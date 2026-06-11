@@ -1,186 +1,127 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C71277CA5;
-	Thu, 11 Jun 2026 18:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCA43CF032
+	for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 23:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781202684; cv=none; b=fjlJY6QhfYzWSD5AxroDz6rk5/O0enTuLnGY+U+drOemoSdYpjM5q2hA+AFbNfYTN9L4zkQuLiuJjF0ebwRKFjQ2OCq0Xl0962jIWpe4XTC8fiesNHWI43XOf3zTZq2AFQQK/I2v5GRO0/hChsJyLfT7H9+2dMuVxYSwbtgmoWU=
+	t=1781219714; cv=none; b=XzBPIJmG9f9JnUCgl9urRIOQm1QR/wdyVR4sG8oLz6Fh45i2RSQAzKgg35SPrmDjn4ceXlNDM3EWio97ofbhWYTBwEeYsOaEyruOcj087twqTgUaWo66VwsIsgR4hUBERYEHKprdXJTJWBz1qjcX34hkDBqpNygecyHrRfY6/Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781202684; c=relaxed/simple;
-	bh=7hFbgC9HnPzMr6oxo3wnpqIPpU8GHodGdbMFTy6e1TU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZ2bPu1UUVxH45Omn7BpNlHM2K7DsONhDMIgv4Dx+r37WgV53V8OR6MXGrOD+1vSPwuiPOyc4ujklv0+O58hFcKKyadnTIkY3iDnR5fMU4CryUuZAGlNuriGu70ARokpArUNqCRLQEDNAD9gJi39rZk0VQoz236MJlS8y/qBxhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n/Jrxrou; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1781219714; c=relaxed/simple;
+	bh=QD69d2OJHwOtuSaX+DoKywFbAEQo0UEq/e3/Fn2QjUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWGiLayTpo9yZdX+Z4VolBAa67wOZDrlmEOx9nsYb22uix2BMV3xcW0KB2Rndc49ParMVgRAhZgXrU4ypIyNSIzGdSGSf1ZRzr0Y4ZdV2W9gzfNpSvJv9WghU17NBBBsjaWRAr82R5+FnlF6kGP7dzBVnTWmnTQYCXmJ9zE7GjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NVtko3so; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n/Jrxrou"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781202683; x=1812738683;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7hFbgC9HnPzMr6oxo3wnpqIPpU8GHodGdbMFTy6e1TU=;
-  b=n/JrxrouDCCmwKE//EE67sldzNYWRJqKgAFI9VAzShLyg9bRm6BdjeU3
-   KXTZUXW+Iu3zwQh5zi2c2BWLzDTcdCh1a4zC0LGZJQkeEH4ObDJ7KrPG2
-   2ebR0ceb1HtTsQa/XvS/bTX59qANMG4cfCWt30aBqrp6JlgzPOBjKr/vG
-   eh5f2Htruma9N6dDfpcGy6wszmAuLxh6I/h9cpFk5M6iCOflUrBq0x69a
-   36+OEbt/7sVpqIRzvIY7FbidUhZCIRB87a5VcBLA/rh4JnbwK3NsEQsiS
-   0TLikE4QADTavHdnRHHtkLGRFKtS7aW179dFCVXmwqgNvOWZYodYO8Fx3
-   Q==;
-X-CSE-ConnectionGUID: Jj81FjmbQMuib/UTgOSwkw==
-X-CSE-MsgGUID: 7iDgGRZaTX+p30aRdF5oYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="93136346"
-X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
-   d="scan'208";a="93136346"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 11:31:21 -0700
-X-CSE-ConnectionGUID: 5eTY9mfpReuvZAQcDYRSJg==
-X-CSE-MsgGUID: MEeJ9TMTQhGOHh6SBSHMRQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
-   d="scan'208";a="276756938"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.123])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 11:31:08 -0700
-Date: Thu, 11 Jun 2026 21:31:04 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Kaitao Cheng <kaitao.cheng@linux.dev>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Sowjanya Komatineni <skomatineni@nvidia.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Laxman Dewangan <ldewangan@nvidia.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Matthew Auld <matthew.auld@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Kaito Cheng <chengkaitao@kylinos.cn>,
-	Muchun Song <muchun.song@linux.dev>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-Message-ID: <air-6P9ZGBbCWtGs@ashevche-desk.local>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
- <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
- <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
- <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
- <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
- <ail8iNvPrJnE7p58@ashevche-desk.local>
- <92683537-8404-47fe-a4ba-160e54870f0b@amd.com>
- <aipx1goKIsk40vrF@ashevche-desk.local>
- <96f9390b-a547-442f-b0a9-99a5ba52c0e1@amd.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NVtko3so"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781219700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ShBjYPEYExajE8ngaKwJEtPoM9APFzTLlxCb37S7wzg=;
+	b=NVtko3soc9++gRfLlIoaBBOFQi0d+fACKKMTE/tCvKwXnD6KettXDw90iH4kYyHTlloMkV
+	Dq3bDtenVXhDxGVOo+guXKNmUzUGkxUOvAeeu0ETMVdZyBdZ6TA1UHu4fh05hjy/Y0/hFO
+	sif6VgxrLQBckRWUx1Jvkn7itQFCQCI=
+From: Usama Arif <usama.arif@linux.dev>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	bsegall@google.com,
+	dietmar.eggemann@arm.com,
+	juri.lelli@redhat.com,
+	kprateek.nayak@amd.com,
+	linux-kernel@vger.kernel.org,
+	mgorman@suse.de,
+	mingo@redhat.com,
+	peterz@infradead.org,
+	rostedt@goodmis.org,
+	vincent.guittot@linaro.org,
+	vschneid@redhat.com
+Cc: shakeel.butt@linux.dev,
+	hannes@cmpxchg.org,
+	riel@surriel.com,
+	kernel-team@meta.com,
+	Usama Arif <usama.arif@linux.dev>,
+	stable@vger.kernel.org
+Subject: [PATCH] block: invalidate cached plug timestamp after task switch
+Date: Thu, 11 Jun 2026 16:14:28 -0700
+Message-ID: <20260611231428.345098-1-usama.arif@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <96f9390b-a547-442f-b0a9-99a5ba52c0e1@amd.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jun 11, 2026 at 10:39:14AM +0200, Christian König wrote:
-> On 6/11/26 10:29, Andy Shevchenko wrote:
-> > On Thu, Jun 11, 2026 at 10:01:25AM +0200, Christian König wrote:
-> >> On 6/10/26 17:02, Andy Shevchenko wrote:
-> >>> On Wed, Jun 10, 2026 at 11:11:34AM +0200, Christian König wrote:
-> >>>> On 6/10/26 10:18, Kaitao Cheng wrote:
-> >>>>> 在 2026/6/10 16:07, Christian König 写道:
+blk_time_get_ns() caches ktime_get_ns() in current->plug->cur_ktime
+and marks the task with PF_BLOCK_TS. That cache is only valid while the
+task keeps running; if the task is switched out, wall-clock time
+advances and the cached value must not be reused when the task runs again.
 
-...
+The existing invalidation covers explicit plug flushes through
+__blk_flush_plug(), and the schedule() / rtmutex paths through
+sched_update_worker(). It does not cover in-kernel preemption paths such
+as preempt_schedule(), preempt_schedule_notrace(), and
+preempt_schedule_irq(), which enter __schedule(SM_PREEMPT) directly and
+return without calling sched_update_worker().
 
-> >>>>> Should we revert to v1, or keep list_for_each_entry() and
-> >>>>> list_for_each_entry_safe() as they are, close this thread, and make no
-> >>>>> changes?
-> >>>>>
-> >>>>> Link to v1:
-> >>>>> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
-> >>>>>
-> >>>>> Or do you have any better suggestions?
-> >>>>
-> >>>> v1 looks perfectly reasonable to me.
-> >>>
-> >>> But why not just hiding that once for all (in case they don't use the temporary
-> >>> iterator)? Easy to automate, robust — everyone is happy?
-> >>
-> >> As far as I can see that is an extremely bad idea.
-> >>
-> >> The distinction between the use cases of 'iterating the list' and 'iterating
-> >> the list while you modify it' is completely intentional.
-> > 
-> > What I meant is to keep the name, just drop the parameter (make it hidden and
-> > being defined inside list_for_each_*_safe() cases).
-> 
-> Ah, sorry I was still thinking the suggestion is to merge
-> list_for_each_entry() and list_for_each_entry_safe().
-> 
-> If the modification is done all at once or in steps doesn't really matter for
-> me as long as the patch can be re-created reproducible.
-> 
-> But I'm wondering if we couldn't improve the name at the same time. The
-> _safe() postfix has caused tons of confusion where especially beginners
-> thought that it is a thread-safe variant, which it clearly isn't.
-> 
-> The _mutable() postfix sounds like a much better description to what happens here.
+As a result, a task preempted while holding a plug with PF_BLOCK_TS set
+can reuse a stale plug->cur_ktime after it is scheduled back in. blk-iocost
+then consumes that stale timestamp through ioc_now(), producing stale vnow
+values for throttle decisions, and through ioc_rqos_done(), inflating
+on-queue time and feeding false missed-QoS samples into vrate
+adjustment.
 
-I see, no objections from my side, but with the new name we don't need to have
-treewide change, the downside that one should undertake this to finish the job,
-otherwise we will have _safe() and _mutable() for a long time.
+Move the schedule-side invalidation to finish_task_switch(), which runs
+for the scheduled-in task after every actual context switch regardless
+of which schedule entry point was used. Keep __blk_flush_plug() as the
+explicit flush/finish-plug invalidation path, and remove only the
+PF_BLOCK_TS handling from sched_update_worker().
 
-> >> See the bool type can be implemented by int as well, but it is just a
-> >> different use case.
-> > 
-> >>>> You should just include some patches in the same patch set to actually use
-> >>>> the new macros.
-> >>>>
-> >>>> If you modify the files under drivers/dma-buf or drivers/gpu/drm/amd to use
-> >>>> the new macro I'm happy to review that.
+Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
+Cc: stable@vger.kernel.org
+Signed-off-by: Usama Arif <usama.arif@linux.dev>
+---
+ kernel/sched/core.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 8b791e9e9f67..bf024ca115ff 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5368,6 +5368,13 @@ static struct rq *finish_task_switch(struct task_struct *prev)
+ 	 */
+ 	kmap_local_sched_in();
+ 
++	/*
++	 * Any cached block-layer timestamp (plug->cur_ktime) is stale now,
++	 * invalidate it.
++	 */
++	if (unlikely(current->flags & PF_BLOCK_TS))
++		blk_plug_invalidate_ts(current);
++
+ 	fire_sched_in_preempt_notifiers(current);
+ 	/*
+ 	 * When switching through a kernel thread, the loop in
+@@ -7290,12 +7297,10 @@ static inline void sched_submit_work(struct task_struct *tsk)
+ 
+ static void sched_update_worker(struct task_struct *tsk)
+ {
+-	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
+-		if (tsk->flags & PF_BLOCK_TS)
+-			blk_plug_invalidate_ts(tsk);
++	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
+ 		if (tsk->flags & PF_WQ_WORKER)
+ 			wq_worker_running(tsk);
+-		else if (tsk->flags & PF_IO_WORKER)
++		else
+ 			io_wq_worker_running(tsk);
+ 	}
+ }
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.53.0-Meta
 
