@@ -1,172 +1,164 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487D738B12A
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 10:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781260609; cv=pass; b=ICFiU60+ulKeOPbtLoTFfy4EkLwd8Ad/5jomn9C1N3HlFu60wfBI7askyFramTcEJOns4yNok2NP56kDwDhGloc3e/jTFXksmxdJ7Up4XV2tiEfNiUfLQAIPpSAInika8vLi4CXCSauMHB/5zwiZZAtNruMxceYz2qfzMKDcQ1o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781260609; c=relaxed/simple;
-	bh=tpqD6dEgKwpDgTt1o9eFgCfJTmaToJVb/2vuyaplCfs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vd5jqBLrLAtOL9GqTunWNrP3h8Qr38+6RzGZdZyesVFnaXzBaD3INsLeFWM7YLu9JOOw0OX3GdlVR8UiknBcf/TGInpUBiDEux4JE3VzMZTj65XcnH/iHzE9PPYgxgi+89fgaDvV1+W6gKoN41ZGOE5dALk2UWNve5AN6J7LYBU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=LzJiviwc; arc=pass smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA092F3C3D
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 11:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781262375; cv=none; b=Ft1qVBmNr6ILcnk2Ql8km6lPPgQW3BYdisyyFIAUjEgQ22WGeJvoRx7paGWzRBjZ0E4QrDEq+onnRyJlrdKrr+aWZkgkDcAHmgFGT5ObMoRGKmyT+rJfNm36Y41CB/9bSjEvkimNGzWUv0WgieKW1ZLSj8EkH/qerSwudiyq/9w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781262375; c=relaxed/simple;
+	bh=a31ONy7dvYGyEt6CcDFCS3l6iPLRau5Kac8mfJDoJ4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dFbzLXrfs0CMk3hCOAdXgWFBcXljV5eR4rQH2kAi6P00jf/NueOcBsH2nCJJJKdopqhe1nhis2eZTn2xr6s2aOOYdog2NEP0oiEbFhp9yq94RTXe5lQtzIPMgZgIAXi4gC2e141zLF74uV6eBUXD9gJjeoEQqOG160sOBBXBiJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NACJrMBd; arc=none smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="LzJiviwc"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-39697a4e16cso7132931fa.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 03:36:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781260605; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lEgEtD8WkesaGYhYFis7/gMHQmStFvCoaU+DScAwNIdRE6OecLsLj4RcqAj3oFGHjy
-         SdOmOtIXDw1BrXezJ5AnhZTfoV/tdDTMPQfYfVDcqvgujJUecf2cmd0lLcL+91+Cout3
-         AU8qMNUNenvAnIh9IEqQ/B05m4cSOdmWCIJHEtyOMj5vQ83YjoZQtDStdX/lGhs7YU0I
-         z4DGTosLT14WK0nvBQKBtikDGtSkqZ81yDXX/T+tgHIHgTsdnccKbzQPoJAuw1WHJDMQ
-         PT09VXL2ynQC4SQQy9FbkDOaGJbFmNJ5m+fqGQO4npax4oQEHFjT/dDXfEUAzf3AB/Ns
-         pTqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=t8/MJrALaz6S8qNbsg31/wcn5U1Sj+Gpvh/chh0VHc4=;
-        fh=yLNc1XidA814+sXQvhZiz4kF9KdVgIGZ2k2PcwTCG54=;
-        b=DSciMHa6RHc167pg3X0gewrgc9D9U8Pg5BJCCdIN+u5XoE8t8HQzpeTvni3a4qhQOL
-         q6skiHd4/UOmtbiCY7UlV0QqlsgzdQLxPklLl9117qXE2iSG4qpoil7qrq1I5B9sk1Y9
-         d8G7pE1ihAC5KwXgTWGxoWOavs24qbFJ5MNY1cbvhGulMpuHDJLND0ITOCf9zAhMN666
-         Lywha1k8jBv9vVKIVtFUsLxhoqeMR9Js7/NASLlFLx8J1d1j+qncBRQT5r4TPMbTauIk
-         81uxmOfJwE2mYZuNFIJPpsyHsOFLpvUMazJXeeY/vTOKKAzbPAzqfjPLuTJi24Yn2EB2
-         LEHg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NACJrMBd"
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-43d133d9a28so356059fac.2
+        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 04:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1781260605; x=1781865405; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t8/MJrALaz6S8qNbsg31/wcn5U1Sj+Gpvh/chh0VHc4=;
-        b=LzJiviwceISAohEOtNC4PCyESDuk7Id7bvpl7o8L4RP6BlHos0fn8TpndiONXXjZgX
-         udRjnpgvScN8U9TUs9hs9vkCVIqUWx8yhOFY448gfw6B075gsvtk0Y7xaCEaEAI7Opek
-         N+TEcWDspniRhHsOa4Ny6+Bop6TjSvRgPXsq9eEUz6QJIN+cziAuatzWBxoYMk5P0mAi
-         0Gh4qFq8eeMQ6l/eZB3pC0iwOjaj9CdAwEuGo67SEVjTbqtpl6uq9GLHPTbLBv5V4F/P
-         sibmLaeaYkD2imXcZLIsGoNdHNUYREBLGc3YXFVYmygnekGFqDJ8fhr95WtEWK+xh0gE
-         KojA==
+        d=gmail.com; s=20251104; t=1781262373; x=1781867173; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1WXsE46dyrXMZ7vtWuSr/UUEHUsjTggx+DaLYudzdb0=;
+        b=NACJrMBd54X4f1Mv8ehjMI/1LkOP9qzhxiPgEvOsxzJdlqoS3gGMJrlgc8q4FIrTg2
+         1h5mseNS8B7FgTd8ElcbM/YtAZ9U3ytBWS8hGvas+rQSNfUUMlE1eb9EcKOdEqR7W988
+         GJgCUtlgzrQYJ6n7ZEaA5Y7STSG8PF4mCjMK8GKp+Mz8V9XOExG0WSdudxIDNpHzTzJm
+         b/UR8KAc9+ArWiwEsWqYAze4/1Db1s1Eumczd/AtnfwyVlzo09XOg9/a7bpLWyfm6HEI
+         COss0EtS/sLhTWrSfH7a1g4rKmDH0+f5E+xrOmk1jFCUCc2yfrhavtOy0rmyqhwtXn4E
+         N7NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781260605; x=1781865405;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=t8/MJrALaz6S8qNbsg31/wcn5U1Sj+Gpvh/chh0VHc4=;
-        b=githnp6RfRRtV58xwgGPv+pPU+XX1DcjH/La4REjnD+cRXPLpjplsTp1tQvDQYcNH3
-         MkQCttBSbjFgt60A1Hbf7sazUkYtG0Mq4hdu2AFv00VGWXFDf46hTc2hK/7Qe9o9eBvK
-         HwkswjRfLixlkuCVpGTdU51oyn7q0LxY8oFYRd2tsGS9l1gg8cRh+uvVGnvKq6pKEMVs
-         3nW1eFUtYa48hoGl1xognbWXuCXBSKrLvJ0rSgWfzawAcwasyq7rZusypKImdryGY+ys
-         DDdrlaaAmpbxup0WmanTMRT6eN8ppPt3yvnk5W5r30gXpq8TztlkjRa6ogp1fDVtK+wH
-         /aNw==
-X-Gm-Message-State: AOJu0YwvNXZYtzb7+O4D1KrgyaYpBwfYVIi0nT6Qb/C0UjlU+UNsrXuo
-	iLvFbuKP9L85nv2eqTU84tx+VKC2Wf8Gv5hsHrBv8kQeRXz2kDllMDjX1ZRx4VhLC+e/cstu0Fl
-	uFeEorzxs89mhc1mtjnjxCa16L9EAW+aa96Nzc2DkiA==
-X-Gm-Gg: Acq92OGsqATit14TQKLxT+7CPMsHSQ4H9vMhlP6c6DTczGqvezQXBa/rTFHGlBNw72F
-	vUzfsnE/4GqkAbWHMmtZB8dkHcwGDPyW8hBdj/BVXs3PeMYWUpvKSuRPYmwaed3idr76PWhfnC6
-	vJrkHlBPNu1eoXHz77WfJWaDWgyPf/jPLjfk7v4yv9r63brafO562ePi4NaVQro2L+QWJbLaY3q
-	eIZN9VfAA3LfnsSJ9TK9jlWMb9c4v5UI6HqY+HiZJByfxZdel+SsdXEewBKMTpPUAZgQINox1mG
-	HYyIcFGagXP7QCKFB7sBHrs3T0aFLLGnaSRzYppqkSNGi0RpZLK9RlZ04XIfIX7wMKHj
-X-Received: by 2002:a05:651c:2114:b0:396:a77d:210d with SMTP id
- 38308e7fff4ca-3992afcb1b9mr7731741fa.7.1781260605428; Fri, 12 Jun 2026
- 03:36:45 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781262373; x=1781867173;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1WXsE46dyrXMZ7vtWuSr/UUEHUsjTggx+DaLYudzdb0=;
+        b=Sx5wb8ynMurg1stCMLlGNcnkCRrM2A1yVn2n8dSw+Pj6zYF6GoiSfzmWfpfMbm5O46
+         A9BN1cqItfyXpBai6n5sAxJliFQBlKEgYd/SpjWASvC8m0O6BpCudkLrWzdWw3S/j4ec
+         nIzta7oiHoyDTnW0Xw8WZpJWxxqfisbj/dn7rvT7/WH1IhxuYfWAvck8A4E5rFH+o5AF
+         rrg0HWc7vGfoqecH6kDj52JICgqcENPaj63SWyN8TMh35D7cmL0i/7Yuo21YyIlYIi8o
+         oVUJpDkxuUBZmAYtB/gNnwmWiSp9+30r5F6RAc7v3zyH6cLd8BUWmjZRn9g7xhUTa9Si
+         wLgg==
+X-Gm-Message-State: AOJu0YyzJM7UOs146Edeq+t/LL0QYZkqvIrcN4mPZ554xLPdwaiSjeHt
+	pnrn68mj23h7/aFFN8575ZzoG7CS6by65RnNidHbHjeuduZiqzkDm52d
+X-Gm-Gg: Acq92OGIxKOoE8L6Z38kkV6wImLqMtExGBAYdRdi62I505nG0tB72ePAmzJbEymbe9K
+	0J8cpV65gOdsvSWLEn92pCYNzPhtZ8c8aVtapBaOqpkftzvkI1uYyGJ8HmWZthq8wNqzqY+60wm
+	dLoo8kEbI+sRqr05lwueDpgAiCfrdWgoX6aSgv8ZiHsWFLDhljSaE9UtAr/WlpUlZdF4pSKHlh3
+	vtiMRXsXcrQ6qenawbqe4Sxzuk16uUClR6GX2Fw6yoH/5jzK1ihifoq/yBpEhO6LZ3n7jBA62V4
+	alzzvA2xk0pKia3ANzASMAITG8C/UA5CdGmEeX0szePhy/HntTVOa7KGga+r+1xNhG1HZUCSkUC
+	uXGY9kQp8Uosj1vXZqTY4jmGLNJveWfdd7ofFhAX49O1YPrBv6LysZSv/DC4UIIRnO/w5fGq+s8
+	k5oQ2SgbEBx9Peksh83uth1EAp1TdZlexnff3aWVoy11Oq+wPW0hgoRxVpXjPdZBpX8EJWt1OwE
+	YENBm+w3hCbTIKNYEGl
+X-Received: by 2002:a05:6870:5d85:b0:43d:3b08:5f92 with SMTP id 586e51a60fabf-4426dcea35bmr1470157fac.13.1781262373159;
+        Fri, 12 Jun 2026 04:06:13 -0700 (PDT)
+Received: from fedora ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4426b394f26sm1562177fac.17.2026.06.12.04.06.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2026 04:06:12 -0700 (PDT)
+Date: Fri, 12 Jun 2026 06:06:06 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH RFC 0/1] block: fix concurrent elevator change failure
+Message-ID: <aivoHk4DE_pkKkDm@fedora>
+References: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
+ <aiqaXfTqCLMu2DwF@fedora>
+ <aivMxPCd305WbBsk@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260505074644.195453-1-haris.iqbal@ionos.com>
- <20260512103424.GR15586@unreal> <CAJpMwyg-6Qxskq2ktuhvf46yD5848J9BYLMPPfBLjg2Uzs=xnw@mail.gmail.com>
- <20260611115902.GO327369@unreal>
-In-Reply-To: <20260611115902.GO327369@unreal>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Fri, 12 Jun 2026 12:36:32 +0200
-X-Gm-Features: AVVi8CcddBB36C8Ot9lu1AJmuGsTsI5ux-b2nD3IzT3SB1V77NCFVDdDUt0L2xE
-Message-ID: <CAJpMwyj2A1ZOAUUd+7KR-RxeMrqgvZd2MqZ2iqjJKXhRXHXY9w@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF RFC PATCH 00/13]
-To: Leon Romanovsky <leon@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, 
-	jgg@ziepe.ca, jinpu.wang@ionos.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aivMxPCd305WbBsk@shinmob>
 
-On Thu, Jun 11, 2026 at 1:59=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> On Wed, May 27, 2026 at 02:44:08PM +0200, Haris Iqbal wrote:
-> > On Tue, May 12, 2026 at 12:34=E2=80=AFPM Leon Romanovsky <leon@kernel.o=
-rg> wrote:
-> > >
-> > > On Tue, May 05, 2026 at 09:46:12AM +0200, Md Haris Iqbal wrote:
-> > > > Following a conversation with Bart yesterday, I am sending the RMR+=
-BRMR
-> > > > code through patch for easier review.
-> > > >
-> > > > The patches apply over the for-next branch of the block tree over c=
-ommit
-> > > > 07dfa981ca3
-> > > >
-> > > > For context,
-> > > > RMR (Reliable Multicast over RTRS) is a kernel module that provides
-> > > > active-active block-level replication over RDMA. It guarantees deli=
-very
-> > > > of IO to a group of storage nodes and handles resynchronization of =
-data
-> > > > directly between storage nodes without involving the compute client=
-.
-> > > >
-> > > > BRMR (Block device over RMR) sits on top of RMR and exposes a stand=
-ard
-> > > > Linux block device (/dev/brmrX) backed by an RMR pool. Together, RM=
-R and
-> > > > BRMR provide a single-hop replication and resynchronization solutio=
-n for
-> > > > RDMA-connected storage clusters.
-> > > >
-> > > > My session is on Wednesday, at 12 in the storage room (Istanbul).
-> > >
-> > > To summarize the discussion:
-> > >
-> > > 1. Move as much logic as possible into the block layer; RDMA should s=
-erve
-> > >    strictly as a transport.
-> > > 2. Identify another in=E2=80=91kernel user of this functionality, and=
- add support for
-> > >    it if required. At least accommodate potential users elsewhere in =
-the
-> > >    kernel.
-> >
-> > Thanks for the summary Leon.
-> >
-> > The main logic which handles multicast/replication legs, missed I/O
-> > tracking, re-synchronization, etc are the core parts of RMR.
-> > If we move those to a separate module, there won't be much left in
-> > RMR. RMR already uses RTRS from the RDMA subsystem as transport.
-> >
-> > Having said that, I am not against moving RMR out of the RDMA layer.
-> > It can serve as a reliable replication service/library for any other
-> > user in the kernel to use.
-> > Which subsystem (block or something else) would be a better fit then,
-> > can be discussed.
-> >
-> > PS: Would this be a good candidate for a session/discussion in the upco=
-ming LPC?
->
-> Probably yes.
->
-> Thanks
+On Fri, Jun 12, 2026 at 06:47:50PM +0900, Shin'ichiro Kawasaki wrote:
+> On Jun 11, 2026 / 06:22, Ming Lei wrote:
+> > Hi Shin'ichiro,
+> 
+> Hi Ming, thanks for the comments.
+> 
+> > 
+> > On Thu, Jun 11, 2026 at 04:41:59PM +0900, Shin'ichiro Kawasaki wrote:
+> > > I observed that the blktests test case block/005 hangs on a specific
+> > > server hardware using a specific HDD as a block device. During the test
+> > > case run, the kernel reported a KASAN null-ptr-deref (and other memory
+> > > corruption symptoms) [2]. This failure looked sporadic and hardware-
+> > > dependent.
+> > > 
+> > > From the kernel message, I noticed that udev-worker wrote to the
+> > > queue/scheduler sysfs attribute to change the IO scheduler, or elevator.
+> > > The test case block/005 also wrote to the same sysfs attribute, which
+> > 
+> > sysfs write is supposed to be serialized...
+> 
+> I checked the sysfs write handler elv_iosched_store() in block/elevator.c.
+> I found elevator_change() call is guarded with the rw_semaphore
+> "set->update_nr_hwq_lock", but the guard is not the writer lock but the reader
+> lock. This does not serialize the sysfs writes.
 
-Thanks Leon. I'll submit the abstract through the portal.
-Do you think the topic is better suited towards Refereed track or Kernel Su=
-mmit?
+Please see kernfs_fop_write_iter(), in which mutex is held before calling
+->write().
 
->
-> >
-> > >
-> > > Thanks
+> 
+> I tried the patch below to replace the reader lock with the writer lock. With
+> a quick trial, it looks working. The kernel message is no longer observed and
+> the new test case does not cause hangs. I will do further testing to confirm
+> that this change does not trigger other new lockdep WARNs. Assuming it does not
+> have such side effects, I hope this fix approach is acceptable. It doesn't add
+> the new lock, so I think it's the better.
+> 
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 3bcd37c2aa34..b03185a217ff 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+>  	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
+>  	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
+>  	 */
+> -	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
+> +	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
+>  		ret = -EBUSY;
+>  		goto out;
+>  	}
+> @@ -824,7 +824,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+>  	} else {
+>  		ret = -ENOENT;
+>  	}
+> -	up_read(&set->update_nr_hwq_lock);
+> +	up_write(&set->update_nr_hwq_lock);
+>  
+>  out:
+>  	if (ctx.type)
+> 
+> [...]
+> 
+> > blk_mq_sched_reg_debugfs already includes debugfs lock, so I feel the proper
+> > fix could be check & avoid the null-ptr-deref.
+> 
+> Actually, null-ptr-deref is one of the failure symptoms. KASAN slab-user-after
+> free is also observed [3]. Then I'm guessing adding null checks may not be
+> enough.
+> 
+> > Adding new lock should be the last straw usually, especially this one is
+> > depended by queue freeze.
+> 
+> Got it, thanks.
+> 
+> 
+> [3] KASAN slab-use-after-free
+
+Then you need to figure out the exact slab type and check if the pointer is cleared
+during free.
+
+Anyway, there is guard already, not see reason to add new lock for covering
+it.
+
+
+Thanks,
+Ming
