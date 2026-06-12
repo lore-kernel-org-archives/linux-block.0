@@ -1,164 +1,211 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA092F3C3D
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 11:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CF93E92BB
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 11:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781262375; cv=none; b=Ft1qVBmNr6ILcnk2Ql8km6lPPgQW3BYdisyyFIAUjEgQ22WGeJvoRx7paGWzRBjZ0E4QrDEq+onnRyJlrdKrr+aWZkgkDcAHmgFGT5ObMoRGKmyT+rJfNm36Y41CB/9bSjEvkimNGzWUv0WgieKW1ZLSj8EkH/qerSwudiyq/9w=
+	t=1781264716; cv=none; b=u9tJuIaGPy8cL3mgIpe9/v75cGgJYkqwXj5/58n9SO9fXytdVr5ItZoAQUSOshqBzyEUUnJ8o/8QoL/ADWWlQxPrU86LulQHY5uV1TPxXXzJPdVC/YwySBv2sLV1ioiS9s0s3/lGqJZXJYOzjeTdjnHazlUJtJN3Gccuj6jF2m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781262375; c=relaxed/simple;
-	bh=a31ONy7dvYGyEt6CcDFCS3l6iPLRau5Kac8mfJDoJ4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFbzLXrfs0CMk3hCOAdXgWFBcXljV5eR4rQH2kAi6P00jf/NueOcBsH2nCJJJKdopqhe1nhis2eZTn2xr6s2aOOYdog2NEP0oiEbFhp9yq94RTXe5lQtzIPMgZgIAXi4gC2e141zLF74uV6eBUXD9gJjeoEQqOG160sOBBXBiJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NACJrMBd; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781264716; c=relaxed/simple;
+	bh=ZQPyJbBW0QFkTiDLhiIaP1AiN0IFcSytjsG8GG3//aI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gkdf9LkSoUEx9TphYIroII1co+zw10k6ZH3C2yeOcr2APzVo8Xq0FpKJJEINH7HhSBcS428mDdE/DheezEQhcz1l9Y+HbGyEKAu6V4zDLdTuzatGUqy/IywdurhFEfZoqTH6612cS7PpFwSd6niCWNqc+dXV1oNS9KVQlfSok2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aHOFHuQg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NACJrMBd"
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-43d133d9a28so356059fac.2
-        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 04:06:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781262373; x=1781867173; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1WXsE46dyrXMZ7vtWuSr/UUEHUsjTggx+DaLYudzdb0=;
-        b=NACJrMBd54X4f1Mv8ehjMI/1LkOP9qzhxiPgEvOsxzJdlqoS3gGMJrlgc8q4FIrTg2
-         1h5mseNS8B7FgTd8ElcbM/YtAZ9U3ytBWS8hGvas+rQSNfUUMlE1eb9EcKOdEqR7W988
-         GJgCUtlgzrQYJ6n7ZEaA5Y7STSG8PF4mCjMK8GKp+Mz8V9XOExG0WSdudxIDNpHzTzJm
-         b/UR8KAc9+ArWiwEsWqYAze4/1Db1s1Eumczd/AtnfwyVlzo09XOg9/a7bpLWyfm6HEI
-         COss0EtS/sLhTWrSfH7a1g4rKmDH0+f5E+xrOmk1jFCUCc2yfrhavtOy0rmyqhwtXn4E
-         N7NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781262373; x=1781867173;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1WXsE46dyrXMZ7vtWuSr/UUEHUsjTggx+DaLYudzdb0=;
-        b=Sx5wb8ynMurg1stCMLlGNcnkCRrM2A1yVn2n8dSw+Pj6zYF6GoiSfzmWfpfMbm5O46
-         A9BN1cqItfyXpBai6n5sAxJliFQBlKEgYd/SpjWASvC8m0O6BpCudkLrWzdWw3S/j4ec
-         nIzta7oiHoyDTnW0Xw8WZpJWxxqfisbj/dn7rvT7/WH1IhxuYfWAvck8A4E5rFH+o5AF
-         rrg0HWc7vGfoqecH6kDj52JICgqcENPaj63SWyN8TMh35D7cmL0i/7Yuo21YyIlYIi8o
-         oVUJpDkxuUBZmAYtB/gNnwmWiSp9+30r5F6RAc7v3zyH6cLd8BUWmjZRn9g7xhUTa9Si
-         wLgg==
-X-Gm-Message-State: AOJu0YyzJM7UOs146Edeq+t/LL0QYZkqvIrcN4mPZ554xLPdwaiSjeHt
-	pnrn68mj23h7/aFFN8575ZzoG7CS6by65RnNidHbHjeuduZiqzkDm52d
-X-Gm-Gg: Acq92OGIxKOoE8L6Z38kkV6wImLqMtExGBAYdRdi62I505nG0tB72ePAmzJbEymbe9K
-	0J8cpV65gOdsvSWLEn92pCYNzPhtZ8c8aVtapBaOqpkftzvkI1uYyGJ8HmWZthq8wNqzqY+60wm
-	dLoo8kEbI+sRqr05lwueDpgAiCfrdWgoX6aSgv8ZiHsWFLDhljSaE9UtAr/WlpUlZdF4pSKHlh3
-	vtiMRXsXcrQ6qenawbqe4Sxzuk16uUClR6GX2Fw6yoH/5jzK1ihifoq/yBpEhO6LZ3n7jBA62V4
-	alzzvA2xk0pKia3ANzASMAITG8C/UA5CdGmEeX0szePhy/HntTVOa7KGga+r+1xNhG1HZUCSkUC
-	uXGY9kQp8Uosj1vXZqTY4jmGLNJveWfdd7ofFhAX49O1YPrBv6LysZSv/DC4UIIRnO/w5fGq+s8
-	k5oQ2SgbEBx9Peksh83uth1EAp1TdZlexnff3aWVoy11Oq+wPW0hgoRxVpXjPdZBpX8EJWt1OwE
-	YENBm+w3hCbTIKNYEGl
-X-Received: by 2002:a05:6870:5d85:b0:43d:3b08:5f92 with SMTP id 586e51a60fabf-4426dcea35bmr1470157fac.13.1781262373159;
-        Fri, 12 Jun 2026 04:06:13 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4426b394f26sm1562177fac.17.2026.06.12.04.06.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 04:06:12 -0700 (PDT)
-Date: Fri, 12 Jun 2026 06:06:06 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH RFC 0/1] block: fix concurrent elevator change failure
-Message-ID: <aivoHk4DE_pkKkDm@fedora>
-References: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
- <aiqaXfTqCLMu2DwF@fedora>
- <aivMxPCd305WbBsk@shinmob>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aHOFHuQg"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65BLOqk6677689;
+	Fri, 12 Jun 2026 11:45:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=VDnsJV
+	ffIDVZyF1MDB9FzH97BgVo4gcj8+G+yH/ZGXg=; b=aHOFHuQgr/JqH/DKBmVFM5
+	1eQDkNgRRYpT0WMpnu9blKmFmWsJTLxiZKQoITreF5Gk8SddYG7g/evMBU2izL41
+	HYG5bxTyni4eFOwcAsAvPEJSEAuGC23R9lo08I6c0VDjjLAwqOA2x8ZK0fyGsGdI
+	xlYl0+QvjLD4DsiQgvmvsHABIFHzW00cO9L9ytaxF8juUjJ+x+lekOQjOWJByN8+
+	KmTWBfrAS/u0AqhNPh7oXDwUTqdkIPT/Ofhhy5WA9RYZr4pztUX2g30EjC3roBvZ
+	iBqAiKsXg2r99L6mawpr796eQ+/hjTjJZA9ldlr7q8O+9LsLoSlgBP8E0xj5QyzQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4eqe8arcpt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jun 2026 11:45:12 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65CBYvDI010924;
+	Fri, 12 Jun 2026 11:45:11 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4eqe09ymdb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jun 2026 11:45:11 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65CBjBcC63504772
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Jun 2026 11:45:11 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0AAAD58060;
+	Fri, 12 Jun 2026 11:45:11 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 621B85805C;
+	Fri, 12 Jun 2026 11:45:09 +0000 (GMT)
+Received: from [9.43.60.77] (unknown [9.43.60.77])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 12 Jun 2026 11:45:08 +0000 (GMT)
+Message-ID: <3db036fe-747f-44eb-93c3-595350278297@linux.ibm.com>
+Date: Fri, 12 Jun 2026 17:15:07 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aivMxPCd305WbBsk@shinmob>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 0/1] block: fix concurrent elevator change failure
+To: Ming Lei <tom.leiming@gmail.com>,
+        "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
+ <aiqaXfTqCLMu2DwF@fedora> <aivMxPCd305WbBsk@shinmob>
+ <aivoHk4DE_pkKkDm@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aivoHk4DE_pkKkDm@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: N_ORbv4FgwFbJUhemhUbWFQ_89uq7TX4
+X-Authority-Analysis: v=2.4 cv=TdKmcxQh c=1 sm=1 tr=0 ts=6a2bf148 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=-5OKdyvLZ9Tln4FY6lIA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDEwNiBTYWx0ZWRfX9VhnAwBMrbO0
+ A2PenQIf/VnrS3L8Jvorq7LmbGnBTWviZvJ0twovZchCHTl22cHm8/2WNwpFKiwzqB1ZSN4gxyD
+ RnLOS7I+yluKN411AKDXFFYbemvN+vFkuE3rcVGuP8XspT5sYcO9x/hS85jr9Bsz7ZSzVnXssmC
+ wJtQEA54bJaD4BHlGCmBuFrVNQrGLqOgAs6r4SscKE6m5k93AHxwLSMMWx6bcbPpv0NVYxl0d7M
+ Io4bX41RQIYiN2NgHgY+ARWAxj+M2zzHgJBN/Yr87+Mt4Rrjm4W2u9AXTQ7zkiLyDwGmxWwoYlz
+ XfWMMr9N+fY5k17uxmz0RzgEw2BdkePTGjxMo0wXwLzmk/O7WKG3b1V22B6OHTmrblU8Y35HMDm
+ jxP801PV1b5sTUSOsbl3q1+vKpHzunY2y/T8WTi5+5Z1Y6uaP9T80lsvPG5iw2B35aUVxNX3/e5
+ D5EK1jqetYMs4/HQ/5A==
+X-Proofpoint-GUID: IPzIJf5Det9ltkEWryYRIMi9tHqdaETt
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDEwNiBTYWx0ZWRfX+SmE0o9nbrsy
+ 4/EK+2+SCG1rX+X+4U3rELdc/UzbokQljUYegsjTRAS3xoZMCe177nJdY+5scIOIFxlUrQwCZaV
+ JcwfufQyzVRvdv61FmZoDJrcXInj3OM=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-12_01,2026-06-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 malwarescore=0 clxscore=1015 impostorscore=0 adultscore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606120106
 
-On Fri, Jun 12, 2026 at 06:47:50PM +0900, Shin'ichiro Kawasaki wrote:
-> On Jun 11, 2026 / 06:22, Ming Lei wrote:
-> > Hi Shin'ichiro,
+On 6/12/26 4:36 PM, Ming Lei wrote:
+> On Fri, Jun 12, 2026 at 06:47:50PM +0900, Shin'ichiro Kawasaki wrote:
+>> On Jun 11, 2026 / 06:22, Ming Lei wrote:
+>>> Hi Shin'ichiro,
+>>
+>> Hi Ming, thanks for the comments.
+>>
+>>>
+>>> On Thu, Jun 11, 2026 at 04:41:59PM +0900, Shin'ichiro Kawasaki wrote:
+>>>> I observed that the blktests test case block/005 hangs on a specific
+>>>> server hardware using a specific HDD as a block device. During the test
+>>>> case run, the kernel reported a KASAN null-ptr-deref (and other memory
+>>>> corruption symptoms) [2]. This failure looked sporadic and hardware-
+>>>> dependent.
+>>>>
+>>>>  From the kernel message, I noticed that udev-worker wrote to the
+>>>> queue/scheduler sysfs attribute to change the IO scheduler, or elevator.
+>>>> The test case block/005 also wrote to the same sysfs attribute, which
+>>>
+>>> sysfs write is supposed to be serialized...
+>>
+>> I checked the sysfs write handler elv_iosched_store() in block/elevator.c.
+>> I found elevator_change() call is guarded with the rw_semaphore
+>> "set->update_nr_hwq_lock", but the guard is not the writer lock but the reader
+>> lock. This does not serialize the sysfs writes.
 > 
-> Hi Ming, thanks for the comments.
+> Please see kernfs_fop_write_iter(), in which mutex is held before calling
+> ->write().
 > 
-> > 
-> > On Thu, Jun 11, 2026 at 04:41:59PM +0900, Shin'ichiro Kawasaki wrote:
-> > > I observed that the blktests test case block/005 hangs on a specific
-> > > server hardware using a specific HDD as a block device. During the test
-> > > case run, the kernel reported a KASAN null-ptr-deref (and other memory
-> > > corruption symptoms) [2]. This failure looked sporadic and hardware-
-> > > dependent.
-> > > 
-> > > From the kernel message, I noticed that udev-worker wrote to the
-> > > queue/scheduler sysfs attribute to change the IO scheduler, or elevator.
-> > > The test case block/005 also wrote to the same sysfs attribute, which
-> > 
-> > sysfs write is supposed to be serialized...
-> 
-> I checked the sysfs write handler elv_iosched_store() in block/elevator.c.
-> I found elevator_change() call is guarded with the rw_semaphore
-> "set->update_nr_hwq_lock", but the guard is not the writer lock but the reader
-> lock. This does not serialize the sysfs writes.
+I think you're referring to @of->mutex here; however of->mutex is per struct
+kernfs_open_file, which is associated with an open instance of the sysfs file.
+The important point is that two separate opens can have different kernfs_open_file
+instances and therefore different mutexes. Thus, concurrent write to same sysfs
+attribute from two different processes may still be possible.
 
-Please see kernfs_fop_write_iter(), in which mutex is held before calling
-->write().
 
+>>
+>> I tried the patch below to replace the reader lock with the writer lock. With
+>> a quick trial, it looks working. The kernel message is no longer observed and
+>> the new test case does not cause hangs. I will do further testing to confirm
+>> that this change does not trigger other new lockdep WARNs. Assuming it does not
+>> have such side effects, I hope this fix approach is acceptable. It doesn't add
+>> the new lock, so I think it's the better.
+>>
+>> diff --git a/block/elevator.c b/block/elevator.c
+>> index 3bcd37c2aa34..b03185a217ff 100644
+>> --- a/block/elevator.c
+>> +++ b/block/elevator.c
+>> @@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+>>   	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
+>>   	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
+>>   	 */
+>> -	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
+>> +	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
+>>   		ret = -EBUSY;
+>>   		goto out;
+>>   	}
+>> @@ -824,7 +824,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+>>   	} else {
+>>   		ret = -ENOENT;
+>>   	}
+>> -	up_read(&set->update_nr_hwq_lock);
+>> +	up_write(&set->update_nr_hwq_lock);
+>>   
+>>   out:
+>>   	if (ctx.type)
+>>
+>> [...]
+>>
+>>> blk_mq_sched_reg_debugfs already includes debugfs lock, so I feel the proper
+>>> fix could be check & avoid the null-ptr-deref.
+>>
+>> Actually, null-ptr-deref is one of the failure symptoms. KASAN slab-user-after
+>> free is also observed [3]. Then I'm guessing adding null checks may not be
+>> enough.
+>>
+>>> Adding new lock should be the last straw usually, especially this one is
+>>> depended by queue freeze.
+>>
+>> Got it, thanks.
+>>
+>>
+>> [3] KASAN slab-use-after-free
 > 
-> I tried the patch below to replace the reader lock with the writer lock. With
-> a quick trial, it looks working. The kernel message is no longer observed and
-> the new test case does not cause hangs. I will do further testing to confirm
-> that this change does not trigger other new lockdep WARNs. Assuming it does not
-> have such side effects, I hope this fix approach is acceptable. It doesn't add
-> the new lock, so I think it's the better.
+> Then you need to figure out the exact slab type and check if the pointer is cleared
+> during free.
 > 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 3bcd37c2aa34..b03185a217ff 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
->  	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
->  	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
->  	 */
-> -	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
-> +	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
->  		ret = -EBUSY;
->  		goto out;
->  	}
-> @@ -824,7 +824,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
->  	} else {
->  		ret = -ENOENT;
->  	}
-> -	up_read(&set->update_nr_hwq_lock);
-> +	up_write(&set->update_nr_hwq_lock);
->  
->  out:
->  	if (ctx.type)
+> Anyway, there is guard already, not see reason to add new lock for covering
+> it.
 > 
-> [...]
-> 
-> > blk_mq_sched_reg_debugfs already includes debugfs lock, so I feel the proper
-> > fix could be check & avoid the null-ptr-deref.
-> 
-> Actually, null-ptr-deref is one of the failure symptoms. KASAN slab-user-after
-> free is also observed [3]. Then I'm guessing adding null checks may not be
-> enough.
-> 
-> > Adding new lock should be the last straw usually, especially this one is
-> > depended by queue freeze.
-> 
-> Got it, thanks.
-> 
-> 
-> [3] KASAN slab-use-after-free
+Regarding the observed failure, my understanding is that blk_mq_debugfs_register_sched()
+and blk_mq_debugfs_register_sched_hctx() access q->elevator without holding q->elevator_lock.
+If multiple scheduler update paths run concurrently, one path can replace and free the
+elevator while another path is still using it, which would explain the observed KASAN
+use-after-free and NULL pointer dereference reports.
 
-Then you need to figure out the exact slab type and check if the pointer is cleared
-during free.
+With the proposed change, upgrading update_nr_hwq_lock from a reader lock to a writer
+lock in elv_iosched_store() would serialize concurrent scheduler updates and therefore
+prevent multiple elevator switch operations from running at the same time.
 
-Anyway, there is guard already, not see reason to add new lock for covering
-it.
-
+The another way to fix this might be to acquire q->elevator_lock in blk_mq_sched_reg_debugfs()
+and thus serialize access to q->elevator in blk_mq_debugfs_register_sched() and
+blk_mq_debugfs_register_sched_hctx().
 
 Thanks,
-Ming
+--Nilay
