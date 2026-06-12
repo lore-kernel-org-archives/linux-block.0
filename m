@@ -1,33 +1,50 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3311C3AC0C6;
-	Fri, 12 Jun 2026 05:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E99028C2A1;
+	Fri, 12 Jun 2026 07:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781242120; cv=none; b=uQz7uZ7gtyudXlPZLzxR/5Q+8LHs0lL2V8P7rYMDCS3UBl4ls1vCKimhvJAqdvO8Dx6IpegM3NSzGJgO5bay3KieSJ/H7ZRTauDHN5wDf5vsVHmMRiR39yDPLaIjA+R9a+pq4kfSLH+RuzRt/NXn4VK01YLn8nPunIbGqbNYz50=
+	t=1781248881; cv=none; b=i6ljCpPlMxoxcZfion6fJPooFPFQotnGmhFCxHklFdPq51qLE1zkMQZxjG7OY7KUpWRaFuM2ObYxhHRFUYdFs6FTApHBkNmLR1lwifWm/oZtnXLTRszRt/j2urUXsHN+q51oChX2jPn3M2RfzR3rvKydELLfFYfKlt5irDxzPSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781242120; c=relaxed/simple;
-	bh=JspGtTuIqHmF9JAX3VdnalFZSZ3Mib4Q1S3WyAzcKMY=;
+	s=arc-20240116; t=1781248881; c=relaxed/simple;
+	bh=BtKo2A0QgcltJ9m1dlsBtgJJWnQ7TNgQwxMy3bgVK2c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tF5JxYjN590OQbHKrGdY04l+DfSVB/EVsq7nGqQ4Cgzkpv3027V1RTH+e4kY3exOuGU1uwi2X/d7KNF3EV8gzfM9lpvYdETqFEcbti2/mKujyu54j+I9FV8Ra4Zd3OGbmmTsBQg9x9gQiOaDB8s+Ul1pdDKJd11UE1uE9aA+2VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 19C5468C4E; Fri, 12 Jun 2026 07:28:32 +0200 (CEST)
-Date: Fri, 12 Jun 2026 07:28:31 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Carlos Maiolino <cem@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	brauner@kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] iomap: enforce DIO alignment check in iomap
-Message-ID: <20260612052831.GA9010@lst.de>
-References: <20260610145218.141369-1-cem@kernel.org> <20260611055744.GA18538@lst.de> <aiqBvF93P4NjfaDR@nidhogg.toxiclabs.cc> <aiqwy5DfHI79KXuZ@kbusch-mbp> <20260611133833.GA14645@lst.de> <airX6BmMQ14Rvjcb@nidhogg.toxiclabs.cc>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ItUrgdsxLP9FGhA9PhiT80Vr5TdDIKS0klG8NY0MIHWpiGtWNONKtGwZHtTHko8rBPIiK5hTnU4WYa5TaIZHsHiob2PG05Z5xxdzCWP/0G1VK0jNZqyBDU/aw7W+nEzRgK+yWvmWYQscG5+mXJB9a1geYLWgdBo5kf2gd0j3lPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PB0Ba+SN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PB0Ba+SN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=h8ENVMjf1uMEpzt8YW7jdaVX+LrwHEufa96AeJ7JWAU=; b=PB0Ba+SNulcjALMzbFBU5gV8yu
+	zCj1DoXGcXVadqtlirOy6AlcxtbHD2aEfbtF3IdTchQeCTzVSlEqyAm5Vg1Frklub/PCAtyRRM6Zq
+	cTK02m2j2pWwEqcTmk2o7z1PAyUtg58yc9uatuk60bJ19mGaKxNBcF7lMS4WzBofVSjCVtqDOKUdj
+	NZw5jmV7CpWlJsTySLHDCB1xO3J6fCVoytfns8QxRldONQr4BCNgW39WvEA7gHDVTLHgeVoDWeYKx
+	amPkP1zRB7cglqNnUo9XcWhpuw1YocwMJtHyDg88yJWu2xaM+fn+fgK8IIjZgaCJXsgBR02ziM3lm
+	8IMW5AUg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wXwCS-00000003KRb-0FxV;
+	Fri, 12 Jun 2026 07:21:08 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 551DB300673; Fri, 12 Jun 2026 09:21:07 +0200 (CEST)
+Date: Fri, 12 Jun 2026 09:21:07 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, bsegall@google.com,
+	dietmar.eggemann@arm.com, juri.lelli@redhat.com,
+	kprateek.nayak@amd.com, linux-kernel@vger.kernel.org,
+	mgorman@suse.de, mingo@redhat.com, rostedt@goodmis.org,
+	vincent.guittot@linaro.org, vschneid@redhat.com,
+	shakeel.butt@linux.dev, hannes@cmpxchg.org, riel@surriel.com,
+	kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH] block: invalidate cached plug timestamp after task switch
+Message-ID: <20260612072107.GR187714@noisy.programming.kicks-ass.net>
+References: <20260611231428.345098-1-usama.arif@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,35 +53,56 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <airX6BmMQ14Rvjcb@nidhogg.toxiclabs.cc>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20260611231428.345098-1-usama.arif@linux.dev>
 
-On Thu, Jun 11, 2026 at 05:47:07PM +0200, Carlos Maiolino wrote:
-> On Thu, Jun 11, 2026 at 03:38:33PM +0200, Christoph Hellwig wrote:
-> > On Thu, Jun 11, 2026 at 06:57:47AM -0600, Keith Busch wrote:
-> > > It's entirely possible a device supports byte aligned addresses. The
-> > > block layer just doesn't let a driver report that. So either it really
-> > > was successful because you found a bug that skips the alignment checks,
-> > > or your device silently corrupted your payload.
+On Thu, Jun 11, 2026 at 04:14:28PM -0700, Usama Arif wrote:
+> blk_time_get_ns() caches ktime_get_ns() in current->plug->cur_ktime
+> and marks the task with PF_BLOCK_TS. That cache is only valid while the
+> task keeps running; if the task is switched out, wall-clock time
+> advances and the cached value must not be reused when the task runs again.
 > 
-> I tried this on different hardware, I find it hard to say all those
-> devices were corrupting the payload.
-
-I think in the other thread we agreed that we are currently missing
-the alignment check for fast-path bios not hitting the splitting code,
-so maybe that is something you see.  Additionally we're missing the
-checks for purely bio based drivers not calling the splitting helper
-at all, but I don't think that applies here.
-
-> > > Anyway, my earlier suggestion should work. Ming thinks it may go to far,
-> > > though, in not taking the optimization when it was possible. So here's
-> > > an alternative suggestion that should get things working as expected:
-> > 
-> > The fix below looks like it is addressing a real bug.  I'm not sure if
-> > Carlos is hitting it, but we were missing the alignment checks for
-> > single-bvec fast path bios so far indeed.
+> The existing invalidation covers explicit plug flushes through
+> __blk_flush_plug(), and the schedule() / rtmutex paths through
+> sched_update_worker(). It does not cover in-kernel preemption paths such
+> as preempt_schedule(), preempt_schedule_notrace(), and
+> preempt_schedule_irq(), which enter __schedule(SM_PREEMPT) directly and
+> return without calling sched_update_worker().
 > 
-> You left context out so I'm assuming by the fix you meant Keith's patch.
+> As a result, a task preempted while holding a plug with PF_BLOCK_TS set
+> can reuse a stale plug->cur_ktime after it is scheduled back in. blk-iocost
+> then consumes that stale timestamp through ioc_now(), producing stale vnow
+> values for throttle decisions, and through ioc_rqos_done(), inflating
+> on-queue time and feeding false missed-QoS samples into vrate
+> adjustment.
+> 
+> Move the schedule-side invalidation to finish_task_switch(), which runs
+> for the scheduled-in task after every actual context switch regardless
+> of which schedule entry point was used. Keep __blk_flush_plug() as the
+> explicit flush/finish-plug invalidation path, and remove only the
+> PF_BLOCK_TS handling from sched_update_worker().
+> 
+> Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+> ---
+>  kernel/sched/core.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index 8b791e9e9f67..bf024ca115ff 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -5368,6 +5368,13 @@ static struct rq *finish_task_switch(struct task_struct *prev)
+>  	 */
+>  	kmap_local_sched_in();
+>  
+> +	/*
+> +	 * Any cached block-layer timestamp (plug->cur_ktime) is stale now,
+> +	 * invalidate it.
+> +	 */
+> +	if (unlikely(current->flags & PF_BLOCK_TS))
+> +		blk_plug_invalidate_ts(current);
 
-Yes.
-
+Can you make that just blk_plug_invalidate_ts() and move the branch into
+the function itself, which is already inline anyway (but perhaps upgrade
+it to __always_inline).
