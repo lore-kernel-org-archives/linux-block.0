@@ -1,151 +1,70 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B7639A4A7
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 05:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3311C3AC0C6;
+	Fri, 12 Jun 2026 05:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781241870; cv=none; b=AKrXBMdGGdQH7KyrZL9GE38eFvsJ+0uTy7H9biW68g09p5xfXWcHtBqpyfQqEjMGfoobpgZNT0p5Sjx5o+HunyvpTyntDRmSLyPfHbK/Ok4Kk2DNnT5l+/44WdN7aOr5uKSABwYpeGNsP0I11edRcd+Eofo+Zn56OYupStuq82A=
+	t=1781242120; cv=none; b=uQz7uZ7gtyudXlPZLzxR/5Q+8LHs0lL2V8P7rYMDCS3UBl4ls1vCKimhvJAqdvO8Dx6IpegM3NSzGJgO5bay3KieSJ/H7ZRTauDHN5wDf5vsVHmMRiR39yDPLaIjA+R9a+pq4kfSLH+RuzRt/NXn4VK01YLn8nPunIbGqbNYz50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781241870; c=relaxed/simple;
-	bh=oBRQIp5mD+KYwRJ0IxD247fQdd97JK+yVjvu6IUmu4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=NthDQNDW7U9rwT2/ZBkMbF3NZwuvx9gwwOUopRvekIW+SqoXANEcLTJXZtuEXYWb59pYuxPbxaok5tc4qbJWJEU7yo90URLVdFuw0N15/3fLqejZLGVtAycSUMm3KHSdnFN19mXdrji3cNV0STftKAux/oS8nf+ssbwj/z2OTow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VHDqTq9I; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VHDqTq9I"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490b211ee6aso3522355e9.3
-        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 22:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1781241868; x=1781846668; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9mY8Ko1A+P6AJEypWSmExtdmu6Mefh9vM6dtIhppSYs=;
-        b=VHDqTq9IVXGDHXipbwIh1Zst3XocX0THTtSAW21C5r8Ay3Is+S3LnaXRKHuwnha6sw
-         BadJTHKu7gSHqYSmq6f72XOgyhRrzkxVZ4z1+KVIzfDPoqDiCgBBlTn1Kop2QFYADxCQ
-         90OchwTYC1zeOSkbS8PrB/qxdeQlfcZAnN8jx6I5GkOftVHSXlzbQoTxVfKBCpYOM+Bz
-         GSzK60dkUQGU8m8TN0UNthgt4JFPpz5YYpgeUWdU83bjP6O39q8nGHNwevA9oI/ArAvr
-         fmXmFX+DYEq0Kevs/KrB4e1c0dJlVy1uOCOqwVx+uCtwrcMQDFPLxYw5+l3gYQ+8vb/t
-         kcUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781241868; x=1781846668;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9mY8Ko1A+P6AJEypWSmExtdmu6Mefh9vM6dtIhppSYs=;
-        b=X9wBZPfC+G3O9TjpOvpp/ql7rrNkMt4kr/YUrYDYhuttAM5hAmpqSC8FAwtOuwrXNt
-         enHbFNrqHKrykA2C4B3LVcIthNSMrnXYyzzS7Q5K78e1qaNX8bqKsdYaorz3RtavSc4T
-         Ey8sQd8yhIjNGtKdVcPPaNUwk5J2fC9ZdPBbGdqkQ++uiFN70W/8yN8/SSvbgohGiuSs
-         zSDyJo1pH9kgvusJvUa5gxh4oUVpvIvwYYGAMfo/zdT3h3NvJu3qWoBgWvkA1mx12Chb
-         W7/vrmsyhLu8s+aJTWpfRDCqIoRv3yVStBtxdPAyKBsFLC8ZA1qitBge7LAeDHTZ0M70
-         6NaA==
-X-Forwarded-Encrypted: i=1; AFNElJ/VgeKI6GT9Ca4tzFj/ak4jnSCjLrOmwZFwW335ZOF7p5D/YuwkD6YkiRPCBPbXpEASHYPg+PUpHaj+hw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXBv2RQQnLMiP0j7tpf1JRSmp6zeLACQOB+sZ5/FF7a2CRQRCX
-	AzPhmfdj1fXhWvOP+/WxuwDaorEveLj0QSxvTF9JzJydy6qpsUZjMqJMDA5j5H8uIcka+s+iCxz
-	tpx9B
-X-Gm-Gg: Acq92OHceJQInHPIsMufqahqcN3wMjgbcEgmRYptRMRERFUdAuILu0h8TZz8N/2Ju88
-	XIul2wUm09SL0oEj4zeg4nMWK5xssLYIsI9hGNg0ybtDUdP6rGRMRPXYf3Myo3ioYD9PR0G3vWC
-	pXrmNTf+c4klWpjv3dmIBT+nSeRhetUu9KLLPhbdju156h6S+dqCO1KWK86oss3iNkFe0ZzJfTN
-	58b6oUap4ELNP8g9Yt50B51z2ijHpiwGiR8AF9KSPnTseqaihjI2UbAymENN1zI2SMxxgCPfR7h
-	GM576t2fBDA3fz2RFOfY01ij6sXP/3UfATgma6rafIlNBBeGVk86JQC39qp5P9RnvvLDFG1D+Ht
-	2Yim0WOeoH0aPVkUCTA6LEAn9jWuThEyw0QaXhPAOkN46myScf8z33IPGNGvK2RlEM/SOqMDQ7v
-	PcNpfxFcNHXHUP6t2ysvS0n1YO/0zlRFdHwZ5gTCuaOb5er45ShsdiTLHNBCcAvYqMOA0iSo9P+
-	cmt97ZtpQiiuoik9nWjGaGjQhrffSvjKvhJgcgpDdg2Cg==
-X-Received: by 2002:a05:600c:8b44:b0:490:b65f:8b1 with SMTP id 5b1f17b1804b1-490ec4992b5mr11700415e9.5.1781241867773;
-        Thu, 11 Jun 2026 22:24:27 -0700 (PDT)
-Received: from ?IPV6:2403:580d:fda1:0:2bb5:f164:6e6a:38d8? (2403-580d-fda1-0-2bb5-f164-6e6a-38d8.ip6.aussiebb.net. [2403:580d:fda1:0:2bb5:f164:6e6a:38d8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c433557c47sm6928115ad.79.2026.06.11.22.24.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 22:24:26 -0700 (PDT)
-Message-ID: <f1dbdcd6-4e6e-4304-8fa5-59c2c60252ad@suse.com>
-Date: Fri, 12 Jun 2026 14:54:22 +0930
+	s=arc-20240116; t=1781242120; c=relaxed/simple;
+	bh=JspGtTuIqHmF9JAX3VdnalFZSZ3Mib4Q1S3WyAzcKMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tF5JxYjN590OQbHKrGdY04l+DfSVB/EVsq7nGqQ4Cgzkpv3027V1RTH+e4kY3exOuGU1uwi2X/d7KNF3EV8gzfM9lpvYdETqFEcbti2/mKujyu54j+I9FV8Ra4Zd3OGbmmTsBQg9x9gQiOaDB8s+Ul1pdDKJd11UE1uE9aA+2VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 19C5468C4E; Fri, 12 Jun 2026 07:28:32 +0200 (CEST)
+Date: Fri, 12 Jun 2026 07:28:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Carlos Maiolino <cem@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+	brauner@kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] iomap: enforce DIO alignment check in iomap
+Message-ID: <20260612052831.GA9010@lst.de>
+References: <20260610145218.141369-1-cem@kernel.org> <20260611055744.GA18538@lst.de> <aiqBvF93P4NjfaDR@nidhogg.toxiclabs.cc> <aiqwy5DfHI79KXuZ@kbusch-mbp> <20260611133833.GA14645@lst.de> <airX6BmMQ14Rvjcb@nidhogg.toxiclabs.cc>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Direct IO page bouncing got some garbage?
-From: Qu Wenruo <wqu@suse.com>
-To: linux-btrfs <linux-btrfs@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Linux Memory Management List <linux-mm@kvack.org>
-References: <b866b2e6-292f-4c5e-ae5a-d77e983cfefd@suse.com>
-Content-Language: en-US
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <b866b2e6-292f-4c5e-ae5a-d77e983cfefd@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <airX6BmMQ14Rvjcb@nidhogg.toxiclabs.cc>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
+On Thu, Jun 11, 2026 at 05:47:07PM +0200, Carlos Maiolino wrote:
+> On Thu, Jun 11, 2026 at 03:38:33PM +0200, Christoph Hellwig wrote:
+> > On Thu, Jun 11, 2026 at 06:57:47AM -0600, Keith Busch wrote:
+> > > It's entirely possible a device supports byte aligned addresses. The
+> > > block layer just doesn't let a driver report that. So either it really
+> > > was successful because you found a bug that skips the alignment checks,
+> > > or your device silently corrupted your payload.
+> 
+> I tried this on different hardware, I find it hard to say all those
+> devices were corrupting the payload.
 
+I think in the other thread we agreed that we are currently missing
+the alignment check for fast-path bios not hitting the splitting code,
+so maybe that is something you see.  Additionally we're missing the
+checks for purely bio based drivers not calling the splitting helper
+at all, but I don't think that applies here.
 
-在 2026/6/12 11:11, Qu Wenruo 写道:
-> Hi,
+> > > Anyway, my earlier suggestion should work. Ming thinks it may go to far,
+> > > though, in not taking the optimization when it was possible. So here's
+> > > an alternative suggestion that should get things working as expected:
+> > 
+> > The fix below looks like it is addressing a real bug.  I'm not sure if
+> > Carlos is hitting it, but we were missing the alignment checks for
+> > single-bvec fast path bios so far indeed.
 > 
-> Recently I'm trying to make btrfs utilize IOMAP_DIO_BOUNCE, however I'm 
-> experiencing weird data corruption.
-> 
-> During test case generic/708, I'm reliably hitting garbage pages at the 
-> last 64KiB, the garbage even contains an ELF header.
+> You left context out so I'm assuming by the fix you meant Keith's patch.
 
-Added ftrace shows that, since btrfs has to disable page fault to avoid 
-certain deadlock, bio_iov_iter_bounced() failed with a short copy.
-
-Initially bio_iov_iter_bounced() got a 1MiB page, but copy_iter_from() 
-only copied 64K then failed due to the disabled page fault.
-
-I don't think it's a coincident that the short 64K exactly matches where 
-the garbage is (the last 64K).
-
-I guess it's in the error path we didn't properly revert the iov iter?
-
-> 
-> In that test case, we mmap a 2MiB sized buffer from another file, and 
-> use that 2MiB mmapped memory as buffer for direct IO, write into a 
-> different file.
-> 
-> The source file has dirty page cache for that 2MiB range, and no 
-> writeback happened during that direct IO write.
-> 
-> So it means as long as we fault in all the pages of that 2MiB buffer, we 
-> should be able to copy them into the newly allocated folio, and submit a 
-> bio using the bounced pages.
-> 
-> But the last 64KiB is reliably corrupted with some ELF header.
-> 
-> I'm wondering where the corruption is from, especially it seems btrfs 
-> has very little to do, except calling fault_in_iov_readable() to fault 
-> in all the pages.
-> 
-> Thanks,
-> Qu
+Yes.
 
