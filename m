@@ -1,122 +1,95 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0938C27281E
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 14:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3902A282F06
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 14:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781273413; cv=none; b=fjusFury9HclxBjR/tGMZNQAEq5+e6p5IFG+W75UVsyFcBydor/tI4RtdEtF+r6vXJzDPmSdi+epsIzsVlyc0XnEs7K3t43UtcDz1c74wTv7E3sBWi/r2x8oCx56xfMw3TwYsmcAaOIpidZY6gQGqNwaM/SNqLCQE58B8iWsgUY=
+	t=1781275952; cv=none; b=gQ9HOr3CJ1NOgE7n5ODQOUmjqkOUoccUGizXF+p1EsOvml6sk1NVGPdOqzTNlrGOPjQbN9d5FI0LuO6XGaGMSnRY6HNxjzJsUKvtC5DFD28ZkR8SB4ZBIc7XU+MIqDQsFyDg96MX/OvzkBi25hs7d6kPx7X/Ru2VG+AeM9D5AAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781273413; c=relaxed/simple;
-	bh=SwcMhVo3e/OSlG5u9jKKasCTCA1E0yZ6CzAo5ieB8Pw=;
+	s=arc-20240116; t=1781275952; c=relaxed/simple;
+	bh=org1tST3u55CEeuti5JaPzcTY/96/v7zS86+8k9Yyco=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G1RB7tdbeRAfpAI2l5auP3XSxURBSX+xJsk6oxPaZ/jOexnc3ETAyMrfF2aHJPOG93QLX+6SZbyUCZQzicZgEOdKeazPn66xC6MCr3d+J1obAdugg2ndSp2FjPjmbQPl7UjWzBjPzoPmGeEluXpbI8LC9/C55EzkdCrFznakPPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tylXjQFX; arc=none smtp.client-ip=91.218.175.188
+	 In-Reply-To:Content-Type; b=tunGZ023NX9Qqg5LCXJ3eyvyoZFtMyN6HxhlhQ21fvUjDzEMcTsFyxhqlodKsIJgvhqi9vMs+PQqNnKBh6Y8ZIp761KZkPKz0tsN+JY7pHAq7D9yLfDQcSCTqDkhJiKs9ZrfknpfRe6TGL+Cu3le6KuFe1JcQcto/MGmeg7xG04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vrtBTIAW; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tylXjQFX"
-Message-ID: <33309e37-e999-4c4c-a2b6-5eff22b1e933@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrtBTIAW"
+Message-ID: <76fa7dfa-70ea-42cd-91fa-1f2e64a345e2@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781273409;
+	t=1781275948;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VgkFgiq3UgWO4mv31jMB1PbxwSyhPsMP6dnk06G777U=;
-	b=tylXjQFXt9nqjJiTMazYQ6lwhdfPDtErq2oXG2P57stw+kOht1lpyupI4/HoeVo9nbbQUj
-	TxlvRg0sqjAOU6uWisuUa52BhH0vLhbWuijbf01r6ibi9CZ7aQN3edFG+GoqhMcm6Hs1K/
-	gTrNXgiGEmNhn5RufSkLile51kJd1Sk=
-Date: Fri, 12 Jun 2026 16:10:06 +0200
+	bh=KuaKQZbpHTJp0GyBmSBNC23x9gC02Y6fBRj7S1V+kVc=;
+	b=vrtBTIAWkWnySTPE3LrsnAGUZkDnpGVKbuT2KI2hKzfoi51gjEh+86ozYRFkGIwaoz0Zfb
+	FyXxbcXqR9qM9opusv/CedqLw4i7eDkC6fMoJDNMrE5WsIXCIp9tMwJ6lhq0VBi7Sjd4cM
+	pa4Kg91ElshEXBkCd6iq86fb/NtZ68o=
+Date: Fri, 12 Jun 2026 16:52:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: configurable block error injection v5
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>,
- Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20260611140703.2401204-1-hch@lst.de>
+Subject: Re: [PATCH 01/27] aoe: Enable lock context analysis
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Marco Elver <elver@google.com>, Christoph Hellwig <hch@lst.de>,
+ Justin Sanders <justin@coraid.com>
+References: <cover.1781042470.git.bvanassche@acm.org>
+ <f15d4c4f4a22ab4788a40d51d88d228a649d0115.1781042470.git.bvanassche@acm.org>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <20260611140703.2401204-1-hch@lst.de>
+In-Reply-To: <f15d4c4f4a22ab4788a40d51d88d228a649d0115.1781042470.git.bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 
 
-On 6/11/26 16:06, Christoph Hellwig wrote:
-> Hi all,
+On 6/10/26 00:04, Bart Van Assche wrote:
+> Add a missing __must_hold() annotation. Enable lock context analysis in the
+> Makefile.
 > 
-> this series adds a new configurable block error injection facility.
-> We already have a few to inject block errors, but unfortunately most
-> of them are either not very useful or hard to use, or both:
-> 
->   - The fail_make_request failure injection point can't distinguish
->     different commands, different ranges in the file and can only injection
->     plain I/O errors.
->   - the should_fail_bio 'dynamic' failure injection has all the same issues
->     as fail_make_request
->   - dm-error can only fail all command in the table using BLK_STS_IOERR
->     and requires setting up a new block device
->   - dm-flakey and dm-dust allow all kinds of configurability, but still
->     don't have good error selection, no good support for non-read/write
->     commands and are limited to the dm table alignment requirements,
->     which for zoned devices enforces setting them up for an entire zone.
->     They also once again require setting up a stacked block device,
->     which is really annoying in harnesses like xfstests
-> 
-> This series adds a new debugfs-based block layer error injection
-> that allows to configure what operations and ranges the injection
-> applied to, and what status to return.  It also allows to configure a
-> failure ratio similar to the xfs errortag injection.
-> 
-> Changes since v4:
->   - don't unlock in removeall to avoid a race between removeall and setup
->   - document why we can't match 0-sized bios
-> 
-> Changes since v3:
->   - use a static branch to guard the new condition
->   - split out a new header so that jump_label.h doesn't get pulled into
->     blk.h
->   - more checking for impossible conditions in blk_status_to_tag
->   - more spelling fixes
-> 
-> Changes since v2:
->   - improve the documentation a bit
->   - fix a spelling mistake in a comment
-> 
-> Changes since v1:
->   - drop the should_fail_bio removal and cleanup depending on it, as it's
->     used by eBPF programs and thus a hidden UABI.
->   - as a result split the code out to it's own Kconfig symbol
->   - various error handling fixed pointed out by Keith
->   - documentation spelling fixes pointed out by Randy
-> 
-> Diffstat:
->   Documentation/block/error-injection.rst |   59 +++++
->   Documentation/block/index.rst           |    1
->   block/Kconfig                           |    8
->   block/Makefile                          |    1
->   block/blk-core.c                        |   87 ++++++--
->   block/blk-sysfs.c                       |    5
->   block/blk.h                             |    3
->   block/error-injection.c                 |  315 ++++++++++++++++++++++++++++++++
->   block/error-injection.h                 |   21 ++
->   block/genhd.c                           |    4
->   include/linux/blkdev.h                  |    6
->   11 files changed, 490 insertions(+), 20 deletions(-)
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Thank you for this series. It is a nice addition.
-
+Looks good,
 
 Reviewed-by: Md Haris Iqbal <haris.iqbal@linux.dev>
-(for the whole series)
 
+> ---
+>   drivers/block/aoe/Makefile | 2 ++
+>   drivers/block/aoe/aoecmd.c | 1 +
+>   2 files changed, 3 insertions(+)
+> 
+> diff --git a/drivers/block/aoe/Makefile b/drivers/block/aoe/Makefile
+> index b7545ce2f1b0..27bff6359a56 100644
+> --- a/drivers/block/aoe/Makefile
+> +++ b/drivers/block/aoe/Makefile
+> @@ -3,5 +3,7 @@
+>   # Makefile for ATA over Ethernet
+>   #
+>   
+> +CONTEXT_ANALYSIS := y
+> +
+>   obj-$(CONFIG_ATA_OVER_ETH)	+= aoe.o
+>   aoe-y := aoeblk.o aoechr.o aoecmd.o aoedev.o aoemain.o aoenet.o
+> diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+> index a4744a30a8af..54c57b9f8894 100644
+> --- a/drivers/block/aoe/aoecmd.c
+> +++ b/drivers/block/aoe/aoecmd.c
+> @@ -1193,6 +1193,7 @@ noskb:		if (buf)
+>    */
+>   static int
+>   ktio(int id)
+> +	__must_hold(&iocq[id].lock)
+>   {
+>   	struct frame *f;
+>   	struct list_head *pos;
 > 
 
