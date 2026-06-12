@@ -1,81 +1,125 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5011C2324;
-	Fri, 12 Jun 2026 08:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E4381AE2;
+	Fri, 12 Jun 2026 08:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781252102; cv=none; b=InQ/wS/MVXYnHgTkbzwiL8pmNDPJOEb4OrDyQYES4Yw8ptYT3uM7R2GSMnWxZcvYgFEHjg45o6ZrD7eXgzW1tY0mTUzLEmaF24YWHamUvB+Lt9p0na34wT24eNb9vXUc8rRbba5OohR1QLYkSThnbHHWPH/HBMr2TH2wkdvCBzM=
+	t=1781252826; cv=none; b=Rh8sWhe7n2/GF3M0r1kgMVBskhtgbgye/wX7BmiD2MORGp70WH9No19fNToRSIq7rpwMoa+Te6OuMbYOHUqzoufg7UPuEJah3vR4Fms3TaPbntyXlurGUKyADDzON9YFFw4QNWYuSbbVEgu9Sp7r2KSlsygdXNZzPKrBqUda7zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781252102; c=relaxed/simple;
-	bh=eHo1/UJvIkKu1vEckkFFfw0jO4Y4w2qFsDl8uEk4OQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d1LbRx0a1pWxJKq2CLYdn9JOTrHx75GailncSvOUbgyExZQUxOzWZzIsN35GFpPoybmbjNb+0rHYbYlyV4EXVhs8wcjOKql8bZwefGT04+OEFjpKSow49cdSE2+CAOJJp0Kcm9fAcMrfJVj6Jul0iYYP94VMt4tTKbGA7yeFGW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nMrOIgHb; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1781252826; c=relaxed/simple;
+	bh=gx91AU+xYWZMu1E5l78i54HZqLlcH+Ag+ScKzMTfD08=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JtWQjq6Rc85EIoMTYXI7UybtYZJ/m/F3l2qDsoeslnnaOY31F43e5JtwkHwZtMDATkS5VnqFC71TrT/hmcnG2CMyf2EBfpQWZt9THiokjgKVVUcGbz6jwZYwImzTTzyp1lE85O3sFflBh9G16RhW7mdeGoqdVtaHnDT2huJgyBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntVQkOQl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nMrOIgHb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=bC82jPab6S3wVzMMxpsWQLnEuTGROvnPgIfnuq5vlbs=; b=nMrOIgHbeqs2wVJIEqvTcSh2u4
-	+S719oQ0n5euK/SYW9MA8GnP+JgqOc1RZpFVdL7AyUKODwIb9wlLfowNhbx6rscZMUzIqO4ysOm3C
-	0vX0Tj1g71AgfZtyiSNg/ORNHUQkZ1MdzMuZb1BtrCg3Z7VRqH5syq9aYU7QdE6HaM7CZPI5gYfDf
-	gGBEx32/bimUkTTGXMqqr0CcqdFPJAZALpB95pAEUACO5cv6X+zOUkD/baBc/+XvIT2RsTpULnK0t
-	wXX7n/1N2v/UMGtxYkTCByzpbsaJBSFA9rsTYHVtZZ0RyJ/XWVCCOzIDz/fFcBcShAc5rVUewb+dp
-	xCW+HRqA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wXx2a-0000000AZA8-0hLA;
-	Fri, 12 Jun 2026 08:15:00 +0000
-Date: Fri, 12 Jun 2026 01:15:00 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Qu Wenruo <wqu@suse.com>
-Cc: linux-btrfs <linux-btrfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Linux Memory Management List <linux-mm@kvack.org>
-Subject: Re: Direct IO page bouncing got some garbage?
-Message-ID: <aivABK8nwNR6Z__A@infradead.org>
-References: <b866b2e6-292f-4c5e-ae5a-d77e983cfefd@suse.com>
- <f1dbdcd6-4e6e-4304-8fa5-59c2c60252ad@suse.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntVQkOQl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83AA11F000E9;
+	Fri, 12 Jun 2026 08:26:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781252824;
+	bh=aCIvGGNlCn3/areAwzPGCMcZ9K6iR0m6gHQcTX8yVnU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=ntVQkOQloHJp9kAqqZHkhpUCbsgEkGoJsRhrBxfhgkScFlY4Tew245Z1dp8lHFEfZ
+	 qCbsoum1ceTQtRLlo37izLtbc+kq7yO+17GgL/Pgd1ktdDvHBLy+2Py2CWuH8wmunk
+	 DpzWzU2BS0GXO+9GuzX52QyMzQmSqqs0mNKLTbQPpJ+mG50ezyENNb7dRRoKxYXs9j
+	 p7VZWBUGGtqCfD9MMA+mZo7Q2BHbWDEXxUJzGBh7H1kzifMw6yjKrgWQrrxJLL0nV9
+	 vH7Vo7wFzwujT1gn78CQBPLJmDgI0lnNt3fKuBuvx/UyceUxmyhAOAiyDA0ILY7W8V
+	 DXBoXWasjJ9kw==
+Message-ID: <ac097d05-8fac-4e93-98c0-33224cef782f@kernel.org>
+Date: Fri, 12 Jun 2026 10:26:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f1dbdcd6-4e6e-4304-8fa5-59c2c60252ad@suse.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/8] dt-bindings: net: wireless: qcom,ath10k: Document
+ NVMEM cells
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson
+ <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saravana Kannan <saravanak@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, daniel@makrotopia.org,
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
+ <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 12, 2026 at 02:54:22PM +0930, Qu Wenruo wrote:
+On 09/06/2026 09:52, Loic Poulain wrote:
+> Document the NVMEM cells supported by the ath10k driver, the
+> mac-address, pre-calibration data, and calibration data.
 > 
-> 
-> 在 2026/6/12 11:11, Qu Wenruo 写道:
-> > Hi,
-> > 
-> > Recently I'm trying to make btrfs utilize IOMAP_DIO_BOUNCE, however I'm
-> > experiencing weird data corruption.
-> > 
-> > During test case generic/708, I'm reliably hitting garbage pages at the
-> > last 64KiB, the garbage even contains an ELF header.
-> 
-> Added ftrace shows that, since btrfs has to disable page fault to avoid
-> certain deadlock, bio_iov_iter_bounced() failed with a short copy.
-> 
-> Initially bio_iov_iter_bounced() got a 1MiB page, but copy_iter_from() only
-> copied 64K then failed due to the disabled page fault.
-> 
-> I don't think it's a coincident that the short 64K exactly matches where the
-> garbage is (the last 64K).
-> 
-> I guess it's in the error path we didn't properly revert the iov iter?
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-Looks like it.  The better option would probably be not to give up on
-a short copy, and just reduce the bio size to fit the short copy
-even if that wastes a little memory.
 
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+
+Best regards,
+Krzysztof
