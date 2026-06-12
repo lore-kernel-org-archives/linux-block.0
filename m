@@ -1,169 +1,152 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BF439C657
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781255557; cv=none; b=RGGZYmwZBnhERFyH6Fh0yoZkKhEQKH9xSTIxufGyAFUlngBozv7MuUpCp1XJUTC+24tE5eEGDKqlbkp4KTXOsUgagaUnh3HpCvB67YjKHjtGUxFnUGZLbxggDpfFojH/HP83ZEh3PH5KZH5EurDDc26+hy5+YFcGwiYmzWIQV/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781255557; c=relaxed/simple;
-	bh=J1AFntJO8yn66Ges7ZIJc4qYkwhNSJYwQcAxHEZv4U0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I2WvgCpVMZT7weuGaKR9ZklfyCEeEtn25jJtR6l3Ij/dQIYLe6Tc4KCVrYRGE8m/6mqZuvi6WqQD7b0E+3lbZ5lDeWr0ZAMFb7djV8SYSrZ7oFgLTiPGOunHlh0dttATJHGBubZarx0KuRFR6jFUghvJ8qbh6RxJQki/8aDTbZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jFNQOBw0; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=drLPnYJ5; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD05A391E59
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781257163; cv=pass; b=PJHyo4cEnF+FvunvVlwDXkcTmY8BcVsawf4yP4AyWzF/BcxiTgWX1s5a4NN1kfnvrbnnaIaBCfydPTFm3lo1eZmYLPU14eQuhSC+1D9OpatQWepCNIM6o3MtDC7mI6sRKIVmiClyHgZXWRgE9cXnUVaXFIObLeKJ5Plquiilvcw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781257163; c=relaxed/simple;
+	bh=CnU9qBZiI2d9l8PWlewTxxURPQrkvvHbexVentScxhc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UIPzqfbYkzmNpw3rsGOzzcHuIp889NWkFWZaQcXw0WRW3LhNBW2oMNIZneik8j8oWlk00snPhjPR3qo5BRTfU+GfoVD4ViuyFPrNsbW4RCRUczB4SiFamNXyevuX8ZOUSilEavgv5T6znxOCb+gu5bJ39wOfQyN/Eat9yJzOApM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=EIs556J2; arc=pass smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jFNQOBw0";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="drLPnYJ5"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65C39WwB2475924
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:12:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=fQHHtK59LcboT6pjvqkOS+sy
-	sywNj2Fo6GwGmNW3Glg=; b=jFNQOBw0YkLzDcDJnKXoiojTKiEGuD6hPTR+kfeE
-	2ss4OSCbPpXkPqcf78P9LgzYKAqxaVmcPlAGqnC4mH8u2xP+ivX8Z1JKJgYJEiuu
-	tFZy4jkbxlMuHM8OS5TEILW7PcEy6XJ+vVd8MXZaQ873NJ+HB+Ao1D4o1bO/TyIV
-	VgTKANxBx0aZTaKWlh9+1fxOJPmQWkduGpSZMoSm+IRWKyDvfkHt0jY1Y3IgaWBK
-	15jG+1HAywMpEhomeAzvahK6xEPIWgg+hnoa6czhQ64d/fuNWtlXMgaVvJnAfehT
-	+9DqgRSqF6u6zfiAclJrVi8a4I0g7mc3Ush60MbZ8QcBMw==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4er2r5tbeh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:12:32 +0000 (GMT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-5176cc5bf2aso9093741cf.1
-        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 02:12:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="EIs556J2"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3967738c801so6407941fa.2
+        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 02:39:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781257158; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WKvcXEORV8rqd2TThl5AaQpdjHwlt/ey0VEHJogdVhCNUyoSiNofZplS14pQxLN86q
+         /x8I++s8BFq5a1pJhn9+sDDRktv+bNvUCcwqOX3ZFGtzNTsAbhBCnOBrV+jcaru9IltC
+         HL3ZNwrG+HHgr36lw/OIJbodiLpOIDbQAiC4X+dXC/DHMMBBX4VY+T3v2NRJ8xVNxG9/
+         BBnBMOe+9iRywF6N/0y/fJ701cIAp4WpXJNeersDfLTwqRbw5Wp4Xl2NVBTt/brx5M71
+         i2I1EIMceV2TDfHUXWm+gaP80dgFC4VQKsbZQcnE6IFDtMZZTwuev6FhLdIlgG9J2UMl
+         Z/vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=F5QL6jsXXlrsglbd7oQwYpEsY1bNUh4psG4/A5eCDr8=;
+        fh=kQT4eZK1pjLv+QoVOxgZhatXuufg4j9l1JTLCC0glqE=;
+        b=fphKpFMVeTn5LwG4GV4EIQLaDZLYd4k/LyNRwEG3oX6rNZnLzaE4m947p2YCPWfmAv
+         ysZIiTCflHAYC+cqEXUuClWf5PZqI3LIo02GLMMgArd1zEYJoFuESILJtrIsLy8co43T
+         VsjnvuLfTSXHmUI3LYynuap5TNK6PUi1HheicF9Dxocbb46E/sWCW987zvrOUsBQwgH2
+         pi/KVyilEZ8gif5qtPB1w5BLbshOEnCGOhPou/CrEgJ43pLXK31YQIiCFVjNNio2z6vw
+         nI+bDjqqTCOt1s5zmVJKrNvgg1B31+Ou2TvhT1hnB3ZC1bowjLym01Vc/GsHayOoZuHw
+         9ODw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781255552; x=1781860352; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fQHHtK59LcboT6pjvqkOS+sysywNj2Fo6GwGmNW3Glg=;
-        b=drLPnYJ5yqlmaM0EM6PNqUTJ6HiVq+kvG/T1wFAH2kUnZ2tVnif0r5RKLShknjLTUc
-         bKZve+jU8sSnJCorzQyzrYbhN8Yv1KORbXN2eQKnyx+y+wWtqZGsQPoD6l5MF6pnvsrJ
-         TAIOM6tJwIvZolezRdba8WH5CFfV4SJqrUhpqkhcqVJXdMaEUHPRosyXntGIATOfogyq
-         2Gf4DQ/29JlYoVxSPUF2CmhMm1Dnh7n2qzG5lJ7JW2pMMGBmDu62Yuh/A3E0MXjb2T2i
-         OPZ4OI7ZBIafLfSb1iCV23fA7uXN7Rs+gNMUNF7P4w/LEsMZ1g7xF45TAn/NB4WCWrQn
-         qv2Q==
+        d=ionos.com; s=google; t=1781257158; x=1781861958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F5QL6jsXXlrsglbd7oQwYpEsY1bNUh4psG4/A5eCDr8=;
+        b=EIs556J2m5Lcz5sKDBER3JbuCdLYJielTg6pS3JbmN0RsYEGvV5DSmjL3G3hT4ioxa
+         PjJSCp+km9KgOJT5iG84mrFhEur7lIlH2ZwTjMsIpWoXvoRRJYqfyfsGLymX+ZnyIg2r
+         8ib8uJFP5aJJvFgczZ9HhbII4dHqCF2NglnvsKAWvRBEk+T4OfDH+cMpetLyHzlsZmQr
+         CbaEsMjv6SPsf7w9y3tZ5Zbau0gg3ET3gCDaUtF3NOJmR0lX9iQE9wWJJtDIhmW/cZwZ
+         M3jI5W08h8gUEFYRQia81+cO9QD/dnwwCiUaOHxDyTJzl8TZkAY3tG032MYMmfejGNIE
+         rUJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781255552; x=1781860352;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fQHHtK59LcboT6pjvqkOS+sysywNj2Fo6GwGmNW3Glg=;
-        b=Uo8lp5mqDmEWflqtBtEeV7103B2xsuAJrynpIGnY1As6utKNnMtvYNp6s+WIPP6w1Z
-         SqZqnH9233DB7x9pF17kN4GsYTo66OdA9WqFnbf23BjHV12q4joVv7g1G4x2Lt0Ho2+8
-         j29kjK/sCJHkcLR9waPk/UuQsQLtB5Su7xUzcenWaRTkdShouwdnbCgOCL/REVqdENMD
-         oyfk8dXpAF5/ovW/FDlJtvQWSRpKRfa7K9eWHR0d8ejtb6yP3TT5dNug89xlB6cWUZ9z
-         +0dVONKKpbzGUoabT2vRRqnxJi9y4BcUJTuLrm/qqizYsgTFO0LiP25c+AE1/HxdSTXc
-         z/iQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/FvGweGRZU9a9IqqO5Y1456/dUmrIRtiBmHFkXKtvn4pc0SJ+AwaY0cEGt5RsRS23ejFFpypufDBevyw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkOFEefcwzXDiSZn0ZJrXX/d2IlrVtZd6C8pkDvzb4mh+4SOMC
-	uQEDp1N2Z6DRXVlNnzys2N/eA3x9G3ZDlYzt0J+wu7euuyCa0yPXVn2AxmmgCBbc7z14epZSZYh
-	rUhZOHNway0kLsBhEYJJWyPz5ogY00S9XJt9KIGHSuTzM3/2AP5kgAf3+r5P3EpzmBg==
-X-Gm-Gg: Acq92OFn2nKWyAW9EXs/ogZ7SokSZMjC1BgvqpqQH+l5y7OgOkcBNsLfilZupQTDlTR
-	rOYIqVDf1D86yH8zWx8PZR3lzqMfycJ3C+2N+WsLfEvsayiepQGObwaf9AzRCqyGw0kWEx2fMj3
-	xjHEXTmDKMctMoFqU4w89xLrdj5qP7KQTIu9Flvhj0VQdfSb7eGElqFC50Z0e1zHFverDBJZT16
-	fKp7lqEs09nUsbMHu4sRYoFrU9JT5Ao4kO+iTQsqr+I3OeeoyM0/OQSUVIU+RaP1ZM+deTrPWQj
-	whm3/BMgNByL03nKN5G+d6hykP2d5/AnWZuB2VG4GQ6AdmlQz2rcOThXh3JAKiL4wMPClDyf62G
-	dt+vZDLuRr8p615oCg2gz0euHTgPL3912MbY76julpzBduDEnBf0WUU0wys/HNHcyfF8B60rcrE
-	3Bml5OOFq90+UQnpH532RvNlIR9dCOOyxyq/c=
-X-Received: by 2002:a05:622a:1109:b0:50f:b257:9301 with SMTP id d75a77b69052e-517fe566319mr24249441cf.52.1781255551628;
-        Fri, 12 Jun 2026 02:12:31 -0700 (PDT)
-X-Received: by 2002:a05:622a:1109:b0:50f:b257:9301 with SMTP id d75a77b69052e-517fe566319mr24248931cf.52.1781255551221;
-        Fri, 12 Jun 2026 02:12:31 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e1a7357sm381663e87.42.2026.06.12.02.12.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 02:12:29 -0700 (PDT)
-Date: Fri, 12 Jun 2026 12:12:28 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Saravana Kannan <saravanak@kernel.org>, linux-mmc@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        daniel@makrotopia.org,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v4 7/8] Bluetooth: qca: Set NVMEM BD address quirks when
- address is invalid
-Message-ID: <uybyiffu2czpzhycp6x7w2pptzmhajxlx3ogglshamppo66kqn@izztlisgr2xc>
-References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
- <20260609-block-as-nvmem-v4-7-45712e6b22c6@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1781257158; x=1781861958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=F5QL6jsXXlrsglbd7oQwYpEsY1bNUh4psG4/A5eCDr8=;
+        b=RTQCL3WWBNtMPeRQWjOmNXazKzxmbPuZZjJWiJyAJbsrVfJobLRjMS8iw+kAqRWcm/
+         33xIWucit+/JLioYlfFjw7JeD7S3JyY3k17OYorRfDq2hTezEYF9AWjwxHW1XcLf0an8
+         kXIhOYIJZuHAIyg16K5iiODbVInPnHx1HoJ/jW3wjWZBNzO1OnT5lHJ3foR8BBdubZMc
+         EmTz31Y7SdqA3VgW9uhI2V1Qipx0QLj/c7jLTqA6E0eyGe5sqwSmQWb4m11xkW5isJ1v
+         y8cGClB++Bs69UDVn3Qx7W47zdFyCHIiuGUAfIMaI9nenKUnzvGEjFCd7YxgxuDjsJZ+
+         ViAQ==
+X-Gm-Message-State: AOJu0Yxci5tE0aNMaStWUPDwE7uaIbMg3DH4aBFXVBi2iWg2PEMu+npc
+	yfFWz7edp60+V1X6DdtGkqUZw4svmdyPLSpCKB/eEmR75682BTWvuzwaPHicurK0bseVjcBM7n7
+	aAfv6Tes8lpo0SWHAVaNWKXPAVyjQs5imV8WBS338RQ==
+X-Gm-Gg: Acq92OGfzbOw4Ih7zTcrCZUf/vXH2XVNg6IJo7c32jAPACONBKz8BGlObwTGK5/ZyA0
+	pdoR9LCxzqoo8oNnOHgyLBObiQ/XvI0KJCnecGv1YDcjbEPUFDRP0BCLc9z3toK6WdHoq5BWz3E
+	3JFYiTNsqvJ0nnPaI5mY1h9ySHyv5Ip3PDYUfsJDMML651/fBZjQfnjYU5OKuuga1xHC5GKXawK
+	uweZVDRn/lhYMPVTdelFKy37yS2nT2Bs218kyN87xNn1mltoiRGSXTqJZgE7PXU6GyjKIZQwQMw
+	Onidwcu9K8R5REqPR0Wbrf733xbBEJd3F4QKeVGnTCIEc5mKZqRZUc0QCynY4yafdG1B
+X-Received: by 2002:a2e:a989:0:b0:399:1ec3:eba7 with SMTP id
+ 38308e7fff4ca-3992b160959mr7302881fa.20.1781257157667; Fri, 12 Jun 2026
+ 02:39:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260609-block-as-nvmem-v4-7-45712e6b22c6@oss.qualcomm.com>
-X-Proofpoint-ORIG-GUID: Gq3g8SwVVXwRKIZo4GTzHzxvDYOPUmGA
-X-Proofpoint-GUID: Gq3g8SwVVXwRKIZo4GTzHzxvDYOPUmGA
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDA4MiBTYWx0ZWRfXzjUzetde2PIU
- ByCMvljzFOjvY314Cn7QDxplYfjX/mYXHNVOhEwtbA2E7j3p7YckcUvZN4/PHcyxIDyRIncZ/Gr
- 4SdjjehF2leuPsN8MSF8hkfD1AE+JDY=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDA4MiBTYWx0ZWRfX5FOvyNx3VnL9
- MOEtICWLFoSeaJx1HbDXz/nQNFtv3oUqn4Pu+mQORKfV8EyuJJbg8d3ilVa+IVY6i+ddKi+r8R4
- Z0+p1BYBFsgHQn4GDqPQP7Qlgjp8Dg9sjwHA7wR/jy5v4fDWqnlNL9C1CChiE/FchVr4hI05xPL
- HS7MW8Sx/H7H9rF4+l9GvR27TYUqz0/NUfSEoDTgK51p50RvxvfeDK8maBj5oLcU0RVL1BI0Toq
- Wk2lFHGGWSqJj7dwDWepHbXCvKnSS4yhi4JwFB/CqSASzLyhhFiuJ96Tw6UZQYioFzyG34N2GUT
- ABg+FZcGhGuPWo8ho9akOO3sJFtNSLJbdkptURrIiVK0+XMCv3iBNX2K8WfiFZfV5VU6jta9GRV
- W/DelRpkCjH/PPefSb3Dg+OXroI+B0z51Ce18yQjp3b2VR4+HYLeKUlQikixmwBqPNZTUxvojNP
- 1V1lvU9NY9RbziivumQ==
-X-Authority-Analysis: v=2.4 cv=M6p97Sws c=1 sm=1 tr=0 ts=6a2bcd80 cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8
- a=m9cM9ScjmTDVYK95jDAA:9 a=CjuIK1q_8ugA:10 a=dawVfQjAaf238kedN5IG:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-12_01,2026-06-11_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- phishscore=0 clxscore=1011 malwarescore=0 impostorscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606120082
+References: <c9f86f0b-331d-4cb1-b8a2-00bc1e857ec7@web.de>
+In-Reply-To: <c9f86f0b-331d-4cb1-b8a2-00bc1e857ec7@web.de>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Fri, 12 Jun 2026 11:39:05 +0200
+X-Gm-Features: AVVi8CdiaXrm1U290JlCGFSnQfH0BBbjtNNWl211mNib7KONSEM1txH-98N6PwY
+Message-ID: <CAJpMwygBw3meeMj9mS+0N1p9mM2cOrYo81jf9toBkmD+rREkRQ@mail.gmail.com>
+Subject: Re: [PATCH] rnbd-clt: Use common error handling code in rnbd_get_iu()
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-block@vger.kernel.org, Jack Wang <jinpu.wang@ionos.com>, 
+	Jens Axboe <axboe@kernel.dk>, LKML <linux-kernel@vger.kernel.org>, 
+	kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 09, 2026 at 09:52:32AM +0200, Loic Poulain wrote:
-> When the controller BD address is invalid (zero or default),
-> set the NVMEM quirks to allow retrieving the address from a
-> 'local-bd-address' NVMEM cell. The BD address is often stored
-> alongside the WiFi MAC address in big-endian format, so also
-> set the big-endian quirk.
-
-Okay, this answers my question to the previous patch. We need to support
-BE addresses.
-
-> 
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+On Wed, Jun 10, 2026 at 9:03=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
+de> wrote:
+>
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Wed, 10 Jun 2026 20:58:47 +0200
+>
+> Use an additional label so that a bit of exception handling can be better
+> reused at the end of an if branch.
+>
+> This issue was detected by using the Coccinelle software.
+>
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 > ---
->  drivers/bluetooth/btqca.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
+>  drivers/block/rnbd/rnbd-clt.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.=
+c
+> index 4d6725a0035e..d8e3f145ee2f 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -329,10 +329,8 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_s=
+ession *sess,
+>                 return NULL;
+>
+>         permit =3D rnbd_get_permit(sess, con_type, wait);
+> -       if (!permit) {
+> -               kfree(iu);
+> -               return NULL;
+> -       }
+> +       if (!permit)
+> +               goto free_iu;
+>
+>         iu->permit =3D permit;
+>         /*
+> @@ -349,6 +347,7 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_se=
+ssion *sess,
+>
+>         if (sg_alloc_table(&iu->sgt, 1, GFP_KERNEL)) {
+>                 rnbd_put_permit(sess, permit);
+> +free_iu:
 
--- 
-With best wishes
-Dmitry
+Thanks for the patch.
+It does what it mentioned in the commit description, but maybe we do
+not need to do this?
+
+If there was a kfree before the last "return iu;", it would have made
+more sense. But jumping to the middle of a conditional block to reuse
+the free and return seems forced.
+
+>                 kfree(iu);
+>                 return NULL;
+>         }
+> --
+> 2.54.0
+>
