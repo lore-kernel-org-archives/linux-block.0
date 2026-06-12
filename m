@@ -1,127 +1,131 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCA43CF032
-	for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 23:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB566301465
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 01:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781219714; cv=none; b=XzBPIJmG9f9JnUCgl9urRIOQm1QR/wdyVR4sG8oLz6Fh45i2RSQAzKgg35SPrmDjn4ceXlNDM3EWio97ofbhWYTBwEeYsOaEyruOcj087twqTgUaWo66VwsIsgR4hUBERYEHKprdXJTJWBz1qjcX34hkDBqpNygecyHrRfY6/Vg=
+	t=1781228472; cv=none; b=sfVknMw6GdNEljt+z/7bXVqoO9DkxQE74xFY8aPgNwNEkpGd+WuPZTdITh2hofn2KmGrxv3rYYlYKHAFzy+Yx/YEEBzhadHnsE8XmcIFPAr2AkCfjUZ/aMG+fiP8p+PIfSLcpYuW3xykPH0QmkhTfRPc8+H2oOIWXczczV0Cjjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781219714; c=relaxed/simple;
-	bh=QD69d2OJHwOtuSaX+DoKywFbAEQo0UEq/e3/Fn2QjUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWGiLayTpo9yZdX+Z4VolBAa67wOZDrlmEOx9nsYb22uix2BMV3xcW0KB2Rndc49ParMVgRAhZgXrU4ypIyNSIzGdSGSf1ZRzr0Y4ZdV2W9gzfNpSvJv9WghU17NBBBsjaWRAr82R5+FnlF6kGP7dzBVnTWmnTQYCXmJ9zE7GjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NVtko3so; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781228472; c=relaxed/simple;
+	bh=H3QgjYHgUWgLf5Hdz3zpZLRu7eotRDY/FjvNmRe5QL8=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=FemJKQ49WoWz2KxMcUC9edvw3zUgPhwRzG56RMTXLDRtqVsm1bmaFF8ppBSIKCR9GbkDkTf7mfLkWZWe/ecx41FZYL4YImTxkkjafLcYR5kj26t7MS1SI59H7xO0htl4glimANT7pnK2XOzXxsXJOm9e9Nt62nXtt8ZX7r/DIeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Po7oArLi; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NVtko3so"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781219700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ShBjYPEYExajE8ngaKwJEtPoM9APFzTLlxCb37S7wzg=;
-	b=NVtko3soc9++gRfLlIoaBBOFQi0d+fACKKMTE/tCvKwXnD6KettXDw90iH4kYyHTlloMkV
-	Dq3bDtenVXhDxGVOo+guXKNmUzUGkxUOvAeeu0ETMVdZyBdZ6TA1UHu4fh05hjy/Y0/hFO
-	sif6VgxrLQBckRWUx1Jvkn7itQFCQCI=
-From: Usama Arif <usama.arif@linux.dev>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	bsegall@google.com,
-	dietmar.eggemann@arm.com,
-	juri.lelli@redhat.com,
-	kprateek.nayak@amd.com,
-	linux-kernel@vger.kernel.org,
-	mgorman@suse.de,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	rostedt@goodmis.org,
-	vincent.guittot@linaro.org,
-	vschneid@redhat.com
-Cc: shakeel.butt@linux.dev,
-	hannes@cmpxchg.org,
-	riel@surriel.com,
-	kernel-team@meta.com,
-	Usama Arif <usama.arif@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: invalidate cached plug timestamp after task switch
-Date: Thu, 11 Jun 2026 16:14:28 -0700
-Message-ID: <20260611231428.345098-1-usama.arif@linux.dev>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Po7oArLi"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-68d23396ed3so817816a12.1
+        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 18:41:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1781228469; x=1781833269; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EwJ/p+oe1BDJOA94TxGJDYaoC20bK7b6q/AC5geke2c=;
+        b=Po7oArLiuN+Ili81TrZoVsortN2L255hMIMWslh/69YFBK5Jwm9Lsd5nJvoy8nGwvb
+         bX34+jzDpxUaZF/XmsqtILykyB0nuaUt6J8JAVMv7oQNW+eh2JJds68YQDzAgNv1S/Cq
+         tUmPF1eUHzZBVbPSoDjuKFYl61wC/zXJnb0hr7TUWoJ0nU48mUj1Qq4gCUlYK5q5NDIe
+         c/W8UuLGVoLvtxactjoqCtLaGtd30KG9VtHR5P8FRFF9mzLIB+pULZ3TYcUDtKYxVmtZ
+         uTZuLyJbLJsyPHd4wcA2IFoqHhP8Ta2dDEy7/FNxRB8BjypewAIPChvqMq+HxW6EOJUA
+         it5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781228469; x=1781833269;
+        h=content-transfer-encoding:autocrypt:subject:from:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EwJ/p+oe1BDJOA94TxGJDYaoC20bK7b6q/AC5geke2c=;
+        b=DBvkAXLW5bTSUkA2xeCMs5A1eFMpXn3me3SpU139Kf5I+sHMiuUc95NB1tfx1D5xYq
+         E3BIkeD2peRz2AnvAifrtXY2uPmxgls4kpYCdZspADtt4E8Th/gEHbRyQTar8T2sf9AK
+         X6MtOMRHlXxgaZ38ZrZzZK+oCjckfFfJhKc2RsknoJGHw8NeYhFdfvyWllSUAN1DlUjX
+         Tx8g+MloZDQTt01tBcxBA97PiGPdhJ4L/2JfunSXIptWxlFaaaUddy8HtS+ZvwnfLLql
+         6TaFE4k4YyyQiFHpwf2JYJTquWnc9dLEcfTjq+GAfbEqh7xiuae27O1SzNcohUVtU0m1
+         0Odw==
+X-Forwarded-Encrypted: i=1; AFNElJ9C2gBV3Jujz4bNthpuCzqY2D6GCLIWhoEBChhqPVUw2muNzNO1yYJhDrhVRtR9gjcCwPXQHtw/cOn8BQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdFS0PmOcfLi8AKyET1RytAjTUqAInQeojWi73M02Wd6CF/Gs4
+	hDhZ8bjVJqOCxtH+oekzccq5hNkKGJv+FF1/9V+KRF/keeBeSHSDuHXIhZ2E6901MYPWzAis9M4
+	R7k5g
+X-Gm-Gg: Acq92OFWnY45Oji1/7evbnskhHs9BODAlLoDMqGuLKJbi+Vip4N5hmuqEDR0+hI2X5J
+	fmwsBmmzxMOrxSpl4ERrAEHYWxUynEfjU+5wL4Iw/RUpJ+Uoxabhu0A2e/qXTPkuqBIBey8h1Sz
+	GkMHhSvGbNTe9eAvTQSffuXvGZgtlDlFreA9Aa5CAjgCbRwoKojaX4bz24zKZgTk7x+VRRSJGUu
+	rpQ3sLFlZG99e/xxGp/KXuhenj334E8sfLyp9/J753CkyRwSrZVKHjUljqHN48dw8Qf3FWDp7L7
+	gIBrTquV3HUNLDlxuS4eG6uZm0BA3GLyHQkTt6UeTq2aokqwjyPIGPulcv9Y3ZGTm/fqjpbY8rM
+	FQLc56bR+sOG0Lwrb+5XklNkn0wUR3KuVitMF+raUcy2WxV3wxf+W7miIkZBlIRju2sm/oVJHI/
+	UVVVm801ZsQ/cKQX7OC7wQ+tpWl+ZaSsO17/GFYijWB5MsPxuDobfCOC+8wC8ouxnyJGaodmeCX
+	W1mHrYenCFBhq0pNoDbmsbwqCKqjfTlQT1mJaNb+2PNyCc=
+X-Received: by 2002:a17:907:7b91:b0:bf1:1df7:3e50 with SMTP id a640c23a62f3a-bfe27b20a09mr22554666b.3.1781228469252;
+        Thu, 11 Jun 2026 18:41:09 -0700 (PDT)
+Received: from ?IPV6:2403:580d:fda1:0:2bb5:f164:6e6a:38d8? (2403-580d-fda1-0-2bb5-f164-6e6a-38d8.ip6.aussiebb.net. [2403:580d:fda1:0:2bb5:f164:6e6a:38d8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434ac9bfe1sm431703b3a.12.2026.06.11.18.41.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jun 2026 18:41:08 -0700 (PDT)
+Message-ID: <b866b2e6-292f-4c5e-ae5a-d77e983cfefd@suse.com>
+Date: Fri, 12 Jun 2026 11:11:03 +0930
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-btrfs <linux-btrfs@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>
+From: Qu Wenruo <wqu@suse.com>
+Subject: Direct IO page bouncing got some garbage?
+Autocrypt: addr=wqu@suse.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
+ FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
+ Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
+ fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
+ 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
+ V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
+ rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
+ rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
+ Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
+ E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
+ vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
+ g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
+ AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
+ cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
+ qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
+ /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
+ o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
+ JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-blk_time_get_ns() caches ktime_get_ns() in current->plug->cur_ktime
-and marks the task with PF_BLOCK_TS. That cache is only valid while the
-task keeps running; if the task is switched out, wall-clock time
-advances and the cached value must not be reused when the task runs again.
+Hi,
 
-The existing invalidation covers explicit plug flushes through
-__blk_flush_plug(), and the schedule() / rtmutex paths through
-sched_update_worker(). It does not cover in-kernel preemption paths such
-as preempt_schedule(), preempt_schedule_notrace(), and
-preempt_schedule_irq(), which enter __schedule(SM_PREEMPT) directly and
-return without calling sched_update_worker().
+Recently I'm trying to make btrfs utilize IOMAP_DIO_BOUNCE, however I'm 
+experiencing weird data corruption.
 
-As a result, a task preempted while holding a plug with PF_BLOCK_TS set
-can reuse a stale plug->cur_ktime after it is scheduled back in. blk-iocost
-then consumes that stale timestamp through ioc_now(), producing stale vnow
-values for throttle decisions, and through ioc_rqos_done(), inflating
-on-queue time and feeding false missed-QoS samples into vrate
-adjustment.
+During test case generic/708, I'm reliably hitting garbage pages at the 
+last 64KiB, the garbage even contains an ELF header.
 
-Move the schedule-side invalidation to finish_task_switch(), which runs
-for the scheduled-in task after every actual context switch regardless
-of which schedule entry point was used. Keep __blk_flush_plug() as the
-explicit flush/finish-plug invalidation path, and remove only the
-PF_BLOCK_TS handling from sched_update_worker().
+In that test case, we mmap a 2MiB sized buffer from another file, and 
+use that 2MiB mmapped memory as buffer for direct IO, write into a 
+different file.
 
-Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
-Cc: stable@vger.kernel.org
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
----
- kernel/sched/core.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+The source file has dirty page cache for that 2MiB range, and no 
+writeback happened during that direct IO write.
 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 8b791e9e9f67..bf024ca115ff 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -5368,6 +5368,13 @@ static struct rq *finish_task_switch(struct task_struct *prev)
- 	 */
- 	kmap_local_sched_in();
- 
-+	/*
-+	 * Any cached block-layer timestamp (plug->cur_ktime) is stale now,
-+	 * invalidate it.
-+	 */
-+	if (unlikely(current->flags & PF_BLOCK_TS))
-+		blk_plug_invalidate_ts(current);
-+
- 	fire_sched_in_preempt_notifiers(current);
- 	/*
- 	 * When switching through a kernel thread, the loop in
-@@ -7290,12 +7297,10 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 
- static void sched_update_worker(struct task_struct *tsk)
- {
--	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
--		if (tsk->flags & PF_BLOCK_TS)
--			blk_plug_invalidate_ts(tsk);
-+	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
- 		if (tsk->flags & PF_WQ_WORKER)
- 			wq_worker_running(tsk);
--		else if (tsk->flags & PF_IO_WORKER)
-+		else
- 			io_wq_worker_running(tsk);
- 	}
- }
--- 
-2.53.0-Meta
+So it means as long as we fault in all the pages of that 2MiB buffer, we 
+should be able to copy them into the newly allocated folio, and submit a 
+bio using the bounced pages.
 
+But the last 64KiB is reliably corrupted with some ELF header.
+
+I'm wondering where the corruption is from, especially it seems btrfs 
+has very little to do, except calling fault_in_iov_readable() to fault 
+in all the pages.
+
+Thanks,
+Qu
