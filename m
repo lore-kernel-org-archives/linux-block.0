@@ -1,95 +1,94 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3902A282F06
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 14:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9494359A6D;
+	Fri, 12 Jun 2026 15:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781275952; cv=none; b=gQ9HOr3CJ1NOgE7n5ODQOUmjqkOUoccUGizXF+p1EsOvml6sk1NVGPdOqzTNlrGOPjQbN9d5FI0LuO6XGaGMSnRY6HNxjzJsUKvtC5DFD28ZkR8SB4ZBIc7XU+MIqDQsFyDg96MX/OvzkBi25hs7d6kPx7X/Ru2VG+AeM9D5AAM=
+	t=1781278854; cv=none; b=Eqbv0H/KQWAJegMhOOUJQmL3VmSunipmGx93A8gfE4TQRlkS9eSO6FQhDEXgi05MBpMZckbUorzOQBHxd9nij+CZgYjhSewrzNkAV+Wa9TAJVGxtxFYbIPhyoVSLJfXG2kEz8xZgps39r0huMb2rCejjVcrtld765+M7/maZTZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781275952; c=relaxed/simple;
-	bh=org1tST3u55CEeuti5JaPzcTY/96/v7zS86+8k9Yyco=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tunGZ023NX9Qqg5LCXJ3eyvyoZFtMyN6HxhlhQ21fvUjDzEMcTsFyxhqlodKsIJgvhqi9vMs+PQqNnKBh6Y8ZIp761KZkPKz0tsN+JY7pHAq7D9yLfDQcSCTqDkhJiKs9ZrfknpfRe6TGL+Cu3le6KuFe1JcQcto/MGmeg7xG04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vrtBTIAW; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781278854; c=relaxed/simple;
+	bh=ys7fbEWrM3IoWeNbEfQSWHANKrDDlIfPDcdZ1JN0ack=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=skwvUCSSXCv1kVz5ZQy8iiqZ46SxukOQ23++sDYjtPTflooo6Jfqz663Kftp/oh+ZdE4ZMKUX8g6z8JqAcFUBoW/CRCUYE0OUuXGEjZlbeoEqigfIeh5shMyOfucNTormU8bi7XgXH21278Pme/vIdsEI3Hqk+NZu+rHFAkrEKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dvXPIKZP; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrtBTIAW"
-Message-ID: <76fa7dfa-70ea-42cd-91fa-1f2e64a345e2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781275948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KuaKQZbpHTJp0GyBmSBNC23x9gC02Y6fBRj7S1V+kVc=;
-	b=vrtBTIAWkWnySTPE3LrsnAGUZkDnpGVKbuT2KI2hKzfoi51gjEh+86ozYRFkGIwaoz0Zfb
-	FyXxbcXqR9qM9opusv/CedqLw4i7eDkC6fMoJDNMrE5WsIXCIp9tMwJ6lhq0VBi7Sjd4cM
-	pa4Kg91ElshEXBkCd6iq86fb/NtZ68o=
-Date: Fri, 12 Jun 2026 16:52:22 +0200
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dvXPIKZP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=MSuCSDG1sU373sc8ON+XkioeC7GLN1a88jygCwBOnYc=; b=dvXPIKZPaw73Y0JqKWErAvQefP
+	Wh6y94usAOWBmmh404EKRSORtrHMVXHhFiJLqzUOOlBqN70mipLzbYT7groNmZ7qylybv2Fp1JCKX
+	XZC2RqOYh76rZtw+tWrMlhT/uzikmYWy+g618q4bni3F8CVR2v59H8eba3oFfR/0iUW1I4SvHYcg/
+	BsR2n+fLDBy7FGG+iy86oLlOxMEjpuyrkt1ClzrzZTf+tQ41COirrBo6atewj3bdLlyc3Gw8FCMV0
+	m828BXBRhFOKUkjrBAHJbb/1Qnmx1x2qfwTae6kIUP9U6Kfxchfr6tOtc9gf+Fa7mnHJL1DTSk3PG
+	j9VnrZ9w==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.99.2 #2 (Red Hat Linux))
+	id 1wY3zc-00000006aqQ-11hs;
+	Fri, 12 Jun 2026 15:40:24 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 561A73005E0; Fri, 12 Jun 2026 17:40:22 +0200 (CEST)
+Date: Fri, 12 Jun 2026 17:40:22 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, bsegall@google.com,
+	dietmar.eggemann@arm.com, juri.lelli@redhat.com,
+	kprateek.nayak@amd.com, linux-kernel@vger.kernel.org,
+	mgorman@suse.de, mingo@redhat.com, rostedt@goodmis.org,
+	vincent.guittot@linaro.org, vschneid@redhat.com,
+	shakeel.butt@linux.dev, hannes@cmpxchg.org, riel@surriel.com,
+	kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2] block: invalidate cached plug timestamp after task
+ switch
+Message-ID: <20260612154022.GC42921@noisy.programming.kicks-ass.net>
+References: <20260612094042.3350401-1-usama.arif@linux.dev>
+ <20260612094520.GA42921@noisy.programming.kicks-ass.net>
+ <789fd34a-d051-4f98-bd66-e3d99ec2dbb1@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 01/27] aoe: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Marco Elver <elver@google.com>, Christoph Hellwig <hch@lst.de>,
- Justin Sanders <justin@coraid.com>
-References: <cover.1781042470.git.bvanassche@acm.org>
- <f15d4c4f4a22ab4788a40d51d88d228a649d0115.1781042470.git.bvanassche@acm.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <f15d4c4f4a22ab4788a40d51d88d228a649d0115.1781042470.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <789fd34a-d051-4f98-bd66-e3d99ec2dbb1@linux.dev>
 
-
-
-On 6/10/26 00:04, Bart Van Assche wrote:
-> Add a missing __must_hold() annotation. Enable lock context analysis in the
-> Makefile.
+On Fri, Jun 12, 2026 at 11:02:58AM +0100, Usama Arif wrote:
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-
-Looks good,
-
-Reviewed-by: Md Haris Iqbal <haris.iqbal@linux.dev>
-
-> ---
->   drivers/block/aoe/Makefile | 2 ++
->   drivers/block/aoe/aoecmd.c | 1 +
->   2 files changed, 3 insertions(+)
 > 
-> diff --git a/drivers/block/aoe/Makefile b/drivers/block/aoe/Makefile
-> index b7545ce2f1b0..27bff6359a56 100644
-> --- a/drivers/block/aoe/Makefile
-> +++ b/drivers/block/aoe/Makefile
-> @@ -3,5 +3,7 @@
->   # Makefile for ATA over Ethernet
->   #
->   
-> +CONTEXT_ANALYSIS := y
-> +
->   obj-$(CONFIG_ATA_OVER_ETH)	+= aoe.o
->   aoe-y := aoeblk.o aoechr.o aoecmd.o aoedev.o aoemain.o aoenet.o
-> diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-> index a4744a30a8af..54c57b9f8894 100644
-> --- a/drivers/block/aoe/aoecmd.c
-> +++ b/drivers/block/aoe/aoecmd.c
-> @@ -1193,6 +1193,7 @@ noskb:		if (buf)
->    */
->   static int
->   ktio(int id)
-> +	__must_hold(&iocq[id].lock)
->   {
->   	struct frame *f;
->   	struct list_head *pos;
+> On 12/06/2026 10:45, Peter Zijlstra wrote:
+> > On Fri, Jun 12, 2026 at 02:40:42AM -0700, Usama Arif wrote:
+> > 
+> >> +static __always_inline void blk_plug_invalidate_ts(void)
+> >>  {
+> >> +	if (unlikely(current->flags & PF_BLOCK_TS)) {
+> >> +		struct blk_plug *plug = current->plug;
+> >>  
+> >> +		if (plug)
+> >> +			plug->cur_ktime = 0;
+> >> +		current->flags &= ~PF_BLOCK_TS;
+> >> +	}
+> >>  }
+> > 
+> > If you can guarantee PF_BLOCK_TS is only ever set when current->plug,
+> > this can be reduced further.
 > 
+> Thanks for the reviews!
+> 
+> The invariant holds at set time (the only set in blk_time_get_ns() is
+> gated by if (!plug)) and through the only legitimate plug clear in
+> blk_finish_plug() (which goes through __blk_flush_plug() that clears
+> PF_BLOCK_TS first).
+> 
+> However, copy_process() sets p->plug = NULL for the child but doesn't
+> strip PF_BLOCK_TS from the inherited flags.
+> 
+> I think the if(plug) is a good defensive check, but can also do the below
+> if you prefer?
 
+I think that's worth the extra few lines.
