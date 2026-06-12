@@ -1,89 +1,111 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708753D6CD5
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 17:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6955733123D
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 22:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781284378; cv=none; b=sg7x+xYKdI5/8HAsMyD43nGBC+MCYagbm0eY4WxNz56x0IEa2Frcd4TLBdMoMzrYB64yVmMWodxeU7r/oAQWnW3iQntSqcicdsjqIaLBpDgcP8dKHGnQR/6RarejS91CXswF19s7S0DrdwznexnCExLi0WV9ZgbfRPWopTSXRLE=
+	t=1781303554; cv=none; b=DSsS1rfEvh9J6s9z/Fkml4Axl1O20H9Lop+ldwcM1cCO0EEXSBrCIXwWUqiId9mG5Uh6A1GRE0EZLFJBQfDlkLrlFvRfFqp5B1dOip/lEXwwFWGWu290yszNgHPee3vZGMbXjdwbzWrhuGs7ojtML+8Gw1m0h8+9uhgjJiPtxWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781284378; c=relaxed/simple;
-	bh=uaylMnCNhhHYh+V/e77ZSe/RAF0I1AmP1cCt/jTZXBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m9DsnDdiQ4ZS1hOFnIk0mnGAJawfXWXlZKhl6ZeVZ6+4s4ut9BXRVGTy/yjvSrtJxrZuuk/s3TL/lCR/gDbMoakeR9Tj1F19J4jgNdv+2ls/ogz/oAJJPTNpAcWsteK6hEqiWrvFjPf14+Ty7czbWEMj1QNIHjjJ6HyFy6IneZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4MULm9jb; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1781303554; c=relaxed/simple;
+	bh=bzbbCgHkNEcseBDUWGHIHQKhW2uEnvW+s4w8mQgh5Pg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ag9eyTvyIG2pF0kVUcVivg7gTRNPR0lKqXFgpEBYmRd1U7bTDxxzugeYJVZ7VUf6AZckRsFA8hqUrJkZJ9TMJO7UITnu5FRpkjtf9oRxKpFJcspiH9GyZy+35BCx8Tdc+nUbqnASAlsKYxUlIirCYx54/183MB+4Etv1DRqprHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=n2Rmy187; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4MULm9jb"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gcR0g1w6Fz1XM5kt;
-	Fri, 12 Jun 2026 17:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1781284368; x=1783876369; bh=uaylMnCNhhHYh+V/e77ZSe/R
-	AF0I1AmP1cCt/jTZXBM=; b=4MULm9jbzSSYnTl/k5ym2EPZR3gnBosO+KzHwKlC
-	TccFjNdiKGHOQKGGF+kL4vdwO2xPj08A8IQ1xxsguUpn83Gv0t+JinqzxJjR8gms
-	/Hunsf1wXoyc4AZjPGHPMgk/REahZpCNJ46ALu5LF9+HL+iWo/oA9bBnBIbF3bBy
-	QGR2OwCPizYtGF5G4TpfgKGw6jwHlX3Rd7+zogjhS0fouv269wRF165BXoJpGd3L
-	CouwbcLlwx1ZVwk/vW/zhi3spHfuEFJgG4zGo97Eqo3N4YmOpwKCk+Ak251BklCJ
-	FlOSB4SJKWn+APa9keX4hkwf9xizFp+l9PjSKOaQYU9StQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id m8uiVeypMxDY; Fri, 12 Jun 2026 17:12:48 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gcR0b39MLz1XMFjH;
-	Fri, 12 Jun 2026 17:12:46 +0000 (UTC)
-Message-ID: <231ae188-a34f-49a5-9b9d-56da83be8fbd@acm.org>
-Date: Fri, 12 Jun 2026 10:12:46 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="n2Rmy187"
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65CLecGh2381163
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 15:32:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=euhFA5V8dxNsiTCGW/
+	4Wb2ZOVCrP5g+1huE0YqjBXJI=; b=n2Rmy187HDX8f/QnOxkoV2l18/55N+Try1
+	SwYuA1lnTStVt6jahFwSQmzmwiMiX2SI3x76OqKtGPE1MZseENzJ5HVBaOgeMv/T
+	47i0CcIQ76Ds+X0u5CKYjJs+5n7dZ7LerwVdx3jgX3Nd3HU8wW49wk3sM1S3aHZa
+	0+I0ctBky/tLa0xZAGY69ti+58L9a44sfdYlDYCbTqfZLrJK2hbUwrlcq10iiYDn
+	QRC832b5+7uvOkpmmfGflgmd2zcfyOy00V2HQzRAGMtmo+SXjxHiiXFZAJ6wnTyO
+	htlXRBfq3qBOK8iYL1OIwM+vkuV76sX1V1egmMcaXtZnyE5M71LA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ermg1jtfw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 15:32:32 -0700 (PDT)
+Received: from twshared21870.02.snb2.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Fri, 12 Jun 2026 22:32:19 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 07E0B227FA6A3; Fri, 12 Jun 2026 15:32:14 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC: <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Carlos Maiolino
+	<cem@kernel.org>
+Subject: [PATCH] block: check bio split for unaligned bvec
+Date: Fri, 12 Jun 2026 15:32:04 -0700
+Message-ID: <20260612223205.465913-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/27] loop: Split loop_configure()
-To: Haris Iqbal <haris.iqbal@linux.dev>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Marco Elver <elver@google.com>
-References: <cover.1781042470.git.bvanassche@acm.org>
- <f001b652198021d586af28c4c2c27be4b1824f3d.1781042470.git.bvanassche@acm.org>
- <667e352d-afad-412e-8f2a-ad5f5f8a737b@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <667e352d-afad-412e-8f2a-ad5f5f8a737b@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: fzg73cR60QpvdhFIj9TYRwtacVMSrXGI
+X-Proofpoint-ORIG-GUID: fzg73cR60QpvdhFIj9TYRwtacVMSrXGI
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDIxNCBTYWx0ZWRfX44r+qD/2J8n5
+ ntPdhL97LEvo9CILo/b2k4cZ/yzdBAhm69YPWThNcHQ6pk6ky8Oagw0+c1RcMIPOabCgLrQqtxM
+ xnzy3juK8YvLsBDJ2gHHkjj1bvSJhzY=
+X-Authority-Analysis: v=2.4 cv=U/Oiy+ru c=1 sm=1 tr=0 ts=6a2c8900 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=PAz_-FQ8hEVmOPYdF0yf:22 a=VwQbUJbxAAAA:8 a=KC3CPbxw_Nr-F8MmkwIA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDIxNCBTYWx0ZWRfX29Dix+gMPKCb
+ z0m6vtxeffY4ZpkcLyb/Jt2JGFFYzmsR780zYMNPfuofs6oVpRVR9mEoo8b1HCVE3vkDHKV/bqJ
+ jiRLfYwqbPMST5Q8KUuujcKE+iWMjIdNeDFWG9DVlpMO06iHvbeujOCZ98FQiEOvjuqqUlUNLTd
+ 4yPzs+7VBbRqxdmHmHT/IkX/UIMfsFAIsBj1SM7Gm/xaP6SnqW1aJIRDx64dMuwyn57Q4J5tx5Z
+ J5E3weYrpC23pU38niPENOVEpyiWpNmE3laACkIIaVVQR9eE35QU1POVo74XUUXBgWYJ2SdXwzD
+ /294IVZduiBNV5xO6Dk4SgpCMHt7p+MLnI0o9UHjOtTFpf1IoJQkLsH89/Ei04uwuwgW3OlNFXg
+ H4/M7G/wRxQjycZtiGe5iZIhQpWAv/mkHQUsWaqXErz/Q4u1NdK1355QMlDR2VFxf/8cGODXaRD
+ 0IxKySFRU6SOO5EG3fA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-12_03,2026-06-12_03,2025-10-01_01
 
-On 6/12/26 9:16 AM, Haris Iqbal wrote:
-> On 6/10/26 00:05, Bart Van Assche wrote:
->> -static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 struct block_device *bdev,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 const struct loop_config *config)
->> +static int __loop_configure(struct loop_device *lo, blk_mode_t mode,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 struct block_device *bdev,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 const struct loop_config *config, struct file *file=
+From: Keith Busch <kbusch@kernel.org>
+
+Offsets and lengths need to be validated against the dma alignment. This
+check was skipped for sufficiently a small bio with a single bvec, which
+may allow an invalid request dispatched to the driver. Force the
+validation for an unaligned bvec by forcing the bio split path that
+handles this condition.
+
+Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
+Reported-by: Carlos Maiolino <cem@kernel.org>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk.h b/block/blk.h
+index 1a2d9101bba04..004048fa0c5a8 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -404,6 +404,8 @@ static inline bool bio_may_need_split(struct bio *bio=
 ,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 bool *partscan)
->> =C2=A0 {
->=20
-> I wonder if we can add "__must_hold(&lo->lo_mutex)" to this.
-> Same for the function __loop_change_fd()
-I will look into this.
+ 	bv =3D __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ 	if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
+ 		return true;
++	if ((bv->bv_offset | bv->bv_len) & lim->dma_alignment)
++		return true;
+ 	return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
+ }
+=20
+--=20
+2.52.0
 
-Thanks,
-
-Bart.
