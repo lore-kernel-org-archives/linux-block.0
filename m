@@ -1,232 +1,120 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF601395AEC
-	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 16:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CFE36CDFC
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 16:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781280967; cv=none; b=RiBzRRSWWij9Vfvg419pnAdaLEzb8ZmXnfCmjdrFheU0quwFGa86uYmFQfZsvSgUGkDoIfjkm7ty6PNoXrl845LFCC9BGhimCAxBNC9qzK75euVEh35m8p8Cw9oeXSvEDo6mEOpu3bxmS5QRG2MvBZcgjfXcM1f8gA/IP8ctuw0=
+	t=1781282656; cv=none; b=r6eYuwBV1M6x6SYNCvYyUUuU0o/HBjxij7QyAqpgxa6U0K22C8bVqd34NOhaswNGgLnX0gj4PHlBATZY/UP/PoMbhTI2eFOLcQQbmpjsVXdek38hW4O+E/aF//RdFlA9057tI/QudYfHYh+1R8C00NWuBDLa04tDa6Hlb3sh8z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781280967; c=relaxed/simple;
-	bh=YG+l5Sqvv97xQ4D9SdRLCYLLUQatuUzC7tglTWPn6rg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EQ8vcMw4OyghwCvdVVgNBABs294hDD2Ra+e2oZYhutLgkUyru1eHHSF5S4x+ZDNhuQtWIX5dJg9HLvUmzWtZO3eopt69q9BhYumpsEN7UCVZvhZVoiUkK75HNRNj1gBpfaU9G4fYg1odSWBjww2L8NhLV6Fup6CrU+SwoaSG5RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d6WbMa1G; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781282656; c=relaxed/simple;
+	bh=ZJHMLe4ngJzg2PRK1QqIRr8+43r78NJCf1N8Kj34+A4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=St4FI8GrWffj4aGL/XKKvNY2V7L3YIhqrofxTzqZUE0+av/PO1fZaz6Cs6R+xoN9izMc9RxVGpAO2cef5zkuL5jgCMvVNGOncJUgJOyGC5fJuqBCUpedIEu87STGxR8W9KcudXBTc3cmIdrnJiLbn5VSTXOgc2Pr27t+FEQ9x94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=RASmTaLU; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d6WbMa1G"
-Message-ID: <667e352d-afad-412e-8f2a-ad5f5f8a737b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781280963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qINpHuayErACXjh0AoeBOU65EJUliYLSX/8Ct5OL2J0=;
-	b=d6WbMa1GTCfYSMTX23bAe7EniyhJG7nuynQLpr6jFRq3h//qVv3ltHA2CDoChE9q3fagWk
-	PhVV2oK8cMTmqBUy7donjPTOUQBSm7gbUw3PfhSMHDnehkSbeBfta8xJa4pTYatwnx0yn+
-	CRpZp/rB8pOo3jEukiOGr6vNHJRqlMg=
-Date: Fri, 12 Jun 2026 18:16:01 +0200
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="RASmTaLU"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-69d7aa0ac14so840863eaf.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781282654; x=1781887454; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ARs7fVy0Lz4B2rFphXAnXjYPYcr1SgRO7NwP4+aeYig=;
+        b=RASmTaLUMGTt6uSQJNGP+ffxRcXSH0fKge4cO2R2CJXSG6ZLNHE32ywNIydLPr+zsr
+         0nJpPtfvd/L0c1bImgMOZhe9gATFUR6iIRtSbbutMGPXuG65aYWxru5dbs6l9jBlHf/C
+         fV7FqyVF8WEudq6p5P0CM0ZQIIYg+V0l48thdm3EjJgZZ73WgRhoo3NMAHaFeg4hMw4j
+         1+DJRQpUPqsjDxCPx2a0v3Zb2SM4xg55voVTtPLrY0O/KOTBNRNPl3GcSEMsg7nZEFdr
+         tzwbuiu9Tkg9CoYycpIHCj8BA7Tq22bgLoQ+ipWpdSJ06rlEjYrI/hrbu7kXZhC/kMja
+         tAhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781282654; x=1781887454;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ARs7fVy0Lz4B2rFphXAnXjYPYcr1SgRO7NwP4+aeYig=;
+        b=Em27Ho61MciLE9FuT+EXKQXgyd4K7ov84tsiAmd7xNODpNQeNlXO8S1MxV3vf7DdjJ
+         QlbhKS1CMf6jdDi9X3MwTCrctKzuiTtUUFD79kIQskR3kFnPhFa6SWptn6eXFl8a+Ao4
+         kP6b0PLdT+CrMn1WGoq4D6ghFscRwQQnfiXKBrDIsYPW6BGQFkZw9Lf9igxO02lQWof7
+         LWJvFP6VoUrlCg4UfaC1F5QxSXThfaAykmGGraPp3GCFKDJLiw38QzmdYVurbl478N7h
+         oGhoKhXvQ8rSbZoztuPiMv9LyRui6Xcyy6fNlVN28MBpcavXswNJomlsvoNGtje8XCes
+         mgxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+u/xjBmdG/PJS3PxuPN6T2fOnh0Oqz7CoMlmHcvqSnUfMppPBHnyHlz9DvLaRo7WeL2gN7oCy2JD+JtQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg6XVGRQ8ve2IP451iTMsBNlzaz45gzyYPwH70/Up5IU6w3u01
+	7CKju6zt3ylgz+bgENTjWVLEF+YZzKR0p7AgsLURr8oSM5Xn+97HRLJTJMKXYtwsKRk=
+X-Gm-Gg: Acq92OHH/6SdQDzqNtaM5B8pTqAUa7yGMQ1q2UiiCXj3roWdMPP43aiu0+pQiIAQmLx
+	ejsBLmscYqhZVZACodACMf7eDALA70HP1Zft9v5xYlVIddx3C+XhFNGRuhgGom0dr2+q9nQTgXv
+	riXufmeoq+rYkN/JjaJI7OXZ6v3eOO/6cxhenquoIWGgxIDUbWhH00zuPkXWjNsQvYwWd2VQvG/
+	yBTUIVnphd8fJHB+T10VdH8idIWo3oy6nvx2S48Q+8BpWS6vilewzYDjalg6rhqUQ8B+yGDBRk4
+	x/KFaH7UOHCAup6xVlUGEKW0b/5XYWC2We/PjZ9PHcVM+nBmCwI9slMjhQp6BW+Mmig6anoasoD
+	YB4gWL3aAfUkjBAaz0Oyz7vuF7RAI9aPPGg9UBecVNV45RCKs+QUaCZ17QY42Cyl27r8BpGfuin
+	b8ChSa+4gC10zbom9kX0zb4GZaB52Cx739TIWtP3CAmwndtLN9AXdLxxXjKTRwBry8955K/1uqD
+	Poi
+X-Received: by 2002:a05:6820:806:b0:69e:3327:1d52 with SMTP id 006d021491bc7-69edc5e7d6cmr2256639eaf.5.1781282654069;
+        Fri, 12 Jun 2026 09:44:14 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4426b30ee99sm2128348fac.15.2026.06.12.09.44.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2026 09:44:13 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>, 
+ Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>, 
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org
+In-Reply-To: <20260611140703.2401204-1-hch@lst.de>
+References: <20260611140703.2401204-1-hch@lst.de>
+Subject: Re: configurable block error injection v5
+Message-Id: <178128265322.1800972.11563818485648340074.b4-ty@b4>
+Date: Fri, 12 Jun 2026 10:44:13 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 16/27] loop: Split loop_configure()
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Marco Elver <elver@google.com>
-References: <cover.1781042470.git.bvanassche@acm.org>
- <f001b652198021d586af28c4c2c27be4b1824f3d.1781042470.git.bvanassche@acm.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <f001b652198021d586af28c4c2c27be4b1824f3d.1781042470.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Mailer: b4 0.15.2
 
 
-
-On 6/10/26 00:05, Bart Van Assche wrote:
-> Prepare for adding a second __loop_configure() call.
+On Thu, 11 Jun 2026 16:06:43 +0200, Christoph Hellwig wrote:
+> this series adds a new configurable block error injection facility.
+> We already have a few to inject block errors, but unfortunately most
+> of them are either not very useful or hard to use, or both:
 > 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/block/loop.c | 109 ++++++++++++++++++++++---------------------
->   1 file changed, 57 insertions(+), 52 deletions(-)
+>  - The fail_make_request failure injection point can't distinguish
+>    different commands, different ranges in the file and can only injection
+>    plain I/O errors.
+>  - the should_fail_bio 'dynamic' failure injection has all the same issues
+>    as fail_make_request
+>  - dm-error can only fail all command in the table using BLK_STS_IOERR
+>    and requires setting up a new block device
+>  - dm-flakey and dm-dust allow all kinds of configurability, but still
+>    don't have good error selection, no good support for non-read/write
+>    commands and are limited to the dm table alignment requirements,
+>    which for zoned devices enforces setting them up for an entire zone.
+>    They also once again require setting up a stacked block device,
+>    which is really annoying in harnesses like xfstests
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 6fbea0af144f..80fdb0dee268 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -981,61 +981,28 @@ static void loop_update_limits(struct loop_device *lo, struct queue_limits *lim,
->   		lim->discard_granularity = 0;
->   }
->   
-> -static int loop_configure(struct loop_device *lo, blk_mode_t mode,
-> -			  struct block_device *bdev,
-> -			  const struct loop_config *config)
-> +static int __loop_configure(struct loop_device *lo, blk_mode_t mode,
-> +			    struct block_device *bdev,
-> +			    const struct loop_config *config, struct file *file,
-> +			    bool *partscan)
->   {
+> [...]
 
-I wonder if we can add "__must_hold(&lo->lo_mutex)" to this.
-Same for the function __loop_change_fd()
+Applied, thanks!
 
-> -	struct file *file = fget(config->fd);
->   	struct queue_limits lim;
-> -	int error;
->   	loff_t size;
-> -	bool partscan;
-> -	bool is_loop;
-> -
-> -	if (!file)
-> -		return -EBADF;
-> -
-> -	error = loop_check_backing_file(file);
-> -	if (error) {
-> -		fput(file);
-> -		return error;
-> -	}
-> -
-> -	is_loop = is_loop_device(file);
-> -
-> -	/* This is safe, since we have a reference from open(). */
-> -	__module_get(THIS_MODULE);
-> -
-> -	/*
-> -	 * If we don't hold exclusive handle for the device, upgrade to it
-> -	 * here to avoid changing device under exclusive owner.
-> -	 */
-> -	if (!(mode & BLK_OPEN_EXCL)) {
-> -		error = bd_prepare_to_claim(bdev, loop_configure, NULL);
-> -		if (error)
-> -			goto out_putf;
-> -	}
-> -
-> -	error = loop_global_lock_killable(lo, is_loop);
-> -	if (error)
-> -		goto out_bdev;
-> +	int error;
->   
-> -	error = -EBUSY;
->   	if (lo->lo_state != Lo_unbound)
-> -		goto out_unlock;
-> +		return -EBUSY;
->   
->   	error = loop_validate_file(file, bdev);
->   	if (error)
-> -		goto out_unlock;
-> +		return error;
->   
-> -	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) != 0) {
-> -		error = -EINVAL;
-> -		goto out_unlock;
-> -	}
-> +	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) != 0)
-> +		return -EINVAL;
->   
->   	error = loop_set_status_from_info(lo, &config->info);
->   	if (error)
-> -		goto out_unlock;
-> +		return error;
->   	lo->lo_flags = config->info.lo_flags;
->   
->   	if (!(file->f_mode & FMODE_WRITE) || !(mode & BLK_OPEN_WRITE) ||
-> @@ -1046,10 +1013,8 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   		lo->workqueue = alloc_workqueue("loop%d",
->   						WQ_UNBOUND | WQ_FREEZABLE,
->   						0, lo->lo_number);
-> -		if (!lo->workqueue) {
-> -			error = -ENOMEM;
-> -			goto out_unlock;
-> -		}
-> +		if (!lo->workqueue)
-> +			return -ENOMEM;
->   	}
->   
->   	/* suppress uevents while reconfiguring the device */
-> @@ -1066,7 +1031,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   	/* No need to freeze the queue as the device isn't bound yet. */
->   	error = queue_limits_commit_update(lo->lo_queue, &lim);
->   	if (error)
-> -		goto out_unlock;
-> +		return error;
->   
->   	/*
->   	 * We might switch to direct I/O mode for the loop device, write back
-> @@ -1087,14 +1052,56 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   	WRITE_ONCE(lo->lo_state, Lo_bound);
->   	if (part_shift)
->   		lo->lo_flags |= LO_FLAGS_PARTSCAN;
-> -	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
-> -	if (partscan)
-> +	*partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
-> +	if (*partscan)
->   		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
->   
->   	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
->   	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
->   
-> +	return 0;
-> +}
-> +
-> +static int loop_configure(struct loop_device *lo, blk_mode_t mode,
-> +			  struct block_device *bdev,
-> +			  const struct loop_config *config)
-> +{
-> +	struct file *file = fget(config->fd);
-> +	int error;
-> +	bool partscan;
-> +	bool is_loop;
-> +
-> +	if (!file)
-> +		return -EBADF;
-> +
-> +	error = loop_check_backing_file(file);
-> +	if (error) {
-> +		fput(file);
-> +		return error;
-> +	}
-> +
-> +	is_loop = is_loop_device(file);
-> +
-> +	/* This is safe, since we have a reference from open(). */
-> +	__module_get(THIS_MODULE);
-> +
-> +	/*
-> +	 * If we don't hold exclusive handle for the device, upgrade to it
-> +	 * here to avoid changing device under exclusive owner.
-> +	 */
-> +	if (!(mode & BLK_OPEN_EXCL)) {
-> +		error = bd_prepare_to_claim(bdev, loop_configure, NULL);
-> +		if (error)
-> +			goto out_putf;
-> +	}
-> +
-> +	error = loop_global_lock_killable(lo, is_loop);
-> +	if (error)
-> +		goto out_bdev;
-> +	error = __loop_configure(lo, mode, bdev, config, file, &partscan);
->   	loop_global_unlock(lo, is_loop);
-> +	if (error)
-> +		goto out_bdev;
->   	if (partscan)
->   		loop_reread_partitions(lo);
->   
-> @@ -1103,8 +1110,6 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   
->   	return 0;
->   
-> -out_unlock:
-> -	loop_global_unlock(lo, is_loop);
->   out_bdev:
->   	if (!(mode & BLK_OPEN_EXCL))
->   		bd_abort_claiming(bdev, loop_configure);
-> 
+[1/4] block: add a macro to initialize the status table
+      commit: 8c8ebed16581faf3b3e97336aeca3d8226c4435f
+[2/4] block: add a "tag" for block status codes
+      commit: ce351560b714403acfdeed86ef96675d229da837
+[3/4] block: add a str_to_blk_op helper
+      commit: d39a63ead381c7ee93cd938ea2d759c17343b522
+[4/4] block: add configurable error injection
+      commit: e8dcf2d142bd720c8334233ad6cfdf00f0e76b7f
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
