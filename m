@@ -1,214 +1,210 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41B730F7EA;
-	Fri, 12 Jun 2026 08:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7DA39A7F4
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781252872; cv=none; b=TeIZKG0GL8S+2/BC1WgB9s8em/3CsUAcAcUJTdqEpk9nM2lCrt76KXdBhmHa5dKsBCJl83aqUCJXpP5vn+EI6Dvx+ahRVWg8SF+8IgXJtgP7VV+KCCM9Wr9evfKcXV/cEOheHDNPSYGtFd6PMc5Yl6rVyzpT3yEFDgCMwf3ib8s=
+	t=1781255504; cv=none; b=Lo05zXgBunv1CNoyDt8dCgpjc1NM4IPI35gDabtd90AsHkeEVSg0QsTdtbzwdD/ZJpOsecplkx9RD+0DS6ILwY5rteVhIXyxT5SeLLYOjXVb6JmRNSK16cQfMSOZf/EYJOM8WQXBYPW+I6r1Mv4NHbKDRakb/1VZHgoxM5ojfH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781252872; c=relaxed/simple;
-	bh=1kVaEdcKw/iBVDpmBcZvo3UImclFdFy7Kgu86PoE6bA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jv5g/gaHHED9Rq3rKU1OTMvFzeWQaclMHz+sONfqNqY9iyXROFlt74wLKfTx0ORL2ZWKhRF7yJpBWh8d8DD+lxtrVt0AcKG3eTsYed1Qi+mF7Pr4inPPSxv3yRg6RLfy6xahGxPcmeQVp5truQPuvXprEjanLDErILGK6QPmNE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=uXxKwQeT; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
+	s=arc-20240116; t=1781255504; c=relaxed/simple;
+	bh=HVX+df4r4r4dxwN87XOAKz4MPubjc4ZqELInIOqinR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dR1m4eipp3yCYsS/fPE+7uZ+U3/YbvJZx11yhkIY2R7IBm1IaCCIBqp/h5KNKBS+jH4JKFzHAJ3ANv7a2cdRAvFNlgIkwOiNXfo3o8UA4pXYAcT5Km6PZ01vHh4vMYKXC7dmcke8Qi1iU9H0LZzFYmru1LtrQXYZUq/AZTqQGKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aVuTXDZ/; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VJjO+9fk; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="uXxKwQeT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
-	s=s31663417; t=1781252859; x=1781857659; i=quwenruo.btrfs@gmx.com;
-	bh=bYA9sJRTwW3jXGyP74eIwb+0WnjsT/Xt81w613k/PKE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=uXxKwQeTV/YZahIrkIu/ssskIZdkkmvt4bIgV1O66i2Ff3l56PgtDwpLodE3Wb51
-	 llN/H1y5xnfAAx3i/iB6Yc/fSoITdBeM9GKehC6VsfDB2oo6rpPBJHoIf7s16pnq1
-	 p86r3UWVqPtO6F/Yp4jBxBHY44QM2baSSN4YE061+MZkYxn3jSDKWI3bPQ6/KOMT3
-	 JbASWod+F5J8i8jKYMwUbMiUooFGQoTp4Wz4WdqbUagm626T9HD4rb6MYQjSTxjIq
-	 gnSExrozt7W0LAwozpP3CkcK+i2tJ6Cyw3WeN2AJ/omUlZ2Hr8CSdB4J4ErZawz5q
-	 GEMT/PO8hiqL7ZmdlQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1Mnpnm-1wzvFY3ZU2-00fs4O; Fri, 12
- Jun 2026 10:27:39 +0200
-Message-ID: <c1134294-dd9e-4481-9cfe-cd708c1d7de6@gmx.com>
-Date: Fri, 12 Jun 2026 17:57:34 +0930
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aVuTXDZ/";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VJjO+9fk"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65C39Rrk940467
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:11:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=MWlVxwNP0J33Tyh80UZciLId
+	M0pPmHRLu6KbBtI6/ys=; b=aVuTXDZ/skZo9mrZ8H+DnfiSbPM3ru7HoXwGU7V2
+	VzsH4v1NdM8uz2jofMhDBBSpV/dVsA+FHFT0XcAn0Rnc9jW3X/f46s0JtVrOK7dx
+	IhHaqUk4N0oIWgVSGDtip7qjoKGlwfImWHQlV/Gpq4TqIYlKI/pr0kOhzdCPU60I
+	+UwtIs1r7wSjgjYoAYfLpZxuhEGfCiQXZaoL09qwrDApCKR/4omYM/FdwiGOAJBK
+	kigAO1j5mBber8zp30yI+XcnRqojTwNqgrZa5FIDVjo8UL3hkHgZCiMUja2ng8Qt
+	LSdiyHjuYU4T+2qxZ+wGNVm61P7Bei8Ky2LgN6r3JlGolg==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4er014ka1e-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 09:11:37 +0000 (GMT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-517afbeda8eso19350611cf.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 02:11:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1781255496; x=1781860296; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MWlVxwNP0J33Tyh80UZciLIdM0pPmHRLu6KbBtI6/ys=;
+        b=VJjO+9fka4La0BpK0RSipyIxHR93KifwVPO5rVu5dMpTTU5zqLsm7sfV+6lH8noI/C
+         5r1GpkW2G6ViM15P76LEQMZSYK2IzVfAzj5XoFrVh64xJbe565xNnX9CG3w2SBbD034r
+         7BVw/Ye6BKIIZj/ioHBEh3KVMVoVY890P/NbEp4XHubjG7mW54eWaQCmVZBU66xyEczz
+         VB++Io9PUjRojEIPA9C/4qxw6mjRLO7pWPKlqxcqqe0/g1gA9Gp00KHAE1N6ZCTQ9Gf/
+         j6RL1lTFL98Q0q29jt7v/Y7Uj35JEp4MpgVKqPW8dT1tyrePpyQ3/ZtD7uPBut0P30x3
+         94/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781255496; x=1781860296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MWlVxwNP0J33Tyh80UZciLIdM0pPmHRLu6KbBtI6/ys=;
+        b=BR09tIpbBF6TMRX92wn6wrKCPnXMaQ2aNuwzmgLjj4dRz83wRepLEy5XDKqf8kK01r
+         jpjxGZpAcSVDpPFfk3rV/QyF8Cg9NCbUL9AAAky1HPCtxb275xBd1D/UzMxCI6G9UrQ9
+         THa3lDbN/tb1iXdXjjikFSwgIaMgMhyn7/JuApgsXKz3g+v0aw/sz+15FHwMjTZB0luL
+         V7CRY43oNzUiPTxltajVVjWnwlv/BdZtA62z+TaShEfoAeNzjklPpvA6/8wqIYAxzzmL
+         Dm284sccpX7nQwmkxrex+1xiLN8hmqfJfRJCYoXu2BvKfm5agDq6XrjGJdm47eNBQJf6
+         EVyA==
+X-Forwarded-Encrypted: i=1; AFNElJ9Kd1HbFHo+xm9fNl37WNrfLwb48bbQSOnyPbgIZA0qqHncEDEKK9pM8lUl7yTOvrMup/yx2t5GtWqLVw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcTTrvd6Y6DDBK+JUFqZ7jK33DvE4WAHZrwmHkyUCgPdjaLQ9Q
+	qlQMOeBD/l2ooAuG3osJx4Y91PkhFMl7wPMTsbzGFA3ouvEUPS5bE0TQTbFBZMiEHeaS/BPNgI+
+	BmhAoNzZ1DoE+r7EtLrhGBf+bMY7c9i++x5u6tPPb3z4y4rA1+gWQKSkpqw4xzGJEoQ==
+X-Gm-Gg: Acq92OHi/BQyXR2QFz3uKHVkOxjcxjsmFMefGlRsYT79UPyQSb13b2DYF6KvZ4Ug0/E
+	oOyBvTyVYbmxtJh9v35I4YgX2GMp5XtP+rV4Mqc6AKJVmggi5O6PdinowSGEVOQG6cXae5ivxKe
+	4K259sIoygO4VExutRRvFmR2ftfCnIhvgm+EY6HYWHi+mAmqIHvi/VVSAjOmGvpcXmMsYi+aY/n
+	jhPvuVBBAkjYYdVs+6mhf+fC32mssTjpcK0eZ5VRQ90jj6pVSnXt4T/PgTTsNlOu1IdlqTkEQ2l
+	/wNoG0puFsQsJ4ve+2IGSfqMj6as4C2tYztsgLHyDz0jL0+OBl7h+G9tTTSomky40X+pbwJHLkD
+	kcHOb/u6H5k9uB0V7djFnGupjN4dELFl9unfaz9NG8m87AgdHL5ZWfr1soCoC0+0LdAYqxhQCzH
+	GbOIWiIlAzTs+wx0GQGUx3wm1jPig8R3qnbhU=
+X-Received: by 2002:ac8:5a41:0:b0:516:e10f:7140 with SMTP id d75a77b69052e-517fe229bc2mr24342591cf.35.1781255496174;
+        Fri, 12 Jun 2026 02:11:36 -0700 (PDT)
+X-Received: by 2002:ac8:5a41:0:b0:516:e10f:7140 with SMTP id d75a77b69052e-517fe229bc2mr24342101cf.35.1781255495685;
+        Fri, 12 Jun 2026 02:11:35 -0700 (PDT)
+Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e170386sm379979e87.30.2026.06.12.02.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2026 02:11:34 -0700 (PDT)
+Date: Fri, 12 Jun 2026 12:11:31 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        daniel@makrotopia.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v4 6/8] Bluetooth: hci_sync: Add NVMEM-backed BD address
+ retrieval
+Message-ID: <sy2ofvdbcxspxtmfdavjvdz7oes5ieuep4znf4ayknmuwhrlgk@7lp3bkegaeif>
+References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
+ <20260609-block-as-nvmem-v4-6-45712e6b22c6@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Direct IO page bouncing got some garbage?
-To: Christoph Hellwig <hch@infradead.org>, Qu Wenruo <wqu@suse.com>
-Cc: linux-btrfs <linux-btrfs@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Linux Memory Management List <linux-mm@kvack.org>
-References: <b866b2e6-292f-4c5e-ae5a-d77e983cfefd@suse.com>
- <f1dbdcd6-4e6e-4304-8fa5-59c2c60252ad@suse.com>
- <aivABK8nwNR6Z__A@infradead.org>
-Content-Language: en-US
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
- BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
- sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
- xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
- naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
- tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
- 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
- VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
- CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
- /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
- GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
- q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
- ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
- CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
- B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
- Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
- +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
- HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
-In-Reply-To: <aivABK8nwNR6Z__A@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tQ7KsZItlZjnq21lHDli+cswh02G09moeLuXet1erTiTt1yaPFD
- hXsnd4+Gx451b29Y3O8rrrBk5xUKluEDF7pzO+a5QMjkT7PojliGKqCzTP52C3tLJEYsbEX
- pWSnc/Lazt2TWnMaFtryYKiIq9VPpuLnXcdpJWdQ9Nz7cpCCZFSCmW7CJA50Q/CC0x/Cnv4
- 8OhGmFjbmHfs5khOew+zA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ZLvzbVSc/3Y=;2UoX3RvPJ60rfwyHmF7yWaVPQDe
- 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
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609-block-as-nvmem-v4-6-45712e6b22c6@oss.qualcomm.com>
+X-Proofpoint-GUID: y0MJS3LJlK4bBXP3QmYHs59vyHUp64Rq
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDA4MiBTYWx0ZWRfX5JKc4qxQVjN/
+ tv7VUDoJ1x+FSlkvhTDTigkp51Hhr6pi8DrOKZDHvDx7v4EM0VVC/RYoASx5+c17fAOHlfw4rXD
+ 2IagZlKCxVyiP1cXFB4uE91qQxrwznA=
+X-Authority-Analysis: v=2.4 cv=Qp9uG1yd c=1 sm=1 tr=0 ts=6a2bcd49 cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=EUspDBNiAAAA:8
+ a=dCyu47M02oNEJ4VrFMgA:9 a=CjuIK1q_8ugA:10 a=dawVfQjAaf238kedN5IG:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDA4MiBTYWx0ZWRfX/pxPhuzKB+Sg
+ Q5/YGVXdisfJlivoLhqxFXEH/J9ijpI4cX2a6h027bKnn5lUUkrd2k9YLwN2WruR6TH4/534DF8
+ 1w5Owp1oo+snKjpW0vquehdnwnds/6+xFFER4NYvr2wjeuiuQ1bZK2XRAyPDNwykVgAcKTCe1LY
+ KnVSGf12wUTxo8ubF/ejIsUQUTVB4exgSEFxWjxpyWR8gtjGSQ4cw8b/EdN9CtNYaDNoJ2X2G49
+ xBmrnYq6dBBki5T6jBs7JMSeIUaZrrI29haWp7aUif0izrPooLoxW/CPnhw+TtmRDWGB5Kvzqrm
+ YY00fDgb9zi1mcOE9Ej1LBnf8UkLRg9gDPyhbYnb0cI3DyAe4lOYAiokxaFO/j/DrQiBY8jFEQf
+ /I/7iYPh/NVxpSBR7yFktgFvI1YwRgvwb8U040RlB+mKVfVMx38oATwdfI+eZL32KDWuDcImgPl
+ DGzayWOiAlq7anmb0gg==
+X-Proofpoint-ORIG-GUID: y0MJS3LJlK4bBXP3QmYHs59vyHUp64Rq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-12_01,2026-06-11_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 bulkscore=0 clxscore=1011
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606040000
+ definitions=main-2606120082
 
+On Tue, Jun 09, 2026 at 09:52:31AM +0200, Loic Poulain wrote:
+> Some devices store the Bluetooth BD address in non-volatile
+> memory, which can be accessed through the NVMEM framework.
+> Similar to Ethernet or WiFi MAC addresses, add support for
+> reading the BD address from a 'local-bd-address' NVMEM cell.
+> 
+> As with the device-tree provided BD address, add a quirk to
+> indicate whether a device or platform should attempt to read
+> the address from NVMEM when no valid in-chip address is present.
+> Also add a quirk to indicate if the address is stored in
+> big-endian byte order.
+> 
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
+>  include/net/bluetooth/hci.h | 18 ++++++++++++++++++
+>  net/bluetooth/hci_sync.c    | 39 ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 56 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 572b1c620c5d653a1fe10b26c1b0ba33e8f4968f..7686466d1109253b0d75edeb5f6a99fb98ce4cc6 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -164,6 +164,24 @@ enum {
+>  	 */
+>  	HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
+>  
+> +	/* When this quirk is set, the public Bluetooth address
+> +	 * initially reported by HCI Read BD Address command
+> +	 * is considered invalid. The public BD Address can be
+> +	 * retrieved via a 'local-bd-address' NVMEM cell.
 
+Why do we need a quirk here? Can't we always assume that if there is an
+NVMEM cell, it contains a correct address, even if HCI command returned
+a seemingly-sensible one?
 
-=E5=9C=A8 2026/6/12 17:45, Christoph Hellwig =E5=86=99=E9=81=93:
-> On Fri, Jun 12, 2026 at 02:54:22PM +0930, Qu Wenruo wrote:
->>
->>
->> =E5=9C=A8 2026/6/12 11:11, Qu Wenruo =E5=86=99=E9=81=93:
->>> Hi,
->>>
->>> Recently I'm trying to make btrfs utilize IOMAP_DIO_BOUNCE, however I'=
-m
->>> experiencing weird data corruption.
->>>
->>> During test case generic/708, I'm reliably hitting garbage pages at th=
-e
->>> last 64KiB, the garbage even contains an ELF header.
->>
->> Added ftrace shows that, since btrfs has to disable page fault to avoid
->> certain deadlock, bio_iov_iter_bounced() failed with a short copy.
->>
->> Initially bio_iov_iter_bounced() got a 1MiB page, but copy_iter_from() =
-only
->> copied 64K then failed due to the disabled page fault.
->>
->> I don't think it's a coincident that the short 64K exactly matches wher=
-e the
->> garbage is (the last 64K).
->>
->> I guess it's in the error path we didn't properly revert the iov iter?
->=20
-> Looks like it.  The better option would probably be not to give up on
-> a short copy, and just reduce the bio size to fit the short copy
-> even if that wastes a little memory.
+> +	 *
+> +	 * This quirk can be set before hci_register_dev is called or
+> +	 * during the hdev->setup vendor callback.
+> +	 */
+> +	HCI_QUIRK_USE_BDADDR_NVMEM,
+> +
+> +	/* When this quirk is set, the Bluetooth Device Address provided by
+> +	 * the 'local-bd-address' NVMEM is stored in big-endian order.
+> +	 *
+> +	 * This quirk can be set before hci_register_dev is called or
+> +	 * during the hdev->setup vendor callback.
+> +	 */
+> +	HCI_QUIRK_BDADDR_NVMEM_BE,
 
-And that will only work if IOMAP_PARTIAL is specified.
+Also, is this necessary? Are the devices which store the address in the
+wrong format in the NVMEM?
 
-For now I'll just fix the short copy path, and continue to make btrfs=20
-work with IOMAP_DIO_BOUNCE first (already testing and finished one round).
+> +
+>  	/* When this quirk is set, the duplicate filtering during
+>  	 * scanning is based on Bluetooth devices addresses. To allow
+>  	 * RSSI based updates, restart scanning if needed.
 
-The partial bio return solution will require some way to pass the dio=20
-flag, or a refactor to move all the error handling to the only caller.
-Anyway it will be a dedicated series for the change, meanwhile the=20
-simple revert fix will be sent out soon along with the btrfs enablement.
-
-Thanks,
-Qu
+-- 
+With best wishes
+Dmitry
