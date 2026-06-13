@@ -1,140 +1,385 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F44389115
-	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 10:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781347276; cv=pass; b=cajCmTYlNx8nulBjj0ZNqp9BWJqgGn8p8fuYLwtGZoPVEL0eTdeqnJSN/kmLhITmX3I9GFvOg/KLii6H1AGZ1ZvrygaXmeNlDPKQcQ5apxV78K7Y5JX+bTbvBTA+O59+noCASOkUKv2NlVE7YkUXdR1mwjLRnJ4birJthypCHqQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781347276; c=relaxed/simple;
-	bh=7k6tbN+HH+WkUq4HSNO/mcXSBNU1lROqmA4mfJkiWzo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WwxkJupkz180XN4uue5z+0uqfODUi15WrrXFatXAlUBkMEAMkItaQDuylNrsa+0bHBFtOLMjcIYisovj2e7M449e0a+g3CBDpOZiedsNbuBSHaIjNaugHFW5l53cgafSfoGnjyMf2qTPhEoOo8AvgP8yB8c5UTuaMDbMf+c5gqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hggXMU4p; arc=pass smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hggXMU4p"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-307b668e1f5so158993eec.1
-        for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 03:41:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781347275; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TcpwIZEUk6toYmfyvKw33NWpRU8Sl/L63F4LxuUs6IIG30FFm+DcEjKrYTJby5oeGN
-         RvQIlZwCLKlFyAl6P5ZUkvioVj7fHGPpyrFkgnkKvMPTLMdIj24zqHSPDREexsLCL/Za
-         NidZUXsCiiCNBxn3seR+6xoW205pCboc9lsR7qAkagNq7YlmEMgqHhASKfLxKW3T0jHs
-         LuxDIRVs0aKEUrZHBNoBHJh1xBuC2g29p/CSKbGcvGc9pPDJEHjKqLI6KlzIl/uT8tJb
-         6y0d8dNKKNrK4/ZO9TK8WIZ2n6zv4Kqiwu7MikbSlty1A41AIRiBvuPNvkUhmsyaBGaO
-         sZHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=G548kc/xuN9FYSMWIgZO2PFN4NWhwpWrdwSftDKzZuE=;
-        fh=MFqtzJVbCKM4fl1Aw+IGaUHQBbywyTHrkh94TiQlC3Q=;
-        b=b4n8YEjBWjDP2Y5JMo5KWrKeMdxm+8FcRIImmHSNEW+vHAip+V81oEJKpTtd5ktoJW
-         Q00M/cChWcEomDVKXimnFxVGylGdlt3wsIkTLc0DuoUpUZx3QqfZLiXrAwqTTaIntUS9
-         +57y2QDPtwxyqslg4wXlXpKSAv1pDKW2KoqYQtTtroL+C3Am6LVIvWFF4DOGxoJZ1fyM
-         x/ewk/nxd+IeFJ1wE67yxKxeMx2+We75pPSyuevQWLBy6Open1Z2foxJYYPRWMUMUmyQ
-         nwBOPklZBWcAojKBodttoGOXaVffqWdgv3oZiSVYASZTXz6j/MfkfgiUxXG1H7iOQJLL
-         I+0w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781347275; x=1781952075; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G548kc/xuN9FYSMWIgZO2PFN4NWhwpWrdwSftDKzZuE=;
-        b=hggXMU4pAdKn2lZVKQNgKjiSta2uifLDJ9Iw/l48crsFzrm3pbnbxxy1To2ak1jByT
-         FsTwmGAtFUqq3xR5x2gmKgtlDFR6VIyUeIVUhyC1mv0lSQ2DJYl9aUHrq0Tn2vgbhdyD
-         64MYLIERBYdof+mNse5jpRn3OOFgL83vhqj8wJobew/GLHRIadj/qPqfBvx2f+gu22cB
-         G68l/HyYn1KEFja7mTg3a7a+gg9VZadaOpmNwO+Rv29lokcfcSpp6O73hfztkdCDV+Iq
-         SuEmMC+UyKiLEGR/ETfUagX0rgZ1wJCMFxhRnmJd3XM3po15eqBiGDd6sa4rfqHAzYSQ
-         mLtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781347275; x=1781952075;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=G548kc/xuN9FYSMWIgZO2PFN4NWhwpWrdwSftDKzZuE=;
-        b=jWkHC19H5np8+pCnK6UZPkUTbiiOJbXlUUKv/IzsLolpDNM4IFmrAf1vRBSY0FAnNF
-         gaVXkUOOswwzjEouoaxsWoWx57ntL+CexjkgDZyeEXhBXIpc3ur0pQyuZTSfvlquyO/8
-         2WRNSyAJnvXgQ/AnW5HgHvwID2d8dohfvLzqMr4VXzP/mMvaUThhCfwY8LhpaLilS1yQ
-         qxim2wwdagh8Z/tCTvnthjKeNEyGuzQatgaADUgId4kRvGXrvTGTeUmDxT1H1poBPAug
-         O5UbGmfz73+yM33zPCecWDbLkuzwRZpfQmpbb9ZIVvSHA/f/WGSgckm7C1rlsA8UEFG4
-         X00g==
-X-Forwarded-Encrypted: i=1; AFNElJ/n6PJPIJ1QpyMPIoUWMPDNyJT4tuDJpOcsSKCMf1a9FQAipB134fycce+FI4CT4hzJmbjz78AZY92O0g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHAS4LqAUio8Ha8ImfES7J/0eMMMmD1TGLyGQVu0+DqHCY59kI
-	BopjW8oq3hV28NDvGj/oAnHruOTHaans54XjNzMjzkwsTzZa/9e8s64HwwszeEHYnsdDedCLH0H
-	OTo/IaBDAa/1v0/q+ZjBq6hWPBa94pHo=
-X-Gm-Gg: Acq92OHsKp3l+NC+ttYspEIcLsPn1K+dGABf93jGiW9zwG/sNPsVpWSQgIaOd9YILOB
-	ulgtwb36DY4dJIesszHA6FkAibbi+ghpm5srCKye5PQ1C8y5PYstLcpXSokoCUZ6gYEeKYBOude
-	iyz8Ke1rog2Ebj3ffk3ibgEUPu+rOFeemKLdnS+aWE0+RB61Yn6NDemnqCpUQtDLfCz09kzgMoL
-	tjOx0Spgnfv3tMLwlsUonMyVuK5GsU7Xaiy/GV51bbTqscKT2dU60yY5QjIHeTE2Bt/M85Il7YN
-	2Ogvpx8WVX5oTZVzSAzZfTMQj4UwERzPQgIhNvilexZfPo8DxaP0JyHvJdu3j4iv/LG2DEkoF1m
-	fUS4SFfKaUNeqDbEEBZ0OklkTKgRIVVVzVA==
-X-Received: by 2002:a05:7301:1e84:b0:2d8:7302:d3c with SMTP id
- 5a478bee46e88-30820037738mr1755166eec.4.1781347274604; Sat, 13 Jun 2026
- 03:41:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8032A1BF;
+	Sat, 13 Jun 2026 11:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781348464; cv=none; b=XLvKsHSmbROvdYz2wf0w2PS70ncv66gXJdNzT22/v/n+kuCo8YQrWpEPlZiyOVGjEzMYfPMvIEYn4ZssfwT/trm4IsVfHknpmzh2rS2UcLx3Pir8y+h1s9eBlLpYR7SzxO/aFWqZofnwkYLhdjB+E1ei8yKoknMeeHFgT/T36Vg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781348464; c=relaxed/simple;
+	bh=mJjmsAx5/+VBtgPRrL8K6lY9CFWNdJHUiOHO0nxWRCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S3Hvi5qWCxsqB7PYKBgKePqmGdnbllq1kfgeMBOcWgqQ/KZ9iinsAAXSvrOXMJmbtdBrabPmaIM+gKtWVhKZtjF4IXvRP9GdkthBXB6TRXRGJfORNgAfdkruZsD9OFULmZTOhA3KGAQL5CB+hsOl8/yv9h/2C2D9EPFDK+uuXE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 65DB0KG1037676;
+	Sat, 13 Jun 2026 20:00:20 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 65DB0Ko2037673
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 13 Jun 2026 20:00:20 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp>
+Date: Sat, 13 Jun 2026 20:00:17 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260612-configfs-syn-v3-1-3292fbc5cc32@gmail.com>
-In-Reply-To: <20260612-configfs-syn-v3-1-3292fbc5cc32@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 13 Jun 2026 12:41:00 +0200
-X-Gm-Features: AVVi8CfjPkD66q9qYEn1K64zbUlvP5cZCsx1hvccWsDn4EDiuxrat-r8eY-_Akc
-Message-ID: <CANiq72=RX5V6W+1tj0GHxZusrk5OqYbZ5-xV=wvSssrx_CWXAA@mail.gmail.com>
-Subject: Re: [PATCH v3] rust: add procedural macro for declaring configfs attributes
-To: Malte Wechter <maltewechter@gmail.com>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Aaron Tomlin <atomlin@atomlin.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-modules@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+        Hillf Danton <hdanton@sina.com>
+References: <20260529220600.1226-1-hdanton@sina.com>
+ <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+ <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
+ <20260609175013.GH2636677@ZenIV>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260609175013.GH2636677@ZenIV>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav302.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-Hi Malte,
+On 2026/06/10 2:50, Al Viro wrote:
+> Still breaks xfs/259, same as the version in next-20260605...
 
-Some quick notes...
+I installed xfstests-dev and reproduced a "umount: /home/test: target is busy." problem which Al Viro is
+experiencing with https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?h=next-20260608&id=fb1d5846e99c8aa4ce8da7e6ee7643b01da25b8c .
 
-On Fri, Jun 12, 2026 at 3:29=E2=80=AFPM Malte Wechter <maltewechter@gmail.c=
-om> wrote:
->
-> +/// ```ignore
+--------------------------------------------------------------------------------
+./check xfs/259
+FSTYP         -- xfs (non-debug)
+PLATFORM      -- Linux/x86_64 kvm1 7.1.0-rc7-next-20260608+ #72 SMP PREEMPT_DYNAMIC Tue Jun  9 18:27:54 EDT 2026
+MKFS_OPTIONS  -- -f /dev/sdb2
+MOUNT_OPTIONS -- /dev/sdb2 /home/scratch
 
-Empty /// before examples.
+xfs/259 3s ... umount: /home/test: target is busy.
+_check_xfs_filesystem: filesystem on /dev/sdb1 has dirty log
+(see /home/al/xfstests/results//xfs/259.full for details)
+_check_xfs_filesystem: filesystem on /dev/sdb1 is inconsistent (r)
+(see /home/al/xfstests/results//xfs/259.full for details)
 
-> +///     // This will extract "foo: <field>" into a variable named "foo".
+Ran: xfs/259
+Failures: xfs/259
+Failed 1 of 1 tests
+--------------------------------------------------------------------------------
 
-` instead of "
 
-i.e. please use Markdown
 
-> +///```
+Below I describe what I tried, but my opinion is that this "target is busy" problem
+should be addressed by xfstests side (i.e. retry umount after a short sleep when
+umount failed with "target is busy" error).
 
-Missing space indentation
+--------------------------------------------------------------------------------
+# fdisk -l
+Disk /dev/nvme0n1: 40 GiB, 42949672960 bytes, 83886080 sectors
+Disk model: VMware Virtual NVMe Disk
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 068F8BED-D8BE-4795-8ABD-47A089653C58
 
-> +/// Expands the following output:
-> +///    let item_type =3D {
+Device         Start      End  Sectors Size Type
+/dev/nvme0n1p1  2048     4095     2048   1M BIOS boot
+/dev/nvme0n1p2  4096 83884031 83879936  40G Linux filesystem
 
-Missing example block, both at the beginning and the end.
 
-Please double-check by generating the docs and looking at how they
-appear in the browser.
+Disk /dev/sda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Disk model: VMware Virtual S
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x1c8e18a6
 
-The prefix of the title should likely be `rust: configfs:`.
+Device     Boot    Start      End  Sectors Size Id Type
+/dev/sda1           2048 20970495 20968448  10G 83 Linux
+/dev/sda2       20971520 41943039 20971520  10G 83 Linux
+--------------------------------------------------------------------------------
 
-Thanks!
+--------------------------------------------------------------------------------
+cd
+git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/cem/xfstests-dev
+cd xfstests-dev/
+make -j10
+make install
+cd /var/lib/xfstests/
+TEST_SZ=$(blockdev --getsz /dev/sda1)
+SCRATCH_SZ=$(blockdev --getsz /dev/sda2)
+dmsetup create delayed_test --table "0 $TEST_SZ delay /dev/sda1 0 10"
+dmsetup create delayed_scratch --table "0 $SCRATCH_SZ delay /dev/sda2 0 10"
+export FSTYP=xfs
+export TEST_DEV=/dev/mapper/delayed_test
+export TEST_DIR=/home/test
+export SCRATCH_DEV=/dev/mapper/delayed_scratch
+export SCRATCH_MNT=/home/scratch
+mkdir -p $TEST_DIR $SCRATCH_MNT
+cd /var/lib/xfstests/
+./check xfs/259
+--------------------------------------------------------------------------------
 
-Cheers,
-Miguel
+--------------------------------------------------------------------------------
+FSTYP         -- xfs (non-debug)
+PLATFORM      -- Linux/x86_64 localhost 7.1.0-rc7-next-20260608 #22 SMP PREEMPT_DYNAMIC Sat Jun 13 18:50:49 JST 2026
+MKFS_OPTIONS  -- -f /dev/mapper/delayed_scratch
+MOUNT_OPTIONS -- /dev/mapper/delayed_scratch /home/scratch
+
+xfs/259 61s ... umount: /home/test: target is busy.
+_check_xfs_filesystem: filesystem on /dev/mapper/delayed_test has dirty log
+(see /var/lib/xfstests/results//xfs/259.full for details)
+_check_xfs_filesystem: filesystem on /dev/mapper/delayed_test is inconsistent (r)
+(see /var/lib/xfstests/results//xfs/259.full for details)
+Trying to repair broken TEST_DEV file system
+_repair_test_fs: failed, err=1
+(see /var/lib/xfstests/results//xfs/259.full for details)
+
+Ran: xfs/259
+Failures: xfs/259
+Failed 1 of 1 tests
+
+--------------------------------------------------------------------------------
+
+I initially suspected that the cause of "target is busy" error is that fput() from
+__loop_clr_fd() does not wait for completion before "losetup -d" completes. But a
+debug printk() patch shown below indicated a tendency:
+
+  (a) __loop_clr_fd() is called by "udev-worker" rather than "losetup" when this problem happens
+
+  (b) propagate_mount_busy()!=0 when do_umount() fails with -EBUSY
+
+--------------------------------------------------------------------------------
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c3b607a3ddc4..7408f314a1fa 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1763,6 +1763,8 @@ static void lo_release(struct gendisk *disk)
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+ 	if (need_clear) {
++		printk("Flush: task=%s[%d] dev=loop%d state=%d\n",
++		       current->comm, current->pid, lo->lo_number, lo->lo_state);
+ 		/*
+ 		 * Temporarily release disk->open_mutex in order to flush pending I/O
+ 		 * requests before clearing the backing device.
+@@ -1813,6 +1815,8 @@ static void lo_release(struct gendisk *disk)
+ 		mutex_lock(&lo->lo_disk->open_mutex);
+ 		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
+ 			return;
++		printk("Teardown: task=%s[%d] dev=loop%d state=%d\n",
++		       current->comm, current->pid, lo->lo_number, lo->lo_state);
+ 		__loop_clr_fd(lo);
+ 	}
+ }
+diff --git a/fs/namespace.c b/fs/namespace.c
+index 09ab7fc72f86..9710460fb449 100644
+--- a/fs/namespace.c
++++ b/fs/namespace.c
+@@ -1893,6 +1893,8 @@ static int do_umount(struct mount *mnt, int flags)
+ 		 */
+ 		lock_mount_hash();
+ 		if (!list_empty(&mnt->mnt_mounts) || mnt_get_count(mnt) != 2) {
++			printk("%s: task=%s[%d] !list_empty(&mnt->mnt_mounts)=%d mnt_get_count(mnt)=%d\n", __func__,
++			       current->comm, current->pid, !list_empty(&mnt->mnt_mounts), mnt_get_count(mnt));
+ 			unlock_mount_hash();
+ 			return -EBUSY;
+ 		}
+@@ -1960,6 +1962,9 @@ static int do_umount(struct mount *mnt, int flags)
+ 		if (!propagate_mount_busy(mnt, 2)) {
+ 			umount_tree(mnt, UMOUNT_PROPAGATE|UMOUNT_SYNC);
+ 			retval = 0;
++		} else {
++			printk("%s: task=%s[%d] propagate_mount_busy()!=0\n", __func__,
++			       current->comm, current->pid);
+ 		}
+ 	}
+ out:
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+[   77.754264] XFS (dm-0): Mounting V5 Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[   78.161012] XFS (dm-0): Ending clean mount
+[   79.882958] XFS (dm-1): Mounting V5 Filesystem f64fdceb-5dd4-489f-ae3f-f14289964a20
+[   80.264828] XFS (dm-1): Ending clean mount
+[   80.466146] XFS (dm-1): Unmounting Filesystem f64fdceb-5dd4-489f-ae3f-f14289964a20
+[   80.547159] XFS (dm-0): Unmounting Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[   81.477419] XFS (dm-0): Mounting V5 Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[   81.871023] XFS (dm-0): Ending clean mount
+[   82.008600] run fstests xfs/259 at 2026-06-13 19:39:59
+[   83.218605] loop: module loaded
+[   83.315929] loop0: detected capacity change from 0 to 8589934584
+[   84.897469] loop1: detected capacity change from 0 to 8589934584
+[   84.997221] Flush: task=(udev-worker)[1134] dev=loop0 state=2
+[   85.014004] Teardown: task=(udev-worker)[1134] dev=loop0 state=2
+[   86.354657] Flush: task=losetup[2016] dev=loop1 state=2
+[   86.377065] Teardown: task=losetup[2016] dev=loop1 state=2
+[   86.416717] loop0: detected capacity change from 0 to 8589934584
+[   87.915638] loop1: detected capacity change from 0 to 8589934588
+[   88.025704] Flush: task=(udev-worker)[1134] dev=loop0 state=2
+[   88.039956] Teardown: task=(udev-worker)[1134] dev=loop0 state=2
+[   89.404018] Flush: task=losetup[2048] dev=loop1 state=2
+[   89.418144] Teardown: task=losetup[2048] dev=loop1 state=2
+[   89.460259] loop0: detected capacity change from 0 to 8589934588
+[   91.034214] loop1: detected capacity change from 0 to 8589934588
+[   91.149505] Flush: task=(udev-worker)[1134] dev=loop0 state=2
+[   91.162932] Teardown: task=(udev-worker)[1134] dev=loop0 state=2
+[   92.626690] Flush: task=losetup[2078] dev=loop1 state=2
+[   92.652036] Teardown: task=losetup[2078] dev=loop1 state=2
+[   92.699585] loop0: detected capacity change from 0 to 8589934590
+[   94.307750] loop1: detected capacity change from 0 to 8589934590
+[   94.424337] Flush: task=(udev-worker)[1134] dev=loop0 state=2
+[   94.441842] Teardown: task=(udev-worker)[1134] dev=loop0 state=2
+[   95.869110] Flush: task=losetup[2108] dev=loop1 state=2
+[   95.885815] Teardown: task=losetup[2108] dev=loop1 state=2
+[   95.931349] loop0: detected capacity change from 0 to 8589934590
+[   97.447354] do_umount: task=umount[2143] propagate_mount_busy()!=0
+[   97.549813] Flush: task=(udev-worker)[1134] dev=loop0 state=2
+[   97.567983] Teardown: task=(udev-worker)[1134] dev=loop0 state=2
+
+[  138.284481] XFS (dm-1): Mounting V5 Filesystem c3b0a09a-f960-464f-a741-84be44d55da0
+[  138.679732] XFS (dm-1): Ending clean mount
+[  138.865274] XFS (dm-1): Unmounting Filesystem c3b0a09a-f960-464f-a741-84be44d55da0
+[  138.944906] XFS (dm-0): Unmounting Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[  139.833646] XFS (dm-0): Mounting V5 Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[  140.213952] XFS (dm-0): Ending clean mount
+[  140.342963] run fstests xfs/259 at 2026-06-13 19:40:58
+[  141.549551] loop0: detected capacity change from 0 to 8589934584
+[  143.112857] loop1: detected capacity change from 0 to 8589934584
+[  143.219426] Flush: task=(udev-worker)[2502] dev=loop0 state=2
+[  143.240186] Teardown: task=(udev-worker)[2502] dev=loop0 state=2
+[  144.575984] Flush: task=losetup[3050] dev=loop1 state=2
+[  144.593206] Teardown: task=losetup[3050] dev=loop1 state=2
+[  144.631137] loop0: detected capacity change from 0 to 8589934584
+[  146.114670] loop1: detected capacity change from 0 to 8589934588
+[  146.229225] Flush: task=(udev-worker)[2502] dev=loop0 state=2
+[  146.248066] Teardown: task=(udev-worker)[2502] dev=loop0 state=2
+[  147.626517] Flush: task=losetup[3080] dev=loop1 state=2
+[  147.644085] Teardown: task=losetup[3080] dev=loop1 state=2
+[  147.679345] loop0: detected capacity change from 0 to 8589934588
+[  149.172884] loop1: detected capacity change from 0 to 8589934588
+[  149.296011] Flush: task=(udev-worker)[2502] dev=loop0 state=2
+[  149.315040] Teardown: task=(udev-worker)[2502] dev=loop0 state=2
+[  150.631328] Flush: task=losetup[3110] dev=loop1 state=2
+[  150.650082] Teardown: task=losetup[3110] dev=loop1 state=2
+[  150.686210] loop0: detected capacity change from 0 to 8589934590
+[  152.186234] loop1: detected capacity change from 0 to 8589934590
+[  152.308623] Flush: task=(udev-worker)[2502] dev=loop0 state=2
+[  152.325972] Teardown: task=(udev-worker)[2502] dev=loop0 state=2
+[  153.652919] Flush: task=losetup[3140] dev=loop1 state=2
+[  153.681000] Teardown: task=losetup[3140] dev=loop1 state=2
+[  153.716545] loop0: detected capacity change from 0 to 8589934590
+[  155.235156] do_umount: task=umount[3175] propagate_mount_busy()!=0
+[  155.337055] Flush: task=(udev-worker)[2502] dev=loop0 state=2
+[  155.352014] Teardown: task=(udev-worker)[2502] dev=loop0 state=2
+
+[  182.533057] XFS (dm-1): Mounting V5 Filesystem a101f7e1-a8bd-44e2-a49f-21985ce78a3b
+[  182.915714] XFS (dm-1): Ending clean mount
+[  183.114481] XFS (dm-1): Unmounting Filesystem a101f7e1-a8bd-44e2-a49f-21985ce78a3b
+[  183.190809] XFS (dm-0): Unmounting Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[  184.064717] XFS (dm-0): Mounting V5 Filesystem a80d3f5c-f068-4b64-bfe4-543a811c5e93
+[  184.456110] XFS (dm-0): Ending clean mount
+[  184.592063] run fstests xfs/259 at 2026-06-13 19:41:42
+[  185.926189] loop0: detected capacity change from 0 to 8589934584
+[  187.473922] loop1: detected capacity change from 0 to 8589934584
+[  187.584471] Flush: task=(udev-worker)[3531] dev=loop0 state=2
+[  187.603274] Teardown: task=(udev-worker)[3531] dev=loop0 state=2
+[  188.961285] Flush: task=losetup[4079] dev=loop1 state=2
+[  188.990308] Teardown: task=losetup[4079] dev=loop1 state=2
+[  189.029614] loop0: detected capacity change from 0 to 8589934584
+[  190.521249] loop1: detected capacity change from 0 to 8589934588
+[  190.631200] Flush: task=(udev-worker)[4075] dev=loop0 state=2
+[  190.645245] Teardown: task=(udev-worker)[4075] dev=loop0 state=2
+[  192.023674] Flush: task=losetup[4109] dev=loop1 state=2
+[  192.035269] Teardown: task=losetup[4109] dev=loop1 state=2
+[  192.074917] loop0: detected capacity change from 0 to 8589934588
+[  193.606595] loop1: detected capacity change from 0 to 8589934588
+[  193.727944] Flush: task=(udev-worker)[4075] dev=loop0 state=2
+[  193.747188] Teardown: task=(udev-worker)[4075] dev=loop0 state=2
+[  195.075694] Flush: task=losetup[4140] dev=loop1 state=2
+[  195.092257] Teardown: task=losetup[4140] dev=loop1 state=2
+[  195.128969] loop0: detected capacity change from 0 to 8589934590
+[  196.636772] loop1: detected capacity change from 0 to 8589934590
+[  196.758941] Flush: task=(udev-worker)[4075] dev=loop0 state=2
+[  196.779155] Teardown: task=(udev-worker)[4075] dev=loop0 state=2
+[  198.105666] Flush: task=losetup[4170] dev=loop1 state=2
+[  198.128203] Teardown: task=losetup[4170] dev=loop1 state=2
+[  198.163723] loop0: detected capacity change from 0 to 8589934590
+[  199.685651] do_umount: task=umount[4205] propagate_mount_busy()!=0
+[  199.787468] Flush: task=(udev-worker)[4075] dev=loop0 state=2
+[  199.804123] Teardown: task=(udev-worker)[4075] dev=loop0 state=2
+--------------------------------------------------------------------------------
+
+That is, if someone else (e.g. udev-worker) by chance has a file descriptor of a loop device
+when "losetup -d" called lo_release(), __loop_clr_fd() is not called by "losetup" due to
+commit 18048c1af783 ("loop: Fix a race between loop detach and loop open"). Therefore,
+I consider that this teardown operation is racy regardless of whether disk->open_mutex is
+temporarily released or not. Actually, I can reproduce this problem with below change
+(lockdep warning aside).
+
+------------------------------------------------------------
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c3b607a3ddc4..076207efb1cc 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1778,7 +1778,7 @@ static void lo_release(struct gendisk *disk)
+ 		 * the Lo_rundown state guarantees that lo_open() will fail with -ENXIO.
+ 		 * Thus, there will be effectively no change caused by this violation.
+ 		 */
+-		mutex_unlock(&lo->lo_disk->open_mutex);
++		//mutex_unlock(&lo->lo_disk->open_mutex);
+ 		/*
+ 		 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
+ 		 * wait for already started loop_queue_rq() to complete.
+@@ -1810,7 +1810,7 @@ static void lo_release(struct gendisk *disk)
+ 		 * released disk->open_mutex, for I am the only and the last user of
+ 		 * this loop device because lo_open() cannot succeed.
+ 		 */
+-		mutex_lock(&lo->lo_disk->open_mutex);
++		//mutex_lock(&lo->lo_disk->open_mutex);
+ 		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
+ 			return;
+ 		__loop_clr_fd(lo);
+------------------------------------------------------------
+
+------------------------------------------------------------
+FSTYP         -- xfs (non-debug)
+PLATFORM      -- Linux/x86_64 localhost 7.1.0-rc7-next-20260608-dirty #23 SMP PREEMPT_DYNAMIC Sat Jun 13 19:19:37 JST 2026
+MKFS_OPTIONS  -- -f /dev/mapper/delayed_scratch
+MOUNT_OPTIONS -- /dev/mapper/delayed_scratch /home/scratch
+
+xfs/259 61s ... umount: /home/test: target is busy.
+_check_xfs_filesystem: filesystem on /dev/mapper/delayed_test has dirty log
+(see /var/lib/xfstests/results//xfs/259.full for details)
+_check_xfs_filesystem: filesystem on /dev/mapper/delayed_test is inconsistent (r)
+(see /var/lib/xfstests/results//xfs/259.full for details)
+Trying to repair broken TEST_DEV file system
+_repair_test_fs: failed, err=1
+(see /var/lib/xfstests/results//xfs/259.full for details)
+
+Ran: xfs/259
+Failures: xfs/259
+Failed 1 of 1 tests
+
+------------------------------------------------------------
+
+Therefore, although commit fb1d5846e99c ("loop: Fix NULL pointer dereference in
+lo_rw_aio()") might have widened the race window, I think that this is a problem
+which should be addressed by updating the "umount" user.
+
