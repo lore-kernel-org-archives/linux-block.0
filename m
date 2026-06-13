@@ -1,145 +1,78 @@
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp153-162.sina.com.cn (smtp153-162.sina.com.cn [61.135.153.162])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350AD2D6409
-	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 04:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B9C3A2572
+	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 10:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781324783; cv=none; b=PZS8McCbHmw39b1Djf7Sn4u+QmECnZmwOj4YJM8nuOEMWVPFF0c6Vvbwj1NkkBd5wIgjZruR6XMZMbtkXGSxDpd4gW0ISMX6r9jEvC5WKNChXq1q+QbmiKUjKf0zyzZIXNDhk/vkG7+FYNxP621uGst/+czlyGr8LQ+KFr+4FNQ=
+	t=1781345706; cv=none; b=RaJ1sGhl22X3iw8xK3W1exoCZCUibF0B/jq7AvsLLEXbGOtZjzWUfbegSZLOxk2fxYy2oukuVMscJPW5lQbcUBU4+NSdKBu2WZXGsgxPOh6eu/YgSjLNGJKRsM50IvEGDqcH3e/kyljKs1dZDMNqKoDNQUucTvumbRfLP70KVCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781324783; c=relaxed/simple;
-	bh=xYvnBoU24LowK9XsuA1dWBRvMVViHxPRA9DkZeY0a+A=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jCTjZfdA/vB43wtt9Tnr8BaUnnOW4iNjkgoEZoYQ2BYcLnRFHfTQPktPuhlWn3v9OCkjY42eqfdDTqe4e6q6vgLxpQbqR5My/9EAbDetd/JkfiG8eL7+WyjuOUyU1t11whsSdOyPa+EL+fYAK/uXTTiIDQrFHDj2wYAnW1NQI3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N+sFa2fk; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+	s=arc-20240116; t=1781345706; c=relaxed/simple;
+	bh=v912xpOvs0q/yr0iMenSrteIUL8UFC9cqr/6/oziSX4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O7BwqxVGLOjaqTgbHwrChAU4sQTKKOvI0LDGrtmEPQtzw7+nUHs9bi/MeyHbmhVN3Zap30Rl9jCAPxqu3Ll1JvMxB3y3CZNM+K9rn3RanP3b0CCCI+ZKWz9QBtUieJ1cRJ1/XBmHphB4mv1NGchhCYfnyEMJotrB1Dv7aZ5Iie8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=VzMrSe/Z; arc=none smtp.client-ip=61.135.153.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N+sFa2fk"
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5195760750bso3407191cf.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 21:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781324781; x=1781929581; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6l2xGU+3qIFZEhz6OluRSAKcM6KzJn808ttYDsC9+QQ=;
-        b=N+sFa2fkbGf9QmHpMmDGIr7Vpu8TbgqzCWJmut9Noc0/CO5USHoncHqmOZ4YBMWjGz
-         GJHVQFCd27Z/31CcWKsx49BoM8/u8wrICVmZSHYlaEeBZ5zX3QulAGzG29l4ZuUNOI/N
-         DAkOOJrKGNanO3xJq1LWFXizuaLkbY8NYqI1ULa5HQRuXv3ZZeE4gY3f4iozxUp5/p0A
-         WoW1eL4bG+ktwK2pVI0ctalLS4+ZHxip4UW6XRf3ZmaVEkyO5kh0rm4XdRCoLiPzbDjC
-         sda8Bg8JIlErnI8TApH+Q/VSL9N5Gf9ipYP8mFLugz0T1bZkI6OvaOSD/qiBfG4ljIU2
-         UN4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781324781; x=1781929581;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6l2xGU+3qIFZEhz6OluRSAKcM6KzJn808ttYDsC9+QQ=;
-        b=Nso//79rB32diM4ReFblHuqDVGAkNOFrHorq+G/T+9t5wESVWdC9zltiAaWWiTv07s
-         R3fWPc4R+yRfHoMPKMfb8Nghqrq4BKRhKb0Gr2+DXm6Pu8RsGqfDrsp58njUIccahB6C
-         /LknupHTtJOH8dUv68ZGtZlma0gAMeR1B6Wt7dYUSYii/hHI7IJ7KNoQE3Uopfo7k6YD
-         oMCvG2nmLMZjSr65rJvXmFratgyIGw8eLUozrC15cRPr+pG6LChA2iiFtKN7o9l5ZZ/f
-         CsgGXsXqaMQ8iyNEZIleTEzti0H3OQxF81G3PF7QMlaV8/72igvgk2XTENngKMJxoaVz
-         X7yA==
-X-Forwarded-Encrypted: i=1; AFNElJ8bGHrWWvV8TvzGjq5IabgZLQP+xZVMwHPAOnpIkT2yKWSevmwrUA4+mN4aaWt6XCB/48p7pqv4NPhzAw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YykhlB7qZzNiyadRD/XJBg4+FmZ67zcbHSw3WsatVImmP+FtVhR
-	9xwZ+bmo4BO5bRPdS8IiSSR5wLefMuYzAfVr+ElxqvQW3C71Twar0hu0sLal5rC2/ovVhLHXWvt
-	G7g5AMiBaC5rIBg==
-X-Received: from qtc12.prod.google.com ([2002:a05:622a:8e0c:b0:517:29b8:33b3])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5e08:0:b0:517:6a26:43b with SMTP id d75a77b69052e-51953553d89mr38847661cf.44.1781324780985;
- Fri, 12 Jun 2026 21:26:20 -0700 (PDT)
-Date: Sat, 13 Jun 2026 04:26:19 +0000
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="VzMrSe/Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1781345700;
+	bh=o+4ANMBUOQ9kcRY4jwP0XwLbZ4OBI1MMyqHEK1GAvEo=;
+	h=From:Subject:Date:Message-ID;
+	b=VzMrSe/ZaxmzIMS+XvTZqouvWYp1ItKP5ozdqq3LGR6XldasyC6uMIARZi+XHYCCA
+	 CasZGNKsBIr1m3RjlWFiidzOIInqT3s/VDZprN5OhNypL+1MWCt3zOKJBPZPmhsITQ
+	 Yx+pEOCNJyRs/GWti91QMI41NqxEcRZxipXBjL9Y=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.31) with ESMTP
+	id 6A2D2D0700000894; Sat, 13 Jun 2026 18:12:25 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 5034706816304
+X-SMAIL-UIID: 9BB9CB8B0A304A6598BC31B0012ACB21-20260613-181225-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	netdev@vger.kernel.org,
+	syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
+Subject: Re: [PATCH] nbd: Reclassify sockets to avoid lockdep circular dependency
+Date: Sat, 13 Jun 2026 18:12:13 +0800
+Message-ID: <20260613101214.1771-1-hdanton@sina.com>
+In-Reply-To: <20260613042619.1108126-1-edumazet@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260613042619.1108126-1-edumazet@google.com>
-Subject: [PATCH] nbd: Reclassify sockets to avoid lockdep circular dependency
-From: Eric Dumazet <edumazet@google.com>
-To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org, 
-	nbd@other.debian.org, Eric Dumazet <eric.dumazet@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-syzbot reported a possible circular locking dependency in udp_sendmsg()
-where fs_reclaim can be triggered while holding sk_lock, and fs_reclaim
-can eventually depend on another sk_lock (e.g., if NBD is used for swap
-or writeback and NBD uses TLS/TCP which acquires sk_lock).
+On Sat, 13 Jun 2026 04:26:19 +0000 Eric Dumazet wrote:
+> syzbot reported a possible circular locking dependency in udp_sendmsg()
+> where fs_reclaim can be triggered while holding sk_lock, and fs_reclaim
+> can eventually depend on another sk_lock (e.g., if NBD is used for swap
+> or writeback and NBD uses TLS/TCP which acquires sk_lock).
+> 
+> Since the UDP socket and the NBD TCP/TLS socket are different, this is a
+> false positive. Fix this by reclassifying NBD sockets to a separate lock
+> class when they are added to the NBD device.
+> 
+> This is similar to what nvme-tcp and other network block devices do.
+> 
+> Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earlier")
 
-Since the UDP socket and the NBD TCP/TLS socket are different, this is a
-false positive. Fix this by reclassifying NBD sockets to a separate lock
-class when they are added to the NBD device.
+Given the Fixes tag, can you specify anything wrong that commit added?
 
-This is similar to what nvme-tcp and other network block devices do.
-
-Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earlier")
-Reported-by: syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a2cdafe.428ffe26.258b27.0161.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/block/nbd.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fe63f3c55d0d960a1a4bbb2c60738cbbece10719..0e2180e910c4eaaa58556a0c75c1b9c3fdc1930d 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1238,6 +1238,42 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
- 	return sock;
- }
- 
-+#ifdef CONFIG_DEBUG_LOCK_ALLOC
-+static struct lock_class_key nbd_key[3];
-+static struct lock_class_key nbd_slock_key[3];
-+
-+static void nbd_reclassify_socket(struct socket *sock)
-+{
-+	struct sock *sk = sock->sk;
-+
-+	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
-+		return;
-+
-+	switch (sk->sk_family) {
-+	case AF_INET:
-+		sock_lock_init_class_and_name(sk, "slock-AF_INET-NBD",
-+					      &nbd_slock_key[0],
-+					      "sk_lock-AF_INET-NBD",
-+					      &nbd_key[0]);
-+		break;
-+	case AF_INET6:
-+		sock_lock_init_class_and_name(sk, "slock-AF_INET6-NBD",
-+					      &nbd_slock_key[1],
-+					      "sk_lock-AF_INET6-NBD",
-+					      &nbd_key[1]);
-+		break;
-+	case AF_UNIX:
-+		sock_lock_init_class_and_name(sk, "slock-AF_UNIX-NBD",
-+					      &nbd_slock_key[2],
-+					      "sk_lock-AF_UNIX-NBD",
-+					      &nbd_key[2]);
-+		break;
-+	}
-+}
-+#else
-+static inline void nbd_reclassify_socket(struct socket *sock) {}
-+#endif
-+
- static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 			  bool netlink)
- {
-@@ -1254,6 +1290,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	sock = nbd_get_socket(nbd, arg, &err);
- 	if (!sock)
- 		return err;
-+	nbd_reclassify_socket(sock);
- 
- 	/*
- 	 * We need to make sure we don't get any errant requests while we're
--- 
-2.54.0.1136.gdb2ca164c4-goog
-
+> Reported-by: syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6a2cdafe.428ffe26.258b27.0161.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
