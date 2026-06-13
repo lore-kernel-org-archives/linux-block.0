@@ -1,225 +1,145 @@
-Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF563A2543;
-	Sat, 13 Jun 2026 02:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350AD2D6409
+	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 04:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781316697; cv=none; b=i2EvVH3U7sGXvplX/Ia9m49FvR7P8Ma58G6IOGw2LwFi36AKIxr4WEdYJAM+wxBDGwGZ43KWIseH4HNycdfWLyqHVzlhAqe2My8jDHPDYOJFU63lTVrsw2+zx9M0dmid96dI/vbFDe+ybOv6qeHQeu8o/F5vsPF1aydjWVNQcII=
+	t=1781324783; cv=none; b=PZS8McCbHmw39b1Djf7Sn4u+QmECnZmwOj4YJM8nuOEMWVPFF0c6Vvbwj1NkkBd5wIgjZruR6XMZMbtkXGSxDpd4gW0ISMX6r9jEvC5WKNChXq1q+QbmiKUjKf0zyzZIXNDhk/vkG7+FYNxP621uGst/+czlyGr8LQ+KFr+4FNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781316697; c=relaxed/simple;
-	bh=ecnkEaaCS8+DWqCNDsS+RP9RroP8df0sQbWKP5wlgus=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IYC7OLwbo0NzfPSxuBeuiDZuJz6Vv3oWx9lCWgiFmp2AxnvBUWHxr/yLMCk6cR4IbatJPkpx6IZe+IZZNEGsF4UFJdvY5qHPAjdoSri7c+L3XuGpPWQ8X43W3wFraFiScuzbSkWT0z4wyuoip9YKJZNkRmSHt+nF4W9Xmy59aTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp; spf=pass smtp.mailfrom=sakamocchi.jp; dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b=m/B1Wk7p; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B/MO738r; arc=none smtp.client-ip=202.12.124.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sakamocchi.jp
+	s=arc-20240116; t=1781324783; c=relaxed/simple;
+	bh=xYvnBoU24LowK9XsuA1dWBRvMVViHxPRA9DkZeY0a+A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jCTjZfdA/vB43wtt9Tnr8BaUnnOW4iNjkgoEZoYQ2BYcLnRFHfTQPktPuhlWn3v9OCkjY42eqfdDTqe4e6q6vgLxpQbqR5My/9EAbDetd/JkfiG8eL7+WyjuOUyU1t11whsSdOyPa+EL+fYAK/uXTTiIDQrFHDj2wYAnW1NQI3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N+sFa2fk; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b="m/B1Wk7p";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B/MO738r"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.stl.internal (Postfix) with ESMTP id F3E41130005A;
-	Fri, 12 Jun 2026 22:11:31 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Fri, 12 Jun 2026 22:11:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sakamocchi.jp;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1781316691; x=
-	1781323891; bh=fh1bnzRZkfgjl9/+6Z2PA5Kxn4ZV0HU2wTlYFBWNiQ4=; b=m
-	/B1Wk7purilBiKkMRVuC3Flfti1lZpKfwlt77AZHkSZhKAS8ia2z8R1CfOFuJXF6
-	jqWuwBOSRldHgJLpHFlWbohi+/JgUUnflgC3sz67VmbHnHyV/qKZ4L9+/cZXwBar
-	pZn5nQLmSLaeUika7jXQ35MDD5xqJYMJ+XFW0A6h82xxae3b35f+ak0pm9sP0j3o
-	Rn6Oms26Dq5JaxYcd+LhJ5gGkGzHljkvR3PWQpdcFDZcrutUQ5Gw4MM7C09x5GvX
-	Rm44QXSJLT+PBjHrSfnnGBG8BhkzE2o2bhAyK2kr+YrDji7XqZrfOW/mHwWthgS8
-	Q8mLA82aenzF3UH78IFeA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1781316691; x=1781323891; bh=fh1bnzRZkfgjl9/+6Z2PA5Kxn4ZV0HU2wTl
-	YFBWNiQ4=; b=B/MO738r25kBC5W1FZEi/jo6InpT95G+oNzeSTFxbs6dD4/bHOo
-	eohWxUFnm/DfWRpK+E9TtLDOCX/uuLyULx8m11eswEvzdxMrqTKhaL6Z02wKBqNd
-	CwUcrPKAd4Siff0BNUrNKfyxMQnnlhIFTpMxLRKZ8xZjD0t2cTZE+U4PZ4f1VLum
-	eUck3wo68eBHMIfH++HVVwfv7ri3oT2EnqWmMJLbVCz7Bgqys21n/vANfaMKmzA5
-	KTcEAvxk1SZlFD9lLcLv/WXuzYzr6P0pxCDuHnQsrl+DKeZ8fmfPZHEY9ZY0Se5J
-	q0LnaDPLjJpMRMgOPg+6e3HR5iqlooX1wzg==
-X-ME-Sender: <xms:ULwsaqJSU3ZGUfYTfTfHvUkDGrkZoAz6knspkLRN72dkmhaAlWGU0w>
-    <xme:ULwsahfpOAjeeQFoOqDeZonzxOth5iwOqocTQN665ujKaw5W4kvXENFHiPc-NQxhw
-    bYtvUQNmu3jDY73PL51YmoAI2sjikN827tQNcmget20GbLVOMoBysI>
-X-ME-Received: <xmr:ULwsahqjIqnco2Z3DcLoZTyMFsoOrP0wNMni9j0HG90Y9TI7BFN_QaV06BuMmbh11eW2LBxgLuuRksM5bGGMSNYbNYgx36I>
-X-ME-Proxy-Cause: dmFkZTF4d5otJNSy4E5+TBrm5t4/oKNW6ZUmoxVyat81cKms57U/uBMehGj0z5o/f8U0/o
-    PK70IhoMQDHia1i8CUjqCHYptK3rsgOvh6V75aLzG/qgZR8GOCrcy2g63bYzQQOxQqQZj/
-    9oT1UuiKnf5HDSuvjSqxoI4qcJJc8bRoOgMhp5UWdtRrRuetAFIP6Aax0o1UXRC5743AIG
-    ohTJB6VzPihRmorA3Lx8YAKhiMlL0+yMkZd8nQebbDlRgY6+OEVjhF6TdMsRENVLgOl/oT
-    e9kd0DiCM7hKkG8v6/VJyviGyBIdYP/hdF4S7lGeNUOAI6uqYDfailcqU2g8IxWFbY33Iz
-    +ACooa7G5aLCHNydDMqgIw/A9YbG1rRl+rnyg/YIAD4D6JdEdoAgr2XQjPH8mcmJlRbD3J
-    L4/zbRcQgfwyBPi98PR4JOKtv58W0qZNGq2bo6mWTGKoyLqrpZmzB453regdcvZ8yWpZmu
-    5lZqhVxLEQEMILodTD6zK1GHSSrZm7GNYXniwmQFVTJUC06+nPk5jOzXfJFTMkjFQnsTua
-    s5EZutrLFiC0SlXAMx3G8OW0t7HhwPROcWEkdP0Sg/cm0K2m7YFRY8ECn2xh73b8iO9AwB
-    tCQHO9fSd6RcJ4FMQt07rf5E93yDlosmA0AAxIdfE3fyuvVFOzAgwLaVB37Q
-X-ME-Proxy: <xmx:ULwsaquT5SmR-xrOGgQFjoa6EFFSjj_YmJFkzvlVLH6-bw1wIgxJcA>
-    <xmx:ULwsaiczRhSGXgdtKE6k3bFZWKF6E3kwyRiRHotFTZvhVr9iHcwmsg>
-    <xmx:ULwsavqtUT6DHcdKXT_TCM513fG-OiPCsLUvufUASvNxvwu79-mjtQ>
-    <xmx:ULwsagTJKGVgV3JEZ3ffGTuu0di_sdwXaiZGwS3tmV3GAsHXbdzfUw>
-    <xmx:U7wsaqO7MfduZe3aBiVNiGj0DHVe0CuJke1_63F3DF10oo3uJ_cbzvXT>
-Feedback-ID: ie8e14432:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 12 Jun 2026 22:11:17 -0400 (EDT)
-Date: Sat, 13 Jun 2026 11:11:15 +0900
-From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-To: Kaitao Cheng <kaitao.cheng@linux.dev>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?=
- <christoph.boehmwalder@linbit.com>,	Jens Axboe <axboe@kernel.dk>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Christian Koenig <christian.koenig@amd.com>,
-	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Laxman Dewangan <ldewangan@nvidia.com>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Sowjanya Komatineni <skomatineni@nvidia.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Peter Zijlstra <peterz@infradead.org>,	Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>,	Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,	Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Matthew Auld <matthew.auld@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: Re: [PATCH v2 02/14] firewire: core: Open-code topology list walk
-Message-ID: <20260613021115.GA130812@sakamocchi.jp>
-Mail-Followup-To: Kaitao Cheng <kaitao.cheng@linux.dev>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?=
- <christoph.boehmwalder@linbit.com>,	Jens Axboe <axboe@kernel.dk>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Christian Koenig <christian.koenig@amd.com>,
-	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Laxman Dewangan <ldewangan@nvidia.com>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Sowjanya Komatineni <skomatineni@nvidia.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Peter Zijlstra <peterz@infradead.org>,	Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>,	Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,	Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Matthew Auld <matthew.auld@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Kaitao Cheng <chengkaitao@kylinos.cn>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <20260609061347.93688-3-kaitao.cheng@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N+sFa2fk"
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5195760750bso3407191cf.0
+        for <linux-block@vger.kernel.org>; Fri, 12 Jun 2026 21:26:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781324781; x=1781929581; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6l2xGU+3qIFZEhz6OluRSAKcM6KzJn808ttYDsC9+QQ=;
+        b=N+sFa2fkbGf9QmHpMmDGIr7Vpu8TbgqzCWJmut9Noc0/CO5USHoncHqmOZ4YBMWjGz
+         GJHVQFCd27Z/31CcWKsx49BoM8/u8wrICVmZSHYlaEeBZ5zX3QulAGzG29l4ZuUNOI/N
+         DAkOOJrKGNanO3xJq1LWFXizuaLkbY8NYqI1ULa5HQRuXv3ZZeE4gY3f4iozxUp5/p0A
+         WoW1eL4bG+ktwK2pVI0ctalLS4+ZHxip4UW6XRf3ZmaVEkyO5kh0rm4XdRCoLiPzbDjC
+         sda8Bg8JIlErnI8TApH+Q/VSL9N5Gf9ipYP8mFLugz0T1bZkI6OvaOSD/qiBfG4ljIU2
+         UN4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781324781; x=1781929581;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6l2xGU+3qIFZEhz6OluRSAKcM6KzJn808ttYDsC9+QQ=;
+        b=Nso//79rB32diM4ReFblHuqDVGAkNOFrHorq+G/T+9t5wESVWdC9zltiAaWWiTv07s
+         R3fWPc4R+yRfHoMPKMfb8Nghqrq4BKRhKb0Gr2+DXm6Pu8RsGqfDrsp58njUIccahB6C
+         /LknupHTtJOH8dUv68ZGtZlma0gAMeR1B6Wt7dYUSYii/hHI7IJ7KNoQE3Uopfo7k6YD
+         oMCvG2nmLMZjSr65rJvXmFratgyIGw8eLUozrC15cRPr+pG6LChA2iiFtKN7o9l5ZZ/f
+         CsgGXsXqaMQ8iyNEZIleTEzti0H3OQxF81G3PF7QMlaV8/72igvgk2XTENngKMJxoaVz
+         X7yA==
+X-Forwarded-Encrypted: i=1; AFNElJ8bGHrWWvV8TvzGjq5IabgZLQP+xZVMwHPAOnpIkT2yKWSevmwrUA4+mN4aaWt6XCB/48p7pqv4NPhzAw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YykhlB7qZzNiyadRD/XJBg4+FmZ67zcbHSw3WsatVImmP+FtVhR
+	9xwZ+bmo4BO5bRPdS8IiSSR5wLefMuYzAfVr+ElxqvQW3C71Twar0hu0sLal5rC2/ovVhLHXWvt
+	G7g5AMiBaC5rIBg==
+X-Received: from qtc12.prod.google.com ([2002:a05:622a:8e0c:b0:517:29b8:33b3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:5e08:0:b0:517:6a26:43b with SMTP id d75a77b69052e-51953553d89mr38847661cf.44.1781324780985;
+ Fri, 12 Jun 2026 21:26:20 -0700 (PDT)
+Date: Sat, 13 Jun 2026 04:26:19 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260609061347.93688-3-kaitao.cheng@linux.dev>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260613042619.1108126-1-edumazet@google.com>
+Subject: [PATCH] nbd: Reclassify sockets to avoid lockdep circular dependency
+From: Eric Dumazet <edumazet@google.com>
+To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org, 
+	nbd@other.debian.org, Eric Dumazet <eric.dumazet@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+syzbot reported a possible circular locking dependency in udp_sendmsg()
+where fs_reclaim can be triggered while holding sk_lock, and fs_reclaim
+can eventually depend on another sk_lock (e.g., if NBD is used for swap
+or writeback and NBD uses TLS/TCP which acquires sk_lock).
 
-On Tue, Jun 09, 2026 at 02:13:35PM +0800, Kaitao Cheng wrote:
-> From: Kaitao Cheng <chengkaitao@kylinos.cn>
-> 
-> A later change will make list_for_each_entry() cache the next element
-> before entering the loop body. for_each_fw_node() intentionally appends
-> newly discovered child nodes to the temporary walk list while the list is
-> being traversed.
-> 
-> Keep the loop open-coded so the next node is looked up only after
-> children have been appended. This preserves the current breadth-first
-> traversal semantics and prepares the code for the list iterator update.
-> 
-> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> ---
->  drivers/firewire/core-topology.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+Since the UDP socket and the NBD TCP/TLS socket are different, this is a
+false positive. Fix this by reclassifying NBD sockets to a separate lock
+class when they are added to the NBD device.
 
-Thanks for the patch.
+This is similar to what nvme-tcp and other network block devices do.
 
-Last September I've realized the issue but not solved yet[1]. A pointer
-array would be another candidate to store the found nodes, since IEEE 1394
-bus a restriction about the maximum number of nodes up to 256. But It is
-too large if put in kernel stack, while it is slightly difficult to keep
-it in heap dynamically since the function is called under holding
-spinning lock.
+Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earlier")
+Reported-by: syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6a2cdafe.428ffe26.258b27.0161.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/block/nbd.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-Anyway, there is no objection to your change. Let me apply it to
-for-next branch so that your further work goes well with no blocks
-locating in this subsystem.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index fe63f3c55d0d960a1a4bbb2c60738cbbece10719..0e2180e910c4eaaa58556a0c75c1b9c3fdc1930d 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1238,6 +1238,42 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+ 	return sock;
+ }
+ 
++#ifdef CONFIG_DEBUG_LOCK_ALLOC
++static struct lock_class_key nbd_key[3];
++static struct lock_class_key nbd_slock_key[3];
++
++static void nbd_reclassify_socket(struct socket *sock)
++{
++	struct sock *sk = sock->sk;
++
++	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
++		return;
++
++	switch (sk->sk_family) {
++	case AF_INET:
++		sock_lock_init_class_and_name(sk, "slock-AF_INET-NBD",
++					      &nbd_slock_key[0],
++					      "sk_lock-AF_INET-NBD",
++					      &nbd_key[0]);
++		break;
++	case AF_INET6:
++		sock_lock_init_class_and_name(sk, "slock-AF_INET6-NBD",
++					      &nbd_slock_key[1],
++					      "sk_lock-AF_INET6-NBD",
++					      &nbd_key[1]);
++		break;
++	case AF_UNIX:
++		sock_lock_init_class_and_name(sk, "slock-AF_UNIX-NBD",
++					      &nbd_slock_key[2],
++					      "sk_lock-AF_UNIX-NBD",
++					      &nbd_key[2]);
++		break;
++	}
++}
++#else
++static inline void nbd_reclassify_socket(struct socket *sock) {}
++#endif
++
+ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 			  bool netlink)
+ {
+@@ -1254,6 +1290,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
++	nbd_reclassify_socket(sock);
+ 
+ 	/*
+ 	 * We need to make sure we don't get any errant requests while we're
+-- 
+2.54.0.1136.gdb2ca164c4-goog
 
-[1] https://social.kernel.org/notice/AyDqvLkpwUvI5eyokK
-
-
-Thanks
-
-Takashi Sakamoto
