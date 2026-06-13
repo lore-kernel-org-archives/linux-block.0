@@ -1,65 +1,109 @@
-Received: from lf-2-18.ptr.blmpb.com (lf-2-18.ptr.blmpb.com [101.36.218.18])
+Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E12437F8DF
-	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 15:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6842749C1
+	for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 22:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781364693; cv=none; b=kAIoYQ39O1rv5hssDFHbLwvPQx8olc//GHK7ivsrUUx816yqdy1HQ0wicMdf035pMZOK5cJ4gNbtTrzPF1U6p7LxBJiImh8HTFP0TjNXO51CgDdfJlCydGA9u378T4GEsWKpVe5ytbZvnM57uahL6ZW1PHG/Tyrprvn86so+7jo=
+	t=1781391276; cv=none; b=K3BiOU5BiYDP2Rx/JS1rthd8iyTmjemEDvvEY7cjqTcFe2yPAmbsO24atcgaOCMEbYgWM/478rqnApf4Vr2INZTwFXT6UHUUcfXUNtImElT2rYkqYcDtzh7pp4JXDQQzmcd6vJ09D7lF+5ZY0bHtnKvqI//RkPlxdYale990Cns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781364693; c=relaxed/simple;
-	bh=nLBRFuGy/Lcdex1xbm7S1MkwajWmAI98NOmaBeM7tcc=;
-	h=In-Reply-To:Cc:Subject:Mime-Version:Message-Id:Content-Type:From:
-	 Date:To:References; b=MaH3QxAYF3T6WLFrnL/fmM9ICvC4N0A/Lq/flimHGiHKXP/E6HZ7nl6Xh8/l0aVU4ZffsR02e4RUuqcyk9x2crEzAzVn2XNXVvob4InRYrfLanNJB44Uzopk66T/ot7L+wYV53ISKnYcVXPJI8cO80393mSqO79phhYnYPH0Ph4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=mFmEYiJs; arc=none smtp.client-ip=101.36.218.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1781391276; c=relaxed/simple;
+	bh=iZbJHDSwm/+M/O7W6upSMl4Wv69MZ6HERedebOMSJkQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qcIdsUyQZ02dQq87SMJBmgCI4zepi0q2JoBegnjKbMmgmJnp3D1ny++WrIBMW31CoJgG6ffptBs5M0iY/VG9vWOIqT7jHPiJXbIDKUmKFsESf1RnWwCKLWH2URwp3igl7lRr08x7R14NBtsgE0wR8vmA+cmQcLmMxyAH1rkhZIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EPtYAaVb; arc=none smtp.client-ip=74.125.82.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="mFmEYiJs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1781364640;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=p1M9GIUIb+CnZmw4OzBE/a+RoVFm8jbl6K0gVEhBtCI=;
- b=mFmEYiJsZJxprQE3RXkCi/POZWl38UyhQRYDlrEvn5FZD1kJT3NEzoHyQ9AEGZTxjH0lvS
- tw3DrBJp/pmd1KJkm8wXA7cz+PMKR/CMWPZQjeQuZWCVMvLCtxo8VfvF7+DxAj4L1lAb1b
- WzTnI2vog0B+Pch6Vbc/VTMLbFMiuAy8LuOH1rExc5CJgC5iPmKqqRAzv9OVphSTZx3zbE
- Raz1EhpifQIPqxF1XZocveRh6OCSBVg5bGB0u+m6zVTxn8iFYO2NZvzTb2DZYfBJXh6ifE
- mz+Rd6LgfMRrJl/ZR2olMLdCL+9L0U/BV1JSXbjzVXQI9C6rvjyhAxEut+K1cA==
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
-In-Reply-To: <178136456783.1954753.8358889895275169463.b4-ty@b4>
-Cc: <linux-bcache@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH Resend] MAINTAINERS: Update Coly Li's email address
-Received: from smtpclient.apple ([120.245.64.89]) by smtp.larksuite.com with ESMTPS; Sat, 13 Jun 2026 15:30:38 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPtYAaVb"
+Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-1384eb94d20so3092080c88.1
+        for <linux-block@vger.kernel.org>; Sat, 13 Jun 2026 15:54:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781391273; x=1781996073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aGN41lJJpUoPArkrSVIPW84Lj0UWsceBpbacK1PPJMQ=;
+        b=EPtYAaVbdb7OMtts5QCZZjsrTny0h4X5jVsH+EtnJ13sSdXRfy3owCyVshZ5rVuCbf
+         eg/O+6o2vWS2giZowymf6/LrUwEIXSdHpO39wQ0e9kaLZFWTvyGjqYOieJLc65HUDMoT
+         ndRyVxX/hpXD+Ky9sEBNnsOKJxJOndx82F63GebSz+xqdEAcc6wb7ZTqAYsFAWSUbsfv
+         iRuomQ0vkvwa7mRD0M7Bsky1riywd90nskZFDO0t3cDhdNQlQMu9u6oiyc+UjvvsyMKy
+         vXFce/eQm1rdHk7sGgw5bnLv/fGGty8H3XT21zvIGrF26aQUtQ6fH6uC8g0XyN3EqYng
+         aJ4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781391273; x=1781996073;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aGN41lJJpUoPArkrSVIPW84Lj0UWsceBpbacK1PPJMQ=;
+        b=pq1/INmrYzJSDVEvW5haZhGWV7oE0s2IaSh48oDamnWWgPmzBcwwX65O8pJ6ZSHG+s
+         YSohjXtTQPFQCXDK5ppd8XNldJ9MfCo+jbtGlh5mUR8Nvz7zgNFfJ9QGubLnBBz2CVoF
+         xIjWvVuUP4cPUkJGdcuyUvi13Qdw9Ejwh759JywwQYS4J03rY1v1AEEkGQpDPTHjezqW
+         ppGJ7Fifwc9zpBXYao0Kz+GAscKPahAhtwssFgNvNqTWIWxwHrKeTP1Unz4inAHAPkRl
+         2sWq5mDk6Z2nLJqKnNf/HS4UYjJv8UGhCgEnHTPaip0znh185C/A+y8f5Ve0txne2B8z
+         xpAg==
+X-Forwarded-Encrypted: i=1; AFNElJ9JWswotX4h0Y70bk9aEIggL4wVFyy72yD+iryDzuP8g5LEBOGrHsAPC/MMBfm7oC2X3B8r3LeXbQIRIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnrRfYFp5z2FCpzVyLdMIl13Pp3VzxyLyfugNY9whcjt1p83WL
+	kB4K5YB2BIBXpk25LFWj10TD4BdIfV4kWXaYgflB4MJ7DMCcniTxDFLc
+X-Gm-Gg: Acq92OFYkHBd/vCUg+cBwDSeBJOWve8QCeOetQxI3zFEfhJhPBFC+nvqydUCVnK3SrP
+	08Fpz0SGYhjEUthbYxG1R1zjUwjIDqVyQoOEpcqZg/+JXnwWXtRaHUi/0fCHL7u0EEb9oMYTNxD
+	VXNwd/sBM2bPQR09nyYxAwiMvZy23Nmh8IcO7ljh8xXjVGHRbZp/K+L1p5BEG78OLERTzDKkr6X
+	J3ujxgx4wMYk/6FFdtK0sms/yqDxjnMdZIuVlDVcgdALETvysEQa9xJL/aOJ32E1kSAsHiLs5O6
+	M2mZnEOWhHROp7hwqWFxUQ0CYAvHGYEcIEZwfV83Fl3Q+nOOfu7AId3VM95QlqfjAU9CFeiq8cK
+	zWBX2uSJ/0nkMmlsqFzrWLQ9xSINCC2z/3G9IzdjLCGB65TxysVjdiay3JyZym7LF9L8gQ27rU4
+	EqiaFJ6L5VsnrH+3krDuiT+cLd4B8jb7j0wXYKt7oV1qivrgWeMsut/A2RIjW6MkB+fvPNToZEN
+	j17ABgzY933icVXNKY1rSSlarr7kPYua8sYuFLoqYa4UZ5NoZyk7XHWAYpvgk44zAfdVcuXnyvv
+	5qBKbvkH7Q92ZxkVVA==
+X-Received: by 2002:a05:7300:4347:b0:304:2af3:5ffa with SMTP id 5a478bee46e88-3093ec3e363mr2952961eec.19.1781391273082;
+        Sat, 13 Jun 2026 15:54:33 -0700 (PDT)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43f69sm8413333eec.20.2026.06.13.15.54.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2026 15:54:32 -0700 (PDT)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] blk-iocost: correct CONFIG_TRACEPOINTS macro name in comments
+Date: Sat, 13 Jun 2026 15:54:26 -0700
+Message-ID: <20260613225427.139129-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Coly Li <colyli@fygo.io>
-Message-Id: <52796FE1-D803-4697-99B1-C75D05DC9154@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-X-Lms-Return-Path: <lba+26a2d779f+266c81+vger.kernel.org+colyli@fygo.io>
-Content-Transfer-Encoding: quoted-printable
-From: "Coly Li" <colyli@fygo.io>
-Date: Sat, 13 Jun 2026 23:30:26 +0800
-To: "Jens Axboe" <axboe@kernel.dk>
-References: <20260613150458.682707-1-colyli@fygo.io> <178136456783.1954753.8358889895275169463.b4-ty@b4>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> 2026=E5=B9=B46=E6=9C=8813=E6=97=A5 23:29=EF=BC=8CJens Axboe <axboe@kernel=
-.dk> =E5=86=99=E9=81=93=EF=BC=9A
->=20
->=20
-> On Sat, 13 Jun 2026 23:04:58 +0800, colyli@fygo.io wrote:
->> I switch to colyli@fygo.io as my current email address.
->=20
-> Applied, thanks!
->=20
-> [1/1] MAINTAINERS: Update Coly Li's email address
->      commit: c7c76f9232bd34835d821f14abdc5fafc17bc938
+Comments in block/blk-iocost.c incorrectly refer to
+CONFIG_TRACE_POINTS instead of CONFIG_TRACEPOINTS. Correct them.
 
-Thanks a lot!
+Discovered while searching for CONFIG_* symbols referenced in code but
+not defined in any Kconfig file.
 
-Coly Li
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+ block/blk-iocost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 0cca88a366dc..04630c36b737 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -205,9 +205,9 @@ static char trace_iocg_path[TRACE_IOCG_PATH_LEN];
+ 		}								\
+ 	} while (0)
+ 
+-#else	/* CONFIG_TRACE_POINTS */
++#else	/* CONFIG_TRACEPOINTS */
+ #define TRACE_IOCG_PATH(type, iocg, ...)	do { } while (0)
+-#endif	/* CONFIG_TRACE_POINTS */
++#endif	/* CONFIG_TRACEPOINTS */
+ 
+ enum {
+ 	MILLION			= 1000000,
+-- 
+2.43.0
+
