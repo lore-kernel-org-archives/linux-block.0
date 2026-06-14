@@ -1,355 +1,266 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729F33C8733
-	for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 15:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220C6235C01;
+	Sun, 14 Jun 2026 18:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781451356; cv=none; b=QRzYl3v9GdoZKUpirpylSV+kFKJwvBqjYkgqcy66lMnkwd2rbLgX0FKLHp6wrloZW9SgffuNzU7fUyTzN1n7LVQ46OCeFL2F+698swMzFikc/lGQzuVkszOByhg2uawuaZgEFHRDbOQXFspmY34+XeXTrOt1ukFKkQJBybnxRjA=
+	t=1781461198; cv=none; b=ooi27aDyC1YzF+T8e3+4Sw75Ua21fPdpNJu/KUx/CWOHhPWa73HsL6Y/9v1T7aYIhH6S30raIpCDx+kLMyWOXnOH3AOaARTsswOiDUOl3FUCz+k2Nya+WFsuDNN/8EhGLs8XSh9UcTRmYG0Zuz+GSUf2sSyu/h6/vwgk5odooyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781451356; c=relaxed/simple;
-	bh=US4ZiUEXSeqi1DqGlIK6guwPu2vW+Htiyg+pB7+1WIk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GTUlpX/HiuS4vdODTPEanpX1U45NWmT9A9rDbjswbxkLowrnQz3CMs9GqMLQdOXCYXfwt8sdaRNSHGAP3EN/7LSzmXg9lE0U9kSaCV8sn3vTNEMvCfUvMFImt/pYufidOofXpD+5SImfGwxH933S2zY8JgQAdSfjg3lO4a+8TDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqOD3dBN; arc=none smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781461198; c=relaxed/simple;
+	bh=rVtY+EKUZ1El/7fU8zYxaaHGgrYULb2axkjiHaR9CfQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=I9Wv1T4omvjvJyLOS4oNBK2TTUAygu9LFqWuLW+Wi8pJ6k6c2Q41Pv3r5KVTOVHGj9SGoPkX42vBrz7ow/sNdIVKl0oxQ9Wse/StsjMnscJSMFqpy0GvTVbAbefvs+j4j0E+GvQaqNXf/O5oypnSI30yTo1eu55DgSKY8QdKSzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=pnDZv11/; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqOD3dBN"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3075ce9c05aso6206709eec.1
-        for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 08:35:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781451355; x=1782056155; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a/lxpqFHcXjSmMEFitPcCUnaBZzEe91eCd6YU/69bl8=;
-        b=UqOD3dBN9XixHF4w1ox9KMcqTFXeDtAsROqo5CLL6Qq9/vS3IUbgDJfSg5/fa8YMua
-         2OwblmwBVGtsNGzwMXzNYe7Qh7Ye6Sx2oSqUjFHV5qWGb2IwD4PFI2VC7OekgqXjUHXa
-         JCjXmWFhcY5MUwsyQ8nHHHGTUvBygPwbo2inc1Qfc35hscN5T0wfk2GA75Q1UBJMyKDK
-         Eu0TKen+Sh16vQMbJU0LC7zqSOW3iQJkkGXfD1E2bcoMyU1EA0d+zWW7kBeC67H6BeYc
-         HzAabiyFbwddc9qHI5gta8ZdT23gpR1h1GKbaTrzHE206JcvfCE4zgSWF6ItGVljJRhy
-         uF4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781451355; x=1782056155;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a/lxpqFHcXjSmMEFitPcCUnaBZzEe91eCd6YU/69bl8=;
-        b=EWMhjdQb8UZ28up98wDWMFt3pgTz2QUgdQVUHOFQyAEFEGBRKlWaM03rxeqo8ENB+D
-         HEB/10FAA7zjfywJU99sfSeZAHgJfFsfkTpr9WpaTIf9v91ZAZVAQREiRG+McTpzwdRb
-         iaW86GdtxYMZgfSXppeKVGFDttOJZxX88OF3gzSuCoAeWTtycIZRQCp2W6AbXOUqaKhd
-         MXDtoKNdnTZYP2egs0K1A899KNe7oAMY9OYzQmP0v322OL8Qe2Inhr1z0mhAI5bezWK5
-         1GfYCr+Mp/Yr4IypyTg5cRilSjUijmdZQkvii0Gc9IPyLo5lKBfvdXj8ybc9AC4W6jhC
-         kpcA==
-X-Forwarded-Encrypted: i=1; AFNElJ/qt8KhQaEmDYcrosN25Mtg2PTIAOuRHtwBxkRadi2vIV0QRMFl9sD5w6A+eRwrmDEAagsQlKrsZ0KU6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0nlCYANH1LNU15fw4RiRFzZnuQlYTNM/jgYJrhNkZP53Bb/W9
-	zzeGJRDmpwaaP4qdq38j+TbHxAI+NESDwDbLCy4+cC639U9JFWoQ3ssR
-X-Gm-Gg: Acq92OHS+3U8gvJK8TJL2qugp6QHn9TEvfHoKtzqa26Ihq5nyRCtXzteVeD9SgXrQDE
-	CyOTt4+rorwwsn30rBdR7dRwTHw7TywvVTdYb3kaiZVRKo6RE4bxl/DpVh0iot7OTauBIyzusbg
-	9mDikNJiPNNF3UPOWxQ7vhW9+Xq3q3u33ZDtbkUeZG9Oqidio6AkXjbiLgA8h/3Y3MueAvFT2XU
-	orXnLLTIw2LvYXK3UbHlB+otzZ6y5riRwa7Q0XCHKblHLTE0NM6yRW/ReI8lMYUH1SethgQZtQt
-	ZhUHMotbFi5M4sfGcUdk9heyVCquWO6irKq7TBPgkgOexmVTek16EHimZ5cK2IjRl7gCLoHlIj0
-	txKnIJUrIM2qhVWaPbiwuE7eblHHqDIKb1UgxpXHuhNjE7cAOnAyLfqTK6vihdk3KfM0uTMziNn
-	zDvlxzDOjCVhglzFqX5em39VLlVmA8TvORDgW4HYO+OtTQkiZC5FH69FXN7WIRl5LaJ+pHIgPrT
-	A==
-X-Received: by 2002:a05:693c:42d1:b0:30b:5571:b412 with SMTP id 5a478bee46e88-30b5571ba3emr2033018eec.5.1781451354593;
-        Sun, 14 Jun 2026 08:35:54 -0700 (PDT)
-Received: from NV-J4GCB44.localdomain ([103.74.125.162])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e5d0849sm12580632eec.7.2026.06.14.08.35.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 08:35:54 -0700 (PDT)
-From: Jianyue Wu <wujianyue000@gmail.com>
-Date: Sun, 14 Jun 2026 23:35:31 +0800
-Subject: [PATCH 3/3] mm/swap: route slot free notifications through
- swap_ops
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="pnDZv11/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=iwuH+zWtbDbDnwE9897b+9/MkUobwIjtm5QS0rkjcs0=; b=pnDZv11/cnfm58v6
+	5wdJCZAPsw8N8bvM507q0Oxy5DV0makFg9erT9DYvEU+VJFxm6VhM+AxT10TeRkqETxG6g9uTPUPZ
+	BL+muFQOR+RbGvVhZYwdhD+6lVaj+UmgjLL2Lt5cBu+vW3jCdHlnfAxsmTEbn3DhuKxsMF2K7yGp9
+	tjEuYMI3nF/L8CgZkTAVivIiN1VCQ0aKMI4dK/5VjgS3yxi1nbPgv32JakHnyHQpAfBfxPJZ2PYl4
+	Zo1nHR5MzqH6eQ7LIsAXy+vV+hAEtsq7uG6Inqk7DGz1D2sSiPOMA1ptcaMcrK5kMxyrrI0c250a1
+	xquK+r58+2AuhkFwcw==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1wYp5g-00000007Z6x-1UC4;
+	Sun, 14 Jun 2026 17:57:48 +0000
+Date: Sun, 14 Jun 2026 17:57:48 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ai7rnH20IYeSmY8s@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260614-zram-swap-ops-block-register-v1-3-6c1a6639c222@gmail.com>
-References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
-In-Reply-To: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>, 
- Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>, 
- Barry Song <baohua@kernel.org>, Kairui Song <kasong@tencent.com>, 
- Kemeng Shi <shikemeng@huaweicloud.com>, 
- Youngjun Park <youngjun.park@lge.com>, Minchan Kim <minchan@kernel.org>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
- Jianyue Wu <wujianyue000@gmail.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openssh-sha256; t=1781451334; l=8570;
- i=wujianyue000@gmail.com; s=id_ed25519; h=from:subject:message-id;
- bh=US4ZiUEXSeqi1DqGlIK6guwPu2vW+Htiyg+pB7+1WIk=;
- b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgW51Zh3v9nG0Wlld2Ti8ylp1TnO7yB
- H+z9CbXty/WEAQAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QJxbc8ZmmOMj7C6hmGDwJCnn35hWaMfWfIUsCO6R2sn9DbHTHbqqbvfKYYh9aaFZPf8vr87ppKP
- 2ptsA6pliaAw=
-X-Developer-Key: i=wujianyue000@gmail.com; a=openssh;
- fpr=SHA256:gVWBPJbHGWlCIw+V8F63Ff0k21S7AB5+rZt8+huemvg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
+X-Uptime: 17:34:01 up 29 days, 20:46,  2 users,  load average: 0.06, 0.02,
+ 0.00
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-Dispatch slot_free_notify through swap_ops instead of
-block_device_operations. Zram keeps slot-free handling alongside its
-other swap_ops methods.
+Hi,
+  I've got a repeatable raid hang/warn and would appreciate some pointers
+as where to debug.
+  (I've been logging stuff on  https://bugzilla.kernel.org/show_bug.cgi?id=221535 )
 
-Move slot_trylock into the CONFIG_SWAP block. With CONFIG_SWAP=n it
-has no callers and the build fails on -Werror=unused-function.
+  This started off as debugging a case where I'd get my RAID1 (on the host)
+getting a reliable 'rescheduling sector'/disk failure while running the qemu block test suite
+during a qemu build, but then I tried to build a smaller discrete
+test, and now I've got a simply triggerable warn and test hang.
+There's no errors from the underlying SATA layer on the storage,
+everything resyncs just fine.
 
-Document the callback locking rules in include/linux/swap.h. Remove
-the outdated locking.rst note for swap_slot_free_notify.
+I've got an existing LVM vg ('main') with two mirrors on sda2, and sdb2
+which are SATA disks.
 
-Signed-off-by: Jianyue Wu <wujianyue000@gmail.com>
----
- Documentation/filesystems/locking.rst |  5 --
- drivers/block/zram/zram_drv.c         | 88 ++++++++++++++++++-----------------
- include/linux/blkdev.h                |  2 -
- include/linux/swap.h                  |  7 +++
- mm/swapfile.c                         | 13 ++----
- rust/kernel/block/mq/gen_disk.rs      |  1 -
- 6 files changed, 57 insertions(+), 59 deletions(-)
+# lvcreate --type mirror --mirrors 1 -L 1G main /dev/sda2 /dev/sdb2
+# mkfs.ext4 /dev/mapper/main-lvol0
+# mount /dev/mapper/main-lvol0 /mnt/tmp/
+# chmod a+rwx /mnt/tmp
 
-diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
-index 70481bdc031d..964c841bf917 100644
---- a/Documentation/filesystems/locking.rst
-+++ b/Documentation/filesystems/locking.rst
-@@ -443,7 +443,6 @@ prototypes::
- 				unsigned long *);
- 	void (*unlock_native_capacity) (struct gendisk *);
- 	int (*getgeo)(struct gendisk *, struct hd_geometry *);
--	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
- 
- locking rules:
- 
-@@ -457,12 +456,8 @@ compat_ioctl:		no
- direct_access:		no
- unlock_native_capacity:	no
- getgeo:			no
--swap_slot_free_notify:	no	(see below)
- ======================= ===================
- 
--swap_slot_free_notify is called with swap_lock and sometimes the page lock
--held.
--
- 
- file_operations
- ===============
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 9b2bd0287402..b78246dc1746 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -72,31 +72,6 @@ static void slot_lock_init(struct zram *zram, u32 index)
- 			 &__key, 0);
- }
- 
--/*
-- * entry locking rules:
-- *
-- * 1) Lock is exclusive
-- *
-- * 2) lock() function can sleep waiting for the lock
-- *
-- * 3) Lock owner can sleep
-- *
-- * 4) Use TRY lock variant when in atomic context
-- *    - must check return value and handle locking failers
-- */
--static __must_check bool slot_trylock(struct zram *zram, u32 index)
--{
--	unsigned long *lock = &zram->table[index].__lock;
--
--	if (!test_and_set_bit_lock(ZRAM_ENTRY_LOCK, lock)) {
--		mutex_acquire(slot_dep_map(zram, index), 0, 1, _RET_IP_);
--		lock_acquired(slot_dep_map(zram, index), _RET_IP_);
--		return true;
--	}
--
--	return false;
--}
--
- static void slot_lock(struct zram *zram, u32 index)
- {
- 	unsigned long *lock = &zram->table[index].__lock;
-@@ -2798,23 +2773,6 @@ static void zram_submit_bio(struct bio *bio)
- 	}
- }
- 
--static void zram_slot_free_notify(struct block_device *bdev,
--				unsigned long index)
--{
--	struct zram *zram;
--
--	zram = bdev->bd_disk->private_data;
--
--	atomic64_inc(&zram->stats.notify_free);
--	if (!slot_trylock(zram, index)) {
--		atomic64_inc(&zram->stats.miss_free);
--		return;
--	}
--
--	slot_free(zram, index);
--	slot_unlock(zram, index);
--}
--
- static void zram_comp_params_reset(struct zram *zram)
- {
- 	u32 prio;
-@@ -3058,6 +3016,50 @@ static void zram_swap_submit_write(struct swap_io_ctx *ctx)
- 	swap_write_end(sio, failed);
- }
- 
-+/*
-+ * entry locking rules:
-+ *
-+ * 1) Lock is exclusive
-+ *
-+ * 2) lock() function can sleep waiting for the lock
-+ *
-+ * 3) Lock owner can sleep
-+ *
-+ * 4) Use TRY lock variant when in atomic context
-+ *    - must check return value and handle locking failers
-+ */
-+static __must_check bool slot_trylock(struct zram *zram, u32 index)
-+{
-+	unsigned long *lock = &zram->table[index].__lock;
-+
-+	if (!test_and_set_bit_lock(ZRAM_ENTRY_LOCK, lock)) {
-+		mutex_acquire(slot_dep_map(zram, index), 0, 1, _RET_IP_);
-+		lock_acquired(slot_dep_map(zram, index), _RET_IP_);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * swap_range_free() holds the swap cluster lock. Use slot_trylock() so
-+ * we never block on a slot that is already locked elsewhere.
-+ */
-+static void zram_swap_slot_free_notify(struct swap_info_struct *sis,
-+				       unsigned long index)
-+{
-+	struct zram *zram = sis->bdev->bd_disk->private_data;
-+
-+	atomic64_inc(&zram->stats.notify_free);
-+	if (!slot_trylock(zram, index)) {
-+		atomic64_inc(&zram->stats.miss_free);
-+		return;
-+	}
-+
-+	slot_free(zram, index);
-+	slot_unlock(zram, index);
-+}
-+
- /*
-  * No ->can_merge: block rules exist to grow bios on contiguous sectors and
-  * matching blkcg.  zram already batches through swap_iocb, and
-@@ -3068,6 +3070,7 @@ static void zram_swap_submit_write(struct swap_io_ctx *ctx)
- static const struct swap_ops zram_swap_ops = {
- 	.submit_read		= zram_swap_submit_read,
- 	.submit_write		= zram_swap_submit_write,
-+	.slot_free_notify	= zram_swap_slot_free_notify,
- };
- 
- #endif /* CONFIG_SWAP */
-@@ -3075,7 +3078,6 @@ static const struct swap_ops zram_swap_ops = {
- static const struct block_device_operations zram_devops = {
- 	.open = zram_open,
- 	.submit_bio = zram_submit_bio,
--	.swap_slot_free_notify = zram_slot_free_notify,
- 	.owner = THIS_MODULE
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 890128cdea1c..f861ceed39eb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1669,8 +1669,6 @@ struct block_device_operations {
- 	int (*getgeo)(struct gendisk *, struct hd_geometry *);
- 	int (*set_read_only)(struct block_device *bdev, bool ro);
- 	void (*free_disk)(struct gendisk *disk);
--	/* this callback is with swap_lock and sometimes page table lock held */
--	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
- 	int (*report_zones)(struct gendisk *, sector_t sector,
- 			    unsigned int nr_zones,
- 			    struct blk_report_zones_args *args);
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 70bf6f3f04dc..09640eb5a45d 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -40,6 +40,11 @@ struct swap_io_ctx {
-  *             the iocb is full or the plug is flushed.
-  * @submit_write: flush the accumulated write ctx to the backend.
-  * @submit_read: flush the accumulated read ctx to the backend.
-+ * @slot_free_notify: optional callback invoked when a swap slot
-+ *                    becomes free. swap_range_free() calls it with the
-+ *                    swap cluster lock held. The folio lock may also be
-+ *                    held on swap-cache teardown paths. Must not sleep
-+ *                    or block.
-  */
- struct swap_ops {
- 	unsigned int		flags;
-@@ -49,6 +54,8 @@ struct swap_ops {
- 					     size_t prev_folio_size, int rw);
- 	void			(*submit_write)(struct swap_io_ctx *ctx);
- 	void			(*submit_read)(struct swap_io_ctx *ctx);
-+	void			(*slot_free_notify)(struct swap_info_struct *sis,
-+						    unsigned long offset);
- };
- 
- int swap_register_block_ops(const struct block_device_operations *fops,
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index ebdc96092961..79a4166fb9bf 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -1311,21 +1311,18 @@ static void swap_range_free(struct swap_info_struct *si, unsigned long offset,
- 			    unsigned int nr_entries)
- {
- 	unsigned long end = offset + nr_entries - 1;
--	void (*swap_slot_free_notify)(struct block_device *, unsigned long);
-+	void (*slot_free_notify)(struct swap_info_struct *sis,
-+				 unsigned long offset);
- 	unsigned int i;
- 
- 	for (i = 0; i < nr_entries; i++)
- 		zswap_invalidate(swp_entry(si->type, offset + i));
- 
--	if (si->flags & SWP_BLKDEV)
--		swap_slot_free_notify =
--			si->bdev->bd_disk->fops->swap_slot_free_notify;
--	else
--		swap_slot_free_notify = NULL;
-+	slot_free_notify = si->ops->slot_free_notify;
- 	while (offset <= end) {
- 		arch_swap_invalidate_page(si->type, offset);
--		if (swap_slot_free_notify)
--			swap_slot_free_notify(si->bdev, offset);
-+		if (slot_free_notify)
-+			slot_free_notify(si, offset);
- 		offset++;
- 	}
- 
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 912cb805caf5..25552d69f711 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -135,7 +135,6 @@ pub fn build<T: Operations>(
-             unlock_native_capacity: None,
-             getgeo: None,
-             set_read_only: None,
--            swap_slot_free_notify: None,
-             report_zones: None,
-             devnode: None,
-             alternative_gpt_sector: None,
+$ dd if=/dev/zero of=/mnt/tmp/testfile bs=1024k count=1
+
+(I then wait for the IO to stop)
+
+then we've got this little test program:
+
+<--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><-->
+#include <errno.h>
+#include <fcntl.h>             
+#include <asm-generic/fcntl.h>
+#include <stdio.h> 
+#include <unistd.h>
+
+
+const char* path="/mnt/tmp/testfile";
+static char buf[8192];
+
+int main()                                       
+{
+  int fd=open(path, O_RDWR|O_DIRECT|O_CLOEXEC);
+    
+  errno=0;
+  int res3=pread(fd, buf, 4096, 0);
+  printf("pread of 4096 said: %d (%m)\n", res3);
+
+}
+<--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><-->
+
+running that, either hangs or gets a 'pread of 4096 said: -1 (Input/output error)'
+when it hangs it's unkillable.
+
+at the moment (on 7.1.0-rc7) this is giving:
+Jun 14 18:08:32 dalek kernel: device-mapper: raid1: Mirror read failed from 252:24. Trying alternative device.
+Jun 14 18:08:32 dalek kernel: ------------[ cut here ]------------
+Jun 14 18:08:32 dalek dmeventd[1010]: Primary mirror device 252:24 read failed.
+Jun 14 18:08:32 dalek kernel: WARNING: block/bio.c:1044 at bio_add_page+0x18b/0x250, CPU#15: kworker/15:1/369
+
+(full backtrace below)
+(Note there is a moan in there about sdb IO error - repeated a lot - but
+again, there's no SATA level errors, and the drive is fine on smart, and
+I can read the whole of the underlying lvm mirrors, so I don't think it's
+physically there).
+
+I did a blktrace, although that gives me a 23G blkparse output, hmm
+(I see each event repeated a lot - maybe per thread?)
+
+252,26  15        1     0.000000000  3435  Q  RS 264192 + 8 [dbf]
+  252,26 is /dev/mapper/main-lvol0
+252,24  15        1     0.000005501  3435  A  RS 264192 + 8 <- (252,26) 264192
+  252,24 is main-lvol0_mimage_0
+252,24  15        2     0.000005761  3435  Q  RS 264192 + 8 [dbf]
+  8,0   15        1     0.000008646  3435  A  RS 71634944 + 8 <- (252,24) 264192
+    so that's sda 
+  8,0   15        2     0.000008787  3435  A  RS 73734144 + 8 <- (8,2) 71634944
+    I guess mapping down from sda2 to sda
+  8,0   15        3     0.000009037  3435  Q  RS 73734144 + 8 [dbf]
+  8,0   15        4     0.000009809  3435  C  RS 73734144 + 8 [65514]
+      ??? Hmm what's the 65514 there?
+252,24  15        3     0.000010320  3435  C  RS 264192 + 8 [65514]
+252,25  15        1     0.000290384   369  Q   R 264192 + 8 [kworker/15:1]
+   252,25 is main-lvol0_mimage_1
+
+and at this point I'm a bit lost as to what I'm looking for.
+
+Hints appreciated!
+
+(I don't believe this is a regression - or at least not recent)
+
+Dave
+
+
+
+
+Jun 14 18:08:32 dalek kernel: device-mapper: raid1: Mirror read failed from 252:24. Trying alternative device.
+Jun 14 18:08:32 dalek kernel: ------------[ cut here ]------------
+Jun 14 18:08:32 dalek dmeventd[1010]: Primary mirror device 252:24 read failed.
+Jun 14 18:08:32 dalek kernel: WARNING: block/bio.c:1044 at bio_add_page+0x18b/0x250, CPU#15: kworker/15:1/369
+Jun 14 18:08:32 dalek dmeventd[1010]: main-lvol0 is now in-sync.
+Jun 14 18:08:32 dalek kernel: Modules linked in: nft_masq nft_reject_ipv4 act_csum cls_u32 sch_htb nf_nat_tftp nf_conntrack_tftp bridge stp llc rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reje>
+Jun 14 18:08:32 dalek kernel:  drm_panel_backlight_quirks gpu_sched drm_suballoc_helper video nvme drm_display_helper nvme_core cec nvme_keyring sp5100_tco nvme_auth wmi serio_raw fuse scsi_dh_alua i2c_dev scsi_dh_rdac scsi_dh_emc
+Jun 14 18:08:32 dalek kernel: CPU: 15 UID: 0 PID: 369 Comm: kworker/15:1 Not tainted 7.1.0-rc7+ #786 PREEMPT(lazy) 
+Jun 14 18:08:32 dalek kernel: Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X570 Pro4, BIOS P3.10 07/13/2020
+Jun 14 18:08:32 dalek kernel: Workqueue: kmirrord do_mirror
+Jun 14 18:08:32 dalek kernel: RIP: 0010:bio_add_page+0x18b/0x250
+Jun 14 18:08:32 dalek kernel: Code: 24 10 4c 8b 04 24 84 c0 0f 85 c9 00 00 00 41 0f b7 40 78 48 8b 74 24 08 8b 4c 24 14 e9 b4 fe ff ff 0f 0b 31 c0 e9 55 d1 af 00 <0f> 0b eb f5 48 8b 7f 08 83 7f 60 05 0f 85 00 ff ff ff 49 8b 3b 4c
+Jun 14 18:08:32 dalek kernel: RSP: 0018:ffffd1fb8176fc10 EFLAGS: 00010246
+Jun 14 18:08:32 dalek kernel: RAX: 0000000000000000 RBX: ffffd1fb8176fd18 RCX: 0000000000000000
+Jun 14 18:08:32 dalek kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8d1a8eb28b00
+Jun 14 18:08:32 dalek kernel: RBP: 0000000000000000 R08: ffffd1fb8176fc38 R09: ffffd1fb8176fc40
+Jun 14 18:08:32 dalek kernel: R10: ffffd1fb8176fc34 R11: 0000000000000000 R12: 0000000000000000
+Jun 14 18:08:32 dalek kernel: R13: ffffd1fb8176fd90 R14: 0000000000000001 R15: ffff8d1a8eb28b00
+Jun 14 18:08:32 dalek kernel: FS:  0000000000000000(0000) GS:ffff8d29d161f000(0000) knlGS:0000000000000000
+Jun 14 18:08:32 dalek kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jun 14 18:08:32 dalek kernel: CR2: 00007f0ddcd7b9d0 CR3: 000000023dcbf000 CR4: 0000000000350ef0
+Jun 14 18:08:32 dalek kernel: Call Trace:
+Jun 14 18:08:32 dalek kernel:  <TASK>
+Jun 14 18:08:32 dalek kernel:  do_region+0x227/0x2a0
+Jun 14 18:08:32 dalek kernel:  dispatch_io+0xf1/0x150
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_get_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_next_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_read_callback+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  dm_io+0x169/0x2d0
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_get_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_next_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  do_reads+0x149/0x230
+Jun 14 18:08:32 dalek kernel:  ? __pfx_read_callback+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  do_mirror+0x11a/0x2b0
+Jun 14 18:08:32 dalek kernel:  process_one_work+0x19e/0x390
+Jun 14 18:08:32 dalek kernel:  worker_thread+0x1a6/0x310
+Jun 14 18:08:32 dalek kernel:  ? __pfx_worker_thread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  kthread+0xe4/0x120
+Jun 14 18:08:32 dalek kernel:  ? __pfx_kthread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ret_from_fork+0x1a1/0x270
+Jun 14 18:08:32 dalek kernel:  ? __pfx_kthread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ret_from_fork_asm+0x1a/0x30
+Jun 14 18:08:32 dalek kernel:  </TASK>
+Jun 14 18:08:32 dalek kernel: ---[ end trace 0000000000000000 ]---
+Jun 14 18:08:32 dalek kernel: ------------[ cut here ]------------
+Jun 14 18:08:32 dalek kernel: WARNING: drivers/scsi/scsi_lib.c:1164 at scsi_alloc_sgtables+0x38a/0x400, CPU#15: kworker/15:1/369
+Jun 14 18:08:32 dalek kernel: Modules linked in: nft_masq nft_reject_ipv4 act_csum cls_u32 sch_htb nf_nat_tftp nf_conntrack_tftp bridge stp llc rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reje>
+Jun 14 18:08:32 dalek kernel:  drm_panel_backlight_quirks gpu_sched drm_suballoc_helper video nvme drm_display_helper nvme_core cec nvme_keyring sp5100_tco nvme_auth wmi serio_raw fuse scsi_dh_alua i2c_dev scsi_dh_rdac scsi_dh_emc
+Jun 14 18:08:32 dalek kernel: CPU: 15 UID: 0 PID: 369 Comm: kworker/15:1 Tainted: G        W           7.1.0-rc7+ #786 PREEMPT(lazy) 
+Jun 14 18:08:32 dalek kernel: Tainted: [W]=WARN
+Jun 14 18:08:32 dalek kernel: Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X570 Pro4, BIOS P3.10 07/13/2020
+Jun 14 18:08:32 dalek kernel: Workqueue: kmirrord do_mirror
+Jun 14 18:08:32 dalek kernel: RIP: 0010:scsi_alloc_sgtables+0x38a/0x400
+Jun 14 18:08:32 dalek kernel: Code: 8b 3d ba 2d a9 01 e9 d1 fd ff ff 48 8b 75 00 48 8d bb f0 fe ff ff e8 15 b7 b0 ff 48 89 ab e0 00 00 00 89 45 08 e9 30 ff ff ff <0f> 0b 4c 8b 6c 24 30 b8 0a 00 00 00 e9 21 ff ff ff b8 09 00 00 00
+Jun 14 18:08:32 dalek kernel: RSP: 0018:ffffd1fb8176f7f0 EFLAGS: 00010246
+Jun 14 18:08:32 dalek kernel: RAX: 0000000000000000 RBX: ffff8d1aedad0110 RCX: 0000000000000009
+Jun 14 18:08:32 dalek kernel: RDX: 0000000000000000 RSI: ffffffff99c15960 RDI: ffff8d1aedad0110
+Jun 14 18:08:32 dalek kernel: RBP: ffff8d1a93d17000 R08: ffff8d1aedad0110 R09: ffff8d1a818fa800
+Jun 14 18:08:32 dalek kernel: R10: 7020676e69736961 R11: 0000000000000000 R12: 0000000000000000
+Jun 14 18:08:32 dalek kernel: R13: 0000000000000000 R14: ffff8d1a93394000 R15: ffff8d1a93d17000
+Jun 14 18:08:32 dalek kernel: FS:  0000000000000000(0000) GS:ffff8d29d161f000(0000) knlGS:0000000000000000
+Jun 14 18:08:32 dalek kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jun 14 18:08:32 dalek kernel: CR2: 00007f0ddcd7b9d0 CR3: 000000023dcbf000 CR4: 0000000000350ef0
+Jun 14 18:08:32 dalek kernel: Call Trace:
+Jun 14 18:08:32 dalek kernel:  <TASK>
+Jun 14 18:08:32 dalek kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 14 18:08:32 dalek kernel:  sd_setup_read_write_cmnd+0x9d/0x740
+Jun 14 18:08:32 dalek kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 14 18:08:32 dalek kernel:  scsi_queue_rq+0x4d2/0x890
+Jun 14 18:08:32 dalek kernel:  blk_mq_dispatch_rq_list+0x241/0x530
+Jun 14 18:08:32 dalek kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 14 18:08:32 dalek kernel:  ? sbitmap_get+0x61/0x100
+Jun 14 18:08:32 dalek kernel:  __blk_mq_do_dispatch_sched+0x330/0x340
+Jun 14 18:08:32 dalek kernel:  __blk_mq_sched_dispatch_requests+0x143/0x180
+Jun 14 18:08:32 dalek kernel:  blk_mq_sched_dispatch_requests+0x2d/0x70
+Jun 14 18:08:32 dalek kernel:  blk_mq_run_hw_queue+0x2bf/0x350
+Jun 14 18:08:32 dalek kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 14 18:08:32 dalek kernel:  blk_mq_dispatch_list+0x172/0x350
+Jun 14 18:08:32 dalek kernel:  blk_mq_flush_plug_list+0x51/0x1a0
+Jun 14 18:08:32 dalek kernel:  ? blk_mq_submit_bio+0x71c/0x9f0
+Jun 14 18:08:32 dalek kernel:  __blk_flush_plug+0x112/0x180
+Jun 14 18:08:32 dalek kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 14 18:08:32 dalek kernel:  __submit_bio+0x19c/0x260
+Jun 14 18:08:32 dalek kernel:  __submit_bio_noacct+0x8e/0x210
+Jun 14 18:08:32 dalek kernel:  do_region+0x14c/0x2a0
+Jun 14 18:08:32 dalek kernel:  dispatch_io+0xf1/0x150
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_get_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_next_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_read_callback+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  dm_io+0x169/0x2d0
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_get_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ? __pfx_bio_next_page+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  do_reads+0x149/0x230
+Jun 14 18:08:32 dalek kernel:  ? __pfx_read_callback+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  do_mirror+0x11a/0x2b0
+Jun 14 18:08:32 dalek kernel:  process_one_work+0x19e/0x390
+Jun 14 18:08:32 dalek kernel:  worker_thread+0x1a6/0x310
+Jun 14 18:08:32 dalek kernel:  ? __pfx_worker_thread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  kthread+0xe4/0x120
+Jun 14 18:08:32 dalek kernel:  ? __pfx_kthread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ret_from_fork+0x1a1/0x270
+Jun 14 18:08:32 dalek kernel:  ? __pfx_kthread+0x10/0x10
+Jun 14 18:08:32 dalek kernel:  ret_from_fork_asm+0x1a/0x30
+Jun 14 18:08:32 dalek kernel:  </TASK>
+Jun 14 18:08:32 dalek kernel: ---[ end trace 0000000000000000 ]---
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:32 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+Jun 14 18:08:37 dalek kernel: blk_print_req_error: 241000 callbacks suppressed
+Jun 14 18:08:37 dalek kernel: I/O error, dev sdb, sector 50606087 op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
+
 
 -- 
-2.43.0
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
