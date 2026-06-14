@@ -1,188 +1,167 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939803770B
-	for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 06:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781418667; cv=fail; b=T21/JNmFon2ehURlWUZLih80yl2dmdQulei7H3TtJ1r2jccDx4h1XYgMzzvQq3oXy1WKxXqYAdhqxemToCM1BTRk1RlEhzfPuAkPuTucXE6pQPNdqU3NolGDf3E66UYBUnMGk834fK9lzS9NAIXMP1Hqu7GwB6n26GQqSj8yneg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781418667; c=relaxed/simple;
-	bh=fwg7NSU1UM+9lFFJ+gL8CLih0N9mt5BDRX8oNSjdN0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=MIOwvf7hAIICwErL4Iq/gCJSCVtSkEaZfa3xL7Toc+YKGP0gM/9SOlYtpWPVUkwKtxFMDuGbyUpoSGLMdASXlNaA2KPevwXYjpAFJN/52WEzf7nYodF3+44i+Z5D/QlrpEDDDK5oEnWQkYDtFoSUZ7h3mDgCIFFZz/e3sUepdPg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=lNE4EDcC; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=t4Ylexmi; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1C839F168
+	for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 15:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781451341; cv=none; b=VYmAc2VmAqKX3WTSdjGvHuAuBMEZTerSQNXyRd/83yRptM3O9hHImJyH4lxL8Ea0+61c1vginF7Cmcdx9lI7LfKFqYnY6uZWpulISgsOx8jaNixQnmZQyQQIxuPCm+IYRne19o5T3tR20uclWeAdw/yP5P6u4wlV5A5SbCl6Y3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781451341; c=relaxed/simple;
+	bh=YipMZO8vcbHpc9Uwgtl34KMkub+gxp1VqBvE4Awkxbs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=DcvSMBgKlwVEiGrBmzJg8vOBtiG8/bS879yTklI7oJ+Azjwy6YvqoU7sPaq6SFMqUouJEWDCtpXEBEZqe4T5ian4WPJhYeq5INealtq/HS4pwFdgdQ+PTXEY20UKtwbiIDG1pkr9QNQO/U+imQQqvzlYJQdpyhlG6X+8tXTtmQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TjQ3bxJD; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lNE4EDcC";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="t4Ylexmi"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1781418667; x=1812954667;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=fwg7NSU1UM+9lFFJ+gL8CLih0N9mt5BDRX8oNSjdN0Y=;
-  b=lNE4EDcC5RhDCMBwmCiBl51pgrGytnqYmt9plkOrJrEXCRJpZm928Gy6
-   j6JyRCyeOiT+nq5MfMHkCmj0nmYNFMNmTij5ykLq9uFfE1thx1acrBAmP
-   JuPP8DILERrTX2uZ+yh7toy0M/QW/5MxyfyWx9XJbxO9k9Qg4Z10JGQhO
-   0vIVCcUBVyrdsrGNOUxcugXi6fX+ta5XugyXlr1T78SkSIUw3OjFaDdha
-   s1zIM42CS3S/oYdzdlBpGQGkY4l8KLsSFebhvSdmDu8JG+IVPWmpIB6ke
-   qf9NVdBCWYByhyGsS13Q/IADzPepO0tB/O4RZyfqZfth13i89w7W8fDeR
-   g==;
-X-CSE-ConnectionGUID: sbket2TnSsaUDkVsd2PkMg==
-X-CSE-MsgGUID: rALhtnnHSH2gL/8SM5iKGw==
-X-IronPort-AV: E=Sophos;i="6.24,204,1774281600"; 
-   d="scan'208";a="148129974"
-Received: from mail-westus2azon11010008.outbound.protection.outlook.com (HELO CO1PR03CU002.outbound.protection.outlook.com) ([52.101.46.8])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2026 14:31:01 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XvyrSfaSqKt+5SpbFxPjvVbes+m/Rz6McM0IvqTQs8tUyl/sRDCxUrgbJqKUba6aEoEblKJXr2XWOgafsVnBgq65tjihvVyYyiGEO+mrH/sciqd4+gVlHBH091RixCKKX386WWtrf0EgJsQg0bm/3FzazuHmNcq38gqH/LMIDNMLkklfbj7JdbK8+sAs5E+cTxBi+6XulOG5EJ9ehVHBDfjXgeHTHaSiZXJGlCjUtypjAVN/K7f0OFD2uDCi9RPGfMetS5bxlEMS3PRZJpLaLcs0iQTpta+Dbm47rXI1AZ7yt0jCSClpsDigXPeGLXkwF7VRhHvm++vmE7Mh/bQqhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CXzD5e+2QTaGCI8P+XIb15gGBt0wHOEOR1vL9qvDlv4=;
- b=lKO5B+Itq3h5UvIO9hCUNJsFGxLJoaf54qAAXnxbtRMBfAMiHrPwcx0jm8y8A9DzmpL+XoySjF2HO1oVgWwUAcapFhSGPZmdiHHtWFm6igVrOlgJS9+9IjJhMYkrnbjHciVifABBKafsqUxYra/dTKfGN+Y2qN+Fi2bxIk1/o04arkEvUnz++yF2sMfI5RcPu+tOP19usx1msy6l0NLzVOcalIicRRtC69ZQQF1Za/0xMGENII9ebY4SAtrlk1uUnR7g06cop/F9nZuaeUYpzXcBnB/VyeRl3ngvLGohqiXTrSELY8EmCxOjFNRIEM3BiB3z6v3uRqLNh6FtmlkUIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjQ3bxJD"
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-3074adb8fcaso3051010eec.0
+        for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 08:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CXzD5e+2QTaGCI8P+XIb15gGBt0wHOEOR1vL9qvDlv4=;
- b=t4YlexmiPqdqcJE6lsnpvNuM6vL1IQlcpgATBaQOo8EalgLnpdYiBUConUnEbAyqDdZEiHPpE7R4l5ZPlJyZL+cLUMa38sUkOh43HSYKPPA+A52frbqKUw3h7UdQgZ6sMnhA/+hmD6oJmFtXwO2JbpWLyVzP7pOPy7ApKNAbq2I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by BY5PR04MB6504.namprd04.prod.outlook.com
- (2603:10b6:a03:1d2::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.16; Sun, 14 Jun
- 2026 06:30:57 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%6]) with mapi id 15.21.0113.013; Sun, 14 Jun 2026
- 06:30:57 +0000
-Date: Sun, 14 Jun 2026 15:30:51 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests v2] throtl/008: Add a test for the iocost cgroup
- controller
-Message-ID: <ai5KEX6V2Ho4cbGl@shinmob>
-References: <20260604175423.3809638-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260604175423.3809638-1-bvanassche@acm.org>
-X-ClientProxiedBy: TY6P301CA0020.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:3bf::10) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+        d=gmail.com; s=20251104; t=1781451339; x=1782056139; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pR8769p891UZMpH2W/uEW47L6qds0Zm441UJr101ko0=;
+        b=TjQ3bxJDzYcUOmMTJOpZ4H6fngnPEjLDNuLI/+pVANMM1nlcrXJ8IoeUXrUJ+biVMP
+         zxb9+PZp42x6FWZ5PQDiHJPKBjXyELd+Ext7SQgYQ0Lvsaz7KGHLdlsLHJIBkW7zGsEI
+         xdDDtQJWyzV9v4pQjgT2Z01P7EP63wZCTc2W5aSnysMBhftDkPQM0RgMERNZAmpOoeAA
+         4Uq9wP3W8TNuIUnN1RG9ku2Mj8yVLoqsvqi62AEuILrYbeoZCdQC7Q8W8J6s96265KZO
+         yH4IeFFZuSXNpJ798ItbVxDVyrVa3q4YEuSItXCXBwx9KAmowBXir22tevssOaiUOVaq
+         OVGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781451339; x=1782056139;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pR8769p891UZMpH2W/uEW47L6qds0Zm441UJr101ko0=;
+        b=kusUdr4mXDdPswRJclmZOiCqHFz2JrRm5SWUCA9fZ+EAOQRCaeI/SyBOTrfuY3Xqrl
+         LwAaoYYoXF6GpYiVB4/Td/wCBQoFp3qE39eE2in9izjSqnabNVBKIy2mTnQkad0UN32X
+         c3jvJyzDdq/Z2nNabmTSxM2t7+FvwWQNI+ZT+rRrYRrjNGQCNsSnrFJh90qAxPjlriea
+         PI8TvcrER3oVfZH53f+SxUQGZZdGBiBxzs/ZNMLnikhXhvHb1gDcePMoSEubodWZ7Mie
+         Vz1l8cTR3NcFCCjkt+FrevCLURE2hyYwE0uz8ex/FR/jaNDtFahGTvCk0gRVqppEcF/D
+         UsoA==
+X-Forwarded-Encrypted: i=1; AFNElJ/gvEmZFBi4rmACs3wNKWWnczSUY2pVYeZoX+S2axgv3nXlhyonzo6aDKkouYE/sKZnz8phhAfsh6j4hA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmMbi0fz+/kRw3UsfvIBMD4rOqjzkn1xlX3Ad/lFUPr8QqTVZM
+	rCNGOmb4756cQW5idjHYPe/sEN4Ta1+4uewJ+Lk1NZ3qnNzRDc6xspjj
+X-Gm-Gg: Acq92OFKas2GLpMlpEkKA2oSMAURNVA6gkaIap9C4OwGVz/OuzbucO23ifR++OArg0U
+	OBjp7cZykWWhc5zpOrDYF3er6k3q4hwAYmuNsJAPinuyqwyNXEsZkbUGl0L4ocLRz4mryRr3She
+	vx5YCfCPTUvllClGiIoTYOwCn405k2x9Yl5mYkdXmjwKRF+RUIfAmHUmjfUjr+qUh39AwrwoKl9
+	zrmHzezFr9LxPIjh34B3KJvhFeDcsr4vVm2WO3koqUn9tr+ve2XpUC0IX0Yht9+4b2rjHHWIAab
+	sKgmLMTZPvb/F4pWKeE2uk9BkxeTutd7oNOSw10dDkpdy0ogZlsNTWwL+eY5KKLgv/7Ur80za/O
+	wpGB3C3soWAaxBm5yqBiRYG0sXdQgbFrdrC7Ad/ecdUoeKsVOQBOiMFRh6NNRhm9/gwD4MDbp1X
+	svr3FZ6oI+zfQDzH9pmB7EuX4CD3NOMZk7sX7NJfhb5aXDNm8xuPmlzufxN/NUPiP4VvU98ghXu
+	g==
+X-Received: by 2002:a05:7301:9f0a:b0:304:dfae:68a with SMTP id 5a478bee46e88-30820213e52mr5158364eec.28.1781451338754;
+        Sun, 14 Jun 2026 08:35:38 -0700 (PDT)
+Received: from NV-J4GCB44.localdomain ([103.74.125.162])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e5d0849sm12580632eec.7.2026.06.14.08.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jun 2026 08:35:38 -0700 (PDT)
+From: Jianyue Wu <wujianyue000@gmail.com>
+Subject: [PATCH 0/3] mm/zram: route block swap I/O through swap_ops
+Date: Sun, 14 Jun 2026 23:35:28 +0800
+Message-Id: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|BY5PR04MB6504:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7fef5757-a9f0-480f-7d74-08dec9de7e68
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|19092799006|366016|376014|1800799024|11063799006|56012099006|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	xOnDtZZYabjl+cb9YlBZK+i4RYODCmkNDdeifOU01ZvHv7cGxFpPVvtL38AWJAie4HzsOOOH1eewqwqefsY4suSddObadACBKEqvaqTZDpJNEwpWhTa1R/qGL16Ib+7GIEH/in/9NZ37IdmUnGEwhOGKWpX3Nvl+HB/IOfA0oHf9PP3MXdYLLwOePeVKzdipgQ5pAht5BUgk3N2bxCVhXLiBPbNPsMz6+zU+Lm4FNBZi/oODN6O8/bXT7Kv/S1x1RXWoqntGRpBFLgLu4zZE7c11Vp9X1fBBlv5wMTo/IE6R4fmcYeh3IGDUXUQz5omR//3SdAXnp7m7WL2A1p8UbXOGEZGqAJLAF+QKMNsd7JL/dM5lkML4o7Tq+VJjf6NA7Z6ZNGZmqkyccYqUgAUQUnw+9ljboUoZnT/BkkS+dfBv4C/TQ25FHEnVzL7yEPyv0en6sB3Dkj/bfVsDvxVQ1lKeLN0z/e+o8zX1/MI8cmpMpWuODUbAeWCT/WATwBrsEXXDayTB5nwd5Ji0h4M85tOnt++zM9dg2btjfhMy1T9xLexC2PhzwN0H8T5VGVTgkRmKELk3cPSbYHBdNNLw8CTQOWez+ywMdPmiSPMjhoA3YL/DZTBOWbDa0hB4PBkDTYZitUZ53zEB4sL5WJduyOQ7Rhr/bFf5UZpJMz6w/W+w6qJ9y45mGYwPUy+ab4ig
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(19092799006)(366016)(376014)(1800799024)(11063799006)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?URIMZGljTbeDBp9pUM1rE+Kw3evKQD1fp69+ahBA6HO29zqqqLLPzdzyv+78?=
- =?us-ascii?Q?+J8MO7MeVZ10uE2D509O4+qUojizH1IcNA7cRFQk3uVlSd7yZNf5YBkv8oSJ?=
- =?us-ascii?Q?jMrajpFzQ8mygzlfudyC4CnBYRjyD/6PRWj81UsMxzdXDG6crDrOzRs3LPNP?=
- =?us-ascii?Q?sLqgugMbsXPvDilb0YPM8bBRoffWOM6QkTidJVvRjUrQgP/XDUIDYzxJsd19?=
- =?us-ascii?Q?lr3wwP+RL2CwDtNm4r43/fjKji10fO/frg9UKgdAfNVhVPQ83+rH5gFAhVZr?=
- =?us-ascii?Q?L34MJkXm7/h7gOvxHRVffBOqOhbTKf6b0os2HCt7GKx9WuBvKuVMfokjihUK?=
- =?us-ascii?Q?pWjSVR0qT9Q2EteTlkjGlJFHrNh8PfDlvObmrvOXNM5UizJ0lNIcq+gNRNv3?=
- =?us-ascii?Q?BDyWID4j8+IEGr7KyKOK7fJ3EW9ahDXcLejYEqlQnphDGQ/PLDwvbyD95dkU?=
- =?us-ascii?Q?7lG7Ot8m0jQx9N151zSyz3a4mMstXRDwDwZy2w64VCbqqJICLnJw4HPUzCG2?=
- =?us-ascii?Q?woHT6aidgM7Sm25I9RXgyVxRVdQ5S0zkpCO6bUvbzMhOf40dUFd3elMqUwQp?=
- =?us-ascii?Q?NQPEdco9gGS6RfgP993L5YfTWDEqKVX+zulcELigqhcg4fSsRqWYNJHWKAsP?=
- =?us-ascii?Q?2iyJX0xzj3eEiK9bQErYFKFAK0oxiwo+Or30LJmUwwlA8nXc0YWlmmBZ0U/M?=
- =?us-ascii?Q?P6yxiRxsodYMZ/jGwsqFLntXTkS0ILESpQf2RbnMXW3Cegae4+0h8ewL+Fa9?=
- =?us-ascii?Q?SWKxGZsI7OF1YOfpwv5zpgCCAAvce4VH8/jiyy5zc8mlm5ObynQtXzMpDZiy?=
- =?us-ascii?Q?m4zsGUBumHJU4DGkZChjYPKni7pqZMf6qnEezwGFny+89GJXZUch81cOc5S0?=
- =?us-ascii?Q?gYogixH7iUFWVqtcVzKu8zzsombGiz/pPCTCDiOWdnr7ir9v5gQIn8smxbFS?=
- =?us-ascii?Q?GQSFB1pWMua30xMIBplSW744RUjhLaefsZiENSskT4cKMN/FDL2keuOGYrv8?=
- =?us-ascii?Q?pmulcfpcKLXplqXjjab7W0B1VfOw3U2dMWdk5QYX5kKUkWX8phS/mjokyBG5?=
- =?us-ascii?Q?WMVghiClXzqwXpdkgGTYqBCxMlWutR4/oy4LwEN3fZyrVnkSCMC3pmX8w47j?=
- =?us-ascii?Q?RQm3K4bLn4y0eZnWW2sVnaD/klHz6ANh5J00Y/3VqwrOcCjdYWan4NtBrjOb?=
- =?us-ascii?Q?IoWP70Ep0BJDRtnB+VAQ8zU1GgEXhpidlyFLprNiUJp22keYyJxLv7OpFOse?=
- =?us-ascii?Q?87ylIUzQrtW6nKzQR++Grp778OO8+hhdHgn5xKQE9blvKDs+5uduWvyPwLF/?=
- =?us-ascii?Q?sq5kZhL4LNGzBu4nXrvM6l9LVWkmtKbTvEjliWOkxftMBlvBuL3SUNBsCNDO?=
- =?us-ascii?Q?Wu5CTdHbEs0B5JdSHjptQd0CRv641IW60ykwelzlp8W9hZxtWqup/z2Ofp8c?=
- =?us-ascii?Q?8amiZFxe9CwhxYiE2Yme8X9fpM/mhI+/szWd9IizraDRMA55hcrUL10VHL3t?=
- =?us-ascii?Q?G8kdk6daiLvU+ydAIXkgFkd+BZy2pipzb4sC/eN7deXxwaX73zKML+4R3AGE?=
- =?us-ascii?Q?k+0iKmcOrRW/HRMQY6zbAWLEh4dR9/4C5cPJwKDnug5BK0aYgWeRXSrgrVvd?=
- =?us-ascii?Q?tqUsWaQJkFskWsto0eYtjDRBrhqRjy5WMwt5Cj5FM+bN1KuXFjaho5bGCvpK?=
- =?us-ascii?Q?cAge1d4Wfi2pS5xeSVm5HS50TGMmQsBcdcnMp2c2W31MOp2YKh8tMwgxe8RF?=
- =?us-ascii?Q?XKgLttIFnYcopNR2QyAcKTTsUap9bbo=3D?=
-X-Exchange-RoutingPolicyChecked:
-	iI2uSPx3YBEGCjKYP7rlJDouiofWSoN+BZXaRVOG3yDt5AMVruqJIF45yrWJAx1EUNruGkss0IrVTpKrEyiAIgbedOHjCJJM2jJflhh/qFkpi787H5p54DwPC1pdigu735inrdQa+qywdS/OrtKf5x0cctlKmXDsQ3AazW2n961AMrTL77osrfRijmaeHf9ASBanP6wdCPb0bfJ/JdLOcqF9HahqsnURM+jSEfXpaBDDqATKGq1pKdqyVwRYDd7/ScfN7buWTiSstinrmQh9Pe01MJ7lLdxRx3E1Hz//E+AJeY4Gbfyx2qfdrI/nBUzgAXYFFGdwh4u+1aWF+GpSCw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	xZ1aOjP5+szbrJbbk+dn3bim+mTBkRC1UTLMy1q4JYM1kCz3SdwQAS5F+u+zK4AuT6DbmTDmVy0Fh9knISqXlGZLdZfZBWahMU0Qn5tDN4FS05M9MV87tGcL3H+dXJmXB/Y/eutJhTLYMXE/dUkKbpw54kGQbD6jTiU8I2BcswqvHgoCaqQJRoHRaLYhweUJ9fOXAbtPqdUtMvL2VHZol1ik5aTxswHDOgSXqaQvhd62hXNY5ii+kuXmv3aqa6YyA2wkXskJe6RwyrB+tWYG/aAeJVzVkzGJ7m4zyOYLDSXNQwng0OBpdGZ6gYXdfcLLF4BNDrvddJp381mLmriC/h4NOCrMOE0VNuU0xuQdIDs14oXIngcFmMA6xll1nLfTmMRuiW/ZRL9Uny8lAqAaVMd/jIKgE/LFkTzGqqitkcj4RMivUw5l+NeLNWx/NnGz8TEX7cuJ3mP2cLUOGq0a+SzTLb/xqrip7XqsLo/ey8T9sGH+YdT3D/T4wZG6wr6pfOyGmU9AZvKOD7yVfQoJdwgNwC6sT5rCxlaXgDoWg9rSH2Kz1oTvWGGLu8qZnq3DAosR6a0tOJ/78vTwMdGB8mnFXoWZbEDft5lmuU2H9b93uHFcAFLYRN7/9yBW/xab
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7fef5757-a9f0-480f-7d74-08dec9de7e68
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2026 06:30:57.5934
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jTllM3+BforYUOt0c3cKU/4zu5uYeSYWEDXChv6EU3e0XG+3RKz8ll3BegzufB+BYZ8cTpt4Yws/Fibl5MhQqd4XPOElF0t5MfWLg2/F/Ms=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6504
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEDKLmoC/x3MQQ7CIBAAwK80nN0EKJDqV0wPCyyVaEvDNmps+
+ nfR41xmF0w1E4tLt4tKz8y5LA3q1Ilww2UiyLFZaKmddMrAp+IM/MIVysrgHyXcodKUeaMKqLw
+ OfTRkkxOtWCul/P7317HZIxOEMs95+6WD0cmqSBjRGXMeTJ8GpXxCrcn2DqVCsiiDOI4vt8GwP
+ 6kAAAA=
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>, 
+ Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>, 
+ Barry Song <baohua@kernel.org>, Kairui Song <kasong@tencent.com>, 
+ Kemeng Shi <shikemeng@huaweicloud.com>, 
+ Youngjun Park <youngjun.park@lge.com>, Minchan Kim <minchan@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Jianyue Wu <wujianyue000@gmail.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openssh-sha256; t=1781451334; l=2936;
+ i=wujianyue000@gmail.com; s=id_ed25519; h=from:subject:message-id;
+ bh=YipMZO8vcbHpc9Uwgtl34KMkub+gxp1VqBvE4Awkxbs=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgW51Zh3v9nG0Wlld2Ti8ylp1TnO7yB
+ H+z9CbXty/WEAQAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QLdreTA16fucfMYtRCr0kKLCyUAAQoxuzmykekFWnqFYKkGLmaOZIoZGMb0x7xF17AyieFiOMQI
+ NKjzX+rxzaQU=
+X-Developer-Key: i=wujianyue000@gmail.com; a=openssh;
+ fpr=SHA256:gVWBPJbHGWlCIw+V8F63Ff0k21S7AB5+rZt8+huemvg
 
-On Jun 04, 2026 / 10:54, Bart Van Assche wrote:
-> Add a test for read and write IOPS throttling.
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+This series builds on Christoph Hellwig's swap batching rework that
+moves block swap onto struct swap_iocb and per-backend struct
+swap_ops handlers [1].  Christoph's patches unify batching for
+ordinary block devices and swap files.  zram still needs a custom
+path because swap slots map to compressed pages, not disk sectors.
 
-Thanks for this v2 patch. I applied it with two minor changes below.
+The first patch adds swap_register_block_ops() so a block driver can
+install custom submit_read/submit_write handlers when swapon targets
+its block device.  The default swap_bdev_ops path is unchanged for
+devices that do not register.
 
-> diff --git a/tests/throtl/008 b/tests/throtl/008
-> new file mode 100755
-> index 000000000000..f4d3b080797a
-> --- /dev/null
-> +++ b/tests/throtl/008
-> @@ -0,0 +1,104 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2026 Google LLC
-> +#
-> +# Test cgroup iocost IOPS limiting.
-> +
-> +. tests/throtl/rc
-> +. common/fio
-> +
-> +DESCRIPTION="test cgroup iocost controller limits"
-> +
-> +requires() {
-> +	_have_fio
-> +	_have_program bc
+The second patch registers zram_swap_ops at module init.  On write,
+the swap core still batches folios into a swap_iocb.  zram maps each
+folio to a slot index and stores it through zram_write_page() instead
+of building one bio per page.  Read handling keeps slot_lock and
+mark_slot_accessed() in one critical section.  Writeback-enabled zram
+falls back to swap_bdev_submit_read() for ZRAM_WB slots.
 
-This check above is in group_requires(), so I dropped it.
+The third patch moves slot_free_notify into swap_ops next to the
+other zram swap callbacks, and documents the locking contract for
+that hook.
 
-> +	_have_kernel_option BLK_CGROUP_IOCOST
-> +}
+Applied on top of Christoph Hellwig's "better block swap batching and
+a different take on swap_ops" series [1].
 
-I added set_conditions() here, so that this test can be run for both
-null_blk and scsi_debug. It also makes this test case consistent with
-other test cases in this group.
+[1] https://lore.kernel.org/linux-mm/?q=better+block+swap+batching
 
-> +
-> +run_test() {
-> +	# dev_t is global to make it available in the caller.
-> +	dev_t=$(<"/sys/block/${THROTL_DEV}/dev")
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Chris Li <chrisl@kernel.org>
+Cc: Baoquan He <bhe@redhat.com>
+Cc: Nhat Pham <nphamcs@gmail.com>
+Cc: Barry Song <baohua@kernel.org>
+Cc: Kairui Song <kasong@tencent.com>
+Cc: Kemeng Shi <shikemeng@huaweicloud.com>
+Cc: Youngjun Park <youngjun.park@lge.com>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: linux-mm@kvack.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
 
-...
+Signed-off-by: Jianyue Wu <wujianyue000@gmail.com>
+---
+Jianyue Wu (3):
+      mm/page_io: let block drivers register custom swap I/O ops
+      mm/zram: handle swap read/write via swap_ops
+      mm/swap: route slot free notifications through swap_ops
+
+ Documentation/filesystems/locking.rst |   5 -
+ drivers/block/zram/zram_drv.c         | 215 +++++++++++++++++++++++++++-------
+ include/linux/blkdev.h                |   2 -
+ include/linux/swap.h                  |  47 ++++++++
+ mm/page_io.c                          | 187 ++++++++++++++++++++++++++++-
+ mm/swap.h                             |  18 +--
+ mm/swapfile.c                         |  17 +--
+ rust/kernel/block/mq/gen_disk.rs      |   1 -
+ 8 files changed, 414 insertions(+), 78 deletions(-)
+---
+base-commit: 842f51deada6449843f811bfa22e536a01ae5a0c
+change-id: 20260614-zram-swap-ops-block-register-a1b2c3d4e5f6
+
+Best regards,
+-- 
+Jianyue Wu <wujianyue000@gmail.com>
+
