@@ -1,86 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3AE3D9680
-	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 09:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE91211A14
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 09:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781516257; cv=none; b=CEHZcUX2wuOY05vvp3IDjKVP8ImRGqo8vXsLON5ws22gfRwcxfim37pb5mGlZ4dkvDdyAQtkH6c5XRBWn/fqjQhOyaaBmtFhiC/tT5bkxY52X7kGIDdhrDcnbMqQIieYX5+emIV51UIpR3Qi+Cg6CL2CeiZURVglVUKpL6i14a8=
+	t=1781516518; cv=none; b=iBiaUSRFBwdnT3Wvhhfp9xk3Isr3rSevhPOo8IoHsqT9MsnF2dQhdNVb8gwcyq9GQD/PHK3XKQSTCeBj4zOzh1+Tio3MiHRjXnGc3BqNOrSr13R8JFm0F5Dl93jRvJqYeBbneWslxl1xqIhtlpxNNBp3bHPZEWpoCnpwXeWvyEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781516257; c=relaxed/simple;
-	bh=loO7NKvVN2w4jdLRqXCSQgo+PxShILO2+o1PEOYLT9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R9ZxENqqX5x4LAQP4VU/PXrEZlzsy5fypI7TpbFyQzH7JGi2J/ay/P5lGpwCleZudYsaQAv4R0n0SMwfMpXCUMr7RdY3TaHXi/40/feBOWZZwLIqHoYnx0E7pHvnsGJKmbBVnfC1F8s+u+s1Ol3KjExfPZewYE/Qpd55CBReDTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aG9tM7zJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781516518; c=relaxed/simple;
+	bh=azJfFqVOB2MaxT88ytf0/OBfidzqNbLjP0eMXeuVpaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j40X0ZXMlNRg+3rUveZ/zdKMZDMUVOJlZSgZo6zI58NAVzRhDp5GjeDZLq08hH7K6ioiF2trwWP3TIa6hAj+IyJG3SShPaw8sLtajgdQDIC6grxGs3QXem5rVC7gbv5yHCyWDw3mDC4mNF6BfJ1ZneiZu7Ax2iZ8lfTf7Gi+4Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emLNom7J; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aG9tM7zJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA88E1F000E9;
-	Mon, 15 Jun 2026 09:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781516256;
-	bh=WR/YhRIjrcgfhabCmiKbG77MgKVQDcqKJj7Fb/dEAuI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aG9tM7zJVCKWgX1rNb1qNjvT2o8vLChR43pnjWb3zCckGeC+iM1p5d5LcVw38bKPQ
-	 DBm6Fu4BJ16c94vHEjxEBlPhWBTrFZTUJwx7Rq97bdq1rvnDWdIEckJ5wql6yc95VF
-	 VitMGe/KPNBu2oGr0/Pd2QnWhncwBOwMCj9GUGPWnLjC0CCya/G7LMDUY/T/VVd4Ps
-	 XfxCarovthpAwBHel+ttx9ojRLp1CuH8uxiJ6tinWb1ILozoLXJY3pu3Mk76t1sxFf
-	 hxPiyt17zkQQObbwxwxC6B+CCBUZ675qc7IdX02t402ry+CvE9hW7mBeQkP4D8b2Vx
-	 4r5jQje/vDcww==
-Date: Mon, 15 Jun 2026 11:37:31 +0200
-From: Carlos Maiolino <cem@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de, 
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH] block: check bio split for unaligned bvec
-Message-ID: <ai_HjZqVRX2Xuf1E@nidhogg.toxiclabs.cc>
-References: <20260612223205.465913-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emLNom7J"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4908b92904fso38068695e9.0
+        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 02:41:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781516515; x=1782121315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+nHWnBYuKAI333Ay4FRBj7Tm6npP4rVtGMWoXA5dsUs=;
+        b=emLNom7JpJYkSk3VOebXDOkbF3IhNDXjCeF8iCnfEO94lcmrpyXn7QjLELKD58rtMa
+         cmwtj1fTvehQ4/l360zhFUmkplr/j1UMjUvupRkbBicd3BnrSKR3f47fJe24h/3b2QdK
+         R4SrlxrpKc8/WbC+nGh+LrivOeJUC2ThqfznptguHd04JwDeVzHEbshgY/KPg79hfMPL
+         mRosICK8QkyCTzrPIy7QTi0XxTrQpNUuxV0elenp4S3+s0YTbUlTOlyyhOgkfn8TYXdr
+         wcs2rNaXRLmepHpL2YVLKRoVSIpqzaX6F+m2JD7R8gPT7B5/ujdoXBhlikObaRtEEwhi
+         2f6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781516515; x=1782121315;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+nHWnBYuKAI333Ay4FRBj7Tm6npP4rVtGMWoXA5dsUs=;
+        b=YK8d12eQVxOUQ3bI4RXi7/qVSkDK3NPRX5ATWp4zygbqHlhUlKE/5/bg/4trWg7YpO
+         TFB7zYYYs/4dBLrIbhX3Clis+R3WY4giyXwtkzv/ZKZKz9QM50MmyIMrPiBwTEQ8BaWn
+         XSfMpyM8oNqE/XBmr+4IVMSyuphX+lMQktREchflgIOvYt3K1EdSHl8i8Tzoa9gi98F/
+         hIIzysvlUxTCxTvW1HjUo2Ep81ChTy/x67ywDGry9/Oxv1YHrjTH49dP3DUohWVHbMP3
+         XKpwqTwM52zaurUKBgI6ULF/xIDEmuhxrK5hVtdk3epKAw/MM0taPUtYt1Lim+sWyKW6
+         +liA==
+X-Gm-Message-State: AOJu0YxTkmvSW12aGqgJlPslLlJ1yi2IXooxT8YJoBEBVFj2an4Aha2B
+	hmDGCki9oDogZDh9wFjpn/VQ7AhjKMY5PQefAcYa8vPjml5fDcI78PlN
+X-Gm-Gg: Acq92OEUCklygx+AZpRmnuQnPdVw2E/NuIvQvJLQIBywOrNZvyIWDjmA5FNBshCJiUP
+	Ab64/lBiNb38KMNXrFfCS84Hcd8Nauo33lXgKCTERW8r2b2KEiijvt8JfCkMp1dn8NLCnSNigrO
+	Gol0k38rE+Lx4gu95oM7vRhFHfN/OpUQxdiZ6updIQv5CRbamtBXlGh0NNjcdkO1Vtr9vnqYnl8
+	UufitPNshzNocpcrnVebBrn32zF7dfj055LAyaPXkvA032x+LW6eA/H3x27OlLV4fdW+cT5+KlB
+	24lu70RvIH5k5vM/q41P6tMRu3n7/zlMge4OJopZqv0lpqif/rzmKPrUHp/hTu30HZ+o6NoqCRE
+	9RZe51QIeopLaKEU2fvc24zUQYkDX5yuiZ7a5pU3DGfI8cBaWIlTjU6BJYKKu5BmIDvtcjxmX6B
+	kopFKwt80Djrk8wBP3BYSe1l1q31iuH/IJFQ2AcSxwj9WByR2N+VT0eCoM24mSSY83xHC7PeJYl
+	rtKeDPe33yk2rujZ5FmLL93pczFX/fp9eHkCCx61Hz/eec=
+X-Received: by 2002:a05:600c:314a:b0:490:b8c0:d470 with SMTP id 5b1f17b1804b1-490ec504d5dmr161971375e9.19.1781516514793;
+        Mon, 15 Jun 2026 02:41:54 -0700 (PDT)
+Received: from localhost.suse.org (apn-78-30-82-184.dynamic.gprs.plus.pl. [78.30.82.184])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922031b7d2sm254353105e9.5.2026.06.15.02.41.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 02:41:54 -0700 (PDT)
+From: Sebastian Chlad <sebastianchlad@gmail.com>
+X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
+To: shinichiro.kawasaki@wdc.com
+Cc: linux-block@vger.kernel.org,
+	Sebastian Chlad <sebastian.chlad@suse.com>
+Subject: [PATCH blktests] ublk: mark all tests as QUICK
+Date: Mon, 15 Jun 2026 11:41:44 +0200
+Message-ID: <20260615094144.13060-1-sebastian.chlad@suse.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260612223205.465913-1-kbusch@meta.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 12, 2026 at 03:32:04PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Offsets and lengths need to be validated against the dma alignment. This
-> check was skipped for sufficiently a small bio with a single bvec, which
-> may allow an invalid request dispatched to the driver. Force the
-> validation for an unaligned bvec by forcing the bio split path that
-> handles this condition.
-> 
-> Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
-> Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
-> Reported-by: Carlos Maiolino <cem@kernel.org>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+These tests are quick to run so mark them accordingly to ensure
+they are included in quick runs.
 
-Jens was quick enough but if needed anyway, I've tested this locally,
-so:
+Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
+---
 
-Tested-by: Carlos Maiolino <cem@kernel.org>
-Reviewed-by: Carlos Maiolino <cem@kernel.org>
+I checked locally - all tests execute well below 10 seconds
 
-> ---
->  block/blk.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/block/blk.h b/block/blk.h
-> index 1a2d9101bba04..004048fa0c5a8 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -404,6 +404,8 @@ static inline bool bio_may_need_split(struct bio *bio,
->  	bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
->  	if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
->  		return true;
-> +	if ((bv->bv_offset | bv->bv_len) & lim->dma_alignment)
-> +		return true;
->  	return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
->  }
->  
-> -- 
-> 2.52.0
-> 
+ tests/ublk/001 | 1 +
+ tests/ublk/002 | 1 +
+ tests/ublk/003 | 1 +
+ tests/ublk/004 | 1 +
+ tests/ublk/005 | 1 +
+ tests/ublk/006 | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/tests/ublk/001 b/tests/ublk/001
+index 3435316..c994cff 100755
+--- a/tests/ublk/001
++++ b/tests/ublk/001
+@@ -7,6 +7,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test ublk delete"
++QUICK=1
+ 
+ _run() {
+ 	local type=$1
+diff --git a/tests/ublk/002 b/tests/ublk/002
+index ca357b6..aaea4a7 100755
+--- a/tests/ublk/002
++++ b/tests/ublk/002
+@@ -7,6 +7,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test ublk crash with delete after dead confirmation"
++QUICK=1
+ 
+ _run() {
+ 	local type=$1
+diff --git a/tests/ublk/003 b/tests/ublk/003
+index e366813..40bbd6f 100755
+--- a/tests/ublk/003
++++ b/tests/ublk/003
+@@ -7,6 +7,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test mounting block device exported by ublk"
++QUICK=1
+ 
+ requires() {
+ 	_have_program mkfs.ext4
+diff --git a/tests/ublk/004 b/tests/ublk/004
+index 1d74fea..6812431 100755
+--- a/tests/ublk/004
++++ b/tests/ublk/004
+@@ -7,6 +7,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test ublk crash with delete just after daemon kill"
++QUICK=1
+ 
+ _run() {
+ 	local type=$1
+diff --git a/tests/ublk/005 b/tests/ublk/005
+index 1e21674..69c1fca 100755
+--- a/tests/ublk/005
++++ b/tests/ublk/005
+@@ -9,6 +9,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test ublk recovery with one time daemon kill"
++QUICK=1
+ 
+ _run() {
+ 	local type=$1
+diff --git a/tests/ublk/006 b/tests/ublk/006
+index 85087bd..2a4d886 100755
+--- a/tests/ublk/006
++++ b/tests/ublk/006
+@@ -9,6 +9,7 @@
+ . tests/ublk/rc
+ 
+ DESCRIPTION="test ublk recovery with two times daemon kill"
++QUICK=1
+ 
+ _run() {
+ 	local type=$1
+-- 
+2.51.0
+
