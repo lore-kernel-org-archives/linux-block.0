@@ -1,142 +1,264 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-35.ptr.blmpb.com (va-2-35.ptr.blmpb.com [209.127.231.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25D340B6D9;
-	Mon, 15 Jun 2026 16:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE683F4DD8
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 16:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781539875; cv=none; b=fr6zRFawMc6cosWiAGKkC4qM+y80oyJwXKPIjyAKfOsomy/bjgJ8BXjo7bIy6urGVvhSigwPNwzCJQssu4NTe0LXRmBmvHBKDShjVIyaIGnqvEM9wm1SetmJmAsuQGvgdZRIHoNapwDVLcGDfHY1WhujyOnqA2FG2Oh8nynqDPs=
+	t=1781540289; cv=none; b=UMkINLA6RHOSyhlNqyDFQ+aGLu8APRufV2zVQ8Aw1pslTslluemjDEk4IBbsupkcMWrm6weQMDdNWFA31cWBiy9atzVGFafxN/TvuIhnEjtoiU5fpCwTrSFn+mvA+0ghsWnswXNPWOHBjT9alxwYmzQEUK54qk/cULBM2qHeF2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781539875; c=relaxed/simple;
-	bh=IQn+EJfXSKnbywiAcRWsmiRkucdeNqtI6usBrzEOsOw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DuYmWKrnE17F0tH7atJwBrB86rlxxo4v22rnNQfQt7bphKJWfRPxWlyVjQpFdhbWEjngchoANuXx07pDQQGQ1AfkSVrnTBE8cKdmoburkb367mjgXTp9hD8b9Zzk6OXJ265wOGyR9izaRo9UkCF9Z8ofmfUFiK64uSu2vTNq0wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SxSK0oMz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781540289; c=relaxed/simple;
+	bh=4PeMgbEmobFrdGDlwf+b58+vlVlWUUifnljuI6GZ+CA=;
+	h=From:Mime-Version:Content-Type:Subject:References:In-Reply-To:To:
+	 Message-Id:Cc:Date; b=NkFRwBiIkP3eGvyb874LaQMgMfhsnmI6CO/iXYHodHjuKRHKY7uxGN9G6GmUSJRUdIidLHhpK11MU95TAmPzSrdzOXVgFvpYbBo4o0IMjxhEuZx7abWvbScvJPXj6UT1pKxj9QKtLTIdQe+2BcdGzh7u2Px0ofEsgWab+lqgKY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=OeckO5/9; arc=none smtp.client-ip=209.127.231.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SxSK0oMz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E6C91F00A3A;
-	Mon, 15 Jun 2026 16:11:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781539874;
-	bh=47eLSZrGC8dbgWbXEjVWdFhdpbCm8wu5R48ilZUcy3g=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=SxSK0oMz+Inh9En/B/++WRvwwzyt0AQXoGQ2HB53cPc9/UR0pDwAhRJqg9jjVbLu8
-	 JraPb5U0gDCRvdjBx7boKePeXuXbwRRsjupbxVNUACBueTKweQcBRdk4hmPwpQ/TOD
-	 rsLkGZwTe7JVw7LP+WoAqsaauzVHHEhtZidWFIR5eJsqv41ZdY59BAsOkEl0Z2MMUT
-	 SrxtWJtY9sQgVWppkYz6oT7RF/FVDyQ6IZn64ZJhzJxteoTNOiiYZbTpSUxx1bvtVh
-	 NnoHa4e32JB5pdYqMHDiz+hEW1Ws/PXs0nHkMhViborx99OL4E6423Cz9j0hUCBIE6
-	 yN5S7S8MhSa0A==
-From: Vincent Mailhol <mailhol@kernel.org>
-Date: Mon, 15 Jun 2026 18:09:15 +0200
-Subject: [PATCH 19/19] docs: document discoverable root partitions
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="OeckO5/9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1781540166;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=xNteM8cvm64RoqWOvtAwKvU/xR4tQhb/JI2DiVJ/Ki8=;
+ b=OeckO5/97BDQ0ImBNRXaRd/eYxFJJh6FF7nrUt+nPi3/pN4yJe4zvB2SU4F45sXoWI+wGM
+ Wyr+oEuNXO4Wi3AUoPLtqt589aEzIYCYIGlowqbXRwYF1q5wKlj3sbp7UjCPUuJR7i2ZYt
+ 91JPJDZ6oAPvOF9K3GqtCQ6+p1F7vFTmLEceohI1hIPxGp24CgfceLXvdooVffHfQs3pGb
+ dNG/2f53+cnadF+idIxCBAzCBRdFKliVhokvVZdUVPceOL1wBvFssnTuADI4QFg4VadvJP
+ Pzrt6cdYtAWzbRMvOB5rHmiIfn/KuTTSI851qhVKJdXrsZabx8V/kmWfoQfc5g==
+From: "Yu Kuai" <yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260615-discoverable-root_partitions-v1-19-39c78fac42e2@kernel.org>
-References: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
-In-Reply-To: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- Vincent Mailhol <mailhol@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3354; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=IQn+EJfXSKnbywiAcRWsmiRkucdeNqtI6usBrzEOsOw=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDFkGytc0Z+74Kx67ebba8mDmqvsr1++Z+0t7qltorvp7/
- TWL1EsrOyayMIhxMViKKbIsK+fkVugo9A479NcSZg4rE8gQaZEGBiBgYeDLTcwrNdIx0jPVNtQz
- BDJ0jBi4OAVgqufXMfyPldtTxCCrHnrj+sO1taszww99f1bc9DDgSZf7+W8Vhw6+ZGSYdEMvOmV
- xxYFPn4UlNmwI/xL2vT30yf7gxsV7P3vMzp/ICAA=
-X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
- fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Received: from [192.168.1.104] ([39.182.0.180]) by smtp.feishu.cn with ESMTPS; Tue, 16 Jun 2026 00:16:03 +0800
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Reply-To: yukuai@fygo.io
+Subject: Re: [PATCH V2] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
+References: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
+In-Reply-To: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
+To: "Zizhi Wo" <wozizhi@huaweicloud.com>, <axboe@kernel.dk>, <tj@kernel.org>, 
+	<josef@toxicpanda.com>, <linux-block@vger.kernel.org>
+Message-Id: <70642ddf-9ed9-45cb-bf40-891a07247c97@fnnas.com>
+X-Lms-Return-Path: <lba+26a302544+5a7ac8+vger.kernel.org+yukuai@fnnas.com>
+Content-Transfer-Encoding: quoted-printable
+Cc: <cgroups@vger.kernel.org>, <yangerkun@huawei.com>, 
+	<chengzhihao1@huawei.com>, <houtao1@huawei.com>, <yukuai@fygo.io>
+Date: Tue, 16 Jun 2026 00:16:01 +0800
+User-Agent: Mozilla Thunderbird
 
-Document the automatic root block device discovery feature.
+Hi=EF=BC=8C
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-doc@vger.kernel.org
-Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
----
- Documentation/admin-guide/discoverable-root.rst | 33 +++++++++++++++++++++++++
- Documentation/admin-guide/index.rst             |  1 +
- Documentation/admin-guide/kernel-parameters.txt |  5 ++++
- 3 files changed, 39 insertions(+)
+=E5=9C=A8 2026/6/15 19:55, Zizhi Wo =E5=86=99=E9=81=93:
+> From: Zizhi Wo <wozizhi@huawei.com>
+>
+> [BUG]
+> Our fuzz testing triggered a blkcg use-after-free issue:
+>
+>    BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
+>    Call Trace:
+>    ...
+>    blkcg_deactivate_policy+0x244/0x4d0
+>    ioc_rqos_exit+0x44/0xe0
+>    rq_qos_exit+0xba/0x120
+>    __del_gendisk+0x50b/0x800
+>    del_gendisk+0xff/0x190
+>    ...
+>
+> [CAUSE]
+> process1						process2
+> cgroup_rmdir
+> ...
+>    css_killed_work_fn
+>      offline_css
+>      ...
+>        blkcg_destroy_blkgs
+>        ...
+>          __blkg_release
+> 	  css_put(&blkg->blkcg->css)
+>            blkg_free
+> 	    INIT_WORK(xxx, blkg_free_workfn)
+> 	    schedule_work
+>      css_put
+>      ...
+>        blkcg_css_free
+>          kfree(blkcg)--------blkcg has been freed!!!
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3Dschedule_work
+>                blkg_free_workfn
+> 							__del_gendisk
+> 							  rq_qos_exit
+> 							    ioc_rqos_exit
+> 							      blkcg_deactivate_policy
+> 							        mutex_lock(&q->blkcg_mutex)
+> 								spin_lock_irq(&q->queue_lock)
+> 							        list_for_each_entry(blkg, xxx)
+> 								  blkcg =3D blkg->blkcg
+> 								  spin_lock(&blkcg->lock)-------UAF!!!
+> 	        mutex_lock(&q->blkcg_mutex)
+> 	        spin_lock_irq(&q->queue_lock)
+> 	        /* Only then is the blkg removed from the list */
+> 	        list_del_init(&blkg->q_node)
+>
+> As a result, a blkg can still be reachable through q->blkg_list while
+> its ->blkcg has already been freed.
+>
+> [Fix]
+> Fix this by deferring the blkcg css_put() until after the blkg has been
+> unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
+> blkcg outlives every blkg still reachable through q->blkg_list, so any
+> iterator holding q->queue_lock is guaranteed to observe a valid
+> blkg->blkcg.
+>
+> While at it, move css_tryget_online() from blkg_create() into blkg_alloc(=
+)
+> so that the css reference is owned by the alloc/free pair rather than
+> straddling layers:
+> blkg_alloc()  <-> blkg_free()
+> blkg_create() <-> blkg_destroy()
+>
+> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free=
+_workfn() and blkcg_deactivate_policy()")
+> Suggested-by: Hou Tao <houtao1@huawei.com>
+> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+> ---
+> v2:
+>   - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
+>     css reference follows the blkg's own lifetime, making the put in
+>     blkg_free_workfn() symmetric with the get in blkg_alloc().
+>
+> v1: https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweiclo=
+ud.com/
+>
+>   block/blk-cgroup.c | 24 ++++++++++++------------
+>   1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index bc63bd220865..27414c291e49 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -132,10 +132,15 @@ static void blkg_free_workfn(struct work_struct *wo=
+rk)
+>   	if (blkg->parent)
+>   		blkg_put(blkg->parent);
+>   	spin_lock_irq(&q->queue_lock);
+>   	list_del_init(&blkg->q_node);
+>   	spin_unlock_irq(&q->queue_lock);
+> +	/*
+> +	 * Release blkcg css ref only after blkg is removed from q->blkg_list,
+> +	 * so concurrent iterators won't see a blkg with a freed blkcg.
+> +	 */
+> +	css_put(&blkg->blkcg->css);
+>   	mutex_unlock(&q->blkcg_mutex);
 
-diff --git a/Documentation/admin-guide/discoverable-root.rst b/Documentation/admin-guide/discoverable-root.rst
-new file mode 100644
-index 000000000000..9645bf39e405
---- /dev/null
-+++ b/Documentation/admin-guide/discoverable-root.rst
-@@ -0,0 +1,33 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+.. _discoverable_root:
-+
-+Discoverable root partitions
-+============================
-+
-+On EFI systems using a supported architecture, the kernel can discover the root
-+block device from GPT partition type UUID metadata on the disk containing the
-+active EFI System Partition.
-+
-+This follows the `Discoverable Partitions Specification`_ which defines a list
-+of architecture-specific root partition type UUIDs.
-+
-+Specifying ``root=`` on the kernel command line takes precedence and entirely
-+disables this automatic root partition discovery.
-+
-+The disk to search is identified by the Boot Loader Interface
-+``LoaderDevicePartUUID`` EFI variable. If multiple partitions on that disk match
-+the architecture root partition type UUID, the kernel selects the first match in
-+block device enumeration order. Systems should not expose multiple eligible root
-+partitions unless that ordering is intended.
-+
-+Partitions marked with the DPS ``no-auto`` GPT attribute are skipped. This
-+allows a partition with an otherwise discoverable type UUID to opt out from
-+automatic discovery.
-+
-+The DPS read-only attribute is not enforced by kernel root discovery. The
-+root filesystem is mounted read-only by default unless ``rw`` is specified,
-+and user space remains responsible for later remount policy.
-+
-+.. _Discoverable Partitions Specification:
-+   https://uapi-group.org/specifications/specs/discoverable_partitions_specification/
-diff --git a/Documentation/admin-guide/index.rst b/Documentation/admin-guide/index.rst
-index cd28dfe91b06..0d9c2796ae09 100644
---- a/Documentation/admin-guide/index.rst
-+++ b/Documentation/admin-guide/index.rst
-@@ -50,6 +50,7 @@ Booting the kernel
- 
-    bootconfig
-    kernel-parameters
-+   discoverable-root
-    efi-stub
-    initrd
- 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index f68bf1cdb53b..c9bfa010883c 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -6696,6 +6696,11 @@ Kernel parameters
- 			ramdisk, "nfs" and "cifs" for root on a network file
- 			system, or "mtd" and "ubi" for mounting from raw flash.
- 
-+			If this option is omitted, the kernel may try to
-+			discover the root block device from the GPT partition
-+			type UUID metadata when additional requirements are met.
-+			See Documentation/admin-guide/discoverable-root.rst.
-+
- 	rootdelay=	[KNL] Delay (in seconds) to pause before attempting to
- 			mount the root filesystem
- 
+Please move css_put after mutex_unlock, unless there is a strong reason.
 
--- 
-2.53.0
+With above change, feel free to add:
 
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+
+>  =20
+>   	blk_put_queue(q);
+>   	free_percpu(blkg->iostat_cpu);
+>   	percpu_ref_exit(&blkg->refcnt);
+> @@ -177,12 +182,10 @@ static void __blkg_release(struct rcu_head *rcu)
+>   	 * blkg_stat_lock is for serializing blkg stat update
+>   	 */
+>   	for_each_possible_cpu(cpu)
+>   		__blkcg_rstat_flush(blkcg, cpu);
+>  =20
+> -	/* release the blkcg and parent blkg refs this blkg has been holding */
+> -	css_put(&blkg->blkcg->css);
+>   	blkg_free(blkg);
+>   }
+>  =20
+>   /*
+>    * A group is RCU protected, but having an rcu lock does not mean that =
+one
+> @@ -311,10 +314,13 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *bl=
+kcg, struct gendisk *disk,
+>   	blkg->iostat_cpu =3D alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask=
+);
+>   	if (!blkg->iostat_cpu)
+>   		goto out_exit_refcnt;
+>   	if (!blk_get_queue(disk->queue))
+>   		goto out_free_iostat;
+> +	/* blkg holds a reference to blkcg */
+> +	if (!css_tryget_online(&blkcg->css))
+> +		goto out_put_queue;
+>  =20
+>   	blkg->q =3D disk->queue;
+>   	INIT_LIST_HEAD(&blkg->q_node);
+>   	blkg->blkcg =3D blkcg;
+>   	blkg->iostat.blkg =3D blkg;
+> @@ -351,10 +357,12 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *bl=
+kcg, struct gendisk *disk,
+>  =20
+>   out_free_pds:
+>   	while (--i >=3D 0)
+>   		if (blkg->pd[i])
+>   			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
+> +	css_put(&blkcg->css);
+> +out_put_queue:
+>   	blk_put_queue(disk->queue);
+>   out_free_iostat:
+>   	free_percpu(blkg->iostat_cpu);
+>   out_exit_refcnt:
+>   	percpu_ref_exit(&blkg->refcnt);
+> @@ -379,32 +387,26 @@ static struct blkcg_gq *blkg_create(struct blkcg *b=
+lkcg, struct gendisk *disk,
+>   	if (blk_queue_dying(disk->queue)) {
+>   		ret =3D -ENODEV;
+>   		goto err_free_blkg;
+>   	}
+>  =20
+> -	/* blkg holds a reference to blkcg */
+> -	if (!css_tryget_online(&blkcg->css)) {
+> -		ret =3D -ENODEV;
+> -		goto err_free_blkg;
+> -	}
+> -
+>   	/* allocate */
+>   	if (!new_blkg) {
+>   		new_blkg =3D blkg_alloc(blkcg, disk, GFP_NOWAIT);
+>   		if (unlikely(!new_blkg)) {
+>   			ret =3D -ENOMEM;
+> -			goto err_put_css;
+> +			goto err_free_blkg;
+>   		}
+>   	}
+>   	blkg =3D new_blkg;
+>  =20
+>   	/* link parent */
+>   	if (blkcg_parent(blkcg)) {
+>   		blkg->parent =3D blkg_lookup(blkcg_parent(blkcg), disk->queue);
+>   		if (WARN_ON_ONCE(!blkg->parent)) {
+>   			ret =3D -ENODEV;
+> -			goto err_put_css;
+> +			goto err_free_blkg;
+>   		}
+>   		blkg_get(blkg->parent);
+>   	}
+>  =20
+>   	/* invoke per-policy init */
+> @@ -440,12 +442,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *b=
+lkcg, struct gendisk *disk,
+>  =20
+>   	/* @blkg failed fully initialized, use the usual release path */
+>   	blkg_put(blkg);
+>   	return ERR_PTR(ret);
+>  =20
+> -err_put_css:
+> -	css_put(&blkcg->css);
+>   err_free_blkg:
+>   	if (new_blkg)
+>   		blkg_free(new_blkg);
+>   	return ERR_PTR(ret);
+>   }
+
+--=20
+Thanks,
+Kuai
