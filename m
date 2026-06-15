@@ -1,117 +1,86 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lgeamrelo03.lge.com (lgeamrelo03.lge.com [156.147.51.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5739A73463
-	for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 18:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41791F2B88
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 01:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.51.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781461333; cv=none; b=GgWgLzSMi4U6uZ84oIqtRuDvy8rGA/VZb8Xx4NA50krKaboRvDtikXuLPCBELXcbqOFyCt5+SQaGQKjogqSNfF8PvHOTAnjg29lRUcV03zPSC2TsKPsD2Y9jm5rzmo0nwzrU5eI5NQDd3H1Kxo+b2ApT6AapAD/U7BWQbRpXV20=
+	t=1781488244; cv=none; b=FyOYezgOnOndRy0tH5PD7TBFDwKiXlTXwfAbtTZJIdj4NW+VZ7bnNtz5UVK2RRt0lcvr+QAUBeXl+K9ogGiqUWaSA4XW8p7HCyq6cQZqQEsxQZ1O3wRKAcuhAW+unuzJ3nHSNVq7msPCd96kM+fnu0gzQ9zrBwmxictiRsPychg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781461333; c=relaxed/simple;
-	bh=jsFcSuYhKuimo076fmVmCBphWTenG/t/L8YXbQit3FE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OpLcR1K4lDvcLrwG0MvUp0JuyW0VaU7X1SbxHkmrTtuBNyNdoj02vteMrZwItlUX/62FiJduHawruUJaTtnj1ttvqnNRStZv0hquCeZx3YW6RdjKnOhfGq7GEnw1V53CaaA+cGO7bmJu8WOWOZVIWA2J0/G03XvrilWVVBVvgSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PeUogzBa; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PeUogzBa"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490be03d47bso26681655e9.0
-        for <linux-block@vger.kernel.org>; Sun, 14 Jun 2026 11:22:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781461331; x=1782066131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uFqh8nYKunPUCxIlPP7QZI2Gqt8nZL3xpDznYcWZpgk=;
-        b=PeUogzBaKFX2qkwSj8mIaTPivJcpNevxhdZwXTKDnmZtFRO6Jvv3O3E5zpzyeDj/vH
-         peF2axJjt6JOWsDPFrowPz4cHcZWQOeIGgmNrA+qoqbvOKo3AHjKWbH6rtSFVtD1gmkX
-         HfqXzxxA+oj4v072YQ1lwROqQPdjCQhVNQdlbMweNY14Ea1w/U2KJSWqI+royVcLJdG5
-         oosDmJuCKAXD32YCrm+dHhooNzsKpdu2cq0ZBuNyjLlmJiNQx5cO1r5aSZ+rjGrkIkTb
-         Hm1XlxFiSZ8rYEsjowGiiv1ZRoJtT+ooBsis48505QSdbcm/HV3BpKQO7NIHfz7zDWsP
-         IL0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781461331; x=1782066131;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uFqh8nYKunPUCxIlPP7QZI2Gqt8nZL3xpDznYcWZpgk=;
-        b=p9Xnl2Yu3Fl3K8imhYWKlJ8ZYaRMi25A03OAaeKhDcXCfbu42bgcWpMwDzUdlqX1ya
-         BUkblLfAWgi5cY3Jt4eVaBlGEhzrRtfs5S95Pcu58Dxw2ogbPmcuV06ts1vgzo9hZVTp
-         HJ+X6W++STCvgDmp7XYVp4hr/F8LEEouyW8CbX5fIPyAIyMgrZc3EIlJ5I2AOp2fFqg/
-         oNjMao5ZMML++qXFp1EzvMvYqpB9n+GSvPWHT+5Ng6hOWTj01bRRG0xEEFQeYIsdtgrZ
-         LyWvPUeL0vrAVr7Xz8n/IlZkXa9LD0za8OPaRlwKSe4BXcMK8m5DhgiFPixoILlX76VZ
-         /08g==
-X-Forwarded-Encrypted: i=1; AFNElJ8iB6AxdONxtTU4CMHusXZraRYHfv8qDIF+AW8SrzircCUb4RoJ9rUbkEdv9xK6CD7meTg8bXJ3Kgwo6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAcKFgmjYMMqEvuPapf4WywQ+jNFxiGskFuR6T/Ip3nXyxGWt2
-	ec9oVIqEE/lvEk4JCRcCbYyBx46LKLI/uRLSmfQxDw5c5Dh1ORapvr7TBI9znQ==
-X-Gm-Gg: Acq92OEOZ1c3gi+Fm4K9GIs3fjGTQ0uS20Dtd7Zp1FD1PEWCeZI3gWdVEq5VOVsipXL
-	2zp+cNVCbHKElrVrz/NGR9g/608tmVk5o6evE3CiVPu7pIGMbSaL9OlbBI7xYnvHeIYIdrC3AOw
-	wnvzK4El9uc/iSeZ4PCIDbFi6AQ0hESt33+XTsYvRo3Iz9fbaMvpgaJUcWP+nrrXSXPR+rv7GKL
-	Mi96529foPGsB/WAQC+ctHuuKvIQ7BhiAYc9AFnMY0UqOrSuP3GfxpJneRPke7W8McaZGoXwMsb
-	V+digFA/ajABWP82Uxa8roArC6r9o4g5V3+YK8fhM2InYgzBU922RG1XaP0V65eYnrvLt/yj53U
-	ZX6D6JD3/zE9dIiXg4QeRUs3I74kvEy1c0SmBC2KkvAShSaSkeCV/DuoBJxR6hHFKgso8AWaJSw
-	I+s4ROYyp3hBxRMOzt7ZPnzaZOdr1XtpEPtkpAQ466dQJaAnZhcF2ujJ46TOpKu05QiDgRfTtIS
-	HRXTAXGhuTMJado2i48Yx2m
-X-Received: by 2002:a05:600c:c177:b0:490:c2a3:3303 with SMTP id 5b1f17b1804b1-490ec51f18dmr147186805e9.34.1781461330727;
-        Sun, 14 Jun 2026 11:22:10 -0700 (PDT)
-Received: from localhost (apn-78-30-82-184.dynamic.gprs.plus.pl. [78.30.82.184])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2b0d70sm27095649f8f.19.2026.06.14.11.22.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 11:22:10 -0700 (PDT)
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
-To: shinichiro.kawasaki@wdc.com,
-	linux-block@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@suse.com>
-Subject: [PATCH blktests] scsi/009: fix unset bytes_to_write in TEST 8
-Date: Sun, 14 Jun 2026 20:16:52 +0200
-Message-ID: <20260614181651.11554-2-sebastian.chlad@suse.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1781488244; c=relaxed/simple;
+	bh=iwPaf5O1p8Bozvyw6mAQYTVebmpFDgP8zVaHzs8U/ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hsVM4ah23JwSd2Im38aVBH/L7qJhDiHlXMyR2RMM6lrAJE8TfrJfePYj+cKosopdHyAjl8cBrE6J1nov/+7lQ6v4a9n/yLkndmVMX/r3/pwcZQn6Y7BRXqyOSSRi3BVSr+5AFwOaCmde/0nurs2BEPld9CxcbkTc0pDznbkQLc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.51.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
+Received: from unknown (HELO yjaykim-PowerEdge-T330) (10.177.112.156)
+	by 156.147.51.102 with ESMTP; 15 Jun 2026 10:50:38 +0900
+X-Original-SENDERIP: 10.177.112.156
+X-Original-MAILFROM: youngjun.park@lge.com
+Date: Mon, 15 Jun 2026 10:50:38 +0900
+From: YoungJun Park <youngjun.park@lge.com>
+To: Jianyue Wu <wujianyue000@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>,
+	Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>,
+	Barry Song <baohua@kernel.org>, Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH 1/3] mm/page_io: let block drivers register custom swap
+ I/O ops
+Message-ID: <ai9abo7GwMl+g43G@yjaykim-PowerEdge-T330>
+References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
+ <20260614-zram-swap-ops-block-register-v1-1-6c1a6639c222@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260614-zram-swap-ops-block-register-v1-1-6c1a6639c222@gmail.com>
 
-bytes_to_write was never assigned before TEST 8, causing it to pass for
-the wrong reason. Set it to atomic_unit_max_bytes + logical_block_size
-and update the golden output with the expected "pwrite: Invalid argument"
-from xfs_io.
+On Sun, Jun 14, 2026 at 11:35:29PM +0800, Jianyue Wu wrote:
 
-Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
----
+...
 
-This is a followup on: https://github.com/linux-blktests/blktests/pull/245
+Hello Jianyue.
 
- tests/scsi/009     | 1 +
- tests/scsi/009.out | 1 +
- 2 files changed, 2 insertions(+)
+Currently, the patch commit log indicates only a single custom swap
+registration is supported. Shouldn't we allow multiple block drivers to
+register their custom ops simultaneously from the beginning?
 
-diff --git a/tests/scsi/009 b/tests/scsi/009
-index 41a5152..c7a1754 100755
---- a/tests/scsi/009
-+++ b/tests/scsi/009
-@@ -143,6 +143,7 @@ test_device() {
- 
- 	test_desc="TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 "
- 	test_desc+="bytes with RWF_ATOMIC flag - pwritev2 should not be succesful"
-+	bytes_to_write=$(( sysfs_atomic_unit_max_bytes + sysfs_logical_block_size ))
- 	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write")
- 	if [ "$bytes_written" = "" ]
- 	then
-diff --git a/tests/scsi/009.out b/tests/scsi/009.out
-index e94882d..6c3780f 100644
---- a/tests/scsi/009.out
-+++ b/tests/scsi/009.out
-@@ -6,6 +6,7 @@ TEST 4 - check sysfs atomic_write_unit_min_bytes = scsi_debug atomic_wr_gran - p
- TEST 5 - check statx stx_atomic_write_unit_min - pass
- TEST 6 - check statx stx_atomic_write_unit_max - pass
- TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+pwrite: Invalid argument
- TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 bytes with RWF_ATOMIC flag - pwritev2 should not be succesful - pass
- TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
- pwrite: Invalid argument
--- 
-2.51.0
+>  int shmem_writeout(struct swap_io_ctx *ctx, struct folio *folio,
+>  		struct list_head *folio_list);
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index 284eebc40a70..ebdc96092961 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -2849,6 +2849,10 @@ static int setup_swap_extents(struct swap_info_struct *sis,
+>  	sis->ops = &swap_bdev_ops;
+>
+>  	if (S_ISBLK(inode->i_mode)) {
+> +		const struct swap_ops *block_ops = lookup_swap_block_ops(sis);
 
+Also, just a personal thought on this part.
+
+Instead of using `block_device_fops` as a lookup key, what if we handle
+this similarly to how filesystems use the `a_ops->swap_activate` callback?
+
+We could add a `swap_activate` callback directly into
+struct block_device_operations (zram's zram_devops). This way, the
+block device itself can set up and replace the swap `ops` directly without
+needing a separate registration/lookup mechanism.
+
+What are your thoughts on this approach?
+
+Thanks,
+Youngjun Park
