@@ -1,51 +1,43 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBC7171CD;
-	Mon, 15 Jun 2026 18:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BA025776;
+	Mon, 15 Jun 2026 19:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781546715; cv=none; b=kVFCh0vXRSPxlL0xLWk7fbpUSGJ5H7TIy0sSQNai9Xz3L/pGeNvQXkf6UjoN4Q+0TmIh8m0po/i42qcbuvllxuODDrjhcFAg8PBK7HsiDOKVnVv/Lja0KuQFnr51VzB68Eeu94BTodxrS/O3sqpDeKGZMlqE0cjqNvhY1RQEJFQ=
+	t=1781551520; cv=none; b=Y5UgyGG9NBy/3oykWYZLtME7b71VMh/dOQHVmXRsg68frswpnyDxR3M89Xz7jvSHRVnEUToCYcbXl3GmtTycmOYcJS5FM+CXgw3ks++IrS84gYTbXEdWsxrH0jhLhjYeTVsCqFY7Rv907Q5FnJW4ei93pXlirR2PQo/QaBKCQqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781546715; c=relaxed/simple;
-	bh=/ph9hmv8Bv3gxVKJvA7XMnqgK8s/htGVs7RhLC844Jc=;
+	s=arc-20240116; t=1781551520; c=relaxed/simple;
+	bh=xcCL0pBFLSUueKbbdCERNE0vD2OIUdxB4/A2QjFsqZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eutPKGpVnAV4b6RYtV5wbbMHvz6PSIKrkdfulYa54VZFvI+XEK7h6QpLIP5PVvQSh7Nmh/pfzW3HBQXsAhIkuS3eSgTurYuJxm6T0V6PKq8yPQkvMYDYHc4BbSW75CF6nFukRYdOrHp87+vqtE5JN9ALF8uob66a/orFXM1NxRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=meDmn82a; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=YRUzfWDPWh4Ly5OMWU8BQtgmZHKKdYY2IRIy0UsuKD7pmLNYweO071kGGqVEfT37flJrNRPkwJCpXU0ZNd7rziukK1yb9QndyVtptC+Ze/Gq3YZwWfGBZ/qO/bks+QPIce107UVF6aLE93E3GWiF3UQ5onGsBi8iyXGP8L/UnAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUR1syh3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="meDmn82a"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=gV3RARbyoDWxd2FbFDV10A8E6ApjHuUWEwK765GMoFs=; b=meDmn82aI5X1jsBR4O+/ynZVS1
-	dRyY2y3L3HsISR0ckn+NlhrlhlUo8xqZTLFqkX1Ws1hHMzyZJ2Jz9fp/I8v4GrVch+ycAyKIn+FS9
-	F+HS98vrZmbZ/0VxEZHamPMEvKFuN+HRMIOyDtMHgR17tpDM0ffztCZgqGCO97s7MgQ3m0mMe/z1C
-	6iCgbfUa8eR9NP+5SLsPNAwvOPp+HQGze0I3OJIDclmCupACHdHoCO0U5QQdgLegpb5TW/pFwC8GE
-	fW0DGRDIjASOe58SfucrbzVcqnc/ux5LqkHZFGZ8xOFHZS+SJcasPm7pEY5gk/W5TyequpTLLvYan
-	ZmB3dOUA==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wZBgH-00000009Exo-3OE8;
-	Mon, 15 Jun 2026 18:05:05 +0000
-Date: Mon, 15 Jun 2026 19:05:05 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Vincent Mailhol <mailhol@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Subject: Re: [PATCH 12/19] x86: define DPS root partition type UUIDs
-Message-ID: <ajA-0YJW4gLr02c7@casper.infradead.org>
-References: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
- <20260615-discoverable-root_partitions-v1-12-39c78fac42e2@kernel.org>
- <03be57ae-0e41-4b8a-adc5-bdd85ccce951@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUR1syh3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704671F000E9;
+	Mon, 15 Jun 2026 19:25:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781551519;
+	bh=XImiJzUy2p4Y8Op2JwUEIV2Jl3UCBUZzU96cLFEpEWI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=EUR1syh3q/KB0CueCCTt3Px9pBu0R9A3V9pCfX8ZKli1nfgYENVfjJJl2xwmtIxxF
+	 TZZd0wOUEN7yqkCkoaVR3/KofDcXoB/aMI3WjngNEYZHxPEbffpn5l0th3XHt0XLSx
+	 4Inr6GoC9GPQgMxx02vpfBgn2kRPRYV+IOVLmY4tyV0QNTmO90kmdnaUXWtAj3RVoQ
+	 PL1N50fMzl9sWciAzgBTmG5PkxF8ZwJSpfO3gl0GSN4BcWnf6rKi+bZTSiQNtcfwD3
+	 ZeiBerDntAsEnZYThBoD3FoDIig2U8W7oTboI2pyicSAtaPWLOERqtL3VVoCpQt+9H
+	 qh2+py2ZKtc5w==
+Date: Mon, 15 Jun 2026 13:25:17 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajBRnUqXd7DqxLiG@kbusch-mbp>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <ajAYN_mmjzYBAimV@kbusch-mbp>
+ <ajAb0m9cNraQn2Pw@kbusch-mbp>
+ <ajAqUwo3eTm1c2_J@gallifrey>
+ <ajA0L-u-r4nhbpfl@kbusch-mbp>
+ <ajA5kpUraXqh9ag9@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,17 +46,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <03be57ae-0e41-4b8a-adc5-bdd85ccce951@intel.com>
+In-Reply-To: <ajA5kpUraXqh9ag9@gallifrey>
 
-On Mon, Jun 15, 2026 at 09:46:41AM -0700, Dave Hansen wrote:
-> There are a lot of ways to do this. I'm just not a super big fan of the
-> current proposal.
+On Mon, Jun 15, 2026 at 05:42:42PM +0000, Dr. David Alan Gilbert wrote:
+> * Keith Busch (kbusch@kernel.org) wrote:
+> > On Mon, Jun 15, 2026 at 04:37:39PM +0000, Dr. David Alan Gilbert wrote:
+> > > Hi Keith,
+> > >   Thanks for the patch, alas it doesn't seem to be helping here;
+> > >  the first warn is still the same
+> > > and it still hangs the test process hard and eventually BUGs at
+> > > 
+> > > void blk_mq_end_request(struct request *rq, blk_status_t error)
+> > > {
+> > >         if (blk_update_request(rq, error, blk_rq_bytes(rq)))
+> > >                 BUG();
+> > 
+> > Oh, that was not expected.
+> > 
+> > What is the dma alignment requirement of your backing devices? You can
+> > find the attribute for sda at /sys/block/sda/queue/dma_alignment. I'm
+> > expecting 511, but just want to double check.
 > 
-> So, boiling it down:
+> Yeh looks like it:
+> /sys/block/sda/queue/dma_alignment:511
+> /sys/block/sdb/queue/dma_alignment:511
 > 
-> 1. Should more than one UUID be supported per kernel build?
-> 2. Should the UUIDs be defined in arch code or generic code?
-> 3. Kconfig or #ifdefs?
+> all of the lvm also looks like it is.
 
-Further questions ... why do this in the kernel?  Seems perfectly
-suited to be in initramfs where we can throw away the code after boot.
+Thanks for confirming.
+
+I'm struggling to see how you're getting there with your reproducer with
+the proposal included. I can see other short comings with preadv or
+really large pread's, but not with a 4k pread. For those other issues
+this patch can fix it:
+
+  https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
+
+It is currently staged for upstream, so hasn't landed yet. But again, I
+don't think those conditions apply to what you're seeing, but worth a
+shot on top of the previous proposal to use byte units instead of
+sectors.
+
+In the meantime, since I so far can't reproduce this after including my
+previous proposal, I may have to request trying out a debug patch to get
+some more visibility on what's happening if that's okay.
