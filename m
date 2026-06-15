@@ -1,92 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BA025776;
-	Mon, 15 Jun 2026 19:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBBF26ED46;
+	Mon, 15 Jun 2026 20:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781551520; cv=none; b=Y5UgyGG9NBy/3oykWYZLtME7b71VMh/dOQHVmXRsg68frswpnyDxR3M89Xz7jvSHRVnEUToCYcbXl3GmtTycmOYcJS5FM+CXgw3ks++IrS84gYTbXEdWsxrH0jhLhjYeTVsCqFY7Rv907Q5FnJW4ei93pXlirR2PQo/QaBKCQqA=
+	t=1781553783; cv=none; b=enWuBJQj3qNIg2FMW3n5ouS95Q7WiixcrcxxxBabYy1bl+VS5AzsmYZXSEEnZOHxbLtRfRtxEiN6vuxWTS8kxdk/RSFojgzu1gxKJQNoGbt50CeYV2zxkS9GosVo19bqn/s8kR19BWj0cgwJfsKTVzd+TSnICs5E+Fqv63oFoYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781551520; c=relaxed/simple;
-	bh=xcCL0pBFLSUueKbbdCERNE0vD2OIUdxB4/A2QjFsqZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YRUzfWDPWh4Ly5OMWU8BQtgmZHKKdYY2IRIy0UsuKD7pmLNYweO071kGGqVEfT37flJrNRPkwJCpXU0ZNd7rziukK1yb9QndyVtptC+Ze/Gq3YZwWfGBZ/qO/bks+QPIce107UVF6aLE93E3GWiF3UQ5onGsBi8iyXGP8L/UnAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUR1syh3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781553783; c=relaxed/simple;
+	bh=6auKCxQAwBHrJU78gjyHu6aVt0oJaJ+SJzzvhSX5rlU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DReO5u/JZTAF/XvgZPR7LBz1WO6T0ljF9DjCjMwBh95ghJ5gAC9WKyZuDb2Co7H2MHzMLVhvuoF4bl6aNDOSLfxmrYqMVGQvg7Z+BEcuLkSy2LOZu1O1nvDm5G8ilrwC0rbGW7APpUXaumykOK0XZEOkSHGWxgJqjLOTORvT8BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=p7ufdKPY; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUR1syh3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704671F000E9;
-	Mon, 15 Jun 2026 19:25:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781551519;
-	bh=XImiJzUy2p4Y8Op2JwUEIV2Jl3UCBUZzU96cLFEpEWI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EUR1syh3q/KB0CueCCTt3Px9pBu0R9A3V9pCfX8ZKli1nfgYENVfjJJl2xwmtIxxF
-	 TZZd0wOUEN7yqkCkoaVR3/KofDcXoB/aMI3WjngNEYZHxPEbffpn5l0th3XHt0XLSx
-	 4Inr6GoC9GPQgMxx02vpfBgn2kRPRYV+IOVLmY4tyV0QNTmO90kmdnaUXWtAj3RVoQ
-	 PL1N50fMzl9sWciAzgBTmG5PkxF8ZwJSpfO3gl0GSN4BcWnf6rKi+bZTSiQNtcfwD3
-	 ZeiBerDntAsEnZYThBoD3FoDIig2U8W7oTboI2pyicSAtaPWLOERqtL3VVoCpQt+9H
-	 qh2+py2ZKtc5w==
-Date: Mon, 15 Jun 2026 13:25:17 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: "Dr. David Alan Gilbert" <linux@treblig.org>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
-Message-ID: <ajBRnUqXd7DqxLiG@kbusch-mbp>
-References: <ai7rnH20IYeSmY8s@gallifrey>
- <ajAYN_mmjzYBAimV@kbusch-mbp>
- <ajAb0m9cNraQn2Pw@kbusch-mbp>
- <ajAqUwo3eTm1c2_J@gallifrey>
- <ajA0L-u-r4nhbpfl@kbusch-mbp>
- <ajA5kpUraXqh9ag9@gallifrey>
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="p7ufdKPY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1781553780;
+	bh=6auKCxQAwBHrJU78gjyHu6aVt0oJaJ+SJzzvhSX5rlU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=p7ufdKPY+OeiDfeZOJTgDDoz8YT3yS3oOfE2fGu3SE9r7vxjQnSVGea+U1MxJeSJS
+	 7aowLu+1z4ydd4/jXMzUFu+6oNaXNhf8atpnI2KJSbFU5TW8xDPU2CYvN/LBVFPB0s
+	 /AC9FTyC7fjhcXh9gud2xD+SBPpXcyFKOGLT3e/4=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::8c71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id DAEDB1C02E4;
+	Mon, 15 Jun 2026 16:02:59 -0400 (EDT)
+Message-ID: <0158c89cffd76c621607f66d1889ccc084754729.camel@HansenPartnership.com>
+Subject: Re: [PATCH 08/19] parisc: define DPS root partition type UUID
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Vincent Mailhol <mailhol@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Davidlohr Bueso <dave@stgolabs.net>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara
+ <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org, Helge Deller
+	 <deller@gmx.de>, linux-parisc@vger.kernel.org
+Date: Mon, 15 Jun 2026 16:02:59 -0400
+In-Reply-To: <20260615-discoverable-root_partitions-v1-8-39c78fac42e2@kernel.org>
+References: 
+	<20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
+	 <20260615-discoverable-root_partitions-v1-8-39c78fac42e2@kernel.org>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajA5kpUraXqh9ag9@gallifrey>
 
-On Mon, Jun 15, 2026 at 05:42:42PM +0000, Dr. David Alan Gilbert wrote:
-> * Keith Busch (kbusch@kernel.org) wrote:
-> > On Mon, Jun 15, 2026 at 04:37:39PM +0000, Dr. David Alan Gilbert wrote:
-> > > Hi Keith,
-> > >   Thanks for the patch, alas it doesn't seem to be helping here;
-> > >  the first warn is still the same
-> > > and it still hangs the test process hard and eventually BUGs at
-> > > 
-> > > void blk_mq_end_request(struct request *rq, blk_status_t error)
-> > > {
-> > >         if (blk_update_request(rq, error, blk_rq_bytes(rq)))
-> > >                 BUG();
-> > 
-> > Oh, that was not expected.
-> > 
-> > What is the dma alignment requirement of your backing devices? You can
-> > find the attribute for sda at /sys/block/sda/queue/dma_alignment. I'm
-> > expecting 511, but just want to double check.
-> 
-> Yeh looks like it:
-> /sys/block/sda/queue/dma_alignment:511
-> /sys/block/sdb/queue/dma_alignment:511
-> 
-> all of the lvm also looks like it is.
+On Mon, 2026-06-15 at 18:09 +0200, Vincent Mailhol wrote:
+> DPS [1] assigns GPT partition type UUIDs to operating system
+> partitions. Root partitions use architecture-specific type UUIDs so
+> the OS can discover the intended root filesystem without relying on a
+> root=3D  cmdline option.
+>=20
+> Define DPS_ROOT_PARTITION_TYPE_UUID in asm/dps_root.h for parisc and
+> select ARCH_HAS_DPS_ROOT_PARTITION_TYPE_UUID.
+>=20
+> [1] The Discoverable Partitions Specification (DPS)
+> Link:
+> https://uapi-group.org/specifications/specs/discoverable_partitions_speci=
+fication/
 
-Thanks for confirming.
+How are you planning to make this work for parisc?  Some systems have a
+PALO boot partition (fdisk type 0xf0) but the more modern way is to
+place palo inside a hidden ext4 inode in /boot.  The way parisc IODC
+works is very similar to the way MSDOS boots with the palo location
+table in the first block so I theorize that would probably work for gpt
+partitions as well ... I'm just not sure anyone has tested it.
 
-I'm struggling to see how you're getting there with your reproducer with
-the proposal included. I can see other short comings with preadv or
-really large pread's, but not with a 4k pread. For those other issues
-this patch can fix it:
+However, to get this to work with PALO for auto discovery, you'd need
+palo patches to recognize the DPS UUID and no-one seems to have
+submitted anything to palo for this.
 
-  https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
+Regards,
 
-It is currently staged for upstream, so hasn't landed yet. But again, I
-don't think those conditions apply to what you're seeing, but worth a
-shot on top of the previous proposal to use byte units instead of
-sectors.
+James
 
-In the meantime, since I so far can't reproduce this after including my
-previous proposal, I may have to request trying out a debug patch to get
-some more visibility on what's happening if that's okay.
