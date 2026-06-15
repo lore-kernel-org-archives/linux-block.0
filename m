@@ -1,122 +1,130 @@
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470CE353EC0;
-	Mon, 15 Jun 2026 13:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70993E5EF1;
+	Mon, 15 Jun 2026 13:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781528848; cv=none; b=LfPtG2ZfRe5t8Ye8hJPFBZXsslXnACgLTwwaFo9QMFP63K8JZ/9Guzr0cnCWHiRJT7PbO18nPRWpHvv5oEsd12CbfoT4Ws2bG4PZDhr+tsls9xZ+pG67LajPAxWgYxN5Rgr0k5U/2byjTDgDAIY1n1V6V7x4uegHzGbFIDnzfhQ=
+	t=1781529499; cv=none; b=Czs/2fpMqici/Rq2AFgFbIsEl63clX9aSkrgl2cRxGKl99iiv7t5MLUg1Yjk0ni89h4kUh9O+WWvXEXIcQl/yzqcCM8TLMpvi8xuJiNEvjnYQ1amLGfXV7qXrffKND67OCkUGSnKKgrj9e21tnCl20+uXaYP0fNqrngx23QrdpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781528848; c=relaxed/simple;
-	bh=OEZiHIIE9ZX02seRqu2Yy/X8d5oWjiuZLrGCD33SD/k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kdQDcVzVCsrzTzGkMA33F3mPng/lvUZNkoPfouVzJGnxX/b4bqnwOPRpibrx9jQDo3nNw2WMLEnVuIR5rXBt2ePIwojepBDB31bDluYt62w9yQiFt9cI6gHm90DBjVQjd0MlYy/j70C++E9nHWxOAll7dlcrpbGfj7NlKil8k28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=aFqQbDpM; arc=none smtp.client-ip=52.35.192.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1781529499; c=relaxed/simple;
+	bh=7IviJDmECLct1mfX+ucUEKM7lpwiYuU/Cv+mO4JFoXk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Qj4JgB0ssyTgSGkouDDAjBP3wVq+Wca+GDDbaefTq8MtZn9LyVXGgEZLVRzSWrawEexgyRZvc7d/i1q7FL6nJMKmXlsvbAJdMKle0ATfVoHrJmpNtrdYdChU1EYL0pCWfXi6NxbdpFksIjccrOad0KQ35NsbUaMM8oSPstcGGZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nfb/Xlnp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="aFqQbDpM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1781528847; x=1813064847;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Nhr6SuT2FEDobG6OCE/2kYZvgYlb8rGVuwF+ofYdc2A=;
-  b=aFqQbDpM9c7VTGXdsJc1bBniyS9ExJ27qpt3kKgR3At6p8jf7USFcMwL
-   oWk9w4xzqh47T/WdG1IAtjemJQLKkMjH+Fx+k8kxMXJnOl+aCNBjY40Rb
-   ULu4kRX90G1Z+l6kimW8YFy3wV9CUpWEFZFI4lAsAvO/dK/N6f0K4yJ29
-   JA4r5p9a3GXjxTLKwcNQNZMnvEWPg1swM37l0XNSBYKpA/PhLAFRBo2Hs
-   vjbDKyNFeq9tXFYMWSqc3q0QNxyu4exA+i2Jp8diprX6OjbdFac6j6hqx
-   pcFKu0TerLjKYjITeYxAaJIYxRP0ZdjlWCckoDP2Q1PIFqPeZD5RDatf5
-   Q==;
-X-CSE-ConnectionGUID: FOOgvbopSX6M9m77WNzVzg==
-X-CSE-MsgGUID: ZtFaur2iRae9EEkxMPDqjA==
-X-IronPort-AV: E=Sophos;i="6.24,206,1774310400"; 
-   d="scan'208";a="21547809"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 13:07:24 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:15341]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.234:2525] with esmtp (Farcaster)
- id 2d1f6771-3b89-456b-9a62-54bab84b91af; Mon, 15 Jun 2026 13:07:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 2d1f6771-3b89-456b-9a62-54bab84b91af
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 15 Jun 2026 13:07:23 +0000
-Received: from dev-dsk-connordw-1a-43da851f.eu-west-1.amazon.com
- (172.19.98.255) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 15 Jun 2026
- 13:07:21 +0000
-From: Connor Williamson <connordw@amazon.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, <yukuai3@huawei.com>, <hch@lst.de>, <jack@suse.cz>,
-	<nh-open-source@amazon.com>, <connordw@amazon.com>
-Subject: [PATCH] block: remove redundant GD_NEED_PART_SCAN in add_disk_final()
-Date: Mon, 15 Jun 2026 13:07:15 +0000
-Message-ID: <20260615130715.53693-1-connordw@amazon.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nfb/Xlnp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7AC01F000E9;
+	Mon, 15 Jun 2026 13:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781529498;
+	bh=8X0V3Tc4hL+9KAbpOBY/kFW6p/k2S39HHy+Iy9zaNRI=;
+	h=From:Subject:Date:To:Cc;
+	b=Nfb/XlnpXNQYZrUOXcgxFHJRVfNuXIuhTHuztah3LprXzljOXFHelkfY8NaYJHyZJ
+	 /npvHLw2Bhjj+pKCzXwCd6VDtY62dUtC6lk02T+m4AAWeAuoYTVD2kXYlKtmtPF9JH
+	 31Fr9s/PlhP+2uHdk0xyOputTHeiTH+w9KSiz5iWSRKVq7aBsgfM95pDDN0QZ49S2x
+	 WBqYiGTO5yUMYxGQHDAbr+WwXszANiowU1xEYMBWSriqWpsnDguHzTaJkyWK5WuGwB
+	 b3szPPlZIgLrs+fq0NsE+4KIOSSi8BugxQVugFHOzS3APbIZLWq+yMhR71P4mgi0Qs
+	 ci5Lyr2vBzSdg==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH RFC 0/6] block,btrfs: fix frozen-superblock strand on
+ device add/remove/replace
+Date: Mon, 15 Jun 2026 15:18:03 +0200
+Message-Id: <20260615-work-super-freeze_deny_upstream-v1-0-a6c72b840e7d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIv7L2oC/yWNyw6CMBBFf4XM2hogWB9bEz/ArTGkwEUqsTQzg
+ A/Cv0t1eU5uzp1IwBZCh2gixmjFdm6BZBVR2Rh3g7LVwpTGqY51slHPjlslgwermoEP8grunQ9
+ eeoZ5qGy/M9DZVicmpqXiGbV9/R4udD4d6fqXMhR3lH1oh1lhBKpg48omqLGWdVA0z19j6V4Bo
+ wAAAA==
+X-Change-ID: 20260615-work-super-freeze_deny_upstream-498ae64761a0
+To: Chris Mason <clm@fb.com>, Jens Axboe <axboe@kernel.dk>, 
+ David Sterba <dsterba@suse.com>, Jan Kara <jack@suse.cz>
+Cc: Naohiro Aota <naohiro.aota@wdc.com>, Josef Bacik <josef@toxicpanda.com>, 
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, 
+ "Christian Brauner (Amutable)" <brauner@kernel.org>
+X-Mailer: b4 0.16-dev-f5839
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3862; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=7IviJDmECLct1mfX+ucUEKM7lpwiYuU/Cv+mO4JFoXk=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTp/56ueNXjMJO+inJ5zqSWxY87vmYoTZ0dt1Uza8aL4
+ Kd5CyoedpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEzkWQfDP0N2kxvaeQ/3+/9M
+ uZZSbnb105OKd/IMM+LPlwnpn9+e84KR4ZjOfrkLOyT65gbJ2if4zorevvlkVuadtt0Hkv5eZHU
+ 25AEA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-add_disk_final() sets GD_NEED_PART_SCAN before calling bdev_add(),
-then calls disk_scan_partitions() which sets the flag itself. The
-early set is redundant and introduces a race.
+A block-device freeze that races a btrfs device membership change can leave
+the whole filesystem stuck frozen, recoverable only with a manual FITHAW.
 
-Between bdev_add() and disk_scan_partitions(), concurrent openers
-(multipathd, blkid, LVM) see the flag in blkdev_get_whole() and
-trigger bdev_disk_changed(). When disk_scan_partitions() then runs,
-it calls bdev_disk_changed() again, dropping the partitions the
-concurrent opener already created before re-adding them, which can
-result in transient partition disappearances.
+btrfs holds each of its devices open with the superblock as the block-device
+holder.  bdev_freeze() - issued by "dmsetup suspend", an LVM snapshot, or
+FIFREEZE on the bare device - resolves that holder to freeze the filesystem,
+and bdev_thaw() ("dmsetup resume") resolves it again to thaw.  If a freeze
+lands while btrfs is adding, removing or replacing a device, it rides in on
+the device's holder link and freezes the filesystem; the membership change
+then drops that link, so the matching thaw can no longer find the
+superblock.  The filesystem stays frozen with no way back short of FITHAW.
 
-The race is observable by inserting an msleep() between bdev_add()
-and disk_scan_partitions() while running concurrent open() calls
-during device bind. Without artificial delay, it manifests under
-scheduling pressure during boot on systems with aggressive device
-scanners (multipathd, systemd-udevd).
+To reproduce on the remove path: build a two-device btrfs with one member
+behind a dm-linear target, write enough data that removing that member
+relocates for a few seconds, start "btrfs device remove" on it, and
+"dmsetup suspend" the dm device while the removal is underway.  The suspend's
+freeze blocks on the remove ioctl's write access and rides in as the ioctl
+drops it; the removal then clears the device's holder link, so the matching
+"dmsetup resume" can no longer reach the superblock.  On an unpatched kernel
+the filesystem is left frozen and the next write hangs in D state until a
+manual FITHAW (fsfreeze -u).
 
-Therefore, do not set GD_NEED_PART_SCAN in add_disk_final(). Other
-GD_NEED_PART_SCAN consumers (blkdev_get_whole(),
-sd_need_revalidate()) should not be affected as the flag
-is set internally by disk_scan_partitions().
+The fix lets a filesystem forbid freezing a device for the duration of a
+membership change, modelled on deny_write_access()/allow_write_access().
+bd_fsfreeze_count becomes signed: > 0 counts active freezes, < 0 counts deny
+holders, and the two are mutually exclusive.  bdev_deny_freeze() reserves the
+device (bdev_freeze() then returns -EBUSY) and bdev_allow_freeze() releases
+it; both are a single lockless atomic, so a filesystem can deny under
+s_umount without inverting against bdev_freeze()'s bd_fsfreeze_mutex.  btrfs
+denies the device across each add, remove and replace, so a racing freeze is
+refused instead of riding in, while a normal freeze of a settled member
+still works.
 
-The retry-on-next-open intention from commit e5cfefa97bcc
-("block: fix scan partition for exclusively open device again")
-should also not be affected as the early return paths in
-disk_scan_partitions() should be unreachable at device registration
-time (bd_holder is NULL and open_partitions is zero).
+To re-allow freezing safely on release, bdev_yield_claim() is split out of
+bdev_fput(): the caller yields the holder while the device file is still
+open, re-allows freezing on the now-holderless device, and only then closes
+it.  Re-allowing after the holder is gone avoids re-stranding on a racing
+freeze; doing it while the file is still open keeps the block device alive
+without referencing it after the final fput.
 
-Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
-Cc: stable@vger.kernel.org
-Signed-off-by: Connor Williamson <connordw@amazon.com>
+Patch 1 is independent: it fixes a pre-existing target-device leak on the
+mark_block_group_to_copy() failure path in btrfs_dev_replace_start().  The
+replace bracket reuses that 'leave' unwind, so it comes first.
+
+With the fix the racing suspend is refused with -EBUSY mid-removal and the
+filesystem stays writable.
+
+Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- block/genhd.c | 4 ----
- 1 file changed, 4 deletions(-)
+Christian Brauner (6):
+      btrfs: destroy the target device when mark_block_group_to_copy() fails
+      block: allow making a block device unfreezable
+      block: split bdev_yield_claim() out of bdev_fput()
+      btrfs: deny freezing a device while it is being removed
+      btrfs: deny freezing a device while it is being added
+      btrfs: deny freezing devices undergoing a replace
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 7d6854fd28e95..0da6cdf3d5fb0 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -407,10 +407,6 @@ static void add_disk_final(struct gendisk *disk)
- 	struct device *ddev = disk_to_dev(disk);
-
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
--		/* Make sure the first partition scan will be proceed */
--		if (get_capacity(disk) && disk_has_partscan(disk))
--			set_bit(GD_NEED_PART_SCAN, &disk->state);
--
- 		bdev_add(disk->part0, ddev->devt);
- 		if (get_capacity(disk))
- 			disk_scan_partitions(disk, BLK_OPEN_READ);
---
-2.47.3
+ block/bdev.c              | 73 ++++++++++++++++++++++++++++++++++++-----
+ fs/btrfs/dev-replace.c    | 67 +++++++++++++++++++++++++++++++++-----
+ fs/btrfs/ioctl.c          |  4 +--
+ fs/btrfs/volumes.c        | 83 ++++++++++++++++++++++++++++++++++++++++-------
+ fs/btrfs/volumes.h        |  6 +++-
+ include/linux/blk_types.h |  2 +-
+ include/linux/blkdev.h    |  3 ++
+ 7 files changed, 206 insertions(+), 32 deletions(-)
+---
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+change-id: 20260615-work-super-freeze_deny_upstream-498ae64761a0
 
