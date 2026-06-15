@@ -1,264 +1,141 @@
-Received: from va-2-35.ptr.blmpb.com (va-2-35.ptr.blmpb.com [209.127.231.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE683F4DD8
-	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 16:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131231A9F87;
+	Mon, 15 Jun 2026 16:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781540289; cv=none; b=UMkINLA6RHOSyhlNqyDFQ+aGLu8APRufV2zVQ8Aw1pslTslluemjDEk4IBbsupkcMWrm6weQMDdNWFA31cWBiy9atzVGFafxN/TvuIhnEjtoiU5fpCwTrSFn+mvA+0ghsWnswXNPWOHBjT9alxwYmzQEUK54qk/cULBM2qHeF2Y=
+	t=1781541463; cv=none; b=R2T+cYAPYfuxtaAqZV/NtDVtbrCGIZYZ/OqafHiDdMrP/+HMJazBRS/nm91o3zoVPzc94eekcGppsXRYz1Nma1kuzQWGiH3S2wc9p41nEa6WkFvHJf5mMuPAYw2NJbKF1N+/lsuqBl8OaY375NS9mqkgt4OthiSo0AkQU1hLDYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781540289; c=relaxed/simple;
-	bh=4PeMgbEmobFrdGDlwf+b58+vlVlWUUifnljuI6GZ+CA=;
-	h=From:Mime-Version:Content-Type:Subject:References:In-Reply-To:To:
-	 Message-Id:Cc:Date; b=NkFRwBiIkP3eGvyb874LaQMgMfhsnmI6CO/iXYHodHjuKRHKY7uxGN9G6GmUSJRUdIidLHhpK11MU95TAmPzSrdzOXVgFvpYbBo4o0IMjxhEuZx7abWvbScvJPXj6UT1pKxj9QKtLTIdQe+2BcdGzh7u2Px0ofEsgWab+lqgKY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=OeckO5/9; arc=none smtp.client-ip=209.127.231.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1781541463; c=relaxed/simple;
+	bh=Cohom2Ou5SLC0ZDO02KAD1e0G/tpoEFYh1cIDL2cUF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwtT01dh+9cL+MUFtnU78u1V9btshrkSZB+fPDtmDsN48D+GqTQSH/lfeN7DQ3zQ6x3+gtAbVWP8aEdNMY3byb0UUDmMwU+UiLQcvxbtm+WCDPUuuAZkSzVBGFsZKHc0BLzZH2GnBI3gtQfVWN+Y2PZ2IZrJ7KSD0cFtfFaN+o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=WCzCU1hV; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="OeckO5/9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1781540166;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=xNteM8cvm64RoqWOvtAwKvU/xR4tQhb/JI2DiVJ/Ki8=;
- b=OeckO5/97BDQ0ImBNRXaRd/eYxFJJh6FF7nrUt+nPi3/pN4yJe4zvB2SU4F45sXoWI+wGM
- Wyr+oEuNXO4Wi3AUoPLtqt589aEzIYCYIGlowqbXRwYF1q5wKlj3sbp7UjCPUuJR7i2ZYt
- 91JPJDZ6oAPvOF9K3GqtCQ6+p1F7vFTmLEceohI1hIPxGp24CgfceLXvdooVffHfQs3pGb
- dNG/2f53+cnadF+idIxCBAzCBRdFKliVhokvVZdUVPceOL1wBvFssnTuADI4QFg4VadvJP
- Pzrt6cdYtAWzbRMvOB5rHmiIfn/KuTTSI851qhVKJdXrsZabx8V/kmWfoQfc5g==
-From: "Yu Kuai" <yukuai@fnnas.com>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="WCzCU1hV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=x9qmKP09x6ZcRWzZLuwWvY1wTy1pWSGt1TNtv/lGbQI=; b=WCzCU1hVCZXGcf7L
+	5GeobtBV9Xqa3O0Cub152YMz2zTBnOTInZLPprTCrEGQzaGebD5d6y7ED1wyqZxsI1Ma9C8ZuEE9U
+	eEBcuF1JO/2MjX5XN1DMSqQ/pKRM+qEh/+xHmMITddgDHds00UDovVP5xvjeTeBvh4O3CXH/M35j1
+	qiyihf4IvXNOWoFzKeIKnk7qvB1Dz3V4mYXf06tJt/fpCf2T0FjvB3pvuG29xT19BIiiZISdS28+8
+	zeIR7i0CFmq9usZp2dqw8jWrDcnABTifEkeoQEPNOJqV/0IaZFAlio8Za2I3ulW+fWrVB0ZLqzIXq
+	KdSpx2nVbkrnP2p3lQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1wZAJf-00000007nJa-44eX;
+	Mon, 15 Jun 2026 16:37:39 +0000
+Date: Mon, 15 Jun 2026 16:37:39 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajAqUwo3eTm1c2_J@gallifrey>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <ajAYN_mmjzYBAimV@kbusch-mbp>
+ <ajAb0m9cNraQn2Pw@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.180]) by smtp.feishu.cn with ESMTPS; Tue, 16 Jun 2026 00:16:03 +0800
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Reply-To: yukuai@fygo.io
-Subject: Re: [PATCH V2] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
-References: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
-In-Reply-To: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
-To: "Zizhi Wo" <wozizhi@huaweicloud.com>, <axboe@kernel.dk>, <tj@kernel.org>, 
-	<josef@toxicpanda.com>, <linux-block@vger.kernel.org>
-Message-Id: <70642ddf-9ed9-45cb-bf40-891a07247c97@fnnas.com>
-X-Lms-Return-Path: <lba+26a302544+5a7ac8+vger.kernel.org+yukuai@fnnas.com>
-Content-Transfer-Encoding: quoted-printable
-Cc: <cgroups@vger.kernel.org>, <yangerkun@huawei.com>, 
-	<chengzhihao1@huawei.com>, <houtao1@huawei.com>, <yukuai@fygo.io>
-Date: Tue, 16 Jun 2026 00:16:01 +0800
-User-Agent: Mozilla Thunderbird
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ajAb0m9cNraQn2Pw@kbusch-mbp>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
+X-Uptime: 16:34:56 up 30 days, 19:47,  2 users,  load average: 0.02, 0.04,
+ 0.00
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-Hi=EF=BC=8C
+* Keith Busch (kbusch@kernel.org) wrote:
+> On Mon, Jun 15, 2026 at 09:20:23AM -0600, Keith Busch wrote:
+> > On Sun, Jun 14, 2026 at 05:57:48PM +0000, Dr. David Alan Gilbert wrote:
+> > > Jun 14 18:08:32 dalek kernel: device-mapper: raid1: Mirror read failed from 252:24. Trying alternative device.
+> > > Jun 14 18:08:32 dalek kernel: ------------[ cut here ]------------
+> > > Jun 14 18:08:32 dalek dmeventd[1010]: Primary mirror device 252:24 read failed.
+> > > Jun 14 18:08:32 dalek kernel: WARNING: block/bio.c:1044 at bio_add_page+0x18b/0x250, CPU#15: kworker/15:1/369
+> > > Jun 14 18:08:32 dalek dmeventd[1010]: main-lvol0 is now in-sync.
+> > > Jun 14 18:08:32 dalek kernel: Modules linked in: nft_masq nft_reject_ipv4 act_csum cls_u32 sch_htb nf_nat_tftp nf_conntrack_tftp bridge stp llc rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reje>
+> > > Jun 14 18:08:32 dalek kernel:  drm_panel_backlight_quirks gpu_sched drm_suballoc_helper video nvme drm_display_helper nvme_core cec nvme_keyring sp5100_tco nvme_auth wmi serio_raw fuse scsi_dh_alua i2c_dev scsi_dh_rdac scsi_dh_emc
+> > > Jun 14 18:08:32 dalek kernel: CPU: 15 UID: 0 PID: 369 Comm: kworker/15:1 Not tainted 7.1.0-rc7+ #786 PREEMPT(lazy) 
+> > > Jun 14 18:08:32 dalek kernel: Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X570 Pro4, BIOS P3.10 07/13/2020
+> > > Jun 14 18:08:32 dalek kernel: Workqueue: kmirrord do_mirror
+> > > Jun 14 18:08:32 dalek kernel: RIP: 0010:bio_add_page+0x18b/0x250
+> > > Jun 14 18:08:32 dalek kernel: Code: 24 10 4c 8b 04 24 84 c0 0f 85 c9 00 00 00 41 0f b7 40 78 48 8b 74 24 08 8b 4c 24 14 e9 b4 fe ff ff 0f 0b 31 c0 e9 55 d1 af 00 <0f> 0b eb f5 48 8b 7f 08 83 7f 60 05 0f 85 00 ff ff ff 49 8b 3b 4c
+> > > Jun 14 18:08:32 dalek kernel: RSP: 0018:ffffd1fb8176fc10 EFLAGS: 00010246
+> > > Jun 14 18:08:32 dalek kernel: RAX: 0000000000000000 RBX: ffffd1fb8176fd18 RCX: 0000000000000000
+> > > Jun 14 18:08:32 dalek kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8d1a8eb28b00
+> > > Jun 14 18:08:32 dalek kernel: RBP: 0000000000000000 R08: ffffd1fb8176fc38 R09: ffffd1fb8176fc40
+> > > Jun 14 18:08:32 dalek kernel: R10: ffffd1fb8176fc34 R11: 0000000000000000 R12: 0000000000000000
+> > > Jun 14 18:08:32 dalek kernel: R13: ffffd1fb8176fd90 R14: 0000000000000001 R15: ffff8d1a8eb28b00
+> > > Jun 14 18:08:32 dalek kernel: FS:  0000000000000000(0000) GS:ffff8d29d161f000(0000) knlGS:0000000000000000
+> > > Jun 14 18:08:32 dalek kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > Jun 14 18:08:32 dalek kernel: CR2: 00007f0ddcd7b9d0 CR3: 000000023dcbf000 CR4: 0000000000350ef0
+> > > Jun 14 18:08:32 dalek kernel: Call Trace:
+> > > Jun 14 18:08:32 dalek kernel:  <TASK>
+> > > Jun 14 18:08:32 dalek kernel:  do_region+0x227/0x2a0
+> > 
+> > I think the problem is that do_region is tracking the "remaining" in
+> > sector granularity, but devices can have dma alignment such that it's
+> > valid to have sub-sector vectors. Rounding the length appended
+> > to_sectors() creates a 0 length subtraction, so the loop thinks no
+> > progress is made and loops forever. If we track it in bytes instead of
+> > sectors, then that should fix this observation.
+> 
+> I recreated your observation and this patch below appears to fix the
+> stuck behavior.
 
-=E5=9C=A8 2026/6/15 19:55, Zizhi Wo =E5=86=99=E9=81=93:
-> From: Zizhi Wo <wozizhi@huawei.com>
->
-> [BUG]
-> Our fuzz testing triggered a blkcg use-after-free issue:
->
->    BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
->    Call Trace:
->    ...
->    blkcg_deactivate_policy+0x244/0x4d0
->    ioc_rqos_exit+0x44/0xe0
->    rq_qos_exit+0xba/0x120
->    __del_gendisk+0x50b/0x800
->    del_gendisk+0xff/0x190
->    ...
->
-> [CAUSE]
-> process1						process2
-> cgroup_rmdir
-> ...
->    css_killed_work_fn
->      offline_css
->      ...
->        blkcg_destroy_blkgs
->        ...
->          __blkg_release
-> 	  css_put(&blkg->blkcg->css)
->            blkg_free
-> 	    INIT_WORK(xxx, blkg_free_workfn)
-> 	    schedule_work
->      css_put
->      ...
->        blkcg_css_free
->          kfree(blkcg)--------blkcg has been freed!!!
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3Dschedule_work
->                blkg_free_workfn
-> 							__del_gendisk
-> 							  rq_qos_exit
-> 							    ioc_rqos_exit
-> 							      blkcg_deactivate_policy
-> 							        mutex_lock(&q->blkcg_mutex)
-> 								spin_lock_irq(&q->queue_lock)
-> 							        list_for_each_entry(blkg, xxx)
-> 								  blkcg =3D blkg->blkcg
-> 								  spin_lock(&blkcg->lock)-------UAF!!!
-> 	        mutex_lock(&q->blkcg_mutex)
-> 	        spin_lock_irq(&q->queue_lock)
-> 	        /* Only then is the blkg removed from the list */
-> 	        list_del_init(&blkg->q_node)
->
-> As a result, a blkg can still be reachable through q->blkg_list while
-> its ->blkcg has already been freed.
->
-> [Fix]
-> Fix this by deferring the blkcg css_put() until after the blkg has been
-> unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
-> blkcg outlives every blkg still reachable through q->blkg_list, so any
-> iterator holding q->queue_lock is guaranteed to observe a valid
-> blkg->blkcg.
->
-> While at it, move css_tryget_online() from blkg_create() into blkg_alloc(=
-)
-> so that the css reference is owned by the alloc/free pair rather than
-> straddling layers:
-> blkg_alloc()  <-> blkg_free()
-> blkg_create() <-> blkg_destroy()
->
-> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free=
-_workfn() and blkcg_deactivate_policy()")
-> Suggested-by: Hou Tao <houtao1@huawei.com>
-> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Hi Keith,
+  Thanks for the patch, alas it doesn't seem to be helping here;
+ the first warn is still the same
+and it still hangs the test process hard and eventually BUGs at
+
+void blk_mq_end_request(struct request *rq, blk_status_t error)
+{
+        if (blk_update_request(rq, error, blk_rq_bytes(rq)))
+                BUG();
+
+Dave
+
 > ---
-> v2:
->   - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
->     css reference follows the blkg's own lifetime, making the put in
->     blkg_free_workfn() symmetric with the get in blkg_alloc().
->
-> v1: https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweiclo=
-ud.com/
->
->   block/blk-cgroup.c | 24 ++++++++++++------------
->   1 file changed, 12 insertions(+), 12 deletions(-)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index bc63bd220865..27414c291e49 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -132,10 +132,15 @@ static void blkg_free_workfn(struct work_struct *wo=
-rk)
->   	if (blkg->parent)
->   		blkg_put(blkg->parent);
->   	spin_lock_irq(&q->queue_lock);
->   	list_del_init(&blkg->q_node);
->   	spin_unlock_irq(&q->queue_lock);
-> +	/*
-> +	 * Release blkcg css ref only after blkg is removed from q->blkg_list,
-> +	 * so concurrent iterators won't see a blkg with a freed blkcg.
-> +	 */
-> +	css_put(&blkg->blkcg->css);
->   	mutex_unlock(&q->blkcg_mutex);
-
-Please move css_put after mutex_unlock, unless there is a strong reason.
-
-With above change, feel free to add:
-
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
-
->  =20
->   	blk_put_queue(q);
->   	free_percpu(blkg->iostat_cpu);
->   	percpu_ref_exit(&blkg->refcnt);
-> @@ -177,12 +182,10 @@ static void __blkg_release(struct rcu_head *rcu)
->   	 * blkg_stat_lock is for serializing blkg stat update
->   	 */
->   	for_each_possible_cpu(cpu)
->   		__blkcg_rstat_flush(blkcg, cpu);
->  =20
-> -	/* release the blkcg and parent blkg refs this blkg has been holding */
-> -	css_put(&blkg->blkcg->css);
->   	blkg_free(blkg);
->   }
->  =20
->   /*
->    * A group is RCU protected, but having an rcu lock does not mean that =
-one
-> @@ -311,10 +314,13 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *bl=
-kcg, struct gendisk *disk,
->   	blkg->iostat_cpu =3D alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask=
-);
->   	if (!blkg->iostat_cpu)
->   		goto out_exit_refcnt;
->   	if (!blk_get_queue(disk->queue))
->   		goto out_free_iostat;
-> +	/* blkg holds a reference to blkcg */
-> +	if (!css_tryget_online(&blkcg->css))
-> +		goto out_put_queue;
->  =20
->   	blkg->q =3D disk->queue;
->   	INIT_LIST_HEAD(&blkg->q_node);
->   	blkg->blkcg =3D blkcg;
->   	blkg->iostat.blkg =3D blkg;
-> @@ -351,10 +357,12 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *bl=
-kcg, struct gendisk *disk,
->  =20
->   out_free_pds:
->   	while (--i >=3D 0)
->   		if (blkg->pd[i])
->   			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
-> +	css_put(&blkcg->css);
-> +out_put_queue:
->   	blk_put_queue(disk->queue);
->   out_free_iostat:
->   	free_percpu(blkg->iostat_cpu);
->   out_exit_refcnt:
->   	percpu_ref_exit(&blkg->refcnt);
-> @@ -379,32 +387,26 @@ static struct blkcg_gq *blkg_create(struct blkcg *b=
-lkcg, struct gendisk *disk,
->   	if (blk_queue_dying(disk->queue)) {
->   		ret =3D -ENODEV;
->   		goto err_free_blkg;
->   	}
->  =20
-> -	/* blkg holds a reference to blkcg */
-> -	if (!css_tryget_online(&blkcg->css)) {
-> -		ret =3D -ENODEV;
-> -		goto err_free_blkg;
-> -	}
-> -
->   	/* allocate */
->   	if (!new_blkg) {
->   		new_blkg =3D blkg_alloc(blkcg, disk, GFP_NOWAIT);
->   		if (unlikely(!new_blkg)) {
->   			ret =3D -ENOMEM;
-> -			goto err_put_css;
-> +			goto err_free_blkg;
->   		}
->   	}
->   	blkg =3D new_blkg;
->  =20
->   	/* link parent */
->   	if (blkcg_parent(blkcg)) {
->   		blkg->parent =3D blkg_lookup(blkcg_parent(blkcg), disk->queue);
->   		if (WARN_ON_ONCE(!blkg->parent)) {
->   			ret =3D -ENODEV;
-> -			goto err_put_css;
-> +			goto err_free_blkg;
->   		}
->   		blkg_get(blkg->parent);
->   	}
->  =20
->   	/* invoke per-policy init */
-> @@ -440,12 +442,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *b=
-lkcg, struct gendisk *disk,
->  =20
->   	/* @blkg failed fully initialized, use the usual release path */
->   	blkg_put(blkg);
->   	return ERR_PTR(ret);
->  =20
-> -err_put_css:
-> -	css_put(&blkcg->css);
->   err_free_blkg:
->   	if (new_blkg)
->   		blkg_free(new_blkg);
->   	return ERR_PTR(ret);
->   }
-
---=20
-Thanks,
-Kuai
+> diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+> index 1db565b376200..d72b9331c2fd1 100644
+> --- a/drivers/md/dm-io.c
+> +++ b/drivers/md/dm-io.c
+> @@ -362,19 +362,26 @@ static void do_region(const blk_opf_t opf, unsigned int region,
+>                         bio->bi_iter.bi_size = num_sectors << SECTOR_SHIFT;
+>                         remaining -= num_sectors;
+>                 } else {
+> -                       while (remaining) {
+> +                       unsigned long byte_remaining = to_bytes(remaining);
+> +
+> +                       while (byte_remaining) {
+>                                 /*
+>                                  * Try and add as many pages as possible.
+>                                  */
+>                                 dp->get_page(dp, &page, &len, &offset);
+> -                               len = min(len, to_bytes(remaining));
+> +                               len = min(len, byte_remaining);
+>                                 if (!bio_add_page(bio, page, len, offset))
+>                                         break;
+> 
+>                                 offset = 0;
+> -                               remaining -= to_sector(len);
+> +                               byte_remaining -= len;
+>                                 dp->next_page(dp);
+>                         }
+> +                       remaining = to_sector(byte_remaining);
+>                 }
+> 
+>                 atomic_inc(&io->count);
+> --
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
