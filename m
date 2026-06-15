@@ -1,104 +1,64 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAF334DB56;
-	Mon, 15 Jun 2026 17:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7961240862E;
+	Mon, 15 Jun 2026 17:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781543087; cv=none; b=Ymi+PTGKMzWF8JcTVF73EXAhbBWkyV676XQLbOinj95wiD3KXcnzHBSYzJQ9YI1CNsQmf+IMQeTd44SNvPWBs/kRlkKUZdVvrG3ze1Da5CgAsp0d+wiRbF5cqUK8nE3NBk1gPtc5MCRhjSXVgiBRFMn7efV9r/hxOt6iDe3Icpg=
+	t=1781543986; cv=none; b=HVInHiN1PymjWid2k83/eGUTe5kOZwLofRCbTZMevE49yNKF4yzZcGtWyTtnugNEYM273S/0Z1RsHXIsiFmQDIdKfdg+VAsSzOBtgz6WIRYUUzcv2uRbzoCs+Y+fz+7mLBCAVrSTILnv4uRHMi/0jC1pHXwUnehBRlHBgsrqExI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781543087; c=relaxed/simple;
-	bh=k9wzEDrn8OWY0tjJOa6e5RtLbGoq+IyJnXkfwU07P80=;
+	s=arc-20240116; t=1781543986; c=relaxed/simple;
+	bh=dvSvu8/1Auv7jdvftDYHlNnsb1ahDhL7Ix2STpwI7HM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QF6uQEQEHg9futom0hrFQOs9iAFBd2WEcfKDttCLlCD6R0Y/uNsPWnjE6MHD5X8PasxdiQqHa54gITg+3IHa1VtAZ+aNpnwCBPcZv1C4K5OpK+yDoWu2/F++GoHEZ6jDbfrui1TsI8VJq+htd6F1Ds5re9OTUVUXD4hh3rbekcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=SLabnQnx; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=oWiFVSxQs+afIyKSjEulSf2smEyXGjdu3rLfXC1QmjV0kkZaBAHrF2SIOo+L1P9lSssHXP7sC9OGEVNE1aXbgcMucdlMSK2R/PwYjm8Qht44w7kYODXvSwhIZXubOvvQmklD0SPmmeka4h6aspTdA2UPgDRK7Jq3ZotxfEaA2RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZ+nTyq7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="SLabnQnx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
-	bh=be/KypQX5Q9fujajARM6Q7r9w26ilWIZmzbrtGfAKys=; b=SLabnQnxi8RKG6kB4YLIrRrIte
-	+jYEaBgX5DOoDOdPOU6k6ypOK6lDxxOMXQzKEUszFj5yTLPDASBaagrmnsOk8tUGdmzHw2XGk68HM
-	2J1tv7+pE0CjbBOIjeYCz0TsyHOIrqFb8Mb1LadfEs+3t0bUVsavfv//KIZ2S3hmTXIBIqEbnE3qn
-	zsd3Hxu29/Ylu8C3lRKI+WwMxWxUWcLIz0u0fTGyYSKAR/XPPXo0Rkv03xUIJElu5cOtap9hCSZj1
-	74eb7LaTsGudBKuTsb4/IH254uFPRDECMTh8XzLqKRh9ykQzpGUZV9OECxDmxcCHO22vobRU+rK1T
-	RNRNGWLQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.2 #2 (Red Hat Linux))
-	id 1wZAjg-00000000Vxn-0xg6;
-	Mon, 15 Jun 2026 17:04:32 +0000
-Date: Mon, 15 Jun 2026 18:04:32 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Vincent Mailhol <mailhol@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>, linux-alpha@vger.kernel.org,
-	Vineet Gupta <vgupta@kernel.org>,
-	linux-snps-arc@lists.infradead.org,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-mips@vger.kernel.org,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	linuxppc-dev@lists.ozlabs.org, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, linux-riscv@lists.infradead.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	linux-s390@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 00/19] init: discoverable root partitions, a.k.a. an
- omittable "root=" cmdline option
-Message-ID: <20260615170432.GW2636677@ZenIV>
-References: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZ+nTyq7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05DB31F000E9;
+	Mon, 15 Jun 2026 17:19:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781543985;
+	bh=Z2tm1zt7+qHSVpBQ0c2Mr4ZDKN4B7CbGgRJQebOQNrA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=eZ+nTyq7qyJBgXaeajz4Mvk74zaupY1RScU6Dzi8XmWyJ5emgQyka+qQ6ThTgv/U2
+	 bkEi/lwLk+wSZZeyvi6YjoO23tbBPOH9BDlSFitPUVApoMr0dCavKnK3ZXQdf/3eZD
+	 5vf+XSuMh2LQk2FLVll+FquoRhqUiUcOOsZFBm5LbGFkapCGHcwYoTSbqienkCpx0D
+	 00t9jVuJZ2iDGfQmIOFSXLM9VlJRMkL2sWFJvZDg79kyJpjHUjrUGdfPKUmEpTJbdG
+	 dFh0uLDgHWctr6y9Khn0ugZ1SeCbp/kYPsgTMuDWhlP2qakM/LSo0MsSaPMY6qr9SJ
+	 mdNNzXFbxzNxA==
+Date: Mon, 15 Jun 2026 11:19:43 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajA0L-u-r4nhbpfl@kbusch-mbp>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <ajAYN_mmjzYBAimV@kbusch-mbp>
+ <ajAb0m9cNraQn2Pw@kbusch-mbp>
+ <ajAqUwo3eTm1c2_J@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <ajAqUwo3eTm1c2_J@gallifrey>
 
-On Mon, Jun 15, 2026 at 06:08:56PM +0200, Vincent Mailhol wrote:
-
-> Tested with GRUB, which implements the LoaderDevicePartUUID EFI variable
-> in its bli module [3]. With this, I was able to boot a kernel with a
-> completely empty cmdline and no initrd.
+On Mon, Jun 15, 2026 at 04:37:39PM +0000, Dr. David Alan Gilbert wrote:
+> Hi Keith,
+>   Thanks for the patch, alas it doesn't seem to be helping here;
+>  the first warn is still the same
+> and it still hangs the test process hard and eventually BUGs at
 > 
-> [1] The Discoverable Partitions Specification (DPS)
-> Link: https://uapi-group.org/specifications/specs/discoverable_partitions_specification/
-> 
-> [2] systemd-gpt-auto-generator
-> Link: https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
-> 
-> [3] GRUB -- §16.2 bli
-> Link: https://www.gnu.org/software/grub/manual/grub/html_node/bli_005fmodule.html
+> void blk_mq_end_request(struct request *rq, blk_status_t error)
+> {
+>         if (blk_update_request(rq, error, blk_rq_bytes(rq)))
+>                 BUG();
 
-So what does that thing, tied to EFI as it is, have to do with architectures where
-	* firmware is rather unlike EFI
-	* firmware wouldn't know what to do with GPT
-	* GRUB is *not* ported to, let alone used
-such as, say it, the very first one mentioned at your [1]?
+Oh, that was not expected.
 
-Or is that conditional upon "if anyone wants to design replacement firmware
-for those, and if they agree to follow our wishlist"?
+What is the dma alignment requirement of your backing devices? You can
+find the attribute for sda at /sys/block/sda/queue/dma_alignment. I'm
+expecting 511, but just want to double check.
