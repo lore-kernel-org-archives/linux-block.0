@@ -1,49 +1,52 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D6730F55F
-	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 13:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220601494A8;
+	Mon, 15 Jun 2026 13:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781530553; cv=none; b=rcvIWnJSu9ryeW5Ra1JbdNvSIhWBem/DaxnYx9ZtyuYsGpJNHjJX8SwvII99+nfUVYWTy8QT8IIg8iH22Amk2XUmmOGWAjOysezq8jngtUheaL+g1FV9QdynEH+lWvFWNorljO7bHfSncoIh318ZjGzEa4KU6AOc2jjdXjDuhqc=
+	t=1781530915; cv=none; b=J3cDzUixAcPXj/de2ueMbcYdnTqkujvu2LEcNuqhGo2sFM07CIRHitr2ZQYuOeObq3I+pmj/bQyTQ4isRcNWqBl0eHiIAWGjClaC3WT5OqUhV0iK8NTOOQiymqhwJHiL+5gNwuydnHgBhaicGi4H6ed4F2+HFUgH0GIdIY+fdM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781530553; c=relaxed/simple;
-	bh=exDgtL21SW+pXLoaCdU+8BfwjjJNAu/It+SXZHwnDoI=;
+	s=arc-20240116; t=1781530915; c=relaxed/simple;
+	bh=ZVEtlPIbNaMZuU3UkfHuPzXBHos9B1wGlGKzdnWW7Fc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mVvLSLs/zqZC64S/3L5sjeBdeYQ1YobN+QVzJ4rMY5LjwTNE4uDfF3Drubi5TIadrLm9glk9cJfhsczipZNQn+zXmnZgbNepLn+huLRgCnvUSbQhg8HTq6dQPMB5iPqK+V9uFNCwC5azFmqoCjpRAi5ze3fVG9y7MZdeuhpqGpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3A8AE68AFE; Mon, 15 Jun 2026 15:35:49 +0200 (CEST)
-Date: Mon, 15 Jun 2026 15:35:49 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk,
-	Keith Busch <kbusch@kernel.org>, Carlos Maiolino <cem@kernel.org>
-Subject: Re: [PATCH] block: check bio split for unaligned bvec
-Message-ID: <20260615133549.GC26132@lst.de>
-References: <20260612223205.465913-1-kbusch@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AzMRhTSLG01rq4h38yR+DwAcpZ2tzWjSM7Oh8shV1VDy3WgHwGbyBHcoHw+/e9NZnKJCFiRITg7BGuGsNS6Rels6a2QzYd0FMpRIkAtIZY7oxWLbZv2WTwINOzNqDXhXMHi1phXBL1wK+H94NdhE4MpF9XqK2H5VYns9yHkWFz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZR2DM75; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZR2DM75"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB711F000E9;
+	Mon, 15 Jun 2026 13:41:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781530913;
+	bh=ZVEtlPIbNaMZuU3UkfHuPzXBHos9B1wGlGKzdnWW7Fc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gZR2DM75YykPorj3Ep23dOyN4iRez39Y1ZQmCTK5D2mAWlX4Z40+tjEOyAgm0YTbb
+	 zb6EHasEUSUIU03oDs46R/emo/Ngplwq2KLf/1da7e9Q9JqPzKPz8OzxgsLMW5hw0F
+	 Z8u9w5XhdHVaMYSVwzrIBtmbtXtk7gukk9gnzkVaY3g6wvLaPvxENc3E8TYFCw9b9T
+	 0YurMfJfR3iUhTWPRnuW1NDhlQwAY6XUb+A6F7ArOYuzPCHxfiscShZ0XhRTu6ItJQ
+	 eY2oMXvaXIreFdEG7NriRZ2ItObqx4Mil1FC75axACdQSDbVt3YhVHJwplJPc06kiV
+	 8wn9toafl/BUA==
+Date: Mon, 15 Jun 2026 15:41:49 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Chris Mason <clm@fb.com>, Jens Axboe <axboe@kernel.dk>, 
+	David Sterba <dsterba@suse.com>, Jan Kara <jack@suse.cz>
+Cc: Naohiro Aota <naohiro.aota@wdc.com>, 
+	Josef Bacik <josef@toxicpanda.com>, linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH RFC 0/6] block,btrfs: fix frozen-superblock strand on
+ device add/remove/replace
+Message-ID: <20260615-hermelin-weltfremd-anrichten-cee9417f4f7f@brauner>
+References: <20260615-work-super-freeze_deny_upstream-v1-0-a6c72b840e7d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260612223205.465913-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20260615-work-super-freeze_deny_upstream-v1-0-a6c72b840e7d@kernel.org>
 
-On Fri, Jun 12, 2026 at 03:32:04PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Offsets and lengths need to be validated against the dma alignment. This
-> check was skipped for sufficiently a small bio with a single bvec, which
-> may allow an invalid request dispatched to the driver. Force the
-> validation for an unaligned bvec by forcing the bio split path that
-> handles this condition.
+> FIFREEZE on the bare device - resolves that holder to freeze the filesystem,
 
-This fix itself looks good, but we'll also need something similar
-for bio-based drivers that never call into the splitting helper.
-
+That's nonsense ofc. FIFREEZE only freezes the superblock.
