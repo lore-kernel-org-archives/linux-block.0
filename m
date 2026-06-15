@@ -1,43 +1,38 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F253D9028;
-	Mon, 15 Jun 2026 15:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415E540313F;
+	Mon, 15 Jun 2026 15:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781535960; cv=none; b=CsugNIn+HmiYwrYdv95Hf2TVIlJ/DB9rmTK/6BTI8NviPdk5xa6DlCvQ35zZPFqfpJ5C/lhCvVFIwe3KPLyBc1RpUHPXQNdjSCqrk/jz4wVH6afzNnVKarmCu9orly/fxtItVs6Q/cq7NkpOvzJPBczxLxHi9bsAD8jDERT7d9U=
+	t=1781536826; cv=none; b=V/dnqeEw/PYi9eJiy9S/oRw3DPbAHJs5kWUCGOJcEup1NvhSUFcAysAiFgGgW7bpAdbAacik2Nl44gogbW1XlX1T/NBemyR0RFoUwWquX8ZDFSWDGst4yzuV+LNldu4z1MyD7x5ZyBsfA1SIFACq54qfS4xMlR+JzrRJqEUDQoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781535960; c=relaxed/simple;
-	bh=i3Oa1SvcqPQmZQwhd4snXFh25HgrJ6dnAxwKziTN6po=;
+	s=arc-20240116; t=1781536826; c=relaxed/simple;
+	bh=avdt4c2mHPT5v2FSu1I85m+T66Wp6hii6Eye7zrlF6E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZsbT1ayCTd+47VnFffb0tAXDBYKn+hsXEluI2YUV5Ky6xLHSf/b/oCgo84YbcG9Dx564JWHkc+I6gtfshAOnJvQc4qajDa7LcwWiHiWipwquBcdk18Z3RvTLpRfVPWswSQCUF39u/jRO6BPmQ+iwX2mJAhi2mDJESOHuacZ5h/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kumsowi3; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=gdBcc7YDN0ozBX/O596BoQXagDFgnLr9utMrg/SiXaA7avNgtlWXMMpgFT+vK9DYDR6ooAjpfkmy084GuhIgU7B0WdE23knir3hTEKchAevb+vfNAK71oYvTpTP8dBauvKTpIQMhNfjzrodliruRVEhUWiIDgyP0O3vDnqxbzTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jvr/8MJf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kumsowi3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GdyZOyXydMikhzAYF55WMP5vDpNHFAUSq7+hJbHZ28Y=; b=kumsowi3PJw/kkp86LIw86azBx
-	whlnIOsjMKv38B5I9Ekf1CTd0rsMnku+zJ/OSyDtNkey0xOdJCkIT9Q4lkiqlG86bRNp9ein06UDF
-	M9vox8qqtNlY2XAMcnN8ZtTrJ1mg/LTnXrnne8i+9LXVxNFraq8heM6aVIjQ1rXW3Rdi2n6Bpm6Yc
-	5VHOGIH8k4oz81kGOU24sD/MiP6S/3Qquwswhgohj8mfVioN/p4e4C2hx17FxVibaD5QmZvGGVYLv
-	QHM24kT5gmIvLXOOjEmcpoL80D+6Ys1bjsjQUs2ysZ4LoAD3LliShnPXbJA2C5bBslbSyomVplYBU
-	7eXy0BCw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wZ8sx-0000000ETda-0AUi;
-	Mon, 15 Jun 2026 15:05:59 +0000
-Date: Mon, 15 Jun 2026 08:05:59 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Qu Wenruo <wqu@suse.com>
-Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] iomap: reject NOWAIT and BOUNCE direct IOs
-Message-ID: <ajAU1yLd32BCiCNj@infradead.org>
-References: <cover.1781253428.git.wqu@suse.com>
- <3d739b6dc37e34ca2a2a3780d12d0288a4060d57.1781253428.git.wqu@suse.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jvr/8MJf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AB431F00A3A;
+	Mon, 15 Jun 2026 15:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781536825;
+	bh=dGPgcbJdO0lRl03JxxXlyEHfZe8b6Vwnet2GCTbESy4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Jvr/8MJfCA/a9Z+fEroNJxIRrD4cGbVvLyGWSHKBFzT5iRUf9llvPm6wyY2NXXQrT
+	 I8rAIjQY7S3Fd2zUBiP2/O6yKFLjg6qltRT/o45cHgQHZRB4m3lkl9sZAR/Azhf0wH
+	 oMuiPrIp7X/EeVBTC6SuuCEqYh2TwAdG339rW5FNDbgIr0Wk4BkEPaw8lXx3IZzdVH
+	 Kk2JLSs8M6BVw4g+oln/A0lj+0mUzVxa83BDM0GJWjm9tT3SLsQ/sdjz/sXhR7Q8Zt
+	 L5f1MaBWU7gj+IftJ33Pj2rak3lATuDdRTp769gmqlcrS/DU9FKnOj0JBFCpanuCfs
+	 EkL0j9QFYjrMQ==
+Date: Mon, 15 Jun 2026 09:20:23 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajAYN_mmjzYBAimV@kbusch-mbp>
+References: <ai7rnH20IYeSmY8s@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,17 +41,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3d739b6dc37e34ca2a2a3780d12d0288a4060d57.1781253428.git.wqu@suse.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ai7rnH20IYeSmY8s@gallifrey>
 
-On Fri, Jun 12, 2026 at 07:21:14PM +0930, Qu Wenruo wrote:
-> If a direct IO requires bounced pages for stable buffer, it will always
-> allocate memory, and both bio_iov_iter_bounce_write() and
-> bio_iov_iter_bounce_read() are allocating pages using GFP_KERNEL, which
-> can sleep and break NOWAIT requirement.
-> 
-> So we need to reject such NOWAIT and BOUNCE direct IO in
-> iomap_dio_bio_iter().
+On Sun, Jun 14, 2026 at 05:57:48PM +0000, Dr. David Alan Gilbert wrote:
+> Jun 14 18:08:32 dalek kernel: device-mapper: raid1: Mirror read failed from 252:24. Trying alternative device.
+> Jun 14 18:08:32 dalek kernel: ------------[ cut here ]------------
+> Jun 14 18:08:32 dalek dmeventd[1010]: Primary mirror device 252:24 read failed.
+> Jun 14 18:08:32 dalek kernel: WARNING: block/bio.c:1044 at bio_add_page+0x18b/0x250, CPU#15: kworker/15:1/369
+> Jun 14 18:08:32 dalek dmeventd[1010]: main-lvol0 is now in-sync.
+> Jun 14 18:08:32 dalek kernel: Modules linked in: nft_masq nft_reject_ipv4 act_csum cls_u32 sch_htb nf_nat_tftp nf_conntrack_tftp bridge stp llc rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reje>
+> Jun 14 18:08:32 dalek kernel:  drm_panel_backlight_quirks gpu_sched drm_suballoc_helper video nvme drm_display_helper nvme_core cec nvme_keyring sp5100_tco nvme_auth wmi serio_raw fuse scsi_dh_alua i2c_dev scsi_dh_rdac scsi_dh_emc
+> Jun 14 18:08:32 dalek kernel: CPU: 15 UID: 0 PID: 369 Comm: kworker/15:1 Not tainted 7.1.0-rc7+ #786 PREEMPT(lazy) 
+> Jun 14 18:08:32 dalek kernel: Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X570 Pro4, BIOS P3.10 07/13/2020
+> Jun 14 18:08:32 dalek kernel: Workqueue: kmirrord do_mirror
+> Jun 14 18:08:32 dalek kernel: RIP: 0010:bio_add_page+0x18b/0x250
+> Jun 14 18:08:32 dalek kernel: Code: 24 10 4c 8b 04 24 84 c0 0f 85 c9 00 00 00 41 0f b7 40 78 48 8b 74 24 08 8b 4c 24 14 e9 b4 fe ff ff 0f 0b 31 c0 e9 55 d1 af 00 <0f> 0b eb f5 48 8b 7f 08 83 7f 60 05 0f 85 00 ff ff ff 49 8b 3b 4c
+> Jun 14 18:08:32 dalek kernel: RSP: 0018:ffffd1fb8176fc10 EFLAGS: 00010246
+> Jun 14 18:08:32 dalek kernel: RAX: 0000000000000000 RBX: ffffd1fb8176fd18 RCX: 0000000000000000
+> Jun 14 18:08:32 dalek kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8d1a8eb28b00
+> Jun 14 18:08:32 dalek kernel: RBP: 0000000000000000 R08: ffffd1fb8176fc38 R09: ffffd1fb8176fc40
+> Jun 14 18:08:32 dalek kernel: R10: ffffd1fb8176fc34 R11: 0000000000000000 R12: 0000000000000000
+> Jun 14 18:08:32 dalek kernel: R13: ffffd1fb8176fd90 R14: 0000000000000001 R15: ffff8d1a8eb28b00
+> Jun 14 18:08:32 dalek kernel: FS:  0000000000000000(0000) GS:ffff8d29d161f000(0000) knlGS:0000000000000000
+> Jun 14 18:08:32 dalek kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> Jun 14 18:08:32 dalek kernel: CR2: 00007f0ddcd7b9d0 CR3: 000000023dcbf000 CR4: 0000000000350ef0
+> Jun 14 18:08:32 dalek kernel: Call Trace:
+> Jun 14 18:08:32 dalek kernel:  <TASK>
+> Jun 14 18:08:32 dalek kernel:  do_region+0x227/0x2a0
 
-That's a bit heavy handed. Just do a noretry allocation.
-
+I think the problem is that do_region is tracking the "remaining" in
+sector granularity, but devices can have dma alignment such that it's
+valid to have sub-sector vectors. Rounding the length appended
+to_sectors() creates a 0 length subtraction, so the loop thinks no
+progress is made and loops forever. If we track it in bytes instead of
+sectors, then that should fix this observation.
