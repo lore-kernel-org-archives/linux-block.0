@@ -1,70 +1,45 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE91211A14
-	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 09:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE5440855
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 10:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781516518; cv=none; b=iBiaUSRFBwdnT3Wvhhfp9xk3Isr3rSevhPOo8IoHsqT9MsnF2dQhdNVb8gwcyq9GQD/PHK3XKQSTCeBj4zOzh1+Tio3MiHRjXnGc3BqNOrSr13R8JFm0F5Dl93jRvJqYeBbneWslxl1xqIhtlpxNNBp3bHPZEWpoCnpwXeWvyEU=
+	t=1781518559; cv=none; b=KqJvj+XeC2EHU+GA4oTI1dT5CLM49x0NU8F/tbkwmoXxI9NFrPsPGQ7reWJgOk4GbGmJWZaZWzYqDujAmO/thYD466TUM+Ol92i5R8GVlQ3dFnQFOHRp8OMZi1hJpwfLe5G+faedJWZxOSPE4GqDqawZ12Wzk3OpmfrS0Lbqgy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781516518; c=relaxed/simple;
-	bh=azJfFqVOB2MaxT88ytf0/OBfidzqNbLjP0eMXeuVpaA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j40X0ZXMlNRg+3rUveZ/zdKMZDMUVOJlZSgZo6zI58NAVzRhDp5GjeDZLq08hH7K6ioiF2trwWP3TIa6hAj+IyJG3SShPaw8sLtajgdQDIC6grxGs3QXem5rVC7gbv5yHCyWDw3mDC4mNF6BfJ1ZneiZu7Ax2iZ8lfTf7Gi+4Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emLNom7J; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emLNom7J"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4908b92904fso38068695e9.0
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 02:41:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781516515; x=1782121315; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+nHWnBYuKAI333Ay4FRBj7Tm6npP4rVtGMWoXA5dsUs=;
-        b=emLNom7JpJYkSk3VOebXDOkbF3IhNDXjCeF8iCnfEO94lcmrpyXn7QjLELKD58rtMa
-         cmwtj1fTvehQ4/l360zhFUmkplr/j1UMjUvupRkbBicd3BnrSKR3f47fJe24h/3b2QdK
-         R4SrlxrpKc8/WbC+nGh+LrivOeJUC2ThqfznptguHd04JwDeVzHEbshgY/KPg79hfMPL
-         mRosICK8QkyCTzrPIy7QTi0XxTrQpNUuxV0elenp4S3+s0YTbUlTOlyyhOgkfn8TYXdr
-         wcs2rNaXRLmepHpL2YVLKRoVSIpqzaX6F+m2JD7R8gPT7B5/ujdoXBhlikObaRtEEwhi
-         2f6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781516515; x=1782121315;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+nHWnBYuKAI333Ay4FRBj7Tm6npP4rVtGMWoXA5dsUs=;
-        b=YK8d12eQVxOUQ3bI4RXi7/qVSkDK3NPRX5ATWp4zygbqHlhUlKE/5/bg/4trWg7YpO
-         TFB7zYYYs/4dBLrIbhX3Clis+R3WY4giyXwtkzv/ZKZKz9QM50MmyIMrPiBwTEQ8BaWn
-         XSfMpyM8oNqE/XBmr+4IVMSyuphX+lMQktREchflgIOvYt3K1EdSHl8i8Tzoa9gi98F/
-         hIIzysvlUxTCxTvW1HjUo2Ep81ChTy/x67ywDGry9/Oxv1YHrjTH49dP3DUohWVHbMP3
-         XKpwqTwM52zaurUKBgI6ULF/xIDEmuhxrK5hVtdk3epKAw/MM0taPUtYt1Lim+sWyKW6
-         +liA==
-X-Gm-Message-State: AOJu0YxTkmvSW12aGqgJlPslLlJ1yi2IXooxT8YJoBEBVFj2an4Aha2B
-	hmDGCki9oDogZDh9wFjpn/VQ7AhjKMY5PQefAcYa8vPjml5fDcI78PlN
-X-Gm-Gg: Acq92OEUCklygx+AZpRmnuQnPdVw2E/NuIvQvJLQIBywOrNZvyIWDjmA5FNBshCJiUP
-	Ab64/lBiNb38KMNXrFfCS84Hcd8Nauo33lXgKCTERW8r2b2KEiijvt8JfCkMp1dn8NLCnSNigrO
-	Gol0k38rE+Lx4gu95oM7vRhFHfN/OpUQxdiZ6updIQv5CRbamtBXlGh0NNjcdkO1Vtr9vnqYnl8
-	UufitPNshzNocpcrnVebBrn32zF7dfj055LAyaPXkvA032x+LW6eA/H3x27OlLV4fdW+cT5+KlB
-	24lu70RvIH5k5vM/q41P6tMRu3n7/zlMge4OJopZqv0lpqif/rzmKPrUHp/hTu30HZ+o6NoqCRE
-	9RZe51QIeopLaKEU2fvc24zUQYkDX5yuiZ7a5pU3DGfI8cBaWIlTjU6BJYKKu5BmIDvtcjxmX6B
-	kopFKwt80Djrk8wBP3BYSe1l1q31iuH/IJFQ2AcSxwj9WByR2N+VT0eCoM24mSSY83xHC7PeJYl
-	rtKeDPe33yk2rujZ5FmLL93pczFX/fp9eHkCCx61Hz/eec=
-X-Received: by 2002:a05:600c:314a:b0:490:b8c0:d470 with SMTP id 5b1f17b1804b1-490ec504d5dmr161971375e9.19.1781516514793;
-        Mon, 15 Jun 2026 02:41:54 -0700 (PDT)
-Received: from localhost.suse.org (apn-78-30-82-184.dynamic.gprs.plus.pl. [78.30.82.184])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922031b7d2sm254353105e9.5.2026.06.15.02.41.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 02:41:54 -0700 (PDT)
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
-To: shinichiro.kawasaki@wdc.com
-Cc: linux-block@vger.kernel.org,
-	Sebastian Chlad <sebastian.chlad@suse.com>
-Subject: [PATCH blktests] ublk: mark all tests as QUICK
-Date: Mon, 15 Jun 2026 11:41:44 +0200
-Message-ID: <20260615094144.13060-1-sebastian.chlad@suse.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1781518559; c=relaxed/simple;
+	bh=NpsdyRmK3L8M0XC046O1IxlMJfcISnJG/M5eT8pjs3c=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=qJCW5rAEILKI9oOP+b3HePckj6PLgKohFMz0fLUAxlIQaNQQCVi1Xxt248RB84MsI6S2bzpcmU2VsCEOeCShrt6yW5NI3n+XgEcBthgABI5sv4SBmc5UArkF/Wa7rRC0nSqcFbiJjaf1AlAAPMQoxZXGsPq4sHcDyv1VqwEMCOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 2ed4743468a311f1aa26b74ffac11d73-20260615
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:fbc60c4a-90f5-45b1-ab59-a4ecef250638,IP:0,U
+	RL:0,TC:0,Content:0,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:e7bac3a,CLOUDID:9b942d939dfe923db547b91326ff20a1,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
+	DM:2,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
+	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 2ed4743468a311f1aa26b74ffac11d73-20260615
+X-User: lijun01@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <lijun01@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 772248616; Mon, 15 Jun 2026 18:15:49 +0800
+From: Li Jun <lijun01@kylinos.cn>
+To: lijun01@kylinos.cn,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Subject: [PATCH] block: genhd: Add NULL check for kobject_create_and_add in genhd_device_init
+Date: Mon, 15 Jun 2026 18:15:41 +0800
+Message-Id: <20260615101541.1094509-1-lijun01@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,94 +48,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These tests are quick to run so mark them accordingly to ensure
-they are included in quick runs.
+The kobject_create_and_add() call in genhd_device_init() may return NULL
+if memory allocation fails, but the return value was not being checked.
+This could lead to NULL pointer dereferences in subsequent calls to
+sysfs_create_link() and sysfs_remove_link() which use block_depr.
 
-Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
+Add proper error checking and cleanup path to handle the case when
+kobject_create_and_add() fails.
+
+Fixes: 721da5cee9d4 ("driver core: remove CONFIG_SYSFS_DEPRECATED
+	and CONFIG_SYSFS_DEPRECATED_V2")
+Signed-off-by: Li Jun <lijun01@kylinos.cn>
 ---
+ block/genhd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-I checked locally - all tests execute well below 10 seconds
-
- tests/ublk/001 | 1 +
- tests/ublk/002 | 1 +
- tests/ublk/003 | 1 +
- tests/ublk/004 | 1 +
- tests/ublk/005 | 1 +
- tests/ublk/006 | 1 +
- 6 files changed, 6 insertions(+)
-
-diff --git a/tests/ublk/001 b/tests/ublk/001
-index 3435316..c994cff 100755
---- a/tests/ublk/001
-+++ b/tests/ublk/001
-@@ -7,6 +7,7 @@
- . tests/ublk/rc
+diff --git a/block/genhd.c b/block/genhd.c
+index 7d4ee5972338..60569d59cd53 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1005,7 +1005,15 @@ static int __init genhd_device_init(void)
  
- DESCRIPTION="test ublk delete"
-+QUICK=1
+ 	/* create top-level block dir */
+ 	block_depr = kobject_create_and_add("block", NULL);
++	if (!block_depr) {
++		error = -ENOMEM;
++		goto out_class_unregister;
++	}
+ 	return 0;
++
++out_class_unregister:
++	class_unregister(&block_class);
++	return error;
+ }
  
- _run() {
- 	local type=$1
-diff --git a/tests/ublk/002 b/tests/ublk/002
-index ca357b6..aaea4a7 100755
---- a/tests/ublk/002
-+++ b/tests/ublk/002
-@@ -7,6 +7,7 @@
- . tests/ublk/rc
- 
- DESCRIPTION="test ublk crash with delete after dead confirmation"
-+QUICK=1
- 
- _run() {
- 	local type=$1
-diff --git a/tests/ublk/003 b/tests/ublk/003
-index e366813..40bbd6f 100755
---- a/tests/ublk/003
-+++ b/tests/ublk/003
-@@ -7,6 +7,7 @@
- . tests/ublk/rc
- 
- DESCRIPTION="test mounting block device exported by ublk"
-+QUICK=1
- 
- requires() {
- 	_have_program mkfs.ext4
-diff --git a/tests/ublk/004 b/tests/ublk/004
-index 1d74fea..6812431 100755
---- a/tests/ublk/004
-+++ b/tests/ublk/004
-@@ -7,6 +7,7 @@
- . tests/ublk/rc
- 
- DESCRIPTION="test ublk crash with delete just after daemon kill"
-+QUICK=1
- 
- _run() {
- 	local type=$1
-diff --git a/tests/ublk/005 b/tests/ublk/005
-index 1e21674..69c1fca 100755
---- a/tests/ublk/005
-+++ b/tests/ublk/005
-@@ -9,6 +9,7 @@
- . tests/ublk/rc
- 
- DESCRIPTION="test ublk recovery with one time daemon kill"
-+QUICK=1
- 
- _run() {
- 	local type=$1
-diff --git a/tests/ublk/006 b/tests/ublk/006
-index 85087bd..2a4d886 100755
---- a/tests/ublk/006
-+++ b/tests/ublk/006
-@@ -9,6 +9,7 @@
- . tests/ublk/rc
- 
- DESCRIPTION="test ublk recovery with two times daemon kill"
-+QUICK=1
- 
- _run() {
- 	local type=$1
+ subsys_initcall(genhd_device_init);
 -- 
-2.51.0
+2.25.1
 
