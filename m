@@ -1,65 +1,42 @@
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720FB3E4C90;
-	Mon, 15 Jun 2026 11:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A060537DEA8;
+	Mon, 15 Jun 2026 12:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781522117; cv=none; b=gO6x9AZUbDWDfrAT5EiZrCDpgROGQYrd0vCCVVq4sIHUuleoi9QpyEHEx1LI6MAHnPoTC+cwoyA+bNqwJ42uQNMuFqBbecPrp1CQXbm1FMtiWWsWiSk3dmuOG4UguWk1gcCvy4EaEvz3Ui21Xd846Re/P5Nvlt6MsSitjCaE7m0=
+	t=1781524955; cv=none; b=eFCu9I0PXZ043O+LEsXTwWQKKTUoBrgqWgiUhbto/KdfzPKNXi+Zsrk5sbNLKX9/+aw8WYku4O29QmX879zYI8AZUlCuOB47C5oZ4eKqx8BvavvLfVtwIeoIrR3atBPrB2t/ipLND3JVL4sBFNQQGZ81bB1aMLy+b4ROCbG0jp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781522117; c=relaxed/simple;
-	bh=uQiyN8t7p9nQW1IMu+mO8bn1XhFA4KngcqsORwXAro0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CrR59kBjOm4TcpH8uNBWgZnlYMduY/2EwPz0qWNqOMLG+9kGvZcW+3S/1NJPCfA3Ht/MmngVX8WSWD9OKaBXc4b9IAedoa76Cv4ETM4fgzDbUwirzjNdwSQ+KdiZwFI+5M872VLvFuOGdDIyWk/J0ooxsJWhDiz7AZokZ9NP8xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=DBt3ZZDn; arc=none smtp.client-ip=52.34.181.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="DBt3ZZDn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1781522115; x=1813058115;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NjpRuBDzwnF/oxt/9bz6BzPrWShPwF5Q2t06bXONSaU=;
-  b=DBt3ZZDnveQ32c6fWZgQBspv2IwWRpjuoGeSyUza3OGhnQ/e0PWxrq0R
-   ttGVkrSBVtPEvQw7N3UVXPOUq1EfwuyrSSalZu29inYLrNETL/FGkJrVK
-   0AK4uVe1fM2r7sNNV48++mdsTKLsG5wG1K8zHIfYEj2UHmTLYRFIOyj68
-   0UBVnSLv3y6a6+9D4vVsrEwDfBKntyBeDswaQDxjHbMsOKALQ3iQ80A8M
-   Z+i5+Rmyr4vElZkGRZTGvFrrhUSgeCZC0T1sun+HXmOCDwm2qUu+XLXns
-   DnNNEQCgqmmeuRlVVxdPFTm2t3XThKKvYLxftc9v6X4D2qHKepTy0valk
-   Q==;
-X-CSE-ConnectionGUID: i5ZV05s+TXyj2x7YIgBhog==
-X-CSE-MsgGUID: vATTV8ktTNuqyc+zRv4n+Q==
-X-IronPort-AV: E=Sophos;i="6.24,206,1774310400"; 
-   d="scan'208";a="21752868"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 11:15:10 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:21120]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.145:2525] with esmtp (Farcaster)
- id db16f6ed-c9c7-4e4b-833d-fe9eb1a21f29; Mon, 15 Jun 2026 11:15:10 +0000 (UTC)
-X-Farcaster-Flow-ID: db16f6ed-c9c7-4e4b-833d-fe9eb1a21f29
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 15 Jun 2026 11:15:10 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 15 Jun 2026 11:15:08 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Eric
- Biggers" <ebiggers@kernel.org>, Jens Axboe <axboe@kernel.dk>, Horia Geanta
-	<horia.geanta@nxp.com>, Gilad Ben-Yossef <gilad@benyossef.com>,
-	<linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>,
-	<linux-block@vger.kernel.org>
-Subject: [PATCH v4 2/3] crypto: testmgr - test for multi-data-unit dispatch
-Date: Mon, 15 Jun 2026 11:14:58 +0000
-Message-ID: <20260615111459.9452-3-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260615111459.9452-1-lravich@amazon.com>
-References: <20260615111459.9452-1-lravich@amazon.com>
+	s=arc-20240116; t=1781524955; c=relaxed/simple;
+	bh=hDXEzZqbtAzr/uSpgHSfGFAWMMKzIXHwxmJ+XLj8vr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DaqEDKLJS8yLxKVjCfWAGxDbpGv91cZmO/VuebiKlSXSveBZTfXIXR6MenoNQ+pzyFUNlN66XxsQe4PpqV0V2/0w6PkOZ6/cWL2/1Xql0EbxxgU8OW4jZsrGoNxgmJejLfJexHVUVQAm/jlLE0HhfsQxk9Zvu8eO22s71ZOG28Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gf7yG35D8zKHMRX;
+	Mon, 15 Jun 2026 20:01:42 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 8601F4058D;
+	Mon, 15 Jun 2026 20:02:27 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with SMTP id cCh0CgA3hzzQ6S9qu2+JBw--.21839S4;
+	Mon, 15 Jun 2026 20:02:25 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	linux-block@vger.kernel.org
+Cc: cgroups@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	yukuai@fnnas.com,
+	houtao1@huawei.com,
+	wozizhi@huaweicloud.com
+Subject: [PATCH V2] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
+Date: Mon, 15 Jun 2026 19:55:56 +0800
+Message-ID: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,246 +44,212 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-CM-TRANSID:cCh0CgA3hzzQ6S9qu2+JBw--.21839S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxKrWfAr4DJF47Ww1fKFWrGrg_yoW7CFyDpF
+	ZxWrZay3yxKry2qa15Xr17X34Fvw48tr1rGrW8Gw4Y9F4ayr92qF1UurWkZFWxZFZ7Ar43
+	Ar4vqF1qyF48CwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Add a test that runs on every skcipher with ivsize == 16.  It
-encrypts random plaintext two ways and compares:
+From: Zizhi Wo <wozizhi@huawei.com>
 
-  1. one batched request with skcipher_request_set_data_unit_size()
-     set, over a deliberately fragmented scatterlist whose entries do
-     not align to the data-unit size (so per-DU views cross SG entries
-     and exercise the scatter_walk cursor), and
-  2. an independent reference of N single-DU requests with IVs walked
-     as a 128-bit LE counter, matching the convention documented in
-     skcipher_request_set_data_unit_size().
+[BUG]
+Our fuzz testing triggered a blkcg use-after-free issue:
 
-The two must produce byte-identical ciphertext; this pins the IV
-convention rather than only checking encrypt/decrypt symmetry.  The
-batched ciphertext is then round-tripped back to plaintext, and the
-caller IV is checked unchanged.  Iterates over typical data unit
-sizes (512, 1024, 2048, 4096).
+  BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
+  Call Trace:
+  ...
+  blkcg_deactivate_policy+0x244/0x4d0
+  ioc_rqos_exit+0x44/0xe0
+  rq_qos_exit+0xba/0x120
+  __del_gendisk+0x50b/0x800
+  del_gendisk+0xff/0x190
+  ...
 
-Algorithms the validator rejects for multi-DU return -EOPNOTSUPP on
-the first call and skip cleanly; a genuine mismatch returns -EBADMSG
-so it cannot be confused with a skip.
+[CAUSE]
+process1						process2
+cgroup_rmdir
+...
+  css_killed_work_fn
+    offline_css
+    ...
+      blkcg_destroy_blkgs
+      ...
+        __blkg_release
+	  css_put(&blkg->blkcg->css)
+          blkg_free
+	    INIT_WORK(xxx, blkg_free_workfn)
+	    schedule_work
+    css_put
+    ...
+      blkcg_css_free
+        kfree(blkcg)--------blkcg has been freed!!!
+====================================schedule_work
+              blkg_free_workfn
+							__del_gendisk
+							  rq_qos_exit
+							    ioc_rqos_exit
+							      blkcg_deactivate_policy
+							        mutex_lock(&q->blkcg_mutex)
+								spin_lock_irq(&q->queue_lock)
+							        list_for_each_entry(blkg, xxx)
+								  blkcg = blkg->blkcg
+								  spin_lock(&blkcg->lock)-------UAF!!!
+	        mutex_lock(&q->blkcg_mutex)
+	        spin_lock_irq(&q->queue_lock)
+	        /* Only then is the blkg removed from the list */
+	        list_del_init(&blkg->q_node)
 
-Signed-off-by: Leonid Ravich <lravich@amazon.com>
+As a result, a blkg can still be reachable through q->blkg_list while
+its ->blkcg has already been freed.
+
+[Fix]
+Fix this by deferring the blkcg css_put() until after the blkg has been
+unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
+blkcg outlives every blkg still reachable through q->blkg_list, so any
+iterator holding q->queue_lock is guaranteed to observe a valid
+blkg->blkcg.
+
+While at it, move css_tryget_online() from blkg_create() into blkg_alloc()
+so that the css reference is owned by the alloc/free pair rather than
+straddling layers:
+blkg_alloc()  <-> blkg_free()
+blkg_create() <-> blkg_destroy()
+
+Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
+Suggested-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
- crypto/testmgr.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 192 insertions(+)
+v2:
+ - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
+   css reference follows the blkg's own lifetime, making the put in
+   blkg_free_workfn() symmetric with the get in blkg_alloc().
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4d86efae65b2..5cbd0f4b070e 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3211,6 +3211,194 @@ static int test_skcipher(int enc, const struct cipher_test_suite *suite,
- 	return 0;
+v1: https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweicloud.com/
+
+ block/blk-cgroup.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index bc63bd220865..27414c291e49 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -132,10 +132,15 @@ static void blkg_free_workfn(struct work_struct *work)
+ 	if (blkg->parent)
+ 		blkg_put(blkg->parent);
+ 	spin_lock_irq(&q->queue_lock);
+ 	list_del_init(&blkg->q_node);
+ 	spin_unlock_irq(&q->queue_lock);
++	/*
++	 * Release blkcg css ref only after blkg is removed from q->blkg_list,
++	 * so concurrent iterators won't see a blkg with a freed blkcg.
++	 */
++	css_put(&blkg->blkcg->css);
+ 	mutex_unlock(&q->blkcg_mutex);
+ 
+ 	blk_put_queue(q);
+ 	free_percpu(blkg->iostat_cpu);
+ 	percpu_ref_exit(&blkg->refcnt);
+@@ -177,12 +182,10 @@ static void __blkg_release(struct rcu_head *rcu)
+ 	 * blkg_stat_lock is for serializing blkg stat update
+ 	 */
+ 	for_each_possible_cpu(cpu)
+ 		__blkcg_rstat_flush(blkcg, cpu);
+ 
+-	/* release the blkcg and parent blkg refs this blkg has been holding */
+-	css_put(&blkg->blkcg->css);
+ 	blkg_free(blkg);
  }
  
-+/* Increment a 16-byte IV as a little-endian 128-bit counter. */
-+static void test_mdu_iv_inc(u8 iv[16])
-+{
-+	int i;
-+
-+	for (i = 0; i < 16; i++)
-+		if (++iv[i])
-+			break;
-+}
-+
-+/*
-+ * Encrypt one du_size block with a plain single-DU request; used to
-+ * build an independent reference for the batched dispatch.
-+ */
-+static int test_mdu_ref_encrypt(struct crypto_skcipher *tfm, const u8 *in,
-+				u8 *out, unsigned int du_size, const u8 iv[16])
-+{
-+	struct skcipher_request *req;
-+	struct scatterlist sg_in, sg_out;
-+	DECLARE_CRYPTO_WAIT(wait);
-+	u8 ivbuf[16];
-+	int err;
-+
-+	req = skcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+	memcpy(ivbuf, iv, 16);
-+	memcpy(out, in, du_size);
-+	sg_init_one(&sg_in, out, du_size);
-+	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+				      CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      crypto_req_done, &wait);
-+	skcipher_request_set_crypt(req, &sg_in, &sg_in, du_size, ivbuf);
-+	err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
-+	skcipher_request_free(req);
-+	return err;
-+}
-+
-+/*
-+ * Build a deliberately fragmented SG over @buf: entries that do not
-+ * align to du_size, so the splitter's per-DU views cross SG entries
-+ * and exercise the scatter_walk cursor.
-+ */
-+static void test_mdu_sg_fragment(struct scatterlist *sg, unsigned int nents,
-+				 u8 *buf, unsigned int total)
-+{
-+	unsigned int chunk = total / nents;
-+	unsigned int off = 0, i;
-+
-+	sg_init_table(sg, nents);
-+	for (i = 0; i < nents; i++) {
-+		unsigned int len = (i == nents - 1) ? total - off : chunk;
-+
-+		sg_set_buf(&sg[i], buf + off, len);
-+		off += len;
-+	}
-+}
-+
-+/*
-+ * Multi-DU test: verify the batched dispatch produces byte-identical
-+ * ciphertext to an independent N x single-DU reference with per-DU IVs
-+ * walked as a 128-bit LE counter (pins the IV convention, not just
-+ * enc/dec symmetry), over a fragmented SG, then round-trips.  Real
-+ * mismatches return -EBADMSG; ineligible algorithms skip via the
-+ * validator's -EOPNOTSUPP.
-+ */
-+#define TEST_MDU_NR_UNITS	4
-+#define TEST_MDU_NR_FRAGS	5
-+static int test_skcipher_multi_du_one(struct crypto_skcipher *tfm,
-+				      unsigned int du_size)
-+{
-+	const char *driver = crypto_skcipher_driver_name(tfm);
-+	const unsigned int total = du_size * TEST_MDU_NR_UNITS;
-+	struct skcipher_request *req = NULL;
-+	struct scatterlist sg[TEST_MDU_NR_FRAGS];
-+	DECLARE_CRYPTO_WAIT(wait);
-+	u8 iv_orig[16], iv_work[16], iv_ref[16];
-+	u8 *plain = NULL, *buf = NULL, *ref = NULL;
-+	unsigned int u;
-+	int err;
-+
-+	plain = kmalloc(total, GFP_KERNEL);
-+	buf = kmalloc(total, GFP_KERNEL);
-+	ref = kmalloc(total, GFP_KERNEL);
-+	req = skcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!plain || !buf || !ref || !req) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	get_random_bytes(plain, total);
-+	get_random_bytes(iv_orig, sizeof(iv_orig));
-+
-+	/* Reference: per-DU single requests with LE128-walked IVs. */
-+	memcpy(iv_ref, iv_orig, sizeof(iv_orig));
-+	for (u = 0; u < TEST_MDU_NR_UNITS; u++) {
-+		err = test_mdu_ref_encrypt(tfm, plain + u * du_size,
-+					   ref + u * du_size, du_size, iv_ref);
-+		/* First single-DU call reveals an ineligible algorithm. */
-+		if (err == -EOPNOTSUPP && u == 0)
-+			goto out;
-+		if (err) {
-+			pr_err("alg: skcipher: %s multi-DU ref encrypt failed (du=%u): %d\n",
-+			       driver, du_size, err);
-+			goto out;
-+		}
-+		test_mdu_iv_inc(iv_ref);
-+	}
-+
-+	/* Batched: one request over a fragmented SG. */
-+	memcpy(buf, plain, total);
-+	memcpy(iv_work, iv_orig, sizeof(iv_orig));
-+	test_mdu_sg_fragment(sg, TEST_MDU_NR_FRAGS, buf, total);
-+	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+				      CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      crypto_req_done, &wait);
-+	skcipher_request_set_crypt(req, sg, sg, total, iv_work);
-+	skcipher_request_set_data_unit_size(req, du_size);
-+	err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
-+	if (err == -EOPNOTSUPP)
-+		goto out;
-+	if (err) {
-+		pr_err("alg: skcipher: %s multi-DU encrypt failed (du=%u): %d\n",
-+		       driver, du_size, err);
-+		goto out;
-+	}
-+	if (memcmp(buf, ref, total) != 0) {
-+		pr_err("alg: skcipher: %s multi-DU ciphertext differs from single-DU reference (du=%u)\n",
-+		       driver, du_size);
-+		err = -EBADMSG;
-+		goto out;
-+	}
-+	/* req->iv must be unchanged after multi-DU dispatch. */
-+	if (memcmp(iv_work, iv_orig, sizeof(iv_orig)) != 0) {
-+		pr_err("alg: skcipher: %s multi-DU encrypt mutated caller IV (du=%u)\n",
-+		       driver, du_size);
-+		err = -EBADMSG;
-+		goto out;
-+	}
-+
-+	/* Round-trip the batched ciphertext back to plaintext. */
-+	test_mdu_sg_fragment(sg, TEST_MDU_NR_FRAGS, buf, total);
-+	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+				      CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      crypto_req_done, &wait);
-+	skcipher_request_set_crypt(req, sg, sg, total, iv_work);
-+	skcipher_request_set_data_unit_size(req, du_size);
-+	err = crypto_wait_req(crypto_skcipher_decrypt(req), &wait);
-+	if (err) {
-+		pr_err("alg: skcipher: %s multi-DU decrypt failed (du=%u): %d\n",
-+		       driver, du_size, err);
-+		goto out;
-+	}
-+	if (memcmp(buf, plain, total) != 0) {
-+		pr_err("alg: skcipher: %s multi-DU round-trip mismatch (du=%u)\n",
-+		       driver, du_size);
-+		err = -EBADMSG;
-+	}
-+
-+out:
-+	skcipher_request_free(req);
-+	kfree(ref);
-+	kfree(buf);
-+	kfree(plain);
-+	return err;
-+}
-+
-+static int test_skcipher_multi_du(struct crypto_skcipher *tfm)
-+{
-+	static const unsigned int du_sizes[] = { 512, 1024, 2048, 4096 };
-+	unsigned int j;
-+	int err;
-+
-+	if (crypto_skcipher_ivsize(tfm) != 16)
-+		return 0;
-+
-+	for (j = 0; j < ARRAY_SIZE(du_sizes); j++) {
-+		err = test_skcipher_multi_du_one(tfm, du_sizes[j]);
-+		/* Ineligible algorithms skip; real failures propagate. */
-+		if (err == -EOPNOTSUPP)
-+			return 0;
-+		if (err)
-+			return err;
-+		cond_resched();
-+	}
-+	return 0;
-+}
-+
- static int alg_test_skcipher(const struct alg_test_desc *desc,
- 			     const char *driver, u32 type, u32 mask)
- {
-@@ -3259,6 +3447,10 @@ static int alg_test_skcipher(const struct alg_test_desc *desc,
- 	if (err)
- 		goto out;
+ /*
+  * A group is RCU protected, but having an rcu lock does not mean that one
+@@ -311,10 +314,13 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
+ 	if (!blkg->iostat_cpu)
+ 		goto out_exit_refcnt;
+ 	if (!blk_get_queue(disk->queue))
+ 		goto out_free_iostat;
++	/* blkg holds a reference to blkcg */
++	if (!css_tryget_online(&blkcg->css))
++		goto out_put_queue;
  
-+	err = test_skcipher_multi_du(tfm);
-+	if (err)
-+		goto out;
-+
- 	err = test_skcipher_vs_generic_impl(desc->generic_driver, req, tsgls);
- out:
- 	free_cipher_test_sglists(tsgls);
+ 	blkg->q = disk->queue;
+ 	INIT_LIST_HEAD(&blkg->q_node);
+ 	blkg->blkcg = blkcg;
+ 	blkg->iostat.blkg = blkg;
+@@ -351,10 +357,12 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 
+ out_free_pds:
+ 	while (--i >= 0)
+ 		if (blkg->pd[i])
+ 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
++	css_put(&blkcg->css);
++out_put_queue:
+ 	blk_put_queue(disk->queue);
+ out_free_iostat:
+ 	free_percpu(blkg->iostat_cpu);
+ out_exit_refcnt:
+ 	percpu_ref_exit(&blkg->refcnt);
+@@ -379,32 +387,26 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+ 	if (blk_queue_dying(disk->queue)) {
+ 		ret = -ENODEV;
+ 		goto err_free_blkg;
+ 	}
+ 
+-	/* blkg holds a reference to blkcg */
+-	if (!css_tryget_online(&blkcg->css)) {
+-		ret = -ENODEV;
+-		goto err_free_blkg;
+-	}
+-
+ 	/* allocate */
+ 	if (!new_blkg) {
+ 		new_blkg = blkg_alloc(blkcg, disk, GFP_NOWAIT);
+ 		if (unlikely(!new_blkg)) {
+ 			ret = -ENOMEM;
+-			goto err_put_css;
++			goto err_free_blkg;
+ 		}
+ 	}
+ 	blkg = new_blkg;
+ 
+ 	/* link parent */
+ 	if (blkcg_parent(blkcg)) {
+ 		blkg->parent = blkg_lookup(blkcg_parent(blkcg), disk->queue);
+ 		if (WARN_ON_ONCE(!blkg->parent)) {
+ 			ret = -ENODEV;
+-			goto err_put_css;
++			goto err_free_blkg;
+ 		}
+ 		blkg_get(blkg->parent);
+ 	}
+ 
+ 	/* invoke per-policy init */
+@@ -440,12 +442,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+ 
+ 	/* @blkg failed fully initialized, use the usual release path */
+ 	blkg_put(blkg);
+ 	return ERR_PTR(ret);
+ 
+-err_put_css:
+-	css_put(&blkcg->css);
+ err_free_blkg:
+ 	if (new_blkg)
+ 		blkg_free(new_blkg);
+ 	return ERR_PTR(ret);
+ }
 -- 
-2.47.3
+2.52.0
 
