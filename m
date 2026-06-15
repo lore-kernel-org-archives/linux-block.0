@@ -1,173 +1,203 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB2329BDBB;
-	Mon, 15 Jun 2026 20:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E5E3B47D3;
+	Mon, 15 Jun 2026 20:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781554165; cv=none; b=OEUNWmDb/0FdvUqNLDEsVM7WKnWMVj6Q3aWDn7VKXyqaSm/wUxYC4wPYkTgmBObLZr3YQKM0t3vT8g1Lb+nZx3gQk3FUfR+n6G07+03jEpmMqcd9FTk0rPMQcK0aQugNTVhlLHyzuvSxHFk6Deo6Fa+/+lrYQVNdV8nGLD1ah64=
+	t=1781554786; cv=none; b=tHW6He1yrH+OFmtvvQZAEHd7KdPeQyfmsqwr/qFsPekGk0wwBdwcK6J6tN9FwviaZztCjgLIxOqdlEaKv4jL3bTJCTOf+li2+hEujvSsj9oi/9jq/5W9+o8jXJPp5+3hCZ0B/zSnMAoo7pQusHUpa9AcQYJZrR3kmw+XbhtrWR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781554165; c=relaxed/simple;
-	bh=tSs2qRaNnzRJ5YYbjRMZFlsY6LW0L1FgXhiTZaYrr08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpxR1lS131aNFMaxcuehL6isSWL0HM/DLmuAraEuPtbvLLZIkb/x92LdtnRWy5SCGWZXRkscCCtu2/2OeK8M8HXcvG4xKNO4kzq1xI0pZCusMj5rIiMATH+AccGSvffaZgeGWACcKtiIOnswSb+72spRwfGr8qmtxDn1I0LbJn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iX/IoOhh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781554786; c=relaxed/simple;
+	bh=PSFbqizfoRxpJ9SdU+0UN+tMF2SLn8/ZW6Ggy3kS+BU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p6QNtPLUQvSbdKTKgekf+CZYQlG2dwvDHJvSqgtcYi3jmjjKHZQ8ExWiqGdBl6DsRsUZUE6NC19acu2WKmB5JpyAVLR/XD0jSIh51vFoX05ifW7C9DUX0smHwT+cIkkaUkdPSSMUeJTgYlL18ey79IyfVOvwiyqtWnwgRT9iF14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiQuj6Dv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iX/IoOhh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E1E1F000E9;
-	Mon, 15 Jun 2026 20:09:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiQuj6Dv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEFC01F000E9;
+	Mon, 15 Jun 2026 20:19:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781554163;
-	bh=wRM/WXOkYOKh+4JQuuVRGyzwmONOzjZ44ML9KD6gb8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iX/IoOhhGGEH6jOnE2wT1iChsVfdz02XSJ1YuPTm9po53Pa8vv+elrfwJ9eV8Hf9T
-	 QqIrwZXrhza+OyOskZO5m7kWgJwqZV6ZaTz5hA5JwtMaTGtrj2y3Qw1ybqOLxbY0gG
-	 Xhie2QLaCCqoFzM8Oha06UCFRkhqI2uoMH1Ugy3oqArYZrlB7S+FFBGaCW4g2zwBEW
-	 d2FRkgNt114lnXtK7RgWwPBWwAjRN9eMO7zEgtvpiH87bUMm3LIZBaY7cvPxuPEJZH
-	 4g4XoTFcToyWtU9b95Mu3m80n+qpnobltkZFNmkBxQ9407u/etJ+2GZtgSWMz8laAB
-	 OxOy0MICeK6hA==
-Date: Mon, 15 Jun 2026 14:09:22 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: "Dr. David Alan Gilbert" <linux@treblig.org>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
-Message-ID: <ajBb8tK-0aJBpIgF@kbusch-mbp>
-References: <ai7rnH20IYeSmY8s@gallifrey>
- <ajAYN_mmjzYBAimV@kbusch-mbp>
- <ajAb0m9cNraQn2Pw@kbusch-mbp>
- <ajAqUwo3eTm1c2_J@gallifrey>
- <ajA0L-u-r4nhbpfl@kbusch-mbp>
- <ajA5kpUraXqh9ag9@gallifrey>
- <ajBRnUqXd7DqxLiG@kbusch-mbp>
+	s=k20260515; t=1781554784;
+	bh=q9MtdCSaQUNmO7ygTuBXbUVOYf/HCJOuBSr7sxavmtM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=BiQuj6Dvoozrwg3X2ukypnOhYEsBs8qPQw3JN8gstHioPz9qirRjLKLWBQALzIZvj
+	 YBDYf3kJKBzBHrZg3TCowO10NyMz1knfrFv0+aAwvfv8+csrJuRAmz/LvUKR5zCBeI
+	 AA8diOPiv/K0CY7wKuBrTsWoIOM62WKq3Al0Cuk+d/hQEBO7cNy96zVaJrHH51vG4q
+	 eZFjEDYz9E9ZIzDP9Sia8bQRN9xYuuhYAFkC4J1/fmVVAVqUSpCPveAfe67k9c/h1V
+	 ygIukuVXpCVb9LXpnEuHZbfFf2w0fgo53EjIj1fgZbMe20hkeOqfOPFQvP+DWMK6Sg
+	 ukwjjOKqvU+tw==
+Message-ID: <ea71a433-fdcc-429d-adce-14e9fb726957@kernel.org>
+Date: Mon, 15 Jun 2026 22:19:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajBRnUqXd7DqxLiG@kbusch-mbp>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/19] x86: define DPS root partition type UUIDs
+To: Dave Hansen <dave.hansen@intel.com>, Jens Axboe <axboe@kernel.dk>,
+ Davidlohr Bueso <dave@stgolabs.net>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org
+References: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
+ <20260615-discoverable-root_partitions-v1-12-39c78fac42e2@kernel.org>
+ <03be57ae-0e41-4b8a-adc5-bdd85ccce951@intel.com>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <03be57ae-0e41-4b8a-adc5-bdd85ccce951@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 15, 2026 at 01:25:17PM -0600, Keith Busch wrote:
-> In the meantime, since I so far can't reproduce this after including my
-> previous proposal, I may have to request trying out a debug patch to get
-> some more visibility on what's happening if that's okay.
+On 15/06/2026 at 18:46, Dave Hansen wrote:
+> On 6/15/26 09:09, Vincent Mailhol wrote:
+>> +#ifdef CONFIG_X86_64
+>> +#define DPS_ROOT_PARTITION_TYPE_UUID "4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
+>> +#else
+>> +#define DPS_ROOT_PARTITION_TYPE_UUID "44479540-f297-41b2-9af7-d131d5f0458a"
+>> +#endif
+> 
+> This doesn't make a whole lot of sense to me. 64-bit kernels can run
+> 32-bit userspace just fine.
+> 
+> But this #ifdef as proposed means that only a 32-bit *OR* 64-bit kernel
+> can auto-discover a given partition.
+> 
+> I kinda think you should just have an array of strings for these things,
+> maybe glued together with some preprocessor magic. Logically something
+> like this:
+> 
+> const char* const uuids[] = {
+> #ifdef CONFIG_ARM64
+> 	"b921b045-1df0-41c3-af44-4c6f280d3fae"
+> #endif
+> #ifdef CONFIG_X86_64
+> 	"4f68bce3-e8cd-4db1-96e7-fbcaf984b709",
+> #endif
+> #if defined(CONFIG_X86) && defined(CONFIG_COMPAT32)
+> 	"44479540-f297-41b2-9af7-d131d5f0458a",
+> #endif
+> ...
+> };
+> 
+> ... and then search the array. I honestly don't think you need to
+> sprinkle UUIDs all over the architectures.
+> 
+> It could probably also be done almost entirely in Kconfig. This could be
+> in, say block/partitions/Kconfig, or arch/*/Kconfig:
+> 
+> config DPS_ROOT_PARTITION_TYPE_UUID_1
+> 	string
+>         default "4f68bce3-e8cd-4db1-96e7-fbcaf984b709" if X86_64
+> 	default "b921b045-1df0-41c3-af44-4c6f280d3fae" if ARM64
+> 	...
+> 
+> config DPS_ROOT_PARTITION_TYPE_UUID_2
+> 	string
+>         default "44479540-f297-41b2-9af7-..." if X86 && COMPAT_32
+> 
+> const char* const uuids[] = {
+> #ifdef CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_1
+> 	CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_1
+> #endif
+> #ifdef CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_2
+> 	CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_2
+> #endif
+> ...
+> };
+> 
+> There are a lot of ways to do this. I'm just not a super big fan of the
+> current proposal.
+> 
+> So, boiling it down:
+> 
+> 1. Should more than one UUID be supported per kernel build?
 
-Going in a different direction here, there's no reason to recreate the
-lower level bio's from scratch when they originate from an incoming bio.
-We can just clone it along with an iterator pointing to the original.
+I didn't pay much attention to this, but this is a very good point.
 
-Can you try this one out? This was successful when I ran your reproducer
-and cuts out a lot of code too with a performance bonus for large IO.
+The Discoverable Partitions Specification is not clear about this
+point. All it has to say is:
 
----
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index 1db565b376200..28adfeb58f240 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -170,12 +170,11 @@ struct dpages {
- 			 struct page **p, unsigned long *len, unsigned int *offset);
- 	void (*next_page)(struct dpages *dp);
- 
--	union {
--		unsigned int context_u;
--		struct bvec_iter context_bi;
--	};
-+	unsigned int context_u;
- 	void *context_ptr;
- 
-+	struct bio *orig_bio;
-+
- 	void *vma_invalidate_address;
- 	unsigned long vma_invalidate_size;
- };
-@@ -210,44 +209,6 @@ static void list_dp_init(struct dpages *dp, struct page_list *pl, unsigned int o
- 	dp->context_ptr = pl;
- }
- 
--/*
-- * Functions for getting the pages from a bvec.
-- */
--static void bio_get_page(struct dpages *dp, struct page **p,
--			 unsigned long *len, unsigned int *offset)
--{
--	struct bio_vec bvec = bvec_iter_bvec((struct bio_vec *)dp->context_ptr,
--					     dp->context_bi);
--
--	*p = bvec.bv_page;
--	*len = bvec.bv_len;
--	*offset = bvec.bv_offset;
--
--	/* avoid figuring it out again in bio_next_page() */
--	dp->context_bi.bi_sector = (sector_t)bvec.bv_len;
--}
--
--static void bio_next_page(struct dpages *dp)
--{
--	unsigned int len = (unsigned int)dp->context_bi.bi_sector;
--
--	bvec_iter_advance((struct bio_vec *)dp->context_ptr,
--			  &dp->context_bi, len);
--}
--
--static void bio_dp_init(struct dpages *dp, struct bio *bio)
--{
--	dp->get_page = bio_get_page;
--	dp->next_page = bio_next_page;
--
--	/*
--	 * We just use bvec iterator to retrieve pages, so it is ok to
--	 * access the bvec table directly here
--	 */
--	dp->context_ptr = bio->bi_io_vec;
--	dp->context_bi = bio->bi_iter;
--}
--
- /*
-  * Functions for getting the pages from a VMA.
-  */
-@@ -332,6 +293,21 @@ static void do_region(const blk_opf_t opf, unsigned int region,
- 		return;
- 	}
- 
-+	if (dp->orig_bio) {
-+		bio = bio_alloc_clone(where->bdev, dp->orig_bio, GFP_NOIO,
-+				      &io->client->bios);
-+		bio->bi_iter.bi_sector = where->sector;
-+		bio->bi_iter.bi_size = where->count << SECTOR_SHIFT;
-+		bio->bi_opf = opf;
-+		bio->bi_end_io = endio;
-+		bio->bi_ioprio = ioprio;
-+		store_io_and_region_in_bio(bio, io, region);
-+
-+		atomic_inc(&io->count);
-+		submit_bio(bio);
-+		return;
-+	}
-+
- 	/*
- 	 * where->count may be zero if op holds a flush and we need to
- 	 * send a zero-sized flush.
-@@ -468,6 +444,7 @@ static int dp_init(struct dm_io_request *io_req, struct dpages *dp,
- 
- 	dp->vma_invalidate_address = NULL;
- 	dp->vma_invalidate_size = 0;
-+	dp->orig_bio = NULL;
- 
- 	switch (io_req->mem.type) {
- 	case DM_IO_PAGE_LIST:
-@@ -475,7 +452,11 @@ static int dp_init(struct dm_io_request *io_req, struct dpages *dp,
- 		break;
- 
- 	case DM_IO_BIO:
--		bio_dp_init(dp, io_req->mem.ptr.bio);
-+		/*
-+		 * The destination bios clone this bio's biovec directly, so
-+		 * there are no per-page accessors to set up here.
-+		 */
-+		dp->orig_bio = io_req->mem.ptr.bio;
- 		break;
- 
- 	case DM_IO_VMA:
--- 
+  On systems *with matching architecture*, the first partition with
+  this type UUID on the disk containing the active EFI ESP is
+  automatically mounted to the root directory /.
+
+Does an x86_32 system match an x86_64 partition? Wouldn't make sense.
+Does an x86_64 system match an x86_32 partition? Could be.
+
+My feeling is that the intent was an *exact* match. This is supported
+by the implementation in systemd which just check against
+SD_GPT_ROOT_NATIVE (which corresponds to the exact match).
+
+  https://github.com/systemd/systemd/blob/main/src/udev/udev-builtin-blkid.c#L243-L247
+
+*But* there are some hints about a secondary UUID. In my terminal I have:
+
+  $ systemd-id128 show root root-secondary
+  NAME           ID                              
+  root           4f68bce3e8cd4db196e7fbcaf984b709
+  root-secondary 44479540f29741b29af7d131d5f0458a
+
+where root is the x86_64 and root-secondary is x86_32. So although I
+see no match logic in the code, the ID table have it!
+
+That said, your points make sense to me, and I would be supportive to
+allow a search for a secondary UUID as a kernel extension. If we do
+so, I think the only constraint should be to make sure that we check
+for the exact match first (e.g. check x86_64 type before x86_32 type).
+
+Would that make sense?
+
+> 2. Should the UUIDs be defined in arch code or generic code?
+
+I think that you convinced me to put it in generic code.
+
+> 3. Kconfig or #ifdefs?
+
+I would say Kconfig. If we go for the exact match only, that would be:
+
+  CONFIG_DPS_ROOT_PARTITION_TYPE_UUID
+
+If we allow more as an extension, that would become:
+
+  - CONFIG_DPS_ROOT_PARTITION_TYPE_UUID for the exact match
+  - CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_SECONDARY for the compatible
+    one.
+
+The drawback is that some entries will be in both:
+
+  config DPS_ROOT_PARTITION_TYPE_UUID
+  	string
+  	  default "4f68bce3-e8cd-4db1-96e7-fbcaf984b709" if X86_64
+  	  default "44479540-f297-41b2-9af7-d131d5f0458a" if X86
+
+  config DPS_ROOT_PARTITION_TYPE_UUID_SECONDARY
+  	string
+  	  default "44479540-f297-41b2-9af7-d131d5f0458a" if X86_64 && COMPAT_32
+
+And I don't think we need more than two.
+
+
+A bonus question: should those Kconfig entries be hidden? I prefer the
+hidden option because it doesn't add that much code and I thought this
+was not worth bothering the user with one more menuconfig question.
+But I would be happy to change if people this this is worth an
+menuconfig entry.
+
+
+Yours sincerely,
+Vincent Mailhol
