@@ -1,255 +1,157 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A060537DEA8;
-	Mon, 15 Jun 2026 12:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781524955; cv=none; b=eFCu9I0PXZ043O+LEsXTwWQKKTUoBrgqWgiUhbto/KdfzPKNXi+Zsrk5sbNLKX9/+aw8WYku4O29QmX879zYI8AZUlCuOB47C5oZ4eKqx8BvavvLfVtwIeoIrR3atBPrB2t/ipLND3JVL4sBFNQQGZ81bB1aMLy+b4ROCbG0jp0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781524955; c=relaxed/simple;
-	bh=hDXEzZqbtAzr/uSpgHSfGFAWMMKzIXHwxmJ+XLj8vr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DaqEDKLJS8yLxKVjCfWAGxDbpGv91cZmO/VuebiKlSXSveBZTfXIXR6MenoNQ+pzyFUNlN66XxsQe4PpqV0V2/0w6PkOZ6/cWL2/1Xql0EbxxgU8OW4jZsrGoNxgmJejLfJexHVUVQAm/jlLE0HhfsQxk9Zvu8eO22s71ZOG28Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gf7yG35D8zKHMRX;
-	Mon, 15 Jun 2026 20:01:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8601F4058D;
-	Mon, 15 Jun 2026 20:02:27 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with SMTP id cCh0CgA3hzzQ6S9qu2+JBw--.21839S4;
-	Mon, 15 Jun 2026 20:02:25 +0800 (CST)
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	linux-block@vger.kernel.org
-Cc: cgroups@vger.kernel.org,
-	yangerkun@huawei.com,
-	chengzhihao1@huawei.com,
-	yukuai@fnnas.com,
-	houtao1@huawei.com,
-	wozizhi@huaweicloud.com
-Subject: [PATCH V2] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
-Date: Mon, 15 Jun 2026 19:55:56 +0800
-Message-ID: <20260615115556.1225472-1-wozizhi@huaweicloud.com>
-X-Mailer: git-send-email 2.52.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DD73E51EF
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 12:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781527778; cv=pass; b=gUk/+gRxARyJLjCa26RWPNeeW82Y+v3q3DF+Kkj+3uYYTcU2KoBRo+mOAHtnu3wuU4RReulcky6CuLDCEjhkjwbrBt4VBi+6O2ER/e876OCklJkfkbW1PaIDxIkdntdId1ZMXf3nQNQRiMfdtXjEsoeSRq900r2A726juLCYHJE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781527778; c=relaxed/simple;
+	bh=EuT5lYOMkkdhbh36n3EuIDGIwufLokD6nYk5Kx0YNCs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dzk3Pt/K03oQipIikyQglcwbpGA22RtscqpB+fYY/uaAZKaAA3k55FvZO97i8n4ZpjUSSQiZjulnP2bUlA9TMIziTKobt3qi/OpMy9za0AdnJz/B4qGVNfCHHzddhaE1tVt4p/Dosj8TxU0oBCs2h3MZgPH3g695vof7SBHkW28=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sKOd6BOv; arc=pass smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sKOd6BOv"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5aa7a7ad4d3so2851748e87.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 05:49:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781527775; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iheR8DXEn5RyUwtEX0GAG+08ZHNbuwp6Ks1aZZeefIxAd4O0b/ie8iqp0XdHE0rGl4
+         mcIHiRz6N+5OIpTiJ8O2uFQNXo7OMpi+Y8XR2Ig/USjsOnFxf7Y22PmyTAi8VEPd0Ztg
+         LlI1/ROU9pe2gawV3ez5GigRJaJa/uXmdAEHBhEkG/SQXaG0o7GB2g6aOlAUz2cRMTmu
+         21mPi43JVSQ9QUW8SpusgFwNF2aVChA3OZMOblG26RZn9vTmYvJlf5R098Tgf3Z7QZnv
+         kvbUBEFqBNIucwYj5WZ8XVmWQu6eGwAj6MZAEBHr0Q/LQmmwWL8ZR1NrXvPvQUaOOEOF
+         Aukw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=EuT5lYOMkkdhbh36n3EuIDGIwufLokD6nYk5Kx0YNCs=;
+        fh=T/7swcw3lanR1a2cA6y5zH0eP6d/CFBYa5uHrEP3UR8=;
+        b=OAo6wtY8cktuDgl30yDYG+k1v/0fieoqyF+WcJru4zI2ZngRdwbo3n373cscuCskJl
+         SLCDQKA+B7HMOds3XFovcwOTc2NUkTCLNDzJTYk+v/b4QIBd9fR9J8hzBKKBj7WQXHQG
+         TZF2OMGEb7cudMcnfoPqOYJut1vDK3kNrMV/wK8N3fdMAKZDWwxHlR2KUW+2Sc+anCF2
+         glBZApD5chA77ZLKby7cEt35E8/caDqa4HwIg5HUCV3ep/m2kRTeJKm20m/rJP2pQ08I
+         lRROA+o1NfreV++8tqmNZ4I9h8OdxnFRXVW+MvkxklutN+pJKNfGrQ+f63keJrCHuDIh
+         Kz/w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781527775; x=1782132575; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EuT5lYOMkkdhbh36n3EuIDGIwufLokD6nYk5Kx0YNCs=;
+        b=sKOd6BOv13rS48sKumGSN98WjIjmsrT1KB2CVI3OlskLoqYiDYt3H+NMuI6KkIekIw
+         tXFqxAa/tXdsNaHRisGNWz1stQBOMoN+gxX0VLzJUJWdw43l9x4DsWY+Tsc7/yErRp1a
+         PgvKNVIBHkvtuyM9jdaHVFRNN/A5B2CNEeod4/9U/pbJKPxcAOhWk1AmcvWIbC1l7qgx
+         SaOJDxYJVeAcZ62WRIxg4NeN1xwTJhz2EfshZ3KRAgc72S+cCSGkveuZ34z1QicotMj2
+         B2Zg7Zeoi+naH5a5XSc5tKS1mxRo9Z2liW2iqc/py3DpTRiwjzOFAI3vOXP6li6jg1bO
+         dFZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781527775; x=1782132575;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EuT5lYOMkkdhbh36n3EuIDGIwufLokD6nYk5Kx0YNCs=;
+        b=aoUF9rcmCn3F0e2rkUaRid1ROq6y3YPS9/NbC7/bc6NLMNxQlTH97EqDstRdRL3lpV
+         jH+LNBaBe+uTIBEZBWcJ9wh/0vhwIRNH+Ct2wG+cTZF/L9/3DsP0B+Yg9Vqg4N38m1Gi
+         oSa6YUz3TJFW3KObdRhYfWN1gI6On7fOS8aVbnMInjhb5ZaoF2qykGGJsU+303qTUM0H
+         iaGUU4GALTDljZ6dY6hKLCI65yX650uYbOk1jZ3juUwqs7D9jEzgTXBNHMo4xFvebzUq
+         +4rXjb+RL1qwBN1fBmfQbGBfwvbwFUNZaU7qJqildjA1NqXKTEo1ht4JRrJ9k0jgvGlx
+         Hitg==
+X-Forwarded-Encrypted: i=1; AFNElJ+j5vN51nYoxYfwzbmSJ/hkvDK0+ZZIH2LZYMwPdincCtA8yaTUwFYT+2H2zrxcFwRbR2ciI6I36JhrXw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW4XKDMIbxf8Uel1w92HcK6+khq0WM4BxZrGZ+zExkSD7omWwm
+	bIabWGS4hu7Itdpz0Sz76kCLxT8ou4stwZ45Vh5DCts1cVsyluqb6SwmySOY8BaWWEjmInX7ljm
+	IePxc5UB7tWLTf4PnLurDMd7N5Fh52LA=
+X-Gm-Gg: Acq92OE5veI2aDlqgHHmwBoyPBvim0eRWtBTo1p23i2SnaZxxcZ68tZu8DsorxEMLgA
+	hPYsr70LAa58U4sANeKMFSBKgYkdPK10Y9atiSPUVVmbGBqt2/MJPJZWME6BP1qWs5B2/EpOiPe
+	wG/mFY/fatiGRIStw7HFsA7qm5HLX/hSFTa7weTTbITEAovDX/2uTzpCt1RGvM08UsqUU9+Jk53
+	gVHyBRpBIkvnEgv6QVNwrZWCWELevzgtCLY6zfJoV7FuLMh1yezp50vVEJA0WcnkXQDorPDlXgN
+	ekdhLw1pok5FyTdtsLeNY6SzpxO/xlH69zgsvpEl7Z+nfQg=
+X-Received: by 2002:ac2:5293:0:b0:5ad:abf:1d36 with SMTP id
+ 2adb3069b0e04-5ad2db5937dmr2832285e87.27.1781527775047; Mon, 15 Jun 2026
+ 05:49:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgA3hzzQ6S9qu2+JBw--.21839S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxKrWfAr4DJF47Ww1fKFWrGrg_yoW7CFyDpF
-	ZxWrZay3yxKry2qa15Xr17X34Fvw48tr1rGrW8Gw4Y9F4ayr92qF1UurWkZFWxZFZ7Ar43
-	Ar4vqF1qyF48CwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
+ <20260614-zram-swap-ops-block-register-v1-1-6c1a6639c222@gmail.com> <ai9abo7GwMl+g43G@yjaykim-PowerEdge-T330>
+In-Reply-To: <ai9abo7GwMl+g43G@yjaykim-PowerEdge-T330>
+From: Jianyue Wu <wujianyue000@gmail.com>
+Date: Mon, 15 Jun 2026 20:49:22 +0800
+X-Gm-Features: AVVi8Cfn_viuMbTTWIMGNjjYhf-WEwtj1PicfDVhhngZ6JvZ_KcLvfvomcBcjRY
+Message-ID: <CAJxJ_jh=q+Jh772w-hsJoCLTE82-btBj20R+zKL0Vn1fdccnqg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] mm/page_io: let block drivers register custom swap
+ I/O ops
+To: YoungJun Park <youngjun.park@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>, 
+	Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>, Barry Song <baohua@kernel.org>, 
+	Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Zizhi Wo <wozizhi@huawei.com>
+On 6/15/2026 9:50 AM, YoungJun Park wrote:
+> On Sun, Jun 14, 2026 at 11:35:29PM +0800, Jianyue Wu wrote:
+>
+> ...
+>
+> Hello Jianyue.
+>
+> Currently, the patch commit log indicates only a single custom swap
+> registration is supported. Shouldn't we allow multiple block drivers to
+> register their custom ops simultaneously from the beginning?
+>
+>> int shmem_writeout(struct swap_io_ctx *ctx, struct folio *folio,
+>> struct list_head *folio_list);
+>> diff --git a/mm/swapfile.c b/mm/swapfile.c
+>> index 284eebc40a70..ebdc96092961 100644
+>> --- a/mm/swapfile.c
+>> +++ b/mm/swapfile.c
+>> @@ -2849,6 +2849,10 @@ static int setup_swap_extents(struct swap_info_struct *sis,
+>> sis->ops = &swap_bdev_ops;
+>>
+>> if (S_ISBLK(inode->i_mode)) {
+>> + const struct swap_ops *block_ops = lookup_swap_block_ops(sis);
+>
+> Also, just a personal thought on this part.
+>
+> Instead of using `block_device_fops` as a lookup key, what if we handle
+> this similarly to how filesystems use the `a_ops->swap_activate` callback?
+>
+> We could add a `swap_activate` callback directly into
+> struct block_device_operations (zram's zram_devops). This way, the
+> block device itself can set up and replace the swap `ops` directly without
+> needing a separate registration/lookup mechanism.
+>
+> What are your thoughts on this approach?
+>
+> Thanks,
+> Youngjun Park
+>
 
-[BUG]
-Our fuzz testing triggered a blkcg use-after-free issue:
+Hello Youngjun,
 
-  BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
-  Call Trace:
-  ...
-  blkcg_deactivate_policy+0x244/0x4d0
-  ioc_rqos_exit+0x44/0xe0
-  rq_qos_exit+0xba/0x120
-  __del_gendisk+0x50b/0x800
-  del_gendisk+0xff/0x190
-  ...
+On multiple registrations:
+Previously I was also a bit hesitate about this. Exactly, better to
+support multiple block driver directly, I'll update it.
 
-[CAUSE]
-process1						process2
-cgroup_rmdir
-...
-  css_killed_work_fn
-    offline_css
-    ...
-      blkcg_destroy_blkgs
-      ...
-        __blkg_release
-	  css_put(&blkg->blkcg->css)
-          blkg_free
-	    INIT_WORK(xxx, blkg_free_workfn)
-	    schedule_work
-    css_put
-    ...
-      blkcg_css_free
-        kfree(blkcg)--------blkcg has been freed!!!
-====================================schedule_work
-              blkg_free_workfn
-							__del_gendisk
-							  rq_qos_exit
-							    ioc_rqos_exit
-							      blkcg_deactivate_policy
-							        mutex_lock(&q->blkcg_mutex)
-								spin_lock_irq(&q->queue_lock)
-							        list_for_each_entry(blkg, xxx)
-								  blkcg = blkg->blkcg
-								  spin_lock(&blkcg->lock)-------UAF!!!
-	        mutex_lock(&q->blkcg_mutex)
-	        spin_lock_irq(&q->queue_lock)
-	        /* Only then is the blkg removed from the list */
-	        list_del_init(&blkg->q_node)
+On swap_activate:
+That's a very good idea, to use swap_activate callback, it is much
+cleaner, I like this approach:) setup_swap_extents() would call it for
+S_ISBLK swap targets, and the driver would install sis->ops at swapon
+time. When the callback is NULL, the core can fall back to
+swap_bdev_activate() and swap_bdev_ops. That removes the separate global
+registration/lookup mechanism entirely, and multiple block drivers are
+supported naturally because each device carries its own ops table.
 
-As a result, a blkg can still be reachable through q->blkg_list while
-its ->blkcg has already been freed.
-
-[Fix]
-Fix this by deferring the blkcg css_put() until after the blkg has been
-unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
-blkcg outlives every blkg still reachable through q->blkg_list, so any
-iterator holding q->queue_lock is guaranteed to observe a valid
-blkg->blkcg.
-
-While at it, move css_tryget_online() from blkg_create() into blkg_alloc()
-so that the css reference is owned by the alloc/free pair rather than
-straddling layers:
-blkg_alloc()  <-> blkg_free()
-blkg_create() <-> blkg_destroy()
-
-Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
-Suggested-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
----
-v2:
- - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
-   css reference follows the blkg's own lifetime, making the put in
-   blkg_free_workfn() symmetric with the get in blkg_alloc().
-
-v1: https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweicloud.com/
-
- block/blk-cgroup.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index bc63bd220865..27414c291e49 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -132,10 +132,15 @@ static void blkg_free_workfn(struct work_struct *work)
- 	if (blkg->parent)
- 		blkg_put(blkg->parent);
- 	spin_lock_irq(&q->queue_lock);
- 	list_del_init(&blkg->q_node);
- 	spin_unlock_irq(&q->queue_lock);
-+	/*
-+	 * Release blkcg css ref only after blkg is removed from q->blkg_list,
-+	 * so concurrent iterators won't see a blkg with a freed blkcg.
-+	 */
-+	css_put(&blkg->blkcg->css);
- 	mutex_unlock(&q->blkcg_mutex);
- 
- 	blk_put_queue(q);
- 	free_percpu(blkg->iostat_cpu);
- 	percpu_ref_exit(&blkg->refcnt);
-@@ -177,12 +182,10 @@ static void __blkg_release(struct rcu_head *rcu)
- 	 * blkg_stat_lock is for serializing blkg stat update
- 	 */
- 	for_each_possible_cpu(cpu)
- 		__blkcg_rstat_flush(blkcg, cpu);
- 
--	/* release the blkcg and parent blkg refs this blkg has been holding */
--	css_put(&blkg->blkcg->css);
- 	blkg_free(blkg);
- }
- 
- /*
-  * A group is RCU protected, but having an rcu lock does not mean that one
-@@ -311,10 +314,13 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
- 	if (!blkg->iostat_cpu)
- 		goto out_exit_refcnt;
- 	if (!blk_get_queue(disk->queue))
- 		goto out_free_iostat;
-+	/* blkg holds a reference to blkcg */
-+	if (!css_tryget_online(&blkcg->css))
-+		goto out_put_queue;
- 
- 	blkg->q = disk->queue;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
- 	blkg->iostat.blkg = blkg;
-@@ -351,10 +357,12 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 
- out_free_pds:
- 	while (--i >= 0)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
-+	css_put(&blkcg->css);
-+out_put_queue:
- 	blk_put_queue(disk->queue);
- out_free_iostat:
- 	free_percpu(blkg->iostat_cpu);
- out_exit_refcnt:
- 	percpu_ref_exit(&blkg->refcnt);
-@@ -379,32 +387,26 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
- 	if (blk_queue_dying(disk->queue)) {
- 		ret = -ENODEV;
- 		goto err_free_blkg;
- 	}
- 
--	/* blkg holds a reference to blkcg */
--	if (!css_tryget_online(&blkcg->css)) {
--		ret = -ENODEV;
--		goto err_free_blkg;
--	}
--
- 	/* allocate */
- 	if (!new_blkg) {
- 		new_blkg = blkg_alloc(blkcg, disk, GFP_NOWAIT);
- 		if (unlikely(!new_blkg)) {
- 			ret = -ENOMEM;
--			goto err_put_css;
-+			goto err_free_blkg;
- 		}
- 	}
- 	blkg = new_blkg;
- 
- 	/* link parent */
- 	if (blkcg_parent(blkcg)) {
- 		blkg->parent = blkg_lookup(blkcg_parent(blkcg), disk->queue);
- 		if (WARN_ON_ONCE(!blkg->parent)) {
- 			ret = -ENODEV;
--			goto err_put_css;
-+			goto err_free_blkg;
- 		}
- 		blkg_get(blkg->parent);
- 	}
- 
- 	/* invoke per-policy init */
-@@ -440,12 +442,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
- 
- 	/* @blkg failed fully initialized, use the usual release path */
- 	blkg_put(blkg);
- 	return ERR_PTR(ret);
- 
--err_put_css:
--	css_put(&blkcg->css);
- err_free_blkg:
- 	if (new_blkg)
- 		blkg_free(new_blkg);
- 	return ERR_PTR(ret);
- }
--- 
-2.52.0
-
+Thanks,
+Jianyue
