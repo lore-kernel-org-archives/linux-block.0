@@ -1,336 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACAF33065D;
-	Mon, 15 Jun 2026 13:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781529517; cv=none; b=J0lZQxJ/582hDK8w2E74zvClJ+e1/eZ0ZVpxLwYoYNT3jfLv6PoVOqP+1VHysctaugT7VAQKaUsTJD9sPyrKBABc9Mkf8tbe5N7AO8XwfYY3I9ijB87iZjSKjcN0MOPLWFm83x17pjpvP+6L574GGVQoPD1CgWrFwA57S/vqsi0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781529517; c=relaxed/simple;
-	bh=j2tYKOHliiTcseByFnEMrSNCojE4F/ZyKqcc1k/44fc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WJJLe7rStx04+5pEZR+BXnjYF+G8uMzn8ofEgFn4B6FVszQ0RyiLVdMAnTpiQLVc1u6U7QpMpixQ9R4vz9QK7d88n5CQMZer4SRBchatLWAOUMxnC7wAPtGKwe4tI8NYBFb6QDxiYQAk6fE4KKkfS6e/bQNiyhyayfweA4hV16w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlVE/jVV; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606213B3893
+	for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 13:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781529565; cv=pass; b=W32fXtnG8eyohXAUu/KVoxryWigA/L8Za/o7EKCBr/Q5maUFzX0CqoTKukS8HfIiIyZLXIMHrZW3M0E2jq4eU4tysWza1dlvrlLxoznbDxuQv1sPEMvr7VmqZyF2lJxPU6R7GfHkhVhbsLsl0suKOdr86yPHrWJvqqlrL8yOZWo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781529565; c=relaxed/simple;
+	bh=aylr0jSHqZiMcYssPunDBwm1K7Kn5m2/H5slQ8rRPTY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=usXonkmzf8rGgrrKgQ7dN3BXRce24GZqITpQ6cO2uebNN+hrrQ+mTFsvTIE4Sqsb/aNrX4xNFbzX/HcfqZSw2v8Md32QIt3+qCCY+yFc+rBqnxas+7kbC7KL9Lrx8sFj92yNudsi/C1XnWhtcZG8DyAfUmcx/m7GrMmrtalyvmg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmNGpbs1; arc=pass smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlVE/jVV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BF221F000E9;
-	Mon, 15 Jun 2026 13:18:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781529515;
-	bh=CG+uYsm+6cBYc4MaaopSAxa8VTETnS8gpQ0R8EuDOO0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=mlVE/jVVaUI2f1buKJfhw23fWUNALpKGJ3j49oR5yOzUBJX3cbU+jTyglUD7tUVKP
-	 ZFxP01QxmZKQ85FK9c0/Qu9V8iciSdJFcD7F5fMfuqbrA7bYNYapeicylhds9crPVh
-	 bFsToR80Gv6qRevFmHWwxz8WgD9+y45inkVzQ0X7/RHXuWhwC79ilO6eEMSULVU7An
-	 BxPwdDCQnk33YaSieOBGznK35aW5Qe0HY1nVto3HbW77gdxehjXek62tDD+oHG6i1x
-	 gYhRzf0zBsou5pSTppEiyVY4v8P7oMCPbf5PsKSvchAwhgcMNSSruWMYfwLRoaeE5a
-	 NHMMLvEnUFiEQ==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 15 Jun 2026 15:18:09 +0200
-Subject: [PATCH RFC 6/6] btrfs: deny freezing devices undergoing a replace
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmNGpbs1"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-396bed274b9so29167941fa.0
+        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2026 06:19:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781529563; cv=none;
+        d=google.com; s=arc-20240605;
+        b=h6OhcZIteEPVxe0Xi+azgK+SQSQawxa4hKEhkgsJja/3ukOr8vhkA8X50wYv9fJTIf
+         MTx3hT7hlv0fxkerWfM//pSYb7RfX3MEFNlX+Ct2dyTHAJwUiQE3sLpay8OnXli8UNhf
+         unPQ2wJtxuNOMaPjcLjIdbbqkdCb63BD4TZnLFvDdYoZTLpgLWJwtR5x4/JnpV2Pehbi
+         cmSnZSBNV+6K/raxowJLa6SIfrJjIR47EjwweK3dQC/hK7SqURz24f1kAVFeQ84HBSpb
+         OCf4i8uTQSZBeohOMraMpaiNafDdacowQNHX3xUvUnfnF/Wa1wF2W5hJHqv3ZlbHoxKo
+         5pKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wpR91dRVrjqKzmtraov7aI7NzeTafl2vyksF7BlIurg=;
+        fh=bEFuKOW0tCIaKuPe98y5Dl419okc83e0FrdYYnAImY4=;
+        b=FBG3v5lD17pKTUpZM4LlJ1JkKXtI1Z+UZv0Gzn7K+XC/PHDnyJorp0RAUoiSXXerpL
+         6aEO746kjyweskMVdahGUiw/6fob6JKbyfSM0SPR49rOdasAuVOkcRpfKS1SXK3QcvKL
+         TbKs1kqmH4eqc2gjzk4vHPKDlEixq6NKkgi4ulHOEka3csZwoCYblWsTSg9N2bJEoUZF
+         dpHJsaw3QLcS/U4ms9dH1Ude81Ow6FCs22lwUULxVD/XOWtR/2rZlmfmF01I+9JMrSTb
+         NTbNKMYgdfl0lQyVZc97Hw+hpt1TDMvxvd9Dsi8ZQQ5SjI8s0eeomL6GxkIC/f5TOXon
+         EQRw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781529563; x=1782134363; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wpR91dRVrjqKzmtraov7aI7NzeTafl2vyksF7BlIurg=;
+        b=BmNGpbs1LFf3K7FAnrO+0OAG8IA9PpOyCXIvamv3tiJkzv9+7Q0K7SPL+VloO4gWJc
+         WlPIG8fXf+WyS0ouObn786ni7702z5ztV/EGO9fkb27QquP/A7KvZW2XePzFZ9fzybNe
+         uSNuR4FeL0EKG1GseLtU0O75bz7FILQAnL8oOH1nqpi4KRil6S6ES1a7PaI9tJ7rzz4d
+         zOrYz6kVpu5L2sVLX3rrfivkwVVKNHWXjAUOHqJyaa+XAY6He/hi+NEtdBAo7XGF9B1v
+         NefB/xAJLf/2DUQJDpUWW2iK7bJpExYhb0xwC01ZSuVzPMLwfpAUHA37jYR5Xxx5jq6T
+         mbPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781529563; x=1782134363;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wpR91dRVrjqKzmtraov7aI7NzeTafl2vyksF7BlIurg=;
+        b=MWMvoPaBm+3WGa4oD5XB+LfL4IirflhvvTgJHj2rX/l6cYpjX1t0JpfalJK5DIkbZl
+         m+tDiNrHc9NaOw2KQ8Dp8zQVal3Bi7mIFuqd25C+kwDn3ANbPQFM1LG5mL4+o8Y0Cloh
+         IST1/bJ4Yqz49VPCBYz309btv3k8zpRHWiUCI6aY2sAvJ875JpeWMQZKfyFeAg+Ag1K6
+         pPPy9t6aWhsSEcjXKjqb2Dd6TbnLdIkmgtQ3vwZ4Z64bxbozbdm5gGbG8fJF5dQ5spOX
+         lLfj9lMr2rJAJv+s/Cl+HjxieG3FXtrKtoegG9uQf2ZSOwZr5NRV7fq8Fs7fnF24Yg08
+         MMoQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8GrN/udOtfnO4JKGUe3hf6NG9my51RlkUSdHUmWxCBHr/kG60MvCTBQ+U2h7w6X0yZgyVKR3Q4KzpfBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzua5oucbJfDK7fBgnhd+MkcrK9eD6P5VyXTPBqbnllVoW6MH05
+	hq1Tn+EmiZKflDj0J8vo6JeZyEJjKWY7TpR2jwSu6cv/ykepK+Ah/QInZuqUDfPoOFnOXoYKbI6
+	mICCeSlDRpHBRk7gorcgzHxgeTfbJDqg=
+X-Gm-Gg: Acq92OEnTMgxGpsfJ8I1UqXYlRo1qQOcW4UwpjoyPcA2+iv+lkYcb0Y38TJT+mQOXi2
+	T7L7z8vF2+U9OoBppJzZ0AdmVa7YJWAKV1jpZSF67QrYVuhbON3Q5U1cS0pL4FGvfhRrjO77T8W
+	2f8h8IagfyqgwuseDits4QzIKWjqPOtR1tjMbqSGwAWfVkT3VFZORIaB/m0iIswh53+t4kZ37NX
+	YtfJeAyrfq4lKSK4b8OAZZVNTgTQlqvM2JOfZ5e+sxJBVPjcRJ6kjxrOFn8RJYQswMOQK4V4wSA
+	n1g/uiyiIXMDTRODJTEMo6Jt8HFSMqMu20jT
+X-Received: by 2002:a05:6512:1545:10b0:5aa:7129:5d43 with SMTP id
+ 2adb3069b0e04-5ad30dc0c0cmr2154191e87.26.1781529562348; Mon, 15 Jun 2026
+ 06:19:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260615-work-super-freeze_deny_upstream-v1-6-a6c72b840e7d@kernel.org>
-References: <20260615-work-super-freeze_deny_upstream-v1-0-a6c72b840e7d@kernel.org>
-In-Reply-To: <20260615-work-super-freeze_deny_upstream-v1-0-a6c72b840e7d@kernel.org>
-To: Chris Mason <clm@fb.com>, Jens Axboe <axboe@kernel.dk>, 
- David Sterba <dsterba@suse.com>, Jan Kara <jack@suse.cz>
-Cc: Naohiro Aota <naohiro.aota@wdc.com>, Josef Bacik <josef@toxicpanda.com>, 
- linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>
-X-Mailer: b4 0.16-dev-f5839
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10942; i=brauner@kernel.org;
- h=from:subject:message-id; bh=j2tYKOHliiTcseByFnEMrSNCojE4F/ZyKqcc1k/44fc=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTp/54uKMH+cP6DRs+ra7Yr8yz688Jw6rZeKduvj6U+5
- a1t43u2sqOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiy90YGfYYiVrlPr14ayXf
- QbfNQtqyOhvrDm578O3jORlDblemvteMDB//FEx/UvItNler015+1wX70i3VMrMzXj0W+fzI/dt
- kVTYA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
+ <20260614-zram-swap-ops-block-register-v1-2-6c1a6639c222@gmail.com> <ai+eG9sFYTn/vTq5@yjaykim-PowerEdge-T330>
+In-Reply-To: <ai+eG9sFYTn/vTq5@yjaykim-PowerEdge-T330>
+From: Jianyue Wu <wujianyue000@gmail.com>
+Date: Mon, 15 Jun 2026 21:19:08 +0800
+X-Gm-Features: AVVi8CcAQj4nbtsy1_GpWkuEBI_5mux4WS8Z_3cRBb-C2eJG0MtZGHlouDRiWCk
+Message-ID: <CAJxJ_jhTPr2P83SpmFwKoWVKEKX_jBv3UJLC4WirdHqTYdckpg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] mm/zram: handle swap read/write via swap_ops
+To: YoungJun Park <youngjun.park@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>, 
+	Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>, Barry Song <baohua@kernel.org>, 
+	Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A device replace opens a target and, on success, frees the source on a live
-filesystem from btrfs_dev_replace_finishing() - which cannot fail and also
-runs from a kthread on mount resume.  A bdev_freeze() racing the source free
-or the target swap-in would freeze the filesystem through a claim that is
-being torn down or replaced, leaving nothing for bdev_thaw() to rebalance.
+On Mon, Jun 15, 2026 at 2:39=E2=80=AFPM YoungJun Park <youngjun.park@lge.co=
+m> wrote:
+>
+> On Sun, Jun 14, 2026 at 11:35:30PM +0800, Jianyue Wu wrote:
+>
+> Hello!
+>
+> > +static void zram_swap_submit_read(struct swap_io_ctx *ctx)
+> > +{
+> > +     struct zram *zram =3D ctx->sis->bdev->bd_disk->private_data;
+>
+> A passing thought. accessing `zram` here is too indirect. We might
+> need a `private_data` in the swap device struct someday?
+>
+> (And If there is a real value like some swap-side only private data reall=
+y needed.)
+>
+> > +     struct swap_iocb *sio =3D ctx->sio;
+> > +     int nr =3D swap_iocb_nr_folios(sio);
+> > +     bool failed =3D false;
+> > +     int i, j;
+> > +                     /*
+> > +                      * read_from_zspool() and mark_slot_accessed() mu=
+st run
+> > +                      * under the same slot_lock.  zram_read_page() un=
+locks
+> > +                      * before returning, which leaves a window where
+> > +                      * writeback can pick an idle slot we just read.
+> > +                      */
+>
+> Regarding the comment about the "window" where writeback can pick an
+> idle slot. I think this reasoning is a bit of a gray area. Writeback
+> could just as easily pick the slot right before entering this routine,
+> so the race condition seems fundamentally the same.
+>
+> Isn't the actual justification here to separate the non-backend logic
+> and ensure mark_slot_accessed() is called under the lock, given that
+> zram_read_page() can call the backend device?
+>
+> If the "window" mentioned in the comment is indeed a valid issue, then
+> zram_read_page() has the exact same problem and needs to be fixed as
+> well?
+>
+> If not, IMHO I suggest revising or removing this comment to clarify
+> the true(?) intention. :)
+>
+> > +                     slot_lock(zram, idx);
+> > +                     ret =3D read_from_zspool(zram, page, idx);
+> > +                     if (!ret)
+> > +                             mark_slot_accessed(zram, idx);
+> > +                     slot_unlock(zram, idx);
+>
 
-Make both devices unfreezable for the whole replace, with the invariant that
-a STARTED replace holds one deny on each device and any other state holds
-none.  The target is denied at open (btrfs_open_device_deny_freeze(), undone
-on btrfs_init_dev_replace_tgtdev()'s error unwind); the source is denied at
-the start of btrfs_dev_replace_start(), before mark_block_group_to_copy() so
-every 'leave' unwind sees both denied.
+Hello Youngjun,
 
-The deny tracks the STARTED state and is dropped whenever the replace leaves
-it: btrfs_dev_replace_finishing() re-allows the target it makes a member and
-frees the source through btrfs_close_bdev(allow_freeze=true), and its
-scrub-error path re-allows both as it cancels.  Its early failures (before
-the device swap) keep the replace STARTED and resumable, so both stay denied.
-Suspending for unmount re-allows both, so they are reopened freezable at the
-next mount where btrfs_resume_dev_replace_async() re-denies them (staying
-suspended if a device is frozen right then); a replace cancelled from the
-suspended state therefore destroys the target without allowing.
-btrfs_close_bdev() and btrfs_destroy_dev_replace_tgtdev() take an allow_freeze
-argument to carry this distinction; the unmount path
-(btrfs_close_one_device()) passes false.
+Agree. Walking ctx->sis->bdev->bd_disk->private_data
+from every swap_ops callback is too indirect. I will add an opaque
+private_data field to struct swap_info_struct, set it from
+->swap_activate() when the swap area is set up, and clear it on
+swapoff. The zram callbacks will then use ctx->sis->private_data directly.
 
-On resume, a failed kthread_run() re-allows both devices and goes through the
-suspend path, resetting the replace to SUSPENDED and finishing the exclusive
-operation instead of returning straight away.  The (re)mount still aborts on
-that error; routing it through suspend keeps the deny balanced against the
-unmount teardown and additionally drops BTRFS_EXCLOP_DEV_REPLACE, closing a
-pre-existing leak that was harmless on the failed mount that frees the fs but
-would have wedged future exclusive operations after a failed remount-rw.
+You are right. The writeback "window" reasoning was overstated.
+Writeback could already have picked the slot before we enter the swap
+read path, we have ZRAM_PP_SLOT to ensure it.
+0. // condition 1 write pick the slot before the lock.
+1. lock =E2=86=92 read_from_zspool =E2=86=92 unlock
+2. // condition 2 write pick the slot inside the lock.
+3. lock =E2=86=92 mark_slot_accessed() =E2=86=92 unlock // clear ZRAM_IDLE =
+and ZRAM_PP_SLOT flag
 
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- fs/btrfs/dev-replace.c | 65 ++++++++++++++++++++++++++++++++++++++++++++------
- fs/btrfs/volumes.c     | 18 +++++++++-----
- fs/btrfs/volumes.h     |  3 ++-
- 3 files changed, 72 insertions(+), 14 deletions(-)
+I think simply removing this comment is good.
 
-diff --git a/fs/btrfs/dev-replace.c b/fs/btrfs/dev-replace.c
-index 0112aa6d7ab1..4d6bd6b4b039 100644
---- a/fs/btrfs/dev-replace.c
-+++ b/fs/btrfs/dev-replace.c
-@@ -247,8 +247,8 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 		return -EINVAL;
- 	}
- 
--	bdev_file = bdev_file_open_by_path(device_path, BLK_OPEN_WRITE,
--					   fs_info->sb, &fs_holder_ops);
-+	/* Unfreezable for the whole replace; see btrfs_dev_replace_start(). */
-+	bdev_file = btrfs_open_device_deny_freeze(device_path, fs_info->sb);
- 	if (IS_ERR(bdev_file)) {
- 		btrfs_err(fs_info, "target device %s is invalid!", device_path);
- 		return PTR_ERR(bdev_file);
-@@ -325,7 +325,8 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 	return 0;
- 
- error:
--	bdev_fput(bdev_file);
-+	/* Undo the open-time freeze deny. */
-+	btrfs_release_device_allow_freeze(bdev_file);
- 	return ret;
- }
- 
-@@ -622,6 +623,15 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
- 	if (ret)
- 		return ret;
- 
-+	/* Deny the source before mark, so every 'leave' unwinds both denied. */
-+	if (src_device->bdev) {
-+		ret = bdev_deny_freeze(src_device->bdev);
-+		if (ret) {
-+			btrfs_destroy_dev_replace_tgtdev(tgt_device, true);
-+			return ret;
-+		}
-+	}
-+
- 	ret = mark_block_group_to_copy(fs_info, src_device);
- 	if (ret)
- 		goto leave;
-@@ -706,7 +716,9 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
- 	return ret;
- 
- leave:
--	btrfs_destroy_dev_replace_tgtdev(tgt_device);
-+	if (src_device->bdev)
-+		bdev_allow_freeze(src_device->bdev);
-+	btrfs_destroy_dev_replace_tgtdev(tgt_device, true);
- 	return ret;
- }
- 
-@@ -887,6 +899,7 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
- 	 */
- 	ret = btrfs_start_delalloc_roots(fs_info, LONG_MAX, false);
- 	if (ret) {
-+		/* Stays started/resumable; keep both denied. */
- 		mutex_unlock(&dev_replace->lock_finishing_cancel_unmount);
- 		return ret;
- 	}
-@@ -900,6 +913,7 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
- 	while (1) {
- 		trans = btrfs_start_transaction(root, 0);
- 		if (IS_ERR(trans)) {
-+			/* Stays started/resumable; keep both denied. */
- 			mutex_unlock(&dev_replace->lock_finishing_cancel_unmount);
- 			return PTR_ERR(trans);
- 		}
-@@ -952,7 +966,10 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
- 		mutex_unlock(&fs_devices->device_list_mutex);
- 		btrfs_rm_dev_replace_blocked(fs_info);
- 		if (tgt_device)
--			btrfs_destroy_dev_replace_tgtdev(tgt_device);
-+			btrfs_destroy_dev_replace_tgtdev(tgt_device, true);
-+		/* The source stays a member; re-allow freezing it. */
-+		if (src_device->bdev)
-+			bdev_allow_freeze(src_device->bdev);
- 		btrfs_rm_dev_replace_unblocked(fs_info);
- 		mutex_unlock(&dev_replace->lock_finishing_cancel_unmount);
- 
-@@ -1018,6 +1035,8 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
- 
- 	mutex_unlock(&dev_replace->lock_finishing_cancel_unmount);
- 
-+	/* The target is now a member; the source is freed (allow + release). */
-+	bdev_allow_freeze(tgt_device->bdev);
- 	btrfs_rm_dev_replace_free_srcdev(src_device);
- 
- 	return 0;
-@@ -1146,8 +1165,9 @@ int btrfs_dev_replace_cancel(struct btrfs_fs_info *fs_info)
- 			btrfs_dev_name(src_device), src_device->devid,
- 			btrfs_dev_name(tgt_device));
- 
-+		/* A suspended replace never re-denied freezing; do not allow. */
- 		if (tgt_device)
--			btrfs_destroy_dev_replace_tgtdev(tgt_device);
-+			btrfs_destroy_dev_replace_tgtdev(tgt_device, false);
- 		break;
- 	default:
- 		up_write(&dev_replace->rwsem);
-@@ -1177,6 +1197,11 @@ void btrfs_dev_replace_suspend_for_unmount(struct btrfs_fs_info *fs_info)
- 		dev_replace->time_stopped = ktime_get_real_seconds();
- 		dev_replace->item_needs_writeback = 1;
- 		btrfs_info(fs_info, "suspending dev_replace for unmount");
-+		/* Reopened freezable next mount; resume re-denies. */
-+		if (dev_replace->srcdev && dev_replace->srcdev->bdev)
-+			bdev_allow_freeze(dev_replace->srcdev->bdev);
-+		if (dev_replace->tgtdev && dev_replace->tgtdev->bdev)
-+			bdev_allow_freeze(dev_replace->tgtdev->bdev);
- 		break;
- 	}
- 
-@@ -1189,6 +1214,7 @@ int btrfs_resume_dev_replace_async(struct btrfs_fs_info *fs_info)
- {
- 	struct task_struct *task;
- 	struct btrfs_dev_replace *dev_replace = &fs_info->dev_replace;
-+	int ret = 0;
- 
- 	down_write(&dev_replace->rwsem);
- 
-@@ -1232,8 +1258,33 @@ int btrfs_resume_dev_replace_async(struct btrfs_fs_info *fs_info)
- 		return 0;
- 	}
- 
-+	/* Re-deny for the resumed replace; stay suspended if frozen now. */
-+	if (dev_replace->srcdev->bdev &&
-+	    bdev_deny_freeze(dev_replace->srcdev->bdev))
-+		goto suspend;
-+	if (bdev_deny_freeze(dev_replace->tgtdev->bdev)) {
-+		if (dev_replace->srcdev->bdev)
-+			bdev_allow_freeze(dev_replace->srcdev->bdev);
-+		goto suspend;
-+	}
-+
- 	task = kthread_run(btrfs_dev_replace_kthread, fs_info, "btrfs-devrepl");
--	return PTR_ERR_OR_ZERO(task);
-+	if (IS_ERR(task)) {
-+		bdev_allow_freeze(dev_replace->tgtdev->bdev);
-+		if (dev_replace->srcdev->bdev)
-+			bdev_allow_freeze(dev_replace->srcdev->bdev);
-+		/* Undo the deny and suspend, but still fail the mount. */
-+		ret = PTR_ERR(task);
-+		goto suspend;
-+	}
-+	return 0;
-+
-+suspend:
-+	btrfs_exclop_finish(fs_info);
-+	down_write(&dev_replace->rwsem);
-+	dev_replace->replace_state = BTRFS_IOCTL_DEV_REPLACE_STATE_SUSPENDED;
-+	up_write(&dev_replace->rwsem);
-+	return ret;
- }
- 
- static int btrfs_dev_replace_kthread(void *data)
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index 4558e018b53b..d9f2cd37a365 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -1128,7 +1128,7 @@ void btrfs_release_device_allow_freeze(struct file *bdev_file)
- 	bdev_fput(bdev_file);
- }
- 
--static void btrfs_close_bdev(struct btrfs_device *device)
-+static void btrfs_close_bdev(struct btrfs_device *device, bool allow_freeze)
- {
- 	if (!device->bdev)
- 		return;
-@@ -1138,7 +1138,11 @@ static void btrfs_close_bdev(struct btrfs_device *device)
- 		invalidate_bdev(device->bdev);
- 	}
- 
--	bdev_fput(device->bdev_file);
-+	/* @allow_freeze undoes a replace-time deny; unmount-close was never denied. */
-+	if (allow_freeze)
-+		btrfs_release_device_allow_freeze(device->bdev_file);
-+	else
-+		bdev_fput(device->bdev_file);
- }
- 
- static void btrfs_close_one_device(struct btrfs_device *device)
-@@ -1159,7 +1163,7 @@ static void btrfs_close_one_device(struct btrfs_device *device)
- 		fs_devices->missing_devices--;
- 	}
- 
--	btrfs_close_bdev(device);
-+	btrfs_close_bdev(device, false);
- 	if (device->bdev) {
- 		fs_devices->open_devices--;
- 		device->bdev = NULL;
-@@ -2511,7 +2515,8 @@ void btrfs_rm_dev_replace_free_srcdev(struct btrfs_device *srcdev)
- 
- 	mutex_lock(&uuid_mutex);
- 
--	btrfs_close_bdev(srcdev);
-+	/* The source was made unfreezable for the replace; undo it. */
-+	btrfs_close_bdev(srcdev, true);
- 	synchronize_rcu();
- 	btrfs_free_device(srcdev);
- 
-@@ -2532,7 +2537,8 @@ void btrfs_rm_dev_replace_free_srcdev(struct btrfs_device *srcdev)
- 	mutex_unlock(&uuid_mutex);
- }
- 
--void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev)
-+void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev,
-+				      bool allow_freeze)
- {
- 	struct btrfs_fs_devices *fs_devices = tgtdev->fs_info->fs_devices;
- 
-@@ -2553,7 +2559,7 @@ void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev)
- 
- 	btrfs_scratch_superblocks(tgtdev->fs_info, tgtdev);
- 
--	btrfs_close_bdev(tgtdev);
-+	btrfs_close_bdev(tgtdev, allow_freeze);
- 	synchronize_rcu();
- 	btrfs_free_device(tgtdev);
- }
-diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-index 75c7963f5d4c..65de9504d887 100644
---- a/fs/btrfs/volumes.h
-+++ b/fs/btrfs/volumes.h
-@@ -790,7 +790,8 @@ int btrfs_init_dev_stats(struct btrfs_fs_info *fs_info);
- int btrfs_run_dev_stats(struct btrfs_trans_handle *trans);
- void btrfs_rm_dev_replace_remove_srcdev(struct btrfs_device *srcdev);
- void btrfs_rm_dev_replace_free_srcdev(struct btrfs_device *srcdev);
--void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev);
-+void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev,
-+				      bool allow_freeze);
- unsigned long btrfs_full_stripe_len(struct btrfs_fs_info *fs_info,
- 				    u64 logical);
- u64 btrfs_calc_stripe_length(const struct btrfs_chunk_map *map);
-
--- 
-2.47.3
-
+Thanks,
+Jianyue
