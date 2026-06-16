@@ -1,106 +1,84 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7586143D4F7
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 15:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9D244CAF9;
+	Tue, 16 Jun 2026 15:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781625193; cv=none; b=WgUQhjOp9Ubzp5WJZ/7fEopx0xLLZym3f3yF9kwjaHu+CrNO4QQP3AKe9o1hQniUsdLj9tHSGb7/NmBvH2lfQGzi2ysuRK8tWE7yzxWT60KaJ3ya+RPnkPAr5Qn6zSk/Hu4SYsoJWcz5OmMvDLbTYxZxtuue9lwH0XKHJG8926s=
+	t=1781625321; cv=none; b=DzEhSJaWwclsR7QaGl5tkvpCwbkBiK+M9RCnrzOIJPeCtXG3amy90FPZ/7CAcLLSvAygwWgoila01oG7a8WUGwlvsO2d5zKdMUaBj52xWaVYvZQXGWtjJqeBUzcJkK1B+BqSQ3TOkF/2eWw6L6KClLkw+Dbxi0gNkXXqZjxO2R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781625193; c=relaxed/simple;
-	bh=Dix6XlZcRB1wc60+/mjZtYMI6ii9+QvvkJDqtEvS9D4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XnZULugkG4LK+IgXmpGKnhhIsGI3v18TvH2ivDdX/vg2rnFBxUfcs0uzvDq/cwLdYPLvcFxCJaJFd2j8V4ov/Fn9PPT3m0p2PAFg7R4f3GURQckffRsrhP3LZQzmLwiVkSlSvQYrEStol1T1qVJ7hByhKXREXs409RnEgX6930U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o0NsXgEK; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781625321; c=relaxed/simple;
+	bh=YLbyZnveNFEwkF2a6dnkpPOuXUTyKCGvx8xycPn/Vg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwTm3kX9NU24n3S0eh4i4M040jJpQ9fDWazNbYjXEvqtGLaFfLDk7/UBOYXKzU2N51J4ppWbT4B9ylfM9z2dl7L9OtUoPsUrvU915nfOOeuHraL6ejc1kDOwkGG9FXX0dzvKAENAxDRwuAGbwkzQHzu0iKzsEI1e/TCwrYNC+ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=kr8TJXvM; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0NsXgEK"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-36bdda53d99so1812606a91.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 08:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781625192; x=1782229992; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jh/KH8bV7E+QxBwe9DjJg5o96G0F2VO8jHzkev1UTe4=;
-        b=o0NsXgEKtx7c37zf1cWf0zdaSIGyX6S3GCHff+tm2cLuUabW47lLwapBFBPXJEZJKi
-         MxbxHnte+/tIgc/5rNU+iTAQpFNqRi161VrkrHgMMm1/cD2jSlEdCPg/JAAnY8xDWDAq
-         nyA01AzIYe2WmruoI2fwbq/3vXH9OSfWQNlrxIORmgXtM6NlWb+96RUlUt4ip+0w9a1Z
-         GENf4OtcjCsPHuYzzMCtTIoY/k/uK4AA2TH+oFoLjta+W7sZUKwZDn4c+7LOuzmJYwse
-         mBuEyOUO3Mz5PokmURI5tgArWGWAhemKT74ata1qM88TfxczqIwnmN3xp0sfMMRnlgv3
-         NYIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781625192; x=1782229992;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jh/KH8bV7E+QxBwe9DjJg5o96G0F2VO8jHzkev1UTe4=;
-        b=riQEz4vfIUb0cKa9mIYmQjBgUZgmLltUhrqySi5wjFd0LXF13TFFqqetCyy/oyxJYr
-         mu7zdnMIE/I/e4OOcp/YqEzzUqN7VyrBecV0kKeqCH7SwPb0inmuqAZxtUoc5qwS3xsg
-         2CQ3hRO6p3BwZQzxYVaFtfg0rMoiOac++vunoiEGNeJsqfcsVbid64iu8/RYdDovB7oB
-         BUYA2M2k0q7eI7jFVyywKEcA+ZOfN6oUZy6aR7+ZYwWRbyCCJYfHWS00hpmnyXRx8KGd
-         ybJhDt4P3GOzQ3+MP1u8oTPiRQ4z29KRGBIpP6cejsS/QpnM3Ob9N36tQWddU/ZLRuBD
-         6ugw==
-X-Gm-Message-State: AOJu0YxtPsZcMTKTJvBSWDtCA7nuNItSA1fxjfk7FjxUtWs6IDE00ppv
-	H4gP4d7rt9Za4AJnq8nzvCwsAgUnc7z02ewOQyErWdb7F7GBFKkwAjsX
-X-Gm-Gg: Acq92OEvSuqFa4i+gwYHRXB/9+Wn/yFEn/INvYYmPdhcCg2fUjbg7ZaqlRyQL3WZU7U
-	2DswbaxJZvi7fPPzT5dVgz7Tq5bQslSrUsnHNfqxmdU6tTMLhWTaRR1DTmG+vdjJjUPv6jsFvmU
-	YAMtd0OBswPQcUpjt7ajvr1Yj5x/mPZo1xing98TK3hlFL0JP9zRe+NQtIXJFffVEnSN0hmJegB
-	Dz8w6woTlBaqJTb4n/c2/0tWqv5+0qwMuTQnst4qiqPNuAO+QdiWG8ceWBJ8WpGljQYwj6NT4kl
-	QcWdloBQqUikHVSuwpoNnfROXwvNUlXvn4W6npqQ6BI3tw2cMMdV7NY8aG+Yg08We4zlkXkhLcn
-	u4lCKe7Pxy/dyxHCCgimwYluShAfsADjP1KyEh0Jr9hdc/jHMk9A+mgvtRKpUVI0Z50BeI2Zl8r
-	ALw/kmQ84rbyMVfTzpQK2GS8F+Qfg=
-X-Received: by 2002:a17:90b:538c:b0:36d:b662:708e with SMTP id 98e67ed59e1d1-37c9366d98emr44582a91.9.1781625191781;
-        Tue, 16 Jun 2026 08:53:11 -0700 (PDT)
-Received: from wokron-navi.. ([2001:250:20f:3:a591:e881:8bc8:acac])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c707b62f4sm638455a91.9.2026.06.16.08.53.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 08:53:11 -0700 (PDT)
-From: Yitang Yang <yi1tang.yang@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Yitang Yang <yi1tang.yang@gmail.com>
-Subject: [PATCH] block: fix IORING_URING_CMD_REISSUE flags check in blkdev_uring_cmd
-Date: Tue, 16 Jun 2026 23:51:29 +0800
-Message-ID: <20260616155129.406057-1-yi1tang.yang@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="kr8TJXvM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=yRIX2AOrE2SZskeh2cCmVhiu01x2DMlBcOnVXRxpeJk=; b=kr8TJXvMPeIC5eQm
+	zQ5PgMDjeYwCA/t/r0qGSEJuA6XpymgBrms3mahPqBBdz1uAUYz4BpDzzZ22IUldfwNzlK+iDzUpn
+	5gWHKoamFLXIjbd8yXZTV2PXnL0UIC4BWXSgNSa621dMZWn82smCxg1fqaX5G44VDz8gIem2D0qLz
+	cfqLBoEYGC40ArfXbKDkCM0EuEj5vx4mW/onyjgoVqc6QMUVzTXH2yTq/J5ZfMLKUcUrm10fzZqA7
+	3QAzQGEUvNqs1WBgSRFOtFgx9geJu4EGfG928nrFlccAYkl2sfPLTjE6i+sCe5nIsUwGA3e5SWRqU
+	10OP+vlT+rs9PeIT6Q==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1wZW8B-000000085w4-3Mry;
+	Tue, 16 Jun 2026 15:55:15 +0000
+Date: Tue, 16 Jun 2026 15:55:15 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: zkabelac@redhat.com, Vjaceslavs Klimovs <vklimovs@gmail.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>, trnka@scm.com,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajFx4zh7hgEn0EZS@gallifrey>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <165d3195-c81d-4760-870b-23a9a3b3b72c@leemhuis.info>
+ <ai_1LYtofh1fwD-N@gallifrey>
+ <CAC_j7i0eDccVWzPeRafM50mZEOFHPz2cwd=RZqqx6TK2EVRFvw@mail.gmail.com>
+ <ajCTaUaACV9eNmWo@kbusch-mbp>
+ <ajFISH9bvyWjLOM6@gallifrey>
+ <ajFK5NXkxd6jU5zu@gallifrey>
+ <ajFbglSvcLrFH8Z-@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ajFbglSvcLrFH8Z-@kbusch-mbp>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
+X-Uptime: 15:54:33 up 31 days, 19:07,  2 users,  load average: 0.23, 0.11,
+ 0.02
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-blkdev_uring_cmd() checks IORING_URING_CMD_REISSUE to determine whether
-this is the first issue. However, this flag lives in cmd->flags instead
-of issue_flags.
+* Keith Busch (kbusch@kernel.org) wrote:
+> On Tue, Jun 16, 2026 at 01:08:52PM +0000, Dr. David Alan Gilbert wrote:
+> > ( lvcreate  -m 1 -L 1G main /dev/sda2 /dev/sdb2 ) rather than
+> > the old mirror with the same patch, then:
+> > 
+> >   a) I get no log errors with either read or write
+> >   b) read still gives EIO
+> 
+> I've a follow up patch to handle the error properly. You want to see
+> EINVAL, not EIO, and that error shouldn't be considered for determining
+> the raid health. Something like what f7b24c7b41f23b5 does, but it's a
+> little more complicated in this path since it doesn't see the lower
+> level error status and just converts everything to EIO.
 
-Coincidentally, IO_URING_F_NONBLOCK shares bit 31 with
-IORING_URING_CMD_REISSUE. As a result, the SQE read was never performed,
-bic->len remained zero, and every BLOCK_URING_CMD_DISCARD failed with
--EINVAL.
+OK, thanks for your help, and I'll be happy to test that when it's done.
 
-Fix it by checking cmd->flags as intended.
-
-Fixes: 212ec34e4e72 ("block: only read from sqe on initial invocation of blkdev_uring_cmd")
-Signed-off-by: Yitang Yang <yi1tang.yang@gmail.com>
----
- block/ioctl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ab2c9ed79946..3d4ea1537457 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -951,7 +951,7 @@ int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	u32 cmd_op = cmd->cmd_op;
- 
- 	/* Read what we need from the SQE on the first issue */
--	if (!(issue_flags & IORING_URING_CMD_REISSUE)) {
-+	if (!(cmd->flags & IORING_URING_CMD_REISSUE)) {
- 		const struct io_uring_sqe *sqe = cmd->sqe;
- 
- 		if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
+Dave
 -- 
-2.43.0
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
