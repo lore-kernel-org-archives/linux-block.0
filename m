@@ -1,154 +1,170 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B5A3655E7
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 13:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667D836F8FB;
+	Tue, 16 Jun 2026 13:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781614804; cv=none; b=AWIzK58OZuifWRV4DGVn0JbIeBf4Jh6s3omtzoVH2KrkVEbprj3WBLTQpFKQxC3DYoWKPpAJLwiiM1jXMv+SeYvZYFK8rULmrVuNpi88qWlKWOmJdVzQGYoiqL4kOEXxBgum3J6PL8O8VEFh2WIkexcTaEdEzGivYVQMjyKgNN0=
+	t=1781615337; cv=none; b=tO8tq1IujNKpwrA8svV9PSEM4xqK9pU8Q+Yred4tBPmliO/YkSgDNRxd02C54JiWt6QOUBbpl5xgJpqYgHEQKxueR6igFSYwgZbvrTigY7bjv91kOFoBrC06bDGICk2GvH0rNeRsa7cCN6Yofm3xIa+aSayhP+SxnlYZzLbgNBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781614804; c=relaxed/simple;
-	bh=bhB8cqYkdx99HnRuLaoyAkAfNvz4q6LWBo4ONFNXjmQ=;
+	s=arc-20240116; t=1781615337; c=relaxed/simple;
+	bh=X7I7GHEfdFoC+FxsXBRr4xh9Ds+tjPBEEv29X4ondH0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLPG7uH54ZBu76ny+S6Mar9jYNxb5nKpRE4+bc2IHrCE1URN/g9CzvI+ukqXZlL728g7AM6PAkkkofVjMCMJM17mi4SjOjfxLVsNGjDFrRPcEDLNTlpZlOUc5UYrOAphg5lYwoO6gAHPiJyGPW92NZc85lWnlzv856z7yppWlDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=izDkDBJ7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qfBFySeP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=YKYRCk30J3gYWa80tEDzjVtCL31h1vG+E37tEePjB18/SNdSPvDKpr9PC4FkPargKrhgNr7nKdnXJVJj1vKhy1m+Rni09LYtxhoPn/FEU/qB636v2u250dvqZVueR9JiCDVi3o+v7gHKUWmhjeFk0Yqx/8xflgjV9M3XyP050YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=sYcAT7DM; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="izDkDBJ7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qfBFySeP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781614801;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
-	b=izDkDBJ7Z9CQ+t9sVivC6Fwt7u0570xgxg57lwKfLkuRLZVXR7g/lOyLyRryNTXuBpzFn8
-	Dpr6Rb3M93oiOWlRL2ymPSwCcImleQkcSAKSx+mrqlt5ciA2q9kRjAFZkrlHyPiTqXe2Ws
-	Aw74I8u0mEIbjU253CKkjOkysy7lWxE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-284-gc91RfpTNY-exgEuZHwrhQ-1; Tue, 16 Jun 2026 08:59:59 -0400
-X-MC-Unique: gc91RfpTNY-exgEuZHwrhQ-1
-X-Mimecast-MFC-AGG-ID: gc91RfpTNY-exgEuZHwrhQ_1781614799
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490ae461f8dso34573725e9.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 05:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781614798; x=1782219598; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
-        b=qfBFySePK3ONJcI32lzd6ju6Dl/CDZqDAPPuyGNVdApEwfgB/jNpbeJV9aLfTDz75T
-         tdKM7IyQoIJmGwAzMsnsJMldk1OYaan/JX9/sKGbHt3gnwcFWJuPUV7GnoUITZoaR8u+
-         y4NXAiiANlwJ/NpvXrLn3+QDzpy6YBVBWk/vZRj5K8gC8KFUuMupwncPJbJn3XMez4ik
-         XKvZzJsDmweg19Kd1SYCBLjQWfpToum/id/FDZD97zHiu7+d2BkYkIrLJb2hbw5RT2lX
-         T7mvx00958dDF5jkcIAgJsibp8wuGmZMlefkkZE8rnCXMTWSFA+SsW8qkHrbIh3O7yCP
-         BaSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781614798; x=1782219598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
-        b=UJ6aAb2zpVdaprYKVSc08WIQSPgkrB5tYVXEQUeRGidPMtFORpgOl9MFzaqTpBVAVZ
-         6fXD9dTOXSmP2glhK8gWiEYqZcNDu/33jENZdmDkHWy7T2C8NHqlPyQbRPamG8vRQoTb
-         8WH+oXOCI/dOUCPpU4HW4V7LFBowV4NwQU2NNxC5sWBbjuee8D4MG2MtPOibrCGxi7+5
-         K47wssAr97cXGizk5U3spyurdd0tgCoLYKvIMoUPcIsGPxePuqo/v25Om6nxIF6BPz+W
-         72HwV1iG9QZtPE/VeOsNCtvQVyqnLkI4iHqnEz4c3rDDTKk8SjTxOWHscecb7JN0MQNf
-         Nh4w==
-X-Forwarded-Encrypted: i=1; AFNElJ9jHmfFMFNKABQzqELGTF47kBcD89ZA0XQxLEmyiF3weVZ5lxhr9mu5eBi9jyBl9/ptsxn0oSTxxmej3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YynZs+nn9y28oFCYnmkAk6AX/pTZALwQUH8hyrCx5EzEU7HH4E/
-	QvstFVhOlXHqGNzeYfJcAZR4aKq01Ifyx8typC560iZBfx/CFoNhfdxPtOMirGt+8nyOM3Io/Ig
-	SIlSoWnvFYTPFJUhI3XVOsVZUYHQYyE6sgSv2wBfX/vTTVpl9Q9zTIOaLHNCNGUEL1NOy/hag
-X-Gm-Gg: Acq92OGw5pKOaJqjkD+qNIhp5GugeY1vSLacMbavI2bQdAwGwvZwdgMrfy/B451g2I8
-	zsanIEcz6QO95kfhH/SRibcOzsEgQpWXKdeUaf2SC09oY4oL6AUGGlOD1GpV0CbOTJAZdqwQWg5
-	M7EhXpYmh6VxHsojywJ8UKkfPHD14g93/FiCNQI25vdMETSXhGei8I0peL0TV0OGM1e32F1rmOT
-	nWPKrCa3lq/NuyptdU/n6b4oH6JtrWM5yYhwqRN5vMrBu25towBb86h1NIazH7uiFGDDmlyfySh
-	wDM+G4YMG4H6eBiiFKjQs67z0m6yhyrIcqDAns478rKqjtkcLfMKEGJFRDNwheF2gnUHBPWwdm8
-	vbfsN96ULNGXNr/1ELZifDSrVtF8nhkDezQEJGIVtotxxPpK1LqifYRgLjOwGznnNBqcm/7s=
-X-Received: by 2002:a05:600c:4713:b0:491:7325:39c4 with SMTP id 5b1f17b1804b1-49220164d3bmr190086345e9.34.1781614797340;
-        Tue, 16 Jun 2026 05:59:57 -0700 (PDT)
-X-Received: by 2002:a05:600c:4713:b0:491:7325:39c4 with SMTP id 5b1f17b1804b1-49220164d3bmr190084565e9.34.1781614795388;
-        Tue, 16 Jun 2026 05:59:55 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-135-12.retail.telecomitalia.it. [82.53.135.12])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa97a07sm131444255e9.14.2026.06.16.05.59.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 05:59:54 -0700 (PDT)
-Date: Tue, 16 Jun 2026 14:59:52 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Octavian Purdila <tavip@google.com>, g@sgarzare-redhat
-Cc: netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Andrew Morton <akpm@linux-foundation.org>, Arseniy Krasnov <avkrasnov@salutedevices.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2 2/2] vsock/virtio: restore msg_iter on
- transmission failure
-Message-ID: <ajFEpMnHsxAYJSOa@sgarzare-redhat>
-References: <20260613000953.467473-1-tavip@google.com>
- <20260613000953.467473-3-tavip@google.com>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="sYcAT7DM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=fW2NTLeR9TGB/Hj8QjYm8DF7HxbCfhgTp3AVz7mwOYY=; b=sYcAT7DMeMfKXGxC
+	8N56fvlErVovKzaoW/LeiNKoRYJTEreMy6C8UmvgFAnyWX4LSwo2xZSRdb+OzoWDl5BJdJQLbtT4V
+	bcYN/P8WySFZT4F96zeTtCdhWVacAFZM10DkRrbE1isI1nhWar83qwZTHALy+jKs/b5yLYMgjitUN
+	yysEju9bavHFyTzZicakiQr/SePrgwvLYShCeS1dnuc4cm43TRDVkUFXcfYBAIPQ6zmjOa1mPFprZ
+	N5x2HxlNn0an00mE7MeF+Fw8skC2tX5tzUJM0VLWUkTUhBnBFxMcd08YlNRoa+LKc2aPZvpZLQVIF
+	r43K4Q3lwKbc1b7o0Q==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1wZTXA-000000082k3-0hFn;
+	Tue, 16 Jun 2026 13:08:52 +0000
+Date: Tue, 16 Jun 2026 13:08:52 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: Keith Busch <kbusch@kernel.org>, zkabelac@redhat.com
+Cc: Vjaceslavs Klimovs <vklimovs@gmail.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>, trnka@scm.com,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajFK5NXkxd6jU5zu@gallifrey>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <165d3195-c81d-4760-870b-23a9a3b3b72c@leemhuis.info>
+ <ai_1LYtofh1fwD-N@gallifrey>
+ <CAC_j7i0eDccVWzPeRafM50mZEOFHPz2cwd=RZqqx6TK2EVRFvw@mail.gmail.com>
+ <ajCTaUaACV9eNmWo@kbusch-mbp>
+ <ajFISH9bvyWjLOM6@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260613000953.467473-3-tavip@google.com>
+In-Reply-To: <ajFISH9bvyWjLOM6@gallifrey>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
+X-Uptime: 13:06:51 up 31 days, 16:19,  2 users,  load average: 0.11, 0.06,
+ 0.02
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On Sat, Jun 13, 2026 at 12:09:53AM +0000, Octavian Purdila wrote:
->When transmission fails in virtio_transport_send_pkt_info, the msg_iter
->might have been partially advanced. If we don't restore it, the next
->attempt to send data will use an incorrect iterator state, leading to
->desync and warnings like "send_pkt() returns 0, but X expected".
->
->Specifically, this can happen in the following scenario, triggered by
->the syzkaller repro:
->
->1. A write-only VMA (PROT_WRITE only) is partially populated by a
->   prior TUN write that failed with -EIO but still faulted in some
->   pages).
->2. A vsock sendmmsg call with MSG_ZEROCOPY requests transmission of a
->   buffer from this VMA.
->3. The first packet (64KB) is sent successfully because the pages are
->   populated.
->4. The second packet allocation fails because GUP fast pins the first page
->   but GUP slow fails on the next unpopulated page due to PROT_WRITE-only
->   permissions.
->5. The iterator is advanced by the partially successful GUP (68KB total
->   advanced: 64KB from first packet + 4KB from second), but the send loop
->   breaks and only reports 64KB sent. This creates a 4KB desync.
->6. The next retry starts with a non-zero iov_offset, disabling zerocopy
->   and falling back to copy mode.
->7. In copy mode, the transmission succeeds for the next packets but
->   exhausts the iterator early because of the desync.
->8. The final retry sees an empty iterator but zerocopy is re-enabled
->   (offset resets). It attempts to send the remaining bytes with zerocopy
->   but pins 0 pages, creating an empty packet.
->9. The transport sends the empty packet, triggering the warning because
->   the returned bytes (header only) do not match the expected payload size.
->10. The loop continues to spin, allocating ubuf_info each time, eventually
->    exhausting sysctl_optmem_max and returning -ENOMEM to userspace.
->
->Restore msg_iter to its original state before the packet allocation
->and transmission attempt if they fail.
->
->Fixes: e0718bd82e27 ("vsock: enable setting SO_ZEROCOPY")
->Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
->Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
->Assisted-by: gemini:gemini-3.1-pro
->Signed-off-by: Octavian Purdila <tavip@google.com>
->---
-> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++++
-> 1 file changed, 13 insertions(+)
+* Dr. David Alan Gilbert (dave@treblig.org) wrote:
+> * Keith Busch (kbusch@kernel.org) wrote:
+> > On Mon, Jun 15, 2026 at 04:16:12PM -0700, Vjaceslavs Klimovs wrote:
+> > > Your trace looks like what the two earlier reports hit: a read reaching
+> > > a leaf device with sectors > 0 but phys_seg 0 (an empty bio). One aside
+> > > that may help read the trace: blk_io_trace.error is a __u16, so the
+> > > bracketed values on your C lines are errnos as u16 (65514 = -EINVAL,
+> > > 65531 = -EIO).
+> > > 
+> > > The WARN itself is new, the bad bio isn't. bio_add_page() only started
+> > > rejecting len == 0 in 643893647cac ("block: reject zero length in
+> > > bio_add_page()", v7.1-rc1); on 7.0.8 the same empty bio tripped
+> > > scsi_alloc_sgtables()'s !nr_segs instead, which matches what you saw.
+> > > That fits your "not a recent regression": the condition is older, v7.1
+> > > just made it loud.
+> > > 
+> > > For Tomas's and my reports (QEMU O_DIRECT to the LV block device) the
+> > > origin looks like 5ff3f74e145a ("block: simplify direct io validity
+> > > check", v6.18): blkdev_dio_invalid() now checks only aggregate
+> > > ki_pos | count alignment and dropped the per-segment
+> > > bdev_iter_is_aligned() walk, so a degenerate or misaligned O_DIRECT no
+> > > longer gets -EINVAL at the fops boundary. But your reproducer reads a
+> > > file, which goes through the filesystem O_DIRECT path and never calls
+> > > blkdev_dio_invalid(), and still makes the empty bio. So it isn't only
+> > > that one entry point.
+> > > 
+> > > dm-mirror then hangs because Keith's f7b24c7b41f2 only covers md
+> > > raid1/raid10; legacy dm-mirror (dm-raid1.c) has no equivalent and
+> > > rebuilds the empty read onto the other leg. Note the leg's status isn't
+> > > even consistent (your SATA path returns BLK_STS_IOERR, not
+> > > BLK_STS_INVAL), so copying that status check into dm-mirror probably
+> > > wouldn't catch every case.
+> > > 
+> > > For what it's worth, that points me toward rejecting the empty or
+> > > misaligned bio once, at submission, with -EINVAL, rather than teaching
+> > > each consumer to tolerate it. But you'll know the tradeoffs far better
+> > > than I do.
+> > > 
+> > > I have a small QEMU + LVM raid1/mirror setup that reproduces the
+> > > block-device variant and bisects to 5ff3f74e. Happy to run your file
+> > > reproducer with some instrumentation at the dm-mirror read entry
+> > > (bi_size vs bio_sectors vs bvec lengths) to see whether the bio is
+> > > already empty on arrival or built that way on the retry, and to test
+> > > any patch.
+> > 
+> > Thanks for following up here. I didn't initially see your follow-up
+> > until Thorsten linked it. I apologize for missing that, this feature is
+> > important so I don't want to see anything regress for it.
+> > 
+> > There is a known bug fix I think future tests should include:
+> > 
+> >   https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
+> 
+> > This likely isn't the fix you're looking for, but including it rules out
+> > conditions that are not important here.
+> > 
+> > After that, can we try this suggestion and see if the hang goes away?
+> > 
+> >   https://lore.kernel.org/linux-block/ajBb8tK-0aJBpIgF@kbusch-mbp/
+> 
+> With just that one in, the machine survives - thanks!
+> 
+> It does give:
+> 
+> [  505.208354] device-mapper: raid1: Mirror read failed from 252:24. Trying alternative device.
+> [  505.239376] device-mapper: raid1: All sides of mirror have failed.
+> [  505.239389] device-mapper: raid1: Read failure on mirror device 252:25.  Failing I/O.
+> [  505.239394] device-mapper: raid1: Mirror read failed.
+> 
+> Although as far as I can tell the RAID hasn't errored and is still in sync.
+> 
+> If I turn the test case into a write (just s/pread/pwrite/ ) - the machine
+> still survives but then it does lose raid sync, and the raid resync
+> seems to stick until I do a 'lvchange --refresh main/lvol0'
+> which recovers after having spat out a:
+> 
+> [  865.319527] Buffer I/O error on dev dm-26, logical block 262128, async page read
+> 
+> > I expect the original test case to still return an error (and I think it
+> > was designed to), but it shouldn't produce the warn or bug splats with a
+> > stuck uninterruptable task.
+> 
+> It's not clear to me if it was designed to fail or not; I've not had
+> a chance to rerun the original qemu block tests yet, and I don't know
+> if old kernels succesfully used O_DIRECT in this case.
+> 
+> It still feels that my pwrite case above shouldn't cause a raid de-sync
+> (especially since a normal user can do it).
 
-Thanks, looks much better to me now!
+Just to follow up on that;  if I use the modern lvm mode 
+( lvcreate  -m 1 -L 1G main /dev/sda2 /dev/sdb2 ) rather than
+the old mirror with the same patch, then:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+  a) I get no log errors with either read or write
+  b) read still gives EIO
+  c) write apparently succeeds ?!
 
+Dave
+
+> Dave
+> -- 
+>  -----Open up your eyes, open up your mind, open up your code -------   
+> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+> \        dave @ treblig.org |                               | In Hex /
+>  \ _________________________|_____ http://www.treblig.org   |_______/
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
