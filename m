@@ -1,166 +1,66 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715BD3B42C9
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 14:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D133314C3;
+	Tue, 16 Jun 2026 14:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781619401; cv=none; b=cfUk30E1MSjvwFpv/TsOa2VZUhejeuAUiZ/bKu4sP0+rm5MJHu2Z+5iImetzBc4/GAz1rAApDjPAYFi69Wvz7iW3yEqXpWDiODwM8xU0MCxP3MyoOnWU0HrRtQ7j8iBVWyzv62qcjc2GYwChENlXkr7PRpULVUFO7Nrn69LU8kY=
+	t=1781619589; cv=none; b=EPIA4ewcBgQd+Q1ffvcPL44tCZii9ww+8+MMxQt2zGqipdMSXwKdaK+gLlyre4HxLvdZddSNRGPsi7mhe0MvXtEdi84F0qhzH20k9s885rfVv2IZr1O8Ah8TEwxHDScl1NQ9Ta56PQflNmLvmtYSwMazEijADWXWwgIYL31PRzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781619401; c=relaxed/simple;
-	bh=o7bdVEsbt6KGhe9AJO7W7f3l30ifqiWb4W+Pvo6TkC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KKBmgn+/Daazvp/Up/ZwX5J/2Mgyk33w2O8DtgFCA4AFzH0bGBmg7O5f1M8YNFihpNKy+Tq8i28HlM7itOeD2qCkZjwiYeR5f3yF2YgQfFs+uXnJQfLKkb2+xHiq7UpguHptdHH5h2V50fq9RpqOdUs89Ae4kTSDWU5LC1FL3YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jxTC35Rg; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781619589; c=relaxed/simple;
+	bh=gS3vka/h+7Rh9dfsayzDWPRVFUNOQ8QqcSRFbGAXhLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kA612eigrH3s5L8ytmgV0a5HcUj6ipwXJCllCyVGcpBb5O12ZiTvzOgksBgEL+t+vPUYWIIICmjaRDETOAUpiZoRLcdEmInqDJNl6RC7JfNbzLZZvxjaG+/nQLVqJFtyS4LDv9dQLO+DB4DaePIhfDmQUYkFp6buysdr4TO40Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gf58Pvxg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jxTC35Rg"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781619397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZN8C+9GRlvXNc1Ra52cny7qtJJM6e8aPGn6zNCjDFHI=;
-	b=jxTC35RgtFx1z86cthtWkocpazcQLXzUOYgQ62gYPVPEK2MhctnL1RvS1OWvfXcgo8J9Pu
-	n4PMCDAx5qfYZJzl2+cLg3eUGpMYReCywXVzdQTsRuiuM1Estu65IgUkX0O7y4CLxQLJIn
-	my5kcbkjkz5ov6hGyVVwcjc3IYuEDA4=
-From: Usama Arif <usama.arif@linux.dev>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	bsegall@google.com,
-	dietmar.eggemann@arm.com,
-	juri.lelli@redhat.com,
-	kprateek.nayak@amd.com,
-	linux-kernel@vger.kernel.org,
-	mgorman@suse.de,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	rostedt@goodmis.org,
-	vincent.guittot@linaro.org,
-	vschneid@redhat.com
-Cc: shakeel.butt@linux.dev,
-	hannes@cmpxchg.org,
-	riel@surriel.com,
-	kernel-team@meta.com,
-	Usama Arif <usama.arif@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] block: invalidate cached plug timestamp after task switch
-Date: Tue, 16 Jun 2026 07:15:18 -0700
-Message-ID: <20260616141604.328820-3-usama.arif@linux.dev>
-In-Reply-To: <20260616141604.328820-1-usama.arif@linux.dev>
-References: <20260616141604.328820-1-usama.arif@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gf58Pvxg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD4271F000E9;
+	Tue, 16 Jun 2026 14:19:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781619588;
+	bh=Jvdm53hImTQZkhDZASRZH4W+Gs4s6DyQuut1fvAE+Mw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gf58PvxgCcO0IpfgLSXyEFzkVVBjLP/HslhwqoMXNbt43iCRgV7xXzGjp7BtWtGAo
+	 oqzvli2v8DfAkimA/v8axQTHvvGssZQXzlL2wU3z+ajx2DFoFoqOIHR6wPF2/NcFei
+	 ka0unH4Z4g16az0aSEhaZGc2Dy2k2l1SMnE/XkZtuhk1o10hUft/6AFbZb+j/J5FDu
+	 cul35JUtWMvhCXt8xFHX8upFPobAu4YGpJEf9/LriuSGoPVi/PEJxqQ/U70F8jeHpb
+	 pJcQFhMuF9qa8XYoAWEE3EHPnxzZm68+S2OTbp7Szi51Ck0S3fQfbKbNLrGn8BTaqs
+	 pJ02cUEg5FI3A==
+Date: Tue, 16 Jun 2026 08:19:46 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: "Dr. David Alan Gilbert" <dave@treblig.org>
+Cc: zkabelac@redhat.com, Vjaceslavs Klimovs <vklimovs@gmail.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>, trnka@scm.com,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
+Message-ID: <ajFbglSvcLrFH8Z-@kbusch-mbp>
+References: <ai7rnH20IYeSmY8s@gallifrey>
+ <165d3195-c81d-4760-870b-23a9a3b3b72c@leemhuis.info>
+ <ai_1LYtofh1fwD-N@gallifrey>
+ <CAC_j7i0eDccVWzPeRafM50mZEOFHPz2cwd=RZqqx6TK2EVRFvw@mail.gmail.com>
+ <ajCTaUaACV9eNmWo@kbusch-mbp>
+ <ajFISH9bvyWjLOM6@gallifrey>
+ <ajFK5NXkxd6jU5zu@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajFK5NXkxd6jU5zu@gallifrey>
 
-blk_time_get_ns() caches ktime_get_ns() in current->plug->cur_ktime
-and marks the task with PF_BLOCK_TS. That cache is only valid while the
-task keeps running; if the task is switched out, wall-clock time
-advances and the cached value must not be reused when the task runs again.
+On Tue, Jun 16, 2026 at 01:08:52PM +0000, Dr. David Alan Gilbert wrote:
+> ( lvcreate  -m 1 -L 1G main /dev/sda2 /dev/sdb2 ) rather than
+> the old mirror with the same patch, then:
+> 
+>   a) I get no log errors with either read or write
+>   b) read still gives EIO
 
-The existing invalidation covers explicit plug flushes through
-__blk_flush_plug(), and the schedule() / rtmutex paths through
-sched_update_worker(). It does not cover in-kernel preemption paths such
-as preempt_schedule(), preempt_schedule_notrace(), and
-preempt_schedule_irq(), which enter __schedule(SM_PREEMPT) directly and
-return without calling sched_update_worker().
-
-As a result, a task preempted while holding a plug with PF_BLOCK_TS set
-can reuse a stale plug->cur_ktime after it is scheduled back in. blk-iocost
-then consumes that stale timestamp through ioc_now(), producing stale vnow
-values for throttle decisions, and through ioc_rqos_done(), inflating
-on-queue time and feeding false missed-QoS samples into vrate
-adjustment.
-
-Move the schedule-side invalidation to finish_task_switch(), which runs
-for the scheduled-in task after every actual context switch regardless
-of which schedule entry point was used. Keep __blk_flush_plug() as the
-explicit flush/finish-plug invalidation path, and remove only the
-PF_BLOCK_TS handling from sched_update_worker().
-
-Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
-Cc: stable@vger.kernel.org
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
----
- include/linux/blkdev.h | 16 ++++++----------
- kernel/sched/core.c    | 12 ++++++++----
- 2 files changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 57e84d59a642..c285a4d9837d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1216,16 +1216,12 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
- 		__blk_flush_plug(plug, async);
- }
- 
--/*
-- * tsk == current here
-- */
--static inline void blk_plug_invalidate_ts(struct task_struct *tsk)
-+static __always_inline void blk_plug_invalidate_ts(void)
- {
--	struct blk_plug *plug = tsk->plug;
--
--	if (plug)
--		plug->cur_ktime = 0;
--	current->flags &= ~PF_BLOCK_TS;
-+	if (unlikely(current->flags & PF_BLOCK_TS)) {
-+		current->plug->cur_ktime = 0;
-+		current->flags &= ~PF_BLOCK_TS;
-+	}
- }
- 
- int blkdev_issue_flush(struct block_device *bdev);
-@@ -1251,7 +1247,7 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
- {
- }
- 
--static inline void blk_plug_invalidate_ts(struct task_struct *tsk)
-+static inline void blk_plug_invalidate_ts(void)
- {
- }
- 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 8b791e9e9f67..e97e98c33be5 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -5368,6 +5368,12 @@ static struct rq *finish_task_switch(struct task_struct *prev)
- 	 */
- 	kmap_local_sched_in();
- 
-+	/*
-+	 * Any cached block-layer timestamp (plug->cur_ktime) is stale now,
-+	 * invalidate it.
-+	 */
-+	blk_plug_invalidate_ts();
-+
- 	fire_sched_in_preempt_notifiers(current);
- 	/*
- 	 * When switching through a kernel thread, the loop in
-@@ -7290,12 +7296,10 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 
- static void sched_update_worker(struct task_struct *tsk)
- {
--	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
--		if (tsk->flags & PF_BLOCK_TS)
--			blk_plug_invalidate_ts(tsk);
-+	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
- 		if (tsk->flags & PF_WQ_WORKER)
- 			wq_worker_running(tsk);
--		else if (tsk->flags & PF_IO_WORKER)
-+		else
- 			io_wq_worker_running(tsk);
- 	}
- }
--- 
-2.53.0-Meta
-
+I've a follow up patch to handle the error properly. You want to see
+EINVAL, not EIO, and that error shouldn't be considered for determining
+the raid health. Something like what f7b24c7b41f23b5 does, but it's a
+little more complicated in this path since it doesn't see the lower
+level error status and just converts everything to EIO.
