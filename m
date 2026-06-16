@@ -1,69 +1,76 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACD63B42FE
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 08:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F0343E48A
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 10:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781597594; cv=none; b=qdn/2F8i294WxhI4Sti3LxySet3S1NyFK2K06X4p+WpVVAdyPZgAyqmBTZLYA/8rcKCqddY5N5Yv0DxdZezO1L8EGsVU0rlNDagu615tWySLyClLXsJ3f8k95DERbGGVQOQofaT1ohzhjJWiHKUxbjq/Oi8DFwuCHZW1fxQhllM=
+	t=1781604630; cv=none; b=BRth+Xdqal7YMlGaB31xrAOqoow63ksx8gihlP4MaXvcjpfMSPWJYy3bsNzEN6MI4zqnfK6Uufk1SIsWR23oXvWs3NZ5UUSBqkWP1PoaepINrmA/2u1+7lA/ObZj6F+WQwCblIaZMy5cyik5/dVWtyuAP9E4hl3+77foENO5B9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781597594; c=relaxed/simple;
-	bh=zcYlI6BOH27Zqh+GlLfj050W5csemhmRX2lQcvXKXco=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fD0307/XH7O5mgV79G3gMKab241TEIZoUyWQ4AYt56DyZ9hzoCtsj7A4n6ln10CRyl9zEmJz8v3yY0va3qMD6JflRri0yk6YbKwYfdV0V8fF1/SjoIFSMxLMU7cpSI8TX3epUbSzjKiEtyYKFBIVexcCnVOk5SWjlQ+rSVXMzeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=f/WkpLdr; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=f/WkpLdr; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1781604630; c=relaxed/simple;
+	bh=SqwxklJ83o+kHGOaNAJRUgJP9VhfEJ76YUfw/s63bUY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OHoShlUI4YNsbuOnhU3mUCSMJzqTEXcVDtggBmZC36tMCygsUshjriS0c8sirIQDzLmgXwsJSJigFzLpR5uAePiKKpSYehGPfKQVsRYLSM2DJ4axpF9Br7f3/NcZxs0zcG+OKjdFfipiUkkAQgnojzCu9RTgMp4EDuBIq0pPGi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q8YaXf6u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="f/WkpLdr";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="f/WkpLdr"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 843736CAA1;
-	Tue, 16 Jun 2026 08:13:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1781597583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q8YaXf6u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781604628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oHkl7eB5Q33d+KIXaR6NtZXizd+J+fXxtJicsuSOa/U=;
-	b=f/WkpLdrAv2Ya5OHyMHsAcxsn5BhLG6dErAXEBzXz6nS+ynPHryxEvoykZSWkUMP1Z6v0w
-	n5LIP3MgQiAtF111/enowu9UwQohDMnXKOHvcQMqhpPIGQnQF8qNxCez6JmDMcAGtdaATN
-	rUlgVfiGwQt8NSl+xSYE7KbfVLB63O0=
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b="f/WkpLdr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1781597583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oHkl7eB5Q33d+KIXaR6NtZXizd+J+fXxtJicsuSOa/U=;
-	b=f/WkpLdrAv2Ya5OHyMHsAcxsn5BhLG6dErAXEBzXz6nS+ynPHryxEvoykZSWkUMP1Z6v0w
-	n5LIP3MgQiAtF111/enowu9UwQohDMnXKOHvcQMqhpPIGQnQF8qNxCez6JmDMcAGtdaATN
-	rUlgVfiGwQt8NSl+xSYE7KbfVLB63O0=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	bh=+7WyxlyafAfljSXx2zE5evSFbmc9/FNDO8/ZJyEWYy0=;
+	b=Q8YaXf6uvj31M3KQAmN424ZLTAcOxc+UkA0TBVIbsq+EvybEmwg0i3JVXbZ4WNQ8R4DD4D
+	h6bgqBx+aTg7RZWNZFu8zdAstv+HG0KJDYoF9WOBy9i76B8vW3b5mHCC5P63KYjXcleTdW
+	4HYNXRiALN6dwfjjik29van/JWrn5DE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-135-LaTbixx_MQquCQOzA5YYBA-1; Tue,
+ 16 Jun 2026 06:10:24 -0400
+X-MC-Unique: LaTbixx_MQquCQOzA5YYBA-1
+X-Mimecast-MFC-AGG-ID: LaTbixx_MQquCQOzA5YYBA_1781604621
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 817A8779A8;
-	Tue, 16 Jun 2026 08:13:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IMwgDI0FMWrWawAAD6G6ig
-	(envelope-from <wqu@suse.com>); Tue, 16 Jun 2026 08:13:01 +0000
-From: Qu Wenruo <wqu@suse.com>
-To: linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org,
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B65F81800A7B;
+	Tue, 16 Jun 2026 10:10:21 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.50.44])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 981481800348;
+	Tue, 16 Jun 2026 10:10:15 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: [PATCH v4 2/3] block: respect iov_iter::nofault flag in bio_iov_iter_bounce_write()
-Date: Tue, 16 Jun 2026 17:42:36 +0930
-Message-ID: <9c165a314022b61566eb247852eb773ca6c70889.1781597506.git.wqu@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <cover.1781597506.git.wqu@suse.com>
-References: <cover.1781597506.git.wqu@suse.com>
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v4 13/30] Add a function to kmap one page of a multipage bio_vec
+Date: Tue, 16 Jun 2026 11:08:02 +0100
+Message-ID: <20260616100821.2062304-14-dhowells@redhat.com>
+In-Reply-To: <20260616100821.2062304-1-dhowells@redhat.com>
+References: <20260616100821.2062304-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,72 +78,49 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 843736CAA1
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email,suse.com:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	DKIM_TRACE(0.00)[suse.com:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-For the incoming usage of IOMAP_DIO_BOUNCE in btrfs, btrfs has set
-iov_iter::nofault to prevent deadlock when a page fault is needed to
-read out the buffer.
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-However bio_iov_iter_bounce_write() doesn't respect iov_iter::nofault
-flag, and just call a plain copy_from_iter() so it can still trigger
-page fault and cause deadlock in btrfs.
-
-Fix it by utilizing copy_folio_from_iter_atomic() if nofault flag is
-set, otherwise use copy_folio_from_iter().
-
-Signed-off-by: Qu Wenruo <wqu@suse.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- block/bio.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index d2fdfcb016c1..7fd7c35f9a28 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1335,7 +1335,11 @@ static int bio_iov_iter_bounce_write(struct bio *bio, struct iov_iter *iter,
- 			break;
- 		bio_add_folio_nofail(bio, folio, this_len, 0);
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index d36dd476feda..f834a862224e 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -299,4 +299,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+ }
  
--		copied = copy_from_iter(folio_address(folio), this_len, iter);
-+		if (iter->nofault)
-+			copied = copy_folio_from_iter_atomic(folio, 0, this_len,
-+							     iter);
-+		else
-+			copied = copy_folio_from_iter(folio, 0, this_len, iter);
- 		if (copied < this_len) {
- 			/*
- 			 * Need to revert the iov iter for all bytes we have
--- 
-2.54.0
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
 
