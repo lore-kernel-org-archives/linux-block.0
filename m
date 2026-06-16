@@ -1,47 +1,47 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CDC3D75CE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942223D8104
 	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781633572; cv=none; b=PwekYLNgrld5n24SunDku/ZNMMFO6IiP2YndNUGKRlD/OaKjAui4SnSqYaK/mkRLiJnVK1ftssuL1oaeHJYdD1VQSmF5SBLEmjAS+3Uhb9yTtTJJhtMo5IJdCymzdMlJcPE3KJuR1GKhzsfX+W0tOdD4ps+/TbJcDC7XYMu753Y=
+	t=1781633573; cv=none; b=TMKlX3tBJluQvvO44VHNIEBmHw8rtT/QurVHaY5acRyeZBq3p2q2s5pgcbb4YAez/owQEq5D/KKOMaTiBQG+iGvga82JCSNblol3qf9wnngS9PM+EjWMyZJZU4RGnn3XD6A9dwDyti7ZM+hogUgtZSBdSXb8lKFQ19RbSWgTl1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781633572; c=relaxed/simple;
-	bh=VV4l/CbJgQioq/C7LDOzOKd46L3M58em1zGzlHHw3Tk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=WDjP6n6rF5F9/RR553CedB3nKuinNFLp0S+sDoxb1qSzyegdbPCd56bmKtqDnAanlwXTnEOVWtsNdOxcsGzx0DXfEcPJvb9i3iSbONk2euirMf2fIC3hl38zjb3yExqQ4ScE2Cr94TpJrn5pDlfGZlJA1CXW7EHBuWbxWLHg59c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=dFQWksTo; arc=none smtp.client-ip=203.254.224.24
+	s=arc-20240116; t=1781633573; c=relaxed/simple;
+	bh=JQyVGGCO+QXn1l2XkyJXdW/XC69rU46Zwp8XmRq9S/4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=GSMzJRsGugHmqvAObgDKqceWBIrHj9lYXzf/CEF9HhRW8Nu+5dm86Muv7H9g4Med2SGq8PH89+I+QtPYa8DKuI3pjeL0Xxa3ALvet7AiAVmQ4JuDN5rkfoLr6YDOQ4lQdIiqTQF+nIqL7LyzhFMBE8IBZPaPR1szMyZBzM9GdlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=R7mpp1Il; arc=none smtp.client-ip=203.254.224.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dFQWksTo"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260616181248epoutp01cf03d228220950189cec5e83d15e541d~5okqEO4Ws0340503405epoutp01L
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:12:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260616181248epoutp01cf03d228220950189cec5e83d15e541d~5okqEO4Ws0340503405epoutp01L
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="R7mpp1Il"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260616181242epoutp02729414a55afe3d84133820b892536392~5okkzjFz22316523165epoutp02P
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:12:42 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260616181242epoutp02729414a55afe3d84133820b892536392~5okkzjFz22316523165epoutp02P
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1781633568;
-	bh=F5uqpFzgn7LzWqo2LfNtYU9Z1Rqfg7mMlr/Q24rdpHE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dFQWksToSZNh1hxmH9O/+FEo3kw6NraKHRRXoDvpiv/kdiMmhl2DSnLSZjapz2keo
-	 og/TJlP0thIhfjNWvJr3rYzAlaNkR+ktpZv/dQI0GF3H92pW9xT+h7ovwrb61DHwRH
-	 rHV7fd6qYXzMChcyHzA1RyTFErempu3n8clnh1gs=
+	s=mail20170921; t=1781633562;
+	bh=nJzQs7slFagdz/F2QmdcMRyHRQrGzFulIfSO+nPReKg=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=R7mpp1IlgWWf25bufyi62vnVHIuVW1zF7SiqxF3pzILD5BnHRgJ9cijAUV05UEyir
+	 U03vrABoyAKJIkcPjO+gF4tinIhgysDuAwJ7YiTXfkmHNGg2Me3fiEUVOiJwLpVQkn
+	 1mTbOvzH/Ono0kH+lZe/dMeSLzQ7ZEl9I6DrOJgk=
 Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260616181247epcas5p44e695a5b44fe0d5a0f7b78b2c94642a2~5okphDxmN0964009640epcas5p4a;
-	Tue, 16 Jun 2026 18:12:47 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.86]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4gfw7z07vyz6B9m5; Tue, 16 Jun
-	2026 18:12:47 +0000 (GMT)
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20260616181242epcas5p17e63ff15c9dff9118c33e69159eec29d~5okkORWmq0207002070epcas5p1D;
+	Tue, 16 Jun 2026 18:12:42 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.38.94]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4gfw7s28RFz6B9m6; Tue, 16 Jun
+	2026 18:12:41 +0000 (GMT)
 Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
 	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260616181246epcas5p30fc85b12b67452b5af39525e4ea966a9~5okoSN0dL1246912469epcas5p3H;
-	Tue, 16 Jun 2026 18:12:46 +0000 (GMT)
+	20260616181240epcas5p3f86fbb67f0d04cb0ee4b34839c9522b5~5okiH_3s_1246912469epcas5p3B;
+	Tue, 16 Jun 2026 18:12:40 +0000 (GMT)
 Received: from localhost.localdomain (unknown [107.99.41.245]) by
 	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260616181244epsmtip1aa94fa64239ad96a8723ea5f21492732~5okmdy02N1049410494epsmtip1T;
-	Tue, 16 Jun 2026 18:12:44 +0000 (GMT)
+	20260616181238epsmtip14cb51c5c5ece8abbbde916e4f8c44f9e~5okgR_IM00200902009epsmtip1a;
+	Tue, 16 Jun 2026 18:12:37 +0000 (GMT)
 From: Kanchan Joshi <joshi.k@samsung.com>
 To: brauner@kernel.org, hch@lst.de, djwong@kernel.org, dgc@kernel.org,
 	jack@suse.cz, cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org,
@@ -49,11 +49,10 @@ To: brauner@kernel.org, hch@lst.de, djwong@kernel.org, dgc@kernel.org,
 Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org, gost.dev@samsung.com, Kanchan Joshi
 	<joshi.k@samsung.com>
-Subject: [PATCH v3 3/6] xfs: implement write-stream management support
-Date: Tue, 16 Jun 2026 23:35:52 +0530
-Message-Id: <20260616180555.33338-4-joshi.k@samsung.com>
+Subject: [PATCH v3 0/6] xfs write streams
+Date: Tue, 16 Jun 2026 23:35:49 +0530
+Message-Id: <20260616180555.33338-1-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260616180555.33338-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,191 +60,215 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260616181246epcas5p30fc85b12b67452b5af39525e4ea966a9
+X-CMS-MailID: 20260616181240epcas5p3f86fbb67f0d04cb0ee4b34839c9522b5
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 cpgsPolicy: CPGSC10-542,Y
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260616181246epcas5p30fc85b12b67452b5af39525e4ea966a9
-References: <20260616180555.33338-1-joshi.k@samsung.com>
-	<CGME20260616181246epcas5p30fc85b12b67452b5af39525e4ea966a9@epcas5p3.samsung.com>
+X-CMS-RootMailID: 20260616181240epcas5p3f86fbb67f0d04cb0ee4b34839c9522b5
+References: <CGME20260616181240epcas5p3f86fbb67f0d04cb0ee4b34839c9522b5@epcas5p3.samsung.com>
 
-Implement support for FS_IOC_WRITE_STREAM ioctl.
+Hi All,
 
-For FS_WRITE_STREAM_OP_GET_MAX, available write streams are reported
-based on the capability of the underlying block device.
-For FS_WRITE_STREAM_OP_{SET/GET}, add a new i_write_stream field in xfs
-inode. This value is propagated to the iomap during block mapping.
+In LSFMMBPF'26, we discussed 'write stream' as a mechanism to reduce the
+filesystem allocator bottlenecks and improving buffered/direct IO
+scalability, in different sessions.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- fs/xfs/xfs_icache.c |  1 +
- fs/xfs/xfs_inode.c  | 46 +++++++++++++++++++++++++++++++++++++++++++++
- fs/xfs/xfs_inode.h  |  6 ++++++
- fs/xfs/xfs_ioctl.c  | 38 +++++++++++++++++++++++++++++++++++++
- fs/xfs/xfs_iomap.c  |  1 +
- 5 files changed, 92 insertions(+)
+This series introduces a generic interface [1,2] for write stream management on
+files. It achieves spatial isolation and concurrency improvments [3] in xfs using
+- generic AG-set (patch #4)
+- write-stream based AG-set (patch #5)
 
-diff --git a/fs/xfs/xfs_icache.c b/fs/xfs/xfs_icache.c
-index 2040a9292ee6..d5f880f5b810 100644
---- a/fs/xfs/xfs_icache.c
-+++ b/fs/xfs/xfs_icache.c
-@@ -130,6 +130,7 @@ xfs_inode_alloc(
- 	spin_lock_init(&ip->i_ioend_lock);
- 	ip->i_next_unlinked = NULLAGINO;
- 	ip->i_prev_unlinked = 0;
-+	ip->i_write_stream = 0;
- 
- 	return ip;
- }
-diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
-index beaa26ec62da..2e7c61d71b48 100644
---- a/fs/xfs/xfs_inode.c
-+++ b/fs/xfs/xfs_inode.c
-@@ -47,6 +47,52 @@
- 
- struct kmem_cache *xfs_inode_cache;
- 
-+int
-+xfs_inode_max_write_streams(
-+	struct xfs_inode	*ip)
-+{
-+	struct block_device	*bdev;
-+
-+	bdev = xfs_inode_buftarg(ip)->bt_bdev;
-+	if (!bdev)
-+		return 0;
-+
-+	return bdev_max_write_streams(bdev);
-+}
-+
-+uint16_t
-+xfs_inode_get_write_stream(
-+	struct xfs_inode	*ip)
-+{
-+	uint16_t	stream_id;
-+
-+	xfs_ilock(ip, XFS_ILOCK_SHARED);
-+	stream_id = ip->i_write_stream;
-+	xfs_iunlock(ip, XFS_ILOCK_SHARED);
-+
-+	return stream_id;
-+}
-+
-+int
-+xfs_inode_set_write_stream(
-+	struct xfs_inode	*ip,
-+	uint16_t		stream_id)
-+{
-+	int ret = 0;
-+
-+	xfs_ilock(ip, XFS_ILOCK_EXCL);
-+
-+	if (stream_id > xfs_inode_max_write_streams(ip)) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
-+	ip->i_write_stream =  stream_id;
-+
-+out_unlock:
-+	xfs_iunlock(ip, XFS_ILOCK_EXCL);
-+	return ret;
-+}
-+
- /*
-  * These two are wrapper routines around the xfs_ilock() routine used to
-  * centralize some grungy code.  They are used in places that wish to lock the
-diff --git a/fs/xfs/xfs_inode.h b/fs/xfs/xfs_inode.h
-index bd6d33557194..768c4195306c 100644
---- a/fs/xfs/xfs_inode.h
-+++ b/fs/xfs/xfs_inode.h
-@@ -38,6 +38,9 @@ typedef struct xfs_inode {
- 	struct xfs_ifork	i_df;		/* data fork */
- 	struct xfs_ifork	i_af;		/* attribute fork */
- 
-+	/* Write stream information */
-+	uint16_t		i_write_stream;
-+
- 	/* Transaction and locking information. */
- 	struct xfs_inode_log_item *i_itemp;	/* logging information */
- 	struct rw_semaphore	i_lock;		/* inode lock */
-@@ -676,4 +679,7 @@ int xfs_icreate_dqalloc(const struct xfs_icreate_args *args,
- 		struct xfs_dquot **udqpp, struct xfs_dquot **gdqpp,
- 		struct xfs_dquot **pdqpp);
- 
-+int xfs_inode_max_write_streams(struct xfs_inode *ip);
-+uint16_t xfs_inode_get_write_stream(struct xfs_inode *ip);
-+int xfs_inode_set_write_stream(struct xfs_inode *ip, uint16_t stream_id);
- #endif	/* __XFS_INODE_H__ */
-diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
-index 46e234863644..3f82a4884b81 100644
---- a/fs/xfs/xfs_ioctl.c
-+++ b/fs/xfs/xfs_ioctl.c
-@@ -1179,6 +1179,42 @@ xfs_ioctl_fs_counts(
- 	return 0;
- }
- 
-+static int
-+xfs_ioc_write_stream(
-+	struct file		*filp,
-+	void __user		*arg)
-+{
-+	struct inode		*inode = file_inode(filp);
-+	struct xfs_inode	*ip = XFS_I(inode);
-+	struct fs_write_stream	ws = { };
-+
-+	if (copy_from_user(&ws, arg, sizeof(ws)))
-+		return -EFAULT;
-+	if (ws.rsvd != 0)
-+		return -EINVAL;
-+
-+	switch (ws.op_flags) {
-+	case FS_WRITE_STREAM_OP_GET_MAX:
-+		ws.max_streams = xfs_inode_max_write_streams(ip);
-+		goto copy_out;
-+	case FS_WRITE_STREAM_OP_GET:
-+		ws.stream_id = xfs_inode_get_write_stream(ip);
-+		goto copy_out;
-+	case FS_WRITE_STREAM_OP_SET:
-+		if (!(filp->f_mode & FMODE_WRITE))
-+			return -EBADF;
-+		return xfs_inode_set_write_stream(ip, ws.stream_id);
-+	default:
-+		return -EINVAL;
-+	}
-+	return 0;
-+
-+copy_out:
-+	if (copy_to_user(arg, &ws, sizeof(ws)))
-+		return -EFAULT;
-+	return 0;
-+}
-+
- /*
-  * These long-unused ioctls were removed from the official ioctl API in 5.17,
-  * but retain these definitions so that we can log warnings about them.
-@@ -1444,6 +1480,8 @@ xfs_file_ioctl(
- 		return xfs_ioc_health_monitor(filp, arg);
- 	case XFS_IOC_VERIFY_MEDIA:
- 		return xfs_ioc_verify_media(filp, arg);
-+	case FS_IOC_WRITE_STREAM:
-+		return xfs_ioc_write_stream(filp, arg);
- 
- 	default:
- 		return -ENOTTY;
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index f20a02f49ed9..ccbf7dcf1ad5 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -144,6 +144,7 @@ xfs_bmbt_to_iomap(
- 	iomap->offset = XFS_FSB_TO_B(mp, imap->br_startoff);
- 	iomap->length = XFS_FSB_TO_B(mp, imap->br_blockcount);
- 	iomap->flags = iomap_flags;
-+	iomap->write_stream = ip->i_write_stream;
- 	if (mapping_flags & IOMAP_DAX) {
- 		iomap->dax_dev = target->bt_daxdev;
- 	} else {
+write streams allow the abstraction provider (fs, block device, raid etc.) to
+leverage application's intent (file relationships/lifecycle).
+- application: sends grouping/isolation intent with a stream id.
+- xfs: maps streams to AGs; allocates without interleaving; gains higher
+  concurrency due to reduced lock contention.
+- hardware: maps streams to underlying allocation unit; reduces device
+  internal write amplification, improved life, predictable QoS.
+
+Also few other points:
+
+- Since high level write streams (in xfs) can work without the
+low-level write streams (in block device), the series has a general
+value beyond hardware with a particular capability.
+
+- For hardware-only spatial isolation, only first 3 patches are needed.
+
+- write-stream is different from existing 'filestream' allocator which
+  maintains directory-to-AG associations in a global MRU cache. That
+requires state managment and memory (and its reclaim). Proposed AG-set
+based steering relies on simple, statless/lockless airthmatic that aligns
+more with the default allocator heuristics.
+
+[3]
+### Performance
+1. On regular NVMe:
+fio 4k write, direct IO, 16 jobs, 16 files * 8GiB, iodepth 32, XFS with 16 AGs
+
+Base: 41 KIOPS
+With generic ag-set: 93 KIOPS (+126%)
+With write-stream ag-set: 227 KIOPS (+453%)
+
+2. On FDP-capable NVMe:
+RocksDB YCSB
+WAF (base vs write-stream): 35% Reduction
+
+[1]
+### Application interface
+
+New vfs ioctl 'FS_IOC_WRITE_STEAM'.
+Application communicates the intended operation using the 'op_flags'
+field of the passed 'struct fs_write_stream'.
+Valid flags are:
+FS_WRITE_STREAM_OP_GET_MAX: Returns the number of available streams.
+FS_WRITE_STREAM_OP_SET: Assign a specific stream value to the file.
+FS_WRITE_STREAM_OP_GET: Query what stream value is set on the file.
+
+[2]
+### Comparison with Write Hints (RWH_WRITE_LIFE_*)
+
+- Semantics: Write Hints describe 'data temperature' (e.g.,
+short/long/extreme), implying a lifetime. Write Streams describe 'data
+placement' (e.g., Bin 1/Bin 2), implying only separation.
+
+- Scalability: Write Hints are limited to a small, fixed enum (6
+values). Write streams are dynamic, provider-dependent values that can
+scale much higher (kernel limit: up to 255 due to u8 field).
+
+- Discovery: The existing write-hint interface is advisory and decoupled
+  from underlying capabilties; application has no way to probe support
+and cannot deterministically know which hints are valid. OTOH, write-streams
+provide explicit discovery.
+
+Note: within the kernel, the separation between two constructs
+(write-hint and write-stream) had started from 6.16 itself.
+
+### Changelog
+since v2:
+https://lore.kernel.org/linux-fsdevel/20260309052944.156054-1-joshi.k@samsung.com/
+- xfs default allocator optimization using fixed-size generic AG set (Dave)
+- reuse the above to simplify the write-stream AG set handling
+- streamline the uapi; Use union for GET_MAX and GET/SET (Darrick)
+- uint16_t for write-stream within xfs inode and other cleanups (Darrick)
+
+since v1:
+https://lore.kernel.org/linux-fsdevel/20260216052540.217920-1-joshi.k@samsung.com/
+- swich from fcntl based to ioctl-based interface (Christian)
+- new patch (#4) that makes xfs allocator use the write streams for AG
+  selection
+- new patch (#5) that introduces software write streams in xfs.
+
+### Interface example
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <string.h>
+#include <errno.h>
+
+/* Duplicate the kernel UAPI definitions */
+struct fs_write_stream {
+        uint32_t op_flags;
+        union {
+                uint32_t stream_id;
+                uint32_t max_streams;
+        };
+        uint64_t __reserved;
+};
+
+#define FS_WRITE_STREAM_OP_GET                  (1 << 1)
+#define FS_WRITE_STREAM_OP_SET                  (1 << 2)
+#define FS_WRITE_STREAM_OP_GET_MAX              (1 << 0)
+
+#define FS_IOC_WRITE_STREAM             _IOWR('f', 135, struct fs_write_stream)
+
+void print_usage(const char *progname) {
+        fprintf(stderr, "Usage:\n");
+        fprintf(stderr, "  %s <file> max       - Get max supported streams\n", progname);
+        fprintf(stderr, "  %s <file> get       - Get current stream ID\n", progname);
+        fprintf(stderr, "  %s <file> set <id>  - Set stream ID\n", progname);
+        exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+        if (argc < 3)
+                print_usage(argv[0]);
+
+        const char *filepath = argv[1];
+        const char *cmd = argv[2];
+        int fd = open(filepath, O_RDWR);
+        if (fd < 0) {
+                perror("Error opening file");
+                return EXIT_FAILURE;
+        }
+
+        struct fs_write_stream req;
+        memset(&req, 0, sizeof(req));
+
+        if (strcmp(cmd, "max") == 0) {
+                req.op_flags = FS_WRITE_STREAM_OP_GET_MAX;
+                if (ioctl(fd, FS_IOC_WRITE_STREAM, &req) < 0) {
+                        perror("ioctl(GET_MAX) failed");
+                        close(fd);
+                        return EXIT_FAILURE;
+                }
+                printf("Max streams supported: %u\n", req.max_streams);
+        } else if (strcmp(cmd, "get") == 0) {
+                req.op_flags = FS_WRITE_STREAM_OP_GET;
+                if (ioctl(fd, FS_IOC_WRITE_STREAM, &req) < 0) {
+                        perror("ioctl(GET) failed");
+                        close(fd);
+                        return EXIT_FAILURE;
+                }
+                printf("Current stream ID: %u\n", req.stream_id);
+        } else if (strcmp(cmd, "set") == 0) {
+                if (argc != 4)
+                        print_usage(argv[0]);
+
+                req.op_flags = FS_WRITE_STREAM_OP_SET;
+                req.stream_id = atoi(argv[3]);
+
+                if (ioctl(fd, FS_IOC_WRITE_STREAM, &req) < 0) {
+                        perror("ioctl(SET) failed");
+                        close(fd);
+                        return EXIT_FAILURE;
+                }
+                printf("Set stream ID to: %u\n", req.stream_id);
+        } else {
+                fprintf(stderr, "Unknown command: %s\n", cmd);
+                close(fd);
+                print_usage(argv[0]);
+        }
+
+        close(fd);
+        return EXIT_SUCCESS;
+}
+
+Kanchan Joshi (6):
+  fs: add generic write-stream management ioctl
+  iomap: introduce and propagate write_stream
+  xfs: implement write-stream management support
+  xfs: generic AG set based steering
+  xfs: write stream based AG placement
+  xfs: introduce software write streams
+
+ fs/iomap/direct-io.c     |  1 +
+ fs/iomap/ioend.c         |  3 ++
+ fs/xfs/libxfs/xfs_bmap.c | 74 ++++++++++++++++++++++++++++++++++++++++
+ fs/xfs/xfs_icache.c      |  1 +
+ fs/xfs/xfs_inode.c       | 69 +++++++++++++++++++++++++++++++++++++
+ fs/xfs/xfs_inode.h       |  6 ++++
+ fs/xfs/xfs_ioctl.c       | 38 +++++++++++++++++++++
+ fs/xfs/xfs_iomap.c       |  1 +
+ include/linux/iomap.h    |  2 ++
+ include/uapi/linux/fs.h  | 14 ++++++++
+ 10 files changed, 209 insertions(+)
+
 -- 
 2.25.1
 
