@@ -1,112 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F5917555;
-	Tue, 16 Jun 2026 00:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2230DF59;
+	Tue, 16 Jun 2026 00:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781568364; cv=none; b=AwA9stbfS1evSX+P1I29MN7ikrrwASjYeJNSMn3lelXggWbhmcTqv/IC37W5u6runVvu9453XZBAwP2+9KbRAX2jraX3TTr9XKXFsNGlCNHogJA1rC4Ho7x04GRTbfrdY+2EoGXU9NQB6R1UsIhYI9dZVMJtH3npmrLXVmMBqGQ=
+	t=1781568599; cv=none; b=LwGdSdkjF5vXZcLjNM55x7xkPX0piUnp5e/2qkrvzmHVFUsHbMB9LPXHkc5ofsvQfVTtl9TC6C5eegK3cbkJUq8/p6RW/yO/hsx186J8hHfI5GjQzq3aaL1jofezdApds/aWY+63JJuFXWtjyaEI5DV26bX8ql/UOgO4+0YqLck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781568364; c=relaxed/simple;
-	bh=dCzH09ZkuD1AgzdmKLO1CA9KGoefFYYfGVx00yz3kkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ukjqYVjIX14IVhwvPimCrCvcmfYl2jLpVL06/Kyo4wpbZXol00nSDVjEDROvAxBa6YsgxH68+FkA1/jP0NRTn17vMAPRTxTyHB3Q/lVqMB5fAhlXy6vvgfYOcatk5Q8Wb909F2XdyLaXA/3cYH36dWY6DVaJtrMHgGMqzf7HLFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4Uwpx/F; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781568599; c=relaxed/simple;
+	bh=t/kM7j8d0foldHsRhUKT2g6+r5v47tS8hckV+My2S7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nwOle6mnTgWg7/EpW+5ihTsTCscLVzrGJ7hpNU7pFxUiWEbzKdHmlqgCftOGbXXOMJMM3EbyWKAHDre5jjDZZZTYBWza4Km2/Lt1JFswba05XiTkChcoQptWavH00zp7Fls/bAEKgIfJvbsHF59WBzvHqdHRzFIwRTT8O0o5j4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RNkAedHA; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4Uwpx/F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97B181F000E9;
-	Tue, 16 Jun 2026 00:06:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781568362;
-	bh=D0PoIHVHhiMu7J6asi9m9ZoXppYPlvsCw4tTs7m5Bvg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=F4Uwpx/FZNdzP8KBMuGIBz/U0evnRCHDgd6WzE/vtxwW0fxBGMgrFTUkZDQxZptnO
-	 hJ05qUxhuhK+jPBtCtv8RLiatIq3U0RrhMy0xI6Nxfxva+Cn4wDItpIw9rr3DyFQ/O
-	 /xMOr7TSAD0Etb0v0OzN7pf0d960CzZUajbQRWIKpeJiCPbnCj1SRQApGl/97GqXIu
-	 jr0ebR48OmZxxEDAiPphmTR86frtbGb2uY3iXqJnAbKm6bkoxwnZV27BlyzcOak/7p
-	 6OXNWt4vsrTq4oJwZLD2FztWOfoOR+ZM5dahl5S2+EGU0EkJ/UbsymihvR1Hzij1ZH
-	 /rWLdGUh+Wa1A==
-Date: Mon, 15 Jun 2026 18:06:01 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Vjaceslavs Klimovs <vklimovs@gmail.com>
-Cc: "Dr. David Alan Gilbert" <linux@treblig.org>,
-	Thorsten Leemhuis <regressions@leemhuis.info>, trnka@scm.com,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	Linux kernel regressions list <regressions@lists.linux.dev>
-Subject: Re: Repeatable, raid1+O_DIRECT, hang/warn
-Message-ID: <ajCTaUaACV9eNmWo@kbusch-mbp>
-References: <ai7rnH20IYeSmY8s@gallifrey>
- <165d3195-c81d-4760-870b-23a9a3b3b72c@leemhuis.info>
- <ai_1LYtofh1fwD-N@gallifrey>
- <CAC_j7i0eDccVWzPeRafM50mZEOFHPz2cwd=RZqqx6TK2EVRFvw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RNkAedHA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781568598; x=1813104598;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=t/kM7j8d0foldHsRhUKT2g6+r5v47tS8hckV+My2S7c=;
+  b=RNkAedHAXpN2Sx0+8nFLXatYI3FZUwtXb5YkRCwvjq9/Td8a2QQFJRHP
+   517P25fehRQNAqzxcWgxyH7pC/omoU3FZ0ra5fKC1gltq8a2OUc6MvNPx
+   XJJAZXZna+292bx9Frxr9vobo9bjJPNpXS0Bb1T0+yNw0RZfsgAe3e0Aa
+   alllcykGi0Va9kGJJyTTBNsv8qd/BXTRXQe58/+soFZ5p6iwKACxOT73l
+   uKEY+XuRPvVBXBwJJ7WsWuzFSew6v/0wKQxCIsBYMlaL9ublVigKZ2lEZ
+   S7bhgCk5U2LjXWaC5EV0BCUoyd1+psCp6yfoANWsjFBDcYWvVwU0VAx/d
+   Q==;
+X-CSE-ConnectionGUID: DxSgR9sjQFO9ugdA5i3tew==
+X-CSE-MsgGUID: YhYtxBa7Ri+GXq8SHlJQqQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11818"; a="104992973"
+X-IronPort-AV: E=Sophos;i="6.24,207,1774335600"; 
+   d="scan'208";a="104992973"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 17:09:56 -0700
+X-CSE-ConnectionGUID: uf8FQ6zNT++z6n9n/jceZw==
+X-CSE-MsgGUID: 6aN6azQ4S8SjD3Yhv78Pgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,207,1774335600"; 
+   d="scan'208";a="285727422"
+Received: from bradocaj-mobl.ger.corp.intel.com (HELO [10.125.111.24]) ([10.125.111.24])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 17:09:55 -0700
+Message-ID: <096515b9-26fd-4835-b713-0112025b9d27@intel.com>
+Date: Mon, 15 Jun 2026 17:09:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAC_j7i0eDccVWzPeRafM50mZEOFHPz2cwd=RZqqx6TK2EVRFvw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/19] x86: define DPS root partition type UUIDs
+To: Vincent Mailhol <mailhol@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Davidlohr Bueso <dave@stgolabs.net>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org
+References: <20260615-discoverable-root_partitions-v1-0-39c78fac42e2@kernel.org>
+ <20260615-discoverable-root_partitions-v1-12-39c78fac42e2@kernel.org>
+ <03be57ae-0e41-4b8a-adc5-bdd85ccce951@intel.com>
+ <ea71a433-fdcc-429d-adce-14e9fb726957@kernel.org>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <ea71a433-fdcc-429d-adce-14e9fb726957@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 15, 2026 at 04:16:12PM -0700, Vjaceslavs Klimovs wrote:
-> Your trace looks like what the two earlier reports hit: a read reaching
-> a leaf device with sectors > 0 but phys_seg 0 (an empty bio). One aside
-> that may help read the trace: blk_io_trace.error is a __u16, so the
-> bracketed values on your C lines are errnos as u16 (65514 = -EINVAL,
-> 65531 = -EIO).
+On 6/15/26 13:19, Vincent Mailhol wrote:
+...
+> That said, your points make sense to me, and I would be supportive to
+> allow a search for a secondary UUID as a kernel extension. If we do
+> so, I think the only constraint should be to make sure that we check
+> for the exact match first (e.g. check x86_64 type before x86_32 type).
 > 
-> The WARN itself is new, the bad bio isn't. bio_add_page() only started
-> rejecting len == 0 in 643893647cac ("block: reject zero length in
-> bio_add_page()", v7.1-rc1); on 7.0.8 the same empty bio tripped
-> scsi_alloc_sgtables()'s !nr_segs instead, which matches what you saw.
-> That fits your "not a recent regression": the condition is older, v7.1
-> just made it loud.
+> Would that make sense?
+
+Yep, that makes sense to me.
+
+>> 2. Should the UUIDs be defined in arch code or generic code?
 > 
-> For Tomas's and my reports (QEMU O_DIRECT to the LV block device) the
-> origin looks like 5ff3f74e145a ("block: simplify direct io validity
-> check", v6.18): blkdev_dio_invalid() now checks only aggregate
-> ki_pos | count alignment and dropped the per-segment
-> bdev_iter_is_aligned() walk, so a degenerate or misaligned O_DIRECT no
-> longer gets -EINVAL at the fops boundary. But your reproducer reads a
-> file, which goes through the filesystem O_DIRECT path and never calls
-> blkdev_dio_invalid(), and still makes the empty bio. So it isn't only
-> that one entry point.
+> I think that you convinced me to put it in generic code.
 > 
-> dm-mirror then hangs because Keith's f7b24c7b41f2 only covers md
-> raid1/raid10; legacy dm-mirror (dm-raid1.c) has no equivalent and
-> rebuilds the empty read onto the other leg. Note the leg's status isn't
-> even consistent (your SATA path returns BLK_STS_IOERR, not
-> BLK_STS_INVAL), so copying that status check into dm-mirror probably
-> wouldn't catch every case.
+>> 3. Kconfig or #ifdefs?
 > 
-> For what it's worth, that points me toward rejecting the empty or
-> misaligned bio once, at submission, with -EINVAL, rather than teaching
-> each consumer to tolerate it. But you'll know the tradeoffs far better
-> than I do.
+> I would say Kconfig. If we go for the exact match only, that would be:
 > 
-> I have a small QEMU + LVM raid1/mirror setup that reproduces the
-> block-device variant and bisects to 5ff3f74e. Happy to run your file
-> reproducer with some instrumentation at the dm-mirror read entry
-> (bi_size vs bio_sectors vs bvec lengths) to see whether the bio is
-> already empty on arrival or built that way on the retry, and to test
-> any patch.
+>   CONFIG_DPS_ROOT_PARTITION_TYPE_UUID
+> 
+> If we allow more as an extension, that would become:
+> 
+>   - CONFIG_DPS_ROOT_PARTITION_TYPE_UUID for the exact match
+>   - CONFIG_DPS_ROOT_PARTITION_TYPE_UUID_SECONDARY for the compatible
+>     one.
+> 
+> The drawback is that some entries will be in both:
+> 
+>   config DPS_ROOT_PARTITION_TYPE_UUID
+>   	string
+>   	  default "4f68bce3-e8cd-4db1-96e7-fbcaf984b709" if X86_64
+>   	  default "44479540-f297-41b2-9af7-d131d5f0458a" if X86
+> 
+>   config DPS_ROOT_PARTITION_TYPE_UUID_SECONDARY
+>   	string
+>   	  default "44479540-f297-41b2-9af7-d131d5f0458a" if X86_64 && COMPAT_32
+> 
+> And I don't think we need more than two.
 
-Thanks for following up here. I didn't initially see your follow-up
-until Thorsten linked it. I apologize for missing that, this feature is
-important so I don't want to see anything regress for it.
+That's not ideal, but it's also a completely static thing that will get
+written very, very rarely.
 
-There is a known bug fix I think future tests should include:
+> A bonus question: should those Kconfig entries be hidden? I prefer the
+> hidden option because it doesn't add that much code and I thought this
+> was not worth bothering the user with one more menuconfig question.
+> But I would be happy to change if people this this is worth an
+> menuconfig entry.
 
-  https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
-
-This likely isn't the fix you're looking for, but including it rules out
-conditions that are not important here.
-
-After that, can we try this suggestion and see if the hang goes away?
-
-  https://lore.kernel.org/linux-block/ajBb8tK-0aJBpIgF@kbusch-mbp/
-
-I expect the original test case to still return an error (and I think it
-was designed to), but it shouldn't produce the warn or bug splats with a
-stuck uninterruptable task.
+Yeah, it should be hidden. Anybody that wants to change it for whatever
+reason can edit the .config file or hack Kconfig.
