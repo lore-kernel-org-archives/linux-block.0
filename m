@@ -1,51 +1,46 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099933C6A29;
-	Tue, 16 Jun 2026 04:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CFB3CF02F;
+	Tue, 16 Jun 2026 05:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781585615; cv=none; b=BJH8xwBJ74N/IR0NkIZGxh36m5+ZCD7F9WvbG2XeoOB6OpvA1Ds1OpQ8sbXn8Q3Rv+exxxDri/Qvo7V24yEgVZMnr+AHOgjZ3J44+h1d15jQVmYPXnMrst2xlu6eVXJfxF1q/ZPlVxQbfcwOJ5kE1DNVeF/EUh69xPbDVdbZ7iY=
+	t=1781587140; cv=none; b=N2e5ZH9IlD06rozCrnhSQPqGT54N8oa2dautpFSegn+f12piPbQUhXRrcu+N332nBNpUAiqPLrgnVRoKF6PW7Kmkj8rAhtN87Tqpd4079dwNc4dhn30kShorRcAPNx2VFDVOu6guAT3JkEDPzOOJFKztzlFQRTDNB7E6YXSfEM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781585615; c=relaxed/simple;
-	bh=se6JjSFqEhcNOcO5yXaTc4lQy0fzqgSqIPAWH1BewYA=;
+	s=arc-20240116; t=1781587140; c=relaxed/simple;
+	bh=auJWAW/KvLjl1iYvS+m6yiX3/vFiUXgoXHpUHwezcbI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rYI/t68vaNZVExiC2KgznbAOtRWsSotzGc7F87wtHMs75dikgcVr24AuEs6W2GuG3ij1JkD+klwigxTBGL0sKYyyth0fzy5eHMmz6w/1IHlpi9jVShiMMfYDjlaq9RBT7OhHZv8DcCK5FXuDTVQORgPc9YmcA8mWVt0iC86wJ2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=VmPsuxtx; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=pt/Xq9fGUt9BN4eaE5Idoh1/z61pE9GpD88FUaMo+Iq5vDYx+YjfbjNFbTsXPIFOKH2tkQu7kRW98/jM4wzTtQO6URwjbY1INQNMYuA9t/up9MlS2W2T6xZR+oRCw4rtd2Ylbe1XycxoNmTeOoSLRiRbFTRNmdeZQh7gpatWAaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mwXXOplr; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="VmPsuxtx"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mwXXOplr"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=Drc4fXjipljDF28wMil4aX3O9W2wJZel/OFv8NyFnHk=; 
-	b=VmPsuxtx+9Bg8KvHv/jo8rkDWN8e5B9NelDNvldK4sqHaOvY7kBjn36NTuRuakXklslItoeNIyQ
-	fUZb+fhu5jE/C/xc3lCQRbcky3ffEu0x2YWR6HZ4x0rxGzNAxu2ixPJfO+tUnrmxhjdgGPrT/CFdD
-	LJrE9e6041bBLhJJQvvfTl7J39KdXI7b/uQq33PoG5c3ykJyCZXB4mpmmsoR5f663smt0pjDLd8i2
-	SVHerGdf2znKxnYpToC+S9XgVzsmP5YVUgIcwUAKd8gKXUpcWOhgEzyxKkyOF80LZozXIxvz2AfRV
-	2vF540NGMOhUUH1MRjZO53OHeloOumdSGr2w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wZLng-00000005lJC-0YMs;
-	Tue, 16 Jun 2026 12:53:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 16 Jun 2026 12:53:23 +0800
-Date: Tue, 16 Jun 2026 12:53:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Leonid Ravich <lravich@amazon.com>, Alasdair Kergon <agk@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Horia Geanta <horia.geanta@nxp.com>,
-	Gilad Ben-Yossef <gilad@benyossef.com>,
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit
- batching
-Message-ID: <ajDWww8OgNcXs73c@gondor.apana.org.au>
-References: <20260615111459.9452-1-lravich@amazon.com>
- <20260615225317.GB28589@quark>
- <ajDNT5jVGgRtiNH6@gondor.apana.org.au>
- <20260616045023.GA113934@sol>
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=gt+vcbhrtqJ+O1ShQXxtiWR4nUZSmr3RMSGrf3Qsazk=; b=mwXXOplr8MbNqmgwSK2mML5q/c
+	QR8dLeLDhzGIdVyEcRqriP41CERNhXbRcErG+2rWrttuqj8lPd7mzwNplY0sqE+V+xeIywBqP+qlx
+	4ukqrOacpZj0XBtnfpVla+vd4mg8NPZ3AtOld3YQWmFj5ePoU/RPPaZLKH8cnzdWogggv1nImdxAz
+	uQ/13pJ5y4b5aWLrhAueY7XxbLZqllXKFHmx6Q1pUN1eL4SELys8Zpj9SFcHytyHp/UY3WDdyjO/j
+	O3/eWcBmiv7oEppq0OmYxEIHgybV4eQY7H8t9m3OnEPxCp+jGRUpgjpfUl4hn2Fwqmttgi9cok6l8
+	cC/BLWZA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wZMCP-0000000FF0V-3nWB;
+	Tue, 16 Jun 2026 05:18:58 +0000
+Date: Mon, 15 Jun 2026 22:18:57 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Qu Wenruo <wqu@suse.com>,
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] iomap: reject NOWAIT and BOUNCE direct IOs
+Message-ID: <ajDcwRtWIao-T5NM@infradead.org>
+References: <cover.1781253428.git.wqu@suse.com>
+ <3d739b6dc37e34ca2a2a3780d12d0288a4060d57.1781253428.git.wqu@suse.com>
+ <ajAU1yLd32BCiCNj@infradead.org>
+ <efa3f1f9-20c2-44c0-914c-5e34a40235a1@gmx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,25 +49,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260616045023.GA113934@sol>
+In-Reply-To: <efa3f1f9-20c2-44c0-914c-5e34a40235a1@gmx.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 15, 2026 at 09:50:23PM -0700, Eric Biggers wrote:
->
-> Have you checked the code?  This patchset adds overhead in multiple
-> places.  Dynamically allocating multiple scatterlists and then parsing
-> them, adding a new field to skcipher_request for everyone, new checks in
-> crypto_skcipher_en/decrypt for everyone, new checks to validate the data
-> unit size that the caller knew was valid in the first place, etc.
+On Tue, Jun 16, 2026 at 08:13:27AM +0930, Qu Wenruo wrote:
+> It looks like NORETRY can still sleep, thus again breaking NOWAIT
+> requirement.
+> 
+> I think you're talking about GFP_NOWAIT?
 
-No I have not :)
-
-I'm just stating the general principle.
-
-Of course I will not apply the patch-set until I have reviewed it
-properly.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yes, GFP_NOWAIT would be a better fit.
