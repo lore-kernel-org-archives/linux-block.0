@@ -1,88 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397744418DF;
-	Tue, 16 Jun 2026 15:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A3B44BCBE
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 15:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781623172; cv=none; b=otUZUfQv4J5PVXC09nmVI5EFSgE607uvnHz/ZDcuVHF9LvSTYYvwtb7VSabJycaqI+sVKDOpVceTzeqRW8GYWvmaHUTAvPFWUGL9CrKk2lKTRhq0Lqao6LTIohEo29selZtNqktMZ4jsOrf7jIezmFGfXp4FM9kagHikpJjCyz0=
+	t=1781624178; cv=none; b=gibjj2YKRm2QtXPCeaSQ6197S6PPnxTcdLyj9WUj05iYrjn1E/9OjeY37uXRSgM08Ynzp18OFi6B8nmR2xN3w8KnxDzBy9EFfQyhg4TVn+hkw+gBhw0wE7Lhs4Nm8d5tvD4ix+6jxj/X2U56nHC9hkIKO9BPp+BGXOh23hCDYFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781623172; c=relaxed/simple;
-	bh=fnM67QtKDbK8xZKF0hGe2BloDUuVbND5ZSldQPQ92vQ=;
+	s=arc-20240116; t=1781624178; c=relaxed/simple;
+	bh=grT1qA9lUeWaFenHae7doyegh2HHUvnM4Xf2fxaX58Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sfGm7apQRoUoptLRm7qiybabZCHwZrjuyVZZL3yBGMlas7GzgcuU6RCklW4iHzznp7H+fp3o5YuhCZEcmKlFTljfWfLlMg9Dhqz4PY66TEeqZNi6UCFY/buRSb1maufhIKZorVXcy0aW2SvjdC5X1DgePrP605JscVU0TECB5ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C3KHeFMf; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=LgGpOpUElgWFX1al6tEZa2vo4ONRTTd0z1a83MM8xEgrmavnHCO+qo3VWxAUVmLASLatoWKuUdcxZqS2V7T0XwF7Xi2wU3lMqRHs5ZMsEj5SDuyiIPx6FEHFgyW2DH++BaRs5Of3ba6kEUi/Tq8s1vsi0dI1/nmcuRsWXLfTO6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBnjzKlh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C3KHeFMf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A73A1F00A3E;
-	Tue, 16 Jun 2026 15:19:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBnjzKlh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE5AF1F000E9;
+	Tue, 16 Jun 2026 15:36:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781623170;
-	bh=juOgUzeXy3XGsInNpe15bufLEDlOx+XQzIp5A397JkY=;
+	s=k20260515; t=1781624177;
+	bh=v+X/MHvNtxwrhQ7a0cfBtfH77O5NOBeKXOMXglD71Vc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=C3KHeFMfPC+yAaSzIg0d95m3I0xEpDsWlEwoaPTaoJYfJNDKmTv0cKSZzfbbqc/Wu
-	 d8akawUi2BghCvAvmcEZuhA3kfz3EKR5coklh4zJ3VKagdyvPjIftRaVpdj913u1s1
-	 K3nWzCRQGfqvcgJH3rQlu5kPL3I3tsC12bpvccsgaixq/ewzcDBZaNKj7UEjUIcS/V
-	 0whVK+dEe/g8IyC4ymEkWjZ1nKTeBmsQ+TpuUxZ7RR5tY0sUiLwcJ2g88pAwV9kzeM
-	 CI9cdL91HodKXSF6pakZ+9nvoRMoav0GjecnDRdjd31LHvVLTYwCQH0xPigTZ7hKpv
-	 T5OvUAgdpT3fg==
-Date: Tue, 16 Jun 2026 17:19:25 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, 
-	linux-ext4@vger.kernel.org, Gao Xiang <xiang@kernel.org>, linux-erofs@lists.ozlabs.org
-Subject: Re: [PATCH RFC 2/8] fs: add a global device to super block hash table
-Message-ID: <20260616-gepumpt-gemischt-verblassen-b4cec29c7a6e@brauner>
-References: <20260602-work-super-bdev_holder_global-v1-0-bb0fd82f3861@kernel.org>
- <20260602-work-super-bdev_holder_global-v1-2-bb0fd82f3861@kernel.org>
- <20260616123443.GA21024@lst.de>
- <20260616-fragil-duktus-nachverfolgen-60f54584c206@brauner>
+	b=kBnjzKlhSFd/ifpiJtPOw1UqVzLs+kZsV13pH8FeUC0+1ONer36/t+WJ9e5f+41eE
+	 6u0POEBkNySUvKAfcF5gxEcEDlXUFrpwplOkbs7un11KA+/HjuToucC5MC1IgKUZeV
+	 J00KuWrl464mTikYgo2x8OlliC3X+5E83ecvO3mja5Jhju1/khw0sZXaVygqXw0Q9W
+	 KGMbR+JqXjx+g7l47uURNjySB+7jywWkxgeXu9cPTKnUVFJDhvOmG1eWMP+1ytwI44
+	 4alp6V40kLWogjDaTyg0SmIYf1b/NeqCdPrxJwJSUCWpz01Izfy6ORG+7rFqJMXWln
+	 0lUfBAFwRHhsg==
+Date: Tue, 16 Jun 2026 09:36:15 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	axboe@kernel.dk, Carlos Maiolino <cem@kernel.org>
+Subject: Re: [PATCH] block: check bio split for unaligned bvec
+Message-ID: <ajFtbzPiEI1kFjp6@kbusch-mbp>
+References: <20260612223205.465913-1-kbusch@meta.com>
+ <20260615133549.GC26132@lst.de>
+ <ajB36Wt9lU_F-r7h@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260616-fragil-duktus-nachverfolgen-60f54584c206@brauner>
+In-Reply-To: <ajB36Wt9lU_F-r7h@kbusch-mbp>
 
-On Tue, Jun 16, 2026 at 04:59:53PM +0200, Christian Brauner wrote:
-> On Tue, Jun 16, 2026 at 02:34:43PM +0200, Christoph Hellwig wrote:
-> > On Tue, Jun 02, 2026 at 12:10:08PM +0200, Christian Brauner wrote:
-> > > fs_holder_ops recovers the owning superblock from bdev->bd_holder, which
-> > > forces the holder to be exactly one superblock and prevents several
-> > > superblocks from sharing one block device. That's what erofs is doing.
-> > > 
-> > > Introduce a global dev_t-keyed rhltable mapping each block device to the
-> > > superblock(s) using it. The holder argument becomes purely the block
-> > > layer's exclusivity token (a superblock, or a file_system_type for
-> > > shared devices) and is no longer needed by the fs specific callbacks.
-> > 
-> > Err, no.  block devices need to have a specific owner.  If erofs wants
-> > to share a device between superblock it needs to come up with an entity
-> > that owns the block devices which is not a superblock.
-> 
-> It already did.
-> 
-> > IMHO sharing devices between superblocks is a bad idea, but that ship
-> > has sailed, but please keep it contained inside of erofs.
-> 
-> We need a simple device number to superblock mapping anyway and that can
-> simply be centralized in the vfs. And it can work with anon device
-> numbers and block device numbers uniformly.
+On Mon, Jun 15, 2026 at 04:08:41PM -0600, Keith Busch wrote:
+>   3: can handle arbitrary memory but advertise default dma_alignment=511
+>       (brd, pmem, zram, ps3vram, simdisk - "limits lie")
 
-Plus, after we're done we then also have a centry place where we can
-intercept what devices can be mounted by a filesystem uniformly.
-
-My first approach for this was of course to just add fs_file_open_by_*()
-wrappers and move the relevant security hook into there. But while doing
-this - ignoring the ton of bugs I found - I realized that having a
-mapping so we can go from device number to superblock is very helpful.
-
-We could of course keep the mapping just local to erofs but I see no
-reason why the vfs cannot just provide this ability natively given that
-it has all the required machinery. I'll let Jan chime in as well.
+That's actually not right because they iterate with
+bio_for_each_segment, which requires all the bv_len's are sector size
+granularity, so their default limits are correct. Just no one's
+enforcing them right now.
