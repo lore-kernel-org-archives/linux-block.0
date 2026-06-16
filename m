@@ -1,180 +1,209 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B75383C97;
-	Tue, 16 Jun 2026 20:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B7938D011;
+	Tue, 16 Jun 2026 20:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781640563; cv=none; b=jY92xbJK9UGeEznoy9MqkYztCeP3FwULIG5ad8zIT0Gtwc/BT3i06ZKQrDq48cA9gbQwWJuTTWQVJ8pc9mdkUMguDOLElmUKzYDwFOCyXtQrIX2WUUsp0LhpmrWk9dBGF8OJ0Yz9qIDLzC7YfgaVYlCXUa61ZUTR/Cjg+YLh+h8=
+	t=1781641016; cv=none; b=KRL7g/WwS9Swj4HbY6JZ+OGBLzqfFQdGV5RKkcWsdOzC1SF+yApEht/auartrgK6JAFWj4LmO7FgWakQj0VWSYQVnryle7I1MOir3EPRF8+XcaGIbr8qNChfqqSW/0rVarRehnH3jRhdNOQFOYMkGORqaNitHIL1anSXzDGGQmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781640563; c=relaxed/simple;
-	bh=biN34mc3tzes4onlYIm5lUp5N4wyzZL6l1DxGLenBIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qolc45eIMs6Nt2QL7r1QWSInGQvT/cUMXWhaOVvHuC5xMEbl71R0RMEoT+9TF1pe73dHsN4en7YbqPiuJ58Mdto6sph4gEC336V4ixHGzOh7UuZektGXH9tyjoodzWzn+WQSOOqud77yd9ACbcpGoxXAC/Nb/x97QmTLyaskUic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=TO0g89Dq; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1781641016; c=relaxed/simple;
+	bh=V1NLVnV77x1FwzmeepuZ5M0qTAvv7JRkHF4W5JsQSXo=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=TwKIT+96Cb5zbZT47bFmxFP1bpf9iqLMjVLLJmKolj1lMBGNTqcyQkxTYBLW7SV+LMUlbd3jjdn04wFQuMyRDDnPBeeHqSR5wzZjbiu1RPDDU6GjJx1RlZM1M6t9HHLeuUC1P5XZ6jfnnA/JrvSoP+vd3VzyeGY3tEe5e1oPcuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ZSqXwoP1; arc=none smtp.client-ip=185.70.43.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="TO0g89Dq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=M3IO3jImbbmdWmdveUeJx2d7uwMS2XBEpl0/onXjTR0=; b=TO0g89DqEuGwESEw
-	vxtGUfjBXSCSDwsA3IT/fGidTeIOKU6k/p9yHkJbmHAeLd5YQETIoGOyhefwptoZqfwE/wyHFDom6
-	7KFf9VoEiuSPl6zwGmKuWZw08ZMaeljXwcLH/o5BYY9gGqC02aU2d26AvLHvGEHXINPl/286qtUYJ
-	4HRRQEyEo1dma18sGRjZfAdmS5SHvUCuF0/ywh7OZeKYHCUmmCjPFIqjS8Zdnb6jRV7/rTCsPdJFS
-	O/qm4459K8UzLDuUxQDeUFM22DA1upREPlSS7HK8+Sm5caJwsUXQuY/OUSkGAKRp8a/yLgxkrtVeK
-	NFlqDpXk25yk6WsfBg==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1wZa62-000000088WK-1pVz;
-	Tue, 16 Jun 2026 20:09:18 +0000
-Date: Tue, 16 Jun 2026 20:09:18 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org, mpatocka@redhat.com,
-	Vjaceslavs Klimovs <vklimovs@gmail.com>
-Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
- errors
-Message-ID: <ajGtbuJ2kXo1GZ1d@gallifrey>
-References: <20260616150554.1686662-1-kbusch@meta.com>
- <20260616150554.1686662-2-kbusch@meta.com>
- <ajGN1OKun3qyvqMc@gallifrey>
- <ajGacnaCZ6v6VE1B@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ZSqXwoP1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1781641008; x=1781900208;
+	bh=H3Goi+Y+UYTPjsaFMxwCKhXsIsypsit8EhU2bFsQTZ8=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ZSqXwoP18j95VEpeIPuJrId4YQp29HTTpm39pM4v+fM4XP33kyZUmEu2wzTuoDYLu
+	 vFSNW4xOrw0N24Afqk6Fo3+Vkl18qSjujUAiK1/hNYIOS889a9itxmVlcnrm8TF4Af
+	 7giJ3PN9MxzKPnw4TfXrhbEgCqDdPA12VfvyZlug20gYFsXH8CjkBAtHH0MduT6G6q
+	 6fEzS5XFR6q7Ujq3uOZOcYJ6mZwcBs8gVNFDa5KegSVOhmtC5LGUkpA/iwKXGNfMaP
+	 VgcZxB3NfyA/SC5L8hVen29zPm6czIiC99C3o6Oy7Bp0P9iP/Kh+M0GUFy1sfd1xWK
+	 Gl+tpnYLLcf+Q==
+Date: Tue, 16 Jun 2026 20:16:41 +0000
+To: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: =?utf-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, Paul Moore <paul@paul-moore.com>, Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, linux-security-module@vger.kernel.org, io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Landlock: LANDLOCK_ACCESS_FS_IOCTL_DEV bypass via io_uring IORING_OP_URING_CMD
+Message-ID: <20260616201633.275067-1-hexlabsecurity@proton.me>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: 3e618764aa8d1c1ba3df37c48f031a42fe7e9e1c
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ajGacnaCZ6v6VE1B@kbusch-mbp>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
-X-Uptime: 20:03:05 up 31 days, 23:15,  2 users,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-* Keith Busch (kbusch@kernel.org) wrote:
-> On Tue, Jun 16, 2026 at 05:54:28PM +0000, Dr. David Alan Gilbert wrote:
-> > OK, for this pair I think would be fair for a Tested-by me as well;
-> > they certainly resolve the hang and the WARN/BUGs.
-> > I still see the errors as EIO on my tests, and on the older mirror type
-> 
-> Could you share your reproducer? I'm just using the original recipe you
-> sent here:
-> 
-> https://lore.kernel.org/linux-block/ai7rnH20IYeSmY8s@gallifrey/
-> 
-> And I'm seeing EINVAL instead EIO.
+Hello Micka=C3=ABl, and Landlock / io_uring folks,
 
-Interesting; I've got your:
-  dm-raid1: don't fail the mirror for invalid I/O errors
-  For DM_IO_BIO requests, do_region() built each destination bio by walking..
-ontop of e21ee273e6fa3879aec9a27251cfce98156e07c4 which is just before 7.1
-  I've not your https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
+A task confined by a Landlock ruleset that grants READ_FILE/WRITE_FILE on a=
+ block
+or NVMe character device but withholds LANDLOCK_ACCESS_FS_IOCTL_DEV can sti=
+ll
+reach the device-command surface through io_uring IORING_OP_URING_CMD with =
+the
+IOCTL_DEV check bypassed: the request enters the device-command handler (bl=
+ock
+discard, or the NVMe char-device passthrough) where the equivalent ioctl(2)=
+ is
+denied. The destructive completion and the NVMe-admin surface follow from t=
+he
+code -- see Impact.
 
-root@dalek:/home/dg# lvcreate  --mirrors 1 -L 1G main /dev/sda2 /dev/sdb2
-root@dalek:/home/dg# mkfs.ext4 /dev/mapper/main-lvol0
-root@dalek:/home/dg# mount /dev/mapper/main-lvol0 /mnt/tmp/
-root@dalek:/home/dg# chmod a+rwx /mnt/tmp
+Affected
+--------
+Any kernel with CONFIG_SECURITY_LANDLOCK=3Dy and Landlock enabled that supp=
+orts
+LANDLOCK_ACCESS_FS_IOCTL_DEV (Landlock ABI >=3D 5, since Linux 6.8) and io_=
+uring
+uring_cmd for the device class (block BLOCK_URING_CMD_DISCARD; NVMe passthr=
+ough).
+Confirmed by source inspection on mainline (v7.1-rc7) and reproduced on Lin=
+ux
+7.0.11 (Landlock ABI 8). The confined task needs a writable fd to a device =
+it is
+legitimately allowed to use (e.g. a partition/loop device or an NVMe namesp=
+ace
+passed into a container or granted by the ruleset); no CAP is required to r=
+each
+the io_uring path. The gap is structural -- Landlock has never registered a
+uring_cmd hook -- so it is present from ABI 5 (Linux 6.8) through current
+mainline (v7.1-rc7) and is not a regression tied to a single Fixes: commit.
 
-dg@dalek:~$ dd if=/dev/zero of=/mnt/tmp/testfile bs=1024k count=1
+Root cause
+----------
+On the ioctl(2) path, the syscall handler in fs/ioctl.c calls
+security_file_ioctl() (its only call site on the ioctl(2) path) before
+dispatching to do_vfs_ioctl(); that reaches Landlock hook_file_ioctl_common=
+(),
+which denies a device ioctl unless the file's
+allowed_access holds LANDLOCK_ACCESS_FS_IOCTL_DEV (BLKDISCARD/BLKSECDISCARD=
+/
+BLKZEROOUT and NVMe passthrough are not in the is_masked_device_ioctl()
+allow-list, so they require the right).
 
-my two tests are separate tests:
-{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}
-dg@dalek:~$ cat dbf.c
-#include <errno.h>
-#include <fcntl.h>             
-#include <asm-generic/fcntl.h>
-#include <stdio.h> 
-#include <unistd.h>
+io_uring reaches the same device-command surface by a different producer:
 
+  IORING_OP_URING_CMD -> io_uring_cmd()   io_uring/uring_cmd.c
+   -> security_uring_cmd(ioucmd)          (the ONLY LSM gate on this path)
+   -> file->f_op->uring_cmd()             e.g. blkdev_uring_cmd() / nvme_ns=
+_chr_uring_cmd()
 
-const char* path="/mnt/tmp/testfile";
-static char buf[8192];
+Landlock's LSM_HOOK_INIT list (security/landlock/fs.c, net.c, task.c) regis=
+ters
+file_ioctl/file_ioctl_compat but no uring_cmd hook -- only SELinux
+(selinux_uring_cmd) and Smack (smack_uring_cmd) gate this surface -- so
+security_uring_cmd() returns 0 for a Landlocked task and hook_file_ioctl /
+IOCTL_DEV is never consulted. For block, blkdev_cmd_discard() is then gated=
+ only
+by BLK_OPEN_WRITE; for NVMe, nvme_ns_chr_uring_cmd() reaches the admin/IO
+passthrough with no security_file_ioctl on the path. There is no shared hel=
+per
+that re-applies the IOCTL_DEV check.
 
-int main()                                       
-{
-  int fd=open(path, O_RDWR|O_DIRECT|O_CLOEXEC);
-    
-  errno=0;
-  int res3=pread(fd, buf, 4096, 0);
-  printf("pread of 4096 said: %d (%m)\n", res3);
+SELinux and Smack hooking uring_cmd while Landlock does not is the coverage
+asymmetry; the Landlock documentation describes IOCTL_DEV as gating ioctl(2=
+) but
+does not mention io_uring.
 
-}
-{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}
-dg@dalek:~$ cat dbf-write.c
-#include <errno.h>
-#include <fcntl.h>             
-#include <asm-generic/fcntl.h>
-#include <stdio.h> 
-#include <unistd.h>
+Reproducer
+----------
+A self-contained PoC is available on request (it needs root only to set up =
+a loop
+block device and open it; Landlock enforcement is uid-independent, so the
+confined child demonstrates the gap regardless of the setup uid). The child
+applies a Landlock ruleset handling READ_FILE|WRITE_FILE|IOCTL_DEV with a r=
+ule
+granting only READ_FILE|WRITE_FILE on the device, then:
 
+  (1) ioctl(fd, BLKDISCARD, range)        -> -EACCES  (Landlock enforces IO=
+CTL_DEV)
+  (2) IORING_OP_URING_CMD,
+      cmd_op =3D BLOCK_URING_CMD_DISCARD     -> reaches the block command h=
+andler
 
-const char* path="/mnt/tmp/testfile";
-static char buf[8192];
+Observed on Linux 7.0.11 (Landlock ABI 8):
 
-int main()                                       
-{
-  int fd=open(path, O_RDWR|O_DIRECT|O_CLOEXEC);
-    
-  errno=0;
-  int res3=pwrite(fd, buf, 4096, 0);
-  printf("pwrite of 4096 said: %d (%m)\n", res3);
+  [1] ioctl(BLKDISCARD)   -> ret=3D-1 errno=3D13 (Permission denied)
+  [2] uring_cmd(DISCARD)  -> cqe.res=3D-22 (Invalid argument)
 
-}
-{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}
+A Landlock denial is always -EACCES; the io_uring path returned -EINVAL, wh=
+ich
+originates in a post-authorization check inside the block command handler
+(blk_validate_byte_range() in blkdev_cmd_discard()), reached only after
+security_uring_cmd() returned 0. So this run demonstrates the authorization
+bypass -- the request traversed the LSM gate into the block device-command
+handler with no IOCTL_DEV check -- and then failed a parameter check, not a=
+n
+authorization check. The destructive completion (an authorized discard with=
+ a
+granularity-aligned range) is the expected behaviour but was not exercised =
+in
+this run.
 
+Impact
+------
+Demonstrated: the LANDLOCK_ACCESS_FS_IOCTL_DEV authorization is bypassed. T=
+he
+device-command request reaches the block command handler with no Landlock c=
+heck;
+the only remaining gate is BLK_OPEN_WRITE (held, since the policy granted w=
+rite).
+Inferred from the code, not exercised here: an authorized DISCARD with a va=
+lid
+range completes (DISCARD/secure-erase semantics, destroying on-device data)=
+, and
+the same missing hook leaves the NVMe char-device uring_cmd surface ungated=
+ --
+nvme_ns_chr_uring_cmd (namespace device /dev/nvmeXnY) -> nvme_ns_uring_cmd =
+for
+NVME_URING_CMD_IO/IO_VEC passthrough, and nvme_dev_uring_cmd (controller de=
+vice
+/dev/nvmeX) for NVME_URING_CMD_ADMIN (format, sanitize, firmware download,
+security send) -- both reach f_op->uring_cmd with no Landlock/IOCTL_DEV gat=
+e.
 
-> > get the stuck resync on write, and on the newer mirror I see the write
-> > apparently succeed (did it really?)
-> 
-> There was a time when ext4 used to fallback to buffered io for writes
-> but not for reads, but looks like that was fixed since 6.18, so should
-> be returning error.
-> 
-> I tried testing it with a modification to your original read test, and
-> it is still failing with EINVAL for me:
-> 
->   pread of 4096 said: -1 (Invalid argument)
->   pwrite of 4096 said: -1 (Invalid argument)
+So the confirmed finding is a missing authorization (the confined task esca=
+pes
+its own IOCTL_DEV restriction); the destructive data effect and the NVMe-ad=
+min
+high-water-mark follow from the code but are not shown in the run above. Th=
+e
+proven authorization bypass alone scores CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C=
+:N/I:H/A:N
+(6.5 Medium) -- S:C because the confined task crosses the Landlock policy
+boundary it was placed under, I:H because the bypassed path reaches a handl=
+er
+whose authorized completion modifies device data. With the device command
+completing destructively the projected ceiling is
+CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:H (8.4 High), the A:H component
+reasoned from the source rather than executed. No memory safety is involved=
+.
 
-Your double test gives me:
-dg@dalek:~$ ./dbf-joint 
-pread of 4096 said: -1 (Input/output error)
-pwrite of 4096 said: 4096 (Input/output error)
+Suggested direction
+-------------------
+Have Landlock register a uring_cmd hook that maps the device command to the=
+ same
+checks the ioctl path applies (IOCTL_DEV, and truncate where relevant), so =
+a
+single chokepoint covers every f_op->uring_cmd provider (block, NVMe, ublk,=
+ and
+any future one). Mirrors how SELinux/Smack already gate this surface.
 
-> ---
-> #define _GNU_SOURCE
-> #include <errno.h>
-> #include <fcntl.h>
-> #include <stdio.h>
-> #include <unistd.h>
-> 
-> const char* path="/mnt/tmp/testfile";
-> static char buf[8192];
-> 
-> int main()
-> {
->   int fd=open(path, O_RDWR|O_DIRECT|O_CLOEXEC);
-> 
->   errno=0;
->   int res3=pread(fd, buf, 4096, 0);
->   printf("pread of 4096 said: %d (%m)\n", res3);
+I am happy to send a patch for this if you would like.
 
-errno=0;
+Best regards,
 
->   res3=pwrite(fd, buf, 4096, 0);
->   printf("pwrite of 4096 said: %d (%m)\n", res3);
-> }
+Bryam Vargas
+Independent security researcher, HEXLAB S.A.S., Cali, Colombia
+hexlabsecurity@proton.me
 
-Dave
-
-> --
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
