@@ -1,40 +1,44 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66744202C46;
-	Tue, 16 Jun 2026 12:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77785332EC8;
+	Tue, 16 Jun 2026 12:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781613413; cv=none; b=RJCGGmWzm9BQPiZsKdyOPkWABwpvffjdjKkrMZTqh5HsFm4XphhRfYUZ+gppSRAYGbcR1PrSyi8tDc9HM35wMUidBZtkQNT3kRZ1h8YOQ71Sn35CEDPabMs7YnX5BQGiKwmpLbtjXZ06QmyRBn775+Fxr6euWJ8lrd0jx85J7yM=
+	t=1781613861; cv=none; b=LZswYfbGsdxGopYUaBY3Yg7hPuE73xi+pe/4oEFSJUKg+nlS93H/TT8UB31d2QfXg/6r1AhaRroBXOtdTUvL/cCVtQCl2BYhpg1jomkRdJTMYysgLvBeMTwnP72+8B2coDm6LaQDAIMSayESRESlk/a/6sdYA/vsfR3rgR15bto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781613413; c=relaxed/simple;
-	bh=xfzKR7IgypJiS1B45c8sdwSFt3SsDVQtlJzJWnaQ1a4=;
+	s=arc-20240116; t=1781613861; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hfxa2DygQlOCi71lu7aBmobAX3wsX/doKfAIKL+NRRFcFBUuyJGQcpGGZo0G8lHzLo3G9GlVhPNy0Rfeh6c2jH/JUkETaK9jwQoB1o3YyGH+Vwin/oNnE7XeqvzwjlyHkpck6Wjil9zXEp2DaLU0mHKyJw3mSlst/YLIhqAVuDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id E2F0E68AFE; Tue, 16 Jun 2026 14:36:46 +0200 (CEST)
-Date: Tue, 16 Jun 2026 14:36:46 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jianyue Wu <wujianyue000@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Chris Li <chrisl@kernel.org>,
-	Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>,
-	Barry Song <baohua@kernel.org>, Kairui Song <kasong@tencent.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Youngjun Park <youngjun.park@lge.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH 0/3] mm/zram: route block swap I/O through swap_ops
-Message-ID: <20260616123646.GB21024@lst.de>
-References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XGpvWHVY8Nqgr/UTj7Jaaau9T2gbXqeoV0W3fbpPececHF6JRDCLRK5WG2acwH4NPuHb5BJgdNOMEqmeBAp1qJhuCSlRuM605icTs79E3NuOfZeNPzNgTdpc9SBUAQyI2r/1FlaPBeZN5pQw5c/4ZwgVpPA1RtrAbWl80liHENY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BUGo6tkE; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BUGo6tkE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=BUGo6tkELx82Q9HWYoFDTJnF77
+	mU9AzIbR0FxvNV6pDEltizQbIM0o2arcPnd0cFLz9qGyFyyEaeSGa3Cvd9gVWfE+JVLVBm2sfJhAt
+	rliIM7ocLt96IFIWThWBr0KP2IHFrZEusSIKuVcowNEeLAnEMdy6zL2L45PRi8/QMRJ0c/IiMZFvR
+	LVZoxv4II8S0j+poVtCJxXEK5j0X/s7RgjqUpC+MorPfWKe08W1v7vsJL4/6/7KbW0iO0Wr0zqSyD
+	i0BrN0xn1rpTTSxyugMWfnA2RZFtI4co57W86sQF/MBTzOlErDqIZom1BrHwyxsdLnHUlf/mf1KLp
+	J761ZEfg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wZT9O-0000000Fmhm-41vj;
+	Tue, 16 Jun 2026 12:44:18 +0000
+Date: Tue, 16 Jun 2026 05:44:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Qu Wenruo <wqu@suse.com>
+Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] block: revert the iov_iter after a short copy in
+ bio_iov_iter_bounce_write()
+Message-ID: <ajFFItbX2NtDX8-G@infradead.org>
+References: <cover.1781597506.git.wqu@suse.com>
+ <c400989f227343b134110773d5acaaacf7024574.1781597506.git.wqu@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +47,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <c400989f227343b134110773d5acaaacf7024574.1781597506.git.wqu@suse.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-I fear this is going entirely in the wrong direction.
+Looks good:
 
-Yes, we have to keep zram around as a legacy interface for now,
-but the right place to deal with compressed swap is in the core.
-
-So please don't add more hacks for 'magic' block devices.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
