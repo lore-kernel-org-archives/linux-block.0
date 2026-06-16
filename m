@@ -1,79 +1,63 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40053CF050;
-	Tue, 16 Jun 2026 05:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B118A324705
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 07:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781587188; cv=none; b=KqKFb4GAW233PowwxnbK3SlQA7q/tRR4IlCsTRBBxoEnzdIBImFHhObf54apA9o34uYjjbrSfYfov36pknCfwa/JaKY+FKk96O/ytszmAPf5gBuS8/9rhca6VVuLJvatoYFyclpcZRNePrxHSXyxWgcdbnQT+4QO3LQWAd0iqko=
+	t=1781596489; cv=none; b=YiUU1iKj7s1c5bHaaevqkXAbVlhrSDvOb3wz9kPZ1EJH+O1bP1y3Y49AZfbDGDVIxA+xpoVftMjHBU9D547GgTmxUTWLyZL1cACoJ+E9L3eGidWlnMiwbf7siFe+kDqAeEAYAjw4LeZAAyXUl6QYhpv7Gk7pHqkMPp7GW0PxakA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781587188; c=relaxed/simple;
-	bh=sixLjN0FDVO4HUjbBLP7jyXMbln2zQW1kQtx0+j4WBM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S9Ttziy4GMW403ZoOq7eEEQTxSxcvnE5EPcHa3ohM3huK6rRQQtpmRw1wrpTSaS20h/Wz1Ntii2OBhMF4FAtPP80AQyP5saCy7nJ6M6oROGHpgsEiAnCuTPuwaEI8YiAVelHnx2xLYlQ3wmpGJfW4TtBKPkAD/96L8PNyCY+nuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Qr5Owso0; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1781596489; c=relaxed/simple;
+	bh=fvYL0tLeWp8xXQFlraiA19JexYbDwRo8mvJ2m+/Nf2Q=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DTS8dyauXpZEUCURBf+qwUx+rkdqKdeWTd7gg4cwS2IK0PUZS7sKjFSLCBO+IWFIEnbSlIu+9riyxLiqIRZ6T4T2FmEL+3+pcdfgEUItoqlBw6j4QKML2Nrm8JrHn+xgzpowTZhDZ0JzVm3embpZfUYyZqcEoRUzxiwv/xcUY4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ha8ieYTA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Qr5Owso0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lJY3rUCqFWGxeFm4eh9bZ4MnNqzzDeT0NZZ7p/99HHs=; b=Qr5Owso0HsiVXkL0WsUdgjCwX0
-	CbxL8zqgWyoOWKucMhuD8d/aELfkNc/mAtcXlcukfeE8Pkud+j/GzXnX/iMvfgDML3euZfu1I5APo
-	nsEHdJyqZk1PdZAqzfbSj8MEIhriKDOf3X2C4eVJCWANlbPvV8w+UiMhoHyTtOLEDSp0qEPTAaIu8
-	0OhvlDY/1a97WybQO7T5LuAz+4SIn/ALqjgLRt6MvqQeNSHQ6+7w6u6F3tW0MNHiR0tzY/zriM8AO
-	v1iZZVAnVnQgNiG7Ocdv1IAKdm8X/4B/YSWa7XKZDt+TiTobkJJKEqE22FSSKZcGHHhB93UVAhrxX
-	cP1iUxcQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wZMDC-0000000FF3y-0et2;
-	Tue, 16 Jun 2026 05:19:46 +0000
-Date: Mon, 15 Jun 2026 22:19:46 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Qu Wenruo <wqu@suse.com>,
-	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] iomap: reject NOWAIT and BOUNCE direct IOs
-Message-ID: <ajDc8nFYyiQ66TOR@infradead.org>
-References: <cover.1781253428.git.wqu@suse.com>
- <3d739b6dc37e34ca2a2a3780d12d0288a4060d57.1781253428.git.wqu@suse.com>
- <ajAU1yLd32BCiCNj@infradead.org>
- <efa3f1f9-20c2-44c0-914c-5e34a40235a1@gmx.com>
- <8a0e1881-fe73-4912-95f9-8eac998840d5@gmx.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ha8ieYTA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 145F81F000E9;
+	Tue, 16 Jun 2026 07:54:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781596488;
+	bh=4IDaOs3FIThacGwshfmVYJ+PxpugSdHymW01YIckJFM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=ha8ieYTARQc/7qqlUbiwmWwhFFzCdrMnrPrOuxIOlec3P/UlqYPeJjUd6hndxg/9L
+	 S+ykTp+tJ3zlEedJsitxkX4l3bfY0p3x5TUkivApx3iPS2UmUSri4hnu4oDI3gP/uL
+	 Sxl0k+d58hXTdaF3WgmxiUphv1/+jafKoXwZFyAZvSdL4+NbI+TTuQelkhGRoR59p4
+	 /9lOpzpHx/fEahflh2jfv7RtRSNQ0JTvPlc3Hw+wq3wikm0WW6QZmq7bkSSQ/78ttj
+	 50fWlKqZ5b8UKxGdcVi86sQJcUUPWntvV93imARabYkf0CE3UVRQexcmjIhXTU9col
+	 otrOx3sUO9fNQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1990E383BF68;
+	Tue, 16 Jun 2026 07:54:44 +0000 (UTC)
+Subject: Re: [GIT PULL] Block updates for 7.2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <28f00610-4a45-47f5-9e08-468c31736090@kernel.dk>
+References: <28f00610-4a45-47f5-9e08-468c31736090@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <28f00610-4a45-47f5-9e08-468c31736090@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.2/block-20260615
+X-PR-Tracked-Commit-Id: c7c76f9232bd34835d821f14abdc5fafc17bc938
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ba9c792c824fff732df85119011d399d9b6d9155
+Message-Id: <178159648268.515891.5399769672022950909.pr-tracker-bot@kernel.org>
+Date: Tue, 16 Jun 2026 07:54:42 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a0e1881-fe73-4912-95f9-8eac998840d5@gmx.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jun 16, 2026 at 10:30:27AM +0930, Qu Wenruo wrote:
-> After scanning the code for related memory allocation, there are some other
-> locations doing memory allocation, including but not limited to:
-> 
-> - iomap_dio_alloc_bio()
->   This one is a little tricky, if we pass GFP_NOWAIT, we can break the
->   old assumption that the function will always return a bio.
-> 
-> - fscrypt_set_bio_crypt_ctx()
->   This one is fine so far, as neither XFS nor btrfs support fscrypt yet.
-> 
-> And any memory allocation failure in NOWAIT mode should return -EAGAIN, not
-> -ENOMEM so that the caller can retry in blocking mode as a fallback.
-> 
-> To me, considering NOWAIT itself is only an optimistic flag, and caller
-> should always have a blocking mode as fallback, I'd prefer to reject NOWAIT
-> + BOUNCE direct writes completely inside btrfs for now.
+The pull request you sent on Mon, 15 Jun 2026 09:24:22 -0600:
 
-If you want to do that in btrfs please do it there.
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.2/block-20260615
 
-> And leave all the missing NOWAIT handling in iomap in a dedicated series.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ba9c792c824fff732df85119011d399d9b6d9155
 
-This might be worth looking into.
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
