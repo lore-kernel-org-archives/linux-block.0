@@ -1,125 +1,218 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4FE3546E3
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 17:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBE247CC63
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 17:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781629755; cv=none; b=EiHqBO3T/lQRwmEP8SZntJyYQ5yM0UwfllHJ+kaf58Lvw+nnG4e+OT6dARwgXTVX8i4RlUAqR+AzEsIDjLU0t7RLGp15Bh30OMQ56cx0LJYbm2W2ovh/CHPCcxlUEsRJMmWZKH1NW1t9cFM7UAgfnbYb/ohVRtzKhlhF2qZROVk=
+	t=1781631727; cv=none; b=u9XZt3IJ/27S85vyfqam1U4Zfojph3H2gmyV1ZsOmjjoUShzq0IRlZvlbBwfPacGtXnt4WxcrrTqhnCxmKFpPfMW6B+3Gw6hFQFTqmNYOEZ6UpurbLTkfeAe3j1ZlyWCigpM5Titdzd67A/CjPGd4d1lHhCtU2CbcOJArdTEzTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781629755; c=relaxed/simple;
-	bh=SpY6/qEVPg9oghQPGJlbPsb4+ihix+AFmNKEy+OvOf4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CKAHgaPn62hg70AO1bsWTy0sGBAaElzwTXuPkvdgkCBrCIbL5CbVKstA0FKfZvbTzmfPKbFJq6m+e+xrmIyBmruRFhnLWnXCJry6rWZtgHOv1Qixnhe6EqXd6SQeCMcWjaGHZQVxw9Iveo6jMoZOhRgXb4TsgOefanM1U7AJymM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=muErZ+Be; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1781631727; c=relaxed/simple;
+	bh=LOwnnb7MLnYXNSGIdbnVIddgC3nGF5HioRRME1HgwxQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b4iSKv/5bMBd2cB1woHKm5g8U+ED1c/KUf60Mb++rmh+k9XU7LFf3nnQAdF4Kljs2Xx7ccAEC3VlNkKNkEkkVSY63kQOFpcXQsSDG7okOp+epYFqp1Bh/RrQ0R+zowe0FAeG1fcp2MsXgYf1GeRzIvd5V1Xol0COPoUdtTPX3k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=uwUs3dbe; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="muErZ+Be"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e6e9408e30so3422269a34.2
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 10:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781629753; x=1782234553; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WvOVp8Jo4aoHBJxFYIf1f27DnohJ1CxVWMkx0wT+xQQ=;
-        b=muErZ+Benmujcx/PSQiSL42A/dYN4A7xltp1BvF2aAkuERtmKk6lPCA7+j0uIBAN/Z
-         FydDhE9PY1r7q0zXCZ1iK8WYThfxWWtU+jssXHPoDJP9osSliVjnT4HTp8iNWBlDrP31
-         TswpGD/MFWZRTYj3g2G4tshtACcQ4bZ6vd1ghTZLsIbXV32H008PTAMUwvPo2kPZbqGt
-         01GXv/HE0HkcYsqUNbc9eekDn+Nd+YTQBDueaUMrOjIJEIEUsOi8zb8iM6gBcxfvNOfi
-         inr3LsyEfrB99nRzwHDda84Llc6zilI5GwISf3ef+AQ8hptgw4nuWQC5O2AN3BY+InXF
-         1GPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781629753; x=1782234553;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WvOVp8Jo4aoHBJxFYIf1f27DnohJ1CxVWMkx0wT+xQQ=;
-        b=NOL///ISJwBwpk9i/4pRjzd4jxjh/icTLBpd4PAKRQ975QDZWwLVjaOtga2eYmRxzJ
-         7hxXMP4JX2weK+JIz5qXuhgkYuwnRaYjZYQ3+Lc/kcGZk7NGbrIXddbQXPOIfqc39JV6
-         mEBNguCOhdVjR/5DdFYygtEBiza4ERQPN5y2Y3flOAfHHuafKZ1VZgbM2wgcBKKlasHH
-         JXoYdiopPnOlKROW8TmPyzewdMpahr5H5/uGiyVQef7Aoes//hOCiNV69jopdQigT8u9
-         ndV1rzytafLEwQ+urCzvNJOXYQuJAoXLbYRu/3I3Q6UG3R3iQKhp4PlYo9CI+ahJFXje
-         qC/A==
-X-Gm-Message-State: AOJu0YxseXh0FAZB8iaAzFWu5rpYv/UqQqqlfDriPB3fksGsO6vkcYIQ
-	IC2S+dmqamOnNwjN4ZwL14dZ/sWO6w2Q5EzqZEBBb4pz9pcJfSPY1h1BKUUmodc3D/AUjNTgmVb
-	2ap/C1IA=
-X-Gm-Gg: Acq92OEQVfh3kLRaketZAEyJGH8d0b+R8pUIZ1om7fR9O3AgEIix8znm8s8dpvLShg+
-	yoZTaB/3QtfZXABf9FdFe+8c2FMPlBQQLifOx3GVwHXCbpFfYJY0CfiWbqspZxxNs5W556MnudT
-	xQeJSQOwbzwVMk24QOZuHesutaKCaPTXO9QhY6QnbO2hZnv5ZmRkDzGk5xb/TYemUEiLpeWPEFe
-	rJCvjvdMCdPQvdDryAx5A+ISwn22jaMwLv83ryrKDoWk8pdx8x0h6dMwWhg5sh0kHFmz+Dh0oMJ
-	Xck0KoJ+OPwwF6j6/avG24C5XMZWgRIDW1t86UaVK0E0mLUaco6nZRRd7ECyFCpImjHfq/14lTs
-	IBhh5rOdPeQ7pzpFEM230ISu/I8y17CxyJBTPn4jCxbNlQAtszP8OXN6KT3W5Z3YyGgS5D6Oy2K
-	d/4cgB6f8uYAIRMkkjoM+UmNAHEe1To3r95hKfoY4TT8q4aRT+09mz0aIGcRkfxMq3BSfgJSbXD
-	Yi5d3qn4Q==
-X-Received: by 2002:a05:6830:4991:b0:7e6:efb8:fe66 with SMTP id 46e09a7af769-7e90b44277cmr437292a34.12.1781629753086;
-        Tue, 16 Jun 2026 10:09:13 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e79f5bb344sm7488184a34.7.2026.06.16.10.09.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jun 2026 10:09:12 -0700 (PDT)
-Message-ID: <702baa76-9254-47e9-bc63-0fdd52cf3ade@kernel.dk>
-Date: Tue, 16 Jun 2026 11:09:11 -0600
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="uwUs3dbe"
+Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GHC6MO1552333
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 10:42:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=tFOpxzrc/5nljYW7VdZedMiTY2PkEVFwNiTljv+laB0=; b=uwUs3dbe8Hd0
+	Y5aXKtkYQ1fpnW8EOLlzBJJHdYuEb5bxY94BlhBLIR9vvmEZnOElg5tDpn0jr2ql
+	6y83oYR6Xhc4Yc7dwZbGdsbG0vjKLUtnZPR67jPGrHEaZ2mzzx5f+U0VTl2O6X6e
+	3arAxAnVk3/eDV1uig/BXsRIghiDHc4si3lMgrCrjtdGYQGiDF6qDIGhIHmA1fE9
+	y/9Fqi5qyh6Wwr88ln/sNHiZklOg+E2M79I8rM7wu9kHr92gjyv81U6Uryx9KAlP
+	kGLXNRqW723LL6G8EEkzFTmoQKQodluPnGBuOoCTF0nlyineegYNapfxQdrAmEGS
+	H+31X5BZlA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4esrudpm2r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 10:42:00 -0700 (PDT)
+Received: from twshared18360.01.snb2.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Tue, 16 Jun 2026 17:41:59 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id C904523312253; Tue, 16 Jun 2026 08:06:11 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>
+CC: <linux-block@vger.kernel.org>, <mpatocka@redhat.com>,
+        Keith Busch
+	<kbusch@kernel.org>,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        Vjaceslavs
+ Klimovs <vklimovs@gmail.com>
+Subject: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O errors
+Date: Tue, 16 Jun 2026 08:05:54 -0700
+Message-ID: <20260616150554.1686662-2-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260616150554.1686662-1-kbusch@meta.com>
+References: <20260616150554.1686662-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] block: invalidate cached plug timestamp on context
- switch
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: linux-block@vger.kernel.org, bsegall@google.com,
- dietmar.eggemann@arm.com, juri.lelli@redhat.com, kprateek.nayak@amd.com,
- linux-kernel@vger.kernel.org, mgorman@suse.de, mingo@redhat.com,
- rostedt@goodmis.org, vincent.guittot@linaro.org, vschneid@redhat.com,
- Usama Arif <usama.arif@linux.dev>, shakeel.butt@linux.dev,
- hannes@cmpxchg.org, riel@surriel.com, kernel-team@meta.com
-References: <20260616141604.328820-1-usama.arif@linux.dev>
- <178162611741.2191657.12211870708971600814.b4-ty@b4>
- <43b0010d-1919-4986-a88a-a4ccdb3639dd@kernel.dk>
- <20260616165434.GG49951@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260616165434.GG49951@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: I_5BB3-zyk_LWG3mBFKLplFXVbpwe8Bn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE4MSBTYWx0ZWRfXwrL6mB7V3dEI
+ ENvRSVGpMjYAMPr2sU54DPdp3T5m+KYCxmTuBH+q6+AGWFI5V5rj8lMyUk1DBHGPnlxNyQy2paK
+ QYIdv6nvGrpFo6qmhZRqtrfA1caN/zNmFb7rCZIYFzD9dbNWVGt/NuMSO26E764dsv79g7KiTlJ
+ bvY31Jlq+AVmYigOANVM9aBTlwSgWbRhg/DJdhhmsOKS1a405gGeJohd8WEXVcAzlib0B14kIQv
+ MWv04mctckoocXuDMqxygFzluf0+voEYoaPfoH2b9vhEYww7VJT+oRmT98rov5jSKQp6S3dPRQb
+ /tqC5wSq8saF5xusLdjyHOpDm6ICfTUTUVDAwwb08Drl4miLziLQA03TQ/+/b/czl+jCPc9hPk/
+ wFNlcj6sOSksdviyM5KfLmjU/L8swQERuARGukJ/gAuESgLA8BW9MOV/mms3icw2+QOBFhAUnT8
+ 3G+Tbf1EUpU0iu9aIDQ==
+X-Proofpoint-ORIG-GUID: I_5BB3-zyk_LWG3mBFKLplFXVbpwe8Bn
+X-Authority-Analysis: v=2.4 cv=e+M2j6p/ c=1 sm=1 tr=0 ts=6a318ae8 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=GbPsI2Ihf5RTnMjR_gZv:22 a=VwQbUJbxAAAA:8 a=3WJfbomfAAAA:8 a=pGLkceISAAAA:8
+ a=ECpI9oUnO1FrOKOjoQ8A:9 a=1cNuO-ABBywtgFSQhe9S:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE4MSBTYWx0ZWRfXyujQuFpslBLY
+ 0MMi9GjQ7oXgS5vFgOcPFQ8zDueXvh8b4ZucZvtmC00LyfvNI7Ot+HXdmYOLabHU5Pm8X/KSVEs
+ QmCLRvMt9YyYTPgCXCAi2kTJ4D5lXLE=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_05,2026-06-16_01,2025-10-01_01
 
-On 6/16/26 10:54 AM, Peter Zijlstra wrote:
-> On Tue, Jun 16, 2026 at 10:10:31AM -0600, Jens Axboe wrote:
->> On 6/16/26 10:08 AM, Jens Axboe wrote:
->>>
->>> On Tue, 16 Jun 2026 07:15:16 -0700, Usama Arif wrote:
->>>> The details for this are in patch 2. The main reason for this series
->>>> is to invalidate the cached timestamp on context switch. This was
->>>> done in sched_update_worker() only before which was resulting in
->>>> blk-iocost reading stale timestamps and throttling based on wrong
->>>> information.
->>>>
->>>> Patch 1 is a prerequisite to create the invariant that
->>>> PF_BLOCK_TS set implies current->plug != NULL.
->>>>
->>>> [...]
->>>
->>> Applied, thanks!
->>>
->>> [1/2] kernel/fork: clear PF_BLOCK_TS in copy_process()
->>>       commit: fd38b75c4b43295b10d69772a46d1c74dbd6fc81
->>> [2/2] block: invalidate cached plug timestamp after task switch
->>>       commit: fad156c2af227f42ca796cbb20ddc354a6dd9932
->>
->> Note: I tentatively queued this on up as a) it looks good to me (and
->> thanks Usama for fixing this!), and b) about to head OOO for a week
->> or so. If Peter or any of the sched people disagree, let me know and
->> we can deal with it. If not, then I plan on sending this in with the
->> usual follow-up merge window fixes next week.
-> 
-> FWIW, looks good to me.
+From: Keith Busch <kbusch@kernel.org>
 
-Great, thanks Peter!
+BLK_STS_INVAL indicates the I/O request itself was invalid (for example a
+misaligned direct I/O), not that the device has failed. dm-raid1 treated
+any read or write completion error as a device failure: it failed the
+mirror leg, retried on the alternatives - which fail identically - and
+eventually returned EIO while spuriously degrading the array.
 
--- 
-Jens Axboe
+Since commit 5ff3f74e145a ("block: simplify direct io validity check") th=
+e
+direct I/O path no longer rejects misaligned buffers up front, so an
+invalid bio now reaches the lower block layers, which fail it with
+BLK_STS_INVAL. dm-io collapses the block status into a per-region error
+bit before invoking the completion callback, so record BLK_STS_INVAL on
+the originating bio and have the dm-raid1 read, write and end_io paths
+propagate it instead of failing the device.
+
+This mirrors the raid1/raid10 fix in commit f7b24c7b41f23
+("md/raid1,raid10: don't fail devices for invalid IO errors") for the
+device-mapper mirror target.
+
+Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
+Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reported-by: Vjaceslavs Klimovs <vklimovs@gmail.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/md/dm-io.c    | 14 +++++++++++++-
+ drivers/md/dm-raid1.c | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 28adfeb58f240..f382e9f9be059 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -37,6 +37,7 @@ struct io {
+ 	struct dm_io_client *client;
+ 	io_notify_fn callback;
+ 	void *context;
++	struct bio *orig_bio;
+ 	void *vma_invalidate_address;
+ 	unsigned long vma_invalidate_size;
+ } __aligned(DM_IO_MAX_REGIONS);
+@@ -132,8 +133,18 @@ static void complete_io(struct io *io)
+=20
+ static void dec_count(struct io *io, unsigned int region, blk_status_t e=
+rror)
+ {
+-	if (error)
++	if (error) {
+ 		set_bit(region, &io->error_bits);
++		/*
++		 * BLK_STS_INVAL means the bio was not valid for the underlying
++		 * device (e.g. a misaligned direct I/O), which is a caller error
++		 * rather than a device failure. Record it on the original bio so
++		 * bio-based targets can propagate it instead of treating it as a
++		 * media error and failing the device.
++		 */
++		if (error =3D=3D BLK_STS_INVAL && io->orig_bio)
++			io->orig_bio->bi_status =3D error;
++	}
+=20
+ 	if (atomic_dec_and_test(&io->count))
+ 		complete_io(io);
+@@ -398,6 +409,7 @@ static void async_io(struct dm_io_client *client, uns=
+igned int num_regions,
+ 	io->client =3D client;
+ 	io->callback =3D fn;
+ 	io->context =3D context;
++	io->orig_bio =3D dp->orig_bio;
+=20
+ 	io->vma_invalidate_address =3D dp->vma_invalidate_address;
+ 	io->vma_invalidate_size =3D dp->vma_invalidate_size;
+diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+index de5c00704e69c..022ad791c2957 100644
+--- a/drivers/md/dm-raid1.c
++++ b/drivers/md/dm-raid1.c
+@@ -524,6 +524,17 @@ static void read_callback(unsigned long error, void =
+*context)
+ 		return;
+ 	}
+=20
++	/*
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. That is a caller error, not a device
++	 * failure, so propagate it rather than failing the mirror and retrying
++	 * on the other legs, which would fail the same way.
++	 */
++	if (bio->bi_status =3D=3D BLK_STS_INVAL) {
++		bio_endio(bio);
++		return;
++	}
++
+ 	fail_mirror(m, DM_RAID1_READ_ERROR);
+=20
+ 	if (likely(default_ok(m)) || mirror_available(m->ms, bio)) {
+@@ -622,6 +633,16 @@ static void write_callback(unsigned long error, void=
+ *context)
+ 		return;
+ 	}
+=20
++	/*
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. Propagate the error without degrading
++	 * the array.
++	 */
++	if (bio->bi_status =3D=3D BLK_STS_INVAL) {
++		bio_endio(bio);
++		return;
++	}
++
+ 	/*
+ 	 * If the bio is discard, return an error, but do not
+ 	 * degrade the array.
+@@ -1262,7 +1283,12 @@ static int mirror_end_io(struct dm_target *ti, str=
+uct bio *bio,
+ 		return DM_ENDIO_DONE;
+ 	}
+=20
+-	if (*error =3D=3D BLK_STS_NOTSUPP)
++	/*
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. Propagate it rather than failing the
++	 * mirror and retrying, which would fail the same way on every leg.
++	 */
++	if (*error =3D=3D BLK_STS_NOTSUPP || *error =3D=3D BLK_STS_INVAL)
+ 		goto out;
+=20
+ 	if (bio->bi_opf & REQ_RAHEAD)
+--=20
+2.52.0
+
