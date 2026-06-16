@@ -1,137 +1,214 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CED3D8114
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4FF46AEFC
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781633579; cv=none; b=Mlq2EQSs5oGWebBX2GzI9+90n4asoPHkwa3m1BXAGv6vijSvSu5wBqLxblHF2REcHE1Qd33Lc7dvzuOw2gQ4g/Psy9/jj6u0GQnyS2aR6lWUjeIR+cNDP9eXrUCZZXcsC81tS40fNVTGlznIde0W9XQwQr6g1RItEVsOEFfW3ik=
+	t=1781634155; cv=none; b=mHAB7nxVnBm51ZpcM1SQrRTF0phSRuc8mNHqbIKnU5vdabvMwGj9YZRAj/NA28kQ3rpKKIQx/kbEaA8etVFobkuUwAt6emCLCcNr2HLE9tP436W2sdbd36Qp3uF+RrPHCCzn8xpFbCXhOjKX1zEkzvl6MyS/0n6yErmjttfh9HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781633579; c=relaxed/simple;
-	bh=fHGZuwbZwe8u2aq3t9mT9Smsjpuqm7+QoAqTHWbXDYA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=LUXb8PTTQ7NLRUNIaj3qnx8psP4cu+dGe4D/k7S/F/y88xsPnG2Y5hDLWF2Sr8tMCmWGK7MP0DWsl+8zzzkGvGAJ0HMSn61M9te0t6FH/chjUKoqvUm5OjaN5YfTg7hTj9sVKeSAd87Q0ZCKI5jrxeMOE2XvpBcRSvXpH18uySM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=i93GnJa4; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1781634155; c=relaxed/simple;
+	bh=LOwnnb7MLnYXNSGIdbnVIddgC3nGF5HioRRME1HgwxQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tiEucon8R+FdIBQkO6HJYeWWVF1qI4EmCpONBnZa53HQJ550Ptk+cIO9oCYgke/cC23NHuhKc13Ch4k65QmLJMYcCsWiFA+xLz04E4nJqOPTamxiByAl0ycI+WQZS85qNWXlDJ4EqlIrbL1MlPP+xpa82PqX8BCsiEmpbzdvLTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=sCp0a44b; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="i93GnJa4"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260616181255epoutp01dbf7f4f66e6296843db0ee55e5a61c9d~5okwvYOAN0292802928epoutp01V
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 18:12:55 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260616181255epoutp01dbf7f4f66e6296843db0ee55e5a61c9d~5okwvYOAN0292802928epoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1781633575;
-	bh=gb30r2inM25OKn9pEp4wraeOHcYG2I5NnvabRp/eOXY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i93GnJa47uwezqVLCmdW98leO7bQU9/My6aytTZ00y+phpNRB2IXzHNWef/V/H/ju
-	 3rhZu3m9/GuOhs30T5dcAsTc+ezUzuZ7TwT5APo3gGcdXtQmexiasQ2ZwH6DGQaGpF
-	 avuVvVn/2j20b1h5QcTqpPfe0U6xDKal+2m2jaQk=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260616181255epcas5p492026b342503e1f9fa210894583f5c22~5okwQ62Da0246302463epcas5p4K;
-	Tue, 16 Jun 2026 18:12:55 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4gfw861g60z6B9m5; Tue, 16 Jun
-	2026 18:12:54 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260616181253epcas5p382d4c14e3d3c2ab9a6ef52f650e456ea~5okumpeso1541715417epcas5p3T;
-	Tue, 16 Jun 2026 18:12:53 +0000 (GMT)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260616181251epsmtip1cfd2e2f1d1d072f53f6301b5fb8e418d~5oksy71Tw0265902659epsmtip1k;
-	Tue, 16 Jun 2026 18:12:51 +0000 (GMT)
-From: Kanchan Joshi <joshi.k@samsung.com>
-To: brauner@kernel.org, hch@lst.de, djwong@kernel.org, dgc@kernel.org,
-	jack@suse.cz, cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org,
-	ritesh.list@gmail.com
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com, Kanchan Joshi
-	<joshi.k@samsung.com>
-Subject: [PATCH v3 6/6] xfs: introduce software write streams
-Date: Tue, 16 Jun 2026 23:35:55 +0530
-Message-Id: <20260616180555.33338-7-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260616180555.33338-1-joshi.k@samsung.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="sCp0a44b"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GHC0NV1564206
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 11:22:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=tFOpxzrc/5nljYW7VdZedMiTY2PkEVFwNiTljv+laB0=; b=sCp0a44bnyK6
+	s6oe0Z2MFVxTLOLoOAQNPyudppZodGEpiRajO51E/sSUCOHzbND4xD3A7oL+e0au
+	hxe8pjs+h3YGH0wmvauQ6EF4WLiwot2jZSOg3d2o4hDzeSLVVmD7lPgtHwkVF0hi
+	DDUBzVskvjuTbO08cvhCjuO59tcfCr4x0zM08km4slpPaBIuuBkR1sM2BmsrzT97
+	E2IyL4r+5JRlxhnnzAJfzlOyNzWIDJYGsB1zcg67Nqfpuof+bdMePEV8m34skZxd
+	Q4kpznoesEwWKpd7sSjPdRCRLxNkWP34sRwMMen4BEpKFfwt9wI+CfkH6+PTa0hj
+	4QMVhR8iMg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4eu81bhuxb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 11:22:32 -0700 (PDT)
+Received: from twshared8664.02.snb3.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Tue, 16 Jun 2026 18:22:31 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 1ABA22331A654; Tue, 16 Jun 2026 08:40:24 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>
+CC: <linux-block@vger.kernel.org>, <mpatocka@redhat.com>, <kbusch@kernel.org>,
+        <linux@treblig.org>, <vklimovs@gmail.com>
+Subject: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O errors
+Date: Tue, 16 Jun 2026 08:40:09 -0700
+Message-ID: <20260616154009.2123183-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260616150554.1686662-1-kbusch@meta.com>
+References: <20260616150554.1686662-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260616181253epcas5p382d4c14e3d3c2ab9a6ef52f650e456ea
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260616181253epcas5p382d4c14e3d3c2ab9a6ef52f650e456ea
-References: <20260616180555.33338-1-joshi.k@samsung.com>
-	<CGME20260616181253epcas5p382d4c14e3d3c2ab9a6ef52f650e456ea@epcas5p3.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE4OCBTYWx0ZWRfX9yyoR0BgoHbW
+ B1zBLlJhh0qLKg2pAo/xoEg2Ppu/M7fOhoPBfC3wzX9n6mSifO3LHXkMQp3qOmhXZkbK7+8j/Tj
+ uCrMUtnX5WWzKcyy+/9tehcreV+fqKgfRxyxZh2bU/Wi0/cIHaR2vPvcTh9C9bW3FFsbzd4eeD7
+ M54DFM9cejDGl/0hViq+S826kZ6AeXs4YcFJCDEt5EBCcXB1n8Jm+l24Z/zJS5RfKCW1V2D3Riy
+ rdLjCHvHDH5tSsBqOkKTyl3KEFrLBhPpEzWOTc2AMFRRD4wkkRs+dxsH4y6j+2wwGxs07TyammG
+ ErAP/ndVJjqLgha+sEPyXHbZaFc8oJkXXGHKo+hwElr7ZpbGi2HS6i1V1ECGzV4kIGdA0mEQVrV
+ lJrme6acxcq+b/1oKyAvVZ1bNS4YlmEljgsE4ArzYlR9YGAB/hEluaMZVuZaecTFIowLkjyf9N4
+ D+OAU366z9pqznsM6gw==
+X-Authority-Analysis: v=2.4 cv=Pa/PQChd c=1 sm=1 tr=0 ts=6a319468 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=JnKecZnUtZousrUlYMGU:22 a=VwQbUJbxAAAA:8 a=3WJfbomfAAAA:8 a=pGLkceISAAAA:8
+ a=ECpI9oUnO1FrOKOjoQ8A:9 a=1cNuO-ABBywtgFSQhe9S:22
+X-Proofpoint-ORIG-GUID: aXFaSj1mVdMpt1k8Lqz8_BRy7LsuZg_I
+X-Proofpoint-GUID: aXFaSj1mVdMpt1k8Lqz8_BRy7LsuZg_I
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE4OCBTYWx0ZWRfX68zHpjhy7ILj
+ WGj6i3QRH49Vq1CdIci4PxDUESCsdXYARkvG78eAJlTHg+dCf+FlRiBUiOuxDaFxMk1QInX6+K2
+ PTuIjWxqYeKYBkSPLL7KR3t5uHjH9YI=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_05,2026-06-16_01,2025-10-01_01
 
-Even when the underlying block device does not advertise write streams,
-XFS can choose do so, as that enables logical spatial isolation and
-dynamic AG-set based concurrency for the standard storage, excluding
-rtvolume.
+From: Keith Busch <kbusch@kernel.org>
 
-Use AG count based heuristic to derive AG set size and software streams.
-Larger filesystem (i.e., more AGs) get wider fanout (i.e., larger AG-set).
+BLK_STS_INVAL indicates the I/O request itself was invalid (for example a
+misaligned direct I/O), not that the device has failed. dm-raid1 treated
+any read or write completion error as a device failure: it failed the
+mirror leg, retried on the alternatives - which fail identically - and
+eventually returned EIO while spuriously degrading the array.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Since commit 5ff3f74e145a ("block: simplify direct io validity check") th=
+e
+direct I/O path no longer rejects misaligned buffers up front, so an
+invalid bio now reaches the lower block layers, which fail it with
+BLK_STS_INVAL. dm-io collapses the block status into a per-region error
+bit before invoking the completion callback, so record BLK_STS_INVAL on
+the originating bio and have the dm-raid1 read, write and end_io paths
+propagate it instead of failing the device.
+
+This mirrors the raid1/raid10 fix in commit f7b24c7b41f23
+("md/raid1,raid10: don't fail devices for invalid IO errors") for the
+device-mapper mirror target.
+
+Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
+Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reported-by: Vjaceslavs Klimovs <vklimovs@gmail.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- fs/xfs/xfs_inode.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ drivers/md/dm-io.c    | 14 +++++++++++++-
+ drivers/md/dm-raid1.c | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
-index 2e7c61d71b48..10ffed130dce 100644
---- a/fs/xfs/xfs_inode.c
-+++ b/fs/xfs/xfs_inode.c
-@@ -45,6 +45,7 @@
- #include "xfs_inode_util.h"
- #include "xfs_metafile.h"
- 
-+#define XFS_MAX_USER_WRITE_STREAMS		(16)
- struct kmem_cache *xfs_inode_cache;
- 
- int
-@@ -52,12 +53,34 @@ xfs_inode_max_write_streams(
- 	struct xfs_inode	*ip)
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 28adfeb58f240..f382e9f9be059 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -37,6 +37,7 @@ struct io {
+ 	struct dm_io_client *client;
+ 	io_notify_fn callback;
+ 	void *context;
++	struct bio *orig_bio;
+ 	void *vma_invalidate_address;
+ 	unsigned long vma_invalidate_size;
+ } __aligned(DM_IO_MAX_REGIONS);
+@@ -132,8 +133,18 @@ static void complete_io(struct io *io)
+=20
+ static void dec_count(struct io *io, unsigned int region, blk_status_t e=
+rror)
  {
- 	struct block_device	*bdev;
-+	struct xfs_mount	*mp = ip->i_mount;
-+	int nr_streams;
-+	xfs_agnumber_t nr_ags, ag_set_size;
- 
- 	bdev = xfs_inode_buftarg(ip)->bt_bdev;
- 	if (!bdev)
- 		return 0;
- 
--	return bdev_max_write_streams(bdev);
-+	nr_streams = bdev_max_write_streams(bdev);
-+	if (nr_streams > 0)
-+		return nr_streams;
-+	if (XFS_IS_REALTIME_INODE(ip))
-+		return 0;
+-	if (error)
++	if (error) {
+ 		set_bit(region, &io->error_bits);
++		/*
++		 * BLK_STS_INVAL means the bio was not valid for the underlying
++		 * device (e.g. a misaligned direct I/O), which is a caller error
++		 * rather than a device failure. Record it on the original bio so
++		 * bio-based targets can propagate it instead of treating it as a
++		 * media error and failing the device.
++		 */
++		if (error =3D=3D BLK_STS_INVAL && io->orig_bio)
++			io->orig_bio->bi_status =3D error;
++	}
+=20
+ 	if (atomic_dec_and_test(&io->count))
+ 		complete_io(io);
+@@ -398,6 +409,7 @@ static void async_io(struct dm_io_client *client, uns=
+igned int num_regions,
+ 	io->client =3D client;
+ 	io->callback =3D fn;
+ 	io->context =3D context;
++	io->orig_bio =3D dp->orig_bio;
+=20
+ 	io->vma_invalidate_address =3D dp->vma_invalidate_address;
+ 	io->vma_invalidate_size =3D dp->vma_invalidate_size;
+diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+index de5c00704e69c..022ad791c2957 100644
+--- a/drivers/md/dm-raid1.c
++++ b/drivers/md/dm-raid1.c
+@@ -524,6 +524,17 @@ static void read_callback(unsigned long error, void =
+*context)
+ 		return;
+ 	}
+=20
 +	/*
-+	 * Enable software-only streams if hardware streams are not available.
-+	 * This helps to
-+	 * - improve isolation; reduce allocation interleaving.
-+	 * - improve concurrency using AG-set based steering within and across streams.
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. That is a caller error, not a device
++	 * failure, so propagate it rather than failing the mirror and retrying
++	 * on the other legs, which would fail the same way.
 +	 */
-+	nr_ags = mp->m_sb.sb_agcount;
-+	if (nr_ags >= 32)
-+		ag_set_size = 4;
-+	else if (nr_ags >= 8)
-+		ag_set_size = 2;
-+	else
-+		ag_set_size = 1;
-+	nr_streams = nr_ags / ag_set_size;
-+	return min_t(uint16_t, nr_streams, XFS_MAX_USER_WRITE_STREAMS);
- }
- 
- uint16_t
--- 
-2.25.1
++	if (bio->bi_status =3D=3D BLK_STS_INVAL) {
++		bio_endio(bio);
++		return;
++	}
++
+ 	fail_mirror(m, DM_RAID1_READ_ERROR);
+=20
+ 	if (likely(default_ok(m)) || mirror_available(m->ms, bio)) {
+@@ -622,6 +633,16 @@ static void write_callback(unsigned long error, void=
+ *context)
+ 		return;
+ 	}
+=20
++	/*
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. Propagate the error without degrading
++	 * the array.
++	 */
++	if (bio->bi_status =3D=3D BLK_STS_INVAL) {
++		bio_endio(bio);
++		return;
++	}
++
+ 	/*
+ 	 * If the bio is discard, return an error, but do not
+ 	 * degrade the array.
+@@ -1262,7 +1283,12 @@ static int mirror_end_io(struct dm_target *ti, str=
+uct bio *bio,
+ 		return DM_ENDIO_DONE;
+ 	}
+=20
+-	if (*error =3D=3D BLK_STS_NOTSUPP)
++	/*
++	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
++	 * e.g. a misaligned direct I/O. Propagate it rather than failing the
++	 * mirror and retrying, which would fail the same way on every leg.
++	 */
++	if (*error =3D=3D BLK_STS_NOTSUPP || *error =3D=3D BLK_STS_INVAL)
+ 		goto out;
+=20
+ 	if (bio->bi_opf & REQ_RAHEAD)
+--=20
+2.52.0
 
