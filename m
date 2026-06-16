@@ -1,73 +1,73 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688EC4534B3
-	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 16:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832AB45BD4B
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 16:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781626118; cv=none; b=TJP1tccRvDwNkVFceUq1sAdT/t03cTpDRBwOVcpu3oQ7JsWMYHrIJ3KKAIVM85khrmnVjqSxhfi3ppUOGQdYWzr55Pta4Q7xGZ33HPGKX6GRmoGYbrauBhjPpr4RY9XaVB4VqHNZm3oE2887oqMp0RU6TVNLLUknQm6D3z5wNGQ=
+	t=1781626119; cv=none; b=iL6g683IBqW5uvN3yfnNkqlejD+DYAh61K9AMAESv01dwaW6tQlH6MDaYHQLkXdeBZ8dKAMiMwaG1oxdZM6mlreeBrczbKiXP9olg8tJdmyUUOxeV3i+bibg2wNP/+A2CkL9HOuudsT3cpHgd1xr4PsO9bTmHxeownQGxDVEhAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781626118; c=relaxed/simple;
-	bh=VhUZQAte8aV83CC83MOWOEkDvGSImT4hMTGNfFf5/RQ=;
+	s=arc-20240116; t=1781626119; c=relaxed/simple;
+	bh=xlJh76Md8wkh/Fi92cqhV/YXIDPiy9Lp3lrOEOU0ABc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=KSW9RSPWnvQVN4G3uOU+lAKXFRMXdY7CI+WmobltWAPDemvjCaojHTvGP6+i7cziBAwll+hFQgihgnNNJrAAi6fLqmPd2uMuKlSE3YRo57H6rjhraFN97zAm5K7gbdfjwb19aevmWoeV/AY6fZL0UsXTp8RuEusut/9uIzVtO9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=MCXXlCNf; arc=none smtp.client-ip=209.85.160.53
+	 MIME-Version:Content-Type; b=RojlRiH53yWVAnkarzW6dYVUbA3G2bPp+levARHht42r0FwwkUrVZ2qKf0osKZdamNK1OQtYlvYA8xTrWunYrbPt4rMGB93Tv1olph0pUuFv0OfkT7F3FQiCnmn8KIbxwUZ+fm+83AI8RQFcmslUZK7k8XWF9Dx1yyrDnTSL1kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=S+8WAkJS; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="MCXXlCNf"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-43cce34c881so4098801fac.2
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 09:08:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="S+8WAkJS"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-441b5b4af7aso2405955fac.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 09:08:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781626115; x=1782230915; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781626116; x=1782230916; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IPQ+FKzahwKUrI+OpROn51ekPUQ+yBviGhjoCLiIV1w=;
-        b=MCXXlCNf9Zqf9RzJH1gGtyJx0P0pnpZuASC0NBG5tAPPO40Rl1uJk2pFHEhdEhUfX4
-         bqyUCJXwMmmHqWyVPx/+oliE3qVHcnOOYXMiGD6cfH42BV42HvktuCym3UMDiwoQnTm5
-         GdR6ik1PWS5BA1BS9+Ws4FW+UwaML82fkaYcXmOPNn1OAngor3/uVNyWLXPQvPtwDnC9
-         dk0SDgx8SK+z1v9KiIGNo1hPs112Ma+Uy2YYcUErJjmR1PEU7V1IGRsyZrauMQvPxUvy
-         L9pg6Gsczi5S2WZ5F7g1WMt0Z8DNO/R1Fxr+wB/N3nlK1wuqSVdhXk1sQwebvw+aOlh2
-         rOMQ==
+        bh=wzIt4F8uHY1gHbYSazgMbvRJiX7QgA75YFrjgD4jGLA=;
+        b=S+8WAkJSCL9n69uYD7Pz1n2z0es32SQx6FJybPbUwamCPEcqvXdM+JXJeCFlpfNVEY
+         ++ObBrFQNcE5TGDEEueZqAtbOP9tgqaCHfLOjADTu2EJ8bRWYSU09tdNGC/Axo2sblgj
+         +e9m1T9hrAMicAYiN+QX1tfJa5oTGjA3seSUSWloqzUFJOMuThX8fkQLgVMjOWyAVHKq
+         BAvw9dGdIlL3KLmr32HKa1YiYfqboXrwRDnovhGAWE0WWeNu9UFw8aNRuw2chg9aZdgj
+         KWE49WKZttRoFIcgN6ZUc55Xmx3yBfOi+qceHCgoQB4Uop9Is7gVMKk7qwwj8544SPC/
+         E7YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781626115; x=1782230915;
+        d=1e100.net; s=20251104; t=1781626116; x=1782230916;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=IPQ+FKzahwKUrI+OpROn51ekPUQ+yBviGhjoCLiIV1w=;
-        b=Wtir4x+nJ9+1U4XgACMRn9/4n403Jck3VJ7gJ5jZhDvqw9VCHf0YDN8WZtA4Ku6GGY
-         oZ446rVnrfLBKacdpEZrz9rul8HyDDJOChODrNJZqoz5pD1l9tLZXS5i30qf7mmA1kXo
-         SMFj4ZYmRod01/XFWtAfyVD5z/IxahygEm3PJ6eUlz0JsGpjuYv5XESQnGhh7W8eFMkJ
-         T9GsNYG3mSmE5iJCPZvykRcIoLleWt56VplcCe/IJiXTZQM17CMBliu5krfdZon1iH/4
-         PzoBwfv2YUOCpzq+fCRPfGm+4Q1e6b7JT0hTW0l6xySH+Z4ni6Sp+kpMHeRS8iJXBk5l
-         XUfA==
-X-Gm-Message-State: AOJu0YxRtYgm0OEKTUdUu2b5vUj/7wOu7cn/VCM9oWz/wLEc5TxZ9Rx4
-	khHTqGoo4MNdW9gX32v/uRZzg88orvyqrYI63zzv9wjoEBFEDY2V3aVbXcLQr0g5yzdbKR8IiY/
-	yn0fS5po=
-X-Gm-Gg: Acq92OHFjRYZoPjbzRQW8RagIUADMrHkPA50aPAT73CeN3XBZQjPRJn2luU9T97xl9T
-	XU97Se0a1jkJo3E43V+BSjeAxxLGGjFRbL6O9lWa5aYh+4a86A9FS1DdJY5yG0ngFB/r2yUnNbP
-	6M9kQsIWM3tuOM91pBMRT+I6jt3Rdcuk3U3DILC2HzwmmkGpTdALyDBzA6dta0x814k85W+Lx/9
-	15C/ZK7cXOT7sOnXS45XFHFEWM0hhjN29+SqdnmoGfNNz3VV+X6eG/4p9QJZq4HjADgEvCw0Rem
-	YeFrdn/+BEcHkYPIotZ9cOJC04tsMhJXl27QWsky/YGFVxxQKRsiFk9dFwqkiqMnDAFFsMRQjCQ
-	5mC6jqZgXdV6yOueo9wpNnqnCksYxJ7+JDk1ArdXsbuJdktu7AxFze3HiWwutW7btErcvxGn/+K
-	q56/TxdgCaGlptSAZLxKaDQtUNQIDRGOIHIluozsDUuYihJWKDTysoH+R5F+kDw0O/fEXqHY/be
-	V8C
-X-Received: by 2002:a05:6808:4f0d:b0:482:6617:d48c with SMTP id 5614622812f47-489429acabemr263716b6e.25.1781626115304;
-        Tue, 16 Jun 2026 09:08:35 -0700 (PDT)
+        bh=wzIt4F8uHY1gHbYSazgMbvRJiX7QgA75YFrjgD4jGLA=;
+        b=dgWmbRaKvuIF/jPomRk+dJHJ/Cwgz62J4TH/3qktK9nbvdLBLnKymITRR1TftX7Vmn
+         x9QXE0Q5GTGOgxQe/Myv7CWrglPC91iLVkS5miYqVi2DfzDcXwyQZC36yvsczqBv6Mgi
+         f9ZNEdOjNPzYl17D50B1EEoeKbFnYNvRZsllBzCbtDArW1ZK/R+q0OQ4xb4bq7KaPMiD
+         WV4+dGPwb16d359GJX/4LvmrZdGMXz97AHXTI5qvCPAwuNm3rIZjziBzkR+KrMm+H1Mw
+         xJ+E9KFw80k1xv6Yb9wIgMGDSFprxjKuINSKSV8V0w3QJepDkndKDkbzB48LJsiBQdl+
+         GeCQ==
+X-Gm-Message-State: AOJu0YyoJozQIXHeRS+mLZ9OwgSl+CUqojeLxJ38eP1cwVLdZWjQPgJY
+	gqmjkgQxU1uAAbGfJlWUzbZ2MrodbzHtcCPAEut68u+/FBM51EyXwNv0Wv2Y5494HhDJe9SvdoW
+	c3T8qpWY=
+X-Gm-Gg: Acq92OHB6ofRtHQ9LoUKbsW9qOUfRCPIvxx+DCbgJ8y0FqL44Hmly5K0FglUQrNjr5w
+	SEeYLELHBK3fRQxI27s3zsFLo01MMREFmST27kEYTjwmOMu67hb25NV/3/P/t7sOLGkKP2NAoJJ
+	Ficnz9VSLwEfbMGEtXhNpoBbt6JfqgwrpgQVgOEaBX+NQVF0jIrDjJqM/emSN8YsU3GEIZhe+QN
+	R0z+3Ftgg9Hq2E7TolD696aJaPdWW9hZbcKSYIKUf2Omw54d2uaWk1srwjD3GoXNV0FOnT98DeY
+	GY6+TOOyuywmjcY9yxb8ctiJWUS+crn/GiuXpZgKkiLS27UT2iZQoSnAAkyrh2gy4xz5ZOAypQn
+	wSQX5WW2KRdtIL1VsJJf3dzp99182ywizc/GRyeJop6iyqRDO2YoRXaGlHHHkyEvsfrrtMWR4Bp
+	7lS/7tnFkyx2cGGqbzauY37IL8e7J2SCX5JUVknDcMAm89nYrrzA4cY47TT+WQoBF29LI57rAGR
+	KdyXPk9qsA6JtM=
+X-Received: by 2002:a05:6808:50a4:b0:486:a9d8:cddb with SMTP id 5614622812f47-48942b488d3mr229217b6e.27.1781626116373;
+        Tue, 16 Jun 2026 09:08:36 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4875ddd9fd3sm4631101b6e.7.2026.06.16.09.08.34
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4875ddd9fd3sm4631101b6e.7.2026.06.16.09.08.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 09:08:34 -0700 (PDT)
+        Tue, 16 Jun 2026 09:08:35 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Yitang Yang <yi1tang.yang@gmail.com>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20260616155129.406057-1-yi1tang.yang@gmail.com>
-References: <20260616155129.406057-1-yi1tang.yang@gmail.com>
-Subject: Re: [PATCH] block: fix IORING_URING_CMD_REISSUE flags check in
- blkdev_uring_cmd
-Message-Id: <178162611413.2191657.11211550111552677845.b4-ty@b4>
-Date: Tue, 16 Jun 2026 10:08:34 -0600
+To: linux-block@vger.kernel.org, wenxiong@linux.ibm.com
+Cc: tom.leiming@gmail.com, yukuai@fygo.io, stable@vger.kernel.org, 
+ wenxiong@us.ibm.com
+In-Reply-To: <20260616143121.878021-1-wenxiong@linux.ibm.com>
+References: <20260616143121.878021-1-wenxiong@linux.ibm.com>
+Subject: Re: [PATCH V2]block: Remove redundant plug in __submit_bio()
+Message-Id: <178162611541.2191657.11227673326428110022.b4-ty@b4>
+Date: Tue, 16 Jun 2026 10:08:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,22 +79,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Tue, 16 Jun 2026 23:51:29 +0800, Yitang Yang wrote:
-> blkdev_uring_cmd() checks IORING_URING_CMD_REISSUE to determine whether
-> this is the first issue. However, this flag lives in cmd->flags instead
-> of issue_flags.
+On Tue, 16 Jun 2026 10:31:21 -0400, wenxiong@linux.ibm.com wrote:
+> The patch removes the automatic plug/unplug operations from __submit_bio()
+> that were added to cache nsecs time when no explicit plug is used.
 > 
-> Coincidentally, IO_URING_F_NONBLOCK shares bit 31 with
-> IORING_URING_CMD_REISSUE. As a result, the SQE read was never performed,
-> bic->len remained zero, and every BLOCK_URING_CMD_DISCARD failed with
-> -EINVAL.
+> The plug mechanism is most effective when batching multiple I/O
+> operations together. Creating a plug for every bio submission
+> provides minimal benefit while adding function call overhead and
+> stack usage for every I/O operation.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: fix IORING_URING_CMD_REISSUE flags check in blkdev_uring_cmd
-      commit: 4f919141be38ea2b1314e3a531b7b998eb64e8bc
+[1/1] block: Remove redundant plug in __submit_bio()
+      commit: 9cbbac29d752fb5d95e375fa3685a359b89caa0a
 
 Best regards,
 -- 
