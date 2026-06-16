@@ -1,75 +1,234 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D163C363C73;
-	Tue, 16 Jun 2026 14:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0051C1D7995
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 15:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781621999; cv=none; b=GDAxHn/4HsBO351YJbsgxeNWiZESuZxRM6X57d0jkxcukmIyDysHVnkBB+KvGoX3NdBYXhpIyFR0jGs2M+Xr6SuWxfSbj1SKvTHabfRr2XOh3QhMboCzSZXfOtPc6NrLn0wr9SsChKPnBntxfjRtVXuvY+1Tu6IFiSXBj8GwAC8=
+	t=1781622389; cv=none; b=kXdup0P6oecPgCD2SBb/sB4BNFXOPk1wJ7lfAPO7ETCjzNGYu22dHuML1qYZRE2dVZp5XDFSC7VvKWoUj6ALCfl6vjRE4pazGFTPAnND8IgyWJTZJbmpq37z2zSW5pX4Cj85zbX20+qG+cSM9HFkVpQe9AgrbSkfI83k/66ESt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781621999; c=relaxed/simple;
-	bh=cVOQmGZhaywNgUpe1waAeohcJcxkKV6VYrn8lHFxGHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s+MftEAROCRCafggdA/BaEiK9s90IPe9FUGsZD1x61r6XxuQ8tTQCJ33eOOg1vBgGenhQ3yafjPpPBFxtsJN26x+D5TWdHd3n3DxCl0w1O4X4c4V29Hm7ZYD8A/Vtky3GUL/ehWpMcE9NlJqN2SdwPGwC2nD2lLVOfeRx821e8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jA2q0c4E; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781622389; c=relaxed/simple;
+	bh=qjAMRIkrTWtf55YKiy2JWQ6uzQPH54YrvaetC38u/SM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NsrC8YR6VsM2O7SwGB5hW6FgBC8kb6kYoaMmmOWabTUDpK9qPUWYFSFllt1zWlZyDRFiQujUtRsBQgnKGbTCTxB64yOVmd/NLECUXcybh4zeJvRhywimFB4ERg1NyDJXHUZ1X8/LvHSVFJuxWnetp3KRG+cLueWs5MqBGnzfYCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=b62Otg18; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jA2q0c4E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5AC1F000E9;
-	Tue, 16 Jun 2026 14:59:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781621998;
-	bh=54nrZd56QlDOLjrnGUMxikC0RJz3adz3i0y4la/F30Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jA2q0c4Ee6LVq3wsrXzEp9N7Su9CbMmoI6RP4rBSzy7r8wEReuDOvyko1gR0PEBZq
-	 bg9x1Q83U6bfJVi8MI1KRXQHZSlLKfTldHay7P4JnrGnDygtoE8Uyr1SZXXq6iopy+
-	 1uiksflRJgCiH46ewjX97OHYoJUczZNbraNTb5w472Yzug6sY9EulbLUSfhDKPqy2P
-	 fXQQ0U37sAQtSAUQVyf1H6jtse9vqf7bUdWGz5uvC+yB+YxD4JAWUp9yh5ga+TP8bC
-	 P3YC8LvGv2tE0gC7aIeruXedVTLx5LPurEO7KW1M1oaYJSRkYmGAKiLdMI2ZflI/gv
-	 Ek4hr9EandhYQ==
-Date: Tue, 16 Jun 2026 16:59:53 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, 
-	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org, 
-	Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org, Gao Xiang <xiang@kernel.org>, 
-	linux-erofs@lists.ozlabs.org
-Subject: Re: [PATCH RFC 2/8] fs: add a global device to super block hash table
-Message-ID: <20260616-fragil-duktus-nachverfolgen-60f54584c206@brauner>
-References: <20260602-work-super-bdev_holder_global-v1-0-bb0fd82f3861@kernel.org>
- <20260602-work-super-bdev_holder_global-v1-2-bb0fd82f3861@kernel.org>
- <20260616123443.GA21024@lst.de>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="b62Otg18"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 65GDrlLF1030977
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 08:06:27 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=8754YTzdUZCrFCN5Ie
+	bHKL3kS7U9JO6bpooJ7zRMorE=; b=b62Otg18YG5TiPx/rMaZBqiabdFXOL/dy6
+	mwucwuO7YGhj0NdXHXnOSjVVTrMhTTHQ3z/mSn0IWAT9QvPPehbRFO0TXUjHvHXb
+	StPwAvWuuTHbOY98SHEbeswXWAcUQypAuu4umSX1Glf7xid/OeF0MYqfSFOkE1Wy
+	w5uM9SGTD8COs09gUsYEXBL82eRH0GjaGWHq9rQJEEd2X3snv0hGv27SUmlFgLXK
+	0VpD05bbujGIaqBTGUAemlrPmX+YdiCzH0a6g4FIvmRk8/JRL1X2W/v8j2dcgFoY
+	jsBmmniBvfPFP0OrMu0XGPWnU+yIXHiOTHwKpnc3zYiox7pQ0bQg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 4eu5r199m5-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 08:06:26 -0700 (PDT)
+Received: from twshared17215.34.frc3.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Tue, 16 Jun 2026 15:06:25 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id B9A8E23312251; Tue, 16 Jun 2026 08:06:11 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>
+CC: <linux-block@vger.kernel.org>, <mpatocka@redhat.com>,
+        Keith Busch
+	<kbusch@kernel.org>,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        Vjaceslavs
+ Klimovs <vklimovs@gmail.com>
+Subject: [PATCH 1/2] dm-io: clone the source bio instead of copying its biovec
+Date: Tue, 16 Jun 2026 08:05:53 -0700
+Message-ID: <20260616150554.1686662-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260616123443.GA21024@lst.de>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=abBRWxot c=1 sm=1 tr=0 ts=6a316672 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=_78whYxrdx1mplLwxq1U:22 a=VwQbUJbxAAAA:8 a=3WJfbomfAAAA:8 a=pGLkceISAAAA:8
+ a=7WxoBgBYM47uA12wEMwA:9 a=1cNuO-ABBywtgFSQhe9S:22
+X-Proofpoint-ORIG-GUID: oxt6I64GYkKy_ldLvVz6QVZ8aeZa2FGs
+X-Proofpoint-GUID: oxt6I64GYkKy_ldLvVz6QVZ8aeZa2FGs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE1NSBTYWx0ZWRfX8o9PjpgnSCZp
+ miX+TjANySXmMMsepeBOPhYSQuw9lOa/foLJ2qv6vwGNyN9c5w+yJ+J6gXsIrN9Fo81X/ZOhjtX
+ CeeVMOlnbuCiRth8hpbxwuj6b1aIzWEG+kQmzm5XKafZo7EyMEWIYNGdBPh96lx3CupApsxaCuN
+ X0I4QcjAVf6ggybIKMemc1MpqThzYqBHcd45z9QLkUYMdtPzwoclnQe/W0kc05Yo850axpg+Maj
+ 8N29YTYGK6mHpXaApfV3Wg0xENS96ScCRdoEh8CYMXzDPK/vUIVH2PX034iGaqLx/kf/oOZsZ3R
+ UUdwCofFy7JHRID7CjTg41nN9d7qRCHQ6dXwSxdEoh2RUMsgbnnWn6LbRDu3V6Hz3oH3Xx+zUxI
+ f0gso9qjgAXjqjx2nEpjI4N1GphbGzJjM64XH+zjUmfHYRVItg240uFSNvS27IS9Rf5cVMCh6Ah
+ gZwi5BOUfcu6IjvBPzA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE1NSBTYWx0ZWRfX+rbpOpCtdYt0
+ suUZBA3iLsdGE22sn/j6AvslAeEblW5Wn/2Z+sRFRTF6HH8/pwTk760Sj/HtbDLp/2A6Y9fR+NH
+ 1XGeLFDLhgQN9vg3Dk3QB9Kcla1OXEI=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_04,2026-06-15_04,2025-10-01_01
 
-On Tue, Jun 16, 2026 at 02:34:43PM +0200, Christoph Hellwig wrote:
-> On Tue, Jun 02, 2026 at 12:10:08PM +0200, Christian Brauner wrote:
-> > fs_holder_ops recovers the owning superblock from bdev->bd_holder, which
-> > forces the holder to be exactly one superblock and prevents several
-> > superblocks from sharing one block device. That's what erofs is doing.
-> > 
-> > Introduce a global dev_t-keyed rhltable mapping each block device to the
-> > superblock(s) using it. The holder argument becomes purely the block
-> > layer's exclusivity token (a superblock, or a file_system_type for
-> > shared devices) and is no longer needed by the fs specific callbacks.
-> 
-> Err, no.  block devices need to have a specific owner.  If erofs wants
-> to share a device between superblock it needs to come up with an entity
-> that owns the block devices which is not a superblock.
+From: Keith Busch <kbusch@kernel.org>
 
-It already did.
+For DM_IO_BIO requests, do_region() built each destination bio by walking
+the source bio's biovec and re-adding the pages one at a time, tracking
+the remaining transfer in sectors. The vector lengths are byte granular
+and need not be sector aligned (e.g. a misaligned O_DIRECT buffer split
+across pages), so the sector-based accounting could lose a sub-sector
+fragment: to_sector() truncated the remainder and the outer loop spun
+forever submitting empty bios, hanging the I/O.
 
-> IMHO sharing devices between superblocks is a bad idea, but that ship
-> has sailed, but please keep it contained inside of erofs.
+There is no need to rebuild the biovec at all. The destination reads into
+(or writes from) exactly the same pages as the source bio, so the bio can
+simply clone the source's biovec with bio_alloc_clone() and remap it to
+the target device. The clone inherits the source's iterator and alignment=
+,
+and the block layer splits it to the target's limits on submission, so th=
+e
+whole region maps to a single cloned bio with no manual page copying or
+sector accounting.
 
-We need a simple device number to superblock mapping anyway and that can
-simply be centralized in the vfs. And it can work with anon device
-numbers and block device numbers uniformly.
+This removes the per-page copy path (and its open-coded bvec dpages
+helpers) for bio-backed I/O and fixes the hang on misaligned direct I/O t=
+o
+a dm-mirror device. Page-list, vma and kmem sources keep the existing cop=
+y
+path.
+
+Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
+Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reported-by: Vjaceslavs Klimovs <vklimovs@gmail.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/md/dm-io.c | 67 +++++++++++++++++-----------------------------
+ 1 file changed, 24 insertions(+), 43 deletions(-)
+
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 1db565b376200..28adfeb58f240 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -170,12 +170,11 @@ struct dpages {
+ 			 struct page **p, unsigned long *len, unsigned int *offset);
+ 	void (*next_page)(struct dpages *dp);
+=20
+-	union {
+-		unsigned int context_u;
+-		struct bvec_iter context_bi;
+-	};
++	unsigned int context_u;
+ 	void *context_ptr;
+=20
++	struct bio *orig_bio;
++
+ 	void *vma_invalidate_address;
+ 	unsigned long vma_invalidate_size;
+ };
+@@ -210,44 +209,6 @@ static void list_dp_init(struct dpages *dp, struct p=
+age_list *pl, unsigned int o
+ 	dp->context_ptr =3D pl;
+ }
+=20
+-/*
+- * Functions for getting the pages from a bvec.
+- */
+-static void bio_get_page(struct dpages *dp, struct page **p,
+-			 unsigned long *len, unsigned int *offset)
+-{
+-	struct bio_vec bvec =3D bvec_iter_bvec((struct bio_vec *)dp->context_pt=
+r,
+-					     dp->context_bi);
+-
+-	*p =3D bvec.bv_page;
+-	*len =3D bvec.bv_len;
+-	*offset =3D bvec.bv_offset;
+-
+-	/* avoid figuring it out again in bio_next_page() */
+-	dp->context_bi.bi_sector =3D (sector_t)bvec.bv_len;
+-}
+-
+-static void bio_next_page(struct dpages *dp)
+-{
+-	unsigned int len =3D (unsigned int)dp->context_bi.bi_sector;
+-
+-	bvec_iter_advance((struct bio_vec *)dp->context_ptr,
+-			  &dp->context_bi, len);
+-}
+-
+-static void bio_dp_init(struct dpages *dp, struct bio *bio)
+-{
+-	dp->get_page =3D bio_get_page;
+-	dp->next_page =3D bio_next_page;
+-
+-	/*
+-	 * We just use bvec iterator to retrieve pages, so it is ok to
+-	 * access the bvec table directly here
+-	 */
+-	dp->context_ptr =3D bio->bi_io_vec;
+-	dp->context_bi =3D bio->bi_iter;
+-}
+-
+ /*
+  * Functions for getting the pages from a VMA.
+  */
+@@ -332,6 +293,21 @@ static void do_region(const blk_opf_t opf, unsigned =
+int region,
+ 		return;
+ 	}
+=20
++	if (dp->orig_bio) {
++		bio =3D bio_alloc_clone(where->bdev, dp->orig_bio, GFP_NOIO,
++				      &io->client->bios);
++		bio->bi_iter.bi_sector =3D where->sector;
++		bio->bi_iter.bi_size =3D where->count << SECTOR_SHIFT;
++		bio->bi_opf =3D opf;
++		bio->bi_end_io =3D endio;
++		bio->bi_ioprio =3D ioprio;
++		store_io_and_region_in_bio(bio, io, region);
++
++		atomic_inc(&io->count);
++		submit_bio(bio);
++		return;
++	}
++
+ 	/*
+ 	 * where->count may be zero if op holds a flush and we need to
+ 	 * send a zero-sized flush.
+@@ -468,6 +444,7 @@ static int dp_init(struct dm_io_request *io_req, stru=
+ct dpages *dp,
+=20
+ 	dp->vma_invalidate_address =3D NULL;
+ 	dp->vma_invalidate_size =3D 0;
++	dp->orig_bio =3D NULL;
+=20
+ 	switch (io_req->mem.type) {
+ 	case DM_IO_PAGE_LIST:
+@@ -475,7 +452,11 @@ static int dp_init(struct dm_io_request *io_req, str=
+uct dpages *dp,
+ 		break;
+=20
+ 	case DM_IO_BIO:
+-		bio_dp_init(dp, io_req->mem.ptr.bio);
++		/*
++		 * The destination bios clone this bio's biovec directly, so
++		 * there are no per-page accessors to set up here.
++		 */
++		dp->orig_bio =3D io_req->mem.ptr.bio;
+ 		break;
+=20
+ 	case DM_IO_VMA:
+--=20
+2.52.0
+
