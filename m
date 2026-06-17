@@ -1,95 +1,72 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27F53ADBAC;
-	Tue, 16 Jun 2026 23:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EFB307AC7;
+	Wed, 17 Jun 2026 03:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781653664; cv=none; b=HyNofBNU6rhgmyb5UCqa8Tw6XxBzOPeDmmL4KuSStt0BPDLsUsGXdJV5l7ZWes3y0FRuub97b74YVkdUlx+BI2b0Cp19Ys7fxTOm0CxavEP/iYtiukZ9KP7p0xxSf1vgYmnvNTPjqR3/T0k1/yshtE2FS7VqGVTJ1tywxAKi9WM=
+	t=1781666231; cv=none; b=K66pB/cevjDKi8GpZp3cZHZ24k51O9a8G4xjgYK1toFufwhxlbl8y7VhrKSITuBIFqn7e9/reXbqxQeoIj2hn9oTiCrIxepHMCCfiZvZjxKiLV9hMDRW84xshANVFzl9ic4cuEwK/zp6g9lB6oJykFsjNRSQoewUo8RnOdRu21U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781653664; c=relaxed/simple;
-	bh=Ia37bVYtODG0iMuzwXEAyjJ7hpWmw5zvE84hvyjJdTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=brb+wfG9EO0LHDG3j+DzEpjzbWeoNf+83gSeWyJHN2LSnV3kRqWEPginIiejVaOPcTskzDXn7rhrm+0d2i1bMC/ZxMz9D5lmTKOq25FQwAPH/4+f1nffwuIGFTeCpTTnlBZNS/cnLO378Wir4w/51bGpFMiJvUXEAGFFsksXCjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Mh4amz8s; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1781666231; c=relaxed/simple;
+	bh=Ct7iMO6gFYe7eq223fdb1zYPiMkE8rMXINFouPmSLdk=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VLgKc3xOkFgmu+b1HgN7QLO1Gtyj5Hoxe3jATQ2XG54cYHOcwcTKP87dqZ5oLA3MPERjwf0+9V65JeYuJy+DgsOt1GvXz0Y6on5QkP/S9V/XYaz5pLvMctAEfnwfsC6z86bt61BSJ/SiSfGfYs20NzhXPyb2pYfYHbYvv534w4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DALtP9L0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Mh4amz8s"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=uUqXq74JcCRG12Ys8DcDIO0suKKnJqu3XS3PIM0oyTk=; b=Mh4amz8svqS0VEgg
-	CoAV8P+tLZ/u09B0tqCDA5dylIDaMnotn2SAQ3Y9tTryhK04g7xinfPSa4NylQmRyDsaIiQcImPdk
-	UUlN5oXYIZkuDV3e7JtWAQvQ+tpDhE1eMjMAkq8NSr+2KJlWUBIOrBOW+UOMGC8YoX70L+fJPbGBL
-	0NhF3LfsfUDRXkfpSKLHoC8GUegsyc75xqFAt7lLrzpYSRHfFSw4kB70RZt0J0hC83hQUUrITMxqi
-	LNL4PjwdRkM6/P+DSFAVaSeMTGXLjv/MuJyShGndyhLqrHBjanNvEAJ6C+mZk88Qe4BOI7cxQf+hS
-	Kjddq5EPrOIGJjMWTg==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1wZdVM-00000008A3o-0iao;
-	Tue, 16 Jun 2026 23:47:40 +0000
-Date: Tue, 16 Jun 2026 23:47:40 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org, mpatocka@redhat.com,
-	Vjaceslavs Klimovs <vklimovs@gmail.com>
-Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
- errors
-Message-ID: <ajHgnCh7mv-TYilH@gallifrey>
-References: <20260616150554.1686662-1-kbusch@meta.com>
- <20260616150554.1686662-2-kbusch@meta.com>
- <ajGN1OKun3qyvqMc@gallifrey>
- <ajGacnaCZ6v6VE1B@kbusch-mbp>
- <ajGtbuJ2kXo1GZ1d@gallifrey>
- <ajHgIWdT0QmeF_t4@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DALtP9L0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE99A1F000E9;
+	Wed, 17 Jun 2026 03:17:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781666230;
+	bh=/XxQiTXNtmMZZ+42Z8EigCzrFqlmyJmwNpk/XdekBPQ=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To;
+	b=DALtP9L0p8+aUXxiIcMFKZv2rjiLUWzBIvBPlQEsPhx+JB6U1kt16NZbokcqsY6Ku
+	 kI0vvEqBJu0k2wAT8WwWo1kkS8BIcegPyV9JNf+yOim12kDqg6o5KlfY0eg5FyQDFu
+	 Y65s3EdSdcAc2iswoIOtP49uLt85K27I4qn9o3fG//A8IGVY8ZyIIArRb9SceLiFzY
+	 5OdNg7da6E6ucmkp1Ws/jRfj6m+QU+aWlxGuOM56R003iYlM4ie9Rerf4Ct9HvTBk1
+	 0LcQlYaH8Uvwn9oIJlWOkqc/KXYGLksTwj0AqseE7mhVF1WKH9rQ96EXUltheg0iEP
+	 jSAU4Oa1Yqkog==
+Message-ID: <77870acc-63a9-4408-a45c-2ec634ebf593@kernel.org>
+Date: Wed, 17 Jun 2026 11:17:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ajHgIWdT0QmeF_t4@kbusch-mbp>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.88+deb13-amd64 (x86_64)
-X-Uptime: 23:46:18 up 32 days,  2:59,  2 users,  load average: 0.01, 0.05,
- 0.01
-User-Agent: Mutt/2.2.13 (2024-03-09)
+User-Agent: Mozilla Thunderbird
+Cc: chao@kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Carlos Maiolino <cem@kernel.org>,
+ linux-xfs@vger.kernel.org, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+ Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Gao Xiang <xiang@kernel.org>, linux-erofs@lists.ozlabs.org
+Subject: Re: [PATCH RFC v2 15/18] f2fs: open via dedicated fs bdev helpers
+To: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+References: <20260616-work-super-bdev_holder_global-v2-0-7df6b864028e@kernel.org>
+ <20260616-work-super-bdev_holder_global-v2-15-7df6b864028e@kernel.org>
+Content-Language: en-US
+From: Chao Yu <chao@kernel.org>
+In-Reply-To: <20260616-work-super-bdev_holder_global-v2-15-7df6b864028e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-* Keith Busch (kbusch@kernel.org) wrote:
-> On Tue, Jun 16, 2026 at 08:09:18PM +0000, Dr. David Alan Gilbert wrote:
-> > Interesting; I've got your:
-> >   dm-raid1: don't fail the mirror for invalid I/O errors
-> >   For DM_IO_BIO requests, do_region() built each destination bio by walking..
-> > ontop of e21ee273e6fa3879aec9a27251cfce98156e07c4 which is just before 7.1
-> >   I've not your https://lore.kernel.org/linux-block/20260612223205.465913-1-kbusch@meta.com/
-> > 
-> > root@dalek:/home/dg# lvcreate  --mirrors 1 -L 1G main /dev/sda2 /dev/sdb2
-> > root@dalek:/home/dg# mkfs.ext4 /dev/mapper/main-lvol0
-> > root@dalek:/home/dg# mount /dev/mapper/main-lvol0 /mnt/tmp/
-> > root@dalek:/home/dg# chmod a+rwx /mnt/tmp
-> > 
-> > dg@dalek:~$ dd if=/dev/zero of=/mnt/tmp/testfile bs=1024k count=1
-> > 
-> > my two tests are separate tests:
+On 6/16/26 22:08, Christian Brauner wrote:
+> Route the extra device opens of a multi-device f2fs through
+> fs_bdev_file_open_by_path() so each device is registered against the
+> superblock, and convert the matching release in destroy_device_list()
+> to fs_bdev_file_release(). The first device aliases the main bdev file
+> opened by setup_bdev_super() and is already registered through it.
 > 
-> Goodness, I'm struggling here. Unpatched, I have no problem recreating
-> the issues you've described, but everything I've tried with the
-> proposals included gets the expected results. I'm running out of ideas
-> on replicating your results with hardware I have, but it's getting late,
-> so I'll try to have new ideas tomorrow.
+> f2fs opened its extra devices without holder ops, so a freeze, sync, or
+> removal of one of them was never propagated to the superblock.
+> Registering them wires those events up: every device now freezes,
+> thaws, syncs, and shuts down the filesystem like the main device does.
+> 
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 
-OK, no problem - let me know if there's any useful diags I can gather;
-would blktrace or function tracing or something help?
+Acked-by: Chao Yu <chao@kernel.org>
 
-Sleep tight!
-
-Dave
-
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Thanks,
