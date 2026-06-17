@@ -1,140 +1,152 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC29F4071FC
-	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 14:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781704895; cv=pass; b=iEet1bZQ/RLRavApK1DakFBbXtZGPbyXhAPDPB4HRLbDNvQAsuZ/aUyCOAiJ3njQzH0ICfva4xP9TzmbW2VMkkLVcZKMSCgHNrHjbszhmGrvGngD8xIuPg65ODXErcWrIE0pv6OZbe7IrQHZ4Jn2jK0nWDTPpqb/c/dPnLQ0asA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781704895; c=relaxed/simple;
-	bh=d+DJYMfAXmvlnPojeQcYjc2FpmtRtc93BPdBcj/yJ2E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U25/oZCiuna8PR1779Gtv0Zzicr114t+/WhysuqSA6smUBtdYsQYAp0S2HOgK8whxNZsmSYnNhnO73DuKTs0eVKtlGKQ/tkOtT34ZuNcb/I/Iypg4be73o42lQTtNpEBdvQsNeoDbWLClsUvczEE4UzjJnpN16E+Q626fIhbBlQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WJJ7KIDw; arc=pass smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3950F1DD877
+	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 15:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781708775; cv=none; b=RtguRAhqX6jt9Ju0iKIwUjkBlOac9/QBx0cRE7EVub47Wz+1XcKB/7by2ERNg7fF7oKRET6VSLsDDVxBGvaBHHNXJX87y6/C2jW0BQKwfdY32ylSnT6x6N0a6VIjTXxb3CdU9MMgIn+lm5Dr57R8ZU1D9Mh4ck3cElY8OjiFhMY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781708775; c=relaxed/simple;
+	bh=+IZrTSKOmCMWffKDoS8DsOy0cIDUWr4neEOXFd0I93A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JV+ucamrLvtcoDdb8yZcxzRBK0U0u1TflBCpO046GO/JGxmgxNjmvPXTSLFig6fbbO4XaGNjLqffp897wqn9UYEwulyWiZh1N9pht42REo1VHrGO/iJTK4wm+d6PwUob7sAsC31YAJY+DyTDKEm1v9WfvWN2PK8OZBr9Q5gpgzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=h+crDyHv; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJJ7KIDw"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36d6bb38b44so3742519a91.0
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 07:01:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781704894; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jBguPtBplEtvYUjJnTcF/br+bkrNqE7uD/abSdtoFbU27/+pfzv0IAdeFmCACpulsf
-         P/UmP0yT6VvhTkl9ZOHAClVEC1ybg3+8KQ0RL0POjJP9gInrAumjeIi6+aEonzSlSx1X
-         PZgb9DTr5mqdm5j0e7TJGMs0+HjC0kpncUypx1ZKzSMj0FqBAbSbS1mQ3JjP9VWvBEx/
-         Tul6a5Ea/tJUng2C1tlHJ0mWj2e4dz3nVVlRMqnKzIYvhm/Or/aJWxMJjaTmac+mCHbf
-         RWQHFYeSfdsIcPlW7pok29iEYOcxYhCS0g2+QzdclV8OHwiwx/WeatRf9UyRMxuJLyc5
-         Zi4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tiRv+G39h+X8YKopQA1rD5KpEf5r1LXb2YHn926YfMc=;
-        fh=l4kwHgI8I3kiuk87rsXLe1eeA92Y9WoDiQrdLdW3dQ4=;
-        b=MP3XGxPae83sBwJ6lrXdjXh/Brhbhxp9GrCyE1SFYfIyJ3gWKch/qjQ+l73f0gQKKK
-         pm1NfElYM20hxaLyFiqu/eVM4gGx4d1ENm+JNAEM1O2cLs+thaHEyoIs7r2CR7vqMxHV
-         oVUN7hPOMsdz3eEN7TRzWBmwmRVm3tvMm5/DDOvpfzijDdZmis+2R99zwiOpicupWjaB
-         QITYmkRpnm3XYjvPWzG7fEaaQjwtqjKtS7mo6eGema1pK1K2s7yOCawY6Mu7D9SkttzW
-         3ZYjfiV+mQUt63dyxhanM7VVVlLHijyDvcQ9g0S4Ptb18Tjuavy2OEiqnJKiiivhuAQi
-         Ig/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="h+crDyHv"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-486560db81cso4389631b6e.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 08:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781704894; x=1782309694; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tiRv+G39h+X8YKopQA1rD5KpEf5r1LXb2YHn926YfMc=;
-        b=WJJ7KIDw1dDQ0IFIaYfeceXa/3cRIOQR3mRU1e7nsrzWNXgAMDRUX3sMK7s9Yyi5ck
-         faPDfgSDe4AyDQ2jyAdf6rOfJd8nywiH0h1DprjC58gEirhbZsL4DK4utX7XU6xx+NNU
-         UdoRGeTz052ebPyT8triSFNpYVCVKIvgQW+4MMA88l6MQqXqfvUjXR7x1pMfrjzGyVzj
-         LUHOlWg6WVFQRQQOTM/CThqtvrol55/lDWO8uojB1d+poktbgiH8iTFTLYEAtN13ZHNS
-         O0sWn8gURpJQj/HcYW9DptxkxqBvZcVdmRgwy264A1wPbty31SC60BGz4X5z6dNZe8IB
-         3RCA==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781708772; x=1782313572; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QWkME3UubDCWfnghCnb/pyR7HEy65kfkjwrbeWa3czk=;
+        b=h+crDyHvjLPXalogQY/rQpjwq2ffMg2k/WRCLHfamOPK5KzXRfCYIn+USXEezDRn85
+         W7fxOR3tgvInB21sVy9yiOHWsV3aYF/e5oL+hYSFDljKtwPq2ND7eOEzF216pC5QDdIV
+         w3V4GlvaOGEA3WZCJXFp0YkAdSkWAZEbjrJdodWiufsT2T73OJoNxgQ2L5OQWUVXxb+a
+         8/3VwDodRt8ZX7akqp3wcJ63s1zRlSYdguMKkVRGuxKi5UeYNYUMt4G6cVpwG38Pv3mI
+         hV7dLgvZd1kP6k8mWPKDGda35AWr//NtshxMGQEtb1Z/ORE8jmAqCw7zAXXi87/AkKyv
+         sRBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781704894; x=1782309694;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tiRv+G39h+X8YKopQA1rD5KpEf5r1LXb2YHn926YfMc=;
-        b=aqq99/dHV+MY0fiPfskF0E7DAA8upc9ISA7u90igcQ8uJRY5KWS5lo8Yn33a02+/jd
-         o+PsJEXJDYZFwRYAvP6a5wPGas4JiOfVAZ5dgp/ux1e/1ap/s9g5G+G3qFCU3nANDKQW
-         f3mHHzK6/QLhyAvyms/WI0VJx3r7Qrf9G8UXCOqXvAb547iXuKsxv3QPqq5wUI1QPSqF
-         jHtfWI/auo1N0vZ7JdioTUPHW+vrrQWBeD4VWbMc6DvGuUdpCmQfoGzOMljuZzm4qQrO
-         nATUCpgiHyrYCLLigDyKVgOz8wQc1jpGsi0BpJZ+wFsGRkCUApfuwdHqgJX80aDYBtPz
-         Khlg==
-X-Forwarded-Encrypted: i=1; AFNElJ/Jqgsg4IOSbdOh6vqIVHo5GsqHVl1npfDJK7QJj2Lgu6GbgjBeNKfe05n1iSf8n7g2barOhOvz6rrJGQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS/NAEr0+ByVvmB7iYw/j2ryLYkZcqFbNdahQ0Jc8b5fjBLbLv
-	yaRKvJGdekktnJHbhfPtTNjhUvBWDGAyj7TS+UuD/NnpNMjLkSWb4a5NqTYD1Xj/A39oOdnA0q5
-	MEfJ7YLMR8dE1FSbH6fMDDbq3KhTipmY=
-X-Gm-Gg: AfdE7clqEAc2ybmZCj93tqfoT2DqlCQku/SgNO9wYu4v667bYVMPFMW3+Buw3J3OeWP
-	dpx0RemrUwfs3kqw1rVoVDNRwBsUVEbGoEF/itc43IauFDvGL1W8IHk9DS7IuMtBgCc4HzR8TvD
-	bKMqGYOPMluO3VRMaHZgusso9WZ/NHpuWw8nkZFZmm9PccbEpeqqwefdXxNOhwPEIZJY7Tt+1KG
-	RL8Ze+vlIp3WfpX7yUuQ7CdJjGg0xNpEEYv99eyie+Yi/nmvxtlJBmCPfYjg/F95NIDcm70YF4q
-	bxy8jM955rJaIqLH6H+5Kz6ZyA==
-X-Received: by 2002:a17:90b:350c:b0:377:36af:c996 with SMTP id
- 98e67ed59e1d1-37c947363e6mr4256111a91.21.1781704892396; Wed, 17 Jun 2026
- 07:01:32 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781708772; x=1782313572;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QWkME3UubDCWfnghCnb/pyR7HEy65kfkjwrbeWa3czk=;
+        b=YyhSVWuirZRDYy/ShcgZhJkSXkibIbVkmNS6U7UuOLefRz8Bb3PjfCdUqs3mH+hOmc
+         1NdyaGALHPN7v6kKw5VvsVoIWWeZD8aj9FHdJEYZr4oCji6e3O06QPbSZ0AB86oIrQa+
+         Zvs7C82BlDlyecnH56RLHnFZmnqA0I0uoEr/Ojhtg1M65FVT0c2r12W9f1kK97syjTCi
+         TsK5u/IcPPVK2RGh6uXHEUrLLigby7O7wjYsm0RERiif1F+qHvoStT+gFDaBnoa66gbb
+         e7YyR8t0cn75SBV/GDylBBBlS6nZwZHWhWdBIJSCQ/6mkMfViwMsFNaYeWUdwhIF0fms
+         dOSA==
+X-Gm-Message-State: AOJu0Yz/Bs/pFGopUs4LjVdt7aPPuQ4dzg2/rjCD1FE1SRsznjiCq1KA
+	8qs24ngtuCm7g3145cpuIKTAaCOnUmb6Fs789CGBunnRq7eExhFtZIfmh2OC6SAwrjY=
+X-Gm-Gg: Acq92OHjBXjmPb5zJ0MFd/STdb7dllWgDAkJvH7OrT+bFMzmxJauS6+LgG1h7Z6xgDl
+	oClONCFAmfHf3gmPoy/tEB9S9opu8pAvTDu7uJwcsQ/TqHLzwMC+dFFljBlMSfNfxONBq7DEm7L
+	FZMDygW3s7HHu+UC7YmR7uGGySMlsMG3s4GT44XQJh19gFABV82fzp//duN4shJRgR8N3XqdlGp
+	9u1XKhUCjNo298UQuewwFrV9MxhuIl2v+x9HVZGYueZebGbg1mfMHlEYgUCWD/rWoDRI6jSmAMG
+	em7chMi/NQhxqbIVOPkwAR5M7ExwLrh7QanUSKKJ0g8ttzBhNAZyivGI7JC9zXMAioGt5N/fQyl
+	dwEAk04AyB2DABdmji7p02LddEkeR2GzWH55CXpPl+/3AnORA9dh4QEygTg4TaxcFsX3nwC9Rdz
+	fBsKJtxE65t+skwK7adu/XTLkgiyDhpSFx290AN5E=
+X-Received: by 2002:a05:6808:c2cc:b0:487:55d8:f0eb with SMTP id 5614622812f47-489429b1525mr3382627b6e.2.1781708771868;
+        Wed, 17 Jun 2026 08:06:11 -0700 (PDT)
+Received: from [172.19.0.220] ([99.196.128.98])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4875dfb4574sm6528668b6e.16.2026.06.17.08.06.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jun 2026 08:06:10 -0700 (PDT)
+Message-ID: <d71f62d7-f1f1-4169-bc05-1b354b94ef78@kernel.dk>
+Date: Wed, 17 Jun 2026 09:05:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
- <20260616123646.GB21024@lst.de> <CAJxJ_jhK+zkpjhs3YsQ9RoasKYh+E0NweQci0sPAEY1ne5LmBA@mail.gmail.com>
- <20260617061743.GA19844@lst.de>
-In-Reply-To: <20260617061743.GA19844@lst.de>
-From: Jianyue Wu <wujianyue000@gmail.com>
-Date: Wed, 17 Jun 2026 22:01:19 +0800
-X-Gm-Features: AVVi8CcmbYlKs19G5r-C0VfRk8c0vOg--A7ctAfStsGLM_YhFG6Fmldj3URh3So
-Message-ID: <CAJxJ_jiBFUwqZwbE1XQg4oKM0XDrBzZeScvJ0PAUqusG0CObvw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] mm/zram: route block swap I/O through swap_ops
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>, 
-	Baoquan He <bhe@redhat.com>, Nhat Pham <nphamcs@gmail.com>, Barry Song <baohua@kernel.org>, 
-	Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
-	Youngjun Park <youngjun.park@lge.com>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] blk-mq: bound blk_hctx_poll() to one jiffy
+To: Anuj Gupta <anuj20.g@samsung.com>, hch@lst.de, kbusch@kernel.org,
+ lidiangang@bytedance.com, changfengnan@bytedance.com, tom.leiming@gmail.com,
+ nj.shetty@samsung.com, joshi.k@samsung.com, anuj1072538@gmail.com
+Cc: linux-block@vger.kernel.org, Alok Rathore <alok.rathore@samsung.com>
+References: <CGME20260617061531epcas5p26e62bfdf2e91b646611191e4451d9843@epcas5p2.samsung.com>
+ <20260617060850.1244788-1-anuj20.g@samsung.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260617060850.1244788-1-anuj20.g@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 17, 2026 at 2:17=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> On Wed, Jun 17, 2026 at 11:38:02AM +0800, Jianyue Wu wrote:
-> > Before I rework or drop the RFC, could you outline how you see that
-> > core-side model working? In particular:
-> >   - How should a compressed backend like zram or future block device
-> >     plug into swap_iocb / swap_ops?
->
-> I don't think that is the right layer.  The virtual swap layer that is
-> currently in the process of being upstreamed is the right level, and
-> the actual swap devices or swap files are just a dumb backend for what
-> they higher level code does.
->
-> >   - What role do you expect zram to keep while the legacy block interfa=
-ce
-> >     remains: current block swap only, or something else?
->
-> For now we'll need to keep it working as-is.  It is heavily used in
-> android and potentially elsewhere.  Once we have zswap fully working
-> in the virtual swap layer world it might make sense to say never
-> compress again in zram when REQ_SWAP is set (or maybe a new
-> REQ_COPRESSED) so that we can use the core compression code without
-> breaking existing setups.
->
-Hello Christoph,
+On 6/17/26 12:08 AM, Anuj Gupta wrote:
+> blk_hctx_poll() can busy-poll until a completion is found or
+> need_resched() becomes true. On preemptible kernels, the scheduler can
+> set TIF_NEED_RESCHED on the timer tick and preempt the task at IRQ
+> return before the loop condition re-evaluates it. After the context
+> switch, the flag is cleared, so the poller can continue spinning instead
+> of returning to its caller.
+> 
+> This can happen with io_uring IOPOLL reads inside iocb_bio_iopoll(),
+> which holds the rcu_read_lock() while calling bio_poll(). If another
+> poller on the same polled queue drains the available completions, this
+> poller may repeatedly find no completions and remain inside the RCU
+> read-side critical section long enough to trigger RCU stall reports:
+> 
+> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> rcu:     Tasks blocked on level-1 rcu_node (CPUs 0-9): P3961
+> rcu:     (detected by 3, t=60002 jiffies, g=18533, q=4943 ncpus=20)
+> task:fio state:R  running task     stack:0     pid:3961
+> Call Trace:
+> <TASK>
+> ? nvme_poll+0x36/0xa0 [nvme]
+> ? blk_hctx_poll+0x39/0x90
+> ? blk_mq_poll+0x30/0x60
+> ? bio_poll+0x87/0x170
+> ? iocb_bio_iopoll+0x32/0x50
+> ? io_uring_classic_poll+0x25/0x50
+> ? io_do_iopoll+0x216/0x420
+> ? __do_sys_io_uring_enter+0x2c7/0x7c0
+> 
+> Reproducible with:
+> 
+> fio -filename=/dev/nvme0n1 -direct=1 -size=4g -rw=randread \
+> --numjobs=32 -bs=4K -ioengine=io_uring -hipri=1 -iodepth=1 \
+> --registerfiles=1 --group_reporting --thread
+> 
+> Record the starting jiffy and exit the loop once jiffies has advanced.
+> This bounds each blk_hctx_poll() invocation while also covering the
+> case where the reschedule flag was cleared by the context switch
+> before the loop condition could observe it.
+> 
+> Fixes: f22ecf9c14c1 ("blk-mq: delete task running check in blk_hctx_poll()")
+> Suggested-by: Fengnan Chang <changfengnan@bytedance.com>
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> Signed-off-by: Alok Rathore <alok.rathore@samsung.com>
+> ---
+>  block/blk-mq.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4c5c16cce4f8..ae6c5f4b80ce 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -5248,6 +5248,7 @@ static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+>  			 struct io_comp_batch *iob, unsigned int flags)
+>  {
+>  	int ret;
+> +	unsigned long timeout = jiffies + 1;
 
-Thanks for the clarification.
+I wonder if it'd be better to set this to jiffies + 2, just to avoid
+skipping after a single loop if jiffies changes right after this.
+Probably not a big deal, on average it should be fine. But also should
+not really matter if this is potentially spinning uselessly 10ms or 20ms
+at most, if HZ == 100. Similarly, this is also a misuse/misconfiguration
+if you end up having multiple pollers on the same queue. Yes it'll work,
+but it's a terrible idea for obvious reasons. Hence the patch is mostly
+about ensuring that bad case isn't TOO terrible. But you'd really want
+to sort out the app/config side of things in any case.
 
-I understand the goal is to have more common code in the core layer,
-with dumb backends. On the swap path, once core has already compressed
-the data, zram would only store it and not compress again, while
-non-swap use of zram stays as-is.
-
-Thanks,
-Jianyue
+-- 
+Jens Axboe
