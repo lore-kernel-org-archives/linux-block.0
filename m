@@ -1,99 +1,95 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2504B3546E6
-	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 06:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF53390233
+	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 06:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781676624; cv=none; b=tt8Yj0Yx8QfendOZCI4WknlRSVXMfkGdGdmA0Wl9cvsHHZNagKvCzhYLZaL0xpT/+1O1bZ/PrPYs3R2nhfy3p4w/hK0epzKgCXMcxS1D+PXXbc0V3axCCyiS5pW0ARxbzM3B/Lmh5Z1cTKJ6cj8ZX+DeeqvaadfB/Y8Au7vdG54=
+	t=1781676914; cv=none; b=C7eKkFvxeq9moCp+kBW1PqIXkFjixlp63o7KdXjzvZJCYwd0W1BD87mU+TFznpYYf2fcK/wwZwi1hbhADaxD4w+l04BkF/wtnnv/8/bz0dXp4R8g5ousloPsaHXcA1ehLS4UOGRwudG0KTWkmvwQNKwBNaw4DVD73E6jv7alcGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781676624; c=relaxed/simple;
-	bh=J1GaUtDu0lV/aN08T7cW6eB+bMo+zoBDOYe/2JHOaAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iul5k2KVbfVtXHfpCejkV5k6qT7SqfIkicVUROAVG0MK/pjJ65t6Ax09vbID90ucCIj/514ih5JmzGXh7PSl0e5a/3lmuQpnWIS1McQGZf4KkZgg9+bGjsotfAoxMqF87PSsWLIvdZsEf+PuIQGjSi8q/mP5aZAfIZiEm4DsZek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=D7y5i/qt; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1781676914; c=relaxed/simple;
+	bh=614yp7So0F5qyjoPHiz1xrAFzHyvVzS5lL4XHAeeOrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=ica2QZRrQNznu9TK+Qw+Rx1KNdGsTRxv18ufQfBaPD+L5N2iiedt/I/KJgTyfp6/y95SLOeQ2s3shcJ5U7mxvx6whV6N1nSX9aNNiduOeDrNGM0/7qoZurfKrFScCYO3a27yiZGkUnC+yYgsD0IWfKKRprLlfVLNxa102bkyk7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Io3Dy4NT; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="D7y5i/qt"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8424b6792efso2277083b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2026 23:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1781676621; x=1782281421; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=00zCxIJF6+oPAz4r/V9ZifNMpH6SjkiBAAesMrF/bTI=;
-        b=D7y5i/qtOJsTxWHh9RXt+2JIsQm0kcvGBjhqY1+C5fOECxgVXMIojQCC/U+wAwBP7d
-         7Y+EQlN/b3KfJ0X2y7KOPMo8m7XJyAleepJpfrcJLHMVoX2VpTshZ6PqhlM0EiK9oPOZ
-         4cUlssh8ZOrIcxZb8Q2+Sh8wRTJneUJHAOs5M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781676621; x=1782281421;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=00zCxIJF6+oPAz4r/V9ZifNMpH6SjkiBAAesMrF/bTI=;
-        b=gvbsU8uVPlmbAxjo616L8Pa3GONMNzpPzWw7Ugnot+3yWDChbHUzWnDvypROmVGEMn
-         ThqgTqUfwdDRkpL740a9sDWarcc9k5E9KZEZeoSXmH/mccmOsdKh7eGA/U/1uFhEurv/
-         IRIBerBsgPBODs0daGRD44bUmB3xNW4eH2oYXqW2R1VKvk06mKgtXLcCztziPcz/NRlp
-         CMsMrkb1DkQpr3xqwqH6JxWkS9seZDFme+/ZtqTNAFkRNPVTWAcbohdHh+TO/g6Q4gBz
-         /CFmp0pL1dHUK5SazWj0WVTfJEJeucilmywcDhob4XiYb8l3RiQlwlJySJHc2UObbK00
-         uqXg==
-X-Forwarded-Encrypted: i=1; AFNElJ9UwXXJvJ2X5mIfE+YNdKdxcXYU10i0RpG0dDoT7TFIxbuLdHuzRBezBJ5ANUQ5m6k9dudolmeXcGXI0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiNkPHoeU+SRDzP8yS3uYpttMlmGv2Mq1c8NdFWRahzTWDt/7J
-	JGV4dKtAL1SIshimmHV/tRBaLw57T3OAVcyuWvZ5mKnAiur2xRH23zDLBK4hYlr8Pw==
-X-Gm-Gg: Acq92OHTUySSK2v0kLQgd9J7/+zibB0JSr0nl6Xf7dssszxFA+ylHZEtN9EtxmnjEvq
-	IHXpbKMQHI3k0dUufvC1J+DSDUViP+RZYikbSBKWMcMXbWCIbEjDLwhER+OxfsmCcKsnR6HCUIZ
-	vH87/eIEZQH5ezXYoALeQsxTr2xO1iCtgFvVyXet6ylkOcF6LQf9D6nHuqBjjiDTsWljdei5/m4
-	PLbJqpkPfTHJK04rtaIfGuavEmusQFiafWO56+B9h3QXOJcS80ufVE9fdPGzgEGtwcGI1WgAKRD
-	OAzzeN4UxGguqlRrQdHKL4CtK48Wsv6b1w0ciUc2emRTyALNY9CJtndwyC4xKxW1+E24jDM9GyI
-	w7KV1W/E9kjdvyuq3QUxcnq0hFz9tlB5i+Gou5oJ0eu7I/N7kdNSncCcPouubE2NKtFUdE+dHTK
-	BGt6sRQbeYb8YAj2SlcMjRitWkt1S3LZBeiX5lkM6ZgUAQ6iHI+sff
-X-Received: by 2002:a05:6a00:2906:b0:835:6388:655d with SMTP id d2e1a72fcca58-8452445abfamr2457086b3a.14.1781676621348;
-        Tue, 16 Jun 2026 23:10:21 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:20ef:efdb:f2c9:836f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b020b53sm14338791b3a.47.2026.06.16.23.10.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 23:10:20 -0700 (PDT)
-Date: Wed, 17 Jun 2026 15:10:15 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Jianyue Wu <wujianyue000@gmail.com>, Christoph Hellwig <hch@lst.de>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>, Baoquan He <bhe@redhat.com>, 
-	Nhat Pham <nphamcs@gmail.com>, Barry Song <baohua@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Youngjun Park <youngjun.park@lge.com>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
-	Brian Geffon <bgeffon@google.com>
-Subject: Re: [PATCH 0/3] mm/zram: route block swap I/O through swap_ops
-Message-ID: <ajI52zahhZIY0kir@google.com>
-References: <20260614-zram-swap-ops-block-register-v1-0-6c1a6639c222@gmail.com>
- <20260616123646.GB21024@lst.de>
- <CAJxJ_jhK+zkpjhs3YsQ9RoasKYh+E0NweQci0sPAEY1ne5LmBA@mail.gmail.com>
- <ajIYFtADxQDq8q1P@google.com>
- <CAJxJ_jiM_-a52EOm896FXkdH+wRxjSHJx+MW6b-ewNLVkp4uSw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Io3Dy4NT"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260617061509epoutp01bc041eb96c1cabacc0bc20d0b497e726~5ybWyIBV90891208912epoutp01w
+	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 06:15:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260617061509epoutp01bc041eb96c1cabacc0bc20d0b497e726~5ybWyIBV90891208912epoutp01w
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1781676909;
+	bh=looy25guBxmRQYLHdOxQcJhFp8WHufn7xAcxrFBynK8=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=Io3Dy4NT2P3cV0U3owcf0Li3sa6HaTmWKNDb+bso04dMC65dLp/pnDUWzL96TAySB
+	 NLg8sv6EJIez8grgpqvgXRgHYwoHBS0/Qx/9UHfPo1p/sYIt8g/u7GlkRiq38LWJvR
+	 NEn96OFkwcaD2n5hiIoBsy4N35q6OMUyEKawc/kI=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260617061509epcas5p2c9d84a6a8e409e54dd05e257447a5827~5ybWPg4j71694416944epcas5p2g;
+	Wed, 17 Jun 2026 06:15:09 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.89]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4ggD9S3ylNz2SSKg; Wed, 17 Jun
+	2026 06:15:08 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260617061507epcas5p4f7f04c2273385138b5abd1496025ef99~5ybVE6ZDB2336723367epcas5p4o;
+	Wed, 17 Jun 2026 06:15:07 +0000 (GMT)
+Received: from [107.122.10.194] (unknown [107.122.10.194]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260617061506epsmtip1a1be0610fd1cdccac36d81fbf22ea02e~5ybTRR01k2669226692epsmtip1r;
+	Wed, 17 Jun 2026 06:15:05 +0000 (GMT)
+Message-ID: <137fc9f3-16f6-481f-98d0-d8eccb346a14@samsung.com>
+Date: Wed, 17 Jun 2026 11:44:59 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJxJ_jiM_-a52EOm896FXkdH+wRxjSHJx+MW6b-ewNLVkp4uSw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-mq: bound blk_hctx_poll() to one jiffy
+To: Fengnan <changfengnan@bytedance.com>, axboe@kernel.dk, hch@lst.de,
+	kbusch@kernel.org, lidiangang@bytedance.com, tom.leiming@gmail.com,
+	nj.shetty@samsung.com, joshi.k@samsung.com, anuj1072538@gmail.com
+Cc: linux-block@vger.kernel.org, Alok Rathore <alok.rathore@samsung.com>
+Content-Language: en-US
+From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
+In-Reply-To: <2e916cee-3a82-47ac-a416-b52a9744cdd5@bytedance.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260617061507epcas5p4f7f04c2273385138b5abd1496025ef99
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260611163403epcas5p2bba1c085eaab24852acfb0751ef148ab
+References: <CGME20260611163403epcas5p2bba1c085eaab24852acfb0751ef148ab@epcas5p2.samsung.com>
+	<20260611162719.910837-1-anuj20.g@samsung.com>
+	<2e916cee-3a82-47ac-a416-b52a9744cdd5@bytedance.com>
 
-Hi,
-
-On (26/06/17 13:44), Jianyue Wu wrote:
-> Hello Sergey,
+On 6/12/2026 7:23 AM, Fengnan wrote:
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 4c5c16cce4f8..d85fa4a51e79 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -5248,6 +5248,7 @@ static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+>>    			 struct io_comp_batch *iob, unsigned int flags)
+>>    {
+>>    	int ret;
+>> +	unsigned long start = jiffies;
+> how about this :
 > 
-> On Wed, Jun 17, 2026 at 11:46 AM Sergey Senozhatsky
-> <senozhatsky@chromium.org> wrote:
-> > Can we elaborate on zram being a "legacy interface"?
-> My previous wording was ambiguous. Actually I didn't mean it is a
-> legacy interface.
+> unsigned long timeout = jiffies + 1;
+> ...
+> } while (!need_resched() && time_before(jiffies, timeout));
 
-Oh, your wording wasn't ambiguous.  I simply forgot to direct my
-previous email to Christoph.
+Thanks for taking a look.
+These are functionally identical but your form is established idiom at 
+other places.
+I will switch to that in v2.
+--
+Anuj
