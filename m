@@ -1,322 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3956D317158
-	for <linux-block@vger.kernel.org>; Thu, 18 Jun 2026 07:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781768496; cv=none; b=TA/K/v5MN+CK695Aps/O52hsHudhPM5RbiWy7b3eVGF9GVvibenIBtaUPPnmPyTrqagqPsh3l2PUHBmmVYGdSpzeEMqnL6gFIAhmcNf7wLPy9xRuCbiPD517zU/r8PoNvVBtPJcIbSoR/YtU155P0kJW/dkgzbI9SOJvk0/HVi8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781768496; c=relaxed/simple;
-	bh=gZkwZs34r2bbac54SVywYC/jPjvgeK3vRDRUywn0qf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e35R0OUGBHTGv/Pwe28MO4CcqlBtK0a3wsYt/oduZb/a54KhHySRPQ59X/75pYm0Er/M7Mg1O+dQdICq3Tua6ysTEXfltS/mbYXzPgKrYcBfNN38Wz7hOsvCCszbpppqGAngj3/tzp1PNXKkKVGNmmc1BEDGSQRL4XWDP11Sxvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JhJMOwXZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nLoV/r2a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E966E36494F
+	for <linux-block@vger.kernel.org>; Thu, 18 Jun 2026 08:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781769874; cv=fail; b=NHPdyF8RABTgdIUHqPc/AnDe2TYoJJfLlmUio5V6UGt6ZXVM7MnR5K6iLbfYpTykK9XEmFgd84GB5mJGG+r4PkN0Ynn0UDiM4+xp+l0s+/pzRvbVfG9wSBAZXNWAk2G5YiG3rifls/VYzfnSk9PsUKRue3Pp0W+R3c+qgfnM2VA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781769874; c=relaxed/simple;
+	bh=qk6Cg0kU0xZnXI3NBIpenPLadIGvc+Pv/9Co45zYy6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=fQOGFLDw+f7WZJrCiJ4ZUNOBNUDF9GrHnoIKT4qsnzJAJTXkfNWCZtRW6Iu5XK3cAgoMSPSKoJLxqOLhO/7kbF5T/7s24wDSGD+/I3YS9PgFTgEmzy+sseXDpEnxBBbDAfGrHjOIb6j//CEm2DtNz+wugy4XivbzO0lAH/QlvB4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=De7EFfY7; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=DtERtwVr; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JhJMOwXZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nLoV/r2a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781768493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y7/6GMFySLjEAnNbADHN8HTqTCVaGwns6zVzwQSvgaU=;
-	b=JhJMOwXZmKszw6eq5HhdiDBBRWeCFomlDpwKeT+9atGBVlwQ7ZmxuqUmVSMMppoocYbI/Y
-	p11sC8ePMn9YAUf5u3Unl6ELxP5tXIyd7gGPCF57H9MqXIA+vHlhj1xOfXZxr1bYLnf/Lm
-	Dc/4t1vzRKPv0jJfRr3SpZBV/2hUDMk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-31-cYD2H7eTMJaklOPaxbM9Uw-1; Thu, 18 Jun 2026 03:41:31 -0400
-X-MC-Unique: cYD2H7eTMJaklOPaxbM9Uw-1
-X-Mimecast-MFC-AGG-ID: cYD2H7eTMJaklOPaxbM9Uw_1781768490
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-490b9318944so3304515e9.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2026 00:41:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="De7EFfY7";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="DtERtwVr"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1781769872; x=1813305872;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=qk6Cg0kU0xZnXI3NBIpenPLadIGvc+Pv/9Co45zYy6k=;
+  b=De7EFfY7Iv5NWWX7c5ImBaPVFYbQLbIkIGheODY8S+7KQSU9goX8sGFU
+   Fr2A6ynixaqqYTCuiPSNdRfiMsDXLMNzItbSlLfxb+mCMD2J4TCXLJcgR
+   Cmr/hbIQ7QkfT4BFbHSJ2Rz37gVV5czklhH6wjs4DWoByYLNln+WgvudY
+   YBR+OMQEqad3nebsc1Y+78TBwFQkxiLAI5KHHQ6AthIL3KkkvmMUPbvYW
+   5kebDKU8U+jXOEFmUZ4OxHIpi42k77/s0HMHZEgpHkBywqCnvTzCubzqV
+   2vOp6/z8BWoOkPKQ/glqZ1aVYSbQl+JK6lM9PolQQbVUs0okKsRrGiRot
+   g==;
+X-CSE-ConnectionGUID: njTgR5pZTVy09cScrGpXQA==
+X-CSE-MsgGUID: Q9DviaxnQuSYtLVu3saZpw==
+X-IronPort-AV: E=Sophos;i="6.24,211,1774281600"; 
+   d="scan'208";a="145255117"
+Received: from mail-westusazon11010014.outbound.protection.outlook.com (HELO BYAPR05CU005.outbound.protection.outlook.com) ([52.101.85.14])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jun 2026 16:04:32 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vGeMBq9X4AUosNkt8UuH6sNSqVBmNAfpYGyWXielkwitueTflTnv07wVJd0Sdqzu6rasL4vUJHwPp2SYEonput9sFofi+Wgabp9ld9O6248m+8ooRWvwND1lsPxQ6Fj5cGcT9tRpmtSFxZngidjVa8UaMvzCckMQIglP7ct6AkO6x7v+7EaI46ftbFpRyiaUN6iJkzc9w84IIbSBoYAImjuO/eGYxZSlDexoF1/PqiMMvqNcpudENX5w3h91hyILpA/NWYsFGqUP/O714yqHLVriwLVDXKH9EsIepgrUaoXcuhrycM2pkKR8g6lvSY0wXNxHN4MTy5r5sNmTvvLzLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qk6Cg0kU0xZnXI3NBIpenPLadIGvc+Pv/9Co45zYy6k=;
+ b=JoJeYtpwIbkjWYhSL2Po9/QM+kL+1xCxa+kmYVFAKOS54lx9LLe2hEw7itYWFRC3KCPK4FUcFbDMr9gexcdN6pYka584l2l3Mi53kEML56Q+AGK2ri3VOIkIL/qmEwf4epTleKLWlWowRXpkdb1q8eKxwarxpCONU4d22d8CL3O0fdZXdwoWnSN/qc1vQ0vccQrL6JN6edZBctcMogIXNb4e3xU07VGTdBfR3kWP7HAc+5zFsdjk2dVKa+FE+Izwi0O4WBXrpEjDY8EnbwhVlOAMealMG5LlI+qEh+pABplg/kZWTsxGOkWiyGkldgbZEsMw6CtHDfWOkRjDgc3zMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781768490; x=1782373290; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y7/6GMFySLjEAnNbADHN8HTqTCVaGwns6zVzwQSvgaU=;
-        b=nLoV/r2a9XDkJ4Ybm8G5QlIBNj7FmQYeXkXuS7DSFMGjpkx8qayczALTshSpSjErkL
-         odsthEezIRO+PgwDHdms6Xa1nmsuBJ2Nj4XqQWeu73ExzUiZ4eMcv0uqQ1BSQw3RcyE7
-         nnw2oQ3TU+s9ktUuoA71GeETr6ircUlmkt0WdhivDJI+eQefZteO4kdF88eDHCHLIHE8
-         Z6SrkcCetihUd5palHNcpU79Io/xvfQoZqJRthZUs7eh8MgjjpD7yT9PUGZxt2YlpMl4
-         A4FzBdztD/XS9Zn3jeCvARkA3lrMkHmRLWnL57VM2hkne3wRtDtm/RtHjek4wN/W4DFZ
-         +pfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781768490; x=1782373290;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y7/6GMFySLjEAnNbADHN8HTqTCVaGwns6zVzwQSvgaU=;
-        b=V9D3w4/kdPL+CoSyeIaDerytL0mqlp/92bIyH1wGQg4/1ftlgULtjfGLcWmh7OK0OV
-         IrcqjlX0bWWzQKG837oTo9xX0VRsPYjEyQvv6aLi285krpUjgxsqZLIhdk12EhYpHQ2G
-         9uYnzVe2ZeCzUUvUbViI4cEjEEKcva2sQEc3osNJt03l+NM8iLbi6GkA40r2kFlVzxIZ
-         KByhOHqWFU4eRk5Pj6v5qKyUlnDgxdG76bwq5enefoP2se8YL6p8a2vvZf8gaMwp0vt/
-         HJVuVQJ8WoFADcGrNfyIOuuMbNCV7kH6DJalGjKnQpk0nHqsfUiSfLCCjpyoS8Btyd5r
-         kMjw==
-X-Forwarded-Encrypted: i=1; AFNElJ/W16IfoJOQdBf1SHtnFBPZVXlBymZMfVqRLMJkNGhA4g0D8+BJWMtfnNuERNPE9enrzgySCV9tUyeXxA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzpdzj9taHddHkoGygiBMaPgO45pKLkIu/dG9OCuuUwdfenpifR
-	tj3F4uL2lkFfhCG0svoa0RQyaGwl/9fJcF457yuZYI8GD1JxnQ+2+N7VzatMoke4IFR+0rsydCd
-	9l4wg40Dc5uBicBkPvbdIN+DZUGCiAX47XuEFjQ3xfv4qZ1v6xwuVyzEGTVF7cnrm
-X-Gm-Gg: AfdE7cnPa+f8PCbBc9TX/rnbozgvIgeIziAJW01sQULZcCh+rzNCDMZN6zK3F6AaS7P
-	b77k4rv5O/NYqldq3trwSVDoP2ViOp6vbzWEnmJsFJjp1IYcxhidPNVrEdsVX+oKQO18Sj/Z4sY
-	CUFabDq65Mj1XM8k06bZQ/ftrDHaaVmReh25DeK8cYLOKTQKGKxuIDMaIhJZgYNCWQoWlVH8sOw
-	cLQo+ghwd0b0z997+nibj7dlsGQSavHeyn9CrbH64TDF5j+RGBBSRu8wrfG+GaZv6WRrd7GZGaO
-	7+ZGDPWxUxFtKFlVhttuMFOxOnaqMniqsO2dg19y/kPDrDHlrnLY/Ee0Uoc7C6o5t4wjAWOq2U7
-	wMPwUi+htqto55ZjGPGUo4Nz3y3c8i8fmRhlM27j2o99b5erp6m+p5Pw+WZfb
-X-Received: by 2002:a05:600c:19d0:b0:490:44eb:c1e0 with SMTP id 5b1f17b1804b1-4923a9d0827mr13387955e9.21.1781768490298;
-        Thu, 18 Jun 2026 00:41:30 -0700 (PDT)
-X-Received: by 2002:a05:600c:19d0:b0:490:44eb:c1e0 with SMTP id 5b1f17b1804b1-4923a9d0827mr13387535e9.21.1781768489797;
-        Thu, 18 Jun 2026 00:41:29 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-135-12.retail.telecomitalia.it. [82.53.135.12])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa97a07sm384710215e9.14.2026.06.18.00.41.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 00:41:29 -0700 (PDT)
-Date: Thu, 18 Jun 2026 09:41:22 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Dmitry Fomichev <dmitry.fomichev@wdc.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Paolo Bonzini <pbonzini@redhat.com>, 
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] virtio-blk: use little-endian types for the zoned fields
-Message-ID: <ajOfAcBC6Ea-yfkB@sgarzare-redhat>
-References: <20260617151727.4071754-1-michael.bommarito@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qk6Cg0kU0xZnXI3NBIpenPLadIGvc+Pv/9Co45zYy6k=;
+ b=DtERtwVrAfEj8d0LQdAmQYrGwwLlkCTrW7FxfqQJ37YT8vmR0VgRi0R0IaTwld4bYuzGzP9TICrOOWFnGguimWWtEEwc4Ttw4PspDLC/OpsyUtAsRArTkxkqjQdo/ZevekEiUvURYZtTyBogjZqK25sSGN3XvwICvdxTDeRq5Ac=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14) by SN4PR04MB8349.namprd04.prod.outlook.com
+ (2603:10b6:806:1e8::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.12; Thu, 18 Jun
+ 2026 08:04:27 +0000
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85%6]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
+ 08:04:27 +0000
+Date: Thu, 18 Jun 2026 17:04:21 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, linux-block@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH RFC 0/1] block: fix concurrent elevator change failure
+Message-ID: <ajOmO7BWZFaR3Nn9@shinmob>
+References: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
+ <aiqaXfTqCLMu2DwF@fedora>
+ <aivMxPCd305WbBsk@shinmob>
+ <aivoHk4DE_pkKkDm@fedora>
+ <3db036fe-747f-44eb-93c3-595350278297@linux.ibm.com>
+ <ajCa9GrGoB4uXRpS@shinmob>
+ <2371227f-43ef-4a0d-ad8f-da23eea43357@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2371227f-43ef-4a0d-ad8f-da23eea43357@linux.ibm.com>
+X-ClientProxiedBy: TY6P286CA0004.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:405:3b8::8) To SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260617151727.4071754-1-michael.bommarito@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|SN4PR04MB8349:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec38285f-aeff-41b4-7c4d-08decd1037ac
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|19092799006|23010399003|1800799024|366016|22082099003|18002099003|4143699003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	HzYRKwV0YyenxGgY/aFh6R0ZucBnLRg1Fd1rmM3xhFvCyumXVHby2u3VV78dfi9mcyXW1rmGWJQIgw3tFsn02m5rVck/PUl8k8OgehgMnbxPuWnt0NxVfKvlSbhWGy6HeK50OI7HS9cFDLUpeRkAfwI7yK37KWYh8kXOklmVghuN00F0PJ4LO+1+x7XxF9YMQIImryHo7NoE/T28dQaz6JBQQ0oXNw3nKzzGv1b9PQDJkvStfFS1TvtpLiK2Woa7hU+dLWD/0ixoFn3XbSdl2sZFHmpTwxrVoo30spRqh+PHILb3wPkVQZVSxsF8h3Bq6VxaV7jiskIUQyGzeq8hnNI2NyIFsSxibZKbVkwsNbAVzC5lRtS4CX6NqOhovlTHFU9qNhnFluiTeGta1vSUSWa+XTLLhYgGhSJjsIrI7rC4hj8ClYVPJ7Y0xICpoqYqczBFKvDmyNYBD8u/Xe6yRBDGWXUu4EnstlqiYWnzLTU1UkkjAWFVejuRidGpWoygUbkvCMDY0lPdPdC/pp6t7Wyn4l1lFJ7ZlvlrRX7STRZp9U+V7ZbXjf31B5tukSOAMwX/f2PtwxLpimE+DBbkaBiPtGTlIy/nlNx8F9PkUQ2QevFcOHgNSO62+Pu3RIvggjiufW5RJEJcdwkFPYCtczwIA7I0Jy0GKs8Mt/NCK8mNlR/2voPw0Jzoy3sKEFcv
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(23010399003)(1800799024)(366016)(22082099003)(18002099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Zp0QObuYe1ArHRW4MdULBv8Zp5Tbxug8QnIb8jtZtQ/s9SKPoRNAIFSMtK83?=
+ =?us-ascii?Q?JHahmCoYPzal1SmEYzQehj6wp+qr2EmLov+jeZWJtv9bxYIx2lxDgaw6RgXP?=
+ =?us-ascii?Q?j/qpjHpZUtQsOisyz4ARRqM0iEfviczbK74re+zJbCl/Nun74zQuEYC7N7gy?=
+ =?us-ascii?Q?t5n23yk3Xiw7fEwpTRCIxNm2CSeY87phV5zcgZO2eZT1CzgJRYFaMnrgD07z?=
+ =?us-ascii?Q?/mgxLhsA466CdO/8bdoqVie6d6wzeNMCcynrLnBKz9ifowpZ0SL6IHxX+Nas?=
+ =?us-ascii?Q?VhsdifU7wm9Ga/FpaYCJ/QsKjgc62irsQiJPdCrVsvUsTNJWbqGN++FVAeGm?=
+ =?us-ascii?Q?r7aDa7ayc+QTooMATPoaVigFp6zdsp66/iBi0YKw6C2PGIZFchoc1eEQ1YQ0?=
+ =?us-ascii?Q?wrdQw64cUaAzDjb7tdJ7cBpL/y+omBR6PpL356Fni2a1XHymPkUvq/9aDZAx?=
+ =?us-ascii?Q?RCXKLg2MplCNKaQbVedibyPaA5IUs11/qK7PrWjCI1OLsBKRVTclQifY8XSq?=
+ =?us-ascii?Q?nzKfC6XTcnQbzKBH0UebwISudBgfz0iBhBJuhlR53wPA6V2T2azj3VQN+/Ib?=
+ =?us-ascii?Q?Q5m++QziYV94p99yR/8CgY8OwbHvOVByVcUmQ/DWDB5j8uaQW02mhix6WC1I?=
+ =?us-ascii?Q?McaJF8J941bPXhZXCoFReeD9NIEieIUrk4wcofVYGixzQkaXPes7CwlcD7tn?=
+ =?us-ascii?Q?Y9G9DIxZzLDRutMaFujj4NKrYz+pVU7wQXlgnoAMUPRvSFGYysLRJFRCjXh5?=
+ =?us-ascii?Q?NgFJxdb4l3TevZRJiTBsI5x/q8NesTr7qL7VHas3N1UA4pi0BTLvQ3390LFh?=
+ =?us-ascii?Q?6bzR058dgH+LVZpw1OXl0C0a/QvjYhnB/2JDT/kFMqYhLC+i2c1vKOSVPnS4?=
+ =?us-ascii?Q?DyhXzXvLig5RFA51RMRLul5ty1Iz7DJ20mIBmtm9vdvWKdE0Xt1jMyOIZ5ph?=
+ =?us-ascii?Q?OdcIsokrCPR6/ArDqgxDrLnrEvtd/Bkr4ONj+4Na6M1vGLl2/wJjtsbmmtP6?=
+ =?us-ascii?Q?pB6ZSBOL5vvc6SRcIewoX/ZA86l3OM/QC1/yd7VOHhFfqcq2dRPIPaU4L+Pl?=
+ =?us-ascii?Q?JLa3FunWTE5Wrm7U86lVZ5SL838ZzU/JnOb94uLGtbCw3d9ETW04gWuOh37/?=
+ =?us-ascii?Q?A97uWrAaTAhcPdGrMji2ZGTIrz4ecCmrZhCJnypU3b6RY4aS6c2C6VMdF1T+?=
+ =?us-ascii?Q?i3TT5u30jgEUQQ1uNjaSvgg7h9zXstv3KLFwt6wGGb52UTQnbnWU4/ff+tyM?=
+ =?us-ascii?Q?3qjigNXgSZiicyzywG2XfodUpdi1W+HYMXjN/ojd/MDpaRzSztPiOiszpt7K?=
+ =?us-ascii?Q?gWICmT7jFYB6dIaRo/4IVW/LqM3UhElqBfwq4nygnfwjXMRz4edl9rZzxaMa?=
+ =?us-ascii?Q?QgP3tXCzM8GzgEfp3ShpGvNrixCeyfw79A8PGIkduZftbmHc0dY47K2dPfJT?=
+ =?us-ascii?Q?MDHXqmBo8eW+XxcldUPYqVZ0fAZWMd6YwEUbUKeesAhE/5C9l25XTlZDk2wE?=
+ =?us-ascii?Q?Jc9Razp3wIKIB/lz/5YLAV3glT2aK9OOoB5caemeouF/ZRNQvXaVTMloXQL2?=
+ =?us-ascii?Q?KSZCOOQ3DuAHauuTpBBOgmuDCxsL3RkQpUFzDDHZ1lf+dJUfBZmOvTo3h+P5?=
+ =?us-ascii?Q?VojEzV6W+lERTNFc1ile7chZLrslev6ac1C69PaDbsB7zWA8YFQTvw/f/pTN?=
+ =?us-ascii?Q?S3SoVSkQmmG5dT/6VwMnzqldQe2swtSsoQKRe8md5VHOlGWkpq50jdAo4Kdd?=
+ =?us-ascii?Q?K3/AkCIpxJz0FG0qi1A30ukeTrmALiA=3D?=
+X-Exchange-RoutingPolicyChecked:
+	RP8qxtXm0kuI66G22MGtgZjxOus2JCVdDZgbMgzTduLg4L8RunV0FOCIq9i+hrYHj8HDXGgadHra8ibcfjVrEg/KzefigWEUyqHcjO1yBrcAqoWj3ASCXkckcrZ5RXBdxVhe0yr0z3NVPdbcxp7Ecwg9BsBECku2eNlK75bR0hTCLaYT/u5aQaftn+LIZpysX/4sq/7JI1J4YnSsEYSUZWUTV5HTiIikOcXHJD351iDHwlyd49r9FCXKMw1Ku+4VGFbHOYQZ+rWFASufMpxcMXMPf/vDTMZwoxtG5QWTdSG2TWkAGDwjOY7EHTlOV3SrR2WUQEXSfKmpbz63Pf+FKQ==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	EtxDx4a5dbkT59KOU1LKporgxOP/Ik7/EYCWoZwn2bAl5sA3XDCjVRJb+qBAB0pAa2kqOdwPFix40hDwM7vcgmkhSLBWO+7NUVVEfMrFlNk1eWRnbsE1sR1ZLhZNlFRXwMZuPStFSw1SJi+yV0Is9bbRDI4Q4thumolync2txCR/0vkW8YwSIZw4JXJLVRUX1Y0lN3D2oF9FJz9bjYwIH0W0aVUVvqy0teo2UXpzIgs4BXqVzhA0QInNYkun58LiL16nsrIhTWBV221m6V71zydj0Di3RgYgoKQ35Uzs5oVLjyQrHrQG2alnx3TowOxaHUK0km6/EWqyX2B6HgzdtAtCVMfLAeW1UnerP4GjW0lz9j2w75DdUWepy1EqtCKNL1W+4fn3IPHxwsfFc0t64/OUlFBx0NoOgV4lXzNxcktjW+Z1XsU40IEiyfQXIUI+JFtB1YH4mY+FvN2B5XgQ2OMdB037ewhNcZJMjAZ+dm4shXZAwlSDzod8chHrBACE3gJduLOfCg90RXPDO0mbsS1FdIn2lNwApy6fTUsdsX9F4kkDNN9bPo420hYqsKIRPW3LcGNcGs3Q03cBULONvFWeup5WqjCPrOq6gfr0FvNe4PlPoYXCVznk50BvEjA6
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec38285f-aeff-41b4-7c4d-08decd1037ac
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 08:04:27.1166
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o6VNtiDI4e3lRzn0vdS9N319GbfbOchtEEA7NxSrX0J5jwojF9VB3rwFOUxA8Vwv7wB99QW9CH95KlK3VHItdSn1yFqHJLf6oSUgLvtAgMo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR04MB8349
 
-On Wed, Jun 17, 2026 at 11:17:27AM -0400, Michael Bommarito wrote:
->The zoned block-device fields in the virtio-blk header are typed
->__virtio{32,64}, so their endianness follows VIRTIO_F_VERSION_1. The
->zoned feature is only defined for VIRTIO 1.x devices, and the virtio
->specification defines all of its fields as little-endian. Commit
->b16a1756c716 ("virtio_blk: mark all zone fields LE") tagged them
->__le* for exactly this reason, but commit f1ba4e674feb ("virtio-blk:
->fix to match virtio spec") re-applied the reviewed version of the
->original zoned series -- which predated b16a1756 -- and silently
->restored the __virtio* typing together with the matching
->virtio*_to_cpu() / virtio_cread() accessors in the driver.
->
->Restore the little-endian typing for the zoned configuration-space
->characteristics, the zone descriptor, the zone report header and the
->ZONE_APPEND in-header sector, and read them with le*_to_cpu() and
->virtio_cread_le() to match.
->
->There is no functional change on any spec-compliant device: zoned
->requires VIRTIO_F_VERSION_1, and for a VERSION_1 device
->virtio*_to_cpu() is identical to le*_to_cpu(). The change makes the
->uapi types describe the actual wire format and removes a latent
->endianness mismatch for a (non-conformant) legacy device on a
->big-endian guest.
+On Jun 17, 2026 / 16:38, Nilay Shroff wrote:
+[...]
+> Given the above, I'm fine with the earlier approach of upgrading update_nr_hwq_lock from
+> a reader lock to a writer lock in elv_iosched_store(). That directly serializes concurrent
+> scheduler updates and avoids the race on q->elevator without introducing additional lock
+> ordering concerns.
 
-Not for this patch, but at this point should we do the same also for the 
-fields gated by the following features that IIUC are all added in 1.*:
-- VIRTIO_BLK_F_MQ
-- VIRTIO_BLK_F_DISCARD
-- VIRTIO_BLK_F_WRITE_ZEROES
-- VIRTIO_BLK_F_SECURE_ERASE
-
->
->Fixes: f1ba4e674feb ("virtio-blk: fix to match virtio spec")
->Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->Assisted-by: Claude:claude-opus-4-8
->Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
->---
->Testing:
-> - Builds with no new warnings; sparse endian-clean (C=2,
->   __CHECK_ENDIAN__, CONFIG_BLK_DEV_ZONED=y) both before and after.
-> - Booted under QEMU with a host-managed zoned device exposed through
->   virtio-blk. Zone revalidation, blkzone report and a sequential
->   write / write-pointer check return correct values; blktests zbd
->   device tests 001-006 (sysfs+ioctl, report zone, reset, write split,
->   write ordering, revalidate) pass, with results identical before and
->   after this change -- expected, since on a VIRTIO_F_VERSION_1 device
->   virtio*_to_cpu() == le*_to_cpu().
->
-> drivers/block/virtio_blk.c      | 38 +++++++++++++++------------------
-> include/uapi/linux/virtio_blk.h | 18 ++++++++--------
-> 2 files changed, 26 insertions(+), 30 deletions(-)
->
->diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->index b1c9a27fe00f3..5532cfbde7bfe 100644
->--- a/drivers/block/virtio_blk.c
->+++ b/drivers/block/virtio_blk.c
->@@ -99,7 +99,7 @@ struct virtblk_req {
-> 		 * be the last byte.
-> 		 */
-> 		struct {
->-			__virtio64 sector;
->+			__le64 sector;
-> 			u8 status;
-> 		} zone_append;
-> 	} in_hdr;
->@@ -335,14 +335,12 @@ static inline void virtblk_request_done(struct request *req)
-> {
-> 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> 	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
->-	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
->
-> 	virtblk_unmap_data(req, vbr);
-> 	virtblk_cleanup_cmd(req);
->
-> 	if (req_op(req) == REQ_OP_ZONE_APPEND)
->-		req->__sector = virtio64_to_cpu(vblk->vdev,
->-						vbr->in_hdr.zone_append.sector);
->+		req->__sector = le64_to_cpu(vbr->in_hdr.zone_append.sector);
->
-> 	blk_mq_end_request(req, status);
-> }
->@@ -589,13 +587,13 @@ static int virtblk_parse_zone(struct virtio_blk *vblk,
-> {
-> 	struct blk_zone zone = { };
->
->-	zone.start = virtio64_to_cpu(vblk->vdev, entry->z_start);
->+	zone.start = le64_to_cpu(entry->z_start);
-> 	if (zone.start + vblk->zone_sectors <= get_capacity(vblk->disk))
-> 		zone.len = vblk->zone_sectors;
-> 	else
-> 		zone.len = get_capacity(vblk->disk) - zone.start;
->-	zone.capacity = virtio64_to_cpu(vblk->vdev, entry->z_cap);
->-	zone.wp = virtio64_to_cpu(vblk->vdev, entry->z_wp);
->+	zone.capacity = le64_to_cpu(entry->z_cap);
->+	zone.wp = le64_to_cpu(entry->z_wp);
->
-> 	switch (entry->z_type) {
-> 	case VIRTIO_BLK_ZT_SWR:
->@@ -687,8 +685,7 @@ static int virtblk_report_zones(struct gendisk *disk, sector_t sector,
-> 		if (ret)
-> 			goto fail_report;
->
->-		nz = min_t(u64, virtio64_to_cpu(vblk->vdev, report->nr_zones),
->-			   nr_zones);
->+		nz = min_t(u64, le64_to_cpu(report->nr_zones), nr_zones);
-> 		if (!nz)
-> 			break;
->
->@@ -698,8 +695,7 @@ static int virtblk_report_zones(struct gendisk *disk, sector_t sector,
-> 			if (ret)
-> 				goto fail_report;
->
->-			sector = virtio64_to_cpu(vblk->vdev,
->-						 report->zones[i].z_start) +
->+			sector = le64_to_cpu(report->zones[i].z_start) +
-> 				 vblk->zone_sectors;
-> 			zone_idx++;
-> 		}
->@@ -725,18 +721,18 @@ static int virtblk_read_zoned_limits(struct virtio_blk *vblk,
->
-> 	lim->features |= BLK_FEAT_ZONED;
->
->-	virtio_cread(vdev, struct virtio_blk_config,
->-		     zoned.max_open_zones, &v);
->+	virtio_cread_le(vdev, struct virtio_blk_config,
->+			zoned.max_open_zones, &v);
-> 	lim->max_open_zones = v;
-> 	dev_dbg(&vdev->dev, "max open zones = %u\n", v);
->
->-	virtio_cread(vdev, struct virtio_blk_config,
->-		     zoned.max_active_zones, &v);
->+	virtio_cread_le(vdev, struct virtio_blk_config,
->+			zoned.max_active_zones, &v);
-> 	lim->max_active_zones = v;
-> 	dev_dbg(&vdev->dev, "max active zones = %u\n", v);
->
->-	virtio_cread(vdev, struct virtio_blk_config,
->-		     zoned.write_granularity, &wg);
->+	virtio_cread_le(vdev, struct virtio_blk_config,
->+			zoned.write_granularity, &wg);
-> 	if (!wg) {
-> 		dev_warn(&vdev->dev, "zero write granularity reported\n");
-> 		return -ENODEV;
->@@ -750,8 +746,8 @@ static int virtblk_read_zoned_limits(struct virtio_blk *vblk,
-> 	 * virtio ZBD specification doesn't require zones to be a power of
-> 	 * two sectors in size, but the code in this driver expects that.
-> 	 */
->-	virtio_cread(vdev, struct virtio_blk_config, zoned.zone_sectors,
->-		     &vblk->zone_sectors);
->+	virtio_cread_le(vdev, struct virtio_blk_config, zoned.zone_sectors,
->+			&vblk->zone_sectors);
-> 	if (vblk->zone_sectors == 0 || !is_power_of_2(vblk->zone_sectors)) {
-> 		dev_err(&vdev->dev,
-> 			"zoned device with non power of two zone size %u\n",
->@@ -767,8 +763,8 @@ static int virtblk_read_zoned_limits(struct virtio_blk *vblk,
-> 		lim->max_hw_discard_sectors = 0;
-> 	}
->
->-	virtio_cread(vdev, struct virtio_blk_config,
->-		     zoned.max_append_sectors, &v);
->+	virtio_cread_le(vdev, struct virtio_blk_config,
->+			zoned.max_append_sectors, &v);
-> 	if (!v) {
-> 		dev_warn(&vdev->dev, "zero max_append_sectors reported\n");
-> 		return -ENODEV;
->diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
->index 3744e4da1b2a7..5af2a0300bb9d 100644
->--- a/include/uapi/linux/virtio_blk.h
->+++ b/include/uapi/linux/virtio_blk.h
->@@ -140,11 +140,11 @@ struct virtio_blk_config {
->
-
-To avoid making this mistake again, how about adding a note here to 
-clarify that all the fields listed below are defined only for VIRTIO 1.x 
-devices and are therefore always little-endian?
-
-Anyway, the patch LGTM:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-
-> 	/* Zoned block device characteristics (if VIRTIO_BLK_F_ZONED) */
-> 	struct virtio_blk_zoned_characteristics {
->-		__virtio32 zone_sectors;
->-		__virtio32 max_open_zones;
->-		__virtio32 max_active_zones;
->-		__virtio32 max_append_sectors;
->-		__virtio32 write_granularity;
->+		__le32 zone_sectors;
->+		__le32 max_open_zones;
->+		__le32 max_active_zones;
->+		__le32 max_append_sectors;
->+		__le32 write_granularity;
-> 		__u8 model;
-> 		__u8 unused2[3];
-> 	} zoned;
->@@ -241,11 +241,11 @@ struct virtio_blk_outhdr {
->  */
-> struct virtio_blk_zone_descriptor {
-> 	/* Zone capacity */
->-	__virtio64 z_cap;
->+	__le64 z_cap;
-> 	/* The starting sector of the zone */
->-	__virtio64 z_start;
->+	__le64 z_start;
-> 	/* Zone write pointer position in sectors */
->-	__virtio64 z_wp;
->+	__le64 z_wp;
-> 	/* Zone type */
-> 	__u8 z_type;
-> 	/* Zone state */
->@@ -254,7 +254,7 @@ struct virtio_blk_zone_descriptor {
-> };
->
-> struct virtio_blk_zone_report {
->-	__virtio64 nr_zones;
->+	__le64 nr_zones;
-> 	__u8 reserved[56];
-> 	struct virtio_blk_zone_descriptor zones[];
-> };
->-- 
->2.53.0
->
-
+Thanks for the comment. I will prepare the "writer lock in elv_iosched_store()"
+approach as v2 patch.
