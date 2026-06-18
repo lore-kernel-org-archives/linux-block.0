@@ -1,57 +1,53 @@
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021081.outbound.protection.outlook.com [52.101.100.81])
+Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022099.outbound.protection.outlook.com [52.101.96.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE9A337B99;
-	Thu, 18 Jun 2026 14:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FD82DC357;
+	Thu, 18 Jun 2026 14:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.99
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792107; cv=fail; b=njPrVrS3XfFhp1G6pEFxcaBYv+5WPXo9yPVW9vPpPA99GzlrmzKWJEH/ShRZ68hZVNXBVqhMeqlEx1F9sn2m/r5tN3edAyf43f8airUFyFBxjvy0JYI9oaSbAzQtoqMdUX5or3u60tJLbfs7hFsR3PtWlfclMm4P0upbvPX0UuI=
+	t=1781792200; cv=fail; b=dF5xgpOEE5dwEa5rRL/lgH7UjYbHD3bUCSAIWTjdwj71Kfl2EWVeD+8/t38fliP6jNNHBQDe+C2I2CcEt3K5iE6OMv2CUJFYIpBXliiOCmUl8AGpZIOzZP0teKtALtEhc6gjl2MiEzi3eMh5++5ZPUCaG7l1FubfQZo+VPV9siw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792107; c=relaxed/simple;
-	bh=QJp+A2fmJQwENSBldWCCIWyw8gkosUO6WpTwVheebts=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=MRyAXD/Di4qyg7KFyRqlZZGGJSs43fnVnGXJIvEHx1owEqTpM7ERb9C16+w2OBbjR6qA0aci6kgPvt079ulhH6TBDYly1/VcZpuY0PuQ8j2NXEVzH2+Q1bkwmzzILAxpsKE9vUFaYE40NFM2qwzwqKwtorAtGPVARDmc+/b3ggs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=l7uLzTKz; arc=fail smtp.client-ip=52.101.100.81
+	s=arc-20240116; t=1781792200; c=relaxed/simple;
+	bh=gXpahiYrAvSbHlul9RMNau2lvObXbfnQQ4/zNx6t0G8=;
+	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
+	 In-Reply-To:MIME-Version; b=PI3UP8beU/zIprE5vrH1AGxZkA/V13Z5L6iSpcA2YTOrAULANEaZ9nmKcMPwBJltsHuiDScrU/o9DydlXH1uMGoxJXfvD4gFXjFAu2bnPCV2UunalXqhYbKOx1YGVP6ee3auKJwd3ghltSmtt4E4Q81vpnb1OqcsSzGpR2MaTDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=BeVYaam4; arc=fail smtp.client-ip=52.101.96.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="l7uLzTKz"
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="BeVYaam4"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wT/YBscamNqWACAPvCRnNjz9xaeiBhsCbsVrA9ap7lRt/FrhN3d5VIsTV1+bIc7/09o5YPiAycZk54s/IrsvsRgAK+ZNzm1EgaXKkMU4j4Y825Nzg+julxwEkBaSh+4d9hZIW5DMQVbSfem1pD7qJNH/UD54hWNTN6Vc/Y2MnikXxyzEZQWWcpeXrLusoRO++m3v7FL2jwVagfyOOkz3RH4D+FOofqhfvdOpFnzw2eui7ou6DTQQW6kuqkqcEscN7jzuT/4cMCr8TyuFVWc54hhpuCBglMbWs2W7JnJ2zA1TFCGSAchAUxj/5YL5YjiawcDCxetIAoMrXdYeW9EWDA==
+ b=wvl5pUc5EKFl4KihIE3elBFOiNT9QcZyznmyE2lvTMNpYm6lCDeUGAjFHFXd7strBBudcMkD5TbCJIrmTkCjED4qVXP5MrIAHNa+KiRtM6Ep0jXqlXeqKicuUm6c7dmVyqlUN1274kL2lEyOoQ4iTVQhv68FPNCehpWU+2NGmDA5zDGUKWh+/iZkyywwJBhGbZ0UUsQM2St9qlvI+g7WIjHzRtKLShqeAnOOjiYOYsB0T8QjM/egpXZmY/ta5t+KhGUvVglnv5m0yRK2u+JYOnv3s3toZTn+h6AbJolRAPD21iikKcV7ICsvVvrBd/hDZSF306yueLTEaCVNztk6EQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YiaO2UyhLy6+0J3jqS0fhWy1eFYQRbm8PKDcjZ4HQFY=;
- b=CrVL2c1D+Ev7m17HDcf0TgExrrc6cJdPzuMguQlqshFVo5nEuuDKfNiJ3fkZdEWAbbO3uokfyTS4niCe6XGsI60v0Bs0KLCMjSIm2jm29xBi8KDV8e+Hn3rUma3azld5Bzf/juyIcj546buw1EiBwDh8atj4si+Jjiz4C+MZQ8htz3Cak4dRUw+kEZDyX6r/q87rS9s+fJVm89DXtW9jTdnhA5Qio2cyUiFlLsssCuN0KM6NEd3FNhBgcKnDh6eOgAb4v6lJj2axvxe7NyUDxgwB8UhBoCVnjZFF70ldvEo9pIKcvkvLyx1eg2DVk+MbgMkasjiw8XLHciOBlJ0ugQ==
+ bh=0NV8qzjTkCssO5bL3QcVxXD14lOzn5n/4d2bA+89Fv0=;
+ b=N61F6cY6Zg33gewXNS1U+tPRc3jOpDtF8AejjWo+75tAbV1jF1Z0bGDjtdQ+iroz4uC23w6CQDU2WSdy74fDzMQzp/9OJKOB+O3pOboMuw2bq86fugm8dGK58TTCiR3ePBuzXtENTjsOrj9A9ElRFfe/k/48HKJPNunYuLJdXrbWYlT3S1heYxY6qq3XSGOhAUCsWJ1TKSzpw56YGiNsdVV/wt/L5LFQwXoAZorAk5vPti3cFVE6h7Q2OpeEbUSXY/EAb1CTd9JYEWwpnRnFoFVD7GPy7wMO7uABsFYpso8G8AEZNLvKH+ALvF9+kxbCXVzJOSvl78rP8vniEmpdxg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
  dkim=pass header.d=garyguo.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YiaO2UyhLy6+0J3jqS0fhWy1eFYQRbm8PKDcjZ4HQFY=;
- b=l7uLzTKzniMA0GFZYYdwgXU7Sl6SL5Y52Sz1pY57TyKMBgBG5O9oid0W8MbaVAKsvEYBRhLFb5nQA65c9uGk/xLiAFPhs4qphB/EeT6LuXOo+IJ6pu3orhIuYp0IE87pZS6T8Wq0/+tLhjj7RAu52ydj2+MCF/5EJJ/m+CeTG54=
+ bh=0NV8qzjTkCssO5bL3QcVxXD14lOzn5n/4d2bA+89Fv0=;
+ b=BeVYaam4blH0M2GvWgeRUK3M7wUBQYbsW9BZbpSHszMoRyJVRxblVfjUub5ZPJAToxIbxNfSlHiq2PhkHEcptsELTYjRp/x9D66tSHr6NmTX5OVJblmvrPDE2qZwAvs4mi0dvQE0F+cvP5zq/6CiWE/COnHc2KpFN2Sk1Th24fo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=garyguo.net;
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO0P265MB2987.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:183::7) with
+ by CW1P265MB7964.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:212::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Thu, 18 Jun
- 2026 14:15:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.13; Thu, 18 Jun
+ 2026 14:16:35 +0000
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
- 14:15:02 +0000
+ 14:16:35 +0000
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 18 Jun 2026 15:15:01 +0100
-Message-Id: <DJC8L3EXC1NA.1JM4AY78YADO4@garyguo.net>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] rust: drm: set fops.owner from driver module
- pointer
+Date: Thu, 18 Jun 2026 15:16:34 +0100
+Message-Id: <DJC8MA4TZ9RE.3T3VXZU2USSJG@garyguo.net>
+Subject: Re: [PATCH v2 1/7] rust: module: add `THIS_MODULE` const to
+ `ModuleMetadata` trait
 From: "Gary Guo" <gary@garyguo.net>
 To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
  "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
@@ -67,12 +63,16 @@ To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
  Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
  "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
  Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>
+Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
+ <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
+ <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>
 X-Mailer: aerc 0.21.0
 References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
- <20260521-fix-fops-owner-v2-4-fd99079c5a04@linux.dev>
-In-Reply-To: <20260521-fix-fops-owner-v2-4-fd99079c5a04@linux.dev>
-X-ClientProxiedBy: LO4P123CA0033.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:151::20) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ <20260521-fix-fops-owner-v2-1-fd99079c5a04@linux.dev>
+In-Reply-To: <20260521-fix-fops-owner-v2-1-fd99079c5a04@linux.dev>
+X-ClientProxiedBy: LO4P265CA0088.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2bc::7) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -81,120 +81,176 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO0P265MB2987:EE_
-X-MS-Office365-Filtering-Correlation-Id: a81ccd92-3a6c-4657-d959-08decd43fceb
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CW1P265MB7964:EE_
+X-MS-Office365-Filtering-Correlation-Id: 780213c6-6026-4f46-c6d7-08decd443462
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|23010399003|1800799024|376014|366016|7416014|4143699003|921020|56012099006|22082099003|18002099003;
+	BCL:0;ARA:13230040|23010399003|10070799003|366016|1800799024|376014|7416014|56012099006|5023799004|6133799003|22082099003|18002099003|4143699003|921020;
 X-Microsoft-Antispam-Message-Info:
-	7EiG6m2bun8H95WW/M2tL1GfAePMMkdOBJ5ztUkaTXx/rvYz8zkShKBr6T76hSrt697MMxLbpyl2V3+GpfEONthprM4jx4gFoh3TwXBg7OZ4EsEypzsyPDgd3lk5CtITP9n/i3b4QTp+LPgyw/BL3QKzWAYe4q+ZvDe1CVsjIzhybF6POK46msr1w3Nt+s+rktWQtClw32/KVyPraTmQYAWs9CPhFTl0+EGrNfMaAO+P8qgd9rdM0OwA9ViKemZWmFGdjqeEOX+oChKgx0otqV1YNL9j8+VAKSo2i46jlW1dfYpFfaE+5ouSXrMCnPOv/fP0str2q6gEaSkZabKwRaczbjYdTCe3rbpYMNOtp+PLPWWOGzAmmdoDpfX4En83egyrYnPhhKkBefc02gwjUawbHRGrtCOBUCM5iI5px4AETdSNssapgqWtFH491WpmDbhiWZZNIQ1YcU4+sv0fmt6ErLJ/L1v3elxD1n8Ksgw0pSW9zVX79wDBURCitlgJ4LpF81raeLClystWTmFUoxBSYGVtvoTZ/z9LFBlmwnDDo+/CpAt5sIe+vetebJkXNRR9vcRlyJFyQ/uoX4TRXk1wiyA2zKYdjzerUEb9IAJ958xEV1nDyHttPiSA0uoFa/QaF7SIUCxsKhjl3oP6CXpY8btZbQratAso5dqRlPfNrIV9EsYKHt69+UzV7AZMlzJ4GeM8/hMUTrV/jun1rXVqlovRbzQduWCaZgQgUOs=
+	nyrRYueL/GrSX3mgvXbn13vASDy9GB+vxeI+gIlWJWSuzE21yzW6mXcN8miJTs0NFz4s5/NnqfCGkMbnHhUEBakckltX3cXtNhOeXvsQcFg83kOWb/8rdUBDtpwxcRkN5JHyNJjdK8gW8jbKCXkBuQxQCDG/onUNaB5xfNgAK3wgY4W8rLgaaGKpSwATamr6OQhNlR8JoqZTPk4m315QllsWZXofXxUS5+t/ADSYBJLnWFH5j3mG5edv2+Z1qFLjPGdz/lKDaXQCLw0kEhYwBNAJ0tgUgjlq3ufrafP162onmKJP4qw3oGMXRTLKIFykLMIEGYQLh5PYwS01mM41QCvMRpc6OSXfyUmw8ToT+NEoeeOmff5d1CclQiL2cuQ/R9iLty0/qWkMFZNN27NFn6CjYZBC35kIKyiuBWNeAFywpR/3Nvf0gSx+xbJEvMUsOfVtB5PjefhqtoKeH5VyrMD1ZqlbfZ15aLkoT9rdT1KZl2+oScKjC08dt9s7gKOjRP4QZElpCrKCv59U786Yh7kDF7IU4+U4jMb2wtNCMu+OzwmyM9dd45EFGWvvvClpucKtlxrTReeLiTShR7sWN22onyDHmtNhldmVKgf4jamnZFVG5gBsNOOWw0YJfik3MrUu1CNQF5F0/evcCVSRCY7sGuPK4MSKoUx1WP0meVYNTJrEhJGSfTktCzp8xY6QHSPezcYcqsk1n2lhn1Gjb0xefW4oeayhbnk+mbjou40=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(23010399003)(1800799024)(376014)(366016)(7416014)(4143699003)(921020)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(10070799003)(366016)(1800799024)(376014)(7416014)(56012099006)(5023799004)(6133799003)(22082099003)(18002099003)(4143699003)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVFtQXNic3gvUDlSYXJkZGZubTFjdFVMRFpWS0tQUUxUTmpFNDBSTXlKRlIx?=
- =?utf-8?B?N295MW9JejM1UjhJZklhclNkeVlTa2hMRGRKYUcxYmpSbFB6M2dGdlJVMU1O?=
- =?utf-8?B?TUZVdkc1cm42SFBIblhNVy9nNHZmVTVzdGRKbXM2TzU3WC9EUE1HN211cXpm?=
- =?utf-8?B?OFJjT01WUFg3QkJCN3V5dkdrdkFaRHpxOG9pSjJxbHdiME1JUXhDSUZwbWU2?=
- =?utf-8?B?MVJRRll1VUtwdHFBM293cDJEems1diszb25VYjNIUlJNSGtSMFJjUDdlKytQ?=
- =?utf-8?B?M3lGNlFtVUY4cTVEOXlvQVNLSTl4QVVERTkwbG9Gc0xlY3h6VlF3aWlxWEtD?=
- =?utf-8?B?U1ZkY3B0YXF5enBhMUFlaTJUNkF5NVF0NXFZbVhKZFpWK0E0YTlzbG5MTVlS?=
- =?utf-8?B?QWdKSGdsdjF2S29oVjNWT1pQTDJYTTdzRldJRzh2Mk55T00vdWhLN0hNRXlV?=
- =?utf-8?B?YlYxdlkyaEtOVWdERXdURkhjTzR5TTNmdTBzMktEbnFKcDB5aTZpL1RubVdD?=
- =?utf-8?B?d0R4OERWNHphamMxcFJVdFgyWVByQ2JJSEt6L2NtMTFGQkwyeEFUYWxKYUYx?=
- =?utf-8?B?M0VQb1F0RjV6RFJkNHpEMTd6cWhsVnJnd1JWeTFnUURZNWk3SEFOVmg3QzNt?=
- =?utf-8?B?R2pCNm8wczAzMnVwZ0pKWk0wM0pyTU9QNVRkYW9yblpjbHdxaEwyVENQZDNV?=
- =?utf-8?B?aWlPMnlxNnlCbFNvME9IUHlOL2F5T1QzMnllWk1ybHY3NmJiUG50akhoK0RS?=
- =?utf-8?B?KzkwUEV4N2lKSHJRVFBhUDVkdUZxNXdHemFSRW01MzBMMnVTM0VJNU95bU5M?=
- =?utf-8?B?WnFUdys4WldmT2NHczNaWDBTNXVKWU14aVV2cVRxdzY5SVF0MjFwc3A1Nnlk?=
- =?utf-8?B?S0R0MFBWRkdQUGVWTDhrY3ZBdWpQc2owdzFIZVhtVHNNWWNrYlIwb2VBSGto?=
- =?utf-8?B?c3pNODFFSk9tcUhtMjFWZG9kTjlQc2NZcWsySFp5bkYydzhrZ1ZYbG9iUGFB?=
- =?utf-8?B?UThMeTV0Y1h0a05iVmZqZ1p5Sm5RYkxyUGFZSTlocWRUcVRuQmJDWEV3bllR?=
- =?utf-8?B?ejR3YzZKTkJYSlhVbXdydmNLUDJsUkxxTFQ0YVhlSG9zTzRDNnQ2dzZyRTE0?=
- =?utf-8?B?b1dNd3U1S01OSU1nOW1VMjIwRTNsU2NxSDJ1VlJvaTNYRmh4d0hWMGl0MHZY?=
- =?utf-8?B?ZE1GUXFOc3laOWhHUVlhdUl5d0l0TXFoZUhSdGRrQkVlTExYdjhEeHRkUzE4?=
- =?utf-8?B?NjBVSWtWZ2V2OHNLUTAvTSt5YWdJNE0wMU1yRkJCY0kyY2k5alNjdVIzS2No?=
- =?utf-8?B?WGpJQXdCNVlhU1RlUFpYbEVVMXBtNEc3TGEwc2tieE1ZTkoyNm01UlVtZnlI?=
- =?utf-8?B?V1hZQ0lTelFmR1MvZXM3eER3Y0xySHZValNTQ1JYamhvczhLS01DYVhmenVQ?=
- =?utf-8?B?NkdzQitjVXJLdS9kTmlUSWczYW1NdFljZUR3KzFRNTRoWXZhemxQdDVtNDdh?=
- =?utf-8?B?QWFseEt1RVNteW9SOFdIME1zZmZYMjNTd0Z5Szg5a3lVdHZqM1J3cmlhQ3lD?=
- =?utf-8?B?ZEJYZ3drZSs4bUZDZlpqVXFuNlB0ZVh6RGw1cWV5OHZlSXZjcDIyd1V2aFRo?=
- =?utf-8?B?Sm5rdFlSeFNEN2ZidUxuZmYrdTVDUGJmWTVLOElHQmtVQk1xa24rNll1QmZE?=
- =?utf-8?B?RVZiS1hmYVRLdDA5d3VNR0dmUnpRV0VLa0hPK0pIN1h1aXJNQ2svejFoM2VP?=
- =?utf-8?B?YzNONkRMUWloaXprK2NMc1FFWkh1SFFnaGZ6UzFPQ0xWU2x6cGtrVUZWaWEv?=
- =?utf-8?B?RDg0SW01ZndDOUlBenJxbXFWTlZNanhtS1M5YkxBZklqZTlzcFFyd2lBbWZP?=
- =?utf-8?B?bEdUbDZ2YUNBbmN4L2pQc1BuRjdXa2U4OXhMOEg5c01SYWNtbnFWcXBuWVl0?=
- =?utf-8?B?OUdqdHhhbzYydWI1QTh5VEV3NWRVa0hlUHRMUEZuaENBMHJTcHk5a3JDSUxF?=
- =?utf-8?B?U3c0T1p4L1ppZHp0MUFQUVZ6NGJ1S1FQR01tdGpQZjdIZnd1blkzSHVWaTQz?=
- =?utf-8?B?Q1U2UDJzdGh1djgwNzM2andab2FoRUszaEFZMnFqcW9GSno4QzZuck1ITlkv?=
- =?utf-8?B?RVJrbVh4MExtMkxJRVZOdXpkYWlUUkJYcFduOXRBdUR3MGU2U2EyaWpCbkpX?=
- =?utf-8?B?THVmR1lJR1BGQkl1TUlXWmEvenE4RnJsYjdJQ3J2MTdjSjRYREE3RktCRkgz?=
- =?utf-8?B?NVU2KzJMTU9BamxVMFUxTWVwTXU2eGJ2YjNGN09LTGMvNEVsSUYydWNNQmNC?=
- =?utf-8?B?cUdwSktWV3BjNlhQT3dlSENBYnUrbjlqTm1rTGw5NUFlNWtYK1BYZz09?=
+	=?utf-8?B?M3dxUGkzVHZ3R3pxTnkyY2JFeDdzMTVoYUxONE5ORkp0b29ZUVRtTUhnTlRh?=
+ =?utf-8?B?bWNyc3Zaa1d4bzlKTjN2akR6TGt1VUJrR1k0L1ZoOGVzYXpxSFRyMG1VQ3I1?=
+ =?utf-8?B?c1NFSExBZFNUZ0R5bXg2V1RuRlBwZUp2dEtXMTd3WmdzSysxVmhBaFNVWEk1?=
+ =?utf-8?B?OVh4eldrRndqdVRMYS9xMTJLU3Zqc1lkMjF6SWxmNUJHeXByaU1HWlF2VUFv?=
+ =?utf-8?B?cW1mc0YrQkVsbnRJekdoMCt6N0gwZW4xc3JTdVk2ZHhBRi9SSzVKdEdralpH?=
+ =?utf-8?B?d1hCOEpLV2VTbng3Vi9wZERyb092aFp4eEdQclRBMGJiQUNEYmpVdFVjclQv?=
+ =?utf-8?B?d25ZaWNSU1dsVWZiOERvSjdxcnZ0eFA4RGRuSnR0eWsyOGxZQUY4Mk9uWkEx?=
+ =?utf-8?B?czNmcFNWUUppL285SGdHamhYZEtHSVd0Zm44VE9QQWdUeE1PVTEzcks3RElO?=
+ =?utf-8?B?aVlsSW1BbTh1QXRrOStzZ0kvM00wU0pzMGM5WXJIZUwrcnpjNzlzMjNhYzFp?=
+ =?utf-8?B?aHFBMWlKZzFlSnVqaENCeXBobGRjRnFvQTlmTFZSc2FqTHgxSkVFcjV5ZGVx?=
+ =?utf-8?B?QTEvSlJRWFY4bVg4b01BOHJ5UzFjKzhuSzkvdnRJUkVvOXpLMmVpVHhGNEs2?=
+ =?utf-8?B?V0ZDUFpzODdQYkEvd1MvaG9lbEtqUEg3cTZuOWVvMFVRczFIKzU4djlONDIz?=
+ =?utf-8?B?Qng4ZFpDTE0vdU9McHJuSHhSRmxITmdweE5TTEd4MWc4a1VCVkJBczh4NnY1?=
+ =?utf-8?B?TFhGeWNVRFpSY2xKNkY0WGVjYWZhUnRlZThSUHFDcWdjQ25yQmg5OEZuVmZj?=
+ =?utf-8?B?dGdGK2ZRd1N0S0NxSHJLUUdDYTBlM0g1SDBoYTJpY2hYT1p0YlpvMkJGQzln?=
+ =?utf-8?B?a1J4aXk0Rk9JRkJDNnFnWkR2V3pHWmhIZ2FGS3ZUbTIvSE9OWUlwV3VFSFFB?=
+ =?utf-8?B?aG9samI0THZXOENZMUpueFB3c0FIMXg0ekJlOENsa1NwQWMzRXZxQit5UFBp?=
+ =?utf-8?B?bFBaTGFQRnRKUnFyTVVBa2pqWHNmNXoxZzUrS3YyNHlBZHlNeXRQVnRlZVps?=
+ =?utf-8?B?UFRhRmdhSVZ2ZWFlczJpdDZNZTVsZ3R0eEd0OHl2SzBZY3UxRlVPck5kTWdR?=
+ =?utf-8?B?VEdRNmN4ajJleG1jRmo0WjJuZ2JUT3hvZTRSZ3Y0K2hMOFk0WmV0TVI3bmxC?=
+ =?utf-8?B?QmNrVG42T240ajNEWmJvSGV3MXpvRVR1Y0MvVkhseWIzL214RXhjRjl3NzE5?=
+ =?utf-8?B?OHE3aURrUlkrNXY4Y0E2UlZsSEthSWRVMlRVS0RKY2lNVUZ2TlNOanBSYVc4?=
+ =?utf-8?B?QUxyd3NOVEh0N3dzSFpEWkJacm9uT3lBZW1tTDNOaTY1eTZ2M2dkazQwK1Vi?=
+ =?utf-8?B?UHhZWWxqK0RkL2tndmgybThpT3hURG5Nb0laakdTYVpwcno1M0NhYngrZVVL?=
+ =?utf-8?B?VDJRcVhROTcwK0JWbzBCb251SVVLTUh5K3YvMWZqQ0xtS1dJVEpuN2hLeUQ2?=
+ =?utf-8?B?MGZCM0dIRFBXNmZrMWdqbWJSeFFsaHFFcmNPNTh6Q0RrN3ZTQTRCZzQ5UHVJ?=
+ =?utf-8?B?Q3RtRjJmYWM1TEd2c040cWpHQVlsTW5EU0diblU2TStZYmt6ZDhGRDFiODFU?=
+ =?utf-8?B?RTNzRVNhWUNpTkVxdWN0VkVDRFpvSytPdWVNSTJQZG5MYitDd0N2NkZhVFRM?=
+ =?utf-8?B?K2FBTFY2ZkJ3YnBtUnFMeGR3SDdTT1pEcDBPVFRrVzZjcEQvY3NlVlRQNmND?=
+ =?utf-8?B?SGtvM0ZsM2wvb2RrZUVWb084d2VKbHN3bzFORzkrL0JJVzd0VHI5ZDdWRE9u?=
+ =?utf-8?B?cXpXM0VaSENGeXNON1BIY3BkRENGcU9abHJPM3lycnRGMXczdFVzUVVUMzM0?=
+ =?utf-8?B?WTBEYzU0T2VUMk5Ia3BwY3BZVXJwM2J2RTBmcHFNVS8zWkJ1YU9KdU0zcldw?=
+ =?utf-8?B?Y1RwZWxVdnlmL1JhY1hadTh3bUtMVU9lK3FoR0F0OTJMaGVhWUEzU3h4Q2Fq?=
+ =?utf-8?B?aTRiK1ZHUEpMYVE0NDQrQmF3RUc5cG4yRTdDaDVjMndLWE95bENISXRqaTRr?=
+ =?utf-8?B?clZqWUwyUXRnNDJjMDNjYlRFSXo1L2tFeXFianRUTkxKQ3ArK2hHVnBTRkxq?=
+ =?utf-8?B?SFdCVGUwMTIvU1hGcy9NbkdMZjJZdVIrVGlQVktsRXUvQ0RhTEhDY3o4N2dh?=
+ =?utf-8?B?UVhqeFpBTlAvdFB6ZGhzTzE1Vi90OVZZRk5YbkJRYm5wTUUwd2pSQSswa3Y5?=
+ =?utf-8?B?WXV2VlZkZmJKMEUySnh1TS95ZkZ3b0E2eG5zenNhQ25odnRpbHV2Y1hhb3dh?=
+ =?utf-8?B?SzlKd2xaMjA4K09CRUQ5U0NCVUxsa0owMjd0QTBHb0Z1WVZVQXV1QT09?=
 X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: a81ccd92-3a6c-4657-d959-08decd43fceb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 780213c6-6026-4f46-c6d7-08decd443462
 X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 14:15:02.3750
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 14:16:35.4442
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q9jnE333t/Ts1wdGc5oantcLT7dJPuhQIELMEkCzUHD7p62voH5p4DMLCv7EXYSjprbsS7EEkGg5HarxPweHqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P265MB2987
+X-MS-Exchange-CrossTenant-UserPrincipalName: TK4wFivKppD5lQbLCgRbLGD6XMveQrxlgnzMc096w5byiO5OCyZFSZPRuh0T0NqAyzCvNM32vIaB8gLOoaXtdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB7964
 
 On Thu May 21, 2026 at 8:52 AM BST, Alvin Sun wrote:
-> Change `create_fops()` to accept an owner module pointer instead of
-> hardcoding `null_mut()`, ensuring the kernel correctly tracks the
-> module owning the DRM device's file operations.
+> Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that
+> modules can provide their `ThisModule` pointer usable in const
+> contexts such as static file_operations.
+>
+> Move the `THIS_MODULE` static from the `module!` macro into the
+> `ModuleMetadata` impl, and update `__init` to use
+> `LocalModule::THIS_MODULE` instead.
+
+Perhaps you could mention that this is made possible by const_refs_to_stati=
+c
+which is stable since the MSRV bump.
+
+Best,
+Gary
+
 >
 > Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 > ---
->  rust/kernel/drm/device.rs  | 3 ++-
->  rust/kernel/drm/gem/mod.rs | 4 ++--
->  2 files changed, 4 insertions(+), 3 deletions(-)
+>  rust/kernel/lib.rs    |  3 +++
+>  rust/macros/module.rs | 34 +++++++++++++++++-----------------
+>  2 files changed, 20 insertions(+), 17 deletions(-)
 >
-> diff --git a/rust/kernel/drm/device.rs b/rust/kernel/drm/device.rs
-> index 403fc35353c74..53e44a780ae97 100644
-> --- a/rust/kernel/drm/device.rs
-> +++ b/rust/kernel/drm/device.rs
-> @@ -111,7 +111,8 @@ impl<T: drm::Driver> Device<T> {
->          fops: &Self::GEM_FOPS,
->      };
-> =20
-> -    const GEM_FOPS: bindings::file_operations =3D drm::gem::create_fops(=
-);
-> +    const GEM_FOPS: bindings::file_operations =3D
-> +        drm::gem::create_fops(<T::ThisModule as crate::ModuleMetadata>::=
-THIS_MODULE.as_ptr());
-
-I wonder if the assoc type should just be called `Owner` or `OwnerModule`?
-
-Best.
-Gary
-
-> =20
->      /// Create a new `drm::Device` for a `drm::Driver`.
->      pub fn new(dev: &device::Device, data: impl PinInit<T::Data, Error>)=
- -> Result<ARef<Self>> {
-> diff --git a/rust/kernel/drm/gem/mod.rs b/rust/kernel/drm/gem/mod.rs
-> index 01b5bd47a3332..9a203efc59116 100644
-> --- a/rust/kernel/drm/gem/mod.rs
-> +++ b/rust/kernel/drm/gem/mod.rs
-> @@ -357,10 +357,10 @@ impl<T: DriverObject> AllocImpl for Object<T> {
->      };
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index b72b2fbe046d6..f0cf0705d9697 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -184,6 +184,9 @@ fn init(module: &'static ThisModule) -> impl pin_init=
+::PinInit<Self, error::Erro
+>  pub trait ModuleMetadata {
+>      /// The name of the module as specified in the `module!` macro.
+>      const NAME: &'static crate::str::CStr;
+> +
+> +    /// The module's `THIS_MODULE` pointer.
+> +    const THIS_MODULE: ThisModule;
 >  }
 > =20
-> -pub(super) const fn create_fops() -> bindings::file_operations {
-> +pub(super) const fn create_fops(owner: *mut bindings::module) -> binding=
-s::file_operations {
->      let mut fops: bindings::file_operations =3D pin_init::zeroed();
+>  /// Equivalent to `THIS_MODULE` in the C API.
+> diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+> index 06c18e2075083..b6d7b3299fbf9 100644
+> --- a/rust/macros/module.rs
+> +++ b/rust/macros/module.rs
+> @@ -497,28 +497,28 @@ pub(crate) fn module(info: ModuleInfo) -> Result<To=
+kenStream> {
+>          /// Used by the printing macros, e.g. [`info!`].
+>          const __LOG_PREFIX: &[u8] =3D #name_cstr.to_bytes_with_nul();
 > =20
-> -    fops.owner =3D core::ptr::null_mut();
-> +    fops.owner =3D owner;
->      fops.open =3D Some(bindings::drm_open);
->      fops.release =3D Some(bindings::drm_release);
->      fops.unlocked_ioctl =3D Some(bindings::drm_ioctl);
+> -        // SAFETY: `__this_module` is constructed by the kernel at load =
+time and will not be
+> -        // freed until the module is unloaded.
+> -        #[cfg(MODULE)]
+> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
+> -            extern "C" {
+> -                static __this_module: ::kernel::types::Opaque<::kernel::=
+bindings::module>;
+> -            };
+> -
+> -            ::kernel::ThisModule::from_ptr(__this_module.get())
+> -        };
+> -
+> -        #[cfg(not(MODULE))]
+> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
+> -            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+> -        };
+> -
+>          /// The `LocalModule` type is the type of the module created by =
+`module!`,
+>          /// `module_pci_driver!`, `module_platform_driver!`, etc.
+>          type LocalModule =3D #type_;
+> =20
+>          impl ::kernel::ModuleMetadata for #type_ {
+>              const NAME: &'static ::kernel::str::CStr =3D #name_cstr;
+> +
+> +            #[cfg(MODULE)]
+> +            const THIS_MODULE: ::kernel::ThisModule =3D {
+> +                extern "C" {
+> +                    static __this_module: ::kernel::types::Opaque<::kern=
+el::bindings::module>;
+> +                }
+> +
+> +                // SAFETY: `__this_module` is constructed by the kernel =
+at load time
+> +                // and lives until the module is unloaded.
+> +                unsafe { ::kernel::ThisModule::from_ptr(__this_module.ge=
+t()) }
+> +            };
+> +
+> +            #[cfg(not(MODULE))]
+> +            const THIS_MODULE: ::kernel::ThisModule =3D unsafe {
+> +                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+> +            };
+>          }
+> =20
+>          // Double nested modules, since then nobody can access the publi=
+c items inside.
+> @@ -616,7 +616,7 @@ pub extern "C" fn #ident_exit() {
+>                  /// This function must only be called once.
+>                  unsafe fn __init() -> ::kernel::ffi::c_int {
+>                      let initer =3D <super::super::LocalModule as ::kerne=
+l::InPlaceModule>::init(
+> -                        &super::super::THIS_MODULE
+> +                        &<super::super::LocalModule as ::kernel::ModuleM=
+etadata>::THIS_MODULE
+>                      );
+>                      // SAFETY: No data race, since `__MOD` can only be a=
+ccessed by this module
+>                      // and there only `__init` and `__exit` access it. T=
+hese functions are only
 
 
