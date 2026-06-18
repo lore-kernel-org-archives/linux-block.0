@@ -1,302 +1,150 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7989E2C11C4
-	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 23:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781740795; cv=none; b=YlfGfoKm/r6lq3ybJcdwZcPR8faTn58GatP0CF9dn1Kg4J2Jp0V8cYXQYJsyIM92/Ud1yKHIyzOjOavumJrsjg0rdYQWvAL+dnrk5bVm9Te5DEqcH/ZQhWJtA5/ZaGzGG7QcSv9VUhQIs6Ereg41fDg8qObyf9XaA5bPJltYbME=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781740795; c=relaxed/simple;
-	bh=bYGJHmHFIdg/vZp+bBJZjvaSuFW3cm1oJyzL7R50C2w=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NWjA0VfoRT9Dj+4Fz7+NlJK8CRoBEhUGvWNYI7Nbw4amufXQQWMnl9W4ZvDTa5Z7B8UslVNll/PV5bke/9altWPLcW1QpGH9OIw8XO07rG3E4iO7BPsFZ7oOi9LoI3HDwzxnclXxwXz36sLLjgiXOgFgdGQJdXYRw8GiwApcQGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=dFL2otj5; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806703290AD
+	for <linux-block@vger.kernel.org>; Thu, 18 Jun 2026 06:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781763648; cv=fail; b=cFFJcnudz1T8N45ukRgNwns3BZedSStbDDzICGnSR1UTZJMzP1oFQyiY/Is3/0tNIOY7Fle4jnKtSK1/bWIvMQAYMZ1vFKKlwipl9cCLaeXsrx5XkCD21fwdOMDxi594sk4icfmcXJQGLbbV5q+bCTyKyS/QEUO7Uj+ehYR4iL8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781763648; c=relaxed/simple;
+	bh=1xV+4IVKGnKW6Iu91Xtfx8dM0aQRVB76q1DgNliMV9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=q+NKIeK6/9llxgkxbziA8D1vbcKy2maB1P+9/7FxkM5kexWkb7E6PH7Tlb82awL4ahN+KaFIEtcVw0vwywff+d5mwxIBUWu1mIhgXosdMF3lslz+2310OBn+o3Txt2kxOYJ3TjKO1201CPNwic52Hg2JIk9rzB5P8u8tJUdnsPM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Yz2gFSLw; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=LVXeCgKI; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="dFL2otj5"
-Received: from pps.filterd (m0528006.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65HK2qpo881744
-	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 16:59:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=M8oj17OkIUhfmg6VbN8ApgSdYh1H4y5vkkOv0aGYNNU=; b=dFL2otj5cPi/
-	cFzux+jvpGhB9xcXMoAy4jOlTY9E3ohTXgZ7fzCVnSiBeYmFhzlHnq77alP64aab
-	L5hyUk1VxPNLQPXxO/B+IYcY5SMvw3WGcttOTqOEE/EaVlMnB/E7e9qC7ddQSmOq
-	QHlQwmN6yfHzWWB0HS0+TeJTz2dbonCPe6nmmGICVWsJXUu4DcyzY4Nu5J23n4PQ
-	tPpTk+0Mm7Vj7wK4BbkT3u3i4hTC3c3Tis8vk8ZRolj1eJPgAzBsKSnMp1+Tmfaw
-	g1dyW5K45f0BCyKOb2v3/TpekvefZuFS+nOKHiZbONbyTvBWW86GnUATo8cthTWC
-	VG8tJZ4EDQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4eueg80bya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 17 Jun 2026 16:59:52 -0700 (PDT)
-Received: from twshared25719.01.snb2.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Wed, 17 Jun 2026 23:59:50 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id E030723517B5B; Wed, 17 Jun 2026 16:32:35 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-CC: <dm-devel@lists.linux.dev>, <hch@lst.de>, <axboe@kernel.dk>,
-        <brauner@kernel.org>, <djwong@kernel.org>, <viro@zeniv.linux.org.uk>,
-        Keith
- Busch <kbusch@kernel.org>, <stable@vger.kernel.org>
-Subject: [PATCH 1/1] block: validate user space vectors during extraction
-Date: Wed, 17 Jun 2026 16:32:35 -0700
-Message-ID: <20260617233235.1016063-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260617233235.1016063-1-kbusch@meta.com>
-References: <20260617233235.1016063-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yz2gFSLw";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="LVXeCgKI"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1781763647; x=1813299647;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=1xV+4IVKGnKW6Iu91Xtfx8dM0aQRVB76q1DgNliMV9M=;
+  b=Yz2gFSLwEK5wjJB+V2G7iyOOlXJUrboZt2mpt769oyw+FEdV2xh+yUds
+   u92uQ2ISnjChONWgf5CftNuZKZEDPma891Ewb+vvzjH+4QrQXujG+ZraQ
+   RpZaGL9kZCb9nk+BYMhT5xWiVllc9ric3X5Rs+V/gSI7fiUs3GA2JqHg/
+   o7FDZ3E2+/TJuHzZcU/EFb3WPnflKRunfb7gDReMrrjEsuyhvY9WYZ6EH
+   1WcSW6U4kyYzPLhmHjshE3jDCpHKGypz7uzaC4o8KA+CQz/ilTSWX7FIK
+   dc/4x73vuDW4PL4RxOnOQwAhuytT1heAnRKaaoxGTambFBnSyT5zXXcuF
+   Q==;
+X-CSE-ConnectionGUID: HNwNujv0RxejjC+yFco3pw==
+X-CSE-MsgGUID: znTYlezESEWIsMfIRvfi4g==
+X-IronPort-AV: E=Sophos;i="6.24,211,1774281600"; 
+   d="scan'208";a="145249675"
+Received: from mail-eastusazon11012017.outbound.protection.outlook.com (HELO BL0PR03CU003.outbound.protection.outlook.com) ([52.101.53.17])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jun 2026 14:20:40 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IoEYM3WCSMcOqeN5BmAaU0jGUqAnLXcUvtl46g1MDAgu1GQuRr5nClhnoZyPxZwzp+KCJpa859JXPigtOyZmANUhkMaXqLPKtr5GZ/cS87yAk4dPh1hsBJUN1GEVGfqEjCIvymck5CzM0KTSQK0rq5TG3t9hczUozj5YevTevSIIeSc9Sq0c0UMeEfwToQcadGz+lSwyM1JkbDwiwmzQRlacVOBgO5WnlxK5TWBe0DcXRQTADXQqTOW5bktG3v/sWXBOOeE5qe2h5QBPUT06pZuFKfQkEH8VQ1y4orAnz8Lv9e9f5/E+FIyjiTcKhRhmCCVBWbiaA3MZ0T3004QQbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1xV+4IVKGnKW6Iu91Xtfx8dM0aQRVB76q1DgNliMV9M=;
+ b=uOc6htnEOmq1YVSwi9cqjv4JC5wug2j1dLbS9Uch12shKkGlAjDFy5V+F+mrcn1OVMPZUrGJA3GGn/oJfHVuQOLZRhTIOoTU9cc9ppYR2GpGL68IbPgP/6Zaq4wagXEr7lEBzxFSxLsR21ZVh5+s8RcwrTv3CcCQBH2dXVy7ndGkf+4nIzXMtUIoVc/i4CemWZfIlRqhv3EZTJ5qz78+qwqXnRgTqBp0ss2RmRQFVAM5tA27m5XgAT1KDyMv+jdKN1VepDFhoVB31hOZFDB/Ei+1KUnuGom7vIdkSPghOKJiQdWISM6uoto/optxdGtsKptDreDrQfjIwdfomp9IxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1xV+4IVKGnKW6Iu91Xtfx8dM0aQRVB76q1DgNliMV9M=;
+ b=LVXeCgKIhViJqaK6CdzMvmrMyyr28FtdUbNKX9lgJHqhixH91fwnSMA22ZryE+8G9vT9F8iVUkTLJtxEnMFyCelnKJleiuhLqBb9XiRJnaHevnse6VCslrU3ZMEgCpwQ77Xqs+7JrjLKzrLb8gowrhlBwoiiXSVSvuhi/1aT1tU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14) by PH0PR04MB10191.namprd04.prod.outlook.com
+ (2603:10b6:510:3be::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Thu, 18 Jun
+ 2026 06:20:39 +0000
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85%6]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
+ 06:20:39 +0000
+Date: Thu, 18 Jun 2026 15:20:33 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Sebastian Chlad <sebastianchlad@gmail.com>
+Cc: linux-block@vger.kernel.org, 
+	Sebastian Chlad <sebastian.chlad@suse.com>
+Subject: Re: [PATCH blktests] ublk: mark all tests as QUICK
+Message-ID: <ajOOHDmLhnrF3l7M@shinmob>
+References: <20260615094144.13060-1-sebastian.chlad@suse.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260615094144.13060-1-sebastian.chlad@suse.com>
+X-ClientProxiedBy: TYCPR01CA0136.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b7::6) To SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=GJM41ONK c=1 sm=1 tr=0 ts=6a3334f8 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=kkcUborcUVj0H7zxAXTl:22 a=VwQbUJbxAAAA:8 a=MFjv_cZ18IANV4BSG9cA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE3MDIyOSBTYWx0ZWRfX7ThQYwEh4mq9
- kN+4CZlMREFJGgccoi8b91HQuAUA+YIrhY+GqqzKGTS/NVqlndNNDRwrg47nSdK/GJ9B9b/rhOp
- GRc/7Mv4GnVy30xtu6B93HBXHbQOgqRwNzTyqs9ow44on6JV8DIsaQLGxDQ6m0gtFLF3B8TZBA/
- zCugzv8HFsdEMARnNmL9fpr+HcPUMnEMgi963DySg3U2yEVKLyz5G2e3S02RjjUxGLLBEs+JNYP
- MI56nSZxusnRX20l3NZ/c9SPBSE5P5lQ4L3uVrO+0BM9Xd52V4cVPXq03XcrzOWL71J7jmllROU
- 14WOU3oo4GoqDcwMJ75RSKryM97Hv2TJ4AZOHx9CrPXNuqy7Uj3g8nD4XzLyp3IIqHT/sfjAmKR
- sCMhssiNFvzeQngb7pxTdG5L/0Q/YDHoYscw78V6GVX+hJCsvc4T3mQE/P4ERPPnEhr883QfTFl
- KKzu2AQXOHELZogrPVw==
-X-Proofpoint-ORIG-GUID: gFbFyi3maCoAVBP_BZHDtMt-6cyUS4CZ
-X-Proofpoint-GUID: gFbFyi3maCoAVBP_BZHDtMt-6cyUS4CZ
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE3MDIyOSBTYWx0ZWRfX44fIhyAMxnwv
- JuoxgAro66ZwGYa9iv02upF1tNd7e7aT83/9Z4eg4Mhx+jCtSnorDBSFUhd/Rb9jliiM5XuOiun
- 5DqR0RMPWnseXKbjXtJujrE/134N/AM=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-17_02,2026-06-17_03,2025-10-01_01
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|PH0PR04MB10191:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30437475-dca5-4d32-4bab-08decd01b78c
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|19092799006|23010399003|18002099003|22082099003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	Nfnl9JipgaC2M/Zb609w0/TOxYn8VS5YwjOu5jmm9CKDW8bz24FcHI/4Jvulyw4O7WYee6wuH9iKi3cBvNUA7T1JeXe1OCs7NUBrFpCvymbHZaWeyWg0mkXChJprzq9QMzHPSWjE++JwBrIwAy6axvwfFhsQAnnARGJKtQZc/RaCAhZKnA+vzANTWErdrMNR6Q0vya99Ou8KW1h/xuH1ZtPV8M3/5a2ZT6Zp0AbW0eFqsKOEzNnjAcUosEARFIsjSwAdwYEaSNjIIq1WZ9BVcIdYj7n0irjTq3ueJiEEhLnkbuJvly5LVcFAv8Ym91qKwWIP5SjxsTSy/x4kFyijduVlUjVjoAnm8dTDr3R68PkfVIuHAHzxOSoNBddODhF5uibXmkOrC9YWv27vYosXtUNM2DBdxRxRRM6HnrHUYE5ZLgkw2I+2uFL8pSmGPwsctKD8Eamcpud1iIH4/TnJK2qNKKDdJ5ShsNQ6CQW1DTaTkLM4yQ78Pxy5FMsMmahwVtnS8nNARozKkF456FEGZqv9xeCJczUolTRXX3SKiKGiujVStk8vcmplTS6/+dG86Nf9/Lw4HFuuqyFmHk7NQ3Qx1XkJ/9eqk5cVayhZdb56qxWhzZXYA3zrjLYy+tJmFQbOJjWJq5UN4ILRqiSn5VXHpC0M7Xck8QjG4EvhsM9iPQQLia9ZlddeF00bxklp
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(19092799006)(23010399003)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8Og+oG5smXOi67ms+ReYseR7xzVVpJbT4HGyRWjG1XWfq6JfNBxiEZtNAWyA?=
+ =?us-ascii?Q?x5ZWOM/ViZ+b5BK4QJlS7oWp5xOMeh2Vrr4/BZjvIYPiJK/WxncyLiXuF5lP?=
+ =?us-ascii?Q?YKwLkhahjItsAePZn25tSLfHrtZ9Edhq0jrbct7kl36k5XGB4O12R4b9XJja?=
+ =?us-ascii?Q?VNlxotluWqdX8rLNSh0D4hqypfbKoo4/3fYza/ALkJEix4KKLDdBifJmXofK?=
+ =?us-ascii?Q?8sC9IGjDj3hIYT9DR78aFi7Lw9CtputUc67FQFgEKy2FidaKc2HZoNb6yeqL?=
+ =?us-ascii?Q?J6Rdi75yNfBa9mMMOXncv+6p/2b7Vvwv+MV54QhdYYTPZgFeIsZdbEm9RLRw?=
+ =?us-ascii?Q?9u66FIpUyKgpnAjLwrlHElJSjYcDvaLHvTZOQgnBeU4q81j3+KA5wzALOW7v?=
+ =?us-ascii?Q?mPYuTiwEc+yC0Fv/moKeOuV8Q+EGRgwHCe0p3+w8phtGuuiRWpB3ioVRYOYN?=
+ =?us-ascii?Q?is4SDvVHrjwNrIAofdxO9UzKVA/5WHNYADfwyAOnh8Imgig8UPK5tbrhGsFZ?=
+ =?us-ascii?Q?9cQ47TO0QVF3TC4lRR0sN4zrXqaGaGuX1V8KMhVWSx6x9mU9YnlmKEeavB90?=
+ =?us-ascii?Q?sdMecXQ+XDfNc7mCtRZCh5Hw3I2K2qs5a6RNnuT8nprfiaQ6Aj5i7bs3UD7X?=
+ =?us-ascii?Q?doDZJNe+L/89QPKjio6TdqQgvDdaGgogzBy/cRXPX59rpsoVZ60zIohA/OPg?=
+ =?us-ascii?Q?unMdh0TQ960PUf6ZDmCqtbIP2MMPp57JzEKwggI0q5H6Pu+frC7XYcgZbGTA?=
+ =?us-ascii?Q?5/Mz/BwznCnFEenmqMx6dBqhTutbVhcHQJdy+qQqMs7D/HAwzIBwwJIsr2/a?=
+ =?us-ascii?Q?fmSlq9YRDkW461L5AUyiErgNxWoU4RgMdccVe7XInG+9E43mB9ryBKZr6qH/?=
+ =?us-ascii?Q?0vae+QyHUK0jecPeUY63dCeGvsQ/SZZEnxnIPNo+S5AK7zDB+gzGAgyL1wFT?=
+ =?us-ascii?Q?WnUGtVcIzxB6g3/RuUac34+6uxO5RwVRm9xvWMc1O/LaxQhzRjUJDmVoKikt?=
+ =?us-ascii?Q?XvpfHWcTgLhTaYcFr4/lDg+GOlhdkt7E+PqK4wIBt/GGpncFIAHC9izpnpY5?=
+ =?us-ascii?Q?DxzU8eaNHDHXN9DKQ9G/P6dBsshyOQ8BtZUmVO4XEJq6fk8OMjEVwP/0Z5zv?=
+ =?us-ascii?Q?L85OfC0UIswFS0Jya4I6Iuj9Uv72FGWJGsAysyfbB5L6bDu1p/DxKJKsuTB/?=
+ =?us-ascii?Q?FYBvTygCLPtFDWd8A+BPUwg9YOpBPFHBjlkN3Hl1Ff3zmqzJqZMw0JQKEy2Z?=
+ =?us-ascii?Q?2NbhCY/La2N7DTc6y/QFqY8IiqnIL77KGp/tK+6EyBeCr+p0e/e/xMHIklfg?=
+ =?us-ascii?Q?Hb/xRoRbuAQ/8Yk3stbLfW+4P3dCogJ5MWPtlZOhDy7Z9RfKPMWk8/J9stwh?=
+ =?us-ascii?Q?l7Vg9oq+tvsuJ3t7gEuWIaECI3HXTeOHa8Q4aO1Vyux5Xf+i0uYmUfh1Y8QV?=
+ =?us-ascii?Q?VlWyNbOdYB0FlIL69N/N6WOp8NOeRZI3mGPyxi6HFm0eoq6FBuN5TTK+BcSS?=
+ =?us-ascii?Q?L7IlhKNbOoXdaebCH19BcJdeZJdmhl1s3WpPWeXK+fob7wW2fWHjpexbeS1w?=
+ =?us-ascii?Q?nigc2FMbrSitW+u2yGNMNocV0510GotNAzVtpozKxvXWciz62ZPxys56FgvX?=
+ =?us-ascii?Q?96L6lKZ9NxmtNud+/dVpMMA2dZ5w0sGqekabzCtkvDvUDAP+NEDSnQq801IQ?=
+ =?us-ascii?Q?NRIuLp83gQR0fWup3CL1L9LVK5K8t9aAMp7J3MUAtmd6CY46ZrXL+VixhHmp?=
+ =?us-ascii?Q?OXv9Priv20KOofZsXneUep/YmfbuZmY=3D?=
+X-Exchange-RoutingPolicyChecked:
+	bAOnJOjWbMu+ynSqLLTjL7oZZ0pWGtF7jpNlvlfPWOt+HRNqoUMATF9m4DwNl8soBv1+BqFi3C+1uPvHBonDKaiXS6KL0iC7eskqULfbXypFwdRJBUdwzj76TXRlTAbb8S6MLM/ffUtsXiX9r1Q7CB5sdkUSLs2oCzNYT/wiAmok7sIOYUbSMZkbGRXNltQSgPi5795ggOIjX3VqXKUk5VD7jW5WmnG0s2WwpD09VirD4p0q0dBAm8ijji7KxFzf7qzZgQxCGdd8iubEz4Kr++Eu9glHyCaKfcNnKvzZJyNXoF5nlvC0JxX/iokvbHcDixjLCo+pQJUT8g9XBLWBqg==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	W5YufcPALJM0r5Aixy0BigqTeVyeeXK4hOTqT0IjW2/7PQZx50XrKTB6Oj4ze6IFMCBUz8cGkuJUFTDDAQnuQPoo8FVkm+Btvv3W2VHaFGkI8ktv9CIqy+LysJIfax62uqHqGcjylgVdvKg050LSZj8dbx6Cg9f1YE+Y4D0yu1lRqUmxmMZakh1+pgb7CH6Ma6viv5LqWFwcQKUxEGGPuZ5hF7mxikPkw5NZIJFUy3GrYzR8PyGKf8ris4gEpponzW54hitpRleXFKAshP8Q2no8VMxitcBMqIzq6iNe236ODv+tqogWRaDIEZEPRdGxAB2R3Q8v2/1GTf5rlVPfw14VlECNtmOj3kYQtdmxfcJSVLm/W/XZkt0wMBBJeczEwiU0ksSMqMLdUL59S3H22NnGaUAuIGdPudGB3rQY+nzfieMsrHglO8Ixy7WSAngYquX8/UXzbHq1f2k2FhMXeljUK7ejVM1lo6scRAdEe+2QJfw3xsaIkIjvp2vnGEImxfFisuOlkbatlZP93L1s3HppUfc7JVVU4/K/O+BAwb2hNdm8Z12tVmq3RKxzQuDuudm5dVr7KDzFZdCdkLxF8BKno5t9kmOkX1rXD/P9b6NJnnDdIi1fmvE2BYnESOqC
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30437475-dca5-4d32-4bab-08decd01b78c
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 06:20:39.2096
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HIgDJFrjVb9LdN4yYWcGCAhAR0QfEVVngtnr66/tFawkPUYybzC9D1rkSIyPdJRb+B2O3uORyzgKjTde9Bi2FCFL+Bv3EohIqpb4Qlhm7YI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB10191
 
-From: Keith Busch <kbusch@kernel.org>
+On Jun 15, 2026 / 11:41, Sebastian Chlad wrote:
+> These tests are quick to run so mark them accordingly to ensure
+> they are included in quick runs.
 
-The blk-mq based drivers have every incoming bio validated by an
-unconditional __bio_split_to_limits() call, which rejects any segment
-that does not meet the queue's dma_alignment with BLK_STS_INVAL, so they
-only see viable requests. A bio-based driver, though, receives a bio
-whose memory alignment has not been checked.
-
-Misalignment is possible for vectors supplied from user space direct-io.
-When a stacking driver forwards a misaligned bio to a member device,
-that member may reject it with BLK_STS_INVAL if the lower level attempts
-to split the bio to the queue limits. The stacker tends to mishandle the
-error: dm-raid1 may degrade an otherwise healthy array.
-
-Alternatively, some lower level bio based block drivers never attempt to
-split their bio and assume the one received is viable. If it's
-unaligned, block devices like brd and pmem may corrupt their data as
-they have a strong dependency on sector size aligned bvecs.
-
-Validate the source against the device's dma_alignment where the bio is
-built from the iov_iter, rejecting misaligned I/O with -EINVAL before it
-is submitted. This is done opportunistically in a path that already pins
-the pages, so no additional io vector walking is needed.
-
-The required alignment is supplied by the callers as vec_align_mask
-(bdev_dma_alignment()); passthrough and the bounce path pass 0 as they
-have no such requirement. If a vector is misaligned while building the
-bio, any pages already pinned into that bio are released before
-returning.
-
-Cc: stable@vger.kernel.org
-Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
-Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/bio.c          | 19 ++++++++++++++++---
- block/blk-map.c      |  2 +-
- block/fops.c         |  3 ++-
- fs/iomap/direct-io.c |  3 ++-
- include/linux/bio.h  |  2 +-
- include/linux/uio.h  |  3 ++-
- lib/iov_iter.c       |  9 ++++++++-
- 7 files changed, 32 insertions(+), 9 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index f2a5f4d0a9672..1bd7da889e069 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1242,7 +1242,7 @@ static int bio_iov_iter_align_down(struct bio *bio,=
- struct iov_iter *iter,
-  * is returned only if 0 pages could be pinned.
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
--			   unsigned len_align_mask)
-+			   unsigned len_align_mask, unsigned vec_align_mask)
- {
- 	iov_iter_extraction_t flags =3D 0;
-=20
-@@ -1251,6 +1251,11 @@ int bio_iov_iter_get_pages(struct bio *bio, struct=
- iov_iter *iter,
-=20
- 	if (iov_iter_is_bvec(iter)) {
- 		bio_iov_bvec_set(bio, iter);
-+
-+		if (mp_bvec_iter_offset(bio->bi_io_vec, bio->bi_iter) &
-+							vec_align_mask)
-+			return -EINVAL;
-+
- 		iov_iter_advance(iter, bio->bi_iter.bi_size);
- 		return 0;
- 	}
-@@ -1265,8 +1270,16 @@ int bio_iov_iter_get_pages(struct bio *bio, struct=
- iov_iter *iter,
-=20
- 		ret =3D iov_iter_extract_bvecs(iter, bio->bi_io_vec,
- 				BIO_MAX_SIZE - bio->bi_iter.bi_size,
--				&bio->bi_vcnt, bio->bi_max_vecs, flags);
-+				&bio->bi_vcnt, bio->bi_max_vecs,
-+				vec_align_mask, flags);
- 		if (ret <=3D 0) {
-+			if (ret =3D=3D -EINVAL) {
-+				bio_release_pages(bio, false);
-+				bio_clear_flag(bio, BIO_PAGE_PINNED);
-+				bio->bi_iter.bi_size =3D 0;
-+				bio->bi_vcnt =3D 0;
-+				return ret;
-+			}
- 			if (!bio->bi_vcnt)
- 				return ret;
- 			break;
-@@ -1377,7 +1390,7 @@ static int bio_iov_iter_bounce_read(struct bio *bio=
-, struct iov_iter *iter,
- 		ssize_t ret;
-=20
- 		ret =3D iov_iter_extract_bvecs(iter, bio->bi_io_vec + 1, len,
--				&bio->bi_vcnt, bio->bi_max_vecs - 1, 0);
-+				&bio->bi_vcnt, bio->bi_max_vecs - 1, 0, 0);
- 		if (ret <=3D 0) {
- 			if (!bio->bi_vcnt) {
- 				folio_put(folio);
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 768549f19f97e..c9535efe1a913 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -274,7 +274,7 @@ static int bio_map_user_iov(struct request *rq, struc=
-t iov_iter *iter,
- 	 * No alignment requirements on our part to support arbitrary
- 	 * passthrough commands.
- 	 */
--	ret =3D bio_iov_iter_get_pages(bio, iter, 0);
-+	ret =3D bio_iov_iter_get_pages(bio, iter, 0, 0);
- 	if (ret)
- 		goto out_put;
- 	ret =3D blk_rq_append_bio(rq, bio);
-diff --git a/block/fops.c b/block/fops.c
-index 15783a6180dec..928ba9be170cd 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -47,7 +47,8 @@ static inline int blkdev_iov_iter_get_pages(struct bio =
-*bio,
- 		struct iov_iter *iter, struct block_device *bdev)
- {
- 	return bio_iov_iter_get_pages(bio, iter,
--			bdev_logical_block_size(bdev) - 1);
-+			bdev_logical_block_size(bdev) - 1,
-+			bdev_dma_alignment(bdev));
- }
-=20
- #define DIO_INLINE_BIO_VECS 4
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index b485e3b191daf..645a4e9cd25f9 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -358,7 +358,8 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_it=
-er *iter,
- 				iomap_max_bio_size(&iter->iomap), alignment);
- 	else
- 		ret =3D bio_iov_iter_get_pages(bio, dio->submit.iter,
--					     alignment - 1);
-+					     alignment - 1,
-+					     bdev_dma_alignment(bio->bi_bdev));
- 	if (unlikely(ret))
- 		goto out_put_bio;
- 	ret =3D bio->bi_iter.bi_size;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8f33f717b14f5..13be7edb524fc 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -477,7 +477,7 @@ int bdev_rw_virt(struct block_device *bdev, sector_t =
-sector, void *data,
- 		size_t len, enum req_op op);
-=20
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
--		unsigned len_align_mask);
-+		unsigned len_align_mask, unsigned vec_align_mask);
-=20
- void bio_iov_bvec_set(struct bio *bio, const struct iov_iter *iter);
- void __bio_release_pages(struct bio *bio, bool mark_dirty);
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index a9bc5b3067e32..be8b2625b376a 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -391,7 +391,8 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i, st=
-ruct page ***pages,
- 			       size_t *offset0);
- ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv=
-,
- 		size_t max_size, unsigned short *nr_vecs,
--		unsigned short max_vecs, iov_iter_extraction_t extraction_flags);
-+		unsigned short max_vecs, unsigned align_mask,
-+		iov_iter_extraction_t extraction_flags);
-=20
- /**
-  * iov_iter_extract_will_pin - Indicate how pages from the iterator will=
- be retained
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 273919b161617..ccd5b49f6b78d 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1886,6 +1886,8 @@ static unsigned int get_contig_folio_len(struct pag=
-e **pages,
-  * @max_size:	maximum size to extract from @iter
-  * @nr_vecs:	number of vectors in @bv (on in and output)
-  * @max_vecs:	maximum vectors in @bv, including those filled before call=
-ing
-+ * @align_mask:	reject with -EINVAL if the source address or length is n=
-ot
-+ *		aligned to this mask
-  * @extraction_flags: flags to qualify request
-  *
-  * Like iov_iter_extract_pages(), but returns physically contiguous rang=
-es
-@@ -1897,14 +1899,19 @@ static unsigned int get_contig_folio_len(struct p=
-age **pages,
-  */
- ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv=
-,
- 		size_t max_size, unsigned short *nr_vecs,
--		unsigned short max_vecs, iov_iter_extraction_t extraction_flags)
-+		unsigned short max_vecs, unsigned align_mask,
-+		iov_iter_extraction_t extraction_flags)
- {
-+	unsigned long start =3D (unsigned long)iter_iov_addr(iter);
- 	unsigned short entries_left =3D max_vecs - *nr_vecs;
- 	unsigned short nr_pages, i =3D 0;
- 	size_t left, offset, len;
- 	struct page **pages;
- 	ssize_t size;
-=20
-+	if ((start | iter_iov_len(iter)) & align_mask)
-+		return -EINVAL;
-+
- 	/*
- 	 * Move page array up in the allocated memory for the bio vecs as far a=
-s
- 	 * possible so that we can start filling biovecs from the beginning
---=20
-2.52.0
-
+Thanks, I applied it.
