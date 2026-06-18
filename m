@@ -1,97 +1,74 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FC93750CB;
-	Thu, 18 Jun 2026 10:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5965E3BBA1E;
+	Thu, 18 Jun 2026 10:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781778394; cv=none; b=DjbnPaLNKlEYodWIcAH3xQ9sMWBuHDv9Ufh/Igd6PTz4hvhTK4T2f8zIdkBzyCfKi+I6f3U3QzvoUvbx7aD+e+ZJpTY5Qx8dICXH4ZLtAcbcYzaqsikY23SFQ85KzwyCIJ+eRfBCOWefRZn0OkzYPdC7xrgN8JtXxbZD2HgpSKU=
+	t=1781778774; cv=none; b=XlcVfCUnIz/Stdwd6t/KQmmahB0odp+4dlNFrDQu7lRJ541rlKRBa202rjy1etntcqepkf3b/8tvfiEWu4SscqB4xlyiOpO1hX11ac3w1I4Zoge5PsFBPiiohKcwFBvANM++rIFBYbCJCtKpuDWoSKphsNaVC7IL+bz20pp3nqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781778394; c=relaxed/simple;
-	bh=QAXjP5J/sFCMInq4Fej3S6aSdguM9eBOQ61FbMRR4s0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qi3rra8sMgRoV2FRVnCxVO8noOsAP+6Z46ClQ0mogT+mhsFW4UZtnLlD1bHuO4+1rD+d6gYJ+J6JkqavOJN6ugMr0OpF9WymYQCCteM3+hkEV+EnoRXh8tabF3E+ocCZ7Rr6z/v+8BV2k6yFd3YL/B/CSfBbFvpZkf4YiWslJnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8508A68C7B; Thu, 18 Jun 2026 12:26:27 +0200 (CEST)
-Date: Thu, 18 Jun 2026 12:26:27 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	dm-devel@lists.linux.dev, hch@lst.de, axboe@kernel.dk,
-	brauner@kernel.org, djwong@kernel.org, viro@zeniv.linux.org.uk,
-	Keith Busch <kbusch@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/1] block: validate user space vectors during
- extraction
-Message-ID: <20260618102627.GA23200@lst.de>
-References: <20260617233235.1016063-1-kbusch@meta.com> <20260617233235.1016063-2-kbusch@meta.com>
+	s=arc-20240116; t=1781778774; c=relaxed/simple;
+	bh=Mhrt51U/3Bst1MWMhW1jqJPyTksxpuMd96R5jg+Xe0A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pDFBkUau7FAGK9cyOGwSYE9s53tjiceGs6XarXWLzaE1Dt+5ib4/y1u59cjoJrWmhj6A+/mWXkXpUROGTViKfD/B8HctwKjMtQNwer3npHAXuSmKRNtfuH6iZQm9HsqF/5m5gO9ARy+FBPl+URU9trjF3Gq5YOdvj3GB9I2Wxt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWToeEld; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWToeEld"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6761C1F000E9;
+	Thu, 18 Jun 2026 10:32:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781778771;
+	bh=Mhrt51U/3Bst1MWMhW1jqJPyTksxpuMd96R5jg+Xe0A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=JWToeEldL94Uxy4bw13SddCruUAAGoHq8yGE8wawQT9pPLc9w3a4D0Dz6E18FvpJk
+	 fERcATt9rlw5myELakU9CQ0PgBfkJQrySMHHC97a8s67XYaQcNLzqCw3IeHXTTFoSY
+	 GZUo33r7yDePj9pc6dk2Sy8lFihyAbRnxBubn+vD1pauLRzw5WK8rHE6HQvcS9MNS9
+	 wtBAXv2RU2jnS/DnsZYZD2DzbwD5M2Ha6vMfiNeamlwwV/AMqjxW1COMorE0ZM8d9s
+	 DDDRIwRDw8Fn5aw/CNnB8Y6G3JTIdev9LhasZCUyWQi0Vnn7GatSCWgbTJ1VHq4qAQ
+	 b9RYPtErqEkNw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Alvin Sun <alvin.sun@linux.dev>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun
+ Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
+	=?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>, Alice
+ Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo
+ Krummrich <dakr@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-block@vger.kernel.org, Alvin
+ Sun <alvin.sun@linux.dev>
+Subject: Re: [PATCH v2 5/5] rust: block: mq: remove redundant imports and
+ format
+In-Reply-To: <20260520-miscdev-use-format-v2-5-64dc48fc1345@linux.dev>
+References: <20260520-miscdev-use-format-v2-0-64dc48fc1345@linux.dev>
+ <ftIkd4Azz8dKfEHMvhxOqdNT0WY0ptvcD4_qdkWPSSzGOZyLcAMD7ECCFojCPMt_Eej80uTQAFCA9wGaRWzWmw==@protonmail.internalid>
+ <20260520-miscdev-use-format-v2-5-64dc48fc1345@linux.dev>
+Date: Thu, 18 Jun 2026 12:32:40 +0200
+Message-ID: <87se6kf8af.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260617233235.1016063-2-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
 
-On Wed, Jun 17, 2026 at 04:32:35PM -0700, Keith Busch wrote:
-> @@ -1242,7 +1242,7 @@ static int bio_iov_iter_align_down(struct bio *bio, struct iov_iter *iter,
->   * is returned only if 0 pages could be pinned.
->   */
->  int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
-> -			   unsigned len_align_mask)
-> +			   unsigned len_align_mask, unsigned vec_align_mask)
+"Alvin Sun" <alvin.sun@linux.dev> writes:
 
-vec_align_mask needs to be documented in the kernel doc.  And I find
-the vec_align_mask name a bit confusing.  This is all about the physical
-address (really the dma address, but the page aligned offset map 1:1),
-so maybe phys_align_mask or dma_align_mask might be better names?
+> Drop `Result`, `Pin`, `pin_data`, `pinned_drop`, `PinInit`, and
+> `try_pin_init` imports already provided by `kernel::prelude`.
+>
+> Simplify `error` imports and flatten parameters formatting.
+>
+> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 
-Also wouldn't it be more natural to pass the start alignment requirement
-before the length alignment paramter?
+Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
 
-> @@ -1251,6 +1251,11 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
->  
->  	if (iov_iter_is_bvec(iter)) {
->  		bio_iov_bvec_set(bio, iter);
-> +
-> +		if (mp_bvec_iter_offset(bio->bi_io_vec, bio->bi_iter) &
-> +							vec_align_mask)
-> +			return -EINVAL;
+@Jens can you pick 4/5 and 5/5?
 
-Can you add a comment here?  Especially as the bvec iter doesn't actually
-require all individual bvecs to be aligned and I'm not entirely sure this
-handles all case - writing down the rules might help a bit with that.
 
->  		ret = iov_iter_extract_bvecs(iter, bio->bi_io_vec,
->  				BIO_MAX_SIZE - bio->bi_iter.bi_size,
-> -				&bio->bi_vcnt, bio->bi_max_vecs, flags);
-> +				&bio->bi_vcnt, bio->bi_max_vecs,
-> +				vec_align_mask, flags);
->  		if (ret <= 0) {
-> +			if (ret == -EINVAL) {
-> +				bio_release_pages(bio, false);
-> +				bio_clear_flag(bio, BIO_PAGE_PINNED);
-> +				bio->bi_iter.bi_size = 0;
-> +				bio->bi_vcnt = 0;
-> +				return ret;
-> +			}
-
-Do we need all this cleanups beyoned the bio_release_pages()?  Most
-callers just free the bio, so should not care about it, and the error
-handling in __blkdev_direct_IO that calls bio_endio looks buggy for
-other reasons..
-
-> + * @align_mask:	reject with -EINVAL if the source address or length is not
-> + *		aligned to this mask
-
-Maybe use the same paramater name as on the bio side here?
-
-And not for this patch, but this makes me wonder if we should handle the
-len alignment in iov_iter_extract_bvecs as well, as that should simplify
-it quite a bit.
+Best regards,
+Andreas Hindborg
 
