@@ -1,57 +1,57 @@
-Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020095.outbound.protection.outlook.com [52.101.195.95])
+Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021081.outbound.protection.outlook.com [52.101.100.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8373B2FC2;
-	Thu, 18 Jun 2026 14:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE9A337B99;
+	Thu, 18 Jun 2026 14:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792006; cv=fail; b=ZVM8sg7m2ZV4UebzYDTUDIc4lLDDL7PArupXukYFQSs3CMSBjeXNduj2Ke6pRHRhs2hA7GQxNiN33cqRn49DRHOWjuzc1miXEZs9bVyqQR9HZJE49MCflDbugm5UltRnQbDCXFMchLjPaX/dcLrMr8lla9OcdDxQpgZZH8iVhvc=
+	t=1781792107; cv=fail; b=njPrVrS3XfFhp1G6pEFxcaBYv+5WPXo9yPVW9vPpPA99GzlrmzKWJEH/ShRZ68hZVNXBVqhMeqlEx1F9sn2m/r5tN3edAyf43f8airUFyFBxjvy0JYI9oaSbAzQtoqMdUX5or3u60tJLbfs7hFsR3PtWlfclMm4P0upbvPX0UuI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792006; c=relaxed/simple;
-	bh=LGguICoG0DF2qdEGyvXd0jTj91Rt8S4MX8i6dxzVZas=;
+	s=arc-20240116; t=1781792107; c=relaxed/simple;
+	bh=QJp+A2fmJQwENSBldWCCIWyw8gkosUO6WpTwVheebts=;
 	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=DmWBjgPwvQv6UkEfq8HNB/Bm8jSNCfcAcGgp6Z/FUfm5vnnqSj8rHt9WsBT24m2bx7PBeyMUTq1QfeGXLMuj4NIvgznASw8ji94u7DCcc3Uq0jNam4qg9yG8dj2urW6jVOOqgOLF9+r0xMWNiBIL6ScoExO70TeZSgaKVFHrlsM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=ti0Nan3a; arc=fail smtp.client-ip=52.101.195.95
+	 In-Reply-To:MIME-Version; b=MRyAXD/Di4qyg7KFyRqlZZGGJSs43fnVnGXJIvEHx1owEqTpM7ERb9C16+w2OBbjR6qA0aci6kgPvt079ulhH6TBDYly1/VcZpuY0PuQ8j2NXEVzH2+Q1bkwmzzILAxpsKE9vUFaYE40NFM2qwzwqKwtorAtGPVARDmc+/b3ggs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=l7uLzTKz; arc=fail smtp.client-ip=52.101.100.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="ti0Nan3a"
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="l7uLzTKz"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D9K1pv/iVb3NCHdopAtmDFsT8KbIO/c1LP5LzOfhOQvwKYsSs07GihWcjEewxqnlawSI7UE/u2/VpuTcc/xMx3ogBLr+OhBIs3e0ppNdHqTYEKSWNCRf5ujhyuisBn3VZg9/lxQWMDvJCRwDzZq8Ohrpqla2KX/y7p5aklMr+/e45m6AuS+bNI5C+0HaDy3iNe2gLIx0XiY1C+0epdS6OWfLnnIbl4jCJ2bDRahJxLb6v2MYYOMuXDHkXdXgiEgOliZEVECySxurzg3Fge0q6gz6CDNmR/e/mkwJCzD2ELbM1FKj0gPUhbB+cJauPzeIx62TQebM+ZUcxQFVk2K81Q==
+ b=wT/YBscamNqWACAPvCRnNjz9xaeiBhsCbsVrA9ap7lRt/FrhN3d5VIsTV1+bIc7/09o5YPiAycZk54s/IrsvsRgAK+ZNzm1EgaXKkMU4j4Y825Nzg+julxwEkBaSh+4d9hZIW5DMQVbSfem1pD7qJNH/UD54hWNTN6Vc/Y2MnikXxyzEZQWWcpeXrLusoRO++m3v7FL2jwVagfyOOkz3RH4D+FOofqhfvdOpFnzw2eui7ou6DTQQW6kuqkqcEscN7jzuT/4cMCr8TyuFVWc54hhpuCBglMbWs2W7JnJ2zA1TFCGSAchAUxj/5YL5YjiawcDCxetIAoMrXdYeW9EWDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GK4+LIHrLyMlwALjwaWbLzPn16Y6El+RtbotrA9WKec=;
- b=binkMd4Q1uINy58xhfCVme5Ue26A6fTSTiewIPgSae/kcalgOktXeC6XMgyTu3+BQUw+fFNpdhfQYTvHvhWQFdI/XJ9NMcEtNCaZrha7hyBxX/6Ax/P9it9rszlNVH+Y7ilyJF/VYmMyH/rkqEpGNP/RJfhyeO4HDSpv0qc/YUXduShvtoDvp0jfj1BYWcXEQqpU8OfauI7n7nyXUP+VnODYOQ3L0j+fITrSJhOkuilDjN2mVzNfA0V5xy58frBxw9+/Wn1jG0q6ItMyxplbjxaNR2S5JuthKRYjULBMj9UEcgc+YEB2AzpvJG3tjm4MVAWhKhJbkkX9d8hoNzi3Xw==
+ bh=YiaO2UyhLy6+0J3jqS0fhWy1eFYQRbm8PKDcjZ4HQFY=;
+ b=CrVL2c1D+Ev7m17HDcf0TgExrrc6cJdPzuMguQlqshFVo5nEuuDKfNiJ3fkZdEWAbbO3uokfyTS4niCe6XGsI60v0Bs0KLCMjSIm2jm29xBi8KDV8e+Hn3rUma3azld5Bzf/juyIcj546buw1EiBwDh8atj4si+Jjiz4C+MZQ8htz3Cak4dRUw+kEZDyX6r/q87rS9s+fJVm89DXtW9jTdnhA5Qio2cyUiFlLsssCuN0KM6NEd3FNhBgcKnDh6eOgAb4v6lJj2axvxe7NyUDxgwB8UhBoCVnjZFF70ldvEo9pIKcvkvLyx1eg2DVk+MbgMkasjiw8XLHciOBlJ0ugQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
  dkim=pass header.d=garyguo.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GK4+LIHrLyMlwALjwaWbLzPn16Y6El+RtbotrA9WKec=;
- b=ti0Nan3aN6nYtMGc6lQK9ARcXL7OIPvPCCkGLKkhvoaC+rJlEeD0GsFzN7JCzUJk8rizWXdAEQqaE8oOiVZnRM3u2KCIGwNqAYCBnrUAGL3mVIDSP7vzt8o0w4yP4j1/YYOKUzA5pCNRt0sT+qX8Ry+BZlQw/FUdUGvdcgbdvUc=
+ bh=YiaO2UyhLy6+0J3jqS0fhWy1eFYQRbm8PKDcjZ4HQFY=;
+ b=l7uLzTKzniMA0GFZYYdwgXU7Sl6SL5Y52Sz1pY57TyKMBgBG5O9oid0W8MbaVAKsvEYBRhLFb5nQA65c9uGk/xLiAFPhs4qphB/EeT6LuXOo+IJ6pu3orhIuYp0IE87pZS6T8Wq0/+tLhjj7RAu52ydj2+MCF/5EJJ/m+CeTG54=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=garyguo.net;
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO0P265MB6005.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:28c::5) with
+ by LO0P265MB2987.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:183::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.13; Thu, 18 Jun
- 2026 14:13:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Thu, 18 Jun
+ 2026 14:15:02 +0000
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
- 14:13:21 +0000
+ 14:15:02 +0000
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 18 Jun 2026 15:13:20 +0100
-Message-Id: <DJC8JSYDERVX.2QI76YCBHDA93@garyguo.net>
+Date: Thu, 18 Jun 2026 15:15:01 +0100
+Message-Id: <DJC8L3EXC1NA.1JM4AY78YADO4@garyguo.net>
 Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
  <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
  <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
  <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 2/7] rust: macros: auto-insert ThisModule in
- #[vtable]
+Subject: Re: [PATCH v2 4/7] rust: drm: set fops.owner from driver module
+ pointer
 From: "Gary Guo" <gary@garyguo.net>
 To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
  "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
@@ -69,10 +69,10 @@ To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
  Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>
 X-Mailer: aerc 0.21.0
 References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
- <20260521-fix-fops-owner-v2-2-fd99079c5a04@linux.dev>
-In-Reply-To: <20260521-fix-fops-owner-v2-2-fd99079c5a04@linux.dev>
-X-ClientProxiedBy: LO4P265CA0062.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2af::18) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ <20260521-fix-fops-owner-v2-4-fd99079c5a04@linux.dev>
+In-Reply-To: <20260521-fix-fops-owner-v2-4-fd99079c5a04@linux.dev>
+X-ClientProxiedBy: LO4P123CA0033.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:151::20) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -81,205 +81,120 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO0P265MB6005:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb0ef11f-41c8-4747-6405-08decd43c0b1
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO0P265MB2987:EE_
+X-MS-Office365-Filtering-Correlation-Id: a81ccd92-3a6c-4657-d959-08decd43fceb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|23010399003|7416014|376014|366016|1800799024|56012099006|6133799003|22082099003|18002099003|3023799007|4143699003|921020;
+	BCL:0;ARA:13230040|10070799003|23010399003|1800799024|376014|366016|7416014|4143699003|921020|56012099006|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	M9P1Q3ZFMfeH7cBrlfiJTP9clnxe22iNRBfdm16oiruTiT+6M2gvKglBhwZT/VnaDHNpday4cP6uy52SBL0qeLGQnS/UCkWXiW+gXPFSn1FO7qtEFHJvf+cLI9YxcsyLn92/2EcU09dxJDeJemAmbD90Bnjbxa14PaJG33tzlpiiqPxGvOPnIele4a+7DNoqdVe0ejQeTh5YSypOyIGaE8KFlEfjiqpRHdTwT0ahZ2I6dHgybAwr+lavVK1DooBjseBPvUn9O/zvdSIzKnA+PGgniQpr3UOSlsg50FBOTshANEWoc4m8LR2l9bZUBlhHUxumd5t+JeOUKI8fWWhw97robOrfl385ZiJBc0hkCA1PZx/KYr5qiu495yPp5X9M+OY3+5LF2hdFZQVpwp4VgqzZinFmPDud010U2iPOvVRnkdS4dKk76q3hABYuU85PN7KllvjFXh/2AkAlXVBV7ntGuSFIeYjBA5usb3E7XhhLws/ljiCazrP85kIjv88HpFD8Ecd3NJZBw9Ga/wuM1/8ebhWRBiObK6xAtzYhZ6rQEiwcTyeUzlnleNzJExZR1yRW3OHahfqQ+rCaCsrjJdY7d/qQX9D5EQpUquMZwosQeCBH5Zk8KjSaWJZrfrGM0HNYvIyIxrDJLMyg0hXxt2Pc9RceDELEve23Cl+4Vq0H3ciTW65LWgFsTQ8JP8kea/BgXBP1YtruRhYS3cXDhSi+TjUFP+SKFqbU8FGD3GkoPupH+sN52qncuU8saTQp
+	7EiG6m2bun8H95WW/M2tL1GfAePMMkdOBJ5ztUkaTXx/rvYz8zkShKBr6T76hSrt697MMxLbpyl2V3+GpfEONthprM4jx4gFoh3TwXBg7OZ4EsEypzsyPDgd3lk5CtITP9n/i3b4QTp+LPgyw/BL3QKzWAYe4q+ZvDe1CVsjIzhybF6POK46msr1w3Nt+s+rktWQtClw32/KVyPraTmQYAWs9CPhFTl0+EGrNfMaAO+P8qgd9rdM0OwA9ViKemZWmFGdjqeEOX+oChKgx0otqV1YNL9j8+VAKSo2i46jlW1dfYpFfaE+5ouSXrMCnPOv/fP0str2q6gEaSkZabKwRaczbjYdTCe3rbpYMNOtp+PLPWWOGzAmmdoDpfX4En83egyrYnPhhKkBefc02gwjUawbHRGrtCOBUCM5iI5px4AETdSNssapgqWtFH491WpmDbhiWZZNIQ1YcU4+sv0fmt6ErLJ/L1v3elxD1n8Ksgw0pSW9zVX79wDBURCitlgJ4LpF81raeLClystWTmFUoxBSYGVtvoTZ/z9LFBlmwnDDo+/CpAt5sIe+vetebJkXNRR9vcRlyJFyQ/uoX4TRXk1wiyA2zKYdjzerUEb9IAJ958xEV1nDyHttPiSA0uoFa/QaF7SIUCxsKhjl3oP6CXpY8btZbQratAso5dqRlPfNrIV9EsYKHt69+UzV7AZMlzJ4GeM8/hMUTrV/jun1rXVqlovRbzQduWCaZgQgUOs=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(23010399003)(7416014)(376014)(366016)(1800799024)(56012099006)(6133799003)(22082099003)(18002099003)(3023799007)(4143699003)(921020);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(23010399003)(1800799024)(376014)(366016)(7416014)(4143699003)(921020)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aytGdjNsOThLL0JuU3hZV3JjZzZoWjcxVWp0V25ZTUYrdFhJY3EyclJqc3J4?=
- =?utf-8?B?d3BLYklyZGlyQWdsc2c2SlZYUytSY1g4aXF6SWk3cWJGM280Q3Q0b25rUno3?=
- =?utf-8?B?THZZQWpTT1Y4d3c1SVFRd0hJeVh0Z2NINDZaWnBEMnN6V1lUWHB5cjlPQWt0?=
- =?utf-8?B?QzdhMTZoVHZ2bEZDa2JRK0J6a05MUm5GMFdmSU02YWQxZXQxNnJEbzI5OHVT?=
- =?utf-8?B?U3N6eGhha2Vnb2hlZG9mYVBxZmZjUFY5S3VpcmRzd0VZenR3Nk0vMm1DcWoz?=
- =?utf-8?B?dy9SNFIySVUzbEhvbjF0RktJYVI4dElWMnpKLyt3bVdmMS94cjRIb1RmY1Fs?=
- =?utf-8?B?ZnBJdVlobEFVcml1UVJ6NlRvS1RuRmI1MG9acUJkKy9yeEljSmw4RXluYXVT?=
- =?utf-8?B?bUplNUUzbGhGTGtkNmoydkR4Y29oZ2NqaEVhRzlQR3dpZzNNMFdkYWVtUUlS?=
- =?utf-8?B?Rnk1aWdqcitQK1FFdVpkSVIxOFExUjJDY0RnYzVWTnl0eDBjTWdITFdKc1li?=
- =?utf-8?B?dVB5RUN4VzBOcGxwODA3eVhWVlE0UEQyTWlWV2VYNFpMbUZjUU04eldvNVVp?=
- =?utf-8?B?K0Qxbm9kRzFQN1JUdi9qTFZ4emRPSnVZcXo5SG9YVGI0NU5UQUs1TjRwcFU1?=
- =?utf-8?B?NEVGbjJlZWlDSGRxWkttalFWNDErdUdTTmpLVXh1RlF5aFBhZGpIZWNtWTFo?=
- =?utf-8?B?SDBOTVg5TmVhRVdRQWxWOUdPbXorSTR0VVJzVnN5L2c5SUo1Sk1XeEMybmRm?=
- =?utf-8?B?L0xGcXJ5dis5RExpTWRZWkZXbnV0dkZrSEJSOHBxanFxY3hGQnRDUjZnQUpI?=
- =?utf-8?B?aG52SlNMczdTQUNxblpJd3JtZWk4Q0F4b0FBWDAyWTdEN25taFpkMjh2ckxh?=
- =?utf-8?B?R2lEdTRjdmJVMkpmaHRoZnZycFdIdkxVVGpLa1NJajBUbWRpUTM3L2w5dWxE?=
- =?utf-8?B?czNlYjhUSnNUMjlCT2hXT3Z2aDlTaTNBQXgzM0FVSkU4L0xWeTdHUXlzdmJ2?=
- =?utf-8?B?VGViMEhQQkRqc29LSnRSdDJuYkFvcHBCUG5BMHZpWDhYVFd5OFp4RmZTWFgz?=
- =?utf-8?B?cHk0S0x5Wm9LMWttTU9EK1J5MWpjL0pRaGFsYkZGTyt2M1hTSXRsVnhsN1Rz?=
- =?utf-8?B?YXEvbU96akpNZEZhbk5OaW1ZYjVIakJKTEt3SGlrSEtnL1dtMDdQL3M1QXRU?=
- =?utf-8?B?STVmZTJqVkl2M0wyWFgvNDBqdWJZekpta21BbUZVZWpvRWhQbjlLeHhJeDZs?=
- =?utf-8?B?U3VmN3NDK0toMmhBekdac1ZySEY0dC9sUnlkSUxrZmlQb3U3dWkyMEJqTE16?=
- =?utf-8?B?SXpaQ1FIbGkxSkFxcGF2aER5d0lUWkZ0K0ExR0ZYZDlpZFY4ZjZ4bzFJZ1JQ?=
- =?utf-8?B?bTVZd2xrNXVjZmFCd3B6Q2hlKzNRV0N0Wk55eWhvSnlaa0tScFJXYzBaTzFx?=
- =?utf-8?B?ZUlhaVAyZ1lSb2hoU1JyUDNGM2JlM0lkcnVBbjkwVHFVWVluMEVhMVF1dlA3?=
- =?utf-8?B?VjRLNFFiRVlPVlI5QjZOZWhacnBJSFVyUFlLMW91NHR6WmQ0OGI4SUg1d3FB?=
- =?utf-8?B?cmNqeXJ5Z09FZjNwK0NzZFg2cFJlYWFoZkJCR3JEQmY4TmlGeWpTTVBSSHVM?=
- =?utf-8?B?UDFEMWc1S2lOcWxPZ0ttZWVJVE5mYVZseXUyT2RDRjdKYnVRTTZEZFVpd3dS?=
- =?utf-8?B?eEZVaFg3eWFwUWV0ckVFLzc2ZVVCV2psOVZVbCtnOEpNZ2g3WTdISW5IOEVB?=
- =?utf-8?B?ck1HbDdkdy90WXFwS1NPbFFRaTg2S0ZnTkhwUW5IVEZyOXZxc2R1bWNkTmNP?=
- =?utf-8?B?TCtxWWVoc1NVZXRwYk16cnU2WlhjWTh1aUVudjhHeTFIWDM5dWI1N2hsU3o4?=
- =?utf-8?B?QmF3ZjdJTVp6UG1aM3pDUStUZUxCWStBTFZrbkJQY1RsUUNQbDhzOFhGR3FK?=
- =?utf-8?B?SmZZOHdjdjBUZ0VBWmFGK3BvWWVxQStXL0h0Y2dSTmNYUzhOSFRHbGZBNmdF?=
- =?utf-8?B?eXNUb3d0UzlVcUVVdHV3Rklub25qb1BrQVhuRi9MbFNHN1VzYzYrRU5lcGxt?=
- =?utf-8?B?WUNwZjR3ZS9HYTZRRG1ncG83NThQRjFlWU5ralFybHVvZll5TGxaM3JMZXF3?=
- =?utf-8?B?VTdlK0t3UTdMTGJzV0xmTktEWkxqS3JHVUtkWWtuamRzOGZaTlIyMDNEZTZJ?=
- =?utf-8?B?NytuOHZTYnhmcFU2RlNvNnI4U3paL0hRNHRTN05mc0wrbzRRMWpkd2J5T0Zn?=
- =?utf-8?B?MUt1WkRmSzl2MG9nTWFaSzNHaDFYdUs0WmpRRVc5RDRSbzk1SkM2Q2lPRmNP?=
- =?utf-8?B?TXZQellOYUtMR0tDTGlBUlYzQ3ptMUMycUtVaUxYUXVIbkx3SFZzdz09?=
+	=?utf-8?B?WVFtQXNic3gvUDlSYXJkZGZubTFjdFVMRFpWS0tQUUxUTmpFNDBSTXlKRlIx?=
+ =?utf-8?B?N295MW9JejM1UjhJZklhclNkeVlTa2hMRGRKYUcxYmpSbFB6M2dGdlJVMU1O?=
+ =?utf-8?B?TUZVdkc1cm42SFBIblhNVy9nNHZmVTVzdGRKbXM2TzU3WC9EUE1HN211cXpm?=
+ =?utf-8?B?OFJjT01WUFg3QkJCN3V5dkdrdkFaRHpxOG9pSjJxbHdiME1JUXhDSUZwbWU2?=
+ =?utf-8?B?MVJRRll1VUtwdHFBM293cDJEems1diszb25VYjNIUlJNSGtSMFJjUDdlKytQ?=
+ =?utf-8?B?M3lGNlFtVUY4cTVEOXlvQVNLSTl4QVVERTkwbG9Gc0xlY3h6VlF3aWlxWEtD?=
+ =?utf-8?B?U1ZkY3B0YXF5enBhMUFlaTJUNkF5NVF0NXFZbVhKZFpWK0E0YTlzbG5MTVlS?=
+ =?utf-8?B?QWdKSGdsdjF2S29oVjNWT1pQTDJYTTdzRldJRzh2Mk55T00vdWhLN0hNRXlV?=
+ =?utf-8?B?YlYxdlkyaEtOVWdERXdURkhjTzR5TTNmdTBzMktEbnFKcDB5aTZpL1RubVdD?=
+ =?utf-8?B?d0R4OERWNHphamMxcFJVdFgyWVByQ2JJSEt6L2NtMTFGQkwyeEFUYWxKYUYx?=
+ =?utf-8?B?M0VQb1F0RjV6RFJkNHpEMTd6cWhsVnJnd1JWeTFnUURZNWk3SEFOVmg3QzNt?=
+ =?utf-8?B?R2pCNm8wczAzMnVwZ0pKWk0wM0pyTU9QNVRkYW9yblpjbHdxaEwyVENQZDNV?=
+ =?utf-8?B?aWlPMnlxNnlCbFNvME9IUHlOL2F5T1QzMnllWk1ybHY3NmJiUG50akhoK0RS?=
+ =?utf-8?B?KzkwUEV4N2lKSHJRVFBhUDVkdUZxNXdHemFSRW01MzBMMnVTM0VJNU95bU5M?=
+ =?utf-8?B?WnFUdys4WldmT2NHczNaWDBTNXVKWU14aVV2cVRxdzY5SVF0MjFwc3A1Nnlk?=
+ =?utf-8?B?S0R0MFBWRkdQUGVWTDhrY3ZBdWpQc2owdzFIZVhtVHNNWWNrYlIwb2VBSGto?=
+ =?utf-8?B?c3pNODFFSk9tcUhtMjFWZG9kTjlQc2NZcWsySFp5bkYydzhrZ1ZYbG9iUGFB?=
+ =?utf-8?B?UThMeTV0Y1h0a05iVmZqZ1p5Sm5RYkxyUGFZSTlocWRUcVRuQmJDWEV3bllR?=
+ =?utf-8?B?ejR3YzZKTkJYSlhVbXdydmNLUDJsUkxxTFQ0YVhlSG9zTzRDNnQ2dzZyRTE0?=
+ =?utf-8?B?b1dNd3U1S01OSU1nOW1VMjIwRTNsU2NxSDJ1VlJvaTNYRmh4d0hWMGl0MHZY?=
+ =?utf-8?B?ZE1GUXFOc3laOWhHUVlhdUl5d0l0TXFoZUhSdGRrQkVlTExYdjhEeHRkUzE4?=
+ =?utf-8?B?NjBVSWtWZ2V2OHNLUTAvTSt5YWdJNE0wMU1yRkJCY0kyY2k5alNjdVIzS2No?=
+ =?utf-8?B?WGpJQXdCNVlhU1RlUFpYbEVVMXBtNEc3TGEwc2tieE1ZTkoyNm01UlVtZnlI?=
+ =?utf-8?B?V1hZQ0lTelFmR1MvZXM3eER3Y0xySHZValNTQ1JYamhvczhLS01DYVhmenVQ?=
+ =?utf-8?B?NkdzQitjVXJLdS9kTmlUSWczYW1NdFljZUR3KzFRNTRoWXZhemxQdDVtNDdh?=
+ =?utf-8?B?QWFseEt1RVNteW9SOFdIME1zZmZYMjNTd0Z5Szg5a3lVdHZqM1J3cmlhQ3lD?=
+ =?utf-8?B?ZEJYZ3drZSs4bUZDZlpqVXFuNlB0ZVh6RGw1cWV5OHZlSXZjcDIyd1V2aFRo?=
+ =?utf-8?B?Sm5rdFlSeFNEN2ZidUxuZmYrdTVDUGJmWTVLOElHQmtVQk1xa24rNll1QmZE?=
+ =?utf-8?B?RVZiS1hmYVRLdDA5d3VNR0dmUnpRV0VLa0hPK0pIN1h1aXJNQ2svejFoM2VP?=
+ =?utf-8?B?YzNONkRMUWloaXprK2NMc1FFWkh1SFFnaGZ6UzFPQ0xWU2x6cGtrVUZWaWEv?=
+ =?utf-8?B?RDg0SW01ZndDOUlBenJxbXFWTlZNanhtS1M5YkxBZklqZTlzcFFyd2lBbWZP?=
+ =?utf-8?B?bEdUbDZ2YUNBbmN4L2pQc1BuRjdXa2U4OXhMOEg5c01SYWNtbnFWcXBuWVl0?=
+ =?utf-8?B?OUdqdHhhbzYydWI1QTh5VEV3NWRVa0hlUHRMUEZuaENBMHJTcHk5a3JDSUxF?=
+ =?utf-8?B?U3c0T1p4L1ppZHp0MUFQUVZ6NGJ1S1FQR01tdGpQZjdIZnd1blkzSHVWaTQz?=
+ =?utf-8?B?Q1U2UDJzdGh1djgwNzM2andab2FoRUszaEFZMnFqcW9GSno4QzZuck1ITlkv?=
+ =?utf-8?B?RVJrbVh4MExtMkxJRVZOdXpkYWlUUkJYcFduOXRBdUR3MGU2U2EyaWpCbkpX?=
+ =?utf-8?B?THVmR1lJR1BGQkl1TUlXWmEvenE4RnJsYjdJQ3J2MTdjSjRYREE3RktCRkgz?=
+ =?utf-8?B?NVU2KzJMTU9BamxVMFUxTWVwTXU2eGJ2YjNGN09LTGMvNEVsSUYydWNNQmNC?=
+ =?utf-8?B?cUdwSktWV3BjNlhQT3dlSENBYnUrbjlqTm1rTGw5NUFlNWtYK1BYZz09?=
 X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb0ef11f-41c8-4747-6405-08decd43c0b1
+X-MS-Exchange-CrossTenant-Network-Message-Id: a81ccd92-3a6c-4657-d959-08decd43fceb
 X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 14:13:21.3433
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 14:15:02.3750
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LGpr8v49BJS1CPRuhnL96ZLkMpGNJcb39+0vqcU9FeijWbxGslEnBjxVGCBKCLZMM+RQ4D4PV8K3aqK1BNsuSQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P265MB6005
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q9jnE333t/Ts1wdGc5oantcLT7dJPuhQIELMEkCzUHD7p62voH5p4DMLCv7EXYSjprbsS7EEkGg5HarxPweHqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P265MB2987
 
 On Thu May 21, 2026 at 8:52 AM BST, Alvin Sun wrote:
-> Auto-add `type ThisModule: ::kernel::ModuleMetadata;` as a required
-> associated type on the trait side if not already defined, and
-> auto-insert `type ThisModule =3D crate::LocalModule;` on the impl side
-> if not explicitly provided, eliminating the need to manually declare
-> and implement `ThisModule` in every vtable trait and impl.
+> Change `create_fops()` to accept an owner module pointer instead of
+> hardcoding `null_mut()`, ensuring the kernel correctly tracks the
+> module owning the DRM device's file operations.
 >
 > Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/all/DIMMWHUOLPSH.13JFRHDKDQJGO@garyguo.net
-
 > ---
->  rust/macros/lib.rs    |  6 ++++++
->  rust/macros/vtable.rs | 38 +++++++++++++++++++++++++++++++++++++-
->  2 files changed, 43 insertions(+), 1 deletion(-)
+>  rust/kernel/drm/device.rs  | 3 ++-
+>  rust/kernel/drm/gem/mod.rs | 4 ++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 >
-> diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-> index 2cfd59e0f9e7c..d35e45ea745c0 100644
-> --- a/rust/macros/lib.rs
-> +++ b/rust/macros/lib.rs
-> @@ -176,6 +176,12 @@ pub fn module(input: TokenStream) -> TokenStream {
->  ///
->  /// This macro should not be used when all functions are required.
->  ///
-> +/// Additionally, this macro automatically handles the `ThisModule`
-> +/// associated type: on the trait side, `type ThisModule: ModuleMetadata=
-;`
-> +/// is added as a required associated type if not already defined; on th=
-e
-> +/// impl side, `type ThisModule =3D LocalModule;` is automatically inser=
-ted
-> +/// if not explicitly defined.
-> +///
->  /// # Examples
->  ///
->  /// ```
-> diff --git a/rust/macros/vtable.rs b/rust/macros/vtable.rs
-> index c6510b0c4ea1d..d3d0e9cbd7172 100644
-> --- a/rust/macros/vtable.rs
-> +++ b/rust/macros/vtable.rs
-> @@ -23,6 +23,7 @@
+> diff --git a/rust/kernel/drm/device.rs b/rust/kernel/drm/device.rs
+> index 403fc35353c74..53e44a780ae97 100644
+> --- a/rust/kernel/drm/device.rs
+> +++ b/rust/kernel/drm/device.rs
+> @@ -111,7 +111,8 @@ impl<T: drm::Driver> Device<T> {
+>          fops: &Self::GEM_FOPS,
+>      };
 > =20
->  fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
->      let mut gen_items =3D Vec::new();
-> +    let mut has_this_module =3D false;
-> =20
->      gen_items.push(parse_quote! {
->           /// A marker to prevent implementors from forgetting to use [`#=
-[vtable]`](vtable)
-> @@ -30,6 +31,28 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTra=
-it> {
->           const USE_VTABLE_ATTR: ();
->      });
-> =20
-> +    // Detect existing type ThisModule so we don't add a duplicate.
-> +    for i in &item.items {
-> +        if let TraitItem::Type(type_item) =3D i {
-> +            if type_item.ident =3D=3D "ThisModule" {
-> +                has_this_module =3D true;
-> +            }
-> +        }
-> +    }
-> +
-> +    // Add `type ThisModule: ModuleMetadata` as a required associated ty=
-pe if
-> +    // the trait does not already define it. No default is used because
-> +    // `associated_type_defaults` is unstable (issue #29661).
+> -    const GEM_FOPS: bindings::file_operations =3D drm::gem::create_fops(=
+);
+> +    const GEM_FOPS: bindings::file_operations =3D
+> +        drm::gem::create_fops(<T::ThisModule as crate::ModuleMetadata>::=
+THIS_MODULE.as_ptr());
 
-I don't think this is relevant. What's the sensible default anyway?
+I wonder if the assoc type should just be called `Owner` or `OwnerModule`?
 
-> +    if !has_this_module {
-
-Perhaps just make this an one liner :
-
-    if !item.items.iter().any(|i| matches!(item, TraitItem::Type(t) if t.id=
-ent =3D=3D "ThisModule")) {
-
-> +        gen_items.push(parse_quote! {
-> +            /// The module implementing this vtable trait.
-> +            ///
-> +            /// Automatically set to `crate::LocalModule` by the `#[vtab=
-le]`
-> +            /// impl macro.
-> +            type ThisModule: ::kernel::ModuleMetadata;
-> +        });
-> +    }
-> +
->      for item in &item.items {
->          if let TraitItem::Fn(fn_item) =3D item {
->              let name =3D &fn_item.sig.ident;
-> @@ -58,18 +81,31 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTr=
-ait> {
->  fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
->      let mut gen_items =3D Vec::new();
->      let mut defined_consts =3D HashSet::new();
-> +    let mut defined_types =3D HashSet::new();
-
-I'd just rename `defined_consts` to `defined_items` to reuse the same set a=
-s
-there cannot be assoc items with same name anyway.
-
-Best,
+Best.
 Gary
 
 > =20
-> -    // Iterate over all user-defined constants to gather any possible ex=
-plicit overrides.
-> +    // Iterate over all user-defined constants and types to gather any p=
-ossible explicit overrides.
->      for item in &item.items {
->          if let ImplItem::Const(const_item) =3D item {
->              defined_consts.insert(const_item.ident.clone());
->          }
-> +        if let ImplItem::Type(type_item) =3D item {
-> +            defined_types.insert(type_item.ident.clone());
-> +        }
->      }
+>      /// Create a new `drm::Device` for a `drm::Driver`.
+>      pub fn new(dev: &device::Device, data: impl PinInit<T::Data, Error>)=
+ -> Result<ARef<Self>> {
+> diff --git a/rust/kernel/drm/gem/mod.rs b/rust/kernel/drm/gem/mod.rs
+> index 01b5bd47a3332..9a203efc59116 100644
+> --- a/rust/kernel/drm/gem/mod.rs
+> +++ b/rust/kernel/drm/gem/mod.rs
+> @@ -357,10 +357,10 @@ impl<T: DriverObject> AllocImpl for Object<T> {
+>      };
+>  }
 > =20
->      gen_items.push(parse_quote! {
->          const USE_VTABLE_ATTR: () =3D ();
->      });
+> -pub(super) const fn create_fops() -> bindings::file_operations {
+> +pub(super) const fn create_fops(owner: *mut bindings::module) -> binding=
+s::file_operations {
+>      let mut fops: bindings::file_operations =3D pin_init::zeroed();
 > =20
-> +    // Auto-insert `type ThisModule =3D crate::LocalModule` if not expli=
-citly defined.
-> +    // `crate::LocalModule` resolves to the real module type (via `modul=
-e!`) or a
-> +    // dummy fallback in non-module contexts (e.g., doctests).
-> +    if !defined_types.contains(&parse_quote!(ThisModule)) {
-> +        gen_items.push(parse_quote! {
-> +            type ThisModule =3D crate::LocalModule;
-> +        });
-> +    }
-> +
->      for item in &item.items {
->          if let ImplItem::Fn(fn_item) =3D item {
->              let name =3D &fn_item.sig.ident;
+> -    fops.owner =3D core::ptr::null_mut();
+> +    fops.owner =3D owner;
+>      fops.open =3D Some(bindings::drm_open);
+>      fops.release =3D Some(bindings::drm_release);
+>      fops.unlocked_ioctl =3D Some(bindings::drm_ioctl);
 
 
