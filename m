@@ -1,256 +1,244 @@
-Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022099.outbound.protection.outlook.com [52.101.96.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FD82DC357;
-	Thu, 18 Jun 2026 14:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792200; cv=fail; b=dF5xgpOEE5dwEa5rRL/lgH7UjYbHD3bUCSAIWTjdwj71Kfl2EWVeD+8/t38fliP6jNNHBQDe+C2I2CcEt3K5iE6OMv2CUJFYIpBXliiOCmUl8AGpZIOzZP0teKtALtEhc6gjl2MiEzi3eMh5++5ZPUCaG7l1FubfQZo+VPV9siw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792200; c=relaxed/simple;
-	bh=gXpahiYrAvSbHlul9RMNau2lvObXbfnQQ4/zNx6t0G8=;
-	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
-	 In-Reply-To:MIME-Version; b=PI3UP8beU/zIprE5vrH1AGxZkA/V13Z5L6iSpcA2YTOrAULANEaZ9nmKcMPwBJltsHuiDScrU/o9DydlXH1uMGoxJXfvD4gFXjFAu2bnPCV2UunalXqhYbKOx1YGVP6ee3auKJwd3ghltSmtt4E4Q81vpnb1OqcsSzGpR2MaTDk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=BeVYaam4; arc=fail smtp.client-ip=52.101.96.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC6F35B634
+	for <linux-block@vger.kernel.org>; Thu, 18 Jun 2026 14:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781792789; cv=none; b=hUhEViXVmZvrYGq/oiZsK+bjQUpIi2+SgjZdt7ZzREQHUfkSmVcWW8QPavd5bEt9xj6r9EW1gj+jhQGuKeh/qyLepiF3yz+ikIstFh/Hbb1HfIB9fHIyxEf5+gYINpHcM19bZMJUXTLel0opfsuW+BSbeW4m4sMxWjrJ5JWyjm8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781792789; c=relaxed/simple;
+	bh=LzFQs2MHTaHygI4LlY5jt51rIpLHsgVp9C3UrBa7sF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XMQ47eSTzt9Deg730Nqm6Npwe5Em6g4zUCuE2Xmf7d3RyfTRtnYUISYDargpaAm4ZDQpwc52ACgS88q3ju00ci/TPsZqtuC/21L1XGQrNcZSooG7TqRdM6NdpdOhf8hO934kzO12h/3D1116Lf8rE0ii2LrLCwyh4V5Cztuy8i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=E7w7aSgO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FPZ6cOcJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Vf/L7LMb; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NzDkm8dm; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="BeVYaam4"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wvl5pUc5EKFl4KihIE3elBFOiNT9QcZyznmyE2lvTMNpYm6lCDeUGAjFHFXd7strBBudcMkD5TbCJIrmTkCjED4qVXP5MrIAHNa+KiRtM6Ep0jXqlXeqKicuUm6c7dmVyqlUN1274kL2lEyOoQ4iTVQhv68FPNCehpWU+2NGmDA5zDGUKWh+/iZkyywwJBhGbZ0UUsQM2St9qlvI+g7WIjHzRtKLShqeAnOOjiYOYsB0T8QjM/egpXZmY/ta5t+KhGUvVglnv5m0yRK2u+JYOnv3s3toZTn+h6AbJolRAPD21iikKcV7ICsvVvrBd/hDZSF306yueLTEaCVNztk6EQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0NV8qzjTkCssO5bL3QcVxXD14lOzn5n/4d2bA+89Fv0=;
- b=N61F6cY6Zg33gewXNS1U+tPRc3jOpDtF8AejjWo+75tAbV1jF1Z0bGDjtdQ+iroz4uC23w6CQDU2WSdy74fDzMQzp/9OJKOB+O3pOboMuw2bq86fugm8dGK58TTCiR3ePBuzXtENTjsOrj9A9ElRFfe/k/48HKJPNunYuLJdXrbWYlT3S1heYxY6qq3XSGOhAUCsWJ1TKSzpw56YGiNsdVV/wt/L5LFQwXoAZorAk5vPti3cFVE6h7Q2OpeEbUSXY/EAb1CTd9JYEWwpnRnFoFVD7GPy7wMO7uABsFYpso8G8AEZNLvKH+ALvF9+kxbCXVzJOSvl78rP8vniEmpdxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0NV8qzjTkCssO5bL3QcVxXD14lOzn5n/4d2bA+89Fv0=;
- b=BeVYaam4blH0M2GvWgeRUK3M7wUBQYbsW9BZbpSHszMoRyJVRxblVfjUub5ZPJAToxIbxNfSlHiq2PhkHEcptsELTYjRp/x9D66tSHr6NmTX5OVJblmvrPDE2qZwAvs4mi0dvQE0F+cvP5zq/6CiWE/COnHc2KpFN2Sk1Th24fo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CW1P265MB7964.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:212::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.13; Thu, 18 Jun
- 2026 14:16:35 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
- 14:16:35 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 18 Jun 2026 15:16:34 +0100
-Message-Id: <DJC8MA4TZ9RE.3T3VXZU2USSJG@garyguo.net>
-Subject: Re: [PATCH v2 1/7] rust: module: add `THIS_MODULE` const to
- `ModuleMetadata` trait
-From: "Gary Guo" <gary@garyguo.net>
-To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
- "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
- Krummrich" <dakr@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
- Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
- Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
- Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>
-X-Mailer: aerc 0.21.0
-References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
- <20260521-fix-fops-owner-v2-1-fd99079c5a04@linux.dev>
-In-Reply-To: <20260521-fix-fops-owner-v2-1-fd99079c5a04@linux.dev>
-X-ClientProxiedBy: LO4P265CA0088.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2bc::7) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="E7w7aSgO";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FPZ6cOcJ";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Vf/L7LMb";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NzDkm8dm"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B506075F38;
+	Thu, 18 Jun 2026 14:26:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1781792786; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3nBTSAFLZWoC3PysnA6b/+hH4FfP0bc0bS97qROFMb8=;
+	b=E7w7aSgOtnaguNa6ZwxnpBPFQ0TaVIrJaFzZVTGai7Q1GKhXenyWr3t8unofUv6n/drpWE
+	hfrRS3HNjUlssOgJwMk6WfD6MTz4jhQFFbHQ2zYszvxh7zCaIHj+u7GFhqIjfT5yCSp6cT
+	hQdpypD6EL0q7XI5bSh0SG8X/rblIVw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1781792786;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3nBTSAFLZWoC3PysnA6b/+hH4FfP0bc0bS97qROFMb8=;
+	b=FPZ6cOcJx+gQ7DSm9rs8s+aUM9o6TPbqz39QQ+O7BCfMQy1/WTjh+sj7KZIF+L96tMMOQL
+	hwt3RgDXsWCuWOAg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="Vf/L7LMb";
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=NzDkm8dm
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1781792784; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3nBTSAFLZWoC3PysnA6b/+hH4FfP0bc0bS97qROFMb8=;
+	b=Vf/L7LMbhvTW2oePUbEbyqRzRV04eTxzyl5caEyrIU6vfwOjNHy+OKRAg+wa2BP56VDyun
+	0vlxQcnJYF3+53do3m6jQmQEfB6Kup8qptVHtw9B+SCIZnCs3pnFeNjw/8MBxWE9D3ej5n
+	eT/yKsOz4BvxF/DrE4gRDyjXLRGgno4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1781792784;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3nBTSAFLZWoC3PysnA6b/+hH4FfP0bc0bS97qROFMb8=;
+	b=NzDkm8dmm333GNGV25Mbtkg3oogOcD4Nmk+3zdfhFyaEaa5j1ytPFdMlKloNBXZWf7UCNG
+	xp96Y/Bo2n90UODw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9BF61779A8;
+	Thu, 18 Jun 2026 14:26:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Wu8KJhAANGpdGgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 18 Jun 2026 14:26:24 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 37368A12D9; Thu, 18 Jun 2026 16:26:09 +0200 (CEST)
+Date: Thu, 18 Jun 2026 16:26:09 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, 
+	Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, 
+	Carlos Maiolino <cem@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
+ infrastructure
+Message-ID: <4jtsjd2sbsn2w7fzfwb7wwowz72r4kc6345ckkkcjoxjbbwjwn@rkl44x3o3sgy>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
+ <agq2KRd8RkP1TAf5@infradead.org>
+ <ea1fa305-3ba2-4cfd-b7cb-86875032a300@columbia.edu>
+ <ahPbaSEoNA755Nt3@infradead.org>
+ <f1b8eeb6-2397-4f48-a21a-a023eb0c80ab@columbia.edu>
+ <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
+ <ahbq0RdUyLIPiItB@infradead.org>
+ <80cb53f3-e7e5-4f96-bacc-f9fb7661d976@columbia.edu>
+ <cuyklvhnt37xwk3jlr2iyyxxkzvt4bsf5iqv2gag4ixdicnbk2@rfqgjlclwesz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CW1P265MB7964:EE_
-X-MS-Office365-Filtering-Correlation-Id: 780213c6-6026-4f46-c6d7-08decd443462
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|10070799003|366016|1800799024|376014|7416014|56012099006|5023799004|6133799003|22082099003|18002099003|4143699003|921020;
-X-Microsoft-Antispam-Message-Info:
-	nyrRYueL/GrSX3mgvXbn13vASDy9GB+vxeI+gIlWJWSuzE21yzW6mXcN8miJTs0NFz4s5/NnqfCGkMbnHhUEBakckltX3cXtNhOeXvsQcFg83kOWb/8rdUBDtpwxcRkN5JHyNJjdK8gW8jbKCXkBuQxQCDG/onUNaB5xfNgAK3wgY4W8rLgaaGKpSwATamr6OQhNlR8JoqZTPk4m315QllsWZXofXxUS5+t/ADSYBJLnWFH5j3mG5edv2+Z1qFLjPGdz/lKDaXQCLw0kEhYwBNAJ0tgUgjlq3ufrafP162onmKJP4qw3oGMXRTLKIFykLMIEGYQLh5PYwS01mM41QCvMRpc6OSXfyUmw8ToT+NEoeeOmff5d1CclQiL2cuQ/R9iLty0/qWkMFZNN27NFn6CjYZBC35kIKyiuBWNeAFywpR/3Nvf0gSx+xbJEvMUsOfVtB5PjefhqtoKeH5VyrMD1ZqlbfZ15aLkoT9rdT1KZl2+oScKjC08dt9s7gKOjRP4QZElpCrKCv59U786Yh7kDF7IU4+U4jMb2wtNCMu+OzwmyM9dd45EFGWvvvClpucKtlxrTReeLiTShR7sWN22onyDHmtNhldmVKgf4jamnZFVG5gBsNOOWw0YJfik3MrUu1CNQF5F0/evcCVSRCY7sGuPK4MSKoUx1WP0meVYNTJrEhJGSfTktCzp8xY6QHSPezcYcqsk1n2lhn1Gjb0xefW4oeayhbnk+mbjou40=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(10070799003)(366016)(1800799024)(376014)(7416014)(56012099006)(5023799004)(6133799003)(22082099003)(18002099003)(4143699003)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M3dxUGkzVHZ3R3pxTnkyY2JFeDdzMTVoYUxONE5ORkp0b29ZUVRtTUhnTlRh?=
- =?utf-8?B?bWNyc3Zaa1d4bzlKTjN2akR6TGt1VUJrR1k0L1ZoOGVzYXpxSFRyMG1VQ3I1?=
- =?utf-8?B?c1NFSExBZFNUZ0R5bXg2V1RuRlBwZUp2dEtXMTd3WmdzSysxVmhBaFNVWEk1?=
- =?utf-8?B?OVh4eldrRndqdVRMYS9xMTJLU3Zqc1lkMjF6SWxmNUJHeXByaU1HWlF2VUFv?=
- =?utf-8?B?cW1mc0YrQkVsbnRJekdoMCt6N0gwZW4xc3JTdVk2ZHhBRi9SSzVKdEdralpH?=
- =?utf-8?B?d1hCOEpLV2VTbng3Vi9wZERyb092aFp4eEdQclRBMGJiQUNEYmpVdFVjclQv?=
- =?utf-8?B?d25ZaWNSU1dsVWZiOERvSjdxcnZ0eFA4RGRuSnR0eWsyOGxZQUY4Mk9uWkEx?=
- =?utf-8?B?czNmcFNWUUppL285SGdHamhYZEtHSVd0Zm44VE9QQWdUeE1PVTEzcks3RElO?=
- =?utf-8?B?aVlsSW1BbTh1QXRrOStzZ0kvM00wU0pzMGM5WXJIZUwrcnpjNzlzMjNhYzFp?=
- =?utf-8?B?aHFBMWlKZzFlSnVqaENCeXBobGRjRnFvQTlmTFZSc2FqTHgxSkVFcjV5ZGVx?=
- =?utf-8?B?QTEvSlJRWFY4bVg4b01BOHJ5UzFjKzhuSzkvdnRJUkVvOXpLMmVpVHhGNEs2?=
- =?utf-8?B?V0ZDUFpzODdQYkEvd1MvaG9lbEtqUEg3cTZuOWVvMFVRczFIKzU4djlONDIz?=
- =?utf-8?B?Qng4ZFpDTE0vdU9McHJuSHhSRmxITmdweE5TTEd4MWc4a1VCVkJBczh4NnY1?=
- =?utf-8?B?TFhGeWNVRFpSY2xKNkY0WGVjYWZhUnRlZThSUHFDcWdjQ25yQmg5OEZuVmZj?=
- =?utf-8?B?dGdGK2ZRd1N0S0NxSHJLUUdDYTBlM0g1SDBoYTJpY2hYT1p0YlpvMkJGQzln?=
- =?utf-8?B?a1J4aXk0Rk9JRkJDNnFnWkR2V3pHWmhIZ2FGS3ZUbTIvSE9OWUlwV3VFSFFB?=
- =?utf-8?B?aG9samI0THZXOENZMUpueFB3c0FIMXg0ekJlOENsa1NwQWMzRXZxQit5UFBp?=
- =?utf-8?B?bFBaTGFQRnRKUnFyTVVBa2pqWHNmNXoxZzUrS3YyNHlBZHlNeXRQVnRlZVps?=
- =?utf-8?B?UFRhRmdhSVZ2ZWFlczJpdDZNZTVsZ3R0eEd0OHl2SzBZY3UxRlVPck5kTWdR?=
- =?utf-8?B?VEdRNmN4ajJleG1jRmo0WjJuZ2JUT3hvZTRSZ3Y0K2hMOFk0WmV0TVI3bmxC?=
- =?utf-8?B?QmNrVG42T240ajNEWmJvSGV3MXpvRVR1Y0MvVkhseWIzL214RXhjRjl3NzE5?=
- =?utf-8?B?OHE3aURrUlkrNXY4Y0E2UlZsSEthSWRVMlRVS0RKY2lNVUZ2TlNOanBSYVc4?=
- =?utf-8?B?QUxyd3NOVEh0N3dzSFpEWkJacm9uT3lBZW1tTDNOaTY1eTZ2M2dkazQwK1Vi?=
- =?utf-8?B?UHhZWWxqK0RkL2tndmgybThpT3hURG5Nb0laakdTYVpwcno1M0NhYngrZVVL?=
- =?utf-8?B?VDJRcVhROTcwK0JWbzBCb251SVVLTUh5K3YvMWZqQ0xtS1dJVEpuN2hLeUQ2?=
- =?utf-8?B?MGZCM0dIRFBXNmZrMWdqbWJSeFFsaHFFcmNPNTh6Q0RrN3ZTQTRCZzQ5UHVJ?=
- =?utf-8?B?Q3RtRjJmYWM1TEd2c040cWpHQVlsTW5EU0diblU2TStZYmt6ZDhGRDFiODFU?=
- =?utf-8?B?RTNzRVNhWUNpTkVxdWN0VkVDRFpvSytPdWVNSTJQZG5MYitDd0N2NkZhVFRM?=
- =?utf-8?B?K2FBTFY2ZkJ3YnBtUnFMeGR3SDdTT1pEcDBPVFRrVzZjcEQvY3NlVlRQNmND?=
- =?utf-8?B?SGtvM0ZsM2wvb2RrZUVWb084d2VKbHN3bzFORzkrL0JJVzd0VHI5ZDdWRE9u?=
- =?utf-8?B?cXpXM0VaSENGeXNON1BIY3BkRENGcU9abHJPM3lycnRGMXczdFVzUVVUMzM0?=
- =?utf-8?B?WTBEYzU0T2VUMk5Ia3BwY3BZVXJwM2J2RTBmcHFNVS8zWkJ1YU9KdU0zcldw?=
- =?utf-8?B?Y1RwZWxVdnlmL1JhY1hadTh3bUtMVU9lK3FoR0F0OTJMaGVhWUEzU3h4Q2Fq?=
- =?utf-8?B?aTRiK1ZHUEpMYVE0NDQrQmF3RUc5cG4yRTdDaDVjMndLWE95bENISXRqaTRr?=
- =?utf-8?B?clZqWUwyUXRnNDJjMDNjYlRFSXo1L2tFeXFianRUTkxKQ3ArK2hHVnBTRkxq?=
- =?utf-8?B?SFdCVGUwMTIvU1hGcy9NbkdMZjJZdVIrVGlQVktsRXUvQ0RhTEhDY3o4N2dh?=
- =?utf-8?B?UVhqeFpBTlAvdFB6ZGhzTzE1Vi90OVZZRk5YbkJRYm5wTUUwd2pSQSswa3Y5?=
- =?utf-8?B?WXV2VlZkZmJKMEUySnh1TS95ZkZ3b0E2eG5zenNhQ25odnRpbHV2Y1hhb3dh?=
- =?utf-8?B?SzlKd2xaMjA4K09CRUQ5U0NCVUxsa0owMjd0QTBHb0Z1WVZVQXV1QT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 780213c6-6026-4f46-c6d7-08decd443462
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 14:16:35.4442
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TK4wFivKppD5lQbLCgRbLGD6XMveQrxlgnzMc096w5byiO5OCyZFSZPRuh0T0NqAyzCvNM32vIaB8gLOoaXtdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB7964
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cuyklvhnt37xwk3jlr2iyyxxkzvt4bsf5iqv2gag4ixdicnbk2@rfqgjlclwesz>
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: B506075F38
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-On Thu May 21, 2026 at 8:52 AM BST, Alvin Sun wrote:
-> Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that
-> modules can provide their `ThisModule` pointer usable in const
-> contexts such as static file_operations.
->
-> Move the `THIS_MODULE` static from the `module!` macro into the
-> `ModuleMetadata` impl, and update `__init` to use
-> `LocalModule::THIS_MODULE` instead.
+On Mon 01-06-26 13:04:41, Jan Kara wrote:
+> On Fri 29-05-26 16:46:15, Tal Zussman wrote:
+> > On 5/27/26 9:00 AM, Christoph Hellwig wrote:
+> > > On Wed, May 27, 2026 at 11:42:28AM +0200, Jan Kara wrote:
+> > >> > I ran some experiments with fio on both XFS and a raw block device. Five
+> > >> > iterations each for 60s. Results below.
+> > >> > 
+> > >> > TLDR: Removing the delay doesn't significantly decrease user-visible
+> > >> > latency or otherwise improve performance, but does significantly reduce
+> > >> > throughput and increase context switches in some workloads (e.g. C).
+> > >> > I think it makes sense to leave the delay as-is. Thoughts?
+> > >> 
+> > >> Thanks for the test! One question below:
+> > > 
+> > > Thanks from me as well!
+> > > 
+> > >> 
+> > >> > Results:
+> > >> > 
+> > >> > Workloads (all `uncached=1`):
+> > >> >   A: rw=write     bs=128k iodepth=1   ioengine=pvsync2     # XFS
+> > >> >   B: rw=write     bs=128k iodepth=128 ioengine=io_uring    # XFS
+> > >> >   C: rw=randwrite bs=4k   iodepth=32  ioengine=io_uring    # XFS
+> > >> >   D: rw=rw 50/50  bs=64k  iodepth=32  ioengine=io_uring    # XFS
+> > >> >   E: rw=write     bs=128k iodepth=128 ioengine=io_uring    # raw /dev/nvmeXn1
+> > >> >   F: rw=write     bs=128k iodepth=128 numjobs=4
+> > >> >      + vm.dirty_bytes=64MB, vm.dirty_background_bytes=32MB # XFS
+> > >> > 
+> > >> > Mean ± stddev across 5 iterations:
+> > >> > 
+> > >> >     metric                     delay=1           delay=0     delta
+> > >> >     --------------------------------------------------------------
+> > >> > 
+> > >> >   A seq 128k qd1
+> > >> >     BW (MB/s)                4333 ± 27         4374 ± 34     +0.9%
+> > >> >     p99   (us)              36.2 ± 0.8        35.8 ± 0.4     -1.1%
+> > >> >     p999  (us)               3260 ± 75         3228 ± 29     -1.0%
+> > >> >     ctx-switches          184 k ± 59 k     3.68 M ± 65 k    +1903%
+> > >> >     cs / io                0.09 ± 0.03       1.86 ± 0.03    +1888%
+> > >> >     avg bios/run            80.4 ± 0.6         1.1 ± 0.0    -98.7%
+> > >> 
+> > >> So 1 jiffie delay is (with default HZ=1000) 1ms. That means for this load
+> > >> the completion latency should be at least 1000us but your results show p99
+> > >> latency of 36. What am I missing?
+> > > 
+> > > Yes, this looks a bit odd.  Unless there's multiple threads submitting
+> > > and somehow the completions get batched this should complete one
+> > > bio at a time and be the worst case for the delay scheme.
+> > 
+> > Sorry, I should've clarified - the latency here is the userspace-visible
+> > I/O completion latency (i.e. fio's clat value).
+> > 
+> > I ran again and traced to get the actual time from __bio_complete_in_task()
+> > to calling ->bi_end_io(). The results match the 1 jiffie delay now:
+> > 
+> >   metric                  delay=1  delay=0
+> > 
+> >   A seq 128k qd1
+> >     fio clat p99             38us     36us
+> >     bio cb p50             1.23ms    2.5us
+> >     bio cb p99             4.13ms   1.44ms
+> >     bio cb p999            5.01ms   2.63ms
+> 
+> So I'm clearly missing something fundamental as I don't see how can fio
+> reported IO completion time be lower than the end_io callback latency...
+> Ahh, it is the strange meaning of clat in fio in combination with sync
+> engine where clat means: "how long after the syscall has returned the data
+> is ready". Which for sync engine is immediately so the clat number is
+> meaningless. I think reporting 'lat' numbers from fio would make more
+> sense but whatever.
+> 
+> The bio cb latency indeed looks like what I'd roughly expect now. And
+> notice how the median latency of IO completion is 1.23ms in delay=1 case
+> and your throughput isn't abbysmal only because writes end up accumulating
+> in the page cache and writeback infrastructure ends up submitting a lot of
+> writeback IOs in parallel (you have ~80 bios to complete per run which
+> amortizes the latency to decent level).
+> 
+> However if you'd have IO that were to use BIO_COMPLETE_IN_TASK
+> infrastructure which doesn't have so many IOs in flight (like direct IO
+> with lower queue depth which has to do extent conversion on completion),
+> you would very much see the latency hit on your throughput as well. In the
+> extreme case of qd=1 direct IO you'd reduce the throughput to ~4MB/s.
+> 
+> Now I'm not saying the delay is bad - it is a tradeoff with clear wins in
+> CPU overhead your benchmarks are showing. I just wanted to point out
+> there's also the cost side which your benchmarks don't show very clearly.
+> So we might need to keep some stats showing how many IO completions we are
+> offloading per second on each CPU and switch to delaying the work only once
+> it crosses a threshold like 1000000/HZ per second or so (so we at most
+> double the IO latency by delaying the end_io callback).
 
-Perhaps you could mention that this is made possible by const_refs_to_stati=
-c
-which is stable since the MSRV bump.
+Any progress here? The patchset looks really promising so I'd love to have
+it completed :)
 
-Best,
-Gary
-
->
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-> ---
->  rust/kernel/lib.rs    |  3 +++
->  rust/macros/module.rs | 34 +++++++++++++++++-----------------
->  2 files changed, 20 insertions(+), 17 deletions(-)
->
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index b72b2fbe046d6..f0cf0705d9697 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -184,6 +184,9 @@ fn init(module: &'static ThisModule) -> impl pin_init=
-::PinInit<Self, error::Erro
->  pub trait ModuleMetadata {
->      /// The name of the module as specified in the `module!` macro.
->      const NAME: &'static crate::str::CStr;
-> +
-> +    /// The module's `THIS_MODULE` pointer.
-> +    const THIS_MODULE: ThisModule;
->  }
-> =20
->  /// Equivalent to `THIS_MODULE` in the C API.
-> diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-> index 06c18e2075083..b6d7b3299fbf9 100644
-> --- a/rust/macros/module.rs
-> +++ b/rust/macros/module.rs
-> @@ -497,28 +497,28 @@ pub(crate) fn module(info: ModuleInfo) -> Result<To=
-kenStream> {
->          /// Used by the printing macros, e.g. [`info!`].
->          const __LOG_PREFIX: &[u8] =3D #name_cstr.to_bytes_with_nul();
-> =20
-> -        // SAFETY: `__this_module` is constructed by the kernel at load =
-time and will not be
-> -        // freed until the module is unloaded.
-> -        #[cfg(MODULE)]
-> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> -            extern "C" {
-> -                static __this_module: ::kernel::types::Opaque<::kernel::=
-bindings::module>;
-> -            };
-> -
-> -            ::kernel::ThisModule::from_ptr(__this_module.get())
-> -        };
-> -
-> -        #[cfg(not(MODULE))]
-> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> -            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-> -        };
-> -
->          /// The `LocalModule` type is the type of the module created by =
-`module!`,
->          /// `module_pci_driver!`, `module_platform_driver!`, etc.
->          type LocalModule =3D #type_;
-> =20
->          impl ::kernel::ModuleMetadata for #type_ {
->              const NAME: &'static ::kernel::str::CStr =3D #name_cstr;
-> +
-> +            #[cfg(MODULE)]
-> +            const THIS_MODULE: ::kernel::ThisModule =3D {
-> +                extern "C" {
-> +                    static __this_module: ::kernel::types::Opaque<::kern=
-el::bindings::module>;
-> +                }
-> +
-> +                // SAFETY: `__this_module` is constructed by the kernel =
-at load time
-> +                // and lives until the module is unloaded.
-> +                unsafe { ::kernel::ThisModule::from_ptr(__this_module.ge=
-t()) }
-> +            };
-> +
-> +            #[cfg(not(MODULE))]
-> +            const THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> +                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-> +            };
->          }
-> =20
->          // Double nested modules, since then nobody can access the publi=
-c items inside.
-> @@ -616,7 +616,7 @@ pub extern "C" fn #ident_exit() {
->                  /// This function must only be called once.
->                  unsafe fn __init() -> ::kernel::ffi::c_int {
->                      let initer =3D <super::super::LocalModule as ::kerne=
-l::InPlaceModule>::init(
-> -                        &super::super::THIS_MODULE
-> +                        &<super::super::LocalModule as ::kernel::ModuleM=
-etadata>::THIS_MODULE
->                      );
->                      // SAFETY: No data race, since `__MOD` can only be a=
-ccessed by this module
->                      // and there only `__init` and `__exit` access it. T=
-hese functions are only
-
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
