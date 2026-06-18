@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170CD3E9588;
-	Thu, 18 Jun 2026 12:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58D0231835;
+	Thu, 18 Jun 2026 12:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781785107; cv=none; b=uxzCeX/Zj/ixhgzSzb6epBTRtGsvDAizK2EFZ615smm1408ijg3QAT465vc5UM6nFovHhuSmKzbbaucqNYrqV4ZuruEDlLT5F1jqJDz1niVk3qh+7fCk6TbID0P+eRkb7ByI9hZQ7dkXJRJlOAYyUIoqiCJykm4x4sOx/gfjXas=
+	t=1781785114; cv=none; b=dkWT4ypN9wTpOuVJ/j2cWjUTp4RmJemzI9D0niRmlUUL8MKM0iZdBxp55G5lf6mrIEJ0BA/tG8mqoaa85IQ4QMCK5vRskVfuKFfu+DVwpbHMYjPmWaOkojIVdyGet1aUEjm+sy8NjX2Qy/JUGOIgeMWoqUsey7t4ts6QR5s3G6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781785107; c=relaxed/simple;
-	bh=/IMHFCTpEmbT0Ogk1LeIliz7VqNHiat4WqgNfPhAoMk=;
+	s=arc-20240116; t=1781785114; c=relaxed/simple;
+	bh=YbjCMA5TYkGRYIkU4h3+DQu1gNQFqhtJ5eNZoJIb5jY=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JNTlX/kst3J37Sp4XXUMYB1yqGHOgz0cuwatW15AWI0eAVGi+OVHqBLBdLI6nKfk+pRD1myvbs4ZErecEVhGdwU/0DwdO2ML6tuYFkWPxk869nEx30aSfkCuTEzivTDh06G9Z1vQSxe3fSXThF2JiB78xVz8YQqJI97v/LXUVww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2Sk2fni; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=PFq1/EauXwV3N48tiBMhKbdj0zQD4Ba9rGKHdMkhavdXoE1x8YlUXfUaRd7lEX9dQ9xU7IqOBwKGb3+sVo3kp5ZVjtmq2HoPfYhLYDfdIRMUU59QsKWT5k6goe3V6aEdA1RtsNegUEtQuMPhuseZpsveZRTj58I2M21kbK6XxZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+R6G+9O; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2Sk2fni"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE0D81F000E9;
-	Thu, 18 Jun 2026 12:18:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+R6G+9O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E60BE1F00A3A;
+	Thu, 18 Jun 2026 12:18:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781785106;
-	bh=/IMHFCTpEmbT0Ogk1LeIliz7VqNHiat4WqgNfPhAoMk=;
+	s=k20260515; t=1781785113;
+	bh=YbjCMA5TYkGRYIkU4h3+DQu1gNQFqhtJ5eNZoJIb5jY=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=U2Sk2fnigIIfCCreUea8OkXmiOdd5RIh66lLcOJcr/59X6/gAuq+RJwoA4CokLAS6
-	 b5wtJWgQB4IibAdeZh9tM95pttJYCc71yKnIh1xj5mA49uxJhGrVcBBVnTG/SdmdMd
-	 gLmnUDVKG7cfWL1wNLXP3iZSyo5q1urY0GN1JXC0V1LY74iQiyXtq4DhZ1VhZqjsb/
-	 II9LC0+wBVMdxCWEEFehp3uCRdMEf7eBb1n33QiHnGXcbxyMYMSZ1ZGXuj9a7p7Lqv
-	 s8DwSiV1yYg+n/I7ElpP7FJOqbayB0FQ9M38f3pF06U3wiQmvZDUgFMl975kDRVPWk
-	 xOXY+DDSlpyHA==
+	b=S+R6G+9OqC99ywOs6Z0hxuK2gGg6+ZqiWW4BbjjEPMETtj24mm6d8y/5TsOVSa8S4
+	 cvOPHRHEmmE7+frePgq0EvAdssTNa/7p2NRLmsvjPSGTPvf/zGQMG+aN7prLm1moYV
+	 ezHedjpEmx48pZE6ECeWnYgjGu22C9iUGrxjsBgKSBqs4Zv3HqEwrxSGdcVrPrHgib
+	 Ozqk5f2wdmzl9SQp58kOvZPjpcmA9kdRPH1qKXzwYvl041soJrFrqCFlWfRg3Tvypz
+	 9sXJ/P5QbmgcaRgI+iewfts7F+N9MbyTJDlQjVoJRV3dJhshyIVuhkcCbfrEXzqytx
+	 aKvQME2MUMCLg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Alvin Sun <alvin.sun@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, Boqun
  Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6r?=
@@ -46,12 +46,13 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
  kunit-dev@googlegroups.com, linux-block@vger.kernel.org, Alvin Sun
  <alvin.sun@linux.dev>
-Subject: Re: [PATCH v2 7/7] block: rnull: use `LocalModule` for `THIS_MODULE`
-In-Reply-To: <20260521-fix-fops-owner-v2-7-fd99079c5a04@linux.dev>
+Subject: Re: [PATCH v2 3/7] rust: doctest: add LocalModule fallback for
+ #[vtable] ThisModule
+In-Reply-To: <20260521-fix-fops-owner-v2-3-fd99079c5a04@linux.dev>
 References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
- <20260521-fix-fops-owner-v2-7-fd99079c5a04@linux.dev>
-Date: Thu, 18 Jun 2026 14:17:53 +0200
-Message-ID: <87cxxof3f2.fsf@t14s.mail-host-address-is-not-set>
+ <20260521-fix-fops-owner-v2-3-fd99079c5a04@linux.dev>
+Date: Thu, 18 Jun 2026 14:13:41 +0200
+Message-ID: <87fr2kf3m2.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,17 +63,17 @@ Content-Type: text/plain
 
 Alvin Sun <alvin.sun@linux.dev> writes:
 
-> Replace the `THIS_MODULE` import with `LocalModule` from the crate,
-> consistent with the move of `THIS_MODULE` into the `ModuleMetadata`
-> trait.
+> Add a `LocalModule` struct with a null-pointer `ModuleMetadata` impl
+> in the doctest harness, so that `crate::LocalModule` (auto-inserted
+> by `#[vtable]`) resolves correctly when there is no `module!` macro.
 >
 > Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 
-You need to squash this with the previous patch.
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 
+Does this need to be ordered before the vtable auto insert in the patch series?
 
 Best regards,
 Andreas Hindborg
-
 
 
