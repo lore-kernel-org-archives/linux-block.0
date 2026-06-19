@@ -1,149 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2AD38237B;
-	Fri, 19 Jun 2026 13:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D81B13DDAE;
+	Fri, 19 Jun 2026 14:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781875019; cv=none; b=i/kl9lZRvNbqQgdmvIC8ksxuhVOgNSqkylEhbtzPbbb0V20/KAQMpK9T90vWK9GlfnNmfMY3tpeVaNHRoKCl2NURBxLoviEglX71OzGHjMjO4TxHRHX58KgxqDn6nAeXmof7/Knw4s9cN8IDN7jf7BnktKCNB8MoG2x6R64bRL0=
+	t=1781879638; cv=none; b=Axxh66A62NQbsYcLq0CJ53k5lN+zt4yOWYupEQFYetEusHxKy1g9ONXDnHw2PtkayN90Sk/t/1GioF9sXbcmhfjn0YJ9LAIiIAloy5TEE0uZPrEfUp3J5LW0stiH6kuY+RoK/sgcQC8ZvPSAjF/Ryc+dTAmPHri218CjjdQuqXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781875019; c=relaxed/simple;
-	bh=RjCLqBbxx6VPLtveYkLrOZByZCsJgyh3Y91PSugqGdA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=igUpUs7zBdyCLUXeb/NZZQ+UxlsnQmMGgAkPf9KZmUyX3YzTDDWfTi6rxfBK8dIa1S0zYHelcNhBHMkrwfGJT+QtBwb5K+Snnwmt9gLfci3pSTL4J0zHwCikJCfDZuu5q8hLBxrxjp291cVnEsBi5jlpW5SKZJuXNQofUmjj4F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRSeQFlt; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRSeQFlt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 712341F000E9;
-	Fri, 19 Jun 2026 13:16:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781875018;
-	bh=HC0gbJXKctgyT5B82ZRUw7sMjAjhY1VXzWkHbrwryVk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=SRSeQFltrK5Xnu65FczNle+7HDjzhr3p9tJWkMGH/gvUyb9qeWXFleW+jbcWw917f
-	 rYn1rRbzPIdJwQ9lM9a+cDdCYbDNIO9ofHx39KAV1GuQ1NYYT2+IkPYtyaRTePf5fm
-	 ka7MyvHKUquAuyaqTGYmCQuvIaevx/udsN+RFv+vosp3cBSgW76yLun5gUMz2xqEb2
-	 V9IvPEmEWqy2nUkTzmCJgYvc4DQCbzANz9AZDLRTg+j3LVq5t3tWAbpMcvLNNXWKpI
-	 03Zvkb0wQKbn+5phoZa8ce09vVXAiq1a/aphggNal7rADJKPqbhnCdqICUyB7omLa9
-	 7tklcoocEm7gw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Christoph Hellwig
- <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>, Jens Axboe
- <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>, LKML
- <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Ming Lei <tom.leiming@gmail.com>, Damien Le
- Moal <dlemoal@kernel.org>, Qu Wenruo <wqu@suse.com>, Hillf Danton
- <hdanton@sina.com>, Miguel Ojeda <ojeda@kernel.org>
-Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to
- disk->open_mutex
-In-Reply-To: <87y0gaekyb.fsf@t14s.mail-host-address-is-not-set>
-References: <147ed056-03d9-4214-b925-0f10fc00cf27@I-love.SAKURA.ne.jp>
- <4cf7ecc7-932c-4589-9d0f-3e025e83e27c@acm.org>
- <20260601071113.GB7468@lst.de>
- <420f723a-8168-4f56-b84a-2a36ecd87fea@I-love.SAKURA.ne.jp>
- <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
- <87wlwdifrv.fsf@kernel.org>
- <9ebc39a8-6025-40e3-a378-ba26bf8d73ae@I-love.SAKURA.ne.jp>
- <87a4sqg8qh.fsf@t14s.mail-host-address-is-not-set>
- <V4cTJ0R2z3aTgmFRzs8OYYzrGPIMcKT9CDZn4JxKj5yx7La9eeBtk7w9nNFeSl75fCz1hatUYAE0QmfMDcRjig==@protonmail.internalid>
- <4d405942-9932-48b0-bdc0-9744d48fe699@I-love.SAKURA.ne.jp>
- <87y0gaekyb.fsf@t14s.mail-host-address-is-not-set>
-Date: Fri, 19 Jun 2026 15:16:49 +0200
-Message-ID: <87v7beekla.fsf@t14s.mail-host-address-is-not-set>
+	s=arc-20240116; t=1781879638; c=relaxed/simple;
+	bh=umWe0F5faZ0lPKhxWGF3FOdyjrlE03wsyDnqzVzXdaA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jbDAtpNIiO0y2M4ZyjvrvNbD4tiT1RVxFojrlH0zA97WoJCT/9NSZwFAd7tHk8rud9/zKFNd1WH/qP97BJtBJhk/JP3MRbAPJfC+Bp7WMOtsepe+x/UcVaW4BB7iKGfZIWGqOxKkuEPgUpvu9gpB/roIQYWobJ7xbTH7IC7o6Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 65JEXE02039344;
+	Fri, 19 Jun 2026 23:33:14 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 65JEXEKA039338
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 19 Jun 2026 23:33:14 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <a9254bf0-fc7a-4b2e-a62f-064e71016fb6@I-love.SAKURA.ne.jp>
+Date: Fri, 19 Jun 2026 23:33:11 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+        Hillf Danton <hdanton@sina.com>
+References: <20260529220600.1226-1-hdanton@sina.com>
+ <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+ <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
+ <20260609175013.GH2636677@ZenIV>
+ <9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav404.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-Andreas Hindborg <a.hindborg@kernel.org> writes:
+Sending this commit to linux.git will be the fastest way to identify who is issuing
+I/O requests too late. Therefore, I want to get a conclusion on xfs/259 breakage.
+Al, can you get the same result?
 
-> "Tetsuo Handa" <penguin-kernel@I-love.SAKURA.ne.jp> writes:
->
->> On 2026/06/19 18:49, Andreas Hindborg wrote:
->>>> My understanding is that we don't have infrastructure for lock class keys
->>>> that can be applied to
->>>>
->>>>   +struct gendisk_lkclass {
->>>>   +	struct lock_class_key bio_lkclass;
->>>>   +	struct lock_class_key open_mutex_lkclass;
->>>>   +};
->>>>
->>>>   -	static struct lock_class_key __key;
->>>>   +	static struct gendisk_lkclass __key;
->>>>
->>>> change. Alternative approach is welcomed if you have one.
->>>
->>> Sorry, I did not pay enough attention. I would suggest this approach:
->>
->> I'm OK with your module-specific lockdep class approach
->>
->>> @@ -164,14 +127,21 @@ pub fn build<T: Operations>(
->>>              lim.features = bindings::BLK_FEAT_ROTATIONAL;
->>>          }
->>>
->>> -        // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
->>> +        let keys = KBox::pin_init(
->>> +            Opaque::ffi_init(|ptr: *mut bindings::gendisk_lkclass| {
->>> +                // SAFETY: `ptr` is valid for writes
->>> +                unsafe { bindings::lockdep_register_key(&raw mut (*ptr).bio_lkclass) };
->>> +                // SAFETY: `ptr` is valid for writes
->>> +                unsafe { bindings::lockdep_register_key(&raw mut (*ptr).open_mutex_lkclass) };
->>> +            }),
->>> +            GFP_KERNEL,
->>> +        )?;
->>> +
->>> +        // SAFETY:
->>> +        // - `tagset.raw_tag_set()` points to a valid and initialized tag set.
->>> +        // - We keep `keys` alive for the lifetime of the returned gendisk.
->>>          let gendisk = from_err_ptr(unsafe {
->>> -            bindings::__blk_mq_alloc_disk(
->>> -                tagset.raw_tag_set(),
->>> -                &mut lim,
->>> -                data,
->>> -                lkclass.as_ptr(),
->>> -            )
->>> +            bindings::__blk_mq_alloc_disk(tagset.raw_tag_set(), &mut lim, data, keys.get())
->>>          })?;
->>>
->>>          const TABLE: bindings::block_device_operations = bindings::block_device_operations {
->>
->> if we can assume that there is (up to) only one
->>
->>   let mut disk = gen_disk::GenDiskBuilder::new().capacity_sectors(4096).build(fmt!("myblk"), tagset, ())?;
->>
->> call for each rust module.
->
-> With the approach I suggest here, we get a new set of keys for each
-> invocation of `GenDiskBuilder::build`. No statics involved, keys are
-> allocated dynamically.
->
-> The current code makes one key for to be shared by _all_ callers, which
-> is probably a bad idea.
->
->>
->> By the way, are you aware that rust-enabled linux-next build is recently failing
->> ( https://syzkaller.appspot.com/bug?extid=1f14a35d0c73d31555e4 ) ?
->
-> I was not aware, thanks for pointing that out. I actually did build
-> linux-next for both June 16 and June 18 and I did not see any issue. It
-> looks like a tooling problem to me. I'll see if I can figure out what it
-> is.
-
-I think this is [1]. We saw it for lkp when they used bindgen 0.72.0
-with clang 22 I think. Probably syzkaller needs to bump bindgen version
-to 0.72.2.
-
-Cc: Miguel Ojeda <ojeda@kernel.org>
-
-Not sure who to Cc on syzkaller side.
-
-Best regards,
-Andreas Hindborg
-
-
-[1] https://github.com/rust-lang/rust-bindgen/issues/3264
+On 2026/06/13 20:00, Tetsuo Handa wrote:
+> On 2026/06/10 2:50, Al Viro wrote:
+>> Still breaks xfs/259, same as the version in next-20260605...
+> 
+> I installed xfstests-dev and reproduced a "umount: /home/test: target is busy." problem which Al Viro is
+> experiencing with https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?h=next-20260608&id=fb1d5846e99c8aa4ce8da7e6ee7643b01da25b8c .
+> 
+(...snipped...)
+> 
+> I initially suspected that the cause of "target is busy" error is that fput() from
+> __loop_clr_fd() does not wait for completion before "losetup -d" completes. But a
+> debug printk() patch shown below indicated a tendency:
+> 
+>   (a) __loop_clr_fd() is called by "udev-worker" rather than "losetup" when this problem happens
+> 
+>   (b) propagate_mount_busy()!=0 when do_umount() fails with -EBUSY
+> 
+> --------------------------------------------------------------------------------
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index c3b607a3ddc4..7408f314a1fa 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1763,6 +1763,8 @@ static void lo_release(struct gendisk *disk)
+>  	mutex_unlock(&lo->lo_mutex);
+>  
+>  	if (need_clear) {
+> +		printk("Flush: task=%s[%d] dev=loop%d state=%d\n",
+> +		       current->comm, current->pid, lo->lo_number, lo->lo_state);
+>  		/*
+>  		 * Temporarily release disk->open_mutex in order to flush pending I/O
+>  		 * requests before clearing the backing device.
+> @@ -1813,6 +1815,8 @@ static void lo_release(struct gendisk *disk)
+>  		mutex_lock(&lo->lo_disk->open_mutex);
+>  		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
+>  			return;
+> +		printk("Teardown: task=%s[%d] dev=loop%d state=%d\n",
+> +		       current->comm, current->pid, lo->lo_number, lo->lo_state);
+>  		__loop_clr_fd(lo);
+>  	}
+>  }
+> diff --git a/fs/namespace.c b/fs/namespace.c
+> index 09ab7fc72f86..9710460fb449 100644
+> --- a/fs/namespace.c
+> +++ b/fs/namespace.c
+> @@ -1893,6 +1893,8 @@ static int do_umount(struct mount *mnt, int flags)
+>  		 */
+>  		lock_mount_hash();
+>  		if (!list_empty(&mnt->mnt_mounts) || mnt_get_count(mnt) != 2) {
+> +			printk("%s: task=%s[%d] !list_empty(&mnt->mnt_mounts)=%d mnt_get_count(mnt)=%d\n", __func__,
+> +			       current->comm, current->pid, !list_empty(&mnt->mnt_mounts), mnt_get_count(mnt));
+>  			unlock_mount_hash();
+>  			return -EBUSY;
+>  		}
+> @@ -1960,6 +1962,9 @@ static int do_umount(struct mount *mnt, int flags)
+>  		if (!propagate_mount_busy(mnt, 2)) {
+>  			umount_tree(mnt, UMOUNT_PROPAGATE|UMOUNT_SYNC);
+>  			retval = 0;
+> +		} else {
+> +			printk("%s: task=%s[%d] propagate_mount_busy()!=0\n", __func__,
+> +			       current->comm, current->pid);
+>  		}
+>  	}
+>  out:
+> --------------------------------------------------------------------------------
 
