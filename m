@@ -1,144 +1,90 @@
-Received: from va-2-45.ptr.blmpb.com (va-2-45.ptr.blmpb.com [209.127.231.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADC21BBBFC
-	for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 18:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839761BBBFC
+	for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 00:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781980172; cv=none; b=jwoyIj7Bkfo7XjhesryFVtjf4TpuCWstm312qWZVhiISimSDnnF3J84yR3Dxp23tXn0h8MjW2RI4oX/2+u+zsZVsDrld3FJIXRKWuPIAoQuErNoUmXOvF+LhQ0hGipykNm6lXUBAkKeWq0OP+y15L3oZ+F+wlgsjjD8NA2pOnoU=
+	t=1782000011; cv=none; b=e7tINHiaIc7BwmWpBLgu+kbpFFVfLuZybuoVexBiNViehqwQddE/N3JdrA/ci9li+eOJ3y40aUV3n1Wyz5QR2tf7CPirQp846DyWVFV1cqDE9zKxN/9DT8fjPqy0ujmBtbbP147lMVXbn/iFIMccQ3OL/XbGMu8Uxir4e1OE82k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781980172; c=relaxed/simple;
-	bh=G1uhWbOWHiqNXfGifFXXcw8ke982MTwaX1MAkHhH0XA=;
-	h=To:Message-Id:In-Reply-To:Subject:Date:References:Content-Type:Cc:
-	 From:Mime-Version; b=RqgWYLKRUUY7wFaF9+MQRzunm9ForOU9MscQJllvfGbQPg7Ee+rGC6u+z7VFcwMl3J6m9MoAb3DaUuZpM/PQ2QZPvMIB0m8sQgLtLLehlw4mYjUjSOV8AHcOE+Vq+1YaS9Cx2EBh8JIX2USK4mGEAPL4jbB7L7FWVYP9AbP/bgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=Iv+YCi1O; arc=none smtp.client-ip=209.127.231.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1782000011; c=relaxed/simple;
+	bh=THoMjS5P8rRPLfdpA2khAi4J+HG4OZ65hEd1yfBbELE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bbdISxpmbsaBvhC6uyO/UBMosDsyCD6+kpCsp7+DT0f5M28COYyQEyFcWHfydSCsHDF/HoCy3fuAsI5dR6tq+Gd7S+d2V5QkK8rNEkx/hZSOILxX50aHNysN7gu7tgzO8Y/96V/5ib6D3L/8+ZJznh0DtVXlYmitKQeTd/CkgNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n8fEWxL/; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="Iv+YCi1O"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1781980157;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=EGlr82o2GSnKsx/C994OUQb0Z+hiBArYu2jTenNVYCg=;
- b=Iv+YCi1OhOmQGa6UJFy8FB9DNppNMeJRr0uVmaTiLnXsX9KDrhhQbf7qs6SF/LuDNEnDdB
- Et9mvp0maa+WPaAQNmXH+O+0nm412XL9BbAeBgzUak8yi6FbakzMhiox/RlCWbUSvT2rY+
- POLJXd5SvnxFmfHYC70+x/t2B/vWKPilA5Lp5iGaj1nOe08gc4In7qp8HbDcRloOUYC0PY
- lJavnxmsa9pey028eGSAxYuCuG5ehy60Qs4j8l7/ZqQlbZ0YWjMdG1FTYy+6+pqWrZHjhD
- 1dcQg+qe38Ovan6FVzz03SKnfPttHyJqrCnxzCMWehtGBBDE4zhBTQNZxMuX7A==
-X-Lms-Return-Path: <lba+26a36dbfc+97cde0+vger.kernel.org+yukuai@fygo.io>
-To: "Zizhi Wo" <wozizhi@huaweicloud.com>, <axboe@kernel.dk>, <tj@kernel.org>, 
-	<josef@toxicpanda.com>, <linux-block@vger.kernel.org>
-Message-Id: <e8758537-a13f-4e65-b407-6c73c5b593e5@fygo.io>
-In-Reply-To: <20260616011746.2451461-1-wozizhi@huaweicloud.com>
-Content-Transfer-Encoding: quoted-printable
-X-Original-From: yu kuai <yukuai@fygo.io>
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
-Date: Sun, 21 Jun 2026 02:29:11 +0800
-References: <20260616011746.2451461-1-wozizhi@huaweicloud.com>
-Received: from [192.168.1.104] ([39.182.0.148]) by smtp.larksuite.com with ESMTPS; Sat, 20 Jun 2026 18:29:15 +0000
-Content-Type: text/plain; charset=UTF-8
-Reply-To: yukuai@fygo.io
-Cc: <cgroups@vger.kernel.org>, <yangerkun@huawei.com>, 
-	<chengzhihao1@huawei.com>, <houtao1@huawei.com>, <yukuai@fygo.io>
-From: "yu kuai" <yukuai@fygo.io>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n8fEWxL/"
+Date: Sat, 20 Jun 2026 23:59:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782000007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R8DR1NL1clN/D0PALl4ZSRlHhu6LMi/K1lpoGDWtHVw=;
+	b=n8fEWxL/zvpO7q3SfWA0VDNtohcksoOrUtuGpMyRTqUeqriaswG8bDp4LResEEfcpNgrPh
+	FXqgFxhN5vejvSqdWUkUWdQrqt6QTC+DUpXI6PeFvHUJBGylUBXntEmXRXeUmGKKib8xSQ
+	lX9IRhvpTS51a6BZPWj1fl0mnasvMMI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+	stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
+	Tejun Heo <tj@kernel.org>, Waiman Long <longman@redhat.com>,
+	coregee2000@gmail.com
+Subject: Re: [PATCH V2] blk-cgroup: fix UAF in __blkcg_rstat_flush()
+Message-ID: <20260620235953.tiofjko4spmm3isd@coder-jfernandez-main-0.coder-jfernandez-main.remote-dev.svc.cluster.local>
+References: <20260205155425.342084-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260205155425.342084-1-ming.lei@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-=E5=9C=A8 2026/6/16 9:17, Zizhi Wo =E5=86=99=E9=81=93:
+On Thu, 5 Feb 2026 23:54:23 +0800, Ming Lei wrote:
+> Move the flush from __blkg_release() (RCU callback) to blkg_release()
+> (before call_rcu). This ensures the RCU grace period waits for any
+> concurrent flush's rcu_read_lock() section to complete before freeing.
 
-> From: Zizhi Wo<wozizhi@huawei.com>
->
-> [BUG]
-> Our fuzz testing triggered a blkcg use-after-free issue:
->
->    BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
->    Call Trace:
->    ...
->    blkcg_deactivate_policy+0x244/0x4d0
->    ioc_rqos_exit+0x44/0xe0
->    rq_qos_exit+0xba/0x120
->    __del_gendisk+0x50b/0x800
->    del_gendisk+0xff/0x190
->    ...
->
-> [CAUSE]
-> process1						process2
-> cgroup_rmdir
-> ...
->    css_killed_work_fn
->      offline_css
->      ...
->        blkcg_destroy_blkgs
->        ...
->          __blkg_release
-> 	  css_put(&blkg->blkcg->css)
->            blkg_free
-> 	    INIT_WORK(xxx, blkg_free_workfn)
-> 	    schedule_work
->      css_put
->      ...
->        blkcg_css_free
->          kfree(blkcg)--------blkcg has been freed!!!
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3Dschedule_work
->                blkg_free_workfn
-> 							__del_gendisk
-> 							  rq_qos_exit
-> 							    ioc_rqos_exit
-> 							      blkcg_deactivate_policy
-> 							        mutex_lock(&q->blkcg_mutex)
-> 								spin_lock_irq(&q->queue_lock)
-> 							        list_for_each_entry(blkg, xxx)
-> 								  blkcg =3D blkg->blkcg
-> 								  spin_lock(&blkcg->lock)-------UAF!!!
-> 	        mutex_lock(&q->blkcg_mutex)
-> 	        spin_lock_irq(&q->queue_lock)
-> 	        /* Only then is the blkg removed from the list */
-> 	        list_del_init(&blkg->q_node)
->
-> As a result, a blkg can still be reachable through q->blkg_list while
-> its ->blkcg has already been freed.
->
-> [Fix]
-> Fix this by deferring the blkcg css_put() until after the blkg has been
-> unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
-> blkcg outlives every blkg still reachable through q->blkg_list, so any
-> iterator holding q->queue_lock is guaranteed to observe a valid
-> blkg->blkcg.
->
-> While at it, move css_tryget_online() from blkg_create() into blkg_alloc(=
-)
-> so that the css reference is owned by the alloc/free pair rather than
-> straddling layers:
-> blkg_alloc()  <-> blkg_free()
-> blkg_create() <-> blkg_destroy()
->
-> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free=
-_workfn() and blkcg_deactivate_policy()")
-> Suggested-by: Hou Tao<houtao1@huawei.com>
-> Signed-off-by: Zizhi Wo<wozizhi@huawei.com>
-> Reviewed-by: Yu Kuai<yukuai@fygo.io>
-> ---
-> v3:
->   - move css_put() after mutex_unlock() in blkg_free_workfn().
->
-> v2:
->   - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
->     css reference follows the blkg's own lifetime, making the put in
->     blkg_free_workfn() symmetric with the get in blkg_alloc().
->
-> v1:https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweiclou=
-d.com/
->   block/blk-cgroup.c | 24 ++++++++++++------------
->   1 file changed, 12 insertions(+), 12 deletions(-)
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
+We started seeing this in the wild on a 6.18.35-based kernel as a NULL
+pointer dereference rather than a KASAN report.  The freed blkg /
+percpu iostat slot gets reallocated and zeroed before the concurrent
+flusher reaches it, so bisc->blkg reads back as NULL:
 
---=20
-Thanks,
-Kuai
+  BUG: kernel NULL pointer dereference, address: 0000000000000030
+  #PF: supervisor read access in kernel mode
+  RIP: 0010:__blkcg_rstat_flush.isra.0+0x8d/0x1c0
+  Code: ... 48 8b 1a 4c 8d 78 f8 31 c0 f3 48 ab <4c> 8b 73 30 ...
+  RBX: 0000000000000000
+  Call Trace:
+   <IRQ>
+   __blkg_release+0x2d/0xf0
+   rcu_do_batch+0x1b8/0x570
+   rcu_core+0x167/0x350
+   handle_softirqs+0xda/0x330
+
+The workload is container-heavy with frequent block-device add/remove,
+so multiple blkgs in the same blkcg routinely hit blkg_release()
+concurrently on different CPUs.
+
+I can reproduce reliably under KASAN by inserting a udelay(2000)
+between llist_del_all() and raw_spin_lock_irqsave() in
+__blkcg_rstat_flush(), then driving direct I/O to N loop devices from
+one cgroup followed by parallel LOOP_CTL_REMOVE on each device.  KASAN
+reports slab-use-after-free in __blkcg_rstat_flush() with the expected
+alloc=blkg_alloc / free=blkg_free_workfn stacks.
+
+With this patch applied on top of the same udelay-widened tree, the
+same harness runs 150 rounds clean.
+
+This doesn't appear to have been picked up after V1 was dropped; would
+be good to get it queued.
+
+Tested-by: Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
