@@ -1,122 +1,144 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-45.ptr.blmpb.com (va-2-45.ptr.blmpb.com [209.127.231.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6CF349CE7;
-	Sat, 20 Jun 2026 09:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADC21BBBFC
+	for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 18:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781948586; cv=none; b=GJSpEcdCPCm2jy+y3z2MeDE6sFx8g25MsbSTdC9rlJS+DrRc0nXb31Y4vBiQM1SwgM79684K9t5cSHav2gfwDDnrnnVvVzuN0diynpy7nT+HRHlibfzoJPp0OxPz0R0OQW7lvJ16gerx3cD3z0w54slBvKHt9u4SxECDwHsw5Dg=
+	t=1781980172; cv=none; b=jwoyIj7Bkfo7XjhesryFVtjf4TpuCWstm312qWZVhiISimSDnnF3J84yR3Dxp23tXn0h8MjW2RI4oX/2+u+zsZVsDrld3FJIXRKWuPIAoQuErNoUmXOvF+LhQ0hGipykNm6lXUBAkKeWq0OP+y15L3oZ+F+wlgsjjD8NA2pOnoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781948586; c=relaxed/simple;
-	bh=BDY6LnHyfiSqNxly7JKFxMIFRGnGAm2SZHM2bQbD3GQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PKWCaBR0KWLcvjo5aHXrwtqtT4V7m3R3En2tybBm0JtA9VMc7N0BpoqHUMDesKZ2rTrYzZkPGdjM5nPdLu5GZL2ksmR7bDuynkp5JVJeqsJc0mboIqSfuQBwsg5VZyb3FcFEZZbOWdRGKNUJAuL45gKEZZPZcS6T4a4KFO6jCvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 65K9gLR5084017;
-	Sat, 20 Jun 2026 18:42:21 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 65K9gLdB084014
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 20 Jun 2026 18:42:21 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <ebceac56-6a65-4918-b47c-1fb87aa66989@I-love.SAKURA.ne.jp>
-Date: Sat, 20 Jun 2026 18:42:20 +0900
+	s=arc-20240116; t=1781980172; c=relaxed/simple;
+	bh=G1uhWbOWHiqNXfGifFXXcw8ke982MTwaX1MAkHhH0XA=;
+	h=To:Message-Id:In-Reply-To:Subject:Date:References:Content-Type:Cc:
+	 From:Mime-Version; b=RqgWYLKRUUY7wFaF9+MQRzunm9ForOU9MscQJllvfGbQPg7Ee+rGC6u+z7VFcwMl3J6m9MoAb3DaUuZpM/PQ2QZPvMIB0m8sQgLtLLehlw4mYjUjSOV8AHcOE+Vq+1YaS9Cx2EBh8JIX2USK4mGEAPL4jbB7L7FWVYP9AbP/bgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=Iv+YCi1O; arc=none smtp.client-ip=209.127.231.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="Iv+YCi1O"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1781980157;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=EGlr82o2GSnKsx/C994OUQb0Z+hiBArYu2jTenNVYCg=;
+ b=Iv+YCi1OhOmQGa6UJFy8FB9DNppNMeJRr0uVmaTiLnXsX9KDrhhQbf7qs6SF/LuDNEnDdB
+ Et9mvp0maa+WPaAQNmXH+O+0nm412XL9BbAeBgzUak8yi6FbakzMhiox/RlCWbUSvT2rY+
+ POLJXd5SvnxFmfHYC70+x/t2B/vWKPilA5Lp5iGaj1nOe08gc4In7qp8HbDcRloOUYC0PY
+ lJavnxmsa9pey028eGSAxYuCuG5ehy60Qs4j8l7/ZqQlbZ0YWjMdG1FTYy+6+pqWrZHjhD
+ 1dcQg+qe38Ovan6FVzz03SKnfPttHyJqrCnxzCMWehtGBBDE4zhBTQNZxMuX7A==
+X-Lms-Return-Path: <lba+26a36dbfc+97cde0+vger.kernel.org+yukuai@fygo.io>
+To: "Zizhi Wo" <wozizhi@huaweicloud.com>, <axboe@kernel.dk>, <tj@kernel.org>, 
+	<josef@toxicpanda.com>, <linux-block@vger.kernel.org>
+Message-Id: <e8758537-a13f-4e65-b407-6c73c5b593e5@fygo.io>
+In-Reply-To: <20260616011746.2451461-1-wozizhi@huaweicloud.com>
+Content-Transfer-Encoding: quoted-printable
+X-Original-From: yu kuai <yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
+Date: Sun, 21 Jun 2026 02:29:11 +0800
+References: <20260616011746.2451461-1-wozizhi@huaweicloud.com>
+Received: from [192.168.1.104] ([39.182.0.148]) by smtp.larksuite.com with ESMTPS; Sat, 20 Jun 2026 18:29:15 +0000
+Content-Type: text/plain; charset=UTF-8
+Reply-To: yukuai@fygo.io
+Cc: <cgroups@vger.kernel.org>, <yangerkun@huawei.com>, 
+	<chengzhihao1@huawei.com>, <houtao1@huawei.com>, <yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
-        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-        Hillf Danton <hdanton@sina.com>
-References: <20260529220600.1226-1-hdanton@sina.com>
- <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
- <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
- <20260609175013.GH2636677@ZenIV>
- <9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp>
- <a9254bf0-fc7a-4b2e-a62f-064e71016fb6@I-love.SAKURA.ne.jp>
- <20260620073939.GF2636677@ZenIV>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20260620073939.GF2636677@ZenIV>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav203.rs.sakura.ne.jp
+Mime-Version: 1.0
 
-On 2026/06/20 16:39, Al Viro wrote:
-> On Fri, Jun 19, 2026 at 11:33:11PM +0900, Tetsuo Handa wrote:
->> Sending this commit to linux.git will be the fastest way to identify who is issuing
->> I/O requests too late. Therefore, I want to get a conclusion on xfs/259 breakage.
->> Al, can you get the same result?
-> 
-> Not a peep in the logs, breakage still there (with cherry-picked fb1d5846e99c8aa4ce
-> and CONFIG_KCOV enabled, that is).
+=E5=9C=A8 2026/6/16 9:17, Zizhi Wo =E5=86=99=E9=81=93:
 
-Please test with debug printk() patch shown below. What messages do you get?
+> From: Zizhi Wo<wozizhi@huawei.com>
+>
+> [BUG]
+> Our fuzz testing triggered a blkcg use-after-free issue:
+>
+>    BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
+>    Call Trace:
+>    ...
+>    blkcg_deactivate_policy+0x244/0x4d0
+>    ioc_rqos_exit+0x44/0xe0
+>    rq_qos_exit+0xba/0x120
+>    __del_gendisk+0x50b/0x800
+>    del_gendisk+0xff/0x190
+>    ...
+>
+> [CAUSE]
+> process1						process2
+> cgroup_rmdir
+> ...
+>    css_killed_work_fn
+>      offline_css
+>      ...
+>        blkcg_destroy_blkgs
+>        ...
+>          __blkg_release
+> 	  css_put(&blkg->blkcg->css)
+>            blkg_free
+> 	    INIT_WORK(xxx, blkg_free_workfn)
+> 	    schedule_work
+>      css_put
+>      ...
+>        blkcg_css_free
+>          kfree(blkcg)--------blkcg has been freed!!!
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3Dschedule_work
+>                blkg_free_workfn
+> 							__del_gendisk
+> 							  rq_qos_exit
+> 							    ioc_rqos_exit
+> 							      blkcg_deactivate_policy
+> 							        mutex_lock(&q->blkcg_mutex)
+> 								spin_lock_irq(&q->queue_lock)
+> 							        list_for_each_entry(blkg, xxx)
+> 								  blkcg =3D blkg->blkcg
+> 								  spin_lock(&blkcg->lock)-------UAF!!!
+> 	        mutex_lock(&q->blkcg_mutex)
+> 	        spin_lock_irq(&q->queue_lock)
+> 	        /* Only then is the blkg removed from the list */
+> 	        list_del_init(&blkg->q_node)
+>
+> As a result, a blkg can still be reachable through q->blkg_list while
+> its ->blkcg has already been freed.
+>
+> [Fix]
+> Fix this by deferring the blkcg css_put() until after the blkg has been
+> unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
+> blkcg outlives every blkg still reachable through q->blkg_list, so any
+> iterator holding q->queue_lock is guaranteed to observe a valid
+> blkg->blkcg.
+>
+> While at it, move css_tryget_online() from blkg_create() into blkg_alloc(=
+)
+> so that the css reference is owned by the alloc/free pair rather than
+> straddling layers:
+> blkg_alloc()  <-> blkg_free()
+> blkg_create() <-> blkg_destroy()
+>
+> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free=
+_workfn() and blkcg_deactivate_policy()")
+> Suggested-by: Hou Tao<houtao1@huawei.com>
+> Signed-off-by: Zizhi Wo<wozizhi@huawei.com>
+> Reviewed-by: Yu Kuai<yukuai@fygo.io>
+> ---
+> v3:
+>   - move css_put() after mutex_unlock() in blkg_free_workfn().
+>
+> v2:
+>   - Move css_tryget_online() from blkg_create() into blkg_alloc() so the
+>     css reference follows the blkg's own lifetime, making the put in
+>     blkg_free_workfn() symmetric with the get in blkg_alloc().
+>
+> v1:https://lore.kernel.org/all/20260518010932.633707-1-wozizhi@huaweiclou=
+d.com/
+>   block/blk-cgroup.c | 24 ++++++++++++------------
+>   1 file changed, 12 insertions(+), 12 deletions(-)
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
 
---------------------------------------------------------------------------------
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c3b607a3ddc4..7408f314a1fa 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1763,6 +1763,8 @@ static void lo_release(struct gendisk *disk)
- 	mutex_unlock(&lo->lo_mutex);
- 
- 	if (need_clear) {
-+		printk("Flush: task=%s[%d] dev=loop%d state=%d\n",
-+		       current->comm, current->pid, lo->lo_number, lo->lo_state);
- 		/*
- 		 * Temporarily release disk->open_mutex in order to flush pending I/O
- 		 * requests before clearing the backing device.
-@@ -1813,6 +1815,8 @@ static void lo_release(struct gendisk *disk)
- 		mutex_lock(&lo->lo_disk->open_mutex);
- 		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
- 			return;
-+		printk("Teardown: task=%s[%d] dev=loop%d state=%d\n",
-+		       current->comm, current->pid, lo->lo_number, lo->lo_state);
- 		__loop_clr_fd(lo);
- 	}
- }
-diff --git a/fs/namespace.c b/fs/namespace.c
-index 09ab7fc72f86..9710460fb449 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -1893,6 +1893,8 @@ static int do_umount(struct mount *mnt, int flags)
- 		 */
- 		lock_mount_hash();
- 		if (!list_empty(&mnt->mnt_mounts) || mnt_get_count(mnt) != 2) {
-+			printk("%s: task=%s[%d] !list_empty(&mnt->mnt_mounts)=%d mnt_get_count(mnt)=%d\n", __func__,
-+			       current->comm, current->pid, !list_empty(&mnt->mnt_mounts), mnt_get_count(mnt));
- 			unlock_mount_hash();
- 			return -EBUSY;
- 		}
-@@ -1960,6 +1962,9 @@ static int do_umount(struct mount *mnt, int flags)
- 		if (!propagate_mount_busy(mnt, 2)) {
- 			umount_tree(mnt, UMOUNT_PROPAGATE|UMOUNT_SYNC);
- 			retval = 0;
-+		} else {
-+			printk("%s: task=%s[%d] propagate_mount_busy()!=0\n", __func__,
-+			       current->comm, current->pid);
- 		}
- 	}
- out:
---------------------------------------------------------------------------------
-
-
+--=20
+Thanks,
+Kuai
