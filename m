@@ -1,95 +1,71 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15E022F01
-	for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 07:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616AD341077;
+	Sat, 20 Jun 2026 07:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781939518; cv=none; b=nQRXxs9MdirZoiwkv68fwc3hEG916aKqXyf3qbi8RIKGxCu1iBgDeVA+c3fJzgr58sqQ8kQJPgA0KZybxQ/GDpORnzagiHtPEc62GHExWOSgWrtn67PMMKgZ+Fq4IhniNl/UjVk2gGa7JZ/Lr2fDX363JHMr392izlcysv8vRhQ=
+	t=1781941192; cv=none; b=KuwXBRVZNhbfFW/TgR1CaaZ4VWzZnIQHw83/OU2CEeerq0AhBB2Y3cVM6ljOtdG+RszF2VDIu9vsq3e/7Q0DWONTZ6x1we+sZiUBP8iFYCKEsxBxKuKWr7PRMUGcQWy8U6VPVXTuLAgJ1KlrreKzcPkX8SUS7lyG583uYehjbKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781939518; c=relaxed/simple;
-	bh=Y71ONCx1FU9qyn9+N4p/R61QZXgPrhVZY2OVrfST7xE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jeI2JCAm5FdQmzksIBIcI4vb9sP1fBEjmtmQC6VD0nm66SU0cuZkmc1OikVy+j7+AhKAOSIkhaRdcjcgypWRTnBk/r0DhZi/mgeV9m5BZ1CrgV8Dv6sE9E5nKFDxVzmweUlPz/YgT1WD9oMpqnuJQ8booJg8rVwnL2ULAQ7b7b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=HV158xRs; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1781941192; c=relaxed/simple;
+	bh=PGC4VHw71GKTPQ4/0tQFkLMHEQPWRYLq7blHWDcw/kc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qqpVoyB9kOTdet5M+CvITGFm1SJarTNvV/tVPcpLroF2K9HyqMGvFAuSXZOciNF3mIVV3t+YMlE9AiUkQIlpVmjfNY5yZQ2ZZX07pCyO46qKYpC/AJiBrTMKtFCU4EiksM6QY4PAFU6MKTYt4Zq79a12phgI+JjyHjWIWZDmgjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=A63KADGy; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="HV158xRs"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gj5Hc2Xg6z1XM2FS;
-	Sat, 20 Jun 2026 07:11:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1781939513; x=1784531514; bh=IUZYr5qG2bJGaBEq3LOCBPtn
-	Y8MmtKHbu1r+MBq069k=; b=HV158xRsHeeaA12P063sO16idg6C/NvsW53JVOTO
-	3OPO+KSgtJuEF2DT9SQJPERPPy9iI/6np+T3NBF21OAU8KkFWpKzsLBCEziyaNnK
-	iyrGBwknEVu1F4/YQTkKHDURSQqxHRWUSNcZM1Qep+r0G0VfHUaqFRo96xXxEFUY
-	E2jraGz7T/YW3GpT661I+9u4J3iQqkC7fTp7LsHHIQJetTIEixUGPJdtTzIKyX3/
-	uDtSW0zmfgFz9wJaSx8PVmR29jcBMmNu+M2QCXIxL3tEZLIUQoFgAAi2zJ6vfdjF
-	4tS22IXrz/tZdjGLQhv5pU+uS3fvTOxFSPbc1lD+y+M9xA==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id UZINQ1zWjJI9; Sat, 20 Jun 2026 07:11:53 +0000 (UTC)
-Received: from [192.168.0.145] (178-117-58-162.access.telenet.be [178.117.58.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gj5HV6fhtz1XM5kt;
-	Sat, 20 Jun 2026 07:11:50 +0000 (UTC)
-Message-ID: <089e0281-4df8-4358-91ce-1f5cc0f0ec4b@acm.org>
-Date: Sat, 20 Jun 2026 09:11:47 +0200
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="A63KADGy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PGC4VHw71GKTPQ4/0tQFkLMHEQPWRYLq7blHWDcw/kc=; b=A63KADGy92fBacifXq56Osipet
+	fVTkkra101oERpJvFFoxr/GwrITRXw989AiJDzyFl9FIFB0skC7Ya1xsVI9kVBbJ7meoHEHqaGEy2
+	U+xn/HPpQmyzntYQriki65sFENhNMintgwcc+ji3wB1WIJ98A5DCM2tpdE5waWUeyTd12UjZw+XCb
+	kKYjEEdknQqvYZSI51NN5e5vVeem6z8GdgyNgHPaXCJ9eSwjAFxCBIUPcCXE0ByhSwx2bFyNp7wtK
+	pvNCpY5eUqaxAhhJK/+aoFhScxXBrO4JqqEnzmS2Vv/Q2RysRSbooxa2dFWbvJm9+XLCSrMFJKqMF
+	a/7LXTrw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.4 #2 (Red Hat Linux))
+	id 1waqIl-00000001Obt-2UZA;
+	Sat, 20 Jun 2026 07:39:39 +0000
+Date: Sat, 20 Jun 2026 08:39:39 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Hillf Danton <hdanton@sina.com>
+Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
+Message-ID: <20260620073939.GF2636677@ZenIV>
+References: <20260529220600.1226-1-hdanton@sina.com>
+ <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+ <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
+ <20260609175013.GH2636677@ZenIV>
+ <9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp>
+ <a9254bf0-fc7a-4b2e-a62f-064e71016fb6@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] Fix _get_page_size()
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Jeff Moyer <jmoyer@redhat.com>, linux-block@vger.kernel.org,
- osandov@osandov.com, kch@nvidia.com
-References: <x497bnvlxlc.fsf@segfault.usersys.redhat.com>
- <ajXmBu9lDZwgMG7_@shinmob> <d0432702-ac0b-410e-9586-2cb9be079033@acm.org>
- <ajYabLMbEo6zyOWh@shinmob>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ajYabLMbEo6zyOWh@shinmob>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a9254bf0-fc7a-4b2e-a62f-064e71016fb6@I-love.SAKURA.ne.jp>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On 6/20/26 6:51 AM, Shin'ichiro Kawasaki wrote:
-> On Jun 20, 2026 / 05:55, Bart Van Assche wrote:
->> On 6/20/26 3:26 AM, Shin'ichiro Kawasaki wrote:
->>> This is a rather fundamental change, so I would like to ask opinions from
->>> other blktests users, especially Omar and Chaitanya. What do you think about
->>> the idea to add getconf to the requirement list?
->>
->> CONFIG_PAGE_SHIFT was introduced in the Linux kernel in February 2024
->> (commit ba89f9c8ccba ("arch: consolidate existing CONFIG_PAGE_SIZE_*KB
->> definitions")). Older kernels had CONFIG_PAGE_SIZE_4KB,
->> CONFIG_PAGE_SIZE_16KB, etc. This means that it is possible to derive the
->> kernel page size from the kernel configuration file for all upstream and
->> distro kernels, isn't it?
-> 
-> I checked the commit is in the tag v6.9. My Debian bookworm system has kernel
-> v6.1, then the config file at /boot does not have CONFIG_PAGE_SHIFT as expected.
-> But it does not have CONFIG_PAGE_SIZE_* either... I'm still afraid that kernel
-> config file approach is not reliable.
+On Fri, Jun 19, 2026 at 11:33:11PM +0900, Tetsuo Handa wrote:
+> Sending this commit to linux.git will be the fastest way to identify who is issuing
+> I/O requests too late. Therefore, I want to get a conclusion on xfs/259 breakage.
+> Al, can you get the same result?
 
-Right, for older kernels CONFIG_PAGE_SIZE_*KB is only available for some
-but not for all supported architectures.
-
-It is not clear to me where the desire to avoid the dependency on
-getconf comes from? As far as I know it is available on all Linux
-distro's. Since it is typically included in the C library package it
-should not introduce a new dependency.
-
-Thanks,
-
-Bart.
+Not a peep in the logs, breakage still there (with cherry-picked fb1d5846e99c8aa4ce
+and CONFIG_KCOV enabled, that is).
