@@ -1,187 +1,117 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A137238166
-	for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 01:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF236254B18
+	for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 06:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782006040; cv=none; b=FhpMkpPLQSEBb5RmdO+NC+S6lqpQRmIdk+3rZIdBsKwEGNCgolTh7eD8Mpd4eRHsx6pznOyraV3a0OynG/OayLXCQOwyQ4D0r+SqwPYimSMpaBNkW70XcjgXXnXv9hUyHD1eSYY4zjkMz0C2a734Zulve3UuFLEe4keEDMJqa50=
+	t=1782021733; cv=none; b=tn6yIrD466+0wkwMwttFVz5VHCgyxcE6WIucughBu3qP+hORi2Bd/0TxpjdY2T6N8krMXU9kutc/dxVQ8R8yp7w9chTG+gY+Ip6tFkE85z0V4Hwp3epCKZOEXzK3/1nyxULKg7ukOiImC/6Xh/YReus8QBWpKP2pie6+3cOvC1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782006040; c=relaxed/simple;
-	bh=L50Ya9H4qA7s0O4Aw3FWQ09DEha+hIy9UvEc9gvFjCY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Juee3oris7CHdQ2n5bCFcnYyqZrzU+gFlSeVo8rfA9XgqZtCsXBKieFJKHZhcywCgQPBmcayBVeNhaL9Eq5xwNM9HYmXfbeUO/hNJXAulLZSMv390LlFBCZBrhhUJYMP9yNagA3Zzf7AMpuGJyZhGj8Ru+34F0eAbp5xXWzTmBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XeRFlCVJ; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1782021733; c=relaxed/simple;
+	bh=oAZ4LLK4qeQvWdxhfK5qeoyXDIjZ5SUq26am3mzeO94=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rnb6ep8j9/X1yWYr5DecLkie32OUAl4lj2fDW4LQRTHYlEQ/uZrdaWyE/2KldvZoj0AHGEXs8ZfpQnD89+95QB2u+hE9Kg0IPf1lfEhHhNxY5NHMGtA3qzjnCd/NQFgDFz4t0j7v9R3q3965SR//J9sX1QiM9JvhFM9ZwbbWPqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TpwLNjLX; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeRFlCVJ"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c6bdb8a8bdso16810565ad.1
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 18:40:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TpwLNjLX"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-45fd464d51fso1941961f8f.3
+        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 23:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782006038; x=1782610838; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782021728; x=1782626528; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QP0vHpV7SRNJLf3qOdU/AwmER/PkJI4+g3ZMkna9Rt8=;
-        b=XeRFlCVJwM28rzth+Bf1wVhwGtxgkGtO8fpXnf7wj3E4kIibnGlNWSKpMbOokjbsDd
-         b8+Mp+127Q14Hhn9lvq+bC7MSeu2UtLL9xLv8HdT6ZL7VUfRsrDO7bX41oaCZNla3HMH
-         GS/C8PBCACmG7lzHcctX/yD8fYAFZgdYbDwA/GiE85EcsqSqxkTHHgW/BA6yj7mI4dBB
-         GBbryBEdpthEcszq9t+cygGs9BVKQIVSYnINHKn2VmQ26V53RI/wDGUVyGcGdSnv+wIz
-         8Gul1hViF79GEDvPN9101BFhHsatq4nqBeE/5HOLnm8LxN4NTlYTA52+T2DPKIE0zXKi
-         boLA==
+        bh=XW22mR6l3lTGNPr8AcOBrvc/VU7Xe5luK3BLVH/LaIo=;
+        b=TpwLNjLX0juNC+e4jLk4Od/OIW8uiJGZYjJjpjW5l2UAL+A+DYKgdXD1THzTZkhi8Z
+         SSDo9TFCEACH6ocQMsXdfhlvM7a7bAYsmy5Y5UxKsj7dpSAKApo6WH/Rae8vf1nLS35g
+         IsYyn2dZ064GZzstI+96ETxh7NXQQLlfjEccglA4dN+McHSQhvy3SCvA1bD80I0XWbJO
+         1nxFOAk/6fbJkGaPFWoviZ8gle2SrmrqOwxB59LqNnvvIM/5mhQATFpBkF6cKT+JunY2
+         PG7Pne9/lWbpFr3dQ0U6/WtCgHbktc5wXLXokdmOiQPArvhjKIWZq/A5f283ZygG+pf3
+         YdwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782006038; x=1782610838;
+        d=1e100.net; s=20251104; t=1782021728; x=1782626528;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QP0vHpV7SRNJLf3qOdU/AwmER/PkJI4+g3ZMkna9Rt8=;
-        b=TuMs6mE7JJ/48vQTuT9z1uVSknFt42Vjr/W60Xmy0qyQZOvGIBfG+b6iSwAmLVTj5w
-         QigYNgwEWS6+Fo/rsbQ51TfA6cEu+Z0nnsMRvhAJiiWOOkvbkfNtVrEEKnnVMXyb0c9J
-         TsnxUkV0o0R/Q06+57CF8BuL46iouqfJS7YFK1tYKHkb/0HD9hzcFigLtPFQqX1TENmk
-         J42c7n736sRUN8GXn8/V6PMUtNjcy1e37mHt2fv6qGz2oF/j8zrRzeqc4kSBVdjXAg2V
-         p/be+DXxaZvwYJaS64KEUjB+Q3iEYgKVuc0VhdWmyws4L9tsJ/wWStFW/CAH1sAGOppN
-         tJqg==
-X-Forwarded-Encrypted: i=1; AHgh+Rq7Utvu4//FvX2YkvBJQWaI8EnQXdBOq2rE/xUDEP9DuNEG1AuvVaLcszp7GuWEoKkLjshHEoiCeYz4JQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpHSix9fGLSMIojHfgS2w09j9m2NGK2xg3us98AST/Jz5AhdKE
-	YRQJ+fQ+l99K/+BB3LFqWREntJftJGQ0gz6AkDJbFYQkj6QICHgzrie6hJ6XOA==
-X-Gm-Gg: AfdE7ckvDxO9nz+87XwlbZUnVlHdMfDXXcLH9CxM5qdognsOQz0uRWLqy1yStwG/ZTy
-	L1abAzcFPxEGyiTjnkL6pj4EJz75kK2BxvVNpHhv1Xme4LfQ22MVlRSgFEO6D1SILzHgBYiZGFW
-	lrFQS/73fiKk44Y1XjZzg3O+bE05xZVYBlArY5di+oguptWZH1lwe8f9bTU8E8JhC/zjZq/wdbV
-	d1QEuggTiFPEBY+3grsYmEZ0odHDU8x1oSwbCB6ZNKrimTKvppZrp1UyqJG6JWy+PQ09iLLObt3
-	Tmf6VWtpDeeRiGpGpnw2coOKuJR9IZFpNzzL7D0RD/sOJq9RGViJ+i3hiyX2OFyUwcbZH8cYF1u
-	+Az+hS+FUW3WgNAMp3LdrcxfxLaJqLny7m9g2qs+YaLS8oJyu37SE90Tf2bFmcnhqpQpyh4mo4e
-	moq2QR4jDGdXsdKFd+sIrv2X/t/ZezALc=
-X-Received: by 2002:a17:902:ec8b:b0:2c6:b7d5:27ea with SMTP id d9443c01a7336-2c725d37e2bmr77924395ad.17.1782006038171;
-        Sat, 20 Jun 2026 18:40:38 -0700 (PDT)
-Received: from n232-175-066.byted.org ([36.110.163.108])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7436afdfesm34711505ad.7.2026.06.20.18.40.36
+        bh=XW22mR6l3lTGNPr8AcOBrvc/VU7Xe5luK3BLVH/LaIo=;
+        b=cSdcVeqpK+8d0GwWsjJUDcG+cotvTkQfrvtY0b8YJovMNPX9TS87smH4ORePb/jfm/
+         lApxgxj3za1LX0gNY3a13uKPK/4EvWGwUdd+CoWUUZhSJeBjh3gZrYhGoAppBPag8S9D
+         uUbw3cyR7yIbg00UJ6py0o5vQrSsDhR38Fr7YUH6wrRjS/v7/PlakWMfX3FWK/rQQFFf
+         PrUSzDfciQyDbLEbNlf9eFpUsdPKmem9Rg/31AOtRCCxzZqVzqb0djRxyFUYktxOZrOA
+         6CteZ90Fba6Bvk3WQgITdvxebqhEz6Fton36MR78a0EItXi084RJ/MURLLiCszx7mnwU
+         l6HQ==
+X-Gm-Message-State: AOJu0Yw1K6ftnFD1dSARl+Y4iFS+bLwgnWJtw65kFdYk6ooSSeRiVm4w
+	YPr95kMeEoDbzKveiU0mWwdNbHGCxomnbgih8+DFCVd1ZaG4C/MVFGgd
+X-Gm-Gg: AfdE7cnW2ZR8DUzLAQrV6csBsgAD5wi8KyiIkHf5KVqNyRpbmd0YlUXUlu3Cvf0g9P0
+	Yo43TPZmw/o4SolbedH4YXC549IRq71nMZ/GhuCE618bXUKka36Rc18BRkEwKnDE/NV9vc/Zhc9
+	L2eOdrrvIceNB3/Mth17Y256vjH5f5BZYu0RSHMWNtjUMndatMxWNpjNbekt57zOWOApPWQADIS
+	ZpDRfShtWEbpqpzsV8gdlvWXqqjr+SoBqeOLALG94I3Zaw789+sExNRBnm33TSe60jzn91wNWUP
+	hJOnhjfHSl6SQQcNJ9B6pccUpJxSMBWMrih9mZsmgh2eB21FOWpZpibSlLpJQiSaFC9ssUXoCya
+	VXr1YwO9SQou2H6s36tAjRjcz37hceEvMmc/VobFLmHYUz6XOh7xO9aqHZL4AmHJxKFqSi7hySf
+	HSpdRrRqmUyiQCksQUdPM60iBTI4rFjFPZwMN4viDh5uTIq+f915MYotxqFIntZgs=
+X-Received: by 2002:a05:6000:46ce:b0:462:1aaa:2490 with SMTP id ffacd0b85a97d-46500a02b2bmr11882002f8f.6.1782021727882;
+        Sat, 20 Jun 2026 23:02:07 -0700 (PDT)
+Received: from practice.local (bzq-79-177-129-37.red.bezeqint.net. [79.177.129.37])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466643f4ee6sm13525771f8f.5.2026.06.20.23.02.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Jun 2026 18:40:37 -0700 (PDT)
-From: guzebing <guzebing1612@gmail.com>
+        Sat, 20 Jun 2026 23:02:07 -0700 (PDT)
+From: Jay Winston <jaybenjaminwinston@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Guzebing <guzebing1612@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Make WBT latency writes honor enable state
-Date: Sun, 21 Jun 2026 09:40:30 +0800
-Message-Id: <20260621014030.1625306-1-guzebing1612@gmail.com>
-X-Mailer: git-send-email 2.20.1
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	corbet@lwn.net,
+	Jay Winston <jaybenjaminwinston@gmail.com>
+Subject: [PATCH] Documentation: ABI: fix "unexpected indentation" error in sysfs-block
+Date: Sun, 21 Jun 2026 09:02:02 +0300
+Message-ID: <20260621060235.12994-1-jaybenjaminwinston@gmail.com>
+X-Mailer: git-send-email 2.46.4
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Guzebing <guzebing1612@gmail.com>
+`make htmldocs` reports:
+Documentation/ABI/stable/sysfs-block:612: ERROR: Unexpected indentation
 
-queue/wbt_lat_usec controls both the stored WBT latency target and the
-effective WBT enable state.
+Leading dashes at lines 623, 636, and 641 were considered line
+continuation with errant indent and not bullet points due to
+missing blank lines.  Add the blank lines.
 
-The old no-op check skipped updates whenever the converted latency
-matched the stored min_lat_nsec. That check ignored whether the current
-WBT state already matched the state requested by the write. For a queue
-disabled by default, attempting to enable WBT by writing the default
-value through sysfs could return success while the enable state was left
-unchanged.
-
-Treat a write as a no-op only when both the stored latency and the
-effective WBT enabled state already match the converted value.
-
-Signed-off-by: Guzebing <guzebing1612@gmail.com>
+Signed-off-by: Jay Winston <jaybenjaminwinston@gmail.com>
 ---
-Background:
+ Documentation/ABI/stable/sysfs-block | 3 +++
+ 1 file changed, 3 insertions(+)
 
-The issue can be reproduced on an NVMe namespace when BFQ is available:
-
-  echo bfq > /sys/block/nvme0n1/queue/scheduler
-  cat /sys/block/nvme0n1/queue/wbt_lat_usec
-  echo 2000 > /sys/block/nvme0n1/queue/wbt_lat_usec
-  cat /sys/block/nvme0n1/queue/wbt_lat_usec
-
-After BFQ selects the queue, WBT is disabled by default.  On a
-non-rotational NVMe namespace the stored default latency remains
-2000000 nsec, while the sysfs file reports 0 because the effective WBT
-state is disabled:
-
-  queue/wbt_lat_usec = 0
-  debugfs enabled = 3
-  debugfs min_lat_nsec = 2000000
-
-Writing the default value succeeds, but the old no-op check skips the
-state transition because min_lat_nsec already matches the converted
-value:
-
-  echo 2000 > /sys/block/nvme0n1/queue/wbt_lat_usec
-  # echo returns success, but:
-  queue/wbt_lat_usec = 0
-  debugfs enabled = 3
-  debugfs min_lat_nsec = 2000000
-
-As a control, writing a non-default value first does work:
-
-  echo 5000 > /sys/block/nvme0n1/queue/wbt_lat_usec
-  queue/wbt_lat_usec = 5000
-  debugfs enabled = 2
-  debugfs min_lat_nsec = 5000000
-
-Writing the default value after that also works, because the stored
-latency changes from 5000000 nsec back to 2000000 nsec:
-
-  echo 2000 > /sys/block/nvme0n1/queue/wbt_lat_usec
-  queue/wbt_lat_usec = 2000
-  debugfs enabled = 2
-  debugfs min_lat_nsec = 2000000
-
-With this patch, writing the default value after BFQ default-disables
-WBT also re-enables WBT as expected:
-
-  queue/wbt_lat_usec = 2000
-  debugfs enabled = 2
-  debugfs min_lat_nsec = 2000000
-
- block/blk-wbt.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index dcc2438ca16dc..953d400fd0137 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -813,6 +813,21 @@ static void wbt_queue_depth_changed(struct rq_qos *rqos)
- 	wbt_update_limits(RQWB(rqos));
- }
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index aa1e94169666..f4bce370a540 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -620,6 +620,7 @@ Description:
+ 		- async_depth is always equal to nr_requests.
  
-+static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
-+{
-+	struct rq_qos *rqos = wbt_rq_qos(q);
-+	struct rq_wb *rwb;
+ 		For bfq scheduler:
 +
-+	if (!rqos)
-+		return true;
-+
-+	rwb = RQWB(rqos);
-+	if (rwb->min_lat_nsec != val)
-+		return true;
-+
-+	return rwb_enabled(rwb) != !!val;
-+}
-+
- static void wbt_exit(struct rq_qos *rqos)
- {
- 	struct rq_wb *rwb = RQWB(rqos);
-@@ -1005,8 +1020,12 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
- 	else if (val >= 0)
- 		val *= 1000ULL;
+ 		- By default, async_depth is set to 75% of nr_requests.
+ 		  Internal limits are then derived from this value:
+ 		  * Sync writes: limited to async_depth (≈75% of nr_requests).
+@@ -633,11 +634,13 @@ Description:
+ 		  these limits proportionally based on the new value.
  
--	if (wbt_get_min_lat(q) == val)
-+	mutex_lock(&disk->rqos_state_mutex);
-+	if (!wbt_set_lat_changed(q, val)) {
-+		mutex_unlock(&disk->rqos_state_mutex);
- 		goto out;
-+	}
-+	mutex_unlock(&disk->rqos_state_mutex);
+ 		For Kyber:
++
+ 		- By default async_depth is set to 75% of nr_requests.
+ 		- If the user writes a custom value to async_depth, then it override the
+ 		  default and directly control the limit for writes and async I/O.
  
- 	blk_mq_quiesce_queue(q);
- 
+ 		For mq-deadline:
++
+ 		- By default async_depth is set to nr_requests.
+ 		- If the user writes a custom value to async_depth, then it override the
+ 		  default and directly control the limit for writes and async I/O.
 -- 
-2.20.1
+2.46.4
+
