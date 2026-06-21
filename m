@@ -1,152 +1,224 @@
-Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C85325B08D
-	for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 06:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE411A3166
+	for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 13:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782023012; cv=none; b=j2bVbYviPrnk72toajJh0NrzdemDhHYtETZTEoJXPFYBQnBoQX6Ws/0E1sMYPvSR+wFj9YZ7eHlQm9ZORPGlQvT6GxlAZofJUH/Som6zhObTKRwWysHMS3dPFoG0ZHCbBmbOGRxpn3+Ye/kSG6Sfrx1PYik91nEcBvY1vvlu6Bg=
+	t=1782050370; cv=none; b=XhyscmrW8IEYEAuYaYezIX9wx/cdAzrZVrMWlIeKQFShMvQEeDJwOclb6RxNpx5JB0Duu2KeTSw95xZ7IcpecSbP7xqXePS3b+/TLK2fiDFYC9CLbseb0+MTflOus9cKMJIQuFAr84MFXbKhCLVC1SYaBtW4ggUp/ZG6/BMVgYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782023012; c=relaxed/simple;
-	bh=fvPdvbKCHNcGq7TIENzOt+l3XxV5oS+AG7cJr0UOi0s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IufqCJozQYQC8PE48+jFCViwzPPMSvytMcGN9B2iKrwJ6fiogXjSykSWPBNpdZPP/TAsJZSKuUEgKlZaasuqSUS1I0gavrms2/wmpG+k3ji5A0OebM8NLBkwAVUvC9LfbOuU13Gcaj4vRu3IGHXyLy3wWYeHvUwG6/e7ROiawPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7e6eeff3b75so4310432a34.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2026 23:23:31 -0700 (PDT)
+	s=arc-20240116; t=1782050370; c=relaxed/simple;
+	bh=7E8W3VETOqPs9uJNQ/rJsMQaDBaWzPuymTc/8AWSl9s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UVZ7OqJB2RCoWQ5ioqbSJQufDs9MmbMxiq3HJx83rB+6VrCNJXqN2Mw4DtQG4C6TOluQ4PUtUfGfKSzuqPV7drinwZrvJm2DwnTzo/RRVTHaOwpADV01wCsD984tUiWb02d0NbvFK08fEgz+mc4z6YyMikWoSH0RqOP4TiioeM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KADqT/t7; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KADqT/t7"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2c77d52bec4so1596715ad.1
+        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 06:59:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782050368; x=1782655168; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UOlLZDSp/+f4baWmQ+nL2uVR8nR0njaY3srnmTa/4vA=;
+        b=KADqT/t7A8AxSN7wX/GeeM3MSeNHVpFwjMHO4zZ4YFxlENfvjP14UtpN7mOM9y/bKK
+         JddU/IWDcH01+G2pMkvbMpYC3yschpu+K40bTGLVIG7ZERU88dNyuYFIMdTdvghXBLwk
+         z4toQjbPNQgofZ6KMPYU1kjC6GuiE5tOjpDQrAS4l3QtAmaouC77Qi6B1FPFix5B2amB
+         GdMxffF+UeEzWi2RNLRldG3YCFQ8bT7ojNQHf2PUB2YQX/+XlPUqHljZYclbi0B+5LQ4
+         mvxrgIYPtAy23HKPC7ejvhcOHNjDt8yY+aHBsbmCwiO7Z2LFqKlvbkjUo6Xd7wcJz6zb
+         weRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782023010; x=1782627810;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8xXO7vuOsbMc3EQf6yQWVfMfKDoPfeW5bIr0yXwy+es=;
-        b=O99LL1o/nfl/UgLU/WAgTujKbiqqeymOaFDSJg4vWEKV1uXMfFEnN+QLLaiHCymyrg
-         SbzSHNT6D++K9/ACV9J8NbJ1flV5UPlE95PjbVW8lp2kMCLd7o6AfqfQGNyEGsgG1QGm
-         8CmTLJ3Ct/Tz7oyAlF9YB8VhVeSLrmtpBhHMPIc0h1RZXpiuwv9KFVSIDgK0mK6s+OBb
-         O8AYq5ugEB+3SO6as2Gi6YR2paWViJ82WOFMzKacY7YNNX4RmXW4wq5ilHfMCRTlkQ4w
-         vfVsQxJVYQr0NiWD4Du/tGAeARifTvijZEwfk3DnZIP+DvOpCw6EH6nTj6Rv0UR3+in2
-         /fig==
-X-Forwarded-Encrypted: i=1; AFNElJ99k7VvpgvDpViTpQYrYv3CJj4FG8RSV0iKPRlA3Xi/3puSblf5OC5PZemJPjwWFmuWNq2tVomW2skVCQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD/eE9r1sUuQpVTJ7n3tXgyo3IbaOTVt2Nsw0sN64/QZuHCwJG
-	gFWKZcvdkcsf1Jige10YF4dTu0Udtx/qy0TcGhA9SwZk5Ui/DcgdKsfGQ749RtougidRg4Hfeum
-	M/SJ6pacIa8HH9/er6kLQZVMAcsDQZWsTqQnlDv5bEWpkbuQ1A2cN560Q/Uw=
+        d=1e100.net; s=20251104; t=1782050368; x=1782655168;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOlLZDSp/+f4baWmQ+nL2uVR8nR0njaY3srnmTa/4vA=;
+        b=Q7HHc4aJyP0cxAVM+cN/278iqV0SVnykV364u8y0kLD0cfMkUYs+j4OqmnhlPVtL5w
+         vucz3Q7WafyBBmiSmtlIZ8GtolgsfcC+eR1RtRfjie67mFXNmF7Mx6zs3OR/hLuHok48
+         ajSwZsDBbS9fRDOcVDNvzYB3hdW4RuQIUbML9SaOYpN+aNwS8o9xmgudxysUIT5nB0lA
+         Xsqc6uBWKAm3+nmWZdS78XIdNMkeAaz4e2E+62i+3zHuZyvnHz8RcTKRA0Q4mTCY9mJo
+         +MOOTabtmYhi7JCvUwh2U0s5knXgUHvXcmXDcKZq2zDxysbs+uW8LjMCah6qFoiRJn53
+         uNrg==
+X-Forwarded-Encrypted: i=1; AHgh+RoIvVwV7coGuReQSFKFL4kA5DEV5m+75jsAoMcFCf8igNrnw90Soq42YW8KznzpFY94I2y7Eg5SRvbkEA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5frA93EnZSjclqnAvTS18egfQk7MOvypIsyYv6eGniqLH6Xe4
+	sqEzEKBuMIhHAMtM53otoxHOLScsycRlT3q4SgzXA6MdahzIdd6SJjjr
+X-Gm-Gg: AfdE7cn5/EfCSdY7YKudrNNhY4l4f/9jlWXJKPxmJZ1LyUsjHMr+TkrmIijps6GuCqd
+	6NPHmWqq9A+cP/EYVGB1tiT6Kr3LV3gYqsqDJm9VMDIrsi4ThJTKbyuJOFZb4onM3/RGmw0HZRI
+	ST1/MM3dDvmk4UQiyZo8/9/Ss0a7Po/tF/uwFGk6xTIX65znmKZX22G6w/rM5eKqPvUEMbkXD2I
+	qx4Ys2T+W8YeEegh0cY40TDiTBkDXUqJo/lUWI0dhM3czIW4lvfqJYncc9P/ue8r9X9l0S5CEJ5
+	5zL7C9EgY2D0YaDQ1XvPyFj1rMUkfxuyth7Yot8SG4X5tXHBIaqyiZQMwqJclGLtbKEuAUUipe3
+	XvDEQAuOgOu5p3CIYsOLTv++m6oQAfiN7wXneRx5S1iMhi4BydjaQn07CtGtra6y2njDOXWNdS3
+	HKvPH9gp8=
+X-Received: by 2002:a17:903:3b8f:b0:2bf:1aa9:6c8a with SMTP id d9443c01a7336-2c719548b7bmr92391135ad.12.1782050367929;
+        Sun, 21 Jun 2026 06:59:27 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7436f5ff5sm50948385ad.29.2026.06.21.06.59.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jun 2026 06:59:27 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH] blk-iolatency: flush enable work after policy deactivation
+Date: Sun, 21 Jun 2026 21:59:16 +0800
+Message-Id: <20260621135916.2657247-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:4f14:b0:489:6f90:2f45 with SMTP id
- 5614622812f47-489aeaa6809mr8700295b6e.1.1782023010490; Sat, 20 Jun 2026
- 23:23:30 -0700 (PDT)
-Date: Sat, 20 Jun 2026 23:23:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a378362.5c48295d.477b4.003e.GAE@google.com>
-Subject: [syzbot] [nbd?] WARNING in nbd_add_socket
-From: syzbot <syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+A blk-iolatency rq-qos teardown can free struct blk_iolatency while a
+freshly queued enable_work callback still references it. The observed
+failure is:
 
-syzbot found the following issue on:
+blkcg_iolatency_exit() flushes enable_work before deactivating the
+iolatency policy. However, blkcg_deactivate_policy() calls
+iolatency_pd_offline() for online policy data, and iolatency_pd_offline()
+clears min_lat_nsec through iolatency_set_min_lat_nsec(). If this clears
+the last nonzero latency target, enable_cnt reaches zero and schedules
+enable_work again after the flush has already returned.
 
-HEAD commit:    b85966adbf5d Merge tag 'net-next-7.2' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=101f6d56580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9a9f723a32776544
-dashboard link: https://syzkaller.appspot.com/bug?extid=6b85d1e39a5b8ed9a954
-compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13584aae580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11fd7b7a580000
+The buggy scenario involves two paths, with each column showing the order
+within that path:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/780edcc3cc37/disk-b85966ad.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/967dd18c7ecd/vmlinux-b85966ad.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/cf9fa92c90ff/bzImage-b85966ad.xz
+blkcg_iolatency_exit() path:          system_wq worker path:
+1. Flush old enable_work.             1. enable_work is idle.
+2. Deactivate the policy.             2. no worker owns it.
+3. Offline queues new enable_work.    3. work item becomes pending.
+4. Free blkiolat.                     4. worker later runs the item.
+5. Owner storage is gone.             5. worker dereferences blkiolat.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
+Flush enable_work again after blkcg_deactivate_policy() returns and before
+freeing blkiolat. Policy offline callbacks have completed at that point,
+so the second drain covers the late queueing path without changing the
+normal enable/disable accounting rules.
 
-netlink: 3936 bytes leftover after parsing attributes in process `syz.0.25'.
-------------[ cut here ]------------
-!sock_allow_reclassification(sk)
-WARNING: drivers/block/nbd.c:1249 at nbd_reclassify_socket drivers/block/nbd.c:1249 [inline], CPU#0: syz.0.25/5992
-WARNING: drivers/block/nbd.c:1249 at nbd_add_socket+0xf35/0x12c0 drivers/block/nbd.c:1293, CPU#0: syz.0.25/5992
-Modules linked in:
+Validation reproduced this kernel report:
+BUG: KASAN: slab-use-after-free in assign_work+0x2a/0x150
 
-CPU: 0 UID: 0 PID: 5992 Comm: syz.0.25 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
-RIP: 0010:nbd_reclassify_socket drivers/block/nbd.c:1249 [inline]
-RIP: 0010:nbd_add_socket+0xf35/0x12c0 drivers/block/nbd.c:1293
-Code: f7 e8 6f b5 20 fc bf e0 01 00 00 49 03 3e 48 c7 c6 40 02 55 8c e8 2b a8 1b fb b8 f0 ff ff ff e9 b2 fd ff ff e8 ac 60 b5 fb 90 <0f> 0b 90 e9 16 f8 ff ff e8 5e 2e 97 05 44 89 e9 80 e1 07 fe c1 38
-RSP: 0018:ffffc90002ef7160 EFLAGS: 00010293
-
-RAX: ffffffff86109574 RBX: 1ffff1100651ddb9 RCX: ffff888020b68000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc90002ef7250 R08: ffff888035af2bdf R09: 1ffff11006b5e57b
-R10: dffffc0000000000 R11: ffffed1006b5e57c R12: ffff8880328eec00
-R13: 1ffff920005dee38 R14: dffffc0000000000 R15: 0000000000000001
-FS:  00007fcc9d5dd6c0(0000) GS:ffff88812527c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f81a8ab50f0 CR3: 0000000078780000 CR4: 00000000003526f0
 Call Trace:
  <TASK>
- nbd_genl_connect+0x133d/0x1c10 drivers/block/nbd.c:2254
- genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
- sock_sendmsg_nosec net/socket.c:775 [inline]
- __sock_sendmsg net/socket.c:790 [inline]
- ____sys_sendmsg+0x9b9/0xa20 net/socket.c:2684
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
- __sys_sendmsg net/socket.c:2770 [inline]
- __do_sys_sendmsg net/socket.c:2775 [inline]
- __se_sys_sendmsg net/socket.c:2773 [inline]
- __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcc9df9ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fcc9d5dd028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fcc9e216090 RCX: 00007fcc9df9ce59
-RDX: 0000000000004040 RSI: 0000200000000140 RDI: 0000000000000004
-RBP: 00007fcc9e032d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fcc9e216128 R14: 00007fcc9e216090 R15: 00007ffc8f827678
+ dump_stack_lvl+0x53/0x70
+ print_report+0xd0/0x630
+ ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __virt_addr_valid+0xea/0x1a0
+ ? assign_work+0x2a/0x150
+ kasan_report+0xce/0x100
+ ? assign_work+0x2a/0x150
+ assign_work+0x2a/0x150
+ worker_thread+0x1b7/0x500
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0x192/0x1d0
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x2ac/0x3c0
+ ? __pfx_ret_from_fork+0x10/0x10
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __switch_to+0x2d5/0x6e0
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
  </TASK>
 
+Allocated by task 470:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x14/0x30
+ __kasan_kmalloc+0x8f/0xa0
+ iolatency_set_limit+0x301/0x450
+ cgroup_file_write+0x178/0x2e0
+ kernfs_fop_write_iter+0x1ef/0x290
+ vfs_write+0x446/0x6f0
+ ksys_write+0xc7/0x160
+ do_syscall_64+0xf9/0x540
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Freed by task 611:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x43/0x70
+ kfree+0x131/0x390
+ rq_qos_exit+0x5d/0x90
+ __del_gendisk+0x394/0x490
+ del_gendisk+0xa1/0xe0
+ virtblk_remove+0x41/0xd0
+ virtio_dev_remove+0x63/0xe0
+ device_release_driver_internal+0x246/0x2e0
+ unbind_store+0xa9/0xb0
+ kernfs_fop_write_iter+0x1ef/0x290
+ vfs_write+0x446/0x6f0
+ ksys_write+0xc7/0x160
+ do_syscall_64+0xf9/0x540
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Last potentially related work creation:
+ kasan_save_stack+0x33/0x60
+ kasan_record_aux_stack+0x8c/0xa0
+ __queue_work+0x42a/0x800
+ queue_work_on+0x5d/0x70
+ iolatency_set_min_lat_nsec+0x196/0x230
+ iolatency_pd_offline+0x1f/0x40
+ blkcg_deactivate_policy+0x194/0x270
+ blkcg_iolatency_exit+0x33/0x40
+ rq_qos_exit+0x5d/0x90
+ __del_gendisk+0x394/0x490
+ del_gendisk+0xa1/0xe0
+ virtblk_remove+0x41/0xd0
+ virtio_dev_remove+0x63/0xe0
+ device_release_driver_internal+0x246/0x2e0
+ unbind_store+0xa9/0xb0
+ kernfs_fop_write_iter+0x1ef/0x290
+ vfs_write+0x446/0x6f0
+ ksys_write+0xc7/0x160
+ do_syscall_64+0xf9/0x540
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x33/0x60
+ kasan_record_aux_stack+0x8c/0xa0
+ __queue_work+0x42a/0x800
+ queue_work_on+0x5d/0x70
+ iolatency_set_min_lat_nsec+0x196/0x230
+ iolatency_set_limit+0x3f1/0x450
+ cgroup_file_write+0x178/0x2e0
+ kernfs_fop_write_iter+0x1ef/0x290
+ vfs_write+0x446/0x6f0
+ ksys_write+0xc7/0x160
+ do_syscall_64+0xf9/0x540
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Fixes: 8a177a36da6c ("blk-iolatency: Fix inflight count imbalances and IO hangs on offline")
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-iolatency.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 1aaee6fb0f59..a0bdd8a5c94c 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -639,6 +639,11 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ 	timer_shutdown_sync(&blkiolat->timer);
+ 	flush_work(&blkiolat->enable_work);
+ 	blkcg_deactivate_policy(rqos->disk, &blkcg_policy_iolatency);
++	/*
++	 * blkcg_deactivate_policy() invokes iolatency_pd_offline(), which may
++	 * queue enable_work again when it clears the last latency target.
++	 */
++	flush_work(&blkiolat->enable_work);
+ 	kfree(blkiolat);
+ }
+ 
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
