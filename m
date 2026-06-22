@@ -1,180 +1,182 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A4A2741A0
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 11:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782128338; cv=fail; b=cQtbzVsMi5+w665Kh4pOZmAxIJhudbPSHGBq2sCsA8NRwk88o7wH8gnkHyRSFFNc9qsNsFWE3rp+hRkepkw7zEez22qLF9p12ZMsDaVuktCLWDKSbGvUIUoBj92wL+fMuhcreyfeb9LS02xTLZa7iKx6296cC1nnistXeQVO8XM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782128338; c=relaxed/simple;
-	bh=pK/fKB2jFtbIplNf4mKawAp88WdzbyVYuqC+zSA9cmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=fbwPHIirHMoNcrk/RcCl4o3i6tLJKWo6cK/5LZ4+gvWdMxS1ixXHfhoUUlRbVLWJcggT2tmCWBAUWSUWx702NXrR6ldcVKUEoES6mAmGFp6GjQTlOaT1EwCdSe/qc0x7kET0cTxIFrXN28+cwvKl6hpUQRGxtAB0i7D/F8UU9UA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Gyh1sDoN; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=EphskzZv; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A49E3ACA46
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 12:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782132183; cv=none; b=rJtFePtUWSNB5iHFPySONWQhZ7cK35UJUSVa6sBkg2KKHbdmEz31cqsIjnKmBxtz2fen+C4+l3cPLkLVjY/bqy8x4PzLbAPX3W3e8f63ovZcThfb29cBvzRnv4eMM/eaNWCTERz5o9aTgGytNOi0VEof7U2uDHmU+b0J1dKCK7M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782132183; c=relaxed/simple;
+	bh=utmAMcDGDjQmBDf1w/Ak2DFft5nBmi6H323DLy5kSPc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z7E4IMznYlay/cxaj6Rdmq1lQzZRd3xBBpDpZRI2co4FUPzwysg+NeV6PuwLlDTNIcJjH2zmGSd46eqjF2n4y894///pTbrauK9/uG5CH0ZIf3KQlY1J6TmwqkvSDUak/036/TQLxbsSkh+qHPoieZ82AdAjEIVPw5R12K2ZXCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=joTryDYq; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Gyh1sDoN";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="EphskzZv"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1782128338; x=1813664338;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=pK/fKB2jFtbIplNf4mKawAp88WdzbyVYuqC+zSA9cmw=;
-  b=Gyh1sDoNYTxCa0qbjRriz6cCp06udGK6xmUiZIVCfFO7HiKBX4KGhswN
-   bZaEnXnYacs/5T2S7rxSwjSJIFJsNSyKC9Mlh5Dtqehjz7LtYMWmvsEKa
-   b25piB53XvTMQ12wNZeDA/agwhlpXohjuVHGFZgaNvOe/JkO5l0biOVAy
-   T9jU3iqrhifHcQV05ED5rWHmvJphVvTZVPxhgo93K1aq/0pM7EOkoX1Ah
-   m9cO0yYYkmreuvyxNj32Z5ir1yxaIJJkiIHzSWfG8vBe/U8u/Ik9kBZbb
-   MrL+/PSpPviNPBSFjTfy3Txp2p6V/ggdE5cDzdZ5iXppJcseu45i88iAZ
-   Q==;
-X-CSE-ConnectionGUID: ypYE/KtTRiqhOZfo58P3BA==
-X-CSE-MsgGUID: eNu0O86sQD+3D686sp7UGA==
-X-IronPort-AV: E=Sophos;i="6.24,218,1774281600"; 
-   d="scan'208";a="145457862"
-Received: from mail-southcentralusazon11011069.outbound.protection.outlook.com (HELO SN4PR0501CU005.outbound.protection.outlook.com) ([40.93.194.69])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jun 2026 19:38:57 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ia5dMK0twpN+tCFZqTkuH1hItpGoaEgzsb1ELxEqtn979VE8GqH+3FuOFgKuEMN9dkyPR4f1ggdqxGNFjysNLIaJKKdE+zLfuI/dwzKHOI9MPzY6KIHMDjZHo8qUsj/zOYoBR7g7U0ylxfwQQl7ZqrdxYvzq2pPLQWpBkiFu8LDllXUgCF8NaAcYzUodJopeIyemRIoCaJ68m4jHm562U/SKi24toHbX9Vazer9/VgmQPlaIUoLz7KM07+ciCjaRE3EB/rqaz31agCPyq/k/Esmpu9lt5hQR6PmRBY+2biuSsSUuorMjGPf0YAqeNNQ5R2+QB1Mondueo84hSWL7cQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ozSJIDcuhbUi2LrWJVEQaPJJDMAsLpP9FjXt+2sSVdY=;
- b=XuLxMKprFnOf8ytbTlQwxMKZmRzRtxDJYDD3qCfT7/Zo8k5aMFKdrDcoFRswZlAvgz+FvmHqHF56RSfzG5w63QI90IpPwO373GA0ZjXeJ81HJDLH7obdAb0pk/0nh9zj46yKM3yJPIyHh9Scg+CrJkqN6UgQcdj29Kmddd5AH9v2wcLDKUUFQ7uqgpC6FloNZ7s9xTNoSVyA5pP3oVQcOavsQ+m4v2ZT0tXXafkXs+Za9UxNNjQG+lvGdkohv/2lAcbtL5r61iXICjfygJNd9ePDU2yZX3bnOSJ3M1Kvfi2PtiBuYJk6r0HDz7EXEF6DdQHKgBZijFQKDHwPE7KpHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ozSJIDcuhbUi2LrWJVEQaPJJDMAsLpP9FjXt+2sSVdY=;
- b=EphskzZviRStujh3ogtlwxOHmqBB6AGkILte18k96TUB506SsR1xy4uBC/2Qdh48s0H+9T329p7UyONnwkC4KGp3yWagZQ6g6T+sIWBTHDHYj4x1XDgJU5oJAeaVidb4ZfT3F5DBFc/EIVFhF3ATHQzAQLO5CONE5EIArGREEoA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by CO1PR04MB8265.namprd04.prod.outlook.com
- (2603:10b6:303:150::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Mon, 22 Jun
- 2026 11:38:53 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%6]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
- 11:38:53 +0000
-Date: Mon, 22 Jun 2026 20:38:48 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jeff Moyer <jmoyer@redhat.com>, linux-block@vger.kernel.org, 
-	osandov@osandov.com, kch@nvidia.com
-Subject: Re: [PATCH blktests] Fix _get_page_size()
-Message-ID: <ajkeGQd-0LnKJbHN@shinmob>
-References: <x497bnvlxlc.fsf@segfault.usersys.redhat.com>
- <ajXmBu9lDZwgMG7_@shinmob>
- <d0432702-ac0b-410e-9586-2cb9be079033@acm.org>
- <ajYabLMbEo6zyOWh@shinmob>
- <089e0281-4df8-4358-91ce-1f5cc0f0ec4b@acm.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <089e0281-4df8-4358-91ce-1f5cc0f0ec4b@acm.org>
-X-ClientProxiedBy: TY6P286CA0021.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:405:3b9::16) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="joTryDYq"
+Message-ID: <0494d714-db5c-4358-86e1-37527f52e7f2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782132179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=faCZmH5g5Ta9m2J6zC+tR3/ZZXd4+AmOWxaxfSCmJCM=;
+	b=joTryDYqD7RqwYRfmbnTLuKFTJVfgXhanPbTiE3S+r8y1qOVGB+xcLyAm9Fohu/5OaIr+P
+	YPWhIg9XER/ei55WL2hAW8PUODttUqHpjKLmi0VbG7XKlebnd5hGUVupZIsOq7yiU71RhY
+	WcpVo0P21fdV4aLrd6dNqxvzkLGcHQ4=
+Date: Mon, 22 Jun 2026 20:42:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|CO1PR04MB8265:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0fb7b2cf-6af1-4048-d834-08ded052d670
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|19092799006|23010399003|1800799024|18002099003|22082099003|11063799006|4143699003|6133799003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	W/50YaMeCewi3lN0qZe/8i+9UI8X35srbXMKOhwWREfEwQpDbMzZ6TkZFgaMNIJvWvc6MOLxsp7nBz49CNksPfXFd0PxyJt6aLMwMFBjcPtXo58/4Z0sz7Bj+VfApsuidiYvsAyE1HcQ1dBMoNUx89X1au8sen2jw+2dwHGCKk+YQb8sUV7aBoBMGoRqGT7fKbdP6LEf9EaeSzUOYMyIfXlMe1E68ym93Tw29IRyZ/h6WPZegVJsV7hacXWFZY0s9YmQipL9+sRTwqBSv219kBbp+6RFq/1B9XsCd0NpxhvyW9+Fpc6tkBsYeyFjRM+D+PRJL1TGtFUckdPmNzQlsTqsD+lv91bGU2xS1gAJpaqEfujFtVXV43xTmoVGlZmWgF0VeslChbRl9co6U13ww0KCVKP8s9EWXx6ndRMefvlwxm52LvDQSh1VNGO2EqFI4yJ2mp3QWucDyFDO4/5S/+Z9b/E8lPaHhn7UfV/fj8Q3LnuAiLmr8sMJ8BbseWNNub/65QMT6+u7bpOZtM6RfNE1RjmAMIOrMLQ8z03TglQrw0R7RbXjnbRyu1JD1W7uAos0JUENsPS+7lelb4Fk8O7m3S0nWdqARARlJGXINwUptn1omF4TkTtufElLZ8leaRptIb2OBzazrdM1nWon5sZh3eEVto04h1901a/E3kE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(19092799006)(23010399003)(1800799024)(18002099003)(22082099003)(11063799006)(4143699003)(6133799003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?O88myrGhyZVcwIV+yf/ba0GEfu69GENNmT6cwIKtYPxNy/fOu9D9Vfq1c3if?=
- =?us-ascii?Q?NFbcpJkIGZ+0CJJWLlbvJlSKmuWW7JRv08OqflIm3thCqmJHfDpfoktcda8t?=
- =?us-ascii?Q?Yxie2vTs4mx+s1F+HGPm2DYnhEBeMMPVq63PTtHrAhwsDvnDOqFCJMB0Kp1p?=
- =?us-ascii?Q?R0EHozYRwGJKt5KCloF00WzTwqb3XCZvRPaeBvrffwqEqMMpdcW78eoDCbHK?=
- =?us-ascii?Q?4+8TB3IwOGPv7WVFeJ+cn5NfxP2wSpCtM+Wwgc2CMjiQgbsEgc85GR2hYwqL?=
- =?us-ascii?Q?sCjOja2G4Tn3v1mwdmGs1KTmMyIvcSjlGUzLPyL6mHKS0Z+WFxkVyBCtwF2N?=
- =?us-ascii?Q?w3XAvqiR1DpsG2xTw67NjgLVTnjCsB5E0JMHa9rfz104ZCOJGC4n4qWgflQC?=
- =?us-ascii?Q?oTIdCVsA9jPHTyDokDiDZh7XRWQjuBBOQtGG/mR/cIiteelB0AqkjTXEcSXA?=
- =?us-ascii?Q?vBLM7z7R945SzEj4eRK+H18PHX6LPTriCyeAVtRbN/bZJ0jnlMtVwAW9lJ2T?=
- =?us-ascii?Q?rJfqgI7C1aRK3GFx1KoWoIPFKx47um7M3xYa4/WYO5kRiRAxsoe/85CPAIf9?=
- =?us-ascii?Q?RvP9IZp9POfb2yMaXMlS0Ho06599ICn8A7KrGRnPEMeCxa6Br1mbW7rdpDaH?=
- =?us-ascii?Q?GzBhXlEaF/zqOVIKuN0DM593pPhn5yGrK/dtGVUlNBSDO0HE9Ct+MhO/OOox?=
- =?us-ascii?Q?0T6F2zrIouOEn7nlVFDqLue4e/4CiJ3D8HkxiSHVN5DqHxh8cLGOpmq30/Wt?=
- =?us-ascii?Q?5y/wHMKj2r+Gpoc+MPcaVd06Sha3ZNgzS6hC7AJBVVhObVdTdLD92yRDe/WL?=
- =?us-ascii?Q?zBSz1hItQYOKy6Kdsrcu7YULdt2CZbmpYkN21Wipev12hxX6DdvSqmEmHzyj?=
- =?us-ascii?Q?GKte2TnFlbVMWgvfiIrCrq8HbpT/H608n0aJD1eqRCRcAMFr1zGA4pIkHHtx?=
- =?us-ascii?Q?+lyhgE2IKA4BRH6xvYZcMwsSSLveMHvYb7kpJbEil28uquLK0SqsMExcQNP5?=
- =?us-ascii?Q?bbaBIIXkfuIEgGx6jVxH+E8pZGNZ5w1+UBrCI7kspQ32ODQ03DGSfU24jfi8?=
- =?us-ascii?Q?XSUhXkYc+ns1Dlsk2B136mfWFwfAPxUI/gy5kmAlTQ5bw692T0bYhZRf/3Vf?=
- =?us-ascii?Q?GKmsxwNsi9DH7BzZ3px0prnY7aR4HKa9ayjXkcCoqTbaRUz+YDgjcw9mKjhF?=
- =?us-ascii?Q?D+OtuxBcb3ok47pPfPn1BTVo2HKo206Eqn2IBmYs8Sy8ksAZI0jLcIoFU5sn?=
- =?us-ascii?Q?BBOE/rAn9ZY8ENijKHNter3HMPoLmr+A5QZJCjmpSjN7zI2f5B4msSMzm+ai?=
- =?us-ascii?Q?TSpQ+oGYoTqVLqnsHnL/gE5jOWtQJAbvR8gLwwKf6MnIAEQ1WaSpHKI7IjH1?=
- =?us-ascii?Q?l7IsxCjg4U/RGvGGVgy3bUiR9hFJu+BI5IjJFlQV/gTxD+U181xVBqbQzN84?=
- =?us-ascii?Q?6GNATfBOscjMNAbpIFzz/nIDLEvre7SelQ/30HrQSZ8AwETUiqb32XbACeYq?=
- =?us-ascii?Q?zaafU0q2H3yRP7ghSfPpAOkNPYxQWRHIJgXGaF3qMKL1232KJHgyZXbkVqFb?=
- =?us-ascii?Q?d7V4L5RwFJj8Wm+Zh5moD45n2gaPIHd7oQ5qNXMaqLA5NCvLpccymCFP+5VE?=
- =?us-ascii?Q?QWC+zs6pU8uXrw0cfomiZAQKw2xFxUp861AwxO9eOrh4I4r8PThtEJ/qWGX+?=
- =?us-ascii?Q?n7sLqOHcIzcl/llRCgyJV/yuyepS+6RoTRwVO9gN/35kQn9gIn9VLNgbi18y?=
- =?us-ascii?Q?cpDywLiojIwXM/lpKQ2RXXOl6EYEilQ=3D?=
-X-Exchange-RoutingPolicyChecked:
-	P8cIzb0VwVXQ1PeWOdUxL1Qa9mpcAp7O8re3Lf9fz5YqlcIEZvWDVSRVGXBHmubK1wCqcAicdekgtr0PXgdZcquHEdompRGhNK/FPpr1JSXNkdFo+IhilnnHQ3Kzk55aoV54TW/IImPAuidSuRsKhLM/paTOlnR4+EL2yRynEp+2WUaeFNqaHWI2Jz4Vn23whd1SIIgyV99nYLVthtt3PSDQUWLVGMKjayS8qyz1xVmfCGdLmS5XhxmtIAaiS95NVCGx4VxaWIQyLIrCRLYfrFOeJh83T9fMPmIXsUb06ikFPf3197LuhEXfu7Gk6If+sR6uxuuXT+nn4iIRM5WHvw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	rkXtDCdzy1wfX5eUqOKuLjmacIZSSxPNosNBLtsPCp3/RidWsDSCkayCtgkkyNdqNx8pQh7mvAZtE8OtNnDukZKomCKjJlH5BFucodKtS/FMqyHNKDaUvlHgacdG4oJ9uMbbq1kZ7yBbMeU5smQUGDFmB6sqDTWiB+XOMjbXxOhqBSEZNzqbk5s2mHPEIqpMwrPoJfXy4DOEZBc8X5P3ayHfonkYHDnsd4N0HwRX/SvzlcYn5c6HL/wOygXzKkqVOCW/b4EhnUQlVT4EEm/TijaRwA8OqIdsmW8ZdAnXjsA37DUOwhw8y2tMfyBlfon8w8wghV0K9s2SkZMnbDQ4xVxtAy4uzOGug3CIRAzzBtr2/j+/SO4TBbrAc4Z+CzUprYGD1z0SsS15t6x62CSMY8cAkyxLCyN2N9PLVXYubJ4GaL/SSod7rTtPYYv/nmcfhFZwxIVAVDQiK2sgWEYfWl882r6rmeNLjFKdOS9OALFXewSjEARqLK5/aoqg6pwEEDpsfm65JcKNy2A/7pJk9pC3CPss9qvJqtmLIzoUj3Da+MswFBxG4Rcs1zly6bbC+BzvmROOzbbhnYhSZ8OXX4xTsvmqwaR4FJPV+wYNI8gcWyJ4/yQis1NxKU8Fy9dy
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fb7b2cf-6af1-4048-d834-08ded052d670
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 11:38:53.7537
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LBURXGblJzyusvBmsJii65061R3Sksmoy253OnNhJ+/TV/lo1Xjirah5ZF9Yulf4Yp+xFBFd8FF9AGm8RPopH41fGSP/JMZIm4o/YRVKcQs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR04MB8265
+Subject: Re: [PATCH v3 1/6] rust: module: add `THIS_MODULE` const to
+ `ModuleMetadata` trait
+To: Gary Guo <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>,
+ Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
+ <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
+ <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
+ <DJFIKIXLML05.3KYOXUGZYJRDZ@garyguo.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Alvin Sun <alvin.sun@linux.dev>
+In-Reply-To: <DJFIKIXLML05.3KYOXUGZYJRDZ@garyguo.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Jun 20, 2026 / 09:11, Bart Van Assche wrote:
-> On 6/20/26 6:51 AM, Shin'ichiro Kawasaki wrote:
-> > On Jun 20, 2026 / 05:55, Bart Van Assche wrote:
-> > > On 6/20/26 3:26 AM, Shin'ichiro Kawasaki wrote:
-> > > > This is a rather fundamental change, so I would like to ask opinions from
-> > > > other blktests users, especially Omar and Chaitanya. What do you think about
-> > > > the idea to add getconf to the requirement list?
-> > > 
-> > > CONFIG_PAGE_SHIFT was introduced in the Linux kernel in February 2024
-> > > (commit ba89f9c8ccba ("arch: consolidate existing CONFIG_PAGE_SIZE_*KB
-> > > definitions")). Older kernels had CONFIG_PAGE_SIZE_4KB,
-> > > CONFIG_PAGE_SIZE_16KB, etc. This means that it is possible to derive the
-> > > kernel page size from the kernel configuration file for all upstream and
-> > > distro kernels, isn't it?
-> > 
-> > I checked the commit is in the tag v6.9. My Debian bookworm system has kernel
-> > v6.1, then the config file at /boot does not have CONFIG_PAGE_SHIFT as expected.
-> > But it does not have CONFIG_PAGE_SIZE_* either... I'm still afraid that kernel
-> > config file approach is not reliable.
-> 
-> Right, for older kernels CONFIG_PAGE_SIZE_*KB is only available for some
-> but not for all supported architectures.
-> 
-> It is not clear to me where the desire to avoid the dependency on
-> getconf comes from? As far as I know it is available on all Linux
-> distro's. Since it is typically included in the C library package it
-> should not introduce a new dependency.
 
-I think less dependent is the better in general, and wanted to confirm that
-it is fine for everybody. If there is no voice to object, I will create a
-patch to add getconf to the requirement list.
+On 6/22/26 18:42, Gary Guo wrote:
+> On Mon Jun 22, 2026 at 3:44 AM BST, Alvin Sun wrote:
+>> Since `const_refs_to_static` has been stable as of the MSRV bump, a
+>> `ThisModule` pointer can now be used in const contexts.
+>>
+>> Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that modules
+>> can provide their `ThisModule` pointer in const contexts such as static
+>> `file_operations`.
+>>
+>> Move the `THIS_MODULE` static from the `module!` macro into the
+>> `ModuleMetadata` impl, add a `this_module()` helper, and update `__init`
+>> to use it.
+> Doesn't this break existing users of THIS_MODULE?
+
+You are right, I missed binder. I will add a patch to update binder to use
+`this_module::<LocalModule>()` in the next version.
+
+While looking into this, I also noticed `gen_disk.rs` has a `// TODO: Set to
+THIS_MODULE` with `owner` still set to `null_mut()`.
+
+Best regards,
+Alvin Sun
+
+>
+> Binder, rnull and configfs macros are using it.
+>
+> Best,
+> Gary
+>
+>> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+>> ---
+>>   rust/kernel/lib.rs    |  8 ++++++++
+>>   rust/macros/module.rs | 34 +++++++++++++++++-----------------
+>>   2 files changed, 25 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+>> index b72b2fbe046d6..50f5a7b5f028e 100644
+>> --- a/rust/kernel/lib.rs
+>> +++ b/rust/kernel/lib.rs
+>> @@ -184,6 +184,14 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, error::Erro
+>>   pub trait ModuleMetadata {
+>>       /// The name of the module as specified in the `module!` macro.
+>>       const NAME: &'static crate::str::CStr;
+>> +
+>> +    /// The module's `THIS_MODULE` pointer.
+>> +    const THIS_MODULE: ThisModule;
+>> +}
+>> +
+>> +/// Returns a reference to the `THIS_MODULE` of the given module type.
+>> +pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
+>> +    &M::THIS_MODULE
+>>   }
+>>   
+>>   /// Equivalent to `THIS_MODULE` in the C API.
+>> diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+>> index 06c18e2075083..b9fdee2f2af47 100644
+>> --- a/rust/macros/module.rs
+>> +++ b/rust/macros/module.rs
+>> @@ -497,28 +497,28 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+>>           /// Used by the printing macros, e.g. [`info!`].
+>>           const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
+>>   
+>> -        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
+>> -        // freed until the module is unloaded.
+>> -        #[cfg(MODULE)]
+>> -        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+>> -            extern "C" {
+>> -                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
+>> -            };
+>> -
+>> -            ::kernel::ThisModule::from_ptr(__this_module.get())
+>> -        };
+>> -
+>> -        #[cfg(not(MODULE))]
+>> -        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+>> -            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+>> -        };
+>> -
+>>           /// The `LocalModule` type is the type of the module created by `module!`,
+>>           /// `module_pci_driver!`, `module_platform_driver!`, etc.
+>>           type LocalModule = #type_;
+>>   
+>>           impl ::kernel::ModuleMetadata for #type_ {
+>>               const NAME: &'static ::kernel::str::CStr = #name_cstr;
+>> +
+>> +            #[cfg(MODULE)]
+>> +            const THIS_MODULE: ::kernel::ThisModule = {
+>> +                extern "C" {
+>> +                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
+>> +                }
+>> +
+>> +                // SAFETY: `__this_module` is constructed by the kernel at load time
+>> +                // and lives until the module is unloaded.
+>> +                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
+>> +            };
+>> +
+>> +            #[cfg(not(MODULE))]
+>> +            const THIS_MODULE: ::kernel::ThisModule = unsafe {
+>> +                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+>> +            };
+>>           }
+>>   
+>>           // Double nested modules, since then nobody can access the public items inside.
+>> @@ -616,7 +616,7 @@ pub extern "C" fn #ident_exit() {
+>>                   /// This function must only be called once.
+>>                   unsafe fn __init() -> ::kernel::ffi::c_int {
+>>                       let initer = <super::super::LocalModule as ::kernel::InPlaceModule>::init(
+>> -                        &super::super::THIS_MODULE
+>> +                        ::kernel::this_module::<super::super::LocalModule>()
+>>                       );
+>>                       // SAFETY: No data race, since `__MOD` can only be accessed by this module
+>>                       // and there only `__init` and `__exit` access it. These functions are only
+>
