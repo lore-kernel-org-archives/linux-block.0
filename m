@@ -1,265 +1,338 @@
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020082.outbound.protection.outlook.com [52.101.196.82])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E2C377ED7;
-	Mon, 22 Jun 2026 10:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125438; cv=fail; b=gFrRwOLZh7mdoLOkk4v1yvBiuPTlr1WjGq+tBzNzZWFKCwTjmzJag0q77zMgYyn1pqQKeO2CHCo3A1vXihoAMi2lYhODOYYzz1TCTRPGJyYWA+FxXQsNsMi/A+/b/RaMPw/cGVwCxL1RgLZv+iIAfD3Ba9Dk7aQWzHyHbD2YRIA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125438; c=relaxed/simple;
-	bh=oFYFwGGA6BVGYjdt6TF8CvlxU6Z70Omxl6jnO9H7pYI=;
-	h=Content-Type:Date:Message-Id:To:Cc:Subject:From:References:
-	 In-Reply-To:MIME-Version; b=RU3tRC9QjeUltO7H69U2MrL4VjrcIpXcRm5pik7qeIOMVegfFcCvOL/e88jYqOo/LLNIfzjqq1dE4PggZNC9QsfLTd9KoME22sQq/47MP2hl4hMD0k0AOO6bTsGrxtoOdnb7qiC/dTpcNyGgdYJbdANyJamxLRVtdf0wuY8EzPk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=JpfdQqxr; arc=fail smtp.client-ip=52.101.196.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF753A4F47;
+	Mon, 22 Jun 2026 11:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782127669; cv=none; b=eVZH/Zgg4diWX7A/vL3ZM6uOVUNs8pT0j/SkTQFOGa4nttJDYAzZ1tNHNj9BbowU657N/sBrd02KpbdAMq5ICKU1evE98i+LuoBSxd/vJjNFw0Uz6vDHy+31UMYdiFcaOkPb/LZe/PAd5h7L01K8P8lvZ2ZREaTEPDNsWLbGh+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782127669; c=relaxed/simple;
+	bh=N/vuDHI9SQW1janB0j5sO1lsg3p3zPSFITHHbgn1I9o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N6BSQiUlze+NFvrkVh5/fninGhgV2NrV1roGLM0qGbypx0hb7Z0Kf/1BM9MBGcyUjr8tbjJqaA7Tg4JzDhDs5ZyVqzzLxKsB7548qWFBecXGhk6lOxjaf7mAlCtlp1XBCsQfx+aPtIXP0JU5aLOwIuhHjj9lxRfMN1yAk95Q6zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NP5vIVfj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="JpfdQqxr"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gzEV9nDg2ezFTR4IlMn8Z9/L+0fqhZEqCwVcNUduUB471sjUWBPjOisG+7LSqXTkwFOLnSDTbVVoVc5oHoe+yaf3X/qbyTVPRIbTKYY9b9JqqzbQNnbsn12riLBKWy6xI5pO+rNUyqTnf+J8lSPZDWTHnvLZRtyRR/9rSnor9uZLFqoQABN5e9JvcIpr0dXLEibp8DyOST10WhL0X/9vx1e4i71Ll+aKIAubNg/41xYd34Ch2aDfeBRL2BZJLW6aBwwkDp9YSgtkhpoY0iGj0GFR4G73CrqT4ow9sJmMUjrsz5yTB4R7OXehN+R6dyh2WM4FlU5H40YYy/GqSAeXSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y6goImp8gxgefLdolFq7tajt8rR8if+B73I/tD/3xz4=;
- b=J9/0AX4ie4rSxT71ng1J0H6aN+uuof/6XHl7R3UkwEbzbCscBfwIAnOGPLkWShRD0Ppi1AuQg13nSwWEKAZ5ajWLn0dA1+UThtf+kv+idk8IzCuf/TkcfQUDNm55dB4eXcHDRAZbGnkWUBWNU9ob5q1ynQQ24fNmcB5AYWPsX/jhMpTGq699nHnKT4tph/UR36jka0TZILKchyArxeEvfkjhAWe074MVXEgWGJ6RyciTX6Bn1iVFH4YpOwyos6Igi8pCFHtYTo9VbPDzQoEsZgqS+G4PoliNykbTlP0/RR/elTHOpGerkMafdFgJq64eMv1SWEEoqXCs2SFvtkP3dQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y6goImp8gxgefLdolFq7tajt8rR8if+B73I/tD/3xz4=;
- b=JpfdQqxr5wlAK85kFnCtFVPMf7/6hk8XcCB+gOB0g7KKcFfWMy4iOiNaP0X23b3En4RZe24PWZmsZ4qegNxuTvJMIKJiikSTjHTDk1Q7povx642GT9jORAigTS6otP8OcJ8yOkkOmd7ifv5mj/JUW/nhfHIwyOCPe/eNVm5+5Qc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LOYP265MB2191.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:112::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
- 2026 10:50:33 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
- 10:50:33 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 22 Jun 2026 11:50:32 +0100
-Message-Id: <DJFIQPLOVO4T.1K8T0VZM30LDA@garyguo.net>
-To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
- "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
- Krummrich" <dakr@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
- Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
- Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
- Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 1/6] rust: module: add `THIS_MODULE` const to
- `ModuleMetadata` trait
-From: "Gary Guo" <gary@garyguo.net>
-X-Mailer: aerc 0.21.0
-References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
- <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
-In-Reply-To: <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
-X-ClientProxiedBy: LO4P123CA0389.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18f::16) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NP5vIVfj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AED81F000E9;
+	Mon, 22 Jun 2026 11:27:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782127667;
+	bh=CxKnwWbJ6o3Gp2gCYHflIyVCw0BGlYpweEWWlR7Zxlc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=NP5vIVfjsp4feyIcuAfoiRvYPwPZKLTXzyb0N0wUNoKxJZDnW14mB+Ksso1zMBEZX
+	 fUxTpjrKClw00GwNOT/ge4xL2rriBHbh5PxOP732GJlaoArFBmxyEOXdYsklIEobB9
+	 /pFQVIcOni9/exs8OPh0iGTCF0YrB1elReGRM0Pk+0VV64ksMWO5Yff5O4AFlcbETU
+	 7oQHcuU8AyNBq9zKQ3Q/5sFiPWawUkfJJPp52WQ+UesWgVbFX7LlIhxh77+4lU8xhN
+	 0Mxv8uME2L+nRo7wVhECL6694CE+9AKg1Xt97qlcIjmOAoH39Xw4JyyfVaAkL3HiaO
+	 P5VjuChOEJC/w==
+Message-ID: <8f98a3a6-f97b-4673-964f-fb09c8879e2e@kernel.org>
+Date: Mon, 22 Jun 2026 13:27:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LOYP265MB2191:EE_
-X-MS-Office365-Filtering-Correlation-Id: 50b63575-d9c2-4c45-8a25-08ded04c15c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|10070799003|7416014|23010399003|1800799024|921020|56012099006|4143699003|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	88H5YPr1cVyqA+1bRz4VBrwTC0KmJsiU7se4gKNdG6FIsZNwDXb/1YLjv1I3vUgF+s9uOrKtGVCVkugi7Kb9n78VzgHES3cnPGaO7BDEQPGHATsCIw5PBYLk/RRukw8sadARzk4s8X9d20fp+Wftokjp83ea9h/lrA26vDCxecFDpZOHkfCmvG9MIpvLmgnr314XsDX3xdxrgUx8aQ+04fjXZJriEKiPet6qp1CZHuLQtFuJoy//ZGkYgqkrcI8UMcJoV6WKNwZRvgxLTSvldfk1zm0wWoseuHOA18LCs1m2JVTmIB1QPU7FnDHwGE9zDHE8cs6Tf5frjzFDkCxOXBnyPAbtmuVG2GQO++KRV8Bn1VCM6wCqSsw1plYt31IW1N5RbqNTFcQDFgswWR0OXQa6Z9Hiig14BOmAz438l214zKnEWHDMKXOrl/y/TKGQVaNs7nR+PO4eD1TXVzE4OKWBM92iodh3qiKg+rD2rLx5QORqTEnajbHXxG/N0oiTChJofWxuJEGVT66WtN2Pe3Ii74uYIGfp/462LZAqWnRlU1olgFaAM+TZIyNiXFODqzgLfgK6NaqNZ3AKzp6HFFPNMqQ4arEvpbAq4RCbTjHR2Oboi+Wl0h6fCjCpDjRiiGgo7h6tAtSI3aHT9rc2uHOKTZXP1xNdC+q/vFq7bi04k6AonhTIqMGTnCWN/tpamn3Ul/jikHp2IdXdiE7PpA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(10070799003)(7416014)(23010399003)(1800799024)(921020)(56012099006)(4143699003)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZndVQ2V0TkRxSTQ0QVpQT0VWN24zUmlIS0YxTmtEeWF5RlhTYnIxV09QZTZx?=
- =?utf-8?B?dUViTGUxay9CUmwvc25DZjRqd2RvbWlQR3RxN2hhVnNZRGhQcE9QRGwwTlFG?=
- =?utf-8?B?YzBqZXEwRStYV2tOK2hBY2JQbHJqdlhiZHJUc1VhSzZwMVpiem5jTytTTWx5?=
- =?utf-8?B?K0E0QXZ5Nmg2ZWYzbXFUVDAvekM3dmpUWlloTEpOMlNnRlZ0V0FvMjkxOGJz?=
- =?utf-8?B?VjhZUzBLTk0rQ2FtZjBmVEV6WGVRekJJTEhmaGYrT0lUOEZ5blh5WHZLZStS?=
- =?utf-8?B?aDhPaDh2VkM2bmY4VU9CNDNGLzBCVTlmaXZQd2hsUUdjV1RvdTR0eFc2ZUF4?=
- =?utf-8?B?WC9RUDhENk5FZEppdEhMN3ZSZTBTZmc3WTBERWcwKzQxbWpJd2ZTT0g0eWVN?=
- =?utf-8?B?V0IrMHI4NGtyWkdLM0dOYk9rN21oNVIwTmhYT1dHYW5WdlI2dXZLZ3JqU0pT?=
- =?utf-8?B?bTJFaUZ4K1FxNEtOWTZ5aUhYdS9saTNkQlo4YXNsZlpjRnkvOWVnbU9tVE1q?=
- =?utf-8?B?SXNYTnNaai96UWh6RjRBeXJqR1VHcFUwclQ3aTlhMzZ4S1JyQmpTVlFLMUd6?=
- =?utf-8?B?ZUpJWHZpVHg4OXhOQUFOS2IxUTYzdk82V2Y0TG9sOTFKa2NZVTdGMlcrbG14?=
- =?utf-8?B?RG1xYjJTQUhmelBzMHVzRTJlNUN6SUIvWjNOb1NTVzFIOHBoQzNsOFEvRFg2?=
- =?utf-8?B?MDNDZHNUUERmK1NQa2FRbzFaeGdJbDVGOUNjNzcwQ1JCcEdXT3BRaExZQ25y?=
- =?utf-8?B?dHBXTFRycFRyR0hsRXE4cEtXYzVDMFo2VHNWcG9Jd2lTQWRyNjFuVTUvdFVV?=
- =?utf-8?B?TkZUV3NBS3YrNk41bTBKYmJrYm51b0VMVU8rUnZaREM0RDJvU1ZOYWY4dVpn?=
- =?utf-8?B?alFJbzlEcUFLV2VGU1VCNWtRa1Ezano3SERZZVdFSW9rVlA3bElGTy8xWEd2?=
- =?utf-8?B?Tks5TENac2JhSXlDenNOR2h3R3VtU2RtcWd2V3pZMUtuaHFWS0ZsUTBUTDZl?=
- =?utf-8?B?bytLenUzVkhZd2pPbWFDVXVhdGxHOGs2KzY1eWx6Ym5PR1ZITlFYQzNjT2pO?=
- =?utf-8?B?VzdYMWE2ZnlLajd4UUgrSUxTRUplVzdkOUJpRldVSGkyQUVtRXdkeTZ4MTVs?=
- =?utf-8?B?TWVua2xQRzdkTTRmZ3V0ODFrQ2lzOGU2WkJnUEpEMlc3ZFk0YXhWNytxdTVP?=
- =?utf-8?B?dks0U2RaSkRVRlJvVlczb0lrSlo3VC83TEFFa1hHT0NaUks2S2NTcjMvNVdW?=
- =?utf-8?B?S2tKZjV6WFVWZ3FVdEcvMzRLOTY2VEtwRkMzMDRod3REVjBOMlFSa1B5WU1N?=
- =?utf-8?B?dTdoOUNURDNyY2g3YXA4eDV2RTVxQWo0SjFjbzEyZnRHSy9Zb0krRDIrQWFE?=
- =?utf-8?B?UU5lbnFzc0tGc2NlT2o0bWNYYWo4TlBycm1qcEZabVNXdUxZYmh5T3BYaWtW?=
- =?utf-8?B?MnVtVURCa2hReW84V0pzOVNaQ3NGSFhMRnVyZXd2M3pqSUQ1UGZJWURLckpw?=
- =?utf-8?B?SzNwWVRGd09Ic1pzYy9JRGZwcGVGZTdWcUozNHpMbG92OUhHYzRZODF2eUFH?=
- =?utf-8?B?OTFsNlZabjhFbWc2Y0VTd0FISTdmSm14TmhrTkp1OEJXdzZvU3N3WFIxckla?=
- =?utf-8?B?Y0tFWU53cGozdExZbjFOOFZlRGg2NW1neGN4WkpTMzlDSkhnUWJpc2tXeThH?=
- =?utf-8?B?SmdRNytxcTdJNlcwcFBxa1ZxZGxDaXJuQkIxdmxSdHhEK2JlQzFpNnVaV2l6?=
- =?utf-8?B?a0FQUnBuZDgzaWlkaUlMbU9VbkR6Y3h0Mm5mZ0IvaXpWZTd4MlBXK0pKWUxi?=
- =?utf-8?B?V2VLQWs0WXhncE4vNnhnZ2kxZUdWVzFiK3VSYnJvL0VkVnFKODdnRVhRWHNx?=
- =?utf-8?B?bkplQ2syT1FUMUhkVlYzR3pFVHlzc0lsbjBJQkhiUkluTjM2eTh0S29BT3dZ?=
- =?utf-8?B?eDBvWlg5MjFzQnNWWE9KRklWV1pld3FiTitLTXRkVDhSeUJySVE3VHVDa0lR?=
- =?utf-8?B?QnpsajZ6ZEUwbzdXTE9mcnZ3N2xBQWVLaDhHbUVUdVE5UUZHM28vM21vVlhJ?=
- =?utf-8?B?WjV3MnE5S0sxUDRsODdvNGVpSDdqOUs4NldPYjQ0ZmlnMEk3UXVTZUtyalI5?=
- =?utf-8?B?eWV3TjhyZWJHMHJTOEY1Wm1JTkZQMXlTRmVuQU16SXRwWFFKQ3gvRlBaWFZJ?=
- =?utf-8?B?R01wNmx3RnBWR0hQa3FNUHgxOWtCL3diMGlrVW5VcXhOOTRDdzZYYzNwL1ht?=
- =?utf-8?B?U3FjeDR6NTdCdk1qM0p1N3FlSEtOaFlNU2JWT00zUzl5dE5qZzBTWkNQcS90?=
- =?utf-8?B?YjllT21YN1Q4dVJUdE9HeTZFenFNZGZGQnl4cUxpTHVEazczMEZtUT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50b63575-d9c2-4c45-8a25-08ded04c15c2
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 10:50:33.5153
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IMy3TGT4OLdZ2ZqDJ7j5Ia+aJdWiC9rTwWmbtrVxtzmsobL6WyWtDZuOiILydTfEPNWNyeMTbv2757cDdwBBpA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOYP265MB2191
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
+ state
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Kaitao Cheng <kaitao.cheng@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+ linux-ntfs-dev@lists.sourceforge.net,
+ Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
+ io-uring <io-uring@vger.kernel.org>, audit@vger.kernel.org,
+ bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ dri-devel@lists.freedesktop.org,
+ "linux-perf-use." <linux-perf-users@vger.kernel.org>,
+ linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Linux Power Management <linux-pm@vger.kernel.org>, rcu@vger.kernel.org,
+ sched-ext@lists.linux.dev, linux-mm <linux-mm@kvack.org>,
+ virtualization@lists.linux.dev, damon@lists.linux.dev,
+ clang-built-linux <llvm@lists.linux.dev>,
+ chengkaitao <chengkaitao@kylinos.cn>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+ <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon Jun 22, 2026 at 3:44 AM BST, Alvin Sun wrote:
-> Since `const_refs_to_static` has been stable as of the MSRV bump, a
-> `ThisModule` pointer can now be used in const contexts.
->
-> Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that modules
-> can provide their `ThisModule` pointer in const contexts such as static
-> `file_operations`.
->
-> Move the `THIS_MODULE` static from the `module!` macro into the
-> `ModuleMetadata` impl, add a `this_module()` helper, and update `__init`
-> to use it.
->
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-> ---
->  rust/kernel/lib.rs    |  8 ++++++++
->  rust/macros/module.rs | 34 +++++++++++++++++-----------------
->  2 files changed, 25 insertions(+), 17 deletions(-)
->
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index b72b2fbe046d6..50f5a7b5f028e 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -184,6 +184,14 @@ fn init(module: &'static ThisModule) -> impl pin_ini=
-t::PinInit<Self, error::Erro
->  pub trait ModuleMetadata {
->      /// The name of the module as specified in the `module!` macro.
->      const NAME: &'static crate::str::CStr;
-> +
-> +    /// The module's `THIS_MODULE` pointer.
-> +    const THIS_MODULE: ThisModule;
-> +}
-> +
-> +/// Returns a reference to the `THIS_MODULE` of the given module type.
-> +pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
-> +    &M::THIS_MODULE
->  }
+On 6/22/26 07:28, Alexei Starovoitov wrote:
+> On Sun, Jun 21, 2026 at 9:06 PM Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+>>
+>> From: chengkaitao <chengkaitao@kylinos.cn>
+>>
+>> The list_for_each*_safe() helpers are used when the loop body may remove
+>> the current entry.  Their current interface, however, forces every caller
+>> to define a temporary cursor outside the macro and pass it in, even when
+>> the caller never uses that cursor directly.  For most call sites this
+>> extra cursor is just boilerplate required by the macro implementation.
+>>
+>> This is awkward because the saved next pointer is an internal detail of
+>> the iteration.  Callers that only remove or move the current entry do not
+>> need to spell it out.
+>>
+>> The _safe() suffix has also caused confusion.  Christian Koenig pointed
+>> out that the name is easy to read as a thread-safe variant, especially
+>> for beginners, even though it only means that the iterator keeps enough
+>> state to tolerate removal of the current entry.  He suggested _mutable()
+>> as a clearer description of what the loop permits.
+>>
+>> Add *_mutable() iterator variants for list, hlist and llist.  The new
+>> helpers are variadic and support both forms.  In the common case, the
+>> caller omits the temporary cursor and the macro creates a unique internal
+>> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+>> explicit temporary cursor, the caller can still pass it and the helper
+>> keeps the existing *_safe() behaviour.
+>>
+>> For example, a call site may use the shorter form:
+>>
+>>   list_for_each_entry_mutable(pos, head, member)
+>>
+>> or keep the explicit temporary cursor form:
+>>
+>>   list_for_each_entry_mutable(pos, tmp, head, member)
+>>
+>> The existing *_safe() helpers remain available for compatibility.  This
+>> series only converts users in mm, block, kernel, init and io_uring.  If
+>> this approach looks acceptable, the remaining users can be converted in
+>> follow-up series.
+>>
+>> Changes in v3 (Christian König, Andy Shevchenko):
+>> - Convert safe list walks to mutable iterators
+>>
+>> Changes in v2 (Muchun Song, Andy Shevchenko):
+>> - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
+>>   cursor change directly in the existing list_for_each_entry*() helpers.
+>> - Open-code special list walks that rely on updating the loop cursor in
+>>   the body, preserving their existing traversal semantics.
+>>
+>> Link to v2:
+>> https://lore.kernel.org/all/20260609061347.93688-1-kaitao.cheng@linux.dev/
+>>
+>> Link to v1:
+>> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+>>
+>> Kaitao Cheng (7):
+>>   list: Add mutable iterator variants
+>>   llist: Add mutable iterator variants
+>>   mm: Use mutable list iterators
+>>   block: Use mutable list iterators
+>>   kernel: Use mutable list iterators
+>>   initramfs: Use mutable list iterator
+>>   io_uring: Use mutable list iterators
+>>
+>>  block/bfq-iosched.c                 |  17 +-
+>>  block/blk-cgroup.c                  |  12 +-
+>>  block/blk-flush.c                   |   4 +-
+>>  block/blk-iocost.c                  |  18 +-
+>>  block/blk-mq.c                      |   8 +-
+>>  block/blk-throttle.c                |   4 +-
+>>  block/kyber-iosched.c               |   4 +-
+>>  block/partitions/ldm.c              |   8 +-
+>>  block/sed-opal.c                    |   4 +-
+>>  include/linux/list.h                | 269 ++++++++++++++++++++++++----
+>>  include/linux/llist.h               |  81 +++++++--
+>>  init/initramfs.c                    |   5 +-
+>>  io_uring/cancel.c                   |   6 +-
+>>  io_uring/poll.c                     |   3 +-
+>>  io_uring/rw.c                       |   4 +-
+>>  io_uring/timeout.c                  |   8 +-
+>>  io_uring/uring_cmd.c                |   3 +-
+>>  kernel/audit_tree.c                 |   4 +-
+>>  kernel/audit_watch.c                |  16 +-
+>>  kernel/auditfilter.c                |   4 +-
+>>  kernel/auditsc.c                    |   4 +-
+>>  kernel/bpf/arena.c                  |  10 +-
+>>  kernel/bpf/arraymap.c               |   8 +-
+>>  kernel/bpf/bpf_local_storage.c      |   3 +-
+>>  kernel/bpf/bpf_lru_list.c           |  25 ++-
+>>  kernel/bpf/btf.c                    |  18 +-
+>>  kernel/bpf/cgroup.c                 |   7 +-
+>>  kernel/bpf/cpumap.c                 |   4 +-
+>>  kernel/bpf/devmap.c                 |  10 +-
+>>  kernel/bpf/helpers.c                |   8 +-
+>>  kernel/bpf/local_storage.c          |   4 +-
+>>  kernel/bpf/memalloc.c               |  16 +-
+>>  kernel/bpf/offload.c                |   8 +-
+>>  kernel/bpf/states.c                 |   4 +-
+>>  kernel/bpf/stream.c                 |   4 +-
+>>  kernel/bpf/verifier.c               |   6 +-
+>>  kernel/cgroup/cgroup-v1.c           |   4 +-
+>>  kernel/cgroup/cgroup.c              |  54 +++---
+>>  kernel/cgroup/dmem.c                |  12 +-
+>>  kernel/cgroup/rdma.c                |   8 +-
+>>  kernel/events/core.c                |  44 +++--
+>>  kernel/events/uprobes.c             |  12 +-
+>>  kernel/exit.c                       |   8 +-
+>>  kernel/fail_function.c              |   4 +-
+>>  kernel/gcov/clang.c                 |   4 +-
+>>  kernel/irq_work.c                   |   4 +-
+>>  kernel/kexec_core.c                 |   4 +-
+>>  kernel/kprobes.c                    |  16 +-
+>>  kernel/livepatch/core.c             |   4 +-
+>>  kernel/livepatch/core.h             |   4 +-
+>>  kernel/liveupdate/kho_block.c       |   4 +-
+>>  kernel/liveupdate/luo_flb.c         |   4 +-
+>>  kernel/locking/rwsem.c              |   2 +-
+>>  kernel/locking/test-ww_mutex.c      |   2 +-
+>>  kernel/module/main.c                |  11 +-
+>>  kernel/padata.c                     |   4 +-
+>>  kernel/power/snapshot.c             |   8 +-
+>>  kernel/power/wakelock.c             |   4 +-
+>>  kernel/printk/printk.c              |  11 +-
+>>  kernel/ptrace.c                     |   4 +-
+>>  kernel/rcu/rcutorture.c             |   3 +-
+>>  kernel/rcu/tasks.h                  |   9 +-
+>>  kernel/rcu/tree.c                   |   6 +-
+>>  kernel/resource.c                   |   4 +-
+>>  kernel/sched/core.c                 |   4 +-
+>>  kernel/sched/ext.c                  |  22 +--
+>>  kernel/sched/fair.c                 |  28 +--
+>>  kernel/sched/topology.c             |   4 +-
+>>  kernel/sched/wait.c                 |   4 +-
+>>  kernel/seccomp.c                    |   4 +-
+>>  kernel/signal.c                     |  11 +-
+>>  kernel/smp.c                        |   4 +-
+>>  kernel/taskstats.c                  |   8 +-
+>>  kernel/time/clockevents.c           |   6 +-
+>>  kernel/time/clocksource.c           |   4 +-
+>>  kernel/time/posix-cpu-timers.c      |   4 +-
+>>  kernel/time/posix-timers.c          |   3 +-
+>>  kernel/torture.c                    |   3 +-
+>>  kernel/trace/bpf_trace.c            |   4 +-
+>>  kernel/trace/ftrace.c               |  49 +++--
+>>  kernel/trace/ring_buffer.c          |  25 ++-
+>>  kernel/trace/trace.c                |  12 +-
+>>  kernel/trace/trace_dynevent.c       |   6 +-
+>>  kernel/trace/trace_dynevent.h       |   5 +-
+>>  kernel/trace/trace_events.c         |  35 ++--
+>>  kernel/trace/trace_events_filter.c  |   4 +-
+>>  kernel/trace/trace_events_hist.c    |   8 +-
+>>  kernel/trace/trace_events_trigger.c |  17 +-
+>>  kernel/trace/trace_events_user.c    |  16 +-
+>>  kernel/trace/trace_stat.c           |   4 +-
+>>  kernel/user-return-notifier.c       |   3 +-
+>>  kernel/workqueue.c                  |  16 +-
+>>  mm/backing-dev.c                    |   8 +-
+>>  mm/balloon.c                        |   8 +-
+>>  mm/cma.c                            |   4 +-
+>>  mm/compaction.c                     |   4 +-
+>>  mm/damon/core.c                     |   4 +-
+>>  mm/damon/sysfs-schemes.c            |   4 +-
+>>  mm/dmapool.c                        |   4 +-
+>>  mm/huge_memory.c                    |   8 +-
+>>  mm/hugetlb.c                        |  56 +++---
+>>  mm/hugetlb_vmemmap.c                |  16 +-
+>>  mm/khugepaged.c                     |  14 +-
+>>  mm/kmemleak.c                       |   7 +-
+>>  mm/ksm.c                            |  25 +--
+>>  mm/list_lru.c                       |   4 +-
+>>  mm/memcontrol-v1.c                  |   8 +-
+>>  mm/memory-failure.c                 |  12 +-
+>>  mm/memory-tiers.c                   |   4 +-
+>>  mm/migrate.c                        |  23 ++-
+>>  mm/mmu_notifier.c                   |   9 +-
+>>  mm/page_alloc.c                     |   8 +-
+>>  mm/page_reporting.c                 |   2 +-
+>>  mm/percpu.c                         |  11 +-
+>>  mm/pgtable-generic.c                |   4 +-
+>>  mm/rmap.c                           |  10 +-
+>>  mm/shmem.c                          |   9 +-
+>>  mm/slab_common.c                    |  14 +-
+>>  mm/slub.c                           |  33 ++--
+>>  mm/swapfile.c                       |   4 +-
+>>  mm/userfaultfd.c                    |  12 +-
+>>  mm/vmalloc.c                        |  24 +--
+>>  mm/vmscan.c                         |   7 +-
+>>  mm/zsmalloc.c                       |   4 +-
+>>  124 files changed, 875 insertions(+), 681 deletions(-)
+> 
+> Not sure what you were thinking, but this diff stat
+> is not landable.
 
-Also, FWIW I think this should not put this in the crate root. Perhaps crea=
-te a
-modules.rs?
+Agreed. If we decide we want this, I guess we should target per-subsystem
+conversions.
 
-Best,
-Gary
+If this goes through the MM tree, I would even appreciate doing this on a per-MM
+component granularity.
 
-> =20
->  /// Equivalent to `THIS_MODULE` in the C API.
-> diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-> index 06c18e2075083..b9fdee2f2af47 100644
-> --- a/rust/macros/module.rs
-> +++ b/rust/macros/module.rs
-> @@ -497,28 +497,28 @@ pub(crate) fn module(info: ModuleInfo) -> Result<To=
-kenStream> {
->          /// Used by the printing macros, e.g. [`info!`].
->          const __LOG_PREFIX: &[u8] =3D #name_cstr.to_bytes_with_nul();
-> =20
-> -        // SAFETY: `__this_module` is constructed by the kernel at load =
-time and will not be
-> -        // freed until the module is unloaded.
-> -        #[cfg(MODULE)]
-> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> -            extern "C" {
-> -                static __this_module: ::kernel::types::Opaque<::kernel::=
-bindings::module>;
-> -            };
-> -
-> -            ::kernel::ThisModule::from_ptr(__this_module.get())
-> -        };
-> -
-> -        #[cfg(not(MODULE))]
-> -        static THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> -            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-> -        };
-> -
->          /// The `LocalModule` type is the type of the module created by =
-`module!`,
->          /// `module_pci_driver!`, `module_platform_driver!`, etc.
->          type LocalModule =3D #type_;
-> =20
->          impl ::kernel::ModuleMetadata for #type_ {
->              const NAME: &'static ::kernel::str::CStr =3D #name_cstr;
-> +
-> +            #[cfg(MODULE)]
-> +            const THIS_MODULE: ::kernel::ThisModule =3D {
-> +                extern "C" {
-> +                    static __this_module: ::kernel::types::Opaque<::kern=
-el::bindings::module>;
-> +                }
-> +
-> +                // SAFETY: `__this_module` is constructed by the kernel =
-at load time
-> +                // and lives until the module is unloaded.
-> +                unsafe { ::kernel::ThisModule::from_ptr(__this_module.ge=
-t()) }
-> +            };
-> +
-> +            #[cfg(not(MODULE))]
-> +            const THIS_MODULE: ::kernel::ThisModule =3D unsafe {
-> +                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-> +            };
->          }
-> =20
->          // Double nested modules, since then nobody can access the publi=
-c items inside.
-> @@ -616,7 +616,7 @@ pub extern "C" fn #ident_exit() {
->                  /// This function must only be called once.
->                  unsafe fn __init() -> ::kernel::ffi::c_int {
->                      let initer =3D <super::super::LocalModule as ::kerne=
-l::InPlaceModule>::init(
-> -                        &super::super::THIS_MODULE
-> +                        ::kernel::this_module::<super::super::LocalModul=
-e>()
->                      );
->                      // SAFETY: No data race, since `__MOD` can only be a=
-ccessed by this module
->                      // and there only `__init` and `__exit` access it. T=
-hese functions are only
+(unless we have some magic "Linus converts all of them" script, which I doubt we
+will have)
 
+Is there a way forward to replace list_for_each_*_safe entirely, possibly just
+reusing the old name but simply the parameter?
 
+-- 
+Cheers,
+
+David
