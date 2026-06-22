@@ -1,64 +1,45 @@
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94BD35F5ED
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 07:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE5F363082;
+	Mon, 22 Jun 2026 07:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782112257; cv=none; b=sP98cOmsazoysdh9QxZ/x0DtykIspLng1lgQUqUMdVgutEH1MHfmngOj/bVhljv4fyA2vLAIP4er48nckv9w23r3kFDrtzynp4nWxV/EmCGuSRdWRBCb0QQIaDJ9AxcXIEuFx7lV5A77Y0FUyQUkfjLebgouaevhkIv3tRCvONA=
+	t=1782112457; cv=none; b=BLYXWfAwEJc9uI1EWkNLUhtYIXhr6zeebIV/qHnFx8dLa55FS+Z3YhKVJdC1OX+ugc+C0+mawCvYDa2uYUwYqFHx93Dq9FHKuiFdBCBUrPUiZXicg7C7nx67x17Ityw4ymMn0ATaT+sntkxHVhKi1k6RE/9h5qwot32nBGIwbkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782112257; c=relaxed/simple;
-	bh=u+uJ4HaPyb2ulGWQw1CNNGmzGbVcQlnW5f3xNQcEsmI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WdpUUHqTv4S4lmGDWi+xYUrSjRTDDh7OjaaAmIYT+0gG1DhrfMwmWeYPow+euAtGMyEhMgf6aD8PplgS9aXvkkRqlKmgzPdse9X0xZZ3SNZ6K3KsPc2+2ONuLZoe8An9RZoXqdxVrH9PdgZsDEZ3L09mHF3L2pq2rgsx1aLIl04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=DcqUk3fG; arc=none smtp.client-ip=35.155.198.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="DcqUk3fG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782112256; x=1813648256;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FdlnEGLSEKk038zsFCl8Dz0uFyO2Udiqy1kTdWElKLI=;
-  b=DcqUk3fGGY+LlE3kxKavdFrhzN8iKXziVUhcu2U+OreQOLjtSTia5Svp
-   5souIebFgwc/A40WeiSz/JpHUJ/MRDuX5LRcN6OMCOi6wnSl03saqdsfW
-   xh7JNxAAKadAAxKU3knzH+pwO0ZiW8Qk0QsWH3y46EtnZbFvJdQ6SWFvv
-   BofmC3WzOQ2yMt47KUV/95IJEkCVc+JIJkmogxVfnx33rjWyqf7zXBZ6v
-   0USOLXgiV/Bv/2Z9DDq/UsvQvw0IVV3DfHUO0MlZXBfpndE74V/NnPz75
-   cZA0k1uflMBqLMfQDoqjFsGRqYi9+tJnfYYSG0MgRWyNe9WzXBLa1kXnQ
-   g==;
-X-CSE-ConnectionGUID: rABLub2gRXyzLLuk3aR/Uw==
-X-CSE-MsgGUID: NRKhkDvkSCGXMxH02XT7qQ==
-X-IronPort-AV: E=Sophos;i="6.24,218,1774310400"; 
-   d="scan'208";a="22108465"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 07:10:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:18825]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.151:2525] with esmtp (Farcaster)
- id 7fa548d2-71cc-4328-98d1-46c29245df1f; Mon, 22 Jun 2026 07:10:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 7fa548d2-71cc-4328-98d1-46c29245df1f
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Mon, 22 Jun 2026 07:10:52 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Mon, 22 Jun 2026 07:10:51 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers
-	<ebiggers@kernel.org>
-CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Jens
- Axboe" <axboe@kernel.dk>, <dm-devel@lists.linux.dev>,
-	<linux-block@vger.kernel.org>
-Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit batching
-Date: Mon, 22 Jun 2026 07:10:44 +0000
-Message-ID: <20260622071044.4079-1-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <ajDWww8OgNcXs73c@gondor.apana.org.au>
-References: <ajDWww8OgNcXs73c@gondor.apana.org.au>
+	s=arc-20240116; t=1782112457; c=relaxed/simple;
+	bh=zc0mHaIb8J20hS18SLRxnEzEwY5WvhCW+hUuzn9Yaro=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sd87W0SKDi0nhxxKqup2M8nND2ZumPKn3Q0KuOmNVe1UIms1IifjO2odE35cVXzRd1JyEXxorIY7GtlHSYGrWA33gC+RlqB7gxIHJkaNhYZ2VQor6aysaq7UTYJQfCf1IZrqc5c1fPMqCCCmdbmHbpD+M1FA+sSEBK8zQ4zumIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gkKD64VRTzKHMRc;
+	Mon, 22 Jun 2026 15:13:10 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id B037C4057D;
+	Mon, 22 Jun 2026 15:14:06 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with SMTP id cCh0CgB3eT694DhqGkK7Cg--.42632S5;
+	Mon, 22 Jun 2026 15:14:06 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	linux-block@vger.kernel.org
+Cc: cgroups@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	houtao1@huawei.com,
+	yukuai@fygo.io,
+	wozizhi@huaweicloud.com
+Subject: [PATCH 1/2] blk-cgroup: fix blkg leak in blkg_create() error path
+Date: Mon, 22 Jun 2026 15:07:12 +0800
+Message-ID: <20260622070714.1158886-2-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260622070714.1158886-1-wozizhi@huaweicloud.com>
+References: <20260622070714.1158886-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,37 +47,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-CM-TRANSID:cCh0CgB3eT694DhqGkK7Cg--.42632S5
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr47Xr13JrWkCrWrAFyDGFg_yoW8XF4xp3
+	y3JrW5tryrKFnrCay3JF1UW34FyF4rJryrJ393Gw4akry7WF1SvF18Cr4UJFW7Ca9rJw15
+	ZryYvFy0ka48C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUQv14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF54CYxVCY1x0262kKe7AK
+	xVWUtVW8ZwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
+	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
+	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUqkskUUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-On Mon, Jun 15, 2026 at 03:53:17PM -0700, Eric Biggers wrote:
-> So in other words, this series slows down dm-crypt and crypto_skcipher
-> for everyone to optimize for an out-of-tree driver.  And there's also no
-> benchmark showing that your driver is even worth it over just using the
-> CPU.
+When radix_tree_insert() fails in blkg_create(), the error path calls
+blkg_put() to release the blkg. This was correct when blkg->refcnt was an
+atomic_t: blkg_put() dropped it to 0 and triggered the release path.
 
-I measured on arm64 (Graviton3, dm-crypt + xts-aes-ce, RAM-backed,
-fixed CPU freq):
+But commit 7fcf2b033b84 ("blkcg: change blkg reference counting to use
+percpu_ref") switched refcnt to a percpu_ref. In percpu mode
+percpu_ref_put() never checks for zero, so the release callback is never
+invoked. This blkg is on neither blkcg->blkg_list nor queue->blkg_list, so
+blkg_destroy_all() / blkcg_destroy_blkgs() can never reach it to call
+blkg_destroy()->percpu_ref_kill() either, cause the leak.
 
-  - 4 KiB random write, 512-byte sectors: v4 as posted regressed ~5%.
-    Root cause (ftrace): a per-bio kmalloc_array() for the scatterlists,
-    where the per-sector path uses dm-crypt's inline sg_in[]/sg_out[].
+Fix it by killing the percpu_ref instead, which switches it to atomic mode
+and drops the initial ref.
 
-  - Reusing the inline arrays when the segment count fits (heap only for
-    larger bios) removes the regression, back to parity. This will be in
-    the dm-crypt patch for v5.
+Fixes: 7fcf2b033b84 ("blkcg: change blkg reference counting to use percpu_ref")
+Signed-off-by: Zizhi Wo <wozizhi@huaweicloud.com>
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+---
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So the software path is neutral after the fix, not slower. No software throughput win
-either: the auto-splitter still calls alg->encrypt per data unit. The win
-is for a consumer that takes the whole request in one pass, a HW engine,
-or any async offload engine that pays a fixed per-request cost,
-it currently pays once per sector instead of once per bio.
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index bc63bd220865..6386fe413994 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -437,11 +437,11 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+ 
+ 	if (!ret)
+ 		return blkg;
+ 
+ 	/* @blkg failed fully initialized, use the usual release path */
+-	blkg_put(blkg);
++	percpu_ref_kill(&blkg->refcnt);
+ 	return ERR_PTR(ret);
+ 
+ err_put_css:
+ 	css_put(&blkcg->css);
+ err_free_blkg:
+-- 
+2.52.0
 
-I'd rather not over-complicate the patches until there's a general
-ack on the direction: per-request data_unit_size + auto-split,
-enabling one-pass consumers, neutral for everyone else. Is that direction
-acceptable? If so I'll respin v5.
-
-Thanks,
-Leonid
