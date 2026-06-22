@@ -1,125 +1,120 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC89391E4C
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 08:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782117115; cv=pass; b=YeBVXVK6zS9e/KYgsK+Rk4xsYbczhFpJwz1gGgFM8CrjAUEeJA8y19hxtNA6A2mZf3UDhjpzzYiW4zgQ3GDuz6OapfkBAsmNaIVL8nP3Wu4GeOqBCOz7I1ZsvvRjxbaQIErzSjcKh/MKaE4quPzPX0FJEbEmZ2WVjkJ+Ji/QSWA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782117115; c=relaxed/simple;
-	bh=ig7N46VIRPdHLHwAftM4zR7B+ytNecdkZgiaA4Kj/To=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oSmZfrnu1ffsHemoHcVHJfpIe/w8jBLQfiEmNlTFanM+pvmNRmRwnIoZCwfd3ezZ+rFyL8fPL2y7oNFcHWuTNLBRe2oT3O6yl9J2ac+5mpfo70G1iZ2J3z/3W9qV0iSFeuKLBdKk2C5zlpErGhw3d/MpnOEgpXs44mAVh7YD4JM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dHAuP0bX; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095D1238159;
+	Mon, 22 Jun 2026 08:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782117471; cv=none; b=Qf/0kATbivMuVZTC6NRp2yVNhBpSATd8UW97WNTco9HX1Vnr66h+qf/rKmEYtJSoNhSlrdxZqR/4BgBfZveqjWWGbFFp13a65rYd0ifw15wgWQItntZCeFzTa/FI4QcnIp9IO1Hh2RP3AqPgdowisEb+rCmTsMZff1bZBexCAB0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782117471; c=relaxed/simple;
+	bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kdsgHnVGCzUbVL9DRipZrLUJnChZekP9N+jzeqr/olTe2w18p91Hmi9jWv+qibOuHS32MTpVtRMM4VQ8JRah1snf3S7sR+7kCw94jccFu7cakKpp6WTQgRT4wbX8aImb3bj9j8yTyTEHqLYrq0il7V0AGWb3j2nF6YcGm0Tks/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lwi+leCq; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dHAuP0bX"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-5176ca6bab1so48644061cf.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 01:31:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782117109; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gtTthqQROrpLR9d/TqjQWvvNgyr98aws9wlNoRI4S7777DmEm1nXwJGRk4ESsT7czS
-         rIVkq3esmNco9KtRHDp6MmrmSkqFXDsnt/YPz5aUEP1Ux8UGcWqki2cHUkAG3pYNSNCJ
-         F2yhiKE7ku6R9iua/kOO4Nrpt2Pen8DX6CrOK3NT+iAnGCdqX6eWzzXM3MlhpmbJaF1I
-         3ZATC7AVhlN5uXHjI3xDsqIVuzlCRhW4qNL9mEekiILOV0ng4W13ZrxxHgwW6ClW09Kv
-         5M9fluSA5+fyTMaLcoUtJGQ8LLQ84Vq3BvHLjs+vrGBGXnAP+l3JJ/CzwE1wuNVKofQc
-         OAzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ig7N46VIRPdHLHwAftM4zR7B+ytNecdkZgiaA4Kj/To=;
-        fh=swioSWXNOXIqleZX12Ah4+piqVk5OhritZqV0it03cc=;
-        b=ioNT+rlNRdhcftZPmbQcDjYtC+oJuco3AEI0NwAHYJG1bD8WMrmS5Y+vvtSJHVzN+q
-         7n7llmeYhf5zOf7ECTndRlqfrV7nxGWTv14Y6KfaCjvKhB9UpGjdNEAJTktbVw4to6KZ
-         ZCCQCiMIeOyS9VafiuwUdc2WzaB7ivLGWUS4+ICiktZB9kk+F52mHaPfQaKHg/EmCJAL
-         3Tt9ImLUu1vl6RnhRz++MEwtBUM0l/8DRQaRF0YQ25n5vtKCJUo9XFb/XAWvrLz14uw2
-         INA5hcQHuZfXqOaxS02BKlVa0sTFou2PJyBZu3X8l3uQNfsHkEaNxIsYHUh2DsOr1PNm
-         nokQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782117109; x=1782721909; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ig7N46VIRPdHLHwAftM4zR7B+ytNecdkZgiaA4Kj/To=;
-        b=dHAuP0bX7cTNWr0EgPBfjw4Ga1zmPqw2Ued7sgh4STqNSfzfjgrXGjntmltYt+uo91
-         xLsNdXn3o4NAliz9r/6PQfMZo1Xf7WtnR1SqVgyvAehmgXMW9S8jASz3m9gEoxc0IBUI
-         y9E2n4m5ojfrpXrhAqANzy0NxLe9bRLSEe6yh4BGm1ZlykcGIDiXVSm96yei6lpQ0+s4
-         vZxQtx0Y0merqcEAml9duw0djSYjnEf3/dsg49iRLqcWxHLY023hoGr9Nfcp5xg9PRcg
-         LcdDrNAIKlLwM1GRq7/LEwCraVIrFpcBKrRGISpvZb3Dxps6xTi9sY/KaIyEV4AsLQz2
-         uaMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782117109; x=1782721909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ig7N46VIRPdHLHwAftM4zR7B+ytNecdkZgiaA4Kj/To=;
-        b=YUV3Kag++dCQ8eNrxhuu3SoP31K355fuUKeP1+PILDKkzGQfuuuvnV8piv8r8aPIpU
-         LzydzRRq5fx0xPXgQ+wrGcr2af+o8L2ZYLAtsUDKUxlOXjWbP+IzqnQ7QZZ6XGUJ2tcD
-         HdPbOxOuLLFTqgj5ucWNx2Cl8kNs6PATpO47fPt9Spi5uJEp0oTTnscanppJWig44+vN
-         E+bWcPnq9LYq6P7y1rhB69dSB1vQxHM95JTUg/RxIB4iMkUnA2hU4DbchB08JxlK7lVv
-         AA2eSA/W8oGlZ0RryXcd6ZUfmjgMFdoAT2uTdkTClijUuA4rkJY9Wh8jcuMn9B/QmOmZ
-         lEBg==
-X-Forwarded-Encrypted: i=1; AFNElJ8+ed4n8QU1zVLRpU51w2z0BAPrI/q/hMqca5GEDpzzgS/YqvnG4udRY0qqBNrNVYfWD/FlG06oFzKF9g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSN4RNv32l9NSh0mtSrodqEIttEQQ5BeicsCpyFN2MG9yFZmD8
-	Y79bv88q6ITvl9V7UPer7GLL1r60dhN91Ah+L5iuZqY49Sbtpup1eb510S8ub9GH4SMo6cD0p7E
-	oI8Mp3/BwI3EJ36HwRv4X0rEqxKa5MXtPGdsmtGNT
-X-Gm-Gg: AfdE7cn8OiSYWoDltFA6mM5K7jAcBBRAFhRkKrAgYr38wa7pBwFs0PHcEQzKgVI1V/q
-	1CKNqA56r4z8n+9HokFFcEXqb1kNFmaWOeYJvaVNikWddRzbH7ZRtHHUJHGV4Axiw5KequQt0ku
-	scjA/SLErtxcJyAjQpKq3+c9NsNgc/TeQ9N7a9NX3OAlJswQH77Nk/iIp9pDpzltR+UKZEB5RIm
-	7NWn6YspFXvOvQjh0Sa7fRRQhHRY73oc6dFQQ0OeOmyNpI49pzodGUflqFQoES5KOUPWR4vgPU4
-	fGmMIJKKvs+jOADfnRcLZ+Oyx/O6vofbRNl6KP7BW53cD1BBrkRtQ+vv7W7dKu2gJ3s2RihquWm
-	tWlTCicxYjup/91lgPLg=
-X-Received: by 2002:ac8:5f4e:0:b0:516:ddfa:b6b9 with SMTP id
- d75a77b69052e-519e66509ddmr120243541cf.23.1782117108133; Mon, 22 Jun 2026
- 01:31:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lwi+leCq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782117469; x=1813653469;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
+  b=lwi+leCqmYWmuFst6FQBZ5DAHNBzvjzKOvdFm9YAWYeck1lFLPstlLLE
+   HfvGplF7vI7ppon4Tfz83R0sJ7Q6UnhkB/puK65jNkqLWlw+oi1UKW+D2
+   dmHcxGUFHvd15Dc0mMhfGhhAkaz7ESnKhl+LjgjHZNbe03xX5s2/kyNKX
+   T2bQkviWBa+gpSAAvQYc38+tPbNSKQi5BFa0ScUd3NRX/apt0d888B4Lh
+   XD1X3LFU5Ma16ZgS00f+GAY92w+Y1DarSdKVL2ZmHgWSG3tOfzLz3BQvQ
+   ft49GdYMp53Vh5tvIMO+kqgJGdj8W04FzLYd7CsN+FVf6+Cmg2mV7j/HT
+   A==;
+X-CSE-ConnectionGUID: MUrLK/3DQ/+jOxbEeduDLw==
+X-CSE-MsgGUID: jN0ZpEg6Tg+TQc4Ge4NM4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="82844719"
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="82844719"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:48 -0700
+X-CSE-ConnectionGUID: 51x2ahlxRfadoXyoUtL0hA==
+X-CSE-MsgGUID: PGIuZ8mzSP2g3MT4S82HXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="254255860"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.82])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:33 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
+ <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
+ Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
+ <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
+ <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, Christian
+ =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>
+Cc: David Howells <dhowells@redhat.com>, Simona Vetter
+ <simona.vetter@ffwll.ch>, Randy Dunlap <rdunlap@infradead.org>, Luca
+ Ceresoli <luca.ceresoli@bootlin.com>, Philipp Stanner <phasta@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ audit@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-perf-users@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, kexec@lists.infradead.org,
+ live-patching@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+ rcu@vger.kernel.org, sched-ext@lists.linux.dev, linux-mm@kvack.org,
+ virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, chengkaitao <chengkaitao@kylinos.cn>
+Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
+ state
+In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+Date: Mon, 22 Jun 2026 11:37:29 +0300
+Message-ID: <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260621235255.66015-1-kartikey406@gmail.com>
-In-Reply-To: <20260621235255.66015-1-kartikey406@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jun 2026 01:31:36 -0700
-X-Gm-Features: AVVi8Ce7w-soiHgBKLGE9ut0Bz1-9KSRdqKSJVe3-LxE5mWN0xgtRYb-cNEzQD8
-Message-ID: <CANn89i+ZE5nEMvhxJQAUp3WgyVLpQCdDhKbx1EqqQTRUtzVLeQ@mail.gmail.com>
-Subject: Re: [PATCH] nbd: don't warn when reclassifying a busy socket lock
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	nbd@other.debian.org, linux-kernel@vger.kernel.org, 
-	syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Sun, Jun 21, 2026 at 4:53=E2=80=AFPM Deepanshu Kartikey
-<kartikey406@gmail.com> wrote:
+On Mon, 22 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+> Add *_mutable() iterator variants for list, hlist and llist.  The new
+> helpers are variadic and support both forms.  In the common case, the
+> caller omits the temporary cursor and the macro creates a unique internal
+> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+> explicit temporary cursor, the caller can still pass it and the helper
+> keeps the existing *_safe() behaviour.
 >
+> For example, a call site may use the shorter form:
 >
-> nbd_reclassify_socket() warns via WARN_ON_ONCE() if the socket lock is
-> held at the point of reclassification. That assertion was copied from
-> nvme-tcp, where the socket is created internally by the kernel
-> (sock_create_kern()) and is never visible to user space, so the lock
-> is guaranteed to be free.
+>   list_for_each_entry_mutable(pos, head, member)
 >
-> NBD is different: the socket is looked up from a user-supplied fd in
-> nbd_get_socket(), and user space retains that fd. A concurrent syscall
-> on the same socket (or softirq processing taking bh_lock_sock() on a
-> connected TCP socket) can legitimately hold the lock at the instant
-> NBD reclassifies it. sock_allow_reclassification() then returns false
-> and the WARN_ON_ONCE() fires, which turns into a crash under
-> panic_on_warn. This is reachable by simply racing NBD_CMD_CONNECT
-> against socket activity on the same fd, as reported by syzbot.
+> or keep the explicit temporary cursor form:
 >
-> Hitting a held lock here is expected for an externally owned socket and
-> is not a kernel bug, so skip reclassification silently instead of
-> warning. Reclassification is a lockdep-only annotation, so skipping it
-> in the rare racing case is harmless.
+>   list_for_each_entry_mutable(pos, tmp, head, member)
 
-Acked-by: Eric Dumazet <edumazet@google.com>
+I'm unconvinced it's a good idea to allow two forms with macro trickery,
+*especially* when it's not the last argument you can omit. I think it's
+a footgun.
 
-Thanks!
+IMO stick with the first form only, and there'll always be the _safe
+variant that can be used when the temp pointer is needed.
+
+
+BR,
+Jani.
+
+
+-- 
+Jani Nikula, Intel
