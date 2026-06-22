@@ -1,33 +1,33 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A49E3ACA46
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 12:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7383ACEFF;
+	Mon, 22 Jun 2026 12:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782132183; cv=none; b=rJtFePtUWSNB5iHFPySONWQhZ7cK35UJUSVa6sBkg2KKHbdmEz31cqsIjnKmBxtz2fen+C4+l3cPLkLVjY/bqy8x4PzLbAPX3W3e8f63ovZcThfb29cBvzRnv4eMM/eaNWCTERz5o9aTgGytNOi0VEof7U2uDHmU+b0J1dKCK7M=
+	t=1782132792; cv=none; b=bCfWlcunz0K1A2WkL08LcxsISCGiqmTieMHKqUJiojWgebYBz2ylDKYFQr1SU0BYeOE+0XHLg8lXWaEKLiTwADRaEreNtggC/Nx+SI0Xg5EqeRRcPTFUoMT7E9fZI7gaAM1NEMH+nMwUsf2NuGKuE3g/g6Z37wen3Ss2EdmCirI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782132183; c=relaxed/simple;
-	bh=utmAMcDGDjQmBDf1w/Ak2DFft5nBmi6H323DLy5kSPc=;
+	s=arc-20240116; t=1782132792; c=relaxed/simple;
+	bh=oRx1ZKCS0mBIWgGBnjbLos7jhHkBOVC7VyGiMgsKJjs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z7E4IMznYlay/cxaj6Rdmq1lQzZRd3xBBpDpZRI2co4FUPzwysg+NeV6PuwLlDTNIcJjH2zmGSd46eqjF2n4y894///pTbrauK9/uG5CH0ZIf3KQlY1J6TmwqkvSDUak/036/TQLxbsSkh+qHPoieZ82AdAjEIVPw5R12K2ZXCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=joTryDYq; arc=none smtp.client-ip=95.215.58.183
+	 In-Reply-To:Content-Type; b=N6kjMsOF6qN0rbExQp73y1/tnwZlKqPXo6zzhmNyAMC5ipz0+It5DC/vqN5BbIiVzxhc/kDo6gT7j0gQFvdZP/KrBJw6Nrf2XdZBfxWKrckdhOJizgP9mWI9VVHUUGoB0iQjE3WbDtrMiT0iqK4JGxxBgxTW4bDdWGVmGusZLUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=go9Zeynv; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="joTryDYq"
-Message-ID: <0494d714-db5c-4358-86e1-37527f52e7f2@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="go9Zeynv"
+Message-ID: <2d54f3e0-3f35-4f97-b6af-b3ceb1aca246@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782132179;
+	t=1782132777;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=faCZmH5g5Ta9m2J6zC+tR3/ZZXd4+AmOWxaxfSCmJCM=;
-	b=joTryDYqD7RqwYRfmbnTLuKFTJVfgXhanPbTiE3S+r8y1qOVGB+xcLyAm9Fohu/5OaIr+P
-	YPWhIg9XER/ei55WL2hAW8PUODttUqHpjKLmi0VbG7XKlebnd5hGUVupZIsOq7yiU71RhY
-	WcpVo0P21fdV4aLrd6dNqxvzkLGcHQ4=
-Date: Mon, 22 Jun 2026 20:42:27 +0800
+	bh=mYFgGrvBWo9bIuXZp9hB0JAcY8NUw9s9RkRxEN+uS9I=;
+	b=go9ZeynvfCDG3FqCedt+4g4p6F7nlA60DLWKRT+icywnFf6xQYwm7i80KAQL1WzurqfcaK
+	36ifq1VJnY/Vgcm0ZBi0Mk3fefk9+KsaFrlRL2RNR+eiRRxII/OUx++x7/QLI4ITC936VK
+	/KQjB0n+QsnMWYnFs5g4Lu/B9QtykTw=
+Date: Mon, 22 Jun 2026 20:52:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,16 +58,16 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
  <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
- <DJFIKIXLML05.3KYOXUGZYJRDZ@garyguo.net>
+ <DJFIQPLOVO4T.1K8T0VZM30LDA@garyguo.net>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Alvin Sun <alvin.sun@linux.dev>
-In-Reply-To: <DJFIKIXLML05.3KYOXUGZYJRDZ@garyguo.net>
+In-Reply-To: <DJFIQPLOVO4T.1K8T0VZM30LDA@garyguo.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 
-On 6/22/26 18:42, Gary Guo wrote:
+On 6/22/26 18:50, Gary Guo wrote:
 > On Mon Jun 22, 2026 at 3:44 AM BST, Alvin Sun wrote:
 >> Since `const_refs_to_static` has been stable as of the MSRV bump, a
 >> `ThisModule` pointer can now be used in const contexts.
@@ -79,23 +79,7 @@ On 6/22/26 18:42, Gary Guo wrote:
 >> Move the `THIS_MODULE` static from the `module!` macro into the
 >> `ModuleMetadata` impl, add a `this_module()` helper, and update `__init`
 >> to use it.
-> Doesn't this break existing users of THIS_MODULE?
-
-You are right, I missed binder. I will add a patch to update binder to use
-`this_module::<LocalModule>()` in the next version.
-
-While looking into this, I also noticed `gen_disk.rs` has a `// TODO: Set to
-THIS_MODULE` with `owner` still set to `null_mut()`.
-
-Best regards,
-Alvin Sun
-
->
-> Binder, rnull and configfs macros are using it.
->
-> Best,
-> Gary
->
+>>
 >> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 >> ---
 >>   rust/kernel/lib.rs    |  8 ++++++++
@@ -119,6 +103,20 @@ Alvin Sun
 >> +pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
 >> +    &M::THIS_MODULE
 >>   }
+> Also, FWIW I think this should not put this in the crate root. Perhaps create a
+> modules.rs?
+
+Makes sense. I'll create a new `module.rs` and move the module-related items
+(`ModuleMetadata`, `ThisModule`, `this_module()`) there, then re-export from
+`lib.rs`.
+
+Best regards,
+Alvin Sun
+
+>
+> Best,
+> Gary
+>
 >>   
 >>   /// Equivalent to `THIS_MODULE` in the C API.
 >> diff --git a/rust/macros/module.rs b/rust/macros/module.rs
