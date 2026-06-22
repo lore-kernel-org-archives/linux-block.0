@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFD739EF23;
-	Mon, 22 Jun 2026 09:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E70C39E9D5;
+	Mon, 22 Jun 2026 09:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782121552; cv=none; b=nSkZ/nQGqu5XCUvS0SKjyxn8bvGT4kktm+GpI90U2pxg/IrCCxIJ7v4Ox7TWZZbqoejU5xml1/wjVWyN/u04J+wqjrF+4Mw8LPK01X9JwR7iJ6uqiYZA+jbN0LYtfe2d+WMwSJx48AfuurJaoyVbeLHND2mY0XF5h+ddSuhNKAo=
+	t=1782121559; cv=none; b=CzNDTDKLfbe2TeBVgtoKIcF/vMXOdyec3Km1Mk0jdtxXSQN7ldIGBGz/L59fALmBTVrS7okvgXHlfd8G6q5lxuqLpQzQFyG9JSwvbFNicyupTj7FfrGBWeNx/KfygPRxGucrNZnZWZkwWMo+ed+kJAd0vaOzB6UlaY2vJ5ZzHek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782121552; c=relaxed/simple;
-	bh=KbqDbO/6Da+smogL0j1WQvfUcASLT2JRLggY+SRaKWY=;
+	s=arc-20240116; t=1782121559; c=relaxed/simple;
+	bh=pzlTDdFESsE7RaaUvivHsEKLw5TRfF5WWmPB/v8rZbs=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sUpw5T175O79olFsTupSu9OeJojmTk2Mnfl0eRSKThvvJOcrqw0PnvYj4IAkZIPO2XPxEbb0LSFgc5kFzX2OE3ooh9n9d5WTdKZxJdlIJazhQvKWTqZrm7QGAjiV0JQr6G6NY6lZPxFtUd2tBi/RTnuRk4PllxpQCgXuEcaaRCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ke7r9MLf; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=biODvWjAzyy2oFz7DaNtssR2RO3+FwNExJ7R0VNxIasjQF+jBem+uod4IZk/VH6+UtQY1TIC58Mi5g2m49op6OoGRqJSdQz1dfHSH+wAgq20HDIwEckpnP6wQmK4LotRew6UdpispLFkzIpWsc08zu5QmsS5L57ZbduQgRljDU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMtRT7Nz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ke7r9MLf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C6661F00A3A;
-	Mon, 22 Jun 2026 09:45:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMtRT7Nz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093211F000E9;
+	Mon, 22 Jun 2026 09:45:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782121549;
-	bh=KbqDbO/6Da+smogL0j1WQvfUcASLT2JRLggY+SRaKWY=;
+	s=k20260515; t=1782121557;
+	bh=pzlTDdFESsE7RaaUvivHsEKLw5TRfF5WWmPB/v8rZbs=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=ke7r9MLfedUaZyoTCtG7sAu/d9pO1Gom3CHm8tWeA3mVTQ3A0svce8Ru4ScauJjdV
-	 6TOardpjckqB/TUSW7BB8kkig4hfNIBOAXFZ0IaUEAkFwj59Jn2QgrdrzUVI9Oalyi
-	 F/jJ6WN9e8wnLlZN0r/hyCaXEg1hlSaBamvZFH7N06eFWZzSvFUp5UajoD1tFwij5L
-	 IgRUYaQHeIhTXpwoDVIy6dOrT0bELUVp52mNoCPFKrxrXBzcJ8EdNnSBuH2qVOA1rY
-	 U2QXbh+J3lZ7YKhslLZQZ/b7lJHUXWXFPEsyjU8izoMS5FcygtohzQxTWT6IrG6pSO
-	 1xh+mOqiV4Rqg==
+	b=GMtRT7Nz4xU+0Oo9rpXrt98aMdSAFP4j02WIV3Aqx8xhoCLQMbrIhI2uAG9Pz6mBt
+	 /0fgNHbbXP2210Xv+l2fcJpHpKRmL60k2pOAfMK8RsZ9zQVroVELH9hwWJJQqDJufs
+	 4sRBz3us8YLJ4f6kOInUTz61BYUJP3pzkqOKAY7d9o3x4BspJr4/vnijdxph1n/xOD
+	 v201sNPqhWti1KqykoJWtvGeL84ImOnmBthlY9SqrKgBwLZU51njKVw6w8RHGqCUAm
+	 xq83NfJgOu/bodCtOmOMEWCXqnezyjdEHM/7tcTWDJp1paAZSuL/t+LcPbm+zK2dqE
+	 S0oE0j9WDedmQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Alvin Sun <alvin.sun@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, Boqun
  Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6r?=
@@ -46,13 +46,13 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
  kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
-Subject: Re: [PATCH v3 1/6] rust: module: add `THIS_MODULE` const to
- `ModuleMetadata` trait
-In-Reply-To: <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
+Subject: Re: [PATCH v3 4/6] rust: drm: set fops.owner from driver module
+ pointer
+In-Reply-To: <20260622-fix-fops-owner-v3-4-49d45cb37032@linux.dev>
 References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
- <20260622-fix-fops-owner-v3-1-49d45cb37032@linux.dev>
-Date: Mon, 22 Jun 2026 11:44:36 +0200
-Message-ID: <87h5muewor.fsf@t14s.mail-host-address-is-not-set>
+ <20260622-fix-fops-owner-v3-4-49d45cb37032@linux.dev>
+Date: Mon, 22 Jun 2026 11:39:15 +0200
+Message-ID: <87jyrqewxo.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,16 +63,9 @@ Content-Type: text/plain
 
 Alvin Sun <alvin.sun@linux.dev> writes:
 
-> Since `const_refs_to_static` has been stable as of the MSRV bump, a
-> `ThisModule` pointer can now be used in const contexts.
->
-> Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that modules
-> can provide their `ThisModule` pointer in const contexts such as static
-> `file_operations`.
->
-> Move the `THIS_MODULE` static from the `module!` macro into the
-> `ModuleMetadata` impl, add a `this_module()` helper, and update `__init`
-> to use it.
+> Change `create_fops()` to accept an owner module pointer instead of
+> hardcoding `null_mut()`, ensuring the kernel correctly tracks the
+> module owning the DRM device's file operations.
 >
 > Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 
