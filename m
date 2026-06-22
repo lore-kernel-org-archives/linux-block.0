@@ -1,237 +1,123 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766DB28B4FD
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 17:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6A6175A85
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 17:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782148422; cv=none; b=CGOSHtidjkz6G/QzR9pN78bRNS8HqcSqY80cV2SlNXIDeHD6tif0VgGUjbiPVGGkQYJrsy/QyR1w4SC4Ik33Gmb1pW2N4xuJlTKJCc7Xxf9AbBsmibR2RzDnhPmKxage1hqseaX79Y6KxJ4xJNzheqLBaMpikmy4QdqbRwISktY=
+	t=1782149473; cv=none; b=sLA872Y3vQqWABgL3UYi4lz5xJKKpg0lbHYjk5Da2+pH3Dx3d7mZGiC4uzMhKRMV3zntV/PwnY610UWNFCvak5h1mtgCwF+yMI6Eptc+WTGqIlXopzonk6GgAukSBdMZSPFLgTB7ZAvPO87PMmtsDg72h0dzRK9wTZjPMGKkmm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782148422; c=relaxed/simple;
-	bh=YPns9BMqruoPxxfbzv9I+MeJ+qdUDzUn5e+bYYe7QOs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dyc7aAWEC88P6OFchDXHjUSWodLHiLS2uO2inyfwLTEN1RyZ3JRUN/bvJCLNTdI34w9kpqPK1YW1ZuWNPzY/0MRINVgQzMZ26sYlyEhBMPX+g/axLxPe+6JYl9TzO4V+JotVqNYg2WU32UEHZPLvCa+SeDshcAuXMT/0/vjWC9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=OgqViIyl; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1782149473; c=relaxed/simple;
+	bh=A64b8u1vEy1l6uw7Ax4fjzMCJUAxW0tqM0cg5+IjHho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pogp+7sYIhUl50v8dsDj8HyTs9yxB8403AaPqLHjt9sgFQgSmUg9FjLa+mIioG76W5ny05Y8D+AH6Mb0YsGZNGx+TZ7gSwbG5feBCpwuKwYigMiJgpkidrXK2geSTShEAy1gQ3rm6laYWLH6fOYjPyFGttQ/84uN6jelDi6SZ+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20251104.gappssmtp.com header.i=@osandov-com.20251104.gappssmtp.com header.b=DALXKMot; arc=none smtp.client-ip=74.125.82.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="OgqViIyl"
-Received: from pps.filterd (m0167071.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65MGYkeH2073895
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 12:45:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=xdMm
-	a0yFZmweYohmNWNZydRh/c/N/8MYIz6Kz390Uw8=; b=OgqViIylG77wjYnZddWf
-	88YfH8KC/P+mTnqfevI0Too4wjycZ3p6FDhKIuH4gSeU6WIqYUin9SIwCTR6PaKZ
-	045ca89rm3XjdDbD88fhES2ssfW6qKxDwQin7jbln+eDXhZkvt3rzuDRgmWjHMRt
-	bXYHTOkWmIAFxgnpV4zpM7IRvRFLSqvlRe9rO0LhHgRiw57Lo6kU9bc2l1P547kk
-	e9qbhjV/IUmE4cBLJp0ph0MjvifIWO9Cbl1cu3blssXdXcGOmioJG41eIAP7Lg8m
-	yUF+mqa00i0REXrcqjro2yGFuw1WO8p8bDvLjCkeQhbdW59jQV35RatkKdld/Er1
-	Cw==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4ey8pk0367-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 12:45:28 -0400 (EDT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-519fdfbd340so1219661cf.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 09:45:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=osandov-com.20251104.gappssmtp.com header.i=@osandov-com.20251104.gappssmtp.com header.b="DALXKMot"
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-30bf5a207a6so269923eec.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 10:31:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20251104.gappssmtp.com; s=20251104; t=1782149471; x=1782754271; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S7o12M/FCB176LvmUOh5Rciwk4R7hxZjTYhxxjcHmnE=;
+        b=DALXKMotFHX2uViU28RhuGZZz+POdw3U1AbkF5sVhu8eOdJ5GkxozUIm+QBNaGW79q
+         el4qqU/TuJwfRy2Owwn9b3QB7NptwUMMqxmbyPwui92OUFMbKrv7kajcztQdWfpnshZ9
+         E/fOXJ1kjrtG1Mqr8T2NwNw4OIMvOXPkcrgUS517uN1I9GBglulrovMVfqD037b7r9lq
+         4gl/GZ56Nb/02fbeeiNJQuLoDrSvJrq/1ZsteMhRF152iOjGMDzyHyN1qeDbgWlzSBGM
+         f9ZkjtWJlUk7c4rB3/lOjEdr9WZdDaM/yWlVdI6yjZgMu2XslUvMcBFQoO+MGQbg2FYy
+         GTcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782146728; x=1782751528;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xdMma0yFZmweYohmNWNZydRh/c/N/8MYIz6Kz390Uw8=;
-        b=jn7bSgRGq37/ur8Z7YGcFcmOhwWi2RUM/61Qc3OSEU/VYJ9QlOpzxcvks5UgdgavpM
-         CttYiQ6Tu5I2WEfOhu207BuwIsLUnd4Z5mYTUURMgpUvgN/OSvqor/DUu6U1/EYCbqtG
-         XbQvNhQV1qNZlee5qjdc4x8JlCBcdOE+vDIc38XUpzA3kLZ7yFzs3IG0uB5LAowQzUtw
-         o5ipk60OUmEPwSCL938xeVdtaPm5V19812y/hxRz+oSjZPf2L1ddwgtvfASh0Khq1dFW
-         ELkrQHYNf8VuG+mEmDDfkpA6Az26sUs1H9PSzaCop4QnoXXJCLtEH1LPUrT6d2CbjHM6
-         KFLA==
-X-Forwarded-Encrypted: i=1; AFNElJ+ONr2RhZHvdiquRVoaePx3uiqgPTicAvEG86NG9+EYnwJRAxMITVlUUPvJl2jjbmDBcuDgEjhAFO4q7g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL3LJGAJ4Yb3mI5BFcQT6BuGIUJakNvqedG95A8Kqu1m+JHxld
-	aYBJd9ek7n6U83Fe6dgFhPu/kgoz/aaDYICM0rU+VQnMW22eSTFzK8cCQrlGenXoCnFFriMuNNm
-	gwuKO7uJMCvSOEpkpno/Qx53GdP2TEe5eX52X4mHdMAPb36zXjWC1vqI0w1ed
-X-Gm-Gg: AfdE7ck4RZ59gEuu5LmPvC61a4FaxgBAeFlx7TEsw+lgWoripA5sx7g2MKwH2ijR8MR
-	Z/eTRaqf6sh/p1cd30FyaYxRgzW29An942H7X+/IOyu5z+QTkxdKu3WjE0JFJlXdraNlftjWoQE
-	n45DKAK3aPXsqrogrjWu1l6ThNs5cJo+FKF8eqMW76/oH8aJ1DZYa2DhQIngKFvvOwWgC0gJoZp
-	kg55LAncDOt1pTw1newmB3oTwGm6SMQhVNXLBaVYv9RdKAOomg+W39M3KssSzIpupPZt7YMSj09
-	/0Tu5wpCPe4/oSpiSU8tYsMv6HX/Mi+DdUd49f/0rul/vDT8v5nCqJuYlQ3AnLLhodYajbi1QPi
-	o/oKU6DWwOPxN85KyQj+kD5qsPyRn
-X-Received: by 2002:ac8:5703:0:b0:516:ed2c:9c75 with SMTP id d75a77b69052e-51a51a9be7bmr4274261cf.16.1782146727912;
-        Mon, 22 Jun 2026 09:45:27 -0700 (PDT)
-X-Received: by 2002:ac8:5703:0:b0:516:ed2c:9c75 with SMTP id d75a77b69052e-51a51a9be7bmr4273601cf.16.1782146727437;
-        Mon, 22 Jun 2026 09:45:27 -0700 (PDT)
-Received: from [10.206.129.146] ([129.236.229.236])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51a515ccdbbsm2022461cf.11.2026.06.22.09.45.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2026 09:45:26 -0700 (PDT)
-Message-ID: <cc58a101-6d09-4e42-b99d-673271934c29@columbia.edu>
-Date: Mon, 22 Jun 2026 12:45:25 -0400
+        d=1e100.net; s=20251104; t=1782149471; x=1782754271;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S7o12M/FCB176LvmUOh5Rciwk4R7hxZjTYhxxjcHmnE=;
+        b=Js4PX/82iP3hKlgj9d0AetEuD1oHUtBZEFFsQwcXZADOKQgQhK0YBpxmop0YZ5uKp6
+         43yxSdSQrpKvdIko1s1TEhAP1gmnMd+aCudDLsdftbMGPl7DoHyliRrsy25ZtmBmyvnY
+         PvWrjqzZQLOMnYw/7mqa/OA/tIeTTDPFE+z5l6E5lTywycK0UV5o+Gs7Lc1Srf866dgr
+         ge55Ow7gPhgWG8uuWL5f04c4T/tSlpVC9fhl4Te8dXrIqlMjY2T8Xq9Cr6VjttIDj0SH
+         PgRMI7AQKX8LJRE28LWgX5kSJWXo6WLR7Mis9j2yO+wvpEHjQ9ZgBLwmvG4bagyakoIM
+         11lQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq3NX6q4VjyOPWJ9bU3jalTUISAxfmqGK3heWNf60fCaOUrbtxA9EzYstuT1MdYILLU+tlydf5cdbgzJg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyRUXrkHprYOEqoCFybxdI/D5Al86znY/rOjKQfKHLQtZQSghA
+	Ihco6JJSsU1GKUTqiE+ATM4jfoOy+pk57VjJpo91ImLxzRJHwE7RMAnj+kzHbTfxOAo=
+X-Gm-Gg: AfdE7clJ3FM1WRL/mZDWj/oiU+ltL4sWNZnd9D8eA9R7xhSlPSmlI0CYotEB9JHYH4+
+	ni20j8xBC3qydL+p7JXRiHpG95vcTnCyN1gEQ+4OETAMbhCDhrJR9YcKIQ/9w4ZxUj9FXNd+6pf
+	mJ0oRFBO9uywFVynQCm13mBTLqa6qrhMCyvc4AmgOmlKVAtjiaueNk3pGPBcOI/GN/rbTEwi/go
+	XdtgoNMGjQL5QVC8CJ6ksyRVTGOjZsSB/yUCag0CZ6JoApS+Spe4cQFt4Bxp0Gm5z2npjPDO7iv
+	GGO8Syl77UmHBf/tnpN5w6k5YdKL8WP0DC+6lgbz5abRuj3ocMrE5z+J/5l4C2+5g6IvnATv3J8
+	S4RVLpqmvKi0yrHZvKyGAfF7edWHTHYHjLaMjSI4y3Fvnznb8/lVbn/Dxjcmv4qXSBx8SVzdwQe
+	uv9ewPUWpUmsgRI1xqQDPjAegzwXNBEw==
+X-Received: by 2002:a05:7300:acae:b0:30b:c021:5045 with SMTP id 5a478bee46e88-30c5232edd4mr286950eec.5.1782149471087;
+        Mon, 22 Jun 2026 10:31:11 -0700 (PDT)
+Received: from telecaster ([2620:10d:c090:500::2:dcf7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1bdffa83sm13544658eec.23.2026.06.22.10.31.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 10:31:10 -0700 (PDT)
+Date: Mon, 22 Jun 2026 10:31:09 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jeff Moyer <jmoyer@redhat.com>,
+	linux-block@vger.kernel.org, kch@nvidia.com
+Subject: Re: [PATCH blktests] Fix _get_page_size()
+Message-ID: <ajlxXfgpMQJ4qlRR@telecaster>
+References: <x497bnvlxlc.fsf@segfault.usersys.redhat.com>
+ <ajXmBu9lDZwgMG7_@shinmob>
+ <d0432702-ac0b-410e-9586-2cb9be079033@acm.org>
+ <ajYabLMbEo6zyOWh@shinmob>
+ <089e0281-4df8-4358-91ce-1f5cc0f0ec4b@acm.org>
+ <ajkeGQd-0LnKJbHN@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
- infrastructure
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
-References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
- <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
- <agq2KRd8RkP1TAf5@infradead.org>
- <ea1fa305-3ba2-4cfd-b7cb-86875032a300@columbia.edu>
- <ahPbaSEoNA755Nt3@infradead.org>
- <f1b8eeb6-2397-4f48-a21a-a023eb0c80ab@columbia.edu>
- <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
- <ahbq0RdUyLIPiItB@infradead.org>
- <80cb53f3-e7e5-4f96-bacc-f9fb7661d976@columbia.edu>
- <cuyklvhnt37xwk3jlr2iyyxxkzvt4bsf5iqv2gag4ixdicnbk2@rfqgjlclwesz>
- <4jtsjd2sbsn2w7fzfwb7wwowz72r4kc6345ckkkcjoxjbbwjwn@rkl44x3o3sgy>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <4jtsjd2sbsn2w7fzfwb7wwowz72r4kc6345ckkkcjoxjbbwjwn@rkl44x3o3sgy>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDE2NCBTYWx0ZWRfXxV5VpCxNcWUf
- hufqaKtqKuvQ0r5VtlGolHQoSzCe9aTrjflIl1bQqthjS7hW+5zeyZKKkyOGjrBcgVlX18yRwgr
- 44IZO4fD9gJaWjZT10mZrfr+9kWl9fOTg7WVdk6Wq6FLx/NgJDeGFF+TdLvmqKHEFidXnGzzyVp
- cPb1yNvkL55+6jF+49TRBsds5MyNA3tquV+eVxNFa5mI3PwsrSBGbT41L4uZp12fuC1/hlzHy/s
- Wx1rxmOBHVKxukVb2bl/HkP5HKvDVLlkupekvJ9T5CL1pqx7a0KOb38jqcK4VtNdYmI23UqtXPQ
- z7XA6JX6XpHxftXdYHEj0H9t1tQUK2yIDyCuD+FGFoubrDjYqK1leROY+sQs/tsgh8p30qtSRf9
- 70EvaYllxrN0awCd9VX/Gn85AKSJmVtzt1yfnGNiY+PziTla4vM11ELepVv84E/ste2Jg0DXFAV
- qDYGoQnRWe4Kmp5bmCQ==
-X-Authority-Analysis: v=2.4 cv=frvsol4f c=1 sm=1 tr=0 ts=6a3966a9 cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=Ne+/oOzQhjyqTAlfBCchDA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=79PYxaXUQd1wl-QFWJnA:22
- a=xMg8OGkpyC76Z8KfPXcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-GUID: nzBmn8oJfC2m4cLOeMU_1EmEzWQqssKh
-X-Proofpoint-ORIG-GUID: nzBmn8oJfC2m4cLOeMU_1EmEzWQqssKh
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDE2NCBTYWx0ZWRfXwqBGzLQGOL0V
- 6o2lD8Vq8DUcOHFgR97/6nYOjAFQTKabgygsbrqal/6t1j5I8cN4Q2EkCDBLOKJVf5FXgavg4Xd
- tHN5UothaaYNIBf8hjiEP1pawFdk4qDEkl85igTgI/x0uku3g0en
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11825
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 lowpriorityscore=10 phishscore=0 suspectscore=0
- adultscore=0 bulkscore=10 impostorscore=10 clxscore=1015 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606220164
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajkeGQd-0LnKJbHN@shinmob>
 
-On 6/18/26 10:26 AM, Jan Kara wrote:
-> On Mon 01-06-26 13:04:41, Jan Kara wrote:
->> On Fri 29-05-26 16:46:15, Tal Zussman wrote:
->> > On 5/27/26 9:00 AM, Christoph Hellwig wrote:
->> > > On Wed, May 27, 2026 at 11:42:28AM +0200, Jan Kara wrote:
->> > >> > I ran some experiments with fio on both XFS and a raw block device. Five
->> > >> > iterations each for 60s. Results below.
->> > >> > 
->> > >> > TLDR: Removing the delay doesn't significantly decrease user-visible
->> > >> > latency or otherwise improve performance, but does significantly reduce
->> > >> > throughput and increase context switches in some workloads (e.g. C).
->> > >> > I think it makes sense to leave the delay as-is. Thoughts?
->> > >> 
->> > >> Thanks for the test! One question below:
->> > > 
->> > > Thanks from me as well!
->> > > 
->> > >> 
->> > >> > Results:
->> > >> > 
->> > >> > Workloads (all `uncached=1`):
->> > >> >   A: rw=write     bs=128k iodepth=1   ioengine=pvsync2     # XFS
->> > >> >   B: rw=write     bs=128k iodepth=128 ioengine=io_uring    # XFS
->> > >> >   C: rw=randwrite bs=4k   iodepth=32  ioengine=io_uring    # XFS
->> > >> >   D: rw=rw 50/50  bs=64k  iodepth=32  ioengine=io_uring    # XFS
->> > >> >   E: rw=write     bs=128k iodepth=128 ioengine=io_uring    # raw /dev/nvmeXn1
->> > >> >   F: rw=write     bs=128k iodepth=128 numjobs=4
->> > >> >      + vm.dirty_bytes=64MB, vm.dirty_background_bytes=32MB # XFS
->> > >> > 
->> > >> > Mean ± stddev across 5 iterations:
->> > >> > 
->> > >> >     metric                     delay=1           delay=0     delta
->> > >> >     --------------------------------------------------------------
->> > >> > 
->> > >> >   A seq 128k qd1
->> > >> >     BW (MB/s)                4333 ± 27         4374 ± 34     +0.9%
->> > >> >     p99   (us)              36.2 ± 0.8        35.8 ± 0.4     -1.1%
->> > >> >     p999  (us)               3260 ± 75         3228 ± 29     -1.0%
->> > >> >     ctx-switches          184 k ± 59 k     3.68 M ± 65 k    +1903%
->> > >> >     cs / io                0.09 ± 0.03       1.86 ± 0.03    +1888%
->> > >> >     avg bios/run            80.4 ± 0.6         1.1 ± 0.0    -98.7%
->> > >> 
->> > >> So 1 jiffie delay is (with default HZ=1000) 1ms. That means for this load
->> > >> the completion latency should be at least 1000us but your results show p99
->> > >> latency of 36. What am I missing?
->> > > 
->> > > Yes, this looks a bit odd.  Unless there's multiple threads submitting
->> > > and somehow the completions get batched this should complete one
->> > > bio at a time and be the worst case for the delay scheme.
->> > 
->> > Sorry, I should've clarified - the latency here is the userspace-visible
->> > I/O completion latency (i.e. fio's clat value).
->> > 
->> > I ran again and traced to get the actual time from __bio_complete_in_task()
->> > to calling ->bi_end_io(). The results match the 1 jiffie delay now:
->> > 
->> >   metric                  delay=1  delay=0
->> > 
->> >   A seq 128k qd1
->> >     fio clat p99             38us     36us
->> >     bio cb p50             1.23ms    2.5us
->> >     bio cb p99             4.13ms   1.44ms
->> >     bio cb p999            5.01ms   2.63ms
->> 
->> So I'm clearly missing something fundamental as I don't see how can fio
->> reported IO completion time be lower than the end_io callback latency...
->> Ahh, it is the strange meaning of clat in fio in combination with sync
->> engine where clat means: "how long after the syscall has returned the data
->> is ready". Which for sync engine is immediately so the clat number is
->> meaningless. I think reporting 'lat' numbers from fio would make more
->> sense but whatever.
->> 
->> The bio cb latency indeed looks like what I'd roughly expect now. And
->> notice how the median latency of IO completion is 1.23ms in delay=1 case
->> and your throughput isn't abbysmal only because writes end up accumulating
->> in the page cache and writeback infrastructure ends up submitting a lot of
->> writeback IOs in parallel (you have ~80 bios to complete per run which
->> amortizes the latency to decent level).
->> 
->> However if you'd have IO that were to use BIO_COMPLETE_IN_TASK
->> infrastructure which doesn't have so many IOs in flight (like direct IO
->> with lower queue depth which has to do extent conversion on completion),
->> you would very much see the latency hit on your throughput as well. In the
->> extreme case of qd=1 direct IO you'd reduce the throughput to ~4MB/s.
->> 
->> Now I'm not saying the delay is bad - it is a tradeoff with clear wins in
->> CPU overhead your benchmarks are showing. I just wanted to point out
->> there's also the cost side which your benchmarks don't show very clearly.
->> So we might need to keep some stats showing how many IO completions we are
->> offloading per second on each CPU and switch to delaying the work only once
->> it crosses a threshold like 1000000/HZ per second or so (so we at most
->> double the IO latency by delaying the end_io callback).
+On Mon, Jun 22, 2026 at 08:38:48PM +0900, Shin'ichiro Kawasaki wrote:
+> On Jun 20, 2026 / 09:11, Bart Van Assche wrote:
+> > On 6/20/26 6:51 AM, Shin'ichiro Kawasaki wrote:
+> > > On Jun 20, 2026 / 05:55, Bart Van Assche wrote:
+> > > > On 6/20/26 3:26 AM, Shin'ichiro Kawasaki wrote:
+> > > > > This is a rather fundamental change, so I would like to ask opinions from
+> > > > > other blktests users, especially Omar and Chaitanya. What do you think about
+> > > > > the idea to add getconf to the requirement list?
+> > > > 
+> > > > CONFIG_PAGE_SHIFT was introduced in the Linux kernel in February 2024
+> > > > (commit ba89f9c8ccba ("arch: consolidate existing CONFIG_PAGE_SIZE_*KB
+> > > > definitions")). Older kernels had CONFIG_PAGE_SIZE_4KB,
+> > > > CONFIG_PAGE_SIZE_16KB, etc. This means that it is possible to derive the
+> > > > kernel page size from the kernel configuration file for all upstream and
+> > > > distro kernels, isn't it?
+> > > 
+> > > I checked the commit is in the tag v6.9. My Debian bookworm system has kernel
+> > > v6.1, then the config file at /boot does not have CONFIG_PAGE_SHIFT as expected.
+> > > But it does not have CONFIG_PAGE_SIZE_* either... I'm still afraid that kernel
+> > > config file approach is not reliable.
+> > 
+> > Right, for older kernels CONFIG_PAGE_SIZE_*KB is only available for some
+> > but not for all supported architectures.
+> > 
+> > It is not clear to me where the desire to avoid the dependency on
+> > getconf comes from? As far as I know it is available on all Linux
+> > distro's. Since it is typically included in the C library package it
+> > should not introduce a new dependency.
 > 
-> Any progress here? The patchset looks really promising so I'd love to have
-> it completed :)
-> 
-Sorry for the delay - got caught up with some other work and had to set this
-aside for a couple weeks, but haven't forgotten about this. Planning to pick
-it back up some time this week.
+> I think less dependent is the better in general, and wanted to confirm that
+> it is fine for everybody. If there is no voice to object, I will create a
+> patch to add getconf to the requirement list.
 
-Thanks,
-Tal
+I agree with Bart, getconf is ubiquitous enough that it's not worth
+trying to hack around its absence. In my opinion, parsing kernel config
+options should be a last resort. If anyone complains about the getconf
+dependency in the future, I think it'd be better to add a simple
+src/pagesize.c file that uses sysconf(_SC_PAGESIZE), but I don't expect
+that to be necessary.
 
+Omar
