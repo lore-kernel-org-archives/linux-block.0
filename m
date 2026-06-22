@@ -1,33 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781913358B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2B7335BB4;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782096302; cv=none; b=h4lDnGPteo0eTHgcav9H6i4LN3rZRZMdqxjg1nLdTKwHWO47gFNahQ8Jg3mwox1v5La0K2s/Sf+kmURNySnksHfolBQUGKJfzrBfRp4mhfQ3MuC+DfiGOmt1rTL1QkmBBjL7fBgwhkVyduBIdBBdgaHN1aLydlSlT5BjOqot4qo=
+	t=1782096302; cv=none; b=A7BUQnS9od4HGlmEg4puVfylTBxzbsh2bPCaFeqN3oXsAJqxcK+YI+VTJBO1PcZ+A2qIzhisZDfQzrOD/eHnZBs6tsSzcA9iruz1h1aj4AAA+HqwFE+eMA1/48Qb8cliSVCw5lbmpliemKhf4WbR814d5whrWhGUnSi93kjeDmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782096302; c=relaxed/simple;
-	bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
+	bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oJuD+KRKEkaqxqzxMREnbSWOT5xO5eqKonH33UqyfwN257qPNjXJlMFCWqvKrLdsc2Rfj6huPGae7876JLKUjE38/onwGdg5AgLR/zzY/dKAsLG0oxPsR+xi/vZW678eUK0qxUmTSnuiv/HtKqAeh4Zc5PdZUGbUaYfzrr/KAdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q3ojaZsY; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Zgu195nRS7P/xM7tMTMy7FThOoQutmJS1oL9befb7eUNc6H67cx+TEpvNHT0XOKeV3FAFa7i6I9ucm+DSUUnuQ902yyI5l1mU+FoHAisXBRd8eT2sAkBhxoh/W1oP6PBpBAK9cdhFfzJokAwpbqrgS483n99qU5U/j7wiBBVaAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kh3vPJcO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q3ojaZsY"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E241C4AF09;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kh3vPJcO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 24C40C2BCF5;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782096302; bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
+	t=1782096302; bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=q3ojaZsY3i6mnlrioO7ANKRbvbXnJsNrStylhhTBSbXvVGQZ0wJ2pdUED/GDunoMk
-	 kj5je+IPXoyWp+bHciONm3Oig7YHyZcAcno67M5CTLFJem6SfNXOvJFW+9ibawcrTo
-	 DNIkVgd9DDnjK6NHjQXCjPWvVSY88SERFwdHlq8k=
+	b=kh3vPJcOJpVVAyc4fRoF96Hms/bQtsreXs0Nb5ymEXT3k49U4TZSpJAjO8lNlOJcT
+	 lGDQ7SuxbukZD9nApYUPc0NCooItKyX9DkAupAWknHfjAkbvFJNgCuawDQyVtuFCLF
+	 9NF+V+LeM+4BJQCmyHk4i1jcu0LX9ZbCS0DqX/2c=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F908CDB470;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3E6CD98F0;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Mon, 22 Jun 2026 10:44:57 +0800
-Subject: [PATCH v3 3/6] rust: macros: auto-insert OwnerModule in #[vtable]
+Date: Mon, 22 Jun 2026 10:44:56 +0800
+Subject: [PATCH v3 2/6] rust: doctest: add LocalModule fallback for
+ #[vtable] ThisModule
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260622-fix-fops-owner-v3-3-49d45cb37032@linux.dev>
+Message-Id: <20260622-fix-fops-owner-v3-2-49d45cb37032@linux.dev>
 References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
 In-Reply-To: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -60,123 +61,53 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782096299; l=4459;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782096299; l=1210;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
- b=Td4KO9mZ3A0Wi4Wo0QWzq+k7aYuN0oZ98hL0noB16/LGdQyTK1oaKnruAJEWqVyMGTSVxnAdn
- hS6z+9PHAUxDD+wnPCVtRHRkwHSi7kHgDm2x1V49okS7dB37q4IhcxL
+ bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
+ b=H9jaPxzJ2Tk9+CTb0D8lMG4t8EfKH4+2wPWcNIugqj0uXYTf2KN5ObtWCeY/kZP81vThj/m4/
+ kxUcfOH9ev9DZOD5YtzrCiXYm8m0j94Ib8FDb6HtuYQCa9WSxD72ajY
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Auto-add `type OwnerModule: ::kernel::ModuleMetadata;` as a required
-associated type on the trait side if not already defined, and
-auto-insert `type OwnerModule = crate::LocalModule;` on the impl side
-if not explicitly provided, eliminating the need to manually declare
-and implement `OwnerModule` in every vtable trait and impl.
+Add a `LocalModule` struct with a null-pointer `ModuleMetadata` impl
+in the doctest harness, so that `crate::LocalModule` (auto-inserted
+by `#[vtable]`) resolves correctly when there is no `module!` macro.
 
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/all/DIMMWHUOLPSH.13JFRHDKDQJGO@garyguo.net
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/macros/lib.rs    |  6 ++++++
- rust/macros/vtable.rs | 41 ++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 42 insertions(+), 5 deletions(-)
+ scripts/rustdoc_test_gen.rs | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index 2cfd59e0f9e7c..bc7ded353c5ca 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -176,6 +176,12 @@ pub fn module(input: TokenStream) -> TokenStream {
- ///
- /// This macro should not be used when all functions are required.
- ///
-+/// Additionally, this macro automatically handles the `OwnerModule`
-+/// associated type: on the trait side, `type OwnerModule: ModuleMetadata;`
-+/// is added as a required associated type if not already defined; on the
-+/// impl side, `type OwnerModule = LocalModule;` is automatically inserted
-+/// if not explicitly defined.
-+///
- /// # Examples
- ///
- /// ```
-diff --git a/rust/macros/vtable.rs b/rust/macros/vtable.rs
-index c6510b0c4ea1d..be9a5ed8abe5e 100644
---- a/rust/macros/vtable.rs
-+++ b/rust/macros/vtable.rs
-@@ -30,6 +30,22 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
-          const USE_VTABLE_ATTR: ();
-     });
+diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
+index ee76e96b41eea..198af4e446c8c 100644
+--- a/scripts/rustdoc_test_gen.rs
++++ b/scripts/rustdoc_test_gen.rs
+@@ -239,6 +239,22 @@ macro_rules! assert_eq {{
  
-+    // Add `type OwnerModule: ModuleMetadata` as a required associated type if
-+    // the trait does not already define it.
-+    if !item
-+        .items
-+        .iter()
-+        .any(|i| matches!(i, TraitItem::Type(t) if t.ident == "OwnerModule"))
-+    {
-+        gen_items.push(parse_quote! {
-+            /// The module implementing this vtable trait.
-+            ///
-+            /// Automatically set to `crate::LocalModule` by the `#[vtable]`
-+            /// impl macro.
-+            type OwnerModule: ::kernel::ModuleMetadata;
-+        });
-+    }
+ const __LOG_PREFIX: &[u8] = b"rust_doctests_kernel\0";
+ 
++/// Dummy module type for doctest context.
++struct LocalModule;
 +
-     for item in &item.items {
-         if let TraitItem::Fn(fn_item) = item {
-             let name = &fn_item.sig.ident;
-@@ -57,12 +73,18 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
- 
- fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-     let mut gen_items = Vec::new();
--    let mut defined_consts = HashSet::new();
-+    let mut defined_items = HashSet::new();
- 
--    // Iterate over all user-defined constants to gather any possible explicit overrides.
-+    // Iterate over all user-defined items to gather any possible explicit overrides.
-     for item in &item.items {
--        if let ImplItem::Const(const_item) = item {
--            defined_consts.insert(const_item.ident.clone());
-+        match item {
-+            ImplItem::Const(const_item) => {
-+                defined_items.insert(const_item.ident.clone());
-+            }
-+            ImplItem::Type(type_item) => {
-+                defined_items.insert(type_item.ident.clone());
-+            }
-+            _ => {}
-         }
-     }
- 
-@@ -70,6 +92,15 @@ fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-         const USE_VTABLE_ATTR: () = ();
-     });
- 
-+    // Auto-insert `type OwnerModule = crate::LocalModule` if not explicitly defined.
-+    // `crate::LocalModule` resolves to the real module type (via `module!`) or a
-+    // dummy fallback in non-module contexts (e.g., doctests).
-+    if !defined_items.contains(&parse_quote!(OwnerModule)) {
-+        gen_items.push(parse_quote! {
-+            type OwnerModule = crate::LocalModule;
-+        });
-+    }
++use kernel::{{
++    str::CStr,
++    ModuleMetadata,
++    ThisModule, //
++}};
++use core::ptr::null_mut;
 +
-     for item in &item.items {
-         if let ImplItem::Fn(fn_item) = item {
-             let name = &fn_item.sig.ident;
-@@ -78,7 +109,7 @@ fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-                 name.span(),
-             );
-             // Skip if it's declared already -- this allows user override.
--            if defined_consts.contains(&gen_const_name) {
-+            if defined_items.contains(&gen_const_name) {
-                 continue;
-             }
-             let cfg_attrs = crate::helpers::gather_cfg_attrs(&fn_item.attrs);
++impl ModuleMetadata for LocalModule {{
++    const NAME: &'static CStr = c"rust_doctests_kernel";
++    // SAFETY: `try_module_get`/`module_put` handle null module pointers gracefully.
++    const THIS_MODULE: ThisModule = unsafe {{ ThisModule::from_ptr(null_mut()) }};
++}}
++
+ {rust_tests}
+ "#
+     )
 
 -- 
 2.43.0
