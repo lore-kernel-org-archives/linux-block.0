@@ -1,90 +1,79 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040A23947AA;
-	Mon, 22 Jun 2026 08:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1773039EF2E;
+	Mon, 22 Jun 2026 09:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118624; cv=none; b=m/pQCly2MpRm64uX3oz8XxnUsW6i2/ivzndzmIWj6bCVEbO+5h71+JvVXNkwxRoEWIAJJCj/uByvcnekXVLaY9eRmicfXdB1GtU4/h/g8DxqQ0nEOB3GpbaaNrvWqC0Jyy+ISNFhw6HAIngV3+Slv4hTyLXlrcAfqG0RT5KdwZU=
+	t=1782121544; cv=none; b=ZvspWtOyfnFDPgXUfFGO2aciCgsB5sRV7AzgFYuwuWnNPEQ7HewZ9KbSyMsMnD5Ai2HE5OI7rdqjUh8EnAVw1301WFrGKjzOqVJZZgU5sN36EFk9HootHmSLD6HdpepZbx+gAj/EHkXZojHGdVMS1Gcb6zWrJtVF0D4bdwT/XaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118624; c=relaxed/simple;
-	bh=IwiPtCiYJpzdkfUTpsvuA+UxXenUurPbutYjstOfze8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ofjCUY4ZX1+CqhQKCjbZLMg43Usm96NLbd3gXwX8qRX0bMTbut7X6LhHSUKxHFQY46AXNIGB3TBQtG/4gYpwnrZPY9i+QwfugU3w7jkVHaGGh0bzXV0VN2NG3elAmdAWisrGq+kQh2c+CVvsL9fkYBqdC4Mr6hBydIsoNc2gJzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Uss9UXhv; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1782121544; c=relaxed/simple;
+	bh=camQzgX11b9RtBketnhIwhWiN/pUYT4PY/SigoZT4oE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bJTieW0XPv6WbusiuzLd/MzWc5sHS7YsNFIOEiaTZdEAHkLnGPVQ2isBYom9pEzI90J5YjJ7jDxLO21MSua+09eHTbIrJFyJaf+bvEO6C8A21KamR25ZQPcKvMGunPgTBpmgbQvGerzpZCs3rEiBhkPNHCqwwUandS1JuUXccF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7Z5h8QV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Uss9UXhv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=WpHPY2uq5XeYoAgK1iV3XUY/BP7dASpo538j4VSIDmk=;
-	b=Uss9UXhvkVOd/mwC2BLE8bdJvu8WjpctBFJAEHpuDy+mmS05btRPJe7F+fPonr
-	7VI6CMy77NyJ7A6OuEyQBpQDb+cmvLfJvlqNgBq15mr8u+IamAm1HevfQZgoor16
-	0fmfVv2mzK55uwG5hCbBXkFbJEMuiMv8oirQ5RaTVZ094=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3V0i5+DhqCisdFA--.60043S2;
-	Mon, 22 Jun 2026 16:56:26 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH] block/cgroup: Drop stale -EBUSY retry from blkg_conf_prep()
-Date: Mon, 22 Jun 2026 16:56:23 +0800
-Message-Id: <20260622085623.520209-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7Z5h8QV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB72F1F000E9;
+	Mon, 22 Jun 2026 09:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782121541;
+	bh=camQzgX11b9RtBketnhIwhWiN/pUYT4PY/SigoZT4oE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=H7Z5h8QV+Sgm23uxmGgab/3yuerJJ1o84Q5vIkNHMPGKE124NDuRJcJQbp9uqpnvf
+	 4heRmTjxC+6YaMZxQnMPNnz6z6n25qWsk6+B73HtLKm5PERaHOzZHnVabMRED5DAS5
+	 10gh5H1eiG2pqQh6dAyzxKa5LwBXYYVqUOvpRo5jiI/A7e0UCyLCRuLUOqzv0VXcxG
+	 PWqsUdkNzMZ1YFudTQqXkqsyEPR9GKa8Rks7oRyGSNGQJFW1fyJI+aYYG9Y+zv0gXI
+	 YTA9qyBvazvUO5Eghahxj39TkvpGrXeX45cP6kGuiUr39wt6bRzLfncfFk7GdVes8E
+	 ATuJiK+e2T7+Q==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alvin Sun <alvin.sun@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, Boqun
+ Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6r?=
+ =?utf-8?Q?n?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl
+ <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
+ <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu
+ <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen
+ <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
+ <simona@ffwll.ch>, Daniel Almeida <daniel.almeida@collabora.com>, Arnd
+ Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, Breno
+ Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
+Subject: Re: [PATCH v3 5/6] rust: miscdevice: set fops.owner from driver
+ module pointer
+In-Reply-To: <20260622-fix-fops-owner-v3-5-49d45cb37032@linux.dev>
+References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
+ <20260622-fix-fops-owner-v3-5-49d45cb37032@linux.dev>
+Date: Mon, 22 Jun 2026 11:38:33 +0200
+Message-ID: <87mrwmewyu.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3V0i5+DhqCisdFA--.60043S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Xr1ruFy8ur1rtF1xKr1rWFg_yoW8JryUpF
-	47Jry3C3WSg3Z8uanxGF47W3W8Kayvkay5AFZxGa4Ykr1qyryIvF1Yy3Wvyr9YqF9FyF4j
-	grWrZryYkr4j9a7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ud5rsUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwRoVpWo4+LooGgAA3J
+Content-Type: text/plain
 
-Since commit 8f4236d9008b ("block: remove QUEUE_FLAG_BYPASS and
-->bypass") nothing in the blkcg blkg lookup/creation path
-returns -EBUSY anymore. blkg_conf_prep() nevertheless still
-retries at fail_exit with msleep(10) and restart_syscall()
-— logic added in 2012 when blk_queue_bypass() could
-cause blkg lookup/creation to fail with -EBUSY while the queue was
-temporarily bypassed during elevator changes.
+Alvin Sun <alvin.sun@linux.dev> writes:
 
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
- block/blk-cgroup.c | 10 ----------
- 1 file changed, 10 deletions(-)
+> Set the miscdevice fops owner field from the driver module pointer
+> via the `this_module::<T::OwnerModule>()` helper, instead of
+> defaulting to null.
+>
+> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3093c1c03902..259f2240e7df 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -919,16 +919,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	spin_unlock_irq(&q->queue_lock);
- fail_exit:
- 	mutex_unlock(&q->blkcg_mutex);
--	/*
--	 * If queue was bypassing, we should retry.  Do so after a
--	 * short msleep().  It isn't strictly necessary but queue
--	 * can be bypassing for some time and it's always nice to
--	 * avoid busy looping.
--	 */
--	if (ret == -EBUSY) {
--		msleep(10);
--		ret = restart_syscall();
--	}
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blkg_conf_prep);
--- 
-2.25.1
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+
+
+Best regards,
+Andreas Hindborg
+
+
 
