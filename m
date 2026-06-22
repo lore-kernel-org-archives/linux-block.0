@@ -1,34 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2B7335BB4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC096339861;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782096302; cv=none; b=A7BUQnS9od4HGlmEg4puVfylTBxzbsh2bPCaFeqN3oXsAJqxcK+YI+VTJBO1PcZ+A2qIzhisZDfQzrOD/eHnZBs6tsSzcA9iruz1h1aj4AAA+HqwFE+eMA1/48Qb8cliSVCw5lbmpliemKhf4WbR814d5whrWhGUnSi93kjeDmY=
+	t=1782096303; cv=none; b=sKH0CHP4iy+KV+2Hg/L/eVTDFXwbZTo3Hfn5bVQALEe5lFChIKUwC1uoNVtqvEIXxuLrgrSVamt7FQIfctGCyZlKEO4qwgR7nAWcDKahJE/H2SZ8Kd7OzeyOZUwoLtv0xBgAnE+YPzUussYlljpKffNJDw6TnFdngODpqKHiGTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782096302; c=relaxed/simple;
-	bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
+	s=arc-20240116; t=1782096303; c=relaxed/simple;
+	bh=aexpDAuFU6mvFkRE4PMFgeTzsZDIZpwH5Q0CvXo0fTs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Zgu195nRS7P/xM7tMTMy7FThOoQutmJS1oL9befb7eUNc6H67cx+TEpvNHT0XOKeV3FAFa7i6I9ucm+DSUUnuQ902yyI5l1mU+FoHAisXBRd8eT2sAkBhxoh/W1oP6PBpBAK9cdhFfzJokAwpbqrgS483n99qU5U/j7wiBBVaAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kh3vPJcO; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=QoRbr9WDXR1F9NbQUd42P51+CQHVrw8ryWN1ViR8Get3eAShPrGFgBxPHGqawo9YntjqGU5IAeAAZ3WWe/eMYS2fKi+p8Po+TZ2bJ8Mq+isYYInK/H5doIqWAKoV5iqbzdJ3JK/hUZoYlvDzlYdZ7DUpMjlqho4NZ1poRvJ771c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZM4NpmKd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kh3vPJcO"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24C40C2BCF5;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZM4NpmKd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 63EB8C4AF12;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782096302; bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
+	t=1782096302; bh=aexpDAuFU6mvFkRE4PMFgeTzsZDIZpwH5Q0CvXo0fTs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=kh3vPJcOJpVVAyc4fRoF96Hms/bQtsreXs0Nb5ymEXT3k49U4TZSpJAjO8lNlOJcT
-	 lGDQ7SuxbukZD9nApYUPc0NCooItKyX9DkAupAWknHfjAkbvFJNgCuawDQyVtuFCLF
-	 9NF+V+LeM+4BJQCmyHk4i1jcu0LX9ZbCS0DqX/2c=
+	b=ZM4NpmKdiTkVv6JZ9rZ9O7mj4YkGbRZlwjU+EVtTamcp3itZr7rPv+74UfEA38TX6
+	 dBsF3VRdgVR585hilTjHWPKG51r2Hd+2yzhCoDaWye+osvKH9Jir0Tgmbnn3/uA/4y
+	 UOeE11zANl7E2PaHnKCLbJ4sALHYrSzvJOPx7yVg=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3E6CD98F0;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58372CDB471;
 	Mon, 22 Jun 2026 02:45:02 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Mon, 22 Jun 2026 10:44:56 +0800
-Subject: [PATCH v3 2/6] rust: doctest: add LocalModule fallback for
- #[vtable] ThisModule
+Date: Mon, 22 Jun 2026 10:45:00 +0800
+Subject: [PATCH v3 6/6] rust: configfs: use `LocalModule` for `THIS_MODULE`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +36,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260622-fix-fops-owner-v3-2-49d45cb37032@linux.dev>
+Message-Id: <20260622-fix-fops-owner-v3-6-49d45cb37032@linux.dev>
 References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
 In-Reply-To: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -61,53 +60,76 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782096299; l=1210;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782096299; l=2487;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=NCKNYPa1eYcitZUfD0OiFCu4ehXyOiLLsU3Tp7Qt5Po=;
- b=H9jaPxzJ2Tk9+CTb0D8lMG4t8EfKH4+2wPWcNIugqj0uXYTf2KN5ObtWCeY/kZP81vThj/m4/
- kxUcfOH9ev9DZOD5YtzrCiXYm8m0j94Ib8FDb6HtuYQCa9WSxD72ajY
+ bh=aexpDAuFU6mvFkRE4PMFgeTzsZDIZpwH5Q0CvXo0fTs=;
+ b=1mv5R7oe2FcSalIxzlKq12ldjlbNMDdqc+3bcdjQ6b25dCBZqGK89H/M1CjNynmGV6elrhMzd
+ Nc/ahs/0mGxAIJgEcYsgn9TO2Tt/xWkfUDirPkbU1Io6YA8H61wCKZv
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Add a `LocalModule` struct with a null-pointer `ModuleMetadata` impl
-in the doctest harness, so that `crate::LocalModule` (auto-inserted
-by `#[vtable]`) resolves correctly when there is no `module!` macro.
+Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
+macro with `this_module::<LocalModule>()`, and update
+rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
+with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
 
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- scripts/rustdoc_test_gen.rs | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/block/rnull/configfs.rs | 6 ++----
+ rust/kernel/configfs.rs         | 8 +++++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
-index ee76e96b41eea..198af4e446c8c 100644
---- a/scripts/rustdoc_test_gen.rs
-+++ b/scripts/rustdoc_test_gen.rs
-@@ -239,6 +239,22 @@ macro_rules! assert_eq {{
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index c10a55fc58948..b2547ad1e5ddd 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -1,9 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
  
- const __LOG_PREFIX: &[u8] = b"rust_doctests_kernel\0";
+-use super::{
+-    NullBlkDevice,
+-    THIS_MODULE, //
+-};
++use super::NullBlkDevice;
++use crate::LocalModule;
+ use kernel::{
+     block::mq::gen_disk::{
+         GenDisk,
+diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
+index 2339c6467325d..8bd32627386e0 100644
+--- a/rust/kernel/configfs.rs
++++ b/rust/kernel/configfs.rs
+@@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
+ ///                 configfs::Subsystem<Configuration>,
+ ///                 Configuration
+ ///                 >::new_with_child_ctor::<N,Child>(
+-///             &THIS_MODULE,
++///             ::kernel::this_module::<LocalModule>(),
+ ///             &CONFIGURATION_ATTRS
+ ///         );
+ ///
+@@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
  
-+/// Dummy module type for doctest context.
-+struct LocalModule;
-+
-+use kernel::{{
-+    str::CStr,
-+    ModuleMetadata,
-+    ThisModule, //
-+}};
-+use core::ptr::null_mut;
-+
-+impl ModuleMetadata for LocalModule {{
-+    const NAME: &'static CStr = c"rust_doctests_kernel";
-+    // SAFETY: `try_module_get`/`module_put` handle null module pointers gracefully.
-+    const THIS_MODULE: ThisModule = unsafe {{ ThisModule::from_ptr(null_mut()) }};
-+}}
-+
- {rust_tests}
- "#
-     )
+                     static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
+                         $crate::configfs::ItemType::<$container, $data>::new::<N>(
+-                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
++                            $crate::this_module::<LocalModule>(),
++                            &[<$ data:upper _ATTRS >]
+                         );
+                 )?
+ 
+@@ -1030,7 +1031,8 @@ macro_rules! configfs_attrs {
+                         $crate::configfs::ItemType<$container, $data>  =
+                             $crate::configfs::ItemType::<$container, $data>::
+                             new_with_child_ctor::<N, $child>(
+-                                &THIS_MODULE, &[<$ data:upper _ATTRS >]
++                                $crate::this_module::<LocalModule>(),
++                                &[<$ data:upper _ATTRS >]
+                             );
+                 )?
+ 
 
 -- 
 2.43.0
