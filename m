@@ -1,272 +1,168 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021120.outbound.protection.outlook.com [52.101.100.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961B12E1746;
-	Mon, 22 Jun 2026 10:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125198; cv=none; b=dgZlRRYEwgCL3MepyIsJLbjvMQetRZGhD4GjIQtkoglAXK0Ii7sEy185/W7VwLFjDVPiYVOSIlWpQFjF2nBj+eGCJf+W/bYamDEXpjTpe+ZS2sb7w8e0jXIQWXPBPHLO+PCCBUfRIxQMEA9Muq+3ReNAsJEfLZIKImeBlpECDPs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125198; c=relaxed/simple;
-	bh=/hKgAevfumO8x7LfebeUyLh/erlFr2Hmr9kpKNVbH0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RXODWZKElkwNYpFJonxchYxL7m7+buIIWgUiJMAD0MYfyKNwNMLSslVv6yBoc/HcLQI6ALqaWoX3hI7BUhDfYNAOp/d/O61d+5hIwFcf2eExAjaRh+yyxF4FlmXcJqP/2R2L+iPy0pH17SBJrNaylwgCZ4MV+XxvZHUJxlT/gKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nzU+mGOE; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C678D2C326D;
+	Mon, 22 Jun 2026 10:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.120
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782125287; cv=fail; b=NQQml3Hp0PJ8hGJgwrJj5a6yQGai4LQaiqJg3UWLZEpi1ddfNE5FDUNeVTx1EOdmADx9sch7Ewc4SP4E0voiawniiymwfcu914LoU/NOlMn7yYm20gLFhgLrqNiSgPff86uzvv4mkcdjmKqWgKCzZD162UELnb4odG/ZHnWT8zk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782125287; c=relaxed/simple;
+	bh=zTL2xa72KnAqESc/1nJiFJw/S8h6/zg1kSc9OrNiy08=;
+	h=Content-Type:Date:Message-Id:From:To:Cc:Subject:References:
+	 In-Reply-To:MIME-Version; b=JEkEJ0ZTcUJJyyUeQNoaxa+QcsxosRA7gXlSMQH9XXO95w3THSBvths+ieZ6oMqjs4TeseerffW7KrQkujTY49ERbH80zA4dvyM++hxRdJF8vAsUT7HnwDvCAL6P1MYSlaZA7hlbrKN+sRIcpKg7pLu5KNkGjPeQpMD9ErQOnlY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=ytfriWXX; arc=fail smtp.client-ip=52.101.100.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nzU+mGOE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782125197; x=1813661197;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=/hKgAevfumO8x7LfebeUyLh/erlFr2Hmr9kpKNVbH0Q=;
-  b=nzU+mGOEqWcv1ZhOmQPh7A2Vpfo+LMNqc4tcIPxCOVAjg5E+B8987oJm
-   CRk7qHz3x3v+O+oG7cXujRDkzL1gtlG6mhDITbvghfqBqcfJ18psAc+PI
-   Tg6A1WV+wrBAYDeVjinRSZ8iVzEiuhmQJVGAURRe3kSmW2jMrs7sROlGE
-   u8+D/V9jaSTcCF1v2EIm0ssuPCon5Qce2IQ+52WID3KKCx1hIbTl0AP50
-   tBvVqFdniXMiI+R7HhzvDTzP1eZ59wlltT5mIxb+U8IVJjshC3XaerKJ+
-   nuUFkH1Xgheje/msjZOEt2IJ3ymfBjkuClzZN1MPvQKC7KGcG7O1ntKDW
-   A==;
-X-CSE-ConnectionGUID: RGyONYQVSea0+pxWnZOPdg==
-X-CSE-MsgGUID: tWucpBD+SQmz4hzgmxAYMg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="93506230"
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="93506230"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 03:46:35 -0700
-X-CSE-ConnectionGUID: xNR2+KjtQLGBpSv9fyyNaQ==
-X-CSE-MsgGUID: i0RzaMPlRGCEVMh1muYCuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="253099713"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.152])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 03:46:25 -0700
-Date: Mon, 22 Jun 2026 13:46:22 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Kaitao Cheng <kaitao.cheng@linux.dev>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Paul Moore <paul@paul-moore.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	David Howells <dhowells@redhat.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-	linux-ntfs-dev@lists.sourceforge.net,
-	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
-	io-uring <io-uring@vger.kernel.org>, audit@vger.kernel.org,
-	bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	dri-devel@lists.freedesktop.org,
-	"linux-perf-use." <linux-perf-users@vger.kernel.org>,
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
-	kexec@lists.infradead.org, live-patching@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Power Management <linux-pm@vger.kernel.org>,
-	rcu@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-mm <linux-mm@kvack.org>, virtualization@lists.linux.dev,
-	damon@lists.linux.dev, clang-built-linux <llvm@lists.linux.dev>,
-	chengkaitao <chengkaitao@kylinos.cn>,
-	Muchun Song <muchun.song@linux.dev>
-Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
- state
-Message-ID: <ajkSftEbdGoiJXYs@ashevche-desk.local>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
- <8c8f1849-86d3-4c69-be27-30bbdffdf616@linux.dev>
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="ytfriWXX"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sLjYwEfgVQW/zcUEpJgwuSgTypfS/h5VxAdgTsmZf70DEX21kFIROq/L3AEO1VzWhAy4scvE0qBHALYiD0YbAr8Z52vsHSi6IteG+r7rVKXCzMnX2iLdE0BO4jJ5vjZirdQeYIljizT4o4kA/6lXnDzW3DAcvJ3eh8iNKLEPa3jMoQ8/voh58KNy3YOqht7UeAvzAcn4NDDVR5VF+1iudrTSMGNdGh4020dkX/NFrj1CAWu0da2Rp0J1Jrnq6UFZv4x41vyUVNZP9VMsfePzbPqk17vKCN/ghJWlGpEMaWhMQP8/9+7FvwNJdgg6jWxXk/4wcFvoGizqv5MCS0bVVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=D/PgOASC1tk+iV56jRNtAlvraXEi9Tg5B5Tx29lNr2k=;
+ b=qEe4uoHAx/FSWZsgQnn9evU+gvEZnT6G//k2IZyfZYjzQZdBptK76KEsuY6Exzbw7TPNHbUJ5dhDZ70ZCcXl4C9lKv0Ljk/6r8oSUh1wiiYRr2gX2JhN6731EW8bcCivVJxVY9Rd6M3ts76dGw8+LAl8q7f+zDJTYcp++Rw9XYf18/8HzPU/UcC151a4140xso4EMmpHDYU7iYc7Uiqp/s4EXtfD8JBc06mt6en1X2g6pnGNIGNY3lvw/FBL5vbjdbvpysDbm5YOxxu9jajXD8dwzVuqzYbCOD8H5jr8aRzxDwG0mjHAExhkrTG0FztH3cm/PG7AIhh/aiGT6tfOJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=D/PgOASC1tk+iV56jRNtAlvraXEi9Tg5B5Tx29lNr2k=;
+ b=ytfriWXXttmvHZBkavvTuYycvu8tt937jEft9jqY/lu/0ER9toKAAijgQYJ5cnyOkQXsGgPxHxVG+PXbMyuxPmpN0D1Apx2Y9Z87l/qpstq1szE2+pOt5oy5c9fyb3KbGgRPQoHjxroEQF0t95tD8JpdtBAQ74j0aIjMGb7lCrI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO3P265MB1963.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:bd::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.20; Mon, 22 Jun
+ 2026 10:48:02 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 10:48:02 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 22 Jun 2026 11:48:01 +0100
+Message-Id: <DJFIOS86RTEE.1N2P2EGHBFXJK@garyguo.net>
+From: "Gary Guo" <gary@garyguo.net>
+To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
+ "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
+ Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
+ Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
+ <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
+ Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>
+Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
+ <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
+ <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 4/6] rust: drm: set fops.owner from driver module
+ pointer
+X-Mailer: aerc 0.21.0
+References: <20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev>
+ <20260622-fix-fops-owner-v3-4-49d45cb37032@linux.dev>
+In-Reply-To: <20260622-fix-fops-owner-v3-4-49d45cb37032@linux.dev>
+X-ClientProxiedBy: LO6P123CA0031.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2fe::11) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8c8f1849-86d3-4c69-be27-30bbdffdf616@linux.dev>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO3P265MB1963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d2ab882-97e5-43a5-f5af-08ded04bbbbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|366016|376014|7416014|10070799003|18002099003|22082099003|921020|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	AFIdiegEM45MlygFBJi4Asczk3pyOWLbrLIszAujhn8zODGqxZBAubjECOtSJhlT7Wni8nkyMV67GMlQ9u48uDc1Eqp2mZV9l5wer2NmC/ATHRDXXFpLsHJraNzi5ug6yu3vv3MS8Vld0pJiOwK8MFr2TjqlKD20Wqxa8qZ5M3MluTMdixjiyvoWDE7qWFAVQAD+FNrqtlqY4dzjxojOWHLE8il453P0hHQACnhklloH+0St/GIX/Vhup82ASZgC2pD1u2Lm0up7S9t2l0187M3lAm5UqafHA1y1Kx8WvwkMAmSYvFI61cX+FIbcOWVzy/vMKsvBzbF2hPU91GjoUgHAldttzl8qrhy7C29QrTXnxbuVhULarUR/kCLOFar9adXpNkZl6x1FL1Qs8Yad5QqzuPfm2rEzwkpgxKrisfrsyNZm7tT+p1RlEHlHvLeCYE+ekOQDHJITdCFhgr+p6ANq77sgFuvizaBfJcETitWSTHIUU5/WmkmYLHyLWYNDRhh9XlpwpQDLujGGgvTHK4cpIlaCBcbwLZK73NxvoX4IxMZo7/iGO27Zbv0v5xuvMvM1bNXdcguMocjL2oAsucoiOHmJIpEfZKjAyyhJ0PMQuxShIytt4PqFc1LmrhIQHwXSl2GPGBqddDTOGpflIMOnQ1eXeuMtr+ymQCk0MaiPwulCiCWKcjucEZ9j2CaUQMxey1ytwhAoL5o/hENweA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(376014)(7416014)(10070799003)(18002099003)(22082099003)(921020)(4143699003)(56012099006);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WG4xc2JjS21rSnlrZmc2NitPVGJOS09DbDY1VXNvM0NOMHI3NVA3SktOQU0w?=
+ =?utf-8?B?WEV2bVBpbWt2UTkrU1NhYW01SG9BWWNXSVBNZHpzZiswUFVYcURLUWNRd0di?=
+ =?utf-8?B?aUljWTY0em5BcXdHeC9sb3puenozMEVLOFBYVnduWm80eGpQeGdxL1JtblFQ?=
+ =?utf-8?B?eDFTL29VRnI5V0RaZ0lMR2FxbFU5RlJIRmhRNnVkNFhyWFpScEo4NUpUT1BJ?=
+ =?utf-8?B?d3pwVDBubnJUazJ4RzJzRDNtZVJFZjM1MU5aTmtSNTkrK2MyTWIwU0dYcUc2?=
+ =?utf-8?B?VmI3aEswY0E0VC9mVW1aU3VjWGlLUHJKZXNiNzdqZDYranlUUHlvSDdoSHBB?=
+ =?utf-8?B?MkRnMU1qdGpJbzBuc2dkU09xbTI3ZnNSMUp6anlqdVBUU29XQzlINWJqV09m?=
+ =?utf-8?B?MUp3ZEtFdlUvL1FacHNsUGdVVDA2WDFtZUJUWEY4K3hzSHdzMm8xRXc4MXh6?=
+ =?utf-8?B?NnhMZCtDRVlFVHpPbUh5eXdrVllEL21yWXlOOEUrT2xXOStjNjAveFJpTTg3?=
+ =?utf-8?B?VXY4aVFKNGZpd2trVTBiVWZjbUxSQW1vYUc4WnhVcGVsK2VzN1dSS0ZWbksw?=
+ =?utf-8?B?eXh5ZlVHcVo3S3lRTVBJUkVQMUswdEU2OGhmTWZhNXJueXNUa3ZGbGRSa09E?=
+ =?utf-8?B?cnhVd1RrK2pOclNOQ0l3bytMQTc3S3ppSTZoYUNrbFNzc2tkcEVMNmdYdXNv?=
+ =?utf-8?B?eW1TRG5uMStUMjJJdXBOdjVRRXZmQjNuU05icmpLZ1NvR0ZsVXVDakxsM0Z0?=
+ =?utf-8?B?d2RoRS9lWTMwckNibUs3YU41eGZkOXRuQjFTdlRxVkFpa2dpenJkUkIxS1Fq?=
+ =?utf-8?B?L0ZqOStodGJMS2E5c1B3NUpudWRhN2VPYzdsTUQzVm5YSmVpcWRraWlhNmdM?=
+ =?utf-8?B?RmpMVisxTXVRMERnbUszRUJhK05uK2poa0pyZThxYzlaWGpWeXU4NnZtSDZn?=
+ =?utf-8?B?enNMd1hYQlFrTWxDV090SjRVRkFabFhTQzRRMUROMjNDWng3Q1lXV1VkcVYx?=
+ =?utf-8?B?OUY2bVZtT0pvK29hVE9Uc2VBRVI3cmJ0VS9CWWttNjNsWnNKQTU3ZEtSbThw?=
+ =?utf-8?B?c1FxaVpTNUY0R1VhTUpPMzNBUDBEazA4UFdmWEIrTU5lM1cxWmhNb0tHTjBj?=
+ =?utf-8?B?V2JraWZnQkV0MTN5OTY0U29oakxwZnZJZzlRNmtoNEswWE1VV2JtUzZmbnNi?=
+ =?utf-8?B?czBVQnhqR2o3WGJrUExFajdFaHZjanRLQXg5d2hyVXI1TGZ5a3JtU241MUdD?=
+ =?utf-8?B?Tm9oWmJIZURWd003c0YxcjBheXhtcnBBdU5xQlBhTzlQMExuUWhlcUZFWmo3?=
+ =?utf-8?B?QUVGYnZSSmtVUmNXTFVtckk4UERZMUI4SFRnVG1kaS9sdWhVOGhLaHlyOGRB?=
+ =?utf-8?B?MVpVNnJJV2g0MGlKN1YrclBFOWpITHN2TEEzV0F3UW1tSDMzNEJSQ2ZYRnlX?=
+ =?utf-8?B?SEhWNHhyY1RxVXpVcEFxMjZwOEpXeDU0SjB6ajRNNHN1MlkxUzFnODc0RG9U?=
+ =?utf-8?B?NWo3REVqM2phazhabGFqeGZoL1ZNWURERzJsMjRwbjBqVjFaQURTVE16ZnFE?=
+ =?utf-8?B?RHUrYWFnQndjeldUbUQ4cTVZL0lWY1Rvdms4aDZFTkllWkhqQnVBUG1qMlZr?=
+ =?utf-8?B?ck9jaElEYnhKWGNocnF5dmhPZ2dBTUZuMEs1N1FvdlJJQThYazN4TFVDWFhh?=
+ =?utf-8?B?VkpDb2RjTXVZR001TjY0MHVHdGJMTHBzYk1MN2RtSzJhcXUyME0vRStJakQ3?=
+ =?utf-8?B?ZWg5Rm5hV2hwS1NISXd6amYxNm5tN2l0eFduYU1JeEJNSlNHQVlEaUNBNHpO?=
+ =?utf-8?B?c3dtSlpRaG1vYytVUFRhdDJEWkwvTmUrQTMxMTJxcG1ON3Q1Y2xaOWNRUGpX?=
+ =?utf-8?B?b01hYlAxU2pPUWdhd1RmazFKaE1RQUxwa2JlQUtSb0c4Y2ZvQkx6alVtVzFy?=
+ =?utf-8?B?a0lWRFQ3QXRjODVuZXRxdjUvejNOZU5rMno5L1NPajh3Vkx4V1d2K09NZDRF?=
+ =?utf-8?B?SitVK1VCeExPQjZXK2VGeGVTaERZb1g0NHp1VTNnd3FBTVpqdlFjbHduOHJP?=
+ =?utf-8?B?VG9EV2JyZ3ZzVituRVQ0a2lRTTZuYldIeU1iT3FVZWdWZnJWeitmYTRLaUZa?=
+ =?utf-8?B?Q3R3cnFzTTFvcEtrNWR6N0pqWDRSSzJUOS9WRXQwU0tUUmh1VTg4TGU2WGFU?=
+ =?utf-8?B?OS9rdXRXODZ2djVzNTgzTWlJbnBMa1ZRcW5sdUw2Y1A5ejhud09NRjFmeDJK?=
+ =?utf-8?B?YmNROEVQT0JYOFY2OEE5ZzByQ09MNUNmS3g3cTdGVnVlMVNGdVdya2JUeFVR?=
+ =?utf-8?B?U3FzdzFCWndVSkNZbURPQVRZdktrVWdmR0pISEgyYmhmSEx0aTFjdz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d2ab882-97e5-43a5-f5af-08ded04bbbbc
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 10:48:02.4900
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ouu4UmaWGgdCGzvwpwDdB2JNG7Z7oorvqdmRUS/g+Sb2xV3A4HFTQFvAIsguEFHG4AxBEoWwnGPPaLoOZfbGfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO3P265MB1963
 
-On Mon, Jun 22, 2026 at 02:15:01PM +0800, Kaitao Cheng wrote:
-> 在 2026/6/22 13:28, Alexei Starovoitov 写道:
-> > On Sun, Jun 21, 2026 at 9:06 PM Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+On Mon Jun 22, 2026 at 3:44 AM BST, Alvin Sun wrote:
+> Change `create_fops()` to accept an owner module pointer instead of
+> hardcoding `null_mut()`, ensuring the kernel correctly tracks the
+> module owning the DRM device's file operations.
+>=20
+> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 
-...
+Reviewed-by: Gary Guo <gary@garyguo.net>
 
-> >>  block/bfq-iosched.c                 |  17 +-
-> >>  block/blk-cgroup.c                  |  12 +-
-> >>  block/blk-flush.c                   |   4 +-
-> >>  block/blk-iocost.c                  |  18 +-
-> >>  block/blk-mq.c                      |   8 +-
-> >>  block/blk-throttle.c                |   4 +-
-> >>  block/kyber-iosched.c               |   4 +-
-> >>  block/partitions/ldm.c              |   8 +-
-> >>  block/sed-opal.c                    |   4 +-
-> >>  include/linux/list.h                | 269 ++++++++++++++++++++++++----
-> >>  include/linux/llist.h               |  81 +++++++--
-> >>  init/initramfs.c                    |   5 +-
-> >>  io_uring/cancel.c                   |   6 +-
-> >>  io_uring/poll.c                     |   3 +-
-> >>  io_uring/rw.c                       |   4 +-
-> >>  io_uring/timeout.c                  |   8 +-
-> >>  io_uring/uring_cmd.c                |   3 +-
-> >>  kernel/audit_tree.c                 |   4 +-
-> >>  kernel/audit_watch.c                |  16 +-
-> >>  kernel/auditfilter.c                |   4 +-
-> >>  kernel/auditsc.c                    |   4 +-
-> >>  kernel/bpf/arena.c                  |  10 +-
-> >>  kernel/bpf/arraymap.c               |   8 +-
-> >>  kernel/bpf/bpf_local_storage.c      |   3 +-
-> >>  kernel/bpf/bpf_lru_list.c           |  25 ++-
-> >>  kernel/bpf/btf.c                    |  18 +-
-> >>  kernel/bpf/cgroup.c                 |   7 +-
-> >>  kernel/bpf/cpumap.c                 |   4 +-
-> >>  kernel/bpf/devmap.c                 |  10 +-
-> >>  kernel/bpf/helpers.c                |   8 +-
-> >>  kernel/bpf/local_storage.c          |   4 +-
-> >>  kernel/bpf/memalloc.c               |  16 +-
-> >>  kernel/bpf/offload.c                |   8 +-
-> >>  kernel/bpf/states.c                 |   4 +-
-> >>  kernel/bpf/stream.c                 |   4 +-
-> >>  kernel/bpf/verifier.c               |   6 +-
-> >>  kernel/cgroup/cgroup-v1.c           |   4 +-
-> >>  kernel/cgroup/cgroup.c              |  54 +++---
-> >>  kernel/cgroup/dmem.c                |  12 +-
-> >>  kernel/cgroup/rdma.c                |   8 +-
-> >>  kernel/events/core.c                |  44 +++--
-> >>  kernel/events/uprobes.c             |  12 +-
-> >>  kernel/exit.c                       |   8 +-
-> >>  kernel/fail_function.c              |   4 +-
-> >>  kernel/gcov/clang.c                 |   4 +-
-> >>  kernel/irq_work.c                   |   4 +-
-> >>  kernel/kexec_core.c                 |   4 +-
-> >>  kernel/kprobes.c                    |  16 +-
-> >>  kernel/livepatch/core.c             |   4 +-
-> >>  kernel/livepatch/core.h             |   4 +-
-> >>  kernel/liveupdate/kho_block.c       |   4 +-
-> >>  kernel/liveupdate/luo_flb.c         |   4 +-
-> >>  kernel/locking/rwsem.c              |   2 +-
-> >>  kernel/locking/test-ww_mutex.c      |   2 +-
-> >>  kernel/module/main.c                |  11 +-
-> >>  kernel/padata.c                     |   4 +-
-> >>  kernel/power/snapshot.c             |   8 +-
-> >>  kernel/power/wakelock.c             |   4 +-
-> >>  kernel/printk/printk.c              |  11 +-
-> >>  kernel/ptrace.c                     |   4 +-
-> >>  kernel/rcu/rcutorture.c             |   3 +-
-> >>  kernel/rcu/tasks.h                  |   9 +-
-> >>  kernel/rcu/tree.c                   |   6 +-
-> >>  kernel/resource.c                   |   4 +-
-> >>  kernel/sched/core.c                 |   4 +-
-> >>  kernel/sched/ext.c                  |  22 +--
-> >>  kernel/sched/fair.c                 |  28 +--
-> >>  kernel/sched/topology.c             |   4 +-
-> >>  kernel/sched/wait.c                 |   4 +-
-> >>  kernel/seccomp.c                    |   4 +-
-> >>  kernel/signal.c                     |  11 +-
-> >>  kernel/smp.c                        |   4 +-
-> >>  kernel/taskstats.c                  |   8 +-
-> >>  kernel/time/clockevents.c           |   6 +-
-> >>  kernel/time/clocksource.c           |   4 +-
-> >>  kernel/time/posix-cpu-timers.c      |   4 +-
-> >>  kernel/time/posix-timers.c          |   3 +-
-> >>  kernel/torture.c                    |   3 +-
-> >>  kernel/trace/bpf_trace.c            |   4 +-
-> >>  kernel/trace/ftrace.c               |  49 +++--
-> >>  kernel/trace/ring_buffer.c          |  25 ++-
-> >>  kernel/trace/trace.c                |  12 +-
-> >>  kernel/trace/trace_dynevent.c       |   6 +-
-> >>  kernel/trace/trace_dynevent.h       |   5 +-
-> >>  kernel/trace/trace_events.c         |  35 ++--
-> >>  kernel/trace/trace_events_filter.c  |   4 +-
-> >>  kernel/trace/trace_events_hist.c    |   8 +-
-> >>  kernel/trace/trace_events_trigger.c |  17 +-
-> >>  kernel/trace/trace_events_user.c    |  16 +-
-> >>  kernel/trace/trace_stat.c           |   4 +-
-> >>  kernel/user-return-notifier.c       |   3 +-
-> >>  kernel/workqueue.c                  |  16 +-
-> >>  mm/backing-dev.c                    |   8 +-
-> >>  mm/balloon.c                        |   8 +-
-> >>  mm/cma.c                            |   4 +-
-> >>  mm/compaction.c                     |   4 +-
-> >>  mm/damon/core.c                     |   4 +-
-> >>  mm/damon/sysfs-schemes.c            |   4 +-
-> >>  mm/dmapool.c                        |   4 +-
-> >>  mm/huge_memory.c                    |   8 +-
-> >>  mm/hugetlb.c                        |  56 +++---
-> >>  mm/hugetlb_vmemmap.c                |  16 +-
-> >>  mm/khugepaged.c                     |  14 +-
-> >>  mm/kmemleak.c                       |   7 +-
-> >>  mm/ksm.c                            |  25 +--
-> >>  mm/list_lru.c                       |   4 +-
-> >>  mm/memcontrol-v1.c                  |   8 +-
-> >>  mm/memory-failure.c                 |  12 +-
-> >>  mm/memory-tiers.c                   |   4 +-
-> >>  mm/migrate.c                        |  23 ++-
-> >>  mm/mmu_notifier.c                   |   9 +-
-> >>  mm/page_alloc.c                     |   8 +-
-> >>  mm/page_reporting.c                 |   2 +-
-> >>  mm/percpu.c                         |  11 +-
-> >>  mm/pgtable-generic.c                |   4 +-
-> >>  mm/rmap.c                           |  10 +-
-> >>  mm/shmem.c                          |   9 +-
-> >>  mm/slab_common.c                    |  14 +-
-> >>  mm/slub.c                           |  33 ++--
-> >>  mm/swapfile.c                       |   4 +-
-> >>  mm/userfaultfd.c                    |  12 +-
-> >>  mm/vmalloc.c                        |  24 +--
-> >>  mm/vmscan.c                         |   7 +-
-> >>  mm/zsmalloc.c                       |   4 +-
-> >>  124 files changed, 875 insertions(+), 681 deletions(-)
-> > 
-> > Not sure what you were thinking, but this diff stat
-> > is not landable.
-> 
-> [PATCH v3 1/7] and [PATCH v3 2/7] contain the main logic and can
-> be merged directly. They are also compatible with the old API.
-> [PATCH v3 3/7] through [PATCH v3 7/7] are just simple interface
-> replacements and do not change any functional logic. They can be
-> left unmerged for now; individual modules can pick them up later
-> if needed.
-> 
-> In v2, Andy Shevchenko mentioned: "If it's done by Linus himself
-> during the day when he prepares -rc1, it's fine."
+How is the patch logistics going to be handled? This series probably should=
+ be
+routed via the rust tree? Perhaps as fixes?
 
-Yes, but you need to get his blessing first to go with this.
-Have you communicated with him on this?
+Best,
+Gary
 
-> Even so, the
-> changes in this patch series are indeed quite large and touch
-> almost every subsystem. I have only converted part of them for
-> now, so I wanted to send this out first and see what people think.
-
-That's why it's better to provide a script to convert (e.g., coccinelle)
-instead of tons of patches.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+> ---
+>  rust/kernel/drm/device.rs  | 3 ++-
+>  rust/kernel/drm/gem/mod.rs | 4 ++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 
