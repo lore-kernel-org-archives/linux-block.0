@@ -1,406 +1,318 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E4625783C
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 04:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782103424; cv=none; b=Em4FwCvtgqYq8oRnokhuYHGzQsciaBt/K/HH0uwaOj09Imx5vT8jjG+DJCE/ZferyRJmyN8fPmgL1LijyLVLkOn7jnSKS26RfHQRpO0ZVKIMbRCdpsZVp9ybeanboaesBYR9Lmm/TZEjeBH01PwC+VAje99eV+VQC92SjG6ElK0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782103424; c=relaxed/simple;
-	bh=yYlDQ/l+zs/b9e8m9s4LMjZbs6vWiIES70Ut+w5bpAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HEFv8rbB3fYwsv75mhngOvc9jcAgSoKVlZdDrL8ZmNuKdzEWKZcBVG8iehLIdf0tqnEGQ8KI/B4Vjzvlf/gT2JWiLoFqlYZnXEaAGBqh9uvueyzeCtidZEPAFla2cGdqBMCX/pjGu/mgLLyw1NjX81aNyEstg4VRONLQPspEhzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QWslGFZB; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930C1359A8B
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 05:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782106136; cv=pass; b=NlwGTdGZsWweIMVBFkdF/T+wd3/JZVE1qUHC0bLfGblZfFIQji5t3SUzIB+/mTYbzL2nWzKcMgv2zmWPYaHI3qtiSRFGjqxqvJNX1EpSxAIJur+LxzNSE6rQudx1eyDQx3q8C3V/tchL6w/wGoYBhAM7bBbAOjwqvFG6vdu6LYI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782106136; c=relaxed/simple;
+	bh=AVkOkRTtOGmOYW1/Vsdb3Eh/mWt3+SXrUWDOYCxFRJI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qD950rrioX0AyaU7hEkLLDasZkxlcJCdeXiUdfGOC495+RgfQZpl7qoknavveGQOC+7kmbF90GgiEPJelyFkHfWFf0Aof7kJevKX9bAD8WDNA6tfE6niaiSMchTIkWuF0CdIpydYt9CS1YWydeceqUGZ9XPVZ/LY1SBbB+EXID4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oeYv79Ts; arc=pass smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QWslGFZB"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782103420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GcqR2qNPO+w7lc6EUo9e2BGGPvGaEH+heJynYFHN+iM=;
-	b=QWslGFZBVKDxsBooFOB8lIGkaap0hC0y1Jgxs1jzCAS2DE206jMFx8veolCwfvmAmidCLt
-	eozFUs5ORiw1c7nklirDa5G5dkzX0iv638J8aiZFJojbTFWCBSbfBbvVQa6SfL/rXKFGWK
-	ePjM7Ql2o6+RYF82RomIRCgauuXv0KU=
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-To: Yu Kuai <yukuai@fygo.io>,
-	Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	"Richard Russon (FlatCap)" <ldm@flatcap.org>,
-	Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net,
-	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v3 4/7] block: Use mutable list iterators
-Date: Mon, 22 Jun 2026 12:42:43 +0800
-Message-ID: <20260622044243.32969-1-kaitao.cheng@linux.dev>
-In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oeYv79Ts"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c8ce8f2e235so675323a12.2
+        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2026 22:28:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782106132; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kUxo/OJQYL3kof8Ca9Y492sP8d7UN61mIChRpfpVaD/68yGuLflLZHgCr3MI3Gfvz2
+         YJyCAZQOTkUH2JmbIQYJdtDcQvzJKDxYQDQQSQ1Cq4C3WXFlkNc+MwBDSnfGmgwEce52
+         xl/P4oF2RGwkvy/lYbzghCv003fnc9NNDTMGyhC4QJ422+8BAgWshInqPzzZCnJ+E/5C
+         YyjWoWHE4V7O462aKze5PMgtgT7h7v0XZYf0jo7+6SXcl6S8GV2FUJnCb5KeEwE9tbL+
+         BWkZnnjNEUwVSduyY5wivmtvhnFFKEHiZkcwNDgzVNlzekjpaFWJyDA/m/CToJ6xT3oI
+         hLEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5KNOLAwZyaBThMY1NJgMdUSjBoVwiFJr4CThsL0B6VY=;
+        fh=jbE9n1KNcDhdg3a34ZKbkluyzeYdWIoNUiAKqWlU0Ec=;
+        b=fwPQq/DqJB6PN27Gzi3TR47VMDGQCVfjPUtIFxNindTMi2Qe5kvZbL7m0kU3n5YILo
+         md80DAXw0ehzIGbKBgCq0g5pX5gQX3lDa0vKQsjF3DChcEVy7nDrrxJX7Z/c+WBNrR4I
+         //WX7sS20WQyr4Rv1fps7UmaWv3zgrhEoNdVbYKVzcERGU0DSIQWi5cSc4o+a26+tczC
+         HllF4MDRoyh0mi10yfEbhqGDiueybs+t2GT4ico0Pul3+GzVkITx9LbUZw5ja/JJEMzE
+         09ps/VA8mXHlkzExasqnplr1qCV02EpqbqrUboah1305nTJNU3KOQBUTo2n/bo3nuoW3
+         bNqg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782106132; x=1782710932; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5KNOLAwZyaBThMY1NJgMdUSjBoVwiFJr4CThsL0B6VY=;
+        b=oeYv79Tsn+qrKAgZY7z2kKZ/F5iVQ7fxdrCLTzHZMdKcAhFNnU/LhmEKscP5KSm7rU
+         VIY/N5GiLu1Gxs8T3o/5LwrAOssUtzJ3QLjTVpXH19TUjCQ01tZi0sehg82Hl97Ac/Kv
+         l5+iX4sQv17oWCxI0DvogCG3NASCrY6gdlfDpH6xCj5CABo8ImN+a6xSe9DzkQA+Q+z3
+         dJ1GksqpeYLNEcvCmiY0ExyB/5dq/RhVYE//ZeykE4wohNBEVooOBO+nPKkZa98zsRPw
+         lj+Vr/Sd9wRzhQN5O6C1m7GwL8Jn6m8Rw6lb86x83ZuZNL6JDfQ7bXiZwUU2b7j3O+2e
+         lndQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782106132; x=1782710932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5KNOLAwZyaBThMY1NJgMdUSjBoVwiFJr4CThsL0B6VY=;
+        b=skgClXZQ1Cr/7zNakf0RzDTa67gxONcGlM7CBJr5nw2qvKTmi8TKBck7eNRIwZUIiS
+         IKraAys4MzUEUOIQId8cbEuy9Ru5h6OEiLaRm1BbVmTPMa6/rprYPHchOLnlNkxJkANB
+         7DRtEhHVYAyTc6Z8ApWWH4uuS1YfiClWCDRp0fdHXQ82kgyo+qbslFr5Y3lU7tKDMUYJ
+         J9a4Izu1bdOFyQFWyaJUVlDbwShrcZDpm4zBxfWDnRT9P1JddVN1V7lCQJ4rRXEaXQCA
+         5v8ej/5wnnIiWwroqTCwqrW/RzO6dp3Mh2AOK/2/UQGPpJlTRsI0JcDqiexZPB8v+1Ly
+         zwsQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+G8qcSNAmFcp2wEZoJXrCH7CDbCtLNhhcjqpPdZMtMuVqatQ+37qhCk/2+lx+W23efdA/U21E4RlHLsg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXaTHxtT5MjbvrZE+Dj0cFvzLSzut/XbIvxh/65sVOTrEDkmFK
+	za8O10oLUD7mFaPwmVkHUZtEVdilfZYafP6Ya3Q4lNfMU14jAH0476svqyceqPy5pF5R4H5ssku
+	lyJ4RJsbzDJuZl0csZbtnLbA4pQiCwzY=
+X-Gm-Gg: AfdE7cmoQZXQlnAOG06VVaJd2Yetf3elmeEOyOMlG4MfPHXUJIyydmY8WpShRbLJIcL
+	rFCDe7zY5O9hJPO6QmseudIFMwC2ns4WDZx/UOE+aABjvlJVVVByBMvc1kfsmK9hY3OofNqHJMa
+	DF5lKoP9DgkYixFQEAIXnTmZ1MLFlW5iz83UEtv7um020b8HtoDyfilYRvcHobn8G9p/JFQeLW1
+	WPSqAwfW3h7imS5otsDTVenidHBcxuxu4a2RyzZg9lY607akuCueC7oxhzGczP4stK4Z30w5ZCp
+	e2JoSiHiWM/BtbF8btw2IH7vnyvf0GRIEaYiukb9MOITZ8kVjv0QRRw/JurJ3qLV59mIbWeHNlJ
+	lLsg1F5JsbvlqcEhaaFAPEREv
+X-Received: by 2002:a05:6a21:9102:b0:3b7:b328:4c8b with SMTP id
+ adf61e73a8af0-3bb3241d5bemr15602261637.19.1782106131632; Sun, 21 Jun 2026
+ 22:28:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 21 Jun 2026 22:28:40 -0700
+X-Gm-Features: AVVi8CdydPWkgrsWeukABG1V_xsA12RL457Ae_ewOX27KaNNGTwhs0J8OHNbSBg
+Message-ID: <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor state
+To: Kaitao Cheng <kaitao.cheng@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Paul Moore <paul@paul-moore.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>, 
+	Randy Dunlap <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
+	Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, linux-ntfs-dev@lists.sourceforge.net, 
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, io-uring <io-uring@vger.kernel.org>, 
+	audit@vger.kernel.org, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, dri-devel@lists.freedesktop.org, 
+	"linux-perf-use." <linux-perf-users@vger.kernel.org>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, kexec@lists.infradead.org, 
+	live-patching@vger.kernel.org, linux-modules@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	Linux Power Management <linux-pm@vger.kernel.org>, rcu@vger.kernel.org, sched-ext@lists.linux.dev, 
+	linux-mm <linux-mm@kvack.org>, virtualization@lists.linux.dev, damon@lists.linux.dev, 
+	clang-built-linux <llvm@lists.linux.dev>, chengkaitao <chengkaitao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Kaitao Cheng <chengkaitao@kylinos.cn>
+On Sun, Jun 21, 2026 at 9:06=E2=80=AFPM Kaitao Cheng <kaitao.cheng@linux.de=
+v> wrote:
+>
+> From: chengkaitao <chengkaitao@kylinos.cn>
+>
+> The list_for_each*_safe() helpers are used when the loop body may remove
+> the current entry.  Their current interface, however, forces every caller
+> to define a temporary cursor outside the macro and pass it in, even when
+> the caller never uses that cursor directly.  For most call sites this
+> extra cursor is just boilerplate required by the macro implementation.
+>
+> This is awkward because the saved next pointer is an internal detail of
+> the iteration.  Callers that only remove or move the current entry do not
+> need to spell it out.
+>
+> The _safe() suffix has also caused confusion.  Christian Koenig pointed
+> out that the name is easy to read as a thread-safe variant, especially
+> for beginners, even though it only means that the iterator keeps enough
+> state to tolerate removal of the current entry.  He suggested _mutable()
+> as a clearer description of what the loop permits.
+>
+> Add *_mutable() iterator variants for list, hlist and llist.  The new
+> helpers are variadic and support both forms.  In the common case, the
+> caller omits the temporary cursor and the macro creates a unique internal
+> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+> explicit temporary cursor, the caller can still pass it and the helper
+> keeps the existing *_safe() behaviour.
+>
+> For example, a call site may use the shorter form:
+>
+>   list_for_each_entry_mutable(pos, head, member)
+>
+> or keep the explicit temporary cursor form:
+>
+>   list_for_each_entry_mutable(pos, tmp, head, member)
+>
+> The existing *_safe() helpers remain available for compatibility.  This
+> series only converts users in mm, block, kernel, init and io_uring.  If
+> this approach looks acceptable, the remaining users can be converted in
+> follow-up series.
+>
+> Changes in v3 (Christian K=C3=B6nig, Andy Shevchenko):
+> - Convert safe list walks to mutable iterators
+>
+> Changes in v2 (Muchun Song, Andy Shevchenko):
+> - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
+>   cursor change directly in the existing list_for_each_entry*() helpers.
+> - Open-code special list walks that rely on updating the loop cursor in
+>   the body, preserving their existing traversal semantics.
+>
+> Link to v2:
+> https://lore.kernel.org/all/20260609061347.93688-1-kaitao.cheng@linux.dev=
+/
+>
+> Link to v1:
+> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev=
+/
+>
+> Kaitao Cheng (7):
+>   list: Add mutable iterator variants
+>   llist: Add mutable iterator variants
+>   mm: Use mutable list iterators
+>   block: Use mutable list iterators
+>   kernel: Use mutable list iterators
+>   initramfs: Use mutable list iterator
+>   io_uring: Use mutable list iterators
+>
+>  block/bfq-iosched.c                 |  17 +-
+>  block/blk-cgroup.c                  |  12 +-
+>  block/blk-flush.c                   |   4 +-
+>  block/blk-iocost.c                  |  18 +-
+>  block/blk-mq.c                      |   8 +-
+>  block/blk-throttle.c                |   4 +-
+>  block/kyber-iosched.c               |   4 +-
+>  block/partitions/ldm.c              |   8 +-
+>  block/sed-opal.c                    |   4 +-
+>  include/linux/list.h                | 269 ++++++++++++++++++++++++----
+>  include/linux/llist.h               |  81 +++++++--
+>  init/initramfs.c                    |   5 +-
+>  io_uring/cancel.c                   |   6 +-
+>  io_uring/poll.c                     |   3 +-
+>  io_uring/rw.c                       |   4 +-
+>  io_uring/timeout.c                  |   8 +-
+>  io_uring/uring_cmd.c                |   3 +-
+>  kernel/audit_tree.c                 |   4 +-
+>  kernel/audit_watch.c                |  16 +-
+>  kernel/auditfilter.c                |   4 +-
+>  kernel/auditsc.c                    |   4 +-
+>  kernel/bpf/arena.c                  |  10 +-
+>  kernel/bpf/arraymap.c               |   8 +-
+>  kernel/bpf/bpf_local_storage.c      |   3 +-
+>  kernel/bpf/bpf_lru_list.c           |  25 ++-
+>  kernel/bpf/btf.c                    |  18 +-
+>  kernel/bpf/cgroup.c                 |   7 +-
+>  kernel/bpf/cpumap.c                 |   4 +-
+>  kernel/bpf/devmap.c                 |  10 +-
+>  kernel/bpf/helpers.c                |   8 +-
+>  kernel/bpf/local_storage.c          |   4 +-
+>  kernel/bpf/memalloc.c               |  16 +-
+>  kernel/bpf/offload.c                |   8 +-
+>  kernel/bpf/states.c                 |   4 +-
+>  kernel/bpf/stream.c                 |   4 +-
+>  kernel/bpf/verifier.c               |   6 +-
+>  kernel/cgroup/cgroup-v1.c           |   4 +-
+>  kernel/cgroup/cgroup.c              |  54 +++---
+>  kernel/cgroup/dmem.c                |  12 +-
+>  kernel/cgroup/rdma.c                |   8 +-
+>  kernel/events/core.c                |  44 +++--
+>  kernel/events/uprobes.c             |  12 +-
+>  kernel/exit.c                       |   8 +-
+>  kernel/fail_function.c              |   4 +-
+>  kernel/gcov/clang.c                 |   4 +-
+>  kernel/irq_work.c                   |   4 +-
+>  kernel/kexec_core.c                 |   4 +-
+>  kernel/kprobes.c                    |  16 +-
+>  kernel/livepatch/core.c             |   4 +-
+>  kernel/livepatch/core.h             |   4 +-
+>  kernel/liveupdate/kho_block.c       |   4 +-
+>  kernel/liveupdate/luo_flb.c         |   4 +-
+>  kernel/locking/rwsem.c              |   2 +-
+>  kernel/locking/test-ww_mutex.c      |   2 +-
+>  kernel/module/main.c                |  11 +-
+>  kernel/padata.c                     |   4 +-
+>  kernel/power/snapshot.c             |   8 +-
+>  kernel/power/wakelock.c             |   4 +-
+>  kernel/printk/printk.c              |  11 +-
+>  kernel/ptrace.c                     |   4 +-
+>  kernel/rcu/rcutorture.c             |   3 +-
+>  kernel/rcu/tasks.h                  |   9 +-
+>  kernel/rcu/tree.c                   |   6 +-
+>  kernel/resource.c                   |   4 +-
+>  kernel/sched/core.c                 |   4 +-
+>  kernel/sched/ext.c                  |  22 +--
+>  kernel/sched/fair.c                 |  28 +--
+>  kernel/sched/topology.c             |   4 +-
+>  kernel/sched/wait.c                 |   4 +-
+>  kernel/seccomp.c                    |   4 +-
+>  kernel/signal.c                     |  11 +-
+>  kernel/smp.c                        |   4 +-
+>  kernel/taskstats.c                  |   8 +-
+>  kernel/time/clockevents.c           |   6 +-
+>  kernel/time/clocksource.c           |   4 +-
+>  kernel/time/posix-cpu-timers.c      |   4 +-
+>  kernel/time/posix-timers.c          |   3 +-
+>  kernel/torture.c                    |   3 +-
+>  kernel/trace/bpf_trace.c            |   4 +-
+>  kernel/trace/ftrace.c               |  49 +++--
+>  kernel/trace/ring_buffer.c          |  25 ++-
+>  kernel/trace/trace.c                |  12 +-
+>  kernel/trace/trace_dynevent.c       |   6 +-
+>  kernel/trace/trace_dynevent.h       |   5 +-
+>  kernel/trace/trace_events.c         |  35 ++--
+>  kernel/trace/trace_events_filter.c  |   4 +-
+>  kernel/trace/trace_events_hist.c    |   8 +-
+>  kernel/trace/trace_events_trigger.c |  17 +-
+>  kernel/trace/trace_events_user.c    |  16 +-
+>  kernel/trace/trace_stat.c           |   4 +-
+>  kernel/user-return-notifier.c       |   3 +-
+>  kernel/workqueue.c                  |  16 +-
+>  mm/backing-dev.c                    |   8 +-
+>  mm/balloon.c                        |   8 +-
+>  mm/cma.c                            |   4 +-
+>  mm/compaction.c                     |   4 +-
+>  mm/damon/core.c                     |   4 +-
+>  mm/damon/sysfs-schemes.c            |   4 +-
+>  mm/dmapool.c                        |   4 +-
+>  mm/huge_memory.c                    |   8 +-
+>  mm/hugetlb.c                        |  56 +++---
+>  mm/hugetlb_vmemmap.c                |  16 +-
+>  mm/khugepaged.c                     |  14 +-
+>  mm/kmemleak.c                       |   7 +-
+>  mm/ksm.c                            |  25 +--
+>  mm/list_lru.c                       |   4 +-
+>  mm/memcontrol-v1.c                  |   8 +-
+>  mm/memory-failure.c                 |  12 +-
+>  mm/memory-tiers.c                   |   4 +-
+>  mm/migrate.c                        |  23 ++-
+>  mm/mmu_notifier.c                   |   9 +-
+>  mm/page_alloc.c                     |   8 +-
+>  mm/page_reporting.c                 |   2 +-
+>  mm/percpu.c                         |  11 +-
+>  mm/pgtable-generic.c                |   4 +-
+>  mm/rmap.c                           |  10 +-
+>  mm/shmem.c                          |   9 +-
+>  mm/slab_common.c                    |  14 +-
+>  mm/slub.c                           |  33 ++--
+>  mm/swapfile.c                       |   4 +-
+>  mm/userfaultfd.c                    |  12 +-
+>  mm/vmalloc.c                        |  24 +--
+>  mm/vmscan.c                         |   7 +-
+>  mm/zsmalloc.c                       |   4 +-
+>  124 files changed, 875 insertions(+), 681 deletions(-)
 
-The safe list iterators require callers to provide a temporary cursor
-even when the cursor is only used by the iterator itself.  The mutable
-iterator variants keep the same removal-safe traversal semantics while
-allowing those internal cursors to be hidden from the call sites.
+Not sure what you were thinking, but this diff stat
+is not landable.
 
-Convert block users of list, hlist and llist safe iterators to the new
-mutable helpers.  Drop the now-unused temporary cursor variables where
-the loop body does not inspect or reset them.
-
-This is a mechanical cleanup with no intended change in traversal order
-or list mutation behavior.
-
-Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
----
- block/bfq-iosched.c    | 17 +++++++----------
- block/blk-cgroup.c     | 12 ++++++------
- block/blk-flush.c      |  4 ++--
- block/blk-iocost.c     | 18 +++++++++---------
- block/blk-mq.c         |  8 ++++----
- block/blk-throttle.c   |  4 ++--
- block/kyber-iosched.c  |  4 ++--
- block/partitions/ldm.c |  8 ++++----
- block/sed-opal.c       |  4 ++--
- 9 files changed, 38 insertions(+), 41 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 141c602d5e85..78e32ba0553d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1209,9 +1209,8 @@ static int bfqq_process_refs(struct bfq_queue *bfqq)
- static void bfq_reset_burst_list(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- {
- 	struct bfq_queue *item;
--	struct hlist_node *n;
- 
--	hlist_for_each_entry_safe(item, n, &bfqd->burst_list, burst_list_node)
-+	hlist_for_each_entry_mutable(item, &bfqd->burst_list, burst_list_node)
- 		hlist_del_init(&item->burst_list_node);
- 
- 	/*
-@@ -1236,7 +1235,6 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 
- 	if (bfqd->burst_size == bfqd->bfq_large_burst_thresh) {
- 		struct bfq_queue *pos, *bfqq_item;
--		struct hlist_node *n;
- 
- 		/*
- 		 * Enough queues have been activated shortly after each
-@@ -1260,8 +1258,8 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 		 * belonging to a large burst. So the burst list is not
- 		 * needed any more. Remove it.
- 		 */
--		hlist_for_each_entry_safe(pos, n, &bfqd->burst_list,
--					  burst_list_node)
-+		hlist_for_each_entry_mutable(pos, &bfqd->burst_list,
-+					     burst_list_node)
- 			hlist_del_init(&pos->burst_list_node);
- 	} else /*
- 		* Burst not yet large: add bfqq to the burst list. Do
-@@ -5330,7 +5328,6 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- void bfq_put_queue(struct bfq_queue *bfqq)
- {
- 	struct bfq_queue *item;
--	struct hlist_node *n;
- 	struct bfq_group *bfqg = bfqq_group(bfqq);
- 
- 	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq, bfqq->ref);
-@@ -5391,8 +5388,8 @@ void bfq_put_queue(struct bfq_queue *bfqq)
- 		hlist_del_init(&bfqq->woken_list_node);
- 
- 	/* reset waker for all queues in woken list */
--	hlist_for_each_entry_safe(item, n, &bfqq->woken_list,
--				  woken_list_node) {
-+	hlist_for_each_entry_mutable(item, &bfqq->woken_list,
-+				     woken_list_node) {
- 		item->waker_bfqq = NULL;
- 		hlist_del_init(&item->woken_list_node);
- 	}
-@@ -7141,13 +7138,13 @@ static void bfq_depth_updated(struct request_queue *q)
- static void bfq_exit_queue(struct elevator_queue *e)
- {
- 	struct bfq_data *bfqd = e->elevator_data;
--	struct bfq_queue *bfqq, *n;
-+	struct bfq_queue *bfqq;
- 	unsigned int actuator;
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
- 	spin_lock_irq(&bfqd->lock);
--	list_for_each_entry_safe(bfqq, n, &bfqd->idle_list, bfqq_list)
-+	list_for_each_entry_mutable(bfqq, &bfqd->idle_list, bfqq_list)
- 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
- 	spin_unlock_irq(&bfqd->lock);
- 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3093c1c03902..ced900019f2e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -997,7 +997,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
- {
- 	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
- 	struct llist_node *lnode;
--	struct blkg_iostat_set *bisc, *next_bisc;
-+	struct blkg_iostat_set *bisc;
- 	unsigned long flags;
- 
- 	rcu_read_lock();
-@@ -1017,17 +1017,17 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
- 	/*
- 	 * Iterate only the iostat_cpu's queued in the lockless list.
- 	 */
--	llist_for_each_entry_safe(bisc, next_bisc, lnode, lnode) {
-+	llist_for_each_entry_mutable(bisc, lnode, lnode) {
- 		struct blkcg_gq *blkg = bisc->blkg;
- 		struct blkcg_gq *parent = blkg->parent;
- 		struct blkg_iostat cur;
- 		unsigned int seq;
- 
- 		/*
--		 * Order assignment of `next_bisc` from `bisc->lnode.next` in
--		 * llist_for_each_entry_safe and clearing `bisc->lqueued` for
--		 * avoiding to assign `next_bisc` with new next pointer added
--		 * in blk_cgroup_bio_start() in case of re-ordering.
-+		 * Order the iterator's internal `bisc->lnode.next` load before
-+		 * clearing `bisc->lqueued`, so the iterator can't pick up a new
-+		 * next pointer added in blk_cgroup_bio_start() in case of
-+		 * re-ordering.
- 		 *
- 		 * The pair barrier is implied in llist_add() in blk_cgroup_bio_start().
- 		 */
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 403a46c86411..20654c2103f2 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -204,7 +204,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
- {
- 	struct request_queue *q = flush_rq->q;
- 	struct list_head *running;
--	struct request *rq, *n;
-+	struct request *rq;
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
- 
-@@ -243,7 +243,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
- 	fq->flush_running_idx ^= 1;
- 
- 	/* and push the waiting requests to the next stage */
--	list_for_each_entry_safe(rq, n, running, queuelist) {
-+	list_for_each_entry_mutable(rq, running, queuelist) {
- 		unsigned int seq = blk_flush_cur_seq(rq);
- 
- 		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 563cc7dcf348..2ca18e52bc13 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1718,7 +1718,7 @@ static void iocg_flush_stat_leaf(struct ioc_gq *iocg, struct ioc_now *now)
- static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
- {
- 	LIST_HEAD(inner_walk);
--	struct ioc_gq *iocg, *tiocg;
-+	struct ioc_gq *iocg;
- 
- 	/* flush leaves and build inner node walk list */
- 	list_for_each_entry(iocg, target_iocgs, active_list) {
-@@ -1727,7 +1727,7 @@ static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
- 	}
- 
- 	/* keep flushing upwards by walking the inner list backwards */
--	list_for_each_entry_safe_reverse(iocg, tiocg, &inner_walk, walk_list) {
-+	list_for_each_entry_mutable_reverse(iocg, &inner_walk, walk_list) {
- 		iocg_flush_stat_upward(iocg);
- 		list_del_init(&iocg->walk_list);
- 	}
-@@ -1848,7 +1848,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- {
- 	LIST_HEAD(over_hwa);
- 	LIST_HEAD(inner_walk);
--	struct ioc_gq *iocg, *tiocg, *root_iocg;
-+	struct ioc_gq *iocg, *root_iocg;
- 	u32 after_sum, over_sum, over_target, gamma;
- 
- 	/*
-@@ -1884,7 +1884,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 		over_target = 0;
- 	}
- 
--	list_for_each_entry_safe(iocg, tiocg, &over_hwa, walk_list) {
-+	list_for_each_entry_mutable(iocg, &over_hwa, walk_list) {
- 		if (over_target)
- 			iocg->hweight_after_donation =
- 				div_u64((u64)iocg->hweight_after_donation *
-@@ -2055,7 +2055,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 	}
- 
- 	/* walk list should be dissolved after use */
--	list_for_each_entry_safe(iocg, tiocg, &inner_walk, walk_list)
-+	list_for_each_entry_mutable(iocg, &inner_walk, walk_list)
- 		list_del_init(&iocg->walk_list);
- }
- 
-@@ -2166,9 +2166,9 @@ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
- static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
- {
- 	int nr_debtors = 0;
--	struct ioc_gq *iocg, *tiocg;
-+	struct ioc_gq *iocg;
- 
--	list_for_each_entry_safe(iocg, tiocg, &ioc->active_iocgs, active_list) {
-+	list_for_each_entry_mutable(iocg, &ioc->active_iocgs, active_list) {
- 		if (!waitqueue_active(&iocg->waitq) && !iocg->abs_vdebt &&
- 		    !iocg->delay && !iocg_is_idle(iocg))
- 			continue;
-@@ -2234,7 +2234,7 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
- static void ioc_timer_fn(struct timer_list *timer)
- {
- 	struct ioc *ioc = container_of(timer, struct ioc, timer);
--	struct ioc_gq *iocg, *tiocg;
-+	struct ioc_gq *iocg;
- 	struct ioc_now now;
- 	LIST_HEAD(surpluses);
- 	int nr_debtors, nr_shortages = 0, nr_lagging = 0;
-@@ -2378,7 +2378,7 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	commit_weights(ioc);
- 
- 	/* surplus list should be dissolved after use */
--	list_for_each_entry_safe(iocg, tiocg, &surpluses, surplus_list)
-+	list_for_each_entry_mutable(iocg, &surpluses, surplus_list)
- 		list_del_init(&iocg->surplus_list);
- 
- 	/*
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 88cb5acc4f39..2daed45ad4e7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1216,9 +1216,9 @@ EXPORT_SYMBOL_GPL(blk_mq_end_request_batch);
- static void blk_complete_reqs(struct llist_head *list)
- {
- 	struct llist_node *entry = llist_reverse_order(llist_del_all(list));
--	struct request *rq, *next;
-+	struct request *rq;
- 
--	llist_for_each_entry_safe(rq, next, entry, ipi_list)
-+	llist_for_each_entry_mutable(rq, entry, ipi_list)
- 		rq->q->mq_ops->complete(rq);
- }
- 
-@@ -4383,14 +4383,14 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
-  */
- void blk_mq_release(struct request_queue *q)
- {
--	struct blk_mq_hw_ctx *hctx, *next;
-+	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
- 
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		WARN_ON_ONCE(hctx && list_empty(&hctx->hctx_list));
- 
- 	/* all hctx are in .unused_hctx_list now */
--	list_for_each_entry_safe(hctx, next, &q->unused_hctx_list, hctx_list) {
-+	list_for_each_entry_mutable(hctx, &q->unused_hctx_list, hctx_list) {
- 		list_del_init(&hctx->hctx_list);
- 		kobject_put(&hctx->kobj);
- 	}
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 47052ba21d1b..1dd4901f00f3 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1686,10 +1686,10 @@ static void tg_cancel_writeback_bios(struct throtl_grp *tg,
- 	tg->flags |= THROTL_TG_CANCELING;
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
--		struct throtl_qnode *qn, *tmp;
-+		struct throtl_qnode *qn;
- 		unsigned int nr_bios = 0;
- 
--		list_for_each_entry_safe(qn, tmp, &sq->queued[rw], node) {
-+		list_for_each_entry_mutable(qn, &sq->queued[rw], node) {
- 			struct bio *bio;
- 
- 			while ((bio = bio_list_pop(&qn->bios_iops))) {
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 971818bcdc9d..1a509666b861 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -578,9 +578,9 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
- 				  blk_insert_t flags)
- {
- 	struct kyber_hctx_data *khd = hctx->sched_data;
--	struct request *rq, *next;
-+	struct request *rq;
- 
--	list_for_each_entry_safe(rq, next, rq_list, queuelist) {
-+	list_for_each_entry_mutable(rq, rq_list, queuelist) {
- 		unsigned int sched_domain = kyber_sched_domain(rq->cmd_flags);
- 		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw[hctx->type]];
- 		struct list_head *head = &kcq->rq_list[sched_domain];
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index c0bdcae58a3e..459f72f2148a 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -1285,11 +1285,11 @@ static bool ldm_frag_add (const u8 *data, int size, struct list_head *frags)
-  */
- static void ldm_frag_free (struct list_head *list)
- {
--	struct list_head *item, *tmp;
-+	struct list_head *item;
- 
- 	BUG_ON (!list);
- 
--	list_for_each_safe (item, tmp, list)
-+	list_for_each_mutable(item, list)
- 		kfree (list_entry (item, struct frag, list));
- }
- 
-@@ -1400,11 +1400,11 @@ static bool ldm_get_vblks(struct parsed_partitions *state, unsigned long base,
-  */
- static void ldm_free_vblks (struct list_head *lh)
- {
--	struct list_head *item, *tmp;
-+	struct list_head *item;
- 
- 	BUG_ON (!lh);
- 
--	list_for_each_safe (item, tmp, lh)
-+	list_for_each_mutable(item, lh)
- 		kfree (list_entry (item, struct vblk, list));
- }
- 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 79b290d9458a..5bf9ebce8452 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2573,10 +2573,10 @@ static int check_opal_support(struct opal_dev *dev)
- static void clean_opal_dev(struct opal_dev *dev)
- {
- 
--	struct opal_suspend_data *suspend, *next;
-+	struct opal_suspend_data *suspend;
- 
- 	mutex_lock(&dev->dev_lock);
--	list_for_each_entry_safe(suspend, next, &dev->unlk_lst, node) {
-+	list_for_each_entry_mutable(suspend, &dev->unlk_lst, node) {
- 		list_del(&suspend->node);
- 		kfree(suspend);
- 	}
--- 
-2.43.0
-
+pw-bot: cr
