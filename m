@@ -1,53 +1,53 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676E4342532
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 17:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628DD340A76
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 17:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782150187; cv=none; b=KayXxoOcXAg4ZwVnZTU+cpFz4SjJByLiEZP8Dn+Ibl0s5MIDwNeoFvvCNMsjH1hKofdPz8Xck27YZ+cU1XinbvquiU0kck5Bgw1liaayhTvXRGWJ7hpBAfqVKQ3gDyaIVOl1Ll43eyIcmgfX8Zwdyfbq66WoFqJk82LT3UWl6LI=
+	t=1782150190; cv=none; b=ZZlrv0b2O2CAZ/j6bB7wm2CUr+ZznTDhRVWrq7VJOuftP3LkV6ZLQTMAz39bQXXY1/MNkfn7FJdJLvqyuKCFfBSt61bLlQj+jRa2irXpeNchOjXQ+eGJb+QI4NPCv6vZagJtoGu00snUmaYUhRrSWgvrrGUF4oLPt02Jz3I5Nbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782150187; c=relaxed/simple;
-	bh=HCwdxVfb5FLyCB74gfm8Qm2x0J04N7DthRxNKqz97TU=;
+	s=arc-20240116; t=1782150190; c=relaxed/simple;
+	bh=ciOnInfIrlVNGj9B+H97jY8XeIm5Xq/k7daeId3+lPc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qweSQYqZOnuqLxH6E7N7QISj052XCCT13D0d2qMsUTrHduxROjDiFZY1SF/42Q3GhWNt3uYP/Se32DjMCzP/VxDOBaF03a/SI2G2+hNOC8yjjYXsKVjoM6PFWIMuyYvU4APz1MWyeW7Vs81vW7Q8e9TbjAqS1ZG37FcoV3Ifo8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=X7xpyDQT; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=BHoZl5M2Fuy4YulYSaQ9TOa44c1nvu72qiUhidXigEC9SfIMZ95tH+N+9cjdK3fVOzL0638q/Bq4PPAq6cu3vFRjcHCnwWRyi7qsaRezdf9XZ1s9nD7oqVYvNmNRYAriEKTqV+UCTLqnPlooFNQUi5H1w5/No9K5yil7VTcEc3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=VX82u59s; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="X7xpyDQT"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65MHVZ362375540
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 10:43:05 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="VX82u59s"
+Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65MHVU572357964
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 10:43:08 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=xVNj/MY3hnE3hUQyxKPtG7Nou5db4RL6KUNVunkMOfs=; b=X7xpyDQTMSlg
-	3/BI9/BtFIJb+2/mzDFTJStI0ewBVH+fVxpt2/f/szVZtuI4261KcGW9Xt7Yqd7s
-	n4AA80X7g5ScjkMkgvhO1Q7MU+rMbYIK7SklYWycxHj8QpooIQo7dDL5yY+tGHi8
-	yMtaNyK9R/OkCYERY6R1DVfpOXD8IjMOQFyxf7/py2FIHY5yB/i4yKq9gkjdETdR
-	43ob+KmY9s0ZNGViLs5hhJUicc7QMi9R+qhhWW+eYmc/j/9f94fZmvwShCRnPf6b
-	UU6uhY5CxnzYI+alEGkPtoBp0U8E/gf8X6vket9pSHsoUBbxGSbHanIf19cFGd1v
-	WEDqXTMKPA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ewt5jvkp8-6
+	 bh=7eZT0eaIoKAY4JfubM1+S7MnrycBVHNDXCi+iFHr330=; b=VX82u59s18YF
+	+0ZDWvFFkC7uZlSfYZFXkEge4CrBSPAk6ch0L6ZM0+rRyugfANZX90MCIJHPZ9dR
+	J/VK412Kt+85WO7VM4sx36VtJivYiUewy2/RqyOOASk9gn5jpSLfGXJ/e0W5K55i
+	O7uEB5SGSj++LFseumY7C659b//zy1g/tSpj5t9wDqrWyrNkGHxxvovmm15MaOla
+	x8D+YupBykHJsHt4Ncghmc4rzGuCuQp6OHkStTVPr63TN6LA21UrnCaUXFh6wo2O
+	BMnPcPhX3d2wRV70gfKvFkSGUk4LdD1C6HyujpCPZaxBROMXbQ30iMsT1qULNKja
+	Lic1mL/6ug==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4excgdrh08-10
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 10:43:05 -0700 (PDT)
-Received: from twshared50265.32.frc3.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 10:43:08 -0700 (PDT)
+Received: from twshared16795.04.snb2.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.2562.41; Mon, 22 Jun 2026 17:43:02 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 0932723A15DE6; Mon, 22 Jun 2026 10:42:47 -0700 (PDT)
+	id 5937223A15DDD; Mon, 22 Jun 2026 10:42:46 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
 CC: <dm-devel@lists.linux.dev>, <hch@lst.de>, <axboe@kernel.dk>,
         <brauner@kernel.org>, <djwong@kernel.org>, <viro@zeniv.linux.org.uk>,
         Keith
  Busch <kbusch@kernel.org>
-Subject: [PATCHv2 5/6] zloop: set dma_alignment from the backing files for direct I/O
-Date: Mon, 22 Jun 2026 10:42:40 -0700
-Message-ID: <20260622174241.2299563-6-kbusch@meta.com>
+Subject: [PATCHv2 2/6] block: report the actual status
+Date: Mon, 22 Jun 2026 10:42:37 -0700
+Message-ID: <20260622174241.2299563-3-kbusch@meta.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260622174241.2299563-1-kbusch@meta.com>
 References: <20260622174241.2299563-1-kbusch@meta.com>
@@ -60,105 +60,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=I65Vgtgg c=1 sm=1 tr=0 ts=6a397429 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDE3MyBTYWx0ZWRfX5iVTwwjc7VNh
+ 7WNvaqXGQIsxurQf5waVezBQHdaoRoFTHQKyTDGO+j772FL5hfjLSXAJ9tigYLdWKL2902cag3X
+ ZZXULvgmE2Ab2i9fF7w4Ku5w95j4u68=
+X-Proofpoint-ORIG-GUID: y6aOiRNygzjBummNGUUmrhUDiqwHv-3g
+X-Proofpoint-GUID: y6aOiRNygzjBummNGUUmrhUDiqwHv-3g
+X-Authority-Analysis: v=2.4 cv=GK841ONK c=1 sm=1 tr=0 ts=6a39742c cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
  a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=crHB47gyY4rKiduisYu9:22 a=VwQbUJbxAAAA:8 a=fUb_SF9hUEpPheumoKcA:9
-X-Proofpoint-GUID: qc8SyyuHGm75NjHZhvLT1Ec7DPsllnFN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDE3MyBTYWx0ZWRfXwrWFXUcIEeZo
- 4ANdGb81R/lWfXxYMxtxXhpcggyKVOb9Z6AxRzEv5bd3OEeNHjROTrkyQS48VCARxrkpDnleKtn
- KxGH1i5TE+UWytjwQcm7yjzb/KBcmZJJtppPlYTY4AP03x9fGNSsv9DTIKehTIJeeP0LTUd9WJ9
- g9sQiOh2EI79B7bhd0z1x2pwgoj+9PL3grm/YAMVvtTGXslc/g2jrlExtgew4J29VDgSxSw1efm
- TloyC5O1CfJXTBXrvCa2x31eTYdKtQTN63ctFc/8mj8+qI1mx1F8H8w9XC6MC4LFLSYWcGSENgn
- cARi3XrtDoprHbjIcR/O1hdEF+53hxogHAcALsJMP4oQOfSmWQpDHqFpcX7b50zhkC78o+bWB3E
- z49rlHb3EWV/qVTJc6auJrio5exBTr8hUxBJjABk5zXB1r+jsE+SxS+80RQveH2MVLwtq80mTiV
- sCmV/0YjlEY5slTJIeg==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDE3MyBTYWx0ZWRfX4tTUbQr8Tx6X
- 7DmEGDrizOdGGq4FX5mV/tNYGHWe34K0JTI78m+47wMBmKEuKNzjqE4INJJEP5fpdcv3PejlT/O
- q+qvKAHAlv8SoiYSVXDDT00n8XWjrKk=
-X-Proofpoint-ORIG-GUID: qc8SyyuHGm75NjHZhvLT1Ec7DPsllnFN
+ a=GbPsI2Ihf5RTnMjR_gZv:22 a=VwQbUJbxAAAA:8 a=3Jhqao3C4D3DWECJMaUA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDE3MyBTYWx0ZWRfX2ANhBin4I626
+ zmzzJUn/KfrVRzjmaGZyqSofvoVfdNxCtUHt78SxODyjsIAvQJ//2Ot9S54cIFD5Ya74zxwi3F7
+ 6MUUqsPZyabDJtaTcEkjYW29ydptu1lb1QX4MIY8V6v0xcxH8Vy9D57n8/a6F0qDO7DNagpySKD
+ qRbrCUOvNqnhy0CFqF14QPOlc9NnwHA9D6cnDFayvskIbgnhVGZJzbZL/pEhM5l97ewU5cKDGhm
+ pFqhLSPSP5hNxfYqmsgApPndL4fP6r+iYJSnYeXz1eNPmcJpFkD5r062cAz2XkK4K6tqjniz0zG
+ T3LZw4Ath0TCznnrtB9yLHu3PtwgdioCHf9rHXYgg25Lak0/mf4GH/FeXHlv8eVysoV9SJNBtNf
+ MdIP9ux5eHr2M/iaCqGAQymB/LAlM/4/SzX6t7WAK8HpzHT21PRkTBJXxsgDOmj80FruRDw1xhF
+ ceDgH0h40RDLcs/LFmA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-22_03,2026-06-22_01,2025-10-01_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Direct I/O request's use pages handed to the backing files unchanged, so
-the backing's DMA alignment requirement applies. Track dio_mem_align and
-advertise it as the device's dma_alignment so we communicate proper
-limits and misaligned I/O is rejected here instead of reaching the
-backend.
+Rather than assume EIO, set the actual reported status for user space
+informational purposes.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/block/zloop.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ block/fops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 55eeb6aac0ea3..1149b817b5bc9 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -144,6 +144,7 @@ struct zloop_device {
- 	unsigned int		nr_conv_zones;
- 	unsigned int		max_open_zones;
- 	unsigned int		block_size;
-+	unsigned int		dio_mem_align;
+diff --git a/block/fops.c b/block/fops.c
+index 15783a6180dec..f237d6cab8975 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -218,7 +218,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
+ struct iov_iter *iter,
 =20
- 	spinlock_t		open_zones_lock;
- 	struct list_head	open_zones_lru_list;
-@@ -1035,6 +1036,9 @@ static int zloop_get_block_size(struct zloop_device=
- *zlo,
- {
- 	struct block_device *sb_bdev =3D zone->file->f_mapping->host->i_sb->s_b=
-dev;
- 	struct kstat st;
-+	bool have_dioalign =3D !vfs_getattr(&zone->file->f_path, &st,
-+					  STATX_DIOALIGN, 0) &&
-+			     (st.result_mask & STATX_DIOALIGN);
-=20
- 	/*
- 	 * If the FS block size is lower than or equal to 4K, use that as the
-@@ -1044,14 +1048,25 @@ static int zloop_get_block_size(struct zloop_devi=
-ce *zlo,
- 	 */
- 	if (file_inode(zone->file)->i_sb->s_blocksize <=3D SZ_4K)
- 		zlo->block_size =3D file_inode(zone->file)->i_sb->s_blocksize;
--	else if (!vfs_getattr(&zone->file->f_path, &st, STATX_DIOALIGN, 0) &&
--		 (st.result_mask & STATX_DIOALIGN))
-+	else if (have_dioalign)
- 		zlo->block_size =3D st.dio_offset_align;
- 	else if (sb_bdev)
- 		zlo->block_size =3D bdev_physical_block_size(sb_bdev);
- 	else
- 		zlo->block_size =3D SECTOR_SIZE;
-=20
-+	/*
-+	 * In direct I/O the request's pages are handed to the backing files
-+	 * unchanged, so track their required memory alignment as a mask for
-+	 * dma_alignment.
-+	 */
-+	if (have_dioalign)
-+		zlo->dio_mem_align =3D st.dio_mem_align - 1;
-+	else if (sb_bdev)
-+		zlo->dio_mem_align =3D bdev_dma_alignment(sb_bdev);
-+	else
-+		zlo->dio_mem_align =3D SECTOR_SIZE - 1;
-+
- 	if (zlo->zone_capacity & ((zlo->block_size >> SECTOR_SHIFT) - 1)) {
- 		pr_err("Zone capacity is not aligned to block size %u\n",
- 		       zlo->block_size);
-@@ -1279,6 +1294,9 @@ static int zloop_ctl_add(struct zloop_options *opts=
-)
-=20
- 	lim.physical_block_size =3D zlo->block_size;
- 	lim.logical_block_size =3D zlo->block_size;
-+	/* Direct I/O hands the request's pages to the backing files unchanged.=
- */
-+	if (!opts->buffered_io)
-+		lim.dma_alignment =3D zlo->dio_mem_align;
- 	if (zlo->zone_append)
- 		lim.max_hw_zone_append_sectors =3D lim.max_hw_sectors;
- 	lim.max_open_zones =3D zlo->max_open_zones;
+ 		ret =3D blkdev_iov_iter_get_pages(bio, iter, bdev);
+ 		if (unlikely(ret)) {
+-			bio_endio_status(bio, BLK_STS_IOERR);
++			bio_endio_errno(bio, ret);
+ 			break;
+ 		}
+ 		if (iocb->ki_flags & IOCB_NOWAIT) {
 --=20
 2.52.0
 
