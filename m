@@ -1,89 +1,45 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB83A356758
-	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 04:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C51B3502A9
+	for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 04:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782101229; cv=none; b=O1aG8AZ/OryZCzhWA9xJh9QnxAxGd4Tr6ONq870jof3EbGQLyyJAOP2S/WPBcQ8xUMOZF9zcryIXpbn4PWnwjw2AXIz1r8NizgIFGteAHLO9asWuJ448LLoQ9Fba5lIKKTsVZ9KHSe3nBvbns4YGLbewTbcBYfPZKHuMIDmUyo0=
+	t=1782102079; cv=none; b=IWdXf2D3LrFkcIGqTr+Q8aKyAgC46vBygp/QwRpLd04otAnRchI9QQiZhas9rXsDjijlnbCk1kKmFJLMQVGJpx9NhkYjQZarOUqV3ahvUgdWNY5VS+YLqiom8RPgZtRYnbSTstdWUsz2gvEBIqcLVdhszLs/8wZDrIozf+S0tUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782101229; c=relaxed/simple;
-	bh=m2LLV+BA5spGIUzLab9tWQ1i0a9h7daxqjgqeVb30rU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e8FswySvW4fe2WigvJDq2yhOKA+D/xf4CLlcvWwkHwq27QzV0MxpLyiobP0eLRRzl3JKS/st5Fj10yF8G+itSastOV8AjTUVePaoWtauHeYpCXBhHI1tX9rXve9dzVsDk2O3VAXJFFIPa5iRbnoaTDyskOwbrbzRV7txlkjh1no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RKNYTOPI; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1782102079; c=relaxed/simple;
+	bh=yYlDQ/l+zs/b9e8m9s4LMjZbs6vWiIES70Ut+w5bpAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S/ky98ar6OivVCSOQ66xgxIODMdCBja3HICGdYvFEivd+/v1kTPSxuPuME24ICLaZbm6hKvIfY/z+H8PeOvGVKm0GjDANoZ14O5DmdOqcQyk936h/RtwN8iy7mZuGFofwYF6d9Cf0DOuUTQUYnYZa4YtQiWQqSoMPSCEw3xjtyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UXztHqAS; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RKNYTOPI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UXztHqAS"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782101224;
+	t=1782102065;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vFaoYZTJfRDH9hDuVHVBgZkR1flChQcp5jR5STw0K2M=;
-	b=RKNYTOPII31SLlFemAcWqWE/TeS/HQJl7crveXc7GdzZz5I+TjbXRbbkZaQSvN3TmVtVYT
-	nSSDvsZk7jNyt6B/E4YmD4cYyLjd5RE2oOf/Hiy1FZ2NcIRHyitOaBZNUaYo6dvHseOLCi
-	TzRgynUCXY7wguiC8GKfv0LXaYiHBGc=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GcqR2qNPO+w7lc6EUo9e2BGGPvGaEH+heJynYFHN+iM=;
+	b=UXztHqAS6SHwAXxG289gYezYczzuhIi/DRFRs+pWipno4EENd97BVP8FqwO4v1UsVWTYzG
+	U7ydREZStW2gD2ALRcUrMl8ljgM0HBFYHIT5WvEhKDV9s2SCAUqLRZdHvsv55Yo3Pklv7W
+	f+AECjdUvZ+RKKrXV+nxXNhMGXy2FFw=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>,
+To: Yu Kuai <yukuai@fygo.io>,
 	Jens Axboe <axboe@kernel.dk>,
 	Tejun Heo <tj@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Paul Moore <paul@paul-moore.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Philipp Stanner <phasta@kernel.org>,
-	linux-block@vger.kernel.org,
+	Josef Bacik <josef@toxicpanda.com>,
+	"Richard Russon (FlatCap)" <ldm@flatcap.org>,
+	Jonathan Derrick <jonathan.derrick@linux.dev>
+Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	cgroups@vger.kernel.org,
 	linux-ntfs-dev@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	audit@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-perf-users@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kexec@lists.infradead.org,
-	live-patching@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	rcu@vger.kernel.org,
-	sched-ext@lists.linux.dev,
-	linux-mm@kvack.org,
-	virtualization@lists.linux.dev,
-	damon@lists.linux.dev,
-	llvm@lists.linux.dev,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v3 2/7] llist: Add mutable iterator variants
-Date: Mon, 22 Jun 2026 12:05:32 +0800
-Message-ID: <20260622040533.29824-3-kaitao.cheng@linux.dev>
-In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+Subject: [PATCH v3 4/7] block: Use mutable list iterators
+Date: Mon, 22 Jun 2026 12:19:59 +0800
+Message-ID: <20260622041959.30981-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,150 +51,352 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
-llist_for_each_safe() and llist_for_each_entry_safe() require callers to
-provide a temporary cursor even when the cursor is only needed by the
-iterator itself.  This makes call sites noisier than necessary for the
-common case where the loop body may remove the current entry but does
-not otherwise inspect the saved next pointer.
+The safe list iterators require callers to provide a temporary cursor
+even when the cursor is only used by the iterator itself.  The mutable
+iterator variants keep the same removal-safe traversal semantics while
+allowing those internal cursors to be hidden from the call sites.
 
-Add llist_for_each_mutable() and llist_for_each_entry_mutable() variants
-that support both forms.  Callers may omit the temporary cursor and let
-the helper create an internal unique cursor, or keep passing an explicit
-cursor when the loop needs to inspect or reset it.
+Convert block users of list, hlist and llist safe iterators to the new
+mutable helpers.  Drop the now-unused temporary cursor variables where
+the loop body does not inspect or reset them.
 
-Keep the existing safe helpers as compatibility wrappers so current users
-continue to build unchanged while new code can use the shorter mutable
-form.
+This is a mechanical cleanup with no intended change in traversal order
+or list mutation behavior.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- include/linux/llist.h | 81 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 65 insertions(+), 16 deletions(-)
+ block/bfq-iosched.c    | 17 +++++++----------
+ block/blk-cgroup.c     | 12 ++++++------
+ block/blk-flush.c      |  4 ++--
+ block/blk-iocost.c     | 18 +++++++++---------
+ block/blk-mq.c         |  8 ++++----
+ block/blk-throttle.c   |  4 ++--
+ block/kyber-iosched.c  |  4 ++--
+ block/partitions/ldm.c |  8 ++++----
+ block/sed-opal.c       |  4 ++--
+ 9 files changed, 38 insertions(+), 41 deletions(-)
 
-diff --git a/include/linux/llist.h b/include/linux/llist.h
-index 8846b7709669..1c6f12411d5e 100644
---- a/include/linux/llist.h
-+++ b/include/linux/llist.h
-@@ -49,6 +49,7 @@
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 141c602d5e85..78e32ba0553d 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1209,9 +1209,8 @@ static int bfqq_process_refs(struct bfq_queue *bfqq)
+ static void bfq_reset_burst_list(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ {
+ 	struct bfq_queue *item;
+-	struct hlist_node *n;
+ 
+-	hlist_for_each_entry_safe(item, n, &bfqd->burst_list, burst_list_node)
++	hlist_for_each_entry_mutable(item, &bfqd->burst_list, burst_list_node)
+ 		hlist_del_init(&item->burst_list_node);
+ 
+ 	/*
+@@ -1236,7 +1235,6 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	if (bfqd->burst_size == bfqd->bfq_large_burst_thresh) {
+ 		struct bfq_queue *pos, *bfqq_item;
+-		struct hlist_node *n;
+ 
+ 		/*
+ 		 * Enough queues have been activated shortly after each
+@@ -1260,8 +1258,8 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		 * belonging to a large burst. So the burst list is not
+ 		 * needed any more. Remove it.
+ 		 */
+-		hlist_for_each_entry_safe(pos, n, &bfqd->burst_list,
+-					  burst_list_node)
++		hlist_for_each_entry_mutable(pos, &bfqd->burst_list,
++					     burst_list_node)
+ 			hlist_del_init(&pos->burst_list_node);
+ 	} else /*
+ 		* Burst not yet large: add bfqq to the burst list. Do
+@@ -5330,7 +5328,6 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ void bfq_put_queue(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_queue *item;
+-	struct hlist_node *n;
+ 	struct bfq_group *bfqg = bfqq_group(bfqq);
+ 
+ 	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq, bfqq->ref);
+@@ -5391,8 +5388,8 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 		hlist_del_init(&bfqq->woken_list_node);
+ 
+ 	/* reset waker for all queues in woken list */
+-	hlist_for_each_entry_safe(item, n, &bfqq->woken_list,
+-				  woken_list_node) {
++	hlist_for_each_entry_mutable(item, &bfqq->woken_list,
++				     woken_list_node) {
+ 		item->waker_bfqq = NULL;
+ 		hlist_del_init(&item->woken_list_node);
+ 	}
+@@ -7141,13 +7138,13 @@ static void bfq_depth_updated(struct request_queue *q)
+ static void bfq_exit_queue(struct elevator_queue *e)
+ {
+ 	struct bfq_data *bfqd = e->elevator_data;
+-	struct bfq_queue *bfqq, *n;
++	struct bfq_queue *bfqq;
+ 	unsigned int actuator;
+ 
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
+ 	spin_lock_irq(&bfqd->lock);
+-	list_for_each_entry_safe(bfqq, n, &bfqd->idle_list, bfqq_list)
++	list_for_each_entry_mutable(bfqq, &bfqd->idle_list, bfqq_list)
+ 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
+ 	spin_unlock_irq(&bfqd->lock);
+ 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 3093c1c03902..ced900019f2e 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -997,7 +997,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+ {
+ 	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+ 	struct llist_node *lnode;
+-	struct blkg_iostat_set *bisc, *next_bisc;
++	struct blkg_iostat_set *bisc;
+ 	unsigned long flags;
+ 
+ 	rcu_read_lock();
+@@ -1017,17 +1017,17 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+ 	/*
+ 	 * Iterate only the iostat_cpu's queued in the lockless list.
+ 	 */
+-	llist_for_each_entry_safe(bisc, next_bisc, lnode, lnode) {
++	llist_for_each_entry_mutable(bisc, lnode, lnode) {
+ 		struct blkcg_gq *blkg = bisc->blkg;
+ 		struct blkcg_gq *parent = blkg->parent;
+ 		struct blkg_iostat cur;
+ 		unsigned int seq;
+ 
+ 		/*
+-		 * Order assignment of `next_bisc` from `bisc->lnode.next` in
+-		 * llist_for_each_entry_safe and clearing `bisc->lqueued` for
+-		 * avoiding to assign `next_bisc` with new next pointer added
+-		 * in blk_cgroup_bio_start() in case of re-ordering.
++		 * Order the iterator's internal `bisc->lnode.next` load before
++		 * clearing `bisc->lqueued`, so the iterator can't pick up a new
++		 * next pointer added in blk_cgroup_bio_start() in case of
++		 * re-ordering.
+ 		 *
+ 		 * The pair barrier is implied in llist_add() in blk_cgroup_bio_start().
+ 		 */
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 403a46c86411..20654c2103f2 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -204,7 +204,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
+ {
+ 	struct request_queue *q = flush_rq->q;
+ 	struct list_head *running;
+-	struct request *rq, *n;
++	struct request *rq;
+ 	unsigned long flags = 0;
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
+ 
+@@ -243,7 +243,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
+ 	fq->flush_running_idx ^= 1;
+ 
+ 	/* and push the waiting requests to the next stage */
+-	list_for_each_entry_safe(rq, n, running, queuelist) {
++	list_for_each_entry_mutable(rq, running, queuelist) {
+ 		unsigned int seq = blk_flush_cur_seq(rq);
+ 
+ 		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 563cc7dcf348..2ca18e52bc13 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1718,7 +1718,7 @@ static void iocg_flush_stat_leaf(struct ioc_gq *iocg, struct ioc_now *now)
+ static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
+ {
+ 	LIST_HEAD(inner_walk);
+-	struct ioc_gq *iocg, *tiocg;
++	struct ioc_gq *iocg;
+ 
+ 	/* flush leaves and build inner node walk list */
+ 	list_for_each_entry(iocg, target_iocgs, active_list) {
+@@ -1727,7 +1727,7 @@ static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
+ 	}
+ 
+ 	/* keep flushing upwards by walking the inner list backwards */
+-	list_for_each_entry_safe_reverse(iocg, tiocg, &inner_walk, walk_list) {
++	list_for_each_entry_mutable_reverse(iocg, &inner_walk, walk_list) {
+ 		iocg_flush_stat_upward(iocg);
+ 		list_del_init(&iocg->walk_list);
+ 	}
+@@ -1848,7 +1848,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+ {
+ 	LIST_HEAD(over_hwa);
+ 	LIST_HEAD(inner_walk);
+-	struct ioc_gq *iocg, *tiocg, *root_iocg;
++	struct ioc_gq *iocg, *root_iocg;
+ 	u32 after_sum, over_sum, over_target, gamma;
+ 
+ 	/*
+@@ -1884,7 +1884,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+ 		over_target = 0;
+ 	}
+ 
+-	list_for_each_entry_safe(iocg, tiocg, &over_hwa, walk_list) {
++	list_for_each_entry_mutable(iocg, &over_hwa, walk_list) {
+ 		if (over_target)
+ 			iocg->hweight_after_donation =
+ 				div_u64((u64)iocg->hweight_after_donation *
+@@ -2055,7 +2055,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+ 	}
+ 
+ 	/* walk list should be dissolved after use */
+-	list_for_each_entry_safe(iocg, tiocg, &inner_walk, walk_list)
++	list_for_each_entry_mutable(iocg, &inner_walk, walk_list)
+ 		list_del_init(&iocg->walk_list);
+ }
+ 
+@@ -2166,9 +2166,9 @@ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
+ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
+ {
+ 	int nr_debtors = 0;
+-	struct ioc_gq *iocg, *tiocg;
++	struct ioc_gq *iocg;
+ 
+-	list_for_each_entry_safe(iocg, tiocg, &ioc->active_iocgs, active_list) {
++	list_for_each_entry_mutable(iocg, &ioc->active_iocgs, active_list) {
+ 		if (!waitqueue_active(&iocg->waitq) && !iocg->abs_vdebt &&
+ 		    !iocg->delay && !iocg_is_idle(iocg))
+ 			continue;
+@@ -2234,7 +2234,7 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
+ static void ioc_timer_fn(struct timer_list *timer)
+ {
+ 	struct ioc *ioc = container_of(timer, struct ioc, timer);
+-	struct ioc_gq *iocg, *tiocg;
++	struct ioc_gq *iocg;
+ 	struct ioc_now now;
+ 	LIST_HEAD(surpluses);
+ 	int nr_debtors, nr_shortages = 0, nr_lagging = 0;
+@@ -2378,7 +2378,7 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	commit_weights(ioc);
+ 
+ 	/* surplus list should be dissolved after use */
+-	list_for_each_entry_safe(iocg, tiocg, &surpluses, surplus_list)
++	list_for_each_entry_mutable(iocg, &surpluses, surplus_list)
+ 		list_del_init(&iocg->surplus_list);
+ 
+ 	/*
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 88cb5acc4f39..2daed45ad4e7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1216,9 +1216,9 @@ EXPORT_SYMBOL_GPL(blk_mq_end_request_batch);
+ static void blk_complete_reqs(struct llist_head *list)
+ {
+ 	struct llist_node *entry = llist_reverse_order(llist_del_all(list));
+-	struct request *rq, *next;
++	struct request *rq;
+ 
+-	llist_for_each_entry_safe(rq, next, entry, ipi_list)
++	llist_for_each_entry_mutable(rq, entry, ipi_list)
+ 		rq->q->mq_ops->complete(rq);
+ }
+ 
+@@ -4383,14 +4383,14 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
   */
+ void blk_mq_release(struct request_queue *q)
+ {
+-	struct blk_mq_hw_ctx *hctx, *next;
++	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
  
- #include <linux/atomic.h>
-+#include <linux/args.h>
- #include <linux/container_of.h>
- #include <linux/stddef.h>
- #include <linux/types.h>
-@@ -143,12 +144,33 @@ static inline bool llist_on_list(const struct llist_node *node)
- #define llist_for_each(pos, node)			\
- 	for ((pos) = (node); pos; (pos) = (pos)->next)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		WARN_ON_ONCE(hctx && list_empty(&hctx->hctx_list));
  
-+/*
-+ * llist_for_each_safe is an old interface, use llist_for_each_mutable instead.
-+ */
-+#define llist_for_each_safe(pos, n, node)			\
-+	for ((pos) = (node); (pos) && ((n) = (pos)->next, true); (pos) = (n))
-+
-+#define __llist_for_each_mutable_internal(pos, tmp, node)		\
-+	for (typeof(pos) tmp = ((pos) = (node)) ? (pos)->next : NULL;	\
-+	     (pos);							\
-+	     (pos) = tmp, tmp = (pos) ? (pos)->next : NULL)
-+
-+#define __llist_for_each_mutable1(pos, node)				\
-+	__llist_for_each_mutable_internal(pos, __UNIQUE_ID(next), node)
-+
-+#define __llist_for_each_mutable2(pos, next, node)			\
-+	llist_for_each_safe(pos, next, node)
-+
- /**
-- * llist_for_each_safe - iterate over some deleted entries of a lock-less list
-- *			 safe against removal of list entry
-+ * llist_for_each_mutable - iterate over some deleted entries of a lock-less list
-+ *			    safe against removal of list entry
-  * @pos:	the &struct llist_node to use as a loop cursor
-- * @n:		another &struct llist_node to use as temporary storage
-- * @node:	the first entry of deleted list entries
-+ * @...:	either (node) or (next, node)
-+ *
-+ * next:	another &struct llist_node to use as optional temporary storage.
-+ *		The temporary cursor is internal unless explicitly supplied by
-+ *		the caller.
-+ * node:	the first entry of deleted list entries
-  *
-  * In general, some entries of the lock-less list can be traversed
-  * safely only after being deleted from list, so start with an entry
-@@ -159,8 +181,9 @@ static inline bool llist_on_list(const struct llist_node *node)
-  * you want to traverse from the oldest to the newest, you must
-  * reverse the order by yourself before traversing.
+ 	/* all hctx are in .unused_hctx_list now */
+-	list_for_each_entry_safe(hctx, next, &q->unused_hctx_list, hctx_list) {
++	list_for_each_entry_mutable(hctx, &q->unused_hctx_list, hctx_list) {
+ 		list_del_init(&hctx->hctx_list);
+ 		kobject_put(&hctx->kobj);
+ 	}
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 47052ba21d1b..1dd4901f00f3 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1686,10 +1686,10 @@ static void tg_cancel_writeback_bios(struct throtl_grp *tg,
+ 	tg->flags |= THROTL_TG_CANCELING;
+ 
+ 	for (rw = READ; rw <= WRITE; rw++) {
+-		struct throtl_qnode *qn, *tmp;
++		struct throtl_qnode *qn;
+ 		unsigned int nr_bios = 0;
+ 
+-		list_for_each_entry_safe(qn, tmp, &sq->queued[rw], node) {
++		list_for_each_entry_mutable(qn, &sq->queued[rw], node) {
+ 			struct bio *bio;
+ 
+ 			while ((bio = bio_list_pop(&qn->bios_iops))) {
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 971818bcdc9d..1a509666b861 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -578,9 +578,9 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 				  blk_insert_t flags)
+ {
+ 	struct kyber_hctx_data *khd = hctx->sched_data;
+-	struct request *rq, *next;
++	struct request *rq;
+ 
+-	list_for_each_entry_safe(rq, next, rq_list, queuelist) {
++	list_for_each_entry_mutable(rq, rq_list, queuelist) {
+ 		unsigned int sched_domain = kyber_sched_domain(rq->cmd_flags);
+ 		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw[hctx->type]];
+ 		struct list_head *head = &kcq->rq_list[sched_domain];
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index c0bdcae58a3e..459f72f2148a 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -1285,11 +1285,11 @@ static bool ldm_frag_add (const u8 *data, int size, struct list_head *frags)
   */
--#define llist_for_each_safe(pos, n, node)			\
--	for ((pos) = (node); (pos) && ((n) = (pos)->next, true); (pos) = (n))
-+#define llist_for_each_mutable(pos, ...)				\
-+	CONCATENATE(__llist_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-+		(pos, __VA_ARGS__)
+ static void ldm_frag_free (struct list_head *list)
+ {
+-	struct list_head *item, *tmp;
++	struct list_head *item;
  
- /**
-  * llist_for_each_entry - iterate over some deleted entries of lock-less list of given type
-@@ -182,13 +205,41 @@ static inline bool llist_on_list(const struct llist_node *node)
- 	     member_address_is_nonnull(pos, member);			\
- 	     (pos) = llist_entry((pos)->member.next, typeof(*(pos)), member))
+ 	BUG_ON (!list);
  
-+/*
-+ * llist_for_each_entry_safe is an old interface, use llist_for_each_entry_mutable instead.
-+ */
-+#define llist_for_each_entry_safe(pos, n, node, member)			       \
-+	for (pos = llist_entry((node), typeof(*pos), member);		       \
-+	     member_address_is_nonnull(pos, member) &&			       \
-+	        (n = llist_entry(pos->member.next, typeof(*n), member), true); \
-+	     pos = n)
-+
-+#define __llist_for_each_entry_mutable_internal(pos, tmp, node, member)	\
-+	for (typeof(pos) tmp = ((pos) = llist_entry((node), typeof(*pos), member), \
-+		member_address_is_nonnull(pos, member) ?			\
-+		llist_entry((pos)->member.next, typeof(*pos), member) : NULL);	\
-+	     member_address_is_nonnull(pos, member);				\
-+	     (pos) = tmp, tmp = member_address_is_nonnull(pos, member) ?	\
-+		llist_entry((pos)->member.next, typeof(*pos), member) : NULL)
-+
-+#define __llist_for_each_entry_mutable2(pos, node, member)			\
-+	__llist_for_each_entry_mutable_internal(pos, __UNIQUE_ID(next), node, member)
-+
-+#define __llist_for_each_entry_mutable3(pos, next, node, member)		\
-+	llist_for_each_entry_safe(pos, next, node, member)
-+
- /**
-- * llist_for_each_entry_safe - iterate over some deleted entries of lock-less list of given type
-- *			       safe against removal of list entry
-+ * llist_for_each_entry_mutable - iterate over some deleted entries of
-+ *				  lock-less list of given type safe against
-+ *				  removal of list entry
-  * @pos:	the type * to use as a loop cursor.
-- * @n:		another type * to use as temporary storage
-- * @node:	the first entry of deleted list entries.
-- * @member:	the name of the llist_node with the struct.
-+ * @...:	either (node, member) or (next, node, member)
-+ *
-+ * next:	another type * to use as optional temporary storage. The
-+ *		temporary cursor is internal unless explicitly supplied by the
-+ *		caller.
-+ * node:	the first entry of deleted list entries.
-+ * member:	the name of the llist_node with the struct.
-  *
-  * In general, some entries of the lock-less list can be traversed
-  * safely only after being removed from list, so start with an entry
-@@ -199,11 +250,9 @@ static inline bool llist_on_list(const struct llist_node *node)
-  * you want to traverse from the oldest to the newest, you must
-  * reverse the order by yourself before traversing.
+-	list_for_each_safe (item, tmp, list)
++	list_for_each_mutable(item, list)
+ 		kfree (list_entry (item, struct frag, list));
+ }
+ 
+@@ -1400,11 +1400,11 @@ static bool ldm_get_vblks(struct parsed_partitions *state, unsigned long base,
   */
--#define llist_for_each_entry_safe(pos, n, node, member)			       \
--	for (pos = llist_entry((node), typeof(*pos), member);		       \
--	     member_address_is_nonnull(pos, member) &&			       \
--	        (n = llist_entry(pos->member.next, typeof(*n), member), true); \
--	     pos = n)
-+#define llist_for_each_entry_mutable(pos, ...)				\
-+	CONCATENATE(__llist_for_each_entry_mutable,			\
-+		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
+ static void ldm_free_vblks (struct list_head *lh)
+ {
+-	struct list_head *item, *tmp;
++	struct list_head *item;
  
- /**
-  * llist_empty - tests whether a lock-less list is empty
+ 	BUG_ON (!lh);
+ 
+-	list_for_each_safe (item, tmp, lh)
++	list_for_each_mutable(item, lh)
+ 		kfree (list_entry (item, struct vblk, list));
+ }
+ 
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 79b290d9458a..5bf9ebce8452 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -2573,10 +2573,10 @@ static int check_opal_support(struct opal_dev *dev)
+ static void clean_opal_dev(struct opal_dev *dev)
+ {
+ 
+-	struct opal_suspend_data *suspend, *next;
++	struct opal_suspend_data *suspend;
+ 
+ 	mutex_lock(&dev->dev_lock);
+-	list_for_each_entry_safe(suspend, next, &dev->unlk_lst, node) {
++	list_for_each_entry_mutable(suspend, &dev->unlk_lst, node) {
+ 		list_del(&suspend->node);
+ 		kfree(suspend);
+ 	}
 -- 
 2.43.0
 
