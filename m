@@ -1,212 +1,135 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740BE331EC1
-	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 03:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67E23A8FE1
+	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 05:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782185237; cv=none; b=mQpYhPuVwrgkAlN392EYrnBU3HelwLSZDNPeJHoUnePpzi5p8o4R462u3IFaMBb2Mee8vhlUUQt5sR+xdPR1AgEPEFk0ZGIYmOTeRvEo0wY1862DlP5HI7g5mkbK1nvAgpVLUD8Ga8oAm8+Z0bcSsCMEt2GvZldCkB2yQyQ1m/k=
+	t=1782192580; cv=none; b=PG47VLBoUUPnveTGiurBpT2bhVFuLFLkj8VM+9u1dJBvtkygXmMKjTe5MwheXbs6kDILi40KSevbPxXrfR8HFAVaCtYNh/Uf4wQZ5a6mtCUsqwVxU//sIBlhnZ+1HpXYhcP56BKz76tT9U2+o3qY/egbpouYet2hYM5W6/qNWuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782185237; c=relaxed/simple;
-	bh=UaIg/W70jad9y3hm4PM7i9LbDnNElSxFM88ZY98KeYw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sKKupkxDLKng29tdPVX93zvFZICCi5LAQP6aBuSp5ONIDAjxfenhXCwG+Y0xbXsiOZN9SU4EeLEMYXrbkd7bYnAf7je13Iu4GHP0MGL5PcfS3V2kfqYLfTllpiX2+5OojGPvdLS6yEZMvtAerNT9baDM1proTL4OFaQbPok5fuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pn9YSzKa; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782192580; c=relaxed/simple;
+	bh=ptRJkoqN2LjFqXRwA7BSe4UszxQijsV08dR5610Fsjw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fDsEKl+FqRNga/Dy68+nAAt+0DJRatmRXmYdf0gJZvRXely8jkrXt2FwFBcrYeVdJa7j8iKA8fPer+/LBfZNjzAzvHb+ZyxElPPzyE++aY7VcjM5PDisYdrFf0qkrJ/py23DPmbQPKn3+x5/aovba6aZM7HTLM+H89FAoDlMFQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=E03EeB9i; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pn9YSzKa"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so39743665e9.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 20:27:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782185234; x=1782790034; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F0MxdLA8fA9f6zO0DHTOluuac+507x4UYeSWNuPxgvo=;
-        b=Pn9YSzKaxdT7V3kLSyXvSB+nvyhzGnUziQXditgvFZ3dXGLJ0xwnhLAmdKutAp+xUt
-         1NgoZ1KnUx6az6xxYtqpTsUsdHYrQkZCgrLHN5J5oVPrX2Wql6U9fpXqJkTer5mmz4v0
-         1xGnlf7LO1sQzW0RUYlCtlzpSnbHHgQ2/eXTjlpM7LUy9NVCsFDJz2x4ta7DBWMPkBKz
-         RkV4ZRd/pPHx6I97I/97f1hX+mWeP1oQYl1KWgmukQtp87tjEd6TmK6sLKHV9nicQoVY
-         t+D0KOzqQ9LBab/mcCTuhF7ttG6wLnAGNb+dswtbT4Jh8DA8hGPSh8Gq2ZNPJEtxvnV+
-         8A8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782185234; x=1782790034;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=F0MxdLA8fA9f6zO0DHTOluuac+507x4UYeSWNuPxgvo=;
-        b=C1qGFXOSsxW046yAVGts+xek0rwzlJqvRC9sFsHxsFQ2e3NAxfi9yPuiYudk4ypnMk
-         gp+AbpJpxpHXPrmiVl9veAs5Ly219rrZS2F5AdyrI9eJgXEIOBkQQlJ/HZoEXo/C4C1R
-         +DolJZdQ+7YqgO3r8ok4SaUM9iAhawJii4h+phM0o5fx3Due3jtVpcaDht/xYDoKdVBI
-         Iyc30lcdWLYZj68MZNbK5rfgya/7Oj4yf6Xpwdb9W2EvXaEghYpvCyD2Fs+vcnY8/0ad
-         3DGwVRy8/iLW3+UvEyeTZ7SbTxUK0LzgCpHShB1IDCxEUDjS+SchAzPpb1P8W+j5sVAi
-         vWlQ==
-X-Gm-Message-State: AOJu0Yyg5Ps/YtrV8DnexM20Q42Op03ufpmt+HoVZXHrsAL70duPM83k
-	+Ar2HLeJ4IVi6vYfOZrmIfaICVD0S7OlIu/8ER8YKLR+49ZZWklPzZ+B9OqM1g==
-X-Gm-Gg: AfdE7cmBENmqfV0ZbQgD2i86owIRcsefB1thPkYqf6WSoSGK2D63lASdLq/sOJy/iF8
-	apaUF47UjLpuugeLDTtAgpdmf76US/5Nl9KzggVXg6s+tVw3uyyrIeOJEHARdi903LOFaoEqx3S
-	W2+aPjnpUrm+KA3tR+640U8UcV4/e3AmxtJWdJN5IwWNEEUcJYiv1Ib6TH8117jtm1YdLbvhwbg
-	om0g+Ko3ezxPtVjZY+6U2hXxM9ljPlwC42oNm63GWYZHE+L9zl0DUgA5eXL1HU68KWNJEAO7WpW
-	eMlxslVDaNdnAbmFBtBb8lUKea1mEXtc18Huuq7P4qjRy6oO198RlFikedjWL9zO5s7+DTZf6yh
-	VurWgznAmD5S50ZeRBnR1htNhHnljCBHzrrNjmFKXpsJJ6ty7HLkVFxUOTKEUHoG3CVYuTxUPAR
-	uXlScWFwHQe6h3cbqR1BTpP+QZkuz4RIlCUFGh5WSKf83c9LyDjHLJV9AwASEVN0Kh81UbW9kvf
-	UcDFYY7/CEpPhQDgdNYjLia7ivVMjFOtg==
-X-Received: by 2002:a05:600c:e547:20b0:492:53e2:7712 with SMTP id 5b1f17b1804b1-4925b3ad732mr7444585e9.21.1782185233722;
-        Mon, 22 Jun 2026 20:27:13 -0700 (PDT)
-Received: from localhost.suse.org (apn-78-30-83-17.dynamic.gprs.plus.pl. [78.30.83.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fc47720sm577781005e9.0.2026.06.22.20.27.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2026 20:27:13 -0700 (PDT)
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com,
-	Sebastian Chlad <sebastian.chlad@suse.com>
-Subject: [PATCH blktests v2 2/2] src/miniublk: fall back to legacy opcodes on older kernels
-Date: Tue, 23 Jun 2026 05:27:07 +0200
-Message-ID: <20260623032707.14439-2-sebastian.chlad@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260623032707.14439-1-sebastian.chlad@suse.com>
-References: <20260623032707.14439-1-sebastian.chlad@suse.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E03EeB9i"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65N0mXwG408490;
+	Tue, 23 Jun 2026 05:29:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=DoC4me
+	LsGc6fzsTvezQ6ByaatUDOkhhCR0ePCnxx0Vk=; b=E03EeB9ivenZgE+apZvgYI
+	RaSJJi6Wboz1PJtg9CIhasNqB46kgdpdyL2/0VQ/qx7gn+gU/ic43IYnZ0/R05+z
+	YOGoi20arso5Wrb/DPikHPUGoiKeIeNxs1OTxyoLF79fWlCkvISobNbzIXlvlZ27
+	q+TeMvHMRYAygfElmGrkSoytg5ERrlBXFrdfgkQGYSwgH8eY5ONYlBfRc+175HAA
+	Cgr+q49l/hLMFq0LSasFXwO6REZxCSmR/UVCxqjJ47xLLj3feTfKSEduACvAJQNd
+	lue6ZL4lYF/KoBEPhukFZyccd780cgIvGaflq4ZWk1WK/O0nlFk2UfUw42dIguaw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ewjc3cstj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jun 2026 05:29:32 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65N5JfUA032284;
+	Tue, 23 Jun 2026 05:29:31 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ex6ph9m1a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jun 2026 05:29:31 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65N5TU4q19464714
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Jun 2026 05:29:30 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 136C158054;
+	Tue, 23 Jun 2026 05:29:30 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4A85558045;
+	Tue, 23 Jun 2026 05:29:28 +0000 (GMT)
+Received: from [9.43.75.139] (unknown [9.43.75.139])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 23 Jun 2026 05:29:27 +0000 (GMT)
+Message-ID: <712b698f-c67b-4d90-bf50-055fe7a09e96@linux.ibm.com>
+Date: Tue, 23 Jun 2026 10:59:26 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: serialize elevator changes for the same queue
+ using a writer lock
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>
+References: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=X4Ni7mTe c=1 sm=1 tr=0 ts=6a3a19bc cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=_xGJq85ICNxIfZ7E:21 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22
+ a=JF9118EUAAAA:8 a=VnNF1IyMAAAA:8 a=eR4HSyMmvT6AvjxFh_YA:9 a=QEXdDO2ut3YA:10
+ a=xVlTc564ipvMDusKsbsT:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIzMDA0MCBTYWx0ZWRfX15fJ6ljHcNeK
+ aoPrE0ZGT9LOOhEmkzuyQX1zJmgsz/brPALsGkYTQZTHbdkmjj/oEbTm1g3TNZsBZjvbGpvltT4
+ IF09PMOlZ594qP519oqU4NVJLrZDo8g=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIzMDA0MCBTYWx0ZWRfX2QpwrjunKPd0
+ ELf5R5Xjl/XdsbsdGESRSZWzu88gewWBKdJfPwzge05fiHLWdICAba0JH6yHwT1auJ0lduIRzlK
+ BXFCnePA0wFZMYoLwGS8iu5e2eyzmkG+6shbbzyvhWPV8p0UAWdaCMFRTZir4sy/8hbbdUq6HUH
+ hqtg5xhusNxAM9K+bPOdWvXDgc99wsqvfCE94CjfkmbwxVa5zytjfCT2rIv9SmAHuw/2Nf9/gwL
+ C0mCsziiKHCIrJABSmdv359nfjp1GAz3GtSly6WIsRnVKgSs1p1yGHmvdfIVzOSN5iuzX8wfuol
+ C15ShJFPQ/WpYe6MwxBYafKwpHsWpvS4h5NXpgvJTP+hcorFQDOhMkjDlRZkJ3beP5VfPiY5Nmy
+ +poqYd4AH9LYUWLSy3A2ZRefMc9/Nxx6VByLYSeV0qyJ9v0JEjJ9CSzJ/XyqWM2f6UzpJAd8EKy
+ kPD0EFn9iZYDVv1e7CA==
+X-Proofpoint-ORIG-GUID: EgscFcdd6QAkQvKsGNJkxcU7pGmnwR3c
+X-Proofpoint-GUID: tRkeqGJnmQi5CIFbG_0_yPNZT_iRjHIt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-23_01,2026-06-22_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0 suspectscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 clxscore=1015 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606230040
 
-Try ioctl-encoded ADD_DEV and GET_DEV_INFO first; if either fails,
-retry with the legacy raw opcode. After a successful bootstrap
-command, derive use_ioctl from UBLK_F_CMD_IOCTL_ENCODE in dev_info.flags
-so all subsequent control and IO commands use the mode reported by the
-kernel.
+On 6/23/26 7:02 AM, Shin'ichiro Kawasaki wrote:
+> When elevator_change() is called concurrently for the same queue, the
+> elevator_change_done() function runs concurrently as well. This function
+> adds or deletes kobjects for the debugfs entry of the queue. Then the
+> concurrent calls cause memory corruption of the kobjects and result in a
+> process hang. The core part of the elevator switch is protected by queue
+> freeze and q->elevator_lock. However, since the commit 559dc11143eb
+> ("block: move elv_register[unregister]_queue out of elevator_lock"), the
+> elevator_change_done() is not serialized. Hence the memory corruption
+> and the hang.
+> 
+> The failures are observed when udev-worker writes to a sysfs
+> queue/scheduler attribute file while the blktests test case block/005
+> writes to the same attribute file. The failure also can be recreated by
+> running two processes that write to the same queue/scheduler file
+> concurrently. The failure is observed since another commit 370ac285f23a
+> ("block: avoid cpu_hotplug_lock depedency on freeze_lock"). This commit
+> changed the behavior of queue freeze and it unveiled the failure.
+> 
+> Fix the failure by changing elv_iosched_store() to acquire
+> update_nr_hwq_lock as the writer lock instead of the reader lock. This
+> serializes the whole elevator switch steps, including the
+> elevator_change_done() call.
+> 
+> Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
+> Signed-off-by: Shin'ichiro Kawasaki<shinichiro.kawasaki@wdc.com>
 
-Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
----
- src/miniublk.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 42 insertions(+), 5 deletions(-)
-
-diff --git a/src/miniublk.c b/src/miniublk.c
-index 628207a..b0c308b 100644
---- a/src/miniublk.c
-+++ b/src/miniublk.c
-@@ -112,6 +112,7 @@ struct ublk_dev {
- 	int fds[2];	/* fds[0] points to /dev/ublkcN */
- 	int nr_fds;
- 	int ctrl_fd;
-+	bool use_ioctl;
- 	struct io_uring ring;
- };
- 
-@@ -235,7 +236,7 @@ static inline int ublk_setup_ring(struct io_uring *r, int depth,
- 
- static inline void ublk_ctrl_init_cmd(struct ublk_dev *dev,
- 		struct io_uring_sqe *sqe,
--		struct ublk_ctrl_cmd_data *data)
-+		struct ublk_ctrl_cmd_data *data, __u32 cmd_op)
- {
- 	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
- 	struct ublksrv_ctrl_cmd *cmd = (struct ublksrv_ctrl_cmd *)ublk_get_sqe_cmd(sqe);
-@@ -255,25 +256,34 @@ static inline void ublk_ctrl_init_cmd(struct ublk_dev *dev,
- 	cmd->dev_id = info->dev_id;
- 	cmd->queue_id = -1;
- 
--	ublk_set_sqe_cmd_op(sqe, data->cmd_op);
-+	ublk_set_sqe_cmd_op(sqe, cmd_op);
- 
- 	io_uring_sqe_set_data(sqe, cmd);
- }
- 
-+static void ublk_update_ioctl_encoding(struct ublk_dev *dev)
-+{
-+	dev->use_ioctl = !!(dev->dev_info.flags & UBLK_F_CMD_IOCTL_ENCODE);
-+}
-+
- static int __ublk_ctrl_cmd(struct ublk_dev *dev,
- 		struct ublk_ctrl_cmd_data *data)
- {
- 	struct io_uring_sqe *sqe;
- 	struct io_uring_cqe *cqe;
-+	__u32 cmd_op = data->cmd_op;
- 	int ret = -EINVAL;
- 
-+	if (!dev->use_ioctl)
-+		cmd_op = _IOC_NR(cmd_op);
-+
- 	sqe = io_uring_get_sqe(&dev->ring);
- 	if (!sqe) {
- 		ublk_err("%s: can't get sqe ret %d\n", __func__, ret);
- 		return ret;
- 	}
- 
--	ublk_ctrl_init_cmd(dev, sqe, data);
-+	ublk_ctrl_init_cmd(dev, sqe, data, cmd_op);
- 
- 	ret = io_uring_submit(&dev->ring);
- 	if (ret < 0) {
-@@ -321,8 +331,19 @@ int ublk_ctrl_add_dev(struct ublk_dev *dev)
- 		.addr = (__u64)&dev->dev_info,
- 		.len = sizeof(struct ublksrv_ctrl_dev_info),
- 	};
-+	int ret;
- 
--	return __ublk_ctrl_cmd(dev, &data);
-+	ret = __ublk_ctrl_cmd(dev, &data);
-+	if (ret < 0) {
-+		/* retry with legacy opcode on older kernels */
-+		dev->use_ioctl = false;
-+		ret = __ublk_ctrl_cmd(dev, &data);
-+	}
-+
-+	if (ret >= 0)
-+		ublk_update_ioctl_encoding(dev);
-+
-+	return ret;
- }
- 
- int ublk_ctrl_del_dev(struct ublk_dev *dev)
-@@ -343,8 +364,19 @@ int ublk_ctrl_get_info(struct ublk_dev *dev)
- 		.addr = (__u64)&dev->dev_info,
- 		.len = sizeof(struct ublksrv_ctrl_dev_info),
- 	};
-+	int ret;
- 
--	return __ublk_ctrl_cmd(dev, &data);
-+	ret = __ublk_ctrl_cmd(dev, &data);
-+	if (ret < 0 && dev->use_ioctl) {
-+		/* retry with legacy opcode on older kernels */
-+		dev->use_ioctl = false;
-+		ret = __ublk_ctrl_cmd(dev, &data);
-+	}
-+
-+	if (ret >= 0)
-+		ublk_update_ioctl_encoding(dev);
-+
-+	return ret;
- }
- 
- int ublk_ctrl_set_params(struct ublk_dev *dev,
-@@ -453,6 +485,8 @@ static struct ublk_dev *ublk_ctrl_init()
- 	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
- 	int ret;
- 
-+	dev->use_ioctl = true; /* use ioctl opcodes by default */
-+
- 	dev->ctrl_fd = open(CTRL_DEV, O_RDWR);
- 	if (dev->ctrl_fd < 0) {
- 		ublk_err("control dev %s can't be opened: %m %d\n", CTRL_DEV, errno);
-@@ -628,6 +662,9 @@ static int ublk_queue_io_cmd(struct ublk_queue *q,
- 	else if (io->flags & UBLKSRV_NEED_FETCH_RQ)
- 		cmd_op = UBLK_U_IO_FETCH_REQ;
- 
-+	if (!q->dev->use_ioctl)
-+		cmd_op = _IOC_NR(cmd_op);
-+
- 	sqe = io_uring_get_sqe(&q->ring);
- 	if (!sqe) {
- 		ublk_err("%s: run out of sqe %d, tag %d\n",
--- 
-2.51.0
+Looks good to me.
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 
