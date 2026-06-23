@@ -1,211 +1,230 @@
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA912D2394;
-	Tue, 23 Jun 2026 05:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BEE331EAE;
+	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782194022; cv=none; b=lpEiA56y3bADJ6IJ7Cvl/4I3SXte+BCON6T+NTI8nH+Tvjn4aobxLesrZrpEjhQi0W1P5IuCdMmfrtMAsVlcMYT12FVa8MFJ7ItWND5RaUMdJmKqpgRnC/6pxeiCdyN9XzKfXcWpitatL43od9hRWuOGmP5flPs3X3Dtd94abQs=
+	t=1782196210; cv=none; b=GbNBSCLwkeyLaDyxGioKIRlVn5+HSyZloXJuk8pCt0hL7Lopi9LVg60SHfY/EuMOpl+eRVs+NTR0TmSlc1gL5Fu89aqqmzbmH83umv0diuglMzH6cqTGqzAsHVD26pKYa2+E/1a2cot0SFGB1NRDzZqDlO+m2vAuq2/b8cj4Kvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782194022; c=relaxed/simple;
-	bh=DXVB+AIQxJRT997wUDnNmJ1ALbn4NQv3o54NwGjMWUw=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=CGo1H+veWE0ZR56vUIXGta8rqzRAArsYJLNqV1rX1GWDyVV2W3QlZq8AdNobwC8ByZv9RpuSOaRs7CNGmTfgxJOxkMrltRu3kmDng/6KDNyeQnTSxlXqJ9K323knaoNfiP0vLw20uec8JngUTTGjJIR4J6kYPcmMHRz9dHq8HJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=pxw1r28X; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
+	s=arc-20240116; t=1782196210; c=relaxed/simple;
+	bh=w0p0qwUGz0fHFmrveEij0M0AmtBZeBDyvPHjwkwqLPg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EMJ5XjqBIm5CfBMBYy97K1XFuvKrmUZ625xsmbJ7IAce/WAKN8cn64NbY7K9MoqpH0eVMXU7W7NR6SBWWvFW5/GaGs6D0k4dDUoWI46DAFsTByNrEVem5MCCvF3nWvBdf6dU+y5C8suLdp2M0U1rXktHdsmRyyFc5MC8eNafFFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mWP0EmSU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="pxw1r28X"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
-	s=iohv2404; t=1782193942;
-	bh=3Jb4hbovMhXjoPYlBFxuuBMSsi9viUd+26z34ZL5FCU=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject;
-	b=pxw1r28XOdqjpbztYBUXi8N0+1BeEyOwhMvBV7vWDLTl3tKAjqkbxF+QrP0+Wbam2
-	 9/SjDp9zLNGqMo0XnQ0MuXbSXIIhSpyrmzdXJIy0my8EQFjUIX3ivripTirXAp/Bh7
-	 cFftaSdKDbPAer5PiAjKVwTQyd26pzhPhfDhM+nU=
-X-QQ-mid: esmtpgz14t1782193936t595f704e
-X-QQ-Originating-IP: 0bFXOGvfhcAf2Y9nMW7jvmbowcCu3T3bou4PCndmFyc=
-Received: from [127.0.0.1] ( [36.152.24.150])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 23 Jun 2026 13:51:58 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 478658043353222059
-Message-ID: <B518B1A813407AC5+004c9da2-4504-44ce-ac1b-7b46bf0c30db@smail.nju.edu.cn>
-Date: Tue, 23 Jun 2026 13:51:40 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mWP0EmSU"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E795C2BCC7;
+	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
+	t=1782196209; bh=w0p0qwUGz0fHFmrveEij0M0AmtBZeBDyvPHjwkwqLPg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=mWP0EmSUaPXmF68nYz5zqzFDMvy1IfCrrxqwgrVUnfEK2uN5SPlPIlgJR4CWIDNRT
+	 Nn7Sl02tbWY9O1n8wBHeobiVwDDLKaUMTcqTLIAkOxwRLaZaj2w5zqoQha/3/n/Aaf
+	 1FQe3PSyuXHqvEnl9E1Y+XVIXrZkXlCUBz4wRw0U=
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B721CDB471;
+	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
+From: Alvin Sun <alvin.sun@linux.dev>
+Subject: [PATCH v4 0/9] Fix missing fops.owner in Rust DRM/misc
+ abstractions
+Date: Tue, 23 Jun 2026 14:29:43 +0800
+Message-Id: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: josef@toxicpanda.com, linux-block@vger.kernel.org
-From: Peiyang He <peiyang_he@smail.nju.edu.cn>
-Subject: [BUG] nbd: backend string memory leaked when device_create_file()
- fails in nbd_genl_connect()
-Cc: axboe@kernel.dk, nbd@other.debian.org, linux-kernel@vger.kernel.org,
- syzkaller@googlegroups.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:smail.nju.edu.cn:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: Nw9C1WBu09hPPr1LIL0enW0m0WeO7SUQw1ebHSzHs1PHzZWHvWfGJ85/
-	3I9Majy+apGqbNDDyk8/Hiit4gJVTJKo6kuoUF+ia1tv2Z3L7jMGYtuuZZs8Zxx56bk+gCF
-	70k9edLxGAGEaRpEfHYq+7mCEOqE+XkK3esPWAiQLI1IzjJwB1huHtG88sTQCbwFRFk742p
-	7s2ReNDCOch24ztXcJ3JtnLkY/XplSeF2/bTTWVvL3bRUAe4jrIJrgz/g1eyBYz/r1TgXiE
-	Qvek0bhTkC/qy1QjJpXrSBQDW0FDF+Ye8LYl+DRMun90oZQWOWt7n7Hwj0JRBzDM+wf4ctZ
-	4Eravzr+dhOQ+c7k0UTzShG3YN0sVXtYmLAwp7shHNwcSIjf8UQakm2ENuFTTIUsn4DLQbZ
-	M+WsATKTdVWuWLgubtFUfdva3Pl4aRlu3M9xnZLYqIUF03YfHIZKA5BpPLNpQM1TSYIvB24
-	yRlFDM6rX08EFsamPg5SOwQOTX2gwYOXY7X3LxYR1rDWtsT9EfhZ2P5LAUWDDhe74ErI3+/
-	rpwNyWz3f9Ceki5L+D1I6yGgKSk93rcm1OG7HCIDZPQl5bF0yK1YJUUBh6CfhGbTJbkKPAp
-	JJJdrz8ahM2pQQycHc5lG3auRo/98YoDWr6oNOJzKsE3gNy96dxAqJrx41w645WCwEb0Mug
-	cOWLxkQZB+e3UP4r9/LV1HFHL3GRAGeoduLsYuoALUEz6EcGwrmYjOgZq4VfEOBeXhF0Rnh
-	ysk6DTraJYOlS4fjWuIWbs1Dk7NhBusTTOIH1wAEP1zMyEKzOLC049XD7p0X9unUzKsWBlr
-	adtSI92OB+SwJBCU4kYrsYel04AJHdgjNJNTmIhIlGhWRKo9BPwSnKx01H+ZSdbIznm8Wzl
-	RfWAFAeJFIfXD8AWZfDq81bLt1s+o2r65s+3vj4uYIfnq8VTs8fSOjDVf4jTn81eWLfOucz
-	aaGYyX1B9iNYZU5LfXTRwuLpHJ0/0wq1GCvl9FpN89mMGOWb96Td3UT4N2pO0KsR+EW6WBq
-	rOCHc1PqXfpUQZpZILFjQ+uc6CBHM=
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
+X-B4-Tracking: v=1; b=H4sIANcnOmoC/3XPS27DIBQF0K1YjPsiPrYJHnUfVQd8nhuk2qRg0
+ 1SR9x7iSIklq8OLOPfClSSMHhPpqiuJmH3yYSyhfquIPenxC8G7kgmnvKUNU9D7C/ThnCD8jhg
+ BhZbSGC5ta0lB54jlxlr48fnIEX/m0js9DonRCcGGYfBTV2V5YBCtJNu9rnquDT5ZhxnmYvoQB
+ z2B0kbiURhmGeuyIPeVk09TiH/rLzJbZ/57cGZAgTt06iio06x+//bjfDmUlbUq8w3nbMd54b1
+ TikplG013XLx4y/mOi8Jr5erGGiGp4Fu+LMsNhEFMYZABAAA=
+X-Change-ID: 20260519-fix-fops-owner-e3a77bb27c6c
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, 
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
+ Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Leon Romanovsky <leon@kernel.org>, Igor Korotin <igor.korotin@linux.dev>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, 
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+ Carlos Llamas <cmllamas@google.com>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org, 
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782196206; l=8471;
+ i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
+ bh=w0p0qwUGz0fHFmrveEij0M0AmtBZeBDyvPHjwkwqLPg=;
+ b=trA/fDrvvdywl2RC+Assn7ckV8U03zAisGwmyv2pf3YeTnAYTeqXO0S2ZUHtrKNvCHMRvjYfm
+ +kpMXee1NQlCV1V23+DXmG///fIUvmGbYKAnLkRcrFvPcAdUVhXI5wO
+X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
+ pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
+X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
+ auth_id=684
 
-Hello Linux kernel developers and maintainers,
+During tyr debugfs development, a kernel NULL pointer dereference was
+encountered after `rmmod tyr` while gnome-shell still held /dev/card1 open:
 
-I found a memory leak in drivers/block/nbd.c when fuzzing with Syzkaller.
+```
+  [158827.868132] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+  [158827.868918] Mem abort info:
+  [158827.869177]   ESR = 0x0000000086000004
+  [158827.869519]   EC = 0x21: IABT (current EL), IL = 32 bits
+  [158827.870000]   SET = 0, FnV = 0
+  [158827.870281]   EA = 0, S1PTW = 0
+  [158827.870571]   FSC = 0x04: level 0 translation fault
+  [158827.871043] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000108dec000
+  [158827.871623] [0000000000000000] pgd=0000000000000000, p4d=0000000000000000
+  [158827.872242] Internal error: Oops: 0000000086000004 [#1]  SMP
+  [158827.872246] Modules linked in: tyr sunrpc snd_soc_simple_card rk805_pwrkey snd_soc_simple_card_utils rtw88_8822bu display_connector rtw88_usb rtw88_8822b snd_soc_rockchip_i2s_tdm snd_soc_hdmi_codec
+  rtw88_core]
+  [158827.872337] CPU: 4 UID: 1000 PID: 11276 Comm: gnome-s:disk$0 Tainted: G                 N  7.1.0-rc1+ #331 PREEMPT
+  [158827.880534] Tainted: [N]=TEST
+  [158827.880535] Hardware name: FriendlyElec NanoPi R6C/NanoPi R6C, BIOS v1.1 04/09/2025
+  [158827.880538] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  [158827.880542] pc : 0x0
+  [158827.880547] lr : _RNvNtCs257m05FHVbX_3tyr2vm8pt_unmap+0x8c/0x12c [tyr]
+  [158827.880578] sp : ffff800083c236b0
+  [158827.880579] x29: ffff800083c236d0 x28: ffff00013f8a0000 x27: 0000000000000000
+  [158827.880585] x26: 000000000000007c x25: ffff000108e6ed80 x24: 0000000000401000
+  [158827.880590] x23: 0000000000000000 x22: 0000000040000000 x21: 0000000000001000
+  [158827.880595] x20: ffff00010f778138 x19: 0000000000400000 x18: 00000000ffffffff
+  [158827.880600] x17: 000000040044ffff x16: 045000f2b5503510 x15: 0720072007200720
+  [158827.880606] x14: 0720072007200720 x13: 0000000000401000 x12: 0000000000400000
+  [158827.880611] x11: ffff800083c239d0 x10: ffff000141e4fd88 x9 : 0000000000000000
+  [158827.880615] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000400000
+  [158827.880620] x5 : ffff00013f8a0000 x4 : 0000000000000000 x3 : 0000000000000001
+  [158827.880625] x2 : 0000000000001000 x1 : 0000000000400000 x0 : ffff00010f778138
+  [158827.880630] Call trace:
+  [158827.880632]  0x0 (P)
+  [158827.880635]  _RNvXs6_NtCs257m05FHVbX_3tyr2vmNtB5_9GpuVmDataNtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm11DriverGpuVm13sm_step_unmap+0x3c/0x120 [tyr]
+  [158827.891166]  _RNvMs4_NtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm6sm_opsINtB7_5GpuVmNtNtCs257m05FHVbX_3tyr2vm9GpuVmDataE13sm_step_unmapB13_+0x18/0x34 [tyr]
+  [158827.891187]  op_unmap_cb+0x78/0xb0
+  [158827.891196]  __drm_gpuvm_sm_unmap+0x18c/0x1b4
+  [158827.891204]  drm_gpuvm_sm_unmap+0x38/0x4c
+  [158827.891209]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm7exec_op+0x1cc/0x254 [tyr]
+  [158827.894085]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm11unmap_range+0x124/0x188 [tyr]
+  [158827.894105]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeNtNtCs257m05FHVbX_3tyr3gem8KernelBoEBK_+0x44/0xd8 [tyr]
+  [158827.894125]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel5alloc4kvec3VecNtNtCs257m05FHVbX_3tyr2fw7SectionNtNtBL_9allocator7KmallocEEB1r_+0x3c/0x100 [tyr]
+  [158827.894147]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel4sync3arc3ArcNtNtCs257m05FHVbX_3tyr2fw8FirmwareEEB1p_+0x94/0x190 [tyr]
+  [158827.894167]  _RNvMs4_NtNtCsgmSOfgXi5CZ_6kernel3drm6deviceINtB5_6DeviceNtNtCs257m05FHVbX_3tyr6driver12TyrDrmDriverE7releaseBW_+0x30/0x98 [tyr]
+  [158827.899550]  drm_dev_put.part.0+0x88/0xc0
+  [158827.899557]  drm_minor_release+0x18/0x28
+  [158827.899562]  drm_release+0x144/0x170
+  [158827.899567]  __fput+0xe4/0x30c
+  [158827.899573]  ____fput+0x14/0x20
+  [158827.899579]  task_work_run+0x7c/0xe8
+  [158827.899586]  do_exit+0x2a8/0xac4
+  [158827.899590]  do_group_exit+0x34/0x90
+  [158827.899594]  get_signal+0xaac/0xabc
+  [158827.899599]  arch_do_signal_or_restart+0x90/0x3e8
+  [158827.899606]  exit_to_user_mode_loop+0x140/0x1d0
+  [158827.899613]  el0_svc+0x2f4/0x2f8
+  [158827.899620]  el0t_64_sync_handler+0xa0/0xe4
+  [158827.899627]  el0t_64_sync+0x198/0x19c
+  [158827.899632] ---[ end trace 0000000000000000 ]---
+```
 
-Kernel version: commit 8cd9520d35a6c38db6567e97dd93b1f11f185dc6 (tag v7.1).
-And the leak is also possible in the current mainline.
+The root cause: `fops.owner` was `NULL` in Rust DRM drivers, so the kernel
+never blocked module unloading while file descriptors were open. This leads to
+use-after-free when drm_release (or other fops) is called on freed module code.
 
-Relevant kernel config:
+The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, threads it
+through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates configfs
+and rnull to use `this_module::<LocalModule>()`.
 
-  CONFIG_BLK_DEV_NBD=y
-  CONFIG_DEBUG_KMEMLEAK=y
-  CONFIG_FAULT_INJECTION=y
-  CONFIG_FAILSLAB=y
-  CONFIG_FAULT_INJECTION_DEBUG_FS=y
+Assisted-by: opencode:glm-5.2
+Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+---
+Changes in v4:
+- Move module-related types into a new `rust/kernel/module.rs`.
+- Migrate binder from the `module!`-generated `THIS_MODULE` static to
+  `this_module::<LocalModule>()`.
+- Reorganise the series so that every commit builds independently, and
+  drop the legacy `THIS_MODULE` static once all users are migrated.
+- Link to v3: https://lore.kernel.org/r/20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev
 
-=============================
-The original Syzkaller report
-=============================
+Changes in v3:
+- Renamed vtable associated type `ThisModule` to `OwnerModule`
+- Added `this_module()` helper for ergonomic `THIS_MODULE` access
+- Refined vtable macro implementation: one-liner detection and single `defined_items` set
+- Reordered commits to place doctest fallback before vtable auto-insert
+- Link to v2: https://lore.kernel.org/r/20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev
 
-BUG: memory leak
-unreferenced object 0xffff888011d17420 (size 16):
-  comm "syz.3.80", pid 9959, jiffies 4294977483
-  hex dump (first 16 bytes):
-    2f 64 65 76 2f 6e 62 64 23 00 00 00 00 00 00 00  /dev/nbd#.......
-  backtrace (crc 889be63d):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4575 [inline]
-    slab_alloc_node mm/slub.c:4899 [inline]
-    __do_kmalloc_node mm/slub.c:5295 [inline]
-    __kmalloc_noprof+0x552/0x850 mm/slub.c:5308
-    kmalloc_noprof include/linux/slab.h:954 [inline]
-    nla_strdup+0xc6/0x150 lib/nlattr.c:816
-    nbd_genl_connect+0x1231/0x1c10 drivers/block/nbd.c:2224
-    genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1114
-    genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
-    genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1209
-    netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2555
-    genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
-    netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-    netlink_unicast+0x584/0x850 net/netlink/af_netlink.c:1344
-    netlink_sendmsg+0x8ba/0xd60 net/netlink/af_netlink.c:1899
-    sock_sendmsg_nosec net/socket.c:787 [inline]
-    __sock_sendmsg net/socket.c:802 [inline]
-    ____sys_sendmsg+0x9eb/0xb80 net/socket.c:2699
-    ___sys_sendmsg+0x134/0x1d0 net/socket.c:2753
-    __sys_sendmsg+0x16d/0x220 net/socket.c:2785
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0x116/0x800 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Changes in v2:
+- Merged old `static THIS_MODULE` and v1's `MODULE_PTR` into a single
+  `ModuleMetadata::THIS_MODULE` const
+- `#[vtable]` macro now auto-inserts `type ThisModule`, removing all per-driver
+  manual patches from v1
+- Added configfs & rnull usage site updates and doctest `LocalModule` fallback
+- Link to v1: https://lore.kernel.org/r/20260519-fix-fops-owner-v1-0-2ded9830da14@linux.dev
 
+---
+Alvin Sun (9):
+      rust: module: move module types into `module.rs`
+      rust: module: add `THIS_MODULE` const to `ModuleMetadata` trait
+      rust: doctest: add LocalModule fallback for #[vtable] ThisModule
+      rust: macros: auto-insert OwnerModule in #[vtable]
+      rust: drm: set fops.owner from driver module pointer
+      rust: miscdevice: set fops.owner from driver module pointer
+      rust: configfs: use `LocalModule` for `THIS_MODULE`
+      rust: binder: use `LocalModule` for `THIS_MODULE`
+      rust: macros: remove `THIS_MODULE` static from `module!`
 
-<<<<<<<<<<<<<<< tail report >>>>>>>>>>>>>>>
+ drivers/android/binder/rust_binder_main.rs |  3 +-
+ drivers/block/rnull/configfs.rs            |  6 +--
+ rust/kernel/auxiliary.rs                   |  2 +-
+ rust/kernel/configfs.rs                    |  8 +--
+ rust/kernel/drm/device.rs                  |  3 +-
+ rust/kernel/drm/gem/mod.rs                 |  4 +-
+ rust/kernel/i2c.rs                         |  2 +-
+ rust/kernel/lib.rs                         | 75 +++-------------------------
+ rust/kernel/miscdevice.rs                  |  4 +-
+ rust/kernel/module.rs                      | 79 ++++++++++++++++++++++++++++++
+ rust/kernel/net/phy.rs                     |  6 ++-
+ rust/kernel/pci.rs                         |  2 +-
+ rust/kernel/platform.rs                    |  2 +-
+ rust/kernel/usb.rs                         |  2 +-
+ rust/macros/lib.rs                         |  6 +++
+ rust/macros/module.rs                      | 34 ++++++-------
+ rust/macros/vtable.rs                      | 41 ++++++++++++++--
+ scripts/rustdoc_test_gen.rs                | 16 ++++++
+ 18 files changed, 187 insertions(+), 108 deletions(-)
+---
+base-commit: b7e5ac83cb16f7ffd11dc23736f84276602100ed
+change-id: 20260519-fix-fops-owner-e3a77bb27c6c
+prerequisite-change-id: 20260519-miscdev-use-format-9ab7e83b1c11:v3
+prerequisite-patch-id: 405b334ff0d48ad350014f05a2321bdbaa025400
+prerequisite-patch-id: 604b631c81d5423f4ebb2e12ba2d22e9ce371bfc
+prerequisite-patch-id: cb550d94cefe01920e0d3ced2b2bcbecd76f3907
+prerequisite-patch-id: 3bc830839742591460cb86d9472c04f4686dc600
+prerequisite-patch-id: 571058244bc8c7088638d2e3225713011246c7e9
+prerequisite-patch-id: 347c5a3c6dbef9832bfce8419fc23e6e08ba477f
+prerequisite-patch-id: 3e202d988b56b88446f7535e90d3f00cf5f15701
 
-
-==========
-Root cause
-==========
-
-nbd_genl_connect() allocates the backend string unconditionally BEFORE
-creating the sysfs file:
-
-    /* drivers/block/nbd.c (v7.1, around line 2223) */
-    if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
-        nbd->backend = nla_strdup(...);       /* (1) heap alloc */
-        if (!nbd->backend) {
-            ret = -ENOMEM;
-            goto out;                         /* (2) backend is NULL here, no leak */
-        }
-    }
-
-    ret = device_create_file(disk_to_dev(nbd->disk), &backend_attr);
-    if (ret) {
-        dev_err(...);
-        goto out;                             /* (3) LEAK: flag not yet set */
-    }
-
-    set_bit(NBD_RT_HAS_BACKEND_FILE, &config->runtime_flags); /* (4) skipped */
-
-    ret = nbd_start_device(nbd);
-out:
-    ...
-    mutex_unlock(&nbd->config_lock);
-    nbd_config_put(nbd);
-    ...
-
-The cleanup path in nbd_config_put() frees nbd->backend ONLY when
-NBD_RT_HAS_BACKEND_FILE is set:
-
-    /* drivers/block/nbd.c (v7.1, around line 1445) */
-    if (test_and_clear_bit(NBD_RT_HAS_BACKEND_FILE,
-                           &config->runtime_flags)) {
-        device_remove_file(disk_to_dev(nbd->disk), &backend_attr);
-        kfree(nbd->backend);      /* never reached here if flag is not set */
-        nbd->backend = NULL;
-    }
-
-When device_create_file() at step (3) fails (e.g. due to OOM or fault injection),
-execution jumps to out before step (4) sets the flag.
-nbd_config_put() is then called with config_refs dropping to zero,
-but since NBD_RT_HAS_BACKEND_FILE is not set, it skips the kfree().
-The string allocated at step (1) is therefore leaked.
-
-The size of a single leak equals the length of the NBD_ATTR_BACKEND_IDENTIFIER
-netlink string rounded up to the next slab boundary.
-The nla_policy entry for this attribute has no .len constraint, so in theory a single connect call
-could leak up to ~65507 bytes (NLA_STRING maximum).
-During Syzkaller fuzzing, the fuzzer produced a 16-byte string.
+Best regards,
+-- 
+Alvin Sun <alvin.sun@linux.dev>
 
 
-============
-Proposed Fix
-============
-
-Decouple device_remove_file() (which correctly requires the flag to avoid
-removing a file that was never created) from kfree(nbd->backend) (which only
-needs the pointer to be non-NULL):
-
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1445,9 +1445,9 @@ static void nbd_config_put(struct nbd_device *nbd)
- 		if (test_and_clear_bit(NBD_RT_HAS_BACKEND_FILE,
- 				       &config->runtime_flags)) {
- 			device_remove_file(disk_to_dev(nbd->disk), &backend_attr);
--			kfree(nbd->backend);
--			nbd->backend = NULL;
- 		}
-+		kfree(nbd->backend);
-+		nbd->backend = NULL;
-
-
-The flag still guards device_remove_file() so we never try to remove a sysfs
-file that was never created.  nbd->backend is always freed if non-NULL,
-regardless of whether the file creation succeeded.
-
-Note: the line number in the above diff is valid in the v7.1 kernel.
-I will adjust it according to the mainline kernel if this patch is considered resonable.
-
-
-Best,
-Peiyang
