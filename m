@@ -1,121 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from sphereful.davidgow.net (sphereful.davidgow.net [203.29.242.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91DA222580;
-	Tue, 23 Jun 2026 09:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAF084039;
+	Tue, 23 Jun 2026 09:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.242.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782205412; cv=none; b=GAFbg+1nzUbH0tgxe7x0AW3yesJLYNRHHj6RAGZFODZM3KVqBk0S3aQkddwm5eEMS9uJ37En/9Q89UII7MYeqe7970fmxl3Yx30+C6+zJB0IiMY+DC91vowllbdXfaBv5DQ10e43GOLpBgmOfVSm0PRNXRrT7hZNfFg6zckLSgM=
+	t=1782206361; cv=none; b=lpoVYJkQPd1ukszp3qDFegHdiWBwQ+WsqwtLLOVmaJmK/Bk9Cul0C5NXM8iQfwK2T/nM6IoeOL9bUyEvWzlEQTt8Wue7FJ8ejcm8gEYdnn4bU3JJ/hGW8ni10ZIPycvKRleip0S3LU/6J1WOt8nyuFB/FZFSWVL1uArdlnfFcz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782205412; c=relaxed/simple;
-	bh=CD26xizmKcdIxeMeep19nxu9JTUKjv9EiCnzxyrJkQk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UiGdl2wTF0S9PGksQaIYeHgob69TBKl0UnwNS3HtlcTiNtcGoPuDHmHIp/ZT1CxgE2ofe7aZ0/X4yhnQ+SCmaOw13XfHUGDnzN00PT1W8SXrH/Xj6oPDV4apni5KqJBX4ZSrPaiT99h2cRYK/LFM806zom59dfu+tStgQfxHHCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaBIsQ1P; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaBIsQ1P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D8C31F000E9;
-	Tue, 23 Jun 2026 09:03:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782205411;
-	bh=nQNT8d4pR2+cAXpyy9kHB2S/PqSTmNI1erpru5gaJSc=;
-	h=From:To:Cc:Subject:Date;
-	b=WaBIsQ1PoC0kq7aLXCe2Dt/WcHXinB6Z2x9UBxYcfdWmnPfFUJ5iPduhyT7NCGnF4
-	 ofID0HE8KqW+gWMT3jfxf5LAFSlLKttHrs5zWTgPL7MOJ954BZtmKiehXyWajuabOE
-	 dyZTKl7Frj9kPF1LC66pmNndqv94qDiTl1zC1YDxmXNBVIrqwFKxws/DrGujH5wULX
-	 BGqo26Dr1pUTT2HK0eeLbwnVkfAYdO1ckwANq9lBXamq24JDY8jwYPhwO1Tr6Ll8Bq
-	 onz3dQPrNwun0mM5udoN3a0NkWUx2jjxFgMz3L5ltVF82sT3t1fAjL0AI0OjXvGBfF
-	 RK7gdzkXFUQSw==
-From: Yu Kuai <yukuai@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
-	Chen Cheng <chencheng@fnnas.com>
-Subject: [GIT PULL] md-7.2-20260623
-Date: Tue, 23 Jun 2026 17:03:27 +0800
-Message-ID: <20260623090327.1097428-1-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1782206361; c=relaxed/simple;
+	bh=fIsU9HO78Ig0J4qHlFK6IG674XoTwqOhcn5KaIphiaU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cT7d17eH2HIdMvWhqtDlZxXYR94BByoZCK8+4uhv8Bh3MnRJV/6nOEJSiUdWX6vOrYK5FPhZLVRQRwZeE+JTOX1bi4+v80O90VnO3mfUfuod+g24OlIMdNTB8iraEX2VYVhjNTdIdot/lfq6HqRAgSBUCqvjL5gE3QasQfqvt90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net; spf=pass smtp.mailfrom=davidgow.net; arc=none smtp.client-ip=203.29.242.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidgow.net
+Received: by sphereful.davidgow.net (Postfix, from userid 119)
+	id E04EC1D7585; Tue, 23 Jun 2026 17:19:10 +0800 (AWST)
+X-Spam-Level: 
+Received: from [IPV6:2001:8003:8810:ea00::9c4] (unknown [IPv6:2001:8003:8810:ea00::9c4])
+	by sphereful.davidgow.net (Postfix) with ESMTPSA id CCA7E1D7574;
+	Tue, 23 Jun 2026 17:19:07 +0800 (AWST)
+Message-ID: <5748f9ca-e684-42a0-9297-e587b178a47c@davidgow.net>
+Date: Tue, 23 Jun 2026 17:19:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/7] rust: doctest: use vertical import style
+To: Alvin Sun <alvin.sun@linux.dev>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Brendan Higgins <brendan.higgins@linux.dev>,
+ Rae Moar <raemoar63@gmail.com>
+Cc: rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com
+References: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
+ <20260521-miscdev-use-format-v3-7-56240ca70d0c@linux.dev>
+From: David Gow <david@davidgow.net>
+Content-Language: fr
+In-Reply-To: <20260521-miscdev-use-format-v3-7-56240ca70d0c@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Jens,
+Le 21/05/2026 à 2:57 PM, Alvin Sun a écrit :
+> Convert `use` imports to vertical layout for better readability and
+> maintainability.
+> 
+> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+> ---
 
-Please consider pulling the following changes into your block-7.2
-branch.
+Assuming this'll go in via the Rust tree, given there are other changers
+to the rustdoc work which will likely go in that way. (But, if we'd
+prefer it to go in via kselftest/kunit, that shouldn't be a problem.)
 
-This pull request contains:
+Acked-by: David Gow <david@davidgow.net>
 
-Bug Fixes:
-- Fix raid1 writes_pending and barrier reference leaks on write failures.
-  (Abd-Alrhman Masalkhi)
-- Fix raid10 writes_pending leak on write request failures.
-  (Abd-Alrhman Masalkhi)
-- Fix raid10 writes_pending and barrier reference leaks on discard failures.
-  (Abd-Alrhman Masalkhi)
-- Fix raid1 REQ_NOWAIT handling while waiting for behind writes.
-  (Abd-Alrhman Masalkhi)
-- Fix raid1 r1_bio leak when a REQ_NOWAIT retry would block.
-  (Abd-Alrhman Masalkhi)
-- Fix raid1 read-balance head_position data race. (Chen Cheng)
-- Fix raid5 stripe batch bm_seq wraparound comparison. (Chen Cheng)
-- Fix raid5 stripe batch state snapshot KCSAN noise. (Chen Cheng)
-- Fix raid5 R5_Overlap races while breaking stripe batches. (Chen Cheng)
+Cheers,
+-- David
 
-Improvements:
-- Add raid5 discard IO accounting. (Yu Kuai)
-- Always convert raid5 llbitmap bits for discard. (Yu Kuai)
+>  scripts/rustdoc_test_gen.rs | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
+> index d61a77219a8c2..ee76e96b41eea 100644
+> --- a/scripts/rustdoc_test_gen.rs
+> +++ b/scripts/rustdoc_test_gen.rs
+> @@ -31,8 +31,15 @@
+>  use std::{
+>      fs,
+>      fs::File,
+> -    io::{BufWriter, Read, Write},
+> -    path::{Path, PathBuf},
+> +    io::{
+> +        BufWriter,
+> +        Read,
+> +        Write, //
+> +    },
+> +    path::{
+> +        Path,
+> +        PathBuf, //
+> +    }, //
+>  };
+>  
+>  /// Find the real path to the original file based on the `file` portion of the test name.
+> 
 
-Cleanups:
-- Simplify raid1_write_request() error handling. (Abd-Alrhman Masalkhi)
-
-Thanks,
-Kuai
-
----
-
-The following changes since commit d5b58fbb2fd7ac25fcd7e1c14730f998a90b0322:
-
-  block: respect iov_iter::nofault flag in bio_iov_iter_bounce_write() (2026-06-16 14:48:35 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux.git md-7.2
-
-for you to fetch changes up to 55b77337bdd088c77461588e5ec094421b89911b:
-
-  md/raid5: avoid R5_Overlap races while breaking stripe batches (2026-06-23 09:44:11 +0800)
-
-----------------------------------------------------------------
-Abd-Alrhman Masalkhi (6):
-      md/raid1: fix writes_pending and barrier reference leaks on write failures
-      md/raid10: fix writes_pending leak on write request failures
-      md/raid10: fix writes_pending and barrier reference leaks on discard failures
-      md/raid1: simplify raid1_write_request() error handling
-      md/raid1: honor REQ_NOWAIT when waiting for behind writes
-      md/raid1: free r1_bio when REQ_NOWAIT is set and read would block on retry
-
-Chen Cheng (4):
-      md/raid1: protect head_position for read balance
-      md/raid5: let stripe batch bm_seq comparison wrap-safe
-      md/raid5: use stripe state snapshot in break_stripe_batch_list()
-      md/raid5: avoid R5_Overlap races while breaking stripe batches
-
-Yu Kuai (3):
-      md/raid5: account discard IO
-      md/raid5: validate discard support at request time
-      md/raid5: always convert llbitmap bits for discard
-
- drivers/md/md-bitmap.c   |   9 +++-
- drivers/md/md-bitmap.h   |   2 +-
- drivers/md/md-llbitmap.c |  13 +++--
- drivers/md/md.c          |   2 +-
- drivers/md/raid1.c       |  99 ++++++++++++++++++++---------------
- drivers/md/raid10.c      |  28 +++++++---
- drivers/md/raid5.c       | 131 +++++++++++++++++++++++++++++------------------
- drivers/md/raid5.h       |   1 +
- 8 files changed, 178 insertions(+), 107 deletions(-)
