@@ -1,121 +1,140 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833AE3451D9
-	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 01:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159723770B
+	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 01:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782177384; cv=none; b=WmKnDVupzygc6BA4vbqaHjHV75V/hmoc1ecNqdal/r4ef6A8dp8HFbcOOSA9YL9Zc+QsVK0+LAE/rDGWV8yGugGno2UvnKdUtbHj1JVjrh1aL20+/lVv6h2QBgyg9VGilyZmWr5gR7WQlJ3zcVTKvWGLQzivEW1OD5LpbveGcNc=
+	t=1782178405; cv=none; b=FVUE9mpAPJVwW0hhbnnUGFEj/VWphhoyqKKnR3GIZz+yaE+qh9s8IZADmJLjE0LWmsIS8plgiF0v3ykgB2jyR6Q+Ho0COMQ6MVukOjDrA3YF02U4N03us6HFKdjMGbj0aEcxnCIR6NvGobzDjsUQf6ZiMpWHCYLyZkQr7Vq49KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782177384; c=relaxed/simple;
-	bh=vg3wPC7jO9qTviKshM1mltF4IV5lb3FhxmhRHoFsvVI=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GTjJPf5d39Q/L7C2liFk4rWaA3eGMlATZTB3lIeCbc3yLHcjHZz9093Mcx4xWvQClPv/4N/znhIIsyt3obL9uw6TQ2OCmlXVAGS9OacVo0zZGU/o4j9EIBF9W2VT9+bOeLR+SdGwL/0eT9CZVvE4julLYjz9xnRVn91rN4nu7W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NX7BAWz3; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782178405; c=relaxed/simple;
+	bh=iyQKGHD12eAAzii7w/c0dazu51aFA19NYiTITqwBPag=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NBC92JohRSXBYPzfB4rLJQsVcu0n1BNn9qtT4/7nCdTvbUZYO4bCOqztCho07Ohir2nfhQYGV4KOzfuoq1oE+a0r2+Sk4x4894Csp94apzb5W6PAc2DOPCnV+Pm5kxkgYyOknM0QNiD7tshYxLVMgbYSiAxxS7li8ZnffZSVnzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=UgGXftiH; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NX7BAWz3"
-Message-ID: <38704548-786f-4ec7-afd4-228aa8d68ad7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782177381;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jazVFyYoX6ftfj3SrA57nJBQLa/oXcNsFtjUmrhgLSk=;
-	b=NX7BAWz309zA4pLIM0U0aZPFiH+SwFh59Czpu0M5/MYWP90j8ARH0PCXdVSrpP7vcAPAbD
-	mCH6d3oTYJmQothNsmM8raLHjX7fcnlheqEqljTzW4O0UgFmLyIMO4onc5dQwy4hdOt29y
-	GhNIXjd7BH6/aL0G6LUanDOfnfu01Q0=
-Date: Tue, 23 Jun 2026 09:16:01 +0800
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UgGXftiH"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1782178404; x=1813714404;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iyQKGHD12eAAzii7w/c0dazu51aFA19NYiTITqwBPag=;
+  b=UgGXftiHpXMqQplI/an/A4XCgzNTcHEYm3mfQ0tuEUYKeqcyGL9HNj9C
+   tTl6qLyAtfgxaoGEy03HYhs2kXLfrs3Q2Bgt/YCcbqiEcMHiRaMTAgBnD
+   CmLPiLx5Zef01PswyHX1di+CCnFj4Is2dhrtrSD+4sOr7K0JtUYMW3Dsu
+   FdFjEeFtTSrWCkFglGxsTdiIHKya+387qjBviICN0j4GopMcwyH2tbhgW
+   8G7/h5duEYD48H2q9TPOL20vDBp3IA9ilkAG6bql2fBhC7tnTxITEK4oF
+   94vJfF7W/TJq8j/cS6CYNaethS72KsC3NBpRpdborn2sCeKpSWlU0WSVU
+   A==;
+X-CSE-ConnectionGUID: pvu6jQ/lTReGvAqBQrOA9g==
+X-CSE-MsgGUID: y+uDQE6zR3q1eb7X15ZuPQ==
+X-IronPort-AV: E=Sophos;i="6.24,219,1774281600"; 
+   d="scan'208";a="149300647"
+Received: from unknown (HELO uls-op-esad1-o.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jun 2026 09:33:17 +0800
+X-CSE-ConnectionGUID: lg4SqykCToCm47AwCEDF5g==
+X-CSE-MsgGUID: rc/RE4SRRUisVb9NV3qRYg==
+IronPort-SDR: 6a39e238_pUhPGHhctQJ8Z4hInowYSwgwHSIIUMdN8Fgv+yjnyZ5IrkH
+ rx7j+IKL+ZWZESHac7Zn1Nb1u0ObaD9NIHPHGlQ==
+Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
+  by uls-op-esad1-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jun 2026 18:32:40 -0700
+X-CSE-ConnectionGUID: GafoTIpoQa6pJWxhMww/Pg==
+X-CSE-MsgGUID: rJpHx3DdS+y32brnYvDb2w==
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
+  by uls-op-esai1-o.wdc.com with ESMTP; 22 Jun 2026 18:32:39 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v2] block: serialize elevator changes for the same queue using a writer lock
+Date: Tue, 23 Jun 2026 10:32:38 +0900
+Message-ID: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, yangerkun@huawei.com,
- chengzhihao1@huawei.com, houtao1@huawei.com, yukuai@fygo.io
-Subject: Re: [PATCH 1/2] blk-cgroup: fix blkg leak in blkg_create() error path
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, tj@kernel.org,
- josef@toxicpanda.com, linux-block@vger.kernel.org
-References: <20260622070714.1158886-1-wozizhi@huaweicloud.com>
- <20260622070714.1158886-2-wozizhi@huaweicloud.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260622070714.1158886-2-wozizhi@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Hi Zizhi,
+When elevator_change() is called concurrently for the same queue, the
+elevator_change_done() function runs concurrently as well. This function
+adds or deletes kobjects for the debugfs entry of the queue. Then the
+concurrent calls cause memory corruption of the kobjects and result in a
+process hang. The core part of the elevator switch is protected by queue
+freeze and q->elevator_lock. However, since the commit 559dc11143eb
+("block: move elv_register[unregister]_queue out of elevator_lock"), the
+elevator_change_done() is not serialized. Hence the memory corruption
+and the hang.
 
-Thanks for the patch.  I ran into the same issue and posted a fix for it
-earlier:
+The failures are observed when udev-worker writes to a sysfs
+queue/scheduler attribute file while the blktests test case block/005
+writes to the same attribute file. The failure also can be recreated by
+running two processes that write to the same queue/scheduler file
+concurrently. The failure is observed since another commit 370ac285f23a
+("block: avoid cpu_hotplug_lock depedency on freeze_lock"). This commit
+changed the behavior of queue freeze and it unveiled the failure.
 
-  https://lore.kernel.org/all/20260507061229.57466-1-cuitao@kylinos.cn/
+Fix the failure by changing elv_iosched_store() to acquire
+update_nr_hwq_lock as the writer lock instead of the reader lock. This
+serializes the whole elevator switch steps, including the
+elevator_change_done() call.
 
-The leak fix is identical to yours (blkg_put() -> percpu_ref_kill()),
-plus one extra change: moving blkg->online = true into the success
-block:
+Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+I observed that the blktests test case block/005 hung on a specific
+server hardware using a specific HDD as a block device. During the test
+case run, the kernel reported KASAN null-ptr-deref and slab-use-after-
+free errors. The failure happened when a sysfs queue/scheduler attribute
+file is written concurrently. I reported the failure and shared a
+candidate fix patch as RFC [1]. Based on the comments and discussion on
+the RFC patch, I propose this v2 patch that avoids introducing a new
+lock. My thanks go to Ming and Nilay for the discussion.
 
-	if (likely(!ret)) {
-		...
-+		blkg->online = true;
-	}
--	blkg->online = true;
+Please refer to [1] for details of the failure. Also, I created a
+blktests test case that recreates the hang [2], which I used to test the
+fix.
 
-On the failure path the blkg was never inserted into any list, and its
-blkg->pd[i]->online flags were not set either (those are in the same
-block).  Leaving blkg->online = true marks a blkg as online that was
-never created -- inconsistent with pd[]->online and with
-blkg_destroy(), which clears blkg->online = false.  Not observable
-today, since the failed blkg is on no list and unreachable by the
-online readers, but the flag should track the actual insertion.
+* Changes from RFC v1
+- Instead of adding a new mutex to struct request_queue, replace the
+  reader lock on update_nr_hwq_lock with the writer lock in
+  elv_iosched_store().
 
-(This was sent to the cgroups list rather than linux-block, hence the
-overlap.)
+[1] https://lore.kernel.org/linux-block/20260611074200.474676-1-shinichiro.kawasaki@wdc.com/
+[2] https://github.com/kawasaki/blktests/commit/8e80b3ccc0bbbe3f209d00eacd138d020de97fc6
 
-Thanks,
-Tao
+ block/elevator.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-在 2026/6/22 15:07, Zizhi Wo 写道:
-> When radix_tree_insert() fails in blkg_create(), the error path calls
-> blkg_put() to release the blkg. This was correct when blkg->refcnt was an
-> atomic_t: blkg_put() dropped it to 0 and triggered the release path.
-> 
-> But commit 7fcf2b033b84 ("blkcg: change blkg reference counting to use
-> percpu_ref") switched refcnt to a percpu_ref. In percpu mode
-> percpu_ref_put() never checks for zero, so the release callback is never
-> invoked. This blkg is on neither blkcg->blkg_list nor queue->blkg_list, so
-> blkg_destroy_all() / blkcg_destroy_blkgs() can never reach it to call
-> blkg_destroy()->percpu_ref_kill() either, cause the leak.
-> 
-> Fix it by killing the percpu_ref instead, which switches it to atomic mode
-> and drops the initial ref.
-> 
-> Fixes: 7fcf2b033b84 ("blkcg: change blkg reference counting to use percpu_ref")
-> Signed-off-by: Zizhi Wo <wozizhi@huaweicloud.com>
-> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-> ---
->  block/blk-cgroup.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index bc63bd220865..6386fe413994 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -437,11 +437,11 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
->  
->  	if (!ret)
->  		return blkg;
->  
->  	/* @blkg failed fully initialized, use the usual release path */
-> -	blkg_put(blkg);
-> +	percpu_ref_kill(&blkg->refcnt);
->  	return ERR_PTR(ret);
->  
->  err_put_css:
->  	css_put(&blkcg->css);
->  err_free_blkg:
+diff --git a/block/elevator.c b/block/elevator.c
+index 3bcd37c2aa34..b03185a217ff 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ 	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
+ 	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
+ 	 */
+-	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
++	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
+@@ -824,7 +824,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ 	} else {
+ 		ret = -ENOENT;
+ 	}
+-	up_read(&set->update_nr_hwq_lock);
++	up_write(&set->update_nr_hwq_lock);
+ 
+ out:
+ 	if (ctx.type)
+-- 
+2.54.0
 
