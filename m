@@ -1,149 +1,258 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40709364059;
-	Tue, 23 Jun 2026 01:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CE3274652
+	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 03:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782178730; cv=none; b=FkZYj/vjMag+BDzvzALWIgevXIrotn4f9l5jCMeEVnojzIvCZhs9dY7eWaeycWJpwN38sgtwR3UsWVEmfMKgKaA/oFj0djgwyYHmD1/A65bdPYPkeZGPgQK2fGdZ7k+yDhdPWbAQgqLOew2bBL9Qk/O5gKxrutnDKQfB9My2w3k=
+	t=1782185235; cv=none; b=F5o7aTNmiaQ11HvYExX1s5IGEIrMeJydzZzq3JgY00HLF8o7MQhJuHCTKAXMbsCMrNNCA7BeuYnOjhPBMmnB1oHUNlLpzwojtnPLplV6v3Gytc3+xYIrD1pwQ6MsCsPGoTPBk1wROFWBiAi+WGFy2m1t1o5ZdV/tUPYZF4h5Zpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782178730; c=relaxed/simple;
-	bh=pQkKsv0LS1e1L2qQfvRpSKq1vZOaj0Ak+cvv6zPx9I4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MxSNsLKnGyFPCIAZr4IIByWTLseADIOvzrZMADTtVTGRkWJ5l8irIuEUFDwi9qXfrRrMWBRm7BLfT3jCNbgEyyTpQPN6bCAxavpaVZueMvLfXAdi8Daetg6zwW929JJ9GX7RU1HQlC1BzRrqYveyXEKhknn4IzrASX/872s/fmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gknkf1qsvzKHMVn;
-	Tue, 23 Jun 2026 09:37:46 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8C10040957;
-	Tue, 23 Jun 2026 09:38:43 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with SMTP id cCh0CgAnKT6e4zlqiLkXCw--.54950S3;
-	Tue, 23 Jun 2026 09:38:41 +0800 (CST)
-Message-ID: <6880c1b0-8a56-4b50-9c1f-73acfb32ca27@huaweicloud.com>
-Date: Tue, 23 Jun 2026 09:38:38 +0800
+	s=arc-20240116; t=1782185235; c=relaxed/simple;
+	bh=i6N94zlU2y12u9JlOp9QsfPAr7n0oPPxQmq9aD6WFdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s3M4fiL8G5B3Xi19iKbjiHvOUmvmPv9uUov9Qd60H8qa2AUy3CniGMC5pOUllaHDmkxYNBuaQq0yriX61mxSR3Mkg3cXL+RSRH22a6B+R6FxEnrT6cB5RXl+56WYBCVIpjdefwrgDD4lSjspK3Z/DxKd6u3Z+0LQp0FZ05vGxX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jcd5xttj; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jcd5xttj"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490bc6a7958so3304775e9.1
+        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2026 20:27:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782185232; x=1782790032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OzdR3o8NjNFisyc6pU+EYg8UCWYaTAz0d/0qRyf0iPU=;
+        b=Jcd5xttj04+QGOuTWVQXKZfB1NCeJ2WRQI8Lk6s3koC8m4/8MahOacmfsDRNTH6leZ
+         y9yqdU3QHmXmV51xyzDSV20gK2z7nwlpXWdjCLhvJrqP4ka+LJlWNTfECa+cg780n5Zh
+         fOi7ZGRDxZ16Lbq4Z7uuzJB1Dcv384NKJQuLC9VA5Sikf5CRFIm4LdYWEXna3PSKJJVk
+         JIfWxf22Svl+/YhXQ9Mp+xT8zqIj9wQFoO2z+Amos+1AySjQFtiJ/Ztzue8I87mmN95C
+         +aD4eJKEXE2Zz7GUFKkbdhAqirjdcvOKM8dZxa5Hm+wI0LrFIffVGZiQMkM1ju0QAnRd
+         ZErw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782185232; x=1782790032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OzdR3o8NjNFisyc6pU+EYg8UCWYaTAz0d/0qRyf0iPU=;
+        b=JNgogceRsK84YSMbDfYBG47tVsBPO5sR/kGzy2HfuzG/fkxnDCrwKgGeg83+KoPNd0
+         upEN9SSdW6evHLLgzSNdRNM0eEfjXeMyLxakCPaXQYmhqJUqQiMdNRLUojqRQ1fGhaGu
+         MqiKCeUrNraTY/wVr3MbqrAUMRZpuxnQb0o+EoBPqjsDQyCBpVvbs21Tuj3qcs4UzQhT
+         mxDH0qMJD42ZP90Iyyu7QioI4LFYKEMosbeNMn47MBtFbJo8PUnkgdccA9gHbF2EzW06
+         GY/CGTRRmn/llhzfjCzRwERdKp8LvZFFLtrEJ+SpZCHurKkrt+hYw0YpkwG1LScN3o1V
+         Fguw==
+X-Gm-Message-State: AOJu0Ywr5AyqEuxJ6/HxBj+oAwWQ5NicWzC5rlCyUp04ujQQO3roDgZ6
+	Zh/TYVGp2Ew+sN7dZTryFPyqp6SK61lbyOZip+GNksrg5fPSHU9yMkvkT5g4dg==
+X-Gm-Gg: AfdE7cms+a4iWGAvokEQ3ZMbfJx9TcCA8neDMkMHhlDrlaYw08s2cUp02BMQodxUbPH
+	rFfYFplfIRv+wURhumiaJ88GgPMN/Y3OSvZaTVuK12cU8O9tB5XgLojl76riTIns4f1YmwRSJbb
+	W7xPZGVXZjR8bUGyYCzoLxczeBfpjMdqxu8yFIY7f++uOAg/BtWB3R0Qv8mTbcrT8oSHnI/SjLG
+	dDXSN1kNfPQpI0QT4CEUyTXTnjs9APMaWDGLQTDF4pXxcDloDIryHnMvdD2hPdggr1rrinq7xt7
+	NXnJWjmuBJGyURgZv4NSVuTt9f6WxS+eRswkGdBCCLPKXVj3YLTIlxdrHEkaSo90OyQWjhdt6Hx
+	vCW76KNU2OB3gMisUqMEoh7Pv6Yq+SSN3KQb0TyXvUE9YlzKoxd7oNN4qLo6Qp639YtdbpxjhnT
+	Da2sSgBt42iPqbPbN10Gna3q1JaEo3G0DkxxChwnV12Juec1PZre2ArEMLyZfuu+Er9xFQcWhHh
+	X4bRhTV+LKg+xT9IdX/B1o=
+X-Received: by 2002:a05:600c:5010:b0:492:1e36:9a90 with SMTP id 5b1f17b1804b1-4925a0da5cdmr24080885e9.18.1782185231919;
+        Mon, 22 Jun 2026 20:27:11 -0700 (PDT)
+Received: from localhost.suse.org (apn-78-30-83-17.dynamic.gprs.plus.pl. [78.30.83.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fc47720sm577781005e9.0.2026.06.22.20.27.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 20:27:11 -0700 (PDT)
+From: Sebastian Chlad <sebastianchlad@gmail.com>
+X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,
+	Sebastian Chlad <sebastian.chlad@suse.com>
+Subject: [PATCH blktests v2 1/2] src/miniublk: switch to ioctl-encoded ublk commands
+Date: Tue, 23 Jun 2026 05:27:06 +0200
+Message-ID: <20260623032707.14439-1-sebastian.chlad@suse.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] blk-cgroup: fix blkg leak in blkg_create() error path
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, tj@kernel.org,
- josef@toxicpanda.com, linux-block@vger.kernel.org
-Cc: cgroups@vger.kernel.org, yangerkun@huawei.com, chengzhihao1@huawei.com,
- houtao1@huawei.com, yukuai@fygo.io
-References: <20260622070714.1158886-1-wozizhi@huaweicloud.com>
- <20260622070714.1158886-2-wozizhi@huaweicloud.com>
- <38704548-786f-4ec7-afd4-228aa8d68ad7@linux.dev>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <38704548-786f-4ec7-afd4-228aa8d68ad7@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAnKT6e4zlqiLkXCw--.54950S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAry8Ww4fCrWkKF4fJr1fWFg_yoW5Ww43pF
-	W3GF45ArZxKFn3Cay3tF17Xw1Fvr4rJr1rt398K34Ykry3uFnavFy8Cw45XFW7J3ZrCF1Y
-	qFWYqFykKa4jkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
+Kernels built without CONFIG_BLKDEV_UBLK_LEGACY_OPCODES reject the
+legacy raw UBLK_CMD_* and UBLK_IO_* opcodes. Switch miniublk to use
+the ioctl-encoded UBLK_U_CMD_* and UBLK_U_IO_* variants defined in
+linux/ublk_cmd.h instead.
 
+For IO commands, the ioctl-encoded opcode is used for submission while
+_IOC_NR() extracts the raw NR bits for build_user_data(), keeping the
+user_data tag encoding intact.
 
-在 2026/6/23 9:16, Tao Cui 写道:
-> Hi Zizhi,
-> 
-> Thanks for the patch.  I ran into the same issue and posted a fix for it
-> earlier:
-> 
->    https://lore.kernel.org/all/20260507061229.57466-1-cuitao@kylinos.cn/
-> 
-> The leak fix is identical to yours (blkg_put() -> percpu_ref_kill()),
-> plus one extra change: moving blkg->online = true into the success
-> block:
-> 
-> 	if (likely(!ret)) {
-> 		...
-> +		blkg->online = true;
-> 	}
-> -	blkg->online = true;
-> 
-> On the failure path the blkg was never inserted into any list, and its
-> blkg->pd[i]->online flags were not set either (those are in the same
-> block).  Leaving blkg->online = true marks a blkg as online that was
-> never created -- inconsistent with pd[]->online and with
-> blkg_destroy(), which clears blkg->online = false.  Not observable
-> today, since the failed blkg is on no list and unreachable by the
-> online readers, but the flag should track the actual insertion.
-> 
-> (This was sent to the cgroups list rather than linux-block, hence the
-> overlap.)
-> 
-> Thanks,
-> Tao
+Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
+Co-authored-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+changes in v2:
+1. Makefile as prepared by Shin'ichiro Kawasaki
+2. restored else if to check if (io->flags & UBLKSRV_NEED_FETCH_RQ)
 
-I'm not subscribed to the cgroup mailing list, so I didn't see that this
-issue had already been fixed. :( And indeed, your patch nicely updates
-blkg->online as well. — I hadn't realized that.
+ src/Makefile   |  9 +++++++++
+ src/miniublk.c | 28 ++++++++++++++--------------
+ 2 files changed, 23 insertions(+), 14 deletions(-)
 
-Thanks for the heads-up!
-
-Thanks,
-Zizhi Wo
-
-> 
-> 在 2026/6/22 15:07, Zizhi Wo 写道:
->> When radix_tree_insert() fails in blkg_create(), the error path calls
->> blkg_put() to release the blkg. This was correct when blkg->refcnt was an
->> atomic_t: blkg_put() dropped it to 0 and triggered the release path.
->>
->> But commit 7fcf2b033b84 ("blkcg: change blkg reference counting to use
->> percpu_ref") switched refcnt to a percpu_ref. In percpu mode
->> percpu_ref_put() never checks for zero, so the release callback is never
->> invoked. This blkg is on neither blkcg->blkg_list nor queue->blkg_list, so
->> blkg_destroy_all() / blkcg_destroy_blkgs() can never reach it to call
->> blkg_destroy()->percpu_ref_kill() either, cause the leak.
->>
->> Fix it by killing the percpu_ref instead, which switches it to atomic mode
->> and drops the initial ref.
->>
->> Fixes: 7fcf2b033b84 ("blkcg: change blkg reference counting to use percpu_ref")
->> Signed-off-by: Zizhi Wo <wozizhi@huaweicloud.com>
->> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
->> ---
->>   block/blk-cgroup.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index bc63bd220865..6386fe413994 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -437,11 +437,11 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
->>   
->>   	if (!ret)
->>   		return blkg;
->>   
->>   	/* @blkg failed fully initialized, use the usual release path */
->> -	blkg_put(blkg);
->> +	percpu_ref_kill(&blkg->refcnt);
->>   	return ERR_PTR(ret);
->>   
->>   err_put_css:
->>   	css_put(&blkcg->css);
->>   err_free_blkg:
+diff --git a/src/Makefile b/src/Makefile
+index d8833bf..adfe3ef 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -8,6 +8,10 @@ HAVE_C_MACRO = $(shell if echo "$(H)include <$(1)>" |	\
+ 		$(CC) $(CFLAGS) -E - 2>&1 /dev/null | grep $(2) > /dev/null 2>&1; \
+ 		then echo 1;else echo 0; fi)
+ 
++HAVE_C_DEF = $(shell if echo -e "$(H)include <$(1)>\n#ifdef $(2)\nHAVE_$(2)\n#endif" | \
++		$(CC) $(CFLAGS) -E - 2>&1 /dev/null | grep HAVE_$(2) > /dev/null 2>&1; \
++		then echo 1;else echo 0; fi)
++
+ C_TARGETS := \
+ 	dio-offsets \
+ 	loblksize \
+@@ -27,6 +31,7 @@ C_UBLK_TARGETS := miniublk
+ 
+ HAVE_LIBURING := $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
+ HAVE_UBLK_HEADER := $(call HAVE_C_HEADER,linux/ublk_cmd.h,1)
++HAVE_NEW_UBLK_INTF := $(call HAVE_C_DEF,linux/ublk_cmd.h,UBLK_U_CMD_START_DEV)
+ 
+ CXX_TARGETS := \
+ 	discontiguous-io
+@@ -37,8 +42,12 @@ SYZKALLER_TARGETS := \
+ TARGETS := $(C_TARGETS) $(CXX_TARGETS) $(SYZKALLER_TARGETS)
+ 
+ ifeq ($(HAVE_UBLK_HEADER), 1)
++ifeq ($(HAVE_NEW_UBLK_INTF), 1)
+ C_URING_TARGETS += $(C_UBLK_TARGETS)
+ else
++$(info Skip $(C_UBLK_TARGETS) build due to missing new ublk interface(v6.4+))
++endif
++else
+ $(info Skip $(C_UBLK_TARGETS) build due to missing kernel header(v6.0+))
+ endif
+ 
+diff --git a/src/miniublk.c b/src/miniublk.c
+index f98f850..628207a 100644
+--- a/src/miniublk.c
++++ b/src/miniublk.c
+@@ -294,7 +294,7 @@ static int __ublk_ctrl_cmd(struct ublk_dev *dev,
+ int ublk_ctrl_stop_dev(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_STOP_DEV,
++		.cmd_op	= UBLK_U_CMD_STOP_DEV,
+ 	};
+ 
+ 	return __ublk_ctrl_cmd(dev, &data);
+@@ -304,7 +304,7 @@ int ublk_ctrl_start_dev(struct ublk_dev *dev,
+ 		int daemon_pid)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_START_DEV,
++		.cmd_op	= UBLK_U_CMD_START_DEV,
+ 		.flags	= CTRL_CMD_HAS_DATA,
+ 	};
+ 
+@@ -316,7 +316,7 @@ int ublk_ctrl_start_dev(struct ublk_dev *dev,
+ int ublk_ctrl_add_dev(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_ADD_DEV,
++		.cmd_op	= UBLK_U_CMD_ADD_DEV,
+ 		.flags	= CTRL_CMD_HAS_BUF,
+ 		.addr = (__u64)&dev->dev_info,
+ 		.len = sizeof(struct ublksrv_ctrl_dev_info),
+@@ -328,7 +328,7 @@ int ublk_ctrl_add_dev(struct ublk_dev *dev)
+ int ublk_ctrl_del_dev(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op = UBLK_CMD_DEL_DEV,
++		.cmd_op = UBLK_U_CMD_DEL_DEV,
+ 		.flags = 0,
+ 	};
+ 
+@@ -338,7 +338,7 @@ int ublk_ctrl_del_dev(struct ublk_dev *dev)
+ int ublk_ctrl_get_info(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_GET_DEV_INFO,
++		.cmd_op	= UBLK_U_CMD_GET_DEV_INFO,
+ 		.flags	= CTRL_CMD_HAS_BUF,
+ 		.addr = (__u64)&dev->dev_info,
+ 		.len = sizeof(struct ublksrv_ctrl_dev_info),
+@@ -351,7 +351,7 @@ int ublk_ctrl_set_params(struct ublk_dev *dev,
+ 		struct ublk_params *params)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_SET_PARAMS,
++		.cmd_op	= UBLK_U_CMD_SET_PARAMS,
+ 		.flags	= CTRL_CMD_HAS_BUF,
+ 		.addr = (__u64)params,
+ 		.len = sizeof(*params),
+@@ -364,7 +364,7 @@ static int ublk_ctrl_get_params(struct ublk_dev *dev,
+ 		struct ublk_params *params)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_GET_PARAMS,
++		.cmd_op	= UBLK_U_CMD_GET_PARAMS,
+ 		.flags	= CTRL_CMD_HAS_BUF,
+ 		.addr = (__u64)params,
+ 		.len = sizeof(*params),
+@@ -378,7 +378,7 @@ static int ublk_ctrl_get_params(struct ublk_dev *dev,
+ static int ublk_ctrl_start_user_recover(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_START_USER_RECOVERY,
++		.cmd_op	= UBLK_U_CMD_START_USER_RECOVERY,
+ 		.flags	= 0,
+ 	};
+ 
+@@ -389,7 +389,7 @@ static int ublk_ctrl_end_user_recover(struct ublk_dev *dev,
+ 		int daemon_pid)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_CMD_END_USER_RECOVERY,
++		.cmd_op	= UBLK_U_CMD_END_USER_RECOVERY,
+ 		.flags	= CTRL_CMD_HAS_DATA,
+ 	};
+ 
+@@ -624,9 +624,9 @@ static int ublk_queue_io_cmd(struct ublk_queue *q,
+ 		return 0;
+ 
+ 	if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
+-		cmd_op = UBLK_IO_COMMIT_AND_FETCH_REQ;
++		cmd_op = UBLK_U_IO_COMMIT_AND_FETCH_REQ;
+ 	else if (io->flags & UBLKSRV_NEED_FETCH_RQ)
+-		cmd_op = UBLK_IO_FETCH_REQ;
++		cmd_op = UBLK_U_IO_FETCH_REQ;
+ 
+ 	sqe = io_uring_get_sqe(&q->ring);
+ 	if (!sqe) {
+@@ -637,7 +637,7 @@ static int ublk_queue_io_cmd(struct ublk_queue *q,
+ 
+ 	cmd = (struct ublksrv_io_cmd *)ublk_get_sqe_cmd(sqe);
+ 
+-	if (cmd_op == UBLK_IO_COMMIT_AND_FETCH_REQ)
++	if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
+ 		cmd->result = io->result;
+ 
+ 	/* These fields should be written once, never change */
+@@ -650,7 +650,7 @@ static int ublk_queue_io_cmd(struct ublk_queue *q,
+ 	cmd->addr	= (__u64)io->buf_addr;
+ 	cmd->q_id	= q->q_id;
+ 
+-	user_data = build_user_data(tag, cmd_op, 0, 0);
++	user_data = build_user_data(tag, _IOC_NR(cmd_op), 0, 0);
+ 	io_uring_sqe_set_data64(sqe, user_data);
+ 
+ 	io->flags = 0;
+@@ -658,7 +658,7 @@ static int ublk_queue_io_cmd(struct ublk_queue *q,
+ 	q->cmd_inflight += 1;
+ 
+ 	ublk_dbg(UBLK_DBG_IO_CMD, "%s: (qid %d tag %u cmd_op %u) iof %x stopping %d\n",
+-			__func__, q->q_id, tag, cmd_op,
++			__func__, q->q_id, tag, _IOC_NR(cmd_op),
+ 			io->flags, !!(q->state & UBLKSRV_QUEUE_STOPPING));
+ 	return 1;
+ }
+-- 
+2.51.0
 
