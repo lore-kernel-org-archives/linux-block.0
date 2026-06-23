@@ -1,108 +1,121 @@
-Received: from smtp153-163.sina.com.cn (smtp153-163.sina.com.cn [61.135.153.163])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B8E1D5146
-	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 00:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833AE3451D9
+	for <linux-block@vger.kernel.org>; Tue, 23 Jun 2026 01:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782175528; cv=none; b=r0GuXYN5DE5XYmSIra8jGpdraF+D7E5w4vatAHGEivh0BiJ/aAUzCe3aE5zqtU9Gdh0Ne6YkOhZ6BIIurjRXUS+GRpFTqWjHC4XZPKRydb9jQ3bM/ptvH7OSn6W2UVWCDp5Zh26Ai0r2T9dhCxOoH3SUCVJnoTraoyl7oW3eVBE=
+	t=1782177384; cv=none; b=WmKnDVupzygc6BA4vbqaHjHV75V/hmoc1ecNqdal/r4ef6A8dp8HFbcOOSA9YL9Zc+QsVK0+LAE/rDGWV8yGugGno2UvnKdUtbHj1JVjrh1aL20+/lVv6h2QBgyg9VGilyZmWr5gR7WQlJ3zcVTKvWGLQzivEW1OD5LpbveGcNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782175528; c=relaxed/simple;
-	bh=TBlMC/6ipN0ztiR+wR5M0zG63VDi28vd+iXPGuLt8YM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qo4Ucjq46oGEQfW2z9TgBsarxxhQ7O08PdMQdbTEqBAYG7doWEj7ZmPzusXVgZuVNzA2+MdyFjjIt757sbz2FClqYvzuwGqqIFhXgdRHLaAxH+YjX5vsT5hP14Hy5cmuiEoCTB5zJJes6eDoIk68nITAhpPoWZR8obNxLBpkHlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=f6XXzGT/; arc=none smtp.client-ip=61.135.153.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1782177384; c=relaxed/simple;
+	bh=vg3wPC7jO9qTviKshM1mltF4IV5lb3FhxmhRHoFsvVI=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=GTjJPf5d39Q/L7C2liFk4rWaA3eGMlATZTB3lIeCbc3yLHcjHZz9093Mcx4xWvQClPv/4N/znhIIsyt3obL9uw6TQ2OCmlXVAGS9OacVo0zZGU/o4j9EIBF9W2VT9+bOeLR+SdGwL/0eT9CZVvE4julLYjz9xnRVn91rN4nu7W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NX7BAWz3; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="f6XXzGT/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1782175522;
-	bh=TBlMC/6ipN0ztiR+wR5M0zG63VDi28vd+iXPGuLt8YM=;
-	h=From:Subject:Date:Message-ID;
-	b=f6XXzGT/g1b/ZYrYqpb963mg6Pph9O7K8EdV8USsAtcXcwqtctFmL/LMCHD63Hmvt
-	 Ci32wQX9jkojovg8MUaIpGtgxc/zPAT/cO8mDAehUIQWqOhdosQexF3gY9HOr+OIlQ
-	 ECVoMx0tGjPEzYEKLPLiECWyDnfaqzAzAocZpWfA=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.32) with ESMTP
-	id 6A39D715000061BB; Tue, 23 Jun 2026 08:45:12 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 4748724456880
-X-SMAIL-UIID: B58136ECF32A43DBA052AC41868A9B6E-20260623-084512-1
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
-Subject: Re: [PATCH] nbd: don't warn when reclassifying a busy socket lock
-Date: Tue, 23 Jun 2026 08:44:58 +0800
-Message-ID: <20260623004500.151-1-hdanton@sina.com>
-In-Reply-To: <CANn89iLPWCo_u-8jCsDM6jjZYfESvtUt9n3xD7yuAyNNntSw6w@mail.gmail.com>
-References: 
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NX7BAWz3"
+Message-ID: <38704548-786f-4ec7-afd4-228aa8d68ad7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782177381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jazVFyYoX6ftfj3SrA57nJBQLa/oXcNsFtjUmrhgLSk=;
+	b=NX7BAWz309zA4pLIM0U0aZPFiH+SwFh59Czpu0M5/MYWP90j8ARH0PCXdVSrpP7vcAPAbD
+	mCH6d3oTYJmQothNsmM8raLHjX7fcnlheqEqljTzW4O0UgFmLyIMO4onc5dQwy4hdOt29y
+	GhNIXjd7BH6/aL0G6LUanDOfnfu01Q0=
+Date: Tue, 23 Jun 2026 09:16:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, yangerkun@huawei.com,
+ chengzhihao1@huawei.com, houtao1@huawei.com, yukuai@fygo.io
+Subject: Re: [PATCH 1/2] blk-cgroup: fix blkg leak in blkg_create() error path
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, tj@kernel.org,
+ josef@toxicpanda.com, linux-block@vger.kernel.org
+References: <20260622070714.1158886-1-wozizhi@huaweicloud.com>
+ <20260622070714.1158886-2-wozizhi@huaweicloud.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20260622070714.1158886-2-wozizhi@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 22 Jun 2026 17:21:53 -0700 Eric Dumazet wrote:
->On Mon, Jun 22, 2026 at 5:07 PM Hillf Danton <hdanton@sina.com> wrote:
->> On Mon, 22 Jun 2026 01:18:10 -0700 Eric Dumazet wrote:
->> >On Sun, Jun 21, 2026 at 6:43 PM Hillf Danton <hdanton@sina.com> wrote:
->> >> On Mon, 22 Jun 2026 05:22:55 +0530 Deepanshu Kartikey wrote:
->> >> > nbd_reclassify_socket() warns via WARN_ON_ONCE() if the socket lock is
->> >> > held at the point of reclassification. That assertion was copied from
->> >> > nvme-tcp, where the socket is created internally by the kernel
->> >> > (sock_create_kern()) and is never visible to user space, so the lock
->> >> > is guaranteed to be free.
->> >> >
->> >> > NBD is different: the socket is looked up from a user-supplied fd in
->> >> > nbd_get_socket(), and user space retains that fd. A concurrent syscall
->> >> > on the same socket (or softirq processing taking bh_lock_sock() on a
->> >> > connected TCP socket) can legitimately hold the lock at the instant
->> >> > NBD reclassifies it. sock_allow_reclassification() then returns false
->> >> > and the WARN_ON_ONCE() fires, which turns into a crash under
->> >> > panic_on_warn. This is reachable by simply racing NBD_CMD_CONNECT
->> >> > against socket activity on the same fd, as reported by syzbot.
->> >> >
->> >> Given the syzbot report, if you are right (I suspect) then Eric delivered
->> >> another half-baked croissant, and feel free to cut it off instead to make
->> >> room for correct fix.
->> >
->> > Nobody (including you) caught this.difference between nbd and other
->> > sock_allow_reclassification() callers.
->> >
->> Nope, actually it raises the question -- does the deadlock still remain
->> after your fix without the lock key you added applied?
->
->LOCKDEP might have a false positive, but it will be much much harder to trigger.
->
->I had about 50 syzbot duplicates (that I did not release) before d532cddb6c60
-> ("nbd: Reclassify sockets to avoid lockdep circular dependency").
->
->>
->> > What was the "correct fix" you envisioned exactly?
->> >
->> Frankly I had no evidence against your fix a couple days back, but now I
->> see your lock key approach fails to take off. And the correct fix is to
->> erase the incorrect locking order ffa1e7ada456 tries to catch, more
->> difficult than you thought so far.
->
->Which incorrect locking order are you referring to? This is a LOCKDEP
->false positive.
->
-In addition to 50 syzbot reports, your fix has a Fixes tag, no?
+Hi Zizhi,
 
->I suggest you send a patch so we can discuss it.
+Thanks for the patch.  I ran into the same issue and posted a fix for it
+earlier:
 
-The deadlock existed before ffa1e7ada456, why is a chance left for your fix?
+  https://lore.kernel.org/all/20260507061229.57466-1-cuitao@kylinos.cn/
+
+The leak fix is identical to yours (blkg_put() -> percpu_ref_kill()),
+plus one extra change: moving blkg->online = true into the success
+block:
+
+	if (likely(!ret)) {
+		...
++		blkg->online = true;
+	}
+-	blkg->online = true;
+
+On the failure path the blkg was never inserted into any list, and its
+blkg->pd[i]->online flags were not set either (those are in the same
+block).  Leaving blkg->online = true marks a blkg as online that was
+never created -- inconsistent with pd[]->online and with
+blkg_destroy(), which clears blkg->online = false.  Not observable
+today, since the failed blkg is on no list and unreachable by the
+online readers, but the flag should track the actual insertion.
+
+(This was sent to the cgroups list rather than linux-block, hence the
+overlap.)
+
+Thanks,
+Tao
+
+在 2026/6/22 15:07, Zizhi Wo 写道:
+> When radix_tree_insert() fails in blkg_create(), the error path calls
+> blkg_put() to release the blkg. This was correct when blkg->refcnt was an
+> atomic_t: blkg_put() dropped it to 0 and triggered the release path.
+> 
+> But commit 7fcf2b033b84 ("blkcg: change blkg reference counting to use
+> percpu_ref") switched refcnt to a percpu_ref. In percpu mode
+> percpu_ref_put() never checks for zero, so the release callback is never
+> invoked. This blkg is on neither blkcg->blkg_list nor queue->blkg_list, so
+> blkg_destroy_all() / blkcg_destroy_blkgs() can never reach it to call
+> blkg_destroy()->percpu_ref_kill() either, cause the leak.
+> 
+> Fix it by killing the percpu_ref instead, which switches it to atomic mode
+> and drops the initial ref.
+> 
+> Fixes: 7fcf2b033b84 ("blkcg: change blkg reference counting to use percpu_ref")
+> Signed-off-by: Zizhi Wo <wozizhi@huaweicloud.com>
+> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+> ---
+>  block/blk-cgroup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index bc63bd220865..6386fe413994 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -437,11 +437,11 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+>  
+>  	if (!ret)
+>  		return blkg;
+>  
+>  	/* @blkg failed fully initialized, use the usual release path */
+> -	blkg_put(blkg);
+> +	percpu_ref_kill(&blkg->refcnt);
+>  	return ERR_PTR(ret);
+>  
+>  err_put_css:
+>  	css_put(&blkcg->css);
+>  err_free_blkg:
+
