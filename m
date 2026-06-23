@@ -1,67 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F4F344DB9;
-	Tue, 23 Jun 2026 12:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1C5218592;
+	Tue, 23 Jun 2026 13:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782217758; cv=none; b=kv2lFNFObocre7KHD5QbHk8ETreVhjQ3JylbKs7Xqd/k6RvTxHLg7ZWhlYzTrENVPVkWlj44W9nt2w0cQf1tmLv9E+Ykbdv1eW11O1OQiw801sA5xE8VhTRPt/iy/p3nNuNCObeP33uGBS+kNS+bqsH0Ec/zwBUQ9BBPD6HPr90=
+	t=1782220371; cv=none; b=k4+1R4iY9rMclE/9Zw12gbOg/zQnmFcRLBhil5lE8MgEiWcAuLqkfGaUzyPR35mpFAGI04dqsrJ79fOXFDdnlR3F8SJ0EoZIdgR74fmlUmIfGrDOmre88zkcQpasg+91Mrn4SQ/TODHobMCDOnYRGfdgXpvjC4Hk1IHEfFdjijc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782217758; c=relaxed/simple;
-	bh=GEHMk1MA6K6TwBF71zdNKyey1sfGalpW8VXt5R1gxqA=;
+	s=arc-20240116; t=1782220371; c=relaxed/simple;
+	bh=LuXejG0zn+L5dDE9r+JIoNsNQIfW2IgJExa7sTKqB7Q=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=htuiCIO4l12It4COfyK1Pz+4Uc02q1wA5zRssmTAG9EjAIBgNYVoQQWXYlSrdhv1us3TVYgfPdDLxaxfhiJwU/wW8p684JNE/QWsTusv++HwT4q/ff+G7KYCQOEJubP6ZJU5BrZrJEjaxuJ7YwRsrIiF2zHuRkWS9SLXCcyyOlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arBH+uTK; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=ALC6IxDqo9hDbg1um8wHC9kpy4kGp5yV1JofRi2Q7mEplEt9e6/EB30mQRx/fwEaQPN+0TXcJt3IB8eGz/Ufn5H9xx4UpzsOrp8kMsa1j2LsXeIWF7JSqCECknUNsE1rkRxpj5DC7jjTw5pQuMRGlW3BnP4yuBBPOPAmf74Kq5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ViufDM0E; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arBH+uTK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60CF61F00A3A;
-	Tue, 23 Jun 2026 12:29:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ViufDM0E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922CF1F000E9;
+	Tue, 23 Jun 2026 13:12:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782217757;
-	bh=GEHMk1MA6K6TwBF71zdNKyey1sfGalpW8VXt5R1gxqA=;
+	s=k20260515; t=1782220370;
+	bh=+rzFpQ8O/10QiSxDOc9EPIkCdPQE1on2cJQrgpHbAZE=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=arBH+uTKfknaykjzbwL1FfpyiT8xhOcMjL2AcHUXlbBmEENDHWaadoxrm535uPOOO
-	 XE1iX8GbG/xZLN6j35b0pRrvXlkJfnZKaCVpgJFRm/FLUBH5qGezlPaMKrzjjNh1Qb
-	 tXLXrOYGMoXE1yHnPqnjuA+JN1/8JlusNBl5903aDAhuRuyUvW23oZYRg5OudLMzkS
-	 xKaJh2kOg7gMsltBBI+2tmXJ2fCa6aTJ4UYC9WywvunR6sTOQVsykYeUmdmw1mZVo2
-	 ghY6sqNjOEI1tGem9MAlu8pLVjfB7g/bmLf5TAaKJh3xtZpv1ZNslXaEXfWDNTmNhB
-	 7jx1ru3eoIcag==
+	b=ViufDM0EZ7iUxbOYXY2wdI5lAjc9KlTZkhijrIJU9IXCwHIq77eaTYi1q+b++HSJt
+	 jRu44bv9q4fNbTcplpUTdl0GDJZVn840Fzexjq6sM7GPsYSYiTwtSkcLVYnzJSyZXC
+	 XfMSaa+2lXkLKi3I8GME16fOL0/IlJBx82RnEsWbIgLgfIOVvDS8Fqgg/B4uDOaU0P
+	 8Yzb+3txaIfMRxZ3u8Rw2Mf2i/3MpTM5foSzb9RR+Z7S8KQiluZIW5EyK08LEoiVk6
+	 4B8eyMNZnIAxVokQYMJlAOvP7Ap0MNQAr72k2+A6DrfvBqVFG4VbXV4/dMqiiLtFsS
+	 GX+wqSW8Cjyqg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alvin Sun <alvin.sun@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, Boqun
- Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6r?=
- =?utf-8?Q?n?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
- <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu
- <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Daniel Almeida <daniel.almeida@collabora.com>, Arnd
- Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, Breno
- Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, Dave Ertman
+To: Gary Guo <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>, Gary Guo
+ <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno
+ Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman
  <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, Leon
- Romanovsky <leon@kernel.org>, Igor Korotin <igor.korotin@linux.dev>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, Arve
- =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, Todd Kjos
- <tkjos@android.com>, Christian
- Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>
-Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
- driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
- nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
-Subject: Re: [PATCH v4 9/9] rust: macros: remove `THIS_MODULE` static from
- `module!`
-In-Reply-To: <20260623-fix-fops-owner-v4-9-0daf5f077d5c@linux.dev>
-References: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
- <20260623-fix-fops-owner-v4-9-0daf5f077d5c@linux.dev>
-Date: Tue, 23 Jun 2026 14:28:11 +0200
-Message-ID: <87echxe90k.fsf@t14s.mail-host-address-is-not-set>
+ Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, David
+ Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Daniel Almeida <daniel.almeida@collabora.com>,
+ Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen
+ Boyd <sboyd@kernel.org>, Bjorn
+ Helgaas <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>, Boqun Feng <boqun@kernel.org>, Uladzislau
+ Rezki <urezki@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, Vlastimil
+ Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, Igor
+ Korotin <igor.korotin@linux.dev>, Pavel Tikhomirov
+ <ptikhomirov@virtuozzo.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
+ driver-core@lists.linux.dev
+Subject: Re: [PATCH v17 03/10] rust: implement `ForeignOwnable` for `Owned`
+In-Reply-To: <DJAGDGPKZ4HX.M47NMAU53PCJ@garyguo.net>
+References: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
+ <20260604-unique-ref-v17-3-7b4c3d2930b9@kernel.org>
+ <DJAGDGPKZ4HX.M47NMAU53PCJ@garyguo.net>
+Date: Tue, 23 Jun 2026 15:10:44 +0200
+Message-ID: <87echxpfl7.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,21 +67,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Alvin Sun <alvin.sun@linux.dev> writes:
+"Gary Guo" <gary@garyguo.net> writes:
 
-> All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
-> `this_module::<LocalModule>()` helper. The `static THIS_MODULE`
-> generated by the `module!` macro is no longer referenced anywhere,
-> so remove it to avoid having two sources of the same `ThisModule`
-> pointer.
+> On Thu Jun 4, 2026 at 9:11 PM BST, Andreas Hindborg wrote:
+>> Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
+>> places such as the `XArray`.
+>>
+>> Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
+>> implement `ForeignOwnable`.
+>>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> ---
+>>  rust/kernel/owned.rs | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 46 insertions(+)
+>>
+>> diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
+>> index 456e239e906e..5eacdf327d12 100644
+>> --- a/rust/kernel/owned.rs
+>> +++ b/rust/kernel/owned.rs
+>> @@ -15,6 +15,8 @@
+>>      ptr::NonNull, //
+>>  };
+>>  
+>> +use kernel::types::ForeignOwnable;
+>> +
+>>  /// Types that specify their own way of performing allocation and destruction. Typically, this trait
+>>  /// is implemented on types from the C side.
+>>  ///
+>> @@ -108,6 +110,7 @@ pub trait Ownable {
+>>  ///
+>>  /// - Until `T::release` is called, this `Owned<T>` exclusively owns the underlying `T`.
+>>  /// - The `T` value is pinned.
+>> +#[repr(transparent)]
 >
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+> AFAIT this `#[repr(transparent)]` isn't actually needed.
 
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+I'll drop it.
+
+>
+>>  pub struct Owned<T: Ownable> {
+>>      ptr: NonNull<T>,
+>>  }
+>> @@ -185,3 +188,46 @@ fn drop(&mut self) {
+>>          unsafe { T::release(self.ptr.as_mut()) };
+>>      }
+>>  }
+>> +
+>> +// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
+>> +// pointer satisfy alignment requirements of `T`.
+>> +unsafe impl<T: Ownable + 'static> ForeignOwnable for Owned<T> {
+>
+> You should drop the `'static` bound and put where bound on the GAT below
+> instead. See how `Box` is doing it.
+
+I will take a look.
 
 
 Best regards,
 Andreas Hindborg
-
 
 
