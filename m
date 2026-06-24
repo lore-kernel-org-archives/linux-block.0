@@ -1,200 +1,242 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79EB25B0AE
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 09:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EA12EC09B
+	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 11:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782294263; cv=none; b=eIO8u16Tkwrvb4xUutbNzgoVqMCe4fKw7cGunq++NfdAVTLNM9gOvSMoPIYUBvr2cunMAztyhjdKJxWXyLnotmSoh1V3Tpk8oW2zTfUw0gObn761HwAEseabPQecigIy39966jCIA7JyMDlhleZJUOjlWcGQL3C7PUVoIFu/K6M=
+	t=1782299656; cv=none; b=k0pJxJGGmsgwA5zbvT3Q9Gb1YFinRlnN03KdnMz9Dgnarg8J+V5Bj1HionjKgDNZfutG96Oo/kGYqP/zrrVuRlRRrmDAeszxYKGv97W9RMKh4Xnm0dsV5fkCEMSHL2J1ahD1ESEVr67tf/gVj1Md+wiLADW7ku7PPR1x1UBz2mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782294263; c=relaxed/simple;
-	bh=Er+CoXlE0qKr6Wl1gnIUVk81x+XWv9ivbXqtAwduT7o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uTF4p2GTq6HinXDjmViS6ndq9nk2TlTjtnDeJbhS79jO3vwWwOVRGmnEiIF7Z4PnGsvk0uWU6b7PrQ7++HJbVrnfsKtruq+X8SGBrlvE5Fw/CfF2sRVCV1CKnNdyyiqQjCmA0Ab/eNT6a4Jpl5g8IUZ1TZqPFbbbLu2VDyq4QkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dCNd0mBm; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782299656; c=relaxed/simple;
+	bh=54qls6R4s7vy2wgeognek0uR5HEWVSyZbQnUs7k/Jys=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=PzZJEfQe/oUo9NTyqMfhr0pdvb9uz/gJvnonmRkfIVK/bzBp1G+RCn00cBOgRzHJFUMbZPvQ3cHt8RGH9vBDYWdijWAXU9Z1Wm0NKu/MpGpBfGs/p4EDo2PUyfG5SRNwqbQp4w2dVnHCYW40ptGIdzEPw1w9v8cg81L92NyNkYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U2UDipMD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dCNd0mBm"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-91591f19c30so115711985a.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 02:44:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782294260; x=1782899060; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eWahjBaYCGUkSS6UYvn12GjsQBiXfoKJkyEVr7CwIq4=;
-        b=dCNd0mBmOnSNlY9AZSAhSfYLFBYZs29Ejzilj57cT1w0QBpL073FlwGf0S3wM8WCsF
-         zU5FdjGhVwyLw4mAm6VAjerkw6zL+E+aZeRIpzARqIe9IxJW65XYXYuuTA3xYEpTjYoj
-         yvZIjcXaM88mw2A5oJiJXKKpprEdy00uZKQXWjek32NNw/HBZricTzNSEFzexCcP5z2Y
-         XJ0mrZtBIMK1Db8AFA2kxKCjE/hhoIM9SeDNESuCWvOEjjNo5cLiA1IFFIrCbgpP5nr6
-         TE7cfnSPh4dY8dcY6G6J/LsYd2+JkCPiNt6AiduT41O3WcBh+GjdKTmHHwb7t/cRz4wj
-         VMdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782294260; x=1782899060;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eWahjBaYCGUkSS6UYvn12GjsQBiXfoKJkyEVr7CwIq4=;
-        b=LJ7EhnZyMSZY9NEtV/R9Fk7fBebXSiSiRqpRkTU2xsFC8/R+pYGW8PuekB4KrvftpR
-         DfYsik463pRVa7OpnevGhsLwaQ6nZn9OLQnWrHBrAoW1SGlUsARYSx5ckLKAYralszvY
-         y9mFqbEZaT2et5HUMBiyn8vEyl3bdVag6JlAlq+kbCtBLAIkS4DDsxIUi1QwkafufYJ1
-         dCPVOhLiFQOGr8Vc/hyztKCSTExUcFqAhoycbPHr+kfCghLqc+z8bS0EE3FPV1emJ2rf
-         Xa0gUrI0YoOsUMHqnq7jWz5Xzsy93zeWtXLtT2j1aTYwVKOT54dBOvWYvoERWW6mN/ie
-         ZN+g==
-X-Gm-Message-State: AOJu0YxhSNFfH+tWhzAwUkMqjZunC6+WXRgKUUsohPnJuDpGTVyhqM/i
-	4s7ITJHytnW4VUGKuxRx0fTu+DhVKj3An2THB4xUQEDQ378F1fh6eAEE
-X-Gm-Gg: AfdE7cn/LK0gJvL28+UlrQ0Gt6YX9GD2UWwbG1sqfGv8gLTPktIGa9irZsmCI/Y/vur
-	yQRXnGWlEi4MgLVXJrZrdtPpZvCTLqiiS5BXPEWv1utngWdKrxbrWPmIYrqNn5Uxg1C4lMJdL/3
-	QBcHPg1MUgjVpnVSLZfzwsKHkWX70DzO+EfHPMXheORmwxn1YHPRzi7Mb/Cyk8fLw5R/bYTOZcx
-	A0aXDMkwKONgVfrkGknV1iMKEH+Cc3EvvZW/KgLV993LzTkMjZVCmIuHlQsXlB9vKPveySk+/GQ
-	IWwvz2vWorjM8DBp83qJrsIMfG+My7e59rPSHPzhFikORtcgHCO+93my+vSlMnA0wpcWPTOnECM
-	uD00KxLbutpJjsoeGOiHo50ZCo0cLLdCECsZlu4Yzx1UbjiqPqnlfrOYZT9VbGgxMD51OcXLGF5
-	/f1eh/qIVMWWiQaDuGN3kcPKhGTBb0jhs30vaVUoyzxf+kAIR9B2MLVS8Jj67F5tHtORP8SYTVH
-	2BBvTSX
-X-Received: by 2002:a05:620a:2610:b0:915:bf79:3e0a with SMTP id af79cd13be357-9277df588d3mr414741085a.26.1782294260421;
-        Wed, 24 Jun 2026 02:44:20 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-926004ac1acsm503817685a.32.2026.06.24.02.44.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 02:44:19 -0700 (PDT)
-Date: Wed, 24 Jun 2026 04:44:14 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH v2] block: serialize elevator changes for the same queue
- using a writer lock
-Message-ID: <ajum7l5BPDRoeJgi@fedora>
-References: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2UDipMD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782299653;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8AKRT0241Rnsq/fzi/nga+xD3qqPVq9mAC76/E0+lFc=;
+	b=U2UDipMDlgk2+jX+0cVCVN8ioHJbwHltY5hFNrUaKvlgxVypU6SA48P9XjRm7z4XcSNfyv
+	dY0TCc4+qLRHsvzIPZv41z5DL0QmLImfe/oitkWxendT0MSaq5RZwEoyiQ3ykdvq28US3P
+	PNq6mzpNfDum5LnlO8+zpl9fREEAOu8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-oWcfJ-k6PHyO5_CVgGhzDg-1; Wed,
+ 24 Jun 2026 07:14:12 -0400
+X-MC-Unique: oWcfJ-k6PHyO5_CVgGhzDg-1
+X-Mimecast-MFC-AGG-ID: oWcfJ-k6PHyO5_CVgGhzDg_1782299651
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 117E019560B6;
+	Wed, 24 Jun 2026 11:14:11 +0000 (UTC)
+Received: from [10.44.32.26] (unknown [10.44.32.26])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DFC83195609E;
+	Wed, 24 Jun 2026 11:14:08 +0000 (UTC)
+Date: Wed, 24 Jun 2026 13:14:03 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Keith Busch <kbusch@kernel.org>, Benjamin Marzinski <bmarzins@redhat.com>
+cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev, 
+    linux-block@vger.kernel.org, "Dr. David Alan Gilbert" <linux@treblig.org>, 
+    Vjaceslavs Klimovs <vklimovs@gmail.com>
+Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
+ errors
+In-Reply-To: <ajFyuoMqnvQm738z@kbusch-mbp>
+Message-ID: <0bd687cf-82ac-eacf-844b-c179a52dc72c@redhat.com>
+References: <20260616150554.1686662-1-kbusch@meta.com> <ajFyuoMqnvQm738z@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Jun 23, 2026 at 10:32:38AM +0900, Shin'ichiro Kawasaki wrote:
-> When elevator_change() is called concurrently for the same queue, the
-> elevator_change_done() function runs concurrently as well. This function
-> adds or deletes kobjects for the debugfs entry of the queue. Then the
-> concurrent calls cause memory corruption of the kobjects and result in a
-> process hang. The core part of the elevator switch is protected by queue
-> freeze and q->elevator_lock. However, since the commit 559dc11143eb
-> ("block: move elv_register[unregister]_queue out of elevator_lock"), the
-> elevator_change_done() is not serialized. Hence the memory corruption
-> and the hang.
+Hi
+
+This approach is OK, I will stage the patches when 7.2-rc1 comes out and 
+when I'll fork the dm git branches.
+
+I suggest one change - it is kind of hacky when multiple I/O completion 
+callbacks write into io->orig_bio->bi_status concurrently - so it would be 
+better to not do it and maintain and return separate bit mask for 
+non-retryable errors.
+
+For example:
+
+static void complete_io(struct io *io)
+{
+        unsigned long error_bits = io->error_bits;
+        unsigned long nonretryable_error_bits = io->nonretryable_error_bits;
+        io_notify_fn fn = io->callback;
+        void *context = io->context;
+
+        if (io->vma_invalidate_size)
+                invalidate_kernel_vmap_range(io->vma_invalidate_address,
+                                             io->vma_invalidate_size);
+
+        mempool_free(io, &io->client->pool);
+        fn(error_bits, nonretryable_error_bits, context);
+}
+
+static void dec_count(struct io *io, unsigned int region, blk_status_t error)
+{
+        if (unlikely(error == BLK_STS_NOTSUPP) || unlikely(error == BLK_STS_INVAL))
+		set_bit(region, &io->nonretryable_error_bits);
+        else if (unlikely(error != BLK_STS_OK))
+                set_bit(region, &io->error_bits);
+
+        if (atomic_dec_and_test(&io->count))
+                complete_io(io);
+}
+
+Please send the updated patch that uses this approach.
+
+BTW. I think that blk_path_error should also test for BLK_STS_INVAL and 
+return false, otherwise, dm-multipath would be suffering from this bug 
+too. Ben, could you test it?
+
+Mikulas
+
+
+On Tue, 16 Jun 2026, Keith Busch wrote:
+
+> BLK_STS_INVAL indicates the I/O request itself was invalid (for example a
+> misaligned direct I/O), not that the device has failed. dm-raid1 treated
+> any read or write completion error as a device failure: it failed the
+> mirror leg, retried on the alternatives - which fail identically - and
+> eventually returned EIO while spuriously degrading the array.
 > 
-> The failures are observed when udev-worker writes to a sysfs
-> queue/scheduler attribute file while the blktests test case block/005
-> writes to the same attribute file. The failure also can be recreated by
-> running two processes that write to the same queue/scheduler file
-> concurrently. The failure is observed since another commit 370ac285f23a
-> ("block: avoid cpu_hotplug_lock depedency on freeze_lock"). This commit
-> changed the behavior of queue freeze and it unveiled the failure.
+> Since commit 5ff3f74e145a ("block: simplify direct io validity check") the
+> direct I/O path no longer rejects misaligned buffers up front, so an
+> invalid bio now reaches the lower block layers, which fail it with
+> BLK_STS_INVAL. dm-io collapses the block status into a per-region error
+> bit before invoking the completion callback, so record BLK_STS_INVAL on
+> the originating bio and have the dm-raid1 read, write and end_io paths
+> propagate it instead of failing the device.
 > 
-> Fix the failure by changing elv_iosched_store() to acquire
-> update_nr_hwq_lock as the writer lock instead of the reader lock. This
-> serializes the whole elevator switch steps, including the
-> elevator_change_done() call.
+> This mirrors the raid1/raid10 fix in commit f7b24c7b41f23
+> ("md/raid1,raid10: don't fail devices for invalid IO errors") for the
+> device-mapper mirror target.
 > 
-> Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+> Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
+> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+> Reported-by: Vjaceslavs Klimovs <vklimovs@gmail.com>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
-> I observed that the blktests test case block/005 hung on a specific
-> server hardware using a specific HDD as a block device. During the test
-> case run, the kernel reported KASAN null-ptr-deref and slab-use-after-
-> free errors. The failure happened when a sysfs queue/scheduler attribute
-> file is written concurrently. I reported the failure and shared a
-> candidate fix patch as RFC [1]. Based on the comments and discussion on
-> the RFC patch, I propose this v2 patch that avoids introducing a new
-> lock. My thanks go to Ming and Nilay for the discussion.
+> Resending patch 2/2 from a different machine. For some reason, only 1/2
+> is getting through with git-send-email, so manually replying to the
+> thread with the missing second patch.
 > 
-> Please refer to [1] for details of the failure. Also, I created a
-> blktests test case that recreates the hang [2], which I used to test the
-> fix.
+>  drivers/md/dm-io.c    | 14 +++++++++++++-
+>  drivers/md/dm-raid1.c | 28 +++++++++++++++++++++++++++-
+>  2 files changed, 40 insertions(+), 2 deletions(-)
 > 
-> * Changes from RFC v1
-> - Instead of adding a new mutex to struct request_queue, replace the
->   reader lock on update_nr_hwq_lock with the writer lock in
->   elv_iosched_store().
-> 
-> [1] https://lore.kernel.org/linux-block/20260611074200.474676-1-shinichiro.kawasaki@wdc.com/
-> [2] https://github.com/kawasaki/blktests/commit/8e80b3ccc0bbbe3f209d00eacd138d020de97fc6
-> 
->  block/elevator.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 3bcd37c2aa34..b03185a217ff 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
->  	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
->  	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
->  	 */
-> -	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
-> +	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
->  		ret = -EBUSY;
+> diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+> index 28adfeb58f240..f382e9f9be059 100644
+> --- a/drivers/md/dm-io.c
+> +++ b/drivers/md/dm-io.c
+> @@ -37,6 +37,7 @@ struct io {
+>  	struct dm_io_client *client;
+>  	io_notify_fn callback;
+>  	void *context;
+> +	struct bio *orig_bio;
+>  	void *vma_invalidate_address;
+>  	unsigned long vma_invalidate_size;
+>  } __aligned(DM_IO_MAX_REGIONS);
+> @@ -132,8 +133,18 @@ static void complete_io(struct io *io)
+>  
+>  static void dec_count(struct io *io, unsigned int region, blk_status_t error)
+>  {
+> -	if (error)
+> +	if (error) {
+>  		set_bit(region, &io->error_bits);
+> +		/*
+> +		 * BLK_STS_INVAL means the bio was not valid for the underlying
+> +		 * device (e.g. a misaligned direct I/O), which is a caller error
+> +		 * rather than a device failure. Record it on the original bio so
+> +		 * bio-based targets can propagate it instead of treating it as a
+> +		 * media error and failing the device.
+> +		 */
+> +		if (error == BLK_STS_INVAL && io->orig_bio)
+> +			io->orig_bio->bi_status = error;
+> +	}
+>  
+>  	if (atomic_dec_and_test(&io->count))
+>  		complete_io(io);
+> @@ -398,6 +409,7 @@ static void async_io(struct dm_io_client *client, unsigned int num_regions,
+>  	io->client = client;
+>  	io->callback = fn;
+>  	io->context = context;
+> +	io->orig_bio = dp->orig_bio;
+>  
+>  	io->vma_invalidate_address = dp->vma_invalidate_address;
+>  	io->vma_invalidate_size = dp->vma_invalidate_size;
+> diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+> index de5c00704e69c..022ad791c2957 100644
+> --- a/drivers/md/dm-raid1.c
+> +++ b/drivers/md/dm-raid1.c
+> @@ -524,6 +524,17 @@ static void read_callback(unsigned long error, void *context)
+>  		return;
+>  	}
+>  
+> +	/*
+> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
+> +	 * e.g. a misaligned direct I/O. That is a caller error, not a device
+> +	 * failure, so propagate it rather than failing the mirror and retrying
+> +	 * on the other legs, which would fail the same way.
+> +	 */
+> +	if (bio->bi_status == BLK_STS_INVAL) {
+> +		bio_endio(bio);
+> +		return;
+> +	}
+> +
+>  	fail_mirror(m, DM_RAID1_READ_ERROR);
+>  
+>  	if (likely(default_ok(m)) || mirror_available(m->ms, bio)) {
+> @@ -622,6 +633,16 @@ static void write_callback(unsigned long error, void *context)
+>  		return;
+>  	}
+>  
+> +	/*
+> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
+> +	 * e.g. a misaligned direct I/O. Propagate the error without degrading
+> +	 * the array.
+> +	 */
+> +	if (bio->bi_status == BLK_STS_INVAL) {
+> +		bio_endio(bio);
+> +		return;
+> +	}
+> +
+>  	/*
+>  	 * If the bio is discard, return an error, but do not
+>  	 * degrade the array.
+> @@ -1262,7 +1283,12 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio,
+>  		return DM_ENDIO_DONE;
+>  	}
+>  
+> -	if (*error == BLK_STS_NOTSUPP)
+> +	/*
+> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
+> +	 * e.g. a misaligned direct I/O. Propagate it rather than failing the
+> +	 * mirror and retrying, which would fail the same way on every leg.
+> +	 */
+> +	if (*error == BLK_STS_NOTSUPP || *error == BLK_STS_INVAL)
 >  		goto out;
->  	}
-> @@ -824,7 +824,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
->  	} else {
->  		ret = -ENOENT;
->  	}
-> -	up_read(&set->update_nr_hwq_lock);
-> +	up_write(&set->update_nr_hwq_lock);
+>  
+>  	if (bio->bi_opf & REQ_RAHEAD)
+> -- 
+> 2.52.0
+> 
+> 
 
-I feel this is still abuse of the above lock, which serves writer vs
-reader wrt. updating hw queue.
-
-How about the following fix?
-
-
-diff --git a/block/elevator.c b/block/elevator.c
-index 3bcd37c2aa34..0375eb77646e 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -627,8 +627,10 @@ static void elv_exit_and_release(struct elv_change_ctx *ctx,
- static int elevator_change_done(struct request_queue *q,
- 				struct elv_change_ctx *ctx)
- {
-+	bool exit_and_release = false;
- 	int ret = 0;
- 
-+	mutex_lock(&q->elevator_lock);
- 	if (ctx->old) {
- 		struct elevator_resources res = {
- 			.et = ctx->old->et,
-@@ -640,10 +642,24 @@ static int elevator_change_done(struct request_queue *q,
- 		kobject_put(&ctx->old->kobj);
- 	}
- 	if (ctx->new) {
-+		if (ctx->new != q->elevator) {
-+			ret = -EBUSY;
-+			goto unlock;
-+		}
- 		ret = elv_register_queue(q, ctx->new, !ctx->no_uevent);
-+		/*
-+		 * Tear down the failed elevator after dropping elevator_lock:
-+		 * elv_exit_and_release() freezes the queue and re-acquires
-+		 * elevator_lock itself, so it must not be called nested here.
-+		 */
- 		if (ret)
--			elv_exit_and_release(ctx, q);
-+			exit_and_release = true;
- 	}
-+unlock:
-+	mutex_unlock(&q->elevator_lock);
-+
-+	if (exit_and_release)
-+		elv_exit_and_release(ctx, q);
- 	return ret;
- }
- 
-
-
-Thanks,
-Ming
