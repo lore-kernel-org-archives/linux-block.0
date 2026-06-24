@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC2B3DB33D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF42E3DB647;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782313245; cv=none; b=N3o5Ryzq2EUFClL0Vs6qFmJHPzHDz4xnhk5kO+0OyQgkQarrd8r4cgyhKfe+AAnOpl5ObRIWQyiUG8Nh2Mp6Mlh1rVwBxFr4zPGdzrlSNYn99dUhhSF5uh9etfwOIgOCd9+KNPRHY6+g52yXjJ0jTO9Y07QCnfGO8FkB1HZP14w=
+	t=1782313246; cv=none; b=JaoI0b7LFrMeQYBECM6jAJpAz/ucSVHNLwGzlE2xp/JRjAXDVXosjhGAqVpl4noLiqoJwtrITRHKi7c/XzkM9PZWdk9rYXMfXgG+CnKlE3QRf/JBi4cDWEYayfDYAD996kOTuAnyC6IMpAChXMu5tEn/L1CWcTCoaftBZdOygfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782313245; c=relaxed/simple;
-	bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
+	s=arc-20240116; t=1782313246; c=relaxed/simple;
+	bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GEur9hOq6HMnFV+4bu9XrvUCmuns/XmqRJe0LqGflU6kDWCEXfgqqJsQtalyC8ORtjyTsXZkv51fe970vKD0yYu5gXTvKaW+aHGHrnItwcsGwpMJp286jZXqHiQdjwfpVBbE0Vt1LthyqRCpcr260Hl/ktkCMnw9p51AJRWG1+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oDH8bUo4; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=ud6ahBXsAllrobtZQPpjtvfEPMZlyqCI9a+jfoMGHIuWszQJAAaQqDxxY3iGS9h+yVPj/FpqOOxKPhJe7Cm7V/iS0N7YvNDd4YGQmoQZvJm9zEHXkZ4uYtnqbLyREw70RlfYLXLcflkyg+3/YDQtKNA2ERW+ExvMw3kIiMagfcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MkxskqGk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oDH8bUo4"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93A60C2BCF4;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MkxskqGk"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB237C2BCFB;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782313245; bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
+	t=1782313245; bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oDH8bUo41/PjS+Gx3aKDm0dTm+WJEYiD3CovAZCOL51c+1w3uOTvuSwCVQG3hIkx9
-	 xIqisQOUmTUbIcJVCt3wgofpSthqAWbbLBujwiaqTT/hvq2mhNWojgfJNrV69kpM5h
-	 c760Dyob5fOr849kl4hfX58suT8FvfQkY6eXnVnk=
+	b=MkxskqGkDR7ziybrs4WVyyJtxyF/p5yta4Zi7sxJd0jTKW7oin2Je82H9unuIQ3v5
+	 DgjXQYKDjDA1/yxRRKcn5Sw+IXmYm4xztxdeit/7AfoJnN5UR+zEn+kYYc/KPSiu7m
+	 H7X0OpP3Qm072tlaDlsiudW6ZB5itrl7mM4P05JA=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88063CDE003;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13FBCDE002;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Wed, 24 Jun 2026 23:00:08 +0800
-Subject: [PATCH v6 09/10] rust: macros: remove `THIS_MODULE` static from
- `module!`
+Date: Wed, 24 Jun 2026 23:00:09 +0800
+Subject: [PATCH v6 10/10] rust: module: update MAINTAINERS to cover
+ module.rs
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260624-fix-fops-owner-v6-9-5295e333cb3e@linux.dev>
+Message-Id: <20260624-fix-fops-owner-v6-10-5295e333cb3e@linux.dev>
 References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 In-Reply-To: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -70,58 +70,41 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=1808;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=868;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
- b=T8XDn77jqammHg8XuGEQ5zYrlxJkJ96REgrZO8/elB8ERN0tU+DY/u1pkKdZvOrIwBlsNdwGS
- DO05YTkWapiDkrK7T8fPPtbgzL9HIEIdlHgUVOq2b5favgMu3KS960s
+ bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
+ b=cmstUrkbLuPuqCovz0itKEpXgZDBXA1/IayJUxZLZYmVoYtq98FdyfxRGEpcVd24CXF9kuRxb
+ Q72y5Oy3kZcBCRmCDuJYlM3aqxGtITNQLqxXObuuHhfQbSegDS9NZq6
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
-`this_module::<LocalModule>()` helper. The `static THIS_MODULE`
-generated by the `module!` macro is no longer referenced anywhere,
-so remove it to avoid having two sources of the same `ThisModule`
-pointer.
+Module types now live in `rust/kernel/module.rs` alongside
+`rust/kernel/module_param.rs`. Update the MODULE SUPPORT file pattern
+from `rust/kernel/module_param.rs` to `rust/kernel/module*.rs` so both
+files are covered.
 
 Assisted-by: opencode:glm-5.2
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Reviewed-by: Gary Guo <gary@garyguo.net>
-Acked-by: Danilo Krummrich <dakr@kernel.org>
+Link: https://lore.kernel.org/rust-for-linux/8ea21b29-9baf-4926-a16f-7d21c5a1a1b8@suse.com
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/macros/module.rs | 16 ----------------
- 1 file changed, 16 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index aa9a618d5d19e..23b6a1b456b80 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -497,22 +497,6 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
-         /// Used by the printing macros, e.g. [`info!`].
-         const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
- 
--        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
--        // freed until the module is unloaded.
--        #[cfg(MODULE)]
--        static THIS_MODULE: ::kernel::ThisModule = unsafe {
--            extern "C" {
--                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
--            };
--
--            ::kernel::ThisModule::from_ptr(__this_module.get())
--        };
--
--        #[cfg(not(MODULE))]
--        static THIS_MODULE: ::kernel::ThisModule = unsafe {
--            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
--        };
--
-         /// The `LocalModule` type is the type of the module created by `module!`,
-         /// `module_pci_driver!`, `module_platform_driver!`, etc.
-         type LocalModule = #type_;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e035a3be797c4..74733de3e41ee 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17984,7 +17984,7 @@ F:	include/linux/module*.h
+ F:	kernel/module/
+ F:	lib/test_kmod.c
+ F:	lib/tests/module/
+-F:	rust/kernel/module_param.rs
++F:	rust/kernel/module*.rs
+ F:	rust/macros/module.rs
+ F:	scripts/module*
+ F:	tools/testing/selftests/kmod/
 
 -- 
 2.43.0
