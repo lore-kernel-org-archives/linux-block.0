@@ -1,33 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2C23B5E07;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3673B6340;
 	Wed, 24 Jun 2026 12:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782305855; cv=none; b=Syi4YdfJy3mNCfPSsgMM5S6nK1m1xk0OLt142H/VhSfWdzQD5eW54pkdfddkvrlF5vyOnK67HMEtuIAPKR6Nnge2cLnBBrtRNFtwTsovvs5xSQcukf8ftXiWbDWTcQY2+IN3Hwe6CHV6FJyprWYCfQwTHIgzHw1j7f2p9ogDXEk=
+	t=1782305855; cv=none; b=S53NIhtYwdRZkcj9qYZ0yk6NL/dnBQk9kP3S7da/JPKC6TDCpqtJ0JaYxpawLuXuLDtgLAUDmPCHlU/D7y0SN/63Cj66F6h251e4qULF0wj31G+Jciphxpuot2CfGT64gWjBhSJ2CTh/R6wlFvfsjybRC4y9WaVpAEWU0BhoDpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782305855; c=relaxed/simple;
-	bh=vg7TXq9sZ2uLATNZBO8F9GCw0KLxYtk1SO9VEaSdjAw=;
+	bh=4rqp7Mtw+lLM+FKB47PogTfFETV0pjaExLBQOXFyKJo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Z+7QbnwhMIt6ENbAiA2Xv9Ge1ey/Q+sPX1hI+7UarpsUvtFU22CqPP2KKRTwfbWeFNPgOnL3VW00y2M1pjShg1j9gXbex+3O7MDqQD6O9ii8oQOoRlbhwAIRBRCPyjUUbnny43u3AFG2XG6q3I/85pukXYp0mvcPSgXvAV+24EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dwtfBDVV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=aiPuy1oEN02C+dqZCxpsE0HCmHsoZ3828v9sL5KBJOsvq+l6X3oGKDkJritcxLzUEiC0FwVWRRtoPF7e56bcB4sy/KqTtQwOmWzJQOLeIjLwnaHCr+FluVoFpH2q0cJ3mz8DqkbK61BTcBnUez6PU66ICqk5cOSSIcH6rSLDEpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sOXUDv/Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dwtfBDVV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 47B06C2BCFB;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sOXUDv/Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5DE4DC2BCB7;
 	Wed, 24 Jun 2026 12:57:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782305855; bh=vg7TXq9sZ2uLATNZBO8F9GCw0KLxYtk1SO9VEaSdjAw=;
+	t=1782305855; bh=4rqp7Mtw+lLM+FKB47PogTfFETV0pjaExLBQOXFyKJo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=dwtfBDVVEYaKoHDGM5Yad1V/Emzf+PKIWL3f5rbRalOFBNOOX39c5NjgaZhBko879
-	 KuYupoQ2L3Lrj+DxEktczIMwlBsLe5oZs/gxWvwXDm4dkgNdvTJMMb4jM1U3YQ6MTl
-	 mfqjiUAIsG+XszN0p5T05TT01S4+HsGhrq/FPUP0=
+	b=sOXUDv/QB55ECoFc51FmelFJGYHz5mi0jk2BcWTDtTceisy/dXdU1Kz1N2hCn97wl
+	 6cceyImolNrd7OqLwSS2nLHaRBGudwoJRpJRcEdk4PdiyIsmV29OIbBB9mAmpEgmxE
+	 JkvrSPyfVt9sW085rTUku9hIrkHx1UBq3fzu76Vw=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E44CDE002;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A1CCDB481;
 	Wed, 24 Jun 2026 12:57:35 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Wed, 24 Jun 2026 20:57:31 +0800
-Subject: [PATCH v5 8/9] rust: binder: use `LocalModule` for `THIS_MODULE`
+Date: Wed, 24 Jun 2026 20:57:32 +0800
+Subject: [PATCH v5 9/9] rust: macros: remove `THIS_MODULE` static from
+ `module!`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260624-fix-fops-owner-v5-8-aa1cba242f05@linux.dev>
+Message-Id: <20260624-fix-fops-owner-v5-9-aa1cba242f05@linux.dev>
 References: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
 In-Reply-To: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -69,48 +70,57 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782305851; l=1331;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782305851; l=1762;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=vg7TXq9sZ2uLATNZBO8F9GCw0KLxYtk1SO9VEaSdjAw=;
- b=XLwQ/2G1lBYnDpGDC1HzFTTNq1mx4Kt+jNerXX9Oqp49DNh8hoWHh2MYb54tH19LpEfTaqDiX
- 4JSYoMeoL2qA9uetQuCHGJb7DtIXXTNUWXzfiCBLNI4OGVJRsrrZLz1
+ bh=4rqp7Mtw+lLM+FKB47PogTfFETV0pjaExLBQOXFyKJo=;
+ b=MhJ332sYXG8TbDqMOH4VaZYWiCkguj7jCz0K1LQzpfaPp4DB5kuNGDpPrR+tsttf9XMlF0p5J
+ 7sDR2hmnqCoDMYyyOKBxNR6cL0lEKBQsLXA1+O3S9eTcDPjsOUylYCZ
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Replace the `THIS_MODULE` static reference in the binder fops with
-`this_module::<LocalModule>()`, consistent with the move of
-`THIS_MODULE` into the `ModuleMetadata` trait.
+All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
+`this_module::<LocalModule>()` helper. The `static THIS_MODULE`
+generated by the `module!` macro is no longer referenced anywhere,
+so remove it to avoid having two sources of the same `ThisModule`
+pointer.
 
 Assisted-by: opencode:glm-5.2
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Reviewed-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- drivers/android/binder/rust_binder_main.rs | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ rust/macros/module.rs | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
-index dc1941cd2407b..d6ceebbd5f94e 100644
---- a/drivers/android/binder/rust_binder_main.rs
-+++ b/drivers/android/binder/rust_binder_main.rs
-@@ -17,6 +17,7 @@
-     bindings::{self, seq_file},
-     fs::File,
-     list::{ListArc, ListArcSafe, ListLinksSelfPtr, TryNewListArc},
-+    module::this_module,
-     prelude::*,
-     seq_file::SeqFile,
-     seq_print,
-@@ -318,7 +319,7 @@ unsafe impl<T> Sync for AssertSync<T> {}
-     let zeroed_ops = unsafe { core::mem::MaybeUninit::zeroed().assume_init() };
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index aa9a618d5d19e..23b6a1b456b80 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -497,22 +497,6 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+         /// Used by the printing macros, e.g. [`info!`].
+         const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
  
-     let ops = kernel::bindings::file_operations {
--        owner: THIS_MODULE.as_ptr(),
-+        owner: this_module::<LocalModule>().as_ptr(),
-         poll: Some(rust_binder_poll),
-         unlocked_ioctl: Some(rust_binder_ioctl),
-         compat_ioctl: bindings::compat_ptr_ioctl,
+-        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
+-        // freed until the module is unloaded.
+-        #[cfg(MODULE)]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            extern "C" {
+-                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
+-            };
+-
+-            ::kernel::ThisModule::from_ptr(__this_module.get())
+-        };
+-
+-        #[cfg(not(MODULE))]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+-        };
+-
+         /// The `LocalModule` type is the type of the module created by `module!`,
+         /// `module_pci_driver!`, `module_platform_driver!`, etc.
+         type LocalModule = #type_;
 
 -- 
 2.43.0
