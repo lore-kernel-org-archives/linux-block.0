@@ -1,64 +1,30 @@
-Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.auroraos.dev (unknown [95.181.193.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40A2305E28;
-	Wed, 24 Jun 2026 19:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2F537C91B;
+	Wed, 24 Jun 2026 20:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.193.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782330787; cv=none; b=KQavhEkRqcxxdbuB0chTc53sC1zriCKYEPKyLZU7R9KHo78QlOzkE9R09GrIIyzdi3fOk8bpsF9rwc2naMQl0o7Dl3bFnJQMZn/Q5Kh2mJFc+CgClN0rFFn8vIvPry0M899A1HoaQYC06Ylx61KjRsJdH5eifsQjq9kUfrVHkDo=
+	t=1782334167; cv=none; b=ApqluQDDTVSBtpUB8UagIWcysvHdql5FgcwQqAcF+WqpRL2EiknHEw0VJlxkWci7oXvL4Ku/GvbTz1AtOe8nU461D9L3f9oCQZLERWsOHByZ6lz6GggcboJ8FYezL86hOUWziu6FbUvdIo8Ufjj6pSic8B65zDAsfkslkJTQqik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782330787; c=relaxed/simple;
-	bh=uGManwo2POKMO9mUH2vgxLmsUYYgJxBMxApUaz/JoN4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yqmf48A9bHjTTmb9Rv3w6YfOA6Y6eWBtsdrZW0RHbUEy32XQfL9JdbvvaiWKrcqdY6GE8QZt5sCimvHGYd+PBTVFw11u3Cuf1yE4/hvkiQclTONRa7/xzqpDXi8Sdi5Kv1KxqjtbxyVldzbLTuBqggqS/JOKgcA/jsqkMkydHnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nOICm2iu; arc=none smtp.client-ip=35.162.73.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nOICm2iu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782330786; x=1813866786;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9kzduUnU0W5KLUH8xRjByArbNZrNdOxKMBIECVRVqgo=;
-  b=nOICm2iuvF/7hBvOGRmdUEltZ79ODKCbDCM/qGUw+xaZGctieYbzpW+P
-   t//aMECdcpQ7YwpTTGXZJooLjhmvPnbmZY+6sXkDQ8WT0JV4318moojUY
-   Sh1ghJEaYS2z0raGJtgrnb6Br9JQejUAomOPJVrCEwd1O/y28gNkAgtNC
-   NedB4OQkrOMzLoifsNYCS8SYPAo+57Fz07SWWeZeQrbAX5IPpjI0dZ7Lm
-   rRRABkqKMK6cf8ndPdR3ovV4h8KmILmlNdc+6IQCPozw5XnVTfR7K2d7C
-   gZfsx9z6N5L5YX3wucb4y6XL4Fv9hk6Y3MIg8V4c/SSV3LAeXBDIqr5ZZ
-   g==;
-X-CSE-ConnectionGUID: T4dFEcxWRLmb1DhwaTaxaQ==
-X-CSE-MsgGUID: CrIjSsjgRWCy8HXfNV8Ngg==
-X-IronPort-AV: E=Sophos;i="6.24,223,1774310400"; 
-   d="scan'208";a="22234931"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 19:53:03 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:4369]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.61:2525] with esmtp (Farcaster)
- id 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59; Wed, 24 Jun 2026 19:53:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Wed, 24 Jun 2026 19:53:02 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Wed, 24 Jun 2026 19:53:01 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>
-CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Jens
- Axboe" <axboe@kernel.dk>, <dm-devel@lists.linux.dev>,
-	<linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit batching
-Date: Wed, 24 Jun 2026 19:52:55 +0000
-Message-ID: <20260624195255.1102-1-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260622182328.GB1250822@google.com>
-References: <20260622182328.GB1250822@google.com>
+	s=arc-20240116; t=1782334167; c=relaxed/simple;
+	bh=MHNiV/cjbM0GYJqZAYCEtwMzr/SALslBDw1UZL8eSTs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IS6NYokcj1ck/jMxwWAcpPmMvoK1mFAC2oybcSQNnWfMMmOcF1v31yBlxpFsShEisoR40ihlsQLdHurWS0F9F9SDibM5Oj7Q/tajcb4r6ht2OVmIK9uYB673y1elFsDZMrmDO4fhdqfFgG5cYFB3RJQoq3VWlEpoTpV8/B6zxUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auroraos.dev; spf=pass smtp.mailfrom=auroraos.dev; arc=none smtp.client-ip=95.181.193.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auroraos.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auroraos.dev
+Received: from wasted (91.79.25.129) by exch16.corp.auroraos.dev
+ (10.189.209.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Wed, 24 Jun
+ 2026 23:34:07 +0300
+From: Sergey Shtylyov <s.shtylyov@auroraos.dev>
+To: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: Sergey Shtylyov <s.shtylyov@auroraos.dev>, <linux-kernel@vger.kernel.org>,
+	Karina Yankevich <k.yankevich@auroraos.dev>
+Subject: [PATCH] block: bio: check offset/length sanity in {__,}bio_add_page()
+Date: Wed, 24 Jun 2026 23:33:26 +0300
+Message-ID: <20260624203327.25553-1-s.shtylyov@auroraos.dev>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,38 +33,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-ClientProxiedBy: exch16.corp.auroraos.dev (10.189.209.38) To
+ exch16.corp.auroraos.dev (10.189.209.38)
 
-On Mon, Jun 22, 2026 at 06:23:28PM +0000, Eric Biggers wrote:
-> I don't think there's a path forward without an in-tree user that's
-> shown to be worthwhile over just using the acceleration built directly
-> into the CPU.  As well as confirmation of no regression to existing
-> users, including in cases where the inline sg list can't be used.
+Sum of the *struct* bio_vec's fields bv_offset and bv_len is calculated in
+some functions in block/{blk-merge.c,blk.h> (and that sum is often compared
+to PAGE_SIZE) -- that sum may overflow (and so the comparison yield a wrong
+result) if some bad arguments were previusly passed to {__,}bio_add_page().
+Add a check that the sum of the offset and length parameters won't overflow
+to {__,}bio_add_page()...
 
-Agreed. Proposing a smaller v5 that meets the no-regression bar now and
-leaves "beats the CPU" to a follow-up with a real in-tree user.
+Found by Linux Verification Center (linuxtesting.org) with the Svace static
+analysis tool.
 
-dm-crypt submits one request per contiguous bio segment (a single
-bio_vec) with data_unit_size = sector_size, instead of one per sector.
-E.g. default sector_size 512 with a 4 KiB bio_vec: one request of 8
-data units, which the fallback splitter walks as 8 per-sector calls --
-dm-crypt no longer open-codes the per-data-unit loop itself.
+Signed-off-by: Sergey Shtylyov <s.shtylyov@auroraos.dev>
 
-  - Uses only the existing inline sg_in[0]/sg_out[0] entry. No per-bio
-    scatterlist, no kmalloc -- the "inline sg list can't be used" case
-    doesn't exist here, so there's nothing to regress.
-  - For a non-native algorithm the core auto-splits into the same
-    per-sector calls dm-crypt makes today: identical output and cost.
-    This is what Herbert predicted -- the per-unit indirect call just
-    moves from the caller into the API; the fallback is no slower.
+---
+The patch is against the for-next branch of Jens Axboeu's linux.git repo...
 
-So it stands on no-regression alone, with no software throughput claim.
-What it adds is the interface a native one-pass driver needs. I'd land
-that now and bring a native offload user + numbers as the follow-up,
-rather than block the interface on the driver.
+ block/bio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Acceptable? If so I'll respin v5 as the minimal version.
-
-Thanks,
-Leonid
+diff --git a/block/bio.c b/block/bio.c
+index f2a5f4d0a967..daca63b94fae 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1000,6 +1000,7 @@ void __bio_add_page(struct bio *bio, struct page *page,
+ {
+ 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+ 	WARN_ON_ONCE(bio_full(bio, len));
++	WARN_ON_ONCE(off + len < off);	/* does the sum overflow? */
+ 
+ 	if (is_pci_p2pdma_page(page))
+ 		bio->bi_opf |= REQ_NOMERGE;
+@@ -1045,6 +1046,9 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 		return 0;
+ 	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
+ 		return 0;
++	/* Are offset and len sane, i.e. their sum doesn't overflow? */
++	if (offset + len < offset)
++		return 0;
+ 
+ 	if (bio->bi_vcnt > 0) {
+ 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-- 
+2.54.0
