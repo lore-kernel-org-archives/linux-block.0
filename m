@@ -1,73 +1,71 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3232D3BFAE7
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 15:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07DD13D9DCB
+	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 15:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782313805; cv=none; b=Dbb5xk9lJ4V98lFUsbrU8Bx1xP0I9BYhn63LUwI2AGp/qt/+9xziwhbk9C5W6FvHPTWHTea62sZdqQe1hhoZOkj5WpoVTlDQPoKQQmuPx38eEbHMofxENxIzOdBF9erhfs5Kr7EePmcTMAJMSvypA7cyC3laRkTemo2S1QhIoos=
+	t=1782313984; cv=none; b=JP4GSmVtyac6sftmMpmK5vOfRp+Fn44QNlsUT9tucT9O9qpEStKXA1QxJtm/LnQ7KQXvUM24pfpFFb3pHAqffH5eqb8bhj0xczHg0cXydaD7oMV8/mR+lWthk6DoIg00Gi6PuKYsWzSA17khU/4oufwRTqJs1Kmt6GDrlrkZ3AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782313805; c=relaxed/simple;
-	bh=TMmaIx3erApkdCYxKGQAiOLnY7LROACCo+P0YiIoosA=;
+	s=arc-20240116; t=1782313984; c=relaxed/simple;
+	bh=oVqZQJ9jmmMsFO8CXOdC79rdOg94OQrhKCJkNuqPxZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gm6rU/Ww7AISdnrrsPvvikpBdAvLhlx1i1f0WcAc/glqU4yfiybo2cIaxAY2y1NPExUExRK6+KVsFLLbjDuLA0P8K8VF7I4+PQqBjkSlxUJCCyOVxpVKcFumJf+lA7Ov0YthUzpU7f5HcLVeEYkLmAjWs+EudPDQ12qJ0XYIB84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8Sf8K18; arc=none smtp.client-ip=209.85.128.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=rAky/rlBemhKLsaBxXbLUlgGzsBAfzpALryJlINmeGAM/OQT4DOActYVC8URCYktzrzgnYKBTozdQeh6987d+PzkrtxOr7EGWYR7av3sNQbqxelAkFEFXLyrpE0u8QCw2QeAvyeyi5RAYHWUDAT5NZt9p+lYqsOnXQs91dpRn1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8vNhcin; arc=none smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8Sf8K18"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-808cdfc2d34so9656187b3.3
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 08:10:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8vNhcin"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-806449d108aso14834087b3.2
+        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 08:13:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782313803; x=1782918603; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782313982; x=1782918782; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t6KADXu8NtacFXidogjf1X9Fv1eYdBXSvAj1mQKHRXc=;
-        b=k8Sf8K18EhkQ4mPfN/5CCkugvPGZ0VJUsKdqgbw1GNHidS66mR15YJj+OfYSZuqQ7H
-         I89RJVhmupsWTxb2bgDx3Cajd7ejK7FaZbRuhY2CaY/bDjisWt7ApyVRae6c78UPExcJ
-         VVtizanEwAB49391BXak6saOuo6dF0KBvvs1w92HFjDLThifkIT0wwV9KWFCk/ejheSA
-         IHY/pJjq2s8EadVnL4Z+OU1Oy9jiEyxnWGli2w6oToCTVbhycefgK5eQWsh+5ZuMHQ5m
-         yoWzkBeZEymRQRfr2qxci5NCDPxS41SAWXq+mUjbtuDqE0gh7MjfVg6NBmvZSmb4huKZ
-         24rw==
+        bh=vA9QX6ZkTA0MM5pEdSW9MiBk/GWU290NZ7cLdKoelp4=;
+        b=h8vNhcinluEy90tZnLVrtZZti2UdQGwDN+TnZp4PLgnAj69ZWu0HhVnyJdm0ly9Tin
+         ZlR2s2S5BdIzhPChoEHC6vpo7ZLNYjyIOJyhs26FZ718nKJ3FunaoKcScEoyIoigGkAZ
+         sucikOduyIaOl1c8RacRkSBwG4QU8OY6h1kqqHllGelpV87sCdM4LJv3MvGmg8LhB59I
+         C27R+UjS8CBw/fykKowYvhx7XIS2aP0jnFTAr24JcGZ9pQtb0vMh0eokfFKM5i5XZRJ8
+         IdbUjFtNGFhvWG2mPXrrc8DH/XEybevyfCruqDpz8+HwNujft2CJQfVtwMkSoY9uks+f
+         1BUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782313803; x=1782918603;
+        d=1e100.net; s=20251104; t=1782313982; x=1782918782;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=t6KADXu8NtacFXidogjf1X9Fv1eYdBXSvAj1mQKHRXc=;
-        b=XR1EThtS+lpYh6l8NIUOuBhoyze5gR1IHL9axtsCWPeui/Ra/nmPoaXuFDNZDAer+9
-         48gYw8xU2gBhGa5dIarSmrVyJ3jvQpLFKIxxNPiUjvoWFkc9vHl+kgKtkbTZfq50ZIsY
-         3rxzjoX5HKTqUFXVSsxg13PvFY9kXACXX//YkWzTA6o2AQ0n62gqEzW0HpdyBG1j2o0k
-         /SpqQR416hlVah38rTjIMWQtbi8GX+FFx85TKjvq3fLeaOTn2TtCblNTY0eqUOJ3fat1
-         47GTDELW2yYCikUPhAtP4A88QIkFcVfdlLdqeG0rhb8Bv9qODbjLDnflkHHSo8FA2MR4
-         ym6w==
-X-Gm-Message-State: AOJu0YwI9CFhAjZClpXpcXdCUepD9kZup5vIBq0000CyVyanU33vTtRz
-	sFz1wRmgM0AciJkNegDXPCQJ7R05OWtQhIUXGTk1krPgLBg/VAyQIysJ
-X-Gm-Gg: AfdE7ckIQtCXbYzdEzChcktAwFTm09lCTiWEkGLF48eyyfalst+YJuL0IUE2c872JPp
-	KkPra4J0Vefwn3RK2PCkT9/bHGiaXR8AAI2G3XgX9vd8xuoqH1Wq7XRIcCycy1uTkJM6/rZc4qL
-	awkkNyqY8+92NYYmy2URU69qAXrBW1qJIyK8gkS408zBwWNbl1/LJ+P3g4A2z8okfQgX9ndnhji
-	YMdnBjGRubTc0wf1BpbzW4cYW2vYG2yHAnyNR8v/jPE2g8q2yM23Hv0Tcu8ZIXBxvwz+0Sm/91a
-	jYPYuoQPGQVuatx87jkMmXJffxLjpDDP4QPPcXpSDy3xzpPXzoSch7lVfuayvUxZ/YGykNHBEZ4
-	cjmoev0JVzD2aDnYIIcXIXbYvoQDP8Y0oG3g5GjddehTRZttS9e0JXuZr86HwtvvUznwm2lLK2s
-	t5J1OyoBM4RM6bJ8DghyRXekATWqdIu2U8EZ4T84tL3jPLuipJZ2RR9A4bNGg8kYBkJ9ntdHlp1
-	gonblQz
-X-Received: by 2002:a05:690c:e732:b0:806:e2ad:534d with SMTP id 00721157ae682-806e2ad5685mr63025537b3.7.1782313802899;
-        Wed, 24 Jun 2026 08:10:02 -0700 (PDT)
+        bh=vA9QX6ZkTA0MM5pEdSW9MiBk/GWU290NZ7cLdKoelp4=;
+        b=PUUHQqDuIin4iUGYiZsHBMHSZka6Nx4xkWaArGlEdg+yFPke6D2YzUDgw21Bxu0+bK
+         qM6R557rIivjbUQdQsaDhGr70A2XuI1p7WCPDmQ+8pkAsZYiey8pIoA7ORkiCHfHCWNQ
+         bO8iXwSgTmhbnp6ADL2NnD+USP20nVRJ9YfayZyLNPJRHqmC9zFI8iWDoepv0Kmfabrx
+         +bUQcWIooNdE1NQbNqkYV4Ptd9WzlKEGa5fVzqLhRjFz3PF/Cg7nOKZKr4gFl6ZMIE0t
+         UX0UTr5xxep2d29NVOLFJIKic20xYUvgHsY4zFaGv+8ou1R2/zl7fIFbTsVkPx2lMBAW
+         vvHw==
+X-Gm-Message-State: AOJu0YwYcuDJoPimzADRHU2n2LetQJ9xeB7MBa6wjmQzA0kUMCrD3dQ7
+	omrSAE/VtNTIyaWBJ7yUv4y9bU5KX14FoLYyAUtf8ic8MqmPCFz1naOf
+X-Gm-Gg: AfdE7cn6LMUTRxjyfCj9JxGVJOGHPcZgaEz8kFyVw/iaG739kO+zyII32W3nUTgaUc7
+	PlHVHhfesoYvnGMyZCaLcJ2eN4KPu185S35sGy0Vctv7e2fORkFJfdSUCaigGUdzMJ3wUSFKVCj
+	3p44cVu7hTrGmHEJSWjxcIG/Qb9Frv1fupctUHJnTw4+gZzxyaFBqMG2i3IDhbFjqHKbC+feDiF
+	gQF1E9UVg/CfgVA8abNC2cfqxJ1rhLH6EhjC64+Y6xDd1cd+CXt1gM01BWePKn9P/yt0fopxYMu
+	I14UI6jCYhI/P9mefycEOYEvPyOuhMbqLkyeV3+tmHZ6vF2enE9qFIuhv3CmnSqkEXiRGzGd3nB
+	7iWBVLIBBd6+QNk3gjtoweq+g+56Vade3SHyikqyEa+E7y1f7hTMc50hVMBDkC6yrtPwU7B98ON
+	JedIQizys8TDokrgWR4IIOLChLvC1dMV6mfVbviUodZPQ9D5VyEJsNLvI4NtxVu0ssNniUKYQxM
+	vMpOtje
+X-Received: by 2002:a05:690c:3585:b0:7fa:c896:8982 with SMTP id 00721157ae682-807f457c504mr35752237b3.26.1782313981917;
+        Wed, 24 Jun 2026 08:13:01 -0700 (PDT)
 Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8025f8de144sm59467307b3.25.2026.06.24.08.10.00
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-80519668bacsm37978887b3.26.2026.06.24.08.12.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 08:10:02 -0700 (PDT)
-Date: Wed, 24 Jun 2026 10:09:56 -0500
+        Wed, 24 Jun 2026 08:13:01 -0700 (PDT)
+Date: Wed, 24 Jun 2026 10:12:55 -0500
 From: Ming Lei <tom.leiming@gmail.com>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
 	Nilay Shroff <nilay@linux.ibm.com>
 Subject: Re: [PATCH v2] block: serialize elevator changes for the same queue
  using a writer lock
-Message-ID: <ajvzROGGO-9JWFHk@fedora>
+Message-ID: <ajvz98mmlJEaTNxd@fedora>
 References: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
- <ajum7l5BPDRoeJgi@fedora>
- <ajvCBkxdTCNt9JWI@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,45 +74,74 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ajvCBkxdTCNt9JWI@shinmob>
+In-Reply-To: <20260623013238.642052-1-shinichiro.kawasaki@wdc.com>
 
-On Wed, Jun 24, 2026 at 08:48:16PM +0900, Shin'ichiro Kawasaki wrote:
-> On Jun 24, 2026 / 04:44, Ming Lei wrote:
-> > On Tue, Jun 23, 2026 at 10:32:38AM +0900, Shin'ichiro Kawasaki wrote:
-> [...]
-> > > Please refer to [1] for details of the failure. Also, I created a
-> > > blktests test case that recreates the hang [2], which I used to test the
-> > > fix.
-> > > 
-> > > * Changes from RFC v1
-> > > - Instead of adding a new mutex to struct request_queue, replace the
-> > >   reader lock on update_nr_hwq_lock with the writer lock in
-> > >   elv_iosched_store().
-> > > 
-> > > [1] https://lore.kernel.org/linux-block/20260611074200.474676-1-shinichiro.kawasaki@wdc.com/
-> > > [2] https://github.com/kawasaki/blktests/commit/8e80b3ccc0bbbe3f209d00eacd138d020de97fc6
-> > > 
-> > >  block/elevator.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> [...]
-> > I feel this is still abuse of the above lock, which serves writer vs
-> > reader wrt. updating hw queue.
-> > 
-> > How about the following fix?
+On Tue, Jun 23, 2026 at 10:32:38AM +0900, Shin'ichiro Kawasaki wrote:
+> When elevator_change() is called concurrently for the same queue, the
+> elevator_change_done() function runs concurrently as well. This function
+> adds or deletes kobjects for the debugfs entry of the queue. Then the
+> concurrent calls cause memory corruption of the kobjects and result in a
+> process hang. The core part of the elevator switch is protected by queue
+> freeze and q->elevator_lock. However, since the commit 559dc11143eb
+> ("block: move elv_register[unregister]_queue out of elevator_lock"), the
+> elevator_change_done() is not serialized. Hence the memory corruption
+> and the hang.
 > 
-> (snip)
+> The failures are observed when udev-worker writes to a sysfs
+> queue/scheduler attribute file while the blktests test case block/005
+> writes to the same attribute file. The failure also can be recreated by
+> running two processes that write to the same queue/scheduler file
+> concurrently. The failure is observed since another commit 370ac285f23a
+> ("block: avoid cpu_hotplug_lock depedency on freeze_lock"). This commit
+> changed the behavior of queue freeze and it unveiled the failure.
 > 
-> Thank you for the idea. I applied the suggested fix on top of the v7.1 kernel,
-> and ran the test case that does the concurrent write to the sysfs sched file
-> [2]. Unfortunately, the test case hung. Before the hang, the kernel reported
-> WARNs in sysfs_create_dir_ns() [3]. KASAN slab-use-after-free was observed also.
-> I also noticed that another WARN was observed during boot [4].
+> Fix the failure by changing elv_iosched_store() to acquire
+> update_nr_hwq_lock as the writer lock instead of the reader lock. This
+> serializes the whole elevator switch steps, including the
+> elevator_change_done() call.
+> 
+> Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+> I observed that the blktests test case block/005 hung on a specific
+> server hardware using a specific HDD as a block device. During the test
+> case run, the kernel reported KASAN null-ptr-deref and slab-use-after-
+> free errors. The failure happened when a sysfs queue/scheduler attribute
+> file is written concurrently. I reported the failure and shared a
+> candidate fix patch as RFC [1]. Based on the comments and discussion on
+> the RFC patch, I propose this v2 patch that avoids introducing a new
+> lock. My thanks go to Ming and Nilay for the discussion.
+> 
+> Please refer to [1] for details of the failure. Also, I created a
+> blktests test case that recreates the hang [2], which I used to test the
+> fix.
+> 
+> * Changes from RFC v1
+> - Instead of adding a new mutex to struct request_queue, replace the
+>   reader lock on update_nr_hwq_lock with the writer lock in
+>   elv_iosched_store().
+> 
+> [1] https://lore.kernel.org/linux-block/20260611074200.474676-1-shinichiro.kawasaki@wdc.com/
+> [2] https://github.com/kawasaki/blktests/commit/8e80b3ccc0bbbe3f209d00eacd138d020de97fc6
+> 
+>  block/elevator.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 3bcd37c2aa34..b03185a217ff 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -813,7 +813,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+>  	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
+>  	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
+>  	 */
+> -	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
+> +	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
 
-Looks this change isn't enough, and it is a bit hard to deal with the
-two-stage switch by re-lock, and it may require sched debugfs & elevator queue
-reg/unreg refactor.
+I'd suggest to document why using write_trylock above, such as serializing
+2-stage elevator switch, anyway this patch looks good as bug fix:
 
-Let's fix with your simpler way first.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
 
 Thanks,
