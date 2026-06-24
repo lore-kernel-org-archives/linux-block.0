@@ -1,194 +1,274 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012049.outbound.protection.outlook.com [52.101.48.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760623B47E0
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 13:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782307406; cv=none; b=NiZvSdpeHBUdAmEBNvufIwkDffXinNu6wG+TrlMqYyAocdNadQT9dtGlIvgjlMdHeK8ym+bUrdyuexfF+y2Jjukd5efijlpyE3LaE0aRqDB/tsvZQpiUQkcpJPIShWG1STL+CZngZ1euzrXpCy1PmwLe5/9SlL4s3agvwBvYgXQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782307406; c=relaxed/simple;
-	bh=nOGI1wI+vpa0w8/Vtce1TwCsycM2v5+pG5SNHLWaxXs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gmgDQbfKDA92AkAlrdMsQxfWi2i05zJvfnZQfJiJIwtOla8ZUfOJEr6U1yUJnSVg2Am+fG1Ql2izEOzYvvnFTtW012BIzWVLTGJW3gIa8j01peAAILNItFakYFpx1ixnECeWXOgKJRRC2WnMp8ovFxTlm5kiVK4Y/hMmvgwidsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=cgCrq7NG; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6961DF736;
+	Wed, 24 Jun 2026 13:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782307449; cv=fail; b=MqassYjNgYgM4A0iLJnQq1GgcjByPW0hXaKse8Wqmui5CTO1MLqdi3sySzrUpJbHVp/X+7CrieX4Sxoqqu/o74gNEEJnloqJbriNt5vK7S4+jDRWZCAczPzHXliZLFa05d3BvE18rMujlCz0fQQxG/HYPetveM0sz1WydCEUNFM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782307449; c=relaxed/simple;
+	bh=fa+S84HJ16sURB3PNA9C1IyPsffcIgr7c2Etm3JmKEY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=L0gCvisSSTG3J1SvZz7tLsLkSfbzU40ffJjmc3aeYG6GKzzKsSNRtnpUdjc9FiKf8hFk6eg54bIBocEOLXv7OPxNwZUNPVDTC53OTFI9o87fmhYbVjwP/ZVxl8cmn9LcsKAa/Odp8NPtRPDYM/feAQ40E2iSWi9l5j25gAh1x4A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dc94bJtD; arc=fail smtp.client-ip=52.101.48.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cgCrq7NG"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-bec3ffb95dbso158621966b.0
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 06:23:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1782307401; x=1782912201; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pcv3i8MxYGcE66nrV/kv3D5y9IOE8aUQHBcOTbfUFU4=;
-        b=cgCrq7NGG1p0s3yNJZX9a278VP+kx23StqMr2I8tXonWrDsYnISG5dIsC6qk7Uktc2
-         XLunBxsVzP1gxhwR2nQvA90HP2RjR2M9FgYY9DSuiLrzvk6fsfdn0LWScB2xSSnwfQDi
-         v8R0W+ObgUgIdywLlvB6Ksnki2hBo6ScvAQqgWh7u5IW8crEsW93sq9e8vpdKTYxbXO5
-         oSpBX3P45oikv1Y4B6xCJKqfYnxKeRsMOj4VhHh/AMDnMGroAUGKEw0dbbK674Jrillk
-         eeEbLOaqP9SZijhcjbaCyCEx0vYr+Np3sq/WmLVv9PAVJnuVhBf9mptydGoMPKthnC9M
-         aelg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782307401; x=1782912201;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pcv3i8MxYGcE66nrV/kv3D5y9IOE8aUQHBcOTbfUFU4=;
-        b=O4xN2QkyOsfW0bYSoIN4nqCBj6LlzL3eiZSIKASmfw4VIrxYW7jEfJ4JNJyc1c10Fu
-         kuQ7Me9HLgsZPB2HLtpi9/KNR+TVC83rNW/gBa1qBfW0XZC2Q/x4Yf1j14bG7KRKaVT8
-         2YXWiLsasIAChDTGXpo1R+lKHkR+IzBtxsyGiiPvMYel4TXyAt1xLYQfTZFelltewJ1C
-         eLTawN2rAI+945vb1vOpyH39fc7Z7ItMthDM9ZqUP1DkZoTh53mrA3vwuOAZtTQT4lmo
-         6Df41ALO5DUasQWcTGVGBKz8/yth+cit467hg5rPCh6xiQnvWAnVwX+WRif0oHvGv2Ha
-         lufw==
-X-Forwarded-Encrypted: i=1; AFNElJ8YX2xmpki7J52G97xAAzUCyagWjhvb11wa5jeN1JbM9i/mcivWWmrsKA8lmUI/Nw8FTGBjTcw11rFdhQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdDT9GBQPkYJ+WLyzwP0yFOfIRdoDeHTSedVSFnRcaagrMOOyi
-	fNVYa5CUnl5oQO7arX38Ms7EQlxuCmzblY5v53k4656DKaG0HwOkklIrqA+oIZ7zOl0=
-X-Gm-Gg: AfdE7cl7DVLPNrSAB21rrQ2QTjpTpbVO4mLs4d5Jo5DVDOD73QAmT9WgjtwZFsnp3Zk
-	d3jFVwBm+rB0RV8R4Zov/F0YU/cMT1B6AIaDY0DeJOgSqVPw3munVncWKr/c9ovO+f7lrZZk8h4
-	EeoGOKGiy0EUhU6S0Z7p3oceN5mtgn+x0Qs8HxDiTSsBfhJ3vUQQyQF5lV2ynhD8iezLtKJDN4r
-	oh09v7lKXlHE42+zGdwDN0j9f1qHRVx6bH5d4dJcURTNoSzj4yKBWmI1lFey2vuuDVcFMH5hNyR
-	p6SKplOkh3KRZoKxyiCWe2VKzH0OzmDKuxnnAPOpJzixymFhgKTJ01FwE0X7JVAglLOb2+BB4St
-	n+kQbON7/pDUK5Tth7A9evR4UorMt8Spt71YRDhxVuZ4mLFzrm9XN8WdP5WZy4w9Dvbd4m4PkPr
-	uji4JUmyy5uGYeFE+3tmnGKfdoT+hqcJhcpZfJxB7ZfwmmcE+VzpYs1x7lB8HvouOpk6ODvOkxn
-	RiNHU4zeTJO3HchVoTFsJYcr5AX4co1jZ5q+UlTjZ1hUkFuw5M27IUd4T4=
-X-Received: by 2002:a17:907:a807:b0:c10:d41c:e540 with SMTP id a640c23a62f3a-c119e179685mr185363566b.11.1782307400601;
-        Wed, 24 Jun 2026 06:23:20 -0700 (PDT)
-Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c5e99e1aasm644551166b.25.2026.06.24.06.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jun 2026 06:23:20 -0700 (PDT)
-Message-ID: <8ea21b29-9baf-4926-a16f-7d21c5a1a1b8@suse.com>
-Date: Wed, 24 Jun 2026 15:23:18 +0200
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dc94bJtD"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tdaAv+ecVA6DZauEGCo9T7B1nQOcCSUU7hNraj6tRtvtEUHeUQj+rFIXvoWnfPqY2jhC6wTt7R5+xcBY+VelRctKrARIr4wFZbaANqvwzrGcUf8rtxtOhVqHYalcx7RfsOmd6Os93RNh+K5OUkebyCKH5NBEKXytYF2j5Rl+jRyvcQ+Gg7v73Tj8YrP+mR/51jOvdRVdZWEAYjMDLVFBpPhzlgphh9Ezf7NC47k8IaCF0Cb/w30LBjYjWpROP/SPaCTetRgg0ltq47Ri5yeOwV9IFjbZYyh7A9G7Qtv/+Nc4zu08kN5H6K8BBSZyZ3m2G2dF3Zq4uRjqZvsALTPMuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d81CM1+AT4WllJ72uDv8AXVKFPVvGK8TiKbKmP7zRcI=;
+ b=sFfEVVxRwsOYnMcorSkPi3qRpCppWOTlauZ7YwzcPjJrepWy2banawSRiQaamujWLzH7Yovh7ENxhyducOetDdXtV1XFbL6iapW7G5HTFQCirdpvpTOYs0YHy+RcrflhBaARVWO1RdbVKvKoyb0fO3BmNMTIBGYfvpvol1u53nhVZ42cRILUOyxRtQ74yozN+rK428+aL8CCErpNEkNAh3+LLelktq5N4ng84SmLdBgXMssQz2zLSrS/mxXQQA3bLevLyLpOyjc+nB7gvgns33sblaC7Wq4xCrlSwG65uV7dd0XfLPQl5XraQD47voUHwmBSQWUTshtT8HLMy4gGog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d81CM1+AT4WllJ72uDv8AXVKFPVvGK8TiKbKmP7zRcI=;
+ b=Dc94bJtDtzGF6zztoUX5l/0+u8PChmvdYrmw4RV69JMcqBPpaCuwM6m7FYCD96iE76/DFmIb1NLF2TM8ns09RKOhlAtoUYlKIt5NKISj2tBRmfTa33pXQr/2q01X23GhzczSPuaJVh7I8h1G2u/xxf1sPPYPTJNjJHQLYY2EQXs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by CH3PR12MB7570.namprd12.prod.outlook.com (2603:10b6:610:149::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.14; Wed, 24 Jun
+ 2026 13:24:01 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0139.018; Wed, 24 Jun 2026
+ 13:24:01 +0000
+Message-ID: <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
+Date: Wed, 24 Jun 2026 15:23:47 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
+To: Kaitao Cheng <kaitao.cheng@linux.dev>,
+ David Laight <david.laight.linux@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, David Howells <dhowells@redhat.com>,
+ Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
+ <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
+ linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+ <20260622040533.29824-2-kaitao.cheng@linux.dev>
+ <20260622094242.64531b9a@pumpkin>
+ <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BL1PR13CA0270.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::35) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/9] Fix missing fops.owner in Rust DRM/misc
- abstractions
-To: Alvin Sun <alvin.sun@linux.dev>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
- <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
- Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
- Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
- Igor Korotin <igor.korotin@linux.dev>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
- Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
- Carlos Llamas <cmllamas@google.com>, rust-for-linux@vger.kernel.org,
- linux-modules@vger.kernel.org, driver-core@lists.linux.dev,
- dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|CH3PR12MB7570:EE_
+X-MS-Office365-Filtering-Correlation-Id: 715eed2d-514b-4810-2f08-08ded1f3da78
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|7416014|6133799003|18002099003|22082099003|56012099006|4143699003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	vjRMDzmTxaLO3rG//AE977uAg8zKrEwMP6cu1AOblab8SZ491Cs0rYGIPxYvAFRNxWSVQ1WdRjVkW8uINOWaaO1LcWyt/wIKFnqXxociABOHsobehPc8e61s3GnfEfviv/vYUJs1BYtORVJs0+rNk2XGq+ZYcvNpXg6oKMgBd60P6S9UAXXOjUalPunVJcruSBXhU+03Db/ZLAvwRMJ4LkyKp9X8urTD29nI1sVli23YRzfr6f7QlYt1NE8z2tjj+tTOuaopcIYaTyRREeh1LTyJGLjXPTHttj/0qGSJWH0dbU2PQ16weT2vE/oUJQOd55L87wLEkz7iKzhzNzwmoRCxnEYaTxhqUK/d7fhbS49r2+o+otSyW6oXmfcTSEh+A13SwWrC412pRamXap2Sq7vEAcnU53bRd7aSf1zOxgJJbd60qry1G7yF8/wahybuHwktLDMb87yqpcxhBNlskColY6z/ieQl9ZLrsRjxsFjJ4g1BGfi6PGkW4cNzSNGwUDfb3g0kKQ3RXayJ1mvTgK+cHwyZAOuPrNH+rmrGsOoC7gIXksGzl1YSqQT/guiSOvjYJs2VkcDleBwpXa21FkM2F/IXE9BjHNUkTuuA2CqTou5m5AUIIvTJkWTeEcpphCrCfaZcRkBjaZAv/XpqW1HguK/RVMJYVXXsSyz8H8k=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(7416014)(6133799003)(18002099003)(22082099003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YWxibmFPMnl4Z04zVXpKQXBkcXNhV1dTQ1o4RW0vQ3czTkIvQVQ4KytXc2dV?=
+ =?utf-8?B?QlIwYmFNbGQwSVNPbVd3MXlQMmJjZWJNTXA3Z0VRTjZSQnVNU1FmejFKNzh3?=
+ =?utf-8?B?ejRvMkY3NHNNSjNSaThtY0xPaTcvNU9BeldYNGx4VW8xZXJmSzJmaWNDV0Z1?=
+ =?utf-8?B?QVdzQzZuUTljZUF6UXIyZzd4OEVwRS9oT2pFdWVPNERlUjBrZjVsSUZ4M1Aw?=
+ =?utf-8?B?VmR2bFl4aFVEd2dmV2Q2NHNUWVE5d3BVTXQvcVFqR0E3blVnUXJRVUhKdmN3?=
+ =?utf-8?B?U251WFF0SlhUc3J0MjdwdXB5UmFFbDRSeGxSckpQSHZ1RXlkTUV4RXZvdkxa?=
+ =?utf-8?B?U1ZZK2NIWlB2cFZDUHNxL2J1MVEzRnp0Z2k2SzFCemtvN3I2M0htRUVrcWlE?=
+ =?utf-8?B?TjVpOGhaNFdnUFR4Zk5WWGpEU2NObC9WM3Z6eHFsbVRkS0NxZGpENi8yR3Qz?=
+ =?utf-8?B?Tmp0cEpqMFcrbnRhQStMV2xWYk1qTHhOdlh4dGtHQWNIS1VEVFJ5UzZXeVEw?=
+ =?utf-8?B?RUc4aUtQS3BmMnlPTXVpNVFDcXJNbDRiR3FuWmVVLytDUm5CdFI3dGltV0xO?=
+ =?utf-8?B?T25rMFhVNXpCaGxlUjM4cEJUK0ozdXF2SEdhRG9MLzNHdVphcDNGVjh3M1hj?=
+ =?utf-8?B?YWozS3Nma2dZMmx2VmdhMmxaTXRVbTByalA5YklaM1hwVk9KNXNyQk1xbnli?=
+ =?utf-8?B?eVFxWkIwdTJBckZuZFVsaEllNnl1cFhNdGkzeEdaeVVRckM0V0d1czZxaFRi?=
+ =?utf-8?B?MmxjdHV1SjNnQnJieTE4K0w1YmdCK0FQbFZsL3QvcTB3dityclIrdHp2dFZo?=
+ =?utf-8?B?WTV5Q043cFNaVm5keXZISjFLZXJzRDZKd3Q3R0pIYzVMZ2tBcDBvaG5vU2ll?=
+ =?utf-8?B?b1VCOUV5VnRyVll5Y3lOTmE3c1RNbzlkWUFwVWRtWXdxSllWK3ZjOS93TUVw?=
+ =?utf-8?B?dnMyekZZSHF1bHU3Q3kxVzZwWkZsWk9ndjZHV21aYzdlMDV2Q0MvVEFTWHVu?=
+ =?utf-8?B?WkN5Qm9LOTZ1am5nL2NaYktHS0thc0FVNEtDcStzMEcrRWY3MDIzdklSL2I0?=
+ =?utf-8?B?ak4xck1qd001enVONE1HeHJMc0xMa2tYTjRQTm9vMGZpNlR5WFV4KzA3aUhy?=
+ =?utf-8?B?MitMSHc3MnFaSjRaemlZWDFRaXVEc0xEeHY4YlpoeHdxa0xEcjJrajVQYkM5?=
+ =?utf-8?B?Qi9ISWE2ODFNYWV1aWNWQ1NGOExiM3E5YzhJODRjcVhOR3YyMk9IbFlFMG10?=
+ =?utf-8?B?czFvWVhOd1UzQU1WU05ZYW1odXBrdXpObXZtVkIwcklLa21XNG5wSmphWHJD?=
+ =?utf-8?B?aGJOajZqSTVmb2gvdHc0WTQySjlHQ2VIRWY3SHZScW1YUlBoL3ErdDFmYUFO?=
+ =?utf-8?B?cTl6WHNGaEtZTVNvVk1sV1NXblB6WG0zRlZnNUVPV3hnSEJYRG10a3RhaXA2?=
+ =?utf-8?B?WU82ZjFqYWdGaXZ6TExybGVNWTk2QzJRTlk4SE9WVUJtV1FRVU1tbkZlTnp1?=
+ =?utf-8?B?bFhTczlvYUttdEU3bEZwTnp3ZjN1MmxQQnk4MGlMYk9Ga3h0YkdDUFk0bWJN?=
+ =?utf-8?B?cWVmR1dWdHVWV1IveHlnWnBla3grZGtqWW85ZkYyQnhWSEtzTlRYa1dhenlP?=
+ =?utf-8?B?Y3FDaXJxSkJiUjdQNktaNUpDVFk3eGpUYWNnOWtramhxZ0RWc0daaW4rY3BX?=
+ =?utf-8?B?cEtsdG81L1lRNCtiTEMvYTNHcVY4MmpuaFZvVTVySlVpVVlkcTNQajhGb08w?=
+ =?utf-8?B?WGFBNERTSGxLc3cvakQzZjRwbzEvMUMvZ2o2SnFzM3RHY1k1YWlYck1KQjJp?=
+ =?utf-8?B?alVWRDFVYXFkOVBLRlY4MkRGQSsvb2Y4SEZ2T2pkemZNU3FnVjJTR2NWU2M1?=
+ =?utf-8?B?RjVpMjdCemZBWXErMndvbkJkaFk5ZnJRck4yYXU5V2FqVzJ2Y1pjQkhSTUEx?=
+ =?utf-8?B?ZmdFZ3lrc2JjL1lpb1R2alpYNUFidDVCNXdFaXdyNk9yWjl1Z2p4Y0FqdEZB?=
+ =?utf-8?B?T0JmTk9xK3MwRGxrL0tqZGFWK3BXZlUyNWlITzBzUHY4ZjYzNkw4MW5ZVVFv?=
+ =?utf-8?B?NFhsR2tPaEFKY3EwRDJOYlVhOU1LUUtDMVRqeVNCZXdnY2lML2k2VU9tbzFI?=
+ =?utf-8?B?WlZOOXBScmUyd3B6bEl2eURzOVB2VzRnLzFGQTZaS1VVd0ZaaVplWExGZ1pQ?=
+ =?utf-8?B?U3RTNWlFaitwNVRqREs4c0RHMFlKVjMyeENKbzk4bjIvL2FkRDExcitRdXA4?=
+ =?utf-8?B?Yys0Rm5zUmtIRkpVYzVKSEhHNmlsbFVvZHpWTHl3SUZkdkxWNndJUUpENkl6?=
+ =?utf-8?Q?cSgurPjmbMLoRmPxTI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 715eed2d-514b-4810-2f08-08ded1f3da78
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2026 13:24:00.9068
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QVhBEK/2F/j8PEv/furwKNhQwAwxU3hZSEqW50n8SOx5hinzeiYl4lrFCu6sDpFf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7570
 
-On 6/24/26 2:57 PM, Alvin Sun wrote:
-> During tyr debugfs development, a kernel NULL pointer dereference was
-> encountered after `rmmod tyr` while gnome-shell still held /dev/card1 open:
+On 6/24/26 15:14, Kaitao Cheng wrote:
 > 
-> ```
->   [158827.868132] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
->   [158827.868918] Mem abort info:
->   [158827.869177]   ESR = 0x0000000086000004
->   [158827.869519]   EC = 0x21: IABT (current EL), IL = 32 bits
->   [158827.870000]   SET = 0, FnV = 0
->   [158827.870281]   EA = 0, S1PTW = 0
->   [158827.870571]   FSC = 0x04: level 0 translation fault
->   [158827.871043] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000108dec000
->   [158827.871623] [0000000000000000] pgd=0000000000000000, p4d=0000000000000000
->   [158827.872242] Internal error: Oops: 0000000086000004 [#1]  SMP
->   [158827.872246] Modules linked in: tyr sunrpc snd_soc_simple_card rk805_pwrkey snd_soc_simple_card_utils rtw88_8822bu display_connector rtw88_usb rtw88_8822b snd_soc_rockchip_i2s_tdm snd_soc_hdmi_codec
->   rtw88_core]
->   [158827.872337] CPU: 4 UID: 1000 PID: 11276 Comm: gnome-s:disk$0 Tainted: G                 N  7.1.0-rc1+ #331 PREEMPT
->   [158827.880534] Tainted: [N]=TEST
->   [158827.880535] Hardware name: FriendlyElec NanoPi R6C/NanoPi R6C, BIOS v1.1 04/09/2025
->   [158827.880538] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->   [158827.880542] pc : 0x0
->   [158827.880547] lr : _RNvNtCs257m05FHVbX_3tyr2vm8pt_unmap+0x8c/0x12c [tyr]
->   [158827.880578] sp : ffff800083c236b0
->   [158827.880579] x29: ffff800083c236d0 x28: ffff00013f8a0000 x27: 0000000000000000
->   [158827.880585] x26: 000000000000007c x25: ffff000108e6ed80 x24: 0000000000401000
->   [158827.880590] x23: 0000000000000000 x22: 0000000040000000 x21: 0000000000001000
->   [158827.880595] x20: ffff00010f778138 x19: 0000000000400000 x18: 00000000ffffffff
->   [158827.880600] x17: 000000040044ffff x16: 045000f2b5503510 x15: 0720072007200720
->   [158827.880606] x14: 0720072007200720 x13: 0000000000401000 x12: 0000000000400000
->   [158827.880611] x11: ffff800083c239d0 x10: ffff000141e4fd88 x9 : 0000000000000000
->   [158827.880615] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000400000
->   [158827.880620] x5 : ffff00013f8a0000 x4 : 0000000000000000 x3 : 0000000000000001
->   [158827.880625] x2 : 0000000000001000 x1 : 0000000000400000 x0 : ffff00010f778138
->   [158827.880630] Call trace:
->   [158827.880632]  0x0 (P)
->   [158827.880635]  _RNvXs6_NtCs257m05FHVbX_3tyr2vmNtB5_9GpuVmDataNtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm11DriverGpuVm13sm_step_unmap+0x3c/0x120 [tyr]
->   [158827.891166]  _RNvMs4_NtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm6sm_opsINtB7_5GpuVmNtNtCs257m05FHVbX_3tyr2vm9GpuVmDataE13sm_step_unmapB13_+0x18/0x34 [tyr]
->   [158827.891187]  op_unmap_cb+0x78/0xb0
->   [158827.891196]  __drm_gpuvm_sm_unmap+0x18c/0x1b4
->   [158827.891204]  drm_gpuvm_sm_unmap+0x38/0x4c
->   [158827.891209]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm7exec_op+0x1cc/0x254 [tyr]
->   [158827.894085]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm11unmap_range+0x124/0x188 [tyr]
->   [158827.894105]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeNtNtCs257m05FHVbX_3tyr3gem8KernelBoEBK_+0x44/0xd8 [tyr]
->   [158827.894125]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel5alloc4kvec3VecNtNtCs257m05FHVbX_3tyr2fw7SectionNtNtBL_9allocator7KmallocEEB1r_+0x3c/0x100 [tyr]
->   [158827.894147]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel4sync3arc3ArcNtNtCs257m05FHVbX_3tyr2fw8FirmwareEEB1p_+0x94/0x190 [tyr]
->   [158827.894167]  _RNvMs4_NtNtCsgmSOfgXi5CZ_6kernel3drm6deviceINtB5_6DeviceNtNtCs257m05FHVbX_3tyr6driver12TyrDrmDriverE7releaseBW_+0x30/0x98 [tyr]
->   [158827.899550]  drm_dev_put.part.0+0x88/0xc0
->   [158827.899557]  drm_minor_release+0x18/0x28
->   [158827.899562]  drm_release+0x144/0x170
->   [158827.899567]  __fput+0xe4/0x30c
->   [158827.899573]  ____fput+0x14/0x20
->   [158827.899579]  task_work_run+0x7c/0xe8
->   [158827.899586]  do_exit+0x2a8/0xac4
->   [158827.899590]  do_group_exit+0x34/0x90
->   [158827.899594]  get_signal+0xaac/0xabc
->   [158827.899599]  arch_do_signal_or_restart+0x90/0x3e8
->   [158827.899606]  exit_to_user_mode_loop+0x140/0x1d0
->   [158827.899613]  el0_svc+0x2f4/0x2f8
->   [158827.899620]  el0t_64_sync_handler+0xa0/0xe4
->   [158827.899627]  el0t_64_sync+0x198/0x19c
->   [158827.899632] ---[ end trace 0000000000000000 ]---
-> ```
 > 
-> The root cause: `fops.owner` was `NULL` in Rust DRM drivers, so the kernel
-> never blocked module unloading while file descriptors were open. This leads to
-> use-after-free when drm_release (or other fops) is called on freed module code.
+> 在 2026/6/22 16:42, David Laight 写道:
+>> On Mon, 22 Jun 2026 12:05:31 +0800
+>> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+>>
+>>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>>
+>>> The list_for_each*_safe() helpers are used when the loop body may
+>>> remove the current entry.  Their API exposes the temporary cursor at
+>>> every call site, even though most users only need it for the iterator
+>>> implementation and never reference it in the loop body.
+>>>
+>>> Add *_mutable() variants for list and hlist iteration.  The new helpers
+>>> support both forms: callers may keep passing an explicit temporary cursor
+>>> when they need to inspect or reset it, or omit it and let the helper use
+>>> a unique internal cursor.
+>>
+>> I'm not really sure 'mutable' means anything either.
+>> It is possible to make it valid for the loop body (or even other threads)
+>> to delete arbitrary list items - but that needs significant extra overheads.
+>>
+>> It might be worth doing something that doesn't need the extra variable,
+>> but there is little point doing all the churn just to rename things.
+>>
+>>>
+>>> This makes call sites that only mutate the list through the current entry
+>>> less noisy, while keeping the existing *_safe() helpers available for
+>>> compatibility.
+>>>
+>>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>> ---
+>>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
+>>>  1 file changed, 231 insertions(+), 38 deletions(-)
+>>>
+>>> diff --git a/include/linux/list.h b/include/linux/list.h
+>>> index 09d979976b3b..1081def7cea9 100644
+>>> --- a/include/linux/list.h
+>>> +++ b/include/linux/list.h
+>>> @@ -7,6 +7,7 @@
+>>>  #include <linux/stddef.h>
+>>>  #include <linux/poison.h>
+>>>  #include <linux/const.h>
+>>> +#include <linux/args.h>
+>>>  
+>>>  #include <asm/barrier.h>
+>>>  
+>>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
+>>>  #define list_for_each_prev(pos, head) \
+>>>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
+>>>  
+>>> -/**
+>>> - * list_for_each_safe - iterate over a list safe against removal of list entry
+>>> - * @pos:	the &struct list_head to use as a loop cursor.
+>>> - * @n:		another &struct list_head to use as temporary storage
+>>> - * @head:	the head for your list.
+>>> +/*
+>>> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
+>>>   */
+>>>  #define list_for_each_safe(pos, n, head) \
+>>>  	for (pos = (head)->next, n = pos->next; \
+>>>  	     !list_is_head(pos, (head)); \
+>>>  	     pos = n, n = pos->next)
+>>>  
+>>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
+>>> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
+>>
+>> Use auto
+>>
+>>> +	     !list_is_head(pos, (head));				\
+>>> +	     pos = tmp, tmp = pos->next)
+>>> +
+>>> +#define __list_for_each_mutable1(pos, head)				\
+>>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
+>>> +
+>>> +#define __list_for_each_mutable2(pos, next, head)			\
+>>> +	list_for_each_safe(pos, next, head)
+>>> +
+>>>  /**
+>>> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
+>>> + * list_for_each_mutable - iterate over a list safe against entry removal
+>>>   * @pos:	the &struct list_head to use as a loop cursor.
+>>> - * @n:		another &struct list_head to use as temporary storage
+>>> - * @head:	the head for your list.
+>>> + * @...:	either (head) or (next, head)
+>>> + *
+>>> + * next:	another &struct list_head to use as optional temporary storage.
+>>> + *		The temporary cursor is internal unless explicitly supplied by
+>>> + *		the caller.
+>>> + * head:	the head for your list.
+>>> + */
+>>> +#define list_for_each_mutable(pos, ...)					\
+>>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
+>>> +		(pos, __VA_ARGS__)
+>>
+>> The variable argument count logic really just slows down compilation.
+>> Maybe there aren't enough copies of this code to make that significant.
+>> But just because you can do it doesn't mean it is a gooD idea.
+>> I'm also not sure it really adds anything to the readability.
+>>
+>> And, it you are going to make the middle argument optional there is
+>> no need to change the macro name.
 > 
-> The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, threads it
-> through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates configfs
-> and rnull to use `this_module::<LocalModule>()`.
+> Christian König and Jani Nikula also disagree with the variadic-argument
+> implementation approach. If we abandon that method, it means we will
+> inevitably need to add some new macros. If mutable is not a good name,
+> suggestions for better alternatives would be welcome; coming up with a
+> suitable name is indeed rather tricky.
 
-I cannot comment that much on all the details of the Rust
-implementation, but the series looks reasonable to me from the modules
-perspective. I'm glad this issue will be finally addressed.
+I don't think you need to add a new macro for the specific use case that people want to modify the next element of the iteration.
 
-I would only suggest adding the new file rust/kernel/module.rs in
-patch #1 under the MODULE SUPPORT support entry in the MAINTAINERS file,
-similarly to the other module-related Rust code, so that the module
-maintainers are emailed when changes to this file are proposed. I think
-you can change the existing 'F: rust/kernel/module_param.rs' to
-'F: rust/kernel/module*.rs'.
+If I remember your numbers correctly that is a really corner case and keeping using the existing *_safe() macros for that sounds perfectly fine to me.
 
--- 
-Thanks,
-Petr
+Regards,
+Christian.
