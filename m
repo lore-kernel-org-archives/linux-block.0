@@ -1,221 +1,112 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A5E30FF31
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 17:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B3C3CC7DF;
+	Wed, 24 Jun 2026 17:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782322183; cv=none; b=qiUAV0c0iD4+qQrB+lQTb0wjgcDUH1bvJd/F6VA5aXu8DI64PRdB/HwSE6wSrldPMKJjeDREITSKitq6kQ9aHUMR1JEtlu8ovtHtXv5umlYJ2aps0HLSb1k19JUziM+h3ip4mSZXF6FjXVjFrLHVlPZrf7B5PnQ5+DDdQBh8DTQ=
+	t=1782322969; cv=none; b=PIiI20ZX4AqqU4EneXjQQAwctmeUo+gK1Z/n71feRVkvhb9pncNXjfMAs69qzXMc6EdceHuvWgqPgkXYq6F+feDDpgPrtfak0m2DmTn74AhKg/7p4JUObr5EipQwBArbVZSEodyHoVqr/y4eUGGaBCbT6lCzLE1bIZHhXLY1s+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782322183; c=relaxed/simple;
-	bh=Fh9BHVIGfQ/RpNprhH8RMfglcQOp0BiJIvJASEH71yg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pUUR+YkjB9NFukQfWxrLQLapleVXGL9iiQyNdRxxNWxKpFZD4AmBUNw3/DSOZmKNROa4zA6bJCmA+CfgHNhla3gj6U+CLqTT5ILxdtbD9NQcUAgy8SnJsOn9rG0KfPc4mtNWXCgsSUYkdi/tNZQ4Y0YnksRPM8XY8SoX2QLQtIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=JR9XLhQ3; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1782322969; c=relaxed/simple;
+	bh=2ZycE3Xs0J5KLMwS+1EP6QccRLENONtX1HayvXH1Hbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=atLtzgTjzruJlpnqo9/VV1fSGhToPGPu3L7m7KMFU+oK20gACSbf67YFxSEGbXp3hZnCyyFNKuy/w6/ufh1HzWiuJ5/1TFJ8KDfqk8sY3SdNBBpQcSgnW9X9nAn2YNz+kcij1qR2XMSmEGHT+YBcHDfeyINZAOv3hX4s5GDoeps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JqlOnzJa; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="JR9XLhQ3"
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65OEjU6u3972965
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 10:29:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=iio3hccJh+B4s2gOQB4736zZXTM3PJ1TkZjIqDtxVOQ=; b=JR9XLhQ3ntPR
-	+ZhJCJTDh1AK3er5sJznNKZ4mMKekiL/8hRfqJhLYkXyHRU0butMdjmAfArwh2YO
-	6+mKe628A4UFMPBEJGYxsGpUEb9kKs1dpVvlRKajp1NAWyEfizGy4aRHckE00hm7
-	+EVInK24t/tw5sGxYwvOmMX9Q9eeiSVUKje/EHF2WmFSKceLAD/Tiw1zhUhYFc+Q
-	nRREkZItJmBhKi2fUHwClKN3PD/LHbdNKvsWmG1XwDO14z3/HEst2nYnPXQWWNIz
-	FKYC+Kx6UxCDCrYd9/ogTeIWW174ywLdFJJZvOz+Gm08M6xe5/n9H2raouZQ1Xx7
-	g4Ud2WGdNg==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4eyumst15j-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 10:29:39 -0700 (PDT)
-Received: from twshared11639.02.snb2.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Wed, 24 Jun 2026 17:29:38 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 4863A23C452BD; Wed, 24 Jun 2026 10:09:08 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-CC: <dm-devel@lists.linux.dev>, <hch@lst.de>, <axboe@kernel.dk>,
-        <brauner@kernel.org>, <djwong@kernel.org>, <viro@zeniv.linux.org.uk>,
-        Keith
- Busch <kbusch@kernel.org>
-Subject: [PATCH v3 3/5] loop: set dma_alignment from the backing file for direct I/O
-Date: Wed, 24 Jun 2026 10:09:03 -0700
-Message-ID: <20260624170905.3972095-4-kbusch@meta.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260624170905.3972095-1-kbusch@meta.com>
-References: <20260624170905.3972095-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JqlOnzJa"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=4ElqMcyD4SnoVaQLQg03XYigTcdoKEg/OF55QxzEAiY=; b=JqlOnzJae0InaYPAqvmaT+XGXF
+	NE3lCHDU5phMBdzAM0HLvga9mK44xqUP0uku/iiapVYmuLjOEM+VKVi+h7bwd8BB16qeT4l/lfmIg
+	2SIx6fLUOWfTVym/Me6CJgOXR1ipgT/pe0/F1t9vo8he1xfBSlllk6a/u0RpRimgPl7UA194cMa64
+	yzePfkpVxA92FFtp86Kn552jKOUeI4t/GsTykC34EA+ZlWt1C/fN6/dsKhH0qJBAuNVx75rbPSvfc
+	dd1VSfF91HTtSS3fxrHwadeNMYE0Azmzg1MOxzcSKVwVQX1CEV7zE5P9buW9h7bJ0DMTPeblo5bex
+	FJA0OTSQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wcRcT-00000008SR5-2ov3;
+	Wed, 24 Jun 2026 17:42:37 +0000
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>,
+	Yuezhang Mo <yuezhang.mo@sony.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	fuse-devel@lists.linux.dev,
+	gfs2@lists.linux.dev,
+	ntfs3@lists.linux.dev
+Subject: [PATCH] iomap: Remove FGP_NOFS from iomap_get_folio()
+Date: Wed, 24 Jun 2026 18:42:26 +0100
+Message-ID: <20260624174228.2015893-1-willy@infradead.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=eoTvCIpX c=1 sm=1 tr=0 ts=6a3c1403 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=JnKecZnUtZousrUlYMGU:22 a=VwQbUJbxAAAA:8 a=w3YrK2sSALtTPwlh2GsA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI0MDE0NiBTYWx0ZWRfX21yXRT0iWsP0
- /OJgLCwSBiW4VoqM7zs4d7qwDjyFYgLr9miYB3n95rAz1mrBvUqntDqmQl1JrabXvoP1CT7oTKx
- g9yqddQV/H1YN9dUpDOWA78fatHD8tZO/9VYniXQriaDZbCqqwUxvfNrr1hTGSMo7g7yJZ92YmZ
- EdUv3ye5VZufRahK7SxLCx+0ZuFMCIaq7wel869LS4lgnzuHIGrm6GA8hUL4QNnb2jokcx0ndro
- OxsviHMynuUOLYDyBFmp5vN8IvLT4IUil53Pvj79mU2O9o7mk6O/w+LopGO2FcYuKeomK4HMID5
- kIJjn+R79aHf/tNeQwd6m6afNP3O0YYhzuwPk85+MPs6QSg7kENfKa45zfm0SXVOR828nMhMRKJ
- xyVWsWP6OSWtiwpoPpr97Uad+mdLhQ==
-X-Proofpoint-ORIG-GUID: 3jpuO6Jwz6NQdii2Yd2or4QxEBxT_kPh
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI0MDE0NiBTYWx0ZWRfX3FQxmmItm/qy
- L7A3lc30AX1uEVwaYa7cqV3O+CBdzfdUaSddaKWlsc29ayBabT3f41/nHwmIDDjXkKoazg7dhuK
- /UcKbPhHdEgpI+4zoUf3PBRH/mrUM28=
-X-Proofpoint-GUID: 3jpuO6Jwz6NQdii2Yd2or4QxEBxT_kPh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-24_03,2026-06-24_01,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+FGP_NOFS is legacy; filesystems should be using memalloc_nofs_save/restore
+instead.  We have it here in iomap because it was buried in
+grab_cache_page_write_begin() and we didn't want to change this behaviour
+as part of the folio transition.
 
-Direct I/O user pages are forwarded to the backing file unchanged, so
-the backing's DMA alignment requirement applies to them. Track the
-backing file's dio_mem_align and advertise it as the loop device's
-dma_alignment if it is larger than the default so we advertise proper
-limits and misaligned I/O is rejected early instead of being dispatched
-to the backend.
+I have tested this with XFS and see no issues.  Other filesystems (cc'd)
+may need to make adjustments.  Please test with lockdep enabled.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org> (iomap)
+Cc: Jens Axboe <axboe@kernel.dk> (block)
+Cc: Namjae Jeon <linkinjeon@kernel.org> (exfat, ntfs)
+Cc: Sungjong Seo <sj1557.seo@samsung.com> (exfat)
+Cc: Yuezhang Mo <yuezhang.mo@sony.com> (exfat)
+Cc: Miklos Szeredi <miklos@szeredi.hu> (fuse)
+Cc: Andreas Gruenbacher <agruenba@redhat.com> (gfs2)
+Cc: Hyunchul Lee <hyc.lee@gmail.com> (ntfs)
+Cc: Konstantin Komarov <almaz.alexandrovich@paragon-software.com> (ntfs3)
+Cc: Carlos Maiolino <cem@kernel.org> (xfs)
+Cc: Damien Le Moal <dlemoal@kernel.org> (zonefs)
+Cc: Naohiro Aota <naohiro.aota@wdc.com> (zonefs)
+Cc: Johannes Thumshirn <jth@kernel.org> (zonefs)
+Cc: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: fuse-devel@lists.linux.dev
+Cc: gfs2@lists.linux.dev
+Cc: ntfs3@lists.linux.dev
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- drivers/block/loop.c | 46 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 8 deletions(-)
+ fs/iomap/buffered-io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 310de0463beb1..5fe61d542f8b7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -54,6 +54,7 @@ struct loop_device {
-=20
- 	struct file	*lo_backing_file;
- 	unsigned int	lo_min_dio_size;
-+	unsigned int	lo_dio_mem_align;
- 	struct block_device *lo_device;
-=20
- 	gfp_t		old_gfp_mask;
-@@ -447,26 +448,37 @@ static void loop_reread_partitions(struct loop_devi=
-ce *lo)
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
- }
-=20
--static unsigned int loop_query_min_dio_size(struct loop_device *lo)
-+static void loop_update_dio_alignment(struct loop_device *lo)
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 8d4806dc46d4..27bc2455a98d 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -768,7 +768,7 @@ EXPORT_SYMBOL_GPL(iomap_is_partially_uptodate);
+  */
+ struct folio *iomap_get_folio(struct iomap_iter *iter, loff_t pos, size_t len)
  {
- 	struct file *file =3D lo->lo_backing_file;
- 	struct block_device *sb_bdev =3D file->f_mapping->host->i_sb->s_bdev;
- 	struct kstat st;
-=20
- 	/*
--	 * Use the minimal dio alignment of the file system if provided.
-+	 * Use the dio alignment of the file system if provided.  The incomoing
-+	 * request's bio_vec is forwarded to the backing file unchanged, so its
-+	 * required memory alignment becomes the device's dma_alignment when
-+	 * used for direct-io.
- 	 */
- 	if (!vfs_getattr(&file->f_path, &st, STATX_DIOALIGN, 0) &&
--	    (st.result_mask & STATX_DIOALIGN))
--		return st.dio_offset_align;
-+	    (st.result_mask & STATX_DIOALIGN)) {
-+		lo->lo_min_dio_size =3D st.dio_offset_align;
-+		lo->lo_dio_mem_align =3D st.dio_mem_align - 1;
-+		return;
-+	}
-=20
- 	/*
- 	 * In a perfect world this wouldn't be needed, but as of Linux 6.13 onl=
-y
- 	 * a handful of file systems support the STATX_DIOALIGN flag.
- 	 */
--	if (sb_bdev)
--		return bdev_logical_block_size(sb_bdev);
--	return SECTOR_SIZE;
-+	if (sb_bdev) {
-+		lo->lo_min_dio_size =3D bdev_logical_block_size(sb_bdev);
-+		lo->lo_dio_mem_align =3D bdev_dma_alignment(sb_bdev);
-+		return;
-+	}
-+
-+	lo->lo_min_dio_size =3D SECTOR_SIZE;
-+	lo->lo_dio_mem_align =3D SECTOR_SIZE - 1;
- }
-=20
- static inline int is_loop_device(struct file *file)
-@@ -509,7 +521,7 @@ static void loop_assign_backing_file(struct loop_devi=
-ce *lo, struct file *file)
- 			lo->old_gfp_mask & ~(__GFP_IO | __GFP_FS));
- 	if (lo->lo_backing_file->f_flags & O_DIRECT)
- 		lo->lo_flags |=3D LO_FLAGS_DIRECT_IO;
--	lo->lo_min_dio_size =3D loop_query_min_dio_size(lo);
-+	loop_update_dio_alignment(lo);
- }
-=20
- static int loop_check_backing_file(struct file *file)
-@@ -940,6 +952,19 @@ static unsigned int loop_default_blocksize(struct lo=
-op_device *lo)
- 	return SECTOR_SIZE;
- }
-=20
-+static void loop_set_dma_limit(struct loop_device *lo, struct queue_limi=
-ts *lim)
-+{
-+	/*
-+	 * Direct I/O forwards the user pages to the backing file unchanged, so
-+	 * track the backing's DMA alignment requirement as the mode is toggled=
-.
-+	 */
-+	if (lo->lo_flags & LO_FLAGS_DIRECT_IO)
-+		lim->dma_alignment =3D max_t(unsigned int, lo->lo_dio_mem_align,
-+					   SECTOR_SIZE - 1);
-+	else
-+		lim->dma_alignment =3D SECTOR_SIZE - 1;
-+}
-+
- static void loop_update_limits(struct loop_device *lo, struct queue_limi=
-ts *lim,
- 		unsigned int bsize)
- {
-@@ -961,6 +986,7 @@ static void loop_update_limits(struct loop_device *lo=
-, struct queue_limits *lim,
- 	lim->logical_block_size =3D bsize;
- 	lim->physical_block_size =3D bsize;
- 	lim->io_min =3D bsize;
-+	loop_set_dma_limit(lo, lim);
- 	lim->features &=3D ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_ROTATIONAL);
- 	if (file->f_op->fsync && !(lo->lo_flags & LO_FLAGS_READ_ONLY))
- 		lim->features |=3D BLK_FEAT_WRITE_CACHE;
-@@ -1416,6 +1442,7 @@ static int loop_set_dio(struct loop_device *lo, uns=
-igned long arg)
- {
- 	bool use_dio =3D !!arg;
- 	unsigned int memflags;
-+	struct queue_limits lim;
-=20
- 	if (lo->lo_state !=3D Lo_bound)
- 		return -ENXIO;
-@@ -1434,6 +1461,9 @@ static int loop_set_dio(struct loop_device *lo, uns=
-igned long arg)
- 		lo->lo_flags |=3D LO_FLAGS_DIRECT_IO;
- 	else
- 		lo->lo_flags &=3D ~LO_FLAGS_DIRECT_IO;
-+	lim =3D queue_limits_start_update(lo->lo_queue);
-+	loop_set_dma_limit(lo, &lim);
-+	queue_limits_commit_update(lo->lo_queue, &lim);
- 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
- 	return 0;
- }
---=20
-2.53.0-Meta
+-	fgf_t fgp = FGP_WRITEBEGIN | FGP_NOFS;
++	fgf_t fgp = FGP_WRITEBEGIN;
+ 
+ 	if (iter->flags & IOMAP_NOWAIT)
+ 		fgp |= FGP_NOWAIT;
+-- 
+2.47.3
 
