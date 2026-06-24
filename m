@@ -1,61 +1,65 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06FF25B091;
-	Wed, 24 Jun 2026 07:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACF529BDB1
+	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 08:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782286747; cv=none; b=iRO6TA0PDw4MxvDSkaB1+fLNWHiSM2tq8rhqUj+jyoDSKZcn+VgA/PBpjwT1883EpJeHy6400NGLXGkc0BdFFuo+kpb20dDhzZgEq+0fU+uRDAQVj3CXQCHWBwej3wLI5iibIYg5baLT8/ERqSp/xuy2z7AFJ7VA5E9FMdaL/TM=
+	t=1782288021; cv=none; b=nA4haqjWZU5ns7g9OLnFjyg5C9+bj/cr0KOC8rm+zCzYN+RPpZEJEvXHtudY4+P6RlbjM+1pvroBiPcwXw5JIFbmnhngESAzSZk9xQslYg+6voHlwmpJBt7D+14TuGnu8bpMwEp8IPykT46NoStQAY8q0sP/mrwtzNOKc0yAq6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782286747; c=relaxed/simple;
-	bh=Z4vHZNdWfmXhY08NWu9SAVKC9IY+kynM7MA+zCAUIZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sOSNl0lS/c9dSqBc879RQFTjqoqOjXIy9liWQytAchmiTG/V8t4/B3R/1q0boOD4LMqzQPs7vjWwBk3B2Y1HJkSawnUrhvBF5+1qReWkop5HGD+2PRMnWDxRFq4ysyjkVv6J4Dc4uPlcQeood/rSBrJ18Vegm8wOISzZTRubJDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 300DA68BEB; Wed, 24 Jun 2026 09:39:02 +0200 (CEST)
-Date: Wed, 24 Jun 2026 09:39:01 +0200
+	s=arc-20240116; t=1782288021; c=relaxed/simple;
+	bh=sRjc/SI038OILsr3bMHdLKKMTziCSvg4xTmOPGlpctA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jk1Lz9Yi25QK5tF2wQZpHzuXUXK3j4x9t7zl873gRs/e2GwYbrc2mZ9/Ria07XJQ9MkjSqG2R/U8PwJexg7/NjnybnB2ORfA87YnWtptP9DxVw9ShwKBIrtSiTvSSirXHPrXNUcthKjEvU12icwQXMnzLyVzbwnkWFPGQ7sJvtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UF+OUmOE; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UF+OUmOE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=K4Q0vf9aPqeDPp1cvmtn7tgo72Dms0Oz5aLWVFeg4Mg=; b=UF+OUmOEEPJKRucA93swbVLWvx
+	uINyxt876JandYQQ/fZ0KxXtNOIJeWWfFl+07tINgiCWBFOFBs8X6uCwGBi6bJJoG6FW/JR+9kVlA
+	mfraXxkp/flKa0IgfoEMxQOmcIJrnvS9am8qNyznB0JI9tmsWiZ/bWdaDMqte9I8GDi6t6UljfC5Z
+	tPGL6tMtjkOBjYl+j74sI9hrlnsyhFpNzFrfrJUyEsSGjyEc5pG3xWoPlTZW737OMeyxKhZx+YEEE
+	C1PAbAG7gValKAa00o+xT/46cOi/zqQeoaKMU1uY3J0f+vmSKhHeOdDIYwSVG1pp7sG+4VHXfDZVM
+	Ypuq4HeQ==;
+Received: from 2a02-8389-2301-9f00-3397-c9eb-6d8a-9179.cable.dynamic.v6.surfer.at ([2a02:8389:2301:9f00:3397:c9eb:6d8a:9179] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wcIWw-00000007Mdc-0dMe;
+	Wed, 24 Jun 2026 08:00:18 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	dm-devel@lists.linux.dev, axboe@kernel.dk, brauner@kernel.org,
-	djwong@kernel.org, viro@zeniv.linux.org.uk, stable@vger.kernel.org
-Subject: Re: [PATCHv2 6/6] block: validate user space vectors during
- extraction
-Message-ID: <20260624073901.GA12649@lst.de>
-References: <20260622174241.2299563-1-kbusch@meta.com> <20260622174241.2299563-7-kbusch@meta.com> <20260623151021.GA14919@lst.de> <ajqxoeZ0R_RwqEKe@kbusch-mbp>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org
+Subject: PI fixes v2
+Date: Wed, 24 Jun 2026 10:00:01 +0200
+Message-ID: <20260624080014.1998650-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajqxoeZ0R_RwqEKe@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jun 23, 2026 at 10:17:37AM -0600, Keith Busch wrote:
-> Exactly, the in-kernel users of ITER_BVEC that allocate their own
-> buffers are, as far as I know, aligned already. Fabric storage targets
-> like nvme allocate their own SGLs on page boundaries so the bio is
-> aligned at the point it was constructed.
-> 
-> The ones that forward user buffers like loop and zloop are addressed in
-> the previous two patches. They generally should have been fine for most
-> hardware without those updates, but they're included in case a backing
-> device has more restrictive constraints than 512b "sector_t" aligned.
-> 
-> The only other user space provided alignment that I think may trip this
-> up is the io_uring registered buffer, so that's what I'm trying to call
-> out here.
+Hi all,
 
-Sounds reasonable, but it would be really helpful to have this in
-the API documentation somewhere..
+this series has two unrelated PI/metadata fixes that came up
+during a little testing surge.
 
-Talking about documented APIs and related bits:  do you still plan
-to get back to exposing our pre-vector alignment requirements and
-add tests to blktests/xfstests based on that?
+Changes since v1:
+ - take operator precedence into account so that zeroing doesn't disable
+   other GFP_ flags.
+ - add a commit log blurb on why Zone Append does not require remapping
+
+Diffstat:
+ block/bio-integrity-auto.c    |    2 +-
+ block/bio-integrity-fs.c      |    4 ++--
+ block/bio-integrity.c         |    9 ++++-----
+ include/linux/bio-integrity.h |    2 +-
+ 4 files changed, 8 insertions(+), 9 deletions(-)
