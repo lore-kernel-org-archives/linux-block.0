@@ -1,242 +1,241 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EA12EC09B
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 11:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269E931AF14
+	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 11:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782299656; cv=none; b=k0pJxJGGmsgwA5zbvT3Q9Gb1YFinRlnN03KdnMz9Dgnarg8J+V5Bj1HionjKgDNZfutG96Oo/kGYqP/zrrVuRlRRrmDAeszxYKGv97W9RMKh4Xnm0dsV5fkCEMSHL2J1ahD1ESEVr67tf/gVj1Md+wiLADW7ku7PPR1x1UBz2mc=
+	t=1782301261; cv=none; b=IzvRH49kinu67wE60BXaXsv9Q/SFwytK1wYjfSrfJD8MKyOY9xtIj9G0lnODuhaxjc3mdPdo39oxIkUTYPRWwpr5dZ/sRWa1ewA/4CTZ7PPeBtU7G/mm6rKer3Hp1WYcrE2iy/SJ+dgEUkfLe5VY13n9gGzRmG67qRsSciRPrxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782299656; c=relaxed/simple;
-	bh=54qls6R4s7vy2wgeognek0uR5HEWVSyZbQnUs7k/Jys=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=PzZJEfQe/oUo9NTyqMfhr0pdvb9uz/gJvnonmRkfIVK/bzBp1G+RCn00cBOgRzHJFUMbZPvQ3cHt8RGH9vBDYWdijWAXU9Z1Wm0NKu/MpGpBfGs/p4EDo2PUyfG5SRNwqbQp4w2dVnHCYW40ptGIdzEPw1w9v8cg81L92NyNkYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U2UDipMD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1782301261; c=relaxed/simple;
+	bh=K1fFXIxaesd+eFthXGatCw4ranSCgFqT9wKribOcSsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FlHWdx86V+e7qdve0OxtV8lsQZREpasoSx52AiuujI+lor3rcaqTs81VQiGdZBFfnAYx624jjjeF6Xv2qOzzWj74rEI7um+pKyJ91Wbd84YDdPJhzpClOQdPyyOarW1NavJ6tdDR65iCP1BZUplxphT8eSPebAfVdIFZ9VLevkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hF6NfODF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY8PcayC; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hF6NfODF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY8PcayC; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2UDipMD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782299653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8AKRT0241Rnsq/fzi/nga+xD3qqPVq9mAC76/E0+lFc=;
-	b=U2UDipMDlgk2+jX+0cVCVN8ioHJbwHltY5hFNrUaKvlgxVypU6SA48P9XjRm7z4XcSNfyv
-	dY0TCc4+qLRHsvzIPZv41z5DL0QmLImfe/oitkWxendT0MSaq5RZwEoyiQ3ykdvq28US3P
-	PNq6mzpNfDum5LnlO8+zpl9fREEAOu8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-oWcfJ-k6PHyO5_CVgGhzDg-1; Wed,
- 24 Jun 2026 07:14:12 -0400
-X-MC-Unique: oWcfJ-k6PHyO5_CVgGhzDg-1
-X-Mimecast-MFC-AGG-ID: oWcfJ-k6PHyO5_CVgGhzDg_1782299651
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hF6NfODF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY8PcayC";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hF6NfODF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY8PcayC"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 117E019560B6;
-	Wed, 24 Jun 2026 11:14:11 +0000 (UTC)
-Received: from [10.44.32.26] (unknown [10.44.32.26])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DFC83195609E;
-	Wed, 24 Jun 2026 11:14:08 +0000 (UTC)
-Date: Wed, 24 Jun 2026 13:14:03 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Keith Busch <kbusch@kernel.org>, Benjamin Marzinski <bmarzins@redhat.com>
-cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev, 
-    linux-block@vger.kernel.org, "Dr. David Alan Gilbert" <linux@treblig.org>, 
-    Vjaceslavs Klimovs <vklimovs@gmail.com>
-Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
- errors
-In-Reply-To: <ajFyuoMqnvQm738z@kbusch-mbp>
-Message-ID: <0bd687cf-82ac-eacf-844b-c179a52dc72c@redhat.com>
-References: <20260616150554.1686662-1-kbusch@meta.com> <ajFyuoMqnvQm738z@kbusch-mbp>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 684BF71314;
+	Wed, 24 Jun 2026 11:40:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1782301257; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1FWZgxDjSUCom9Re05WOOJuJNeJjEZN52wMGosALaUs=;
+	b=hF6NfODFPkCXvzr0SSHA/NliEy6UInLzHmobMqkJkWJfYWzdB1aaFCcQ3SiNrr4QQigZ61
+	IOck3SKBclnNectWeI+wu8MiofOCvj0ZXWfpy+xmlOOYlUfZExVRabhPdzvAJwfpomETeR
+	45DUjs7WXol1xxnSafaemMVirLgl+FA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1782301257;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1FWZgxDjSUCom9Re05WOOJuJNeJjEZN52wMGosALaUs=;
+	b=GY8PcayCGoSTcAmLpIduGlP87R01qakK2tGhInNlAk5tsyVp1pmYg7EgUSRtXuSA9+T442
+	xJqVt0prij7hymBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1782301257; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1FWZgxDjSUCom9Re05WOOJuJNeJjEZN52wMGosALaUs=;
+	b=hF6NfODFPkCXvzr0SSHA/NliEy6UInLzHmobMqkJkWJfYWzdB1aaFCcQ3SiNrr4QQigZ61
+	IOck3SKBclnNectWeI+wu8MiofOCvj0ZXWfpy+xmlOOYlUfZExVRabhPdzvAJwfpomETeR
+	45DUjs7WXol1xxnSafaemMVirLgl+FA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1782301257;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1FWZgxDjSUCom9Re05WOOJuJNeJjEZN52wMGosALaUs=;
+	b=GY8PcayCGoSTcAmLpIduGlP87R01qakK2tGhInNlAk5tsyVp1pmYg7EgUSRtXuSA9+T442
+	xJqVt0prij7hymBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5C833779A8;
+	Wed, 24 Jun 2026 11:40:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id PNKTFknCO2p9HgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 24 Jun 2026 11:40:57 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id EADF4A093E; Wed, 24 Jun 2026 13:40:56 +0200 (CEST)
+Date: Wed, 24 Jun 2026 13:40:56 +0200
+From: Jan Kara <jack@suse.cz>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>, 
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>, Ritesh Harjani <ritesh.list@gmail.com>, 
+	Zhang Yi <yi.zhang@huawei.com>, Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>
+Subject: Re: [PATCH 10/16] fs/buffer: Remove fs-layer decryption code
+Message-ID: <hu7h6ga2ndrsedjvjbemdevjzrhvtz7jx2hbc2rtmkskufckmi@yf3a6t4hhike>
+References: <20260624050334.124606-1-ebiggers@kernel.org>
+ <20260624050334.124606-11-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624050334.124606-11-ebiggers@kernel.org>
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.sourceforge.net,lst.de,mit.edu,dilger.ca,linux.alibaba.com,suse.cz,linux.ibm.com,gmail.com,huawei.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
 
-Hi
-
-This approach is OK, I will stage the patches when 7.2-rc1 comes out and 
-when I'll fork the dm git branches.
-
-I suggest one change - it is kind of hacky when multiple I/O completion 
-callbacks write into io->orig_bio->bi_status concurrently - so it would be 
-better to not do it and maintain and return separate bit mask for 
-non-retryable errors.
-
-For example:
-
-static void complete_io(struct io *io)
-{
-        unsigned long error_bits = io->error_bits;
-        unsigned long nonretryable_error_bits = io->nonretryable_error_bits;
-        io_notify_fn fn = io->callback;
-        void *context = io->context;
-
-        if (io->vma_invalidate_size)
-                invalidate_kernel_vmap_range(io->vma_invalidate_address,
-                                             io->vma_invalidate_size);
-
-        mempool_free(io, &io->client->pool);
-        fn(error_bits, nonretryable_error_bits, context);
-}
-
-static void dec_count(struct io *io, unsigned int region, blk_status_t error)
-{
-        if (unlikely(error == BLK_STS_NOTSUPP) || unlikely(error == BLK_STS_INVAL))
-		set_bit(region, &io->nonretryable_error_bits);
-        else if (unlikely(error != BLK_STS_OK))
-                set_bit(region, &io->error_bits);
-
-        if (atomic_dec_and_test(&io->count))
-                complete_io(io);
-}
-
-Please send the updated patch that uses this approach.
-
-BTW. I think that blk_path_error should also test for BLK_STS_INVAL and 
-return false, otherwise, dm-multipath would be suffering from this bug 
-too. Ben, could you test it?
-
-Mikulas
-
-
-On Tue, 16 Jun 2026, Keith Busch wrote:
-
-> BLK_STS_INVAL indicates the I/O request itself was invalid (for example a
-> misaligned direct I/O), not that the device has failed. dm-raid1 treated
-> any read or write completion error as a device failure: it failed the
-> mirror leg, retried on the alternatives - which fail identically - and
-> eventually returned EIO while spuriously degrading the array.
+On Tue 23-06-26 22:03:28, Eric Biggers wrote:
+> Now that fscrypt's file contents en/decryption is always implemented
+> using blk-crypto when the filesystem is block-based, the fs-layer
+> decryption code in fs/buffer.c is unused code.  Remove it.
 > 
-> Since commit 5ff3f74e145a ("block: simplify direct io validity check") the
-> direct I/O path no longer rejects misaligned buffers up front, so an
-> invalid bio now reaches the lower block layers, which fail it with
-> BLK_STS_INVAL. dm-io collapses the block status into a per-region error
-> bit before invoking the completion callback, so record BLK_STS_INVAL on
-> the originating bio and have the dm-raid1 read, write and end_io paths
-> propagate it instead of failing the device.
-> 
-> This mirrors the raid1/raid10 fix in commit f7b24c7b41f23
-> ("md/raid1,raid10: don't fail devices for invalid IO errors") for the
-> device-mapper mirror target.
-> 
-> Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
-> Fixes: 5ff3f74e145a ("block: simplify direct io validity check")
-> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
-> Reported-by: Vjaceslavs Klimovs <vklimovs@gmail.com>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+
+Fine by me. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
 > ---
-> Resending patch 2/2 from a different machine. For some reason, only 1/2
-> is getting through with git-send-email, so manually replying to the
-> thread with the missing second patch.
+>  fs/buffer.c | 45 ++++++++-------------------------------------
+>  1 file changed, 8 insertions(+), 37 deletions(-)
 > 
->  drivers/md/dm-io.c    | 14 +++++++++++++-
->  drivers/md/dm-raid1.c | 28 +++++++++++++++++++++++++++-
->  2 files changed, 40 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-> index 28adfeb58f240..f382e9f9be059 100644
-> --- a/drivers/md/dm-io.c
-> +++ b/drivers/md/dm-io.c
-> @@ -37,6 +37,7 @@ struct io {
->  	struct dm_io_client *client;
->  	io_notify_fn callback;
->  	void *context;
-> +	struct bio *orig_bio;
->  	void *vma_invalidate_address;
->  	unsigned long vma_invalidate_size;
->  } __aligned(DM_IO_MAX_REGIONS);
-> @@ -132,8 +133,18 @@ static void complete_io(struct io *io)
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index 9af5f061a1f8..21dd9596a941 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -334,82 +334,53 @@ static void end_buffer_async_read(struct buffer_head *bh, int uptodate)
 >  
->  static void dec_count(struct io *io, unsigned int region, blk_status_t error)
+>  still_busy:
+>  	spin_unlock_irqrestore(&first->b_uptodate_lock, flags);
+>  }
+>  
+> -struct postprocess_bh_ctx {
+> +struct verify_bh_ctx {
+>  	struct work_struct work;
+>  	struct buffer_head *bh;
+>  	struct fsverity_info *vi;
+>  };
+>  
+>  static void verify_bh(struct work_struct *work)
 >  {
-> -	if (error)
-> +	if (error) {
->  		set_bit(region, &io->error_bits);
-> +		/*
-> +		 * BLK_STS_INVAL means the bio was not valid for the underlying
-> +		 * device (e.g. a misaligned direct I/O), which is a caller error
-> +		 * rather than a device failure. Record it on the original bio so
-> +		 * bio-based targets can propagate it instead of treating it as a
-> +		 * media error and failing the device.
-> +		 */
-> +		if (error == BLK_STS_INVAL && io->orig_bio)
-> +			io->orig_bio->bi_status = error;
-> +	}
+> -	struct postprocess_bh_ctx *ctx =
+> -		container_of(work, struct postprocess_bh_ctx, work);
+> +	struct verify_bh_ctx *ctx =
+> +		container_of(work, struct verify_bh_ctx, work);
+>  	struct buffer_head *bh = ctx->bh;
+>  	bool valid;
 >  
->  	if (atomic_dec_and_test(&io->count))
->  		complete_io(io);
-> @@ -398,6 +409,7 @@ static void async_io(struct dm_io_client *client, unsigned int num_regions,
->  	io->client = client;
->  	io->callback = fn;
->  	io->context = context;
-> +	io->orig_bio = dp->orig_bio;
+>  	valid = fsverity_verify_blocks(ctx->vi, bh->b_folio, bh->b_size,
+>  				       bh_offset(bh));
+>  	end_buffer_async_read(bh, valid);
+>  	kfree(ctx);
+>  }
 >  
->  	io->vma_invalidate_address = dp->vma_invalidate_address;
->  	io->vma_invalidate_size = dp->vma_invalidate_size;
-> diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-> index de5c00704e69c..022ad791c2957 100644
-> --- a/drivers/md/dm-raid1.c
-> +++ b/drivers/md/dm-raid1.c
-> @@ -524,6 +524,17 @@ static void read_callback(unsigned long error, void *context)
->  		return;
+> -static void decrypt_bh(struct work_struct *work)
+> -{
+> -	struct postprocess_bh_ctx *ctx =
+> -		container_of(work, struct postprocess_bh_ctx, work);
+> -	struct buffer_head *bh = ctx->bh;
+> -	int err;
+> -
+> -	err = fscrypt_decrypt_pagecache_blocks(bh->b_folio, bh->b_size,
+> -					       bh_offset(bh));
+> -	if (err == 0 && ctx->vi) {
+> -		/*
+> -		 * We use different work queues for decryption and for verity
+> -		 * because verity may require reading metadata pages that need
+> -		 * decryption, and we shouldn't recurse to the same workqueue.
+> -		 */
+> -		INIT_WORK(&ctx->work, verify_bh);
+> -		fsverity_enqueue_verify_work(&ctx->work);
+> -		return;
+> -	}
+> -	end_buffer_async_read(bh, err == 0);
+> -	kfree(ctx);
+> -}
+> -
+>  /*
+>   * I/O completion handler for block_read_full_folio() - folios
+>   * which come unlocked at the end of I/O.
+>   */
+>  static void bh_end_async_read(struct bio *bio)
+>  {
+>  	struct buffer_head *bh;
+>  	bool uptodate = bio_endio_bh(bio, &bh);
+>  	struct inode *inode = bh->b_folio->mapping->host;
+> -	bool decrypt = fscrypt_inode_uses_fs_layer_crypto(inode);
+>  	struct fsverity_info *vi = NULL;
+>  
+>  	/* needed by ext4 */
+>  	if (bh->b_folio->index < DIV_ROUND_UP(inode->i_size, PAGE_SIZE))
+>  		vi = fsverity_get_info(inode);
+>  
+> -	/* Decrypt (with fscrypt) and/or verify (with fsverity) if needed. */
+> -	if (uptodate && (decrypt || vi)) {
+> -		struct postprocess_bh_ctx *ctx = kmalloc_obj(*ctx, GFP_ATOMIC);
+> +	/* Verify (with fsverity) if needed. */
+> +	if (vi && uptodate) {
+> +		struct verify_bh_ctx *ctx = kmalloc_obj(*ctx, GFP_ATOMIC);
+>  
+>  		if (ctx) {
+>  			ctx->bh = bh;
+>  			ctx->vi = vi;
+> -			if (decrypt) {
+> -				INIT_WORK(&ctx->work, decrypt_bh);
+> -				fscrypt_enqueue_decrypt_work(&ctx->work);
+> -			} else {
+> -				INIT_WORK(&ctx->work, verify_bh);
+> -				fsverity_enqueue_verify_work(&ctx->work);
+> -			}
+> +			INIT_WORK(&ctx->work, verify_bh);
+> +			fsverity_enqueue_verify_work(&ctx->work);
+>  			return;
+>  		}
+>  		uptodate = false;
 >  	}
->  
-> +	/*
-> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
-> +	 * e.g. a misaligned direct I/O. That is a caller error, not a device
-> +	 * failure, so propagate it rather than failing the mirror and retrying
-> +	 * on the other legs, which would fail the same way.
-> +	 */
-> +	if (bio->bi_status == BLK_STS_INVAL) {
-> +		bio_endio(bio);
-> +		return;
-> +	}
-> +
->  	fail_mirror(m, DM_RAID1_READ_ERROR);
->  
->  	if (likely(default_ok(m)) || mirror_available(m->ms, bio)) {
-> @@ -622,6 +633,16 @@ static void write_callback(unsigned long error, void *context)
->  		return;
->  	}
->  
-> +	/*
-> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
-> +	 * e.g. a misaligned direct I/O. Propagate the error without degrading
-> +	 * the array.
-> +	 */
-> +	if (bio->bi_status == BLK_STS_INVAL) {
-> +		bio_endio(bio);
-> +		return;
-> +	}
-> +
->  	/*
->  	 * If the bio is discard, return an error, but do not
->  	 * degrade the array.
-> @@ -1262,7 +1283,12 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio,
->  		return DM_ENDIO_DONE;
->  	}
->  
-> -	if (*error == BLK_STS_NOTSUPP)
-> +	/*
-> +	 * BLK_STS_INVAL means the bio was not valid for the underlying device,
-> +	 * e.g. a misaligned direct I/O. Propagate it rather than failing the
-> +	 * mirror and retrying, which would fail the same way on every leg.
-> +	 */
-> +	if (*error == BLK_STS_NOTSUPP || *error == BLK_STS_INVAL)
->  		goto out;
->  
->  	if (bio->bi_opf & REQ_RAHEAD)
+>  	end_buffer_async_read(bh, uptodate);
 > -- 
-> 2.52.0
+> 2.54.0
 > 
-> 
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
