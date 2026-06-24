@@ -1,34 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7BA3DA7C2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE5D3DB321;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782313245; cv=none; b=nnKtvarIuxrodPqnkiOBGXLpD16Cz0ULQG9HFT2O0GsUIJm9OAnvsYuwDyEGrELdnRrG+4gukHeKnCwKUfA0ruibAr7c5INkc7g4vG3ivtn5CHSena4ZeLyfsjHLzp6Y9679g0xSjnNTFBabgL7+zb1Q2Zk4Y00HmJiu9UZchLc=
+	t=1782313245; cv=none; b=OOR9tmQ2jxgq59+YIFUSp/CzS8mfdyL/vX1wQ7jgD5rjJL7gdjNKg4NSfb17PwvGQdHYv71eGGtiRZM0B6U57o045WKiglQFu+vlXl7/zi1dZStQJUXJP22zfPA6VgUt0PO7nLfq+7aVZjGrUMbVXZMzXdHEW5XEREbl9GDJviI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782313245; c=relaxed/simple;
-	bh=gU6gZs9B/IA8ULZetqvCr1eysZf16s5NNe4fRGEWm7c=;
+	bh=0iEJ9CoHu7M3V0ejPEkK0764ck94VjFLyF6WPTDVWGc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hIt9vmypXCUgrBVYgMtrwaiAXW8HXB8UvYdt3X1nmSNXdco7sxs6xyod2xI77cQOc4CY2eJ91dXfbkT4xD2MB6ssAyXaTBhHjSRuQwFrOQdjE00IB1qtAQ16/11U2WZ+edeA0fhouTQYi8GtdfE9iZw6BI1m2GOFQFDTxsJMSS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ed2xAtHc; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=eX8B9MGWzk5D0mYr64CMMTmkAJfuTfEpClavni5PXejwgqMFUd+Nt82SluMR8u4yb2Gen59B/ZxDoN9CdoCDdFpc0pKdrwVep/dzDPMaLcjECuz+NPMOcqc2hscQvI+8qTREKSpHFsRZPUrg6P1Bx+IJUCY+xL0EIGtV486mpso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cZPaeaYu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ed2xAtHc"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41F2CC2BCF6;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cZPaeaYu"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B43AC2BCB7;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782313245; bh=gU6gZs9B/IA8ULZetqvCr1eysZf16s5NNe4fRGEWm7c=;
+	t=1782313245; bh=0iEJ9CoHu7M3V0ejPEkK0764ck94VjFLyF6WPTDVWGc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ed2xAtHcrCLW03Pn2SBHDYoUbR+7hr1tR2KbsavAbaoxY8isMurzjvmAqiPvUf5hD
-	 zEQqB99QE0pKMjgF4CURbzmlTwq+tBaHSTxOZPUemfB/3uDwkzQReQmRNJ6vNAexpy
-	 hzFZQVuMjB8Sm8UyTHHqRU8jZr9JlyAFWdz8pTDg=
+	b=cZPaeaYuvPXFW16yS4h5jK7GIvfVXWWFrA9SpB6FzR/f6kxfdyHp/hFf5X0al4BtR
+	 pchH7/2cH58erhFtTi1TOmoEyhJdKCYDHCvu6dcAmYKMeBnTeK6ZufLydvuJCWba4m
+	 hdJtzNocjQobxtpa6kzYlKDEnGQJX0Ek9z5iMb7w=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D49ECDB47F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8E1CDB47F;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Wed, 24 Jun 2026 23:00:06 +0800
-Subject: [PATCH v6 07/10] rust: configfs: use `LocalModule` for
- `THIS_MODULE`
+Date: Wed, 24 Jun 2026 23:00:07 +0800
+Subject: [PATCH v6 08/10] rust: binder: use `LocalModule` for `THIS_MODULE`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +36,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260624-fix-fops-owner-v6-7-5295e333cb3e@linux.dev>
+Message-Id: <20260624-fix-fops-owner-v6-8-5295e333cb3e@linux.dev>
 References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 In-Reply-To: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -70,79 +69,49 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=2650;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=1377;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=gU6gZs9B/IA8ULZetqvCr1eysZf16s5NNe4fRGEWm7c=;
- b=MVvdIxw7WXMiycv+EFc0egEcg9YYNpWs+fDj5SvSJ457mR4yww5ZNTNGgBIkNmEHmLmMxhPf1
- HXh6n2Q2HMhBZXTflKkkt+WTEY7/ywaCb2Sou/EVFnsiFHl+Oz30KJT
+ bh=0iEJ9CoHu7M3V0ejPEkK0764ck94VjFLyF6WPTDVWGc=;
+ b=90DVehEzX4GVxkJQKp/UkmxJ/SvBfRIhVfUWxWBiHcaw5Y90iPWP+6yMllw1lFeTiju16tIx+
+ 6gL491tyPcBAe94hlWjWZaF7bZauaIu1tJn66BkwMb2Z2dx2gGxHoUA
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
-macro with `this_module::<LocalModule>()`, and update
-rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
-with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
+Replace the `THIS_MODULE` static reference in the binder fops with
+`this_module::<LocalModule>()`, consistent with the move of
+`THIS_MODULE` into the `ModuleMetadata` trait.
 
 Assisted-by: opencode:glm-5.2
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+Reviewed-by: Gary Guo <gary@garyguo.net>
 Acked-by: Danilo Krummrich <dakr@kernel.org>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- drivers/block/rnull/configfs.rs | 6 ++----
- rust/kernel/configfs.rs         | 8 +++++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/android/binder/rust_binder_main.rs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index c10a55fc58948..b2547ad1e5ddd 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -1,9 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
+diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
+index dc1941cd2407b..d6ceebbd5f94e 100644
+--- a/drivers/android/binder/rust_binder_main.rs
++++ b/drivers/android/binder/rust_binder_main.rs
+@@ -17,6 +17,7 @@
+     bindings::{self, seq_file},
+     fs::File,
+     list::{ListArc, ListArcSafe, ListLinksSelfPtr, TryNewListArc},
++    module::this_module,
+     prelude::*,
+     seq_file::SeqFile,
+     seq_print,
+@@ -318,7 +319,7 @@ unsafe impl<T> Sync for AssertSync<T> {}
+     let zeroed_ops = unsafe { core::mem::MaybeUninit::zeroed().assume_init() };
  
--use super::{
--    NullBlkDevice,
--    THIS_MODULE, //
--};
-+use super::NullBlkDevice;
-+use crate::LocalModule;
- use kernel::{
-     block::mq::gen_disk::{
-         GenDisk,
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 2339c6467325d..c31d7882e216d 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
- ///                 configfs::Subsystem<Configuration>,
- ///                 Configuration
- ///                 >::new_with_child_ctor::<N,Child>(
--///             &THIS_MODULE,
-+///             ::kernel::module::this_module::<crate::LocalModule>(),
- ///             &CONFIGURATION_ATTRS
- ///         );
- ///
-@@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
- 
-                     static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
-                         $crate::configfs::ItemType::<$container, $data>::new::<N>(
--                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                            $crate::module::this_module::<LocalModule>(),
-+                            &[<$ data:upper _ATTRS >]
-                         );
-                 )?
- 
-@@ -1030,7 +1031,8 @@ macro_rules! configfs_attrs {
-                         $crate::configfs::ItemType<$container, $data>  =
-                             $crate::configfs::ItemType::<$container, $data>::
-                             new_with_child_ctor::<N, $child>(
--                                &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                                $crate::module::this_module::<LocalModule>(),
-+                                &[<$ data:upper _ATTRS >]
-                             );
-                 )?
- 
+     let ops = kernel::bindings::file_operations {
+-        owner: THIS_MODULE.as_ptr(),
++        owner: this_module::<LocalModule>().as_ptr(),
+         poll: Some(rust_binder_poll),
+         unlocked_ioctl: Some(rust_binder_ioctl),
+         compat_ioctl: bindings::compat_ptr_ioctl,
 
 -- 
 2.43.0
