@@ -1,147 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC1937268B;
-	Wed, 24 Jun 2026 19:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40A2305E28;
+	Wed, 24 Jun 2026 19:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782328646; cv=none; b=GvtlrK8TbpH2ZjwqTyYXypRsMdZbUbJpy4gRX4DcBPvC5ERLIXBrf2IjBYcohonlXwGM3iRgsmw9u2fVo3qelzfM6H6nry7Ak5Afkf/EivhTOX/xoWoIqRPoHeqhB9TZQcHMgE2FNSml6NKv4wFN12H3zF7r51cmhUPeuUeuAvk=
+	t=1782330787; cv=none; b=KQavhEkRqcxxdbuB0chTc53sC1zriCKYEPKyLZU7R9KHo78QlOzkE9R09GrIIyzdi3fOk8bpsF9rwc2naMQl0o7Dl3bFnJQMZn/Q5Kh2mJFc+CgClN0rFFn8vIvPry0M899A1HoaQYC06Ylx61KjRsJdH5eifsQjq9kUfrVHkDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782328646; c=relaxed/simple;
-	bh=NvF+pR0fYQdZKbUADyPaq42Q6BnQZUMM3H2eaBsL90Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=B4rOyT2hjRXHD7pVczn06ObnjEulVDZf7hd9aTlCi59MUZwXde1bE2q7eg0bm8MXWtewGJUMV9EkMOaOmuPTj+mldcCC3DLvOcEnAQF6beFyu+nj35E/XH3+Sqbstjw56FKuoLYA8Z6brgHrvJz7H503ksZiyz9SmEtCWLwXKzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jipwVXQt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782330787; c=relaxed/simple;
+	bh=uGManwo2POKMO9mUH2vgxLmsUYYgJxBMxApUaz/JoN4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Yqmf48A9bHjTTmb9Rv3w6YfOA6Y6eWBtsdrZW0RHbUEy32XQfL9JdbvvaiWKrcqdY6GE8QZt5sCimvHGYd+PBTVFw11u3Cuf1yE4/hvkiQclTONRa7/xzqpDXi8Sdi5Kv1KxqjtbxyVldzbLTuBqggqS/JOKgcA/jsqkMkydHnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nOICm2iu; arc=none smtp.client-ip=35.162.73.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jipwVXQt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DA3A1F000E9;
-	Wed, 24 Jun 2026 19:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782328643;
-	bh=BXTL1/pEN/FTyKPKMA8BVIZWBMRtKuw+rExm3vmkKx4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=jipwVXQtIhW9z8lFxljLcuY7oEB/LokW5tJFCYei9aG4AJZaD4IX+IkiuSVyW+9gX
-	 XkAsEiaMRxjWXGmEuXVkVh28pqAoVc/aDo37K2YiiFJUxAjm2ddCHFTl9+aM661GW3
-	 PE+Qcm1rb4neo7M1iuFsvHQGR9Z8jyp3VjjmJiFWU3LtteGM0CUG1TvIJmIFo9kAFC
-	 4R6ORXsd+HioryjRDjvG1YfuF4t1dKBfkbIc9bDf7FTKereQM/74Au9PjcixYNzNzD
-	 QYNlB8bH7PIOPQgoUBOOyXhslgfwjWS1ahCofuush0ejyBFSORKT3noH+//Lvsum9v
-	 qnflbrsxJvUcA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice
- Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo
- Krummrich <dakr@kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, Ira
- Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, Paul Moore
- <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Daniel
- Almeida <daniel.almeida@collabora.com>, Viresh Kumar <vireshk@kernel.org>,
- Nishanth Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>,
- Boqun Feng <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
- Lorenzo Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>,
- "Liam R. Howlett" <liam@infradead.org>, Igor Korotin
- <igor.korotin@linux.dev>, Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
- driver-core@lists.linux.dev, Oliver Mangold <oliver.mangold@pm.me>, Viresh
- Kumar <viresh.kumar@linaro.org>
-Subject: Re: [PATCH v17 06/10] rust: rename `AlwaysRefCounted` to `RefCounted`.
-In-Reply-To: <20260623175814.87191-1-work@onurozkan.dev>
-References: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
- <20260604-unique-ref-v17-6-7b4c3d2930b9@kernel.org>
- <20260623175814.87191-1-work@onurozkan.dev>
-Date: Wed, 24 Jun 2026 21:17:08 +0200
-Message-ID: <87cxxfiw97.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nOICm2iu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1782330786; x=1813866786;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9kzduUnU0W5KLUH8xRjByArbNZrNdOxKMBIECVRVqgo=;
+  b=nOICm2iuvF/7hBvOGRmdUEltZ79ODKCbDCM/qGUw+xaZGctieYbzpW+P
+   t//aMECdcpQ7YwpTTGXZJooLjhmvPnbmZY+6sXkDQ8WT0JV4318moojUY
+   Sh1ghJEaYS2z0raGJtgrnb6Br9JQejUAomOPJVrCEwd1O/y28gNkAgtNC
+   NedB4OQkrOMzLoifsNYCS8SYPAo+57Fz07SWWeZeQrbAX5IPpjI0dZ7Lm
+   rRRABkqKMK6cf8ndPdR3ovV4h8KmILmlNdc+6IQCPozw5XnVTfR7K2d7C
+   gZfsx9z6N5L5YX3wucb4y6XL4Fv9hk6Y3MIg8V4c/SSV3LAeXBDIqr5ZZ
+   g==;
+X-CSE-ConnectionGUID: T4dFEcxWRLmb1DhwaTaxaQ==
+X-CSE-MsgGUID: CrIjSsjgRWCy8HXfNV8Ngg==
+X-IronPort-AV: E=Sophos;i="6.24,223,1774310400"; 
+   d="scan'208";a="22234931"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 19:53:03 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:4369]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.61:2525] with esmtp (Farcaster)
+ id 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59; Wed, 24 Jun 2026 19:53:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
+ Wed, 24 Jun 2026 19:53:02 +0000
+Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
+ Wed, 24 Jun 2026 19:53:01 +0000
+From: Leonid Ravich <lravich@amazon.com>
+To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Jens
+ Axboe" <axboe@kernel.dk>, <dm-devel@lists.linux.dev>,
+	<linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit batching
+Date: Wed, 24 Jun 2026 19:52:55 +0000
+Message-ID: <20260624195255.1102-1-lravich@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260622182328.GB1250822@google.com>
+References: <20260622182328.GB1250822@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Onur =C3=96zkan <work@onurozkan.dev> writes:
+On Mon, Jun 22, 2026 at 06:23:28PM +0000, Eric Biggers wrote:
+> I don't think there's a path forward without an in-tree user that's
+> shown to be worthwhile over just using the acceleration built directly
+> into the CPU.  As well as confirmation of no regression to existing
+> users, including in cases where the inline sg list can't be used.
 
-> On Thu, 04 Jun 2026 22:11:18 +0200
-> Andreas Hindborg <a.hindborg@kernel.org> wrote:
->
->> From: Oliver Mangold <oliver.mangold@pm.me>
->>=20
->> There are types where it may both be reference counted in some cases and
->> owned in others. In such cases, obtaining `ARef<T>` from `&T` would be
->> unsound as it allows creation of `ARef<T>` copy from `&Owned<T>`.
->>=20
->> Therefore, we split `AlwaysRefCounted` into `RefCounted` (which `ARef<T>`
->> would require) and a marker trait to indicate that the type is always
->> reference counted (and not `Ownable`) so the `&T` -> `ARef<T>` conversion
->> is possible.
->>=20
->> - Rename `AlwaysRefCounted` to `RefCounted`.
->> - Add a new unsafe trait `AlwaysRefCounted`.
->> - Implement the new trait `AlwaysRefCounted` for the newly renamed
->>   `RefCounted` implementations. This leaves functionality of existing
->>   implementers of `AlwaysRefCounted` intact.
->>=20
->> Suggested-by: Alice Ryhl <aliceryhl@google.com>
->> Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
->> Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
->> [ Andreas: Updated commit message and rebase on rust-6.20-7.0 ]
->> Acked-by: Igor Korotin <igor.korotin.linux@gmail.com>
->> Acked-by: Danilo Krummrich <dakr@kernel.org>
->> Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
->> Reviewed-by: Gary Guo <gary@garyguo.net>
->> Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
->>  rust/kernel/auxiliary.rs        |  7 +++++-
->>  rust/kernel/block/mq/request.rs | 15 ++++++++-----
->>  rust/kernel/cred.rs             | 13 +++++++++--
->>  rust/kernel/device.rs           | 12 ++++++++--
->>  rust/kernel/device/property.rs  | 11 +++++++--
->>  rust/kernel/drm/device.rs       |  9 ++++++--
->>  rust/kernel/drm/gem/mod.rs      | 16 ++++++++++----
->>  rust/kernel/fs/file.rs          | 16 ++++++++++----
->>  rust/kernel/i2c.rs              | 13 ++++++++---
->>  rust/kernel/mm.rs               | 15 +++++++++----
->>  rust/kernel/mm/mmput_async.rs   |  9 ++++++--
->>  rust/kernel/opp.rs              | 10 ++++++---
->>  rust/kernel/owned.rs            |  2 +-
->>  rust/kernel/pci.rs              | 10 ++++++++-
->>  rust/kernel/pid_namespace.rs    | 12 ++++++++--
->>  rust/kernel/platform.rs         |  7 +++++-
->>  rust/kernel/sync/aref.rs        | 49 ++++++++++++++++++++++++++--------=
--------
->>  rust/kernel/task.rs             | 13 +++++++++--
->>  rust/kernel/types.rs            |  3 ++-
->>  rust/kernel/usb.rs              | 17 +++++++++++---
->>  20 files changed, 195 insertions(+), 64 deletions(-)
->>=20
->> diff --git a/rust/kernel/auxiliary.rs b/rust/kernel/auxiliary.rs
->> index 93c0db1f6655..49f07740f657 100644
->> --- a/rust/kernel/auxiliary.rs
->> +++ b/rust/kernel/auxiliary.rs
->> @@ -19,6 +19,7 @@
->>          to_result, //
->>      },
->>      prelude::*,
->> +    sync::aref::{AlwaysRefCounted, RefCounted},
->
-> This patch has multiple horizontal use statements around.
+Agreed. Proposing a smaller v5 that meets the no-regression bar now and
+leaves "beats the CPU" to a follow-up with a real in-tree user.
 
-Thanks, I'll take another pass to fix that.
+dm-crypt submits one request per contiguous bio segment (a single
+bio_vec) with data_unit_size = sector_size, instead of one per sector.
+E.g. default sector_size 512 with a 4 KiB bio_vec: one request of 8
+data units, which the fallback splitter walks as 8 per-sector calls --
+dm-crypt no longer open-codes the per-data-unit loop itself.
 
+  - Uses only the existing inline sg_in[0]/sg_out[0] entry. No per-bio
+    scatterlist, no kmalloc -- the "inline sg list can't be used" case
+    doesn't exist here, so there's nothing to regress.
+  - For a non-native algorithm the core auto-splits into the same
+    per-sector calls dm-crypt makes today: identical output and cost.
+    This is what Herbert predicted -- the per-unit indirect call just
+    moves from the caller into the API; the fallback is no slower.
 
-Best regards,
-Andreas Hindborg
+So it stands on no-regression alone, with no software throughput claim.
+What it adds is the interface a native one-pass driver needs. I'd land
+that now and bring a native offload user + numbers as the follow-up,
+rather than block the interface on the driver.
 
+Acceptable? If so I'll respin v5 as the minimal version.
 
-
+Thanks,
+Leonid
