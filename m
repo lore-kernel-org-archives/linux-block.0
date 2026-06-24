@@ -1,118 +1,122 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01491DF736
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 12:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A12263F4A
+	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 12:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782304426; cv=none; b=cJRuify2ZGUt0tcy8ocdLahq41J2Y2+Ak165wzsYd5Ql383FPcI0KTk1WpNIUKN6O4oRbt3VsH5xPzN3easrShKegBI75MxqOmklDrUs8TbAHUc0bi6ReCSafT7d3T0Tp6JhCmSf6kKpYn82PAknHoXQSfyl4aHyP8GYyA7BKTA=
+	t=1782304621; cv=none; b=AqtzqhNStUGdAjcFSHo9YJrwcgyijWxoGrb6kdoYlsD5AEBC/Ax6tu+C+NEVsU0Xsc5oJkWEHI3xVL7s3PNslVt88Bpw6yTbJK4aRQeTs/wR7LMY0IS1/W6oTtZCq7E1XD/D8YCmE0+/3D1A9ve4mJWKuEPwAMVvwbclUL2AWP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782304426; c=relaxed/simple;
-	bh=sLtMKNNBxNPRoTT7i52CS+cA3UpL8EVU7zz6HmezOgM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cQvh0ijpPM0B+0OZLm4FeZAYJ7qehmbkdLlCotVlR+osSzR4702GUvgfHyXT3xEztBHDHmKovYl2ANCVfeTYILX8a4/AfV3Bg/3v7QERnDsDkPmHk3mLa9Jel7MkS/Z3/X3Rc+nATu3DdJM/83DUcEesop5fWNo4ZdrzzBdJrB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=vCTIeBQ8; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1782304621; c=relaxed/simple;
+	bh=n7yeLGokqqCEYqPAMP4LCZTg50ntP6woAwtrH9YhnIQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rdasYNka1Dfmg9WVwW+ZIGicQqv86mzadOOh/aKnhaPlOZMWcvcYY/DFmDDkq+RtTPwIeMNl1HE8Y1rW/91eo9sUPVn4IDmq14KoBuwKKaYlk9v+oAWLuQCcrFz7ly9R44tB8prbA+tGFvWnaN+bIFYGaJpVEvKYZ/TILDl96UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jVRfEuUJ; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="vCTIeBQ8"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-69e7dfcea4dso1183314eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 05:33:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVRfEuUJ"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-492329c5514so4084425e9.1
+        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 05:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1782304423; x=1782909223; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rgCaZQUlPbeknSjtTTO3LBzo17VyVdrEEzXLcaDWWkM=;
-        b=vCTIeBQ8VMHyy4Qr7rcvl+Y50X9SjiMg9riC03uhQfjsrmznHRFssgTDo5LOVHP5eG
-         h65OlqG3++iGyJ7CWHM1qYcO/HXXDQmLUI8XXsH9XqPnvHtAFYbyscL76aRow1rvB0Qd
-         ogQEKLUwsYOoahGZi6PYz09j5E3ZqeVmeASmzp9Nu0FmxETz+TZ3ZoLGLTVtr+LRr4l4
-         0XERG2mx5q2TKIIOFWhxer7vtnutdyzgYCTBHn1EYEHaNxtjZwdiE5qpbyTKr+MYpAeE
-         nomlmKMFHhCf44J9DSsI/8bKQyce/l4O+AImsfxTfBU4NjHLD0dk1QXoNEe5ab67Tumv
-         45Wg==
+        d=gmail.com; s=20251104; t=1782304619; x=1782909419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aVVzYHaalnDwmrRDCXsQm1lcc3hZBz2mEnxrShCLD2c=;
+        b=jVRfEuUJ1wAJ8mVKScQhvSR7fHYlYtfH7rwKA1RK1Co6ZDlmEosW7vQgATt7R0sgV7
+         lPNO5UynbCc2RgSQx0Ii2V+fmj31w5E31k4MX37wEyIePdXUp7AumSFVyrH01XRIqTjf
+         hVjpfdhFg6Olraa4rDeL6OAa27Exu/gSKcTiwz/xIfww+lthnQAxhOypazA6TA1Be/I8
+         Sj1vRKqmk2A+m51NUNAh/f502DEiPfOxG5prwe92UawZN0a0OKw+j0y47KDwxPDBWIz5
+         bEBuj8DsTmtQGZPFA8bgdWSVqKKetshqUtNFI2rs/j7JxT8MtDsqVJlIhaLe1miZEHwq
+         wP0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782304423; x=1782909223;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rgCaZQUlPbeknSjtTTO3LBzo17VyVdrEEzXLcaDWWkM=;
-        b=iJRy0rRau7BmW+40ay/F8KUmnb1BuvrzkSah9DZuwP16+Dw0TBErmjx4+aGeA7w/w8
-         WM6Ve62mJDc6MhuzL7765gi2BK4gnJ+xyfb9/5xGm4RNgsfwXv/pPHXA7Vyfmk4qbjS6
-         6ARCegibYX6k95b8Jxhap9GjEezcVAoc8aTb12TAalsuFoYnYXyxj4GSbxW1N6MiOBQD
-         xeIRrsM3feasfsAsBCBKy+Beht5Rlom1uJrjRkozzKSdSTEuPrtc6zHsooX6INNoHcro
-         0mUX1WCkaEwZCaNKOpCxTTgqa4kBl7ObuGOscL0jRYhks/uZqugbBr+fw0vn69sKCcDh
-         L/jQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/pRoZotjfGiz7CF7NT9VhGJu11yHrjZRcFGEs5L4mffwW+z02WgUGfzctHkVjbkJknGOMQ0VrH6HH9Ww==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpIoblIH8b4MXtkwwHyOmXez2NmmRNLBYLjNWkt2ZFvCXRe8Tt
-	LPomWb4OMBX8b9cJSy1NIsGaFnmdqbUsPnayXb/UgBGmt0WC9uEZrG3180dgn9gX9ZM=
-X-Gm-Gg: AfdE7cnh/Zv6On/DIdNxDx76yEhOawreKirNDYVXz88u1ecuSp5FVYR90QX1VZlNjZU
-	fY1HW3o5T9/SrUu1cEP4Px9evhapESpPBriLsJG6KyGZ7rLYu7e09fcMrM6JVapLB5Hfb1Uquvo
-	RPi1cQhuEzkBIfjRZ1OTOSY4Yr+k/SnCtDk8h59Ouc/3CfUv1j449ELIn8lY7o4UT1hl3VqnJ/S
-	LOBGyn+/0PsrLTVFyYuD7M9kjBDd5A7dSTGoNM5mgP3J/ZCZLyEfRfBW4EANSUil1eezgHInDhz
-	fko/3oHAEr0OAAQxOEjFSnkZhv4AO1Y1VoVOJvp9IzF0vfcBz41f/VMcR7QeWdX46gD/17SS9Hc
-	S5CHwoGo4uZgwGg7sFXadriB2Rw+dePm2k+ftIOqFuuQFCQSrPNs5dNvg0sSXKNHNzPsZSw1Q4x
-	rJp3RvefaezA71BE+pw9eyNS3EGDUKwWC/lyh9MzhYHCXdNVmCe5WMvOxO5GzwYsPv/vKWXqw=
-X-Received: by 2002:a05:6820:1c94:b0:69d:ecb9:4a2 with SMTP id 006d021491bc7-6a12d788b4dmr115278eaf.4.1782304423346;
-        Wed, 24 Jun 2026 05:33:43 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a0e9f698ccsm8680170eaf.4.2026.06.24.05.33.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jun 2026 05:33:42 -0700 (PDT)
-Message-ID: <354f8038-e402-42d3-a706-6c1fac284e0d@kernel.dk>
-Date: Wed, 24 Jun 2026 06:33:41 -0600
+        d=1e100.net; s=20251104; t=1782304619; x=1782909419;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aVVzYHaalnDwmrRDCXsQm1lcc3hZBz2mEnxrShCLD2c=;
+        b=a+nbLsyv8psOqEE1FSWw4V8FDKoSNIi4GVOpIirojkbBcAk5UcU+faZwXGa7VF9ajI
+         Vmp1F2n3WsdP65ZagjGz6ftIUZUEP1Jc/FqSfGRNaxq3tllaiNFXvZIUwCGcLZHDM3iA
+         1bh2P60exx3KW4OhSpjjWjMqzUFtFhBX5y5+1lqjrSfT4pUWJSDYUjF2r1L6yFWpGUV6
+         9zsp0/IclsGJvelFNIcr/OPmvv2wkUB7sgZvMILeNsDMEAlqhvuL8fxQHnYOwHcEEmXP
+         wi3ykJUw9yy0CA0/FelR90W4xPwUxz/03oO9ptE9sFv4FVRh4ifWhKbpzWLpvECtla03
+         SQ+g==
+X-Forwarded-Encrypted: i=1; AFNElJ+PiDRyf/1B/W5XaanANT7nj2VK0YvogC4LX1+8kXMGA5be9/sMhu2Hn0NaDb38p0Yt/DN3C/e1bFQWkQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWFumi54Xmilxr9sE1tqVRAP8odxahcc9g+w6gRboXbLCkdg/d
+	692jIb0zYowA1oRmlzXkrn+kdeUBhNuhY7tW6L2t5w6OjW5ekglOQ7Ft
+X-Gm-Gg: AfdE7clwrLQUFutynBHbVn9rCS4QKk4SdroiLwfqv6tJPH54BWTvClioQw8RSDl6F78
+	HOgX5sLr6clsOaSUyoVrY9D7vubX9LXvjXHHHwEHe3KsrjiRhiE5QwcCmBfzAqYQr6tnyNCsY6i
+	tjHHk5/VTW+rXh4z/BKTh8ELJ0Mp1yh4+FWgnzZtPju90Tz7Zt1wD2YsZ0T0i3Z6adfPAMxPI/K
+	JRlUoOY3ZH+RgZQa8Zt1zLWC/KVlCFQVQM0CP0bjrp6ydP+VQ4l6pcwqsAXVW9pEXtmraakYe3X
+	h930jOsYRNIKpX1KAPprZtaf6EhBaLiqgRCk+rfUKeHo628ThPf7OuDMz9FvrPce5Se2FkcJxyO
+	9CmMBuLrJYOIlpvijxQbecMROxvmOdFz4cinlCnQO8yd0S+ibb5RsGacL0Abu/jorR8KI4P6AH+
+	Ze/V+62ZRmf2pHUemhn2rqkKmiNQ==
+X-Received: by 2002:a05:600c:4747:b0:490:3cf0:8d81 with SMTP id 5b1f17b1804b1-492632b20b7mr4090775e9.13.1782304618712;
+        Wed, 24 Jun 2026 05:36:58 -0700 (PDT)
+Received: from Dev-Null-MSI ([2a0d:3344:52ac:a808:98a4:4381:be45:536f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fe7b359sm432036495e9.9.2026.06.24.05.36.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 05:36:58 -0700 (PDT)
+From: Yousef Alhouseen <alhouseenyousef@gmail.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yousef Alhouseen <alhouseenyousef@gmail.com>
+Subject: [PATCH] tools/cgroup: iocost_monitor: parse help before importing drgn
+Date: Wed, 24 Jun 2026 14:36:52 +0200
+Message-ID: <20260624123652.8108-1-alhouseenyousef@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-7.2-20260623
-To: Yu Kuai <yukuai@kernel.org>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
- Chen Cheng <chencheng@fnnas.com>
-References: <20260623090327.1097428-1-yukuai@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260623090327.1097428-1-yukuai@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/23/26 3:03 AM, Yu Kuai wrote:
-> Hi Jens,
-> 
-> Please consider pulling the following changes into your block-7.2
-> branch.
-> 
-> This pull request contains:
-> 
-> Bug Fixes:
-> - Fix raid1 writes_pending and barrier reference leaks on write failures.
->   (Abd-Alrhman Masalkhi)
-> - Fix raid10 writes_pending leak on write request failures.
->   (Abd-Alrhman Masalkhi)
-> - Fix raid10 writes_pending and barrier reference leaks on discard failures.
->   (Abd-Alrhman Masalkhi)
-> - Fix raid1 REQ_NOWAIT handling while waiting for behind writes.
->   (Abd-Alrhman Masalkhi)
-> - Fix raid1 r1_bio leak when a REQ_NOWAIT retry would block.
->   (Abd-Alrhman Masalkhi)
-> - Fix raid1 read-balance head_position data race. (Chen Cheng)
-> - Fix raid5 stripe batch bm_seq wraparound comparison. (Chen Cheng)
-> - Fix raid5 stripe batch state snapshot KCSAN noise. (Chen Cheng)
-> - Fix raid5 R5_Overlap races while breaking stripe batches. (Chen Cheng)
-> 
-> Improvements:
-> - Add raid5 discard IO accounting. (Yu Kuai)
-> - Always convert raid5 llbitmap bits for discard. (Yu Kuai)
-> 
-> Cleanups:
-> - Simplify raid1_write_request() error handling. (Abd-Alrhman Masalkhi)
+iocost_monitor.py imports drgn before argparse can handle "-h" or report
+argument errors. That makes basic usage help fail on systems where drgn is
+not installed.
 
-Pulled, thanks.
+Parse arguments before importing drgn so the help and argument-error paths
+work without the runtime debugging dependency. Normal execution still
+imports drgn before reading kernel state.
 
+Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+---
+ tools/cgroup/iocost_monitor.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tools/cgroup/iocost_monitor.py b/tools/cgroup/iocost_monitor.py
+index 933c750b3..bdd78ba27 100644
+--- a/tools/cgroup/iocost_monitor.py
++++ b/tools/cgroup/iocost_monitor.py
+@@ -15,11 +15,6 @@ import time
+ import json
+ import math
+ 
+-import drgn
+-from drgn import container_of
+-from drgn.helpers.linux.list import list_for_each_entry,list_empty
+-from drgn.helpers.linux.radixtree import radix_tree_for_each,radix_tree_lookup
+-
+ import argparse
+ parser = argparse.ArgumentParser(description=desc,
+                                  formatter_class=argparse.RawTextHelpFormatter)
+@@ -34,6 +29,11 @@ parser.add_argument('--json', action='store_true',
+                     help='Output in json')
+ args = parser.parse_args()
+ 
++import drgn
++from drgn import container_of
++from drgn.helpers.linux.list import list_for_each_entry,list_empty
++from drgn.helpers.linux.radixtree import radix_tree_for_each,radix_tree_lookup
++
+ def err(s):
+     print(s, file=sys.stderr, flush=True)
+     sys.exit(1)
 -- 
-Jens Axboe
+2.54.0
 
