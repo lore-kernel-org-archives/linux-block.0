@@ -1,264 +1,97 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859BA3C13E3
-	for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 14:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7F63C1084;
+	Wed, 24 Jun 2026 14:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782311011; cv=none; b=jmntBr18iehEFKwBDclHUXWS3L9DB8bPJojBoUwPdhzxI34U65fVtpJGVTsPsEFcGlfObAUhMqMMAEDR70wV0sQ7GGASRijY8io3BOiEXb6GfcajTkxlzCO5kcCq2636SzLVTwXakAVynw21PtfKQkGCz4C9/KtxL/ofUWmipbk=
+	t=1782312657; cv=none; b=msVaGVP3EVmQk694Hs8iihxVaxPLoxWy7wRpFsI9uzt1tMH9AF3LVxDmSR+7uTHXX/E0ZxnSzkB51ZHh0FH12lnRgCzLpBDaLtUDgoBoPrUaxHO4/GXbiaFSrfCe2hOtRdq33HovsR6aOGNxHOSFdPLsapDeKusOIzw7qiJRysk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782311011; c=relaxed/simple;
-	bh=ANcnDbJl1GrE6afhpUmaNktn53Zw0TE+IUnQR7Lyflk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZe0F+CEM0Y+FcHXOnXA1y8Bbjw1BQRnTBQ77X5SUt5miWe/2UFu2z+MZboMk9NsMLfCO8JYbth9xgUrgBIB0+X1MdKy5UxIITLZ8XQBU61SIV+Opda4BLb4fxPsL1CrVGS24uiXZGJmabfAgXc4KMNnRswyqq5TgSsSO9nX0iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CK1QgHuI; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782312657; c=relaxed/simple;
+	bh=sxx4jcfqifuLsse/09Zxvfs7xYRJegnI9jN3UhlAT5Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iuzWrMXEEpGPr8cOSrvbXhKyWYbJDhuk+lEK9UIRc6YuFrxSs3GrgJxkl/dWJH+IAP+KfebD23lr8OEvQgL3voMiKAhhEbY02GvKbsxFhndp93cP4ozGk+YwTBJCDb/TnwUXlUisMPEgm+qj073HG05UQwFwbB9KXswfc2vQKW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRvzuIXi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CK1QgHuI"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-4629051c946so786352f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2026 07:23:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782311007; x=1782915807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
-        b=CK1QgHuIU3L+Hoq9eyhLAP/tW60WuHCUI7tfWelD/UEnl2Wy0NhsVkfh8AA22XEOA2
-         hDg0I3Qw0c8thCpYKIRQF2GB97/jDtHq3N7sH/zC33OPWPVMkUtDc/wZajKMWaLEVhh+
-         9ZNJdTbT7ze+PrqZ/wGdLFb1rAwCCMVFvHdTBfoD6HTQegbltGhdwjkQ+PvECoQiudJB
-         SKRNGqOXEB2kF2ZVf2qCX1biZAaWtJawZh0E366EpIQ4SAIrWsXVO2ZBPpaWDzupv+RC
-         TaMQybC2UB1JHLVfYACnBxKWlff5n5TZv8mwnhHgObgWNzrtct1UvpEaaP+EMi+/wDnr
-         NuMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782311007; x=1782915807;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
-        b=JXzMUpjxiKhnBBwbJltBDmuqpc1UUw3i5ojK7D69W9VblFM4tvhySeBxK1n2ZoXkfP
-         uvNXcX5+xv64iv8qkgBalOftUGJ77LNVf9SjbbZhrlQ9rch8FZ6Lu56jxHDxEMJzqD8z
-         WYtksIB+/t3MCVARjp1/PWtQuHZaG0XPdVjY79NH+Lv6RhPEQLChKjqccEukZK9fLZV5
-         cXwmrQWLL+MyhASVcE5R2NanLV7/dEplgTazYtu9Jfy75Q9olIPGlPPJHe30WonRQYqP
-         upf3PE1Hjt1eAokGoi8zHa31YYVPH0HdHHNxXqC4rwVcOBzutwUwa2/h3RwNGHYmGU4q
-         rhhA==
-X-Forwarded-Encrypted: i=1; AHgh+Royxl8lq4qEwwi6FFI2JVYrOsKLhdw1q5985NSsLIX6nu1YdIMIVsinZZg/woT80a1DMsT0C+p2o87Spg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt1LIjd/VqbOAKF4C2fb6660yv6WjhdrYug6jYMdsKQN4vpWWI
-	XqER3m2CmJfveehjyCStQ9f0QwZnV64/VDlEh3qN7LPFJ25M3dTJ2zLC
-X-Gm-Gg: AfdE7cneMrrWANPldhGAztpk0NglxlYmgOdYrar/PCSoUIvx2CRpPt6PI/vaqRhna1m
-	1mK89JrcByGNHl1TX1BoDe39DjhHXQNtBBv2nHC/Z2DmXGp4oLIoNi1eYA4EMvygOYLPJbVMSun
-	cPsMDYWzk97DernlBbRcosnNs7Funkj8sVFvlH99PpUXk2Vi8w0unzJyCaLtKu/9rtWml3nSYK/
-	txCd9gXeGJNQk2KUth9uZWaxDkOUIMdYyjCXtGj/N8fHBd1kLsBSFkMBBxiJWfbp9WKqKNDyFnc
-	sPQB4WcZOjGqK2kxWrza7upEq/r7fqWT5obbUgPkGtAC2syJ271CevqpXk19jK1yEyVKR3MStLP
-	zgKyBtFLvxe7bjaFkMG+rdmBTyq3HHQIWWntwXrVrDJWcS1kFKjh6xNfudrB+eWiycqs6uzLwSl
-	55GTFZgKyfdOUDb2bjE3t3EMMaOaT/vTb5oiBZV23UPsGJjzA6Bg==
-X-Received: by 2002:a05:6000:471a:b0:460:2e53:a6f6 with SMTP id ffacd0b85a97d-46d04583b35mr1261972f8f.12.1782311006854;
-        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c221d9405sm8183744f8f.22.2026.06.24.07.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
-Date: Wed, 24 Jun 2026 15:23:24 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
- <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
- Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
- <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, Paul
- Moore <paul@paul-moore.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, David Howells
- <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>, Philipp
- Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-Message-ID: <20260624152324.3def88ce@pumpkin>
-In-Reply-To: <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-	<20260622040533.29824-2-kaitao.cheng@linux.dev>
-	<20260622094242.64531b9a@pumpkin>
-	<351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
-	<cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRvzuIXi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292281F000E9;
+	Wed, 24 Jun 2026 14:50:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782312655;
+	bh=RhE7XAYwFGAxOusv3m7rjZ+ngd7AFo0axuxmFrVituk=;
+	h=From:Date:Subject:To:Cc;
+	b=oRvzuIXi8ZVCKl/P8o0YWgUcS3JGxQr4HFP6J0foPVth9XuRyD8ERQTvASityYIl6
+	 d5L8viiMpFOoQO1BZU/9SRhOXF5Ee3s/NCUF6k7lFioIWrz99ox5nJwy6dHj+XR6k0
+	 Y33xEeywGtDxd+Tc+k3EEWHbkddv0jPewIP3mojQR2FS2gfL9BL1ZrHtUXkGMkqFb5
+	 Ne54vHqTwwKZhInPQu+CSCUemXuLTLQkgwrX/ru7hHmVPOr86DJ7hE66exmFTz/XYD
+	 4SThKB9klqt2QV/dJRiKG1KbQEmh6bza0XBvp1S/eJl/Q1X4YlZrAQ2+7Jk4t2rNt+
+	 q9JXpj5+Eg6iQ==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 24 Jun 2026 10:50:34 -0400
+Subject: [PATCH] blkcg: update iocost_coef_gen.py to use io_uring
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260624-iocost-v1-1-2d53f3c026a2@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDMyMT3cz85PziEt1EQ0szCyOD5GQDE0sloOKCotS0zAqwQdGxtbUAc1e
+ XIVgAAAA=
+X-Change-ID: 20260624-iocost-a196820cc049
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
+ linux-block@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1303; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=sxx4jcfqifuLsse/09Zxvfs7xYRJegnI9jN3UhlAT5Y=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBqO+7IQBpnJNjXqOJgu2/E8aKIpK5vnSEBDEEe3
+ jKh+pR99IqJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCajvuyAAKCRAADmhBGVaC
+ FT2REACrUljSpTvaaImwhGWQAP56QO5dySpOYz+SisD9yDMmCLLIvbnBOnQEioce/5N81EtuLow
+ swzlryslxEeJuW9+bSl7K2SACO95uG5lCro3HBrtvyAsEB6yRlLiklvPGfF6iTvMU/XynTy9bFm
+ BwqSBaFkJTvP8BlKnfENlGrSVhZEn4gPJalux4JFWMqNsfLlIqTI0Om9gS8yOPHhaYoXxWtQehg
+ BDpIfwHBM7ZO1jTUsT+H/FA1KoblOUVsnVhIvbE551OVKg5mWA/bnW1D3qDMubPZVSsiQbTmWm9
+ xzLnMm0EhnOkAFXn3kEPqpETO0qWZXR2P9dMc0aRY1W3Ig7kn/KgTNcg47zVFYKSWPORF2A/5q5
+ jjdo9c4M8EA+tV2WQOa9la0xHSoM1iEQ8JR/Yg1ai6S3t+ois3USLN9Op5wCHnuv8jwq+UGEs2P
+ YSTy0+ZY3A0ejt3boHovZRQUGrmO9jtB6O3qa6G5aAUz8dpMvDFjgX4CgysoLBPp/1Ejs1Fj/yO
+ TUtySV0CAmki8+bD0+PWe+bcaU0kFIW5+gJ1IoBGdBg4f+xxzBw4cZdWPQUru7V+ppz+CMlOACj
+ eL6NwYw9YmBiQGFpLqlJpkK92Q5ZVcSsEu/hEND2qXrbYkPSk4Es28ucLFIeo8oQcK6Nf008vpa
+ T/eaAEUfznmWxcg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Wed, 24 Jun 2026 15:23:47 +0200
-Christian K=C3=B6nig <christian.koenig@amd.com> wrote:
+Recently I found myself having to benchmark some rather fast disks for
+iocost, but the old iocost_coef_gen.py script couldn't generate enough
+throughput to saturate it. Make it use io_uring instead.
 
-> On 6/24/26 15:14, Kaitao Cheng wrote:
-> >=20
-> >=20
-> > =E5=9C=A8 2026/6/22 16:42, David Laight =E5=86=99=E9=81=93: =20
-> >> On Mon, 22 Jun 2026 12:05:31 +0800
-> >> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
-> >> =20
-> >>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
-> >>>
-> >>> The list_for_each*_safe() helpers are used when the loop body may
-> >>> remove the current entry.  Their API exposes the temporary cursor at
-> >>> every call site, even though most users only need it for the iterator
-> >>> implementation and never reference it in the loop body.
-> >>>
-> >>> Add *_mutable() variants for list and hlist iteration.  The new helpe=
-rs
-> >>> support both forms: callers may keep passing an explicit temporary cu=
-rsor
-> >>> when they need to inspect or reset it, or omit it and let the helper =
-use
-> >>> a unique internal cursor. =20
-> >>
-> >> I'm not really sure 'mutable' means anything either.
-> >> It is possible to make it valid for the loop body (or even other threa=
-ds)
-> >> to delete arbitrary list items - but that needs significant extra over=
-heads.
-> >>
-> >> It might be worth doing something that doesn't need the extra variable,
-> >> but there is little point doing all the churn just to rename things.
-> >> =20
-> >>>
-> >>> This makes call sites that only mutate the list through the current e=
-ntry
-> >>> less noisy, while keeping the existing *_safe() helpers available for
-> >>> compatibility.
-> >>>
-> >>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> >>> ---
-> >>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++----=
---
-> >>>  1 file changed, 231 insertions(+), 38 deletions(-)
-> >>>
-> >>> diff --git a/include/linux/list.h b/include/linux/list.h
-> >>> index 09d979976b3b..1081def7cea9 100644
-> >>> --- a/include/linux/list.h
-> >>> +++ b/include/linux/list.h
-> >>> @@ -7,6 +7,7 @@
-> >>>  #include <linux/stddef.h>
-> >>>  #include <linux/poison.h>
-> >>>  #include <linux/const.h>
-> >>> +#include <linux/args.h>
-> >>> =20
-> >>>  #include <asm/barrier.h>
-> >>> =20
-> >>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct=
- list_head *list,
-> >>>  #define list_for_each_prev(pos, head) \
-> >>>  	for (pos =3D (head)->prev; !list_is_head(pos, (head)); pos =3D pos-=
->prev)
-> >>> =20
-> >>> -/**
-> >>> - * list_for_each_safe - iterate over a list safe against removal of =
-list entry
-> >>> - * @pos:	the &struct list_head to use as a loop cursor.
-> >>> - * @n:		another &struct list_head to use as temporary storage
-> >>> - * @head:	the head for your list.
-> >>> +/*
-> >>> + * list_for_each_safe is an old interface, use list_for_each_mutable=
- instead.
-> >>>   */
-> >>>  #define list_for_each_safe(pos, n, head) \
-> >>>  	for (pos =3D (head)->next, n =3D pos->next; \
-> >>>  	     !list_is_head(pos, (head)); \
-> >>>  	     pos =3D n, n =3D pos->next)
-> >>> =20
-> >>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
-> >>> +	for (typeof(pos) tmp =3D (pos =3D (head)->next)->next;		\ =20
-> >>
-> >> Use auto
-> >> =20
-> >>> +	     !list_is_head(pos, (head));				\
-> >>> +	     pos =3D tmp, tmp =3D pos->next)
-> >>> +
-> >>> +#define __list_for_each_mutable1(pos, head)				\
-> >>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> >>> +
-> >>> +#define __list_for_each_mutable2(pos, next, head)			\
-> >>> +	list_for_each_safe(pos, next, head)
-> >>> +
-> >>>  /**
-> >>> - * list_for_each_prev_safe - iterate over a list backwards safe agai=
-nst removal of list entry
-> >>> + * list_for_each_mutable - iterate over a list safe against entry re=
-moval
-> >>>   * @pos:	the &struct list_head to use as a loop cursor.
-> >>> - * @n:		another &struct list_head to use as temporary storage
-> >>> - * @head:	the head for your list.
-> >>> + * @...:	either (head) or (next, head)
-> >>> + *
-> >>> + * next:	another &struct list_head to use as optional temporary stor=
-age.
-> >>> + *		The temporary cursor is internal unless explicitly supplied by
-> >>> + *		the caller.
-> >>> + * head:	the head for your list.
-> >>> + */
-> >>> +#define list_for_each_mutable(pos, ...)					\
-> >>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> >>> +		(pos, __VA_ARGS__) =20
-> >>
-> >> The variable argument count logic really just slows down compilation.
-> >> Maybe there aren't enough copies of this code to make that significant.
-> >> But just because you can do it doesn't mean it is a gooD idea.
-> >> I'm also not sure it really adds anything to the readability.
-> >>
-> >> And, it you are going to make the middle argument optional there is
-> >> no need to change the macro name. =20
-> >=20
-> > Christian K=C3=B6nig and Jani Nikula also disagree with the variadic-ar=
-gument
-> > implementation approach. If we abandon that method, it means we will
-> > inevitably need to add some new macros. If mutable is not a good name,
-> > suggestions for better alternatives would be welcome; coming up with a
-> > suitable name is indeed rather tricky. =20
->=20
-> I don't think you need to add a new macro for the specific use case that =
-people want to modify the next element of the iteration.
->=20
-> If I remember your numbers correctly that is a really corner case and kee=
-ping using the existing *_safe() macros for that sounds perfectly fine to m=
-e.
+Cc: Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+ tools/cgroup/iocost_coef_gen.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-IIRC currently you have a choice of either:
-	define               Item that can't be deleted
-	list_for_each()	     The current item.
-	list_for_each_safe() The next item.
-There is also likely to be code that updates the variables to allow
-for other scenarios.
+diff --git a/tools/cgroup/iocost_coef_gen.py b/tools/cgroup/iocost_coef_gen.py
+index df17a2ae80e5..41f93f4536cc 100644
+--- a/tools/cgroup/iocost_coef_gen.py
++++ b/tools/cgroup/iocost_coef_gen.py
+@@ -91,7 +91,7 @@ def run_fio(testfile, duration, iotype, iodepth, blocksize, jobs):
+ 
+     eta = 'never' if args.quiet else 'always'
+     outfile = tempfile.NamedTemporaryFile()
+-    cmd = (f'fio --direct=1 --ioengine=libaio --name=coef '
++    cmd = (f'fio --direct=1 --ioengine=io_uring --name=coef '
+            f'--filename={testfile} --runtime={round(duration)} '
+            f'--readwrite={iotype} --iodepth={iodepth} --blocksize={blocksize} '
+            f'--eta={eta} --output-format json --output={outfile.name} '
 
-Note that if increase a reference count and release a lock then list_for_ea=
-ch()
-is likely safer than list_for_each_safe() :-)
+---
+base-commit: 840ef6c78e6a2f694b578ecb9063241c992aaa9e
+change-id: 20260624-iocost-a196820cc049
 
-list.h has 9 variants of the 'safe' loop.
-The bloat of another 9 is getting excessive.
-
-It has to be said that this is one of my least favourite type of list...
-
-	David
-
->=20
-> Regards,
-> Christian.
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
