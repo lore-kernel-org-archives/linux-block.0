@@ -1,112 +1,175 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B3C3CC7DF;
-	Wed, 24 Jun 2026 17:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9103DD53B;
+	Wed, 24 Jun 2026 17:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782322969; cv=none; b=PIiI20ZX4AqqU4EneXjQQAwctmeUo+gK1Z/n71feRVkvhb9pncNXjfMAs69qzXMc6EdceHuvWgqPgkXYq6F+feDDpgPrtfak0m2DmTn74AhKg/7p4JUObr5EipQwBArbVZSEodyHoVqr/y4eUGGaBCbT6lCzLE1bIZHhXLY1s+0=
+	t=1782323659; cv=none; b=ovim6x9vrJx4syt4N0pfaUbBzuh/aSvJqG5wFKzKk8JL6VweyM38+8eNXBc0ykBfqgFHwO2lkpU2VxEZ04iM7EpGla+alewMp1C4kuAk2BwlwfIO30GoBHBEv5lgSPpaJU+cmybNrq5tBMYWwwP0Y0DVL1imQ7mxBfJ9KFllzdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782322969; c=relaxed/simple;
-	bh=2ZycE3Xs0J5KLMwS+1EP6QccRLENONtX1HayvXH1Hbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=atLtzgTjzruJlpnqo9/VV1fSGhToPGPu3L7m7KMFU+oK20gACSbf67YFxSEGbXp3hZnCyyFNKuy/w6/ufh1HzWiuJ5/1TFJ8KDfqk8sY3SdNBBpQcSgnW9X9nAn2YNz+kcij1qR2XMSmEGHT+YBcHDfeyINZAOv3hX4s5GDoeps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JqlOnzJa; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1782323659; c=relaxed/simple;
+	bh=Ei0aoxqHXsqgximkJIsLmwPY89BVcMh4q8r0iMz7bU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIvZyOG/rAuE51nMcHc5IgXYAoNGC5rCEFhJpo0TfTO1rUrWQRcE/THdma/MEy+NkzVWHIUp1phNu2+/yNb7omgmmczUvd6zRm7l4meb9UjsssKVyBsZ38FF42dECjE/a22nOqYaBqIxEeCuyybpIlsgPuM90FpO0qS900idmk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ohfBN4CZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JqlOnzJa"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=4ElqMcyD4SnoVaQLQg03XYigTcdoKEg/OF55QxzEAiY=; b=JqlOnzJae0InaYPAqvmaT+XGXF
-	NE3lCHDU5phMBdzAM0HLvga9mK44xqUP0uku/iiapVYmuLjOEM+VKVi+h7bwd8BB16qeT4l/lfmIg
-	2SIx6fLUOWfTVym/Me6CJgOXR1ipgT/pe0/F1t9vo8he1xfBSlllk6a/u0RpRimgPl7UA194cMa64
-	yzePfkpVxA92FFtp86Kn552jKOUeI4t/GsTykC34EA+ZlWt1C/fN6/dsKhH0qJBAuNVx75rbPSvfc
-	dd1VSfF91HTtSS3fxrHwadeNMYE0Azmzg1MOxzcSKVwVQX1CEV7zE5P9buW9h7bJ0DMTPeblo5bex
-	FJA0OTSQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wcRcT-00000008SR5-2ov3;
-	Wed, 24 Jun 2026 17:42:37 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ohfBN4CZ"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 45C4B1F000E9;
+	Wed, 24 Jun 2026 17:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782323658;
+	bh=n2E8Koujq0uvPGlna4mr7jMR9YCJEf6gPjQNGHvZ2Xo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ohfBN4CZZ+vdeOflw8EvU1hiNw7Nq80ZI6Zr27sQqO5v8JF7ljFlttrPJC1sI5V/N
+	 0zSO9m3aJYF+OYHHOgJVoU/sFRfwrs57uyo3jWjdYtWVA7J0RZDzkqD+RNB746PVoV
+	 gfADQGfGId9SX4S1M4EgpByHV3jDu57fG/RWw2HRXjHnfG88CbLSg1bSQg3gIdgHDt
+	 FXBy+ovvi91tczo0SiyacfoLP6MhlbuwJdrmDN7+b5zyIcw27QgL/Iizbs11DMIIn6
+	 JmsmUQGUUx/poPPzQu+y/eSgjIgeucDjs/jOr6H7PZsqVBTMC1m9EOtnMSNdh6E0Cw
+	 h5Z9XbPkv00ug==
+Date: Wed, 24 Jun 2026 10:54:17 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
 To: Christian Brauner <brauner@kernel.org>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
 	Jens Axboe <axboe@kernel.dk>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	fuse-devel@lists.linux.dev,
-	gfs2@lists.linux.dev,
-	ntfs3@lists.linux.dev
-Subject: [PATCH] iomap: Remove FGP_NOFS from iomap_get_folio()
-Date: Wed, 24 Jun 2026 18:42:26 +0100
-Message-ID: <20260624174228.2015893-1-willy@infradead.org>
-X-Mailer: git-send-email 2.54.0
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Carlos Maiolino <cem@kernel.org>,
+	linux-xfs@vger.kernel.org, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+	Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+	Gao Xiang <xiang@kernel.org>, linux-erofs@lists.ozlabs.org
+Subject: Re: [PATCH RFC v2 17/18] fs: look up the superblock via the device
+ table in user_get_super()
+Message-ID: <20260624175417.GU6078@frogsfrogsfrogs>
+References: <20260616-work-super-bdev_holder_global-v2-0-7df6b864028e@kernel.org>
+ <20260616-work-super-bdev_holder_global-v2-17-7df6b864028e@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260616-work-super-bdev_holder_global-v2-17-7df6b864028e@kernel.org>
 
-FGP_NOFS is legacy; filesystems should be using memalloc_nofs_save/restore
-instead.  We have it here in iomap because it was buried in
-grab_cache_page_write_begin() and we didn't want to change this behaviour
-as part of the folio transition.
+On Tue, Jun 16, 2026 at 04:08:33PM +0200, Christian Brauner wrote:
+> user_get_super() still finds the superblock for a device number by
+> walking the global super_blocks list under sb_lock. Every superblock is
+> registered in the device table under its s_dev since sget_fc() inserts
+> it there, including superblocks on anonymous devices, so use the table
+> instead.
+> 
+> The refcount-pinning cursor helpers super_dev_{get,first,next}() only
+> touch table state and do not depend on CONFIG_BLOCK, so drop the
+> CONFIG_BLOCK guard around them: their new caller serves anonymous
+> devices as well (ustat() on e.g. tmpfs) and is built without
+> CONFIG_BLOCK. The guard falls in this patch rather than separately
+> since without this caller the helpers would be unused without
+> CONFIG_BLOCK.
+> 
+> The pinned entry holds a passive reference on the superblock so
+> super_lock() can be called directly; once the superblock is locked grab
+> a passive reference for the caller before dropping the pin.
+> 
+> The device table contains more than the old walk could find: a
+> superblock is also registered for every additional device it claims
+> (the xfs log and realtime devices, btrfs member devices, the ext4
+> external journal, erofs blob devices). Don't filter those out:
+> specifying any device a filesystem uses now resolves to that
+> filesystem, so ustat() and quotactl() work on e.g. the xfs log device
+> or a btrfs member device (the latter used to fail outright as btrfs
+> superblocks carry an anonymous s_dev that never matches a member
+> device). When several superblocks share a device (erofs blob devices)
+> the first live superblock wins.
 
-I have tested this with XFS and see no issues.  Other filesystems (cc'd)
-may need to make adjustments.  Please test with lockdep enabled.
+Does erofs have a means to find the other superblocks that share a
+device given a notification coming in on one of them?  As hch says, it
+feels weird to have a lookup mechanism when there's also an upcall
+mechanism.
 
-Cc: "Darrick J. Wong" <djwong@kernel.org> (iomap)
-Cc: Jens Axboe <axboe@kernel.dk> (block)
-Cc: Namjae Jeon <linkinjeon@kernel.org> (exfat, ntfs)
-Cc: Sungjong Seo <sj1557.seo@samsung.com> (exfat)
-Cc: Yuezhang Mo <yuezhang.mo@sony.com> (exfat)
-Cc: Miklos Szeredi <miklos@szeredi.hu> (fuse)
-Cc: Andreas Gruenbacher <agruenba@redhat.com> (gfs2)
-Cc: Hyunchul Lee <hyc.lee@gmail.com> (ntfs)
-Cc: Konstantin Komarov <almaz.alexandrovich@paragon-software.com> (ntfs3)
-Cc: Carlos Maiolino <cem@kernel.org> (xfs)
-Cc: Damien Le Moal <dlemoal@kernel.org> (zonefs)
-Cc: Naohiro Aota <naohiro.aota@wdc.com> (zonefs)
-Cc: Johannes Thumshirn <jth@kernel.org> (zonefs)
-Cc: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Cc: fuse-devel@lists.linux.dev
-Cc: gfs2@lists.linux.dev
-Cc: ntfs3@lists.linux.dev
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- fs/iomap/buffered-io.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+<shrug> I've been on vacation for a while so maybe I missed that there's
+another use for the bdev->sb lookup?  There are 1600 more emails for me
+to go through... :P
 
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 8d4806dc46d4..27bc2455a98d 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -768,7 +768,7 @@ EXPORT_SYMBOL_GPL(iomap_is_partially_uptodate);
-  */
- struct folio *iomap_get_folio(struct iomap_iter *iter, loff_t pos, size_t len)
- {
--	fgf_t fgp = FGP_WRITEBEGIN | FGP_NOFS;
-+	fgf_t fgp = FGP_WRITEBEGIN;
- 
- 	if (iter->flags & IOMAP_NOWAIT)
- 		fgp |= FGP_NOWAIT;
--- 
-2.47.3
+--D
 
+> 
+> The cursor also keeps scanning past dying superblocks where the old
+> walk gave up after the first s_dev match, so a mount racing with the
+> unmount of the same device (or with the reuse of a recycled anonymous
+> dev_t) finds the live superblock where the old walk could spuriously
+> return NULL.
+> 
+> This removes the last s_dev-keyed walk of the super_blocks list and
+> takes ustat() and quotactl()'s block device lookup off sb_lock
+> entirely.
+> 
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+> ---
+>  fs/super.c | 28 ++++++++--------------------
+>  1 file changed, 8 insertions(+), 20 deletions(-)
+> 
+> diff --git a/fs/super.c b/fs/super.c
+> index 2d0a07861bfc..93f24aea75c4 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -501,7 +501,6 @@ static int super_dev_register(struct super_block *sb)
+>  	return err;
+>  }
+>  
+> -#ifdef CONFIG_BLOCK
+>  static struct super_dev *super_dev_get(struct rhlist_head *pos)
+>  {
+>  	struct super_dev *sb_dev;
+> @@ -535,7 +534,6 @@ static struct super_dev *super_dev_next(struct super_dev *prev)
+>  	super_dev_put(prev);
+>  	return sb_dev;
+>  }
+> -#endif
+>  
+>  static void kill_super_notify(struct super_block *sb)
+>  {
+> @@ -1044,29 +1042,19 @@ EXPORT_SYMBOL(iterate_supers_type);
+>  
+>  struct super_block *user_get_super(dev_t dev, bool excl)
+>  {
+> -	struct super_block *sb;
+> -
+> -	spin_lock(&sb_lock);
+> -	list_for_each_entry(sb, &super_blocks, s_list) {
+> -		bool locked;
+> +	struct super_dev *sb_dev;
+>  
+> -		if (sb->s_dev != dev)
+> -			continue;
+> +	for (sb_dev = super_dev_first(dev); sb_dev; sb_dev = super_dev_next(sb_dev)) {
+> +		struct super_block *sb = sb_dev->sd_sb;
+>  
+> -		if (!refcount_inc_not_zero(&sb->s_passive))
+> +		if (!super_lock(sb, excl))
+>  			continue;
+>  
+> -		spin_unlock(&sb_lock);
+> -
+> -		locked = super_lock(sb, excl);
+> -		if (locked)
+> -			return sb;
+> -
+> -		put_super(sb);
+> -		spin_lock(&sb_lock);
+> -		break;
+> +		/* The pinned entry holds a passive reference, take our own. */
+> +		refcount_inc(&sb->s_passive);
+> +		super_dev_put(sb_dev);
+> +		return sb;
+>  	}
+> -	spin_unlock(&sb_lock);
+>  	return NULL;
+>  }
+>  
+> 
+> -- 
+> 2.47.3
+> 
+> 
