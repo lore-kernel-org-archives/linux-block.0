@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7BC30C15C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5674B34041B;
 	Thu, 25 Jun 2026 14:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782396631; cv=none; b=MbgB8aPPwwrWi4lav4NbwW45uXBPY5LOhKm4BQo9p8aVUWmM60kpvzfwjwlsiZyFND+W2fJRPScya1K0TCl9vWDp/UP7BhxDBaUiUAVkIcLFo2UCkDQUaK/jjtb5ruW2XSwVSXKt9XcgdMM0iMPXhacv2MaHbRaZcznQMwdXATM=
+	t=1782396631; cv=none; b=M/NdqyewwhZi+lOKD08ZU3UdFZkNMzN6hv3zmJAbhqhX/CQwCAYiWGgSuqiLbh4NfATs4uc+0c5wip+zzDxglst1J6nyyLR5GunATHn1NQLdWnG4I/BjNo+CppoJBme25+1wcM4NEyG1fshWfIDuQB7ZAFJUbvFo8kSxItPVmm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782396631; c=relaxed/simple;
-	bh=O39ws0iMru9hm8TgXu7rNxCKAIVbTXEq4BlFEP3abHw=;
+	bh=yrszS7W1eAEcg3XdaKP+FpRzs0RmFdVuiIWNio6sCbU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KgUjol2IVqFzUyQEsG7YpBD+EC7DnAcCYzILcXmZsPkA0f8TVjIkouHD648bzjBTp/W9Y4umGxoZ/4nbqblYChrKYsjnQVKSOwReaRJlA5d4j2N1iMjlXZFV7w0eK1mk7azWXwCUKpHUUK99GOwLAA9Rpbew1dPpXijIZk6jlUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M7yi9uvv; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=uXyalfcIfQgPHAmF2dP5QXk8ACjTEd52gZ6RtE5P5gqE5LIp4zrnhetxEq0cjqZW7NSyfzeOgrRYJGVHko40yPMUccdvVa8RWOk050H9s87fiKjtlMg7lPuQ3JLfa63j9L0ScPwxO//l6fke+wqV+TSErYrzaNQy/4P6Ubb7EtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAXpgrG2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M7yi9uvv"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F1D23C2BCB7;
-	Thu, 25 Jun 2026 14:10:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAXpgrG2"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26FC6C2BD01;
+	Thu, 25 Jun 2026 14:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1782396631;
-	bh=O39ws0iMru9hm8TgXu7rNxCKAIVbTXEq4BlFEP3abHw=;
+	bh=yrszS7W1eAEcg3XdaKP+FpRzs0RmFdVuiIWNio6sCbU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=M7yi9uvvaw76kuzKhtvRlSvxlIOsDdlcqnEsorvKqYVUMAeaNysO4qRlS3dQINjBm
-	 xN58K8uBBMPOfw33e5meQkXxSb1Vc7ByxkFLlXJ2nzHUUmtsn6ktLSOpwiEDGarjbx
-	 +Uj95jt84ZPxFaC6DOJ6B3GqNGE5PjA+qduv47H/CXVuKeGK4cfc6ChfXA3qNG4cnM
-	 vkNYF0B7z1bCgFmMIlIJ8/HLh1FOMhCVZgVSiUmxupGjA8Uv4nlIwa+5E5y5ts6Dut
-	 7f3p1dWB0JET1p4qlek6OhuklqCE5htWwUS6O/1OMYydsACjOpCFFp02hcWrLXlzTy
-	 h8M4OYaJ4qOYw==
+	b=GAXpgrG2NVYwPd6ImSXWysygelBpW97fsLnnU6h4Y1Pb9F1znfK++OYj6e9qV/+HP
+	 o3054yMGEZYWJJ2QwP4uGPbBkWZzHIJqfd3QlidmJICS0VPlLR3kEp+5DzOA4qHNUc
+	 V1xurOspSyLctXQrlnVaBP7mzLGIUEqHwmLxzhn7q2rh7me+4K21MCGL4nT8T05cL5
+	 UUC9vm/ctwFOKwM8R/3y7S1nejOB/O+h2jXYPECtUHeFXBV0DT2zraY3L4kgs+Qq6U
+	 bNlvqYTs0+1Kyr8FDeM8TZx71o0bOg7cNsw2Z3InmYwdkwNukuhPp10j9eMXomy3Sp
+	 SJ0ebhloPDxKA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8633CDE000;
-	Thu, 25 Jun 2026 14:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA96CDE00B;
+	Thu, 25 Jun 2026 14:10:31 +0000 (UTC)
 From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Thu, 25 Jun 2026 18:10:05 +0400
-Subject: [PATCH 1/6] dt-bindings: remoteproc: document M0 Bluetooth
- Subsystem secure PIL
+Date: Thu, 25 Jun 2026 18:10:07 +0400
+Subject: [PATCH 3/6] Bluetooth: btqca: Add IPQ5018 support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,7 +40,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260625-ipq5018-bluetooth-v1-1-d999be0e04f7@outlook.com>
+Message-Id: <20260625-ipq5018-bluetooth-v1-3-d999be0e04f7@outlook.com>
 References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
 In-Reply-To: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
 To: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
@@ -69,11 +68,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
  George Moussalem <george.moussalem@outlook.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782396628; l=2405;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782396628; l=3109;
  i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=aASt9ShJzJWACzszmUFOYCQKCOgD0FP+gd6rS7LrksI=;
- b=N1N0fyN6SorxNs2uShNAzctNepCMehbe1sjqld58fbG/kPye64F2aPdTfu+pjaWj+h5Wt5Wr1
- UkWP3yZildXD0XNWruBonDbZdCY2LJC8qZePwmbFxQjRooTh5BB9aaG
+ bh=YfdZYTMB/SghkLi82xybv2Ru5WS6Sv6NKlsHcB3g49A=;
+ b=Ut0ZStC7p267bavS0Dx+6BAKei2zMsIxNkSqi2oQsxKi69k1+hjGTj9dyQ5GRQOsTm5z/z/2R
+ L5EedHT2+GUDUD27g2ip3OorJMJe045LjCmLbV6tVHinkKTcGm3YPOi
 X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
  pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
 X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
@@ -83,93 +82,109 @@ Reply-To: george.moussalem@outlook.com
 
 From: George Moussalem <george.moussalem@outlook.com>
 
-Document the M0 Bluetooth Subsystem remote processor core found in the
-Qualcomm IPQ5018 SoC. Firmware loaded is authenticated via TrustZone.
-The firmware running on the M0 core provides bluetooth functionality.
+Add the IPQ5018 SoC type and support for loading its firmware.
+
+The firmware tested has been taken from GPL sources of various router
+boards. Firmware files needed are:
+- qca/bt_fw_patch.mbn
+- qca/mpnv10.bin
 
 Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 ---
- .../bindings/remoteproc/qcom,m0-btss-pil.yaml      | 72 ++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ drivers/bluetooth/btqca.c | 16 ++++++++++++++++
+ drivers/bluetooth/btqca.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml b/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml
-new file mode 100644
-index 000000000000..397bb6815d71
---- /dev/null
-+++ b/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml
-@@ -0,0 +1,72 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/remoteproc/qcom,m0-btss-pil.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 04ebe290bc78..e136e91976cf 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -380,6 +380,9 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
+ 		break;
+ 
+ 	case TLV_TYPE_NVM:
++		if (soc_type == QCA_IPQ5018)
++			break;
 +
-+title: Qualcomm M0 BTSS Peripheral Image Loader
+ 		if (fw_size < sizeof(struct tlv_type_hdr))
+ 			return -EINVAL;
+ 
+@@ -794,6 +797,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	else
+ 		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+ 
++	if (soc_type == QCA_IPQ5018)
++		goto download_nvm;
 +
-+maintainers:
-+  - George Moussalem <george.moussalem@outlook.com>
+ 	if (soc_type == QCA_WCN6750)
+ 		qca_send_patch_config_cmd(hdev);
+ 
+@@ -881,6 +887,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
+ 		qca_read_fw_board_id(hdev, &boardid);
+ 
++download_nvm:
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	if (firmware_name) {
+@@ -939,6 +946,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+ 				 "hmtnv", soc_type, ver, rom_ver, boardid);
+ 			break;
++		case QCA_IPQ5018:
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/mpnv%02x.bin", rom_ver);
++			break;
+ 		default:
+ 			snprintf(config.fwname, sizeof(config.fwname),
+ 				 "qca/nvm_%08x.bin", soc_ver);
+@@ -958,6 +969,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		return err;
+ 	}
+ 
++	if (soc_type == QCA_IPQ5018)
++		msleep(NVM_READY_DELAY_MS);
 +
-+description:
-+  Qualcomm M0 BTSS Peripheral Secure Image Loader loads firmware and powers up
-+  the M0 BTSS remote processor core on the Qualcomm IPQ5018 SoC.
+ 	switch (soc_type) {
+ 	case QCA_QCA2066:
+ 	case QCA_QCA6390:
+@@ -965,6 +979,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
++	case QCA_IPQ5018:
+ 		err = qca_disable_soc_logging(hdev);
+ 		if (err < 0)
+ 			return err;
+@@ -1001,6 +1016,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
++	case QCA_IPQ5018:
+ 		/* get fw build info */
+ 		err = qca_read_fw_build_info(hdev);
+ 		if (err < 0)
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 8f3c1b1c77b3..343cd62d1137 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -54,6 +54,8 @@
+ #define QCA_HSP_GF_SOC_ID		0x1200
+ #define QCA_HSP_GF_SOC_MASK		0x0000ff00
+ 
++#define NVM_READY_DELAY_MS		1500
 +
-+properties:
-+  compatible:
-+    enum:
-+      - qcom,ipq5018-btss-pil
-+
-+  firmware-name:
-+    maxItems: 1
-+    description: Firmware name for the M0 Bluetooth Subsystem core
-+
-+  clocks:
-+    items:
-+      - description: M0 BTSS low power oscillator clock
-+
-+  clock-names:
-+    items:
-+      - const: btss_lpo_clk
-+
-+  memory-region:
-+    items:
-+      - description: M0 BTSS reserved memory carveout
-+
-+  resets:
-+    items:
-+      - description: M0 BTSS reset
-+
-+  reset-names:
-+    items:
-+      - const: btss_reset
-+
-+required:
-+  - compatible
-+  - firmware-name
-+  - clocks
-+  - clock-names
-+  - resets
-+  - reset-names
-+  - memory-region
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,gcc-ipq5018.h>
-+    #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
-+
-+    remoteproc {
-+      compatible = "qcom,ipq5018-btss-pil";
-+
-+      firmware-name = "qca/bt_fw_patch.mbn";
-+
-+      clocks = <&gcc GCC_BTSS_LPO_CLK>;
-+      clock-names = "btss_lpo_clk";
-+      resets = <&gcc GCC_BTSS_BCR>;
-+      reset-names = "btss_reset";
-+
-+      memory-region = <&btss_region>;
-+    };
+ enum qca_baudrate {
+ 	QCA_BAUDRATE_115200	= 0,
+ 	QCA_BAUDRATE_57600,
+@@ -158,6 +160,7 @@ enum qca_btsoc_type {
+ 	QCA_WCN6750,
+ 	QCA_WCN6855,
+ 	QCA_WCN7850,
++	QCA_IPQ5018,
+ };
+ 
+ #if IS_ENABLED(CONFIG_BT_QCA)
 
 -- 
 2.53.0
