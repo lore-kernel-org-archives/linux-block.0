@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738173CEB9B;
-	Thu, 25 Jun 2026 10:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B233803D1;
+	Thu, 25 Jun 2026 10:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782382556; cv=none; b=XxMRnOHIZlI20GIrLTvM7lizAcpoFOFq7bKFMvdNeecE/9dc8txiOPsY/Z8DEw0mQgtRn86028n79a81pMA9JsExvh+fjJRz32QhrZ7Qit9RaWKOXmYLTPEDbmMq16MARk+SRKiidMhPPYj8DBsVTDTCCYqGhNf3CdxyfWQ3nxI=
+	t=1782382566; cv=none; b=MEbIx2O5a5f6PsVy0XtetPqoumCYXGxUByvw6P5DB48bhjtx5IN2vWQK3Mt4wvCpNyGWaEOwX3ZAmTQ/XABWTxmuufVoSWVWDk6H5zHC9qhcEKgS/LD44ah/5x/1ZaD/FMdv5c+rp2ZQGWbGQGHNNd7Nhb11n3PnSYRgv/zBboU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782382556; c=relaxed/simple;
-	bh=07UwugMGGF13AofqLnujkYeATx0wKHVCxy61iC0wZIs=;
+	s=arc-20240116; t=1782382566; c=relaxed/simple;
+	bh=3uINpTzkUhozxHIus2GyzGQBK4ZG0dvDGDWbpAs8t8g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e1DAEOQo3PD0nHIboRbKfKyOe3ysSbXYcpFGEgbJel3T4DqKat8Llv0BNlo+oXha9m0OpmwgVtfAoUPKLUqeND6heEaiEwBsc43NCqogO8J/Nz/pH/AcmHdeCm7Cbfq/dBXOzvO0a6jVcAgPHRCcCvI0ZZMt8RzfyT3ihssVdUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZ9E4325; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=YJX71Kt2/BFTlrLZcVLmsIa8oa7RjzQlc8tuXawyVFuYYu7p/nPustBgzFfYOlhwy5tQ630uMaEDGAbKD4gFj/4doc8kJFwV9spzYjyiYmF7wXVVgZb7j9K+J8EMNb6IwPiTcbA8VszJU5F/lze1VVKdRj3Xb2Ba8llY/dukuIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g41zFLTB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZ9E4325"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093711F000E9;
-	Thu, 25 Jun 2026 10:15:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g41zFLTB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE4911F00A3A;
+	Thu, 25 Jun 2026 10:15:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782382554;
-	bh=ZToO+NQD3LW0EAmo0Z2TAVZkC45YHlFo8YdIzTw1Q2A=;
+	s=k20260515; t=1782382564;
+	bh=H5Xg/yTmsDmIapUPd9z3AV1OgB7aVzEYKvcyGnA0u9g=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=FZ9E4325NuPDynK8zLdwbNfS+lbrGpPD6GpiFQY9yM+ZvbhO1TFzNBkRBA5AHz7us
-	 gg/U00xWrsz1s/i8RCxBwnI9xmiiVdfZYF9JmoEpc5yGosCDjf/Y/BI6RKtv4NFK8+
-	 aJOJUZ37Hes4cAXKVRCiazykWCkSVhDptaO91vQBvl3gpQ9KPtfURJy+eLQhlPhtlu
-	 GjebExOR/ZHbbNPr3ZSySn3nPzQ2jy9/QyIiFKtYqo0o6CUiHfuFoMAzsLodoX+icv
-	 RbGPKHldyC093xSpf3gnl5pADqKYapZP/BICOcqdgKbbYp0EaqZyQ1t7QC/6z6Ifhi
-	 6c3/XEXORjwWA==
+	b=g41zFLTBGsqkkSpFeYLF3eOtvkWbqEWeeo8Kw7jTMoqeW8ZdTAEQ1ZpLpIIcUMLnb
+	 bEfzUqxbnMbfV9AKc9R0P4A0VKvwyPJL7sE7TCRgJ7eQsHZUUqevO2UBudO9e7VJef
+	 XekImAFCYhnlRcIf9LCneqEBuJQ0rNC8M/ONFbZOF7VgeAJqjINtoF9gvzZp3ZD/7+
+	 fcOXEho9Vhe3GOc6ZwJtnzwvEsxAVlIPW+iKX2oQmo6Vbve5SYi84qXq+VesJbtpds
+	 O7fmBnDatIYz1+R2ykBY1yhWtEQ8v5smthl5Xyz/Wj4QcCelQIhK0LfJ1VPfryEJkl
+	 MK/Uym1yAliaA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Thu, 25 Jun 2026 12:15:09 +0200
-Subject: [PATCH v18 7/8] rust: Add `OwnableRefCounted`
+Date: Thu, 25 Jun 2026 12:15:06 +0200
+Subject: [PATCH v18 4/8] rust: page: convert to `Ownable`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260625-unique-ref-v18-7-4e06b5896d47@kernel.org>
+Message-Id: <20260625-unique-ref-v18-4-4e06b5896d47@kernel.org>
 References: <20260625-unique-ref-v18-0-4e06b5896d47@kernel.org>
 In-Reply-To: <20260625-unique-ref-v18-0-4e06b5896d47@kernel.org>
 To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
@@ -74,262 +74,334 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>,
  linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
  linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
  linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
- Oliver Mangold <oliver.mangold@pm.me>
+ Asahi Lina <lina+kernel@asahilina.net>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9473; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=cWJqdUJZGXrcHaKbHpYDZftK3zE/sexxuAi+S26aqlw=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqPP/Du39o/7gxB53usiQFtTa8MFJbFxK5czvjr
- 83YAteFVpiJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCajz/wwAKCRD6UCkIqsW9
- 0Af9D/9w10G3io//DOmUeHH9FD6KsXpwAK/zpVsZ/QT6kNTFOGFn6S+fnXjMpb2m56aKPaCYGlE
- eVcKwRT9xacubbqlID9d1mFW6lIrwuR01kff3cVlzFNlF05UScRgidldx8PoLSdGMlVktTUgT1n
- oaTYDcojM+IWpqK0aUU8nGFhwKFCScnaBaNJSpYNSRxtb4A++eweLs15r0bBglVqsuaZR6GTbqY
- Oig66z+jCWVptLSXAjJVj+jVn/fz4kHX3I9UwnMkdzFrWh8YMAt6EGO/1wN4sVr8IvW1vcg+TCg
- GNeePvc+YEwh6SfmxhuTrIhDbxPwLFZ0xs+GDXvdzryDurPfB7dHh10Vb59WJeSTMy3/Uwm6sD7
- JjPYO3a2RYqzccURIrqcFZR/hZqGLFT1p9er66xsxT3ODZJakt0wP+hLIiSZQ4o1B69RbJ8yRG9
- 8RVMuGZ0/tGttIzpYXfPlojokwgWvCcwAJpdtYMlM3pWg6jzMS+2m0eJ7DjlGwGoFnnmKWHb3Xh
- IFWxGg+FN9pqhAlQ3NiR40jYCKL2QUKjtqREWqVlMuqsIBvvwTsCDOjBMkxBydMAGmmcs6m4YtT
- BUqvXMqrl0TQS0IzFpbuREHR/s0O2Gp+97s2oCAxGeS5YQKQ+o09DRnOOcmj8peXME0ZNv5hc5V
- cpyJprpdU6ZxEaw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11863;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=5bd0TxDzpYiKKCTrS6HXmXBDHPGtsZH/9D62Iw9UkrM=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqPP/BCWQM722m+yjafknz+l6FH4E7Ve8Sn88Yc
+ 5K1v+J4DEiJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCajz/wQAKCRD6UCkIqsW9
+ 0Af5D/96+ELr5E0sqyM62OFpGK0e93aiOTYRF2KxmnoWdwI+mu65DfAd0zvFpoa4Lgd9OQIKw6F
+ t3qWnQeaDosG2Bvy0UuWO814oZAchA3LXBjnxZ7fD/mauJvgNkNsajr838+6ZiH/3wv1q2ThUqv
+ MW4iFZYsLUL2Y4MzHtgdoeI0mVY/BalFIWNXpC9Cx1b/OPwsIyPGt1+GUOgB0+wA7IaxboCs12B
+ I8sW66sm6x94A7/JeijBk3c7u+g+r7byPsIm8Bb3F1Kdw1mzNNS+N5mUYagCwaANFwBKgTiG3JV
+ Hd6la1NRxPe3GUbOe2A8ON/Lp96Au/WPzIgS5omlx15Z3Pyxz5YUW5qPdjPNNqE0nznoVAAGi7s
+ 5Gj3GmOHjTLFH8jj2FtNuJZ2oTMJF9NtMBW9kXTR6pb8ZtAOB2EhlCoc9uwAf7xxi2I+COFZHkK
+ D7sb82JE4PpZXsgSrd5dWL+Y69InIlx6pQc0wX492810c1XpJc1rtMHagvpe7Aqd147fm1qYAaF
+ pAdkbD+Vdiqem6sZGjG8aTZ0IrVq7iQjOdSK+xe/+92Egy3gL3qLGxJ+SDTDiiUOS16RcAQrGJS
+ 5Trz9VryC6e2jIAGsziImd6sGtzsOTzVobvKAqyXMb8k2K6W6XwadfEh8bf/dpTJq2I8WIqxwtY
+ ZW/2VuSRkvrRR4A==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-From: Oliver Mangold <oliver.mangold@pm.me>
+From: Asahi Lina <lina@asahilina.net>
 
-Types implementing one of these traits can safely convert between an
-`ARef<T>` and an `Owned<T>`.
+This allows Page references to be returned as borrowed references,
+without necessarily owning the struct page.
 
-This is useful for types which generally are accessed through an `ARef`
-but have methods which can only safely be called when the reference is
-unique, like e.g. `block::mq::Request::end_ok()`.
+Remove `BorrowedPage` and update users to use `Owned<Page>`.
 
-Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
-[ Andreas: Fix formatting, update documentation, fix error handling in
-  examples. ]
-Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
+Signed-off-by: Asahi Lina <lina@asahilina.net>
+[ Andreas: Fix formatting and add a safety comment, update users. ]
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/owned.rs     | 140 +++++++++++++++++++++++++++++++++++++++++++++--
- rust/kernel/sync/aref.rs |  16 +++++-
- rust/kernel/types.rs     |   1 +
- 3 files changed, 151 insertions(+), 6 deletions(-)
+ drivers/android/binder/page_range.rs |  10 +--
+ rust/kernel/alloc/allocator.rs       |  19 +++---
+ rust/kernel/alloc/allocator/iter.rs  |   6 +-
+ rust/kernel/page.rs                  | 122 +++++++++--------------------------
+ 4 files changed, 46 insertions(+), 111 deletions(-)
 
-diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
-index e79936c00002c..bb4223c0f725a 100644
---- a/rust/kernel/owned.rs
-+++ b/rust/kernel/owned.rs
-@@ -14,20 +14,26 @@
-     pin::Pin,
-     ptr::NonNull, //
+diff --git a/drivers/android/binder/page_range.rs b/drivers/android/binder/page_range.rs
+index e54a90e62402a..7941eb85b4ef4 100644
+--- a/drivers/android/binder/page_range.rs
++++ b/drivers/android/binder/page_range.rs
+@@ -33,7 +33,7 @@
+     sync::{aref::ARef, Mutex, SpinLock},
+     task::Pid,
+     transmute::FromBytes,
+-    types::Opaque,
++    types::{Opaque, Owned},
+     uaccess::UserSliceReader,
  };
-+use kernel::{
-+    sync::aref::ARef,
-+    types::RefCounted, //
-+};
  
- use kernel::types::ForeignOwnable;
- 
- /// Types that specify their own way of performing allocation and destruction. Typically, this trait
- /// is implemented on types from the C side.
- ///
--/// Implementing this trait allows types to be referenced via the [`Owned<Self>`] pointer type. This
--/// is useful when it is desirable to tie the lifetime of the reference to an owned object, rather
--/// than pass around a bare reference. [`Ownable`] types can define custom drop logic that is
--/// executed when the owned reference [`Owned<Self>`] pointing to the object is dropped.
-+/// Implementing this trait allows types to be referenced via the [`Owned<Self>`] pointer type.
-+///  - This is useful when it is desirable to tie the lifetime of an object reference to an owned
-+///    object, rather than pass around a bare reference.
-+///  - [`Ownable`] types can define custom drop logic that is executed when the owned reference
-+///    of type [`Owned<_>`] pointing to the object is dropped.
- ///
- /// Note: The underlying object is not required to provide internal reference counting, because it
- /// represents a unique, owned reference. If reference counting (on the Rust side) is required,
--/// [`RefCounted`](crate::types::RefCounted) should be implemented.
-+/// [`RefCounted`] should be implemented. [`OwnableRefCounted`] should be implemented if conversion
-+/// between unique and shared (reference counted) ownership is needed.
- ///
- /// # Examples
- ///
-@@ -239,3 +245,127 @@ unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a>
-         unsafe { Pin::new_unchecked(inner) }
-     }
+@@ -198,7 +198,7 @@ unsafe impl Send for Inner {}
+ #[repr(C)]
+ struct PageInfo {
+     lru: bindings::list_head,
+-    page: Option<Page>,
++    page: Option<Owned<Page>>,
+     range: *const ShrinkablePageRange,
  }
-+
-+/// A trait for objects that can be wrapped in either one of the reference types [`Owned`] and
-+/// [`ARef`].
-+///
-+/// # Examples
-+///
-+/// A minimal example implementation of [`OwnableRefCounted`], [`Ownable`] and its usage with
-+/// [`ARef`] and [`Owned`] looks like this:
-+///
-+/// ```
-+/// # #![expect(clippy::disallowed_names)]
-+/// # use core::cell::Cell;
-+/// # use core::ptr::NonNull;
-+/// # use kernel::alloc::{flags, kbox::KBox, AllocError};
-+/// # use kernel::sync::aref::{ARef, RefCounted};
-+/// # use kernel::types::{Owned, Ownable, OwnableRefCounted};
-+///
-+/// // An internally refcounted struct for demonstration purposes.
-+/// //
-+/// // # Invariants
-+/// //
-+/// // - `refcount` is always non-zero for a valid object.
-+/// // - `refcount` is >1 if there is more than one Rust reference to it.
-+/// //
-+/// struct Foo {
-+///     refcount: Cell<usize>,
-+/// }
-+///
-+/// impl Foo {
-+///     fn new() -> Result<Owned<Self>> {
-+///         // We are just using a `KBox` here to handle the actual allocation, as our `Foo` is
-+///         // not actually a C-allocated object.
-+///         // INVARIANT: We initialize `refcount` to 1, satisfying the invariants.
-+///         let result = KBox::new(
-+///             Foo {
-+///                 refcount: Cell::new(1),
-+///             },
-+///             flags::GFP_KERNEL,
-+///         )?;
-+///         let result = KBox::into_non_null(result);
-+///         // SAFETY:
-+///         //  - We just allocated the `Self`, thus it is valid and we own it.
-+///         //  - We can transfer this ownership to the `from_raw` method.
-+///         Ok(unsafe { Owned::from_raw(result) })
-+///     }
-+/// }
-+///
-+/// // SAFETY: We increment and decrement each time the respective function is called and only free
-+/// // the `Foo` when the refcount reaches zero.
-+/// unsafe impl RefCounted for Foo {
-+///     fn inc_ref(&self) {
-+///         self.refcount.replace(self.refcount.get() + 1);
-+///     }
-+///
-+///     unsafe fn dec_ref(this: NonNull<Self>) {
-+///         // SAFETY: By requirement on calling this function, the refcount is non-zero,
-+///         // implying the underlying object is valid.
-+///         let refcount = unsafe { &this.as_ref().refcount };
-+///         let new_refcount = refcount.get() - 1;
-+///         if new_refcount == 0 {
-+///             // The `Foo` will be dropped when `KBox` goes out of scope.
-+///             // SAFETY: The [`KBox<Foo>`] is still alive as the old refcount is 1. We can pass
-+///             // ownership to the [`KBox`] as by requirement on calling this function,
-+///             // the `Self` will no longer be used by the caller.
-+///             unsafe { KBox::from_raw(this.as_ptr()) };
-+///         } else {
-+///             refcount.replace(new_refcount);
-+///         }
-+///     }
-+/// }
-+///
-+/// impl OwnableRefCounted for Foo {
-+///     fn try_from_shared(this: ARef<Self>) -> Result<Owned<Self>, ARef<Self>> {
-+///         if this.refcount.get() == 1 {
-+///             // SAFETY: The `Foo` is still alive and has no other Rust references as the refcount
-+///             // is 1.
-+///             Ok(unsafe { Owned::from_raw(ARef::into_raw(this)) })
-+///         } else {
-+///             Err(this)
-+///         }
-+///     }
-+/// }
-+///
-+/// impl Ownable for Foo {
-+///     unsafe fn release(this: NonNull<Self>) {
-+///         // SAFETY: Using `dec_ref()` from [`RefCounted`] to release is okay, as the refcount is
-+///         // always 1 for an [`Owned<Foo>`].
-+///         unsafe { Foo::dec_ref(this) };
-+///     }
-+/// }
-+///
-+/// let foo = Foo::new()?;
-+/// let foo = ARef::from(foo);
-+/// {
-+///     let bar = foo.clone();
-+///     assert!(Owned::try_from(bar).is_err());
-+/// }
-+/// assert!(Owned::try_from(foo).is_ok());
-+/// # Ok::<(), Error>(())
-+/// ```
-+pub trait OwnableRefCounted: RefCounted + Ownable + Sized {
-+    /// Checks if the [`ARef`] is unique and converts it to an [`Owned`] if that is the case.
-+    /// Otherwise it returns again an [`ARef`] to the same underlying object.
-+    fn try_from_shared(this: ARef<Self>) -> Result<Owned<Self>, ARef<Self>>;
-+
-+    /// Converts the [`Owned`] into an [`ARef`].
-+    #[inline]
-+    fn into_shared(this: Owned<Self>) -> ARef<Self> {
-+        // SAFETY: `Owned::into_raw` returns a pointer to a valid `Self`, and the `Owned` owned the
-+        // reference count that we now transfer to the new `ARef`.
-+        unsafe { ARef::from_raw(Owned::into_raw(this)) }
-+    }
-+}
-+
-+impl<T: OwnableRefCounted> TryFrom<ARef<T>> for Owned<T> {
-+    type Error = ARef<T>;
-+    /// Tries to convert the [`ARef`] to an [`Owned`] by calling
-+    /// [`try_from_shared()`](OwnableRefCounted::try_from_shared). In case the [`ARef`] is not
-+    /// unique, it returns again an [`ARef`] to the same underlying object.
-+    #[inline]
-+    fn try_from(b: ARef<T>) -> Result<Owned<T>, Self::Error> {
-+        T::try_from_shared(b)
-+    }
-+}
-diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
-index d0865aeb9371b..77eb390139079 100644
---- a/rust/kernel/sync/aref.rs
-+++ b/rust/kernel/sync/aref.rs
-@@ -23,6 +23,10 @@
-     ops::Deref,
-     ptr::NonNull, //
- };
-+use kernel::types::{
-+    OwnableRefCounted,
-+    Owned, //
-+};
  
- /// Types that are internally reference counted.
- ///
-@@ -35,7 +39,10 @@
- /// Note: Implementing this trait allows types to be wrapped in an [`ARef<Self>`]. It requires an
- /// internal reference count and provides only shared references. If unique references are required
- /// [`Ownable`](crate::types::Ownable) should be implemented which allows types to be wrapped in an
--/// [`Owned<Self>`](crate::types::Owned).
-+/// [`Owned<Self>`](crate::types::Owned). Implementing the trait
-+/// [`OwnableRefCounted`] allows to convert between unique and
-+/// shared references (i.e. [`Owned<Self>`](crate::types::Owned) and
-+/// [`ARef<Self>`](crate::types::Owned)).
- ///
- /// # Safety
- ///
-@@ -188,6 +195,13 @@ fn from(b: &T) -> Self {
+@@ -206,7 +206,7 @@ impl PageInfo {
+     /// # Safety
+     ///
+     /// The caller ensures that writing to `me.page` is ok, and that the page is not currently set.
+-    unsafe fn set_page(me: *mut PageInfo, page: Page) {
++    unsafe fn set_page(me: *mut PageInfo, page: Owned<Page>) {
+         // SAFETY: This pointer offset is in bounds.
+         let ptr = unsafe { &raw mut (*me).page };
+ 
+@@ -229,13 +229,13 @@ unsafe fn get_page<'a>(me: *const PageInfo) -> Option<&'a Page> {
+         let ptr = unsafe { &raw const (*me).page };
+ 
+         // SAFETY: The pointer is valid for reading.
+-        unsafe { (*ptr).as_ref() }
++        unsafe { (*ptr).as_deref() }
+     }
+ 
+     /// # Safety
+     ///
+     /// The caller ensures that writing to `me.page` is ok for the duration of 'a.
+-    unsafe fn take_page(me: *mut PageInfo) -> Option<Page> {
++    unsafe fn take_page(me: *mut PageInfo) -> Option<Owned<Page>> {
+         // SAFETY: This pointer offset is in bounds.
+         let ptr = unsafe { &raw mut (*me).page };
+ 
+diff --git a/rust/kernel/alloc/allocator.rs b/rust/kernel/alloc/allocator.rs
+index cd4203f27aed0..c7b9b069cf75d 100644
+--- a/rust/kernel/alloc/allocator.rs
++++ b/rust/kernel/alloc/allocator.rs
+@@ -169,7 +169,7 @@ unsafe fn realloc(
+ }
+ 
+ impl Vmalloc {
+-    /// Convert a pointer to a [`Vmalloc`] allocation to a [`page::BorrowedPage`].
++    /// Convert a pointer to a [`Vmalloc`] allocation to a [`Page`](page::Page) reference.
+     ///
+     /// # Examples
+     ///
+@@ -202,20 +202,17 @@ impl Vmalloc {
+     ///
+     /// - `ptr` must be a valid pointer to a [`Vmalloc`] allocation.
+     /// - `ptr` must remain valid for the entire duration of `'a`.
+-    pub unsafe fn to_page<'a>(ptr: NonNull<u8>) -> page::BorrowedPage<'a> {
++    pub unsafe fn to_page<'a>(ptr: NonNull<u8>) -> &'a page::Page {
+         // SAFETY: `ptr` is a valid pointer to `Vmalloc` memory.
+         let page = unsafe { bindings::vmalloc_to_page(ptr.as_ptr().cast()) };
+ 
+-        // SAFETY: `vmalloc_to_page` returns a valid pointer to a `struct page` for a valid pointer
+-        // to `Vmalloc` memory.
+-        let page = unsafe { NonNull::new_unchecked(page) };
+-
+         // SAFETY:
+-        // - `page` is a valid pointer to a `struct page`, given that by the safety requirements of
+-        //   this function `ptr` is a valid pointer to a `Vmalloc` allocation.
+-        // - By the safety requirements of this function `ptr` is valid for the entire lifetime of
+-        //   `'a`.
+-        unsafe { page::BorrowedPage::from_raw(page) }
++        // - `vmalloc_to_page` returns a valid, non-null pointer to a `struct page` for a valid
++        //   pointer to `Vmalloc` memory, given that by the safety requirements of this function
++        //   `ptr` is a valid pointer to a `Vmalloc` allocation.
++        // - By the safety requirements of this function `ptr`, and hence the `struct page`, is
++        //   valid for the entire lifetime of `'a`.
++        unsafe { &*page.cast() }
      }
  }
  
-+impl<T: OwnableRefCounted> From<Owned<T>> for ARef<T> {
-+    #[inline]
-+    fn from(b: Owned<T>) -> Self {
-+        T::into_shared(b)
-+    }
-+}
-+
- impl<T: RefCounted> Drop for ARef<T> {
-     fn drop(&mut self) {
-         // SAFETY: The type invariants guarantee that the `ARef` owns the reference we're about to
-diff --git a/rust/kernel/types.rs b/rust/kernel/types.rs
-index 5ef763717e59a..6aa760952cb63 100644
---- a/rust/kernel/types.rs
-+++ b/rust/kernel/types.rs
-@@ -18,6 +18,7 @@
- pub use crate::{
-     owned::{
-         Ownable,
-+        OwnableRefCounted,
-         Owned, //
+diff --git a/rust/kernel/alloc/allocator/iter.rs b/rust/kernel/alloc/allocator/iter.rs
+index 02fda3ea5cae6..8dcc16ed89893 100644
+--- a/rust/kernel/alloc/allocator/iter.rs
++++ b/rust/kernel/alloc/allocator/iter.rs
+@@ -9,7 +9,7 @@
+     ptr::NonNull, //
+ };
+ 
+-/// An [`Iterator`] of [`page::BorrowedPage`] items owned by a [`Vmalloc`] allocation.
++/// An [`Iterator`] of [`Page`](page::Page) references owned by a [`Vmalloc`] allocation.
+ ///
+ /// # Guarantees
+ ///
+@@ -28,11 +28,11 @@ pub struct VmallocPageIter<'a> {
+     size: usize,
+     /// The current page index of the [`Iterator`].
+     index: usize,
+-    _p: PhantomData<page::BorrowedPage<'a>>,
++    _p: PhantomData<&'a page::Page>,
+ }
+ 
+ impl<'a> Iterator for VmallocPageIter<'a> {
+-    type Item = page::BorrowedPage<'a>;
++    type Item = &'a page::Page;
+ 
+     fn next(&mut self) -> Option<Self::Item> {
+         let offset = self.index.checked_mul(page::PAGE_SIZE)?;
+diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
+index 8affd8262891b..6dc1c2395acaf 100644
+--- a/rust/kernel/page.rs
++++ b/rust/kernel/page.rs
+@@ -12,16 +12,16 @@
+         code::*,
+         Result, //
      },
-     sync::aref::{
++    types::{
++        Opaque,
++        Ownable,
++        Owned, //
++    },
+     uaccess::UserSliceReader, //
+ };
+-use core::{
+-    marker::PhantomData,
+-    mem::ManuallyDrop,
+-    ops::Deref,
+-    ptr::{
+-        self,
+-        NonNull, //
+-    }, //
++use core::ptr::{
++    self,
++    NonNull, //
+ };
+ 
+ /// A bitwise shift for the page size.
+@@ -65,93 +65,29 @@ pub const fn page_align(addr: usize) -> Option<usize> {
+     Some(sum & PAGE_MASK)
+ }
+ 
+-/// Representation of a non-owning reference to a [`Page`].
+-///
+-/// This type provides a borrowed version of a [`Page`] that is owned by some other entity, e.g. a
+-/// [`Vmalloc`] allocation such as [`VBox`].
+-///
+-/// # Example
+-///
+-/// ```
+-/// # use kernel::{bindings, prelude::*};
+-/// use kernel::page::{BorrowedPage, Page, PAGE_SIZE};
+-/// # use core::{mem::MaybeUninit, ptr, ptr::NonNull };
+-///
+-/// fn borrow_page<'a>(vbox: &'a mut VBox<MaybeUninit<[u8; PAGE_SIZE]>>) -> BorrowedPage<'a> {
+-///     let ptr = ptr::from_ref(&**vbox);
+-///
+-///     // SAFETY: `ptr` is a valid pointer to `Vmalloc` memory.
+-///     let page = unsafe { bindings::vmalloc_to_page(ptr.cast()) };
+-///
+-///     // SAFETY: `vmalloc_to_page` returns a valid pointer to a `struct page` for a valid
+-///     // pointer to `Vmalloc` memory.
+-///     let page = unsafe { NonNull::new_unchecked(page) };
+-///
+-///     // SAFETY:
+-///     // - `self.0` is a valid pointer to a `struct page`.
+-///     // - `self.0` is valid for the entire lifetime of `self`.
+-///     unsafe { BorrowedPage::from_raw(page) }
+-/// }
+-///
+-/// let mut vbox = VBox::<[u8; PAGE_SIZE]>::new_uninit(GFP_KERNEL)?;
+-/// let page = borrow_page(&mut vbox);
+-///
+-/// // SAFETY: There is no concurrent read or write to this page.
+-/// unsafe { page.fill_zero_raw(0, PAGE_SIZE)? };
+-/// # Ok::<(), Error>(())
+-/// ```
+-///
+-/// # Invariants
+-///
+-/// The borrowed underlying pointer to a `struct page` is valid for the entire lifetime `'a`.
+-///
+-/// [`VBox`]: kernel::alloc::VBox
+-/// [`Vmalloc`]: kernel::alloc::allocator::Vmalloc
+-pub struct BorrowedPage<'a>(ManuallyDrop<Page>, PhantomData<&'a Page>);
+-
+-impl<'a> BorrowedPage<'a> {
+-    /// Constructs a [`BorrowedPage`] from a raw pointer to a `struct page`.
+-    ///
+-    /// # Safety
+-    ///
+-    /// - `ptr` must point to a valid `bindings::page`.
+-    /// - `ptr` must remain valid for the entire lifetime `'a`.
+-    pub unsafe fn from_raw(ptr: NonNull<bindings::page>) -> Self {
+-        let page = Page { page: ptr };
+-
+-        // INVARIANT: The safety requirements guarantee that `ptr` is valid for the entire lifetime
+-        // `'a`.
+-        Self(ManuallyDrop::new(page), PhantomData)
+-    }
+-}
+-
+-impl<'a> Deref for BorrowedPage<'a> {
+-    type Target = Page;
+-
+-    fn deref(&self) -> &Self::Target {
+-        &self.0
+-    }
+-}
+-
+-/// Trait to be implemented by types which provide an [`Iterator`] implementation of
+-/// [`BorrowedPage`] items, such as [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
++/// Trait to be implemented by types which provide an [`Iterator`] of [`Page`] references, such as
++/// [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
+ pub trait AsPageIter {
+     /// The [`Iterator`] type, e.g. [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
+-    type Iter<'a>: Iterator<Item = BorrowedPage<'a>>
++    type Iter<'a>: Iterator<Item = &'a Page>
+     where
+         Self: 'a;
+ 
+-    /// Returns an [`Iterator`] of [`BorrowedPage`] items over all pages owned by `self`.
++    /// Returns an [`Iterator`] of [`Page`] references over all pages owned by `self`.
+     fn page_iter(&mut self) -> Self::Iter<'_>;
+ }
+ 
+-/// A pointer to a page that owns the page allocation.
++/// A `struct page`.
++///
++/// A `Page` is accessed through a shared reference or through an owning [`Owned<Page>`]; the latter
++/// frees the page allocation when it is dropped.
+ ///
+ /// # Invariants
+ ///
+-/// The pointer is valid, and has ownership over the page.
++/// The `Page` is backed by a valid `struct page`.
++#[repr(transparent)]
+ pub struct Page {
+-    page: NonNull<bindings::page>,
++    page: Opaque<bindings::page>,
+ }
+ 
+ // SAFETY: Pages have no logic that relies on them staying on a given thread, so moving them across
+@@ -185,19 +121,20 @@ impl Page {
+     /// # Ok::<(), kernel::alloc::AllocError>(())
+     /// ```
+     #[inline]
+-    pub fn alloc_page(flags: Flags) -> Result<Self, AllocError> {
++    pub fn alloc_page(flags: Flags) -> Result<Owned<Self>, AllocError> {
+         // SAFETY: Depending on the value of `gfp_flags`, this call may sleep. Other than that, it
+         // is always safe to call this method.
+         let page = unsafe { bindings::alloc_pages(flags.as_raw(), 0) };
+         let page = NonNull::new(page).ok_or(AllocError)?;
+-        // INVARIANT: We just successfully allocated a page, so we now have ownership of the newly
+-        // allocated page. We transfer that ownership to the new `Page` object.
+-        Ok(Self { page })
++        // SAFETY: We just successfully allocated a page, so we now have ownership of the newly
++        // allocated page. We transfer that ownership to the new `Owned<Page>` object.
++        // Since `Page` is transparent, we can cast the pointer directly.
++        Ok(unsafe { Owned::from_raw(page.cast()) })
+     }
+ 
+     /// Returns a raw pointer to the page.
+     pub fn as_ptr(&self) -> *mut bindings::page {
+-        self.page.as_ptr()
++        Opaque::cast_into(&self.page)
+     }
+ 
+     /// Get the node id containing this page.
+@@ -372,10 +309,11 @@ pub unsafe fn copy_from_user_slice_raw(
+     }
+ }
+ 
+-impl Drop for Page {
++impl Ownable for Page {
+     #[inline]
+-    fn drop(&mut self) {
+-        // SAFETY: By the type invariants, we have ownership of the page and can free it.
+-        unsafe { bindings::__free_pages(self.page.as_ptr(), 0) };
++    unsafe fn release(this: NonNull<Self>) {
++        // SAFETY: By the function safety requirements, we have ownership of the page and can free
++        // it. Since Page is transparent, we can cast the raw pointer directly.
++        unsafe { bindings::__free_pages(this.as_ptr().cast(), 0) };
+     }
+ }
 
 -- 
 2.51.2
