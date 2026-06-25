@@ -1,46 +1,31 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951A7384CFB
-	for <linux-block@vger.kernel.org>; Thu, 25 Jun 2026 08:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543CF31F9BA;
+	Thu, 25 Jun 2026 09:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782377539; cv=none; b=UO+JOPRebHsZF7dDsg5IdKbvgigzJ+2shbm0fjLzTw5T8b9yz413hLQTdaZbFK8SO22HkerQoTjOdjSDhXrUiBc37bcBs6EIhuJ/TXwHWIo0rj2bxsQ7cUU1zEVtfQ1MGQzLT4S3rj4S9hcIGxjSG3gXzxyOoZrpP84qy4XzdH8=
+	t=1782379276; cv=none; b=POS3v9jydhcFMVi2b5+mp21HerDYeZHHYEHNOehJBMEbMTZeRQDi6ZKFgluo0KP2SM0tEinx6WatHYPtxZRZ6kxHjjgQhnBiDpdFynFyuRlLLSTKzFQJS7dFfFr/sQYG1Juo77lYgpidnt97uCy774be6ycDDsDdZCsmOEEFrSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782377539; c=relaxed/simple;
-	bh=XZhMNNw5ajjnEOLVcQgZbri5CZTxDEd28PRR1w0X+ME=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LNFkDI5SR2dOg6c4m7Rk7Pq1s9PxACMhActhMrAxk1Uy8pH9TL0UteWqq7ORC+wIYsf4X6/0IkWOzY0hnFglIERdLuV+ZHEQlCY1sS/kBpqdf5ZNjl4wE2nwjIQ6Ge2TDO4sKEXUueSO/0HxrvRsIi8Zf0NXto2/LN7VFNZCNLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gmCG23RDjzYQtj9
-	for <linux-block@vger.kernel.org>; Thu, 25 Jun 2026 16:51:22 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 69D5F4058C
-	for <linux-block@vger.kernel.org>; Thu, 25 Jun 2026 16:52:06 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP2 (Coremail) with SMTP id Syh0CgA3rYIw7DxqlmUxDA--.39891S7;
-	Thu, 25 Jun 2026 16:52:06 +0800 (CST)
-From: Yang Erkun <yangerkun@huawei.com>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	yukuai@kernel.org
-Cc: yi.zhang@huawei.com,
-	chengzhihao1@huawei.com,
-	echo.chenlin@huawei.com,
-	leo.lilong@huaweicloud.com,
-	wangkefeng.wang@huawei.com,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org
-Subject: [PATCH v2 3/5] nbd: remove redundant num_connections boundary checks
-Date: Thu, 25 Jun 2026 16:44:56 +0800
-Message-ID: <20260625084458.4171890-4-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260625084458.4171890-1-yangerkun@huawei.com>
-References: <20260625084458.4171890-1-yangerkun@huawei.com>
+	s=arc-20240116; t=1782379276; c=relaxed/simple;
+	bh=NujA1wfsAVj9+8fMtwK0GLvBLjFpYWx6bls65f4X6Zk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UEjDFnH/AvHGEFhD6yhOusJqZwkWDvaKZjJ6BPBk1tl34MgNcQrNiZVc2BwPlm75vq5r8JVuT3cgX56zJpbSap2X4PNtOhgdJiXjfCMY3VkJORpzrU13nkcfRxH7vNc3MFpAoqwSFCixg3OMZIrB68hnG/4ZK98SjndPfqaLWpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [117.182.75.66])
+	by APP-03 (Coremail) with SMTP id rQCowADnvJME8zxqJgrNFQ--.7731S2;
+	Thu, 25 Jun 2026 17:21:09 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] block: Fix dio->ref leak on integrity error in __blkdev_direct_IO()
+Date: Thu, 25 Jun 2026 17:21:06 +0800
+Message-Id: <20260625092106.47695-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,81 +33,69 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgA3rYIw7DxqlmUxDA--.39891S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar1rArWkGw1furW7tFyrWFg_yoW8AF4UpF
-	45uay0krW8JF1fZF4FyaykWryYyanxGa97W3W8Ja1xAFy5Cry0kF98KFyIgFyUJrZ5Z39F
-	vFs8GF1fAF1UGrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx
-	0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWU
-	JVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxV
-	WUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2IqxVCFs4IE
-	7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-	8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWU
-	CwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
-	1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBI
-	daVFxhVjvjDU0xZFpf9x07UHwZ7UUUUU=
-Sender: yangerkun@huaweicloud.com
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+X-CM-TRANSID:rQCowADnvJME8zxqJgrNFQ--.7731S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ArWfWFWxKr4kGF1kWr13twb_yoW8AF4kpr
+	45Ka98AFZ5X3WxKF47Aa18ua4SyrZ5G3yDWFWjyw4Sk3s8Xr10vF40yr1YqF18CF93GrW3
+	Xrsavw18AFyUAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUehL0UU
+	UUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwsJA2o84ARTogAAsF
 
-From: Long Li <leo.lilong@huawei.com>
+When __blkdev_direct_IO() splits an I/O across multiple bios and
+bio_integrity_map_iter() fails on a non-first bio, the function jumps
+to the 'fail' label which frees the current bio without accounting for
+the dio->ref increments from previously submitted bios.
 
-Now that config->socks uses xarray instead of a plain array, explicit
-bounds checking against num_connections is no longer necessary.
-xa_load() returns NULL for any out-of-range or missing index, and
-xa_for_each() is a no-op on an empty xarray, making these guards
-redundant.
+The in-flight bios complete normally but their atomic_dec_and_test()
+in blkdev_bio_end_io() can never bring dio->ref to zero, leaving the
+dio structure (and the first bio it is embedded in) permanently leaked.
+For synchronous I/O, the waiter is never woken, causing a hang.
 
-Signed-off-by: Long Li <leo.lilong@huawei.com>
+Fix by matching the existing error handling pattern used for
+blkdev_iov_iter_get_pages() failure: end the current bio with an error
+status and break out of the submission loop. This ensures the normal
+completion path properly accounts for all dio->ref references, both
+from the current errored bio and from any in-flight bios.
+
+The NOWAIT error path is unaffected as its goto fail only triggers
+on the first iteration where no bios have been submitted yet.
+
+Cc: stable@vger.kernel.org
+Fixes: 3d8b5a22d404 ("block: add support to pass user meta buffer")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
- drivers/block/nbd.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ block/fops.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index d88bdc97f4d1..409a655c40f0 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1094,7 +1094,7 @@ static int find_fallback(struct nbd_device *nbd, int index)
- 		goto no_fallback;
- 
- 	fallback = nsock->fallback_index;
--	if (fallback >= 0 && fallback < config->num_connections) {
-+	if (fallback >= 0) {
- 		fallback_nsock = xa_load(&config->socks, fallback);
- 		if (fallback_nsock && !fallback_nsock->dead)
- 			return fallback;
-@@ -1149,12 +1149,6 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		return BLK_STS_IOERR;
- 	}
- 
--	if (index >= config->num_connections) {
--		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Attempted send on invalid socket\n");
--		nbd_config_put(nbd);
--		return BLK_STS_IOERR;
--	}
- 	cmd->status = BLK_STS_OK;
- again:
- 	nsock = xa_load(&config->socks, index);
-@@ -1512,11 +1506,9 @@ static void nbd_config_put(struct nbd_device *nbd)
+diff --git a/block/fops.c b/block/fops.c
+index bb6642b45937..9f16b995c60c 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -239,8 +239,11 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
  		}
- 		nbd_clear_sock(nbd);
- 
--		if (config->num_connections) {
--			xa_for_each(&config->socks, i, nsock) {
--				sockfd_put(nsock->sock);
--				kfree(nsock);
--			}
-+		xa_for_each(&config->socks, i, nsock) {
-+			sockfd_put(nsock->sock);
-+			kfree(nsock);
+ 		if (iocb->ki_flags & IOCB_HAS_METADATA) {
+ 			ret = bio_integrity_map_iter(bio, iocb->private);
+-			if (unlikely(ret))
+-				goto fail;
++			if (unlikely(ret)) {
++				bio->bi_status = errno_to_blk_status(ret);
++				bio_endio(bio);
++				break;
++			}
  		}
- 		xa_destroy(&config->socks);
  
+ 		if (is_read) {
 -- 
-2.52.0
+2.39.5 (Apple Git-154)
 
