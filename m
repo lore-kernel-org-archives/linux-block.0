@@ -1,29 +1,36 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C8B149C6F
-	for <linux-block@vger.kernel.org>; Fri, 26 Jun 2026 04:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DFF1714AA;
+	Fri, 26 Jun 2026 05:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782449814; cv=none; b=urA+5s+EgwzkqdKK4E15fvPO8rKHLoWbQwiWFhCD5L42CCMz1xLsDAhaBIXKuOUjQ83LDNb8rfvavTG+KnvAjx8tWKq7XuhMOSrYfUhSWDiEUr/HGdmVILqGZjyLTTL6pwmUkEnMa3laJrCjW5RZM5NFgdnuZIQVbJ57LTIxsY0=
+	t=1782451035; cv=none; b=e1o4vZm/XGltbcGkTco0HG+HT18GnCjrRM42rpWXJ6/7XUSJKgV1MRVceTtkZyr7X5QyblXG3DtRGvpqUGFkpWMoL0UAhPlXowSM4N0SMIPTtPiXZqXr5boGoIOl4a2s/hIfugK+OqRxviD+Xb3XxH0pD2AeC3KTzmfU6sZysb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782449814; c=relaxed/simple;
-	bh=9RR3ntnfEKY7km1IK+/Tv0gM6YK1R+Pz2fh2vZmyUbA=;
+	s=arc-20240116; t=1782451035; c=relaxed/simple;
+	bh=jLmt3+eE4jJPzSJIb5TXjXC8/57s9fXSmW2h/HafM8s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hRZGvPII0y40JQ4CVrk0mVTcMEI0ACKeVKB+Z0mUPri6mcpd4JC29/3Q6CgqUSQfM5Kbi5q9B6L0wVlCjo873hDWUa2AnJ7VbrHeJSPc6FjQveS8q3fM3kq03WuJiLzilum2gB6GmGyFujZnbOmQtN1+10c9yZvzdyubv9o+Jyc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZXvTlMVo87L9gU68ykcsAnt+4f7y0F4b0icml3LHu0f+kNSelwQy05MWbRHYRPbh51GQb6g/vfFx5O2kXTaUuCQGKq9IGd3xMTo5moOhb72urb0IdIrTLUyc7Vs8ynk7Y8+w53nMe5krr1kRQP046WDNp5q3sDw/66yVdL/ixng=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id E64F368B05; Fri, 26 Jun 2026 06:56:50 +0200 (CEST)
-Date: Fri, 26 Jun 2026 06:56:50 +0200
+	id 6C60368C4E; Fri, 26 Jun 2026 07:17:08 +0200 (CEST)
+Date: Fri, 26 Jun 2026 07:17:07 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] block/044: basic block error injection sanity
- test
-Message-ID: <20260626045650.GA8752@lst.de>
-References: <20260622160808.1552568-1-hch@lst.de> <ajzJiWqsQc2EgR3I@shinmob> <20260625115422.GA18348@lst.de> <aj3_nKfmUFj67jX6@shinmob>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-block@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Zhang Yi <yi.zhang@huawei.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>
+Subject: Re: [PATCH 01/16] blk-crypto: Simplify check for fallback support
+Message-ID: <20260626051707.GA9043@lst.de>
+References: <20260624050334.124606-1-ebiggers@kernel.org> <20260624050334.124606-2-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,30 +39,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aj3_nKfmUFj67jX6@shinmob>
+In-Reply-To: <20260624050334.124606-2-ebiggers@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jun 26, 2026 at 01:31:06PM +0900, Shin'ichiro Kawasaki wrote:
-> > > Nit: Majority of the blktests test cases have GPL-3.0+. If you do not mind,
-> > > I suggest GPL-3.0+.
-> > 
-> > Well a mix of licenses is obviously bad, although I hate the GPL 3 with
-> > passion.
-> 
-> I see, I respoect author's choice.
+On Tue, Jun 23, 2026 at 10:03:19PM -0700, Eric Biggers wrote:
+> Since blk-crypto-fallback supports all blk_crypto_keys except wrapped
+> keys, just check for that condition directly instead of using
+> __blk_crypto_cfg_supported().  With this done,
+> __blk_crypto_cfg_supported() is now used only for the hardware support.
 
-Well, if the common bits are GPLv3+ we can't actually legally combine
-them with test that have a pure GPLv2 license.  So I need at least
-GPL-2.0+.
+Looks good:
 
-And we need to as a few authors to also fix this up for:
-
-block/029
-block/030
-block/031
-block/040
-block/042
-block/043
-block/044
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
