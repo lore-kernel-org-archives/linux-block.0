@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286B23F5BE3;
-	Fri, 26 Jun 2026 11:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA1D3F4DC2;
+	Fri, 26 Jun 2026 11:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782474977; cv=none; b=WmMNUdYmjBqn1M+Fepvlm1y3/HdreAqP4lilIUdv1tFwSdNXMyzGgSVtYGd4BPhWUaOXcm8edobGj/cxVIgCIhfErbeR2ytxJBFCPVDTZu2rv+WkMn4u7oxEw1skUhqcAyRPtlDsj4vHG6dhbjZl81Csrg1snNwViBqtrO/AW+8=
+	t=1782474987; cv=none; b=a5vfyZT0se/LlXjagT6jqDE7g0OqYw6aej7LbeoDHTaxY04xSJL9rKjrpfh0mkTQA2FKqy9c8HeaZMfANaX+UXsQd2Yv/OD3NAg7zfU0ZnPnH5nAt9/WvZhQqzBUckWJ//xxZhutHogziR1YthTuxrxyrGVCNbtkOOpGPv2y2qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782474977; c=relaxed/simple;
-	bh=eOVBkmdaix9R57OIZcNGlkDki841Kd/mNbMrRno0GwM=;
+	s=arc-20240116; t=1782474987; c=relaxed/simple;
+	bh=L57zDm7ALp0lZWMW+Cln/Gg2DuJozYQVYKA2SZ2s83c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OBL350N+xnNuFOSytKiglQmO7y8fJ49T42MciHHvkivaNvYhRWKzcM/JeQN0nM21lLOvjHAVX7YFooc07hS1do4rCb/CFGVe6JdBoPdu0DQhF51/BU4Fn1cTSkTCmJ9OHrLyVS6zVOhTCCh7nYKn86NDKd2dfOXQoV5eHlZdq5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2HjqLdX; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=rb2rK14iGiEfHVb6aQHhaUfB+5f0kxtYwWLZVFIVIt4Heauqqw9let9rB0pITjPcL1CFTxQTA/l+EGE1Av8+MVTcnOybrAxvzaenx9SFB7LR4S3MEx9lT0uFaDqEacS2VuP6bsY6CVmc5Scfb9JNF2Wl0SXdAjCbnyYoW0tqGvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HkuZ7XBk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2HjqLdX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18FAA1F00A3D;
-	Fri, 26 Jun 2026 11:56:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HkuZ7XBk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32BDD1F000E9;
+	Fri, 26 Jun 2026 11:56:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782474973;
-	bh=Bin9OshcS/0Q4LoasQxw3FlG5Jjc6G5Z3KsYRu0B2FU=;
+	s=k20260515; t=1782474984;
+	bh=9MHwt/piGbHaBX1U0Ciw0A9tLdy3GnbZtG5V2/pNbH0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=e2HjqLdX8rb3hYbzK48OJyIhzraVLRWfX+FWMqFMCzo9gXVCLAJmVGfYTaQyp02MM
-	 1beqryTAdyWlhi7c8QFSEtZ1CILF3aUHQzOWRlwXByODwaL9Bnq8chl9R+3hbRNzuk
-	 LtyKqJECTTnFiJNX/Zg06ZgWVSxdipj7gHPH7WB5O+BYypWSe5Y8ix9aG8b/tJVXXk
-	 CIPSlsoIN7RExURrPhXYmZq4TmtaiDl7xRxZeHvMIwAzMJcrjpIEgFd9fAJjE5dwC8
-	 kF+Vj3jW3YfynSAzI4cWJenkzrsCZkwf1UYJr7zTsBxi9RwwBDY72q1eQbEDZckG3G
-	 MW/uszgOTFUjQ==
+	b=HkuZ7XBkNBbPpmNh0jHv41Wuw70A+GdUFYjWET1qmXcQIKjTVrIaymEhyhQxZiJDQ
+	 OYQaC+YTngeDtEXGcTZg2nrhdNP6R8cyrSArn0Vcg4mmq7Hto8gxALTcWSWfRU8kgb
+	 i1NX1hBZ94yWCUrkJOY2045ItoVFnZTRZkQr1dHUJS9nY+rKTbTq6HIwWBAr/01JNd
+	 oDiP18WI45XFmDdzBNkxdUAOofCB8I9OwzTdx5AOBXno0NZp0mktQRseoVeUXD9ds/
+	 Ea6yM6KoBk2H/UJkJmv+1gH1PriKePYHNbY2wWHbjbguzGKMCCtNXrSSLLiaCwHwV6
+	 ioGjyljtNEVjg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 26 Jun 2026 13:54:01 +0200
-Subject: [PATCH v19 4/8] rust: page: convert to `Ownable`
+Date: Fri, 26 Jun 2026 13:53:58 +0200
+Subject: [PATCH v19 1/8] rust: alloc: add `KBox::into_non_null`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260626-unique-ref-v19-4-2607ca88dfdf@kernel.org>
+Message-Id: <20260626-unique-ref-v19-1-2607ca88dfdf@kernel.org>
 References: <20260626-unique-ref-v19-0-2607ca88dfdf@kernel.org>
 In-Reply-To: <20260626-unique-ref-v19-0-2607ca88dfdf@kernel.org>
 To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
@@ -73,336 +73,56 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>,
  driver-core@lists.linux.dev, linux-block@vger.kernel.org, 
  linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
  linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
- linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
- Asahi Lina <lina+kernel@asahilina.net>
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11905;
- i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=0tBaWt6qkrDUI2N6nu7SQxnFyUvs8y7lmCxwWfJLPDo=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqPmh3GBh8sy4cjSOhi49SZKrsH/nNhyGHYuGzL
- 9PAeUuQrI2JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaj5odwAKCRD6UCkIqsW9
- 0CbOEACZXh9pBrAlP+99ZXl1KTzM4RDTQOAoAVSi+Bw95O0rsT2J+fuosnuDQ5YrJmItVU/Dz7y
- U61x8Ywaf4j9fvhXN1r1EX4pFWKlnP+DicNMYaH8HEAdBujyiy0meUMBbTy80I6mIvrMIhyUxPO
- vkTlHDUvVFeJTlcDOrj5ckCFf91f7aZxsx+xywEowRddbIQnntWXuCNtoRBV1maJYnKkWzLxWdi
- uAN8dUez524S3zZTvT5f/NlHuASDkrt0LV1I1hsR+SCD+4NaLspTp8x5FXtWhjVYjeopV9ISkt5
- bWOez7NXzMKyrQv0lA2UV+vU0mC46FtIRBSXxNBzEqLjOiWZX3GaRSMG3KKWcPN/Ta42/KJU6UX
- DVF/MQNXw/GoRZvKcYl9RZBwJFPx6U2pprPKk1RuSAVTIDaLCLB8pThJJTnR9p4hgI/1NTQ4TSq
- 6/27mPZYD5tstAabYui/go4RXDZs31P0Rmxc2Cmr6H9BXrmTqalswXn5PdKl/+ih5bphPV4igdy
- AoKYXvqrp9aniFd47MZ6EaLEmo2TrATijJ/L1TSRrdr19HZi38Wb0YUOZi0i4zQ3NIZgbErWhCX
- gXfRj0Ks1/xoBreZHj5BauqvyoO83FCCQqthnuOvAI/CgtRMVAqQKHfwKl7pmha31aqzyp95k6Z
- UW7bIu8+7cUEDWg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1170; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=L57zDm7ALp0lZWMW+Cln/Gg2DuJozYQVYKA2SZ2s83c=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqPmh0T9NXm2ekfnSlVS5q2a5Nkx3elel1Z+sUE
+ lVzxvaywm6JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaj5odAAKCRD6UCkIqsW9
+ 0GQwD/kBPhAfqhuRT/wPQuyxM0apWmNdKJ15rz0l+MH0DxUqynfkKds77p9Ba1hBaXZEiIgHmCH
+ pDIBbcmrQR3ZzjLNEC27ic8X6+BdCVjQKsQBQWJ7NKui+imMc++MYWVIYyM0r0enlZe2kmN8hO5
+ neGpUe0IvwQ3Lj6UWc6ACsUoOIJ/VSSl4SFZNnkH2SbWvbImu4RPT5mmyv3heMJ9g65NMAedvle
+ tw99mHlW+RMWghmbVY1G0CFXcrMFX/ICi7lpll6iz01cgmdWZ00Zk2kIk1MDSePNSLkiHcviPYo
+ eujIyeR9+opejbUdjMsWAJIqUz1K+CusSsy+pMB9t+0TM36BK03TehWUHzki1rXsWQby8KUOQx5
+ JtTsLGUeCdq8jj5LJh7ikHfha1V5+4WAgb1NU6rWbu0HAaCDeoUfacnX5DMEVlA2YDZYl6lGSYy
+ LTe2rZntwugKRllSVNPfbq+vpbu4eh/00OZ+rZuo6jg4qjxcaF8bpEujK1QOVaT6mqH0SIO6fL7
+ dafroHQszbX998/omhRnZ/sCkPDELv4EwBaAlkTH7N3G0DsXiUEUx3nko9wa630BA3dS1kWBvKn
+ cRx4J3Tc31/zybazPxJ7yei5pHjMTfOHDnSsGrWwiXODWfvRUZiqgEWUO3S3KJWIZpG2VabKArA
+ vHegIagDX5flLQQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-From: Asahi Lina <lina@asahilina.net>
+Add a method to consume a `Box<T, A>` and return a `NonNull<T>`. This
+is a convenience wrapper around `Self::into_raw` for callers that need
+a `NonNull` pointer rather than a raw pointer.
 
-This allows Page references to be returned as borrowed references,
-without necessarily owning the struct page.
-
-Remove `BorrowedPage` and update users to use `Owned<Page>`.
-
-Signed-off-by: Asahi Lina <lina@asahilina.net>
-[ Andreas: Fix formatting and add a safety comment, update users. ]
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Gary Guo <gary@garyguo.net>
 ---
- drivers/android/binder/page_range.rs |  10 +--
- rust/kernel/alloc/allocator.rs       |  19 +++---
- rust/kernel/alloc/allocator/iter.rs  |   6 +-
- rust/kernel/page.rs                  | 122 +++++++++--------------------------
- 4 files changed, 46 insertions(+), 111 deletions(-)
+ rust/kernel/alloc/kbox.rs | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/android/binder/page_range.rs b/drivers/android/binder/page_range.rs
-index e54a90e62402a..7941eb85b4ef4 100644
---- a/drivers/android/binder/page_range.rs
-+++ b/drivers/android/binder/page_range.rs
-@@ -33,7 +33,7 @@
-     sync::{aref::ARef, Mutex, SpinLock},
-     task::Pid,
-     transmute::FromBytes,
--    types::Opaque,
-+    types::{Opaque, Owned},
-     uaccess::UserSliceReader,
- };
- 
-@@ -198,7 +198,7 @@ unsafe impl Send for Inner {}
- #[repr(C)]
- struct PageInfo {
-     lru: bindings::list_head,
--    page: Option<Page>,
-+    page: Option<Owned<Page>>,
-     range: *const ShrinkablePageRange,
- }
- 
-@@ -206,7 +206,7 @@ impl PageInfo {
-     /// # Safety
-     ///
-     /// The caller ensures that writing to `me.page` is ok, and that the page is not currently set.
--    unsafe fn set_page(me: *mut PageInfo, page: Page) {
-+    unsafe fn set_page(me: *mut PageInfo, page: Owned<Page>) {
-         // SAFETY: This pointer offset is in bounds.
-         let ptr = unsafe { &raw mut (*me).page };
- 
-@@ -229,13 +229,13 @@ unsafe fn get_page<'a>(me: *const PageInfo) -> Option<&'a Page> {
-         let ptr = unsafe { &raw const (*me).page };
- 
-         // SAFETY: The pointer is valid for reading.
--        unsafe { (*ptr).as_ref() }
-+        unsafe { (*ptr).as_deref() }
+diff --git a/rust/kernel/alloc/kbox.rs b/rust/kernel/alloc/kbox.rs
+index 35d1e015848dd..d534e8adcf7b3 100644
+--- a/rust/kernel/alloc/kbox.rs
++++ b/rust/kernel/alloc/kbox.rs
+@@ -211,6 +211,15 @@ pub fn leak<'a>(b: Self) -> &'a mut T {
+         // which points to an initialized instance of `T`.
+         unsafe { &mut *Box::into_raw(b) }
      }
- 
-     /// # Safety
-     ///
-     /// The caller ensures that writing to `me.page` is ok for the duration of 'a.
--    unsafe fn take_page(me: *mut PageInfo) -> Option<Page> {
-+    unsafe fn take_page(me: *mut PageInfo) -> Option<Owned<Page>> {
-         // SAFETY: This pointer offset is in bounds.
-         let ptr = unsafe { &raw mut (*me).page };
- 
-diff --git a/rust/kernel/alloc/allocator.rs b/rust/kernel/alloc/allocator.rs
-index cd4203f27aed0..c7b9b069cf75d 100644
---- a/rust/kernel/alloc/allocator.rs
-+++ b/rust/kernel/alloc/allocator.rs
-@@ -169,7 +169,7 @@ unsafe fn realloc(
++
++    /// Consumes the `Box<T,A>` and returns a `NonNull<T>`.
++    ///
++    /// Like [`Self::into_raw`], but returns a `NonNull`.
++    #[inline]
++    pub fn into_non_null(b: Self) -> NonNull<T> {
++        // SAFETY: `KBox::into_raw` returns a valid pointer.
++        unsafe { NonNull::new_unchecked(Self::into_raw(b)) }
++    }
  }
  
- impl Vmalloc {
--    /// Convert a pointer to a [`Vmalloc`] allocation to a [`page::BorrowedPage`].
-+    /// Convert a pointer to a [`Vmalloc`] allocation to a [`Page`](page::Page) reference.
-     ///
-     /// # Examples
-     ///
-@@ -202,20 +202,17 @@ impl Vmalloc {
-     ///
-     /// - `ptr` must be a valid pointer to a [`Vmalloc`] allocation.
-     /// - `ptr` must remain valid for the entire duration of `'a`.
--    pub unsafe fn to_page<'a>(ptr: NonNull<u8>) -> page::BorrowedPage<'a> {
-+    pub unsafe fn to_page<'a>(ptr: NonNull<u8>) -> &'a page::Page {
-         // SAFETY: `ptr` is a valid pointer to `Vmalloc` memory.
-         let page = unsafe { bindings::vmalloc_to_page(ptr.as_ptr().cast()) };
- 
--        // SAFETY: `vmalloc_to_page` returns a valid pointer to a `struct page` for a valid pointer
--        // to `Vmalloc` memory.
--        let page = unsafe { NonNull::new_unchecked(page) };
--
-         // SAFETY:
--        // - `page` is a valid pointer to a `struct page`, given that by the safety requirements of
--        //   this function `ptr` is a valid pointer to a `Vmalloc` allocation.
--        // - By the safety requirements of this function `ptr` is valid for the entire lifetime of
--        //   `'a`.
--        unsafe { page::BorrowedPage::from_raw(page) }
-+        // - `vmalloc_to_page` returns a valid, non-null pointer to a `struct page` for a valid
-+        //   pointer to `Vmalloc` memory, given that by the safety requirements of this function
-+        //   `ptr` is a valid pointer to a `Vmalloc` allocation.
-+        // - By the safety requirements of this function `ptr`, and hence the `struct page`, is
-+        //   valid for the entire lifetime of `'a`.
-+        unsafe { &*page.cast() }
-     }
- }
- 
-diff --git a/rust/kernel/alloc/allocator/iter.rs b/rust/kernel/alloc/allocator/iter.rs
-index 02fda3ea5cae6..8dcc16ed89893 100644
---- a/rust/kernel/alloc/allocator/iter.rs
-+++ b/rust/kernel/alloc/allocator/iter.rs
-@@ -9,7 +9,7 @@
-     ptr::NonNull, //
- };
- 
--/// An [`Iterator`] of [`page::BorrowedPage`] items owned by a [`Vmalloc`] allocation.
-+/// An [`Iterator`] of [`Page`](page::Page) references owned by a [`Vmalloc`] allocation.
- ///
- /// # Guarantees
- ///
-@@ -28,11 +28,11 @@ pub struct VmallocPageIter<'a> {
-     size: usize,
-     /// The current page index of the [`Iterator`].
-     index: usize,
--    _p: PhantomData<page::BorrowedPage<'a>>,
-+    _p: PhantomData<&'a page::Page>,
- }
- 
- impl<'a> Iterator for VmallocPageIter<'a> {
--    type Item = page::BorrowedPage<'a>;
-+    type Item = &'a page::Page;
- 
-     fn next(&mut self) -> Option<Self::Item> {
-         let offset = self.index.checked_mul(page::PAGE_SIZE)?;
-diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
-index 8affd8262891b..6dc1c2395acaf 100644
---- a/rust/kernel/page.rs
-+++ b/rust/kernel/page.rs
-@@ -12,16 +12,16 @@
-         code::*,
-         Result, //
-     },
-+    types::{
-+        Opaque,
-+        Ownable,
-+        Owned, //
-+    },
-     uaccess::UserSliceReader, //
- };
--use core::{
--    marker::PhantomData,
--    mem::ManuallyDrop,
--    ops::Deref,
--    ptr::{
--        self,
--        NonNull, //
--    }, //
-+use core::ptr::{
-+    self,
-+    NonNull, //
- };
- 
- /// A bitwise shift for the page size.
-@@ -65,93 +65,29 @@ pub const fn page_align(addr: usize) -> Option<usize> {
-     Some(sum & PAGE_MASK)
- }
- 
--/// Representation of a non-owning reference to a [`Page`].
--///
--/// This type provides a borrowed version of a [`Page`] that is owned by some other entity, e.g. a
--/// [`Vmalloc`] allocation such as [`VBox`].
--///
--/// # Example
--///
--/// ```
--/// # use kernel::{bindings, prelude::*};
--/// use kernel::page::{BorrowedPage, Page, PAGE_SIZE};
--/// # use core::{mem::MaybeUninit, ptr, ptr::NonNull };
--///
--/// fn borrow_page<'a>(vbox: &'a mut VBox<MaybeUninit<[u8; PAGE_SIZE]>>) -> BorrowedPage<'a> {
--///     let ptr = ptr::from_ref(&**vbox);
--///
--///     // SAFETY: `ptr` is a valid pointer to `Vmalloc` memory.
--///     let page = unsafe { bindings::vmalloc_to_page(ptr.cast()) };
--///
--///     // SAFETY: `vmalloc_to_page` returns a valid pointer to a `struct page` for a valid
--///     // pointer to `Vmalloc` memory.
--///     let page = unsafe { NonNull::new_unchecked(page) };
--///
--///     // SAFETY:
--///     // - `self.0` is a valid pointer to a `struct page`.
--///     // - `self.0` is valid for the entire lifetime of `self`.
--///     unsafe { BorrowedPage::from_raw(page) }
--/// }
--///
--/// let mut vbox = VBox::<[u8; PAGE_SIZE]>::new_uninit(GFP_KERNEL)?;
--/// let page = borrow_page(&mut vbox);
--///
--/// // SAFETY: There is no concurrent read or write to this page.
--/// unsafe { page.fill_zero_raw(0, PAGE_SIZE)? };
--/// # Ok::<(), Error>(())
--/// ```
--///
--/// # Invariants
--///
--/// The borrowed underlying pointer to a `struct page` is valid for the entire lifetime `'a`.
--///
--/// [`VBox`]: kernel::alloc::VBox
--/// [`Vmalloc`]: kernel::alloc::allocator::Vmalloc
--pub struct BorrowedPage<'a>(ManuallyDrop<Page>, PhantomData<&'a Page>);
--
--impl<'a> BorrowedPage<'a> {
--    /// Constructs a [`BorrowedPage`] from a raw pointer to a `struct page`.
--    ///
--    /// # Safety
--    ///
--    /// - `ptr` must point to a valid `bindings::page`.
--    /// - `ptr` must remain valid for the entire lifetime `'a`.
--    pub unsafe fn from_raw(ptr: NonNull<bindings::page>) -> Self {
--        let page = Page { page: ptr };
--
--        // INVARIANT: The safety requirements guarantee that `ptr` is valid for the entire lifetime
--        // `'a`.
--        Self(ManuallyDrop::new(page), PhantomData)
--    }
--}
--
--impl<'a> Deref for BorrowedPage<'a> {
--    type Target = Page;
--
--    fn deref(&self) -> &Self::Target {
--        &self.0
--    }
--}
--
--/// Trait to be implemented by types which provide an [`Iterator`] implementation of
--/// [`BorrowedPage`] items, such as [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
-+/// Trait to be implemented by types which provide an [`Iterator`] of [`Page`] references, such as
-+/// [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
- pub trait AsPageIter {
-     /// The [`Iterator`] type, e.g. [`VmallocPageIter`](kernel::alloc::allocator::VmallocPageIter).
--    type Iter<'a>: Iterator<Item = BorrowedPage<'a>>
-+    type Iter<'a>: Iterator<Item = &'a Page>
-     where
-         Self: 'a;
- 
--    /// Returns an [`Iterator`] of [`BorrowedPage`] items over all pages owned by `self`.
-+    /// Returns an [`Iterator`] of [`Page`] references over all pages owned by `self`.
-     fn page_iter(&mut self) -> Self::Iter<'_>;
- }
- 
--/// A pointer to a page that owns the page allocation.
-+/// A `struct page`.
-+///
-+/// A `Page` is accessed through a shared reference or through an owning [`Owned<Page>`]; the latter
-+/// frees the page allocation when it is dropped.
- ///
- /// # Invariants
- ///
--/// The pointer is valid, and has ownership over the page.
-+/// The `Page` is backed by a valid `struct page`.
-+#[repr(transparent)]
- pub struct Page {
--    page: NonNull<bindings::page>,
-+    page: Opaque<bindings::page>,
- }
- 
- // SAFETY: Pages have no logic that relies on them staying on a given thread, so moving them across
-@@ -185,19 +121,20 @@ impl Page {
-     /// # Ok::<(), kernel::alloc::AllocError>(())
-     /// ```
-     #[inline]
--    pub fn alloc_page(flags: Flags) -> Result<Self, AllocError> {
-+    pub fn alloc_page(flags: Flags) -> Result<Owned<Self>, AllocError> {
-         // SAFETY: Depending on the value of `gfp_flags`, this call may sleep. Other than that, it
-         // is always safe to call this method.
-         let page = unsafe { bindings::alloc_pages(flags.as_raw(), 0) };
-         let page = NonNull::new(page).ok_or(AllocError)?;
--        // INVARIANT: We just successfully allocated a page, so we now have ownership of the newly
--        // allocated page. We transfer that ownership to the new `Page` object.
--        Ok(Self { page })
-+        // SAFETY: We just successfully allocated a page, so we now have ownership of the newly
-+        // allocated page. We transfer that ownership to the new `Owned<Page>` object.
-+        // Since `Page` is transparent, we can cast the pointer directly.
-+        Ok(unsafe { Owned::from_raw(page.cast()) })
-     }
- 
-     /// Returns a raw pointer to the page.
-     pub fn as_ptr(&self) -> *mut bindings::page {
--        self.page.as_ptr()
-+        Opaque::cast_into(&self.page)
-     }
- 
-     /// Get the node id containing this page.
-@@ -372,10 +309,11 @@ pub unsafe fn copy_from_user_slice_raw(
-     }
- }
- 
--impl Drop for Page {
-+impl Ownable for Page {
-     #[inline]
--    fn drop(&mut self) {
--        // SAFETY: By the type invariants, we have ownership of the page and can free it.
--        unsafe { bindings::__free_pages(self.page.as_ptr(), 0) };
-+    unsafe fn release(this: NonNull<Self>) {
-+        // SAFETY: By the function safety requirements, we have ownership of the page and can free
-+        // it. Since Page is transparent, we can cast the raw pointer directly.
-+        unsafe { bindings::__free_pages(this.as_ptr().cast(), 0) };
-     }
- }
+ impl<T, A> Box<MaybeUninit<T>, A>
 
 -- 
 2.51.2
