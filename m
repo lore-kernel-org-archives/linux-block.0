@@ -1,56 +1,73 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536EE3BC669;
-	Fri, 26 Jun 2026 05:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F7F3C555B
+	for <linux-block@vger.kernel.org>; Fri, 26 Jun 2026 05:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782451999; cv=none; b=qXjBFe9TfrkEPhrxInVH5c2faZiwgC7kI3a9MR1wRI/GS3L/2YEAxD5SN5EFgUGWf7BU2iT83AWwaQmpnXgOcjaAUpzS28cZuMOYlwuyFmHFOL409O8SbCuGA3xD0+/jv/UKa+bCo/+RCbrL1lO+f7MX9aorfwwNzvki1q5qZwo=
+	t=1782452452; cv=none; b=jzHaTd0JwlN1rzG7a71/QoHqJCtoBj1+w9ajjQ1ysug8LpCrrkru/lDMkF8e79ebq6hu96ljf1cnyIuc058pRAHS7J5E9FnPp14v1aMfoqXOaaNTJ2jJxalsdNuDK0p7nd1f2Bpopdi2TOv/OFXu8Y8zzKV8h7BRKkGAra5SnXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782451999; c=relaxed/simple;
-	bh=lxtrRo+jigevR0QJcO58kA51VyPHqNiIDGDN+D9NtO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bocICj1x/yDMkYE8nu6Mhb4XgABh6FzbquLjlx3ktMz8KGPEXRZSxjl1AGy97fNKSrL3E74kW199zFJdLz4mn2Gj9D/2owmQ5guMtaDLTyGWDHnu8904k4uG42so/MWEdO+/KoVB+QUYw7r1hpW9kgtqsZN1TUR+7IgRgXztakI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id ED7B468B05; Fri, 26 Jun 2026 07:33:07 +0200 (CEST)
-Date: Fri, 26 Jun 2026 07:33:07 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-block@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Zhang Yi <yi.zhang@huawei.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>
-Subject: Re: [PATCH 16/16] fscrypt: Add safety checks to non-block-based
- en/decryption
-Message-ID: <20260626053307.GO9043@lst.de>
-References: <20260624050334.124606-1-ebiggers@kernel.org> <20260624050334.124606-17-ebiggers@kernel.org>
+	s=arc-20240116; t=1782452452; c=relaxed/simple;
+	bh=KHTyagwvEuBlGDoQ1xV8y1FFb1CzN4gezK/0F1/akls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dQxlSZfOSkSW0p1bfsE+5wP9K5v8BsINynwzo84xltzD5kwy+nNDsKABk9ysM2rITRs2kQkiPpOde6ohtmx1AQ63Qm+Ob2ehvYY3SkiVqAhuluk3oGc662TZTLlUNxDRv2y582JNS0NQM+mMLF4gB3HKQFOlIxA4q/SbicxJU9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ncby5n+O; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ncby5n+O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 792ED1F000E9;
+	Fri, 26 Jun 2026 05:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782452450;
+	bh=xJHuxYaA249Mh8+LDL/12MchBFlVDwyuQfkM0SVgZaA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=ncby5n+OwZ7A540gaYDXuYUdMIZBf87ilkLeK0x199uadLTTxQAsZ/INNaMikEWWA
+	 0ztSYvYFUf4+subb3vDa51uX7qIolzYhYNLd0fSZujcOhobNT7+NmN+vru3JoWclL3
+	 AW6cVT69N+RCYnjLuTf1g87dS89yIv/TFZp0dnVxe61dBFl4ySDD3mHvK2WptQN07B
+	 shPGdR+TP4nHnDukexvL5K6j422tuzDpW//eYV8pX8/3Jqp+FqRz6LHGBOMY9FzVUg
+	 Bm73E11MDl5ak2byXr2UDPKZtKtkoyTNm2Q3KmN9X4s5pnPAoNAFC1PaM4MNzPvLE4
+	 XFF9yGD/md95g==
+Message-ID: <254e6964-d9bf-467b-a045-e3907de5b226@kernel.org>
+Date: Fri, 26 Jun 2026 14:40:39 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624050334.124606-17-ebiggers@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: avoid potential deadlock on zone revalidation
+ failure
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20260625062824.2013244-1-dlemoal@kernel.org>
+ <20260625115232.GC18076@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20260625115232.GC18076@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 23, 2026 at 10:03:34PM -0700, Eric Biggers wrote:
-> fscrypt_encrypt_pagecache_blocks(), fscrypt_encrypt_block_inplace(),
-> fscrypt_decrypt_block_inplace() would dereference a NULL
-> fscrypt_inode_info pointer if they were to be called on a file that
-> hasn't been opened yet or on a block-based filesystem.  Since they have
-> the ability to report errors anyway, add WARN_ON_ONCE checks for this.
+On 6/25/26 8:52 PM, Christoph Hellwig wrote:
+> On Thu, Jun 25, 2026 at 03:28:24PM +0900, Damien Le Moal wrote:
+> 
+> [very long lockdep trace]
+> 
+>> +	/*
+>> +	 * We may already have a zone write plug workqueue as this function may
+>> +	 * be called after disk_free_zone_resources(), which does not destroy
+>> +	 * the workqueue (the zone write plugs workqueue is destroyed at
+>> +	 * disk_release() time).
+>> +	 */
+>> +	if (!disk->zone_wplugs_wq) {
+> 
+> Can't we just allocate this at add_disk time instead of the magic NULL
+> check here to mirror the freeing side?
 
+Just tried and yes, that is fine to do. A bit more code reshuffling that I
+wanted for a fix, but in the end, a lot cleaner and simpler.
+Will send V2 after some more tests.
 
-Looks good:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+-- 
+Damien Le Moal
+Western Digital Research
