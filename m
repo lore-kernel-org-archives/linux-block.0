@@ -1,176 +1,126 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3B63A59BC;
-	Sat, 27 Jun 2026 13:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DD738D
+	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 23:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782565884; cv=none; b=QU4HPRwhKW9ZXtTT6RW3DWfL57cLuPCAjoso7TGOgC40auUnxgfOlf3vqrRil0fXgiHNEgWEm0KBIHTUbruudn9BoHRccHW0RJjur29xsqQ7xXAsrTAaGHghvgoUx01T/EI9KSK9yxy3XTun/AQeXe233GCaTUaOPEeWb9xfKpk=
+	t=1782602952; cv=none; b=l77PnDIhEifXLSKHfS+s6FunBoZ4C3olQRaS53WBdXURiKyXE/5iYb9saUu/le8HhBYiyoJzlHvQf3HZhiOP9OmiAY6PF14Y2Z66lXRZqONolsHhsy6EWDIoFUP5pQaowN1q9Wp3liSrGr0GN0T6u4iiUY8HTe1KKF43mKViob0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782565884; c=relaxed/simple;
-	bh=0D3QtVTQ9/VyZ2GHdi7eh0l4L5UHK8hpuhOW6sOiDcg=;
+	s=arc-20240116; t=1782602952; c=relaxed/simple;
+	bh=qZH/vLziPpGFkaHRQVYGhPXdoiOMCfjDzJOMJvF/wyc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pvyWFqX46yBLbj2ARM9NFjprEWSKQ/ceSF3GWNADi8ViXYh4V8izk5KYNkTVXMTC74av+2W2OOtLx/hMRzNe4nB2PMpLDDgIjyMAbP6EJkkh25G1qDeYcCdESeSJqYU2ge52CwiGHl8YeAbdPxQUfv+jnSHuu7bNlLd/OZBeSLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I88UiKZ+; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=qI8239cS5Aqsw2jpuatg1GJItes5JTxmfgnb5f4SbByNi1ncKEr3jcWZpG8PpvxYwKzbf03M8KJCnQaVDayAPMaSnVU3f+c6FKy0IfKQNqiDHl/0pRL6TcNkydoO3OCqupTAkOH7Ik8F6dujeVKeT0UF5wo1ugpgqxRHXe5jtAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=VBZv59so; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I88UiKZ+"
-Message-ID: <b35c76ac-030a-4458-b85b-90ef7bcd3894@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782565869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kTfmCVZgLsQAYxOGmqgi+d9SGTwihp06nkzRCBL0e+M=;
-	b=I88UiKZ+5NSVSOCF6J4gIIRkkZToigFcGN3SeLfMhryeUfJLFw4kvfe+NuwObJ0Mm2vtFf
-	tpQ1eQi/oIHPtsZgpegcnpq7MyzNRpWpRQ5M3ApzXTndtytC16U3Rb06RVXWdNorU7alQy
-	0BGxL8bMeCgEkMhwf/yUBhSRJmUrCN4=
-Date: Sat, 27 Jun 2026 21:10:43 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="VBZv59so"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e9565cc13aso681654a34.3
+        for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 16:29:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1782602949; x=1783207749; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bTFP5CSo5QZCJqZ+KzYyZeTm5wMD2RDlL7lOuaGwi3A=;
+        b=VBZv59soxFApnihf6l5a4ki4deMTOmFZS8p10H0++KEoTdYukYJD0zKI8rR/9ub2qv
+         +qNbSkMWaQUiYJbi/96O6PQWQqCxn2Ecmm52zS+WAnnhsQB6JgrfHHVlxkebV2FYynVd
+         jAd5xwnzLqblaoi2ckNqeyb3bLDFjU0j7VZDkzjCkkMqJe/i2GBtrWD+nAtC+013EyUg
+         y/5unb95vzMJsL6QXcFW8MTs2UaMAkiQ9rgrPfMYm+9SEGAna+mhVVBpu+6U8QSOzXCs
+         hku90PYv1TKg/uzzjY/CCLB8S3KwvzqXoJyUVWEDNjeHXZCfyL0WsmwRy3uADySwKF7J
+         GR2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782602949; x=1783207749;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bTFP5CSo5QZCJqZ+KzYyZeTm5wMD2RDlL7lOuaGwi3A=;
+        b=mP3ACUBr9qHHBXz4v5cd9/N3IxGcUS99Wt0bI6EgOBe6CcsP4FR5Pt5lpY5eIpJIH1
+         /4NF4BLBaqve3I+zt46K2gKa+yXeGzWRKjmVxFZ3R3dswAAjLJFevBWJU3d/SxJcvmZ4
+         AI8WekWLldIqRqzTdMXx3dTOkjj7gl6pQTecSHCDPeEq7W05WgWQasBWaLcyln87nhXF
+         2amFZur8Zk8c0VjTbY/lGQ37adHvr5SLeGcTX1ksFX+bzS7WipCIO1OujWP/v1RYmlOo
+         sTvVQlGSi/Q/r+djgfFyouFbETkt2dBTZjsBdhdVOF1qrWs/4AbrZLJis7PdX03Nkhd1
+         AAGg==
+X-Gm-Message-State: AOJu0YwyD3tYPp7IvRnd/Gosc8ulB7seHGOM65mSecnUFmz3LYAOO/7k
+	QP9wzB43kqmf6h7e+h7OKh7oxE0x1zxtFLNdRmTJZNYB4Qp6ig9vSdjAMm5RbFZDLJJ6YePOM8T
+	3rS4Ih/U=
+X-Gm-Gg: AfdE7cnVelACjsMIfLk4NmOAZXypAmfX+0YxxRHCwrCszp+wpzZrWhfxvyrK281txQX
+	ObVCogHU8F0FKB9cj9kAYzcc22mKKRqCVLLavaGBrIV6oXvXPLJ0Cxm2AuH0pp/XVu2+rGN1fJi
+	qrCf7FVaiHRnzQW3OqCgFJSV3cU3wstzMyj0FLeer8bJYXK/KT7craSmPyKuBkAb+uuV0WJ9NAQ
+	DwmIM8PhRS3nVygFXAfkYbG3ZeR5LFmKD4tm48+VMuGgzX0wkz8+8Q7V6GWSgCxYIt1gDbs4Il1
+	kQmj3f8vRSknAE7j94UHBDB7TghTAJmJ1hpvuWbqbyZAjwuRYKxpcmtjl1l4LFEm2mc9Nce/pIT
+	hhMIUsgR05q2HWYOq9KXU9RS3PsMoNSm468/XIZmLu8Z4VoW9wqPKyqOZ+r3r+p8uIKc5+bJSqC
+	zIB/042tsslb/TtqSVXDjo6x2Aj7gxmMOUgReJN7SB0hbtd/WyyvFvTVEhwnudT1OAV9SxGmI=
+X-Received: by 2002:a05:6830:81d7:b0:7e9:b4cf:683c with SMTP id 46e09a7af769-7e9b4cf6a9fmr4341287a34.28.1782602949587;
+        Sat, 27 Jun 2026 16:29:09 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e9c48735f9sm1770198a34.2.2026.06.27.16.29.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Jun 2026 16:29:08 -0700 (PDT)
+Message-ID: <8069f6ab-f732-4a57-94b0-881eab59d9e5@kernel.dk>
+Date: Sat, 27 Jun 2026 17:29:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 07/10] rust: configfs: use `LocalModule` for
- `THIS_MODULE`
-To: Gary Guo <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>,
- Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
- Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
- Aaron Tomlin <atomlin@atomlin.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
- <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
- Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
- Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
- Igor Korotin <igor.korotin@linux.dev>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
- Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
- Carlos Llamas <cmllamas@google.com>
-Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
- driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
- nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org
-References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
- <20260624-fix-fops-owner-v6-7-5295e333cb3e@linux.dev>
- <DJI7IOXAD84M.2F6VSBY64BO62@garyguo.net>
- <34a009d9-a1f3-4347-9e92-866ec05ddb60@linux.dev>
- <DJJ25JJ3TDO9.1UFOP60U0IPX5@garyguo.net>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Alvin Sun <alvin.sun@linux.dev>
-In-Reply-To: <DJJ25JJ3TDO9.1UFOP60U0IPX5@garyguo.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fix error injection static_branch dec imbalance
+To: dayou5941@163.com
+Cc: linux-block@vger.kernel.org, liyouhong <liyouhong@kylinos.cn>
+References: <20260627023749.1048910-1-dayou5941@163.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260627023749.1048910-1-dayou5941@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 6/26/26 8:37 PM, dayou5941@163.com wrote:
+> From: liyouhong <liyouhong@kylinos.cn>
+> 
+> error_inject_add() only increments blk_error_injection_enabled when
+> adding the first rule to a given disk, but error_inject_removeall()
+> always decrements the static key.  blk_error_injection_exit() is
+> invoked from blk_unregister_queue() for every gendisk teardown, including
+> disks that never configured any injection rules.
+> 
+> Removing an unrelated block device therefore decrements the global
+> static key without a matching increment, which can silently disable
+> error injection on disks that still have rules in their
+> error_injection_list.  Repeated teardown of unconfigured disks can
+> further trigger a static_key underflow WARN in jump_label.c.
+> 
+> Only decrement the static key when removing a disk that actually had
+> entries, mirroring the list_empty() guard in error_inject_add().
 
-On 6/26/26 22:41, Gary Guo wrote:
-> On Fri Jun 26, 2026 at 3:35 AM BST, Alvin Sun wrote:
->> On 6/25/26 22:40, Gary Guo wrote:
->>> On Wed Jun 24, 2026 at 4:00 PM BST, Alvin Sun wrote:
->>>> Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
->>>> macro with `this_module::<LocalModule>()`, and update
->>>> rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
->>>> with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
->>>>
->>>> Assisted-by: opencode:glm-5.2
->>>> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
->>>> Acked-by: Danilo Krummrich <dakr@kernel.org>
->>>> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
->>>> ---
->>>>    drivers/block/rnull/configfs.rs | 6 ++----
->>>>    rust/kernel/configfs.rs         | 8 +++++---
->>>>    2 files changed, 7 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
->>>> index c10a55fc58948..b2547ad1e5ddd 100644
->>>> --- a/drivers/block/rnull/configfs.rs
->>>> +++ b/drivers/block/rnull/configfs.rs
->>>> @@ -1,9 +1,7 @@
->>>>    // SPDX-License-Identifier: GPL-2.0
->>>>    
->>>> -use super::{
->>>> -    NullBlkDevice,
->>>> -    THIS_MODULE, //
->>>> -};
->>>> +use super::NullBlkDevice;
->>>> +use crate::LocalModule;
->>>>    use kernel::{
->>>>        block::mq::gen_disk::{
->>>>            GenDisk,
->>>> diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
->>>> index 2339c6467325d..c31d7882e216d 100644
->>>> --- a/rust/kernel/configfs.rs
->>>> +++ b/rust/kernel/configfs.rs
->>>> @@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
->>>>    ///                 configfs::Subsystem<Configuration>,
->>>>    ///                 Configuration
->>>>    ///                 >::new_with_child_ctor::<N,Child>(
->>>> -///             &THIS_MODULE,
->>>> +///             ::kernel::module::this_module::<crate::LocalModule>(),
->>>>    ///             &CONFIGURATION_ATTRS
->>>>    ///         );
->>>>    ///
->>>> @@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
->>>>    
->>>>                        static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
->>>>                            $crate::configfs::ItemType::<$container, $data>::new::<N>(
->>>> -                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
->>>> +                            $crate::module::this_module::<LocalModule>(),
->>> ^ You only changed one single place. This is still plain `LocalModule`.
->> Initially I wrote it as `crate::LocalModule`, but clippy warned about it. So
->> instead of putting the crate path in the macro body, I added `use
->> crate::LocalModule` in the calling file.
->>
->> ```
->> warning: `crate` references the macro call's crate
->>       --> rust/kernel/configfs.rs:1024:59
->>        |
->> 1024 | ...  $crate::module::this_module::<crate::LocalModule>(),
->>        |                                                     ^^^^^ help:
->> to reference the macro definition's crate, use: `$crate`
->>        |
->>        = help: for further information visit
->> https://rust-lang.github.io/rust-clippy/rust-1.94.0/index.html#crate_in_macro_def
->>        = note: `-W clippy::crate-in-macro-def` implied by `-W clippy::all`
->>        = help: to override `-W clippy::all` add
->> `#[allow(clippy::crate_in_macro_def)]`
->>
->> warning: 1 warning emitted
->> ```
-> Clippy has a point about `crate::` being usually wrong in macros, but it is what
-> we actually want here, so obviously you should allow the warning.
->
-> It is the exact same case in `vtable` macro, just that Clippy is unable to check
-> proc macros!
+This was already fixed in Linus's tree by the time you sent this out.
+One more note below...
 
-Thanks for the detailed explanation.
+> diff --git a/block/error-injection.c b/block/error-injection.c
+> index d24c90e9a25f..d210bd5fd8fb 100644
+> --- a/block/error-injection.c
+> +++ b/block/error-injection.c
+> @@ -118,15 +118,24 @@ static int error_inject_add(struct gendisk *disk, enum req_op op,
+>  static void error_inject_removeall(struct gendisk *disk)
+>  {
+>  	struct blk_error_inject *inj;
+> +	bool had_entries;
+>  
+>  	mutex_lock(&disk->error_injection_lock);
+> +	had_entries = !list_empty(&disk->error_injection_list);
 
-I specifically searched for issues related to `crate_in_macro_def`, and 
-this information is very useful to me.
+I'm 99% sure this is LLM generated, they seemingly love to use bool
+variables like this, where humans rarely do. If this is the case, add
+the appropriate annotations as per our documentation.
 
-Best regards,
+commit 214cdae69dba9bb1fc0b517b7fb97bab385a2e3a
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Mon Jun 22 18:07:52 2026 +0200
 
-Alvin
+    block: fix incorrect error injection static key decrement
 
->
-> Best,
-> Gary
->
->> Alternatively, `#[allow(clippy::crate_in_macro_def)]` could be added on
->> the macro
->> definition. Would you suggest that approach?
+-- 
+Jens Axboe
