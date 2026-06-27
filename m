@@ -1,80 +1,78 @@
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C38535F199
-	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 06:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C322C0261
+	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 07:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782541182; cv=none; b=VCY7MgglT4F93qOb50OkYBFwXsO6zqFScPnC4tTASxtxilNk0Mfa7B+3YB+i2FcI1bfFPFrW7msC+CfyMpD5VpR9hsZlqC+4TqmV7+Sfb1etorxnpzCsjIAniMBqjPd4ymoGiecOber+p3VsxQXe/qc4HZW5c3qlKmNnasv0gNo=
+	t=1782543806; cv=none; b=WlM/XqycgQdiZfhIN461zfmo7k31Bluprh2HQINYwKKq3zgre4ZQLZ7Bi4VoopbqgIpX/1+rnGVDK+yslVDZ/FL3/orKmJa7pMmX6yn25sLRCmWDdJ33hs4iSf9S2mIrn2oOCq+eVijxhHczc3ScI4sb5dESxUlxwJ5KPprTjYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782541182; c=relaxed/simple;
-	bh=d0M7wh+b9oxyqpa5s4l2JAPnkxWgIlRGgutMaLK5E5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rKS1lO2Z0U+7bhgcwdtLorasWnCKDqo1uYLgZKSkZ3yeA/ubSiOYBc+VtvoifgHaX5gN2FufRL+b5vDtXsW1a9Og0An0uXmqXTiiRF5N2Jm0Gy07tWLhMhuJDg7SlOhjydRCi/IFWxS5m8T2XB+RonaG/qCKyfiOBQ4sTBNCfNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=LBJzvHHy; arc=none smtp.client-ip=209.85.216.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1782543806; c=relaxed/simple;
+	bh=roBNc2sQN3ldHuLOLGDe6TaQysJmJwxZKM2xHYz9Ky0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D4+EXPEBq+d1rNhlKpbRBogdgjzJBfAP1LE/xhDHzITFnoxkKz36QsqtyRmK+lZ5Lgs33B201lz5b9WdYA1N7mKY2k4McW6MzN8APt3O0DSg4xdo9bH4D1uMZVcqPf/cS3ufch9Uz4Zi/HAcR+9xlmu0sWcj8pjDApvOGANd6D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJGjghdv; arc=none smtp.client-ip=209.85.216.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="LBJzvHHy"
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-37c5dabff14so126703a91.0
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2026 23:19:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJGjghdv"
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-37df0b86a82so1618819a91.0
+        for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 00:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1782541178; x=1783145978; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782543804; x=1783148604; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=eDhSqgeSsmOMGL+q4n2G7rVfqWeNyMvzos/MllXGj4U=;
-        b=LBJzvHHyouEyd8u7VMHf5xH8G8i/kGtDWT2Zo75GWlIIrFAxMVjhEiHBy4YZkk+nK/
-         EOlMln4o7nfQKO9RDIFJweK7tO3v4pQYxpiY94dU86a8SVqaHFWZnpRgWU5IyH6JwNAa
-         5PsKD8e+PUnncWmY90EeCAvaqqvrvCJu1lKEk0gg/UFKsSZFfYJBa9duRq6Hub+4eIka
-         f6pzy5RL9nUgHj28D/HG74WR+PWP4CREXTZE2Lv8Eb4/xObIEuyLnBqw/VtxUY1Uho6M
-         zQrCSHA2whpe47ZefxKs+wPioYjmCrCwyid7ACzRoMDfc1qydgt2tyayXaGFjpx1KSJy
-         PKJA==
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3eQn/a3TS5gmFPjuhsccSa1AXinLOkLgHR/IoZKvOu0=;
+        b=BJGjghdv68Q/BUx3gz9pO+FwMcVzzKeV3Z1p8KzZrYWZQJVngRQxlKdkSYKnRRqz4B
+         J5SpWdgigb7FHZY1CPSmGu/uDVYVATcH0xba22XWxJmMYLpqXATGsSwyoM/EXFR3Ib1i
+         9trAbee17sbuutD8/uCDL4D4z5W5WJkR+2UzBHB58bvdsqJCXp7uBKOCol0r/hbWSj43
+         srBAHrgJe0pB4ja5RltKqizJAXDfCC959vUOU3bZmQE8EIXcb46uartXUFxzMXpC90wh
+         a4+Petke9IHiAeUqhxP1oEBREgYOqOGR2vExeZW7k5svoNjEoGOUMpZvm80vePmpTKXL
+         WdAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782541178; x=1783145978;
+        d=1e100.net; s=20251104; t=1782543804; x=1783148604;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=eDhSqgeSsmOMGL+q4n2G7rVfqWeNyMvzos/MllXGj4U=;
-        b=N2bcAT8fxrurA3t4bGqpjqT4W+SAMpZKCaKJqaKluy9QszLX/KB3tm/yldhESrPpWF
-         aynwaTuCUKIv+eOUHAJm70rQn8ODb9J6R1tatMhF3808L7E0XX37C4bKDCTV0o4BLWLw
-         S1XbcFK4eX8wPZGlXpynfmPiVfZcp3zs1mizbd0Rjc/yP2fmIVhSRFmmT24CxKm35tdx
-         J1VwmiT4qpDIQmYSdoamtdyER67JT0OWlmwS+L58xctHJQVrmNVe+DUXLdJoZKt1IooG
-         M5aOsswF8q/31vYS4wHQH2Pn9vXN/IZYNgLTK6yE1LqqUwtIeZSQEJOBpeJehY3j443J
-         P20A==
-X-Gm-Message-State: AOJu0YwMIV73Lna590VSjSqQHU6PbdoFVoWJRyrXumK+1nGWvLKetmiW
-	tKXmPBV4ozX5cdbm/X+ki0M7qDrGBYrk+w1QX5MzfU15DzBuocFTXVbigfFAnw00uYVIMSlreko
-	d1iaDsTI+AckVS6ItvXMKJQuvF3SJWkF0+0wQ
-X-Gm-Gg: AfdE7cmbAECkUCVEuqbtGElRmSOd/P5Iw0+upzEnNJ3iqWD4LpxwNIx1069m9TcqAtv
-	Iu+rvRDDYASZChcARTYnuHul64mtbQbfXGt+ZRFL8pKgaWCqMhjg1VJHw0kKZirS+3quc7KmcU8
-	QqPEz1Xnr9wfTPDG4iw6f0cJ3h6QbMUOiMAeX2niKnqrv3HzW6BVAP8gybSLE0LRlmnqdy5mCDP
-	9oeOn6xZERvfHxo89+YzvVYiNUzWG2bVlDQ46Bm1eiKJoEvw9BuWAdhDKmGMYrra5T/RS+2W3Ud
-	5SKOzq7vO7QB+/SozEf+yxrCCnW8u6fjAZeTgNeNsg47trovXdNEwSD5GhQJSH55NRboWebMZXC
-	ioB10Pa4FqZjfOPt/skcT8I+dSTeuzA2tPoydXulksQ0=
-X-Received: by 2002:a17:90b:2886:b0:36d:cc9b:2f60 with SMTP id 98e67ed59e1d1-37dfa27d18amr4991337a91.4.1782541178343;
-        Fri, 26 Jun 2026 23:19:38 -0700 (PDT)
-Received: from c7-smtp-2026.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-37fc2abbd48sm47306a91.4.2026.06.26.23.19.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 23:19:38 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (bond0.slc5-n17m28-k8s.dev.purestorage.com [IPv6:2620:125:9025:20::a31:41f])
-	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 9E1C240146;
-	Sat, 27 Jun 2026 00:19:37 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 986B7E40789; Sat, 27 Jun 2026 00:19:37 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [RFC PATCH 0/2] Avoid software ref tag remapping for NVMe devices
-Date: Sat, 27 Jun 2026 00:19:31 -0600
-Message-ID: <20260627061933.2187447-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.54.0
+         :message-id:reply-to;
+        bh=3eQn/a3TS5gmFPjuhsccSa1AXinLOkLgHR/IoZKvOu0=;
+        b=s4tLUZfpaQWHwk6Z17YdG4LTgR9RygLTXy7cTCBo4odTvLu4//SWfoxqPnCl7Ehwvk
+         En8IeNqTyGZFpCiiJdEkSmVsFz76eiEzsuNOnbpbsS0EAeR3khI16+Y1OhTVIggtvV75
+         W+UnFGg2U0kVsIjz+G/dGcYl2CpMzI47NXuW6Mc6eNTG3O63xj9HXenb3E76V/Kajmdw
+         EihYx4Wi1rhfL21e+RlDD605sNsojesaqgPKNZciJfFSrMl93XkavhCq99hR2CxzSn3l
+         eKOh2Ve0/miyD+vcFnis2cTRMnykViAzeY6yiQrCZFBQknpQ5W7m7/GQUbeQ5yMpVJju
+         fdfQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rrcb8SesnJUzIWoDeP7LAHlRBGnDfi2aE1WjVdcVUV9V9KGNGsqt/Jcw6eoZpAABwPEzZIlkmjbenBfVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX27DRvGv2uw1f/CmsnMG23x6huDse6v8xZfPpPDCnK7ZhiEJT
+	dNvStv5Kn4ARrAfRIzztgLn5OzDntocMHqGozbVovAz2IjR97zwiCrN1
+X-Gm-Gg: AfdE7clTW2PXtyIhgnVoKD7HL38NN0kZVYQI2Ns53H4Smk9/aO2ML2bOZQ1ji8W7Ash
+	dsXxJZQXIz/Tb+HBmSb5RUyToWgaEeAIA3nEIyjyGc8VmFLGTz5YofJA0M2r4Vjf9ZahqlY/hYD
+	77EGtOlvvA8LLhpHfmT1jLAjtBmZHtQ9WjvODSIYxox+QQmOeshc0IMztzkQGfWqqJGVAc7q4xg
+	OmssN0lWLuM8rpJWM98nVeedLw1ZF7+uixYqiYh6PKqYemSwmF/BfMYJ8Z81+TJnI0kfYFkWY9k
+	kUDkyTwzFLkOWzPME7xvJDTyoZ0/q1LxfS8uOswOGyXWT6EjyMSoG+yPm1slurMUVMLCcui6NAi
+	2+pb+oM9aY1SyBWM9JbsKBnbvttJQh44AaazltAahtV5qeenTyjU41ICG1JdOyywAjyVm53CgE6
+	rTS4a161aY8UAVgdeyBKr9AVQmDLX+vdXu2nGKex8TPxi7yDy9UM7RcEA8MA==
+X-Received: by 2002:a17:902:d484:b0:2c9:994c:9a5 with SMTP id d9443c01a7336-2c9994c0b4amr20237805ad.30.1782543804035;
+        Sat, 27 Jun 2026 00:03:24 -0700 (PDT)
+Received: from HAOQINHUANG-MC0.tencent.com ([2409:8a00:1a20:7370:71bb:5f2e:c181:eb3e])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7f65088cesm51596995ad.80.2026.06.27.00.03.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 27 Jun 2026 00:03:23 -0700 (PDT)
+From: Haoqin Huang <haoqinhuang7@gmail.com>
+To: minchan@kernel.org,
+	senozhatsky@chromium.org,
+	axboe@kernel.dk,
+	terrelln@fb.com,
+	dsterba@suse.com,
+	akpm@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	haoqinhuang7@gmail.com,
+	rongwei.wrw@gmail.com,
+	Haoqin Huang <haoqinhuang@tencent.com>,
+	Rongwei Wang <zigiwang@tencent.com>
+Subject: [PATCH 1/3] zram: fix zstd dict use-after-free on per-CPU error path
+Date: Sat, 27 Jun 2026 15:02:14 +0800
+Message-ID: <20260627070216.13511-1-haoqinhuang7@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,46 +81,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, each bio has a reference tag seed which is used to generate
-the sequential ref tags in its protection information. In principle, the
-ref tag seed can be any value as long as the same value is used when
-blocks are written as when they are read back. However, some devices
-(e.g. T10 DIF) require the ref tags to match the low bits of the
-absolute integrity interval numbers. So the block integrity layer always
-"remaps" ref tags to absolute integrity intervals using
-blk_integrity_prepare() on writes and blk_integrity_complete() on reads.
+From: Haoqin Huang <haoqinhuang@tencent.com>
 
-On devices which do support an explicit "expected initial reference tag"
-field in addition to the logical block address on each I/O, the software
-ref tag remapping could be skipped by just passing the ref tag seed as
-the expected initial ref tag.
+zstd_setup_params() creates global cdict and ddict stored in
+params->drv_data, shared across all per-CPU contexts. When a
+per-CPU zstd_create() failed, its error path called
+zstd_release_params() which freed those shared objects while
+other per-CPU contexts might already hold references to them.
 
-Introduce a BLK_EXPECTED_REF_TAG_CAPABLE flag for devices to advertise
-support for an expected initial ref tag. On devices that set this flag,
-skip the block integrity layer ref tag remapping. Also take care not to
-merge bios with non-contiguous ref tags, as the merged bio's ref tags
-would no longer come from a single ref tag seed.
+Remove the premature zstd_release_params() from the per-CPU
+error path, the global cdict/ddict are properly released later
+by zstd_release_params(), called from zcomp_init()'s cleanup
+or from zcomp_destroy().
 
-Set BLK_EXPECTED_REF_TAG_CAPABLE for NVMe devices and plumb the ref tag
-seed (if provided) to the NVMe Read/Write (E)ILBRT field.
+Fixes: 6a559ecd6e7e ("zram: add dictionary support to zstd backend")
+Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
+Reviewed-by: Rongwei Wang <zigiwang@tencent.com>
+---
+ drivers/block/zram/backend_zstd.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-One potential concern would be NVMe devices which already have ref tags
-written by an old kernel, which did perform the remapping (persisting
-ref tags set to the low bits of the LBAs). When a new kernel that skips
-the remapping reads back the ref tags, it would expect them to match the
-ref tag seed, which would fail the ref tag verification.
-
-Caleb Sander Mateos (2):
-  blk-integrity: add BLK_EXPECTED_REF_TAG_CAPABLE
-  nvme/core: advertise BLK_EXPECTED_REF_TAG_CAPABLE
-
- block/blk-integrity.c         | 18 ++++++++++++++++++
- block/t10-pi.c                |  3 ++-
- drivers/nvme/host/core.c      | 20 ++++++++++----------
- include/linux/blk-integrity.h |  2 ++
- include/linux/t10-pi.h        |  5 -----
- 5 files changed, 32 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index d00b548056dc..2584f47c9b3c 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -161,7 +161,6 @@ static int zstd_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
+ 	return 0;
+ 
+ error:
+-	zstd_release_params(params);
+ 	zstd_destroy(ctx);
+ 	return -EINVAL;
+ }
 -- 
-2.54.0
+2.43.7
 
