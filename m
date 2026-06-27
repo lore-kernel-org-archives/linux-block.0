@@ -1,68 +1,68 @@
-Received: from mail-ua1-f101.google.com (mail-ua1-f101.google.com [209.85.222.101])
+Received: from mail-vk1-f232.google.com (mail-vk1-f232.google.com [209.85.221.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EF835AC12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97D937646A
 	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 06:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782541181; cv=none; b=B6/Ks1HQvlPKMsb7rzWXpccA8uwWT77oDKH2JKiqHo3ILBGKM9aRNg3Nkw2T6d972b9sZ+/upRR4U5hPwBSpkkk1qzFDIZIZVE91yb91yzzsZaL6jCEhhdCHL9VjZ+y6RUzjSIkIl+91lZkFoJBpbZeBXZWtRxf+QXtNoWjZcBo=
+	t=1782541181; cv=none; b=GHJmwSlsigSRT8VwrdEDglMYHNk9r4Gz+djaJgORoOV7Ub3WxTJ36BDfPY2mm8tBwaCZ0wnIGUhC/p1/QVcRgD0iYXnvh/HqQ10hnm7+kZfO827LI9U0pcfElNJQ9Ge311TxgjQ7FY6ZOQ8c3+RDsJEy/yOp5Jr6puqXL7ZXxWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782541181; c=relaxed/simple;
-	bh=u9zKfTLVgVFdloT0bkUEf2OGEZ/bTNohRvlKgt+PhLI=;
+	bh=WH2EmK113vtygaAYNvnSohGHKmLaHR8HBcvB+g+o0J8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=smwy6OSI85PcHa5z0gVyGM+7nFouDPd4aw3nDPDhVM4SYb0b7sdN/8vqm/uel+D9qQvwjAaDQ4ZHDYMLnoJOipyBk2NBoNOlUT01+IwWlqmzjHAi3zJti2Zi/Miefx4N8j3P1oddZCtVEC11p3B4DQUVl0SpKhPLs8LnpxaRgpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HjEVVLUq; arc=none smtp.client-ip=209.85.222.101
+	 MIME-Version; b=ltOBoyl8cV/urjK2wxIHas4HzwVPOE7i4e0Yti3hm3n4RTIp/w0kNaqZzPEKLETj8BRelfFKKPdWMDsoGnifGE5UITSUZRuYV2z0uW3XSAZqO988zROET//NV/PM11FweLEJGkzuqcDa3Xa4vJDDR2eb+mOZtD02Kw5hMah13Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Hed5foT8; arc=none smtp.client-ip=209.85.221.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HjEVVLUq"
-Received: by mail-ua1-f101.google.com with SMTP id a1e0cc1a2514c-9674f14207fso28567241.3
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Hed5foT8"
+Received: by mail-vk1-f232.google.com with SMTP id 71dfb90a1353d-5bd6cf9ee13so48531e0c.2
         for <linux-block@vger.kernel.org>; Fri, 26 Jun 2026 23:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1782541179; x=1783145979; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=MqfsBjO22oyS+9rLfQyq3JIhryb7923Ij1b+1n+khmA=;
-        b=HjEVVLUqMUjMtWs2ed7BahIrp3Knk6Ppy98iNcVbLLStwlB8BJbGdBJRw0QhQ7TXSX
-         Ev0uYiZ4I6AZYlPX2iO7lHPqiqT1UfCf5rSLYxpPhorfVAZgQWCzUpByUcq958k5LnHp
-         rpbT7RQJXB86yKjizfxfoK8zlaXR+f3Pog5g5LqhZQxWEmNIOS+pE/ayLRl8n4LAWQ+t
-         IVGhqQ4Wh2o5CB/3HpUwDzhbJgk8DOJnobb0iac3krULJgsX4HF1H93ptNgTKseI8hkU
-         QAQXcICAcdVPpxWx7B43etL8647ifjRdxpD9Pg3QFh7t8pVPDX/yh9X+wXpnw7JVbL40
-         JSgg==
+        bh=uXbtz+s99vB1QCMmnC1aR8CIIYeKhTXyxwg1XNiOcIg=;
+        b=Hed5foT87L19rRG2htqCF1gmK7cBbnMfVKNHUCuEvAzGVGTwNIANpBNc13fqFKocGi
+         tIZZRalBcBXFfW2BecRjMryRyV22nCoALHlaqeiTFjWg2dwtt075vS7TtYJXt0Q7v8JF
+         8BPdkRft8nVWQsU67AOzDNCOpK9YdlHpwz8L8HJVNoAbJQMqcxDTVjundq1/kNKTy5g/
+         W4P4DkjrXCYkTsh+B/Rk88cby8jwIqpiFMriAwAdN9R6b1z0ARTdoV04sLFtNItI1anL
+         NaTFGIeadOza2+SlyjRQHW+LJ+2i9YkzN8hsL8hwhBQaEt7ENSk5Od5c6x4HRCcgmpOk
+         ZAXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1782541179; x=1783145979;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MqfsBjO22oyS+9rLfQyq3JIhryb7923Ij1b+1n+khmA=;
-        b=Pa0lBBzOaor3N0+Z46Vzmq1v0FYKQkdeM08g8TZCBqFXm1PkCIeQZFwIQRKMYS1UEJ
-         Bj6JVF5GajwX+mo8RNS7xGGGiJcTOP4vsfL0e2x1Ewe4tcltj7LGh+WwqAD7qtQeLTOK
-         7HtLEOFSM4q7fTGak3gmuk/YFC1O3/F+BRh78IJH3KzcFZH5SBuvYoXBrpzTysdsRyKc
-         Imf3o0FXLyXkGNGfruCKfCtjZ1RlWifkxO4veQmNUQj8MRvCASV/7qwMh8iFFQMiFj/5
-         LYbE4/1j5PG9aLfPEySc+ccBPiV8YsIsSkYLQ8C9iHFm7C+iYqIXlOK476smSqfMJg80
-         gHJA==
-X-Gm-Message-State: AOJu0YwDkJ6lNco6aCPGC2wEyB7LHCnpZU1O3PYvI0Sluz1+sX1BOkKH
-	xIeXIUSxlho+fAjjz1L5kHt1LJAaN1DSCwQrG3qH0MBqd0+EU34imBv4prPiScGySntLlFTTnp+
-	hO/m8F9ZU1NYY3k6SKJV+MbihR4szwu0DTNZl9FCkLv4yRc8Xg7qR
-X-Gm-Gg: AfdE7ckrJq7YprFUxA+oH97CnWYMLECfRbB9ok/ctOsKVW4SbKsTG9R8+TJ4actDT4m
-	goajVijlGsrpU3KlKNtHJ7Dj8y4jEEg/P77YQ4hAoQHALXiBgHMbPqXIiVEFBhVD3osZkqilEP4
-	O+tfG6fg4YT32gTN7fhcX5ZxyZ0uVAmm+DnaMf5ROKocNJWIXU2GmSKtU8hpg7J0FFRmT6l2W9M
-	38Zeouhmt9NQKFTLnkQXmW2KX62c+kyXcG7EvTNAJDTvGMDT9ZTzTEcCmmV4Z0ONbr/uLghff1i
-	m/DtOOmHFNrtf+DDydngXIJ8reHWaW40nukWiDXeXc81G8nm1YWS0cbEOr4F0S33V+Zx0uJnk9l
-	P+AlLBu7ASY0tadlVfnNrIOBOcRYr
-X-Received: by 2002:a05:6102:148e:b0:6c2:7d0d:e09f with SMTP id ada2fe7eead31-73433e3675amr1676645137.1.1782541178797;
+        bh=uXbtz+s99vB1QCMmnC1aR8CIIYeKhTXyxwg1XNiOcIg=;
+        b=kov4u1/3YuCnyYMsWAdhftJ8LZlE++iKjS3hX4EB2dUusfrqL1A6qvBPsp0x7hmrpT
+         LINHmxNvONkyW92HeDKCRfwLNNm1dkGY41v6h3BArt9AJyipTojuczTI64AcLJj1Mq6q
+         RICcS4fn/+y5qh8GFFDZ5PdMRNJ+xVVwBB4MbXrbs03tmJKQ14EYKB3+yxhbm/8t+uSU
+         dndWzNwzE5n5aUu8WPxh1r/kzk1n2ImIYRPmPjNHUuTWZbamaJnRCsBjZHsG4bZUjYiL
+         vvuxM+QYiOk6l8hekxkv/MgmlUq/50YDFQno1/CLkDN05BzcQPj2MQVf7RgtPjYSiiwN
+         E47g==
+X-Gm-Message-State: AOJu0YydMmDvWnjjoiPpEeZUyZer403EnBdBsX56bhcvf78U445+bMhZ
+	XWELWR7YY6m7zuNBh6jIBus4YH1vUrwcDDWtpn+aGoF319VQOr7zS0azgH+bnpTmZ0719tWopkt
+	B0gB43Hx9wzVqRopgQb67YSTM3rbAKgIuMgtBHLPgPezP3PSPz4HX
+X-Gm-Gg: AfdE7cmcJs8zEIyUzXVLgAZ0wET5YqJpAT/DLDIvbtywoVKKHcoV8rSBMw444dEvTQX
+	6I/vIMnIlT2OWxPhKVNEPMC/+O8mIgDfUF7jrxjB0c81odBRtNl2UsaZCHpPevlesii0cy41mXe
+	UaccLMV0J3QUvkrCgBbnSNWYb8rndRgiOxtkV7zzOR4k+3OmCiG2OR7U7ZG+xIdHncdZlfaE9vB
+	scu68Q5/cnPe4doM0K+It+5LugX1zmsZ9FglUn5plst4c5icJSkg3OACjyIzSHSWAC8Rph8wvHg
+	XnkH2gs/fquGRtr8Y1R35sc8ZvAcLydk+0lnkdsNwtJWi5glEEABxeVt/leCz67JQmwPCRcycBb
+	yU93ZnosyUDEs4GegVyP3my+vNuto
+X-Received: by 2002:a05:6122:1079:b0:5aa:82ce:d15a with SMTP id 71dfb90a1353d-5bd69dc9a16mr1359420e0c.3.1782541178906;
         Fri, 26 Jun 2026 23:19:38 -0700 (PDT)
 Received: from c7-smtp-2026.dev.purestorage.com ([2620:125:9017:12:36:3:6:0])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-73568fa2fb3sm414403137.15.2026.06.26.23.19.38
+        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-5bd78e656cdsm515052e0c.1.2026.06.26.23.19.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 26 Jun 2026 23:19:38 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.12.104])
-	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id CBBBA402AE;
-	Sat, 27 Jun 2026 00:19:37 -0600 (MDT)
+Received: from dev-csander.dev.purestorage.com (bond0.slc5-n17m28-k8s.dev.purestorage.com [IPv6:2620:125:9025:20::a31:41f])
+	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 056FF402B1;
+	Sat, 27 Jun 2026 00:19:38 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id C8D0DE40789; Sat, 27 Jun 2026 00:19:37 -0600 (MDT)
+	id 032BEE40789; Sat, 27 Jun 2026 00:19:38 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>,
@@ -73,9 +73,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [RFC PATCH 1/2] blk-integrity: add BLK_EXPECTED_REF_TAG_CAPABLE
-Date: Sat, 27 Jun 2026 00:19:32 -0600
-Message-ID: <20260627061933.2187447-2-csander@purestorage.com>
+Subject: [RFC PATCH 2/2] nvme/core: advertise BLK_EXPECTED_REF_TAG_CAPABLE
+Date: Sat, 27 Jun 2026 00:19:33 -0600
+Message-ID: <20260627061933.2187447-3-csander@purestorage.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260627061933.2187447-1-csander@purestorage.com>
 References: <20260627061933.2187447-1-csander@purestorage.com>
@@ -87,127 +87,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add BLK_EXPECTED_REF_TAG_CAPABLE to enum blk_integrity_flags to allow a
-device to report support for specifying an expected initial ref tag in
-I/O. Make blk_integrity_remap() a no-op if the flag is set, as the ref
-tag seed used to generate/verify ref tags in the protection information
-can be passed as the expected initial ref tag.
+NVMe Read, Write, and Write Zeroes commands include an (E)ILBRT field to
+specify the expected initial reference tag for the controller to check
+against the ref tags in the protection information buffer. However, the
+NVMe driver currently always sets (E)ILBRT to the lower bits of the LBA.
+The block integrity layer generates/verifies the PI ref tags according
+to the bio's ref tag seed, so it must "remap" the ref tags, adjusting
+for the difference between the ref tag seed and the absolute integrity
+interval number (= LBA).
 
-Ref tag remapping is necessary to merge bios with non-contiguous ref tag
-seeds, as it converts both bios' ref tags to/from absolute integrity
-interval numbers, which are contiguous. So don't merge bios to a
-BLK_EXPECTED_REF_TAG_CAPABLE device if the next bio's ref tag seed
-doesn't match the ref tag that would follow the end of the first bio.
+If a request has an integrity payload, set (E)ILBRT to its ref tag seed
+so no ref tag remapping is required. Set BLK_EXPECTED_REF_TAG_CAPABLE in
+NVMe devices' enum blk_integrity_flags to skip the block integrity layer
+ref tag remapping.
 
 Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- block/blk-integrity.c         | 18 ++++++++++++++++++
- block/t10-pi.c                |  3 ++-
- include/linux/blk-integrity.h |  2 ++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 20 ++++++++++----------
+ include/linux/t10-pi.h   |  5 -----
+ 2 files changed, 10 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 964eebbee14d..85ebe13f0912 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -139,10 +139,12 @@ EXPORT_SYMBOL_GPL(blk_rq_integrity_map_user);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 453c1f0b2dd0..8202ca706c97 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -914,34 +914,34 @@ static void nvme_set_app_tag(struct request *req, struct nvme_command *cmnd)
+ }
  
- bool blk_integrity_merge_rq(struct request_queue *q, struct request *req,
- 			    struct request *next)
+ static void nvme_set_ref_tag(struct nvme_ns *ns, struct nvme_command *cmnd,
+ 			      struct request *req)
  {
- 	struct bio_integrity_payload *bip, *bip_next;
-+	struct blk_integrity *bi;
-+	u64 intervals;
+-	u32 upper, lower;
+-	u64 ref48;
++	u64 ref_tag;
  
- 	if (blk_integrity_rq(req) == 0 && blk_integrity_rq(next) == 0)
- 		return true;
- 
- 	if (blk_integrity_rq(req) == 0 || blk_integrity_rq(next) == 0)
-@@ -155,10 +157,17 @@ bool blk_integrity_merge_rq(struct request_queue *q, struct request *req,
- 
- 	if (bip->bip_flags & BIP_CHECK_APPTAG &&
- 	    bip->app_tag != bip_next->app_tag)
- 		return false;
- 
-+	bi = blk_get_integrity(req->bio->bi_bdev->bd_disk);
-+	intervals = blk_rq_bytes(req) >> bi->interval_exp;
-+	if (bip->bip_flags & BIP_CHECK_REFTAG &&
-+	    bi->flags & BLK_EXPECTED_REF_TAG_CAPABLE &&
-+	    bip->bip_iter.bi_sector + intervals != bip_next->bip_iter.bi_sector)
-+		return false;
-+
- 	if (req->nr_integrity_segments + next->nr_integrity_segments >
- 	    q->limits.max_integrity_segments)
- 		return false;
- 
- 	if (integrity_req_gap_back_merge(req, next->bio))
-@@ -169,11 +178,13 @@ bool blk_integrity_merge_rq(struct request_queue *q, struct request *req,
- 
- bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
- 			     struct bio *bio)
- {
- 	struct bio_integrity_payload *bip, *bip_bio = bio_integrity(bio);
-+	struct blk_integrity *bi;
- 	int nr_integrity_segs;
-+	u64 intervals;
- 
- 	if (blk_integrity_rq(req) == 0 && bip_bio == NULL)
- 		return true;
- 
- 	if (blk_integrity_rq(req) == 0 || bip_bio == NULL)
-@@ -185,10 +196,17 @@ bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
- 
- 	if (bip->bip_flags & BIP_CHECK_APPTAG &&
- 	    bip->app_tag != bip_bio->app_tag)
- 		return false;
- 
-+	bi = blk_get_integrity(req->bio->bi_bdev->bd_disk);
-+	intervals = blk_rq_bytes(req) >> bi->interval_exp;
-+	if (bip->bip_flags & BIP_CHECK_REFTAG &&
-+	    bi->flags & BLK_EXPECTED_REF_TAG_CAPABLE &&
-+	    bip->bip_iter.bi_sector + intervals != bip_bio->bip_iter.bi_sector)
-+		return false;
-+
- 	nr_integrity_segs = blk_rq_count_integrity_sg(q, bio);
- 	if (req->nr_integrity_segments + nr_integrity_segs >
- 	    q->limits.max_integrity_segments)
- 		return false;
- 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 71367fd082bd..becf3e316b06 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -545,11 +545,12 @@ static void blk_integrity_remap(struct request *rq, unsigned int nr_bytes,
- 	struct blk_integrity *bi = &rq->q->limits.integrity;
- 	u64 ref = bio_integrity_intervals(bi, blk_rq_pos(rq));
- 	unsigned intervals = nr_bytes >> bi->interval_exp;
- 	struct bio *bio;
- 
--	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
-+	if (!(bi->flags & BLK_INTEGRITY_REF_TAG) ||
-+	    bi->flags & BLK_EXPECTED_REF_TAG_CAPABLE)
+ 	/* only type1 and type 2 PI formats have a reftag */
+ 	switch (ns->head->pi_type) {
+ 	case NVME_NS_DPS_PI_TYPE1:
+ 	case NVME_NS_DPS_PI_TYPE2:
+ 		break;
+ 	default:
  		return;
+ 	}
  
- 	__rq_for_each_bio(bio, rq) {
- 		__blk_reftag_remap(bio, bi, &intervals, &ref, prep);
- 		if (!intervals)
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-index c82b2f6fe194..e314d22d9922 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -13,10 +13,12 @@ enum blk_integrity_flags {
- 	BLK_INTEGRITY_NOGENERATE	= 1 << 1,
- 	BLK_INTEGRITY_DEVICE_CAPABLE	= 1 << 2,
- 	BLK_INTEGRITY_REF_TAG		= 1 << 3,
- 	BLK_INTEGRITY_STACKED		= 1 << 4,
- 	BLK_SPLIT_INTERVAL_CAPABLE	= 1 << 5,
-+	/* Device I/O specifies expected initial ref tag independent of LBA */
-+	BLK_EXPECTED_REF_TAG_CAPABLE	= 1 << 6,
- };
++	ref_tag = full_pi_ref_tag(req);
++	if (blk_integrity_rq(req))
++		ref_tag = bio_integrity(req->bio)->bip_iter.bi_sector;
++
+ 	/* both rw and write zeroes share the same reftag format */
+ 	switch (ns->head->guard_type) {
+ 	case NVME_NVM_NS_16B_GUARD:
+-		cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
++		cmnd->rw.reftag = cpu_to_le32(lower_32_bits(ref_tag));
+ 		break;
+ 	case NVME_NVM_NS_64B_GUARD:
+-		ref48 = ext_pi_ref_tag(req);
+-		lower = lower_32_bits(ref48);
+-		upper = upper_32_bits(ref48);
+-
+-		cmnd->rw.reftag = cpu_to_le32(lower);
+-		cmnd->rw.cdw3 = cpu_to_le32(upper);
++		ref_tag = lower_48_bits(ref_tag);
++		cmnd->rw.reftag = cpu_to_le32(lower_32_bits(ref_tag));
++		cmnd->rw.cdw3 = cpu_to_le32(upper_32_bits(ref_tag));
+ 		break;
+ 	default:
+ 		break;
+ 	}
+ }
+@@ -1889,11 +1889,11 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
+ 		break;
+ 	default:
+ 		break;
+ 	}
  
- const char *blk_integrity_profile_name(struct blk_integrity *bi);
- bool queue_limits_stack_integrity(struct queue_limits *t,
- 		struct queue_limits *b);
+-	bi->flags |= BLK_SPLIT_INTERVAL_CAPABLE;
++	bi->flags |= BLK_SPLIT_INTERVAL_CAPABLE | BLK_EXPECTED_REF_TAG_CAPABLE;
+ 	bi->metadata_size = head->ms;
+ 	if (bi->csum_type) {
+ 		bi->pi_tuple_size = head->pi_size;
+ 		bi->pi_offset = info->pi_offset;
+ 	}
+diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+index b6c2496866ea..5cf4859877f5 100644
+--- a/include/linux/t10-pi.h
++++ b/include/linux/t10-pi.h
+@@ -66,11 +66,6 @@ struct crc64_pi_tuple {
+ static inline u64 lower_48_bits(u64 n)
+ {
+ 	return n & ((1ull << 48) - 1);
+ }
+ 
+-static inline u64 ext_pi_ref_tag(struct request *rq)
+-{
+-	return lower_48_bits(full_pi_ref_tag(rq));
+-}
+-
+ #endif
 -- 
 2.54.0
 
