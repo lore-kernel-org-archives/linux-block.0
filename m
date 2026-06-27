@@ -1,172 +1,184 @@
-Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
+Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD8338839E
-	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 04:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782533649; cv=none; b=MrNEK87roUG1inmLxkdd6NsSml9MQ2jSKzjIgxYycvTiZVRC3p37AFWGDJbEXlkI7bX1wt3qnA6UPOLliQb3PPmmRyOr884qWh8kwq4cv4CYNwmsHrq+Ox5ruxg23HJz+gJ9L2cV2kt6UOl3tiL67T1PCTmc7TUgUfwvlq4yyY0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782533649; c=relaxed/simple;
-	bh=e6ji9vzCjGH0E67FHnI7gOsvMmXXkoPcVj9vcddWOl8=;
-	h=Subject:Mime-Version:Content-Type:In-Reply-To:To:Cc:References:
-	 Message-Id:From:Date; b=Q4RuJBPSiOcX0bbEDk+T9H4OVRiS+Ky/HNQHtwAySGTnWc2IYLU3wA72s5r6iUdlcRV6Ff4ma+CrJmF3vxs/zXIkrAPbBiQYN41ak+ehLudu/nRySX0FuhXPUPBRVTfwC2wUfYC5UUSfyUm7mLzLfM77YvqvbXIAELJbdLQ/Qa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=DL72uGsb; arc=none smtp.client-ip=209.127.231.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F6C1632DD
+	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 04:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782535086; cv=pass; b=q0+IMKMgeNmk5qp2f0AJqpjwB0inWBd+8WsU2ET+Ffrr/Ylr3RFGCivK4TYaEZHNuzuVJQggNBgdQkYUg8qJcsea2O3kcGQfOZ8GC9fFA8XXPfRQStKn8UV7DWagqnm1uW1daD46ZeEwIdRN25Ar3/94TblshyDGzlpq+Ax9/74=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782535086; c=relaxed/simple;
+	bh=WjcNysgJ1cmO85TM5aS9Urfw5hQC2DHrRyxP1v+DX1s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RSDHOi76ij0f/lrNuw/ykJUw84ZLpe7+KTXEddllslYUiwfdpZHn6dutuAQ+Vq5SAwvLzeC6C8RpkU5S8rf0xp22c0+OChW65F8d9+jrgiLJa7tsI3EnAr1A90zENjWBVY1P7OWtIuVOwcaiF6ETyvLMQlnAxrvwqmlh2SCz1sk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tMbTEULM; arc=pass smtp.client-ip=209.85.208.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="DL72uGsb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1782533637;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=e6ji9vzCjGH0E67FHnI7gOsvMmXXkoPcVj9vcddWOl8=;
- b=DL72uGsbbCefdp0hqhGYiHT/jICt6TorK6eWv3ZJvmntqGIaZKnNpCI59ej4esJSG1ttJT
- R79mXDuIRuCnn/RqMuDXmIF7KbG/IWbTKW5rQ+34KiW12aPH2DWCa6pMXVkGDehYFfFBzW
- C6X4+q1hYmSSF2swtUpQrFLKGlPCTSsvBTqGn6YJGVoDFNbGE6AhxUfkKZ2kM7CCY9FSuB
- +wUFDOWZHVl94aD3cmUVygsW6ixyLh4EA+rE27U4OCtvZFFkbikJPiM9TxN4YEIZr/n6Mj
- NLiMwOyJ6sTjXL8vBEiW0UYluEJayT20tm0vYl1M3+ImIbZImqkJSEQlHmcjiA==
-Reply-To: yukuai@fygo.io
-Subject: Re: [PATCH v2 2/4] blk-cgroup: fix race between policy activation and blkg destruction
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tMbTEULM"
+Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-697ce8cfe65so2719544a12.3
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2026 21:38:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782535083; cv=none;
+        d=google.com; s=arc-20260327;
+        b=PKmC7/+avfthQV/wr4J4syCluRI3Jk5XsfAfLhZqIqoxJKz5BEuRpavM0UAW9Z5J72
+         94JU+ZXBQsJnUgsjGetPD4GL/GJpauo9jNyfSstMoSFV62FYdJ45/bF5txDuWGJxTm4o
+         tIP9Q1dA4HrVgjO9/hBNb0b2/F+UpY/3Ssx7Jxs/8nzVNxQlamlBIxCFBOtPBWqO/cBS
+         Gs2lVmZfBkhoVX32DXAQb+JaYBMhucvGRgHscXBVpcyrb1I8MtttvDnZVOMp+04kEPJX
+         bZRTYDwtsHSVD1ixH1Tt9FnHDgApxJVR3DO+TI+A69WdJ/TskVE7e3MvwxQNP5uDAjc5
+         RdjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YMnFoAkMSB8x3pEfoOBV+xpCcydJt5zrj489HlTpRmo=;
+        fh=P/MfEgDehikrLT5744YkIOhNnS5Pwhrca7H2wSp9IIA=;
+        b=G/r6Pefa51aNtk/GzpsbBbSvV+S57mnORxtWDUjII0dI79W9+31IBi1A2CFg2yfVBN
+         rz/9MBFGmKDSkDpPB443NsIQkmqbpSK+lrcONzr4QWGxlGhN0yuSaOTNqUHbl5bJUG1G
+         yyqg1etH75O5EhuL/L2jqsi3JbKvnLfl7isJzi9AG+MlXysTb19dswWaebQQBYBw3Enf
+         sH4OMwGOmrqE+F+wX5OfxPKQbbRPwUqPPdJodJ56azqyp8dB/cAkqt3baAhs4PE2RzNS
+         P1JTptwTfmTV+VH6R/YxiJbpyipsk9Gui/6xMTGeK/vuudWQ3ePFSZAplr2MJBrGZpG8
+         VMig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782535083; x=1783139883; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YMnFoAkMSB8x3pEfoOBV+xpCcydJt5zrj489HlTpRmo=;
+        b=tMbTEULM3C6ZCVkMw8kScUFfV4Q2KufapNU48twqLls8gYl0dbcct0VRjGMCOxZzkc
+         fVEoRYoFlv7cLxqvfZl3FIGnY3RqEW1q9PDfg8D9ZxXkImbfEinfHYpPy8Qqj9+ORga8
+         xlcSiFPgROLt2Ep6E/t5T+7lGuPTWIHBwbKv8oFnLnw2gP4k2AMxEhTreDa0Luy8TH/e
+         Cbv5BohjFwljVCXRWuo7/5ylzqZDqJY3pvrESHBVs4DB+j36Kd39lnHxKLaVIQyjoesH
+         9b+l+MWzht/tMQP37aSltRT5p7923owyCM40ZFXZ35sfAgvuKQuvYoFWqfBcbrq9tAq4
+         dWXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782535083; x=1783139883;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YMnFoAkMSB8x3pEfoOBV+xpCcydJt5zrj489HlTpRmo=;
+        b=ZlHe35EXWm24HKWNqdsCkvMvMphWzCHaQvoRj8Ejwe51BQxlx03ZQq50IOXzAZDJz7
+         lEZzXQSqIUHcOxFqdlKTwSH7VTKBlMczFKOevnoZMFn4waFA18llEQ1VWP+COIltCq8d
+         kJ5kWczrnAZQnUvRVUbZ7gAtfEUJOECYRdXTX9TrZdeLh2kUhnA9i9e5rUWpVy88zlgI
+         nq1bDZ5oAd3K1d37k6OBswD5QF9gTyzY6dVovVBe1wv2ELn2beCtDBB8pA/8X5MRptka
+         ET/CgeW8q64mjNUVsEvsOckZrcmAdNyYKqIskDMsqawp2+RgALPCtk0HK7WB20UnoLMo
+         jkDQ==
+X-Forwarded-Encrypted: i=1; AHgh+RorHyPOfXDS+kctbpoqFJWdG9MQn6IsEjdweonfttCKhNfJs8utWJxo34xFDQ8npYNrAfn28/LW+DgWdw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwML7yW5MATowaL5TFXMOyTVOXUOn70Ib9J8DDYctZA0h/wked1
+	CELAp6GWo3RbkjUIUzHCSJfEXHMRJJGbfbztL/GFypyt5Or/hPkUND85PAFK5trto4fsmSARhQD
+	dR8whSPV38xJ8ASSd6xzgNNZSIFcu9A0=
+X-Gm-Gg: AfdE7cmkk6f5IYTodB72KmjB2HuZwW91e9SWFVALR+qMal2TOjWFwlIvhHVm1kbecyg
+	mWPq3PbBE04EWek7e94JB0M+hg6sn+969BNUV/rYx2GvhEaF4qrFpFEXYEgozO/WENUI2cfqiUI
+	gj+4Fhglab4A3vsjJS1gReltVvVWLKPkM7y0FiXX+GCdj0Rmm6ObBmHXH+HIz5b3Ttjkt6PzWra
+	TPRetrjSY/qm7r9T+eM7CZlgZy00wYpadYcfYTnUydt2XEA/3pYpwfkS6dWc1NURwINETWSVPiC
+	V2LK
+X-Received: by 2002:a17:907:948f:b0:c12:2e52:185f with SMTP id
+ a640c23a62f3a-c122e522de1mr208949366b.3.1782535082691; Fri, 26 Jun 2026
+ 21:38:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Sat, 27 Jun 2026 04:13:56 +0000
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+References: <cover.1782398104.git.roxy520tt@gmail.com> <6f381f63ccfe458e15067fd9b9428884cb8d5f97.1782407859.git.roxy520tt@gmail.com>
+ <20260626090929.GA4627@frolo.corp.macq.eu>
+In-Reply-To: <20260626090929.GA4627@frolo.corp.macq.eu>
+From: tt roxy <roxy520tt@gmail.com>
+Date: Sat, 27 Jun 2026 12:37:50 +0800
+X-Gm-Features: AVVi8CeFak8CulrnxUsJNgYGqYRMax2U6VAL5cz8d6zjhqrc0n7ileM1NzDc87M
+Message-ID: <CALMqdkS0arRS5FSsbPBiHAZzU-NeDEBhm01-r5v00GFQN=sx8w@mail.gmail.com>
+Subject: Re: [PATCH 1/1] block: partition: aix: bound LV name formatting
+To: Philippe De Muyter <phdm@macqel.be>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, linux-block@vger.kernel.org, axboe@kernel.dk, 
+	kees@kernel.org, hexlabsecurity@proton.me, objecting@objecting.org, 
+	akpm@linux-foundation.org, yuantan098@gmail.com, bird@lzu.edu.cn
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <866644be-3b07-49f9-9c5d-e0f94ad1c793@linux.ibm.com>
-To: "Nilay Shroff" <nilay@linux.ibm.com>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>
-Cc: "Zheng Qixing" <zhengqixing@huawei.com>, 
-	"Christoph Hellwig" <hch@lst.de>, "Tang Yizhou" <yizhou.tang@shopee.com>, 
-	"Ming Lei" <ming.lei@redhat.com>, <cgroups@vger.kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<yukuai@fygo.io>
-References: <20260624064625.1743650-1-yukuai@kernel.org> <20260624064625.1743650-5-yukuai@kernel.org> <6580506d-3baa-4ceb-bf2e-5f6c974f3d10@linux.ibm.com> <7ebbf312-7c1b-4024-a35d-89a95d82b4f4@fygo.io> <749d17be-ff9f-4f70-a948-0133f02eec93@fygo.io> <866644be-3b07-49f9-9c5d-e0f94ad1c793@linux.ibm.com>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Message-Id: <5f5a4729-0c90-4f6f-b97e-cab9d0289dc2@fygo.io>
-X-Lms-Return-Path: <lba+26a3f4e05+9f07f3+vger.kernel.org+yukuai@fygo.io>
-From: "yu kuai" <yukuai@fygo.io>
-Date: Sat, 27 Jun 2026 12:13:52 +0800
-User-Agent: Mozilla Thunderbird
 
-Hi,
-
-=E5=9C=A8 2026/6/26 14:12, Nilay Shroff =E5=86=99=E9=81=93:
-> On 6/26/26 7:22 AM, yu kuai wrote:
->> Hi,
->>
->> =E5=9C=A8 2026/6/26 9:50, yu kuai =E5=86=99=E9=81=93:
->>> Hi,
->>>
->>> =E5=9C=A8 2026/6/25 23:08, Nilay Shroff =E5=86=99=E9=81=93:
->>>> On 6/24/26 12:16 PM, Yu Kuai wrote:
->>>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->>>>> index 7baccfb690fe..f7e788a7fe95 100644
->>>>> --- a/block/blk-cgroup.c
->>>>> +++ b/block/blk-cgroup.c
->>>>> @@ -1563,10 +1563,12 @@ int blkcg_activate_policy(struct gendisk
->>>>> *disk, const struct blkcg_policy *pol)
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (WARN_ON_ONCE(!pol->pd_alloc=
-_fn || !pol->pd_free_fn))
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return =
--EINVAL;
->>>>> =C2=A0 =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (queue_is_mq(q))
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memflag=
-s =3D blk_mq_freeze_queue(q);
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 mutex_lock(&q->blkcg_mutex);
->>>>> =C2=A0 =C2=A0 retry:
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spin_lock_irq(&q->queue_lock);
->>>>> =C2=A0 =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* blkg_list is pushed a=
-t the head, reverse walk to
->>>>> initialize parents first */
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 list_for_each_entry_reverse(blk=
-g, &q->blkg_list, q_node) {
->>>>> @@ -1625,10 +1627,11 @@ int blkcg_activate_policy(struct gendisk
->>>>> *disk, const struct blkcg_policy *pol)
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __set_bit(pol->plid, q->blkcg_p=
-ols);
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D 0;
->>>>> =C2=A0 =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spin_unlock_irq(&q->queu=
-e_lock);
->>>>> =C2=A0 =C2=A0 out:
->>>>> +=C2=A0=C2=A0=C2=A0 mutex_unlock(&q->blkcg_mutex);
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (queue_is_mq(q))
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_mq_=
-unfreeze_queue(q, memflags);
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pinned_blkg)
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blkg_pu=
-t(pinned_blkg);
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pd_prealloc)
->>>> If the policy allocation fails, we jump to the lable enomem: and
->>>> teardown pds.
->>>> But I see this path still only acquires ->queue_lock. Don't we also=20
->>>> need
->>>> to protect it with ->blkcg_mutex?
->>> Yes, I agree we should protect it as well.
->>
->> Just take a closer look at the code, the enomem is already protected by
->> blkcg_mutex :)
->>
+On Sat, Jun 27, 2026 at 4:50=E2=80=AFAM Philippe De Muyter <phdm@macqel.be>=
+ wrote:
 >
-> Oh yes, but the ->blkcg_mutex is never released if we jump to enomem.
-> So that may potentially cause deadlock. We need to release ->blkcg_mutex
-> once blkcg_policy_teardown_pds() returns. Or may be refactor code (or add
-> comment) so that it's easy to realize or spot the ->blkcg_mutex is=20
-> acquired
-> and then released around blkcg_policy_teardown_pds().
-
-the enomem will goto out at last, and blkcg_mutex do released. The code is
-a bit hacky.
-
+> Hello Ren Wei,
 >
->>>
->>>> Moreover I still see race between blkg insertion in blkg_create()=20
->>>> which
->>>> still doesn't use ->blkcg_mutex and so list traversal in
->>>> bfq_end_wr_async()
->>>> may still race with blkg_create(), isn't it? I remember you once told
->>>> this will be handled in another series but I couldn't find that yet.
->>> This is the set:
->>>
->>> [PATCH 0/8] blk-cgroup: remove queue_lock nesting from blkcg paths - Yu
->>> Kuai <https://lore.kernel.org/all/cover.1780621988.git.yukuai@fygo.io/>
->>>
->>> Noted that set just make sure queue_lock is not nested under other=20
->>> atomic
->>> context, and that set do not acquire blkcg_mutex for blkg_create()=20
->>> yet. Howerver,
->>> with that set it'll be easy to convert all queue_lock to blkcg_mtuex=20
->>> for blkg
->>> protection, and together with lots of blk-cgroup code cleanups.
->>>
+> On Fri, Jun 26, 2026 at 03:21:22PM +0800, Ren Wei wrote:
+> > From: Zhiling Zou <roxy520tt@gmail.com>
+> >
+> > AIX logical volume names are stored on disk as fixed-size fields.
+> > The partition parser reads them into struct lvname, but later formats
+> > the fields with %s. If an on-disk name is not NUL-terminated, the strin=
+g
+> > formatting code can keep reading past the end of the 64-byte name field=
+.
+> >
+> > Limit the formatted string length to the size of the on-disk name field
+> > when printing AIX logical volume names.
+> >
+> > Fixes: 6ceea22bbbc8 ("partitions: add aix lvm partition support files")
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Yuan Tan <yuantan098@gmail.com>
+> > Reported-by: Xin Liu <bird@lzu.edu.cn>
+> > Assisted-by: Codex:gpt-5.4
+> > Signed-off-by: Zhiling Zou <roxy520tt@gmail.com>
+> > Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> > ---
+> >  block/partitions/aix.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/block/partitions/aix.c b/block/partitions/aix.c
+> > index f3c4174e003e..de19c19c85b2 100644
+> > --- a/block/partitions/aix.c
+> > +++ b/block/partitions/aix.c
+> > @@ -261,7 +261,8 @@ int aix_partition(struct parsed_partitions *state)
+> >                               put_partition(state, lv_ix + 1,
+> >                                 (i + 1 - lp_ix) * pp_blocks_size + psn_=
+part1,
+> >                                 lvip[lv_ix].pps_per_lv * pp_blocks_size=
+);
+> > -                             seq_buf_printf(&state->pp_buf, " <%s>\n",
+> > +                             seq_buf_printf(&state->pp_buf, " <%.*s>\n=
+",
+> > +                                            (int)sizeof(n[lv_ix].name)=
+,
+> >                                              n[lv_ix].name);
+> >                               lvip[lv_ix].lv_is_contiguous =3D 1;
+> >                               ret =3D 1;
+> > @@ -273,7 +274,8 @@ int aix_partition(struct parsed_partitions *state)
+> >                       if (lvip[i].pps_found && !lvip[i].lv_is_contiguou=
+s) {
+> >                               char tmp[sizeof(n[i].name) + 1]; // null =
+char
+> >
+> > -                             snprintf(tmp, sizeof(tmp), "%s", n[i].nam=
+e);
+> > +                             snprintf(tmp, sizeof(tmp), "%.*s",
+> > +                                      (int)sizeof(n[i].name), n[i].nam=
+e);
 >
-> Okay, so are you planning to send a follow-up patchset that replaces=20
-> ->queue_lock
-> with ->blkcg_mutex for protecting the blkg_list? If so, I'd still=20
-> prefer acquiring
-> ->blkcg_mutex around blkg_create() in this patchset. That would=20
-> address the race
-> between blkg_create() and the blkg_list traversal in=20
-> bfq_end_wr_async(), while the
-> subsequent series can focus on cleaning up and removing the remaining=20
-> ->queue_lock
-> usage for blkg protection.
+> Is this change necessary ? snprintf always adds a NULL terminator and
+> truncates the input if needed, isn't it ?
+>
 
-Yes, there is a follow-up patchset. When this set was posted, blkg_create i=
-s still
-called with queue_lock held, so I can't do that. However, not that the othe=
-r set
-is already applied, I can hold blkcg_mutex for blkg_create() now.
+Yes, snprintf() guarantees that the destination buffer is
+NUL-terminated and truncates the output.
 
+However, with %s and no precision, snprintf() still treats n[i].name as
+a NUL-terminated source string. If the on-disk fixed-size name field is
+not NUL-terminated, snprintf() can keep reading past the end of
+n[i].name while looking for the terminator, before truncating the output
+into tmp.
+
+So the issue is not an overflow of tmp, but an out-of-bounds read from
+the fixed-width source field. The precision is needed to bound that
+source read to sizeof(n[i].name).
+
+> >                               pr_warn("partition %s (%u pp's found) is =
+"
+> >                                       "not contiguous\n",
+> >                                       tmp, lvip[i].pps_found);
+> > --
+> > 2.43.0
 >
-> Thanks,
-> --Nilay
+> Best Regards
 >
---=20
-Thanks,
-Kuai
+> Philippe De Muyter
