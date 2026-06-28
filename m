@@ -1,126 +1,403 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DD738D
-	for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 23:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248AD4315F;
+	Sun, 28 Jun 2026 03:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782602952; cv=none; b=l77PnDIhEifXLSKHfS+s6FunBoZ4C3olQRaS53WBdXURiKyXE/5iYb9saUu/le8HhBYiyoJzlHvQf3HZhiOP9OmiAY6PF14Y2Z66lXRZqONolsHhsy6EWDIoFUP5pQaowN1q9Wp3liSrGr0GN0T6u4iiUY8HTe1KKF43mKViob0=
+	t=1782616037; cv=none; b=InqEo5mzzUUapt0o1DsijPaxEZyaSPeeIfpgbu0YPSjd/5tbAVeyzzsGv4KTrnzqxrNEPduh1+/x8X8IoPsOTcwXal2DizcFUZp0q0I264eIw5iQZyLnIDDDTAsoSgN4epUPSrICNR7t3LxNx2NS1ta7BvZb8VUsmRfHn0Wsfss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782602952; c=relaxed/simple;
-	bh=qZH/vLziPpGFkaHRQVYGhPXdoiOMCfjDzJOMJvF/wyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qI8239cS5Aqsw2jpuatg1GJItes5JTxmfgnb5f4SbByNi1ncKEr3jcWZpG8PpvxYwKzbf03M8KJCnQaVDayAPMaSnVU3f+c6FKy0IfKQNqiDHl/0pRL6TcNkydoO3OCqupTAkOH7Ik8F6dujeVKeT0UF5wo1ugpgqxRHXe5jtAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=VBZv59so; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1782616037; c=relaxed/simple;
+	bh=Yo4L18fh7VvlYUxkirlUx93t9UYHughwTkMPL5DLwqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iRNyH7P8x+bfboC2xBa4ClwUZntA4bZ3fMceeQOTu+ztX3z/iki26cHZHAWCWvyshjCybwQFujxmQTT+Hx2mb6orHVOComFfUho+8QqNWkpUk70D1ewsYOlH/YZMrBD1EMSHaaWTVFaoG7PT2k3YD4ykpypqqL8Jj8SQtzvCK+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lu0VtDr5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="VBZv59so"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e9565cc13aso681654a34.3
-        for <linux-block@vger.kernel.org>; Sat, 27 Jun 2026 16:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1782602949; x=1783207749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bTFP5CSo5QZCJqZ+KzYyZeTm5wMD2RDlL7lOuaGwi3A=;
-        b=VBZv59soxFApnihf6l5a4ki4deMTOmFZS8p10H0++KEoTdYukYJD0zKI8rR/9ub2qv
-         +qNbSkMWaQUiYJbi/96O6PQWQqCxn2Ecmm52zS+WAnnhsQB6JgrfHHVlxkebV2FYynVd
-         jAd5xwnzLqblaoi2ckNqeyb3bLDFjU0j7VZDkzjCkkMqJe/i2GBtrWD+nAtC+013EyUg
-         y/5unb95vzMJsL6QXcFW8MTs2UaMAkiQ9rgrPfMYm+9SEGAna+mhVVBpu+6U8QSOzXCs
-         hku90PYv1TKg/uzzjY/CCLB8S3KwvzqXoJyUVWEDNjeHXZCfyL0WsmwRy3uADySwKF7J
-         GR2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782602949; x=1783207749;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bTFP5CSo5QZCJqZ+KzYyZeTm5wMD2RDlL7lOuaGwi3A=;
-        b=mP3ACUBr9qHHBXz4v5cd9/N3IxGcUS99Wt0bI6EgOBe6CcsP4FR5Pt5lpY5eIpJIH1
-         /4NF4BLBaqve3I+zt46K2gKa+yXeGzWRKjmVxFZ3R3dswAAjLJFevBWJU3d/SxJcvmZ4
-         AI8WekWLldIqRqzTdMXx3dTOkjj7gl6pQTecSHCDPeEq7W05WgWQasBWaLcyln87nhXF
-         2amFZur8Zk8c0VjTbY/lGQ37adHvr5SLeGcTX1ksFX+bzS7WipCIO1OujWP/v1RYmlOo
-         sTvVQlGSi/Q/r+djgfFyouFbETkt2dBTZjsBdhdVOF1qrWs/4AbrZLJis7PdX03Nkhd1
-         AAGg==
-X-Gm-Message-State: AOJu0YwyD3tYPp7IvRnd/Gosc8ulB7seHGOM65mSecnUFmz3LYAOO/7k
-	QP9wzB43kqmf6h7e+h7OKh7oxE0x1zxtFLNdRmTJZNYB4Qp6ig9vSdjAMm5RbFZDLJJ6YePOM8T
-	3rS4Ih/U=
-X-Gm-Gg: AfdE7cnVelACjsMIfLk4NmOAZXypAmfX+0YxxRHCwrCszp+wpzZrWhfxvyrK281txQX
-	ObVCogHU8F0FKB9cj9kAYzcc22mKKRqCVLLavaGBrIV6oXvXPLJ0Cxm2AuH0pp/XVu2+rGN1fJi
-	qrCf7FVaiHRnzQW3OqCgFJSV3cU3wstzMyj0FLeer8bJYXK/KT7craSmPyKuBkAb+uuV0WJ9NAQ
-	DwmIM8PhRS3nVygFXAfkYbG3ZeR5LFmKD4tm48+VMuGgzX0wkz8+8Q7V6GWSgCxYIt1gDbs4Il1
-	kQmj3f8vRSknAE7j94UHBDB7TghTAJmJ1hpvuWbqbyZAjwuRYKxpcmtjl1l4LFEm2mc9Nce/pIT
-	hhMIUsgR05q2HWYOq9KXU9RS3PsMoNSm468/XIZmLu8Z4VoW9wqPKyqOZ+r3r+p8uIKc5+bJSqC
-	zIB/042tsslb/TtqSVXDjo6x2Aj7gxmMOUgReJN7SB0hbtd/WyyvFvTVEhwnudT1OAV9SxGmI=
-X-Received: by 2002:a05:6830:81d7:b0:7e9:b4cf:683c with SMTP id 46e09a7af769-7e9b4cf6a9fmr4341287a34.28.1782602949587;
-        Sat, 27 Jun 2026 16:29:09 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e9c48735f9sm1770198a34.2.2026.06.27.16.29.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jun 2026 16:29:08 -0700 (PDT)
-Message-ID: <8069f6ab-f732-4a57-94b0-881eab59d9e5@kernel.dk>
-Date: Sat, 27 Jun 2026 17:29:06 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lu0VtDr5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 806041F000E9;
+	Sun, 28 Jun 2026 03:07:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782616035;
+	bh=vmkXcgYl+w/R1qnunR6PXyn5dCrixKgKvmxDaG58d0g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Lu0VtDr5h7i8BPVcYGWggTsEN1HWGUyBHpvQ+ivLYx+dwKxxVv5xx7QXxzB57eGKA
+	 tO1DM6iQgNP1tPmAKEpwHtFMU3gtm+J0aiKZ3UeuHb42TPYr/ovLH/J2Ky23SD2BEt
+	 Tfp+B7BWIfCZ1O8HuHB4/TNeCOSm5cErCo4mpcA9Ai7f4l52BGc11+mbvmL56cg+Qx
+	 Ez/bZOyo0/uh8Fgd4oVjho1IWhDtQLJxC7CVJfQhQRWOP9VXl9qjsdBvYdQfqsA7vU
+	 I0yU1daXd/kTOPks4tPmOmVRVq2h2LFqXyl549ZBSDLnNx4ME0H7Am1UDYvRQOg1NV
+	 L5nBys3SveKpw==
+Date: Sat, 27 Jun 2026 22:07:05 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: george.moussalem@outlook.com
+Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
+Subject: Re: [PATCH 2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
+Message-ID: <akCOYIIhyl738PC6@baldur>
+References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
+ <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: fix error injection static_branch dec imbalance
-To: dayou5941@163.com
-Cc: linux-block@vger.kernel.org, liyouhong <liyouhong@kylinos.cn>
-References: <20260627023749.1048910-1-dayou5941@163.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260627023749.1048910-1-dayou5941@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
 
-On 6/26/26 8:37 PM, dayou5941@163.com wrote:
-> From: liyouhong <liyouhong@kylinos.cn>
+On Thu, Jun 25, 2026 at 06:10:06PM +0400, George Moussalem via B4 Relay wrote:
+> From: George Moussalem <george.moussalem@outlook.com>
 > 
-> error_inject_add() only increments blk_error_injection_enabled when
-> adding the first rule to a given disk, but error_inject_removeall()
-> always decrements the static key.  blk_error_injection_exit() is
-> invoked from blk_unregister_queue() for every gendisk teardown, including
-> disks that never configured any injection rules.
+> Add support to bring up the M0 core of the bluetooth subsystem found in
+> the IPQ5018 SoC.
 > 
-> Removing an unrelated block device therefore decrements the global
-> static key without a matching increment, which can silently disable
-> error injection on disks that still have rules in their
-> error_injection_list.  Repeated teardown of unconfigured disks can
-> further trigger a static_key underflow WARN in jump_label.c.
+> The signed firmware loaded is authenticated by TrustZone. If successful,
+> the M0 core boots the firmware and the peripheral is taken out of reset
+> using a Secure Channel Manager call to TrustZone.
 > 
-> Only decrement the static key when removing a disk that actually had
-> entries, mirroring the list_empty() guard in error_inject_add().
 
-This was already fixed in Linus's tree by the time you sent this out.
-One more note below...
+The remoteproc framework deals with life cycle management of
+coprocessors, but you don't want that - you want the BT driver to own
+the life cycle.
 
-> diff --git a/block/error-injection.c b/block/error-injection.c
-> index d24c90e9a25f..d210bd5fd8fb 100644
-> --- a/block/error-injection.c
-> +++ b/block/error-injection.c
-> @@ -118,15 +118,24 @@ static int error_inject_add(struct gendisk *disk, enum req_op op,
->  static void error_inject_removeall(struct gendisk *disk)
->  {
->  	struct blk_error_inject *inj;
-> +	bool had_entries;
+Further, the fact that you split this in "BT" and "remoteproc", results
+in you having two representations in DeviceTree and in the device model
+for the same hardware.
+
+I know we have examples of this in the kernel already, but they are all
+racy...
+
+Please see if you can embed the firmware loading, authentication and
+PAS calls directly into the BT driver - to have a single entity managing
+the life cycle of your M0 processor.
+
+Regards,
+Bjorn
+
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
+>  drivers/remoteproc/Kconfig            |  12 ++
+>  drivers/remoteproc/Makefile           |   1 +
+>  drivers/remoteproc/qcom_m0_btss_pil.c | 261 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 274 insertions(+)
+> 
+> diff --git a/drivers/remoteproc/Kconfig b/drivers/remoteproc/Kconfig
+> index c521c744e7db..6b52f78f1427 100644
+> --- a/drivers/remoteproc/Kconfig
+> +++ b/drivers/remoteproc/Kconfig
+> @@ -163,6 +163,18 @@ config PRU_REMOTEPROC
+>  	  processors on various TI SoCs. It's safe to say N here if you're
+>  	  not interested in the PRU or if you are unsure.
 >  
->  	mutex_lock(&disk->error_injection_lock);
-> +	had_entries = !list_empty(&disk->error_injection_list);
-
-I'm 99% sure this is LLM generated, they seemingly love to use bool
-variables like this, where humans rarely do. If this is the case, add
-the appropriate annotations as per our documentation.
-
-commit 214cdae69dba9bb1fc0b517b7fb97bab385a2e3a
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Mon Jun 22 18:07:52 2026 +0200
-
-    block: fix incorrect error injection static key decrement
-
--- 
-Jens Axboe
+> +config QCOM_M0_BTSS_PIL
+> +	tristate "Qualcomm M0 BTSS Peripheral Image Loader"
+> +	depends on OF && ARCH_QCOM
+> +	select QCOM_MDT_LOADER
+> +	select QCOM_RPROC_COMMON
+> +	select QCOM_SCM
+> +	help
+> +	  Say y here to support the Secure Peripheral Imager Loader for the
+> +	  Qualcomm Bluetooth Subsystem running on the M0 remote processor found
+> +	  in the IPQ5018 SoC. The M0 core is started and stopped using a
+> +	  Secure Channel Manager call to TrustZone.
+> +
+>  config QCOM_PIL_INFO
+>  	tristate
+>  
+> diff --git a/drivers/remoteproc/Makefile b/drivers/remoteproc/Makefile
+> index 1c7598b8475d..df80faf8d0df 100644
+> --- a/drivers/remoteproc/Makefile
+> +++ b/drivers/remoteproc/Makefile
+> @@ -21,6 +21,7 @@ obj-$(CONFIG_DA8XX_REMOTEPROC)		+= da8xx_remoteproc.o
+>  obj-$(CONFIG_KEYSTONE_REMOTEPROC)	+= keystone_remoteproc.o
+>  obj-$(CONFIG_MESON_MX_AO_ARC_REMOTEPROC)+= meson_mx_ao_arc.o
+>  obj-$(CONFIG_PRU_REMOTEPROC)		+= pru_rproc.o
+> +obj-$(CONFIG_QCOM_M0_BTSS_PIL)		+= qcom_m0_btss_pil.o
+>  obj-$(CONFIG_QCOM_PIL_INFO)		+= qcom_pil_info.o
+>  obj-$(CONFIG_QCOM_RPROC_COMMON)		+= qcom_common.o
+>  obj-$(CONFIG_QCOM_Q6V5_COMMON)		+= qcom_q6v5.o
+> diff --git a/drivers/remoteproc/qcom_m0_btss_pil.c b/drivers/remoteproc/qcom_m0_btss_pil.c
+> new file mode 100644
+> index 000000000000..7168e270e4d4
+> --- /dev/null
+> +++ b/drivers/remoteproc/qcom_m0_btss_pil.c
+> @@ -0,0 +1,261 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2026 The Linux Foundation. All rights reserved.
+> + */
+> +
+> +#include <linux/clk.h>
+> +#include <linux/delay.h>
+> +#include <linux/elf.h>
+> +#include <linux/firmware/qcom/qcom_scm.h>
+> +#include <linux/io.h>
+> +#include <linux/kernel.h>
+> +#include <linux/of_reserved_mem.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/reset.h>
+> +#include <linux/soc/qcom/mdt_loader.h>
+> +
+> +#include "qcom_common.h"
+> +
+> +#define BTSS_PAS_ID	0xc
+> +
+> +struct m0_btss {
+> +	struct device *dev;
+> +	phys_addr_t mem_phys;
+> +	phys_addr_t mem_reloc;
+> +	void __iomem *mem_region;
+> +	size_t mem_size;
+> +	struct reset_control *btss_reset;
+> +};
+> +
+> +static int m0_btss_start(struct rproc *rproc)
+> +{
+> +	int ret;
+> +
+> +	if (!qcom_scm_pas_supported(BTSS_PAS_ID)) {
+> +		dev_err(rproc->dev.parent,
+> +			"PAS is not available for peripheral: 0x%x\n",
+> +			BTSS_PAS_ID);
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret = qcom_scm_pas_auth_and_reset(BTSS_PAS_ID);
+> +	if (ret) {
+> +		dev_err(rproc->dev.parent, "Failed to start rproc: %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int m0_btss_stop(struct rproc *rproc)
+> +{
+> +	int ret;
+> +
+> +	if (rproc->state == RPROC_RUNNING || rproc->state == RPROC_CRASHED) {
+> +		ret = qcom_scm_pas_shutdown(BTSS_PAS_ID);
+> +		if (ret) {
+> +			dev_err(rproc->dev.parent, "Failed to stop rproc: %d\n",
+> +				ret);
+> +			return ret;
+> +		}
+> +
+> +		dev_info(rproc->dev.parent, "Successfully stopped rproc\n");
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int m0_btss_load(struct rproc *rproc, const struct firmware *fw)
+> +{
+> +	struct m0_btss *desc = rproc->priv;
+> +	const struct elf32_phdr *phdrs;
+> +	const struct firmware *seg_fw;
+> +	const struct elf32_phdr *phdr;
+> +	const struct elf32_hdr *ehdr;
+> +	void __iomem *metadata;
+> +	size_t metadata_size;
+> +	int i, ret;
+> +
+> +	ehdr = (const struct elf32_hdr *)fw->data;
+> +	phdrs = (const struct elf32_phdr *)(ehdr + 1);
+> +
+> +	ret = request_firmware(&fw, rproc->firmware, rproc->dev.parent);
+> +	if (ret) {
+> +		dev_err(rproc->dev.parent, "Failed to request firmware: %d\n",
+> +			ret);
+> +		return ret;
+> +	}
+> +
+> +	metadata = qcom_mdt_read_metadata(fw, &metadata_size, rproc->firmware,
+> +					  rproc->dev.parent);
+> +	if (IS_ERR(metadata)) {
+> +		ret = PTR_ERR(metadata);
+> +		dev_err(rproc->dev.parent,
+> +			"Failed to read firmware metadata: %d\n", ret);
+> +		goto release_fw;
+> +	}
+> +
+> +	ret = qcom_scm_pas_init_image(BTSS_PAS_ID, metadata,
+> +				      metadata_size, NULL);
+> +	if (ret) {
+> +		dev_err(rproc->dev.parent, "PAS init image failed: %d\n", ret);
+> +		goto free_metadata;
+> +	}
+> +
+> +	for (i = 0; i < ehdr->e_phnum; i++) {
+> +		char *seg_name __free(kfree) = kstrdup(rproc->firmware,
+> +						       GFP_KERNEL);
+> +		if (!seg_name)
+> +			return -ENOMEM;
+> +
+> +		phdr = &phdrs[i];
+> +
+> +		/* Only process valid loadable data segments */
+> +		if (phdr->p_type != PT_LOAD || !phdr->p_memsz)
+> +			continue;
+> +
+> +		if (phdr->p_vaddr + phdr->p_filesz > desc->mem_size) {
+> +			dev_err(rproc->dev.parent,
+> +				"Segment data exceeds the reserved memory area!\n");
+> +			goto free_metadata;
+> +		}
+> +
+> +		/* Check if firmware is split across multiple segment files */
+> +		if (phdr->p_offset > fw->size ||
+> +		    phdr->p_offset + phdr->p_filesz > fw->size) {
+> +			sprintf(seg_name + strlen(seg_name) - 3, "b%02d", i);
+> +			ret = request_firmware(&seg_fw, seg_name,
+> +					       rproc->dev.parent);
+> +			if (ret) {
+> +				dev_err(rproc->dev.parent,
+> +					"Could not find split segment binary: %s\n",
+> +					seg_name);
+> +				goto free_metadata;
+> +			}
+> +
+> +			/*
+> +			 * Use the virtual instead of the physical address as
+> +			 * the offset
+> +			 */
+> +			memcpy_toio(desc->mem_region + phdr->p_vaddr,
+> +				    seg_fw->data, phdr->p_filesz);
+> +
+> +			release_firmware(seg_fw);
+> +		} else {
+> +			memcpy_toio(desc->mem_region + phdr->p_vaddr,
+> +				    fw->data + phdr->p_offset, phdr->p_filesz);
+> +		}
+> +	}
+> +
+> +	return 0;
+> +
+> +free_metadata:
+> +	kfree(metadata);
+> +release_fw:
+> +	release_firmware(fw);
+> +	return ret;
+> +}
+> +
+> +static const struct rproc_ops m0_btss_ops = {
+> +	.start = m0_btss_start,
+> +	.stop = m0_btss_stop,
+> +	.load = m0_btss_load,
+> +	.get_boot_addr = rproc_elf_get_boot_addr,
+> +};
+> +
+> +static int m0_btss_alloc_memory_region(struct m0_btss *desc)
+> +{
+> +	struct device *dev = desc->dev;
+> +	struct resource res;
+> +	int ret;
+> +
+> +	ret = of_reserved_mem_region_to_resource(dev->of_node, 0, &res);
+> +	if (ret) {
+> +		dev_err(dev, "unable to acquire memory-region resource\n");
+> +		return ret;
+> +	}
+> +
+> +	desc->mem_phys = res.start;
+> +	desc->mem_reloc = res.start;
+> +	desc->mem_size = resource_size(&res);
+> +	desc->mem_region = devm_ioremap(dev, desc->mem_phys, desc->mem_size);
+> +	if (!desc->mem_region) {
+> +		dev_err(dev, "unable to map memory region: %pR\n", &res);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int m0_btss_pil_probe(struct platform_device *pdev)
+> +{
+> +	// struct reset_control *btss_reset;
+> +	struct device *dev = &pdev->dev;
+> +	const char *fw_name = NULL;
+> +	struct m0_btss *desc;
+> +	struct clk *lpo_clk;
+> +	struct rproc *rproc;
+> +	int ret;
+> +
+> +	ret = of_property_read_string(dev->of_node, "firmware-name",
+> +				      &fw_name);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	rproc = devm_rproc_alloc(dev, "m0btss", &m0_btss_ops,
+> +				 fw_name, sizeof(*desc));
+> +	if (!rproc) {
+> +		dev_err(dev, "failed to allocate rproc\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	desc = rproc->priv;
+> +	desc->dev = dev;
+> +
+> +	ret = m0_btss_alloc_memory_region(desc);
+> +	if (ret)
+> +		return ret;
+> +
+> +	lpo_clk = devm_clk_get_enabled(dev, "btss_lpo_clk");
+> +	if (IS_ERR(lpo_clk))
+> +		return dev_err_probe(dev, PTR_ERR(lpo_clk),
+> +				     "Failed to get lpo clock\n");
+> +
+> +	desc->btss_reset = devm_reset_control_get(dev, "btss_reset");
+> +	if (IS_ERR_OR_NULL(desc->btss_reset))
+> +		return dev_err_probe(dev, PTR_ERR(desc->btss_reset),
+> +				     "unable to acquire btss_reset\n");
+> +
+> +	ret = reset_control_deassert(desc->btss_reset);
+> +	if (ret)
+> +		return dev_err_probe(rproc->dev.parent, ret,
+> +				     "Failed to deassert reset\n");
+> +
+> +	rproc->auto_boot = false;
+> +	ret = devm_rproc_add(dev, rproc);
+> +	if (ret)
+> +		return ret;
+> +
+> +	platform_set_drvdata(pdev, rproc);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct of_device_id m0_btss_of_match[] = {
+> +	{ .compatible = "qcom,ipq5018-btss-pil" },
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(of, m0_btss_of_match);
+> +
+> +static struct platform_driver m0_btss_pil_driver = {
+> +	.probe = m0_btss_pil_probe,
+> +	.driver = {
+> +		.name = "qcom-m0-btss-pil",
+> +		.of_match_table = m0_btss_of_match,
+> +	},
+> +};
+> +
+> +module_platform_driver(m0_btss_pil_driver);
+> +
+> +MODULE_DESCRIPTION("Qualcomm M0 Bluetooth Subsystem Peripheral Image Loader");
+> +MODULE_LICENSE("GPL");
+> 
+> -- 
+> 2.53.0
+> 
+> 
