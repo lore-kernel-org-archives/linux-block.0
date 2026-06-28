@@ -1,103 +1,146 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11021096.outbound.protection.outlook.com [40.107.130.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A87934404F
-	for <linux-block@vger.kernel.org>; Sun, 28 Jun 2026 12:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782651567; cv=none; b=UwNeOic3gtMrJVsnghGjHdZpQlFj5EosvB8mfczyYLUvcn6jx8CX3jby0RCJhtTbPeMUqqBmq+xdo2Pylfi9VonfRIIfHPzA4HBmYZGeP0oEK3rJx2wSRUOQFanwBHCOK2ii6rd3j7d0QcQ7+6JtVZN/CY6wFaOpRFSLW5TtL0M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782651567; c=relaxed/simple;
-	bh=Y4BnfNiT1we4bt1zWbjoZAkgncDWAqCsT4UhVeCZyjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fhxw7QWQ5gNtLWOyZgV/CxrwCVBqxse34PNllH75gSjGt2oiHasH+dnYcGhkp+z1g17sbCfo2kHkOBpKLE4eoodLpuL9GOrdPMmulMMwEI+hZwVQtdfMRJ3fg4x0lnA1mQziI0tDByTIlX/9ecxWnqn32A7Qg1X8naZ7PVmtTsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JEixEAoC; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D072AD03
+	for <linux-block@vger.kernel.org>; Sun, 28 Jun 2026 16:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.96
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782664825; cv=fail; b=ILZZkhHmjMV7cIiudrlEXkhk55jeeEMQqkbGuCdJvLmWR85jRB9uHlq1LiIEJuVKhoWNayqDR93J361hc+2V68DopVv6621M04W0boz24bp342RXINkeRUD6OUqrP4Xue/5lMkhEltCUv+KESzEjKIx5SIauuVjHQpnFx9v3a70=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782664825; c=relaxed/simple;
+	bh=vnNDWhfZ4WuQ1VZb0ymDoYsex/qRylOP8U8NYrolaHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tskdg8FQOk8scLss+SSfWTrI7YgXia+5uP3+h5jXSvlq+EJdSEt9zV8GFTm7IC9PH4NdQcKa+wU6RnY0hH7bGzjeD5ZbUhgZT5usFAbK3S7UIn/ChTNcN1Ezegj1t524tGhMrm+fQdfoaTw1IZm/J5w2N8SYamtR1GGp+jkwBqo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=macqel.be; spf=pass smtp.mailfrom=macq.eu; dkim=pass (1024-bit key) header.d=macq.onmicrosoft.com header.i=@macq.onmicrosoft.com header.b=YeA+2jQM; arc=fail smtp.client-ip=40.107.130.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=macqel.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=macq.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JEixEAoC"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-46ee68c3b7aso2024084f8f.3
-        for <linux-block@vger.kernel.org>; Sun, 28 Jun 2026 05:59:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782651565; x=1783256365; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=m3xuQGI0YA2MOv6aDh1dGyM6NDCzSIEOXdNl1rcjYmQ=;
-        b=JEixEAoC/rub/eNMeszkA4Y2LWBhUKfnvM6OoBYn0WCDz2vBPjnNEOXivsTn8qbrMM
-         jVdWwANM3x/ll6IX5+xu1BRVcwkvx0go3+KoKj2zmftPievzuK3eU5ijeKtpCuwLPXIy
-         9318Dl+/mcu4J21PDvLYJU2faRvmvzuzR7is1HFlFnRpvMeDHpHE1hECE0LExsNdN63U
-         NpOcxlGVAnwNLrpx3izIxrqui8NghCDug5i1Qpr8kiGo6l9F11T+shzhMn0PQdibwn09
-         J6XwSAdPzbtNWYvaMQ8FjBdoVryimfNPAfMcV/KCmwCsekFvX6XwxjZiOa3enDfgfDoc
-         UWbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782651565; x=1783256365;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m3xuQGI0YA2MOv6aDh1dGyM6NDCzSIEOXdNl1rcjYmQ=;
-        b=G4Rv7YQlydvGJPOidbD5ESoGmSlKooFpC1wCUycYFFzwA4/GX3SyvcEsLk6PXKZ9GD
-         ZeZFSyAQeAscQ2gyUhoyux/DYWjj6UWNKoZ4owkJxvT3k5q+qEopIcPCNGsn7jP4vPvR
-         M7vwP2+KAmd9/2OgCQ+08OCRP6kSETdWaP1xPzFOfNiD9ZzKRqnmvQeMnB7nZA7JpHoT
-         ZKNw1uyPAUCOij2TaSwN+fRyfFZ+9niAg211i5C1VdokABljUyOlNolwdWQJ5wxapptR
-         9A3W74eIOOA5vj6cAlk/BLqkPCTVN8oXOYVSme2nUO+vTYkJ6hFMzVSNSaP2fYFeBz4d
-         bzMQ==
-X-Gm-Message-State: AOJu0Yy0RcTP85cD28ejpsMnOLjPpFqZqDkfGCuoT/juU5mXm4YcZlEj
-	MEoeiMC6R8FBOBCE5lMhImv6vzinxm91fRPG36q8nk8NkkNzxMdzyitkU7/2kw==
-X-Gm-Gg: AfdE7cnO5u2vMRwg7OPAPnDtqSQU/THN6TN3mpd8ptQkLuLq09EXpL7oCe9pPeJDUyO
-	fKtyIpSYMukBmuXDfjH5POAoio4wb8WmdFGu9QIYAMldd5aWKGi1uSHc+Ge8n3KubPFYjOOT6HI
-	Avksa+MZheWVllyJVszMXs6xkcMq9B7D0vZhXXXRlP+O28rSRPiu/sNMo6Hi7GXCTlIxeYcXD3r
-	Noc3VeKv6CiuQvJKmOlT+PSV1U8EeFahnAyhH34+c0B8s2rZjsDX87myOwXyIQHqMjMWrFX06PU
-	5iX2x3bZL8OiB98bHYqgW+PvtiGWR3RBsBIhKBDdlVMuLQMaFraPd8fPQZ7YMjr/lwJBHGODwKf
-	EAoGmlBvT9cS8YEzzAKD9zlxidHoErbmiAAZs/15VaETFC6578LEq91KpkAe+FahA/D2Ric0xzK
-	4TDFsUo+X5IFIek+oSIIxQMTGSonkifaIlEzPdCQE/CsbZvyIZfAUqsuMdpyX27L9zalqm
-X-Received: by 2002:a05:600c:e556:20b0:493:bb0:3b43 with SMTP id 5b1f17b1804b1-4930bb03c0amr48898535e9.2.1782651564866;
-        Sun, 28 Jun 2026 05:59:24 -0700 (PDT)
-Received: from localhost.suse.org ([37.109.163.86])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49269071c9esm229273735e9.9.2026.06.28.05.59.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jun 2026 05:59:24 -0700 (PDT)
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com,
-	Sebastian Chlad <sebastian.chlad@suse.com>
-Subject: [PATCH blktests] src/Makefile: escape '#' in HAVE_C_DEF
-Date: Sun, 28 Jun 2026 14:59:08 +0200
-Message-ID: <20260628125908.31524-1-sebastian.chlad@suse.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (1024-bit key) header.d=macq.onmicrosoft.com header.i=@macq.onmicrosoft.com header.b="YeA+2jQM"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=knXFYzakQqxn4MX855UOfj5d7iN6shAaM5cOUQ+trVeRn2mKNvztwUuKhdGat5X0XkTj5XXTMwe0BsOuvddVILxYcXIcObU50xmymPJCmWPG8aDpycmIbZL0z7y9+0mtn3Ph36U7LRtFEqOo1Djq3OAh8d0RlZC4TSpn8NxCd4sjwsx4QevRnCs4XAjAn4m+OZjChq30Gtv1Ir5IIJwp/tbD/cr9VAKIKekNhN4O9mFyvyFmMLR9EmU37tHhyAfcZN5O83agAqUDGyQrUwxXLgAJ1qSnqpiUKB7KVvCjeHNdlFVWJWgIEx+obaYVPAD32yJgZx+1lCsoJ4uyCF/oYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PPgQy2WIaXu3OhOl7K7MJhzXdi2J4ZZBCq4zjw7ANqM=;
+ b=CCIOPWnSLtD4CO0EmhRrykEn9E6HwNaAjhFjWxyq7GpuH9DDTTKX4K/kRbMD0kdnVbAUHJiZlQ1fs3t4oAg9mWCiq/FvQtAS9dYrxepqhlo1BENg0f6uJjD0X09rWC61C1YkWUPcqLoJPKC09s6sFH8frwyLPXok05C9UDwAbTdX+zw5mOB+CtfxlI9R5uO4EPMvRBKv4wla0KNsCeyrgyf24++Mi6UHxIQod+WxyuVQPQBsiLKB7fJ+bRTEQB42wFe+RhKyk2N46r7yy0sJblxF60WZn3xtqy32z6lHWQ+T/nriEBk5sN9pLM1b9QP8MW4v0wZUd/s0FXQ0vOULMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=softfail (sender ip
+ is 91.183.173.212) smtp.rcpttodomain=gmail.com smtp.mailfrom=macqel.be;
+ dmarc=none action=none header.from=macqel.be; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=macq.onmicrosoft.com;
+ s=selector2-macq-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PPgQy2WIaXu3OhOl7K7MJhzXdi2J4ZZBCq4zjw7ANqM=;
+ b=YeA+2jQM3Bf0YoapUBBmqMyoFixWMoqqFBwEJP+Ao+G6os9tWYQSS1KaqWCwGEB5gs+aKY8FK5+gNRBbyQliRwEvDtAEYX6jljEZKmvJ3vLxY+Av8gHzpZUL5OH2HJLNcqoueE5H5+YdweHrvO1ydpCIs7zMzjX2Eh3CzErRZ5Q=
+Received: from DUZPR01CA0297.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::8) by AS5PR05MB11071.eurprd05.prod.outlook.com
+ (2603:10a6:20b:67f::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Sun, 28 Jun
+ 2026 16:40:16 +0000
+Received: from DB5PEPF00014B88.eurprd02.prod.outlook.com
+ (2603:10a6:10:4b7:cafe::7f) by DUZPR01CA0297.outlook.office365.com
+ (2603:10a6:10:4b7::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.19 via Frontend Transport; Sun,
+ 28 Jun 2026 16:40:16 +0000
+X-MS-Exchange-Authentication-Results: spf=softfail (sender IP is
+ 91.183.173.212) smtp.mailfrom=macqel.be; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=macqel.be;
+Received-SPF: SoftFail (protection.outlook.com: domain of transitioning
+ macqel.be discourages use of 91.183.173.212 as permitted sender)
+Received: from frolo.macqel.be (91.183.173.212) by
+ DB5PEPF00014B88.mail.protection.outlook.com (10.167.8.196) with Microsoft
+ SMTP Server id 15.21.181.6 via Frontend Transport; Sun, 28 Jun 2026 16:40:16
+ +0000
+Received: by frolo.macqel.be (Postfix, from userid 1000)
+	id 4742CDF00C7; Sun, 28 Jun 2026 18:40:16 +0200 (CEST)
+Date: Sun, 28 Jun 2026 18:40:16 +0200
+From: Philippe De Muyter <phdm@macqel.be>
+To: tt roxy <roxy520tt@gmail.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, linux-block@vger.kernel.org,
+	axboe@kernel.dk, kees@kernel.org, hexlabsecurity@proton.me,
+	objecting@objecting.org, akpm@linux-foundation.org,
+	yuantan098@gmail.com, bird@lzu.edu.cn
+Subject: Re: [PATCH 1/1] block: partition: aix: bound LV name formatting
+Message-ID: <20260628164016.GA23966@frolo.corp.macq.eu>
+References: <cover.1782398104.git.roxy520tt@gmail.com> <6f381f63ccfe458e15067fd9b9428884cb8d5f97.1782407859.git.roxy520tt@gmail.com> <20260626090929.GA4627@frolo.corp.macq.eu> <CALMqdkS0arRS5FSsbPBiHAZzU-NeDEBhm01-r5v00GFQN=sx8w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALMqdkS0arRS5FSsbPBiHAZzU-NeDEBhm01-r5v00GFQN=sx8w@mail.gmail.com>
+User-Agent: Mutt/1.5.16 (2007-06-09)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5PEPF00014B88:EE_|AS5PR05MB11071:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2657c2fe-9098-488f-161d-08ded533ef2d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|23010399003|36860700016|82310400026|1800799024|18002099003|22082099003|11063799006|56012099006|3023799007|4143699003|14776008|75936004;
+X-Microsoft-Antispam-Message-Info:
+	YGg9ufX5fK2bhevBhshYLNcO1gGYQYemKyNn8+OycGFoGJqqvkSQ5CGh05sXx2bw3g7xikhG90GYYebfzDAWnP3Iyxb17QZ1PTgjc5EkhEwRSgVhUyIdj1muRchHFCRFSvIPpbwZ6C/+xd6lCk9c3eq2gcaI26r0fzVzO2PQe1MIBuHtMPIstDHi/DLP/HpN137/m5wdCdZ35hYzQHcG1v8bChLVsA8G/0xT/X7/Qo6aVRM0oB72y2vmiNHDkVk2rU+Oxrno2JZKIGSpwhTMlxF7ldqxc9SqO14IhHFe2e078ZkBopV/uCl69DsIq8+9vlxI5pfivnILoMkN5Efokp8gKZSOOfhDpjYcdpnNZ5+9AC1DkK6NHDz2LuVZQ4fYz7uMO9zpZ6p695xngUBsgvIiLxdUM+FO6v1chD26qRgpMbQGFbzZFdSEbGx3jc8U6zNJgj3TU0zqkM5s4VJulauvKBCgoAHjhlwZPCTCYJ38zJ/zup6DWUq0J3IGj8UpJ6cDH1o3p5jF3nlyXlGG6rTRODSwPTg5hT686h7UIJlM/vNNkgzwtRaHz6wNrZ4zVDuUaAxcEnd/iVe8hApG1z5G48137Tbv9rDcu+rIeJs3UflI4ttdI5c4qqjFsQiWTGvqQkgvz/TidIfmBGiVY6aTcLglbygiB5ZB3D4cayiFPFST9qBDFC/q9THiRxBXKZy/jhbiqwbglz4uco2JzY73QO5VYy0bWihYCUb0oSauKpuqu51wghQmFy71Eu06562SeuFT+p6KG7HzDL5Abw==
+X-Forefront-Antispam-Report:
+	CIP:91.183.173.212;CTRY:BE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:frolo.macqel.be;PTR:212.173-183-91.adsl-static.isp.belgacom.be;CAT:NONE;SFS:(13230040)(7416014)(376014)(23010399003)(36860700016)(82310400026)(1800799024)(18002099003)(22082099003)(11063799006)(56012099006)(3023799007)(4143699003)(14776008)(75936004);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	MMUGMqtufrrF77Y728OJSuVmdVMfxIismSS7SEFpaIOZUbYK5Rd2ir+dyC5Iw7W8myB4BMRWMC7VpA4e2R8u4UXJdoyr1m7ml/F4QUfBiaODfX4jx664VxEJreY0AqCFZ6dT5hMQCk4qrSIFKlvgL80r+2z7KjjTgccOpp5fNnZTbz1OPOCOeDdmuQVx9aI2jRd3dDI5kAWanjuhmj/0TdkSe+MmeEY51b3MSmfICTkIxect53malTojdU7dL0K0XYmXsGW+K5yJ9i7onqeWiuWd3L7sroDcQn33aZTzbBxBfbca1NIO83rOIY/cHXNo0r5lSys1LLOFQdncar3oQQklDU6C//rf7CpJoeEPletwvmqmBGIYm/IYd7ZeYrOWgQ9D5ZE1Ps3Ep/YrhNLJ0F8q6ZHqNgEj6KIc06dZ/+VU0hfimlLtc8xELa6OjRfg
+X-OriginatorOrg: macqel.be
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2026 16:40:16.4930
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2657c2fe-9098-488f-161d-08ded533ef2d
+X-MS-Exchange-CrossTenant-Id: 5541087b-384c-4066-992a-42aa5fe171eb
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5541087b-384c-4066-992a-42aa5fe171eb;Ip=[91.183.173.212];Helo=[frolo.macqel.be]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB5PEPF00014B88.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR05MB11071
 
-Older make versions treat '#' as a comment, leaving the shell call
-unterminated. Use $(H) instead.
+Hello tt roxy,
 
-Signed-off-by: Sebastian Chlad <sebastian.chlad@suse.com>
----
+On Sat, Jun 27, 2026 at 12:37:50PM +0800, tt roxy wrote:
+> On Sat, Jun 27, 2026 at 4:50 AM Philippe De Muyter <phdm@macqel.be> wrote:
+> >
+> > Hello Ren Wei,
+> >
+> > On Fri, Jun 26, 2026 at 03:21:22PM +0800, Ren Wei wrote:
+> > > From: Zhiling Zou <roxy520tt@gmail.com>
+> > > @@ -273,7 +274,8 @@ int aix_partition(struct parsed_partitions *state)
+> > >                       if (lvip[i].pps_found && !lvip[i].lv_is_contiguous) {
+> > >                               char tmp[sizeof(n[i].name) + 1]; // null char
+> > >
+> > > -                             snprintf(tmp, sizeof(tmp), "%s", n[i].name);
+> > > +                             snprintf(tmp, sizeof(tmp), "%.*s",
+> > > +                                      (int)sizeof(n[i].name), n[i].name);
+> >
+> > Is this change necessary ? snprintf always adds a NULL terminator and
+> > truncates the input if needed, isn't it ?
+> >
+> 
+> Yes, snprintf() guarantees that the destination buffer is
+> NUL-terminated and truncates the output.
+> 
+> However, with %s and no precision, snprintf() still treats n[i].name as
+> a NUL-terminated source string. If the on-disk fixed-size name field is
+> not NUL-terminated, snprintf() can keep reading past the end of
+> n[i].name while looking for the terminator, before truncating the output
+> into tmp.
+> 
+> So the issue is not an overflow of tmp, but an out-of-bounds read from
+> the fixed-width source field. The precision is needed to bound that
+> source read to sizeof(n[i].name).
+> 
+> > >                               pr_warn("partition %s (%u pp's found) is "
+> > >                                       "not contiguous\n",
+> > >                                       tmp, lvip[i].pps_found);
+> > > --
 
-Reproduces on GNU Make 4.2.1 as:
-`Makefile:11: *** unterminated call to function 'shell': missing ')'.  Stop`
+Actually the 'tmp' buffer is not needed.  Printing directky n[i].name
+with '%.*s' in pr_warn would be enough to fix the problem IMHO.
 
-
- src/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/Makefile b/src/Makefile
-index adfe3ef..d75daf1 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -8,7 +8,7 @@ HAVE_C_MACRO = $(shell if echo "$(H)include <$(1)>" |	\
- 		$(CC) $(CFLAGS) -E - 2>&1 /dev/null | grep $(2) > /dev/null 2>&1; \
- 		then echo 1;else echo 0; fi)
- 
--HAVE_C_DEF = $(shell if echo -e "$(H)include <$(1)>\n#ifdef $(2)\nHAVE_$(2)\n#endif" | \
-+HAVE_C_DEF = $(shell if echo -e "$(H)include <$(1)>\n$(H)ifdef $(2)\nHAVE_$(2)\n$(H)endif" | \
- 		$(CC) $(CFLAGS) -E - 2>&1 /dev/null | grep HAVE_$(2) > /dev/null 2>&1; \
- 		then echo 1;else echo 0; fi)
- 
--- 
-2.51.0
-
+Philippe
