@@ -1,40 +1,40 @@
-Received: from out-21.smtp.spacemail.com (out-21.smtp.spacemail.com [66.29.159.70])
+Received: from out-06.smtp.spacemail.com (out-06.smtp.spacemail.com [66.29.159.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B2637F73C;
-	Mon, 29 Jun 2026 03:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E68237FF62;
+	Mon, 29 Jun 2026 03:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782704705; cv=none; b=D3Z8vWgXvT6KA7ZvxoTLPujpj4zPZVOTCvgs1Ft+t5axmiy4YozgFjwIStLoxoOqrfj70hU6NVpEGv7bRS6pIpRKKAdmFmoF3h8GdgP1HuVp7dOsC4OhDuX4VDnpD1yKuPYA1zoF+tDxZ3pMVXediBzHGu28ycA2QldeZYjzxGA=
+	t=1782704706; cv=none; b=mQ3lB7QM+GBBFEOpqiKxmekZ6YKY3OkMqk9s+7RjRCiIQOnhD9h2UnNSRBinRnlzoYwAGbhLfYDT1/UWhWi/lnBHx5YA8ChXStIP8sSewQtn6HiLsMUd72U090VrlhprOKCeILgj6n5ikt4r0UcYivmtA1mHuj+UZ7nmnsS5Mt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782704705; c=relaxed/simple;
-	bh=cm24XvW/F4GoTflvWfzGJPlAEitmGS5RvymfGbSDfIk=;
+	s=arc-20240116; t=1782704706; c=relaxed/simple;
+	bh=okKxM59CE4/G2xX4raBSlrCkbSnH5+WESqBKuNIdq1M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oUah96jJqfybnO3OV3iWOR0nhVlVF3a2e8AAA52YRiOnkQigR7w5z5NGHphOkHe6FqA3FrnkowwpTDsji03GavEP39iEoQ//X4Lwbhka/JaHThKt8Krh9OK1pkG+KEFv1UGDGc4N1qkCG0UnSKHOg554oKNPj0Dw4EoIX15DdXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=Wn/fpinj; arc=none smtp.client-ip=66.29.159.70
+	 In-Reply-To:To:Cc; b=ZTCGu5f+5WhrdAI0MbCf0UAJ9hr6DLFD7Z/ByJy9D009bQA2PIY9KQ53OMnz0dAnbjojNCk9ASF284mRJHh0dm0Bq0Lkm6xgAVA98Fn+dVxEVko0W/sL1PeZvAR3gy05ky9FhI5b2xAxk3nkoUNdMlvUle6XZiLtjKIpA2kZmIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=mHJDmukg; arc=none smtp.client-ip=66.29.159.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="Wn/fpinj"
+	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="mHJDmukg"
 Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7F3RH8z8sbD;
-	Mon, 29 Jun 2026 03:38:33 +0000 (UTC)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX78520mz8sbh;
+	Mon, 29 Jun 2026 03:38:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1782704315;
-	bh=+xTdES5iivUlujAb8S85lcbvOQK1iknw8m7NM0ttyH8=;
+	s=spacemail; t=1782704311;
+	bh=vyHdIyQGWD9zJBic852muetfsygYSW+BCtH1XnAbMTU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Wn/fpinj+vbdRtvql+K6l/cdD/IQuxl+e8wa5bMUwtZjuwKBolSQ7MPAy/E7r34Vm
-	 JlNz056v097vPX0LzLgdqw2ChkZM2e+fJk8P/tSAAd2maOeMGg8lIAZF85c2zvHBDu
-	 VvjXDXzHnPpQjWCS+ByzEU1aJQsXP4SMkbdEEHVqG1BkAeoV2x9WC0P0K0Z+MjYOjS
-	 au8gLtLRrapdakIsP6VjyV1XxDwH+fWg+f5WXQGK+fiJCCeuiHfvVAww/GogX62e5/
-	 gE9EB44qcxIf7szuf9P8Mfi3D550P367GBwwZjyXTtADMoUywMT2GZh/cupjmsZoPi
-	 3qRa8ft7LLoJA==
+	b=mHJDmukg/yuC/3MQOVMDJETsHa4Wvh88erkOpCvPts0Huj9qZLrHgY8vpF6ioEYaA
+	 aIFgHzyDg2unc9n8WqLPZ3pwh1ZsI6RTEYsFnJL2/pRRldQnQW0q6Hd7RiGMtPUzig
+	 bLzd3WHQLiMdXkw778RFLwBqWxodnH/S5vszAHpSQbjX7VJyAAOIkJbBykYkp8E9to
+	 CVA9pk1sdPuBipgpDfi58vs+3yMCrHLWSMyYuyDtn4JDvRaTMA0B4+VnBMf+uKLr7c
+	 FktZdsJIGJOI3qrfAFy47T0Rss1+kKqCC8zA4T0xH8Y0rcSkRL/xYyjRcVdue1elc5
+	 Cc3pMuT50pZGw==
 From: Guru Das Srinagesh <linux@gurudas.dev>
-Date: Sun, 28 Jun 2026 20:38:18 -0700
-Subject: [PATCH 4/7] block: rnull: use vertical import style
+Date: Sun, 28 Jun 2026 20:38:16 -0700
+Subject: [PATCH 2/7] pwm: th1520: use vertical import style
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,7 +43,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260628-b4-rust-vertical-imports-v1-4-98bc71d4810b@gurudas.dev>
+Message-Id: <20260628-b4-rust-vertical-imports-v1-2-98bc71d4810b@gurudas.dev>
 References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
@@ -83,72 +83,26 @@ maintainability.
 
 Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
 ---
- drivers/block/rnull/configfs.rs | 20 ++++++++++++++++----
- drivers/block/rnull/rnull.rs    | 13 ++++++++++---
- 2 files changed, 26 insertions(+), 7 deletions(-)
+ drivers/pwm/pwm_th1520.rs | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 7c2eb5c0b722..07ce21a44081 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -2,14 +2,26 @@
- 
- use super::{NullBlkDevice, THIS_MODULE};
+diff --git a/drivers/pwm/pwm_th1520.rs b/drivers/pwm/pwm_th1520.rs
+index 3e3fa51ccef9..3e4524a1910b 100644
+--- a/drivers/pwm/pwm_th1520.rs
++++ b/drivers/pwm/pwm_th1520.rs
+@@ -23,7 +23,11 @@
+ use core::ops::Deref;
  use kernel::{
--    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
--    configfs::{self, AttributeOperations},
-+    block::mq::gen_disk::{
-+        GenDisk,
-+        GenDiskBuilder, //
+     clk::Clk,
+-    device::{Bound, Core, Device},
++    device::{
++        Bound,
++        Core,
++        Device, //
 +    },
-+    configfs::{
-+        self,
-+        AttributeOperations, //
-+    },
-     configfs_attrs,
--    fmt::{self, Write as _},
-+    fmt::{
-+        self,
-+        Write as _, //
-+    },
-     new_mutex,
-     page::PAGE_SIZE,
-     prelude::*,
--    str::{kstrtobool_bytes, CString},
-+    str::{
-+        kstrtobool_bytes,
-+        CString, //
-+    },
-     sync::Mutex,
- };
- 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 0ca8715febe8..d58d2c4c5f63 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -10,12 +10,19 @@
-         self,
-         mq::{
-             self,
--            gen_disk::{self, GenDisk},
--            Operations, TagSet,
-+            gen_disk::{
-+                self,
-+                GenDisk, //
-+            },
-+            Operations,
-+            TagSet, //
-         },
-     },
-     prelude::*,
--    sync::{aref::ARef, Arc},
-+    sync::{
-+        aref::ARef,
-+        Arc, //
-+    },
- };
- 
- module! {
+     devres,
+     io::{
+         mem::IoMem,
 
 -- 
 2.54.0
