@@ -1,116 +1,111 @@
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from r3-21.sinamail.sina.com.cn (r3-21.sinamail.sina.com.cn [202.108.3.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1438637D126
-	for <linux-block@vger.kernel.org>; Mon, 29 Jun 2026 04:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C4738C2D4
+	for <linux-block@vger.kernel.org>; Mon, 29 Jun 2026 05:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782707975; cv=none; b=PUEbHGTeVUIs3/cm28rFk3I5XlaqMzQeDo49MV9LkIIman2WcMf8TpnVReQO0560a//UCQ9ZsAK36pBdNTR2zW/i6+++ayUJIJg1MaDOptoGXrc4oZxSRtgxBMVVX6/DsHrZx6+PqFgaPjZ+PmMuLEYdT5ABlylZolkJZX1yyws=
+	t=1782711093; cv=none; b=MMFbIQ5XLajB3eSwjCNULL/9HYFr8lFC4DvlGv3HU/494SdPwz1mlfR1OTPb8ug6kHfDdXVoTzG05UAtbBneLRuMGyJMccvlT6TxRgk1MkPbR49LFN+vidP/PWNkh5LZvvi9+f9dd3SkOEaQD4D+42zSN40vNZlmIyTh/UdfusM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782707975; c=relaxed/simple;
-	bh=1eU+2bDqdzNluinyylphYvQVh/IYBb3LxR6xoSyK7UA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tk7Gt215LEoJMK4CjWdLUx4DcDMLEz9bhmc9Sm/IISYcUDu5yjkBa3OeT50gD8AkCF8CFGwhROo2Ad19OrdytvNAgeLOqATPCRo/48334GNgJ7Sy9N0KCL6aG8ZFSuIAfjHHVKGNJTnbao0u+pbkSj4vFF7R8RwqEZibfpHlMiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hn+E1MsJ; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1782711093; c=relaxed/simple;
+	bh=pgz8ZN3f97QTNC7ptiwrRQ4sGhDnQquLa23d53znH0Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CeI/dm56ACdziF8dOLRVLypSYkAb+4+JSxxhY975VYnCLlDn8llgANrLb4dRewGXYHAFR6fZ6rZOkQksHElF9woTHmlFv67zIFZoyiRxQqJ5UGhi9l476yu3dUxVWJevF55hx/CTwxg/bYTsLTAtTUoD1NHwRC0NHde+PWnP0Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=UMEeK0Is; arc=none smtp.client-ip=202.108.3.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hn+E1MsJ"
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-30c99ccb1afso2693790eec.1
-        for <linux-block@vger.kernel.org>; Sun, 28 Jun 2026 21:39:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1782707973; x=1783312773; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tAkDY+MQvqYfr4IaXyrXZrjWk09q7w3/qlUx+mpeOiI=;
-        b=hn+E1MsJrcDHw4L7JMBDRGaEVWJGa0ETOsmQqVkAezoHqRNCzAOGRuGGIvFIzzgKAj
-         5WbmJiHasrXBsw2nHoHF1trp0cS9knpAh085FbvxF1XlG/DPaHrEmcR5qOONpWipekTI
-         b2pmR3DACgvrHz+t5K24F1Klul23PedHMKZDFVxRkjraR01Q2lZwnkB4VEOAS38x302C
-         RZiSAD2L8UPyAhNhq9GeEbgcAxM6bpc8M18GprrNeMR9TQXwcNyYWNbEZe2Iplh0nXwf
-         JkyvAD/bQHrPjowwEaqS8/fiHVxRV9+9F+3y+wWGAbHlMLR/ZbracNqgYEj3tkzGnPPZ
-         Cm5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782707973; x=1783312773;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tAkDY+MQvqYfr4IaXyrXZrjWk09q7w3/qlUx+mpeOiI=;
-        b=KoPkTgAYrk6ffx2cVz5mKczc9EV6LO8BeKyIjvTzrmkPrGSRoNaWCGaWKlxGGH71Aq
-         q2ajV6WZotlrdV1qHZzBOqPos2co8p5G/Sh50dAdMuaLT2hvHRCvpc7TZvdLCOgrdRta
-         UL2IBdBxcF4sMtYwTXOEi+pX8dJgANTv4OAHy389dXWbHnEf/VN/rfAq73rHMkROtXY1
-         cMS61tZZowV10K1/bSuDAct6KkjYm8cvoY3QLzWg1WtIRHiktj71JbTj1UTa05SMKiIv
-         MLOFyHfoYrO9xUNKAwHO5sJjU+DcVXWQXi8XGDpb04n9Mq54a7NQDmw9Pb45WT0OJrEJ
-         ORlw==
-X-Forwarded-Encrypted: i=1; AHgh+RqX8kZVjlC9cxN97d6GsPTi364bxwZuV3RV87ODpVe5741FFLMNYR0dkRXuofFZipWlPaN4lqJnr0QvZg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyP+dwnzAvlv20iWOYw/Z0Yr1kW9lKwyr5rrLwgsgBDCuJdJPz8
-	qg0x//l972RlRQRxjYJSLxjXLY/WUXoRiffdBWQmUiT0/gmSJD3ywwlo3cVgs+PMCT8=
-X-Gm-Gg: AfdE7cn6w8m5sJFxR7cc5+FWdgl3TPRa4XKpNVfjdx4MoZNmYTniJt+N4XaXGldLv7L
-	HcWbT/Ld454lCBp/2FSQNhKK35WvKbyrLmwU4VY9OoF1ehGEc3fAQFYDiSIE1EaYMydYKHMHhDq
-	j8/92BdK1UP6cVA+29V7z2UjKjD6BrHVaO5giLV4m1cTVQykd5rU694/C0Dq5e8HI0AThQ4q5l7
-	+is/MkUEBhvEnJfTXBDphcomCXMy5M/AxbyIP9bxGZFxRdQOl/bWl6lJzbTlIzg7ag2HRQLP3Dn
-	dg1hy4oL6FFbYz2wjyB/GvN/296Kwfi1FyhADC9hDuT/Z9ht4gDF/JKGUker5gBm9MlwSf/pkal
-	sHQi+GXAHnrXaQOIkETZetqv4DX+KSyjPWI4JI0dn76q+n9GAuQJ9EokBkXhwbosTJ1Wk4nPnSd
-	GToDPhWdfZbG/g
-X-Received: by 2002:a05:7300:5341:b0:307:d4e7:b177 with SMTP id 5a478bee46e88-30c84f3cb8emr16773092eec.16.1782707972936;
-        Sun, 28 Jun 2026 21:39:32 -0700 (PDT)
-Received: from localhost ([122.172.82.94])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30cac1b9751sm23319860eec.3.2026.06.28.21.39.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jun 2026 21:39:31 -0700 (PDT)
-Date: Mon, 29 Jun 2026 10:09:29 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Trevor Chan <trev@trevrosa.dev>
-Cc: gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org, 
-	ojeda@kernel.org, a.hindborg@kernel.org, paul@paul-moore.com, aliceryhl@google.com, 
-	airlied@gmail.com, simona@ffwll.ch, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	igor.korotin@linux.dev, vireshk@kernel.org, nm@ti.com, sboyd@kernel.org, 
-	m.wilczynski@samsung.com, boqun@kernel.org, gary@garyguo.net, axboe@kernel.dk, 
-	daniel.almeida@collabora.com, shankari.ak0208@gmail.com, lyude@redhat.com, j@jananu.net, 
-	lossin@kernel.org, acourbot@nvidia.com, markus.probst@posteo.de, 
-	driver-core@lists.linux.dev, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	david.m.ertman@intel.com, iweiny@kernel.org, leon@kernel.org, bjorn3_gh@protonmail.com, 
-	tmgross@umich.edu, tamird@kernel.org, work@onurozkan.dev, sergeh@kernel.org, 
-	matthew.brost@intel.com, thomas.hellstrom@linux.intel.com, jack@suse.cz, ljs@kernel.org, 
-	liam@infradead.org, bhelgaas@google.com, kwilczynski@kernel.org, 
-	ptikhomirov@virtuozzo.com
-Subject: Re: [PATCH v7] rust: aref: make `AlwaysRefCounted::inc_ref` an
- associated function
-Message-ID: <xak7wil2w2wdnmkfh4e4ijhlgnudzuh5y3ltlo72454e52tocv@434kdjz2eupv>
-References: <20260628100731.64885-1-trev@trevrosa.dev>
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="UMEeK0Is"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1782711088;
+	bh=pgz8ZN3f97QTNC7ptiwrRQ4sGhDnQquLa23d53znH0Y=;
+	h=From:Subject:Date:Message-ID;
+	b=UMEeK0IsgXDnnZTr7QHysR1rspnWoT3JhIGPNiHDeA4N07q3R5ccsQgDKyz7OzO5o
+	 uICWh4v980blbiN4BpdqCD0DROnd7L/Vj593lFMdBT7nTG/8zz0Q99ISg82wXx4pmC
+	 ZgXwNh+BZHEj6nCPM7jh7fDcsBCaZcBxvbwasaY0=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.33) with ESMTP
+	id 6A42029A0000305B; Mon, 29 Jun 2026 13:29:00 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 4781066685930
+X-SMAIL-UIID: CE2F1112CFF44E3D87F9709C02B04F74-20260629-132900-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
+Subject: Re: [PATCH] nbd: don't warn when reclassifying a busy socket lock
+Date: Mon, 29 Jun 2026 13:28:52 +0800
+Message-ID: <20260629052854.252-1-hdanton@sina.com>
+In-Reply-To: <CANn89iLPWCo_u-8jCsDM6jjZYfESvtUt9n3xD7yuAyNNntSw6w@mail.gmail.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260628100731.64885-1-trev@trevrosa.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 28-06-26, 18:07, Trevor Chan wrote:
-> diff --git a/rust/kernel/opp.rs b/rust/kernel/opp.rs
-> index 62e44676125d..84802f22b652 100644
-> --- a/rust/kernel/opp.rs
-> +++ b/rust/kernel/opp.rs
-> @@ -1043,9 +1043,9 @@ unsafe impl Sync for OPP {}
->  /// SAFETY: The type invariants guarantee that [`OPP`] is always refcounted.
->  unsafe impl AlwaysRefCounted for OPP {
->      #[inline]
-> -    fn inc_ref(&self) {
-> +    fn inc_ref(obj: &Self) {
->          // SAFETY: The existence of a shared reference means that the refcount is nonzero.
-> -        unsafe { bindings::dev_pm_opp_get(self.0.get()) };
-> +        unsafe { bindings::dev_pm_opp_get(obj.0.get()) };
->      }
->  
->      #[inline]
+On Mon, 22 Jun 2026 17:21:53 -0700 Eric Dumazet wrote:
+>On Mon, Jun 22, 2026 at 5:07 PM Hillf Danton <hdanton@sina.com> wrote:
+>> On Mon, 22 Jun 2026 01:18:10 -0700 Eric Dumazet wrote:
+>> >On Sun, Jun 21, 2026 at 6:43 PM Hillf Danton <hdanton@sina.com> wrote:
+>> >> On Mon, 22 Jun 2026 05:22:55 +0530 Deepanshu Kartikey wrote:
+>> >> > nbd_reclassify_socket() warns via WARN_ON_ONCE() if the socket lock is
+>> >> > held at the point of reclassification. That assertion was copied from
+>> >> > nvme-tcp, where the socket is created internally by the kernel
+>> >> > (sock_create_kern()) and is never visible to user space, so the lock
+>> >> > is guaranteed to be free.
+>> >> >
+>> >> > NBD is different: the socket is looked up from a user-supplied fd in
+>> >> > nbd_get_socket(), and user space retains that fd. A concurrent syscall
+>> >> > on the same socket (or softirq processing taking bh_lock_sock() on a
+>> >> > connected TCP socket) can legitimately hold the lock at the instant
+>> >> > NBD reclassifies it. sock_allow_reclassification() then returns false
+>> >> > and the WARN_ON_ONCE() fires, which turns into a crash under
+>> >> > panic_on_warn. This is reachable by simply racing NBD_CMD_CONNECT
+>> >> > against socket activity on the same fd, as reported by syzbot.
+>> >> >
+>> >> Given the syzbot report, if you are right (I suspect) then Eric delivered
+>> >> another half-baked croissant, and feel free to cut it off instead to make
+>> >> room for correct fix.
+>> >
+>> > Nobody (including you) caught this.difference between nbd and other
+>> > sock_allow_reclassification() callers.
+>> >
+>> Nope, actually it raises the question -- does the deadlock still remain
+>> after your fix without the lock key you added applied?
+>
+>LOCKDEP might have a false positive, but it will be much much harder to trigger.
+>
+>I had about 50 syzbot duplicates (that I did not release) before d532cddb6c60
+> ("nbd: Reclassify sockets to avoid lockdep circular dependency").
+>
+>>
+>> > What was the "correct fix" you envisioned exactly?
+>> >
+>> Frankly I had no evidence against your fix a couple days back, but now I
+>> see your lock key approach fails to take off. And the correct fix is to
+>> erase the incorrect locking order ffa1e7ada456 tries to catch, more
+>> difficult than you thought so far.
+>
+>Which incorrect locking order are you referring to? This is a LOCKDEP
+>false positive.
+>
+For archive purpose, syzbot report [1] where udp was not invovled defies
+what is fixed in d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep
+circular dependency") -- "Since the UDP socket and the NBD TCP/TLS socket
+are different, this is a false positive."
 
-For OPP:
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-
--- 
-viresh
+[1] Subject: [syzbot] [net?] possible deadlock in inet_shutdown (3)
+https://lore.kernel.org/lkml/69c37e6a.a70a0220.234938.0045.GAE@google.com/
