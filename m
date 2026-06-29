@@ -1,40 +1,40 @@
-Received: from out-12.smtp.spacemail.com (out-12.smtp.spacemail.com [198.54.127.83])
+Received: from out-21.smtp.spacemail.com (out-21.smtp.spacemail.com [66.29.159.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59617331ED8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B2637F73C;
 	Mon, 29 Jun 2026 03:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.54.127.83
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782704704; cv=none; b=NyQ+B5HZcnuawKuMzxc3KH2rovDWWtHqkUwgCYr9lZe4FgVLwB4Lh3B27C0TjXN6JdZcUYZLniy6LCxoh6Z5niu+Lx5qrgKyEoSbGCDBh3dyPRwH/gJ/kKeb0yk0CKDQ83aj1DM+qqGTTHX+CjEm0kPT0tX4Vu71c5FJB0QEGg8=
+	t=1782704705; cv=none; b=D3Z8vWgXvT6KA7ZvxoTLPujpj4zPZVOTCvgs1Ft+t5axmiy4YozgFjwIStLoxoOqrfj70hU6NVpEGv7bRS6pIpRKKAdmFmoF3h8GdgP1HuVp7dOsC4OhDuX4VDnpD1yKuPYA1zoF+tDxZ3pMVXediBzHGu28ycA2QldeZYjzxGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782704704; c=relaxed/simple;
-	bh=QbkbgEcDOp8DemVXI/V0dpeBMUXkEeOhRVWsw1KUqmo=;
+	s=arc-20240116; t=1782704705; c=relaxed/simple;
+	bh=cm24XvW/F4GoTflvWfzGJPlAEitmGS5RvymfGbSDfIk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KrJ/pDl9BPgYYBcOI2GTnxsspjuzbMYWB7ECEF8WYRHdMzBI3xeUsLqQaFuJ4OlHVVHos48c4EmmgbO/zsuqnl7TCqADlwycTrWbOIUur+hpDBq49rypabnyAK/L2jGA6R0NX8clL0iUmJ8mRYtURWanxf1AVXAJALGYndFMSE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=IK8TBh20; arc=none smtp.client-ip=198.54.127.83
+	 In-Reply-To:To:Cc; b=oUah96jJqfybnO3OV3iWOR0nhVlVF3a2e8AAA52YRiOnkQigR7w5z5NGHphOkHe6FqA3FrnkowwpTDsji03GavEP39iEoQ//X4Lwbhka/JaHThKt8Krh9OK1pkG+KEFv1UGDGc4N1qkCG0UnSKHOg554oKNPj0Dw4EoIX15DdXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=Wn/fpinj; arc=none smtp.client-ip=66.29.159.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="IK8TBh20"
+	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="Wn/fpinj"
 Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7P59qNz8sbj;
-	Mon, 29 Jun 2026 03:38:41 +0000 (UTC)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7F3RH8z8sbD;
+	Mon, 29 Jun 2026 03:38:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1782704324;
-	bh=jKx+94n82aR0aGPCo9y8gNwhGoiI7gsWMuBc5ujvVUw=;
+	s=spacemail; t=1782704315;
+	bh=+xTdES5iivUlujAb8S85lcbvOQK1iknw8m7NM0ttyH8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IK8TBh20FCaBU8hFE79rDS1IeLvUpmNeCrw1Xd/aj5CmfYaTmvloJz6AXTa8HAIFS
-	 kGP9eqO+IXWFu5ldt1V5SUuyTagyiqAl+5AKruDwebOg5E1gf2iFIKx8ojXCS5CmFW
-	 ABawlfgtTdXozg5f4yPPc+oF5Qmhhud6oDvUyvRbespTxwCa5/tak5hZlxH+yzoohL
-	 9hfkhZUFjHej2hQNNmjGkzHYxmnWOwEIOmwMi/Vq8rqE30d/SeQmb4dup9V1hVfRQV
-	 CQ7AEOZKORM64XTLXgFWxzHQPrXbrC9eNiDqL9u7+D0Lt0ALP0jZN84WzoTbSRzsqb
-	 XxS+9tq6GQdRw==
+	b=Wn/fpinj+vbdRtvql+K6l/cdD/IQuxl+e8wa5bMUwtZjuwKBolSQ7MPAy/E7r34Vm
+	 JlNz056v097vPX0LzLgdqw2ChkZM2e+fJk8P/tSAAd2maOeMGg8lIAZF85c2zvHBDu
+	 VvjXDXzHnPpQjWCS+ByzEU1aJQsXP4SMkbdEEHVqG1BkAeoV2x9WC0P0K0Z+MjYOjS
+	 au8gLtLRrapdakIsP6VjyV1XxDwH+fWg+f5WXQGK+fiJCCeuiHfvVAww/GogX62e5/
+	 gE9EB44qcxIf7szuf9P8Mfi3D550P367GBwwZjyXTtADMoUywMT2GZh/cupjmsZoPi
+	 3qRa8ft7LLoJA==
 From: Guru Das Srinagesh <linux@gurudas.dev>
-Date: Sun, 28 Jun 2026 20:38:21 -0700
-Subject: [PATCH 7/7] drm/nova: use vertical import style
+Date: Sun, 28 Jun 2026 20:38:18 -0700
+Subject: [PATCH 4/7] block: rnull: use vertical import style
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,7 +43,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260628-b4-rust-vertical-imports-v1-7-98bc71d4810b@gurudas.dev>
+Message-Id: <20260628-b4-rust-vertical-imports-v1-4-98bc71d4810b@gurudas.dev>
 References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
@@ -83,43 +83,72 @@ maintainability.
 
 Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
 ---
- drivers/gpu/drm/nova/file.rs | 5 ++++-
- drivers/gpu/drm/nova/gem.rs  | 6 +++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ drivers/block/rnull/configfs.rs | 20 ++++++++++++++++----
+ drivers/block/rnull/rnull.rs    | 13 ++++++++++---
+ 2 files changed, 26 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/gpu/drm/nova/file.rs b/drivers/gpu/drm/nova/file.rs
-index a3b7bd36792c..9a1404a7a687 100644
---- a/drivers/gpu/drm/nova/file.rs
-+++ b/drivers/gpu/drm/nova/file.rs
-@@ -4,7 +4,10 @@
- use crate::gem::NovaObject;
- use kernel::{
-     alloc::flags::*,
--    drm::{self, gem::BaseObject},
-+    drm::{
-+        self,
-+        gem::BaseObject, //
-+    },
-     pci,
-     prelude::*,
-     uapi,
-diff --git a/drivers/gpu/drm/nova/gem.rs b/drivers/gpu/drm/nova/gem.rs
-index 9d8ff7de2c0f..f6bc7fdee732 100644
---- a/drivers/gpu/drm/nova/gem.rs
-+++ b/drivers/gpu/drm/nova/gem.rs
-@@ -2,7 +2,11 @@
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 7c2eb5c0b722..07ce21a44081 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -2,14 +2,26 @@
  
+ use super::{NullBlkDevice, THIS_MODULE};
  use kernel::{
-     drm,
--    drm::{gem, gem::BaseObject, DeviceContext},
-+    drm::{
-+        gem,
-+        gem::BaseObject,
-+        DeviceContext, //
+-    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+-    configfs::{self, AttributeOperations},
++    block::mq::gen_disk::{
++        GenDisk,
++        GenDiskBuilder, //
 +    },
-     page,
++    configfs::{
++        self,
++        AttributeOperations, //
++    },
+     configfs_attrs,
+-    fmt::{self, Write as _},
++    fmt::{
++        self,
++        Write as _, //
++    },
+     new_mutex,
+     page::PAGE_SIZE,
      prelude::*,
-     sync::aref::ARef,
+-    str::{kstrtobool_bytes, CString},
++    str::{
++        kstrtobool_bytes,
++        CString, //
++    },
+     sync::Mutex,
+ };
+ 
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 0ca8715febe8..d58d2c4c5f63 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -10,12 +10,19 @@
+         self,
+         mq::{
+             self,
+-            gen_disk::{self, GenDisk},
+-            Operations, TagSet,
++            gen_disk::{
++                self,
++                GenDisk, //
++            },
++            Operations,
++            TagSet, //
+         },
+     },
+     prelude::*,
+-    sync::{aref::ARef, Arc},
++    sync::{
++        aref::ARef,
++        Arc, //
++    },
+ };
+ 
+ module! {
 
 -- 
 2.54.0
