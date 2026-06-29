@@ -1,40 +1,41 @@
-Received: from out-06.smtp.spacemail.com (out-06.smtp.spacemail.com [66.29.159.77])
+Received: from out-03.smtp.spacemail.com (out-03.smtp.spacemail.com [63.250.43.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E68237FF62;
-	Mon, 29 Jun 2026 03:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B799237F8AD;
+	Mon, 29 Jun 2026 03:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.250.43.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782704706; cv=none; b=mQ3lB7QM+GBBFEOpqiKxmekZ6YKY3OkMqk9s+7RjRCiIQOnhD9h2UnNSRBinRnlzoYwAGbhLfYDT1/UWhWi/lnBHx5YA8ChXStIP8sSewQtn6HiLsMUd72U090VrlhprOKCeILgj6n5ikt4r0UcYivmtA1mHuj+UZ7nmnsS5Mt8=
+	t=1782704706; cv=none; b=Dle20VHgMuMWGxY2nAqngxEgZEVNVEIA57k3sudEwmI0lEc39WGYs2F6WAquDczW/pHuD16d5ETfLZOSYprhvrJUxfB0PfXGBjh7OFIwBkIVrvXwM6n0ZGhTyOtrTPZnjjyYBLPbZppUJ+q4BrdQMdwTsdNa6JZSR+oWLef+nRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782704706; c=relaxed/simple;
-	bh=okKxM59CE4/G2xX4raBSlrCkbSnH5+WESqBKuNIdq1M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZTCGu5f+5WhrdAI0MbCf0UAJ9hr6DLFD7Z/ByJy9D009bQA2PIY9KQ53OMnz0dAnbjojNCk9ASF284mRJHh0dm0Bq0Lkm6xgAVA98Fn+dVxEVko0W/sL1PeZvAR3gy05ky9FhI5b2xAxk3nkoUNdMlvUle6XZiLtjKIpA2kZmIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=mHJDmukg; arc=none smtp.client-ip=66.29.159.77
+	bh=M//mWQVs8UGwJdPy/VhJJVHY4HrmO9f2gE55KxpqglU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=S5wV3CsJeeEUjHNVlyVfCD+Yg61jaT48sTvHxYPnGC70IYxpiRltlSL2f8Emm7p5uY37MXxdw8zd0lWu65PC6i3acb7TaPPTAtHiIMpBBca1eq+yUsJ8+9ilhIgaaFLnSMuX25SvOU96rNvPwCL+0kMvkx/9oNvM3loQ6GHcXtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=g8g5D1EN; arc=none smtp.client-ip=63.250.43.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="mHJDmukg"
+	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="g8g5D1EN"
 Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX78520mz8sbh;
-	Mon, 29 Jun 2026 03:38:28 +0000 (UTC)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX745lPmz8sb8;
+	Mon, 29 Jun 2026 03:38:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1782704311;
-	bh=vyHdIyQGWD9zJBic852muetfsygYSW+BCtH1XnAbMTU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=mHJDmukg/yuC/3MQOVMDJETsHa4Wvh88erkOpCvPts0Huj9qZLrHgY8vpF6ioEYaA
-	 aIFgHzyDg2unc9n8WqLPZ3pwh1ZsI6RTEYsFnJL2/pRRldQnQW0q6Hd7RiGMtPUzig
-	 bLzd3WHQLiMdXkw778RFLwBqWxodnH/S5vszAHpSQbjX7VJyAAOIkJbBykYkp8E9to
-	 CVA9pk1sdPuBipgpDfi58vs+3yMCrHLWSMyYuyDtn4JDvRaTMA0B4+VnBMf+uKLr7c
-	 FktZdsJIGJOI3qrfAFy47T0Rss1+kKqCC8zA4T0xH8Y0rcSkRL/xYyjRcVdue1elc5
-	 Cc3pMuT50pZGw==
+	s=spacemail; t=1782704306;
+	bh=9yoPMHqZhzE3iqqcnolBlcsUAlSSjRhy9gREnWpZKGs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=g8g5D1ENhx0FQXYOE+JOzorI+irSq/d4W2LRj/WFMzmT6KCIBS7JXZnh9ShOgGvNZ
+	 aszSMWYS/ub/pIKYTwqrIon+1uEFqma6r0HBSn5ixt8jZHDbtLJAJAgazxD7fgzEvp
+	 kSXsX2UHXYI+HFz5zqXxa2EzMqpV4UuVs3AI/aGF93KLqj93boQneIElJUHAHncIVI
+	 3vVp7mGhu/nm8AfBxKI50mwA+0/XUsg2ZFMlSZvNy7WixAEk1oNp1h4/QwPHWDPPca
+	 V5Gwm64Bne8LdzuTHGjEOhJy+S3uOPsnvXG4IyE1GsodIRiBDNDOlIa24h9pYwadjK
+	 CKuYevZSxFVRQ==
 From: Guru Das Srinagesh <linux@gurudas.dev>
-Date: Sun, 28 Jun 2026 20:38:16 -0700
-Subject: [PATCH 2/7] pwm: th1520: use vertical import style
+Subject: [PATCH 0/7] rust: Use kernel style vertical imports in various
+ drivers
+Date: Sun, 28 Jun 2026 20:38:14 -0700
+Message-Id: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,9 +44,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260628-b4-rust-vertical-imports-v1-2-98bc71d4810b@gurudas.dev>
-References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
-In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXM0QqCQBCF4VeRuW7AFtmsV4kudD3mRKnMrCKI7
+ +6alx+H869kUIHRI1tJMYvJ0CdcLxmFrurfYGmSyeXO596VXBesk0WeoVFC9WX5jYNGS4MHfHD
+ F7d5Suo+KVpZ/+vk6bVP9QYhHj7ZtB0PCpC58AAAA
+X-Change-ID: 20260628-b4-rust-vertical-imports-b46ee6c2479f
 To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org
 Cc: Danilo Krummrich <dakr@kernel.org>, 
@@ -78,32 +80,36 @@ Cc: Danilo Krummrich <dakr@kernel.org>,
 X-Mailer: b4 0.15.2
 X-Envelope-From: linux@gurudas.dev
 
-Convert `use` imports to vertical layout for better readability and
-maintainability.
+Came across a recent commit bc58905eb07 ("samples: rust_misc_device: use
+vertical import style") and found a few more locations that could
+benefit from this cleanup. No functional changes.
 
 Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
 ---
- drivers/pwm/pwm_th1520.rs | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Guru Das Srinagesh (7):
+      samples: rust_dma: use vertical import style
+      pwm: th1520: use vertical import style
+      cpufreq: rcpufreq_dt: use vertical import style
+      block: rnull: use vertical import style
+      net: phy: ax88796b: use vertical import style
+      net: phy: qt2025: use vertical import style
+      drm/nova: use vertical import style
 
-diff --git a/drivers/pwm/pwm_th1520.rs b/drivers/pwm/pwm_th1520.rs
-index 3e3fa51ccef9..3e4524a1910b 100644
---- a/drivers/pwm/pwm_th1520.rs
-+++ b/drivers/pwm/pwm_th1520.rs
-@@ -23,7 +23,11 @@
- use core::ops::Deref;
- use kernel::{
-     clk::Clk,
--    device::{Bound, Core, Device},
-+    device::{
-+        Bound,
-+        Core,
-+        Device, //
-+    },
-     devres,
-     io::{
-         mem::IoMem,
+ drivers/block/rnull/configfs.rs  | 20 ++++++++++++++++----
+ drivers/block/rnull/rnull.rs     | 13 ++++++++++---
+ drivers/cpufreq/rcpufreq_dt.rs   |  5 ++++-
+ drivers/gpu/drm/nova/file.rs     |  5 ++++-
+ drivers/gpu/drm/nova/gem.rs      |  6 +++++-
+ drivers/net/phy/ax88796b_rust.rs |  7 ++++++-
+ drivers/net/phy/qt2025.rs        | 10 ++++++++--
+ drivers/pwm/pwm_th1520.rs        |  6 +++++-
+ samples/rust/rust_dma.rs         |  5 ++++-
+ 9 files changed, 62 insertions(+), 15 deletions(-)
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260628-b4-rust-vertical-imports-b46ee6c2479f
 
--- 
-2.54.0
+Best regards,
+--  
+Guru Das Srinagesh <linux@gurudas.dev>
 
