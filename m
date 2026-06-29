@@ -1,115 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE86D406290;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED5D372B4F;
+	Mon, 29 Jun 2026 14:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782738121; cv=none; b=JoZolcdSYfwI09hncxVjjioCFlMGWCP94qvdIO3QGibQHLK15O1hRU1CZQurAfU4MaAKXPa0ea2DwtQNE3AnMoOFOkzUI4lv3jJS0om1q1r+H/Z+U3dVjJlERFAMycxsnr3aw2ie7ucor5nXcLHsY9+610tniST3ci132roWKko=
+	t=1782742048; cv=none; b=tYJghlsXhPQDR+v6q64MymrJdwFqLeIib2XsSvz2v5OSubWBlmVLmWo/mKfXJoDcRz+BDbj2WGpcR/UOzIwJ+zokynKLP5oMKT4AqnZDWTpP8TRSOIzrPBIk+6/gR6BjJG9/CrReJ2Ewa8S5Htmbzd0BDqTEE3fCtUSUyGWfs1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782738121; c=relaxed/simple;
-	bh=sVfZV5FAtAUUUFWxrC0Zg7CsOdSgFgkDNnZ7Y9T5fBU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qozYfwTRn1SFFfdt4lPeyLcH2IKkH0jiSrVWvS4Oh9ylbL4xgg0XNNZMio+wh3tsSlOjj9LC+oDDaErhQDa94xWA1jw81J7Y32B9NoYdDemVAOYOAqQfRf1DuHR+kqn+8eMCu07NQx6ZvU/6LbDmFulukV7Y0DyYvPkX3Y+qDG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+pzfhh9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1782742048; c=relaxed/simple;
+	bh=QoLTJ57tMoqWinR7HP1trdAaWAx87URKv1Q4ZqAnHvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j2QZhXTeZzLw1l7yPiJC7OgJ/OVN/ARA06Rxodh8uNjXwzR3aYTgZoWL4pwbIHov/MLOE7yDC3r4H5ALk/fQR7VS+jDAWm6ZgXBfoXF0a/Vm+R/V7xgmEmdCM01/Il2PG8t8jsDNHsiHiDsj/25Jz+FtdwPv47RPotz2w+AziKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sPe3Iq+2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+pzfhh9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A6E0C19425;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782738120;
-	bh=sVfZV5FAtAUUUFWxrC0Zg7CsOdSgFgkDNnZ7Y9T5fBU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=L+pzfhh9NATwjEl/MgOmoWhFnhdxeYvwUOjjCY1lXcCCkCC4M0d8chna8Yk+IedPr
-	 qWaHdDrsDhKU/9X34pK1/OANQ4ZVJuos471wzrjYGlw939Zfkv+UR+DbUdo/VUH5L/
-	 3Ghs+YJf5AoJLOvnUBilnqhuZLzL3AhoPWXzfIwBf531VE95EmpbntlWQeVX9iCXJ0
-	 ZcaDXSJdkAOnOVRuf7brPOCIe3eY/8+Z63MTog8F8ER8w8QpD9qQ1tHb+SJtBUWd1K
-	 ZTGZvo9JixsMgMtEApIeHSK5QToVz+Jeq6XmaeKFdBd9MBeeTHnuKquvL4+EEQhD6D
-	 ZUscpYvdft03w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763B2C43458;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Mon, 29 Jun 2026 17:01:49 +0400
-Subject: [PATCH v2 6/6] MAINTAINERS: Add entry for Qualcomm IPQ5018
- Bluetooth driver
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sPe3Iq+2"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=AK6FrYtKSIh8cngqIV8WnN9GXpQxjhIF++nUuJZfwbU=; b=sPe3Iq+2B0cNSg858/MXj17mqs
+	nGlNw4jzWt1Blm83SZhOTLuScCneipEQxYrk7fXoJmwYNeCbx8QSg1zGqipMB+jk5FPKkzUkyFMIs
+	HpGichrCIBqHOm8y6SCjU5HgKkXaATkMgoXLLY+KqvXdNOnkRWFnviWgOcyKmCa5rfCU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1weCdA-009lYC-UB; Mon, 29 Jun 2026 16:06:36 +0200
+Date: Mon, 29 Jun 2026 16:06:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Guru Das Srinagesh <linux@gurudas.dev>
+Cc: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Michal Wilczynski <m.wilczynski@samsung.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
+	linux-block@vger.kernel.org, netdev@vger.kernel.org,
+	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH 0/7] rust: Use kernel style vertical imports in various
+ drivers
+Message-ID: <c89a1bc8-6cc1-4e16-ac95-add389e45a2b@lunn.ch>
+References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-ipq5018-bluetooth-v2-6-02770f03b6bb@outlook.com>
-References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
-In-Reply-To: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
-To: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>, 
- Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782738117; l=906;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=DrQrzkPl3cbWFmYstKvKokgP5FFWzafGXK+cjmpTmUA=;
- b=WHjMybUgY1YmSj4Ea/kchfwjt9e395GAYngQB0uqV2f8fpoxFPAByR3nOPcenEnDMEMZ8Y3yx
- mlGy6okm/1TCDAfx2bhlJTXU7gZa4Ap8w7tJAuCmQsqRCYAJytae/qt
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 
-From: George Moussalem <george.moussalem@outlook.com>
+On Sun, Jun 28, 2026 at 08:38:14PM -0700, Guru Das Srinagesh wrote:
+> Came across a recent commit bc58905eb07 ("samples: rust_misc_device: use
+> vertical import style") and found a few more locations that could
+> benefit from this cleanup. No functional changes.
+> 
+> Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+> ---
+> Guru Das Srinagesh (7):
+>       samples: rust_dma: use vertical import style
+>       pwm: th1520: use vertical import style
+>       cpufreq: rcpufreq_dt: use vertical import style
+>       block: rnull: use vertical import style
+>       net: phy: ax88796b: use vertical import style
+>       net: phy: qt2025: use vertical import style
+>       drm/nova: use vertical import style
 
-Add maintainers entry for Qualcomm IPQ5018 Bluetooth driver.
+You have multiple subsystems here, so you need to split this patch
+setup, per subsystem, and submit them separately. Maintainers only
+accept patchsets for their own subsystems.
 
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+For netdev, please take a read of:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+You need to get the correct tree, and set the Subject: line correctly.
+
+    Andrew
+
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0b9d7c8276ac..60f7251d1a16 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22289,6 +22289,13 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/regulator/vqmmc-ipq4019-regulator.yaml
- F:	drivers/regulator/vqmmc-ipq4019-regulator.c
- 
-+QUALCOMM IPQ5018 BLUETOOTH DRIVER
-+M:	George Moussalem <george.moussalem@outlook.com>
-+L:	linux-bluetooth@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
-+F:	drivers/bluetooth/btqcomipc.c
-+
- QUALCOMM IRIS VIDEO ACCELERATOR DRIVER
- M:	Vikash Garodia <vikash.garodia@oss.qualcomm.com>
- M:	Dikshita Agarwal <dikshita.agarwal@oss.qualcomm.com>
-
--- 
-2.53.0
-
-
+pw-bot: cr
