@@ -1,111 +1,226 @@
-Received: from r3-21.sinamail.sina.com.cn (r3-21.sinamail.sina.com.cn [202.108.3.21])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C4738C2D4
-	for <linux-block@vger.kernel.org>; Mon, 29 Jun 2026 05:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA0738C2D0;
+	Mon, 29 Jun 2026 05:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782711093; cv=none; b=MMFbIQ5XLajB3eSwjCNULL/9HYFr8lFC4DvlGv3HU/494SdPwz1mlfR1OTPb8ug6kHfDdXVoTzG05UAtbBneLRuMGyJMccvlT6TxRgk1MkPbR49LFN+vidP/PWNkh5LZvvi9+f9dd3SkOEaQD4D+42zSN40vNZlmIyTh/UdfusM=
+	t=1782711257; cv=none; b=LytBVXpxE/z9pxAJ/1Se3KMU4npaS7oKBUE5XR5qb6Jnn3pNAAWf7KLayYtddqlIOmyXkHUhtoKLFy+SFXxuqOq/sU8Kk+vRmDlgafwPSchXgTGoe3leMzIqKOvkb2w/AUPzUZTXaxZsCxKH6YLf0UjyP2DoEzvzSGX/vgpIju8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782711093; c=relaxed/simple;
-	bh=pgz8ZN3f97QTNC7ptiwrRQ4sGhDnQquLa23d53znH0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CeI/dm56ACdziF8dOLRVLypSYkAb+4+JSxxhY975VYnCLlDn8llgANrLb4dRewGXYHAFR6fZ6rZOkQksHElF9woTHmlFv67zIFZoyiRxQqJ5UGhi9l476yu3dUxVWJevF55hx/CTwxg/bYTsLTAtTUoD1NHwRC0NHde+PWnP0Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=UMEeK0Is; arc=none smtp.client-ip=202.108.3.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1782711257; c=relaxed/simple;
+	bh=twJxANRV4/8ZUJYYZa1HHFVUG2s+6DHakpe5jbUhDFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ID1yQEMky9eqG9PqNQSLBm0D4j1ZoM9Y2/EfYNCx5RDrsF9nH1YS/2wiKtlpcRRQ5lsDzDxF8ZF9bGNdZy6Ip7vWa6QpDzsSsSxROJGcycwlGHHWUMXUZdLD6ytFL43rYW1CBO28gtB1gJidOGgzKwygG5GboQTfy5loNtyRC78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HI6NjzKO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="UMEeK0Is"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1782711088;
-	bh=pgz8ZN3f97QTNC7ptiwrRQ4sGhDnQquLa23d53znH0Y=;
-	h=From:Subject:Date:Message-ID;
-	b=UMEeK0IsgXDnnZTr7QHysR1rspnWoT3JhIGPNiHDeA4N07q3R5ccsQgDKyz7OzO5o
-	 uICWh4v980blbiN4BpdqCD0DROnd7L/Vj593lFMdBT7nTG/8zz0Q99ISg82wXx4pmC
-	 ZgXwNh+BZHEj6nCPM7jh7fDcsBCaZcBxvbwasaY0=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.33) with ESMTP
-	id 6A42029A0000305B; Mon, 29 Jun 2026 13:29:00 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 4781066685930
-X-SMAIL-UIID: CE2F1112CFF44E3D87F9709C02B04F74-20260629-132900-1
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
-Subject: Re: [PATCH] nbd: don't warn when reclassifying a busy socket lock
-Date: Mon, 29 Jun 2026 13:28:52 +0800
-Message-ID: <20260629052854.252-1-hdanton@sina.com>
-In-Reply-To: <CANn89iLPWCo_u-8jCsDM6jjZYfESvtUt9n3xD7yuAyNNntSw6w@mail.gmail.com>
-References: 
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HI6NjzKO"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65T3INKO2098905;
+	Mon, 29 Jun 2026 05:33:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Jk9mqL
+	QrGTOtVv9651WmCNXPgc/e6swsLlpW4qFhSKo=; b=HI6NjzKOHebiXVO8gxW4Ty
+	UTupPbk5NGZfmTUVhQ4LcMSNQSK8ChyUk+AfsK4gkabbokt2aciLjqSwfn/9ryUW
+	CSTijKNoNMvIe6ZbIZiff8H03lfnfQtq9KsSxHla22o4tyEHHvBf7Drvyznvjxs2
+	XuZecUEQfuBRjD+P2G2gwz5SRtOnidJyI96VouKD+uGnv6lDdce/EWBUOCSSGs1X
+	dmbp/ZcsXTBE98Eo01YATvlO0puIEbA/Ey7r8AfQnb1ZceN5/FZiXwW2ZVNDVcCO
+	DJMXi6sGTtpQfjyk4hVutqbxVaDcI0JyuxeFI33PjlcHNQlyIQiQomTap/0URUxA
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26pdqng1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jun 2026 05:33:34 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65T5Jcvg003596;
+	Mon, 29 Jun 2026 05:33:33 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f2tbh3x3e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jun 2026 05:33:33 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65T5XX5w25363194
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jun 2026 05:33:33 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4A15858059;
+	Mon, 29 Jun 2026 05:33:33 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8D1C158043;
+	Mon, 29 Jun 2026 05:33:29 +0000 (GMT)
+Received: from [9.123.7.57] (unknown [9.123.7.57])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Jun 2026 05:33:29 +0000 (GMT)
+Message-ID: <c44fcd50-6341-4617-b6cb-cad3c65a7a75@linux.ibm.com>
+Date: Mon, 29 Jun 2026 11:03:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] blk-cgroup: fix race between policy activation and
+ blkg destruction
+To: yukuai@fygo.io, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Zheng Qixing <zhengqixing@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Tang Yizhou <yizhou.tang@shopee.com>, Ming Lei <ming.lei@redhat.com>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20260624064625.1743650-1-yukuai@kernel.org>
+ <20260624064625.1743650-5-yukuai@kernel.org>
+ <6580506d-3baa-4ceb-bf2e-5f6c974f3d10@linux.ibm.com>
+ <7ebbf312-7c1b-4024-a35d-89a95d82b4f4@fygo.io>
+ <749d17be-ff9f-4f70-a948-0133f02eec93@fygo.io>
+ <866644be-3b07-49f9-9c5d-e0f94ad1c793@linux.ibm.com>
+ <5f5a4729-0c90-4f6f-b97e-cab9d0289dc2@fygo.io>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <5f5a4729-0c90-4f6f-b97e-cab9d0289dc2@fygo.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fYNevrjts4ObRU8b1D8rzrfmsejwYhdB
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDA0MyBTYWx0ZWRfX0CR+fij5ehMa
+ Vc+c4G96+CTTLreaBg1T9qzOuADlwisXiaetzpInLgeVAgBTT73VxUIT3CQu/64bNdttGmnmpBl
+ NI1PfcyPhdIUOW9svHczSpd9P5QR1I0=
+X-Authority-Analysis: v=2.4 cv=edsNubEH c=1 sm=1 tr=0 ts=6a4203ae cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=XbbiLa-TNhvNMnDTbA4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDA0MyBTYWx0ZWRfX1aGiwIW7GH2s
+ 3f/pZiWuFOGqur06YK4gWXDJjvqyqfOUfGqaqWVCZwMwhXD0E37A840m5irGSVBkJwMl4/bsmZf
+ wtgoPArp04A9ynxF5l+dWUtlly+almVfVgdK8IzspgEsABuds/fy1CRAuENpA6MRX1aENUWe3x1
+ 9M709c38vQqTtRhxR1xTZiY7wrvgJKcTsvLU7oVKKfpREKDhyGkvDxUe27bS/LInXQSi6Cw8jeC
+ sit87M9AB/tL2AzBBUUawA0r0akGauzdu6NaiMC/hdd3o/6E7PilcfLNvlW88oaNrdeG/w3dA+/
+ dmxp9KwbrXrC+jeKxioWj0zqyx44nTzzNmb2pc7/Sv8GzAvrFVR2weXrYW5/p135b/2rStxMD0g
+ e/FZGF0Wb399t22vh54+0SeYs6w3JtYtwb8bFTeVx9KLHCIirDg7bWrimQJPTknjoJtHqr5e8sF
+ xQUetN58tsFHzEVYqig==
+X-Proofpoint-ORIG-GUID: fYNevrjts4ObRU8b1D8rzrfmsejwYhdB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-29_01,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606290043
 
-On Mon, 22 Jun 2026 17:21:53 -0700 Eric Dumazet wrote:
->On Mon, Jun 22, 2026 at 5:07 PM Hillf Danton <hdanton@sina.com> wrote:
->> On Mon, 22 Jun 2026 01:18:10 -0700 Eric Dumazet wrote:
->> >On Sun, Jun 21, 2026 at 6:43 PM Hillf Danton <hdanton@sina.com> wrote:
->> >> On Mon, 22 Jun 2026 05:22:55 +0530 Deepanshu Kartikey wrote:
->> >> > nbd_reclassify_socket() warns via WARN_ON_ONCE() if the socket lock is
->> >> > held at the point of reclassification. That assertion was copied from
->> >> > nvme-tcp, where the socket is created internally by the kernel
->> >> > (sock_create_kern()) and is never visible to user space, so the lock
->> >> > is guaranteed to be free.
->> >> >
->> >> > NBD is different: the socket is looked up from a user-supplied fd in
->> >> > nbd_get_socket(), and user space retains that fd. A concurrent syscall
->> >> > on the same socket (or softirq processing taking bh_lock_sock() on a
->> >> > connected TCP socket) can legitimately hold the lock at the instant
->> >> > NBD reclassifies it. sock_allow_reclassification() then returns false
->> >> > and the WARN_ON_ONCE() fires, which turns into a crash under
->> >> > panic_on_warn. This is reachable by simply racing NBD_CMD_CONNECT
->> >> > against socket activity on the same fd, as reported by syzbot.
->> >> >
->> >> Given the syzbot report, if you are right (I suspect) then Eric delivered
->> >> another half-baked croissant, and feel free to cut it off instead to make
->> >> room for correct fix.
->> >
->> > Nobody (including you) caught this.difference between nbd and other
->> > sock_allow_reclassification() callers.
->> >
->> Nope, actually it raises the question -- does the deadlock still remain
->> after your fix without the lock key you added applied?
->
->LOCKDEP might have a false positive, but it will be much much harder to trigger.
->
->I had about 50 syzbot duplicates (that I did not release) before d532cddb6c60
-> ("nbd: Reclassify sockets to avoid lockdep circular dependency").
->
+On 6/27/26 9:43 AM, yu kuai wrote:
+> Hi,
+> 
+> 在 2026/6/26 14:12, Nilay Shroff 写道:
+>> On 6/26/26 7:22 AM, yu kuai wrote:
+>>> Hi,
+>>>
+>>> 在 2026/6/26 9:50, yu kuai 写道:
+>>>> Hi,
+>>>>
+>>>> 在 2026/6/25 23:08, Nilay Shroff 写道:
+>>>>> On 6/24/26 12:16 PM, Yu Kuai wrote:
+>>>>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>>>>> index 7baccfb690fe..f7e788a7fe95 100644
+>>>>>> --- a/block/blk-cgroup.c
+>>>>>> +++ b/block/blk-cgroup.c
+>>>>>> @@ -1563,10 +1563,12 @@ int blkcg_activate_policy(struct gendisk
+>>>>>> *disk, const struct blkcg_policy *pol)
+>>>>>>          if (WARN_ON_ONCE(!pol->pd_alloc_fn || !pol->pd_free_fn))
+>>>>>>              return -EINVAL;
+>>>>>>            if (queue_is_mq(q))
+>>>>>>              memflags = blk_mq_freeze_queue(q);
+>>>>>> +
+>>>>>> +    mutex_lock(&q->blkcg_mutex);
+>>>>>>      retry:
+>>>>>>          spin_lock_irq(&q->queue_lock);
+>>>>>>            /* blkg_list is pushed at the head, reverse walk to
+>>>>>> initialize parents first */
+>>>>>>          list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
+>>>>>> @@ -1625,10 +1627,11 @@ int blkcg_activate_policy(struct gendisk
+>>>>>> *disk, const struct blkcg_policy *pol)
+>>>>>>          __set_bit(pol->plid, q->blkcg_pols);
+>>>>>>          ret = 0;
+>>>>>>            spin_unlock_irq(&q->queue_lock);
+>>>>>>      out:
+>>>>>> +    mutex_unlock(&q->blkcg_mutex);
+>>>>>>          if (queue_is_mq(q))
+>>>>>>              blk_mq_unfreeze_queue(q, memflags);
+>>>>>>          if (pinned_blkg)
+>>>>>>              blkg_put(pinned_blkg);
+>>>>>>          if (pd_prealloc)
+>>>>> If the policy allocation fails, we jump to the lable enomem: and
+>>>>> teardown pds.
+>>>>> But I see this path still only acquires ->queue_lock. Don't we also
+>>>>> need
+>>>>> to protect it with ->blkcg_mutex?
+>>>> Yes, I agree we should protect it as well.
+>>>
+>>> Just take a closer look at the code, the enomem is already protected by
+>>> blkcg_mutex :)
+>>>
 >>
->> > What was the "correct fix" you envisioned exactly?
->> >
->> Frankly I had no evidence against your fix a couple days back, but now I
->> see your lock key approach fails to take off. And the correct fix is to
->> erase the incorrect locking order ffa1e7ada456 tries to catch, more
->> difficult than you thought so far.
->
->Which incorrect locking order are you referring to? This is a LOCKDEP
->false positive.
->
-For archive purpose, syzbot report [1] where udp was not invovled defies
-what is fixed in d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep
-circular dependency") -- "Since the UDP socket and the NBD TCP/TLS socket
-are different, this is a false positive."
+>> Oh yes, but the ->blkcg_mutex is never released if we jump to enomem.
+>> So that may potentially cause deadlock. We need to release ->blkcg_mutex
+>> once blkcg_policy_teardown_pds() returns. Or may be refactor code (or add
+>> comment) so that it's easy to realize or spot the ->blkcg_mutex is
+>> acquired
+>> and then released around blkcg_policy_teardown_pds().
+> 
+> the enomem will goto out at last, and blkcg_mutex do released. The code is
+> a bit hacky.
+> 
+>>
+>>>>
+>>>>> Moreover I still see race between blkg insertion in blkg_create()
+>>>>> which
+>>>>> still doesn't use ->blkcg_mutex and so list traversal in
+>>>>> bfq_end_wr_async()
+>>>>> may still race with blkg_create(), isn't it? I remember you once told
+>>>>> this will be handled in another series but I couldn't find that yet.
+>>>> This is the set:
+>>>>
+>>>> [PATCH 0/8] blk-cgroup: remove queue_lock nesting from blkcg paths - Yu
+>>>> Kuai <https://lore.kernel.org/all/cover.1780621988.git.yukuai@fygo.io/>
+>>>>
+>>>> Noted that set just make sure queue_lock is not nested under other
+>>>> atomic
+>>>> context, and that set do not acquire blkcg_mutex for blkg_create()
+>>>> yet. Howerver,
+>>>> with that set it'll be easy to convert all queue_lock to blkcg_mtuex
+>>>> for blkg
+>>>> protection, and together with lots of blk-cgroup code cleanups.
+>>>>
+>>
+>> Okay, so are you planning to send a follow-up patchset that replaces
+>> ->queue_lock
+>> with ->blkcg_mutex for protecting the blkg_list? If so, I'd still
+>> prefer acquiring
+>> ->blkcg_mutex around blkg_create() in this patchset. That would
+>> address the race
+>> between blkg_create() and the blkg_list traversal in
+>> bfq_end_wr_async(), while the
+>> subsequent series can focus on cleaning up and removing the remaining
+>> ->queue_lock
+>> usage for blkg protection.
+> 
+> Yes, there is a follow-up patchset. When this set was posted, blkg_create is still
+> called with queue_lock held, so I can't do that. However, not that the other set
+> is already applied, I can hold blkcg_mutex for blkg_create() now.
+> 
+
+If you already have a follow-up patchset that replaces ->queue_lock with
+->blkcg_mutex for protecting blkg_list, then I think it might make sense
+to send that out first (if you haven't already) and hold off this series for
+now. That way, the blkg_create() race can be addressed first, and this
+series can build on top of those changes.
+
+BTW, if that follow-up series is merged first, I suspect the first two patches in
+this series may no longer be necessary, leaving only patches 3/4 and 4/4.
+
+Thanks,
+--Nilay
 
 
-[1] Subject: [syzbot] [net?] possible deadlock in inet_shutdown (3)
-https://lore.kernel.org/lkml/69c37e6a.a70a0220.234938.0045.GAE@google.com/
