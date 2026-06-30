@@ -1,145 +1,162 @@
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1427A261B9E
-	for <linux-block@vger.kernel.org>; Tue, 30 Jun 2026 21:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76FA314A83
+	for <linux-block@vger.kernel.org>; Tue, 30 Jun 2026 21:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782854318; cv=none; b=NXrHwcwYuHdzaEYuT132kqmC4UX7jkJJdBlFZtBgdwrMIv74kK38hJ+1JgS5avQPdDFRH5mIOf2moQoxeXUS1EKyH47ti41apFdACrQ9vFqJqrliAh3ccdP40CXiYqwlrrGgptyQ5/3AIWiwBU30JmRMpnzZNjWv0LEhx+L8KLk=
+	t=1782855969; cv=none; b=m3JnKK2PJtwknyZMtIpw0DMU98byU0h7Hm3DHe5SYd1fWpt/IEoVjLL8ad2FNmG28LTMOVPaFhMgd2Y1VcOBsO8k+B0VNCBIl5sdOGlVBMJfYW3lEw8O6C8XKrKWndumiplYH2tHtz6vSNkN35/6M21ZMgKZB/tABmMuzfwy3CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782854318; c=relaxed/simple;
-	bh=GWK3vz0iRuHbMgrM0TESuIGL6z0pCRGR+33geI5gyLc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WOiO2fDVxI4GJrb7QnNoQxtOkDGX3CmFOHkT74VCvO9j6JUvolKFkQsgm0DMEv9WM8rsqwyu4JTSCGKuyHcN3Iw7h8elXRkSvGLdJaXYTRJOp7odSK709UzzdtTWm9flddoITU0Y9GSCF5zRLHIYcyLwL7czGkpD70MR5y5PgSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oDsHmtrQ; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782855969; c=relaxed/simple;
+	bh=QWuxanpR96XxW/AQtuxKdVFi5wsx2VqMS5+/jhKwVBE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u4VQ396hGwVwkPWx45PUioZF6k2060T16veCAyDqKaSxxeuBQb9dm8qmO6y5NC7yqHJzySwbTEXgnCoPIscaoOTO94KIf8sKKQbFPowl5Il//qQyH/8Vp+o/a+Y18IUYeuQ/MKm1YB+AvtjaaHAZNvabLEzKYc7NtuJnj0so1+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D7/fwntI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oDsHmtrQ"
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-664d910cc75so2916674d50.1
-        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2026 14:18:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782854316; x=1783459116; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pmTw3Vr2+LsyNMbam3ooBMySK+M5u/Z76CpvLSVF7Ac=;
-        b=oDsHmtrQ/jcZ+h+zavxh+u1pzcLzIwDcxX6NKeiR4SjF6xlFTPp0upeKXwEoDexWjz
-         OsQshZDBrixoyX5Ynw/SXNHamM7z33/sPsN80mI/qMMWmMyJNUFLHJ1rbiDqFOfPDJwJ
-         acJ0HibIVaG83eOR4P0DFhppHUDb0yd140j46K9udG+TNpzU8iFdsuNyVUjP+uGlVlTJ
-         GS6Zr1wGs7fxnXkgkdohlA3rPOB8gC23akTmChN9PHFptdLAp84+wAKVz25kKH+Zw47a
-         hMzjgbb3PSRLw5B+AMJOGF2YJZoiiLErqvABeZInWV341NMRvqID3fpPd89ho8l2dSn6
-         +HFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782854316; x=1783459116;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pmTw3Vr2+LsyNMbam3ooBMySK+M5u/Z76CpvLSVF7Ac=;
-        b=SnufF1DHn1HBBrzPT03+AMbsII+50QlZ5EWO9ptJat+TZ3znWtSLh+zLhxjysKg4Ef
-         BSTM6dmJHKI3/mh/RuPqAgJPsQNZAlfUKcTAdqx1LXf2gD7C0Fivy27ztlqPZUiuwB6/
-         1jUJZDLCum+teWYoH1ubWuTsRIYXRAXti9CflmMEFenfwTnBYBkZqvl2U3kzZDO9DTD6
-         qyoAqJhJ2WByqLRvtNQ4ywTe7g1Xg55+7Z5K8AxrPLpMwi5JtrPuCGZVH9JnpuAlvwsO
-         ehccvoDZUVop2yP/0jBxox0iHQU4WBlJdjaGLNSC0qOtAwKVYOHHxph5vQ6eE4QuzX04
-         Otnw==
-X-Forwarded-Encrypted: i=1; AHgh+RouPECIiSGEk728ONa0CUpe7dD7CXKBmKpPKaZ7d8u7fI1xIw/Mmun/Mo6llYxWkyoUiogP/RZAliMUuw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ+jbwGQOBTaqdrxkMzH2Zsn7xG8rgv4JKALLFe2+Y+x4Zljmo
-	VBa37oSEWOmMLe4phDMU9eDBd7DTF9Ci3CA7oPQayQRs6x2ommoWq44F
-X-Gm-Gg: AfdE7cmDVW1W6pGKd0TEfKt0sRtNSZEFOnT7+rg9sN03cK6n0yEcxq+nwj9eQiUWENM
-	tNGOo/ExkQsUdFVMYUwaKekHKkxe+2jBvTPKOkH042YlICHspsl0bac+aHB88Mr5YbloBY/l5Qm
-	N7yeKCqD0T1yeBaPq4NS+H6jDgrD7Knq8kBf+EO7DfP8ahitOM9kr9Ds7THEJTr3+8St3uSbyAp
-	Wuv0lHNSnULogolveAW5X86yKxu5SR6yUpsjwqXs8mMc1DGqvQhcfCnEP2h8KekheQAOaH/yY2W
-	xzPfgn+p6SGJKkdx984sBm+kllgp2ue7QCgQ8dBf/U2tPsUwIvoxaohMRaISlsxHOQlFm024MEc
-	Amml1PhEYPdRRvg7j4CfYiOhmNkG9A+qoNLfhl+oSUsMFeBrEsV5hbT/1aZhFz2Y3TG0HXPnfhm
-	BSYWc42ep7xhneeoNG+hNDdXKN4A==
-X-Received: by 2002:a05:690c:b03:b0:80c:1317:5928 with SMTP id 00721157ae682-810d7eb0c40mr57756567b3.1.1782854316202;
-        Tue, 30 Jun 2026 14:18:36 -0700 (PDT)
-Received: from Dev-Null-MSI ([2a0d:3344:52ac:a808:98a4:4381:be45:536f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8128ac35643sm132357b3.14.2026.06.30.14.18.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 14:18:35 -0700 (PDT)
-From: Yousef Alhouseen <alhouseenyousef@gmail.com>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+1a67ee1aa79484801ec6@syzkaller.appspotmail.com,
-	Yousef Alhouseen <alhouseenyousef@gmail.com>
-Subject: [PATCH] ublk: snapshot batch commands before preparing I/O
-Date: Tue, 30 Jun 2026 23:18:27 +0200
-Message-ID: <20260630211827.50475-1-alhouseenyousef@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D7/fwntI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76411F00ACF
+	for <linux-block@vger.kernel.org>; Tue, 30 Jun 2026 21:46:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782855968;
+	bh=pUvDaNXzQAJTqE61fbo+DfZd1bDU6D/qLMCG5IKiMGk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=D7/fwntI/3EHRu1rhEkf/Sxm5cxtWYBPvIyeiHr4BbeE+U3AC8KziRAH/U9R2kZMS
+	 qnVlrScxXMTR+aij1253AguCwtOB36ZJlqGONrgVB0aIem+0zGFOPt2bkghO19pNQA
+	 0L11F8QdXG3xIS9oH+cULaOedAwOQpsrBZ8+RmrxF+WXYCsMkF8ip8T0M2sh/dSMah
+	 zEJrNBRx53ziG79D5Bk6qHq/Ay1OkwovDv8nf9b1+5iqiKFwvZNA6/ZlQIlt+gGpli
+	 OcoR5vcOBHqTjCfrBl6hNTosFoPsoO5PxYZ505Drx/3wDSyHCEo3Fw7RyinOJ8sFFX
+	 N8ihdn7Dk2vHA==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c1268f71572so157373566b.0
+        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2026 14:46:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoGK6wZleU1X+c6IzvZHm+/990MpBHEdah6CgmScXwW6Dq5izCL91knycFtETA+Zwnx5ERln10A+4QRrg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGWCDBhZf+6RU5orDqgARCyBJVF7IPkrdWFe+5f5GjR6LReLkJ
+	49wfpog3ktyEcdqem+6opHY6A2TZR6aQojJV4Z6yUwHayXYEHH1kKCERB5oGZoOb3dmPKrExULU
+	9iyLUa/H0gFcp4gkE7bZ0JLGPoElIcw==
+X-Received: by 2002:a17:907:6d06:b0:c08:580e:899a with SMTP id
+ a640c23a62f3a-c129042e82emr232092166b.10.1782855967114; Tue, 30 Jun 2026
+ 14:46:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com>
+ <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
+ <20260630180219.GA4139943-robh@kernel.org> <CAFEp6-163adAq8-H_pCzGnq+Fo4jpyKGs6Jv25j3fSpZg3COjQ@mail.gmail.com>
+In-Reply-To: <CAFEp6-163adAq8-H_pCzGnq+Fo4jpyKGs6Jv25j3fSpZg3COjQ@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 30 Jun 2026 16:45:54 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqKFjk-mdaAAOzNB6rFiJbw5gd4eDpRBLQL-4q+uJKnp3g@mail.gmail.com>
+X-Gm-Features: AVVi8Cc4MorOqwfKhUItBpWtyYeUsNNDkbig_T10OqzF2nSF1JgV4ariSeJFQ-w
+Message-ID: <CAL_JsqKFjk-mdaAAOzNB6rFiJbw5gd4eDpRBLQL-4q+uJKnp3g@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] block: partitions: of: Skip child nodes without
+ reg property
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	daniel@makrotopia.org, stable@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The batch prepare path rereads its userspace element array when rolling
-back a partially prepared batch. Userspace can change an already
-processed tag before the second read, causing rollback to reject the
-replacement tag and leave earlier I/O slots prepared. The
-WARN_ON_ONCE() in the rollback path then fires.
+On Tue, Jun 30, 2026 at 2:59=E2=80=AFPM Loic Poulain
+<loic.poulain@oss.qualcomm.com> wrote:
+>
+> Hi Rob,
+>
+> On Tue, Jun 30, 2026 at 8:02=E2=80=AFPM Rob Herring <robh@kernel.org> wro=
+te:
+> >
+> > On Mon, Jun 29, 2026 at 10:55:20AM +0200, Loic Poulain wrote:
+> > > Child nodes of a fixed-partitions node are not necessarily partition
+> > > entries, for example an nvmem-layout node has no reg property. The
+> > > current code passes a NULL reg pointer and uninitialized len to the
+> > > length check, which can result in a kernel panic or silent failure to
+> > > register any partitions.
+> >
+> > That does not sound right to me. A fixed-partitions node should only be
+> > defining partitions with address ranges. I would expect a partition nod=
+e
+> > could be nvmem-layout, but not the whole address range. If you wanted
+> > the latter, then just do:
+> >
+> > partitions {
+> >   ...
+> > };
+> >
+> > nvmem-layout {
+> >   ...
+> > };
+>
+> In our case, the nvmem-layout needs to be associated with a specific
+> eMMC hardware partition, nvmem cells can be a simple sub-range within
+> the global eMMC, each hardware partition (boot0, boot1, user...)
+> having its own address spaces.
+>
+> That said, your point about not abusing fixed-partitions is valid. I
+> initially dropped the compatible =3D "fixed-partitions" from the
+> partitions-boot1 node when it only carries an nvmem-layout and no
+> actual partition entries, making it a plain named container node. But
+> it's a bit fragile if we want to support both nvmem-layout and
+> fixed-partitions.
+>
+> Regarding your expectation of a partition node being a nvmem-layout,
+> do you mean that the nvmem-layout should live under a fixed-partitions
+> node? Something along these lines:
+>
+> partitions-boot1 {
+>       compatible =3D "fixed-partitions";
+>       #address-cells =3D <1>;
+>       #size-cells =3D <1>;
+>
+>       nvmem@4400 {
 
-Copy the bounded batch into kernel memory before changing any I/O state
-and use the same snapshot for preparation and rollback. Commit and fetch
-batches retain the existing chunked userspace walk.
+partition@4400
 
-Fixes: b256795b3606 ("ublk: handle UBLK_U_IO_PREP_IO_CMDS")
-Reported-by: syzbot+1a67ee1aa79484801ec6@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1a67ee1aa79484801ec6
-Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
----
- drivers/block/ublk_drv.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+>           reg =3D <0x4400 0x1000>;
+>
+>           nvmem-layout {
+>               compatible =3D "fixed-layout";
+>               #address-cells =3D <1>;
+>               #size-cells =3D <1>;
+>
+>               wifi_mac_addr: mac-addr@0 {
+>                   compatible =3D "mac-base";
+>                   reg =3D <0x0 0x6>;
+>                   #nvmem-cell-cells =3D <1>;
+>               };
+>       [...]
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4f6d9e652187..c2c11f2a01e7 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -3584,6 +3584,7 @@ ublk_batch_auto_buf_reg(const struct ublk_batch_io *uc,
- #define UBLK_CMD_BATCH_TMP_BUF_SZ  (48 * 10)
- struct ublk_batch_io_iter {
- 	void __user *uaddr;
-+	const u8 *kaddr;
- 	unsigned done, total;
- 	unsigned char elem_bytes;
- 	/* copy to this buffer from user space */
-@@ -3632,7 +3633,10 @@ static int ublk_walk_cmd_buf(struct ublk_batch_io_iter *iter,
- 	while (iter->done < iter->total) {
- 		unsigned int len = min(sizeof(iter->buf), iter->total - iter->done);
- 
--		if (copy_from_user(iter->buf, iter->uaddr + iter->done, len)) {
-+		if (iter->kaddr) {
-+			memcpy(iter->buf, iter->kaddr + iter->done, len);
-+		} else if (copy_from_user(iter->buf, iter->uaddr + iter->done,
-+				  len)) {
- 			pr_warn("ublk%d: read batch cmd buffer failed\n",
- 					data->ub->dev_info.dev_id);
- 			return -EFAULT;
-@@ -3723,14 +3727,21 @@ static int ublk_handle_batch_prep_cmd(const struct ublk_batch_io_data *data)
- 		.total = uc->nr_elem * uc->elem_bytes,
- 		.elem_bytes = uc->elem_bytes,
- 	};
-+	void *cmd_buf;
- 	int ret;
- 
-+	cmd_buf = vmemdup_user(iter.uaddr, iter.total);
-+	if (IS_ERR(cmd_buf))
-+		return PTR_ERR(cmd_buf);
-+	iter.kaddr = cmd_buf;
-+
- 	mutex_lock(&data->ub->mutex);
- 	ret = ublk_walk_cmd_buf(&iter, data, ublk_batch_prep_io);
- 
- 	if (ret && iter.done)
- 		ublk_batch_revert_prep_cmd(&iter, data);
- 	mutex_unlock(&data->ub->mutex);
-+	kvfree(cmd_buf);
- 	return ret;
- }
- 
--- 
-2.55.0
+Either this or replacing "fixed-partitions" with "fixed-layout" if you
+want to make the whole boot1 partition nvmem-layout looks like the
+right way to me.
 
+> That makes some sense, this would require extra work for the
+> emmc/block layer to also associate fwnodes with logical partitions,
+> not just the whole disk/hw (hw part), Is that the direction you'd like
+> us to go?
+
+Yes.
+
+> Also, Note that regardless of which approach we settle on, this
+> specific fix/patch remains necessary to validate the partition node
+> and prevent NULL-deref.
+
+Fair enough, though the reasoning for it would be different and
+perhaps should give a warning.
+
+Rob
