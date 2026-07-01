@@ -1,196 +1,316 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368DF425CF2
-	for <linux-block@vger.kernel.org>; Wed,  1 Jul 2026 10:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EF444BCB0;
+	Wed,  1 Jul 2026 11:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782902453; cv=none; b=pugJFf2LOyUChVLaN+Rde1CQlgyUWGZn9giHzKOwvsgH4I7hgmr91TJiuGykIBsuOKtNuFYMZbyh6MVx7rWF4I3AKb1cSYDGZrcCKj7OSxMugKFBYIElS3xD3D1Rxig/BoNASIPZ+3+6ZIGlRnkFXT8O2X4v4FqKp6cWQkJFRgw=
+	t=1782904115; cv=none; b=IreV0gKx7hzitGsM/5Z2OJYMQ9spFWDia9hwFaf1Kc+dkIDddTxccOnyMvzYfkSktPgMWqIW9gQSQXAvw43tqc+TuVrIIgvtMWvUMYjmvOPdUNsBDYTuhAW7RAF9YsJMi+XgFjzwfHqgqrFAxQAALsmxWG+B5IBgDJFZaT0lFY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782902453; c=relaxed/simple;
-	bh=HOn0CaCePfNgAAG9q0s3jJIiPvvFTH5KrOgQqhOkSqw=;
+	s=arc-20240116; t=1782904115; c=relaxed/simple;
+	bh=S9U/QQkOj2QcN7GOUDf8Nq4vJ3cWwPyQIEl2/pEFaPo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d02GlFfgCDR8pPlqAN3C7GAuEr2YpwYTNLaqJUsTNVSyAHrImyV5N7Eo4mX31Ay022lsIlU/BTZfDNGfVoc2pZebH6yZAW9p2eiCHlH2rnk+gL9AuPL899KPyvkV+h0hmYbI2Lxg9SZCwnTVqDuZtd4F3DgknELZad85UXx+vHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nsg+7PGS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GyL4FosQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 In-Reply-To:Content-Type; b=bhW0nh0PqRc5FYwORkU8VTuEqYVF6zsDgdE2oWga05dcZX/rD1XsOovYwPGFAV4OWi9n2MqAzKvUU9KlGICuGBXQ3g/AqLbbRSD3rEeGP53Uwe6YpTUPsZsu7miFpLY1UV/KivphYjTDCIQol+c/vVpbBwd632YsLqx3v7euXUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QRnvYhKi; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nsg+7PGS";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GyL4FosQ"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661A8wQ6644881
-	for <linux-block@vger.kernel.org>; Wed, 1 Jul 2026 10:40:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	m/6nkzPv+WrZ0PcEEcEQEu660EWyt8TZ3LWKgMKw0Bc=; b=nsg+7PGSN9LMaaHb
-	vP7qwVAt0LvmfNhpwCNGGrHCO3fVvstLF7mT3Di+sWTZork4SslT9bHt26h9Mi92
-	IaYhXfMfqJWclBMkqxErZVX/sXvQ1vvohbsCRngPa0TuPp5VB+JOzvndmxfZnSkJ
-	ieUI1piKVL7WKls80+Aju0hIxcycUnroOorlyO/9M8hEMVrMg9Pyrww7Lxd0qWPN
-	ZqzULmqFpA7/z9kemgHxgGkpVUbrJUSJzUqeFMWkqUtdHdrWDrwwRvgol4kD4Mps
-	FMcvtl/2AdFVVCEzWSJDZwHSG2iEjIVD+UGCQ4/eUewg5ouFQT6h713Po8G7SAkB
-	+O7xfA==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f4hbd4bp1-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 01 Jul 2026 10:40:49 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51c267931ebso1500391cf.2
-        for <linux-block@vger.kernel.org>; Wed, 01 Jul 2026 03:40:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782902448; x=1783507248; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=m/6nkzPv+WrZ0PcEEcEQEu660EWyt8TZ3LWKgMKw0Bc=;
-        b=GyL4FosQWSFeMIENYzn5k8JSIEfI2ZrGYNpC1fKjjmS6BTMlrw4rxicSfTG4qjXnIS
-         9+CZ3gwlOkhoeRZcwnQ0b6/iEy4VFcwtGAfWMcCC6SddQdXl7UZc862VOOwZn/5Y34Mw
-         FA59JJ+0GbiFvCry5GBqdGRKHBNyXTjoCEPdFTN7jrt7Tp1GF/CsiBad/vFQWNmP2Q8U
-         +6JzkSpZsT3BOUv9RqiZzOYkPZcdR0S+7Odk37PqsVEGPqI1rCzZfz6VT5Don0LtgZen
-         rSOTEplzWuWhvChXWd4lm9B0fx0lROoKOZLkV5qzDxDiADLi6Fy0zCPvHzltp3aRKxnt
-         rscQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782902448; x=1783507248;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=m/6nkzPv+WrZ0PcEEcEQEu660EWyt8TZ3LWKgMKw0Bc=;
-        b=O5l2nOsM1rPtvNxJdnkOJSgNlI5CHD0M9oxRBBsJ1pBbDgmiP3RrNFxgMdHFmWhIln
-         PM4jIqNP+09Q5ODrBF1Siy741VuzBJpanKGxQjxfIO8PgB0C0qWBMsL6MOAhl4LNdEMf
-         vdCE6vkSI2lWQGJNzDbu6dwsB7VLz2Ev0EI6pAHjsPr57rO7ok1tQ/PUZ3CyZy/8m/nt
-         6AWcu9Z1ZTDg0msxKYHiZnkNeuYBcdNUkRSKtgwgfhia5B9XL81opjH8m1SLj0SyrBEX
-         Ka9xEporuyspQ7bBtu9KobrEGcUgj/RTsHZMp038113cyjhrv+9mEf8Z1lyQbaM1rFtu
-         wV3w==
-X-Gm-Message-State: AOJu0Ywrw2/c1iWrtrYHnCLUevXrGaW+6WJCFMSOF4a8eePrIlEIefAk
-	sJWNwQ0JrXgdGTZmn4+1RRgZV8W7ghHWJRZ1lznq3PNDUO9lWloLrfrcjM7KQAwE24jz7HNS77x
-	EYv5Kmkctv7YhBMlrtWJgScUKgfuM0Qn8kUjV5cKYek0VdhDNmKfKD/muP04rR9nIFg==
-X-Gm-Gg: AfdE7cn9p5QPsrH7+GWBrvcnavQSS4IXcN+drYddYMVh8oO9LUZstIP18h0vRokGcm7
-	3PRuv5ugyI/OIb4P0/MsLKTn3RMH3aSXZ6dKxwT7Hf77AGu7g78IOAFrh/NADB8TIjE589CFRpN
-	l2gdE52hyh6R5v6cisZKW0cRtLkhjwU8ZjLTeYniKVxmZTzhUohrrPIcjWqFAY0ILiPah8NzD94
-	QGG2yHhV+KpGfw0milxJB5wo7fW93fKxZt3hU7m2L1TpoVgbJ5oDNGp9Cu6SIx81Bgr+3PBO9fw
-	pMOQz74A3JmClcW/N6Uvak966uPpYhSKJS5k1gDkR7yje0shmRD7ou4z+cDJPxh91CNKbDE8+Bb
-	F1Exuilm7YZX/tmmIkfFbhMKSpiVAbw7Msys=
-X-Received: by 2002:ac8:590d:0:b0:51a:8c9b:6492 with SMTP id d75a77b69052e-51c26b25d63mr7031841cf.9.1782902448035;
-        Wed, 01 Jul 2026 03:40:48 -0700 (PDT)
-X-Received: by 2002:ac8:590d:0:b0:51a:8c9b:6492 with SMTP id d75a77b69052e-51c26b25d63mr7031251cf.9.1782902447419;
-        Wed, 01 Jul 2026 03:40:47 -0700 (PDT)
-Received: from [192.168.120.170] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1296b1f9cesm165809466b.16.2026.07.01.03.40.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 03:40:45 -0700 (PDT)
-Message-ID: <175f7835-df18-4bc6-8267-ceef35696af8@oss.qualcomm.com>
-Date: Wed, 1 Jul 2026 12:40:42 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QRnvYhKi"
+Message-ID: <0efcc0a9-a51d-4de8-8406-b8fa536a91b7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782904099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ieMgPSS1eIBfAPTWcoeMePMwN2vKLGAwkXUol+yS3JM=;
+	b=QRnvYhKi7ifn2CAOqwrrTALRRhFuKdBNRY4USBSzQESgxOH79yyPbWsw+wvjxJGm9pDQu3
+	75wHltVABewcdEultw97xVO9Srux+vxmHLrM1y3qkyY8Qi8RlcbW/19L2d+jmEkSOqKAw5
+	8d3ZpLHm3o4fEt3mWUbZ+Ie+mvfoBxk=
+Date: Wed, 1 Jul 2026 19:07:22 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/6] firmware: qcom: scm: Add support for setting
- Bluetooth power modes
-To: george.moussalem@outlook.com, Jens Axboe <axboe@kernel.dk>,
-        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Saravana Kannan
- <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
- <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
-References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
- <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
+Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
+To: Jani Nikula <jani.nikula@linux.intel.com>,
+ David Laight <david.laight.linux@gmail.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "David Hildenbrand (Arm)" <david@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, David Howells <dhowells@redhat.com>,
+ Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
+ <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
+ linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>,
+ Muchun Song <muchun.song@linux.dev>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+ <20260622040533.29824-2-kaitao.cheng@linux.dev>
+ <20260622094242.64531b9a@pumpkin>
+ <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
+ <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
+ <20260624152324.3def88ce@pumpkin>
+ <0ed6b5c3-e955-46e2-9fc6-075a0dfd1c4f@linux.dev>
+ <734f66ca51485ee3ec9788c0eaaead681e00664b@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+In-Reply-To: <734f66ca51485ee3ec9788c0eaaead681e00664b@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDExMSBTYWx0ZWRfXz4Z+3fXUQj1u
- m0fTEMVS+lMRS+8Mabk/BKNoTmPyTzUGUQq8qcBtRGBpvsYW/2XmYTu8QTkMzmRzsnSlzfbZgpC
- U36Q7E5yzUJZS32RYATyKFg3vi7eJ9U=
-X-Authority-Analysis: v=2.4 cv=MpJiLWae c=1 sm=1 tr=0 ts=6a44eeb1 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
- a=UqCG9HQmAAAA:8 a=506_Lbxh6H-Y4vAdgPkA:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-ORIG-GUID: oDOH-Mgnbjvy6tDme1DA4bqrMmx1nDyd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDExMSBTYWx0ZWRfXwUyp7aQjc3P4
- lhh8FEmiansjthqW6Cii+ucvwJKFXb/dfkKF/eGlrZ/sSWEdwFLEw7sPQucyO6jNi6PLBcnJyEd
- G+eoOm/viiaQZdkVQfP+bdPv1FOO2wiqnBQz8Mvz3GTjTzd2ltVNypMU+tf4gAEAJVRRGT5LILV
- JzXh5hGu0Gu1MSmitEN4GTr55RxYxdywrW6XJShaBkAAG+3X6r3lua7Q9Zvps2lNwLS1ifRaqVl
- NlfbSCl1YZe7iQCt3lw+nfGzuKmflSseewzlsSOJ3fmyJ40ynBu8XlGiESf7HB8gSe++HqOZijk
- CLbtD9C+G2f3RnsC63gVvbjOUQAY7o0kJxJLpn7k6/RZ4IzR5C16H86UwUNBANhtBd3zpRfOHvj
- 4gcLKGPA5wpMp+8JFIFZujEqFIc+FSL+1L7J9EwiO5xIjZLZ7esUZoj8zA1KUfohyiK21PxynL/
- Ep5awnB+9hq60ektTEg==
-X-Proofpoint-GUID: oDOH-Mgnbjvy6tDme1DA4bqrMmx1nDyd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-01_03,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- phishscore=0 adultscore=0 malwarescore=0 bulkscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607010111
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/29/26 3:01 PM, George Moussalem via B4 Relay wrote:
-> From: George Moussalem <george.moussalem@outlook.com>
+在 2026/6/25 19:00, Jani Nikula 写道:
+> On Thu, 25 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+>> 在 2026/6/24 22:23, David Laight 写道:
+>>> On Wed, 24 Jun 2026 15:23:47 +0200
+>>> Christian König <christian.koenig@amd.com> wrote:
+>>>> On 6/24/26 15:14, Kaitao Cheng wrote:
+>>>>> 在 2026/6/22 16:42, David Laight 写道:  
+>>>>>> On Mon, 22 Jun 2026 12:05:31 +0800
+>>>>>> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+>>>>>>  
+>>>>>>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>>>>>>
+>>>>>>> The list_for_each*_safe() helpers are used when the loop body may
+>>>>>>> remove the current entry.  Their API exposes the temporary cursor at
+>>>>>>> every call site, even though most users only need it for the iterator
+>>>>>>> implementation and never reference it in the loop body.
+>>>>>>>
+>>>>>>> Add *_mutable() variants for list and hlist iteration.  The new helpers
+>>>>>>> support both forms: callers may keep passing an explicit temporary cursor
+>>>>>>> when they need to inspect or reset it, or omit it and let the helper use
+>>>>>>> a unique internal cursor.  
+>>>>>>
+>>>>>> I'm not really sure 'mutable' means anything either.
+>>>>>> It is possible to make it valid for the loop body (or even other threads)
+>>>>>> to delete arbitrary list items - but that needs significant extra overheads.
+>>>>>>
+>>>>>> It might be worth doing something that doesn't need the extra variable,
+>>>>>> but there is little point doing all the churn just to rename things.
+>>>>>>  
+>>>>>>>
+>>>>>>> This makes call sites that only mutate the list through the current entry
+>>>>>>> less noisy, while keeping the existing *_safe() helpers available for
+>>>>>>> compatibility.
+>>>>>>>
+>>>>>>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>>>>>> ---
+>>>>>>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
+>>>>>>>  1 file changed, 231 insertions(+), 38 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/include/linux/list.h b/include/linux/list.h
+>>>>>>> index 09d979976b3b..1081def7cea9 100644
+>>>>>>> --- a/include/linux/list.h
+>>>>>>> +++ b/include/linux/list.h
+>>>>>>> @@ -7,6 +7,7 @@
+>>>>>>>  #include <linux/stddef.h>
+>>>>>>>  #include <linux/poison.h>
+>>>>>>>  #include <linux/const.h>
+>>>>>>> +#include <linux/args.h>
+>>>>>>>  
+>>>>>>>  #include <asm/barrier.h>
+>>>>>>>  
+>>>>>>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
+>>>>>>>  #define list_for_each_prev(pos, head) \
+>>>>>>>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
+>>>>>>>  
+>>>>>>> -/**
+>>>>>>> - * list_for_each_safe - iterate over a list safe against removal of list entry
+>>>>>>> - * @pos:	the &struct list_head to use as a loop cursor.
+>>>>>>> - * @n:		another &struct list_head to use as temporary storage
+>>>>>>> - * @head:	the head for your list.
+>>>>>>> +/*
+>>>>>>> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
+>>>>>>>   */
+>>>>>>>  #define list_for_each_safe(pos, n, head) \
+>>>>>>>  	for (pos = (head)->next, n = pos->next; \
+>>>>>>>  	     !list_is_head(pos, (head)); \
+>>>>>>>  	     pos = n, n = pos->next)
+>>>>>>>  
+>>>>>>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
+>>>>>>> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\  
+>>>>>>
+>>>>>> Use auto
+>>>>>>  
+>>>>>>> +	     !list_is_head(pos, (head));				\
+>>>>>>> +	     pos = tmp, tmp = pos->next)
+>>>>>>> +
+>>>>>>> +#define __list_for_each_mutable1(pos, head)				\
+>>>>>>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
+>>>>>>> +
+>>>>>>> +#define __list_for_each_mutable2(pos, next, head)			\
+>>>>>>> +	list_for_each_safe(pos, next, head)
+>>>>>>> +
+>>>>>>>  /**
+>>>>>>> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
+>>>>>>> + * list_for_each_mutable - iterate over a list safe against entry removal
+>>>>>>>   * @pos:	the &struct list_head to use as a loop cursor.
+>>>>>>> - * @n:		another &struct list_head to use as temporary storage
+>>>>>>> - * @head:	the head for your list.
+>>>>>>> + * @...:	either (head) or (next, head)
+>>>>>>> + *
+>>>>>>> + * next:	another &struct list_head to use as optional temporary storage.
+>>>>>>> + *		The temporary cursor is internal unless explicitly supplied by
+>>>>>>> + *		the caller.
+>>>>>>> + * head:	the head for your list.
+>>>>>>> + */
+>>>>>>> +#define list_for_each_mutable(pos, ...)					\
+>>>>>>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
+>>>>>>> +		(pos, __VA_ARGS__)  
+>>>>>>
+>>>>>> The variable argument count logic really just slows down compilation.
+>>>>>> Maybe there aren't enough copies of this code to make that significant.
+>>>>>> But just because you can do it doesn't mean it is a gooD idea.
+>>>>>> I'm also not sure it really adds anything to the readability.
+>>>>>>
+>>>>>> And, it you are going to make the middle argument optional there is
+>>>>>> no need to change the macro name.  
+>>>>>
+>>>>> Christian König and Jani Nikula also disagree with the variadic-argument
+>>>>> implementation approach. If we abandon that method, it means we will
+>>>>> inevitably need to add some new macros. If mutable is not a good name,
+>>>>> suggestions for better alternatives would be welcome; coming up with a
+>>>>> suitable name is indeed rather tricky.  
+>>>>
+>>>> I don't think you need to add a new macro for the specific use case that people want to modify the next element of the iteration.
+>>>>
+>>>> If I remember your numbers correctly that is a really corner case and keeping using the existing *_safe() macros for that sounds perfectly fine to me.
+>>>
+>>> IIRC currently you have a choice of either:
+>>> 	define               Item that can't be deleted
+>>> 	list_for_each()	     The current item.
+>>> 	list_for_each_safe() The next item.
+>>> There is also likely to be code that updates the variables to allow
+>>> for other scenarios.
+>>>
+>>> Note that if increase a reference count and release a lock then list_for_each()
+>>> is likely safer than list_for_each_safe() :-)
+>>>
+>>> list.h has 9 variants of the 'safe' loop.
+>>> The bloat of another 9 is getting excessive.
+>>>
+>>> It has to be said that this is one of my least favourite type of list...
+>>
+>> Hi Christian König, David Laight, Jani Nikula, David Hildenbrand,
+>> Andy Shevchenko, Alexei Starovoitov
+>>
+>> For ease of discussion, I need to summarize the currently possible
+>> approaches and briefly describe their respective pros and cons,
+>> using the list_for_each_entry* interfaces as examples.
+>>
+>> 1. Add list_for_each_entry_mutable, while keeping list_for_each_entry
+>> and list_for_each_entry_safe unchanged. list_for_each_entry_mutable
+>> would be used specifically for safe deletion scenarios that do not
+>> need to expose the temporary cursor externally. The code can refer to
+>> the v1 version.
+>>
+>> Pros: Does not depend on immediate per-subsystem adaptation and can be
+>>       merged directly.
+>> Cons: Requires adding a whole set of mutable interfaces, which makes the
+>>       code somewhat redundant.
 > 
-> The Bluetooth subsystem (BTSS) on the IPQ5018 SoC supports setting power
-> modes which are required to be configured through a Secure Channel
-> Manager (SCM) call to TrustZone. However, not all Trusted Execution
-> Environment (QSEE) images support this call, so first check if the call
-> is available.
+> Seems fine, and the original _safe naming is ambiguous anyway.
 > 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> ---
+>> 2. Directly optimize away the temporary cursor in list_for_each_entry_safe
+>> and define it inside the loop instead, changing the interface from four
+>> arguments to three.
+>>
+>> Pros: Does not add redundant interfaces.
+>> Cons: (1) Users need to manually update special cases that use the
+>>       traversal variable of list_for_each_entry_safe, the new
+>>       list_for_each_entry_safe would no longer apply there and would
+>>       need to be open-coded.
+>>       (2) Because the macro arguments changes, all list_for_each_entry_safe
+>>       callers would need to be modified and merged together, making it
+>>       difficult to merge such a large amount of code at once.
+> 
+> This won't fly because there are literally thousands of
+> list_for_each_entry_safe() users.
+> 
+>> 3. Use a variadic macro approach to optimize list_for_each_entry_safe,
+>> so that it supports both three and four arguments.
+>>
+>> Pros: (1) Does not add redundant interfaces.
+>>       (2) Does not depend on immediate per-subsystem adaptation and can
+>>       be merged directly.
+>> Cons: (1) Increases compile time.
+>>       (2) Makes the interface harder for users to use.
+> 
+> Basically I'm against any variadic macro tricks where the optional
+> argument is not the last argument. That's just way too surprising, and
+> goes against common practice in just about all other languages.
+> 
+>> 4. Optimize list_for_each_entry by defining the temporary cursor internally,
+>> making it compatible with the functionality of list_for_each_entry_safe.
+>> The code can refer to the v2 version.
+>>
+>> Pros: (1) Does not add redundant interfaces.
+>>       (2) The number of externally visible arguments of list_for_each_entry
+>>       remains unchanged, still three.
+>> Cons: (1) list_for_each_entry and list_for_each_entry_safe would be merged
+>>       into one, and list_for_each_entry_safe would gradually be deprecated.
+>>       (2) Users need to manually update special cases that use the traversal
+>>       variable of list_for_each_entry, the new list_for_each_entry would no
+>>       longer apply there and would need to be open-coded. There are 15 such
+>>       cases in total.
+> 
+> This sounds good to me, though I take it there's some code size increase
+> and/or performance penalty?
+> 
+> Maybe the 15 cases are questionable anyway?
+> 
+>> 5. Use a variadic macro approach to optimize list_for_each_entry, so that
+>> it supports both three and four arguments.
+>>
+>> Pros: (1) Does not add redundant interfaces.
+>>       (2) Does not depend on immediate per-subsystem adaptation and can be
+>>       merged directly.
+>> Cons: (1) Increases compile time.
+>>       (2) list_for_each_entry and list_for_each_entry_safe would be merged
+>>       into one, and list_for_each_entry_safe would gradually be deprecated.
+> 
+> Please don't do the macro tricks.
+> 
+>> 6. Make no changes, keep the current logic unchanged, and close the current
+>> email discussion.
+> 
+> I like hiding the temporary stuff when possible.
+> 
+> BR,
+> Jani.
 
-I'm amazed changing this setting is a secure operation
+Hi all,
+If there are no objections, I will make the changes using the first approach.
 
-[...]
 
-> +/**
-> + * qcom_scm_pas_set_bluetooth_power_mode() - Configure power optimization mode
-> + *					     for the Bluetooth subsystem (BTSS)
-> + * @pas_id:	peripheral authentication service id
-> + * @val:	0x0 for normal operation, 0x4 for ECO mode
+Hi David Laight,
+You previously expressed a different opinion. Do you have any further comments
+on the current proposed approach?
 
-If there's just two values, maybe we should make this take a `bool eco_mode`?
+-- 
+Thanks
+Kaitao Cheng
 
-> + *
-> + * Return: 0 on success, negative errno on failure.
-> + * Returns -EOPNOTSUPP if the firmware configuration call is unavailable.
-> + */
-> +int qcom_scm_pas_set_bluetooth_power_mode(u32 pas_id, u32 val)
-> +{
-> +	if (!__qcom_scm_is_call_available(__scm->dev, QCOM_SCM_SVC_PIL,
-> +					  QCOM_SCM_PIL_PAS_BT_PWR_MODE))
-> +		return -EOPNOTSUPP;
-> +
-> +	return __qcom_scm_pas_set_bluetooth_power_mode(pas_id, val);
-
-Let's just inline the whole definition here - it's single-use anyway
-
-Konrad
