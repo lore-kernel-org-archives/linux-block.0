@@ -1,941 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F64D24E4C3;
-	Thu,  2 Jul 2026 16:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783011524; cv=none; b=K8d6i4sT68LWnLKTwIHm1rlr2x2Vq8opK6TPZ/46bajvLvz8KxWJxJe7n9myFejti2+FLOS641dzdN694FO9TfFnSWJGl9suEBfjZPNHEANXWeY2SVCjxyFDT4m7GtqhfwIApSJFN7HRahmjaukB8FlnaOOUqjMvD0tZpob3czs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783011524; c=relaxed/simple;
-	bh=RksY6spesc/RoHAYv/aQp+bjn/v8Ix3DpuSmFQ9PvD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rAePnmSknBze0cxjFFDOLt6KmTS/q6bRYz5CuYa2oIwAF2B1gZjKNUOp9dbzTYbj6QcUG6Jdpa456lozIb3RlJha3vWa4IA5DdWqwu7c9m9rI9r2choonEoxKFkZ98IU/sItXVUhek9jhNOnkxrZeJmNv28TwhhAs7FDDeNk+D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrRX4a4t; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B823176EF;
+	Thu,  2 Jul 2026 23:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783035752; cv=fail; b=Dh7r2TAOWHzNdJajR9YVk96C+JACxmRLLPzSy+7e2fEzkMS9xJLkaC2Zx527sll9eSK/zb5gRX8gHEAvKl0qYNjOhkjuGo2IP2Y9tc7XGbYA5weSvZZSGDkLZ0fPMFDb646vRnLNw0LFG9drHE714qEdH1qqNWtsW/ML/Xy9ihE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783035752; c=relaxed/simple;
+	bh=t87kzcKBHapzpzXPcKdis9WsIfLLB2uJniBUU8JPUGo=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=XosBxa0TMaDXIcQhnCQI/GcQrTt7TDYVrvdwcKbYI1R1D96JQP61ojLu/ySs6/8yzxdlGGC35tK4XcethJgiFgjbK0Bm4us9m/0jgHF8aJcAtQUdvetQk1R2XlaInkoH7WMzYUpKvJXPdc8f6B73VgfQ1YjjirJeYlVq3giGrT4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AmUILLWC; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=AHN0ZzeY; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrRX4a4t"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1D9BD1F00A3E;
-	Thu,  2 Jul 2026 16:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783011522;
-	bh=Zb5EXf2ovo6UufrOrmxA5aKxNooLmPywNDd7EorJKw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=CrRX4a4txrvnJFsq8oC4/tLM23WGjr79R1MaXHPIntlbz2i82r3XLtXpgw8yN0y81
-	 uVPZwMvQWPGXeBAGsB0vu+rPz0S+03F5LZog1LWuHUbljjzyinbiqS7hwgE6pMLtni
-	 kIcIkwwmhVGuEVlC9PmMCFRyz83W7+dpUMYRGeF2PzLvkpPPvucfC2gc3XYHg0YTX1
-	 34IGxmH9rtPnDL7P3ZRRwWGXsxm4IWB5M48pvwPNmXpuadV56EWnisVxXG+RilRucL
-	 rWTku0kZz+GuPQWu4VyLMbxCf0ZeKbR+IM7Y8gEic3vFhVJd5LQ0CNduVtqkyxq6nk
-	 4aGi0F4S/+HHA==
-Date: Thu, 2 Jul 2026 09:58:41 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: brauner@kernel.org, hch@lst.de, willy@infradead.org,
-	hsiangkao@linux.alibaba.com, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Dan Williams <djbw@kernel.org>, Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Chunhai Guo <guochunhai@vivo.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>, Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Baokun Li <libaokun@linux.alibaba.com>,
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Zhang Yi <yi.zhang@huawei.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:BTRFS FILE SYSTEM" <linux-btrfs@vger.kernel.org>,
-	"open list:FILESYSTEM DIRECT ACCESS (DAX)" <nvdimm@lists.linux.dev>,
-	"open list:EROFS FILE SYSTEM" <linux-erofs@lists.ozlabs.org>,
-	"open list:EXT2 FILE SYSTEM" <linux-ext4@vger.kernel.org>,
-	"open list:F2FS FILE SYSTEM" <linux-f2fs-devel@lists.sourceforge.net>,
-	"open list:FUSE FILESYSTEM [CORE]" <fuse-devel@lists.linux.dev>,
-	"open list:GFS2 FILE SYSTEM" <gfs2@lists.linux.dev>,
-	"open list:NTFS3 FILESYSTEM" <ntfs3@lists.linux.dev>
-Subject: Re: [PATCH v2 17/18] iomap: pass iomap_next_fn directly instead of
- struct iomap_ops
-Message-ID: <20260702165841.GM9392@frogsfrogsfrogs>
-References: <20260701000949.1666714-1-joannelkoong@gmail.com>
- <20260701000949.1666714-18-joannelkoong@gmail.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AmUILLWC";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="AHN0ZzeY"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 662LTOvx909421;
+	Thu, 2 Jul 2026 23:42:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=s0aWwp/CxxZSiCE71i
+	MoX16SuYkp/pvNcKY0Jyaw0hM=; b=AmUILLWCsvPP3CZvOh2Q0WQqq7qmA4KVUS
+	NquFlijIM9o/ZSlQllSflA3IY8DGw/hfe/Ix9iSfe4CBOc7NV5bZ5gTeHFeOGgL7
+	dewGB70rGd0OXmeyAGO9TXsmS+0slSvugP8Ir4j+BiklZx8jbu4NlyR+hJ9hpYPi
+	Mrkw2oMH5FUQ4OUyKMuE7QZDO36+IT1pmsnNbib1e4HVa1WA9VwKSFi7M0z6mOg8
+	/LgH0SMGqc7Ft1Nan//+aVLfQ/LpqrmrJgsVg3jPG+6OifLGTlyooLr7hc0MLjUc
+	JGyGrnSOsAicHWECDEWTiIGiVgH9H7glbix1gYmHGqOabZpirKsA==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4f272qsa94-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 Jul 2026 23:42:01 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 662Ncbv6039991;
+	Thu, 2 Jul 2026 23:42:00 GMT
+Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012071.outbound.protection.outlook.com [52.101.43.71])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4f3u1yxy90-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 Jul 2026 23:41:59 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hvXiw/yvvmr/UWJHUivUeLSnoYPs1kzNrc5h0LB91HKa4UDLG1jeuyyGNc9ughh8TGi5fZObK/J74pXmtbN6DJWLdgL7DHePh57ncyg3VgBzX86VC0AUncQ7l+3BNSDj6zscz8qhkNuvG9WKxQNbGl9SPgZINzujaccf6apc0ccW27m1Vv/UsX1Pjz+ZgK48ixwi9xojmGyyE2JPAiR0IJHa4O8QN8Hl366kGGfuycp7uz0BAbl3nWqSOI0J92yaxIfATqn7f2lKMWeSacokV95kwCMheNu/OycYhMMak6NVni2JM22BtkAVUkZuaS3oVvmOn5lEQzMfNUNqw0iUAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s0aWwp/CxxZSiCE71iMoX16SuYkp/pvNcKY0Jyaw0hM=;
+ b=A9TBL4OGea6l3+1rxkSyrR5eFZXzksi+Xwotlffh1iK2SDCHfyvdIe1uVrucBjIHJN6XBf5SgcWlO0CneaQH34YvhcEuSmw+Nub5pfLXIAdd//Og7xZahFqT8NfFRgtszF8MP2a2j1P4B2PqguY/orn5atM9Tm2ZYQvXgga8uLh8Nv6guXUtSTvS6QGEhKU+2cieY+aJAWMjiYDv0c7EwLStW21aqJs8HS8K/ra9S7sDlQUcz9zK62h5Rql6fR03es6vmoniOGRLWmfa6axd3ln3ls7atIH9I2veqJ95NhdLGuJU/7alJNCIHk8KBFxMvB3pRehxiPqYbipaYT7mhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s0aWwp/CxxZSiCE71iMoX16SuYkp/pvNcKY0Jyaw0hM=;
+ b=AHN0ZzeYUAi7i+bQJhlOtiW/+WeAXdJewSsn75TV8bvK6AJLFHtBrAVYymFRhbHidScIBM4LKJ2HGC6AX+A6gsoKa4pjMEDQoZ4/RSsQQCwWQkIck8t/dgDBpNokAl8a7uy+x5ID5T8Qm55F1MweIOfDBalZDjTClmNCq56kw/U=
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
+ by BL3PR10MB6209.namprd10.prod.outlook.com (2603:10b6:208:3bd::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Thu, 2 Jul
+ 2026 23:41:56 +0000
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5]) by CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5%6]) with mapi id 15.21.0181.009; Thu, 2 Jul 2026
+ 23:41:55 +0000
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Anuj Gupta
+ <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe
+ <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg
+ <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v4 1/5] block: use integrity interval instead of sector
+ as seed
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <CADUfDZqE6JLLbugK+qYe=XFSLV5zUwFEQ6qRqvJ-=uVs8OtfVg@mail.gmail.com>
+	(Caleb Sander Mateos's message of "Wed, 1 Jul 2026 12:56:24 -0700")
+Organization: Oracle
+Message-ID: <yq1ldbtm025.fsf@ca-mkp.ca.oracle.com>
+References: <20260627054220.2174166-1-csander@purestorage.com>
+	<20260627054220.2174166-2-csander@purestorage.com>
+	<CADUfDZqE6JLLbugK+qYe=XFSLV5zUwFEQ6qRqvJ-=uVs8OtfVg@mail.gmail.com>
+Date: Thu, 02 Jul 2026 19:41:53 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: YQBPR0101CA0141.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:e::14) To CH0PR10MB5338.namprd10.prod.outlook.com
+ (2603:10b6:610:cb::8)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260701000949.1666714-18-joannelkoong@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|BL3PR10MB6209:EE_
+X-MS-Office365-Filtering-Correlation-Id: a22505b9-aea5-42b7-fba1-08ded8938021
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|23010399003|366016|4143699003|18002099003|22082099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	6IYkoKkAeBNxZbvtheEP7kl0OjcXtijPupQdKT7u9O+EdQFt3XS9FuTXfuIQriMPgYoIPPozzWw89hxlMqr3yzqzrauyS4QZsi+CnAp19hxEbhdS3jsc/PolDHCyhzpPqC0ChpAcmgAVebvdBJFVJ7/SZMDCIIGYGIu0JsaunP93cJHiI29EsMuzmEaV/Za2Hoq4nSo4D2B76NzJg/DT3F0w3/th6JAFVRFEc1CgBYkgoz+fS0IjdlSyXGJsXm8gKMQ3l5Al0QBkaNiQ6UWpDBzIAY9Du6SDZDZ48TMLhIJtraPgil2bE3+DH3UEw7aksWwJ+SMZo3+Ttc01wdQNjF29KEJ9lyQiq92RUbkwGrAR1hsqS2QTQcPfYOSiB6L79zpDc2/OmWGdR6culk67fA+eAWUyJHcQMsrNc7Ean7tqvvWPcvCU3jtB15/yvHH1z0xzN0oZra3NbquxxipP8ADXeuuW1eOrsopiq3gmrFSA1mt5O5jagIvmw6B2iR1SILBj+HIUvFZAg1J15kTxI5Wh7yBgfCAu5QjamzzTRZJhEhH8c/0FAJDWS0jusdAASDVQmXGUpyZjT13pwMs7kEewa/XFbk3YikecLOxbSh52b7nvexkAFhfHWHVLXMjRftNuXna1uDzbtn4AybQzj0yfPKPcWeyBqstBx2grcFg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(23010399003)(366016)(4143699003)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?J2LVdHQVHUoU/WD2g5q5okRxUk5owaLI8mKwZE4ORt55WRzd/nZIPrp+Yofr?=
+ =?us-ascii?Q?jg8bZ1RBkYRB6Gww2+IuxqbX74SqF7rSryjL9GaR34MvIcQfMWSES5QLcH7L?=
+ =?us-ascii?Q?1YM/GpJw1GGptbfgX/P7kLKstqzVTXj87YLV6DwUEZXfmElKxfn+0C6ZWRCp?=
+ =?us-ascii?Q?c349RZUN14Z9Z+wU3qcyvA+HMj0ejznI5UhhMYZj1YkAH+SuQLp8x4FwZMsU?=
+ =?us-ascii?Q?7W0DK1Uwy/PtlnPS6pAbKBlLLFhZudyZcQ2LJ1ZAwVI8zwF1bLVDNaR6rAmY?=
+ =?us-ascii?Q?eS4SFHUMxZmnE2OUSmN1jsVJ9bJyuXpXBwFuBnTdXjzAP7LMISnor5DHC2MB?=
+ =?us-ascii?Q?FmIq0fSGV0soO0D7ol2mR8H4Mz2pynsD2IYNI3epF1vyW+JFxI8bUizokLO/?=
+ =?us-ascii?Q?U6+bnihzhb47WyG7Wxr1P4oND/q68Wb9TxzEkHmSZmlfC92iec7ku4fQB7EV?=
+ =?us-ascii?Q?d2kccN+dNhNwDKhrBWQvaS2DLLKrkrOLEt70azMdKW+l6sf6ASfQQ/3DS3dG?=
+ =?us-ascii?Q?Pb45FBEFbQsZk2IZoK4bK+IyuzFuFwRqRnzUe6Aw00vh3VaHgoGr9SY9HXuZ?=
+ =?us-ascii?Q?YtuQki2cdjxurHBxCVl6aiJJJF7W86OQ3dlerK7Nl4kdKjTlo3kSC1TtYdtn?=
+ =?us-ascii?Q?tE6odio5p+rktDt2aZdJOTPMvSxqQw8bx/8W1NQTI6bR4d5gyteCjZBZO6yc?=
+ =?us-ascii?Q?DUVQhfB+phl0zZ0fYZJf8kNdDIs6/9LgrfidYzyHYeswc09NXYvoPFXQekBf?=
+ =?us-ascii?Q?YAQdS/2PVeKa5K1W1jTyc8FHcseqfEYrvqQ2TMv3RSwYfvuwaAZXqHCpxhyX?=
+ =?us-ascii?Q?WVv0QuFM+y9SICXwAB0vW8Z9BWQO0tIt2Lb0Vx2r/0Ydnn7WQxP+agM4e5r2?=
+ =?us-ascii?Q?ZPTup6bKnIWVTvJWgnVkKDpXgJ8lXi4bvQHrj9elfSOkNjAjSwypM4A8SMyN?=
+ =?us-ascii?Q?mCtoPMoffabto1iIsNQc+GHHRtdrp/4fefdh9K5SHPHy3crXMRPrLMw2txKE?=
+ =?us-ascii?Q?jWxbzZEC3aEgSGLDRd1PfYwJ1nRjTDktMCxrmwPU2ZFHfB8Vu9xHRKLsX9Sz?=
+ =?us-ascii?Q?3SurxCLM1fY/v2837VZ9yc6Y95vraqh3MLzJ2kQ14h6yNxBwWZ7FLfg5pjDt?=
+ =?us-ascii?Q?J4+GyRJ2K7pzThc7hFvk482pXRMmUoU3uw57HCZOgTekqbfKnNMZBwddtbKR?=
+ =?us-ascii?Q?8EzoSp1RXRSz7ZA2f6PEPfvApCt0BdfwIdQm3e1TE+g3uEbt05IlklkBugdA?=
+ =?us-ascii?Q?yS/tDg41mb+Corc++ziKK3uPpewAPin8+WdgEjRj/5PIvkpXgVxvSkLM/9Ky?=
+ =?us-ascii?Q?k9KlMy6uBpWFrl/Wu2YcBuPN5Psvt+XFPdWGRyDGqFyZsna16DimGHMBrMt9?=
+ =?us-ascii?Q?HUPamdqsXz2XORK9GEnvWBh4FfJ1pmUvLdxsAYnEt4qosgWAx4qcgomkXqPs?=
+ =?us-ascii?Q?YTn8JWM89LRqA1mtbJ96uYt0EsKYhWA/iaGcmYF2QH/boaRxHR+bb8pUvGyn?=
+ =?us-ascii?Q?WJV/OCzHsAsevQN6YXpz+9OEa9cgNw5FPHt8aLahv0F5PcJnV6CGFlTe4n1D?=
+ =?us-ascii?Q?DQClHEe+9TEgfVHQcYoPJ3gGbIbpj5Z78/xTJCZfT3kTyqLVzOKtKkD7w5XN?=
+ =?us-ascii?Q?4k/jy0fPbxHVj3DGis8dWef0ONM3YK2mq/O/q7t8JsKGvRRKCBiGujZWG5Wc?=
+ =?us-ascii?Q?S9IlLuqs+IgRPlP5zrz2zP8hEJnumACOarRnTblnRsdBF+2iQ05mePWGkarP?=
+ =?us-ascii?Q?7Rbkkz3HYvbdUSfVsUcEuqxVjG0zUCk=3D?=
+X-Exchange-RoutingPolicyChecked:
+	gOdOEndaCE3Ob2t11uOskjxTDMKMgWahlmCFnJSRHK5sh2zJStDYvCqo7DUcbvb2mgDA1t1tNWZ2lb9EpCfQUlseokV+joWnpCDLTG4jheiAZdYNV48jV3D1WszNMlTF2GhIOMtXCCoxit/mzKTYj9mmLGKlrK0V9AKlDfp/CDH75iEhwTbQm9+rjtQqs2VhF2rsHlJyVEGGTs5Xp5QLe86z9d7J4czv0TZCL+r1XXOFBuxoH+tGYNvarmDGPgj3rMAadDXqg/+JeNQwEEJ0009drRpbhdIZFV0c8G4E5tWHda6q380H0KRCYJIzUdCl8Wn7bPrF3zYUTZBwo8XBTA==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	FEB78kQA8inqEogaWayPQiQpaWUbmgX0RVqAoO5MGgQYyiBaRElSItwhLITuVfsmsOeEGp6m2WR5ZMDfNvuF90PlXEGUx4EnPlAg8Oi0xuYvE3lNmQfDnHRL3RjAkMHwu4R9AIRO6e6khFknFVHAc4X5LLS6H9rFc30XL3UYCRIp4VRcCmry/05fesupWA+bahTDF4jzdvJU6mNONEzdcb8+YMF7woVpfqfmCyvTzUPdq6FbNQsMS7TOKJ2+BtUJ3HWoBbSIAyfqHiMW4M+RM3AR/ZclknhqYD4VVnqIJG1nm/h3TsuZLnelxXaroY9SkREcrOo10IGguLURKrQKf2x7weEtLeTOWl5csesz1xfEETk0efRcE2rpZPw1sqMTCITSY8g46XwWveKXaq6DQ4XOeWSBJko+Cba8nhoa8NEqUruBkaGCR0tjoYgrrvSBc9DK8s2JTHFyr0qLZVqu4EskOlWoFZVZUIZ3yYgjyZBusNHgAxiIVsZoS7ng4l1wzAPTLRxrLclImbplLTsYP4l7EZGgRdhsgerwXrOqiYNSheLeQGwZprr1XFDkQ2fmXb8+IMWbuqbYMB+DK0ZvlOpor5urjn+JQ6IgI92PTIA=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a22505b9-aea5-42b7-fba1-08ded8938021
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 23:41:55.6228
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LHRE3Xlc/jBQGrc2pZhKsNCnRjqYM2djNeQLDTArOKMH9tP8oqPaY7FrYX069gFxz+MIn19P26uSpLzPmms1rHEX7AT+lQVFe2b7s7ezHQ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR10MB6209
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-02_03,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 bulkscore=0
+ mlxlogscore=862 suspectscore=0 phishscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2606160000 definitions=main-2607020246
+X-Proofpoint-ORIG-GUID: PKCaY8q63hY7TFhs9QO-0MkTi5omGZZ5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDI0NyBTYWx0ZWRfXw4H8NcHkzmYq
+ T5EVQXuss91w6RF0Qb6Mpj3LY6jKerAuQtPZjxFiwyVlMfONC5wWIENGDj7NWBwVVCDOjjGY91/
+ gwO0Gwsbtor9LR2CU5fCf7nhcJJpl8HNY6hzeX8xrV7pPd+Ds9sMXYoNGNwHKhPwZTRivp58C+E
+ g/bYlUKH2fR10t6GAc8MTn6z32eS5/7QhTeDA8AlZHHchbq1kUSDlzCStwXlhs2OypG/mTbwvAF
+ 77t9DXatjCxY0/gLhf41RRcmbsQv9YII2b7idIBGvq1Xyj3Ok+bBgQ+iXdEdXlmQ4s6IL9i7/xs
+ zF6aOWRdB/2xoJzpxDrjaR8G8Pvr68IjMDQFSV1/rJfdZuGYtey78nBO3do6wLmOtkJot+RTRah
+ Bgi1k+HhJdkeJoNdb2PfwghPGY19hUDMXF6IOw8zzXkcAnVPcTrKdkPOuaYYFqWDC9AkOWt0NGW
+ 3cgBprABO594jYbtgHPwLHEcJuxmbomzGC27aX7Q=
+X-Authority-Analysis: v=2.4 cv=LOxWhpW9 c=1 sm=1 tr=0 ts=6a46f749 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=RAioF0-LDSMA:10
+ a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=7Gl3-_t3PgB9XO-mQDs3:22 a=MaQmoaksjz7auIIbQzIA:9 a=5yU3S35YU4bGjq-dph-N:22
+ a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:12313
+X-Proofpoint-GUID: PKCaY8q63hY7TFhs9QO-0MkTi5omGZZ5
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDI0NyBTYWx0ZWRfXwCM2oX8QWK8h
+ 6YwBcnRZ6CNNgl0TsHfaQ9Z70ZAPkSt3uVMGzxMvAF/iawS5iy5Wf0YqQYqsxW2CYBzp/X0I8V1
+ PbuOLafJzrL+vVgnosH8UZe0eY8UFdTqeuTICPB4IMyHpsVcihhQ
 
-On Tue, Jun 30, 2026 at 05:09:32PM -0700, Joanne Koong wrote:
-> Now that all filesystems implement ->iomap_next() and the legacy
-> ->iomap_begin()/->iomap_end() fallback is gone, struct iomap_ops only
-> wraps a single iomap_next function pointer. Drop the struct entirely and
-> pass the iomap_next_fn directly to iomap_iter() and all the iomap/dax
-> entry points; filesystems pass their ->iomap_next function instead of an
-> ops struct.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
 
-I'm gonna cut out quite a bit of this patch to reduce the reply size.
+Caleb,
 
-> ---
-<snip>
->  fs/iomap/buffered-io.c | 38 ++++++++++++++---------------
->  fs/iomap/direct-io.c   |  8 +++---
->  fs/iomap/fiemap.c      |  8 +++---
->  fs/iomap/iter.c        |  8 +++---
->  fs/iomap/seek.c        |  8 +++---
->  fs/iomap/swapfile.c    |  4 +--
-<snip>
->  fs/remap_range.c       |  6 ++---
->  fs/xfs/xfs_aops.c      |  8 +++---
->  fs/xfs/xfs_file.c      | 40 +++++++++++++++---------------
->  fs/xfs/xfs_iomap.c     | 55 +++++++++---------------------------------
->  fs/xfs/xfs_iomap.h     | 24 ++++++++++++------
->  fs/xfs/xfs_iops.c      |  4 +--
->  fs/xfs/xfs_reflink.c   |  6 ++---
->  fs/zonefs/file.c       | 22 ++++++-----------
->  include/linux/dax.h    | 18 ++++++--------
->  include/linux/fs.h     |  7 ++++--
->  include/linux/iomap.h  | 46 +++++++++++++++--------------------
->  54 files changed, 302 insertions(+), 411 deletions(-)
-> 
-<snip>
+> Martin, are you okay with this updated commit message? Would be nice
+> to get this fix in so auto-integrity works correctly for zone appends
+> on 4KB-integrity-interval devices.
 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 3f0932e46fd6..0aa8abc438c1 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -626,7 +626,7 @@ static int iomap_read_folio_iter(struct iomap_iter *iter,
->  	return 0;
->  }
->  
-> -void iomap_read_folio(const struct iomap_ops *ops,
-> +void iomap_read_folio(iomap_next_fn iomap_next,
+I'm on vacation.
 
-If you took my earlier suggestion to rename the typedef to
-iomap_iter_fn, then this parameter ought to be named iter_fn.
+Will take a look when I'm back next week.
 
->  		struct iomap_read_folio_ctx *ctx, void *private)
->  {
->  	struct folio *folio = ctx->cur_folio;
-> @@ -650,7 +650,7 @@ void iomap_read_folio(const struct iomap_ops *ops,
->  		fsverity_readahead(ctx->vi, folio->index,
->  				   folio_nr_pages(folio));
->  
-> -	while ((ret = iomap_iter(&iter, ops)) > 0) {
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0) {
->  		iter.status = iomap_read_folio_iter(&iter, ctx,
->  				&bytes_submitted);
->  		iomap_read_submit(&iter, ctx);
-> @@ -688,22 +688,22 @@ static int iomap_readahead_iter(struct iomap_iter *iter,
->  
->  /**
->   * iomap_readahead - Attempt to read pages from a file.
-> - * @ops: The operations vector for the filesystem.
-> + * @iomap_next: The iomap_next callback for the filesystem.
-
-"The iomap iteration function for the filesystem" ?
-
-Using the term "iomap_next" in the definition for iomap_next isn't that
-helpful.
-
->   * @ctx: The ctx used for issuing readahead.
->   * @private: The filesystem-specific information for issuing iomap_iter.
->   *
->   * This function is for filesystems to call to implement their readahead
->   * address_space operation.
->   *
-> - * Context: The @ops callbacks may submit I/O (eg to read the addresses of
-> + * Context: The @iomap_next callback may submit I/O (eg to read the addresses of
->   * blocks from disc), and may wait for it.  The caller may be trying to
->   * access a different page, and so sleeping excessively should be avoided.
->   * It may allocate memory, but should avoid costly allocations.  This
->   * function is called with memalloc_nofs set, so allocations will not cause
->   * the filesystem to be reentered.
->   */
-> -void iomap_readahead(const struct iomap_ops *ops,
-> -		struct iomap_read_folio_ctx *ctx, void *private)
-> +void iomap_readahead(iomap_next_fn iomap_next, struct iomap_read_folio_ctx *ctx,
-> +		void *private)
->  {
->  	struct readahead_control *rac = ctx->rac;
->  	struct iomap_iter iter = {
-> @@ -725,7 +725,7 @@ void iomap_readahead(const struct iomap_ops *ops,
->  		fsverity_readahead(ctx->vi, readahead_index(rac),
->  				readahead_count(rac));
->  
-> -	while (iomap_iter(&iter, ops) > 0) {
-> +	while (iomap_iter(&iter, iomap_next) > 0) {
->  		iter.status = iomap_readahead_iter(&iter, ctx,
->  					&cur_bytes_submitted);
->  		iomap_read_submit(&iter, ctx);
-> @@ -1268,7 +1268,7 @@ static int iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i,
->  
->  ssize_t
->  iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *i,
-> -		const struct iomap_ops *ops,
-> +		iomap_next_fn iomap_next,
->  		const struct iomap_write_ops *write_ops, void *private)
->  {
->  	struct iomap_iter iter = {
-> @@ -1285,7 +1285,7 @@ iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *i,
->  	if (iocb->ki_flags & IOCB_DONTCACHE)
->  		iter.flags |= IOMAP_DONTCACHE;
->  
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_write_iter(&iter, i, write_ops);
->  
->  	if (unlikely(iter.pos == iocb->ki_pos))
-> @@ -1297,7 +1297,7 @@ iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *i,
->  EXPORT_SYMBOL_GPL(iomap_file_buffered_write);
->  
->  int iomap_fsverity_write(struct file *file, loff_t pos, size_t length,
-> -		const void *buf, const struct iomap_ops *ops,
-> +		const void *buf, iomap_next_fn iomap_next,
->  		const struct iomap_write_ops *write_ops)
->  {
->  	int			ret;
-> @@ -1314,7 +1314,7 @@ int iomap_fsverity_write(struct file *file, loff_t pos, size_t length,
->  
->  	iov_iter_kvec(&iiter, WRITE, &kvec, 1, length);
->  
-> -	ret = iomap_file_buffered_write(&iocb, &iiter, ops, write_ops, NULL);
-> +	ret = iomap_file_buffered_write(&iocb, &iiter, iomap_next, write_ops, NULL);
->  	if (ret < 0)
->  		return ret;
->  	return ret == length ? 0 : -EIO;
-> @@ -1586,7 +1586,7 @@ static int iomap_unshare_iter(struct iomap_iter *iter,
->  
->  int
->  iomap_file_unshare(struct inode *inode, loff_t pos, loff_t len,
-> -		const struct iomap_ops *ops,
-> +		iomap_next_fn iomap_next,
->  		const struct iomap_write_ops *write_ops)
->  {
->  	struct iomap_iter iter = {
-> @@ -1601,7 +1601,7 @@ iomap_file_unshare(struct inode *inode, loff_t pos, loff_t len,
->  		return 0;
->  
->  	iter.len = min(len, size - pos);
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_unshare_iter(&iter, write_ops);
->  	return ret;
->  }
-> @@ -1710,7 +1710,7 @@ EXPORT_SYMBOL_GPL(iomap_fill_dirty_folios);
->  
->  int
->  iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
-> -		const struct iomap_ops *ops,
-> +		iomap_next_fn iomap_next,
->  		const struct iomap_write_ops *write_ops, void *private)
->  {
->  	struct folio_batch fbatch;
-> @@ -1735,7 +1735,7 @@ iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
->  	 */
->  	range_dirty = filemap_range_needs_writeback(mapping, iter.pos,
->  					iter.pos + iter.len - 1);
-> -	while ((ret = iomap_iter(&iter, ops)) > 0) {
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0) {
->  		const struct iomap *srcmap = iomap_iter_srcmap(&iter);
->  
->  		if (!(iter.iomap.flags & IOMAP_F_FOLIO_BATCH) &&
-> @@ -1761,7 +1761,7 @@ EXPORT_SYMBOL_GPL(iomap_zero_range);
->  
->  int
->  iomap_truncate_page(struct inode *inode, loff_t pos, bool *did_zero,
-> -		const struct iomap_ops *ops,
-> +		iomap_next_fn iomap_next,
->  		const struct iomap_write_ops *write_ops, void *private)
->  {
->  	unsigned int blocksize = i_blocksize(inode);
-> @@ -1770,7 +1770,7 @@ iomap_truncate_page(struct inode *inode, loff_t pos, bool *did_zero,
->  	/* Block boundary? Nothing to do */
->  	if (!off)
->  		return 0;
-> -	return iomap_zero_range(inode, pos, blocksize - off, did_zero, ops,
-> +	return iomap_zero_range(inode, pos, blocksize - off, did_zero, iomap_next,
->  			write_ops, private);
->  }
->  EXPORT_SYMBOL_GPL(iomap_truncate_page);
-> @@ -1795,7 +1795,7 @@ static int iomap_folio_mkwrite_iter(struct iomap_iter *iter,
->  	return iomap_iter_advance(iter, length);
->  }
->  
-> -vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_ops *ops,
-> +vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, iomap_next_fn iomap_next,
->  		void *private)
->  {
->  	struct iomap_iter iter = {
-> @@ -1812,7 +1812,7 @@ vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_ops *ops,
->  		goto out_unlock;
->  	iter.pos = folio_pos(folio);
->  	iter.len = ret;
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_folio_mkwrite_iter(&iter, folio);
->  
->  	if (ret < 0)
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index b485e3b191da..e299d186f743 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -676,7 +676,7 @@ static int iomap_dio_iter(struct iomap_iter *iter, struct iomap_dio *dio)
->   */
->  struct iomap_dio *
->  __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
-> -		const struct iomap_ops *ops, const struct iomap_dio_ops *dops,
-> +		iomap_next_fn iomap_next, const struct iomap_dio_ops *dops,
->  		unsigned int dio_flags, void *private, size_t done_before)
->  {
->  	struct inode *inode = file_inode(iocb->ki_filp);
-> @@ -800,7 +800,7 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
->  	inode_dio_begin(inode);
->  
->  	blk_start_plug(&plug);
-> -	while ((ret = iomap_iter(&iomi, ops)) > 0) {
-> +	while ((ret = iomap_iter(&iomi, iomap_next)) > 0) {
->  		iomi.status = iomap_dio_iter(&iomi, dio);
->  
->  		/*
-> @@ -890,12 +890,12 @@ EXPORT_SYMBOL_GPL(__iomap_dio_rw);
->  
->  ssize_t
->  iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
-> -		const struct iomap_ops *ops, const struct iomap_dio_ops *dops,
-> +		iomap_next_fn iomap_next, const struct iomap_dio_ops *dops,
->  		unsigned int dio_flags, void *private, size_t done_before)
->  {
->  	struct iomap_dio *dio;
->  
-> -	dio = __iomap_dio_rw(iocb, iter, ops, dops, dio_flags, private,
-> +	dio = __iomap_dio_rw(iocb, iter, iomap_next, dops, dio_flags, private,
->  			     done_before);
->  	if (IS_ERR_OR_NULL(dio))
->  		return PTR_ERR_OR_ZERO(dio);
-> diff --git a/fs/iomap/fiemap.c b/fs/iomap/fiemap.c
-> index d11dadff8286..fc488f05d8ce 100644
-> --- a/fs/iomap/fiemap.c
-> +++ b/fs/iomap/fiemap.c
-> @@ -56,7 +56,7 @@ static int iomap_fiemap_iter(struct iomap_iter *iter,
->  }
->  
->  int iomap_fiemap(struct inode *inode, struct fiemap_extent_info *fi,
-> -		u64 start, u64 len, const struct iomap_ops *ops)
-> +		u64 start, u64 len, iomap_next_fn iomap_next)
->  {
->  	struct iomap_iter iter = {
->  		.inode		= inode,
-> @@ -73,7 +73,7 @@ int iomap_fiemap(struct inode *inode, struct fiemap_extent_info *fi,
->  	if (ret)
->  		return ret;
->  
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_fiemap_iter(&iter, fi, &prev);
->  
->  	if (prev.type != IOMAP_HOLE) {
-> @@ -92,7 +92,7 @@ EXPORT_SYMBOL_GPL(iomap_fiemap);
->  /* legacy ->bmap interface.  0 is the error return (!) */
->  sector_t
->  iomap_bmap(struct address_space *mapping, sector_t bno,
-> -		const struct iomap_ops *ops)
-> +		iomap_next_fn iomap_next)
->  {
->  	struct iomap_iter iter = {
->  		.inode	= mapping->host,
-> @@ -107,7 +107,7 @@ iomap_bmap(struct address_space *mapping, sector_t bno,
->  		return 0;
->  
->  	bno = 0;
-> -	while ((ret = iomap_iter(&iter, ops)) > 0) {
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0) {
->  		if (iter.iomap.type == IOMAP_MAPPED)
->  			bno = iomap_sector(&iter.iomap, iter.pos) >> blkshift;
->  		/* leave iter.status unset to abort loop */
-> diff --git a/fs/iomap/iter.c b/fs/iomap/iter.c
-> index 466c491bdef6..984045af310a 100644
-> --- a/fs/iomap/iter.c
-> +++ b/fs/iomap/iter.c
-> @@ -42,7 +42,7 @@ static inline void iomap_iter_done(struct iomap_iter *iter)
->  /**
->   * iomap_iter - iterate over a ranges in a file
->   * @iter: iteration structue
-> - * @ops: iomap ops provided by the file system
-> + * @iomap_next: iomap_next callback provided by the file system
->   *
->   * Iterate over filesystem-provided space mappings for the provided file range.
->   *
-> @@ -54,13 +54,13 @@ static inline void iomap_iter_done(struct iomap_iter *iter)
->   * of the loop body:  leave @iter.status unchanged, or set it to a negative
->   * errno.
->   */
-> -int iomap_iter(struct iomap_iter *iter, const struct iomap_ops *ops)
-> +int iomap_iter(struct iomap_iter *iter, iomap_next_fn iomap_next)
->  {
->  	int ret;
->  
-> -	trace_iomap_iter(iter, ops, _RET_IP_);
-> +	trace_iomap_iter(iter, iomap_next, _RET_IP_);
->  
-> -	ret = ops->iomap_next(iter, &iter->iomap, &iter->srcmap);
-> +	ret = iomap_next(iter, &iter->iomap, &iter->srcmap);
->  	iter->status = 0;
->  	if (ret > 0)
->  		iomap_iter_done(iter);
-> diff --git a/fs/iomap/seek.c b/fs/iomap/seek.c
-> index 6cbc587c93da..1bc5053d3fc1 100644
-> --- a/fs/iomap/seek.c
-> +++ b/fs/iomap/seek.c
-> @@ -27,7 +27,7 @@ static int iomap_seek_hole_iter(struct iomap_iter *iter,
->  }
->  
->  loff_t
-> -iomap_seek_hole(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
-> +iomap_seek_hole(struct inode *inode, loff_t pos, iomap_next_fn iomap_next)
->  {
->  	loff_t size = i_size_read(inode);
->  	struct iomap_iter iter = {
-> @@ -42,7 +42,7 @@ iomap_seek_hole(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
->  		return -ENXIO;
->  
->  	iter.len = size - pos;
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_seek_hole_iter(&iter, &pos);
->  	if (ret < 0)
->  		return ret;
-> @@ -73,7 +73,7 @@ static int iomap_seek_data_iter(struct iomap_iter *iter,
->  }
->  
->  loff_t
-> -iomap_seek_data(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
-> +iomap_seek_data(struct inode *inode, loff_t pos, iomap_next_fn iomap_next)
->  {
->  	loff_t size = i_size_read(inode);
->  	struct iomap_iter iter = {
-> @@ -88,7 +88,7 @@ iomap_seek_data(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
->  		return -ENXIO;
->  
->  	iter.len = size - pos;
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_seek_data_iter(&iter, &pos);
->  	if (ret < 0)
->  		return ret;
-> diff --git a/fs/iomap/swapfile.c b/fs/iomap/swapfile.c
-> index 0db77c449467..b8bb34deddfc 100644
-> --- a/fs/iomap/swapfile.c
-> +++ b/fs/iomap/swapfile.c
-> @@ -139,7 +139,7 @@ static int iomap_swapfile_iter(struct iomap_iter *iter,
->   */
->  int iomap_swapfile_activate(struct swap_info_struct *sis,
->  		struct file *swap_file, sector_t *pagespan,
-> -		const struct iomap_ops *ops)
-> +		iomap_next_fn iomap_next)
->  {
->  	struct inode *inode = swap_file->f_mapping->host;
->  	struct iomap_iter iter = {
-> @@ -163,7 +163,7 @@ int iomap_swapfile_activate(struct swap_info_struct *sis,
->  	if (ret)
->  		return ret;
->  
-> -	while ((ret = iomap_iter(&iter, ops)) > 0)
-> +	while ((ret = iomap_iter(&iter, iomap_next)) > 0)
->  		iter.status = iomap_swapfile_iter(&iter, &iter.iomap, &isi);
->  	if (ret < 0)
->  		return ret;
-
-<snip>
-
-> diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-> index 2a0c54256e93..91480cb6a4d8 100644
-> --- a/fs/xfs/xfs_aops.c
-> +++ b/fs/xfs/xfs_aops.c
-> @@ -752,7 +752,7 @@ xfs_vm_bmap(
->  	 */
->  	if (xfs_is_cow_inode(ip) || XFS_IS_REALTIME_INODE(ip))
->  		return 0;
-> -	return iomap_bmap(mapping, block, &xfs_read_iomap_ops);
-> +	return iomap_bmap(mapping, block, xfs_read_iomap_next);
->  }
->  
->  static void
-> @@ -793,7 +793,7 @@ xfs_vm_read_folio(
->  	struct iomap_read_folio_ctx	ctx = { .cur_folio = folio };
->  
->  	ctx.ops = xfs_get_iomap_read_ops(folio->mapping);
-> -	iomap_read_folio(&xfs_read_iomap_ops, &ctx, NULL);
-> +	iomap_read_folio(xfs_read_iomap_next, &ctx, NULL);
->  	return 0;
->  }
->  
-> @@ -804,7 +804,7 @@ xfs_vm_readahead(
->  	struct iomap_read_folio_ctx	ctx = { .rac = rac };
->  
->  	ctx.ops = xfs_get_iomap_read_ops(rac->mapping),
-> -	iomap_readahead(&xfs_read_iomap_ops, &ctx, NULL);
-> +	iomap_readahead(xfs_read_iomap_next, &ctx, NULL);
->  }
->  
->  static int
-> @@ -850,7 +850,7 @@ xfs_vm_swap_activate(
->  	sis->bdev = xfs_inode_buftarg(ip)->bt_bdev;
->  
->  	return iomap_swapfile_activate(sis, swap_file, span,
-> -			&xfs_read_iomap_ops);
-> +			xfs_read_iomap_next);
->  }
->  
->  const struct address_space_operations xfs_address_space_operations = {
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index 7f8bef1a9954..a987ffbf3c02 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -269,7 +269,7 @@ xfs_file_dio_read(
->  		dio_ops = &xfs_dio_read_bounce_ops;
->  		dio_flags |= IOMAP_DIO_BOUNCE;
->  	}
-> -	ret = iomap_dio_rw(iocb, to, &xfs_read_iomap_ops, dio_ops, dio_flags,
-> +	ret = iomap_dio_rw(iocb, to, xfs_read_iomap_next, dio_ops, dio_flags,
->  			NULL, 0);
->  	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
->  
-> @@ -292,7 +292,7 @@ xfs_file_dax_read(
->  	ret = xfs_ilock_iocb(iocb, XFS_IOLOCK_SHARED);
->  	if (ret)
->  		return ret;
-> -	ret = dax_iomap_rw(iocb, to, &xfs_read_iomap_ops);
-> +	ret = dax_iomap_rw(iocb, to, xfs_read_iomap_next);
->  	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
->  
->  	file_accessed(iocb->ki_filp);
-> @@ -742,7 +742,7 @@ xfs_file_dio_write_aligned(
->  	struct xfs_inode	*ip,
->  	struct kiocb		*iocb,
->  	struct iov_iter		*from,
-> -	const struct iomap_ops	*ops,
-> +	iomap_next_fn		iomap_next,
->  	const struct iomap_dio_ops *dops,
->  	struct xfs_zone_alloc_ctx *ac)
->  {
-> @@ -777,7 +777,7 @@ xfs_file_dio_write_aligned(
->  	if (mapping_stable_writes(iocb->ki_filp->f_mapping))
->  		dio_flags |= IOMAP_DIO_BOUNCE;
->  	trace_xfs_file_direct_write(iocb, from);
-> -	ret = iomap_dio_rw(iocb, from, ops, dops, dio_flags, ac, 0);
-> +	ret = iomap_dio_rw(iocb, from, iomap_next, dops, dio_flags, ac, 0);
->  out_unlock:
->  	xfs_iunlock(ip, iolock);
->  	return ret;
-> @@ -799,7 +799,7 @@ xfs_file_dio_write_zoned(
->  	if (ret < 0)
->  		return ret;
->  	ret = xfs_file_dio_write_aligned(ip, iocb, from,
-> -			&xfs_zoned_direct_write_iomap_ops,
-> +			xfs_zoned_direct_write_iomap_next,
->  			&xfs_dio_zoned_write_ops, &ac);
->  	xfs_zoned_space_unreserve(ip->i_mount, &ac);
->  	return ret;
-> @@ -824,16 +824,16 @@ xfs_file_dio_write_atomic(
->  	unsigned int		iolock = XFS_IOLOCK_SHARED;
->  	ssize_t			ret, ocount = iov_iter_count(from);
->  	unsigned int		dio_flags = 0;
-> -	const struct iomap_ops	*dops;
-> +	iomap_next_fn		dops;
->  
->  	/*
->  	 * HW offload should be faster, so try that first if it is already
->  	 * known that the write length is not too large.
->  	 */
->  	if (ocount > xfs_inode_buftarg(ip)->bt_awu_max)
-> -		dops = &xfs_atomic_write_cow_iomap_ops;
-> +		dops = xfs_atomic_write_cow_iomap_next;
->  	else
-> -		dops = &xfs_direct_write_iomap_ops;
-> +		dops = xfs_direct_write_iomap_next;
-
-Probably ought to be called iter_fn, or at least something that isn't
-"dops".
-
->  
->  retry:
->  	ret = xfs_ilock_iocb_for_write(iocb, &iolock);
-> @@ -862,9 +862,9 @@ xfs_file_dio_write_atomic(
->  	 * possible. The REQ_ATOMIC-based method is typically not possible if
->  	 * the write spans multiple extents or the disk blocks are misaligned.
->  	 */
-> -	if (ret == -ENOPROTOOPT && dops == &xfs_direct_write_iomap_ops) {
-> +	if (ret == -ENOPROTOOPT && dops == xfs_direct_write_iomap_next) {
->  		xfs_iunlock(ip, iolock);
-> -		dops = &xfs_atomic_write_cow_iomap_ops;
-> +		dops = xfs_atomic_write_cow_iomap_next;
->  		goto retry;
->  	}
->  
-> @@ -947,7 +947,7 @@ xfs_file_dio_write_unaligned(
->  		flags |= IOMAP_DIO_BOUNCE;
->  
->  	trace_xfs_file_direct_write(iocb, from);
-> -	ret = iomap_dio_rw(iocb, from, &xfs_direct_write_iomap_ops,
-> +	ret = iomap_dio_rw(iocb, from, xfs_direct_write_iomap_next,
->  			   &xfs_dio_write_ops, flags, NULL, 0);
->  
->  	/*
-> @@ -987,7 +987,7 @@ xfs_file_dio_write(
->  	if (iocb->ki_flags & IOCB_ATOMIC)
->  		return xfs_file_dio_write_atomic(ip, iocb, from);
->  	return xfs_file_dio_write_aligned(ip, iocb, from,
-> -			&xfs_direct_write_iomap_ops, &xfs_dio_write_ops, NULL);
-> +			xfs_direct_write_iomap_next, &xfs_dio_write_ops, NULL);
->  }
->  
->  static noinline ssize_t
-> @@ -1011,7 +1011,7 @@ xfs_file_dax_write(
->  	pos = iocb->ki_pos;
->  
->  	trace_xfs_file_dax_write(iocb, from);
-> -	ret = dax_iomap_rw(iocb, from, &xfs_dax_write_iomap_ops);
-> +	ret = dax_iomap_rw(iocb, from, xfs_dax_write_iomap_next);
->  	if (ret > 0 && iocb->ki_pos > i_size_read(inode)) {
->  		i_size_write(inode, iocb->ki_pos);
->  		error = xfs_setfilesize(ip, pos, ret);
-> @@ -1054,7 +1054,7 @@ xfs_file_buffered_write(
->  
->  	trace_xfs_file_buffered_write(iocb, from);
->  	ret = iomap_file_buffered_write(iocb, from,
-> -			&xfs_buffered_write_iomap_ops, &xfs_iomap_write_ops,
-> +			xfs_buffered_write_iomap_next, &xfs_iomap_write_ops,
->  			NULL);
->  
->  	/*
-> @@ -1135,7 +1135,7 @@ xfs_file_buffered_write_zoned(
->  retry:
->  	trace_xfs_file_buffered_write(iocb, from);
->  	ret = iomap_file_buffered_write(iocb, from,
-> -			&xfs_buffered_write_iomap_ops, &xfs_iomap_write_ops,
-> +			xfs_buffered_write_iomap_next, &xfs_iomap_write_ops,
->  			&ac);
->  	if (ret == -ENOSPC && !cleared_space) {
->  		/*
-> @@ -1856,10 +1856,10 @@ xfs_file_llseek(
->  	default:
->  		return generic_file_llseek(file, offset, whence);
->  	case SEEK_HOLE:
-> -		offset = iomap_seek_hole(inode, offset, &xfs_seek_iomap_ops);
-> +		offset = iomap_seek_hole(inode, offset, xfs_seek_iomap_next);
->  		break;
->  	case SEEK_DATA:
-> -		offset = iomap_seek_data(inode, offset, &xfs_seek_iomap_ops);
-> +		offset = iomap_seek_data(inode, offset, xfs_seek_iomap_next);
->  		break;
->  	}
->  
-> @@ -1883,8 +1883,8 @@ xfs_dax_fault_locked(
->  	}
->  	ret = dax_iomap_fault(vmf, order, &pfn, NULL,
->  			(write_fault && !vmf->cow_page) ?
-> -				&xfs_dax_write_iomap_ops :
-> -				&xfs_read_iomap_ops);
-> +				xfs_dax_write_iomap_next :
-> +				xfs_read_iomap_next);
->  	if (ret & VM_FAULT_NEEDDSYNC)
->  		ret = dax_finish_sync_fault(vmf, order, pfn);
->  	return ret;
-> @@ -1948,7 +1948,7 @@ __xfs_write_fault(
->  	if (IS_DAX(inode))
->  		ret = xfs_dax_fault_locked(vmf, order, true);
->  	else
-> -		ret = iomap_page_mkwrite(vmf, &xfs_buffered_write_iomap_ops,
-> +		ret = iomap_page_mkwrite(vmf, xfs_buffered_write_iomap_next,
->  				ac);
->  	xfs_iunlock(ip, lock_mode);
->  
-> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-> index 4fa1a5c985db..71c4bb024f04 100644
-> --- a/fs/xfs/xfs_iomap.c
-> +++ b/fs/xfs/xfs_iomap.c
-> @@ -1037,7 +1037,7 @@ xfs_direct_write_iomap_begin(
->  	return error;
->  }
->  
-> -static int
-> +int
->  xfs_direct_write_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -1047,10 +1047,6 @@ xfs_direct_write_iomap_next(
->  			NULL);
->  }
->  
-> -const struct iomap_ops xfs_direct_write_iomap_ops = {
-> -	.iomap_next		= xfs_direct_write_iomap_next,
-> -};
-> -
->  #ifdef CONFIG_XFS_RT
->  /*
->   * This is really simple.  The space has already been reserved before taking the
-> @@ -1099,7 +1095,7 @@ xfs_zoned_direct_write_iomap_begin(
->  	return 0;
->  }
->  
-> -static int
-> +int
->  xfs_zoned_direct_write_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -1109,9 +1105,6 @@ xfs_zoned_direct_write_iomap_next(
->  			xfs_zoned_direct_write_iomap_begin, NULL);
->  }
->  
-> -const struct iomap_ops xfs_zoned_direct_write_iomap_ops = {
-> -	.iomap_next		= xfs_zoned_direct_write_iomap_next,
-> -};
->  #endif /* CONFIG_XFS_RT */
->  
->  #ifdef DEBUG
-> @@ -1294,7 +1287,7 @@ xfs_atomic_write_cow_iomap_begin(
->  	return error;
->  }
->  
-> -static int
-> +int
->  xfs_atomic_write_cow_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -1304,10 +1297,6 @@ xfs_atomic_write_cow_iomap_next(
->  			xfs_atomic_write_cow_iomap_begin, NULL);
->  }
->  
-> -const struct iomap_ops xfs_atomic_write_cow_iomap_ops = {
-> -	.iomap_next		= xfs_atomic_write_cow_iomap_next,
-> -};
-> -
->  static int
->  xfs_dax_write_iomap_end(
->  	struct inode		*inode,
-> @@ -1328,7 +1317,7 @@ xfs_dax_write_iomap_end(
->  	return xfs_reflink_end_cow(ip, pos, written);
->  }
->  
-> -static int
-> +int
->  xfs_dax_write_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -1338,10 +1327,6 @@ xfs_dax_write_iomap_next(
->  			xfs_dax_write_iomap_end);
->  }
->  
-> -const struct iomap_ops xfs_dax_write_iomap_ops = {
-> -	.iomap_next	= xfs_dax_write_iomap_next,
-> -};
-> -
->  /*
->   * Convert a hole to a delayed allocation.
->   */
-> @@ -2207,7 +2192,7 @@ xfs_buffered_write_iomap_end(
->  	return 0;
->  }
->  
-> -static int
-> +int
->  xfs_buffered_write_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -2218,10 +2203,6 @@ xfs_buffered_write_iomap_next(
->  			xfs_buffered_write_iomap_end);
->  }
->  
-> -const struct iomap_ops xfs_buffered_write_iomap_ops = {
-> -	.iomap_next		= xfs_buffered_write_iomap_next,
-> -};
-> -
->  static int
->  xfs_read_iomap_begin(
->  	struct inode		*inode,
-> @@ -2263,7 +2244,7 @@ xfs_read_iomap_begin(
->  				 shared ? IOMAP_F_SHARED : 0, seq);
->  }
->  
-> -static int
-> +int
->  xfs_read_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -2272,10 +2253,6 @@ xfs_read_iomap_next(
->  	return iomap_process(iter, iomap, srcmap, xfs_read_iomap_begin, NULL);
->  }
->  
-> -const struct iomap_ops xfs_read_iomap_ops = {
-> -	.iomap_next		= xfs_read_iomap_next,
-> -};
-> -
->  static int
->  xfs_seek_iomap_begin(
->  	struct inode		*inode,
-> @@ -2360,7 +2337,7 @@ xfs_seek_iomap_begin(
->  	return error;
->  }
->  
-> -static int
-> +int
->  xfs_seek_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -2369,10 +2346,6 @@ xfs_seek_iomap_next(
->  	return iomap_process(iter, iomap, srcmap, xfs_seek_iomap_begin, NULL);
->  }
->  
-> -const struct iomap_ops xfs_seek_iomap_ops = {
-> -	.iomap_next		= xfs_seek_iomap_next,
-> -};
-> -
->  static int
->  xfs_xattr_iomap_begin(
->  	struct inode		*inode,
-> @@ -2416,7 +2389,7 @@ xfs_xattr_iomap_begin(
->  	return xfs_bmbt_to_iomap(ip, iomap, &imap, flags, IOMAP_F_XATTR, seq);
->  }
->  
-> -static int
-> +int
->  xfs_xattr_iomap_next(
->  	const struct iomap_iter *iter,
->  	struct iomap		*iomap,
-> @@ -2425,10 +2398,6 @@ xfs_xattr_iomap_next(
->  	return iomap_process(iter, iomap, srcmap, xfs_xattr_iomap_begin, NULL);
->  }
->  
-> -const struct iomap_ops xfs_xattr_iomap_ops = {
-> -	.iomap_next		= xfs_xattr_iomap_next,
-> -};
-> -
->  int
->  xfs_zero_range(
->  	struct xfs_inode	*ip,
-> @@ -2443,9 +2412,9 @@ xfs_zero_range(
->  
->  	if (IS_DAX(inode))
->  		return dax_zero_range(inode, pos, len, did_zero,
-> -				      &xfs_dax_write_iomap_ops);
-> +				      xfs_dax_write_iomap_next);
->  	return iomap_zero_range(inode, pos, len, did_zero,
-> -			&xfs_buffered_write_iomap_ops, &xfs_iomap_write_ops,
-> +			xfs_buffered_write_iomap_next, &xfs_iomap_write_ops,
->  			ac);
->  }
->  
-> @@ -2460,8 +2429,8 @@ xfs_truncate_page(
->  
->  	if (IS_DAX(inode))
->  		return dax_truncate_page(inode, pos, did_zero,
-> -					&xfs_dax_write_iomap_ops);
-> +					xfs_dax_write_iomap_next);
->  	return iomap_truncate_page(inode, pos, did_zero,
-> -			&xfs_buffered_write_iomap_ops, &xfs_iomap_write_ops,
-> +			xfs_buffered_write_iomap_next, &xfs_iomap_write_ops,
->  			ac);
->  }
-> diff --git a/fs/xfs/xfs_iomap.h b/fs/xfs/xfs_iomap.h
-> index ebcce7d49446..01875d20fb66 100644
-> --- a/fs/xfs/xfs_iomap.h
-> +++ b/fs/xfs/xfs_iomap.h
-> @@ -49,14 +49,22 @@ xfs_aligned_fsb_count(
->  	return count_fsb;
->  }
->  
-> -extern const struct iomap_ops xfs_buffered_write_iomap_ops;
-> -extern const struct iomap_ops xfs_direct_write_iomap_ops;
-> -extern const struct iomap_ops xfs_zoned_direct_write_iomap_ops;
-> -extern const struct iomap_ops xfs_read_iomap_ops;
-> -extern const struct iomap_ops xfs_seek_iomap_ops;
-> -extern const struct iomap_ops xfs_xattr_iomap_ops;
-> -extern const struct iomap_ops xfs_dax_write_iomap_ops;
-> -extern const struct iomap_ops xfs_atomic_write_cow_iomap_ops;
-> +int xfs_buffered_write_iomap_next(const struct iomap_iter *iter,
-> +		struct iomap *iomap, struct iomap *srcmap);
-> +int xfs_direct_write_iomap_next(const struct iomap_iter *iter,
-> +		struct iomap *iomap, struct iomap *srcmap);
-> +int xfs_zoned_direct_write_iomap_next(const struct iomap_iter *iter,
-> +		struct iomap *iomap, struct iomap *srcmap);
-> +int xfs_read_iomap_next(const struct iomap_iter *iter, struct iomap *iomap,
-> +		struct iomap *srcmap);
-> +int xfs_seek_iomap_next(const struct iomap_iter *iter, struct iomap *iomap,
-> +		struct iomap *srcmap);
-> +int xfs_xattr_iomap_next(const struct iomap_iter *iter, struct iomap *iomap,
-> +		struct iomap *srcmap);
-> +int xfs_dax_write_iomap_next(const struct iomap_iter *iter, struct iomap *iomap,
-> +		struct iomap *srcmap);
-> +int xfs_atomic_write_cow_iomap_next(const struct iomap_iter *iter,
-> +		struct iomap *iomap, struct iomap *srcmap);
->  extern const struct iomap_write_ops xfs_iomap_write_ops;
->  
->  #endif /* __XFS_IOMAP_H__*/
-> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-> index 6339f4956ecb..5c3d9a365f93 100644
-> --- a/fs/xfs/xfs_iops.c
-> +++ b/fs/xfs/xfs_iops.c
-> @@ -1239,10 +1239,10 @@ xfs_vn_fiemap(
->  	if (fieinfo->fi_flags & FIEMAP_FLAG_XATTR) {
->  		fieinfo->fi_flags &= ~FIEMAP_FLAG_XATTR;
->  		error = iomap_fiemap(inode, fieinfo, start, length,
-> -				&xfs_xattr_iomap_ops);
-> +				xfs_xattr_iomap_next);
->  	} else {
->  		error = iomap_fiemap(inode, fieinfo, start, length,
-> -				&xfs_read_iomap_ops);
-> +				xfs_read_iomap_next);
->  	}
->  	xfs_iunlock(XFS_I(inode), XFS_IOLOCK_SHARED);
->  
-> diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
-> index a5c188b78138..2b9792626bab 100644
-> --- a/fs/xfs/xfs_reflink.c
-> +++ b/fs/xfs/xfs_reflink.c
-> @@ -1683,7 +1683,7 @@ xfs_reflink_remap_prep(
->  				pos_out, len, remap_flags);
->  	else
->  		ret = dax_remap_file_range_prep(file_in, pos_in, file_out,
-> -				pos_out, len, remap_flags, &xfs_read_iomap_ops);
-> +				pos_out, len, remap_flags, xfs_read_iomap_next);
->  	if (ret || *len == 0)
->  		goto out_unlock;
->  
-> @@ -1878,10 +1878,10 @@ xfs_reflink_unshare(
->  
->  	if (IS_DAX(inode))
->  		error = dax_file_unshare(inode, offset, len,
-> -				&xfs_dax_write_iomap_ops);
-> +				xfs_dax_write_iomap_next);
->  	else
->  		error = iomap_file_unshare(inode, offset, len,
-> -				&xfs_buffered_write_iomap_ops,
-> +				xfs_buffered_write_iomap_next,
->  				&xfs_iomap_write_ops);
->  	if (error)
->  		goto out;
-
-Aside from the name bikeshedding, the logic looks solid. :)
-
---D
+-- 
+Martin K. Petersen
