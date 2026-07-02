@@ -1,104 +1,124 @@
-Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F84B477E42;
-	Thu,  2 Jul 2026 08:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782981951; cv=none; b=NrbcXedeqeQpvoCR4+HKeoJgzXJ8t/p7h0REKTvF1XGNh6SQ8GBuMxPvqXmperEHOJGQAcgmBJyg27+jW4H6qcTt6pP5gUtJ8mPR+dpNQwXYATe5GTJSz2S4ZM80KfGnQE/XsH4wK/iBTVdv+UU870VA68S/gIS77vPbAoHQR9I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782981951; c=relaxed/simple;
-	bh=XaGq2N4hzaoOvlmXPKXPnNiTArw77/3qb7KXDPOvlBg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R6zqo1gJU4yqepzCUvnfLvKYLuBB09/Mmav+uf8CMlSt6bpZaOXuq6APw2oRf8RIz9C78R816wL6ocGWsLzI259loGHGl8HTB4SeUfFuthDlyWCxO0zos3MYl6u5/gyBiVQaCshAmaPDW3SADcJrpd4PXWNJz8Y7Pd+cfuX6XRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=VU9kcwBi; arc=none smtp.client-ip=52.13.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2965D372052
+	for <linux-block@vger.kernel.org>; Thu,  2 Jul 2026 11:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782993245; cv=pass; b=CCFysHbU5p1ejEevaiLqn/Lgq7e0AvhEAqGJ3tBKp5W8JoA99b5d+YysgyxDbdiBQgUgL4d4U5Po+NWPFDcqvCArpgw7B6KqNhlrXlga5Zdq1j3vvHmxjKUJ2OQM6LYOoDkuWXfShIsrcHsD3dXT03oPL9DVcnJu0pNqtUtpUHw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782993245; c=relaxed/simple;
+	bh=cTB0VfE1d+0Ee/RoWGncspUgiGZBeynSuwaTByL01zg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Slqp5l/8CGqc2gEPv45GO64dkMoG9Q9FLNGGgD96GmP2aqym8ku4+BG4QHqjv/fvFIC3johQ3nFNWONOmOIFLG+iuNUkAc3BcBg/AQ8PO7NNYOq6PVM9Dj2wg/gr1PpDwmy8mNKlNX8cQaEHPXbaUIPdGsp8ux9TEL8/k6hbzFQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ptu5xhGF; arc=pass smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="VU9kcwBi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ptu5xhGF"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-4471b489240so519630fac.2
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2026 04:54:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782993243; cv=none;
+        d=google.com; s=arc-20260327;
+        b=kPAb9q2oDRiIWCMhRXLsiMdv/vIUsac+UhPtNKlhnV4EQzGW2edlSnkhi8WFgewBEN
+         vE5IEdvpVQ8/YInTxOyVWQ4JAP1psegTJjMrDWqopT85Cy+Y872W2Gv8SzOTbaV95wmN
+         nCbGr/lwd4fPioGvHndJEEKmutNUa3U4ZYHUH5LOkeLWqMGXwmed4ZEPF5E+mWCj1ff2
+         /tGOt5ObCQh2gZB+0YyowO+JF+xV7OSKAIKXuUvHO/1unC87zlcB7Jijrahe53izxLtE
+         Kf7LzJsNrIx3pm9ypu//nnHMUt4FQPcrBmUhdUToMGRml6GIOoS7hI9uFKckqSd0VQFa
+         Q/eA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cTB0VfE1d+0Ee/RoWGncspUgiGZBeynSuwaTByL01zg=;
+        fh=w2IGoGkJSP6MwrI5O148XD8JZwaBUgpQFyIk6iALmm0=;
+        b=nhlMbD7iSDEssO7OJwjYfmSQxhVAWmrp09YVTNw3tS+D8zPb+I0RC0YF2UyWlro5Ep
+         LCDPceoAYmkNJ0JaavqvGZJ9BK+dIF0mN3bHIqjwMRtNXSOViTzolXlfYN0Emd/DrDc6
+         y7hQBKE75eUfueZSJfuXijKUgTQNmRUpvQWYTNdAxt7gkVhQV0OnE55LfwuM5IyMp0g2
+         skTLaAU2QZd3RfLoflst47tw11W0/hfTCoR5HLbEj94WtZaqV185tCzH/g/ZxArDrKRe
+         H2VQS9TimcqeCX0powinMgA84M9PjI/7x1Qlv2086os7VQLflWw1eqlMD+GCsawzw9jz
+         XHww==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782981950; x=1814517950;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=15z0y8ySKUMx+uWQiHzk+lZ8m7PQlTRsdM1TkQfCHy4=;
-  b=VU9kcwBi1tcRI9lRfA9WbNaDd3i4W7K5P7qk85H4ftjCNvWVa/exvNV7
-   GNdSRRMlXZMlw4LehBHvQE+lwN9mBcmRiVeruqxdo1PtSNl8c0JkPuJyF
-   dKseMgzSsBMws6qOCqriwVuFgbQOD2ZZU90JstdgdbW1kTBP7TtTp+4ou
-   +OSi9f1oeOHXod54Wc5+dW1qI/jskDQL7HLUi9fq2ZbF6KrfRt7BloYUp
-   N8gAuNyFQDYf78r+nE8IlzCHXCk9hVG1i1wz1b0VpO4Qzs5Niusql31Tn
-   ysGIzYt+AlkKejPCRO0UqXWjHBZI5XsnDTtq9bxp40MhFurkCUc9b/d73
-   w==;
-X-CSE-ConnectionGUID: F6rlKnB4QtuwS33tLCr6XA==
-X-CSE-MsgGUID: YZcntuZGTW+LPVfAeb3RaQ==
-X-IronPort-AV: E=Sophos;i="6.25,143,1779148800"; 
-   d="scan'208";a="22896411"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 08:45:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:29711]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.225:2525] with esmtp (Farcaster)
- id e874728e-4e92-47f4-8242-dec1fa8f4564; Thu, 2 Jul 2026 08:45:46 +0000 (UTC)
-X-Farcaster-Flow-ID: e874728e-4e92-47f4-8242-dec1fa8f4564
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 2 Jul 2026 08:45:46 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 2 Jul 2026 08:45:44 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: <linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>
-CC: Eric Biggers <ebiggers@kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <snitzer@kernel.org>, <mpatocka@redhat.com>,
-	<axboe@kernel.dk>
-Subject: Re: [PATCH v5 0/5] crypto: skcipher - multi-data-unit dispatch as a template
-Date: Thu, 2 Jul 2026 08:45:34 +0000
-Message-ID: <20260702084534.22846-1-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260701071919.GA111652@sol>
-References: <20260630083431.2772-1-lravich@amazon.com>
- <20260701071919.GA111652@sol>
+        d=gmail.com; s=20251104; t=1782993243; x=1783598043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cTB0VfE1d+0Ee/RoWGncspUgiGZBeynSuwaTByL01zg=;
+        b=ptu5xhGFnnSAyB/KDyUKfspPU8ipZZlioX7mnDtozkAUrgTOli3ZEiOJ3pz2lBuEn6
+         oE+fQ308/mFFF/dbZJ1SVktkq7jQ2ZqvBQQfL2zkw1Vz9HalL/zIfW3CJ3VWXZR+e7NH
+         H/YEDCu6nrOycCwwMHL/0cugd4lfazh1NiOzefbilnHmUQXft/ruGlZwjrd0PW5ydijF
+         cm2gx74RRg81quHG80PHeT1mg0vZ+kXwuHGFGMF0yk3rvGEpff1A0ji3KF3RWPEZckj/
+         kUm5RLIlh8aKb327EqXh2MicWhNY0OHmCljs+hGyjxakADKvKnwVhkbAbSKJbNiG99Pk
+         sjCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782993243; x=1783598043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cTB0VfE1d+0Ee/RoWGncspUgiGZBeynSuwaTByL01zg=;
+        b=QoNhlhiBKt6ta9/aUFTGvE/6ZJQuGHrAc1gODgdcDXKjt6DR9Lb57Gf5Ky34CoJ1Qe
+         2YDkp5sJXsIDfmmmE3vwzHfvnFBO5IoIBg8r90DfirTdZ7rPt7BtQGNPiTLc9pb282yD
+         7rJJ5KFCYK/WSSLiLyEMwXno3H2/NHUCqlwVutCuynm72hMm5V0r9GQdFAgMCOknvFmt
+         apACZ4Ewzi1xEOnL4U8iwH20dgfJebbZD4MF/26L/qTjSop+9B+gGVKJgKnVDX3yWKd7
+         hS5Et/RWYC+4QdgEZnXPuD5TXfElsw/8TlYF4qYcpCCD8XVgnY0RT1lKKzAK6Dmv0vbt
+         cdPg==
+X-Forwarded-Encrypted: i=1; AHgh+RqrGRvJwWFbrY7a2Sr3XGwi/wL7ZtwI9z6CzjS10f/HaJRnzMiv7i4JOU3c/2KHKEHIyPJZrbKK3F9DdQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHDzwBX1Hk1g7qXCjfuZDQlSYx3nPpn23pw5NdcKdU1puA60G0
+	AJ5ouKxzgqds5b4fGF6DNsi2tdv7ODhKT7MIo5BkzqMlemssXG7khRIKUhthv3ArpaOBYXCHqpG
+	9C+0jFuE2djeAH4nZGnMjJkPhyZOdKFPVXg==
+X-Gm-Gg: AfdE7clcMpgK30CHX98qrdjc6wjKOSRaa9LWCnCKZT0O2dHngYRG05LwqRDB+sbyAFP
+	UGvvYO8V4ht4QQ8PV2iaeLsTz47N93wIrztxG5b1FQLRMG7jNVtrPGr43AnNjZEFfc9YnLv9eW9
+	BK4C4ySV+Nq/dNuKZaQc4iINL4XbRxBSmcSjjDaZ8npOu+xkBGELRKzAJfrkkTR0qwFulwtsH5n
+	AQpsIQU8xl3SsMahgCSMlvYBFEZo6zAZUQr47eo5QMw0iuVpjwWNKw9Kbq9nk0KMpxWlXewFegl
+	+J6SHPwhAWNtFvbDjYQaULQhIvUSvLyBUmI1wodqN0pQcbrHdn/qwxK7xJP5bHSa+B/CzU/i
+X-Received: by 2002:a05:6870:be86:b0:430:29c3:9d15 with SMTP id
+ 586e51a60fabf-44cab4f5ab5mr3404122fac.1.1782993242995; Thu, 02 Jul 2026
+ 04:54:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260630211827.50475-1-alhouseenyousef@gmail.com>
+In-Reply-To: <20260630211827.50475-1-alhouseenyousef@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 2 Jul 2026 06:53:51 -0500
+X-Gm-Features: AVVi8Cdlh0ezi0CoH7M8cV39VtUoYE332zrI4qf4X3qdabNfMGHbBorQKkIEf8c
+Message-ID: <CACVXFVP7Dn+y=mpX1MYH9CCbC=EcTO=2VcFOZjoaqpnT5XXymQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: snapshot batch commands before preparing I/O
+To: Yousef Alhouseen <alhouseenyousef@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Caleb Sander Mateos <csander@purestorage.com>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+1a67ee1aa79484801ec6@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Wed, Jul 01, 2026 at 12:19:19AM -0700, Eric Biggers wrote:=0D
-> No, this didn't address my feedback.  It moved things around but still=0D
-> adds additional overhead for everyone to support an out-of-tree driver,=0D
-> which also hasn't been shown to be any better than just using the CPU.=0D
-=0D
-Eric, thanks for the fast reply.=0D
-=0D
-Overhead: for a non-user the only cost is the data_unit_size field plus=0D
-one zeroing store in set_tfm()/ON_STACK; the en/decrypt paths are=0D
-untouched.  A dun() user pays one indirect dispatch into the template per=0D
-request plus a scatterwalk step and IV copy per unit -- the same per-DU=0D
-bookkeeping the consumer already open-codes today.=0D
-=0D
-On the driver: I agree pushing code optimized for an out-of-tree driver=0D
-is wrong, but I don't think that's the case here -- this helps any async=0D
-crypto engine, and there are in-tree async xts(aes) ones dm-crypt is=0D
-eligible to use today: HiSilicon SEC2, TI DTHEv2, Atmel (I don't have any=0D
-to test on).  To bound the win, I used cryptd as a pure async carrier and=0D
-moved the per-DU split inside it, then ran dm-crypt + fio: batching cut=0D
-CPU ~30% on 128k I/O (large batch) and had zero impact on 4k -- so the=0D
-saving is dispatch, not crypto.  A real engine that submits a whole=0D
-multi-DU request in one descriptor avoids that per-DU dispatch entirely,=0D
-so it saves at least that.=0D
-=0D
-So the question for me is what the bar is: does landing the API and dun()=0D
-template now (with the in-tree consolidation it already buys dm-crypt and=0D
-blk-crypto-fallback), with a throughput demonstration deferred to a real=0D
-async provider, work for you ?=0D
-=0D
-Thanks,=0D
-Leonid=0D
+On Tue, Jun 30, 2026 at 4:18=E2=80=AFPM Yousef Alhouseen
+<alhouseenyousef@gmail.com> wrote:
+>
+> The batch prepare path rereads its userspace element array when rolling
+> back a partially prepared batch. Userspace can change an already
+> processed tag before the second read, causing rollback to reject the
+> replacement tag and leave earlier I/O slots prepared. The
+> WARN_ON_ONCE() in the rollback path then fires.
+>
+> Copy the bounded batch into kernel memory before changing any I/O state
+> and use the same snapshot for preparation and rollback. Commit and fetch
+> batches retain the existing chunked userspace walk.
+>
+> Fixes: b256795b3606 ("ublk: handle UBLK_U_IO_PREP_IO_CMDS")
+> Reported-by: syzbot+1a67ee1aa79484801ec6@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D1a67ee1aa79484801ec6
+> Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+
+The fix looks fine, given the copy is only added in prep stage, which
+isn't part of fast io path:
+
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+
+
+
+Thanks,
+Ming Lei
