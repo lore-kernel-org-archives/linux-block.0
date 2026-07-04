@@ -1,74 +1,56 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1BF374A19
-	for <linux-block@vger.kernel.org>; Sat,  4 Jul 2026 17:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913BF12FF69;
+	Sat,  4 Jul 2026 19:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783185367; cv=none; b=HmnsOLJ/aQikoOQBWHVp3o3RrQuPB7zI1uHcYlipCVgvnC2JQGarhxfa8YT32yHsqJUx8yWRj9uqhaO3+JP6e6z79fOQdD52f6EoPVvudWrCtC3e8aviNbnjNLWOAG4zisCJLEaIaBOISJ8+0IsgwoV8WrFgHSMUTMvcnnDStQc=
+	t=1783194706; cv=none; b=dJw1M9tQFxTmFTs7hFoPKxWLyMqd4DpYp1aW4JAYoNFgNhfL/EKqBGKfs7PtnkN67Tlgbf0ec2QzjF1lVOQ0jXk5jJ5jZPMtytyF1864FS0YHCyBuBpi6ykhJfMSBMJuVPZ4QNzi2e2omV8dvgm2NSV1tf+Bs1iyDKcr0Eboq0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783185367; c=relaxed/simple;
-	bh=uqVUKZYuiHplE+yHfo3stb05fU/h7uOfwnAK4XVUajs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OgVROriHMgdxZWnGux26Q8NCBH41LCaI3zqHWPOGL33ZVKr6zBodhQFU7zfIY01n4X5oOr8Brhr2YLT4Z+LyWudUekixKqIzmeXCJBNxO58izjHCX2GfWAn7lNMMYIzya/6h6wewjT3agKYHSFVD06cXwlSkCiciMRBMCPvCJos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=skvxSK6/; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783194706; c=relaxed/simple;
+	bh=SzNrAnwW1lRUyp0FZqIxKmarVC5X/hKSnp3uWTm97d8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cgMzkZSQ0YOcYcq/uWaz/0WgIHt5OC50VM4GLb7ey0jhxUdLYIsax21CgPKr+yuqmLnhcq3uL4Wl3n0NGorgC84WG4KdWiyUy6SHWTE58EyCBdITHWQglzyCdLqmXtvV5mYHRR4hi1kpTP4kI7rYUs1pZuFRBo00XwWhzJfxrnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyGDj+l9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="skvxSK6/"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-384c94c9414so99033a91.3
-        for <linux-block@vger.kernel.org>; Sat, 04 Jul 2026 10:16:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783185366; x=1783790166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EUJOl1IrLR4QLZ3yl+xmXHxn/gPQpgl66zAYngIU4h0=;
-        b=skvxSK6/NkQIrKb18xPP6FH8W0R4bjQT0D3bvEt15ljRoykYzlqE0SNizk8y4TeeOQ
-         9EObk5w4wTY3yR1IgPOmHpOeULlEAOJ9GSuywMSl9zfszSI9E+9jFphVs2dIbp/Wi2em
-         gyHriiD/i8DteusGpvfTxuZ4NTQDnl/0GdblGrfIr61yg+mySQbCYz1FelcSBNCWkDuT
-         96g6q7iOZfF4bDQbOFx7XLz3B+xIs39MK5ae/bSpEROaFEUECLMKYqtNRlhO0l210hPl
-         u0L/R2BNRebrOyhf4UbCWLdoi0niTrNPKBRsYrh+fo4b+NfPG8x+ayyYOZsH4gW3ATCX
-         AnZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783185366; x=1783790166;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EUJOl1IrLR4QLZ3yl+xmXHxn/gPQpgl66zAYngIU4h0=;
-        b=N6GFbOJqJRdj2Rf84cs75O5Hd8AiS+U7HGRv/3tQEFkYI4wmPMGR4xDIzi7+ksaBle
-         +3lEpYuhS1avbZg890ar0fssM2iwfGSe3CXCF6wfRjTmgfe2IIw5P3hlUTt/5HgIUYmc
-         HCPZDsBSuVJ6NvB51NxFOfhuV2WZJYT3+2B4NLD0E3talOAH4NNx6fvxzc4QFCfy7lhD
-         alZKuHdr/noSEqwjumpG7cEQo4f8z1PoxI4n9nfLPPBUbxKpP2euPnGI7Gz6+PBiQG7f
-         A1Lmz1M0fq/VQdEcHECoHDehJAw3LgP36ckJH/QvcIKkCxtYyiJkRx08YyaSns2eFf3/
-         +mbg==
-X-Gm-Message-State: AOJu0Yxaz8R+AkE6BGd6ASJ2FN/0vuv6WKZ1xTZhroULjoaMYZiFXE8I
-	AwjePs4CkDJdPnVpqwf4yADN2j1QYWI58wjpOu2j9lRA157KacZ1hxeX2y8aCdGdDA==
-X-Gm-Gg: AfdE7cncRR8YXTMAyFmFxiyD51lWbiAcTeeM5fKQdtMR85JDb9i9L8Zsrs7CDLYDfyA
-	n6aa+Wk+nZbQx8ZhTFHYGECW33G3m6SgaOErkxJMvQteFLDNqFLbdd8BOJLhypmbimrpHuxPhZS
-	+QXyE6C6yDmxuUOC/8rT1NJZzm+s1US5wY27KzNZGLnZdTICwNSmPhpSQa/+tb2zynLXWmZchPs
-	SuDsEQPEJerZCKQm11uvU4elYubqPtF8scrwljqrnRmT1llUvfizjcbaa3PGqkCHoiUAazmV8Ye
-	iwPgH8acDrDPTaq+xSb2X4cMRxbDTmNcqx3vI2pH3CtkQCFQlxJaGVctHShRSzMUQTIMxk+7AnB
-	hk4ov+X/B/B/EO1F0l8ubQbBa10B5Zy/OS+iDQD6+dIjVJLcvXHm2EjQ9YxNZf8pGqb4Z0fGlvq
-	ENrqfHK+ygDyXerj+qAeAjSSn5SXT1IF4J59wJ0O3Vdl/8SQD5T47p4irmemT8KhA=
-X-Received: by 2002:a17:90b:1f8a:b0:37d:7bb4:bffb with SMTP id 98e67ed59e1d1-382803b4445mr3995151a91.2.1783185365485;
-        Sat, 04 Jul 2026 10:16:05 -0700 (PDT)
-Received: from coe.tail83f5bd.ts.net ([137.59.92.178])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fe46sm39418200eec.14.2026.07.04.10.16.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jul 2026 10:16:05 -0700 (PDT)
-From: Ramesh Adhikari <adhikari.resume@gmail.com>
-To: axboe@kernel.dk,
-	gregkh@linuxfoundation.org
-Cc: linux-block@vger.kernel.org,
-	lkp@intel.com,
-	Ramesh Adhikari <adhikari.resume@gmail.com>
-Subject: [PATCH v5] badblocks: fix infinite loop due to incorrect rounding and overflow
-Date: Sat,  4 Jul 2026 22:43:21 +0530
-Message-ID: <20260704171321.1956937-1-adhikari.resume@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260427151048.756072-1-adhikari.resume@gmail.com>
-References: <20260427151048.756072-1-adhikari.resume@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyGDj+l9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB6A41F000E9;
+	Sat,  4 Jul 2026 19:51:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783194705;
+	bh=XBefwgHbcKa8lF9fx4CimAkm/mOI1OLeJiYAKnbJMVM=;
+	h=From:To:Cc:Subject:Date;
+	b=eyGDj+l9ou1O5f59vydhkXwbA3fDVbVY5wPAk+z0treKXGPKqXslTE3lUBAsGocd7
+	 j4HWvk4BMNpWicrOIm4gLY3YVgF3Q6UEhK7cReG0YCnUSyd7h/IgSYc0DKYXfWNGK2
+	 4NTeA2Sr3moCGhheLA2o94lnROHcghNi1lucHAcN49jDn2x5ypWvXlRjRz19Rb4+79
+	 D3BUC+ZGPqCZb8zqM+3k0kbrkEvOlPw3Ll9PYCZOu2J/UuiBjkZaboSHjLU787V9b2
+	 JaEC6vggxII6Lo1jd3LNPsKr4cE4QactM2ublptM5aeMxzXzOBZq6U+mCcpHFheYal
+	 aWylKO5MUd0xw==
+From: Yu Kuai <yukuai@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alasdair Kergon <agk@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Dongsheng Yang <dongsheng.yang@linux.dev>,
+	Zheng Gu <cengku@gmail.com>,
+	Coly Li <colyli@fygo.io>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Yu Kuai <yukuai@fygo.io>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	dm-devel@lists.linux.dev,
+	linux-bcache@vger.kernel.org
+Subject: [RFC PATCH v1 00/17] blk-cgroup: protect blkgs with blkcg_mutex
+Date: Sun,  5 Jul 2026 03:51:07 +0800
+Message-ID: <20260704195124.1375075-1-yukuai@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,159 +59,146 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The roundup() and rounddown() macros return the rounded value but
-do not modify their input in place. In _badblocks_set(),
-_badblocks_clear(), and badblocks_check(), the return values were
-being discarded, so s and target/next remained unrounded. Sectors
-were then calculated from these unrounded values, which could make
-sectors way too large (or zero), causing infinite loops in the
-re_insert/re_clear/re_check loops.
+From: Yu Kuai <yukuai@fygo.io>
 
-This was confirmed with local syzkaller fuzzing against the nvdimm
-ioctl path (ND_IOCTL_CLEAR_ERROR -> nvdimm_clear_badblocks_region()
--> badblocks_clear()), which reliably produces RCU stalls with the
-looping task caught mid-loop:
+This RFC moves queue-local blkg topology synchronization from
+q->queue_lock to q->blkcg_mutex.
 
-  rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-  rcu: rcu_preempt kthread starved for 21001 jiffies! g40229 f0x0 RCU_GP_WAIT_FQS(5)
-  ...
-  Call Trace:
-   badblocks_clear+0x259/0xb10
-   nvdimm_clear_badblocks_region+0x165/0x1e0 [libnvdimm]
-   device_for_each_child+0x11e/0x1a0
-   nd_ioctl+0x1413/0x1750 [libnvdimm]
-   __x64_sys_ioctl+0x18e/0x210
-   do_syscall_64+0x102/0x5a0
+q->queue_lock is a hot block-layer spinlock used by request queue runtime
+paths, and it is also used in irq-disabled or otherwise atomic contexts.
+Using it to protect blkg topology makes blkg lookup, creation,
+destruction, policy activation, and policy-state walks inherit those atomic
+locking constraints.  That forces awkward preallocation schemes such as
+radix-tree preloading and prevents missing-blkg creation from sleeping,
+even though blkg creation is a blkcg control-plane operation rather than a
+queue dispatch fast-path operation.
 
-Fix this by properly capturing the return values of round_up()/
-round_down() (the power-of-two variants, since 1 << bb->shift is
-always a power of two -- roundup()/rounddown() use a division/
-modulo internally, which is undesirable here). Also add overflow
-checks (s > ULLONG_MAX - sectors) before the s + sectors addition
-in all three functions, and handle the case where sectors becomes
-zero after rounding.
+q->blkcg_mutex is a better fit for blkg protection because it is already a
+queue-local blkcg lock, it can serialize the full lookup/create/destroy and
+policy activation path, and it allows allocation and parent lookup to run
+from sleepable contexts.  Moving blkg topology under q->blkcg_mutex also
+separates blkcg topology from queue runtime locking, reducing queue_lock
+scope and making the locking rules for blkcg policy users explicit.
 
-The overflow check is done unconditionally, before the bb->shift
-rounding block, rather than inside it. bb->shift == 0 is not just
-an initial state -- __badblocks_init() sets it to 0 by default, and
-drivers/md/md.c explicitly sets rdev->badblocks.shift back to 0 in
-several paths -- so s + sectors needs the same overflow guard
-whether or not rounding happens.
+bio_set_dev() and bio allocation with a bdev can associate a bio with the
+destination queue's blkg.  Once missing blkg creation is serialized by
+q->blkcg_mutex, those helpers may sleep when they create a blkg.  The first
+part of the series therefore audits callers that can reach these helpers
+from completion, spinlocked, irq-disabled, GFP_NOWAIT, or other
+non-blocking paths, and either moves association to process context or uses
+a nowait association path that avoids sleeping.
 
-Signed-off-by: Ramesh Adhikari <adhikari.resume@gmail.com>
----
-v1-v3 chased individual len==0 symptoms in _badblocks_clear()/
-_badblocks_check() one call site at a time. Jens pointed out that
-approach wasn't finding the actual bug, just papering over spots as
-they were noticed. v4 was a full rewrite around the real root cause
-(roundup()/rounddown() discarding their return values), covering all
-three functions with proper overflow handling.
+The preparatory patches cover NVMe multipath requeue, dm-thin and
+dm-snapshot map paths, blk-throttle's private runtime lock, atomic bio
+allocation helpers, bcache, dm-bufio, dm-pcache, DM NOWAIT clones/remaps,
+and BFQ's locked cgroup update path.  The final blkcg patches then move
+blkg lookup/create/destroy, policy activation, and configuration
+preparation to q->blkcg_mutex; remove radix-tree preloading; move blkg
+allocation into blkg_create(); and share creation code between bio
+association and config preparation.
 
-Changes in v5:
- - Switch from roundup()/rounddown() (which use division/modulo on
-   sector_t, a u64) to round_up()/round_down() (bitmask-based, since
-   1 << bb->shift is always a power of two). Fixes the v4 build
-   failure kernel test robot reported on 32-bit (undefined reference
-   to __aeabi_uldivmod on ARM, __umoddi3 on i386).
- - Move the s > ULLONG_MAX - sectors overflow check so it runs
-   unconditionally in all three functions, instead of only inside
-   the `if (bb->shift)` block. bb->shift == 0 is a real, common
-   state (default init value, and explicitly set by drivers/md/md.c
-   in several paths), so the overflow guard needs to apply there
-   too, not just when rounding is active.
- - Build-tested locally (x86_64) and confirmed no residual div/mod
-   symbols in the object file.
+This is RFC because the locking conversion changes a central blkcg lifetime
+path and relies on all non-sleepable bio association users either being
+converted or tolerating nowait association failure.
 
-Link to v4: https://lore.kernel.org/r/20260427151048.756072-1-adhikari.resume@gmail.com
+One intentional tradeoff is left in the nowait paths.  They first associate
+with an existing blkg.  If a thread issues IO to a queue for the first time
+from a GFP_NOWAIT or otherwise non-blocking path, the cgroup's blkg for
+that queue may not exist yet.  After blkg topology moves to q->blkcg_mutex,
+preemptible task-context callers try q->blkcg_mutex and attempt blkg
+creation.  Once allocation moves into blkg_create(), that opportunistic
+nowait creation uses GFP_ATOMIC.  If the caller is in atomic context,
+q->blkcg_mutex is contended, or allocation fails, the nowait helper still
+fails and the caller needs to retry from a blocking context, defer the
+association, or fall back to an existing slow path.
 
- block/badblocks.c | 40 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 32 insertions(+), 8 deletions(-)
+Patch layout:
 
-diff --git a/block/badblocks.c b/block/badblocks.c
-index ece64e76fe8..e8484912532 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -853,15 +853,21 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
- 		/* Invalid sectors number */
- 		return false;
- 
-+	if (s > ULLONG_MAX - sectors)
-+		return false;
-+
- 	if (bb->shift) {
- 		/* round the start down, and the end up */
- 		sector_t next = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(next, 1 << bb->shift);
-+		s = round_down(s, 1 << bb->shift);
-+		next = round_up(next, 1 << bb->shift);
- 		sectors = next - s;
- 	}
- 
-+	if (sectors == 0)
-+		return false;
-+
- 	write_seqlock_irqsave(&bb->lock, flags);
- 
- 	bad.ack = acknowledged;
-@@ -1061,6 +1067,9 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
- 		/* Invalid sectors number */
- 		return false;
- 
-+	if (s > ULLONG_MAX - sectors)
-+		return false;
-+
- 	if (bb->shift) {
- 		sector_t target;
- 
-@@ -1071,11 +1080,17 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
- 		 * isn't than to think a block is not bad when it is.
- 		 */
- 		target = s + sectors;
--		roundup(s, 1 << bb->shift);
--		rounddown(target, 1 << bb->shift);
--		sectors = target - s;
-+		s = round_up(s, 1 << bb->shift);
-+		target = round_down(target, 1 << bb->shift);
-+		if (target < s)
-+			sectors = 0;
-+		else
-+			sectors = target - s;
- 	}
- 
-+	if (sectors == 0)
-+		return false;
-+
- 	write_seqlock_irq(&bb->lock);
- 
- 	bad.ack = true;
-@@ -1303,13 +1318,22 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
- 
- 	WARN_ON(bb->shift < 0 || sectors == 0);
- 
-+	if (s > ULLONG_MAX - sectors)
-+		return -EINVAL;
-+
- 	if (bb->shift > 0) {
- 		/* round the start down, and the end up */
- 		sector_t target = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(target, 1 << bb->shift);
--		sectors = target - s;
-+		s = round_down(s, 1 << bb->shift);
-+		target = round_up(target, 1 << bb->shift);
-+		if (target < s)
-+			sectors = 0;
-+		else
-+			sectors = target - s;
-+
-+		if (sectors == 0)
-+			return 0;
- 	}
- 
- retry:
+Patch 1: move NVMe multipath failover bio retargeting to requeue work so
+bio_set_dev() runs from process context instead of completion context.
+
+Patches 2-3: remove or avoid bio_set_dev() while dm-thin and dm-snapshot
+locks are held, and restore blkcg association later where needed.
+
+Patch 4: give blk-throttle its own runtime-state lock so blkcg topology
+can be moved away from queue_lock.
+
+Patches 5-7: add bio_alloc_atomic(), make bio association nowait-aware,
+and make bio allocation with a bdev fail rather than sleep for
+non-blocking callers.
+
+Patches 8-12: convert bcache, dm-bufio, dm-pcache, block helper
+allocations, and DM NOWAIT remaps/clones to the new nowait or deferred
+association model.
+
+Patch 13: avoid a sleeping blkg lookup from BFQ while bfqd->lock is held.
+
+Patch 14: protect queue-local blkg lookup, creation, destruction, policy
+activation, and policy state walks with q->blkcg_mutex.  This also makes
+preemptible nowait bio association try q->blkcg_mutex instead of failing
+immediately after an RCU lookup miss.
+
+Patch 15: remove radix-tree preloading after blkg creation no longer runs
+under queue_lock.
+
+Patch 16: allocate blkgs inside blkg_create() and use GFP_ATOMIC for the
+nowait bio-association trylock creation path.
+
+Patch 17: share blkg creation between bio association and config
+preparation.
+
+Yu Kuai (17):
+  nvme-multipath: retarget failedover bios from requeue work
+  dm thin: avoid bio_set_dev under pool lock
+  dm snapshot: avoid bio_set_dev in locked map paths
+  blk-throttle: protect throttle state with td lock
+  block: add bio_alloc_atomic() for atomic bio users
+  blk-cgroup: support non-blocking bio association
+  block: support non-blocking bio allocation with a bdev
+  bcache: avoid sleeping blkg association from locked paths
+  dm bufio: avoid blkg association from GFP_NOWAIT bio init
+  dm pcache: handle non-blocking bio clone init failure
+  block: avoid scheduling from non-blocking helper allocations
+  dm: avoid sleeping blkg association from NOWAIT remaps
+  bfq: avoid blkg lookup from locked cgroup update
+  blk-cgroup: protect blkgs with blkcg_mutex
+  blk-cgroup: remove blkg radix tree preloading
+  blk-cgroup: allocate blkgs in blkg_create
+  blk-cgroup: share blkg creation between lookup and config prep
+
+ block/bfq-cgroup.c                 |  26 +-
+ block/bio.c                        |  50 +++-
+ block/blk-cgroup.c                 | 397 ++++++++++++-----------------
+ block/blk-cgroup.h                 |  16 +-
+ block/blk-crypto-fallback.c        |   2 +-
+ block/blk-iocost.c                 |   5 +-
+ block/blk-iolatency.c              |   7 +-
+ block/blk-lib.c                    |   3 +-
+ block/blk-map.c                    |   7 +-
+ block/blk-throttle.c               |  93 +++++--
+ drivers/md/bcache/journal.c        |   9 +-
+ drivers/md/bcache/request.c        |   4 +-
+ drivers/md/dm-bufio.c              |   9 +-
+ drivers/md/dm-linear.c             |   2 +-
+ drivers/md/dm-pcache/backing_dev.c |  10 +-
+ drivers/md/dm-snap.c               |  29 ++-
+ drivers/md/dm-stripe.c             |   6 +-
+ drivers/md/dm-switch.c             |   2 +-
+ drivers/md/dm-thin.c               |   3 -
+ drivers/md/dm-unstripe.c           |   2 +-
+ drivers/md/dm.c                    |  28 +-
+ drivers/md/md.c                    |   2 +-
+ drivers/nvdimm/nd_virtio.c         |  11 +-
+ drivers/nvme/host/multipath.c      |   4 +-
+ fs/gfs2/lops.c                     |   3 +-
+ fs/ocfs2/cluster/heartbeat.c       |  15 +-
+ include/linux/bio.h                |  53 ++--
+ include/linux/device-mapper.h      |   8 +
+ include/linux/writeback.h          |   2 +-
+ mm/page_io.c                       |   2 +-
+ 30 files changed, 467 insertions(+), 343 deletions(-)
+
+
+base-commit: a1c8bdbbd72564cebb0d02948c1ed57b80b2e773
 -- 
-2.43.0
-
+2.51.0
