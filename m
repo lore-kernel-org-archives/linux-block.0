@@ -1,43 +1,42 @@
-Received: from out-06.smtp.spacemail.com (out-06.smtp.spacemail.com [66.29.159.77])
+Received: from out-21.smtp.spacemail.com (out-21.smtp.spacemail.com [66.29.159.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D170C4207A;
-	Sun,  5 Jul 2026 01:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926CEDDCD;
+	Sun,  5 Jul 2026 01:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783213328; cv=none; b=KWeoYsODK9a0kyomA9oA7JvyYBc5V0T8gd/2OlrWIXCwAcSfqoe7ptjmCBrxSs77VzZDF7Q85mEwJ6iEZKI64pTHgxHmBmstvgZgFORnS02345l7JTKmq0zjCIMFode3kw7TSp82s5jCi+nCgWjntyGPyglMvleK8OYHQX6BjKM=
+	t=1783214160; cv=none; b=TJhwVQ7tMOD+qnuHT9xjbyQshjqxu1+M+xodCHdx5HT8X4KT9BtI1PQKb6oZw8camp53gv4TtF0ywGFiXVhriDmUNP+279as5OY1nqpyNLNXQqWhenNuLiGjsvD43LXvhJsVySbcvY/iU0n6tZIE/BoFJmg2zumOtS9hKJIROnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783213328; c=relaxed/simple;
-	bh=P3lugvHk1nwzrdTe7G8u/RXPAFOq2rNX03Ue4yK1EdI=;
+	s=arc-20240116; t=1783214160; c=relaxed/simple;
+	bh=QPy17h4e5yABRPwckIOx4tS7pXaXzbXdDl2ZbtQVdXQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UyHFNZfemT/vlp3PLJxCrq+DQZuBicHD6aMh1rONrw0Ltk11SDTmU9SBFrcelcPKOwcNVGldyXBq6rypQr1V4Dx8BmRyTHYFqOtUBFXs7zPVx59vt6YqcrA9YYmruP3P4B97tmWG8SJUIC8EinZNej5M42+7Eieim2P0J8l5WAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=gxzDANV1; arc=none smtp.client-ip=66.29.159.77
+	 Content-Type:Content-Disposition:In-Reply-To; b=VJfgjMPnlq5IEB7q/dLXC86EUJ0MlpjUsezbhTd0FrBd+9uefeGcf9U6L2RRvF8fjCDK/tVDuc3eCEFJdiKXcBcE9ny7KIGcy4vSP9NklDN0hRKlnDh2ptlwcaMfn+owo02UfKu+Qdwp0Kp/pogbwLmwtcnL+c0rHNN3BZDfOiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=YCR0Kndl; arc=none smtp.client-ip=66.29.159.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="gxzDANV1"
+	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="YCR0Kndl"
 Received: from gurudas.dev (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gt8Mn0CXjz6tkM;
-	Sun, 05 Jul 2026 01:01:57 +0000 (UTC)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gt8gn46MPz2x99;
+	Sun, 05 Jul 2026 01:15:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1783213318;
-	bh=2qJqLI5cYmY6XssOjT5mS6RQt8tME0zYaMT/RBuKHhI=;
+	s=spacemail; t=1783214151;
+	bh=OHTMZhj9UQl6REPNtWFTGyIxAJpWRu/Vu/bsjHn8Ex0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gxzDANV1JQoWbSrlTIw2Hbb83lUzmrjW19c3OZvI3lIFLUx0NWjORGAdcrfZ4Iy1r
-	 8iyC/nftZCN6RsgyVPXhGqT3xB7lKhDTIYvv4mPgt23HneL2vlZdPZGvj5/AKk5Pfp
-	 wZfKzZkjQvogs3VONlJW1oADetqYF+Z1IsjAZyW86GXa/ntxYiqBXIBTcI8TBWs5qC
-	 6LphD9AsDF1QQyi7SDc//YsSj4N4PrmToDXekNK0bsPhGwCiGJIgQfdhGPqBLM/i3q
-	 aiuUXbswiQh086BPfvu9FQvRyd8BtJCb/XDmrMZaTKsgOjTHbYsMvyE/xBsne6r0RG
-	 gHli7e1+IvGdA==
-Date: Sat, 4 Jul 2026 18:01:55 -0700
+	b=YCR0KndlSWOcBAYhlrSZDBeGTpdr14biiYKVLt+UmWumy96f3oqAWHqVF/TQ+IAtc
+	 W8CK29uX1Lh9CPRo7lR7pqTXojRf0OFI0LLCU7Px6m8NE+Kn2WS3aa7NRUioQkSDvc
+	 cgJAze28g5e+zTVGdX1qgjvHRlp4q9+m9doUoyofhgK1V4m2D5shrUlDAeXRZdXGcl
+	 SgncobJsd4Of3wxD2goIHgP2QgtaVKilrKBJlRnToBb0RV77b3HzBzq+HsOiO/jjii
+	 a4ALmIBRGCcVGFOd3uGxDUKLkPn8u+8SgblOttrfz3VAvBhsBRDTl8cEr+aABbPKOH
+	 LXVb/sykR+vPQ==
+Date: Sat, 4 Jul 2026 18:15:48 -0700
 From: Guru Das Srinagesh <linux@gurudas.dev>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>,
-	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
 	Daniel Almeida <daniel.almeida@collabora.com>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -68,12 +67,11 @@ Cc: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>,
 	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
 	linux-block@vger.kernel.org, netdev@vger.kernel.org,
 	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH 3/7] cpufreq: rcpufreq_dt: use vertical import style
-Message-ID: <akmtA7EbVBdhRAOq@gurudas.dev>
-Mail-Followup-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>,
+Subject: Re: [PATCH 1/7] samples: rust_dma: use vertical import style
+Message-ID: <akmwRDWy0FkAPeXf@gurudas.dev>
+Mail-Followup-To: Danilo Krummrich <dakr@kernel.org>,
 	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
+	linux-kernel@vger.kernel.org,
 	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
 	Daniel Almeida <daniel.almeida@collabora.com>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -105,58 +103,23 @@ Mail-Followup-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
 	linux-block@vger.kernel.org, netdev@vger.kernel.org,
 	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
 References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
- <20260628-b4-rust-vertical-imports-v1-3-98bc71d4810b@gurudas.dev>
- <f0ed588a-6cfb-4079-a2fe-7c14f1b42727@oss.qualcomm.com>
- <CANiq72=SQK7pd-fj+4MOb=E6=R-DHCcLcuCvN=us2E5o7Rcy2A@mail.gmail.com>
+ <20260628-b4-rust-vertical-imports-v1-1-98bc71d4810b@gurudas.dev>
+ <DJMAFSKM4K9W.19ED2PVPU6S3R@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72=SQK7pd-fj+4MOb=E6=R-DHCcLcuCvN=us2E5o7Rcy2A@mail.gmail.com>
+In-Reply-To: <DJMAFSKM4K9W.19ED2PVPU6S3R@kernel.org>
 X-Envelope-From: linux@gurudas.dev
 
-On Tue, Jun 30, 2026 at 10:35:00AM +0200, Miguel Ojeda wrote:
-> On Mon, Jun 29, 2026 at 2:43 PM Zhongqiu Han
-> <zhongqiu.han@oss.qualcomm.com> wrote:
-> >
-> > If the preferred style is to place each imported item on its own line,
-> > shouldn't imports such as
-> >
-> >      cpu, cpufreq,
-> >
-> > be formatted similarly as well?
+On Tue, Jun 30, 2026 at 11:48:48AM +0200, Danilo Krummrich wrote:
+> On Mon Jun 29, 2026 at 5:38 AM CEST, Guru Das Srinagesh wrote:
+> >      page, pci,
 > 
-> Indeed, good eyes.
-> 
-> To do what we want, `rustfmt` needs the `//` at the end of that level
-> too (in the future, it will be without the `//`), i.e. the patch
-> probably passes `rustfmtcheck`, but it still needs to split that line
-> and add the other `//`.
+> Can you please also convert this one? Patch 7 also misses at least one case.
 
-Hi Zhongqiu, Miguel:
-
-Yes, I did run `make LLVM=1 rustfmtcheck` and it passed on this series. I will fix
-the missed ones in v2.
-
-While investigating this, I found that that adding this config `imports_layout =
-"Vertical"` to the rustfmt options would fix all the imports automatically, including
-the ones I missed. I ran it locally on the files touched in this series using rustfmt
-nightly and it correctly fixed the imports as desired:
-
-    rustup run nightly rustfmt --unstable-features \
-      --config "imports_layout=Vertical" \
-      --config-path .rustfmt.toml <file>
-
-But unfortunately, since `imports_layout` is an unstable option currently [1], it
-cannot be used straightaway.
-
-However, .rustfmt.toml already has a section of commented-out unstable options kept
-as a reference for when they stabilize. Would it make sense to add `#imports_layout =
-"Vertical"` there? If so, I can include it in v2.
-
-[1]: https://github.com/rust-lang/rustfmt/issues/3361
+Will fix this and the missed ones in Patch 7 as well. Thanks for your review, Danilo.
