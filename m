@@ -1,125 +1,70 @@
-Received: from out-21.smtp.spacemail.com (out-21.smtp.spacemail.com [66.29.159.70])
+Received: from va-2-41.ptr.blmpb.com (va-2-41.ptr.blmpb.com [209.127.231.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926CEDDCD;
-	Sun,  5 Jul 2026 01:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009BD30E831
+	for <linux-block@vger.kernel.org>; Sun,  5 Jul 2026 09:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783214160; cv=none; b=TJhwVQ7tMOD+qnuHT9xjbyQshjqxu1+M+xodCHdx5HT8X4KT9BtI1PQKb6oZw8camp53gv4TtF0ywGFiXVhriDmUNP+279as5OY1nqpyNLNXQqWhenNuLiGjsvD43LXvhJsVySbcvY/iU0n6tZIE/BoFJmg2zumOtS9hKJIROnI=
+	t=1783243959; cv=none; b=RrW/vg051yv6/PnmwiCggJj3RSMFMAQ0WKot1NsIo//cFAS84u3BnbgEGSJIxdVvxxrGM9lFqAS+cbKJCv0z0kmu7PcwSXvoT5gTJqm71mynDDv4MiX/mPHo04FVJPLp6D2w9dN0J7u3rtnKUtZPohRh7SQpIyuZ05l1HHPH4SM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783214160; c=relaxed/simple;
-	bh=QPy17h4e5yABRPwckIOx4tS7pXaXzbXdDl2ZbtQVdXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VJfgjMPnlq5IEB7q/dLXC86EUJ0MlpjUsezbhTd0FrBd+9uefeGcf9U6L2RRvF8fjCDK/tVDuc3eCEFJdiKXcBcE9ny7KIGcy4vSP9NklDN0hRKlnDh2ptlwcaMfn+owo02UfKu+Qdwp0Kp/pogbwLmwtcnL+c0rHNN3BZDfOiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=YCR0Kndl; arc=none smtp.client-ip=66.29.159.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
+	s=arc-20240116; t=1783243959; c=relaxed/simple;
+	bh=mJcdztOL/HKkJyr20IVdaCsHNNcnr07Inou3i/GzSXU=;
+	h=Cc:Subject:Mime-Version:Date:Content-Type:In-Reply-To:To:From:
+	 Message-Id:References; b=ub+RukjJnygnRzEdmy527NdOf4ZT+VUZqe9UEpF4Fzsof4DFecSIttjuJA5hZB3qygxzSru0di5OtCDB1YWvHxk5IoX0DKrfYAsw0k6TNRV+3iGh3Dkc7e5aVwg2iRuh1BMe6ZwVfwnycMWD5r18GYEElmYu3OIysjB/jSe4D/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=Xd6lnBBF; arc=none smtp.client-ip=209.127.231.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="YCR0Kndl"
-Received: from gurudas.dev (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gt8gn46MPz2x99;
-	Sun, 05 Jul 2026 01:15:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1783214151;
-	bh=OHTMZhj9UQl6REPNtWFTGyIxAJpWRu/Vu/bsjHn8Ex0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YCR0KndlSWOcBAYhlrSZDBeGTpdr14biiYKVLt+UmWumy96f3oqAWHqVF/TQ+IAtc
-	 W8CK29uX1Lh9CPRo7lR7pqTXojRf0OFI0LLCU7Px6m8NE+Kn2WS3aa7NRUioQkSDvc
-	 cgJAze28g5e+zTVGdX1qgjvHRlp4q9+m9doUoyofhgK1V4m2D5shrUlDAeXRZdXGcl
-	 SgncobJsd4Of3wxD2goIHgP2QgtaVKilrKBJlRnToBb0RV77b3HzBzq+HsOiO/jjii
-	 a4ALmIBRGCcVGFOd3uGxDUKLkPn8u+8SgblOttrfz3VAvBhsBRDTl8cEr+aABbPKOH
-	 LXVb/sykR+vPQ==
-Date: Sat, 4 Jul 2026 18:15:48 -0700
-From: Guru Das Srinagesh <linux@gurudas.dev>
-To: Danilo Krummrich <dakr@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org, netdev@vger.kernel.org,
-	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH 1/7] samples: rust_dma: use vertical import style
-Message-ID: <akmwRDWy0FkAPeXf@gurudas.dev>
-Mail-Followup-To: Danilo Krummrich <dakr@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org, netdev@vger.kernel.org,
-	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
-References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
- <20260628-b4-rust-vertical-imports-v1-1-98bc71d4810b@gurudas.dev>
- <DJMAFSKM4K9W.19ED2PVPU6S3R@kernel.org>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="Xd6lnBBF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783243953;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=yfmo+Opzuf9+9Y6texDec4/pAC1ruAiFfECAfXs3mT4=;
+ b=Xd6lnBBFX6bPLeFS448dJ+s0XAhRBS+i/fKVR64kfP0b9mde6m806bQDVHWv9G1SSPTP12
+ KBf83yDKpRBuL3p2JUeq5fRS/0QItdLBYU/cBz2B3zL6DIDQKqRQnATenn+hLu3YsFcYYO
+ K7DDu2LKQ5HjU6Ca4wOPev75ntB19Fg4X0hvfRTCfyE5fiuaGfGFiWGkVpCtYjwdeew+DK
+ m0SkYql8xA+VEhsxWbBHNL0siASqlSkO9132hkMoutg+Ij79ylulAmFd0ZlnSb/6g1P4C7
+ tUxe3fOHkef8CukCpEEcw1plQUPLv+7YXAhkpBlxOZ3E2ySeaF66oJBYUcGOCQ==
+Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
+	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>, 
+	<nbd@other.debian.org>
+Subject: Re: [PATCH v2 1/5] nbd: simplify find_fallback() by removing redundant logic
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DJMAFSKM4K9W.19ED2PVPU6S3R@kernel.org>
-X-Envelope-From: linux@gurudas.dev
+Mime-Version: 1.0
+Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Sun, 05 Jul 2026 09:32:32 +0000
+Date: Sun, 5 Jul 2026 17:32:27 +0800
+Content-Type: text/plain; charset=UTF-8
+X-Lms-Return-Path: <lba+26a4a24b1+787d4a+vger.kernel.org+yukuai@fygo.io>
+In-Reply-To: <20260625084458.4171890-2-yangerkun@huawei.com>
+Reply-To: yukuai@fygo.io
+To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>, <hch@lst.de>, <yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Message-Id: <40aef437-bfd6-4484-ba4b-04adf192be86@fygo.io>
+References: <20260625084458.4171890-1-yangerkun@huawei.com> <20260625084458.4171890-2-yangerkun@huawei.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 30, 2026 at 11:48:48AM +0200, Danilo Krummrich wrote:
-> On Mon Jun 29, 2026 at 5:38 AM CEST, Guru Das Srinagesh wrote:
-> >      page, pci,
-> 
-> Can you please also convert this one? Patch 7 also misses at least one case.
+=E5=9C=A8 2026/6/25 16:44, Yang Erkun =E5=86=99=E9=81=93:
 
-Will fix this and the missed ones in Patch 7 as well. Thanks for your review, Danilo.
+> The second conditional checking nsock->fallback_index validity is the
+> logical inverse of the first, so drop it and let execution fall through
+> naturally. Consolidate the two identical dev_err_ratelimited() + return
+> paths into a single no_fallback label to reduce duplication.
+>
+> Signed-off-by: Long Li<leo.lilong@huawei.com>
+> ---
+>   drivers/block/nbd.c | 37 ++++++++++++++-----------------------
+>   1 file changed, 14 insertions(+), 23 deletions(-)
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+
+--=20
+Thanks,
+Kuai
