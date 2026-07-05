@@ -1,90 +1,84 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-54.ptr.blmpb.com (va-2-54.ptr.blmpb.com [209.127.231.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711CFB672;
-	Sun,  5 Jul 2026 15:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083BA382380
+	for <linux-block@vger.kernel.org>; Sun,  5 Jul 2026 15:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783263845; cv=none; b=uEuTgJm8mZUIXfhxr3YJY8+sMwIEqECabpD7NvCE5jksnVT9ZzTyUKlI7CyiLX5/96aDuK8SqdBqzLwdIxnpAFjA3FO0LFbaGk1lSkUtFsTD12dEWC3lazCn89Ymi1rxaWwIUPR8yjafyuLt1u9VHApVZKD5/59SCc+5DLanfbQ=
+	t=1783266981; cv=none; b=YhbDQgjjr8xmfi+g9tFArzrz+ZzwWfXkcndTDgorTX1wuZNqUgVt5jZ8kneBDaGTr2USlMOKB2nFrO3Na4fxdDQmBSV0dMAc6Bahb3lIsuS+kUW+jfLHMbjaX+v5TzdLvAcyyQ0ZtIJxLwiLK8zI/9lJbfsTfmjJ3Tl0yTF3/cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783263845; c=relaxed/simple;
-	bh=wo4lqtA47GkxIAmoMhie9KkYyvnhazyJKrtTvigul0M=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sh0/Gu9Q/f0WMtOIm7rMg2DFAtdz5mFuV99VaT9+ILzau34agBSmNEIzvpMMrVhpgKuwm6/rHKA2IGvtYsKIvSYa0MdbDrVG/cMoGvWg5v/MkddQg6Jnny34ehEWvheI0Y4shUbeuoYlFVHk/MZZNHXtqNrxIMToXAYHuv7LA1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u7Fb4+hm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	s=arc-20240116; t=1783266981; c=relaxed/simple;
+	bh=j/wcPS8f7rqMiknLCq0LHaBmKpRTCklDKW2ebTK7iJw=;
+	h=To:Message-Id:In-Reply-To:From:References:Mime-Version:Subject:
+	 Date:Content-Type:Cc; b=njh+ZXLXd+T/1smupT8TUaTCAu91jeDhcetiw3UK3qEK2RZpZA7/SfKgM5X8ZUmtXREdHwYKZG55pEgTrZXNqALXGZ+MMwC2diQDLa90FggTaAn59fhv0h764Y5mK316Yz5RZFDiB1UilWzWUBVyrbBqhKz0J03GkjA3Jcj8l+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=eMAXjv7i; arc=none smtp.client-ip=209.127.231.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u7Fb4+hm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MjFyE/GuY4zCXOCWmZjS9nf5WEwFKlMosakxlzzhgKA=; b=u7Fb4+hmzFx3UipHSwoWedWBaU
-	KSTZCMZWLVdMdrU31XEcUPWdZlHdz0ghtvmlN3vYOq03ljvEGr7J1v8LIogoINE9dgA7GCnG4mXCJ
-	WS9CcL5vZF6JVFEG5lvN5eyR1iIHx3Uu1oP70Kxkp4a5WTenUj/5s6GW+Oe8Akb6oPZw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wgONV-00AqQj-DU; Sun, 05 Jul 2026 17:03:29 +0200
-Date: Sun, 5 Jul 2026 17:03:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org, netdev@vger.kernel.org,
-	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH 0/7] rust: Use kernel style vertical imports in various
- drivers
-Message-ID: <66d3d69d-0974-49e1-ad93-9295407f4b78@lunn.ch>
-References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
- <c89a1bc8-6cc1-4e16-ac95-add389e45a2b@lunn.ch>
- <akmnh0AKFfu9-OYn@gurudas.dev>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="eMAXjv7i"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783266972;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=cytcHvExyWJLLYT7BP4F1smnTra0QyeLSWqMsXI7UM8=;
+ b=eMAXjv7iEpnDCKaOUbF9d5sxdzNscUy1r+gTryGqH8XymTCOlj6p6cIZva3UF/5rg0FyVc
+ mf0AjvZdRGpmbNlK1CU1uKU13+D/Y53Z75JaZ9VEtpruPza8ZiD9dZUYJaGSKYvKwu5IdP
+ sgQxCuzBi+EcT74BIetPjrmbT9X7uxZt7swt19S+D8LbCUkybgXtGB6gnxrIwo2V2tJtJj
+ Yg/nZ3o0b2D80a0kBpSPDBpQy9HXNRX2z4W30jFNMpNp0iCFHH45XGUXH+ggkC1vCDVX6L
+ CYK8etpmYz+exSJDaNZWtFJ6ARhUrnDgu7w5MGVjClGLygCNuBWbXaScso9Umw==
+To: "Zizhi Wo" <wozizhi@huaweicloud.com>, <axboe@kernel.dk>, 
+	<linux-block@vger.kernel.org>
+X-Lms-Return-Path: <lba+26a4a7e9c+440373+vger.kernel.org+yukuai@fygo.io>
+Reply-To: yukuai@fygo.io
+Message-Id: <7ad5ca8a-0943-42b0-b75d-c661e7f7faab@fygo.io>
+User-Agent: Mozilla Thunderbird
+In-Reply-To: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+From: "yu kuai" <yukuai@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+Content-Transfer-Encoding: quoted-printable
+Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Sun, 05 Jul 2026 15:56:11 +0000
+References: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akmnh0AKFfu9-OYn@gurudas.dev>
+Mime-Version: 1.0
+Subject: Re: [PATCH] block: fix BLKSECDISCARD zero-length range causing page cache invalidation
+Date: Sun, 5 Jul 2026 23:56:07 +0800
+Content-Type: text/plain; charset=UTF-8
+Cc: <linux-kernel@vger.kernel.org>, <yangerkun@huawei.com>, 
+	<chengzhihao1@huawei.com>, <wozizhi@huawei.com>, <yukuai@fygo.io>
 
-> Is that reasoning off-base, or is the right path to split these out per subsystem
-> regardless?
+=E5=9C=A8 2026/7/4 15:39, Zizhi Wo =E5=86=99=E9=81=93:
 
-Adding to what others have said, some subsystems have there own CI
-system which tests every patch. Does it build? Does it add new
-warning, is sparse happy, are there more self test failures. What do
-different AIs think of the patch etc. Cross subsystem patches don't
-always hit the per subsystem CI tests.
+> From: Zizhi Wo<wozizhi@huawei.com>
+>
+> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixe=
+d
+> the start+len overflow via check_add_overflow() but did not handle the
+> start=3D0, len=3D0 case. There, start + len =3D 0, so end =3D 0 passes al=
+l checks,
+> and truncate_bdev_range()->truncate_inode_pages_range() is then called wi=
+th
+> lend=3DUINT64_MAX, whitch is the "truncate to the end of file" sentinel, =
+so
+> the entire page cache is invalidated.
+>
+> Fix this by replacing the validation with blk_validate_byte_range(), whic=
+h
+> already rejects a zero-length range and is what BLKDISCARD uses. This als=
+o
+> switches the alignment check from a hardcoded 512 to
+> bdev_logical_block_size().
+>
+> Signed-off-by: Zizhi Wo<wozizhi@huawei.com>
+> ---
+>   block/ioctl.c | 13 +++++--------
+>   1 file changed, 5 insertions(+), 8 deletions(-)
 
-So in general, it is better to submit per subsystem.
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
 
-       Andrew
+--=20
+Thanks,
+Kuai
