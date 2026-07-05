@@ -1,86 +1,90 @@
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CFF3783B4
-	for <linux-block@vger.kernel.org>; Sun,  5 Jul 2026 12:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711CFB672;
+	Sun,  5 Jul 2026 15:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783254753; cv=none; b=IVtjqwiVd2aFrvTPL/lbzNwB4695XvajR2sz9KAlYGNrRlWLLypu/Su8CtRdpYWlFI+FBUkLzf7V5O5vABMle6uKwyLTmiRgbrgrVGRlx+MYm006iw+pldgNpuKPjKo0AV0/uisiVAoBtpEeUJe5mJHG3xzqyz7Z5wNV7Px+s90=
+	t=1783263845; cv=none; b=uEuTgJm8mZUIXfhxr3YJY8+sMwIEqECabpD7NvCE5jksnVT9ZzTyUKlI7CyiLX5/96aDuK8SqdBqzLwdIxnpAFjA3FO0LFbaGk1lSkUtFsTD12dEWC3lazCn89Ymi1rxaWwIUPR8yjafyuLt1u9VHApVZKD5/59SCc+5DLanfbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783254753; c=relaxed/simple;
-	bh=CCIMdfljEQTPG2y+fa9/zJCZ0sPvzm7YTEZ5kwYmAZg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=iRwHzIetxKapWK5JfSKpWoH27PZUMVkOgv8I9RREJYnrN+/M+XV3IIUK1pfMo1pw6sVxHTBr5CZsWdGftIW/yX1HLkvMq2pF4laHkANEvn6c/b5LzFi/A07OojpBu1VDDUb/8K4Qq3R25Uw2x3mqpyKbzhUld60IkfecKkp9v1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-495f7693e7dso3756925b6e.0
-        for <linux-block@vger.kernel.org>; Sun, 05 Jul 2026 05:32:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783254751; x=1783859551;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oVQayXX17+z7bbRFOo7lTV2QeNZyuJzGhhIImA0uwac=;
-        b=pXjvNRgRoFNrESTCCCZCgv4zsCoB5SO0+8oK1pTI8iejBVlYwF6sdev3wFrPm2dkNT
-         l+PTA17m/kYXSEbwF/oGjqrPShXycqVLaCzddRIritLZl2a3rG5Pndsc7+BWyQgOVrq9
-         eockeryYK4JHjEOWFWVr/BV79OHTZyKcowcr7TceKsLs8m3udOVGLISuwKTu17H2tIn4
-         KZw5AzXyYUUUsG4Mw2NKhZEcIImBjkpokm8FBp8XPLyp7WNFP1VGrolmJgzjcpbx9J4U
-         lsYfX9tM3Rq5GIj+XoBWaH/LFgFpLIpF5xxPl3t3MuA6Ra5zaRJf1YCjT3GqOpGcC6S3
-         hYMw==
-X-Gm-Message-State: AOJu0YyRpQ83tFwwZzULe+U7UTP8UZ9X/rEW/9mzP0UK7JQCpdoObUUr
-	gvExNivBqqMGCjW0TtkFjPcSk4B+EeKeO7GE0LIX0YOrhKbqh4qlFSVpgbVeTB7Uz20gDZIk1wd
-	XCrhvKPCxO5b2JhJv2culisi/7McItLZG8aJJU/T/S6r34dKPXHpbEHt7YnI=
+	s=arc-20240116; t=1783263845; c=relaxed/simple;
+	bh=wo4lqtA47GkxIAmoMhie9KkYyvnhazyJKrtTvigul0M=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sh0/Gu9Q/f0WMtOIm7rMg2DFAtdz5mFuV99VaT9+ILzau34agBSmNEIzvpMMrVhpgKuwm6/rHKA2IGvtYsKIvSYa0MdbDrVG/cMoGvWg5v/MkddQg6Jnny34ehEWvheI0Y4shUbeuoYlFVHk/MZZNHXtqNrxIMToXAYHuv7LA1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u7Fb4+hm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u7Fb4+hm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MjFyE/GuY4zCXOCWmZjS9nf5WEwFKlMosakxlzzhgKA=; b=u7Fb4+hmzFx3UipHSwoWedWBaU
+	KSTZCMZWLVdMdrU31XEcUPWdZlHdz0ghtvmlN3vYOq03ljvEGr7J1v8LIogoINE9dgA7GCnG4mXCJ
+	WS9CcL5vZF6JVFEG5lvN5eyR1iIHx3Uu1oP70Kxkp4a5WTenUj/5s6GW+Oe8Akb6oPZw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wgONV-00AqQj-DU; Sun, 05 Jul 2026 17:03:29 +0200
+Date: Sun, 5 Jul 2026 17:03:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Michal Wilczynski <m.wilczynski@samsung.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
+	linux-block@vger.kernel.org, netdev@vger.kernel.org,
+	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH 0/7] rust: Use kernel style vertical imports in various
+ drivers
+Message-ID: <66d3d69d-0974-49e1-ad93-9295407f4b78@lunn.ch>
+References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
+ <c89a1bc8-6cc1-4e16-ac95-add389e45a2b@lunn.ch>
+ <akmnh0AKFfu9-OYn@gurudas.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:2e48:b0:49b:486d:2637 with SMTP id
- 5614622812f47-49b486d27afmr2906084b6e.1.1783254751056; Sun, 05 Jul 2026
- 05:32:31 -0700 (PDT)
-Date: Sun, 05 Jul 2026 05:32:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a4a4edf.b42ede87.8bd1.000b.GAE@google.com>
-Subject: [syzbot] Monthly block report (Jul 2026)
-From: syzbot <syzbot+list23cf249e36604ab03108@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akmnh0AKFfu9-OYn@gurudas.dev>
 
-Hello block maintainers/developers,
+> Is that reasoning off-base, or is the right path to split these out per subsystem
+> regardless?
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+Adding to what others have said, some subsystems have there own CI
+system which tests every patch. Does it build? Does it add new
+warning, is sparse happy, are there more self test failures. What do
+different AIs think of the patch etc. Cross subsystem patches don't
+always hit the per subsystem CI tests.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 19 issues are still open and 112 have already been fixed.
-There are also 25 low-priority issues.
+So in general, it is better to submit per subsystem.
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 1162    No    general protection fault in lo_rw_aio
-                  https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28
-<2> 31      No    INFO: task hung in read_cache_folio (6)
-                  https://syzkaller.appspot.com/bug?extid=9db0864859224b833108
-<3> 102     No    INFO: rcu detected stall in blkdev_release (3)
-                  https://syzkaller.appspot.com/bug?extid=07d6f9c5d7633ed4a5c8
-<4> 89      Yes   INFO: rcu detected stall in kjournald2 (2)
-                  https://syzkaller.appspot.com/bug?extid=14c6ac6811273526cfa5
-<5> 25      No    KASAN: slab-out-of-bounds Read in blk_mq_free_rqs
-                  https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+       Andrew
