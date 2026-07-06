@@ -1,85 +1,127 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863C72E6CB3;
-	Mon,  6 Jul 2026 14:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE76B392C3D
+	for <linux-block@vger.kernel.org>; Mon,  6 Jul 2026 15:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783349150; cv=none; b=cArk0T+0m3yiLKqiLEpzcRZn+zkIxcwTiJBUC1wOzV4dbvdIAdQaJOvdSmpp2fivvePlKXuqTxtOFmqNuAqUEDQw3bEKjVsbX3rsqNlWXZbNzdSisXjz6naj75WseHOE3KlIYaZw/+ERzTSIakmVmBmQ82rSAtRttnWAWsDmJoM=
+	t=1783351712; cv=none; b=RH+FmbWs3BniZuLtd+JF3Z2nXY5OtSh0rvqMnl837ELAKURSm1of97sdpgRntwqtx8sKXDRtwDE9YCM0ZYc8unxE2XAb8r4NjW+k8tsqL+UayaTbq12tPUgA+NjNDoAzUFIhmDAx5JaIHNU3EKrQEIphVaJllENsu+PExEUyklw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783349150; c=relaxed/simple;
-	bh=5FF82p5yqBFNyjiv52zXQu0y4MzLFESUlUBmIVFIf94=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YBjxEyICiRzrHCCaenzHZn/J82Zenw/vqRwyboCkxFC87F3dH6GGTocnJX27WxGYPP7I0wcK7sfpx0ORNtC78e8TyRLWhOrlGN9DMkuU60qlpXewItVQXZ6on9EIhnaaU0k3HFsHPYHUY09A/XfS/Cp+w967Hm2sZhKcsmK2IrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sTO8zeyk; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1783351712; c=relaxed/simple;
+	bh=W2r34cI+XaaQUdqCi3aOgKHvzlTyAT8XuHNk4YjX+HU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VD8wc9dG3m375N7aeYGvYJB9U+dioaXZUGuwEo2ilCTCXszvWqKFpp+55aXLVbRMjh2gSWvsNVTIDaeI/HnUXeF8ZIvjN+9+PePG9kZ2hlVoNmKY/qz9UKenxJz8Q15xkEffx2aNxa75SEk9IQRlVRf2dBwlkxNtuzYdA+Ol2i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/2oHzmz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sTO8zeyk"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gv6bx03XYz1XM6JQ;
-	Mon,  6 Jul 2026 14:45:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1783349144; x=1785941145; bh=HaF39ur/i/EmXJ82xXzWqPJI
-	Bqle1XYeHYVmVNH5g3g=; b=sTO8zeykUlp7+1JcFuGXmS+9gTKfBod9fTfSGjZ4
-	WmnE/eEQXjIav7yQIltQJky6n0vGPXOy2LyNqro46WeQmY7OhIhTokFKu15N05ku
-	vz3/GB1NGKsWkPrN56LmF9rgyFRl+JjhIKLPAYdTxkyjqrfzF9Vp3ipkMhZ0fBme
-	5L/cxvqQXvWWdVLSu1Asgzs6FjodnX1WanVNg47UuH9woqNWUs2860BOB1swAKON
-	vMioUxa+hUWggUr/ErZ2EhSeQZH9jvtcoKRfdyAbFsJUV7lHuCvm1lhizciDNYNu
-	wQw8m6s8YxP6s/7rS1xsPFaI145UgILyVZSQFnHnYDjNgQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id QjjKBSfuP5LG; Mon,  6 Jul 2026 14:45:44 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/2oHzmz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783351709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=forfFVNHXdcKUrAO6tYWFvQxC3xkWQUr9XOJVlaCNVg=;
+	b=g/2oHzmzbuZH+Cr/vrRrHTzqUTCxkCRYxxvJ61yBZQ2t+idBSyEZAwh76B3rswebprcsu0
+	QdTcfFtUFhFO2R+c5bN+jMyBkTota/y6IMqDmzZfvK+XDeFuLjGOytmsgnJp6cBiNiC155
+	yixQDdCnScI1H5ZYutp4feHG/2pfBSU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-189-FunbdqJFPQy1m90ySFxkbA-1; Mon,
+ 06 Jul 2026 11:28:28 -0400
+X-MC-Unique: FunbdqJFPQy1m90ySFxkbA-1
+X-Mimecast-MFC-AGG-ID: FunbdqJFPQy1m90ySFxkbA_1783351705
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gv6bk5Th2z1XM6J4;
-	Mon,  6 Jul 2026 14:45:38 +0000 (UTC)
-Message-ID: <e20382ed-255e-4fdd-b864-657785d309f8@acm.org>
-Date: Mon, 6 Jul 2026 07:45:37 -0700
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 618C01955F21;
+	Mon,  6 Jul 2026 15:28:24 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.159])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3EF0736918;
+	Mon,  6 Jul 2026 15:28:16 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v5 03/21] Add a function to kmap one page of a multipage bio_vec
+Date: Mon,  6 Jul 2026 16:27:18 +0100
+Message-ID: <20260706152737.1231312-4-dhowells@redhat.com>
+In-Reply-To: <20260706152737.1231312-1-dhowells@redhat.com>
+References: <20260706152737.1231312-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] null_blk: give the file-scope mutex a descriptive
- name
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, dlemoal@kernel.org,
- nilay@linux.ibm.com, linux-block@vger.kernel.org, kch@nvidia.com,
- johannes.thumshirn@wdc.com, kbusch@kernel.org
-Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
- chengzhihao1@huawei.com, wozizhi@huawei.com
-References: <20260706123507.3809871-1-wozizhi@huaweicloud.com>
- <20260706123507.3809871-3-wozizhi@huaweicloud.com>
- <9004743e-f522-424e-a1ab-8779ecc6da02@acm.org>
- <5f99b2f3-05c1-4754-9827-d55528861ecc@huaweicloud.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5f99b2f3-05c1-4754-9827-d55528861ecc@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-On 7/6/26 6:21 AM, Zizhi Wo wrote:
-> Thanks for the reminder! Agreed that "nullb_list_lock" is too narrow
-> since it also serializes nullb_device_power_store() and
-> nullb_update_nr_hw_queues().
-> 
-> However, I'm a bit worried that "nullb_lock" is easy to confuse with the
-> per-device spinlock "nullb->lock"... They are only one "->" apart?
-> 
-> Would "nullb_global_lock" (or "nullb_config_lock") work better? It
-> reflects the broader purpose and avoids clashing with nullb->lock.
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-Not sure what others prefer but nullb_global_lock sounds good to me.
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Thanks,
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 92837e2743f1..53cf36e73967 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+ }
+ 
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
 
-Bart.
