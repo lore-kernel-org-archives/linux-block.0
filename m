@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E05B3E9F76;
-	Mon,  6 Jul 2026 06:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F292EB87F;
+	Mon,  6 Jul 2026 06:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318897; cv=none; b=V05sNCRX7YtW2FskqmQ1D2Kn8WmNAqMVlyCK+sG47RQsMbrs6BhBlphkkBnMnMs24sdGFNSMjLA3/WIkTuzrM5zyhdFj6zKdh91k61YS0wZDDVzhdQZG6pEmjVqPO/P/EsBDiYYkO77ErWphm1nox2IBHubA0MP3vlAad1a5xBY=
+	t=1783318879; cv=none; b=Kz8IMZsa0PWVYamidDXvcl7qFh0koH0u8t70U4UMY1ZrnErMBfkAiwkgFhtxmnUt/3N6sXg3X/fQDOm7MvEDRZmOjPfmCnNc+xs9rRd5S8ZRpD7EtCg+RwsPOajE6B9EiZe/Q2BViHnLTBUgP8S6xxodl2W1jGrwBj5lU0XQquY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318897; c=relaxed/simple;
-	bh=zDQdYdTFavgacMtdiXy3/hskR9xaYH1DaF21getAMWE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=GNSkDN98Cvnd6admLCwwFiAcLGxwLcSPLuy/p+GsZj7X3Mokkn4dZfl5ELX90cE/3PRmyVKDTvq/yORLCYFvFqNnalrdx7v4O6PuQyCUvIVy73YIi0H6Ceie96I2gCDLjhi4vjVivQC0f2b1CtJKbeBwd7oXwInIqPVQDcF267A=
+	s=arc-20240116; t=1783318879; c=relaxed/simple;
+	bh=uG3xryX72/VrJ5xN0YK0iTHXuo6Y0vSJs70jtDbKz5M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=uZeIBGLiORT9aPM/EXeslsV0HUMpKSjwaTM1aHMNq7BdOc4i0JMa8JgGPqje1Wb43ZoBnniq74obz+ZGsMFgRm7+8A42w6YafaKoHhZFZRkwikFGgcdK8gCgDPONhCXqubt9yaUzEiXHk79qw7SUtGgLOj8HN4rRhGwMS5NRDmM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-2e-6a4b4905a985
+X-AuditID: a67dfc5b-c2dff70000001609-9e-6a4b490083a4
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -178,45 +178,44 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 33/40] dept: call dept_hardirqs_off() in local_irq_*() regardless of irq state
-Date: Mon,  6 Jul 2026 15:19:21 +0900
-Message-Id: <20260706061928.66713-34-byungchul@sk.com>
+Subject: [PATCH v19 20/40] dept: apply timeout consideration to dma fence wait
+Date: Mon,  6 Jul 2026 15:19:08 +0900
+Message-Id: <20260706061928.66713-21-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUxTZxTG9977vvdeKt1uOjKuuMSlmdPgB5PhchIXhu4P7uayzJkZP6Ku
-	GzejfBRWFGTBhG6WgSukcWubwdAyRltrN7G1RjeJCkEDGRW/Zhm6wlYbq5QGKFTkYysY/3vy
-	nOf8zvPH4WjFAEnj1Jr9klajKlIyMiyLJLesZd/dUvD6becbcDcQJDAZq8VQ6/6BQGCyFoH+
-	/H8Y5o5eYSE2PciCv/8iDa4zOgom2ucZeNQ1jsA0HGQgajMgiAR+J3BnagSBLThPQfDSNwjm
-	zIVw/CcPAxZTP4KW4Xs0jIeHENw3emnoMX3LgPWrDgLmZjeGgC2EwRJmwHw6FZosDyiYtjlZ
-	+MfRyELgag0B90A3ApchREPHX6uhpeZnDBc6ehJ952IIqpviBNruXKdgeMhPwDYZZUF3uRWD
-	Y8xC4Ir1JfBe1COomZgn0NfkI3C34SGGU6EuGtocEQJdkyMUeNwmGp7YE2f6zvayoDdMs2Ca
-	rWXA2x1noX3MzsDM4x8ZaPDlQnNsPYwaYyQnR4zrG7CovzHHiK5jLiTOPDmKxFjb17R42FMh
-	dkxZsXi+8R4rWt0HRI8jXWy9EKZEt7OOEUd9PlYM3rJQ4rGerWJrw3fkw7RdsrfypCJ1uaTN
-	yP5Elv/gTz0p1b1wMOSCahRZcgQlcQKfJfTdGMXP9LUzukXN8CsFv3+aXtAp/CuCpz5EjiAZ
-	R/M3lwsGW/1i6EX+U8Ec+TsR4jjMrxDqb5Uu2HL+TcF21kg9ZS4XTrZfWuQkJfxfZ5sXfQW/
-	QRiMXsULTIG3JwkmZy95urBUuOzwYyOSW9FzTqRQa8qLVeqirHX5lRr1wXWflRS7UeLhbIdm
-	d59D4/3bOhHPIWWyHHLeK1AQVXlZZXEnEjhamSJ/bdWWAoU8T1X5paQt2ac9UCSVdaJlHFam
-	yjOnKvIU/Oeq/VKhJJVK2mdTiktKq0abM1B0p8abvGlAtuTf4Y3vxP3ebWu4cKHui4k/nk/P
-	zvw+87F6a+Wy6Ksph8PQVqWo2FNRFZhfvbZqZm92/OMNOz7I8FXNbu/+Tf92Vu6hXzbZZR8N
-	vryj8aTavHvv0veLedo7lNtTZ08NnzPTdRljdb1+leHEyJ6StL4wNnqVmwuVuCxftT6d1pap
-	/gdoHahobAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0xScRTH+90XV5K6Ec07bdlYT0urle30WPbmmus129r6p6juEgUzKItW
-	SyCmPWxEgUs0zZI1pTIflDWWs2UPa0n2cOWjB1FOiVZY+UBDW/+cfc/nfM93549D42InGUkr
-	0vfz6nS5UkoJCeGGJYZYMjEpde4JxxzIMR6D1g4PCa91dQT0BHIIKLjhoCBouyWAnMoLJDx6
-	oyeg6Xo5go6eHAS/+204GGuHCAiaGwQQ6H0nAIsOwZCrAYHVbcahpekeDo5qHQY/KwYp6Lr/
-	A4Hlg4eCvE4dAX77aQT5XpsAOh/IwNdxl4Shti8YvPnVjcDuGcTAU5eNIGhNg6KSqtC69TsF
-	/c+e45BnaUJw6UMbDj863yOobmhH4Lqqp+CzqQaHZs8YeNnjp+Cx5RQFPncBBt8qKCjWu0hw
-	P+1CUGgzI/C+dWFguHyDAmthJQG17+8IwN01gEGr1YxBeeV66LB7CWg0lWChc0OumxFgyzNg
-	ofIVA8u1uxj02ssEy0sR99t4huDKqpwYZ3wRpDjHRQfi+vvMiAuUGnDOaAq197v9OHe86iBX
-	2thNcX09ryjO9auY4J6UsNyVE30Yd/ZZLFeb3ybYtGKbcOluXqnI5NVzlu0Qpnx9bSQzdGMP
-	eR2QhXyjT6IwmmUWsM+rdcSwppjpbEtLLz6sJcxktirXS55EQhpnmqPZ0/bcEdN4Zidr9bWH
-	TDRNMFPZ3JcZw1jELGTtThP2LzOaLa+oG8kJC/HrA4UjXMzEs+/8DwkTEhajUWVIokjPVMkV
-	yvg4TVqKNl1xKG7XXlUlCn2T/ejA2dso0CyrRwyNpOEiWL4uVUzKMzVaVT1iaVwqEU2bkZQq
-	Fu2Waw/z6r3b1QeUvKYeRdGENEK0biu/Q8zske/n03g+g1f/n2J0WGQWulWTrfRLuFFrHdPu
-	zIjJ7t066WPUqnPYlORA8Jg2fO30yT7JlVUDWRPVTnf827hZ81dPiNJGvpiavCjxJlqcXIav
-	UanOxSQcWR3VvuXy5i/hR/cl/BkXiNZr/Pol9bNlO396Z9ZuDPTrGrelnTl/QC4rkh3+HPuA
-	SJj/9NPKmsEVW45ICU2KfF4MrtbI/wIjatboSQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTZxzGfc/lPYfGLieV4BGz6LpMNxSGiOZvpga/zNexuOk+TeOlkZNR
+	KGCKMjDZUpcRkduwDdVQq0ViJXigWFQUbYJVEGK4KApELLEWykgFNpQiUmBcsm+/PM+T36eH
+	p1U9bCSvTT8h6dM1OjVWMIqR5eXR1J7ElFhvzRa46JAxTE5baHg/1cfBnKsZgXzzNAXvamcx
+	jNkLEcx5hiiwD8xSMNB4BsGMORUC5n8wTLd10HC+tBNBuddDg6vyDwyDJbdoeD4xhqG1tACD
+	1WJEYLY6GXgaCFHwymyk4Pwwhil7FQdvKss4CHk3wZwtA2pGOlgI+I0Y6g2vOZAL/fPGlxsg
+	b+Y9gn55jgWDZZKFJ80tDHQ0VLNwtecpBb0lgwiqR69gMI36EQSCdhrsE2McNNsiwOgf5+DM
+	3/cwtFnaWXjkqKfA4X9Iw1CZlQLTMxuGj547LHQbL8/TtSYEb4pHOBi3zrJQGsrDUJBrZuBW
+	0yQH0x8uYihu3w0fan0sWJr6uYQEMplbzBD5koyIK2hjyLm2aHK3zMMRm/MkqauMIhX3hyny
+	MrCDOKvOYuIcN3JktL2dIy0Xphly17uNlBtKaXKpdd+Pqw8otidJOm2WpP9651FFcn9jLTru
+	5rP7bvRgA7Jw+SiMF4V40eGS6XzEL3Lhn58uxFhYL/b2TtELHC6sFeuK/Gw+UvC00LVGLLQX
+	MQvFCmGveNbrW2RG+EKcKDBRC6wUtor/Fnjwkn+NeL22cVEUNp/XhKyLG5WwRewbe8wsbSrC
+	REMgdolXiQ8qe5kSpLShZVVIpU3PStNodfExyTnp2uyYYxlpTjR/N/tvoYN30HjnT24k8Ei9
+	XAkJ36WoWE1WZk6aG4k8rQ5XrvsyMUWlTNLknJL0GUf0J3VSphut5hn1SmVc8NcklfCL5oSU
+	KknHJf3/LcWHRRpQfFyR75zrm++7Irs/P1DTPRx6vmqgOqZuhShfiXEf1m9L/ZYUrXcmT20s
+	/+Sz4AZdnOJ6ovroY/su/ML8w9Deqw0ljol1T/Ke/d4aldDi2X/7q2P7d+YqfBVvfSbVZuw7
+	tEzOzo08pBoMNoBzppOJHe4zJXX9Fft2888Rl4fI7o89aiYzWbMpitZnav4D5K0reGoDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUhTcRTG/d97d3cdri5L6qKVMcii0GZkHKjE8ENXI4k+WPmlVl1yOjW2
+	mhpIvg1fC11tUnNlpiN8KdvK0liJ5XuSZqXkW9JciTNNN0Xdsin05fA753nOw/lwKFz0kudH
+	yZKucookqVxMCghB9KHsIK/I4/GSIbsQ8tQ3YHjMyoOvmc0EOB15BJQ9rSXBrX/JhzzTXR50
+	DGQR0PukBsGYMw/B4ooeB3XjKgFuTRsfHEtDfNBmIli1tCHQ9WlwGOx9i0Pt80wM5uv/kjD1
+	bg6BdtxKQulkJgEzxiIE92x6Pky2HoPpsdc8WB35icHAgh2B0foXA2tzLgK3LgEeVJg967pZ
+	ElZ6PuJQqu1F8HB8BIe5ye8InreNIrA8ziJhovgFDv3WDfDZOUNCp7aQhOm+Mgx+15NQnmXh
+	Qd+HKQQGvQaB7ZsFg+xHT0nQGUwENH5v4kPflAuDYZ0GgxrTCRgz2gjoLq7APOd6XM+2gL40
+	G/OUXxho615jsGSs5odXIXZRfYtgq80NGKv+5CbZ2vu1iF1Z1iDWUZWNs+piT/vOPoOzOeYU
+	tqrbTrLLzi8ka1koJ9iuCoatzF/G2JKeILbx3gj/5NFYweFLnFym4hT7ws4L4kab69GVFip1
+	6NkAmYH0/AJEUQx9gCnK2VaAvCmS3sUMDi7ha+xL72DMN228AiSgcLo/gCky3iTWhE10NJM/
+	/mOdCXon4yy8ja2xkD7I/CkcIdeYoQOYmvrm9SBvz/yJy7DuEdGhzNBMO1GMBOXIqxr5ypJU
+	iVKZPDRYmRCXliRLDb6YnGhCnncyprtKXiFH/7EWRFNI7COE8Kh4EU+qUqYltiCGwsW+wsDd
+	x+NFwkvStOucIvmc4pqcU7Ygf4oQbxFGnebOi+jL0qtcAsdd4RT/VYzy9stAHf3BnRMbG8os
+	e832tuWm9sCFriZDTOvmif3zDRkqn5AISeAZVVNybpeY8Xeafjnzj368LA/pif3htp1uOKJ/
+	Izn5wCU72xUUERwzrkuX7Ke3ihqn0COv+YW7F+4c0kZHSlzhH3inZt/7mO/7bo+rdESEpchj
+	VlPrYvPrug2CSjGhjJOG7MEVSuk/SRws0EoDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,63 +223,36 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-For dept to function properly, dept_task()->hardirqs_enabled must be set
-correctly.  If it fails to set this value to false, for example, dept
-may mistakenly think irq is still enabled even when it's not.
-
-Do dept_hardirqs_off() regardless of irq state not to miss any
-unexpected cases by any chance e.g. changes of the state by asm code.
+Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
+consideration to dma fence wait.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/irqflags.h | 14 ++++++++++++++
- kernel/dependency/dept.c |  1 +
- 2 files changed, 15 insertions(+)
+ drivers/dma-buf/dma-fence.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
-index d8b9cf093f83..586f5bad4da7 100644
---- a/include/linux/irqflags.h
-+++ b/include/linux/irqflags.h
-@@ -214,6 +214,13 @@ extern void warn_bogus_irq_restore(void);
- 		raw_local_irq_disable();		\
- 		if (!was_disabled)			\
- 			trace_hardirqs_off();		\
-+		/*					\
-+		 * Just in case that C code has missed	\
-+		 * trace_hardirqs_off() at the first	\
-+		 * place e.g. disabling irq at asm code.\
-+		 */					\
-+		else					\
-+			dept_hardirqs_off();		\
- 	} while (0)
+diff --git a/drivers/dma-buf/dma-fence.c b/drivers/dma-buf/dma-fence.c
+index f7498c770035..b75b7b9c445a 100644
+--- a/drivers/dma-buf/dma-fence.c
++++ b/drivers/dma-buf/dma-fence.c
+@@ -823,7 +823,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
+ 	cb.task = current;
+ 	list_add(&cb.base.node, &fence->cb_list);
  
- #define local_irq_save(flags)				\
-@@ -221,6 +228,13 @@ extern void warn_bogus_irq_restore(void);
- 		raw_local_irq_save(flags);		\
- 		if (!raw_irqs_disabled_flags(flags))	\
- 			trace_hardirqs_off();		\
-+		/*					\
-+		 * Just in case that C code has missed	\
-+		 * trace_hardirqs_off() at the first	\
-+		 * place e.g. disabling irq at asm code.\
-+		 */					\
-+		else					\
-+			dept_hardirqs_off();		\
- 	} while (0)
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (!dma_fence_test_signaled_flag(fence) && ret > 0) {
+ 		if (intr)
+ 			__set_current_state(TASK_INTERRUPTIBLE);
+@@ -927,7 +927,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
+ 		}
+ 	}
  
- #define local_irq_restore(flags)			\
-diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 007e1bc7d201..35a3667ac8b3 100644
---- a/kernel/dependency/dept.c
-+++ b/kernel/dependency/dept.c
-@@ -2095,6 +2095,7 @@ void noinstr dept_hardirqs_off(void)
- 	 */
- 	dept_task()->hardirqs_enabled = false;
- }
-+EXPORT_SYMBOL_GPL(dept_hardirqs_off);
- 
- void noinstr dept_update_cxt(void)
- {
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (ret > 0) {
+ 		if (intr)
+ 			set_current_state(TASK_INTERRUPTIBLE);
 -- 
 2.17.1
 
