@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60B83C10B7;
-	Mon,  6 Jul 2026 06:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A5442B307;
+	Mon,  6 Jul 2026 06:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318948; cv=none; b=sLPELSbBidgKaK/O3lSCBnAnH94sTam70V+7OcepkhRJRue+B+FAcj8xRkjRhfhDhOr6wCDDpFW/p38EpD0W4J3n3/Nm1mhgBK5ZvOZpo8SLRjaAT4eWfqCxLeGkQqV7i59Qo+1XxorY65tUCqG85BZyOW1zAsQnuy2dou1Fx7w=
+	t=1783318947; cv=none; b=BGogdNHlGW+rFfgVDC9ka7aHboAS3ds2AtUf2ypH0MtQG2o6nm3Sl4jEsIOJamGDEl6Y079oDpSZDPe9vTpcPfu1rzLTK1uQqW6OZuQacDSx9mEthKQAYzPvxDeztlGh5HnOdjWgG31cRs/Nxzs0bJ7llBV66Mdo2GlzY48XnmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318948; c=relaxed/simple;
-	bh=4COXvF59c/1DTqwH8B+Ve+9eXwb29DTJEmWnDMVF5Ls=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=SHosDzCKTJ8bYcTYkqijC4K7EHj4gx6eIr6mfJsqU3VSHAOCjfV/dbGQzzDIRr/FOfRKXOIJXg5F7kgh43mFswY47OwTfenmJ6IEYFN3rbBD69h6h+HV8LMaskLmSyKwqE46Afjq2OErt7jETGlI5EuZLuSBQYCvIxn4fRXddP4=
+	s=arc-20240116; t=1783318947; c=relaxed/simple;
+	bh=IVs7UrTREahv4P4gaL8VNCv4Y1x1l3V8HrPMnx32xWM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Ii9cv++GAYG8ROXzYS/KhSc6hSxtYIdNWK7wBp/Or13y960HIcwcn8Iw676mTBL2UjrXmqJEFMsxmu8y9GXmxCEglNurNqct7CaSiHNo2gvGNs7SbZoA+c3mn53SkJsyV/mGXj70YaqNgAEBHN6bN7OofYVhPbKRLwPNXQ1zJUY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-5e-6a4b49848897
+X-AuditID: a67dfc5b-c2dff70000001609-3e-6a4b4984481c
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -178,45 +178,45 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 39/40] rust: completion: Add __rust_helper to rust_helper_wait_for_completion()
-Date: Mon,  6 Jul 2026 15:19:27 +0900
-Message-Id: <20260706061928.66713-40-byungchul@sk.com>
+Subject: [PATCH v19 38/40] mm: percpu: increase PERCPU_DYNAMIC_SIZE_SHIFT on DEPT and large PAGE_SIZE
+Date: Mon,  6 Jul 2026 15:19:26 +0900
+Message-Id: <20260706061928.66713-39-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0yTdxSH/b93Kk3eVJK9ygdc4w0QBk63k2EcMTN5HVuC2ZfFS7SBN6PI
-	xRRbZckW6EDQWVcwBUctlBBbaAtoC4oXHMOJFOU21lKwOsSuuHEThBoJGFvMvpw853fyez4d
-	BpeMkBsYec5JQZEjy5JSIkI0HV4bV7Q/JTNhdnYHuAs7CCi1/0rCQJMVga4QQcVgOQ6T9+aD
-	2zMfBVV+PQ3DgSkEJt9bDHwdJQhWKo5De72agn+0rTg4dT9TYFS3k2DQlyP4qa6Zgptjt2jQ
-	V77AQNd4G4M3JgsNj+q8BOh7h0hYfpYIXdYJGpqm+0mY9JdTcKNgjAb7yH0EtvN+HOzP3SS0
-	j8ZC6coCgq62cQyGbl2m4E/rAAHNEx4MHnZ1E+CsaiDgyvAgBoELkTBQpiHh4owfwWTAhMNI
-	5RQNftcZDBpqzAgeaDowKHlxm4K7pWMYTFQZMLi3OIWBw67DYelJGwm913to6FnqwcA6SEDr
-	/dc0FL76G0GRdxcYFhKhccWNYEa7QCYn87ZqG+KLtcGxtOii+LLeOP5m1ROaL7o7SvNGu5Iv
-	+mOa5B31MXzdnX8x3m45S/EzfX007/urEuNrC3Q4X+08wP9msNGpUQdFu9OFLLlKUHy055go
-	o8XSgE48J0+PlpWgArRInENhDMfu5Eo1k0FmVlntVYZiit3KeTxv8BBHsBs5h8ZPnkMiBmeH
-	orjzJs1qdx2bxlW7+lGICXYzV9MyR4ZYzH7C9elvkO/9UZz1aseqKCyYNy0bsBBL2F3c49kH
-	REjKsc1hnN4+Tr0vrOd+r/cQWiQ2ojUWJJHnqLJl8qyd8Rn5OfLT8Wm52XYUfDjTD8uH2tD8
-	wDediGWQNFwMyV9mSkiZKi8/uxNxDC6NEG/ZlpIpEafL8r8XFLlHFcosIa8TRTKE9APxjsCp
-	dAn7neykcFwQTgiK/68YE7ahAB3jWq7ZzO4kl+Uz7Z1Z7+fmvfv6fU+9qT0x6lhznzv84mFn
-	9H+PHz11VHfHXYqekCcZA7nDexO2GFO+8EhdBz8+9fLTSFfC0SSzSi/fVOFcPz59aaWlsLtY
-	SWqyv9Kmnp2aP/Lt0rYP1xZHJHga1aZf2hzbv1bG/jgXfblGNfcw/oKUyMuQJcbgijzZOxo5
-	Q0hsAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0xTdxTHd3730UtjzbWSeONMMDXoYoLTKOM4NwT8gzuNZv8Qk02ijd5A
-	eVTTKsqI0VKqFdBAl7bRykOURoEptp2IpJFAxAc+6OqDKIhoxRFQFKnIo2JL4j8nn3O+3/PN
-	+eNwlLKJWchptHslnVado2LltHzLOmNc0W+bslbePcKj2XQIe/oCDD42tNIYHDPTePpSA4sh
-	R5MMza6TDN56Ukhj18V6wL6gGXB8ykGhqXmGxpClQ4ZjE89kaDUAzng7AG0+C4XdXdcpbPAY
-	CH5s/MLiUPsooLU/wKJ90EDjiLMU8NSAQ4aDN1LxbV8LgzO9bwg++TQM6Ax8IRhoPQoYsmVj
-	VY07vG57z+LUvQcU2q1dgGf6eykcHXwB6Ol4Dug9X8ji67J/KfQH5uLD4AiLt60lLL71nSb4
-	rpHF6kIvg767Q4AVDgvgwFMvQePZSyzaKlw0Nr+4JkPf0DTBHpuFYL1rM/Y5B2jsLKsh4XPD
-	rssL0GE3knD5n6D1nxaCE846WVItiOOmE7RY575CRNN/IVZsqGwAcWrSAuJYrZESTWXhtn14
-	hBKL3PvF2s5hVpwMPmJF76dqWrxTI4jnjk0SsfxenNh8qlf2e/If8l92STmaPEn3Y+IOeaan
-	7gLsecUceFp+FA5DkC4GjhP4NUJhz75iiOJYfpnQ3T1BRTiaXyy4jw8wxSDnKN4fI5Q6j9MR
-	YT6/U6h89AAiTPOxQpXnAxNhBf+TcN/RNMsCHyPUN7bOBkWF5xenK0iElXy88GzkJl0G8mr4
-	rg6iNdq8XLUmJ36FPjszX6s5sGLn7lwXhN/JeXC6/CqM+VPbgOdANUeBSRuzlIw6T5+f2wYC
-	R6miFUt/2JSlVOxS5/8l6XZv1+3LkfRt8D1HqxYoNm6Vdij5DPVeKVuS9ki6byrhohYehvqC
-	DKLasP/XReN/Dh46WzRn9Lb6zSuDv+qdN5ZUzqR0HCxWOSfiStakGVlH8/qUgrypto/zRy9P
-	O6t+Ftv7l23zJLjnhtITEpNal7xcLs9f70uJeZjcuTW+Pe36Z+32tavdab3xiRb/vG0JUbX9
-	LvffZ+al39QXbEi3HzN32hWTBSpan6letZzS6dVfAdgyZ0pKAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzVSbUxTZxj1vfe9H21scq1mXnFT0oguGnAYMM8Po/4xuUg0MyQmajJt1uso
+	lsLKt8uywgBrB1oxHRFEq4wLCqmshU2QToYGgsgs2QcdrGK1KyowUAtOW62txn/nOec5JzlP
+	HpZU/k3FsVp9vmjQq3UqWo7lM4svJpanpWd9cvnsKjBVfAPzQRMGk+MMBW57K4KJeROC56F6
+	Eiq6Ihhe1fQzEHwxzoC1FEHE1Y/A475OwrP21zRM3XiKwOrz01D7qBTDrFQVXfFOEjC6MI1A
+	8r8mwN97DEFo+A4JtVY3ggs+LwmuljIa/rV0kjBo/Y4GW5mLgob6GgSBMRcB3zc4MHTd62Zg
+	ZCpMQKtjF0xIAQxDlotR8cflUF/7kIDbjf9gkIwJEPYlQ8SWA/2tkwx4T1ox2GfuUDB49y8K
+	pgI1NEwMVFIQ/MNHQFtVgART9zwG19gG6HENRnu/CiLov3qfgKr2zugFeocouDLpIWCw7hKG
+	8eGTDDSNjhDgu+ehwDl8mwT3qWpqu0Z4XnECC23n2pAQelmDhGDTt6RQYYmON6ZnSaHcWSQ0
+	DU3Twsv5P2nBtWDDwqnhRKGrzssI5b+MMYLNUSA4W9YLjT2PiE+T9su3aESdtlA0bNx6SJ7p
+	uemhcjtlxT+bIowR3WfMSMbyXAo/IjWS7/FPx8vpGKa5dbzH8+Itv4yL553VAcqM5CzJ/b6a
+	r5KqcUxYyom8y2yOGlgWcwn8te6CGK3gNvP/hXvod5mr+db23rc5sihvDzcQMazkUvnx2QEc
+	y+S5Rhk/7ZfQO8MK/tcWD7YghQ0tuoyUWn1htlqrS0nKLNFri5M+z8l2oOjDSV+HD1xFT90Z
+	fYhjkWqxArbvzFJS6sK8kuw+xLOkapli7cfpWUqFRl1yVDTkHDQU6MS8PrSSxarlik0LRRol
+	94U6Xzwiirmi4b1KsLI4IxI7hHWW4zufWJaU/Z8e2VHcrJmjN1UWPbi+xvnZ7g9+8O/T7wmu
+	vbIvbZvKmPugbuvG5psDLR99eYCYG+2OezyTuih19revVhjtp0N1x4Y22+OlD5ODREZiaf2h
+	QP6OC74jaQn7y1Qd0pz3mSz+cPPuttCtjFVFe28t7ag0z+h0h8+nqHBepjp5PWnIU78Blxps
+	5mwDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzVSe0hTcRjtd+/dvdfR4rKELvaHMehBYVlkfJGUBdXtSRER9E+NvOTcQ9vK
+	shJ1a7jspYtNalpmbuSjtFmZ2cisLHu6LBvpmtqaia+wLdHNbCv65+N853zncP74aFxcL4ih
+	ZarDvFolVUhIISHcvkoXp9u0JTX+qzsRDPps6PJ4BdCR20RAwG8goLimmoRJSz0FBvslAbz4
+	pCWg7VYVAk/AgGAsaMFB3zBFwKSxhQL/eCcFplwEU44WBGanEQdX2yMcqu/kYvCz9jcJA09G
+	EZh6vCQU9ecSMGI7i+Cyz0JB/7ONMORpFMCUuw+DT78GEdi8vzHwNuUhmDTL4WpZXdhu/kFC
+	8M07HIpMbQiu9bhxGO3vRnCn5QsCxw0tCd8K7uLQ7p0BHwIjJLSazpAw5CzGYLiWhFKtQwDO
+	1wMISixGBL7PDgx012tIMJfYCWjofkCBcyCEQZfZiEGVfRt4bD4CXhWUYeG64avbs8BSpMPC
+	4zsGppuNGIzbKqkkK+LG9OcJrrLuHsbp30+SXPWVasQFJ4yI81t1OKcvCK9PBkdw7lTdUc76
+	apDkJgIfSc7xq5TgXpaxXPnpCYwrfBPHNVx2UzvW7hUmJvMKWQavXrJ6vzDF9dQlSL8bdaze
+	MEXloF4qH0XRLLOcvXf6FBnBJDOfdbnG8QiOZuawded8gnwkpHGmPZY9aztHRISZDM868vPD
+	BpommLls44MjEVrErGCHQw/Jf5mxbFVt09+cqDB/K1SCRbCYSWA7R54TBUhYiqZVomiZKkMp
+	lSkSFmvkKZkq2bHFB9KUdhR+J1tWqPA+8rdvbEYMjSTTRZC0OVUskGZoMpXNiKVxSbRo3oIt
+	qWJRsjTzOK9O26c+ouA1zWg2TUhmiTbv4feLmYPSw7yc59N59X8Vo6NictAyEZaVt3Nnh7xw
+	fUJv4/mYjF0T3YduKw3HF4H80EqVOsGv7RyuiXOfLN/9NqAqr0jTC8dHK8ou1CqslfVDwTyt
+	8sTFMd9QcYfu6tr4E6HW71uTe6cH12zoGNU692YvDF4p9cRUJD6yX5gZ30z09fGPuxwzrPTD
+	n3lx7zVt69IcEkKTIl26EFdrpH8ALUQrlUoDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,27 +224,41 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-This is needed to inline these helpers into Rust code, which is required
-for DEPT to play with wait_for_completion().
+Yunseong reported a build failure due to the BUILD_BUG_ON() statement in
+alloc_kmem_cache_cpus().  In the following test:
 
+  PERCPU_DYNAMIC_EARLY_SIZE < NR_KMALLOC_TYPES * KMALLOC_SHIFT_HIGH * sizeof(struct kmem_cache_cpu)
+
+The following factors increase the right side of the equation:
+
+  1. PAGE_SIZE > 4KiB increases KMALLOC_SHIFT_HIGH.
+  2. DEPT increases the size of the local_lock_t in kmem_cache_cpu.
+
+Increase PERCPU_DYNAMIC_SIZE_SHIFT to 11 on configs with PAGE_SIZE
+larger than 4KiB and DEPT enabled.
+
+Reported-by: Yunseong Kim <ysk@kzalloc.com>
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- rust/helpers/completion.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/percpu.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/rust/helpers/completion.c b/rust/helpers/completion.c
-index 5ea2eef74abc..7b55c960fe22 100644
---- a/rust/helpers/completion.c
-+++ b/rust/helpers/completion.c
-@@ -7,7 +7,7 @@ __rust_helper void rust_helper_init_completion(struct completion *x)
- 	init_completion(x);
- }
+diff --git a/include/linux/percpu.h b/include/linux/percpu.h
+index 85bf8dd9f087..dd74321d4bbd 100644
+--- a/include/linux/percpu.h
++++ b/include/linux/percpu.h
+@@ -43,7 +43,11 @@
+ # define PERCPU_DYNAMIC_SIZE_SHIFT      12
+ #endif /* LOCKDEP and PAGE_SIZE > 4KiB */
+ #else
++#if defined(CONFIG_DEPT) && !defined(CONFIG_PAGE_SIZE_4KB)
++#define PERCPU_DYNAMIC_SIZE_SHIFT      11
++#else
+ #define PERCPU_DYNAMIC_SIZE_SHIFT      10
++#endif /* DEPT and PAGE_SIZE > 4KiB */
+ #endif
  
--void rust_helper_wait_for_completion(struct completion *x)
-+__rust_helper void rust_helper_wait_for_completion(struct completion *x)
- {
- 	wait_for_completion(x);
- }
+ /*
 -- 
 2.17.1
 
