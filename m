@@ -1,102 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0927A30D3EA;
-	Mon,  6 Jul 2026 07:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4742D0C63;
+	Mon,  6 Jul 2026 09:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783321521; cv=none; b=cSjOWWRxu+W5X6gXftUjeD1bw+YFLIwWPxtTgyyWBow/fn4Fp0kdb2fxaq/fZxQJXuyUc68w0jiPU7QC5gSoWld9aBR1sbkZxHv72mIQZVXKlOnULAuvlyLeVnOBAABxEwWEo6RFd6U4uOkRYQIehtSeizawTZJjGIkI2ihAFCI=
+	t=1783331655; cv=none; b=Q6yXQ0lfj3TNaD3TX5cALPqe6cmdcIZO2pdROfYX/gjXKPe3U6NbKrOx7NcdysrWUOidKbxEnr3tYIibddmxLIZgt6IaoMUlLD3WWR+6aB10+gE9dCtPsR3xQ18DOkx8YdwPz4PLBYxsQ3vOLnnhFHS60tGNxot5h7bixcqK9KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783321521; c=relaxed/simple;
-	bh=ifp4jrTbWm892emhrD2Jct5nLbBFcW3SW8Hx2KR8+QU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kx5e57ZjRyMiW0EQuDvVbnmzRIXO3hotpcgrShD5kS0ciBi4MGRymyarfGjexXVzogdfTSB/d7Wp+CalvCjV+F2jb8Dqi6c/otVvA721vuubkPXqE6LotPivtxi3joUl25d+2JR6Ao032eCoVlOWKsRwMYzSkbou3aqI3cVIbQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feFpZYt/; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feFpZYt/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF3F1F000E9;
-	Mon,  6 Jul 2026 07:05:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783321501;
-	bh=pNbrr+7vMT7d+YXsU70gpKCnA0Dr+Mk7HOfp5wCYwZo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=feFpZYt/26Zu6oQDe8KTR4CsOLq8nbovv5veYlAR8oXbRmknryTnI6dTL06QDz2Km
-	 4L6h0rGzbcCThuUWIGOgQuketk1b7E8jST5IYWRijP63cHmE20eeT4UbQlbzNyLqaa
-	 UeKQac7FEP1jMX+JvUdMlhMBLPaObSXgf5poOROmGxLqeMlOSSHhgzWda0QALdh4Vc
-	 xpRJmLCShiOArPmQULLXXNc9bieFXDIpHt691bECXrwOGqFrYZjo5NMrYOFggIxP6P
-	 CTaO1Os/viUA2cwscR359cgFmNjbTJ8RMwPqMzDgUzcDaX5qV3cRc1QgSLwdoUew8/
-	 94dRKMzW9DAAg==
-Message-ID: <f389a101-2af1-4b18-a74b-031e6c1899bd@kernel.org>
-Date: Mon, 6 Jul 2026 16:04:48 +0900
+	s=arc-20240116; t=1783331655; c=relaxed/simple;
+	bh=88rZNE8H62mx4kkv9q3eZ1/Dp5y2P4DyFwj7L+eNNvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SBsymRhFMU8MoSndrYCtYnCVEJV6EsA4GORd/2IvAil1wGI5NF+vFgHvHzrWkFp5p7cIrwvAoaOQ0rT+fw5VZ2x/oTcxYGNKOZMDqA2jyCyShSiMbAfTletuAQo+ZVKmbM+4/+W+Az8SABOSUwWOMTXHfIYtOlZGwI+IyLISfMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 7114168B05; Mon,  6 Jul 2026 11:54:07 +0200 (CEST)
+Date: Mon, 6 Jul 2026 11:54:07 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-aio@kvack.org, linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH] block: split out a new blk_plug.h helper
+Message-ID: <20260706095407.GA4420@lst.de>
+References: <20260706041125.642097-1-hch@lst.de> <f389a101-2af1-4b18-a74b-031e6c1899bd@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: split out a new blk_plug.h helper
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-aio@kvack.org, linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
- linux-mm@kvack.org
-References: <20260706041125.642097-1-hch@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20260706041125.642097-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f389a101-2af1-4b18-a74b-031e6c1899bd@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 7/6/26 1:11 PM, Christoph Hellwig wrote:
-> blkdev.h gets included in various places outside the block layer just
-> for struct blk_plug and related plugging functions.
+On Mon, Jul 06, 2026 at 04:04:48PM +0900, Damien Le Moal wrote:
+> > +#include <linux/sched.h>
 > 
-> Split blk_plug into a separate helper to reduce the amount of code
-> that needs to get rebuilt when blkdev.h changes and to slightly
-> reduce compile times.
+> struct blk_plug_cb has a list_head. So maybe also add
 > 
-> In io_uring this requires pulling in a few other headers explicitly that
-> previously were implicitly included through blkdev.h.
+> #include <linux/types.h>
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ?
 
-A couple of nits below (not entirely sure if they make sense).
-But otherwise looks OK to me.
+That already gets pulled in.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> > +
+> > +struct blk_plug_cb;
+> 
+> Maybe add "struct request;" here too ?
 
-> diff --git a/include/linux/blk_plug.h b/include/linux/blk_plug.h
-> new file mode 100644
-> index 000000000000..2ac1265662ad
-> --- /dev/null
-> +++ b/include/linux/blk_plug.h
-> @@ -0,0 +1,95 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _LINUX_BLK_PLUG_H
-> +#define _LINUX_BLK_PLUG_H
-> +
-> +#include <linux/sched.h>
+No need for type forward declarations when the types are only used
+for pointers in structs (or as pointer variables).  They are needed
+only when pointers to the type are used in prototypes.
 
-struct blk_plug_cb has a list_head. So maybe also add
-
-#include <linux/types.h>
-
-?
-
-> +
-> +struct blk_plug_cb;
-
-Maybe add "struct request;" here too ?
-
-> +typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *cb, bool from_schedule);
-> +
-> +struct rq_list {
-> +	struct request *head;
-> +	struct request *tail;
-> +};
-
-
--- 
-Damien Le Moal
-Western Digital Research
