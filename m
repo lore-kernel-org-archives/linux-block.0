@@ -1,101 +1,172 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out-21.smtp.spacemail.com (out-21.smtp.spacemail.com [66.29.159.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C931C5F39;
-	Mon,  6 Jul 2026 01:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD37D1EEA54;
+	Mon,  6 Jul 2026 01:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783299933; cv=none; b=a1ZqzgDHucBxZ8ZBEX9bE1xc4j/6PQNNjEFhYeRXzlT4a/uR11WlLxPyj/uQblbwdc+6sVfBACMj4bqm7oFgt+x9+2BPZ7O3KwNx/lUgq3sfCj9sA9KIpryoufOhjogYK8Syrj9pZV/RCN7JEYNZpMnObiPef37NdC782hJ8blE=
+	t=1783301819; cv=none; b=I1xKAFzUkNtrBGNU/aNaQt7hlaqzvxEWDweHNdpQQaRNeIEwmch+Zb3CgoIFqIXecsSp3CCyR3r1wLWWtQCvAOcfc6WIgg3PvA1G5lkw7UlDCOEwJPRRes9SHI+nzflbFBzyLtfgmcV0FQ5x8cw7WLxeFLPpWtW5too+o+YLVy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783299933; c=relaxed/simple;
-	bh=1nT2r483PMemz+eeDXRcKDdvJvT4D2SJlRXJ7t9Hi7E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T29viymtH6RS9eBBYYPkYDHbkMhtPdJzR+mOXFmae0F2MXcW/3VJ5h0WFEGO8339WKeRlbqBQqhYJkkCJf0EkRfAux1yvrrHafNzkOZv2vlYHEZyoVYeutvIvH1wQ+Z/FfA+y9bUMeqzZxKVWJJRMpmFMSoXXOTIq8a43MIK63Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gtmNw5Z2PzKHMMP;
-	Mon,  6 Jul 2026 09:05:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id B14CC4057D;
-	Mon,  6 Jul 2026 09:05:21 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgC3xnJP_0pqa1rSAA--.40649S3;
-	Mon, 06 Jul 2026 09:05:21 +0800 (CST)
-Message-ID: <28c3d5ea-fab3-4e52-afbe-2e0fad854912@huaweicloud.com>
-Date: Mon, 6 Jul 2026 09:05:19 +0800
+	s=arc-20240116; t=1783301819; c=relaxed/simple;
+	bh=HyEqGbayGnvhC9h1TBFxEK9QF1cFOv+6uZ+d8nJ/32U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rlqaVmoCjTnzEioC8uc6JNhIhqxnAgiG5RdY90w1rEXfOBsXRb210SIGhlCYstEKCpAroVMxP/zzoR36mRkgqa2R9yMlJL1dY2FcvkrVurzplJBN/sTvgo6mFjpvWwSQLU8erfgD8W13ugJtymMQwjyy2ms2mfqtSKHPhTKlL6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=G2EfseSQ; arc=none smtp.client-ip=66.29.159.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gurudas.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b="G2EfseSQ"
+Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gtn5Y3Yqtz6tkR;
+	Mon, 06 Jul 2026 01:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
+	s=spacemail; t=1783301810;
+	bh=tM+AcZKfOAoskfcs0wU7letSfehw7FN+lx/KixPmf/k=;
+	h=From:Date:Subject:To:Cc:From;
+	b=G2EfseSQ0jflfZawScIWDGocVvLr4VQkoRtQ7HyKiCG4KLimBCQ/hzJqTsSX7GTnT
+	 1hlXjcuI0avn8kBed/8apUiVnwn+xKIIpISheqqyjg7vPimhwx6LVrQ6vOtZF4ep1N
+	 VQg0z8ah1c4YNoe+eSWlSoSRaE+5cZVqHAn4XHYmoFhhdWndGCxjQTYf7dr7H6PvDn
+	 Htx/ydkQ4ETfX7yqVb4rCkh+vvrCFWXRZ2O510xJQPoDWAQhQhoD0JS2wgx8Qn4r6V
+	 BNbQiXkkg2y6Od0gCsxYe+Bl2dj1U5uO/zUkHiaxno0DhVjwiRvUuT/lC6no7HtFoh
+	 9iH+yeMZvW5HQ==
+From: Guru Das Srinagesh <linux@gurudas.dev>
+Date: Sun, 05 Jul 2026 18:36:48 -0700
+Subject: [PATCH] block: rnull: use vertical import style
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] null_blk: initialize lock mutex before registering
- configfs subsystem
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
- dlemoal@kernel.org, nilay@linux.ibm.com, linux-block@vger.kernel.org,
- kch@nvidia.com, johannes.thumshirn@wdc.com, kbusch@kernel.org
-Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
- chengzhihao1@huawei.com, wozizhi@huawei.com
-References: <20260704092323.748772-1-wozizhi@huaweicloud.com>
- <33ec54bf-b6b5-466b-82fb-f05b133336c9@acm.org>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <33ec54bf-b6b5-466b-82fb-f05b133336c9@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgC3xnJP_0pqa1rSAA--.40649S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Wr4kuw4kXw17ZFWfKF1kAFb_yoWkWwc_Aw
-	4kZr48Xrn7Cw45Cr1xKFnxZryUJr4v9r1kGw12vrZxGFy7XrnxJ3W5A3s3Gw48Kr47CrZ8
-	CrW5ZFWavr17CjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260705-rfl-vert-imp-2-v1-1-e6ab69c55095@gurudas.dev>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQ5EQBBA0atIraeS0hM6XEVmoammZAapNiIRd
+ 9dYvsX/OwRW4QBlsoPyKkGmMSJ9JdD09dgxShsNhkxOljJU/8WVdUH5zWiwcK62lvL27QliNCt
+ 72e5h9Xkc/m7gZrkucBwnmsWDW3IAAAA=
+X-Change-ID: 20260705-rfl-vert-imp-2-9bba7706d3f0
+To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+ Guru Das Srinagesh <linux@gurudas.dev>
+X-Mailer: b4 0.15.2
+X-Envelope-From: linux@gurudas.dev
 
+Convert `use` imports to vertical layout for better readability and
+maintainability.
 
+Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+---
+Came across a recent commit bc58905eb07 ("samples: rust_misc_device: use
+vertical import style") and found a few more locations that could
+benefit from this cleanup. No functional changes.
 
-在 2026/7/4 21:25, Bart Van Assche 写道:
->> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/ 
->> main.c
->> index f8c0fd57e041..98616d290c5c 100644
->> --- a/drivers/block/null_blk/main.c
->> +++ b/drivers/block/null_blk/main.c
->> @@ -2161,13 +2161,12 @@ static int __init null_init(void)
->>       config_group_init(&nullb_subsys.su_group);
->>       mutex_init(&nullb_subsys.su_mutex);
->> +    mutex_init(&lock);
->>       ret = configfs_register_subsystem(&nullb_subsys);
->>       if (ret)
->>           return ret;
->> -    mutex_init(&lock);
->> -
->>       null_major = register_blkdev(0, "nullb");
->>       if (null_major < 0) {
->>           ret = null_major;
-> 
-> Why an explicit mutex_init() call instead of changing "static struct
-> mutex lock" into "static DEFINE_MUTEX(lock)"? Additionally, shouldn't
-> the "lock" name be made more descriptive since it has file scope?
-> 
-> Thanks,
-> 
-> Bart.
+Separating out patches per-subsystem as per the review feedback in [0].
 
-Thanks for your suggestion, this is indeed more appropriate. I'll send
-out a v2 shortly.
+Tested via:
 
-Thanks,
-Zizhi Wo
+	$ make LLVM=1 rustfmtcheck || echo "fail"
+	$
+
+Initially thought that rust-for-linux/rust-block-next was the right base
+branch to use, which is why I didn't group this with [1] based on
+rust-next that I sent out a short while ago. Using rust-next as base for
+this patch.
+
+[0]: https://lore.kernel.org/lkml/20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev/
+[1]: https://lore.kernel.org/lkml/20260705-rfl-vert-imp-v1-1-2f07946a905f@gurudas.dev/
+---
+ drivers/block/rnull/configfs.rs | 25 ++++++++++++++++++++-----
+ drivers/block/rnull/rnull.rs    | 13 ++++++++++---
+ 2 files changed, 30 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 7c2eb5c0b722..2149b47db697 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -1,15 +1,30 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
+-use super::{NullBlkDevice, THIS_MODULE};
++use super::{
++    NullBlkDevice,
++    THIS_MODULE, //
++};
+ use kernel::{
+-    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+-    configfs::{self, AttributeOperations},
++    block::mq::gen_disk::{
++        GenDisk,
++        GenDiskBuilder, //
++    },
++    configfs::{
++        self,
++        AttributeOperations, //
++    },
+     configfs_attrs,
+-    fmt::{self, Write as _},
++    fmt::{
++        self,
++        Write as _, //
++    },
+     new_mutex,
+     page::PAGE_SIZE,
+     prelude::*,
+-    str::{kstrtobool_bytes, CString},
++    str::{
++        kstrtobool_bytes,
++        CString, //
++    },
+     sync::Mutex,
+ };
+ 
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 0ca8715febe8..d58d2c4c5f63 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -10,12 +10,19 @@
+         self,
+         mq::{
+             self,
+-            gen_disk::{self, GenDisk},
+-            Operations, TagSet,
++            gen_disk::{
++                self,
++                GenDisk, //
++            },
++            Operations,
++            TagSet, //
+         },
+     },
+     prelude::*,
+-    sync::{aref::ARef, Arc},
++    sync::{
++        aref::ARef,
++        Arc, //
++    },
+ };
+ 
+ module! {
+
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260705-rfl-vert-imp-2-9bba7706d3f0
+
+Best regards,
+--  
+Guru Das Srinagesh <linux@gurudas.dev>
 
