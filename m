@@ -1,30 +1,48 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A308345CCE;
-	Mon,  6 Jul 2026 13:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863C72E6CB3;
+	Mon,  6 Jul 2026 14:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783344895; cv=none; b=kKL1/PGJ62qaHaVcLHkbirxYBobQtKD6jglJQ4dvmU5eMOK2pd500whmB1o0rkWf4kRK84t5hRnOvc6pb9ZCKNT+apMGznPoxziCsYOr/9+mWlvKMgREBRQELsTBrZ8/Vol/L+Ujo87Lnsmy8gNsZZEFk22pUL1PAOjAO/q3dQc=
+	t=1783349150; cv=none; b=cArk0T+0m3yiLKqiLEpzcRZn+zkIxcwTiJBUC1wOzV4dbvdIAdQaJOvdSmpp2fivvePlKXuqTxtOFmqNuAqUEDQw3bEKjVsbX3rsqNlWXZbNzdSisXjz6naj75WseHOE3KlIYaZw/+ERzTSIakmVmBmQ82rSAtRttnWAWsDmJoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783344895; c=relaxed/simple;
-	bh=f0UIkUYPReSNpUyhwRpue4mKYSnZP2yWBlACfBpBajg=;
+	s=arc-20240116; t=1783349150; c=relaxed/simple;
+	bh=5FF82p5yqBFNyjiv52zXQu0y4MzLFESUlUBmIVFIf94=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g6wWdM6zI3RHeb4iNR+1GZ1JHBcS6PBK5Pksx0cg1Vhnrb24quNW5/KV4iFUBSAG8Xezs4H4DdobWL18oZTKvSVR0EadlYkZyMr0hSYrT1tGLcf2YAiPYv9depjI9hr5DjE+SKQ1jllzvrgvU0krccfPUgSIQTh3l1Y9H2dx3Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gv51g5fVmzKHMNt;
-	Mon,  6 Jul 2026 21:34:31 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 925C140D1A;
-	Mon,  6 Jul 2026 21:34:49 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHWHT3rktq6kgRAQ--.50332S3;
-	Mon, 06 Jul 2026 21:34:49 +0800 (CST)
-Message-ID: <c8cc96b2-7ff0-4368-9c2d-5054301ff6c5@huaweicloud.com>
-Date: Mon, 6 Jul 2026 21:34:47 +0800
+	 In-Reply-To:Content-Type; b=YBjxEyICiRzrHCCaenzHZn/J82Zenw/vqRwyboCkxFC87F3dH6GGTocnJX27WxGYPP7I0wcK7sfpx0ORNtC78e8TyRLWhOrlGN9DMkuU60qlpXewItVQXZ6on9EIhnaaU0k3HFsHPYHUY09A/XfS/Cp+w967Hm2sZhKcsmK2IrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sTO8zeyk; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sTO8zeyk"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gv6bx03XYz1XM6JQ;
+	Mon,  6 Jul 2026 14:45:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1783349144; x=1785941145; bh=HaF39ur/i/EmXJ82xXzWqPJI
+	Bqle1XYeHYVmVNH5g3g=; b=sTO8zeykUlp7+1JcFuGXmS+9gTKfBod9fTfSGjZ4
+	WmnE/eEQXjIav7yQIltQJky6n0vGPXOy2LyNqro46WeQmY7OhIhTokFKu15N05ku
+	vz3/GB1NGKsWkPrN56LmF9rgyFRl+JjhIKLPAYdTxkyjqrfzF9Vp3ipkMhZ0fBme
+	5L/cxvqQXvWWdVLSu1Asgzs6FjodnX1WanVNg47UuH9woqNWUs2860BOB1swAKON
+	vMioUxa+hUWggUr/ErZ2EhSeQZH9jvtcoKRfdyAbFsJUV7lHuCvm1lhizciDNYNu
+	wQw8m6s8YxP6s/7rS1xsPFaI145UgILyVZSQFnHnYDjNgQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id QjjKBSfuP5LG; Mon,  6 Jul 2026 14:45:44 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gv6bk5Th2z1XM6J4;
+	Mon,  6 Jul 2026 14:45:38 +0000 (UTC)
+Message-ID: <e20382ed-255e-4fdd-b864-657785d309f8@acm.org>
+Date: Mon, 6 Jul 2026 07:45:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,65 +50,36 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] null_blk: register configfs subsystem after creating
- default devices
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
- dlemoal@kernel.org, nilay@linux.ibm.com, linux-block@vger.kernel.org,
- kch@nvidia.com, johannes.thumshirn@wdc.com, kbusch@kernel.org
+Subject: Re: [PATCH 2/3] null_blk: give the file-scope mutex a descriptive
+ name
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, dlemoal@kernel.org,
+ nilay@linux.ibm.com, linux-block@vger.kernel.org, kch@nvidia.com,
+ johannes.thumshirn@wdc.com, kbusch@kernel.org
 Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
  chengzhihao1@huawei.com, wozizhi@huawei.com
 References: <20260706123507.3809871-1-wozizhi@huaweicloud.com>
- <20260706123507.3809871-4-wozizhi@huaweicloud.com>
- <490008e2-2345-48ea-bd8e-c078d828a43f@acm.org>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <490008e2-2345-48ea-bd8e-c078d828a43f@acm.org>
+ <20260706123507.3809871-3-wozizhi@huaweicloud.com>
+ <9004743e-f522-424e-a1ab-8779ecc6da02@acm.org>
+ <5f99b2f3-05c1-4754-9827-d55528861ecc@huaweicloud.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <5f99b2f3-05c1-4754-9827-d55528861ecc@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHWHT3rktq6kgRAQ--.50332S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF47uF15Aw4rKrW3WF4DArb_yoWxKrb_Jw
-	s5tr4kWryqvayFkw1akw1UZryxGFZFgrnxXr1IvrW7Gw17XFnxKw1YvFZYvr1rKa15CrZ8
-	X3y5Aasakr1xGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AK
-	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j
-	6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUOB
-	MKDUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Transfer-Encoding: 7bit
 
+On 7/6/26 6:21 AM, Zizhi Wo wrote:
+> Thanks for the reminder! Agreed that "nullb_list_lock" is too narrow
+> since it also serializes nullb_device_power_store() and
+> nullb_update_nr_hw_queues().
+> 
+> However, I'm a bit worried that "nullb_lock" is easy to confuse with the
+> per-device spinlock "nullb->lock"... They are only one "->" apart?
+> 
+> Would "nullb_global_lock" (or "nullb_config_lock") work better? It
+> reflects the broader purpose and avoids clashing with nullb->lock.
 
-
-在 2026/7/6 21:17, Bart Van Assche 写道:
-> On 7/6/26 5:35 AM, Zizhi Wo wrote:
->> @@ -2187,8 +2185,6 @@ static int __init null_init(void)
->>           null_destroy_dev(nullb);
->>       }
->>       unregister_blkdev(null_major, "nullb");
->> -err_conf:
->> -    configfs_unregister_subsystem(&nullb_subsys);
->>       return ret;
->>   }
-> 
-> Please make null_exit() consistent with the cleanup path in null_init().
-> null_exit() calls unregister_blkdev() before it destroys the null_blk
-> instances. That doesn't look right to me.
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-
-Thanks for pointing this out, I hadn't noticed that. I'll add this
-change in the next version.
+Not sure what others prefer but nullb_global_lock sounds good to me.
 
 Thanks,
-Zizhi Wo
 
+Bart.
