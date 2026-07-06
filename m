@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A5442B307;
-	Mon,  6 Jul 2026 06:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D3B431E68;
+	Mon,  6 Jul 2026 06:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318947; cv=none; b=BGogdNHlGW+rFfgVDC9ka7aHboAS3ds2AtUf2ypH0MtQG2o6nm3Sl4jEsIOJamGDEl6Y079oDpSZDPe9vTpcPfu1rzLTK1uQqW6OZuQacDSx9mEthKQAYzPvxDeztlGh5HnOdjWgG31cRs/Nxzs0bJ7llBV66Mdo2GlzY48XnmM=
+	t=1783318949; cv=none; b=GZzI0/koBU4o04f81BbLyTi2PaggG96pKjFtsilcgQakqrq0/9uXKQ/DfVEGDcNreiE1TvRY7Om8jv+RkGkfuqfoerrlDySuDpM93kR5Hyo6PvxCt3Lr7t9IWxaOgu+WRXHZLzTb6soO3wmFF4LkZH90I4MsTE8aHYgnz/IRsjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318947; c=relaxed/simple;
-	bh=IVs7UrTREahv4P4gaL8VNCv4Y1x1l3V8HrPMnx32xWM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Ii9cv++GAYG8ROXzYS/KhSc6hSxtYIdNWK7wBp/Or13y960HIcwcn8Iw676mTBL2UjrXmqJEFMsxmu8y9GXmxCEglNurNqct7CaSiHNo2gvGNs7SbZoA+c3mn53SkJsyV/mGXj70YaqNgAEBHN6bN7OofYVhPbKRLwPNXQ1zJUY=
+	s=arc-20240116; t=1783318949; c=relaxed/simple;
+	bh=xc0OMbUS9uSQ9nwrKgQqOcPYyrCTpzyELXOiHv+uu08=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=U9wEByiGLGY6sWWkywkOI21NiTkDa7YtDzda5Qi6vUOpj3KXpRK7y7YRPL/8NEQeEDymm0RBhdGxMiUF/tY2H3WPmAUH7gmq+3P5UbLndJr/TUCy6hIU0dvfJg6sm38Zf3oqSt2naFx1Vn7F4ZxyC1Dpv5HD4BOUg5YfxeShoho=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-3e-6a4b4984481c
+X-AuditID: a67dfc5b-c45ff70000001609-82-6a4b4984efbe
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -178,45 +178,45 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 38/40] mm: percpu: increase PERCPU_DYNAMIC_SIZE_SHIFT on DEPT and large PAGE_SIZE
-Date: Mon,  6 Jul 2026 15:19:26 +0900
-Message-Id: <20260706061928.66713-39-byungchul@sk.com>
+Subject: [PATCH v19 40/40] dept: implement a basic unit test for dept
+Date: Mon,  6 Jul 2026 15:19:28 +0900
+Message-Id: <20260706061928.66713-41-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzVSbUxTZxj1vfe9H21scq1mXnFT0oguGnAYMM8Po/4xuUg0MyQmajJt1uso
-	lsLKt8uywgBrB1oxHRFEq4wLCqmshU2QToYGgsgs2QcdrGK1KyowUAtOW62txn/nOec5JzlP
-	HpZU/k3FsVp9vmjQq3UqWo7lM4svJpanpWd9cvnsKjBVfAPzQRMGk+MMBW57K4KJeROC56F6
-	Eiq6Ihhe1fQzEHwxzoC1FEHE1Y/A475OwrP21zRM3XiKwOrz01D7qBTDrFQVXfFOEjC6MI1A
-	8r8mwN97DEFo+A4JtVY3ggs+LwmuljIa/rV0kjBo/Y4GW5mLgob6GgSBMRcB3zc4MHTd62Zg
-	ZCpMQKtjF0xIAQxDlotR8cflUF/7kIDbjf9gkIwJEPYlQ8SWA/2tkwx4T1ox2GfuUDB49y8K
-	pgI1NEwMVFIQ/MNHQFtVgART9zwG19gG6HENRnu/CiLov3qfgKr2zugFeocouDLpIWCw7hKG
-	8eGTDDSNjhDgu+ehwDl8mwT3qWpqu0Z4XnECC23n2pAQelmDhGDTt6RQYYmON6ZnSaHcWSQ0
-	DU3Twsv5P2nBtWDDwqnhRKGrzssI5b+MMYLNUSA4W9YLjT2PiE+T9su3aESdtlA0bNx6SJ7p
-	uemhcjtlxT+bIowR3WfMSMbyXAo/IjWS7/FPx8vpGKa5dbzH8+Itv4yL553VAcqM5CzJ/b6a
-	r5KqcUxYyom8y2yOGlgWcwn8te6CGK3gNvP/hXvod5mr+db23rc5sihvDzcQMazkUvnx2QEc
-	y+S5Rhk/7ZfQO8MK/tcWD7YghQ0tuoyUWn1htlqrS0nKLNFri5M+z8l2oOjDSV+HD1xFT90Z
-	fYhjkWqxArbvzFJS6sK8kuw+xLOkapli7cfpWUqFRl1yVDTkHDQU6MS8PrSSxarlik0LRRol
-	94U6Xzwiirmi4b1KsLI4IxI7hHWW4zufWJaU/Z8e2VHcrJmjN1UWPbi+xvnZ7g9+8O/T7wmu
-	vbIvbZvKmPugbuvG5psDLR99eYCYG+2OezyTuih19revVhjtp0N1x4Y22+OlD5ODREZiaf2h
-	QP6OC74jaQn7y1Qd0pz3mSz+cPPuttCtjFVFe28t7ag0z+h0h8+nqHBepjp5PWnIU78Blxps
-	5mwDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzVSe0hTcRjtd+/dvdfR4rKELvaHMehBYVlkfJGUBdXtSRER9E+NvOTcQ9vK
-	shJ1a7jspYtNalpmbuSjtFmZ2cisLHu6LBvpmtqaia+wLdHNbCv65+N853zncP74aFxcL4ih
-	ZarDvFolVUhIISHcvkoXp9u0JTX+qzsRDPps6PJ4BdCR20RAwG8goLimmoRJSz0FBvslAbz4
-	pCWg7VYVAk/AgGAsaMFB3zBFwKSxhQL/eCcFplwEU44WBGanEQdX2yMcqu/kYvCz9jcJA09G
-	EZh6vCQU9ecSMGI7i+Cyz0JB/7ONMORpFMCUuw+DT78GEdi8vzHwNuUhmDTL4WpZXdhu/kFC
-	8M07HIpMbQiu9bhxGO3vRnCn5QsCxw0tCd8K7uLQ7p0BHwIjJLSazpAw5CzGYLiWhFKtQwDO
-	1wMISixGBL7PDgx012tIMJfYCWjofkCBcyCEQZfZiEGVfRt4bD4CXhWUYeG64avbs8BSpMPC
-	4zsGppuNGIzbKqkkK+LG9OcJrrLuHsbp30+SXPWVasQFJ4yI81t1OKcvCK9PBkdw7lTdUc76
-	apDkJgIfSc7xq5TgXpaxXPnpCYwrfBPHNVx2UzvW7hUmJvMKWQavXrJ6vzDF9dQlSL8bdaze
-	MEXloF4qH0XRLLOcvXf6FBnBJDOfdbnG8QiOZuawded8gnwkpHGmPZY9aztHRISZDM868vPD
-	BpommLls44MjEVrErGCHQw/Jf5mxbFVt09+cqDB/K1SCRbCYSWA7R54TBUhYiqZVomiZKkMp
-	lSkSFmvkKZkq2bHFB9KUdhR+J1tWqPA+8rdvbEYMjSTTRZC0OVUskGZoMpXNiKVxSbRo3oIt
-	qWJRsjTzOK9O26c+ouA1zWg2TUhmiTbv4feLmYPSw7yc59N59X8Vo6NictAyEZaVt3Nnh7xw
-	fUJv4/mYjF0T3YduKw3HF4H80EqVOsGv7RyuiXOfLN/9NqAqr0jTC8dHK8ou1CqslfVDwTyt
-	8sTFMd9QcYfu6tr4E6HW71uTe6cH12zoGNU692YvDF4p9cRUJD6yX5gZ30z09fGPuxwzrPTD
-	n3lx7zVt69IcEkKTIl26EFdrpH8ALUQrlUoDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTdxjG/Z/zP+e01ZpjRT3KB0jNnGGRecHl1ZjJBw1HyYxmccn0gzZw
+	kHKpplUuGg2gdRUKsmGpKxdBtA5ErO1ULjIVY7RRCohoWSHQoIVyVdYScXhpMX775Xne93mT
+	J6+IlPVQy0RK1WFBrVKkyGkJlozNq1yl3RabtLppSAIvsu9h8Pt0GHTWPyl4/DIHQ3vdVQS+
+	aRcDhmwEtX9nE2Bwv6LB6M3GMGHWI/A+jIFPvYMEfChOhgsXbTSMFL+h4f/WNhKMhnYEle5e
+	Eia9/QjshjwaxjpKCWjob2Sgz+zBUHxjCUybaxh4WtWDoaS1k4K6sTYKRjx/0ND36DQFvudu
+	AnSNfgzN/34HnY2lNOgtNymwm6oxuFrPMuDud1IwVRAK7b/nU+AsfI2gaNyDoNs4yoDZP8GA
+	p+s0AZZTJgaqL1xBcPOuFsFl3zgJvw010dBTMIzheXcTguueByQMmsoIeOAfJaDoWQUNNquB
+	BK1+OlDBjI6GPG0xBsvbKzQUOGLg2ocXKDqar7HdIvja8lrE+y6fJHltYYBO2dL59/4umm+e
+	qsB8g6mX4SusR/iqO16Ct9acoflxh4PhK7MMJF9u38W7Pg6QfM7Th+TO0D2STfFCijJNUH//
+	435J4rluHT7UsjnD8G6EzEJ563ORWMSxUZxDd5v6yn3/uYgg0+y3nNM5TQY5hA3nbPmewIxE
+	RLKdYZzenI+DxkJ2K9dR3cwEGbPfcB2OS7O6lP2By613kV9Cw7irlnuzLA7odTNlswdk7HrO
+	NfEIB0M5tkrM6W8N0F8WlnL3/3LiQiStQHNqkEypSktVKFOiIhMzVcqMyLiDqVYU+Dnz8Zm9
+	9Wiy/ecWxIqQfJ4UorcnyShFmiYztQVxIlIeIl2xMjZJJo1XZB4V1Af3qY+kCJoWFCrC8iXS
+	tVPp8TL2gOKwkCwIhwT1V5cQiZdlocXHw41jQM01iSWLNEVxEwMsbps8mRERfsKZHCYJmfNx
+	R/Ivv/Yu6BrZ3106NT9Nv8O7IWGfJb3hJ06xZstwPYoJX413qwbco49L3tpLhne/Gyw/31Cb
+	I8tZimK3HOuIoJYPcRu0T4yfol6eSE8oC4uM+2d85cWddxLc9tyN6wZ9cqxJVKyJINUaxWdj
+	cndZbwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRTH+917dzdHi8uSvBn0GD3VHkbKiV4WVLciiwiiItstLzkfS7Yy
+	7UHpXC0fNVeb1LLMdKWzWq7SKSNRMnuYTistsxWs1VBTTCvfTaN/Dp/z/Z7XH0eAi8t4/gKZ
+	/AinkLOxElJICMNXqBambtoSvcT2VQIa9Wn46HTx4F1yJQF9vRoCrt0vJmHYWMoHTckVHtQ2
+	pxDQcM+MwNmnQfB70IiD2jZKwLCuhg+9/a180CcjGLXXIDA4dDi0NDzBofhhMgY/LSMktFf3
+	INB/cZGQ7UkmoMuUgeCq28gHz9ON0Oms4MFo2zcMmn91IDC5RjBwVZ5DMGyIgRt5Vm+7oZuE
+	wbp6HLL1DQhufmnDocfzGcHDmk8I7HdSSPiqfYRDk2sSvOnrIuG5Pp2ETsc1DH5YSMhNsfPA
+	8aodQY5Rh8D9wY6B6tZ9Egw5JQTYPpfzwdE+hMFHgw4Dc8lWcJrcBLzU5mHec71VD/zAmK3C
+	vOE7Bvq7FRj0m4r4YQWI+a2+QDBF1scYo24cJpni68WIGRzQIaa3QIUzaq03re7owplU6zGm
+	4GUHyQz0vSUZ+69cgnmRRzP55wcwJqtuIWO72sbfvnaPcGUkFytL4BSLV0uFUZffa4j4qjWJ
+	+j/t+BmUHpKGfAQ0tYx2/mzFxpik5tEtLf34GPtSM2lrppuXhoQCnGqaQWeYMokxYzK1nnYU
+	2vljTFBzaMfr/HFdRIXSaWWt+L+hM2izpXKcfbz6vaGc8QViKoRu7XpGaJEwF00oQr4yeUIc
+	K4sNWaSMiUqSyxIXHTwcV4K8/2Q6NZRVhnqbNlYhSoAkE0UQtjlazGMTlElxVYgW4BJf0dz5
+	W6LFokg26TinOLxfcTSWU1ahaQJC4ifavIuTiqlD7BEuhuPiOcV/FxP4+J9B0kZ2dv0UqyWo
+	cffz0ilZ5WL1qpgDZ3MuSwMt4cf22bXT44wb1v2pXW41e6QBmr3BQWsS02RHB0/daAjnFljl
+	5b6fKmqn7ogItJ3uDr2Y1+kvuXCi83bppPqdnrqmQPfS0PRZXFJZt6pat1VamGqAk3LxjhTt
+	tvUBly6KmIgC1iwhlFFscACuULJ/AYjxPnJLAwAA
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,41 +224,311 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Yunseong reported a build failure due to the BUILD_BUG_ON() statement in
-alloc_kmem_cache_cpus().  In the following test:
+Implement CONFIG_DEPT_UNIT_TEST introducing a kernel module that runs
+basic unit test for dept.
 
-  PERCPU_DYNAMIC_EARLY_SIZE < NR_KMALLOC_TYPES * KMALLOC_SHIFT_HIGH * sizeof(struct kmem_cache_cpu)
-
-The following factors increase the right side of the equation:
-
-  1. PAGE_SIZE > 4KiB increases KMALLOC_SHIFT_HIGH.
-  2. DEPT increases the size of the local_lock_t in kmem_cache_cpu.
-
-Increase PERCPU_DYNAMIC_SIZE_SHIFT to 11 on configs with PAGE_SIZE
-larger than 4KiB and DEPT enabled.
-
-Reported-by: Yunseong Kim <ysk@kzalloc.com>
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/percpu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/dept_unit_test.h     |  61 ++++++++++++
+ kernel/dependency/Makefile         |   1 +
+ kernel/dependency/dept.c           |  10 ++
+ kernel/dependency/dept_unit_test.c | 149 +++++++++++++++++++++++++++++
+ lib/Kconfig.debug                  |  12 +++
+ 5 files changed, 233 insertions(+)
+ create mode 100644 include/linux/dept_unit_test.h
+ create mode 100644 kernel/dependency/dept_unit_test.c
 
-diff --git a/include/linux/percpu.h b/include/linux/percpu.h
-index 85bf8dd9f087..dd74321d4bbd 100644
---- a/include/linux/percpu.h
-+++ b/include/linux/percpu.h
-@@ -43,7 +43,11 @@
- # define PERCPU_DYNAMIC_SIZE_SHIFT      12
- #endif /* LOCKDEP and PAGE_SIZE > 4KiB */
- #else
-+#if defined(CONFIG_DEPT) && !defined(CONFIG_PAGE_SIZE_4KB)
-+#define PERCPU_DYNAMIC_SIZE_SHIFT      11
+diff --git a/include/linux/dept_unit_test.h b/include/linux/dept_unit_test.h
+new file mode 100644
+index 000000000000..753ac9ac727c
+--- /dev/null
++++ b/include/linux/dept_unit_test.h
+@@ -0,0 +1,61 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * DEPT unit test
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2025 SK hynix, Inc., Byungchul Park
++ */
++
++#ifndef __LINUX_DEPT_UNIT_TEST_H
++#define __LINUX_DEPT_UNIT_TEST_H
++
++#if defined(CONFIG_DEPT_UNIT_TEST) || defined(CONFIG_DEPT_UNIT_TEST_MODULE)
++struct dept_ut {
++	bool circle_detected;
++
++	int ecxt_stack_total_cnt;
++	int wait_stack_total_cnt;
++	int evnt_stack_total_cnt;
++	int ecxt_stack_valid_cnt;
++	int wait_stack_valid_cnt;
++	int evnt_stack_valid_cnt;
++};
++
++extern struct dept_ut dept_ut_results;
++
++static inline void dept_ut_circle_detect(void)
++{
++	dept_ut_results.circle_detected = true;
++}
++static inline void dept_ut_ecxt_stack_account(bool valid)
++{
++	dept_ut_results.ecxt_stack_total_cnt++;
++
++	if (valid)
++		dept_ut_results.ecxt_stack_valid_cnt++;
++}
++static inline void dept_ut_wait_stack_account(bool valid)
++{
++	dept_ut_results.wait_stack_total_cnt++;
++
++	if (valid)
++		dept_ut_results.wait_stack_valid_cnt++;
++}
++static inline void dept_ut_evnt_stack_account(bool valid)
++{
++	dept_ut_results.evnt_stack_total_cnt++;
++
++	if (valid)
++		dept_ut_results.evnt_stack_valid_cnt++;
++}
 +#else
- #define PERCPU_DYNAMIC_SIZE_SHIFT      10
-+#endif /* DEPT and PAGE_SIZE > 4KiB */
- #endif
++struct dept_ut {};
++
++#define dept_ut_circle_detect() do { } while (0)
++#define dept_ut_ecxt_stack_account(v) do { } while (0)
++#define dept_ut_wait_stack_account(v) do { } while (0)
++#define dept_ut_evnt_stack_account(v) do { } while (0)
++
++#endif
++#endif /* __LINUX_DEPT_UNIT_TEST_H */
+diff --git a/kernel/dependency/Makefile b/kernel/dependency/Makefile
+index 92f165400187..fc584ca87124 100644
+--- a/kernel/dependency/Makefile
++++ b/kernel/dependency/Makefile
+@@ -2,3 +2,4 @@
+ 
+ obj-$(CONFIG_DEPT) += dept.o
+ obj-$(CONFIG_DEPT) += dept_proc.o
++obj-$(CONFIG_DEPT_UNIT_TEST) += dept_unit_test.o
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 35a3667ac8b3..bcff14f20046 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -78,8 +78,12 @@
+ #include <linux/workqueue.h>
+ #include <linux/irq_work.h>
+ #include <linux/vmalloc.h>
++#include <linux/dept_unit_test.h>
+ #include "dept_internal.h"
+ 
++struct dept_ut dept_ut_results;
++EXPORT_SYMBOL_GPL(dept_ut_results);
++
+ static int dept_stop;
+ static int dept_per_cpu_ready;
+ 
+@@ -826,6 +830,10 @@ static void print_dep(struct dept_dep *d)
+ 			pr_warn("(wait to wake up)\n");
+ 			print_ip_stack(0, e->ewait_stack);
+ 		}
++
++		dept_ut_ecxt_stack_account(valid_stack(e->ecxt_stack));
++		dept_ut_wait_stack_account(valid_stack(w->wait_stack));
++		dept_ut_evnt_stack_account(valid_stack(e->event_stack));
+ 	}
+ }
+ 
+@@ -920,6 +928,8 @@ static void print_circle(struct dept_class *c)
+ 	dump_stack();
+ 
+ 	dept_outworld_exit();
++
++	dept_ut_circle_detect();
+ }
  
  /*
+diff --git a/kernel/dependency/dept_unit_test.c b/kernel/dependency/dept_unit_test.c
+new file mode 100644
+index 000000000000..e8dada2e3dfb
+--- /dev/null
++++ b/kernel/dependency/dept_unit_test.c
+@@ -0,0 +1,149 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * DEPT unit test
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2025 SK hynix, Inc., Byungchul Park
++ */
++
++#include <linux/module.h>
++#include <linux/spinlock.h>
++#include <linux/mutex.h>
++#include <linux/dept.h>
++#include <linux/dept_unit_test.h>
++
++MODULE_DESCRIPTION("DEPT unit test");
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Byungchul Park <max.byungchul.park@sk.com>");
++
++struct unit {
++	const char *name;
++	bool (*func)(void);
++	bool result;
++};
++
++static DEFINE_SPINLOCK(s1);
++static DEFINE_SPINLOCK(s2);
++static bool test_spin_lock_deadlock(void)
++{
++	dept_ut_results.circle_detected = false;
++
++	spin_lock(&s1);
++	spin_lock(&s2);
++	spin_unlock(&s2);
++	spin_unlock(&s1);
++
++	spin_lock(&s2);
++	spin_lock(&s1);
++	spin_unlock(&s1);
++	spin_unlock(&s2);
++
++	return dept_ut_results.circle_detected;
++}
++
++static DEFINE_MUTEX(m1);
++static DEFINE_MUTEX(m2);
++static bool test_mutex_lock_deadlock(void)
++{
++	dept_ut_results.circle_detected = false;
++
++	mutex_lock(&m1);
++	mutex_lock(&m2);
++	mutex_unlock(&m2);
++	mutex_unlock(&m1);
++
++	mutex_lock(&m2);
++	mutex_lock(&m1);
++	mutex_unlock(&m1);
++	mutex_unlock(&m2);
++
++	return dept_ut_results.circle_detected;
++}
++
++static bool test_wait_event_deadlock(void)
++{
++	struct dept_map dmap1;
++	struct dept_map dmap2;
++
++	sdt_map_init(&dmap1);
++	sdt_map_init(&dmap2);
++
++	dept_ut_results.circle_detected = false;
++
++	sdt_request_event(&dmap1); /* [S] */
++	sdt_wait(&dmap2); /* [W] */
++	sdt_event(&dmap1); /* [E] */
++
++	sdt_request_event(&dmap2); /* [S] */
++	sdt_wait(&dmap1); /* [W] */
++	sdt_event(&dmap2); /* [E] */
++
++	return dept_ut_results.circle_detected;
++}
++
++static struct unit units[] = {
++	{
++		.name = "spin lock deadlock test",
++		.func = test_spin_lock_deadlock,
++	},
++	{
++		.name = "mutex lock deadlock test",
++		.func = test_mutex_lock_deadlock,
++	},
++	{
++		.name = "wait event deadlock test",
++		.func = test_wait_event_deadlock,
++	},
++};
++
++static int __init dept_ut_init(void)
++{
++	int i;
++
++	lockdep_off();
++
++	dept_ut_results.ecxt_stack_valid_cnt = 0;
++	dept_ut_results.ecxt_stack_total_cnt = 0;
++	dept_ut_results.wait_stack_valid_cnt = 0;
++	dept_ut_results.wait_stack_total_cnt = 0;
++	dept_ut_results.evnt_stack_valid_cnt = 0;
++	dept_ut_results.evnt_stack_total_cnt = 0;
++
++	for (i = 0; i < ARRAY_SIZE(units); i++)
++		units[i].result = units[i].func();
++
++	pr_info("\n");
++	pr_info("******************************************\n");
++	pr_info("DEPT unit test results\n");
++	pr_info("******************************************\n");
++	for (i = 0; i < ARRAY_SIZE(units); i++) {
++		pr_info("(%s) %s\n", units[i].result ? "pass" : "fail",
++				units[i].name);
++	}
++	pr_info("ecxt stack valid count = %d/%d\n",
++			dept_ut_results.ecxt_stack_valid_cnt,
++			dept_ut_results.ecxt_stack_total_cnt);
++	pr_info("wait stack valid count = %d/%d\n",
++			dept_ut_results.wait_stack_valid_cnt,
++			dept_ut_results.wait_stack_total_cnt);
++	pr_info("event stack valid count = %d/%d\n",
++			dept_ut_results.evnt_stack_valid_cnt,
++			dept_ut_results.evnt_stack_total_cnt);
++	pr_info("******************************************\n");
++	pr_info("\n");
++
++	lockdep_on();
++
++	return 0;
++}
++
++static void dept_ut_cleanup(void)
++{
++	/*
++	 * Do nothing for now.
++	 */
++}
++
++module_init(dept_ut_init);
++module_exit(dept_ut_cleanup);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 5c7f22ba253e..41c822f7b75a 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1477,6 +1477,18 @@ config DEPT_AGGRESSIVE_TIMEOUT_WAIT
+ 	  that timeout is used to avoid a deadlock. Say N if you'd like
+ 	  to avoid verbose reports.
+ 
++config DEPT_UNIT_TEST
++	tristate "unit test for DEPT"
++	depends on DEBUG_KERNEL && DEPT
++	default n
++	help
++	  This option provides a kernel module that runs unit test for
++	  DEPT.
++
++	  Say Y if you want DEPT unit test to be built into the kernel.
++	  Say M if you want DEPT unit test to build as a module.
++	  Say N if you are unsure.
++
+ config LOCK_DEBUGGING_SUPPORT
+ 	bool
+ 	depends on TRACE_IRQFLAGS_SUPPORT && STACKTRACE_SUPPORT && LOCKDEP_SUPPORT
 -- 
 2.17.1
 
