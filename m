@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA43A3B585F;
-	Mon,  6 Jul 2026 06:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB2A42640F;
+	Mon,  6 Jul 2026 06:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318927; cv=none; b=b/82xhMOs1nCkht2K1ezZ97sBBhI8Fb78jM7NJkxIVki/j0iIHbuJktVCM3bKuteiyTzGi2hCtyvC6Qkc3xLID1nlL0YAelCBpRgBytC+IMiOmH1z/vx/+bgiXEwKcHtEgkFyF1a1yV3erXQ4EEHyqC50lUmDqfeCy7L8GzBefQ=
+	t=1783318929; cv=none; b=mfTH8bs7WW0ZVQ8ZDCec/V04pPEk9yu0DP4GNYEKVmCaumAd20la56okF9ibsUeRFPRRSO3+/aFZ/nT5TMOFMzgD3e0gWsliV/m7JCIf09tU+IiX+glkzesLwiBTAG029Io5Exx3OVgoOoNO401cvvms+erDmM2WZxrY642mHsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318927; c=relaxed/simple;
-	bh=qdrhPquz9LK1TSCcGBmbSQVFrGLawwrbGLlsjRyWAwg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=LxVTr8WsKCq4WAAKhwdsqZBi9OW3xrZNrRuNbn6NjI/PDYZzLvDDghelBrNr2ON5W6O+0DpUSC8Ep61wRZf5iRLU1oszOnLu+FbjFpy4Jmou+CBALVV1mAyrzhhB2Cmh2wD3917ptAtOvuM3/LVUrtm0f/aWEqsUoMNrlUQfAJc=
+	s=arc-20240116; t=1783318929; c=relaxed/simple;
+	bh=6m46/bR7ahZ1eyue+jCsPNm2Mx2DXPiA4927jmqmv5Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=TzdA8LKYHLZj19MJxXoPWDXagSTQsW8zpXfAFbXqBlyqWQnVIv7ybVao8KhN9eu/lgSOtuPDy7efjTitRO3gCKJosM2tbTn+EoSfYeJ/V/zrYrm0F1Jhej1s8NqM/CRbTImLmk9D8xddCRj4Pjvm31NmDwvsILNX/LeDnBdXIAk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-c6-6a4b4983a0e6
+X-AuditID: a67dfc5b-c45ff70000001609-03-6a4b4983b95c
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -178,45 +178,45 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 34/40] rcu/update: fix same dept key collision between various types of RCU
-Date: Mon,  6 Jul 2026 15:19:22 +0900
-Message-Id: <20260706061928.66713-35-byungchul@sk.com>
+Subject: [PATCH v19 36/40] dept: track PG_writeback with dept
+Date: Mon,  6 Jul 2026 15:19:24 +0900
+Message-Id: <20260706061928.66713-37-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxiG957zng86a046N49uiaaZbGHi1CF5ljhDlix7nVviss0fGxGr
-	HKVQKCmI1EVHQbeKOBmGLqPiEFxltFE5NQpEDKuTj2ADrAwrn602VdYJwlqcDOiom/+u3Pf9
-	XL8enlYNMCt5bU6+ZMjR6NSsAiseLqlNLNm6LXO9uyIBzEe/guGxAAMDpjYMkbAZw7z1Kgdm
-	+QcGOm8XYzjaHMUQfjLEQaUJgeOyiYLQjWkElf4AC9+PmzBM2soQVAWtHIzffB+iI/cpuD3z
-	JwJbYIGCQNs3COYtWfBjrZOFkOURC/+4e2g46x+hobW+mAVPYCn0RyZZ6Ko8zsLDvtMUTFxi
-	oe9WCEG1tQJBSd1FFizVMoZmXwsHw5YKCrrLaymwNC6HW3XDGKxuDwN366s4mPNvgGiNHtrt
-	9zkYOVmJoWt0gIGrRT4Owv1+ChxlQRrMLREM8r3FonXwDTDPhxG0N92lwNNymoVRR5SB3+y9
-	GLrbOzEMuU9y4Pd5GTg1EUQQmrHRKemkwXmFIo4zDkTCP5XQ5IjzAJmN/M6S1pkaTM4dm6XI
-	d+5E0lw1wpEj1wc5UiPvJ876BFJ3bZwig6F3iNxwjCXydAW3fe3nis3pkk5bIBne3LJLkXG2
-	p5XK7d9SeL20gS5CPetLURwvCkni1wtO9hmPjbqYGLPCa6LX+4SO8TJhteg8EVzMFTwteFaJ
-	ZbYTuBTx/AtCmni+c29sg4U14pT34lOPUkgWh/7u4/5zrhLtl9qeeuIW8wtz1VSMVcImcWiy
-	A8ecomCPEx/fafr/YIX4S70XlyNlDXquAam0OQXZGq0uaV2GMUdbuG6PPltGi99mOzT3RROa
-	7v3EhQQeqZcoIeWDTBWjKcgzZruQyNPqZcr417dlqpTpGuNByaBPM+zXSXku9DKP1cuVG2cO
-	pKuEfZp8KUuSciXDs5bi41YWIWtqxPy8R8pn/lIW3wzUvutOedG1Pesz5FvTIZ/KjSinDs9d
-	WZFY+Fb2q8LOLuPSR4ONx1+JJ99u/fA9nX61eXZf+Mxa/du9u5M7ft4U/7HBl4xfikbG084v
-	3Ljw5SGO+3X3Y7fpYPnlpB0f2Rs1f+g2pqZOGcf2Gu7JwQdt3Z9O5k+ocV6GZkMCbcjT/At7
-	OUwdaQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUxTZxTGfd9779tLY81NIXqDiZoG8SuKZkhOVIgmRu40GhMTRRMDjV6l
-	fKmtQzFblGJjZTjbmpZIQQGlakFBQBS1SiDrHIpQi9IMsGI6HAFFkSqfdu3M/jn5nec858n5
-	47CU/C4TyaqyjorqLGWGgkhp6ba1ecu1P25JW2k6Hwt63Uno8foYeJXbRIN/VE9DcXUVgWnr
-	XQnoay8y8KRLS0PHrUoEXr8ewddJKwW6xgAN0yanBEbHuyVgzkUQcDgRWFwmCjwdjymoqs/F
-	8LnmG4HBlhEE5j4fgcKBXBqGbQUIivqtEhj4PRHeex8wEOh9h6HryxACm+8bBl/TGQTTlnS4
-	XF4XXLd8JDDZ1k5BobkDQVlfLwUjA28Q1DtfI3Bc1xL423CHArdvFnT6hwn8af6VwHtXMYYP
-	NQRKtQ4GXM8GEZRYTQj6/3JgyLtSTcBSUktD45v7EnANTmHosZgwVNZuBa+tn4anhnIcPDfo
-	uj0HrIV5OFj+wWC++QDDuM0uWV+BhK+632jBXteABd2LaSJUXapCwuSECQmjFXmUoDME25ah
-	YUo4XXdMqHg6RIQJ/0siOL6U0kJrOS9cPTuBBWPbcqGxqFeyfcMe6br9YoYqW1THJKRIU8va
-	HfhwZ8LxR/l26hRqX5mPwliei+W9r5uZEBNuEe/xjFMhjuAW8HXn+oO6lKU493y+wHaOzkcs
-	G84l89eeHAh5aG4h/8lTTUIs4+L47jGX5HvmfL6ypum/nLCgfmuqBIdYzq3mu4f/oA1IWopm
-	2FGEKis7U6nKWL1Ck56ak6U6vmLfocxaFHwn2y9Txnto1J3YjDgWKWbKYP3mNDmjzNbkZDYj
-	nqUUEbLoxVvS5LL9ypwTovpQsvqnDFHTjOaytGKObPMuMUXOHVQeFdNF8bCo/n+K2bDIUyj+
-	PO6r2bs1ENs52/HQuNH+6fYPC3t+1p1s60hagjbJR4pnLotfUxTQ7Yjyawui8knU7lfUEaNp
-	G7NkjafhUon7Rmt4Qtlzg3GMOC9E1scdIclvW/DOMynassRonX6PIjzJ1XUjGxrmHUttdS7Q
-	lEu1MSSmKd697+bY6WimM05Ba1KVq5ZSao3yX1zt3TVKAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf1CTdRzH+z57nmdjuXpcnD3iJd38xWGSdlDv66Lor75l3Zn1j3ZeTXku
+	huNHAxHo6gbCBERZI9GDltPp4HApja70CG9C/uAA08Ixhp7oEbYGTOdGjSDb8PzvdZ/3vV/v
+	fz4Kmfo6l6TQ5RdLhnytXsMrWeXUomPr9ry9MXe9270BkXANi29OO3lcHq5kUX32IYtwdFSO
+	gxUEzh8qGAR6QwRBRz2B/8JbGJ6ZJJhv2olA0z0eIf8YwVAkyKPv4D4e0x08rg0ECKwtFoI9
+	9tM8mqwuFtcCcwxOut5Dv/kYg0N+HlFHuxwO4yo8tBUgMGHhceuSiYNr5AJBeOg2g27fWhw1
+	HWdRMx8muHjmDgNjy98crrr7OcwcWAav+Q+CxukJAkckKMdvbhuDivN2FhdtS2CZCMlhevAf
+	hxPhaRn2/tnFY2iki+BczRiDE21TsSmnh8fdZiuD3sgkA4/lCI/Z1th8yBqrVddH5WipOECw
+	r7qJRdWNDHw37yGYNoe5rCzq/NZJaO9kUEarOnfT2ch1nh6vnWXoV4Pr6Nnmm3Jadc4npzbX
+	LtrZlkrtP/sZejQU4agvkEld7bU8vXz4X5aODx1iNj23VflatqTXlUiGF1//RJkzWGuSFUaX
+	lwYiJmIk0aV1JEEhCulie7BR/pgjPvsC88Ia0euNyuKcKDwvdu6f4OqIUiETfk8W6x372Xjw
+	jJAptnabuTizwiqxbuqnBVYJL4tHxq6QR9Jk8WSHe0GUELufmrMycVYLGeJo8BIbl4qCPUEc
+	9zdyjwpLxfNtXtZMVDbyRDtR6/JL8rQ6fXpaTlm+rjRtR0Gei8SezfHF3EdnSOjqBz1EUBDN
+	IhWy3slVc9qSorK8HiIqZJpE1eqUjblqVba2rFwyFHxs2KWXinrIMgWreVb10szubLXwqbZY
+	2ilJhZLhccooEpKMJDN1s2/As6Xvx7KnbnRv/3Jx5YPBuuT7r95lb6Xea/h128Bnb+aY1s5X
+	VXaU973/tC4r7fPmry2FDYXJJa1ISbrTX/9kQ4b7wzeuJC5fqW/zhLv04RdKEfi+mCu/abOO
+	BveOdP7TQFfrNkVX3F+/xtv113jKKwOZ78K4YtjTvG1J+u1fNGxRjnZDqsxQpP0frpyfJmgD
+	AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRTH+/3u3b3X1eqypF0LKhZZBPaAHodeGP3RLXv9E1EEOfKS87Fs
+	K8sgcq6Z2oM52qSWZZYr1HRtpi4bmaI9V5pZZpmTlmVqlrlkU7Ot6J/D53y/53w5fxyGkFaL
+	pjNK1SFBrVIkySkxKd66Shel2xiTsPjcZxlk6U/A+06vCF5ra0nwDWWRcKm8lIIxSxUNWfYL
+	Inj0JoOEprISBJ2+LATDIxYC9M5xEsaMjTQM+d/RYNIiGHc1IjA3Gwloa7pPQGmFFsNP228K
+	eusHEZi6vBTk9WhJGLCeQXCx20JDT8MG6O+sEcF4x2cMb371IbB6f2Pw1p5CMGZOhCuFjuC6
+	+TsFI+4XBOSZmhBc7eogYLDHg6Ci8QMC180MCj4Z7hDQ4p0Mr3wDFDw2naagv/kShm82Cgoy
+	XCJoftaLIN9iRNDd7sKgu1ZOgTnfToLTc5eG5t5RDO/NRgwl9i3Qae0m4amhEAfPDU7dloEl
+	T4eD5QsG060aDH5rMR1dhPhh/TmSL3ZUYl7/coziSy+XIn4kYET8UJGO4PWGYFvfN0DwJx1H
+	+KKnfRQf8LVSvOtXAck/KeT469kBzOe6o3jnxQ56+7rd4tVxQpIyVVAvWhsrjndnZxIp/plH
+	e32ZKB35I3JQGMOxSzlf+zU6xBQ7j2tr8xMhDmdnc46z3aIcJGYItmUWd8Z6lgwZU9k13A2X
+	QRRikp3L5fRX/WUJu5y74nmO/oXO4kpstX+DwoJ62Wg+DrGUXca9G3hIGpC4AE0oRuFKVWqy
+	Qpm0bKEmMT5NpTy6cN+BZDsK/pP1+GhuNRpq2VCHWAbJJ0kgelOCVKRI1aQl1yGOIeThksj5
+	MQlSSZwi7ZigPrBXfThJ0NShGQwpl0k27RRipex+xSEhURBSBPV/FzNh09MRjrj6zL1+5Y8d
+	JdOWb7N50iar7ztaTQerH6dksrYpw7YCO7+Cylhd4ZNFBNyt0Z6Jztzsr5Vz6HqTNEp1eIq/
+	xWlfpS107Gr8tujezqrUBTWayB+bB+Uzu9Lxp/lvA7ntcXNUchkzcVJt5ANZ4g22wRUOLxKs
+	5/eUn/jYcLwyRk5q4hVLFhBqjeIPAg6jj0sDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,230 +224,111 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-From: Yunseong Kim <ysk@kzalloc.com>
+Makes dept able to track PG_writeback waits and events, which will be
+useful in practice.
 
-The current implementation shares the same dept key for multiple
-synchronization points, which can lead to false positive reports in
-dependency tracking and potential confusion in debugging.  For example,
-both normal RCU and tasks trace RCU synchronization points use the same
-dept key.  Specifically:
-
-   1. synchronize_rcu() uses a dept key embedded in __wait_rcu_gp():
-
-      synchronize_rcu()
-         synchronize_rcu_normal()
-            _wait_rcu_gp()
-               __wait_rcu_gp() <- the key as static variable
-
-   2. synchronize_rcu_tasks_trace() uses the dept key, too:
-
-      synchronize_rcu_tasks_trace()
-         synchronize_rcu_tasks_generic()
-            _wait_rcu_gp()
-               __wait_rcu_gp() <- the key as static variable
-
-Since the both rely on the same dept key, dept may report false positive
-circular dependency.  To resolve this, separate dept keys and maps
-should be assigned to each struct rcu_synchronize.
-
-   ===================================================
-   DEPT: Circular dependency has been detected.
-   6.15.0-rc6-00042-ged94bafc6405 #2 Not tainted
-   ---------------------------------------------------
-   summary
-   ---------------------------------------------------
-   *** DEADLOCK ***
-
-   context A
-      [S] lock(cpu_hotplug_lock:0)
-      [W] __wait_rcu_gp(<sched>:0)
-      [E] unlock(cpu_hotplug_lock:0)
-
-   context B
-      [S] (unknown)(<sched>:0)
-      [W] lock(cpu_hotplug_lock:0)
-      [E] try_to_wake_up(<sched>:0)
-
-   [S]: start of the event context
-   [W]: the wait blocked
-   [E]: the event not reachable
-   ---------------------------------------------------
-   context A's detail
-   ---------------------------------------------------
-   context A
-      [S] lock(cpu_hotplug_lock:0)
-      [W] __wait_rcu_gp(<sched>:0)
-      [E] unlock(cpu_hotplug_lock:0)
-
-   [S] lock(cpu_hotplug_lock:0):
-   [<ffff8000802ce964>] cpus_read_lock+0x14/0x20
-   stacktrace:
-         percpu_down_read.constprop.0+0x88/0x2ec
-         cpus_read_lock+0x14/0x20
-         cgroup_procs_write_start+0x164/0x634
-         __cgroup_procs_write+0xdc/0x4d0
-         cgroup_procs_write+0x34/0x74
-         cgroup_file_write+0x25c/0x670
-         kernfs_fop_write_iter+0x2ec/0x498
-         vfs_write+0x574/0xc30
-         ksys_write+0x124/0x244
-         __arm64_sys_write+0x70/0xa4
-         invoke_syscall+0x88/0x2e0
-         el0_svc_common.constprop.0+0xe8/0x2e0
-         do_el0_svc+0x44/0x60
-         el0_svc+0x50/0x188
-         el0t_64_sync_handler+0x10c/0x140
-         el0t_64_sync+0x198/0x19c
-
-   [W] __wait_rcu_gp(<sched>:0):
-   [<ffff8000804ce88c>] __wait_rcu_gp+0x324/0x498
-   stacktrace:
-         schedule+0xcc/0x348
-         schedule_timeout+0x1a4/0x268
-         __wait_for_common+0x1c4/0x3f0
-         __wait_for_completion_state+0x20/0x38
-         __wait_rcu_gp+0x35c/0x498
-         synchronize_rcu_normal+0x200/0x218
-         synchronize_rcu+0x234/0x2a0
-         rcu_sync_enter+0x11c/0x300
-         percpu_down_write+0xb4/0x3e0
-         cgroup_procs_write_start+0x174/0x634
-         __cgroup_procs_write+0xdc/0x4d0
-         cgroup_procs_write+0x34/0x74
-         cgroup_file_write+0x25c/0x670
-         kernfs_fop_write_iter+0x2ec/0x498
-         vfs_write+0x574/0xc30
-         ksys_write+0x124/0x244
-
-   [E] unlock(cpu_hotplug_lock:0):
-   (N/A)
-   ---------------------------------------------------
-   context B's detail
-   ---------------------------------------------------
-   context B
-      [S] (unknown)(<sched>:0)
-      [W] lock(cpu_hotplug_lock:0)
-      [E] try_to_wake_up(<sched>:0)
-
-   [S] (unknown)(<sched>:0):
-   (N/A)
-
-   [W] lock(cpu_hotplug_lock:0):
-   [<ffff8000802ce964>] cpus_read_lock+0x14/0x20
-   stacktrace:
-         percpu_down_read.constprop.0+0x6c/0x2ec
-         cpus_read_lock+0x14/0x20
-         check_all_holdout_tasks_trace+0x90/0xa30
-         rcu_tasks_wait_gp+0x47c/0x938
-         rcu_tasks_one_gp+0x75c/0xef8
-         rcu_tasks_kthread+0x180/0x1dc
-         kthread+0x3ac/0x74c
-         ret_from_fork+0x10/0x20
-
-   [E] try_to_wake_up(<sched>:0):
-   [<ffff8000804233b8>] complete+0xb8/0x1e8
-   stacktrace:
-         try_to_wake_up+0x374/0x1164
-         complete+0xb8/0x1e8
-         wakeme_after_rcu+0x14/0x20
-         rcu_tasks_invoke_cbs+0x218/0xaa8
-         rcu_tasks_one_gp+0x834/0xef8
-         rcu_tasks_kthread+0x180/0x1dc
-         kthread+0x3ac/0x74c
-         ret_from_fork+0x10/0x20
-   (wait to wake up)
-   stacktrace:
-         __schedule+0xf64/0x3614
-         schedule+0xcc/0x348
-         schedule_timeout+0x1a4/0x268
-         __wait_for_common+0x1c4/0x3f0
-         __wait_for_completion_state+0x20/0x38
-         __wait_rcu_gp+0x35c/0x498
-         synchronize_rcu_tasks_generic+0x14c/0x220
-         synchronize_rcu_tasks_trace+0x24/0x8c
-         rcu_init_tasks_generic+0x168/0x194
-         do_one_initcall+0x174/0xa00
-         kernel_init_freeable+0x744/0x7dc
-         kernel_init+0x78/0x220
-         ret_from_fork+0x10/0x20
-
-Separating the dept key and map for each of struct rcu_synchronize,
-ensuring proper tracking for each execution context.
-
-Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
-[ Rewrote the changelog. ]
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/rcupdate_wait.h | 13 ++++++++-----
- kernel/rcu/rcu.h              |  1 +
- kernel/rcu/update.c           |  5 +++--
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ include/linux/mm_types.h   | 1 +
+ include/linux/page-flags.h | 7 +++++++
+ mm/filemap.c               | 6 +++++-
+ mm/mm_init.c               | 1 +
+ 4 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/rcupdate_wait.h b/include/linux/rcupdate_wait.h
-index 4c92d4291cce..ee598e70b4bc 100644
---- a/include/linux/rcupdate_wait.h
-+++ b/include/linux/rcupdate_wait.h
-@@ -19,17 +19,20 @@ struct rcu_synchronize {
- 
- 	/* This is for debugging. */
- 	struct rcu_gp_oldstate oldstate;
-+	struct dept_map dmap;
-+	struct dept_key dkey;
- };
- void wakeme_after_rcu(struct rcu_head *head);
- 
- void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *crcu_array,
--		   struct rcu_synchronize *rs_array);
-+		   struct rcu_synchronize *rs_array, struct dept_key *dkey);
- 
- #define _wait_rcu_gp(checktiny, state, ...) \
--do {												\
--	call_rcu_func_t __crcu_array[] = { __VA_ARGS__ };					\
--	struct rcu_synchronize __rs_array[ARRAY_SIZE(__crcu_array)];				\
--	__wait_rcu_gp(checktiny, state, ARRAY_SIZE(__crcu_array), __crcu_array, __rs_array);	\
-+do {													\
-+	call_rcu_func_t __crcu_array[] = { __VA_ARGS__ };						\
-+	static struct dept_key __key;									\
-+	struct rcu_synchronize __rs_array[ARRAY_SIZE(__crcu_array)];					\
-+	__wait_rcu_gp(checktiny, state, ARRAY_SIZE(__crcu_array), __crcu_array, __rs_array, &__key);	\
- } while (0)
- 
- #define wait_rcu_gp(...) _wait_rcu_gp(false, TASK_UNINTERRUPTIBLE, __VA_ARGS__)
-diff --git a/kernel/rcu/rcu.h b/kernel/rcu/rcu.h
-index 9b10b57b79ad..d30dfc345532 100644
---- a/kernel/rcu/rcu.h
-+++ b/kernel/rcu/rcu.h
-@@ -12,6 +12,7 @@
- 
- #include <linux/slab.h>
- #include <trace/events/rcu.h>
-+#include <linux/dept_sdt.h>
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index e25d09f3dfa9..81dc9999090a 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -222,6 +222,7 @@ struct page {
+ #endif
+ 	struct dept_page_usage usage;
+ 	struct dept_ext_wgen pg_locked_wgen;
++	struct dept_ext_wgen pg_writeback_wgen;
+ } _struct_page_alignment;
  
  /*
-  * Grace-period counter management.
-diff --git a/kernel/rcu/update.c b/kernel/rcu/update.c
-index d98a5c38e19c..c2858650ccf5 100644
---- a/kernel/rcu/update.c
-+++ b/kernel/rcu/update.c
-@@ -409,7 +409,7 @@ void wakeme_after_rcu(struct rcu_head *head)
- EXPORT_SYMBOL_GPL(wakeme_after_rcu);
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 0b0655354b08..ec736811a2c6 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -203,6 +203,7 @@ enum pageflags {
+ #include <linux/dept.h>
  
- void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *crcu_array,
--		   struct rcu_synchronize *rs_array)
-+		   struct rcu_synchronize *rs_array, struct dept_key *dkey)
+ extern struct dept_map pg_locked_map;
++extern struct dept_map pg_writeback_map;
+ 
+ static inline void dept_set_page_usage(struct page *p,
+ 		unsigned int new_type)
+@@ -292,6 +293,8 @@ static inline void dept_page_set_bit(struct page *p, int bit_nr)
+ 
+ 	if (bit_nr == PG_locked)
+ 		dept_request_event(&pg_locked_map, &p->pg_locked_wgen);
++	else if (bit_nr == PG_writeback)
++		dept_request_event(&pg_writeback_map, &p->pg_writeback_wgen);
+ }
+ 
+ static inline void dept_page_clear_bit(struct page *p, int bit_nr)
+@@ -300,6 +303,8 @@ static inline void dept_page_clear_bit(struct page *p, int bit_nr)
+ 
+ 	if (bit_nr == PG_locked)
+ 		dept_event(&pg_locked_map, evt_f, _RET_IP_, __func__, &p->pg_locked_wgen);
++	else if (bit_nr == PG_writeback)
++		dept_event(&pg_writeback_map, evt_f, _RET_IP_, __func__, &p->pg_writeback_wgen);
+ }
+ 
+ static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
+@@ -311,6 +316,8 @@ static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
+ 
+ 	if (bit_nr == PG_locked)
+ 		dept_wait(&pg_locked_map, evt_f, _RET_IP_, __func__, 0, -1L);
++	else if (bit_nr == PG_writeback)
++		dept_wait(&pg_writeback_map, evt_f, _RET_IP_, __func__, 0, -1L);
+ }
+ 
+ static inline void dept_folio_set_bit(struct folio *f, int bit_nr)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index c0bff1e08a28..e3aa2754da3f 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1197,7 +1197,7 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
+ 	 * dept_page_clear_bit() being called multiple times is harmless.
+ 	 * The worst case is to miss some dependencies but it's okay.
+ 	 */
+-	if (bit_nr == PG_locked)
++	if (bit_nr == PG_locked || bit_nr == PG_writeback)
+ 		dept_page_clear_bit(&folio->page, bit_nr);
+ 
+ 	spin_lock_irqsave(&q->lock, flags);
+@@ -1254,6 +1254,9 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
+ struct dept_map __maybe_unused pg_locked_map = DEPT_MAP_INITIALIZER(pg_locked_map, NULL);
+ EXPORT_SYMBOL(pg_locked_map);
+ 
++struct dept_map __maybe_unused pg_writeback_map = DEPT_MAP_INITIALIZER(pg_writeback_map, NULL);
++EXPORT_SYMBOL(pg_writeback_map);
++
+ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
+ 		int state, enum behavior behavior)
  {
- 	int i;
- 	int j;
-@@ -426,7 +426,8 @@ void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *c
- 				break;
- 		if (j == i) {
- 			init_rcu_head_on_stack(&rs_array[i].head);
--			init_completion(&rs_array[i].completion);
-+			sdt_map_init_key(&rs_array[i].dmap, dkey);
-+			init_completion_dmap(&rs_array[i].completion, &rs_array[i].dmap);
- 			(crcu_array[i])(&rs_array[i].head, wakeme_after_rcu);
- 		}
+@@ -1697,6 +1700,7 @@ void folio_end_writeback_no_dropbehind(struct folio *folio)
+ 		folio_rotate_reclaimable(folio);
  	}
+ 
++	dept_page_clear_bit(&folio->page, PG_writeback);
+ 	if (__folio_end_writeback(folio))
+ 		folio_wake_bit(folio, PG_writeback);
+ 
+diff --git a/mm/mm_init.c b/mm/mm_init.c
+index 66b68c02d8d4..2695d7b3b089 100644
+--- a/mm/mm_init.c
++++ b/mm/mm_init.c
+@@ -589,6 +589,7 @@ void __meminit __init_single_page(struct page *page, unsigned long pfn,
+ 	page_cpupid_reset_last(page);
+ 	page_kasan_tag_reset(page);
+ 	dept_ext_wgen_init(&page->pg_locked_wgen);
++	dept_ext_wgen_init(&page->pg_writeback_wgen);
+ 
+ 	INIT_LIST_HEAD(&page->lru);
+ #ifdef WANT_PAGE_VIRTUAL
 -- 
 2.17.1
 
