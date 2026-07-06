@@ -1,30 +1,30 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1CA41610F;
-	Mon,  6 Jul 2026 13:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A308345CCE;
+	Mon,  6 Jul 2026 13:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783344086; cv=none; b=K8pdXDU+305dKkrFthqdz9kyH04IJ2bQ3zdwBM8HudaZV0k6jP6Lo0bxmRGkR8HhFCY3GBTBrPii4CMjVxNTRxqOphr0LSVrp2XRuTcv4Xpmnmk2MmZTC4ny9XLf60GD62uAWnWOh9p2JLb15ynNdPePG0uGaOxnEgddIfjUBB4=
+	t=1783344895; cv=none; b=kKL1/PGJ62qaHaVcLHkbirxYBobQtKD6jglJQ4dvmU5eMOK2pd500whmB1o0rkWf4kRK84t5hRnOvc6pb9ZCKNT+apMGznPoxziCsYOr/9+mWlvKMgREBRQELsTBrZ8/Vol/L+Ujo87Lnsmy8gNsZZEFk22pUL1PAOjAO/q3dQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783344086; c=relaxed/simple;
-	bh=gaCJ25QjdQrF7nxW9Qz2pBDcYnjlAwyaj4KdNuWjQuQ=;
+	s=arc-20240116; t=1783344895; c=relaxed/simple;
+	bh=f0UIkUYPReSNpUyhwRpue4mKYSnZP2yWBlACfBpBajg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UrlrMg8ANlkyErerog926IwXOTpxuxzQdcWjl5bMxj0U1VrsDSQE46cbHlOMU4yCEkCC4ogCf75zIX/C1m5QInStWQXplWhrUp48g/v5u0CwpuwWxc6jQBVjiEMAzc3ryhxJNzKQAsFwl9tgxPNq32wNF2LTrfUTHAjGBz8MmU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 In-Reply-To:Content-Type; b=g6wWdM6zI3RHeb4iNR+1GZ1JHBcS6PBK5Pksx0cg1Vhnrb24quNW5/KV4iFUBSAG8Xezs4H4DdobWL18oZTKvSVR0EadlYkZyMr0hSYrT1tGLcf2YAiPYv9depjI9hr5DjE+SKQ1jllzvrgvU0krccfPUgSIQTh3l1Y9H2dx3Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gv4kQ6765zYQtlr;
-	Mon,  6 Jul 2026 21:21:18 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gv51g5fVmzKHMNt;
+	Mon,  6 Jul 2026 21:34:31 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 83D684058C;
-	Mon,  6 Jul 2026 21:21:20 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 925C140D1A;
+	Mon,  6 Jul 2026 21:34:49 +0800 (CST)
 Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHWHTOq0tqXCcQAQ--.50158S3;
-	Mon, 06 Jul 2026 21:21:20 +0800 (CST)
-Message-ID: <5f99b2f3-05c1-4754-9827-d55528861ecc@huaweicloud.com>
-Date: Mon, 6 Jul 2026 21:21:18 +0800
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHWHT3rktq6kgRAQ--.50332S3;
+	Mon, 06 Jul 2026 21:34:49 +0800 (CST)
+Message-ID: <c8cc96b2-7ff0-4368-9c2d-5054301ff6c5@huaweicloud.com>
+Date: Mon, 6 Jul 2026 21:34:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,75 +32,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] null_blk: give the file-scope mutex a descriptive
- name
+Subject: Re: [PATCH 3/3] null_blk: register configfs subsystem after creating
+ default devices
 To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
  dlemoal@kernel.org, nilay@linux.ibm.com, linux-block@vger.kernel.org,
  kch@nvidia.com, johannes.thumshirn@wdc.com, kbusch@kernel.org
 Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
  chengzhihao1@huawei.com, wozizhi@huawei.com
 References: <20260706123507.3809871-1-wozizhi@huaweicloud.com>
- <20260706123507.3809871-3-wozizhi@huaweicloud.com>
- <9004743e-f522-424e-a1ab-8779ecc6da02@acm.org>
+ <20260706123507.3809871-4-wozizhi@huaweicloud.com>
+ <490008e2-2345-48ea-bd8e-c078d828a43f@acm.org>
 From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <9004743e-f522-424e-a1ab-8779ecc6da02@acm.org>
+In-Reply-To: <490008e2-2345-48ea-bd8e-c078d828a43f@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHWHTOq0tqXCcQAQ--.50158S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF1kWw48ur1xGr1rGr43trb_yoW8Gr4fp3
-	ZYgw4DJ348Wrs7Z3W7XFZ7KrZavwn3uay5tF4UGry0kw4DZr9avFZIyr48W3yUWws3JrWY
-	qa45X3W2yay8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	7KsUUUUUU==
+X-CM-TRANSID:cCh0CgBHWHT3rktq6kgRAQ--.50332S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF47uF15Aw4rKrW3WF4DArb_yoWxKrb_Jw
+	s5tr4kWryqvayFkw1akw1UZryxGFZFgrnxXr1IvrW7Gw17XFnxKw1YvFZYvr1rKa15CrZ8
+	X3y5Aasakr1xGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AK
+	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j
+	6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUOB
+	MKDUUUU
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 
 
-在 2026/7/6 21:12, Bart Van Assche 写道:
+在 2026/7/6 21:17, Bart Van Assche 写道:
 > On 7/6/26 5:35 AM, Zizhi Wo wrote:
->> The file-scope lock mutex mainly serializes access to the global 
->> nullb_list
->> and related device setup. Rename it to "nullb_list_lock" to make its
->> purpose clear. No functional change.
+>> @@ -2187,8 +2185,6 @@ static int __init null_init(void)
+>>           null_destroy_dev(nullb);
+>>       }
+>>       unregister_blkdev(null_major, "nullb");
+>> -err_conf:
+>> -    configfs_unregister_subsystem(&nullb_subsys);
+>>       return ret;
+>>   }
 > 
->  From commit a2db328b0839 ("null_blk: fix null-ptr-dereference while
-> configuring 'power' and 'submit_queues'"):
-> 
->      Writing 'power' and 'submit_queues' concurrently will trigger kernel
->      panic:
->      [ ... ]
->      Fix this problem by resuing the global mutex to protect
->      nullb_device_power_store() and nullb_update_nr_hw_queues() from 
-> configfs.
-> 
-> This makes it clear that the "lock" mutex has a broader purpose than
-> only protecting nullb_list. Hence, the name nullb_list_lock is
-> confusing. How about using the name "nullb_lock"?
+> Please make null_exit() consistent with the cleanup path in null_init().
+> null_exit() calls unregister_blkdev() before it destroys the null_blk
+> instances. That doesn't look right to me.
 > 
 > Thanks,
 > 
 > Bart.
+> 
+> 
 
-Thanks for the reminder! Agreed that "nullb_list_lock" is too narrow
-since it also serializes nullb_device_power_store() and
-nullb_update_nr_hw_queues().
-
-However, I'm a bit worried that "nullb_lock" is easy to confuse with the
-per-device spinlock "nullb->lock"... They are only one "->" apart?
-
-Would "nullb_global_lock" (or "nullb_config_lock") work better? It
-reflects the broader purpose and avoids clashing with nullb->lock.
+Thanks for pointing this out, I hadn't noticed that. I'll add this
+change in the next version.
 
 Thanks,
 Zizhi Wo
