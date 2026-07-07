@@ -1,263 +1,298 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823B630DEB2
-	for <linux-block@vger.kernel.org>; Tue,  7 Jul 2026 02:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783391319; cv=pass; b=W6L2O6laqoPUEpXRRNwaaqm5EQcYOb2lTAtJ8tBIJ3S/SxBBipxc7z4YGm+oYtbKy0bGbWh5/hoNwqO+XR2+ZU1Oi380q+pk6HrSVF2R1bJV2HfaiUq+B6J25YCZLfxOoObGWl3RZo3mYpcnX9XyJhI2hHBQQEZoKzBvHSbX/sw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783391319; c=relaxed/simple;
-	bh=6W8O92UiA79DWd1L2UFfMr/QL8xVI13/QY5YPPSzdiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WnRYntTEf1sbKJ7ZuB2ARNr5HJKFwPmNnsLa2cM63TO2qnAB2q1payk3tc50r9ZRFyxqinWjm0Kae5SpyQxEHY9/TW+ME1I/lixOEbdvVSeJdOu+et+je0NuCvcwrQ4tMy4HSBNj+9kZJ/fvflDmzZ45Ia8VK4ULUUHIiHApn0g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IOeWT/f8; arc=pass smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOeWT/f8"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-7dbcb505578so31638947b3.3
-        for <linux-block@vger.kernel.org>; Mon, 06 Jul 2026 19:28:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783391314; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Sm7Do/pVO07YcNLEZ+8P3E9lOB4fcNqTEnK3X7t4b+JHq2PC3K9fpHl/JnXblwZZUG
-         kyjluxV4kGtUVUJjTvR04eLpljhJ33o3E2+Qu1Z8akDxrPv3QhLdbjGDtDwjhQHbllJa
-         5ovIuPfgMMpplmuGQGIUT5zZcJzjEYYn3oGme//XtUEGE9tfjy5EB+vbwkwQjgAo/1Pz
-         QYdp0AbZBtnzpf4XrHTrHz23QZpMdQG5Zq1dHX3rBCCr+Xk0JCLmYB3LgYILWGB2mUU+
-         JtMxgTXsvtBbXQGwD6YUuNhYkekILltGzIb4DuA5hnrSzPGksNXnVLzILV+gfmgRhCeb
-         Bskw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2xZAidflWm8ydGc55RaFAxsXLvMNZAbWlrn3C16+oXQ=;
-        fh=5f+YklkDNofi3jn7fPZUxQQVjXZH03z3uaQLaopkyZU=;
-        b=j8aOu7IUC8duBUJtJ8ea4ZmtLmSmlm22vhMzjvLlzIce1JNu+j3zpj9CkQFXb2B+Gc
-         EhJmX3dQsw7OY474p9beVoL7dsYlTkpBRq3Ne6x6R3qXJqcXGN+gf3DI/39hgkr0OYFu
-         k0NluHqGH8UYddloCSenLPNdRJ5/Db36l6NuwHEMszLtgFrCbO/riwbRMhGPhCxrmuXQ
-         6Rc/qcwQRTmMqAPVkng26/I3KY4EhxHYQEpGQ/I26UQg1I1GrBKAnjJLMSXPnIwKoTZh
-         c/t8wOE/fgFo4lvVMH/n/y9IAh78vNbOe7NYNdofLQCNUpXFFgD0meIS/jJMNqJ9mMHv
-         KWkw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783391314; x=1783996114; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=2xZAidflWm8ydGc55RaFAxsXLvMNZAbWlrn3C16+oXQ=;
-        b=IOeWT/f8GEFbMfcWusWMefPMt1/nVvrMP4n9sg5AybZ1n/G7MzNHgGKqFbIIooUAjX
-         xwc/6YXzD44WDrG3u0OtWNnrLsQgXgWJZG4TQ0VulQ1u9EtSsMPYvkzzdlXqRbHaLQzz
-         x+VVGCP5M+Zm6Obm/kc/477lK8ePeLVy9wOvoo+nCM8NTUAnzmBFGqG0V+NzB5ospjCP
-         +ORVr2E27TguVMmmG1nHoTljaJ8YL5lINg6vLncMof2209zrWNkgoFwXhlJggefiMDxo
-         oXcyo1YeZjsfvFSx66/BPYsfmgPqnpyZu/tTZUOAHHZFr4VrxmRwLGd5kjg8yicqtsfm
-         hjrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783391314; x=1783996114;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2xZAidflWm8ydGc55RaFAxsXLvMNZAbWlrn3C16+oXQ=;
-        b=jeM7iDaJqndgto1CkSTGFv2VXRZPi5/mEuD6dpRQ1ZNg6srCeLCTknNl/DPD30Q+ux
-         aFS2kg3g6AHoZgvlIMZ2b575epVlibW3b5/nY9CjS6qcvM/JxGjvQlzaPtuMcetfqPrE
-         mvAhGbPBfazXYK8kVcNx8gVkfZz0ATg4g84lklvE0iA00H1pF2sFc7o2YFWaT3VLQ2Hy
-         gl6JFfP+PyoIg8xR+zc4E6qa+Ep8AfJNWejhkafpREYWtRnCr0J4IypIMHVCrf3Yh/gb
-         A3ysRGJ8AtsYjzA9PTy+yCSZqygcHdGfCndWp2Mw7RfZ0CTW+/qbHWhyiIHWR4Ov5D9O
-         wLgw==
-X-Forwarded-Encrypted: i=1; AHgh+RoGNGNfn+rJ9qixrFosn0ltUhbZpcB5dh87yMyjVIJoBe+UiPSDV17j7AOBtiJjKxZRKq/MWbKe9YFV9A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZxs7NxSoHMG/lit/qxjmLMeTHuisRFLxtxR+rFBoXpeM3RQCC
-	OMTmhB60neo789NBkJCePMJojmiP9nsaVixfnX6JLbC0vWZrHSu7YKwhvLK+f26LRAVeKedda93
-	Qd1s2MbQ5T5xOAnPx3d51kGG97gxrH6Y=
-X-Gm-Gg: AfdE7ckBqGniEihCGshE9JXVHvs3KpBxJxyZ9bXEO3WXZmC+50srwWPecOkbhG9Ef9M
-	G/V7rj8/AbCY2bwlRxBZ828t2G+U+AI+niy8t8L6VA9RCmJTSn3i3BDxMlHpDNMag2/0H0SVEVJ
-	fr7zkESr7uRM+/vCTptYwNmEz6ZodtUcM49ADBKRarffryNhY5aQxrDAgk5BUpbHqsaLQnsSJzn
-	oBKz0fFra15Oiru5xV1o7I3Vbh/X811oFrnuUxWciTxmI4cCrnIhNBKuRrEhIJAJmeUjqTUwxY=
-X-Received: by 2002:a05:690c:4a02:b0:80c:85b6:764b with SMTP id
- 00721157ae682-81be3dd5f38mr24315517b3.64.1783391313848; Mon, 06 Jul 2026
- 19:28:33 -0700 (PDT)
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCA136B048;
+	Tue,  7 Jul 2026 02:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783391756; cv=none; b=avezIVHor5HBINqgHTabGyzkFeCNg794O0UTbP0YuELdXWqwPMgtJW5CC9z9lU+vkbs0LB04oMH5FDkOmcTdy6OSm1I76xvNG9kX9Sikx9O2rJ/Dr3E01HzP5zu7sUanoFnbCntE6P9hpGO8LNiocbRwCuZIXVA5BjCHsRKK8zQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783391756; c=relaxed/simple;
+	bh=4aXH2f9ytQjDBaSOD98MPjwilmVXY5Gbzhe6oue0oYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CrknILNZmzbBrxGUn5HMTs3x9e9J87LTdTXOBHJRMXSSyWYy2WRJ3g2VKdTcT/io+4KWKAPM4ymWr5jdhlu1DXlgfmo2H6K42xrRaAfADWYcIysL52js83cVjJDtYDBccIgf0ZAZ1jHUf5FIK1FL9vN/GG6Bz3FOv1O0NprSxtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-b3-6a4c66043553
+Date: Tue, 7 Jul 2026 11:35:42 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com,
+	kernel_team@skhynix.com, torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org,
+	kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+	mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+	vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+	dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+	linux-block@vger.kernel.org, josef@toxicpanda.com,
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+	harry.yoo@oracle.com, chris.p.wilson@intel.com,
+	gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, longman@redhat.com,
+	yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+	netdev@vger.kernel.org, matthew.brost@intel.com,
+	her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com,
+	bp@alien8.de, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+	tmgross@umich.edu, rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v19 22/40] dept: track PG_locked with dept
+Message-ID: <20260707023542.GA33746@system.software.com>
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <20260706061928.66713-23-byungchul@sk.com>
+ <akvueAxPl8aoLvMR@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260621135916.2657247-1-zzzccc427@gmail.com>
-In-Reply-To: <20260621135916.2657247-1-zzzccc427@gmail.com>
-From: Cen Zhang <zzzccc427@gmail.com>
-Date: Tue, 7 Jul 2026 10:28:20 +0800
-X-Gm-Features: AVVi8CfnnNKkDInUTXgjVMLCp7oBm7r0SraFmHbJ_HK7RJmtNGneYk1TwT5pq4U
-Message-ID: <CAFRLqsWb=_LVBKfYR0Y5=ym8M5Fddy3EmWj54PYFcuYA+fK_fw@mail.gmail.com>
-Subject: Re: [PATCH] blk-iolatency: flush enable work after policy deactivation
-To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akvueAxPl8aoLvMR@casper.infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUybZRSGfd7vNtS8qyM+jsVoVVy2dI5lJsdoyKJ/3kSNS/g3k2lZX6Wz
+	wGwBhwRTYEysiF1dIbQgXefqRMiw3diAdOvYZ1VMO9jWlW/TVpdSpqOulo9iiy7u33XOfefK
+	+XE4Um5nNnCasgpRV6bSKhgpJY3nOJTUe2/s2xaKAkxMh2m4WeeloMnVTsO1W/UUJJdsJDQO
+	rFKwYr7CQiI1zoKlDkFrwExC0H+ehIW+NAOxi/cQWGbDDFijNhbi00M0rE7+RoAznCagy+HO
+	VFr/YKDN4kdw6soUAs+JegYiptMkjIYfBZ/lcwbigQ4C5vsYsNd7aAj8HEPQaTMjiIY8BDQc
+	O8lAa6eLgoGZQRYCsWUCJlrNBHzvehOmnVEK2u4wYGv7nQBL7xABKWc3C07Dc2AbGaVhebYA
+	Vu3lMPmlhQLf1E0aYlEzA2cMMyy4bl9GkBibJaCnOUqCJ7QFmlYSCEYHOxho7jtNg8GWpMHv
+	/YmG47cCBPgPf0FD0BRB0DvvYHaqhWRjCyV0u/sJofH6CiP0fN2DhKVFMxISxxtIodGUGS/O
+	3SWFxb9uMMKPDix889kiIRweUQoD1klWOHguxAp2V6Vw8FKc3qXcLX1FLWo1VaLuhcJ3pSV/
+	9kbI/baCA+5uD2tAC/lGJOEwvwOPXz9PPeB29w9rTPHP4l8u2YksM/zzOBhMkUbEcev5TXju
+	1HYjknIkf+RJfLSln812HuML8bnx+2ss4wGb7EfYbEnONyM815ym/g3WYV97eI1JfjMOpu8Q
+	WSnJ5+Fv01x2LcncMJ2MkVnO5Z/B3v6rRNaD+V8leDCS/u/QJ/CFE0HKhHjrQ1rrQ1rr/1o7
+	IruRXFNWVarSaHdsLaku0xzYure81IUyf+usXX77LLrnLxpGPIcUObI+4+v75LSqSl9dOoww
+	RyrWy/I3ZVYytar6Y1FX/o6uUivqh1EeRykel22//5Fazr+vqhA/EMX9ou5BSnCSDQYECx3D
+	T+flblRoTw5Njrlv7/m7prK4Wjn20kzyUMunl72pwtzygWM3puJnJw5NUbOdqZ11TQ0vS/aG
+	k0VY5tu4bsTx6rbOpbvsVwI392HVLp+xvfi7o127HwHixRFlUS3jfUudI9RESNOZT4a6EvqQ
+	K3+xtqlCsDw1XyMxaF4rVlD6ElXBZlKnV/0DA5Tr8bMDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH8zzP7b2XZtVrZfMGEhLry0wzcTI0J3PzJVnCzXyJcR+2+EWb
+	cZXypmkdA5NFKDRWJKY0toRWtKLUBXkrrUxwZVi2MmUOKttgA1ZZKti0jg15CSDF1mXRLye/
+	8z///8n5cFgij0qSWHX+KVGTr8pV0FJKemBH6Wbq2L7sdwMTUjDoz8BIICiB30q6KJiZNlBw
+	qbmBhiXbNwwYWqsl8OOgjoL+ppsIAjMGBHOLNgL69mUKlkw+BqbnhxkwlyBY9vgQWPwmAkP9
+	3xFocJdgeNYSpSHcPYXAPBakoSpUQsGkowKBddzGQOiHDHgauCOB5dEJDIOzEQSOYBRDsOss
+	giVLDlypdcXiln9oWHzQR6DK3I/g6tgoganQIwRu358IPF/raHhsvEVgILgCfpmZpOGe+TwN
+	T/2XMPzdQoNd55GA/6cwghqbCcH4Hx4MpdeaabDUtFLQ/qiDAX/4OYYRiwnDzdb9EHCMU9Br
+	rMWxc2Mu5xqwVZXiWHmCwdx4B8O8o57ZXYeEOf0FSqh3tWFB/3CJFhouNyBhccGEhOm6UiLo
+	jbG2OzJJhDLXl0Jdb4QWFmZ+pQXPrJ0S7tfywvVzC1iofLBZaLeOMgf3HJZ+kCnmqgtEzZad
+	R6VZ/zY+JidtWwtd9R6mGD3bWI4SWJ5L56tdTirOFLee//l7O44zzb3NDw3Nk3LEsoncJj7i
+	TitHUpZwF1P4qxfamLhnNbeT7xyefckyDnij/SITN8m5CsRHKqLUf4NV/L3q4EsmnJIfioZw
+	fCnhkvkbUTYuJ8RuCMyFSZzf5NbxXW092Ihk1tfS1tfS1ldpOyL1KFGdX5CnUuduS9XmZBXl
+	qwtTPz+R14piX+n46nnlbTQ9kOFFHIsUb8hayvdmyyWqAm1RnhfxLFEkyjZuikmyTFXRaVFz
+	4ojmi1xR60XJLKVYI/v4U/GonDuuOiXmiOJJUfP/FLMJScVox8rOTzqN207vYrZ3HAzNjvUd
+	ej/tQ+9b78gHC4uFhYq6bP9HqUfW9w4cakJlzhTnsfdu/I5GjG7Pck96dI//4Srf9hppzxZb
+	d8YtX3Ll3W/DE86IUuFOYJo6XOfGy9YOW9OaJRuUuhFvn1Lc9VfSZ/evJDam56lG16YYdIev
+	TWUqKG2WaquSaLSqF3VSn4uRAwAA
+X-CFilter-Loop: Reflected
 
-Hi all,
+On Mon, Jul 06, 2026 at 07:05:44PM +0100, Matthew Wilcox wrote:
+> On Mon, Jul 06, 2026 at 03:19:10PM +0900, Byungchul Park wrote:
+> > Makes dept able to track PG_locked waits and events, which will be
+> > useful in practice.  See the following link that shows dept worked with
+> > PG_locked and detected real issues in practice:
+> >
+> >    https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
+> 
+> > @@ -219,6 +220,7 @@ struct page {
+> >       struct page *kmsan_shadow;
+> >       struct page *kmsan_origin;
+> >  #endif
+> > +     struct dept_ext_wgen pg_locked_wgen;
+> >  } _struct_page_alignment;
+> 
+> I may not understand this quite correctly, but I think that tracking
+> PG_locked dependencies in the struct page has both false positive and
+> false negative problems.
+> 
+> Imagine we have a file mapping M1 containing folio F1 at index 0 and F2
+> at index 1.  It is correct locking order to lock F1 before locking F2
+> (for example when doing writeback).  Later, M1 has its folios reclaimed
+> and returned to the free pool.  Then each is added to mapping M2, this
+> time with folio F2 at index 8 and F1 at index 9.  Now the correct order
+> to lock these folios in the order F2 followed by F1.
 
-Sorry for the noise, but I wanted to gently follow up on this patch in
-case it got buried.
+First of all, I appreciate your feedback.  Thanks!
 
-I would really appreciate any feedback when you have a chance. Please
-let me know if I should make any changes or provide more testing
-results.
+That case doesn't generate any dependency unless any other waits are
+involved in.  That should be handled in xxx_nested manner e.g.
+folio_lock_nested() that I need to introduce.  The work is in progress.
 
-Thanks a lot.
+> I don't see a part of this patch where we clear pg_locked_wgen when the
+> page is returned to the page allocator.  Maybe I missed that.
 
-Best regards,
-Cen Zhang
+You are right.  pg_locked_wgen doesn't get cleared.  However, DEPT works
+this way:
 
-Cen Zhang <zzzccc427@gmail.com> =E4=BA=8E2026=E5=B9=B46=E6=9C=8821=E6=97=A5=
-=E5=91=A8=E6=97=A5 21:59=E5=86=99=E9=81=93=EF=BC=9A
->
-> A blk-iolatency rq-qos teardown can free struct blk_iolatency while a
-> freshly queued enable_work callback still references it. The observed
-> failure is:
->
-> blkcg_iolatency_exit() flushes enable_work before deactivating the
-> iolatency policy. However, blkcg_deactivate_policy() calls
-> iolatency_pd_offline() for online policy data, and iolatency_pd_offline()
-> clears min_lat_nsec through iolatency_set_min_lat_nsec(). If this clears
-> the last nonzero latency target, enable_cnt reaches zero and schedules
-> enable_work again after the flush has already returned.
->
-> The buggy scenario involves two paths, with each column showing the order
-> within that path:
->
-> blkcg_iolatency_exit() path:          system_wq worker path:
-> 1. Flush old enable_work.             1. enable_work is idle.
-> 2. Deactivate the policy.             2. no worker owns it.
-> 3. Offline queues new enable_work.    3. work item becomes pending.
-> 4. Free blkiolat.                     4. worker later runs the item.
-> 5. Owner storage is gone.             5. worker dereferences blkiolat.
->
-> Flush enable_work again after blkcg_deactivate_policy() returns and befor=
-e
-> freeing blkiolat. Policy offline callbacks have completed at that point,
-> so the second drain covers the late queueing path without changing the
-> normal enable/disable accounting rules.
->
-> Validation reproduced this kernel report:
-> BUG: KASAN: slab-use-after-free in assign_work+0x2a/0x150
->
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x53/0x70
->  print_report+0xd0/0x630
->  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
->  ? srso_alias_return_thunk+0x5/0xfbef5
->  ? __virt_addr_valid+0xea/0x1a0
->  ? assign_work+0x2a/0x150
->  kasan_report+0xce/0x100
->  ? assign_work+0x2a/0x150
->  assign_work+0x2a/0x150
->  worker_thread+0x1b7/0x500
->  ? __pfx_worker_thread+0x10/0x10
->  kthread+0x192/0x1d0
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x2ac/0x3c0
->  ? __pfx_ret_from_fork+0x10/0x10
->  ? srso_alias_return_thunk+0x5/0xfbef5
->  ? __switch_to+0x2d5/0x6e0
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
->
-> Allocated by task 470:
->  kasan_save_stack+0x33/0x60
->  kasan_save_track+0x14/0x30
->  __kasan_kmalloc+0x8f/0xa0
->  iolatency_set_limit+0x301/0x450
->  cgroup_file_write+0x178/0x2e0
->  kernfs_fop_write_iter+0x1ef/0x290
->  vfs_write+0x446/0x6f0
->  ksys_write+0xc7/0x160
->  do_syscall_64+0xf9/0x540
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Freed by task 611:
->  kasan_save_stack+0x33/0x60
->  kasan_save_track+0x14/0x30
->  kasan_save_free_info+0x3b/0x60
->  __kasan_slab_free+0x43/0x70
->  kfree+0x131/0x390
->  rq_qos_exit+0x5d/0x90
->  __del_gendisk+0x394/0x490
->  del_gendisk+0xa1/0xe0
->  virtblk_remove+0x41/0xd0
->  virtio_dev_remove+0x63/0xe0
->  device_release_driver_internal+0x246/0x2e0
->  unbind_store+0xa9/0xb0
->  kernfs_fop_write_iter+0x1ef/0x290
->  vfs_write+0x446/0x6f0
->  ksys_write+0xc7/0x160
->  do_syscall_64+0xf9/0x540
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Last potentially related work creation:
->  kasan_save_stack+0x33/0x60
->  kasan_record_aux_stack+0x8c/0xa0
->  __queue_work+0x42a/0x800
->  queue_work_on+0x5d/0x70
->  iolatency_set_min_lat_nsec+0x196/0x230
->  iolatency_pd_offline+0x1f/0x40
->  blkcg_deactivate_policy+0x194/0x270
->  blkcg_iolatency_exit+0x33/0x40
->  rq_qos_exit+0x5d/0x90
->  __del_gendisk+0x394/0x490
->  del_gendisk+0xa1/0xe0
->  virtblk_remove+0x41/0xd0
->  virtio_dev_remove+0x63/0xe0
->  device_release_driver_internal+0x246/0x2e0
->  unbind_store+0xa9/0xb0
->  kernfs_fop_write_iter+0x1ef/0x290
->  vfs_write+0x446/0x6f0
->  ksys_write+0xc7/0x160
->  do_syscall_64+0xf9/0x540
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Second to last potentially related work creation:
->  kasan_save_stack+0x33/0x60
->  kasan_record_aux_stack+0x8c/0xa0
->  __queue_work+0x42a/0x800
->  queue_work_on+0x5d/0x70
->  iolatency_set_min_lat_nsec+0x196/0x230
->  iolatency_set_limit+0x3f1/0x450
->  cgroup_file_write+0x178/0x2e0
->  kernfs_fop_write_iter+0x1ef/0x290
->  vfs_write+0x446/0x6f0
->  ksys_write+0xc7/0x160
->  do_syscall_64+0xf9/0x540
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Fixes: 8a177a36da6c ("blk-iolatency: Fix inflight count imbalances and IO=
- hangs on offline")
-> Assisted-by: Codex:gpt-5.5
-> Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
-> ---
->  block/blk-iolatency.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> index 1aaee6fb0f59..a0bdd8a5c94c 100644
-> --- a/block/blk-iolatency.c
-> +++ b/block/blk-iolatency.c
-> @@ -639,6 +639,11 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos=
-)
->         timer_shutdown_sync(&blkiolat->timer);
->         flush_work(&blkiolat->enable_work);
->         blkcg_deactivate_policy(rqos->disk, &blkcg_policy_iolatency);
-> +       /*
-> +        * blkcg_deactivate_policy() invokes iolatency_pd_offline(), whic=
-h may
-> +        * queue enable_work again when it clears the last latency target=
-.
-> +        */
-> +       flush_work(&blkiolat->enable_work);
->         kfree(blkiolat);
->  }
->
-> --
-> 2.43.0
->
+   folio_lock()
+      wait_for_pg_locked_cleared()
+      set_pg_locked() // (1) update pg_locked_wgen to the current wgen
+
+   ... // there might be other waits
+
+   folio_unlock()
+      clear_pg_locked() // (2) check if there have been any waits since (1)
+
+In other words, it's guranteed that pg_locked_wgen has been updated e.i.
+(1) when DEPT refers to pg_locked_wgen e.i. (2).  So I don't think it's
+a problem.
+
+> I think we should be tracking PG_locked dependencies in the owner
+> of the folio.  For files, that would be in the struct address_space.
+> For anon memory, I think that's in the anon_vma, but if somebody told
+> me it was in some other structure, I wouldn't argue with them.
+
+I think it's a good point but it's a classification issue.  folios owned
+by struct address_space should be classified to e.g. address_space_class
+and ones owned by struct anon_vma should be classified to e.g.
+anon_vma_class.  I will work on it to apply the insight you just gave
+but better do it as follow-up patches since the initial patchset is
+already too big to get reviewed.
+
+> This requires slightly more complexity than lockdep currently has.
+> We don't want to use a lockdep class for each folio, obviously.  So we
+> need something to say "I already have folio F1 locked, is it OK to lock
+
+From DEPT's perspective, folio_lock(F1) and folio_lock(F2) are waits and
+folio_unlock(F1) and folio_unlock(F2) are events.  Since DEPT tracks
+dependencies with specified classes between waits and events, DEPT's
+interest in the following example is to detect a situation like:
+
+   < context X >
+
+   folio_lock(address_space_class'ed F1)
+   ...
+   folio_lock(anon_vma_class'ed F2)
+   ...
+   folio_unlock(anon_vma_class'ed F2)
+   ...
+   folio_unlock(address_space_class'ed F1)
+
+   < context Y >
+
+   folio_lock(anon_vma_class'ed any folio)
+   ...
+   folio_lock(address_space_class'ed any folio)
+   ...
+   folio_unlock(address_space_class'ed any folio)
+   ...
+   folio_unlock(anon_vma_class'ed any folio)
+
+However, the following pattern should be manually annotated by
+developers like using folio_lock_nested() or something.  DEPT cannot
+work with it automatically:
+
+   folio_lock(address_space_class'ed F1)
+   ...
+   folio_lock(address_space_class'ed F2)
+   ...
+   folio_unlock(address_space_class'ed F2)
+   ...
+   folio_unlock(address_space_class'ed F1)
+
+or
+
+   folio_lock(anon_vma_class'ed F1)
+   ...
+   folio_lock(anon_vma_class'ed F2)
+   ...
+   folio_unlock(anon_vma_class'ed F2)
+   ...
+   folio_unlock(anon_vma_class'ed F1)
+
+These should be explicitly annotated by developers if it's intended:
+
+   folio_lock(address_space_class'ed F1)
+   ...
+   folio_lock_nested(address_space_class'ed F2)
+   ...
+   folio_unlock(address_space_class'ed F2)
+   ...
+   folio_unlock(address_space_class'ed F1)
+
+or
+
+   folio_lock(anon_vma_class'ed F1)
+   ...
+   folio_lock_nested(anon_vma_class'ed F2)
+   ...
+   folio_unlock(anon_vma_class'ed F2)
+   ...
+   folio_unlock(anon_vma_class'ed F1)
+
+> folio F2?".  Essentially figuring out how we can track all folios in a
+> given mapping the same way, and making sure that we don't deadlock on
+> folios in the same mapping.
+
+At the moment, as I told you, DEPT cannot work with dependencies between
+the same class'ed folios.  However, it'd be much better if DEPT can work
+with even those cases.  Could you provide a scenario where a deadlock
+happens between the same class'ed ones?  Any idea how to detect for the
+cases?
+
+> If F1 and F2 are in different mappings, it's not a deadlock if F1 is in a
+> filesystem mapping and F2 is in its backing dev.  It's also not a deadlock
+> if F1 and F2 are both filesystem folios and the inodes are both locked.
+> See vfs_lock_two_folios() in fs/remap_range.c.
+
+Yeah.. DEPT is a tracker to track dependencies between waits and events
+even across different contexts, but not a magic unfortunately.  That
+lock ordering issue - with the same class'ed ones - should be resolved
+in the manual manner as vfs_lock_two_folios() does.
+
+> I have much less knowledge about anonymous memory locking order.
+> Maybe it doesn't happen.  Or about locking one anon and one file folio.
+> For slab memory, we don't sleep on PG_locked (it's used as a spinlock bit).
+> For other kinds of memory ... I don't know.  Page migration is fun.
+
+Anyway, the sophisticated classification you mentioned is necessary for
+DEPT to be better especially for folio locking mechanism.
+
+Thanks again!
+
+	Byungchul
