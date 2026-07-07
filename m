@@ -1,27 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBE13603EE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF32537DEAF;
 	Tue,  7 Jul 2026 03:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783393411; cv=none; b=mLxDq1G73krZY97kRYpTTHjCHRS4NAhKr9UAgjmr+qyPohKNWd+iF3BVnyTdxHZp6eN8k0a0KIrMD25BIPe496PkooQzDLW96V4RQN5MRygXokVWi6s/JTOjXVBhdrK1NJkI0OrekpM0MWhPibLWiBNRxe3Y8IcVB+AZukkI6xk=
+	t=1783393411; cv=none; b=Q772PxvsncFUB4YOzPwMjWogaIO+YLYs+yT9KS2vokr9ll2e/n5Yw7E3MwdIEkfpCJPU61klVaKLXkIJ5SR0guTbk8JRs39E+dhK71lkLr50vGW9wJAF7CaXjswrJXWCcCqN3sFLE+3C6lODscLAZ3EICj7MRFAdXCT2MJPJJfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783393411; c=relaxed/simple;
-	bh=Y6r/lTFeh0nvcefVzlTJlPXGRykjAcc5UD2R3uGvtLE=;
+	bh=EBimzj8Ww2a7zqmAx5myurPgLZr2qQ9ifNY4XLEZ+30=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n2Vn0mqUC01+WKJArUe15uKDxjtu6OtEGg1Dc8ZCMmgh7VDvhgmYqWfuIzRM8UBH45D46tjVYBvwt6Wci9ql1Kc/UDcOFqNfmGSGXVPBnEyq7GTImnQKIW6Zbe38JfyP5LStRAW208GKnwFal7M5Dy+wzVqeRw4IWgcfbcWXRWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=AB1bs2ml8lIcwi5YketsUtiYKbf0F9EkC1WCXHwEBPs3P35gmo4TI7VLPAta6ZCRQztQas/cy5hKxsn+GUbyVNfzntJnFlRAuPN/u/7DurGFPmtMaMhI+JiCkBvZMFKZmE0qAoai380ly/8rSOStoI7K7cEnfD1NOlxqSBQwVSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gvQyz4N80zYQtjv;
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gvQyz4w9CzYQtk2;
 	Tue,  7 Jul 2026 11:03:23 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 3F0A4406C8;
+	by mail.maildlp.com (Postfix) with ESMTP id 51D474056D;
 	Tue,  7 Jul 2026 11:03:26 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgA3SHR8bExq6ahUAQ--.61638S7;
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgA3SHR8bExq6ahUAQ--.61638S8;
 	Tue, 07 Jul 2026 11:03:26 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	yangerkun@huawei.com,
 	chengzhihao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [PATCH V2 3/6] null_blk: register configfs subsystem after creating default devices
-Date: Tue,  7 Jul 2026 10:55:39 +0800
-Message-ID: <20260707025542.1299859-4-wozizhi@huaweicloud.com>
+Subject: [PATCH V2 4/6] null_blk: move unregister_blkdev() after destroying dev in null_exit()
+Date: Tue,  7 Jul 2026 10:55:40 +0800
+Message-ID: <20260707025542.1299859-5-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260707025542.1299859-1-wozizhi@huaweicloud.com>
 References: <20260707025542.1299859-1-wozizhi@huaweicloud.com>
@@ -49,114 +49,60 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgA3SHR8bExq6ahUAQ--.61638S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxGrykGry8Ar17ur45ZFyrJFb_yoW5uFW8pF
-	WUWry7Kr18tF1Uur4jva10gF9xGa1vv3y8C34fCF1rZa13Ary5AF9IvayrGF4UG3yxAr4f
-	XasYvayrGa48Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
-	0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFF4i
-	UUUUU
+X-CM-TRANSID:cCh0CgA3SHR8bExq6ahUAQ--.61638S8
+X-Coremail-Antispam: 1UD129KBjvJXoW7Xr48Cw1UKFW3GF4kAFWUJwb_yoW8Jr43pr
+	45W340kr1jyF47Zr4UAa1xKFy5tan5tryj9rWUCa9YvrZ8Ary29w1Dtas8WF1UKw4xAr4S
+	vFyvqa4fJayDAF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E
+	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
+	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
+	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
+	AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI
+	0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7I
+	U1aLvJUUUUU==
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-From: Zizhi Wo <wozizhi@huawei.com>
+In null_exit(), unregister_blkdev() was called before the null_blk
+instances were destroyed, which is inconsistent with the cleanup order in
+null_init(). Move it after null_destroy_dev() so that teardown happens in
+the reverse order of initialization.
 
-In null_init(), configfs_register_subsystem() currently runs before
-register_blkdev(), so when null_blk is built as a module, a racing mkdir()
-+ poweron from userspace can reach null_add_dev() while null_major is still
-0. __add_disk() then hits WARN_ON(disk->minors) (major=0 with minors!=0)
-and fails:
+No functional change intended.
 
-[root@fedora ~]# [ 2366.521436] WARNING: block/genhd.c:476 at __add_disk+0x8a7/0xde0,
-[ 2366.523552] Modules linked in: null_blk(+) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
-[ 2366.529081] CPU: 26 UID: 0 PID: 1600 Comm: sh Not tainted 7.2.0-rc1+ #66 PREEMPT(full)
-......
-[ 2366.547251] Call Trace:
-[ 2366.547575]  <TASK>
-[ 2366.547831]  ? _raw_spin_lock+0x84/0xe0
-[ 2366.548260]  add_disk_fwnode+0x114/0x560
-[ 2366.548739]  null_add_dev+0x102d/0x1b80 [null_blk]
-[ 2366.549310]  ? __pfx_null_add_dev+0x10/0x10 [null_blk]
-[ 2366.549906]  ? mutex_lock+0xde/0x1c0
-[ 2366.550361]  ? __pfx_mutex_lock+0x10/0x10
-[ 2366.550827]  nullb_device_power_store+0x1e7/0x280 [null_blk]
-[ 2366.551499]  ? __pfx_nullb_device_power_store+0x10/0x10 [null_blk]
-[ 2366.552177]  ? __kmalloc_cache_noprof+0x1f5/0x470
-[ 2366.552748]  ? configfs_write_iter+0x35c/0x4e0
-[ 2366.553242]  configfs_write_iter+0x286/0x4e0
-[ 2366.553787]  vfs_write+0x52d/0xd00
-[ 2366.554169]  ? __pfx_vfs_write+0x10/0x10
-[ 2366.554679]  ? __pfx___css_rstat_updated+0x10/0x10
-[ 2366.555196]  ? fdget_pos+0x1cf/0x4c0
-[ 2366.555649]  ksys_write+0xfc/0x1d0
-......
-
-Additionally, the err_dev path destroys all devices on nullb_list while
-configfs is still registered. If a racing mkdir() + poweron puts a user
-device on the list, null_destroy_dev()->null_free_dev() kfrees the user
-device's nullb_device but /sys/kernel/config/nullb/<name> is still
-reachable. Any userspace access to the item will trigger a UAF.
-
-For simplicity, move configfs_register_subsystem() to the end to solve
-the problems above. This also mirrors null_exit().
-
-Fixes: 3bf2bd20734e ("nullb: add configfs interface")
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Zizhi Wo <wozizhi@huaweicloud.com>
 ---
- drivers/block/null_blk/main.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ drivers/block/null_blk/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 98f6935bb502..024c89b36ddc 100644
+index 024c89b36ddc..cab51301560e 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -2162,15 +2162,9 @@ static int __init null_init(void)
- 	config_group_init(&nullb_subsys.su_group);
- 	mutex_init(&nullb_subsys.su_mutex);
+@@ -2194,8 +2194,6 @@ static void __exit null_exit(void)
  
--	ret = configfs_register_subsystem(&nullb_subsys);
--	if (ret)
--		return ret;
+ 	configfs_unregister_subsystem(&nullb_subsys);
+ 
+-	unregister_blkdev(null_major, "nullb");
 -
- 	null_major = register_blkdev(0, "nullb");
--	if (null_major < 0) {
--		ret = null_major;
--		goto err_conf;
--	}
-+	if (null_major < 0)
-+		return null_major;
- 
- 	for (i = 0; i < nr_devices; i++) {
- 		ret = null_create_dev();
-@@ -2178,6 +2172,10 @@ static int __init null_init(void)
- 			goto err_dev;
+ 	mutex_lock(&nullb_global_lock);
+ 	while (!list_empty(&nullb_list)) {
+ 		nullb = list_entry(nullb_list.next, struct nullb, list);
+@@ -2203,6 +2201,8 @@ static void __exit null_exit(void)
  	}
+ 	mutex_unlock(&nullb_global_lock);
  
-+	ret = configfs_register_subsystem(&nullb_subsys);
-+	if (ret)
-+		goto err_dev;
++	unregister_blkdev(null_major, "nullb");
 +
- 	pr_info("module loaded\n");
- 	return 0;
- 
-@@ -2187,8 +2185,6 @@ static int __init null_init(void)
- 		null_destroy_dev(nullb);
- 	}
- 	unregister_blkdev(null_major, "nullb");
--err_conf:
--	configfs_unregister_subsystem(&nullb_subsys);
- 	return ret;
- }
+ 	if (tag_set.ops)
+ 		blk_mq_free_tag_set(&tag_set);
  
 -- 
 2.52.0
