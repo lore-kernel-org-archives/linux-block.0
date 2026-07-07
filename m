@@ -1,38 +1,43 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467C172618
-	for <linux-block@vger.kernel.org>; Tue,  7 Jul 2026 12:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABCF414A0F
+	for <linux-block@vger.kernel.org>; Tue,  7 Jul 2026 12:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783426941; cv=none; b=bblc+vm0TzAjKJJ2jZ4yoCBdevmz8UMZFG2UHftfK6W7WePEEIvr7UXA59RAxS1Y4FiRNTcrgf8GyP3A6W7uHZQcJjN+/7lmwsGV3i7NzedaDv9vTjwZlZAVARC+vqDPhYepSbPbDHFqXP2PWviaeGGEPzs8LjdxjQHAVMv+N1M=
+	t=1783429121; cv=none; b=nsoU3wpxPCTjpmjQRoGbY4Itw7UnewA2glE5pQxjpN0hVwenCM6UWXZpSSWWQ+syIUqnxX3XHQAH9wYM6DoYr/8Tufyhaso/Nj1jZw4DxcG88ScEkTlKS5geiVwbM3FnkVxLcjQuv08kAemeyghg8YuIpBHDwrLI/N969mNITZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783426941; c=relaxed/simple;
-	bh=G4KdD+lIcM+dhzydeWP0uxzjUzCoAG3SeAuTgjH9GZ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e814xhWBbOV/kGTOoSXKr265wpTDuJVf1neQ6kmXlxXx+XAtCJxmWQK3ZM5XxPRiQNuWdIRouF1XnEiW7rjXGppC0vErEmRm09wBYgRcGNSSjxyAoA1D5fUN1So7q8B7zNcfU0JrUkEaG5OPcObsSCr0xyGpxt3rSnUBTwHeKhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L8nJ+k/e; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1783429121; c=relaxed/simple;
+	bh=Avdmm5bCKj4UrKHrWWvOcEkT2IML9FcHGFEcZB+YUh8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nA4g3XtnsvcCTagWvyhV12LiH23rGTLCPJacMGhDIPpTzPQrs9jh8FSJs1y4EEr2K6MDon1yFcfnvt2h9flwW4m4fwyWBXGnWC3XHHQnRlCqrjNWReM3KikBOt5NX7usoaOrATV5ckVnOHwgha91i+0IHWaAT4oIHGHT100hbtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lyO+g6PR; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L8nJ+k/e"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lyO+g6PR"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783426928;
+	t=1783429107;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=sVWv41bmiFthdKDzNFxWXKqef1mAKb1CpuWBKlIUeDs=;
-	b=L8nJ+k/eVf8eejzLCr+sG4XaUIx6T0dxA9VZHZmqHzGVhlxmGzI6ii+a+S1kWeKPzbYcLa
-	FJePqpD1vC5gedSAGzbeeG2C7lvOfFWPm6XteHTqOuVGzuANh185b9pd+jLCYcmfz0FV3x
-	nIuyC2L44hMuuOL0FFYUPP6vLjdduLg=
+	bh=HNN6uJyAAz0ItIHp6/ioUA/ZbJe1X+Q07YJqCR6OCdE=;
+	b=lyO+g6PRlQDxDzStF6SI1LeCwufkepLhNzsYi90Ke0ATEp75EvURWSE1O4AFUnFBvPKzd8
+	WLicb2oYfnxscuOoic04D17IgWwfquk+j24TRXa3p9XNTUPP1Uql3oAu97aQbkzQ/hP9a8
+	ubuka1tQB1SHSzFFV+tv58tJdur2s38=
 From: Guopeng Zhang <guopeng.zhang@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Yu Kuai <yukuai@fygo.io>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Guopeng Zhang <guopeng.zhang@linux.dev>,
 	Guopeng Zhang <zhangguopeng@kylinos.cn>
-Subject: [PATCH] blk-ioprio: fix stale prio_policy kernel-doc
-Date: Tue,  7 Jul 2026 20:21:55 +0800
-Message-ID: <20260707122155.1696613-1-guopeng.zhang@linux.dev>
+Subject: [PATCH] blk-cgroup: clear blkg->pd[] with WRITE_ONCE() in blkcg_deactivate_policy()
+Date: Tue,  7 Jul 2026 20:58:14 +0800
+Message-ID: <20260707125814.1978139-1-guopeng.zhang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,39 +49,33 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Guopeng Zhang <zhangguopeng@kylinos.cn>
 
-Fix two stale kernel-doc entries in blk-ioprio. The
-POLICY_PROMOTE_TO_RT comment should describe promotion from
-non-IOPRIO_CLASS_RT classes, and @prio_policy stores enum prio_policy
-values rather than IOPRIO_CLASS_* values.
+blkcg_activate_policy() installs blkg->pd[] entries with WRITE_ONCE()
+and also uses WRITE_ONCE() when clearing them on its error path.
+blkg_to_pd() is used by RCU readers and reads the same array with
+READ_ONCE().
 
+blkcg_deactivate_policy() clears the entry with a plain store. Use
+WRITE_ONCE() there as well.
+
+Fixes: 56cc24f59c14 ("blk-cgroup: don't nest queue_lock under rcu in blkcg_print_blkgs()")
 Signed-off-by: Guopeng Zhang <zhangguopeng@kylinos.cn>
 ---
- block/blk-ioprio.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index 8fa8bca35062..a94c50233d90 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -23,7 +23,8 @@
- /**
-  * enum prio_policy - I/O priority class policy.
-  * @POLICY_NO_CHANGE: (default) do not modify the I/O priority class.
-- * @POLICY_PROMOTE_TO_RT: modify no-IOPRIO_CLASS_RT to IOPRIO_CLASS_RT.
-+ * @POLICY_PROMOTE_TO_RT: promote non-IOPRIO_CLASS_RT classes to
-+ *		IOPRIO_CLASS_RT.
-  * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
-  *		IOPRIO_CLASS_BE.
-  * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
-@@ -52,7 +53,7 @@ static struct blkcg_policy ioprio_policy;
- /**
-  * struct ioprio_blkcg - Per cgroup data.
-  * @cpd: blkcg_policy_data structure.
-- * @prio_policy: One of the IOPRIO_CLASS_* values. See also <linux/ioprio.h>.
-+ * @prio_policy: One of the POLICY_* values defined by enum prio_policy.
-  */
- struct ioprio_blkcg {
- 	struct blkcg_policy_data cpd;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index d2a1f5903f24..a1dd69f99f5c 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1691,7 +1691,7 @@ void blkcg_deactivate_policy(struct gendisk *disk,
+ 			if (blkg->pd[pol->plid]->online && pol->pd_offline_fn)
+ 				pol->pd_offline_fn(blkg->pd[pol->plid]);
+ 			pol->pd_free_fn(blkg->pd[pol->plid]);
+-			blkg->pd[pol->plid] = NULL;
++			WRITE_ONCE(blkg->pd[pol->plid], NULL);
+ 		}
+ 		spin_unlock(&blkcg->lock);
+ 	}
 -- 
 2.43.0
 
