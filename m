@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495821386C9;
-	Tue,  7 Jul 2026 04:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC18D70836;
+	Tue,  7 Jul 2026 04:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783397795; cv=none; b=uUur5iYDWtZKeXPJLwD0uax5FkVdBSgnb6/Ow3kYvQp0yxk4EVeXkWlCIQqzpMVb/mYlWfJ/4SUET2nT38+kOD6yXtvPgsMEifQkpfULWiWhSJAEePECgqdDPUL/peka/zuskGBXUgIuh+3zP2aBABL+XyntFjbF8TMl3fvLLyo=
+	t=1783397884; cv=none; b=iz1V46cyudpVAeLxIHByhGVs9DzvhWxxl/HsmUKu4RXila3Q1bXJEXBDc0kS6qWInTzHg/AVZVtKbQGHeDIRMbfcOaZBy85tnbHbd9Sa+kfTWM+UAO+J0smv4l+cYmEUS2OdB1kvqqkZzovTK9My17/b52gWCHnHN1LG/RTMlvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783397795; c=relaxed/simple;
-	bh=yPB1qQAo2YKyrfBFTU3zn2/qTf8euUAWSo0o5zaGY9w=;
+	s=arc-20240116; t=1783397884; c=relaxed/simple;
+	bh=QF8mVjX8IIrE/53BB1Ev0Shy7PrSJ7cJTRxaJKnhcbc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YxpmglbV2gB/0SMQC4x9ZFHuJ8S+XQRsIIfJWA/bPBt97AS7V4dY3esO6SVvHzCQxNV7XgT9ABSMOID+C5UegrNyxmPuqKSZaQVrFDuUEpocdxp3tuxuE9h1kZS85g8Lx8Ix2bH1gUFYFEE4mEz8+z0wmL6dl6PLuyost28mEHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UwKULv8T; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=dMNDySVoOO5O3seRQXyT6gn8OfqTDPEX2zS6ml+7Ty0jnkNYPznsA3mWaSgfuzjzf5/aJh0y6Q42TRTy/SRaHNzu/zVs5D47mbww3WjY9mEz8CYetHwRpMx9AdQKUih86RUOnrcfqvLJD213OI/hBS7ybUi9Y2ff/Z/1zzjypEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJt3gv+M; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UwKULv8T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2706B1F000E9;
-	Tue,  7 Jul 2026 04:16:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJt3gv+M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD6541F000E9;
+	Tue,  7 Jul 2026 04:18:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783397793;
-	bh=DNYrtg9ouhD1UCkr2Oc3ploskcIbVJXx+Zuka9SPV0E=;
+	s=k20260515; t=1783397883;
+	bh=SNRxr4zQ6HOifpngaa6brHBRqw26BzuaHAbkvSeDAeU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=UwKULv8TtiubjasgEoM0VDiBlCsXe9aR0T9CJZQawQNpQNynDsyYU6abmp640O1sb
-	 eMMEoOXg5NWRJS1vyUUc3pNKY3x1tJGUeAHhhwtAsX5EC5DTqpQQzA/28gL5gmDg6I
-	 U3+6QwdzlrkasiBPcvvYUJkAuui3aTplXdwdzyMMERmoiJAoePgFaVy2qIrZpwQOP/
-	 rdR4GKf91FOaFP6ga6OR8SiAG2iuY23jblxyxTY1FvLFUUTSpEHaiXyA5SL/RzsHpj
-	 tgdR6yseVps1ZYKKsfGliqybz/A/eYXtY61f8IG8/RqLTQu+e2dk0N/X0gnUwcGcp6
-	 U1XES8swhNwAA==
-Message-ID: <0ab391b1-20e2-4ae9-a606-7111014e489c@kernel.org>
-Date: Tue, 7 Jul 2026 13:16:30 +0900
+	b=cJt3gv+MyYvh9dBwqNiO6L+gHRpGI15cHu3O/3s1HirJgkjB7664f/dBL1NHNXRv7
+	 faOZTO4RlKSfO1QON0TaqfEO8lkjZGRmzwwSfxhnnHlPzpeT5alYVaH0lU3QajH7fO
+	 hElcjsaIzJZZGKbwCsWZA/oRDwzOoG7iFDxqk2qVRXbNJ3mcbHVK/Ub8krYXfs4ZQO
+	 9s8ynO32mOpkscjYBmciUy8ITYlOS21oOBJJpQssGQnULRtgpRuy2W+n9uVVixYBzA
+	 ahE4bzaSVGQfkqHUN+vPdSAWYakZN1H8ktjdW5E7ZiARnYwXb+o89mSSV9SPoYgdeO
+	 v5leB388HOdWQ==
+Message-ID: <ca15dc52-d2ee-4fef-8c3d-6b8425e7afb7@kernel.org>
+Date: Tue, 7 Jul 2026 13:18:00 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,86 +35,70 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/6] null_blk: give the file-scope mutex a descriptive
- name
+Subject: Re: [PATCH V2 3/6] null_blk: register configfs subsystem after
+ creating default devices
 To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, nilay@linux.ibm.com,
  linux-block@vger.kernel.org, kch@nvidia.com, johannes.thumshirn@wdc.com,
  kbusch@kernel.org, bvanassche@acm.org
 Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
  chengzhihao1@huawei.com, wozizhi@huawei.com
 References: <20260707025542.1299859-1-wozizhi@huaweicloud.com>
- <20260707025542.1299859-3-wozizhi@huaweicloud.com>
+ <20260707025542.1299859-4-wozizhi@huaweicloud.com>
 Content-Language: en-US
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20260707025542.1299859-3-wozizhi@huaweicloud.com>
+In-Reply-To: <20260707025542.1299859-4-wozizhi@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 7/7/26 11:55, Zizhi Wo wrote:
 > From: Zizhi Wo <wozizhi@huawei.com>
 > 
-> The file-scope lock mutex serializes access to global null_blk state,
-> including the nullb_list and device creation/removal. Rename it to
-> "nullb_global_lock" to make its purpose clear. No functional change.
+> In null_init(), configfs_register_subsystem() currently runs before
+> register_blkdev(), so when null_blk is built as a module, a racing mkdir()
+> + poweron from userspace can reach null_add_dev() while null_major is still
+> 0. __add_disk() then hits WARN_ON(disk->minors) (major=0 with minors!=0)
+> and fails:
 > 
-> Suggested-by: Bart Van Assche <bvanassche@acm.org>
+> [root@fedora ~]# [ 2366.521436] WARNING: block/genhd.c:476 at __add_disk+0x8a7/0xde0,
+> [ 2366.523552] Modules linked in: null_blk(+) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
+> [ 2366.529081] CPU: 26 UID: 0 PID: 1600 Comm: sh Not tainted 7.2.0-rc1+ #66 PREEMPT(full)
+> ......
+> [ 2366.547251] Call Trace:
+> [ 2366.547575]  <TASK>
+> [ 2366.547831]  ? _raw_spin_lock+0x84/0xe0
+> [ 2366.548260]  add_disk_fwnode+0x114/0x560
+> [ 2366.548739]  null_add_dev+0x102d/0x1b80 [null_blk]
+> [ 2366.549310]  ? __pfx_null_add_dev+0x10/0x10 [null_blk]
+> [ 2366.549906]  ? mutex_lock+0xde/0x1c0
+> [ 2366.550361]  ? __pfx_mutex_lock+0x10/0x10
+> [ 2366.550827]  nullb_device_power_store+0x1e7/0x280 [null_blk]
+> [ 2366.551499]  ? __pfx_nullb_device_power_store+0x10/0x10 [null_blk]
+> [ 2366.552177]  ? __kmalloc_cache_noprof+0x1f5/0x470
+> [ 2366.552748]  ? configfs_write_iter+0x35c/0x4e0
+> [ 2366.553242]  configfs_write_iter+0x286/0x4e0
+> [ 2366.553787]  vfs_write+0x52d/0xd00
+> [ 2366.554169]  ? __pfx_vfs_write+0x10/0x10
+> [ 2366.554679]  ? __pfx___css_rstat_updated+0x10/0x10
+> [ 2366.555196]  ? fdget_pos+0x1cf/0x4c0
+> [ 2366.555649]  ksys_write+0xfc/0x1d0
+> ......
+> 
+> Additionally, the err_dev path destroys all devices on nullb_list while
+> configfs is still registered. If a racing mkdir() + poweron puts a user
+> device on the list, null_destroy_dev()->null_free_dev() kfrees the user
+> device's nullb_device but /sys/kernel/config/nullb/<name> is still
+> reachable. Any userspace access to the item will trigger a UAF.
+> 
+> For simplicity, move configfs_register_subsystem() to the end to solve
+> the problems above. This also mirrors null_exit().
+> 
+> Fixes: 3bf2bd20734e ("nullb: add configfs interface")
 > Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-> ---
->  drivers/block/null_blk/main.c | 32 ++++++++++++++++----------------
->  1 file changed, 16 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index eba204b27785..98f6935bb502 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -66,7 +66,7 @@ struct nullb_page {
->  #define NULLB_PAGE_FREE (MAP_SZ - 2)
->  
->  static LIST_HEAD(nullb_list);
-> -static DEFINE_MUTEX(lock);
-> +static DEFINE_MUTEX(nullb_global_lock);
 
-Since this seem to protect only the device list, why not simply call this
-nullb_list_lock ?
+Looks good.
 
->  static int null_major;
->  static DEFINE_IDA(nullb_indexes);
->  static struct blk_mq_tag_set tag_set;
-> @@ -423,9 +423,9 @@ static int nullb_apply_submit_queues(struct nullb_device *dev,
->  {
->  	int ret;
->  
-> -	mutex_lock(&lock);
-> +	mutex_lock(&nullb_global_lock);
->  	ret = nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
-> -	mutex_unlock(&lock);
-> +	mutex_unlock(&nullb_global_lock);
-
-Nothing in nullb_update_nr_hw_queues() touches the device list. So it is very
-odd that nullb_global_lock is used for serialization here instead of a
-nullb_device mutex. If you change this, why not a prep patch to introduce such a
-mutex ?
-
->  
->  	return ret;
->  }
-> @@ -435,9 +435,9 @@ static int nullb_apply_poll_queues(struct nullb_device *dev,
->  {
->  	int ret;
->  
-> -	mutex_lock(&lock);
-> +	mutex_lock(&nullb_global_lock);
->  	ret = nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
-> -	mutex_unlock(&lock);
-> +	mutex_unlock(&nullb_global_lock);
-
-Same here.
-
->  
->  	return ret;
->  }
-
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
 -- 
 Damien Le Moal
