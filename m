@@ -1,61 +1,63 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504C2373C00
-	for <linux-block@vger.kernel.org>; Wed,  8 Jul 2026 15:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E30409288
+	for <linux-block@vger.kernel.org>; Wed,  8 Jul 2026 15:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783525567; cv=none; b=pdRI+3X72d4YEcNlFqdJBPeSDCMkvERmBx0QUYke+OS/17Ojub7Gel4gJ0CTFh9aJKVh78e6MRhv5OWK4j8qLVMGgDdT0ewP1JdzcjzhlA7L5FznzvShQRnSkFjV/i76CH32sqR3PjDG5uxPPDUKxKMISN6ppSKfMzfA0npPbmE=
+	t=1783525571; cv=none; b=NLmC56hZOVNg5H9SlSOWE72NJxESusP2kOgC2hxIZFKvaqdPhT7v3khC4X1BSHGamur2nRAo3/nHHdKWh93rjBJNnZ760NM/1o3H4GGBrEM0l0jXAIWBewki6W8Pbu6XSad5uuByrFaxoOZpIWWXRkfVThEArRhRePi4scSubOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783525567; c=relaxed/simple;
-	bh=9vHkvbT9qGw6XnwnbsV8mVwKGJQJ6h+q3CIzqn5nO9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R/7MOW/1HYmjDdAduTCXjTkQ2muehTJtSkWiaizbP2RGH5gvboM7LDTPXhSF4j6dZsUxXNEj3HUBsePVhW3/UyAwiF+SxbbGtL5Lg94eLv9v3Q4iAdKnJFiSC0d4E+mfjry5neFQU0U0GEFBxlhrSWIGnLrzIv/SbdMTvpycEZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=V9o0/GIU; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1783525571; c=relaxed/simple;
+	bh=6o/Os/YHoHLpbGBJ/Oz87lOS4kylKBP062qGBWElKsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M4Bkm2KB/fyHNj4MQL4nNGj+x2EFNPOuV7B3K1+lqzbDkGu2XKXhs/s9vM44W4OCK80ClR0gZdLmIjUH27ytm/OLJGpqdS1ePlf4WxYTdHe3F93Y46S6RCp0IIH9CgrzZpyO2uufCVzkFUWl0fgjNhYXtrXcYnm8yh0v136PikI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=F/xDcraq; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="V9o0/GIU"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-474560436c3so803969f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2026 08:46:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="F/xDcraq"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4720d22c94aso808528f8f.1
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2026 08:46:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783525562; x=1784130362; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=f/mdlbu7kxNAYQt2PwbA0grJPU5KW1EejarCbBPlRO8=;
-        b=V9o0/GIUUfwXKE6Si0vT9XcZGfRtCEAITKFydTRSMtxOkifhRtmp/MtdeuBSvQjlah
-         GKs0jcAl1dbNwep3X2epdX94A1E2PRCE/RJiQzscSyYA+100AJlBrKKtfaJDQR7m4qkR
-         MweaN2SaoTQVXZzo+CbE6iStSMIrM4q/CBP5yJG7R81GdmoVDUVD+GVaUICIey6oYKd8
-         c0/nveapDqgLkjDAcqEvEelk984mV+G/mTYHz2PA9ukpzmVGFCRmoyUTJUuTmnoF/KXq
-         /H2ps2dV9sdcW0mO39x4tQ2SC1Bv8NBxCJ8uQ5aycxoeyR9m8B7y7ZQSTbchyM/Rw7cS
-         uAKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783525562; x=1784130362;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1783525566; x=1784130366; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=f/mdlbu7kxNAYQt2PwbA0grJPU5KW1EejarCbBPlRO8=;
-        b=GE/6r3u7qsGLCE1ox+ea3h/W0sii0b4r6MFR2/KgNQvHjxZbGyxdge7DG4DjieuIX8
-         u5pSdkS+uIFVuPQDWWw6sorfIR5DLkGRtbzMPRw2CxpRUkAFr1zXzqJ3wdF9nBOwAssr
-         Qa+UKlzdMgsWNwwaJlpAIng0/xtNZwk7/b6P8D3LagWfmoeIK7XxiyLVO8u6CxWCqZ3K
-         vcaudcaungLrO0vBnvnnJQhdZYzpQkOhYQyNpgHoL9eahY9WN7wkXikofiTZpfCsSIjt
-         5NFqJEMASjmEspfzffwwFAueTywoLs88+Jo5jPZZrHjJ2HPDbOUhZ7bOLtaYOP4j3rNo
-         aOKg==
-X-Forwarded-Encrypted: i=1; AHgh+Rrp+C85xjZBKmFHzOWmjEK2jgTVxnV/LLKha341aAn964Z4z8brZqIQAzJ4ETvzfZ/oOW0fi5iM/IBzTQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM/uNHLkdbBFug1035pz8ABTS0REKpB3eo4EB6Z8itjAK1X3I2
-	DdzMmB0bbubYPZE4o2fO1/+FYi34PiNFdcx28t5TqJ8jUkVwMSrX0si6YKEZhuR0VI4=
-X-Gm-Gg: AfdE7ckKtD0cEf5DpPvrH1QOgwZ5K7HTg9dyfpWQ/CpHt1Q5NLPFBjLBQQ4JHcbEgVj
-	+iL0JNfU41vWkobo/B64ZP96wFS/8/Up3nETSKMQpQIrfcRaP92r3WQxltvYseelCoqEerm7gJR
-	wvr36z0syPKNggnH1j5RXMkFtNzvSD/7xrUbXlxIp11/ILwBBhPtroAraB/j3fbIMC+sl0+tEd2
-	tkZVFCck/XG8RtlIj0ojVqod1ayhtq2WVgtMlZijRVydXEYYFK+WiJOOpAGoH04XOqon9mdC/tk
-	qgCGzlqR2nqHsgNhyKsh+ZN8mzByM/E3piXWuU03TnFPLyUFTvf3lBWGxpLcs5V9Fhl/0Bk7Jha
-	GxEo0c2HmFF6LMx9LP8vrJjEjj3xdl/4InIrRm+drQxzwCIzbIG/nEsr4bgt/z5jrQQgwZALM9n
-	xhlFH/9GbCR1xclKNncO8HctXER6Ro3LhpxUWIKxpY
-X-Received: by 2002:a05:6000:4304:b0:46d:55a5:8ec5 with SMTP id ffacd0b85a97d-47df078bbffmr3378920f8f.33.1783525561596;
-        Wed, 08 Jul 2026 08:46:01 -0700 (PDT)
+        bh=DFzX8ayLrWD5LLPflyw5iQn6+h660qomUnmCAVS4si0=;
+        b=F/xDcraqE7zjRny9dGpElvcrYP+TvLHulDUmHNdZhg0hx4k/ecCY84wCOji4oou5cz
+         VXJpUOkuokde7MMu0flycEjUugRu4z0NFWPcqjYItrQ3J4nRTl3+vzC1w1b3HnpGNxdf
+         H64963aqUef7jrOhAPDPzwH79R8InoYlihBzie9t14dqKK4Fl1xxfHrt+T3uIIp5iYi4
+         gfE2K5QZBbk3aiPJN4k0Xu9STGQab/mn2KuaphtmU3Nl1u9Dmd/gQc4sqc0+srk3Dgcr
+         JHFdBIBj+w+scyPJLw/BVf9V6UaVNl407BpnFBOfTrzUF22wnSL5rqwEUY1MvfPw1fLm
+         ueMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783525566; x=1784130366;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DFzX8ayLrWD5LLPflyw5iQn6+h660qomUnmCAVS4si0=;
+        b=Hj753o4GKCWXX3efkSNi6UR8mTUinBbgZ+hPUx66vnisrcUqInxLJGogOwaVkDcHvU
+         W1y4dfrWHJcpnzofBvfbfE8wgneLXHT/snOx8/ya6vVZXEVh5vjGgnjfYOmUpkF0LXad
+         9LUPkPZfn2ylzMCOxSKM98/2MZjiOMJ2iIvztypRS1/Utes89Y/8ehd7K0HTSQPzFDKq
+         n6ED3zxFn7zX4KaoN68n6mkzxyxFq4qfLCa8wAoq6t0aPYz8mtxk1I8wot+qXWlKxYVh
+         fxe6q4oOjPWrcvZaQ1eXqD9crdXfhMTNyf1TLU6BjiXP9oO7S64Fm5p8iwgr+Nh50IQw
+         Lmzg==
+X-Forwarded-Encrypted: i=1; AHgh+Rp/vAYXXquiKWFBtIQLK379s4e6X0hMrJi+Lr4UDhvCeVkfs8DgJLfdigq9BVfO5mLRo+WMUxFKYb/WRg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXlTmt715dGmnsLBwoBXiWneA+WO2u7zpDO9qf5gg9kiJvoXEa
+	vmHuja1W/0jMoYzt07/6rYumn1vw26/sDkPr+gkzbmmDcFo3E1Y80WHCE+ME7O+7FC0=
+X-Gm-Gg: AfdE7clJ6oH4FykjGC2CTBJMYZYOq45prXC03/YppZJC7ksIkBR24LxSs6Rxbeu9aWC
+	QuAi7rfUi5rt2GknzNbzHZQyt+TAMEqia7R3/w2rqBRLoMW+Xlb6ybcf7D3t6fP1Zqtz4yYoNGQ
+	8+6OL26zo+Pbl8t9cyyp/ldeNZ/Rx7KBh03WBUBjb3WVhZ5Ex4lmsPrG2QNMcFww47lXwm9ZMrB
+	4vRkHYT02YJF2X44+LSoOrqshEJGhMnEQH8iJXGbLWsuXEgGzRf1Ej8/p+qJU9BADT1fqFUrpUZ
+	IsxslSUR4yhFM8ZM2zWdTosLI6QaWu6GRJFLEEwXPQKhEcGt1bgg83IGj4RFe4wdsZJKAaxuWVF
+	eRF5JiYi9x4w070Cs3Y5Yc3pGWi6YubEtDetGij+nr2N5Y2RMfYkUi9EQVjJUguc57mUMT8gMtf
+	PHjocaBeOguEWf30zSt6C9C0sl6DGjNA==
+X-Received: by 2002:a05:6000:26d0:b0:473:673e:3836 with SMTP id ffacd0b85a97d-47df078bb73mr3861713f8f.28.1783525565920;
+        Wed, 08 Jul 2026 08:46:05 -0700 (PDT)
 Received: from zovi.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d780csm44806847f8f.11.2026.07.08.08.45.59
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d780csm44806847f8f.11.2026.07.08.08.46.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 08:46:01 -0700 (PDT)
+        Wed, 08 Jul 2026 08:46:05 -0700 (PDT)
 From: Petr Pavlu <petr.pavlu@suse.com>
 To: Tony Luck <tony.luck@intel.com>,
 	Borislav Petkov <bp@alien8.de>,
@@ -134,10 +136,12 @@ Cc: linux-edac@vger.kernel.org,
 	netdev@vger.kernel.org,
 	keyrings@vger.kernel.org,
 	linux-security-module@vger.kernel.org
-Subject: [PATCH 0/2] Bring includes in linux/kmod.h up to date
-Date: Wed,  8 Jul 2026 17:44:28 +0200
-Message-ID: <20260708154510.6794-1-petr.pavlu@suse.com>
+Subject: [PATCH 2/2] module: Bring includes in linux/kmod.h up to date
+Date: Wed,  8 Jul 2026 17:44:30 +0200
+Message-ID: <20260708154510.6794-3-petr.pavlu@suse.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260708154510.6794-1-petr.pavlu@suse.com>
+References: <20260708154510.6794-1-petr.pavlu@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -146,54 +150,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The usermode helper declarations were previously provided by linux/kmod.h
-but commit c1f3fa2a4fde ("kmod: split off umh headers into its own file")
-moved them to linux/umh.h in 2017. Add explicit includes of linux/umh.h to
-files that use usermode helpers and remove linux/kmod.h where it is no
-longer needed.
+Including linux/kmod.h alone results in 1.5 MB of preprocessed output, even
+though it provides only a few functions and macros.
 
-Then clean up linux/kmod.h so that it includes only the headers that it
-actually requires, importantly removing the compat linux/umh.h include.
+The header currently depends on:
 
-Apologies for the wide distribution.
+* __printf() -> linux/compiler_attributes.h,
+* ENOSYS -> linux/errno.h,
+* bool -> linux/types.h.
 
-This cleanup is motivated by trying to reduce the preprocessed size of
-linux/module.h, which includes linux/kmod.h. The linux/module.h header is
-included by every *.mod.c file to provide `struct module` and other related
-definitions, so it should avoid pulling in unnecessary dependencies. Note
-that this series doesn't immediately improve the situation, since most of
-the files included by linux/kmod.h are, for now, also included by
-linux/module.h through other paths.
+Include only these files, reducing the preprocessed output to 10 kB.
 
-Petr Pavlu (2):
-  umh, treewide: Explicitly include linux/umh.h where needed
-  module: Bring includes in linux/kmod.h up to date
+Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
+---
+ include/linux/kmod.h | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
- arch/x86/kernel/cpu/mce/dev-mcelog.c |  2 +-
- drivers/block/drbd/drbd_nl.c         |  1 +
- drivers/greybus/svc_watchdog.c       |  1 +
- drivers/macintosh/windfarm_core.c    |  1 +
- drivers/pnp/pnpbios/core.c           |  2 +-
- drivers/video/fbdev/uvesafb.c        |  1 +
- fs/coredump.c                        |  2 +-
- fs/nfs/cache_lib.c                   |  2 +-
- fs/nfsd/nfs4layouts.c                |  2 +-
- fs/nfsd/nfs4recover.c                |  1 +
- fs/ocfs2/stackglue.c                 |  1 +
- include/linux/kmod.h                 | 12 ++----------
- kernel/cgroup/cgroup-v1.c            |  1 +
- kernel/module/kmod.c                 |  1 +
- kernel/power/process.c               |  2 +-
- kernel/reboot.c                      |  2 +-
- kernel/umh.c                         |  2 +-
- lib/kobject_uevent.c                 |  2 +-
- net/bridge/br_stp_if.c               |  2 +-
- security/keys/request_key.c          |  2 +-
- security/tomoyo/common.h             |  2 +-
- 21 files changed, 22 insertions(+), 22 deletions(-)
-
-
-base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+diff --git a/include/linux/kmod.h b/include/linux/kmod.h
+index 9a07c3215389..b9474a62a568 100644
+--- a/include/linux/kmod.h
++++ b/include/linux/kmod.h
+@@ -2,17 +2,9 @@
+ #ifndef __LINUX_KMOD_H__
+ #define __LINUX_KMOD_H__
+ 
+-/*
+- *	include/linux/kmod.h
+- */
+-
+-#include <linux/umh.h>
+-#include <linux/gfp.h>
+-#include <linux/stddef.h>
++#include <linux/compiler_attributes.h>
+ #include <linux/errno.h>
+-#include <linux/compiler.h>
+-#include <linux/workqueue.h>
+-#include <linux/sysctl.h>
++#include <linux/types.h>
+ 
+ #ifdef CONFIG_MODULES
+ /* modprobe exit status on success, -ve on error.  Return value
 -- 
 2.54.0
 
