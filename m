@@ -1,167 +1,105 @@
-Received: from luna.linkmauve.fr (82-65-109-163.subs.proxad.net [82.65.109.163])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992DD3EF0C9;
-	Wed,  8 Jul 2026 07:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.65.109.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8771B3E44E6;
+	Wed,  8 Jul 2026 07:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783496466; cv=none; b=Oky8FKPFHFom1888qQJIPW/T1Q1slcl2Cngr0gEuLg/oWHWdZAZBhnK9p8xue4SLyK/6OWOpLSUVwqnYAM/fL1W6kouroe/tC4g66seB1ajW/MylqbIhnV68EsD2zX/AeWcF3igzow4KjDtliRb+4lbzyslZBI191iszS3Q1bIY=
+	t=1783496838; cv=none; b=kyd555HWe7tOdHefhjjDuP5znrRBY1BkjLA4D/434u9fbLQXziX+0t2+/pOywtiYGgkE8N9yL3hGzP2ieYmfgSr1qlH2wEJPhbxnF270KDqwk9TgDXYE9osdevE5hKWfQYDqhPFV1sIeNgHnvHz1pXWc8nx4qewtVXS7DsnJQEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783496466; c=relaxed/simple;
-	bh=kQi3t//9JIKO0BDRcuw6+XDGAmEoWle1uAhS6hLB43M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oAIAKWpmDo1gO4LOKkMUnXS2XSlXIqunCLV+f5gZdUed6MmVzx78XXNpQ5A/fNY+Dqb7I7FVnfs80jMXx5oAnJM10cu6n0DhiEmY4frU7k4xnbG1NCxFW3/iyszX4g/QgbO8AR6TfI2WYhAlJCaVU2VRi9K1QYjmyCSs45asTng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linkmauve.fr; spf=pass smtp.mailfrom=linkmauve.fr; arc=none smtp.client-ip=82.65.109.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linkmauve.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linkmauve.fr
-Received: by luna.linkmauve.fr (Postfix, from userid 1000)
-	id 40BC0F40B7A; Wed, 08 Jul 2026 09:40:45 +0200 (CEST)
-Date: Wed, 8 Jul 2026 09:40:45 +0200
-From: Link Mauve <linkmauve@linkmauve.fr>
-To: Guru Das Srinagesh <linux@gurudas.dev>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH] block: rnull: use vertical import style
-Message-ID: <ak3-_Y0p1D7YnitH@luna>
-References: <20260705-rfl-vert-imp-2-v1-1-e6ab69c55095@gurudas.dev>
+	s=arc-20240116; t=1783496838; c=relaxed/simple;
+	bh=GeDHGYVbHREzQt1BYSe2uGobGGJv8ropWxrQKLOvrc0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=I7CjYz6vMg9L5CNOGyQqrlpNAqYa1NicedSiiHqD+n54i7NGqNScKC3CbqsrkLOG2uWktjxRJ5HYeoi+g1cxf40a+GObAbweY1SZo2khDj5OD7Ol8DJLWdHHxq7hkixA7ipSmKNe0T9IzZ4eiDg0P8qcBrKRiFnEBu4hL8Anbqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gw9Cn1XHYzYQtl1;
+	Wed,  8 Jul 2026 15:47:01 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id DCA0A40B4D;
+	Wed,  8 Jul 2026 15:47:05 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgCnt3N4AE5qQOTkAQ--.19577S8;
+	Wed, 08 Jul 2026 15:47:05 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	nilay@linux.ibm.com,
+	kch@nvidia.com,
+	johannes.thumshirn@wdc.com,
+	kbusch@kernel.org,
+	bvanassche@acm.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huawei.com
+Subject: [PATCH V3 4/6] null_blk: free global tag_set on init error path
+Date: Wed,  8 Jul 2026 15:39:15 +0800
+Message-ID: <20260708073917.2172392-5-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260708073917.2172392-1-wozizhi@huaweicloud.com>
+References: <20260708073917.2172392-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260705-rfl-vert-imp-2-v1-1-e6ab69c55095@gurudas.dev>
-Jabber-ID: linkmauve@linkmauve.fr
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgCnt3N4AE5qQOTkAQ--.19577S8
+X-Coremail-Antispam: 1UD129KBjvJXoW7JF48uryDXrWkArWUKw48WFg_yoW8Jr17pF
+	WUWa1UKryYkF17ZFWUAw4IkFy5Ga1kJryUKryak34F9r43Ar9Fkr1ktF98XF1UX393JrZa
+	vFn3XFyrJFWDGFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E
+	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
+	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
+	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
+	AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI
+	0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7I
+	U1aLvJUUUUU==
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-On Sun, Jul 05, 2026 at 06:36:48PM -0700, Guru Das Srinagesh wrote:
-> Convert `use` imports to vertical layout for better readability and
-> maintainability.
-> 
-> Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+From: Zizhi Wo <wozizhi@huawei.com>
 
-This one is:
-Reviewed-by: Link Mauve <linkmauve@linkmauve.fr>
+If shared_tags is enabled, null_setup_tagset() allocates the global tag_set
+via null_init_global_tag_set(). If device creation later fails, err_dev
+destroys the default devices and calls unregister_blkdev(), but never frees
+the global tag_set. Since module init failed, null_exit() is never invoked,
+so the global tag_set's tags and maps are permanently leaked.
 
-Thanks!
+Free the global tag_set in err_dev, matching null_exit() which does
+if (tag_set.ops) blk_mq_free_tag_set(&tag_set).
 
-> ---
-> Came across a recent commit bc58905eb07 ("samples: rust_misc_device: use
-> vertical import style") and found a few more locations that could
-> benefit from this cleanup. No functional changes.
-> 
-> Separating out patches per-subsystem as per the review feedback in [0].
-> 
-> Tested via:
-> 
-> 	$ make LLVM=1 rustfmtcheck || echo "fail"
-> 	$
-> 
-> Initially thought that rust-for-linux/rust-block-next was the right base
-> branch to use, which is why I didn't group this with [1] based on
-> rust-next that I sent out a short while ago. Using rust-next as base for
-> this patch.
-> 
-> [0]: https://lore.kernel.org/lkml/20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev/
-> [1]: https://lore.kernel.org/lkml/20260705-rfl-vert-imp-v1-1-2f07946a905f@gurudas.dev/
-> ---
->  drivers/block/rnull/configfs.rs | 25 ++++++++++++++++++++-----
->  drivers/block/rnull/rnull.rs    | 13 ++++++++++---
->  2 files changed, 30 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-> index 7c2eb5c0b722..2149b47db697 100644
-> --- a/drivers/block/rnull/configfs.rs
-> +++ b/drivers/block/rnull/configfs.rs
-> @@ -1,15 +1,30 @@
->  // SPDX-License-Identifier: GPL-2.0
->  
-> -use super::{NullBlkDevice, THIS_MODULE};
-> +use super::{
-> +    NullBlkDevice,
-> +    THIS_MODULE, //
-> +};
->  use kernel::{
-> -    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
-> -    configfs::{self, AttributeOperations},
-> +    block::mq::gen_disk::{
-> +        GenDisk,
-> +        GenDiskBuilder, //
-> +    },
-> +    configfs::{
-> +        self,
-> +        AttributeOperations, //
-> +    },
->      configfs_attrs,
-> -    fmt::{self, Write as _},
-> +    fmt::{
-> +        self,
-> +        Write as _, //
-> +    },
->      new_mutex,
->      page::PAGE_SIZE,
->      prelude::*,
-> -    str::{kstrtobool_bytes, CString},
-> +    str::{
-> +        kstrtobool_bytes,
-> +        CString, //
-> +    },
->      sync::Mutex,
->  };
->  
-> diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-> index 0ca8715febe8..d58d2c4c5f63 100644
-> --- a/drivers/block/rnull/rnull.rs
-> +++ b/drivers/block/rnull/rnull.rs
-> @@ -10,12 +10,19 @@
->          self,
->          mq::{
->              self,
-> -            gen_disk::{self, GenDisk},
-> -            Operations, TagSet,
-> +            gen_disk::{
-> +                self,
-> +                GenDisk, //
-> +            },
-> +            Operations,
-> +            TagSet, //
->          },
->      },
->      prelude::*,
-> -    sync::{aref::ARef, Arc},
-> +    sync::{
-> +        aref::ARef,
-> +        Arc, //
-> +    },
->  };
->  
->  module! {
-> 
-> ---
-> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
-> change-id: 20260705-rfl-vert-imp-2-9bba7706d3f0
-> 
-> Best regards,
-> --  
-> Guru Das Srinagesh <linux@gurudas.dev>
-> 
-> 
+Fixes: 82f402fefa50 ("null_blk: add support for shared tags")
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ drivers/block/null_blk/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 6cb213779cc5..df85189f0b69 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -2185,6 +2185,8 @@ static int __init null_init(void)
+ 		null_destroy_dev(nullb);
+ 	}
+ 	unregister_blkdev(null_major, "nullb");
++	if (tag_set.ops)
++		blk_mq_free_tag_set(&tag_set);
+ 	return ret;
+ }
+ 
 -- 
-Link Mauve
+2.52.0
+
