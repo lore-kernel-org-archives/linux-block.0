@@ -1,74 +1,65 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561A4439356;
-	Wed,  8 Jul 2026 16:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8142DA43;
+	Wed,  8 Jul 2026 16:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783527053; cv=none; b=fawFaZKrn04O9bW5VRBtPWopTS0Ul+a1a3jdk3AN5ceiJ3WyB8LfdJ8QRXHmMy/I4NpwTKe9eXpohYV3smxEoECAyAXQ4bkQANM0D3iRzAOv19z/7IQLGLPp0ioAJ7EaRzyGrw7o03X3SnpRGDrYkOBo0gsbIP/bcZGqK/iawdM=
+	t=1783527497; cv=none; b=cBE3Y6U2QE8YyOwrpuu5q/HAgwKOQOuL8xZ29NuxT2S3r4EsClczXoBAax0VGnuAqZFaPfpmLq8QsywtDMp97DQ1TXCgwtDpouAkajtO2ch0PcWyNM9S+B3GJilTYhVfGQV7cRSOBpTWa5er3UTau/ZWe3NrjoW9kGsd1cKsCw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783527053; c=relaxed/simple;
-	bh=C1TIejWUdfPVvpwpCNZ0XphflYzn5B4iuY9k3oAqZEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kggfP/KZisPU9YWLcoTyIGgk7qFPdesJZ//QZR4bwCxxa7tsZokzaHS2Tksxik1ulKe2/Xl4DRi/urxDxvXnM+ZlQyiHIAwk0KHJgpCj3viOFMHCjVmxUMu2StgdgXom6B0550sd6Oq4iwsWg9eWzM9CugP+rGqBxVxIvGxoxvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NM/zBaFn; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1783527497; c=relaxed/simple;
+	bh=emeqFPYJhsU54P4D5pKnIVo2bLb1/yDskAr0lHzp7o0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YBYTyhTf+3PkcXWmnKKkDTzOl0+NuwuYwnkaChHcBc9SzJBeRSlWjv4vwtmq6L7ZKcfL17k5HNduf3wujaqVmRts6hbDCmjw+iGdOyciG6LV71dyAd616mtmOcwSzXR2MQ4Cy0SAK7SHfPh3jphdCjA0U7OEVkGCMZRgQFrINHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+LU6yiJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NM/zBaFn"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gwNP761lgz1XM31H;
-	Wed,  8 Jul 2026 16:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1783527048; x=1786119049; bh=C1TIejWUdfPVvpwpCNZ0Xphf
-	lYzn5B4iuY9k3oAqZEI=; b=NM/zBaFny7NgN6J4FwgcP5jOMq48N8AnYHn7bKqW
-	tYRr5dHA8Ru+cXtG+WTOf1QOAoXc3+r5qzRd1rQ4+Uo6U6h1Vm3WCrXG7nNreKaH
-	U7q4N9lWVuSbGBW4Kl/kRw4igZ5swJPRy+ZcguNyO4Aa4z6Uzl8+75at7mUeYVmI
-	AQBFdSIuWK5cHNQrmRsp9JR1Fqg7/ARLa00A+b0JLoJiqZsBuTIb7oTCcL8Gushf
-	Ds2iYiYq/cnsPLjJWIdQz+/UcwQbNs9T73ERel8NYPomJ3SaJKmFAV1l+N5OTNl0
-	NvkmJB/YUbMFZlwZHQs05etaOrJbMuTfMp8Q2+i8YGBGqw==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id tYrmmjVEYAwV; Wed,  8 Jul 2026 16:10:48 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gwNP15YYQz1XM5kW;
-	Wed,  8 Jul 2026 16:10:45 +0000 (UTC)
-Message-ID: <a5fa376d-90d6-4767-a994-2b91fb9cb951@acm.org>
-Date: Wed, 8 Jul 2026 09:10:44 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+LU6yiJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF1C1F00A3D;
+	Wed,  8 Jul 2026 16:18:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783527496;
+	bh=JiC5/914qoX/pLC23xYMfmaM5nvG9RDJDy++UnOezLY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=P+LU6yiJCrkAx1zLq9qFp3mjvSNsmF1Ik1xPmJNmb/SD+Ox4RCmHRhlZJmaIOfFGl
+	 e5L5WbJok5h5KvYloSY8cauaFg6D40uLnX8Ahgv4X6xPZT0akCmMJ8okiBkMzNwxlc
+	 9TC12QsYiUJ4QXcAAJfq+qRBvRiyUNKUVTFxe3QZSbkKv0+ONzqsPPyyX4jBuDrZho
+	 g95UOTIJ8HEokiLssLxr2/qUitCFNtSxJl0IhmM89z8VbmezPfVwtPkYkg4q3fPKpj
+	 hGUZ1oPJM5FW8QYhPefAQeUokFh8tXGjyQoXewPMtEeUOSfW3zszr8MmIhxmBTaJx7
+	 BWV7GvOv8ooew==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Konstantin Andreev <andreev@swemel.ru>
+Subject: Re: [PATCH 6.12.y 1/2] block: add a store_limit operations for sysfs entries
+Date: Wed,  8 Jul 2026 12:18:03 -0400
+Message-ID: <20260708120505.agent5-0005@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260707153729.1834723-1-andreev@swemel.ru>
+References: <20260707153729.1834723-1-andreev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] scsi: sg: validate and round up scatter_elem_sz module
- parameter
-To: Yang Erkun <yangerkun@huawei.com>, dgilbert@interlog.com,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
- yukuai@kernel.org, hch@lst.de, axboe@kernel.dk
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20260708063045.2008478-1-yangerkun@huawei.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260708063045.2008478-1-yangerkun@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/7/26 11:30 PM, Yang Erkun wrote:
-> Additionally, the code handling scatter_elem_sz is refactored for
-> clarity: [ ... ]
-One change per patch please. The code refactoring and the bug fix should
-be separate patches.
+On Tue, Jul 07, 2026 at 06:37:27PM +0300, Konstantin Andreev wrote:
+> The prerequisite patch to backport of the CVE-2025-21807 fix to 6.12.y LTS
+> (see Stable-dep-of)
 
+Queued the series for 6.12, thanks.
+
+-- 
 Thanks,
-
-Bart.
+Sasha
