@@ -1,155 +1,160 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C624968E0
-	for <linux-block@vger.kernel.org>; Wed,  8 Jul 2026 18:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B10B385D97
+	for <linux-block@vger.kernel.org>; Wed,  8 Jul 2026 23:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783534415; cv=none; b=GiaKpufw6OH4kiTmTFT7BG5p8mtSZEYTk6dOoPYdMezgsETry1GAsIgILgqTTmLxbZeYgpvSog7CfDCUdfofhoZ72WxKqb5s23g0OmsNJ6TLmd7yFcHKelEaFf6paHMy7h0ClxJ20UYpGFv8eoODmYPcFxvibT12jnhip39F2XU=
+	t=1783553063; cv=none; b=m7YUuiLaRQfz9WIM//aUgJIQK2xxETPOQNeCWi3w5EgzaRpxbVH84ErvvbwTvFbymreKM/htcok00z8FlRvMETNrjkMUm+HxPW2I2jEabCdX326YDw5dpneJs4/DYm6IYQZ05EBsvQBxhBKhFiI8//exlxp2JEzJ0LGIx0koKrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783534415; c=relaxed/simple;
-	bh=mKB64eFzBwevlbfHP4GHbGCdzZzNbk41FGpjUYsfux4=;
+	s=arc-20240116; t=1783553063; c=relaxed/simple;
+	bh=JtRB+pY0jGgOOTlVurcxI4B+c+Yq3YAfLr+R/J5xOM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L1kfMF3dNFo/zu0O+DmHF5yRuPL49PepsTQdc+Nrex7rE+HDNXmRjZaHJJiw5vgI2MRW9guYeZiD841SGEVcAh6wIzoiBaK3oNpLYXxqUSANiE0wu3iAlXPQWjMpDI/coXGcleLyMth8LrzGgmeX7Wp69dOX9j+PLo1bBGx6QcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NXY/JxGv; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+6yehGr+q/QC27+5PUpvy4+GHynoGykWvoLKolX/grPKYULsmzkchVJfc/FehkxcdKyYG6aaCsw66KE/bKhu2Yp2Mn/MJudvg3rLmEYNUKRmS+PTv3Tay7REtvcRhTV50csTEXMYPbKxIUbav7OosMKq1LGqeeYf4AXgPCazx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FjeiTpJb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NXY/JxGv"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-47de008b020so73310f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2026 11:13:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783534407; x=1784139207; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WEMJWE1zcwQ4UkLGDHzDIo1wA9TMgoKtQk475YCTe6o=;
-        b=NXY/JxGvymDRFrsijRMZ9tHdf1vok229JiWLzBHZwp/af9/Y7FHShzV1p28lfGDO0P
-         Zjbde5zb79XSg/jwyzfbIjMg0JbSsUD456xvuSBgfX9elPAfqtA7LRQ4E5uq5/7exmey
-         EqK3Ef4oiDQgW7SogTWxwIn9DFaDCNwAlfxgMTUAGHE1yhxkzaZ+/aNgxXqr5PJhJTbk
-         YJ3U/xgt0mK8BckXQ4KsDSdGzsNpqaB1DoJXAjYrfk/nUDVL5XmP9eQo6rp9dUT4uRxU
-         WqEtlylEfFx/GQK85wL6RWzG+tt8Cl+7EtXP6XzSYBHRNjkC+HgLsWCbnvW7fF2s9gZo
-         WeaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783534407; x=1784139207;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WEMJWE1zcwQ4UkLGDHzDIo1wA9TMgoKtQk475YCTe6o=;
-        b=Mevtc4eKa/heOVK4V/63cxEi3TtAEf48QQee1iNDeUkIn6kn53vGBcZawyZvjv0gto
-         IhRSQ77YUSqYD9wqg+nXkZphJsTPT38gTJhq+z9CBCox0u9IMLPhksE+49TTMDjhQs7J
-         owk9clK1N8Q9ZZvLlnW55g039qweqgqed7EIihtucyHeO43RvBhdEAuxpxQO7zgEktt/
-         T6a9vMnzvH5ycFAn0ano//eEhVfpb6t8VXqQsb3CP+5X+6i5WirrRCRMjrcGQ7+6Lcsf
-         mEn4w/8x9k3mKMRU9sC5ibu+qo0iP6vDKOC6sSdhYT1gf37mHdTI6eHdW/o3Y0hhcmGq
-         S1Jw==
-X-Forwarded-Encrypted: i=1; AHgh+RpSOs3OuLDsShw4xqMswCdtTQKlmmMUwy3gbXpaXNE4q9fNjH8BCqMurTl1Dqm4tmMMzPd/BTXKEJK1RQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIC4e8QEuV1s48WFQqWJVD/scO231E5lqDMkeYTmAcsWOaHLTE
-	NeQDRCDacRDU2aGdY9ZtHWuhXZh/KxBwD7cF970+unNRJBawk+Wdgqi3FHzGxldppSY=
-X-Gm-Gg: AfdE7cns0+ft78wQJQtMT0JkojTmB+pi6uLjke+WLGKXvds3Ipuk+XY25oirN/af4VW
-	wILx+YTJCTH1S4vEJUzeo5j0U+uKMtBVt36b0joZwtnLZWQsZC3w7eu/JRg6BzNx4JwZImhGqON
-	RQ4FT3Vi/JSJfn162UoU2Cpf4jFe+7P2vrDC08YwsRMwtpMpx7zYxQeofCHQGCZ88BK+6WU5n0T
-	EwfSoHgRA3gqxN6eBo4PC26qbRh+P6NCYYmJvgG5SGlkflKynzNMBSE+O9dQGH5DuhVKHWWJ53r
-	SvFgCEiRZ0V1Gah7D2sE4Px6pxyOcizt4CI2kqYlLlXsTkescN0QB/hqIBrQQ9T9RGNDaYHWKXS
-	rt2o4PsRc/21T05ZJCmM7zbxL6aqqEktRc8xCLmeyf+H6nPf2Wx7JcllvHb836+ykKh/DhtV1J2
-	2MG9H1ugf2xzvWqiWgWmu0Bsogx6/mwAGdpY6biw==
-X-Received: by 2002:a05:6000:460c:b0:473:c608:eeb5 with SMTP id ffacd0b85a97d-47de9a4f159mr9196162f8f.29.1783534406837;
-        Wed, 08 Jul 2026 11:13:26 -0700 (PDT)
-Received: from localhost.localdomain (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1d910sm43325516f8f.6.2026.07.08.11.13.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 11:13:26 -0700 (PDT)
-Date: Wed, 8 Jul 2026 20:13:23 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Petr Pavlu <petr.pavlu@suse.com>
-Cc: Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, 
-	Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>, Johan Hovold <johan@kernel.org>, 
-	Alex Elder <elder@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Michal Januszewski <spock@gentoo.org>, 
-	Helge Deller <deller@gmx.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Mark Fasheh <mark@fasheh.com>, 
-	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>, 
-	Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
-	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	drbd-dev@lists.linux.dev, linux-block@vger.kernel.org, greybus-dev@lists.linaro.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-acpi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	ocfs2-devel@lists.linux.dev, cgroups@vger.kernel.org, linux-modules@vger.kernel.org, 
-	linux-pm@vger.kernel.org, driver-core@lists.linux.dev, bridge@lists.linux.dev, 
-	netdev@vger.kernel.org, keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 1/2] umh, treewide: Explicitly include linux/umh.h where
- needed
-Message-ID: <ak6STbqZd-Q-c56v@localhost.localdomain>
-References: <20260708154510.6794-1-petr.pavlu@suse.com>
- <20260708154510.6794-2-petr.pavlu@suse.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjeiTpJb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783553061;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p9Tdbre0PNKSXvRptozBBT+tS7NebUWHcrzp9pkL8yo=;
+	b=FjeiTpJbGwyvSUgksUYIf46hIzpQdaTWJ6huyV2IyvDIGhZhxafCyiWY046ZmTdFHMgESX
+	RlAvrVlmbWM3TA2NkWDQ/fv0e2cLMIQ51etAiWLuzJbbyo0Qh2g9bS0bsxiF+7BKue15dZ
+	BCloUHNH778syfJVQKIFtKBCWP/uslg=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-412-zC17dWHfNZ2Q1N59mu4B1w-1; Wed,
+ 08 Jul 2026 19:24:18 -0400
+X-MC-Unique: zC17dWHfNZ2Q1N59mu4B1w-1
+X-Mimecast-MFC-AGG-ID: zC17dWHfNZ2Q1N59mu4B1w_1783553056
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2DBE419560B7;
+	Wed,  8 Jul 2026 23:24:16 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 372943F317;
+	Wed,  8 Jul 2026 23:24:15 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 668NOD8G2029519
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 8 Jul 2026 19:24:14 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 668NODbv2029518;
+	Wed, 8 Jul 2026 19:24:13 -0400
+Date: Wed, 8 Jul 2026 19:24:13 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>, axboe@kernel.dk,
+        Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@meta.com>,
+        dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        Vjaceslavs Klimovs <vklimovs@gmail.com>
+Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
+ errors
+Message-ID: <ak7cHXaWjVX6Uamj@redhat.com>
+References: <20260616150554.1686662-1-kbusch@meta.com>
+ <ajFyuoMqnvQm738z@kbusch-mbp>
+ <0bd687cf-82ac-eacf-844b-c179a52dc72c@redhat.com>
+ <akwVkSnXtyl6rBdh@kbusch-mbp>
+ <ak1XNlyFC34W47iP@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kijzkd5xnaepafl2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260708154510.6794-2-petr.pavlu@suse.com>
+In-Reply-To: <ak1XNlyFC34W47iP@kernel.org>
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
+On Tue, Jul 07, 2026 at 03:44:54PM -0400, Mike Snitzer wrote:
+> On Mon, Jul 06, 2026 at 02:52:33PM -0600, Keith Busch wrote:
+> > On Wed, Jun 24, 2026 at 01:14:03PM +0200, Mikulas Patocka wrote:
+> > > This approach is OK, I will stage the patches when 7.2-rc1 comes out and 
+> > > when I'll fork the dm git branches.
+> > > 
+> > > I suggest one change - it is kind of hacky when multiple I/O completion 
+> > > callbacks write into io->orig_bio->bi_status concurrently - so it would be 
+> > > better to not do it and maintain and return separate bit mask for 
+> > > non-retryable errors.
+> > > 
+> > > For example:
+> > > 
+> > > static void complete_io(struct io *io)
+> > > {
+> > >         unsigned long error_bits = io->error_bits;
+> > >         unsigned long nonretryable_error_bits = io->nonretryable_error_bits;
+> > >         io_notify_fn fn = io->callback;
+> > >         void *context = io->context;
+> > > 
+> > >         if (io->vma_invalidate_size)
+> > >                 invalidate_kernel_vmap_range(io->vma_invalidate_address,
+> > >                                              io->vma_invalidate_size);
+> > > 
+> > >         mempool_free(io, &io->client->pool);
+> > >         fn(error_bits, nonretryable_error_bits, context);
+> > > }
+> > > 
+> > > static void dec_count(struct io *io, unsigned int region, blk_status_t error)
+> > > {
+> > >         if (unlikely(error == BLK_STS_NOTSUPP) || unlikely(error == BLK_STS_INVAL))
+> > > 		set_bit(region, &io->nonretryable_error_bits);
+> > >         else if (unlikely(error != BLK_STS_OK))
+> > >                 set_bit(region, &io->error_bits);
+> > > 
+> > >         if (atomic_dec_and_test(&io->count))
+> > >                 complete_io(io);
+> > > }
+> > > 
+> > > Please send the updated patch that uses this approach.
+> > 
+> > Sure thing, I can get started on that. Though I think it's largely
+> > obviated if we get the block layer to handle things early rather than
+> > submit malformed bio's, and this will accomplish that:
+> > 
+> >   https://lore.kernel.org/dm-devel/20260624170905.3972095-1-kbusch@meta.com/
+> 
+> Jens hasn't picked that series up yet. Jens?
+> 
+> > But I can certainly respin this series as it provides a more indepth
+> > defence.
+> > 
+> > I also owe an update on the relaxed dm-crypt direct-io memory alignment
+> > as well, as that series fell through the cracks on me for the previous
+> > merge window.
+> 
+> So where does dm-raid1 and dm-crypt stand relative to these DIO memory
+> alignment changes?  Inferring they are pretty exposed.
+> 
+> > > BTW. I think that blk_path_error should also test for BLK_STS_INVAL and 
+> > > return false, otherwise, dm-multipath would be suffering from this bug 
+> > > too. Ben, could you test it?
+> > 
+> > Good point.
+> 
+> Would appreciate knowing if multipath exposed too.
 
---kijzkd5xnaepafl2
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 1/2] umh, treewide: Explicitly include linux/umh.h where
- needed
-MIME-Version: 1.0
+I can't make it happen. I can reproduce this using dm-mirror, but when I
+try with dm-multipath, it fails with BLK_STS_INVAL before it ever makes
+it into the request layer.
 
-Hi Petr.
+blk_mq_submit_bio() -> __bio_split_to_limits() -> bio_split_rw() ->
+bio_split_rw_at() -> bio_split_io_at()
 
-On Wed, Jul 08, 2026 at 05:44:29PM +0200, Petr Pavlu <petr.pavlu@suse.com> =
-wrote:
-> diff --git a/kernel/cgroup/cgroup-v1.c b/kernel/cgroup/cgroup-v1.c
-> index a4337c9b5287..60eb994c32ae 100644
-> --- a/kernel/cgroup/cgroup-v1.c
-> +++ b/kernel/cgroup/cgroup-v1.c
-> @@ -16,6 +16,7 @@
->  #include <linux/pid_namespace.h>
->  #include <linux/cgroupstats.h>
->  #include <linux/fs_parser.h>
-> +#include <linux/umh.h>
-> =20
->  #include <trace/events/cgroup.h>
+bio_split_io_at() checks the bio_vec alignment and fails with -EINVAL,
+causing the bio to get failed.
 
-There is kmod.h in here too but it's unnecessary, no module lazy loading
-in this code.
+-Ben
 
-Thanks,
-Michal
+> 
+> Thanks,
+> Mike
 
---kijzkd5xnaepafl2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCak6TOhsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+AgY2gEAgOkCGIEUNQ8/AFfxYtdb
-0XG1ZQXkD0d1Rm0cAq1+u8cBANw3nWI/wHkp5zcHmZWevxdnweU507gsyVTXzMGQ
-ZwsB
-=k+w6
------END PGP SIGNATURE-----
-
---kijzkd5xnaepafl2--
