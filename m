@@ -1,130 +1,124 @@
-Received: from va-2-59.ptr.blmpb.com (va-2-59.ptr.blmpb.com [209.127.231.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BFA367F39
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 15:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB2B3932E5
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 16:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783610204; cv=none; b=Rh01kcfPy+mux0oRxiFDDhAhTi2KsODBnwRLmKhK24vSOLxmJaWTPfr7q3kCKSc2bYA3S8zRsgnx06bzjNfwN00823GKAVLh0FZIoXGP3EXxvZanQHXrR/08cLN6w9cpsgvaXB+H+qAVStYlVUCX01LnSGN0kF6uYSDMNUEJtng=
+	t=1783613609; cv=none; b=GmJzN2B9pmVy8aeviVJ75famsF/aQ3CBUUnlRU5SSIClgAWlU2nyROiwhFM1tf8x48rumY6lNXWiy63mayugdbaU951575MfnJg/OSjoHA6It/+Igcs2NWp1fvQe6QO4FWqUa69gwMC7obYb8Zv1mCDdmDb0g20bO8ASdaQmWlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783610204; c=relaxed/simple;
-	bh=v5Ns8GKJPYvWVGr4v4iYQQv2ZvitE5xVf/lTUKRkRlI=;
-	h=Cc:Message-Id:Content-Type:Date:Mime-Version:References:Subject:
-	 In-Reply-To:To:From:Content-Disposition; b=Nq3C9Gnv/7qkzF8v2+Cf2zL9AbK/MjecDj8sfF0wtPr6t+7pnq/TqX0gi4V/jgoVVKW6STKiw5g+17XrazInrCpThemXaMDdumy2mQDIfQ4ZKON+IT3LA8WQJsBbRU6R3yGViTTZ8K04oR6+DVD9jVUJn5wkKX40yuUPhTyfVNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=E54EpZ84; arc=none smtp.client-ip=209.127.231.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1783613609; c=relaxed/simple;
+	bh=zbY2bSEaCu31T0WXTlUACKyoNXNWjDA105FQaP4TAkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xt7PTt7brnptvPlH3Ena3xCuIJEnZlS/GtPSY8EhNvmpMP6QsbmLdbLZ0h2oPjeP9fx1UCN8yJNNQDumo0Y3yd/s1F9xR/XSsGJqhzcjoYKHj+XtnN4BPjVCM9ul3k/MZQLTtSQ8RFNflOqvNL6EaZToyRKa2h4OYd0x5XPwS34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGD5X6D8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="E54EpZ84"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783610196;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=v5/1YTROofIQRbICB2AmBt3EuPPyhbngivzTeCwZ5O4=;
- b=E54EpZ846zjtDfIqG7tSc9jNphhTNWl5hA0Hrg8PU7NormqplylWjVNbXIpnc0M/NvY000
- yaaDxipxUvwuYqtbNls4X+bNvSAfk6iV3SlnTdQ/eNXO0RZ6+ZckZlqO8eJ6tqqi+h8Y+K
- dUPtOdgWE1ONTWsmPm+E+OafGuYackJUKYqygdEyU235w+yIbuvftXOSIq0lzKD+bpWG41
- 5NZm5zFKWz0u8zOsFU95ggRHdHSU6lyRVjF5Tdli0Fx7vop09N+w4EUBSFqNW0aOr3ir/T
- /yYhSJitkgkE009l2QEQoUY9afCiI8YhdZlOBB3NCEg6YOmrqBXfNRGIIkuTjw==
-Received: from studio.local ([120.245.64.95]) by smtp.larksuite.com with ESMTPS; Thu, 09 Jul 2026 15:16:34 +0000
-Cc: <axboe@kernel.dk>, <gregkh@linuxfoundation.org>, 
-	<linux-block@vger.kernel.org>, <stable@vger.kernel.org>, 
-	"kernel test robot" <lkp@intel.com>
-Message-Id: <ak-7HLuHJ-5vJvFN@studio.local>
-Content-Type: text/plain; charset=UTF-8
-X-Original-From: Coly Li <colyli@fygo.io>
-X-Lms-Return-Path: <lba+26a4fbb53+d90e7d+vger.kernel.org+colyli@fygo.io>
-Date: Thu, 9 Jul 2026 23:16:32 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGD5X6D8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783613606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iTviDvuDhSfVkGar73Qrb9ZQD1B5BTK09OmZSnwxUg4=;
+	b=hGD5X6D8DvzMkf+DbGdQu/BtZgyDtY1hJGnsg6xZA+RtWVMK0fS59mLxwYorsI/TyeVNdX
+	xDz+37d8g+YVxDYc6zzlnLT4bmdu1wwQWW9DHeApiqLZ/HK5FwxtDU+swS8yrkZyK1CLeO
+	fB7MB2TQ9XRKd4TTJW4y5EoNHLWhj/8=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-422-yCqKLsm-O0GVQmhzLl7HCA-1; Thu,
+ 09 Jul 2026 12:13:22 -0400
+X-MC-Unique: yCqKLsm-O0GVQmhzLl7HCA-1
+X-Mimecast-MFC-AGG-ID: yCqKLsm-O0GVQmhzLl7HCA_1783613601
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99A601800BDF;
+	Thu,  9 Jul 2026 16:13:20 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADD9E3000C01;
+	Thu,  9 Jul 2026 16:13:19 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 669GDHvF2055297
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 9 Jul 2026 12:13:17 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 669GDGCO2055294;
+	Thu, 9 Jul 2026 12:13:16 -0400
+Date: Thu, 9 Jul 2026 12:13:16 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>, axboe@kernel.dk,
+        Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@meta.com>,
+        dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        Vjaceslavs Klimovs <vklimovs@gmail.com>
+Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
+ errors
+Message-ID: <ak_InD1CX7GJXzJv@redhat.com>
+References: <20260616150554.1686662-1-kbusch@meta.com>
+ <ajFyuoMqnvQm738z@kbusch-mbp>
+ <0bd687cf-82ac-eacf-844b-c179a52dc72c@redhat.com>
+ <akwVkSnXtyl6rBdh@kbusch-mbp>
+ <ak1XNlyFC34W47iP@kernel.org>
+ <ak7cHXaWjVX6Uamj@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <ak9CC591ivuQ4BP1@studio.local> <20260709131904.596684-1-adhikari.resume@gmail.com> <20260709131904.596684-2-adhikari.resume@gmail.com>
-Subject: Re: [PATCH v6 1/2] badblocks: fix in-place round_up/round_down usage bug
-In-Reply-To: <20260709131904.596684-2-adhikari.resume@gmail.com>
-Content-Transfer-Encoding: 7bit
-To: "Ramesh Adhikari" <adhikari.resume@gmail.com>
-From: "Coly Li" <colyli@fygo.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <ak7cHXaWjVX6Uamj@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Jul 09, 2026 at 06:49:03PM +0800, Ramesh Adhikari wrote:
-> rounddown() and roundup() do not modify their first argument in
-> place; they return the rounded value. _badblocks_set(),
-> _badblocks_clear() and badblocks_check() were calling them as
-> bare statements and discarding the result, so 's' (and 'next'/
-> 'target') were never actually rounded. Depending on the caller's
-> alignment this can leave 'sectors' unchanged or, in the reported
-> case, produce a range whose end never advances, causing
-> _badblocks_check()/badblocks_check() to loop with a non-advancing
-> cursor and stall the CPU (RCU stall) when called through the
-> nvdimm ioctl path via nvdimm_clear_badblocks_region().
+On Wed, Jul 08, 2026 at 07:24:14PM -0400, Benjamin Marzinski wrote:
+> On Tue, Jul 07, 2026 at 03:44:54PM -0400, Mike Snitzer wrote:
+> > On Mon, Jul 06, 2026 at 02:52:33PM -0600, Keith Busch wrote:
+> > > On Wed, Jun 24, 2026 at 01:14:03PM +0200, Mikulas Patocka wrote:
+
+> > So where does dm-raid1 and dm-crypt stand relative to these DIO memory
+> > alignment changes?  Inferring they are pretty exposed.
+> > 
+> > > > BTW. I think that blk_path_error should also test for BLK_STS_INVAL and 
+> > > > return false, otherwise, dm-multipath would be suffering from this bug 
+> > > > too. Ben, could you test it?
+> > > 
+> > > Good point.
+> > 
+> > Would appreciate knowing if multipath exposed too.
 > 
-> rounddown()/roundup() also do division/modulo on the sector_t
-> (u64) operand, which requires libgcc helpers (__aeabi_uldivmod,
-> __umoddi3) that are not linked into the kernel on 32-bit builds,
-> breaking the build on arm/i386 (reported by kernel test robot).
+> I can't make it happen. I can reproduce this using dm-mirror, but when I
+> try with dm-multipath, it fails with BLK_STS_INVAL before it ever makes
+> it into the request layer.
 > 
-> Switch to round_down()/round_up() (include/linux/math.h), which
-> are mask-based, assign their result back to the variable being
-> rounded, and require no 64-bit division, fixing both the
-> non-rounding bug and the 32-bit build breakage.
+> blk_mq_submit_bio() -> __bio_split_to_limits() -> bio_split_rw() ->
+> bio_split_rw_at() -> bio_split_io_at()
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202604301231.IpPh4AiH-lkp@intel.com/
-> Fixes: aa511ff8218b ("badblocks: switch to the improved badblock handling code")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ramesh Adhikari <adhikari.resume@gmail.com>
+> bio_split_io_at() checks the bio_vec alignment and fails with -EINVAL,
+> causing the bio to get failed.
 
-It looks good to me.
+However, as a general issue, I don't believe it's impossible to have an
+unaligned bio_vec that returns false for bio_may_need_split(), so that
+the splitting code will never get run. But if this is already getting
+fixed earlier in the bio code, then the point is kind of moot.
 
-Reviewed-by: Coly Li <colyli@fygo.io>
+In reference to changing blk_path_error(), multipath should only be
+passing down requests that are valid on any of its paths, so it seems
+reasonable to make the case that BLK_STS_INVAL is not a path error. But
+if we are going to be checking the bios early against multipath's
+limits, then it seems like the only reason we would get a BLK_STS_INVAL
+is that multipath's limits don't work with the underlying path's. That
+would likely mean there was a limit stacking bug, and who knows whether
+another path would work better.
 
-Thanks.
+-Ben
+ 
+> > 
+> > Thanks,
+> > Mike
 
-Coly Li
-
-> ---
->  block/badblocks.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/badblocks.c b/block/badblocks.c
-> index ece64e76fe8..1f786b193fb 100644
-> --- a/block/badblocks.c
-> +++ b/block/badblocks.c
-> @@ -857,8 +857,8 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
->  		/* round the start down, and the end up */
->  		sector_t next = s + sectors;
->  
-> -		rounddown(s, 1 << bb->shift);
-> -		roundup(next, 1 << bb->shift);
-> +		s = round_down(s, 1 << bb->shift);
-> +		next = round_up(next, 1 << bb->shift);
->  		sectors = next - s;
->  	}
->  
-> @@ -1071,8 +1071,8 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
->  		 * isn't than to think a block is not bad when it is.
->  		 */
->  		target = s + sectors;
-> -		roundup(s, 1 << bb->shift);
-> -		rounddown(target, 1 << bb->shift);
-> +		s = round_up(s, 1 << bb->shift);
-> +		target = round_down(target, 1 << bb->shift);
->  		sectors = target - s;
->  	}
->  
-> @@ -1307,8 +1307,8 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
->  		/* round the start down, and the end up */
->  		sector_t target = s + sectors;
->  
-> -		rounddown(s, 1 << bb->shift);
-> -		roundup(target, 1 << bb->shift);
-> +		s = round_down(s, 1 << bb->shift);
-> +		target = round_up(target, 1 << bb->shift);
->  		sectors = target - s;
->  	}
->  
-> -- 
-> 2.43.0
