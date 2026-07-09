@@ -1,27 +1,26 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9474403B1B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE975410D13;
 	Thu,  9 Jul 2026 10:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591975; cv=none; b=DBmDfuAlqBTLEPqIuIDXIN4GbV3IJx/qU/9Ec9lAdeIPnuv2BVGVX8UmfuPlxGiwqrerHY7fhQ7Dn6a5ITO9INXuFdCi++ndRt82Ha2vxv7XXrzbHVt0HsS0xBhIneafmHpK5K1TL3Z7gVNYqw/jXiKSfE1Nbuu3+LAGyAtoqUU=
+	t=1783591975; cv=none; b=hBtuCgSZ6dTyUpxrnKuaxlQ1z37EPRMAiLz7XOqQIq4Z3ttZyG3Yx+SoeObH3d1yLQCrBQyNrXXJIjCLltXuwhxexWRp5oGwGs9/BvM87vVZ2Gxfpx8rX770uprFPVJ3UiJ8l3UVPbnJ7cQp97YAZXP5quzwo86M6V41w5DCDiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783591975; c=relaxed/simple;
-	bh=KNs7gluhh6T0Ax4ZeD42JP4XJ6xondfxz2FvhfuNJOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tx9vzTEgHGt1YqUm4eF+tUhjAnU5cu0BVc7fGljB7D10JkHWOfb5OkFnRkt4bSPqryK19TsWGPTyeHHe1w5IuScsqe+kRFJI4dFv+992mf+EZF7OattOKkjiZPakOsnqPul7n5XTSPQI3tP47TbE1dV37rvK3eK604OOBrWwLUc=
+	bh=POiq8km4FbYHP6DYY6ZDQYyGt8XS3P+ClFeCFoaVjpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Iw7CZINoRLktWTUvIt/CzKHAOQcnaP0ngEzkK32GCUcAcB6kHo9O0k/QByUD0y7DYSsOj5e43c9Rf1kpKkBKAHqp6Mt1MyFNLq5EFSpmJMdgH2YAHcopxQ5Dlb55MuiJy1/AsYINr+RUtM3KVr9G+SG1xTZ0RxjplCWj9bMmdWs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gwrPK31mHzYQtyB;
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gwrPK2McGzYQtxx;
 	Thu,  9 Jul 2026 18:12:37 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id F2EC340977;
+	by mail.maildlp.com (Postfix) with ESMTP id DDCCC4070E;
 	Thu,  9 Jul 2026 18:12:43 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3MadE9qn4RpAg--.38318S5;
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3MadE9qn4RpAg--.38318S4;
 	Thu, 09 Jul 2026 18:12:43 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
@@ -36,12 +35,10 @@ Cc: linux-kernel@vger.kernel.org,
 	yangerkun@huawei.com,
 	chengzhihao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [PATCH V4 1/9] null_blk: use DEFINE_MUTEX for the file-scope mutex
-Date: Thu,  9 Jul 2026 18:04:43 +0800
-Message-ID: <20260709100452.3520482-2-wozizhi@huaweicloud.com>
+Subject: [PATCH V4 0/9] null_blk: fix init/exit races and memleaks
+Date: Thu,  9 Jul 2026 18:04:42 +0800
+Message-ID: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
-References: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,95 +46,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHV3MadE9qn4RpAg--.38318S5
-X-Coremail-Antispam: 1UD129KBjvJXoWxGrWUAr4fZr4rWr18CF15Arb_yoW5Gr45pF
-	WUW3409r10qF17ZFZ8ta4xuFy3Aan2gFW8Gry7CF1F9FsxArn8ArnrCFWYgF45K3yxC3y3
-	XFnYyrWxAayUCrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
-	A2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
-	0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU2HGQ
-	DUUUU
+X-CM-TRANSID:cCh0CgBHV3MadE9qn4RpAg--.38318S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4rWr48JFy7Kw1rtF47Jwb_yoW8tw1fpa
+	yYgw15Gr4DKr17XwsrCa1fWFyrZ3Z5G3y5KFnxJw1rCFWY9ryIvr97Kr45XFW7J393GrZI
+	ganrZr95ua4jva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	xUF1v3UUUUU
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 From: Zizhi Wo <wozizhi@huawei.com>
 
-In null_init(), mutex_init(&lock) currently happens after
-configfs_register_subsystem(), which exposes the nullb subsystem to
-userspace. A racing mkdir() into /sys/kernel/config/nullb/ can reach
-null_find_dev_by_name() -> mutex_lock(&lock) before the mutex is
-initialized, trigger warning:
+This series fixes several issues in null_blk around lock initialization,
+memory leaks, concurrent configfs access, and module init/exit.
 
-[  123.137788] DEBUG_LOCKS_WARN_ON(lock->magic != lock)
-[  123.137796] WARNING: kernel/locking/mutex.c:159 at mutex_lock+0x171/0x1c0, CPU#13: mkdir/1301
-[  123.140090] Modules linked in: null_blk(+) nft_fib_inet nft_fib_ipv4
-......
-[  123.154926] Call Trace:
-[  123.155172]  <TASK>
-[  123.155419]  ? __pfx_mutex_lock+0x10/0x10
-[  123.156181]  ? __pfx__raw_spin_lock+0x10/0x10
-[  123.156571]  nullb_group_make_group+0x20/0x100 [null_blk]
-[  123.157011]  configfs_mkdir+0x47b/0xc70
-[  123.157337]  ? __pfx_configfs_mkdir+0x10/0x10
-[  123.157719]  ? may_create_dentry+0x242/0x2e0
-[  123.158061]  vfs_mkdir+0x2a9/0x6c0
-[  123.158352]  filename_mkdirat+0x3dc/0x500
-[  123.158710]  ? __pfx_filename_mkdirat+0x10/0x10
-[  123.159070]  ? strncpy_from_user+0x3a/0x1d0
-[  123.159413]  __x64_sys_mkdir+0x6b/0x90
-[  123.159760]  do_syscall_64+0xea/0x600
+Patches 1-4 are unchanged from v3.
+Patch 5 fixes another memory leak of the zones array, and patch 6 is a
+related cleanup.
+Patch 7 fixes a NULL-ptr-deref of hctx when shrinking submit_queues on a
+device that shares the global tag_set.
+Patch 8 fixes a data race, similar to patch 5 in v3, but adjusts the
+return value handling.
+Patch 9 serializes configfs attribute shows to close the remaining
+show-vs-write races.
 
-Replace the runtime mutex_init(&lock) with a static DEFINE_MUTEX(lock)
-declaration to fix this issue.
+See the individual patch descriptions for details.
 
-Fixes: 49c3b9266a71 ("block: null_blk: Improve device creation with configfs")
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- drivers/block/null_blk/main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Changes since v3:
+- Added patch 5 (zones array memleak) and patch 6 (cleanup).
+- Added patch 7 (NULL-ptr-deref on shared tag_set queue shrink).
+- Patch 9: reworked the fix from v3's patch 6 to take the file-scope
+  lock in _store instead of scattering READ_ONCE/WRITE_ONCE.
+https://lore.kernel.org/all/20260708073917.2172392-1-wozizhi@huaweicloud.com/
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index f8c0fd57e041..eba204b27785 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -64,11 +64,11 @@ struct nullb_page {
- };
- #define NULLB_PAGE_LOCK (MAP_SZ - 1)
- #define NULLB_PAGE_FREE (MAP_SZ - 2)
- 
- static LIST_HEAD(nullb_list);
--static struct mutex lock;
-+static DEFINE_MUTEX(lock);
- static int null_major;
- static DEFINE_IDA(nullb_indexes);
- static struct blk_mq_tag_set tag_set;
- 
- enum {
-@@ -2164,12 +2164,10 @@ static int __init null_init(void)
- 
- 	ret = configfs_register_subsystem(&nullb_subsys);
- 	if (ret)
- 		return ret;
- 
--	mutex_init(&lock);
--
- 	null_major = register_blkdev(0, "nullb");
- 	if (null_major < 0) {
- 		ret = null_major;
- 		goto err_conf;
- 	}
+Changes since v2:
+- Dropped the lock rename patch; the rename and locking rework will be
+  sent as a separate series (per Damien's suggestion).
+- Patch 3: fixed the tense in the commit message.
+- Patch 4: also update dev->NAME in the "!dev->nullb" path, which was
+  previously lost.
+https://lore.kernel.org/all/20260707025542.1299859-1-wozizhi@huaweicloud.com/
+
+Changes since v1:
+- Added patches 4-6, and modify the lock name in patch 2.
+https://lore.kernel.org/all/20260706123507.3809871-1-wozizhi@huaweicloud.com/
+
+Zizhi Wo (9):
+  null_blk: use DEFINE_MUTEX for the file-scope mutex
+  null_blk: register configfs subsystem after creating default devices
+  null_blk: move unregister_blkdev() after destroying dev in null_exit()
+  null_blk: free global tag_set on init error path
+  null_blk: free zones array on device power-off
+  null_blk: clean up null_del_dev() to use cached dev pointer
+  null_blk: reject per-device queue resize for shared tag set
+  null_blk: serialize configfs attribute stores with device setup
+  null_blk: serialize configfs attribute shows with the file-scope lock
+
+ drivers/block/null_blk/main.c | 79 +++++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 35 deletions(-)
+
 -- 
 2.52.0
 
