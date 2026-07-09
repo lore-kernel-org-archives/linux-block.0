@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09CB2DCF41
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD584499AB
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632965; cv=none; b=EBS1LmcswZ7KLscichT3uO5BEiVnsEuUyd6PNbbrKb6E33qS6DyK4CIGtyylLAzZiNLsuUZoCE1NY/nDHvA+U/PkHvEADKHzlBjwlqWKbia+0XFtDacPhSca8WrCGLUGVLDTcMfPE3QzYUQTya7X0l1OVe2QWaFuOrIWWP8RG0Q=
+	t=1783632972; cv=none; b=vAs1kPyA8KvqmwpqldIJB+2x+xUkqOl6giP8TkqqrDPdlVCLJeBszMsBkFop4Za2AjZfm4Bct03lGr6mGu6lgcv+1mhw7dfyb+jRlrt31/8XZmMR1YX+SUQTpMxYw+0NcbimAuzcoNVxJzsOdi0OyireuCMVfwcUFQggFTkSnk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632965; c=relaxed/simple;
-	bh=SGPXMt47Lgd4I5NLXGGdWvEYFYTcS1t//djwqaZEuCw=;
+	s=arc-20240116; t=1783632972; c=relaxed/simple;
+	bh=v+9kaNooxOtNy/BmZ4gJBp+n1JTnpDA7Hu99G6elUF0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nOEg6jOHzaSdeeGDAq2dxy+W4kko5EFOwkXHsgQxEWgfhvex5i10GQfGwDMp+buZRIZaSa6v7jWF2yh0BDSebzT6h8kAn1mmYgHddoLfTe1msOKsrG+2LoaKSk2DTDRFmh5EoGFWIsT+1XBrIgWdq83shz5imbtPM06ikiYfVZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=k90MgSBZ; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=Mx7HUgW4ub2qLtb5wH+6AGYFuQZ/Pv3TH0cNhIJOu5EyUV8x2kO23ks2iLW2MFnxHW0u0JEZYtgnfUwBdyARcbLAuldRrMEer+/4eA5Pk+pf6nqBFZas+7Ex1vUvoB9mzNQ7APLlvVcwKiJEWMXVbeao4rysiu7dIR5cx9tP4M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=U+6Em4Cj; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="k90MgSBZ"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="U+6Em4Cj"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Yv2G2xzlhH07;
-	Thu,  9 Jul 2026 21:36:03 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Z23JLpzlhH0Y;
+	Thu,  9 Jul 2026 21:36:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1783632958; x=1786224959; bh=/7T59
-	Z0pUcRfIggjT1uwrqo8WW2/igGw6UGI3xXXOT8=; b=k90MgSBZoLEhp0QrPpIex
-	mlyfEKvOchrj30iXeYaGHAVeJoZm3AVtPoK69j3CvjGZRpmDKE0NSajVnIoU0Jxd
-	buDhT9OFb5JCRzCBHNlieGn03EyfNLaYVjSyBrEG4nlTSCnvjG64WPfIskaxs/tM
-	Z5PGfN8/oSEkXIUYuvUHadE/+qNwvcark3Rq5LFVz+oqmjJH/YLqH3+jdr2ngGqR
-	aYXkWi6w8vDMzF/6hm+G5xUc1tDxb+NTxwvEPW81/TPsqERQqaXfrRh4Mq6wLQap
-	+sEP/o2FR9ylkHNshJ4rcsReeA6xZ0EeFZ3cn5cTaoi9HQRS0FBCbX5mhDQwHRIG
-	Q==
+	:received:received; s=mr01; t=1783632964; x=1786224965; bh=FbBvt
+	ThbPERZbmFDwX/RVnb2ygHZMIxHWt7WizAwJ8I=; b=U+6Em4CjZm6cnEZfiL3oV
+	xgRRY3iWOSZTop45SsYgu8PppN2LYyUPKr+9zTpswCdaHej/OtRnud5YYZsIZA1M
+	gUmK8vIY0o67iu5aTZpcP7lM0a3xdU3nMsresRH1QfCuHIrEIENTIg8lxL8mYXrj
+	Clt+KLhPDWSL/+1w0dOGQ3c+oXNMVTx4On8oMTT6Xq+YzPwM8FxYuRs7xEAEKyvj
+	XASSakY/zKy+vjlbFGq4Z540sNOYVRZq/L9M/4WHlmn29WeNi70wV7CLC10synAO
+	wLdv5s75HZUWz3yR5xKKXA+7b0dqAe5gqtttYzuJWHFf9ZNv7lfkka/fzTrMxWZb
+	A==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id hgbY-nKe3JUu; Thu,  9 Jul 2026 21:35:58 +0000 (UTC)
+ id UtZkZvkku66R; Thu,  9 Jul 2026 21:36:04 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Ym4zS8zlh30c;
-	Thu,  9 Jul 2026 21:35:56 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yt4LT3zlfdCs;
+	Thu,  9 Jul 2026 21:36:02 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH 03/12] drbd: Remove the get_ldev_if_state() macro
-Date: Thu,  9 Jul 2026 14:35:24 -0700
-Message-ID: <08fd1a5f8aebf51d3c547c585c87adb6d7485051.1783632330.git.bvanassche@acm.org>
+Subject: [PATCH 05/12] drbd: Simplify the bitmap locking functions.
+Date: Thu,  9 Jul 2026 14:35:26 -0700
+Message-ID: <2bed33a871a6cb6ee13933b3a1f6bccb41cbb1e6.1783632330.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 In-Reply-To: <cover.1783632330.git.bvanassche@acm.org>
 References: <cover.1783632330.git.bvanassche@acm.org>
@@ -65,41 +65,59 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The get_ldev_if_state() macro has been introduced because sparse does
-not support something like __cond_acquires(). Remove this macro and
-rename _get_ldev_if_state() into get_ldev_if_state().
+Call mutex_lock() instead of mutex_trylock() followed by mutex_lock().
+Remove the code that depends on device->bitmap =3D=3D NULL because this
+can't happen. All drbd_bm_{lock,unlock}() callers guarantee that the
+device->bitmap pointer is valid.
 
+Suggested-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/drbd/drbd_int.h | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/block/drbd/drbd_bitmap.c | 20 +-------------------
+ 1 file changed, 1 insertion(+), 19 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
-h
-index bba52252fbac..49383c309865 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -2002,9 +2002,6 @@ static inline bool is_sync_state(enum drbd_conns co=
-nnection_state)
-  *
-  * You have to call put_ldev() when finished working with device->ldev.
-  */
--#define get_ldev_if_state(_device, _min_state)				\
--	(_get_ldev_if_state((_device), (_min_state)) ?			\
--	 ({ __acquire(x); true; }) : false)
- #define get_ldev(_device) get_ldev_if_state(_device, D_INCONSISTENT)
-=20
- static inline void put_ldev(struct drbd_device *device)
-@@ -2033,8 +2030,8 @@ static inline void put_ldev(struct drbd_device *dev=
-ice)
- 	}
- }
-=20
--static inline int _get_ldev_if_state(struct drbd_device *device,
--				     enum drbd_disk_state mins)
-+static inline int get_ldev_if_state(struct drbd_device *device,
-+				    enum drbd_disk_state mins)
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_b=
+itmap.c
+index 1c68f1774e28..e332a96fe90c 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -124,22 +124,8 @@ static void __bm_print_lock_info(struct drbd_device =
+*device, const char *func)
+ void drbd_bm_lock(struct drbd_device *device, char *why, enum bm_flag fl=
+ags)
  {
- 	int io_allowed;
+ 	struct drbd_bitmap *b =3D device->bitmap;
+-	int trylock_failed;
 =20
+-	if (!b) {
+-		drbd_err(device, "FIXME no bitmap in drbd_bm_lock!?\n");
+-		return;
+-	}
+-
+-	trylock_failed =3D !mutex_trylock(&b->bm_change);
+-
+-	if (trylock_failed) {
+-		drbd_warn(device, "%s[%d] going to '%s' but bitmap already locked for =
+'%s' by %s[%d]\n",
+-			  current->comm, task_pid_nr(current),
+-			  why, b->bm_why ?: "?",
+-			  b->bm_task->comm, task_pid_nr(b->bm_task));
+-		mutex_lock(&b->bm_change);
+-	}
++	mutex_lock(&b->bm_change);
+ 	if (BM_LOCKED_MASK & b->bm_flags)
+ 		drbd_err(device, "FIXME bitmap already locked in bm_lock\n");
+ 	b->bm_flags |=3D flags & BM_LOCKED_MASK;
+@@ -151,10 +137,6 @@ void drbd_bm_lock(struct drbd_device *device, char *=
+why, enum bm_flag flags)
+ void drbd_bm_unlock(struct drbd_device *device)
+ {
+ 	struct drbd_bitmap *b =3D device->bitmap;
+-	if (!b) {
+-		drbd_err(device, "FIXME no bitmap in drbd_bm_unlock!?\n");
+-		return;
+-	}
+=20
+ 	if (!(BM_LOCKED_MASK & device->bitmap->bm_flags))
+ 		drbd_err(device, "FIXME bitmap not locked in bm_unlock\n");
