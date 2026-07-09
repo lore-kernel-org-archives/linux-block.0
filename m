@@ -1,91 +1,114 @@
-Received: from sg-3-45.ptr.tlmpb.com (sg-3-45.ptr.tlmpb.com [101.45.255.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F564071F5
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 10:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.45.255.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBC83E3142;
+	Thu,  9 Jul 2026 10:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591809; cv=none; b=LLZqSAk3CH9zmm2Bf7wVMDkbbVtirZe74qisyhTm3DYP3gxpO23TKR4hv5MttW/6JutSqnXp8LPNtZtDZu1yEz3/9KaOFHdmOnyVSvpbPuHuCcwchKP9KIvxx3B69vLCRHp6tI95hyfc6sdqiGn6kjk2W9ds56AGY6FsJL7FSlg=
+	t=1783591969; cv=none; b=Edm/9Us0FIrAg35btZrrHsgiT2lL4on2OsQTmFyptpX8gLiW1BN5Mh52pETLYmTXHZQN4uq9mRd4m8l1CNicY/s99zk/b1I9HR6h8LtOMAEx2YFWg4FJHVOVJFDIoat2LHWpLC5EGH3I2TbLWfxD7eCJz8KTvXdNOg9wgA3sHBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783591809; c=relaxed/simple;
-	bh=8Y8a558XU+yeUr5q6e4HBxwJmZ5LZ+XgJZHBJowpPs8=;
-	h=Mime-Version:Content-Type:To:Subject:Date:Message-Id:In-Reply-To:
-	 From:Cc:References; b=boxSWWa/XZnXOCR0pnZBR2BAX5X4ZUJYmq31wOBzhTEq+Jbu/IhSeJrl3nBPUj7TrFrsYpMZCG9Wo/yfAiQqubwaxQldYfKEZ3QscN5pvZc2UhxeLxVJINRuhI/lH7bB64wFkSmWINJ/Gy305rl5gl/b5e4n8tbsj5hQhuOaj4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=lmEr59L6; arc=none smtp.client-ip=101.45.255.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="lmEr59L6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783591722;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=nzPK7Q3qm+3tUE8Y8KFwnXjquoOkl/kUWyXBpYXUuB8=;
- b=lmEr59L6hyNDPoexltHX9iycAL/45pk6YoF3XWWsg6Wvx0rwSLZKorXPyguGonelmtu3sE
- 2SFPEcoysIMDs3YXsZXF9DIQ7mta8Ukm1vDmj0+cGVbZRE0mBZyjMYpnUpuYXmV7XjRnUC
- eONZHfJJ+Ns3mhhCK59zJJWgCu4Vyjod1zKrlUG/b4BQLAUvG7c8X0yc+qTy2Fp/FYWYh/
- 3Myivt1FYf4L5l67F5beixXxczc9s07jswbBqs/CkDlav9ZhKGzZdZaeKWcKxneIdsk0Kf
- auVcM8LVokNBtyNphHUMxjAcQdvowFH8U55ZQUNtxWRmykiEhEAtk2JT4XGIeQ==
+	s=arc-20240116; t=1783591969; c=relaxed/simple;
+	bh=nP/UxZvwZnDICegL+X5NP25UhkZBG8VchpxHzmd+Xb4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LOH40d4IYMVksEVymfXftplBYkJsJiiGZ70pruneAwEsZUq+y6AResiM/MqmIFq8EQxIARlKL2g3caE7brTCtBfiidpUPhSfQQJjMWbETzRxZJpOz/62qXPbKlqRXyTOj8hubJHElI6BHsLFsJuxHDqj1kwpRXd7HibByehMT94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gwrP16XBVzKHMd0;
+	Thu,  9 Jul 2026 18:12:21 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 564A34056D;
+	Thu,  9 Jul 2026 18:12:44 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3MadE9qn4RpAg--.38318S10;
+	Thu, 09 Jul 2026 18:12:44 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	nilay@linux.ibm.com,
+	kch@nvidia.com,
+	johannes.thumshirn@wdc.com,
+	kbusch@kernel.org,
+	bvanassche@acm.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huawei.com
+Subject: [PATCH V4 6/9] null_blk: clean up null_del_dev() to use cached dev pointer
+Date: Thu,  9 Jul 2026 18:04:48 +0800
+Message-ID: <20260709100452.3520482-7-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
+References: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Thu, 09 Jul 2026 10:08:41 +0000
-Content-Type: text/plain; charset=UTF-8
-To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Subject: Re: [RFC PATCH v1 00/17] blk-cgroup: protect blkgs with blkcg_mutex
-Date: Thu, 9 Jul 2026 18:08:36 +0800
-Message-Id: <75bc21b5-9cc5-4d39-8ba3-7cf69689e438@fygo.io>
-In-Reply-To: <20260709060959.GA16504@lst.de>
-From: "yu kuai" <yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Content-Transfer-Encoding: quoted-printable
-Reply-To: yukuai@fygo.io
-Cc: "Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>, 
-	"Keith Busch" <kbusch@kernel.org>, "Sagi Grimberg" <sagi@grimberg.me>, 
-	"Alasdair Kergon" <agk@redhat.com>, 
-	"Benjamin Marzinski" <bmarzins@redhat.com>, 
-	"Mike Snitzer" <snitzer@kernel.org>, 
-	"Mikulas Patocka" <mpatocka@redhat.com>, 
-	"Dongsheng Yang" <dongsheng.yang@linux.dev>, 
-	"Zheng Gu" <cengku@gmail.com>, "Coly Li" <colyli@fygo.io>, 
-	"Kent Overstreet" <kent.overstreet@linux.dev>, 
-	"Josef Bacik" <josef@toxicpanda.com>, 
-	"Nilay Shroff" <nilay@linux.ibm.com>, <linux-block@vger.kernel.org>, 
-	<cgroups@vger.kernel.org>, <linux-nvme@lists.infradead.org>, 
-	<dm-devel@lists.linux.dev>, <linux-bcache@vger.kernel.org>
-References: <20260704195124.1375075-1-yukuai@kernel.org> <20260709060959.GA16504@lst.de>
-X-Lms-Return-Path: <lba+26a4f7329+7afd3c+vger.kernel.org+yukuai@fygo.io>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBHV3MadE9qn4RpAg--.38318S10
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr4kWF45AF1kWry7tw1fJFb_yoW8GFy7pr
+	Wjg3WjkF15ZF40vF4DGws7JFy3Jr4DJrW0grWjkasYkr1ayryYyw1qyFy5Wr1UX397Ar4f
+	ZFZxXFy7ZayUJ3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x02
+	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
+	80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
+	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
+	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E
+	5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtV
+	W8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY
+	1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
+	v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x
+	07UZTmfUUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hi,
+From: Zizhi Wo <wozizhi@huawei.com>
 
-=E5=9C=A8 2026/7/9 14:09, Christoph Hellwig =E5=86=99=E9=81=93:
-> On Sun, Jul 05, 2026 at 03:51:07AM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai@fygo.io>
->>
->> This RFC moves queue-local blkg topology synchronization from
->> q->queue_lock to q->blkcg_mutex.
->>
->> q->queue_lock is a hot block-layer spinlock used by request queue runtim=
-e
->> paths,
-> I don't think it is hot any more.  If it is in one of your workloads
-> we have a deep problem somewhere.  That being said, futher removing
-> uses of his old catch-all lock is always good, hopefully we can
-> eventually remove it entirely.
->
-> So this series looks great to me conceptually, but I'm unfortunately
-> not a very qualified reviewer for the blk-cgroup code.
+Replace remaining nullb->dev dereferences with the already-cached
+local dev variable. No functional change.
 
-Thanks a lot for taking a look at this RFC set, it's very helpful.
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+---
+ drivers/block/null_blk/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-It's true that blk-cgroup review is not active for a long time. I'd like to
-help but I really don't have time to check every block layer patches.
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index a75989220a2f..6d30591abb28 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1767,11 +1767,11 @@ static void null_del_dev(struct nullb *nullb)
+ 
+ 	list_del_init(&nullb->list);
+ 
+ 	del_gendisk(nullb->disk);
+ 
+-	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
++	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
+ 		hrtimer_cancel(&nullb->bw_timer);
+ 		atomic_long_set(&nullb->cur_bytes, LONG_MAX);
+ 		blk_mq_start_stopped_hw_queues(nullb->q, true);
+ 	}
+ 
+@@ -1779,11 +1779,11 @@ static void null_del_dev(struct nullb *nullb)
+ 	null_free_zoned_dev(dev);
+ 	if (nullb->tag_set == &nullb->__tag_set)
+ 		blk_mq_free_tag_set(nullb->tag_set);
+ 	kfree(nullb->queues);
+ 	if (null_cache_active(nullb))
+-		null_free_device_storage(nullb->dev, true);
++		null_free_device_storage(dev, true);
+ 	kfree(nullb);
+ 	dev->nullb = NULL;
+ }
+ 
+ static void null_config_discard(struct nullb *nullb, struct queue_limits *lim)
+-- 
+2.52.0
 
->
---=20
-Thanks,
-Kuai
