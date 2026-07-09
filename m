@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E369B4499AB
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F502DCF41
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632990; cv=none; b=qXhMvaEEl+9cjuTtJwW0vhsyDHt1tFojIXTjvraGURHd4gVfrJ1UKFQk7QvEBG0K7N1eeIqSOVL77/vs1OVtt5WPuVmH3t56431kwO+vR3cuGFOuVtO+tEyEZkKjEwBNsFHuX5fZzayUFJjFbSJn8JrK94oG2MDnhxdpbwpx4XE=
+	t=1783632997; cv=none; b=tfDAKBPeSt7tUDTXALjMBNBdUBcp1G8zIpi4+qjiRvmMC7tkLXUEVDWTrnxAFA5gSLstryrxiCU8ei7SMkDglNE6GVPhixMYCvXnW3+V5+a2jQI4GIPwKEFfM95Fm4lHD9nIEHfgWKEEvrtoRVj7ZvCEOH+n7BwcLWKYfYjfBAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632990; c=relaxed/simple;
-	bh=3itDCo/xKHYaVqNAFLoaT3afn0NeudMD9ftH4HtAX0I=;
+	s=arc-20240116; t=1783632997; c=relaxed/simple;
+	bh=BS8sIisUmufiy5rMbyi2AZWAyez+Pyfr19euPeVvvOo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JKlYjy7t2rMCtiM058p3u1TJ+FWQJHRlxhKXs9FYhUOn0Ea3vU558RuujiIntV9MAUS+HS7t6S6fdJXJ3CGxLjLudtX8OyByaClZiCbggT6/z/OTdXcGoDhZOwvuQKnc53GhkA2fy0e7fVCX78oc08pv8bLagQsGaZ61K5BWYPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=mUbHv3hw; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version:Content-Type; b=mITTWMUf10xOhdazkgqY0CpV4zW1H0J2vj/yPWwlFd1sJpEdi+Y2uNI1JYQox9kL0XLzJWlFOmUlrExFRX7oifChLiP5seIA2W85aHfD625ufeKTHxqYE1p8UXASM3cp8JnqFG90+OstRerYUaQQQv91Uf9ANbFc2ELSgBQpKEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SHmjhRiH; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="mUbHv3hw"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SHmjhRiH"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7ZN4zSjzlhH09;
-	Thu,  9 Jul 2026 21:36:28 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7ZW4TyczlffvQ;
+	Thu,  9 Jul 2026 21:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1783632982; x=1786224983; bh=HyzBl
-	vTptNB+AT5OWquYTTtxVbwKdkQOW24Pg02AS/8=; b=mUbHv3hwy8hr5sVuLvJBR
-	h6nHoFgrLboI6k8kMAbZKLvomNekzJF2N3YbCE04oN4QYfCZeer7I1NdEoYAKCtv
-	Zh1OTH5tcvRgoQ8q+Rd7xfwJnWvpOvy5ymBnCSZJxbY4L2vylU5PmVKAaa6RJszC
-	2t24gp/4KOx7ToKEAc0ed13ZdQ7C3p05kw4BfUtNvzaT0uRn0yFyERuBs1/rrvee
-	iWx80wnUBit1MWTqq8KhKqNdj4tJ1+In1o4jpe1AXcIMx+2mrr3ZhbbOvLTYErut
-	givPU9xeOhAx89Xv6eIP98+EdBI9nZUyQDlA9Mspdpkd49Kqt0GftdDRlnV0U6JB
-	w==
+	content-transfer-encoding:content-type:content-type:mime-version
+	:references:in-reply-to:x-mailer:message-id:date:date:subject
+	:subject:from:from:received:received; s=mr01; t=1783632985; x=
+	1786224986; bh=x5xtvbk8C2nyGsuhgY0OERzwN7eAbuqT0dP15E3cF2o=; b=S
+	HmjhRiHG8MIWePr+7efEa6i3L/LQy8hnKSYn9AiBrpUnOXSXO+VYcTgM41YjfqCd
+	pDo25hsYpagc3NCbbDjcnloeBS5+bjz1wMFCZ+6EAl+zI3uvPd5B9MKFrnyXVGnN
+	66+9JjiljSWAp9cPGjUzZzkVVx1yX6YCBZ1x+4IMtTkJCYxxfKF0Vjxq8qPW+3Mp
+	twfaz+YICaB6sss1HruzbcY5Ze9Wo6y9McRa+m2co0lpo/cHJEvGavgOZzjy3p0f
+	IgiQZ0n8ha+o9sFEI67c5NeVz2rzqusb7CwzWQX6KmuVaAQ0HfFn5eMrC0k0729W
+	XETACMVardz4HDRwBNhnw==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id meK-ocbbwKpO; Thu,  9 Jul 2026 21:36:22 +0000 (UTC)
+ id B6SmTOTsDpk3; Thu,  9 Jul 2026 21:36:25 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7ZC2BJTzlhH0F;
-	Thu,  9 Jul 2026 21:36:19 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7ZH4HXDzlhH04;
+	Thu,  9 Jul 2026 21:36:23 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -48,12 +48,12 @@ Cc: linux-block@vger.kernel.org,
 	Marco Elver <elver@google.com>,
 	=?UTF-8?q?Cc=20=3A=20Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>,
 	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH 11/12] drbd: Annotate drbd_bm_{lock,unlock}()
-Date: Thu,  9 Jul 2026 14:35:32 -0700
-Message-ID: <2108bc1373807d815e3c2f8b656b873b7b201adc.1783632330.git.bvanassche@acm.org>
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 12/12] drbd: Enable lock context analysis
+Date: Thu,  9 Jul 2026 14:35:33 -0700
+Message-ID: <f0d908c60c68af345184b6b349edaaa6fa0faa96.1783632330.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 In-Reply-To: <cover.1783632330.git.bvanassche@acm.org>
 References: <cover.1783632330.git.bvanassche@acm.org>
@@ -63,81 +63,207 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Annotate the bitmap locking functions. Introduce a new token context
-lock because the struct drbd_device definition is not visible from the
-drbd_int.h header file. Annotate the declarations of bitmap locking
-functions with only the token context lock. Annotate the definitions of
-the bitmap locking functions with both the token context lock and the
-actual mutex.
+Clang performs more strict checking of lock context annotations than
+sparse. This patch makes the DRBD lock context annotations compatible
+with Clang and enables lock context analysis in the Makefile.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Christoph B=C3=B6hmwalder <christoph.boehmwalder@linbit.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/drbd/drbd_bitmap.c | 6 ++++++
- drivers/block/drbd/drbd_int.h    | 8 ++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ drivers/block/drbd/Makefile        |  3 +++
+ drivers/block/drbd/drbd_int.h      | 27 ++++++++++++++++++---------
+ drivers/block/drbd/drbd_main.c     |  2 ++
+ drivers/block/drbd/drbd_receiver.c |  6 ++++++
+ drivers/block/drbd/drbd_req.c      |  1 +
+ drivers/block/drbd/drbd_state.c    |  2 ++
+ 6 files changed, 32 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_b=
-itmap.c
-index e332a96fe90c..d849bd780ca9 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -122,9 +122,12 @@ static void __bm_print_lock_info(struct drbd_device =
-*device, const char *func)
- }
-=20
- void drbd_bm_lock(struct drbd_device *device, char *why, enum bm_flag fl=
-ags)
-+	__acquires(drbd_dev_bm_lock)
-+	__acquires(&device->bitmap->bm_change)
- {
- 	struct drbd_bitmap *b =3D device->bitmap;
-=20
-+	__acquire(drbd_dev_bm_lock);
- 	mutex_lock(&b->bm_change);
- 	if (BM_LOCKED_MASK & b->bm_flags)
- 		drbd_err(device, "FIXME bitmap already locked in bm_lock\n");
-@@ -135,6 +138,8 @@ void drbd_bm_lock(struct drbd_device *device, char *w=
-hy, enum bm_flag flags)
- }
-=20
- void drbd_bm_unlock(struct drbd_device *device)
-+	__releases(drbd_dev_bm_lock)
-+	__releases(&device->bitmap->bm_change)
- {
- 	struct drbd_bitmap *b =3D device->bitmap;
-=20
-@@ -145,6 +150,7 @@ void drbd_bm_unlock(struct drbd_device *device)
- 	b->bm_why  =3D NULL;
- 	b->bm_task =3D NULL;
- 	mutex_unlock(&b->bm_change);
-+	__release(drbd_dev_bm_lock);
- }
-=20
- /* we store some "meta" info about our pages in page->private */
+diff --git a/drivers/block/drbd/Makefile b/drivers/block/drbd/Makefile
+index 5faaa8a8e7f0..cae65578001b 100644
+--- a/drivers/block/drbd/Makefile
++++ b/drivers/block/drbd/Makefile
+@@ -1,4 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++
++CONTEXT_ANALYSIS :=3D y
++
+ drbd-y :=3D drbd_buildtag.o drbd_bitmap.o drbd_proc.o
+ drbd-y +=3D drbd_worker.o drbd_receiver.o drbd_req.o drbd_actlog.o
+ drbd-y +=3D drbd_main.o drbd_strings.o drbd_nl.o
 diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
 h
-index 1f3f2157df8b..7e0e0a0f27ae 100644
+index 7e0e0a0f27ae..73ceaab3842d 100644
 --- a/drivers/block/drbd/drbd_int.h
 +++ b/drivers/block/drbd/drbd_int.h
-@@ -1337,8 +1337,12 @@ void drbd_bm_merge_lel(struct drbd_device *device,=
- size_t offset, size_t number,
- void drbd_bm_get_lel(struct drbd_device *device, size_t offset, size_t n=
-umber,
- 		     unsigned long *buffer);
+@@ -197,8 +197,8 @@ struct drbd_device_work {
 =20
--void drbd_bm_lock(struct drbd_device *device, char *why, enum bm_flag fl=
-ags);
--void drbd_bm_unlock(struct drbd_device *device);
-+token_context_lock(drbd_dev_bm_lock);
-+
-+void drbd_bm_lock(struct drbd_device *device, char *why, enum bm_flag fl=
-ags)
-+	__acquires(drbd_dev_bm_lock);
-+void drbd_bm_unlock(struct drbd_device *device)
-+	__releases(drbd_dev_bm_lock);
- /* drbd_main.c */
+ extern struct mutex resources_mutex;
 =20
- extern struct kmem_cache *drbd_request_cache;
+-void lock_all_resources(void);
+-void unlock_all_resources(void);
++void lock_all_resources(void) __acquires(&resources_mutex);
++void unlock_all_resources(void) __releases(&resources_mutex);
+=20
+ struct drbd_request {
+ 	struct drbd_work w;
+@@ -1094,7 +1094,8 @@ int drbd_bmio_set_n_write(struct drbd_device *devic=
+e,
+ 			  struct drbd_peer_device *peer_device);
+ int drbd_bmio_clear_n_write(struct drbd_device *device,
+ 			    struct drbd_peer_device *peer_device);
+-int drbd_wait_misc(struct drbd_device *device, struct drbd_interval *i);
++int drbd_wait_misc(struct drbd_device *device, struct drbd_interval *i)
++	__must_hold(&device->resource->req_lock);
+=20
+ /* Meta data layout
+  *
+@@ -1859,12 +1860,20 @@ static inline void request_ping(struct drbd_conne=
+ction *connection)
+ 	wake_ack_receiver(connection);
+ }
+=20
+-void *conn_prepare_command(struct drbd_connection *, struct drbd_socket =
+*);
+-void *drbd_prepare_command(struct drbd_peer_device *, struct drbd_socket=
+ *);
+-int conn_send_command(struct drbd_connection *, struct drbd_socket *,
+-		      enum drbd_packet, unsigned int, void *, unsigned int);
+-int drbd_send_command(struct drbd_peer_device *, struct drbd_socket *,
+-		      enum drbd_packet, unsigned int, void *, unsigned int);
++void *conn_prepare_command(struct drbd_connection *connection,
++			   struct drbd_socket *sock)
++	__cond_acquires(true, &sock->mutex);
++void *drbd_prepare_command(struct drbd_peer_device *peer_device, struct =
+drbd_socket *sock)
++	__cond_acquires(true, &sock->mutex);
++int conn_send_command(struct drbd_connection *connection,
++		      struct drbd_socket *sock,
++		      enum drbd_packet cmd, unsigned int header_size,
++		      void *data, unsigned int size)
++	__releases(&sock->mutex);
++int drbd_send_command(struct drbd_peer_device *peer_device, struct drbd_=
+socket *sock,
++		      enum drbd_packet cmd, unsigned int header_size,
++		      void *data, unsigned int size)
++	__releases(&sock->mutex);
+=20
+ int drbd_send_ping(struct drbd_connection *connection);
+ int drbd_send_ping_ack(struct drbd_connection *connection);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_mai=
+n.c
+index d9eb95aa5c44..6f3c04252b5d 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -3659,6 +3659,7 @@ int drbd_wait_misc(struct drbd_device *device, stru=
+ct drbd_interval *i)
+ }
+=20
+ void lock_all_resources(void)
++	__context_unsafe(locking loop)
+ {
+ 	struct drbd_resource *resource;
+ 	int __maybe_unused i =3D 0;
+@@ -3670,6 +3671,7 @@ void lock_all_resources(void)
+ }
+=20
+ void unlock_all_resources(void)
++	__context_unsafe(locking loop)
+ {
+ 	struct drbd_resource *resource;
+=20
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd=
+_receiver.c
+index 4e04ff2dc65d..b4a350cd03b0 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -288,6 +288,7 @@ static int drbd_finish_peer_reqs(struct drbd_device *=
+device)
+=20
+ static void _drbd_wait_ee_list_empty(struct drbd_device *device,
+ 				     struct list_head *head)
++	__must_hold(&device->resource->req_lock)
+ {
+ 	DEFINE_WAIT(wait);
+=20
+@@ -897,6 +898,8 @@ static int conn_connect(struct drbd_connection *conne=
+ction)
+ 	if (drbd_send_protocol(connection) =3D=3D -EOPNOTSUPP)
+ 		return -1;
+=20
++	/* context_unsafe() because of two locking loops */
++	context_unsafe(
+ 	/* Prevent a race between resync-handshake and
+ 	 * being promoted to Primary.
+ 	 *
+@@ -914,6 +917,7 @@ static int conn_connect(struct drbd_connection *conne=
+ction)
+=20
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
+ 		mutex_unlock(peer_device->device->state_mutex);
++	);
+=20
+ 	rcu_read_lock();
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+@@ -2231,6 +2235,7 @@ static blk_opf_t wire_flags_to_bio(struct drbd_conn=
+ection *connection, u32 dpf)
+=20
+ static void fail_postponed_requests(struct drbd_device *device, sector_t=
+ sector,
+ 				    unsigned int size)
++	__must_hold(&device->resource->req_lock)
+ {
+ 	struct drbd_peer_device *peer_device =3D first_peer_device(device);
+ 	struct drbd_interval *i;
+@@ -2257,6 +2262,7 @@ static void fail_postponed_requests(struct drbd_dev=
+ice *device, sector_t sector,
+=20
+ static int handle_write_conflicts(struct drbd_device *device,
+ 				  struct drbd_peer_request *peer_req)
++	__must_hold(&device->resource->req_lock)
+ {
+ 	struct drbd_connection *connection =3D peer_req->peer_device->connectio=
+n;
+ 	bool resolve_conflicts =3D test_bit(RESOLVE_CONFLICTS, &connection->fla=
+gs);
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.=
+c
+index a851e43c94a8..1cc455846f92 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -953,6 +953,7 @@ static bool remote_due_to_read_balancing(struct drbd_=
+device *device, sector_t se
+  */
+ static void complete_conflicting_writes(struct drbd_resource *resource,
+ 					struct drbd_request *req)
++	__must_hold(&resource->req_lock)
+ {
+ 	DEFINE_WAIT(wait);
+ 	struct drbd_device *device =3D req->device;
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_st=
+ate.c
+index c60c071a666a..416a71d7a61c 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -714,6 +714,7 @@ int drbd_request_detach_interruptible(struct drbd_dev=
+ice *device)
+ enum drbd_state_rv
+ _drbd_request_state_holding_state_mutex(struct drbd_device *device, unio=
+n drbd_state mask,
+ 		    union drbd_state val, enum chg_state_flags f)
++	__must_hold(&device->state_mutex)
+ {
+ 	enum drbd_state_rv rv;
+=20
+@@ -2307,6 +2308,7 @@ _conn_rq_cond(struct drbd_connection *connection, u=
+nion drbd_state mask, union d
+ enum drbd_state_rv
+ _conn_request_state(struct drbd_connection *connection, union drbd_state=
+ mask, union drbd_state val,
+ 		    enum chg_state_flags flags)
++	__context_unsafe(conditional locking)
+ {
+ 	enum drbd_state_rv rv =3D SS_SUCCESS;
+ 	struct after_conn_state_chg_work *acscw;
