@@ -1,85 +1,99 @@
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D464838B7B4;
-	Thu,  9 Jul 2026 01:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83BB28D8DB;
+	Thu,  9 Jul 2026 02:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783560106; cv=none; b=TMpg0J+UWDWfTiBcA2kKuHSHnxDZetwv8Mj4clFojmDwBq5fn2OqHi8uY2jQ/iqJYANbU4cIdRo+yJlpPj5OUAEpX10YceI+ySz64tt0NMlXjlvB5Kf9bagXhGBAhzScvzm7xgeZEr/ZFp5KiCLI/Br5yUQn6HoFQPMh+R1uN2M=
+	t=1783562517; cv=none; b=fK0hhcXlu+8ijif7AVp8cu0nxYE+MujWD3Tmoqycg2QFKd75aCpr31hMy5l70ZbjMvIm8aC0NvEImi6Krvxl0F6OVsZg7vyyw52rBvCGqeukR4AXYt+v3BcEI9LXkvwno1A1waBzR68P95sZmRxGJoLfMFfCb5tS9H+dcLrh4Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783560106; c=relaxed/simple;
-	bh=+DihPCn4xArVV/YqZmr1a/09s4lPoQjYYS7iV5R7SW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gh/NWpWTtK7dq37FxZEHnKpWcDlEKiBk9bAkCs1puqNEQqNO1ql/YWAWQBNTjbZs5vyImE0HAg7vWtXQ1Kr9XJzbrQ01VLhUATI9kBUOzBLTCUqpSP12o5Qt5MuQV+ONSSBVgjMXuiStcMxggCdljK2aLtGeNXBjG2ALCLgJ65E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CkqkLXCJ; arc=none smtp.client-ip=115.124.30.111
+	s=arc-20240116; t=1783562517; c=relaxed/simple;
+	bh=ptPEga048dDfpgc4NPgaPHAhwkl8FxeIJkwYC+b6Dtc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sbGB/KJkMplzF8KVSXREoXwa8w4MnOjvsM2IcZOsTj3Tjsp2rjnC301zx/7Ly1XvUKqgZbH/RmKZ6+EnMMxEDpUwM7gVh9lOf9YDpD/Jy2Ujgy6V68oeeJt1Y9CCxdN5O17rcCbqNP+DF2Q0aX5yCqOEp5Shrg0wZWYc23Z5IKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ka6bwvf4; arc=none smtp.client-ip=115.124.30.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CkqkLXCJ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ka6bwvf4"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1783560100; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=K7F9uC92T4GAk+VUln9wzSr5AAHGp3bwf4vD/uf3Hqc=;
-	b=CkqkLXCJWhTAsIErPKL9dAN+XxWK8L9t3jJk+FFfmgIXnKZO1HDuDTMb0Th7cwAK2fPCXtaCwJVs86NCO7JazpuR2yA6Tw8RmH8fU0ltW9HRqtTvID+tuEQ0NNKhflh/v0POZTTGvyfJ6zjBs9ySXghV8K6KV1jURkIQGJ8i+28=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0X6intuN_1783560098;
-Received: from 30.221.145.97(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0X6intuN_1783560098 cluster:ay36)
+	t=1783562507; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=scrgrihMNdO71W2pEG7BjKMGeX9yjfpvjJGMYkvGkKA=;
+	b=ka6bwvf4y0jXqMy1JMcATa1ldYpuE8DE+Pr+Asu/hA92tinDN9SqHx+BAmmccmt0hjhLsydchk3i87x4JOh8+LN9rTi9R0Ye1mALHqboE3khrtPw41NqjltUc0nHhcWmoQZfEESDZnlJ6J2lxWCen7MdtaDIh6zGx+8Ox7S5uLg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R471e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0X6j0BH0_1783562506;
+Received: from localhost(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0X6j0BH0_1783562506 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 09 Jul 2026 09:21:39 +0800
-Message-ID: <4383327c-0e74-4aa7-b682-04f874b23478@linux.alibaba.com>
-Date: Thu, 9 Jul 2026 09:21:37 +0800
+          Thu, 09 Jul 2026 10:01:46 +0800
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Baokun Li <libaokun@linux.alibaba.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] block: try slab allocation in bio_alloc_bioset() before mempool
+Date: Thu,  9 Jul 2026 10:01:45 +0800
+Message-Id: <20260709020145.4011533-1-joseph.qi@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: fix bio_alloc_bioset() percpu cache fallback for
- non-reclaim contexts
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Baokun Li <libaokun@linux.alibaba.com>
-References: <20260708011413.1710118-1-joseph.qi@linux.alibaba.com>
- <20260708084547.GA3591@lst.de>
- <b8b95aeb-8443-404b-a320-e3bd3fed1598@linux.alibaba.com>
- <20260708162100.GA2502@lst.de>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <20260708162100.GA2502@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+When the per-CPU bio cache is enabled but empty, bio_alloc_percpu_cache()
+returns NULL and bio_alloc_bioset() falls straight through to the mempool
+fallback:
 
+    if (unlikely(!bio)) {
+        if (!(saved_gfp & __GFP_DIRECT_RECLAIM))
+            return NULL;
+        ...
+    }
 
-On 7/9/26 12:21 AM, Christoph Hellwig wrote:
-> On Wed, Jul 08, 2026 at 05:49:21PM +0800, Joseph Qi wrote:
->> Looks sane. So commit b520c4eef83d exposed the bug but not introduced it.
-> 
-> Well, there is a bug in virtio_pmem for sure.  But I also think the
-> bio_alloc_bioset behavior isn't quite optimal for non-sleeping
-> allocations.  But I'd probably go more for something like this there:
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index f2a5f4d0a967..bdca2e60514b 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -555,6 +555,13 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
->  		bio = bio_alloc_percpu_cache(bs);
->  	} else {
->  		opf &= ~REQ_ALLOC_CACHE;
-> +	}
-> +
-> +	/*
-> +	 * If the percpu cache was empty, try an slab allocation with optimistic
-> +	 * GFP_ flags ass well before falling back to the mempool.
-> +	 */
-> +	if (!bio) {
->  		p = kmem_cache_alloc(bs->bio_slab, gfp);
->  		if (p)
->  			bio = p + bs->front_pad;
+For non-sleeping allocations (no __GFP_DIRECT_RECLAIM) this returns NULL
+without ever attempting a slab allocation, even when there is plenty of
+free memory.
 
-I wrote like this firstly, but to not mixed the bs->cache and normal
-case so I dropped it.
-Anyway I'm fine with this way. I'll send v2 later.
+Commit b520c4eef83d ("block: split bio_alloc_bioset more clearly into a
+fast and slowpath") introduced this. Before it, a percpu cache miss fell
+through to mempool_alloc(), which attempted the underlying slab allocation
+first and only failed when that slab allocation failed. The restructuring
+dropped the slab attempt that non-sleeping callers of a cache-enabled
+bioset (such as the default fs_bio_set used by bio_alloc()) relied on.
 
-Thanks,
-Joseph
+Try a slab allocation with optimistic GFP_ flags before falling back to
+the mempool whenever the bio is still NULL, so both the cache-empty and
+non-cache paths share the same slab attempt. This restores the previous
+behavior for non-sleeping allocations.
+
+Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+---
+ block/bio.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/block/bio.c b/block/bio.c
+index f2a5f4d0a9672..982f2e47a4218 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -555,6 +555,14 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+ 		bio = bio_alloc_percpu_cache(bs);
+ 	} else {
+ 		opf &= ~REQ_ALLOC_CACHE;
++	}
++
++	/*
++	 * For a bioset without a percpu cache, or when the percpu cache was
++	 * empty, try a slab allocation with optimistic GFP_ flags before
++	 * falling back to the mempool.
++	 */
++	if (!bio) {
+ 		p = kmem_cache_alloc(bs->bio_slab, gfp);
+ 		if (p)
+ 			bio = p + bs->front_pad;
+-- 
+2.39.3
+
