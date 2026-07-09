@@ -1,40 +1,32 @@
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA506391853;
-	Thu,  9 Jul 2026 00:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D464838B7B4;
+	Thu,  9 Jul 2026 01:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783558795; cv=none; b=O58OzIFglZ+ftpzyFcczK1dJvica+/1BjGFq5xoVovO1+g2lDE4Y3ZlGtAo5OXxinKWsThSheSJut66g7hHZVmANnAWpe5rJ7tPNquqg2jPEGt4x5vXwCgz63BMEWOg4vWtQHfcbr1pgwGFE67maRppRZRFg9BquYaMitA+jyqk=
+	t=1783560106; cv=none; b=TMpg0J+UWDWfTiBcA2kKuHSHnxDZetwv8Mj4clFojmDwBq5fn2OqHi8uY2jQ/iqJYANbU4cIdRo+yJlpPj5OUAEpX10YceI+ySz64tt0NMlXjlvB5Kf9bagXhGBAhzScvzm7xgeZEr/ZFp5KiCLI/Br5yUQn6HoFQPMh+R1uN2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783558795; c=relaxed/simple;
-	bh=LIHV+HE+Ks7r+PALIKh2TcbyskdwnmlliHjZbAEgX64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DvoLOcCvqtIiNkYl8eOOQDJpm2bof9DLccVitk3zgiqstBd51wSVbB8+wIlcp4SM9xCahzC8+pXHzC3lCEbb4m9Y55IoXPVoyF888kBr0oX9HVo0cr2RUWqPdn3CFG9NOs0JQi1uw2sm+utDNe+okB8Q2Ja4BpPpGy7PjUUsZUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=h+KpCCJs; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1783560106; c=relaxed/simple;
+	bh=+DihPCn4xArVV/YqZmr1a/09s4lPoQjYYS7iV5R7SW0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gh/NWpWTtK7dq37FxZEHnKpWcDlEKiBk9bAkCs1puqNEQqNO1ql/YWAWQBNTjbZs5vyImE0HAg7vWtXQ1Kr9XJzbrQ01VLhUATI9kBUOzBLTCUqpSP12o5Qt5MuQV+ONSSBVgjMXuiStcMxggCdljK2aLtGeNXBjG2ALCLgJ65E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CkqkLXCJ; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="h+KpCCJs"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=FHgY77I+AJCpAnaShfoa2rikXqXoO/GrUtdyxE8eo0I=;
-	b=h+KpCCJs3toAEm5JxN0X0N1GYbH0g9567vpOTG9MPJz9++mWosKbm6bQKhs82AwiLB25PzJcF
-	LxZQ5lVlUMQ/pgM4+luGfjKohzm0UvmdUeweNCeJEJmeQOulsGDugicdgEiAd1NnMAlyCVjEqcd
-	2/XD34ck2EBeQmiyouWaqsw=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gwbwh3mdjzLlVT;
-	Thu,  9 Jul 2026 08:50:28 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id EA99D4048B;
-	Thu,  9 Jul 2026 08:59:42 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 9 Jul 2026 08:59:42 +0800
-Message-ID: <33474553-c47c-4508-ac77-e0598834bb7c@huawei.com>
-Date: Thu, 9 Jul 2026 08:59:41 +0800
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CkqkLXCJ"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1783560100; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=K7F9uC92T4GAk+VUln9wzSr5AAHGp3bwf4vD/uf3Hqc=;
+	b=CkqkLXCJWhTAsIErPKL9dAN+XxWK8L9t3jJk+FFfmgIXnKZO1HDuDTMb0Th7cwAK2fPCXtaCwJVs86NCO7JazpuR2yA6Tw8RmH8fU0ltW9HRqtTvID+tuEQ0NNKhflh/v0POZTTGvyfJ6zjBs9ySXghV8K6KV1jURkIQGJ8i+28=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0X6intuN_1783560098;
+Received: from 30.221.145.97(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0X6intuN_1783560098 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Jul 2026 09:21:39 +0800
+Message-ID: <4383327c-0e74-4aa7-b682-04f874b23478@linux.alibaba.com>
+Date: Thu, 9 Jul 2026 09:21:37 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,32 +34,52 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] scsi: sg: validate and round up scatter_elem_sz module
- parameter
-To: Bart Van Assche <bvanassche@acm.org>, <dgilbert@interlog.com>,
-	<James.Bottomley@HansenPartnership.com>, <martin.petersen@oracle.com>,
-	<yukuai@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-References: <20260708063045.2008478-1-yangerkun@huawei.com>
- <a5fa376d-90d6-4767-a994-2b91fb9cb951@acm.org>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <a5fa376d-90d6-4767-a994-2b91fb9cb951@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+Subject: Re: [PATCH] block: fix bio_alloc_bioset() percpu cache fallback for
+ non-reclaim contexts
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Baokun Li <libaokun@linux.alibaba.com>
+References: <20260708011413.1710118-1-joseph.qi@linux.alibaba.com>
+ <20260708084547.GA3591@lst.de>
+ <b8b95aeb-8443-404b-a320-e3bd3fed1598@linux.alibaba.com>
+ <20260708162100.GA2502@lst.de>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+In-Reply-To: <20260708162100.GA2502@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-在 2026/7/9 0:10, Bart Van Assche 写道:
-> On 7/7/26 11:30 PM, Yang Erkun wrote:
->> Additionally, the code handling scatter_elem_sz is refactored for
->> clarity: [ ... ]
-> One change per patch please. The code refactoring and the bug fix should
-> be separate patches.
 
-Thanks for your review! Will do it next version.
 
+On 7/9/26 12:21 AM, Christoph Hellwig wrote:
+> On Wed, Jul 08, 2026 at 05:49:21PM +0800, Joseph Qi wrote:
+>> Looks sane. So commit b520c4eef83d exposed the bug but not introduced it.
 > 
-> Thanks,
+> Well, there is a bug in virtio_pmem for sure.  But I also think the
+> bio_alloc_bioset behavior isn't quite optimal for non-sleeping
+> allocations.  But I'd probably go more for something like this there:
 > 
-> Bart.
+> diff --git a/block/bio.c b/block/bio.c
+> index f2a5f4d0a967..bdca2e60514b 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -555,6 +555,13 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+>  		bio = bio_alloc_percpu_cache(bs);
+>  	} else {
+>  		opf &= ~REQ_ALLOC_CACHE;
+> +	}
+> +
+> +	/*
+> +	 * If the percpu cache was empty, try an slab allocation with optimistic
+> +	 * GFP_ flags ass well before falling back to the mempool.
+> +	 */
+> +	if (!bio) {
+>  		p = kmem_cache_alloc(bs->bio_slab, gfp);
+>  		if (p)
+>  			bio = p + bs->front_pad;
 
+I wrote like this firstly, but to not mixed the bs->cache and normal
+case so I dropped it.
+Anyway I'm fine with this way. I'll send v2 later.
+
+Thanks,
+Joseph
