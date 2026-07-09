@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD584499AB
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC5C4499AB
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632972; cv=none; b=vAs1kPyA8KvqmwpqldIJB+2x+xUkqOl6giP8TkqqrDPdlVCLJeBszMsBkFop4Za2AjZfm4Bct03lGr6mGu6lgcv+1mhw7dfyb+jRlrt31/8XZmMR1YX+SUQTpMxYw+0NcbimAuzcoNVxJzsOdi0OyireuCMVfwcUFQggFTkSnk8=
+	t=1783632974; cv=none; b=duN59K8Expbd9+2VZL95qu+n4yh4d8RXMBqS6VZenzCE6Ox3d6TPcVoH87mhuLA45b7a/O1x18W92L8nVBwkvtJnVQa7jU4ZVaXxuGEyfgmB4QSq26Jn3idZZflnvy0LL8FNI4Ii7b3a/qkNyHR9zRQpl9HWy6J9A+HjX2+gQCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632972; c=relaxed/simple;
-	bh=v+9kaNooxOtNy/BmZ4gJBp+n1JTnpDA7Hu99G6elUF0=;
+	s=arc-20240116; t=1783632974; c=relaxed/simple;
+	bh=nlB/kUWzPjczR0gDlJs7DJzEUEfZfsjyWSgBxeIFycY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mx7HUgW4ub2qLtb5wH+6AGYFuQZ/Pv3TH0cNhIJOu5EyUV8x2kO23ks2iLW2MFnxHW0u0JEZYtgnfUwBdyARcbLAuldRrMEer+/4eA5Pk+pf6nqBFZas+7Ex1vUvoB9mzNQ7APLlvVcwKiJEWMXVbeao4rysiu7dIR5cx9tP4M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=U+6Em4Cj; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=AfWjrTGoM37QvCP2LQeGHGTYYwXyMOE78dRI+rz8oH5+oKGTnMoxopmudVxEBlPutwPNfadiNYGGFpTQJUatpvhpETqSa2jLVM5Ph0PyeoeuduqsEulEC7FkPlNZiJmZgW7DDqTmUqSAS+7pjwCXNBBhBY9Xjpem5KfuAT5NxAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WdDYdEHC; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="U+6Em4Cj"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WdDYdEHC"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Z23JLpzlhH0Y;
-	Thu,  9 Jul 2026 21:36:10 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Z446t7zlhH0B;
+	Thu,  9 Jul 2026 21:36:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1783632964; x=1786224965; bh=FbBvt
-	ThbPERZbmFDwX/RVnb2ygHZMIxHWt7WizAwJ8I=; b=U+6Em4CjZm6cnEZfiL3oV
-	xgRRY3iWOSZTop45SsYgu8PppN2LYyUPKr+9zTpswCdaHej/OtRnud5YYZsIZA1M
-	gUmK8vIY0o67iu5aTZpcP7lM0a3xdU3nMsresRH1QfCuHIrEIENTIg8lxL8mYXrj
-	Clt+KLhPDWSL/+1w0dOGQ3c+oXNMVTx4On8oMTT6Xq+YzPwM8FxYuRs7xEAEKyvj
-	XASSakY/zKy+vjlbFGq4Z540sNOYVRZq/L9M/4WHlmn29WeNi70wV7CLC10synAO
-	wLdv5s75HZUWz3yR5xKKXA+7b0dqAe5gqtttYzuJWHFf9ZNv7lfkka/fzTrMxWZb
-	A==
+	:received:received; s=mr01; t=1783632967; x=1786224968; bh=enOgg
+	uDwPE5BpoyBXSQ+CMayqCmimu5QC3uM/GH7brc=; b=WdDYdEHC7zTnplZS2uDrT
+	UjLQf1v84ATKzvaF6FJL/nQOniLnfWrk6PDBqd77fVueCU7FGDk+/nHo9u2aHOus
+	mGBJjOkXb7TvJPC74pFg6RmaVw+3aI6HscCF9Vo5LICWQPcHFCGFTHWaoiijd5m7
+	aV/kt3VzubzQuUrurJS5MTkWJalLo2/VEJwJuB615PrleB2U+pFl/CftOPO9gmMh
+	H11d4L5c/EoZcznlQ/9PNEZH0FymhXtRo/Ywg90/5t1+yN4H+YG0rGXhypRRD28x
+	WDsY8aH/Kn63kRnDcvcOvGVkFL9V0aq9oj6C9TbSFFx26leJS70xYX3K/dmGHRHh
+	w==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id UtZkZvkku66R; Thu,  9 Jul 2026 21:36:04 +0000 (UTC)
+ id K-FSJ8jfE49m; Thu,  9 Jul 2026 21:36:07 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yt4LT3zlfdCs;
-	Thu,  9 Jul 2026 21:36:02 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yx2bqZzlhH0D;
+	Thu,  9 Jul 2026 21:36:05 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH 05/12] drbd: Simplify the bitmap locking functions.
-Date: Thu,  9 Jul 2026 14:35:26 -0700
-Message-ID: <2bed33a871a6cb6ee13933b3a1f6bccb41cbb1e6.1783632330.git.bvanassche@acm.org>
+Subject: [PATCH 06/12] drbd: Move two declarations
+Date: Thu,  9 Jul 2026 14:35:27 -0700
+Message-ID: <ae5f9acb485444cc67604b5e2e04867c093c1ef3.1783632330.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 In-Reply-To: <cover.1783632330.git.bvanassche@acm.org>
 References: <cover.1783632330.git.bvanassche@acm.org>
@@ -65,59 +65,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Call mutex_lock() instead of mutex_trylock() followed by mutex_lock().
-Remove the code that depends on device->bitmap =3D=3D NULL because this
-can't happen. All drbd_bm_{lock,unlock}() callers guarantee that the
-device->bitmap pointer is valid.
+Move the resources_mutex declaration in front of the functions that
+acquire and release this mutex. Move the drbd_wait_misc() declaration
+past the struct drbd_device definition. This patch prepares for adding
+lock context annotations.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/drbd/drbd_bitmap.c | 20 +-------------------
- 1 file changed, 1 insertion(+), 19 deletions(-)
+ drivers/block/drbd/drbd_int.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_b=
-itmap.c
-index 1c68f1774e28..e332a96fe90c 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -124,22 +124,8 @@ static void __bm_print_lock_info(struct drbd_device =
-*device, const char *func)
- void drbd_bm_lock(struct drbd_device *device, char *why, enum bm_flag fl=
-ags)
- {
- 	struct drbd_bitmap *b =3D device->bitmap;
--	int trylock_failed;
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
+h
+index 4b9d69adb9d4..1f3f2157df8b 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -195,7 +195,7 @@ struct drbd_device_work {
 =20
--	if (!b) {
--		drbd_err(device, "FIXME no bitmap in drbd_bm_lock!?\n");
--		return;
--	}
--
--	trylock_failed =3D !mutex_trylock(&b->bm_change);
--
--	if (trylock_failed) {
--		drbd_warn(device, "%s[%d] going to '%s' but bitmap already locked for =
-'%s' by %s[%d]\n",
--			  current->comm, task_pid_nr(current),
--			  why, b->bm_why ?: "?",
--			  b->bm_task->comm, task_pid_nr(b->bm_task));
--		mutex_lock(&b->bm_change);
--	}
-+	mutex_lock(&b->bm_change);
- 	if (BM_LOCKED_MASK & b->bm_flags)
- 		drbd_err(device, "FIXME bitmap already locked in bm_lock\n");
- 	b->bm_flags |=3D flags & BM_LOCKED_MASK;
-@@ -151,10 +137,6 @@ void drbd_bm_lock(struct drbd_device *device, char *=
-why, enum bm_flag flags)
- void drbd_bm_unlock(struct drbd_device *device)
- {
- 	struct drbd_bitmap *b =3D device->bitmap;
--	if (!b) {
--		drbd_err(device, "FIXME no bitmap in drbd_bm_unlock!?\n");
--		return;
--	}
+ #include "drbd_interval.h"
 =20
- 	if (!(BM_LOCKED_MASK & device->bitmap->bm_flags))
- 		drbd_err(device, "FIXME bitmap not locked in bm_unlock\n");
+-int drbd_wait_misc(struct drbd_device *, struct drbd_interval *);
++extern struct mutex resources_mutex;
+=20
+ void lock_all_resources(void);
+ void unlock_all_resources(void);
+@@ -1094,6 +1094,7 @@ int drbd_bmio_set_n_write(struct drbd_device *devic=
+e,
+ 			  struct drbd_peer_device *peer_device);
+ int drbd_bmio_clear_n_write(struct drbd_device *device,
+ 			    struct drbd_peer_device *peer_device);
++int drbd_wait_misc(struct drbd_device *device, struct drbd_interval *i);
+=20
+ /* Meta data layout
+  *
+@@ -1363,8 +1364,6 @@ extern struct bio_set drbd_md_io_bio_set;
+ /* And a bio_set for cloning */
+ extern struct bio_set drbd_io_bio_set;
+=20
+-extern struct mutex resources_mutex;
+-
+ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ct=
+x,
+ 				      unsigned int minor);
+ void drbd_destroy_device(struct kref *kref);
