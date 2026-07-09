@@ -1,28 +1,28 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB253C5546;
-	Thu,  9 Jul 2026 10:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38737403B1B;
+	Thu,  9 Jul 2026 10:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591970; cv=none; b=UAXkot2uvy4BuA8SNwRJ18FrOKdmE9/9xMbeQteeW7oC6MKqLgjoc5Tvc5rl83O3DuPm7N9AMfcyAuIwJcN/uLIOwvEB4SviuB3MYKFnB9gbeRtOshk5PPItGiK1llZJUrRi/zngPhX8ILGI/7Z2vlnojL7g7Nm8EcDIe6HfLBU=
+	t=1783591970; cv=none; b=usZ4Q6rRF6wmgryLBnPNDyCDsc2mdbYLgVRfNulh6TAj0uyti6aXE2+IhVgVtefxdEp/Fc/DxLoKK4hIsMZaz1pIdeDgzecVQivTYe/pmkQbQN4GFtc8wem/HSNz4g/cqJVF7i89An9mMo0HJgvn4vl79zUv8R4JJMop1YYlxtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783591970; c=relaxed/simple;
-	bh=BryAbSDMHN51xAb4NtOZ4hwV3fOHOx2fZrTEmy6kgk0=;
+	bh=3cmfbgEhlb0Wr2zehjIyaNNdgtIfBvCWH+RNz2v+mM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kQaMJrxD88eNu5kG4fah8C8W+QBwexYLFSTBHUJcLs9u/608NF1QcFDuNL4pFbhASzj+6znmm/UiJ3XVIJXCuychHxi2uu6+NsUdQVpsTZmCOyfmt/2iqZuqDb/S9ReNcQKeO5+/BRO6pk5WZXqLebtD53GtS5MPAh0x9Tw1EMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=bI0+I80S25WSr5mB+yaa8Qv+NsGlA8k0f/IOJN5mzyhoniUuHmHcU1qbSkyQQTCjyXAeg2obdqHekm+hQB5XDS4ctRNDArv22AobNrxzK4RTfccsby7v9h5uTrynd1GWm8bpP2alL1JXJ+MTe8ik++VC125/TsryikCEaMm70nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gwrP14hFQzKHMcW;
-	Thu,  9 Jul 2026 18:12:21 +0800 (CST)
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gwrP20wm7zKHMcX;
+	Thu,  9 Jul 2026 18:12:22 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 1722C4058D;
+	by mail.maildlp.com (Postfix) with ESMTP id 89FD14056D;
 	Thu,  9 Jul 2026 18:12:44 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3MadE9qn4RpAg--.38318S6;
-	Thu, 09 Jul 2026 18:12:43 +0800 (CST)
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3MadE9qn4RpAg--.38318S13;
+	Thu, 09 Jul 2026 18:12:44 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
 	dlemoal@kernel.org,
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	yangerkun@huawei.com,
 	chengzhihao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [PATCH V4 2/9] null_blk: register configfs subsystem after creating default devices
-Date: Thu,  9 Jul 2026 18:04:44 +0800
-Message-ID: <20260709100452.3520482-3-wozizhi@huaweicloud.com>
+Subject: [PATCH V4 9/9] null_blk: serialize configfs attribute shows with the file-scope lock
+Date: Thu,  9 Jul 2026 18:04:51 +0800
+Message-ID: <20260709100452.3520482-10-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
 References: <20260709100452.3520482-1-wozizhi@huaweicloud.com>
@@ -49,122 +49,98 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHV3MadE9qn4RpAg--.38318S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxGrykGry8Ar17ur45ZFyrJFb_yoW5tFyDpF
-	yUWryUKr18tF1Uur4jva1IgF1fGan2vw47u34fCF1rZanxAry5AF9IvayrGF4UG3yxCr4f
-	Xas0va1rGa48Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
-	0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFSdy
-	UUUUU
+X-CM-TRANSID:cCh0CgBHV3MadE9qn4RpAg--.38318S13
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr45Ww4rWw4rCFWDCw4DArb_yoW5Cw1fpF
+	Z8Ka45Wrn7Kr17uF429w4ku345uw4IyFWUGrW5J3WSkw45Wr9Iv3sxKFW5Xa4DJ39rJwsI
+	vFsrZr97CFWUArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPmb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x02
+	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
+	80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
+	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
+	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E
+	5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtV
+	W8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY
+	1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67
+	AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZE
+	Xa7IU1aLvJUUUUU==
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 From: Zizhi Wo <wozizhi@huawei.com>
 
-In null_init(), configfs_register_subsystem() currently runs before
-register_blkdev(), so when null_blk is built as a module, a racing mkdir()
-+ poweron from userspace can reach null_add_dev() while null_major is still
-0. __add_disk() then hits WARN_ON(disk->minors) (major=0 with minors!=0)
-and fails:
+The _show callback in the NULLB_DEVICE_ATTR macro reads dev->NAME and the
+_store path writes it. configfs does not serialize accesses across separate
+open file descriptions (buffer->mutex is per-fd), and _show takes no lock,
+so a concurrent read and write on the same attribute is a data race. The
+_show readers also race against writes to these fields that run after the
+configfs item becomes visible, e.g. in nullb_update_nr_hw_queues().
 
-[root@fedora ~]# [ 2366.521436] WARNING: block/genhd.c:476 at __add_disk+0x8a7/0xde0,
-[ 2366.523552] Modules linked in: null_blk(+) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
-[ 2366.529081] CPU: 26 UID: 0 PID: 1600 Comm: sh Not tainted 7.2.0-rc1+ #66 PREEMPT(full)
-......
-[ 2366.547251] Call Trace:
-[ 2366.547575]  <TASK>
-[ 2366.547831]  ? _raw_spin_lock+0x84/0xe0
-[ 2366.548260]  add_disk_fwnode+0x114/0x560
-[ 2366.548739]  null_add_dev+0x102d/0x1b80 [null_blk]
-[ 2366.549310]  ? __pfx_null_add_dev+0x10/0x10 [null_blk]
-[ 2366.549906]  ? mutex_lock+0xde/0x1c0
-[ 2366.550361]  ? __pfx_mutex_lock+0x10/0x10
-[ 2366.550827]  nullb_device_power_store+0x1e7/0x280 [null_blk]
-[ 2366.551499]  ? __pfx_nullb_device_power_store+0x10/0x10 [null_blk]
-[ 2366.552177]  ? __kmalloc_cache_noprof+0x1f5/0x470
-[ 2366.552748]  ? configfs_write_iter+0x35c/0x4e0
-[ 2366.553242]  configfs_write_iter+0x286/0x4e0
-[ 2366.553787]  vfs_write+0x52d/0xd00
-[ 2366.554169]  ? __pfx_vfs_write+0x10/0x10
-[ 2366.554679]  ? __pfx___css_rstat_updated+0x10/0x10
-[ 2366.555196]  ? fdget_pos+0x1cf/0x4c0
-[ 2366.555649]  ksys_write+0xfc/0x1d0
-......
+All of those writers now run under the file-scope lock: _store takes it
+unconditionally, and the setup-side writers run under power_store() which
+holds the same lock. The only remaining unsynchronized accesses are the
+plain reads in _show. Rather than annotating every field with
+READ_ONCE()/WRITE_ONCE() across files, simply take the file-scope lock in
+_show (and in power_show) as well. This closes the remaining _show-vs-write
+data races with a single lock and keeps the writers as plain assignments.
 
-Additionally, the err_dev path destroys all devices on nullb_list while
-configfs is still registered. If a racing mkdir() + poweron puts a user
-device on the list, null_destroy_dev()->null_free_dev() kfrees the user
-device's nullb_device but /sys/kernel/config/nullb/<name> is still
-reachable. Any userspace access to the item will trigger a UAF.
+configfs attribute access is not on the I/O hot path, so taking the mutex
+in _show is acceptable from a performance standpoint. The dev fields
+written in null_alloc_dev() and dev->power in nullb_group_drop_item() need
+no locking: the former runs from .make_group before the item is published,
+and the latter is serialized by configfs frag_sem/frag_dead against
+attribute show/store.
 
-For simplicity, move configfs_register_subsystem() to the end to solve
-the problems above.
-
-Fixes: 3bf2bd20734e ("nullb: add configfs interface")
+Suggested-by: Nilay Shroff <nilay@linux.ibm.com>
 Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/null_blk/main.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ drivers/block/null_blk/main.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index eba204b27785..4613035222cd 100644
+index a411db6a8c40..e829b502981b 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -2160,37 +2160,33 @@ static int __init null_init(void)
- 	}
+@@ -343,12 +343,18 @@ static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
+ /* The following macro should only be used with TYPE = {uint, ulong, bool}. */
+ #define NULLB_DEVICE_ATTR(NAME, TYPE, APPLY)				\
+ static ssize_t								\
+ nullb_device_##NAME##_show(struct config_item *item, char *page)	\
+ {									\
+-	return nullb_device_##TYPE##_attr_show(				\
++	ssize_t ret;							\
++									\
++	mutex_lock(&lock);						\
++	ret = nullb_device_##TYPE##_attr_show(				\
+ 				to_nullb_device(item)->NAME, page);	\
++	mutex_unlock(&lock);						\
++									\
++	return ret;							\
+ }									\
+ static ssize_t								\
+ nullb_device_##NAME##_store(struct config_item *item, const char *page,	\
+ 			    size_t count)				\
+ {									\
+@@ -477,11 +483,17 @@ NULLB_DEVICE_ATTR(rotational, bool, NULL);
+ NULLB_DEVICE_ATTR(badblocks_once, bool, NULL);
+ NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
  
- 	config_group_init(&nullb_subsys.su_group);
- 	mutex_init(&nullb_subsys.su_mutex);
- 
--	ret = configfs_register_subsystem(&nullb_subsys);
--	if (ret)
--		return ret;
--
- 	null_major = register_blkdev(0, "nullb");
--	if (null_major < 0) {
--		ret = null_major;
--		goto err_conf;
--	}
-+	if (null_major < 0)
-+		return null_major;
- 
- 	for (i = 0; i < nr_devices; i++) {
- 		ret = null_create_dev();
- 		if (ret)
- 			goto err_dev;
- 	}
- 
-+	ret = configfs_register_subsystem(&nullb_subsys);
-+	if (ret)
-+		goto err_dev;
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+ {
+-	return nullb_device_bool_attr_show(to_nullb_device(item)->power, page);
++	ssize_t ret;
 +
- 	pr_info("module loaded\n");
- 	return 0;
- 
- err_dev:
- 	while (!list_empty(&nullb_list)) {
- 		nullb = list_entry(nullb_list.next, struct nullb, list);
- 		null_destroy_dev(nullb);
- 	}
- 	unregister_blkdev(null_major, "nullb");
--err_conf:
--	configfs_unregister_subsystem(&nullb_subsys);
- 	return ret;
++	mutex_lock(&lock);
++	ret = nullb_device_bool_attr_show(to_nullb_device(item)->power, page);
++	mutex_unlock(&lock);
++
++	return ret;
  }
  
- static void __exit null_exit(void)
+ static ssize_t nullb_device_power_store(struct config_item *item,
+ 				     const char *page, size_t count)
  {
 -- 
 2.52.0
