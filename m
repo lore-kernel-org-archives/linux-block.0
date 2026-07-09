@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC5C4499AB
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BB54499AB
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632974; cv=none; b=duN59K8Expbd9+2VZL95qu+n4yh4d8RXMBqS6VZenzCE6Ox3d6TPcVoH87mhuLA45b7a/O1x18W92L8nVBwkvtJnVQa7jU4ZVaXxuGEyfgmB4QSq26Jn3idZZflnvy0LL8FNI4Ii7b3a/qkNyHR9zRQpl9HWy6J9A+HjX2+gQCs=
+	t=1783632977; cv=none; b=GnTQWtJMI8FBVI8J/kmHN4dKXjC8ZcTl6GFPk2QshMaih3PwGqCtJFhojf2W2ZzqT0IJVHZpof/FD7CC8GXTvVbsdp/oxI9xGhO4AUYwLHRO5OfD8gWCRORFbP0+C4jSvXG36LIGSgKPVtn8jQDJ4u9WN3YoMn5Q1DUboptOGzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632974; c=relaxed/simple;
-	bh=nlB/kUWzPjczR0gDlJs7DJzEUEfZfsjyWSgBxeIFycY=;
+	s=arc-20240116; t=1783632977; c=relaxed/simple;
+	bh=5L3dKF/TmRPqJsufq4j45uuwoxsmAMtI2jHoqn/hOsQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AfWjrTGoM37QvCP2LQeGHGTYYwXyMOE78dRI+rz8oH5+oKGTnMoxopmudVxEBlPutwPNfadiNYGGFpTQJUatpvhpETqSa2jLVM5Ph0PyeoeuduqsEulEC7FkPlNZiJmZgW7DDqTmUqSAS+7pjwCXNBBhBY9Xjpem5KfuAT5NxAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WdDYdEHC; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=rh2RvUD03VDTxWcGhXYDJzrK3IsHPJgiCt1E1XJb8or450fx5dH/0afLr94QFW2oMf7ZYzzofrE2y4wXXgcqDLzY2IRL6FDvxvc0XNZ4RKrSIom5HG3EYzGcXW4nYCFl9Q0Dfc1uT4IHGfpOSg6n6W39QrwRSQWkIKGoXjrEtqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=n5rCdvIP; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WdDYdEHC"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="n5rCdvIP"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Z446t7zlhH0B;
-	Thu,  9 Jul 2026 21:36:12 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Z73bjTzlhH0H;
+	Thu,  9 Jul 2026 21:36:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1783632967; x=1786224968; bh=enOgg
-	uDwPE5BpoyBXSQ+CMayqCmimu5QC3uM/GH7brc=; b=WdDYdEHC7zTnplZS2uDrT
-	UjLQf1v84ATKzvaF6FJL/nQOniLnfWrk6PDBqd77fVueCU7FGDk+/nHo9u2aHOus
-	mGBJjOkXb7TvJPC74pFg6RmaVw+3aI6HscCF9Vo5LICWQPcHFCGFTHWaoiijd5m7
-	aV/kt3VzubzQuUrurJS5MTkWJalLo2/VEJwJuB615PrleB2U+pFl/CftOPO9gmMh
-	H11d4L5c/EoZcznlQ/9PNEZH0FymhXtRo/Ywg90/5t1+yN4H+YG0rGXhypRRD28x
-	WDsY8aH/Kn63kRnDcvcOvGVkFL9V0aq9oj6C9TbSFFx26leJS70xYX3K/dmGHRHh
-	w==
+	:received:received; s=mr01; t=1783632970; x=1786224971; bh=kZEw6
+	lMVS5gosFZGv8v43mBasv9ZzQZSF99N7L1dNx8=; b=n5rCdvIPZGAZCLxnMLgTn
+	rxI+Z/8uwA/t9kIHQN4wBmlpE+QOPSWOMUeETCC1BNx76DWGDyuijL2QZ61h5SdM
+	xHVAtpBOVl+2GjFFjjmCMf7k7LhvGMt4PAy3J/BAIpfMQi0WzG8PutqG70lDcGyQ
+	CpZwbC8Apik9vN6p2HTva/yBrQUPkx2tldBMLlBDlJTyCRDYrrwGu5mJDcw9y+SZ
+	qXQNv/0V/nDxu/ytNriIuhqS7rPBd21nRtsg4TIA8/ZZwKZVA6qB46ZaL+eC55A7
+	+bYwXXJS2qaKishh96qGHGyxLZqsKW0ZjS+ftRp7QLXSJGOgqYp/1Br+WjNC7aOj
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id K-FSJ8jfE49m; Thu,  9 Jul 2026 21:36:07 +0000 (UTC)
+ id iD1jT_FHuDH2; Thu,  9 Jul 2026 21:36:10 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yx2bqZzlhH0D;
-	Thu,  9 Jul 2026 21:36:05 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Z011XnzlhH09;
+	Thu,  9 Jul 2026 21:36:07 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH 06/12] drbd: Move two declarations
-Date: Thu,  9 Jul 2026 14:35:27 -0700
-Message-ID: <ae5f9acb485444cc67604b5e2e04867c093c1ef3.1783632330.git.bvanassche@acm.org>
+Subject: [PATCH 07/12] drbd: Pass 'resource' directly to complete_conflicting_writes()
+Date: Thu,  9 Jul 2026 14:35:28 -0700
+Message-ID: <b1132419aec70bb2cf9e1dd62ca09a6e3b9e6cdf.1783632330.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 In-Reply-To: <cover.1783632330.git.bvanassche@acm.org>
 References: <cover.1783632330.git.bvanassche@acm.org>
@@ -65,47 +65,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move the resources_mutex declaration in front of the functions that
-acquire and release this mutex. Move the drbd_wait_misc() declaration
-past the struct drbd_device definition. This patch prepares for adding
-lock context annotations.
+Prepare for adding lock context annotations. Without this change, an
+__assume_ctx_lock() statement would have to be added.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/drbd/drbd_int.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/drbd/drbd_req.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
-h
-index 4b9d69adb9d4..1f3f2157df8b 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -195,7 +195,7 @@ struct drbd_device_work {
-=20
- #include "drbd_interval.h"
-=20
--int drbd_wait_misc(struct drbd_device *, struct drbd_interval *);
-+extern struct mutex resources_mutex;
-=20
- void lock_all_resources(void);
- void unlock_all_resources(void);
-@@ -1094,6 +1094,7 @@ int drbd_bmio_set_n_write(struct drbd_device *devic=
-e,
- 			  struct drbd_peer_device *peer_device);
- int drbd_bmio_clear_n_write(struct drbd_device *device,
- 			    struct drbd_peer_device *peer_device);
-+int drbd_wait_misc(struct drbd_device *device, struct drbd_interval *i);
-=20
- /* Meta data layout
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.=
+c
+index 70f75ef07945..a851e43c94a8 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -951,7 +951,8 @@ static bool remote_due_to_read_balancing(struct drbd_=
+device *device, sector_t se
   *
-@@ -1363,8 +1364,6 @@ extern struct bio_set drbd_md_io_bio_set;
- /* And a bio_set for cloning */
- extern struct bio_set drbd_io_bio_set;
+  * Only way out: remove the conflicting intervals from the tree.
+  */
+-static void complete_conflicting_writes(struct drbd_request *req)
++static void complete_conflicting_writes(struct drbd_resource *resource,
++					struct drbd_request *req)
+ {
+ 	DEFINE_WAIT(wait);
+ 	struct drbd_device *device =3D req->device;
+@@ -974,9 +975,9 @@ static void complete_conflicting_writes(struct drbd_r=
+equest *req)
+ 		/* Indicate to wake up device->misc_wait on progress.  */
+ 		prepare_to_wait(&device->misc_wait, &wait, TASK_UNINTERRUPTIBLE);
+ 		i->waiting =3D true;
+-		spin_unlock_irq(&device->resource->req_lock);
++		spin_unlock_irq(&resource->req_lock);
+ 		schedule();
+-		spin_lock_irq(&device->resource->req_lock);
++		spin_lock_irq(&resource->req_lock);
+ 	}
+ 	finish_wait(&device->misc_wait, &wait);
+ }
+@@ -1329,7 +1330,7 @@ static void drbd_send_and_submit(struct drbd_device=
+ *device, struct drbd_request
+ 		/* This may temporarily give up the req_lock,
+ 		 * but will re-aquire it before it returns here.
+ 		 * Needs to be before the check on drbd_suspended() */
+-		complete_conflicting_writes(req);
++		complete_conflicting_writes(resource, req);
+ 		/* no more giving up req_lock from now on! */
 =20
--extern struct mutex resources_mutex;
--
- enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ct=
-x,
- 				      unsigned int minor);
- void drbd_destroy_device(struct kref *kref);
+ 		/* check for congestion, and potentially stop sending
