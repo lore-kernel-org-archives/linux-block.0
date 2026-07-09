@@ -1,92 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F390E3FFAB0
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 08:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256073FB7D3
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 09:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783587109; cv=none; b=Z6WPWWJXvzcT6sruiX/063PqzfDQbFQX4bLH7CLHCqz2jZlH3inPHRoU5I/kPH1oeMOR9sl3GBdP/e7hmBPCuiktZZVUYa087KsQWSqaAHTk0dr2vZzoJ8da4NlvKvtWxXO71NhDXqcMMgQ7T0/Ml8QMyOCVNZNU1nn7wdtJHUw=
+	t=1783588495; cv=none; b=qFLgMeKQdTmjwQUneP2EOYX22jHTH3yc/SEYhiOH0vOfJpoJQUuPYiJtHRtKhYfmOJA6i0dovv+H7bzlxy8IZb6epNx6viqHG0gMdCgcFzZr/GvJfy50JrATnCGJAU0CblAWG0KmYTioNtoyxuMG/dGmFO6Krw2xZIrcg/3thnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783587109; c=relaxed/simple;
-	bh=znq26plhwxInEG6rMm+26AmDR8mHesOo4g2XGqxnm+E=;
+	s=arc-20240116; t=1783588495; c=relaxed/simple;
+	bh=o0I0OjPFe4LmYKdueZYmtVzeFX7nC29HCEypr39F0oE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aSbsG5Rjeuaa2AVDLThKpUTWkUprRcJ99LNtWEqlTD5ZAq1EKVDVK7pcrah2wIfbxzNk8ccQuteSIq1+/beoC5vxjUrJYKPdYlDXo9qw4v02BEhYsWrInX4kydfqup+xmHj1JALnSqT4shel2ZmVuUDzdm6Kf2WWgSUTtB3lDl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iza834L5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WJZyI6bX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hs3k8D5X09OtX7pgP7k48GdbmrnBPTtKqsxoHvueAYC1k8wp7uFRJkPkv1vcVVmkr0Cl05Xibtmzlr5XtYizLibWyjfBJSdR8tybIrw8xQA4FjXg21R262LRh0Y63F1tHs1I0wzoGPTSxRpYaUtqGudKfv312cn8VDRvs/MFWTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UHPw56Oy; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IA7TR7wq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UHPw56Oy; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IA7TR7wq; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iza834L5";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJZyI6bX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783587106;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UHPw56Oy";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IA7TR7wq";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UHPw56Oy";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IA7TR7wq"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3501F7609E;
+	Thu,  9 Jul 2026 09:14:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1783588492; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eb5jDTkXBTPOE342mmNfwm5lDoBFxjZ2KPIK/Aydl/0=;
-	b=iza834L5VL4ghd3uS/qwfK26v06iCDCHiZ2z7zsaJ0ylLcpa1eWADTc9i9X/fWm19bl264
-	QgI4N5jNYKNxZTzfat48yOmrhvb4Ppip5zPTruRZhbA8nwMVjFxHxJrVCipqrgHMlrH0Qy
-	8cA6E9aJVUxYbReHXlmNFov4FiM2kHE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-9vpncJ_COM2B2irMb6Ze1w-1; Thu, 09 Jul 2026 04:51:44 -0400
-X-MC-Unique: 9vpncJ_COM2B2irMb6Ze1w-1
-X-Mimecast-MFC-AGG-ID: 9vpncJ_COM2B2irMb6Ze1w_1783587104
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-493c55d5ce5so9840975e9.0
-        for <linux-block@vger.kernel.org>; Thu, 09 Jul 2026 01:51:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783587103; x=1784191903; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=eb5jDTkXBTPOE342mmNfwm5lDoBFxjZ2KPIK/Aydl/0=;
-        b=WJZyI6bXBH2/vvILVynx+GtNbmR3khzYZB4phm3GjRrJbvpTiHoouRN8+2DCzLMxC6
-         PdRkuIGVEeX0C6AhiWrPW6FkQC9tlPf/e2VfMQD8UW1s1O6/kuK6V4WWdcepQxyLpLqw
-         kx9HskoNwbR56G3kbwQqug2O8Z9YhaUB/5Dm7ggZfCNbYulWDUJsy0hIdbrH42Pwd3m/
-         ++AWF9jw9zLOuCiZO+0mWyi+LKsd7Nak6+gm/LqlJfCHfiF1rwEOG/6ydqHTcjJE46Kf
-         iLLF7aZbq5azY742cVWimJkQxtYoTfCbP00sNNkHxLSGX/YCPOMYE9z3TdPo2qjtm61Y
-         YZaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783587103; x=1784191903;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=eb5jDTkXBTPOE342mmNfwm5lDoBFxjZ2KPIK/Aydl/0=;
-        b=G6CJHknvn3Mvyz5TBucSh61Kkf6TC+TPdAZ2WWuBb/WZC3ZojYcX0e+Nmjbz4j9PfW
-         HH8GbfSqgSN/d7nlpXr8Njg82Q9MTAgouQX1Sv4Gz2jHbOTknXrEY/xXnGbboOpi6Kqu
-         INdoaPz/uy5iSeQ7Bc8AUjJ+E3G1oTmzGxPCGiLyojC6AfRdjnKjyDJ3tHP/t4fWWV+Y
-         9xB09NXn89I/j0TeQl3n/3b1fgBllGFivP4OlmiFFXYCztAT3rj7Lxsua2ZPAsacLcy1
-         3P3RSesHNLW/pDgJYM1iJIoVbpvz+p/2CGfY+8Cnj4ezxThRocR0zmW7s9xSpA6c4xlk
-         JbJg==
-X-Forwarded-Encrypted: i=1; AHgh+RpJjKonD4D7iRJkaCB56GnN5GMzZQsIQ5uz6PUR9EbtkQu5AQz5/4Eaqb/CF1cJK9XLFB0e378SfAzNuw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ8zf9QZIcjpV3dRlPdpkzrFJZ06v1SccYKVypXMwptPnyQtG4
-	YbceGSTuDKJNMml8fGpiMSEqCr3/pEBApIkEten2pVNCngaKWbLW48694772F326z+iYtGSNAJ9
-	8e1+HoMrIfuMT62GITqu0ogBh2dK65wymLAo5XTwm4VZldCZC7gMYKWal8k81mFM=
-X-Gm-Gg: AfdE7cmEeISJ13F/Lk24j5Dxe2GX9mH/wHgOKERRKomk0RSWJUz4ODSSTBwsvOGh5jI
-	2W/wq8K/A8mNK35vrt9lC/iTG1Ulf1BKCtD0Sy1QFIb/GCE6bcp/4B8wnGri1CMlWcCfHDK2KDC
-	GnsD7v45cByR2Mzey8HCunuMAamhQ50wihHUSk1jiO/R7ULCW9V/ZUYMeqOISWrdYD3oKTf9CEK
-	s8YcbfKSa2YlELk8Jn9uKZX5qQjgZ4evHFgFQMWdum7QJl+/kzBRw1adyPO2lNG76+xCY20qAR/
-	gm+W4yKgfr8vZ17opcQhh4sRakGG/8d6ZOv2r8rXmlGN9uTk9mqx9SXZwiGuwH5o93mvOjj0YAj
-	F1lqU04KfUt5rz2fJToOAC759kfqgjha8bufukYQ+294oog==
-X-Received: by 2002:a05:600c:628d:b0:493:bcef:5646 with SMTP id 5b1f17b1804b1-493e6862b68mr57369625e9.12.1783587103526;
-        Thu, 09 Jul 2026 01:51:43 -0700 (PDT)
-X-Received: by 2002:a05:600c:628d:b0:493:bcef:5646 with SMTP id 5b1f17b1804b1-493e6862b68mr57369285e9.12.1783587102989;
-        Thu, 09 Jul 2026 01:51:42 -0700 (PDT)
-Received: from aalbersh-thinkpadx1carbongen13.rmtcz.csb ([217.30.74.39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a5d174sm144100205e9.2.2026.07.09.01.51.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 01:51:41 -0700 (PDT)
-Date: Thu, 9 Jul 2026 10:51:39 +0200
-From: Andrey Albershteyn <aalbersh@redhat.com>
+	bh=Ay+n3JYalJzW9RHZobonYNYRCZVSzmMR1IGHyNCWzyY=;
+	b=UHPw56OyPmIjWA+2nG7gQU0hzHfzejIpg4uq9GjDmPFCk4bR3mdzIyAkSg/3eNos7ROXLz
+	ENHztyCFutKlONYqBVszG7usJBWEhYg0vWAHWdVYg+VC97ed9rKMPdboMhTg/yC2oP9aNE
+	ORoYQUf1OXjTBCNPffkjBfYcLkpilKQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1783588492;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ay+n3JYalJzW9RHZobonYNYRCZVSzmMR1IGHyNCWzyY=;
+	b=IA7TR7wqvGR4RJHVc0YWNq4bzAOoEHUQx3XnyccXR22re+Pj9Z7TBoPaIME4o0d2iquKWo
+	SEIiuus8l2UVxCBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=UHPw56Oy;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=IA7TR7wq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1783588492; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ay+n3JYalJzW9RHZobonYNYRCZVSzmMR1IGHyNCWzyY=;
+	b=UHPw56OyPmIjWA+2nG7gQU0hzHfzejIpg4uq9GjDmPFCk4bR3mdzIyAkSg/3eNos7ROXLz
+	ENHztyCFutKlONYqBVszG7usJBWEhYg0vWAHWdVYg+VC97ed9rKMPdboMhTg/yC2oP9aNE
+	ORoYQUf1OXjTBCNPffkjBfYcLkpilKQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1783588492;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ay+n3JYalJzW9RHZobonYNYRCZVSzmMR1IGHyNCWzyY=;
+	b=IA7TR7wqvGR4RJHVc0YWNq4bzAOoEHUQx3XnyccXR22re+Pj9Z7TBoPaIME4o0d2iquKWo
+	SEIiuus8l2UVxCBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2BD86779AA;
+	Thu,  9 Jul 2026 09:14:52 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FJusCoxmT2paMgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 09 Jul 2026 09:14:52 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id C4D2BA12D7; Thu, 09 Jul 2026 11:14:47 +0200 (CEST)
+Date: Thu, 9 Jul 2026 11:14:47 +0200
+From: Jan Kara <jack@suse.cz>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, 
 	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
 	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, axboe@kernel.dk, jack@suse.cz, 
 	brauner@kernel.org, cem@kernel.org, jaegeuk@kernel.org, aalbersh@kernel.org, 
-	tytso@mit.edu, Keith Busch <kbusch@kernel.org>
+	tytso@mit.edu, Keith Busch <kbusch@kernel.org>, 
+	Eric Biggers <ebiggers@kernel.org>
 Subject: Re: [PATCH] fs: report direct io constraints through file_getattr
-Message-ID: <ak9f0CXSegLq8l5w@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
+Message-ID: <neamg3phll7hjwd765ddtqebtxasdvkoskff75dqzmgzv2xy5i@mf4agr6yoizn>
 References: <20260708011843.1036846-1-kbusch@meta.com>
  <20260709071352.GA20180@lst.de>
 Precedence: bulk
@@ -98,29 +94,75 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20260709071352.GA20180@lst.de>
+X-Spam-Flag: NO
+X-Rspamd-Action: no action
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MISSING_XM_UA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 3501F7609E
+X-Spam-Score: -4.01
 
-On 2026-07-09 09:13:52, Christoph Hellwig wrote:
+On Thu 09-07-26 09:13:52, Christoph Hellwig wrote:
 > On Tue, Jul 07, 2026 at 06:18:43PM -0700, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > Memory alignment constraints for direct io can vary depending on the
-> > backing storage hardware. Provide support through file_getattr to report
-> > the attributes necessary for applications to know how to construct valid
-> > read and write requests.
+> > +		u32 dio_align = ext4_dio_alignment(inode);
+> > +
+> > +		if (dio_align != 0) {
 > 
-> This probably wants to be split in one patch for the new UAPI,
-> one for the helper and one for each user.
 > 
-> And especially the UAPI one needs a much more detailed commit log
-> explaining it, including why this duplicates some of the informastion
-> already in statx and documenting the semantics for all the fields.
+> > +			struct block_device *bdev = inode->i_sb->s_bdev;
+> > +
+> > +			if (dio_align == 1) {
+> > +				fa->fsx_dio_mem_align = bdev_dma_alignment(bdev) + 1;
+> > +				fa->fsx_dio_offset_align = bdev_logical_block_size(bdev);
+> > +				fa->fsx_dio_read_offset_align = bdev_logical_block_size(bdev);
+> > +			} else {
+> > +				fa->fsx_dio_mem_align = dio_align;
+> > +				fa->fsx_dio_offset_align = dio_align;
+> > +				fa->fsx_dio_read_offset_align = dio_align;
+> > +			}
 > 
-> Andrey, is there a man page or other official documentation for
-> file_setattr/file_getattr?
+> Call bdev_fileattr and override the relevant field as needed?
+> 
+> Question to the ext4 maintainers: why does ext4_dio_alignment
+> affect the in-memory alignment?  If it does so, it should probably
+> also affect the virt boundry alignment..
 
-No, I had a draft in cover letter but haven't got to sending it to
-man-pages. I will prepare a man page.
+I guess that is mostly a historical accident. ext4_dio_alignment() returns
+1 (iomap alignment is used and that's different for memory and file offset
+alignment), 0 (dio not supported, memory and file offset alignment is
+indeed the same), and blocksize (a special case which can happen for
+fscrypt if it supports dio and where I believe memory alignment
+requirements may be in fact different). I'm adding Eric to CC to answer
+what actual requirements fscrypt has for memory buffers for direct IO. I'd
+expect with inline encryption we would have the same requirements as
+ordinary iomap direct IO and for other code paths I'm not sure... Eric?
+
+								Honza
 
 -- 
-- Andrey
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
