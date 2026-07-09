@@ -1,124 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB2B3932E5
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 16:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3404499AB
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783613609; cv=none; b=GmJzN2B9pmVy8aeviVJ75famsF/aQ3CBUUnlRU5SSIClgAWlU2nyROiwhFM1tf8x48rumY6lNXWiy63mayugdbaU951575MfnJg/OSjoHA6It/+Igcs2NWp1fvQe6QO4FWqUa69gwMC7obYb8Zv1mCDdmDb0g20bO8ASdaQmWlc=
+	t=1783632955; cv=none; b=RM4XVxlgY4uNPhhHYjRsHtFh78iHSPs3YLz28EAPrrDBfTAO40oUKc0iQFMdxMEtFxz/B9bhQhtr0I0D28C2Be2idmbaq0CmpL4fAcGrdBslHzdnQhbMVBzGX8JygbMzosTcv4iPj2xMFfxVGGjdN9TV+bWfqdGLrAatKLEgubM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783613609; c=relaxed/simple;
-	bh=zbY2bSEaCu31T0WXTlUACKyoNXNWjDA105FQaP4TAkQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xt7PTt7brnptvPlH3Ena3xCuIJEnZlS/GtPSY8EhNvmpMP6QsbmLdbLZ0h2oPjeP9fx1UCN8yJNNQDumo0Y3yd/s1F9xR/XSsGJqhzcjoYKHj+XtnN4BPjVCM9ul3k/MZQLTtSQ8RFNflOqvNL6EaZToyRKa2h4OYd0x5XPwS34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGD5X6D8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1783632955; c=relaxed/simple;
+	bh=VryNCqDkwS+/q7VYxBCQNgJwWOuMJMLYdqMhdaWsx0M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qS76edlAhdYdkHhHWqOdBs37X5tmWB6AlUh+LxdWNMdNvJag1vN9XpyVVZB1cU8G2UXNpJZRu8ffolbM8mbb5iTDN0ecGovziNld++JPt2XpWY7Da4uRXzJwjizVYkw4A1hq0XAOWZRsxgd8ZvZz4G/gUX8JAZTGYsbcbxSW7PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=u/3M8cD9; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGD5X6D8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783613606;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iTviDvuDhSfVkGar73Qrb9ZQD1B5BTK09OmZSnwxUg4=;
-	b=hGD5X6D8DvzMkf+DbGdQu/BtZgyDtY1hJGnsg6xZA+RtWVMK0fS59mLxwYorsI/TyeVNdX
-	xDz+37d8g+YVxDYc6zzlnLT4bmdu1wwQWW9DHeApiqLZ/HK5FwxtDU+swS8yrkZyK1CLeO
-	fB7MB2TQ9XRKd4TTJW4y5EoNHLWhj/8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-422-yCqKLsm-O0GVQmhzLl7HCA-1; Thu,
- 09 Jul 2026 12:13:22 -0400
-X-MC-Unique: yCqKLsm-O0GVQmhzLl7HCA-1
-X-Mimecast-MFC-AGG-ID: yCqKLsm-O0GVQmhzLl7HCA_1783613601
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="u/3M8cD9"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Yj0jgtzlhH04;
+	Thu,  9 Jul 2026 21:35:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:mime-version
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1783632949; x=1786224950; bh=HEkye
+	3boB2c402e0J9urodn6qOL1Qf7apbZ397JCq2o=; b=u/3M8cD9/8IYimaQxnBV+
+	UzYK6jESd5Wwn/XNDrADKPXchgRLXZhS4YZDY0s8ZYfjcLROhv9i/1aQvQMblA+P
+	5bth/CIRDUDK6apBGSyrYQo6qP8BEuWMysQntXmcTrEyYM39CL+umrGlcv7OaYAd
+	B9hF6yVJyrwDrRqMGayGko1n2dH6jUOAgIJ8fayfqpgG7Oojdx5iClFll5IxG6k1
+	ebw6OZtH5alxHW+tJ5/jlFf+4S4rwriLrQfV+1ucsamGB8uIJNIunv8K44Tjwms7
+	5w/Rufdvvl06Oo3F7IFM5wCKBvmEfPmvhdNonXXRub1b+ySlP+QGpgUnXeam/ck6
+	w==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id loyh8NckAZCb; Thu,  9 Jul 2026 21:35:49 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99A601800BDF;
-	Thu,  9 Jul 2026 16:13:20 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADD9E3000C01;
-	Thu,  9 Jul 2026 16:13:19 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 669GDHvF2055297
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 9 Jul 2026 12:13:17 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 669GDGCO2055294;
-	Thu, 9 Jul 2026 12:13:16 -0400
-Date: Thu, 9 Jul 2026 12:13:16 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Keith Busch <kbusch@kernel.org>, axboe@kernel.dk,
-        Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@meta.com>,
-        dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-        "Dr. David Alan Gilbert" <linux@treblig.org>,
-        Vjaceslavs Klimovs <vklimovs@gmail.com>
-Subject: Re: [PATCH 2/2] dm-raid1: don't fail the mirror for invalid I/O
- errors
-Message-ID: <ak_InD1CX7GJXzJv@redhat.com>
-References: <20260616150554.1686662-1-kbusch@meta.com>
- <ajFyuoMqnvQm738z@kbusch-mbp>
- <0bd687cf-82ac-eacf-844b-c179a52dc72c@redhat.com>
- <akwVkSnXtyl6rBdh@kbusch-mbp>
- <ak1XNlyFC34W47iP@kernel.org>
- <ak7cHXaWjVX6Uamj@redhat.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yc0C9bzlfdCs;
+	Thu,  9 Jul 2026 21:35:47 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Marco Elver <elver@google.com>,
+	=?UTF-8?q?Cc=20=3A=20Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 00/12] drbd: Enable lock context analysis
+Date: Thu,  9 Jul 2026 14:35:21 -0700
+Message-ID: <cover.1783632330.git.bvanassche@acm.org>
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ak7cHXaWjVX6Uamj@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 08, 2026 at 07:24:14PM -0400, Benjamin Marzinski wrote:
-> On Tue, Jul 07, 2026 at 03:44:54PM -0400, Mike Snitzer wrote:
-> > On Mon, Jul 06, 2026 at 02:52:33PM -0600, Keith Busch wrote:
-> > > On Wed, Jun 24, 2026 at 01:14:03PM +0200, Mikulas Patocka wrote:
+Hi Jens,
 
-> > So where does dm-raid1 and dm-crypt stand relative to these DIO memory
-> > alignment changes?  Inferring they are pretty exposed.
-> > 
-> > > > BTW. I think that blk_path_error should also test for BLK_STS_INVAL and 
-> > > > return false, otherwise, dm-multipath would be suffering from this bug 
-> > > > too. Ben, could you test it?
-> > > 
-> > > Good point.
-> > 
-> > Would appreciate knowing if multipath exposed too.
-> 
-> I can't make it happen. I can reproduce this using dm-mirror, but when I
-> try with dm-multipath, it fails with BLK_STS_INVAL before it ever makes
-> it into the request layer.
-> 
-> blk_mq_submit_bio() -> __bio_split_to_limits() -> bio_split_rw() ->
-> bio_split_rw_at() -> bio_split_io_at()
-> 
-> bio_split_io_at() checks the bio_vec alignment and fails with -EINVAL,
-> causing the bio to get failed.
+This patch series enables compile-time lock context analysis for DRBD. Th=
+e goal
+of this series is to allow the compiler to statically verify that locks a=
+re
+acquired and released correctly, helping to prevent deadlocks and race
+conditions. This version addresses feedback received on the v1 series, im=
+proves
+the annotations, and refactors some conditional locking paths to use the =
+modern
+cleanup.h guard infrastructure.
 
-However, as a general issue, I don't believe it's impossible to have an
-unaligned bio_vec that returns false for bio_may_need_split(), so that
-the splitting code will never get run. But if this is already getting
-fixed earlier in the bio code, then the point is kind of moot.
+Changes since v1:
+- Extracted the DRBD patches from a larger series. See also
+  "[PATCH 00/27] Enable lock context analysis in drivers/block/"
+  (https://lore.kernel.org/all/cover.1781042470.git.bvanassche@acm.org/).
+- Fixed the indentation of the arguments of
+  drbd_nl_put_dump_connections_result().
+- Combined the two drbd_req_state() patches into a single patch.
 
-In reference to changing blk_path_error(), multipath should only be
-passing down requests that are valid on any of its paths, so it seems
-reasonable to make the case that BLK_STS_INVAL is not a path error. But
-if we are going to be checking the bios early against multipath's
-limits, then it seems like the only reason we would get a BLK_STS_INVAL
-is that multipath's limits don't work with the underlying path's. That
-would likely mean there was a limit stacking bug, and who knows whether
-another path would work better.
+Please consider these patches for the next merge window.
 
--Ben
- 
-> > 
-> > Thanks,
-> > Mike
+Thanks,
+
+Bart.
+
+Bart Van Assche (12):
+  drbd: Remove "extern" from function declarations
+  drbd: Retain one _get_ldev_if_state() implementation
+  drbd: Remove the get_ldev_if_state() macro
+  drbd: Remove the 'local' lock context
+  drbd: Simplify the bitmap locking functions.
+  drbd: Move two declarations
+  drbd: Pass 'resource' directly to complete_conflicting_writes()
+  drbd: Split drbd_nl_get_connections_dumpit()
+  drbd: Make a mutex_unlock() call unconditional
+  drbd: Rework locking in drbd_req_state()
+  drbd: Annotate drbd_bm_{lock,unlock}()
+  drbd: Enable lock context analysis
+
+ drivers/block/drbd/Makefile            |   3 +
+ drivers/block/drbd/drbd_bitmap.c       |  43 +-
+ drivers/block/drbd/drbd_config.h       |   2 +-
+ drivers/block/drbd/drbd_int.h          | 594 +++++++++++++------------
+ drivers/block/drbd/drbd_interval.h     |  11 +-
+ drivers/block/drbd/drbd_main.c         |  41 +-
+ drivers/block/drbd/drbd_nl.c           | 117 ++---
+ drivers/block/drbd/drbd_receiver.c     |  27 +-
+ drivers/block/drbd/drbd_req.c          |  10 +-
+ drivers/block/drbd/drbd_req.h          |  24 +-
+ drivers/block/drbd/drbd_state.c        |  49 +-
+ drivers/block/drbd/drbd_state.h        |  35 +-
+ drivers/block/drbd/drbd_state_change.h |  32 +-
+ drivers/block/drbd/drbd_worker.c       |   6 +-
+ 14 files changed, 508 insertions(+), 486 deletions(-)
 
