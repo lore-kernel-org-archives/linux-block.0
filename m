@@ -1,40 +1,50 @@
-Received: from lf-2-44.ptr.blmpb.com (lf-2-44.ptr.blmpb.com [101.36.218.44])
+Received: from va-2-45.ptr.blmpb.com (va-2-45.ptr.blmpb.com [209.127.231.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56342381AFF
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 09:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEECF401485
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 09:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590645; cv=none; b=UN3XMZQ2COC5v7TvFGZs/DfZzu5hyiabPFcMYwA4Vur3P0oMD+63WB7MzgcDrMnTblOr/MeWhdGeht3+LhS6EoG0EE1K4KB9fztGzBsfk3fsjSOu7ObyMs+HAUZHUUpyOcoglz8y6DghBpNYkEPyUAyReCYj4om6lSH5DFxYiR8=
+	t=1783591051; cv=none; b=eWg+jq1lt/aZhzoGFG851BvN/kGMKuKQ+C558dx8jYp1llqhO6QSBcld6RND6cbxxtCiGtVv98rmfAi6wKvO/tm6SCxhwjRy/aQKat+868EHXoxh5xC8C2+AhQRWNp7hl+GwBSTlbejc4PKCfuzm8pu/RLFvc0JYjeZ2nAchpXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590645; c=relaxed/simple;
-	bh=rxSgwuGzIsEmyghbrvFjO2zv/MUWNeA+OR1hBhENbho=;
-	h=Subject:Message-Id:Date:References:To:Cc:Mime-Version:In-Reply-To:
-	 From:Content-Type; b=RT7TLYzjeGzzaMoYlS+eDKcy5TCe3FAp1+azIsIbIttdHvlh72Kz6GgnBkO+w0XMplfip2spESoZsB2YJM0KUoIJhMKRLldgMcPmHl8fLUyB9EB9EFUMq45INoQWdfpzWTLEiAs0+MpOI1F9nhfoMbpTyiGwvOg5LuixYad6hsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=RxNIZIz7; arc=none smtp.client-ip=101.36.218.44
+	s=arc-20240116; t=1783591051; c=relaxed/simple;
+	bh=ScNDU72QZIGljZYAXX3TtqEW+QUCJIdbOtB91OHVf94=;
+	h=Content-Type:To:From:Subject:Date:Message-Id:In-Reply-To:
+	 Mime-Version:Cc:References; b=MooM3sEOVKH03pJ5U05w4PD9TpTUj/w9/z8A+zvA0qGR+VHGnCq9D8WhkeQ8JTTPHxWxRyPJcVd7pDNSMr8jpJZ0u3fz/lcdngdXSKZfKsSSYkQGY5hZrdjzz7phSxGqZciGX3RdGLSoW4UBsnboPupRfDNwfUs+MAS9/0wepDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=GKr+YBcv; arc=none smtp.client-ip=209.127.231.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="RxNIZIz7"
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="GKr+YBcv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783590594;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1783591040;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=rxSgwuGzIsEmyghbrvFjO2zv/MUWNeA+OR1hBhENbho=;
- b=RxNIZIz7eSOtPa6jIHY4CV4fggcmRCLwpFMTN8m1WM0cVnXypHLbgIe5nW0c406nK+b7oQ
- X3mbgsAYSDg4zDrJ6jRGl/0BGq0rF64LeRYAARiBYaw1ekDTCC1U7yNWa2t4XX8n1l0Gsa
- b5M68uxjr++Zh2juQf5i1V7vxyE1BPPxl5uI5ci13k7Ny+MO+kne5RRQdVQ0XhgHcN3fu4
- xjHRa8YDbYnSQj3o9n8Oi8cS3NIjFlmMwNQZ3khIFuSgrqL9sXINKPOjogq8NPlsqB5au4
- atdFpFXNAfxX6Mrz7Qf+LqpbBhX6AqiNIucMwfFnXSnjseluYq7Yr23YoPRbFw==
-Subject: Re: [RFC PATCH v1 05/17] block: add bio_alloc_atomic() for atomic bio users
-Message-Id: <1bf1939e-6a7b-4a8d-a316-96812cd6924e@fygo.io>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 9 Jul 2026 17:49:47 +0800
-References: <20260704195124.1375075-1-yukuai@kernel.org> <20260704195124.1375075-6-yukuai@kernel.org> <20260709061207.GC16504@lst.de>
-Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Thu, 09 Jul 2026 09:49:52 +0000
-X-Original-From: yu kuai <yukuai@fygo.io>
+ bh=HOGu0DcVoj6IGMDLrDh2fK8YIc1W/aNya5uNQNN/KKs=;
+ b=GKr+YBcv0NFr3xoiiCd7poxeeFYuqJw3Ssw/t0vRxeohJnXWLEBUUOLgO4sXJvs/1SWT9j
+ ZjAdreVVOJuzGQofpZTmAECG0IVX0xb/2EZchMjOa25K4U3p/VEECoRuxp/GwjnN9rV5mQ
+ QcG6NulqKgrLJ+rsthrOPE4LYVv7KdtDhauSFIKDpX3ekCGczn3YHRNRckWIOxRxMU/EPD
+ JcFdw8uQjIeirkRxl3Lz3rf71q53c39Up0LgV2lwdH76qMdIPOFoznH5Dmyr7qh6Q48G3z
+ 9oaQJAfdFBbzY0+QLFjjE2rqf5YXQB+smaNvRxLDvDeXpzmRNtBc4zbEhi+CEw==
 Reply-To: yukuai@fygo.io
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+Received: from [192.168.1.104] ([39.182.0.144]) by smtp.larksuite.com with ESMTPS; Thu, 09 Jul 2026 09:57:18 +0000
+Content-Transfer-Encoding: quoted-printable
 To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
+Subject: Re: [RFC PATCH v1 15/17] blk-cgroup: remove blkg radix tree preloading
+Date: Thu, 9 Jul 2026 17:57:13 +0800
+Message-Id: <e2ae59dc-14b9-48fa-a945-0b15acff338d@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+In-Reply-To: <20260709061837.GF16504@lst.de>
+Precedence: bulk
+X-Mailing-List: linux-block@vger.kernel.org
+List-Id: <linux-block.vger.kernel.org>
+List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Lms-Return-Path: <lba+26a4f707f+22850d+vger.kernel.org+yukuai@fygo.io>
 Cc: "Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>, 
 	"Keith Busch" <kbusch@kernel.org>, "Sagi Grimberg" <sagi@grimberg.me>, 
 	"Alasdair Kergon" <agk@redhat.com>, 
@@ -47,45 +57,35 @@ Cc: "Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>,
 	"Josef Bacik" <josef@toxicpanda.com>, 
 	"Nilay Shroff" <nilay@linux.ibm.com>, <linux-block@vger.kernel.org>, 
 	<cgroups@vger.kernel.org>, <linux-nvme@lists.infradead.org>, 
-	<dm-devel@lists.linux.dev>, 
-	"linux-bcache@vger.kernel.org Joseph Qi" <joseph.qi@linux.alibaba.com>
-Precedence: bulk
-X-Mailing-List: linux-block@vger.kernel.org
-List-Id: <linux-block.vger.kernel.org>
-List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-In-Reply-To: <20260709061207.GC16504@lst.de>
-From: "yu kuai" <yukuai@fygo.io>
-User-Agent: Mozilla Thunderbird
-Content-Type: text/plain; charset=UTF-8
-X-Lms-Return-Path: <lba+26a4f6ec1+0320de+vger.kernel.org+yukuai@fygo.io>
+	<dm-devel@lists.linux.dev>, <linux-bcache@vger.kernel.org>
+References: <20260704195124.1375075-1-yukuai@kernel.org> <20260704195124.1375075-16-yukuai@kernel.org> <20260709061837.GF16504@lst.de>
 
 Hi,
 
-=E5=9C=A8 2026/7/9 14:12, Christoph Hellwig =E5=86=99=E9=81=93:
-> On Sun, Jul 05, 2026 at 03:51:12AM +0800, Yu Kuai wrote:
+=E5=9C=A8 2026/7/9 14:18, Christoph Hellwig =E5=86=99=E9=81=93:
+> On Sun, Jul 05, 2026 at 03:51:22AM +0800, Yu Kuai wrote:
 >> From: Yu Kuai <yukuai@fygo.io>
 >>
->> Add bio_alloc_atomic() for callers that need a GFP_ATOMIC bio from the
->> default bio set but cannot safely pass a bdev during allocation. The
->> helper returns an unattached bio, leaving callers to set bi_bdev and
->> attach blkcg state explicitly before submission.
+>> blkg creation is now serialized by q->blkcg_mutex and no longer runs
+>> under q->queue_lock.  The radix tree is initialized with GFP_NOWAIT, so
+>> radix_tree_insert() cannot sleep while blkcg->lock is held and the old
+>> preload dance is no longer needed.
 >>
->> Use the helper for virtio-pmem flush child bios and OCFS2 heartbeat I/O.
->> Both allocate bios from atomic paths and must avoid creating missing blk=
-gs
->> once blkg creation is protected by q->blkcg_mutex. virtio-pmem clones th=
-e
->> parent bio's blkg association; OCFS2 binds heartbeat I/O to the root blk=
-g.
-> Let's kill off the concept of atomic bio allocations instead.
-> Joseph already has an outstanding patch for nd_virtio that needs a little
-> bit more work, and ocfs2 should be easy enough as well.
+>> Remove the preload calls and the associated unwind path.
+> Isn't the GFP_NOWAIT a bit of a problem because it can fail way too
+> easy?
 
-Thanks for the notice and good to hear that. This will make this set much
-simpler.
+I think GFP_NOWAIT should not be a problem because it's only possible to
+allocate blkg when the thread is issuing the first IO. And it's not a big
+deal to fail nowait in this case because the caller should fall back to
+sleepable context to issue this IO, and then blkg will be created. The foll=
+owing
+nowait IO issued by this thread should no longer hit blkg allocation path
+anymore.
 
+>
+> What about converting both the radix tree and list to an xarray
+> using the internal xarray to deal with sleeping allocations?
 >
 --=20
 Thanks,
