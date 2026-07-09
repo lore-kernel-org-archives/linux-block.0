@@ -1,119 +1,147 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3404499AB
-	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7954499AB
+	for <linux-block@vger.kernel.org>; Thu,  9 Jul 2026 21:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632955; cv=none; b=RM4XVxlgY4uNPhhHYjRsHtFh78iHSPs3YLz28EAPrrDBfTAO40oUKc0iQFMdxMEtFxz/B9bhQhtr0I0D28C2Be2idmbaq0CmpL4fAcGrdBslHzdnQhbMVBzGX8JygbMzosTcv4iPj2xMFfxVGGjdN9TV+bWfqdGLrAatKLEgubM=
+	t=1783632964; cv=none; b=pJ1BC7JZdfb4b10j6Rrl7uoLABM+KhkYq11rwNjF8vCDOtO6B1MhZqsN8zyiFMfTogw/GNmhL6alrOpgdS+AvtN0FQu5lp+emyna3MhMINiY7zK4bCXJ0MeHTRFqyYaB7pPLj1JKtt2sKYChQHJJKVGhI1dFCIZGJwlbyNbzyLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632955; c=relaxed/simple;
-	bh=VryNCqDkwS+/q7VYxBCQNgJwWOuMJMLYdqMhdaWsx0M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qS76edlAhdYdkHhHWqOdBs37X5tmWB6AlUh+LxdWNMdNvJag1vN9XpyVVZB1cU8G2UXNpJZRu8ffolbM8mbb5iTDN0ecGovziNld++JPt2XpWY7Da4uRXzJwjizVYkw4A1hq0XAOWZRsxgd8ZvZz4G/gUX8JAZTGYsbcbxSW7PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=u/3M8cD9; arc=none smtp.client-ip=199.89.1.16
+	s=arc-20240116; t=1783632964; c=relaxed/simple;
+	bh=xbq+00QUEJgV9atEtW0i9wF42qoaHU2Iq/UGaat8LrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sFnjJOgToOr4W7Irh9dGpgtuDjXScT9VT8je2QgLPy8IT42XA1sLv+ouE1b3DzdXTtHgCKOXAOlOQqOlvT6OIt9XmGAGn9owXIo4j9wzqjV//zOQ+Cne3Y5zX1X8dSBhWiODVKSY+hv8OB311yLcKUux1gpFFPvsMy4HJbTWBAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TH6lWHPA; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="u/3M8cD9"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TH6lWHPA"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Yj0jgtzlhH04;
-	Thu,  9 Jul 2026 21:35:53 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gx7Yt1xdwzlhH01;
+	Thu,  9 Jul 2026 21:36:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:mime-version
+	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1783632949; x=1786224950; bh=HEkye
-	3boB2c402e0J9urodn6qOL1Qf7apbZ397JCq2o=; b=u/3M8cD9/8IYimaQxnBV+
-	UzYK6jESd5Wwn/XNDrADKPXchgRLXZhS4YZDY0s8ZYfjcLROhv9i/1aQvQMblA+P
-	5bth/CIRDUDK6apBGSyrYQo6qP8BEuWMysQntXmcTrEyYM39CL+umrGlcv7OaYAd
-	B9hF6yVJyrwDrRqMGayGko1n2dH6jUOAgIJ8fayfqpgG7Oojdx5iClFll5IxG6k1
-	ebw6OZtH5alxHW+tJ5/jlFf+4S4rwriLrQfV+1ucsamGB8uIJNIunv8K44Tjwms7
-	5w/Rufdvvl06Oo3F7IFM5wCKBvmEfPmvhdNonXXRub1b+ySlP+QGpgUnXeam/ck6
-	w==
+	:received:received; s=mr01; t=1783632956; x=1786224957; bh=EJvtT
+	GDvcSPxzREaPXRpQeUK/eRsWTrtnSdDUlC8+Jw=; b=TH6lWHPAY0+HNij8xDZAl
+	Y9tEkc6gcyxvwzpQfHAWibwDikco9scW4sZhkN6oL8T1klVzyFL/LK4bJ+78sFfV
+	xEXe12yWP1EK7DytyEKyJhdyVWrOY77KxbakMjZl94pENtnAdSPu91r50S1n6WP9
+	SSI1DlVg7oYp4tykCNldy3UqFyYeKkKMbUli5NsUu4zXA2wExOR8D07optheOQXh
+	s7na7K9zDC4AyvwkMBLQZIAd3Nhh5LE0BEd7qhyXg0zcxV1Hiq+FCkcYvTxR7EoF
+	6fxRtIy+/1u7sk25oBYL528naP40P618Unt7r8diSzyd/XoEYgkR6pn/tUNIx3Q5
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id loyh8NckAZCb; Thu,  9 Jul 2026 21:35:49 +0000 (UTC)
+ id QLYNHlyqnz7l; Thu,  9 Jul 2026 21:35:56 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yc0C9bzlfdCs;
-	Thu,  9 Jul 2026 21:35:47 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gx7Yj3JQ7zlfdCs;
+	Thu,  9 Jul 2026 21:35:53 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Marco Elver <elver@google.com>,
 	=?UTF-8?q?Cc=20=3A=20Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 00/12] drbd: Enable lock context analysis
-Date: Thu,  9 Jul 2026 14:35:21 -0700
-Message-ID: <cover.1783632330.git.bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 02/12] drbd: Retain one _get_ldev_if_state() implementation
+Date: Thu,  9 Jul 2026 14:35:23 -0700
+Message-ID: <3e4528bba912f3bc6def952c2159733c06ab928d.1783632330.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+In-Reply-To: <cover.1783632330.git.bvanassche@acm.org>
+References: <cover.1783632330.git.bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jens,
+There are two slightly different _get_ldev_if_state() implementations
+in the DRBD source code. Keep the version that is used. This does not
+affect C=3D1 / C=3D2 builds because lock context checking is performed by
+Clang instead of sparse since commit 5b63d0ae94cc ("compiler-context-
+analysis: Remove Sparse support").
 
-This patch series enables compile-time lock context analysis for DRBD. Th=
-e goal
-of this series is to allow the compiler to statically verify that locks a=
-re
-acquired and released correctly, helping to prevent deadlocks and race
-conditions. This version addresses feedback received on the v1 series, im=
-proves
-the annotations, and refactors some conditional locking paths to use the =
-modern
-cleanup.h guard infrastructure.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/drbd/drbd_int.h  |  7 ++-----
+ drivers/block/drbd/drbd_main.c | 19 -------------------
+ 2 files changed, 2 insertions(+), 24 deletions(-)
 
-Changes since v1:
-- Extracted the DRBD patches from a larger series. See also
-  "[PATCH 00/27] Enable lock context analysis in drivers/block/"
-  (https://lore.kernel.org/all/cover.1781042470.git.bvanassche@acm.org/).
-- Fixed the indentation of the arguments of
-  drbd_nl_put_dump_connections_result().
-- Combined the two drbd_req_state() patches into a single patch.
-
-Please consider these patches for the next merge window.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (12):
-  drbd: Remove "extern" from function declarations
-  drbd: Retain one _get_ldev_if_state() implementation
-  drbd: Remove the get_ldev_if_state() macro
-  drbd: Remove the 'local' lock context
-  drbd: Simplify the bitmap locking functions.
-  drbd: Move two declarations
-  drbd: Pass 'resource' directly to complete_conflicting_writes()
-  drbd: Split drbd_nl_get_connections_dumpit()
-  drbd: Make a mutex_unlock() call unconditional
-  drbd: Rework locking in drbd_req_state()
-  drbd: Annotate drbd_bm_{lock,unlock}()
-  drbd: Enable lock context analysis
-
- drivers/block/drbd/Makefile            |   3 +
- drivers/block/drbd/drbd_bitmap.c       |  43 +-
- drivers/block/drbd/drbd_config.h       |   2 +-
- drivers/block/drbd/drbd_int.h          | 594 +++++++++++++------------
- drivers/block/drbd/drbd_interval.h     |  11 +-
- drivers/block/drbd/drbd_main.c         |  41 +-
- drivers/block/drbd/drbd_nl.c           | 117 ++---
- drivers/block/drbd/drbd_receiver.c     |  27 +-
- drivers/block/drbd/drbd_req.c          |  10 +-
- drivers/block/drbd/drbd_req.h          |  24 +-
- drivers/block/drbd/drbd_state.c        |  49 +-
- drivers/block/drbd/drbd_state.h        |  35 +-
- drivers/block/drbd/drbd_state_change.h |  32 +-
- drivers/block/drbd/drbd_worker.c       |   6 +-
- 14 files changed, 508 insertions(+), 486 deletions(-)
-
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
+h
+index aa39c4d19133..bba52252fbac 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -2033,8 +2033,8 @@ static inline void put_ldev(struct drbd_device *dev=
+ice)
+ 	}
+ }
+=20
+-#ifndef __CHECKER__
+-static inline int _get_ldev_if_state(struct drbd_device *device, enum dr=
+bd_disk_state mins)
++static inline int _get_ldev_if_state(struct drbd_device *device,
++				     enum drbd_disk_state mins)
+ {
+ 	int io_allowed;
+=20
+@@ -2048,9 +2048,6 @@ static inline int _get_ldev_if_state(struct drbd_de=
+vice *device, enum drbd_disk_
+ 		put_ldev(device);
+ 	return io_allowed;
+ }
+-#else
+-int _get_ldev_if_state(struct drbd_device *device, enum drbd_disk_state =
+mins);
+-#endif
+=20
+ /* this throttles on-the-fly application requests
+  * according to max_buffers settings;
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_mai=
+n.c
+index a2a841c89201..dbf6e413db03 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -128,25 +128,6 @@ static const struct block_device_operations drbd_ops=
+ =3D {
+ 	.release	=3D drbd_release,
+ };
+=20
+-#ifdef __CHECKER__
+-/* When checking with sparse, and this is an inline function, sparse wil=
+l
+-   give tons of false positives. When this is a real functions sparse wo=
+rks.
+- */
+-int _get_ldev_if_state(struct drbd_device *device, enum drbd_disk_state =
+mins)
+-{
+-	int io_allowed;
+-
+-	atomic_inc(&device->local_cnt);
+-	io_allowed =3D (device->state.disk >=3D mins);
+-	if (!io_allowed) {
+-		if (atomic_dec_and_test(&device->local_cnt))
+-			wake_up(&device->misc_wait);
+-	}
+-	return io_allowed;
+-}
+-
+-#endif
+-
+ /**
+  * tl_release() - mark as BARRIER_ACKED all requests in the correspondin=
+g transfer log epoch
+  * @connection:	DRBD connection.
