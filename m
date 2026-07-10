@@ -1,85 +1,275 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.archlinux.org (mail.archlinux.org [95.216.189.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7EC363C5B;
-	Fri, 10 Jul 2026 15:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D033793CC
+	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 18:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.216.189.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783696955; cv=none; b=g00qFfOcQI7v311xrMTEHperVHbxIiilXiXO6R+xLH4LtjBURW+4DJ1ovj9OK8smKbMALeXlFxHjcBLDfjyXF12UZ/7UWpNG9Fuvdc1q01l1i/OXW2Yo/iZxSVD1yhTdtqC90dSeud+MYTnh5WZed7lo5ZuY+PPGIRikGwNuZpE=
+	t=1783706859; cv=none; b=Q8RZpA8nIya2zdLLh8mZ+FiBqDbkmDUOtgJRIiiLQ0oATpLthpiPPRpZXntYwEofNAlzI/6J53RCT5671Dbb5nK15ild04qCYbweLPkLTJOfWoR8zG77iDOLMS6PAT45NUXWmlb/SSVsDrBpF+lUkEODqsKvnBNEq8zSoZQGmEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783696955; c=relaxed/simple;
-	bh=8gzFoNNR4YwjlaVrX0OmmylnRCGx7JLjJgNqHpDhGus=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=re7BE0OkUHmK9l8IDDmxLPRhoBBuD+x8a1b77kc4g3NrpW5BsUAcscro3QuZwzro34TCN3sdOdjmKztemwThY9MJJrw5uSOAnFNeh0/v0G392bHlXR/QES0lq1SwbstsbZB04skZAuWcPUCATtq1juQnGyDpdJKMO7mtNglnrMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UClDCNbC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783706859; c=relaxed/simple;
+	bh=39h6QD+l+hFXPLtdb2AjCsJlPk3MPfFWMaRsDosbQkY=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=Pb0Fzehfel7w/HXm5UTT4mEJPZtUbR3kg3Ldz5+FEdnsxDOkFgfdudy5eUY73aXXndc8AeTdtjBMXxDv7+gycRV9mhENt8/bhVI40P/Rf0DWnuHRJda3oQiZjQZemCjGMw1z6KnMZbZ2FX+39T7uKczEPaqjvbeyCdxTF5fhoJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=archlinux.org; spf=pass smtp.mailfrom=archlinux.org; dkim=pass (4096-bit key) header.d=archlinux.org header.i=@archlinux.org header.b=x4DaBxzg; dkim=permerror (0-bit key) header.d=archlinux.org header.i=@archlinux.org header.b=Kej11nkE; arc=none smtp.client-ip=95.216.189.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=archlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=archlinux.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UClDCNbC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83291F000E9;
-	Fri, 10 Jul 2026 15:22:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783696953;
-	bh=BZBmbz6+BQI2Kzh1iUDOvyORAvj/yICrOCZDo+Rp0kw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UClDCNbCQfNVRQhm1i8d0xb29cuN0tYD1gSYn7nGQxcwS7UY+Fj+hD+7dJGoKu6Zg
-	 5dYucbOrXi+v7T24cB56Kj8GAb1o3zBc9NpvUvN5qN3+YfFzwGuu96lk54Lzoit87D
-	 P/hGUwB9WQjR82lZLQWwQitL+/Bv5Y8BZH6R/S5wyEVMfzdFEcixq45ps9RC5QDPjc
-	 iSoPzj/1r4B8qaXm++3azwoC4Yb8dd/t/FKEfXkTGZYSqWjTHmfxIksx4hz8WTp+TP
-	 xjssz+2VAgXF7xqPMcYBg54aH6eutuE3PC4QXMK3tooi3O/AVmgdjEBLUn+HPAXBxF
-	 9d+WnwGLCmO8A==
-Date: Fri, 10 Jul 2026 09:22:31 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	axboe@kernel.dk, jack@suse.cz, brauner@kernel.org, cem@kernel.org,
-	jaegeuk@kernel.org, aalbersh@kernel.org, tytso@mit.edu
-Subject: Re: [PATCH] fs: report direct io constraints through file_getattr
-Message-ID: <alEON9EQ3BAX_D35@kbusch-mbp>
-References: <20260708011843.1036846-1-kbusch@meta.com>
- <20260709071352.GA20180@lst.de>
- <ak-mQqt-a-jy6ZoV@kbusch-mbp>
- <20260710043519.GA6205@lst.de>
+	dkim=pass (4096-bit key) header.d=archlinux.org header.i=@archlinux.org header.b="x4DaBxzg";
+	dkim=permerror (0-bit key) header.d=archlinux.org header.i=@archlinux.org header.b="Kej11nkE"
+Message-ID: <8a2b1abf-3c8a-4242-82c5-fba9943cf8f4@archlinux.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=archlinux.org;
+	s=dkim-rsa; t=1783706854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
+	bh=39h6QD+l+hFXPLtdb2AjCsJlPk3MPfFWMaRsDosbQkY=;
+	b=x4DaBxzgobEdOEKeB+pmWa8AAQO86d+s6ptKr0aMaKGTLomVMPARuAPHWkHz26HK/CZejs
+	V/kTazdmfMLqmeizABKgWoeCnML5jyQvhGjDF284x0ZGpvYv8enA/t4OpmZS6TFv/gARqf
+	g+ADUlo7cDir/RXmdHsucKyMYB8Yr/p7OuTub1DEe2JC52/ihnRyqFX8XAq1GAfmM5hAG0
+	2rCBMTg2E2fZ48AMNzKUa/6YmPzkY4Faqwtw2MBfnA5qUWWSJ3+r3RCiipHy1DdGoszZ/X
+	zQdOcyJc639WSEWyq6bWF/ny6S1AIzSe9VZ8K8UHh+sbcgrMXNFqC1zVdAS11xVu1FAVSP
+	08MPYTM8+9F14Nq9tD8nYRdph9JLx9CbWAxOxQJRSvSG0DeeKOnqDxnmqZDq7z9n3t+qdk
+	nm+vGwg03gHbWtSeuh910vRVHugcfi7VxYF02hJ9MiaNfYtqKd7SDZuMFxBsGLrN5EJYTF
+	gomzQxrGDHDzgX6EwvzaS3Cfo5JqXlLJLytEEnd8C7fhTu0pBWSXq2b9rhYaGzVHCwFo4X
+	o68gFP+JoDBPoQNZ0f9wHdA0hhEWr1odwwlLNgk1yTO8aS9od6SSuUg+vhvnps5yGVZLhn
+	XUdm7auCg7z0hGn3qg6fevLpyW4GUk7x978W4qRRWoAZLXMBcWeV0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=archlinux.org;
+	s=dkim-ed25519; t=1783706854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
+	bh=39h6QD+l+hFXPLtdb2AjCsJlPk3MPfFWMaRsDosbQkY=;
+	b=Kej11nkESNPzYDkrw96KCEfzFRTTtiAWC+scaPptfGnYODTY5mW37BS28it0ZgpRASWmun
+	/C9VJo1GUYTRK2Cg==
+Authentication-Results: mail.archlinux.org;
+	auth=pass smtp.auth=svenstaro smtp.mailfrom=svenstaro@archlinux.org
+Date: Fri, 10 Jul 2026 20:07:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260710043519.GA6205@lst.de>
+Content-Language: en-US-large, de-DE
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+From: Sven-Hendrik Haase <svenstaro@archlinux.org>
+Subject: [REGRESSION] commit b520c4eef83d ("block: split bio_alloc_bioset more
+ clearly into a fast and slowpath") causes fsync to fail with pmem
+Autocrypt: addr=svenstaro@archlinux.org; keydata=
+ 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
+ 2+Dd0G7AznpgJHOb1rk=
+Cc: regressions@lists.linux.dev, linux-block@vger.kernel.org,
+ Li Chen <me@linux.beauty>, Joseph Qi <joseph.qi@linux.alibaba.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------YrHT8vHkbTdSGA3pB0SKvhJg"
 
-On Fri, Jul 10, 2026 at 06:35:19AM +0200, Christoph Hellwig wrote:
-> On Thu, Jul 09, 2026 at 07:46:42AM -0600, Keith Busch wrote:
-> > On Thu, Jul 09, 2026 at 09:13:52AM +0200, Christoph Hellwig wrote:
-> > > On Tue, Jul 07, 2026 at 06:18:43PM -0700, Keith Busch wrote:
-> > > 
-> > > > +	fa->fsx_dio_mem_align = bdev_dma_alignment(bdev) + 1;
-> > > > +	fa->fsx_dio_offset_align = bdev_logical_block_size(bdev);
-> > > > +	fa->fsx_dio_read_offset_align = bdev_logical_block_size(bdev);
-> > > > +	fa->fsx_dio_virt_boundary_align = bdev_virt_boundary_alignment(bdev);
-> > > > +	fa->fsx_max_segments = bdev_max_segments(bdev);
-> > > 
-> > > How is the max_segments value defined in a way that is meaningful to
-> > > userspace?
-> > 
-> > It tells you how many sub-sector vectors you can submit in your
-> > readv/writev before it needs to add up to a logical block size.
-> > 
-> > Ex: 4k logical block size, 4 byte DMA, 256 max segments. You can define
-> > 4-byte iov's in your command, but you'll hit the max segment count
-> > before you have a valid IO if they're all that small.
-> 
-> Ah, makes sense.  But besides the missing documentation I think
-> max_segments is a bit of a misleading name for that.
-> 
-> Something like max_vecs_per_block (although we don't expose blocks
-> in the UAPI) or max_vecs_per_granularity (I think grammar wants a word
-> with me for that, though...) might be a bit more suitable.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------YrHT8vHkbTdSGA3pB0SKvhJg
+Content-Type: multipart/mixed; boundary="------------9k0lNiORNwXEmWZIzG3Cl0gd";
+ protected-headers="v1"; hp="clear"
+Message-ID: <8a2b1abf-3c8a-4242-82c5-fba9943cf8f4@archlinux.org>
+Date: Fri, 10 Jul 2026 20:07:32 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US-large, de-DE
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+From: Sven-Hendrik Haase <svenstaro@archlinux.org>
+Subject: [REGRESSION] commit b520c4eef83d ("block: split bio_alloc_bioset more
+ clearly into a fast and slowpath") causes fsync to fail with pmem
+Autocrypt: addr=svenstaro@archlinux.org; keydata=
+ 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
+ 2+Dd0G7AznpgJHOb1rk=
+Cc: regressions@lists.linux.dev, linux-block@vger.kernel.org,
+ Li Chen <me@linux.beauty>, Joseph Qi <joseph.qi@linux.alibaba.com>
 
-The granularity it has to add up to is defined by the
-fsx_dio_offset_align attribute. This is a bit long, but to make that
-relationship clear, how about:
+--------------9k0lNiORNwXEmWZIzG3Cl0gd
+Content-Type: multipart/mixed; boundary="------------0oGzMl9l2W1Nlufk7EhgZxwh"
 
-  fsx_dio_max_vecs_per_offset_align
+--------------0oGzMl9l2W1Nlufk7EhgZxwh
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+
+SGV5LA0KDQpGaXJzdCBvZiBhbGwsIEkgZG9uJ3QgZG8gYSBsb3Qgb2YgTGludXggZGV2ZWxv
+cG1lbnQgYW5kIHNvIEkgaG9wZSB0aGF0IA0KSSdtIHN1Ym1pdHRpbmcgdGhpcyBpc3N1ZSB0
+byB0aGUgcmlnaHQgcGVvcGxlIGFuZCBsaXN0cywgcGxlYXNlIGJlIGdlbnRsZS4NCg0KSSBu
+b3RpY2VkIHRoYXQgc3RhcnRpbmcgd2l0aCBMaW51eCA3LjEsIG15IHBtZW0gdm9sdW1lcyBp
+bnNpZGUgb2YgUUVNVSANCnN0b3BwZWQgd29ya2luZy4gTXkgdXNlIGNhc2UgaXMgdGhpczoN
+Cg0KcWVtdS1zeXN0ZW0teDg2XzY0IC4uLiB0b25zIG9mIFFFTVUgZmxhZ3MgLi4uDQotb2Jq
+ZWN0IA0KbWVtb3J5LWJhY2tlbmQtZmlsZSxpZD1wbWVtMCxzaGFyZT1vbixtZXJnZT1vbixk
+aXNjYXJkLWRhdGE9b24sbWVtLXBhdGg9L3BhdGgvcG1lbTAucG1lbSxzaXplPTEwMEcNCi1k
+ZXZpY2UgdmlydGlvLXBtZW0tcGNpLG1lbWRldj1wbWVtMCxpZD1udjANCg0KVGhpcyB1c2Vk
+IHRvIHdvcmsgYnV0IGluc2lkZSB0aGUgVk0gSSdkIGdldCB0aGlzIHdoZW4gcnVubmluZyBt
+a2ZzLmV4dDQgDQovZGV2L3BtZW0wIHdpdGggZ3Vlc3Qga2VybmVsIDcuMS4zOg0KDQo+IFty
+b290QGFyY2hsaW51eCB+XSMgbWtmcy5leHQ0IC9kZXYvcG1lbTANCj4gbWtlMmZzIDEuNDcu
+NCAoNi1NYXItMjAyNSkNCj4gQ3JlYXRpbmcgZmlsZXN5c3RlbSB3aXRoIDI2MjE0NDAwIDRr
+IGJsb2NrcyBhbmQgNjU1MzYwMCBpbm9kZXMNCj4gRmlsZXN5c3RlbSBVVUlEOiAxYTE0MDQ0
+Ni00M2U2LTQ1MDEtOTFkYi1jZmFhMjUwOTE2ZTUNCj4gU3VwZXJibG9jayBiYWNrdXBzIHN0
+b3JlZCBvbiBibG9ja3M6IA0KPiAgICAgMzI3NjgsIDk4MzA0LCAxNjM4NDAsIDIyOTM3Niwg
+Mjk0OTEyLCA4MTkyMDAsIDg4NDczNiwgMTYwNTYzMiwgMjY1NDIwOCwgDQo+ICAgICA0MDk2
+MDAwLCA3OTYyNjI0LCAxMTIzOTQyNCwgMjA0ODAwMDAsIDIzODg3ODcyDQo+IA0KPiBBbGxv
+Y2F0aW5nIGdyb3VwIHRhYmxlczogZG9uZSAgICAgICAgICAgICAgICAgICAgICAgICAgICAN
+Cj4gV3JpdGluZyBpbm9kZSB0YWJsZXM6IGRvbmUgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgDQo+IENyZWF0aW5nIGpvdXJuYWwgKDEzMTA3MiBibG9ja3MpOiBkb25lDQo+IFdyaXRp
+bmcgc3VwZXJibG9ja3MgYW5kIGZpbGVzeXN0ZW0gYWNjb3VudGluZyBpbmZvcm1hdGlvbjog
+bWtmcy5leHQ0OiBJbnB1dC9vdXRwdXQgZXJyb3Igd2hpbGUgd3JpdGluZyBvdXQgYW5kIGNs
+b3NpbmcgZmlsZSBzeXN0ZW0NCg0KSSBmaWd1cmVkIGl0IG11c3QndmUgYmVlbiBhIHJlY2Vu
+dCByZWdyZXNzaW9uIHNpbmNlIGl0IHdvcmtlZCB1bnRpbCANCjcuMC4xMyAodGhlIGxhdGVz
+dCB0aGF0IEkgdGVzdGVkIGluIHRoZSBWTSkuIEkgaW52ZXN0aWdhdGVkIGEgYml0IGFuZCAN
+CndhcyBhYmxlIHRvIHRyYWNrIGl0IGRvd24gdG8gYjUyMGM0ZWVmODNkIHdoZXJlIHNvbWUg
+a2luZCBvZiByZWZhY3RvciANCndhcyBjb21taXR0ZWQuIEl0IHNlZW1zIHRvIGNyZWF0ZSB0
+aGUgZmlsZXN5c3RlbSBmaW5lIHVudGlsIHRoZSBmbHVzaCBhdCANCnRoZSBlbmQuIEkgZGlk
+IGFub3RoZXIgdGVzdDoNCg0KTm8gZnN5bmMgZGQ6DQoNCj4gW3Jvb3RAYXJjaGxpbnV4IH5d
+IyBkZCBpZj0vZGV2L3plcm8gb2Y9L2Rldi9wbWVtMCBicz0xTSBjb3VudD0xMDAgICAgICAg
+ICAgIA0KPiAxMDArMCByZWNvcmRzIGluDQo+IDEwMCswIHJlY29yZHMgb3V0DQo+IDEwNDg1
+NzYwMCBieXRlcyAoMTA1IE1CLCAxMDAgTWlCKSBjb3BpZWQsIDAuMTk1MzI3IHMsIDUzNyBN
+Qi9zDQoNCmZzeW5jIGRkOg0KDQo+IFtyb290QGFyY2hsaW51eCB+XSMgZGQgaWY9L2Rldi96
+ZXJvIG9mPS9kZXYvcG1lbTAgYnM9MU0gY291bnQ9MTAwIGNvbnY9ZnN5bmMNCj4gZGQ6IGZz
+eW5jIGZhaWxlZCBmb3IgJy9kZXYvcG1lbTAnOiBJbnB1dC9vdXRwdXQgZXJyb3INCj4gMTAw
+KzAgcmVjb3JkcyBpbg0KPiAxMDArMCByZWNvcmRzIG91dA0KPiAxMDQ4NTc2MDAgYnl0ZXMg
+KDEwNSBNQiwgMTAwIE1pQikgY29waWVkLCAwLjQ0MjA4OSBzLCAyMzcgTUIvcw0KDQpOb3cs
+IEknbSBlbnRpcmVseSB1bmZhbWlsaWFyIHdpdGggdGhlIGJsb2NrIHN1YnN5c3RlbSBpbiBM
+aW51eCBidXQgSSANCnBva2VkIGF0IGl0IGEgbGl0dGxlIGFuZCB3YXMgYWJsZSB0byBwcm9k
+dWNlIGEgdGlueSBwYXRjaCB0aGF0IGZpeGVzIA0KdGhpcyBmb3IgbWUgYW5kIEknbSBhdHRh
+Y2hpbmcgaXQgdG8gdGhpcyBlbWFpbCBhcyBhIGRpc2N1c3Npb24gcG9pbnQuIA0KSG93ZXZl
+ciwgSSdtIG5vdCBzdWJtaXR0aW5nIGl0IGFzIGFuIG9mZmljaWFsIHBhdGNoIGJlY2F1c2Ug
+ZnJhbmtseSBJIA0KY2FuJ3QgZXhwbGFpbiBpdCB3ZWxsIGVub3VnaCBhbmQgSSBoYXZlbid0
+IGRvbmUgQyBpbiBhIGxvbmcgdGltZSwgSSBqdXN0IA0KbG9va2VkIGF0IHRoZSBvbGQgbG9n
+aWMgYW5kIHRoZSBuZXcgYW5kIHB1dCBhIGJ1bmNoIG9mIGRlYnVnIHByaW50cyBhbGwgDQpv
+dmVyIHRoZSBwbGFjZS4gQmFzaWNhbGx5IHRoaXMgaXMganVzdCBtZSBkb2luZyBteSBiZXN0
+IHRvIHRyeSB0byByZXBvcnQgDQp0aGlzIGlzc3VlLg0KDQpXaGlsZSBzY2FubmluZyBhcm91
+bmQsIEkgbm90aWNlZCB0aGF0IGp1c3QgeWVzdGVyZGF5LCBhIHN1c3BpY2lvdXNseSANCnNp
+bWlsYXIgdG9waWMgd2FzIHNlbnQgdG8gdGhlIE1MIFswXS4gVGhhdCBwYXRjaCBpcyBhIGxv
+dCBiaWdnZXIgdGhhbiANCm1pbmUsIHRob3VnaC4gQWxzbyBqdXN0IHdoZW4gSSB3YXMgYWJv
+dXQgdG8gc2VuZCB0aGlzIG1haWwsIEkgbm90aWNlZCANClsxXSB3aGljaCBzZWVtcyB0byBi
+ZSBleGFjdGx5IG15IGlzc3VlLg0KDQpBbGwgb2YgdGhpcyBtYWtlcyBtZSBldmVuIGxlc3Mg
+Y29uZmlkZW50IGluIG15IHBhdGNoIHNpbmNlIGFsbCBvZiB0aGVzZSANCnBhdGNoZXMgYXJl
+IHNvIG11Y2ggYmlnZ2VyIGFuZCBhdCBsZWFzdCBvbiB0aGUgc3VyZmFjZSBzZWVtIHRvIHRh
+Y2tsZSANCnRoZSBzYW1lIHByb2JsZW0gYnV0IG1heWJlIG15IHJlcG9ydCBjYW4gYWRkIHNv
+bWV0aGluZyBoZXJlLiBJZiBub3QsIA0Kc29ycnkgZm9yIHRoZSBub2lzZS4NCg0KI3JlZ3pi
+b3QgaW50cm9kdWNlZDogYjUyMGM0ZWVmODNkDQoNClswXSANCmh0dHBzOi8vbG9yZS5rZXJu
+ZWwub3JnL2xrbWwvMjAyNjA3MDkxMjQ0NTUuMTU0NzkxMi0xLWpvc2VwaC5xaUBsaW51eC5h
+bGliYWJhLmNvbS8NClsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMjYwNjMw
+MDkyMzM4LjIwOTQ2MjgtMS1tZUBsaW51eC5iZWF1dHkvDQo=
+--------------0oGzMl9l2W1Nlufk7EhgZxwh
+Content-Type: text/x-patch; charset=UTF-8; name="bio.patch"
+Content-Disposition: attachment; filename="bio.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jpby5jIGIvYmxvY2svYmlvLmMKaW5kZXggNWYxMDkwMGIz
+ZjQyLi45YTk0YjQ1MTM1YjcgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Jpby5jCisrKyBiL2Jsb2Nr
+L2Jpby5jCkBAIC01NTUsNiArNTU1LDggQEAgc3RydWN0IGJpbyAqYmlvX2FsbG9jX2Jpb3Nl
+dChzdHJ1Y3QgYmxvY2tfZGV2aWNlICpiZGV2LCB1bnNpZ25lZCBzaG9ydCBucl92ZWNzLAog
+CQliaW8gPSBiaW9fYWxsb2NfcGVyY3B1X2NhY2hlKGJzKTsKIAl9IGVsc2UgewogCQlvcGYg
+Jj0gflJFUV9BTExPQ19DQUNIRTsKKwl9CisJaWYgKCFiaW8pIHsKIAkJcCA9IGttZW1fY2Fj
+aGVfYWxsb2MoYnMtPmJpb19zbGFiLCBnZnApOwogCQlpZiAocCkKIAkJCWJpbyA9IHAgKyBi
+cy0+ZnJvbnRfcGFkOwo=
+
+--------------0oGzMl9l2W1Nlufk7EhgZxwh--
+
+--------------9k0lNiORNwXEmWZIzG3Cl0gd--
+
+--------------YrHT8vHkbTdSGA3pB0SKvhJg
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEEj8FaBklQqZ3RvRTdOeS4d+YuuRUFAmpRNOQFAwAAAAAACgkQOeS4d+YuuRWB
+Zg//dIH3vfsYsyLr7gikDujL+vtI62AgbiFsUrrZI6Jr4GKDuqII8A/5pmqUC0CS/tKdKgDubCNm
+hM9LGyoH8+bLPduvAZkyuNvrITv54t4mpmF07fZlBNkF6Vg7ckw+8dDltsxlUEFxW+KSFzuqtNwz
++4Im7ik3tjOqJyzjQAFZWoDy7qM70uklwCQ+wbuzuzwd7fFV14qddBl3FrPCXEx95RWkrZfzzV0Q
+2CZ56y647CL7LILhMAWcmoBn0zCFSBG333+pTPFJRbJ2Nxb7aHTRCHbMqZIFT8tdrtmykwpp0kHT
+UCl5a7qxFWV0LWmppQ5eRJHXqpLCi9B4p1C2I9sdgm/g1vvCr6iUS2T+1wmQIlN8EbNZ/yzD5Lw4
+aynQcMbCxZclloEN2XLxdK3FKc64PBnFuaTVeDlNLHgcev/LYEiBmUtSbLZDt+x8gzGvH5I8pOkh
+3VaI3s3o9ZCdcSGizv58pSZ1yyjvwrxvsNCQpTAzA1KlVQZEIgl4zrpp87YJ0vXi3ARIoMRw9yfu
+C8nDAndBrcgYnMOd5IPDyVQ7tShB8YllVgPc5bcRdE9849Hgb/+S3IzUeR6ovWW8Ywa5G9CRV01D
+DN/1sRxWn5N1P+nGl9SJiczdnQd8Irj0jrg33LWH5j0XoFvl7gk+PcN1NaFDziI28IUPFhwx19qw
+Rk8=
+=lyoF
+-----END PGP SIGNATURE-----
+
+--------------YrHT8vHkbTdSGA3pB0SKvhJg--
