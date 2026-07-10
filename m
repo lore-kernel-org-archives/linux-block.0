@@ -1,163 +1,283 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF24413D8C
-	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 11:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783682031; cv=none; b=FfMI+maiiuIRbjRnPNlGtM2/RYrc696BZ5AC1hOmuqBZZ4HwiWQcZpTBl3iTq+lZn2ugmXM+hMPt/2Qt6jElC57Kps2vLCePUXCSg3mDkzYLTq7nerMI6IwsdhrIy3mvsV+oQrbMuHO4ei2MTV9G+tkqHd/zw68QhkPWEll5rDE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783682031; c=relaxed/simple;
-	bh=c4OVHU38z7vfkatYPQKtn8vnc7akYZidlGLsN81aP0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u+vXQDKO7HH5L+DUcD4XMNnwjiMqi402Fk2mTQdUZNfhzdJAGJhGgiz4HIlz7XkW7X20n11/+AVhNGIrIvofB4JfpzP0QkqOxQYOUAJR8hBfaL79rlGKBazodaCocTCyGl499cpHkKzjYNFcmk+r8DFlz8js0H00v5LhaXRMcWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=Gu3tOBcG; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E48C420E7A
+	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 12:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783686402; cv=pass; b=NOrj8HL7sRpYh0mr2kWBrx2Y0r2iFzJq8Q0nYUI/U4TZ4zl5OiHcBttIRTBbIeoJl6vnPxuxJVsE1CoDFNs+R6buz8ex9My4xk/viB/tAJDUt7kv4ZNfacjqfTpt3792e+cV/co26dfsH0526djUiSdtoG9ujkQmj/90GcIA3dI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783686402; c=relaxed/simple;
+	bh=q4/BQ4KH5y3vSKgWe4o/xo7A1YY9mmS0eOWDxqB1uLw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Z+iXN5Wbt9w7XVBkFpxhOAAjz/zjTuBze2p0n5tutp4pw1QBpk+QL+aPpnjqK2FWz+mLc+tO3g9JYxYjeImQKmqzZHwit41Qwas7uqR+oPf9duwO8p7la3ykzaPUyJeVTBSSh1wDc1SRvsdtqP0m8JByWusZLcS2zHBZTrFXX1k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqX9Ea6I; arc=pass smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="Gu3tOBcG"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-47640541585so413130f8f.1
-        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 04:13:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqX9Ea6I"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-90004d2f7b7so13226506d6.1
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 05:26:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783686399; cv=none;
+        d=google.com; s=arc-20260327;
+        b=FB+vinuvNFEx7EINM3/yYFCCJeZpWTdK9v5lBjTewdICY0Z38gggeqzgSrt8A2sMwU
+         yDRFqy71hBn9kHZ/Ff4f1x7gDJ/cuTrNdKfaWcgLT7XjUZeMQpXJBHOnPMEOuFC99ACx
+         Km2BIvspS7L8OTu/Qb5DmtdJeJ37lqLvfB/8RAwY39ufjwKZqsjHq2Fp0PeWIbgJCpaR
+         Rfhror5QAOPpWl2StGbXj+aVMCVkrUfYW0CSGTFgs3IYoIqa8+yFYn9xPIEBzOrTRwPK
+         RYNdYxmDeTTdLjFtVAJAcyR/epdeuOpDxnlG5IXa3R+qSWxRwt1qzouLoePpdXjhFs8d
+         sKvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=P7LqUBukt2rMNYxiApGcoalzSvkntcsDQXDi4tpWW30=;
+        fh=eosDhnWcWiQc8na2k6XbyaML2Ll696MP+Nzji/sa+Nc=;
+        b=G9a4M5Pw1ztPN3mwmPGW+u9GvDe4NMdhMNZXpCdbiDDN+A3Z7slzXADhnWfgJsj236
+         y6HKRMD4gFE1+r72MSS9/JXBCHKwnXEQxWYSxV4O9LQ+Ay33LHMPlGwZkLJKd8mzb/Yd
+         YFKCK3L6mmJhDHIQ6XXFG/qlsD8J2lUgsbCnhv/VlysOOT6jF0RHpdoXXM1ivQGDFRLp
+         mo8oxCxV3VD+mniGJ0vPBDF94V1uju2kVOyJPdIppRvAbm6ThafSw0vSdN+32bpaYoHP
+         cnMYnmZccbt5hDgJa2fq9iJ8BQPe8A1857/fAflGtUwG5r9JmMTzzVJ6Av6/mo0GBCOD
+         QUpQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1783682027; x=1784286827; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:mail-followup-to:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ODgufXz1PhelMlB2W5pp8vf7ivTLwxqDccyqSe9smQ8=;
-        b=Gu3tOBcGf3T0pnU9ybwJ1OIj0sxHVMkkaVxMCpYU1p+VQfXrRcf8t/tZq4Nl9iRgrb
-         jedOKWmhfFdqNIBXQuF27OcoYXMobk5QXFhM/CeFArNDEzILbQscmFisasjsQsFVFmT6
-         n70WRs3rocq8pj9uCxgEYoqUVecNlXWK5WWyrBfZ7lkjY4imeN5GobWtbADjQSazOER3
-         zUJs1w1n/cUWM+k/n9t7cAxyAF708wvv8Xnfq89Gg4VZfqLCP1u+Rx3xLeuUA/C7xYCm
-         zzb/QmgHnpBVTyUyOFFkaIipLq1JCIf3sFKPvgz9iaSMXmUSp5WOzTOHyJOLhFw5Fixc
-         BOkw==
+        d=gmail.com; s=20251104; t=1783686399; x=1784291199; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=P7LqUBukt2rMNYxiApGcoalzSvkntcsDQXDi4tpWW30=;
+        b=MqX9Ea6I0XAmE+Dy2Ilh3SXv4RmzGZGG3Iv5dHwDzn5GBdV1DagwF6GGTOtc67p439
+         fmpWSXjYDv15VXaTpUMd2HKrSBq0yjJCRkPYlPMRUBspo3QU/nqV7WVQZYSgWeePCC4B
+         x/NiKIZQl15cWXWa/tYxa15pWP6TfrK746YYcOxww60/7UmBxJ3Zk6u3vCKNqCt+uTV6
+         bcDlqmaF0/662N56dq6qKUetY+vacQLQpQK4eUVbN/CWfhFT4aL0UH1F+TGU4XBxE2zz
+         Mp/K1csTvdd5nKhP/OZf8rAp78g+p/etxZrfVu6rGzYjrYnBL9E/xGW1v9RWnjZYSxV1
+         6Rzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783682027; x=1784286827;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:mail-followup-to:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ODgufXz1PhelMlB2W5pp8vf7ivTLwxqDccyqSe9smQ8=;
-        b=YUWAT0QSmJuVtntqrRGZ0fZeVRSdISh23R0LOmEb/5JKNRCRwHTrEhcygvDf8cKfKX
-         UPaNV1bxpOcPRzT8p+jT8rvJ1seDdWaPHBJ78dJj0dl5NF8X4DlnXtL2cjZWTXilAO5q
-         DY81ZPwK1dU/CzNM5/5ExDVvUCYPxDKK324EP0ahpw+ZtTlyuqAWHc8108/i7I1aEYUA
-         WncDp8C+HbqWly05NqEq0eJid3SMn/HqWGVC7ac3OB+8D506BHdLrHgBTfyIWtKaH9y0
-         1qf6EtVFQtcUyEpZwcqR3fCNHJXSKl/dg8IArTK5uzgbFvOUIc8b8czoSROGqV4rz+tM
-         VlCA==
-X-Forwarded-Encrypted: i=1; AHgh+RoLdqF7r3FhoZ8dDGspWz8QdD23KNk0C3EsdwE6uwaq3Ex1L9v0eaPF5binnbyJgtyO4zw59QmrkhBdDQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4eWpqjMRh5p4WB9zG019L2Ny14cVMHbV0NRDdfTH6paZHpwAR
-	0irgeLUTJMZ3/gvUWGSJNA4cr/0xK7jWHbxTEJIZhJ3FXmonJVoeMHnaBAGuKACnF30=
-X-Gm-Gg: AfdE7cmAKJOT4tQHu8QDpU9bDLAiiPKdEqIXDoAaD6StK6xVaBCVZiw6MiBm2eQQ7ij
-	SGKFG46DgWBNLE0OLSRC3GO35TMJf7jYEnkmnYRESi4SUbGBllMgqa1RcSpf8BFbAzCPNsiViIN
-	Uoqr3I3JKRAwpyKfQZcw69V55yKv1AtUWFwZh4X+AU3bag83P69G39Of3XEZ8+Ot86QhXGsaz2n
-	kG2ZBC2RKCr0caSdyLsLeo1iiXtx5koUl+yR6yHipCTsnUsFLL86EMhqG9uV91OZlwWFtOLeMyP
-	9XTHHATl1D5uvkeVmUPAx5LW6uK28oWi+5nm1SsP01MI2bpPOXOkXIXj0USgcZhKpLGo0i9nVCS
-	3mlhw5njb3g4jgZHCgMR63fuZOfwnn+EfW+8W682gfYkMZeglx6BJTmHwhDtfSUWCtFwsOPqXJb
-	NpguolCrFspYtaVSpJ0hyVV9qTYsdy5mOU2MlCtDeE0H/Turi0dDOl4lcQ
-X-Received: by 2002:a05:6000:2482:b0:477:6874:5415 with SMTP id ffacd0b85a97d-47df074605amr11973058f8f.26.1783682027154;
-        Fri, 10 Jul 2026 04:13:47 -0700 (PDT)
-Received: from localhost (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d6e4csm56399132f8f.10.2026.07.10.04.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 04:13:46 -0700 (PDT)
-Date: Fri, 10 Jul 2026 13:13:45 +0200
-From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
-	Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>, 
-	Andreas Gruenbacher <agruen@linbit.com>, "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] drbd: Fix potential NULL pointer dereference in
- _drbd_set_state()
-Message-ID: <alDRuDisKeheSGc8@linbit.com>
-Mail-Followup-To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>, 
-	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, 
-	Jens Axboe <axboe@kernel.dk>, Andreas Gruenbacher <agruen@linbit.com>, 
-	"drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-References: <20260625050016.12004-1-a.vatoropin@crpt.ru>
+        d=1e100.net; s=20251104; t=1783686399; x=1784291199;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=P7LqUBukt2rMNYxiApGcoalzSvkntcsDQXDi4tpWW30=;
+        b=gPl71yr24VUbp3ZcfErO4WzFrrDomg89O3AV4bxAGjHf/hkVR608K5d3A4Qvm1vXwW
+         Aj7AbI+PuGvqIsjHztnnU8hB/dNbQV2vFr34SWjE9XP1QHjsNYYvqa8SfBusgg99FLyV
+         OqFbo6V7mbpOcZzbQNAw2rJgBP0jPYXHsYCdKH5LBuF/U8Hgg5HUbjIGchGg1UnQitvD
+         RGvFPhFbhwoItRzzSveQUjgPgqyRLu42sA2JkLhOzLUwZi/PVC6qUX0CCEuCPoy10FqH
+         GgGzpYpkMlQm0exNb6Qz50lVn4L8R65p77lHB08AvC63dFFuNytAAuHxBnG7/yTDvSgS
+         P/yA==
+X-Gm-Message-State: AOJu0YycAPWMrNfiY9IB2hIq/nB8yBAg5Fz8SyCYl697f5bOuTY9wDHC
+	eAt4Mb6536dqgxo41R8eJ+kQFaP+OQ7QAvPsxx7BZYTwpWHfsr8P+mPMkcBmF6qZ4OjWzgAPnZY
+	Y4p9kjerAjg2w+F77KRw6N2ErhfbS0Cg=
+X-Gm-Gg: AfdE7ckE4CuB/iu3gahxXj1+3wNgQ1QD+fqFELT8fQCQfUt3TgouR7LCbbRYLxgHc+p
+	XHpwvvxbhV3HXCjBngUfopd4S7kSWUXp5XmALFEYfcn4tRuD4skzVH1cAmGTWvgWIq7DR0iE3aq
+	J9jlqpYvv9wubL9zSrKGDGagtxrKj6rxW21RYXdUTlZLkFSSPiCPaptGxR51ZUedy1LXxkGASNF
+	QqwcF69IdZP8i1khvgAfi4aPtOKn9kimdPotC2uDQX8kz8m+kKZoPjda/7RVgITVV9wneA=
+X-Received: by 2002:a0c:f405:0:b0:8fd:6e32:2bf9 with SMTP id
+ 6a1803df08f44-8fec3ee152cmr119011706d6.58.1783686398554; Fri, 10 Jul 2026
+ 05:26:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260625050016.12004-1-a.vatoropin@crpt.ru>
+From: Neptune <z1281552865@gmail.com>
+Date: Fri, 10 Jul 2026 20:26:25 +0800
+X-Gm-Features: AUfX_mw8y3IeQlYXYwrVIOk3H3rSo8TmkgFooSQ78Wlg3JjdHwdwIGi1frxoQ7w
+Message-ID: <CAKTh279tH68oS4gTQd9DFqNuegvAhwZ8ck2uViR+cbeJDW9jDA@mail.gmail.com>
+Subject: [RESEND][SECURITY] block: double unpin in bounced direct reads
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, security@kernel.org
+Content-Type: multipart/mixed; boundary="0000000000002db5c5065640dad7"
 
-Thanks for your patch.
+--0000000000002db5c5065640dad7
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 25, 2026 at 05:03:06AM +0000, Ваторопин Андрей wrote:
->From: Andrey Vatoropin <a.vatoropin@crpt.ru>
->
->The connection pointer receives a value in the _drbd_set_state()
->function, including through a call to the first_peer_device() function.
->This function returns a pointer to a list element. If the list is empty, it
->returns a NULL pointer, which is later assigned to the connection
->pointer. Subsequently, this pointer will be dereferenced.
+Resending in plain text because my first message was rejected by the
+mailing list due to its MIME format. The technical content is
+unchanged.
 
-Can the list actually be empty at this point?
-The peer_device is linked into the list in drbd_create_device(), before
-add_disk() and before the device is inserted into connection->peer_devices,
-so no state change can reach the device earlier.
+Hi Jens, Christoph,
 
-It is only unlinked again in drbd_destroy_device(), after the last kref
-to the device is gone.
-The connection itself is created together with the resource in
-drbd_adm_new_resource() and lives until the resource is destroyed.
+I found a double-unpin in the block-layer read-bounce path that can be
+reached by an unprivileged process through XFS direct I/O. I
+reproduced it as a uid-1000 to uid-0 privilege escalation on mainline
+commit 0e35b9b6ec0f. The bug was introduced by e7b8b3c5b2a6 ("block:
+align down bounces bios"), which first appears in v7.1-rc4.
 
-So for any device this function can be called on, first_peer_device()
-returns a valid peer_device.
+AI-assisted tooling was used during the source review and validation.
+I independently verified the bug against the source, reproduced the
+complete privilege-escalation chain, and tested the proposed fix. I am
+treating the finding as public for coordination purposes, but I have
+not included the reproducer or exploit in this message.
 
->
->Add a NULL check for the connection pointer to avoid dereferencing an
->invalid pointer.
->
->Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
->Fixes: a6b32bc3cebd ("drbd: Introduce "peer_device" object between "device" and "connection"")
->Cc: stable@vger.kernel.org
->Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
->---
-> drivers/block/drbd/drbd_state.c | 5 +++++
-> 1 file changed, 5 insertions(+)
->
->diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
->index adcba7f1d8ea..ea982d48017e 100644
->--- a/drivers/block/drbd/drbd_state.c
->+++ b/drivers/block/drbd/drbd_state.c
->@@ -1281,6 +1281,11 @@ _drbd_set_state(struct drbd_device *device, union drbd_state ns,
-> 	if (rv < SS_SUCCESS)
-> 		return rv;
->
->+	if (!connection) {
->+		drbd_err(device, "No connection to peer, aborting!\n");
->+		return SS_ALREADY_STANDALONE;
->+	}
->+
+bio_iov_iter_bounce_read() stores the bounce folio in bi_io_vec[0],
+while the extracted user bvecs start at bi_io_vec[1]. bi_vcnt counts
+only those user bvecs. bio_iov_iter_align_down(), however, treats
+bi_vcnt as the length of an array starting at slot zero and selects
+the last vector with bio->bi_io_vec[bio->bi_vcnt - 1].
 
-Also, even if the condition could happen, its handling here would be 
-wrong. Since this check happens before handling hard state changes, 
-those could potentially be skipped, which is not allowed.
-For example, after a local I/O error (drbd_chk_io_error), if this 
-condition would trigger, the detach state change would be silently 
-skipped. So in that circumstance, this patch would be actively harmful.
+I create the partial extraction with three iovecs: a one-byte mapped
+segment, a 512-byte mapped segment, and a 511-byte PROT_NONE segment.
+The complete 1024-byte read is aligned, but pinning the third segment
+fails after the first two segments have already produced 513 bytes.
+This leaves the following state immediately before trimming:
 
-Also, SS_ALREADY_STANDALONE would map to the error message "Can not
-disconnect a StandAlone device", which does not make any sense in this 
-context.
+    bi_size        = 513
+    bi_vcnt        = 2
+    len_align_mask = 511
 
-> 	if (!(flags & CS_HARD)) {
-> 		/*  pre-state-change checks ; only look at ns  */
-> 		/* See drbd_state_sw_errors in drbd_strings.c */
->-- 
->2.43.0
+    vec[0] = bounce folio,     len 513
+    vec[1] = first user page,  len   1
+    vec[2] = second user page, len 512
 
-In summary, unless I missed something major: NAK.
+The one-byte remainder should be removed from vec[2], but the helper
+selects vec[1]. Because that bvec is exactly one byte long, it is
+removed and its page is unpinned. bi_vcnt becomes one, and read-bounce
+completion subsequently walks the user array from vec[1] and unpins
+the same page again. Once the partial-extraction state has been
+created, the two unpins are deterministic and do not depend on a race.
 
-Thanks,
-Christoph
+The in-tree path I confirmed is xfs_file_dio_read() with
+IOMAP_DIO_BOUNCE set when mapping_stable_writes() is true. The trigger
+needs a non-DAX XFS file backed by an allocated extent on a device
+that either provides an integrity checksum or advertises
+BLK_FEAT_STABLE_WRITES. It only requires read access to that file and
+an aligned O_DIRECT vectored read; raw block-device access and
+capabilities are not required. In my test setup, queue/stable_writes
+was zero, but the NVMe namespace exposed T10-DIF-TYPE1-CRC, which also
+makes bdev_stable_writes() true.
+
+For the privilege-escalation test, I registered the page backing the
+one-byte first iovec as an io_uring fixed buffer before triggering the
+bug. The DIO pin and the fixed-buffer pin account for two
+GUP_PIN_COUNTING_BIAS references. GDB showed a refcount of 2050 at the
+first erroneous unpin, followed by 2050 -> 1026 in the trim path and
+1026 -> 2 in read-bounce completion. After munmap() and memfd
+teardown, the page is freed while io_uring still retains its bvec and
+old PFN.
+
+I then reclaimed that PFN as the page-cache page containing the entry
+point of a root-owned setuid ELF. IORING_OP_WRITE_FIXED was used as a
+read oracle to confirm the reuse, and IORING_OP_READ_FIXED replaced
+the entry point with a position-independent
+setuid(0)/execve("/bin/sh") payload. This does not require a kernel
+address leak or kernel control-flow hijacking.
+
+The vulnerable kernel produced:
+
+    $ id
+    uid=1000(ctf) gid=1000(ctf) groups=1000(ctf)
+    $ /bio_bounce_lpe
+    [*] uid=1000
+    [+] stale page hit
+    [+] exec
+    # id
+    uid=0(root) gid=0(root) groups=1000(ctf)
+
+With the proposed fix, using the same config, initramfs, NVMe PI
+namespace and XFS setup, the exploit no longer obtains a stale page:
+
+    $ /bio_bounce_lpe
+    [*] uid=1000
+    [-] stale page miss
+    $ id
+    uid=1000(ctf) gid=1000(ctf) groups=1000(ctf)
+
+I repeated the fixed-kernel test on fresh images and obtained the same
+result. The setuid target in the disposable VM was an unmodified
+static BusyBox binary copied onto XFS and installed as root-owned mode
+4755. It was only a convenient page-cache target: the exploit parses
+the ELF entry point at runtime, does not depend on BusyBox behavior or
+a hard-coded offset, and I also validated the same ending with a
+dynamically linked PIE executable.
+
+The attached patch changes bio_iov_iter_align_down() to accept the
+index of the first vector it is allowed to trim. Existing callers pass
+zero and read-bounce passes one. It also updates the bounce bvec
+length after alignment and drops the bounce folio if alignment removes
+all user data. I tested the resulting kernel in the same VM described
+above.
+
+I can provide the minimal trigger, full exploit, disposable initramfs,
+exact QEMU command line, and the GDB transcript showing both unpins if
+they would be useful for review.
+
+Could you take a look at the analysis and patch? In particular, I
+would appreciate your view on whether passing the first vector index
+into the alignment helper is the right fix, or whether you would
+prefer the read-bounce layout itself to be changed.
+
+Regards,
+
+0wnerD1ed
+l7z@0b1t.tech
+
+--0000000000002db5c5065640dad7
+Content-Type: application/octet-stream; 
+	name="0001-block-fix-bvec-offset-when-aligning-bounced-reads.patch"
+Content-Disposition: attachment; 
+	filename="0001-block-fix-bvec-offset-when-aligning-bounced-reads.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mrewte3w0>
+X-Attachment-Id: f_mrewte3w0
+
+RnJvbSBkYWU5MDI1YjM0MDNiY2VjYjJmMTIyNDMwNmNiNGI4YjIyYTZjMjdjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiAwd25lckQxZWQgPGw3ekAwYjF0LnRlY2g+CkRhdGU6IEZyaSwg
+MTAgSnVsIDIwMjYgMTk6MDU6NTggKzA4MDAKU3ViamVjdDogW1BBVENIXSBibG9jazogZml4IGJ2
+ZWMgb2Zmc2V0IHdoZW4gYWxpZ25pbmcgYm91bmNlZCByZWFkcwoKYmlvX2lvdl9pdGVyX2JvdW5j
+ZV9yZWFkKCkgc3RvcmVzIHRoZSBib3VuY2UgZm9saW8gaW4gYmlfaW9fdmVjWzBdIGFuZApleHRy
+YWN0cyB1c2VyIGJ2ZWNzIHN0YXJ0aW5nIGF0IGJpX2lvX3ZlY1sxXS4gIGJpX3ZjbnQsIGhvd2V2
+ZXIsIGNvdW50cwpvbmx5IHRoZSBleHRyYWN0ZWQgdXNlciBidmVjcy4KCmJpb19pb3ZfaXRlcl9h
+bGlnbl9kb3duKCkgYXNzdW1lcyB0aGF0IHRoZSB2ZWN0b3JzIGl0IHRyaW1zIHN0YXJ0IGF0Cmlu
+ZGV4IHplcm8uICBUaHVzLCB3aXRoIHR3byBleHRyYWN0ZWQgdXNlciBidmVjcyBpdCBzZWxlY3Rz
+IGluZGV4IG9uZSBhcwp0aGUgbGFzdCB2ZWN0b3IgaW5zdGVhZCBvZiBpbmRleCB0d28uICBJZiB0
+aGUgYWxpZ25tZW50IHJlbWFpbmRlcgpjb25zdW1lcyB0aGF0IHZlY3RvciwgYSBwaW5uZWQgdXNl
+ciBwYWdlIGlzIHJlbGVhc2VkIGV2ZW4gdGhvdWdoIGl0IGlzCnN0aWxsIHByZXNlbnQgaW4gdGhl
+IGNvbXBsZXRpb24tc2lkZSB2ZWN0b3IgYXJyYXkuICBDb21wbGV0aW9uIHJlbGVhc2VzCnRoZSBz
+YW1lIHBhZ2UgYWdhaW4uCgpQYXNzIHRoZSBmaXJzdCB2ZWN0b3IgaW5kZXggdG8gdGhlIGFsaWdu
+bWVudCBoZWxwZXIgYW5kIHVzZSBhbiBvZmZzZXQgb2YKb25lIGZvciBib3VuY2VkIHJlYWRzLiAg
+QWZ0ZXIgdHJpbW1pbmcsIGFsc28gc3luY2hyb25pemUgdGhlIGJvdW5jZQpmb2xpbyBsZW5ndGgg
+d2l0aCB0aGUgYWxpZ25lZCBiaW8gc2l6ZS4gIFJlbGVhc2UgdGhlIGJvdW5jZSBmb2xpbyBpZgph
+bGlnbm1lbnQgcmVtb3ZlcyBhbGwgdXNlciBkYXRhLgoKRml4ZXM6IGU3YjhiM2M1YjJhNiAoImJs
+b2NrOiBhbGlnbiBkb3duIGJvdW5jZXMgYmlvcyIpCkNjOiBzdGFibGVAdmdlci5rZXJuZWwub3Jn
+ClNpZ25lZC1vZmYtYnk6IDB3bmVyRDFlZCA8bDd6QDBiMXQudGVjaD4KLS0tCiBibG9jay9iaW8u
+YyB8IDE4ICsrKysrKysrKysrKystLS0tLQogMSBmaWxlIGNoYW5nZWQsIDEzIGluc2VydGlvbnMo
+KyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYmxvY2svYmlvLmMgYi9ibG9jay9iaW8u
+YwppbmRleCBmMmE1ZjRkMGE5NjcuLjZiN2Q4OTNkZjE2OSAxMDA2NDQKLS0tIGEvYmxvY2svYmlv
+LmMKKysrIGIvYmxvY2svYmlvLmMKQEAgLTExOTEsNyArMTE5MSw3IEBAIHZvaWQgYmlvX2lvdl9i
+dmVjX3NldChzdHJ1Y3QgYmlvICpiaW8sIGNvbnN0IHN0cnVjdCBpb3ZfaXRlciAqaXRlcikKICAq
+IGZvciB0aGUgbmV4dCBpdGVyYXRpb24uCiAgKi8KIHN0YXRpYyBpbnQgYmlvX2lvdl9pdGVyX2Fs
+aWduX2Rvd24oc3RydWN0IGJpbyAqYmlvLCBzdHJ1Y3QgaW92X2l0ZXIgKml0ZXIsCi0JCQkgICAg
+dW5zaWduZWQgbGVuX2FsaWduX21hc2spCisJCQkgICAgdW5zaWduZWQgaW50IGxlbl9hbGlnbl9t
+YXNrLCB1bnNpZ25lZCBpbnQgZmlyc3RfdmVjKQogewogCXNpemVfdCBuYnl0ZXMgPSBiaW8tPmJp
+X2l0ZXIuYmlfc2l6ZSAmIGxlbl9hbGlnbl9tYXNrOwogCkBAIC0xMjAxLDcgKzEyMDEsOCBAQCBz
+dGF0aWMgaW50IGJpb19pb3ZfaXRlcl9hbGlnbl9kb3duKHN0cnVjdCBiaW8gKmJpbywgc3RydWN0
+IGlvdl9pdGVyICppdGVyLAogCWlvdl9pdGVyX3JldmVydChpdGVyLCBuYnl0ZXMpOwogCWJpby0+
+YmlfaXRlci5iaV9zaXplIC09IG5ieXRlczsKIAlkbyB7Ci0JCXN0cnVjdCBiaW9fdmVjICpidiA9
+ICZiaW8tPmJpX2lvX3ZlY1tiaW8tPmJpX3ZjbnQgLSAxXTsKKwkJc3RydWN0IGJpb192ZWMgKmJ2
+ID0KKwkJCSZiaW8tPmJpX2lvX3ZlY1tmaXJzdF92ZWMgKyBiaW8tPmJpX3ZjbnQgLSAxXTsKIAog
+CQlpZiAobmJ5dGVzIDwgYnYtPmJ2X2xlbikgewogCQkJYnYtPmJ2X2xlbiAtPSBuYnl0ZXM7CkBA
+IC0xMjc2LDcgKzEyNzcsNyBAQCBpbnQgYmlvX2lvdl9pdGVyX2dldF9wYWdlcyhzdHJ1Y3QgYmlv
+ICpiaW8sIHN0cnVjdCBpb3ZfaXRlciAqaXRlciwKIAogCWlmIChpc19wY2lfcDJwZG1hX3BhZ2Uo
+YmlvLT5iaV9pb192ZWMtPmJ2X3BhZ2UpKQogCQliaW8tPmJpX29wZiB8PSBSRVFfTk9NRVJHRTsK
+LQlyZXR1cm4gYmlvX2lvdl9pdGVyX2FsaWduX2Rvd24oYmlvLCBpdGVyLCBsZW5fYWxpZ25fbWFz
+ayk7CisJcmV0dXJuIGJpb19pb3ZfaXRlcl9hbGlnbl9kb3duKGJpbywgaXRlciwgbGVuX2FsaWdu
+X21hc2ssIDApOwogfQogCiBzdGF0aWMgc3RydWN0IGZvbGlvICpmb2xpb19hbGxvY19ncmVlZHko
+Z2ZwX3QgZ2ZwLCBzaXplX3QgKnNpemUsCkBAIC0xMzYwLDcgKzEzNjEsNyBAQCBzdGF0aWMgaW50
+IGJpb19pb3ZfaXRlcl9ib3VuY2Vfd3JpdGUoc3RydWN0IGJpbyAqYmlvLCBzdHJ1Y3QgaW92X2l0
+ZXIgKml0ZXIsCiAKIAlpZiAoIWJpby0+YmlfaXRlci5iaV9zaXplKQogCQlyZXR1cm4gLUVOT01F
+TTsKLQlyZXR1cm4gYmlvX2lvdl9pdGVyX2FsaWduX2Rvd24oYmlvLCBpdGVyLCBtaW5zaXplIC0g
+MSk7CisJcmV0dXJuIGJpb19pb3ZfaXRlcl9hbGlnbl9kb3duKGJpbywgaXRlciwgbWluc2l6ZSAt
+IDEsIDApOwogfQogCiBzdGF0aWMgaW50IGJpb19pb3ZfaXRlcl9ib3VuY2VfcmVhZChzdHJ1Y3Qg
+YmlvICpiaW8sIHN0cnVjdCBpb3ZfaXRlciAqaXRlciwKQEAgLTEzNjgsNiArMTM2OSw3IEBAIHN0
+YXRpYyBpbnQgYmlvX2lvdl9pdGVyX2JvdW5jZV9yZWFkKHN0cnVjdCBiaW8gKmJpbywgc3RydWN0
+IGlvdl9pdGVyICppdGVyLAogewogCXNpemVfdCBsZW4gPSBtaW4zKGlvdl9pdGVyX2NvdW50KGl0
+ZXIpLCBtYXhsZW4sIFNaXzFNKTsKIAlzdHJ1Y3QgZm9saW8gKmZvbGlvOworCWludCByZXQ7CiAK
+IAlmb2xpbyA9IGZvbGlvX2FsbG9jX2dyZWVkeShHRlBfS0VSTkVMLCAmbGVuLCBtaW5zaXplKTsK
+IAlpZiAoIWZvbGlvKQpAQCAtMTM5OCw3ICsxNDAwLDEzIEBAIHN0YXRpYyBpbnQgYmlvX2lvdl9p
+dGVyX2JvdW5jZV9yZWFkKHN0cnVjdCBiaW8gKmJpbywgc3RydWN0IGlvdl9pdGVyICppdGVyLAog
+CWJ2ZWNfc2V0X2ZvbGlvKCZiaW8tPmJpX2lvX3ZlY1swXSwgZm9saW8sIGJpby0+YmlfaXRlci5i
+aV9zaXplLCAwKTsKIAlpZiAoaW92X2l0ZXJfZXh0cmFjdF93aWxsX3BpbihpdGVyKSkKIAkJYmlv
+X3NldF9mbGFnKGJpbywgQklPX1BBR0VfUElOTkVEKTsKLQlyZXR1cm4gYmlvX2lvdl9pdGVyX2Fs
+aWduX2Rvd24oYmlvLCBpdGVyLCBtaW5zaXplIC0gMSk7CisJcmV0ID0gYmlvX2lvdl9pdGVyX2Fs
+aWduX2Rvd24oYmlvLCBpdGVyLCBtaW5zaXplIC0gMSwgMSk7CisJaWYgKHJldCkgeworCQlmb2xp
+b19wdXQoZm9saW8pOworCQlyZXR1cm4gcmV0OworCX0KKwliaW8tPmJpX2lvX3ZlY1swXS5idl9s
+ZW4gPSBiaW8tPmJpX2l0ZXIuYmlfc2l6ZTsKKwlyZXR1cm4gMDsKIH0KIAogLyoqCi0tIAoyLjM0
+LjEKCg==
+--0000000000002db5c5065640dad7--
