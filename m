@@ -1,77 +1,74 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AF22D5926
-	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 15:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83EB2DEA75
+	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 15:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783696149; cv=none; b=WJ1/j1jE3Te1RUa6sjwUaR8kzEWsi9k3ppJZf/PWb6jL6vrYWDZ92BA/7nleM5gD+rxrvZwS5A3EYcPqDuGHIVn8unKcr0zGqvOFZavdws3kOXqY51dgra6O1xOSWuIkUBZexrLTMYLtB+aCsXoN2c/T85V1ofUiJaJoXmO/yAE=
+	t=1783696150; cv=none; b=fIBc2mkGHL7Xh7dq+vW5ZKxuFw0Hu9es+UaMaebwMPYuxavp0g0MQUmJ1x2Lxbb4sXJs3QrljLRLNaGZHANDYyiz7vZa5qI6eFQA42hDsx4BQG+JxS0Ex5sluDEJ64t0GvDDs0wFM/cCmkh0OaeMLb/8vKjOpCWWVSj7bMILjBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783696149; c=relaxed/simple;
-	bh=VIBBX3cl6rWXkdD2OEROnBIfyfxiG/yYPHuS8OihCX8=;
+	s=arc-20240116; t=1783696150; c=relaxed/simple;
+	bh=KZqtujcSYrjp1XKrHdU8txiKbJH+Es7z7r2jC7Zc6Sw=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jFNcqmnQPOms9kEmIjY1t/DaPMVsk9IWEeXwSx3rZ7cl5HHg1VMhlElCY1K56DGcLPlMbK3BJHupwQJmOYCboqGOcyuqNbgsdXJ+jErcbSKtv5Qzh5/+phyArKdX3ynorHz5GvUnwxwEWj+D6J/zM96QIKwYJBUeM/YsZjG4bEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=IwYji6kC; arc=none smtp.client-ip=209.85.210.41
+	 MIME-Version:Content-Type; b=VZcaaMCs8ecOi5qnF9lqCoHO6sxIeGMJsmpWZHOz8hgTvZyq3Feh4AUkxXBnxAbxnqc+CcL1axeaupaCTWnAOzzwuSKXpJZVJoVAHpznc8O0FwOZclfaG1UcUAkw4iIKZjMvnoUhFC8+ad4wg972u0BTZXCtm9oS0mHnJyaHtpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=T6sIx243; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="IwYji6kC"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7eb545db3afso653020a34.0
-        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 08:09:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="T6sIx243"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7eb5bdb50fcso824900a34.1
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 08:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1783696146; x=1784300946; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1783696148; x=1784300948; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=8czkgUXRj6O1Wp+SDMx8lgL+MynprJo1fYUcHuIszUY=;
-        b=IwYji6kCZP5Yomf022TY/gk90L0CJ3x15J1ZsQz9BlfOKH8Hh5/IhHX0QHwQLSYlsB
-         AurdYPt4NhDuVlxJdU65P20JoH8GQ3pWz8YJcY4wtFqPxLVpR6DFbnX/8ALsdqzvyG0x
-         W0ci39u3mZPvXUZXpUCwjIFTqUicmLk8i2l2UZHgWjhoRRhzoPmDSzrMCaiNEbTO3hHu
-         yBI6WWFiHAOfkoLtVN6qsE2milhfCqhchT3MXjkCtudYR+2xxJF7ksF8W4fPI2AUj4E0
-         i6H5Mdiq/IadvnuQFd0zvGUbEe6pyc59i5j0QkkYIQyCuEyLXJetYgLMRkfD+SgoS2G9
-         zbow==
+        bh=w3tK8TtDuHzKVLUaacAPkZ3tgZuo4O65PAWl05AIJ+4=;
+        b=T6sIx243ummo2V782Lg4u+AGt+fWHSM+Uhg72U0JEX8f/NIt4663qJ/9HNa+GFmINu
+         K1lnPZyRSzV9j113rccnciLgH7uWUcWtkfkWWC1a0mq75y/I7aD86NeIsFRzofkPDTPH
+         Wz+7Cf2bbBd8kItdK26GuB123QIlKRFAdIfKnbhjZkOv67YIaNobJyr94/GhuqUfhwpo
+         enLIU9kqQ8DN0jV59upgablVDx3ji8NUOgt55H7Q6WNqgw7SqujN6y4XdzgWgBno5kJ6
+         1A1N6oZnYfN6ds1QGLGOIPPmq1qfaEnPKdJW2+IQjprVbzOQSiUtZZPVIiFbQpQ3ECWB
+         /vtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783696146; x=1784300946;
+        d=1e100.net; s=20251104; t=1783696148; x=1784300948;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=8czkgUXRj6O1Wp+SDMx8lgL+MynprJo1fYUcHuIszUY=;
-        b=gM1oPv6s3kSzQpfNYcT3cSMJGHdX9MiQZZqKl93qjwbMQdKBwEGQ8pQRfJteSBK3/B
-         7nnyhCA8C0akyDDRZXTpXw4eAvCgGLXjzrNor0EIcgdAiN2wz3AT+6sd0rcpx42J4T4v
-         rpOH3NEu9TCeaPM9ZR3mO34bv9zP+IpE8bjWtAF5m4ZrCN6ft65TBP0FbxBhJ/4Q0K8N
-         lTXXexD7mfDoKYcMWnnQ5qIF+K2nvBt2gJjwG3X1InaAn6gk4LH9kPtKnmpaW1XOSERS
-         pIbwjXXlahDDLjNVgQviWwiUYi9EFKFPdqtjG3MRXsQREHT/CGKsMrQxXwybgxNwA0FO
-         HdxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8fH4QyZv0UcQtDNbdPOTkRrxc+8vDYxVoQn+QHuJklDXgjDtFl92ZK0/p60ehMwNOuChTZVGgHbYw/BQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzN8BrsMCqotqyfWe4QxSGnuuQNC18YcOs9SFsnvespRCUEAc3
-	o8kjEoMWpuyhoQClk3GT0WNKWDKGWFqKdCZCPezgYGbTZO4Qe13b9I6N1YYaUGGmFF8=
-X-Gm-Gg: AfdE7ckXdniCoE9dZxKcoyDMsT2vZ6b6oJS/K+ckHN5xAl5LyE+NAJ+zEttrPjxFPuP
-	XBBBVXdIw3KGfWp4vQp89K13O4IV7hneqUKDHDQ5Z3cPe/3ZwrKU4lIOxGHFECIOngucnSVrbfv
-	MXZRMFXCujdr12UOdGezaVfWXP2lMWigCKbvqmLeUUiIJZ1gMB0w4B6//76sdoeZiRmgcTR0KSk
-	0Gy+65G+2KDKjuwNHiAVHN/muETeIdLzgKcjPTbFzHQBuVdM2k2gTvVAvIcRko4No1scohFvE23
-	JC5cf0Q4wj8XZdnya5MQoOOwAeZ7g9pE6srXTbgqW1PhcgBXJTbECy534gPGiOiHRbrmXWje7jb
-	3TgxJcYV7Sy22YUqizAY79xPI4ssxGRdW+OIHpyBg9hLB5k9TKqV6zIG4/Meu1ixUiwTAsnXBV7
-	DbZ9PvBafX6aeT3+eNeStplWgjkycRxVmjgPovP6EAO0caVapBCdzcX1/1fTaQJjKhYA==
-X-Received: by 2002:a05:6830:4387:b0:7e9:ead3:4449 with SMTP id 46e09a7af769-7ebcfe1da0emr8679171a34.6.1783696146204;
-        Fri, 10 Jul 2026 08:09:06 -0700 (PDT)
+        bh=w3tK8TtDuHzKVLUaacAPkZ3tgZuo4O65PAWl05AIJ+4=;
+        b=SkkB2tPPvnGrxTFAwf6qFCSp6iJoG3SGAYESRtcu6Oznxg6udLYPy+yS7HX6ICjBNM
+         PzJ/T/P1BwOddBpMjC75WSAic0TuGEiyBRpJS6X98k2g6eEwjaLt7yKkSB6NqRArGiq5
+         PK+8so0MxcHRZFbDH034RUWvdwWm8zU84aFwqNVqMsfJ9b5jIrmKr4/rOPIPND4rChiM
+         mHJLh73xhO5EqM7nq08vLpKSM6/UlM/8w7WXQjbs4gPeahCZjrZl+CoYRW9KhoGup2B+
+         QrKriRThbCNuRSuqeg4zeSucjmPqZ2wt2bibFKhHY4SyZ3RW5/egp9WvE+QsDIT64CjY
+         r5EQ==
+X-Gm-Message-State: AOJu0YwVkN5jtVqkygS19HU7J4+rAKdWtESHdiUaD16uONkk2p1I0MPq
+	A/PpHdjKrkeqLpm+gZo063P6pNicKgkMC4oQWX0JClnIw2qB+G3/WVZw1nel24qaRJA=
+X-Gm-Gg: AfdE7clFwSV990Dfx+izrzMftaxOMvIgRgckDf3nCmr3QN5Lk7e4eRuRJAG/LWbAH2D
+	v84n23qjTy/XjPJyggd/x2bqHeqkwraNnaeK1acZX7jAXDuoQrH/3cAn4hf/F3Hpnubzep52u1x
+	N+zRU54R5jY9VUREZUV1OpiRa0dBlQzRPD0rA8WA34hncJhfA65Z6MmCbC6yv4fYqpUdtBZlPPa
+	VdhYGIItMJ0lLakdo0CkS4xFK5t9rbNN/O/TV8tUFxMUSP20Aq+2p79KTl+ImWJFMCtt2aRrOWc
+	EZjlYgO7NKq54wqOtI5F27pE50PeV1TsXAySrGEEQyvcXC0KXJK6H7TSIv6e8tTtw9aimIIeZ8n
+	CSFd5/rckxZp2teKCZ9Pn/+8KP/pKbxYjsPE1k+mzTlShf2vULSMSAiP9VKt9Ytn4QpovZuI3Xs
+	ChhonG+Hx4MVolJHktMgDzu9WQELRUWFLBj/LAeT5S44oaeYTMydGQ7vSStsld2k1z2w==
+X-Received: by 2002:a05:6830:81f0:b0:7e9:b4cf:d8c7 with SMTP id 46e09a7af769-7ebcff9cc64mr8083563a34.27.1783696147861;
+        Fri, 10 Jul 2026 08:09:07 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ebcae177c5sm6709330a34.5.2026.07.10.08.09.05
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ebcae177c5sm6709330a34.5.2026.07.10.08.09.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 08:09:05 -0700 (PDT)
+        Fri, 10 Jul 2026 08:09:06 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Philipp Reisner <philipp.reisner@linbit.com>, 
- Lars Ellenberg <lars.ellenberg@linbit.com>, 
- Christoph Boehmwalder <christoph.boehmwalder@linbit.com>, 
- Michael Bommarito <michael.bommarito@gmail.com>
-Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260710022837.3738461-1-michael.bommarito@gmail.com>
-References: <20260710022837.3738461-1-michael.bommarito@gmail.com>
-Subject: Re: [PATCH] drbd: reject data replies with an out-of-range payload
- size
-Message-Id: <178369614511.284240.12733294719230479134.b4-ty@b4>
-Date: Fri, 10 Jul 2026 09:09:05 -0600
+To: Connor Williamson <connordw@amazon.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, yukuai3@huawei.com, hch@lst.de, jack@suse.cz, 
+ nh-open-source@amazon.com
+In-Reply-To: <20260615130715.53693-1-connordw@amazon.com>
+References: <20260615130715.53693-1-connordw@amazon.com>
+Subject: Re: [PATCH] block: remove redundant GD_NEED_PART_SCAN in
+ add_disk_final()
+Message-Id: <178369614634.284240.18222044248749979725.b4-ty@b4>
+Date: Fri, 10 Jul 2026 09:09:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,26 +80,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Thu, 09 Jul 2026 22:28:37 -0400, Michael Bommarito wrote:
-> recv_dless_read() receives a P_DATA_REPLY from a peer into the bio of an
-> outstanding read request. The peer-supplied payload length reaches it as
-> the signed int data_size, and two peer-controlled inputs can make it
-> negative. With a negotiated data-integrity-alg the digest length is
-> subtracted first, so a reply whose payload is smaller than the digest
-> underflows data_size. With no integrity algorithm (the default) data_size
-> is assigned from the unsigned h95/h100 wire length and drbdd() never
-> bounds it for a payload-carrying command, so a length above INT_MAX casts
-> it negative; this path needs no non-default feature. The bio receive loop
-> then computes expect = min_t(int, data_size, bv_len), which is negative,
-> and drbd_recv_all_warn(mapped, expect) receives with a size_t of SIZE_MAX
-> into the first mapped page.
+On Mon, 15 Jun 2026 13:07:15 +0000, Connor Williamson wrote:
+> add_disk_final() sets GD_NEED_PART_SCAN before calling bdev_add(),
+> then calls disk_scan_partitions() which sets the flag itself. The
+> early set is redundant and introduces a race.
+> 
+> Between bdev_add() and disk_scan_partitions(), concurrent openers
+> (multipathd, blkid, LVM) see the flag in blkdev_get_whole() and
+> trigger bdev_disk_changed(). When disk_scan_partitions() then runs,
+> it calls bdev_disk_changed() again, dropping the partitions the
+> concurrent opener already created before re-adding them, which can
+> result in transient partition disappearances.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] drbd: reject data replies with an out-of-range payload size
-      commit: bd910a7660d280595ef94cb6d193951d855d330f
+[1/1] block: remove redundant GD_NEED_PART_SCAN in add_disk_final()
+      commit: 181bb9c9eae4f69fe510a62a42c2932d0314a800
 
 Best regards,
 -- 
