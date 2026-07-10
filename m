@@ -1,33 +1,92 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B0A1A5B9D;
-	Fri, 10 Jul 2026 04:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC1E230BE9;
+	Fri, 10 Jul 2026 05:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783658132; cv=none; b=JRSiK529UBo6R5c75VvLOJLLs4YUPdZmgo1dyS3UEIQ2QX0EL7u86GiRwqiGis/Win1WJCclWk8sn+d0gatIkTXYqc3atznYew4pEQaP7ZxX9s18Q+CBbpTUtsdj69ET6XYtkFPKNPGN0eMPikyomsEPpkAJBwrCA/Byk+u7uGs=
+	t=1783662853; cv=none; b=ueCD2zFrv+MdlRfIJHrHCJdhZo9HanZ55ZK/uRY8v2OQNFNLp5ENywz/DMih1EI0vWDe8BbiGhjXkG2ncSCxwBLfLaw5NJcTj2rAwjnC1i+C7132BtbKDJVFuKva1RfsB2+DHWa+gBYpoEqEGKsy/0rpIvbhwPnmwYTsjY2SClo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783658132; c=relaxed/simple;
-	bh=t78A5rSeEI3MRsSV+lVKitFPJppqUsyVSaYrK5HAwuo=;
+	s=arc-20240116; t=1783662853; c=relaxed/simple;
+	bh=nyDBnktELM+hz7RvTSyEr5tTXDizK+ufnQXY3jTKq48=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MKcihQvMgk6OTFq+mXR7bFE4UEZaNIsn0ucAr9AuJ5UQ9S2nY2t1yo0kceyT7QvCFdvdBy8dyXRDpIULJaczpdYdajm9jETOUcIY9TqrNdiuooENJqBVK00uRkZLizgJQ0mEJIQVF/a7pybMF+FkLZLs5fa8pIOJWdzcXzpQBQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B66A068B05; Fri, 10 Jul 2026 06:35:19 +0200 (CEST)
-Date: Fri, 10 Jul 2026 06:35:19 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	axboe@kernel.dk, jack@suse.cz, brauner@kernel.org, cem@kernel.org,
-	jaegeuk@kernel.org, aalbersh@kernel.org, tytso@mit.edu
-Subject: Re: [PATCH] fs: report direct io constraints through file_getattr
-Message-ID: <20260710043519.GA6205@lst.de>
-References: <20260708011843.1036846-1-kbusch@meta.com> <20260709071352.GA20180@lst.de> <ak-mQqt-a-jy6ZoV@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHnNTng40LYlxMTCqM6XcjVREF4/k/oaH9ahfyy5Arw+jpXnGc2i8Ro68QoH8dv0kZTkQHDUG5mFrx9Gx8Rpj42bJHAz2j5bVoS/6hG1WcF2kODfR8+yWe798+pf5Lz/2Ys5KXyOkrwWnt1aveZUFtJtjAV3PUMe3YYQo+V6YOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-c3-6a5088f7d053
+Date: Fri, 10 Jul 2026 14:53:54 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Gary Guo <gary@garyguo.net>
+Cc: linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com,
+	kernel_team@skhynix.com, torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+	gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
+	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
+	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
+	jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	boqun.feng@gmail.com, longman@redhat.com, yunseong.kim@ericsson.com,
+	ysk@kzalloc.com, yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+	gustavo@padovan.org, christian.koenig@amd.com,
+	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
+	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
+	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
+	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+	josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+	alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, lossin@kernel.org,
+	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v19 31/40] dept: assign unique dept_key to each distinct
+ wait_for_completion() caller
+Message-ID: <20260710055354.GA37630@system.software.com>
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <20260706061928.66713-32-byungchul@sk.com>
+ <DJSEK3KA2ECQ.1512A4KGOBSCV@garyguo.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,49 +95,93 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ak-mQqt-a-jy6ZoV@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <DJSEK3KA2ECQ.1512A4KGOBSCV@garyguo.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxzG857zngsdHYdO4ztrNlNHWJhTt7jln+gu2RdPspmxkS1u+zCb
+	9QTKVVvlssSsKKhBcAzXMtqJXFxtAFktDgfSBYt0NmjWakJqp7OSBlML6DqEIdjuUGPmt1+e
+	53mf5//h5WlVK7ua15fukQyl2mINq8CK6fT2V/89nFu46YcZNdy4FWFgvHoYw4PZwxge2c5x
+	4O/tRjC/aKOhdiApa01eDmYX/uTAXI0g6fYisASaaPjHmWAhNhJHYL4dYaE5Wo3hnr0eQXR0
+	GyRv3qHAHklQELPcl02zH0E8Gkbgduxn4VrkWfCZj7AwHfiRghknC2373QxMhtwUWI67MAyE
+	BzkIxJYo6HZth1v2SQxjjR2UPMKC5cwqsDUfoMB8+jwFC/YuDi533sBgN2WB7co1BiYcVg6S
+	bWXg+2ucgXOmMAeu66PydOgVaD94EsOQ24eh3vkLAybbPAP+4TEGrnb7Mfx8J0jBmPcShr4r
+	l2mYO6oG/3cNDJye6WDh2MwkgticnX5XJ87XHsViV18/Jfa09iBx8WETEmsbZRqZukeLNX0V
+	4k9jU6w4YL3JiTW/hTixzbVXrLk4zYh9jhyxcyhKie3xB4wYir2V+/Lniq06qVhfLhk2vr1T
+	UTB6sh/vas2sHJwcok3ob2UdSuOJsJlEL52in/DExSFmmbGQRaYPTHHLzArZJBhcSGVWCC8S
+	V1cHVYcUPC20vECuzvlSD54TisiSI5oKKQUgI+OdqZBKaEDE+9DGPDYyia8lgpeZFnJIMBGV
+	Q7zManIqwS/LacIb5P7ZeGp4pbCODPf/nuohwkQa+f5sEj++9HlywRHEjUiwPlVrfarW+n9t
+	G6K7kEpfWl6i1Rdv3lBQVaqv3PBVWYkLyb/Wvm/pi19R3J/nQQKPNOnKTd98WKhitOXGqhIP
+	IjytWaEMr5ElpU5b9bVkKPvSsLdYMnqQmseaVcrX5yp0KiFfu0cqkqRdkuGJS/Fpq01IO5G+
+	bfexuy25RxZbErfzQmcKF/Kuf2LJL6rgwp7eWemjei9nXGvO3nmionLjt1M7mo/bMg6Onrfm
+	1wWysne8r165fp9ljY6d3f2S2lkXWMoteedCQc9na/9Yt5j5waNPuYZDvYcKleTN97ZnfNzB
+	ntBsHcx4Jr6eOD3m5tot9pq7WzTYWKB9LYc2GLX/Ae5QvRexAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxjH877n9PTQWT0UCCdek5rFhEyRTZIn2bKLmXpivPCNhCzRRk9G
+	5aJpEWUJU6iN1ampTVqk9QJFKitMsCCOSyMBrUPnbLlIo7DCUuu6giBQCJeWnWKMfnnye57n
+	/8vzfnhpQrYkWk0r8wt4Vb4iV05JSMm+LzWbZ3UZR7bet6aCTnsKBn1+ETwv6SAhPK0j4Wp9
+	HQURyz0x6BzlIvhjoJQE9+1aBL6wDsHsgoUAbcsSCRGDSwzTcy/FYCxBsOR0ITB5DAR43fcJ
+	qGsqwTDVEKUg1DWJwDjip6AsWELCuO0CAnPAIobgw10w5msTwdLQawwDM6MIbP4oBn/HWQQR
+	Uw7csDYKummCgoWnzwgoM7oRVI4METAZHEbQ5PobgbOmlIJX+rsE9PpXQl94nIJu4y8UjHmu
+	YnjTQEFFqVMEnj9DCK5ZDAgCL5wYNFX1FJiuOUhoGW4Vgye0iGHQZMBQ69gLPluAhCd6Kxae
+	K6TuJIOlTIOF8i8G429tGOZsdvG31Yib1V4iOXtjM+a0PRGKq7teh7iFeQPipqs1BKfVC23X
+	6DjBnWk8wVU/GaW4+XA/xTlnKkjusZXlbp6bx9zlp5u5FvOQOOO7LMlXh/lcZSGvSv36oCT7
+	4c1m8tj1+JOtgXbiNHorPY/iaJbZxv7zoF0UY5L5lB3TjIpjTDGbWK93johxIrOBddit+DyS
+	0ARTvp7tmeleFhKYHHaxJrgckjLAdj2vWg7JmIuIdc1bRO8W8Wx3uZ+MMcGksN5oUAjRAq9h
+	b0Xp2DiOSWcnmiaXDycxG9mO5kdYj6Tmj2zzR7b5g12BCDtKVOYX5imUuelb1DnZRfnKk1sO
+	Hc1zIOFb2ooXL/+Opnt3dSKGRvIV0q2n9h+RiRSF6qK8TsTShDxROrxWGEkPK4p+4lVHD6iO
+	5/LqTrSGJuXJ0t2Z/EEZ86OigM/h+WO86v0W03GrT6NNrXcKip9lq88W7zBMeONTd//X03ku
+	lLh36pXsojnl5aNP0jrazUWRAcnaK+4+Q8iV3PD5TllCZtKqxuTt4YxfM+9VfpEU/N7zwD5Y
+	2+/ybf+mH+uyVuzYqV73Q3Pv20D6SNvdqopV6/V861Rl9K8+RVZC8DO38/XjffXMngvlB9J+
+	lpPqbEVaCqFSK/4HtzJC/ZIDAAA=
+X-CFilter-Loop: Reflected
 
-On Thu, Jul 09, 2026 at 07:46:42AM -0600, Keith Busch wrote:
-> On Thu, Jul 09, 2026 at 09:13:52AM +0200, Christoph Hellwig wrote:
-> > On Tue, Jul 07, 2026 at 06:18:43PM -0700, Keith Busch wrote:
-> > 
-> > > +	fa->fsx_dio_mem_align = bdev_dma_alignment(bdev) + 1;
-> > > +	fa->fsx_dio_offset_align = bdev_logical_block_size(bdev);
-> > > +	fa->fsx_dio_read_offset_align = bdev_logical_block_size(bdev);
-> > > +	fa->fsx_dio_virt_boundary_align = bdev_virt_boundary_alignment(bdev);
-> > > +	fa->fsx_max_segments = bdev_max_segments(bdev);
-> > 
-> > How is the max_segments value defined in a way that is meaningful to
-> > userspace?
+On Tue, Jul 07, 2026 at 03:18:29PM +0100, Gary Guo wrote:
+> On Mon Jul 6, 2026 at 7:19 AM BST, Byungchul Park wrote:
+> > wait_for_completion() can be used at various points in the code and it's
+> > very hard to distinguish wait_for_completion()s between different usages.
+> > Using a single dept_key for all the wait_for_completion()s could trigger
+> > false positive reports.
+> >
+> > Assign unique dept_key to each distinct wait_for_completion() caller to
+> > avoid false positive reports.
+> >
+> > While at it, add a rust helper for wait_for_completion() to avoid build
+> > errors.
 > 
-> It tells you how many sub-sector vectors you can submit in your
-> readv/writev before it needs to add up to a logical block size.
+> This will cause Rust code to share the same dept_key, so it will have all the
+> false positives that the change is trying to avoid.
+
+Thank you for the input.
+
+> In general it is easy to create Rust bindings for static inline C functions
+> because it'll be just some computation, while creating bindings for C
+> function-like macros that define additional statics can be challenging.
 > 
-> Ex: 4k logical block size, 4 byte DMA, 256 max segments. You can define
-> 4-byte iov's in your command, but you'll hit the max segment count
-> before you have a valid IO if they're all that small.
+> Is dept_key similar to lock_class_key, where only the address matters? If so,
+> the approach that I use in
+> https://lore.kernel.org/rust-for-linux/DJP0CDOR98N5.29BK8PUFRWRUK@garyguo.net
 
-Ah, makes sense.  But besides the missing documentation I think
-max_segments is a bit of a misleading name for that.
+Yes, dept_key is similar to lock_class_key.  IIUC, the way you tried for
+lock_class_key can be applied to DEPT too.  I will do:
 
-Something like max_vecs_per_block (although we don't expose blocks
-in the UAPI) or max_vecs_per_granularity (I think grammar wants a word
-with me for that, though...) might be a bit more suitable.
+   1) add 'key' parameter to sdt_might_sleep_start_timeout()
+   2) introduce init_completion_dkey() to allow custom keys
+   3) remove init_completion_dmap() and adjust the existing users
 
-> > > @@ -145,6 +155,8 @@ static int file_attr_to_fileattr(const struct file_attr *fattr,
-> > >  
-> > >  	if (fattr->fa_xflags & ~mask)
-> > >  		return -EINVAL;
-> > > +	if (fattr->fa_pad)
-> > > +		return -EINVAL;
-> > 
-> > How is this related?
+Just in case, it's worth noting that the custom keys must be
+well-managed using e.g. dept_key_destroy() when the key gets freed.
+
+	Byungchul
+
+> could be used for dept_key as well, then we can keep Rust `wait_for_completion`
+> still a function; otherwise we have to turn it into a macro too on the Rust side
+> to create such statics, which isn't ideal.
 > 
-> I had to add a padding field to the struct to account for the implicit
-> hole in 64-bit and to ensure the struct is the same size for 32-bit.
-> It's a reserved field, so we have to ensure the current kernel doesn't
-> support any value here in case we define this field for something else
-> in the future.
-
-Ah, right.
+> Best,
+> Gary
+> 
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/linux/completion.h | 100 +++++++++++++++++++++++++++++++------
+> >  kernel/sched/completion.c  |  60 +++++++++++-----------
+> >  rust/helpers/completion.c  |   5 ++
+> >  3 files changed, 120 insertions(+), 45 deletions(-)
