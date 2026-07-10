@@ -1,107 +1,163 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6169E1E1024
-	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 10:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF24413D8C
+	for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 11:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783679687; cv=none; b=uV6qk5T++KV5887B9n5Tq3XmupCWrzVspMcKHzTgcEOIRK8h7Ox3dKxEsf3gHHiEkKqCiycCl1V3s4+19+ok40yIkZFmT4JMi891B6RGUlsq3Og2q2jS3NDyouD4Qr01I9Gi8ettISmkY7NjYimAlJkQ2kNjw/1Z3MxJ4g1C9FA=
+	t=1783682031; cv=none; b=FfMI+maiiuIRbjRnPNlGtM2/RYrc696BZ5AC1hOmuqBZZ4HwiWQcZpTBl3iTq+lZn2ugmXM+hMPt/2Qt6jElC57Kps2vLCePUXCSg3mDkzYLTq7nerMI6IwsdhrIy3mvsV+oQrbMuHO4ei2MTV9G+tkqHd/zw68QhkPWEll5rDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783679687; c=relaxed/simple;
-	bh=DVGBVk+mO7WPLb+Zs+aUZlOHthLb5rGfTXLOLzkiN6Q=;
+	s=arc-20240116; t=1783682031; c=relaxed/simple;
+	bh=c4OVHU38z7vfkatYPQKtn8vnc7akYZidlGLsN81aP0Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hkbrokLO2HBYOPBzXrOKllO6Rlrs1yhRLfY1lKWapLkGGknaj9VaFUgV51EGoqMbYNWQx8JgFeP/y1ngbd1GRQ1EeHNDM3nQ1Jdx4qP0q1xT2X+wb/JSG39dTF2dFS3y6IevMocr1XuA/qrSynFp4F8rxRpx8/ayrKjGmSj8+o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=Y+ZGEDP2; arc=none smtp.client-ip=209.85.221.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=u+vXQDKO7HH5L+DUcD4XMNnwjiMqi402Fk2mTQdUZNfhzdJAGJhGgiz4HIlz7XkW7X20n11/+AVhNGIrIvofB4JfpzP0QkqOxQYOUAJR8hBfaL79rlGKBazodaCocTCyGl499cpHkKzjYNFcmk+r8DFlz8js0H00v5LhaXRMcWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=Gu3tOBcG; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="Y+ZGEDP2"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47ddf7b09aaso507805f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 03:34:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="Gu3tOBcG"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-47640541585so413130f8f.1
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2026 04:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1783679684; x=1784284484; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0hNKws68GKcsqG1qn9goDkKgmOz4q7bVaIJzV/ptteo=;
-        b=Y+ZGEDP2flq2OEPBlctnl7vFP3FsaRl0VVTGAtDMwehbuh/57Vv6uCdmyHQiOP7/rr
-         C6tGsYhqrKwHu2auQDagKPGtTP0jhiYj+ZHUfqcC/BAwyFrtNMo7Qw/zoiOBJbbAFq17
-         wmfaOkdrgoGoHhVktif7u34+8BoF9fNJCwekqTKh+qfewfh5yFYze4GoSkm5K0Gs86Js
-         StgBbNRlP8JyRwgJnGwOGQXvyMC40dLqfpuWHDr3hcyH13LEuxQwIHTtb3ImR3ox15C4
-         J3N79yNXCIgqWva1y60OJ5M+sgAOL9UmErBms/GwMTxBgEdV55MYa8NHHDwXwuxUQezy
-         zQPA==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1783682027; x=1784286827; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:mail-followup-to:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ODgufXz1PhelMlB2W5pp8vf7ivTLwxqDccyqSe9smQ8=;
+        b=Gu3tOBcGf3T0pnU9ybwJ1OIj0sxHVMkkaVxMCpYU1p+VQfXrRcf8t/tZq4Nl9iRgrb
+         jedOKWmhfFdqNIBXQuF27OcoYXMobk5QXFhM/CeFArNDEzILbQscmFisasjsQsFVFmT6
+         n70WRs3rocq8pj9uCxgEYoqUVecNlXWK5WWyrBfZ7lkjY4imeN5GobWtbADjQSazOER3
+         zUJs1w1n/cUWM+k/n9t7cAxyAF708wvv8Xnfq89Gg4VZfqLCP1u+Rx3xLeuUA/C7xYCm
+         zzb/QmgHnpBVTyUyOFFkaIipLq1JCIf3sFKPvgz9iaSMXmUSp5WOzTOHyJOLhFw5Fixc
+         BOkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783679684; x=1784284484;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=0hNKws68GKcsqG1qn9goDkKgmOz4q7bVaIJzV/ptteo=;
-        b=mqfFYHRXw7+oIaHpxbn0vISFt8LpzSH62M3sMBSie4v3QFg+OSIRnRo9fc+acGB8/O
-         MULcYpDjWkC2bD8c1v0JRdjoouQXQDqfx7Rb1JX/80/ns/dArU9aSl4adEXrvC812wDU
-         JTLh4vJt27M50zZdq/uVkBIMlBcGCa/+lykKTv66LL2p+iNI3hzCJi1mL5E3ajCf2q+r
-         4su1yMoLm38kNNfwWKvCch1aIbLJR27NNqJNsUTMBqvPrUGZOOx7H9uAm7+2zp0rm2rH
-         vQeYNwXO/bc2ZFirduEsskrVA3+DT2CRiFqUN+dsUj6RAzmrp/T+7HxJ+RIq9+fT1Lh8
-         5WWw==
-X-Forwarded-Encrypted: i=1; AHgh+RovuHeV+voklNVlK6WWywQ3vsvYmHYpDQR/VPwUyKoUi9BXkoArNYz0s6Dr5PvGG4o2qnb9LPgB1f5R2w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqzk6i/RHgZmXUvuuYkFyD/pnZcUMaiGWjh3oyRY7iaZf8/i+1
-	GxUhckX2/nthKf74pTQBHFacE2DFOxUjD3DIUpO0MRZsfx+7+EkDSHw2OpoLsQbZtvM=
-X-Gm-Gg: AfdE7ckOKpWc2vD0p+Yh/GZkxBfqZ8KlBLIEazldvVtqxz/dZmYsoceOCvTgZfuC1I4
-	Qn/mfoJFe/jEv+Fjp0y4R4qOjj2oyGKMV5mQ9a/P/Xh3huK1cBJpHQ1nonDROGLmmvZF4XYaHBx
-	WdbnqI5qECvjI2GhEvRNedcF+UIOiympxe4YTBPCRUHpP1UMckYHT6zrNHaU/nem6JKitYBPCG+
-	jwlLH3kfEe4H+HthYlnRiHo1tJchJd6CDcaITXrON4QSOu9iEaZIQA2JRTdBsZsoirlszjXcIJH
-	KwQMIQOpUc9HVIMDvbMXLcKr4vAGXl2uDK8gF81j3NBr9cBWjQ/+yt31FWUMN6Rn+9BYzqWMhhS
-	pnh1oRbhMmFogil7IUP7KGcRoXK1fNpoYzMgOU0VFUFgLCkDd//hbgIB3+Q69+DTI0zMQLcCkLI
-	CI4Lwke7lQ+qUp6igQAlledOTT06z0X2PqzMouyLcLn9Q1VGTIxGyANYrN
-X-Received: by 2002:a05:6000:26c2:b0:47d:f01d:104b with SMTP id ffacd0b85a97d-47df077657cmr11701617f8f.46.1783679683738;
-        Fri, 10 Jul 2026 03:34:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783682027; x=1784286827;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:mail-followup-to:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ODgufXz1PhelMlB2W5pp8vf7ivTLwxqDccyqSe9smQ8=;
+        b=YUWAT0QSmJuVtntqrRGZ0fZeVRSdISh23R0LOmEb/5JKNRCRwHTrEhcygvDf8cKfKX
+         UPaNV1bxpOcPRzT8p+jT8rvJ1seDdWaPHBJ78dJj0dl5NF8X4DlnXtL2cjZWTXilAO5q
+         DY81ZPwK1dU/CzNM5/5ExDVvUCYPxDKK324EP0ahpw+ZtTlyuqAWHc8108/i7I1aEYUA
+         WncDp8C+HbqWly05NqEq0eJid3SMn/HqWGVC7ac3OB+8D506BHdLrHgBTfyIWtKaH9y0
+         1qf6EtVFQtcUyEpZwcqR3fCNHJXSKl/dg8IArTK5uzgbFvOUIc8b8czoSROGqV4rz+tM
+         VlCA==
+X-Forwarded-Encrypted: i=1; AHgh+RoLdqF7r3FhoZ8dDGspWz8QdD23KNk0C3EsdwE6uwaq3Ex1L9v0eaPF5binnbyJgtyO4zw59QmrkhBdDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4eWpqjMRh5p4WB9zG019L2Ny14cVMHbV0NRDdfTH6paZHpwAR
+	0irgeLUTJMZ3/gvUWGSJNA4cr/0xK7jWHbxTEJIZhJ3FXmonJVoeMHnaBAGuKACnF30=
+X-Gm-Gg: AfdE7cmAKJOT4tQHu8QDpU9bDLAiiPKdEqIXDoAaD6StK6xVaBCVZiw6MiBm2eQQ7ij
+	SGKFG46DgWBNLE0OLSRC3GO35TMJf7jYEnkmnYRESi4SUbGBllMgqa1RcSpf8BFbAzCPNsiViIN
+	Uoqr3I3JKRAwpyKfQZcw69V55yKv1AtUWFwZh4X+AU3bag83P69G39Of3XEZ8+Ot86QhXGsaz2n
+	kG2ZBC2RKCr0caSdyLsLeo1iiXtx5koUl+yR6yHipCTsnUsFLL86EMhqG9uV91OZlwWFtOLeMyP
+	9XTHHATl1D5uvkeVmUPAx5LW6uK28oWi+5nm1SsP01MI2bpPOXOkXIXj0USgcZhKpLGo0i9nVCS
+	3mlhw5njb3g4jgZHCgMR63fuZOfwnn+EfW+8W682gfYkMZeglx6BJTmHwhDtfSUWCtFwsOPqXJb
+	NpguolCrFspYtaVSpJ0hyVV9qTYsdy5mOU2MlCtDeE0H/Turi0dDOl4lcQ
+X-Received: by 2002:a05:6000:2482:b0:477:6874:5415 with SMTP id ffacd0b85a97d-47df074605amr11973058f8f.26.1783682027154;
+        Fri, 10 Jul 2026 04:13:47 -0700 (PDT)
 Received: from localhost (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039bcdasm61474279f8f.21.2026.07.10.03.34.42
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d6e4csm56399132f8f.10.2026.07.10.04.13.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 03:34:43 -0700 (PDT)
-Date: Fri, 10 Jul 2026 12:34:42 +0200
+        Fri, 10 Jul 2026 04:13:46 -0700 (PDT)
+Date: Fri, 10 Jul 2026 13:13:45 +0200
 From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Tianchu Chen <tianchu.chen@linux.dev>
-Cc: philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
-	drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	axboe@kernel.dk
-Subject: Re: [PATCH] drbd: reject oversized DataReply before signed conversion
-Message-ID: <alDJWJYBNGpugftk@localhost.localdomain>
-Mail-Followup-To: Tianchu Chen <tianchu.chen@linux.dev>, 
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com, drbd-dev@lists.linbit.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@kernel.dk
-References: <d4924afb559896a4a22258f14e4a97c8d12d8527@linux.dev>
+To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>, 
+	Andreas Gruenbacher <agruen@linbit.com>, "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] drbd: Fix potential NULL pointer dereference in
+ _drbd_set_state()
+Message-ID: <alDRuDisKeheSGc8@linbit.com>
+Mail-Followup-To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Jens Axboe <axboe@kernel.dk>, Andreas Gruenbacher <agruen@linbit.com>, 
+	"drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <20260625050016.12004-1-a.vatoropin@crpt.ru>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <d4924afb559896a4a22258f14e4a97c8d12d8527@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260625050016.12004-1-a.vatoropin@crpt.ru>
 
-On Tue, Jun 30, 2026 at 10:59:31AM +0000, Tianchu Chen wrote:
->From: Tianchu Chen <flynnnchen@tencent.com>
+Thanks for your patch.
+
+On Thu, Jun 25, 2026 at 05:03:06AM +0000, Ваторопин Андрей wrote:
+>From: Andrey Vatoropin <a.vatoropin@crpt.ru>
 >
->Discovered by Atuin - Automated Vulnerability Discovery Engine.
+>The connection pointer receives a value in the _drbd_set_state()
+>function, including through a call to the first_peer_device() function.
+>This function returns a pointer to a list element. If the list is empty, it
+>returns a NULL pointer, which is later assigned to the connection
+>pointer. Subsequently, this pointer will be dereferenced.
+
+Can the list actually be empty at this point?
+The peer_device is linked into the list in drbd_create_device(), before
+add_disk() and before the device is inserted into connection->peer_devices,
+so no state change can reach the device earlier.
+
+It is only unlinked again in drbd_destroy_device(), after the last kref
+to the device is gone.
+The connection itself is created together with the resource in
+drbd_adm_new_resource() and lives until the resource is destroyed.
+
+So for any device this function can be called on, first_peer_device()
+returns a valid peer_device.
+
 >
->Reject DataReply payload lengths that cannot fit in recv_dless_read()'s
->signed size argument so a bogus remote peer cannot wrap the length negative
->and turn it into a huge heap OOB-write.
+>Add a NULL check for the connection pointer to avoid dereferencing an
+>invalid pointer.
 >
->Fixes: b411b3637fa7 ("The DRBD driver")
+>Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+>Fixes: a6b32bc3cebd ("drbd: Introduce "peer_device" object between "device" and "connection"")
 >Cc: stable@vger.kernel.org
->Signed-off-by: Tianchu Chen <flynnnchen@tencent.com>
+>Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
+>---
+> drivers/block/drbd/drbd_state.c | 5 +++++
+> 1 file changed, 5 insertions(+)
+>
+>diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+>index adcba7f1d8ea..ea982d48017e 100644
+>--- a/drivers/block/drbd/drbd_state.c
+>+++ b/drivers/block/drbd/drbd_state.c
+>@@ -1281,6 +1281,11 @@ _drbd_set_state(struct drbd_device *device, union drbd_state ns,
+> 	if (rv < SS_SUCCESS)
+> 		return rv;
+>
+>+	if (!connection) {
+>+		drbd_err(device, "No connection to peer, aborting!\n");
+>+		return SS_ALREADY_STANDALONE;
+>+	}
+>+
 
-This is similar to [0], but the mentioned patch is a more complete fix. 
-There is also a case in recv_dless_read where data_size can underflow 
-when a data-integrity-alg is configured.
+Also, even if the condition could happen, its handling here would be 
+wrong. Since this check happens before handling hard state changes, 
+those could potentially be skipped, which is not allowed.
+For example, after a local I/O error (drbd_chk_io_error), if this 
+condition would trigger, the detach state change would be silently 
+skipped. So in that circumstance, this patch would be actively harmful.
 
-The other patch catches this case as well by placing the guard later, so 
-I would prefer to apply that one instead of this.
+Also, SS_ALREADY_STANDALONE would map to the error message "Can not
+disconnect a StandAlone device", which does not make any sense in this 
+context.
+
+> 	if (!(flags & CS_HARD)) {
+> 		/*  pre-state-change checks ; only look at ns  */
+> 		/* See drbd_state_sw_errors in drbd_strings.c */
+>-- 
+>2.43.0
+
+In summary, unless I missed something major: NAK.
 
 Thanks,
 Christoph
-
-[0] https://lore.kernel.org/all/20260710022837.3738461-1-michael.bommarito@gmail.com/
