@@ -1,110 +1,70 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0B519F121
-	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 12:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F71337C0F8
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783946879; cv=none; b=u1otAF2Dl/unlThTRGP/OcaXzCT58QVz7NTD6/sA2Bb1xhwnyKMM629qfkTWyJdJ/JkquPD+mIVHlUoVahVe6B3ShvYKp9ZeD6uIzNo2VNs23KO74dO3xmZ+CM+vLpaLjn06ERHdKMa2nRcrxqlTN4xnvuN0xtUEa6iam8IqHT8=
+	t=1783956560; cv=none; b=N0rjF2nP20XUYtvBWbAXNO0ATgamlDwGKjdUEf3nos4qHhzlFMuklCw56ROigKP/oxAuj/XZY/SEo0ZZ0J80oaUHYsfWdEfFN7mjhbNcxIxNf/CBOp9YroUCXlEenmWkCFzLNQI7ZUHJaWjj4qKWq8GrnbpaJjJgug2rBRg/4kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783946879; c=relaxed/simple;
-	bh=FYy33pOn0JC2bfSNUAwqxl5o1NmjaMo0ah+ybG4IzBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mKFNOP/wGsiwq6lCtm6vGdLo0AjxHIg0KURnqO237zGfMMke2sLtXY21xxKfpHu0pXgLbbCN7tQ8phURVxtxA707VGpXx7XGAp3n/eYQ6o2gyZgMLvtUtYlqa+7qXcxQ0NvRuXrKlR6Opmk6IvQwYjB89vCtTVddzeiwXxk2jeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2E07268BFE; Mon, 13 Jul 2026 14:47:51 +0200 (CEST)
-Date: Mon, 13 Jul 2026 14:47:50 +0200
+	s=arc-20240116; t=1783956560; c=relaxed/simple;
+	bh=WhIG53CP9GeL9Con1P1OkTpo1x7Cl0NFUmuE4jMqnFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YEjFrosRH3TQYxCrfX6ApZHEOMJNYKg4te5NUcYXV1sRYh3b+7qT1jRsvgTQ/Rewt2uzySmwzjz43UfMeK6Jto8axttwteFX720lsMAbj8ctGEgO8V02OExpKQRKRlZqdRT0fcys0WZB269OlW8xqatO9R/I9U8CgUJLXJwBICw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ixJXMu/d; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ixJXMu/d"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=aXQ6htMvj+6dLr1z4nwbyxcIwZaDbRUnLdgYQscG+H4=; b=ixJXMu/d7I4ugH04QkJQL5CZe+
+	4NGG4e9nrLOQhX+3rVuDy7dG7UDcvdr3YX57B9jvcQ832uj0/pXSZt1XU1twJPH2v8NxsP0H42V53
+	UBszDSs4G/jXV1JuCpGM43dDVmg2wpGYBzLfVcjBAAajF6np3ABwLJ6spasTHieNORJNX0Pu6bWnc
+	XZqe0rsIa8GrTB9Sx3X+vfIFf49KVibSpLcFk6aSGkySqNC4Awtl6Po+MgayC7BB3NDcn8kfyZgZc
+	eOpfJIXFg8Qe/a3aKDxtQloadmNr8LNw63Pj1qRpaZmuqZcBiq3XV9ZyCqZGN+LNVBSDZVNmzoPsj
+	two1ufEw==;
+Received: from [77.237.62.199] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wjIao-00000009nMH-4Aww;
+	Mon, 13 Jul 2026 15:29:15 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Neptune <z1281552865@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, security@kernel.org
-Subject: Re: [RESEND][SECURITY] block: double unpin in bounced direct reads
-Message-ID: <20260713124750.GA21676@lst.de>
-References: <CAKTh279tH68oS4gTQd9DFqNuegvAhwZ8ck2uViR+cbeJDW9jDA@mail.gmail.com> <20260713092945.GA8612@lst.de> <CAKTh279snB+AfprcUxVazx8v6WBo99AXzEGoeYOYqLfPuhyZhA@mail.gmail.com>
+To: axboe@kernel.dk
+Cc: kbusch@kernel.org,
+	z1281552865@gmail.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] block: fix aligning of bounced dio read bios
+Date: Mon, 13 Jul 2026 17:29:11 +0200
+Message-ID: <20260713152912.2333321-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKTh279snB+AfprcUxVazx8v6WBo99AXzEGoeYOYqLfPuhyZhA@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-
-On Mon, Jul 13, 2026 at 06:20:13PM +0800, Neptune wrote:
-> Hi Christoph,
-> 
-> On Mon, Jul 13, 2026 at 11:29 AM Christoph Hellwig <hch@lst.de> wrote:
-> > Does fix the issue for you?
-> 
-> Yes, it fixes the reported double-unpin in my original reproducer. I
-> applied the patch to the vulnerable parent, built an x86-64 KASAN
-> kernel, and reran the test with the same QEMU NVMe PI namespace and
-> XFS setup. The exploit now reports a stale page miss and the process
-> remains uid 1000.
-> 
-> I did find a boundary bug in the rewritten alignment loop. If the bio
-> contains a single one-byte bvec and nbytes is also one, the first
-> iteration consumes that bvec, decrements bi_vcnt to zero, and moves bv
-> before the vector array. The next while condition then dereferences
-> the invalid bv before the later bi_vcnt check can run.
-> 
-> I reproduced this on the patched kernel with a 512-byte O_DIRECT pread
-> from a raw virtio block device. The destination starts at the last
-> byte of a mapped 4 KiB page and the following page is PROT_NONE,
-> leaving one bvec with bv_len=1 and bv_offset=4095. Immediately before
-> the loop, GEF showed bi_vcnt=1, nbytes=1, and bv_len=1. After that
-> bvec was consumed, GEF caught another call to unpin_user_page() with
-> page=0x100020000, bi_vcnt=0, and nbytes=0; KASAN then reported a
-> general protection fault from unpin_user_page() through
-> bio_iov_iter_get_pages().
-> 
-> This boundary test requires permission to open the raw block device.
-> It is a correctness regression in the proposed loop and is separate
-> from the original unprivileged XFS entry point.
-> 
-> Keeping the loop driven by nbytes, with the old partial-bvec check
-> inside it, should avoid evaluating bv after the last vector has been
-> consumed. The callers can still pass an explicit starting bvec, but
-> the loop needs to stop as soon as nbytes reaches zero.
-
-Yes, updated version below.
-
-> I also noticed two read-bounce cleanup details while reviewing the
-> error paths. If alignment removes every user bvec,
-> bio_iov_iter_bounce_read() returns the error without dropping the
-> allocated bounce folio. If alignment succeeds after trimming bytes,
-> bi_io_vec[0].bv_len retains the pre-trim length even though
-> bio_iov_iter_unbounce_read() later uses it as the copy length. The
-> error path appears to need a folio_put(), and the successful path
-> needs to synchronize vector zero's length with bio->bi_iter.bi_size.
-
-I'll look into that next.
-
----
-From 43e1b03b38264d8fb8c647c8a801bd1e81a4638a Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Mon, 13 Jul 2026 10:42:34 +0200
-Subject: block: fix aligning of bounced dio read bios
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
 bio_iov_iter_align_down expects the "normal" biovec layout from vector 0,
 while bio_iov_iter_bounce_read abuses vector 0 for a bounce buffer
 allocation.  Pass an explicit bvec to bio_iov_iter_align_down to deal
 with this case to avoid a double unpin.
 
+Additionally we need to free the folio if no bio_vec could be added,
+and adjust the size of the first bio_vec that contains the bounce buffer
+when the I/O size is aligned down.
+
 Fixes: e7b8b3c5b2a6 ("block: align down bounces bios")
 Reported-by: Neptune <z1281552865@gmail.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ block/bio.c | 41 ++++++++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index f2a5f4d0a967..cc50c603a9f8 100644
+index f2a5f4d0a967..212fe768407d 100644
 --- a/block/bio.c
 +++ b/block/bio.c
 @@ -1191,7 +1191,7 @@ void bio_iov_bvec_set(struct bio *bio, const struct iov_iter *iter)
@@ -160,15 +120,50 @@ index f2a5f4d0a967..cc50c603a9f8 100644
  }
  
  static int bio_iov_iter_bounce_read(struct bio *bio, struct iov_iter *iter,
-@@ -1398,7 +1399,10 @@ static int bio_iov_iter_bounce_read(struct bio *bio, struct iov_iter *iter,
+@@ -1368,21 +1369,18 @@ static int bio_iov_iter_bounce_read(struct bio *bio, struct iov_iter *iter,
+ {
+ 	size_t len = min3(iov_iter_count(iter), maxlen, SZ_1M);
+ 	struct folio *folio;
++	ssize_t ret;
+ 
+ 	folio = folio_alloc_greedy(GFP_KERNEL, &len, minsize);
+ 	if (!folio)
+ 		return -ENOMEM;
+ 
+ 	do {
+-		ssize_t ret;
+-
+ 		ret = iov_iter_extract_bvecs(iter, bio->bi_io_vec + 1, len,
+ 				&bio->bi_vcnt, bio->bi_max_vecs - 1, 0);
+ 		if (ret <= 0) {
+-			if (!bio->bi_vcnt) {
+-				folio_put(folio);
+-				return ret;
+-			}
++			if (!bio->bi_vcnt)
++				goto out_folio_put;
+ 			break;
+ 		}
+ 		len -= ret;
+@@ -1398,7 +1396,20 @@ static int bio_iov_iter_bounce_read(struct bio *bio, struct iov_iter *iter,
  	bvec_set_folio(&bio->bi_io_vec[0], folio, bio->bi_iter.bi_size, 0);
  	if (iov_iter_extract_will_pin(iter))
  		bio_set_flag(bio, BIO_PAGE_PINNED);
 -	return bio_iov_iter_align_down(bio, iter, minsize - 1);
 +
 +	/* The first vec stores the bounce buffer, so do not subtract 1 here. */
-+	return bio_iov_iter_align_down(bio, iter,
++	ret = bio_iov_iter_align_down(bio, iter,
 +			&bio->bi_io_vec[bio->bi_vcnt], minsize - 1);
++	if (ret)
++		goto out_folio_put;
++
++	/* Update the bounc buffer bv_len to the aligned down size. */
++	bio->bi_io_vec[0].bv_len = bio->bi_iter.bi_size;
++	return 0;
++
++out_folio_put:
++	folio_put(folio);
++	return ret;
  }
  
  /**
