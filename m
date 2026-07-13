@@ -1,51 +1,51 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF13446C9;
-	Mon, 13 Jul 2026 02:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928D64317D;
+	Mon, 13 Jul 2026 02:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783910096; cv=none; b=lxZUjj9Z3DF4GeDF620BJZgofpuMvI8EfgO1cIxC65KbXADLmUNrEr/gBExK9pC9F+6Kk4qn5c5E7ZvlJMeBbm24pvWQuCboKXzBIHXbVP2LLIa1ikXy9UC+2wFN1Ftuvd3vD4yjJkLGdHmkHrFEnsBvuLE4w6k1lvAUFcg7sDY=
+	t=1783910372; cv=none; b=npjvDqEs2FOVn3v9WxKgySmrCqiHl3/gBRMLuQpZYjL7tDH/8wG7HGXe8rqIfva1kfgLngTHGlcOc+DBt7waGXxiN//uPowoWinEhPvUfl7nE87yqKVucfQJuMj0GwIaf5PwCDr7XPHnobY7RjPbdGMasiIQGCvn1gtavGQbEP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783910096; c=relaxed/simple;
-	bh=yCyzcjYOyBP6A69t64DraS4e5KLQJrhICUQotuZY/1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B+6DgIlSyVRGW6SBefJrXZXIKAOnro6tZfQD8eI7CTSCvamNlpkwYxfsZHBClc2LzYjsVq96QIsY3EEIxt8mGc1K/aLWOmiudj+rqkkpJyl2lSskkUnvR8AQrixIvGo39jMB5nyFhpHWOvNaoxDcEKa7HJc/IfLrTTegzNTMPok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 654535d27e6311f1aa26b74ffac11d73-20260713
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:7c16dff9-2e78-4b10-9674-d07c9c0f24ef,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:e9c765c3a093e1f715bd5f72e70f1ee9,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
-	DM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
-	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 654535d27e6311f1aa26b74ffac11d73-20260713
-X-User: lilinmao@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lilinmao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1671177437; Mon, 13 Jul 2026 10:34:39 +0800
-From: Linmao Li <lilinmao@kylinos.cn>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linux.dev,
+	s=arc-20240116; t=1783910372; c=relaxed/simple;
+	bh=ERt0ccSiPlbeJ/A/7GfWCl/2hwReIl6adW8mCOgSq6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LzCIebYQvPPU4UzyMzYEX1YjMxZXo4hhxw2A5jHFgXTTjsjpW6B5+cPkoQAIJtY2HZR/pd4OdMn3iwXroajjCP1oqE1xtXlGEzT79Sd0p/A5Ry1mCRMcoUZcGdPjQX4dg40Q8ClsUpMuy6ipJgxeOCr2IUDNmfrrwmsoojU88d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfToqvAw; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfToqvAw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E9F21F000E9;
+	Mon, 13 Jul 2026 02:39:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783910371;
+	bh=Anvrc5QyuwQ48kzKoweg2kNJHM923i1rPiWcvi+taB4=;
+	h=From:To:Cc:Subject:Date;
+	b=OfToqvAwxJnFISd+Iw7yOl5WvJFvukBFM+f2oqQndEK7Wxo5/Iy/E/p7TtFHnafU4
+	 gtmwxliwVifw6idYU8l0qQuSycJGd4UWIqO9y/5eNi/Z9kG/JOfF0jyp8MWHi/z2Bf
+	 Xfr15V8xlZNHScHaGqrU8JfJtDoEVMOqVLol2kZRiM+66f7YdIKfC1CjH8bIgDPLYA
+	 VUGKCp95jKux0j7WEDnzXHa3yJSeJTEw4N6T1S0Da81oADP8oX4Il0uj1q8MGhW9kP
+	 bMTmrbX4r5PJ/OWdywUJTX3JNwyefNO55kR7oVlNECzQxrT4Glw8x7sHLuKRNVbQid
+	 sZjvad5Un2vQQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-fscrypt@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Linmao Li <lilinmao@kylinos.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] drbd: reject out-of-range sizes when draining data
-Date: Mon, 13 Jul 2026 10:34:34 +0800
-Message-Id: <20260713023434.288279-1-lilinmao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	Christoph Hellwig <hch@lst.de>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Baokun Li <libaokun@linux.alibaba.com>,
+	Jan Kara <jack@suse.cz>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Zhang Yi <yi.zhang@huawei.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v3 00/17] fscrypt: Standardize on blk-crypto
+Date: Sun, 12 Jul 2026 22:36:51 -0400
+Message-ID: <20260713023708.9245-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,41 +54,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-drbd_drain_block() receives the peer-provided payload size through a
-signed int argument. A wire length above INT_MAX therefore becomes
-negative. The receive loop still runs, converts the negative result of
-min_t() to an unsigned length, and may receive more than the single
-allocated page can hold.
+This series applies to commit 2d0afaac9137e9 of
+https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=for-next
+It can also be retrieved from:
 
-Commit bd910a7660d2 ("drbd: reject data replies with an out-of-range
-payload size") addressed the same issue in recv_dless_read(), but the
-error paths which discard payload data still use drbd_drain_block().
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/ fscrypt-blk-crypto-v3
 
-Reject negative sizes before allocating and mapping the temporary page.
+Currently, ext4 and f2fs (i.e., the block-based filesystems with fscrypt
+support) have two file contents encryption implementations:
 
-Fixes: b411b3637fa7 ("The DRBD driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
----
- drivers/block/drbd/drbd_receiver.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ - Filesystem-layer, where code in fs/crypto/ directly invokes
+   crypto_skcipher to en/decrypt data using the CPU.  This
+   implementation requires the management of bounce pages at the
+   filesystem level.  It doesn't support direct I/O or large folios.
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 2135c14354a8..38721afa0006 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1772,6 +1772,11 @@ static int drbd_drain_block(struct drbd_peer_device *peer_device, int data_size)
- 	int err = 0;
- 	void *data;
+ - blk-crypto (also known as inline encryption), where the filesystem
+   assigns bio_crypt_ctxs to bios, which are then processed either by
+   the CPU using blk-crypto-fallback.c or by inline encryption hardware.
+   This supports direct I/O and is compatible with large folios.
+
+Currently, the latter implementation is enabled only when the
+"inlinecrypt" mount option is given.
+
+The persistence of the fs-layer implementation is mainly for historical
+reasons, as it came first.  It's becoming increasingly hard to maintain,
+especially as the filesystems get refactored to use iomap, large folios,
+etc.  It's time to remove it and just rely on the similar code in
+blk-crypto-fallback.  This series does that.
+
+Some fs-layer encryption support remains in fs/crypto/ for non-block
+based filesystems (UBIFS and CephFS), as well as directories and
+symlinks.  So it's not entirely gone, but it's reduced.
+
+To be clear, this just changes an internal implementation detail.  ext4
+and f2fs continue to fully support encryption (fscrypt), regardless of
+the presence of inline encryption hardware on the system.
+
+Changed in v3:
+
+  - Fixed bug in mpage_prepare_extent_to_map().
+
+  - Updated a couple other places in fscrypt.rst.
+
+  - Cleaned up outdated comments in {ext4,f2fs}_getattr().
+
+  - Removed an orphaned function prototype.
+
+  - Fixed accidental removal of @key_type kerneldoc.
+
+Changed in v2:
+
+  - Replaced the allow_hw bool with a flags argument.
+
+  - Added patch "Documentation: fscrypt: Update docs for inlinecrypt"
+    which updates the documentation more completely by updating not just
+    fscrypt.rst (which was previously part of another patch), but also
+    the documentation for inlinecrypt in ext4.rst and f2fs.rst.  
+
+  - Removed extern from declarations of ext4_init_verity_caches() and
+    ext4_exit_verity_caches()
  
-+	if (data_size < 0) {
-+		drbd_err(peer_device, "Invalid data block size\n");
-+		return -EIO;
-+	}
-+
- 	if (!data_size)
- 		return 0;
- 
+  - Remove unused 'inode' argument from ext4_set_verity_work()
+
+  - Added Reviewed-by tags
+
+Eric Biggers (17):
+  blk-crypto: Simplify check for fallback support
+  blk-crypto: Fold __blk_crypto_cfg_supported() into its caller
+  blk-crypto: Allow control over whether hardware is used
+  fscrypt: Fully disallow IV_INO_LBLK_32 with s_blocksize != PAGE_SIZE
+  fscrypt: Always use blk-crypto for contents on block-based filesystems
+  Documentation: fscrypt: Update docs for inlinecrypt
+  ext4: Remove fs-layer file contents en/decryption code
+  ext4: Make ext4_bio_write_folio() return void
+  ext4: Further de-generalize the bio postprocessing code
+  f2fs: Remove fs-layer file contents en/decryption code
+  fs/buffer: Remove fs-layer decryption code
+  fscrypt: Replace calls to fscrypt_inode_uses_inline_crypto()
+  fscrypt: Remove fscrypt_dio_supported()
+  fscrypt: Remove fs-layer zeroout code
+  fscrypt: Remove unused functions and workqueue
+  fscrypt: Merge bio.c and inline_crypt.c into block.c
+  fscrypt: Add safety checks to non-block-based en/decryption
+
+ Documentation/admin-guide/ext4.rst          |   8 +-
+ Documentation/filesystems/f2fs.rst          |  10 +-
+ Documentation/filesystems/fscrypt.rst       |  58 ++--
+ arch/loongarch/configs/loongson32_defconfig |   1 -
+ arch/loongarch/configs/loongson64_defconfig |   1 -
+ block/blk-crypto-fallback.c                 |   3 +-
+ block/blk-crypto-internal.h                 |   3 -
+ block/blk-crypto-profile.c                  |  22 --
+ block/blk-crypto.c                          |  34 ++-
+ drivers/md/dm-inlinecrypt.c                 |   3 +-
+ fs/buffer.c                                 |  45 +---
+ fs/crypto/Kconfig                           |   8 +-
+ fs/crypto/Makefile                          |   3 +-
+ fs/crypto/bio.c                             | 216 ---------------
+ fs/crypto/{inline_crypt.c => block.c}       | 284 ++++++++++----------
+ fs/crypto/crypto.c                          | 140 ++++------
+ fs/crypto/fscrypt_private.h                 |  28 +-
+ fs/crypto/keysetup.c                        |  31 +--
+ fs/crypto/policy.c                          |  17 ++
+ fs/ext4/crypto.c                            |   2 +-
+ fs/ext4/ext4.h                              |   6 +-
+ fs/ext4/inode.c                             |  71 +----
+ fs/ext4/page-io.c                           |  74 +----
+ fs/ext4/readpage.c                          | 139 +++-------
+ fs/ext4/super.c                             |   6 +-
+ fs/f2fs/compress.c                          |  31 +--
+ fs/f2fs/data.c                              |  93 +------
+ fs/f2fs/f2fs.h                              |   2 -
+ fs/f2fs/file.c                              |   6 +-
+ fs/f2fs/segment.c                           |   2 -
+ fs/f2fs/super.c                             |   2 +-
+ include/linux/blk-crypto.h                  |  13 +-
+ include/linux/fscrypt.h                     |  96 ++-----
+ 33 files changed, 387 insertions(+), 1071 deletions(-)
+ delete mode 100644 fs/crypto/bio.c
+ rename fs/crypto/{inline_crypt.c => block.c} (61%)
+
+
+base-commit: 2d0afaac9137e95e504bd3ad3512a9044745536b
 -- 
-2.25.1
+2.55.0
 
