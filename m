@@ -1,93 +1,251 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84A1214A9B
-	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 00:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97829175A9D
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 01:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783903174; cv=none; b=fTIW42rx04f9AH6Czeff4fQ8uiWckr/1vU9p9/8QUyZc0br+Y6ud8o8coifroRnyortBeNXHPrCPv1l3B0apIVWDr802cTco7rCq6btms8O0Y+lSPf/wfyoAzdWeWlMzGXJMf3XJX0X4nbBPEVc57VTxDEqMKorvBXJv+St/Qn4=
+	t=1783904674; cv=none; b=oDQzfmKSdzel+Q4cyIXYSb+46bRs7eYaw9v0msQzFwX6zkSdxaxgUcJlVRH25p1cLxlCV3WvS4eAhPF+oUQmWSDrA6ptiSXUMqLpfLa3AOjWYuuHisiXnEYDQAUDW/kHob2qplDU0CbxfOw2j4/AO0TWyGvt/6xerknm6OHXw4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783903174; c=relaxed/simple;
-	bh=mIo3rXHbmOxTmJNEKH5qOQCJUhuDzPKTHLwlpLqV3KQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q2gRcL8bHltQnYw6HykEes9/pXqbeWkHKwQ3wTtt0+lEuut/XYaIqpLQIavBpkbSlAz09H0mLu3W1vmns86/T/AT0UDQQH/EH0TrH1bTSTOGBJdx7+stv1VIFJLT7tVZsiNQJpNETGwP5utxOvlKtCtTWmbY6cwq0Q4lYoHgxSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=JhlEbvTh; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JhlEbvTh"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1783903172; x=1815439172;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mIo3rXHbmOxTmJNEKH5qOQCJUhuDzPKTHLwlpLqV3KQ=;
-  b=JhlEbvTh/XOs44tLoFvap7jyQMl9asYk+AzdZo9v6ER+nezpP1Xvexm9
-   a9aTPrsl2Wkjt6YfBJ6otWZwUUPcGfJ4b4Lw56E9mjtZ9cD3yKD71hv6N
-   eKR0xRp+WmIWlg7SYmOljb6cHDZKID9/Lhh8bJPQqEHaJYF1rITxl/Puz
-   vr+Ce/qmMVcmDLi2s+IAh+P7pSiGPf21DswEKqIGpffr0GQdhK9PFg65w
-   qcmEggC0MaZacO1CRPcwE6GEgWpuIqxJAuCVK5VH8fbH8lG3HhxFxbZcZ
-   G9RtLpY7W4PKsxs0Xs5NP8wX0/gDRKajWDcmDzvCpUzUGpd286D/WsHdQ
-   w==;
-X-CSE-ConnectionGUID: xkLDZ4OmT/28gOO/QhUJWQ==
-X-CSE-MsgGUID: zdyVrDG4Tkqc/zszYH/KRA==
-X-IronPort-AV: E=Sophos;i="6.25,154,1779120000"; 
-   d="scan'208";a="150596167"
-Received: from unknown (HELO uls-op-esad3-o.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jul 2026 08:39:29 +0800
-X-CSE-ConnectionGUID: RbkkATMgSQCgxi8u32H68A==
-X-CSE-MsgGUID: YOv/g0JLTFmiD0Dhoom6XA==
-IronPort-SDR: 6a5433b0_gkDRoS3ZaVFxnHO/S+GC3N5IKWxQKf2d1jSd7j7W8wgjGqh
- TpEjSu6oey+aKE0R+8PSbLwSX8nTzb8k4fWqEiw==
-Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
-  by uls-op-esad3-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jul 2026 17:39:12 -0700
-X-CSE-ConnectionGUID: rqFW510mTOeLajmnUS+GhA==
-X-CSE-MsgGUID: wQaYklwbTzGGyOBYyOmS8A==
-WDCIronportException: Internal
-Received: from unknown (HELO shinmob.iptvf.jp) ([10.224.106.2])
-  by uls-op-esai1-o.wdc.com with ESMTP; 12 Jul 2026 17:39:11 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 4/4] new: guide long command options
-Date: Mon, 13 Jul 2026 09:39:06 +0900
-Message-ID: <20260713003906.21153-5-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260713003906.21153-1-shinichiro.kawasaki@wdc.com>
-References: <20260713003906.21153-1-shinichiro.kawasaki@wdc.com>
+	s=arc-20240116; t=1783904674; c=relaxed/simple;
+	bh=YbEmnHMtVlQ2AY06n1jytrK/bLvHqW1Oe9+OanWghx8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CxaMAokj4O050AP+8KmXAL+HMZkHKTyzFDcTqZPKD0NGuK9ZMJDWGW4zyF/bsxievE0vRgj/35t8qenElC6DL27MIvSIMPIbwIa52aULDKnfW69ZxKtnsvEYXqPkXfaV3NGqHWYakTt7EbnDiD7+h7FDN/pc6xXCv1+Qhf+nGpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-451acf33124so1497065fac.0
+        for <linux-block@vger.kernel.org>; Sun, 12 Jul 2026 18:04:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783904671; x=1784509471;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6+U7PyFX1Kqit0bR8s7WERf65H1Kv5zCzUrqfobcgqc=;
+        b=WO8Ge5JJYzTLHoZ/qcuTDLBfbGW4j9pnSlV7sIXzZUC2DAg9Eip1B3Za3Ipu4aukyg
+         Sq5KZ8DPqo29TNh/Koo8suzD9dkgJMoeHK2UDoDBCknICNTewJ9Oq6a/J1FNXv2cKoYQ
+         0o6hG5P4YWsVwuXii9PexpitIl9o7fvai/aFmqr6MYMzcTb9f585x7PK6HuMskRZ8cM1
+         0L7lCJz2L/JQ4uzaF+GHGKykvpwS+3PuKVabmTI4j8Z7HHO+jv7hG2Kc4F1oLv74hWyV
+         JKEPP7y2wkx/939/wdIB5M3iKDiN0fRH0Z5T7PXlMj0ta9Pw2gp2NXRmnqDhYFPtyL9r
+         YPJA==
+X-Forwarded-Encrypted: i=1; AFNElJ9QaOlR8XeDYofBCx7JYI2FGpF+AvQV0UJ2Ngt1yug7OenENXeeJwhS0ISe0FcAWEPHxnZu8Kknz2KwBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjeGP6Dv1VbvVY14xdY/HZtB3pxJxOcLGtg8ZlFma0+E4hIPLt
+	O7LZOH9pE0am3NVsHnTG4UJmR/9B1s98iATcpmEO57mQ9ukGk4At0hBpdBjwAAWPD8/LNAg8fRw
+	Fg3EGwiqqlOmFto1P7X1nHnz3fy2uctqENtWuKYzTep4MJQ3acPSTurSCMnc=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:1b2c:b0:495:f79d:b08e with SMTP id
+ 5614622812f47-4a42ae80d43mr4664082b6e.21.1783904671685; Sun, 12 Jul 2026
+ 18:04:31 -0700 (PDT)
+Date: Sun, 12 Jul 2026 18:04:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a54399f.278cdcd2.e885.0023.GAE@google.com>
+Subject: [syzbot] [block?] KASAN: slab-use-after-free Read in update_io_ticks (5)
+From: syzbot <syzbot+8be85719817f5c3d8a9d@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-In the past, command option confusion caused a script bug. The command
-option definition change and command option misunderstanding were the
-cause. To avoid such troubles, guide to use long command options.
+Hello,
 
-Link: https://lore.kernel.org/linux-nvme/Zbu2qJGoz9UQfPw7@kbusch-mbp.dhcp.thefacebook.com/
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+syzbot found the following issue on:
+
+HEAD commit:    0e35b9b6ec0f Merge tag 'mm-hotfixes-stable-2026-07-06-17-4..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17ba0f39580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=20c9876b0f77b546
+dashboard link: https://syzkaller.appspot.com/bug?extid=8be85719817f5c3d8a9d
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-0e35b9b6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2a17ca6db8f5/vmlinux-0e35b9b6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c885024dccba/bzImage-0e35b9b6.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8be85719817f5c3d8a9d@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in update_io_ticks+0xa9/0x280 block/blk-core.c:1064
+Read of size 8 at addr ffff88803236b9a8 by task kworker/u4:6/176
+
+CPU: 0 UID: 0 PID: 176 Comm: kworker/u4:6 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Workqueue: loop0 loop_rootcg_workfn
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ update_io_ticks+0xa9/0x280 block/blk-core.c:1064
+ blk_account_io_done+0x188/0x870 block/blk-mq.c:1082
+ __blk_mq_end_request_acct block/blk-mq.c:1125 [inline]
+ __blk_mq_end_request+0x2cf/0x6c0 block/blk-mq.c:1131
+ lo_rw_aio_complete drivers/block/loop.c:337 [inline]
+ lo_rw_aio+0xcd4/0xf20 drivers/block/loop.c:405
+ do_req_filebacked drivers/block/loop.c:431 [inline]
+ loop_handle_cmd drivers/block/loop.c:1921 [inline]
+ loop_process_work+0x95e/0x11c0 drivers/block/loop.c:1956
+ process_one_work kernel/workqueue.c:3322 [inline]
+ process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3405
+ worker_thread+0xa47/0xfb0 kernel/workqueue.c:3486
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 5324:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4612 [inline]
+ slab_alloc_node mm/slub.c:4945 [inline]
+ kmem_cache_alloc_lru_noprof+0x2aa/0x5f0 mm/slub.c:4978
+ bdev_alloc_inode+0x29/0x90 block/bdev.c:380
+ alloc_inode+0x6a/0x1b0 fs/inode.c:338
+ new_inode+0x1f/0x170 fs/inode.c:1174
+ bdev_alloc+0x24/0x370 block/bdev.c:464
+ add_partition+0x1c3/0x8e0 block/partitions/core.c:328
+ blk_add_partition block/partitions/core.c:566 [inline]
+ blk_add_partitions block/partitions/core.c:635 [inline]
+ bdev_disk_changed+0xc3e/0x17a0 block/partitions/core.c:695
+ loop_reread_partitions drivers/block/loop.c:443 [inline]
+ loop_set_status+0x9f7/0xd50 drivers/block/loop.c:1272
+ loop_set_status64 drivers/block/loop.c:1368 [inline]
+ lo_ioctl+0xc14/0x1fc0 drivers/block/loop.c:1554
+ blkdev_ioctl+0x5e3/0x740 block/ioctl.c:797
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5287:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2705 [inline]
+ slab_free mm/slub.c:6405 [inline]
+ kmem_cache_free+0x182/0x650 mm/slub.c:6532
+ rcu_do_batch kernel/rcu/tree.c:2645 [inline]
+ rcu_core+0x78b/0x10a0 kernel/rcu/tree.c:2897
+ handle_softirqs+0x225/0x840 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x220 kernel/softirq.c:735
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1062 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1062
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:674
+
+Last potentially related work creation:
+ kasan_save_stack+0x3e/0x60 mm/kasan/common.c:57
+ kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:556
+ __call_rcu_common kernel/rcu/tree.c:3159 [inline]
+ call_rcu+0xee/0x8b0 kernel/rcu/tree.c:3279
+ destroy_inode fs/inode.c:392 [inline]
+ evict+0x987/0xb50 fs/inode.c:849
+ device_release+0xc4/0x1f0 drivers/base/core.c:-1
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x222/0x550 lib/kobject.c:737
+ blkdev_release+0x15/0x20 block/fops.c:680
+ __fput+0x418/0xa50 fs/file_table.c:512
+ fput_close_sync+0x11f/0x240 fs/file_table.c:617
+ __do_sys_close fs/open.c:1511 [inline]
+ __se_sys_close fs/open.c:1496 [inline]
+ __x64_sys_close+0x7e/0x110 fs/open.c:1496
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88803236b980
+ which belongs to the cache bdev_cache of size 2792
+The buggy address is located 40 bytes inside of
+ freed 2792-byte region [ffff88803236b980, ffff88803236c468)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x32368
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+memcg:ffff888040428e81
+flags: 0x4fff00000000040(head|node=1|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 04fff00000000040 ffff88801ca81140 dead000000000122 0000000000000000
+raw: 0000000000000000 00000008000b000b 00000000f5000000 ffff888040428e81
+head: 04fff00000000040 ffff88801ca81140 dead000000000122 0000000000000000
+head: 0000000000000000 00000008000b000b 00000000f5000000 ffff888040428e81
+head: 04fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Reclaimable, gfp_mask 0xd20d0(__GFP_RECLAIMABLE|__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 19037798701, free_ts 0
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f9/0x250 mm/page_alloc.c:1859
+ prep_new_page mm/page_alloc.c:1867 [inline]
+ get_page_from_freelist+0x21fa/0x2270 mm/page_alloc.c:3946
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5304
+ alloc_slab_page mm/slub.c:3294 [inline]
+ allocate_slab+0x79/0x5e0 mm/slub.c:3408
+ new_slab mm/slub.c:3454 [inline]
+ refill_objects+0x2d5/0x350 mm/slub.c:7338
+ refill_sheaf mm/slub.c:2832 [inline]
+ __pcs_replace_empty_main+0x2bf/0x6b0 mm/slub.c:4703
+ alloc_from_pcs mm/slub.c:4801 [inline]
+ slab_alloc_node mm/slub.c:4933 [inline]
+ kmem_cache_alloc_lru_noprof+0x389/0x5f0 mm/slub.c:4978
+ bdev_alloc_inode+0x29/0x90 block/bdev.c:380
+ alloc_inode+0x6a/0x1b0 fs/inode.c:338
+ new_inode+0x1f/0x170 fs/inode.c:1174
+ bdev_alloc+0x24/0x370 block/bdev.c:464
+ __alloc_disk_node+0x11f/0x600 block/genhd.c:1465
+ __blk_alloc_disk+0x105/0x1d0 block/genhd.c:1523
+ pmem_attach_disk+0x4d9/0xe10 drivers/nvdimm/pmem.c:509
+ nvdimm_bus_probe+0x332/0x6c0 drivers/nvdimm/bus.c:91
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x254/0xae0 drivers/base/dd.c:706
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff88803236b880: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+ ffff88803236b900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88803236b980: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff88803236ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88803236ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
 ---
- new | 3 +++
- 1 file changed, 3 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/new b/new
-index 4773175..58b5006 100755
---- a/new
-+++ b/new
-@@ -279,6 +279,9 @@ test() {
- # - Use the \$() form of command substitution instead of backticks.
- # - Use bash for loops instead of seq. E.g., for ((i = 0; i < 10; i++)), not
- #   for i in \$(seq 0 9).
-+# - Use long command options instead of short options for readability and
-+#   stability: e.g., 'nvme io-passthru --opcode X' is recommended over
-+#   'nvme io-passthru -o X'.
- #
- # Please run \`make check\` after your test is done to check for shell
- # scripting errors and other mistakes.
--- 
-2.55.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
