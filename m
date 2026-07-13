@@ -1,167 +1,152 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012067.outbound.protection.outlook.com [40.93.195.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC793D5C0C
-	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 08:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B198B3E00B8;
+	Mon, 13 Jul 2026 09:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783933076; cv=pass; b=h+nr/XKsgNaMkfK0loCgq5glS9QWAFuV38vLyMLJoL7udco9WC1OoHoGvutJi06mUqtR96DLWSLzv8heF3AcHAcS4fyp1aTlAtkjglJ8F3kHvUcxuOTN9unhoCPwVqQtXIQP81MGDMDkTwdNA6q9DcbC49STeF7S+R7Mu/fAuto=
+	t=1783934420; cv=fail; b=QkFqB05pt5BqpIsBJLHUIDHhC4EuNHWfjzM6BVA4SSv/KwZDMuIIlTfw9NZkXTrU1OKGt/AB2mz7zuKQ5oOFFqBXwI7tLzPOOIUfGHnrH9LeuAu3tG3uGpXFvY1iWq0cbP6O1B6ewiNl5SgXG9no7UzeXngRQo5Ura86o9ZINYE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783933076; c=relaxed/simple;
-	bh=zGXlgemVtM/fd1QacjWZsPwmu1tJ8IeGxyTqkvyGisI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k5LtOBHXRYvQd69ZjVETYMgTpFQtIkVuhMyC6HR8IW6fTbghRm0rEt1Bl/mN0sPsHhNVOQP1UhSopC/QqRyEELu9WimL+Phb6OqbVCocYjsqEk2cOk9h6S4tmKmNvl7ID2zoDORBt14bajIbDm2ycFV2HyNxUV5nfs5F3Sv2zzg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bhZpWy9p; arc=pass smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1783934420; c=relaxed/simple;
+	bh=kNumdKz17IbSJQ/90wZUBo6gI1iRFlFWhTxP2fXXn+k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=MAoGkCr70FXvpPHADECRp3VEoEphPTQG0FMafHRKoyfJyYGhyzSfwgZAim4SS3ToXPDaiRLh/FmcZxOHmuVsiHYKluxU3DxpUbTUxpWc9D0eTfSyXli54mDk0n79go/mwEREz9Vrx6uKTwX8C4ng+XZZQ+4Btq5d5LEqsDsl5tE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZLgeT/E6; arc=fail smtp.client-ip=40.93.195.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bhZpWy9p"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4728c12ba97so1170070f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 01:57:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783933071; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RBw5DWG/WHshjWIMsTKLrAMEWJIKFaFiaPNKOzJbXPsaRVWCscwnSeJVT4hn+VO9bY
-         1Q1asjrFxHHCJa7lslGCCg5aBWVEvfobUtvFr8rBzI2VpxwXO5pm/ebl8SiEaFP5+muq
-         bEFXZHEp7w9hcnR2tUAbt3/CxFev6DrASvAYygzHHyMkQRnqwfenfRWNaJMxRgjt6Nzx
-         aTjH5CJ4kW17tpnxpMNriLCZx+glQEH5KGHNgRIevD7duodvKm3HcXw+Ef7w8WTYyhma
-         /yAWYAtACypFvxdVD4UcEb1rT5b3K78ZsbldZfyesWwa7C0IYMjv1Y9TSYYZ4kYiL8t0
-         sl/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Niw6ma3uSQo4Oag5BSyj5O/UfANxhnZNo3KLkxIFV/I=;
-        fh=H59ga766EngMEdNiaTBmiOMXHBisd7qqWEde+bojd0U=;
-        b=ms+brjlLLVS6MqeQwQtHUJdmUZ65JY2TDeR+p2aAUpVbp8nBRRG1+1fBY+Q1h9iM8k
-         UqLGd34z0j7zb21M0+4F62lOPknOpKQosUjNONk7JNs0kVJIy3QmlrAZ3v/xCI5leUjD
-         uYVCPOs10HOVjQEc4eONfpGm4+Fj1N5W2DV3A7aLH7wcDBtrZBNZWPGF/C8ZxzAlLjf6
-         +2Zw8ivr+J3t2vIemlIL0BTAum7Y3iqJZydZDuk0AeehoZfUJ1NQ3qnFFjqaXDuJvV7U
-         DexEr4tYEnv0JFFVVhqEwUimolRFmY+zoQrFsMeyyJxUhBX3/feZRjR0X6HpeGVrancC
-         87kQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783933071; x=1784537871; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Niw6ma3uSQo4Oag5BSyj5O/UfANxhnZNo3KLkxIFV/I=;
-        b=bhZpWy9p92MsHXolXEEEzyqO6a8taUshJqNTLDakidqvhciCwPleXpZnFFjlWiYgu2
-         PD4KtR4wi8mFviwOMoQsSLwoiUrgbFxzrfMzPSO3Sybm9n1+9I9aGIKm/8G9v52bT/Dy
-         /ECgJDqbQXnj9gc2kOfy3eG3Oyas3PdEqt32qqoJCGj+tlRe2CTAPATVLVaT2ZBSLmFE
-         6NLrPC6nlM9BaqCBTXA2N+qswyb64G3vtCx9kHyfA9GDzZl//f+Oby1N7yx4QVQbPtoh
-         MUkxAek+4XmOD/fokqGCzy3ZmMRVg9nKjm32kMvJgFt/LiXZSc+ZvzDDjsD9s3OVP1/l
-         B5sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783933071; x=1784537871;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Niw6ma3uSQo4Oag5BSyj5O/UfANxhnZNo3KLkxIFV/I=;
-        b=XUhHRyhBp0lkQX2Exf6BCIjiUgKVdB463/JxhOs+6UustYvmzjnMq7dAZtVmVw7GJ/
-         JlxV8QN+wf+mRIVOtFzObvP4H1+3WZ9Zm60ZPiRVXVoGN6GMQygJQu5/Ia957X/xCGSG
-         8YAtbWRCkMvTJRzMpQtf/trlgDYuuj3nM8J/zITsEyeOTqaTcmFm+VCijR21ASENnRHT
-         rag2uq1KbtgrgQdV1lq2DCobLNa+5UmhflwgN2uFWbqhtRVdFMQR5Nsh8XJQ7dwhp8LS
-         Xo7q+b/T3cWrM1eGW1AZja3d97+8Dhc/yiaohTZh+mH7NJdmAGDSssRYwVmi/JytUtZL
-         7nRw==
-X-Forwarded-Encrypted: i=1; AHgh+Rq7W05Z0VVRl32fV5bUVqZsOsHrHrrnXD8d29cUMqenrM61wq4tcMVLIwM+2dTMIBOzJVq+PDc0khoUoA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyX0tk6LOf1lUR3RR1pctP8TwiAHBbT8WNgADbyFI3DcRk8L/r
-	j/P0gKbj/gOzSzWJKD2KUk0INAXdjojCM4aKMPMwdxuC7ItfPZze+x7YbefSHuofbUMRAUY4wrq
-	v9aNxVmy3EKslk6bEvN1lOQgtVHF+f4XUtQcIoQ8T
-X-Gm-Gg: AfdE7clzFBlKivKXv13PTK8XSS+iKjCfSnHhO/4Spj0E+JBXi6c5r1bkqOd3kZCMkNA
-	ayZZy8Uo+SYcB58+l0D/H80lxxxlkbS+hZDJ4elduqA2mj1OavyriVjrPgVArMs5tKCGHuLg7Ui
-	tgsUOGy8xlReIAExCkLz5QAWXfo+47f1xnLXihFsUmF6ySNHp6XTBs7reljhFFUtbMGn5qnXg1u
-	tIRDE7kyNwyzXCYx/FMjjE7+BuTg1oBGQxZP/9OYh+qP78CZKwTztvR4hv0UvZe3G0jeTZA+QQU
-	oT0Qojk/OM268xAlT+bwxvQ+U+0uu2HB8vbk2xOYLAdz3MdoRjRtcX4DvzK6Iv1N4u/XNg==
-X-Received: by 2002:a5d:5850:0:b0:472:55a:ef9b with SMTP id
- ffacd0b85a97d-47f2dcac418mr8602513f8f.8.1783933070140; Mon, 13 Jul 2026
- 01:57:50 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZLgeT/E6"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CPwx9tu90c9w1shAmTUVb/p7OmWRbC0uhU5n2gOq2cZN7959iWp8zf6VVStDrm3oEI0wGbjm3OB88VdEwMPl2M90reuei0ZsVHN12pdbhDasW4AX/DaSQLgTegtut5gsQD93n9lx4w9v5LOYU81aGZymR7a8/pzVhqtdUZVRv+3fsQ6FCPIM4BB78bNSJcz44w43XP103d7cG+7KJlvgfetsmix84rbzuiMYaDU5HQNlDWekCkfNLr3IBbxK5sIfUfjJ1UmYkIPCJUjYGzpNfiUdPcdMOTrOTvfnQyQjyOKEWb0ooqa/4wrx2fv4quSBYrkBTobERWcZb8tGPRy/4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YKiAQpcpocLrynnbHYWnSs+Xau7JUQkxyzo5xsI2ME4=;
+ b=oCF9KjC3KBICwySvZVSZlA7lGWXN/1rh+tEtO2G0+Ym+gsQ6NSH96qHOdn9dxA91GDtLW5zDQ2DDN2WIk3NOgoBz+na7X5O6nfKzrYiyC/yue5OXB7TZ7+PnR8dbHCvSmkUh9DYEsaqbuvBtkzsq8et1gHFPNPe/PtLS6kxM9vTpx1/+d/n8toSZhusynjGN6a1q4bcyUYLxm1mu/FnVSX3brDDUXpJmX6b3zKg5UU2uwAUSAUMz98wI2nzfJeovxKCg19Q2sMdK7wKtmnioVjLhOd53T/cARqMn/xPu9ZbVjxczAIXmVb/bSce9LRMk3Wtl2cwomdS1k6JVaboaqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YKiAQpcpocLrynnbHYWnSs+Xau7JUQkxyzo5xsI2ME4=;
+ b=ZLgeT/E6NcZcWllcnqn70i7jHCCbSWFesB8j5mgq7+/Wybjy4qxynB8C6hxA2etCVySzmDW+wdnrrQ/1ML2dnSVqFVtuNQu8PLlKdrO9bIo9PguzZjZDU/9suA6APGlbbBadfT26UvTl4cgIdmHh05lBQOBG2T2E+T8x3eSGbTg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by MW4PR12MB6973.namprd12.prod.outlook.com (2603:10b6:303:20a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.19; Mon, 13 Jul
+ 2026 09:20:11 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0202.014; Mon, 13 Jul 2026
+ 09:20:11 +0000
+Message-ID: <49b4c4e0-d0a0-4301-afc6-5f6acf5e9424@amd.com>
+Date: Mon, 13 Jul 2026 11:20:01 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
+To: Christoph Hellwig <hch@lst.de>, Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, Nitesh Shetty <nj.shetty@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>,
+ Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <20260713071828.GB30168@lst.de>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <20260713071828.GB30168@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR5P281CA0011.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f2::19) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260713-fix-fops-owner-v8-0-2495cfa82d47@linux.dev>
- <20260713-fix-fops-owner-v8-10-2495cfa82d47@linux.dev> <alSe6PsvdrSYP_Z0@google.com>
- <d7c1607f-ea74-442a-9700-7fc4f0c64b76@linux.dev>
-In-Reply-To: <d7c1607f-ea74-442a-9700-7fc4f0c64b76@linux.dev>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 13 Jul 2026 10:57:37 +0200
-X-Gm-Features: AUfX_mw1uUYgV4eMXkVflbUYoDKpPh-OOQHMx0yAVcG6yUMQsdEhmzk4SLg_fQ0
-Message-ID: <CAH5fLggszOnUm7Rykt41V91de8h9YVaZt49wr52i3t5-QV84Xg@mail.gmail.com>
-Subject: Re: [PATCH v8 10/10] rust: module: update MAINTAINERS to cover module.rs
-To: Alvin Sun <alvin.sun@linux.dev>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Aaron Tomlin <atomlin@atomlin.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Rae Moar <raemoar63@gmail.com>, Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
-	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
-	Igor Korotin <igor.korotin@linux.dev>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, rust-for-linux@vger.kernel.org, 
-	linux-modules@vger.kernel.org, driver-core@lists.linux.dev, 
-	dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|MW4PR12MB6973:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19b2df55-2d77-4a20-7cc7-08dee0bff094
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|23010399003|7416014|366016|1800799024|18002099003|22082099003|4143699003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	Maa6C0aIAEqIxiKREQcKjsXtpqN5WbTixaqoWHINISpoQwrpPoO+0WRKMHOw6LblHPp7Rx7r9Dy50/RB/lsQFqT2Y+l/OKCgAl1HZk6FPRfBB6cR1LPyGMrtwsf2qsARC1C7zWZzZg8CCLIjsHBFuHDZ8arkDfE+RAgvwAKiQcEvND1voahvJi0cUthnFfeKlZKg0So3wWqAzbN0ysW7P4tHZosH9DbwyTB7w3z/1F4VkgAKuz2afQxGaTEWzfvGk3wffyj7sisiDuW/MfU9macu6eXy8t6oTxWZh+7XNDkrIdnT9epWV3FSiO4de6suPW9vupzMRW3VV3au3KHI3/qZamDuTj45rrZfApAtY1m0DPfN6irszDyvw/lPeeVz0uVlOR1J299bZ87nBUgjX0wrhb54RW2Tqb0bML+ymyPJ1GSn+zCbBkdFbxa3W06iLPl1Rv3F+oXwemWNdggBS4Qw6D0b3e3Z0WMqyJfCJPz0OpyztMZNylIYVr4YdksGbJRr/broCxcuQ3ZIn6+PcCe1WmOL6r+dJX8YZjGvX3Y9OE/s2sNrudaN/S165faI5KHMbe7zJap/lnu+EcMvPJEeYWt7vyIE3u9cAOxEP7i3dgeJqNrJdWt0enRyS10EqhX6AZ/HLF87mfvAZqzWyYgtlm5cqBnYVXzIIh0rl4g=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(7416014)(366016)(1800799024)(18002099003)(22082099003)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QlZZOEU4S0Y4NGJyUy9ibGltU0RpZWtRNjBFL3JwVGNIUU45SmE5VHlVai9x?=
+ =?utf-8?B?b3psM3VNN2VKWFo4a0FIMkpwbXdaODBJUDRCTjN6Nk5mNlJ1SmtqWThxYUw1?=
+ =?utf-8?B?UnY0RkYrcHc4WUdpVlgwQnlzajJGSGM3SjhIWkVFKzJTUzhWaSt4Q0NKaTJy?=
+ =?utf-8?B?bUdGUUQxSnh0RENHRGFwZll0Q2ZRZ24xSkxaVHhNYkZOdmJMOGc2N2grSUpR?=
+ =?utf-8?B?bGtGOFFsRmxSM2ZSY2pZM3I3UXVwa2VaMmFIN0pzUi9GY0NYVHhCVHpLUHYv?=
+ =?utf-8?B?bnYzemVkUnI3eFBQYzlGWVJWby9LT0tSMkRIa0pUaDE1TjY1WHlJTW5QUkVU?=
+ =?utf-8?B?R29ZODJmK1pZT2pKNGZMR3N1YmRob3FTTVM3TGV4b1ZEWmR4SG56amhyL01s?=
+ =?utf-8?B?Q1RmTTQ2bzlEcDY0UndCa09lY25MMitUL1Bod05weURsbnVkdkRzTnhVM0lV?=
+ =?utf-8?B?WGFDOG1SZDVDOGYrTGpRTlM2SlFmekV0aXEwaXZGQ01YblhJMXNjOElNZXJD?=
+ =?utf-8?B?bExLYUw0bHF6cC9wNzI3bklZTzMraGk5Rk4zTjExYjZlbk1jS0NaOFBlbkIr?=
+ =?utf-8?B?Rkw3UmdPOUxvNDZVM1hnTnNtUGVLSVRMaHhvcXM2Szh5V01vR0hZZmovRS80?=
+ =?utf-8?B?cHNocS85VjIwVHpxNnhHcmJuMDFDTFNxRUVpM2hwQ1Ivdi8vYUJnZ2R6U1Fj?=
+ =?utf-8?B?UzFMM2xocnJMUzNQbUpBWENaN1ZaSnN4eUlqNFI0ZmpldFBhYUZyT1VmVURl?=
+ =?utf-8?B?REhSSURlWHZJVWlkYXI0eVJCYVpVekdWTGxERWNENUxmcU1rUkc1dHdmVzdm?=
+ =?utf-8?B?M2RKZmRySk1Bd1N3VnN1MFF6NXMzbUQyV0lZeWN2MDBwZUl5VStTdVAvTUlS?=
+ =?utf-8?B?YkdUMm1ZQ3JWMExhWnpCSHFUTzYxcDJKY3FqelU3WDBQMngxNmNBSHlMYmdU?=
+ =?utf-8?B?VmJhMFVXZElUSDJUUklmSFhMN09DQ29VeWsveDBYTjJhc2owOTZ4MDA0eFcv?=
+ =?utf-8?B?blN3YWppeHIxcmF3VmNIN1dPM3pnNVVQZHJjMnZBRVV0Q2JmM1pEWUgwTUI4?=
+ =?utf-8?B?VEtZOUY5aHIxQmQvakdSdndOQ01QVnVLYi9aWG1jcXF2Rk9oa3pZbzBXdXNq?=
+ =?utf-8?B?OVFJU2NLZktkcytmTkZkUTdIL2VxRzRvSytnL3BQTXpyODNkN2dNL3VXRHJR?=
+ =?utf-8?B?SURybEpwWk52Wi9hbkViaVRDZUZEUSs2L3g3RTJvMDVjMVFiQjhlU1RVMDh4?=
+ =?utf-8?B?MmttZWdwUVBSSzd0TXh5bW1FNjdvdEJJeGltNCtCQi9JMWdxdzliUnJJNUVP?=
+ =?utf-8?B?aW9nNks1Nmp1bWxoMUlMSEdXa3hWcGtobXZYSnlvVk9DTFh5emRXMS9UcVh0?=
+ =?utf-8?B?SFE3SHVod3hxNm5oRXE3RkhpbVo5VFlDckV1c0Fwek84MjZEaU5OVmFLaGhs?=
+ =?utf-8?B?OThSZDlkaGhybU5ZTzdBS05SSUJiSW00aXplSFBqUW16dUFCbVd6b25lbzdC?=
+ =?utf-8?B?RUQwN2I5eHFpVFV6YmNESGNmSlJlaGhaeUJFQzVSZm9QT3ZzOTc0WlV5QnB4?=
+ =?utf-8?B?VW16ZWNLSWdDVi92cktBalA2L0I5UGFtWXYya2Z2V0lUOEN1SHdpSmdqSHZq?=
+ =?utf-8?B?bkpHLzNGY0IwbzVNV2FkdEZwSVJ0ekh1b09rN0xaVUxteExub0lVMnFRZFlV?=
+ =?utf-8?B?YWtPa3NmQVZENjBWZ3cvV1MxdjRVNlpacGZuSTVSMHg5S2lPRTBzSUdGRm5v?=
+ =?utf-8?B?OEtUSDQxcnBMRC9hbG5hQ0ZiWFpMUWRjbU52amxzV3FuaFZzM1JlS3JnRXpa?=
+ =?utf-8?B?VnFiRWw5YlVuRit3VmJ3R0p5RjJIQ291SmNGYUVTR2VpZGRmcUhrekFHQXNS?=
+ =?utf-8?B?VzFOalVsK1VZZXByWExIOGViMGtqbU96akRRZ2xnYzVOZjhSVUtsOHlBQVRT?=
+ =?utf-8?B?M1hRRDRmZTFuUC9TV3dTUklGZ1hwY3k5SENsOFpPUmdzZkN4eDdIVVpFODZZ?=
+ =?utf-8?B?UkhrM1FIVXZFUUJ5YlJxR1BJVFljS29JSWdCTUgzRTJlSE9aNGV6OEQyaTRn?=
+ =?utf-8?B?QUNMbjZUMkljQjUzdkwrQkFjN3UvbFlFM1k3a0NqVldpdG9qMWxMNDk0U2k0?=
+ =?utf-8?B?YXdVbnZ6dHdCcFlJNm40dnMwNXgzcGhEWmNoY0tLc0dJSk02SzB6TnB3TmFK?=
+ =?utf-8?B?U2RBbUZ5Y3k0OG9sRVBRUnZNOEs3S2t5bjhmL1cxdWFtT2JMSS8rcU1HOENV?=
+ =?utf-8?B?N2U3Q2QvWEovZUw1Q2RLN2xBWHo3NFhjRnBLRDRhbzM3ZzNzVE8zRlo4UDA2?=
+ =?utf-8?Q?NQF5UXo/cbVDCVBchz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19b2df55-2d77-4a20-7cc7-08dee0bff094
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2026 09:20:11.6336
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BqF35hSEX2A8JC8BZmm3J/p6xURQIdzOgnmvbZwr6oRn/3dZYNNuXP9vh4B8xsxH
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6973
 
-On Mon, Jul 13, 2026 at 10:48=E2=80=AFAM Alvin Sun <alvin.sun@linux.dev> wr=
-ote:
->
->
-> On 7/13/26 16:16, Alice Ryhl wrote:
-> > On Mon, Jul 13, 2026 at 02:45:31PM +0800, Alvin Sun wrote:
-> >> Module types now live in `rust/kernel/module.rs` alongside
-> >> `rust/kernel/module_param.rs`. Update the MODULE SUPPORT file pattern
-> >> from `rust/kernel/module_param.rs` to `rust/kernel/module*.rs` so both
-> >> files are covered.
-> >>
-> >> Cc: Petr Pavlu <petr.pavlu@suse.com>
-> >> Assisted-by: opencode:glm-5.2
-> >> Link: https://lore.kernel.org/rust-for-linux/8ea21b29-9baf-4926-a16f-7=
-d21c5a1a1b8@suse.com
-> >> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-> >> ---
-> >>   MAINTAINERS | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/MAINTAINERS b/MAINTAINERS
-> >> index e035a3be797c4..74733de3e41ee 100644
-> >> --- a/MAINTAINERS
-> >> +++ b/MAINTAINERS
-> >> @@ -17984,7 +17984,7 @@ F:   include/linux/module*.h
-> >>   F: kernel/module/
-> >>   F: lib/test_kmod.c
-> >>   F: lib/tests/module/
-> >> -F:  rust/kernel/module_param.rs
-> >> +F:  rust/kernel/module*.rs
-> >>   F: rust/macros/module.rs
-> >>   F: scripts/module*
-> >>   F: tools/testing/selftests/kmod/
-> > Is there a reason why this is a separate commit from the commit that
-> > introduces rust/kernel/module.rs file?
->
-> Gary asked the same on v6; `git log` shows MAINTAINERS changes are
-> conventionally
-> standalone commits with a `MAINTAINERS: ` prefix, so I kept it separate.
-> Gary agreed [1].
->
-> [1]:
-> https://lore.kernel.org/rust-for-linux/DJJ26195JBS9.D3DNLZPRJYO4@garyguo.=
-net/
+On 7/13/26 09:18, Christoph Hellwig wrote:
+> Hi Pavel,
+> 
+> do you plan to resend this series?  A lot of people are eagerly waiting
+> for it to land.
+> 
 
-Ok, that's fine then.
+Seconded, we have a lot of people desperately waiting for that.
 
-Alice
+Thanks,
+Christian.
