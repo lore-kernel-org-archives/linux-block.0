@@ -1,186 +1,121 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556B9342CBA
-	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 06:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB45D368D4B
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 07:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783925479; cv=none; b=nUFT7k3LEmKTMn1H3GcEEl/v1MwBO++zFFX4fybgHBXnw7S9KINLIH7y7kGuV95jhp5qm/wnstYwaObzYWpnIAH8cDiswWqBw8MYhH0tUZoTGX3lEjVfwZ0ZTfDS4mefcrOgTrZaHUYVmJGE5+ZM/nhw5T5qAmeIcE9Q1MP3ahY=
+	t=1783926306; cv=none; b=q13T/9i5vn4CmOQ795PQ6/DxxARovIg7aKCDyNikEr7W/1OQduMe24xBDwlpFyMUloNen2HuAq+bAA94tkZRa3LzIFxJ+RsJT1Ta7WSTTj2RH+L8bEF7fYzlnVvI45CyrbTK/G9HY+zlTeGsf3a+/6cbopX4LR+5Fw40LW1uZzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783925479; c=relaxed/simple;
-	bh=3i/EzXkWvSHr5bRVpIx9fX1f045wr/eghivsmwBX6BM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MIC645Epu12jP4f6i4gYqysNljbzONqNpIu5H5HzSY1cfz3CkoqoIsXLVnesH9lFLu09XmKRpMxwVUOunkqT+Gli4yb/0Q65WGzgURjYkdbDvAIKgtc1T8af5rhuc2p7P0mrDB9RazhVQ6iZu5OXJxTFoaKcCWOWrzJ17WpScPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Ss3p1Bil; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fq3Zovrs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Ss3p1Bil; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fq3Zovrs; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Ss3p1Bil";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fq3Zovrs";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Ss3p1Bil";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fq3Zovrs"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2A6217740B;
-	Mon, 13 Jul 2026 06:51:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783925470; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iYE/cr+IHUxdiM3OBW129gkzz/uLDWhYyZFceMYkVbg=;
-	b=Ss3p1BilMXNdCo+rh2WY/NeGrv1xfbPAxORpilXsuh7Jv4SU0T560DqNtne0Bbzd18+tfW
-	xiKoajFvDzbhg+iAesh4AJCJf8GLamANDVHBvlw0RZkIu/ZWArptHb7Lnh48iiXLHH7yE/
-	iV8L52jiQLRivBX1TyoUoWOmT/qoptM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783925470;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iYE/cr+IHUxdiM3OBW129gkzz/uLDWhYyZFceMYkVbg=;
-	b=fq3Zovrspe/CHvd4ezmjh2aA7T2CmYk2fDvM2hZ6zD+59KOnHDg3Cpa1WTV1oEscezp3V5
-	n2pnC5P1TT+o1gCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783925470; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iYE/cr+IHUxdiM3OBW129gkzz/uLDWhYyZFceMYkVbg=;
-	b=Ss3p1BilMXNdCo+rh2WY/NeGrv1xfbPAxORpilXsuh7Jv4SU0T560DqNtne0Bbzd18+tfW
-	xiKoajFvDzbhg+iAesh4AJCJf8GLamANDVHBvlw0RZkIu/ZWArptHb7Lnh48iiXLHH7yE/
-	iV8L52jiQLRivBX1TyoUoWOmT/qoptM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783925470;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iYE/cr+IHUxdiM3OBW129gkzz/uLDWhYyZFceMYkVbg=;
-	b=fq3Zovrspe/CHvd4ezmjh2aA7T2CmYk2fDvM2hZ6zD+59KOnHDg3Cpa1WTV1oEscezp3V5
-	n2pnC5P1TT+o1gCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ECDE7779AE;
-	Mon, 13 Jul 2026 06:51:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id n6uYON2KVGo9QwAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 13 Jul 2026 06:51:09 +0000
-Message-ID: <ee86f276-d3ff-401c-927f-6103018b96b9@suse.de>
-Date: Mon, 13 Jul 2026 08:51:09 +0200
+	s=arc-20240116; t=1783926306; c=relaxed/simple;
+	bh=+NJRUCIsFFqwqUzpYtQUOYNzJKrwrV2P9PCWORjMkhU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HjlKqsEEvnX6enLePlE84zum+i1JoWORPiN4OW+YGYX9aH6YejruMJqfMSHKFeVy5MZjz/Ab6QGbCrzHYdmiL73xrX6+kUFJLGgVb7hS6IWwhNR5ya/RX6Zs25dmK7xjXrlNhBMNUKXljXv9zFLmSsb9B3L2vj70F0xMSTTnvTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gzD2N4LZDzKHMPK
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:04:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 4F9F44056D
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:04:57 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgD3B3QQjlRq9dc7BA--.38720S10;
+	Mon, 13 Jul 2026 15:04:57 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	yukuai@kernel.org
+Cc: yi.zhang@huawei.com,
+	chengzhihao1@huawei.com,
+	echo.chenlin@huawei.com,
+	leo.lilong@huaweicloud.com,
+	wangkefeng.wang@huawei.com,
+	yangerkun@huawei.com,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: [PATCH v3 6/6] nbd: add nr_hw_queues module parameter for pre-created devices
+Date: Mon, 13 Jul 2026 14:56:44 +0800
+Message-ID: <20260713065644.1637594-7-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260713065644.1637594-1-yangerkun@huawei.com>
+References: <20260713065644.1637594-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] partitions: aix: bound the lvd scan to one sector
-To: Michael Bommarito <michael.bommarito@gmail.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <kees@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260606170721.1530005-1-michael.bommarito@gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260606170721.1530005-1-michael.bommarito@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.dk];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Level: 
-X-Spam-Score: -2.80
+X-CM-TRANSID:cCh0CgD3B3QQjlRq9dc7BA--.38720S10
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFy7WFyxtw4kXrW3Xry3CFg_yoW8ArWUpF
+	W5tFZrKFWxKr43uaykXwnrWFn8Ga4kC34fWF1xt34xuFy5Zwnavr97ta4Yqr1UtF9xAF4Y
+	v3WDZF48GF4UCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmKb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
+	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
+	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
+	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
+	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
+	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+	xVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcI
+	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
+	6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFPETDUUUU
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-On 6/6/26 7:07 PM, Michael Bommarito wrote:
-> aix_partition() reads the logical-volume descriptor array as a single
-> sector and then scans it:
-> 
-> 	if (numlvs && (d = read_part_sector(state, vgda_sector + 1, &sect))) {
-> 		struct lvd *p = (struct lvd *)d;
-> 		...
-> 		for (i = 0; foundlvs < numlvs && i < state->limit; i += 1) {
-> 			lvip[i].pps_per_lv = be16_to_cpu(p[i].num_lps);
-> 
-> p points at a single 512-byte sector, which holds 512 / sizeof(struct
-> lvd) = 16 entries, but the loop runs until foundlvs reaches the on-disk
-> numlvs or i reaches state->limit (DISK_MAX_PARTS, 256). numlvs is an
-> on-disk __be16 read straight from the volume group descriptor and is not
-> validated, so a crafted AIX image with numlvs larger than 16 and lvd
-> entries whose num_lps fields are zero (so foundlvs never advances) drives
-> the loop to read p[i] well past the end of the read sector buffer.
-> 
-> The 2014 off-by-one fix d97a86c170b4 hardened the matching write of
-> lvip[lv_ix] but left this read loop unbounded.
-> 
-> Bound the scan to the number of struct lvd entries that fit in the
-> sector that was actually read.
-> 
-> Fixes: 6ceea22bbbc8 ("partitions: add aix lvm partition support files")
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
->   block/partitions/aix.c | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/partitions/aix.c b/block/partitions/aix.c
-> index 29b8f4cebb63d..6679e825ba329 100644
-> --- a/block/partitions/aix.c
-> +++ b/block/partitions/aix.c
-> @@ -208,7 +208,14 @@ int aix_partition(struct parsed_partitions *state)
->   		if (n) {
->   			int foundlvs = 0;
->   
-> -			for (i = 0; foundlvs < numlvs && i < state->limit; i += 1) {
-> +			/*
-> +			 * The lvd array was read as a single sector; only the
-> +			 * struct lvd entries that fit in it are valid.  Bound the
-> +			 * scan so an on-disk numlvs larger than that cannot walk
-> +			 * the read buffer out of bounds.
-> +			 */
-> +			for (i = 0; foundlvs < numlvs && i < state->limit &&
-> +				    i < 512 / (int)sizeof(struct lvd); i += 1) {
+Previous commit can help remove all freeze for netlink newly created nbd
+device. But for the devices pre-created at module load(nbds_max default
+as 16), the nr_hw_queues was setting default as 1, then ioctl/netlink
+path will set the real connection count, and blk_mq_update_nr_hw_queues
+in nbd_start_device will introduce freeze.
 
-I would use SECTOR_SIZE here. And maybe 'i++' instead of 'i += 1'.
->   				lvip[i].pps_per_lv = be16_to_cpu(p[i].num_lps);
->   				if (lvip[i].pps_per_lv)
->   					foundlvs += 1;
-> 
-> base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+Add an nr_hw_queues module parameter so that users who know their
+expected connection count can pre-created devices with the right queue
+count to avoid this freeze too.
 
-Cheers,
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/nbd.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Hannes
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 2c7b09c70da2..f918c9efa9b2 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
+ 
+ static unsigned int nbds_max = 16;
+ static int max_part = 16;
++static int nr_hw_queues = 1;
+ static int part_shift;
+ 
+ static int nbd_dev_dbg_init(struct nbd_device *nbd);
+@@ -2752,8 +2753,10 @@ static int __init nbd_init(void)
+ 	}
+ 	nbd_dbg_init();
+ 
++	if (nr_hw_queues < 1)
++		nr_hw_queues = 1;
+ 	for (i = 0; i < nbds_max; i++)
+-		nbd_dev_add(i, 1, 1);
++		nbd_dev_add(i, 1, nr_hw_queues);
+ 	return 0;
+ }
+ 
+@@ -2814,3 +2817,6 @@ module_param(nbds_max, int, 0444);
+ MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
+ module_param(max_part, int, 0444);
+ MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
++module_param(nr_hw_queues, int, 0444);
++MODULE_PARM_DESC(nr_hw_queues,
++"number of hardware queues for devices pre-created at module load (default: 1). ");
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.52.0
+
