@@ -1,28 +1,28 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB45D368D4B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB37F36894D
 	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 07:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783926306; cv=none; b=q13T/9i5vn4CmOQ795PQ6/DxxARovIg7aKCDyNikEr7W/1OQduMe24xBDwlpFyMUloNen2HuAq+bAA94tkZRa3LzIFxJ+RsJT1Ta7WSTTj2RH+L8bEF7fYzlnVvI45CyrbTK/G9HY+zlTeGsf3a+/6cbopX4LR+5Fw40LW1uZzs=
+	t=1783926307; cv=none; b=BgIvIWWgD5AsP1ubDLTXcnoe1H4Lgp0ksPM6ks2NhIaSUIvHJ6OLMFlfown/aHc9vcIPHrT5HQRASd7sw5NmgCIZxXxXxKsT66c6DI1HRVbkigPbU8eBvuSkKzHm1E1zA0mcFYOhtKM9BEjlg2FbeiaFR+pRpqllI7BuLKa9fwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783926306; c=relaxed/simple;
-	bh=+NJRUCIsFFqwqUzpYtQUOYNzJKrwrV2P9PCWORjMkhU=;
+	s=arc-20240116; t=1783926307; c=relaxed/simple;
+	bh=lXkykSfhdMXwQ8GHG6k9wl+RaF7SQLYA0UbLcnMxvfo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HjlKqsEEvnX6enLePlE84zum+i1JoWORPiN4OW+YGYX9aH6YejruMJqfMSHKFeVy5MZjz/Ab6QGbCrzHYdmiL73xrX6+kUFJLGgVb7hS6IWwhNR5ya/RX6Zs25dmK7xjXrlNhBMNUKXljXv9zFLmSsb9B3L2vj70F0xMSTTnvTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=Fi5n182QMJu4ydeIEXbmqZfz2KCWSRZ7kmlAIJJ4SAvkeDCKORoMYxrQhrpWRyS/cFtwT7epUYskm+p7ZuKEtl0nGYemuwcTS0kmWtTaMVlpiHG2vCwpTGOLDapqxkOj5zSHuW1oAxNVDxlJPVE6kj43f6xudwbhaBGYakQGkys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gzD2N4LZDzKHMPK
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gzD2N293DzKHMP4
 	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:04:28 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 4F9F44056D
-	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:04:57 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 0090E40594
+	for <linux-block@vger.kernel.org>; Mon, 13 Jul 2026 15:04:56 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgD3B3QQjlRq9dc7BA--.38720S10;
-	Mon, 13 Jul 2026 15:04:57 +0800 (CST)
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgD3B3QQjlRq9dc7BA--.38720S6;
+	Mon, 13 Jul 2026 15:04:56 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
 	axboe@kernel.dk,
@@ -36,9 +36,9 @@ Cc: yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v3 6/6] nbd: add nr_hw_queues module parameter for pre-created devices
-Date: Mon, 13 Jul 2026 14:56:44 +0800
-Message-ID: <20260713065644.1637594-7-yangerkun@huawei.com>
+Subject: [PATCH v3 2/6] nbd: disallow NBD_SET_SOCK on an active device
+Date: Mon, 13 Jul 2026 14:56:40 +0800
+Message-ID: <20260713065644.1637594-3-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260713065644.1637594-1-yangerkun@huawei.com>
 References: <20260713065644.1637594-1-yangerkun@huawei.com>
@@ -49,73 +49,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3B3QQjlRq9dc7BA--.38720S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFy7WFyxtw4kXrW3Xry3CFg_yoW8ArWUpF
-	W5tFZrKFWxKr43uaykXwnrWFn8Ga4kC34fWF1xt34xuFy5Zwnavr97ta4Yqr1UtF9xAF4Y
-	v3WDZF48GF4UCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmKb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
-	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
-	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
-	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
-	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
-	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
-	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
-	xVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcI
-	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
-	6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFPETDUUUU
+X-CM-TRANSID:cCh0CgD3B3QQjlRq9dc7BA--.38720S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrW3WF4rXr15Cr1UWw4UArb_yoWDJrXEkw
+	4ru348Wws3GFW3u3yYkw15ZrW0yan2vF1v9F1jyrsagFyIvasavFn2vrZxAw1DXFWUWF15
+	AryUZws7ZryxJjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb9xYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M2
+	8IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK
+	021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F
+	4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
+	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
+	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+	WUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
+	CTnIWIevJa73UjIFyTuYvjxUF6pBDUUUU
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-Previous commit can help remove all freeze for netlink newly created nbd
-device. But for the devices pre-created at module load(nbds_max default
-as 16), the nr_hw_queues was setting default as 1, then ioctl/netlink
-path will set the real connection count, and blk_mq_update_nr_hw_queues
-in nbd_start_device will introduce freeze.
-
-Add an nr_hw_queues module parameter so that users who know their
-expected connection count can pre-created devices with the right queue
-count to avoid this freeze too.
+We cannot add a socket to an already running nbd device, the reconfigure
+for netlink can only active dead socket. But for ioctl path, we can call
+NBD_SET_SOCK after NBD_DO_IT, reject this using nbd->pid which has been
+setted when NBD_DO_IT. Besides, it is the root cause for commit
+b98e762e3d71 ("nbd: freeze the queue while we're adding connections").
 
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- drivers/block/nbd.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/block/nbd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 2c7b09c70da2..f918c9efa9b2 100644
+index b1a5acd57426..a15553ab4b97 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
- 
- static unsigned int nbds_max = 16;
- static int max_part = 16;
-+static int nr_hw_queues = 1;
- static int part_shift;
- 
- static int nbd_dev_dbg_init(struct nbd_device *nbd);
-@@ -2752,8 +2753,10 @@ static int __init nbd_init(void)
+@@ -1302,6 +1302,13 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 		goto put_socket;
  	}
- 	nbd_dbg_init();
  
-+	if (nr_hw_queues < 1)
-+		nr_hw_queues = 1;
- 	for (i = 0; i < nbds_max; i++)
--		nbd_dev_add(i, 1, 1);
-+		nbd_dev_add(i, 1, nr_hw_queues);
- 	return 0;
- }
- 
-@@ -2814,3 +2817,6 @@ module_param(nbds_max, int, 0444);
- MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
-+module_param(nr_hw_queues, int, 0444);
-+MODULE_PARM_DESC(nr_hw_queues,
-+"number of hardware queues for devices pre-created at module load (default: 1). ");
++	if (nbd->pid) {
++		dev_err(disk_to_dev(nbd->disk),
++			"Cannot add socket to a running device\n");
++		err = -EBUSY;
++		goto put_socket;
++	}
++
+ 	nsock = kzalloc_obj(*nsock);
+ 	if (!nsock) {
+ 		err = -ENOMEM;
 -- 
 2.52.0
 
