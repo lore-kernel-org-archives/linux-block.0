@@ -1,27 +1,27 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FE22D7DD7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363C62D2394;
 	Tue, 14 Jul 2026 04:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784003179; cv=none; b=B52QcXQBt2TB2OYWMnitdd9sMOR4WejHpQb1F2jG7RPgtOxixLgWZYOd5pbELWQ84sVGlZm6NMLyrdZkFNJJL/8GgvGgoKhbIHf29eXsmEAOpToMUw1Ky+zt52sEZNZLby+LbCoeIA/caO0KHpjAFB9XlOSOzsaR+p9FAhcLBqM=
+	t=1784003179; cv=none; b=IJca413YRq56F4ykFBAB7ABciaqbefompcD0mprxserkk9Q9JtkubUUgzwRtCX1GxDiI2MY+GA2vs30vd+aAM3NGTkK/JfxBnhRCBkX4GF6nih1yp5wyrZAtwXxsxmasyanq+oOPR3C4ULWXdeHg/M4qQ4t3WckTLBqqGP9neVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784003179; c=relaxed/simple;
-	bh=iciori9I+Uo+Ch/qT8BCLYPKlfBxEliOxgX/56dF+Ho=;
+	bh=R3I6gVd+APqzfeC+W+pgCe8DnbwqbUbl4E5EOcivFNk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BvRXJd6z0IkliRyDb/0jqRYofwl3iWL7bOY4dmo7rT20TfBZyM+54IWANayXOjH5Yb2cLy2MS3fAZK7m4ZIPU1ho3ryxOxdwVEPUIypRmFHMc7jxtuj2EsJC8kWsh5kMk1hJlOmXr1V5U3RR9HZ0xLmusT/T4XwbDz2NpTjg+C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=WUr8GtsNPRv2Sx8Ja7/IdJ+ifsUi5jj8pQoPIfVfp0XOe31M5rbwQdRR9mdJQUC5WWrXh+TlEW9gKqSfMYWUNw4JALLHTmrTPLvh/suiyL6DRNvUrnTVqYtjJNUEtHNZCADZAHUDNwSlpD5K0Y0N28HqTH9s29NAPZNaJ2fLljo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gzmT32gvPzYQtht;
-	Tue, 14 Jul 2026 12:25:59 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gzmSl5W01zKHMMD;
+	Tue, 14 Jul 2026 12:25:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 19D68408CE;
-	Tue, 14 Jul 2026 12:26:14 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id E049C407DC;
+	Tue, 14 Jul 2026 12:26:13 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHWHRkulVq2zKnBA--.54416S9;
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHWHRkulVq2zKnBA--.54416S6;
 	Tue, 14 Jul 2026 12:26:13 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	yangerkun@huawei.com,
 	chengzhihao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [PATCH V5 5/9] null_blk: free zones array on device power-off
-Date: Tue, 14 Jul 2026 12:18:01 +0800
-Message-ID: <20260714041805.1088702-6-wozizhi@huaweicloud.com>
+Subject: [PATCH V5 2/9] null_blk: register configfs subsystem after creating default devices
+Date: Tue, 14 Jul 2026 12:17:58 +0800
+Message-ID: <20260714041805.1088702-3-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260714041805.1088702-1-wozizhi@huaweicloud.com>
 References: <20260714041805.1088702-1-wozizhi@huaweicloud.com>
@@ -49,105 +49,118 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHWHRkulVq2zKnBA--.54416S9
-X-Coremail-Antispam: 1UD129KBjvJXoWxGrWrZF15Ar18GryxJryUGFg_yoW5CrW8pF
-	4jga4Ygry0gr13ZFWDZr4DWF15uw4vyayxCry8Ja4S9rW3Ar9IyrWDAFy5Z3WDJ397ArWf
-	XFZ5WFyfCa17JaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
-	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
-	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
-	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
-	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s02
-	6c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw
-	0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvE
-	c7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67
-	AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuY
-	vjxUF9NVUUUUU
+X-CM-TRANSID:cCh0CgBHWHRkulVq2zKnBA--.54416S6
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrykGry8Ar17ur45ZFyrJFb_yoW5tFWfpF
+	yUWw17Kry8tF1Uur4jva109FyfGan293yxu3yxCF1rZanxAry5AF9IvayrGF4UG3yxCF4f
+	Xas0va1rGa48Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXw
+	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ew
+	Av7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY
+	6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14
+	v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
+	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8Zw
+	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
+	67AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
+	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1VT
+	5JUUUUU==
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 From: Zizhi Wo <wozizhi@huawei.com>
 
-null_init_zoned_dev() allocates dev->zones when a zoned device is powered
-on, but null_del_dev() never frees it on power-off; dev->zones is only
-freed later in null_free_dev(), when the configfs directory is removed. If
-the device is powered off and then on again, null_init_zoned_dev()
-allocates a new array and overwrites the dev->zones pointer, leaking the
-previous allocation each power cycle.
+In null_init(), configfs_register_subsystem() currently runs before
+register_blkdev(), so when null_blk is built as a module, a racing mkdir()
++ poweron from userspace can reach null_add_dev() while null_major is still
+0. __add_disk() then hits WARN_ON(disk->minors) (major=0 with minors!=0)
+and fails:
 
-Free dev->zones in null_del_dev() via null_free_zoned_dev() to solve it.
-And calling null_free_zoned_dev() in null_free_dev() is no longer necessary
-because every caller already invokes null_del_dev() first: via
-nullb_group_drop_item() before nullb_device_release(), in the
-null_add_dev() error path of null_create_dev(), and in null_destroy_dev().
-Remove the redundant call.
+[root@fedora ~]# [ 2366.521436] WARNING: block/genhd.c:476 at __add_disk+0x8a7/0xde0,
+[ 2366.523552] Modules linked in: null_blk(+) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
+[ 2366.529081] CPU: 26 UID: 0 PID: 1600 Comm: sh Not tainted 7.2.0-rc1+ #66 PREEMPT(full)
+......
+[ 2366.547251] Call Trace:
+[ 2366.547575]  <TASK>
+[ 2366.547831]  ? _raw_spin_lock+0x84/0xe0
+[ 2366.548260]  add_disk_fwnode+0x114/0x560
+[ 2366.548739]  null_add_dev+0x102d/0x1b80 [null_blk]
+[ 2366.549310]  ? __pfx_null_add_dev+0x10/0x10 [null_blk]
+[ 2366.549906]  ? mutex_lock+0xde/0x1c0
+[ 2366.550361]  ? __pfx_mutex_lock+0x10/0x10
+[ 2366.550827]  nullb_device_power_store+0x1e7/0x280 [null_blk]
+[ 2366.551499]  ? __pfx_nullb_device_power_store+0x10/0x10 [null_blk]
+[ 2366.552177]  ? __kmalloc_cache_noprof+0x1f5/0x470
+[ 2366.552748]  ? configfs_write_iter+0x35c/0x4e0
+[ 2366.553242]  configfs_write_iter+0x286/0x4e0
+[ 2366.553787]  vfs_write+0x52d/0xd00
+[ 2366.554169]  ? __pfx_vfs_write+0x10/0x10
+[ 2366.554679]  ? __pfx___css_rstat_updated+0x10/0x10
+[ 2366.555196]  ? fdget_pos+0x1cf/0x4c0
+[ 2366.555649]  ksys_write+0xfc/0x1d0
+......
 
-And take &lock around zone_cond_store() in the two store wrappers to
-serialize dev->zones check-and-deref against its alloc/free, which already
-run under &lock. The reason there was no problem before is that only
-nullb_device_release() or null_exit() frees the dev->zones, which
-guarantees that subsequent users won't access the configfs interface.
+Additionally, the err_dev path destroys all devices on nullb_list while
+configfs is still registered. If a racing mkdir() + poweron puts a user
+device on the list, null_destroy_dev()->null_free_dev() kfrees the user
+device's nullb_device but /sys/kernel/config/nullb/<name> is still
+reachable. Any userspace access to the item will trigger a UAF.
 
-Fixes: ca4b2a011948 ("null_blk: add zone support")
-Assisted-by: Claude-Code:GLM-5.2
+For simplicity, move configfs_register_subsystem() to the end to solve
+the problems above.
+
+Fixes: 3bf2bd20734e ("nullb: add configfs interface")
 Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- drivers/block/null_blk/main.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/block/null_blk/main.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index df85189f0b69..e063c931dfca 100644
+index eba204b27785..4613035222cd 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -579,8 +579,13 @@ static ssize_t nullb_device_zone_readonly_store(struct config_item *item,
- 						const char *page, size_t count)
- {
- 	struct nullb_device *dev = to_nullb_device(item);
-+	ssize_t ret;
-+
-+	mutex_lock(&lock);
-+	ret = zone_cond_store(dev, page, count, BLK_ZONE_COND_READONLY);
-+	mutex_unlock(&lock);
+@@ -2162,15 +2162,9 @@ static int __init null_init(void)
+ 	config_group_init(&nullb_subsys.su_group);
+ 	mutex_init(&nullb_subsys.su_mutex);
  
--	return zone_cond_store(dev, page, count, BLK_ZONE_COND_READONLY);
-+	return ret;
- }
- CONFIGFS_ATTR_WO(nullb_device_, zone_readonly);
+-	ret = configfs_register_subsystem(&nullb_subsys);
+-	if (ret)
+-		return ret;
+-
+ 	null_major = register_blkdev(0, "nullb");
+-	if (null_major < 0) {
+-		ret = null_major;
+-		goto err_conf;
+-	}
++	if (null_major < 0)
++		return null_major;
  
-@@ -588,8 +593,13 @@ static ssize_t nullb_device_zone_offline_store(struct config_item *item,
- 					       const char *page, size_t count)
- {
- 	struct nullb_device *dev = to_nullb_device(item);
-+	ssize_t ret;
- 
--	return zone_cond_store(dev, page, count, BLK_ZONE_COND_OFFLINE);
-+	mutex_lock(&lock);
-+	ret = zone_cond_store(dev, page, count, BLK_ZONE_COND_OFFLINE);
-+	mutex_unlock(&lock);
-+
-+	return ret;
- }
- CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
- 
-@@ -836,7 +846,6 @@ static void null_free_dev(struct nullb_device *dev)
- 	if (!dev)
- 		return;
- 
--	null_free_zoned_dev(dev);
- 	badblocks_exit(&dev->badblocks);
- 	kfree(dev);
- }
-@@ -1777,6 +1786,7 @@ static void null_del_dev(struct nullb *nullb)
+ 	for (i = 0; i < nr_devices; i++) {
+ 		ret = null_create_dev();
+@@ -2178,6 +2172,10 @@ static int __init null_init(void)
+ 			goto err_dev;
  	}
  
- 	put_disk(nullb->disk);
-+	null_free_zoned_dev(dev);
- 	if (nullb->tag_set == &nullb->__tag_set)
- 		blk_mq_free_tag_set(nullb->tag_set);
- 	kfree(nullb->queues);
++	ret = configfs_register_subsystem(&nullb_subsys);
++	if (ret)
++		goto err_dev;
++
+ 	pr_info("module loaded\n");
+ 	return 0;
+ 
+@@ -2187,8 +2185,6 @@ static int __init null_init(void)
+ 		null_destroy_dev(nullb);
+ 	}
+ 	unregister_blkdev(null_major, "nullb");
+-err_conf:
+-	configfs_unregister_subsystem(&nullb_subsys);
+ 	return ret;
+ }
+ 
 -- 
 2.52.0
 
