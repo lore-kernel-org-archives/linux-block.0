@@ -1,73 +1,71 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB0947A0A9;
-	Tue, 14 Jul 2026 13:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3EF2E414;
+	Tue, 14 Jul 2026 14:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784037200; cv=none; b=AczsWcthKhvmY8E+UK/J4cELddxeAJvzPsRVfZEGfekTqnKjGTkVm8bn/k9qNx4LPOSFaU40Cn7xp89rV0YnZLrs1g51JfW/Q+GojZh3zDXQDZV89JfwFizxmoguO7hNnQkcNvlQdNMqkcC32DejHuOv4O56zoB0MjMxhn59i8s=
+	t=1784038394; cv=none; b=cNHECoUQhmxjcDrT59dPhnHpSKonVFdeIHANelnib8fANTQxrM1wUHJy3u2qUouAkLaxOohMnT9wOkwG0PhHfk6TINsn819xijNIMi987gU0eGdlqsR2Dx2AMIC4SVtR6TwFAXByKDuzafohO8FsDv9dfdGs2yCTyffGjL03Cs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784037200; c=relaxed/simple;
-	bh=Eq6GXVyYsbPKzg1i1/RNjt8f3O56MsKOzyQV2B05ngA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZpvCjphm9UXFtD318hwkPa5zi0OC/d65UQDPPnoLxWY/w4782yQCQG8zdumsFdRAE7fJpNf8UCiBI54AsOuqZiXWBzK5T0Yd3tNRkjKCTrwGOHIyHHI+QNDTXhAjmmdHZ+GuDzCYrR1RBUpKiMbzSquxo9uj8E322IPgRb0taI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id BFDE868BEB; Tue, 14 Jul 2026 15:53:11 +0200 (CEST)
-Date: Tue, 14 Jul 2026 15:53:10 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] nvme/core: advertise
- BLK_EXPECTED_REF_TAG_CAPABLE
-Message-ID: <20260714135310.GB714@lst.de>
-References: <20260627061933.2187447-1-csander@purestorage.com> <20260627061933.2187447-3-csander@purestorage.com>
+	s=arc-20240116; t=1784038394; c=relaxed/simple;
+	bh=itz8NZebyCxW+9WAjAbrXu6cnvXyQHBitp2JqN63+TE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P7Ftits2/fQbyXVpMZZ5RoyFtglYruzweLlZ3OH7DqaYd21nihStgRTPbe244zlzBKetsBNxXpBcPcetpf8AEJl1Q6YcQmJzeicmAdV7OHKuXIn9zgAxJH7iRwQcV5kXhb1oPo26am1Za6KJEIJ4nmgsR9YpfvyPbKiFZWzkEAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=quWLUj11; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HYfYMxv8; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="quWLUj11";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HYfYMxv8"
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1784038389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=T2DXny51Nh1rgEsSJgEqCUm/I9JDn2RiZBU3zQu58Rk=;
+	b=quWLUj11OcInwxwtGmPegpcRHSjq53X/sLIDS9i4KcJhYBN5ENuOM+lWrZsKFjfWU3t4fX
+	Rn2mJ2xOmtDQ7sm83ZdZVTxMxSJ+o3c36FWufAtB8Evn+Hxnfkdzm6i7k+T7UHpGNbogSM
+	eAkhCZpmh9rCiAbv1zmWYAF9q/oaGoFkY26yEJryV1pQUm/JhLE9wxOMTzPp7ih4qd335F
+	TQ8lIiGAbkoIxIV6tvTaAnmgdt6JgUepx6Iq+ZPXBcA8MsHUMNSH12DEJg2m1+ByfpiDHS
+	yhahwSixw4GIsm1cJlExXpfdd7a/nICVfqwPk8Tn/zsnYKz3dc9L+tuPLCAijg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1784038389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=T2DXny51Nh1rgEsSJgEqCUm/I9JDn2RiZBU3zQu58Rk=;
+	b=HYfYMxv828hvoA0XI0BbsqGBAoCLwsPH62gWF3qv7OTRLq5esWJBuNRFq9vmmnktP4Jfnf
+	GCXfnATXMw/sYBBQ==
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 0/2] zram: lockmap tweaks
+Date: Tue, 14 Jul 2026 16:12:58 +0200
+Message-ID: <20260714141300.3945672-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260627061933.2187447-3-csander@purestorage.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 27, 2026 at 12:19:33AM -0600, Caleb Sander Mateos wrote:
-> NVMe Read, Write, and Write Zeroes commands include an (E)ILBRT field to
-> specify the expected initial reference tag for the controller to check
-> against the ref tags in the protection information buffer. However, the
-> NVMe driver currently always sets (E)ILBRT to the lower bits of the LBA.
-> The block integrity layer generates/verifies the PI ref tags according
-> to the bio's ref tag seed, so it must "remap" the ref tags, adjusting
-> for the difference between the ref tag seed and the absolute integrity
-> interval number (= LBA).
-> 
-> If a request has an integrity payload, set (E)ILBRT to its ref tag seed
-> so no ref tag remapping is required. Set BLK_EXPECTED_REF_TAG_CAPABLE in
-> NVMe devices' enum blk_integrity_flags to skip the block integrity layer
-> ref tag remapping.
+Sergey, this should be a follow up on=20
+	https://lore.kernel.org/all/akza1qtgHm7zbjMW@google.com/
 
-I don't really understand how this is supposed to work.  For type 1 PI,
-NVMe requires (E)ILBRT to match the lower bits of the start LBA:
+Could you try if this does what I claimed it does?
 
-  If the namespace is formatted for Type 1 protection, the value of the
-  computed reference tag for the first logical block of the command is
-  the value contained in the Initial Logical Block Reference Tag (ILBRT)
-  or Expected Initial Logical Block Reference Tag (EILBRT) field in the
-  command, and the computed reference tag is incremented for each
-  subsequent logical block. The controller shall complete the command
-  with a status of Invalid Protection Information if the ILBRT field or
-  the EILBRT field does not match the value of the least significant bits
-  of the SLBA field sized to the number of bits in the Logical Block
-  Reference Tag"
+Sebastian Andrzej Siewior (2):
+  zram: Move lockmap to be per-zram instead per table
+  zram: Use a custom key for each zram object.
 
-For Type 2 this remapping could work, but doing it unconditionally
-will make all data written using and earlier kernel in a partition
-unreadable once this changes has been applied.
+ drivers/block/zram/zram_drv.c | 26 +++++++++-----------------
+ drivers/block/zram/zram_drv.h |  3 ++-
+ 2 files changed, 11 insertions(+), 18 deletions(-)
+
+--=20
+2.53.0
+
