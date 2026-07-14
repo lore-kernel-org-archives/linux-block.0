@@ -1,46 +1,94 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mail3-165.sinamail.sina.com.cn (mail3-165.sinamail.sina.com.cn [202.108.3.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D337F2475D0;
-	Tue, 14 Jul 2026 04:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECA91C6FF5
+	for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 04:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784003749; cv=none; b=uknUeSyQEKkOQJfH737HB2qJw4y9/hdYV67iiuolH/cacCpc2sm+GwwKgk6HU17rnm/dV6lgyo4WuYsmK1wKT4jvfNaQ0ahzsZSBPmU9YQaSvKP3UtsHIW2iLGXafRC/3RvuD4uBBIvY+6JH9jYeZXTAo2RLtd0wT3DnqV1Z2T0=
+	t=1784003969; cv=none; b=M4uM4ygEQ9Akq6T+9bqOZnhjYDWLeJyoxXGWdO5fq9LcguORqgn0nGOB9H6Bscwzo/VgGdCJL4HDqrd4wjLixDJYX0ERC4Tgs3HdQkJGVxBK4yumYbx0ctfPrIXRrGTdvQc0Rm1yc0nZ48y1wxR77f3R56sCy4is33IRJAOO+LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784003749; c=relaxed/simple;
-	bh=C0+IdKbVeVdaa81xL7FHb6BNvZUke28lOgmoNt9OxQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pBMaHupvIcQM5qBeR3ygDhEawDD7y55VAZCVKVq7SFEYgZEDPrUMjDizJHr66VqYyx/bpF+UqY2g2YkDuvs1Te+dloGUPjMzlBhdTQOjVZdGG0zLuO1kmHQtVjSgXmdmBcUdc+WIeUkmW7Ky2g+O4hKJXlwLtuitJOx7Pb/Vz24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3EA3468C4E; Tue, 14 Jul 2026 06:35:43 +0200 (CEST)
-Date: Tue, 14 Jul 2026 06:35:43 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	dm-devel@lists.linux.dev, hch@lst.de, axboe@kernel.dk,
-	brauner@kernel.org, djwong@kernel.org, viro@zeniv.linux.org.uk,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v3 0/5] block: validate direct I/O memory alignment
-Message-ID: <20260714043543.GA30880@lst.de>
-References: <20260624170905.3972095-1-kbusch@meta.com>
+	s=arc-20240116; t=1784003969; c=relaxed/simple;
+	bh=63iCjLzjUGgIPWgpXrZGHZFDsLVx5r5fTToGdyRWLC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tejKDk6YVM0/l7MRmrDO4Ox8Byg4R+bUCQhqF0JUwn9Tf7o62LQTZ1KvIIvJRZAgXl958uqTn+XbClA6zT1FjVOuPxveOiiBeRekYJpweq+6jYi6kjCIEuVK39sy+2GnOnHtlckgpC5yCje5wj1elnQcSJwTk3HjJm/9VvZaGYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=sWv4AXv6; arc=none smtp.client-ip=202.108.3.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="sWv4AXv6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1784003966;
+	bh=E+DqH9w0CFDT+FpgETLE+ky0m/kkR8WsjPHPbAseKBI=;
+	h=From:Subject:Date:Message-ID;
+	b=sWv4AXv6WGq3QkKLUVrFu3IYjGgdMVnXo35+Ah2FgdyRT46BY+IBgN2pxG5qB62NO
+	 qsdUm4w6R2nen/HHs491nCl2mDnKxR2qBeO6pGzAckI4151bTqs0HboDpPYDNC1+Pd
+	 s0fg8A2fKqlFl17qWMNpUxnHdCp2SyooJE1lAhYo=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.33) with ESMTP
+	id 6A55BD5400007C9F; Tue, 14 Jul 2026 12:38:47 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 3282726685363
+X-SMAIL-UIID: 5C427D2DEC9C42C9A88BBEA97C916B4E-20260714-123847-1
+From: Hillf Danton <hdanton@sina.com>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-btrfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
+Date: Tue, 14 Jul 2026 12:38:33 +0800
+Message-ID: <20260714043834.554-1-hdanton@sina.com>
+In-Reply-To: <33277fd6-0479-4f6c-bc21-f25f7179d2dc@I-love.SAKURA.ne.jp>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624170905.3972095-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 24, 2026 at 10:09:00AM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> This addresses the misaligned direct-io problem behind various threads:
-
-It looks like this never got merged and is still missing in 7.2-rc3.
-
+On Mon, 13 Jul 2026 20:02:52 +0900 Tetsuo Handa wrote:
+>On 2026/07/13 12:04, Hillf Danton wrote:
+>> On Tue, 9 Jun 2026 18:50:13 +0100 Al Viro wrote:
+>>> On Sun, Jun 07, 2026 at 07:54:58PM +0900, Tetsuo Handa wrote:
+>>>> syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
+>>>> An analysis by the Gemini AI collaborator [3] considers that this problem
+>>>> is caused by a timing shift primarily exposed by commit 65565ca5f99b
+>>>> ("block: unify the synchronous bi_end_io callbacks"), along with helper
+>>>> refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
+>>>> helper").
+>>>>
+>>>> But due to difficulty of reproducing this race, discussion about what is
+>>>> happening and how to fix this problem is stalling. Also, we haven't
+>>>> identified how many filesystems are subjected to this problem.
+>>>>
+>>>> Therefore, this patch introduces a grace period for flushing pending I/O
+>>>> requests (which should be a good thing from the perspective of defensive
+>>>> programming) so that we won't hit NULL pointer dereference problem, and
+>>>> also emits BUG: message in order to help filesystem developers identify
+>>>> the caller of an I/O request that failed to wait for completion so that
+>>>> filesystem developers can fix such caller to wait for completion.
+>>>>
+>>>> Note that emitting BUG: message is enabled only if CONFIG_KCOV=y, for
+>>>> this check is a waste of computation resources for almost all users.
+>>>
+>>> Still breaks xfs/259, same as the version in next-20260605...
+>>>
+>> And syzbot report [1]
+>> 
+>> [1] https://lore.kernel.org/lkml/6a54399f.278cdcd2.e885.0023.GAE@google.com/
+>
+> No. This report is from upstream tree where "loop: Fix NULL pointer dereference
+> in lo_rw_aio()" is not yet applied.
+>
+The issue remains but this work stalls.
