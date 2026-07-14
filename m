@@ -1,141 +1,109 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DE731D371
-	for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 09:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF7643B493
+	for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 09:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020096; cv=none; b=VnwTCrj5VsBJqocoJP/DHN4atcu+uORye+VnudEnz9bt6yOUSAGAnlj2XV2WVkN/MB1ACd49mB9v0DZzS9wgYczjI2QtKUprGuqp8TDLizNkwY5TQ0Mtae52Jw8bBDITNe6G2l1ek04s1fQKKX6FrXU+PXbgTD7xU4kXHtcVQ+s=
+	t=1784020929; cv=none; b=C/MRAEwMZSQvxdmWPYjqYtkMVPpLhPkY+G7KkeLbYpEzYUInce9gDRPKCNiMFMAtJ2jZIzoB6YhNDzAXNgZvHqs0lKPJBcZ9SCE8wdg7isn+88eaAzx8daRZHo7eN0Y+keo/dwKYgP8ntadaOleCKgPp0xa5DIzhbFJly0J4UMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784020096; c=relaxed/simple;
-	bh=NJo7MlhG03XZ95eyKjganVgYCzFt7x8XxLl5h68wULA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=At2ugx/TcMFRMWPvjthmDJ+LJbS3mjo9B1KNihJPYB857a3ijwKn0Igpkgmd7HLYvYgsOPcSbPy7TdY/Gppb+kKB8g0sykliYB80ImcLkjpRrYaK58PKfKWgbPPoSgKAG1NIeittZuxRAD2YFZgLFZikFHmTEpNwFbGsSOjl2+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qA7XEVE8; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qA7XEVE8; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1784020929; c=relaxed/simple;
+	bh=W8OT6ovmAQkwBwCI5qoFSNzG+sz1ik3/qbazlMkp4fM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tOeFzbP+H3TZsLh/ACIlQmFj2LKjoj+N3RwUnlGNRpKnXUX2OJfN7ViS1ssYjpr/N9kvzrwC4MSTLTD/UfZgjcMHyq0Q5EFMS/rzj/Tj7EOu+/MNFTZieLP684lXrlNTtXjW2w+65guVa7nLwfW+TG94sWbaHcszjmeNsHWqg74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JlMpiiPu; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qA7XEVE8";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qA7XEVE8"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2264D3E0A;
-	Tue, 14 Jul 2026 09:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1784020093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=fp0ZRjg/oOEFcNQzC5Wgr2V0kNXwMTWRpG8kllYk3QQ=;
-	b=qA7XEVE8kmjnmUDq8BmivtXUnyPhaZNTv/iAqzG5Lm89s6HEKbobpr98IA+tfPvh9hkN41
-	WXr+fcSQg6KJDfwxAKL1tngtv7oOn4/+InK5jO1k/YDfbRtDeOJpq4WJbVAVbGBsH6dR5C
-	hlLFAA4n8Qz5EQh/BfPvaNRFYBUt6jo=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1784020093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=fp0ZRjg/oOEFcNQzC5Wgr2V0kNXwMTWRpG8kllYk3QQ=;
-	b=qA7XEVE8kmjnmUDq8BmivtXUnyPhaZNTv/iAqzG5Lm89s6HEKbobpr98IA+tfPvh9hkN41
-	WXr+fcSQg6KJDfwxAKL1tngtv7oOn4/+InK5jO1k/YDfbRtDeOJpq4WJbVAVbGBsH6dR5C
-	hlLFAA4n8Qz5EQh/BfPvaNRFYBUt6jo=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1D607779AE;
-	Tue, 14 Jul 2026 09:08:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zsPjM3v8VWrXVQAAD6G6ig
-	(envelope-from <wqu@suse.com>); Tue, 14 Jul 2026 09:08:11 +0000
-From: Qu Wenruo <wqu@suse.com>
-To: linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: do not warn when doing greedy allocation in folio_alloc_greedy()
-Date: Tue, 14 Jul 2026 18:37:39 +0930
-Message-ID: <d10571445ee505d95ba6eaad7558fc1f556d2921.1784020005.git.wqu@suse.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JlMpiiPu"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4758b2a9e2aso2518105f8f.2
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 02:22:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784020926; x=1784625726; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ersi/mYvINkBI2FWvIZV+GjZx0POxK8U4eXz4ZcSu2s=;
+        b=JlMpiiPuB/c2oZZrBc95DV5SlirlC+vI33zg0SPOc/HulQ6PRfzknxCCkoafPIpvrP
+         /EJj/1KtO89mjrSwAg804DK5vh0COyxGNwuawFtnFZ7KMBigbh7Zzl57kK43Uc+sUCpE
+         GCcqSMQeeV9CRff6mbMZEH7sAKA5t6q/8IcQVSdLwXCGd07VBWMpDWIVtj2UX6ZZVhsX
+         0NgcdbBMpU5zzjkqiMRgF/+NQWG+NLTSjvp/R3LTfmwft2KTKXT4bD3XsaWvDLQ9qOGc
+         i61iRKqNiiAd7ancftpI04EnANyP1jtq9AboinBkMGpTe2fYXFve0PE4fjxU28iAycwY
+         oXWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784020926; x=1784625726;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ersi/mYvINkBI2FWvIZV+GjZx0POxK8U4eXz4ZcSu2s=;
+        b=cKpuFJSYsMUv/KahVipNKHWNvcw02tyLL+BBq6GubuGd5BarbKeIElbCWKglkp+bUr
+         oA357p+ahE964SfzMPx++PX0BvsnE8Jirb3dXUW4a+cXaTmUMoKH1J5e4rXiH5DIC/aG
+         M8oXIwHRAg5viflukDQ77g1A5bYPEJEJEJsNeFmnHI20tiIsxvzmhMTyPIfT3Wp7a3Ib
+         YpK978VebRImnQzN3xC44Vm7SqeR9ifNim/2MWZFdS837XLwAmKXzglTMd5G3e7I/EXJ
+         vbMr4QtWD7GJPTk5AeMIsMx7cls8tkWrYpmEguqH/Zw5K8Tzi4TAOqfMYEfPrj7AF1No
+         YR6Q==
+X-Forwarded-Encrypted: i=1; AHgh+Rou4DyImRtcdVoQJX4aPTiJ7ZcNXBjF6VdrPPwon+3dGDh8hmfKKA3hzR9q/mnUIH1mrvl3iBLwGROnBA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv1AfIKIsQBzrTrRGZG1BJFiGaXenA0r6QwHlg3xpK0K6kxYn6
+	dXHp2hcMe2spgcWqQDlEBL/wfeAA9i80vRbWuoW9kJewIatianaB6bKpUcFklC0F
+X-Gm-Gg: AfdE7clOPXIiEijY69KqRyoVFl6sRf9LRt5u9ol+N+ajcpr2AuLoNWKF+1A/ZXp7fgd
+	IpNcs1z/WYqtfKMBvmwMFYDw+TAByIDMYVNFWvkm0xt0+b3hYYz2y+Clc2P8bUrHkpUPohrBVto
+	L2BKFjI8Aj7JclhXGX0oSEaRAlQkTAZTK3hsJwTxEkjXb7zjl1GrjeRh3B1AMag12jAUjcKDMlo
+	cO3jN8vP5+m3LwRJdXqHePlFMzu/8FTkZmGOMzRoJDVdWzNO0z54iANLY1yuCG2Ix5eRI+j+VZW
+	AEqF9nNM3ONcXmOaDH3ROzUc7fhUbA4tZgtye/GxKVoerjST7A1pv9hzXUCI5HApOG8qTMXZ2ID
+	/UU4FIpb+eDX4ReHF7SrvfVNfJpAVVqbeZD7fYx/2rrVC9MMuYgf0FCh1vkEG5W6rZIS7wgCZ9a
+	CK3agSuBwCDD3iJZo6pcqbIpDKoLLzH1ysa12snr1OO4a5LfvmiPGkGLnRgCpxVJ0iqUs28FgAJ
+	KJI9VKvM9mwDZ+/c4e+7DSG7tWKHWnRl+AZfIuDQU584A==
+X-Received: by 2002:adf:e186:0:b0:475:6c34:2120 with SMTP id ffacd0b85a97d-47f4887dd78mr2004457f8f.18.1784020926324;
+        Tue, 14 Jul 2026 02:22:06 -0700 (PDT)
+Received: from [192.168.0.207] (nat-wifi0.uniroma3.it. [193.204.167.180])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f476e9d02sm6291743f8f.19.2026.07.14.02.22.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2026 02:22:03 -0700 (PDT)
+Message-ID: <619bb771-1038-4ec1-8d4c-17dc69df33d6@gmail.com>
+Date: Tue, 14 Jul 2026 10:22:03 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_TWO(0.00)[2];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid,imap1.dmz-prg2.suse.org:helo];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <20260713071828.GB30168@lst.de>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260713071828.GB30168@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-[WARNING]
-During one of my local btrfs fstests runs, folio_alloc() inside
-folio_alloc_greedy() triggered an allocation failure report when trying
-to allocate an order-4 folio.
+Hi Christoph,
 
-The kernel is from the latest development branch, which is utilizing
-the IOMAP_DIO_BOUNCE flag for direct writes when the inode requires
-checksum.
+On 7/13/26 08:18, Christoph Hellwig wrote:
+> Hi Pavel,
+> 
+> do you plan to resend this series?  A lot of people are eagerly waiting
+> for it to land.
 
-Unfortunately I didn't save the full log, only the function and the
-order.
+Absolutely, I'm going to finish v4 next or hopefully this week.
 
-[CAUSE]
-When the IOMAP_DIO_BOUNCE flag is utilized, we will hit the following call
-chain:
-
- bio_iov_iter_bounce_write()
- |- folio_alloc_greedy()
-    |- folio_alloc(gfp | __GFP_NORETRY, get_order(*size));
-
-However __GFP_NORETRY will still emit an allocation failure report
-when it fails.
-
-And folio_alloc_greedy() will retry with a smaller order anyway, there
-is no point in emitting that allocation failure report.
-
-[FIX]
-Append the __GFP_NOWARN flag to folio_alloc() for the larger-order folio
-attempts.
-
-Fixes: 8dd5e7c75d7b ("block: add helpers to bounce buffer an iov_iter into bios")
-Signed-off-by: Qu Wenruo <wqu@suse.com>
----
- block/bio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index f2a5f4d0a967..5ac954c70dd0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1285,7 +1285,8 @@ static struct folio *folio_alloc_greedy(gfp_t gfp, size_t *size,
- 	struct folio *folio;
- 
- 	while (*size > minsize) {
--		folio = folio_alloc(gfp | __GFP_NORETRY, get_order(*size));
-+		folio = folio_alloc(gfp | __GFP_NORETRY | __GFP_NOWARN,
-+				    get_order(*size));
- 		if (folio)
- 			return folio;
- 		*size = rounddown_pow_of_two(*size - 1);
 -- 
-2.54.0
+Pavel Begunkov
 
