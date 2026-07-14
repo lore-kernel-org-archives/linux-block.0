@@ -1,156 +1,146 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2FC364927
-	for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 11:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BED7389460
+	for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 11:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784029079; cv=none; b=Sc7cnP+OONW2ZD/Bcrym0P6ikILrEfNlo2eLOetG2LnV10R5Ed6FmUqgoMTBa8ouaIClmY46O0p7tWCR+bCeuHdoikCqSTbNbPt4JuPABkbHVx/hihU5wR7LnUS5i3DqnATxQ/sASD2XHdPZgyNNj2xaSCEo1qrubj8uC9Ey6nk=
+	t=1784029693; cv=none; b=e7zS0zZQgRnWZEDxkkS/3+h7lpK9o+PlCc0uz7mjIdKASka9j8QXpMbBoHgG91FiGo8SZd6mYGvAEyB+XXS/HHMMA2+qTKhsHwFOmNM35hUNBSOMpPi6ojdcGHVeUmukmtlsAxyvkiBBM1IpQm0A7nK9LId5edX76UCkUhYo3wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784029079; c=relaxed/simple;
-	bh=jvi/C9nTXOmhhjc0Lb9aktYocYiVVnB804trf7lfPrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uWDTWZxX0Dif/v0WdOjT5cZYQ0x6wU2tByEVaRoJl02EnuAgKlECvuivAqM89yGYMhPPoZmXjU0qkRkOqkXAKX3120yLv1BL2Cubss8odf7hWkr8Z8YYyjtVJDmBFlsc+LGvdyV8krTXM+tXxXYQIk3CCZ5p8OaqrzjAFyp5T8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEDllHkM; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1784029693; c=relaxed/simple;
+	bh=NcZZI6DLOn8WnqVj7lun8kCkdomtlBs0wkD14C1RB2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oh8JMpPu+yljUF/sC158GS1iKwtuwnhNzBqIKvo4ykFz28Lpy+h7SQONNlhfu9Tt4l2mcFu7yHX6b9QHzvXCMYwedjOyo1jwBUFwpGRbQE1PJwPMgIKIVhiJUZet/pQC0gUVnN9/PZqbzpeza6KEtLVd23U947no+yRI65UopDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CLe/QcBv; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEDllHkM"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4703bc0a99aso2433772f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 04:37:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CLe/QcBv"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-92e5b048375so264271485a.1
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2026 04:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784029076; x=1784633876; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=b41+ZmPO1kjwWz2S29LAqh9eI9JWVyVGFI2NWPufoa4=;
-        b=GEDllHkMR41S+dFNps77d42LYWFFvUETZcKa6lXe5Jznb1xNebSNVqjLBft4ultjhH
-         qPDxg6pt6SzoDx06feDSqLh/R/K7JoAPcsjhcb5xP4Z9aHTtsfihFjuMh/JfMN4WLDNZ
-         R9oKnySqSg266qG6syoaTLWYm4rD1FlA5PcK0holyYlTikmax3zsgTXs7Zi5uLiG8nGs
-         jcKJBg2m0W4fb7Q3uk4qkVbyYvKB9be78gNuSW4O/uFxwxDKmalSJYbHlVhcUKGo8MBo
-         u5+gwFL/wAdlaKM2RYh+QyfMAASBhfJf8BvWMSjIACaGt4mBpYCGmV3Fra+To33aBy7H
-         Tt5w==
+        d=gmail.com; s=20251104; t=1784029691; x=1784634491; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=CeV9RSdVOzkds4wZ0hwKnF9OcSJyOgbgPYS5NxtvfX8=;
+        b=CLe/QcBvaB7rwm8JAH9vOKiUwWT2qj0ESDCXqE1QfRU5KMooP5sAmt39ObKPomyGi6
+         iYS2OwqAoEPV7t0BblBEDWCgujq2B5y0IEaDAMBGrtVg/zSykjo5XGWisKAgsurcQQLG
+         L0Hi4xKh7K9x5t62btxlGsS5Mz7dzZD/k+/+UgPmXYXGu7CgWeTiIKpV2jYQCuT9Fye5
+         YqbDUrJ8uocBZ1FgruQUJnZJfU4GoxKigheOZTF/7vwy9Zq+Ze02z+Wi+RnwHm70Ujb1
+         WuZfpGSBJwwA6xI7jbelC3R2MPjuuDOCsgJXqhjTcEy6TI2SQWZwMm/FAtIRaqZukbkZ
+         1+Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784029076; x=1784633876;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=b41+ZmPO1kjwWz2S29LAqh9eI9JWVyVGFI2NWPufoa4=;
-        b=YH0aBAbgqyvPvLZUX4Xi9th8fklZgwPoJ7LA0QQJwTw+2/topbMe9uHTAtuON0Lbip
-         W/Bux4LPNIN0FGnY92pr9EKCyNDXw4X9qt/lKrLPfjGGfCgv6Jsbe4LgX1wLQ50VUY70
-         NP7Eo6h1qSAycZAjof1L8j7DCv3UZ4IT4DaWS522FTIWotTVEDzWEhaS/DKbxU+tdW6w
-         zueAFerlxrrJL0s/vMGum+/JUXVYo7AIiS/8oU7A3u2Od9Bi9U8TFrBYSvuFOdl8IThW
-         D+99DrGuG7I1PSQPifV1AiXr0b33bFE+WYBXN5/nX8NciYd0bDmDIKyKYUi0t7Bp6KA8
-         qYGw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrx5P7rnc0bik/QMY+w3prBlce1p/soiy+eMqM0s7PLLRZzLR+ZFFXKT78OFh2eZDCCJkMm75n9HJSueQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv+5WM3vgMMleE+g/XrjUuOMKdqDRuYmYR6AdGc0822FM223c3
-	zyx3vv1lKkWyEGCk0omtZbcHyIyuLd3mxuD4BzynmrlS3sxTn0qk6qAZOftsaD4r
-X-Gm-Gg: AfdE7clFqWqRNbo9p+ZaOIp6YE74AuZro+UPJPN3K4ub2rQVoyIRKtyqJ8+4rbr4j8l
-	R3cj0NyCehB6PLhQO9WBUmX6NP8tEWpSEO/hF+nptbkB8yId+70PJPDqkrt+RKrx7pIFRc4SRdY
-	AvC20nJ03VRtqg9KtEW9lxEuo+jnVbx2oFHdLo5pLf2fGi5gYllJ+KI4gn0ApZaVn42QqsBqAay
-	TY6TXR5tAJ6QadZOWVwwiNxwnlGdlXwkTzrOeaU0rva/JWQv7Yg5USn6hprXOx+zgcbQ6UCV6ff
-	vORcDoiJ2ZgvA1Rup6lXjlDtCVqK2PfNClXWl6xC+oK5kixRTrw2IW8fs2II6Oehxf2kmT06GJ5
-	0ShaLqq+XRuNkl0WqYmNKxw/mz0CTe3fpFG/TABTwhk41Eka5c5zy5bKvfpy4LLQ7i9ZIV16Irh
-	/bnG1bnOZEcLzScE90LvckoV/wK0+scpXPEpQRURe1Y9CChUXvPw==
-X-Received: by 2002:a05:6000:240f:b0:475:f0f0:9f01 with SMTP id ffacd0b85a97d-47f2dd05108mr15393267f8f.56.1784029076179;
-        Tue, 14 Jul 2026 04:37:56 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464d6fa7sm7440719f8f.37.2026.07.14.04.37.55
+        d=1e100.net; s=20251104; t=1784029691; x=1784634491;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=CeV9RSdVOzkds4wZ0hwKnF9OcSJyOgbgPYS5NxtvfX8=;
+        b=QSHFlhRONHzKCCGXsl8Ax41dMC/Ypn5GsEVO9RkJUP7eENN4XtEAjG3vxXQQFIXEri
+         eb4OaDor7Zal01vL/c+U3Nn+W/KKgNhxXnA4HKsazV1L1NPLGyrp9UQXiJG7NHyHXEax
+         3wril4PLY06TonfLtN6Uocvee6/lXX9GQCmH5JutCveYu0IQXWnJqcYogUppF6AJzaGu
+         L+COu9z7bdMQs2Z+/+zUUn1gXmeJeU5pbMpV++rPndaK/u3bPUmswwYQ/byRrvDuQ4hZ
+         BvQzQbWAqJqPLCamIJFDbDNS5AsKmM+EfrUNDkuTzF6bvDKgyqfJ2uUbrRBvW4wvjknN
+         ukAA==
+X-Forwarded-Encrypted: i=1; AHgh+Rr4ohptHtm/jZI5bGlsfKCURl/ZueNJGkDdeHsC565RcEZE5xgBa1HrlpdjuupjsvErvAm1ueb+iiX2tg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0aVfm4v1NZgnPmQJAETPPkSk9ROKzXeejefxEtk5UDjnu9F2Z
+	Mt6bQTcYtwocWG4Y4fjRf3O4cXEADQr/+42YKsbV+phNDbSSnjpRgCe8
+X-Gm-Gg: AfdE7cnzw1HHgdLht2da2OqtJL2KUmAZnQbYmLIKYgsdShrJzeAG6to+X9s+31LC6dF
+	4wlnSM33K8N7qe+cgYNGOIU4B3vSM9NiJNzRLgTpIHxXHdSoQhdNjT+U185kC93AjMUwzEqJ83Z
+	YxJZ9KnqtjlDv71c1v786cZ4uTFSNFQ/MjgkS0EwLM4DJbqQLnTHsKd2xHEYFb8CqUA9/VVAbTt
+	NC70HTZ7JNqFdkx0JuLrHZXeJwo+4PrBye9NjgO3oAxae2jLhjKwqEZsw/eI2fTHHjU4x1jiYB6
+	jhRjGeILmWCyCuYPjt1gwESDFGdasYbmfU/BW3SR5hQCzabftMjQPN6ghP+0BCWuMGyZi7TrQMz
+	gjXQuDOLEJqeCKq0zzemFeEevWEy+MG/RH1jICmkEyzP2IKa+Tb9mjyHo2o12Z3atNpSvAwvSBK
+	3fMHydAvTFOud8NSKKvz/96wDVIG7VkoMnqnvjoDQ9yoLvD/XbxWmv7RvU7Lig6+nYLu+mSx03c
+	fKGSxTjR18dQPXgzfBZ
+X-Received: by 2002:a05:620a:bce:b0:92e:76cd:9594 with SMTP id af79cd13be357-9308683d96amr165376585a.19.1784029690749;
+        Tue, 14 Jul 2026 04:48:10 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd50e082csm183996216d6.5.2026.07.14.04.48.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 04:37:55 -0700 (PDT)
-Date: Tue, 14 Jul 2026 12:37:54 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH] blk-throttle: fix divide-by-zero on legacy iops limit
- of 0
-Message-ID: <20260714123754.7a88a65b@pumpkin>
-In-Reply-To: <20260714103552.1335658-1-cui.tao@linux.dev>
-References: <20260714103552.1335658-1-cui.tao@linux.dev>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Tue, 14 Jul 2026 04:48:10 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Hannes Reinecke <hare@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Philippe De Muyter <phdm@macqel.be>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] partitions: aix: bound the lvd scan to one sector
+Date: Tue, 14 Jul 2026 07:48:06 -0400
+Message-ID: <20260714114806.3761553-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 14 Jul 2026 18:35:52 +0800
-Tao Cui <cui.tao@linux.dev> wrote:
+aix_partition() reads the logical-volume descriptor array as a single
+sector and then scans it:
 
-> From: Tao Cui <cuitao@kylinos.cn>
-> 
-> Writing a multiple of 2^32 (e.g. 4294967296) to a legacy cgroup v1
-> throttle iops file (blkio.throttle.{read,write}_iops_device) silently
-> truncates to 0: tg_set_conf() stores the sscanf-parsed u64 value into
-> an unsigned int field with no clamping. The cgroup v2 path,
-> tg_set_limit(), already clamps the same kind of value with
-> min_t(u64, val, UINT_MAX), but the legacy path never did. Note that
-> the "!v -> U64_MAX" mapping only catches an explicit zero and does not
-> catch a value that truncates to zero.
-> 
-> With iops stored as 0, tg_update_has_rules() sets has_rules_iops[] and
-> the next IO reaches tg_within_iops_limit(), which computes
-> 
->     jiffy_wait = max(jiffy_wait, HZ / iops_limit + 1);
-> 
-> triggering a divide-by-zero oops.
-> 
-> Fix it in two places:
-> 
->   * tg_set_conf(): clamp the value to UINT_MAX, consistent with
->     tg_set_limit(). This closes the truncation root cause (and the
->     general silent truncation for any value above UINT_MAX).
-> 
->   * tg_dispatch_iops_time(): treat iops_limit == 0 as unlimited so the
->     divide in tg_within_iops_limit() is never reached, defending
->     against any future path that could produce a zero limit.
-> 
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> ---
->  block/blk-throttle.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index ffc3b70065d4..3f3c1374f4b2 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -883,7 +883,12 @@ static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bi
->  	u32 iops_limit = tg_iops_limit(tg, rw);
->  	unsigned long iops_wait;
->  
-> -	if (iops_limit == UINT_MAX || tg->flags & THROTL_TG_CANCELING)
-> +	/*
-> +	 * iops_limit == 0 is not a valid limit. Treat it as unlimited so we
-> +	 * never reach the HZ / iops_limit divide in tg_within_iops_limit().
-> +	 */
-> +	if (iops_limit == UINT_MAX || iops_limit == 0 ||
-> +	    tg->flags & THROTL_TG_CANCELING)
->  		return 0;
->  
->  	tg_update_slice(tg, rw);
-> @@ -1386,7 +1391,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
->  	if (is_u64)
->  		*(u64 *)((void *)tg + of_cft(of)->private) = v;
->  	else
-> -		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
-> +		*(unsigned int *)((void *)tg + of_cft(of)->private) =
-> +			min_t(u64, v, UINT_MAX);
+	if (numlvs && (d = read_part_sector(state, vgda_sector + 1, &sect))) {
+		struct lvd *p = (struct lvd *)d;
+		...
+		for (i = 0; foundlvs < numlvs && i < state->limit; i++) {
+			lvip[i].pps_per_lv = be16_to_cpu(p[i].num_lps);
 
-The LHS casts look horrid - there has to be a nicer way to do that.
+p points at a single 512-byte sector, which holds SECTOR_SIZE /
+sizeof(struct lvd) = 16 entries, but the loop runs until foundlvs reaches
+the on-disk numlvs or i reaches state->limit (DISK_MAX_PARTS, 256).
+numlvs is an on-disk __be16 read straight from the volume group
+descriptor and is not validated, so a crafted AIX image with numlvs
+larger than 16 and lvd entries whose num_lps fields are zero (so foundlvs
+never advances) drives the loop to read p[i] well past the end of the
+read sector buffer.
 
-And you don't need min_t() a plain min() will be fine.
+Commit d97a86c170b4 ("partitions: aix.c: off by one bug") hardened the
+matching write of lvip[lv_ix] in 2014 but left this read loop unbounded.
 
-	David
+Bound the scan to the number of struct lvd entries that fit in the
+sector that was actually read.
 
+Fixes: 6ceea22bbbc8 ("partitions: add aix lvm partition support files")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+v2: use SECTOR_SIZE instead of the literal 512 and i++ instead of
+    i += 1 in the bounded loop, per Hannes Reinecke's review.
+v1: https://lore.kernel.org/linux-block/20260606170721.1530005-1-michael.bommarito@gmail.com/
 
+Evidence: reproduced behaviorally on UML+KASAN (v7.1-rc4,
+CONFIG_AIX_PARTITION): a crafted AIX LVM image with numlvs > 16 and lvd
+entries whose num_lps are zero drives p[i] to read past the single
+512-byte sector read for the descriptor array.  The read lands on a
+page-cache folio (not slab), so KASAN-generic does not splat; the
+instrumented run shows the index walking to state->limit (256) instead of
+stopping at the 16 entries that fit the sector, and the patched build
+stops at 16.  Built clean, no new warnings.
 
->  
->  	tg_conf_updated(tg, false);
->  	ret = 0;
+ block/partitions/aix.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/block/partitions/aix.c b/block/partitions/aix.c
+index f3c4174e003e9..689837deba279 100644
+--- a/block/partitions/aix.c
++++ b/block/partitions/aix.c
+@@ -208,7 +208,14 @@ int aix_partition(struct parsed_partitions *state)
+ 		if (n) {
+ 			int foundlvs = 0;
+ 
+-			for (i = 0; foundlvs < numlvs && i < state->limit; i += 1) {
++			/*
++			 * The lvd array was read as a single sector; only the
++			 * struct lvd entries that fit in it are valid.  Bound the
++			 * scan so an on-disk numlvs larger than that cannot walk
++			 * the read buffer out of bounds.
++			 */
++			for (i = 0; foundlvs < numlvs && i < state->limit &&
++				    i < SECTOR_SIZE / (int)sizeof(struct lvd); i++) {
+ 				lvip[i].pps_per_lv = be16_to_cpu(p[i].num_lps);
+ 				if (lvip[i].pps_per_lv)
+ 					foundlvs += 1;
+-- 
+2.53.0
 
