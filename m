@@ -1,90 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368DD3128D7;
-	Wed, 15 Jul 2026 06:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856841C5F27
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 07:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784098070; cv=none; b=Igpo6EBranfc+o1EvjcqtTSeKAtIT4ElMlm0j4fsRlWo5RqZbsou4Nx6IMmFuHfn2IOnnSl7PU3mwgaLLzsnX7qBmTHZ93EHDBeXvx/MWE9wLC4TtaVHpOiGaYnyNaslHj+e1UkmFMgsoHPZvSq6wa9Dl8JvngIGZC6Sp6RK+Yw=
+	t=1784099089; cv=none; b=FpGzhDTZwoF5oRLUUnP+zXRkTvyCQWeNWjPePlKNqpJt9A4xsOqnXMXIdzgIGDyVhAZzzAG5dG3jslCfRqdkOxaqsdIVE54WLYmLDaMyo92AlOdAkNOAiYnmwUupjs0zcV3ZQOOgI06QjlNzc6rBaiMSVjygpOss7ujw6OCVaHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784098070; c=relaxed/simple;
-	bh=Kspjd676zvs0DkYjbeRjHFL+eRleqOy5TmzjeLfcgxg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PSzx5UyQQgmi+8J/y2QtgSOaOy8KhmPJgWkiDlTRd4TvH3jxvjndaMhXKCshghO8HOOcOfxyNSX8YJzbD4sP26we+Bvhd6WS4GIE/jgnyve0FyUeFGX7WrSptMUtU1Gaj/LIulZyNMjPPxWBNL4vfuRsdaAfCu0p26jOhFI8Aa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rxe5BH0x; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784099089; c=relaxed/simple;
+	bh=/zH0H886Ih8K+KPbJ6n56BpNclXSgD3BWLZZmGLMOiw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HzyRZC6YnfvMnYN2dmZwxSoiT26oUwzFTSZP51sr3eLM/BkbqlciuVkIhwTsuowhqwMCJHTk62DX6SH+TXimAF1338NKWXKhtEQgqHC5xKEnCwT6H03n2/vncZ02F5vLzvqS4F+RVbJnEazmh29pSJK6Pn89WiJuiF0uLC/t5FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tfBi9/51; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lYW59uBQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tfBi9/51; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lYW59uBQ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rxe5BH0x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7291F000E9;
-	Wed, 15 Jul 2026 06:47:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784098068;
-	bh=Kspjd676zvs0DkYjbeRjHFL+eRleqOy5TmzjeLfcgxg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=Rxe5BH0xxS8Vh4oYbl/NJWNcYGvgJM17Umbc51sM7xu1SMeV4cV515HpEvcKV4FMP
-	 TGJ8PNvDRgCYG01V10/2gn5Q6f5ZuvzRtp9u8pLjXDAxuYDZUmjxg0UxhJR2UstyQm
-	 QQk0Exe4Ex7DMTCVrb5jDz0CQlyGwXtccd3Fv5EUvYKRyPrOtJ7wl03qR7SDDiSixz
-	 Vvx+lW4UtYvtbN14sNTyGLAY454TSkUZoEZ8NdAShabcq7GngGNDKCIne4gq9uY0XD
-	 W8mnw/OD5Qm36U8Ti0gXvCupfR0ODtgPQgMa4APmfNia4h6YM6yxGVLzQBjGW5yoyE
-	 ryb4o97GKAkIg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alvin Sun <alvin.sun@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, Boqun
- Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6r?=
- =?utf-8?Q?n?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
- <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu
- <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Daniel Almeida <daniel.almeida@collabora.com>, Arnd
- Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, Breno
- Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, Dave Ertman
- <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, Igor
- Korotin <igor.korotin@linux.dev>, FUJITA Tomonori
- <fujita.tomonori@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Arve
- =?utf-8?B?SGrDuG5uZXbDpWc=?=
- <arve@android.com>, Todd Kjos <tkjos@android.com>, Christian Brauner
- <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>
-Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
- driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
- nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
-Subject: Re: [PATCH v8 07/10] rust: configfs: use `LocalModule` for
- `THIS_MODULE`
-In-Reply-To: <20260713-fix-fops-owner-v8-7-2495cfa82d47@linux.dev>
-References: <20260713-fix-fops-owner-v8-0-2495cfa82d47@linux.dev>
- <20260713-fix-fops-owner-v8-7-2495cfa82d47@linux.dev>
-Date: Wed, 15 Jul 2026 08:46:42 +0200
-Message-ID: <87ldbchhrh.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tfBi9/51";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lYW59uBQ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tfBi9/51";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lYW59uBQ"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 202DC78283;
+	Wed, 15 Jul 2026 07:04:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784099085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=moy03FBMAoCRgC1asF1OxnbzQTW9SAkXCZnMHhvA3b8=;
+	b=tfBi9/51IGefLdCEMzsn/+xS9OIXHjuP5bdY9oEQR6U3DSgGuSDpLeVvWj78udqcgBGCXO
+	R08OsvX6mbn+HC9GFMv1cHtPDefKKK7/OSCqokI/bfhKDCOnOSS8TSbipzSmGLmWty5GLO
+	DDlvPbHS74JMxE3CaYOXZOeIepvAxqk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784099085;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=moy03FBMAoCRgC1asF1OxnbzQTW9SAkXCZnMHhvA3b8=;
+	b=lYW59uBQsMHBtDvse9jLZ0mPwC8HDmtnW23F9Sb5UOfhULOwemqZpdVQi/3F7V78Y2kOlD
+	dihzvjjRmOHkn3Dw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784099085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=moy03FBMAoCRgC1asF1OxnbzQTW9SAkXCZnMHhvA3b8=;
+	b=tfBi9/51IGefLdCEMzsn/+xS9OIXHjuP5bdY9oEQR6U3DSgGuSDpLeVvWj78udqcgBGCXO
+	R08OsvX6mbn+HC9GFMv1cHtPDefKKK7/OSCqokI/bfhKDCOnOSS8TSbipzSmGLmWty5GLO
+	DDlvPbHS74JMxE3CaYOXZOeIepvAxqk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784099085;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=moy03FBMAoCRgC1asF1OxnbzQTW9SAkXCZnMHhvA3b8=;
+	b=lYW59uBQsMHBtDvse9jLZ0mPwC8HDmtnW23F9Sb5UOfhULOwemqZpdVQi/3F7V78Y2kOlD
+	dihzvjjRmOHkn3Dw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EEF4B779AD;
+	Wed, 15 Jul 2026 07:04:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3ww8OQwxV2rSCQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 15 Jul 2026 07:04:44 +0000
+Message-ID: <d55cbfc0-a08a-4c65-ba2d-9154768a8f01@suse.de>
+Date: Wed, 15 Jul 2026 09:04:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: handle huge zero folios in bio_free_folios
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Neptune <z1281552865@gmail.com>,
+ linux-block@vger.kernel.org
+References: <20260715064215.2934345-1-hch@lst.de>
+ <20260715064215.2934345-2-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260715064215.2934345-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.28 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.18)[-0.901];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Score: -4.28
 
-Alvin Sun <alvin.sun@linux.dev> writes:
+On 7/15/26 8:42 AM, Christoph Hellwig wrote:
+> When CONFIG_PERSISTENT_HUGE_ZERO_FOLIO is enabled, iomap_dio_zero() can
+> add a huge zero folio to a zeroing bio, which needs special treatment
+> in bio_free_folios by also checking is_huge_zero_folio() in addition to
+> is_zero_folio().
+> 
+> Fixes: 8dd5e7c75d7b ("block: add helpers to bounce buffer an iov_iter into bios")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/bio.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index f2a5f4d0a967..4d6e5f5f5710 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1302,7 +1302,7 @@ static void bio_free_folios(struct bio *bio)
+>   	bio_for_each_bvec_all(bv, bio, i) {
+>   		struct folio *folio = bvec_folio(bv);
+>   
+> -		if (!is_zero_folio(folio))
+> +		if (!is_zero_folio(folio) && !is_huge_zero_folio(folio))
+>   			folio_put(folio);
+>   	}
+>   }
 
-> Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
-> macro with `this_module::<LocalModule>()`, and update
-> rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
-> with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
->
-> Assisted-by: opencode:glm-5.2
-> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-> Acked-by: Danilo Krummrich <dakr@kernel.org>
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
+Cheers,
 
-Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
-
-Best regards,
-Andreas Hindborg
-
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
