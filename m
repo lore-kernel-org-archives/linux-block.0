@@ -1,69 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAD12F8BC0;
-	Wed, 15 Jul 2026 16:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A0838F25A;
+	Wed, 15 Jul 2026 16:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784131304; cv=none; b=SBhU47XidI48tJ5TXHWqa+UG7feEvmmKLBYighGi7PB0+XndtHQLY/eQaAa3wfggahp/9ByFcBmxFFl+4q+9x8xejqX63meyx36PWuRInXvfXPAfQcO/5tIfnaPlEr+i3UEPXEGRESX/mUT+j5wDenLr3L/ZAscURpLrmJGbvk0=
+	t=1784131324; cv=none; b=nZavo2xOQ8K9q03+6c5Lju4ZnpLhAeq2KWx67fI0x1FItmZriA/buX3c2Rb63S77nWPvCnE2gYCtKqmAsE1ETuExEOkeOALkEhDX+9xZpmujsVfkVgS6X6IjkxwtRpVLVVPoneRRvma/rmllSQ+jv9ykTHP2+B2UgEBmet28xeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784131304; c=relaxed/simple;
-	bh=P6+BacNEbPVgCpg/afcY03V/sudTlkKvfLIAg0Q6rfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ea0AbLAXdjIn4LSY9mrQ65nAJmhcPMPuGVXEm7hSlMAoEloOh3QFWwFa3TYJaMtQ6ffnPQS7h+m8y1Y8qbim0BZUySXBYFR3Hsm219ey2wSr0DaBoMz3g8td1qAWDSgki5HKlhgrhIuPZFiL6J4jxYsmX9gwYzd5YjsCE1knjTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRshH5t1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784131324; c=relaxed/simple;
+	bh=CtPnErgxzlUsTa1PT902ZiLrDLKGVfd+NI4BqbPs3D4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=kmcCwg3nICmdaN3gHYIF6GiKEaAm5ahCzmvJGEFRS4cwmWurY6OurdXYLvIk18MGIy119kvhwjNIAaDCvNIgIHH0dcOky59QtfGtILEjcvuh95LVkhfNpql++Bd7KU47TNMKHj4+gd/Mslv/XjtMqD8P1HXUNKbQKzY+ZJZereU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=tdIBtwsh; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lRshH5t1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 879B31F00A3A;
-	Wed, 15 Jul 2026 16:01:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784131301;
-	bh=7tBe5Hh5CZ9elNDX+NryJrxuUN0H1brjZYHGsOoRSfw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lRshH5t1r6At+UCyzxIn+UZOUDMdzTGuGsCYdi9w4mD3TJADafkaaZoT+hRpHf6b2
-	 rQ3vDn0ESOZlZFaHttSqqR8lmF1UKdBMbZP/ky1bwdubAflv3+s75ES+77aMwZm2tQ
-	 xKgxwN4arecU0/X642znBfaNf4XI7cK/e7uLJRxMyYCBR3Kgjtr1CCnLjaYhDWc7Wr
-	 O+BT1ResAyI+plW8ebqO+DUhPC5zOM29lETxU9Nagu9ZissqzUHyUR+MG5sxc9G2e5
-	 /uPKkhHp7XxHIJrcd8iLSSEqYJeWuXQtIzIrmFfjLaqYbMEKMMwwqrmSXRqS0t49oL
-	 ouWLV1Cp4OAAg==
-Date: Wed, 15 Jul 2026 10:01:39 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] nvme/core: advertise BLK_EXPECTED_REF_TAG_CAPABLE
-Message-ID: <aleu49e4GxG-Z7B6@kbusch-mbp>
-References: <20260627061933.2187447-1-csander@purestorage.com>
- <20260627061933.2187447-3-csander@purestorage.com>
- <20260714135310.GB714@lst.de>
- <CADUfDZoGheGP6JCwwV=BCBnqxAspJ1n9Aes=UsjtS-DxAMxeEA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="tdIBtwsh"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4h0gsk2PsTzlfc9G;
+	Wed, 15 Jul 2026 16:02:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1784131319; x=1786723320; bh=CtPnErgxzlUsTa1PT902ZiLr
+	DLKGVfd+NI4BqbPs3D4=; b=tdIBtwshicjSXaFZ5pvrwnjKSx6RrctXnfkxUV9H
+	1FOME0CNUFcCUp1PRoN9orHXIn0DIqQEU4A0FtAlQuX7dQ533uBcNWOHC7sNF8+z
+	1YLvU5JROV45MLPn4BYM9uooPeAnwU/kufB4GIsDVIryN+urmxNHcuMU6TLPTXDk
+	uYu7RXrCGhbFnlRdSI1dewVtroGZ7ORey5yGTb8MuDseTF0FNHd830P1PtkMxLpd
+	bqqtlETxzrRF0aLxGXN9j6LP6rNf8Hd7H5LzAww1bn0JYutvDq1h49+bykRxeEA3
+	PIGhVs3WBKjfapfcep/8GQDvekLD34QXAMw2MwXaqohjCw==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id nRrhdntD9B8N; Wed, 15 Jul 2026 16:01:59 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4h0gsc03xfzlh30R;
+	Wed, 15 Jul 2026 16:01:55 +0000 (UTC)
+Message-ID: <e1f2d5d3-6974-4294-a459-89a5f6c360a9@acm.org>
+Date: Wed, 15 Jul 2026 09:01:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZoGheGP6JCwwV=BCBnqxAspJ1n9Aes=UsjtS-DxAMxeEA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [block?] general protection fault in lo_rw_aio
+To: syzbot <syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Christoph Hellwig <hch@lst.de>
+References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 15, 2026 at 08:30:33AM -0700, Caleb Sander Mateos wrote:
-> On Tue, Jul 14, 2026 at 6:53 AM Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > For Type 2 this remapping could work, but doing it unconditionally
-> > will make all data written using and earlier kernel in a partition
-> > unreadable once this changes has been applied.
-> 
-> I mentioned this in the cover letter (and that's why I marked these
-> patches "RFC"). Unless you have a clever idea, it does seem like an
-> insurmountable obstacle here.
-
-We had a similar problem when we enabled PI at the end of the metadata
-rather than just at the beginning. This left machines unbootable after
-upgrading the kernel, so we have a module parameter to turn off support
-for the feature. It's an unpleasant solution as there's no upgrade path
-to ever turn on the feature without a format first.
+#syz test: git@github.com:bvanassche/linux.git block-for-next
