@@ -1,36 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2666B36A033;
-	Wed, 15 Jul 2026 19:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AC83BE156
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 22:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784144399; cv=none; b=t6IXQU3APLRz7NZAEh87KiU2Hcjgj2luWImaM0/skOc1/Skfs6KLvp2gFbpDOg3ri1/sz5xBTDHIx8Q5H5WsFdhNykm22ifwhRJvvfqPuVPa+kSKw2h+//R4FT35XOXwdy4/QV7nzVRymKKiAv6v2ukBvayNouo7LcddvP/F+AE=
+	t=1784154879; cv=none; b=E6rp8BqlLqozEVGrMJxo67EoLH+WZnQB2FElM1waybEejJU39S7aazpE1/P1j2z+QvlduSzSiyR1jGr4ITVOC9T2UK8GxPWdbDiEGfvvh9SgeDYIcWyhH4Cke9n4zCGmeJahnH5UZcbXFfLjGtEjyZPXCUh8e/4EtxjjAgqjD80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784144399; c=relaxed/simple;
-	bh=bQvxuIC7f71Wke5vQUt2qtJpSa5sPAWw77uMJuFBdxs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nEGs4D0D2Y5yzg2YPVwpDULqnqhIZqBRAawxTwTS0orBgnyFwwr+/p4evVrQOZbLoh53wnQiR/aFCbHds9aAd1IaT4y1Oz7mbuYU8MXNMO48pirfsnza35Lir+yfVH7Xlg1j6g6mOo4SI0dOC2kKzu/smgt8FBIivdf7CdFKVNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXElbKL2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1784154879; c=relaxed/simple;
+	bh=epCF3WAtVK+rHoAAfkpRXRa/RsXFmQXBbOeXNtNyprE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=kfZtJRxKpjruxUOpLC3d3BfKDQSi5X8CqoEiGyaQ0yO2lDQ/PV9pA7veIN7qzz/6Vcd8FRNXtFU+ZjAbMT6iohKJ8vl6+Z4s8+SKfcUK+sdIfv6vf4jexIRl+Yp6BwnQ8/S3IkQaZh1K3Hy5+1vANZeKcY97FRSQwD/1wkJ0UGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=g50754wT; arc=none smtp.client-ip=209.85.160.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXElbKL2"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 630D6C2BCB7;
-	Wed, 15 Jul 2026 19:39:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1784144398;
-	bh=bQvxuIC7f71Wke5vQUt2qtJpSa5sPAWw77uMJuFBdxs=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=VXElbKL2/7jzmZM81akBjJ+5oZoVPHSNy2YYrmu2/hP7j4yOm3+gAlMwXbNjKGXXS
-	 FGtQbauk7E1CbNbB9hwY+kWkEqwo54ni9k7ndlhdOm5NSy4lUg2m0O6KmCLIgOUwLJ
-	 Kh58kEixx33k9nihlAKDMgImdJozM3TBYEDJan/RCub7HU501S/T7Aio4kK35nemen
-	 0D/jMkXsbgYWPatcxM2uMWCgMQnteC5ZdDbsb5pKcfvWMoeZ9xK4T4o7SUUno+ub4g
-	 PGYi0T2OpHFjBmbyHzpFldxPxG8R4og0+yXHxSDxNn6PvFxHDvUh9OVJFyRLrKWZrn
-	 TgEVDRrx6VGSw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5A7C4450F;
-	Wed, 15 Jul 2026 19:39:58 +0000 (UTC)
-From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Date: Wed, 15 Jul 2026 21:39:57 +0200
-Subject: [PATCH] loop: remove manually added partitions on detach
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="g50754wT"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-44caeb973b3so3611991fac.1
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:34:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784154875; x=1784759675; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=OMsKH9F+ormFI1Pys8jKczpMBx0PRFI2SBhZZ0ypZyA=;
+        b=g50754wT3OirDsmAblB+hhBMkqxo4Peg/u97803yY5t2xqzH/385hrjeZ+dlg5P6tE
+         5A3LfzlK+0q9Yg454PhlCQn+jOkK80KFm+3YbBVcXHRD0afc945bHTSz8c1FqdAnjV88
+         rvkX6niE0g53fPovTvhJhmoIvEj2wrHaQs1iNcNtLfjVo/EVWWI54CLPVMs+906Bv1FO
+         cDHStmT1DlZPe4x0zKWuA13EkT1m4nzoOEAlg4uGRov2gipCvTkTSTrJSdSeenfr9uyn
+         4LMWJS3Or6h2d/0loGoLJ/ImA+1ZEaeseRqjCKZafF9Ec+5OYTdSHF93jyFMw6OxZMFp
+         Dwdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784154875; x=1784759675;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=OMsKH9F+ormFI1Pys8jKczpMBx0PRFI2SBhZZ0ypZyA=;
+        b=HFGbka37mHgMuqPf1BKfg4+72PAtyAC9XjN27bddRiRIW/lRvrPzdB0BfmWd81wran
+         6dbYNWy9KFUEg+w2oSTsjmqhB0W8HBAPmpWIMtLrETPcVM0i51FL5cgv8BVMo1yCSkK7
+         P80nOhd35m0xH46t4XEJDhyn54yTj0uXfiMEH2KH0UXncGktAHJgKEGDBQDUCXvRP+lh
+         DNNY3LmLF53xEF873vsclRYCd6co7yDgzaU9xPlSCOkuN+VtpE6aelaet7ASBdZTNmVr
+         oPI9E3xQuUjm9rcppz8wLrLymzWQWmNw+jxPH52IX3hS66vx3RnWFHUU1cLRGFwt9L08
+         GwyA==
+X-Gm-Message-State: AOJu0Yz9lDntLNkTakM0iGw7P9LT6dqrSGZQxhCuiGLiOPHQopqkzLG5
+	3PCulj8Ytq0Dfw5gtvRuVIxMklEM5OK1vAI7uq0qte3ZP4t8IwsmSNOzuDL/0pcauVg=
+X-Gm-Gg: AfdE7cntEB0iHD0q3j2s1yFBffTugTw617JpISiAJ6I+53O+yh6X9LteW2TKUDoa4vl
+	GF4AJoWtO1OuVOPs8t/wBSziX4NpMN47AaxxHu62+hc3pojgvPZAbSMk6cvcGIAQ9wfXCn0QfFf
+	CMenrjI/b19LYOED5JaULKMVqcxbAmtxo66i3GTjYXTSArZJbvWcLxHqeARnJ5Ut2+FZL7fysnP
+	msT5qWnh+FQ8pPwtvahrk8tmRtVhEWApAyK2Hli5AFLXQF0GbFgu/smSH5IPGs/0xWg6dBNI5mN
+	91kZecr34cEycfT54twpX7oOStF7sr1SYtKA3i3MPmp14AU7Niri3NhXBPztSPLegjzdRfSyC6I
+	PikXCy1HdhzVIu/tAik2KcKhPxIKaWxh7skcJUY40RvhfVQEuX03l6/s9oToPAxnhJ3ctcKsy6c
+	ecKc6mDMHSdyzGxjdR442v+3Mt6ksqgm5ZTzT9iy9MCItBLaf8jYKKpyM=
+X-Received: by 2002:a05:6870:65a9:b0:43b:637b:c33f with SMTP id 586e51a60fabf-455f7a2d10fmr5770132fac.6.1784154875484;
+        Wed, 15 Jul 2026 15:34:35 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-45200b7b4c5sm14362722fac.10.2026.07.15.15.34.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2026 15:34:34 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Usama Arif <usama.arif@linux.dev>, Mike Waychison <mike@waychison.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+In-Reply-To: <20260715192950.2488921-1-mike@waychison.com>
+References: <20260715192950.2488921-1-mike@waychison.com>
+Subject: Re: [PATCH] block: fix race in blk_time_get_ns() returning 0
+Message-Id: <178415487451.159585.8139693010371927224.b4-ty@b4>
+Date: Wed, 15 Jul 2026 16:34:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,118 +75,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260715-b4-loop-partition-cleanup-v1-1-b9f59910cd1e@amutable.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMSw7CMAwFr1J5jaW0Kv1wFdSFEwwNKmlkpwip6
- t1JYDlP82YHZfGscKl2EH579WvIUJ8qcDOFB6O/ZYbGNJ3p6zPaFpd1jRhJkk/ZRrcwhS2iGdt
- +MM5042Ah/6Pw3X9+7ev0Z93sk10qwWJYUkYrFNxcphdpYoHj+AKW5WvWlgAAAA==
-X-Change-ID: 20260715-b4-loop-partition-cleanup-094780c0698b
-To: Jens Axboe <axboe@kernel.dk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
- Christian Brauner <brauner@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel test robot <oliver.sang@intel.com>, 
- Daan De Meyer <daan@amutable.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784144397; l=3576;
- i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=fPPZWG7NW2GU2Hqco/N/7L2VKe873LLf2vvD1GDAenU=;
- b=22HVTNT37nM6PwWYG6lZ2ORtb4FLk5KkfK15gwheSmG8xZJ5VW/9p98XNlXMHYtT1vtHArG4H
- ZsmQlUIZmXPAp2O5GQQBJTPXyQdDf+DScPjisxMrLA4/aZOFi8GPDmw
-X-Developer-Key: i=daan@amutable.com; a=ed25519;
- pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
-X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
- auth_id=868
-X-Original-From: Daan De Meyer <daan@amutable.com>
-Reply-To: daan@amutable.com
 
-From: Daan De Meyer <daan@amutable.com>
 
-Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from
-setting GD_NEED_PART_SCAN because loop devices with LO_FLAGS_PARTSCAN
-rescan partitions explicitly. However, partitions can also be added
-manually with BLKPG while LO_FLAGS_PARTSCAN is clear.
+On Wed, 15 Jul 2026 15:29:50 -0400, Mike Waychison wrote:
+> blk_time_get_ns() populates the per-plug cached timestamp and then
+> returns it by re-reading the field:
+> 
+> 	if (!plug->cur_ktime) {
+> 		plug->cur_ktime = ktime_get_ns();
+> 		current->flags |= PF_BLOCK_TS;
+> 	}
+> 	return plug->cur_ktime;
+> 
+> [...]
 
-When such a loop device is detached, __loop_clr_fd() skips
-bdev_disk_changed(). Without GD_NEED_PART_SCAN, reopening the unbound
-device no longer performs the previous lazy cleanup, leaving dead
-partition devices behind. A subsequent LOOP_CONFIGURE can then fail its
-partition scan with -EBUSY, as seen in blktests loop/009 after loop/008.
+Applied, thanks!
 
-Call bdev_disk_changed() unconditionally during __loop_clr_fd(). The
-disk capacity is already zero and the release path holds open_mutex, so
-this drops all partitions without rescanning the detached backing file.
-
-The new blktests loop/013 case covers this sequence by adding a partition
-with BLKPG without LO_FLAGS_PARTSCAN, detaching the loop device, and
-checking that the partition is gone when the device is reopened.
-
-Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202607150754.b660f5b9-lkp@intel.com
-Signed-off-by: Daan De Meyer <daan@amutable.com>
----
- drivers/block/loop.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 310de0463beb..1faecef33009 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1113,6 +1113,7 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	struct queue_limits lim;
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
-+	int err;
- 
- 	spin_lock_irq(&lo->lo_lock);
- 	filp = lo->lo_backing_file;
-@@ -1146,26 +1147,21 @@ static void __loop_clr_fd(struct loop_device *lo)
- 
- 	disk_force_media_change(lo->lo_disk);
- 
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
--		int err;
--
--		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
--		 *
--		 * If the reread partition isn't from release path, lo_refcnt
--		 * must be at least one and it can only become zero when the
--		 * current holder is released.
--		 */
--		err = bdev_disk_changed(lo->lo_disk, false);
--		if (err)
--			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
--				__func__, lo->lo_number, err);
--		/* Device is gone, no point in returning error */
--	}
-+	/*
-+	 * Remove all partitions, including partitions added manually with
-+	 * BLKPG, which may exist even if LO_FLAGS_PARTSCAN is not set.
-+	 *
-+	 * open_mutex has been held already in release path, so don't acquire
-+	 * it here.
-+	 */
-+	err = bdev_disk_changed(lo->lo_disk, false);
-+	if (err)
-+		pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
-+			__func__, lo->lo_number, err);
-+	/* Device is gone, no point in returning error */
- 
- 	/*
--	 * lo->lo_state is set to Lo_unbound here after above partscan has
-+	 * lo->lo_state is set to Lo_unbound here after removing partitions has
- 	 * finished. There cannot be anybody else entering __loop_clr_fd() as
- 	 * Lo_rundown state protects us from all the other places trying to
- 	 * change the 'lo' device.
-
----
-base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
-change-id: 20260715-b4-loop-partition-cleanup-094780c0698b
+[1/1] block: fix race in blk_time_get_ns() returning 0
+      commit: 691b052139c94ee6640ac39e0b764dd3867897c0
 
 Best regards,
---  
-Daan De Meyer <daan@amutable.com>
+-- 
+Jens Axboe
+
 
 
