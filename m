@@ -1,124 +1,137 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B98C353A7F
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 12:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5E74418DC
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 12:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784118053; cv=none; b=rModulR3v0Riv2cnwWTtat8q+vqLUwGPwkLZkLWe3fP6klb3E81BNzx+ZdcDF+moSHgdetaTxwFeGQ+AFH1cFBn7+7bVRPp/GhyKRu4IZk6Utd37ZzqIbrDTn6NNzB4hgHL8A/0p3IdUaPusFPHrpvE7wuGrFxBUe+lxelZ3F1E=
+	t=1784119501; cv=none; b=jpyk6OTAuRU7IT7nT51P3pxjzXCGIjcMYYNEKBcU1xhUNopyu2jD5yknVfUspzIOL4tkMceyE8hK4MAHJs1T3HYW0C3MluajyqscT63PKkdeEKiQ/mFdRj9e2k3/wqyOI1ZmZSS/VFSHn4qD+3sopH8RwHGqpCQBpSQ48NvGUwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784118053; c=relaxed/simple;
-	bh=ck+1Qemtg0EsT5LFvjN/87xZgLtSEv3ee6bOMqDUWK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GMFXeKe9bin22z1puAF8Pw7ouaWl1r7FffRKc0QWcAFKPJcbRTxzkBI4v5gP1aiL3emEwSp+5MRGyEFU8qy87Q2QM8+rkuXzE8JVQSKKP87Slcg40lvxHQ2GrduCZXnrR2GAfJPf1epfZFj6qOZ4gLJjtBdXlSoVgxJIayvshDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tObKmBi4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=91ZvY8fG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tObKmBi4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=91ZvY8fG; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1784119501; c=relaxed/simple;
+	bh=Z13mCUbakk2/eWKWVOW9JmH2y08kjCRmD4nBz4zwb/k=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pTZ+SzZpJiq1qkXNZ+q3l80Toy8CyAGPE8ILnPBm6g0pH4TgdFFYjiUsO3vsxT2aeWqVtXMIkW++1e6VmrvjR1P9OAMcontIwQ+QpDUNvafNAC4eQq69PtKx+bPU/3NhH5j9nFmxBExmy5cMw2gP1BteQjkwUTcuyS1oV1shfJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fWO690wB; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tObKmBi4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="91ZvY8fG";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tObKmBi4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="91ZvY8fG"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 605213E41;
-	Wed, 15 Jul 2026 12:20:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1784118050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fWO690wB"
+Message-ID: <882fbac2-bd42-44a7-8fba-b387b3f0fb2b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784119481;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IDqIdcZkl5wMk5+BaKH82ykdei6aC8VXm1/goFEqohQ=;
-	b=tObKmBi4kD240+5jFg1/HvfThYVwFhh37YIRtiSqpSzSpMAKVzRs/zqlqozAI32jj5K/Ca
-	iIyV/7tZ5hIaI6NiJLq7e5Q5zf5EY8iT9VXoqqSbMm9EdD1wLKNBTn0NZaITM95hpyXi9c
-	cFwuF5M3wV3ewphrz51OPtLgOXvZpyc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1784118050;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IDqIdcZkl5wMk5+BaKH82ykdei6aC8VXm1/goFEqohQ=;
-	b=91ZvY8fGeNhJYeZ/jTEnRwR8H+qtDA9dJH8VpBwG27SbvenZovIWtFV4RJNJSyBRaXXCB8
-	O5tbWCUdIuZbfEBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1784118050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IDqIdcZkl5wMk5+BaKH82ykdei6aC8VXm1/goFEqohQ=;
-	b=tObKmBi4kD240+5jFg1/HvfThYVwFhh37YIRtiSqpSzSpMAKVzRs/zqlqozAI32jj5K/Ca
-	iIyV/7tZ5hIaI6NiJLq7e5Q5zf5EY8iT9VXoqqSbMm9EdD1wLKNBTn0NZaITM95hpyXi9c
-	cFwuF5M3wV3ewphrz51OPtLgOXvZpyc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1784118050;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IDqIdcZkl5wMk5+BaKH82ykdei6aC8VXm1/goFEqohQ=;
-	b=91ZvY8fGeNhJYeZ/jTEnRwR8H+qtDA9dJH8VpBwG27SbvenZovIWtFV4RJNJSyBRaXXCB8
-	O5tbWCUdIuZbfEBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4B253779AD;
-	Wed, 15 Jul 2026 12:20:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id lnidECJ7V2quTAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 15 Jul 2026 12:20:50 +0000
-Date: Wed, 15 Jul 2026 14:20:49 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org, hch@lst.de, 
-	linux-nvme@lists.infradead.org, John Garry <john.garry@linux.dev>
-Subject: Re: [PATCH blktests] nvme/069: add a test for multipath cdev lifetime
-Message-ID: <7f5c5f13-78a1-4d66-bdc4-e2e2260dd949@flourine.local>
-References: <20260714094345.3370884-1-john.g.garry@oracle.com>
+	bh=W/AULJBPGThMdnA0tzmgbmYa+mAU/00kSN7xatYKRAg=;
+	b=fWO690wBzePos0ZC41kuuDNM8sVZqLVxEMHoTKZKM+z5izjTgG0PTb8GKSIt+lJpqHRw05
+	lIIZ+C+q70zFfdYGqMrUsFCnLdwIcyaIRFRQg2Zgjq60IZ08Un5ol4ziofVIWiudMPimPN
+	S8kQ+SBV6OGIbLSKrMYlHq7kGtKdWBk=
+Date: Wed, 15 Jul 2026 20:44:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260714094345.3370884-1-john.g.garry@oracle.com>
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,flourine.local:mid]
-X-Spam-Level: 
+Cc: cui.tao@linux.dev, axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+Subject: Re: [PATCH] blk-throttle: fix divide-by-zero on legacy iops limit of
+ 0
+To: David Laight <david.laight.linux@gmail.com>
+References: <20260714103552.1335658-1-cui.tao@linux.dev>
+ <20260714123754.7a88a65b@pumpkin>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20260714123754.7a88a65b@pumpkin>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 14, 2026 at 09:43:45AM +0000, John Garry wrote:
-> +	# nvme-delay-ioctl will open the nvme-generic cdev, sleep, and then
-> +	# issue an ioctl.
-> +	# We tear down the nvme-subsystem in the foreground so we can catch
-> +	# if the ioctl triggers a use-after-free KASAN warn.
-> +	src/nvme-delay-ioctl "/dev/$nvmegeneric" &
-> +	sleep 0.5
-> +	_nvme_disconnect_ctrl "${nvmedev}"
 
-The sleep above is to give nvme-delay-ioctl enough time to setup,
-right? Would it possible for nvme-delay-ioctl issue some signal (or any
-other working sync method) and we just wait for it to show up? IMO sleep
-should be avoided if possible.
+
+在 2026/7/14 19:37, David Laight 写道:
+> On Tue, 14 Jul 2026 18:35:52 +0800
+> Tao Cui <cui.tao@linux.dev> wrote:
+> 
+>> From: Tao Cui <cuitao@kylinos.cn>
+>>
+>> Writing a multiple of 2^32 (e.g. 4294967296) to a legacy cgroup v1
+>> throttle iops file (blkio.throttle.{read,write}_iops_device) silently
+>> truncates to 0: tg_set_conf() stores the sscanf-parsed u64 value into
+>> an unsigned int field with no clamping. The cgroup v2 path,
+>> tg_set_limit(), already clamps the same kind of value with
+>> min_t(u64, val, UINT_MAX), but the legacy path never did. Note that
+>> the "!v -> U64_MAX" mapping only catches an explicit zero and does not
+>> catch a value that truncates to zero.
+>>
+>> With iops stored as 0, tg_update_has_rules() sets has_rules_iops[] and
+>> the next IO reaches tg_within_iops_limit(), which computes
+>>
+>>     jiffy_wait = max(jiffy_wait, HZ / iops_limit + 1);
+>>
+>> triggering a divide-by-zero oops.
+>>
+>> Fix it in two places:
+>>
+>>   * tg_set_conf(): clamp the value to UINT_MAX, consistent with
+>>     tg_set_limit(). This closes the truncation root cause (and the
+>>     general silent truncation for any value above UINT_MAX).
+>>
+>>   * tg_dispatch_iops_time(): treat iops_limit == 0 as unlimited so the
+>>     divide in tg_within_iops_limit() is never reached, defending
+>>     against any future path that could produce a zero limit.
+>>
+>> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+>> ---
+>>  block/blk-throttle.c | 10 ++++++++--
+>>  1 file changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index ffc3b70065d4..3f3c1374f4b2 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -883,7 +883,12 @@ static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bi
+>>  	u32 iops_limit = tg_iops_limit(tg, rw);
+>>  	unsigned long iops_wait;
+>>  
+>> -	if (iops_limit == UINT_MAX || tg->flags & THROTL_TG_CANCELING)
+>> +	/*
+>> +	 * iops_limit == 0 is not a valid limit. Treat it as unlimited so we
+>> +	 * never reach the HZ / iops_limit divide in tg_within_iops_limit().
+>> +	 */
+>> +	if (iops_limit == UINT_MAX || iops_limit == 0 ||
+>> +	    tg->flags & THROTL_TG_CANCELING)
+>>  		return 0;
+>>  
+>>  	tg_update_slice(tg, rw);
+>> @@ -1386,7 +1391,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+>>  	if (is_u64)
+>>  		*(u64 *)((void *)tg + of_cft(of)->private) = v;
+>>  	else
+>> -		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
+>> +		*(unsigned int *)((void *)tg + of_cft(of)->private) =
+>> +			min_t(u64, v, UINT_MAX);
+> 
+> The LHS casts look horrid - there has to be a nicer way to do that.
+> 
+> And you don't need min_t() a plain min() will be fine.
+> 
+Hi David,
+
+Both done in v2 — introduced a void *field local so the writes read
+*(u64 *)field / *(unsigned int *)field, and switched to
+min(v, (u64)UINT_MAX).
+
+Thanks,
+Tao
+> 	David
+> 
+> 
+> 
+>>  
+>>  	tg_conf_updated(tg, false);
+>>  	ret = 0;
+> 
+
