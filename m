@@ -1,148 +1,157 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B24420481
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784129447; cv=pass; b=OKzgz1nNKlscs7pzKVTy0g2eJ81UplqJJsqLkWkIapQ3Wu0XqI8EGVAg1hpDa8YyRtehGqV5+V8byqCVgx1qVaNeg4ZXSm3ZO9NS1bdp9DKAdiW1X7SeMQKOWLx8nSqrVQpwf7lAlZhzc38yiTXSPRfbCptW+U+IpP4mA3ce1gQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784129447; c=relaxed/simple;
-	bh=oih6BEAC9IlPg7VwsK03FEa6S4q91uost2WmMEnafbw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z4J27JdHFTy3W8C4SKCe3iCmtobBrbig45hrKfgcXcTUAEsnUKcupLBlfOCHuecfNXYyLQFpgIndot9VrzHArxzbONNcy5tHBOCNq7QLhEyRQZIyg9bbe9Hn7vFoCMByI1ukwjrw9JNpmqD1srUkmnu+AdspDJsRwxAypevxLPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JyTpB0lQ; arc=pass smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2839A48A2A3;
+	Wed, 15 Jul 2026 15:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784130460; cv=none; b=lVgjghWYksC+noLc753d6JmeWc2OeRfGJaqieXzNvwCyEU0YwdGDCF84agw/VWiowI+hjxJv+tMryf+C+8lQLMtDokDGK0gy1oe887BMm2PQThm+5iWwGhk1pz3gTx/A6NZ7y+Cll5qN+HKgl3tUjwlbN3Obc2dOxWSPzCvyUJU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784130460; c=relaxed/simple;
+	bh=/xC2WGDNLvQzAimd6hKP2dg2bLuehJ+Iq7jh5SpJA2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ShllHS8c2xHyFK/uwc7JBcOH48H6TFyWzacZQHu8bexWegoVJiKTjY5mBclxg9NEVwf3mx7z4QH8vtQJKGBgl0/uqiwqsqg3JVzpluMLHxEgHna4B+NRGQMzTprD74vcAH5ljht5qAqof19DFUTak9hbgzl7OCV9sBzw1jOxvtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WSoiT7XY; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JyTpB0lQ"
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-6a3dabf2d61so48583eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:30:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784129444; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Ikb1Wp0KnT9PchVVm66RG+rioFtay/GzA/mjiyoD7bWjRDm4ot7ce6/OGkLGXMs/8a
-         tvZL5lgvC4sxj6+1U69Dlh8LKSzGnBCWqRgblyoZ5WGUCGSfTRXslp5AE4cmvmthw4to
-         AVGclil6ERKjwSMGhsC2fC4bYIAkIxJ+18k+BuuOEElhAauUfo0LaSVC6zhr7TsZmZFq
-         zY7NE+YuU9uJNpZD9GfRKX40/Py0kbqUSYot2yA4AmHqn03P/0nsEKCGYDjsFUpShBqP
-         kV7JCARxl3DHFhObzxwh5TXKl/+R1mRuho9azfO6DcT3Gy9xXdSqDT1kIu2xpO6MA6BG
-         EZkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
-        fh=PcgzSuBgc+xtFehY+yeRFIlXX12yQNgPfqmJEs1pbbU=;
-        b=DlAzmvf9J89RXHhhcSh0fjrDeYTB8TR8n7QVNYcZDg4NqiMc/dKRg6tp3MxEcS9oor
-         Bp8CZhk18o6ypXhQ/vPtD2BMCfsC+XZ8qpBFo8hhZs0/D1Tl8A6BdJQ3Oxdq1V1fdDp9
-         eRVCaov7HXvJpolSoFkpuY9LYv6kcGGIyiSP+bk2MydYlBZkYpD6IqKa+0zBd4Y+cBJZ
-         Sb7stmzAEvuAktfs08L7bn5IMPzvSc7Tny2SDf1OgbH9/ZCs1JnB4PcCGKAz9Z+QELEV
-         daBYMBgXP5O1kilJntYDIeVlmEKLKbCH5PauiYvztOSQCTwm9HoZ9t8qfYyDSO+eAimP
-         p8JA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1784129444; x=1784734244; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
-        b=JyTpB0lQl1DpFqRY36xy7GlKlRfruwo9ErAvpG4MTdiIUierWKGpyV0JkoADMm4sPf
-         qCZBt/7QNnfdyRBeEqouVC4xdc931l92aCDT0vK8zlISLlwNm+4h7FhN2MoInQwE6xx3
-         8vHCgMbECqVHQw4Q0CatYB54eshrAoYbVuCT7n7GKhn1I/d1ARElGKFMIbx6+1rQBTsw
-         PfVOcXotlBZ5QzmVhqxlszI7C9jtDnUisr2RL14ApEjxUWebPZXCJrX+fW8l5P8AbEjh
-         gxX42RAvNJfVM/k5RJBbtLN4aUzkMv/8Q3QDnPLI//3GI+MUDGjilh1M9Po5uitcyDGX
-         +Xeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784129444; x=1784734244;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
-        b=P5BUFYwVQHVPGp5YaUSWKzCIsGPZzhwl6TXlS7M/1njnU0TTYz60v3pwW/Y7JX76Pr
-         tFKfIv8d7Wqb41pMRXUVwdYQ2kFqmiaQCL62DidnfeSxHYaC/33rqb6//hqJjE98YxOv
-         qITFvO3b52rbbh0tWb5JNhrLIb/RobGFoZA0ThR8yuw5HJASyKil09gxnZKLDKejgzZW
-         czOx7z+W+wvVQnO8e3m0fHMiBe4uy2JXvHh5CvTeSFmFouP+SonpnulzmhTIv6+HhW4s
-         WheMA5aR8FT0AQCgWr8uJ6v+2zeax7yIgRKz/w+kIuBooTzbg3RxR9AoryYDkNSjhTam
-         aWIQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rrk8clEzEy3mBr6Z6l5bm3ETylH11bLaJ1xXnzkHO5AGItzTAdviWBi+6iSRRECzB/ugxflwvEOs+4Ycw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO5+nOS0jg00qdNIj2ftLK0H8bNwZ9uSs7tSs+i1I/MHbNPg3H
-	+vrMUX2qzR4vhKw6P3yiqU1UVxZnX7oZrdYeqweSlK+i3AA8SMmqBG4Cm4xP/5aJAE55H5Twrn8
-	ZLRrYa98/SpdFJUcgZu/QQs+y5O1KhIErffcQ+X7nFw==
-X-Gm-Gg: AfdE7cnKTO7W2+qcbboTePrH6IambLAxD78spPUxthwgnvXodOh/cozpV/ONW8bGSBg
-	kaxF+kvb4AEMKYc3ARy4rg5GaHj5dnXgI2MYwZ/eHf/bYELXjzNwNkybh77NUTK1m3FUG/hBr0E
-	9mr2Hiz+WcINWr9eC23g5lC6rsDH7u682o1cAtAixncrg/ocTtJzpCOMrSWbEXpAxzli+3q4HE6
-	O6xiKjrWfir1Pt6/7vVOYLWfnJGSOckF1Ftc9AMTaGcYVhEfJUcVJVq1ReLGCRHUv2UuCYy
-X-Received: by 2002:a05:6808:191b:b0:485:7c46:b870 with SMTP id
- 5614622812f47-4a42ac4c1d1mr7855454b6e.2.1784129444114; Wed, 15 Jul 2026
- 08:30:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WSoiT7XY"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66FEBwVU381413;
+	Wed, 15 Jul 2026 15:47:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=35wtI0
+	BkWrzWzWrTR8z5SkAaND2VzkmJ5qaRGOp68yA=; b=WSoiT7XYt2t6oiwtIKObm3
+	uIiJBAbIdY23PNtmtYOoGdUkskMMjptBieTKaCObH2E/ure2q+PCeXo/4j8RgTiU
+	tDemU5KtoWypQvYNwftlPUXpgLMHdyUKF3twgxefacAO64aC+yAVS7xM5chZrNU0
+	BVzGD18Thy1xBGcwuApIighYHiMRvKhiQEWSjJugUwB3RVL2OyLYWzsaV33A/nSa
+	90PAfez2Q0Gh7s9LStmekA70iBGFIn58USEhHskripcjEGZHCPG7NsMgX7k980fN
+	a7uRCczvbwnjNivxvkQQsYPEx8PYZZ9NK99U1chTyB5jW5cuaRhL+M3WhQ/rBIMg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegbusn6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jul 2026 15:47:27 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66FFYaAW020029;
+	Wed, 15 Jul 2026 15:47:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fc15k0qd3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jul 2026 15:47:26 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66FFlOKt40960486
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jul 2026 15:47:24 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9EC8720043;
+	Wed, 15 Jul 2026 15:47:24 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5173920040;
+	Wed, 15 Jul 2026 15:47:24 +0000 (GMT)
+Received: from [9.87.130.177] (unknown [9.87.130.177])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Jul 2026 15:47:24 +0000 (GMT)
+Message-ID: <cd1aa844-72bc-45af-a907-98baa234c510@linux.ibm.com>
+Date: Wed, 15 Jul 2026 17:47:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260627061933.2187447-1-csander@purestorage.com>
- <20260627061933.2187447-3-csander@purestorage.com> <20260714135310.GB714@lst.de>
-In-Reply-To: <20260714135310.GB714@lst.de>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 15 Jul 2026 08:30:33 -0700
-X-Gm-Features: AUfX_mxo7lB146q5JXEsmTmctGA9iKJ24a4jDXPS2pCRNBa9UNhJ5U7jlOaJJJA
-Message-ID: <CADUfDZoGheGP6JCwwV=BCBnqxAspJ1n9Aes=UsjtS-DxAMxeEA@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] nvme/core: advertise BLK_EXPECTED_REF_TAG_CAPABLE
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nbd: reclassify u->iolock of AF_UNIX sockets
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>
+References: <20260713181401.11088-1-borntraeger@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20260713181401.11088-1-borntraeger@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a57ab8f cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=5468bmbA8M3FRU0-7hsA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE1MDE1NiBTYWx0ZWRfX/Lw+ARBgyxkv
+ 3MNeOXkoAEuFfVBgJY9D3vumhrhHitlLTJ9s2daBvzBDpcUhRgtTJmdBoCma0GTH41NJGxNN3Gx
+ /ekiOcVK2b7BUS4UIoHOm5sZvJ9oqkgWROkG171MmLkh1l4ergUrpJ4CRzOL5s0f144m2+r7UG8
+ DMveYxyHs581AFjz/ZXI5bSS21acZpDh9AYvBx3dcXB/Cos1+lrKOYQ1khVXqaXZ7awksD/xLKr
+ BYJ803kGlB/5dBLTAARZUiBvhESVObegPDSXnfHTZDUM6mg153VvUX5ttKUqK/jDH7DeZwutBdg
+ FbwVKv3bzeeaNIn5pCWuAQmiyC0nroP3LbYgiLf2v9vnSUqeBZ/uwbogYQfeFNZX+zHVjKWsWHO
+ LqsQdFIPOikzY86x/0JcMkoUSj9Anz0i4kVIA0YscFoCTJh2A+GvJYiLU455G8BQqK2JjZ4a7RA
+ XiCRlVMbvPPi66YppNQ==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE1MDE1NiBTYWx0ZWRfXz/wCgYlkx2mH
+ B373Q2OTFNa6otHAwoj/IJWzhj27jeH2tNBfPX/r+HAIrJvOnmO9fArIPj1jWjydWcaPvdwuy7g
+ aRGYuBu72IjI/1Ybmmfzth8gcWZV8Kg=
+X-Proofpoint-GUID: TnhTNyQXiC6lqG9aiFpBKjjU2JfvXyCS
+X-Proofpoint-ORIG-GUID: Q1K_-aQwUXmt2bXPqC8GRLNANVgiMytF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-15_03,2026-07-15_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607150156
 
-On Tue, Jul 14, 2026 at 6:53=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> On Sat, Jun 27, 2026 at 12:19:33AM -0600, Caleb Sander Mateos wrote:
-> > NVMe Read, Write, and Write Zeroes commands include an (E)ILBRT field t=
-o
-> > specify the expected initial reference tag for the controller to check
-> > against the ref tags in the protection information buffer. However, the
-> > NVMe driver currently always sets (E)ILBRT to the lower bits of the LBA=
-.
-> > The block integrity layer generates/verifies the PI ref tags according
-> > to the bio's ref tag seed, so it must "remap" the ref tags, adjusting
-> > for the difference between the ref tag seed and the absolute integrity
-> > interval number (=3D LBA).
-> >
-> > If a request has an integrity payload, set (E)ILBRT to its ref tag seed
-> > so no ref tag remapping is required. Set BLK_EXPECTED_REF_TAG_CAPABLE i=
-n
-> > NVMe devices' enum blk_integrity_flags to skip the block integrity laye=
-r
-> > ref tag remapping.
->
-> I don't really understand how this is supposed to work.  For type 1 PI,
-> NVMe requires (E)ILBRT to match the lower bits of the start LBA:
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 8f10762e90ef..a811e431b47a 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -32,6 +32,7 @@
+>   #include <linux/err.h>
+>   #include <linux/kernel.h>
+>   #include <linux/slab.h>
+> +#include <net/af_unix.h>
+>   #include <net/sock.h>
+>   #include <linux/net.h>
+>   #include <linux/kthread.h>
+> @@ -1241,6 +1242,7 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+>   #ifdef CONFIG_DEBUG_LOCK_ALLOC
+>   static struct lock_class_key nbd_key[3];
+>   static struct lock_class_key nbd_slock_key[3];
+> +static struct lock_class_key nbd_unix_iolock_key;
+>   
+>   static void nbd_reclassify_socket(struct socket *sock)
+>   {
+> @@ -1267,6 +1269,17 @@ static void nbd_reclassify_socket(struct socket *sock)
+>   					      &nbd_slock_key[2],
+>   					      "sk_lock-AF_UNIX-NBD",
+>   					      &nbd_key[2]);
+> +		/*
+> +		 * The AF_UNIX stream recvmsg/sendmsg paths serialize on
+> +		 * u->iolock, not sk_lock, so it must be reclassified as
+> +		 * well.  A held mutex cannot be reclassified; skip it in
+> +		 * that case, as sock_allow_reclassification() does for
+> +		 * sk_lock.
+> +		 */
+> +		if (!mutex_is_locked(&unix_sk(sk)->iolock))
+> +			lockdep_set_class_and_name(&unix_sk(sk)->iolock,
+> +						   &nbd_unix_iolock_key,
+> +						   "&u->iolock-NBD");
+>   		break;
+>   	}
+>   }
 
-Good point. I suppose we could only set BLK_EXPECTED_REF_TAG_CAPABLE
-for namespaces that report Type 2 PI.
 
->
->   If the namespace is formatted for Type 1 protection, the value of the
->   computed reference tag for the first logical block of the command is
->   the value contained in the Initial Logical Block Reference Tag (ILBRT)
->   or Expected Initial Logical Block Reference Tag (EILBRT) field in the
->   command, and the computed reference tag is incremented for each
->   subsequent logical block. The controller shall complete the command
->   with a status of Invalid Protection Information if the ILBRT field or
->   the EILBRT field does not match the value of the least significant bits
->   of the SLBA field sized to the number of bits in the Logical Block
->   Reference Tag"
->
-> For Type 2 this remapping could work, but doing it unconditionally
-> will make all data written using and earlier kernel in a partition
-> unreadable once this changes has been applied.
+FWIW, as sashiko pointed out, the mutex_lock check is racy;
+it narrows the window but does not close it. In mirrors the existing
+sk_lock path, which has the same property.
 
-I mentioned this in the cover letter (and that's why I marked these
-patches "RFC"). Unless you have a clever idea, it does seem like an
-insurmountable obstacle here.
+AFAIK, the consequences are confined to lockdep bookkeeping.
+In practice the window is one-shot and unreachable for a functioning
+client: the reclassification runs once at socket hand-over, and a
+thread concurrently doing recvmsg() on the socket it just handed to
+nbd would destroy the NBD protocol framing anyway.
 
-Thanks,
-Caleb
+So the patch is basically best effort to avoid lockdep being turned
+off - which is my concern since this happens early during our CI runs.
