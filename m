@@ -1,73 +1,74 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FA13C98BE
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 22:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54913D5252
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 22:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784154879; cv=none; b=huijsgWgI4JSgMKOadTXhqg0Gbjnylw2C04xtE5D/nXp7H1YKG7vMwtSW+DKA8qsSw4hXQNXt8EFUxC0Xg9n53VxYRWpxngeO20fUrNsqDmzV7IkewRidzVP6elIYJ1f1yJ5k6yh6qcObJdcsXNvGivypOgohk5Ujzqj4WapnMg=
+	t=1784154881; cv=none; b=nhm9SEWhTVKdU1b7BXb7fCHvxbudJ0D9Gh87Ni4flPofsMjHNyPfmDjtZCzEYZ9mjAgzmq3YRhHw7BjCw1q6cAsS3fAQkQKnXUzibNd9OAkWgkHh0VpBDzIafUfOmGRRZWr3xMPpKm9AlWJp9BUWppcbEOFzTM1+ylfzIxDCrls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784154879; c=relaxed/simple;
-	bh=GIdlQuIjDuIzsJqtcE3kFuAvSVLoG9tPGeZwKd7I/wQ=;
+	s=arc-20240116; t=1784154881; c=relaxed/simple;
+	bh=MAbe7FFOxvk/HvR5Y86UBIzMmuEkVFfK1ZfCexZxO8k=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=sagPqWiIdzvSAgkwIKlu8Yxfek8JXphQsl0X21C506yRUoUnw0Xu8F7oWiIiMjPIdQgSuTARt8J6i84yisTpkXGvjZJBqj4/dPQjcuHF37gaKc7vo3EQIUnJEx9K+2Rq/njLs1G5eMGSjJmmbRLxyTUMzLmkX7e3LCGZWDVtNEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=0roWetlT; arc=none smtp.client-ip=209.85.160.49
+	 MIME-Version:Content-Type; b=MZn8l+JAqPFS50sukKbm14fnzaANm6/aVZn9BdwLPwi5BQ+7UoVXIb79b7uM9E35v655ucIeoLHSuQVDz6lSyCJ768rsBlk8coCFqCut39xu1qVzgGmsdRRgr2C7JpLvjCj/TDMBE7S6Zy9JFgQsZTsWzx52Je3YxuFPYeQzanw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=JAkHSR+J; arc=none smtp.client-ip=209.85.160.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="0roWetlT"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-448b69cfc6dso1519773fac.3
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:34:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="JAkHSR+J"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-455a61c53d3so2301008fac.2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:34:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784154877; x=1784759677; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784154878; x=1784759678; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6XggqMlUurXEr1KQCtY04ORi5k4fbc/Vyu3AcdPcPDs=;
-        b=0roWetlTJ6EipKRfJISFaLjbWTkKGqMjqR6GR7UKoZxG+MVrSzMq9jjQgMPedkNlIp
-         4iAHKuRZmduwR0jvx+8zVpgkkeAY1RPMvIzmFcKRcitNmX4ooYVMxhTU8yN/ymNHuytp
-         z4exdlJotnQoT7hM+6PF+58x80kN8DvDKtJ2GeodK62B8+NINgIZqj3jyc43yWOfxfLT
-         COL4XImIpdlDSx7gbsq8mvQb1CsJ+jYIHHEpNoOg5u+Xi3vIhfG8KQkGI5tlNLCJ/943
-         XRNe5clshOHbhKs7H/XHwCBSGWF2KCD7MpHO0ASYIJHxlbybEZGmKwrrEzf2tbFI/bKW
-         tLgA==
+        bh=niLd5/LGzk3n5S3gnqCqcM7O0n/4L/Fl7i1GyHScQFo=;
+        b=JAkHSR+J/lKZzFfSOa+qcnjWG4jwFN5eXGXjHUilfSDLw85wx8gmkaVKT5dfkfeJ1p
+         qgK856/YYTvmGVmLPybXiValbIHUROtU81Ad61lUyEIKZpCq8BjK90yEFseI3JaM3XfY
+         KL2SYa2uxzZaUwb6lDVrMSGOlN9kA6rXVkc1ZP+ANLAiRfqbyF53tnvD1fv5EU/mSDRA
+         D/s3aIYzO41WBl39kdU2NWzgeymXwp9HMuclsS6QGAlcBhHAPL881pShUZXyUEFBtrVN
+         b64zJEcIgtFYvSqGCnIJzRl9SMSNuEkTu+r6C4Dl06r6tTrZWU/r9g7kTCKrbqrwlMdw
+         pDoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784154877; x=1784759677;
+        d=1e100.net; s=20251104; t=1784154878; x=1784759678;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=6XggqMlUurXEr1KQCtY04ORi5k4fbc/Vyu3AcdPcPDs=;
-        b=rdQl2k3a4x3sAquUBWK/iL0QNuCma94XYcOb9KeChWKOW+2FYZI8RMs4jTj/vKsKEe
-         r2ULSq/TxNhrqMMmYszJpNrt6OpYdXZxuCvpO5YajAIqh/zjmjaDUCU80forzHuv4zbG
-         tqsZXrjoDQOq+HU5vEbFp7E7IqUpNks4Pod6C5BraixsrE+12oh3qnwmKfJh2K+SedzC
-         nF8xzqt9PNfJAo8a/2uUz8nsNFsbsWDztqDSC3ZcCWL6puigUwcCnYiD9BL8D16drlel
-         bTaO5gQGNNts4h9qHtzPfR0rjzsDwplgpnKNsro0GL6HSv1JvAh6q760ZY8S+QGMeSzO
-         sR3A==
-X-Gm-Message-State: AOJu0YzVKrMF7g68PJGEd0k+dUP+3lNKnhCf8W8HUC9fFYY0VWw3FJk6
-	wdc0IbhZrXq9YGQhyfsQfsXNHUS9Wu8axqkAtMISU3KnbxJdAgo2v2nBH0CVKWZZKCc=
-X-Gm-Gg: AfdE7clgRb8RQqC6a5uIw5zg1GTx2f/CMaVHp1nr/qmVV7hX79G8uVk4arfO7EyZHUT
-	uiIETCGGCUGW7WgCVO6BDxzUPjGziOAcowfesnyHytV3/817s8OgTzEfiqheLCkO/eJGG/umega
-	tTM4hW7zKBFCO3G/Apn7/lK9WvAgE3HE9ObgmvKmfEvGZGZihfW4e6KEp1UFL6LbUzUaC/XsvpM
-	GzWHdaXEJR346E/k9GzVCa8av6HB4GytR64GPfGF1PpTjwUoJ4BzrpW7PyzqX0HX1kP/1h6xbTY
-	tgC1m/rx49Vb2iqwILzUN2fzoSW0lN7PyDlNod7g0R8BsY6KB1LgZRN4+6X0XiQTNodeyWUjWrc
-	ZG70fYQgEHFyQLIg2LcKwL0eD6jnp7Ys+I1xrS8lO+6kSeV/vHFWHyJp4gxffNUHnkjXR/2aMj6
-	f2k1iaQEJTs8C1tO+ktuNVeNt3PxfJNPIEm67TH1QHY8F5sO5a6DMPG5M=
-X-Received: by 2002:a05:6871:8788:b0:448:c6ce:9617 with SMTP id 586e51a60fabf-451f0fc79fdmr10720122fac.5.1784154876738;
-        Wed, 15 Jul 2026 15:34:36 -0700 (PDT)
+        bh=niLd5/LGzk3n5S3gnqCqcM7O0n/4L/Fl7i1GyHScQFo=;
+        b=nRJOgDwBytkE7He53oP4ug/MIY5ZuR3DheFv29qC4QhgaBAt+tpP2w9YcdROV10/kP
+         4+cYKBCvTNIfQhdgKqbfDP3fLHt08WCaVOcNP8nXGtVyc26onX6tSlb6rj9uA4vFMeUA
+         IUR9eJ2XrtsZv0CEHlQuTePKoFaZw/lK3vRqDHL6PwA0ucwNeDKZw1NNByj1mVEXPwR+
+         MACvH0MI6xPbECM/sFCatbUZBY5PPUlqH3FrvDwTV1JNWSpgvYONpqNBOjbDB4ePC4fB
+         JrjFIPuubHxjHd3+NP7CHkxtKHnNudLlMtXLt4mcE7vOTPFOKYe+8baVYcMKTK/ORnY+
+         J4GA==
+X-Forwarded-Encrypted: i=1; AHgh+RqGE8GcsIVTSRQG+5reFH0sQffG6jmYqkaji8cs7zIeSUFuG6DqEIFE9y5+m075nnSeOZPL6N/M4Jtj4Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM9T54CT7wjISSI3HzW8G2zDvvrENeQI41WqaaE6g/neZfUkeY
+	BIeBdsukCJFJ8Nff/N28FKDKK3XW0/hdJZ/AUM1dpK26cIVqGAdD+Lvf/cpW0YApUXo=
+X-Gm-Gg: AfdE7clIMTr5tfPOgcDkfBZjxBoSbAEdZHRAlTfBe+reZ2ITfntbN3fUmXimK7GIv1a
+	F52E3v0Sk/kNh0Om98dqADmT+hpBqgakP05V50xxXjxJjyIy7aaO48SFKH1wkIZ6UMS11euiXgC
+	oC9agBjmtQQZyGvrcfOND0U9FulZYrOw+6w8apRa7LSubQll4q+e5t2aCrMJq3OjtkEFx3zFdWM
+	sfQtnH6eauZNwaXom0xMG/A4JplFQLy95oKIzm/kBqydNWxQrPfa93IBEfN76YNVjm3pT/I2XL1
+	2VirMKGQM3I7CcZpGbJUIJfNkZmAn4kH1ySNLeiCw2VBP0V2eirFcUUaTot6lA2a4+SVDkY955k
+	qhcAW41+Xv65yVrLIdTQFwnNmgphyy/YOSK+pFi2MmEULY7cus3TDh9sI1vTp5gQinrH8U1Ip8Q
+	MzZjYQ7FeVzcjaM0EMhrzl4QKNBx2zOkwCGyBVvCOyM7g1Ydz4uquEtDA=
+X-Received: by 2002:a05:6870:70a1:b0:451:738b:79a9 with SMTP id 586e51a60fabf-4560b3f2edcmr4833708fac.4.1784154878606;
+        Wed, 15 Jul 2026 15:34:38 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-45200b7b4c5sm14362722fac.10.2026.07.15.15.34.35
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-45200b7b4c5sm14362722fac.10.2026.07.15.15.34.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 15:34:36 -0700 (PDT)
+        Wed, 15 Jul 2026 15:34:37 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Daan De Meyer <daan.j.demeyer@gmail.com>, 
- Christian Brauner <brauner@kernel.org>, Daan De Meyer <daan@amutable.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel test robot <oliver.sang@intel.com>
-In-Reply-To: <20260715-b4-loop-partition-cleanup-v1-1-b9f59910cd1e@amutable.com>
-References: <20260715-b4-loop-partition-cleanup-v1-1-b9f59910cd1e@amutable.com>
-Subject: Re: [PATCH] loop: remove manually added partitions on detach
-Message-Id: <178415487567.159585.4815884092425440929.b4-ty@b4>
-Date: Wed, 15 Jul 2026 16:34:35 -0600
+To: tj@kernel.org, josef@toxicpanda.com, Tao Cui <cui.tao@linux.dev>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+In-Reply-To: <20260715132407.1469777-1-cui.tao@linux.dev>
+References: <20260715132407.1469777-1-cui.tao@linux.dev>
+Subject: Re: [PATCH v4] blk-cgroup: fix leaks and online flag on
+ radix_tree_insert failure
+Message-Id: <178415487685.159585.7452024735126853374.b4-ty@b4>
+Date: Wed, 15 Jul 2026 16:34:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,29 +76,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Mailer: b4 0.15.2
 
 
-On Wed, 15 Jul 2026 21:39:57 +0200, Daan De Meyer wrote:
-> Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-> loop_reread_partitions()") stopped disk_force_media_change() from
-> setting GD_NEED_PART_SCAN because loop devices with LO_FLAGS_PARTSCAN
-> rescan partitions explicitly. However, partitions can also be added
-> manually with BLKPG while LO_FLAGS_PARTSCAN is clear.
+On Wed, 15 Jul 2026 21:24:07 +0800, Tao Cui wrote:
+> When radix_tree_insert() fails in blkg_create(), the error path has two
+> issues:
 > 
-> When such a loop device is detached, __loop_clr_fd() skips
-> bdev_disk_changed(). Without GD_NEED_PART_SCAN, reopening the unbound
-> device no longer performs the previous lazy cleanup, leaving dead
-> partition devices behind. A subsequent LOOP_CONFIGURE can then fail its
-> partition scan with -EBUSY, as seen in blktests loop/009 after loop/008.
+> 1. blkg->online is set to true unconditionally, even when the blkg was
+>    never fully inserted.  Move the assignment inside the success block.
+> 
+> 2. The error path calls blkg_put() without first calling
+>    percpu_ref_kill().  Because the refcount is still in percpu mode,
+>    percpu_ref_put() only does this_cpu_sub() without checking for zero,
+>    so blkg_release() is never triggered.  This permanently leaks the
+>    blkg memory, its percpu iostat, policy data, the parent blkg
+>    reference, and the cgroup css reference — the latter preventing the
+>    cgroup from ever being destroyed.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] loop: remove manually added partitions on detach
-      commit: c4f4c0fc551cbcdccbbbc2d874d7d6440c7b4983
+[1/1] blk-cgroup: fix leaks and online flag on radix_tree_insert failure
+      commit: dbbca20764382b4d411ec2918f4e278ffe547acc
 
 Best regards,
 -- 
