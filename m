@@ -1,136 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76471435ABB
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 12:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAB5434E55
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 12:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784117252; cv=none; b=rDj4fUoPd7Fp+jz4M6nUsFK7Sel1glJJNGCZgRv7eL6HNPI8BCfBIcyzHDdZoUJHHFmzHPC9uuKr7N6MInO5KZb2cw8m4zNEdwBHzp+HDiTlFbbMYi/BBxlhJwPpD8dgl6BojQvHMcVHNk+XIkfYUP+NZHYZl5CGFgmwOWtWFaY=
+	t=1784117560; cv=none; b=cmyFBq/gVbpKaLrrrQ5U6cyx+/5Fx3cO8xkIUAs3sx8rAt49LzrhMgn0tcZFwYoYd4VPo4XGkaeKX3OXS4M/L843RBeEishLg1jArOs2Vdow/XtXcglcDOYWJxb2b4eIiHe/rqOgkTd5Xx+o5Ky0tZPdzXCKchs8qjrWpdZFWas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784117252; c=relaxed/simple;
-	bh=f2Zj74TZ4DoqiACSYtc5w8cY4fNh79DTd3mLuz53jr8=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ki9KT8wDqxlcHtinbt5BXtXz/5xVosPhOHCJZ3urlwcKRqOPEshv32yRpYWZl0XdaUd2/heD56QTXqyZ7BuTa4EzrDEm4byh8ZashqOCL030vcNlz+Egm8M0V9xXLyQDSt9z6u9zol2hJzFstBnKx3JERF6gJx9SctjRSJEMQ7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8ts8fDP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784117560; c=relaxed/simple;
+	bh=vnJNlOBmMgTLgQMXG7JD+scDursCtir3KG1H5wgQNX8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N8aOQgKrYZtKwZQ1+3g5iKwFWjoDIGtX2GJlV7/3zP6zbxflglzCIUs13wcg1SAvAAWcOWRQ4ECBpbPeKhu0RDBalQVN2w4Fi6FPHdohEIgk/5bRz8M7P4zsPsfcnb678Iejfmk8x37mH/XvCUdL6/AwnRyhvtrEG4u4MVztGRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1YRLsYo8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GBNJfTvp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1YRLsYo8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GBNJfTvp; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8ts8fDP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 121C71F00ADF
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 12:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784117248;
-	bh=WKCD7udqW/dT/0NFTWMaszCBVogtz2n64C25G28PPzI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=g8ts8fDPfeP4aPC4wcsC8csEYsmlfO9W55RW7E+28seh+twc4ka/lYw4hfsfDzqoL
-	 KnPMsLyiPUWAthLbF28u3T77KAMt/7h2e1Bvpv3QQEbBlPMRH2IH08iYX+1TiNCb+N
-	 xdP5RFHIXeNlvRieT6iU0iQqnyTmPR/58lgRXx/T3uef1Bro6FLeYnjt8WjpO8sjis
-	 +tF/t/vRCi6qviGJ28NvyU+rkJ22Az3x4vRrT/WlPJMA+h+5Lp7UUH4FTnVP1/5Qhh
-	 LZzDJ5Zis4XciF9fqLZzt16VKYXsdC961v/sL6O2nX1zQ6GsWW+BMSvV+p4AmpMYK4
-	 0vnQP4LZmyrJw==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-39c86ce9e29so33199761fa.3
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 05:07:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrIfDl685inbJBg3kGiLIsbqLr3E2WZNVJcKJJqcW37NtIdy8OmqO6FbN0wFPUhqmSLxrZ8QF6nGJK9AQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkP3/0HtHtfRfEJjTm+WVk9uuhQ+736a6vsTqak5pGUvUrSPbO
-	eGRtWgN5KRtcOJh1LNXaUIzz5oTDRhlmaaeuL2A1RnMcYgpRxM+fsD6wG9yTaATII4yCMz3YMYS
-	AY7ibC9xLNGIrVs463lx3AayLxCsZ5OzVQslKCLbnTA==
-X-Received: by 2002:a05:6512:3ca1:b0:5ae:bb4b:9357 with SMTP id
- 2adb3069b0e04-5b159b76543mr1504606e87.27.1784117246567; Wed, 15 Jul 2026
- 05:07:26 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 15 Jul 2026 05:07:24 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 15 Jul 2026 05:07:24 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1YRLsYo8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GBNJfTvp";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1YRLsYo8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GBNJfTvp"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C58C8783B9;
+	Wed, 15 Jul 2026 12:12:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784117556; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h3qCa6h/Jvlmbl1Ys+5fQfN3jSZxZGaoGH61HxHQNew=;
+	b=1YRLsYo8r79BCIWJoZfm9IieU5v6JggzVTxHo+mCiP8xjmtS/gy7V1QfdUGL1F4b5mINsK
+	r6k84SYqV5UXfB6Hj2xQ15GrXf+M/0y2Rw7vBQento+AfHXl6/Osq1onWpfR1VjvfJgQkS
+	MGBc0T6enwj0sgqyE6Evgt1rY1lXbiM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784117556;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h3qCa6h/Jvlmbl1Ys+5fQfN3jSZxZGaoGH61HxHQNew=;
+	b=GBNJfTvpEf8RwkWdcKSaMFHyzF6IpiBxvNZBVE3t89FxrKune0xp0VDJQSGutGwO58ZtHG
+	us2FWwFJ3PGEaxAQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784117556; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h3qCa6h/Jvlmbl1Ys+5fQfN3jSZxZGaoGH61HxHQNew=;
+	b=1YRLsYo8r79BCIWJoZfm9IieU5v6JggzVTxHo+mCiP8xjmtS/gy7V1QfdUGL1F4b5mINsK
+	r6k84SYqV5UXfB6Hj2xQ15GrXf+M/0y2Rw7vBQento+AfHXl6/Osq1onWpfR1VjvfJgQkS
+	MGBc0T6enwj0sgqyE6Evgt1rY1lXbiM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784117556;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h3qCa6h/Jvlmbl1Ys+5fQfN3jSZxZGaoGH61HxHQNew=;
+	b=GBNJfTvpEf8RwkWdcKSaMFHyzF6IpiBxvNZBVE3t89FxrKune0xp0VDJQSGutGwO58ZtHG
+	us2FWwFJ3PGEaxAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AD9BF779AD;
+	Wed, 15 Jul 2026 12:12:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id HM8YKjR5V2rvQwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 15 Jul 2026 12:12:36 +0000
+Date: Wed, 15 Jul 2026 14:12:31 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests 0/4] misc fixes
+Message-ID: <8fb8b561-77d2-4192-8180-8ffbe283665f@flourine.local>
+References: <20260713003906.21153-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com> <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com>
-Date: Wed, 15 Jul 2026 05:07:24 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-X-Gm-Features: AUfX_mzq1KbXpXfl_bzC2i2_CZOvOZaRAVu5gjRfir9Gou3fViKyrxWRMFDDFs8
-Message-ID: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-Subject: Re: [PATCH v8 4/9] nvmem: layouts: Support fixed-layout as the nvmem
- device node itself
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260713003906.21153-1-shinichiro.kawasaki@wdc.com>
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-On Fri, 3 Jul 2026 15:45:17 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> of_nvmem_layout_get_container() only looks for a child node named
-> "nvmem-layout" to locate the cell definitions. This does not cover
-> providers whose device tree node is itself the fixed-layout container,
-> such as an eMMC boot partition block device whose fwnode points directly
-> at a "fixed-layout" compatible partitions node.
->
-> When no "nvmem-layout" child is present, fall back to returning the nvmem
-> device node itself if it is compatible with "fixed-layout", so that its
-> cells are parsed by nvmem_add_cells_from_fixed_layout().
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  drivers/nvmem/layouts.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/nvmem/layouts.c b/drivers/nvmem/layouts.c
-> index b90584e1b99eab4217cbe7ec48373e18a7caf0dc..efa631ce7283bdd6c8ecda75915911b5e3a33c99 100644
-> --- a/drivers/nvmem/layouts.c
-> +++ b/drivers/nvmem/layouts.c
-> @@ -167,7 +167,18 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
->
->  struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
->  {
-> -	return of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
-> +	struct device_node *np;
-> +
-> +	/* Search for nvmem-layout child */
-> +	np = of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
-> +	if (np)
-> +		return np;
-> +
-> +	/* The nvmem of_node is itself a fixed-layout node */
-> +	if (of_device_is_compatible(nvmem->dev.of_node, "fixed-layout"))
-> +		return of_node_get(nvmem->dev.of_node);
-> +
-> +	return NULL;
->  }
->  EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
->
->
-> --
-> 2.34.1
->
->
+On Mon, Jul 13, 2026 at 09:39:02AM +0900, Shin'ichiro Kawasaki wrote:
+> These are miscellaneous fixes. They do not affect test results, but worth
+> fixing.
+> 
+> Shin'ichiro Kawasaki (4):
+>   check: fix exit status code handling
+>   nvme/rc: use _set_attr() in _create_nvmet_passthru()
+>   CONTRIBUTING: clarify that GPL-2.0 is not applicable
+>   new: guide long command options
 
-I have it on my TODO list to convert nvmem layouts to be fwnode-agnostic. While
-I'm not sure when I'll have the time to look into it, I think it makes sense
-to not introduce any new OF-specific interfaces. Can you make it into:
+Looks good to me.
 
-  struct fwnode_handle *nvmem_layout_get_container_node(struct
-nvmem_device *nvmem);
-
-by replacing of_get_child_by_name() with fwnode_get_name_child_node() and
-of_device_is_compatible() with device_is_compatible()? That would mean less
-churn in the future.
-
-Other than that, it looks good.
-
-Bart
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
