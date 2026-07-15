@@ -1,127 +1,148 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86546472784
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784127675; cv=none; b=VqkrgUCmos4y9MN00YbDPHYLP6ooJwb93a5GpVlCblOB0Fi6D3SiZ0wIXBlW4HbSGwuO/bPbHSBCgHAFVBzgzAsbtYddxXo73h/AEpjXdSO39+5iUiSbbgh4ZYCQjMapm0OychH7Mi3qV6TSEzq+3n9dkNraIeLNAKDM2sngjzE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784127675; c=relaxed/simple;
-	bh=qKOrk4ZpdygBcHTzM6yIeZBltWpVde0shkwhzwQGYhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J9C61/vnPbax+P+RnQwqGBgdsXfNtauhKRTdPC1ZiW4nPjXdEvpjKjRRe70sn/Gaoy02WdOTcvTPWo6kNGqZrf9JCPcPWL3aleyfKG+tdr7TCjfeKZnMTrMHEPJY3DHOE1YosPcVuPoGMX0ZPNFaHivylBEP/EWbmH257GGyyso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qqf5DJPc; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B24420481
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 15:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784129447; cv=pass; b=OKzgz1nNKlscs7pzKVTy0g2eJ81UplqJJsqLkWkIapQ3Wu0XqI8EGVAg1hpDa8YyRtehGqV5+V8byqCVgx1qVaNeg4ZXSm3ZO9NS1bdp9DKAdiW1X7SeMQKOWLx8nSqrVQpwf7lAlZhzc38yiTXSPRfbCptW+U+IpP4mA3ce1gQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784129447; c=relaxed/simple;
+	bh=oih6BEAC9IlPg7VwsK03FEa6S4q91uost2WmMEnafbw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z4J27JdHFTy3W8C4SKCe3iCmtobBrbig45hrKfgcXcTUAEsnUKcupLBlfOCHuecfNXYyLQFpgIndot9VrzHArxzbONNcy5tHBOCNq7QLhEyRQZIyg9bbe9Hn7vFoCMByI1ukwjrw9JNpmqD1srUkmnu+AdspDJsRwxAypevxLPY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JyTpB0lQ; arc=pass smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qqf5DJPc"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4720f3bf164so490560f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:01:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JyTpB0lQ"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-6a3dabf2d61so48583eaf.1
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:30:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784129444; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Ikb1Wp0KnT9PchVVm66RG+rioFtay/GzA/mjiyoD7bWjRDm4ot7ce6/OGkLGXMs/8a
+         tvZL5lgvC4sxj6+1U69Dlh8LKSzGnBCWqRgblyoZ5WGUCGSfTRXslp5AE4cmvmthw4to
+         AVGclil6ERKjwSMGhsC2fC4bYIAkIxJ+18k+BuuOEElhAauUfo0LaSVC6zhr7TsZmZFq
+         zY7NE+YuU9uJNpZD9GfRKX40/Py0kbqUSYot2yA4AmHqn03P/0nsEKCGYDjsFUpShBqP
+         kV7JCARxl3DHFhObzxwh5TXKl/+R1mRuho9azfO6DcT3Gy9xXdSqDT1kIu2xpO6MA6BG
+         EZkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
+        fh=PcgzSuBgc+xtFehY+yeRFIlXX12yQNgPfqmJEs1pbbU=;
+        b=DlAzmvf9J89RXHhhcSh0fjrDeYTB8TR8n7QVNYcZDg4NqiMc/dKRg6tp3MxEcS9oor
+         Bp8CZhk18o6ypXhQ/vPtD2BMCfsC+XZ8qpBFo8hhZs0/D1Tl8A6BdJQ3Oxdq1V1fdDp9
+         eRVCaov7HXvJpolSoFkpuY9LYv6kcGGIyiSP+bk2MydYlBZkYpD6IqKa+0zBd4Y+cBJZ
+         Sb7stmzAEvuAktfs08L7bn5IMPzvSc7Tny2SDf1OgbH9/ZCs1JnB4PcCGKAz9Z+QELEV
+         daBYMBgXP5O1kilJntYDIeVlmEKLKbCH5PauiYvztOSQCTwm9HoZ9t8qfYyDSO+eAimP
+         p8JA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784127672; x=1784732472; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=purestorage.com; s=google2022; t=1784129444; x=1784734244; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Vz9m2fMjwxafHbkl7XFVNeLKmdyS/JjM0NsjBw69d7Q=;
-        b=Qqf5DJPc5CdeBvy/0ptDwxy5dU90Ijv+srMNJ6eNoO6OnFNuxv7ObcsKSBt0vVo4iV
-         x2FW9NKrVHxi4S2DultftFzA1KnOildBIR2pV/jUJmFQi8D/xbVZl89wdttcpUT980us
-         MyUm8edk4ciE6tVHVWTNSkAy98LYzq3dBbwMzwhqYk16i4uEJrayNqZ2Hexr1zik38o4
-         UQVYWCzdAsQF39e87D6bXvmL0A8kjd5hcIANZQeGyaN5JpBQFbDsmtUU0iaqmwNHLR0o
-         6u8bb+U1/Fxz27BDpWnZxBbXgNnIQy6bgGTEZYBCKpgozd3pe2lzHYrhZ0YUk3Ka3eos
-         7JHQ==
+        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
+        b=JyTpB0lQl1DpFqRY36xy7GlKlRfruwo9ErAvpG4MTdiIUierWKGpyV0JkoADMm4sPf
+         qCZBt/7QNnfdyRBeEqouVC4xdc931l92aCDT0vK8zlISLlwNm+4h7FhN2MoInQwE6xx3
+         8vHCgMbECqVHQw4Q0CatYB54eshrAoYbVuCT7n7GKhn1I/d1ARElGKFMIbx6+1rQBTsw
+         PfVOcXotlBZ5QzmVhqxlszI7C9jtDnUisr2RL14ApEjxUWebPZXCJrX+fW8l5P8AbEjh
+         gxX42RAvNJfVM/k5RJBbtLN4aUzkMv/8Q3QDnPLI//3GI+MUDGjilh1M9Po5uitcyDGX
+         +Xeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784127672; x=1784732472;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1784129444; x=1784734244;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Vz9m2fMjwxafHbkl7XFVNeLKmdyS/JjM0NsjBw69d7Q=;
-        b=d9bjzX77cenOFjiLy2r5SrMGEpW+CUILj0D0deZUHS5+A33Hcgjn3jXNV3626JVzWJ
-         T3yZPC/c/eGyLNdxQACQVezBBjdBUaej4ZFsIKmY68NtzC/o5XvngQYtR+Mp1dNu//Vi
-         6o0ubsvhaaRsgn1meIoHYNeH2qPoyCPVWgN4EBYEzdbxMYNitI290owVc2mzf0p1Uy16
-         nk6/BnMGrhmQ9LvyQRbr2NLYBBsGLUTFDrryOqko+8MZFDmRlVBRCl1J43jML5Nt0hRE
-         W5GIdJqGRnG+d3S/NcTv6/nmSF3zQ1lH24JVKbBkDQXIrIG1u8Hfq40PFD4s0wAGoq8M
-         j/JA==
-X-Forwarded-Encrypted: i=1; AHgh+RoQMktoc9QbcgSC5tYOtOWS5hjSCHxc1iuiZe7sO4bXTG4RbsaFuqLG3Yrpbe/NpNuhijUV+AhkwEm7Lw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwScnujQhWI7PvoBiROy3hNrnChQJ0U/4Gtb+FfMcGowLNZrW8r
-	IZRAIFskSAdsXV0UK/ZKBPfKPdFeEV93+HiVYzq4WgKShB89X4I2tJyym7nQXFoB
-X-Gm-Gg: AfdE7cmAvmG+4sYqYeiABgo5FRKuy7GTY1OY+r2UX53pLsGk5rWXZl296/XtmhfQRo1
-	m9NsTsGE9us5fgp7cX2L6kJ/ljIcByJc1RYtruNIcwo9yCGoN4G+sw0s+EGgGTQPFgylxzEEV2b
-	RRIqBJShKGYPT2pOCx4PzofIhSDYSbaxfnt0nb4QmKMXVZ0++yDKP2EClt9ocAqnhNZL2lJrcVq
-	NQvrZTW3+C3YIdsq66r9NcOc5k/QKxZOtn5HSE19JtFHj52yeOXjBX1WswkJq1AC7L8JceEtpZL
-	ppxbPbF/FsekwkbUBdnYCi2vDwsHmUaPXuSAbPP3uPv8RZbFvY8NIA1VizHuAccu0sQmkW7wfeH
-	vlPs96Ro1+GCGUgL35tvI/yP9iXS30IhL7ClGc6u8C/AcIBV2Rr5gasdQ4YE09WCN9fzgxdz0p6
-	AQtDI+UgCKcn38jRarsHV+il+twSeDc1sv8VmsOaikfNlSjvHXLA==
-X-Received: by 2002:a05:6000:4810:b0:47e:96f6:ab7f with SMTP id ffacd0b85a97d-47f2dcc1174mr24109536f8f.16.1784127671424;
-        Wed, 15 Jul 2026 08:01:11 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f4635a63esm17501217f8f.9.2026.07.15.08.01.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 08:01:10 -0700 (PDT)
-Date: Wed, 15 Jul 2026 16:01:09 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH] blk-throttle: fix divide-by-zero on legacy iops limit
- of 0
-Message-ID: <20260715160109.51f553a7@pumpkin>
-In-Reply-To: <882fbac2-bd42-44a7-8fba-b387b3f0fb2b@linux.dev>
-References: <20260714103552.1335658-1-cui.tao@linux.dev>
-	<20260714123754.7a88a65b@pumpkin>
-	<882fbac2-bd42-44a7-8fba-b387b3f0fb2b@linux.dev>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=ciDlz/JF2okrWUKZolnPsQiK1AaPriH2d5olMSaW/OM=;
+        b=P5BUFYwVQHVPGp5YaUSWKzCIsGPZzhwl6TXlS7M/1njnU0TTYz60v3pwW/Y7JX76Pr
+         tFKfIv8d7Wqb41pMRXUVwdYQ2kFqmiaQCL62DidnfeSxHYaC/33rqb6//hqJjE98YxOv
+         qITFvO3b52rbbh0tWb5JNhrLIb/RobGFoZA0ThR8yuw5HJASyKil09gxnZKLDKejgzZW
+         czOx7z+W+wvVQnO8e3m0fHMiBe4uy2JXvHh5CvTeSFmFouP+SonpnulzmhTIv6+HhW4s
+         WheMA5aR8FT0AQCgWr8uJ6v+2zeax7yIgRKz/w+kIuBooTzbg3RxR9AoryYDkNSjhTam
+         aWIQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rrk8clEzEy3mBr6Z6l5bm3ETylH11bLaJ1xXnzkHO5AGItzTAdviWBi+6iSRRECzB/ugxflwvEOs+4Ycw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO5+nOS0jg00qdNIj2ftLK0H8bNwZ9uSs7tSs+i1I/MHbNPg3H
+	+vrMUX2qzR4vhKw6P3yiqU1UVxZnX7oZrdYeqweSlK+i3AA8SMmqBG4Cm4xP/5aJAE55H5Twrn8
+	ZLRrYa98/SpdFJUcgZu/QQs+y5O1KhIErffcQ+X7nFw==
+X-Gm-Gg: AfdE7cnKTO7W2+qcbboTePrH6IambLAxD78spPUxthwgnvXodOh/cozpV/ONW8bGSBg
+	kaxF+kvb4AEMKYc3ARy4rg5GaHj5dnXgI2MYwZ/eHf/bYELXjzNwNkybh77NUTK1m3FUG/hBr0E
+	9mr2Hiz+WcINWr9eC23g5lC6rsDH7u682o1cAtAixncrg/ocTtJzpCOMrSWbEXpAxzli+3q4HE6
+	O6xiKjrWfir1Pt6/7vVOYLWfnJGSOckF1Ftc9AMTaGcYVhEfJUcVJVq1ReLGCRHUv2UuCYy
+X-Received: by 2002:a05:6808:191b:b0:485:7c46:b870 with SMTP id
+ 5614622812f47-4a42ac4c1d1mr7855454b6e.2.1784129444114; Wed, 15 Jul 2026
+ 08:30:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20260627061933.2187447-1-csander@purestorage.com>
+ <20260627061933.2187447-3-csander@purestorage.com> <20260714135310.GB714@lst.de>
+In-Reply-To: <20260714135310.GB714@lst.de>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 15 Jul 2026 08:30:33 -0700
+X-Gm-Features: AUfX_mxo7lB146q5JXEsmTmctGA9iKJ24a4jDXPS2pCRNBa9UNhJ5U7jlOaJJJA
+Message-ID: <CADUfDZoGheGP6JCwwV=BCBnqxAspJ1n9Aes=UsjtS-DxAMxeEA@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] nvme/core: advertise BLK_EXPECTED_REF_TAG_CAPABLE
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 15 Jul 2026 20:44:19 +0800
-Tao Cui <cui.tao@linux.dev> wrote:
+On Tue, Jul 14, 2026 at 6:53=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> On Sat, Jun 27, 2026 at 12:19:33AM -0600, Caleb Sander Mateos wrote:
+> > NVMe Read, Write, and Write Zeroes commands include an (E)ILBRT field t=
+o
+> > specify the expected initial reference tag for the controller to check
+> > against the ref tags in the protection information buffer. However, the
+> > NVMe driver currently always sets (E)ILBRT to the lower bits of the LBA=
+.
+> > The block integrity layer generates/verifies the PI ref tags according
+> > to the bio's ref tag seed, so it must "remap" the ref tags, adjusting
+> > for the difference between the ref tag seed and the absolute integrity
+> > interval number (=3D LBA).
+> >
+> > If a request has an integrity payload, set (E)ILBRT to its ref tag seed
+> > so no ref tag remapping is required. Set BLK_EXPECTED_REF_TAG_CAPABLE i=
+n
+> > NVMe devices' enum blk_integrity_flags to skip the block integrity laye=
+r
+> > ref tag remapping.
+>
+> I don't really understand how this is supposed to work.  For type 1 PI,
+> NVMe requires (E)ILBRT to match the lower bits of the start LBA:
 
-> =E5=9C=A8 2026/7/14 19:37, David Laight =E5=86=99=E9=81=93:
-...
-> >>  	tg_update_slice(tg, rw);
-> >> @@ -1386,7 +1391,8 @@ static ssize_t tg_set_conf(struct kernfs_open_fi=
-le *of,
-> >>  	if (is_u64)
-> >>  		*(u64 *)((void *)tg + of_cft(of)->private) =3D v;
-> >>  	else
-> >> -		*(unsigned int *)((void *)tg + of_cft(of)->private) =3D v;
-> >> +		*(unsigned int *)((void *)tg + of_cft(of)->private) =3D
-> >> +			min_t(u64, v, UINT_MAX); =20
-> >=20
-> > The LHS casts look horrid - there has to be a nicer way to do that.
-> >=20
-> > And you don't need min_t() a plain min() will be fine.
-> >  =20
-> Hi David,
->=20
-> Both done in v2 =E2=80=94 introduced a void *field local so the writes re=
-ad
-> *(u64 *)field / *(unsigned int *)field, and switched to
-> min(v, (u64)UINT_MAX).
+Good point. I suppose we could only set BLK_EXPECTED_REF_TAG_CAPABLE
+for namespaces that report Type 2 PI.
 
-You don't need the cast either.
+>
+>   If the namespace is formatted for Type 1 protection, the value of the
+>   computed reference tag for the first logical block of the command is
+>   the value contained in the Initial Logical Block Reference Tag (ILBRT)
+>   or Expected Initial Logical Block Reference Tag (EILBRT) field in the
+>   command, and the computed reference tag is incremented for each
+>   subsequent logical block. The controller shall complete the command
+>   with a status of Invalid Protection Information if the ILBRT field or
+>   the EILBRT field does not match the value of the least significant bits
+>   of the SLBA field sized to the number of bits in the Logical Block
+>   Reference Tag"
+>
+> For Type 2 this remapping could work, but doing it unconditionally
+> will make all data written using and earlier kernel in a partition
+> unreadable once this changes has been applied.
 
-	David
+I mentioned this in the cover letter (and that's why I marked these
+patches "RFC"). Unless you have a clever idea, it does seem like an
+insurmountable obstacle here.
 
->=20
-> Thanks,
-> Tao
-> > 	David
-> >=20
-> >=20
-> >  =20
-> >> =20
-> >>  	tg_conf_updated(tg, false);
-> >>  	ret =3D 0; =20
-> >  =20
->=20
-
+Thanks,
+Caleb
