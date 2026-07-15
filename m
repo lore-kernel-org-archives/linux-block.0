@@ -1,99 +1,62 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EBA39F162
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 07:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F88F2737E0
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784100937; cv=none; b=mfdca/G3wYqWRazaUBB3PIw35VSavI8MHVwcJfl3rMGEbBdAfUlKzJVoFS1wTNyVvSUNAeoZpReOGz3OcWnG7DpHBM08pXWH6SzVUyAV308Lb8BqAB26hCg5cWhl403gTl6eGNaVHbex8C1j7pou3O+6w7yrziFyAHsHOUQ/AG4=
+	t=1784103752; cv=none; b=YqGM048pPaKLWy7i5EOVd6CAGejhXyaKSLYx93qSQkDKA54tiZ4Uv6qRMP849/52swuUmOuvl2U+EecK2DUruz0Argg5K2P2fJFL+lW7iwcf/Qmj8MZohBteteQBg4EzWJijUOgL/PbppiosCl1gtFhdNEsUskgS5JACSWiBZes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784100937; c=relaxed/simple;
-	bh=1FWjYA3aCDGVx/v6BRiCbv2Xh12gTBqDHtlfIjMPZ2k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sotipx1OmiKbILhwr3JTithXEArcZpjMhbBpLMzXPUcS31UZU5hXI1n1YHEFMynuefT2fFPaOEAIzlBEmUOhIQjZw/+rYBS2ZhIHh1QSTp2D7DlGudjM3FMusAi2zx/KHhqOmPuxm5DVKpVUhQHXHHO2XzjudS4ZjYShAKTAw68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u1o3n/a+; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784103752; c=relaxed/simple;
+	bh=CiBeUlz2lXq8xODT2nr+6qVUdQc/cX8oIcCslHORPHA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=famULZ2SyM/1qhQZ4CKV0jcV4fwyIYOii/XlDbx41M70vwkg8xuEyKEFCbXSKYPOKInucoPFtmTYvdYs+2Eu3ZfaQLI3Arod3ysFpV6r382d2ay5iZhBNKPg5CkSyjobpBY/ZL0GtjhRbMzbYo9cIB/7GjN0VdjvoQZLcuYYrHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5NuRiFC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u1o3n/a+"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784100933;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bRslnRVkNS+fv54hAOHsKH/tpgOpVb80fZL88zeT3xA=;
-	b=u1o3n/a+eG+kydbUGaAjoIA1FrLGTJA9jGnnzjQFUKhxmlOSEAuLFtsk2AVd+4gZIa8b8K
-	jfdwXGvZR64QDUrGarULbTy9W00PPo0WGF2P0gUyH5vRF56gWTysptjH4l4QNu8eIkFXCV
-	LWJFtgPb/J4ZY7wR2V6v9KvL/fiJ2s8=
-From: Jackie Liu <liu.yun@linux.dev>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: free copied pages when blk_rq_map_kern() fails
-Date: Wed, 15 Jul 2026 15:35:18 +0800
-Message-ID: <20260715073518.96042-1-liu.yun@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5NuRiFC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9D5B1F000E9;
+	Wed, 15 Jul 2026 08:22:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784103751;
+	bh=T0G63opEaQpVyxRe6nv6VA4EAr9PIlAsWX9okjWfe3w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Q5NuRiFC88f8TyiD09H2fCPeiR1UdcxEZQo4F7VLRC7mDHbLNTqbzdMp5JM3cJ2XG
+	 qqjpabB5tEjXCJo3xTBphJoLZCdGjyge+18FuH+nT3RH5kjQtzyL8bBIGXVcfZn5db
+	 8/9e0PFdxSFwOrM+zcrZGZWwqtdZdJeVvmHQOqQJbXfhwbKMzAk/E4rSkm0dDfvSP+
+	 C55TAH0yDMJto7L2dR+UKD65MF2wL8gt2wYyvp1TVwKKN1I9keHxwNC9aztPQlrUFW
+	 Jagd9eg68lFrDql6uLM1xGvCzqDeTSD2x7BR7A8j2zG7fC2O//dSWiQUiZlMN9cWCR
+	 p4dMAisYGaeHg==
+Message-ID: <38cd2f60-dd5c-40dd-946d-9d2c17db0044@kernel.org>
+Date: Wed, 15 Jul 2026 17:22:19 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: remove most blkdev_cmd_discard arguments
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+References: <20260715063734.2933511-1-hch@lst.de>
+ <20260715063734.2933511-2-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20260715063734.2933511-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+On 7/15/26 15:37, Christoph Hellwig wrote:
+> All other arguments can be derived from cmd, so do that to simplify the
+> calling convention.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-bio_copy_kern() allocates pages that are normally freed by the bio
-completion callback. If blk_rq_append_bio() rejects the bio, however,
-blk_rq_map_kern() only drops the bio reference. Since bio_put() does not
-free pages referenced by the bio vectors, those pages leak.
+Looks good to me.
 
-This can happen when the bio exceeds the queue segment constraints or
-when a later mapping cannot be merged into a request built by earlier
-calls. Track whether the buffer was copied and free those pages before
-dropping the rejected bio.
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Fixes: 3a5a39276d2a ("block: allow blk_rq_map_kern to append to requests")
-Assisted-by: Codex:gpt-5.6-sol
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- block/blk-map.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 768549f19f97..d1d6bbe0ecf1 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -653,6 +653,7 @@ int blk_rq_map_kern(struct request *rq, void *kbuf, unsigned int len,
- 		gfp_t gfp_mask)
- {
- 	unsigned long addr = (unsigned long) kbuf;
-+	bool do_copy;
- 	struct bio *bio;
- 	int ret;
- 
-@@ -661,7 +662,8 @@ int blk_rq_map_kern(struct request *rq, void *kbuf, unsigned int len,
- 	if (!len || !kbuf)
- 		return -EINVAL;
- 
--	if (!blk_rq_aligned(rq->q, addr, len) || object_is_on_stack(kbuf))
-+	do_copy = !blk_rq_aligned(rq->q, addr, len) || object_is_on_stack(kbuf);
-+	if (do_copy)
- 		bio = bio_copy_kern(rq, kbuf, len, gfp_mask);
- 	else
- 		bio = bio_map_kern(rq, kbuf, len, gfp_mask);
-@@ -670,8 +672,11 @@ int blk_rq_map_kern(struct request *rq, void *kbuf, unsigned int len,
- 		return PTR_ERR(bio);
- 
- 	ret = blk_rq_append_bio(rq, bio);
--	if (unlikely(ret))
-+	if (unlikely(ret)) {
-+		if (do_copy)
-+			bio_free_pages(bio);
- 		blk_mq_map_bio_put(bio);
-+	}
- 	return ret;
- }
- EXPORT_SYMBOL(blk_rq_map_kern);
 -- 
-2.54.0
-
+Damien Le Moal
+Western Digital Research
