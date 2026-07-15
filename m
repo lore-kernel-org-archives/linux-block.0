@@ -1,60 +1,92 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD9B768EA
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 16:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1925F32ABCD;
+	Wed, 15 Jul 2026 16:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784131325; cv=none; b=Piw0aXyZzJYf7ToRRbWqIxJyPojbUdLECYT75H76I9K2tvkxQtbd0tMLLrRjE+aAneUgTe66GP993Og+WB4TOzA6PiEKlrVzea7ETvDHYVK6Lhgqc6WCtPIEwyl0BO8i3CKl81yvfhp5NijFrlAVJVhAulzISQhdQx6jGfL0gEk=
+	t=1784131335; cv=none; b=RqbBSJW/jRUcYGI9h8NJNHDJBJTX6gRAmYs9eelqD++4zE/hOuNmOx16WZB3RiBX3athK3OQ+s8R345gxqaKQ39Kgj851bLuO/xC8t6DbXmm72LYLeWUba1/8cbhu0HKMnRAe55bcB1UrBUvZM1cd9Ft4vZIbZGbExw7XdbUoTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784131325; c=relaxed/simple;
-	bh=SKZBPJWI/xxIhV4ugicProuWlf6hIcTeR3Yci9Qh/7M=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=WsqxgFm8VrD4SJ58jcVLPMZV6QNo2ZoH4KRTTAH7UaLX2rZYQFKT4j/KfwX6PRtu3Up5glVxqAFO4zZyR8hNbY6UFxiJCz0iJWq/v0zCWN1RpbqGHeI8OiEvIjg/wxYQbKbJdkSlFpnnO9Eb6wDjiSf24gkw3o8VV83nWqyVZB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7e9e0e71e05so2551069a34.2
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 09:02:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784131323; x=1784736123;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=SKZBPJWI/xxIhV4ugicProuWlf6hIcTeR3Yci9Qh/7M=;
-        b=dfTShNIRFKnm2LoRxsQIfdzp4q53Odir6to3ctpJKLMt45Zrsnnl+7rcopaY6WE/BH
-         Aa4AyTIdmpB5YcwtC3dpt/pwWoUYwpYBrDVaYHzw9upAcSRHqUBXkQUvZf0QdZkABfPj
-         WEZs8n/sPjNb1VrKKkgfoP57TZQcNDhzXpzeX9jvTcHE3lZX9Z/8qt1/XlopWJ2G9dOZ
-         gbcV9XRm7BXhFMoBBJLKhFZ5cV4hR4ZSHxL/NVJ4mmdagph6E0Q2NtV0esPJAC0frYN5
-         B1EVt5ETaF00KBvjMOAZmAEh4jetNMtLMdosq4yuBiaIuW6aiYwSv3Tbu/LFuOGF+4zA
-         7+Vw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrw4eQ9gSLRnaOiE0vmbyv4H23/aWsEfkBz15FHSId5arBgMnQUAZvpUal9xc31UmVFSDDbuMhpWQfCgg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwacTq+NFMfS9mhZ9ZpgzP52vYONpnDjnAIqxIHd8sHhwXzaTB6
-	mhMU+73V8OZwYw/Z5TIzjMQdh7DDy20luL52v55fT9gwcrTN913e475c1WJnFIFP1SGJk2CyjSI
-	mQ1fEx3qY6OadYcdv3PJKoFPORBFu2NWgtX9flye35k4qLgBul3j5a0pIrJI=
+	s=arc-20240116; t=1784131335; c=relaxed/simple;
+	bh=98RKyKaV2LduCo//Kgl/PRvsw8mI68exCDNmSvWmOIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dd1HWCIT9m9kftR+f8eTAvNeUhL6UUuzb37UYwJtFVyq/4QfCdFNBTSSEYjtbrM4XjPW5+ni6eQqjKHut8ScA8t+gqwF8Y/KuCNwo2phnoIqiXCnAxDe4NysINVjmPM6/5MRmTpWHZ2qK2AgcQO1Z7PZCdsK4yObwstmY5k6CcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwNGJLsU; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwNGJLsU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A9C1F000E9;
+	Wed, 15 Jul 2026 16:02:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784131333;
+	bh=azKGq+Lnlr31pxajBrx9OCvGqEZYN4Rc7bzdJFFDzvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cwNGJLsUXdZFBZRSRkEgPwn87bibZHODmMgW/Nbm4Ex5kAD1Dl7Ka7lFazeyUQjmY
+	 6jyp+94m0PAEYf8/69rEJGOZTaMfr+/XmNdVOx2w0ESdRCPAb/VN+tPz1toUAMKzEg
+	 lAsN0WdVfMlr9qjhK+cbcZDcMmCDb1V4V3od7E+ByFv6MOwHPyeqp37WrNTSFgM3pK
+	 32Ofn6k++ONaO4TLLRtCK2f3IX5oxLQnjIausshL9tb9+w2a7ds61NX53+E+RrUjGo
+	 6jYZouLYPJaBSfq4CR/MT9uRgfgKRiRB9A2ymNq13fCUdL9ggglotQOKDzTg5nQ1AS
+	 UmZXtqJyD1aqQ==
+Date: Wed, 15 Jul 2026 17:02:09 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-next@vger.kernel.org,
+	axboe@kernel.dk
+Subject: Re: [linux-next:master] [loop] d908729e74:
+ stress-ng.umount.ops_per_sec 100.0% regression
+Message-ID: <b7ef10a7-5c67-4172-9845-fe77db31629a@sirena.org.uk>
+References: <202607151655.9d74999d-lkp@intel.com>
+ <aleZammRRSVN4dl0@infradead.org>
+ <4ea4703c-7385-4f75-aee2-f21a6c8cce82@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:61c3:b0:7e9:b4d1:78ab with SMTP id
- 46e09a7af769-7ec0980222emr10314811a34.25.1784131323163; Wed, 15 Jul 2026
- 09:02:03 -0700 (PDT)
-Date: Wed, 15 Jul 2026 09:02:03 -0700
-In-Reply-To: <e1f2d5d3-6974-4294-a459-89a5f6c360a9@acm.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a57aefb.9d83364e.246513.0006.GAE@google.com>
-Subject: Re: [syzbot] [block?] general protection fault in lo_rw_aio
-From: syzbot <syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com>
-To: bvanassche@acm.org
-Cc: axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	penguin-kernel@i-love.sakura.ne.jp, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="NGQ0ytg4Ru8r0nck"
+Content-Disposition: inline
+In-Reply-To: <4ea4703c-7385-4f75-aee2-f21a6c8cce82@I-love.SAKURA.ne.jp>
+X-Cookie: "Speed is subsittute fo accurancy."
 
-> #syz test: git@github.com:bvanassche/linux.git block-for-next
 
-This crash does not have a reproducer. I cannot test it.
+--NGQ0ytg4Ru8r0nck
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Wed, Jul 15, 2026 at 11:45:41PM +0900, Tetsuo Handa wrote:
+
+> Then, can we please keep discussion on
+> https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 alive?
+> I am asking Al Viro to reproduce xfs/259 problem, but it seems that
+> Al is too busy to respond. I can drop this patch if somebody is
+> interested in fixing this bug which became visible in 7.1. Current
+> state is a result of insufficient interests/resources for debugging.
+
+I would recommend a combination of having more patience and, if things
+really do seem stuck (eg, after several reasonably spaced resends)
+copying in Andrew Morton on any patches for other subsystems.  If the
+other tree is pulled by someone else on it's way to Linus then whoever
+pulls it might also be worth copying.  Andrew generally picks up patches
+that are for things that don't have an obvious route to mainline or are
+getting dropped on the floor for some reason.
+
+--NGQ0ytg4Ru8r0nck
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpXrwAACgkQJNaLcl1U
+h9B8egf7BMIvRS4MEnppIuRB0dRtfonZZx7EVv3RLF1KS+BVsg7OWtlQJTUZo9gq
+fqXTZ+pTNvG3JLHMwqX9wCpK0SUHtRkyraTTxpSKdLsr2rfkJhSHO9EBTCbVhsJR
+zXBaFLeVk+YadntaAWQ1O0A01jrFFR/Bmt6hS0RQIr6jDe7qm3t6XAP0SvT65bmb
+bXfgEpdVJCACbWH6zirmEhFJ2y7WIftKEFyplmPE8qE1VqwOCw6mw/1FoLLmlGvO
+S6w8gbtEgggp7/lwWlpKmfi9RzfAibyR0+T8NdoUquKgl6yNLXvhgo/B3xXBxjzd
+NkfYdAXEScMLNMWJHthitFAB0bG9CQ==
+=Q9gO
+-----END PGP SIGNATURE-----
+
+--NGQ0ytg4Ru8r0nck--
