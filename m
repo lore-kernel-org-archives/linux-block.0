@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F88F2737E0
-	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B590D3C553B
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 08:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784103752; cv=none; b=YqGM048pPaKLWy7i5EOVd6CAGejhXyaKSLYx93qSQkDKA54tiZ4Uv6qRMP849/52swuUmOuvl2U+EecK2DUruz0Argg5K2P2fJFL+lW7iwcf/Qmj8MZohBteteQBg4EzWJijUOgL/PbppiosCl1gtFhdNEsUskgS5JACSWiBZes=
+	t=1784103991; cv=none; b=sSUkxP1tTxmMbhWrDq8xivfcn0MkdpEgiBIrhO+Vwb4KWXAS39bm14InL0Lg0gljHBF0a2Kx02q76Cz6ki6ukPL5ikf33bZ09zCjZ7AMksPMYH/I5llk+O0LGP5kg5XUDxgzirB0UnelJqKH9quEDFa1FIZN4mrFhfWksAR83U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784103752; c=relaxed/simple;
-	bh=CiBeUlz2lXq8xODT2nr+6qVUdQc/cX8oIcCslHORPHA=;
+	s=arc-20240116; t=1784103991; c=relaxed/simple;
+	bh=uoSYTWKnyLl9lQRqnnVBIuHGO2s3Wd2JzJfEhH1KYjE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=famULZ2SyM/1qhQZ4CKV0jcV4fwyIYOii/XlDbx41M70vwkg8xuEyKEFCbXSKYPOKInucoPFtmTYvdYs+2Eu3ZfaQLI3Arod3ysFpV6r382d2ay5iZhBNKPg5CkSyjobpBY/ZL0GtjhRbMzbYo9cIB/7GjN0VdjvoQZLcuYYrHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5NuRiFC; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=r96kkfKilDW9RngewcKG9YeSLqUt3dCYdnttymrzQCF4+LUJC0RamXarQwMpdiFpvw/20qleIijv6hvPef4zOiyxZVyYRMUvIbDUz2ZW9tjviOI7l1lBSpdbymr3nwZ1+fUizYHrsfwYPNqZeRTLJQci/9Cv/0JyDBQbtA4aGh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiNeOAbP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5NuRiFC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9D5B1F000E9;
-	Wed, 15 Jul 2026 08:22:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fiNeOAbP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F29311F000E9;
+	Wed, 15 Jul 2026 08:26:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784103751;
-	bh=T0G63opEaQpVyxRe6nv6VA4EAr9PIlAsWX9okjWfe3w=;
+	s=k20260515; t=1784103990;
+	bh=TC1jYvsI/erlZoNf7WcRgNZkScJS3/ot0aaO8Gml36c=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Q5NuRiFC88f8TyiD09H2fCPeiR1UdcxEZQo4F7VLRC7mDHbLNTqbzdMp5JM3cJ2XG
-	 qqjpabB5tEjXCJo3xTBphJoLZCdGjyge+18FuH+nT3RH5kjQtzyL8bBIGXVcfZn5db
-	 8/9e0PFdxSFwOrM+zcrZGZWwqtdZdJeVvmHQOqQJbXfhwbKMzAk/E4rSkm0dDfvSP+
-	 C55TAH0yDMJto7L2dR+UKD65MF2wL8gt2wYyvp1TVwKKN1I9keHxwNC9aztPQlrUFW
-	 Jagd9eg68lFrDql6uLM1xGvCzqDeTSD2x7BR7A8j2zG7fC2O//dSWiQUiZlMN9cWCR
-	 p4dMAisYGaeHg==
-Message-ID: <38cd2f60-dd5c-40dd-946d-9d2c17db0044@kernel.org>
-Date: Wed, 15 Jul 2026 17:22:19 +0900
+	b=fiNeOAbPm09X8VrBwt8tAbIu2l8n42dWds4gFuJfNEtRuZaLl0CPXejEX9f2r9Ed/
+	 TB3u5tlci1I2b9/a6Hlx4/ndp1B9YEQGmCFMUmqJtY5rySPWoQWQv5BdLjd58nZFKu
+	 RNUNZT4cnvG/jB5/dnRAxLu+wdwmraYMbyJmn3e0w6SpHKVRH5sRJXfR6626CwjEoR
+	 Ugw19Sl9UXjEIYF1zPz8H3Af6JuxbWqSBXFDjEe3K68cjP2fxeMHGoHknYZzH45VZI
+	 yVDBjZHkZs9dCyLQAFu9rnUU1OHgYRVXCeo1QCes814BdnBLqNODO+5u2c/xdvLNUJ
+	 Kifv3EZvTgHZQ==
+Message-ID: <3eff5b2f-f635-4422-b55f-04d06434d149@kernel.org>
+Date: Wed, 15 Jul 2026 17:26:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,21 +35,22 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: remove most blkdev_cmd_discard arguments
+Subject: Re: [PATCH 2/2] block: implement async io_uring zone reset all
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 References: <20260715063734.2933511-1-hch@lst.de>
- <20260715063734.2933511-2-hch@lst.de>
+ <20260715063734.2933511-3-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20260715063734.2933511-2-hch@lst.de>
+In-Reply-To: <20260715063734.2933511-3-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 7/15/26 15:37, Christoph Hellwig wrote:
-> All other arguments can be derived from cmd, so do that to simplify the
-> calling convention.
+> Add a new BLOCK_URING_CMD_ZONE_RESET_ALL uring cmd to reset all zones
+> for a given block device.  This can be used by storage systems or
+> file system mkfs tools to initialize multiple devices in parallel.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
