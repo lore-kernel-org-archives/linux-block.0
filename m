@@ -1,119 +1,146 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8811E3AFAEC;
-	Wed, 15 Jul 2026 16:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5A63AFB0C
+	for <linux-block@vger.kernel.org>; Wed, 15 Jul 2026 16:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784132011; cv=none; b=gw/9rs6dybLJG271VJ5s8ScR0L/Yepn8NwP7wCqpKST6TBfvgzK7PBhKIZq9QgQoEwI+MXfONuYAabUlEk9M3hdvyxqwfnyoZbS/fXiMnndvhJ4QKhxiHwuHl5GkcJorz6Xj1CXSwhH5aDcuWOx2KQWxsxQ5BPv3pwS1Tro+fto=
+	t=1784132486; cv=none; b=utsg880tf+bJAnT82dd0Yg9SES4mlGnkCnPa1zefTkLJUOdJ5GOiUrcGSR4F1fplFiru2h6t66QO1bqDFostghAkugeN/sUhMnwV0g0jpQpy3iWK3w1O0W8GojtdveJiYglKHLS04PjiMwlZXBd3IuAF8LpvVM4bKQEDoWXJMvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784132011; c=relaxed/simple;
-	bh=zSVAMJaQUDsFciFJg16/GmBBW9Wmrg9p11I0eoysN8k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tEcjmBKCSNdrclMrfb8ynb1r6KwA8zX8R8drf+aGJXu5Pvd7R6mnh2BWQ+/hOXJN4iqbE9cM28alsxmqOUu+E8NX6kH9Gmt0xi5iUonjNmDVLxhStblMKYLpnsZXpfcLpEWFk3I6yw1aP4lN2DoEOKS46CjcH5lS+HCkrRNannk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=roc/xdTy; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784132486; c=relaxed/simple;
+	bh=D9eUJAoVQO42ob2SYIni4Z4Z5kpPvoc1fgpKgJ7anrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HGPW5uEVTuBQHx8fIDvPVAGTsv+dTjw8vAInyWIn6+hSmClHDtgLUCntMvXNVItu+5X7D3/hUbeCHSojS6t9LwXkPkHTpxWFrYWibLv0WvfhUV8bh7FKD31km+XoYFhIofh5ES2GPEohXnj0gkVn9EbS67GNTuZH8DpZA89sjD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ruu3dXqn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=a6sxY0KL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EaOodu+q; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=q14cGpL6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="roc/xdTy"
-Message-ID: <d7d251c8-c0a7-493d-ab7a-386d441b93cb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784131997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ruu3dXqn";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="a6sxY0KL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EaOodu+q";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="q14cGpL6"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7EC5F7849E;
+	Wed, 15 Jul 2026 16:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784132482; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QuYmew9g9h1Lk97Vz/1tfuW0aB6gC3MArV36HTaSGi8=;
-	b=roc/xdTySo+nrg9PSt4WT8U1UwJT0JrEhJbfLQzJh57hdA4VQVNgVWX6YbUwVOAY77ylBF
-	RrKlhtVrExzt5yAefTZrtuaRwQ1WGRqrbJzCu0iiWqNDUz0F0KX3dPC+IDCrDrOaexmv/v
-	HkN16fFiVtHCv3jsAIw/oBa0U/oQ5do=
-Date: Wed, 15 Jul 2026 18:13:06 +0200
+	bh=8A+qnwoHbjA587BcSxezq7X4w5raOP090pcKdJlzmqY=;
+	b=ruu3dXqnJNiGFdA4AxQVjypbl1C+c8X0nj8DK8c2dPoeotAb4W3Nd9m2WB9aWe3b2LvG7I
+	yAS7E5ALgcpeO+Qm+PbBFanw1zXPw4f3NeRrph/2Hvkt/LNFC0mE8T8pBFse/Eqzfcqa8j
+	5etTr1nMuK6glwaUkX0N1lK5mKtePr4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784132482;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8A+qnwoHbjA587BcSxezq7X4w5raOP090pcKdJlzmqY=;
+	b=a6sxY0KLG0w45aiUP93KAvEahw9qyMC6KqbBchAIs/EbOK3rIGMrmSo70uAabrPCdLqmXp
+	DpF5F6vEsugHU7AQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=EaOodu+q;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=q14cGpL6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1784132481; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8A+qnwoHbjA587BcSxezq7X4w5raOP090pcKdJlzmqY=;
+	b=EaOodu+q9n5G1r5Mt9EqCoFKYoQc8TYqJ5FKzbxWV8gKd4Rj2ubw3zAFAnJCb2E2uCoMKO
+	d2h83Ogg0NhD8rh19FTvSMHdPXJHgLfiU61+f+UG29wqzSd0jWzwM71QYXBfEqrxqHGyAq
+	Kskr+7ZVPW4ZQeJhMxYlcCr5YRCqQ24=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1784132481;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8A+qnwoHbjA587BcSxezq7X4w5raOP090pcKdJlzmqY=;
+	b=q14cGpL63AQxTba3CzFylFtGFufk02KTg6m6gM/DJfRdciCaY46m+Rs/LPqhgdbKndVsyC
+	mwUfUOhMhMF2xnDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BA6A779AD;
+	Wed, 15 Jul 2026 16:21:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id B/7DGIGzV2plQQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 15 Jul 2026 16:21:21 +0000
+Date: Wed, 15 Jul 2026 18:21:20 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org, hch@lst.de, 
+	linux-nvme@lists.infradead.org, John Garry <john.garry@linux.dev>
+Subject: Re: [PATCH v3] nvme/069: add a test for multipath cdev lifetime
+Message-ID: <56d237df-baf9-4541-a785-fdc0499ad27f@flourine.local>
+References: <20260715155531.3811457-1-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] blk-throttle: fix divide-by-zero on legacy iops limit of
- 0
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, tj@kernel.org,
- josef@toxicpanda.com
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-References: <20260714103552.1335658-1-cui.tao@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <20260714103552.1335658-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260715155531.3811457-1-john.g.garry@oracle.com>
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 7EC5F7849E
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,linux.dev:email,flourine.local:mid,suse.de:email,suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
+On Wed, Jul 15, 2026 at 03:55:31PM +0000, John Garry wrote:
+> From: John Garry <john.garry@linux.dev>
+> 
+> In [0], a fix was proposed for the NS and NS head (multipath) cdev
+> lifetime.
+> 
+> The issue was that fds for the nvme-generic cdev may exist after we tear
+> down the nvme-subsystem. Issuing an ioctl on that cdev may expose a
+> use-after-free.
+> 
+> This test recreates the method described in [0] to expose this issue
+> for NS head cdev.
+> 
+> First a fd is created by opening the nvme-generic cdev. Next we tear down
+> the nvme-subsystem. Finally we try to issue an ioctl on the cdev - without
+> the kernel fix in [0], this should trigger a KASAN warn.
+> 
+> [0] https://lore.kernel.org/linux-nvme/20260713104238.3034640-1-john.g.garry@oracle.com/T/#me118851584fbcbb960795d0f04e2262e5a295613
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
 
+Looks good to me! Thanks!
 
-On 7/14/26 12:35, Tao Cui wrote:
-> From: Tao Cui <cuitao@kylinos.cn>
-> 
-> Writing a multiple of 2^32 (e.g. 4294967296) to a legacy cgroup v1
-> throttle iops file (blkio.throttle.{read,write}_iops_device) silently
-> truncates to 0: tg_set_conf() stores the sscanf-parsed u64 value into
-> an unsigned int field with no clamping. The cgroup v2 path,
-> tg_set_limit(), already clamps the same kind of value with
-> min_t(u64, val, UINT_MAX), but the legacy path never did. Note that
-> the "!v -> U64_MAX" mapping only catches an explicit zero and does not
-> catch a value that truncates to zero.
-> 
-> With iops stored as 0, tg_update_has_rules() sets has_rules_iops[] and
-> the next IO reaches tg_within_iops_limit(), which computes
-> 
->      jiffy_wait = max(jiffy_wait, HZ / iops_limit + 1);
-> 
-> triggering a divide-by-zero oops.
-> 
-> Fix it in two places:
-> 
->    * tg_set_conf(): clamp the value to UINT_MAX, consistent with
->      tg_set_limit(). This closes the truncation root cause (and the
->      general silent truncation for any value above UINT_MAX).
-> 
->    * tg_dispatch_iops_time(): treat iops_limit == 0 as unlimited so the
->      divide in tg_within_iops_limit() is never reached, defending
->      against any future path that could produce a zero limit.
-> 
-
-Does this need a "Fixes:" tag.
-
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> ---
->   block/blk-throttle.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index ffc3b70065d4..3f3c1374f4b2 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -883,7 +883,12 @@ static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bi
->   	u32 iops_limit = tg_iops_limit(tg, rw);
->   	unsigned long iops_wait;
->   
-> -	if (iops_limit == UINT_MAX || tg->flags & THROTL_TG_CANCELING)
-> +	/*
-> +	 * iops_limit == 0 is not a valid limit. Treat it as unlimited so we
-> +	 * never reach the HZ / iops_limit divide in tg_within_iops_limit().
-> +	 */
-> +	if (iops_limit == UINT_MAX || iops_limit == 0 ||
-> +	    tg->flags & THROTL_TG_CANCELING)
->   		return 0;
->   
->   	tg_update_slice(tg, rw);
-> @@ -1386,7 +1391,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
->   	if (is_u64)
->   		*(u64 *)((void *)tg + of_cft(of)->private) = v;
->   	else
-> -		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
-> +		*(unsigned int *)((void *)tg + of_cft(of)->private) =
-> +			min_t(u64, v, UINT_MAX);
->   
->   	tg_conf_updated(tg, false);
->   	ret = 0;
-
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
