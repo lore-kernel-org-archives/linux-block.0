@@ -1,74 +1,72 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EF641DE0D
-	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFFC3BBFD2
+	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784203931; cv=none; b=hhrMBvVjVSOrIU/9vj98xkJ6w8ci2Xk/Hwo1515FhW4+yIMx7B5nVbhh7SQv3zS0Tc0OUs6FbCi2IgQoyoluIoVdBVPNYOIJhoYdP8eNa7ZjLttkSf08pgyGqcImMbPpR7/+hcKirUlHNpzhdMEdYbgfC2FJJsaRCMNS6Dw3D6I=
+	t=1784203934; cv=none; b=qKkSuWc8FdpUOM5Q4+kdEowmooUPR/eoUcdZ78IvJUPhLOpQA50xj9ZxchWKeIyWyRL2DxwmW+xQQnzDrk+ZGVnR7s2bqaTqExh77tNqQyr6YTdQ6Ct6eQspIIlXXUAK33h90u6SbjY2OS/cQHcNggXueCPdrICETpAVBYFL4Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784203931; c=relaxed/simple;
-	bh=sH3+44vQaQM8peB9ppgLrHutvbYFdw6Xe1o5I+S0bYQ=;
+	s=arc-20240116; t=1784203934; c=relaxed/simple;
+	bh=/ydX0Tx7JIIxQfkwbpXi9aBXHmoyd+1dzmQzQXEGbMc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=U7tnxlRw0q0hlp4udanEjIVZR5Pa3TfuqcI+ty8yQptmtZPBQn/WLjHIciywvF+VKTtE6F16jHws45rSXD1GF65Bje6C1Vk/q6u8otglZ7Bj3pjk1/5kunPVsRvFIqJPCYcKBnuZwdnn6JvhHuFv2/0FJi5UVSBeX1wFebFW0nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=pdegp61L; arc=none smtp.client-ip=209.85.161.41
+	 MIME-Version:Content-Type; b=kGfk4v4FYOcvBIfcoFWIGGrpdsDZhEUxzG2MJ+lxailRe1quoLDoNwuvxzLkz8gpuQQNhzXKThGX8q5kuBHUPo7kztBhH7yzIKF6dWAXr4WIO9ZNuLpcPnr/BluHIpQ06i+EjEgbSy4q9icjpNb4psj6gYQD6SDiSdAgolQYHQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=O7KiQ5cY; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="pdegp61L"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-6a397a0e5d8so3004131eaf.3
-        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 05:12:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="O7KiQ5cY"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6a3d915616fso503957eaf.2
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 05:12:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784203928; x=1784808728; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784203931; x=1784808731; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=b2jgJrAzmB89EB8vthyooRE337DkTvMZqBhHuoWYHh4=;
-        b=pdegp61L4RvaAbnFfpgfhOQc4nEVqjdGXzXHgCPbHTWcx7xg11w0T+6stEbTzPGM1u
-         Y8HlsvTNBBO92phPvln55YWL51do8XmmdnUl5LALdLChC7DuWTgyr2xTVlpVIdYDs0Yz
-         RJP23Aj764aK9KjmMuzcB21c355QRGOHa0MpvqAKd4b00FVuYPzAs+qgs4xDR3bsM40g
-         nmTu0TtCqj/UfxdBNGjTKxt59M0R9MFkSFZQ1pOBQnc9GwjyHTvUhKBiNbyW33kkdqx3
-         AYbNML51jlJF+irkKNcehGIzeror70dgrEtwW1qPxZTeQFrx6U7Btog/ZBd996+UcFCh
-         JOhQ==
+        bh=MOQ08mFARROE5GDJpTfRDUjCD6cSYFvt9O9pJjVNLQ0=;
+        b=O7KiQ5cYoQwP/kycpYC//cebf+wkJfnILmteZn7rUafjBPXhITIKlxVPcRBCxnH50i
+         2PlfQ9zcjnhMyXUUOM9S7vwS+/6pokGPvprj8qzH5/cnWz9BfxiMya8hhTFpjCwmXrL9
+         Rxl0Do76HzPRpTe6EnSH8Ph7XAvB9UNv7X5099DUYiWdENPrpwP+nzVz3fv/+kFdZxca
+         NEMkvZC2FLehqWWqIMqBLKzRjrlLDuyFYHdCZKrq/V3dtZ1aTN1s9k+cpwI8ZObYStN2
+         +VQJYijtdmn2b8Q3pBp82sKhP6ldS1mKDbA6VqwL90hop8R7JVS9ycgu/y4dB1yyYu45
+         dMOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784203928; x=1784808728;
+        d=1e100.net; s=20251104; t=1784203931; x=1784808731;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=b2jgJrAzmB89EB8vthyooRE337DkTvMZqBhHuoWYHh4=;
-        b=Lwc5P+oCyDOpPNiayag6c0GYfULf/6p/4gaYcNL0VHDAmH/wZlcyV/otY8vhVQ8rDn
-         WGG2Ck3J4qbNfBfnxU5g2cRL//TF5rQhGCqIKnQ7VakIElxG4zNMocQOEYVixEh5VVOz
-         t6+obGtqztE7puRWA/eXQnhM6xZALxKm0wa/QAwv25LRsfULMypKGs67ghfjvXmCYyTz
-         rA0rI8bVh4ck+VxEbseLrsfpldqdw9OFUQXJxpN4J8eL9nuCwuftoF9nBTCw7gjv0xn4
-         4dFzhMBWD74qKHzSaPaxGi9PLxWBXvf7wj04OJt/SislWKSZ2zL9eJPlkWYV6WODNQWA
-         0prA==
-X-Gm-Message-State: AOJu0YwgXhmCIc7DslaQAbCl2HEZMl6UNGuhqsIxu4/IiDjXD2eZinSU
-	60bKah6nq86nLhm2Lxqw9h+cy2FRstmP0Or+uhwCjDQeqTgs7s+nZUOgH51axBSbsTW+UUc8FGL
-	db4omHy0=
-X-Gm-Gg: AfdE7ckkBc52HkJ4m3pRupgS0zNbCfd/51cZUD7S+1z5D1GG7Ic/kkmG99dd2aaK2jb
-	ymA8zZB3TjihmlrUHimPaJl5DZmjYnBTzly+LVDKCP/7FytjyBrbFkT2SUE9He3O/p9SX/Akfir
-	yDA8yOFjs9YIz1QUhi9xvKt74ynO5Y/tmIRMOJmAcbBeUPSiamJDbY48dIE/Kr04JLPeXmutEqs
-	LoEuk0KqQnzw98yJ11MN4BKLjOxsdPlpheWO5JN5iAGQ3PrqVTVf7b4IKVZizvHPZvCM/Tnd/nC
-	RObMo/wX6VxyKMKGXKBrVW+NPiO8xTbsaHmn0VauFu6A01sw05XVe4cdQ65jcQqSlcko7GmJz9a
-	vmjFZ8AMlIa9dAwo7uSSURRWJW45QiVELJYQl5iN0EnUOiS/4lp0EgW5O+wI4BJ40Kzr/Rh/nDY
-	g5dpECI8gNKEjp5ReTfXJiksVhA7AI9j0+//bqvSUj1kyg5jz1tNLBC2U=
-X-Received: by 2002:a05:6820:1c89:b0:6a1:50eb:2110 with SMTP id 006d021491bc7-6a3da0bd8dcmr4199559eaf.69.1784203927900;
-        Thu, 16 Jul 2026 05:12:07 -0700 (PDT)
+        bh=MOQ08mFARROE5GDJpTfRDUjCD6cSYFvt9O9pJjVNLQ0=;
+        b=oTtG+BqEP1qIdDS1h6tZfXDgu6aXUxs4QGLUL1BNIWipCA7HjhFGGQltp/6bH27ybc
+         QH3JDt4hUpKs4k7u+HGkTM/d3mQsvEe0Lw/2OIqGqDmaujPfeZGCb5X1GDXHQq3jKWFe
+         Fqn8dTnrnuSykRroFePmblKonvunoKacUncAfF0kF0NABZjvDVPRlN6ALe9gYrDteS+6
+         hoLG0dnov4NckwioRXLjSlKcS6TCTiQd2arTq4xk8db8Wy550m3X/y9/MiUpYfsTjmwt
+         a0KFni8xQd3iWllznvjLNHHCHYXFggI7R9gciz94JIVEEOw15KSTQTzsywEs2+/3Um8X
+         08GQ==
+X-Gm-Message-State: AOJu0Yx7zny/NyxUa1ohhLZAvn9GhGT//eINWi9qo5X9w14Ef1lfCYTW
+	nipklKBirC4+TaYoYldZKilxyv3uKNJiGQcr5GMtYb2KAINrYOpQi8Kwb5iw26NsQK9XXCYBpbE
+	Jdka3h2Y=
+X-Gm-Gg: AfdE7cnliLbiR9Y4vg9MXpS7iA372Ldd80GL6RaOLWJkFGksCIcOHA36L8zbInIHaj2
+	9/mAYpryGEUUPlIX99ONzyEjQY9bhqyFKbLgDK8FoJ7W45CTzWhgwlwxEFTuJhYYgqUfEp+5zc7
+	JDUoIkBSEnzbKUuQcr77Wc9FxhZjHXG70H71AMdHehKfXBSHxA14vG6zQnbPT8cE8LM3QNHff0h
+	q4B5Zb/ADHccC3eEpF4IVS96egEUCXwyQdBddyGMxF6PuHhizBFYAehi3QAmgtLhl6k8f3vYbTe
+	ddXG+andyUDG0ODlzaHJb559F3m3Cl+E4R1UHPe5JUy1uJD17ACgd8vTVmX1fhXzqyxCTdUCm7K
+	uxRD7evb2DUTFpslqXkdSbgBngJ/NpxahPCHQf8L06FHfB/VL1yZQ0fNXMZuRF88FUYizzIt2n0
+	aSmCX6Pnr/JjT0hAWWaI4fEqbHaLaNBgYuMjM+g5tdT0V+98sqSaG5b9I=
+X-Received: by 2002:a05:6820:6ae5:b0:6a1:475f:1350 with SMTP id 006d021491bc7-6a3d9f06230mr4103252eaf.19.1784203930776;
+        Thu, 16 Jul 2026 05:12:10 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a38a4bd734sm11627050eaf.4.2026.07.16.05.12.06
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a38a4bd734sm11627050eaf.4.2026.07.16.05.12.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2026 05:12:06 -0700 (PDT)
+        Thu, 16 Jul 2026 05:12:08 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Ming Lei <tom.leiming@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260716092237.1305030-1-shinichiro.kawasaki@wdc.com>
-References: <20260716092237.1305030-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v3 REPOST] block: serialize elevator changes for the
- same queue using a writer lock
-Message-Id: <178420392608.282740.8247081669734891037.b4-ty@b4>
-Date: Thu, 16 Jul 2026 06:12:06 -0600
+To: xboe@kernel.dk, Jackie Liu <liu.yun@linux.dev>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20260715073341.95129-1-liu.yun@linux.dev>
+References: <20260715073341.95129-1-liu.yun@linux.dev>
+Subject: Re: [PATCH] block: show operation in error injection rules
+Message-Id: <178420392807.282740.2473268498977818022.b4-ty@b4>
+Date: Thu, 16 Jul 2026 06:12:08 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,23 +78,15 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Thu, 16 Jul 2026 18:22:37 +0900, Shin'ichiro Kawasaki wrote:
-> When elevator_change() is called concurrently for the same queue, the
-> elevator_change_done() function runs concurrently as well. This function
-> adds or deletes kobjects for the debugfs entry of the queue. Then the
-> concurrent calls cause memory corruption of the kobjects and result in a
-> process hang. The core part of the elevator switch is protected by queue
-> freeze and q->elevator_lock. However, since the commit 559dc11143eb
-> ("block: move elv_register[unregister]_queue out of elevator_lock"), the
-> elevator_change_done() is not serialized. Hence the memory corruption
-> and the hang.
-> 
-> [...]
+On Wed, 15 Jul 2026 15:33:41 +0800, Jackie Liu wrote:
+> Rules listed through the error_injection debugfs file omit the block
+> operation they match.  As a result, rules that differ only in operation
+> are indistinguishable even though op is mandatory when adding a rule.
 
 Applied, thanks!
 
-[1/1] block: serialize elevator changes for the same queue using a writer lock
-      commit: 4ff58d6bc9dd4c7fe6092d0ab5677a79ebc788af
+[1/1] block: show operation in error injection rules
+      commit: f94de432646ebec7857ba2624fe082e779b52572
 
 Best regards,
 -- 
