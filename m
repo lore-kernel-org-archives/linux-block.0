@@ -1,73 +1,44 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF1A371880
-	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 09:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D2D3C455C
+	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 09:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784192809; cv=none; b=uOT4DyLfDKFlhIqAZmWT+FRIP9ag3p8zObj/Ja/ncF3HY1XH+Y7EOaeVNBR25u0baTd/Eo57aVzHBQ+6hY80MQNKs8hOH92WTGbPPOK7Q6uGHDhW1CPjbRWTXEGCk/DSm7Bbrqq0nA/QEg8ByC/xPdOVx084EVaiyPcHaixCeBk=
+	t=1784193196; cv=none; b=Jl0WdhyO2enEOdMFiN9IqKKEYbYd11BlswrhmAdLJfm/Xn+1kFVcgMFJ3Tl8ETSkdrm8Yz+bQM+POt0Rex0+ejN1syP+Vyy9JA0pHIZfz8QAL+pR0NNGAWlZEv8up7XIxoZFe3rmOSJb+e6BfnMjajBAl8/VLH9KJnMTddexcuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784192809; c=relaxed/simple;
-	bh=yc1ZERZmyyBl9BFJfkpN7IfeLpD6Cx+LUniYcStIryE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TQhH/5fcrdoqY06UsMNcMYJ2QwVn2/7muBkHxxKNcvoW9VGUkiBULt3AlGVFsCjY4uF8xE7p9gm+CpvHV3cE83mH9ye4EdH/R80ccdB2SdvprGPWY8tj4+soRaWsRXQ+jc3bgImQTXBlmJ+fr3A47ZdrTykd7AAA2pJ07OHMW60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OJcz1iQx; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784193196; c=relaxed/simple;
+	bh=fq9Bg4DnH/m07kT2/y4DDlAE+UUy6g835/QaVpK4MHI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vut+CMaz6GLiyA5AljDRJ7iCT0hTRsxR4BkOG3wvpAgTbkqU60/b9kDkr/om2M5UTeuLQiwjtoh0UbMYhDZ0VYCPFY3vaDHKliyIIHD7TJTk41p50+CguQ11lE/eYzFQKCEEhy5jYAfk2IBy7oriFQ/bQLTA9JrkBO/Sogc9Xv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=khDLpDZn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJcz1iQx"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-493f45e20cdso37411045e9.2
-        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 02:06:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784192806; x=1784797606; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=bYYKiLk1/mJhSG8VU9NAerU+4eCoRKrnRltemvuY65c=;
-        b=OJcz1iQxnT7ZinHYIqMqx0dsypnRvD9pxcSCeMVtsdkuW7bt/EdqlP0pvmo/92HpeT
-         Odcr2vawv6SnQE3jPud9ba2gu2M7TDu5vq46H26ZZktY/QQutgrcxMQfiyW9PDCSjZAK
-         PjwJ69j1IKxMZTP7p7nEFEZ101e784aKEaxT2v9AcWhLqTD4RLT5Zm5wFCm3bDsaRBFy
-         h5R/04uqkVhSa0n5bIkUKHE/2Ez2i/ClHZLMU19HF+R1SfC6nUuztFah6jtwtqMctsD+
-         MxswNPtbTTZP5OfkpEPzZN2uJv7FwqRjlnhd4QMa1LuDUDJOlcCJSnJWBAP78Mpm37UK
-         yGpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784192806; x=1784797606;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=bYYKiLk1/mJhSG8VU9NAerU+4eCoRKrnRltemvuY65c=;
-        b=i7LZNrz3Tv+fQTcLTeiPfX2hUBN5I5GBQ/T0BcuELi2h420GirT1zVrU3DEYEPKhvb
-         rpiN0sRjfEFRTojWgp12v3jpfbMsnHt6grqf/JgoDQx5FCAk9TBY5hX63SzQmvL4B9k7
-         SOYCvlWMkNTidt6V3BCLHUnxytoG0AApL2E/syV6tYPyKVFrrBIamQLefno1p1Tb0sbt
-         te4dpuzjpPVFz3yz3p1PMT2g1oXRLiJL7kWqEyo4gOyurjHAIdLluIwa3cltI4uAL4ir
-         Xt0MJP4PnD7whaOUHtzZGQpFieTMc/P0R3IOA/CqyVfDAY8xz8obgC6Z19ykCezqwBF4
-         2UpQ==
-X-Gm-Message-State: AOJu0YzmUhorM8sjKzlcDfG3wIO3fgW18NOftW6K3p/cbzwj0EwNnF1I
-	Qc0p4tW82uL+CF93ofhYSvjsiaBOEubohfggtb3KOn5mjTTsKuGMwbzgDwtE7g==
-X-Gm-Gg: AfdE7cmQKHm59GmU6S7yrg1h/ACkIXTfq9c3Clff0TvzoUz+3sDwYgyN6jy2NxXkfpB
-	J4MHPPCkGhFCIa0QYCxgjHb81vMIdF0t/xsJhyT8r516X4yWdQMiFzWJZGg/CdoxQ5ij65cuzxK
-	GswWW1898ZTCqAXlpboco+vyVzD2rLSuS1Wg++F8i8z2WN+rwAzLpVy7Zvc3DaGK2mhcZwTog2v
-	x1DmNYtxy3sXxH7pYg9fXvObLXZd7JCGUO51dS0JFMtnOIM1sIkkdJagxRYNNixp0mGOdFrmfqq
-	FpSmo6pX/8wJ5RPIOFgHKPwdxIxXAHMS8s9afpwu3ogU8tV8OctJBNY7ok+dg27atW20lsUazHJ
-	ssxH+4xgMFmE8WaWT/0VJm/tCtDavP9r7qkGaEt5FhOUZbIC4AJ/AoYJsq65S9Big+uFbEY3eXB
-	9PQONuePgxfv6CSu9qV7kiIzj3XueTtkHi8zaGek+A25CJ6qg=
-X-Received: by 2002:a05:600d:6405:20b0:493:f807:1a79 with SMTP id 5b1f17b1804b1-49538a0ef82mr85194155e9.27.1784192806088;
-        Thu, 16 Jul 2026 02:06:46 -0700 (PDT)
-Received: from localhost.suse.org ([37.109.161.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49541e83d05sm39662895e9.6.2026.07.16.02.06.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2026 02:06:45 -0700 (PDT)
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-X-Google-Original-From: Sebastian Chlad <sebastian.chlad@suse.com>
-To: linux-block@vger.kernel.org
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Sebastian Chlad <sebastian.chlad@suse.com>
-Subject: [PATCH 2/2] nvme/039: skip cleanly when debugfs is not mounted
-Date: Thu, 16 Jul 2026 11:06:26 +0200
-Message-ID: <20260716090626.27558-2-sebastian.chlad@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260716090626.27558-1-sebastian.chlad@suse.com>
-References: <20260716090626.27558-1-sebastian.chlad@suse.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="khDLpDZn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=75Ac/yGGdisdg3elGal4loJA5UhGWq0GxMI3wjHefD8=; b=khDLpDZnlwke91cQKV+qv8mvtl
+	Hobg9fdPkEhf9599P/hBlHpz3G/94ICEmNZV7p26MvttOEkqzZgYGRBuopT3mjcVdMniuDmWUGQGR
+	JHKqP5nbuVjsDxn/SnWdCOrI30l1WlPGux13fg537GC8gUum7OK9YuB6VSl26dOK7xRmm0HU2QenF
+	ar7w+6Ikm1Tvn5XNrxs6cbE8r8rfdGVJeXl1RCzAqUFQA1eSGdPePmkr4Ku496D0kAVOB18ueT009
+	C7GbcKuD6pmJlS0uMc4OCbZworqZbuYSYwHzZ5Oo/ef02nZT16pBAqQf53tNujP1fwuvakrKVEh0z
+	N12GFUVA==;
+Received: from 2a02-8389-2301-9f00-b29a-36e9-8c1c-0994.cable.dynamic.v6.surfer.at ([2a02:8389:2301:9f00:b29a:36e9:8c1c:994] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wkI9V-0000000GpRV-30Q6;
+	Thu, 16 Jul 2026 09:13:10 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Neptune <z1281552865@gmail.com>,
+	0wnerD1ed <l7z@0b1t.tech>,
+	linux-block@vger.kernel.org
+Subject: bio bounce buffering fixes v3
+Date: Thu, 16 Jul 2026 11:12:44 +0200
+Message-ID: <20260716091306.316625-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,30 +46,19 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-_nvme_err_inject_setup() reads/writes files under
-/sys/kernel/debug/<dev>/fault_inject/, which don't exist if debugfs
-isn't mounted even though FAULT_INJECTION_DEBUG_FS is enabled in the
-kernel config (e.g. SLE, where sys-kernel-debug.mount isn't started
-by default).
+Hi all,
 
-Call _have_debugfs() from requires() to skip cleanly instead.
----
- tests/nvme/039 | 1 +
- 1 file changed, 1 insertion(+)
+this series fixes a few issues with the bio bounce buffering code.
 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index 8c70c5c..b634008 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -15,6 +15,7 @@ QUICK=1
- requires() {
- 	_have_program nvme
- 	_have_kernel_options FAULT_INJECTION FAULT_INJECTION_DEBUG_FS
-+	_have_debugfs
- }
- 
- device_requires() {
--- 
-2.51.0
+Changes since v2:
+ - fix another issue found by the original reproducer
 
+Changes since v1:
+ - go back to the previously tested approach without iov_iter.c
+   changes that break small vectors
+
+Diffstat:
+ bio.c |   53 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
