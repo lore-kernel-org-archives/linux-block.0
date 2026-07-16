@@ -1,139 +1,174 @@
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B409D400980;
-	Thu, 16 Jul 2026 10:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A46F3FF8A7;
+	Thu, 16 Jul 2026 10:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197039; cv=none; b=eHYSZFKTiQ6VstN3q5cY2+CNRLmUiBhcY14yd5vY+K378ZFT00JKOZvDh0KplbJdZxayGXdQbqcHwDzU5NhIbgvtycDdR9lXgJEvB2Zaf6iTryJ0h15yKNvfoJeE/4e09hn5lCRzY5jqfR3oSnfUMEjfNYMZJ0NuHMnW4bVYUVU=
+	t=1784197050; cv=none; b=ZQ1AObzLY3i/4lnw+t7A3a+j6MMXZ6udfrHenpTlvLOEA8zKarEeaEzUSmx+qhkygxHKUNv3te9jIKQF0ssIktpV1swnEGYHEEbpKkeeC5n0Tcj0FErILau0Q20Zb5ePRajt/snOqaUAls+0rSLQMqybDAX94SAdsau17lyrFZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197039; c=relaxed/simple;
-	bh=6/eckOiWFh6Pr5UTfrcyRgKkQih3gyse2papWRUcEaQ=;
-	h=Message-ID:From:Subject:Date:To:Cc; b=oqjXGdYeCcak4V+JAd3IPPIQ9S/QSvpcs7PrtNffUZIPh9sGua9J0xFEkp4NNIgyvdLT/lmatEp+XJ0BR76bpgwlR8kLw14zTRyDGTyMUw2aHMcrCu1NTLi0obPPwuA94FM5+mismLHG1XXZ2TFpR8a5NoIQq6+vx1jjBzP+cIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oR/EYreY; arc=none smtp.client-ip=103.168.172.151
+	s=arc-20240116; t=1784197050; c=relaxed/simple;
+	bh=53cSgaI40k9oYdGOrgyNR585oXsZNtU2cYIO//J4+64=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Yer5HQw+f50btaHs/BmzCSaZ10S7LddFAgUokp4lClK6c4Cj8NrNGM0rY5QRWBCNJ/4BkVIPN0yicKN/1WI0bZMO1RLB49Ueu+4AZgBYHAlRBZ1pNOItfGih2mxUJcVdAig9KrlwAEDOfMRbCKL4SxOaq+USDFBD1GMBGQVb53w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AMLKvodV; arc=none smtp.client-ip=103.168.172.159
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oR/EYreY"
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id ED0D0EC0178;
-	Thu, 16 Jul 2026 06:17:13 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AMLKvodV"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 600AE14000F3;
+	Thu, 16 Jul 2026 06:17:24 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Thu, 16 Jul 2026 06:17:13 -0400
+  by phl-compute-01.internal (MEProxy); Thu, 16 Jul 2026 06:17:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-	:feedback-id:from:from:in-reply-to:message-id:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1784197033; x=1784283433; bh=HT8d07KWmpWRn3nVrLzBYFmE/8xd
-	lMWGqbhR+fWeSHc=; b=oR/EYreY379S7JfxH+PXKC0MVQ1h2EaYdfF+xBuoVlXs
-	f/zuZ36hix43bAbCUzq3iExdxGxS/vcY1kbwPK/8b4FF3pqUViHuEVfOTLo/Berv
-	gmuE3bQYwgTdEhrZWV+1mSnIojaLHadnbPI4SBbMDx+TfdlHTyZAuOJ3brHQ453b
-	cboWG+KUic/xp7Y2+pu3LxZ4BUn/pQJcQGZOKRabk77bL2UDaokuXahc4Z1ZDdqN
-	vZpWUEMmBCI22hWol/toR8YMMwC+wEXYkiNmr4D66PBsEO82b8FRTqfXPjTgUbAd
-	la9+JaqBwwt6JO68ZWyfhjFa5vlurY8tiw/XNL/suw==
-X-ME-Sender: <xms:qa9YavI-oE3UIyoFIvyQHz7Hyl-3Wd6PRz2Z_ZQtLxtkCcM3BFY0vA>
-    <xme:qa9Yap6Jo2vEBqlSv7NwPMWBmoK8wB_n_QIHp3YZLw9afaQdNIgPrjchgzSRzd5GN
-    3LRvVxa2HpW9c-V8Ggh-5lKcNem2mAdkFET3AmVpNebe2F4LqQ-k84>
-X-ME-Received: <xmr:qa9YapdsodZWIJaJFTu9NdR0tF7YA2rWZhgTOSRoEJLyC1kEbOr9HHLl2ASjmng_Ea1QBqYIoONJDsQNQkmC_5pq0n_wLrud8PM>
-X-ME-Proxy-Cause: dmFkZTEFlgfSsIHEissvjoRolBasER+BSmQiztZ764mRrzQppVasRNhlClHBGkhne1GBK7
-    esIV/FqfyjcceS+t+kRxSFHsEeeAjX1OI0YyRDJDlGav7qajaLofWyFdKKd+RHCk+VIyB6
-    vf685T9Zlb/2BsDCF/oGGV1v9pYX7UTWBl8mxrULRdWcmZsTJJ8cp72qLQxumFca2I34/5
-    dBWV5jAti7rvoDVLZjCLCqFWuyS6aJnJCNlfwD7DvGPdTd7UhjD7p43/XKUSyVHMuiUHfh
-    Ut1XlGf+NJ93KVVL/RnXEpER+XQyLJQlIIT+oIEJaWlL2bpJEzKnnHs5RzwDNY4dQu35ls
-    Jd+F1pZ+0xx1QIWExfCyJjkhAoYbzr+Ei2fMVfcH2vyqP7kgXP1g2WRPb5mA+EdSxBXZ7l
-    1qtYQmznjJc0tNSTSA/2zo5VVKtdrV2LVC/ys8QYLeF9YY0R4Cwtzg2hFg9NppJ2Cgja6x
-    j6VCb/akdGz06M2BCHxPDpcIJ4r8Mm3BwbGVXyAnrW2Gli2E7CuI76pseckGoo/5xgHhnP
-    tKezmDUTDWQnukNmhuSyj49h3TF80QNbdbrVmRiH85qsFUWgu9ynV7USJLYZ/bIl+Do4xA
-    FG7YBtIrT/QYO2Ocnyyx/UKQ1BMiQai1gTYnaxcoaSU70xcKhc3VzgKleGNw
-X-ME-Proxy: <xmx:qa9YakG7nP78d19Cct29j3E9yPOWjzNgXH5487uCXujBIssT-TcDog>
-    <xmx:qa9YaiTWcEQ2r2RepQhyCWYWI28Ze3tthgfC6oqzH4lJY8haPzQB8Q>
-    <xmx:qa9Yaia1H6d-z7MdQqZLDq3iEAfzQHJZE2T42UOYPOR5rLwHcoZiZg>
-    <xmx:qa9Yal376akCnPuKlW1S3vPP5Qmy2U7-QpVklIYxfrqNgzi9nqcbiA>
-    <xmx:qa9YaveG-uwbFlLAskClYUXqpn_jzMA7XOw6dx3EtLUB_4LchdYdPycw>
+	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197044; x=
+	1784283444; bh=GZ+Y9HHwl+n/BGQRE116ewYffqbxZd/kucdg61aQyf8=; b=A
+	MLKvodVwboPuBecBOMoa8ueMIVSSyTE87eo6FtQqeznUNsf2mLnuhb04FQkRqr0f
+	MMQX2BDZZOaxcWzRL8iIAnRwViKNEw0IfsQihfgpOkgh9jSGvvJ0B7dUwrhavj9H
+	bUR+Ubh07eQS7cf4wH8Gj+YaazmyBL8HILOiZNVflAkoqD0W9USagdZfCASBY+9a
+	IP9i0+3C7ysyfWEPdMWWINn/BsgyhXjNPcFtm602OMnlTqvCVNxtSB/ODNkfV3ZT
+	q1R/chfJq8iFsEQcEvLUVDFCn7qXBvgK6fkuYLqO5gkm/Ig/qwjkqo2mc1r5xDaC
+	Fl5svkwz/ykB7AuLDT+AQ==
+X-ME-Sender: <xms:tK9YapVtJJ6598d-7HfKq59Rqu3T3LAT9ZzbviggKYbP_bJUUtBL0Q>
+    <xme:tK9Yajrmn51tjzsjL8DklIdyLlXUEd3A7FVaE-PCcxGcR83-IJGpYz2tTow3q7WBY
+    5jSk3Gwf7PnOCkm_buYg2FefzBWktyxjG71MCGp_2iTs4qzEseTvX8>
+X-ME-Received: <xmr:tK9YalR-P8N1Gq9_fPz0Bk_zZ6VrczgtsBRsEp-6ssnnQI6NWCHV4bt09CM5v3AU8EYmDRDHbSVcfRijt6SQ1s4ahSsw2TxF5Us>
+X-ME-Proxy-Cause: dmFkZTGS6ZY5pWCItkgy9Xukn2zcuewFxo8ZHHN4pRvLqTF9Ej/jkXu4Mnxg+8SVH62C9Z
+    NdfHOTAcoQsik7u3NMaqdaj/Sb4GyhvEyXqxfPz1ORC+VOfUwL7xO6EixFaof20XPTjQoT
+    w0gMCsjiGcBL5Sc/2+7W28zCMKgBMJ8o0m6Z5UnNj8t2Ub59pnmCGLWOBXXFwHGukKnjg9
+    oPwii2VoGp9LyZNtBuP22Qc33o2tx6mCHkKvSggiUEwKtN1s+YoPNk4J+4iDvPQupo41VS
+    yjh7oZu4qBQRwkQZnPNtC4Habjb6Lk5fCXqzalnvP7SEl72bFlt1OaIxxzE5VmPVNQezVC
+    uw4UKGDWG4JcB/UAREVW8ri2RDGBCNG1dW6Vk/BWToggr8iVVUFArrYCNscBOcv1kEVle4
+    WesT3AYzG1Kzazk2F0NgK56uuG/Wm7VuveJiQluI+Flm6paI22kZLuUSdN/jly8EksBQU1
+    j5ZnVQZPLrIPSqYNy1mWIHEZniKCNBR6PJecpllos6SYOJ4qJWWjX4n1l4lCCy58xjFjig
+    dAUAmvZSF7Szam6NJm9ZJhCXbE0VfUK8bLKo0L8qyLIqQg/8oylKUrTXmIW/l/+qguKoHF
+    pobp04kagngQn3feJVdJuiaWPPWZJZdYdsrbccfjWV6iGEZCmHyPngeyTkfA
+X-ME-Proxy: <xmx:tK9Yat08YQmTvQzqkHl11QZbpIRJU8rahJDdigaFw78klhntyIhP6w>
+    <xmx:tK9YahA2XrAs7qFcVtXC_Xc2suaGs5tVO-jdh_-1sW1d5NXEtFkbyA>
+    <xmx:tK9YapiCWOjCAyT6y-fucmFnelniwzlowQq9yMQi_WcJ_WEsHw_3_Q>
+    <xmx:tK9YajO5Ys_F7cxj7c9zy9yT9OZ5PrfELF_idiMd7xK3wlMNKh68Pg>
+    <xmx:tK9YakFMtIY0mOfoU90WdtkZDjY30w1aL9xaMMScFE_NZd2tr8ScX69u>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Jul 2026 06:17:10 -0400 (EDT)
-Message-ID: <cover.1784196135.git.fthain@linux-m68k.org>
-From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH 00/31] block/swim: Fixes and improvements
-Date: Thu, 16 Jul 2026 20:02:15 +1000
+ 16 Jul 2026 06:17:21 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Joshua Thompson <funaho@jurai.org>,
+Cc: Laurent Vivier <laurent@vivier.eu>,
     Geert Uytterhoeven <geert@linux-m68k.org>,
-    Laurent Vivier <laurent@vivier.eu>,
+    Joshua Thompson <funaho@jurai.org>,
     linux-block@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
-    Omar Sandoval <osandov@fb.com>
+    linux-kernel@vger.kernel.org
+Message-ID: <998aeb6ae4536503516df34ae38709835c61c8cb.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <cover.1784196135.git.fthain@linux-m68k.org>
+References: <cover.1784196135.git.fthain@linux-m68k.org>
+From: Finn Thain <fthain@linux-m68k.org>
+Subject: [PATCH 01/31] swim: Assert strobe with stable outputs
+Date: Thu, 16 Jul 2026 20:02:15 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-I recently had a need for the 'swim' driver but found that it was too buggy
-to be useful for my purposes. I had two aims in mind--
+Inside Macintosh says, "Be sure that you don't change CA0-CA2 or SEL
+while LSTRB is high". Unfortunately, those bits do change. The CA0-CA2
+outputs become inputs when (LSTRB << 4) | LSTRB gets written to the
+phase register. Then when LSTRB is driven low, CA0-CA2 get driven high.
 
-Firstly, I needed this driver to help me test my new BMoW Floppy Emu for 
-emulation correctness. Being that Linux is open source and MacOS is not,
-this driver should be ideal for that.
+This is a problem because the drive interprets a STEP command as an
+EJECT command when these pins float high. This occurs intermittently,
+perhaps because interrupts are disabled and the race condition happens
+to end well. However, when I add code to step the heads with interrupts
+enabled, the disk always ejects.
 
-Secondly, I needed to realign the heads in some disk drives. The swim driver
-has most of the code needed for a feedback loop for manual re-alignment, so
-I wrote the remaining code and pushed it to a repo here:
-https://github.com/fthain/linux/commits/swim/
+Keep the four phase pin directions set to output and hold their levels
+constant during LSTRB signalling.
 
-These patches fix all the bugs I found. They improve stability,
-compatibility and performance. Additional patches improve source code
-quality by removing redundant code and cleaning up a bit.
-
-This patch series was successfully tested on the following systems.
-
-Mac Quadra 650 - SWIM 2 with Mitsubishi FDD
-Mac LC III     - SWIM 2 with Mitsubishi FDD and Sony FDD
-Mac Quadra 700 - SWIM with Sony FDD
-Mac IIvx       - SWIM with Sony FDD
-
+Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
+ drivers/block/swim.c | 52 ++++++++++++++++++++++----------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
-Finn Thain (31):
-  swim: Assert strobe with stable outputs
-  swim: Select appropriate drive once only
-  swim: Enable the drive when probing
-  swim: Don't disable drive after every sector
-  swim: Perform ISM/IWM mode switching according to specs
-  swim: Configure parameter memory
-  swim: Enable clock divider only where appropriate
-  swim: Don't start motor until medium is present
-  swim: Recalibrate when drive is probed
-  swim: Add track zero recalibration delay
-  swim: Handle FIFO timeout error
-  swim: Simplify return value initialization
-  swim: Check for CRC errors
-  swim: Check error register during sector read
-  swim: Don't use the mark register to read data
-  swim: Fix buffer overflow
-  swim: Convert to blocking queue
-  swim: Remove redundant RELAX actions
-  swim: Deduplicate polling loops
-  swim: Check drive ready bit
-  swim: Revisit delays
-  swim: Remove pointless mode0 register write
-  swim: Don't needlessly re-read sectors
-  swim: Remove pointless specifiers
-  swim: Move swd initialization
-  swim: Add some helpful references
-  swim: Remove unused macro definitions
-  swim: Clean up whitespace
-  swim: Define macros for constants
-  swim: Define symbols for constants
-  swim: Unexport global symbols
-
- arch/m68k/mac/config.c   |  31 ++-
- drivers/block/swim.c     | 422 ++++++++++++++++++++-------------------
- drivers/block/swim_asm.S | 306 ++++++++++++++--------------
- 3 files changed, 403 insertions(+), 356 deletions(-)
-
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 0ccc12a72388..b61e92d0e3e9 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -89,35 +89,35 @@ struct iwm {
+ 
+ /* bits in phase register */
+ 
+-#define SEEK_POSITIVE	0x070
+-#define SEEK_NEGATIVE	0x074
+-#define STEP		0x071
+-#define MOTOR_ON	0x072
+-#define MOTOR_OFF	0x076
+-#define INDEX		0x073
+-#define EJECT		0x077
+-#define SETMFM		0x171
+-#define SETGCR		0x175
++#define SEEK_POSITIVE	0x0F0
++#define SEEK_NEGATIVE	0x0F4
++#define STEP		0x0F1
++#define MOTOR_ON	0x0F2
++#define MOTOR_OFF	0x0F6
++#define INDEX		0x0F3
++#define EJECT		0x0F7
++#define SETMFM		0x1F1
++#define SETGCR		0x1F5
+ 
+-#define RELAX		0x033
+-#define LSTRB		0x008
++#define RELAX		0x0F3
++#define LSTRB		0x0F8
+ 
+-#define CA_MASK		0x077
++#define CA_MASK		0x0F7
+ 
+ /* Select values for swim_select and swim_readbit */
+ 
+-#define READ_DATA_0	0x074
+-#define ONEMEG_DRIVE	0x075
+-#define SINGLE_SIDED	0x076
+-#define DRIVE_PRESENT	0x077
+-#define DISK_IN		0x170
+-#define WRITE_PROT	0x171
+-#define TRACK_ZERO	0x172
+-#define TACHO		0x173
+-#define READ_DATA_1	0x174
+-#define GCR_MODE	0x175
+-#define SEEK_COMPLETE	0x176
+-#define TWOMEG_MEDIA	0x177
++#define READ_DATA_0	0x0F4
++#define ONEMEG_DRIVE	0x0F5
++#define SINGLE_SIDED	0x0F6
++#define DRIVE_PRESENT	0x0F7
++#define DISK_IN		0x1F0
++#define WRITE_PROT	0x1F1
++#define TRACK_ZERO	0x1F2
++#define TACHO		0x1F3
++#define READ_DATA_1	0x1F4
++#define GCR_MODE	0x1F5
++#define SEEK_COMPLETE	0x1F6
++#define TWOMEG_MEDIA	0x1F7
+ 
+ /* Bits in handshake register */
+ 
+@@ -284,9 +284,9 @@ static inline void swim_action(struct swim __iomem *base, int action)
+ 
+ 	swim_select(base, action);
+ 	udelay(1);
+-	swim_write(base, phase, (LSTRB<<4) | LSTRB);
++	swim_write(base, phase, action | LSTRB);
+ 	udelay(1);
+-	swim_write(base, phase, (LSTRB<<4) | ((~LSTRB) & 0x0F));
++	swim_write(base, phase, action);
+ 	udelay(1);
+ 
+ 	local_irq_restore(flags);
 -- 
 2.52.0
 
