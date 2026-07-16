@@ -1,49 +1,68 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18481D61BC
-	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E8C41D638
+	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784204857; cv=none; b=lLoEplXtQ5CuLvYMn8IqOn4tH8sGSS68yu1O7o/X148TccqKbpHT6A+/UEHmuexXzTacE0QOp26QYf2oXj0mmi/D2l3h7SaKiOEN3DYrWomZY1RM7NdbAx/S0hPgiE/GF1dJCKo2r7y4oLxSZr7ae1ZDDRGzWtrjJl0HIkuZF4I=
+	t=1784206459; cv=none; b=YdXqbOuNENw5eJcTlkvok4fDhzB7QXQ0tLqN9Ql12Rt+7ehd1VzDCV8+TUWwN/TJ8Qq4F4cgArZjmsCSawC2bmW4BXT9uDOVrwDa9FosruEuFDlsPhQWz0U3DPKONrb2ujPfOlfFyCDpJEECpLDI143N4+zxUKULNj/si60hDQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784204857; c=relaxed/simple;
-	bh=6a3Myq+YEczHskqy6H5LktCSv/08gjKKFs8PPfwvXO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=d3xnwDwASh0m7FfPRWkX+m9kZcLRApRamIJABZBVu14LM1TYUL9Ee1tTn/bRX5l9AUR2mN9Ag2tylnFaPPobNKFD5ZUld+uIxBKBJb6Zm5GZHU0YbGNgaPJGjN25aamGkUEzfupiE81z162i7bKo1zLjkUol6w9AbIUmSmAfpVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=lrSMTPsv; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1784206459; c=relaxed/simple;
+	bh=VLvepFLbLnMw4+j5aVxMqNrtA5wOAZxiUEu7BvqkcO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CrxWivnl+3bJrPeobRog5pLPSmwJt8yYeKeCw0EWMXBoj2wHe1x+27eITI/WddwVL70dN8Xn1fCqpecasdHnUq9B/6Sidm2mC6ZsbIqPjg0m9XZfYUxRPHz08cTLJ0026aHgDkiAnuTCTup/CZ2afl0OvCxvba+Nl2XCDRRjQSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAjkLfCe; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lrSMTPsv"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260716122732epoutp04d0cc7beb9f59e6cad010dbb67629990d~CxNwcGdu51716017160epoutp04P
-	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:27:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260716122732epoutp04d0cc7beb9f59e6cad010dbb67629990d~CxNwcGdu51716017160epoutp04P
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1784204852;
-	bh=goVpL7phv0f5v85AoAM/QZBOHt0lBeS9xOxdnmRJRho=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=lrSMTPsvhirFZvmuKPdVvZe4wEm9pkIf2FYnRWaB0QlnYRwyxKwqAirvZEPcngvfH
-	 0q+sCKiZArUftASUedHW+jEHhZC3AjeYESMt++ALvLajZXrjAdrRrvtE3TMtNoT78d
-	 jvJV9XKbCbgYDc11CPrd/I7FYgese4lvAZWWBCFQ=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260716122731epcas5p4b72a6b2d54f87de136569cb57bf22e21~CxNvuHdeA0311403114epcas5p4o;
-	Thu, 16 Jul 2026 12:27:31 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.95]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4h1C3k27Ybz2SSKX; Thu, 16 Jul
-	2026 12:27:30 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260716122729epcas5p1c1d760a6356d1234e8098d8a4436e541~CxNuCviDN1127111271epcas5p1B;
-	Thu, 16 Jul 2026 12:27:29 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260716122727epsmtip277c923c3033f4e6c4f6432f6195bce6b~CxNsOdiBE0195101951epsmtip2R;
-	Thu, 16 Jul 2026 12:27:27 +0000 (GMT)
-Message-ID: <9cb5024f-7e39-4b02-8720-fb4a76affa60@samsung.com>
-Date: Thu, 16 Jul 2026 17:57:26 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAjkLfCe"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cace91f112so63455515ad.0
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 05:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784206457; x=1784811257; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UlkKCvRMizikKPPQV5+qMzDl1ZZFHbMqGmdaZXVWNSc=;
+        b=WAjkLfCeaOrVV/9tbRE1ASOadH3HX1O4PU3ubZhV14xtRWEksUExL/4NDqtgZX2Hwq
+         Ur9tPhueAtUkdJ5afPcWFjgIdm1W5qFNbCn0/Nvx0xhvr8eimivvdi+0mfqXfq+WXnro
+         V/2LVevZ+216RRVAHzFhXwV7WT5hH2uBFfxVHsfg5uUM0HHCAqIECpK+ESIjH7Ty4O20
+         yf1xPAxpglm3yrwbuAetUB17emXAC0BHPXAGHP3GPxV83CDyEkzPfOEvGZ/59QhDAXH7
+         m13h+GpiZCA0j7QgDksL5qF6Ql6/D3giD0eCgAO4dl3WPv1Mwd1iWz2ZX/G1DDnxOWNU
+         Bu0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784206457; x=1784811257;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=UlkKCvRMizikKPPQV5+qMzDl1ZZFHbMqGmdaZXVWNSc=;
+        b=l76d5ZMSGUKBSz5QiGVcg/pexjxB94RNwd4F4YMrFPRa3VoKP9SjQr3oV7fJPapse0
+         P2THvzY/C0lzkWUYU9UNFr9OYdElHJaXmOgmY47D1RfCLY/hBSVGHaxUoEdWQ51rh9gV
+         n4ZsNpTPnBX36MDuIQuBNyr5JN+7I04Dvyq6Y8MCpYfXgfAkKsOrq/9mVc08xpBwN1ZR
+         Ztk4lkqbVUomqrxCe/aHAiG/nwqW0exikV81Xnt35L/x8h9+OVm2clrBvHYJToU6Z9Be
+         Jg9pDk5s5G3mLmUiWv+m5QS1BKmgpBmP5t/eKIRVAn1ZZizkU3OcUdz2URyVLsxQJcx6
+         tPYg==
+X-Forwarded-Encrypted: i=1; AHgh+RoN4IPiXSfDaIhXTPEtL3LQJwmB9PLOJkp/RRA2W1jwIr1XmSNNWuWyIqqxGtP2/A9WoB//zPOG8/sVOQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYBmsXJwIc5ETcU4ThyLCesypDKPY6B2CpEJPTgQOTOxAJe0vA
+	Q//hNvkiHS+fjG0NEKeuCFTF7Yd7DjYUe9pLcn7K/tjQQMROwYmxaY3Zc9dQ/WsMfzM=
+X-Gm-Gg: AfdE7cnltd+/CuifMejx7oFS3S5njAe74p+1t1YaOgkUqT8cFu4nZ9aCCTanHHT7kMV
+	Ehj1kbrdteUsDejwewECbwMnCJBCzbzE0gcDqdHN2044e6llKg8PpRcO2JUDupCO1ATIy+DAX18
+	ZVhqlbfqqbuSCd2UTuYUVFJrqjSZQGDZ67VCOb4oG4/hDfbgtM7VfnR8P3x4tl+7GztkhGoAnxb
+	ppVfMToWZXeucfgjjyG2cHxbLXnRXL3BHXs0az9O7INKCY6NZ/4a1/LAKe9/PvFbvFh6OrW0Jld
+	sMnUrygIwCV5fGazkTzbxX4yQLsnM4VHx8+KR7z8+GIFHQCCqkCD6rW2pobgOH6XD3mxpNePdNp
+	35ufpuh8Uxw9+mbOadFks6QW1P80nhw1tachO2IMe/q7/va8Pkl1Oo+8VsYqiOStbcTfJ+2bSJc
+	+OATDlD04JZ5ppDL51zcteEYbXkJQmIm7unOdJtXBej/Q/GtZ4ypui7t7PSr18UjZVW853kzap0
+	Mqo
+X-Received: by 2002:a17:902:fdab:b0:2ca:329:3da1 with SMTP id d9443c01a7336-2cf03ca9c33mr65942925ad.16.1784206457145;
+        Thu, 16 Jul 2026 05:54:17 -0700 (PDT)
+Received: from ?IPV6:2400:79e0:1203:64b0:e174:fd48:2cf7:d01e? ([2400:79e0:1203:64b0:e174:fd48:2cf7:d01e])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf1012fe86sm19726645ad.26.2026.07.16.05.54.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jul 2026 05:54:16 -0700 (PDT)
+Message-ID: <ed8b92b3-18d8-43d4-b204-8ae82d0f5e38@gmail.com>
+Date: Thu, 16 Jul 2026 20:54:13 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,80 +70,65 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] iomap: introduce and propagate write_stream
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: brauner@kernel.org, hch@lst.de, dgc@kernel.org, jack@suse.cz,
-	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH] blk-cgroup: avoid 32-bit overflow in root io.stat byte
+ accounting
+To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk
+Cc: tj@kernel.org, josef@toxicpanda.com, boris@bur.io,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+References: <20260714063118.1153083-1-cui.tao@linux.dev>
 Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260624181044.GW6078@frogsfrogsfrogs>
+From: Tang Yizhou <tangyeechou@gmail.com>
+In-Reply-To: <20260714063118.1153083-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260716122729epcas5p1c1d760a6356d1234e8098d8a4436e541
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260616181244epcas5p318804096b125c240c2155e54f76e2e07
-References: <20260616180555.33338-1-joshi.k@samsung.com>
-	<CGME20260616181244epcas5p318804096b125c240c2155e54f76e2e07@epcas5p3.samsung.com>
-	<20260616180555.33338-3-joshi.k@samsung.com>
-	<20260624181044.GW6078@frogsfrogsfrogs>
 
-On 6/24/2026 11:40 PM, Darrick J. Wong wrote:
->> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
->> index b36ee619cdcd..455fd5d97d25 100644
->> --- a/fs/iomap/direct-io.c
->> +++ b/fs/iomap/direct-io.c
->> @@ -348,6 +348,7 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
->>   	fscrypt_set_bio_crypt_ctx(bio, iter->inode, pos, GFP_KERNEL);
->>   	bio->bi_iter.bi_sector = iomap_sector(&iter->iomap, pos);
->>   	bio->bi_write_hint = iter->inode->i_write_hint;
->> +	bio->bi_write_stream = iter->iomap.write_stream;
->>   	bio->bi_ioprio = dio->iocb->ki_ioprio;
->>   	bio->bi_private = dio;
->>   	bio->bi_end_io = iomap_dio_bio_end_io;
->> diff --git a/fs/iomap/ioend.c b/fs/iomap/ioend.c
->> index acf3cf98b23a..56ed5ba6a421 100644
->> --- a/fs/iomap/ioend.c
->> +++ b/fs/iomap/ioend.c
->> @@ -164,6 +164,7 @@ static struct iomap_ioend *iomap_alloc_ioend(struct iomap_writepage_ctx *wpc,
->>   			       GFP_NOFS, &iomap_ioend_bioset);
->>   	bio->bi_iter.bi_sector = iomap_sector(&wpc->iomap, pos);
->>   	bio->bi_write_hint = wpc->inode->i_write_hint;
->> +	bio->bi_write_stream = wpc->iomap.write_stream;
->>   	wbc_init_bio(wpc->wbc, bio);
->>   	wpc->nr_folios = 0;
->>   	return iomap_init_ioend(wpc->inode, bio, pos, ioend_flags);
->> @@ -187,6 +188,8 @@ static bool iomap_can_add_to_ioend(struct iomap_writepage_ctx *wpc, loff_t pos,
->>   	if (!(wpc->iomap.flags & IOMAP_F_ANON_WRITE) &&
->>   	    iomap_sector(&wpc->iomap, pos) != bio_end_sector(&ioend->io_bio))
->>   		return false;
->> +	if (wpc->iomap.write_stream != ioend->io_bio.bi_write_stream)
->> +		return false;
->>   	/*
->>   	 * Limit ioend bio chain lengths to minimise IO completion latency. This
->>   	 * also prevents long tight loops ending page writeback on all the
->> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
->> index 2c5685adf3a9..44583429ffa4 100644
->> --- a/include/linux/iomap.h
->> +++ b/include/linux/iomap.h
->> @@ -120,6 +120,8 @@ struct iomap {
->>   	u64			length;	/* length of mapping, bytes */
->>   	u16			type;	/* type of mapping */
->>   	u16			flags;	/* flags for mapping */
->> +	u8			write_stream; /* write stream for I/O */
-> I'm mildly confused by the types here -- the ioctl exposes a u32, iomap
-> has a u8, and xfs seems to use u16.  I gather you want maximum
-> flexibility in the uapi and that's the reason for the u32, but can the
-> internal interfaces be made consistent?
+On 14/7/26 2:31 pm, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> blkcg_fill_root_iostats() converts per-CPU sector counts to bytes with
+> 
+>     tmp.bytes[BLKG_IOSTAT_READ] += cpu_dkstats->sectors[STAT_READ] << 9;
+> 
+> but disk_stats.sectors is `unsigned long`, and the shift is carried out in
+> that type before the result is promoted to the u64 accumulator.  On 32-bit
+> kernels (unsigned long is 32 bits) this wraps, so once a per-CPU counter
+> reaches 2**23 sectors (~4 GiB) the computed byte count is wrong, corrupting
+> the root cgroup's io.stat.
+> 
+> Every other sector->byte conversion in the tree casts to a wide type first
+> ((loff_t)sectors << SECTOR_SHIFT in bdev.c, (u64)max_sectors << SECTOR_SHIFT
+> in blk-settings.c); do the same here.
+> 
+> Fixes: ef45fe470e1e5 ("blk-cgroup: show global disk stats in root cgroup io.stat")
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+> ---
+>  block/blk-cgroup.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index d2a1f5903f24..a778aa9d2bb9 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1112,11 +1112,11 @@ static void blkcg_fill_root_iostats(void)
+>  				cpu_dkstats->ios[STAT_DISCARD];
+>  			// convert sectors to bytes
+>  			tmp.bytes[BLKG_IOSTAT_READ] +=
+> -				cpu_dkstats->sectors[STAT_READ] << 9;
+> +				(u64)cpu_dkstats->sectors[STAT_READ] << SECTOR_SHIFT;
+>  			tmp.bytes[BLKG_IOSTAT_WRITE] +=
+> -				cpu_dkstats->sectors[STAT_WRITE] << 9;
+> +				(u64)cpu_dkstats->sectors[STAT_WRITE] << SECTOR_SHIFT;
+>  			tmp.bytes[BLKG_IOSTAT_DISCARD] +=
+> -				cpu_dkstats->sectors[STAT_DISCARD] << 9;
+> +				(u64)cpu_dkstats->sectors[STAT_DISCARD] << SECTOR_SHIFT;
+>  		}
+>  
+>  		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
 
-Yes, using u16 within iomap will make it better.
+Reviewed-by: Tang Yizhou <yizhou.tang@shopee.com>
 
-> I also wonder what happens if the write stream ever becomes persistent,
-> but this patchset doesn't go there, and maybe the programming model is
-> simply that you have to set it every time you open the file?
+-- 
+Best Regards,
+Yi
 
-Right, not trying to make things persistent.
