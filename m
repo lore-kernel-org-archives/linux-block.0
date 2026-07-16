@@ -1,100 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C0041DDFF;
-	Thu, 16 Jul 2026 12:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC773F9F37
+	for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 12:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784204205; cv=none; b=d+sVFun6zQrPSp9hfUwipLn+T+PvnwskLqp225CJSqbD1Rx6OU6uRJJIyrum2ZSf4q0crKRG6Bn7Fv9tCTgD7Dw/kX2STRLmYPvIAPgtaCAbx4RqHDuJ9nVJrYHnGdrcxYTvGAeEVnL/c9x+N2ZL7sf9Udpbq20K+9gC+/YmIQg=
+	t=1784204393; cv=none; b=P4UoX1AAmnj5e0KqnLboVDFSutdIWiVv+BFEvPl8xpZPWV1wGVfCkdMzRkbb8ibFc5slipGmOhcz6pPg8x6tOMT8UyiAosc8Hl4PFsBWKvvV3BBm4kSsO5ZQchjXlnIk8czoB4F1MXmU6XSqw8qyIMgwec5juXcZpUIV62p0tmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784204205; c=relaxed/simple;
-	bh=RHnoUoVVBRHznZDjfg7p1zoSY/QFz6KSM7e+8oRx5t4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T+h6qKBQhqG5/BSeEV/kS/bHC8nWGE6D/B8UUCMxsXb+XcjSImJrTklLmCyK6MtvgXrMJRDGXn2X1NoGWQunGFEb/X0FQS1gxcS8HIq8X/Y3EU2Qy/UDeXlfTCHP/1X31ZV/RAlBKKdZ3JaKT4THvvic/v2MaYa5gavRS+SdNl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7b+FEw5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784204393; c=relaxed/simple;
+	bh=PlzjWzgDDt6tc68NVLye65j+dlo1TtiJV4HmRQ9VJao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bsmepBjkK25ZrXmumdYoc0nCD7y2ufwuDSNz3piJklemeXDaFFIv4G1KC3QYz88R/c5ff1CchxbGeXS+3EhUC5SaDxTLyjLmlB+F1gbHY4AN+nKaAYG84x5q6s7EW1qGnKChWGHErqH8LQOapBrz+Fd/D5gv7HEmhYYhQakPNHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fmxbrowx; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7b+FEw5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C0B1F000E9;
-	Thu, 16 Jul 2026 12:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784204185;
-	bh=OeY/RrnCDHeRA7waqEnCw2zQoIH3AdOyPp5nJdiYRUI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=C7b+FEw5oW4E/09NAyQh5OGXjrU634n8rTS8NN5msWGpky97UJYzngQcko/OfNo9H
-	 7MZyCCbaIAEGufoCKyGKIjODfzlMsW6yt1g2rulcjLtl/rlVAWIZvwKTeNC+JssUnT
-	 h0sqMU+7U4g/0sB2w7zjoXg/pFB/PDoIK9T1YUmtoKmfe7eqCmB8I3S+/aPXATfKeG
-	 Q0NNVAWvcK4Qb3QqYudhggsIgxEsf4dd96OQMfBo4oGCVxr7U+aCYGKtWv4gAU0MoG
-	 vCJ3RW6mMd6zZyJ8g79AMwBGhcKW6h/QF6tRBGeSR4F59aqJEEUZzRmlPWM1cCLhEL
-	 D+Z/FYd0Zuvbg==
-Date: Thu, 16 Jul 2026 13:16:19 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-next@vger.kernel.org,
-	axboe@kernel.dk, Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>
-Subject: Re: [linux-next:master] [loop]  d908729e74:
- stress-ng.umount.ops_per_sec 100.0% regression
-Message-ID: <e75c9a7c-77dd-47aa-949f-27a937a64760@sirena.org.uk>
-References: <202607151655.9d74999d-lkp@intel.com>
- <aleZammRRSVN4dl0@infradead.org>
- <c625eb50-e474-4966-bf3b-e83d7e7d1750@sirena.org.uk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fmxbrowx"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-caf45fc5202so3985875a12.1
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2026 05:19:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784204388; x=1784809188; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NNVBy8u+XjMaZM3z2LpdEO0iw/XOyiSV5aem9nLfAFg=;
+        b=Fmxbrowx2/fDb/VorBk4l4aoN61eN4Fqzn/DN3EMn3VhtVhD2SQtsMCfp5AXNOcG8B
+         +npZhUJdT8/Y6M7JBuirILsehyEAne3RcJH8dGnng8gfUF4nQrA+iAqjYBYA9uk3/FA1
+         wkIfkb43iXKnp5nlQYOfaNxwI2shfw/LASOPLqXSnno3bUwE+1aqFrXhLgpm6tEHZKm8
+         uCChY/06s4zX7gQ7PTbNsjQL2BYpnXjbuvBDFZE9OqJ3g2GypmzJ+oxk1PT5tIveNsJK
+         dhwf6x5oPtgzPMdVsOtGYTzUs+x55JqwKs8dSTZRUXoCjykgwsilH/EIImlt8X8Q0Mu8
+         1frw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784204388; x=1784809188;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NNVBy8u+XjMaZM3z2LpdEO0iw/XOyiSV5aem9nLfAFg=;
+        b=VqjoxRlRdQSHyHSpsdj0jsyllEuIKDGCfRFJGFN+ZtzjrpzXyO2Elw9rdTbWqo9TKS
+         2DX39yRtVgxkLGsA1jeDil55xo9bkED7pn5Hh+etIzYB2MRY9Q8uHAMAuRu978W2xfhA
+         kz0Hvvt4M/ArtGPUtZR+MJavN0xiVWt2XMa6PkfmlyNgtzOIXGBRgIaMQuhHAsfiLa8l
+         GVy5c3BJpRGtEellsYTGQ9p0181DYAoQW/tARXRPOGwGQ5XQHV0UrOS3vuw6uayhzxZb
+         tt1Xt9aoyQ8vIoujGROuXHEC6M8uZXpqbEKNZd1d7LmxFGLGAloFVn8VxectcRFUCzim
+         wAFw==
+X-Forwarded-Encrypted: i=1; AHgh+RrQconQOcm7GOJWtk2fjdadk0epC7h+nJLO4ag3rItITRYwRNrOTH0+SAojXCl2LRN3YKmWDqBLKwZUYg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YznjIxTmAedTqjQ7ylu+HQh1lUuOoX+e8QWKPnLWRqSP1xWlhXU
+	eYkzSsYcyxc1eh95CMKvoLEyNNBe5a6OVRBsvrIOE5PnYfweYz3et6KH
+X-Gm-Gg: AfdE7cnMcHzBPkwptsOruwKWW+Wi52YlFKPbfRGsJiF5G+jdbvCPgT+Qws70O3/bs8x
+	gLKFa2oKu/b0fvTLWJ6x5xfZIlayUQE1QuvgDVF7VX2lmpqM+TBrl4O4G07yqHgWlGXZoFMAodX
+	soCgN1pRav09q006JYm0zYN6d3othgLxJToBLLgCrZf6NvaxrfGdhkPJlb7JWI1Qow7XU91tvXM
+	HU3SgK9U4FLuYF4b/s7eggfPtVhCZ8bxW/3tjZWjDZgkLlhkCUzeP38WOhq53R7q5kieRUwAMJB
+	iFLk9QEOmc5bEcDJXgeII3SRtnx/paMNQNISg7JmVhOghuC8WJdBYUcOB3DhzrWmiVz/fQ35J/E
+	E4YSsZA+AkiGis2dI+RZol+6zEOip0haojVCq/5Ok0V4XaEVV1sS+7Ay2ePLWgdAy4BeX/6aF15
+	agHMhKMQmNzzw8dTrYXJAA
+X-Received: by 2002:a05:6a21:e97:b0:3c0:9c18:d5a7 with SMTP id adf61e73a8af0-3c3572937c3mr13731565637.68.1784204387596;
+        Thu, 16 Jul 2026 05:19:47 -0700 (PDT)
+Received: from [192.168.0.23] ([210.10.76.89])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cb258eb8578sm1834476a12.3.2026.07.16.05.19.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jul 2026 05:19:47 -0700 (PDT)
+Message-ID: <676f4205-edef-4d2d-a7b1-8878d466bb7e@gmail.com>
+Date: Thu, 16 Jul 2026 20:19:43 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="61mQimz+8MzkIz9g"
-Content-Disposition: inline
-In-Reply-To: <c625eb50-e474-4966-bf3b-e83d7e7d1750@sirena.org.uk>
-X-Cookie: Celebrity voices impersonated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-cgroup: show io.stat numbers for discard-only cgroups
+To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk
+Cc: tj@kernel.org, josef@toxicpanda.com, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tao Cui <cuitao@kylinos.cn>
+References: <20260714063302.1153238-1-cui.tao@linux.dev>
+Content-Language: en-US
+From: Tang Yizhou <tangyeechou@gmail.com>
+In-Reply-To: <20260714063302.1153238-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---61mQimz+8MzkIz9g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 14/7/26 2:33 pm, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> blkcg_print_one_stat() gates the rbytes/wbytes/rios/wios/dbytes/dios
+> output on
+> 
+>     if (rbytes || wbytes || rios || wios)
+> 
+> which omits the discard counters.  A cgroup that has issued only discards
+> (zero read and write counters) therefore prints an empty stat line and its
+> dbytes/dios are never surfaced, even though they are accounted correctly.
+> 
+> The guard predates the addition of discard stats and was never updated;
+> include dbytes/dios so discard-only cgroups are reported.
+> 
+> Fixes: 636620b66d5d ("blkcg: Track DISCARD statistics and output them in cgroup io.stat")
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+> ---
+>  block/blk-cgroup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index a778aa9d2bb9..b324701cb05d 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1154,7 +1154,7 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>  		dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
+>  	} while (u64_stats_fetch_retry(&bis->sync, seq));
+>  
+> -	if (rbytes || wbytes || rios || wios) {
+> +	if (rbytes || wbytes || rios || wios || dbytes || dios) {
+>  		seq_printf(s, "rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
+>  			rbytes, wbytes, rios, wios,
+>  			dbytes, dios);
 
-On Wed, Jul 15, 2026 at 03:57:22PM +0100, Mark Brown wrote:
-> On Wed, Jul 15, 2026 at 07:30:02AM -0700, Christoph Hellwig wrote:
+Reviewed-by: Tang Yizhou <yizhou.tang@shopee.com>
 
-> point where I think I have to do as Christoph suggests.  Looking at the
-> current contents of the tomoyo tree all I see is:
+-- 
+Best Regards,
+Yi
 
-> Tetsuo Handa (6):
->       lib/Kconfig.debug: add CONFIG_DEBUG_AID_FOR_SYZBOT option
->       net: update dev_put()/dev_hold() debugging
->       net: add "struct dst_entry" debugging
->       loop: Fix NULL pointer dereference in lo_rw_aio()
->       kcov: fix data corruption and race conditions on PREEMPT_RT by moving saved remote state to task_struct
->       apparmor: temporarily disable in syzbot kernels.
-
-> Absolutely none of which are obviously on topic for the tomoyo tree and
-> some of which are patches that people have previously raised concerns
-> with.  This is very disappointing to see.  I will check the status again
-> tomorrow but as things stand I think I need to drop the tomoyo
-> tree from -next.
-
-Looking today I see that all these patches were dropped from the tree so
-I've left tomoyo in place, thanks for taking care of this Tetsuo.
-
---61mQimz+8MzkIz9g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpYy5IACgkQJNaLcl1U
-h9AWbwf+LalYQS/hl3QxwcQit0fMn8PF/NHQ2mK5pM/8LWvNLQG5laomGTUjblwJ
-CrmU/rP6ODlTiWwPTv5M3t+9lJXtjjrd0d2tOD6IKPZsUmqJzriYVDUpbZW9M/aW
-QD9EkvubuFJW0chc/XHOoK9ciQJSH1kZnThLARHVmqn0A+bBbsw4el4Q1ZNjZ+f9
-Gkrlg66MqX56yPsCkTsX5xjCWwQEqpyM3z1y11H0ZRd5hIFbZohHw5FuQSl3BD2H
-fpuicDvOkg3m1R35bDOuJzoXC/7aB//qf+TL3OsB+o0glhrTD8+BOEdZvwJhNzSK
-wJUkwaQ+vjLP0iumFcjOzHRtsr5DFw==
-=DFfZ
------END PGP SIGNATURE-----
-
---61mQimz+8MzkIz9g--
