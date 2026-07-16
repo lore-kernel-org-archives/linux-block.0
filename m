@@ -1,59 +1,59 @@
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA3519E7F7;
-	Thu, 16 Jul 2026 10:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF6B3FF8A7;
+	Thu, 16 Jul 2026 10:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197169; cv=none; b=aB96DPmncowH7klxT4ufFnCyhz4eD+ZNYji5fsPTQaMvAVOCYmMg3+IHeAP5yEeYD8PXiYpP/go8PskC2T8KtRY1M2rFpat2E8RqjrJKDIvTP1qZd8jU7qCALA4QMGNmxuGDqQXpeSSuh850xZYaQMuE97i+0+gQBrRVukEyjJ8=
+	t=1784197179; cv=none; b=buED6yzTjShAVncoQyPWDHwkT5sPIHCM45RxqrYktWgRoTeBsHClADavsur4irVxTHYVJHbfHzoxJQFYMOGHywNm2BPjtuUXQVX8qk21RxoWXJjINIVCRB3Gs4v5DQGH2n8L8ojeKtJEiLgaD3jXzsYRq2DAhDCS0meccnUKeo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197169; c=relaxed/simple;
-	bh=FMM8KpjE40LwwAIT1qntlDYzJALDnK7ajpePNTGy8Wg=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Rau3+c3AjM3ub0Zs6HeOmwuukCKky83lwYmh9PB8zkqoqXLa2h7ltr5SMbz1GSFm9HI2Ia0qEkybDyO2Vw1rXBgDbX1TsKg6DC+AcYGSxdVDB9wb60Zu9qcOsH218Pq/gTgXlWy4r+QHiB0Ds6+OXflIcVubrwV15+UdpvwjL/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QjJLmKsb; arc=none smtp.client-ip=103.168.172.159
+	s=arc-20240116; t=1784197179; c=relaxed/simple;
+	bh=nl2dMaMd/YjSSmQZ1XOZL/2UWtRPGmaeMMrhtOCmpQw=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=JWThE/lnLRd5W6hDuWvNF4Cck4CE4br90mLj7VgvXhtROfiSTzuLQlq0esxE808rbG7QCdfUWtA4hAbk0WBH4T/PNTUQ/au/bvF9x+Ja6GCnZekzAqFPQUoQDuSEq10WUn2NMtK+5TXGXB8kkTyuZeO30IyCjmAu2cnPED7cScI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lUv+aE/L; arc=none smtp.client-ip=103.168.172.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QjJLmKsb"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 56AE5140010B;
-	Thu, 16 Jul 2026 06:19:27 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lUv+aE/L"
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 89A94EC01A7;
+	Thu, 16 Jul 2026 06:19:37 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 16 Jul 2026 06:19:27 -0400
+  by phl-compute-11.internal (MEProxy); Thu, 16 Jul 2026 06:19:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197167; x=
-	1784283567; bh=DgF22wdqtJtH94iuaDMprm/3xbSplJyJEAvdJ2VsNSc=; b=Q
-	jJLmKsbREtc8gxHtBzgs4ZVhCymnV1K641BOjcA7/YphSMHLUe7gBwSFqk/EMuC/
-	qZfrdhx7a5KveyJxXj/wTGL7+T488H56No3X2g7YbNmArkQzd6QdPYAtIgPWFmiC
-	K92JnYlLw1ItwJAq3oEdaaa5J/C8uzO+YRWGRAaKdl8LtctcUAyB1basOmO+amjs
-	Rrhdn0v7dLszcDkq8ZnKuVDC3SlysDS6d/TuKthW5/Kg6+3J6BzCw3tIA+qSjEm0
-	L7b+7atar55G/8PyeLU0QA5NFeA4F81yAySUmGX+OmwszCKne3TKL691bS5befav
-	MXeK6TBK5VwA2LZ7q7axQ==
-X-ME-Sender: <xms:L7BYatQcWy3UofHh1ytg2-Pk5pKdOalyXj4TSVLLyqJxi7HIUzFRUg>
-    <xme:L7BYag0eb-kbo5VySD0FsVh26HDXipepWYSt5FHHWmyPx98bZzAGvgRM5eABs30zq
-    vyBSSyJLZmSxJywLOaawML6-HNpycEMKryMiWpGogdiKJ_NYK6_iQE>
-X-ME-Received: <xmr:L7BYaivVJafWF6xPBS1M6Bkr-No6u57l-DkDEU43e0Vvh5gLwAB9vq5ikR9x6DQT_07knFPZLXiminZCPwAkcQITG1tVgJd0Iio>
-X-ME-Proxy-Cause: dmFkZTFltWOiqi3GJy7/GjNP9KLpSvE6YkRxm2Q3A+Dj/aP0Z6dA9iIiBN0USRzNJCcteS
-    K/D0kvNTDbqtTANaUA/xfgoZfMpszLplr5/pvHVqKKo5s0RVWCO2umMrR+nQZw0OKxwLXK
-    KaQRMPKUEdI+qra509DzvjLAVS5kcbe0yFLHbQq8WitTPnaA9a//q0SseAu/arIDWD3AGb
-    W1DzaVjmh3YVxjd6oh9EZ+C9JcqMLUvXWkcNjeyN/Zi7JLie6B4Pll4f+m9WsP9wdaNbE/
-    iZiUd3GAI7vwYmV5kLRtY/IqoaNmE03sbAQ65XKcDP6gxXaEdq+cc/kMIqclO0/e7Ytpj7
-    0H8+JkXJMCgLSOGSp4Y1q8U8Rs8AJntyf66X/TJTNBLjSdeub0yyzXhI9OBMlTcUDixmWw
-    SAeCuL47Z5N86zr6N2W+weGeEq3Af3ZvjXkO1bCZtHLjBGkQyUadBnr38IE+/EiBYo9Sez
-    r7iGeZjV0EYqmFd9Wk82CuPRb+RXVWXYu4KMiULZROec1trRwJtyCkC7VR+cJ0PfbWgf4w
-    0xyC/YmVqM6+LdrrnpHwGzKUc4UiZuGmmUkur6ffJEzHobG/ulANx4Lft5c5tFnoMu5wcH
-    OCgpo5GfVnb0zrb0WVRnzROFeZV5CNvaQvNxpN3Ci1BGUc9zwuO2Dekc8Mnw
-X-ME-Proxy: <xmx:L7BYamhgrYSYHLSfP3uc_S50_uRpMLcb0umUIrRd_Xo3MByoU-zF7w>
-    <xmx:L7BYaj863OXmmZyIQHr505PcAX12Ls18TstId_wDV4tM2fU4QvzurA>
-    <xmx:L7BYapuEFoQTnx5f2aD6GpJwsbr9xecOhXW0lRjRV8Uq84pfyjWZZQ>
-    <xmx:L7BYanpG3ElZLQEI63_VyhknZkHSFOoa97HUTM-Vg0vE98QV5w_YVQ>
-    <xmx:L7BYauC2E5g-fv5gudNc4xaaQB79Jbxs9l1EilkWzwLM0y88Vd3hgcc6>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197177; x=
+	1784283577; bh=7p6ECjfEtCTzs/4hVX5xdJb+UbIrStDYTZW5Fvekq6s=; b=l
+	Uv+aE/LeYpP1qltw+qqseGmiYakpJK3SPxZIemWEVQpcrb8EkrrhCJ6nnmt8SEuX
+	y7NTL3+ym2YywZtZqsjsCToJig8nhRebpaAvrpkVqcP8ekgGiZFPhhzFTL5yjDJ7
+	rBbPLunmf3OeCioKAMaYS4HKBJqy0Q26xZmATVm+omQyRdKqpGJtjpha9KE8/a/4
+	AmJKgPeiKUZlNo2k40hIkztie3WLo32+uNGiLuAfavSefjMf6F7ICRx5aaAD0RdX
+	G+QZDPVu1cOQy4R3pSjZZk+DMbZuyEzcr1Wr15HU2YmVFuz9h2aeqMx06kFKNjcj
+	BAeMiKTzRo0uunwiRgNYg==
+X-ME-Sender: <xms:ObBYagyiuafjSop9y4Nx-7_I2e8uSdXU51Sl_XQ4uIqXWWKOw0WDYA>
+    <xme:ObBYauUm_k5bR36o9EmwiwNk2K6TfuHkL4onIrX2D5TOP_4ALkqUIXEn8f4qw_uPM
+    RPnE4LSNjJZs26cswb-f8FQXK-lAwbpO7s7JH-AbiIanbYjJkLpbKM>
+X-ME-Received: <xmr:ObBYaiOpHt6bMzM6OJ1xTcexUhOYdxlqZtwtdop7ixct3431ItpARvvwDq40Gvfilm2CZdC83KxYIIRzrHz1SsVszga_Fhl-4sk>
+X-ME-Proxy-Cause: dmFkZTGG1WvACauGCOcM2B/yAZpkq1Vfshyu2QdkuCaTyi2sZ9jSR+0WfB558P/2bXY/VS
+    /l1qB5vOBeKryAVKalTeyJUIfvtabXWu6jrcr+2H4GTdkKYe+JptuUNZSpgysWilnbi/cI
+    sZmyh8BTZ6v6ENSZtu53jhYH3SM34CEqAxNsBxf9Ka6lLw4wL4lL9lT0urxseuG9CEv5eY
+    33qM/na2kwcAMv21ZzGCraLWHNsZgN3tpnlM1/9p2Rsfp21N3eEqO59FH0/QWPWVOpB9LB
+    hdEYqoxU/QM2iWDyKRhDRXEHagteHtZBwABFHC9S3zIVHiSTxI0NLw74c5KnA+8au5ydXC
+    r/cGVHr81NQud1ZJPtbpuY4wuai9ojMd5xBB00l4fOintLkOUykmLNow+6oDOSKvA2hQ8+
+    PCDZvzRPgwnRrRCamOuVbPZZStve1Wb/DaZEGR4KpHCmu89vIBzrV8jzg9HGM8t6ayhzVp
+    rKAYLRQQufhFyGBsq+RazYzDtxXyhJNZp8VplT+MvoOn/4hAW7LkBDW9/YI1NKNG5u7lJF
+    cG3nekzPqY8Iq3y58PDvGgdxPowxyWj5Bl+NTlV+jAFFJ09ELquCPm4l12FQ/sx8kJn78p
+    nYgoL+a4NhCTm0Du9JhseUioLmuOTr+E8IvKVpl9n08rEQMDXWeIXKKInpOg
+X-ME-Proxy: <xmx:ObBYagBxsPPlIrQJD98WZZ69VXXIUopHkZTYg7sMagG2DUfMyzy_tg>
+    <xmx:ObBYavfaMgfBdvq6XR0bg6iQkEV9N5LSNoX_QKv02vmKZqOQ2s3JiA>
+    <xmx:ObBYavNC_kONj3A7pAAvFikuU2CutxT_cGhDHilK2otW48STtC-dAg>
+    <xmx:ObBYavJhq_3HP-a691mgq5elWtxrG9TAt3C5DbsReZfu3z7n8fWzfg>
+    <xmx:ObBYahgfFrYUb6L02ZrpCi6aFNiHzAV96GGwG8J1f2Mx6BLei9NVXGuT>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Jul 2026 06:19:24 -0400 (EDT)
+ 16 Jul 2026 06:19:36 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Laurent Vivier <laurent@vivier.eu>,
     Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Laurent Vivier <laurent@vivier.eu>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <c680a69ca18822f0f27dbba0f9a22949431dcd08.1784196135.git.fthain@linux-m68k.org>
+Message-ID: <27750f91f40f6a276d777a91fda3c7e0a17fa396.1784196135.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1784196135.git.fthain@linux-m68k.org>
 References: <cover.1784196135.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH 13/31] swim: Check for CRC errors
+Subject: [PATCH 14/31] swim: Check error register during sector read
 Date: Thu, 16 Jul 2026 20:02:15 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,72 +73,98 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-After reading either the sector header or sector data, examine that flag
-in the handshake register which holds the result of the CRC calculation.
-CRC validation has to take place with the last byte still in the FIFO.
-This flag can't be checked by the caller because by then all bytes will
-have been retrieved from the FIFO. Return an error code when appropriate.
+Clear the error register only once before a sector read operation. Don't
+clear it afterwards -- the caller needs it. Check the error register in
+swim_read_sector() and return the appropriate error when necessary. Fully
+validate the sector header. Don't terminate the search loop early just
+because an erroneous sector header showed up.
 
 Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim_asm.S | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ drivers/block/swim.c     | 13 +++++++------
+ drivers/block/swim_asm.S |  8 --------
+ 2 files changed, 7 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 9755b86d4dd4..e2a8c4ba4e39 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -483,20 +483,21 @@ static inline int swim_read_sector(struct floppy_state *fs,
+ 
+ 	local_irq_save(flags);
+ 	for (i = 0; i < 36; i++) {
+-		ret = swim_read_sector_header(base, &header);
+-		if (!ret && (header.sector == sector)) {
++		if (swim_read_sector_header(base, &header) ||
++		    swim_read(base, error) || header.track != track ||
++		    header.side != side || header.size != 2)
++			continue;
++		if (header.sector == sector) {
+ 			/* found */
+ 
+ 			ret = swim_read_sector_data(base, buffer);
++			if (swim_read(base, error))
++				ret = -EIO;
+ 			break;
+ 		}
+ 	}
+ 	local_irq_restore(flags);
+ 
+-	if ((header.side != side)  || (header.track != track) ||
+-	     (header.sector != sector))
+-		return 0;
+-
+ 	return ret;
+ }
+ 
 diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-index 31fc63b074dc..f40e19e48021 100644
+index f40e19e48021..1d394ee930d6 100644
 --- a/drivers/block/swim_asm.S
 +++ b/drivers/block/swim_asm.S
-@@ -42,6 +42,8 @@
- 	.equ	max_retry, 40
- 	.equ	sector_size, 512
+@@ -67,7 +67,6 @@ mfm_read_addrmark:
+ 	movew	#seek_time, %d2
  
-+	.equ	.Lhr_crc_error,		0x02
-+
- 	.global swim_read_sector_header
- swim_read_sector_header:
- 	link	%a6, #0
-@@ -128,12 +130,15 @@ crc0:	tstb	%a2@
+ wait_header_init:
+-	tstb	%a3@(read_error - read_mark)
+ 	moveb	#0x18, %a3@(write_mode0 - read_mark)
+ 	moveb	#0x01, %a3@(write_mode1 - read_mark)
+ 	moveb	#0x01, %a3@(write_mode0 - read_mark)
+@@ -139,8 +138,6 @@ crc1:	moveb	%a2@, %d5
+ 	andb	#.Lhr_crc_error, %d5
+ 	bne	signal_nonyb
  
- 	moveq	#max_retry, %d2
- 
--crc1:	tstb	%a2@
-+crc1:	moveb	%a2@, %d5
- 	dbmi	%d2, crc1
- 	bpl	signal_nonyb
- 
- 	moveb	%a3@, %a4@(o_crc1)
- 
-+	andb	#.Lhr_crc_error, %d5
-+	bne	signal_nonyb
-+
- 	tstb	%a3@(read_error - read_mark)
- 
+-	tstb	%a3@(read_error - read_mark)
+-
  	moveq	#0, %d0
-@@ -212,17 +217,20 @@ data_crc0:
- 	dbmi	%d2, data_crc0
- 	bpl	data_exit
+ signal_nonyb:
+ 	moveb	#0x18, %a3@(write_mode0 - read_mark)
+@@ -165,7 +162,6 @@ mfm_read_data:
+ 	movew	#seek_time, %d2
  
--	moveb	%a3@, %d5
-+	moveb	%a3@, %d2
+ wait_data_init:
+-	tstb	%a3@(read_error - read_mark)
+ 	moveb	#0x18, %a3@(write_mode0 - read_mark)
+ 	moveb	#0x01, %a3@(write_mode1 - read_mark)
+ 	moveb	#0x01, %a3@(write_mode0 - read_mark)
+@@ -190,8 +186,6 @@ wait_data_mark_byte:
  
- 	moveq	#max_retry, %d2
+ 	/* read data */
  
- data_crc1:
+-	tstb	%a3@(read_error - read_mark)
+-
+ 	movel	#sector_size-1, %d4		/* sector size */
+ read_new_data:
+ 	movew	#max_retry, %d2
+@@ -232,8 +226,6 @@ data_crc1:
+ 	andb	#.Lhr_crc_error, %d5
+ 	bne	data_exit
  
--	tstb	%a2@
-+	moveb	%a2@, %d5
- 	dbmi	%d2, data_crc1
- 	bpl	data_exit
+-	tstb	%a3@(read_error - read_mark)
+-
+ 	/* return number of bytes read */
  
--	moveb	%a3@, %d5
-+	moveb	%a3@, %d2
-+
-+	andb	#.Lhr_crc_error, %d5
-+	bne	data_exit
- 
- 	tstb	%a3@(read_error - read_mark)
- 
+ 	movel	#sector_size, %d0
 -- 
 2.52.0
 
