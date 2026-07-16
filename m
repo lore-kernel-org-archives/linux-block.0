@@ -1,71 +1,72 @@
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFA240097D;
-	Thu, 16 Jul 2026 10:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4825140096C;
+	Thu, 16 Jul 2026 10:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197199; cv=none; b=TvFuqoRsILNUqf//epjzGqp8ZGxImyfcucZ0Rxoid9Mw7d0FZcqS94Wdjgr1tO75Xk/lfRFged6//yhtXsi7CMJK7h99ywTO6qWJCbe8IDb1XCqJX5gX2XmHZyLxrSuK+Sevn6ECSzuB/KEPkiHAAE4s9ylZ8iEan0VCQ/I4qaY=
+	t=1784197211; cv=none; b=sMyjCEE3Opb6M1ZAyAgMopSNZpY7Zj6GBkydmOVfFwDfh2rhFdPaPjkEPXxMqd5Tv9ldE5QnpvSeV+yYsNycxOg4f9vC4IrqiNIHLrTwYyeKHaOL4Ruyj59tbeu91B+5N/QDVEHPfctrCGNngFLDHYw4v2ul7o+OHERGHZniMr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197199; c=relaxed/simple;
-	bh=giRgepT9Jr5MnZNs2gedsWC/lnHHNxFC8o+bXHCcsc4=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=NhaRgKI3KL1hGMEx/u4hKDNZXpT+RmzHSOwCnKpYcc30ut3lc8g+8jRYOqXivDNbsM+HAVu71V4SDlPQd4SZe1jFSkFMKBgbDtclX06d7b8pQicymQ/Ag8jdTrqBbWmkSJX0z0zikEFsYreuGCe9tiheAxD6Y9mG4wHQI9cw248=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nZD0YqqO; arc=none smtp.client-ip=103.168.172.159
+	s=arc-20240116; t=1784197211; c=relaxed/simple;
+	bh=W+qxDMK9vjaprSkSPJrXxuBc5SyHoiKsT/9mqwPusPQ=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=kmMqeRzhQhYcbKsWHAaiw38NzKNb1UqgXR0eCnG9TsDOJLfEvFGAu20ywg+IVsrW1TG1Nlm9dGdFfDspt/uFLAoT+8qwCS7ahKcWUdFvWFAw1kYzYzfhbpJHbl96DRxI3pGj3POPmiqClE1wRbe+45/SvkDaMU2yP5yhvYzS2Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gjMEDOhA; arc=none smtp.client-ip=103.168.172.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nZD0YqqO"
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 61C5A140010F;
-	Thu, 16 Jul 2026 06:19:56 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gjMEDOhA"
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 89FA3EC019D;
+	Thu, 16 Jul 2026 06:20:09 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Thu, 16 Jul 2026 06:19:56 -0400
+  by phl-compute-12.internal (MEProxy); Thu, 16 Jul 2026 06:20:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197196; x=
-	1784283596; bh=Q3bn2vHSQ3mKVdFh1En5/GbczEmcB6U58nxHknuUKfk=; b=n
-	ZD0YqqON2Dz4OfZQgPPrTkVHoUgu65waixhTYEWkzVGaKPsfRMmd0Rd5TazNh6bA
-	4pZDSWDtMziaeitox0pSVrgLFrSwMdmZUapzaBCaiPNdz2gFesdOWgpxKIEtjcXC
-	EqYs1b2gurj9dzFOoQ/dmofLl4YukEMX4q31zydHULvQ0anGG0lMJwFDeO/NLLwd
-	5BR03wf6XFVy984paEaxwCcjOe76FydS0rTEZj4+//V2RRYV/0z3hI2ze1wGyNsb
-	HuU2wL7DNNrJVJ0ee6Y3FtThs7FdakLTMo/vQGsgaV82g5uktPBkV7GA/Y9SYNOM
-	djO++NxJIBffq3Rl8xMwA==
-X-ME-Sender: <xms:TLBYasP7iw-PfcNAIC-uAQghyBi3vwNuoOYQz4nVjC241g5fFIHSnQ>
-    <xme:TLBYatDD3OYmkI4VzI3SVMykjtyQZzZU1zpBrkX06UnOAETOo0BZD3Eq08Xr_GAcH
-    XY0dbfVJTTF9gCnVc6nUjuFePMBZGvxcnHQMSmKQRQK-Oc97Elgi4go>
-X-ME-Received: <xmr:TLBYajKbhvvl4eWFk7ruOHkfOFet-UQADuU2OUBv-dESg9sf6ywm3LuS30VMPjM85qsSqGlqhDBSuS6kcD_49n1uAgqM1MMgNPI>
-X-ME-Proxy-Cause: dmFkZTFltWOiqi3GJy7/GjNP9KLpSvE6YkRxm2Q3A+Dj/aP0Z6dA9iIiBN0USRzNJCcteS
-    K/D0kvNTDbqtTANaUA/xfgoZfMpszLplr5/pvHVqKKo5s0RVWCO2umMrR+nQZw0OKxwLXK
-    KaQRMPKUEdI+qra509DzvjLAVS5kcbe0yFLHbQq8WitTPnaA9a//q0SseAu/arIDWD3AGb
-    W1DzaVjmh3YVxjd6oh9EZ+C9JcqMLUvXWkcNjeyN/Zi7JLie6B4Pll4f+m9WsP9wdaNbE/
-    iZiUd3GAI7vwYmV5kLRtY/IqoaNmE03sbAQ65XKcDP6gxXaEdq+cc/kMIqclO0/e7YtpSR
-    JfO/en4pjK5Kad2Sdk7RdNqk0LJyxxtd1CQiOygB8i+bapzdZBYNqo2270RCe4sO4hIF66
-    ss1BImlFKN4sg3Mog3aLfSv7y4XRNDNxDxW34RN1E1ilhqLU5qTuWU6Oo26OK/+mVz1Whn
-    QH5FB4LkCido5+BUztF/RIFbzMFnU1YkO4XypEs1dk4Qlb42+vvguCmdMZUh2PZSnURTO6
-    GfiKEjPnXTxBeVXctnVUZWp0mT5Zj/BiIyJd7C0N1H0/ItZmpPE0QGIr8NFCmjP+G9m+zU
-    5byPhf7WX2fWu+GXKeKK2Ylq7JpYJgwc9OohRRgS0vGpTmqxFSo9jCYrk/8A
-X-ME-Proxy: <xmx:TLBYamP7PwRufsp1SMkV73pJlzeGyiGq3z33Ubgau5R0sQ9VDufDJg>
-    <xmx:TLBYah656XdtB3ujljk1Fb9ccwQwWGMjCK1G1ntBTo-Job5rJMJJHw>
-    <xmx:TLBYao7jZSu8BFGPfhuJ2tbirrmghjRICWuaWVGfwmH2SU9E2-7_DA>
-    <xmx:TLBYavEF-hfvQ3X_SbKp82L_EroMGShzFm7MV-1qpbMoWaKBnokNng>
-    <xmx:TLBYai9fWzUOxNgTwdDb9g7yLVU2dV7cK0-G9aGaXncHBLGVZHtW2jVc>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197209; x=
+	1784283609; bh=KFIl1qcajTm91cZmcEXNfFqEG1xkNZjr1CSuzERE7tY=; b=g
+	jMEDOhA0lG6cAtvCd+PL9XN11Ae6EuKFSPQBXBkodNzGCFlCtA7rizsnCXD8vSN+
+	SFoODgX5fUj6MNvrsWQwe5D6eF5QX9vB/+A8TiQoZcQdKOsBsR9Axi+WMpTbj+cU
+	JUbfLWK6xaCau41X8VIYrbzwrReV/5VXXlQpV+ZP2Ng2LqMwbuxKEz8WQRYAE2/n
+	HKQVWbEIu4jNublFf/Jb7nN3+0CCQKXlGzUenRyNFc4XG9SIgrM0U1KvgLPWHjDv
+	7GvoXFv3quszAi5sMvXdwb/O0SZUULRWwyhoOqMisTeUdNSBUz/bJjE/IZn4zRmL
+	PeDUx0REQv9GZX8v+8ilg==
+X-ME-Sender: <xms:WbBYasDI5ROa7Rvf7-GYX-Lj7cm3DXLEj5OkenLBKGQLMGcgV0B9mw>
+    <xme:WbBYaqj36lxO7_DNVOfD6q50WtbOPTn0iXZQ1uvDozLews50tHHFpnsvfnp2njpvW
+    cpKoV-iUxXbs6RkWvVwH7vzDVpPl99w5xGFbY1whjQV8VqRbLj_sg>
+X-ME-Received: <xmr:WbBYahyzLyx7ROtM2UfzWMXPu7DvruT167Bts1zzbg1TwHWVjf5B256IU0r8GXX1sk8pi9zehmHC6UanNc5699bDTisWr7ZkzNs>
+X-ME-Proxy-Cause: dmFkZTF5Vj6SMnL8eVqPH19rXSXYFY6bmUyIoIPempWpt6RoQSweRYHbiNk5m+J6sOC/Df
+    QLYvSnliCZuWD1s2mWahZuN7gCKrYPBFFnsiZQIW71i1lMh/ZXBxMq0tP9aULtTK+H7/xX
+    Ww9JWg1/lFcZQlPVV6Q5Bq9c9Blcib4cAYDkI8jTrr/ZPXvvNG/6NTq4K5IPCw9N9+gHtb
+    isKzZAEeG45eYU42dcGWZUrYrrIbz2mg+YmDde/CburzcJqnVYm06Mx8ERUN23RPu6Q8Oh
+    GsUURWluJMmbbIpIw7ihDXg/j+GrDcjAYLvJprCSezUF3CQjsj5AjdVlyTm3K3zd9zPEoI
+    +kgkyaFBG1/JbQqckWV+MnZ0e4Rq0NlZ7tFtC+SHOpahN1mhOHvNnAd0khoz4ITsvFAL4H
+    ELNMD3OKUlqDcPaKYH9aTlnhQrxaXfgpyRyNY0BS4td6zhMXrorxcESrimbIYFoMXGF6Is
+    zDjDqlCEFQEAQ6sDNwCk08Gn+wYZx2Agpb0+xY9dttRnE8JqC/S1DEcpInFS+WafS+kFX0
+    H79UsAefVJN9Ly/onXq8krt67meSvJC+RTeYWBaqFyDfKvbjkbQmdzV15sAjz1Mr7rBJPU
+    hdJEDhYbU1KsArvGfOlZjcgDz7sD9WE7SCVDCHzbP4BzwG/o9YlcHzwv3upA
+X-ME-Proxy: <xmx:WbBYaj1LvkMM3ajKQWZATWCA_MOKFuTBZg6VqOORchBl90b04KADjw>
+    <xmx:WbBYau-r-JhEJAgVQizKFVuUQT1Zb-td718TmqcTrS23TcmWlwylqw>
+    <xmx:WbBYajqkOlwiQUj14Xm4qgPLXp4whScxHRsarYW4ur99KXwlZnZV5A>
+    <xmx:WbBYaoQ4fCetQmE-AuLwX101sKVHPJ6Ivevd9nhYSf6ryuVxxVjU6g>
+    <xmx:WbBYand8PjdG3BTYmdHbDSxebnQ26sGwTvAsauvu3xy60fu7LJkTMVb4>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Jul 2026 06:19:54 -0400 (EDT)
+ 16 Jul 2026 06:20:07 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Laurent Vivier <laurent@vivier.eu>,
     Geert Uytterhoeven <geert@linux-m68k.org>,
     Joshua Thompson <funaho@jurai.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
-    linux-kernel@vger.kernel.org
-Message-ID: <afaeaf8ed29a73e1b361519b542269c4a57a1713.1784196135.git.fthain@linux-m68k.org>
+    linux-kernel@vger.kernel.org,
+    Omar Sandoval <osandov@fb.com>
+Message-ID: <33f99f4aad5a482c5465bcef4d3542cbb2a51dbf.1784196135.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1784196135.git.fthain@linux-m68k.org>
 References: <cover.1784196135.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH 16/31] swim: Fix buffer overflow
+Subject: [PATCH 17/31] swim: Convert to blocking queue
 Date: Thu, 16 Jul 2026 20:02:15 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,85 +74,73 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-The effect of this bug can be observed as swim_read_sector_data()
-inexplicably returning -5, or an error flag indicating that a mark byte
-was read from the data register, or other odd behviour.
+These drives are slow: completing a request can take hundreds of
+milliseconds. Delays are managed by disabling interrupts judiciously and
+sleeping opportunistically.
 
-When copying bytes from the chip FIFO to the read buffer, the driver
-keeps count of the remaining buffer space using register %d4. A counter
-in register %d2 serves as a timeout. The driver polls (%a2), the handshake
-register, until flags indicate that byte(s) have arrived in the FIFO.
+As of commit e3896d77b702 ("swim: convert to blk-mq"), a spinlock is
+taken in irq mode as soon as a request is issued. That lock is held for
+the duration of the request. Hence the driver sleeps while holding the
+lock which is forbidden.
 
-        movel   #sector_size-1, %d4
-read_new_data:
-        movew   #max_retry, %d2
-read_data_loop:
-        moveb   %a2@, %d5
-        andb    #0xc0, %d5
-        dbne    %d2, read_data_loop
-        beq     data_exit
-        moveb   %a5@, %a4@+
-        andb    #0x40, %d5
-        dbne    %d4, read_new_data
-        beq     exit_loop
+Adopt BLK_MQ_F_BLOCKING and remove the spinlock. Use a mutex to serialize
+requests from the two request queues. (The chip cannot simultaneously
+process requests on both internal and external drive.)
 
-Note that the exit_loop branch depends upon a flag in the handshake
-register and not on the remaining buffer space. Hence there may be no
-branch to exit_loop after %d4 is decremented to -1 (i.e. full buffer).
-
-        moveb   %a5@, %a4@+
-        dbra    %d4, read_new_data
-exit_loop:
-
-Here is a second decrement of %d4 which can now reach -2. But the buffer
-bounds check is a comparison with -1, which is now ineffective. Hence the
-loop will continue copying until %d2 eventually reaches -1.
-
-Fix this bug by terminating the loop as soon as %d4 or %d2 reach -1.
-Reset the timeout whenever a byte is copied.
-
-Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+Cc: Omar Sandoval <osandov@fb.com>
+Fixes: e3896d77b702 ("swim: convert to blk-mq")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim_asm.S | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/block/swim.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-index 5caeba3a75d8..ae767da671e3 100644
---- a/drivers/block/swim_asm.S
-+++ b/drivers/block/swim_asm.S
-@@ -43,6 +43,8 @@
- 	.equ	sector_size, 512
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index e2a8c4ba4e39..6f93ebaaffb7 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -211,7 +211,6 @@ enum head {
  
- 	.equ	.Lhr_crc_error,		0x02
-+	.equ	.Lhr_fifo_2bytes,	0x40
-+	.equ	.Lhr_fifo_1byte,	0x80
+ struct swim_priv {
+ 	struct swim __iomem *base;
+-	spinlock_t lock;
+ 	int floppy_count;
+ 	struct floppy_state unit[FD_MAX_UNIT];
+ };
+@@ -537,12 +536,10 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 				  const struct blk_mq_queue_data *bd)
+ {
+ 	struct floppy_state *fs = hctx->queue->queuedata;
+-	struct swim_priv *swd = fs->swd;
+ 	struct request *req = bd->rq;
+ 	blk_status_t err;
  
- 	.global swim_read_sector_header
- swim_read_sector_header:
-@@ -192,16 +194,17 @@ read_new_data:
- 	movew	#max_retry, %d2
- read_data_loop:
- 	moveb	%a2@, %d5
--	andb	#0xc0, %d5
-+	andb	#(.Lhr_fifo_2bytes + .Lhr_fifo_1byte), %d5
-+	beq	1f
-+	movew	#max_retry, %d2
-+	moveb	%a5@, %a4@+
-+	dbra	%d4, 1f
-+	bra	data_crc0
-+1:	andb	#.Lhr_fifo_2bytes, %d5
- 	dbne	%d2, read_data_loop
- 	beq	data_exit
- 	moveb	%a5@, %a4@+
--	andb	#0x40, %d5
--	dbne	%d4, read_new_data
--	beq	exit_loop
--	moveb	%a5@, %a4@+
- 	dbra	%d4, read_new_data
--exit_loop:
+-	if (!spin_trylock_irq(&swd->lock))
+-		return BLK_STS_DEV_RESOURCE;
++	mutex_lock(&swim_mutex);
  
- 	/* read CRC */
+ 	blk_mq_start_request(req);
+ 
+@@ -560,7 +557,7 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ 	err = BLK_STS_OK;
+ out:
+-	spin_unlock_irq(&swd->lock);
++	mutex_unlock(&swim_mutex);
+ 	return err;
+ 
+ }
+@@ -839,11 +836,9 @@ static int swim_floppy_init(struct platform_device *pdev)
+ 		return -EBUSY;
+ 	}
+ 
+-	spin_lock_init(&swd->lock);
+-
+ 	for (drive = 0; drive < swd->floppy_count; drive++) {
+ 		err = blk_mq_alloc_sq_tag_set(&swd->unit[drive].tag_set,
+-				&swim_mq_ops, 2, 0);
++				&swim_mq_ops, 2, BLK_MQ_F_BLOCKING);
+ 		if (err)
+ 			goto exit_put_disks;
  
 -- 
 2.52.0
