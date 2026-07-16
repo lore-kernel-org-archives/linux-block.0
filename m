@@ -1,97 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E7A3D5679;
-	Thu, 16 Jul 2026 12:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C0041DDFF;
+	Thu, 16 Jul 2026 12:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784203985; cv=none; b=aPoCcBOrJMi3suuj3RFiKZZkhIdycWbo7oaxN0OKku22jh3L22dqtIjU0MEd6u3Jb1pgcInjyuHcwisjKC+8rSCmM7/9I3b1mVaR4/ZflgrXkQRXzs5bHoMhGEW4S2ONkNR5+xC6nOIdQ5RHIY7qFQq/P1a4rW8L/9OXZ/9yQ/s=
+	t=1784204205; cv=none; b=d+sVFun6zQrPSp9hfUwipLn+T+PvnwskLqp225CJSqbD1Rx6OU6uRJJIyrum2ZSf4q0crKRG6Bn7Fv9tCTgD7Dw/kX2STRLmYPvIAPgtaCAbx4RqHDuJ9nVJrYHnGdrcxYTvGAeEVnL/c9x+N2ZL7sf9Udpbq20K+9gC+/YmIQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784203985; c=relaxed/simple;
-	bh=Ckb0eONmkNlU/06GqrCD0O5Olje0Wl8rMWUeXqtqEl8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GTnHShM03xSlvl+ajb0uwc978IoJYCCv7f+GUJH22BwcpUMMbfaAZE2vsE49Yusa2246Jpml92Vd/RZa2c6J+J/DzE3JbYQX/DddUzxcvI169SGwzOc/e7mKLHoKsP1BufoD7Tla+sW98kSrRy1RgYQaLgz6L9JLyEpDF3wQbqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nf6kGPkV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784204205; c=relaxed/simple;
+	bh=RHnoUoVVBRHznZDjfg7p1zoSY/QFz6KSM7e+8oRx5t4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T+h6qKBQhqG5/BSeEV/kS/bHC8nWGE6D/B8UUCMxsXb+XcjSImJrTklLmCyK6MtvgXrMJRDGXn2X1NoGWQunGFEb/X0FQS1gxcS8HIq8X/Y3EU2Qy/UDeXlfTCHP/1X31ZV/RAlBKKdZ3JaKT4THvvic/v2MaYa5gavRS+SdNl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7b+FEw5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nf6kGPkV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D63C1F000E9;
-	Thu, 16 Jul 2026 12:13:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7b+FEw5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C0B1F000E9;
+	Thu, 16 Jul 2026 12:16:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784203984;
-	bh=f6q6s46vHorcCHv+FM4Ui1x5CWUjeSHX8auGSmpNtG8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=nf6kGPkV1vFC4KHAbJ2YSz+z33XG40bzUkBFpMFi/vlbIzPU2lrxeNoyo0m7WR1Ln
-	 mjZBB1JQuCqWxc5qP6xL0ZTqP7xnSeYRA+FyOgVMYrq+vV3yWqxdWDG6yLldy/HMVV
-	 AGxpk/hH1HdsfcGy0IcwPoA3yJUDtWKC8Y2qYMjaM6kH/vXoQKMUGmZkmvAtLmgxRH
-	 TfuRpjgSjnETo3g1NTMbJUZoNQO33rA1PiMd1rAXlvarX12l2R5JdVZfmEieSTalaI
-	 LHfXmIfsEd+g5s5pkHx72ADwol1XSMPmWt/oygk5MIHl7tLKHH+aD0y8vlr0gQcsA0
-	 B4MaZCDtXCmNQ==
-Message-ID: <5932975c-39db-44a7-8fe1-5ae6cad22946@kernel.org>
-Date: Thu, 16 Jul 2026 21:13:01 +0900
+	s=k20260515; t=1784204185;
+	bh=OeY/RrnCDHeRA7waqEnCw2zQoIH3AdOyPp5nJdiYRUI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=C7b+FEw5oW4E/09NAyQh5OGXjrU634n8rTS8NN5msWGpky97UJYzngQcko/OfNo9H
+	 7MZyCCbaIAEGufoCKyGKIjODfzlMsW6yt1g2rulcjLtl/rlVAWIZvwKTeNC+JssUnT
+	 h0sqMU+7U4g/0sB2w7zjoXg/pFB/PDoIK9T1YUmtoKmfe7eqCmB8I3S+/aPXATfKeG
+	 Q0NNVAWvcK4Qb3QqYudhggsIgxEsf4dd96OQMfBo4oGCVxr7U+aCYGKtWv4gAU0MoG
+	 vCJ3RW6mMd6zZyJ8g79AMwBGhcKW6h/QF6tRBGeSR4F59aqJEEUZzRmlPWM1cCLhEL
+	 D+Z/FYd0Zuvbg==
+Date: Thu, 16 Jul 2026 13:16:19 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-next@vger.kernel.org,
+	axboe@kernel.dk, Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [linux-next:master] [loop]  d908729e74:
+ stress-ng.umount.ops_per_sec 100.0% regression
+Message-ID: <e75c9a7c-77dd-47aa-949f-27a937a64760@sirena.org.uk>
+References: <202607151655.9d74999d-lkp@intel.com>
+ <aleZammRRSVN4dl0@infradead.org>
+ <c625eb50-e474-4966-bf3b-e83d7e7d1750@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/11] blkparse: add option to emit a specific trace
- protocol version
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>, linux-btrace@vger.kernel.org
-References: <20260716110442.1291010-1-johannes.thumshirn@wdc.com>
- <20260716110442.1291010-12-johannes.thumshirn@wdc.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260716110442.1291010-12-johannes.thumshirn@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="61mQimz+8MzkIz9g"
+Content-Disposition: inline
+In-Reply-To: <c625eb50-e474-4966-bf3b-e83d7e7d1750@sirena.org.uk>
+X-Cookie: Celebrity voices impersonated.
 
-On 7/16/26 20:04, Johannes Thumshirn wrote:
-> Add the '--trace-version=<1|2>' command line option to select the trace
-> protocol version of the binary output file. Requesting version 1 emits
-> the legacy 'struct blk_io_trace', while version 2 (the default) emits
-> 'struct blk_io_trace2'.
-> 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-Looks OK to me, modulo the nit below.
+--61mQimz+8MzkIz9g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+On Wed, Jul 15, 2026 at 03:57:22PM +0100, Mark Brown wrote:
+> On Wed, Jul 15, 2026 at 07:30:02AM -0700, Christoph Hellwig wrote:
 
-> @@ -3298,6 +3337,17 @@ int main(int argc, char *argv[])
->  		case 'M':
->  			bin_output_msgs = 0;
->  			break;
-> +		case OPT_TRACE_VERSION: {
+> point where I think I have to do as Christoph suggests.  Looking at the
+> current contents of the tomoyo tree all I see is:
 
-		case OPT_TRACE_VERSION:
-			dump_trace_version = atoi(optarg);
-			if (dump_trace_version != 1 &&
-			    dump_trace_version != 2) {
-				usage(argv[0]);
-				return 1;
-			}
+> Tetsuo Handa (6):
+>       lib/Kconfig.debug: add CONFIG_DEBUG_AID_FOR_SYZBOT option
+>       net: update dev_put()/dev_hold() debugging
+>       net: add "struct dst_entry" debugging
+>       loop: Fix NULL pointer dereference in lo_rw_aio()
+>       kcov: fix data corruption and race conditions on PREEMPT_RT by moving saved remote state to task_struct
+>       apparmor: temporarily disable in syzbot kernels.
 
-Is a lot simpler I think.
+> Absolutely none of which are obviously on topic for the tomoyo tree and
+> some of which are patches that people have previously raised concerns
+> with.  This is very disappointing to see.  I will check the status again
+> tomorrow but as things stand I think I need to drop the tomoyo
+> tree from -next.
 
-> +			int ver = atoi(optarg);
-> +
-> +			if (ver == 1 || ver == 2)
-> +				dump_trace_version = ver;
-> +			else {
-> +				usage(argv[0]);
-> +				return 1;
-> +			}
-> +			break;
-> +		}
->  		default:
->  			usage(argv[0]);
->  			return 1;
+Looking today I see that all these patches were dropped from the tree so
+I've left tomoyo in place, thanks for taking care of this Tetsuo.
 
--- 
-Damien Le Moal
-Western Digital Research
+--61mQimz+8MzkIz9g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpYy5IACgkQJNaLcl1U
+h9AWbwf+LalYQS/hl3QxwcQit0fMn8PF/NHQ2mK5pM/8LWvNLQG5laomGTUjblwJ
+CrmU/rP6ODlTiWwPTv5M3t+9lJXtjjrd0d2tOD6IKPZsUmqJzriYVDUpbZW9M/aW
+QD9EkvubuFJW0chc/XHOoK9ciQJSH1kZnThLARHVmqn0A+bBbsw4el4Q1ZNjZ+f9
+Gkrlg66MqX56yPsCkTsX5xjCWwQEqpyM3z1y11H0ZRd5hIFbZohHw5FuQSl3BD2H
+fpuicDvOkg3m1R35bDOuJzoXC/7aB//qf+TL3OsB+o0glhrTD8+BOEdZvwJhNzSK
+wJUkwaQ+vjLP0iumFcjOzHRtsr5DFw==
+=DFfZ
+-----END PGP SIGNATURE-----
+
+--61mQimz+8MzkIz9g--
