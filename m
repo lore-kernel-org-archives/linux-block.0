@@ -1,59 +1,59 @@
 Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C0A3FFFB5;
-	Thu, 16 Jul 2026 10:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBD940313D;
+	Thu, 16 Jul 2026 10:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197269; cv=none; b=hXmuicpy/4PYJmUhIG+Xj9nR7I88XvpLtra2BUxW+UaHwETjCBn5kePdrh7Bon7Ka/Cwd8SHcIMl+fipYyOdsDKNaxSDNtzqVKwjDNlDVOr0mxPe9kWbzX0cH/IomVl5ce4uOkFi5oHrSs01BriZfJ8dc4Nq8Yuq2yfWdr2iUsM=
+	t=1784197278; cv=none; b=ZJi65le3+CA3NYqXzv7J9DNN355LKNcbIvlNBGJTimKj9n+GVv1nYUN6CdUpGs06NM+M97jnA9hP+haoA33mVGIHsslhJ+8Pf9YFLAgOof58kqo6brCc7bBXmww0VPcmDWpriAUl+oR8B2DJtxgKO2kXHiPv/MYNctYjfRmdGtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197269; c=relaxed/simple;
-	bh=xfjRc7uZHqGGkrV+4rQM/46pKoDJBnA3Xrk2IFx8mgA=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=dbKGLlNowo7QtpdRwWJyCni2r6OrRFJDvRFdyttZJEmIjzR/Lmb1nshlVLV/XK5yxYhHy5Sq/BKh5kXlCIH9HB/Bn89HF0SBSo/T3rKkBqUdixL2GwrbFM5nzAx8/7f3ZqUbDF1n6t/2Dy1IV3OLkjkJQbDI78ocBV7EE/nDUGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MXRgbKmT; arc=none smtp.client-ip=103.168.172.151
+	s=arc-20240116; t=1784197278; c=relaxed/simple;
+	bh=yhtj1BvnWqE6behwWjb+t5wSGAVzrKkmZConj7e+WrE=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=gjFmyhY4tXZs71P0BmTZUxouOb0KZc+znwMUai1oBRzfWx6pFoBh7QAiv7/3Q03hnYwJ+u1e/JC404lzCilCyQyle6gVOLvyQFZ5fDQ+LvlGteNxOl2lgbrU9FagoCKnrdSimS0CvNTaiP6thwd808NHHHs/tiGkHFP+i9YknB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Qe/yzH5o; arc=none smtp.client-ip=103.168.172.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MXRgbKmT"
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4BB6FEC01A3;
-	Thu, 16 Jul 2026 06:21:07 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Qe/yzH5o"
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id F2DBEEC0079;
+	Thu, 16 Jul 2026 06:21:16 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Thu, 16 Jul 2026 06:21:07 -0400
+  by phl-compute-08.internal (MEProxy); Thu, 16 Jul 2026 06:21:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197267; x=
-	1784283667; bh=KBZb2FNbwsNJnGYhwKC1YhMoYJLkvcqUjOKlXzwZa+o=; b=M
-	XRgbKmTJfiEYPuNj22J+pQf56LwSu3U4FolrAHqD5oYX2MGY+bS8KtimduXYaIGN
-	J/skdZluYIFu7/NWdICB0/Hox2ZRK7DVvgQFZhefkzNW5rcUodIW47x6rIYVGYI0
-	i1isarYdAOQL229wbBjXaupebnGId7RHKTcWgbrTdT6CgPrpSTrt+RMmeGCl615/
-	96m5a0/d7/UkKEFpGChWObC+QVDhiiq+yaI4T2XwN3uBGlXtNN+meyJzLmC/jUi8
-	E+aKjaQOWkJZloXJ65NWJL9aVG42fwavvfKkoyD7a6GJJneHMo3zIFapzak5e2Ai
-	bSMBNsVkkuEcAuVG9XPCg==
-X-ME-Sender: <xms:k7BYart4kipxk2G7_77Ls0TnoDNBIH1PKcxUfYFSOeO151tFwiB9SA>
-    <xme:k7BYamjJhoFPem-luEVmFQjuqlaUuELXp0urs5Mu7wKiBIlsEeIx5kVyu6_wqGaK3
-    PijoI9lJdtYRSFtLlJ9w7QSYxu8RuU71M97_pLbgax4FrjY9ZDQDZQ>
-X-ME-Received: <xmr:k7BYauqMEY_85O3Ff4WwMVWrh0UF53iBki1CNsDA4YQqGXbbQCQYUj-vCiaPJUupcIqdyFH-eWPhBprcF4XR3IBlRz9lrmLsAm8>
-X-ME-Proxy-Cause: dmFkZTGGGewHkjpARU5mNGplDlBlY7p1odKmymFrbaV8Q3+bQsnQg5xAUvXrrFQLL3CMBN
-    9OSeY8TluGCuzgV+6h5sHMBhm4tUYGi/0KgjlrhR0aTheYnJ2w9fc0FJjykw30cCwVzUFL
-    VGxlKRb4ZAcUJiaZQDcagjySXR0/ef0ba8eFQaLtttRWf9QsrK03r3YkHui/deCxQth/F+
-    L64jeKVJRY1u0e8lxhds+DWKKAvmh18CB8YPb28fqoWrUOliAkLNFtF3+XFb6ws0WJx78w
-    nPtgmyMFrfwQ7SNoPNjar/gw4XUxnklUoqg+oB4Zx6dZBtlIjsZ3+1UWIFq+f7P2FdyPoo
-    9CmLQ6XzmlVGkdC9Aun5nc07FHvO9zB2chwQfIG1cvcEjR0h550uRFmwSB+1tvNT8ZYtyd
-    809Rp0TYyvclWF+ywgSjNUqapI1Zxd2mC6nRkWVQpghG5BUG9qnuBMAMxWfJDxBcb1QkWc
-    94qt8TS68+BVvL1rsRcCbv7laxebDdxtiKwkadrACz0WFMfjtCrZjYFS3dEDX/tsq+DTtl
-    q+7EjXkF8G7FFVMRTsLvquvotrKPqdd9ijds/T0dEF3D44bJgLqRWPydXi0x4SiRtFxf6o
-    uQemSPjTA66Blv8Wtj1z0RyyBi8Ww3uqyCQK4C5M8uX4Kce15BTewFYqR15g
-X-ME-Proxy: <xmx:k7BYars2NBESqQyC1sxvCg-lf2UT_7W8UOLaGpUStuTVcBBHup94RA>
-    <xmx:k7BYapYNWG5r_yrQ2n528V6dHmzqLsVCVZ4q4--Vfs2smaJnaIVfaQ>
-    <xmx:k7BYaqaq4yZZrdzOkKjm01B5iqiVRKcSbxh5BdTs3-7sa7_uZWSAGQ>
-    <xmx:k7BYailbh4dFnS4eFR5fvaI_hUf8lZc8YCIfFeVUo9dU-swNNHi7zw>
-    <xmx:k7BYaieXrQNGxpkAE6YoFsD4oLYK-Qf58oNmZffd2c_YmQlH_lJStHr9>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784197276; x=
+	1784283676; bh=RvjOLHX3MDGcSBbcDZW7GFImD/Fsa4W8rkMgvJTWlCU=; b=Q
+	e/yzH5oP5zuTZKm3hQFD/JeHZoxkJAdQzWgm4xAU+90gxiCGc6s43zSmDzJ3vcfo
+	JlVW+hDiyeMFphbUk8Q6GXmq13G2225T2iwQ1LZAPZPx45KJjARD2M08vBihtnJN
+	PaQoPb+PzJhEHgdZ32xqBY0zgsN/X2tsTVLlSOQgSz+wvhG7PS1FVedwKHQ31wPh
+	UspTYxzHg978eC2H9cnRVIjg+wc1PdoKXOR/98wsPRsOWnD1F0K9gAsxs1DxbXcC
+	YBdRQaFpLLod2wfVWqyGlhEMLMvMSu7K2oPQYPXNBorKMoKMLOJe34QkoXGG3/lj
+	5/Th7jU2yl19r4UU9W2VQ==
+X-ME-Sender: <xms:nLBYau-umWF4Xucbm9eFxqgtfdKc-nvJF7sbwWpmvsn_bBMrr2qHww>
+    <xme:nLBYamWRyJvqt6eRVDNMTVx5Rh__qwIm-a5HFv0p0Td_wkwjogVQUQztGSSU2FCKU
+    RfGW4Z4g_4I-oy2j3QwrBV88eZI-U75Iuyt_8f7XH7HtTIbnPMeXuk>
+X-ME-Received: <xmr:nLBYahqhi7TKyYnv6OAtsbapTi4lyHW8Ae0VrVWPn44DX2STYEM5V0RDYbiQiNOzsXRul52bedvbQPJB34zGu_jP6bwkJmemP1E>
+X-ME-Proxy-Cause: dmFkZTGjTgzaXEfYNBjEVriyw2q9F/uRW3a5OUTRrp/7MrDLeZQ6aO79fp7d+O4PdbSKdf
+    /sLTmT8MbjPdH5UeFxt611a7A6umKHgcJd6FeutqKrXNZ/PQQaQksvgFoRxd576GHi7HM+
+    niXc/DSD0ln5FX/1gfQCzakr/OY4GbKmIR5S3H4m1TalplR037EzqrEC5ugaHHCdJSwAUG
+    pdkzcuL9P7MmjPf8R8bDG7rLu/XnFc/d/WpuqdmHHAEZRanbTznGD/JvqzCnsmivRMEyGu
+    jqqkwlja73A9mkDbvEUvtIQMZf1HzzWjILAGhC6KxW3EueXJFmFQ3rgfN7nxGslmIl5fgQ
+    vcK771fofk6pcY0jWkm0Z/yMpte90Gv2vyKY7iIyB9XNSpV+ZyURId83pxvuVnbLmJypog
+    Njtjva4AaxY/JzH5zKeookOsNUcVNPeKI6R8DbRtGZNNgPkB5Ok3PWJGwlcOv9HwHa0BEs
+    C7NeZH6MvuZwL7AuikBy0Bl0AiyZXcNIZrhsRFUnYxugYG2Yz3Ah/JrokiMnmoz+xgSlA1
+    LuBCRT9wFXmMoycSG660HqhFWvHbQ9eL5CjD18KifDHk0QqsS/PvKKxlthX6sBGm4X6yrw
+    5boAwgxTSBMTr39lVUNbDeat8h6sRK16xVGvnZo7HFwZVWqnkF3q2oipHBuQ
+X-ME-Proxy: <xmx:nLBYagmytfVGK7r22RsziBcqSd8iLf4y0NCtuW272OfjkhelXmbLkg>
+    <xmx:nLBYap0Bhj8t7Yt67MSqeIrdfTqIZtkPw25jw7me1LQLIP7rnspcsg>
+    <xmx:nLBYalRMfDxauxCJDx3zWVmUedulbocDcFetZDmqgegjLsKLc7a-wQ>
+    <xmx:nLBYaqz1p4Mig0PQtffxkUKQESfbJvK2MBHl3L6tS3IJWky7WfnPog>
+    <xmx:nLBYaumaC-7p4qd3LSs74k1-i3F3FUCeAizBqzS8tG1-AI8Ho349_ABu>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 16 Jul 2026 06:21:05 -0400 (EDT)
+ 16 Jul 2026 06:21:15 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Laurent Vivier <laurent@vivier.eu>,
     Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Laurent Vivier <laurent@vivier.eu>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <740e314f4ff30796afa466c6a3d8cfa42e9b1af8.1784196135.git.fthain@linux-m68k.org>
+Message-ID: <4c0b70c4f500c05d0b1a3430afc57e51e541ef36.1784196135.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1784196135.git.fthain@linux-m68k.org>
 References: <cover.1784196135.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH 23/31] swim: Don't needlessly re-read sectors
+Subject: [PATCH 24/31] swim: Remove pointless specifiers
 Date: Thu, 16 Jul 2026 20:02:15 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,177 +73,101 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-floppy_read_sectors() is confusing because variable names seem to conflate
-tracks and cylinders. Rename the track variable, eliminate a division
-operation and adopt suitable integer types.
+If the compiler made these functions "as fast as possible" that wouldn't
+actually help because they involve slow mechanical operations. Remove
+pointless inline function specifiers.
 
-For readahead to work effectively, small sequential reads should not
-require waiting for spindle rotation. Unfortunately, the present algorithm
-is very inefficient and does a lot of unnecessary waiting.
-
-E.g. if the device is asked to read sectors 1 thru 18, and if sector 9
-happens to be under the heads, the driver will proceed to read sectors 9
-thru 18, but discard the results, while it waits for sector 1 to arrive.
-
-If sector 1 couldn't be read on the first attempt, and needs a retry, the
-driver will proceed to read sectors 2 thru 18, but discard the results,
-while it waits for sector 1 to come around again.
-
-In between reading sector 1 and sector 2, the driver needlessly calls
-swim_track() and swim_head() again. But what's worse is that, on a 68030
-system, re-enabling interrupts after each sector read can result in a full
-rotation between sectors (that is a 3 ms wait).
-
-Floppy drivers often implement a track cache, that can be filled in a
-single rotation, to solve problems like these. But I think this solution
-is much simpler.
-
-For each request, use a sector bitmap to keep a record of sectors read
-successfully. Read or retry, as necessary, the requested sectors in
-whatever sequence they arrive in. Keep interrupts disabled until the
-whole track has passed under the read head.
-
-Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 91 +++++++++++++++++++++++++-------------------
- 1 file changed, 52 insertions(+), 39 deletions(-)
+ drivers/block/swim.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 0bab7ed3daa8..dae401e649d7 100644
+index dae401e649d7..4679f554fec5 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -180,9 +180,9 @@ struct floppy_state {
- 	enum media_type	 type;
- 	int		 write_protected;
+@@ -222,7 +222,7 @@ extern int swim_read_sector_data(struct swim __iomem *base,
+ 				 unsigned char *data);
  
--	int		 total_secs;
--	int		 secpercyl;
--	int		 secpertrack;
-+	unsigned int	 total_secs;
-+	unsigned int	 secpercyl;
-+	unsigned int	 secpertrack;
- 
- 	/* in-use information */
- 
-@@ -455,68 +455,81 @@ static int floppy_eject(struct floppy_state *fs)
- 	return 0;
- }
- 
--static inline int swim_read_sector(struct floppy_state *fs,
--				   int side, int track,
--				   int sector, unsigned char *buffer)
-+static unsigned int swim_read_sector_range(struct floppy_state *fs,
-+					unsigned int side, unsigned int track,
-+					unsigned int start, unsigned int count,
-+					unsigned char *buffer)
+ static DEFINE_MUTEX(swim_mutex);
+-static inline void set_swim_mode(struct swim __iomem *base, int enable)
++static void set_swim_mode(struct swim __iomem *base, int enable)
  {
- 	struct swim __iomem *base = fs->swd->base;
+ 	struct iwm __iomem *iwm_base = (struct iwm __iomem *)base;
  	unsigned long flags;
- 	struct sector_header header;
--	int ret = -1;
--	short i;
-+	int i, bits = 0;
- 
--	swim_track(fs, track);
--	swim_head(base, side);
-+	for (i = 0; i < 18; i++) { /* A track has at most 18 sectors */
-+		if (i >= count)
-+			break;
-+		bits |= BIT(i);
-+	}
- 
- 	local_irq_save(flags);
- 	for (i = 0; i < 36; i++) {
-+		if (bits == 0) /* All count sectors were read ok */
-+			break;
-+
- 		if (swim_read_sector_header(base, &header) ||
- 		    swim_read(base, error) || header.track != track ||
- 		    header.side != side || header.size != 2)
- 			continue;
--		if (header.sector == sector) {
--			/* found */
- 
--			ret = swim_read_sector_data(base, buffer);
--			if (swim_read(base, error))
--				ret = -EIO;
--			break;
-+		if (header.sector >= start && header.sector < start + count) {
-+			unsigned int offset = header.sector - start;
-+			int ret;
-+
-+			if ((bits & BIT(offset)) == 0)
-+				continue; /* This sector was already read ok */
-+
-+			ret = swim_read_sector_data(base, buffer + 512 * offset);
-+			if (ret == 512 && swim_read(base, error) == 0)
-+				bits &= ~BIT(offset);
- 		}
- 	}
+@@ -250,7 +250,7 @@ static inline void set_swim_mode(struct swim __iomem *base, int enable)
  	local_irq_restore(flags);
- 
--	return ret;
-+	return bits ? ffs(bits) - 1 : count; /* No. of contiguous ok sectors */
  }
  
- static blk_status_t floppy_read_sectors(struct floppy_state *fs,
--			       int req_sector, int sectors_nb,
--			       unsigned char *buffer)
-+					unsigned int req_sector,
-+					unsigned int sectors_nb,
-+					unsigned char *buffer)
+-static inline int get_swim_mode(struct swim __iomem *base)
++static int get_swim_mode(struct swim __iomem *base)
+ {
+ 	unsigned long flags;
+ 
+@@ -324,7 +324,7 @@ static inline bool swim_readbit(struct swim __iomem *base, int bit)
+ 	ret; \
+ })
+ 
+-static inline void swim_drive(struct swim __iomem *base,
++static void swim_drive(struct swim __iomem *base,
+ 			      enum drive_location location)
+ {
+ 	if (location == INTERNAL_DRIVE) {
+@@ -343,8 +343,8 @@ static inline void swim_drive(struct swim __iomem *base,
+ 	udelay(1);
+ }
+ 
+-static inline void swim_motor(struct swim __iomem *base,
+-			      enum motor_action action)
++static void swim_motor(struct swim __iomem *base,
++		       enum motor_action action)
+ {
+ 	if (action == ON) {
+ 		swim_action(base, MOTOR_ON);
+@@ -355,7 +355,7 @@ static inline void swim_motor(struct swim __iomem *base,
+ 	}
+ }
+ 
+-static inline void swim_eject(struct swim __iomem *base)
++static void swim_eject(struct swim __iomem *base)
+ {
+ 	swim_action(base, EJECT);
+ 	swim_readbit_timeout(base, DISK_IN, false, 2000 * 1000);
+@@ -370,14 +370,14 @@ static inline void swim_head(struct swim __iomem *base, enum head head)
+ 		swim_select(base, READ_DATA_0);
+ }
+ 
+-static inline int swim_step(struct swim __iomem *base)
++static int swim_step(struct swim __iomem *base)
+ {
+ 	swim_action(base, STEP);
+ 	udelay(150);
+ 	return swim_readbit_timeout_atomic(base, STEP, false, 20 * 1000);
+ }
+ 
+-static inline int swim_track00(struct swim __iomem *base)
++static int swim_track00(struct swim __iomem *base)
+ {
+ 	int try;
+ 
+@@ -397,7 +397,7 @@ static inline int swim_track00(struct swim __iomem *base)
+ 	return -1;
+ }
+ 
+-static inline int swim_seek(struct swim __iomem *base, int step)
++static int swim_seek(struct swim __iomem *base, int step)
+ {
+ 	if (step < 0) {
+ 		swim_action(base, SEEK_NEGATIVE);
+@@ -422,7 +422,7 @@ static inline int swim_seek(struct swim __iomem *base, int step)
+ 	return 0;
+ }
+ 
+-static inline int swim_track(struct floppy_state *fs,  int track)
++static int swim_track(struct floppy_state *fs,  int track)
  {
  	struct swim __iomem *base = fs->swd->base;
--	int ret;
--	int side, track, sector;
--	int i, try;
--
-+	unsigned int failures = 0;
- 
- 	swim_drive(base, fs->location);
- 	swim_READY_timeout(base);
- 
--	for (i = req_sector; i < req_sector + sectors_nb; i++) {
--		int x;
--		track = i / fs->secpercyl;
--		x = i % fs->secpercyl;
--		side = x / fs->secpertrack;
--		sector = x % fs->secpertrack + 1;
--
--		try = 5;
--		do {
--			ret = swim_read_sector(fs, side, track, sector,
--						buffer);
--			if (try-- == 0)
--				return BLK_STS_IOERR;
--		} while (ret != 512);
--
--		buffer += ret;
-+	while (sectors_nb) {
-+		unsigned int cyl, x, head, sector, n, ret;
-+
-+		cyl = req_sector / fs->secpercyl;
-+		x = req_sector % fs->secpercyl;
-+		head = (x >= fs->secpertrack) ? 1 : 0;
-+		sector = x % fs->secpertrack;
-+		n = min(sectors_nb, fs->secpertrack - sector);
-+
-+		swim_track(fs, cyl);
-+		swim_head(base, head);
-+
-+		ret = swim_read_sector_range(fs, head, cyl, sector + 1, n, buffer);
-+		if (ret != n)
-+			++failures;
-+		if (failures >= 5)
-+			return BLK_STS_IOERR;
-+
-+		buffer += 512 * ret;
-+		sectors_nb -= ret;
-+		req_sector += ret;
- 	}
- 
- 	return 0;
+ 	int ret;
 -- 
 2.52.0
 
