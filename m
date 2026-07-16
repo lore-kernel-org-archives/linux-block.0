@@ -1,71 +1,91 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD293F4851;
-	Thu, 16 Jul 2026 17:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511AB351C28;
+	Thu, 16 Jul 2026 19:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784222236; cv=none; b=R1S9ztxaJx4bNGyfwTwbrBv8XcbB7uznw1LWnV//8iG3m+hkLpD9hqkB8YIjPLya0swqZV/QqhC901JE21q5C9VgntgLOrEFpuBbuX1jDkZLoBuvP5HliuU5by3l55lF0tmJUFSxJvtrTIA9FQX+w5B+ZQbikta8SzgrBFT4l/c=
+	t=1784230958; cv=none; b=s+Yrx1xfoPvPhUtPSV9sDc6ASosUZyLkyeuieClNN+S7osCeU6P7IIwa/2ZoMwOu1tq9W3Ot5rIUT2fxtah6h38zsrLRJG8ZZr+8/nRB6PxWyQ/lQ6kCwY8v0/I30aZGvJjkXqLQ68l3xxBcFh95ogV2KzuXNnsv3YK97vxvrVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784222236; c=relaxed/simple;
-	bh=hHizop6TFz7B43wKQB8RZz3TZNBsJRkMr9GmKG36umk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MJ6fjODL+wygNuHVUemMKSH0lJd2I0e3NKTg3SrjKSO4IS8YVpxDCSeThEKSHQAWlSPc0OoWBQL+6AxoV/aDs2ghiNB1zS0M4TAJmhYGZ8OLNhYKr55GFb2aMVPFj4vrLRI6TEePlfS6L548rr6g3VNtgKBpLWOe/vaPxOVwAkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=MSTdP8go; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1784230958; c=relaxed/simple;
+	bh=Ig+GsN0kMZ05cJ4o3ugakK8qv+geJHudqh6YgXHniOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aKup+n8BzicQaKIlFgg3eghOlxjzjXLP704KAC3zIHHdnr9g7Z3R2BrTEILNAml6SFeSwikkIaTi3mkZe9S8egMRzdTVQkjQ53XeCyWVBDpDAJa80UbbgLoJExeqBHsipr/bS0j1EIYWzFf5h3tnHqyhJxjIlEj+Cx64FQWirZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHHnrgri; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="MSTdP8go"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4h1KTw3ZFKzlh2rk;
-	Thu, 16 Jul 2026 17:17:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1784222224; x=1786814225; bh=hHizop6TFz7B43wKQB8RZz3T
-	ZNBsJRkMr9GmKG36umk=; b=MSTdP8goCsorPsMX6woQbcDKwvnBCSBvqtwI2ceB
-	p1NIRDqWpN0GZzmJm6189asE5Rclk2SgN/m+OmEtXN6BtrsslLlio/J+EHE4zaoT
-	Dnz4aEtLdyRtcS+5cxEZBL+61n6eSA7eXTParsI0H0C7Sj2WEryb0aj1XHdTTQkV
-	RSiS32GFptW3f/+6e4aHPxnyx9eNmSy+2DkmfIt58xPsZaw3VXD6oUa6SGBqwiUY
-	oE9UT5eEickzaUq0lT2Ffz1twnwtAwbUlCgVXTzML0YouO+KbjVzOhmDt9UbWwMI
-	SicwHEKfsHoxisiH2dhquhwareIWn6685k9znMOpglIUbw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id FT1UPYR79nwg; Thu, 16 Jul 2026 17:17:04 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4h1KTp39FSzlh2s9;
-	Thu, 16 Jul 2026 17:17:02 +0000 (UTC)
-Message-ID: <1832a339-a7f9-4c2f-b95f-22cdaed41a42@acm.org>
-Date: Thu, 16 Jul 2026 10:17:01 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHHnrgri"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51D21F000E9;
+	Thu, 16 Jul 2026 19:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784230956;
+	bh=usR4FsGWwyujnpLuckLUoYL0cDU6hXmHk5b1uovpKno=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=WHHnrgriO+KrWCsVg+TwAvkOfNWs/YkXkGQ1U3xxZ9mhjMX3Lr0Grm7vAzXVHIJn9
+	 ctA9QM3HGp2Ze1NRWtDy+wSs4UuXRVpkGjl53T2V9mNgDburjmXXR24tRt7uTBUPcZ
+	 gvfyaboifn0XGp/WKn7chqa5qTHjN/l/ohrNaoCX8v1PPDHA27mbyj3jg0NA9n1W5r
+	 V6FqBhqa44TF2LcNoN0AlORsEzAkH2F6DUDbbVsbisfdmubF9TrArc3v/RikOrhMsQ
+	 c3OZAX2Pcba9r7LV5Ibx4dxMN7aD1XwfuHYJK2o3rEXm01PWu3oy44quzApuD+uemy
+	 elvvQxD+O5t8g==
+Date: Thu, 16 Jul 2026 14:42:36 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>, daniel@makrotopia.org,
+	linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saravana Kannan <saravanak@kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Ulf Hansson <ulfh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, devicetree@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ath10k@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH v8 1/9] dt-bindings: mmc: Document fixed-layout NVMEM
+ provider support
+Message-ID: <178423095566.1177840.10999909737617285520.robh@kernel.org>
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+ <20260703-block-as-nvmem-v8-1-98ae32bfc49a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-cgroup: avoid 32-bit overflow in root io.stat byte
- accounting
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk
-Cc: tj@kernel.org, josef@toxicpanda.com, boris@bur.io,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-References: <20260714063118.1153083-1-cui.tao@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260714063118.1153083-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260703-block-as-nvmem-v8-1-98ae32bfc49a@oss.qualcomm.com>
 
-On 7/13/26 11:31 PM, Tao Cui wrote:
-> Every other sector->byte conversion in the tree casts to a wide type first
-> ((loff_t)sectors << SECTOR_SHIFT in bdev.c, (u64)max_sectors << SECTOR_SHIFT
-> in blk-settings.c); do the same here.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On Fri, 03 Jul 2026 15:45:14 +0200, Loic Poulain wrote:
+> Allow an eMMC hardware partition node to describe an NVMEM layout so the
+> partition can be exposed as an NVMEM provider. This lets a partition
+> (e.g. an eMMC boot partition) store device-specific information such as a
+> WiFi MAC address or a Bluetooth BD address and reference it through NVMEM
+> cells.
+> 
+> Accept "fixed-layout" as the partition node compatible, in addition to
+> "fixed-partitions", so the layout can be described directly on the
+> partition node.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
+>  .../devicetree/bindings/mmc/mmc-card.yaml          | 23 +++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
+> 
+
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
