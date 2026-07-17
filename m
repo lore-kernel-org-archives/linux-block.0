@@ -1,91 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511AB351C28;
-	Thu, 16 Jul 2026 19:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2660E1531C8
+	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 04:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784230958; cv=none; b=s+Yrx1xfoPvPhUtPSV9sDc6ASosUZyLkyeuieClNN+S7osCeU6P7IIwa/2ZoMwOu1tq9W3Ot5rIUT2fxtah6h38zsrLRJG8ZZr+8/nRB6PxWyQ/lQ6kCwY8v0/I30aZGvJjkXqLQ68l3xxBcFh95ogV2KzuXNnsv3YK97vxvrVk=
+	t=1784261240; cv=none; b=Up88gSwFi0i/M/qIZ09HpQWd8UYlEzysI39/TjOWFgB9yD0xSYTei1Bu0NLiILAXxOGhFAY168o2kgxj5UcXultBQScLkGPlEW2H6EbM74xIFJzxVN/DwH2aFIy8VduG81gThQO020D3JYDWrLhY3MWJQpIv81ztTgeofHuMGy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784230958; c=relaxed/simple;
-	bh=Ig+GsN0kMZ05cJ4o3ugakK8qv+geJHudqh6YgXHniOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKup+n8BzicQaKIlFgg3eghOlxjzjXLP704KAC3zIHHdnr9g7Z3R2BrTEILNAml6SFeSwikkIaTi3mkZe9S8egMRzdTVQkjQ53XeCyWVBDpDAJa80UbbgLoJExeqBHsipr/bS0j1EIYWzFf5h3tnHqyhJxjIlEj+Cx64FQWirZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHHnrgri; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784261240; c=relaxed/simple;
+	bh=CE2mrwIxUFCp242j0hb1GsQiMWFiRqOGHd4mM3R37Wk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OoUsTNH27ipHZVSiruoDV/y1hpeI51rVbIOVsmenl6TecdIlxRlNfMNkMzJV2kMf0F6+rLfsQD4CFVk6JBjR9LoA1xqzCj1Z7QfBEbjgUO+BMPWaBzrmhSkiBIysMzMcOvdsHmXCfVDnLM0iJZBY7g2tJzjnjouwk9/drif5rJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpkG8NX6; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHHnrgri"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51D21F000E9;
-	Thu, 16 Jul 2026 19:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784230956;
-	bh=usR4FsGWwyujnpLuckLUoYL0cDU6hXmHk5b1uovpKno=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WHHnrgriO+KrWCsVg+TwAvkOfNWs/YkXkGQ1U3xxZ9mhjMX3Lr0Grm7vAzXVHIJn9
-	 ctA9QM3HGp2Ze1NRWtDy+wSs4UuXRVpkGjl53T2V9mNgDburjmXXR24tRt7uTBUPcZ
-	 gvfyaboifn0XGp/WKn7chqa5qTHjN/l/ohrNaoCX8v1PPDHA27mbyj3jg0NA9n1W5r
-	 V6FqBhqa44TF2LcNoN0AlORsEzAkH2F6DUDbbVsbisfdmubF9TrArc3v/RikOrhMsQ
-	 c3OZAX2Pcba9r7LV5Ibx4dxMN7aD1XwfuHYJK2o3rEXm01PWu3oy44quzApuD+uemy
-	 elvvQxD+O5t8g==
-Date: Thu, 16 Jul 2026 14:42:36 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
-	linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>, daniel@makrotopia.org,
-	linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Simon Horman <horms@kernel.org>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saravana Kannan <saravanak@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Ulf Hansson <ulfh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ath10k@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH v8 1/9] dt-bindings: mmc: Document fixed-layout NVMEM
- provider support
-Message-ID: <178423095566.1177840.10999909737617285520.robh@kernel.org>
-References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
- <20260703-block-as-nvmem-v8-1-98ae32bfc49a@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpkG8NX6"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784261232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SK1L/6dGOgAAA5jjj79H5VPkpf29CnzE1f50qRIaoOk=;
+	b=CpkG8NX6+88cAmYCv/jcivqOPTkusXUQKXhgtXwZDz/AbVSSR50rXVr+GlTDlIQt5m+m4J
+	4Nu+18O12CthAK8gGaKAQxFMcW3Y+u3IGgJzHVrCNYI+2sfnKQYJI6LYQ57K7/+TTDA7NW
+	0cmszYSi/dml3vWw4p5mt86gFFG+gYg=
+From: Tao Cui <cui.tao@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cuitao@kylinos.cn,
+	cui.tao@linux.dev
+Subject: [PATCH] blk-iolatency: use spin_lock_irqsave() in iolatency_clear_scaling()
+Date: Fri, 17 Jul 2026 12:06:53 +0800
+Message-ID: <20260717040653.1999364-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260703-block-as-nvmem-v8-1-98ae32bfc49a@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+From: Tao Cui <cuitao@kylinos.cn>
 
-On Fri, 03 Jul 2026 15:45:14 +0200, Loic Poulain wrote:
-> Allow an eMMC hardware partition node to describe an NVMEM layout so the
-> partition can be exposed as an NVMEM provider. This lets a partition
-> (e.g. an eMMC boot partition) store device-specific information such as a
-> WiFi MAC address or a Bluetooth BD address and reference it through NVMEM
-> cells.
-> 
-> Accept "fixed-layout" as the partition node compatible, in addition to
-> "fixed-partitions", so the layout can be described directly on the
-> partition node.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  .../devicetree/bindings/mmc/mmc-card.yaml          | 23 +++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
-> 
+child_lat.lock is acquired with spin_lock_irqsave() in both
+iolatency_check_latencies() (called from the blkcg_iolatency_done_bio()
+softirq path) and blkiolatency_timer_fn() (timer softirq).
+iolatency_clear_scaling() instead uses a plain spin_lock(), which only
+happens to be safe because both of its callers enter with interrupts
+already disabled:
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+  * iolatency_set_limit() runs under queue_lock via blkg_conf_prep(),
+    which returns with the lock held and interrupts disabled;
+  * iolatency_pd_offline() runs under queue_lock from blkg_destroy() and
+    blkcg_deactivate_policy(), both of which take it with spin_lock_irq().
+
+Take the lock with spin_lock_irqsave()/spin_unlock_irqrestore() so the
+locking is self-contained and consistent with the other two sites, instead
+of relying on an undocumented caller precondition. No functional change.
+
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+---
+ block/blk-iolatency.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index cef02b6c5fa9..68b74258cd95 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -811,16 +811,17 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
+ 	if (blkg->parent) {
+ 		struct iolatency_grp *iolat = blkg_to_lat(blkg->parent);
+ 		struct child_latency_info *lat_info;
++		unsigned long flags;
+ 		if (!iolat)
+ 			return;
+ 
+ 		lat_info = &iolat->child_lat;
+-		spin_lock(&lat_info->lock);
++		spin_lock_irqsave(&lat_info->lock, flags);
+ 		atomic_set(&lat_info->scale_cookie, DEFAULT_SCALE_COOKIE);
+ 		lat_info->last_scale_event = 0;
+ 		lat_info->scale_grp = NULL;
+ 		lat_info->scale_lat = 0;
+-		spin_unlock(&lat_info->lock);
++		spin_unlock_irqrestore(&lat_info->lock, flags);
+ 	}
+ }
+ 
+-- 
+2.43.0
 
