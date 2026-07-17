@@ -1,42 +1,46 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2660E1531C8
-	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 04:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAA9346AC3
+	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 04:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784261240; cv=none; b=Up88gSwFi0i/M/qIZ09HpQWd8UYlEzysI39/TjOWFgB9yD0xSYTei1Bu0NLiILAXxOGhFAY168o2kgxj5UcXultBQScLkGPlEW2H6EbM74xIFJzxVN/DwH2aFIy8VduG81gThQO020D3JYDWrLhY3MWJQpIv81ztTgeofHuMGy4=
+	t=1784262544; cv=none; b=YAaaIBq4IoR38hU8bIiDkh9xDBfr55aVOTvp2k6+ti7qMajb9v78qdsW4wCrpogtGRUqDxBL2BqDT5cjgKRPXG1/DSB/x6hcG3PA5IVqjO8kXZYnT4QR0IkxItBYwXtnZf3ZKHMUgOHVGpq+y+1qsnY+EPIC8BbaXec7iXDgFJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784261240; c=relaxed/simple;
-	bh=CE2mrwIxUFCp242j0hb1GsQiMWFiRqOGHd4mM3R37Wk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OoUsTNH27ipHZVSiruoDV/y1hpeI51rVbIOVsmenl6TecdIlxRlNfMNkMzJV2kMf0F6+rLfsQD4CFVk6JBjR9LoA1xqzCj1Z7QfBEbjgUO+BMPWaBzrmhSkiBIysMzMcOvdsHmXCfVDnLM0iJZBY7g2tJzjnjouwk9/drif5rJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpkG8NX6; arc=none smtp.client-ip=91.218.175.183
+	s=arc-20240116; t=1784262544; c=relaxed/simple;
+	bh=cqVgEQjGi8SC8nIGs3Bo9AwpjXz1B44w2UNfMMxe+ZQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gRiQ6FKiY1GYzuD2GlAw/2Oc+FJXisUw1FLcb2NzVqFrj9qVAe2axw65535Sm4g+w5cIxCatAWVWQD3Y+RqIuumvnGKtduESP3zke2gzYLLFO+J6lY/NFEovyhfskGqQPNuXTviML4dLJz3AvlWhnbFVzNZ2Ek4Z1UKP14CkNx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e1r4t96W; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpkG8NX6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e1r4t96W"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784261232;
+	t=1784262541;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=SK1L/6dGOgAAA5jjj79H5VPkpf29CnzE1f50qRIaoOk=;
-	b=CpkG8NX6+88cAmYCv/jcivqOPTkusXUQKXhgtXwZDz/AbVSSR50rXVr+GlTDlIQt5m+m4J
-	4Nu+18O12CthAK8gGaKAQxFMcW3Y+u3IGgJzHVrCNYI+2sfnKQYJI6LYQ57K7/+TTDA7NW
-	0cmszYSi/dml3vWw4p5mt86gFFG+gYg=
+	bh=rYkAJ6k25UpukOkE6eF37TfWeES/EpuM0W49M8Ed5io=;
+	b=e1r4t96Wcno2ya2yjCaWkx5Op9S4qoxSr7fLp8P03JMRpkm3NAM1CtQAwATn7csNf9WnmZ
+	Fx/vjHpQClf5JUOqjwdH4K9M0k473XAKW3+dLFsRgFzBEyXwDiuZehgcbqOkFxRagfj5mu
+	LkuhUjuwxbDBFtxsJM/jaFawt6+UvCE=
 From: Tao Cui <cui.tao@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
+To: Tejun Heo <tj@kernel.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
 	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
 	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	cuitao@kylinos.cn,
-	cui.tao@linux.dev
-Subject: [PATCH] blk-iolatency: use spin_lock_irqsave() in iolatency_clear_scaling()
-Date: Fri, 17 Jul 2026 12:06:53 +0800
-Message-ID: <20260717040653.1999364-1-cui.tao@linux.dev>
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH 0/2] blk-iolatency: fix io.latency documentation accuracy
+Date: Fri, 17 Jul 2026 12:28:15 +0800
+Message-ID: <20260717042817.2001826-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,51 +52,31 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-child_lat.lock is acquired with spin_lock_irqsave() in both
-iolatency_check_latencies() (called from the blkcg_iolatency_done_bio()
-softirq path) and blkiolatency_timer_fn() (timer softirq).
-iolatency_clear_scaling() instead uses a plain spin_lock(), which only
-happens to be safe because both of its callers enter with interrupts
-already disabled:
+Hi,
 
-  * iolatency_set_limit() runs under queue_lock via blkg_conf_prep(),
-    which returns with the lock held and interrupts disabled;
-  * iolatency_pd_offline() runs under queue_lock from blkg_destroy() and
-    blkcg_deactivate_policy(), both of which take it with spin_lock_irq().
+This series fixes three inaccuracies in the io.latency documentation
+(Documentation/admin-guide/cgroup-v2.rst), all caused by the doc
+describing only rotational-device behavior:
 
-Take the lock with spin_lock_irqsave()/spin_unlock_irqrestore() so the
-locking is self-contained and consistent with the other two sites, instead
-of relying on an undocumented caller precondition. No functional change.
+  Patch 1 documents the rotational vs non-rotational difference:
+  throttling is based on average latency on rotational devices but on the
+  fraction of IOs that miss the target on non-rotational devices; the
+  tuning guidance and io.stat field list are updated accordingly
+  (avg_lat/win are rotational-only; missed/total are documented for
+  non-rotational devices).
 
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- block/blk-iolatency.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+  Patch 2 corrects the delay unit: io.stat reports delay_nsec in
+  nanoseconds, not microseconds as the doc stated.
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index cef02b6c5fa9..68b74258cd95 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -811,16 +811,17 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
- 	if (blkg->parent) {
- 		struct iolatency_grp *iolat = blkg_to_lat(blkg->parent);
- 		struct child_latency_info *lat_info;
-+		unsigned long flags;
- 		if (!iolat)
- 			return;
- 
- 		lat_info = &iolat->child_lat;
--		spin_lock(&lat_info->lock);
-+		spin_lock_irqsave(&lat_info->lock, flags);
- 		atomic_set(&lat_info->scale_cookie, DEFAULT_SCALE_COOKIE);
- 		lat_info->last_scale_event = 0;
- 		lat_info->scale_grp = NULL;
- 		lat_info->scale_lat = 0;
--		spin_unlock(&lat_info->lock);
-+		spin_unlock_irqrestore(&lat_info->lock, flags);
- 	}
- }
- 
--- 
+Both patches are documentation-only and checkpatch-clean.
+
+Tao Cui (2):
+  Docs/admin-guide/cgroup-v2: document io.latency rotational vs
+    non-rotational behavior
+  Docs/admin-guide/cgroup-v2: fix delay_nsec unit in io.latency doc
+
+ Documentation/admin-guide/cgroup-v2.rst | 53 +++++++++++++++++--------
+ 1 file changed, 36 insertions(+), 17 deletions(-)
+
+--
 2.43.0
-
