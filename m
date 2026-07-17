@@ -1,170 +1,163 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294AC3E4C65
-	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 09:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784281656; cv=pass; b=RLGbeaJbZqVDveep0KtW00Iz1IvFdyDsoIgUFfMCvIlx233/6qwd7JaqJT2hxoL3zV8cbYCk5Fi+a5rBJ3oZ52Erpbmanfn6zaGFw36dhsPiJ6CFr4Rn5IxVR2xsekLH+SC/jhcF7xV0W0e1y3sribS79GxPgqudna6fyMQYnEQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784281656; c=relaxed/simple;
-	bh=UjTpkiOcq8brRffnQ7vEvC4+cTuo7MTwov4DeVg/Yvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ADMD3bUkZ8yZf87ftg2dod0sqBJ2OtgBz05y3o2s8vDrtGGDE97EDuVKu+8oAw/TcrvM/86VF68JvwCuAvzIm78L4qavk5evfuykpn3uls+dtpv43MxkkovSob42qZE+SiRFUf2TXN5x+MYcV1fULiirH60iiodD5rIRej9+uQU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b=RGrEYI3y; arc=pass smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CF53E5A2D
+	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 09:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784281762; cv=none; b=NNsWo6hAbI+vzWmwxItjALfWYDhxzyyMg/XWx/TQ3xxyL0W0NuHCu32H3WG0Fpggp/jWlbKNIIPLkXTZR4r9U8jdhuT/6tS+Tg270errgCoqbqlmiYRCz0eOKwan41gCheAv8/ZPtSY11LOuy+caoeaY0qcILAEQwQiPPvhFgKY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784281762; c=relaxed/simple;
+	bh=OtjQOHWNlzSWCrNa0SnSape8Ed5EuYdqNcVhAHpgC20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hJu+LyNJ+zdVBiFnRiXNhEB6Q8YNbDcnVi7+eSeLUlUQIOqquNxx93jdNpLTwCzJb1nqLu087/hk4wFU623LnHFCrXWtcPSHTod+0gAcmStcEoOU7PbJWjfZgo7af0R/jRdEM+2NE567odHFhua0TY22/mnE2eHfqWGv3hJvwj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AmbjVpNA; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="RGrEYI3y"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c166ec26696so47231566b.0
-        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 02:47:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784281652; cv=none;
-        d=google.com; s=arc-20260327;
-        b=lyIKYeB3D8nqwADGLIiEHguj3m4i1UzYZ6wVhNnVcBmzjEe9jrMoKJJVgcIKJCVUTi
-         cJBKgfs37MU0Xhn6WD+lDWB6SrcmhzPOqr8KEJD+ygf3+/5M0b7XGM4YOJYl1rTI4xTg
-         CwECyQcT85y6tqUo+7KOGIPy/vLwjP9ZSNfz2WLNd7zvfjyfAV0pcmrkz5KzWs1en9Xq
-         7BKrb6aWO+a0lePoO8kkVP2g7PIG3dwMGW1eFpUYO01RkCnEp5qp/eRTfDycgztai22n
-         9+J9XDsPy1MaFXPiShFSbbrOVSrwRw1Yk3zSnVCUo7Z2KNmrptNTol2Th2FRZ8jns4j1
-         CyXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qvUe7qgak+4VWoHWMbfHFceGcLZldsmBmrDHucACarE=;
-        fh=kA/jpmXQVZRe+2dznKQYZkZ1H7dYdSzqYwpbEBCipM0=;
-        b=prDLQq7T9lQUGZbLoVqwlJ4ZuKOHbNScAgB50TmLlvywiIcMwhRY3/KUuelCoQYSrI
-         poIEhhHahO2MjZMyEjkXdflOhsDf8ry93MtvO2M0Iwy9oaLyTuhdS1bGrGzVs56cq7Jt
-         zKdqS0y3E3M60NmnD4l4Gvlld4MnuHDnyYHIGUxQUXHVeY5uBW8YY/WvWGcSWlW2OAH3
-         l311/9w2HJCBgphCJzCL7ndGEBJV/6VsEsmEyC7FxGIg6rCaAl1hETiEIsEoGjtEKKSe
-         4vn1txzAQuLiXziGznmuFuUsXzw4M9hF+XRTAgHRa7U6GhqxDDitivC4RsCOaC3+76tn
-         8Osw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google; t=1784281652; x=1784886452; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=qvUe7qgak+4VWoHWMbfHFceGcLZldsmBmrDHucACarE=;
-        b=RGrEYI3ytnGd/PiR8RzgxKMEaelbhQxFI1zwyQvsT437hUttqrKUWmNxEADPu62P5x
-         WE4PuuTk6q3dSub+nZVwS5it64AMgV9q6cQ6158mpiFZmH8WT0JDQzx1KzSU7kGXK1p0
-         hjoTXPl4nG3DWi4fQNzHvzP1dmOye1gs5Rmwv6hSpzydwMPSKUAD10cqxSlf3Kc53wTF
-         Nc/xbbNoyKA9KurrLNwdyOc2ywWqaP39dXrvKismJpAWfnynPoPowoqhrAyKMgeGAuvf
-         PL/exdPd3aiAk4gXyAmofEDknIYjTtyxLuG1eX8nytxb71CLOtRuKw5C+Ug1LyIdx9o2
-         UTzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784281652; x=1784886452;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qvUe7qgak+4VWoHWMbfHFceGcLZldsmBmrDHucACarE=;
-        b=Ezfi01szBsx6HQf/sOQ9UoydzrrL/6eLK2Kx4y5Vn8Fapg6CGi3vA4b/a4TmBo6X9+
-         vIHAG/ELIOZOF9MK4I/hMJMuCyDdHi/tIlNp0QrVJdJ34TkBM/2mfHPwQLs0AG9OaLnW
-         G70RAmJWp0anmzUh82Ls172c/LEbXu81MS37ogMfiNVeJzn4cZFMty8oKCOqLNP90oLY
-         MgoD/3EqAC2EOgtOUbpE7EW9X7PvjgfimTTnRqoWIYADSfHU9OQoL3hOYL8mDnFD/pi/
-         d2p809uhtVgHhoxUzyZQGjkBAbI1giDONOH5apDo/CyRdAd4hceNxgfd1pKulnUXvtCw
-         i07Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rojnjj45Mvx5etB6Ay1tJG0RiVKxio24CSQPLBLWEXqszBDh0XzfgItadzrHgTHwn+cWrET2dnBWtjmQQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ3gA1e4xrhcIKccMztkRTG87DvBdVgU245joIq7sZd42hEQQr
-	zqUlnWsi5oST+cSr6iEz/vIjwguBdLAZqJol06rVo4neK5ZFibMapRJil/cJSbjDQytAIfcYqXx
-	zyoHAcvXLvO8ieW7zJRR1Raw20bvMCHtgHneRrlhCVQ==
-X-Gm-Gg: AfdE7cmVm2My6rrpoNzpYY45olLPrmX4JjEkHuDsfwfWxRl9OLZZB4E54xIwUrM0DL+
-	lbYGwGASbBU8GbesO5d5URbh4MkzSV8vlZ31bDjWVdrMzBDA1IjhXcQeBeGF4IOYl6OTvHIYIaP
-	FpHUf/aQQtrprNhG0T9b/H+4aPkKetYw9e6U+qcCisZjM0V4oMMuPNE0+Yf19Lyhiah7qLPZ3bH
-	O7zDWy4nmrnnnTIwM117jBfhFtq53DwLZw0d2NkLkwDypU5Nc8toIp+csaCLqjKFWosAfwJFeks
-	WXanFUUgoAjsOUB/SQ==
-X-Received: by 2002:a17:907:1ca2:b0:c12:e4f7:9a0 with SMTP id
- a640c23a62f3a-c16b46b2758mr43790166b.2.1784281652282; Fri, 17 Jul 2026
- 02:47:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AmbjVpNA"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66H6gRVg1279635;
+	Fri, 17 Jul 2026 09:49:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=jxNnfq
+	vIKw34B2xIKrEtjKVLc0TAsbQJv6LrQ2KIZ5Q=; b=AmbjVpNAGGZp08IWsEdbjJ
+	N+AblvzDUsaNRhcy1y7vn4UxPVWUjRB2pgUjzU5PwWQ4H/ZJSufnw/r3cIgMkNv8
+	yfwdC9dPY1h4DZznmr3o7FxRljJ2cqLJLd5L2PqMKN0ILlxDvxYto8nUvwDB8Sns
+	Gx4qJUIPGVgSFUFoMrVv5aRukOCPItk7kSiqcwDkP99ox15e6eRKgDEoD9ebimPk
+	cUIbtwEiTm4ze4D+z8uwBOJR1ERMr1w1yxY9nm+BdtQ/m+dzjxOtGgT0lbvOfyzs
+	GeQM6Yf7NyaUVvjuFzdQAUdWjBb4PSqUwUSgLTOiiVpaeF8wVKc0znFdb+TnXUig
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegc4t8x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jul 2026 09:49:08 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66H9Yb43025824;
+	Fri, 17 Jul 2026 09:49:07 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc2cgrwpj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jul 2026 09:49:07 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66H9n6Le21758700
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jul 2026 09:49:06 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C2A5E58043;
+	Fri, 17 Jul 2026 09:49:06 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 226A558055;
+	Fri, 17 Jul 2026 09:49:04 +0000 (GMT)
+Received: from [9.43.55.154] (unknown [9.43.55.154])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jul 2026 09:49:03 +0000 (GMT)
+Message-ID: <b8bfb51d-81f1-4bfd-b83b-5cd764473718@linux.ibm.com>
+Date: Fri, 17 Jul 2026 15:19:02 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260714115051.1401174-1-lgs201920130244@gmail.com>
-In-Reply-To: <20260714115051.1401174-1-lgs201920130244@gmail.com>
-From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date: Fri, 17 Jul 2026 11:47:21 +0200
-X-Gm-Features: AUfX_mwbPUzFF6hJCWj4_ebzZ4F7Bs345-sg-n39cyrfh8893KslX5SbYtue0uA
-Message-ID: <CAMGffEm+SAvqHt7qORVrzmKnOo8hKazCcscXfdWjbHZiyg1bqQ@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd: Fix double free in process_msg_open
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jens Axboe <axboe@kernel.dk>, 
-	Danil Kipnis <danil.kipnis@cloud.ionos.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] nvme/069: add a test for multipath cdev lifetime
+To: John Garry <john.g.garry@oracle.com>, shinichiro.kawasaki@wdc.com,
+        linux-block@vger.kernel.org
+Cc: hch@lst.de, linux-nvme@lists.infradead.org, dwagner@suse.de,
+        John Garry <john.garry@linux.dev>
+References: <20260716082927.4053505-1-john.g.garry@oracle.com>
+ <a4f4f444-967f-43a8-becf-465a3007ade8@linux.ibm.com>
+ <ae3a2f44-b26d-4040-b9a4-cd6122dca29a@oracle.com>
+ <99842431-3ffa-412a-af57-e284888342a7@linux.ibm.com>
+ <4a7868c2-a67c-4bfd-bf61-58131a98c97a@oracle.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <4a7868c2-a67c-4bfd-bf61-58131a98c97a@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a59fa94 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=rQewcHpba3w_WFlePm4A:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDA5NiBTYWx0ZWRfX0a2Rlmq4ogIv
+ TBwKb1ClBCsjpVgKX66yF3sBQqYF5YtfIfpYWxhADvNSDwPRR4fMhDbq25o+LYYEAprURFf+oiP
+ 6EGeZ8ZOdyMrqyUFhqDGgjm6Ae0GdHRuGB42Db/A2B3vRqr7Xymh57cXRMKCGoHsqKnWr7kSsSz
+ 0at5QvsthFsf3BXiZOHAZE5JM4Glg5TXpoJR1SXlxEcm/d9wZeqduDY2eeTY1JZEPFGVFpX6Nlt
+ aRtb7E8z0nXV0qHZdhVP17ynxZSBC+gufn5nZvxkTffvhP9Z26Zaj1TLBHvSgw5GC1ZsJWjdlE4
+ L7K7ttX++YMNkSLoA0mJEez6PtE3Xr0UbXD8YEVYR/PHexx7IXJhQHIqylZNm2TsQ2ni5j8Z2ey
+ GDXAk51/eUpaPcQ9soGXDsD3oxqiM2RQIzTUcnX8CcIfReOmR7jY2TfmRKxqV0SRci+ZWjLrKHc
+ ajy36vEBwJ2o2MMWX8g==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDA5NiBTYWx0ZWRfX+e8tclNh4Ke3
+ pQAHEiyhc80ScB1hnKAVsyUnk4V4VrJIVqUwNlYJbcdFZfl/VGqIjnONJmmwqc3FeRYZNbqWSTw
+ KKV39DTDL3nGK3tqOCP9h811VTnv/Rw=
+X-Proofpoint-GUID: nx3zChGdrfD9Gh1ql-2iFgXywdFfP7lF
+X-Proofpoint-ORIG-GUID: nx3zChGdrfD9Gh1ql-2iFgXywdFfP7lF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-17_02,2026-07-15_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607170096
 
-On Tue, Jul 14, 2026 at 1:53=E2=80=AFPM Guangshuo Li <lgs201920130244@gmail=
-.com> wrote:
->
-> process_msg_open() allocates srv_sess_dev with
-> rnbd_srv_create_set_sess_dev() and then initializes its embedded kobject
-> through rnbd_srv_create_dev_session_sysfs().
->
-> If sysfs creation fails, the helper calls kobject_put(). The final put
-> invokes rnbd_srv_sess_dev_release(), which reaches
-> rnbd_destroy_sess_dev() and frees srv_sess_dev. process_msg_open() then
-> jumps to free_srv_sess_dev and calls kfree() on the same object again,
-> resulting in a double free.
->
-> Add the session device to the list and release srv_dev->lock before
-> creating the sysfs entries. On failure, rely on the kobject release
-> callback as the sole owner of the cleanup instead of freeing the object
-> again.
->
-> This issue was found by a static analysis tool I am developing.
->
-> Fixes: 8cee532f469b ("block/rnbd: server: sysfs interface functions")
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-lgtm.
-Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> ---
->  drivers/block/rnbd/rnbd-srv.c | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
-c
-> index 10e8c438bb43..5a991bfbf3ad 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -778,18 +778,22 @@ static int process_msg_open(struct rnbd_srv_session=
- *srv_sess,
->                 }
->         }
->
-> +       /*
-> +        * Add the session device to the list before initializing its
-> +        * kobject. If sysfs creation fails, kobject_put() invokes the
-> +        * release callback, which removes the object from this list and
-> +        * releases all resources associated with the session device.
-> +        */
-> +       list_add(&srv_sess_dev->dev_list, &srv_dev->sess_dev_list);
-> +       mutex_unlock(&srv_dev->lock);
-> +
->         ret =3D rnbd_srv_create_dev_session_sysfs(srv_sess_dev);
->         if (ret) {
-> -               mutex_unlock(&srv_dev->lock);
-> -               rnbd_srv_err(srv_sess_dev,
-> -                             "Opening device failed, failed to create de=
-v client sysfs files, err: %d\n",
-> -                             ret);
-> -               goto free_srv_sess_dev;
-> +               pr_err("Opening device '%s' on session %s failed, failed =
-to create dev client sysfs files, err: %d\n",
-> +                      full_path, srv_sess->sessname, ret);
-> +               goto free_path;
->         }
->
-> -       list_add(&srv_sess_dev->dev_list, &srv_dev->sess_dev_list);
-> -       mutex_unlock(&srv_dev->lock);
-> -
->         rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->name=
-);
->
->         kfree(full_path);
-> --
-> 2.43.0
->
+On 7/17/26 2:36 PM, John Garry wrote:
+> On 17/07/2026 08:00, Nilay Shroff wrote:
+>> On 7/16/26 10: 06 PM, John Garry wrote: > On 16/07/2026 16: 16, Nilay Shroff
+>> wrote: >>> +    kill(getppid(), SIGUSR2); >>> +    count = 0; >>> +    for (;;)
+>> { >>> +        fd1 = open(argv[1], O_RDONLY); >>>
+>>
+>>
+>> On 7/16/26 10:06 PM, John Garry wrote:
+>>> On 16/07/2026 16:16, Nilay Shroff wrote:
+>>>>> +    kill(getppid(), SIGUSR2);
+>>>>> +    count = 0;
+>>>>> +    for (;;) {
+>>>>> +        fd1 = open(argv[1], O_RDONLY);
+>>>>> +        usleep(500000);
+>>>>> +        if (fd1 < 0)
+>>>>> +            break;
+>>>>
+>>>> Does it make sense to check for errno set to ENODEV or ENOENT
+>>>> before breaking out here?
+>>>
+>>> ehh, if the errno is not ENODEV or ENOENT, then how to handle? Would it to fail the test due to unexpected errno?
+>>
+>> I think yes, something like below:
+>>
+>> for (;;) {
+>>            fd1 = open(argv[1], O_RDONLY);
+>>            if (fd1 < 0) {
+>>                    if (errno == EINTR)
+>>                            continue;
+>>
+>>                    if (errno == ENOENT || errno == ENODEV)
+>>                            break;
+>>
+>>                    perror("open");
+> 
+> if fd1 < 0, how is it open? Or maybe this message is too vague...
+> 
+Yes, if fd1 < 0 then it implies errno is non-zero and device is not
+opened. Later we evaluate the error code and take necessary
+action.
+
+>>                    return EINVAL;
+> 
+> So are ENOENT, ENODEV, and EINTR the only expected error codes? Others are just unsupported and we fail the test (if and when we get them), right?
+
+Yes. My thinking is that, apart from EINTR, any failure from open() is an error.
+For this particular test, we're specifically waiting until the device node
+disappears, so ENOENT or ENODEV indicate the expected condition and we can
+break out of the loop and issue the ioctl() on the original fd. Any other
+errno would be unexpected, so I'd treat it as a test failure by logging the
+error and exiting.
+
+Thanks,
+--Nilay
+
