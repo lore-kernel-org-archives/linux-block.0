@@ -1,144 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722733C2790
-	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 08:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E483D669C;
+	Fri, 17 Jul 2026 08:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784276969; cv=none; b=NNgG9AFStMFQnr6kinB7LwB/AhFT78UTLKcGFVng0pYxde3pvPDImkUkNf4+CdhBZaUjnDVZxFevnxmtPIxZWUCj8wq8A8y0mmGwyXrh1VZ2t0wlQg2s5nqB+suoILViXJ4S2ZDtc/YxSuYR/srBwamtmud+1qUDTvJLX7H3hIo=
+	t=1784278699; cv=none; b=f8tBCCrsOdSgpNz7jSAtEmxom7o/7iWqhJEgOMVdT+9rsx3b5/lmC9v7CAr46ExKneIh7hPNHn5bEUumjpF01KjtkxwTw8MfI42sYx3gHrTt0C8yWx9PDSsIxsSGDZVSDptbYypv7yo97tOEIq1Tnp0tq8cFMytMswcgt/p0NDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784276969; c=relaxed/simple;
-	bh=gYJGpWPn3e3bGCIfGgtUOZeACOMhz8yVeCqfuC3c2zs=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CBJDftgXC4dRiMSY957Fw5BC4n4Tq+QHkhBO0aJvXvoXVLNQxja0B0W6RUtV87LvFjsigA9u6mSiXRpy/ekbPg8YWST3SBxkajns7EWysaANUFegHOXwKUAikrekB6RBDYP+0yA8Vfi1GBfSQGXgRWIlOBv1clNrv6JFTxOHDLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOxgN5Vw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784278699; c=relaxed/simple;
+	bh=v9FWPyrWhZzWH9ElyAC5giLmIq3XG3HZyAdKDJy3ddQ=;
+	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=SKtmDUJvFogESCNUS7ReeFECzqzDjiPQtDBT9AurNjMbfgbcKYEJXIrndimY6a2TJdx4ygsxFKCfUENXttdRxpjTFcMujTBRU5WEUnotjnu2BivVJjnT0xEE7L77iDCz9PAVCGEfwf65SapuVj/c+khc1trRcYx+0uBDrUeDSLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j70V53lb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOxgN5Vw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D0601F00ADE
-	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 08:29:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j70V53lb"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0D9581F00A3A;
+	Fri, 17 Jul 2026 08:58:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784276968;
-	bh=EPZgr4u40Ey253+h5jZaWa/6ga/57quCqeZN6Y3LbLs=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=MOxgN5Vw0ExTWFj/csnN0Eq1CWmvQhK4Uhi0Qmu6WfKTz7ScXP5gKOZ+DjIv5XEbD
-	 KK55g99Uh9TRYVscAXPiRqO8rbSGR0St22hqW8n+UbyQlNEN3VTeGuiPVlB4mxsc/i
-	 UWN46RdUqAoVguX6rv619gIPbCqrt+i2pT8hIRnK7AorfCbHOebHnq9jceHyuPuvrn
-	 UK3Wo5pzjCVV9Rw1CE+7EC+EJlWXR1CDJXu/TPc3kCbtpF7qXyAzaA853jV0ot6UQj
-	 hheX2Hg/Kq5E6zplZEjKU9Hk8SPU1IOCdZV3V+fN8UY8ylt8ewWgPKllCZzUBZCLB1
-	 SZe6ydnUs4ZoA==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5aeb5e85378so8148660e87.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 01:29:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RresAjSq929bsYoIbr8aSAB2xKv4ZcBrIvORDxbgHB6zInhk9SDlvRH7coue+OS7dHR2nXCE662nkB41A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7hlCQyTqpdcqP/oZstAtYm1WHMCLmqPDnW87iJ0MqS3haFA3a
-	DQczAuop/lgUU6r9TWKBLAH5tHPap8OetZ/iCLh3EHx5tpnEBEMhjXiUmTzPlQdbdei+qkrD7E7
-	OG2a6Ap3j/TyzQ9WwhiTSd+cNm92//I+LDpZasxJ8uQ==
-X-Received: by 2002:a05:6512:6d0:b0:5b0:1359:3dd4 with SMTP id
- 2adb3069b0e04-5b28f8471b5mr432020e87.5.1784276966788; Fri, 17 Jul 2026
- 01:29:26 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
+	s=k20260515; t=1784278698;
+	bh=3AogwMFEUrTVdFNcvpZMG2Wa3b83aj0rSoDs431W/To=;
+	h=From:To:Cc:Subject:Date;
+	b=j70V53lbHrUiduUA1sL8k2PHrCVe6Mx/3U9+bJNGDc3mEMFeyK366I73hdfUzuG/I
+	 8gWrOgW/qG/gNdWrzXD4TAfBK3WnhMELyGKnXytOzbPZjRPZBFPC+q56VY7Bw7LGis
+	 Gz/lfvA3ui+6Ed9uLYu8fWB8JowSH5N40JYK5QHo8djLQ4cFirM2QKovtShN3dO8Hy
+	 F95h0gpQsW/+XYfRxZ8lVSm5wAackUtljnvUB3DJFnkeSLCgGSk53wlky83sccIw3j
+	 9t+jA9Bh5eQTAbY4+xqvusZVTT9c1wptRhCz+KzWvqIvMlmmoFdl7YxWevHnRW6uUD
+	 aa0OLNIqJdEww==
+From: "syzbot" <syzbot@kernel.org>
+To: syzkaller-bugs@googlegroups.com, Kusaram Devineni <kusaram@devineni.in>, "Jens Axboe" <axboe@kernel.dk>, "Josef Bacik" <josef@toxicpanda.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
+Subject: [PATCH] nbd: fix I/O hang on dead socket and rate-limit console error
+Message-ID: <c4c2aa69-a3bc-4d1b-96ed-64ae891f921e@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
- <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com> <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-Date: Fri, 17 Jul 2026 01:29:25 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
-X-Gm-Features: AUfX_mzH2Q0kFyO4TFR4vp1sRhWEa1QLfB0S2bP-OIJE8-QcpGQ5uxWfAzjRRCI
-Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
-Subject: Re: [PATCH v8 4/9] nvmem: layouts: Support fixed-layout as the nvmem
- device node itself
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, 
-	Loic Poulain <loic.poulain@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Date: Fri, 17 Jul 2026 08:58:18 +0000 (UTC)
 
-On Wed, 15 Jul 2026 14:07:24 +0200, Bartosz Golaszewski <brgl@kernel.org> said:
-> On Fri, 3 Jul 2026 15:45:17 +0200, Loic Poulain <loic.poulain@oss.qualcomm.com> said:
->> of_nvmem_layout_get_container() only looks for a child node named
->> "nvmem-layout" to locate the cell definitions. This does not cover
->> providers whose device tree node is itself the fixed-layout container,
->> such as an eMMC boot partition block device whose fwnode points directly
->> at a "fixed-layout" compatible partitions node.
->>
->> When no "nvmem-layout" child is present, fall back to returning the nvmem
->> device node itself if it is compatible with "fixed-layout", so that its
->> cells are parsed by nvmem_add_cells_from_fixed_layout().
->>
->> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
->> ---
->>  drivers/nvmem/layouts.c | 13 ++++++++++++-
->>  1 file changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/nvmem/layouts.c b/drivers/nvmem/layouts.c
->> index b90584e1b99eab4217cbe7ec48373e18a7caf0dc..efa631ce7283bdd6c8ecda75915911b5e3a33c99 100644
->> --- a/drivers/nvmem/layouts.c
->> +++ b/drivers/nvmem/layouts.c
->> @@ -167,7 +167,18 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
->>
->>  struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
->>  {
->> -	return of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
->> +	struct device_node *np;
->> +
->> +	/* Search for nvmem-layout child */
->> +	np = of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
->> +	if (np)
->> +		return np;
->> +
->> +	/* The nvmem of_node is itself a fixed-layout node */
->> +	if (of_device_is_compatible(nvmem->dev.of_node, "fixed-layout"))
->> +		return of_node_get(nvmem->dev.of_node);
->> +
->> +	return NULL;
->>  }
->>  EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
->>
->>
->> --
->> 2.34.1
->>
->>
->
-> I have it on my TODO list to convert nvmem layouts to be fwnode-agnostic. While
-> I'm not sure when I'll have the time to look into it, I think it makes sense
-> to not introduce any new OF-specific interfaces. Can you make it into:
->
->   struct fwnode_handle *nvmem_layout_get_container_node(struct nvmem_device *nvmem);
->
-> by replacing of_get_child_by_name() with fwnode_get_name_child_node() and
-> of_device_is_compatible() with device_is_compatible()? That would mean less
-> churn in the future.
->
-> Other than that, it looks good.
->
-> Bart
->
+From: Kusaram Devineni <kusaram@devineni.in>
 
-Scratch that, I didn't realize this isn't a new function but a rework of an
-existing one.
+When an NBD device is configured with a timeout of 0, a closed socket can
+lead to a permanent I/O hang. The sequence is as follows: a request is sent
+and marked in-flight, but then the socket becomes dead (e.g., due to a
+connection failure). Since the socket is dead, no reply will ever arrive.
+In nbd_xmit_timeout(), if the configured timeout is 0, the code currently
+only checks if the socket has been replaced by comparing cookies. If the
+cookie still matches, the request timer is unconditionally reset and the
+request stays in-flight forever. This causes tasks to hang indefinitely in
+TASK_UNINTERRUPTIBLE, triggering the hung task detector:
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+INFO: task udevd:5915 blocked in I/O wait for more than 143 seconds.
+Call Trace:
+ <TASK>
+ schedule+0x164/0x2b0
+ io_schedule+0x7f/0xd0
+ folio_wait_bit_common+0x836/0xbc0
+ do_read_cache_folio+0x1ac/0x590
+ read_part_sector+0xb6/0x2b0
+ adfspart_check_POWERTEC+0x9a/0x7a0
+ bdev_disk_changed+0x851/0x17a0
+ blkdev_get_whole+0x372/0x510
+ bdev_open+0x324/0xd70
+ ...
+ </TASK>
 
-Bart
+Fix this by checking nsock->dead in addition to the cookie check in
+nbd_xmit_timeout(). If the socket is dead, the command is requeued.
+Requeuing returns the request to the existing fallback, reconnect, or
+failure policy. For the reported configuration where no reconnect is
+possible, this results in the request being properly failed, which
+terminates the hung operation.
+
+A secondary issue was observed where repeated attempts to connect to an
+already-in-use NBD device cause console spam because the "nbd%d already in
+use" error message in nbd_genl_connect() is not rate-limited. This can
+delay console_unlock() and trigger NMI backtraces. This is fixed by
+changing the pr_err() to pr_err_ratelimited().
+
+Fixes: 2c272542baee ("nbd: requeue command if the soecket is changed")
+Assisted-by: Gemini:gemini-3.1-pro-preview Gemini:gemini-3-flash-preview syzbot
+Reported-by: syzbot+82de77d3f217960f087d@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+Link: https://syzkaller.appspot.com/ai_job?id=40e56b38-627e-4b49-b7ac-d3a21e77dba2
+Signed-off-by: Kusaram Devineni <kusaram@devineni.in>
+
+---
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 8f10762e9..eedb1c870 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -523,7 +523,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
+ 			blk_rq_bytes(req), (req->timeout / HZ) * cmd->retries);
+ 
+ 		mutex_lock(&nsock->tx_lock);
+-		if (cmd->cookie != nsock->cookie) {
++		if (cmd->cookie != nsock->cookie || nsock->dead) {
+ 			nbd_requeue_cmd(cmd);
+ 			mutex_unlock(&nsock->tx_lock);
+ 			mutex_unlock(&cmd->lock);
+@@ -2172,7 +2172,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		nbd_put(nbd);
+ 		if (index == -1)
+ 			goto again;
+-		pr_err("nbd%d already in use\n", index);
++		pr_err_ratelimited("nbd%d already in use\n", index);
+ 		return -EBUSY;
+ 	}
+ 
+
+
+base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+-- 
+See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
+You can comment on the patch as usual, syzbot will try to address
+the comments and send a new version of the patch if necessary.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
