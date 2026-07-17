@@ -1,73 +1,59 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F18438D40D
-	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 12:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533BD3D1A97
+	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 12:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784292629; cv=none; b=CVvJQITVAfGfwE1bR8jBCiGtz+gTy+jvAkynQMrRjp3H1+ymJtfGZIY/TOZ9Qq5Yq4UgW8sdysxSBBHLDtBy05UK4iGXutJ+twgG8k403A8Ps7l3aOMqxRb6oozaIBhfG9VmAeZ/mpz14CRANdSCVyVq6LxsdwL59fN6QVvS7vM=
+	t=1784292996; cv=none; b=sG4yfR+qR/zpEKMsC5KGjYThDUSFl0UTzUIhBGE+y5ZstNdP/xW1qWe3JcBp35Nx/g80Mhkbqnd/4zr1MXKtpcttdQ3KDp6ah6+UaJY99lOCeesjhMrAieJn02W0IFU9NAhYUP3hu26Oc6zIZSl5AyQ+4B7xi+CL9W0/ZVCzAno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784292629; c=relaxed/simple;
-	bh=yHpHCxNOC5MlsnpDgYnYkeYbWsX6snYvQjK/qKOfYz0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=INyAP/fA8Lfo98Xrkx9BD3rHokrxCd6HUF6J4Hf05l3GqGM2FhcvHv6W4PbIZr4NLek/8VFuys/jI9iyH0qa3uMAQJ9aK7MQiWdGAELdw1itnZdVPtylCJW0kvSPB++Uc+TL+WaMpXyvhqKeaTp9k5ljmm1QZ4kacSbdk3oU9Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=NhrYqFgX; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
+	s=arc-20240116; t=1784292996; c=relaxed/simple;
+	bh=LcygAO5eYE4EGFv7udID9rGj3qDnf3al/NMz8bFPlcg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=ipcrubKMWXsqq696tEtArSYg4hVRkLpXDZUTCbO1k0GpkbzEqWcvTzva9eoAJKMVUkozgELvUtHGL7qujOFkLzIwPAP+8K356trpEBe6HAAkaeJMFN9L/Mi7kXIOBTnX13mr7mHO7b7dazlrKkkIonFAMRxAjL4w6p15Eb7R43o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Al5KViI+; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="NhrYqFgX"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-ca7bea5e5b3so5628341a12.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 05:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1784292628; x=1784897428; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ts6ItQRv/aSdCv0Y+lKO30HlVCBc9sllq/rXrxpJ0EM=;
-        b=NhrYqFgXCgSL/0L1mTny9IynK1wzTBI1/cRMXwa6PyhtKFcrru+zvKUcobjefJDm3o
-         xitmv7fs3kvkSj7KbijDlwyCX+OrarJcreXbT4PgYH1n7CfZV/pwOqQiFWgR+U/ENNXB
-         FnY7ZfAccK6I7RzT63s1CdNAm7bWKHx/R2fB27VWzvuD1Haf/Ok0JizusW2H2s4h8fX+
-         ELAzAel7hdw+o5FS2atLFjgP/uwJfWDFrtD1WUgcWjKI2PPzgfmXvFx+3UsoASuiGnQd
-         zwrISvkmdelWGGnrr/ollACPRurRnXFO0fJvwxqbJ+XFkBW4OfjWK+SY5+hrf6ZFxm01
-         Ungw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784292628; x=1784897428;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ts6ItQRv/aSdCv0Y+lKO30HlVCBc9sllq/rXrxpJ0EM=;
-        b=XHZXDH62A5Ucd3SL+JegNcKVAJ+HK7cPOQSQXXVcA5QTs2X4DX2CXhcy5X+RIUnkt9
-         mQ8irOtt8fUQ/3r4XHIf8NzqbEUASOdziz+PzVNcx9OBpAbaW7jn7AQBpoUmRF+Q2ynw
-         v6b7yROu+j4k3Tn4SH3n8dDCgZuyF/8qv7ne8lBYpDXlyC13comlt3VW/qi+1jQEQ92n
-         9HMhlMkPx9zg74boAXGVyp8W0ydBukWYAT/Wirrg3JzKPJ9HYzgkyGfHOjqgUqW2c4rb
-         ffhGpD9HMqKxwD66yRiIA+ZcxKGsKz0TGfpbj7fq131x7q5XyC7IAR//K3WIvMGrEgc+
-         ofSQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoQIcu4Slzsa2DOuYFkf0wd6bGt5hIzWVZ/meFYNTViQx6Qp+oaMt67G8Hb20hduYmQ71JMuf8LbNC9LQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YysfdVpnWitbvKVPVnAvlmPIBHvhm17PrxvlyEQpy1FbcgEantS
-	aO+LRlp47IOnUOJiSoNJTZXbjTfYqVl6XzB+a+nDTCknXs0+r6GWs4wiDwm1w2wVHHg=
-X-Gm-Gg: AfdE7cmOKWiUcsiNrg4uhF4CgIqu0Az1fNFmGGd+5v9yC5qjU992ImwsTIEEP5Md6vq
-	w0rK7RXr9AP9zdBIElmtJMJJbtEUuk6MtwpHUWqnuhnDuaaPk5z4D0swll0HZOBmVdzYSzElIb9
-	O/Q6ctWpm6hFCaiOig58un1C6Y8Te2ZiEDu7nG+4mxeX/aEz9PWMeOKGVhTuT36/d6GlN9Gk98y
-	IZsi+2Q+U9x0dXKbHomEJgsPJcv36gzal0BjKS7SLdKLAp+H+cuwSUEwwM5ls5bckd5z5K9ZqH3
-	t83j1FcSeT+CVYJtE+n0fP0AoJwAgYylPFPPUGkYLnRzgskH45t/tIyoB0zrRkZFB9C5r+pMP0T
-	neHu4kwTV3RX/6ddcFMTUncAI7EW6H45Kknv6/Jns6HvOKjEG6KV3nPj7ldskWhpej0op69TaLg
-	==
-X-Received: by 2002:a05:6300:48:b0:3c3:994f:b4f5 with SMTP id adf61e73a8af0-3c3ad67a262mr2799204637.28.1784292627902;
-        Fri, 17 Jul 2026 05:50:27 -0700 (PDT)
-Received: from localhost.localdomain ([147.136.157.3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cb517aad72csm808235a12.1.2026.07.17.05.50.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2026 05:50:27 -0700 (PDT)
-From: Tang Yizhou <yizhou.tang@shopee.com>
-X-Google-Original-From: Tang Yizhou
-To: axboe@kernel.dk,
-	guzebing1612@gmail.com
-Cc: yukuai@fygo.io,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tang Yizhou <yizhou.tang@shopee.com>
-Subject: [PATCH] blk-wbt: Always change enable_state to MANUAL when setting latency
-Date: Fri, 17 Jul 2026 20:50:21 +0800
-Message-ID: <20260717125021.88825-1-yizhou.tang@shopee.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Al5KViI+"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260717125632epoutp04555bca7693da27dce6ccabacfea21ab2~DFQXp5_1H2887728877epoutp04m
+	for <linux-block@vger.kernel.org>; Fri, 17 Jul 2026 12:56:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260717125632epoutp04555bca7693da27dce6ccabacfea21ab2~DFQXp5_1H2887728877epoutp04m
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1784292992;
+	bh=u7QmUTrANUZMp+v3inIoxHzFt55POwZ12RGxl6WmS9Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Al5KViI+kYSPj0VvFD92nnBtPCPWVTAHHpfxDg+c4X04uB/JMl/d788j4Bca4I4W9
+	 jULn0tktt2fw86nDfmFx9ps/KdmQjHvfhQC84qqwlbdNPIQSDi5Q5qB07yrp8NqGjF
+	 4EsFmsm9n2xSk6MGYPFYQCrI0n3+iw6hCQzZboFQ=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20260717125632epcas5p3023ab9ae8ddf7d44a6fe9fb956c89cca~DFQXMenhW1956419564epcas5p3E;
+	Fri, 17 Jul 2026 12:56:32 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.87]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4h1qfl0RCkz3hhT8; Fri, 17 Jul
+	2026 12:56:31 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20260717125630epcas5p362b2f527ed32de9cd4d59a89bc6d64e2~DFQVvM67M1965319653epcas5p3C;
+	Fri, 17 Jul 2026 12:56:30 +0000 (GMT)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260717125627epsmtip228b7732d86c393cfef5d36160fe693da~DFQTNq3QH1798617986epsmtip2M;
+	Fri, 17 Jul 2026 12:56:27 +0000 (GMT)
+From: Kanchan Joshi <joshi.k@samsung.com>
+To: brauner@kernel.org, hch@lst.de, djwong@kernel.org, dgc@kernel.org,
+	jack@suse.cz, cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org,
+	ritesh.list@gmail.com
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com, Kanchan Joshi
+	<joshi.k@samsung.com>
+Subject: [PATCH v4 2/6] iomap: introduce and propagate write_stream
+Date: Fri, 17 Jul 2026 18:25:34 +0530
+Message-Id: <20260717125538.508925-3-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260717125538.508925-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,76 +61,74 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260717125630epcas5p362b2f527ed32de9cd4d59a89bc6d64e2
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260717125630epcas5p362b2f527ed32de9cd4d59a89bc6d64e2
+References: <20260717125538.508925-1-joshi.k@samsung.com>
+	<CGME20260717125630epcas5p362b2f527ed32de9cd4d59a89bc6d64e2@epcas5p3.samsung.com>
 
-From: Tang Yizhou <yizhou.tang@shopee.com>
+Add a new write_stream field to struct iomap. Existing hole is used to
+place the new field.
+Propagate write_stream from iomap to bio in both direct I/O and buffered
+writeback paths.
 
-Commit 1e56f30a73f3 ("block: Make WBT latency writes honor enable
-state") compares only the boolean enabled state in the no-op check.
-Writing the current latency value while WBT is in WBT_STATE_ON_DEFAULT
-is therefore still skipped, and enable_state is not changed to
-WBT_STATE_ON_MANUAL. A subsequent elevator switch to BFQ then disables
-WBT through wbt_disable_default(), silently discarding the explicit
-sysfs setting:
-
-  # enable_state = WBT_STATE_ON_DEFAULT, min_lat_nsec = 2000000
-  echo 2000 > /sys/block/nullb0/queue/wbt_lat_usec  # skipped as a no-op
-  echo bfq > /sys/block/nullb0/queue/scheduler
-  cat /sys/block/nullb0/queue/wbt_lat_usec          # 0, WBT disabled
-
-Skip the update only if the stored latency matches and enable_state
-already equals the exact target state: WBT_STATE_ON_MANUAL for a
-non-zero value, WBT_STATE_OFF_MANUAL for zero.
-
-A write that passes the check then reaches wbt_set_min_lat(), which
-performs the actual transition to the MANUAL state.
-
-Rename the helper to wbt_lat_changed() to improve readability.
-
-Fixes: 1e56f30a73f3 ("block: Make WBT latency writes honor enable state")
-Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- block/blk-wbt.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ fs/iomap/direct-io.c  | 1 +
+ fs/iomap/ioend.c      | 3 +++
+ include/linux/iomap.h | 2 ++
+ 3 files changed, 6 insertions(+)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 953d400fd013..4f12a064286e 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -813,7 +813,14 @@ static void wbt_queue_depth_changed(struct rq_qos *rqos)
- 	wbt_update_limits(RQWB(rqos));
- }
- 
--static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
-+/*
-+ * Return true if writing @val would change the WBT state:
-+ * 1) @val differs from the stored min_lat_nsec, or
-+ * 2) @val matches, but enable_state is not the corresponding manual state
-+ *    (WBT_STATE_ON_MANUAL for non-zero @val, WBT_STATE_OFF_MANUAL for 0),
-+ *    so the write still has to update enable_state.
-+ */
-+static bool wbt_lat_changed(struct request_queue *q, u64 val)
- {
- 	struct rq_qos *rqos = wbt_rq_qos(q);
- 	struct rq_wb *rwb;
-@@ -825,7 +832,8 @@ static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
- 	if (rwb->min_lat_nsec != val)
- 		return true;
- 
--	return rwb_enabled(rwb) != !!val;
-+	return rwb->enable_state !=
-+	       (val ? WBT_STATE_ON_MANUAL : WBT_STATE_OFF_MANUAL);
- }
- 
- static void wbt_exit(struct rq_qos *rqos)
-@@ -1021,7 +1029,7 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
- 		val *= 1000ULL;
- 
- 	mutex_lock(&disk->rqos_state_mutex);
--	if (!wbt_set_lat_changed(q, val)) {
-+	if (!wbt_lat_changed(q, val)) {
- 		mutex_unlock(&disk->rqos_state_mutex);
- 		goto out;
- 	}
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index e2cd5f92babe..b7771a25c1c7 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -348,6 +348,7 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
+ 	fscrypt_set_bio_crypt_ctx(bio, iter->inode, pos, GFP_KERNEL);
+ 	bio->bi_iter.bi_sector = iomap_sector(&iter->iomap, pos);
+ 	bio->bi_write_hint = iter->inode->i_write_hint;
++	bio->bi_write_stream = iter->iomap.write_stream;
+ 	bio->bi_ioprio = dio->iocb->ki_ioprio;
+ 	bio->bi_private = dio;
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+diff --git a/fs/iomap/ioend.c b/fs/iomap/ioend.c
+index 0565328764c1..5ea2c68993cf 100644
+--- a/fs/iomap/ioend.c
++++ b/fs/iomap/ioend.c
+@@ -165,6 +165,7 @@ static struct iomap_ioend *iomap_alloc_ioend(struct iomap_writepage_ctx *wpc,
+ 			       GFP_NOFS, &iomap_ioend_bioset);
+ 	bio->bi_iter.bi_sector = iomap_sector(&wpc->iomap, pos);
+ 	bio->bi_write_hint = wpc->inode->i_write_hint;
++	bio->bi_write_stream = wpc->iomap.write_stream;
+ 	wbc_init_bio(wpc->wbc, bio);
+ 	wpc->nr_folios = 0;
+ 	return iomap_init_ioend(wpc->inode, bio, pos, ioend_flags);
+@@ -188,6 +189,8 @@ static bool iomap_can_add_to_ioend(struct iomap_writepage_ctx *wpc, loff_t pos,
+ 	if (!(wpc->iomap.flags & IOMAP_F_ANON_WRITE) &&
+ 	    iomap_sector(&wpc->iomap, pos) != bio_end_sector(&ioend->io_bio))
+ 		return false;
++	if (wpc->iomap.write_stream != ioend->io_bio.bi_write_stream)
++		return false;
+ 	/*
+ 	 * Limit ioend bio chain lengths to minimise IO completion latency. This
+ 	 * also prevents long tight loops ending page writeback on all the
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 56b43d594e6e..4dc71da598f9 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -132,6 +132,8 @@ struct iomap {
+ 	u64			length;	/* length of mapping, bytes */
+ 	u16			type;	/* type of mapping */
+ 	u16			flags;	/* flags for mapping */
++	u16			write_stream; /* write stream for I/O */
++	/* 2 bytes padding hole here */
+ 	struct block_device	*bdev;	/* block device for I/O */
+ 	struct dax_device	*dax_dev; /* dax_dev for dax operations */
+ 	void			*inline_data;
 -- 
-2.43.0
+2.25.1
 
