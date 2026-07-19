@@ -1,60 +1,62 @@
-Received: from mail-wm2-f5.google.com (mail-wm2-f5.google.com [74.125.225.133])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7248F3911AD
-	for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 10:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E63639150A
+	for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 10:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784458419; cv=none; b=LVISxSxkyd2ZYupgpxjIfR4JoMmCeQv2UL2p3uvfRfzMFQaFbU4h9T1pXv7JssNIEaxbWr0UfFp5Ib7HTIqix8XGaeCWsHFtcy6JfeBE6+Otlt4Jw7m32kHe1PF5Uizy02gtKC/q84S2qb+TbVE2g70mwQ68J+XMKUFn8k+BIQk=
+	t=1784458421; cv=none; b=t1+BF279tKaeqkm8+yGWGVMcWsyBatjor479iDz7ANUx2UVzfbBS9P5OqeERGMA03e15AW0BJCMsZiBED2sjbLMsBc8Tbzw/dKm3de2gtgFBE1etC1sjihJKWnYDFr/sRS75nO+N4o25mWaQqmENZimVIR7PpUueqpFcTtrC1G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784458419; c=relaxed/simple;
-	bh=/F44cJwGwvD3KJqM7PuByqNY4t72DFlWMyqeZdEcoV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=txs4xKNIr1FOQQ4CVoBFPBaclKBlWz3IaMKlPKc4gWSU1h6Nt7UqythhULsJ7k/g9FKfUW68M7T+xfpGHj6AgLu0tMNlwQ8lN3ugQv3GDzKmY7ULg1vb0q59+ZnHn5aa1OfDq0N4voCa60Nzj+QycDa7menjWJBo/Kj4d36Oaz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=b7KSwtPc; arc=none smtp.client-ip=74.125.225.133
+	s=arc-20240116; t=1784458421; c=relaxed/simple;
+	bh=I0++bTZ6dP7SwW+DMBEsuDxoAUGip3+1I9WU1guq83I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sEdJbMjlKMTC0Cl3pdWdfW6BAmRuCiAyJPkuaBliXRYqxXSxPvjP5ReoPIrPyKkctKxuPUhsc632Vzv6VUs+KJOXGGn9PMW//t3+wBsn2gSh1OhtSOqRSYjPSZiVdmOCt/i1HgrspAiVF1Xog5Ul2+lGHdF0ZXZ0hCmmxB38u3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=M0TUPaja; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="b7KSwtPc"
-Received: by mail-wm2-f5.google.com with SMTP id 5b1f17b1804b1-4955060c214so4719785e9.0
-        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 03:53:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="M0TUPaja"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493f75f7172so71571675e9.1
+        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 03:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=meshstor.io; s=google; t=1784458416; x=1785063216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=OtVNRyXgZ3+RL4yiGXcejIrCkaAlEMOcMS0RlQFV+sM=;
-        b=b7KSwtPc8Af+ple+ey6WpVg/wQf+7DU/GaBD464veh11jJ+ufTGNiWBVn4MxMFujYW
-         IbOq5+D3Q+kDuO0sTxRd3eerqsZ9y0sM7Ov4EuX3xfztul6HOTIZ9vTOmKrYVDZfmEHX
-         7DUOfKcLqAZuW7sWMYg7GK1058poiWSow0Xw0gB1D4wp81lyZFq6pOTz6+PHrSbknkLC
-         Ecd0R9bcJGNb6R4WsCfGPxP+ndW3P7xA2HoRyWiXGWq2s8ClcwoyucQKEN1f3RNsqqnY
-         x92qLpLLHFMBPh5Woj4t5fGnnBzZlGM9UuaOXNCV376F6WjPVoayagErKBaTqHkxMo3/
-         EgmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784458416; x=1785063216;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=meshstor.io; s=google; t=1784458417; x=1785063217; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=OtVNRyXgZ3+RL4yiGXcejIrCkaAlEMOcMS0RlQFV+sM=;
-        b=ZLfAVdIHAT2++dWJcihUX4Uo0Z0GpTor4vlcBBUsPup2nLi/Vuc8dqGxKhFW2XdVo6
-         Btbh5G9DL4WxyXJlxCv0Pby1BxRhXK8RS4FNIS8lsYsgRjVGJpX5q23m7kcuBaWkVmgx
-         M/H9VXEQHMotXUwaqnFcavvtu0sd+CeEaf2fOPsl4JULpj4bCy9ZCOB7grMSJQsxdsL5
-         /he2CP3lMsynNAZANcwAEcYUUF/+V5fFl7MagEGV9rdJ4pUbuFA1MAgZQShm0rX2Dx/t
-         hnazIJSmVrKaVwzFAb36tEEewMuk34PotVJbGB6iOHftkMHIhIpFg+Epe50zCrCjFTsz
-         mi+g==
-X-Forwarded-Encrypted: i=1; AHgh+RpA3nBHtZ90YVI3Aw/XHYInn7HwhHA6je9OZIel4vqV6X+JdlHSm3ihTfj4exbnX6magf+AlUuG8ZcCHw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy3Y1HbgiRskOVlCUM/5TReWiSNLT8rbTUS4IDuI1cH1yTFuo7
-	X/F5p3qfiui6TlGocLMYuTpF55Ol+Nfanb1V5DCesN4NRPo3LBykT6NXFpFPxsRP/g==
-X-Gm-Gg: AfdE7ckOhwrftu01LkkQ2FAEoGdpVdHVK9PUw7+5npBMQ1DICSPuj9tFaK7jS7oHKNL
-	dbqcy+tC5bDo9zFXnbnIpLkuUG2cN8nD1hzpsOHV/TeNEUClAy8FSMxtcS2v0RMF3qe/chD3/k3
-	VD+hpx+fuN5lWq29r0AEdpnxIGBEJHz+ZOMig1meGEqKEMp1caht94Yli9Kp6ia98qRvPXM2f7g
-	mxYtg7rqZ45P8BDXrSKq/dUmGzL1gYfnz7MBQhegtQG6eC6wpILv3SaNzPXml3A2mQjMyairs8W
-	UDC890cDYSeTC6h+UzzYsqGNAbEEIDhjYzE9dytHKnHUm8nm+L1/2thgBrv+qgzGGX0YaU7y2jC
-	o0mAhmqURRrTjFfrU1FfQNOO9DZwv1VUwqneD6ep8Sf+qCBx9Opc9//fUrJXRHw==
-X-Received: by 2002:a05:600c:42c6:b0:495:4182:4456 with SMTP id 5b1f17b1804b1-4954a4104e1mr65164425e9.29.1784458414698;
-        Sun, 19 Jul 2026 03:53:34 -0700 (PDT)
+        bh=hybfSCWaTjres2ZZlI9Lu6CV5Kqe33y6xILjvKI8G00=;
+        b=M0TUPajadEG7LHHvuhNik2cKvB9QyqXj/5nvWQcAIOmHx8E0g1cZAfgZreCmzneDyg
+         9G0AwF7BSiHMJ0P1gY+yGp+2omGaaVJmBDb7alJtSiX01mqMtsfHKohUBxRzuE9bqjSb
+         eAgdCAZeHcTlIXJC40LXL5ewCCPIUePXGTVfjPh7Je+v2K1NrhQnC6Z8NVcAGLKcc0kK
+         clSeAw1o6Vfo+lqbE5YRphPOpubboNdK0PhtyqGKJbL4dtXd2IQaVCrZRyt0gqB3CVEl
+         p4ouF6AFBdyf05SEZNQT4H0s2Y2BwsfN0yIbIdZgX3AkuBE9jOCeHcqyZb1BZ9DDtqOT
+         x/7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784458417; x=1785063217;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=hybfSCWaTjres2ZZlI9Lu6CV5Kqe33y6xILjvKI8G00=;
+        b=EFaKoLLzksDevsCa4J+fs4Znb/NwDNoh41MVlkoQzpcbQbZNpdKGC5CrJKgnwA68c6
+         PNsKPreGGduAP4haPkN/D8cf4yyXsF3+vVjHDpMOEY3rxZJj/FCo8TpWF1TW/zZqNQXa
+         hfrSPc4p1z1Ow/WzqXerzMfqswIaY/cJnoMcrXgu3mXaZJ2J5Jx58nfBmVhM1nU4aJ2q
+         fOcwTOGXKt1kZ8U8FoRfLpNqhS+01UzNcLaCKC/ppLgV6UVjeq0cgl9+j3MlKEIVdSe9
+         xcW5S5MvwMlcdyj0vzMidg9HZq/KnyqZxhz39iKoEMtBaF0dUUwsgWHN3W4CbjujYDI3
+         Rfew==
+X-Forwarded-Encrypted: i=1; AHgh+Rp+iJFTeEocqKyZJW4S/dP7XIepiXhx3gZvouNs9z4p7zUEyku9RCV2vQLuE06M2uS2Te68fou6Ia+Zeg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbFKiLmt8OIa9u8Rdin3NMCUrsiHx8JfbElhJxLxBpBnLUClT8
+	dMeXQxzayHVpyFOS6IYLjaOo4wyrPNOgIoK9447/TyBGsHS+UOtAaBhRRfHlq4grsw==
+X-Gm-Gg: AfdE7cke5D4g9qFOnyqtP2YW16K0UZEauea13l7xR6ROv0vgJLOJma0YxVN1OkuIRng
+	rXdOlSZ7sWZg6mia1ix0c2t2Di02e4/M2F8ZE2439YPw5fONJL3Co5pKuYmfe0wC7aey49W0n9Z
+	sR1FEoLKUtI1H7YCaTxSjuQxGmrZqc0yNuKaXoEGB6WTorgKnqIaRwMovYmeli1mVQH1f+DkjB1
+	LHa0ELwpH2WTGkfq3RQqZadTwwngBdn1yduTk1cAs5OxKHOlQkhI982P4X93uNkUVGJJr/7nxXI
+	uWAW1Nii53qWiqj3k03XJo2p7Kw5Zth78dD4jWDT6UOelwslugu7yPwgxkH4b3Af7M5SlX5zQh5
+	aeSrC5dBMFG1DWpf6Z+0LC2iLjJErHNXZPTnGEjkdw0g9ysMIJN1NZzWB3ZtR2Q==
+X-Received: by 2002:a05:600c:e54a:10b0:490:5057:f5f7 with SMTP id 5b1f17b1804b1-4954a3ed516mr73355155e9.11.1784458416521;
+        Sun, 19 Jul 2026 03:53:36 -0700 (PDT)
 Received: from mf-00-01.. ([194.220.239.180])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4954a2a24b6sm197679575e9.3.2026.07.19.03.53.32
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4954a2a24b6sm197679575e9.3.2026.07.19.03.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jul 2026 03:53:34 -0700 (PDT)
+        Sun, 19 Jul 2026 03:53:35 -0700 (PDT)
 From: Mykola Marzhan <mykola@meshstor.io>
 To: Jens Axboe <axboe@kernel.dk>,
 	Song Liu <song@kernel.org>,
@@ -80,10 +82,12 @@ Cc: Li Nan <magiclinan@didiglobal.com>,
 	linux-kernel@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	linux-pci@vger.kernel.org
-Subject: [PATCH v2 0/7] block,md,nvme: correct handling of unsupported P2PDMA transfers
-Date: Sun, 19 Jul 2026 10:53:20 +0000
-Message-ID: <20260719105327.864949-1-mykola@meshstor.io>
+Subject: [PATCH v2 1/7] blk-mq-dma: restore BLK_STS_TARGET for unsupported P2P transfers
+Date: Sun, 19 Jul 2026 10:53:21 +0000
+Message-ID: <20260719105327.864949-2-mykola@meshstor.io>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260719105327.864949-1-mykola@meshstor.io>
+References: <20260719105327.864949-1-mykola@meshstor.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -92,222 +96,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Driving peer-to-peer I/O (NVMe CMB source) through md arrays and
-nvme-rdma legs on asymmetric PCIe topologies -- where the peer device
-reaches some members/paths but not others -- turns up two failures on
-v7.2-rc, both rooted in how an unsupported-P2PDMA mapping failure is
-reported. On md: silent data loss -- an unreachable-leg P2PDMA write
-counts as written, mirrors silently diverge, and where no member is
-reachable the write reports success with zero copies on stable
-storage; reads picked to an unreachable leg fail with EIO and are
-never retried on the mirror that holds the data. On nvme-rdma: the
-transport swallows the DMA layer's mapping errno into a path error,
-which under the default multipath configuration livelocks the I/O (a
-stacked md mirror hangs) and with nvme_core.multipath=N surfaces as
-retryable BLK_STS_TRANSPORT.
+Commit 91fb2b6052f7 ("nvme-pci: convert to using dma_map_sgtable()")
+deliberately mapped unsupported P2PDMA transfers to BLK_STS_TARGET,
+matching dma_map_sgtable()'s -EREMOTEIO: "When this happens, return
+BLK_STS_TARGET so the request isn't retried." The conversion to
+blk_rq_dma_map silently changed the status to BLK_STS_INVAL, which
+regresses two consumers:
 
-The root cause is a block-layer status-code regression, not an md or
-nvme bug. Commit 91fb2b6052f7 ("nvme-pci: convert to using
-dma_map_sgtable()") deliberately mapped unsupported P2PDMA transfers
-to BLK_STS_TARGET ("... return BLK_STS_TARGET so the request isn't
-retried"). Commit 858299dc6160 ("block: add scatterlist-less DMA
-mapping helpers") silently changed that to BLK_STS_INVAL, and since
-commit 7ce3c1dd78fc ("nvme-pci: convert the data mapping to
-blk_rq_dma_map") in v6.17 the failure surfaces to direct NVMe
-consumers as EINVAL instead of the documented -EREMOTEIO, with
-blk_path_error() now classifying it as retryable. md/raid1,raid10
-ignore BLK_STS_INVAL leg failures per commit f7b24c7b41f2
-("md/raid1,raid10: don't fail devices for invalid IO errors"), where
-it means a request-shaped error that fails identically on every
-member -- hence the silent divergence. The md leg of the regression
-became reachable when md started advertising BLK_FEAT_PCI_P2PDMA in
-v7.2-rc1 (commit 02666132403a ("md: propagate BLK_FEAT_PCI_P2PDMA
-from member devices to RAID device")).
+ - md/raid1 and raid10 ignore BLK_STS_INVAL leg failures
+   (commit f7b24c7b41f2 ("md/raid1,raid10: don't fail devices for
+   invalid IO errors"), where it means a request-shaped error that
+   fails identically on every member).  Since commit 02666132403a
+   ("md: propagate BLK_FEAT_PCI_P2PDMA from member devices to RAID device")
+   P2PDMA bios reach md arrays: a peer-memory write to a member the
+   peer cannot reach is counted as written, the master bio reports
+   success, mirrors silently diverge, and on a topology where no
+   member is reachable the write reports success with zero copies on
+   stable storage.
 
-Patch 1 restores BLK_STS_TARGET at the source. md then handles an
-unreachable leg like any other per-device error: badblocks on the
-affected member, the master bio succeeds while an In_sync leg holds
-the data, and reads are redirected to the other mirror.
+ - the failure's classification flips: for direct NVMe consumers
+   (nvme advertises BLK_FEAT_PCI_P2PDMA) the mapping failure has
+   surfaced as EINVAL instead of the documented -EREMOTEIO since
+   v6.17, and blk_path_error(BLK_STS_INVAL) is true, so a stacking
+   consumer would treat it as a retryable path error (dm-mpath is
+   the only in-tree blk_path_error() caller; P2P bios cannot
+   currently reach it, but the classification is wrong on its face).
 
-Patches 2, 4 and 5 fix independent md-side P2PDMA bugs of the same
-vintage: md_submit_bio() strips REQ_NOMERGE (the only request-level
-protection against merging P2PDMA segments across pgmaps); raid1
-write-behind CPU-copies device BAR memory via bio_copy_data(); and
-narrow_write_error()'s retry clones reset bi_opf, dropping the
-REQ_NOMERGE protection exactly on the error-retry path.  Patch 3 is
-a standalone raid1 fix for a pre-existing ordering hole the
-write-behind bypass in patch 4 would otherwise widen: writes that
-skip write-behind (queue saturation, a waiting reader, allocation
-failure, discards -- and now P2PDMA bios) never serialized against
-in-flight write-behind I/O to overlapping sectors.
+Restore BLK_STS_TARGET.  md then routes an unreachable leg through
+its per-device error handling (badblocks, mirror
+retry for reads); a later patch in this series teaches raid1/raid10
+to handle mapping failures without the retry storms that machinery
+was built around.
 
-Patch 6 stops the restored device-error machinery from misfiring
-where its medium-error assumptions don't hold. A mapping failure is a
-property of the peer/member pairing: retrying the same peer pages
-against the same member cannot succeed, and there is nothing on the
-medium to repair. Without it, narrow_write_error() serializes hundreds
-of guaranteed-to-fail chunk retries per failed write; on reads each
-unreachable-leg pick costs a full freeze_array() quiesce plus a tick
-of the read-error budget -- measured below, a mixed host/P2P read
-workload on an asymmetric topology kicks the perfectly healthy far
-leg after ~20 failed picks, in under a second; and on FailFast
-members a single unroutable I/O evicts a healthy mirror outright.
-Because BLK_STS_TARGET is also produced for transient device
-conditions md cannot distinguish from bi_status alone, writes probe
-the whole range once instead of predicting futility: a real mapping
-failure is recorded in one call, a cleared transient recovers with
-nothing recorded. Patches 1 and 6 belong in the same release: with
-patch 1 alone, restoring the error surfaces the retry storms and
-read-path evictions above on 7.2's newly reachable md path.
+Fixes: 858299dc6160 ("block: add scatterlist-less DMA mapping helpers")
+Fixes: 7ce3c1dd78fc ("nvme-pci: convert the data mapping to blk_rq_dma_map")
+Cc: stable@vger.kernel.org # v6.17
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
+---
+ block/blk-mq-dma.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Patch 7 closes the same hole in the rdma transport. nvme-rdma maps
-the data scatterlist with ib_dma_map_sg(), which returns 0 on a
-peer-unreachable failure, discarding the -EREMOTEIO that
-dma_map_sgtable() documents for exactly this case; the driver reports
-it as a path error. Because the multipath head node advertises
-BLK_FEAT_PCI_P2PDMA (commit fb0eeeed91f3 ("nvme-multipath: enable PCI
-P2PDMA for multipath devices"), v7.2-rc1) and the mapping failure is
-deterministic, nvme_failover_req() requeues the bios with a fresh
-retry budget every cycle and the I/O never completes -- a hot requeue
-livelock that hangs a stacked md mirror instead of failing over; with
-nvme_core.multipath=N it burns nvme_max_retries requeues and
-completes as retryable BLK_STS_TRANSPORT. Patch 7 maps with
-ib_dma_map_sgtable_attrs() to preserve the errno and returns
-BLK_STS_TARGET, matching nvme-pci so patch 6's handling covers rdma
-legs too, and starts the request only after the map succeeds so
-nvme_mpath_start_request() accounting cannot leak on the direct
-blk-mq completion. nvme-rdma stays on the scatterlist DMA API: its
-fast-reg MR path (ib_map_mr_sg()) consumes scatterlists, so a
-blk_rq_dma_map conversion is separate modernization, out of scope for
-a fix.
-
-Behavior on v7.2-rc2, QEMU rig (one CMB provider, two NVMe members,
-q35 PCIe topologies), 90 8KiB peer-memory reads under concurrent
-host reads for the read rows:
-
-  topology     op          v7.2-rc2                patched (md set)
-  symmetric    write+read  ok                      ok
-  asymmetric   write       "ok", silent diverge    ok + badblocks on
-                                                   far leg (1 probe)
-  asymmetric   read        41/90 EIO, no mirror    90/90 ok, no
-               under load  retry, no eviction      eviction
-  unreachable  write       "ok", NO data copied    EIO + badblocks
-  unreachable  read        EIO                     EIO, no members
-                                                   kicked
-
-Also verified on the same rig: a transient injected TARGET recovers
-through the single probe with nothing recorded; P2P MEDIUM keeps the
-chunked path; host-page TARGET/INVAL handling is unchanged; FailFast
-survives mapping failures but still evicts on genuine errors;
-write-mostly legs are written directly (no write-behind CPU copy); a
-degraded array whose only leg is unreachable gets plain EIO -- no
-budget charge, no eviction; an exhausted badblocks table fails the
-member as described below. The write/read/injection rows repeat
-identically on raid10.
-
-Validation of patch 7: the mechanism -- ib_dma_map_sg() returning 0
-where ib_dma_map_sgtable_attrs() preserves -EREMOTEIO -- was
-confirmed on a real mlx5 HCA with a map-only probe. The
-start-after-map reorder ran over an rxe nvmet-rdma loopback under fio
-with crc32c verification; multipath inflight and nr_active accounting
-drain to zero, matching the pre-reorder kernel. rxe cannot produce
--EREMOTEIO, so the failure paths were driven by injecting that exact
-mechanism at the map call site: unpatched, one 4KiB write livelocked
-(132 failover requeues in 8s, a stacked raid1 hung; multipath=N:
-retryable BLK_STS_TRANSPORT); patched, it failed immediately as
-BLK_STS_TARGET with zero requeues, and the stacked raid1 badblocked
-the leg without evicting it.
-
-Known trade-offs of routing through the stock md write machinery:
-an unroutable P2P write records badblocks and sets WriteErrorSeen
-(which gates the write-path badblocks consult), so later writes
-overlapping those ranges skip the member -- host writes do not clear
-the entries and repair skips known-bad ranges -- leaving them
-single-copy until a re-add rebuild (host memory, so it succeeds)
-rewrites and clears them.  WantReplacement is deliberately not set
-for mapping failures: replacing a member cannot fix a topology
-property, and would burn a spare per unreachable member.  A member
-whose badblocks table is exhausted or disabled is failed on the
-first unroutable P2P write, as with any write error md cannot
-record. FailFast members are exempted from md_error() for
-mapping failures only (nothing reached the wire, so the error says
-nothing about device health); genuine I/O errors keep their
-immediate-eviction semantics. raid10 additionally fails a
-replacement device outright on a P2P write mapping failure (its
-stock replacement-write policy), and an IO_BLOCKED slot excludes
-that slot's replacement from the read retry -- both pre-existing
-raid10 behaviors with a new trigger. On reads, read_balance() keeps
-no memory of unreachability, so each far-leg pick still costs one
-failed submission before the redirect.
-
-Routing: patch 1 is block-tree material and fixes a v6.17-rc1 status
-regression (hence its Cc: stable); patches 2-6 are md (patch 3 fixes
-a pre-existing raid1 ordering bug and carries its own Cc: stable;
-the rest address exposure that only became reachable with v7.2-rc1);
-patch 7 is nvme-rdma and also carries Cc: stable -- the transport
-misreport predates the head-node change (Fixes: 23528aa3320a, v7.1)
-and is reachable on v7.1 with multipath=N. Patch 7 sources the errno
-from dma_map_sgtable() in rdma.c and does not depend on patch 1,
-which fixes the separate blk_rq_dma_map path. Patches 1 (block) and
-7 (nvme) are independently applicable bug fixes; a maintainer can
-take them even if the md discussion runs longer -- if the md side
-slips a release, patch 1 turns the silent divergence into loud
-per-leg errors, which we consider the right interim behavior.
-Single-cycle routing through the relevant trees with acks works for
-us: patch 1 block, 2-6 md, 7 nvme.
-
-Per Documentation/process/coding-assistants.rst: the patches were
-developed with AI assistance (see the Assisted-by trailers); all code
-was human-reviewed and tested as described above.
-
-Series is against v7.2-rc2.
-
-Changes in v2 (after Sashiko AI review of v1 and further internal
-review):
- - new patch 3: writes that bypass write-behind (including discards)
-   never serialized against in-flight write-behind I/O to overlapping
-   sectors; gate the non-behind path on CollisionCheck so host
-   fallback writes, discards and P2PDMA bios (patch 4) all order
-   correctly.  Verified with an overlap scenario that hangs if the
-   completion-side removal is missing.
- - patch 6: track P2PDMA masters with an r1bio/r10bio state bit set
-   at submission instead of sniffing bvec pages at completion time;
-   stop setting WantReplacement for mapping failures (a spare cannot
-   fix a topology property; verified that a genuine write error
-   still sets it); document why raid10 replacement legs keep their
-   stock fail-on-error policy and why the read path charges no
-   read-error budget.
- - patch 7: also convert the metadata scatterlist to
-   ib_dma_map_sgtable_attrs() -- bio_integrity_map_user() accepts
-   P2P pages when the queue advertises P2PDMA, so integrity buffers
-   are not always host memory; state the asymmetric-multipath
-   failover trade-off explicitly.
- - patch 1: version-annotate the stable Cc.
- - patches 2, 5: unchanged.
-
-Link: https://lore.kernel.org/linux-raid/20260718162547.448892-1-mykola@meshstor.io/
-
-Mykola Marzhan (7):
-  blk-mq-dma: restore BLK_STS_TARGET for unsupported P2P transfers
-  md: ensure REQ_NOMERGE is set on P2PDMA bios
-  md/raid1: serialize non-write-behind writes on CollisionCheck rdevs
-  md/raid1: don't use write-behind for P2PDMA bios
-  md/raid1,raid10: keep REQ_NOMERGE on narrow_write_error() retry clones
-  md/raid1,raid10: skip futile retries on P2PDMA mapping failures
-  nvme-rdma: return BLK_STS_TARGET for unsupported P2P transfers
-
- block/blk-mq-dma.c       | 10 +++++-
- drivers/md/md.c          | 14 ++++++--
- drivers/md/md.h          | 18 ++++++++++
- drivers/md/raid1.c       | 78 ++++++++++++++++++++++++++++++++++------
- drivers/md/raid1.h       |  2 ++
- drivers/md/raid10.c      | 72 +++++++++++++++++++++++++++++++------
- drivers/md/raid10.h      |  2 ++
- drivers/nvme/host/rdma.c | 42 +++++++++++++---------
- 8 files changed, 198 insertions(+), 40 deletions(-)
-
-
-base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index bfdb9ed70741..2eed06bfe791 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -190,7 +190,15 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
+ 	case PCI_P2PDMA_MAP_NONE:
+ 		break;
+ 	default:
+-		iter->status = BLK_STS_INVAL;
++		/*
++		 * P2P transfers that the mapping layer cannot support
++		 * report BLK_STS_TARGET, matching dma_map_sgtable()'s
++		 * -EREMOTEIO and the pre-blk_rq_dma_map nvme behavior:
++		 * the failure is a property of this device pairing, so
++		 * it must not be retried on another path (blk_path_error)
++		 * nor be mistaken for an invalid request.
++		 */
++		iter->status = BLK_STS_TARGET;
+ 		return false;
+ 	}
+ 
 -- 
 2.43.0
 
