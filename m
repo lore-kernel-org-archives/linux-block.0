@@ -1,168 +1,110 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A6425B09D
-	for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 14:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A762D9EE7
+	for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 16:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784472088; cv=none; b=ZWdvWC+peFr+mO9BIu6puR45sSgGqI1jsiaaAT3C0lAxXEzovQcDBm23jsDuUbyF3st9BGJeptJtQwr5xOm9o2+eZ8M11pwRzfstDnR2zx9WWMO++CcRDKa/wm0tbJyNBTyoKklJ+DaSQ9AXqpANu/YqEaBJz7hDF+Unrlrvt5w=
+	t=1784477162; cv=none; b=TU8SLBeiCNcXusdq5G4GpsIc4oa2jY+jDxi91k13UUZ+zkppslWdLI/tC/RWrSJOJonTxM1/wm+2CvAJJZL/40gf9EJdmMExkOJ3lf3Q+IS9x/DaGZxN5vJi+7Jg/wTlWnvl9wk3T6TZrOx9kUXaAyq6ohb7QjgKrJ2qaQhRvK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784472088; c=relaxed/simple;
-	bh=aLH1SZ1c8ztdgdpHR3mIRxeUrFQZOR/9bN8xp1rWKu0=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=TME4KjMJqbTjX4/QIu/ZQY4CtAvTB5FDbTaPO2Mtqx0YbFwSvcO3LgMfDDLG4HCfNgfAFjhZmzQSKHYDtMSPWA87L8L7xbG1H1ZNas39MsC2L0jOoj4eChUwrFAYxrTPzx7vRwrQ7CPpcDczUT4owcgaOTs14dYhCSHIedUYsOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=HmHmjVhP; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1784477162; c=relaxed/simple;
+	bh=IPntKLkEOzLvzwxcSGiD302RIanbdRbGDxuKARn4u7Q=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=efYzA1b/DdhqTf868OVH8D7viUZh3jgh57svcoRl8Soe/QCN379RTlsnFYDWQSiFeWpeOmjGiCS8SZcJUBnJ17QpAUdB7SfM4a/VDrsHNCDv+jSwjTuh+EqFB/lxefkVmUPBebPi5hy1elRyewg/u5CCQWKbqecBGl0cW5ndJh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=uWOYQ8bG; arc=none smtp.client-ip=209.85.161.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="HmHmjVhP"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7e9ecb1e13bso3438173a34.2
-        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 07:41:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="uWOYQ8bG"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-6a3d9aded38so2549499eaf.1
+        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2026 09:05:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784472085; x=1785076885; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=/6Ajzvl8oy3aeU3dbW5OCm8OuQi0CC2qF81AmIAyuyM=;
-        b=HmHmjVhPH6AsfMBX8MoFFDdA142MomgZI91x0qOV8xAH8FM/ARESQ1e9WzMw7wtfpt
-         yJSML3RUbwOYeG7q3BUDmUMt68HR7hXqdLg3RDGdoischn9/OanJc76AfYvBnpcNCXVa
-         ZNeU6RrLu+wlKr+VAfLk6hczx8EkynxjFFiRU4WfR3t370B4BD/9UUCstjbXiN55U7Wj
-         akfDKPSYxXkOnvQvuIOHAFbL+bSHzuMjVVFbc5AsWFJ14ckxCqVtfWSoqzpNVW2Puib5
-         gRK4ysp3Io/yt3tKWEUGmXlWK7oAkocl0hehlmovNEgxIUi+Qn2HeBki3DiP8zN/0QnX
-         IzUg==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784477159; x=1785081959; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/MvDZW/POLDcRoqoRMZWeqN9TSs71ndbA2gC5lGcHbc=;
+        b=uWOYQ8bG82QAZGo3rGsmqYID2AA82Cc79StI+zvWaD/UEgIga9h8++LnKbdb5O9Qkj
+         KlZP+5gb+zF5a9gq21mp8825DIJkl7O1xgVZVbrYNWVGNjDpqBcYu01ee6C3i009EvmY
+         LrXHoWCC9sVU3Kw/9C9A4b/1FmjfDU7YM4MWod0V0pc+LprdNyhuxZL6tfsW4enqLoqb
+         daVpuWFrZc/2ffNAPaSvszLKGJqk7ukkn39r8bz/Dh9OHs4oEPQqEQ5Lgxl0Mh2XdP4i
+         gd7IQCWToQyp3WTtC4GaVWluWabJwq1I/2u6dGsvMzTCOUz65H+MQpGv2VZC89xwZG9g
+         yEmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784472085; x=1785076885;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+        d=1e100.net; s=20251104; t=1784477159; x=1785081959;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=/6Ajzvl8oy3aeU3dbW5OCm8OuQi0CC2qF81AmIAyuyM=;
-        b=o3Gd4gI+7pncWUx4xnYkx5mJigFdvMv6eaaCZ4di50etSlaVI5UOFsJHla07L4kW0f
-         WUwsPmkCb/W1GQhOp8/QtHOic0DsFdr/qbPrCyuoM2dUJWZmeq06tFhW58lsfWWCUtoJ
-         vVpZBuI6ek6YT4IPUC1kenVnLXB9Tcnix7EGVgVNGhv9tbB8opAs9p8jpqD8KBgXxM2X
-         vnGCi6kNs17VCyl25eV5p+1rC64ReXB3q2kjt0miLzY7wutIR9XB46eh0uAbOqOzDr8F
-         2Xd4E+h+noxourTJstucqhurAzjP/zVX1he+zoY98aERlrSnIpaNcJVdmTUi+iX3b1O3
-         WPag==
-X-Gm-Message-State: AOJu0YyGYWPrWY2p93nLERhZDev6oHQCMbWNcNqFKh+qHGx+hDIuoQto
-	NUl5SBZ9bcoMj1l5JTg+q1Mm83gwiEIdZgf+OIf4+bzTLHjzBc/f9WAjspAOBcrQB803iCN3rY+
-	GFvQQLE4=
-X-Gm-Gg: AfdE7cmNSJxv/vIYlmVKhmqbDSmn9rP5Z7Pte5AiTROKXM5RmPcPMWG4zzal5n/yjeL
-	E+yp5wiPI90H6jtLJK7Z0qEb01MpXdpxENPDckbRLWv8IoyEUsLD2DrNup0S1zoufYPzHD+yvZ5
-	Lh9umo5SXbD6TpTrY5S8YPAw1Szi+M8ZBgHfP1Rcdec0ZyvL7S2yZkrxOUsMdPAfQghp9X1nt7M
-	l0ZjDYbHl+9JxfqnjCR7705+9Eu24qwqsyA2TYLaQq8udiYjn8J/AUpH2VbJb+IwBdzvKDbUCuZ
-	yRS97SFvyd5LfTFfYwFUK3olIR/xJEcrmHojnuQCijeTRqgufP3C3O0W7ar/2OvD6VzJYP3imJl
-	6pUAFcV/FFXSFAboo0o5d2V65WStuSIOrmFQE5AkM3AstHBks9PBLm6MOoW4Im9aSpLGcfdeObp
-	RvfzrOEM6oh+mxGY0pl0wYPQPaheOpTTnkcqda0/H86lyUYDdr9mB3BUyJnizbY04G+o0hOg==
-X-Received: by 2002:a05:6830:3499:b0:7e9:e0be:583b with SMTP id 46e09a7af769-7eda073ca12mr5430061a34.9.1784472084797;
-        Sun, 19 Jul 2026 07:41:24 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7edaac40bc1sm5957799a34.0.2026.07.19.07.41.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jul 2026 07:41:23 -0700 (PDT)
-Message-ID: <5edc8456-eac9-4c74-bf29-48a9ee333bad@kernel.dk>
-Date: Sun, 19 Jul 2026 08:41:23 -0600
+        bh=/MvDZW/POLDcRoqoRMZWeqN9TSs71ndbA2gC5lGcHbc=;
+        b=JhupIEpuwjQAyrTmFNvt4hh0rmAV+lhHTfgYMbL4cOfRw8B7wgKwVUEZwHPcvXvMRo
+         9qY7+Omff2jWPvlcalVbx1CeKUmPLKyJgxCKDm7IzelzTnPdjOLV7xADMYtJkWLwQegR
+         NerhAQSvE9pNcZ2v5XIYpnnLochEVAt9IwnjVm8+put/ozdb3CfIoZ8gmwkeyBkr/7w3
+         WXx+UFVvGatDw3ddsYwgUxZv6ZkY3l9io2klldj0MdqViA4FKkgDLd86a3cv5ZIjYUvf
+         yYNHpxzblTH289DQKh1Rl7tjMN9hb04/8xa7bQgzfc+h91ZAVdcqQr8hWjs+aCiLzzmw
+         L9aw==
+X-Gm-Message-State: AOJu0Yzl2KlJ1GMyIaqjcO8Z4IDAGASDAI4SVY13erX10AqL3e2iE3se
+	2apJbJ2EDjjcDE8uCEYapLZUDIUtPgTBrSderGKLiwowSDIGXpqxQsu3ir0kPxbFbhg=
+X-Gm-Gg: AfdE7cmJTOfHuaqqp979NhRF0pIij3iPhrOU60lIDrorzuFqtAeuw9Pi1ic3JUkV1xt
+	ZR3VsZUb25hgYngFb3QWaWUqwd5aRalJtYzM80VxplbjV1lM6BNNvBVMgCzN0E88Jf+46CR6cq3
+	4G2mO9o0EvMQPaExbcvqQ59jr0c0ZbdhEn1ClfaJPLD0isGq2TfPCDYU/Y+IXGAzmhXIxzxpANK
+	tLuL86nnwLPRGKbGUJ9bBXWhprPmDcydFp/AbdyNqPDlLFXpF628LhCLmXwP2Al4OBCpK5W+UBz
+	bIGOQQ8wQ061aDtDxaY3kFHM4fBBVVm2263RuvTyMANhLt1Eeef2NAhpyDxqoHxuiitiE9/JIzL
+	m2Y/clAfzidalEA3jCHrbxsbDH1QbTNRmx5xk62BAYfupxoZ3sFeIPQdRTrXcgB51oODERC+8uY
+	En1sNeb1d0381o0zkLKSMjIli5RYKsZ+CegrNt0jOtmvhisn7nSgW1bUGKSerUxxl/
+X-Received: by 2002:a05:6820:4df9:b0:6a1:818d:97da with SMTP id 006d021491bc7-6a521583b58mr5007205eaf.24.1784477158915;
+        Sun, 19 Jul 2026 09:05:58 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7edaf983632sm5994012a34.19.2026.07.19.09.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Jul 2026 09:05:57 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>, 
+ George Salisbury <gsalisbury@apnic.net>, stable@vger.kernel.org
+In-Reply-To: <20260719134540.120269-1-tom.leiming@gmail.com>
+References: <20260719134540.120269-1-tom.leiming@gmail.com>
+Subject: Re: [PATCH] ublk: wait on ublk_dev_ready() instead of
+ ub->completion
+Message-Id: <178447715664.1223836.10975749805730287423.b4-ty@b4>
+Date: Sun, 19 Jul 2026 10:05:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] block fixes for 7.2-rc4
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-
-Hi Linus,
-
-Fixes for block that should go into this release. This pull request
-contains:
-
-- Fixes for the dio bounce buffer helpers: correct the alignment of
-  bounced dio read bios to avoid a double unpin, handle huge zero
-  folios in bio_free_folios(), and don't warn on the larger-order
-  folio attempts in the greedy allocation path.
-
-- Try a slab allocation in bio_alloc_bioset() before falling back to
-  the mempool, restoring the previous behavior for non-sleeping
-  allocations from a cache-enabled bioset.
-
-- Serialize elevator changes for the same queue using the writer lock.
-
-- Fix a race in blk_time_get_ns() where a task preempted between
-  setting PF_BLOCK_TS and the cached-timestamp reload could return 0.
-
-- blk-cgroup fix for leaks and the online flag on a radix_tree_insert()
-  failure in blkg_create().
-
-- Free the copied pages when blk_rq_map_kern() fails after
-  blk_rq_append_bio() rejects the bio.
-
-- Remove manually added partitions on loop device detach, fixing dead
-  partition devices left behind and a subsequent LOOP_CONFIGURE -EBUSY
-
-- Bound the AIX partition lvd scan to the sector that was actually
-  read.
-
-- Show the block operation in error injection rules (Jackie)
-
-Please pull!
+X-Mailer: b4 0.15.2
 
 
-The following changes since commit 181bb9c9eae4f69fe510a62a42c2932d0314a800:
+On Sun, 19 Jul 2026 08:45:40 -0500, Ming Lei wrote:
+> ub->completion is only re-armed by a successful START_USER_RECOVERY. If
+> the ublk server sends END_USER_RECOVERY without one - e.g. its START
+> failed with -EBUSY and the error was ignored - the wait is satisfied by
+> the stale completion of the previous recovery cycle, and the device is
+> marked LIVE and the requeue list kicked while the FETCH stream is still
+> running and ubq->canceling is still set. The kick redispatches a
+> previously requeued request, __ublk_queue_rq_common() sees ->canceling
+> and parks it again via __ublk_abort_rq(), and after the last FETCH
+> clears ->canceling nothing ever kicks the requeue list again: the
+> request is stranded there while holding its tag. If it is the flush
+> machinery's flush_rq, every subsequent fsync piles up in uninterruptible
+> sleep and teardown hangs on tag draining. This matches a report of a
+> lost PREFLUSH with ext4 on top of ublk after daemon crash recovery.
+> 
+> [...]
 
-  block: remove redundant GD_NEED_PART_SCAN in add_disk_final() (2026-07-10 09:08:50 -0600)
+Applied, thanks!
 
-are available in the Git repository at:
+[1/1] ublk: wait on ublk_dev_ready() instead of ub->completion
+      commit: 432a9b2780c0a01caf547bd1fc2fcf28aeb8d173
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260717
-
-for you to fetch changes up to df308a14585649f7683a560f5c94978ab4f8224d:
-
-  block: fix aligning of bounced dio read bios (2026-07-16 06:11:37 -0600)
-
-----------------------------------------------------------------
-Christoph Hellwig (2):
-      block: handle huge zero folios in bio_free_folios
-      block: fix aligning of bounced dio read bios
-
-Daan De Meyer (1):
-      loop: remove manually added partitions on detach
-
-Jackie Liu (2):
-      block: free copied pages when blk_rq_map_kern() fails
-      block: show operation in error injection rules
-
-Joseph Qi (1):
-      block: try slab allocation in bio_alloc_bioset() before mempool
-
-Michael Bommarito (1):
-      partitions: aix: bound the lvd scan to one sector
-
-Mike Waychison (1):
-      block: fix race in blk_time_get_ns() returning 0
-
-Qu Wenruo (1):
-      block: do not warn when doing greedy allocation in folio_alloc_greedy()
-
-Shin'ichiro Kawasaki (1):
-      block: serialize elevator changes for the same queue using a writer lock
-
-Tao Cui (1):
-      blk-cgroup: fix leaks and online flag on radix_tree_insert failure
-
- block/bio.c             | 64 ++++++++++++++++++++++++++++++-------------------
- block/blk-cgroup.c      |  4 ++--
- block/blk-map.c         |  9 +++++--
- block/blk.h             | 13 +++++++---
- block/elevator.c        |  9 +++++--
- block/error-injection.c |  7 +++---
- block/partitions/aix.c  |  9 ++++++-
- drivers/block/loop.c    | 32 +++++++++++--------------
- 8 files changed, 91 insertions(+), 56 deletions(-)
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
