@@ -1,29 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E577B3F4DF2;
-	Mon, 20 Jul 2026 11:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EE83F8715;
+	Mon, 20 Jul 2026 11:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784546049; cv=none; b=cjF0eLqYUfbTqC7rpTNxoU5KcwbK701lUi4A1rM4YJ9nJzcyfoN3KAipdHqRVDmyr2IDR2yDyhszQwwniXJjcCviYHFR5LEA3tt5sCa2AQ2bPzRbP53COiwSwvjCNeWBrlZIz9GqgC0Z7fY5Y6ri+yGZNqm4736eyPNT3ebXMIU=
+	t=1784546099; cv=none; b=DOS2yawIk+ZQf0eDgjF7CxWoPd5w1sXBh4OwS1kRZ56GX4NHNKWdHMrRQnepmyBkxUfknPXSyU8B0qY5B5EKCI/Wg3bN9FUstVCi8O4Wm2dYmb5NnhMxADMg/K3Jwy0BhVUOrv3GVAwfBdSa+4K+gavpw3QsYi2Md02+2jkft6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784546049; c=relaxed/simple;
-	bh=YI82VNNEo/LwgUIDuwttqbRtglLcASOGSIS8oEAYia4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S6t1bO1bhl9PHDCyHL8k3TQcgl/cOTGc3+Z7yqUY/WbyFFnk1cVnpqYY4pZ7tnqQRp/n7mYg8cinyqAodcaB2lYAqEtqTXCiAa2u9AVkDtjHaJYNWs26dJBMpia7w8khA2PLVLi06vwyv7rIiRbT3X6n2/gf4nHcy2OkiH2vjfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E10F71F00A3A;
-	Mon, 20 Jul 2026 11:14:05 +0000 (UTC)
-From: colyli@fygo.io
-To: yukuai@fygo.io
-Cc: linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Coly Li <colyli@fygo.io>,
-	stable@vger.kernel.org,
-	Ramesh Adhikari <adhikari.resume@gmail.com>
-Subject: [PATCH] md: do overflow check for sb->bblog_shift in super_1_load()
-Date: Mon, 20 Jul 2026 19:14:00 +0800
-Message-ID: <20260720111400.2120834-1-colyli@fygo.io>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1784546099; c=relaxed/simple;
+	bh=sRFmjYc/nJiNM4rbrNBuHaIuthtsTICelAtHUsBjMDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ipp0rLZji/3LsThetE8p5HNR1XIw0VFcVZpt1QIznTMvd4FdYTL5ELBGMGnNiF91fJexM2OaZU/sKhl8scjWmWOllhpm4cs7VmDwWRmeaMWn5NBKAn0cH2cIvr9iY/y14E7NGjNvOqonVQyx85lq4huVz81V8Av61usL2lW39Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=MX5EYI96; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MX5EYI96"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1784546097; x=1816082097;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sRFmjYc/nJiNM4rbrNBuHaIuthtsTICelAtHUsBjMDg=;
+  b=MX5EYI96tNR3naVX3kVcpljNbDIxFOu6WtZOB8LE05IwcBiyHTonkF0q
+   TgX65ZS9eKCXKSlZpoqUKShDaErqCer6fXUzBRRenCFOSYsYkks3cOquq
+   bhcS+LnELq7/dscaMnUasaA0MNJmW+DyOCeQ8YhiHOjhfyZNdQPRIemBd
+   cJYHcX0oatfFysrDhZH4YMmBS71mjxQb0HOzQeUXSAnUdzY2Fd76yZLuP
+   +k7HYr42t44aN6LwZIjqt0RVg3FL3r4+EAr50bkBCKF7/C2QWir1d7jPE
+   eCdIcgDNzrts5JyGqNI5Jdy3sCEPm/ljVXlDL0RPfmr+QbXAQwvzOBahe
+   w==;
+X-CSE-ConnectionGUID: kOoELZnfRhWEJxLGvwjQ4Q==
+X-CSE-MsgGUID: EgXtb+2tTH2qz7Mpig6m3w==
+X-IronPort-AV: E=Sophos;i="6.25,174,1779120000"; 
+   d="scan'208";a="151105444"
+Received: from unknown (HELO uls-op-esad2-o.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jul 2026 19:14:50 +0800
+X-CSE-ConnectionGUID: 37TUTg51TJy8k9lOgQzDZQ==
+X-CSE-MsgGUID: wfDahKuFR9C4BhClnLIGfQ==
+IronPort-SDR: 6a5e030d_tkjfNmkrtf25XfFo/OoohlWVtScNhAZKvFs/6XlwseSNs3B
+ QQ4T6dOOtkNK76NnpkSBAIXw180drZ+OqPRKgng==
+Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
+  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jul 2026 04:14:21 -0700
+X-CSE-ConnectionGUID: FaaWFJPLQ4ivqTna7J6nSA==
+X-CSE-MsgGUID: okX54QNPRK+eeiazmaR66A==
+WDCIronportException: Internal
+Received: from wdap-kyufgunycc.ad.shared (HELO neo.fritz.box) ([10.224.19.3])
+  by uls-op-esai1-o.wdc.com with ESMTP; 20 Jul 2026 04:14:19 -0700
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	linux-btrace@vger.kernel.org,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v2 00/11] blktrace: parse blk_io_trace2 in btt and iowatcher
+Date: Mon, 20 Jul 2026 13:14:06 +0200
+Message-ID: <20260720111417.1658507-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,72 +65,39 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Coly Li <colyli@fygo.io>
+We had an internal report that the new blktrace format does not work
+with the btt tool.
 
-In super_1_load(), sb->bblog_shift is an __u8 type value loaded from on-
-disk superblock. It is used for badblocks API badblocks_set() by the
-following sequence,
+This is because I simply forgot to update these tools. Do so now and
+sorry for all the inconvenience it might have brought.
 
- 1930   rdev->badblocks.shift = sb->bblog_shift;
- 1931   for (i = 0 ; i < (sectors << (9-3)) ; i++, bbp++) {
- 1932           u64 bb = le64_to_cpu(*bbp);
- 1933           int count = bb & (0x3ff);
- 1934           u64 sector = bb >> 10;
- 1935           sector <<= sb->bblog_shift;
- 1936           count <<= sb->bblog_shift;
- 1937           if (bb + 1 == 0)
- 1938                   break;
- 1939           if (!badblocks_set(&rdev->badblocks, sector, count, 1))
- 1940                   return -EINVAL;
- 1941   }
+Johannes Thumshirn (11):
+  btt: use blk_io_trace2 internally
+  btt: natively parse blk_io_trace2
+  blktrace: add option to request a specific trace protocol version
+  blkrawverify: use blk_io_trace2 internally
+  blkrawverify: natively parse blk_io_trace2
+  blkiomon: use blk_io_trace2 internally
+  blkiomon: natively parse blk_io_trace2
+  iowatcher: use blk_io_trace2 internally
+  iowatcher: natively parse blk_io_trace2
+  btreplay: support blk_io_trace2 in btrecord
+  blkparse: add option to emit a specific trace protocol version
 
-bb->bblog_shit is in range of 0-255, variable sector is 64bit width, for
-an invalid bb->bblog_shit, it is possible to make sector be overflowed
-by the following calculation,
- 1935           sector <<= sb->bblog_shift;
-Then in turn when call badblocks_set() at line 1939 with the invalid
-rdev->badblocks.shift set at line 1930, may result an overflow inside
-_badblocks_clear() in block/badblocks.c.
+ blkiomon.c           |  93 +++++++++++++++++++--------
+ blkparse.c           |  64 +++++++++++++++---
+ blkrawverify.c       |  69 +++++++++++++++-----
+ blktrace.c           |  24 ++++++-
+ blktrace.h           |  20 ++++++
+ btreplay/btrecord.c  |  83 +++++++++++++++++++-----
+ btt/globals.h        |   4 +-
+ btt/mmap.c           | 134 ++++++++++++++++++++++++++++++++++++--
+ doc/blkparse.1       |   7 ++
+ doc/blktrace.8       |   7 ++
+ iowatcher/blkparse.c | 150 ++++++++++++++++++++++++++++++++-----------
+ iowatcher/blkparse.h |   3 +-
+ 12 files changed, 543 insertions(+), 115 deletions(-)
 
-Although there are many places to call badblocks APIs, the non-zero
-shift value is only used in super_1_load(), other places always use 0 as
-the shift value. Therefore it is unnecessary to do a general shift value
-overflow check inside badblock API, and just check here as the caller.
-
-This may avoid unnecessary check, make the badblocks API code more simple
-and elegant.
-
-Fixes: 2699b67223aca ("md: load/store badblock list from v1.x metadata")
-Fixes: 1726c77467833 ("badblocks: improve badblocks_set() for multiple ranges handling")
-Cc: stable@vger.kernel.org
-Cc: Ramesh Adhikari <adhikari.resume@gmail.com>
-Signed-off-by: Coly Li <colyli@fygo.io>
----
- drivers/md/md.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index d1465bcd86c8..67f8edf4db36 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -1918,10 +1918,17 @@ static int super_1_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor_
- 		bb_sector = (long long)offset;
- 		if (!sync_page_io(rdev, bb_sector, sectors << 9,
- 				  rdev->bb_page, REQ_OP_READ, true))
- 			return -EIO;
- 		bbp = (__le64 *)page_address(rdev->bb_page);
-+
-+		/* check for badblocks api. */
-+		if (sb->bblog_shift >= BITS_PER_TYPE(sector_t)) {
-+			pr_err("md: %pg: bogus bblog_shift %u for badblocks.\n",
-+				rdev->bdev, sb->bblog_shift);
-+			return -EINVAL;
-+		}
- 		rdev->badblocks.shift = sb->bblog_shift;
- 		for (i = 0 ; i < (sectors << (9-3)) ; i++, bbp++) {
- 			u64 bb = le64_to_cpu(*bbp);
- 			int count = bb & (0x3ff);
- 			u64 sector = bb >> 10;
 -- 
-2.47.3
+2.54.0
 
