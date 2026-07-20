@@ -1,126 +1,142 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9E1449B14
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 19:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DFC7263B
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 20:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784576666; cv=none; b=YMZ+Rp286m+zz6j9CHdRI/Y9wn3Vbh8kgrhitjiM3Iw2/zw84pvGJXWOekWNzO93HaL3ZGmCqyfmVCIyYxpCDCi2wfL4at8xhFxLz3GU6W7FHZGlCGfWI2442FolQnEKhQHqBkLXYdx/+v8vU+fE/oyPMYV0PkQpTcXIqfCbZdw=
+	t=1784578270; cv=none; b=Yhj7FmUmtiXH29bOFvJrmTsi3VYU5v7koM/DvA2yb15qo72MCIU4AEcdgUCI+gfxeFM4RYdEtwPvPHNS7oNw/39dD7F59GnhOWYoeJeo9icx/HPw7lTDS0WzBpX2uj0zhRM+7LuviOQcjACRpPSZhwX4qnsmx7nfxKQt+P36S6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784576666; c=relaxed/simple;
-	bh=UMFAJLlkdhiAiXJxPECb8KGPHLmWVaQbYtJj/8NRAfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a11qm6cSLEObklm+7Rg3lEn7q9KZInFW1trR2b+jrRBf63yNaGaReo4HbWx04iIoPGHbke9uAjGeFOx1LKR5cCDLGFIBVsXYKrwBGIdWB9UpF7mqJRLIFnzO6qz6Nn2qGA1oNnDWEOUO+laSJk/ajJnmVjF+csfPNUnUxcik8kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b=IjbvN0tD; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
+	s=arc-20240116; t=1784578270; c=relaxed/simple;
+	bh=OUuOHmPuAVyZLe5WHXkb7v0Ym0I+unXVLFV/t/XYvXo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MyGE62abs3UXvGirIC+fiGiSYfPT8G1gLa+86WvRoXCaIc0azpHgMd97pxcdLiVNitKAJLCibR9YfQUPca5C6+CTqHASql4dpBdhPEn55zjHGcNiLyGWI1B9in7Q53tlJ6Nei02Ap4SeMCG0CYJ3MwX/IIO5tKYtBAtSZekWg/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=EEjuFbNK; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b="IjbvN0tD"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-47f73d9c177so1416386f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 12:44:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20251104.gappssmtp.com; s=20251104; t=1784576662; x=1785181462; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=aHbadXg6CUSoqHxAKPZRLjtEG7IiQoNH5no6JLfzRAU=;
-        b=IjbvN0tDQtoqqL6mwcpjjdAbcfZpwUlPYBqOQD59Z8ZPbDyklfhJi4keSyutt7kPfO
-         y0/mZ+EvJCpbyYOa66hGuxvxbLxf+sMHU69AbdFD+uJWJ8E6EEHdy85JyASvYFZVyggN
-         K11WNFaJ0wBFoLFcVnyWUdiMxcF9f6CgYliaFG2F3Ly7zA1dO34533suoDsem82R8vHD
-         CZ1vW8airO9EXOHs/d3ZLF4gphhX4qNZKAg6Tl+H8Yxh+dyi1P3vj5p1FQ7Jie4C9KPw
-         A63vkVJYVObOiPhSbZrho3/zcU3DuujRDsMhzRJ70HAhMGKEu/Cm+u/SxlChbwjTbfah
-         EcAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784576662; x=1785181462;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aHbadXg6CUSoqHxAKPZRLjtEG7IiQoNH5no6JLfzRAU=;
-        b=Y11i+OTyc3eCsnN061XatLykGIHY2ToCJj8G0cBf65og1MRuUoOsMOiho5B6ic/Y/I
-         x6u+WCiJS9FHQ75OIBAG9B4l6pAgAGvw/jL8FsInelO7DakN9uFO9pKo7VuvlD+BWqlg
-         omddGfSYCeOcutCRi8l9xYyk/yLeA3d//0cf7E4ZEA0H1+0MpccxH9LxZDuDiAqFE8ar
-         iqFpJZqn3iAG/7nZRBwkQlSe4rzDoPXYBCNlCOksnuxGZY5ijdg3H71hOEXF/SkVM6HL
-         T5ogp7MLGSFkdbKVQwVT3J2C4wwr2/ChLByrvuSRL+haNGGv6VuqTdcSMIniMN0GvmyN
-         R9KA==
-X-Gm-Message-State: AOJu0YwRWVFdcpnrxKmbP3Y9OVgVOBLZswsUlqcsHCYF5cYpS1RgSs8k
-	/KpX6SwccyeueE5jhxsHUFXXkdQ6AnJftRXsbX7rsNPe7x5Z0xB/ANEIjLyEQd5qTDw=
-X-Gm-Gg: AR+sD12nhnafPHnEvJHk5r+rRe8wAKRaXSPqPowAzbz3tXTDr60g+HxMXtZS3HTOWPx
-	LD/A3ByEZL4pHkNv0CRIg7LhcOo9Ao7D6p0cvr7AQAgkQLWka3hgpwVJmtz1CjUz/Ljh2bGx+UR
-	gDFkhG8cb9Zlsu4EidA7/FVs4w+3uRB++OgAs9XdGHL/boEzhBb4Daaoi6lU+fon4mpz31TGBMB
-	//FHNb7Sk/ZLs1DiRTrzrixFJFCCjrCaN+SzZiFnQTFSeNi1rJ8zkoF1+cV2d9jiABSRLq/Fy1+
-	JfXX5yzOXCbTqz2E98ruhxl/xwTdMIoQ6BxODptxKwmHMYbKz/HvkWR4ajNq0BZWBEN3gEeho/R
-	k6ErHSSTIEAkIb7C/Rs024R6z8tZf737rj2N2B7TuYYxdhKiFSukiIjHiWZR9PF1LmkRchBl8BX
-	bbS/cl5UrJxeQKW8DcmklaXJ6SLWTEQHvf5ZgYuByeLW7cU+cEIBzgyBgvpvukOQ==
-X-Received: by 2002:a05:6000:2f86:b0:47f:7c54:4d09 with SMTP id ffacd0b85a97d-47f7c544d3cmr4066245f8f.43.1784576662544;
-        Mon, 20 Jul 2026 12:44:22 -0700 (PDT)
-Received: from KernelVM (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e51986sm37031348f8f.11.2026.07.20.12.44.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2026 12:44:22 -0700 (PDT)
-From: Phillip Potter <phil@philpotter.co.uk>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	raoxu@uniontech.com
-Subject: [PATCH 1/1] cdrom: fix stack out-of-bounds read in CDROMVOLCTRL
-Date: Mon, 20 Jul 2026 20:44:21 +0100
-Message-ID: <20260720194421.1497-2-phil@philpotter.co.uk>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260720194421.1497-1-phil@philpotter.co.uk>
-References: <20260720194421.1497-1-phil@philpotter.co.uk>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="EEjuFbNK"
+Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66KJQDfA2796050
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:07 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=dA9VgY7XPpIvG6wKms
+	Q9cynp3tOwpPa627n1rXVynfo=; b=EEjuFbNKz5JEQJxT/k6+kAi44fF0m3esd+
+	ZoTE2OvJk43E3se6O9zO7dSIn9Wwkl4yzNdhRYlyXXvKcL2PJyAcSCaPHv+83qTK
+	ZfMG7zDEQwCuX6oa+iPlDslagGTFV/cSDWMsVjUwz+tgtOCYHGYlY9BO7osM96p/
+	IPfIdiAodCUoFyqTH/uV8ZG7mH5AefTZTFzyKQx3BrzAdcMRzWA4xRir1kECb33e
+	6+XgzJtiqpHHSv7sKay5I8Ojw+w3DuyKHp8l87N2LZSAU/O8TOp+JRzGuooL37Fe
+	8XgI7p6BLYvYjpg6BK9gS4fzUf9D4kNkc0ZMM1qDMVScIqpmDsTg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4fgu4dfyy3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:07 -0700 (PDT)
+Received: from twshared40132.32.frc3.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Mon, 20 Jul 2026 20:11:06 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 890F525A00281; Mon, 20 Jul 2026 13:11:03 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+CC: <dm-devel@lists.linux.dev>, <hch@lst.de>, <axboe@kernel.dk>,
+        <brauner@kernel.org>, <djwong@kernel.org>, <viro@zeniv.linux.org.uk>,
+        Keith
+ Busch <kbusch@kernel.org>
+Subject: [PATCH RESEND 0/5] block: validate direct I/O memory alignment
+Date: Mon, 20 Jul 2026 13:10:52 -0700
+Message-ID: <20260720201057.1862857-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: Db1Zf8cth6yNZWyhRtnuTS0OO2F8akAC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfX5nyjW6Tjtb9f
+ cLrDxjzaZW+H7ay1vsrBTRZRimH03wKrJKgrv7KA+CHfw4q3ulKhzQA0s7eJonjtVqsn4fIsKzh
+ F5Bqt7sZX5IPWjlvgNb2IQ6CUn216o758+qcCsmXDimILkvKBFY28hopOuKO7VyAu9w8Y6LWz3C
+ N0pmv8pxyvGIO3VE3RfWtJx3ynAntEhzOdEJSku0KHS9zFG1HGC0zrInaO6Cs1g7U/2LPOLth4M
+ A35M+ekAHDyes+4fXkXhjMetuC+D0ep16hYOyylYI9ZgGSj28bcEG5hPzBE9mz1Msz865/+lu1j
+ zsuhj/VFOx7KQ4o0N0vCS/rH7xj9Hzmn4awchZn1mgxvqLkgJrHwGHQBxoecYj9L7wf4p0G77gR
+ qnk3iaaX65IlhgvD742QbSpf89OPYIZu8SBcH1XGLEHfGyUa6gU0qxRTwT3YiPJw6aelIafn0ie
+ aWAxpoHDhFuc+G77W9w==
+X-Proofpoint-ORIG-GUID: Db1Zf8cth6yNZWyhRtnuTS0OO2F8akAC
+X-Authority-Analysis: v=2.4 cv=NOrlPU6g c=1 sm=1 tr=0 ts=6a5e80db cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=GbPsI2Ihf5RTnMjR_gZv:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VabnemYjAAAA:8
+ a=rFgjrMAfHNG0gpnDTA8A:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfXyC8yiw9UwX2n
+ M9rHTa2YLOZYBxRWqNKGBqcWe4ev9TZnIDX7KWvP0Dc+pc0tWfAC3C0D5i0K4/nfAUqposSwYjW
+ DN4stLodwQUYM986Yt57MU2eGFSD1Kk=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-20_05,2026-07-20_03,2025-10-01_01
 
-From: Xu Rao <raoxu@uniontech.com>
+From: Keith Busch <kbusch@kernel.org>
 
-mmc_ioctl_cdrom_volume() first reads the audio control mode page into a
-32-byte stack buffer with cgc->buflen set to 24.  If the device reports a
-block descriptor, the function increases cgc->buflen to include that
-descriptor and reads the page again.
+Resending in case this got lost.
 
-For CDROMVOLCTRL, the function then builds a MODE SELECT parameter list
-by moving cgc->buffer forward by offset - 8 bytes.  This drops the block
-descriptor from the outgoing payload and leaves a new 8-byte mode
-parameter header in front of the audio control page.  However, cgc->buflen
-is left unchanged.
+This addresses the misaligned direct-io problem behind various threads:
 
-With a standard 8-byte block descriptor, cgc->buffer points at buffer + 8
-but cgc->buflen remains 32.  cdrom_mode_select() therefore asks the low
-level packet path to write 32 bytes from that adjusted pointer, reading 8
-bytes past the end of the 32-byte stack buffer.
+ https://lore.kernel.org/linux-xfs/20260610145218.141369-1-cem@kernel.org=
+/
+ https://lore.kernel.org/all/CAC_j7i1R7oy+nRhxEjCTba=3DDUgn02w9X+p94DCu0a=
+Hv5+5tKnQ@mail.gmail.com/
+ https://lore.kernel.org/linux-block/ai7rnH20IYeSmY8s@gallifrey/
+ https://lore.kernel.org/linux-block/20260616154009.2123183-1-kbusch@meta=
+.com/
 
-This is not hit by CDROMVOLREAD, and CDROMVOLCTRL only triggers it on
-drives that return a non-zero block descriptor length, which helps explain
-why it has gone unnoticed.  The overread is also sent to the device as
-extra MODE SELECT payload, so it may not produce an obvious local failure.
+The previously tested fixes are correct as far as they go, but they
+treat the symptom: they only matter because an invalid bio reaches those
+drivers in the first place.
 
-Reduce cgc->buflen by the same amount as the buffer pointer adjustment so
-the MODE SELECT transfer covers only the intended parameter list.
+The reason it reaches them is an assumption I made when I removed
+direct-io alignment checks in 5ff3f74e145a ("block: simplify direct io
+validity check") and 7eac331869575 ("iomap: simplify direct io validity
+check"): every bio is eventually split to the device limits, and the
+upper layers cope with resulting errors once the bio has formed. Both
+were optimistic assumptions. Drivers with their own ->submit_bio may
+never pass through blk_mq_submit_bio()'s split, so the check never runs
+for them, and as numerous threads showed, the consumers don't uniformly
+handle this condition.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
-Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
----
- drivers/cdrom/cdrom.c | 1 +
- 1 file changed, 1 insertion(+)
+This series stops the invalid bio at the source instead. It validates
+the buffer's alignment against the alignment limits when the bio is
+built from the iov_iter. The check is folded into the bvec extraction
+that already walks the vectors, so it adds only a comparison on a path
+that is pinning direct-io pages anyway. Misalignment is now uniformly
+rejected with EINVAL before submission for every direct-io path.
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index 62934cf4b10d..4f1fd389260f 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -3187,6 +3187,7 @@ static noinline int mmc_ioctl_cdrom_volume(struct cdrom_device_info *cdi,
- 
- 	/* set volume */
- 	cgc->buffer = buffer + offset - 8;
-+	cgc->buflen -= offset - 8;
- 	memset(cgc->buffer, 0, 8);
- 	return cdrom_mode_select(cdi, cgc);
- }
--- 
-2.55.0
+Only changes in this version are just adding the reviewers from the
+previous:
+
+https://lore.kernel.org/linux-block/20260624170905.3972095-1-kbusch@meta.=
+com/
+
+Keith Busch (5):
+  block: use blkdev_iov_iter_get_pages status for errors
+  block: fix dio leak on metadata mapping error
+  loop: set dma_alignment from the backing file for direct I/O
+  zloop: set dma_alignment from the backing files for direct I/O
+  block: validate user space vectors during extraction
+
+ block/bio.c           | 56 ++++++++++++++++++++++++++++++++++++++++---
+ block/blk-map.c       |  2 +-
+ block/fops.c          | 10 ++++----
+ drivers/block/loop.c  | 46 ++++++++++++++++++++++++++++-------
+ drivers/block/zloop.c | 35 +++++++++++++++++++--------
+ fs/iomap/direct-io.c  |  1 +
+ include/linux/bio.h   |  2 +-
+ include/linux/uio.h   | 10 +++++++-
+ lib/iov_iter.c        |  9 ++++++-
+ 9 files changed, 142 insertions(+), 29 deletions(-)
+
+--=20
+2.52.0
 
