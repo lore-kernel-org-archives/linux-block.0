@@ -1,57 +1,96 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C13D45CF;
-	Mon, 20 Jul 2026 09:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9E13D1CAC
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 09:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784539729; cv=none; b=YHGXE3OHC7hdHPlzCiY/rzEXPBL6swkBpR2vHjzd+kKRpYd15IVmHWMOJhE10C8h/nVqGWo5UmpsvQ8vi6AKbMfU4wyuDrlH6g76BdXUkeUQtWU1KwOvDCktKaZXG7SdbBc7Z2PA9+LWqJeWaj5eEmRb5t4+jwLD6zy+BpJDXb8=
+	t=1784540270; cv=none; b=sY7fej+1yKWT/m1j7i2hRChB9+P05RBfnFiATXbqdxCO5sE1no8oPPkf7qrQM4aXZFPEMbfOzBP5IoEqqJ2FLGzB7gXzHtfz9q2jiX8FKRZkLyKaippEeWFrvl4+yBCebXp172ZbO533BDzvmQfNRy85J/Pr1foMrSDh7palicI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784539729; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVRMsXg7gfG0Yw3tyucSIKofokPKf+WyvKLrFjV2Fg0Yx7eXSlw5HBvjE7sN+lVzH8C+hgT2esW9eIuUbeP1qr2jAaY6hr9wzyNZvD9RrDts12n0i6eV1SoyGcqZ/AGnQztEq5qiNsIkHnbhFEoz1KInaJlr8zO2wlsTAGgxH2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WLw8smQN; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1784540270; c=relaxed/simple;
+	bh=HHHR2fCkjaL7OZ4yudrjiMX2vqSjKQ3OEyHXi0EHKog=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hYwriQ27VVqOlK2Hpv8ni4df+2tc3kKFSkfG5sugAOlwtATQFjiSBWEfIuIHu0HNxlwpepCXca8PtTRVhCkzQB7QXOYczhqjPRNHC09h4Kkvs6yOYjSMNrcZeH5Qv57fbU19/dmZbZ8ixAycG/fGQ+GGC1MYz6hsZNrNwyhhKig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OnToIPNA; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WLw8smQN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=WLw8smQNszrz2YbXzshZ0vNE6e
-	eK2eFCdXIVTHyOsBmDO2CBkP7Cw3kDolFMxstUUDi87LJ/yzV0KcvC3GBCuSW9drBykPUjBpkRtXe
-	u/NHJnsOESJlKaxFf4RlM/aTOsJz+flyqwTPryE5HsaFhspXQsjHJUZKj8bDC71JheIXij8TXA/Jd
-	gkG0MdlxNcyH0ALT1k5BDDYkVDCh2VD/FmHzoG0ZFeTlwAElED9YENHwn+Yv6dFjDrOl7/E7YgFz7
-	+p9Vt9dxb/GnHB3fTpD7KdLmtu1AxBkU+ybwnVZeMJEhxt6yCuTj7NrbMn77/bnGXtgvGhe5M2MbO
-	ylfAhwaA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wlkIp-00000006JoT-2VUp;
-	Mon, 20 Jul 2026 09:28:47 +0000
-Date: Mon, 20 Jul 2026 02:28:47 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 6/6] blk-crypto: Update docs for blk-crypto-fallback
- motivation
-Message-ID: <al3qTyeHDJ2RXBK3@infradead.org>
-References: <20260718214655.63186-1-ebiggers@kernel.org>
- <20260718214655.63186-7-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OnToIPNA"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784540266;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/PquVwhdyrMNc13NQQZsLRGO9rX2J1W8dm5bTzHHsNo=;
+	b=OnToIPNAngCHRLWHE3PNKSwylR/6+6y/D46OdAv1WSyjg/oTl0xf+tHLT+6x7/M721DZ92
+	6aOD0M4pX0VA1pK8dWMBrfiXsiuiZ+5xtU7Sy1MP1MUrAsZLDnHzK3YMGFVF+/12Drbp+Y
+	WlsaObqhBL2h1eb8PeqpB61Ion17HDA=
+From: Tao Cui <cui.tao@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Yu Kuai <yukuai@fygo.io>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Hannes Reinecke <hare@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cui.tao@linux.dev,
+	cuitao@kylinos.cn
+Subject: [PATCH 1/4] block/blk-stat: drain per-cpu callback stats over possible CPUs
+Date: Mon, 20 Jul 2026 17:37:23 +0800
+Message-ID: <20260720093726.28965-2-cui.tao@linux.dev>
+In-Reply-To: <20260720093726.28965-1-cui.tao@linux.dev>
+References: <20260720093726.28965-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260718214655.63186-7-ebiggers@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Looks good:
+From: Tao Cui <cuitao@kylinos.cn>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+blk_stat_timer_fn() sums and resets a callback's per-cpu buckets using
+for_each_online_cpu().  A CPU that goes offline with pending samples is
+skipped, so its samples are neither accumulated into the window nor
+cleared; they sit in the bucket until the CPU comes back online, at
+which point the stale values are flushed into whatever window is then
+running.
+
+This silently corrupts the latency picture that consumers (notably
+writeback throttling via wbt, and blk-mq latency tracking) base
+decisions on around CPU hotplug: under-counting while the CPU is
+offline, then a burst of stale data on re-online.
+
+Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+---
+ block/blk-stat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index de126e1ea5ac..d57c2fc6bf06 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -83,7 +83,7 @@ static void blk_stat_timer_fn(struct timer_list *t)
+ 	for (bucket = 0; bucket < cb->buckets; bucket++)
+ 		blk_rq_stat_init(&cb->stat[bucket]);
+ 
+-	for_each_online_cpu(cpu) {
++	for_each_possible_cpu(cpu) {
+ 		struct blk_rq_stat *cpu_stat;
+ 
+ 		cpu_stat = per_cpu_ptr(cb->cpu_stat, cpu);
+-- 
+2.43.0
 
