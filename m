@@ -1,54 +1,29 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AD33D45CB
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 09:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E577B3F4DF2;
+	Mon, 20 Jul 2026 11:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784540287; cv=none; b=Bnrs4icKmaCKvlslxhMV0Re3eP0MKROv9vbJdcEvrNBa0KULx/EcHLHhw20Vr1AxImGyO6utzGNXMV+iUznqshdR0yU8hSCyzA/HsszQMQa5DBM9giMPDfC+GjgV1Xzxhw431KHIZ10vnQuahhkRz/tSR3YHmFjfLAJSasiIC2c=
+	t=1784546049; cv=none; b=cjF0eLqYUfbTqC7rpTNxoU5KcwbK701lUi4A1rM4YJ9nJzcyfoN3KAipdHqRVDmyr2IDR2yDyhszQwwniXJjcCviYHFR5LEA3tt5sCa2AQ2bPzRbP53COiwSwvjCNeWBrlZIz9GqgC0Z7fY5Y6ri+yGZNqm4736eyPNT3ebXMIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784540287; c=relaxed/simple;
-	bh=CwcS1rpDH9/zVMo1p/kk3iMOwfOYQpuysnAULIMw0Pc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=at8EismuPaKw8l5iHWpTPbX1Rt1mpWCtOKpZ97Gp60Vt3pUm3IQp5YyemqfI3m1e6xWUVaIemwo3/7JaOfI8XwXNdvooVa2H8HzNq86JCgxzhsMdMInzujgP0v3SlwYRxnWoskDKMOL3oWkbGjRsItu+p8VOH935XjVnqsSEBss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oFe+Y33Q; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oFe+Y33Q"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784540284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iu062VwjFJmKb1NYwQO4WuL9MAqm4vzNE/XIfYy4xek=;
-	b=oFe+Y33QSRXyYWUXCA7Oc6uCw1WlmHDohQcWnNoGA/iV2IJN243vtB/Lo49nx5vTumTfBr
-	Kov2ZXHu5FsqFC6x6+865QYbCOfWTDW8x/bHBE3SfSq3jZAlgHJHvx4GmKZPSgoC8jDa6i
-	8O6GTMeyN6qOZJga5dBgG/R9B6gLbn4=
-From: Tao Cui <cui.tao@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Yu Kuai <yukuai@fygo.io>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Hannes Reinecke <hare@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Nilay Shroff <nilay@linux.ibm.com>,
+	s=arc-20240116; t=1784546049; c=relaxed/simple;
+	bh=YI82VNNEo/LwgUIDuwttqbRtglLcASOGSIS8oEAYia4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S6t1bO1bhl9PHDCyHL8k3TQcgl/cOTGc3+Z7yqUY/WbyFFnk1cVnpqYY4pZ7tnqQRp/n7mYg8cinyqAodcaB2lYAqEtqTXCiAa2u9AVkDtjHaJYNWs26dJBMpia7w8khA2PLVLi06vwyv7rIiRbT3X6n2/gf4nHcy2OkiH2vjfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E10F71F00A3A;
+	Mon, 20 Jul 2026 11:14:05 +0000 (UTC)
+From: colyli@fygo.io
+To: yukuai@fygo.io
+Cc: linux-raid@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn
-Subject: [PATCH 4/4] block/kyber-iosched: flush per-cpu latency buckets over possible CPUs
-Date: Mon, 20 Jul 2026 17:37:26 +0800
-Message-ID: <20260720093726.28965-5-cui.tao@linux.dev>
-In-Reply-To: <20260720093726.28965-1-cui.tao@linux.dev>
-References: <20260720093726.28965-1-cui.tao@linux.dev>
+	Coly Li <colyli@fygo.io>,
+	stable@vger.kernel.org,
+	Ramesh Adhikari <adhikari.resume@gmail.com>
+Subject: [PATCH] md: do overflow check for sb->bblog_shift in super_1_load()
+Date: Mon, 20 Jul 2026 19:14:00 +0800
+Message-ID: <20260720111400.2120834-1-colyli@fygo.io>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,34 +31,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: Tao Cui <cuitao@kylinos.cn>
+From: Coly Li <colyli@fygo.io>
 
-kyber_timer_fn() sums the per-cpu latency histograms with
-for_each_online_cpu().  A CPU that goes offline mid-interval leaves its
-bucket un-flushed; the samples are lost from the current decision and
-re-appear (stale) when the CPU is onlined again.
+In super_1_load(), sb->bblog_shift is an __u8 type value loaded from on-
+disk superblock. It is used for badblocks API badblocks_set() by the
+following sequence,
 
-Fixes: 6e25cb01ea20 ("kyber: implement improved heuristics")
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+ 1930   rdev->badblocks.shift = sb->bblog_shift;
+ 1931   for (i = 0 ; i < (sectors << (9-3)) ; i++, bbp++) {
+ 1932           u64 bb = le64_to_cpu(*bbp);
+ 1933           int count = bb & (0x3ff);
+ 1934           u64 sector = bb >> 10;
+ 1935           sector <<= sb->bblog_shift;
+ 1936           count <<= sb->bblog_shift;
+ 1937           if (bb + 1 == 0)
+ 1938                   break;
+ 1939           if (!badblocks_set(&rdev->badblocks, sector, count, 1))
+ 1940                   return -EINVAL;
+ 1941   }
+
+bb->bblog_shit is in range of 0-255, variable sector is 64bit width, for
+an invalid bb->bblog_shit, it is possible to make sector be overflowed
+by the following calculation,
+ 1935           sector <<= sb->bblog_shift;
+Then in turn when call badblocks_set() at line 1939 with the invalid
+rdev->badblocks.shift set at line 1930, may result an overflow inside
+_badblocks_clear() in block/badblocks.c.
+
+Although there are many places to call badblocks APIs, the non-zero
+shift value is only used in super_1_load(), other places always use 0 as
+the shift value. Therefore it is unnecessary to do a general shift value
+overflow check inside badblock API, and just check here as the caller.
+
+This may avoid unnecessary check, make the badblocks API code more simple
+and elegant.
+
+Fixes: 2699b67223aca ("md: load/store badblock list from v1.x metadata")
+Fixes: 1726c77467833 ("badblocks: improve badblocks_set() for multiple ranges handling")
+Cc: stable@vger.kernel.org
+Cc: Ramesh Adhikari <adhikari.resume@gmail.com>
+Signed-off-by: Coly Li <colyli@fygo.io>
 ---
- block/kyber-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/md.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 971818bcdc9d..2ee552ab8135 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -275,7 +275,7 @@ static void kyber_timer_fn(struct timer_list *t)
- 	bool bad = false;
- 
- 	/* Sum all of the per-cpu latency histograms. */
--	for_each_online_cpu(cpu) {
-+	for_each_possible_cpu(cpu) {
- 		struct kyber_cpu_latency *cpu_latency;
- 
- 		cpu_latency = per_cpu_ptr(kqd->cpu_latency, cpu);
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index d1465bcd86c8..67f8edf4db36 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -1918,10 +1918,17 @@ static int super_1_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor_
+ 		bb_sector = (long long)offset;
+ 		if (!sync_page_io(rdev, bb_sector, sectors << 9,
+ 				  rdev->bb_page, REQ_OP_READ, true))
+ 			return -EIO;
+ 		bbp = (__le64 *)page_address(rdev->bb_page);
++
++		/* check for badblocks api. */
++		if (sb->bblog_shift >= BITS_PER_TYPE(sector_t)) {
++			pr_err("md: %pg: bogus bblog_shift %u for badblocks.\n",
++				rdev->bdev, sb->bblog_shift);
++			return -EINVAL;
++		}
+ 		rdev->badblocks.shift = sb->bblog_shift;
+ 		for (i = 0 ; i < (sectors << (9-3)) ; i++, bbp++) {
+ 			u64 bb = le64_to_cpu(*bbp);
+ 			int count = bb & (0x3ff);
+ 			u64 sector = bb >> 10;
 -- 
-2.43.0
+2.47.3
 
