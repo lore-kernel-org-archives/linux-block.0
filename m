@@ -1,92 +1,65 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837B44218B6
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1FA74BE1;
+	Mon, 20 Jul 2026 14:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784554715; cv=none; b=BawreIHl4zg7l2UcYMEAqwwTT9xuZifK9KrQDXA/ys5hBJ7GD2w2vE8Ox8NxIFk90YxBA4jXXXZLvH4dk7vikNtrNLmUBxKOPfcZekfTS3yiWAwUPR+Vv5SbmLqRXfyDxaF67mZG3Dh904pwaVUXRcHvBXvZGGmVlx4UKvCsDrc=
+	t=1784558990; cv=none; b=mncpLe/FF9Yn4aT4Cz1T9z4ysTfgcP0s1k8ml6OzFCErGu83eD0QcGP75ZdXbzeshTBuOUxGYs84JqG8xhO5n8D1YT6xdAB+SzIbE2SWWXkIQMcWB/91pXeN31eFhFlF5NPhyvLyjmzL21yxxRViGUijK09PBC3e/GVrjszKsWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784554715; c=relaxed/simple;
-	bh=rAWYy+XgM2+PVqAjj1+13LrrgPiy6gU2vIF5sbQoFCw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fOREpGUKbZD0YLS9iCLPtyO3k3/x7Fx7ibCPevFz6sKtkY9krlUgDJ0ymFFIpdPyJLSoZtcMbzB4q/bqfrGdJPgacsNdd0qISvVelSBTxKnDWxaN19kWVwgyb8RNRRWkLtG2YPFNswCSmSsugHa1JHBlugmtKeQhFWSM+JRj6bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vvyJPX6h; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vvyJPX6h"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784554711;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rekiApd+TL8VgL26SdAjVH6XkN7/9eFi2Fixg55/ce0=;
-	b=vvyJPX6hV1CKDyBx8ByeJnoL/+C//e5ZFhhCwstNbcd8vJWMFTtuCSWTRq0tS6T/z2YwFO
-	vwH2QfCIy6tbpQd5dGEXoxRvCcbq7+wfdv2E3OTOu2phuSpHosGDNwM5VifttLSmt93xck
-	GUoj1kJ7ihS9lK5bQvGILpoqDmCu/Vw=
-From: Tao Cui <cui.tao@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH] block/blk-stat: fix mean loss when re-summing aggregated stats
-Date: Mon, 20 Jul 2026 21:38:12 +0800
-Message-ID: <20260720133813.45150-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1784558990; c=relaxed/simple;
+	bh=iR6kr1AJ9R1UNAyVimsd/834QO0ilMIUmrx2JKD+oGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ekH3kVPjUHaXcBykxdlnlKFJe7UqRpeVbChOeuug4c/s6ApuvKUkzAMy4qQAsxI+Zaq0BvUWW82aWUc4qCh4erbkTfJfv7IbW89OaYd1btZBkjLjbONr2VHcORZT9ZMmYGBd79+FoJvZwlcecJtRREfKWpM7UnClq6/62Zl4iJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 96DBE68C4E; Mon, 20 Jul 2026 16:49:43 +0200 (CEST)
+Date: Mon, 20 Jul 2026 16:49:43 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mykola Marzhan <mykola@meshstor.io>
+Cc: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@fygo.io>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Li Nan <magiclinan@didiglobal.com>,
+	Xiao Ni <xiao@kernel.org>, Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Shivaji Kant <shivajikant@google.com>,
+	Pranjal Shrivastava <praan@google.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH v2 1/7] blk-mq-dma: restore BLK_STS_TARGET for
+ unsupported P2P transfers
+Message-ID: <20260720144943.GA17375@lst.de>
+References: <20260719105327.864949-1-mykola@meshstor.io> <20260719105327.864949-2-mykola@meshstor.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260719105327.864949-2-mykola@meshstor.io>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Sun, Jul 19, 2026 at 10:53:21AM +0000, Mykola Marzhan wrote:
+> matching dma_map_sgtable()'s -EREMOTEIO: "When this happens, return
+> BLK_STS_TARGET so the request isn't retried." The conversion to
+> blk_rq_dma_map silently changed the status to BLK_STS_INVAL, which
+> regresses two consumers:
 
-blk_rq_stat_sum() folds src into dst but only advances dst->mean and
-dst->nr_samples, leaving dst->batch untouched.  The mean is computed
-from src->batch (the raw per-cpu sum), so a stat that has already been
-through one sum carries batch=0; if that aggregated stat is then used
-as the src of another sum, its samples add nothing to the new mean.
+This is a really weird writing style, and suggested to me you neither
+understand the code nor the problem.  Please actually think yourself,
+write the patches and commit logs yourself instdad of this garbage.
 
-iolatency hits exactly that: iolatency_check_latencies() first sums the
-per-cpu stats into a local stat, then sums that local stat into
-iolat->cur_stat.  After the first sum the local stat has batch=0, so
-every later window drives cur_stat->mean toward zero.  On non-SSD
-devices it stays at 0, making the latency_sum_ok(&cur_stat) check that
-gates scaling up always true -- the scale-up hysteresis is effectively
-defeated.  SSD devices use the percentile path and are unaffected.
+And please also explain how you even generate the I/O that fails this
+way.
 
-Keep dst->batch in sync across sums so an aggregated stat can be reused
-as a src.  blk_rq_stat.batch is internal to blk_rq_stat_init/_add/_sum
-(no other reader in the tree), so the wbt and blk-mq consumers, which
-only read ->mean/->min/->nr_samples, behave as before.
-
-Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-
----
- block/blk-stat.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index de126e1ea5ac..4d4781350083 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -36,6 +36,7 @@ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- 	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
- 				dst->nr_samples + src->nr_samples);
- 
-+	dst->batch += src->batch;
- 	dst->nr_samples += src->nr_samples;
- }
- 
---
-2.43.0
