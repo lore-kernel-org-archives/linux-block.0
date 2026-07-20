@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8E33612F4;
-	Mon, 20 Jul 2026 18:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1015391E58;
+	Mon, 20 Jul 2026 18:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784571053; cv=none; b=TwXToucclSjIbMqUfLFPuSjje+jkKBc+P4qwAHBNkM3PRnON6tv+aWDj9dK6MT+MxUQnmW/Y1PyYRpLjApkVnvY5nZ89A22H+FS9pn7f0Vl77Ct1VeiNWIfKUqrIhox5R/4DEiFiV+TMoL5+eiC2U4rYv2FLu07WOOBvpXG/OFY=
+	t=1784571665; cv=none; b=i/dnQqa0Jt8yZlyU5pNhnVrZEW6oDEwo1Q+CIN9auaEPrSNU1OhB6KNvWx6YF2i2AOd9hgIRN99+9oAD7exxU1XJSRUYq3CeQV20p/NLdZB8ogsaQdmQ0eNtT3PiEtIxcYH3LRaJFAycO+63Jih9Y8TU3M8hGoF6b0CjU3hVAuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784571053; c=relaxed/simple;
-	bh=SrcvSWApBMQsf1Y4yuwSaHILY+Vjyb+mFmuU/2R48X8=;
+	s=arc-20240116; t=1784571665; c=relaxed/simple;
+	bh=aRvLuDb/k36CjbOTyk3JyTCNSGM0gJYfIF0L+GOdxHE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WzXvyJ8ENKptvAqhrjKyjmYXhLSrttWAMYykrqlKhGnryXmgNa4aVZTAZh3yo7chBf/pChptIoEgWK8SZokqg+GmWhm04ehPOPAlvtvGfQ/S1l4N+J7YM8M4sylXxarXSw3Xq0zMsAlvFhvCzQeatQKtLF0cqskiJKfVyXaFh4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=NI5hVn2I; arc=none smtp.client-ip=212.227.17.24
+	 In-Reply-To:Content-Type; b=iBEu2U/UKUEmL0XjvU4imtTTDJn0NNRvqdH+F1Yw4U34c+VwfTK4i+kahNGgEYP7nG7ml/9ztmLYULZD6yhEtX+PfFmmatcBADSJB7ape/xfFECTe/5qVj1D9kym8kW3OTFQMtITT2vCWH2mv9vjIhkTfAq7D1InqomVNgZ5NaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=QIqIN22l; arc=none smtp.client-ip=217.72.192.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="NI5hVn2I"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="QIqIN22l"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784571043; x=1785175843; i=laurent@vivier.eu;
-	bh=4n0bVAGooJQxTsucxNapc/D6DQHkh6TlqC/upEyYYfA=;
+	s=s1-ionos; t=1784571654; x=1785176454; i=laurent@vivier.eu;
+	bh=u8YlWEIOHxcF7x0HRDxnEOeJDCqaIs1YuZYk8KJTbEk=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=NI5hVn2IkSV4f+BqTlT2HKot8v4YtYmw0wWHBOiAAsp0d9tBHHN6EOVaPLhiJma6
-	 Aeh5Y+QKOc7xEzc6DqwC4tGX45wLxQf/uT1v/xhIlSuxc4eoYzwr3b0y2XlneyrPU
-	 Zpn/4+kLoEoAJlpVptXhdNdy8DpWlruXS2SzoIZ82LU4xM1W2BrIdFIIk25sdLK+b
-	 ioblUf7Fou2ljx+ssqhlZGoBAPk0VHDIv30kH1wEArTMViVtWPWnFgevPIhZ98yBn
-	 Z4Zmm6uBuUonhySkcvzLuwAPCSktX3gf6c23UycZe9bE6w8w1kvYtFbS674Rz+hIY
-	 AlEO7lgT0RUYZWNvaw==
+	b=QIqIN22l4BnejypRtPOKZIt3ggw80uo5SwCVJl6phDn+480QlO9p0EDWu4Vm2IUG
+	 KTQaGRIy11iyt7KBCohSnedBKNw/LPuV65XcWUcA9gSyPfqR1LnbaCOw3EFxgkpiC
+	 Ul1OxbNMw8RsUAzBdQjurHRX5UsngaoZspVdxH0K3xpdhPtrdMJ7NrES6CVsKCLku
+	 s/5TEnrelMblFqqw6EXQWirkw/QmABGVZoeNHurknM8b69ctHHPE/LX9BvtyOXtGE
+	 CwbzxeyjINClSmZtgKCZfokimhvl2Lfwlv9sI4FN7bILuk3SNYULz5fGt7caFQ+M3
+	 YSuJ+oKrYho00SOOmA==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MuUWi-1x2zrM3q4I-011YiT; Mon, 20
- Jul 2026 20:10:42 +0200
-Message-ID: <dec2c403-7161-458a-b5f2-cd1a02b1a6f2@vivier.eu>
-Date: Mon, 20 Jul 2026 20:10:41 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1MoOpq-1xNPIc2IQq-00k0GT; Mon, 20
+ Jul 2026 20:20:54 +0200
+Message-ID: <f5ce64bb-2ec9-4d48-a7fd-3a79d45d34e5@vivier.eu>
+Date: Mon, 20 Jul 2026 20:20:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,14 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/31] swim: Don't disable drive after every sector
+Subject: Re: [PATCH 05/31] swim: Perform ISM/IWM mode switching according to
+ specs
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <5d8b1ca2808d723fc58aaa7be4bab7e4d9eb946c.1784196135.git.fthain@linux-m68k.org>
+ <05ab4a40a3fc2fb8e80c2ad0e73d0fbc853c95f5.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,79 +95,100 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <5d8b1ca2808d723fc58aaa7be4bab7e4d9eb946c.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <05ab4a40a3fc2fb8e80c2ad0e73d0fbc853c95f5.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:PRqgXoYdY6wDgSHHf4QWDB8R5yWqlIjW2U1I/iXW2HBzagPJAeU
- 1e2kIjr+6w7H3+pOpPBny72B6OSSDiOmbuvH7fTVMiOT6DmNOcZizpRqHSEl3j5hHdoVuDt
- VgpmArx//VLXMTqqxdpqJFFeqVUR7PxF3Efar/2/S3do/8aL0eREW5MUTgT7dH5lAO1SThG
- TPrdIy4RMUcPMHIq+SMyg==
+X-Provags-ID: V03:K1:rU3oZFodBAmCEnxsrEe9SyZTT2pwKkXuF3Qt+DeEHV98KlsUz2F
+ 7I2eCHGPuvv8UaEXJ/38qLyTLqI7KbipylePEtp8rOhJbWtfr2LcvYcdvqKV9shDm2tizS4
+ 5pVKm6Ku8SzB4dus3jSR0lzQfbm+6NHBbnCVBNWT8xZDqUkcU1Jz+20C47+lKPHhzW1zWGD
+ i0JRX5PVlrndTZRr7XnJw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:xkGk9RXg5tE=;JO/9NKTAhHLskU9ecDWJMwR1kal
- JUn2KXIhF92CH80HuqEHOtJ0K9mO5OzEEf0kzrWZfI18eLZPK2Wf691iWBNvAkzZV85wkWG44
- LiAgHNz/9c7owecW1gMAJa2wF5ZjatC/SH7JYz/SL9IMJQQ8Rw8wPl8yW6NoAPNZfP+dMnRnH
- 2v3CGT6y4k8iKFsAq1QlMSXohOaj5zKkUF7D2GJCY8Zlztoc0YD98zIJEBPgMDrhLUFpGCm3A
- YgM0jk1acUUHr+Ep0/LPvCYntcqK4LvXbK9hUqe+lm3+z444+FfsLCPedIAfTUZ+JgTWNXUyX
- aSnZArEc3/mntyA2OYbSotCzKUIMagH9mow4zMnOi4W5brf/8nCDF7j0nZt8R5HogJmhmHe04
- ULZu9YY+PR9aurIFHAm04+1MJ3xrCGLwGxvlRqYtaifCeBh0YhTgJaVzd6ZZwwBitqeXrUmk5
- uKD1IVzMjN2gKQNguu+0rWEQBYoUo3cymScNSxEd2xGcOGvd3k/kTostt6oVrH/Itw4vbDz5E
- rMpwlUXuYj4KD5yGk3Ge4u7xwUDeQdBdWv2nNGMCgfol4s0Gl/bi/fpb9fueE18lwDvabrsKI
- 5slbDXJGZfa+GjLdSOL7oi6gE23pULq80zjYbvJHyVo5V0cAdtzhSjT66KjdCgqTgBDN761Jo
- JnVUrfsdwEtbC/Gmn6e6N7tfvTc5Kzt9dYsFEmk68pofXnyD65Zb9cUQXTzv7rgTyarHe47FE
- vx89x31AuqKmLEyCA533WLmCuLBxZuJRP6F1W7HZ+sVhKl7s32bRCmDWZvinGTOPzQ/FXbjZ6
- FcNUf7o5JwZGQ2aqk+1U7X/FbLGnowFJ2cf1PeKRsq7ywxCPekB8Z6TACxczl7hF4Mj7RzcNz
- gHzkOAg3QhHRCnrmemkcZ0xqtxruNcYf224a6KcVGhOIVwpZjSbN3Pyepk6VaR0oUgfEFdNi6
- /nth2MQ6E1IEWhQyfORtItG2a6gg2daEJZMmjRzG7WGMiLHvGd6/OiX1RwTpa7AE/9b8My+If
- naXcIBZaczIygnlNQ8lbdehROX0DYTeIQvTFQxsvddHshtweJW5PUERwFcXaKmFwR2ykIxAb4
- 7jb6RM0IOMUja59z0QOgHX//EvnD7aaDm1Ob1uXo+peDRW2x3ikIOBpcFo0s2/qQdTBDSh4Ts
- zX9UU9kI6/oCur0fuKpbsC+qjJY16pKr/spiMBbpSTPuCAAbApbQdY4SrTlQQYtw+lcxbCUZT
- Gvte2KnX7Z+knPMTxv1bzSS/PBN7MFZqXEpdhkfOqzIlnthOgfZhoRUx4Hfg6d6DErQ9gI+aX
- 9bUoqxvhXOgYEquaoP6tY8GXBweE2Lv2+g/yQegVZ9E+/FqEGl7AanXb3Ov/ZWVUlQeUNHPdR
- JhrEPe+WygRZUDHPvvcxTQn0QwoWDy5f2Rw4KuxNyZUddKhCEXAza1KRCBULBVN1z63QvvlOr
- I4m/EKipBAozHE7UPUBFcFSnRPdT16qZImX/Z6E2wFdP4uwX2xeGZEzG5XsWC4sFlT9WMNXoN
- FZ/a9I2RcMV1opHUYr3sQvV3wu0Vl2gGlva1hVG+2dnnLppKKvKUxixMeF+rNhu8DkTer/6KV
- bRDlfA3hsqdzPXKUDpxJ9gSGXi1pcwYutSpoCeyWUYLr2v+HWYXigH89wm7CBcSmhmVw41Yme
- 0I7mHfKZWsso6BDaLY65hCKL32Q3jJg95ybu9SghVCvWj71N9cftdQl7ZCaFHKpASqIYQSXTN
- hjzqViLD97qXaggE7bGl/ufPH2JeVIIedRigOajCV73UsDpRD4LsQo27O/rmEOjhDq9Y1M2EJ
- wFXDlJ7gf+K/QuOe7oAUKMdbnxPkDRUXPuzjfFA+W5jf2MnMS0OnmQ8dPcNkCm9TVjqcLPRb3
- s25lumPrH3rmY0hk9g7fFc7nmumQ0S9LY2eUWfWatn+B3mO7L74FhrGPqirLOp8RAeWoGvHMv
- zqmVZSFXoaI7R0tVBqIUBi4rOUjdTvW1DFxGQY1cuP+tOEG9KhkRelk+3iR+lbwDpycL67/Q=
- =
+UI-OutboundReport: notjunk:1;M01:P0:YwO29iyiQuA=;5bJkqdPR3HTBr7g8bsXmDLPXQKE
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> This fixes multi-sector reads on a Sony drive. The Mitsubishi drive
-> doesn't seem to care either way.
+> The SWIM spec says, "MOTOREN must be low to switch modes" and "after
+> switching from ISM to IWM, the very first command must be a clear L7".
+>=20
+> The ISM spec says, MOTOREN "must not be cleared until after the Action
+> bit is cleared". Perform those operations in the correct sequence.
+>=20
+> When switching to ISM mode, the Mode register has to be selected with a
+> particular sequence of bit flips. Set q7 low then q6 low then mtrOff.
 >=20
 > Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim.c | 4 ----
->   1 file changed, 4 deletions(-)
+>   drivers/block/swim.c | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-> index 2a400e544959..f9c59282b81f 100644
+> index f9c59282b81f..7499ff250ca7 100644
 > --- a/drivers/block/swim.c
 > +++ b/drivers/block/swim.c
-> @@ -473,8 +473,6 @@ static inline int swim_read_sector(struct floppy_sta=
-te *fs,
->   	short i;
+> @@ -149,6 +149,7 @@ struct iwm {
+>   #define ACTION		0x08
+>   #define WRITE_MODE	0x10
+>   #define HEDSEL		0x20
+> +#define ISM_SELECT	0x40
+>   #define MOTON		0x80
 >  =20
->   	swim_track(fs, track);
-> -
-> -	swim_write(base, mode1, MOTON);
->   	swim_head(base, side);
->   	swim_write(base, mode0, side);
+>   /*--------------------------------------------------------------------=
+=2D-------*/
+> @@ -223,18 +224,21 @@ extern int swim_read_sector_data(struct swim __iom=
+em *base,
+>   static DEFINE_MUTEX(swim_mutex);
+>   static inline void set_swim_mode(struct swim __iomem *base, int enable=
+)
+>   {
+> -	struct iwm __iomem *iwm_base;
+> +	struct iwm __iomem *iwm_base =3D (struct iwm __iomem *)base;
+>   	unsigned long flags;
 >  =20
-> @@ -490,8 +488,6 @@ static inline int swim_read_sector(struct floppy_sta=
-te *fs,
+>   	if (!enable) {
+> -		swim_write(base, mode0, 0xf8);
+> +		swim_write(base, mode0, ACTION);
+> +		swim_write(base, mode0, ENBL1 | ENBL2 | MOTON);
+> +		swim_write(base, mode0, ISM_SELECT);
+> +		iwm_read(iwm_base, q7L);
+>   		return;
 >   	}
->   	local_irq_restore(flags);
 >  =20
-> -	swim_write(base, mode0, MOTON);
-> -
->   	if ((header.side !=3D side)  || (header.track !=3D track) ||
->   	     (header.sector !=3D sector))
->   		return 0;
+> -	iwm_base =3D (struct iwm __iomem *)base;
+>   	local_irq_save(flags);
+>  =20
+>   	iwm_read(iwm_base, q7L);
+> +	iwm_read(iwm_base, q6L);
+>   	iwm_read(iwm_base, mtrOff);
+>   	iwm_read(iwm_base, q6H);
+>  =20
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
