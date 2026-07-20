@@ -1,38 +1,67 @@
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F381383983;
-	Mon, 20 Jul 2026 16:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CE6443E4E
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 17:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784566154; cv=none; b=bvWUzolhU+WrAgw6cW0wAnvq5FZKRaqbzwtXqEmjxqZHt0xObx5Iwcj4hfMBRIyfLDulA26CVExNkemv2xhxMmT4yWyNL/FihjUv1qyiOGLaupmJub5aQG0x19snWAiLPnbaWG8+ymzw2nrR+N764wGbMHysJ/SW4+YrCkuZ+oY=
+	t=1784567146; cv=none; b=kwz0W0EnhkGO6h/QdUnDxVF1Be2VCBU2F0l4Ca/BrrNbwL82FQzOVkOH6aZvDSKo+/rKHwgWKsFOJ75/7aBu8eMfBmET1/SAb+IysWbooblXJs8rZA4HIt6o02xgOVdVahvYib/4+BhBll07GwnHiY+zAySPN7qidfTrbdCDwOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784566154; c=relaxed/simple;
-	bh=SHo+dz0Ue/2d8c2Zthacq5yVOF7GekXFdbk0EEM/MEo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=N8IfPmepgHv0rdoFuDzLcWz86SdUJKVgCdwnJ1Z5b3s585G8yap1UE7BThdOmKVrilDmw35gNvVlTVs92pUat2TFTF2FdE/ZfvvoM0CXftR2yg25A7HE6/HnPLHZxWOtOUthWG6zqxdTzi8yHGf9suupKFZXVpH4biICzBdDfbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=lUrb8QGA; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+	s=arc-20240116; t=1784567146; c=relaxed/simple;
+	bh=EPHXgE92OZtwrusVZTpJimPa6PHp1mjxA6Q2dzygXUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DkBsSPd1uULx5Q8a6tq4s7hU9YWbIhvJaIqzeLENP1mXy18ZQQGLucv0QcRHjOANmtmFXVUgTIz704tz90qEdUP4j0/I2BgGJyyqeaebQcYN0a+gnTau1HMvyQNp9Yp54okDsRYAbXkOBiTMXOyutgOysH3ph4fbdL7PY5DBCaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FO5m1tKv; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="lUrb8QGA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=YYL05epQu09BiBSr5PNusLFDqwuNDaosRFFB/h9tybo=; b=lUrb8QGAIKHH8XNsAn4DH31GNb
-	7pJSLAJ+N2/ga/ONySFdI6oDNwO8URdhxhAm6ZNuQa26FXOsO2znTZkY00e2aH22cCAMuVle9ks2Y
-	Jr04yHux6mPAh+g1sezb74gocr26o+tUenFYzOGV4C+DaIEcN+uAOE3Cq4sop5niXyY06EQoU1u9J
-	c/0pPGEMLPjZrQKaRx/UGUGgwedzCqf/0oV49O2oaAtNe7NMCYayNPy9R80kaDuSmONndf/rwSTcX
-	J8lTc3kqqITZ1jaCi92f5gnRAAuR0TrGD7bB02G7r5qWnjJyHSaRJM4mozl6wb/RLibcfS4on2/TH
-	DVH/wUig==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <logang@deltatee.com>)
-	id 1wlrAv-0000000B6Zd-40ka;
-	Mon, 20 Jul 2026 10:49:06 -0600
-Message-ID: <ee312bcb-92f4-4884-91cd-3bd56180c8c7@deltatee.com>
-Date: Mon, 20 Jul 2026 10:49:03 -0600
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FO5m1tKv"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-81e8fa1b8d6so104462747b3.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 10:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784567138; x=1785171938; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=GqlMGabo3ObXGmn0thsIH4WBoZJD0hx7su/ezzAUMj8=;
+        b=FO5m1tKvKY/aP9evleF+whRzKapro7xwpXTfGXXNFizkcZTJJYzjp7TrdtyJpzms44
+         wEGW2ZSDLx2S2MiuDVvCk8mnjw/9LYB7guNFDmTc98T6KeIw5Zkd/f66x21agGOP8vry
+         PovdbWeDQP3x+5VmgeCTa6UGAq4ANHuXSzvk6csHEpJNYDqFVYt6l9G+cAfj8RDzIunb
+         Su7DWx3/CycylC+5AaLNtrwMDvbYMDdFmLddLDVLrsVdtcwiczCMsbgYdwLtlx4XtWdi
+         3GILtvxicmAALWa0xztdyfuSXYXS0w/qc0ANr5jAvgXxedXmG7ptBY0fwtDISIKwezA1
+         y9qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784567138; x=1785171938;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GqlMGabo3ObXGmn0thsIH4WBoZJD0hx7su/ezzAUMj8=;
+        b=AsHkXx+Eeathu8XjsUuN/dRu9pZJMyJL1lRJlkzR2woBiQfoEMLEkMcTdeTnax1igq
+         KkkOPzQa/rqPvGJ6NGIhyCALHY//HS5hruiFBHJ0FpADsffWi5yMViAdywn+nRQEiG5O
+         1BvkQ6UsDHOLXONOnClNKVCwa1e1El0+NpSwJ6kFMGxBoNizo8vSviV66sD5FhIJR6kd
+         ZKwaBHYHF3S8Dqn3BDTxgAjOTc3SpaSSA9PsZ+I4XA+dYKd8qWbc41sxNf5o1xDzcD/m
+         FWLVv9PYg7xuujQtoVlypfWWX3Z9r93El2RkzyjoI01677cNQkoeuH+4x5jbEmsVsw/M
+         HjqA==
+X-Forwarded-Encrypted: i=1; AHgh+RrQnz76j9XnpluMrlRmNyzSTWTxuAXLhAojDCQmVF6IDXFmUtFB5W2lnt1YLGkHIEwf8Hr2Elr//iBlNQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7/ZtOjy0XnsbylDO+fowKcbA+kO+/noOGML9fAiwx2qaIrz+1
+	zEQ8JxFMIhEKxXgMgYyiHYUkVhkVfAWZJhfxZipq7QtjTWE/Wpl9rDE+
+X-Gm-Gg: AR+sD113ZcSJ+2kpvIMgrtphhPZVJ+wIwZiVWYqx0+3g4npCGoldMlIqkmkBV9fs7Om
+	8mVexou92xk2P4imHV4aqy8GIn6fuiZBbti6oRBtWZgJd+uDme3GK+snJYCwFcu2ggxBqn1ReGE
+	vQD69GOubGkizQYvAx5mANSUTXnXQTtbSODVBHWdeJVtONcaDLW6UJ+oMjR1HC+AwPiEg0VIfl4
+	dzkb1yZQ96FTsxHjBhly3oHIrEk4CxKMFBIu/NzO0ZEvUAsSxhzkefd2KQBdYXAErSDOw9XFPPI
+	45RIn5RLqsazQDcTmzIRTXAuaRvklui9T6c15KBd7fVcFiI+itWO3lsST9cUAZ6TXOBFLA8RFax
+	Dieuh4p4134sNg+eqh+0Q/Ag1NOQCfFPSMyD+8MQN+4D5T/uF9jkkGQB7BPL7JOiGvJSLrgR4e6
+	7vQPZdhvFvY+GEalfmWfqU
+X-Received: by 2002:a05:690c:4b0a:b0:80c:5ce9:8f1a with SMTP id 00721157ae682-81ef27f1ccbmr48967227b3.34.1784567137799;
+        Mon, 20 Jul 2026 10:05:37 -0700 (PDT)
+Received: from [192.168.0.23] ([210.10.76.89])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81ef4034901sm53073037b3.12.2026.07.20.10.05.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jul 2026 10:05:37 -0700 (PDT)
+Message-ID: <296cbf18-86da-4c1b-832d-a27a78881dd8@gmail.com>
+Date: Tue, 21 Jul 2026 01:05:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,59 +69,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
- Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
- <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-pci@vger.kernel.org
-References: <20260719105327.864949-1-mykola@meshstor.io>
- <20260719105327.864949-7-mykola@meshstor.io>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20260719105327.864949-7-mykola@meshstor.io>
+Subject: Re: [PATCH] block/blk-stat: fix mean loss when re-summing aggregated
+ stats
+To: Tao Cui <cui.tao@linux.dev>, Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+ Omar Sandoval <osandov@fb.com>, Bart Van Assche <bvanassche@acm.org>,
+ linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+References: <20260720133813.45150-1-cui.tao@linux.dev>
+Content-Language: en-US
+From: Tang Yizhou <tangyeechou@gmail.com>
+In-Reply-To: <20260720133813.45150-1-cui.tao@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH v2 6/7] md/raid1,raid10: skip futile retries on P2PDMA
- mapping failures
-X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
+On 20/7/26 9:38 pm, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> blk_rq_stat_sum() folds src into dst but only advances dst->mean and
+> dst->nr_samples, leaving dst->batch untouched.  The mean is computed
+> from src->batch (the raw per-cpu sum), so a stat that has already been
+> through one sum carries batch=0; if that aggregated stat is then used
+> as the src of another sum, its samples add nothing to the new mean.
+> 
+> iolatency hits exactly that: iolatency_check_latencies() first sums the
+> per-cpu stats into a local stat, then sums that local stat into
+> iolat->cur_stat.  After the first sum the local stat has batch=0, so
+> every later window drives cur_stat->mean toward zero.  On non-SSD
 
+Good catch, this is indeed a real issue.
 
-On 2026-07-19 04:53, Mykola Marzhan wrote:
->  drivers/md/raid1.c  | 56 +++++++++++++++++++++++++++++++-----
->  drivers/md/raid1.h  |  2 ++
->  drivers/md/raid10.c | 69 ++++++++++++++++++++++++++++++++++++++-------
->  drivers/md/raid10.h |  2 ++
+> devices it stays at 0, making the latency_sum_ok(&cur_stat) check that
+> gates scaling up always true -- the scale-up hysteresis is effectively
+> defeated.  SSD devices use the percentile path and are unaffected.
+> 
+> Keep dst->batch in sync across sums so an aggregated stat can be reused
+> as a src.  blk_rq_stat.batch is internal to blk_rq_stat_init/_add/_sum
+> (no other reader in the tree), so the wbt and blk-mq consumers, which
+> only read ->mean/->min/->nr_samples, behave as before.
+> 
+> Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+> 
+> ---
+>  block/blk-stat.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/blk-stat.c b/block/blk-stat.c
+> index de126e1ea5ac..4d4781350083 100644
+> --- a/block/blk-stat.c
+> +++ b/block/blk-stat.c
+> @@ -36,6 +36,7 @@ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
+>  	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
+>  				dst->nr_samples + src->nr_samples);
+>  
+> +	dst->batch += src->batch;
 
-This is an intimidating and massive patch to review. I gotta second the
-verbosity of the AI commit messages comment from Keith.
+This change doesn't actually fix the issue. As you already found, the local
+stat's batch is 0. Also, according to the comment of blk_rq_stat_sum(), @src is
+a per-CPU stat, so there is no issue in blk_stat_timer_fn(). Your change would
+actually make this case look strange.
 
-My eyes glazed over a bit. But one point is that maybe this could be
-split into multiple patches: one patch introduces R1BIO_P2PDMA, one
-patch for raid1 and another patch for raid10? That might make it a bit
-more manageable.
+-- 
+Best Regards,
+Yi
 
-Also, I'm not sure if it's possible without digging deeper but, instead
-of adding a !p2pdma_unmappable check to every if() statement in the
-raid*_end_write_request() functions, might it be possible to factor out
-a helper function and return early from it? Maybe the helper could be
-shared between raid10 and raid1 as they look very similar. The
-differences between the two are minimal -- there might be a bug fix that
-was applied to one that should be applied to both?
+>  	dst->nr_samples += src->nr_samples;
+>  }
+>  
+> --
+> 2.43.0
+> 
 
-Thanks!
-
-Logan
