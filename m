@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1015391E58;
-	Mon, 20 Jul 2026 18:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2359478E39;
+	Mon, 20 Jul 2026 18:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784571665; cv=none; b=i/dnQqa0Jt8yZlyU5pNhnVrZEW6oDEwo1Q+CIN9auaEPrSNU1OhB6KNvWx6YF2i2AOd9hgIRN99+9oAD7exxU1XJSRUYq3CeQV20p/NLdZB8ogsaQdmQ0eNtT3PiEtIxcYH3LRaJFAycO+63Jih9Y8TU3M8hGoF6b0CjU3hVAuQ=
+	t=1784572273; cv=none; b=oxEXH3AL+dA86hKCmA71UcV0HjVj3b10cOWxabw8Ipmv5hRVTMOsXoQFXC/QzAaZ5ho69ybQl0SWRexbngpuIFGFy61c5QyGl7wvAYZPbmp4oCCElBATm1pqF8h6qwU0ktBGVzpgTueWYItJ1dNUqBfTwk9DGT08r7aKFM3hw30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784571665; c=relaxed/simple;
-	bh=aRvLuDb/k36CjbOTyk3JyTCNSGM0gJYfIF0L+GOdxHE=;
+	s=arc-20240116; t=1784572273; c=relaxed/simple;
+	bh=K3nl+ykPsZzpl7njS0jfjLzad8a+/vs6BPtCN4B39Z0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iBEu2U/UKUEmL0XjvU4imtTTDJn0NNRvqdH+F1Yw4U34c+VwfTK4i+kahNGgEYP7nG7ml/9ztmLYULZD6yhEtX+PfFmmatcBADSJB7ape/xfFECTe/5qVj1D9kym8kW3OTFQMtITT2vCWH2mv9vjIhkTfAq7D1InqomVNgZ5NaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=QIqIN22l; arc=none smtp.client-ip=217.72.192.73
+	 In-Reply-To:Content-Type; b=TUAHxQzrOyAbXSxSd8b2YqerCJdHY/5W2vuTmsyyjBqtMczAT6UCCVmBXqw+BRwze244gIcozJt81kWHhvDHUxwdnAEG9pa8/+BEBzRN8Y5nagtqtUHmU5wpqZMLjlWIxQjqmyXhkmK/Lqft9KaoIVQKSuxEMnPK4rXGEV4Rjhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=ugV/xZWP; arc=none smtp.client-ip=212.227.17.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="QIqIN22l"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="ugV/xZWP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784571654; x=1785176454; i=laurent@vivier.eu;
-	bh=u8YlWEIOHxcF7x0HRDxnEOeJDCqaIs1YuZYk8KJTbEk=;
+	s=s1-ionos; t=1784572263; x=1785177063; i=laurent@vivier.eu;
+	bh=p2O2gXV0Ylre/q8y0+sIgD6wS0wQwtYaxRKcmgGI558=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=QIqIN22l4BnejypRtPOKZIt3ggw80uo5SwCVJl6phDn+480QlO9p0EDWu4Vm2IUG
-	 KTQaGRIy11iyt7KBCohSnedBKNw/LPuV65XcWUcA9gSyPfqR1LnbaCOw3EFxgkpiC
-	 Ul1OxbNMw8RsUAzBdQjurHRX5UsngaoZspVdxH0K3xpdhPtrdMJ7NrES6CVsKCLku
-	 s/5TEnrelMblFqqw6EXQWirkw/QmABGVZoeNHurknM8b69ctHHPE/LX9BvtyOXtGE
-	 CwbzxeyjINClSmZtgKCZfokimhvl2Lfwlv9sI4FN7bILuk3SNYULz5fGt7caFQ+M3
-	 YSuJ+oKrYho00SOOmA==
+	b=ugV/xZWPXyt9cPqImapc/TdfIjcIdpAJy6GKlAFDEtsULViKZy3dagieqRxwEi3+
+	 H6QdA/tNMzrWl3p8F/XAHVC5zRrvj2Ruz4VEX4l3shGayf3qnevimr3djcf2ZYcAs
+	 K/2Hx82oeWsLrWhj2ElC08Df+J4MTNRewNzvlaqlZ+NIoAP8L6AXkLyBNIOviXhXa
+	 rzRXcWiX4abIsEPWHdHqyI/j0Oc1vhPAt7xJnIxCoEvTBys8DFa3NyUr0QeI8ii4B
+	 I1eN8FlFsdFhuaSmliurbMtL+FLzTOICzTdJ/LlaiAntUyDiptz0m0V+kbhYdshTw
+	 swX/Fkraz5ddLkjg1A==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MoOpq-1xNPIc2IQq-00k0GT; Mon, 20
- Jul 2026 20:20:54 +0200
-Message-ID: <f5ce64bb-2ec9-4d48-a7fd-3a79d45d34e5@vivier.eu>
-Date: Mon, 20 Jul 2026 20:20:53 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1M4JVv-1wm9kU2yjx-00A93q; Mon, 20
+ Jul 2026 20:31:03 +0200
+Message-ID: <d0d22009-14e4-4f26-b5b7-39d9335ef812@vivier.eu>
+Date: Mon, 20 Jul 2026 20:31:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,14 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/31] swim: Perform ISM/IWM mode switching according to
- specs
+Subject: Re: [PATCH 06/31] swim: Configure parameter memory
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <05ab4a40a3fc2fb8e80c2ad0e73d0fbc853c95f5.1784196135.git.fthain@linux-m68k.org>
+ <e18df7f66a9159421693b3e95fc6805b3bcc90e1.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -95,100 +94,95 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <05ab4a40a3fc2fb8e80c2ad0e73d0fbc853c95f5.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <e18df7f66a9159421693b3e95fc6805b3bcc90e1.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:rU3oZFodBAmCEnxsrEe9SyZTT2pwKkXuF3Qt+DeEHV98KlsUz2F
- 7I2eCHGPuvv8UaEXJ/38qLyTLqI7KbipylePEtp8rOhJbWtfr2LcvYcdvqKV9shDm2tizS4
- 5pVKm6Ku8SzB4dus3jSR0lzQfbm+6NHBbnCVBNWT8xZDqUkcU1Jz+20C47+lKPHhzW1zWGD
- i0JRX5PVlrndTZRr7XnJw==
+X-Provags-ID: V03:K1:NvOrEdpMdMM4psy8bTxCKDP0/RF/x6fYoABMNk3FFwArzSkMVTP
+ HPuDyH/zFwubt0qVVaMwE47M6bS7k9ZWQRfqe8CA49GuOut7FtX9XNFIzFAPw2wz6qElhI0
+ kB3DhpckGWTNkxu5+ninXsuEVvTNRO7GS9SrKDfCoBS7/DdVxMEEmHndSA2YSvv2X9LmEyo
+ RDluRp16gVbL8H7aAaPJg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:YwO29iyiQuA=;5bJkqdPR3HTBr7g8bsXmDLPXQKE
- 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
+UI-OutboundReport: notjunk:1;M01:P0:XX7+5xTwXMw=;jtT1Pkh4yp4TzHp5FmgKrpUQgqr
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> The SWIM spec says, "MOTOREN must be low to switch modes" and "after
-> switching from ISM to IWM, the very first command must be a clear L7".
+> The original SWIM chip has a 16 byte memory to store parameters which
+> control read/write timing. The SWIM 2 chip retains the last 4 parameters
+> which control write pre-compensation, but omits the first 12. Hence
+> SWIM 2 can perform reads without any parameter memory setup but SWIM 1
+> cannot.
 >=20
-> The ISM spec says, MOTOREN "must not be cleared until after the Action
-> bit is cleared". Perform those operations in the correct sequence.
->=20
-> When switching to ISM mode, the Mode register has to be selected with a
-> particular sequence of bit flips. Set q7 low then q6 low then mtrOff.
+> Configure the SWIM parameter memory with the appropriate values so that
+> SWIM 1 can read too. The parameters used here were observed in SWIM chip
+> memory, using Macsbug, while MacOS was reading from an MFM floppy disk.
 >=20
 > Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim.c | 10 +++++++---
->   1 file changed, 7 insertions(+), 3 deletions(-)
+>   drivers/block/swim.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 >=20
-> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-> index f9c59282b81f..7499ff250ca7 100644
-> --- a/drivers/block/swim.c
-> +++ b/drivers/block/swim.c
-> @@ -149,6 +149,7 @@ struct iwm {
->   #define ACTION		0x08
->   #define WRITE_MODE	0x10
->   #define HEDSEL		0x20
-> +#define ISM_SELECT	0x40
->   #define MOTON		0x80
->  =20
->   /*--------------------------------------------------------------------=
-=2D-------*/
-> @@ -223,18 +224,21 @@ extern int swim_read_sector_data(struct swim __iom=
-em *base,
->   static DEFINE_MUTEX(swim_mutex);
->   static inline void set_swim_mode(struct swim __iomem *base, int enable=
-)
->   {
-> -	struct iwm __iomem *iwm_base;
-> +	struct iwm __iomem *iwm_base =3D (struct iwm __iomem *)base;
->   	unsigned long flags;
->  =20
->   	if (!enable) {
-> -		swim_write(base, mode0, 0xf8);
-> +		swim_write(base, mode0, ACTION);
-> +		swim_write(base, mode0, ENBL1 | ENBL2 | MOTON);
-> +		swim_write(base, mode0, ISM_SELECT);
-> +		iwm_read(iwm_base, q7L);
->   		return;
->   	}
->  =20
-> -	iwm_base =3D (struct iwm __iomem *)base;
->   	local_irq_save(flags);
->  =20
->   	iwm_read(iwm_base, q7L);
-> +	iwm_read(iwm_base, q6L);
->   	iwm_read(iwm_base, mtrOff);
->   	iwm_read(iwm_base, q6H);
->  =20
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+
+> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+> index 7499ff250ca7..481fb1e63ac1 100644
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+> @@ -796,6 +796,17 @@ static void swim_cleanup_floppy_disk(struct floppy_=
+state *fs)
+>   	blk_mq_free_tag_set(&fs->tag_set);
+>   }
+>  =20
+> +static void swim_set_parameters(struct swim __iomem *base)
+> +{
+> +	unsigned int i;
+> +	static const u8 mem[] =3D { 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b, =
+0x1b,
+> +				  0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57, 0x3b, };
+> +
+> +	swim_write(base, mode0, 0); /* reset parameter memory index */
+> +	for (i =3D 0; i < 16; ++i)
+> +		swim_write(base, parameter, mem[i]);
+> +}
+> +
+>   static int swim_floppy_init(struct swim_priv *swd)
+>   {
+>   	struct queue_limits lim =3D {
+> @@ -805,6 +816,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+>   	int drive;
+>   	struct swim __iomem *base =3D swd->base;
+>  =20
+> +	swim_set_parameters(base);
+> +
+>   	/* scan floppy drives */
+>  =20
+>   	swim_drive(base, INTERNAL_DRIVE);
 
