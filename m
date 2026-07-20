@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63048282F35;
-	Mon, 20 Jul 2026 19:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2112FD69E;
+	Mon, 20 Jul 2026 19:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784575075; cv=none; b=MNUUKEnik1TFTVJ43z6w+ZaeuC/RS0dyFzIiwsc7VuP67/tkJJz5xhaSejMD7FxEljTrCB9pwCqUlW0ys3/8hI8G+iq7IWNwIQHuXR19H51awBQJeS1PghOEgysDbNwlB3C4c4urJWwtWBPD2+NXKmavbarzFu1uaoTV4f1oHBM=
+	t=1784575304; cv=none; b=H0SOn7xUbgNIthr2wxYyayH27pqltGUVCMq1f6MSQ2DUR5vC0zaHNY7lrRMbNYxwqVsnX3K17S698q+b/3bgpZYYmVJACz6dVrzxuqKnWFM1U2nMmFmLGWGAzWwaC4ZdBAkNMHJpyvCVAlzLUAshBaES24+xJ0JoRGXXu/c2lVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784575075; c=relaxed/simple;
-	bh=YNOD1dSeV6ea2Db4CdlfQNtsq//UwYu4UwKaQsEsWd0=;
+	s=arc-20240116; t=1784575304; c=relaxed/simple;
+	bh=xE4aois9z1T4IQTX19UuPHI75EPmqUCBI01iJ5y1TfM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Od3r+VhdZ+8e54jy2msImD6w3LrzAAyxoOzJ1QgLQz7aIltn0MQZg+clVoZ9I4yaaKN9Wc7gcaixWcKOnXosUYTgOUtoJ9uqb8xc8LWD60/QJTSlCU8GCl7cG51gLDn7Ho7Ox6Kwv3d5Ve9ERZsyMKa6Ia7SeYfg+VCBL0BYA1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=16tobNKp; arc=none smtp.client-ip=217.72.192.73
+	 In-Reply-To:Content-Type; b=CmFiHAbSfLV53VGWEaE+TVllgXAvywZDwwTT45OkKXAp7XW34fUEh03NgDWCBc5/FMUHNbABUOY1jb1rQ4LhFpXUimKfcoRvIb5UdxZZSh6jGQYU1nuPixsdJ+bi1uDaX8OxLYVmLuP2eHykYVtklUNlpIEo98r45C0ZtSxFJ8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=nbzB/eh8; arc=none smtp.client-ip=217.72.192.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="16tobNKp"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="nbzB/eh8"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784575071; x=1785179871; i=laurent@vivier.eu;
-	bh=MRDYg2gFO1hubxx+v6oMgaIyLqarb65CN772wyVb7kg=;
+	s=s1-ionos; t=1784575292; x=1785180092; i=laurent@vivier.eu;
+	bh=Zm3oyJ2nSHaeGNz+ov9Jx2hMq+/3tg62bEiWhwe2oIA=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=16tobNKp1X3SkDcUqz+mxMVzrJPrUDRKdny5TxA4AfFk8gXwn6p1ycWUj+Q7oBBc
-	 wMxAQL9IfLZ28Ds0gJBCvueAOsqGpz2M8XytQdorLTLNAqM+3m4iblaj9YdZCcBtV
-	 dCbCEEPUxRvrW8iPztniuwAL8BSP9Xso395aiH+J2TSc1PriFzSV7Bvy5Z5DZihwA
-	 2Z7aztuXCLIu3Sr97myIGiAXDQ2pZce7eIJx7DsQi9aTBgtFM3r+S9ZEcZsF8/HsM
-	 C9i2gRMJKhDFPZotezx2qj6rI/NVqIu/WHhKoP6WymvoePfsHNSwndWl0cAxk9lpC
-	 5GDYIXh+Bx95sG3ckg==
+	b=nbzB/eh8ZYd9VzhWTF1NhWPk63ctxbdaIVTRwTnRgSJmbn8bOryYuqupkr9gELu6
+	 IRLnoTQWGqsN1EVTpTRLdMKMbQhobyVOI4FcSXFCKJixsibldGNwiOhJx3y/t02Oz
+	 PmEHuEsKYyh7g240Q5lSImln08Tkc8Gb35R+mXbGoMxohunZKRyStrnODwn/Nnhvd
+	 Jz/spGjni0Sk7EhWq3QwWQ2Kb77G3GKD1ry2gikf4MJAq3aoW5D65jYD8dRkGG+3d
+	 61n2jW+czHvUawVj2Fqs64TWfIiT0wLopDZKpibSDdlo9nD6Q65DHX7AgkFE+bR2s
+	 Sz5QBvvQp3aBapGMsQ==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
 Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MvsR7-1x2Baq06qN-011kwx; Mon, 20
- Jul 2026 21:17:51 +0200
-Message-ID: <56132071-16d0-41c6-b133-5dbfdf054142@vivier.eu>
-Date: Mon, 20 Jul 2026 21:17:50 +0200
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1MfpKZ-1xEtdt3HA1-00p0po; Mon, 20
+ Jul 2026 21:21:32 +0200
+Message-ID: <71b645bd-2453-4012-b30e-d55a1cce4ced@vivier.eu>
+Date: Mon, 20 Jul 2026 21:21:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/31] swim: Handle FIFO timeout error
+Subject: Re: [PATCH 12/31] swim: Simplify return value initialization
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <8e4b8cbf93d5091df2fa3d652eaeb3793a2388b0.1784196135.git.fthain@linux-m68k.org>
+ <c79e0ce999ba5e71583960f75189c8f7ce6b3fc8.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,76 +94,110 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <8e4b8cbf93d5091df2fa3d652eaeb3793a2388b0.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <c79e0ce999ba5e71583960f75189c8f7ce6b3fc8.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1BbTU49HIAZv3YRUSaQtTaYTyTQaOxtz8KR2SCxlP+aMD7t424Q
- qf0PsQ5ub+yIqc2bn8whPKghIm/C80bR0u3Q2pOVoc66g82H7CXok1FloN9Mnsl10mo9r/a
- xMFyS/Wnqoqy/qgAKnKe4X9PvMCU67U1V7vujmozWNzBwjUnK8JM3TCvCJdVuneOnB9bTtD
- +Tyql8vdHCVw4aJhqzM0A==
+X-Provags-ID: V03:K1:mwyRhh11/T8k7IYuDEhFj1qxbIWqi7xxeBeMNkcvnkE2ZRaLHzK
+ JvYClRPbX9DDaoYFzsyPLl3ysv5xo2mDSDyxIbs7jTYOKShrGEvRinYWMKhheqatLLw6LXj
+ W4K14QEFawwoN6UqYTJYeGsTmpDLfPJIqhRXP5b8Gl/ncycnLlxKHQvPaVIXDv1jzy5+VnB
+ f7hAXXHNOUBHFynacHePg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:dIkY1coljRs=;1U0kY15ku+kFP1k4rW30gGHGAb+
- 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
- EQiU2xyjyCIJImWMDyNdEq7zu1ORM=
+UI-OutboundReport: notjunk:1;M01:P0:Y2R2R8odIhA=;uYDZjEbetCCHO/5a4x4SOQIR0Nj
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> When polling the FIFO for a mark byte in the sector header, don't
-> return zero if the timeout counter has expired, return an error code.
+> Initialize the error result once only. Update the result only after a
+> successful read.
 >=20
-> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim_asm.S | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+>   drivers/block/swim_asm.S | 11 +++--------
+>   1 file changed, 3 insertions(+), 8 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 >=20
 > diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-> index 3d7a2d87595a..208622ac4aeb 100644
+> index 208622ac4aeb..31fc63b074dc 100644
 > --- a/drivers/block/swim_asm.S
 > +++ b/drivers/block/swim_asm.S
-> @@ -79,7 +79,7 @@ wait_addr_mark_byte:
+> @@ -47,6 +47,7 @@ swim_read_sector_header:
+>   	link	%a6, #0
+>   	moveml	%d1-%d5/%a0-%a4,%sp@-
+>   	movel	%a6@(0x0c), %a4
+> +	moveq	#-1, %d0
+>   	bsr	mfm_read_addrmark
+>   	moveml	%sp@+, %d1-%d5/%a0-%a4
+>   	unlk	%a6
+> @@ -61,7 +62,6 @@ mfm_read_addrmark:
+>   	movel	%a6@(0x08), %a3
+>   	lea	%a3@(read_handshake), %a2
+>   	lea	%a3@(read_mark), %a3
+> -	moveq	#-1, %d0
+>   	movew	#seek_time, %d2
 >  =20
->   	tstb	%a2@
->   	dbmi	%d2, wait_addr_mark_byte
-> -	bpl	header_exit
-> +	bpl	signal_nonyb
+>   wait_header_init:
+> @@ -137,10 +137,7 @@ crc1:	tstb	%a2@
+>   	tstb	%a3@(read_error - read_mark)
 >  =20
->   	moveb	%a3@, %d3
->   	cmpb	%a0@+, %d3
-> @@ -136,7 +136,6 @@ crc1:	tstb	%a2@
+>   	moveq	#0, %d0
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> -	rts
+>   signal_nonyb:
+> -	moveq	#-1, %d0
+>   	moveb	#0x18, %a3@(write_mode0 - read_mark)
+>   	rts
+>  =20
+> @@ -149,6 +146,7 @@ swim_read_sector_data:
+>   	link	%a6, #0
+>   	moveml	%d1-%d5/%a0-%a5,%sp@-
+>   	movel	%a6@(0x0c), %a4
+> +	moveq	#-1, %d0
+>   	bsr	mfm_read_data
+>   	moveml	%sp@+, %d1-%d5/%a0-%a5
+>   	unlk	%a6
+> @@ -228,15 +226,12 @@ data_crc1:
 >  =20
 >   	tstb	%a3@(read_error - read_mark)
 >  =20
-> -header_exit:
->   	moveq	#0, %d0
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> -
+>   	/* return number of bytes read */
+>  =20
+>   	movel	#sector_size, %d0
+>   	addw	#1, %d4
+>   	subl	%d4, %d0
+> -	rts
+> +
+>   data_exit:
 >   	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> -	moveq	#-1, %d0
 >   	rts
 
