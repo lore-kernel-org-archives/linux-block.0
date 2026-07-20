@@ -1,256 +1,241 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A0E4071D2;
-	Mon, 20 Jul 2026 12:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C0B425893;
+	Mon, 20 Jul 2026 13:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784551392; cv=none; b=lrVubR+SGcPZyHyLa05dvBKOUSMOxYiLxsmK7CpFbsTQRJgnRKrwOes4yvSIX0ktg+HFGt4Mqx12kMWVH7lDhWPOr+7OkMoU6e8o/zjSd1044gHv6AGsB0vc7wwUUwBvzpshS7xvFog+QyfJdZ4Mj2gVP7AG8JKHaYh/Rkm0jWI=
+	t=1784553755; cv=none; b=UQhvcN1fbtP7dmhGBZdpI5ICJzF6Nbn6xFk7DIH8vqGhpu0wTj45tQGDF9UbIP3xJKRlzqip+6CPvEDvxYoI3MLJjTCse1L85TbTsjjypOhENy0jr9u8C8BOmAd9EaEE7dFW7uYPyv5/KYO3EtZzxLc1McK6rs4BHrj4rKVFCuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784551392; c=relaxed/simple;
-	bh=5GV+UDVHJs9uqvKLtjF1jmFCE+hrX0LhyK32S09kBLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nDpEW+qf9npKGTOswMdpJgrnEFE58UuyjlMhADFMdp5ZdupfC1h2XcY5HYMgXpz9NX5jAqxSxS6mgJWs/guN4DTna8ksyV6J6OVwvIlcwhlyxB/+gpFWTBQF4ob37x0mmUzXd94750PdtAtfZPQAIdRnGrALrcSUski4TODJd+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UYelArYi; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784553755; c=relaxed/simple;
+	bh=R1CeUUmGlyZ8V6OKL8LfGdYG/GD3a2jatkU0ixGNjtc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xt5ifUQ6RmEjk9d7pIiadOTKPsuAKTmlGwW8sQzwAJY5C5qjwXIc0qT78W59vutKUxpY1Z9hWIx8wXINSMXqtl+ltK5Vfc+5XzLPBcbItD8FhhZEbWI+7dY3o8UP6RH6nBM8oeKkJXkwvH5AFIftAKL4WBRHPo9gRgHSyokNthU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=lsG05Sal; arc=none smtp.client-ip=217.72.192.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UYelArYi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEF571F000E9;
-	Mon, 20 Jul 2026 12:43:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784551390;
-	bh=vh8stEmHz5bYtGKNO5Fy88qwSoN0fVVLHD1xF2VP1xw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UYelArYi0UUykQ/8KrpNSIBoSVZcxpEu3XqJga3fr2+gQD30+VNt3gN+ElNtO1HCg
-	 zG93FLYGosF4qLC1nH2vcqPyKLIq8haLcijvxIrcoL9lxmjXe/FBGj0T5u9ug2rwsE
-	 LYPzV+XWVhqobcEQdCio3Js6Zj+0Uq61RtkRBa3TMYg92E1TbsPQM/3fU2JscyvUAA
-	 DeM7d32/zt1/zAIoCJMLBQ1KRAeMT4x7rDFawTAJ2D8qoZZYEwJq+2WE6veaNISiws
-	 MGvCs6rbbvwFLFVcpbF/gGhd035/Z44tXUttS0KvtbhCNRe0e8RBVpkM0kyp641+pw
-	 2VGswEhaGWssQ==
-Date: Mon, 20 Jul 2026 15:43:04 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Mykola Marzhan <mykola@meshstor.io>
-Cc: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-nvme@lists.infradead.org, Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Shivaji Kant <shivajikant@google.com>,
-	Pranjal Shrivastava <praan@google.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH 0/6] block,md,nvme: correct handling of unsupported
- P2PDMA transfers
-Message-ID: <20260720124304.GE110966@unreal>
-References: <20260718162547.448892-1-mykola@meshstor.io>
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="lsG05Sal"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
+	s=s1-ionos; t=1784553750; x=1785158550; i=laurent@vivier.eu;
+	bh=52FB1fUO6weyGqBY9EnL11WrjXDeW95oj1dqhWO6rl4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=lsG05SalASJA2o/kQ8jOh9XSUZC7FPZC9KoNBJy4rBgT69EHExBocBUUIbQ8BatI
+	 30oH9japNIHSMWZmEWmoJsupjQIr2xxcDMUMbKoeSjXNNH9NZ33H7sTzpcY8teFJ8
+	 IxQwZu5gzB6raNN6psq0uhRN0pkFWr4VVDHtVkJ5J69KSH0C3ZdwULqhUn9cSnTF+
+	 v0cKzRzNm04CRcyZybh4LEkQWyhS3f6MhsVwl+1nvp/guGDkPxlgMDVctHIRiBrjj
+	 ZXltUXGPMqFz3HcCLNnuZSn2pzkerVHMvGgpALrBRokSTV31SfmSpyPjupElwgy4I
+	 oh1pYaTBcPZISG0bHQ==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1Mv2pC-1x3buw0cD2-00zpbd; Mon, 20
+ Jul 2026 15:22:30 +0200
+Message-ID: <c71fd9de-6379-4d45-9443-b3036aab889b@vivier.eu>
+Date: Mon, 20 Jul 2026 15:22:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260718162547.448892-1-mykola@meshstor.io>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/31] swim: Assert strobe with stable outputs
+To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+ Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+References: <cover.1784196135.git.fthain@linux-m68k.org>
+ <998aeb6ae4536503516df34ae38709835c61c8cb.1784196135.git.fthain@linux-m68k.org>
+Content-Language: fr
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; keydata=
+ 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
+In-Reply-To: <998aeb6ae4536503516df34ae38709835c61c8cb.1784196135.git.fthain@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:mpz8CBijKy1tTStWH/QJAwFy3rDDYXTF+5qr3LeIgYdjx2knR5i
+ q9uhfat12mruh39T5BD0VA034/hTxxeQRfsOXU0h4qeudoF9dvvYNzZOmF6czbKApvuhOx/
+ 8q/KIk8zx7l+KX2gRi+sw7B1DR74xlb8pZgHJSoIXv8QxcHxE8iYMM08Do36T1qzs3pfsKg
+ ZmamGOPwGnI5Rv+983hCQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:LW7CBH3DgvM=;jV0GUupaKkwlOaxQHSf3R1luxPR
+ 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
 
-On Sat, Jul 18, 2026 at 04:25:41PM +0000, Mykola Marzhan wrote:
-> Driving peer-to-peer I/O (NVMe CMB source) through md arrays and
-> nvme-rdma legs on asymmetric PCIe topologies -- where the peer device
-> reaches some members/paths but not others -- turns up two failures on
-> v7.2-rc, both rooted in how an unsupported-P2PDMA mapping failure is
-> reported. On md: silent data loss -- an unreachable-leg P2PDMA write
-> counts as written, mirrors silently diverge, and where no member is
-> reachable the write reports success with zero copies on stable
-> storage; reads picked to an unreachable leg fail with EIO and are
-> never retried on the mirror that holds the data. On nvme-rdma: the
-> transport swallows the DMA layer's mapping errno into a path error,
-> which under the default multipath configuration livelocks the I/O (a
-> stacked md mirror hangs) and with nvme_core.multipath=N surfaces as
-> retryable BLK_STS_TRANSPORT.
-> 
-> The root cause is a block-layer status-code regression, not an md or
-> nvme bug. Commit 91fb2b6052f7 ("nvme-pci: convert to using
-> dma_map_sgtable()") deliberately mapped unsupported P2PDMA transfers
-> to BLK_STS_TARGET ("... return BLK_STS_TARGET so the request isn't
-> retried"). Commit 858299dc6160 ("block: add scatterlist-less DMA
-> mapping helpers") silently changed that to BLK_STS_INVAL, and since
-> commit 7ce3c1dd78fc ("nvme-pci: convert the data mapping to
-> blk_rq_dma_map") in v6.17 the failure surfaces to direct NVMe
-> consumers as EINVAL instead of the documented -EREMOTEIO, with
-> blk_path_error() now classifying it as retryable. md/raid1,raid10
-> ignore BLK_STS_INVAL leg failures per commit f7b24c7b41f2
-> ("md/raid1,raid10: don't fail devices for invalid IO errors"), where
-> it means a request-shaped error that fails identically on every
-> member -- hence the silent divergence. The md leg of the regression
-> became reachable when md started advertising BLK_FEAT_PCI_P2PDMA in
-> v7.2-rc1 (commit 02666132403a ("md: propagate BLK_FEAT_PCI_P2PDMA
-> from member devices to RAID device")).
-> 
-> Patch 1 restores BLK_STS_TARGET at the source. md then handles an
-> unreachable leg like any other per-device error: badblocks on the
-> affected member, the master bio succeeds while an In_sync leg holds
-> the data, and reads are redirected to the other mirror.
-> 
-> Patches 2-4 fix independent md-side P2PDMA bugs of the same vintage:
-> md_submit_bio() strips REQ_NOMERGE (the only request-level protection
-> against merging P2PDMA segments across pgmaps); raid1 write-behind
-> CPU-copies device BAR memory via bio_copy_data(); and
-> narrow_write_error()'s retry clones reset bi_opf, dropping the
-> REQ_NOMERGE protection exactly on the error-retry path.
-> 
-> Patch 5 stops the restored device-error machinery from misfiring
-> where its medium-error assumptions don't hold. A mapping failure is a
-> property of the peer/member pairing: retrying the same peer pages
-> against the same member cannot succeed, and there is nothing on the
-> medium to repair. Without it, narrow_write_error() serializes dozens
-> of guaranteed-to-fail chunk retries per failed write; on reads each
-> unreachable-leg pick costs a full freeze_array() quiesce plus a tick
-> of the read-error budget -- measured below, a mixed host/P2P read
-> workload on an asymmetric topology kicks the perfectly healthy far
-> leg after ~20 failed picks, in under a second; and on FailFast
-> members a single unroutable I/O evicts a healthy mirror outright.
-> Because BLK_STS_TARGET is also produced for transient device
-> conditions md cannot distinguish from bi_status alone, writes probe
-> the whole range once instead of predicting futility: a real mapping
-> failure is recorded in one call, a cleared transient recovers with
-> nothing recorded. Patches 1 and 5 belong in the same release: with
-> patch 1 alone, restoring the error surfaces the retry storms and
-> read-path evictions above on 7.2's newly reachable md path.
-> 
-> Patch 6 closes the same hole in the rdma transport. nvme-rdma maps
-> the data scatterlist with ib_dma_map_sg(), which returns 0 on a
-> peer-unreachable failure, discarding the -EREMOTEIO that
-> dma_map_sgtable() documents for exactly this case; the driver reports
-> it as a path error. Because the multipath head node advertises
-> BLK_FEAT_PCI_P2PDMA (commit fb0eeeed91f3 ("nvme-multipath: enable PCI
-> P2PDMA for multipath devices"), v7.2-rc1) and the mapping failure is
-> deterministic, nvme_failover_req() requeues the bios with a fresh
-> retry budget every cycle and the I/O never completes -- a hot requeue
-> livelock that hangs a stacked md mirror instead of failing over; with
-> nvme_core.multipath=N it burns nvme_max_retries requeues and
-> completes as retryable BLK_STS_TRANSPORT. Patch 6 maps with
-> ib_dma_map_sgtable_attrs() to preserve the errno and returns
-> BLK_STS_TARGET, matching nvme-pci so patch 5's handling covers rdma
-> legs too, and starts the request only after the map succeeds so
-> nvme_mpath_start_request() accounting cannot leak on the direct
-> blk-mq completion. nvme-rdma stays on the scatterlist DMA API: its
-> fast-reg MR path (ib_map_mr_sg()) consumes scatterlists, so a
-> blk_rq_dma_map conversion is separate modernization, out of scope for
-> a fix.
-> 
-> Behavior on v7.2-rc2, QEMU rig (one CMB provider, two NVMe members,
-> q35 PCIe topologies), 90 8KiB peer-memory reads under concurrent
-> host reads for the read rows:
-> 
->   topology     op          v7.2-rc2                patched (1-5)
->   symmetric    write+read  ok                      ok
->   asymmetric   write       "ok", silent diverge    ok + badblocks on
->                                                    far leg (1 probe)
->   asymmetric   read        41/90 EIO, no mirror    90/90 ok, no
->                under load  retry, no eviction      eviction
->   unreachable  write       "ok", NO data copied    EIO + badblocks
->   unreachable  read        EIO                     EIO, no members
->                                                    kicked
-> 
-> Also verified on the same rig: a transient injected TARGET recovers
-> through the single probe with nothing recorded; P2P MEDIUM keeps the
-> chunked path; host-page TARGET/INVAL handling is unchanged; FailFast
-> survives mapping failures but still evicts on genuine errors;
-> write-mostly legs are written directly (no write-behind CPU copy); a
-> degraded array whose only leg is unreachable gets plain EIO -- no
-> budget charge, no eviction; an exhausted badblocks table fails the
-> member as described below. The write/read/injection rows repeat
-> identically on raid10.
-> 
-> Validation of patch 6: the mechanism -- ib_dma_map_sg() returning 0
-> where ib_dma_map_sgtable_attrs() preserves -EREMOTEIO -- was
-> confirmed on a real mlx5 HCA with a map-only probe. The
-> start-after-map reorder ran over an rxe nvmet-rdma loopback under fio
-> with crc32c verification; multipath inflight and nr_active accounting
-> drain to zero, matching the pre-reorder kernel. rxe cannot produce
-> -EREMOTEIO, so the failure paths were driven by injecting that exact
-> mechanism at the map call site: unpatched, one 4KiB write livelocked
-> (132 failover requeues in 8s, a stacked raid1 hung; multipath=N:
-> retryable BLK_STS_TRANSPORT); patched, it failed immediately as
-> BLK_STS_TARGET with zero requeues, and the stacked raid1 badblocked
-> the leg without evicting it.
-> 
-> Known trade-offs of routing through the stock md write machinery:
-> an unroutable P2P write records badblocks and sets WriteErrorSeen
-> and WantReplacement, so later writes overlapping those ranges skip
-> the member -- host writes do not clear the entries and repair skips
-> known-bad ranges -- leaving them single-copy until re-add or
-> replacement recovery (host memory, so it succeeds) rewrites and
-> clears them; a member whose badblocks table is exhausted or disabled
-> is failed on the first unroutable P2P write, as with any write error
-> md cannot record. FailFast members are exempted from md_error() for
-> mapping failures only (nothing reached the wire, so the error says
-> nothing about device health); genuine I/O errors keep their
-> immediate-eviction semantics. raid10 additionally fails a
-> replacement device outright on a P2P write mapping failure (its
-> stock replacement-write policy), and an IO_BLOCKED slot excludes
-> that slot's replacement from the read retry -- both pre-existing
-> raid10 behaviors with a new trigger. On reads, read_balance() keeps
-> no memory of unreachability, so each far-leg pick still costs one
-> failed submission before the redirect; a sticky per-rdev
-> reachability hint would be md-next follow-up material, as would a
-> distinct block status naming the mapping failure exactly.
-> 
-> Routing: patch 1 is block-tree material and fixes a v6.17-rc1 status
-> regression (hence its Cc: stable); patches 2-5 are md and address
-> exposure that only became reachable with v7.2-rc1; patch 6 is
-> nvme-rdma and also carries Cc: stable -- the transport misreport
-> predates the head-node change (Fixes: 23528aa3320a, v7.1) and is
-> reachable on v7.1 with multipath=N. Patch 6 sources the errno from
-> dma_map_sgtable() in rdma.c and does not depend on patch 1, which
-> fixes the separate blk_rq_dma_map path. Patches 1 (block) and 6 (nvme) are
-> independently applicable bug fixes: each fixes a user-visible defect
-> on its own and neither depends on the md patches, while 2-5 are
-> md-side hardening built on patch 1 -- a maintainer can take 1 and 6
-> even if the md discussion runs longer. Single-cycle routing through
-> the relevant trees with acks works for us: patch 1 block, 2-5 md,
-> 6 nvme.
-> 
-> Per Documentation/process/coding-assistants.rst: the patches were
-> developed with AI assistance (see the Assisted-by trailers); all code
-> was human-reviewed and tested as described above.
+Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
+> Inside Macintosh says, "Be sure that you don't change CA0-CA2 or SEL
+> while LSTRB is high". Unfortunately, those bits do change. The CA0-CA2
+> outputs become inputs when (LSTRB << 4) | LSTRB gets written to the
+> phase register. Then when LSTRB is driven low, CA0-CA2 get driven high.
+>=20
+> This is a problem because the drive interprets a STEP command as an
+> EJECT command when these pins float high. This occurs intermittently,
+> perhaps because interrupts are disabled and the race condition happens
+> to end well. However, when I add code to step the heads with interrupts
+> enabled, the disk always ejects.
+>=20
+> Keep the four phase pin directions set to output and hold their levels
+> constant during LSTRB signalling.
 
-It would be great if developers supervised their AI tools and kept
-commit messages and cover letters concise and readable.
+Perhaps you can also add a short comment to describe the changes you made =
+to the defines.
 
-Everything above can be reduced to a simple sentence: "MD treats an
-unsupported P2P operation as success rather than failure; update the
-code accordingly."
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Thanks
+Thansk,
+Laurent
 
-> 
-> Series is against v7.2-rc2.
-> 
-> Mykola Marzhan (6):
->   blk-mq-dma: restore BLK_STS_TARGET for unsupported P2P transfers
->   md: ensure REQ_NOMERGE is set on P2PDMA bios
->   md/raid1: don't use write-behind for P2PDMA bios
->   md/raid1,raid10: keep REQ_NOMERGE on narrow_write_error() retry clones
->   md/raid1,raid10: skip futile retries on P2PDMA mapping failures
->   nvme-rdma: return BLK_STS_TARGET for unsupported P2P transfers
-> 
->  block/blk-mq-dma.c       | 10 ++++++-
->  drivers/md/md.c          | 14 ++++++++--
->  drivers/md/md.h          | 31 +++++++++++++++++++++
->  drivers/md/raid1.c       | 56 +++++++++++++++++++++++++++++++------
->  drivers/md/raid10.c      | 60 ++++++++++++++++++++++++++++++++++------
->  drivers/nvme/host/rdma.c | 26 +++++++++++------
->  6 files changed, 168 insertions(+), 29 deletions(-)
-> 
-> 
-> base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
-> --
-> 2.43.0
-> 
-> 
+> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+> Signed-off-by: Finn Thain <fthain@linux-m68k.org>
+> ---
+>   drivers/block/swim.c | 52 ++++++++++++++++++++++----------------------
+>   1 file changed, 26 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+> index 0ccc12a72388..b61e92d0e3e9 100644
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+> @@ -89,35 +89,35 @@ struct iwm {
+>  =20
+>   /* bits in phase register */
+>  =20
+> -#define SEEK_POSITIVE	0x070
+> -#define SEEK_NEGATIVE	0x074
+> -#define STEP		0x071
+> -#define MOTOR_ON	0x072
+> -#define MOTOR_OFF	0x076
+> -#define INDEX		0x073
+> -#define EJECT		0x077
+> -#define SETMFM		0x171
+> -#define SETGCR		0x175
+> +#define SEEK_POSITIVE	0x0F0
+> +#define SEEK_NEGATIVE	0x0F4
+> +#define STEP		0x0F1
+> +#define MOTOR_ON	0x0F2
+> +#define MOTOR_OFF	0x0F6
+> +#define INDEX		0x0F3
+> +#define EJECT		0x0F7
+> +#define SETMFM		0x1F1
+> +#define SETGCR		0x1F5
+>  =20
+> -#define RELAX		0x033
+> -#define LSTRB		0x008
+> +#define RELAX		0x0F3
+> +#define LSTRB		0x0F8
+>  =20
+> -#define CA_MASK		0x077
+> +#define CA_MASK		0x0F7
+>  =20
+>   /* Select values for swim_select and swim_readbit */
+>  =20
+> -#define READ_DATA_0	0x074
+> -#define ONEMEG_DRIVE	0x075
+> -#define SINGLE_SIDED	0x076
+> -#define DRIVE_PRESENT	0x077
+> -#define DISK_IN		0x170
+> -#define WRITE_PROT	0x171
+> -#define TRACK_ZERO	0x172
+> -#define TACHO		0x173
+> -#define READ_DATA_1	0x174
+> -#define GCR_MODE	0x175
+> -#define SEEK_COMPLETE	0x176
+> -#define TWOMEG_MEDIA	0x177
+> +#define READ_DATA_0	0x0F4
+> +#define ONEMEG_DRIVE	0x0F5
+> +#define SINGLE_SIDED	0x0F6
+> +#define DRIVE_PRESENT	0x0F7
+> +#define DISK_IN		0x1F0
+> +#define WRITE_PROT	0x1F1
+> +#define TRACK_ZERO	0x1F2
+> +#define TACHO		0x1F3
+> +#define READ_DATA_1	0x1F4
+> +#define GCR_MODE	0x1F5
+> +#define SEEK_COMPLETE	0x1F6
+> +#define TWOMEG_MEDIA	0x1F7
+>  =20
+>   /* Bits in handshake register */
+>  =20
+> @@ -284,9 +284,9 @@ static inline void swim_action(struct swim __iomem *=
+base, int action)
+>  =20
+>   	swim_select(base, action);
+>   	udelay(1);
+> -	swim_write(base, phase, (LSTRB<<4) | LSTRB);
+> +	swim_write(base, phase, action | LSTRB);
+>   	udelay(1);
+> -	swim_write(base, phase, (LSTRB<<4) | ((~LSTRB) & 0x0F));
+> +	swim_write(base, phase, action);
+>   	udelay(1);
+>  =20
+>   	local_irq_restore(flags);
+
