@@ -1,53 +1,53 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4723B352C34
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 20:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04963B4E8F
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 20:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784578284; cv=none; b=jhcOoS6QDF7io54tKWuVuVTYq9DkOr8kMbCaVztbjM0IYZz+pNhcH/EUnpbW1haDhxazNYWREMylIlyDb2ji7/gE48bATkkz6o0TftkMX5DP3/OP/RA9957L/6SxReRvIr7zfmU102esO3o/3TmDUKXBIaF9Zs68tgWjcKByi0k=
+	t=1784578287; cv=none; b=GQBCFLWEBtjJLbITgEA39F3HXUKJCHg/v7cQnUL28OcT+MvxwqzDIJpkjQ2kCXUAsrlOJt8elsxh2LgvO5fBwArk0o41MV4AQIVlhkjwS4aVQ9I+RKo3rGSR1UMjnqiEUKP+EqsjNFI1uQ1EJIi9knyYXf99uA6V+FlOjFBKQ90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784578284; c=relaxed/simple;
-	bh=w3Xa/iXqzZWiooILbdH/Rjm/ENI/F9TkzgM2t/CehlM=;
+	s=arc-20240116; t=1784578287; c=relaxed/simple;
+	bh=O4AioAC3G8DsznNvnEKnfiaTjLEuHncknSgivw2LW3E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PBGTIP1gflxsn6VGnK9o9uQAN4m4dSj0pZWxK+YJPYqmZQlhisxjo5F0VsfPlEhvvZQ08mGqvywCVW4bF6ZPfkEMDHjGFYsS/HvebsWwV9SLGNS0+cGGvnwqD04OBYZ2UEgyMRXjz4gMtR/5skKlVnxbFRVHqI1/4UKonIwAAWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=meld+Cxw; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=gT4IMWCv0OefRHYkwmbOzZlJIqURTPFQtolz4y5YXmsD9b/BITA+4Kx1EehU5Sx7pKyra8SYZhzzQ6nqsMlMPVZDKY4kUo+4zRjcZ/U3xfVSsdR+op76VNL0WquPavIkN36lVF8cPoDduFnUSzpQsg/zOWV1nsBtoXkCOMlOBOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=QEGRCkGY; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="meld+Cxw"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66KJPa6B2812993
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:22 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="QEGRCkGY"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66KJQXF12644575
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:25 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=6IkMvZEDQC8Kyw2HxFcjW9YV77xNYp0pa980zCACESc=; b=meld+Cxw4Sft
-	ROjZZBiHj/zqHlsx1v81YLehgeX4PxOlbyeZWLjI25bJLIQ6tBggtR7zhbckk18X
-	FLTovdFm7eyi1VMijCtdfqyrbXOjKVz0+RFBMg0+q8hg0t7UlEqvSH1KCEsVdXLO
-	SpnBwE3XjZ64jhsUlz1o5/i+yciCcUeygZRKVhX+Gi6hSmw2QfE3RGGvzxZS/4eC
-	qCIHBtP9+bIUYnga4UPlK6zblhBFumoQqW5mirYeruIONdyrsguWzp5mFK2+ZEjs
-	q3478xqZgxMthiSdRRDz91jVW5I6tLvM+ehz5XcQTAkssM5MuTMyd10cop1RCCfj
-	jHaaebR66A==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4fg8sgbh44-2
+	 bh=mz92xofgircHI4YMm+iPtuHHV6ROQ/EWWkRXCM1MtNE=; b=QEGRCkGYmgRU
+	7pA/egdJFGGAFh6gZt9g1GBwsv9+pJJtG000LQMA6evCeSK9PAvFoeI8vA7Qid65
+	Rkq8qbIdiAkG/sC7GLaTciELVQjh21IBWnsvxEP4eTahwVqSP1rfWHsubFfegij3
+	dcYIYtMTCdPNIwil4beBjUwhKIlyKRia6nvSIf1EHblE4gc/C6cTJwxd5QmxaD77
+	x+u00FxbpoFNl6eMMECULp1EznAXN0/rzOw6YyNvaA9qS4hKGR20idlz2iDMqrtz
+	xDwHCXaIPFG3K03xCGGB+YAbKrZ2M2Wwq4luG5lp4CwgyH3I79HLCe77eAwd1GHa
+	6zXrWXkvqA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4fg4t1c4u2-10
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:22 -0700 (PDT)
-Received: from twshared19691.04.snb1.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Mon, 20 Jul 2026 13:11:24 -0700 (PDT)
+Received: from twshared132622.14.frc2.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Mon, 20 Jul 2026 20:11:21 +0000
+ 15.2.2562.41; Mon, 20 Jul 2026 20:11:18 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id C72C025A0028A; Mon, 20 Jul 2026 13:11:03 -0700 (PDT)
+	id 9C51625A00285; Mon, 20 Jul 2026 13:11:03 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
 CC: <dm-devel@lists.linux.dev>, <hch@lst.de>, <axboe@kernel.dk>,
         <brauner@kernel.org>, <djwong@kernel.org>, <viro@zeniv.linux.org.uk>,
         Keith
  Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH RESEND 3/5] loop: set dma_alignment from the backing file for direct I/O
-Date: Mon, 20 Jul 2026 13:10:55 -0700
-Message-ID: <20260720201057.1862857-4-kbusch@meta.com>
+Subject: [PATCH RESEND 2/5] block: fix dio leak on metadata mapping error
+Date: Mon, 20 Jul 2026 13:10:54 -0700
+Message-ID: <20260720201057.1862857-3-kbusch@meta.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260720201057.1862857-1-kbusch@meta.com>
 References: <20260720201057.1862857-1-kbusch@meta.com>
@@ -60,164 +60,60 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=MKZQXsZl c=1 sm=1 tr=0 ts=6a5e80ea cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfX4zOF3MIr6c3n
+ re28GFtROO4WfuBcNBHlw9rLuUfVdPgQpzvEqdxFs6CVF5/xssVhnTBR5OATuCYDr84UM67X8Vp
+ Wv90cdDeaOD90SqF+aSXEc4kxHLxgfV/p00ze9LfT02A5xTHkPw2e0zflcewVvoNNEiomeLlCc/
+ HlHJhYhlNvOeoCPg2OuYTDnQOZ+n1LGYAzgTbuvDWdbn6F5POazn4+SBpHaVdX2Unr4zvYrhwOl
+ gplXjNX8OhD5F7tiQor8lh+Q26ZyianHiaDZJBYMYRq4F+X3kJ0mcnU9nIZDwOKUNOumIo82Q+7
+ icXARfazolFbuMgvWmjF/g4fwv/7d2GyppIHj4PTR5sx17Uv+qggTp6KTw7sAPvC6/Mrn1fGqs0
+ wudHAnezpKsqpclzcAaZd1VA0XWucFBdj732gfYAqIAgv08+oclSue5sU7DGqQVUpzSfeGJsAnn
+ mRb2wRl/+34gzHLPRUg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfX4yD49dDLcEDW
+ QkiwHm/kDklzObehx45uRmMxW5/DBYJ3Cf1B6gKgJMaxmbnweqC37J0gBnqlORj1gfOB6fQ/5GM
+ 7hay16uhrYEEx5sgva/BC+4sPEE1i6g=
+X-Authority-Analysis: v=2.4 cv=FbgHAp+6 c=1 sm=1 tr=0 ts=6a5e80ec cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
  a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=crHB47gyY4rKiduisYu9:22 a=VwQbUJbxAAAA:8 a=w3YrK2sSALtTPwlh2GsA:9
-X-Proofpoint-GUID: W34JbPni5tmNh7ZuEU97PpQaV9L1U_BC
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfX9sN3RuuVk/ff
- WixdPyFM4jNmTOydTd4SZmXNzn149XsiY3LTpGI+t6x4KkaGxBDiHP4p/ubpcQBp5F0mwM0+pXr
- L24S5d/IJINBRLwI8zoKoscbas76LPE=
-X-Proofpoint-ORIG-GUID: W34JbPni5tmNh7ZuEU97PpQaV9L1U_BC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIwMDIyMCBTYWx0ZWRfXzvDBY4NEGIf6
- 7cFdGPTwaoHRWRt59tL0zeHKLw//c0dfdgNPtmZh86yg50M1N5J+bPZ4OTNbpmgrcOvVF0pjCf+
- 9FJnzkVRSWBwD4oUF8IxVvbnWvbMEHez7nOwEBtQmaxi88nExywHGgR75qL7EJOScPXtBigSg2O
- H1yJtrlD2756kFqnQg1ABlioz8PrvSsHBcOAECeCjRReRKHUrHPAs6PhwCsFH9aT1K/vid3Cq7n
- zGxhZ4vhqeT5ASW36eKD+Rd+aIsNOXYbaG4kfyenE1nvVfy0mqTE1Dn7BWKxWzzE6NUupc8or3R
- oN0LnMccc/9XuXuvnx3s8+ChDmaL4b79OXuNRtTUUgW5YxdBiMy7YUdC8aFQgoDEe75Ujw2HcJU
- xR+Yc4svpa2kSse2tOGFkcMYCVcGPh+g60vpidMwEQPeGhQGdifgK+j5B5RntH4haW0FcCDHoCV
- fEJfJmZIbdApZuvPDjg==
+ a=8elwO82fXORLTBIkMd32:22 a=VwQbUJbxAAAA:8 a=hePQWg9M9jSv14wK35YA:9
+X-Proofpoint-ORIG-GUID: aVG7mZqJiK_pXkNrYlN5ssz-LO-3fc6R
+X-Proofpoint-GUID: aVG7mZqJiK_pXkNrYlN5ssz-LO-3fc6R
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-20_05,2026-07-20_03,2025-10-01_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Direct I/O user pages are forwarded to the backing file unchanged, so
-the backing's DMA alignment requirement applies to them. Track the
-backing's dio_mem_align and advertise it as the loop device's
-dma_alignment so we advertise proper limits and misaligned I/O is
-rejected here instead of being dispatched to the backend.
+A failed integrity mapping holds a dio reference, so we need to go
+through the full bio ending in case there were previously submitted
+bio's in the sequence.
 
+Fixes: 2729a60bbfb92 ("block: don't silently ignore metadata for sync rea=
+d/write")
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/block/loop.c | 46 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 8 deletions(-)
+ block/fops.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 310de0463beb1..5fe61d542f8b7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -54,6 +54,7 @@ struct loop_device {
+diff --git a/block/fops.c b/block/fops.c
+index 0827bb884d473..0098a90a956e1 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -238,8 +238,10 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb=
+, struct iov_iter *iter,
+ 		}
+ 		if (iocb->ki_flags & IOCB_HAS_METADATA) {
+ 			ret =3D bio_integrity_map_iter(bio, iocb->private);
+-			if (unlikely(ret))
+-				goto fail;
++			if (unlikely(ret)) {
++				bio_endio_status(bio, errno_to_blk_status(ret));
++				break;
++			}
+ 		}
 =20
- 	struct file	*lo_backing_file;
- 	unsigned int	lo_min_dio_size;
-+	unsigned int	lo_dio_mem_align;
- 	struct block_device *lo_device;
-=20
- 	gfp_t		old_gfp_mask;
-@@ -447,26 +448,37 @@ static void loop_reread_partitions(struct loop_devi=
-ce *lo)
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
- }
-=20
--static unsigned int loop_query_min_dio_size(struct loop_device *lo)
-+static void loop_update_dio_alignment(struct loop_device *lo)
- {
- 	struct file *file =3D lo->lo_backing_file;
- 	struct block_device *sb_bdev =3D file->f_mapping->host->i_sb->s_bdev;
- 	struct kstat st;
-=20
- 	/*
--	 * Use the minimal dio alignment of the file system if provided.
-+	 * Use the dio alignment of the file system if provided.  The incomoing
-+	 * request's bio_vec is forwarded to the backing file unchanged, so its
-+	 * required memory alignment becomes the device's dma_alignment when
-+	 * used for direct-io.
- 	 */
- 	if (!vfs_getattr(&file->f_path, &st, STATX_DIOALIGN, 0) &&
--	    (st.result_mask & STATX_DIOALIGN))
--		return st.dio_offset_align;
-+	    (st.result_mask & STATX_DIOALIGN)) {
-+		lo->lo_min_dio_size =3D st.dio_offset_align;
-+		lo->lo_dio_mem_align =3D st.dio_mem_align - 1;
-+		return;
-+	}
-=20
- 	/*
- 	 * In a perfect world this wouldn't be needed, but as of Linux 6.13 onl=
-y
- 	 * a handful of file systems support the STATX_DIOALIGN flag.
- 	 */
--	if (sb_bdev)
--		return bdev_logical_block_size(sb_bdev);
--	return SECTOR_SIZE;
-+	if (sb_bdev) {
-+		lo->lo_min_dio_size =3D bdev_logical_block_size(sb_bdev);
-+		lo->lo_dio_mem_align =3D bdev_dma_alignment(sb_bdev);
-+		return;
-+	}
-+
-+	lo->lo_min_dio_size =3D SECTOR_SIZE;
-+	lo->lo_dio_mem_align =3D SECTOR_SIZE - 1;
- }
-=20
- static inline int is_loop_device(struct file *file)
-@@ -509,7 +521,7 @@ static void loop_assign_backing_file(struct loop_devi=
-ce *lo, struct file *file)
- 			lo->old_gfp_mask & ~(__GFP_IO | __GFP_FS));
- 	if (lo->lo_backing_file->f_flags & O_DIRECT)
- 		lo->lo_flags |=3D LO_FLAGS_DIRECT_IO;
--	lo->lo_min_dio_size =3D loop_query_min_dio_size(lo);
-+	loop_update_dio_alignment(lo);
- }
-=20
- static int loop_check_backing_file(struct file *file)
-@@ -940,6 +952,19 @@ static unsigned int loop_default_blocksize(struct lo=
-op_device *lo)
- 	return SECTOR_SIZE;
- }
-=20
-+static void loop_set_dma_limit(struct loop_device *lo, struct queue_limi=
-ts *lim)
-+{
-+	/*
-+	 * Direct I/O forwards the user pages to the backing file unchanged, so
-+	 * track the backing's DMA alignment requirement as the mode is toggled=
-.
-+	 */
-+	if (lo->lo_flags & LO_FLAGS_DIRECT_IO)
-+		lim->dma_alignment =3D max_t(unsigned int, lo->lo_dio_mem_align,
-+					   SECTOR_SIZE - 1);
-+	else
-+		lim->dma_alignment =3D SECTOR_SIZE - 1;
-+}
-+
- static void loop_update_limits(struct loop_device *lo, struct queue_limi=
-ts *lim,
- 		unsigned int bsize)
- {
-@@ -961,6 +986,7 @@ static void loop_update_limits(struct loop_device *lo=
-, struct queue_limits *lim,
- 	lim->logical_block_size =3D bsize;
- 	lim->physical_block_size =3D bsize;
- 	lim->io_min =3D bsize;
-+	loop_set_dma_limit(lo, lim);
- 	lim->features &=3D ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_ROTATIONAL);
- 	if (file->f_op->fsync && !(lo->lo_flags & LO_FLAGS_READ_ONLY))
- 		lim->features |=3D BLK_FEAT_WRITE_CACHE;
-@@ -1416,6 +1442,7 @@ static int loop_set_dio(struct loop_device *lo, uns=
-igned long arg)
- {
- 	bool use_dio =3D !!arg;
- 	unsigned int memflags;
-+	struct queue_limits lim;
-=20
- 	if (lo->lo_state !=3D Lo_bound)
- 		return -ENXIO;
-@@ -1434,6 +1461,9 @@ static int loop_set_dio(struct loop_device *lo, uns=
-igned long arg)
- 		lo->lo_flags |=3D LO_FLAGS_DIRECT_IO;
- 	else
- 		lo->lo_flags &=3D ~LO_FLAGS_DIRECT_IO;
-+	lim =3D queue_limits_start_update(lo->lo_queue);
-+	loop_set_dma_limit(lo, &lim);
-+	queue_limits_commit_update(lo->lo_queue, &lim);
- 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
- 	return 0;
- }
+ 		if (is_read) {
 --=20
 2.52.0
 
