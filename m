@@ -1,74 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B712343BE;
-	Tue, 21 Jul 2026 00:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620DD337BA4
+	for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 02:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784595411; cv=none; b=cemqn2UG1LCOzV2XT7ybCk0IjMKsAAWx0cmzu/nOYKdJcMnAF+XAlbw5W+7E0TfiN29I8NU+r0PkMevXy2ZSXmaItnCcdsAfMhTQj3FvfFF0X9F/hm0IqzLuC/wny/HZShWH4ytZZElQke0jRumWRB5QnGMtNg5k/5QmB1CHDZI=
+	t=1784601384; cv=none; b=Pizk9vxSEzhvkS97rRQJajmGo5V9lHeJE+ManF9UY562gydg0cl8NFXKHRxQPW1d8vM4WOGcNnx3gWwb5p/tPV2cY0zs8EK6eCBLNqR/fyzwSdBFZIb0pAwMxKQBuEICg6qQws3VVEtUH2yxSEL8034HvUFTeaMm/JKRe01X7kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784595411; c=relaxed/simple;
-	bh=JVwnFGCAnbjB/qSE/g8BJHZsuhAls8GNPLWblFmdOto=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FIp+/zXMm63RR9imcC2I4UzzVU4MC/gmmO1GJnIYhVQ5WvBBRy+TbAucU/9ZihyQJZZ9IPuhRo0QilL2paq5n7L0gp4kbDVzMm4YxqwSWfpp0q21+AN45YCfrSbRaBx+GIPqhVo2w/aQAsV+EdqUSTJk5NpdmI2anHMnVcJKWPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iHV5SGCm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784601384; c=relaxed/simple;
+	bh=Bcjr36qrjeZHprXpCoFh09aHa4pmC9UiEgqz8uIuQIo=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=T6ezrT2kuExU3fD9eLoanxXWMbV3SgrRpzEBUpBN0muDxLMLVcwj7AJGN0lLrDlKAoVHnfx7/N6NUzHUfB6Y5U0MTo5XfM6ueiNVU2VqVRu8yX8lcffTQ8IcSaB9wxrKs/TbdR/B1d+BjmGtuD1cpteBETzVX2sHRbLE5HPY12w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CY648WXk; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHV5SGCm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44DBB1F00A3E;
-	Tue, 21 Jul 2026 00:56:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784595410;
-	bh=gGdWM/13jGHuz3wJTyl8SuDGKXG0eRMStW6GAOaGyR8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iHV5SGCmmd8KCF3tfXYtuhTQbTdPOWM/oL1kcXqAT4OoLeErzKlWUvLEFD/E7bTPN
-	 hJV9tjTH2yTAeyb0zvZKYewZolTRO5VFjdb1onkxdwArXR6hkdqSxOKiVwjqoWqR3j
-	 Uofpl7be990MWQpuOAIm6III5VJt+/sbj+zlWmfciP6AuP6DqhGJJ+8Bv/Q6inCjvP
-	 XbjIhA8+kcmCyCkRQoJ84ROQBaY6OgE1vxQp12Nu6cIh6DojMQ+xci8hbpfKZHF1Pv
-	 JFmm6+HfYtmOoDK8cJ2ab7ix05txf2kxZ2RiY9AFT0QSkPeaOIawO5b/OuFAcGcw6O
-	 L2V9bGTqauTTw==
-From: Sasha Levin <sashal@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Sasha Levin <sashal@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Boqun Feng <boqun@kernel.org>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	stable@vger.kernel.org,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Subject: Re: [PATCH 6.12.y] rust: block: `allow(deprecated)` for `fetch_update` for Rust >= 1.99.0
-Date: Mon, 20 Jul 2026 20:56:23 -0400
-Message-ID: <20260720175500.0016-stable-reply@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CANiq72nLTuv2s71bNBVV85bTbWriiCdhG_O+-=t+1Ubv-sHFJw@mail.gmail.com>
-References: <CANiq72nLTuv2s71bNBVV85bTbWriiCdhG_O+-=t+1Ubv-sHFJw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CY648WXk"
+Message-ID: <49b87018-952e-4ec1-8c23-833c2cd88f3a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784601380;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=467IXcSrQPHtgxAsAnztPpkNUe8fIE7pYnj4OHkNsPU=;
+	b=CY648WXk+9vKwceZJHsEunWBv/fzxPZHGrpCsKsCm9uBO+al8efDiGzwEatlYRfxGQiguq
+	lnXN6VPZE2AUPzeYXPza0LTj4yXiSFK5mz6sskH0AMmdu67UCYQpcFDSnef6OUlpdcr5N+
+	0G3YFTs6DS3lHAHyxE/Da+KAd/4NKxM=
+Date: Tue, 21 Jul 2026 10:36:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Cc: cui.tao@linux.dev, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>, Omar Sandoval <osandov@fb.com>,
+ Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tao Cui <cuitao@kylinos.cn>
+Subject: Re: [PATCH] block/blk-stat: fix mean loss when re-summing aggregated
+ stats
+To: Tang Yizhou <tangyeechou@gmail.com>, Jens Axboe <axboe@kernel.dk>
+References: <20260720133813.45150-1-cui.tao@linux.dev>
+ <296cbf18-86da-4c1b-832d-a27a78881dd8@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <296cbf18-86da-4c1b-832d-a27a78881dd8@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
->> Warning: this is a 6.12.y-only patch -- I assume you prefer something
->> local like this instead of backporting the commit that made this go away
->> later with the move to `Refcount`.
->
-> Cc'ing stable here in the reply.
 
-Queued for 6.12, thanks.
 
--- 
+在 2026/7/21 01:05, Tang Yizhou 写道:
+> On 20/7/26 9:38 pm, Tao Cui wrote:
+>> From: Tao Cui <cuitao@kylinos.cn>
+>>
+>> blk_rq_stat_sum() folds src into dst but only advances dst->mean and
+>> dst->nr_samples, leaving dst->batch untouched.  The mean is computed
+>> from src->batch (the raw per-cpu sum), so a stat that has already been
+>> through one sum carries batch=0; if that aggregated stat is then used
+>> as the src of another sum, its samples add nothing to the new mean.
+>>
+>> iolatency hits exactly that: iolatency_check_latencies() first sums the
+>> per-cpu stats into a local stat, then sums that local stat into
+>> iolat->cur_stat.  After the first sum the local stat has batch=0, so
+>> every later window drives cur_stat->mean toward zero.  On non-SSD
+> 
+> Good catch, this is indeed a real issue.
+> 
+>> devices it stays at 0, making the latency_sum_ok(&cur_stat) check that
+>> gates scaling up always true -- the scale-up hysteresis is effectively
+>> defeated.  SSD devices use the percentile path and are unaffected.
+>>
+>> Keep dst->batch in sync across sums so an aggregated stat can be reused
+>> as a src.  blk_rq_stat.batch is internal to blk_rq_stat_init/_add/_sum
+>> (no other reader in the tree), so the wbt and blk-mq consumers, which
+>> only read ->mean/->min/->nr_samples, behave as before.
+>>
+>> Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
+>> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+>>
+>> ---
+>>  block/blk-stat.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/block/blk-stat.c b/block/blk-stat.c
+>> index de126e1ea5ac..4d4781350083 100644
+>> --- a/block/blk-stat.c
+>> +++ b/block/blk-stat.c
+>> @@ -36,6 +36,7 @@ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
+>>  	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
+>>  				dst->nr_samples + src->nr_samples);
+>>  
+>> +	dst->batch += src->batch;
+> 
+> This change doesn't actually fix the issue. As you already found, the local
+> stat's batch is 0. Also, according to the comment of blk_rq_stat_sum(), @src is
+> a per-CPU stat, so there is no issue in blk_stat_timer_fn(). Your change would
+> actually make this case look strange.
+> 
+You're right. blk_rq_stat_sum() is contracted on a raw per-cpu src,
+which blk_stat_timer_fn() honors; the actual misuse is iolatency
+feeding an already-aggregated stat at blk-iolatency.c. I'll drop
+the blk-stat.c change and fix it on the iolatency side — merging
+cur_stat with the per-window stat by their reconstructed totals, since
+both already carry a valid mean. Will send a v2.
+
 Thanks,
-Sasha
+Tao
+
