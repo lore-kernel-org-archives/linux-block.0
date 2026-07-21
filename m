@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011D439FD4;
-	Tue, 21 Jul 2026 05:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D4B2DECCB;
+	Tue, 21 Jul 2026 05:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784612997; cv=none; b=Ck2OWMahBqIg9LxyJA5CWbeqQZMqA4JhZpiAEX+BKtDkgJ0ptx8GW5rU9+g7UFIa5yxMgRoPfvAt3YiZzkZSsSz3HrmbDhHZCuvpM5JIDjBR+KPukskaP7tzq01NO/EZc1F4qZ3IcbV83S/zGbSk/8NPHMNoZaJEsl4nuuq9NNw=
+	t=1784613597; cv=none; b=AYUB5+vEztWjRX0A+XRl02o/+EzMwmVjGOYutCnPK99l37XhiygFfrffQ2CtsDt7nye4mrw82T28bc6IGpasOetsDZXPD6iaQVwIYlrTwqFZu/Qe3kq3IkqHMQNSbb/wAGoR2R/e+5aUwr9hjYPkfgZkIKHRITa8VhJaMP+MKsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784612997; c=relaxed/simple;
-	bh=FuZYnIrq3qmEuTRQrY/oPdKvxjN2PTG+Y8UR/oOfiGE=;
+	s=arc-20240116; t=1784613597; c=relaxed/simple;
+	bh=wkK8Eik/JY5z7LKeR4wODhpZg74AKBRgJI3oOf9JvTs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iyMmyc8EeEp/gp4lLyiKK1rlge2ZUsUwIz11aH2r5KaX5Fb8XPdkYw1rOdvd87jMRY9V96FTeZDV6MdNYb5ripJkofIE0JwVrAftGAkXhH+6RpBbafzWlfULLstnqr70h46QG6CCMDygfFkrtjwX07atJrsADouz5jQtVTXcnXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=lFoJnJ/Z; arc=none smtp.client-ip=217.72.192.74
+	 In-Reply-To:Content-Type; b=PgA/B33dkR9WKVE3L6be7TK9ITuGazuR6J643XV7W9JT5Y+D5yvPHjiUuOzzRflG7rPOJE6pCYIM7BCWBJxNtsQec1LsbLhBIAirMBZCydEB5Tw/D9zDr2zcJxchFVrzdoKn8Ao8/hYMh33rDqqhxR9cmiMoO2LmRQ4ZeEHcnOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=SfbHMiHQ; arc=none smtp.client-ip=212.227.17.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="lFoJnJ/Z"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="SfbHMiHQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784612987; x=1785217787; i=laurent@vivier.eu;
-	bh=l1EEmXual/CmENi0X75pDrQceWfSuMf0rOB6ltHG0S4=;
+	s=s1-ionos; t=1784613593; x=1785218393; i=laurent@vivier.eu;
+	bh=EjrJI+iykxRjD1LXrVLRB66bUNOhQN8Hh9Hwg2NHqQ4=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=lFoJnJ/ZYg6j815c6N7gINbPCJ0fn3MPQBws44OpF+1wKx+II8alQY4YpxJBQsDP
-	 gSPOhQKq0eBCZeDmpzUXdpokHooKABZHSVwavKarYOAxrh0NbjB9XkoUwSg6HjySN
-	 cbv5FsQhD1AAGDgzJS4JF3x5fVednFaRGeE4W4kE4p57EHhNSk3LOaCJNH1Zf/Cuc
-	 yqv7cbN174tGit5qCxh1jkchHCRrJq4XpbMD//mr/YQVLtUiIHtQslB725xTBu22G
-	 N6Uc1Qx250Ajt0Iggf1oRBpbnL2aZt9L5uOxi20ipL+i9zH8bQWJfVJ81flT1DRI0
-	 K4og/wJKSu336fbw/Q==
+	b=SfbHMiHQGGDcqX/i+9KLqG7L8eQk0gURCdQMvDN4onfEYDZRnRPcgZV5n5ne/Y/h
+	 BgOO5rlQ+mPD1XN6d1dpywvKjc6bIpsCnbA4bpIIbVy81cWfQIEBYfA6oAtfLgpUF
+	 yHz2b8D3iEzdU4q2TzDtH/bgQu9mQmJBAYA3FUu865cGEZ+5frMXkKVgiXfpK/g4k
+	 3LyWqLV82P9e+9FyNGQA5W0SJzUYG8qkqnafUleZJ1q1bVtG95YqvcrvTjoJFmFiH
+	 mxfVj6nkBeatvlAFBiEjK+OkFZa/kYZB5xEh6UbKTPly1wAUde4N1lSJatq9VCP4N
+	 xUjeiLmEBQgTaAj8nA==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
 Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1M8hEd-1whOeo1Juz-00EZ7p; Tue, 21
- Jul 2026 07:49:47 +0200
-Message-ID: <91d2afca-fcdc-43fe-ae1d-217dbc6fe6e3@vivier.eu>
-Date: Tue, 21 Jul 2026 07:49:46 +0200
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1M5gAG-1weudn1ih8-00Hahv; Tue, 21
+ Jul 2026 07:59:53 +0200
+Message-ID: <d7af2b83-d5ff-4a98-9008-6209efb9a243@vivier.eu>
+Date: Tue, 21 Jul 2026 07:59:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 15/31] swim: Don't use the mark register to read data
+Subject: Re: [PATCH 16/31] swim: Fix buffer overflow
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <c25cd3fe9919ad85d1e2147a294bfbd6ae2a2c21.1784196135.git.fthain@linux-m68k.org>
+ <afaeaf8ed29a73e1b361519b542269c4a57a1713.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,155 +94,128 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <c25cd3fe9919ad85d1e2147a294bfbd6ae2a2c21.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <afaeaf8ed29a73e1b361519b542269c4a57a1713.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zpO4/CF+YU6isRjZK1CNLpq5JtQDOjBNnYmGhYgnOKj1LgA60d3
- wO5uD4a45cYUA5Dklsd/gVq8N1/ey9JWL6IMjgU8Q8k4Apdk7pVLDk/cf1H8Q+n+y9duwQl
- 8avN2exQ1Mn25o5IJgVXiAe9l5zrRl7WzDnKeXIkmYyaX9jmK6fwIYvTEzj5c8kOb23wefU
- lsmnIpoRJu2nSWMppR5JQ==
+X-Provags-ID: V03:K1:zipMuL4y7zQYDA8iDwn8FPi0RjSB3U1Y0ljkz4O2bR3C3UIPmLX
+ TARoL6OQCbF0n9xqwVAf6FZdJWTvN0jP4NYmjarYKvF9kjzsfNCzl87Dhm4XMBfJuxqBHRD
+ V9Dbqtev8ryAVAvruNFIoOvf1lW7U1kceq6dj31EyI8L7FcWxNNpXYwSvz0F1aQoahijkpI
+ qc6Dz3Yem23eE8zCY7cPg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:i5H9MnOoeDE=;kKvyeidP4RSmLgTUZXuSvB+A3IW
- 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
- lSaj1oQJDG747JJAFci+Owpc1UA50=
+UI-OutboundReport: notjunk:1;M01:P0:IkVs4cBbYH0=;2YlE3f+p5s+vDNewp0q3gF13oI+
+ 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
+ XMyfmvriiSrG2YxLQ3SFx1zLb6/2s=
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> If an unexpected mark byte were to be read from the data register, an
-> error would be flagged. But no error gets flagged when such a byte is
-> read from the mark register, which is misleading. Always use the data
-> register except when a mark byte is expected.
+> The effect of this bug can be observed as swim_read_sector_data()
+> inexplicably returning -5, or an error flag indicating that a mark byte
+> was read from the data register, or other odd behviour.
+>=20
+> When copying bytes from the chip FIFO to the read buffer, the driver
+> keeps count of the remaining buffer space using register %d4. A counter
+> in register %d2 serves as a timeout. The driver polls (%a2), the handsha=
+ke
+> register, until flags indicate that byte(s) have arrived in the FIFO.
+>=20
+>          movel   #sector_size-1, %d4
+> read_new_data:
+>          movew   #max_retry, %d2
+> read_data_loop:
+>          moveb   %a2@, %d5
+>          andb    #0xc0, %d5
+>          dbne    %d2, read_data_loop
+>          beq     data_exit
+>          moveb   %a5@, %a4@+
+>          andb    #0x40, %d5
+>          dbne    %d4, read_new_data
+>          beq     exit_loop
+>=20
+> Note that the exit_loop branch depends upon a flag in the handshake
+> register and not on the remaining buffer space. Hence there may be no
+> branch to exit_loop after %d4 is decremented to -1 (i.e. full buffer).
+>=20
+>          moveb   %a5@, %a4@+
+>          dbra    %d4, read_new_data
+> exit_loop:
+>=20
+> Here is a second decrement of %d4 which can now reach -2. But the buffer
+> bounds check is a comparison with -1, which is now ineffective. Hence th=
+e
+> loop will continue copying until %d2 eventually reaches -1.
+>=20
+> Fix this bug by terminating the loop as soon as %d4 or %d2 reach -1.
+> Reset the timeout whenever a byte is copied.
 >=20
 > Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim_asm.S | 21 +++++++++++----------
->   1 file changed, 11 insertions(+), 10 deletions(-)
+>   drivers/block/swim_asm.S | 15 +++++++++------
+>   1 file changed, 9 insertions(+), 6 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 >=20
 > diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-> index 1d394ee930d6..5caeba3a75d8 100644
+> index 5caeba3a75d8..ae767da671e3 100644
 > --- a/drivers/block/swim_asm.S
 > +++ b/drivers/block/swim_asm.S
-> @@ -47,11 +47,11 @@
+> @@ -43,6 +43,8 @@
+>   	.equ	sector_size, 512
+>  =20
+>   	.equ	.Lhr_crc_error,		0x02
+> +	.equ	.Lhr_fifo_2bytes,	0x40
+> +	.equ	.Lhr_fifo_1byte,	0x80
+>  =20
 >   	.global swim_read_sector_header
 >   swim_read_sector_header:
->   	link	%a6, #0
-> -	moveml	%d1-%d5/%a0-%a4,%sp@-
-> +	moveml	%d1-%d5/%a0-%a5,%sp@-
->   	movel	%a6@(0x0c), %a4
->   	moveq	#-1, %d0
->   	bsr	mfm_read_addrmark
-> -	moveml	%sp@+, %d1-%d5/%a0-%a4
-> +	moveml	%sp@+, %d1-%d5/%a0-%a5
->   	unlk	%a6
->   	rts
+> @@ -192,16 +194,17 @@ read_new_data:
+>   	movew	#max_retry, %d2
+>   read_data_loop:
+>   	moveb	%a2@, %d5
+> -	andb	#0xc0, %d5
+> +	andb	#(.Lhr_fifo_2bytes + .Lhr_fifo_1byte), %d5
+> +	beq	1f
+> +	movew	#max_retry, %d2
+> +	moveb	%a5@, %a4@+
+> +	dbra	%d4, 1f
+> +	bra	data_crc0
+> +1:	andb	#.Lhr_fifo_2bytes, %d5
+>   	dbne	%d2, read_data_loop
+>   	beq	data_exit
+>   	moveb	%a5@, %a4@+
+> -	andb	#0x40, %d5
+> -	dbne	%d4, read_new_data
+> -	beq	exit_loop
+> -	moveb	%a5@, %a4@+
+>   	dbra	%d4, read_new_data
+> -exit_loop:
 >  =20
-> @@ -63,6 +63,7 @@ sector_data_mark:
->   mfm_read_addrmark:
->   	movel	%a6@(0x08), %a3
->   	lea	%a3@(read_handshake), %a2
-> +	lea	%a3@(read_data), %a5
->   	lea	%a3@(read_mark), %a3
->   	movew	#seek_time, %d2
+>   	/* read CRC */
 >  =20
-> @@ -93,7 +94,7 @@ amark0:	tstb	%a2@
->   	dbmi	%d2, amark0
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_track)
-> +	moveb	%a5@, %a4@(o_track)
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -101,7 +102,7 @@ amark1:	tstb	%a2@
->   	dbmi	%d2, amark1
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_side)
-> +	moveb	%a5@, %a4@(o_side)
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -109,7 +110,7 @@ amark2:	tstb	%a2@
->   	dbmi	%d2, amark2
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_sector)
-> +	moveb	%a5@, %a4@(o_sector)
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -117,7 +118,7 @@ amark3:	tstb	%a2@
->   	dbmi	%d2, amark3
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_size)
-> +	moveb	%a5@, %a4@(o_size)
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -125,7 +126,7 @@ crc0:	tstb	%a2@
->   	dbmi	%d2, crc0
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_crc0)
-> +	moveb	%a5@, %a4@(o_crc0)
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -133,7 +134,7 @@ crc1:	moveb	%a2@, %d5
->   	dbmi	%d2, crc1
->   	bpl	signal_nonyb
->  =20
-> -	moveb	%a3@, %a4@(o_crc1)
-> +	moveb	%a5@, %a4@(o_crc1)
->  =20
->   	andb	#.Lhr_crc_error, %d5
->   	bne	signal_nonyb
-> @@ -211,7 +212,7 @@ data_crc0:
->   	dbmi	%d2, data_crc0
->   	bpl	data_exit
->  =20
-> -	moveb	%a3@, %d2
-> +	moveb	%a5@, %d2
->  =20
->   	moveq	#max_retry, %d2
->  =20
-> @@ -221,7 +222,7 @@ data_crc1:
->   	dbmi	%d2, data_crc1
->   	bpl	data_exit
->  =20
-> -	moveb	%a3@, %d2
-> +	moveb	%a5@, %d2
->  =20
->   	andb	#.Lhr_crc_error, %d5
->   	bne	data_exit
 
