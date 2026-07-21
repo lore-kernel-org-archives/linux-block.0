@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D4B2DECCB;
-	Tue, 21 Jul 2026 05:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A79C2BE7DD;
+	Tue, 21 Jul 2026 06:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784613597; cv=none; b=AYUB5+vEztWjRX0A+XRl02o/+EzMwmVjGOYutCnPK99l37XhiygFfrffQ2CtsDt7nye4mrw82T28bc6IGpasOetsDZXPD6iaQVwIYlrTwqFZu/Qe3kq3IkqHMQNSbb/wAGoR2R/e+5aUwr9hjYPkfgZkIKHRITa8VhJaMP+MKsk=
+	t=1784613803; cv=none; b=OHE6qmLUAkrhT+Rq94ZAs93lXNFIW2E2fHzr21KaujtTgXyXvR2iZz5hJNwke/msTmN0a0M06O8hToH3s1Q/UZiI0hGv+YkYjtpBcjwrOeIFwq9h1sTr/OsKg6YA/X0X2NECPjNxpGP8VQEnNLvTG5RwVo+QhHhpdL5uU/E0r5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784613597; c=relaxed/simple;
-	bh=wkK8Eik/JY5z7LKeR4wODhpZg74AKBRgJI3oOf9JvTs=;
+	s=arc-20240116; t=1784613803; c=relaxed/simple;
+	bh=r8s9HmFvS4LchEp1JX5VWrk9H8sI40WvnsZfpHB1MVY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PgA/B33dkR9WKVE3L6be7TK9ITuGazuR6J643XV7W9JT5Y+D5yvPHjiUuOzzRflG7rPOJE6pCYIM7BCWBJxNtsQec1LsbLhBIAirMBZCydEB5Tw/D9zDr2zcJxchFVrzdoKn8Ao8/hYMh33rDqqhxR9cmiMoO2LmRQ4ZeEHcnOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=SfbHMiHQ; arc=none smtp.client-ip=212.227.17.10
+	 In-Reply-To:Content-Type; b=Y560GPcNfTcsOABlRVBwQctTgaqqxkLZrPv8sI4A+jh+/+DVepsEYEnpHCh/fKF6zocPjCji3nhBLJZlY/go6TjWJs99S2uh0R6heg2T8ltuA486+BEAiaX9I9BfYOP4QqPIMk7Z8MeoEU5tnvki2xNfFYIsYBGIFGNKT5a6XJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=SImjA2PV; arc=none smtp.client-ip=212.227.17.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="SfbHMiHQ"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="SImjA2PV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784613593; x=1785218393; i=laurent@vivier.eu;
-	bh=EjrJI+iykxRjD1LXrVLRB66bUNOhQN8Hh9Hwg2NHqQ4=;
+	s=s1-ionos; t=1784613797; x=1785218597; i=laurent@vivier.eu;
+	bh=5jy/aNxoBQ7MOYujklIiGO1Rx0sDbGP81UyGjEwYbdQ=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=SfbHMiHQGGDcqX/i+9KLqG7L8eQk0gURCdQMvDN4onfEYDZRnRPcgZV5n5ne/Y/h
-	 BgOO5rlQ+mPD1XN6d1dpywvKjc6bIpsCnbA4bpIIbVy81cWfQIEBYfA6oAtfLgpUF
-	 yHz2b8D3iEzdU4q2TzDtH/bgQu9mQmJBAYA3FUu865cGEZ+5frMXkKVgiXfpK/g4k
-	 3LyWqLV82P9e+9FyNGQA5W0SJzUYG8qkqnafUleZJ1q1bVtG95YqvcrvTjoJFmFiH
-	 mxfVj6nkBeatvlAFBiEjK+OkFZa/kYZB5xEh6UbKTPly1wAUde4N1lSJatq9VCP4N
-	 xUjeiLmEBQgTaAj8nA==
+	b=SImjA2PVua+1CpkXusyMNaOX/D5XKjSk4bKma1E+KQPJ8obZ/pvIg7hrXW/PqtIx
+	 1a8r/BzAmyJARi1TVSVM4O1rQEmISmz9SHphAVgo5MA7D6xV3zZKM7fBbOV2tP5dg
+	 GdNEqe/0HBD1S4zR9KwpRbxPUpRIFWv2xKGRokgmzNEKiiIg/sVFdAONa3uS+8jPr
+	 ygeQew0USVG9Km4GxjZett3DTBjPRK2ldKwD9Tem6YF+0+UHOsY52p0cgQ7dUY1IY
+	 hGtbIDtXWkvgVO/R6C94Rexhapq+BELHwz2/EL/HsR1TLdwsky4Y8ZZMkQabpi8Zy
+	 4vRuVKe8sGOJOXYCWA==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1M5gAG-1weudn1ih8-00Hahv; Tue, 21
- Jul 2026 07:59:53 +0200
-Message-ID: <d7af2b83-d5ff-4a98-9008-6209efb9a243@vivier.eu>
-Date: Tue, 21 Jul 2026 07:59:52 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue109
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1Mbj3Y-1xHXEx1MkQ-00db65; Tue, 21
+ Jul 2026 08:03:17 +0200
+Message-ID: <71650fbe-572b-48f3-a5e3-de266bb5c69b@vivier.eu>
+Date: Tue, 21 Jul 2026 08:03:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,14 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/31] swim: Fix buffer overflow
+Subject: Re: [PATCH 17/31] swim: Convert to blocking queue
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+ linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
+ Omar Sandoval <osandov@fb.com>
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <afaeaf8ed29a73e1b361519b542269c4a57a1713.1784196135.git.fthain@linux-m68k.org>
+ <33f99f4aad5a482c5465bcef4d3542cbb2a51dbf.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,128 +95,119 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <afaeaf8ed29a73e1b361519b542269c4a57a1713.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <33f99f4aad5a482c5465bcef4d3542cbb2a51dbf.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zipMuL4y7zQYDA8iDwn8FPi0RjSB3U1Y0ljkz4O2bR3C3UIPmLX
- TARoL6OQCbF0n9xqwVAf6FZdJWTvN0jP4NYmjarYKvF9kjzsfNCzl87Dhm4XMBfJuxqBHRD
- V9Dbqtev8ryAVAvruNFIoOvf1lW7U1kceq6dj31EyI8L7FcWxNNpXYwSvz0F1aQoahijkpI
- qc6Dz3Yem23eE8zCY7cPg==
+X-Provags-ID: V03:K1:knhxwteij36lWcWaVQf7dPfVN59/J8W2232O6OY3WS4BEZnZe1J
+ co0l72sMNHggr0+SZF1p0RgyJ5p5WjFOA5XS5sWic2+I/fkWIy8tgg0JJKEAEOUoLAQLy9Z
+ 8oVlSP1Ucx5spWty41iVXh57PZGspJAqpAdGc6ilMSQmyq74lFjkRt0dCRQSovmIrgM1adU
+ eDPnAEe/D02WCcyrh9S5g==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:IkVs4cBbYH0=;2YlE3f+p5s+vDNewp0q3gF13oI+
- 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
- XMyfmvriiSrG2YxLQ3SFx1zLb6/2s=
+UI-OutboundReport: notjunk:1;M01:P0:Z4zfJ9DAojE=;sXlZAU18lEV7XTblDgSJXETuSUz
+ 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
+ =
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> The effect of this bug can be observed as swim_read_sector_data()
-> inexplicably returning -5, or an error flag indicating that a mark byte
-> was read from the data register, or other odd behviour.
+> These drives are slow: completing a request can take hundreds of
+> milliseconds. Delays are managed by disabling interrupts judiciously and
+> sleeping opportunistically.
 >=20
-> When copying bytes from the chip FIFO to the read buffer, the driver
-> keeps count of the remaining buffer space using register %d4. A counter
-> in register %d2 serves as a timeout. The driver polls (%a2), the handsha=
-ke
-> register, until flags indicate that byte(s) have arrived in the FIFO.
+> As of commit e3896d77b702 ("swim: convert to blk-mq"), a spinlock is
+> taken in irq mode as soon as a request is issued. That lock is held for
+> the duration of the request. Hence the driver sleeps while holding the
+> lock which is forbidden.
 >=20
->          movel   #sector_size-1, %d4
-> read_new_data:
->          movew   #max_retry, %d2
-> read_data_loop:
->          moveb   %a2@, %d5
->          andb    #0xc0, %d5
->          dbne    %d2, read_data_loop
->          beq     data_exit
->          moveb   %a5@, %a4@+
->          andb    #0x40, %d5
->          dbne    %d4, read_new_data
->          beq     exit_loop
->=20
-> Note that the exit_loop branch depends upon a flag in the handshake
-> register and not on the remaining buffer space. Hence there may be no
-> branch to exit_loop after %d4 is decremented to -1 (i.e. full buffer).
->=20
->          moveb   %a5@, %a4@+
->          dbra    %d4, read_new_data
-> exit_loop:
->=20
-> Here is a second decrement of %d4 which can now reach -2. But the buffer
-> bounds check is a comparison with -1, which is now ineffective. Hence th=
+> Adopt BLK_MQ_F_BLOCKING and remove the spinlock. Use a mutex to serializ=
 e
-> loop will continue copying until %d2 eventually reaches -1.
+> requests from the two request queues. (The chip cannot simultaneously
+> process requests on both internal and external drive.)
 >=20
-> Fix this bug by terminating the loop as soon as %d4 or %d2 reach -1.
-> Reset the timeout whenever a byte is copied.
->=20
-> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+> Cc: Omar Sandoval <osandov@fb.com>
+> Fixes: e3896d77b702 ("swim: convert to blk-mq")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim_asm.S | 15 +++++++++------
->   1 file changed, 9 insertions(+), 6 deletions(-)
+>   drivers/block/swim.c | 11 +++--------
+>   1 file changed, 3 insertions(+), 8 deletions(-)
+>=20
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
->=20
-> diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-> index 5caeba3a75d8..ae767da671e3 100644
-> --- a/drivers/block/swim_asm.S
-> +++ b/drivers/block/swim_asm.S
-> @@ -43,6 +43,8 @@
->   	.equ	sector_size, 512
+> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+> index e2a8c4ba4e39..6f93ebaaffb7 100644
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+> @@ -211,7 +211,6 @@ enum head {
 >  =20
->   	.equ	.Lhr_crc_error,		0x02
-> +	.equ	.Lhr_fifo_2bytes,	0x40
-> +	.equ	.Lhr_fifo_1byte,	0x80
+>   struct swim_priv {
+>   	struct swim __iomem *base;
+> -	spinlock_t lock;
+>   	int floppy_count;
+>   	struct floppy_state unit[FD_MAX_UNIT];
+>   };
+> @@ -537,12 +536,10 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw=
+_ctx *hctx,
+>   				  const struct blk_mq_queue_data *bd)
+>   {
+>   	struct floppy_state *fs =3D hctx->queue->queuedata;
+> -	struct swim_priv *swd =3D fs->swd;
+>   	struct request *req =3D bd->rq;
+>   	blk_status_t err;
 >  =20
->   	.global swim_read_sector_header
->   swim_read_sector_header:
-> @@ -192,16 +194,17 @@ read_new_data:
->   	movew	#max_retry, %d2
->   read_data_loop:
->   	moveb	%a2@, %d5
-> -	andb	#0xc0, %d5
-> +	andb	#(.Lhr_fifo_2bytes + .Lhr_fifo_1byte), %d5
-> +	beq	1f
-> +	movew	#max_retry, %d2
-> +	moveb	%a5@, %a4@+
-> +	dbra	%d4, 1f
-> +	bra	data_crc0
-> +1:	andb	#.Lhr_fifo_2bytes, %d5
->   	dbne	%d2, read_data_loop
->   	beq	data_exit
->   	moveb	%a5@, %a4@+
-> -	andb	#0x40, %d5
-> -	dbne	%d4, read_new_data
-> -	beq	exit_loop
-> -	moveb	%a5@, %a4@+
->   	dbra	%d4, read_new_data
-> -exit_loop:
+> -	if (!spin_trylock_irq(&swd->lock))
+> -		return BLK_STS_DEV_RESOURCE;
+> +	mutex_lock(&swim_mutex);
 >  =20
->   	/* read CRC */
+>   	blk_mq_start_request(req);
+>  =20
+> @@ -560,7 +557,7 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw_c=
+tx *hctx,
+>  =20
+>   	err =3D BLK_STS_OK;
+>   out:
+> -	spin_unlock_irq(&swd->lock);
+> +	mutex_unlock(&swim_mutex);
+>   	return err;
+>  =20
+>   }
+> @@ -839,11 +836,9 @@ static int swim_floppy_init(struct platform_device =
+*pdev)
+>   		return -EBUSY;
+>   	}
+>  =20
+> -	spin_lock_init(&swd->lock);
+> -
+>   	for (drive =3D 0; drive < swd->floppy_count; drive++) {
+>   		err =3D blk_mq_alloc_sq_tag_set(&swd->unit[drive].tag_set,
+> -				&swim_mq_ops, 2, 0);
+> +				&swim_mq_ops, 2, BLK_MQ_F_BLOCKING);
+>   		if (err)
+>   			goto exit_put_disks;
 >  =20
 
