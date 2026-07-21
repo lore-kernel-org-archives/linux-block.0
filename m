@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9703290B7;
-	Tue, 21 Jul 2026 06:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F93D40861E;
+	Tue, 21 Jul 2026 06:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784614218; cv=none; b=m5roHH1lb2fTAYPNYL/Dn2Y3IfiJJU1FmFuz71oF3vRGWQT0C+2Nx39fB6yCNGY6rKCBRaC/33X2gHOj/XKuBLpzLvX/wtNt4wUDmft7QcKTEqJd8/WG1iQqDUAxCJmpjN4Xlkg/Jc+eLN7s0Da/COvYuHx4q/MyDhdGrZHrh20=
+	t=1784615035; cv=none; b=bKGIchXpoMY5e7pnRJNN9w630oqn9L7v54ezgedLZXCE5yhe4JaSZF8LZfcwnCG4rS7SlPkM1NRmWpMfxblC3+Rci+ZHMsF+hnyf1c69hxe/sLgELor1B8U9CfxvjTUvpyQnLVEJRJT+aoCduYhGtDa0TnQv4Dp3IDuk8K07iuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784614218; c=relaxed/simple;
-	bh=Ez0kmVBDVgH/czqbSKTwTrF7hNc3+b1SIIrtv49gxNk=;
+	s=arc-20240116; t=1784615035; c=relaxed/simple;
+	bh=I0oOUGx29KqvQ3e1WFYBDgKPo6BQsbw4m0mHpB01rPU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rBcp5XAWgfkxsQFmzbRQ2qxHYZ8ounrW3aU3z42s+MSNki5iCVdDZbaz1b/CL29FHyt+SYOiPc9RPEZ6rMlyJBBiZHEvIW+kLVC77RS8POxuAlLIJCb20N8YypdicI3CuNV79nA+bQnLL41sVu8ueJpVAwj4waf1MAXUUlgXRmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=CrWzPM+h; arc=none smtp.client-ip=212.227.17.13
+	 In-Reply-To:Content-Type; b=G1sfYcuD+0su6oSXPJiDNp/KNZZwZKlNeMUb1Ihi586AmLxsLq2tQBM6ylinf0pkxiNtKK5B3A9nvxBp88sawa8fTPW/DKh9aLzfehRkCHc6fV364QscoHrMvAAYJj0ThMoHW7hNbPawLdE4BIy1bgszLA15sW7ZR/WIC4/7I+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=ccdEpHbo; arc=none smtp.client-ip=212.227.17.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="CrWzPM+h"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="ccdEpHbo"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1784614213; x=1785219013; i=laurent@vivier.eu;
-	bh=+sPjVGOFsIs4O89gUm/+dj3GhZce6LDyhz7hqBx9UXI=;
+	s=s1-ionos; t=1784615031; x=1785219831; i=laurent@vivier.eu;
+	bh=I0oOUGx29KqvQ3e1WFYBDgKPo6BQsbw4m0mHpB01rPU=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=CrWzPM+hWSHQsNG9pdWpEK01PC3RuyWwckYhLlLf8k3a5/fy95jBtbYy6pkO5q2G
-	 hNpWGYjXkRE6dmraAlKK41Zp8u+U6tjjYPdk42U4pzp1kb/bK57ncBkSyTg4vOzHB
-	 HHKO+fIRfEK2/QW/yfHOc/OlfLHiRIo5ozSwLwZZJkhC4cnjmICLw45hwi8bxUAZK
-	 wNO7DMJGibUG7YrNFhkL1mqmTy28VLHMmXOGAtfeeAgFQ4G/H+0WavlO4a+rx8Fp6
-	 wf2mePwftJlIbc6GxABgnI1na8Hkl2lw7mPgxtO/9VgUP11Uz9120MxGO6fbsLjgk
-	 COU1ahE8b/Q/I/+o+Q==
+	b=ccdEpHbo8QRThg/id4mauka0MqCyEOSUnF7UnPSf6ttr0IAedDCbfBUt63X3Cp3/
+	 G16KmF9owBXot/C6PGwLOGgnMdBqeI3UREyABTYayx/grh+mr+TBxduyNLLpgJmgC
+	 f4s8BzxTdynYKk/bhUpErJtAbDFpUMjpkCrbSYVLOqpMj+bkGv/ddRcV6ennyzdwj
+	 O3vLE2aiVbOkZq0k8oYi3OfTnWxcwDAh28Ye+VamsqUXNOuN5auBVQiv/WcnRciyG
+	 yrWSv3G068DpjMmO0uoBkjGRI2i3BHnr52wo3Br1iWOzsFQzAS0jkJ/I8/TJidB3K
+	 ZBkwU0ulOajuJgopgQ==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1M3UEW-1wlViR3E3e-008Egh; Tue, 21
- Jul 2026 08:10:13 +0200
-Message-ID: <58552253-50c1-4add-82d7-567526a85d91@vivier.eu>
-Date: Tue, 21 Jul 2026 08:10:13 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1MNso2-1wNvId0X7Y-00X4Bp; Tue, 21
+ Jul 2026 08:23:51 +0200
+Message-ID: <e4544f42-df6d-49b7-96ab-f0235ff67f7c@vivier.eu>
+Date: Tue, 21 Jul 2026 08:23:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,15 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/31] swim: Remove redundant RELAX actions
-To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+Subject: Re: [PATCH 01/31] swim: Assert strobe with stable outputs
+To: Finn Thain <fthain@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <46e56724a3d8a9268ff2d086e21e23b6a0b2d97e.1784196135.git.fthain@linux-m68k.org>
+ <998aeb6ae4536503516df34ae38709835c61c8cb.1784196135.git.fthain@linux-m68k.org>
+ <c71fd9de-6379-4d45-9443-b3036aab889b@vivier.eu>
+ <cd820359-cdd4-de54-d397-54094f6571ca@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,122 +96,85 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <46e56724a3d8a9268ff2d086e21e23b6a0b2d97e.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <cd820359-cdd4-de54-d397-54094f6571ca@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:COeJ0ayWe7OVDsLvhin/4ssoX0Ar5D0yEpbBpMF0SwI7rNU/2SZ
- X9tPbai2hE+Z+kYfRHQld4KNyJKWYnznbrJUinfg2E4pI+gsQVeRT25HM+UoQQKjYQ4FWUB
- ZisWA7+gDsAKQNXN+mQVjzgAgXyXiuKquP8l9Sfsyh9E34FTfdM8W+az8JhMBsWMxNGMHxU
- tHfoQLEgvdtvtyRf6+6MQ==
+X-Provags-ID: V03:K1:YZQd8IcCYdulDstkdoQkdKgj7bfo4Zuf+OnSq4Bax4oJuM27TjJ
+ cBFA7pV0d2tLaXKPkbMDGtFLfjaEwCw20BJvtcst3JpKmx67YsBuipOqZqTTWGypf8842yE
+ UXxiC4ysXZ352ZFdA3uOwn5y8Ur4NSpNiGih3jNJ30NZAMSO//v7J6djxNiZye7Mir8iDdU
+ OxQb4ind8bJuUaPidJpGw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:qa6JWVoF8uw=;/x/tm/S9fBsW1EEWXmp29rHQFNB
- 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
+UI-OutboundReport: notjunk:1;M01:P0:+TsHAN/X5j4=;Bj0BuxBtEjA12amtFw1y2xDWuMj
+ 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
+ =
 
-Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> Wherever we have a swim_select() or swim_readbit() call there is an
-> implicit RELAX. That means the caller doesn't have to do it. Remove the
-> redundant code.
+Le 21/07/2026 =C3=A0 07:41, Finn Thain a =C3=A9crit=C2=A0:
 >=20
-> BTW, Inside Macintosh says, "Be sure [...] that CA0 and CA1 are set high
-> before changing SEL." Hence the RELAX found in swim_select(). The SwimII=
-I
-> driver in mkLinux also has that. But the swim3.c driver in Linux is odd:
-> it scatters RELAX actions around as though SEL was not actually under it=
-s
-> control... In anycase, swim.c really does control SEL so there's no need
-> for that here.
+> On Mon, 20 Jul 2026, Laurent Vivier wrote:
 >=20
-> Signed-off-by: Finn Thain <fthain@linux-m68k.org>
-> ---
->   drivers/block/swim.c | 8 +-------
->   1 file changed, 1 insertion(+), 7 deletions(-)
+>> Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
+>>
+>>> Keep the four phase pin directions set to output and hold their levels
+>>> constant during LSTRB signalling.
+>>
+>> Perhaps you can also add a short comment to describe the changes you
+>> made to the defines.
+>>
 >=20
+> Can you clarify please? I think what you're asking is, shouldn't the PH3
+> pin be an input when it's not being used for LSTRB signalling?
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+My question is simpler:
+You added the directions bits in the defines and it's not clear in the com=
+mit message.
+For instance, I can see you update all the defines, but at first glance I =
+didn't understand why.
 
-> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-> index 6f93ebaaffb7..b4bf96a788db 100644
-> --- a/drivers/block/swim.c
-> +++ b/drivers/block/swim.c
-> @@ -336,7 +336,6 @@ static inline void swim_motor(struct swim __iomem *b=
-ase,
->   		swim_action(base, MOTOR_ON);
->  =20
->   		for (i =3D 0; i < 2*HZ; i++) {
-> -			swim_select(base, RELAX);
->   			if (swim_readbit(base, MOTOR_ON))
->   				break;
->   			set_current_state(TASK_INTERRUPTIBLE);
-> @@ -344,7 +343,7 @@ static inline void swim_motor(struct swim __iomem *b=
-ase,
->   		}
->   	} else if (action =3D=3D OFF) {
->   		swim_action(base, MOTOR_OFF);
-> -		swim_select(base, RELAX);
-> +		swim_write(base, phase, RELAX);
->   	}
->   }
->  =20
-> @@ -355,13 +354,11 @@ static inline void swim_eject(struct swim __iomem =
-*base)
->   	swim_action(base, EJECT);
->  =20
->   	for (i =3D 0; i < 2*HZ; i++) {
-> -		swim_select(base, RELAX);
->   		if (!swim_readbit(base, DISK_IN))
->   			break;
->   		set_current_state(TASK_INTERRUPTIBLE);
->   		schedule_timeout(1);
->   	}
-> -	swim_select(base, RELAX);
->   }
->  =20
->   static inline void swim_head(struct swim __iomem *base, enum head head=
-)
-> @@ -385,7 +382,6 @@ static inline int swim_step(struct swim __iomem *bas=
-e)
->   		set_current_state(TASK_INTERRUPTIBLE);
->   		schedule_timeout(1);
->  =20
-> -		swim_select(base, RELAX);
->   		if (!swim_readbit(base, STEP))
->   			return 0;
->   	}
-> @@ -399,8 +395,6 @@ static inline int swim_track00(struct swim __iomem *=
-base)
->   	swim_action(base, SEEK_NEGATIVE);
->  =20
->   	for (try =3D 0; try < 100; try++) {
-> -
-> -		swim_select(base, RELAX);
->   		msleep(3);
->  =20
->   		if (swim_readbit(base, TRACK_ZERO))
+Thanks,
+Laurent
+
+>=20
+> It would be nice if we had specs for the relevant FDD models, to show th=
+at
+> no FDD ever drives the phase lines. Then I could write something more
+> authoritative. I don't have that information but I do have the chip spec=
+s.
+>=20
+> The swim3.c driver never sets phase pin direction because the SWIM3 chip
+> doesn't implement that i.e. the four phase pins are permanently outputs.
+> Similary, the programming model for the IWM chip offers no way to use
+> phase lines as inputs, AFAICT. Same for the uPD72070 FDC chip.
+>=20
+> I will add some of these observations to the commit log or the commentar=
+y
+> in the source code if you think it would help.
+>=20
+> Thanks for your review.
 
