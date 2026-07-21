@@ -1,74 +1,73 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D2F337B99
-	for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 16:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A1F33374F
+	for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 16:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784652161; cv=none; b=Ua1bA5R5Yx7SkG9lfsgYYxIJ2Uv0Wqpf891J9AVTETCRj6jtin63Cl4HOjHT6gMdl/spOOwWna+gjuV6GteBJG0kjOVett7YItOhFV085NmrT1L9lVsq7C96wAI5s4WwBSKgDjLiCj3RLLh3eAmgq7E8i1ucS8qM1cpp4/hKBt8=
+	t=1784652203; cv=none; b=P4VVLwhkzT4B/bBzdfy4YdPbfAgXrBHwXOjoBCX42J58buFZoGZGJDIG9ACjLiUdNXWPCfTUElic6nnayYzq2HlBvWT0Jd9wA+Sv17KZlvwOX14fEM/Hnwx8fBrXM6p44dXoxok+DH4pPwyHvqE9zfJfrP5xVbsxuTkZKvZUxfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784652161; c=relaxed/simple;
-	bh=aMqCQlU/51nTh4McNUnDQbM+oOF6RGhLFFsMPHidHeY=;
+	s=arc-20240116; t=1784652203; c=relaxed/simple;
+	bh=19IcGc/7CN6FJaWvzPDso+RUb7gKc7Q9cSuKvJGU2UQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZmsstEmBF7lu3dQwRAi11hIE0kP1eynjTs93NKh8Pdemo1YL5q/jY0P4zr5FFTMOPEol2zXbMhzK4xsvDiIZnXlKEqK4dWXcR5VuHPxQ6wXtUJ4pcQ/Q9la9aO4aJ5qJRHzbhVx5KmFrD283fhbTEUFXWHni5jh7Nrs41woAUEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEDymNyx; arc=none smtp.client-ip=209.85.216.46
+	 MIME-Version; b=hmVeb/UvzCzyIPtlVYQSXPotz/6/dw4Yh5Kc3Idc9m8D4m2/UQEJiVfoOPo7Y83xv8x8EC6hmw76Kecy/lnTv+Sb6uwhzTsx5udQyhtseQZP0Xm5hty0oXhRSzuJXAQFD4QcIGzYyeOi8/+eR8GzUk1Fy5pLc4QFQkKg6hTVr4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VdqpjufC; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEDymNyx"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-38759bcd877so10314039a91.2
-        for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 09:42:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VdqpjufC"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c9e30214d8fso8248794a12.3
+        for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 09:43:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784652158; x=1785256958; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784652201; x=1785257001; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=QyRI5K/D2UL8ohnuHgzhdDNvsAlVZY47bGS7E8xJ6wM=;
-        b=jEDymNyxm/iIQVS2mjk+PcCdnaD9yA/k18Mp+HdwGBuvdf4GvJuA37vUuyOsObXw8L
-         X7M+ZOIr1gIw+OkES4TnWPKRf3VTstG/kwnnNhZ/9THSWmmjJy74z1gCk6qo+FGl3Kg0
-         eumt83orAttqJS+6+kjLfU7XQJAhP7yCjx89zzb8giyYvuzNQ7J0DuQX+ZRu9/RRP00G
-         m3KssMN9J+UfxMb9yEJGsfqJtXakB2EYsyUsspfSe/7EsShZNX3uKAxJLXyXiRGq7akb
-         exf35fI/L5G6m+sLi1fiOmnEB3B2sjJlkzE73nZuxxaOFX8dq1tSX0GCUNIkNgvUp82g
-         MlKQ==
+        bh=0YEU1On5Z9QygyW7afm3G5c7ueZM2Z9hLMwsovoUjpM=;
+        b=VdqpjufCCkyvdUI7RFBpMfumeM7N33uOLXZShg36bm5xGavnt2Ida3uYY4D8wpTsN9
+         mT9TwG+8Gm6CLDsVvrZCJfBUIPgVYn46+9U7xURwfVEPfVj/97GUZD7A7IOOu0LZkzRN
+         Q/R43aZ+2xvOye/0CAIheBJFhOR3kQL/21ttSsPvly4vCkX3URbFf5v37X0NPM8yrjAk
+         jSA4oUGh1EH1B7GSo9k9koL5Zwa5IxRqb7KhNnLGHXXAsiOnLdlaM4XiI2RrjxVQSZHx
+         klvSL4ewMbfHUb/nJes+S7z56qqdZOYkiZxPttoabNq1D+qsC9jSCVhPCivAvWMX9MQ7
+         6Nvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784652158; x=1785256958;
+        d=1e100.net; s=20251104; t=1784652201; x=1785257001;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=QyRI5K/D2UL8ohnuHgzhdDNvsAlVZY47bGS7E8xJ6wM=;
-        b=A1TKDn1dNyIOZvwC1Rk923Vt0LS/JBGt2c6PySkPr0iY8hK3kxZt9u6tDMeSyqhDEZ
-         5zZVYQqbfn9V5kbsd5DfqKRpTTHc3eAKs9YeQ+G/wpOSgTidy4RnMZmRWH7jDX5moWPB
-         inJTJ82WSKb2XS2ULX0JeMsb9P6p/gdyYuulPWzI2HqTzgnO3ldHk0yqE9PoTo4RfgGv
-         AgXexuLdKcUIJ2kBJcMLvDgnQyKJAghJbS26i9/7EOJ9rqwLYl6ftV/bURhsCtPobHqU
-         tH0YhiEUppQv5TbXhglWp6szGd1gixJoWvsa1zmJE5AxNTaklKgIauipcVSIhtUdr55g
-         zl+w==
-X-Forwarded-Encrypted: i=1; AHgh+RpIDC6LtTdv7Qwef8A4KOnzmV48DQayUFCbTp0jmP7RRqWrP1NIdP+6WIPTdJScY0dAn951WOubrEOxHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya4oAlg8GnQwaErAShCPgnjS+vTsQI8JuqoxIdYLKRbgDaff6Z
-	53mdP/hPVS92rlSL6EovcpL1uJm0TvzuE7X1QvopE2X3jVJxMZWvIpI=
-X-Gm-Gg: AfdE7cnw+w2r5QdAStU1VyELsxJ4LD0dD6NCoNtRHreIHnnvOdWRQnc0bRWntGyp+nK
-	PCN3SHgH6gNXIReYnv6gxfp3h+UB5+vyVXk+8Gw6QteS+9L6S2mjUCKlEGHZkFAXd9evqMcD/mW
-	YbBTnDxlOXZoz97E3ECtRhkC6vbdsbX1A0L99Axq9dyp4aolkE4Qnh3lXuGimL6vhA0ZsWHohoN
-	9OzAPRmrnQyRl87ao3HpvIO+7cDXMAAjuxvnZCsJhrHvM+k1AyhBgioqaN3zhLPE5aEUdkOJHA4
-	aJKhLyWHIGWCxHbXMyLfnQeg5ZZM6E6iyM5fZPC488m9O7WXBtbi6tffb603eDbJjNo71YsjneU
-	x/TLHS6cndqxUFeoN7lU6nHDFJLWfR1Xp2F7gQASzau2HkF4d567VlFw910jg52g/WqbduSJj4p
-	SmN6PnlJKmNoEa05/NJv/wMwZy82sr5oiPE5ptLqpzKifnKN0dpNeNtQ==
-X-Received: by 2002:a05:6a21:4a81:b0:3c3:8298:da0c with SMTP id adf61e73a8af0-3c3ad972c12mr22065654637.41.1784652158424;
-        Tue, 21 Jul 2026 09:42:38 -0700 (PDT)
+        bh=0YEU1On5Z9QygyW7afm3G5c7ueZM2Z9hLMwsovoUjpM=;
+        b=VWZcJfcCmvqSMgF+ao6Ptn2XGJFhX+onzUor7owM80Le8sn0+S4tscWtD4eriYX+E2
+         ZP6otg6hRR5ePv20n7fP+nnh9L/WJ5EaSrSppQghJL7K7rycgZeyCk6SsYh4WvLk60Nv
+         Zf1A6V/es+I7Zo6tfUdIj1oxmNP7d/P+iH71SEo/q+XXYeYIPn1lKKJ68mkb+96mVkeK
+         D2wa6gRmDXXRidlplHQ1vSuH9MhiW/jNkzBVK/hnLlOU0QCIj5j6Lsv+8Ks6+og1NdYJ
+         BOVF/WxdTybHUC4G98AwUWrZfs3vitJ5j4AwgsCEcEYJHoqrlJgBdVQUmke+DeBFtLcs
+         hWSQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpoMFKPdeg3xwBNk1asf5SpBQjz4XOAAVIT/4ssALmk9r5/blICnOe/GvHljBuptVMjReykS74YVCiY/w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxb38YyiN/LxhcUPGHaB6/uq/OFBqrbBjycIk9G8Eg5J5Z6bjhO
+	cejyGHORwXcDeN9iTbHjGWlyDu2R8D1E2+D3YmsbjA4ykyw0snnMEH0=
+X-Gm-Gg: AfdE7cmGXI3qwBoEj2uMGMALAT0BXoLMb6IsGppuwpZgLpO/sgLHskvy2M6tg+7QU9E
+	axm/7xeSxg0cCTIBZWC57+qCVT7TxWH3S7JKSVT9H3MPAT+iH6Y2dLckJEPm5oNaXpxKEtXkE4N
+	Clas2YLK/7EVyUnahT89H8CFiJU5Vn193280+mzskc47CwUbxV+5jOshWAiSBwqAodcymimPtg4
+	ZILvzLziSX10rw+mypYshhADtG2ccKNvNXR0BVNPIhPzXZ8Xj3ZiGhCm4COVpabobQEw5nvSkOw
+	Ykyt8yIJ3OFMG15nZZFkqZGsCk1OBhu1RbZmhLgSkdQSkBxStL/i5yRiESKUjZs5jFNVoVh0ymQ
+	7IFYUUokFSSO4A7H6yb1zRrwhAdiPZRHOFHZQ/sLbgt4zvhTF1vlEjnUeS1JQUQFXC55be2KXRN
+	MpeFh2wkyKXVhHG8sZ9WUYquM2FiqB/gKOcCX9ZUzon9PeVlhUCgLI8w==
+X-Received: by 2002:a05:6a20:9397:b0:3bf:6c08:fb94 with SMTP id adf61e73a8af0-3c3ada37416mr20565979637.54.1784652201182;
+        Tue, 21 Jul 2026 09:43:21 -0700 (PDT)
 Received: from coe.tail83f5bd.ts.net ([125.19.217.182])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3147e1c7ff4sm447487eec.27.2026.07.21.09.42.36
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3147e1c7ff4sm447487eec.27.2026.07.21.09.43.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 09:42:38 -0700 (PDT)
+        Tue, 21 Jul 2026 09:43:20 -0700 (PDT)
 From: Ramesh Adhikari <adhikari.resume@gmail.com>
 To: colyli@fygo.io
 Cc: axboe@kernel.dk,
 	gregkh@linuxfoundation.org,
 	linux-block@vger.kernel.org,
 	stable@vger.kernel.org,
-	Ramesh Adhikari <adhikari.resume@gmail.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v7 1/2] badblocks: fix in-place round_up/round_down usage bug
-Date: Tue, 21 Jul 2026 22:10:23 +0530
-Message-ID: <20260721164027.637078-2-adhikari.resume@gmail.com>
+	Ramesh Adhikari <adhikari.resume@gmail.com>
+Subject: [PATCH v7 2/2] badblocks: validate sector range and shift before rounding
+Date: Tue, 21 Jul 2026 22:10:24 +0530
+Message-ID: <20260721164027.637078-3-adhikari.resume@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260721164027.637078-1-adhikari.resume@gmail.com>
 References: <20260709131904.596684-3-adhikari.resume@gmail.com>
@@ -81,74 +80,165 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-rounddown() and roundup() do not modify their first argument in
-place; they return the rounded value. _badblocks_set(),
-_badblocks_clear() and badblocks_check() were calling them as
-bare statements and discarding the result, so 's' (and 'next'/
-'target') were never actually rounded. Depending on the caller's
-alignment this can leave 'sectors' unchanged or, in the reported
-case, produce a range whose end never advances, causing
-_badblocks_check()/badblocks_check() to loop with a non-advancing
-cursor and stall the CPU (RCU stall) when called through the
-nvdimm ioctl path via nvdimm_clear_badblocks_region().
+_badblocks_set(), _badblocks_clear() and badblocks_check() round
+the caller-supplied [s, s+sectors) range to the current bb->shift
+block size before touching the bad block table. That rounding
+was not defensive against a few cases:
 
-rounddown()/roundup() also do division/modulo on the sector_t
-(u64) operand, which requires libgcc helpers (__aeabi_uldivmod,
-__umoddi3) that are not linked into the kernel on 32-bit builds,
-breaking the build on arm/i386 (reported by kernel test robot).
+- s + sectors can overflow sector_t (u64), wrapping the range
+  end before it is ever compared against s.
 
-Switch to round_down()/round_up() (include/linux/math.h), which
-are mask-based, assign their result back to the variable being
-rounded, and require no 64-bit division, fixing both the
-non-rounding bug and the 32-bit build breakage.
+- bb->shift is a plain 'int' field, populated in one case
+  (drivers/md/md.c, from the on-disk superblock's bblog_shift)
+  straight from an unvalidated byte with no upper bound. Shifting
+  by an amount >= the width of the shifted type is undefined
+  behaviour in C; "1 << bb->shift" was shifting an int literal,
+  so this was already undefined for bb->shift >= 32, let alone
+  the full 0-255 range bblog_shift allows.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202604301231.IpPh4AiH-lkp@intel.com/
+- round_up()/round_down() rounding a value near ULLONG_MAX can
+  itself wrap back to a small value, so even with a valid shift
+  the rounded end of the range could end up smaller than the
+  rounded start, silently turning a small range into a huge one
+  (in _badblocks_clear()/badblocks_check(), which round the end
+  up) or losing the range entirely.
+
+Add an explicit s+sectors overflow check and cast the shift
+operand to sector_t so the shift itself is never performed on a
+32-bit int, and detect post-rounding wrap by comparing the
+rounded result back against the pre-rounding value.
+
+badblocks.c does not itself bound bb->shift: every caller except
+drivers/md/md.c always leaves it at 0, so the one caller that
+populates it from untrusted on-disk data is responsible for
+bounding it before assigning it, per struct badblocks's shift
+field documentation in include/linux/badblocks.h. That md.c-side
+bound is being sent as a separate patch.
+
+badblocks_check() returns 0 rather than -EINVAL on the wrap case,
+matching its existing "0: no known bad blocks in the range"
+return convention instead of introducing a new error path callers
+don't expect.
+
+Suggested-by: Coly Li <colyli@fygo.io>
 Fixes: aa511ff8218b ("badblocks: switch to the improved badblock handling code")
 Cc: stable@vger.kernel.org
 Signed-off-by: Ramesh Adhikari <adhikari.resume@gmail.com>
-Reviewed-by: Coly Li <colyli@fygo.io>
 ---
- block/badblocks.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Changes in v7 (per Coly Li's review of v6):
+ - Simplify the overflow check in all three call sites from
+   "s > ULLONG_MAX - sectors" to "(s + sectors) < s".
+ - Drop the "bb->shift >= BITS_PER_LONG_LONG" guards in badblocks.c.
+   Only drivers/md/md.c ever sets a nonzero bb->shift, so the bound
+   belongs where bblog_shift is read off the on-disk superblock, not
+   scattered through the badblocks API. Documented the caller
+   requirement on struct badblocks.shift in badblocks.h instead; the
+   md.c-side bound follows as a separate patch.
+ - badblocks_check() now returns 0 instead of -EINVAL on the wrap
+   case, consistent with its existing return convention.
+
+ block/badblocks.c         | 40 ++++++++++++++++++++++++++++++++-------
+ include/linux/badblocks.h |  6 +++++-
+ 2 files changed, 38 insertions(+), 8 deletions(-)
 
 diff --git a/block/badblocks.c b/block/badblocks.c
-index ece64e76fe8..1f786b193fb 100644
+index 1f786b193fb..728b59a1a5d 100644
 --- a/block/badblocks.c
 +++ b/block/badblocks.c
-@@ -857,8 +857,8 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
+@@ -853,12 +853,19 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
+ 		/* Invalid sectors number */
+ 		return false;
+ 
++	if ((s + sectors) < s)
++		/* Range wraps past the end of sector_t */
++		return false;
++
+ 	if (bb->shift) {
  		/* round the start down, and the end up */
  		sector_t next = s + sectors;
  
--		rounddown(s, 1 << bb->shift);
--		roundup(next, 1 << bb->shift);
-+		s = round_down(s, 1 << bb->shift);
-+		next = round_up(next, 1 << bb->shift);
+-		s = round_down(s, 1 << bb->shift);
+-		next = round_up(next, 1 << bb->shift);
++		s = round_down(s, (sector_t)1 << bb->shift);
++		next = round_up(next, (sector_t)1 << bb->shift);
++		if (next <= s)
++			/* Rounding wrapped past the end of sector_t */
++			return false;
  		sectors = next - s;
  	}
  
-@@ -1071,8 +1071,8 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
+@@ -1061,7 +1068,12 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
+ 		/* Invalid sectors number */
+ 		return false;
+ 
++	if ((s + sectors) < s)
++		/* Range wraps past the end of sector_t */
++		return false;
++
+ 	if (bb->shift) {
++		sector_t orig_s = s;
+ 		sector_t target;
+ 
+ 		/* When clearing we round the start up and the end down.
+@@ -1071,9 +1083,16 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
  		 * isn't than to think a block is not bad when it is.
  		 */
  		target = s + sectors;
--		roundup(s, 1 << bb->shift);
--		rounddown(target, 1 << bb->shift);
-+		s = round_up(s, 1 << bb->shift);
-+		target = round_down(target, 1 << bb->shift);
- 		sectors = target - s;
+-		s = round_up(s, 1 << bb->shift);
+-		target = round_down(target, 1 << bb->shift);
+-		sectors = target - s;
++		s = round_up(s, (sector_t)1 << bb->shift);
++		target = round_down(target, (sector_t)1 << bb->shift);
++		if (s < orig_s || target < s)
++			/* Rounding wrapped, or range collapsed */
++			sectors = 0;
++		else
++			sectors = target - s;
++
++		if (sectors == 0)
++			return false;
  	}
  
-@@ -1307,8 +1307,8 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
+ 	write_seqlock_irq(&bb->lock);
+@@ -1303,12 +1322,19 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
+ 
+ 	WARN_ON(bb->shift < 0 || sectors == 0);
+ 
++	if ((s + sectors) < s)
++		/* Range wraps past the end of sector_t */
++		return 0;
++
+ 	if (bb->shift > 0) {
  		/* round the start down, and the end up */
  		sector_t target = s + sectors;
  
--		rounddown(s, 1 << bb->shift);
--		roundup(target, 1 << bb->shift);
-+		s = round_down(s, 1 << bb->shift);
-+		target = round_up(target, 1 << bb->shift);
+-		s = round_down(s, 1 << bb->shift);
+-		target = round_up(target, 1 << bb->shift);
++		s = round_down(s, (sector_t)1 << bb->shift);
++		target = round_up(target, (sector_t)1 << bb->shift);
++		if (target <= s)
++			/* Rounding wrapped past the end of sector_t */
++			return 0;
  		sectors = target - s;
  	}
  
+diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+index 996493917f3..5d88992b55a 100644
+--- a/include/linux/badblocks.h
++++ b/include/linux/badblocks.h
+@@ -34,7 +34,11 @@ struct badblocks {
+ 				 */
+ 	int shift;		/* shift from sectors to block size
+ 				 * a -ve shift means badblocks are
+-				 * disabled.*/
++				 * disabled. Callers that set this from
++				 * untrusted/on-disk data are responsible
++				 * for bounding it so 1 << shift does not
++				 * overflow a sector_t.
++				 */
+ 	u64 *page;		/* badblock list */
+ 	int changed;
+ 	seqlock_t lock;
 -- 
 2.43.0
 
