@@ -1,196 +1,157 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37B83655C1
-	for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 13:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784639574; cv=none; b=FfqiNL3OTN66gMH8sICKEABol4ikYnmWAoa7N74HgZCONncd6od/5iQZXuYyMQXo+9fPBobSJVT5Q/Z2qM3W/tQluUtrg41yOPUdFnTmWhsdgiVf9MwnZhrcihwYK9LkSBKnrwimWWcZ29xLcgun3gZmRJ4+fajdM6eNdY1+7C8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784639574; c=relaxed/simple;
-	bh=roviBJb1B7iQhUITwXosnTCAe4xvx3i/dIY5PCDwenw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hi7aCzLfyDTGxB7PQLKsEdj7ejnuoA1wpWN1mSZJkn29nuwQ/0pgq6Y+tvVlCwjJANUWs6M4lIBwCd0QMOF3hSEjfXZLxem8VODUsrt56KkV8hmDOhw190TeyD8KMZZ9Lztsy8U3umbQ+cwtU7s5eq8WX2WUG0cW40tv8BJNDJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LoGxvBpD; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D6D384CE1
+	for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 14:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784643581; cv=pass; b=qbQItIHNt/ardO0a1RTb3BsVbOqczmeAqGyrexpvdUKL9BoQ5iisEnuLy7xEDqWQ8ylPRG1piWUl6QQDZaBQN/M0/6NCXv95X17TZu3vFX6DUiUYuZEKTpkS/kA4QqJUvy3ffV9sIVRkVLdZkYTE5Bn+EdsM7ArviEAhQVtNztg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784643581; c=relaxed/simple;
+	bh=fefYiigP66hOxT3e2HqsrvW3PypwMJOrVqLdJW1W4zc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QQZwWwFgcTVhvBWYlw+ewRZXKyCza6CiLNQ5jAZAD4hlHECTr8luB98mR90EKqikzaBqt7KmYp0uoLkcl5r4lqFMtmB1mKFpYtoamiHxFW7su59J7SDl9FS8/eJYHorh5Md49EKTINtoSHWP5BP25niMe3JgJCuD+lOCHyGKSZo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=EqTJ4qnt; arc=pass smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LoGxvBpD"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-47f752b3423so1874764f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 06:12:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="EqTJ4qnt"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5b0f19bea2fso7304905e87.1
+        for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 07:19:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784643578; cv=none;
+        d=google.com; s=arc-20260327;
+        b=KT1c4HgmDIahCXuxRlS88A4wnKEMt5zU6eoCNjTLNbWpwYeqiHySEylEGyniFcV+vq
+         EJc7nlEZRwVFgM32Ev7RAcsqwqcKBVRy4waCC+eZQDQw94VdM8K+TaTppI15xE1w27Sg
+         2k5IzTQYCG3zVz+IsWUXo/QB3mbsZNMlP44uav8BWAdSbPFBUc7UXNOnp8atWdn7uvT/
+         ttDcmxeZ5xo8B0yJarmahVkrEV+9VI5SvTRyOQG2/xWAZIqcnww8sHVU82XvQjLegVQb
+         yO6jT1vo4xHvgXKLh+ALp+nUxcL0WpxL16EbT8dbjqAq7khrrH0GJjJxkHo7PBq5vaJJ
+         kNMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5hsRBYJ6NeVLz5bhRTH0PFL/4wzqsvQ0xpezK+EO66c=;
+        fh=po3igxYtSaTvk5DHTzsXmQNV/46SohM+k5Pzm0eCOSI=;
+        b=ZnT/skAFdedurE0JfuwAyj76jFJgRkaNunDDalrFZPzoXluPHnjKkshqIreGy3v5ZP
+         odKPGFQVX/nfSG/4QXgXJOaAXtHYk0JRAI6atIYYjeUpC3dOo51bP6jdZBxxLxuAM6fO
+         PJxVyVAEM5F77A2NKQJp774i/0ODwSPQUjTONll+I9WgHI3VeA9Pi+0nDG6GDg6RZ0/q
+         4uRxov4ejyxCta75nlb/fwDbavd/ojC9OVPkkU/toA46ubhGR+nQ2BTUM4XuF7q/qTEP
+         rLt/ig8dYgCE5PtflIlfvnE1ZRO2YOMZc46jiHW6pL2LN8jBiQsBMuL85B46KDPaUCBd
+         mN/Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1784639565; x=1785244365; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=LZcY8JywvKXANV4b4Y/mnnGxXAY43BzjPnwULQV05KI=;
-        b=LoGxvBpDEU586mANHKg0AlOVLSwjxUwcerLWqBCuDTqB3BKr12xDPuAeaITf0OJ5u7
-         pW5MXZkNE0Spz9kUiB9YFRowyZ0wzFTcuAQcWOmZNSNocM1lGunteIJ6qMNsP+7LQHCn
-         K9g4hWqiodIzksvb86yTlUcAOgIE59cm3keL138dQdp2+Aqm72Oe/K9ovJombOHk9b77
-         q7K21gZoQ5BwAZI8RwxdUwRFZcTCvQniV3IZouqx83co77jWHl0m4ZIhqH83wfbTdKJo
-         gJdyjf/44/40tPfp4ckSZbjo5gpkBplWyQ2sI3AVC3OjkfeUBdeeMBulLolpi/ubh9oF
-         H8Aw==
+        d=suse.com; s=google; t=1784643578; x=1785248378; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=5hsRBYJ6NeVLz5bhRTH0PFL/4wzqsvQ0xpezK+EO66c=;
+        b=EqTJ4qnt3URyqbG75bKQG/5xcWtM9p9I90YO4ySlMw3tseiALjVxY2ZiSfaRmIu4Q4
+         d7DBlNsedMIW0irsjV2MqDMY+I4vgDyXNL10XKx6dpuQbe4OHrSVgbga/0tx1W+DpzJy
+         iuvtR26IHc+RQKQ/w0SdJcAwhvjPVAV/g0SRju+i9EWoOmFhGUmhTkvxMZ+nOsKrNzjV
+         Ouk0U5+e5XVcZme/Ltei/M9VFKGNGBHOQh3fq6UuqMk+S+DdNpeMgEhtj0OMzp85H5iO
+         NaOlQuxJgaxF4camR7xBtzQ1qtTggvcUVexaXxjDNbZDRmAQTFJeIZjyLRPnMo1G/xvg
+         esiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784639565; x=1785244365;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=LZcY8JywvKXANV4b4Y/mnnGxXAY43BzjPnwULQV05KI=;
-        b=DbuWj4jb/IIOs9x0AMJx05MQLgSANfOs7RXFdxZYOiciPGpQn77wXBeR+sGBSP4/A0
-         wp3xA0GTFWyhvnV582AxVjpJQyel6ezMW92T8jbPW0JWSti4NGeBjrtdEZ/rVhItoNhP
-         5Hs810yhfR5hODt54qx3ZYknwYEHfcYNmTtj4uUG6BZupDt+7dZ4JQnweVv63fqskA+v
-         Nm1Q07q5D17rmS48Fq8d5lh+DHFb3taPQxW7o031P4cPiGUR5pEbLVweQ2u61g7ki3mU
-         qJP7cys2kWC6AI9XlHPIZ0tTB/FNsIM+GM/HDGUhlStoPJyVhCrRXVpK03l02qjeTnEI
-         RilQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoUwM7g5BrEg5XauFLT92bLo+RcVIWnhVf5UtWXYjWolNnXCBZxv0F5PMblVYR7be2iJH0nrUu7jURKtg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVyeuUTImdWjbOYfcqGJqmR/5Zow/odIinwQdplFFYt3yc3TFt
-	lOMVnL06f6pJm6LA8MY4og48IcNjDoRpeUa6m1vLZjBVYacq/VPz0H26v47W1JcajK0=
-X-Gm-Gg: AR+sD11fUk0bYdHhrPZYeAmKnTJy6RPWeEmo7CqaqI+0ynaGO1a+xjoG/Y+C29xfVGD
-	pnmAPm799YaBXq6Cl2chVYIj7XxbPUaaUjLIwbGqthOMa2LB1B9+veZg+7NoPwCx5rTGd2sJ53k
-	e4j/lVzuPJOurR75tRmQkKSEn1dL+oI8tljApTvGB/AvzZZqdRTJBDoE8OReBuJ5ALzLc43+PRm
-	uDqsT2EFkVtVvEXhe0HJQkU9UJtDsxb+XIFhtBj1y4SF5zGLgY8HSI3Okec2W62TI6jLBTCVzv2
-	A8xrWsUJCsa6UqgyMFJL1hqHAX6cXxN1UokeGNYHkRijtPw+i/cWIUwI7SDWkSohlSObUEIrkf9
-	F5e5xHz2uv9oSMwHkkn7sVRxIBhPybMN+FIobVH8+bmSN30pnmSqDkzdoKSuJzpFkOM4ZsqCOCg
-	==
-X-Received: by 2002:a5d:64e8:0:b0:47f:6fbd:8a17 with SMTP id ffacd0b85a97d-47f6fbd8e65mr15616435f8f.59.1784639564680;
-        Tue, 21 Jul 2026 06:12:44 -0700 (PDT)
-Received: from zovi.suse.cz ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63ee9281sm42070938f8f.36.2026.07.21.06.12.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 06:12:44 -0700 (PDT)
-From: Petr Pavlu <petr.pavlu@suse.com>
-To: Tony Luck <tony.luck@intel.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Michal Januszewski <spock@gentoo.org>,
-	Helge Deller <deller@gmx.de>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <cel@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	Pavel Machek <pavel@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: linux-edac@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	drbd-dev@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	greybus-dev@lists.linaro.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-acpi@vger.kernel.org,
-	linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev,
-	cgroups@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	driver-core@lists.linux.dev,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-Subject: [PATCH v2 3/3] module: Bring includes in linux/kmod.h up to date
-Date: Tue, 21 Jul 2026 15:11:27 +0200
-Message-ID: <20260721131207.803760-4-petr.pavlu@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260721131207.803760-1-petr.pavlu@suse.com>
-References: <20260721131207.803760-1-petr.pavlu@suse.com>
+        d=1e100.net; s=20251104; t=1784643578; x=1785248378;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5hsRBYJ6NeVLz5bhRTH0PFL/4wzqsvQ0xpezK+EO66c=;
+        b=Xm3Alyeay2jJMiIw6j4P8EHTBl9gsmzlYyw9dZk74jQc4laxFR6RO7D9QMn0KQpEzL
+         b0r50TaOSCu9lyyAwrMTfyA4675uaHI/QKUNkihR0ZZmQk4Li1PDiUmDKFdIGZot4I4C
+         tDGl530qe+yswqNJHjpdjCytY9/QgXnYPnyaeio6mMqjlNr/YK2aRg4rajx8iCcDSGuh
+         MwXxQMzoi/3BDTlsYvEAqevGspM3FQ7XCAs2QHLH+zXElLpfMgOhuqKlimoNaEJby00Z
+         iisL0/Y5D4hPXAxeEEnU1VcdxsJtXKVEu7A7/2dCe0Bq/25nDYI7jybaFb9ynp1ty6uL
+         4qLg==
+X-Forwarded-Encrypted: i=1; AHgh+Rqby6RLarItbAke/SgcMf4njk+pq74MilMzBO3bPQcniPTLuV1OyH3yUsGaW0A46/pExG2LRkGRTxXGEg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzN/RCDsJmLU94uX3zcvo667sA5ITaV0L2UplqUn4gwmL51+XCS
+	4A3cLl+hiUl9RHlkLjjRR1DP+aTCeaIpeI9J0782sqGiR6le9lyKpwJ2RUfCTacwBcFU6gui6C5
+	0twG12mj4tdNlUxh4EMPFYwhDHliTyYkqRvVSqBccTw==
+X-Gm-Gg: AR+sD13KxMh1hqqbLuR4KLeweuhobc8qeYleudtJ1iaj4cU9oiwm8zmqSik5mTu58Wr
+	rGEhcOFfkRzCUH1xUXHT0wSc0+XN5tkrj/UZaQPCpQgnKADHWh69akD9JTeJ+tkEgYRaSG4Efb5
+	WYU7ApV0s7b3By1EQUs5tTefeoYldLzV+d7w2DnnBrGHHqD1shAN1wia+haIkOHcHifbwJKMv4a
+	+pZ6llUalpitfdF7cttb1Ff0L2zU0Hwq1pluYUH+wuVquDOoFXiH7HwMG0EEotNgLN17NfOMVPC
+	Rj1oslpDufeJBYTB1tM=
+X-Received: by 2002:a05:6512:12cc:b0:5b2:a21a:10fc with SMTP id
+ 2adb3069b0e04-5b2a21a1358mr1690621e87.63.1784643578023; Tue, 21 Jul 2026
+ 07:19:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260521232956.553287-1-atomlin@atomlin.com> <20260521232956.553287-7-atomlin@atomlin.com>
+In-Reply-To: <20260521232956.553287-7-atomlin@atomlin.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Tue, 21 Jul 2026 16:19:26 +0200
+X-Gm-Features: AUfX_my6LhVqDArLqDi_kNG90-hCGS8NtlfpTwmaoMYxk7cfngrk94P0fzOImBc
+Message-ID: <CAAofZF6z-m9oikO6CEd_VUeBmgEq08E5RW0ED9C9m+xanOsdSg@mail.gmail.com>
+Subject: Re: [PATCH v15 6/8] blk-mq: prevent offlining hk CPUs with associated
+ online isolated CPUs
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
+	mst@redhat.com, aacraid@microsemi.com, James.Bottomley@hansenpartnership.com, 
+	martin.petersen@oracle.com, liyihang9@h-partners.com, 
+	kashyap.desai@broadcom.com, sumit.saxena@broadcom.com, 
+	shivasharan.srikanteshwara@broadcom.com, chandrakanth.patil@broadcom.com, 
+	sathya.prakash@broadcom.com, sreekanth.reddy@broadcom.com, 
+	suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, 
+	jinpu.wang@cloud.ionos.com, tglx@kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
+	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com, 
+	bigeasy@linutronix.de, yphbchou0911@gmail.com, wagi@kernel.org, 
+	frederic@kernel.org, longman@redhat.com, chenridong@huawei.com, hare@suse.de, 
+	kch@nvidia.com, ming.lei@redhat.com, tom.leiming@gmail.com, steve@abita.co, 
+	sean@ashe.io, chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com, 
+	nick.lange@gmail.com, rishil1999@outlook.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Including linux/kmod.h alone results in 1.5 MB of preprocessed output, even
-though it provides only a few functions and macros.
+Hi,
 
-The header currently depends on:
+On Fri, May 22, 2026 at 1:30=E2=80=AFAM Aaron Tomlin <atomlin@atomlin.com> =
+wrote:
+> [...]
+>  static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
+>                 unsigned int this_cpu)
+>  {
+> @@ -3771,6 +3821,11 @@ static int blk_mq_hctx_notify_offline(unsigned int=
+ cpu, struct hlist_node *node)
+>                         struct blk_mq_hw_ctx, cpuhp_online);
+>         int ret =3D 0;
+>
+> +       if (housekeeping_enabled(HK_TYPE_IO_QUEUE)) {
+> +               if (!blk_mq_hctx_can_offline_hk_cpu(hctx, cpu))
+> +                       return -EINVAL;
+> +       }
+> +
+>         if (!hctx->nr_ctx || blk_mq_hctx_has_online_cpu(hctx, cpu))
+>                 return 0;
 
-* __printf() -> linux/compiler_attributes.h,
-* ENOSYS -> linux/errno.h,
-* bool -> linux/types.h.
+I noticed the existing `if` returns 0, while the added code returns
+-EINVAL. I'm wondering if this will prevent the system from suspending
+because of the -EINVAL error.
+Should ` !cpuhp_tasks_frozen` be added to the if statement?
 
-Include only these files, reducing the preprocessed output to 10 kB.
+eg.
 
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
-Reviewed-by: Aaron Tomlin <atomlin@atomlin.com>
----
- include/linux/kmod.h | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+if (housekeeping_enabled(HK_TYPE_IO_QUEUE) && !cpuhp_tasks_frozen) {
+    if (!blk_mq_hctx_can_offline_hk_cpu(hctx, cpu))
+        return -EINVAL;
+}
 
-diff --git a/include/linux/kmod.h b/include/linux/kmod.h
-index 9a07c3215389..b9474a62a568 100644
---- a/include/linux/kmod.h
-+++ b/include/linux/kmod.h
-@@ -2,17 +2,9 @@
- #ifndef __LINUX_KMOD_H__
- #define __LINUX_KMOD_H__
- 
--/*
-- *	include/linux/kmod.h
-- */
--
--#include <linux/umh.h>
--#include <linux/gfp.h>
--#include <linux/stddef.h>
-+#include <linux/compiler_attributes.h>
- #include <linux/errno.h>
--#include <linux/compiler.h>
--#include <linux/workqueue.h>
--#include <linux/sysctl.h>
-+#include <linux/types.h>
- 
- #ifdef CONFIG_MODULES
- /* modprobe exit status on success, -ve on error.  Return value
--- 
-2.54.0
+Or maybe just handling this inside blk_mq_hctx_can_offline_hk_cpu()
+returning true.
 
+Does it make sense?
+
+Thanks!
+
+--=20
+
+Marco Crivellari
+
+SUSE Labs
