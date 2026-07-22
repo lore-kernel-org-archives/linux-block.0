@@ -1,187 +1,134 @@
-Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45EA3E51FC
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 03:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B753624DB
+	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 03:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784691540; cv=none; b=XUYSVH4zYx3vasM3hrCUXtKKN7/cqHSZelr1AknGlgnMTzDTH+FRG6zn7ud630YTHyXAhc/0GB4eP9aBEO+/OM/1rCCWQuZimqZi6jWBtaqIbjE8HvJO5qQzCe5MxBObnTJRUyXCEX+U42V9PSgx3GPqRcgtS/ibY9BP2fzsRds=
+	t=1784691897; cv=none; b=NWh58LPWn+CyVpiU/RnaoCo90DjfyEqPCzcpQq6IJFO4uNSrZbzHyinzpIi/H8G9p9mw/0Vvpdw5+k6T0sF5OmM56VyTc4GX4VkBpiE+bT9PjQW8AFvCJmRUXMyX5pFEYJP3XSUFT1oA1QcP5yzdaI6b7tqpgezmURT1HrdGgZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784691540; c=relaxed/simple;
-	bh=LvQ0l8Y1Sr4q5vki0hokRfiHpzJeoepEXQz3oRTmlXo=;
-	h=Content-Type:Subject:To:Cc:References:In-Reply-To:Date:Message-Id:
-	 Mime-Version:From; b=Tn6ICHawUZciO4oWoG5GDv2HLXXO8dZAl0StQT2erW3V9sAVYozMAX2qlHWZvrDiP4fdc9rqCvBEYCemItfdUfxWF34AyPYtPyKaHxFvM85a7J1c+0eLuYS7rhgZMy5wWtQk2otQM50VcYl6LP+rBwnSsmIWWd5Abg9afWp/dXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=YQCV3XwF; arc=none smtp.client-ip=209.127.231.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1784691897; c=relaxed/simple;
+	bh=E7dmmcnU+LmIbXuBg4/pv0wUeDKswzuUKZorvsx2djI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q8EdfIMlcXszmyGTc3VnzJphY7jEGaq6sno1WOZ85Xt0Vik9M0NZHr289dgNUxoj8J+3R7zY7dPOB/UzrYyo5GBI4NgFhyCARSQ1Evylt6QsrA8obItNqDraNDvuASQ6NvrBcH7xTGpKC+xY4qROsDvTJ6uH86b8YcxbvLPwkSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rqoKNb/A; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="YQCV3XwF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784691525;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=ypsEvJ3+ptO3hb6bwrhxUuy7340bLg0ckLETzBzbR/I=;
- b=YQCV3XwFjp0fJKF+wGuXn9gOuSi29OZ0nxNAzS6OErm7dLoNvAKrxZoVk5Xz+YJueB0Tj3
- 9HPJughX18KogHJoel+zryuk2dP4k4seE59cwHhtkxA/DqgzN1FEG/jY5lfcsKnkIvIXB0
- aq7CcxoRWd3NtBrlDsCAJBJMmwsMUNkpV8MDZjA5Jf4Rw0v82MiDik3sl91npQScosJ5ko
- jPM0CJ3dNCZZo6SmNoIU+rOzEPGz9d+LuB3S40yF0TVobbyLMGaMkLDFgwADD3IKPDA2Y4
- +9YDDF7rgtvu5m+JTWKgLl2Fc8NkmDz97BQR8PHc6AW/1vpGk9c4T4b0/yYcDQ==
-X-Original-From: yu kuai <yukuai@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] nbd: set nr_hw_queues at device creation to skip queue freeze
-To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
-	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>, 
-	<nbd@other.debian.org>
-X-Lms-Return-Path: <lba+26a603b44+7840d0+vger.kernel.org+yukuai@fygo.io>
-References: <20260713065644.1637594-1-yangerkun@huawei.com> <20260713065644.1637594-5-yangerkun@huawei.com>
-In-Reply-To: <20260713065644.1637594-5-yangerkun@huawei.com>
-Reply-To: yukuai@fygo.io
-Date: Wed, 22 Jul 2026 11:38:39 +0800
-Message-Id: <a36f609c-c861-42ad-afd5-b44e7cdcfb80@fygo.io>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rqoKNb/A"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4954dff6536so30933005e9.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Jul 2026 20:44:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784691894; x=1785296694; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ppOhKumLepZWu8WHOmlT34Cz/7DtUO+ziKpkk444+3M=;
+        b=rqoKNb/AxLEzlXPKSSP8Uwni6kD3WgdoPQN5wEs+cmnJepmaqxscC85JbTDgZF5veb
+         /2Hod0VwRNvvcZb6IXr0GbJpnB0LNSx+ZbtkvI/zoHmxyTG51Eu6ExpMaOYAPIhG7afP
+         xn86fhDizSekXsvu5MtdQPZOMmOjwxcKqSLyAsFn1fzqxqoL52YjIuKPOG3xAhIH4huF
+         4JAQ7M3BR//7VTJDwFrR37KwKIK3mmAd4bzhO40ywQB55BT3o5hcLKqh15MrFqPNYONC
+         O1tdCBDlpVhgEwSBLYAItt0WqcLy1U9nPCLt1I82YCzQMktzMufAGBfP7AZp95pZY01Q
+         eRKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784691894; x=1785296694;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ppOhKumLepZWu8WHOmlT34Cz/7DtUO+ziKpkk444+3M=;
+        b=TSF1A95Ai0aW06kQLVqB3NXJPgrhNLK6tt08cSG3SNMP9woN9IpXKGF98wj9SBqOlG
+         M0FrDoW/w3/SAa1ywVbL8pcDBRJWtEYqfMT2WZyUkuqm5O+bJSrVrQQ8IlhjST+9fKut
+         0WzK9NnSMtU66UDODiKG1PDwquMkcomyT8jP7MeX4lz/7NQYpFIWe+DvFYefYZj77evm
+         nGaHPqrYUIBrzJaVNiRqGJ6i0YhGO3u2WhkB1WjNU1lDKrCuq8TGRAFXDcoPXZJs8l8f
+         i+Kh2AGrtsi837DVSHJi1uefkVl1QT/7PpI7UDEabAv+FDzijaIFos5erczaL8RmEsrk
+         o0CA==
+X-Forwarded-Encrypted: i=1; AHgh+RqBqaBpJF/9inEVnmLEvXZobmlT8xnkpP5lhuLzLOEIHo6YoshdR6ioE15AxOnwZe+6kzdpb8Cf3tFPRg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJLYFF7l9ji3sx9NkhVjvBc87aMg0HWnxPYN/7VeuyuZyqi0DI
+	0bvyy4fVqI7YQaz1O+bcvoZHhfE2fWdTfM4ctIp30pQRYuloD4864x+4
+X-Gm-Gg: AR+sD11y5a1l5+d1xNBFfm4P2BmbPfAKwYQSgTCVZzjH9G6UoTHeiyAr2WndUyp6FVu
+	K+3tyiyZgnkzxMcVqf7Q0VdaJXKUUBe2QBON8lwkl6ttFoTMZQGgMQLmcHK/B+Ktpwsw5XIIUjP
+	dASkMI6frgcqX4r+N+muJLfxZ35/Y+5UZFIdVuRGUwVZ99IizG7xQgP2WwP1Nw5Heo/e2LR2VlO
+	XLA5IkcQNN/+X917h9YiV5PSzHaEMdk2+OF4/Ff17Mai1tezFkUShPV30dXuTjVbD8dxkvwVS5m
+	+7E9OCi+kBZ6k1wcVRQnkFLBSuzH7iVwPFkh2Fuvlp594MU+NDEKZurCZ5Qx0ruJ1tyZiGwV5iB
+	QRHJOJXxFD4l4f4D3Cpq9xqeOuhOfDXSmZ40Y1gyTNC8pSauPne7rBQBjLT0a4Efj3kufTGJJFD
+	/wwMMxfSWAkPwajTNJZ5DyHWq3lL+74hCsFK2Wu4X774zdRAowcsFSV0qgJfoppdf/jZKWOQKCI
+	Hco1PnvkN64JB1kgN1U2rr2+ccp02TM4NlSfwIa8nqvcMhnQE1hsGhHoQq2JLGNl4HxEYUzaD5+
+	Qr+qTe0U
+X-Received: by 2002:a05:600c:1548:b0:493:c062:a533 with SMTP id 5b1f17b1804b1-4954a3e8fe1mr243623005e9.17.1784691893766;
+        Tue, 21 Jul 2026 20:44:53 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-2a02-3100-ac57-0f01-2d95-8753-45c1-c833.310.pool.telefonica.de. [2a02:3100:ac57:f01:2d95:8753:45c1:c833])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c6dc25sm2068993f8f.33.2026.07.21.20.44.52
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 21 Jul 2026 20:44:53 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Denis Efremov <efremov@linux.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] floppy: flush pending work before releasing resources on init failure
+Date: Wed, 22 Jul 2026 05:44:35 +0200
+Message-Id: <20260722034435.13432-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 22 Jul 2026 03:38:43 +0000
-Content-Transfer-Encoding: quoted-printable
-From: "yu kuai" <yukuai@fygo.io>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+do_floppy_init() probes each FDC with user_reset_fdc(), which queues a
+redo_fd_request() work item on floppy_wq that may still be pending when
+the probe finishes. When no controller is found, the error path calls
+floppy_release_irq_and_dma() to free the IRQ and DMA channel, and only
+later destroys the workqueue. destroy_workqueue() drains the queued work
+last, so it can run after the IRQ and DMA are already gone:
 
-=E5=9C=A8 2026/7/13 14:56, Yang Erkun =E5=86=99=E9=81=93:
-> There still be queue freeze call when nbd_start_device invoking
-> blk_mq_update_nr_hw_queues. For netlink path, we can obtain the actual
-> number of connections before calling nbd_dev_add in nbd_genl_connect,
-> which can helps remove this queue freeze.
->
-> However, nbd devices created with a fixed nbds_max may still require
-> this freezing because the real connection count is unknown.
->
-> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
-> ---
->   drivers/block/nbd.c | 39 +++++++++++++++++++++++++++++++++++----
->   1 file changed, 35 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 0755b7046ed4..400f638e832e 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1930,7 +1930,8 @@ static const struct blk_mq_ops nbd_mq_ops =3D {
->   	.timeout	=3D nbd_xmit_timeout,
->   };
->  =20
-> -static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
-> +static struct nbd_device *nbd_dev_add(int index, unsigned int refs,
-> +				       int nr_hw_queues)
->   {
->   	struct queue_limits lim =3D {
->   		.max_hw_sectors		=3D 65536,
-> @@ -1947,7 +1948,7 @@ static struct nbd_device *nbd_dev_add(int index, un=
-signed int refs)
->   		goto out;
->  =20
->   	nbd->tag_set.ops =3D &nbd_mq_ops;
-> -	nbd->tag_set.nr_hw_queues =3D 1;
-> +	nbd->tag_set.nr_hw_queues =3D nr_hw_queues;
->   	nbd->tag_set.queue_depth =3D 128;
->   	nbd->tag_set.numa_node =3D NUMA_NO_NODE;
->   	nbd->tag_set.cmd_size =3D sizeof(struct nbd_cmd);
-> @@ -2070,6 +2071,35 @@ static const struct nla_policy nbd_sock_policy[NBD=
-_SOCK_MAX + 1] =3D {
->   	[NBD_SOCK_FD]			=3D	{ .type =3D NLA_U32 },
->   };
->  =20
-> +/*
-> + * Count the number of socket FDs in the NBD_ATTR_SOCKETS netlink attrib=
-ute.
-> + * This is used to determine the correct nr_hw_queues before creating th=
-e
-> + * nbd device, so that blk_mq_update_nr_hw_queues (and its RCU grace per=
-iod
-> + * overhead) can be avoided entirely.
-> + */
-> +static int nbd_genl_count_sockets(struct genl_info *info)
-> +{
-> +	struct nlattr *attr;
-> +	int rem, count =3D 0;
-> +
-> +	if (!info->attrs[NBD_ATTR_SOCKETS])
-> +		return 0;
-> +
-> +	nla_for_each_nested(attr, info->attrs[NBD_ATTR_SOCKETS], rem) {
-> +		struct nlattr *socks[NBD_SOCK_MAX + 1];
-> +
-> +		if (nla_type(attr) !=3D NBD_SOCK_ITEM)
-> +			continue;
+  floppy0: no floppy controllers found
+  work still pending
 
-nbd_genl_connect() will fail in this case.
+The flush used to be here. Commit 070ad7e793dc ("floppy: convert to
+delayed work and single-thread wq") renamed the label out_flush_work to
+out_release_dma and dropped it. Restore it so the work drains before the
+IRQ and DMA are released, as floppy_module_exit() already does.
 
-> +		if (nla_parse_nested_deprecated(socks, NBD_SOCK_MAX,
-> +						  attr, nbd_sock_policy,
-> +						  info->extack) !=3D 0)
-> +			continue;
-> +		if (socks[NBD_SOCK_FD])
-> +			count++;
-> +	}
-> +	return count;
-> +}
+Fixes: 070ad7e793dc ("floppy: convert to delayed work and single-thread wq")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
 
-Personally I don't like to copy code from existed NBD_ATTR_SOCKETS handling=
-. Do
-you consider moving NBD_ATTR_SOCKETS handling forward or factor out a commo=
-n helper?
+Noticed while running mainline on an emulated Acorn RiscPC, a custom
+personal QEMU machine. It has no floppy controller and rpc_defconfig
+sets CONFIG_BLK_DEV_FD=y, so every boot takes the no-controller error
+path. No disk is registered there, so the drained work takes the
+empty-request fast path and just unlocks the FDC, leaving only the
+spurious message.
 
-> +
->   /* We don't use this right now since we don't parse the incoming list, =
-but we
->    * still want it here so userspace knows what to expect.
->    */
-> @@ -2101,6 +2131,7 @@ static int nbd_genl_connect(struct sk_buff *skb, st=
-ruct genl_info *info)
->   	struct nbd_device *nbd;
->   	struct nbd_config *config;
->   	int index =3D -1;
-> +	int num_connections =3D nbd_genl_count_sockets(info);
->   	int ret;
->   	bool put_dev =3D false;
->  =20
-> @@ -2148,7 +2179,7 @@ static int nbd_genl_connect(struct sk_buff *skb, st=
-ruct genl_info *info)
->   	mutex_unlock(&nbd_index_mutex);
->  =20
->   	if (!nbd) {
-> -		nbd =3D nbd_dev_add(index, 2);
-> +		nbd =3D nbd_dev_add(index, 2, num_connections);
->   		if (IS_ERR(nbd)) {
->   			pr_err("failed to add new device\n");
->   			return PTR_ERR(nbd);
-> @@ -2715,7 +2746,7 @@ static int __init nbd_init(void)
->   	nbd_dbg_init();
->  =20
->   	for (i =3D 0; i < nbds_max; i++)
-> -		nbd_dev_add(i, 1);
-> +		nbd_dev_add(i, 1, 1);
->   	return 0;
->   }
+Verified with 100 QEMU boots per platform on v7.2-rc4, no controller
+present. "work still pending" appeared on an unfixed kernel vs with this
+patch:
 
-This approach will only be useful when nbd device is created the first time=
-.
-If NBD_ATTR_INDEX is set and nbd device is found, or NBD_ATTR_IDNEX is not =
-set
-and nbd_find_get_unused() found an unused nbd device, blk_mq_update_nr_hw_q=
-ueues()
-is still required. As you can see, nbds_max is default to 16 and all these =
-devices
-will be created with nr_hw_queues as 1.
+  Acorn RiscPC, rpc_defconfig: 100/100 -> 0/100
+  x86_64 defconfig, qemu -M q35: 6/100 -> 0/100
 
->  =20
+With a controller present on qemu -M pc, reading and writing a 1.44M
+floppy image still works.
 
---=20
-Thanks,
-Kuai
+ drivers/block/floppy.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index f04397b8e381..6cfd114d27df 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4744,6 +4744,8 @@ static int __init do_floppy_init(void)
+ 		}
+ 	}
+ out_release_dma:
++	/* Drain the queued redo_fd_request() before releasing IRQ and DMA. */
++	flush_workqueue(floppy_wq);
+ 	if (atomic_read(&usage_count))
+ 		floppy_release_irq_and_dma();
+ out_unreg_driver:
+-- 
+2.53.0
