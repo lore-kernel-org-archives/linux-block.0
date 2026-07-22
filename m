@@ -1,145 +1,115 @@
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FEF470E8A;
-	Wed, 22 Jul 2026 19:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784747978; cv=none; b=vCN7zFSjYp9P7u/Zg+W+1rpTDH6/xdXe68i1SWKL1OzfSSTxwxLit6gh3By5t1QX9SBGP9e3vr1Z9nWrswdUqQRkPcyYVA4omWY3K63t103hUkWbd4VH+MKpXx1JfQJHjhvKLhhvmOCTexnDAXuxMYFW8qLm0oteac2BaJWfiDs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784747978; c=relaxed/simple;
-	bh=w4ohT//4srnT//XbpT91/xlrNycZFUuC2JhcXtoooJg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=PaSwlxNDImrC8w6dJYMCuO+XUoKj7KJ+s1VyUFmQX5CgYBNBgMvcp/iu2CqNiIcsyqESxkz9VMzrDVLYkY/abTRWoFfJ245TFeLCJLQ/DjUm2CfqHlG8OrM2hDuyULK31udEClKayEbJiWZ3x6WTIqEfg6YSOtVsNwukQroNZV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=cRN/668f; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095E33A7F40
+	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 19:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784749829; cv=pass; b=VIQGLz9ZFzdSKO6lxxW9TrBOn8E1ZdNOrZUylaVre1//I9qcJ89We2zwBJcH8rtfdXRFB8Nqe4BImatyTzvSF4qf66/hlSCB9vOJZjHodPTofSnNC1lzYbFaPx5DQ+QMo4G4WsVoHOm6TRidI3WKsWZ/WwK9WTrYgxeWqW/tz34=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784749829; c=relaxed/simple;
+	bh=oCdr0VyYuWFniik+cq5m2m8gRYzMe6MoyKAYOFWNB4k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C04VhQy94vlZ5/N9a24EjC8Nl4hqr6IrR/DaSME2vFbcrc/o0dP//41Dud9jpYvdsmBNO2m3iNY339K8o9FfAOfQwEkQsNYBhQ9unSBlwPAbK3jGWR3LtX56W31o7lbW3byTrISKcYTrezmhRN6EoYooACC2v1Kl3BOoXjbUFpY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=YeIXLrM4; arc=pass smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="cRN/668f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=Ag7JybFwd1Hljy8FXU4GMOuS37EW2IpYIz19SCB7FmY=; b=cRN/668fxd1DGWOTgoIoSTt7Te
-	OxVzTKBp/YlJSgXLQ44VW8bAYhP6LezdoIIsBSZDPbBMhcTHoBDQBwDTZsJIRrIG6rEO811rEpRW3
-	T/yPw+BJly9z3pXslNbGadE35GvW2pAu3L5ch9pAsJypoHocuFmjMFIghW0LLSaGzacdEUOMs0OxD
-	z4dqjV1HobwfKr6gefBIPdEjPf+ERneFK22S7t4yBFTT4Co5bYJwoPzbD4fFNZNAMzT3TuHmHTHH9
-	MK8ozXJ4XCbUq2QsGfp1Q246wH1X5JybsmZKLSCRuPHk9IrxvyCmSMyKQza7yR/BxC2zvhLIH6h7f
-	lfN4z2cw==;
-Received: from d172-219-145-25.abhsia.telus.net ([172.219.145.25] helo=[192.168.11.155])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <logang@deltatee.com>)
-	id 1wmcTa-0000000CaCN-19fj;
-	Wed, 22 Jul 2026 13:19:31 -0600
-Message-ID: <536428fd-9c23-45c3-be0a-5eaaf8f3939a@deltatee.com>
-Date: Wed, 22 Jul 2026 13:19:29 -0600
+	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="YeIXLrM4"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-38e08baf860so10691397a91.2
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 12:50:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784749827; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Rxz4NxuSMrFbw6jHlcRCr0Soiw5chFLzlq1lDnlHlZF6MOAgiLsjc6v8N06OAgKtwd
+         3M0zlec0tYuMtRycPcVBJ9h0MO1DYkzLN6jy3/kEbn45nolKcLvnKhcqVDU3gAc1q5zx
+         o8YKPJ//U+8U+7JdG7W33DZ0Q3fP6s8o7Sn5OobD3yA5EavGTBuK1XR7LmBjOfDcWGbA
+         7NnKQUc/NX2o6mhrgn0vjEjPLA7euvb3wbowkjzzbfCnzJScaqrwhzNFlQFeSKlV4LYm
+         J09eK84YUsN+IsiA+1tLUBgDYnRxKQQPT4eZCjA4hRt9Mgl5xYh2IzIiArsg8Y65AHqz
+         Tk1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=L59f6N/a3yWmzrdAG6ejPSTgLStmVPx9Cs1jpRvp2rY=;
+        fh=i2qInDgUPB8v4fsfWxfpswX3d9/rMszwy2BsEs8Gweo=;
+        b=DodauRT68688a1mMQu8aPwOQ6p9IlUPf89QQ91srliPl44Pu7sfVeJI6JUjWXoqNFG
+         02misZSexlh2WgrpIs56bvTbTDstb8gGWZoEsme9zuWR2RtDlJlD+Qt1MlA9sMZW27VZ
+         TDWHfiTkEabnuZXyGvDC/tc9HwtPhW3gOylSIBEWrHcSKkaB+jEpq48fl7mF/Dgyj+Bz
+         KzIBmZlB9XOI764xoe1ax2AF44eqR4z9CVZFAItGNPXpbG2RXIbIkVDfd0Z31c6PblhD
+         FMJsuZrsZHUMPaX6y0+wTGNv0iYl+M/RFBPHr+rq9bFSMQT+3MDrYaJXQWFwsQbWd6aC
+         gATw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=meshstor.io; s=google; t=1784749827; x=1785354627; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=L59f6N/a3yWmzrdAG6ejPSTgLStmVPx9Cs1jpRvp2rY=;
+        b=YeIXLrM4K4HgxBCvURWc8JwUoFLnuTm31u0ZBw1QqoSyqXcCXd1B/ilcUDzWDg5437
+         qjmIgvAvp9KTAatdM4wTzp53MVqpI6Iptu2xH2fvHG1DdIej/dRvcM/RCnWLDC/9KOuM
+         1jqvVvWr0EcNNv9ol/xRweVpHmQO38bdcXge+wQDEYGrAqDjX6goVP/IyBdSht0NdeTt
+         p8wiKX5yH4XTkKkZ96PP/zLgXuGb6N2J2Jrg2rMJxbfZY5RyQOwvpINnQIn9D8DGaDMf
+         DK8TgMX1Av8WtyC7nH+87La9CI4wxSGfOh1IkBiAlrrbmA6kCXVtqYIREDD8aUaDidPs
+         diqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784749827; x=1785354627;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=L59f6N/a3yWmzrdAG6ejPSTgLStmVPx9Cs1jpRvp2rY=;
+        b=sQzSN5QUTaknLB6o9wOqFBp05dUGl/cx5d4a+4FXVfnJoK3EQx+sm4ExrdCh0EhxbZ
+         Lwf/7zfRWycNVbosVSSQEUv679/71MWW6j80jXpYa9exU0tV0RhdpFkju4tJCQedAUA4
+         vTl8n9Xobl2b7RRAYvzAeklfdgUXkcccOmB8AnAQ8tmfRAoSEG8PGx9U9GFwBrBQqKOQ
+         BsyKflxPTx2vv4xlGlLtEYH1ZJYvR3gEA11hEIw/RS2b+FJ40a1Es4G0CK+UhQwZBfnM
+         gQ271Loi2RkQ9i2+I3b9QvajpfD9BmBEGvmX9XSI01UEbzXO1IcCgbD+7pWisoxi2cnM
+         yo8A==
+X-Forwarded-Encrypted: i=1; AHgh+RowqBQXQovt2Luii49RNRQrmYFVcyslcR1O63SIrvXNNWAxTEDYlhRpB8/fzQ5FBnHEDZbFEzsfg2iVfw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMuCbrO6wdtSTrOH1hzMSpv3UcMD0y17bzU/U9BrhmvcuxikWi
+	JS63SNjInYqeNwFVX/UhA3h+tu9iNc4XTmD5uImILEKVRZYZaQdL+b3C+9VDcgspOOVi4noYSDP
+	xJc430/oa4Sfa1zdNFOddPe3YWW+W1ZziC40gK1Qc
+X-Gm-Gg: AR+sD12qOGpYmhFqiCgxdAWuJyl18YPetrBxRs6AUa+Vh2gXB8BqWDDKIXIqyxV5oIC
+	wFjJP3ynZugWEk9N4kzdLIFypBfHXVtfec35vBGzju9WVJs6Mp1H3nbMR6vjVnj94XBj+rp6oGc
+	LF9hTtJaVL0G7G5fZC3bpOesND1LUc0xqkzxNY72IcqWIwPg3aN+UbRYgtYYd4Ud+p3VQP9TJrs
+	M5WUhdIrqAZdPLq44ZC+1Ldr631vV4yjVcIpA4Nn81EECSJR1hrgL2oaylrZKFRhmpVNv7g1Q9b
+	yruZlCWglKvIX36/U6/fTNItN1hpRtuBmr6bsauOgDMzttzjjWYq0IOZcMlrZEGXA0mbW7YGN3X
+	hPta60b4U3yW+nXaesBr74RZb9c3z
+X-Received: by 2002:a17:90b:518c:b0:38e:b3fd:d582 with SMTP id
+ 98e67ed59e1d1-38ec6657a87mr93881a91.39.1784749827092; Wed, 22 Jul 2026
+ 12:50:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
- Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
- <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-pci@vger.kernel.org
-References: <20260722185841.449934-1-mykola@meshstor.io>
- <20260722185841.449934-9-mykola@meshstor.io>
-Content-Language: en-US
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20260722185841.449934-9-mykola@meshstor.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.219.145.25
-X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH v4 8/9] md/raid1,raid10: set IO_BLOCKED in case of
- BLK_STS_P2PDMA
-X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+References: <20260722185841.449934-1-mykola@meshstor.io> <20260722185841.449934-8-mykola@meshstor.io>
+ <38c44536-51c0-43a1-b83c-b94915890aa2@deltatee.com>
+In-Reply-To: <38c44536-51c0-43a1-b83c-b94915890aa2@deltatee.com>
+From: Mykola Marzhan <mykola@meshstor.io>
+Date: Wed, 22 Jul 2026 21:50:14 +0200
+X-Gm-Features: AUfX_mxD5xjrC5SGVG19NWXUUrwiVViRlgsz7kddupZQwNnofwkXgV0KRRHwCnM
+Message-ID: <CAPzsNDtmEFf2uyJr+gSs4iw_E+LYiH5+3uojxhGMYKYku+fw+Q@mail.gmail.com>
+Subject: Re: [PATCH v4 7/9] md/raid1,raid10: skip futile retries on P2PDMA
+ mapping failures
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Li Nan <magiclinan@didiglobal.com>, 
+	Xiao Ni <xiao@kernel.org>, Guoqing Jiang <guoqing.jiang@linux.dev>, 
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kiran Kumar Modukuri <kmodukuri@nvidia.com>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Shivaji Kant <shivajikant@google.com>, 
+	Pranjal Shrivastava <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-pci@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+> Maybe drop my authorship from this patch.
 
+I will do in v5. Any other changes needed?
 
-On 2026-07-22 12:58, Mykola Marzhan wrote:
-> From: Logan Gunthorpe <logang@deltatee.com>
-> 
-> A read that fails with BLK_STS_P2PDMA cannot succeed against that
-> member, so mark the leg IO_BLOCKED and let the retry redirect elsewhere.
-> Skip the read-error machinery: there is nothing on the medium to fix,
-> fix_read_error()'s probe reads into host pages and would "succeed", and
-> charging the read-error budget would evict a healthy member under a P2P
-> read workload.  FailFast eviction is skipped for the same reason -- the
-> request never reached the wire.
-> 
-> Fixes: 02666132403a ("md: propagate BLK_FEAT_PCI_P2PDMA from member devices to RAID device")
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Co-developed-by: Mykola Marzhan <mykola@meshstor.io>
-> Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
-> ---
->  drivers/md/raid1.c  | 4 +++-
->  drivers/md/raid10.c | 5 ++++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-> index 917d694ef401..76a1426e64f0 100644
-> --- a/drivers/md/raid1.c
-> +++ b/drivers/md/raid1.c
-> @@ -2658,6 +2658,8 @@ static void handle_read_error(struct r1conf *conf, struct r1bio *r1_bio)
->  {
->  	struct md_rdev *rdev = conf->mirrors[r1_bio->read_disk].rdev;
->  	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
-> +	/* evaluate before the bio_put() below */
-> +	bool p2pdma_error = bio->bi_status == BLK_STS_P2PDMA;
->  	struct mddev *mddev = conf->mddev;
->  	sector_t sector;
->  
-> @@ -2675,7 +2677,7 @@ static void handle_read_error(struct r1conf *conf, struct r1bio *r1_bio)
->  	 * read error.  This is all done synchronously while the array is
->  	 * frozen.
->  	 */
-> -	if (mddev->ro) {
-> +	if (mddev->ro || p2pdma_error) {
->  		r1_bio->bios[r1_bio->read_disk] = IO_BLOCKED;
->  	} else if (test_bit(FailFast, &rdev->flags)) {
->  		md_error(mddev, rdev);
-> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-> index 9045a3f02dae..e35aeac29f06 100644
-> --- a/drivers/md/raid10.c
-> +++ b/drivers/md/raid10.c
-> @@ -2848,6 +2848,7 @@ static void handle_read_error(struct mddev *mddev, struct r10bio *r10_bio)
->  {
->  	int slot = r10_bio->read_slot;
->  	struct bio *bio;
-> +	bool p2pdma_error;
->  	struct r10conf *conf = mddev->private;
->  	struct md_rdev *rdev = r10_bio->devs[slot].rdev;
->  
-> @@ -2860,10 +2861,12 @@ static void handle_read_error(struct mddev *mddev, struct r10bio *r10_bio)
->  	 * frozen.
->  	 */
->  	bio = r10_bio->devs[slot].bio;
-> +	/* evaluate before the bio_put() below */
-> +	p2pdma_error = bio->bi_status == BLK_STS_P2PDMA;
+> I'm not sure I follow the point of this new comment here.
 
-I see why we needed to add the p2pdma_error variable now. I guess I
-missed that. But can we maybe do both raid10 and raid1 the same even if
-it means moving the `bio =` line up a bit? I think it would be better to
-move the code more towards similarity with raid1 instead of diverging it
-further. Maybe someday it can be cleaned up into more common code and
-that will be easier if we make both changes the same.
-
-Thanks,
-
-Logan
+I will drop the comment; it means the failure covers the whole bio and
+won't change on retry, so we record  whole range rather than per block.
