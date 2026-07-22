@@ -1,114 +1,111 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6306023E320
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 20:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784750575; cv=pass; b=AND7EEmWzaaRuC3+7TC5PFlEABNI+5NVkEZ+F4LirqH6n24s3oCHKdsjSx7/BwF7L/zWBRpbpYgmULRBQTZu5KPKow/lB8L9Eb1DJ3uD1csDNH7zcC6D6qcQnn7e6qWxc6D2Jih3ZdW7W5sIiZuiwaLa0+ZOeDclbXlqyDjQU8E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784750575; c=relaxed/simple;
-	bh=vu4r/k+6CRzm0HvAmjC2f8PLSYRb0q27NObpyU+llPc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=koKnGsqR+S2uf0d4UwGXZfUsbGkTYR/7j8t+2LFaPo9FgxucSj6+GKaiDJJv3BuxPIAftT2ehLAVQjCAQfJQ/y1xcs4Eh+oCuP16qJFIrUH6p/BAFDC9xXvPIW/AYBGY2tckt+uV8LSAGHHUir7jTiP7FpSDSu8jDykfXG4CpSI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=fVqSFWa8; arc=pass smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CCC345EBF;
+	Wed, 22 Jul 2026 22:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784757613; cv=none; b=Z1pjuA+uXntgJl1zJvmQTkW4X+oalZYTY0czHkNw4XodR/dLuoRtFYkasdH/xIQ9Vfq4nzvwEBNOrBoZv3Th851cdCYrZUeWeny0WQG/Pbo/X4UhSljG7AJLvuytV7HXmg5lJWg7WuM9+sTIOBggjFBoJwiI8nqOMesd6bn7xbU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784757613; c=relaxed/simple;
+	bh=AlOzJ3PucvMhjsxe049wK97vJfOJA8H9ozMVnIVACpg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=OJworiymcQ2mmcqKZApAeABYeWnjmcPy+dj/HbRBIuSPo9fcq8o+X47vuZmQNtvovPKhScI3ICsxKrBxpPKT/eRAZ8Ty+GoFNocGljMthT34ohRo9aL8qOYcHtXSD1bkrr9BVEDgOgaA2tOuNVGhANqfBeubzNoiUGIF0WZG/94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=H80nSWfW; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="fVqSFWa8"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-38e69bdb0fcso3400499a91.1
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 13:02:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784750574; cv=none;
-        d=google.com; s=arc-20260327;
-        b=NVYQmCUl0t0+5sR7XsfMFKO5TTD5TCqxje4Z6iQqaJJi6K/dp5CJcqNpoZGPMZz8SF
-         jDUSG2SDvmAo+mos7AV1nnzRzgoTuPEGtEnbqdExc0/6+/sfwjwyzMwZMzT0iXTzUkgl
-         iNacXTkWWQNXbcoJyZuHTl63yVSRGVT9Y6sjEIz8WDJ97hKoN+fiXpYbPO9LGoWPL0Bz
-         4iO62dMfF4J3+k8Wol0U37GLC48OOXbTo8VzwIyLwUMraPI19eUhoQHpaur4Hjy9rS0N
-         aOe2J3rPy+788i4duNpCH4uh48S5ql/72T/kvpA3Mhln9eG6ttFFoM01DQys/pKq5kD9
-         Gw0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=vu4r/k+6CRzm0HvAmjC2f8PLSYRb0q27NObpyU+llPc=;
-        fh=puOI87+GkbfKdPRGddnU5l2LqtouvuVlroiSjzs8kt4=;
-        b=MjR+VRdiQ92HgQmW+31QdOZy6qbCrz/IyHz1IP/Bsb6W3nmLItL3aOC3b9Cu7tlwyU
-         mTrhtROcEe118NMWI4z4/6PzFdio3n/SbwWWLqchBUdel6/gHGAAr6jBtH6fQo4IaskB
-         u0CpMTlBMemXsmqyngfofsRlVg42KZCuM4cssSlFCmD0CkJ52/Grd4zsrvbXPikAQ3+o
-         zla2bMUnod3OXZMMOckaxCW+Y2OHKOxEmIAyjh4ku7YK3gg5Ez54Iuxz29Bdf13hVASI
-         3TkGyirlWQn9buD0qZcrz3t9Csgc8cg5dVe6iB3WlqS0b4B8UFBbidYY84Hy/p3ThhSZ
-         Gqpw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=meshstor.io; s=google; t=1784750574; x=1785355374; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vu4r/k+6CRzm0HvAmjC2f8PLSYRb0q27NObpyU+llPc=;
-        b=fVqSFWa8CR4WGP03THynVHBaqIQzRh1S9Vl7PP6rUAN/da1I02prdrIB2JF1bbV1L1
-         jHKk3cp7aLmOGxcp8y0PLLD7sZMFWl7a3pBjaCJUK3J71I5PCfocLuZiopCUpIXu+sxc
-         BqX6U5InP7Xn9YJ65cTQQJTHDnd3tuWpL3HpGZCceJkKdASxEA+FTIYKo03SN1HBJfms
-         CP8NrqIzfmwRbKqLu0AvRKYacacnwzJh1HiFGTm2kgQbtz7nNj1TKnS4wmGAaHF+t0tR
-         7Y4IFgR2kWg/Ef3Ej0Tcvd5EeTM+FiGokqFpY+964NguHyTc9n5FCXVcfXaAzqJ1xbnf
-         pRMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784750574; x=1785355374;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=vu4r/k+6CRzm0HvAmjC2f8PLSYRb0q27NObpyU+llPc=;
-        b=bsIaPxBPRhy/9QmPh+6eR0b+zr0vAGn90fhLEul9O676GmJxcb9tS1n/CBMSgwlCC3
-         DbTOjBPi+kYAqZllbSdGcsqkHlCgS41utMOK++erAl97glefhk3CYCeM5p43/Ql6eQHo
-         jqsclR1S6Kb5MhDJBiRPlU09Xfxq+aOIfkuZw9ibC1aPWoSzG5rYQk57pktd1ivL/Ah6
-         EcsasRAQ/pZzJF15OvLc4Sg5+og3BWqFcKiHhv3O5utx9s06eFbdyeLhcCj2H1Tkv8aR
-         d496iE3x3r+ppEQ4RpqujUCDI7cEZhmrqwPqHqDgEkILjoH2max5wEim0FxWjlTzZxVj
-         t+oA==
-X-Forwarded-Encrypted: i=1; AHgh+RoI5ENBzmt/TjQTciBGiMqOJFHMlfgFYzMVGMJgPGOYeWuoSye1Lq9TzWr0Lup0I46orsdhLxdSL+FCGw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPn7MsBbnPDjRfuvRcKRnSBx3ZUWQJg62j3CF2Z85344aAaFil
-	PkFFgI/vszikCUyvf8dRMItUyu9SXphafqDxWVXdxW0/HIMYxEsMgeTqpzl8CkWJ4zElJAZesoI
-	vFxbtbtgucoLK+VjcTIeoxXtxR1iDNawiDT+OrBJa
-X-Gm-Gg: AR+sD10tinjmYCTycRWH4jehl21xZxonU3BMlmFruOKDe/0SsSVk6wt/8/WM/GT2uJq
-	pHrRzTtW1j5MRCpuweE0iaam1jbjiEbHrA2iFldDmxJBuhUB1reAJJynS4cYdgQRGX930LMkIdb
-	QA/HJycYFypj15PPanBezdX0YW/uchFC5dd5tceCuw00ajomYEQ1vxOSJXup6PxDRTIxy/+wgcv
-	N5hlRHalLeGjAf72GKzu2WypdWmb1+LyElhfzRmV4d3GVYTqsNHQyVz7N1pklyjakTVHZlQIbdz
-	ydp6w4dqQd31bMjpu/R/BYWj45ptAW5yCoGcScHppEt5UIMkf5C1C4OSKSmzIk0GOhHYn/DwXxO
-	jITU+Hh2j5shxd+6oDQPufTuQtA0aYIzTpYIFVSo=
-X-Received: by 2002:a17:90b:2d10:b0:38c:a59b:5189 with SMTP id
- 98e67ed59e1d1-38ec698af76mr113249a91.15.1784750573899; Wed, 22 Jul 2026
- 13:02:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="H80nSWfW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=mWLM0sNqj8A+i8RsOd2Hmw7WLj+R4XIGUQ97gxss7QY=; b=H80nSWfWXMG7+WawMVnp9g982Y
+	l4MDmkHHwJaBipGMWml11JCpIMHWEkOL0zPbZo1GPMWZLvgdAga9WMfiySF/nWucEmoClt6MNfuC0
+	YHiEocy1hNKn1EVedB09F2jVj+0gga1as3yohtlIgoxcbfK01gAFK+01mdKyAzxlqLp/45Tnyx1rT
+	a1sC3iXJoCQ2ecHm5Orlcj5VRGuxiiB4sL7LpgQLyvwy6y3pewb+vltNHNm8KC9yrMmCMsyT7234k
+	vcCqRG2a3kQYmw/efvm+QkJ2qDX6WcKGkQzTQodogTuyyOgqc0q0GAPUAsr07MXpDUphBq7rhPdJI
+	O95uAEmg==;
+Received: from d172-219-145-25.abhsia.telus.net ([172.219.145.25] helo=[192.168.11.155])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <logang@deltatee.com>)
+	id 1wmeyv-0000000CbjN-1hVE;
+	Wed, 22 Jul 2026 16:00:02 -0600
+Message-ID: <528ead56-5621-48ec-8828-d9071ebfa2bb@deltatee.com>
+Date: Wed, 22 Jul 2026 15:59:55 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260722185841.449934-1-mykola@meshstor.io> <20260722185841.449934-9-mykola@meshstor.io>
- <536428fd-9c23-45c3-be0a-5eaaf8f3939a@deltatee.com>
-In-Reply-To: <536428fd-9c23-45c3-be0a-5eaaf8f3939a@deltatee.com>
-From: Mykola Marzhan <mykola@meshstor.io>
-Date: Wed, 22 Jul 2026 22:02:41 +0200
-X-Gm-Features: AUfX_my0hGYZfb89FIks6uN6jtY1SapXkJQfTk3Dh1NK0AxygDAcUpRTP3iNF6Y
-Message-ID: <CAPzsNDscnb+fH0XZF3qBDgxkREmgh6F=rp0GO18Wy7gLc=4Ldw@mail.gmail.com>
-Subject: Re: [PATCH v4 8/9] md/raid1,raid10: set IO_BLOCKED in case of BLK_STS_P2PDMA
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, Li Nan <magiclinan@didiglobal.com>, 
-	Xiao Ni <xiao@kernel.org>, Guoqing Jiang <guoqing.jiang@linux.dev>, 
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Kiran Kumar Modukuri <kmodukuri@nvidia.com>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Shivaji Kant <shivajikant@google.com>, 
-	Pranjal Shrivastava <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+ Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
+ <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-pci@vger.kernel.org
+References: <20260722185841.449934-1-mykola@meshstor.io>
+ <20260722185841.449934-10-mykola@meshstor.io>
+Content-Language: en-US
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20260722185841.449934-10-mykola@meshstor.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.219.145.25
+X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH v4 9/9] nvme-rdma: return BLK_STS_P2PDMA for unsupported
+ P2P transfers
+X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-> I think it would be better to
-> move the code more towards similarity with raid1 instead of diverging it
-> further.
 
-I'll move bio = r10_bio->devs[slot].bio; up into the declaration so
-raid10 matches raid1 in v5.
 
-Thank you!
+On 2026-07-22 12:58, Mykola Marzhan wrote:
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index 6909e3542794..2f50509a7a61 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -1469,6 +1469,7 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
+>  		int *count, int *pi_count)
+>  {
+>  	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
+> +	struct sg_table sgt;
+>  	int ret;
+>  
+>  	req->data_sgl.sg_table.sgl = (struct scatterlist *)(req + 1);
+> @@ -1480,12 +1481,14 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
+>  
+>  	req->data_sgl.nents = blk_rq_map_sg(rq, req->data_sgl.sg_table.sgl);
+>  
+> -	*count = ib_dma_map_sg(ibdev, req->data_sgl.sg_table.sgl,
+> -			       req->data_sgl.nents, rq_dma_dir(rq));
+> -	if (unlikely(*count <= 0)) {
+> -		ret = -EIO;
+> +	sgt = (struct sg_table) {
+> +		.sgl		= req->data_sgl.sg_table.sgl,
+> +		.orig_nents	= req->data_sgl.nents,
+> +	};
+
+Maybe we could make this patch a little clearer by splitting the change
+to sg_table into it's own patch? That would make it much easier for me
+to review. I've looked through it now a couple times and think it's ok,
+but it's a little more complex than I can really untangle in my head.
+
+Per your other email, I think that will make things good from my
+perspective for v5, but I reserve the right to find something new when I
+look at it ;)
+
+Thanks for your efforts cleaning this up.
+
+Logan
