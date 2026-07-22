@@ -1,1169 +1,213 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E29A356A12
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 13:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D571E3469F6;
+	Wed, 22 Jul 2026 13:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784725455; cv=none; b=geOgUghVVXZdgx1UGH10PVY2Ka7KbcOsVr7cNuFiqKikiC5FwQDbM9UJWrzjSIVe9mBoaoAkK/zh8ZwmReD/mJgx/AP0pbg2u7JxTRdefnX75NuO3QXaeeea0IVeXWxT32JTsh7BMYzoP+HOu9tzMaGnfTVt4YTDbZqApFdOj7Q=
+	t=1784728612; cv=none; b=j/3vEprRxbVNYzUIIqolfJFBChg70BEpmBN3ygdi8+CIza5wuCA6OmSZT5yWzT4wTEh79aY2h4gCChdqVJDdAFz6qau6nlr3n27GKPZ+L6qatfbDD+mA2hln1oMrRDaW2wHCiZwheukF1l38OQ9xcjcoAxGifmBL5UsPxlghLsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784725455; c=relaxed/simple;
-	bh=IfkNbnkK+K9R/MLEGAR4rdNkMxF+ELUjPLzXBT1rhoA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PAbCakp5dk9IChChg/38LPgBwAK4RVuF/z+AieReGxB3LuEc7yCjDKICax3hwqtVX3XniuMPLYWtz52Y5LVY1xpeUJqIu3ok8J5PzGoTD7WNrzSnV+BBz8kaKGgyZ5VH9QPiyYjn0wuGABq3EmDUE3/bezs+1Xy0h6UmyRQyvlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WxllbVHw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1784728612; c=relaxed/simple;
+	bh=c/7N6KbADqM0WgN320UPrjz3skJFAld4wBD9sgg7JaM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T4/9XIcshb0aaEQRxo4QESppA1zVEiJuKz7Z9fi0c3CDZMQdpedEv8SDNvSrPk/cCkvG5sPSLYPcWP449zjMCvZosPk+bPDTMvjNZGsKnrJfvGSMuA50lE1IYpJAVOxjCbwYEZ89dVNLEunQo6bUXPyQVcpHOHHmesd28WEuRic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aM4rVYxw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxllbVHw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784725450;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HmYZTTSB8yIZ8w5PlCJ8NfYJb0si0i+oApJKiHwj5aE=;
-	b=WxllbVHwnSdoBJW/FCYF+5JYsBDHCHExPksuWAT7djdzGeZCJYkGYO+cdOvFNdnKY/6qYF
-	gj/CHFRn7UhKg0HLHZmX1Q2lSqc2CCjEBDq1SWT/ObFvGBss5rY8OoPXmkP0gI0g8p1IvI
-	G2iAuafY2Bv/5j6lzL3AVeLSTgSOtRo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-580-dy_UDwLIOtKz4G6LBu93wQ-1; Wed,
- 22 Jul 2026 09:04:06 -0400
-X-MC-Unique: dy_UDwLIOtKz4G6LBu93wQ-1
-X-Mimecast-MFC-AGG-ID: dy_UDwLIOtKz4G6LBu93wQ_1784725443
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8051D18E6A57;
-	Wed, 22 Jul 2026 13:04:03 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 37934180034C;
-	Wed, 22 Jul 2026 13:03:56 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 11/29] iov_iter: Add a segmented queue of bio_vec[]
-Date: Wed, 22 Jul 2026 14:01:58 +0100
-Message-ID: <20260722130218.78958-12-dhowells@redhat.com>
-In-Reply-To: <20260722130218.78958-1-dhowells@redhat.com>
-References: <20260722130218.78958-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aM4rVYxw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 742BE1F000E9;
+	Wed, 22 Jul 2026 13:56:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784728610;
+	bh=sehDTWB0q5frYBeNUuht2aeeZDtQWH6OWbqVSpxsbs4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=aM4rVYxwFhpdESVNtNEH0TL19rF/Ph+vLZLrEzmEh+nq2M52/uJlNSVyTwUkWbLA3
+	 WbLKcWcQeIRu0SXOKP45pQQS+cNUS6JE3tHPuQyumc/K7ZkaOmbEGASa+je8cmfWvE
+	 V934w3dNxldNFSAMHNutcTpLW3sxy9cU6+hGFrGRzPqth4bBfuB0iM1H6OBaCt21LG
+	 3Oz/E18Hr2KL+/IiFKrR+PPm+Tsp/YjK+A/HWTmyRBWhiNPeqd7T/gzUAkdAw5ylth
+	 DDE54SjkJCghE5f5Kh/I2wyc9ntGzbL592c83Umm4pjriXC+sVXrWVx/HYnIsL9NDk
+	 wD+xJd5JJs1Hw==
+Message-ID: <3d954cdd-6dde-4be6-84c9-2f2f7d008f5b@kernel.org>
+Date: Wed, 22 Jul 2026 14:56:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 0/9] Support for block device NVMEM providers
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson
+ <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saravana Kannan
+ <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, daniel@makrotopia.org,
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+Content-Language: en-US
+From: Srinivas Kandagatla <srini@kernel.org>
+In-Reply-To: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Add the concept of a segmented queue of bio_vec[] arrays.  This allows an
-indefinite quantity of elements to be handled and allows things like
-network filesystems and crypto drivers to glue bits on the ends without
-having to reallocate the array.
 
-The bvecq struct that defines each segment also carries capacity/usage
-information along with flags indicating whether the constituent memory
-regions need freeing or unpinning and the file position of the first
-element in a segment.  The bvecq structs are refcounted to allow a queue to
-be extracted in batches and split between a number of subrequests.
 
-The bvecq can have the bio_vec[] it manages allocated in with it, but this
-is not required.  A flag is provided for if this is the case as comparing
-->bv to ->__bv is not sufficient to detect this case.
+On 7/3/26 2:45 PM, Loic Poulain wrote:
+> On embedded devices, it is common for factory provisioning to store
+> device-specific information, such as Ethernet or WiFi MAC addresses,
+> in a dedicated area of an eMMC partition. This avoids the need for
+> and additional EEPROM/OTP and leverages the persistence of eMMC.
+> 
+> One example is the Arduino UNO-Q, where the WiFi MAC address and the
+> Bluetooth Device address are stored in the eMMC Boot1 partition.
+> 
+> Until now, accessing this information required a custom bootloader
+> to read the data and inject it into the Device Tree before handing
+> control over to the kernel. This approach is fragile and leads to
+> device-specific workarounds.
+> 
+> Rather than adding a new NVMEM provider specifically to the eMMC
+> subsystem, the new support operates at the block layer, allowing any
+> block device to behave like other non-volatile memories such as EEPROM
+> or OTP.
+> 
+> This series builds on earlier work by Daniel Golle that enables block
+> devices to act as NVMEM providers:
+> https://lore.kernel.org/all/6061aa4201030b9bb2f8d03ef32a564fdb786ed1.1709667858.git.daniel@makrotopia.org/
+> 
+> It also introduces an NVMEM layout description for the Arduino UNO-Q,
+> allowing device-specific data stored in the eMMC Boot1 partition to
+> be accessed in a standard way.
+> 
+> WiFi and Ethernet already support retrieving MAC addresses from NVMEM.
+> Bluetooth requires similar support, which is also addressed.
+> 
+> Note that this is currently limited to MMC-backed block devices, as
+> only the MMC core associates a firmware node with the block device
+> (add_disk_fwnode). This can be easily extended in the future to
+> support additional block drivers.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 
-Add an iterator type ITER_BVECQ for it.  This is intended to replace
-ITER_FOLIOQ (and ITER_XARRAY).
+What is the merge strategy here, Am happy to take it via nvmem tree if
+all the non nvmem patches are acked or reviewed-by.
 
-Note that the prev pointer is only really needed for iov_iter_revert() and
-could be dispensed with if struct iov_iter contained the head information
-as well as the current point.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- include/linux/bvecq.h      |  56 +++++++
- include/linux/iov_iter.h   |  74 +++++++-
- include/linux/uio.h        |  11 ++
- lib/iov_iter.c             | 334 ++++++++++++++++++++++++++++++++++++-
- lib/scatterlist.c          |  67 +++++++-
- lib/tests/kunit_iov_iter.c | 260 +++++++++++++++++++++++++++++
- 6 files changed, 796 insertions(+), 6 deletions(-)
- create mode 100644 include/linux/bvecq.h
-
-diff --git a/include/linux/bvecq.h b/include/linux/bvecq.h
-new file mode 100644
-index 000000000000..15f16f905877
---- /dev/null
-+++ b/include/linux/bvecq.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Implementation of a segmented queue of bio_vec[].
-+ *
-+ * Copyright (C) 2026 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#ifndef _LINUX_BVECQ_H
-+#define _LINUX_BVECQ_H
-+
-+#include <linux/bvec.h>
-+
-+/*
-+ * The type of memory retention used by the elements in bvecq->bv[] and how to
-+ * clean it up.
-+ */
-+enum bvecq_mem {
-+	BVECQ_MEM_EXTERNAL,	/* Externally retained memory - no freeing */
-+	BVECQ_MEM_PAGECACHE,	/* Ref'd pagecache pages - must put */
-+	BVECQ_MEM_GUP,		/* Pinned memory from get_user_pages() - unpin */
-+	BVECQ_MEM_ALLOCED,	/* Memory alloc'd by bvecq - can be freed/pooled */
-+} __mode(byte);
-+
-+/*
-+ * Segmented bio_vec queue.
-+ *
-+ * These can be linked together to form messages of indefinite length and
-+ * iterated over with an ITER_BVECQ iterator.  The list is non-circular; next
-+ * and prev are NULL at the ends.
-+ *
-+ * The bv pointer points to the bio_vec array; this may be __bv if allocated
-+ * together.  The caller is responsible for determining whether or not this is
-+ * the case as the array pointed to by bv may be follow on directly from the
-+ * bvecq by accident of allocation (ie. ->bv == ->__bv is *not* sufficient to
-+ * determine this).
-+ *
-+ * The file position and discontiguity flag allow non-contiguous data sets to
-+ * be chained together, but still teased apart without the need to convert the
-+ * info in the bio_vec back into a folio pointer.
-+ */
-+struct bvecq {
-+	struct bvecq	*next;		/* Next bvec in the list or NULL */
-+	struct bvecq	*prev;		/* Prev bvec in the list or NULL */
-+	unsigned long long fpos;	/* File position */
-+	refcount_t	ref;
-+	u32		priv;		/* Private data */
-+	u16		nr_slots;	/* Number of elements in bv[] used */
-+	u16		max_slots;	/* Number of elements allocated in bv[] */
-+	enum bvecq_mem	mem_type:3;	/* What sort of memory and how to free it */
-+	bool		inline_bv:1;	/* T if __bv[] is being used */
-+	bool		discontig:1;	/* T if not contiguous with previous bvecq */
-+	struct bio_vec	*bv;		/* Pointer to array of page fragments */
-+	struct bio_vec	__bv[];		/* Default array (if ->inline_bv) */
-+};
-+
-+#endif /* _LINUX_BVECQ_H */
-diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
-index f9a17fbbd398..04b8a6d943fa 100644
---- a/include/linux/iov_iter.h
-+++ b/include/linux/iov_iter.h
-@@ -10,6 +10,7 @@
- 
- #include <linux/uio.h>
- #include <linux/bvec.h>
-+#include <linux/bvecq.h>
- #include <linux/folio_queue.h>
- 
- typedef size_t (*iov_step_f)(void *iter_base, size_t progress, size_t len,
-@@ -141,6 +142,71 @@ size_t iterate_bvec(struct iov_iter *iter, size_t len, void *priv, void *priv2,
- 	return progress;
- }
- 
-+/*
-+ * Handle ITER_BVECQ.
-+ */
-+static __always_inline
-+size_t iterate_bvecq(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-+		     iov_step_f step)
-+{
-+	const struct bvecq *bq = iter->bvecq;
-+	unsigned int slot = iter->bvecq_slot;
-+	size_t progress = 0, skip = iter->iov_offset;
-+
-+	do {
-+		const struct bio_vec *bvec;
-+		struct page *page;
-+		size_t poff, plen;
-+		void *base;
-+
-+		if (slot >= bq->nr_slots) {
-+			if (!bq->next)
-+				break;
-+			bq = bq->next;
-+			slot = 0;
-+			continue;
-+		}
-+
-+		bvec = &bq->bv[slot];
-+		/*
-+		 * The caller must ensure that a slot with bv_len>0 has a valid
-+		 * bv_page.
-+		 */
-+		page = bvec->bv_page + (bvec->bv_offset + skip) / PAGE_SIZE;
-+		poff = (bvec->bv_offset + skip) % PAGE_SIZE;
-+		plen = umin(bvec->bv_len - skip, len);
-+
-+		while (plen > 0) {
-+			size_t part, remain, consumed;
-+
-+			part = umin(plen, PAGE_SIZE - poff);
-+			base = kmap_local_page(page) + poff;
-+			remain = step(base, progress, part, priv, priv2);
-+			kunmap_local(base);
-+
-+			consumed = part - remain;
-+			progress += consumed;
-+			skip += consumed;
-+			len -= consumed;
-+			if (!len || remain)
-+				goto stop;
-+			page++;
-+			poff = 0;
-+			plen -= consumed;
-+		}
-+
-+		skip = 0;
-+		slot++;
-+	} while (len);
-+
-+stop:
-+	iter->bvecq_slot = slot;
-+	iter->bvecq = bq;
-+	iter->iov_offset = skip;
-+	iter->count -= progress;
-+	return progress;
-+}
-+
- /*
-  * Handle ITER_FOLIOQ.
-  */
-@@ -306,6 +372,8 @@ size_t iterate_and_advance2(struct iov_iter *iter, size_t len, void *priv,
- 		return iterate_bvec(iter, len, priv, priv2, step);
- 	if (iov_iter_is_kvec(iter))
- 		return iterate_kvec(iter, len, priv, priv2, step);
-+	if (iov_iter_is_bvecq(iter))
-+		return iterate_bvecq(iter, len, priv, priv2, step);
- 	if (iov_iter_is_folioq(iter))
- 		return iterate_folioq(iter, len, priv, priv2, step);
- 	if (iov_iter_is_xarray(iter))
-@@ -342,8 +410,8 @@ size_t iterate_and_advance(struct iov_iter *iter, size_t len, void *priv,
-  * buffer is presented in segments, which for kernel iteration are broken up by
-  * physical pages and mapped, with the mapped address being presented.
-  *
-- * [!] Note This will only handle BVEC, KVEC, FOLIOQ, XARRAY and DISCARD-type
-- * iterators; it will not handle UBUF or IOVEC-type iterators.
-+ * [!] Note This will only handle BVEC, KVEC, BVECQ, FOLIOQ, XARRAY and
-+ * DISCARD-type iterators; it will not handle UBUF or IOVEC-type iterators.
-  *
-  * A step functions, @step, must be provided, one for handling mapped kernel
-  * addresses and the other is given user addresses which have the potential to
-@@ -370,6 +438,8 @@ size_t iterate_and_advance_kernel(struct iov_iter *iter, size_t len, void *priv,
- 		return iterate_bvec(iter, len, priv, priv2, step);
- 	if (iov_iter_is_kvec(iter))
- 		return iterate_kvec(iter, len, priv, priv2, step);
-+	if (iov_iter_is_bvecq(iter))
-+		return iterate_bvecq(iter, len, priv, priv2, step);
- 	if (iov_iter_is_folioq(iter))
- 		return iterate_folioq(iter, len, priv, priv2, step);
- 	if (iov_iter_is_xarray(iter))
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index a9bc5b3067e3..f7cfa6ea8213 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -26,6 +26,7 @@ enum iter_type {
- 	ITER_IOVEC,
- 	ITER_BVEC,
- 	ITER_KVEC,
-+	ITER_BVECQ,
- 	ITER_FOLIOQ,
- 	ITER_XARRAY,
- 	ITER_DISCARD,
-@@ -68,6 +69,7 @@ struct iov_iter {
- 				const struct iovec *__iov;
- 				const struct kvec *kvec;
- 				const struct bio_vec *bvec;
-+				const struct bvecq *bvecq;
- 				const struct folio_queue *folioq;
- 				struct xarray *xarray;
- 				void __user *ubuf;
-@@ -77,6 +79,7 @@ struct iov_iter {
- 	};
- 	union {
- 		unsigned long nr_segs;
-+		u16 bvecq_slot;
- 		u8 folioq_slot;
- 		loff_t xarray_start;
- 	};
-@@ -145,6 +148,11 @@ static inline bool iov_iter_is_discard(const struct iov_iter *i)
- 	return iov_iter_type(i) == ITER_DISCARD;
- }
- 
-+static inline bool iov_iter_is_bvecq(const struct iov_iter *i)
-+{
-+	return iov_iter_type(i) == ITER_BVECQ;
-+}
-+
- static inline bool iov_iter_is_folioq(const struct iov_iter *i)
- {
- 	return iov_iter_type(i) == ITER_FOLIOQ;
-@@ -295,6 +303,9 @@ void iov_iter_kvec(struct iov_iter *i, unsigned int direction, const struct kvec
- void iov_iter_bvec(struct iov_iter *i, unsigned int direction, const struct bio_vec *bvec,
- 			unsigned long nr_segs, size_t count);
- void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
-+void iov_iter_bvec_queue(struct iov_iter *i, unsigned int direction,
-+			 const struct bvecq *bvecq,
-+			 unsigned int first_slot, unsigned int offset, size_t count);
- void iov_iter_folio_queue(struct iov_iter *i, unsigned int direction,
- 			  const struct folio_queue *folioq,
- 			  unsigned int first_slot, unsigned int offset, size_t count);
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 31afc9687eb6..ff12ddd917cd 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -538,6 +538,40 @@ static void iov_iter_iovec_advance(struct iov_iter *i, size_t size)
- 	i->__iov = iov;
- }
- 
-+static void iov_iter_bvecq_advance(struct iov_iter *i, size_t by)
-+{
-+	const struct bvecq *bq = i->bvecq;
-+	unsigned int slot = i->bvecq_slot;
-+
-+	if (!i->count)
-+		return;
-+	i->count -= by;
-+
-+	by += i->iov_offset; /* From beginning of current segment. */
-+	do {
-+		size_t len;
-+
-+		if (slot >= bq->nr_slots) {
-+			if (!bq->next)
-+				break;
-+			bq = bq->next;
-+			slot = 0;
-+			continue;
-+		}
-+
-+		len = bq->bv[slot].bv_len;
-+
-+		if (likely(by < len))
-+			break;
-+		by -= len;
-+		slot++;
-+	} while (by);
-+
-+	i->iov_offset = by;
-+	i->bvecq_slot = slot;
-+	i->bvecq = bq;
-+}
-+
- static void iov_iter_folioq_advance(struct iov_iter *i, size_t size)
- {
- 	const struct folio_queue *folioq = i->folioq;
-@@ -583,6 +617,8 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
- 		iov_iter_iovec_advance(i, size);
- 	} else if (iov_iter_is_bvec(i)) {
- 		iov_iter_bvec_advance(i, size);
-+	} else if (iov_iter_is_bvecq(i)) {
-+		iov_iter_bvecq_advance(i, size);
- 	} else if (iov_iter_is_folioq(i)) {
- 		iov_iter_folioq_advance(i, size);
- 	} else if (iov_iter_is_discard(i)) {
-@@ -591,6 +627,33 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
- }
- EXPORT_SYMBOL(iov_iter_advance);
- 
-+static void iov_iter_bvecq_revert(struct iov_iter *i, size_t unroll)
-+{
-+	const struct bvecq *bq = i->bvecq;
-+	unsigned int slot = i->bvecq_slot;
-+
-+	for (;;) {
-+		size_t len;
-+
-+		if (slot == 0) {
-+			bq = bq->prev;
-+			slot = bq->nr_slots;
-+			continue;
-+		}
-+		slot--;
-+
-+		len = bq->bv[slot].bv_len;
-+		if (unroll <= len) {
-+			i->iov_offset = len - unroll;
-+			break;
-+		}
-+		unroll -= len;
-+	}
-+
-+	i->bvecq_slot = slot;
-+	i->bvecq = bq;
-+}
-+
- static void iov_iter_folioq_revert(struct iov_iter *i, size_t unroll)
- {
- 	const struct folio_queue *folioq = i->folioq;
-@@ -648,6 +711,9 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
- 			}
- 			unroll -= n;
- 		}
-+	} else if (iov_iter_is_bvecq(i)) {
-+		i->iov_offset = 0;
-+		iov_iter_bvecq_revert(i, unroll);
- 	} else if (iov_iter_is_folioq(i)) {
- 		i->iov_offset = 0;
- 		iov_iter_folioq_revert(i, unroll);
-@@ -678,9 +744,30 @@ size_t iov_iter_single_seg_count(const struct iov_iter *i)
- 		if (iov_iter_is_bvec(i))
- 			return min(i->count, i->bvec->bv_len - i->iov_offset);
- 	}
-+	if (!i->count)
-+		return 0;
-+	if (unlikely(iov_iter_is_bvecq(i))) {
-+		const struct bvecq *bq = i->bvecq;
-+		unsigned int slot = i->bvecq_slot;
-+		size_t offset = i->iov_offset;
-+
-+		for (;;) {
-+			while (slot >= bq->nr_slots) {
-+				bq = bq->next;
-+				if (!bq)
-+					return 0;
-+				slot = 0;
-+				offset = 0;
-+			}
-+			if (bq->bv[slot].bv_len > offset)
-+				break;
-+			slot++;
-+			offset = 0;
-+		}
-+		return umin(i->count, bq->bv[slot].bv_len - offset);
-+	}
- 	if (unlikely(iov_iter_is_folioq(i)))
--		return !i->count ? 0 :
--			umin(folioq_folio_size(i->folioq, i->folioq_slot), i->count);
-+		return umin(folioq_folio_size(i->folioq, i->folioq_slot), i->count);
- 	return i->count;
- }
- EXPORT_SYMBOL(iov_iter_single_seg_count);
-@@ -717,6 +804,35 @@ void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
- }
- EXPORT_SYMBOL(iov_iter_bvec);
- 
-+/**
-+ * iov_iter_bvec_queue - Initialise an I/O iterator to use a segmented bvec queue
-+ * @i: The iterator to initialise.
-+ * @direction: The direction of the transfer.
-+ * @bvecq: The starting point in the bvec queue.
-+ * @first_slot: The first slot in the bvec queue to use
-+ * @offset: The offset into the bvec in the first slot to start at
-+ * @count: The size of the I/O buffer in bytes.
-+ *
-+ * Set up an I/O iterator to either draw data out of the buffers attached to an
-+ * inode or to inject data into those buffers.  The pages *must* be prevented
-+ * from evaporation, either by the caller.
-+ */
-+void iov_iter_bvec_queue(struct iov_iter *i, unsigned int direction,
-+			 const struct bvecq *bvecq, unsigned int first_slot,
-+			 unsigned int offset, size_t count)
-+{
-+	WARN_ON(direction & ~(READ | WRITE));
-+	*i = (struct iov_iter) {
-+		.iter_type	= ITER_BVECQ,
-+		.data_source	= direction,
-+		.bvecq		= bvecq,
-+		.bvecq_slot	= first_slot,
-+		.count		= count,
-+		.iov_offset	= offset,
-+	};
-+}
-+EXPORT_SYMBOL(iov_iter_bvec_queue);
-+
- /**
-  * iov_iter_folio_queue - Initialise an I/O iterator to use the folios in a folio queue
-  * @i: The iterator to initialise.
-@@ -839,6 +955,39 @@ static unsigned long iov_iter_alignment_bvec(const struct iov_iter *i)
- 	return res;
- }
- 
-+static unsigned long iov_iter_alignment_bvecq(const struct iov_iter *iter)
-+{
-+	const struct bvecq *bq;
-+	unsigned long res = 0;
-+	unsigned int slot = iter->bvecq_slot;
-+	size_t skip = iter->iov_offset;
-+	size_t size = iter->count;
-+
-+	if (!size)
-+		return res;
-+
-+	for (bq = iter->bvecq; bq; bq = bq->next) {
-+		for (; slot < bq->nr_slots; slot++) {
-+			const struct bio_vec *bvec = &bq->bv[slot];
-+			size_t part = umin(bvec->bv_len - skip, size);
-+
-+			if (part) {
-+				res |= bvec->bv_offset + skip;
-+				res |= part;
-+			}
-+
-+			size -= part;
-+			if (size == 0)
-+				return res;
-+			skip = 0;
-+		}
-+
-+		slot = 0;
-+	}
-+
-+	return res;
-+}
-+
- unsigned long iov_iter_alignment(const struct iov_iter *i)
- {
- 	if (likely(iter_is_ubuf(i))) {
-@@ -854,6 +1003,8 @@ unsigned long iov_iter_alignment(const struct iov_iter *i)
- 
- 	if (iov_iter_is_bvec(i))
- 		return iov_iter_alignment_bvec(i);
-+	if (iov_iter_is_bvecq(i))
-+		return iov_iter_alignment_bvecq(i);
- 
- 	/* With both xarray and folioq types, we're dealing with whole folios. */
- 	if (iov_iter_is_folioq(i))
-@@ -1066,6 +1217,38 @@ static int bvec_npages(const struct iov_iter *i, int maxpages)
- 	return npages;
- }
- 
-+static size_t iov_npages_bvecq(const struct iov_iter *iter, size_t maxpages)
-+{
-+	const struct bvecq *bq;
-+	unsigned int slot = iter->bvecq_slot;
-+	size_t npages = 0;
-+	size_t skip = iter->iov_offset;
-+	size_t size = iter->count;
-+
-+	for (bq = iter->bvecq; bq; bq = bq->next) {
-+		for (; slot < bq->nr_slots; slot++) {
-+			const struct bio_vec *bvec = &bq->bv[slot];
-+			size_t offs = (bvec->bv_offset + skip) % PAGE_SIZE;
-+			size_t part = umin(bvec->bv_len - skip, size);
-+
-+			if (part) {
-+				npages += DIV_ROUND_UP(offs + part, PAGE_SIZE);
-+				if (npages >= maxpages)
-+					goto out;
-+			}
-+
-+			size -= part;
-+			if (!size)
-+				goto out;
-+			skip = 0;
-+		}
-+
-+		slot = 0;
-+	}
-+out:
-+	return umin(npages, maxpages);
-+}
-+
- int iov_iter_npages(const struct iov_iter *i, int maxpages)
- {
- 	if (unlikely(!i->count))
-@@ -1080,6 +1263,8 @@ int iov_iter_npages(const struct iov_iter *i, int maxpages)
- 		return iov_npages(i, maxpages);
- 	if (iov_iter_is_bvec(i))
- 		return bvec_npages(i, maxpages);
-+	if (iov_iter_is_bvecq(i))
-+		return iov_npages_bvecq(i, maxpages);
- 	if (iov_iter_is_folioq(i)) {
- 		unsigned offset = i->iov_offset % PAGE_SIZE;
- 		int npages = DIV_ROUND_UP(offset + i->count, PAGE_SIZE);
-@@ -1366,6 +1551,147 @@ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
- 	i->nr_segs = state->nr_segs;
- }
- 
-+/*
-+ * Count the number of virtually contiguous pages coming up next in an
-+ * ITER_BVECQ iterator, up to the specified maxima.
-+ */
-+static unsigned int iter_count_bvecq_pages(const struct iov_iter *iter,
-+					   size_t maxsize,
-+					   unsigned int maxpages)
-+{
-+	const struct bvecq *bvecq = iter->bvecq;
-+	unsigned int slot = iter->bvecq_slot;
-+	ssize_t remain = umin(maxsize, iter->count);
-+	size_t count = 0, offset = iter->iov_offset;
-+
-+	do {
-+		const struct bio_vec *bv;
-+		size_t boff, blen;
-+
-+		if (slot >= bvecq->nr_slots) {
-+			if (!bvecq->next) {
-+				WARN_ON_ONCE(remain > 0);
-+				break;
-+			}
-+			bvecq = bvecq->next;
-+			slot = 0;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		bv = &bvecq->bv[slot++];
-+		boff = bv->bv_offset;
-+		blen = bv->bv_len;
-+
-+		if (unlikely(!bv->bv_page)) {
-+			if (blen && count > 0)
-+				break;
-+			continue;
-+		}
-+		if (!PAGE_ALIGNED(boff) && count > 0)
-+			break;
-+
-+		boff += offset;
-+		blen -= offset;
-+		offset = 0;
-+		if (!blen)
-+			continue;
-+
-+		blen = umin(blen, remain);
-+		remain -= blen;
-+		blen += offset_in_page(boff);
-+		count += DIV_ROUND_UP(blen, PAGE_SIZE);
-+
-+		if (!PAGE_ALIGNED(blen))
-+			break;
-+	} while (remain > 0 && count < maxpages);
-+
-+	return umin(count, maxpages);
-+}
-+
-+/*
-+ * Extract a list of virtually contiguous pages from an ITER_BVECQ iterator.
-+ * This does not get references on the pages, nor does it get a pin on them.
-+ */
-+static ssize_t iov_iter_extract_bvecq_pages(struct iov_iter *iter,
-+					    struct page ***pages, size_t maxsize,
-+					    unsigned int maxpages,
-+					    iov_iter_extraction_t extraction_flags,
-+					    size_t *offset0)
-+{
-+	const struct bvecq *bvecq;
-+	struct page **p;
-+	unsigned int slot, nr = 0;
-+	size_t extracted = 0, offset;
-+
-+	/* Count the next run of virtually contiguous pages. */
-+	maxpages = iter_count_bvecq_pages(iter, maxsize, maxpages);
-+
-+	if (!*pages) {
-+		*pages = kvmalloc_array(maxpages, sizeof(struct page *), GFP_KERNEL);
-+		if (!*pages)
-+			return -ENOMEM;
-+	}
-+
-+	p = *pages;
-+
-+	/* Now transcribe the page pointers. */
-+	extracted = 0;
-+	bvecq = iter->bvecq;
-+	offset = iter->iov_offset;
-+	slot = iter->bvecq_slot;
-+
-+	do {
-+		const struct bio_vec *bv;
-+		size_t boff, blen;
-+
-+		if (slot >= bvecq->nr_slots) {
-+			if (!bvecq->next) {
-+				WARN_ON_ONCE(extracted < iter->count);
-+				break;
-+			}
-+			bvecq = bvecq->next;
-+			slot = 0;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		bv = &bvecq->bv[slot];
-+		boff = bv->bv_offset;
-+		blen = bv->bv_len;
-+
-+		if (!bv->bv_page)
-+			blen = 0;
-+
-+		if (offset < blen) {
-+			size_t part = umin(maxsize - extracted, blen - offset);
-+			size_t poff = (boff + offset) % PAGE_SIZE;
-+			size_t pix = (boff + offset) / PAGE_SIZE;
-+
-+			if (poff + part > PAGE_SIZE)
-+				part = PAGE_SIZE - poff;
-+
-+			if (!extracted)
-+				*offset0 = poff;
-+
-+			p[nr++] = bv->bv_page + pix;
-+			offset += part;
-+			extracted += part;
-+		}
-+
-+		if (offset >= blen) {
-+			offset = 0;
-+			slot++;
-+		}
-+	} while (nr < maxpages && extracted < maxsize);
-+
-+	iter->bvecq = bvecq;
-+	iter->bvecq_slot = slot;
-+	iter->iov_offset = offset;
-+	iter->count -= extracted;
-+	return extracted;
-+}
-+
- /*
-  * Extract a list of contiguous pages from an ITER_FOLIOQ iterator.  This does
-  * not get references on the pages, nor does it get a pin on them.
-@@ -1726,6 +2052,10 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i,
- 		return iov_iter_extract_bvec_pages(i, pages, maxsize,
- 						   maxpages, extraction_flags,
- 						   offset0);
-+	if (iov_iter_is_bvecq(i))
-+		return iov_iter_extract_bvecq_pages(i, pages, maxsize,
-+						    maxpages, extraction_flags,
-+						    offset0);
- 	if (iov_iter_is_folioq(i))
- 		return iov_iter_extract_folioq_pages(i, pages, maxsize,
- 						     maxpages, extraction_flags,
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 6ea40d2e6247..23e5a180103b 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -10,6 +10,7 @@
- #include <linux/highmem.h>
- #include <linux/kmemleak.h>
- #include <linux/bvec.h>
-+#include <linux/bvecq.h>
- #include <linux/uio.h>
- #include <linux/folio_queue.h>
- 
-@@ -1267,6 +1268,65 @@ static ssize_t extract_kvec_to_sg(struct iov_iter *iter,
- 	return ret;
- }
- 
-+/*
-+ * Extract up to sg_max folios from an BVECQ-type iterator and add them to
-+ * the scatterlist.  The pages are not pinned.
-+ */
-+static ssize_t extract_bvecq_to_sg(struct iov_iter *iter,
-+				   ssize_t maxsize,
-+				   struct sg_table *sgtable,
-+				   unsigned int sg_max,
-+				   iov_iter_extraction_t extraction_flags)
-+{
-+	const struct bvecq *bvecq = iter->bvecq;
-+	struct scatterlist *sg = sgtable->sgl + sgtable->nents;
-+	unsigned int slot = iter->bvecq_slot;
-+	ssize_t ret = 0;
-+	size_t offset = iter->iov_offset;
-+
-+	maxsize = umin(maxsize, iov_iter_count(iter));
-+
-+	while (sg_max > 0 && ret < maxsize) {
-+		const struct bio_vec *bv;
-+		size_t blen, part;
-+
-+		if (slot >= bvecq->nr_slots) {
-+			if (!bvecq->next) {
-+				WARN_ON_ONCE(ret < iter->count);
-+				break;
-+			}
-+			bvecq = bvecq->next;
-+			slot = 0;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		bv = &bvecq->bv[slot];
-+		blen = bv->bv_len;
-+
-+		if (offset >= blen) {
-+			offset = 0;
-+			slot++;
-+			continue;
-+		}
-+
-+		part = umin(maxsize - ret, blen - offset);
-+
-+		sg_set_page(sg, bv->bv_page, part, bv->bv_offset + offset);
-+		sgtable->nents++;
-+		sg++;
-+		sg_max--;
-+		offset += part;
-+		ret += part;
-+	}
-+
-+	iter->bvecq = bvecq;
-+	iter->bvecq_slot = slot;
-+	iter->iov_offset = offset;
-+	iter->count -= ret;
-+	return ret;
-+}
-+
- /*
-  * Extract up to sg_max folios from an FOLIOQ-type iterator and add them to
-  * the scatterlist.  The pages are not pinned.
-@@ -1391,8 +1451,8 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
-  * addition of @sg_max elements.
-  *
-  * The pages referred to by UBUF- and IOVEC-type iterators are extracted and
-- * pinned; BVEC-, KVEC-, FOLIOQ- and XARRAY-type are extracted but aren't
-- * pinned; DISCARD-type is not supported.
-+ * pinned; BVEC-, BVECQ-, KVEC-, FOLIOQ- and XARRAY-type are extracted but
-+ * aren't pinned; DISCARD-type is not supported.
-  *
-  * No end mark is placed on the scatterlist; that's left to the caller.
-  *
-@@ -1424,6 +1484,9 @@ ssize_t extract_iter_to_sg(struct iov_iter *iter, size_t maxsize,
- 	case ITER_KVEC:
- 		return extract_kvec_to_sg(iter, maxsize, sgtable, sg_max,
- 					  extraction_flags);
-+	case ITER_BVECQ:
-+		return extract_bvecq_to_sg(iter, maxsize, sgtable, sg_max,
-+					   extraction_flags);
- 	case ITER_FOLIOQ:
- 		return extract_folioq_to_sg(iter, maxsize, sgtable, sg_max,
- 					    extraction_flags);
-diff --git a/lib/tests/kunit_iov_iter.c b/lib/tests/kunit_iov_iter.c
-index d9690ba1db88..f6413e6b925a 100644
---- a/lib/tests/kunit_iov_iter.c
-+++ b/lib/tests/kunit_iov_iter.c
-@@ -12,6 +12,7 @@
- #include <linux/mm.h>
- #include <linux/uio.h>
- #include <linux/bvec.h>
-+#include <linux/bvecq.h>
- #include <linux/folio_queue.h>
- #include <linux/scatterlist.h>
- #include <linux/minmax.h>
-@@ -552,6 +553,183 @@ static void __init iov_kunit_copy_from_folioq(struct kunit *test)
- 	KUNIT_SUCCEED(test);
- }
- 
-+static void iov_kunit_destroy_bvecq(void *data)
-+{
-+	struct bvecq *bq, *next;
-+
-+	for (bq = data; bq; bq = next) {
-+		next = bq->next;
-+		/* The pages are freed by vmap with VM_MAP_PUT_PAGES. */
-+		kfree(bq);
-+	}
-+}
-+
-+static struct bvecq *iov_kunit_alloc_bvecq(struct kunit *test, unsigned int max_slots)
-+{
-+	struct bvecq *bq;
-+
-+	bq = kzalloc(struct_size(bq, __bv, max_slots), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, bq);
-+	bq->max_slots = max_slots;
-+	bq->bv = bq->__bv;
-+	bq->inline_bv = true;
-+	return bq;
-+}
-+
-+static struct bvecq *iov_kunit_create_bvecq(struct kunit *test, unsigned int max_slots)
-+{
-+	struct bvecq *bq;
-+
-+	bq = iov_kunit_alloc_bvecq(test, max_slots);
-+	kunit_add_action_or_reset(test, iov_kunit_destroy_bvecq, bq);
-+	return bq;
-+}
-+
-+static void __init iov_kunit_load_bvecq(struct kunit *test,
-+					struct iov_iter *iter, int dir,
-+					struct bvecq *bq_head,
-+					struct page **pages, size_t npages)
-+{
-+	struct bvecq *bq = bq_head;
-+	size_t size = 0;
-+
-+	for (int i = 0; i < npages; i++) {
-+		if (bq->nr_slots >= bq->max_slots) {
-+			bq->next = iov_kunit_alloc_bvecq(test, 13);
-+			bq->next->prev = bq;
-+			bq = bq->next;
-+		}
-+		bvec_set_page(&bq->bv[bq->nr_slots], pages[i], PAGE_SIZE, 0);
-+		bq->nr_slots++;
-+		size += PAGE_SIZE;
-+	}
-+	iov_iter_bvec_queue(iter, dir, bq_head, 0, 0, size);
-+}
-+
-+/*
-+ * Test copying to a ITER_BVECQ-type iterator.
-+ */
-+static void __init iov_kunit_copy_to_bvecq(struct kunit *test)
-+{
-+	const struct kvec_test_range *pr;
-+	struct iov_iter iter;
-+	struct bvecq *bq;
-+	struct page **spages, **bpages;
-+	u8 *scratch, *buffer;
-+	size_t bufsize, npages, size, copied;
-+	int i, patt;
-+
-+	bufsize = 0x100000;
-+	npages = bufsize / PAGE_SIZE;
-+
-+	bq = iov_kunit_create_bvecq(test, 13);
-+
-+	scratch = iov_kunit_create_buffer(test, &spages, npages);
-+	for (i = 0; i < bufsize; i++)
-+		scratch[i] = pattern(i);
-+
-+	buffer = iov_kunit_create_buffer(test, &bpages, npages);
-+	memset(buffer, 0, bufsize);
-+
-+	iov_kunit_load_bvecq(test, &iter, READ, bq, bpages, npages);
-+
-+	i = 0;
-+	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+		size = pr->to - pr->from;
-+		KUNIT_ASSERT_LE(test, pr->to, bufsize);
-+
-+		iov_iter_bvec_queue(&iter, READ, bq, 0, 0, pr->to);
-+		iov_iter_advance(&iter, pr->from);
-+		copied = copy_to_iter(scratch + i, size, &iter);
-+
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		KUNIT_EXPECT_EQ(test, iter.count, 0);
-+		i += size;
-+		if (test->status == KUNIT_FAILURE)
-+			goto stop;
-+	}
-+
-+	/* Build the expected image in the scratch buffer. */
-+	patt = 0;
-+	memset(scratch, 0, bufsize);
-+	for (pr = kvec_test_ranges; pr->from >= 0; pr++)
-+		for (i = pr->from; i < pr->to; i++)
-+			scratch[i] = pattern(patt++);
-+
-+	/* Compare the images */
-+	for (i = 0; i < bufsize; i++) {
-+		KUNIT_EXPECT_EQ_MSG(test, buffer[i], scratch[i], "at i=%x", i);
-+		if (buffer[i] != scratch[i])
-+			return;
-+	}
-+
-+stop:
-+	KUNIT_SUCCEED(test);
-+}
-+
-+/*
-+ * Test copying from a ITER_BVECQ-type iterator.
-+ */
-+static void __init iov_kunit_copy_from_bvecq(struct kunit *test)
-+{
-+	const struct kvec_test_range *pr;
-+	struct iov_iter iter;
-+	struct bvecq *bq;
-+	struct page **spages, **bpages;
-+	u8 *scratch, *buffer;
-+	size_t bufsize, npages, size, copied;
-+	int i, j;
-+
-+	bufsize = 0x100000;
-+	npages = bufsize / PAGE_SIZE;
-+
-+	bq = iov_kunit_create_bvecq(test, 13);
-+
-+	buffer = iov_kunit_create_buffer(test, &bpages, npages);
-+	for (i = 0; i < bufsize; i++)
-+		buffer[i] = pattern(i);
-+
-+	scratch = iov_kunit_create_buffer(test, &spages, npages);
-+	memset(scratch, 0, bufsize);
-+
-+	iov_kunit_load_bvecq(test, &iter, READ, bq, bpages, npages);
-+
-+	i = 0;
-+	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+		size = pr->to - pr->from;
-+		KUNIT_ASSERT_LE(test, pr->to, bufsize);
-+
-+		iov_iter_bvec_queue(&iter, WRITE, bq, 0, 0, pr->to);
-+		iov_iter_advance(&iter, pr->from);
-+		copied = copy_from_iter(scratch + i, size, &iter);
-+
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		KUNIT_EXPECT_EQ(test, iter.count, 0);
-+		i += size;
-+	}
-+
-+	/* Build the expected image in the main buffer. */
-+	i = 0;
-+	memset(buffer, 0, bufsize);
-+	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+		for (j = pr->from; j < pr->to; j++) {
-+			buffer[i++] = pattern(j);
-+			if (i >= bufsize)
-+				goto stop;
-+		}
-+	}
-+stop:
-+
-+	/* Compare the images */
-+	for (i = 0; i < bufsize; i++) {
-+		KUNIT_EXPECT_EQ_MSG(test, scratch[i], buffer[i], "at i=%x", i);
-+		if (scratch[i] != buffer[i])
-+			return;
-+	}
-+
-+	KUNIT_SUCCEED(test);
-+}
-+
- static void iov_kunit_destroy_xarray(void *data)
- {
- 	struct xarray *xarray = data;
-@@ -867,6 +1045,85 @@ static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
- 	KUNIT_SUCCEED(test);
- }
- 
-+/*
-+ * Test the extraction of ITER_BVECQ-type iterators.
-+ */
-+static void __init iov_kunit_extract_pages_bvecq(struct kunit *test)
-+{
-+	const struct kvec_test_range *pr;
-+	struct iov_iter iter;
-+	struct bvecq *bq;
-+	struct page **bpages, *pagelist[8], **pages = pagelist;
-+	ssize_t len;
-+	size_t bufsize, size = 0, npages;
-+	int i, from;
-+
-+	bufsize = 0x100000;
-+	npages = bufsize / PAGE_SIZE;
-+
-+	bq = iov_kunit_create_bvecq(test, 13);
-+
-+	iov_kunit_create_buffer(test, &bpages, npages);
-+	iov_kunit_load_bvecq(test, &iter, READ, bq, bpages, npages);
-+
-+	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+		from = pr->from;
-+		size = pr->to - from;
-+		KUNIT_ASSERT_LE(test, pr->to, bufsize);
-+
-+		iov_iter_bvec_queue(&iter, WRITE, bq, 0, 0, pr->to);
-+		iov_iter_advance(&iter, from);
-+
-+		do {
-+			size_t offset0 = LONG_MAX;
-+
-+			for (i = 0; i < ARRAY_SIZE(pagelist); i++)
-+				pagelist[i] = (void *)(unsigned long)0xaa55aa55aa55aa55ULL;
-+
-+			len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
-+						     ARRAY_SIZE(pagelist), 0, &offset0);
-+			KUNIT_EXPECT_GE(test, len, 0);
-+			if (len < 0)
-+				break;
-+			KUNIT_EXPECT_LE(test, len, size);
-+			KUNIT_EXPECT_EQ(test, iter.count, size - len);
-+			if (len == 0)
-+				break;
-+			size -= len;
-+			KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
-+			KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
-+
-+			for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
-+				struct page *p;
-+				ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
-+				int ix;
-+
-+				KUNIT_ASSERT_GE(test, part, 0);
-+				ix = from / PAGE_SIZE;
-+				KUNIT_ASSERT_LT(test, ix, npages);
-+				p = bpages[ix];
-+				KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
-+				KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
-+				from += part;
-+				len -= part;
-+				KUNIT_ASSERT_GE(test, len, 0);
-+				if (len == 0)
-+					break;
-+				offset0 = 0;
-+			}
-+
-+			if (test->status == KUNIT_FAILURE)
-+				goto stop;
-+		} while (iov_iter_count(&iter) > 0);
-+
-+		KUNIT_EXPECT_EQ(test, size, 0);
-+		KUNIT_EXPECT_EQ(test, iter.count, 0);
-+	}
-+
-+stop:
-+	KUNIT_SUCCEED(test);
-+}
-+
- /*
-  * Test the extraction of ITER_FOLIOQ-type iterators.
-  */
-@@ -1226,12 +1483,15 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
- 	KUNIT_CASE(iov_kunit_copy_from_kvec),
- 	KUNIT_CASE(iov_kunit_copy_to_bvec),
- 	KUNIT_CASE(iov_kunit_copy_from_bvec),
-+	KUNIT_CASE(iov_kunit_copy_to_bvecq),
-+	KUNIT_CASE(iov_kunit_copy_from_bvecq),
- 	KUNIT_CASE(iov_kunit_copy_to_folioq),
- 	KUNIT_CASE(iov_kunit_copy_from_folioq),
- 	KUNIT_CASE(iov_kunit_copy_to_xarray),
- 	KUNIT_CASE(iov_kunit_copy_from_xarray),
- 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
-+	KUNIT_CASE(iov_kunit_extract_pages_bvecq),
- 	KUNIT_CASE(iov_kunit_extract_pages_folioq),
- 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
- 	KUNIT_CASE(iov_kunit_iter_to_sg_kvec),
+--srini
+> ---
+> Changes in v8:
+> - block: Fix bdev->bd_nvmem on registering failure (sashiko)
+> - net: of_net: of_get_nvmem_eui48() now also rejects all-ones cells (sashiko)
+> - Bluetooth: mgmt: account for HCI_QUIRK_USE_BDADDR_NVMEM in
+>   is_configured() and get_missing_options() (sashiko)
+> - Reword blk-nvmem KCONFIG help text to satisfy checkpatch
+> - Link to v7: https://lore.kernel.org/r/20260701-block-as-nvmem-v7-0-3fe8205ef0a8@oss.qualcomm.com
+> 
+> Changes in v7:
+> - Rework bindings/dts so that the eMMC boot partition can be a nvmem fixed-layout
+>   and not a child of fixed-partition. (Rob)
+> - Add Support for fixed-layout as the nvmem device node itself
+> - Remove "block: partitions: of: Skip child nodes without reg property"
+>   This is no more required in this series and will be submitted separately (Rob)
+> - Add missing linux/cleanup.h and linux/device.h includes (Bartosz)
+> - simplify nvmem_register() error path using dev_err_probe() (Bartosz)
+> - nvmem_device forward declaration to blk_types.h (Bartosz)
+> - Add hci_dev_get_bd_addr_from_nvmem() kernel-doc for return value (Piotr)
+> - Link to v6: https://lore.kernel.org/r/20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com
+> 
+> Changes in v6:
+> - blk_nvmem_add() returns int, error properly propagated (Bartosz)
+> - Redundant if (bdev->bd_nvmem) guard removed in blk_nvmem_del() (Bartosz)
+> - Size guard changed from UINT_MAX → INT_MAX to avoid signed overflow in config.size (sashiko)
+> - BLK_OPEN_RESTRICT_WRITES removed from blk_nvmem_reg_read() (sashiko)
+> - Link to v5: https://lore.kernel.org/r/20260612-block-as-nvmem-v5-0-95e0b30fff90@oss.qualcomm.com
+> 
+> Changes in v5:
+> - Fixed ath10k binding issue + extended commit message (Krzysztof)
+> - Moved blk-nvmem handling to block core instead of a class_interface
+>   This allows correct/robust integration with block device life cycle (Bartosz).
+> - block: partitions: of: Skip child nodes without reg property (sashiko)
+> - Link to v4: https://lore.kernel.org/r/20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com
+> 
+> Changes in v4:
+> - Fix squash issue (dts commit incorrectly squashed) (Konrad)
+> - Use devres for nvmem resources (Bartosz)
+> - use __free() destructor helper when possible (Bartosz)
+> - Fix value return checking for bdev_file_open_by_dev
+> - Link to v3: https://lore.kernel.org/r/20260608-block-as-nvmem-v3-0-82681f50aa35@oss.qualcomm.com
+> 
+> Changes in v3:
+> - Fixed missing 'fixed-partitions' compatible in partition (Rob)
+> - Fixed clashing nvmem cells, document calibration along mac (Sashiko)
+> - Remove workaround to handle dangling nvmem references after
+>   unregistering, this is a generic nvmem framework issue handled
+>   in Bartosz's series:
+>    https://lore.kernel.org/all/20260429-nvmem-unbind-v3-0-2a694f95395b@oss.qualcomm.com/
+> - Validate mac (is_valid_ether_addr) before copying to output buffer
+> - Link to v2: https://lore.kernel.org/r/20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com
+> 
+> Changes in v2:
+> - Fix example nvmem-layout cells to use compatible = "mac-base"
+> - Squash WiFi MAC and Bluetooth BD address consumer patches into the nvmem layout patch
+> - Fix possible use-after-free in blk-nvmem: bnv (nvmem priv) linked to nvmem lifetime
+> - Simplify nvmem-cell-names from items: - const: to plain const:
+> - Factor out common NVMEM EUI-48 retrieval logic
+> - Reorder changes
+> - Link to v1: https://lore.kernel.org/r/20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com
+> 
+> ---
+> Daniel Golle (1):
+>       block: implement NVMEM provider
+> 
+> Loic Poulain (8):
+>       dt-bindings: mmc: Document fixed-layout NVMEM provider support
+>       dt-bindings: net: wireless: qcom,ath10k: Document NVMEM cells
+>       dt-bindings: bluetooth: qcom: Add NVMEM BD address cell
+>       nvmem: layouts: Support fixed-layout as the nvmem device node itself
+>       net: of_net: Add of_get_nvmem_eui48() helper for EUI-48 lookup
+>       Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
+>       Bluetooth: qca: Set NVMEM BD address quirks when address is invalid
+>       arm64: dts: qcom: arduino-imola: Describe NVMEM layout for WiFi/BT addresses
+> 
+>  .../devicetree/bindings/mmc/mmc-card.yaml          |  23 ++++-
+>  .../net/bluetooth/qcom,bluetooth-common.yaml       |   9 ++
+>  .../bindings/net/wireless/qcom,ath10k.yaml         |  16 +++
+>  arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts |  32 ++++++
+>  block/Kconfig                                      |  11 +++
+>  block/Makefile                                     |   1 +
+>  block/blk-nvmem.c                                  | 110 +++++++++++++++++++++
+>  block/blk.h                                        |   8 ++
+>  block/genhd.c                                      |   4 +
+>  drivers/bluetooth/btqca.c                          |   5 +-
+>  drivers/nvmem/layouts.c                            |  13 ++-
+>  include/linux/blk_types.h                          |   4 +
+>  include/linux/of_net.h                             |   7 ++
+>  include/net/bluetooth/hci.h                        |  18 ++++
+>  net/bluetooth/hci_sync.c                           |  41 +++++++-
+>  net/bluetooth/mgmt.c                               |   6 +-
+>  net/core/of_net.c                                  |  52 +++++++---
+>  17 files changed, 342 insertions(+), 18 deletions(-)
+> ---
+> base-commit: dffcfe75c722be66aa2669fb335528edb0590671
+> change-id: 20260428-block-as-nvmem-4b308e8bda9a
+> 
+> Best regards,
 
