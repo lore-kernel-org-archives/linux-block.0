@@ -1,48 +1,40 @@
-Received: from va-2-46.ptr.blmpb.com (va-2-46.ptr.blmpb.com [209.127.231.46])
+Received: from va-2-54.ptr.blmpb.com (va-2-54.ptr.blmpb.com [209.127.231.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4319C2F3C37
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 06:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A6240C5DD
+	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 07:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784702143; cv=none; b=kMPQFicFgkwpnQ/k+SF0owVzPSUh4da55wokdPCaIe7Py8qtEd9mPaQR1nLeGuL9qxGmyLSUd/RNTBRb35mUfHt2b6nHGRgWhvuD4W/JcIItAc01KUoXbmNYz1J4ZG8riiQVXNC/vJkNcqF4eFlL03BBp8d57lbEXHLUMBInr2Q=
+	t=1784705127; cv=none; b=DNzlQ3gcSNw7U7ell6eKEujU8jnNKpNfeSZVC4MdBe68g2M3g3VriRAwmJcHgqzX3+m4fh/b2My5y4X5Dbararykb8Zb/YzSnPOd4ie+oR2o4WAyeWe3Tb6kwEnUF7axfJ0UD3whTYK0be9UWcHv4ogEAQ4DSMrmGZpwUEi4tnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784702143; c=relaxed/simple;
-	bh=OVqg11dRVv/cGt5qWA9d6SB/btrYFO4g0//t0nRzYSo=;
-	h=To:Date:Cc:Subject:Content-Type:References:Message-Id:In-Reply-To:
-	 From:Mime-Version; b=bxJTSgF7hQrItSqig3fR2be1Ysr66KOSWnEVDd/zhpBS41DpMol56BjcgQ7Iw1iO0wMCmz1RyDVU7N6HtmUWosGZ/LObQqq4idTQOx9aNgl3jEYHFFki5b9vCAXTIrlG2oS5RewWXC/q/dHzD/CJrjOro/RWBQT6+d/83Tz8Dns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=NjrrjeqK; arc=none smtp.client-ip=209.127.231.46
+	s=arc-20240116; t=1784705127; c=relaxed/simple;
+	bh=zB7U2ir+JJuCSEgAyWkNgy3e7Zs1/My/cXM8Kax0PVc=;
+	h=In-Reply-To:Cc:Message-Id:References:From:Mime-Version:
+	 Content-Type:To:Subject:Date; b=So4bKH6bpBSnmAN4MhUq1/84h5EtwB/AIFfz70cwA5g8vbGM4yT4pbrrKRAuRT88M+fI34ctfRq54MGvT15CB1P9Fq13DHOgJiytc2x05jUfV3Jk/OjzJ813y1+VYsrqovrRmfItj8ZbhJDF/ipu0+Az7APJaxBF5M6Kj6vnBXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=E3kFPVMc; arc=none smtp.client-ip=209.127.231.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="NjrrjeqK"
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="E3kFPVMc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784702133;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784705107;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=IS+vLUAqF19uHa9r4MFEDZEo9090sfLlD8hvwjzZzwA=;
- b=NjrrjeqKlu+0DSluIurFU9EPCR+chPGQq/PjOx4Fxif19+Q8+NfZaqZtNRhW42PyH0lZUS
- P1yq/nCKmdnETdbkyhRtiO5xy8MXQZxlumaVY0flNYmaSRNLt6HvmOFy3yvJz0W75Z9i0Y
- ug9wAH++yH1174R3ShRB+E2Uof3hUWiNk+4XzDdJWLOgU/6sjvIPAg0T9aEUSYT3xlGbwX
- t0/9ojQUr8xYCwdqeeXYe6VXUn3ojy33UZrQxJuCpDX+VD7k+ZYyJ0+4XxNesFFD/EvN0d
- 3SZSYjA++v4ILmQOkZJiN/m2BzWM4SHXHS9d8ibGha3Oi74HvbFUJwxcUounwQ==
-To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Date: Wed, 22 Jul 2026 14:35:28 +0800
+ bh=zx6TxZ6zM2UF5uSkDFusmCwpUxnBAKsbCIx5qZSDSh4=;
+ b=E3kFPVMcGMIgwMBmt2pJkL/sRcwSPjGtT2eTuZjDDKH5ev+gprmtSdDp6IuDxZxaRNnQVB
+ 3JL9gdKzYZTdHn2WQn8Bu8SFc35zXOzq8wHepDYaHNNQgZizafcNFaP54xV3niROQJ+ql8
+ dYNJ8W5BCQKrvF8xcV6SZvLd6u8E79Xm3BkP3Lv3iEAwsdUcGIeLiYAhRTIxS3SVpS9Xat
+ vCNZUisvD23g3HjlnJqnmWKgUltpapewLUUghZljadgTc6u20hbwuO3xdCeusbsKF+s4id
+ sZunxtZCcZM8O8WWwuOkGvwezAVJAUK/J+ByHKQrW/DsdXS56v0IQ1WDbjoYLQ==
 Content-Transfer-Encoding: quoted-printable
-X-Lms-Return-Path: <lba+26a6064b5+0f5f72+vger.kernel.org+yukuai@fygo.io>
+In-Reply-To: <20260721040850.90544-1-cui.tao@linux.dev>
 Reply-To: yukuai@fygo.io
-Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
-	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>, 
-	<nbd@other.debian.org>
-Subject: Re: [PATCH v3 3/6] nbd: remove queue freeze in nbd_add_socket
-Content-Type: text/plain; charset=UTF-8
-References: <20260713065644.1637594-1-yangerkun@huawei.com> <20260713065644.1637594-4-yangerkun@huawei.com> <1b8b00e4-3f6f-42f1-a52a-b4d99c9f2cc3@fygo.io>
-Message-Id: <5799ffec-f179-47ec-b685-1f992648aff5@fygo.io>
-In-Reply-To: <1b8b00e4-3f6f-42f1-a52a-b4d99c9f2cc3@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 22 Jul 2026 06:35:32 +0000
-User-Agent: Mozilla Thunderbird
+Cc: <linux-block@vger.kernel.org>, <josef@toxicpanda.com>, 
+	<cgroups@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<david.laight.linux@gmail.com>, <haris.iqbal@linux.dev>, 
+	"Tao Cui" <cuitao@kylinos.cn>
+Message-Id: <3e1616f1-1dc1-4912-8404-4f53b2d1205c@fygo.io>
+References: <20260721040850.90544-1-cui.tao@linux.dev>
 From: "yu kuai" <yukuai@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -50,90 +42,121 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 22 Jul 2026 07:25:05 +0000
+X-Lms-Return-Path: <lba+26a607052+bbbe3f+vger.kernel.org+yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
 X-Original-From: yu kuai <yukuai@fygo.io>
+To: "Tao Cui" <cui.tao@linux.dev>, <tj@kernel.org>, <axboe@kernel.dk>, 
+	"yu kuai" <yukuai@fygo.io>
+Subject: Re: [PATCH v3] blk-throttle: fix divide-by-zero on legacy iops limit of 0
+Date: Wed, 22 Jul 2026 15:25:02 +0800
 
 Hi,
 
-=E5=9C=A8 2026/7/22 11:17, yu kuai =E5=86=99=E9=81=93:
-> Hi,
+=E5=9C=A8 2026/7/21 12:08, Tao Cui =E5=86=99=E9=81=93:
+> From: Tao Cui <cuitao@kylinos.cn>
 >
-> =E5=9C=A8 2026/7/13 14:56, Yang Erkun =E5=86=99=E9=81=93:
->> nbd_add_socket can never run concurrently with inflight I/O:
->>
->>    - netlink path: nbd_genl_connect calls nbd_add_socket before
->>      nbd_start_device, so no I/O can happened when invoking nbd_add_sock=
-et,
->>      nbd_genl_reconfigure cannot too since it won't call nbd_add_socket
->>
->>    - ioctl path: NBD_SET_SOCK cannot be called after NBD_DO_IT with
->>      the previous commit, so capability of nbd will keep 0 while
->>      invoking NBD_SET_SOCK
->>
->> Removing the freeze in nbd_add_socket to speed up nbd device startup.
-> Check nbd_open(), the pid is not checked there, which means the nbd devic=
+> Writing a multiple of 2^32 (e.g. 4294967296) to a legacy cgroup v1
+> throttle iops file (blkio.throttle.{read,write}_iops_device) silently
+> truncates to 0: tg_set_conf() stores the sscanf-parsed u64 value into
+> an unsigned int field with no clamping. The cgroup v2 path,
+> tg_set_limit(), already clamps the same kind of value with
+> min_t(u64, val, UINT_MAX), but the legacy path never did. Note that
+> the "!v -> U64_MAX" mapping only catches an explicit zero and does not
+> catch a value that truncates to zero.
+>
+> With iops stored as 0, tg_update_has_rules() sets has_rules_iops[] and
+> the next IO reaches tg_within_iops_limit(), which computes
+>
+>      jiffy_wait =3D max(jiffy_wait, HZ / iops_limit + 1);
+>
+> triggering a divide-by-zero oops. The unclamped write in tg_set_conf()
+> is long-standing, but it only became a crash once the HZ / iops_limit
+> divide was added.
+>
+> Fix it in two places:
+>
+>    * tg_set_conf(): clamp the value to UINT_MAX, consistent with
+>      tg_set_limit(). This closes the truncation root cause (and the
+>      general silent truncation for any value above UINT_MAX).
+>
+>    * tg_dispatch_iops_time(): treat iops_limit =3D=3D 0 as unlimited so t=
+he
+>      divide in tg_within_iops_limit() is never reached, defending
+>      against any future path that could produce a zero limit.
+>
+> Fixes: 1beabab88ece ("blk-throttle: fix lower control under super low iop=
+s limit")
+
+I think the root cause is that iops_limit set to 0, and what's the behavior=
+ of throttle
+with iops=3D0? Since calculate_io_allowed() will always return 0, it's like=
+ly that no IO
+can be issued.
+
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+>
+> ---
+> Changes in v3:
+> - Drop the (u64) cast on UINT_MAX: the kernel's type-checked min() accept=
+s
+>    two unsigned types of different width (both >=3D 4 bytes), so
+>    min(v, UINT_MAX) compiles clean. (David Laight)
+> - Add a Fixes: tag pointing at the commit that introduced the
+>    HZ / iops_limit divide, which is also where the oops became reachable.
+>
+> Changes in v2:
+> - Use a "void *field" local for the config write so the assignment reads
+>    *(u64 *)field / *(unsigned int *)field instead of the
+>    (type *)((void *)tg + of_cft(of)->private) casts.
+> - Use min(v, UINT_MAX) instead of min_t(u64, v, UINT_MAX).
+> ---
+>   block/blk-throttle.c | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index ffc3b70065d4..e894852c3142 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -883,7 +883,12 @@ static unsigned long tg_dispatch_iops_time(struct th=
+rotl_grp *tg, struct bio *bi
+>   	u32 iops_limit =3D tg_iops_limit(tg, rw);
+>   	unsigned long iops_wait;
+>  =20
+> -	if (iops_limit =3D=3D UINT_MAX || tg->flags & THROTL_TG_CANCELING)
+> +	/*
+> +	 * iops_limit =3D=3D 0 is not a valid limit. Treat it as unlimited so w=
 e
-> can be opened after add_disk() succeed. Normally read/write IO will not p=
-ass
-> bio_check_eod() checking, however, there can be special zero sized bio th=
-at
-> might still be issued to nbd device. So I think there should be a pid che=
-cking
-> in nbd_open() for this patch, and I'm not aware of any special IO mush be=
- handled
-> before nbd_start_device(). Otherwise, the freeze is still necessary since
-> nbd_handle_cmd() will deference config->socks[] directly.
+> +	 * never reach the HZ / iops_limit divide in tg_within_iops_limit().
+> +	 */
+> +	if (iops_limit =3D=3D UINT_MAX || iops_limit =3D=3D 0 ||
+> +	    tg->flags & THROTL_TG_CANCELING)
+>   		return 0;
 
-Sorry this is a mistake, nbd_open() must succeed before pid is set, because=
- of ioctl
-like NBD_SET_SOCK and NED_DO_IT :( I just forgot this simple case.
+Is the above still needed with the tg_set_conf() changes? 0 is not a valid =
+limit, and
+it should not exist in the first place, so I don't like the above new check=
+ing.
 
->
->> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
->> ---
->>    drivers/block/nbd.c | 9 ---------
->>    1 file changed, 9 deletions(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index a15553ab4b97..0755b7046ed4 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -1272,7 +1272,6 @@ static int nbd_add_socket(struct nbd_device *nbd, =
-unsigned long arg,
->>    	struct socket *sock;
->>    	struct nbd_sock **socks;
->>    	struct nbd_sock *nsock;
->> -	unsigned int memflags;
->>    	int err;
->>   =20
->>    	/* Arg will be cast to int, check it to avoid overflow */
->> @@ -1283,12 +1282,6 @@ static int nbd_add_socket(struct nbd_device *nbd,=
- unsigned long arg,
->>    		return err;
->>    	nbd_reclassify_socket(sock);
->>   =20
->> -	/*
->> -	 * We need to make sure we don't get any errant requests while we're
->> -	 * reallocating the ->socks array.
->> -	 */
->> -	memflags =3D blk_mq_freeze_queue(nbd->disk->queue);
->> -
->>    	if (!netlink && !nbd->task_setup &&
->>    	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
->>    		nbd->task_setup =3D current;
->> @@ -1335,12 +1328,10 @@ static int nbd_add_socket(struct nbd_device *nbd=
-, unsigned long arg,
->>    	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
->>    	socks[config->num_connections++] =3D nsock;
->>    	atomic_inc(&config->live_connections);
->> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
->>   =20
->>    	return 0;
->>   =20
->>    put_socket:
->> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
->>    	sockfd_put(sock);
->>    	return err;
->>    }
+>  =20
+>   	tg_update_slice(tg, rw);
+> @@ -1383,10 +1388,12 @@ static ssize_t tg_set_conf(struct kernfs_open_fil=
+e *of,
+>   	tg =3D blkg_to_tg(ctx.blkg);
+>   	tg_update_carryover(tg);
+>  =20
+> +	void *field =3D (void *)tg + of_cft(of)->private;
+> +
+>   	if (is_u64)
+> -		*(u64 *)((void *)tg + of_cft(of)->private) =3D v;
+> +		*(u64 *)field =3D v;
+>   	else
+> -		*(unsigned int *)((void *)tg + of_cft(of)->private) =3D v;
+> +		*(unsigned int *)field =3D min(v, UINT_MAX);
+>  =20
+>   	tg_conf_updated(tg, false);
+>   	ret =3D 0;
 
 --=20
 Thanks,
