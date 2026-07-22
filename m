@@ -1,63 +1,63 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A245E26CE05
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 18:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1857638F957
+	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 18:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784746749; cv=none; b=FMQpFdID58inPViN5dtzy5PQeqAjDlE8WUi54YfoVo+QyF14pg4s92w89Y8/g8lkByWOTlbcc52ttdBMSwV/t/DR6EMXOjMXER2T5ma1Fo/nMmgCew38j68i/RYutsWLke504pUVaKfSF5y5ImY/GsX3GR15HihoGq5d0J8YjJQ=
+	t=1784746752; cv=none; b=UX6Ij/zb67DxHguG//g8bU3BSWmS3bvkx53IndFnpSEPcqgwrdygO96vd0dy5gUUuotsy9LaPdsjVcbJRsFsqcY/JYVGDHSEg3j5GJjj9/d5EvwlzWtJ1slF2T2pSRYA2jhQykL4GAF3Z/eo8vV9BJyfS0nzrKXxAdo/yI46T3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784746749; c=relaxed/simple;
-	bh=UmHDQ8Avh88213YFsBTKp7WY9yAPzXpx6PsDprJSvWw=;
+	s=arc-20240116; t=1784746752; c=relaxed/simple;
+	bh=hrTCMMr70YntHE8rHfpC3UJfjfd1U5mS3A9u7ATI3Z0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P+BhImr9dG1mKm5sufS6gLtWEPNEw6tZHTR6dCaVx9UNXRq08h42HzxlcuM8C4pgLM1EluFA9ZA1a58gBjrRcAVVDA8K9w+Mj7dBX808p8YblNMH68Ui7TgwMJcG8gWZn+dpFi951g/QoITk0q4dQQtgmeB04J6b+2y1rO4mxAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=pO2ctPAC; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version; b=swPjZGkkkeGSOSUeJ6DmjuQh561jumhM/TiOzeL3/LZSIIoYmHUgT7keNjmmB3Mn0rTT7t5XzzEsUo2RzF3RY/uqoiCTS5eHyb70rSFrER987+4eDQBb9QuerugzU94pm12oSu/GccRGLJ0vCELuo+6Wyjof2leLJPWztChPNrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=SCM4LtE0; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="pO2ctPAC"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4954a32cf1eso24596235e9.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 11:59:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="SCM4LtE0"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-493f75f7172so100317215e9.1
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 11:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=meshstor.io; s=google; t=1784746743; x=1785351543; darn=vger.kernel.org;
+        d=meshstor.io; s=google; t=1784746744; x=1785351544; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=V5hliKyCAPWFZqHS5mW2T1dJRPt4J/vTka7mcNCHq10=;
-        b=pO2ctPAC573zzwGSfqULFeBA/5OYTJ9IkLMmUQ1RrtLSK3KfQS67DoOTO1kXRMVcya
-         ACKo1PTnFejVlqK1mJ2B7lvLgQjhUUIz10hXfa3KGkvobunjwH6ccIGlqZtzITEUKLGo
-         K9jTdr8MlsILiYfBr76Tfr4iOEOOXEXRgam3mpvmRrDutTw87yV0VAeAtxL7pA+B7WCZ
-         mWoqdrMEA0gIJbX29W85S8v/qNcw3urPkU1GbNFi2T+jfYpMwqWoyuEBsCAdAh5SR3I9
-         OeVFWeaX4uwA6M0Nd+EQszydv0AU6zpsVxdwRx49or6g1yrsqNGgpKFlu1ORIke9WuSX
-         GLpA==
+        bh=GLcS/ETJPdW48ntvSy2VqAomcBgiATmYTCUKJMNlgIw=;
+        b=SCM4LtE0/HpN8EcuX55CGhXLzQF6CsoQYXwzal4P7HmkEvDIZZkJr5vC/kZovKCeL5
+         PbzcFYqq0NevqxMdGWPlGgJNkm069JS2A0YXg+z/gRCj9mM8V8mTJ5g0OePRGhZahP2R
+         WE1+kftU5H0VLSnCXfGtSkx5C5lJoWSsgahn9zwgXpEuuEgZuQwbsFRU9c/YuKlbGSmt
+         ls30RVA7zLvvd4l2JiWbZKamN9xdgNZiryp5kbj9H5flxCjCwY1nLZRjB14Jy4PxFwTH
+         wW+Mbb5hP/c+D2MkM3PGnESFAs905wfwpcYLmk/M1LL3WJLiy+rXXs9KPasSJz4m//Gf
+         a2bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784746743; x=1785351543;
+        d=1e100.net; s=20251104; t=1784746744; x=1785351544;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=V5hliKyCAPWFZqHS5mW2T1dJRPt4J/vTka7mcNCHq10=;
-        b=USyVG2c7k5TBDklWKuIW1/XG8hLjo8owbEfXBCy6Z7ORZD+E+lJ88XAExfYlJYu5/0
-         sYd1TOu5acmEzCnGlfgcnQgV39XPKnacIUM7GLIBNA+bc1jqjduOYoaS/VY1WZN6VKFN
-         IuSV6dlVGlTLWKqhvTXJKQmzIY3NEkfq3ah8+mLgIDfPjgKXBoYonHARlbLoSxlpPiN2
-         rDJNxhw4paI+8ErEQpzOfcmmDTDZaHtsiEVZnBjaH59v65KlXeaTIus01nv9atFaL3nd
-         gJWCQ0SsQQe/boJZu22sgIdAlrDD8rmtZ6E2XZWqRyu4hv0vclZ34q6xMxuBPMW0X+4u
-         ibeA==
-X-Forwarded-Encrypted: i=1; AHgh+RpvSm1cGfnHJutrsv7rQ138ady5KQ2HC66KaOCt//10lRKw0rqybHgbOGdFBizVYyP+wZw27N+UrbRqCg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRPEAb74bZbpQoOa7qtmIN9GKcCRGI0m13d717gGHfgLYSfTBK
-	xAFQS0oL8+Pek9CL03+y8SJs9IlgwbL5ANmUhIQNvrUGCT7uLIaIYiMXJTl6OOo0Cg==
-X-Gm-Gg: AR+sD12asl62kaJUO13oUJWUzutYHzuM0ig7hlX1h2axGDHVosK5+ANI5uNT9NOM170
-	qkFv6VK6vHKxU4npqvbKjeOZIofYdIaUcNw+3JMt84ujdtteGHMGoL7NuT3dMd/OVnMMckjtqpz
-	ik6Q+xJBjn2fGB7x7ucN4LOvic51lcSSHQEQPZMsC7NOa3yIk3xAhBYGgEzvkdap5tCRki6rdcc
-	E5tOqb7Rug5SIM2RXTiFKnZsK+27hCoqd1lV7ImXae42TG6aXrMhhBd4twylREKCyXfGg7FyNNK
-	L3AWBA6Wmpy7R94T2n33WgqrafX3Ek4sj8JJOcWYP0mfjJrdLCeNzQiOanyHG1OJ/auLfRsK9lf
-	bTwB5t0oLW+2ofOznUacqOUQaPIq4WNth8n6Q4g9lZe85zKJwujtqf05Zmi+CIJHrOU7Y6fc8FO
-	gTs/mrjpk0RuhOr8dlZ2NO5dkQrG0a2CRT2KlfnA3ZmiTT/0Q=
-X-Received: by 2002:a05:600c:c174:b0:495:63e4:7f78 with SMTP id 5b1f17b1804b1-49563e47fa7mr133877135e9.10.1784746742455;
-        Wed, 22 Jul 2026 11:59:02 -0700 (PDT)
+        bh=GLcS/ETJPdW48ntvSy2VqAomcBgiATmYTCUKJMNlgIw=;
+        b=h5WPSRrfCKz2CapgX08Xm82Ee9hiskTbPf0eJKcrpvpsIl8QDJEq0UNMAtcMD2BE5Z
+         xsO2bPTnxJNicX1/b/jBgxEchApR+1W1etpR0fFdhXq+wtEQlGQYirePKuYO3qp/aS2e
+         DhMnsKR+cSrrHMpm4pPlj56uvJyfarve55QfzFNo/Ogdf+inTx1sTAAXBCuUEkwhdcEj
+         i1fFqWPhp3qiaWN1iow8hvXwNUHBBCg0NsaP+Z59f5KnTi+LSupYmcx1XhqeMgmEes2P
+         Yf1ndmCsWzr5sgHP+dtbacvjtX50CZw1oLjWLSmSAx4h59Hi2TpKIMWhs5/tcxpEi7zZ
+         VSUg==
+X-Forwarded-Encrypted: i=1; AHgh+RodkKkcaFDgKeh3SUgmIwT9qpkx7gkQWMHnnJC5muL4D/oJWBT4fuxP5C7QAzZyVN4gL2hypaPC7VAIcQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVS+p2B3zha/sPHuU2vSQw3eUegA/UoeH7zyYuneJWgv2O48Wz
+	QcT71t33w62lrmd6jIHXo+mYqZWZPt7yfniyUyeuKJsJp+oRQsAmBZsqYQdgZZXriA==
+X-Gm-Gg: AR+sD12MwkOACGHZTV9qxWUB9+/+VwiaVLqFXEdZh/rTrzlQz3ZyBj+pE9eA0Lc9zEK
+	PYsWn/8OJFLuMT4LxHzyepiAclcR4qmi5Y/IlHOyO3J+xgxBH+mZTTuZ8qwTKjWBUB/bTt9XDhH
+	1wxzAmqSbxycl9G1JFiCKR3G6CGqnAU8CtBR5Ysjt4AwVKYyB0OpaZz5BL5uJA3Rr0hw7wrGu16
+	lxYhvplzFmopdcqv1/llo+otbSQLKXirLyoek3aW+Fp0UTrP5nHIaXKY33WiLHK0tsq/Y0FC4bj
+	QVRGdXKV5Lmx9cRmePdd2fN/Vrphs8moY6tcaHSE71Pk4BysyjjGW8lflrIQMY774PWf2w4lo0R
+	4eFCbhQbfAtEzF0L5EVZZW3DQ1sKhLbw2Boq0PdPx0fLaTliPdTAFww6xglT8XRBM+qXuRf1FOq
+	thbb5+sQ2RwfHqEjV7aELraHWyTff8OfSynpOgoNuJXpcf0e4=
+X-Received: by 2002:a05:600c:c84:b0:495:4811:d71c with SMTP id 5b1f17b1804b1-4954a3ed4bamr271393965e9.13.1784746744468;
+        Wed, 22 Jul 2026 11:59:04 -0700 (PDT)
 Received: from ai-pc ([46.172.241.174])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-495730353d9sm13740055e9.12.2026.07.22.11.59.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-495730353d9sm13740055e9.12.2026.07.22.11.59.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jul 2026 11:59:02 -0700 (PDT)
+        Wed, 22 Jul 2026 11:59:03 -0700 (PDT)
 From: Mykola Marzhan <mykola@meshstor.io>
 To: Jens Axboe <axboe@kernel.dk>,
 	Song Liu <song@kernel.org>,
@@ -83,9 +83,9 @@ Cc: Li Nan <magiclinan@didiglobal.com>,
 	linux-kernel@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	linux-pci@vger.kernel.org
-Subject: [PATCH v4 2/9] md: ensure REQ_NOMERGE is set on P2PDMA bios
-Date: Wed, 22 Jul 2026 20:58:34 +0200
-Message-ID: <20260722185841.449934-3-mykola@meshstor.io>
+Subject: [PATCH v4 3/9] md/raid1: serialize non-write-behind writes on CollisionCheck rdevs
+Date: Wed, 22 Jul 2026 20:58:35 +0200
+Message-ID: <20260722185841.449934-4-mykola@meshstor.io>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260722185841.449934-1-mykola@meshstor.io>
 References: <20260722185841.449934-1-mykola@meshstor.io>
@@ -97,79 +97,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-md_submit_bio() strips REQ_NOMERGE from every bio.  For P2PDMA bios
-the flag is what keeps requests single-provider (see
-__bio_add_page()): merging a P2PDMA bio with one over a different
-pgmap, or over host memory, maps the merged request with the wrong
-bus address.  Set the flag on P2PDMA bios -- bios built via
-bio_iov_bvec_set() arrive without it -- and keep stripping it
-otherwise.
+A write that skips write-behind (full behind queue, a waiting
+reader, failed behind-bio allocation) races the in-flight behind
+write it overlaps: nothing orders the two on the write-mostly
+member, and if the older behind data lands last the member keeps
+stale data for sectors already acknowledged as rewritten.
 
-Fixes: 02666132403a ("md: propagate BLK_FEAT_PCI_P2PDMA from member devices to RAID device")
-Assisted-by: Claude:claude-opus-4-8
+Serialize on CollisionCheck, which marks exactly the rdevs owning a
+serial tree: serialize_policy rdevs plus write-mostly members when
+write-behind arms serialization -- the case the MD_SERIALIZE_POLICY
+test misses.  remove_serial() under the same condition.  This also
+avoids the old gate's latent NULL deref for rdevs hot-added under
+serialize_policy (they never get a serial tree).
+
+Fixes: d0d2d8ba0494 ("md/raid1: introduce wait_for_serialization")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-fable-5
 Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/md/md.c | 10 ++++++++--
- drivers/md/md.h | 15 +++++++++++++++
- 2 files changed, 23 insertions(+), 2 deletions(-)
+ drivers/md/raid1.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index d1465bcd86c8..3770bdb4d4b2 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -451,8 +451,14 @@ static void md_submit_bio(struct bio *bio)
- 		return;
- 	}
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index afe2ca96ad8c..997f79c05db7 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -564,7 +564,7 @@ static void raid1_end_write_request(struct bio *bio)
+ 				call_bio_endio(r1_bio);
+ 			}
+ 		}
+-	} else if (test_bit(MD_SERIALIZE_POLICY, &rdev->mddev->flags))
++	} else if (test_bit(CollisionCheck, &rdev->flags))
+ 		remove_serial(rdev, lo, hi);
+ 	if (r1_bio->bios[mirror] == NULL)
+ 		rdev_dec_pending(rdev, conf->mddev);
+@@ -1677,7 +1677,11 @@ static bool raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 			mbio = bio_alloc_clone(rdev->bdev, bio, GFP_NOIO,
+ 					       &mddev->bio_set);
  
--	/* bio could be mergeable after passing to underlayer */
--	bio->bi_opf &= ~REQ_NOMERGE;
-+	/*
-+	 * A bio md split may merge again below md -- except P2PDMA bios,
-+	 * which must stay single-provider (see __bio_add_page()).
-+	 */
-+	if (md_bio_is_p2pdma(bio))
-+		bio->bi_opf |= REQ_NOMERGE;
-+	else
-+		bio->bi_opf &= ~REQ_NOMERGE;
+-			if (test_bit(MD_SERIALIZE_POLICY, &mddev->flags))
++			/*
++			 * CollisionCheck marks every rdev with a serial
++			 * tree; order against in-flight write-behind I/O.
++			 */
++			if (test_bit(CollisionCheck, &rdev->flags))
+ 				wait_for_serialization(rdev, r1_bio);
+ 		}
  
- 	md_handle_request(mddev, bio);
- }
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index d8daf0f75cbb..73df1a6eccd8 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -11,8 +11,10 @@
- #include <linux/blkdev.h>
- #include <linux/backing-dev.h>
- #include <linux/badblocks.h>
-+#include <linux/bio.h>
- #include <linux/kobject.h>
- #include <linux/list.h>
-+#include <linux/memremap.h>
- #include <linux/mm.h>
- #include <linux/mutex.h>
- #include <linux/timer.h>
-@@ -22,6 +24,19 @@
- #include <trace/events/block.h>
- 
- #define MaxSector (~(sector_t)0)
-+
-+/*
-+ * P2P and host pages never mix within a bio, so the first bvec is
-+ * representative.  Read bi_io_vec directly: bio_first_bvec_all()
-+ * WARNs on the split clones md handles, and data-less bios have no
-+ * bi_io_vec.  Not valid after the bio's iterator is consumed.
-+ */
-+static inline bool md_bio_is_p2pdma(struct bio *bio)
-+{
-+	return bio_has_data(bio) && bio->bi_io_vec &&
-+	       is_pci_p2pdma_page(bio->bi_io_vec->bv_page);
-+}
-+
- /*
-  * Number of guaranteed raid bios in case of extreme VM load:
-  */
 -- 
 2.52.0
 
