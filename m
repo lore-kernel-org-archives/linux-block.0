@@ -1,103 +1,140 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-46.ptr.blmpb.com (va-2-46.ptr.blmpb.com [209.127.231.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1C72DF701
-	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 06:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4319C2F3C37
+	for <linux-block@vger.kernel.org>; Wed, 22 Jul 2026 06:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784700739; cv=none; b=arxslLOaDULIjOGEpEvmzSYpwAzV796mBNiRvrh/rhtsUj4MVPZCoKELzS43QVOg17NL71vlQ4vw1M+n/PqA5DJkC6hdtGNeN9Hf5zZwj/VnIbEJ7TLiQY556+WFWaauEnbjUqKDf+8AVb4LpnhnnS/7cMbebAyWZiGv4Z9jFmQ=
+	t=1784702143; cv=none; b=kMPQFicFgkwpnQ/k+SF0owVzPSUh4da55wokdPCaIe7Py8qtEd9mPaQR1nLeGuL9qxGmyLSUd/RNTBRb35mUfHt2b6nHGRgWhvuD4W/JcIItAc01KUoXbmNYz1J4ZG8riiQVXNC/vJkNcqF4eFlL03BBp8d57lbEXHLUMBInr2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784700739; c=relaxed/simple;
-	bh=PCII0VcyddlhIVm+gYADn4ekUKlyoEi6n7v+urLGWQc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GrzZRF08o9Xno5OCXM/gYjZH/xeb5juVgipQVN5xc3PJGa4LVkeM39Ri2Kq4yqKpz3Q/Wqw3aBnbb+JwY3q8Kn341yQlA+o2TZ/xyf7zl2nrQzFrQxgQjjMTEIkxsZlWa4N9164BYA3anil39uc9j4EQV1IYutee9/Ji2V5Lkk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ampft/+4; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1784702143; c=relaxed/simple;
+	bh=OVqg11dRVv/cGt5qWA9d6SB/btrYFO4g0//t0nRzYSo=;
+	h=To:Date:Cc:Subject:Content-Type:References:Message-Id:In-Reply-To:
+	 From:Mime-Version; b=bxJTSgF7hQrItSqig3fR2be1Ysr66KOSWnEVDd/zhpBS41DpMol56BjcgQ7Iw1iO0wMCmz1RyDVU7N6HtmUWosGZ/LObQqq4idTQOx9aNgl3jEYHFFki5b9vCAXTIrlG2oS5RewWXC/q/dHzD/CJrjOro/RWBQT6+d/83Tz8Dns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=NjrrjeqK; arc=none smtp.client-ip=209.127.231.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ampft/+4"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=bO1QFtNGdIOROC3PtmhxYYlmfvCFVM/mFaSIFPFOhXc=;
-	b=ampft/+4VQCQjMLGkY6Y7FAyYIZMURyMftKcvnXhZl8hxItUSj4Dy4ZYeNwPapm2bvt/iTgZ/
-	LboRj+d1ToWrkOMcLz74Z7h6KFeoR0DXFyvALKo8wzJqkYSBHL24QTQQaXiPiNpL7Wb3/JvCLCH
-	c66hTmgWa74ZqioCwQnYFW8=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h4kDw3h1rznTbJ;
-	Wed, 22 Jul 2026 14:02:40 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id D490C4048B;
-	Wed, 22 Jul 2026 14:12:11 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 22 Jul 2026 14:12:10 +0800
-Message-ID: <7e8df66e-e6f6-4be4-acc2-58fce2403ad9@huawei.com>
-Date: Wed, 22 Jul 2026 14:12:10 +0800
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="NjrrjeqK"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784702133;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=IS+vLUAqF19uHa9r4MFEDZEo9090sfLlD8hvwjzZzwA=;
+ b=NjrrjeqKlu+0DSluIurFU9EPCR+chPGQq/PjOx4Fxif19+Q8+NfZaqZtNRhW42PyH0lZUS
+ P1yq/nCKmdnETdbkyhRtiO5xy8MXQZxlumaVY0flNYmaSRNLt6HvmOFy3yvJz0W75Z9i0Y
+ ug9wAH++yH1174R3ShRB+E2Uof3hUWiNk+4XzDdJWLOgU/6sjvIPAg0T9aEUSYT3xlGbwX
+ t0/9ojQUr8xYCwdqeeXYe6VXUn3ojy33UZrQxJuCpDX+VD7k+ZYyJ0+4XxNesFFD/EvN0d
+ 3SZSYjA++v4ILmQOkZJiN/m2BzWM4SHXHS9d8ibGha3Oi74HvbFUJwxcUounwQ==
+To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+Date: Wed, 22 Jul 2026 14:35:28 +0800
+Content-Transfer-Encoding: quoted-printable
+X-Lms-Return-Path: <lba+26a6064b5+0f5f72+vger.kernel.org+yukuai@fygo.io>
+Reply-To: yukuai@fygo.io
+Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
+	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>, 
+	<nbd@other.debian.org>
+Subject: Re: [PATCH v3 3/6] nbd: remove queue freeze in nbd_add_socket
+Content-Type: text/plain; charset=UTF-8
+References: <20260713065644.1637594-1-yangerkun@huawei.com> <20260713065644.1637594-4-yangerkun@huawei.com> <1b8b00e4-3f6f-42f1-a52a-b4d99c9f2cc3@fygo.io>
+Message-Id: <5799ffec-f179-47ec-b685-1f992648aff5@fygo.io>
+In-Reply-To: <1b8b00e4-3f6f-42f1-a52a-b4d99c9f2cc3@fygo.io>
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 22 Jul 2026 06:35:32 +0000
+User-Agent: Mozilla Thunderbird
+From: "yu kuai" <yukuai@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] nbd: disallow NBD_SET_SOCK on an active device
-To: <yukuai@fygo.io>, <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@lst.de>
-CC: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>,
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>,
-	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>,
-	<nbd@other.debian.org>
-References: <20260713065644.1637594-1-yangerkun@huawei.com>
- <20260713065644.1637594-3-yangerkun@huawei.com>
- <9210a679-21f9-4b57-9220-6a15955c5bcf@fygo.io>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <9210a679-21f9-4b57-9220-6a15955c5bcf@fygo.io>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+Mime-Version: 1.0
+X-Original-From: yu kuai <yukuai@fygo.io>
 
+Hi,
 
-
-在 2026/7/22 11:03, yu kuai 写道:
+=E5=9C=A8 2026/7/22 11:17, yu kuai =E5=86=99=E9=81=93:
 > Hi,
-> 
-> 在 2026/7/13 14:56, Yang Erkun 写道:
->> We cannot add a socket to an already running nbd device, the reconfigure
->> for netlink can only active dead socket. But for ioctl path, we can call
->> NBD_SET_SOCK after NBD_DO_IT, reject this using nbd->pid which has been
->> setted when NBD_DO_IT. Besides, it is the root cause for commit
->> b98e762e3d71 ("nbd: freeze the queue while we're adding connections").
+>
+> =E5=9C=A8 2026/7/13 14:56, Yang Erkun =E5=86=99=E9=81=93:
+>> nbd_add_socket can never run concurrently with inflight I/O:
 >>
+>>    - netlink path: nbd_genl_connect calls nbd_add_socket before
+>>      nbd_start_device, so no I/O can happened when invoking nbd_add_sock=
+et,
+>>      nbd_genl_reconfigure cannot too since it won't call nbd_add_socket
+>>
+>>    - ioctl path: NBD_SET_SOCK cannot be called after NBD_DO_IT with
+>>      the previous commit, so capability of nbd will keep 0 while
+>>      invoking NBD_SET_SOCK
+>>
+>> Removing the freeze in nbd_add_socket to speed up nbd device startup.
+> Check nbd_open(), the pid is not checked there, which means the nbd devic=
+e
+> can be opened after add_disk() succeed. Normally read/write IO will not p=
+ass
+> bio_check_eod() checking, however, there can be special zero sized bio th=
+at
+> might still be issued to nbd device. So I think there should be a pid che=
+cking
+> in nbd_open() for this patch, and I'm not aware of any special IO mush be=
+ handled
+> before nbd_start_device(). Otherwise, the freeze is still necessary since
+> nbd_handle_cmd() will deference config->socks[] directly.
+
+Sorry this is a mistake, nbd_open() must succeed before pid is set, because=
+ of ioctl
+like NBD_SET_SOCK and NED_DO_IT :( I just forgot this simple case.
+
+>
 >> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 >> ---
->>    drivers/block/nbd.c | 7 +++++++
->>    1 file changed, 7 insertions(+)
+>>    drivers/block/nbd.c | 9 ---------
+>>    1 file changed, 9 deletions(-)
 >>
 >> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index b1a5acd57426..a15553ab4b97 100644
+>> index a15553ab4b97..0755b7046ed4 100644
 >> --- a/drivers/block/nbd.c
 >> +++ b/drivers/block/nbd.c
->> @@ -1302,6 +1302,13 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
->>    		goto put_socket;
->>    	}
->>    
->> +	if (nbd->pid) {
->> +		dev_err(disk_to_dev(nbd->disk),
->> +			"Cannot add socket to a running device\n");
->> +		err = -EBUSY;
->> +		goto put_socket;
->> +	}
-> 
-> I think the checking if fine, but I'd like to add the checking before nbd_get_socket() and
-> return -EBUSY directly.
+>> @@ -1272,7 +1272,6 @@ static int nbd_add_socket(struct nbd_device *nbd, =
+unsigned long arg,
+>>    	struct socket *sock;
+>>    	struct nbd_sock **socks;
+>>    	struct nbd_sock *nsock;
+>> -	unsigned int memflags;
+>>    	int err;
+>>   =20
+>>    	/* Arg will be cast to int, check it to avoid overflow */
+>> @@ -1283,12 +1282,6 @@ static int nbd_add_socket(struct nbd_device *nbd,=
+ unsigned long arg,
+>>    		return err;
+>>    	nbd_reclassify_socket(sock);
+>>   =20
+>> -	/*
+>> -	 * We need to make sure we don't get any errant requests while we're
+>> -	 * reallocating the ->socks array.
+>> -	 */
+>> -	memflags =3D blk_mq_freeze_queue(nbd->disk->queue);
+>> -
+>>    	if (!netlink && !nbd->task_setup &&
+>>    	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
+>>    		nbd->task_setup =3D current;
+>> @@ -1335,12 +1328,10 @@ static int nbd_add_socket(struct nbd_device *nbd=
+, unsigned long arg,
+>>    	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
+>>    	socks[config->num_connections++] =3D nsock;
+>>    	atomic_inc(&config->live_connections);
+>> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+>>   =20
+>>    	return 0;
+>>   =20
+>>    put_socket:
+>> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+>>    	sockfd_put(sock);
+>>    	return err;
+>>    }
 
-OK.
-> 
->> +
->>    	nsock = kzalloc_obj(*nsock);
->>    	if (!nsock) {
->>    		err = -ENOMEM;
-> 
-
+--=20
+Thanks,
+Kuai
