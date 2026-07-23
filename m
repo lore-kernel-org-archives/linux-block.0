@@ -1,164 +1,91 @@
-Received: from va-2-19.ptr.blmpb.com (va-2-19.ptr.blmpb.com [209.127.231.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5297E34B410
-	for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 07:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10C03DBD65
+	for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 07:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784790249; cv=none; b=g9DrcUtRuTE2Y94mucq4mVbpDGM61z9O2chzsdQ1QkjNKIz3gKe8i1rOgfr8XJe2f52CQgIlAvA+ARf3dbs4PUo+Sc9+18W/Cw0NDDartjcQbj707vA2gBqjMbrCy7ZQG+K/Lx+yGegYzZqKZA67hFiumifVyBgqfBgNbf8q5C8=
+	t=1784792049; cv=none; b=f3o6zdDGo2yiRS5e7T3CsvGVZ7/U0yzn+oZ1ePkjDBVztLDMbqQlnbcBTDXCC8je0UYtU1GqBDg5bhNU2UlABdLnscZwG7eimjXB4wjwrhrLkuaaK5jg6c1cRvLPyAserX+fU1xARaXyajGwBAR8WvK+Uyi+qR8k3AS0sT6i4Kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784790249; c=relaxed/simple;
-	bh=uhyBvDEhPU+sGnw3/t9PBXDk9+k140Odr/fon+soAPc=;
-	h=Message-Id:References:To:Mime-Version:Content-Type:Date:
-	 In-Reply-To:Cc:From:Subject; b=QDtJUpsaWG70zF8n5sLUt6csueZIUIAo19OP3x8XYGb5KHtsUzsa/Q2T4amkb7VKjBmWSvRlS1ea8A0WfuwnWgpfmUW8FvLrs4DBkLZJY9768bkhMscPtBq9nqfzJIuHaN/mCFQVaaaMwkn25roYXyHPjPhIlcxrdPlU1sFKKv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=BBwgp7L3; arc=none smtp.client-ip=209.127.231.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1784792049; c=relaxed/simple;
+	bh=hmITaqgDuLqWdeBIigSTXggwSACVll2GE/YaTiXLANs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k/gElkPaioCpoAUWHl4dxvAPfoheNjDcsY+4BvOtJw0qEhZAi+RpVYeZb5xCCf1yng1zUpvA3wacta4KzKfnNtD9kCbB4DVFydKWkMv2aPwgoC0QoZnr9UkzcjMeVVPAnL6oHxRqW1EfnOwM/EvPe62nc0q87t3JoOLI5921XUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=MmU9YBwY; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="BBwgp7L3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784790241;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=uhyBvDEhPU+sGnw3/t9PBXDk9+k140Odr/fon+soAPc=;
- b=BBwgp7L309E0Mhsv6RYOtd67PQkfTBhWRfVVocP/Q4x+oqVPdz01FsT8H7XpTN12+UG914
- UaWzzNmYGwb7CC7zgBeriPoCDMj8nFFUMV5UAao9skgk3VVPUHBZHSfg07/fRI8CUpESmm
- CZkxy3kyAKNqwj3dC1bB7ICWwNw+d1HaBC/qeUy882fwyZAt6vpsjaTvl+PKidpLJzTD0+
- ATOctslZbXvaaFO3rYUvVwYdkSBXCPuBPd4+99vSqfY4MssxuZVlWLDf7tmTV48PTHiT04
- oybbHE6IMhg/8uV6zDdlaY4hPEoPNvsjFcuwn1m33wTTDf3499RoxEOulFhKXQ==
-Message-Id: <338127ba-2c79-405e-bd8c-afa2bf812615@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Thu, 23 Jul 2026 07:03:42 +0000
-User-Agent: Mozilla Thunderbird
-References: <20260704195124.1375075-1-yukuai@kernel.org> <20260704195124.1375075-2-yukuai@kernel.org> <6baae2af-640e-48bd-9909-977cd316c8d5@linux.ibm.com>
-To: "Nilay Shroff" <nilay@linux.ibm.com>, "Jens Axboe" <axboe@kernel.dk>, 
-	"Tejun Heo" <tj@kernel.org>, "yu kuai" <yukuai@fygo.io>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MmU9YBwY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Xn
+	BghWhc9bHK5c0hYD4A5ldUbfuEbl7V+wVp6KD5iog=; b=MmU9YBwYQIsm0KttXZ
+	FjC8O8a+pZX7//xD5nPwsnjyvlcZBjKHzBiFEYQmSxazcm4Am0oBNaCGTml3zJIY
+	XBl/jxq3tDizUriqZo+N3tq83PFeN6NwgfLol9FnqHgRDWCSw+zf05ScHXoGtDlH
+	TqFGXeSGiTgZtRGgBIwWUzHP8=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgAHq__ew2FqOtnHHw--.2762S2;
+	Thu, 23 Jul 2026 15:33:51 +0800 (CST)
+From: dayou5941@163.com
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	liyouhong <liyouhong@kylinos.cn>
+Subject: [PATCH] loop: clear backing file on LOOP_CONFIGURE limits failure
+Date: Thu, 23 Jul 2026 15:33:47 +0800
+Message-Id: <20260723073347.2129494-1-dayou5941@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Original-From: yu kuai <yukuai@fygo.io>
-Date: Thu, 23 Jul 2026 15:03:37 +0800
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6baae2af-640e-48bd-9909-977cd316c8d5@linux.ibm.com>
-Reply-To: yukuai@fygo.io
-Cc: "Christoph Hellwig" <hch@lst.de>, "Keith Busch" <kbusch@kernel.org>, 
-	"Sagi Grimberg" <sagi@grimberg.me>, "Alasdair Kergon" <agk@redhat.com>, 
-	"Benjamin Marzinski" <bmarzins@redhat.com>, 
-	"Mike Snitzer" <snitzer@kernel.org>, 
-	"Mikulas Patocka" <mpatocka@redhat.com>, 
-	"Dongsheng Yang" <dongsheng.yang@linux.dev>, 
-	"Zheng Gu" <cengku@gmail.com>, "Coly Li" <colyli@fygo.io>, 
-	"Kent Overstreet" <kent.overstreet@linux.dev>, 
-	"Josef Bacik" <josef@toxicpanda.com>, "Yu Kuai" <yukuai@fygo.io>, 
-	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>, 
-	<linux-nvme@lists.infradead.org>, <dm-devel@lists.linux.dev>, 
-	<linux-bcache@vger.kernel.org>
-From: "yu kuai" <yukuai@fygo.io>
-Subject: Re: [RFC PATCH v1 01/17] nvme-multipath: retarget failedover bios from requeue work
-X-Lms-Return-Path: <lba+26a61bccf+eca662+vger.kernel.org+yukuai@fygo.io>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PSgvCgAHq__ew2FqOtnHHw--.2762S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KrW3JFW8Wr1xtFW7Gw18Grg_yoW8Xw4fpF
+	ZxKFykK39Y9F4DWFWjq34kWFy5Jw47C3y7ury7tw1v9rs8Zr9IvFyxKry5WrZ7tFWrtaya
+	qF4qyrWDCr1UKF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UBuWJUUUUU=
+X-CM-SenderInfo: 5gd103ivzuiqqrwthudrp/xtbC3h8byWphw99nxQAA3m
 
-Hi,
+From: liyouhong <liyouhong@kylinos.cn>
 
-=E5=9C=A8 2026/7/18 3:12, Nilay Shroff =E5=86=99=E9=81=93:
-> On 7/5/26 1:21 AM, Yu Kuai wrote:
->> From: Yu Kuai <yukuai@fygo.io>
->>
->> bio_set_dev() is about to become explicitly sleepable because it can
->> associate the bio with a blkg for the destination queue.=C2=A0 NVMe fail=
-over
->> can run from request completion context, and nvme_failover_req() also=20
->> holds
->> head->requeue_lock with interrupts disabled while it steals bios from=20
->> the
->> failed request.=C2=A0 Calling bio_set_dev() there is not safe once the=
-=20
->> helper is
->> allowed to sleep.
->>
->> The requeue lock only protects head->requeue_list.=C2=A0 Keep the list
->> manipulation under that lock, but defer retargeting to=20
->> nvme_requeue_work(),
->> which already drains the list from process context before=20
->> resubmitting each
->> bio.=C2=A0 The bios remain private to the requeue list until the worker =
-pops
->> them, so moving the device switch there preserves the existing retry=20
->> flow
->> while avoiding a sleepable helper in completion context.
->>
->> Signed-off-by: Yu Kuai <yukuai@fygo.io>
->> ---
->> =C2=A0 drivers/nvme/host/multipath.c | 4 +---
->> =C2=A0 1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/drivers/nvme/host/multipath.c=20
->> b/drivers/nvme/host/multipath.c
->> index 9b9a657fa330..76baa180ae1c 100644
->> --- a/drivers/nvme/host/multipath.c
->> +++ b/drivers/nvme/host/multipath.c
->> @@ -149,7 +149,6 @@ void nvme_failover_req(struct request *req)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct nvme_ns *ns =3D req->q->queuedata;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u16 status =3D nvme_req(req)->status & NV=
-ME_SCT_SC_MASK;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long flags;
->> -=C2=A0=C2=A0=C2=A0 struct bio *bio;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvme_mpath_clear_current_path(ns);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_long_inc(&ns->failover);
->> @@ -165,8 +164,6 @@ void nvme_failover_req(struct request *req)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spin_lock_irqsave(&ns->head->reque=
-ue_lock, flags);
->> -=C2=A0=C2=A0=C2=A0 for (bio =3D req->bio; bio; bio =3D bio->bi_next)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bio_set_dev(bio, ns->head->d=
-isk->part0);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_steal_bios(&ns->head->requeue_list, r=
-eq);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spin_unlock_irqrestore(&ns->head->requeue=
-_lock, flags);
->> =C2=A0 @@ -684,6 +681,7 @@ static void nvme_requeue_work(struct=20
->> work_struct *work)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 next =3D bio->bi_=
-next;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bio->bi_next =3D =
-NULL;
->> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bio_set_dev(bio, head=
-->disk->part0);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 submit_bio_noacct=
-(bio);
->
-> What happens if bio_set_dev() fails to associate a blkg? From what
-> I understand, bio_associate_blkg() may fail, leaving bio->bi_blkg
-> set to NULL. Later, submit_bio_noacct() can invoke blkcg-related
-> helpers such as blk_should_throtl(), which expect a valid bio->bi_blkg.
-> However if bio->bi_blkg is NULL then accessing it without NULL check
-> could crash the kernel. This is probably not a bug introduced with your
-> changes, but you may want to check it.
+loop_configure() assigns the backing file before queue_limits_commit_update().
+If the limits update fails (e.g. an invalid block_size), the error path
+fput()s the file but leaves lo->lo_backing_file set, keeps the modified
+mapping gfp mask, leaves lo->lo_device dangling, and never clears the
+uevent suppression flag.
 
-bio_set_dev() will not leave bio->bi_blkg set to NULL. blkg_lookup_create()
-will iterate closest blkg start from root_blkg, if any blkg is missing then
-create, and if creating failed, current closest blkg is returned.
+Undo the assign on that failure path.
 
-The same iteration exist in blkcg configuration, where failure is returned =
-if
-blkg creation failed.
+Fixes: b38c8be255e8 ("loop: use queue_limits_commit_update() for configuring")
+Assisted-by: Cursor:grok-4.5
+Signed-off-by: liyouhong <liyouhong@kylinos.cn>
+---
+ drivers/block/loop.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
->
-> The question is, is bio_associate_blkg() guaranteed never to fail, or
-> should the failure be handled explicitly before the bio is resubmitted?
->
-> I also skimmed through the rest of the series. However, as Christoph
-> mentioned in an earlier thread, we may be moving away from non-blocking
-> blkg allocation altogether. If that's the direction we're taking, this
-> series will likely need to be reworked. I'd therefore prefer to wait for
-> the next revision before reviewing the other patches.
->
-> Thanks,
-> --Nilay
->
->
---=20
-Thanks,
-Kuai
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 1faecef33009..bfe2a788db44 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1059,7 +1059,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 	/* No need to freeze the queue as the device isn't bound yet. */
+ 	error = queue_limits_commit_update(lo->lo_queue, &lim);
+ 	if (error)
+-		goto out_unlock;
++		goto out_clear_backing;
+ 
+ 	/*
+ 	 * We might switch to direct I/O mode for the loop device, write back
+@@ -1096,6 +1096,11 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 
+ 	return 0;
+ 
++out_clear_backing:
++	mapping_set_gfp_mask(file->f_mapping, lo->old_gfp_mask);
++	lo->lo_backing_file = NULL;
++	lo->lo_device = NULL;
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+ out_unlock:
+ 	loop_global_unlock(lo, is_loop);
+ out_bdev:
+
