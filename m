@@ -1,93 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-41.ptr.blmpb.com (va-2-41.ptr.blmpb.com [209.127.231.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD02C3191D6;
-	Thu, 23 Jul 2026 06:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489713BA253
+	for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 06:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784787085; cv=none; b=BnvpvhSdb+eAOoBNyoFjly0KMwg+rF11H+yI/7ejBIdL8dZphLu7rAPIIvpsUmbh9VjIi1I+qQuI8mjkKaeR9M8DvshrtwAp9dwSQyFYt56l7WcY0f1Uw8CpSeSo+K+3womS+LIUTeIwYlPLV337VWy9KonWup4sjWvZh0BVcoY=
+	t=1784789179; cv=none; b=rFvfhD0zdgUvlPfgoXOuOX7lc+d+sk6I4QWleTDn9UimFh/G79Sz9T4vGxQd5hh70c7L7Zczami0F1cyp5EPxMKxRVybU2iWsliYtWKZ3bTkXZdWkweKdlR606esX2lnUmEs37dqTt1zkYqw3urwnOnmjJc6BEYmHA+Pul98yYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784787085; c=relaxed/simple;
-	bh=Qae+3iD0gUpcR0ak4mkDHhk+7oPwN70ONsdbSH40q5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cI1iS3LmMja5Oz8/ygAVGHc9cbZvrAjzcRT2OabmsOr2yYGyJI+MLUHxvFgSUHkvgYf3JImR8LRp1tlxsObFZtHck7NnhnrdJIchxxo1DuqVF8z/LELhaBdriIH1gTxVtX06Ey0v7rTgWk/IApEGRlepeO6Yd1Dz6QOIA8Nebr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQI35ZHF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784789179; c=relaxed/simple;
+	bh=BfuMpD0JejPvki+J2+J+6Z24bwpQM3FqEhh7Rz1xsmU=;
+	h=Subject:Date:In-Reply-To:Cc:Message-Id:References:To:From:
+	 Mime-Version:Content-Type; b=szFP7vFstn7Bzq2vBaeYg6MZY8Isj3ieksXSYtme7AoZbaKwNgexqy6NgymlBK8/6evSGhSegcZOz5k8vcnO6EFi4fP9byWqDOGWDdKohEs5XEaGcnSl+RaxGgzJrJDA+fMKJ3HEr3OJ26VH1UVkJHAgfAQqC98oU5NLvRoHR6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=HqH3s36S; arc=none smtp.client-ip=209.127.231.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQI35ZHF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7994E1F000E9;
-	Thu, 23 Jul 2026 06:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784787084;
-	bh=VBdn2EWjCzaB/LsGvu5JNC2sbY5O5dhhwEkMKQrKz6Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jQI35ZHFBTChYjQ6kfiY3FIG5lc5U7yuTiFHA0MAJuCB5lQhyHKzfGFvMqu0Vg7oS
-	 wbmqZnrDUGLV+3FxAGADTsdviVKQKmKxL5b42UsWs1FHa/mxdTow2mrTa9oHPGfiFq
-	 7VcDodqNgInG29zaRfj9Q59DE3247biTYu4J02Ld6oUHDbnanBWeSf2IeYtx8nhSGh
-	 C4UgTQZqxfkmK2AoIZyCTBNAVlrVMRTOt7Unzfeklkfjs4POShPbXDmJPwwg+nCZOz
-	 P8UMjW2HY0eW3UKLb58b2RFEDv2qDkLqgPOUN6Ue6Zq6qTLfJTgAqH/sJ3VXsHAVsq
-	 IPE4/hdrctM0g==
-Date: Thu, 23 Jul 2026 09:11:18 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Mykola Marzhan <mykola@meshstor.io>
-Cc: Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
-	Guoqing Jiang <guoqing.jiang@linux.dev>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Shivaji Kant <shivajikant@google.com>,
-	Pranjal Shrivastava <praan@google.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH v2 6/7] md/raid1,raid10: skip futile retries on P2PDMA
- mapping failures
-Message-ID: <20260723061118.GA110966@unreal>
-References: <20260719105327.864949-1-mykola@meshstor.io>
- <20260719105327.864949-7-mykola@meshstor.io>
- <ee312bcb-92f4-4884-91cd-3bd56180c8c7@deltatee.com>
- <CAPzsNDsLr_BABgizujN0CgnLNfzS3S37vQ133fjbJzFMvRs7CQ@mail.gmail.com>
- <9f846c85-f427-433a-b87d-8e9e3a4406e7@deltatee.com>
- <20260722083015.GU110966@unreal>
- <CAPzsNDuGfneEmx_nWqw5vYLyPyK8krfWChNRcsxO7icTEDDX5g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="HqH3s36S"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1784789166;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=1VSRY8DjQjQuIUS0pS4CSBluQaqfLAGbzI2985QqDtI=;
+ b=HqH3s36SOfVG7JXnwBbQWU979NzuEpHDhQJnXuyWL7tsbzwpjNitHDMyeaKK9YsdGyn2UM
+ len8eDYFCC/MdYIwMlYINsjKIigow4tEib70K3fkwn7sFP5rKEpSx04A+iD9mMyfp2oF7p
+ kpjZR7S1BpPln+NZHmiByo/9hRcZ7IiBNfEYqm72OVwRpT15JvnqfBRcT4ppd9O4V/b7dY
+ 4/KjNNM6Z4PEfIGAWfFlbp5w6CEJauhNDz7HHmSw+R+CJ8X+k+/6MhAyuuqfE0QWWEn4zO
+ yY+ljvgbnw4MKBPQx0N/E8nMFi10EN1wQMe4MIUW4vVobl/tAhjezCVYhnjF5A==
+Subject: Re: [PATCH v4] blk-throttle: fix divide-by-zero on legacy iops limit of 0
+Date: Thu, 23 Jul 2026 14:46:01 +0800
+In-Reply-To: <20260722102459.253189-1-cui.tao@linux.dev>
+User-Agent: Mozilla Thunderbird
+X-Original-From: yu kuai <yukuai@fygo.io>
+X-Lms-Return-Path: <lba+26a61b8ad+fe840b+vger.kernel.org+yukuai@fygo.io>
+Reply-To: yukuai@fygo.io
+Cc: <linux-block@vger.kernel.org>, <josef@toxicpanda.com>, 
+	<cgroups@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<david.laight.linux@gmail.com>, <haris.iqbal@linux.dev>, 
+	"Tao Cui" <cuitao@kylinos.cn>
+Message-Id: <cac8989a-d097-4f50-be01-d26d95555e64@fygo.io>
+Content-Transfer-Encoding: quoted-printable
+References: <20260722102459.253189-1-cui.tao@linux.dev>
+To: "Tao Cui" <cui.tao@linux.dev>, <tj@kernel.org>, <axboe@kernel.dk>, 
+	"yu kuai" <yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPzsNDuGfneEmx_nWqw5vYLyPyK8krfWChNRcsxO7icTEDDX5g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Thu, 23 Jul 2026 06:46:04 +0000
 
-On Wed, Jul 22, 2026 at 09:00:16PM +0200, Mykola Marzhan wrote:
-> > I had thoughts about this series too. It seems best to avoid
-> > the P2P path entirely unless all legs support P2P.
-> >
-> > Can the md/raid code determine P2P support in advance?
-> 
-> Yes, and it already does: the block layer ANDs the P2PDMA queue
-> feature across all legs, so an array with a non-P2P member
-> (e.g. an nvme-tcp leg) never advertises P2P at all.
-> 
-> But that flag can only say "this driver can do P2P in general".
-> md cannot see which HCA device does the DMA for a fabrics leg —
-> and with multipath failover it can change at any time.
-> 
-> So the up-front gate covers what is knowable up front.
-> This series is about the remainder.
-> In mixed case, one local P2P leg plus a remote replica, with it:
-> 1) a failed read just redirects to a capable mirror;
-> 2) a failed write records bad blocks instead of retrying forever.
+=E5=9C=A8 2026/7/22 18:24, Tao Cui =E5=86=99=E9=81=93:
 
-Thanks for the explanation.
+> From: Tao Cui<cuitao@kylinos.cn>
+>
+> Writing a multiple of 2^32 (e.g. 4294967296) to a legacy cgroup v1
+> throttle iops file (blkio.throttle.{read,write}_iops_device) silently
+> truncates to 0: tg_set_conf() stores the sscanf-parsed u64 value into
+> an unsigned int field with no clamping. The cgroup v2 path,
+> tg_set_limit(), already clamps the same kind of value with
+> min_t(u64, val, UINT_MAX), but the legacy path never did. Note that
+> the "!v -> U64_MAX" mapping only catches an explicit zero and does not
+> catch a value that truncates to zero.
+>
+> With iops stored as 0, tg_update_has_rules() sets has_rules_iops[] and
+> the next IO reaches tg_within_iops_limit(), which computes
+>
+>      jiffy_wait =3D max(jiffy_wait, HZ / iops_limit + 1);
+>
+> triggering a divide-by-zero oops.
+>
+> Fix it in tg_set_conf() by clamping the value to UINT_MAX, consistent
+> with tg_set_limit(). This closes the truncation root cause: with 0 no
+> longer reachable as a stored limit, the HZ / iops_limit divide is never
+> hit.
+>
+> Signed-off-by: Tao Cui<cuitao@kylinos.cn>
+>
+> ---
+> Changes in v4:
+> - Drop the defensive "iops_limit =3D=3D 0" check in tg_dispatch_iops_time=
+():
+>    with the tg_set_conf() clamp in place, 0 can never be stored as a limi=
+t,
+>    so the runtime check only guards an unreachable state. (Yu Kuai)
+> - Drop the Fixes: tag: the unclamped write -- and the iops=3D0 behavior i=
+t
+>    can produce (calculate_io_allowed() returns 0, so no IO is issued) --
+>    long predates the commit that added the HZ / iops_limit divide, so
+>    attributing it there was incorrect. (Yu Kuai)
+>
+> Changes in v3:
+> - Drop the (u64) cast on UINT_MAX: the kernel's type-checked min() accept=
+s
+>    two unsigned types of different width (both >=3D 4 bytes), so
+>    min(v, UINT_MAX) compiles clean. (David Laight)
+>
+> Changes in v2:
+> - Use a "void *field" local for the config write so the assignment reads
+>    *(u64 *)field / *(unsigned int *)field instead of the
+>    (type *)((void *)tg + of_cft(of)->private) casts.
+> - Use min(v, UINT_MAX) instead of min_t(u64, v, UINT_MAX).
+> ---
+>   block/blk-throttle.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
 
-> 
-> Mykola
-> 
+--=20
+Thanks,
+Kuai
