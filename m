@@ -1,38 +1,48 @@
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CCC345EBF;
-	Wed, 22 Jul 2026 22:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D45417A300;
+	Thu, 23 Jul 2026 01:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784757613; cv=none; b=Z1pjuA+uXntgJl1zJvmQTkW4X+oalZYTY0czHkNw4XodR/dLuoRtFYkasdH/xIQ9Vfq4nzvwEBNOrBoZv3Th851cdCYrZUeWeny0WQG/Pbo/X4UhSljG7AJLvuytV7HXmg5lJWg7WuM9+sTIOBggjFBoJwiI8nqOMesd6bn7xbU=
+	t=1784768580; cv=none; b=FfQRAbiNfh0+9dCeJi3HFU17UHYvBiaA26gaRf+oKDUkHr5wonGQsBy5AsPQpCAEHCjKlz3uGfnCtxmSOyuTtbLsD3FuD+RhY+QaGXN5ylZqzwcq9UdSvQJbjheRGvhXPFARihPZezykyL8QN7n4AKFZQ4o8yxoME2NA2IyixkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784757613; c=relaxed/simple;
-	bh=AlOzJ3PucvMhjsxe049wK97vJfOJA8H9ozMVnIVACpg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=OJworiymcQ2mmcqKZApAeABYeWnjmcPy+dj/HbRBIuSPo9fcq8o+X47vuZmQNtvovPKhScI3ICsxKrBxpPKT/eRAZ8Ty+GoFNocGljMthT34ohRo9aL8qOYcHtXSD1bkrr9BVEDgOgaA2tOuNVGhANqfBeubzNoiUGIF0WZG/94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=H80nSWfW; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+	s=arc-20240116; t=1784768580; c=relaxed/simple;
+	bh=QYcM38Ff4R/5NJ9E2ioHy0uQxPnU2NNaD5JJQVeJECg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C+YHfucJ07ffK5P+5xcIzyyl4FGkOyAievapVdS25ZtkBX42gJj4hHt51/M3ys4KMqsVtxO+PtXvnNPToRZdWq/mJFWNmbbWpVbeXVAiGC4AsZwILuCrzglc18+RVjAjKFpm/liBOm1fUPixSb7cthe34IIsg+i3ymSK7mY5xxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZZUADrjg; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="H80nSWfW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=mWLM0sNqj8A+i8RsOd2Hmw7WLj+R4XIGUQ97gxss7QY=; b=H80nSWfWXMG7+WawMVnp9g982Y
-	l4MDmkHHwJaBipGMWml11JCpIMHWEkOL0zPbZo1GPMWZLvgdAga9WMfiySF/nWucEmoClt6MNfuC0
-	YHiEocy1hNKn1EVedB09F2jVj+0gga1as3yohtlIgoxcbfK01gAFK+01mdKyAzxlqLp/45Tnyx1rT
-	a1sC3iXJoCQ2ecHm5Orlcj5VRGuxiiB4sL7LpgQLyvwy6y3pewb+vltNHNm8KC9yrMmCMsyT7234k
-	vcCqRG2a3kQYmw/efvm+QkJ2qDX6WcKGkQzTQodogTuyyOgqc0q0GAPUAsr07MXpDUphBq7rhPdJI
-	O95uAEmg==;
-Received: from d172-219-145-25.abhsia.telus.net ([172.219.145.25] helo=[192.168.11.155])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <logang@deltatee.com>)
-	id 1wmeyv-0000000CbjN-1hVE;
-	Wed, 22 Jul 2026 16:00:02 -0600
-Message-ID: <528ead56-5621-48ec-8828-d9071ebfa2bb@deltatee.com>
-Date: Wed, 22 Jul 2026 15:59:55 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZZUADrjg"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4h5CXX0Gr2z1XM5kY;
+	Thu, 23 Jul 2026 01:02:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1784768570; x=1787360571; bh=QYcM38Ff4R/5NJ9E2ioHy0uQ
+	xPnU2NNaD5JJQVeJECg=; b=ZZUADrjgHlJ4PSGhgCVVXdVNGvKUY5PCPVNGAWe5
+	n5qLU2p96UcJbKV4ZjV6H+x4nh0hDfygC7HLj4p4gm1p01+6qvprJibb4nlmy8ZK
+	KH5ss3fwwtS4rpiaMyKoIVTK47AaVcYzXOBej++2ahnXdIKcgVc83u4cG5zg0xFS
+	m+U6WxYI8Nq+hRLQJijOOVq+x8Dm8/mzl2b/E4uhV7LXdOTHDmln8dML9yauM0UM
+	tGh7oNxMoWtTr7iP7Z0uzhxpfdGuRnyP9Bb44tzuqIu/irjMbkvFFAYm3s/9/x2E
+	fyZqswpaU/JJO/5SWn/gcF6eoJsof80PDbmlGoNmrdMROg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 3LojP614dqlJ; Thu, 23 Jul 2026 01:02:50 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4h5CXS65Dkz1XM5jn;
+	Thu, 23 Jul 2026 01:02:48 +0000 (UTC)
+Message-ID: <625c8daa-832f-4b9b-ae9c-446a024493f0@acm.org>
+Date: Wed, 22 Jul 2026 18:02:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,72 +50,28 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
- Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
- <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-pci@vger.kernel.org
-References: <20260722185841.449934-1-mykola@meshstor.io>
- <20260722185841.449934-10-mykola@meshstor.io>
+Subject: =?UTF-8?B?UmU6IOWbnuWkjTogUmU6IFtQQVRDSCB2MV0gYmxvY2svbXEtZGVhZGxp?=
+ =?UTF-8?Q?ne=3A_hold_elevator=5Flock_in_debugfs_next=5Frq_show?=
+To: =?UTF-8?B?5YiY5Zac6ZGr?= <liuxixin@kylinos.cn>,
+ linux-block <linux-block@vger.kernel.org>
+Cc: axboe <axboe@kernel.dk>, linux-kernel <linux-kernel@vger.kernel.org>
+References: <4gmvbeouu7qb-4gn345cmtdpg@nsmail8.2--kylin--1>
 Content-Language: en-US
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20260722185841.449934-10-mykola@meshstor.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.219.145.25
-X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH v4 9/9] nvme-rdma: return BLK_STS_P2PDMA for unsupported
- P2P transfers
-X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4gmvbeouu7qb-4gn345cmtdpg@nsmail8.2--kylin--1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
+On 7/22/26 5:14 PM, =E5=88=98=E5=96=9C=E9=91=AB wrote:
+> I have verified the patch.
 
+Which patch has been verified? Your patch or my patch?
 
-On 2026-07-22 12:58, Mykola Marzhan wrote:
-> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-> index 6909e3542794..2f50509a7a61 100644
-> --- a/drivers/nvme/host/rdma.c
-> +++ b/drivers/nvme/host/rdma.c
-> @@ -1469,6 +1469,7 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
->  		int *count, int *pi_count)
->  {
->  	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
-> +	struct sg_table sgt;
->  	int ret;
->  
->  	req->data_sgl.sg_table.sgl = (struct scatterlist *)(req + 1);
-> @@ -1480,12 +1481,14 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
->  
->  	req->data_sgl.nents = blk_rq_map_sg(rq, req->data_sgl.sg_table.sgl);
->  
-> -	*count = ib_dma_map_sg(ibdev, req->data_sgl.sg_table.sgl,
-> -			       req->data_sgl.nents, rq_dma_dir(rq));
-> -	if (unlikely(*count <= 0)) {
-> -		ret = -EIO;
-> +	sgt = (struct sg_table) {
-> +		.sgl		= req->data_sgl.sg_table.sgl,
-> +		.orig_nents	= req->data_sgl.nents,
-> +	};
+> yet locking with dd->lock does not take effect.
+Is the above statement based on analysis of the source code or on
+actual testing? In the latter case, please share the reproducer of the
+crash and also the KASAN output triggered by my patch.
 
-Maybe we could make this patch a little clearer by splitting the change
-to sg_table into it's own patch? That would make it much easier for me
-to review. I've looked through it now a couple times and think it's ok,
-but it's a little more complex than I can really untangle in my head.
+Thanks,
 
-Per your other email, I think that will make things good from my
-perspective for v5, but I reserve the right to find something new when I
-look at it ;)
-
-Thanks for your efforts cleaning this up.
-
-Logan
+Bart.
