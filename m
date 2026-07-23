@@ -1,98 +1,81 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4924648B376
-	for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 17:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784826353; cv=pass; b=MEswxdOWFsHsS8SmL2nhPBIMqeUcaPgkTVdR7oCulj8iESLeaNocSbrnAEk0gbfeMF/58gV8wJHuq54OhDq9Zg0s7+zpkkTpyhkSFWL6ZZ1VWWnI/TF9yHsufWjVhxSLcqgsGRqjzvTfOlvFCliSfa1rrEqEqXPcls04UAmabzI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784826353; c=relaxed/simple;
-	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qt24NUt2FA4FLRxNbag0V6t7ZhHbZGsKLxZwIhkmFqfBiPEJ4NjY1ua5iEI4nA3DRoHcccn/KjYNewHUS2MICGUR3MS4HX0YwOMR8f9BIMRHRTIJNr6FUBuwl98HlIwoUUVss4KvM3V1PXjuE95zMf0gFqVhERKmgI7UPt+BpTU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8pkA7oJ; arc=pass smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BB2368D6F;
+	Thu, 23 Jul 2026 17:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784828318; cv=none; b=hCaVquWmidm8xRuZ+03NshdAcSqrRAFYZYFVMBgNdfQKn8sUDeQYtOrvp/3hJuyVzo2H8LvO4JBQ0qtLNpCC4xTVG2YuWbDS/ustmbTnZ+ZxuWSPH3+45vb0BKhAX5yYgHK8LrYOoHuwMtOMRX/3onqZA93APYb6FDJIlVLCmBo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784828318; c=relaxed/simple;
+	bh=eWI+G4fD2ZdiktrUHuIE+WQJNxpnJbYhSsRZdSbikLc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bvFAh5MkZiPFvlJP8yHmt/I7zCZpFCdU08QE6BcFxqmDNH6LgLdRdI3ZYdawBr6UBrtxJiZxXvvTJ8AG0ujXWtvJcvURE56VeqdCswszCqCQO6xreCHG7UfDsH94AmswpjiYy36U9cYOcNxC6eeYGfo3Uh3sBA8kGL8G6MqShTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Dc+cLRQz; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8pkA7oJ"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c12614b81c9so138558566b.3
-        for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 10:05:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784826348; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JGqmb1Pc01pTScePBE3UVADUWbqfbzZWnf+3/5QE+3S5mSkBqADflbMDuInmh1a88M
-         5ZPg+qSVuYbvKAlmetjeWkmvUkzXr+JM6ikwTwmUqkPEHD+Ilcjnp/RvFN7KL+tIgJRA
-         OfQLLXI4H6VL7cmAcoQ5QIVOXSyMrF/YdzFVOEWhmJ6fzr1MtSfFpZJisn8a/vZRqI/2
-         xlWEX9UVy4j8Dhuw7yqdolCFvsHFb1SKf+WOysx612DZYHLgdii0lZAGtHTd1F8goNiV
-         95TB7v3eCiYLhPLN/uUjAdALdKIsdzy0AutHSzg4BoOU7knYeBOm0Metro2HvLdU3dgZ
-         lhQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        fh=RqUplsYlZFCikNZXlQ8BvCiJcetoKpzmFET/HauxT7Q=;
-        b=Uq3a1mi+cdm6zWrsCD2S6uIL8Qvl9vXXVjPI1P2/oEiVy6OpPgB2sI+1qR/SqR3C49
-         JN5l4baqNWDnHMafPQ3DP8Ug5DAvjWJI2f/qnAvkh+T6H/TxytafAYDxJUv0gJvKiN/n
-         qENVrgV61fwrGoreG2pOlP+EjKk+R6lIogBEv1xg7UL0UFOTsWisV39cBUCEKIZ5akqu
-         LF+xdXKWIjx9S9P8N3/uDMnYxvxka2F4A787cAn8HgNIxDB0xQSB6V2T6AcpWSTWgcth
-         n1NVWFgrgK7/Sraq6nPNHMsUvDq1XV4aBBMBtCS/N0KDzq5Dxdl17qD3BazKLV+X1aRt
-         6R9Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784826348; x=1785431148; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=l8pkA7oJLih8TzuvTDGh7j0dMOl6Eb9Nrun3ybHk91qSM1/ZqamVq51elv79Ndy4aN
-         L4+7SrUjtKtmoGwa1tNEQxBxhuWfYLqVZwNrhC81cIf7IR1JoLsJZ1znekQ/5tZrvHQT
-         M1IvSMRdCj29VDkj0qw7igjvkqLE8fVDl5sdnQrGoXo14i8HrALrM0LPwQCIxY8u3uPg
-         y86xoHXl1TJOzQYuCunnpAnCcpNVXX/P0WDUKNre1PTW3TtLNrKUYMUAMjOEQUN7fwqk
-         9FiLydcKYQpgYmvsHWElZNb9x5pvHnfoXzL7wbr1bKgxb8J16ovuFAZezrsKvJL/OK87
-         JR6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784826348; x=1785431148;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=hPVO3UB5BNhfsfpFr4/T51u/Ki+AfMJHa7D1licsT5MKVYSvA4HoL9ASbOjapDu+F/
-         tlXNVZIsKZJD1OGiFajfHB8rvVBPzqgkSA8dE8Krq+MNE33hXR0R1UACaUPsx+UlpQOl
-         ht6cZsQv3nCKs686YJQpABa1AlyfHoX9ITCotpJD17lonPwaOF+i8AtVFGUcGOL3BLEP
-         d5k4vYO3+cJR0xghHXE3a32OzueSw71cTTa5anOAifa4GbZHTlGMgNIN12hRiKxS0Si3
-         RgsUEfGIjw23azbaq5gOOSLLq633SGm0tqJpI9mHEZAn86bxPQ/i935ZA4I+UQSsqkQu
-         Klig==
-X-Forwarded-Encrypted: i=1; AHgh+RqrL0KZOBhCVTEstDbEoVjiCkwnFLKXvu+F8VXWDDV+bxGPzY2C0N6XwjXlpAshy1aCIaJniQeum7Jhxg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyImwO2395u5bxHprLO/J+1maJWHgAtF1GIQrK2eMs3R3xhyxQm
-	3PTKJWZ5yjY4NXD4cYZVvL065B5za0Y7g62YjK6sFiyAU0yumN9Ouj+Bpt5pYpOVg8jLSo1KEUy
-	VNQEYOqUWqndDW04ce8TdjMoItjTReA==
-X-Gm-Gg: AR+sD13QRFv5z1d4JNunDpQT6frZ55YOPZjQ/6Ge8c8TzZTB07n/hinsRnswohquX/C
-	lGdyR7sQ5ce7uvdTXzcaqZnR7vXsr0tvO5rTutEN/EzvROSVSNxy8lsuku2wPa9gj0Qi15Iyucc
-	wCApCe7FaGcCxcyWzGMM/hwnqjjKsla3EbSXLrV0dmZrDgyHk3gVUUv0kw4WyHggdXYhYG2urzA
-	eXx/c5c0tK519rPJJPul9XSlKjIPAdu3QLkceGeV4tg+uCO+mP6JFAR48CGf9ANtY45RFFKaBry
-	ioq5KxH//i3GNnfKDV9U5NjrNmhCvdPL72FF+9dG22s=
-X-Received: by 2002:a17:906:9fce:b0:c16:a9e0:d5eb with SMTP id
- a640c23a62f3a-c1c509a83b2mr202122866b.56.1784826348034; Thu, 23 Jul 2026
- 10:05:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Dc+cLRQz"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4h5ddT0VTFzlfq9R;
+	Thu, 23 Jul 2026 17:38:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1784828314; x=1787420315; bh=gvLGMOIY5UuDgQBU72WpsXk1
+	8dZZlxeUgXW+M9PEJ6k=; b=Dc+cLRQz61iVnz5A8yYKrpB5xMHZ40np0ynws/3s
+	IAh2A3+ehteg6Bo3SKQjaGslnZItQhZmkgC2J+Q71/xqs0yPJ6hyAAh7R60DovIK
+	WbZFzn6Ieh6dPIawJGxHIT0bwBkVnDAnYeVMXyDwnnQd6mmRActzxWrlobHncBA7
+	ecN9tWWDn9Pf/klXDhtJdRFvb4Eti85pkWO4UYe27X2MNSfQYAZWeau7nYzcnXDw
+	lj+4yLrH1t2MOrlj/AMTzSnIYEadNbwzm6eckt+1GsEbujjM63mvZs6nATDajQMS
+	FT/h9dWJEJodMqlf5QZf+0KKEyneV6rE2Pr6d8lhFCFhLA==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id lJf_m1-86BEo; Thu, 23 Jul 2026 17:38:34 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4h5ddQ0GxKzlfqKv;
+	Thu, 23 Jul 2026 17:38:33 +0000 (UTC)
+Message-ID: <af98cabf-89a6-41b0-9929-ec3e24783503@acm.org>
+Date: Thu, 23 Jul 2026 10:38:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723145000.116419-1-hch@lst.de> <20260723145000.116419-5-hch@lst.de>
-In-Reply-To: <20260723145000.116419-5-hch@lst.de>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Thu, 23 Jul 2026 22:35:08 +0530
-X-Gm-Features: AUfX_mx42CjHuGi597hWO-eDmQkzzqIKaOn08um8jFHZz68xIGpeWOmFM7SNP0w
-Message-ID: <CACzX3AsOLiKnG=spMY5uHOJX06QB759HY6fh7Z+=zBgjwEPfZg@mail.gmail.com>
-Subject: Re: [PATCH 04/22] block: handle nogenerate/noverify properly in fs-integrity
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>, 
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: =?UTF-8?B?UmU6IOWbnuWkjTogUmU6IOWbnuWkjTogUmU6IFtQQVRDSCB2MV0gYmxv?=
+ =?UTF-8?Q?ck/mq-deadline=3A_hold_elevator=5Flock_in_debugfs_next=5Frq_show?=
+To: =?UTF-8?B?5YiY5Zac6ZGr?= <liuxixin@kylinos.cn>,
+ linux-block <linux-block@vger.kernel.org>
+Cc: axboe <axboe@kernel.dk>, linux-kernel <linux-kernel@vger.kernel.org>
+References: <4vwol95qmudj-4vww18fcfi2w@nsmail8.2--kylin--1>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4vwol95qmudj-4vww18fcfi2w@nsmail8.2--kylin--1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+On 7/22/26 7:37 PM, =E5=88=98=E5=96=9C=E9=91=AB wrote:
+> That approach did not take effect, so I switched to the current patch.
+>=20
+> I have verified the current patch, and the KASAN crash is gone with it.
+
+The following is missing from your patch:
+- An explanation why q->elevator_lock is locked instead of dd->lock. I
+   think that you are misunderstanding the purpose of these locks.
+- An explanation why locking q->elevator_lock from inside a debugfs
+   attribute neither triggers lock inversion nor a deadlock.
+- An explanation why the dd and per_prio assignments happen with the
+   lock held. This seems unnecessary to me because neither
+    e->elevator_data nor the address of dd->per_prio[] are modified while
+   the mq-deadline debugfs attributes exist. Did I perhaps overlook
+   something?
+
+Bart.
