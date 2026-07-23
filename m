@@ -1,125 +1,169 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6313C17A300
-	for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 01:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB612472B6;
+	Thu, 23 Jul 2026 02:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784769853; cv=none; b=cMsji+Y7dHUXalrowCFMmas3EN0M1Pl0r7YDnTzlaRqzS4l2Rc28z9cjXBegd+Ys90wyKy094Io19Jtk2aX6fKaszPkEOh7LG5PbmXpZC9lyI6V9FJCOBa5EibSIB35z+SDF6AxPjh/jIK0yDw0L15e73c6nqPq3/emBvVbjfuA=
+	t=1784772682; cv=none; b=rREUsgpgRWVJmMQmDPSructhccjTbLOV9WGOIdg6dJ8Erpd0+bMHeOP/Kh4DndNO1vvWLKxWSlWS/5OMpseTLc0d3Tje84Kk1vV5lIr4pu7A/fyyFT0OU4Ijk0kPcfVPcc9CzqPuwFcbBGoU7MRcFAWUzjHNhiTWu0uwUACFsD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784769853; c=relaxed/simple;
-	bh=rH1Wsn71inUuK+5SZQRNnGRTJnf9ht5PVLOthcrA6zM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=h5Who6ByYbzwqhKTVnx3JLl2IPh41oL+6384UKtNpDbA6MZ0lh7ONDXuqDymfWT9ZrBSvcNUXi9o07HDla/rFb6G/GbJ+QzOHxUhq8Oa/a6KNDCF/tlLDpSMNgp7rNf9lPdWCtGKUpawuD/0TxaC/ZU/xdrP81aDRZigNS/PFtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=EgzBmZm9; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1784772682; c=relaxed/simple;
+	bh=ouhDi1wJe8VGK20MEf1IZFZ5IYEJfw377WQZ4ejJ8YI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ARb1AUH5R6ePPiCNsLNC8OWAH96ZaGsvt8AZKGlEGMBWCO+0DNLOA4b0x3Tbm4oj9CfwUpnccsGibqXMZlVf41Nzb/ovM1t+ZgGL484AkLjyStPd1bjX5BgpTs9AeCHNof1LrFbwgq5nhfHI5f5uzfLiWSKKNpPE8v/5S/n71tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=soKETOWc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="EgzBmZm9"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=tI7jlf2gVhufqXJTBiWI992LoBfe5J6nfmLVFkrOcDg=;
-	b=EgzBmZm96DW8DjprCUcns96A0qgQEyc5VDk91CR32PxulQHKzL7WnmErmPZt7IXUwpM28L+Vg
-	DOVjgGHyyx1K/eW83Pm/tg337SFOK1LDFp7zfBgX3a/GF9xS1QlPNUM+oSlf0RNG6o8wd3Delih
-	VbZE3/rCPF5mr7iCabfqYmw=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h5Cp870yszKm5m;
-	Thu, 23 Jul 2026 09:14:40 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8A9024055B;
-	Thu, 23 Jul 2026 09:24:06 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 23 Jul 2026 09:24:05 +0800
-Message-ID: <f4033527-5a7f-47f4-8431-7090d063ee34@huawei.com>
-Date: Thu, 23 Jul 2026 09:24:05 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="soKETOWc"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6470AC2BCB3;
+	Thu, 23 Jul 2026 02:11:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
+	t=1784772682; bh=ouhDi1wJe8VGK20MEf1IZFZ5IYEJfw377WQZ4ejJ8YI=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=soKETOWc/MwjdYmmA62S5oe8slwJMNtmiFHqqMk99cysO7lga8HDQfxsrZJ2VPrWi
+	 uo+M3P6QWW6YY1hWjHDDB7RhCDeBEWptJjwTfTEtT/puBirrZFtJ6Rwgyl71z9Gdqn
+	 GSjEMc2kHrCeCVo0IhUk1cmOOHXfSv0yQvQfidtQ=
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424EEC4453D;
+	Thu, 23 Jul 2026 02:11:22 +0000 (UTC)
+From: Alvin Sun <alvin.sun@linux.dev>
+Date: Thu, 23 Jul 2026 10:10:25 +0800
+Subject: [PATCH v9 02/10] rust: module: add `THIS_MODULE` const to
+ `ModuleMetadata` trait
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/6] nbd: add nr_hw_queues module parameter for
- pre-created devices
-To: <yukuai@fygo.io>, <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@lst.de>
-CC: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>,
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>,
-	<wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>,
-	<nbd@other.debian.org>
-References: <20260713065644.1637594-1-yangerkun@huawei.com>
- <20260713065644.1637594-7-yangerkun@huawei.com>
- <cbcbe9e9-3700-4801-88b8-6b99f61a8936@fygo.io>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <cbcbe9e9-3700-4801-88b8-6b99f61a8936@fygo.io>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260723-fix-fops-owner-v9-2-c1c3af7f7bcb@linux.dev>
+References: <20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev>
+In-Reply-To: <20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev>
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, 
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+ Igor Korotin <igor.korotin@linux.dev>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, 
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+ Carlos Llamas <cmllamas@google.com>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org, 
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784772679; l=3642;
+ i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
+ bh=ouhDi1wJe8VGK20MEf1IZFZ5IYEJfw377WQZ4ejJ8YI=;
+ b=1IKe3MdMXW65w8esAMoVSrL3diqwoJGtpM/+HNPOuMlkFzxOm7NUOZ2S91rib+uGuo4IBgoTz
+ NIVnyw3PMd/BWesjoKp8gg1gsMInp4ft0T9Re7q6mixm5fscFiPZhqS
+X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
+ pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
+X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
+ auth_id=684
 
+Since `const_refs_to_static` has been stable as of the MSRV bump, a
+`ThisModule` pointer can now be used in const contexts.
 
+Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that modules
+can provide their `ThisModule` pointer in const contexts such as static
+`file_operations`.
 
-在 2026/7/22 11:53, yu kuai 写道:
-> Hi,
-> 
-> 在 2026/7/13 14:56, Yang Erkun 写道:
->> Previous commit can help remove all freeze for netlink newly created nbd
->> device. But for the devices pre-created at module load(nbds_max default
->> as 16), the nr_hw_queues was setting default as 1, then ioctl/netlink
->> path will set the real connection count, and blk_mq_update_nr_hw_queues
->> in nbd_start_device will introduce freeze.
->>
->> Add an nr_hw_queues module parameter so that users who know their
->> expected connection count can pre-created devices with the right queue
->> count to avoid this freeze too.
-> 
-> I'm fine with this, but this is misleading. Please also add comment to
-> emphasize this module parameter is just to avoid queue freeze if user configure
-> the exact number of socks as this new module parameter. Otherwise, the real
-> nr_hw_queues is still depend on the real number of user configured socks.
+Add a `this_module()` helper to retrieve the `THIS_MODULE` pointer of a
+given module type, and update `__init` to use it instead of the
+`THIS_MODULE` static generated by the `module!` macro.
 
-OK, will add this comment in next version! Thanks a lot for your careful 
-review!
+The `static THIS_MODULE` generated by the `module!` macro is retained
+for backwards compatibility with existing users and removed in a later
+patch once all references have been migrated.
 
-> 
->>
->> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
->> ---
->>    drivers/block/nbd.c | 8 +++++++-
->>    1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index 2c7b09c70da2..f918c9efa9b2 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
->>    
->>    static unsigned int nbds_max = 16;
->>    static int max_part = 16;
->> +static int nr_hw_queues = 1;
->>    static int part_shift;
->>    
->>    static int nbd_dev_dbg_init(struct nbd_device *nbd);
->> @@ -2752,8 +2753,10 @@ static int __init nbd_init(void)
->>    	}
->>    	nbd_dbg_init();
->>    
->> +	if (nr_hw_queues < 1)
->> +		nr_hw_queues = 1;
->>    	for (i = 0; i < nbds_max; i++)
->> -		nbd_dev_add(i, 1, 1);
->> +		nbd_dev_add(i, 1, nr_hw_queues);
->>    	return 0;
->>    }
->>    
->> @@ -2814,3 +2817,6 @@ module_param(nbds_max, int, 0444);
->>    MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
->>    module_param(max_part, int, 0444);
->>    MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
->> +module_param(nr_hw_queues, int, 0444);
->> +MODULE_PARM_DESC(nr_hw_queues,
->> +"number of hardware queues for devices pre-created at module load (default: 1). ");
-> 
+Assisted-by: opencode:glm-5.2
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+Reviewed-by: Gary Guo <gary@garyguo.net>
+Acked-by: Danilo Krummrich <dakr@kernel.org>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+---
+ rust/kernel/module.rs |  9 +++++++++
+ rust/macros/module.rs | 18 +++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/rust/kernel/module.rs b/rust/kernel/module.rs
+index be242a82e86d2..d713705984477 100644
+--- a/rust/kernel/module.rs
++++ b/rust/kernel/module.rs
+@@ -42,6 +42,15 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, crate::erro
+ pub trait ModuleMetadata {
+     /// The name of the module as specified in the `module!` macro.
+     const NAME: &'static crate::str::CStr;
++
++    /// The module's `THIS_MODULE` pointer.
++    const THIS_MODULE: ThisModule;
++}
++
++/// Returns a reference to the `THIS_MODULE` of the given module type.
++#[inline]
++pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
++    &M::THIS_MODULE
+ }
+ 
+ /// Equivalent to `THIS_MODULE` in the C API.
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index 06c18e2075083..aa9a618d5d19e 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -519,6 +519,22 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+ 
+         impl ::kernel::ModuleMetadata for #type_ {
+             const NAME: &'static ::kernel::str::CStr = #name_cstr;
++
++            #[cfg(MODULE)]
++            const THIS_MODULE: ::kernel::ThisModule = {
++                extern "C" {
++                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
++                }
++
++                // SAFETY: `__this_module` is constructed by the kernel at load time
++                // and lives until the module is unloaded.
++                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
++            };
++
++            #[cfg(not(MODULE))]
++            const THIS_MODULE: ::kernel::ThisModule = unsafe {
++                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
++            };
+         }
+ 
+         // Double nested modules, since then nobody can access the public items inside.
+@@ -616,7 +632,7 @@ pub extern "C" fn #ident_exit() {
+                 /// This function must only be called once.
+                 unsafe fn __init() -> ::kernel::ffi::c_int {
+                     let initer = <super::super::LocalModule as ::kernel::InPlaceModule>::init(
+-                        &super::super::THIS_MODULE
++                        ::kernel::module::this_module::<super::super::LocalModule>()
+                     );
+                     // SAFETY: No data race, since `__MOD` can only be accessed by this module
+                     // and there only `__init` and `__exit` access it. These functions are only
+
+-- 
+2.43.0
+
 
