@@ -1,122 +1,99 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77936376A17
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 13:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784899755; cv=none; b=m8gVWiwVVNSXne5JG0deMm1iPTJ1XNU+FpQy8O3Qc9Lfda1NZiAHcsxS/IWARq0KXMVcPm4j298C5LqqbXEF7LBawaix9TOsazjZMAXGHnExvIdO+sYUtcvpQZLF6J3oZbjmiW0T3hrC4/Jfj/skn1jQwehGHPJo7gOCLm4pzpY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784899755; c=relaxed/simple;
-	bh=yz+/AVCcs7dGYmuHmNbbQKIC/lt8UMfpEiho0iyjYiQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OEmE2gUjTtAQrFosChjyGENOIMLbNXe8gLlNrvpvzhBrD0jBaTBeeORqrWbW0+79QdFsEbSBHDXalRnNUnBoq1kNMdJ1dqEdKcXApfz9IlrxzAKoZfzmmXn70Y1KTny0bx2J1EjokJX9aoxMjbWfrtasXc01iN2vW0D+JRBfyD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF43353A6E
+	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 13:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784900078; cv=pass; b=KZIgpcB78QItciucwmCAhk15UqcrppkjX6roLKQMqUMexGH5m4k4jDNprClHKuh+1f/ECPXNgdVpr/PmKsv9jDJNAebJfICCV13fALv1Th6KwzXzvLoXWMsJ/gQm8f1r2deJ6TBt1wkIGTc360QYNgahKpyYcsvUQVFvWAK2OoE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784900078; c=relaxed/simple;
+	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rosc3uxKF06nN+R/8outsXL4C6Ux4KYk/f0s2r4L0UGXMs2U5n7xv13ooTQD8bJ3gK4J/OUGsfivtwFCBqtQx15JpIuI2ViU8k5HbRzKgep0m8erIWktCq6pch7Plk2DR7rr0jF7qvu/nMVIgtmG1rwhh+tVxNg365wx02w/cSQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VpUbj/gx; arc=pass smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-471eeac43bfso436573f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 06:29:13 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VpUbj/gx"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c15dd4b9132so66250166b.1
+        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 06:34:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784900075; cv=none;
+        d=google.com; s=arc-20260327;
+        b=XHIaYl46q8t7sftUYC6DCtfgRPzYsJeTmygCOOsHb74Y3V2NViZma/E70mRQoL83rj
+         9rDeBBBrmUxlZCPOs28MwrFGBUyH6uxA/3I3FhrP2GDFiw7fPn2fmLFv18Ko4O3i8HYP
+         jInMR74ISeIc+e+hcVCnVhC6N7+spxSmDT0gYawn0/j1eIHOUdIRbOPin9HJKuIxSlJ6
+         yjB1WkVpJnfSXEF4a/hw1KD/fuEyiq+4OflVothS6/tfaroU9H2BZBjVRAFMaejbYTmw
+         8lASYEiIXcgtWOwXsuQOGc0UhVuiTHXQRmB3gopqSY+5p9c24jIhEpUIWkrz5UdPA5Hu
+         vuPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        fh=5UUzxGfj34aXxrLIrmJqQu9wwlvzH0kf1NqVmKB76Ow=;
+        b=Wun6iDFb5CIyg2xSfZyY4dR9cjiPcjCA6+71YuOzPXeDJTTvOb1UrdvIMeC5x98Ydr
+         p0bCqkCiLvubQ7Iwp1tZtZ8wAkQ53tiWV+SoGZ9MPDd7EmjxYfjVq3XDO/r0Kn8l5abc
+         Ca1y9x9ryVa9sm9EJkVGLMuEjAIQb9wMQsXQDQlt00Hu9frr8ndjjtxomBy1DFQaVhVy
+         hsCKAcfHjaB4AObey4k3vBQSajvTX3UfWKuP71bJd8O2zWcEDExK5tmLCDzX95jBcgSj
+         lLstkN8YIurEXbf/7EUQFwMYg3J9PLZFIzNi885fZz5KnSJ5DXPkOb3WEXwz/aNd6KS5
+         Ybdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784900075; x=1785504875; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=VpUbj/gxPfu2RJKKVmjsZsjVpFXa4JvxOTc/1TcRNMnnNVefaCvfqx2/odkO9g0NTh
+         CnsiBs4DgQ48FWOpJDSSiPo0E6xIq/kxYpQsS4Dbv3aZurShT/W+A9qHMjEDVCTojNe5
+         5zf79qnNQjhwS1zaVKbawSHze1NF4okyEJHHH4ArW6N3YMjavlI7eyMl+xOpiqmxLb2E
+         NKJ06T7BITwLjVRs4DNk4bAi3fEzM1kirP5LYLY2pSojTlhlTzeIY2DM5oDjrSJ0zXy8
+         zsPTuXchjV6bQkcVQAf1IJmIjWs6rbLpwnX15kRDf5kjA369ONxgdH7bmD2X4GrAZEig
+         ECZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784899752; x=1785504552;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20251104; t=1784900075; x=1785504875;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=aHuHrzO50Iy6z0MvBYXW3ZKFWlwXidTBEpMxTWDNph4=;
-        b=cROUJeFEz0mqdstIMSyN1rfqGLt304xvu6v7+9H2DNkw/Mm13XfFGOeSSKsnaMa73M
-         jfaYbwAYCyPHml2Qr+ZNba7S1aSkwADy4dZ1Z86gWUymsEZSFi/Gw889rtGCHWrp7Qvr
-         DM01KtViA/fGCxrI2X7HvlibIyXGiwV78DLCbJpq4jagzuITMmEIJvB2dG0Qq8rKXFNe
-         XyuBpxhdcNz9CAw+KOeoRQOj+vL2sLe9ofua0TEivPu3mEuYsL84OoaRTJW6x1/wcy9v
-         8JPhDf+u2YTaOv1SAn+ofFjv/wMsLv42KyKyCMDfxhxrgLVIviRRSdz/8O1PnzjpOR7o
-         yQpA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro+ODyFVWgYIs68lWV7I9ba8iLTiGqcHR7IRiWDs5QILk6hTqNhr9PsTveMqjldphGRxLnzoeiAzmO8mw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxo1WvsR1nuKE6VJUu7Ih5EUV+VxpsKeEerS3/f3alL7MK8R2CT
-	lW7D67sBa94EI73wyQh03ijwv78bgOK/uC+Lm+MdKL0CsTNozwM6Y0Vr
-X-Gm-Gg: AR+sD11KdaVB/OzE0gl1zARY3A22luMKtca2wc2vu5E7o3KenQ7JeBGCOpZon1bHeZB
-	EVuZbhxqk9RcS2FBCdwnjZyhCj5AdNSlL+1yPo/sRNj/9EH44qVJQ1XXR/eWORa8l/m4TGY4o6l
-	rwE5l7gpTJ+ujq8BpO1+FfGm03WrHOb7wNIPF3QWywG6cCoanJK67Un/hmkUsODGWK8zJWVTfYJ
-	iqntUrdlHKie/UAQBBKWHyQvtyg8E7FzElB/tSjk4LB5N9HV4Zs0eHYflofyrmNoxMj1S2kogGr
-	wFQfjeDx1sxSuzqt1piytOW0Tw7cRAmhXEyjRl+IcfSM+iHGiKlUk3FojERdG4ReORfGr5yAEDH
-	JmwTkcnT10ZrJvrgqnD15nnQlMDq61/p+MC3SyFinJmtLJA8WleP/VWyGvsjR3GEKPAZgO9MZRA
-	==
-X-Received: by 2002:a5d:64c4:0:b0:47f:9ac6:ca5b with SMTP id ffacd0b85a97d-47f9ac6ccbdmr2258907f8f.37.1784899751418;
-        Fri, 24 Jul 2026 06:29:11 -0700 (PDT)
-Received: from [10.68.32.41] ([5.194.84.52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c7880dsm25036785f8f.37.2026.07.24.06.29.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jul 2026 06:29:10 -0700 (PDT)
-Message-ID: <b70879c2-4dac-4068-8a98-ef1d28168234@linux.com>
-Date: Fri, 24 Jul 2026 17:29:07 +0400
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=tNkDdJdjifGk2tsbPXuU7xl6SOPDBP7FmAqPj0tkvkwIVzGzmrIZpePTFTS0KYS/xf
+         IfQHa2LSWQ0h4wWoXH1vpfQL1b4UVBfRgkfQq3rmpvQzXXUST9gBCLrw+ZfZQc8VCj5h
+         kk6C3WFPtk1Y/mK6uYfsmbBnjkXqbLP43MwTBhKmufw2Xq3MY0YcxW7OnkVESOMP0wbI
+         KtRuG6Rne93VhW9UYvGL7GkuGkr4lxrqXl/fmwjNIBhFuCmJqLCZySvVqtnBa0Oh7RI5
+         +PbrV2f0RoBkLb2/jBLtqtVp4a/AKnY94xovO9Oxk2zDmHfFUrn+gHZrwF5m+o9AL+Cv
+         MA7w==
+X-Forwarded-Encrypted: i=1; AHgh+RodrhCZDxAfnoWFSu7mZ44WVO56WdeJTWcGRQTfg9jeaxGU7M5RAaowYjBUKS2smhWdWuOEB9fKdp1sWg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMWyipYc/aiyBofGXJ57ZYcXM+Kbduwj86uBTERUftA93AbXej
+	+pv6qp3YBqa6O3h/FPTqWmmphN1ws8WOTHWw0i185VIp94sa26BmvN5QzJHxK9md3pyU21tsOTE
+	Uem62hlKfoW2DZy52hTca9LVVJ3+jZQ==
+X-Gm-Gg: AR+sD13lU7SBZAJJb0gCWM3j6dO21LOWdYVTs19oEqaRRVkwML0pFPzL7TiG3iw02E+
+	MfFvfh6e4+DqsTkPQUMTXpwZRUEKMe8TodAGmoLIn1CI5rCwixb/vs+7L3baJrrlPe2/fMwnPzG
+	PMTYt8kzt7qMYLyFMQMY/iOrMclD8bThgatzPeg1RZqaSjeBTZj1kOyPmQL5ZR7OMtEY9G/mL0k
+	vPKpFKCdXl9sUWoiODHS3ip3XupIzxA20+l4PwNg/U455m0LOK9lJm+Qv/Fxi1SwygN/kGyJy6M
+	xUlDZAosRqibRNonzydT205ahhO0unMsYtM=
+X-Received: by 2002:a17:907:1c13:b0:c12:34ed:da14 with SMTP id
+ a640c23a62f3a-c1c50b6671cmr294192966b.64.1784900075121; Fri, 24 Jul 2026
+ 06:34:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: unregister platform device on add_disk failure
-To: Guangshuo Li <lgs201920130244@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260708105703.747262-1-lgs201920130244@gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20260708105703.747262-1-lgs201920130244@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260724051001.202741-1-hch@lst.de> <20260724051001.202741-5-hch@lst.de>
+In-Reply-To: <20260724051001.202741-5-hch@lst.de>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Fri, 24 Jul 2026 19:03:56 +0530
+X-Gm-Features: AUfX_mwWTg42HDw4aWDghBP51qdfXyDKkMoJixeJkgq6b4QcQa_tMbSOXy-DN0w
+Message-ID: <CACzX3AvJUPUhxCPgqOW6zSF2exawYG_okkL3xAEd=s2g=EDd3A@mail.gmail.com>
+Subject: Re: [PATCH 4/4] iomap: don't free integrity payload that doesn't exist
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>, 
+	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello,
-
-Thank you for the patch.
-
-On 08/07/2026 14:57, Guangshuo Li wrote:
-> The change referenced by the Fixes tag reverted a previous fix because
-> that fix added incorrect cleanup for the platform_device_register()
-> failure path.
-> 
-> However, reverting the whole change also removed the cleanup for a later
-> failure path. If platform_device_register() succeeds but device_add_disk()
-> fails, the current floppy platform device has already been registered and
-> registered[drive] has been set.
-> 
-> The common out_remove_drives path uses while (drive--), so it starts from
-> the previous drive and does not unregister the current one. As a result,
-> the platform device registered for the failing drive is leaked.
-> 
-> Unregister the current platform device directly on the device_add_disk()
-> failure path, where platform_device_register() is known to have
-> succeeded. Leave the platform_device_register() failure path unchanged.
-> 
-> Fixes: 895a9b37917d ("Revert "floppy: fix reference leak on platform_device_register() failure"")
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-
-Reviewed-by: Denis Efremov (Oracle) <efremov@linux.com>
-
-I would also add
-Fixes: 47d34aa2d211 ("floppy: add error handling support for add_disk()")
-Cc: stable@vger.kernel.org
-
-> ---
->  drivers/block/floppy.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index f04397b8e381..7a34af534460 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -4729,8 +4729,11 @@ static int __init do_floppy_init(void)
->  
->  		err = device_add_disk(&floppy_device[drive].dev,
->  				      disks[drive][0], NULL);
-> -		if (err)
-> +		if (err) {
-> +			platform_device_unregister(&floppy_device[drive]);
-> +			registered[drive] = false;
->  			goto out_remove_drives;
-> +		}
->  	}
->  
->  	return 0;
-
-Thanks,
-Denis
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
