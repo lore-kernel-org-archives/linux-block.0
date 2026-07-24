@@ -1,44 +1,70 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA0F2F5A0E;
-	Fri, 24 Jul 2026 04:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A87E3264C2;
+	Fri, 24 Jul 2026 04:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784868773; cv=none; b=rI0cUUGX7d8eZzLvZbQ72EKyQQ4/Edvk0SB1QtsaWaSR/2EuEnKSQOqphaJ/aX2kb7GgkevBXBVv8FUJLMppwx/ej4iY5znvHtSmrB4LS/0dl2A2mwKZLhsTeHWwA3Ri5g1qIxY03TPUTyIGKgX23ADRcyMxj729TgKNtgrXf4k=
+	t=1784869083; cv=none; b=rIUgdE4hctFmKeANe6LF+sQ7mfiqD4vYKNEyTrO8iUX6NW5s2l+N8Sjq2YK3sobyG6FB5buuYFSFcPCkN+UFjiOA7gUeR5JBnSASPmtTLTtHYBfw9L5/vMvstkarKpqewjVB0GUXf+Y5qfy87PYocKJlBk//4jAUBUvmfz6kFBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784868773; c=relaxed/simple;
-	bh=Ji0OUeK5LjhHr2BY2BhGX0ZtbxvAiysXWOwBRdN8LkI=;
+	s=arc-20240116; t=1784869083; c=relaxed/simple;
+	bh=muNGbVSE63ZwLx6JTwUqy7Oq+2WVsxviAG63JXRC72A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWSTaH3apgCNBU6uii5QcnZBQFzrVnpbQwHeheZlayS+7U1y9zanLoz3D6DlOCZbBCwYRyj5fAGBVjQSrlu3QDjPuan9rx0KrzIkVExXEf5O79gP6XLCivjEeVN3Z2KG1NmtEE6P3Wo7vJYBkTH4U5MqHD16sQ++ivc7dsrW5cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YQVUFVVy; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=T7JZDOMZCMUn/07GDAp4Gf+rx8XYrFq+zZXLXu+eG7PjACNkI6luzqeA4pmTjmZnILpG+AXXBt2W4H3WeOZoumrANhhbF9yF01LEZdw5V6qwQFF/EtMqokhpQYbvx+KuFpci6bUpXRto2GRm/uP0xHDRsT5k4g25g2th590ndqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dCJEMHRn; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YQVUFVVy"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dCJEMHRn"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=UoF9wcDUPRYb4adbhXStn8laZZegKLaKlhduz8Oo6fg=; b=YQVUFVVyCjA/gjxaPvMFP22Uwk
-	ZCrjWCI13ZbnYQ7C6wMzzqSvwq3nQzyfvJFfLVt5ODEj1D2EyLC0glBmZvcWoQ/RvQnIn1KrF+Ewp
-	clzewvHhePP70hgOB/bl8rSjXv5yfk1+OY/E1Ao/0UvS9w42g1PQVycXjM7TO0iu+LnkEEaPvPLvR
-	e3D/5eshmeFXzjjJNrCmEIOi9O/JOOU9eLLk5vjtnlJy7zdZ02o+jjwR1PrlIfhb7t/Pp3PA3Xhy9
-	a01ZpWDXsFjtf52t2KWvv9flblWeR1YQP192UxBVL5YIBMvIpBPUCcM85hEA8/7PfbIXf835MFw0V
-	8wl7DcQw==;
+	bh=0pO6hUB0iIxD4TyXUYlqc7LrnsyhEtYUcjdZrQrosCo=; b=dCJEMHRn3xYqVAfuYYkzbIPIp3
+	Inq2NxvS38Srj9Jj4S6ZY+acCFPe1cObOEJRiTmc+Ezv/JVCiqJtb50wgxpJaBky5Nu/S0t47ipvB
+	GO715i4MWZCMen5TGlZJM+oZYzf5tt+pLPElmDgc+RediL8nEVrUwocrewR2SlAwypnL/5SzFO3c7
+	hbasNQagNIq0oEqoKbmWsN8LzbUg4tQAcYUct//pUr5JQCGXI0GhKjzCVct4bqY6ZFn/o2fpDIOyn
+	WM1czYp32/cejCQe5997e7Om4NX3n1Iz1mj01qp/3S6PZafVrfY6vZWI0M0Di/xGIL4vifq4/n0q2
+	RPRVg4gQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wn7tq-0000000FTjv-2P2J;
-	Fri, 24 Jul 2026 04:52:42 +0000
-Date: Thu, 23 Jul 2026 21:52:42 -0700
+	id 1wn7yp-0000000FTwy-42lv;
+	Fri, 24 Jul 2026 04:57:51 +0000
+Date: Thu, 23 Jul 2026 21:57:51 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Zizhi Wo <wozizhi@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yangerkun@huawei.com,
-	chengzhihao1@huawei.com, wozizhi@huawei.com
-Subject: Re: [PATCH] block: fix BLKSECDISCARD zero-length range causing page
- cache invalidation
-Message-ID: <amLvmjCNwF8Ftobe@infradead.org>
-References: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	daniel@makrotopia.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v8 5/9] block: implement NVMEM provider
+Message-ID: <amLwz6WuHYUwKKJo@infradead.org>
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+ <20260703-block-as-nvmem-v8-5-98ae32bfc49a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,25 +73,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+In-Reply-To: <20260703-block-as-nvmem-v8-5-98ae32bfc49a@oss.qualcomm.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, Jul 04, 2026 at 03:39:42PM +0800, Zizhi Wo wrote:
-> From: Zizhi Wo <wozizhi@huawei.com>
-> 
-> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
-> the start+len overflow via check_add_overflow() but did not handle the
-> start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
-> and truncate_bdev_range()->truncate_inode_pages_range() is then called with
-> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
-> the entire page cache is invalidated.
-> 
-> Fix this by replacing the validation with blk_validate_byte_range(), which
-> already rejects a zero-length range and is what BLKDISCARD uses. This also
-> switches the alignment check from a hardcoded 512 to
-> bdev_logical_block_size().
+On Fri, Jul 03, 2026 at 03:45:18PM +0200, Loic Poulain wrote:
+> +	  Allow block devices (or partitions) to act as NVMEM providers,
 
-I though I had reviewed this before?  But either way it looks good:
+Based on the code below I don't think you actually support partitions.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> +static int blk_nvmem_reg_read(void *priv, unsigned int from, void *val, size_t bytes)
 
+Overly long line.
+
+> +{
+> +	dev_t devt = (dev_t)(uintptr_t)priv;
+> +	size_t bytes_left = bytes;
+> +	loff_t pos = from;
+> +	int ret = 0;
+> +
+> +	struct file *bdev_file __free(fput) =
+> +		bdev_file_open_by_dev(devt, BLK_OPEN_READ, NULL, NULL);
+
+Please try to avoid all that magic autfree stuff that makes the code
+impossible to read about.
+
+> +	if (IS_ERR(bdev_file))
+> +		return PTR_ERR(bdev_file);
+> +
+> +	while (bytes_left) {
+
+.. and just use __kernel_read instead of badly reimplementing it.
+
+> +	config.name = dev_name(dev);
+> +	config.owner = THIS_MODULE;
+> +	config.priv = (void *)(uintptr_t)dev->devt;
+
+Why is this storing the dev_t and not the block device itself?
+
+> +
+> +		blk_nvmem_add(disk->part0);
+
+Hmm, and you're always doing it for the whole device.  So the intefaces
+really should be based on a gendisk, not a block_device.
+
+Also once you register the whole devices as nvmem provider, we really
+should keep it from being used a block device, shouldn't we?
