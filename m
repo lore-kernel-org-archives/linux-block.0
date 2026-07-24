@@ -1,69 +1,70 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F3D2EEE63
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 03:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1F736F905
+	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 03:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784863603; cv=none; b=WvcbnYcDP1TCCK/+az+b0eWWzKXW2TItt+yh2QNffeN66C1cWUQslUGoCTDQmf7aRlz87qgRjU++MTdW/ab8XEkPHN33roAJ/6cPkCbjVCi1WO+AKwUiedBr88cWMra/kRZ3Q4lJtUM+amao2mAgAlpS5LuhdpWcXinGd+dAdec=
+	t=1784863882; cv=none; b=CBXs7qvxzEslN6AExrpciZO2+WUpjWEaj1TgJRq9pB32X47eq16gFRW9dEiY12Qry+isKkYmtAZR2ZvY4uxiQbNW8asSQSeySYlAWOAgKUv/AcuUFYTeBpIx9ehcphz7RwOk+XbxqbQyTWf6ngDbF6GQKpiME3eZhb8MHg0p81c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784863603; c=relaxed/simple;
-	bh=JZEj18Pbbp9v5QcQrebynYI8dHLearldCtxTpU/+hx4=;
+	s=arc-20240116; t=1784863882; c=relaxed/simple;
+	bh=TL+k6fgFuceMeoCCkLnBe84J5DcfmOGs9dlGjrg9wvE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IvRqthp0LS7p5f0ZCLBJVQMvhflh/B4DdFvI/D8s+oHSpxtj5fo3W4jyflU3cNYOOPBi2FQCzVlwmIW42wU08Ie9gToFn/i6q+Xsd5f4bTHMCYMk9yk4CmdafXF6ZCn51K5IlVBHr+4wBGgqkErs3YBiOoB1bHwUPbhBjlUf21I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jzFD2OgK; arc=none smtp.client-ip=209.85.214.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=X+9HISBdK9W1kbG2FzgvUppzD5YkXrwzphLc1A4+yS8T6pWWZVaA4+NGbBGYAOcAPiVX56dfxS3XAd5l1WKyYOXnFDLJMGiIbPACkPknaYoSN+vetyfofGilLEihJPwdplVsmK8jV4q6dYFCNNQhBo/yApl1jUfhT51Nhi8adFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=gBEjKEOI; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jzFD2OgK"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2ceb096e675so13065ad.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 20:26:41 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gBEjKEOI"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c96b08cdd1cso4086a12.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 20:31:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1784863601; x=1785468401; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1784863880; x=1785468680; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=bDSV9ZIH2XXXU7d0GkQ3pAFMxusv1lFhr254wzjBK2o=;
-        b=jzFD2OgKdnW+r+ZG0fxSzgW4/BeCldFUEkvGIGdnB0F0PC9dMxRni9WoiWCZhHRtKZ
-         3StASHsGFbWEY8frC8LEakPmAr93NkrSl3dJIKQ0SOSiQ1TeA5U7JwLtgMEYFC+Md24B
-         YgPupoU4o4kACVFZDbADlA6w4g0VbyTnVeeH4=
+        bh=bYxXZo7D4pD82e+g4mcEFIIpBXSWHuVTRzeFebMt6IM=;
+        b=gBEjKEOIJep34rQ9UcMaFuXf+h8u2gqeDib2lpqotWhYXrLDn+mRoLILtkBlqqoeXv
+         q65vlSriQLWKehBfLKKrsCf5oPXYsjZDOmE6+CuSNboHqhnoOguIpSp8Pyj7o4kXTvNs
+         TYPoCmYHFJAmbsQKuMpurVbx+H0SPfLaowVsc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784863601; x=1785468401;
+        d=1e100.net; s=20251104; t=1784863880; x=1785468680;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=bDSV9ZIH2XXXU7d0GkQ3pAFMxusv1lFhr254wzjBK2o=;
-        b=qNGGkw/XWQXcQXuaHbTpDzTk56zrAZP0fFYMRjyz8SO44igI6pev/ZCsBjYnl8c9Rt
-         OYysTNuJLVmGpjGCbKSUn5gx9d/Vx+ABmLXiicakH3GZIHgN6ECNGKGuR3FCihhSaZ9o
-         0xSolWl+WM6E3sM/L7q8TJmys8eMEAcjnDsb7A2gLCNEA09wj2Swpj4zQHuxT4dycXnh
-         joZhJZcik/cIXQFP/5BckI2MTvE/cnqbGQdEj1fT0vCNAHVxdjXLTjQONKiqGKsZwwlV
-         ExXLEkJwswPfZlsDNsb+xaFVuSAgPe4gRSJR0qPXBDuDxo7D1F//CMq7L7qvFXJR0E49
-         UYQg==
-X-Forwarded-Encrypted: i=1; AHgh+RocrLZdGIz6mp4CYjftSEWGznpEtDMvZzJNJiAA8gLsWBlfaz+QEs214W+wrrXU8KjMmr1l1L+PjRLOng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgMCxVWoMs2Rlit8EFWdSe2MbBsA1gRJdvfwtI6RLUyNWHBFgN
-	dk5Ty0uxD+cnLSasIoaIMtkRyK4G5E8oST4m1RN67aTrLi+ZAY4vs3nmc/tTlt1ADw==
-X-Gm-Gg: AR+sD12LTjlqKJfloA4Qt7mwp+jHyX++U7gh9Qr5e4ZBf9rXC4X4ofu5Sfpw4Cbovji
-	bjuZ5Tb+Xu7+s1A3cP5H8siHJM1lyAPq7R/Jc820grsepcNl4rVMCbIum/6GngKhjxIlkQ7WYYt
-	skcSVBaPL+B3gYi0SeU0eB6bqdyGuijsQLFF45qDyWRmIqEPwPe22HQxgNPOzeaalJD1h+RF8i7
-	TdprHJ8Dtt7Of3QD6+mEx+uVnhOAEylsFZAdhN3ZNmGWwL42OlHEJDnY56baPDuF682fbxeElGm
-	wHPEu5soMzZ9vbDB4Bs1KzlWhiXB8DPTUrdiYHlHy6TqgQKo6OE4yoOlrSW0PFjtTLb+xrTqYGh
-	vAEmGPyXrBvPbs36NWnM2bw/aPiH59l9U9qfURcF+k8Ye55g2EzMpSjDygksEybIrHGyJzXyL9u
-	2Uc+X1q8OwSrbeRQVE2zDjL5BLcvmczmzIIa1rzjvh53aVrZ5Det1w
-X-Received: by 2002:a17:903:320d:b0:2cc:c9cb:371c with SMTP id d9443c01a7336-2cfa6c87609mr67525645ad.40.1784863601314;
-        Thu, 23 Jul 2026 20:26:41 -0700 (PDT)
+        bh=bYxXZo7D4pD82e+g4mcEFIIpBXSWHuVTRzeFebMt6IM=;
+        b=BJm5KMYcW4J4IRqmfwEISgD0Xhc0mqH3Dz0R7Lr2/ucFRs/vSVcWkCHtdQ/SfI0/h7
+         sK42ElZlScyFwgg5rvYtGil2Fpi9s/yUMVdcuUt2y9CttVhslxTs82dmQTNxCeHqYqha
+         nX4HbTEe/hxZb9VMgQQT/i6UjprfeCyZjXH2HhWuVqAXFJzUFHz/1aAjtsnsJxStsGOk
+         58Ss3tsoZEqB2fRHEDoJj4A+4/S1ygYYhuJUQudTb0XTwRoCeH2yCt4lPGYWPkWqx9TX
+         ZeOBtGzIBbHrCeQrE9Ojf5bn6Qwdp3hI6Qd2A4qIMxHaFdQSR3jkBoVmMqt8MwAMhtwe
+         TQhw==
+X-Forwarded-Encrypted: i=1; AHgh+RrX1SLa4Wmrm0QPzEn1jPgLBK/bUY1CXQwYKbVxn9rx63RXWHb1lCo1l8mlNPFfxsz+UXYZRwi+USyc4A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsySF+io3agF3Sy+esTySHivULg7bkKMZmxy+nLtvdI2wavdVH
+	Sj2wXvZXrt4ztBXpxYk3McRaJQD3tlhqHHRH/j4wT1BCdyQwj8vKqADgCTGKJpm76Q==
+X-Gm-Gg: AR+sD11kqbC4eO4MV1qUT0oWQdzANdAmVvW03XgOgPMElXAsArYkZ1A4zuxO/WSziNh
+	rhLefS+yCCaYUGyiL9+zVeO1oQoQMM6yqJSEL+M8ectt4suhhsENXvShXT8PNr922aiyUS2N2Xx
+	iyVNtNmWz6mxrpWBH5Su1sGfbgBrJYVczCxmjlm7JU1/8tccN0zi97yrSRTtAaPi1RnAALnx1F1
+	2hYA8Bgax2BonrcIcB2a3jzlFKiotJkIewceKl6K6yf7Ny36kU7yfErAigHg+I7KK462gjxWfpB
+	PhQZ1iw7ZVraOFowkj8VuOVY75d3jYtX3HrB37wBLbcfwf0g273va1hL9JovbNIfFJ38TVoAy0c
+	FWbqHMLgfEs20eETDcQkHYevcsLmK1FoK5vclNfjQoGq+I5mmS1nHuWVGTcpN9d+8NW9rHOkvAm
+	8F+56kYkHlZ7b49B+YQUy8Hr9Rwb6O7beHjzJWaas4LvWJJWvly/DB
+X-Received: by 2002:a17:903:24c:b0:2c9:aae1:a61a with SMTP id d9443c01a7336-2cfa71dc76emr72514665ad.14.1784863880123;
+        Thu, 23 Jul 2026 20:31:20 -0700 (PDT)
 Received: from google.com ([2a00:79e0:2031:6:c102:f12d:5168:6be5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf8f2e6252sm43583705ad.52.2026.07.23.20.26.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf8efd88f7sm43696025ad.22.2026.07.23.20.31.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2026 20:26:40 -0700 (PDT)
-Date: Fri, 24 Jul 2026 12:26:37 +0900
+        Thu, 23 Jul 2026 20:31:19 -0700 (PDT)
+Date: Fri, 24 Jul 2026 12:31:15 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Andrew Morton <akpm@linux-foundation.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
 	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
 	Jens Axboe <axboe@kernel.dk>
 Subject: Re: [PATCH 0/2] zram: lockmap tweaks
-Message-ID: <amLbHzqNbPEGlSaf@google.com>
+Message-ID: <amLbxpYGMbqMI3fU@google.com>
 References: <20260714141300.3945672-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -80,7 +81,17 @@ On (26/07/14 16:12), Sebastian Andrzej Siewior wrote:
 > 	https://lore.kernel.org/all/akza1qtgHm7zbjMW@google.com/
 > 
 > Could you try if this does what I claimed it does?
+> 
+> Sebastian Andrzej Siewior (2):
+>   zram: Move lockmap to be per-zram instead per table
+>   zram: Use a custom key for each zram object.
 
-Thank you Sebastian!
+Seems that Sebastian is out-of-office (until Aug 13).
 
-I tested the patches.  Posted some minor comments for patch 2.
+Andrew, can you please pick up these patches?  Patch 2 has a minor
+commit message "issue" - missing word "swap".  As for unique name
+for lockdep map comment - I will send a followup patch once this
+series is in your tree.
+
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Tested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
