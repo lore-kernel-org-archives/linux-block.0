@@ -1,104 +1,106 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4B5370AD5
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 10:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E1141D215;
+	Fri, 24 Jul 2026 10:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784887429; cv=none; b=u5Vi4Lm6M3Aqyy3wIBhszj62ngdFtGcqVzidQ2+sMbinnH/5xrMS7GvRo+sO8Nyuf5XlNwlsyaj2I+eAT5C68ckUAEiUyal0Eu9LpGT+bU64lfnGdN3G/mqfuTeM+Nv2MnUtX6fdaR9rvuzN6HG3/QtU/hRIBRH4wHKeZH8t8VQ=
+	t=1784888505; cv=none; b=Ai2oYUHUikQS7YZf+FldHoZF4xY1Ew+napx5csRCUlLORDu1TwvC0RtriYbFJRM6Kkrh8YfSdySejHnfBTEZTD2bD1C3QjjFEr1l3c8MVT+i7HBHfSqCICXj1bnjwOmbdsHbEFasAKXZGiNIXQjwIQVyR/ozyz8MHz5E9qdFfuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784887429; c=relaxed/simple;
-	bh=U/+FDvvGx/uY20Rd05tJux8xUhNWj4u4aJamozobyuM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h53VWMYZa28NI6D2sXgqC8nS7qvYslXx5uCC0ACJF2FRgRogq4vzCuctF4Jr4LTkt79ydeM1Ll1SCrbTtdPl8Wu/55Ajocqy32Re52e9IwJ4OGB1qqOpWubRybw4nGsMsiM8quYxgmDOAgrDNS0e7sySPmj1KsVMzEvRwGb5o+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oZU8yv+O; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1784888505; c=relaxed/simple;
+	bh=o1i6BGbHsXA2S1cnmSyWtCQB/tcY7gOoTS0f9ZPd+gw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dx93C9dcitEh4mCMyRhTYeNPlPrO8BvPnHt75mbi7m4ROhXpiTMoOjfadDPQTYB/o8LFXw+x1z8DWaLgUQuHh3+s4tjPE8qRm1P/OI/V7N4OWKVdnkOmohs2Us5Mv32AHbG60aYENbaloD0/FbOYBImedllXysp/AzGAwvRJhTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=OhU8R58Q; arc=none smtp.client-ip=46.38.247.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oZU8yv+O"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=/B
-	1PjG4410+CxkG/geZhvV6BzkAhNhJSEYFJ2VjTLVU=; b=oZU8yv+OA8ic/RAA/8
-	aU6BkZ9aCfzZO9mwxRZKPkUmQ6LC56cemWfy7gjmJeMLfcLQYWWGuq8e7w+gvi1V
-	dMIVl6A+cFUbImeM/FJJi38tvDN6WQkzWA6DXLxCIpvVTLty6c35YODRPeb3HV/d
-	nnQARe5HshO8u5cnM2q4UqUAQ=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wDnb6VxOGNq42bKKw--.58003S2;
-	Fri, 24 Jul 2026 18:03:30 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH] ublk: configure io buffer before taking uring_cmd
-Date: Fri, 24 Jul 2026 18:03:27 +0800
-Message-Id: <20260724100327.43482-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="OhU8R58Q"
+Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4h63tj5HkRz8L7H;
+	Fri, 24 Jul 2026 12:21:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1784888493;
+	bh=o1i6BGbHsXA2S1cnmSyWtCQB/tcY7gOoTS0f9ZPd+gw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OhU8R58QE2v8FnEHmf0IhAkFnRUuHit96VHskuy0c3JPF1BGKgCXqzPr2+mRaGFrW
+	 25ztoWyqndgjKpnp8dZOfBnZ7RLHAWpwD40klhqzrmQNymveo2M3PEH7GmUPm/J0pI
+	 hcJeQIaWflrRB5MPwxYKbL/DVvZDX4MljnWrEN1DnjnKuem3XavSdGp3bPp7DRLS3+
+	 XtvpCCPpXUt+B2RV4ShIi0UVyvkgPl54eVp/jBAyzng+0qiUKVpiMCmrdzvO0J4brH
+	 APWAqi+TQHpdM25cnoQ1jkxKabAVocNi6TH4dhWefm5syPRvKW9TGdkskDAEIXP0hl
+	 aOPyBDTylUrAA==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4h63tj4Wrsz4xJK;
+	Fri, 24 Jul 2026 12:21:33 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4h63tg5329z8tH7;
+	Fri, 24 Jul 2026 12:21:31 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 666925F9DB;
+	Fri, 24 Jul 2026 12:21:30 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <c969f48f-833c-4a0d-8e3c-c7e88f9a052d@leemhuis.info>
+Date: Fri, 24 Jul 2026 12:21:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnb6VxOGNq42bKKw--.58003S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tryfCF4ktr4fZry7uFyxAFb_yoW8CF43pF
-	45u34jkFy8WF4fXF4UA397Xa4Yg3yxCayUCrWS9w1S9r15ArZIvFW7KF45JFWxtrW8XF15
-	XF40yF18GF47CF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UR89_UUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwhKdLmpjOHLlQgAA3H
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 00/10] block,md,nvme: correct handling of unsupported
+ P2PDMA transfers
+To: Mykola Marzhan <mykola@meshstor.io>,
+ Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+ Song Liu <song@kernel.org>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+ Guoqing Jiang <guoqing.jiang@linux.dev>, linux-raid@vger.kernel.org,
+ Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Logan Gunthorpe <logang@deltatee.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
+ <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
+ stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, Yu Kuai <yukuai@fygo.io>,
+ Keith Busch <kbusch@kernel.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20260723204206.76930-1-mykola@meshstor.io>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <20260723204206.76930-1-mykola@meshstor.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <178488849128.3023183.9483321544575683507@mxe9fb.netcup.net>
+X-NC-CID: bgfn6WwD6tNqsJl92qX4PPcCQ3rLaKDwr3eppdgdbpQWarfWVJI=
 
-With UBLK_F_AUTO_BUF_REG, ublk_config_io_buf() may fail on invalid
-auto buffer register data in sqe->addr. Calling ublk_fill_io_cmd()
-first leaves UBLK_IO_FLAG_ACTIVE set while io_uring has already
-completed the uring_cmd. The tag can no longer be fetched, and
-device teardown may hang or complete a stale command.
+On 7/23/26 22:41, Mykola Marzhan wrote:
+> md treats an unsupported P2PDMA transfer to a member as success, and
+> nvme-rdma retries one forever.  Whether peer memory can be DMA-mapped
+> depends on the PCIe topology between the two devices, and since v6.17
+> the failure completes as BLK_STS_INVAL: retryable for multipath and
+> deliberately ignored by md for member failures, so mirrors silently
+> diverge.
+> [...]
+> Routing: patch 1 block, 2-8 md, 9-10 nvme; 7, 8 and 10 use the new
+> status.  Patch 1 alone stops the divergence and the dm-multipath
+> requeue loop; the nvme-rdma loop also needs 9-10; everything else
+> refines the fallout, so the series bisects safely.  The md patches
+> fix a v7.2-rc1 regression (02666132403a), except 3 (older bug,
+> stable) and 5 (refactor).
+This landed on my radar due to the word "regression" here. Given the
+complexity of this patch-set and that we are at v5 please allow me to ask:
 
-Fixes: 52460dda3a77 ("ublk: move auto buffer register handling into one dedicated helper")
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
- drivers/block/ublk_drv.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Should 02666132403aec ("md: propagate BLK_FEAT_PCI_P2PDMA from member
+devices to RAID device") [v7.2-rc1] maybe be removed for now and
+reapplied later once this was sorted out? Or is that for some reason
+unneeded? Note, no need for a long explanation needed in the latter
+case, a brief statement from long-term developer will suffice.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c2c11f2a01e7..d932a4026031 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -3295,9 +3295,9 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
- 	 * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
- 	 */
- 	mutex_lock(&ub->mutex);
--	ret = __ublk_fetch(cmd, ub, io, q_id);
-+	ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
- 	if (!ret)
--		ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
-+		ret = __ublk_fetch(cmd, ub, io, q_id);
- 	if (!ret)
- 		ublk_mark_io_ready(ub, q_id, io);
- 	mutex_unlock(&ub->mutex);
-@@ -3447,19 +3447,18 @@ static int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
- 		if (ret)
- 			goto out;
- 		io->res = result;
--		req = ublk_fill_io_cmd(io, cmd);
- 		ret = ublk_config_io_buf(ub, io, cmd, addr, &buf_idx);
- 		if (buf_idx != UBLK_INVALID_BUF_IDX)
- 			io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
-+		if (ret)
-+			goto out;
-+		req = ublk_fill_io_cmd(io, cmd);
- 		compl = ublk_need_complete_req(ub, io);
- 
- 		if (req_op(req) == REQ_OP_ZONE_APPEND)
- 			req->__sector = addr;
- 		if (compl)
- 			__ublk_complete_rq(req, io, ublk_dev_need_map_io(ub), NULL);
--
--		if (ret)
--			goto out;
- 		break;
- 	case UBLK_IO_NEED_GET_DATA:
- 		/*
--- 
-2.25.1
-
+Ciao, Thorsten
