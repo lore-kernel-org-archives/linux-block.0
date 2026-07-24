@@ -1,52 +1,49 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4160D431A52
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 14:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA21531F98D
+	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 14:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784901781; cv=none; b=EUPJaFDNPHoo8PlJhgUJrW6M1qsC9Ze1rglTf3WM5xv53anS3XRRIUVXJjUwSQgp8R7h5P3ov7vPN63BWzD8+HOd0m9y36YOZmpKnDvSNGa0LNZ80xxqqJdVPW6m1F+H1rhi+lOK6W9kCPxvTX244XucxFLwNNc7WIa06m5zZqY=
+	t=1784905089; cv=none; b=Z2hz4Lki5qukm6i50VxWNI0RVBBTuA7Pgrfacm+NmUa15ejBhj3T0IO9ojfMLZHBEOUW1kgQE8Md09cHF44g4kVcVvtpSxhjW6hQDFJ5F1pnbi37EcUNC+VRyqGrL7/wWiVCCeDsCIj5LPoYgITFryM9cSTFZGeFg/ckRVnhppE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784901781; c=relaxed/simple;
-	bh=5QQ6S5gtlaOoBbz58TgOJhlugFcCf64BDQrishMnZNg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iK7O8zuKt0JS+SfGOsGrKxf0ZtOhMUETJXK6MieKuRpuFN5j+OVULTqmBloL3Hs1aCq/4aC4vtc2mcwQMEVC9M1HYVgg0mAvTF+oeLDhd293sISPVteo6NDSHiZ8QieAMofU8Thllm49X4KNZNTvikXqr4ioUM1rQYXQ/rdEzj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-47f3b39f2a1so446319f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 07:02:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784901776; x=1785506576;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=u+yCT/Eblu4UeNhqNTTlhHPJBitOg/WHKTObkURtwP4=;
-        b=bh/UZj0cSWs38xAZKB9ACoHlcY/KZvI1hIsxFA8aAELpTBYNf1jiqXlzJC5QmW0QGX
-         6a8pt0A2GVhoE1JiVfgqL4Ma/SWIxyrZjSWHDXGofEtvCwyiMdL9ROgYaMxbFYkQdqWg
-         rlAWaryaOLWDq+bYYJ9CIyf1022D6he+CLn48Upwjt/k/XT0tbdr3z2++oS3S9c75hI5
-         ntTVxz/t91OPynZtIbaSVqY8we8letAWHVLrUWvfpa3xQaVfzcis8qzTGJlDXPd1UMed
-         KPXBognl7tXpCX6NTdgFR6x4/FeRuLXAfOITQHqoSYPfJocVvA9MWFvsDW0DgHfnBuEF
-         NdeA==
-X-Forwarded-Encrypted: i=1; AHgh+Rr5ijDLjHEeygm5P+GA8i9aswhE2M94n3fBP+207WAbh5LMWKvQf1O/oQ9oeoWE2bShe3cSduQsGczE2Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB+ZB8jRP7B+UXi7mCJQXfSamVG634a2dZoMIweE4qSN4MHbA9
-	WGp+01Hk60dK1873PlSlu3X+ArwDGbf3czZjGsvDPSzoabVTOiR3bZWZwR62vjsq
-X-Gm-Gg: AR+sD119w1RaI/ZDpuy9+yRa7MsGt+ng085QibHQW3Rr4RE9JqQIVq1fmCm0xoKWpf8
-	LMe+cZ13fDKYOlFRdTiKevzvsAtU0ymTKVUB5/5FVA/wMQhD4eeKg70f43gKK8jSZcN5N1BKowy
-	r3JthmgBzIoCHFW6b2F9uJ+dIU6R05ZhiNHIYYCk0uCI3gUPJKgCnTkb7UQpOXEA4JWBxXotEXb
-	WFbyJJAIQBjxj8xV28F4fVfWI/VhnJ+NdS0/fXZWl+7pz132NS2ke6+k3jAmxzfrI3HUiq1/3Kt
-	Hhq4v7A4IlpQzPD4E0aJpD58o5aaSp9WZxV8SiW3h6N67FMqMeKSDT9aPcC6PPi6M2MGZwJqf4n
-	+4zDooai4LfqBvDfyJyRZ3xPaqvJPRpQqwPUturohS/0CMjNU/Du0kzlXj2szGMWbh9hTHlaRFg
-	==
-X-Received: by 2002:a05:6000:29cc:b0:47f:9096:3c57 with SMTP id ffacd0b85a97d-47f90963f93mr6578833f8f.40.1784901775974;
-        Fri, 24 Jul 2026 07:02:55 -0700 (PDT)
-Received: from [10.68.32.41] ([5.194.84.52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85bc62basm24446636f8f.13.2026.07.24.07.02.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jul 2026 07:02:55 -0700 (PDT)
-Message-ID: <c1270448-e13e-4fc3-a8ce-e0cfa83e8107@linux.com>
-Date: Fri, 24 Jul 2026 18:02:53 +0400
+	s=arc-20240116; t=1784905089; c=relaxed/simple;
+	bh=G2o9I89S5wuacRZuT0aUp53MkHxSYgNvKch1jD0dbh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=cwVlQzT3JdXujggTdYzBF2/d3+y2GxSHr7pynv3mnsG+RT3gA/uKnG9OYxAMAXFxkZkAXNYV2h8jQTbwklPSc1Heeo8ZknRX/dY6hrTd66yI/f+j9X0UHvufrEvukXWVulW8Y28Gja0k5PoIaUFZ9q9ZSKDynSuMtNP9qbiDW8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=IU93YA0B; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="IU93YA0B"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260724145803epoutp0266a2cba882834b02bc8cf99050833762~FQbdeo4Gl1954419544epoutp02Z
+	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 14:58:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260724145803epoutp0266a2cba882834b02bc8cf99050833762~FQbdeo4Gl1954419544epoutp02Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1784905083;
+	bh=RlDKF1N50HsiEmVfMhX9vE9WiGz6JSadAcE/1zQN2vU=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=IU93YA0BiP5WQtgNQgym4F8uAreIvPDz42vjbPmA1npv18f391gVfYi+Qisyb0sot
+	 tYUrcc89/geiGqYo5v6rYNYi4QfMXX5d9WCDqHTe6G5EPp0UBRSJvHraMp4Luxlbjn
+	 Cbo9nJYEa2Bk3alBb6IM1u1tF/b/1MnCEy83A08s=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260724145802epcas5p23e58de35e56bf362815d3a34e69a4e8a~FQbdEymDx1115411154epcas5p2B;
+	Fri, 24 Jul 2026 14:58:02 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.87]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4h6B1j4Z68z3hhT3; Fri, 24 Jul
+	2026 14:58:01 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260724145800epcas5p41d7adc13127a557af92554114e6d33e7~FQbbO4yg-2731027310epcas5p4I;
+	Fri, 24 Jul 2026 14:58:00 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260724145758epsmtip1d5c833758f471a46d1b8c43cf355ac04~FQbZZjji50280002800epsmtip11;
+	Fri, 24 Jul 2026 14:57:58 +0000 (GMT)
+Message-ID: <3eb1b5dc-449c-4d13-ae38-b48e60de8705@samsung.com>
+Date: Fri, 24 Jul 2026 20:27:57 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,80 +51,171 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: flush pending work before releasing resources on
- init failure
-To: Karl Mehltretter <kmehltretter@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Jiri Kosina <jikos@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260722034435.13432-1-kmehltretter@gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20260722034435.13432-1-kmehltretter@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v4 4/6] xfs: generic AG set based steering
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: brauner@kernel.org, hch@lst.de, dgc@kernel.org, jack@suse.cz,
+	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
+	<anuj20.g@samsung.com>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260721032027.GW7380@frogsfrogsfrogs>
 Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260724145800epcas5p41d7adc13127a557af92554114e6d33e7
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df
+References: <20260717125538.508925-1-joshi.k@samsung.com>
+	<CGME20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df@epcas5p2.samsung.com>
+	<20260717125538.508925-5-joshi.k@samsung.com>
+	<20260721032027.GW7380@frogsfrogsfrogs>
 
-Hello,
+On 7/21/2026 8:50 AM, Darrick J. Wong wrote:
+> On Fri, Jul 17, 2026 at 06:25:36PM +0530, Kanchan Joshi wrote:
+>> Improve allocator concurrency and reduce interleaving by introducing
+>> fixed sized AG set.
+>> Use low bits of the inode as a hash to select AG within the AG set.
+>> Overall, a file will try to use the same AG (and contiguity is maintained),
+>> but multiple files will be spread across all AGs in the target AG set.
+>>
+>> Suggested-by: Dave Chinner<dgc@kernel.org>
+>> Signed-off-by: Kanchan Joshi<joshi.k@samsung.com>
+>> Signed-off-by: Anuj Gupta<anuj20.g@samsung.com>
+>> ---
+>>   fs/xfs/libxfs/xfs_bmap.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 38 insertions(+)
+>>
+>> diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
+>> index d64defeda645..fd1a3aa4ad3f 100644
+>> --- a/fs/xfs/libxfs/xfs_bmap.c
+>> +++ b/fs/xfs/libxfs/xfs_bmap.c
+>> @@ -3192,6 +3192,36 @@ xfs_bmap_select_minlen(
+>>   	return args->maxlen;
+>>   }
+>>   
+>> +#define	GENERIC_AG_SET_SZ	(2)
+> What does this define?
 
-Thank you for the patch.
+We need more than 1 AG to do inode-based fanning of files and improve 
+concurrency (AGF lock). This is the minimum required to do any 
+improvement, in the default allocator.
+This 'minimum fan-out' is what Dave suggested to extract out of 
+write-stream and apply to two other allocators- default (which is what 
+you see now), and filestream (future work).
 
-On 22/07/2026 07:44, Karl Mehltretter wrote:
-> do_floppy_init() probes each FDC with user_reset_fdc(), which queues a
-> redo_fd_request() work item on floppy_wq that may still be pending when
-> the probe finishes. When no controller is found, the error path calls
-> floppy_release_irq_and_dma() to free the IRQ and DMA channel, and only
-> later destroys the workqueue. destroy_workqueue() drains the queued work
-> last, so it can run after the IRQ and DMA are already gone:
-> 
->   floppy0: no floppy controllers found
->   work still pending
-> 
-> The flush used to be here. Commit 070ad7e793dc ("floppy: convert to
-> delayed work and single-thread wq") renamed the label out_flush_work to
-> out_release_dma and dropped it. Restore it so the work drains before the
-> IRQ and DMA are released, as floppy_module_exit() already does.
-> 
-> Fixes: 070ad7e793dc ("floppy: convert to delayed work and single-thread wq")
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+And this can be reviewed as an independent patch as it does not require 
+any other work done in the series. No application input is required, 
+this is automatic optimization.
 
-Reviewed-by: Denis Efremov (Oracle) <efremov@linux.com>
+The write-stream allocator (next patch), uses a different AG-set of size 
+NR_AGs/NR_WRITE_STREAMs. And that is an explicit (application input 
+based) allocator.
 
-> ---
-> 
-> Noticed while running mainline on an emulated Acorn RiscPC, a custom
-> personal QEMU machine. It has no floppy controller and rpc_defconfig
-> sets CONFIG_BLK_DEV_FD=y, so every boot takes the no-controller error
-> path. No disk is registered there, so the drained work takes the
-> empty-request fast path and just unlocks the FDC, leaving only the
-> spurious message.
-> 
-> Verified with 100 QEMU boots per platform on v7.2-rc4, no controller
-> present. "work still pending" appeared on an unfixed kernel vs with this
-> patch:
-> 
->   Acorn RiscPC, rpc_defconfig: 100/100 -> 0/100
->   x86_64 defconfig, qemu -M q35: 6/100 -> 0/100
-> 
-> With a controller present on qemu -M pc, reading and writing a 1.44M
-> floppy image still works.
-> 
->  drivers/block/floppy.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index f04397b8e381..6cfd114d27df 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -4744,6 +4744,8 @@ static int __init do_floppy_init(void)
->  		}
->  	}
->  out_release_dma:
-> +	/* Drain the queued redo_fd_request() before releasing IRQ and DMA. */
-> +	flush_workqueue(floppy_wq);
->  	if (atomic_read(&usage_count))
->  		floppy_release_irq_and_dma();
->  out_unreg_driver:
+  >> +
+>> +static inline xfs_agnumber_t
+>> +xfs_default_ag_set_size(
+>> +	struct xfs_inode	*ip)
+>> +{
+>> +	struct xfs_mount	*mp = ip->i_mount;
+>> +
+>> +	return min_t(xfs_agnumber_t, GENERIC_AG_SET_SZ, mp->m_sb.sb_agcount);
+> Because I'm not sure what it means on a single-AG filesystem.
 
-Thanks,
-Denis
+On a single-AG filesystem, this will do nothing. The base-AG input given 
+by the default allocator will not get changed.
+
+But we get improvements on multi-AG filsystem; not sure if you saw the 
+numbers in the cover letter. Corresponding to the 'generic AG-set' below:
+
+1. On regular NVMe
+
+a. Inter-stream concurrency
+---------------------------
+fio: 4k write, direct IO, 16 jobs, 1 directory, 16 files * 8GiB, iodepth 32
+xfs: 16 AGs, 4 write-streams
+
+base: 41 KIOPS
+generic AG-set: 93 KIOPS (+126%)
+write-stream AG-set: 227 KIOPS (+453%)
+here, 16 files are assigned 4 unique write-streams (4 files/stream)
+
+b. Intra-stream concurrency
+----------------------------
+fio: 4k write, direct IO, 4 jobs, 1 directory, 4 files * 8GiB, iodepth 32
+xfs: 16 AGs, 4 write-streams, generic AG-set size = 2, write-stream 
+AG-set size = 4
+
+base: 59 KIOPS
+generic AG-set: 94 KIOPS (+59%)
+write-stream AG-set: 112 KIOPS (+89%)
+here, 4 files are assigned single write-stream
+
+
+>> +}
+>> +
+>> +static xfs_agnumber_t
+>> +xfs_ag_to_ag_set(
+>> +	struct xfs_bmalloca	*ap,
+>> +	xfs_agnumber_t		base_agno)
+>> +{
+>> +	struct xfs_inode	*ip = ap->ip;
+>> +	struct xfs_mount	*mp = ip->i_mount;
+>> +	xfs_agnumber_t		set_size;
+>> +
+>> +	/* Apply fanning only for regular file data */
+>> +	if (!(ap->datatype & XFS_ALLOC_USERDATA))
+>> +		return base_agno;
+>> +
+>> +	set_size = xfs_default_ag_set_size(ip);
+>> +	/* Fan out within the AG set using low bits of the inode */
+>> +	return (base_agno + (XFS_INO_TO_AGINO(mp, I_INO(ip)) % set_size)) %
+>> +		mp->m_sb.sb_agcount;
+>> +}
+>> +
+>>   static int
+>>   xfs_bmap_btalloc_select_lengths(
+>>   	struct xfs_bmalloca	*ap,
+>> @@ -3587,8 +3617,16 @@ xfs_bmap_btalloc_best_length(
+>>   {
+>>   	xfs_extlen_t		blen = 0;
+>>   	int			error;
+>> +	xfs_agnumber_t		target_ag, start_ag;
+>>   
+>>   	ap->blkno = XFS_INODE_TO_FSB(ap->ip);
+>> +
+>> +	/* fan out initial AG across the generic AG set */
+>> +	start_ag = XFS_FSB_TO_AGNO(args->mp, ap->blkno);
+>> +	target_ag = xfs_ag_to_ag_set(ap, start_ag);
+>> +	if (target_ag != start_ag)
+>> +		ap->blkno = XFS_AGB_TO_FSB(args->mp, target_ag, 0);
+> /me wonders, if xfs_bmap_rtalloc looked at ap->blkno for a hint the way
+> that the data device allocator does, then would it be trivial to have
+> write streams on the rt device too?
+Trying to understand if this kind of fanning out (this patch) or the 
+logical placement (patch 5 with write-stream based AG placement) help us 
+solve anything for rt device?
+For regular RT device, the round-robin rotor will distribute files into 
+multiple RTGs. So we don't have AGF like contention.
+And using write-stream to explicitly send multiple files to a single RTG 
+will do more harm than good?
+
+And for zoned RT device, the placement is happening via write-hint.
+
+Am I missing something that you have in mind?
+
+All the above is for logical isolation. For physical isolation, your 
+comments already help to establish that write-stream can be made to 
+work. For the regular RT device sitting on top of NVMe (FDP-enabled). 
+That needs few changes, but in previous patch (#3).
+
+
+> I guess the tricky part would be figuring out what to do if you ever
+> want to switch a file between rt and data devices -- presumably you'd
+> just reset the write stream id to the default, but I guess you could
+> reject such a switch if the id had been set explicitly.
+
+Yes, we do such checks in patch 3 now also.
