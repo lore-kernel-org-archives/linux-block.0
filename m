@@ -1,38 +1,48 @@
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEBD388393;
-	Fri, 24 Jul 2026 18:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FEC44AB9A;
+	Fri, 24 Jul 2026 19:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784919092; cv=none; b=EwHMnvXOxlDJ9I5brIs4NFfc0cnBC9U1cIJrcXKmiYlLUdH1A6/mUOPOMULXkcuvDfzC+YyBMxMl7/QC4zm67tZyP0it07GYJ71yQfpQmFnk2u7YVqNxIBole4r39w2S3MpBmYQ1jFisZ4cfemPzIdXMpPAhRosIQWeRFXnZ2/A=
+	t=1784921983; cv=none; b=tYRYpVleIfM0PYii5izzkGAzBOhr1oFzJVIIbNl0W3bokgG7fxxZPldbOX5FItNGHoZ9CNoUUVyx3Kg1EXJeRwImAJ9+jeFZDWttUB079Sl2tREuy5L9IHytl+wwQYBh7WAj0FOvZflPBun1mnDUCPsK0p0sTpVzr7ceVzbOnJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784919092; c=relaxed/simple;
-	bh=sX031qyb3snFrJjKmoNKk/6/fJJWgyZ7ikchVOkegLc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=UyTQsIkSihx/j6jUcNiJFVIWvu6+Hq4f0+QAfmEA4/wElRDrRpCVQRDhfMxGv5yOJVJK80zwCHXJyuPXz7jKb5lpmWH4JFdZh6bx7yJP3P8+AMb+PoN3lwsr3NH2AmvmfpCq1v644nkExC3aw2oPyPKFmosOfLEQysSjWkSPNoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=jjg68SQ2; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+	s=arc-20240116; t=1784921983; c=relaxed/simple;
+	bh=EqqTpor9tX0TUxZRphka8rjjO8kKQfBCXwYvOzt21Ec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r6wBiIrqhwwZmfmRFUV8k1ycfRBP2JLotFkbE677bH0iJX3NgyUD+sPtlyTJ+NJPNt4Q8x+X8VHlz9+eLH3ElDsa731MnkIPybCxfASQHq/imxXHTQ04k7ZzXhVjFcOV+Id1TzNg+CLNhVTLwX3RjOU0iNyBoy52O8iESWZ6qZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=u9Z21ldm; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="jjg68SQ2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=HeLi3cYbc3bVGppW4plLifn1UQG3PWFSk8cImbFB1Pg=; b=jjg68SQ2itQQU+efSypVQfQV2J
-	lbOB4CouCbkRF2sBRX6sYzLPn9f3kq0kv0gWydzWQ+3s1s+gTW07PARHqOoSPrPFBEDkD5iIVCRpI
-	GPnwepRfWEnaZozV+hzEq+uDhFTVTsFr4TfoSnHyc529MF+F94O4beKkwFj1KSFSqiRRe2c5VnKjB
-	42eUHlf0kWy8GMassW93ZTVDDULkoG72VvEB/ZlQqteSejvffLwHqVFyErhseTvUKObOlSKjqMPPm
-	FOIBs2Dd5ER0ZPltO9t4SOGmI1kGz4y7xtSGI+5mq8Z34i29DeCsZqxINkGrLCVRxiOBO3GqXcXyW
-	veCk0MJw==;
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([96.51.150.74] helo=[10.0.33.8])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <logang@deltatee.com>)
-	id 1wnKzT-0000000E1Q5-0fGd;
-	Fri, 24 Jul 2026 12:51:23 -0600
-Message-ID: <15a1fc13-f70d-4403-8084-2836fb05cd0e@deltatee.com>
-Date: Fri, 24 Jul 2026 12:50:18 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="u9Z21ldm"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4h6JGj4Sbhzlfvpb;
+	Fri, 24 Jul 2026 19:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1784921978; x=1787513979; bh=yLOiYGiMIhOm5K40/b8I9sQC
+	KgCL7Edg6O4AQtiFuyI=; b=u9Z21ldmXsiCnhEQRCUcxCFWifsJBXzAoZk4THna
+	FC6IuAGM3QbjO+fsmP+FH38h1xbG6DFyPTRbJ0KDdKZrbazJh9wm+9HCQrUedpkn
+	UPid1rluc/4SkJdG7e9/E4BBSTHCPf37DkOV7Up/r0R1455aKw5/IctPQT3QfPc6
+	Vl4NOuqekjqnMmWHMZEjZyH3NUSJCPNbhZBEq3qB/1z9TU5rkDzGfOx5mINAYINL
+	xSACGLdLniHpZYdqU/Ps5uPT7AOoN4vhhwNgwI2xcI4Pq6VuVbE/LElyITkLiqkq
+	T+0InNDFwWkN+AaAsiCMRi62/qedbHvwjwsPuiR/pinbcw==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 6P8n4Zz_Szcr; Fri, 24 Jul 2026 19:39:38 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4h6JGc45JTzlfvpW;
+	Fri, 24 Jul 2026 19:39:36 +0000 (UTC)
+Message-ID: <4ef6f2b4-57b9-40cc-a5cd-e34473e1cba3@acm.org>
+Date: Fri, 24 Jul 2026 12:39:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,112 +50,33 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
- Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
- <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20260723204206.76930-1-mykola@meshstor.io>
- <20260723204206.76930-11-mykola@meshstor.io>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20260723204206.76930-11-mykola@meshstor.io>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] block: fix BLKSECDISCARD zero-length range causing page
+ cache invalidation
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
+ chengzhihao1@huawei.com, wozizhi@huawei.com
+References: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 96.51.150.74
-X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, stable@vger.kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH v5 10/10] nvme-rdma: return BLK_STS_P2PDMA for unsupported
- P2P transfers
-X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-
-
-On 2026-07-23 2:42 p.m., Mykola Marzhan wrote:
-> A P2P transfer the PCIe topology cannot route fails DMA mapping
-> with -EREMOTEIO.  nvme-rdma folds every mapping error into -EIO, a
-> retryable host-path error: multipath requeues the I/O forever, a
-> single path burns its whole retry budget.
+On 7/4/26 12:39 AM, Zizhi Wo wrote:
+> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
+> the start+len overflow via check_add_overflow() but did not handle the
+> start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
+> and truncate_bdev_range()->truncate_inode_pages_range() is then called with
+> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+> the entire page cache is invalidated.
 > 
-> Propagate the real error code and return the unroutable case as the
-> non-retryable BLK_STS_P2PDMA.  As in nvme-pci, -ENOMEM now requeues
-> (BLK_STS_RESOURCE) and -EINVAL fails (BLK_STS_IOERR); -EIO stays a
-> retryable host-path error.  While at it, start the request only
-> after mapping succeeds -- nvme-pci's order -- and ratelimit the
-> map-failure message.
-> 
-> Fixes: 23528aa3320a ("nvme: enable PCI P2PDMA support for RDMA transport")
-> Cc: stable@vger.kernel.org # v7.1: requires "nvme-rdma: use ib_dma_map_sgtable_attrs()"
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
+> Fix this by replacing the validation with blk_validate_byte_range(), which
+> already rejects a zero-length range and is what BLKDISCARD uses. This also
+> switches the alignment check from a hardcoded 512 to
+> bdev_logical_block_size().
 
-This is much more understandable now. Thanks. I have one nit below,
-other than that:
+A Fixes: tag is missing. Once this has been addressed, feel free to add:
 
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-> ---
->  drivers/nvme/host/rdma.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-> index 63830334c73e..2f50509a7a61 100644
-> --- a/drivers/nvme/host/rdma.c
-> +++ b/drivers/nvme/host/rdma.c
-> @@ -1486,10 +1486,8 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
->  		.orig_nents	= req->data_sgl.nents,
->  	};
->  	ret = ib_dma_map_sgtable_attrs(ibdev, &sgt, rq_dma_dir(rq), 0);
-> -	if (unlikely(ret)) {
-> -		ret = -EIO;
-> +	if (unlikely(ret))
->  		goto out_free_table;
-> -	}
->  	*count = sgt.nents;
->  
->  	if (blk_integrity_rq(rq)) {
-> @@ -1511,10 +1509,8 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
->  			.orig_nents	= req->metadata_sgl->nents,
->  		};
->  		ret = ib_dma_map_sgtable_attrs(ibdev, &sgt, rq_dma_dir(rq), 0);
-> -		if (unlikely(ret)) {
-> -			ret = -EIO;
-> +		if (unlikely(ret))
->  			goto out_free_pi_table;
-> -		}
->  		*pi_count = sgt.nents;
->  	}
->  
-> @@ -2033,8 +2029,6 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	if (ret)
->  		goto unmap_qe;
->  
-> -	nvme_start_request(rq);
-> -
->  	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
->  	    queue->pi_support &&
->  	    (c->common.opcode == nvme_cmd_write ||
-> @@ -2046,11 +2040,13 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
->  
->  	err = nvme_rdma_map_data(queue, rq, c);
->  	if (unlikely(err < 0)) {
-> -		dev_err(queue->ctrl->ctrl.device,
-> -			     "Failed to map data (%d)\n", err);
-> +		dev_err_ratelimited(queue->ctrl->ctrl.device,
-> +				    "Failed to map data (%d)\n", err);
-
-This rate limit change probably doesn't belong in this patch. It's
-pretty clear in the commit message with the "while at it" message. Worth
-moving to another patch.
-
-Logan
