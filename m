@@ -1,99 +1,141 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF43353A6E
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 13:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784900078; cv=pass; b=KZIgpcB78QItciucwmCAhk15UqcrppkjX6roLKQMqUMexGH5m4k4jDNprClHKuh+1f/ECPXNgdVpr/PmKsv9jDJNAebJfICCV13fALv1Th6KwzXzvLoXWMsJ/gQm8f1r2deJ6TBt1wkIGTc360QYNgahKpyYcsvUQVFvWAK2OoE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784900078; c=relaxed/simple;
-	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rosc3uxKF06nN+R/8outsXL4C6Ux4KYk/f0s2r4L0UGXMs2U5n7xv13ooTQD8bJ3gK4J/OUGsfivtwFCBqtQx15JpIuI2ViU8k5HbRzKgep0m8erIWktCq6pch7Plk2DR7rr0jF7qvu/nMVIgtmG1rwhh+tVxNg365wx02w/cSQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VpUbj/gx; arc=pass smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7755212E1DC
+	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 13:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784900537; cv=none; b=dbGYCnKNZKxxi5p4Wfupi1QfY+T0cHmBjGvhQGL6lRcRZV+Ze+ZkJL5YI+KYcr/cnUP4P4AddthnUmDYJr6Q5CMgN8RnAVyj/D//jxzkbBzip+QDjbxPLeZwgyC9pXVJCWJfdeLF/mrCq6xL8VRBJiICyiHXVV4HQj9Gbn6Ed70=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784900537; c=relaxed/simple;
+	bh=PLkBCO7IMxNvJ/KmysadWVzPU3HCVHbPfuXQqT8pR1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hTRq6+8vs0iDB0CJwPwODj5ziJAgycu4mZ5SyvtNnKzGODAjRZDJ59dUhrpaGQem7inahA3yuh2fQ+95IDVru2gZs9ggV9JVWsR7jiiF+HhOGX0KN4oqX6gTQSEgGYRGpB+div3Ce1L1wLqIKJwiIE56SFBogsysf2q4MXiT8dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VpUbj/gx"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c15dd4b9132so66250166b.1
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 06:34:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784900075; cv=none;
-        d=google.com; s=arc-20260327;
-        b=XHIaYl46q8t7sftUYC6DCtfgRPzYsJeTmygCOOsHb74Y3V2NViZma/E70mRQoL83rj
-         9rDeBBBrmUxlZCPOs28MwrFGBUyH6uxA/3I3FhrP2GDFiw7fPn2fmLFv18Ko4O3i8HYP
-         jInMR74ISeIc+e+hcVCnVhC6N7+spxSmDT0gYawn0/j1eIHOUdIRbOPin9HJKuIxSlJ6
-         yjB1WkVpJnfSXEF4a/hw1KD/fuEyiq+4OflVothS6/tfaroU9H2BZBjVRAFMaejbYTmw
-         8lASYEiIXcgtWOwXsuQOGc0UhVuiTHXQRmB3gopqSY+5p9c24jIhEpUIWkrz5UdPA5Hu
-         vuPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        fh=5UUzxGfj34aXxrLIrmJqQu9wwlvzH0kf1NqVmKB76Ow=;
-        b=Wun6iDFb5CIyg2xSfZyY4dR9cjiPcjCA6+71YuOzPXeDJTTvOb1UrdvIMeC5x98Ydr
-         p0bCqkCiLvubQ7Iwp1tZtZ8wAkQ53tiWV+SoGZ9MPDd7EmjxYfjVq3XDO/r0Kn8l5abc
-         Ca1y9x9ryVa9sm9EJkVGLMuEjAIQb9wMQsXQDQlt00Hu9frr8ndjjtxomBy1DFQaVhVy
-         hsCKAcfHjaB4AObey4k3vBQSajvTX3UfWKuP71bJd8O2zWcEDExK5tmLCDzX95jBcgSj
-         lLstkN8YIurEXbf/7EUQFwMYg3J9PLZFIzNi885fZz5KnSJ5DXPkOb3WEXwz/aNd6KS5
-         Ybdw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784900075; x=1785504875; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=VpUbj/gxPfu2RJKKVmjsZsjVpFXa4JvxOTc/1TcRNMnnNVefaCvfqx2/odkO9g0NTh
-         CnsiBs4DgQ48FWOpJDSSiPo0E6xIq/kxYpQsS4Dbv3aZurShT/W+A9qHMjEDVCTojNe5
-         5zf79qnNQjhwS1zaVKbawSHze1NF4okyEJHHH4ArW6N3YMjavlI7eyMl+xOpiqmxLb2E
-         NKJ06T7BITwLjVRs4DNk4bAi3fEzM1kirP5LYLY2pSojTlhlTzeIY2DM5oDjrSJ0zXy8
-         zsPTuXchjV6bQkcVQAf1IJmIjWs6rbLpwnX15kRDf5kjA369ONxgdH7bmD2X4GrAZEig
-         ECZA==
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-47f59f25ec4so228652f8f.2
+        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 06:42:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784900075; x=1785504875;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20251104; t=1784900534; x=1785505334;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=tNkDdJdjifGk2tsbPXuU7xl6SOPDBP7FmAqPj0tkvkwIVzGzmrIZpePTFTS0KYS/xf
-         IfQHa2LSWQ0h4wWoXH1vpfQL1b4UVBfRgkfQq3rmpvQzXXUST9gBCLrw+ZfZQc8VCj5h
-         kk6C3WFPtk1Y/mK6uYfsmbBnjkXqbLP43MwTBhKmufw2Xq3MY0YcxW7OnkVESOMP0wbI
-         KtRuG6Rne93VhW9UYvGL7GkuGkr4lxrqXl/fmwjNIBhFuCmJqLCZySvVqtnBa0Oh7RI5
-         +PbrV2f0RoBkLb2/jBLtqtVp4a/AKnY94xovO9Oxk2zDmHfFUrn+gHZrwF5m+o9AL+Cv
-         MA7w==
-X-Forwarded-Encrypted: i=1; AHgh+RodrhCZDxAfnoWFSu7mZ44WVO56WdeJTWcGRQTfg9jeaxGU7M5RAaowYjBUKS2smhWdWuOEB9fKdp1sWg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMWyipYc/aiyBofGXJ57ZYcXM+Kbduwj86uBTERUftA93AbXej
-	+pv6qp3YBqa6O3h/FPTqWmmphN1ws8WOTHWw0i185VIp94sa26BmvN5QzJHxK9md3pyU21tsOTE
-	Uem62hlKfoW2DZy52hTca9LVVJ3+jZQ==
-X-Gm-Gg: AR+sD13lU7SBZAJJb0gCWM3j6dO21LOWdYVTs19oEqaRRVkwML0pFPzL7TiG3iw02E+
-	MfFvfh6e4+DqsTkPQUMTXpwZRUEKMe8TodAGmoLIn1CI5rCwixb/vs+7L3baJrrlPe2/fMwnPzG
-	PMTYt8kzt7qMYLyFMQMY/iOrMclD8bThgatzPeg1RZqaSjeBTZj1kOyPmQL5ZR7OMtEY9G/mL0k
-	vPKpFKCdXl9sUWoiODHS3ip3XupIzxA20+l4PwNg/U455m0LOK9lJm+Qv/Fxi1SwygN/kGyJy6M
-	xUlDZAosRqibRNonzydT205ahhO0unMsYtM=
-X-Received: by 2002:a17:907:1c13:b0:c12:34ed:da14 with SMTP id
- a640c23a62f3a-c1c50b6671cmr294192966b.64.1784900075121; Fri, 24 Jul 2026
- 06:34:35 -0700 (PDT)
+        bh=eV7NacM7zz8dD71BscPxtfUEUlFKKkiOun0ZEBZ5n2A=;
+        b=Zt0S/2UAAQEFMMxffV7rEZQGKjtlQRoXDOAGgl9rR0ecpHEe+azQ517cwuCabGEKLf
+         M8x8ImQcL0sGmINPT7mYwiYHW47lGDdR979vtZiTG99eXrX/v2AnM0q4zC6yHQev39nk
+         t+ebFCNANIvtd0bFacLuM03sOI2J0tNb2EoCtwMrK5BhaHqKUwfqa90h7wXkPlTrEpQk
+         hS5u6Whl3xp0YQvZ4aXw5Fnvp85xgm5t3YxvZhzjdktd1ehnzDjjhOmAnnJap/vXDGM/
+         RJcDeuARErSxRTpi5TPjXwa6pKxLbPVPSxRD0CwGdMXQdA/T4DgY4i0W/Fj3vjcu97dD
+         bnqQ==
+X-Gm-Message-State: AOJu0Yzn46SNt8Uf6iJqCoQ6r9x37Oa7LYrAnIWx+5wkPzaeVFTsU6CL
+	k8luJNNmuoH2Y/LcC2s2RXIECLKtcpZgjqdTOek8Va47D4ska1nVQHPT
+X-Gm-Gg: AR+sD1192rEypo1STzr3QRdivXBtXjbzCS1wl0c81TD1b1cLcZQCbA1upZiN/aqQUIb
+	YpAd6c1jLGr0cJm97S6OFaNmlDhWd01UMNj/ENehDecdsKbA2f6CmrXtWtm4c8o5ZNVr8H3TY9y
+	FvIQqQZ1tDgXtU0YkjqOVz7w4TUWjcQE4cuwqFaH8LyZArjv7CyyjNQ+z5zS4QdJb11Ys2taNXa
+	wOYj61PcVjn1UUU/7ksyP0h++SyomzfMgeW7O8Jv93Y1YZWssegZCrUOduXS2caiutGKGVm1stJ
+	IZtMi9vsZ4dCy/gFo+GxDmtibz8AND0VD/qK4dUJltW7sDQzoBfi296sQeCII7kCeLbem+Tdux5
+	cGuOHMLel2Sqo+xb/bhbeG8qfpesoN/MY64n6ZRpZRk+Q/MYF4gx9Zf/8L+pSAXk0Qhvy2j7lAA
+	==
+X-Received: by 2002:a05:6000:2dc5:b0:46e:1815:6a83 with SMTP id ffacd0b85a97d-47f8dc8cfd4mr9396273f8f.29.1784900533455;
+        Fri, 24 Jul 2026 06:42:13 -0700 (PDT)
+Received: from [10.68.32.41] ([5.194.84.52])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c63678sm23076091f8f.29.2026.07.24.06.42.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jul 2026 06:42:13 -0700 (PDT)
+Message-ID: <27146f5c-5e57-44a6-bbe9-d910d8bbdfcf@linux.com>
+Date: Fri, 24 Jul 2026 17:42:11 +0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260724051001.202741-1-hch@lst.de> <20260724051001.202741-5-hch@lst.de>
-In-Reply-To: <20260724051001.202741-5-hch@lst.de>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Fri, 24 Jul 2026 19:03:56 +0530
-X-Gm-Features: AUfX_mwWTg42HDw4aWDghBP51qdfXyDKkMoJixeJkgq6b4QcQa_tMbSOXy-DN0w
-Message-ID: <CACzX3AvJUPUhxCPgqOW6zSF2exawYG_okkL3xAEd=s2g=EDd3A@mail.gmail.com>
-Subject: Re: [PATCH 4/4] iomap: don't free integrity payload that doesn't exist
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>, 
-	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Reply-To: efremov@linux.com
+Subject: Re: [PATCH] floppy: avoid NULL deref in reset_interrupt when cont is
+ cleared
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+ syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com
+References: <20260723073512.11120-1-yangxiuwei@kylinos.cn>
+Content-Language: en-US, ru-RU
+From: "Denis Efremov (Oracle)" <efremov@linux.com>
+In-Reply-To: <20260723073512.11120-1-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+Hello,
+
+Thank you for the patch.
+
+On 23/07/2026 11:35, Yang Xiuwei wrote:
+> reset_fdc() arms do_floppy = reset_interrupt; the IRQ handler then
+> queues that function via schedule_bh(). If unlock_fdc() or do_wakeup()
+> clears cont before the work runs, reset_interrupt() dereferences a NULL
+> cont and oopses.
+> 
+> Example crash excerpt:
+> 
+> [ 1070.468148] status=80
+> [ 1070.468152] fdc_busy=1
+> [ 1070.468158] cont=          (null)
+> [ 1070.468161] current_req=          (null)
+> [ 1070.468162] command_status=-1
+> [ 1070.468163]
+> [ 1070.557051] floppy0: floppy timeout called
+> [ 1070.557053] no cont in shutdown!
+> [ 1070.557056] floppy0: floppy_shutdown: timeout handler died.
+> [ 1074.419509] floppy0: FDC access conflict!
+> [ 1074.419782] BUG: unable to handle kernel NULL pointer dereference at
+> 0000000000000008
+> [ 1074.421969] PGD 0 P4D 0
+> [ 1074.422320] Oops: 0000 [#1] SMP NOPTI
+> [ 1074.422648] CPU: 10 PID: 3269 Comm: kworker/u256:4 Kdump: loaded
+> [ 1074.423830] Hardware name: inspur Standard PC (i440FX + PIIX, 1996),
+> BIOS 0.0.0 02/06/2015
+> [ 1074.424284] Workqueue: floppy floppy_work_workfn [floppy]
+> [ 1074.424757] RIP: 0010:reset_interrupt+0x3a/0xa0 [floppy]
+> 
+> The same NULL deref has also been reported by syzbot on upstream.
+> 
+> Return early if cont is already NULL after result(). The hardware reset
+> has completed; result() still drains the FDC. A later request can lock
+> the FDC and reset again. This is a defensive fix for stale work, not a
+> rewrite of the floppy continuation state machine.
+> 
+> Reported-by: syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=619e27617b2abe6b9b72
+> Link: https://lore.kernel.org/linux-block/00000000000093c4d105f9aa34d6@google.com/
+> Link: https://lists.openwall.net/linux-kernel/2021/10/27/56
+> Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+> ---
+>  drivers/block/floppy.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index f04397b8e381..3d2df99dbb29 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -1784,6 +1784,9 @@ static void reset_interrupt(void)
+>  {
+>  	debugt(__func__, "");
+>  	result(current_fdc);		/* get the status ready for set_fdc */
+> +	/* Stale work: unlock_fdc()/do_wakeup() may have cleared cont. */
+> +	if (!cont)
+> +		return;
+
+It looks to me that this check closes the exact reported crash, but it doesn't
+fix the root cause of the problem. I think cont can be set here with a valid
+but unrelated continuation while stale reset work is inside result(). We need
+a more generic solution to close the bug here.
+
+
+>  	if (fdc_state[current_fdc].reset) {
+>  		pr_info("reset set in interrupt, calling %ps\n", cont->error);
+>  		cont->error();	/* a reset just after a reset. BAD! */
+
+
+Thanks,
+Denis
