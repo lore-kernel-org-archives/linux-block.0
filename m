@@ -1,73 +1,34 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88C5378828
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 05:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BF2386C0A;
+	Fri, 24 Jul 2026 06:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784870887; cv=none; b=qKQNK4x6cTG1rQtTtsKDwflwHYy3+XOi2tgRe5brlfLdEio3FKyNUNxym1fjI85cTAAOsDqhekM8H+DF+yHL1srn9wY9KLkyAMaNsBH1PWnE0a+OFoOknBXFp/IqCPXWfSkd3098aJQ6qnst+NVVCqELYlGyfODRvmfQv40kMxw=
+	t=1784874090; cv=none; b=jcJYaPOEAuNKxd/ZC58gY/aoPCXPV7vuUdLr8m4ANUtd7M1wq/dDgEcSwzuftCJ0skK8JISi/11pW0d5KhstxyrmU62vZmEEVLCDh3X1qF+0e15aP+qpP3ivMNUKUd1sZQXUch+wRMKLpRc4KIqVm6opwI0d23xnO0qfa26RvK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784870887; c=relaxed/simple;
-	bh=e3eFk56qC1aswalWanSluJKLapPRIS3jOtxP1UjlQ+c=;
+	s=arc-20240116; t=1784874090; c=relaxed/simple;
+	bh=BaV1Epx9hWiAkuSSyAZCGFH1V0UbFkWeMpBWezrzoVE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b65jTnpxnHkgfWgwnOFrJeaxEk1wPJ9d13nbknliJ4qCfibN0KDg3EtbzVnlQBe/QmrD92RPK/chV9WK8HfutmCyjVasXqqi9VEqqIj6Jth2z4UE3mWOxsE6/Pzk0BO4aMKuGrUDILlHrNqA55mVvirN914Qm3QpaWa97idy7Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=d5Oo5KkR; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d5Oo5KkR"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-848d21bbaffso26877b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Jul 2026 22:28:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1784870882; x=1785475682; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=BqdCN7np/OnzZei+qTFQX7Mqn8owBvoqzCC1D2N5rP8=;
-        b=d5Oo5KkR/der0ajZm+dThvCO5vNIdqxNN2h3tHyYKApcBms5ERdO5+4JvnkLnPi229
-         NUphLVqEyOu645ZjHZUpORkPN/C890ZfJ/mNd7pi2XDQ1JcP5YBIa7WX35phZMTxJZC5
-         N9P9shchd2U5PQK0hJibFusIzn2llxBilvDGw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784870882; x=1785475682;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BqdCN7np/OnzZei+qTFQX7Mqn8owBvoqzCC1D2N5rP8=;
-        b=NtVtx5IoMGcUUZpNlJ7tb9/p9OSV7a9kfBDIMqx17JNRGxIoLXUKvuaPzlJqWs03dw
-         A+NQzNWQwAsw8izoc9jgGnmc8WHvCBC8Io0kV+ZF1NbfnQTExTTqj7ytChdKq4Z6w2Lh
-         lgMLKl/NYiF0daLrayudcNsCtFVZD9rgbs0MfnwNBOhho6VzirSd5DNIXg3XFoODdSO7
-         XANKy5yS+yMRtIJSyrs3MHT+yMYQ64CZXhjDEvuboPj9bcxtt3LEsv4XiE+y7+HefmtD
-         U2659Iu5zDqfLUmcaFKocWac6tzTC9dYLeSha09qeoP/hyspoWl1qqmRfW+y56dBh5eB
-         gTRw==
-X-Forwarded-Encrypted: i=1; AHgh+RqYBfHAPwzA2VcZaFepso9pyEGbH8BYe4NegH7A1jUpkNkR+kgCkxBgJY/IyW81Xf4DN/bD49xJB/FfAw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7nbPXSfW8LQbfpCQLhagVVmw0skgtn0jF6FGi/GGXusw2XS5M
-	besE0c/G7hFJtJAwB4V9sZ22faOl5Yjj0GnN1YquQ4MqCxSgmw84sEMjoQssX09b5Q==
-X-Gm-Gg: AR+sD11mqK/Q2xO5ZahTg+r/gF0DKD9tIUtLYbbdSPaIy71kbJip56Qs/lFhq3jdvZv
-	Gtp4A6grZBpOUsHuB40EBcIy5OblhJJj/hQ93tcTup9WUQQwvZljaUo+A4IaN9M+SscEJRIRrgm
-	Int63bhuL0/xUti0rQUEXmDP1b52uQhXwvnlCRt98Qb4VVo/De1qp7mhVDaV4/SN3JLRzWttJNs
-	J/K2smiScn567NHcJrvA94qSlBWjDH9Z2EMGB7EFlWR59VQeazIMENCRcO50e1AUmFRwhfbZnaE
-	eLcXm2RxmfWvp/DFv2jB1vsghqnAu7MT2goxEUb7PRsskSegCyN3Rt492xraFiHABeoJKg646EG
-	bNxc0oJQ5kCSE6551Gyml7Wx1BxGHTCWYxhkWdVZHvlZhllFh+LRnziw1DguVyMIN/Jhwn2Vrr2
-	9ctr6VOnc8M+nUS8luvUi6ErwjO/LL9p47uZtO6NeiHQ==
-X-Received: by 2002:a05:6a00:1bcc:b0:848:2f84:72c with SMTP id d2e1a72fcca58-84e2c23fd19mr6027905b3a.63.1784870881717;
-        Thu, 23 Jul 2026 22:28:01 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:c102:f12d:5168:6be5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84e1757488csm4011470b3a.33.2026.07.23.22.27.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2026 22:28:01 -0700 (PDT)
-Date: Fri, 24 Jul 2026 14:27:57 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	terrelln@fb.com, dsterba@suse.com, akpm@linux-foundation.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, rongwei.wrw@gmail.com, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH 2/3] zram: add per-backend capability flags and validate
- parameters early
-Message-ID: <amL1-Q-HGLJj16rG@google.com>
-References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260627070216.13511-2-haoqinhuang7@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AvBGvUFz3YvRAlniJCL+47PfMI4Bzxk1nVC5BBWTFU5LgeO+e20VuKtBXCPnqMhI8S9cA7l3C3hijdOfwWA5iHX3ZqEN5CaSqT4Ha9YMm4qRub3vl8nN4S2tvIZaA375ZrlBlteynsZcZNCqWYk23RM9yALE6UfxIUzL9ZYw8PU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id EC95668CFE; Fri, 24 Jul 2026 08:21:21 +0200 (CEST)
+Date: Fri, 24 Jul 2026 08:21:20 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Andrey Albershteyn <aalbersh@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>,
+	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 18/22] xfs: use BIO_COMPLETE_IN_TASK for bounce
+ buffered read I/Os
+Message-ID: <20260724062120.GA4953@lst.de>
+References: <20260723145000.116419-1-hch@lst.de> <20260723145000.116419-19-hch@lst.de> <amItES6s54i1QSHw@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,24 +37,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260627070216.13511-2-haoqinhuang7@gmail.com>
+In-Reply-To: <amItES6s54i1QSHw@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On (26/06/27 15:02), Haoqin Huang wrote:
-> Writing dict or level parameters for algorithms that don't support
-> them was silently accepted but had no effect.  Out-of-range levels
-> were silently clamped by the underlying library.  Dict read failures
-> always lost the real error from kernel_read_file_from_path().
+On Thu, Jul 23, 2026 at 05:58:49PM +0200, Andrey Albershteyn wrote:
+> I would probably need something like this for fsverity.
 > 
-> Add caps, level_min and level_max to zcomp_ops and validate
-> user-supplied parameters in algorithm_params_store() before storing,
-> giving immediate error feedback. Also fix comp_params_store() to
-> read the new dict into a temporary buffer before resetting old
-> parameters, making the update atomic.
+> When using integrity checksums with fsverity together, both file data
+> ioends and fsverity metadata ioends get onto the inode queue
+> (without checksums there's no metadata ioends). This way worker could
+> self-deadlock if data ioend processed first in xfs_end_io(). It will
+> call verify_bio to read merkle pages which could be already waiting
+> in queue.
 
-I probably would prefer not to add this.  Again, zram setup is almost
-always automated, you figure out what you need to put into your init
-script once and you never touch it again.
+Yes.  Same as the situation we have (or had as this is changing
+for 7.3) with fsverity and fscrypt.
 
-The 0 i_size for CD-dict is something that simply should not happen.
-If you insist on handling that then we can replace "sz < 0" with "sz <= 0",
-but that 0 len dictionary case is something purely theoretical.
+> I initially considered changing xfs_end_io, for read ioends, to just
+> schedule them instead of adding to the queue, but decided just sort
+> metadata ioends first in the queue [1] as a bit simpler fix.
+> 
+> The difference is that work won't be scheduled on the high-priority
+> fsverity's workqueue. Not sure how critical this is as with
+> checksums all reads would be the same priority.
+
+I'll need to go back to your series, but just sorting isn't going
+to fix the problem, as the reading of the verity metadata could
+be kicked off from the completion workqueue and you could be blocking
+the rescuer thread.  So either verity needs it's own WQ, or we'd need
+some way for a currently running I/O completion to exit and get
+restarted.
+
+With BIO_COMPLETE_IN_TASK we could probably do that restart thing.
+Or add a second set of workers for "metadata".
