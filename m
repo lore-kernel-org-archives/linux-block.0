@@ -1,102 +1,104 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D20448CF4
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 16:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78DF402B99;
+	Fri, 24 Jul 2026 18:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784912205; cv=none; b=a/RgPGV5cvQq2l/UxnMOJ4wtc0C0Pg7Cb8N6CWJ2JbRzxVwN/AXFo1ktnW7jZjr1uHXjuVW9uOWIWvRQ0Bjujxu6wOI+26UEHIqhvm/faEtkOdedmgmRzcH4+1dpe147gcVoQeE+lEr2Y2bvKfvsWGSEyKvbBU0XI/57loVQIZ0=
+	t=1784916989; cv=none; b=VYFtqOWSFQ59eB03oDXVuSoA7D3ExZJZd1DjtjEVXRQQoosUzmTbNur9m8Ot0ar3LrQQW6MLmCMur4H26pD1ivbtte9Rt0PJliTVzQijoHtM5x16HqG7j3JJDrrY82y2ZEih2qhR+Lzdx2dzXjrKQELM0mSzyXZv8LS79mf3x4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784912205; c=relaxed/simple;
-	bh=zE3gxvGgwugD20Ct90IVmuDEhCYhymVsoQa+BUY7wJk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LL5awITrkzFF5VqA5Nwjqh727CJ/zw67HYq0dM4rTfvp7kptir3Sq1IBikFRt2DU7ffZpeN0JqFGqWy3hgHcVMtDdiUt6/FKT5WyBTBvKkQyJ9dcQ7iMEjyoXj/GWiwQLH2+intyEF1nuCyXCdjDecjbVCSCkaDa31nRsnHcZhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Epciqs5y; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784916989; c=relaxed/simple;
+	bh=YBNUPhK+dSG8Rj+GgFl/0zrJ57AbV8JvJot3uj9k1OU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=b8FeexzAdOYPt9/7KzXkbdbZ1oOjat6H2k2BYg23+Ubxknlo+8KB2GAOVZlVuGq4I10w1qOTnxuG9X1Pz6HgFwd20qvn9x9fOZjblzfFeYtD9MJYw7TtKnD3ohRIKMfQH76bytPd5nJaaR3si6fnFQNdHV4PbJ7qSo5yKzovPgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AUqbyAnm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Epciqs5y"
-Message-ID: <94ed42ce-895d-4197-994b-60fc1d3f040c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784912197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cUrnWy2WKVTXvQRFpa4Dg33IG19qhdXuCbSecbj9/ww=;
-	b=Epciqs5yfiRz6u6HGHqSg2CDRdAPPD2qTeNhYpUfxlt4tyVplFWCPZJTERcKUlRTR9DICd
-	O+xLXrvBLWYvPwmSi4c1SuSXIp39vebQL541e4rtC+fWoHyYr+cP1RVNJmfoolbNRuxvxk
-	9T7jv2kla5l9ZTEy9iV6lJWczJEAPt4=
-Date: Fri, 24 Jul 2026 17:56:35 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AUqbyAnm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE4EA1F000E9;
+	Fri, 24 Jul 2026 18:16:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784916985;
+	bh=7cgAipI1fCRs+j94B3V9v2XQIDOdhYQSv7FLrs5JCAY=;
+	h=From:Date:Subject:To:Cc;
+	b=AUqbyAnmDGUatPGQMxkwrbiu1ATsGLQdktzmC3PHqH3AiLMcL9lTLmDYcmFjvCsxX
+	 cVTN6Wvl/Zc3hkDuj94KNf8HRm5aW8vbWEpsocwutGck7Leuz1bXKDaKl7FZ2veQ1w
+	 gs/illBPOV3R6oFGjTuCqR9qtCal1zNswOBLP2bPe6GtmjfDSXqARO8q38SYw5Z3QN
+	 aOwuU3JAz7GhHA5qE9DPwIr/ce5Ld8tffwybafToOMwajpZZNGH9PUPEpzQMpA4dvv
+	 /Xdnxd3+8BHIrtmGdiQ4u8PpSAtMu7sTmQ31Hrx8bbXDtG3idLCWcPHFqBEiCBd5eN
+	 jpaj8f+ERLG8w==
+From: Vincent Mailhol <mailhol@kernel.org>
+Date: Fri, 24 Jul 2026 20:15:58 +0200
+Subject: [PATCH] block: store GPT attributes as a raw value
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC] nvme-multipath: fix diskstats for partitions
-To: Keith Busch <kbusch@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>,
- sagi@grimberg.me, axboe@fb.com, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20260721114553.1657841-1-john.g.garry@oracle.com>
- <20260724050152.GA3680@lst.de>
- <987782a9-e12a-4098-b438-a54a5765c2ae@oracle.com>
- <amNegPEvRX99EvPN@kbusch-mbp>
- <f76e9466-4b66-4a32-a491-728e24d34052@linux.dev>
- <amOGxr3rxvDflHLv@kbusch-mbp>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: John Garry <john.garry@linux.dev>
-In-Reply-To: <amOGxr3rxvDflHLv@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Message-Id: <20260724-fix_gpt_entry_attributes-v1-1-eca37d728dec@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MwQqDMBAFf0X2bCAGW9v+ikiI9ql7SWWziiL+u
+ 6HHgZk5KUEYiT7FSYKNE/9ihqosaJhDnGD4m5mcdU/buNqMvPtpUY+ocvigKtyvimTwCOMb9mU
+ HVJTzRZDd/7rtrusGkrwYBmoAAAA=
+X-Change-ID: 20260724-fix_gpt_entry_attributes-e5af9e080ce1
+To: Davidlohr Bueso <dave@stgolabs.net>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-efi@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Vincent Mailhol <mailhol@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1540; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=YBNUPhK+dSG8Rj+GgFl/0zrJ57AbV8JvJot3uj9k1OU=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDFnJq7/c4NFdFRP82DPgbuuKaj6lv++ta4+ttn7vemH2Y
+ g+TaX7pHRNZGMS4GCzFFFmWlXNyK3QUeocd+msJM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
+ Ahk6RgxcnAIw1QbXGP7n6yU+T1zU/6zI/FhajrTe0cV6+pz3c053bmG9/mdTl0QzI8Pc/ef+zDh
+ VvyQ85kvxicuX/81P13C/qc41y+/klDmnCkX5AA==
+X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
+ fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-On 7/24/26 16:37, Keith Busch wrote:
-> On Fri, Jul 24, 2026 at 04:29:08PM +0100, John Garry wrote:
->> On 7/24/26 13:45, Keith Busch wrote:
->>> Can we just thread through partitions for the bio's block_device instead
->>> of assuming part0? I know the hidden path devices skip partition
->>> scanning, but maybe if we let it happen, then those will have the same
->>> partition setup as the head gendisk. Then we can go right to the
->>> disk->part_tbl for what we provide to bio_set_dev() for both submission
->>> and failover, and everything should work out from there.
->>
->> I guess that we would just scan through the per-path gendisk->part_tbl and
->> match somehow to lookup the partition. Maybe vs start address of
->> bio->bi_bdev. Or is there a simpler (and quicker) way?
->>
-> 
-> This is the idea, assuming we can get the partition tables of the head
-> and path disks to be aligned:
-> 
-> ---
-> --- a/drivers/nvme/host/multipath.c
-> +++ b/drivers/nvme/host/multipath.c
-> @@ -543,7 +543,10 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
->          srcu_idx = srcu_read_lock(&head->srcu);
->          ns = nvme_find_path(head);
->          if (likely(ns)) {
-> -               bio_set_dev(bio, ns->disk->part0);
-> +               struct block_device *bdev;
-> +
-> +               bdev = xa_load(&ns->disk->part_tbl, bdev_partno(bio->bi_bdev));
-> +               bio_set_dev(bio, bdev);
->                  /*
->                   * Use BIO_REMAPPED to skip bio_check_eod() when this bio
->                   * enters submit_bio_noacct() for the per-path device. The EOD
-> --
+struct _gpt_entry_attributes currently models the GPT partition entry
+attributes field with bitfields. This is broken on machines using the
+__BIG_ENDIAN_BITFIELD ABI because GPT always stores the attributes on
+disk as a 64-bit little-endian.
 
-ok, got it.
+No current code consumes individual fields from that structure. So just
+remove struct _gpt_entry_attributes entirely and replace it by an __le64
+value in struct _gpt_entry instead. This lets users apply endian-aware
+masks explicitly when inspecting attribute bits.
 
-And I think that we would need to do the reverse lookup in 
-nvme_mpath_start_request() and nvme_mpath_end_request() to get the head 
-disk partition, like:
-bdev = xa_load(&ns->head->disk->part_tbl, bdev_partno(bio->bi_bdev));
+Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+---
+ block/partitions/efi.h | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-I suppose that the tricky part now would be have the per-path disk scan 
-run but keep those per-path disks hidden.
+diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+index 84b9f36b9e47..1f56f93b2804 100644
+--- a/block/partitions/efi.h
++++ b/block/partitions/efi.h
+@@ -75,18 +75,12 @@ typedef struct _gpt_header {
+ 	 */
+ } __packed gpt_header;
+ 
+-typedef struct _gpt_entry_attributes {
+-	u64 required_to_function:1;
+-	u64 reserved:47;
+-        u64 type_guid_specific:16;
+-} __packed gpt_entry_attributes;
+-
+ typedef struct _gpt_entry {
+ 	efi_guid_t partition_type_guid;
+ 	efi_guid_t unique_partition_guid;
+ 	__le64 starting_lba;
+ 	__le64 ending_lba;
+-	gpt_entry_attributes attributes;
++	__le64 attributes;
+ 	__le16 partition_name[72/sizeof(__le16)];
+ } __packed gpt_entry;
+ 
 
-I experimented by stop setting GENHD_FL_HIDDEN for the per-path disk, 
-and the diskstats look ok, FWIW.
+---
+base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
+change-id: 20260724-fix_gpt_entry_attributes-e5af9e080ce1
+
+Best regards,
+-- 
+Vincent Mailhol <mailhol@kernel.org>
+
