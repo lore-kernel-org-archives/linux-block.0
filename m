@@ -1,49 +1,38 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA21531F98D
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 14:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C994457A1;
+	Fri, 24 Jul 2026 15:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784905089; cv=none; b=Z2hz4Lki5qukm6i50VxWNI0RVBBTuA7Pgrfacm+NmUa15ejBhj3T0IO9ojfMLZHBEOUW1kgQE8Md09cHF44g4kVcVvtpSxhjW6hQDFJ5F1pnbi37EcUNC+VRyqGrL7/wWiVCCeDsCIj5LPoYgITFryM9cSTFZGeFg/ckRVnhppE=
+	t=1784906011; cv=none; b=hTBxMcJcD/tGAniCqcEE1+tlAYr+NDiyu6EGGEXLzmBKYPye07mhKd8k3OUABDXTh6yTn6aoYwxzeV+snbA4owdApWxRUi/WChl5rVVarTOcae0dGcDWuc3vX/m7Ck86JOX3QlYDMmVOtugA8XfuddPXBgFTepgiXq4w9tkvVW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784905089; c=relaxed/simple;
-	bh=G2o9I89S5wuacRZuT0aUp53MkHxSYgNvKch1jD0dbh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=cwVlQzT3JdXujggTdYzBF2/d3+y2GxSHr7pynv3mnsG+RT3gA/uKnG9OYxAMAXFxkZkAXNYV2h8jQTbwklPSc1Heeo8ZknRX/dY6hrTd66yI/f+j9X0UHvufrEvukXWVulW8Y28Gja0k5PoIaUFZ9q9ZSKDynSuMtNP9qbiDW8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=IU93YA0B; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1784906011; c=relaxed/simple;
+	bh=gvq61LPzryx7OIsJgT5KcTzegy2Z9MAjptSrQ3OG7hs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=p4NbgLNf7Z4zwUEie99P27C0/vIO59Zils+6QC6Z6MKeJZ7Uz/5qJXC1U71Anb+I3ehPOPaVkcMviUXa3OLXDxxZ01UKNiVg/km4vbBc29qoCD3zYb5B0VJJkMaqCXKJGu2ZjidiMaSQN6en4AX9eh9RlZB+YbBnB6RmMmW1nw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=cWmRFP83; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="IU93YA0B"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260724145803epoutp0266a2cba882834b02bc8cf99050833762~FQbdeo4Gl1954419544epoutp02Z
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 14:58:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260724145803epoutp0266a2cba882834b02bc8cf99050833762~FQbdeo4Gl1954419544epoutp02Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1784905083;
-	bh=RlDKF1N50HsiEmVfMhX9vE9WiGz6JSadAcE/1zQN2vU=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=IU93YA0BiP5WQtgNQgym4F8uAreIvPDz42vjbPmA1npv18f391gVfYi+Qisyb0sot
-	 tYUrcc89/geiGqYo5v6rYNYi4QfMXX5d9WCDqHTe6G5EPp0UBRSJvHraMp4Luxlbjn
-	 Cbo9nJYEa2Bk3alBb6IM1u1tF/b/1MnCEy83A08s=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260724145802epcas5p23e58de35e56bf362815d3a34e69a4e8a~FQbdEymDx1115411154epcas5p2B;
-	Fri, 24 Jul 2026 14:58:02 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4h6B1j4Z68z3hhT3; Fri, 24 Jul
-	2026 14:58:01 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20260724145800epcas5p41d7adc13127a557af92554114e6d33e7~FQbbO4yg-2731027310epcas5p4I;
-	Fri, 24 Jul 2026 14:58:00 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260724145758epsmtip1d5c833758f471a46d1b8c43cf355ac04~FQbZZjji50280002800epsmtip11;
-	Fri, 24 Jul 2026 14:57:58 +0000 (GMT)
-Message-ID: <3eb1b5dc-449c-4d13-ae38-b48e60de8705@samsung.com>
-Date: Fri, 24 Jul 2026 20:27:57 +0530
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="cWmRFP83"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=ZNQaYBhxmRPRp3MSD4orn4lVQITWPI7vJhQDea9WLWA=; b=cWmRFP83Y7oPZwBv2BLRKVl1HD
+	D8rIMDnGdgxr1yVtuC+jeiGi7dT25yeEYXLQa5VBnxPIjaaiyQD5kqefwtNR8JP5td2qaCWlapYtw
+	Vd2lB/XyAkRJ2ZYbDE31HdlR0rB9YHNMJYPHrxkeOOKcfuwUzhQbWPqu0eghgt2IWpDxyjsQs1s8d
+	EB2c2EoWjQB8/ZBKMgtiZt+tj/HCdbS3B8MSQR9XpzXaLeng7EChYiemPYUadTVebvcIttEkCRR1t
+	n1T4l23fiGPBBRgawhsx7Y5uaX/BZmHaiB575OBeptxUHZa0Y0Ysymx0XcHzwlA3gqqS1dl5ECFhz
+	VU6pA5+A==;
+Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([96.51.150.74] helo=[10.0.33.8])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <logang@deltatee.com>)
+	id 1wnHaC-0000000DzHJ-0tXv;
+	Fri, 24 Jul 2026 09:13:05 -0600
+Message-ID: <47954eca-63e6-401b-82d7-d5969207ded9@deltatee.com>
+Date: Fri, 24 Jul 2026 09:11:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,171 +40,55 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/6] xfs: generic AG set based steering
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: brauner@kernel.org, hch@lst.de, dgc@kernel.org, jack@suse.cz,
-	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260721032027.GW7380@frogsfrogsfrogs>
+To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+ Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
+ <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
+ stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20260723204206.76930-1-mykola@meshstor.io>
+ <20260723204206.76930-8-mykola@meshstor.io>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20260723204206.76930-8-mykola@meshstor.io>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260724145800epcas5p41d7adc13127a557af92554114e6d33e7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df
-References: <20260717125538.508925-1-joshi.k@samsung.com>
-	<CGME20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df@epcas5p2.samsung.com>
-	<20260717125538.508925-5-joshi.k@samsung.com>
-	<20260721032027.GW7380@frogsfrogsfrogs>
-
-On 7/21/2026 8:50 AM, Darrick J. Wong wrote:
-> On Fri, Jul 17, 2026 at 06:25:36PM +0530, Kanchan Joshi wrote:
->> Improve allocator concurrency and reduce interleaving by introducing
->> fixed sized AG set.
->> Use low bits of the inode as a hash to select AG within the AG set.
->> Overall, a file will try to use the same AG (and contiguity is maintained),
->> but multiple files will be spread across all AGs in the target AG set.
->>
->> Suggested-by: Dave Chinner<dgc@kernel.org>
->> Signed-off-by: Kanchan Joshi<joshi.k@samsung.com>
->> Signed-off-by: Anuj Gupta<anuj20.g@samsung.com>
->> ---
->>   fs/xfs/libxfs/xfs_bmap.c | 38 ++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 38 insertions(+)
->>
->> diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
->> index d64defeda645..fd1a3aa4ad3f 100644
->> --- a/fs/xfs/libxfs/xfs_bmap.c
->> +++ b/fs/xfs/libxfs/xfs_bmap.c
->> @@ -3192,6 +3192,36 @@ xfs_bmap_select_minlen(
->>   	return args->maxlen;
->>   }
->>   
->> +#define	GENERIC_AG_SET_SZ	(2)
-> What does this define?
-
-We need more than 1 AG to do inode-based fanning of files and improve 
-concurrency (AGF lock). This is the minimum required to do any 
-improvement, in the default allocator.
-This 'minimum fan-out' is what Dave suggested to extract out of 
-write-stream and apply to two other allocators- default (which is what 
-you see now), and filestream (future work).
-
-And this can be reviewed as an independent patch as it does not require 
-any other work done in the series. No application input is required, 
-this is automatic optimization.
-
-The write-stream allocator (next patch), uses a different AG-set of size 
-NR_AGs/NR_WRITE_STREAMs. And that is an explicit (application input 
-based) allocator.
-
-  >> +
->> +static inline xfs_agnumber_t
->> +xfs_default_ag_set_size(
->> +	struct xfs_inode	*ip)
->> +{
->> +	struct xfs_mount	*mp = ip->i_mount;
->> +
->> +	return min_t(xfs_agnumber_t, GENERIC_AG_SET_SZ, mp->m_sb.sb_agcount);
-> Because I'm not sure what it means on a single-AG filesystem.
-
-On a single-AG filesystem, this will do nothing. The base-AG input given 
-by the default allocator will not get changed.
-
-But we get improvements on multi-AG filsystem; not sure if you saw the 
-numbers in the cover letter. Corresponding to the 'generic AG-set' below:
-
-1. On regular NVMe
-
-a. Inter-stream concurrency
----------------------------
-fio: 4k write, direct IO, 16 jobs, 1 directory, 16 files * 8GiB, iodepth 32
-xfs: 16 AGs, 4 write-streams
-
-base: 41 KIOPS
-generic AG-set: 93 KIOPS (+126%)
-write-stream AG-set: 227 KIOPS (+453%)
-here, 16 files are assigned 4 unique write-streams (4 files/stream)
-
-b. Intra-stream concurrency
-----------------------------
-fio: 4k write, direct IO, 4 jobs, 1 directory, 4 files * 8GiB, iodepth 32
-xfs: 16 AGs, 4 write-streams, generic AG-set size = 2, write-stream 
-AG-set size = 4
-
-base: 59 KIOPS
-generic AG-set: 94 KIOPS (+59%)
-write-stream AG-set: 112 KIOPS (+89%)
-here, 4 files are assigned single write-stream
+X-SA-Exim-Connect-IP: 96.51.150.74
+X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, stable@vger.kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH v5 07/10] md/raid1,raid10: skip futile retries on P2PDMA
+ mapping failures
+X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
 
->> +}
->> +
->> +static xfs_agnumber_t
->> +xfs_ag_to_ag_set(
->> +	struct xfs_bmalloca	*ap,
->> +	xfs_agnumber_t		base_agno)
->> +{
->> +	struct xfs_inode	*ip = ap->ip;
->> +	struct xfs_mount	*mp = ip->i_mount;
->> +	xfs_agnumber_t		set_size;
->> +
->> +	/* Apply fanning only for regular file data */
->> +	if (!(ap->datatype & XFS_ALLOC_USERDATA))
->> +		return base_agno;
->> +
->> +	set_size = xfs_default_ag_set_size(ip);
->> +	/* Fan out within the AG set using low bits of the inode */
->> +	return (base_agno + (XFS_INO_TO_AGINO(mp, I_INO(ip)) % set_size)) %
->> +		mp->m_sb.sb_agcount;
->> +}
->> +
->>   static int
->>   xfs_bmap_btalloc_select_lengths(
->>   	struct xfs_bmalloca	*ap,
->> @@ -3587,8 +3617,16 @@ xfs_bmap_btalloc_best_length(
->>   {
->>   	xfs_extlen_t		blen = 0;
->>   	int			error;
->> +	xfs_agnumber_t		target_ag, start_ag;
->>   
->>   	ap->blkno = XFS_INODE_TO_FSB(ap->ip);
->> +
->> +	/* fan out initial AG across the generic AG set */
->> +	start_ag = XFS_FSB_TO_AGNO(args->mp, ap->blkno);
->> +	target_ag = xfs_ag_to_ag_set(ap, start_ag);
->> +	if (target_ag != start_ag)
->> +		ap->blkno = XFS_AGB_TO_FSB(args->mp, target_ag, 0);
-> /me wonders, if xfs_bmap_rtalloc looked at ap->blkno for a hint the way
-> that the data device allocator does, then would it be trivial to have
-> write streams on the rt device too?
-Trying to understand if this kind of fanning out (this patch) or the 
-logical placement (patch 5 with write-stream based AG placement) help us 
-solve anything for rt device?
-For regular RT device, the round-robin rotor will distribute files into 
-multiple RTGs. So we don't have AGF like contention.
-And using write-stream to explicitly send multiple files to a single RTG 
-will do more harm than good?
 
-And for zoned RT device, the placement is happening via write-hint.
+On 2026-07-23 2:42 p.m., Mykola Marzhan wrote:
+> BLK_STS_P2PDMA reflects the peer/member pairing, not member health:
+> retrying the same pages on the same member cannot succeed.  Keep
+> WriteErrorSeen so the range stays fenced, but skip WantReplacement and
+> FailFast eviction, as commit f7b24c7b41f2 ("md/raid1,raid10: don't fail
+> devices for invalid IO errors") did for BLK_STS_INVAL.
+> 
+> The failure is whole-range and deterministic, so narrow_write_error()'s
+> block-by-block submit_bio_wait() retries are pointless.  Record the
+> whole range as a bad block in the completion handler instead.
+> 
+> Fixes: 02666132403a ("md: propagate BLK_FEAT_PCI_P2PDMA from member devices to RAID device")
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
 
-Am I missing something that you have in mind?
+Change my no longer correct first Signed-off-by to:
 
-All the above is for logical isolation. For physical isolation, your 
-comments already help to establish that write-stream can be made to 
-work. For the regular RT device sitting on top of NVMe (FDP-enabled). 
-That needs few changes, but in previous patch (#3).
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
-
-> I guess the tricky part would be figuring out what to do if you ever
-> want to switch a file between rt and data devices -- presumably you'd
-> just reset the write stream id to the default, but I guess you could
-> reject such a switch if the id had been set explicitly.
-
-Yes, we do such checks in patch 3 now also.
+Logan
