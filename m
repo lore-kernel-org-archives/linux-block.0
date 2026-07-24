@@ -1,34 +1,73 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1910C2749DC;
-	Fri, 24 Jul 2026 12:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C964E2931FF;
+	Fri, 24 Jul 2026 13:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784897681; cv=none; b=LGcqxQkHo/aMD+qLFZbiJqV/kxmca7zQJoMwcN3W1E2tGOYBS66/N3xOXnGtTW1Mvp+lzl6w+KvG2aS9efiCzv8ajDm8Xn6kV6GHQNVzw7e4A5mGG++Vm4XrLpxXIur0t+aqNOMZirM4ltyMH0fP1cPhatDujjW6FgIvVRI8sHU=
+	t=1784898685; cv=none; b=IsJoK7iVxs36yW8TULdFye/ssh1PwUMW1ywznYkew3IoMcxCNxFMnL3zHPsLuWlUPi/nhN4/16TM8yOFLnd9COgarab5ca6p5eNonIAXpviU8iyA9RcQ3L61rFP2Pe7dH5A0SIntRWZgtfKUuq7D3GesHN6P1VrQRaVyheinoxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784897681; c=relaxed/simple;
-	bh=tqRxpgQdUJ7Au5eLmLySTDovM0MWNImE4pIPqVY7ztk=;
+	s=arc-20240116; t=1784898685; c=relaxed/simple;
+	bh=NUna20UvecMvvldvWQK7l6dRgL5Kg++Jc2/WPoM8vog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4Xd10t8t6/TfzyOJzboRqgzeYSnCYL1JEH7wD8bPXFMuXEHiHsfK/L9VaZ14CYsJk7fN8EgDVNA9C7Txjcsut3S2J0FBOr7oanfnCZUfRFO+TW1K5RDLhLvtBpcP8YlbqFUtID5NJDf6bLE24jLUbXm8gMXdN0quMyo3rJqYas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1BE9F68AFE; Fri, 24 Jul 2026 14:54:35 +0200 (CEST)
-Date: Fri, 24 Jul 2026 14:54:34 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Andrey Albershteyn <aalbersh@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>,
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 18/22] xfs: use BIO_COMPLETE_IN_TASK for bounce
- buffered read I/Os
-Message-ID: <20260724125434.GA27168@lst.de>
-References: <20260723145000.116419-1-hch@lst.de> <20260723145000.116419-19-hch@lst.de> <amItES6s54i1QSHw@aalbersh-thinkpadx1carbongen13.rmtcz.csb> <20260724062120.GA4953@lst.de> <amMvIEtEtRrNE7A_@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmE6i2H6wfDw/dT3+vA8CzUYWybGPYCP/gIQCwOltLK0oftErJQXCv82YgsBc8r8b1UM0J+s1KXIvQKnPrtr7oIDSL6mRm9xQRFaRM4e6v9zwSUApeU4Gc07fH5krZ7ezR59T1sI6Z+Ps5WXemVtYSNNJjm1I6RpSXK9WZRqJZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eVQW4YyH; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eVQW4YyH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=tIGeMUsaNb0y93vr8pcc7knEo2f51EGekAs0IIpo/eY=; b=eVQW4YyHf2n+7nUYlm9j9OoqmW
+	93jEEsn1tgghZPGu21TlFvfxft/ALHG/mcJ4p2P/W/aubzHwD5nZtVcahmZaQw6D3DVgoEHKXTTrQ
+	NTVlYkiTW41de23zdPu1kvTfNTe8DuxdK4P0Uq4beMSHQ22WvPeuvI0drpbOvsZt4C8PJgXi6m/4A
+	jhZLQ13UK8c6cUqXfoFqsaW/24ALutRbfEWvhyrM4Gi3ngVRbOdVBRYP1+ZTqC7A6cYQ/KjSw7y5u
+	LfrmaxaUtxKbK5ASxHwjBB/eX2I41fzVQwewAD4AgLl/JDI6lPDDchhWsILYnKSegrrYGZtkoSzCD
+	gd+/Lzzw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wnFfz-0000000GSAN-1qmn;
+	Fri, 24 Jul 2026 13:10:55 +0000
+Date: Fri, 24 Jul 2026 06:10:55 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Ulf Hansson <ulfh@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	daniel@makrotopia.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v8 5/9] block: implement NVMEM provider
+Message-ID: <amNkX6HV7c_8jRUa@infradead.org>
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+ <20260703-block-as-nvmem-v8-5-98ae32bfc49a@oss.qualcomm.com>
+ <amLwz6WuHYUwKKJo@infradead.org>
+ <CAFEp6-1_iariDyqWj0KezHAtULSO+piPHX0F=Z46Rx4KDNLmXw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,49 +76,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <amMvIEtEtRrNE7A_@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAFEp6-1_iariDyqWj0KezHAtULSO+piPHX0F=Z46Rx4KDNLmXw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jul 24, 2026 at 11:38:53AM +0200, Andrey Albershteyn wrote:
-> On 2026-07-24 08:21:20, Christoph Hellwig wrote:
-> > On Thu, Jul 23, 2026 at 05:58:49PM +0200, Andrey Albershteyn wrote:
-> > > I would probably need something like this for fsverity.
-> > > 
-> > > When using integrity checksums with fsverity together, both file data
-> > > ioends and fsverity metadata ioends get onto the inode queue
-> > > (without checksums there's no metadata ioends). This way worker could
-> > > self-deadlock if data ioend processed first in xfs_end_io(). It will
-> > > call verify_bio to read merkle pages which could be already waiting
-> > > in queue.
-> > 
-> > Yes.  Same as the situation we have (or had as this is changing
-> > for 7.3) with fsverity and fscrypt.
-> > 
-> > > I initially considered changing xfs_end_io, for read ioends, to just
-> > > schedule them instead of adding to the queue, but decided just sort
-> > > metadata ioends first in the queue [1] as a bit simpler fix.
-> > > 
-> > > The difference is that work won't be scheduled on the high-priority
-> > > fsverity's workqueue. Not sure how critical this is as with
-> > > checksums all reads would be the same priority.
-> > 
-> > I'll need to go back to your series, but just sorting isn't going
-> > to fix the problem, as the reading of the verity metadata could
-> > be kicked off from the completion workqueue and you could be blocking
-> > the rescuer thread.  So either verity needs it's own WQ, or we'd need
-> > some way for a currently running I/O completion to exit and get
-> > restarted.
+On Fri, Jul 24, 2026 at 11:10:58AM +0200, Loic Poulain wrote:
+> Right, I was planning to add partition support in a follow-up series.
+> But since this is really supposed to be a block-agnostic feature,
+> whether it's a disk or a partition, I'll include partition in v8.
+
+Please include the partitions, as including them or not matters for
+the interfaces.  What is holding that support back now?  fwnode
+magic?
+
+> > Also once you register the whole devices as nvmem provider, we really
+> > should keep it from being used a block device, shouldn't we?
 > 
-> Oh I see, then, the data reads could be queue further with
-> fsverity_enqueue_verify_work(ioend). This way bio completion queue
-> can continue process incoming metadata reads while data ioend is
-> waiting for verification.
+> 
+> I'm not sure, the whole concept is block backed NVMEM, so we still
+> need to add that block as base layer, though we could discuss
+> suppressing uevent for it. Preventing block usage would make the
+> feature much more intrusive than other NVMEM providers like MTD, where
+> the underlying device stays accessible. And we may genuinely still
+> want to write the disk (e.g. for factory provisioning), updating the
+> very data the cells point to, etc. There's also the layering aspect,
+> if a disk (e.g. mmcblk0) has logical partitions on top (mmcblk0pX), we
+> still register/expose the whole disk mmcblk0 as a block device
+> regardless. So if a disk contains NVMEM cells, I think it should still
+> be exposed as a block device as well.
 
-
-fsverity_enqueue_verify_work would actually really benefit from doing
-a list (percpu or otherwise) so that the caller only needs a single
-or doubly linked list entry instead of adding another struct.
-
-But if we don't want to do that work yet, adding a verity context
-of some sort and using fsverity_enqueue_verify_work could work.
+So we now get two unsynchronized ways to access the same device?
+At least we need to prevent exclusive openers on the block device
+side.  And document the side channel very well.
 
