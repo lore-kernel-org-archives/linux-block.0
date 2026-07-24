@@ -1,85 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910F0292B4B
-	for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 12:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1910C2749DC;
+	Fri, 24 Jul 2026 12:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784897157; cv=none; b=kdCgQR3cwKh7RWLWyNuvQgxn5g4GWRE2qix1XSlQg2VUu8I5qDRmeEqLivsZ0VawpLqvTcKXurEj2f61XzVfYMANos3aiV3vEvscu1LqD/j0uYEkrWlDDHECe+y8zQFbYx0a8vQwN1dhi4ak5bSWUeRocoGpT02US+V6h7DDuXQ=
+	t=1784897681; cv=none; b=LGcqxQkHo/aMD+qLFZbiJqV/kxmca7zQJoMwcN3W1E2tGOYBS66/N3xOXnGtTW1Mvp+lzl6w+KvG2aS9efiCzv8ajDm8Xn6kV6GHQNVzw7e4A5mGG++Vm4XrLpxXIur0t+aqNOMZirM4ltyMH0fP1cPhatDujjW6FgIvVRI8sHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784897157; c=relaxed/simple;
-	bh=dZ+4MBE//ChtnA6tIRG9AnZqzA6Zx9zmGDYDyiAzPJY=;
+	s=arc-20240116; t=1784897681; c=relaxed/simple;
+	bh=tqRxpgQdUJ7Au5eLmLySTDovM0MWNImE4pIPqVY7ztk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HylELvRQ1420KPypE4/+wC7+vHeUCChs3KXxNguym1MHzxHHBz1qH7In08hQPXCAEmJ4+Qhgt0iX2QIv6dbNqfysy2c54wOzilHsICCb4p9nmzWxX74M1wOUoOMIfcHu3CwHpmgT9amZEdmsgQvicGZC2yYZGDtR4QnVTtVcbio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aW1LGXub; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aW1LGXub"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D40BD1F000E9;
-	Fri, 24 Jul 2026 12:45:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784897156;
-	bh=NdIIWNJ3ERJGsJjiN9AEhl+dFqQlbhp2u6CVyCyiXJU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aW1LGXubKWmZ7lNn4RAQkojiORE442GPtMZOnI+ff9putpeT4OLQArHbUv+Z3m2t/
-	 sTZe3vn3/ZJLnMLrzGTfsCaZfmH7m+ABSiKImPhyYFoEW+rZpoI7Bcy+UM98M/p167
-	 HMnlvyXKaj6cAfPHq3eNsfsBUVJR3tl0A0hNuZbcB+lchr4vUg70/dBf2g981DWeg3
-	 WctRX3oUyoARZeD8xVcg/cm8pEJpc2PLl6noZZAgK4odMxP5ICpnsnYLIyNNecu4AC
-	 c4+zx3tP4oLcG/Y9PDFLM7mYuupMcuUrNh+rlcT3XzXgR3Fjgb7jdotTLpVBIFF4wF
-	 +1b29CjCDk+7Q==
-Date: Fri, 24 Jul 2026 06:45:52 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, sagi@grimberg.me, axboe@fb.com,
-	linux-nvme@lists.infradead.org, John Garry <john.garry@linux.dev>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC] nvme-multipath: fix diskstats for partitions
-Message-ID: <amNegPEvRX99EvPN@kbusch-mbp>
-References: <20260721114553.1657841-1-john.g.garry@oracle.com>
- <20260724050152.GA3680@lst.de>
- <987782a9-e12a-4098-b438-a54a5765c2ae@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=T4Xd10t8t6/TfzyOJzboRqgzeYSnCYL1JEH7wD8bPXFMuXEHiHsfK/L9VaZ14CYsJk7fN8EgDVNA9C7Txjcsut3S2J0FBOr7oanfnCZUfRFO+TW1K5RDLhLvtBpcP8YlbqFUtID5NJDf6bLE24jLUbXm8gMXdN0quMyo3rJqYas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1BE9F68AFE; Fri, 24 Jul 2026 14:54:35 +0200 (CEST)
+Date: Fri, 24 Jul 2026 14:54:34 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Andrey Albershteyn <aalbersh@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>,
+	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 18/22] xfs: use BIO_COMPLETE_IN_TASK for bounce
+ buffered read I/Os
+Message-ID: <20260724125434.GA27168@lst.de>
+References: <20260723145000.116419-1-hch@lst.de> <20260723145000.116419-19-hch@lst.de> <amItES6s54i1QSHw@aalbersh-thinkpadx1carbongen13.rmtcz.csb> <20260724062120.GA4953@lst.de> <amMvIEtEtRrNE7A_@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <987782a9-e12a-4098-b438-a54a5765c2ae@oracle.com>
+In-Reply-To: <amMvIEtEtRrNE7A_@aalbersh-thinkpadx1carbongen13.rmtcz.csb>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jul 24, 2026 at 08:09:51AM +0100, John Garry wrote:
-> On 24/07/2026 06:01, Christoph Hellwig wrote:
-> > On Tue, Jul 21, 2026 at 11: 45: 53AM +0000, John Garry wrote: > Setting as an
-> > RFC as adding this extra bio field is not acceptable, but I > can't see how to
-> > lookup the original partition. In general it is not, but you should mark this a
+On Fri, Jul 24, 2026 at 11:38:53AM +0200, Andrey Albershteyn wrote:
+> On 2026-07-24 08:21:20, Christoph Hellwig wrote:
+> > On Thu, Jul 23, 2026 at 05:58:49PM +0200, Andrey Albershteyn wrote:
+> > > I would probably need something like this for fsverity.
+> > > 
+> > > When using integrity checksums with fsverity together, both file data
+> > > ioends and fsverity metadata ioends get onto the inode queue
+> > > (without checksums there's no metadata ioends). This way worker could
+> > > self-deadlock if data ioend processed first in xfs_end_io(). It will
+> > > call verify_bio to read merkle pages which could be already waiting
+> > > in queue.
 > > 
+> > Yes.  Same as the situation we have (or had as this is changing
+> > for 7.3) with fsverity and fscrypt.
 > > 
-> > On Tue, Jul 21, 2026 at 11:45:53AM +0000, John Garry wrote:
-> > > Setting as an RFC as adding this extra bio field is not acceptable, but I
-> > > can't see how to lookup the original partition.
+> > > I initially considered changing xfs_end_io, for read ioends, to just
+> > > schedule them instead of adding to the queue, but decided just sort
+> > > metadata ioends first in the queue [1] as a bit simpler fix.
+> > > 
+> > > The difference is that work won't be scheduled on the high-priority
+> > > fsverity's workqueue. Not sure how critical this is as with
+> > > checksums all reads would be the same priority.
 > > 
-> > In general it is not, but you should mark this a block patch so that
-> > Jens can better cream at you :)
-> > 
-> > I'm also not sure that supporting per-partition diskstats on a multipath
-> > device makes too much sense, but then again there's a lot of setups
-> > that are crazy and actually used..
-> > 
+> > I'll need to go back to your series, but just sorting isn't going
+> > to fix the problem, as the reading of the verity metadata could
+> > be kicked off from the completion workqueue and you could be blocking
+> > the rescuer thread.  So either verity needs it's own WQ, or we'd need
+> > some way for a currently running I/O completion to exit and get
+> > restarted.
 > 
-> It just seems to me that we should have same behaviour as if it were not
-> multipath.
-> 
-> So we can't use bi_private as that can be set by original bio submitter. I
-> was thinking that this bdev pointer could be temp stashed in bi_next (as it
-> should be originally NULL), but that it dodgy and maybe won't even work.
+> Oh I see, then, the data reads could be queue further with
+> fsverity_enqueue_verify_work(ioend). This way bio completion queue
+> can continue process incoming metadata reads while data ioend is
+> waiting for verification.
 
-Failover is corner case to consider here. We always reset the bio bdev
-to the part0, so your stats will be incorrect when that happens. I think
-you can quickly fix that in your proposal with the "bi_orig", though.
 
-Can we just thread through partitions for the bio's block_device instead
-of assuming part0? I know the hidden path devices skip partition
-scanning, but maybe if we let it happen, then those will have the same
-partition setup as the head gendisk. Then we can go right to the
-disk->part_tbl for what we provide to bio_set_dev() for both submission
-and failover, and everything should work out from there.
+fsverity_enqueue_verify_work would actually really benefit from doing
+a list (percpu or otherwise) so that the caller only needs a single
+or doubly linked list entry instead of adding another struct.
+
+But if we don't want to do that work yet, adding a verity context
+of some sort and using fsverity_enqueue_verify_work could work.
+
