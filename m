@@ -1,30 +1,65 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f3.google.com (mail-yx2-f3.google.com [74.125.224.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0C5326939;
-	Sat, 25 Jul 2026 01:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC2DBE63
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 01:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784942830; cv=none; b=FVs0Pu7HWZjs1p4oF2WkqV6WXAVXY+kvty5d3ANlTWYUcG9NYm1MhFa1ll/5Us6dpopsmmuWlLr14ZPBN1tQk6Qy0aWMoVYaLLEUt1gKWbdwUO7tHseKyqU+PnE4A0aZj+N1zkF+uQ7pvczkFVA+cYJ85C5qR4RH6G4VCMmubPs=
+	t=1784943238; cv=none; b=ccAgZVO/IhqcqIYiZgiIgGz1d49UdYfWXVQdcbBPCwVebeWgEgDSLKG+uBBjf8WkYvc2O6+sJY/RB89NxpGO1MpIsrdw5scvYB3Sc2ijtS4T3xlC2KlYAPfs8S9smDd9VLbjGjOmlMqaI3ugTWSjMOBjSmyJoyXu2Bi2fHnd8aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784942830; c=relaxed/simple;
-	bh=rkkMwtvnUN4gAh8lxTpq04WYg6vbeKWnZ26WZS8Ujc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Chp9oFCon1wEXN1GEZrnAg821fDr4nHA4ocfUFTAxigf5H3rLeJz1AvATkXjyw0NxoREf9EfCUatIY6ABTucAJNI3lXL7lZasVklDlDjxdYFcZM8D+y+S/Vs6jUH5/WU0X05wHEHQXAJGon5aueKP46Jz6e3s+s/nmBDSof/K8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h6Ryv2sJbzYQtpF;
-	Sat, 25 Jul 2026 09:26:31 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id BE3FA4056B;
-	Sat, 25 Jul 2026 09:27:04 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHV3PnEGRqZprNCQ--.41106S3;
-	Sat, 25 Jul 2026 09:27:04 +0800 (CST)
-Message-ID: <26340aba-b93c-47d2-b648-2cf732e884d5@huaweicloud.com>
-Date: Sat, 25 Jul 2026 09:27:03 +0800
+	s=arc-20240116; t=1784943238; c=relaxed/simple;
+	bh=mZ1inUOTN+yH1N5I91jr69QiAJRXRSDLRebzGEpV2fY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=lZykQjbuyjp6HNOApSe/KAL/2sB0ixY2M2buxX69J14YdArTmxzUNb9vrILEOpumxIQz1ASbwbGBH5US/gTxBpE4dqRMM2tSVSVZ+N0TP+FG2W7ITfo+7YF7B6OWpwelfl0JJuOGfTNXmB5ogkaStFvt3JeB/jAUYlzBzdjcqEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=cJh7P0LC; arc=none smtp.client-ip=74.125.224.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="cJh7P0LC"
+Received: by mail-yx2-f3.google.com with SMTP id 00721157ae682-81dfd9cae2cso3328067b3.0
+        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 18:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784943235; x=1785548035; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=qElFBQ39C7n9ZaicWYMVoNS4PnOREctSMAe/+ybWRuA=;
+        b=cJh7P0LCfUOrqyh7EIy3yc92Q7w/UejuHJBg18YyPzfR2dDnhjCm6KsZyn7AteNv8F
+         vypOm5B8HClqjGKu9E7CmaEis4L6p866SfpuUxAijCFwDWO88EcjrtVTPMuX1ZKaxPB8
+         dRgikLtV2t415QnW0EcG9K5HOhsO8HmPBT4KLs1DX8yWql1o9n3Msjvio1YHgfYQvKZA
+         FehH/w/oi9zMAdm66qxqQ71VBjBzS4EXuIhHzM9RVG+wdM1nWy+guWgeXbydbbmSZ1ak
+         0LtO5xkgSPGilEstR2nBlEZ643Mm8Ft8V8jUMppc6TPHGbLETBqtLFMI+P7O7l4ukzxh
+         D7/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784943235; x=1785548035;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=qElFBQ39C7n9ZaicWYMVoNS4PnOREctSMAe/+ybWRuA=;
+        b=kv4MMUds2jpTBWOwah3q0T8BmYcJaTmPjB2blWXx7fVQ3eOBDZp/WrC4rTT2W4naBX
+         WqUvhjXtgn1czuKlDfIpS1j/3p0lBqZwNf1yYbPwRTEjMe434d9jTyDbsR0yLQwbT+mL
+         69p4kAqlHBsrP0KAYLPlXInakCDKdyk9nabrTFCRbQ7LSOAwSe4lKymtD14fuOuR7JHT
+         hSCJBHsz705aE/ktZF6+HSGG1ux6xXvezYw2yGYR2M0KtZUAcbTQoC62ktPwIoYqHiVj
+         FYLLprvnKbyXw03GaamVM9Ehy/ekipb/9wwqHTLgwRvB+NT7alwQelqwTvhuC+MQSmr3
+         tt4A==
+X-Gm-Message-State: AOJu0Yx1TvyzJ/0VZWQIHdPbkauoVbryXXXKKIBY7Q5gQQDBNhCs33QT
+	gLZrIsa0KZKr8ktKCszSZ5JCHu+bffadsy31NoVBdec7JX4CDmp9d9eZ0/CuPUpq5r2IKsLobCE
+	tbnIepnXafhu1
+X-Gm-Gg: AR+sD13z3RvmgCe+RklYXSd4eI2FNmuRArim6eYKYFh9eSW0nRK1ZLB2LE5nY1wEzko
+	0fXvdM5SNtVO9liBaV188oKu/I4UiHvJ0/hzCOiAq4KyXcLMpkEJpatSkyGJFBnGsOqQVlLuWg2
+	aRGG+VgKAN6GdXMIcjO56G0bqtubafA9sKMAOKwXv9uDxpl9n5eOKBnD14avaniVZViz37qprR5
+	yMNPLI0UlQbt7oEeYC8EHvmsAv0mOFeGEwdea40uh0sWimnncZu2t2dnJRacH0boP8s6pigHHtV
+	aRoLYTyQvpgMBSbl6sm9COlYt/KSYyZyAlKChcbE2YRzBljyPAyDifsrZk3dBT6mXVVV+odxct5
+	jhJu4dpWMZc9dJR8Abujv16JgLDvDCScA0g7k5BMjHuBw8MOIHLDtOsG7sFzEIuPm279zJGvfZT
+	+XIzLtNxEXoZERKuGCCcJENsLHoGZkH7GfnZKzJ3T8K5wtuL6NLl9RSSyD8Cs=
+X-Received: by 2002:a05:690c:3344:b0:812:c236:1287 with SMTP id 00721157ae682-81f69e52984mr2649057b3.45.1784943234820;
+        Fri, 24 Jul 2026 18:33:54 -0700 (PDT)
+Received: from [172.17.0.108] ([50.168.186.2])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81f6576ee52sm7564057b3.3.2026.07.24.18.33.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jul 2026 18:33:52 -0700 (PDT)
+Message-ID: <3f1dae20-214a-4b2f-b13e-2c996b31acca@kernel.dk>
+Date: Fri, 24 Jul 2026 19:33:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,92 +67,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 9/9] null_blk: serialize configfs attribute shows with
- the file-scope lock
-To: Bart Van Assche <bvanassche@acm.org>, Zizhi Wo <wozizhi@huaweicloud.com>,
- axboe@kernel.dk, dlemoal@kernel.org, nilay@linux.ibm.com, kch@nvidia.com,
- johannes.thumshirn@wdc.com, kbusch@kernel.org, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
- chengzhihao1@huawei.com
-References: <20260714041805.1088702-1-wozizhi@huaweicloud.com>
- <20260714041805.1088702-10-wozizhi@huaweicloud.com>
- <30c062e3-1f8b-43a9-8c85-4bc86cd74336@acm.org>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <30c062e3-1f8b-43a9-8c85-4bc86cd74336@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHV3PnEGRqZprNCQ--.41106S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF45Kw43JrW8GrykGF1kAFb_yoW5Jw45pr
-	18JryUJryUJr18Xr1UGr1UJryUJr1jyw1UJr1UJF18Jw1UJr1jqr1DXryqgw1UJw48Jr1U
-	Xr1UXr17Zr1UJrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VU13ku3UUUUU==
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] block fixes for 7.2-rc5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi Linus,
+
+A few block fixes for this week:
+
+- Fix a ublk recovery hang, where END_USER_RECOVERY without a
+  successful START_USER_RECOVERY could be satisfied by a stale
+  completion latch.
+
+- Fix a stack out-of-bounds read in the CDROMVOLCTRL ioctl.
+
+- MAINTAINERS email address update for Roger Pau Monne
+
+Please pull!
 
 
+The following changes since commit df308a14585649f7683a560f5c94978ab4f8224d:
 
-在 2026/7/25 5:16, Bart Van Assche 写道:
-> 
-> On 7/13/26 9:18 PM, Zizhi Wo wrote:
->> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/ 
->> main.c
->> index 67cd32d28887..c8487a630e1a 100644
->> --- a/drivers/block/null_blk/main.c
->> +++ b/drivers/block/null_blk/main.c
->> @@ -345,8 +345,14 @@ static ssize_t nullb_device_bool_attr_store(bool 
->> *val, const char *page,
->>   static ssize_t                                \
->>   nullb_device_##NAME##_show(struct config_item *item, char *page)    \
->>   {                                    \
->> -    return nullb_device_##TYPE##_attr_show(                \
->> +    ssize_t ret;                            \
->> +                                    \
->> +    mutex_lock(&lock);                        \
->> +    ret = nullb_device_##TYPE##_attr_show(                \
->>                   to_nullb_device(item)->NAME, page);    \
->> +    mutex_unlock(&lock);                        \
->> +                                    \
->> +    return ret;                            \
->>   }                                    \
->>   static ssize_t                                \
->>   nullb_device_##NAME##_store(struct config_item *item, const char 
->> *page,    \
->> @@ -479,7 +485,13 @@ NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
->>   static ssize_t nullb_device_power_show(struct config_item *item, 
->> char *page)
->>   {
->> -    return nullb_device_bool_attr_show(to_nullb_device(item)->power, 
->> page);
->> +    ssize_t ret;
->> +
->> +    mutex_lock(&lock);
->> +    ret = nullb_device_bool_attr_show(to_nullb_device(item)->power, 
->> page);
->> +    mutex_unlock(&lock);
->> +
->> +    return ret;
->>   }
-> 
-> The above changes would be much more elegant if guard()() would be used 
-> instead of explicit mutex_lock() and mutex_unlock() calls.
-> 
-> Thanks,
-> 
-> Bart.
+  block: fix aligning of bounced dio read bios (2026-07-16 06:11:37 -0600)
 
-Thanks Bart. Will switch to using guard() in the next version :)
+are available in the Git repository at:
 
-Thanks,
-Zizhi Wo
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260724
+
+for you to fetch changes up to 093fbffe03f5c1bb9c10a9e5aa65b23250844403:
+
+  MAINTAINERS: update my email address (2026-07-21 06:24:43 -0600)
+
+----------------------------------------------------------------
+Ming Lei (1):
+      ublk: wait on ublk_dev_ready() instead of ub->completion
+
+Roger Pau Monne (1):
+      MAINTAINERS: update my email address
+
+Xu Rao (1):
+      cdrom: fix stack out-of-bounds read in CDROMVOLCTRL
+
+ MAINTAINERS              |  2 +-
+ drivers/block/ublk_drv.c | 47 ++++++++++++++++++++++++++++++-----------------
+ drivers/cdrom/cdrom.c    |  1 +
+ 3 files changed, 32 insertions(+), 18 deletions(-)
+
+-- 
+Jens Axboe
 
