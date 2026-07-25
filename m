@@ -1,27 +1,28 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202D334404B
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 02:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C27B388E60
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 02:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784946844; cv=none; b=ek2FBD/o58D1bYmvFw4t7OC96F6zkm0eah9MlvqeaG95tj35pOFO8/OSH6Ti5neqhy5RiEFae03/Q/GXcFu7WqojrRDsYQsGC63NRBm0AQSktSo8EZm8Ph80BuSnXbXigI+5mtEjKmEgAnzcIaCZAkWn6MIEq85v8PFMdk2bBGQ=
+	t=1784946846; cv=none; b=aVE1eImO3Nr7SBQAF3/G4EPgN8JHTob6HJb1XnvpFbqUe482CpV9cXi7csMK3OA9ZCSIz983wa+6VlIwy4pa8C3XKbWfPrAMrv5DhWgIiyOdehyYBmc1dfJv8L22r2tj/wH66Hxh2s8f8g8T+YWb7ltVuvTExs5z6c/L4uROco0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784946844; c=relaxed/simple;
-	bh=17nBPiVM1wMvOb/LdScLEadfpyg83tKIFZLEuQKeqog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R6eVopxU5jh5gqIORhlNUKTLo8KNbY/HnE4s179bRqmqKYNDsLkv6ylkJuTjOEbfYlTlcRw96ae/vTPQh3vO918730/l34z2XcovDPBw3LHeSouIS5Cs34QN6ubaAsarlc3bYWutRtWYHIsqtUImeX7vNpMYdNecRDeZyPVSuDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1784946846; c=relaxed/simple;
+	bh=+5u+06XcQ9/qBgFvsepBkBbYbPK992KqZg7tteJXfsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cKvZxYfIawzyUL59J257iIy6zDZxmK5UW/ebS4foTxgzkdHG1J6cCe/tr+oTKJYxWft+sq3jNGuYxdfd5x8hYmD53uogCtxad7I2KH7xMMCZdBfXRt+FFumE8F4h9RM1G9G2tXyHnKvCYPfWNVJfoyNHuVUmtVwL0tPKTu50MqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h6TRl6wdXzKHMWb
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:07 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h6TS30p5FzYQtwQ
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:23 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id D16124081F
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:55 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 8C2804089B
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:56 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgA3SHSSIGRqCkPTCQ--.40042S4;
-	Sat, 25 Jul 2026 10:33:55 +0800 (CST)
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgA3SHSSIGRqCkPTCQ--.40042S14;
+	Sat, 25 Jul 2026 10:33:56 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
 	dlemoal@kernel.org,
@@ -35,10 +36,12 @@ To: axboe@kernel.dk,
 Cc: yangerkun@huawei.com,
 	chengzhihao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [PATCH V6 00/10] null_blk: fix init/exit races and memleaks
-Date: Sat, 25 Jul 2026 10:24:59 +0800
-Message-ID: <20260725022509.714271-1-wozizhi@huaweicloud.com>
+Subject: [PATCH V6 10/10] null_blk: serialize configfs attribute shows with the lock
+Date: Sat, 25 Jul 2026 10:25:09 +0800
+Message-ID: <20260725022509.714271-11-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260725022509.714271-1-wozizhi@huaweicloud.com>
+References: <20260725022509.714271-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,78 +49,78 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgA3SHSSIGRqCkPTCQ--.40042S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4rWr45ZryfAr1rJFykAFb_yoW8KFyrp3
-	yYgw13Wr4DKr17XrsFka17ua4Fqwn5G3yjgFnrJw1rCFWY9F10vrs2kr45XFyUJ393W39I
-	qFsrZr9ava4qv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
-	0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
-	tVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
-	CY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU17KsUUUUUU==
+X-CM-TRANSID:cCh0CgA3SHSSIGRqCkPTCQ--.40042S14
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFyUAw4rCr4rAr17Ww4DJwb_yoW5JFyfpa
+	98Ka45Gr97Kr1UuF4qka1kZFy5Xws2yFWUGry5J3WF9rs8Cryavr9xKFy5Xa4Dt3srta1a
+	vrsrZr97Aa4UArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPlb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
+	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
+	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
+	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
+	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s02
+	6c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw
+	0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvE
+	c7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
+	AFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZF
+	pf9x07UZTmfUUUUU=
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 From: Zizhi Wo <wozizhi@huawei.com>
 
-This series fixes several issues in null_blk around lock initialization,
-memory leaks, concurrent configfs access, and module init/exit.
+The _show callback in the NULLB_DEVICE_ATTR macro reads dev->NAME and the
+_store path writes it. configfs does not serialize accesses across separate
+open file descriptions (buffer->mutex is per-fd), and _show takes no lock,
+so a concurrent read and write on the same attribute is a data race. The
+_show readers also race against writes to these fields that run after the
+configfs item becomes visible, e.g. in nullb_update_nr_hw_queues().
 
-See the individual patch descriptions for details.
+All of those writers now run under the file-scope lock: _store takes it
+unconditionally, and the setup-side writers run under power_store() which
+holds the same lock. The only remaining unsynchronized accesses are the
+plain reads in _show. Rather than annotating every field with
+READ_ONCE()/WRITE_ONCE() across files, simply take the file-scope lock in
+_show (and in power_show) as well. This closes the remaining _show-vs-write
+data races with a single lock and keeps the writers as plain assignments.
 
-Changes since v5:
-- Add a new patch converting the file-scope mutex users to gaurd(mutex).
-- Simplify the last two patches accordingly.
-https://lore.kernel.org/all/20260714041805.1088702-1-wozizhi@huaweicloud.com/
+configfs attribute access is not on the I/O hot path, so taking the mutex
+in _show is acceptable from a performance standpoint. The dev fields
+written in null_alloc_dev() and dev->power in nullb_group_drop_item() need
+no locking: the former runs from .make_group before the item is published,
+and the latter is serialized by configfs frag_sem/frag_dead against
+attribute show/store.
 
-Changes since v4:
-- Modified patch 5 to fix the check-and-deref race on dev->zones in
-  zone_cond_store().
-- Simplified the fix in patch 7.
-https://lore.kernel.org/all/20260709100452.3520482-1-wozizhi@huaweicloud.com/
+Suggested-by: Nilay Shroff <nilay@linux.ibm.com>
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ drivers/block/null_blk/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Changes since v3:
-- Added patch 5 (zones array memleak) and patch 6 (cleanup).
-- Added patch 7 (NULL-ptr-deref on shared tag_set queue shrink).
-- Patch 9: reworked the fix from v3's patch 6 to take the file-scope
-  lock in _store instead of scattering READ_ONCE/WRITE_ONCE.
-https://lore.kernel.org/all/20260708073917.2172392-1-wozizhi@huaweicloud.com/
-
-Changes since v2:
-- Dropped the lock rename patch; the rename and locking rework will be
-  sent as a separate series (per Damien's suggestion).
-- Patch 3: fixed the tense in the commit message.
-- Patch 4: also update dev->NAME in the "!dev->nullb" path, which was
-  previously lost.
-https://lore.kernel.org/all/20260707025542.1299859-1-wozizhi@huaweicloud.com/
-
-Changes since v1:
-- Added patches 4-6, and modify the lock name in patch 2.
-https://lore.kernel.org/all/20260706123507.3809871-1-wozizhi@huaweicloud.com/
-
-
-Zizhi Wo (10):
-  null_blk: use DEFINE_MUTEX for the file-scope mutex
-  null_blk: register configfs subsystem after creating default devices
-  null_blk: move unregister_blkdev() after destroying dev in null_exit()
-  null_blk: free global tag_set on init error path
-  null_blk: free zones array on device power-off
-  null_blk: clean up null_del_dev() to use cached dev pointer
-  null_blk: reject per-device queue resize for shared tag set
-  null_blk: convert file-scope mutex users to guard(mutex)
-  null_blk: serialize configfs attribute stores with the lock
-  null_blk: serialize configfs attribute shows with the lock
-
- drivers/block/null_blk/main.c | 92 ++++++++++++++++-------------------
- 1 file changed, 43 insertions(+), 49 deletions(-)
-
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index c7dfbec3e7d6..1c20d773dd0c 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -345,6 +345,7 @@ static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
+ static ssize_t								\
+ nullb_device_##NAME##_show(struct config_item *item, char *page)	\
+ {									\
++	guard(mutex)(&lock);						\
+ 	return nullb_device_##TYPE##_attr_show(				\
+ 				to_nullb_device(item)->NAME, page);	\
+ }									\
+@@ -476,6 +477,7 @@ NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
+ 
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+ {
++	guard(mutex)(&lock);
+ 	return nullb_device_bool_attr_show(to_nullb_device(item)->power, page);
+ }
+ 
 -- 
 2.52.0
 
