@@ -1,170 +1,107 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E36129AAEA
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 19:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785007149; cv=pass; b=YUwI2ZefbDEoEJvrozM4EgOv9Ud9j+l/U3lemInkl2RurQe1mI6wNiYH5XW/SyOenuQiE9dhnIBhRUvc5VSRythpoqpi0vSfbAdbbF5RbVJ7OQsReqsh3hkOSdCYNkVrYaEXhBhH39XNu+Apip933OU5rBalWoHKT/bB30IIszM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785007149; c=relaxed/simple;
-	bh=T8zwm8QhLSuQA9+E3OX2J/oLjudjveeXT+7DImBd6TQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vFxAU2lIaJRhDAXHYnY5X2rIWPmYj+dud2wR3eiq8YXjQgQyIfk2Ld1L5e3evD5e2+uohKGYAX99rRoznHCTD3p9+A//lgkJ616WXijJMxgYdz+YYrJN3YgubKsEGKTdB6fSHHGRZMoZjL3RQj+Y39tDkNZnuEHR1zPQxo25XKo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=KFKzorcv; arc=pass smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0BC625;
+	Sat, 25 Jul 2026 20:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785011472; cv=none; b=aTgBjb9cj0tsiNCIRNgwNLQgX0d4hZvqBukP+Rg2l7tWTaje0908uRIqsphDDLpNn90NS7itft0NcPZn0kT/lLzw0lkWg+AGJ+lbKUrBFyLPInQnST1u4p1GrXrFF2jSYORyEQQo4xyOyaRpTavkuvEMlc1C2OJHvum7JLtMtJs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785011472; c=relaxed/simple;
+	bh=e6KMoD3bd5/q6p3xQeg23qgiuejFXySUo/aGZ6esyCc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JKAGydDvVpvukxAV9Q1NF4vPSEA0b15yWfsrQ+p8Z/gHAJTBkG3dE+5eiVca8cKXSa3+Noh0ZRnip2j1grPveDwhnKx5JBqbrqP+cZ/zdtyC9p92rmeO423HfMKXTQCZvNPA2mBE33TwVY9FNnKOF7f2Gxtd/dBn9DwNGDP2Zzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAfTn9kP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="KFKzorcv"
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-43ccd57a931so312945fac.0
-        for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 12:19:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785007146; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GT8GWW0LXMbSI93XhosBzsqgP7q5607jl6WkZ4rQrixEFzahl6BWJLU+sAEesHWpSE
-         ecJYEjn04KZKUUVmRDagFPq9VM5X3CQbBH8k0MMu3p4451ulGfEESVLd60VKSvZnPIVT
-         3R2QGZeY8AJq22wk7U1BKp8+/3wQCZGrPRFPWKrWc9HnnR9pjSp8IlLXXnTponuoJIG2
-         zd4gvanUy0NQPxU2VfcqKTAGNaJcuWHh4ghnFvMa5xYHAoLbKDa9ZUe7H9+ioGaKCyYX
-         jFc5wrWW2Q+8SSBRjDSUku0tHdCjX7UDUxsDpTxvvjNjtOZcfiWZ3r8lnqyHWdnDEtx9
-         U5rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jWgm6co6pXhHaItsuSR7VaMCmCnMpKZ8efD8kAtRia4=;
-        fh=bUKAMZ46n2eZed/LcInT7yw/1lC3CRLgxkV23aQv6rY=;
-        b=mS/Oh8O8o6hX48DLfkoClhlBBg6wkVGLvEFhHx+Ne+LfCjFH0jyfariOkW+wQE9afq
-         pb10GvgqQV52MXLnB56ludBTw7c2GztmWkRROTy3VBauFNPHrbUcWLjqZjsWGKcWrlxF
-         H6p8A/JXop/oYhaMp/qg+Nicrpg2PHWtqOgzevqKkLq9xffuf6xhZPNLl9QQnffictzT
-         gF/N5mMrewkr+Jwzxg/ggtXuXLTOy8Q1GmpeGYK/a7ODxEiwlXOUJHNydJrQcOuhvzgx
-         gVuSM5eK97ZvcJbhRU1n1wjW1rBRJvJE4qgle0l+qPyonK1zEbCDHGjKelrP2BilvE63
-         e0Mw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1785007146; x=1785611946; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=jWgm6co6pXhHaItsuSR7VaMCmCnMpKZ8efD8kAtRia4=;
-        b=KFKzorcvQ98We58KSdOc2M0GpaZRsT+26Xq0o/z1OVD4SPTiNteG1jazgoQLNV9Qbh
-         ZL10APPQkPplTamBgqp6OPP9tRO76ua0lImUbKe5EKcRrks2kH974KBtxiP7rDwaGbnt
-         eZhTi80egnawPLAz3iDl8mztSg+IxDmDcY65QdXAxx+FyRY6ZQRENkV5UMuOt5kKtSOO
-         29LpEv783Z/NrZT2+Fb34KCKJGHyqiHewJ/dj2ds+GY3AIu7tSeup6OfSOlNKBSs+L+j
-         +zvxi8MV38y6k42wVKu3SJj9Cyp81+x8hruj5H9ShICU3v38wO3D/oPNSf/QbpiuDjdt
-         tvOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785007146; x=1785611946;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jWgm6co6pXhHaItsuSR7VaMCmCnMpKZ8efD8kAtRia4=;
-        b=G2EZfLNO+iS6LrvhIBcv6OWs0GJYnbxh4P4Ky0uiDM1ZhES5YhIGUMFn5YkPgqV7Ve
-         yzPZXwqS6XZxZjlipsXdf5HILkURBs2z/iZtb9Iw7qFDqFer5ZQIjKj5mJizAyIIrfui
-         naNRsIKlGm2o1ED9EbjRIxjCS5/JdbU/rKYZekYPFEItZO0/+LUufeIUClTg3+S89y9B
-         kG4zLzubj+X7xaHgkfNDF6dha9EsXr4Phf8pKj0XrcxXzGDaTRlL9eN884GlvvnbrPZP
-         1tV4pOOk/6yKLvepszFe4isq/Wsb3Rtmu1kkF8pATL5FYW3Ed76yd6W5Ml7NKsB/uhgd
-         el4Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rr9mM1HiZKndH8ts0Fr2U+T+bgMiDZ6ItjXfhMxap4gIzR0bDr1erkJnjuvzbfKmGD108yL68Pvt0eMsA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzikXuAR+DU8vdExJTKckFc7rJrX60PuZWnp8/NqyllKMm/DLwA
-	6EANCyN0bfgfOHPBiZYO8VpRXa0Y7Sk6MHgJDPH91g1OEnUY1ep6yDq78HxQce7vSO+4zByendF
-	ScUs3GMbkMfRH0Y5j7lDaDCqMIc+joMgfYrVI3dyu+g==
-X-Gm-Gg: AR+sD13FCC6dph0nbyKl6WTB08OSTJK8ZokjIMz4gYgE4He/VeVZa5S1sz10YceYOGj
-	MGeajRGjYRV+o91uZkqz22dauTVr4XrxCdNHOx5DAsVelHQ+DnyItAo+KY2DldpklJMTdqTlfIi
-	RYWRWFObCth6D3muohce8uR7bxQss/CB1QMh86iygkEbN7S8GAj4sd7Kb1Il5L+8ZLz43IFG7Qj
-	TBDuGRXpEuj47gJ/qWKYwqrYLiSIrlYqAKRDYn6GNNc18fcwUg5cFgMzm0gBOA=
-X-Received: by 2002:a05:6871:2008:b0:441:21b4:c9ee with SMTP id
- 586e51a60fabf-457f23abf4bmr1646409fac.1.1785007145763; Sat, 25 Jul 2026
- 12:19:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAfTn9kP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFFA01F000E9;
+	Sat, 25 Jul 2026 20:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785011470;
+	bh=e6KMoD3bd5/q6p3xQeg23qgiuejFXySUo/aGZ6esyCc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=hAfTn9kP3ZABFKIwidJBkzkwUEnV03/r5N7p8kmUos3uDtUKUWtEJzQPpdypzC87s
+	 s8zXrjsDbl2M4eM1W7J86H4KiLLuZnMtxMMILtEw98qiQcngdzhm3Z933lwVaUuZ1u
+	 NLkyUWEUlaRXQiJD2BrV3+doGFNu5m2sLbsSq0EGZklaA6R4wtvLOLLa2OnPQe5qNl
+	 qRc/eqpUyUDjcyObmg1ruSpXH9PI078U1i4aarlF7k3SAVuPPwJdBfCiYHUHqv1JgK
+	 gHSHbd+Pb+4KEwvFVr0Xj05kVhoMd7+HPlRE8f80fEhbz02ckPWPFwbzdqixw/v4UL
+	 pVfAw00n8dMXA==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Petr Pavlu <petr.pavlu@suse.com>, Tony Luck <tony.luck@intel.com>,
+ Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Dave
+ Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Philipp Reisner <philipp.reisner@linbit.com>, Lars
+ Ellenberg <lars.ellenberg@linbit.com>, Christoph =?utf-8?Q?B=C3=B6hmwalde?=
+ =?utf-8?Q?r?=
+ <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>, Johan
+ Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Michal Januszewski <spock@gentoo.org>, Helge Deller
+ <deller@gmx.de>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+ Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Trond Myklebust
+ <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+ <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, NeilBrown
+ <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+ <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Mark Fasheh
+ <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, Joseph Qi
+ <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
+ <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+ Luis Chamberlain
+ <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez
+ <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Aaron
+ Tomlin <atomlin@atomlin.com>, Pavel Machek <pavel@kernel.org>, Len Brown
+ <lenb@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Danilo
+ Krummrich <dakr@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David
+ Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>, Paul
+ Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E.
+ Hallyn" <serge@hallyn.com>, Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org,
+ drbd-dev@lists.linux.dev, linux-block@vger.kernel.org,
+ greybus-dev@lists.linaro.org, linuxppc-dev@lists.ozlabs.org,
+ linux-acpi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+ cgroups@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-pm@vger.kernel.org, driver-core@lists.linux.dev,
+ bridge@lists.linux.dev, netdev@vger.kernel.org, keyrings@vger.kernel.org,
+ linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] time/jiffies: Include linux/sysctl.h for
+ proc_int_u2k_conv_uop(), ...
+In-Reply-To: <20260721131207.803760-3-petr.pavlu@suse.com>
+References: <20260721131207.803760-1-petr.pavlu@suse.com>
+ <20260721131207.803760-3-petr.pavlu@suse.com>
+Date: Sat, 25 Jul 2026 22:31:07 +0200
+Message-ID: <874ihmke0k.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260724100327.43482-1-yangxiuwei@kylinos.cn>
-In-Reply-To: <20260724100327.43482-1-yangxiuwei@kylinos.cn>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Sat, 25 Jul 2026 12:18:55 -0700
-X-Gm-Features: AUfX_myLJlM_9VyHEwWjEzSp6A4ddQ9jj_m2Z8XqxUUiqXR57zxHxOs-6sctL1I
-Message-ID: <CADUfDZq1djzvp0rmG48jwavAZGWAZ4Fe3BUCCFxLMUPewbcH5Q@mail.gmail.com>
-Subject: Re: [PATCH] ublk: configure io buffer before taking uring_cmd
-To: Yang Xiuwei <yangxiuwei@kylinos.cn>
-Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Fri, Jul 24, 2026 at 3:05=E2=80=AFAM Yang Xiuwei <yangxiuwei@kylinos.cn>=
- wrote:
->
-> With UBLK_F_AUTO_BUF_REG, ublk_config_io_buf() may fail on invalid
-> auto buffer register data in sqe->addr. Calling ublk_fill_io_cmd()
-> first leaves UBLK_IO_FLAG_ACTIVE set while io_uring has already
-> completed the uring_cmd. The tag can no longer be fetched, and
-> device teardown may hang or complete a stale command.
->
-> Fixes: 52460dda3a77 ("ublk: move auto buffer register handling into one d=
-edicated helper")
-> Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
-> ---
->  drivers/block/ublk_drv.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c2c11f2a01e7..d932a4026031 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -3295,9 +3295,9 @@ static int ublk_fetch(struct io_uring_cmd *cmd, str=
-uct ublk_device *ub,
->          * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
->          */
->         mutex_lock(&ub->mutex);
-> -       ret =3D __ublk_fetch(cmd, ub, io, q_id);
-> +       ret =3D ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
->         if (!ret)
-> -               ret =3D ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
-> +               ret =3D __ublk_fetch(cmd, ub, io, q_id);
+On Tue, Jul 21 2026 at 15:11, Petr Pavlu wrote:
 
-I'm not sure this ordering works either. __ublk_fetch() is responsible
-for checking that the I/O is in a valid state to fetch (device not yet
-started, I/O not yet fetched). It wouldn't be safe to overwrite
-io->buf before this check. Probably it would make sense to perform the
-sqe->addr validation before calling __ublk_fetch() and then make
-ublk_config_io_buf() infallible.
+> The kernel/time/jiffies.c file uses proc_int_u2k_conv_uop(),
 
-Best,
-Caleb
+jiffies.c uses ...
 
+> proc_int_k2u_conv_kop(), proc_int_conv(), proc_dointvec_conv() and
+> proc_doulongvec_minmax_conv(), which are declared in linux/sysctl.h. It
+> currently relies on this header being included indirectly through
+> linux/module.h -> linux/kmod.h. Add the missing include in preparation for
+> removing the linux/sysctl.h include from linux/kmod.h.
 
->         if (!ret)
->                 ublk_mark_io_ready(ub, q_id, io);
->         mutex_unlock(&ub->mutex);
-> @@ -3447,19 +3447,18 @@ static int ublk_ch_uring_cmd_local(struct io_urin=
-g_cmd *cmd,
->                 if (ret)
->                         goto out;
->                 io->res =3D result;
-> -               req =3D ublk_fill_io_cmd(io, cmd);
->                 ret =3D ublk_config_io_buf(ub, io, cmd, addr, &buf_idx);
->                 if (buf_idx !=3D UBLK_INVALID_BUF_IDX)
->                         io_buffer_unregister_bvec(cmd, buf_idx, issue_fla=
-gs);
-> +               if (ret)
-> +                       goto out;
-> +               req =3D ublk_fill_io_cmd(io, cmd);
->                 compl =3D ublk_need_complete_req(ub, io);
->
->                 if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
->                         req->__sector =3D addr;
->                 if (compl)
->                         __ublk_complete_rq(req, io, ublk_dev_need_map_io(=
-ub), NULL);
-> -
-> -               if (ret)
-> -                       goto out;
->                 break;
->         case UBLK_IO_NEED_GET_DATA:
->                 /*
-> --
-> 2.25.1
->
->
+Can you please split that spaghetti sentence into paragraphs?
+
+https://docs.kernel.org/process/maintainer-tip.html#changelog
+
+> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
+
+Other than that.
+
+Acked-by: Thomas Gleixner <tglx@kernel.org>
