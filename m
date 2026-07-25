@@ -1,63 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F3E38AC8B
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 03:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9C81E32D6
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 03:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784949158; cv=none; b=FvIKssXaeNRtKrYfu7Yhrm4Qsnc6tvMj/j4mETfhYc3fqPSS1uD5muc5E6bokJox+v/jhb5J57rIHmvurDNwhoQ/qaoBj2tDBXxj3mM1JcJLTF7/se8xd2aY/uQRV4fiIY4pE3htKwJyBbCC5enxdZqbtoX5PgRc4/VvgbpqqXE=
+	t=1784950855; cv=none; b=DvBVc51bGmYcl8wFX5xZN/APhYgOyH3gyQoQUIow9D5eMvQWPLUwwuXZfxzMPvtCF3u2yagr7Iud+czCYNCtpHeaUcj3GfSiSX3AmV4W17VomoQLhnBaGeBvDxYtfLq8y3uwPBIk3Q2zJ+BEsgrfPEN2mXChAsMtpDpPTvwOwBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784949158; c=relaxed/simple;
-	bh=BnoLwqViMef5Sd5t5PCbinzXp/aVFcgIxst8Orqjids=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DBN/gD5+XxtjGoF2zglmuZVj4brHhyxz3vMfbRG/qyznZIIuvaUotgU5woQZA55/3jzleXazW3Mm25erJ35R3DnEv9KWmzc6T4qWkMxbJ8dqETug185fFNHgct0g7TSBxUHFpJnq/GlxjFK3H4NHwWprxn9sW7nD5wYl6zyPos0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOKvNWeQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784950855; c=relaxed/simple;
+	bh=4YSSlMyuBy+xqXGXj8Tpv/4cW8UnYQeiG/0mlrVu4FU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lZ+7ubn+QIYuDLvQcCYQzzRHj4NwExZqsW5KHGAD4kSL1pVooc0BZ5EtytBS6BO9GHrtjV4qTpnxabYzCx1HyULYotoY6vLZEkEDpP+Z04mEY2g5PQNlOKfyc46niYxllXy70FLZSOt9IXcq/Z2ukfIP9SXJvIpVBpgJzdqu/Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=eJO9iuM5; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOKvNWeQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD2231F00A3D;
-	Sat, 25 Jul 2026 03:12:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784949153;
-	bh=U+k0EtPQ5GA/GHTDSMGJ7xohOvxP6NiSdp49Q7bvKKM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=UOKvNWeQ0Rwhmahaxwh32Yfy2Q8Wi3UwgDd5wQ8v4mWCG8kpULR5w32+dnKpoXJm9
-	 z5FbNYjaTDTnbRQSHhuccSIT3+8MqBgbTR9WpwhXsZaW4mDRJBn7DlYk0sRZRkAIha
-	 GPa6pVs4W/8EJVfDSeM8DeehYWtIWKxLELkHV8xdf3m/+Mg3azzorNtgrY1QglCekB
-	 G+9WiIt13x4FVN82CIgfKAZKJ5b9zP+TSKoHyY4jtiV8FzMdPGOHl1ML+yLKyLFCZO
-	 O9wcUOSMuZHNA+g83GJwUdhamycNLC/NZLp2/QhM/ZiiHPp0+DNFdynFXcfd5cHBQs
-	 VRpODocPv0kUg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DF5B138111DB;
-	Sat, 25 Jul 2026 03:12:01 +0000 (UTC)
-Subject: Re: [GIT PULL] block fixes for 7.2-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <3f1dae20-214a-4b2f-b13e-2c996b31acca@kernel.dk>
-References: <3f1dae20-214a-4b2f-b13e-2c996b31acca@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <3f1dae20-214a-4b2f-b13e-2c996b31acca@kernel.dk>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260724
-X-PR-Tracked-Commit-Id: 093fbffe03f5c1bb9c10a9e5aa65b23250844403
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0ce37745d4bfbc493f718169c3974898ffec8ee7
-Message-Id: <178494912062.3393598.5722314186890666923.pr-tracker-bot@kernel.org>
-Date: Sat, 25 Jul 2026 03:12:00 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="eJO9iuM5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=4Y
+	SSlMyuBy+xqXGXj8Tpv/4cW8UnYQeiG/0mlrVu4FU=; b=eJO9iuM5rZcCC9LCgQ
+	y2O3R3ITt/HHM88b6esiVhQ8r90xAEcdP5zZZ13OapaBeI5QjD0q8iGvXiCvaZQp
+	qm9dvXsfNoqDFLxgrzo4L7GBxIOhfNgf6AecybGo2jl2VE1E4C0zMqcfvZO4aeoS
+	pxhcc4ui86hO7TP4Dc9b1fWA8=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wA3oPghMGRqxxkJLg--.4927S2;
+	Sat, 25 Jul 2026 11:40:19 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: efremov@linux.com
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: Re: [PATCH] floppy: avoid NULL deref in reset_interrupt when cont is cleared
+Date: Sat, 25 Jul 2026 11:40:07 +0800
+Message-Id: <20260725034007.2829360-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <27146f5c-5e57-44a6-bbe9-d910d8bbdfcf@linux.com>
+References: <20260723073512.11120-1-yangxiuwei@kylinos.cn> <27146f5c-5e57-44a6-bbe9-d910d8bbdfcf@linux.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wA3oPghMGRqxxkJLg--.4927S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrXr15CrWDXw1DZFWUCFW3ZFb_yoWxGwb_C3
+	s3Zw4DAw1UXa18JFsrKw1DJrs7CFs09ryjvrW0gr1xJ34xJwn3Gaykuwn8Zw18GrZIkas8
+	ArnIq34xur12vjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjgTmPUUUUU==
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6QPHWGpkMCM0uwAA3n
 
-The pull request you sent on Fri, 24 Jul 2026 19:33:51 -0600:
+Hi Denis,
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260724
+On 24/07/2026 17:42, Denis Efremov (Oracle) wrote:
+> It looks to me that this check closes the exact reported crash, but it doesn't
+> fix the root cause of the problem. I think cont can be set here with a valid
+> but unrelated continuation while stale reset work is inside result(). We need
+> a more generic solution to close the bug here.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0ce37745d4bfbc493f718169c3974898ffec8ee7
+Agreed, this patch only avoids the oops and does not fix the underlying
+lifetime issue. I went with the simple guard first as a minimal
+workaround for the crash we hit.
 
-Thank you!
+I will look at a more complete fix for v2. Suggestions welcome if you
+have a preferred approach.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Yang Xiuwei
+
