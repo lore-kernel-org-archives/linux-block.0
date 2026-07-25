@@ -1,122 +1,108 @@
-Received: from mail-yx2-f3.google.com (mail-yx2-f3.google.com [74.125.224.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC2DBE63
-	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 01:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7048E346A1D
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 02:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784943238; cv=none; b=ccAgZVO/IhqcqIYiZgiIgGz1d49UdYfWXVQdcbBPCwVebeWgEgDSLKG+uBBjf8WkYvc2O6+sJY/RB89NxpGO1MpIsrdw5scvYB3Sc2ijtS4T3xlC2KlYAPfs8S9smDd9VLbjGjOmlMqaI3ugTWSjMOBjSmyJoyXu2Bi2fHnd8aQ=
+	t=1784946841; cv=none; b=INeC5QSAR4K9DbVWs6J2yFxmhkdH2W5zTuwQ9qNfJHGU5mdsdchBWLicf055UR4Uh7lELiUG8FPs4yrmOHZmDjkIYIHRJswsVFT6iXa5iclxMSmzigyt92pro1Gb7muaEA8g1g0ZobCuj9NSDwKS6e45NFQRh8SXU6PYQ8xSM9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784943238; c=relaxed/simple;
-	bh=mZ1inUOTN+yH1N5I91jr69QiAJRXRSDLRebzGEpV2fY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=lZykQjbuyjp6HNOApSe/KAL/2sB0ixY2M2buxX69J14YdArTmxzUNb9vrILEOpumxIQz1ASbwbGBH5US/gTxBpE4dqRMM2tSVSVZ+N0TP+FG2W7ITfo+7YF7B6OWpwelfl0JJuOGfTNXmB5ogkaStFvt3JeB/jAUYlzBzdjcqEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=cJh7P0LC; arc=none smtp.client-ip=74.125.224.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="cJh7P0LC"
-Received: by mail-yx2-f3.google.com with SMTP id 00721157ae682-81dfd9cae2cso3328067b3.0
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2026 18:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1784943235; x=1785548035; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qElFBQ39C7n9ZaicWYMVoNS4PnOREctSMAe/+ybWRuA=;
-        b=cJh7P0LCfUOrqyh7EIy3yc92Q7w/UejuHJBg18YyPzfR2dDnhjCm6KsZyn7AteNv8F
-         vypOm5B8HClqjGKu9E7CmaEis4L6p866SfpuUxAijCFwDWO88EcjrtVTPMuX1ZKaxPB8
-         dRgikLtV2t415QnW0EcG9K5HOhsO8HmPBT4KLs1DX8yWql1o9n3Msjvio1YHgfYQvKZA
-         FehH/w/oi9zMAdm66qxqQ71VBjBzS4EXuIhHzM9RVG+wdM1nWy+guWgeXbydbbmSZ1ak
-         0LtO5xkgSPGilEstR2nBlEZ643Mm8Ft8V8jUMppc6TPHGbLETBqtLFMI+P7O7l4ukzxh
-         D7/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784943235; x=1785548035;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qElFBQ39C7n9ZaicWYMVoNS4PnOREctSMAe/+ybWRuA=;
-        b=kv4MMUds2jpTBWOwah3q0T8BmYcJaTmPjB2blWXx7fVQ3eOBDZp/WrC4rTT2W4naBX
-         WqUvhjXtgn1czuKlDfIpS1j/3p0lBqZwNf1yYbPwRTEjMe434d9jTyDbsR0yLQwbT+mL
-         69p4kAqlHBsrP0KAYLPlXInakCDKdyk9nabrTFCRbQ7LSOAwSe4lKymtD14fuOuR7JHT
-         hSCJBHsz705aE/ktZF6+HSGG1ux6xXvezYw2yGYR2M0KtZUAcbTQoC62ktPwIoYqHiVj
-         FYLLprvnKbyXw03GaamVM9Ehy/ekipb/9wwqHTLgwRvB+NT7alwQelqwTvhuC+MQSmr3
-         tt4A==
-X-Gm-Message-State: AOJu0Yx1TvyzJ/0VZWQIHdPbkauoVbryXXXKKIBY7Q5gQQDBNhCs33QT
-	gLZrIsa0KZKr8ktKCszSZ5JCHu+bffadsy31NoVBdec7JX4CDmp9d9eZ0/CuPUpq5r2IKsLobCE
-	tbnIepnXafhu1
-X-Gm-Gg: AR+sD13z3RvmgCe+RklYXSd4eI2FNmuRArim6eYKYFh9eSW0nRK1ZLB2LE5nY1wEzko
-	0fXvdM5SNtVO9liBaV188oKu/I4UiHvJ0/hzCOiAq4KyXcLMpkEJpatSkyGJFBnGsOqQVlLuWg2
-	aRGG+VgKAN6GdXMIcjO56G0bqtubafA9sKMAOKwXv9uDxpl9n5eOKBnD14avaniVZViz37qprR5
-	yMNPLI0UlQbt7oEeYC8EHvmsAv0mOFeGEwdea40uh0sWimnncZu2t2dnJRacH0boP8s6pigHHtV
-	aRoLYTyQvpgMBSbl6sm9COlYt/KSYyZyAlKChcbE2YRzBljyPAyDifsrZk3dBT6mXVVV+odxct5
-	jhJu4dpWMZc9dJR8Abujv16JgLDvDCScA0g7k5BMjHuBw8MOIHLDtOsG7sFzEIuPm279zJGvfZT
-	+XIzLtNxEXoZERKuGCCcJENsLHoGZkH7GfnZKzJ3T8K5wtuL6NLl9RSSyD8Cs=
-X-Received: by 2002:a05:690c:3344:b0:812:c236:1287 with SMTP id 00721157ae682-81f69e52984mr2649057b3.45.1784943234820;
-        Fri, 24 Jul 2026 18:33:54 -0700 (PDT)
-Received: from [172.17.0.108] ([50.168.186.2])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81f6576ee52sm7564057b3.3.2026.07.24.18.33.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jul 2026 18:33:52 -0700 (PDT)
-Message-ID: <3f1dae20-214a-4b2f-b13e-2c996b31acca@kernel.dk>
-Date: Fri, 24 Jul 2026 19:33:51 -0600
+	s=arc-20240116; t=1784946841; c=relaxed/simple;
+	bh=wdt4FTwzz4gr4HU3vHsJdydu/S+y7AMUgSJc+hyysWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D+9kbXpnf573Z6X/QUKFzkyvtw1Kz94u6SQQa5BQtuv1VPzeme8vvDR8zO43yGVPnisCz8P2TbekJK/VtwIFFwXXK7Bo5679nnxucNpHFr3UFuZlsLDMgvXXlroFT18JZZ4lDTsSqRQbOLePov0HW+O11ChzcCo1I0U6Wr5JxxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h6TS261X1zYQtwh
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 4B8764056D
+	for <linux-block@vger.kernel.org>; Sat, 25 Jul 2026 10:33:56 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgA3SHSSIGRqCkPTCQ--.40042S10;
+	Sat, 25 Jul 2026 10:33:56 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	nilay@linux.ibm.com,
+	bvanassche@acm.org,
+	yukuai@fygo.io,
+	kch@nvidia.com,
+	johannes.thumshirn@wdc.com,
+	kbusch@kernel.org,
+	linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huawei.com
+Subject: [PATCH V6 06/10] null_blk: clean up null_del_dev() to use cached dev pointer
+Date: Sat, 25 Jul 2026 10:25:05 +0800
+Message-ID: <20260725022509.714271-7-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260725022509.714271-1-wozizhi@huaweicloud.com>
+References: <20260725022509.714271-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] block fixes for 7.2-rc5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgA3SHSSIGRqCkPTCQ--.40042S10
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw47WryxXrWxJrykCFWUCFg_yoW8Jw1fpr
+	WjgF1jkFW8AF1UZF4qkws7XFy5Ja1Dt3y0grWjyasY9ryayryYyrsFyFy5WF1UX397Ar43
+	ZFnxZFWxWay8J3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x02
+	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
+	80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
+	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
+	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E
+	5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtV
+	W8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY
+	1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
+	v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuY
+	vjxUF9NVUUUUU
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hi Linus,
+From: Zizhi Wo <wozizhi@huawei.com>
 
-A few block fixes for this week:
+Replace remaining nullb->dev dereferences with the already-cached
+local dev variable. No functional change.
 
-- Fix a ublk recovery hang, where END_USER_RECOVERY without a
-  successful START_USER_RECOVERY could be satisfied by a stale
-  completion latch.
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/null_blk/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- Fix a stack out-of-bounds read in the CDROMVOLCTRL ioctl.
-
-- MAINTAINERS email address update for Roger Pau Monne
-
-Please pull!
-
-
-The following changes since commit df308a14585649f7683a560f5c94978ab4f8224d:
-
-  block: fix aligning of bounced dio read bios (2026-07-16 06:11:37 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260724
-
-for you to fetch changes up to 093fbffe03f5c1bb9c10a9e5aa65b23250844403:
-
-  MAINTAINERS: update my email address (2026-07-21 06:24:43 -0600)
-
-----------------------------------------------------------------
-Ming Lei (1):
-      ublk: wait on ublk_dev_ready() instead of ub->completion
-
-Roger Pau Monne (1):
-      MAINTAINERS: update my email address
-
-Xu Rao (1):
-      cdrom: fix stack out-of-bounds read in CDROMVOLCTRL
-
- MAINTAINERS              |  2 +-
- drivers/block/ublk_drv.c | 47 ++++++++++++++++++++++++++++++-----------------
- drivers/cdrom/cdrom.c    |  1 +
- 3 files changed, 32 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index e063c931dfca..249caaf6ce89 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1779,7 +1779,7 @@ static void null_del_dev(struct nullb *nullb)
+ 
+ 	del_gendisk(nullb->disk);
+ 
+-	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
++	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
+ 		hrtimer_cancel(&nullb->bw_timer);
+ 		atomic_long_set(&nullb->cur_bytes, LONG_MAX);
+ 		blk_mq_start_stopped_hw_queues(nullb->q, true);
+@@ -1791,7 +1791,7 @@ static void null_del_dev(struct nullb *nullb)
+ 		blk_mq_free_tag_set(nullb->tag_set);
+ 	kfree(nullb->queues);
+ 	if (null_cache_active(nullb))
+-		null_free_device_storage(nullb->dev, true);
++		null_free_device_storage(dev, true);
+ 	kfree(nullb);
+ 	dev->nullb = NULL;
+ }
 -- 
-Jens Axboe
+2.52.0
 
