@@ -1,48 +1,30 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52743EDE77;
-	Fri, 24 Jul 2026 21:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4BD3B1B3;
+	Sat, 25 Jul 2026 00:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784927773; cv=none; b=fDipWt6vs1eTjWROIjKNTi3GSNRXxJyeHUPj1NapJK/s7zd7lX1fYAk1avslL4bssaWi4pSLM2B5KHbpGcNPt+trW7mKmnqRPDMYwAKHZRlaXF3mA/4ivpgS6Llm6wwoNTDHVdak1KHHVq9H6hu6S5uRoIJyhFqaW1tB+Odvsd0=
+	t=1784939349; cv=none; b=XMr7gLk5lmm5GWozjMnbZLjNmsl2/9Ov5UL3ZixrDx00N5naZiODbXa4HizjbIb+NphYolW/wowHifFy5aNQCXAfd4EogMn8o6TxnmZouS05lyh8vTLI6WF9chJVnuYbDB7qGKjgBkHo9MnRR2hm5sHP3zXZMOtLn/C4DXguxAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784927773; c=relaxed/simple;
-	bh=49Jsa6TSufuApX1v1B9niAScIfPb1lgZo7oMj1mE+jE=;
+	s=arc-20240116; t=1784939349; c=relaxed/simple;
+	bh=+3XC2swu5r9T7CSdaGFC5WcnSLB4wf6F/7gTt2Q1gHg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C+LE+g0+y/6Ta0u9yC8HxDB86GJH8+lS9zOjOux5SJX2Uc5ng4B3KGulE8o1NhflmDjR2fds/hR1A4WAZyeZmFg+BpppD8UsgdafGzVxGK3WgbprptTrmXoPVb3/Qjc87FEZdJyqPXmFGNwL7tp2h/xmB7lYixzPl+lP7dFvIpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=g+ZmKSfH; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="g+ZmKSfH"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4h6LQ35nbQz1XM4Tn;
-	Fri, 24 Jul 2026 21:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1784927765; x=1787519766; bh=wm/Y7puwu6OFnzxn9rAksSi6
-	ksgugu85bXB309vd0jI=; b=g+ZmKSfHuY6G0KqT7dqd0ivw4dje/oBfEBVp22aM
-	cWQGNVTbzTAysB4R+hURyyhYrm8CbzV1Saspj6IQslQQO59w7O4Z34aKffWPRXJB
-	0+QNV5oafMItjMf6XLm1g0IlMP5kbJELBOhTb1N/43I9xJ1vWhDf18nMwl8WWmrc
-	6qkqwv1lnK+i/BhqtW6dCti5gW7n0i6UTXkEh7jYE7+nbHhBVlkCdJScunE2/xVh
-	C1WiRTcnqoGTzWmnNGaFabZEKVMzXKgNf9sL3xR0xiURHG3uuj1zO7tYSHlTmkPk
-	UkdPcjj1mhJ7gs+JLqRswvZkSFTWd4tDtw7hvgPd1A2Rsg==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id fbaGJMs_t4Pu; Fri, 24 Jul 2026 21:16:05 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4h6LPs6zCNz1XM4TB;
-	Fri, 24 Jul 2026 21:16:01 +0000 (UTC)
-Message-ID: <30c062e3-1f8b-43a9-8c85-4bc86cd74336@acm.org>
-Date: Fri, 24 Jul 2026 14:16:00 -0700
+	 In-Reply-To:Content-Type; b=WWUATdPPGuV28z/FD7lDedv+ndXg8Mpi+tv6xMiqAPUDwWAO1wEZeyMW/AC8MqbfIT93G8xYQgwP1vdeqzh0836ffel5VyvH4wthNZ8nRiPb+Vr2QrMjzuxG7HjD9x/nQCb6CLNnKQF/AF0uPm51NJnfmm6rvpABn7t12WEQpUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h6Qgw4WykzYQtwt;
+	Sat, 25 Jul 2026 08:28:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id E33AE4058D;
+	Sat, 25 Jul 2026 08:29:01 +0800 (CST)
+Received: from [10.174.176.179] (unknown [10.174.176.179])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgCX8W1LA2RqJrDICQ--.23231S3;
+	Sat, 25 Jul 2026 08:29:01 +0800 (CST)
+Message-ID: <57d39035-f065-47d7-a100-5b3bc9d952c2@huaweicloud.com>
+Date: Sat, 25 Jul 2026 08:28:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,60 +32,65 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 9/9] null_blk: serialize configfs attribute shows with
- the file-scope lock
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, dlemoal@kernel.org,
- nilay@linux.ibm.com, kch@nvidia.com, johannes.thumshirn@wdc.com,
- kbusch@kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix BLKSECDISCARD zero-length range causing page
+ cache invalidation
+To: Bart Van Assche <bvanassche@acm.org>, Zizhi Wo <wozizhi@huaweicloud.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
- chengzhihao1@huawei.com, wozizhi@huawei.com
-References: <20260714041805.1088702-1-wozizhi@huaweicloud.com>
- <20260714041805.1088702-10-wozizhi@huaweicloud.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260714041805.1088702-10-wozizhi@huaweicloud.com>
+ chengzhihao1@huawei.com
+References: <20260704073942.3760597-1-wozizhi@huaweicloud.com>
+ <4ef6f2b4-57b9-40cc-a5cd-e34473e1cba3@acm.org>
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+In-Reply-To: <4ef6f2b4-57b9-40cc-a5cd-e34473e1cba3@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgCX8W1LA2RqJrDICQ--.23231S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruF4kZF1UKrW5CF13Wr4kWFg_yoWDXFg_Xr
+	18AFyrA3W8XF4xJa1qkayfZFWxJ3yUWr4DJrWkGwsru3sxGayrZFW8trZY9anxJa1FgFnI
+	9r909ayjvr1SvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbckFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
+	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
 
-On 7/13/26 9:18 PM, Zizhi Wo wrote:
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 67cd32d28887..c8487a630e1a 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -345,8 +345,14 @@ static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
->   static ssize_t								\
->   nullb_device_##NAME##_show(struct config_item *item, char *page)	\
->   {									\
-> -	return nullb_device_##TYPE##_attr_show(				\
-> +	ssize_t ret;							\
-> +									\
-> +	mutex_lock(&lock);						\
-> +	ret = nullb_device_##TYPE##_attr_show(				\
->   				to_nullb_device(item)->NAME, page);	\
-> +	mutex_unlock(&lock);						\
-> +									\
-> +	return ret;							\
->   }									\
->   static ssize_t								\
->   nullb_device_##NAME##_store(struct config_item *item, const char *page,	\
-> @@ -479,7 +485,13 @@ NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
->   
->   static ssize_t nullb_device_power_show(struct config_item *item, char *page)
->   {
-> -	return nullb_device_bool_attr_show(to_nullb_device(item)->power, page);
-> +	ssize_t ret;
-> +
-> +	mutex_lock(&lock);
-> +	ret = nullb_device_bool_attr_show(to_nullb_device(item)->power, page);
-> +	mutex_unlock(&lock);
-> +
-> +	return ret;
->   }
 
-The above changes would be much more elegant if guard()() would be used 
-instead of explicit mutex_lock() and mutex_unlock() calls.
+在 2026/7/25 3:39, Bart Van Assche 写道:
+> On 7/4/26 12:39 AM, Zizhi Wo wrote:
+>> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") 
+>> fixed
+>> the start+len overflow via check_add_overflow() but did not handle the
+>> start=0, len=0 case. There, start + len = 0, so end = 0 passes all 
+>> checks,
+>> and truncate_bdev_range()->truncate_inode_pages_range() is then called 
+>> with
+>> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+>> the entire page cache is invalidated.
+>>
+>> Fix this by replacing the validation with blk_validate_byte_range(), 
+>> which
+>> already rejects a zero-length range and is what BLKDISCARD uses. This 
+>> also
+>> switches the alignment check from a hardcoded 512 to
+>> bdev_logical_block_size().
+> 
+> A Fixes: tag is missing. Once this has been addressed, feel free to add:
+> 
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> 
+
+
+Thanks for the reminder, I will add a fixtag in the second version.
 
 Thanks,
+Zizhi Wo
 
-Bart.
