@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764821C28E;
-	Sun, 26 Jul 2026 15:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6663C3BE0;
+	Sun, 26 Jul 2026 15:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785080594; cv=none; b=USvdqUl47/8ZKx7lAtLYrmUQdUCdHGq/avRKlHG3oZLohyWb79P3YNxAeoUI2trveYaG2lb8b0SmDszY7VXABzfAmoIgkhlzx++Pelg54uVcrIvr4UWjcDRlJO6AAuusKAHxExekuDLI83zEPxPZP68wjx2TXRIjE6fdNEwB1T8=
+	t=1785080717; cv=none; b=jNUNLXnMrmtYCoZmdfH3L2/dQ8kEPrRb5+Mn/XT8ec1T/JofZNbNN3VFj09pFGDb631xVApQXxdjPq2gLFbYX1jKbM53TLZzjWDZJroLxybak+ow2VzjVP9AjmIc3FmFytV0NfruSq3C41SZXbaHGE3X/H/gieDV8QNzRGktYp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785080594; c=relaxed/simple;
-	bh=n7iE/yntPI3uFNwpBVh40bqH3P6q9tzdbW1mUb0ASWw=;
+	s=arc-20240116; t=1785080717; c=relaxed/simple;
+	bh=H2qNQ8oAvDhXqQN1cAkSRyMOHIihYX7k1dLHRrj30CA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=orYbxQ8thyyY4nZR62AkCLRIh+YFpRCyqiK2oarGMJS1z/zMn6/KkQgW0oXh8qOEEgGO3HVoVQgXfSp/WjGe6mdvYUZXn6EKIpwMmCyJN+hjQdAOdXPnCupH4kjoOLGn8p8Z9OaS+xwgOoKeuJmLyKIi8KpiNfzbQK3n5YD6zYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=Ck9Fg8O/; arc=none smtp.client-ip=212.227.17.13
+	 In-Reply-To:Content-Type; b=lOw6bR87CMiK1Q5Oj8MTSEKUL9mVdhNILYU9sd+hzmdE0/WGDxpD66ifxMKldcV64czSYy1birs43ZEqT+6nKk6Nis8RThgN9NU6SA/1j9Q6KSqmlXwGLuOj5IYb5ORKoV9kHbmhlp4Mg+EUiWWZWS5jL0Eg6TOcA9kRqrhSCdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=q/4ZP1DB; arc=none smtp.client-ip=212.227.17.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="Ck9Fg8O/"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="q/4ZP1DB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1785080581; x=1785685381; i=laurent@vivier.eu;
-	bh=x8Z59e8xyy6tHJFJNMj3PmHwt5BxEra5gsGyWJcrDiU=;
+	s=s1-ionos; t=1785080707; x=1785685507; i=laurent@vivier.eu;
+	bh=xAuAflx5WoYvb/7BGHEQE4UATb+tkAu4hFFftt0G7hg=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=Ck9Fg8O/rdT0Z7ZdMn/8pR6O0fKS6UM+LK6sOyUHxrouZiXWfm/fH4xfXV6foujn
-	 yYqzq9H8vB2F6g/o2Ozg0Gy8MJeHwy3qq/UbIBe+iUQvJmmXEh749oukU4YnPyb3P
-	 45HlNmg7QmV2GYUukd8gLPL/VmJsWH5jVhqmvg4UZYW+ZT3i9md7aZV887HCj7TZ9
-	 LGHuGXI+fSuJa42cNfkUMUNGrDc2bDVEMGl70Net/7VmxoGc2X88YuIVFlWwNBBeV
-	 vwHbHWi41L+OUmTRQx2C7pvadQhgSe5MkKcMEr3e95GK1JLvoB/w9RCPyhRHhB4tY
-	 AjnfIn/alP1o7kFwfQ==
+	b=q/4ZP1DB4gKoVXO+Cq376zTjlixjSOMU6OuyzyrgY+H+mHo9kyvSIKmcGUnllS2G
+	 h+QcdHP4BQBbdgSXLBXvapeGQH2fh9tpAVJy8kp8dKAnWIyASr4ue55vaRImV77aC
+	 U/dahBK1Wsp5+T0cjBDgUwrmdAyj1VkEvnD2Ad5aPfH0kEl7cHyQU/i8c+pNuzwGW
+	 paA43NM+C1Scgf+8c6lqD3FHn15/yOAUh9BjIeuRAmq0/QnD9eGoCHzcqwYGLhJ2y
+	 +0fyXYrffTTele4JyuSje43T0q/UoIDwDtlr1bTgkGzDcAXeq25kBTKaIgyTXnvxz
+	 8Z+175iFBiYZqBcR/A==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MSckp-1wQ7J62gFl-00L37H; Sun, 26
- Jul 2026 17:43:01 +0200
-Message-ID: <792320f7-8741-4f90-b480-b47347588cdb@vivier.eu>
-Date: Sun, 26 Jul 2026 17:43:00 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1MK3a4-1wX1sz1CsI-00UKwX; Sun, 26
+ Jul 2026 17:45:07 +0200
+Message-ID: <249db6ef-b752-4cf5-9350-a7660e29d735@vivier.eu>
+Date: Sun, 26 Jul 2026 17:45:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 27/31] swim: Remove unused macro definitions
+Subject: Re: [PATCH 28/31] swim: Clean up whitespace
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <38052482a1b7010beb01c0d96b0849875f5f8e16.1784196135.git.fthain@linux-m68k.org>
+ <638c40ba880bd6b2ed1641d54eb65be14e89e3da.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,98 +94,314 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <38052482a1b7010beb01c0d96b0849875f5f8e16.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <638c40ba880bd6b2ed1641d54eb65be14e89e3da.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:GhGrodRRs9IngcF6t58wAGbyyVRDyPBX/BkTjMxX4GtYWO/ViMb
- Ghokc09vk+csBlljrJN8cGevhWLAFsPcrdEwy4eGZSNQpDcCvwAQXDFpNcUmXiiIynTO1k+
- j1M5mfXtTgmmzCWeaP8pS/q0HmGj8jxu3LU+4hs3Tk1qj8IU7OhjvffC81VfdCWA3WyUYWX
- 7LtZUwGv7d1CpeMieLQnA==
+X-Provags-ID: V03:K1:dWPO2Tu9lNihAuDU3BZvsAjwnUH37TkUu4raFdiM1n+lYNigRDt
+ vafdWddFs2jnlTe/pI0W+voc7n7eaEkvoUF3kvGOIQ8Jw9quXZByRDUmzmVDj9oZzu9adQi
+ hUwjnyCPAsTlcRYDZpanuLlMjzJoRuwjzv+HZhd23DXGWSaCtxuyD7XQJMsqHIrH+jpL2HQ
+ mmz0ch3K0MdwwNDT342Cw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:2MaZOBPbZCc=;f14RQxyE3TekY+kZU0jLZkKQ7/1
- 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
+UI-OutboundReport: notjunk:1;M01:P0:on+TM359ap0=;RjI5Gip3IYOGmHNqVQk+2B2RFhU
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> Also remove the horizontal rule at the end of the macro definitions as
-> it doesn't any add value, IMO.
+> No functional changes.
 >=20
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim.c | 14 --------------
->   1 file changed, 14 deletions(-)
+>   drivers/block/swim.c     | 46 +++++++++++++++++++++-------------------
+>   drivers/block/swim_asm.S | 15 ++-----------
+>   2 files changed, 26 insertions(+), 35 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 >=20
 > diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-> index 444c3f31ba48..9661d8f7a5ed 100644
+> index 9661d8f7a5ed..406792952e7f 100644
 > --- a/drivers/block/swim.c
 > +++ b/drivers/block/swim.c
-> @@ -130,25 +130,14 @@ struct iwm {
+> @@ -2,7 +2,7 @@
+>   /*
+>    * Driver for SWIM (Sander Woz Integrated Machine) floppy controller
+>    *
+> - * Copyright (C) 2004,2008 Laurent Vivier <Laurent@lvivier.info>
+> + * Copyright (C) 2004, 2008 Laurent Vivier <Laurent@lvivier.info>
+>    *
+>    * based on Alastair Bridgewater SWIM analysis, 2001
+>    * based on SWIM3 driver (c) Paul Mackerras, 1996
+> @@ -69,7 +69,7 @@ struct swim {
+>   	REG(read_handshake)
+>   } __attribute__((packed));
 >  =20
->   /* Bits in handshake register */
+> -#define swim_write(base, reg, v) 	out_8(&(base)->write_##reg, (v))
+> +#define swim_write(base, reg, v)	out_8(&(base)->write_##reg, (v))
+>   #define swim_read(base, reg)		in_8(&(base)->read_##reg)
 >  =20
-> -#define MARK_BYTE	0x01
-> -#define CRC_ZERO	0x02
-> -#define RDDATA		0x04
->   #define SENSE		0x08
-> -#define MOTEN		0x10
-> -#define ERROR		0x20
->   #define DAT2BYTE	0x40
->   #define DAT1BYTE	0x80
+>   /* IWM registers */
+> @@ -93,7 +93,7 @@ struct iwm {
+>   	REG(q7H)
+>   } __attribute__((packed));
 >  =20
->   /* bits in setup register */
+> -#define iwm_write(base, reg, v) 	out_8(&(base)->reg, (v))
+> +#define iwm_write(base, reg, v)		out_8(&(base)->reg, (v))
+>   #define iwm_read(base, reg)		in_8(&(base)->reg)
 >  =20
-> -#define S_INV_WDATA	0x01
-> -#define S_3_5_SELECT	0x02
-> -#define S_GCR		0x04
->   #define S_FCLK_DIV2	0x08
-> -#define S_ERROR_CORR	0x10
->   #define S_IBM_DRIVE	0x20
-> -#define S_GCR_WRITE	0x40
-> -#define S_TIMEOUT	0x80
+>   /* bits in phase register */
+> @@ -165,23 +165,23 @@ struct floppy_state {
+>   	/* physical properties */
 >  =20
->   /* bits in mode register */
+>   	enum drive_location location;	/* internal or external drive */
+> -	int		 head_number;	/* single- or double-sided drive */
+> +	int head_number;		/* single- or double-sided drive */
 >  =20
-> @@ -157,12 +146,9 @@ struct iwm {
->   #define ENBL2		0x04
->   #define ACTION		0x08
->   #define WRITE_MODE	0x10
-> -#define HEDSEL		0x20
->   #define ISM_SELECT	0x40
->   #define MOTON		0x80
+>   	/* media */
 >  =20
-> -/*---------------------------------------------------------------------=
-=2D------*/
+> -	int		 disk_in;
+> -	int		 ejected;
+> -	enum media_type	 type;
+> -	int		 write_protected;
+> +	int disk_in;
+> +	int ejected;
+> +	enum media_type type;
+> +	int write_protected;
+>  =20
+> -	unsigned int	 total_secs;
+> -	unsigned int	 secpercyl;
+> -	unsigned int	 secpertrack;
+> +	unsigned int total_secs;
+> +	unsigned int secpercyl;
+> +	unsigned int secpertrack;
+>  =20
+>   	/* in-use information */
+>  =20
+> -	int		track;
+> -	int		ref_count;
+> +	int track;
+> +	int ref_count;
+>   	bool registered;
+>  =20
+>   	struct gendisk *disk;
+> @@ -216,6 +216,7 @@ extern int swim_read_sector_data(struct swim __iomem=
+ *base,
+>   				 unsigned char *data);
+>  =20
+>   static DEFINE_MUTEX(swim_mutex);
+> +
+>   static void set_swim_mode(struct swim __iomem *base, int enable)
+>   {
+>   	struct iwm __iomem *iwm_base =3D (struct iwm __iomem *)base;
+> @@ -405,7 +406,7 @@ static int swim_seek(struct swim __iomem *base, int =
+step)
+>   	if (step =3D=3D 0)
+>   		return 0;
+>  =20
+> -	for ( ; step > 0; step--) {
+> +	for (; step > 0; step--) {
+>   		if (swim_step(base))
+>   			return -1;
+>   	}
+> @@ -416,7 +417,7 @@ static int swim_seek(struct swim __iomem *base, int =
+step)
+>   	return 0;
+>   }
+>  =20
+> -static int swim_track(struct floppy_state *fs,  int track)
+> +static int swim_track(struct floppy_state *fs, int track)
+>   {
+>   	struct swim __iomem *base =3D fs->swd->base;
+>   	int ret;
+> @@ -560,10 +561,10 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw=
+_ctx *hctx,
+>   }
+>  =20
+>   static struct floppy_struct floppy_type[4] =3D {
+> -	{    0,  0, 0,  0, 0, 0x00, 0x00, 0x00, 0x00, NULL }, /* no testing   =
+*/
+> +	{    0,  0, 0,  0, 0, 0x00, 0x00, 0x00, 0x00, NULL }, /* no testing */
+>   	{  720,  9, 1, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 360KB SS 3.5=
+"*/
+> -	{ 1440,  9, 2, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 720KB 3.5"   =
+*/
+> -	{ 2880, 18, 2, 80, 0, 0x1B, 0x00, 0xCF, 0x6C, NULL }, /* 1.44MB 3.5"  =
+*/
+> +	{ 1440,  9, 2, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 720KB 3.5" */
+> +	{ 2880, 18, 2, 80, 0, 0x1B, 0x00, 0xCF, 0x6C, NULL }, /* 1.44MB 3.5" *=
+/
+>   };
+>  =20
+>   static int get_floppy_geometry(struct floppy_state *fs, int type,
+> @@ -590,10 +591,11 @@ static void setup_medium(struct floppy_state *fs)
+>  =20
+>   	if (swim_readbit(base, DISK_IN)) {
+>   		struct floppy_struct *g;
+> +
+>   		fs->disk_in =3D 1;
+>   		fs->write_protected =3D swim_readbit(base, WRITE_PROT);
+>   		fs->type =3D swim_readbit(base, TWOMEG_MEDIA) ?
+> -			HD_MEDIA : DD_MEDIA;
+> +			   HD_MEDIA : DD_MEDIA;
+>   		fs->head_number =3D swim_readbit(base, SINGLE_SIDED) ? 1 : 2;
+>   		get_floppy_geometry(fs, 0, &g);
+>   		fs->total_secs =3D g->size;
+> @@ -695,7 +697,7 @@ static int floppy_ioctl(struct block_device *bdev, b=
+lk_mode_t mode,
+>   	int err;
+>  =20
+>   	if ((cmd & 0x80) && !capable(CAP_SYS_ADMIN))
+> -			return -EPERM;
+> +		return -EPERM;
+>  =20
+>   	switch (cmd) {
+>   	case FDEJECT:
+> @@ -805,7 +807,7 @@ static int swim_floppy_init(struct platform_device *=
+pdev)
+>   	struct swim_priv *swd =3D platform_get_drvdata(pdev);
+>   	unsigned int *data =3D pdev->dev.platform_data;
+>   	struct queue_limits lim =3D {
+> -		.features		=3D BLK_FEAT_ROTATIONAL,
+> +		.features =3D BLK_FEAT_ROTATIONAL,
+>   	};
+>   	int err;
+>   	int drive;
+> @@ -963,7 +965,7 @@ static void swim_remove(struct platform_device *dev)
+>   static struct platform_driver swim_driver =3D {
+>   	.probe  =3D swim_probe,
+>   	.remove =3D swim_remove,
+> -	.driver   =3D {
+> +	.driver =3D {
+>   		.name	=3D CARDNAME,
+>   	},
+>   };
+> diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
+> index ae767da671e3..3d5ad525ccde 100644
+> --- a/drivers/block/swim_asm.S
+> +++ b/drivers/block/swim_asm.S
+> @@ -5,7 +5,7 @@
+>    * needs assembly language because is very timing dependent
+>    * this controller exists only on macintosh 680x0 based
+>    *
+> - * Copyright (C) 2004,2008 Laurent Vivier <Laurent@lvivier.info>
+> + * Copyright (C) 2004, 2008 Laurent Vivier <Laurent@lvivier.info>
+>    *
+>    * based on Alastair Bridgewater SWIM analysis, 2001
+>    * based on netBSD IWM driver (c) 1997, 1998 Hauke Fath.
+> @@ -80,7 +80,6 @@ wait_header_init:
+>   	moveq	#3, %d1
+>  =20
+>   wait_addr_mark_byte:
 > -
->   enum drive_location {
->   	NO_DRIVE =3D 0,
->   	INTERNAL_DRIVE =3D BIT(1),
+>   	tstb	%a2@
+>   	dbmi	%d2, wait_addr_mark_byte
+>   	bpl	signal_nonyb
+> @@ -91,7 +90,6 @@ wait_addr_mark_byte:
+>   	bne	wait_header_init
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   amark0:	tstb	%a2@
+>   	dbmi	%d2, amark0
+>   	bpl	signal_nonyb
+> @@ -99,7 +97,6 @@ amark0:	tstb	%a2@
+>   	moveb	%a5@, %a4@(o_track)
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   amark1:	tstb	%a2@
+>   	dbmi	%d2, amark1
+>   	bpl	signal_nonyb
+> @@ -107,7 +104,6 @@ amark1:	tstb	%a2@
+>   	moveb	%a5@, %a4@(o_side)
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   amark2:	tstb	%a2@
+>   	dbmi	%d2, amark2
+>   	bpl	signal_nonyb
+> @@ -115,7 +111,6 @@ amark2:	tstb	%a2@
+>   	moveb	%a5@, %a4@(o_sector)
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   amark3:	tstb	%a2@
+>   	dbmi	%d2, amark3
+>   	bpl	signal_nonyb
+> @@ -123,7 +118,6 @@ amark3:	tstb	%a2@
+>   	moveb	%a5@, %a4@(o_size)
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   crc0:	tstb	%a2@
+>   	dbmi	%d2, crc0
+>   	bpl	signal_nonyb
+> @@ -131,7 +125,6 @@ crc0:	tstb	%a2@
+>   	moveb	%a5@, %a4@(o_crc0)
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   crc1:	moveb	%a2@, %d5
+>   	dbmi	%d2, crc1
+>   	bpl	signal_nonyb
+> @@ -177,7 +170,6 @@ wait_data_init:
+>   	/* wait data address mark */
+>  =20
+>   wait_data_mark_byte:
+> -
+>   	tstb	%a2@
+>   	dbmi	%d2, wait_data_mark_byte
+>   	bpl	data_exit
+> @@ -189,7 +181,7 @@ wait_data_mark_byte:
+>  =20
+>   	/* read data */
+>  =20
+> -	movel	#sector_size-1, %d4		/* sector size */
+> +	movel	#sector_size - 1, %d4		/* sector size */
+>   read_new_data:
+>   	movew	#max_retry, %d2
+>   read_data_loop:
+> @@ -210,7 +202,6 @@ read_data_loop:
+>  =20
+>   	movew	#max_retry, %d2
+>   data_crc0:
+> -
+>   	tstb	%a2@
+>   	dbmi	%d2, data_crc0
+>   	bpl	data_exit
+> @@ -218,9 +209,7 @@ data_crc0:
+>   	moveb	%a5@, %d2
+>  =20
+>   	moveq	#max_retry, %d2
+> -
+>   data_crc1:
+> -
+>   	moveb	%a2@, %d5
+>   	dbmi	%d2, data_crc1
+>   	bpl	data_exit
 
