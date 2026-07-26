@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310212405EB;
-	Sun, 26 Jul 2026 15:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F02C2459EA;
+	Sun, 26 Jul 2026 16:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785081089; cv=none; b=jPGUSaz+6al3TUv1jOtq6Bf3tEwVUjSh8C9gqf0W2coMN6kQTv8uIg338R8QVZGTCOaV7uUasgc8iqMFJXlf3fdeyNRqZeyqyfgbMBkPQ2wvpXbwYXCIFCLWz+fVcjnIVMVjIjGBYTILGRAvva0bD88F+a+VY3uLW6kN+eZhyN8=
+	t=1785081678; cv=none; b=Q3AIvdK5w+rElrznbvJL7asLfWxXjvewbPhhaeipBgfQKd1F9phSLrrbCPrfxpDdjfcxuGA/bfYpIuNWOQt/FfuODyrVS4JCMHbN/7wWsX9iy9qIOike35+WbPm8OdwkkrlAgMCvLvvTnc5ixbh+czpk4h80BkY/lVeh/G3npAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785081089; c=relaxed/simple;
-	bh=H3F+p5i1MImsAYgmhpx641LsancnQJgeOBYKeT/R/C0=;
+	s=arc-20240116; t=1785081678; c=relaxed/simple;
+	bh=LG4NBulOfhVDIbKT4ZYNgS5L+v8Z1HW9Ybf53gys5bI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t2XiYyF7kb7bD+1yM/q3aq0TVE1IaA7tgtXbyCqPT6ug1x1UWPiCO6VO0F26p2ly1R6VydwRXbotU1kpKzGVjWgLcfQYjhY92fKqYkiBT9D5LEDCm1aOapSs6sPDkf3UpWgJIKylPduV3yJIVpyFkJAc1MDfY+Qj6UVsuvki7bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=LmX90APd; arc=none smtp.client-ip=217.72.192.73
+	 In-Reply-To:Content-Type; b=WHzd+eBYZyliCnE8VzGMo8cwQajq2vSbdOEFtAKMr/ZMcP7q2qa0UnMRTMbXWEpLueGBhonOx+BHNYvK+/EmEhtTTXzTfwb592O/GpUnlcZJAQwve1EMdnzO2e3XaGp0C47yz01fFK1Kgqe1U7U0vYGfWyP9puhY2HKxxNcumkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=zekX67lX; arc=none smtp.client-ip=212.227.17.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="LmX90APd"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="zekX67lX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1785081080; x=1785685880; i=laurent@vivier.eu;
-	bh=Dpl5JW1rkP4pObqL/FcXPHbETqRkrvSHzK3bzbqpPIU=;
+	s=s1-ionos; t=1785081669; x=1785686469; i=laurent@vivier.eu;
+	bh=j0VIoPnu00Ui+69dGy9DoF8+QPsjkXApg3Vr1A1Bbig=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=LmX90APdl6ZgJQ+44RYWyTwrbTB3oZOfk4cIoMublW1cx9IsaNqw0syqsSuREXhv
-	 uH6yHixezwCY4IK+tRa/CrIT2CPUe4qDiKdarJPqBrJ9/Y3AAtZJt+ePws5P/XBES
-	 Z0e+NlCT0xVwzPFKeLXL0tSpm4oSbc3AvSJnB95Ieue7CQ7C/9BMStwLRGaUhj7lO
-	 yT1Wz9QAS9TFpu0dJO6LQCW9hk11bogPu8U0gt2lRXkBkjctRcBs3VaDgz9d2161e
-	 eqbDQi4zTyhDaAG9PkPeJHB/38g7H02xTnDLSlImrl3q66mnPTMfcden4UmjqxQd4
-	 CZw48i1x2I4P+hWBDw==
+	b=zekX67lXW+mVb/PFdi1kCNxlCAPpmIXsbFvHxlLKCEThOa1Stad7abd5gqPPldIC
+	 aMQx9mPaWtPCOzSN1G+BBC+GLVuZPKE5n0vVV8T7gLW73pTuUVgQh7npsWJI0CMBm
+	 UuSnERHp0J8Ajy6a+9wcugVR3mCSUjJTdunY7IprKnDUX/h9aXyZ9gZ/dtVBPchYt
+	 MCNek6SKAkYq4PbUm5X3qhEcujZlFcRUes0WKCrd4+aqLhZIbCfsSZPrsejcIEHn9
+	 xX2f28Kr2AAyK0BO4wWninYEnSUqT7/h9/tdhENATQ/RbAkAutjLcAIolyqGankw+
+	 LI4Bfse7M3iBe6jvyA==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
 Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MG9wg-1wkgfb3eqS-009qXu; Sun, 26
- Jul 2026 17:51:19 +0200
-Message-ID: <33b70275-7642-48a6-9be5-0354d0e09217@vivier.eu>
-Date: Sun, 26 Jul 2026 17:51:19 +0200
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1N18I8-1wydA71h9O-015P2e; Sun, 26
+ Jul 2026 18:01:09 +0200
+Message-ID: <34364739-9153-4538-aed3-7c71860bdf08@vivier.eu>
+Date: Sun, 26 Jul 2026 18:01:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 31/31] swim: Unexport global symbols
+Subject: Re: [PATCH 23/31] swim: Don't needlessly re-read sectors
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <b1193c2e8e8850922bec72f7ea2b07710d9f0fdd.1784196135.git.fthain@linux-m68k.org>
+ <740e314f4ff30796afa466c6a3d8cfa42e9b1af8.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,400 +94,230 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <b1193c2e8e8850922bec72f7ea2b07710d9f0fdd.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <740e314f4ff30796afa466c6a3d8cfa42e9b1af8.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:g4/Abcto6ivGdW49HVkDfUOHP8DsotIBx+Ibvy613+sed3xVBTc
- qW6qEsO0fzN7yc0nfItKo3FSTSBTwVoMXvKqmthsLXClnL2m0LQ7o290j10LkRfkEBHcX2L
- LgSUCZS2NFdBOxA3r1hNQvUxHQQE+kEytPPh9gHaTkAT0ogG4AsDQkrSgoKDZeMVWYjOap5
- VQWr48+DBIKQU38HkPrkg==
+X-Provags-ID: V03:K1:2aNvs9EF5G+RiPsHTxKCAHT86yO3D910Rq+12Ic1DS0nO7wlU4l
+ V5+imRhWJNyCP9VsdXYGNzCXLFXf/LVCjoRfhLsCWmJP9dIxGwYjAnFYGXj3G1Lh+5V6qyU
+ we6WvXcc0APRXFmE6BWCuhwmz+sd7ZHwQWDgZ8A03NlafrYcHv4BeHxswHb4/ocYi4XM5Ao
+ NUZPiQwBYOzFRpqwHEj7Q==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:SgTRYBRY774=;N2bvybOuZySMoPccgnbmBMv3iev
- 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
- =
+UI-OutboundReport: notjunk:1;M01:P0:C70VQ9f9Yxw=;Hbz1CkvBrXegcam+hAZUrpHYc/W
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> These symbols aren't used outside of this file so use local ones.
-> No functional change.
+> floppy_read_sectors() is confusing because variable names seem to confla=
+te
+> tracks and cylinders. Rename the track variable, eliminate a division
+> operation and adopt suitable integer types.
 >=20
+> For readahead to work effectively, small sequential reads should not
+> require waiting for spindle rotation. Unfortunately, the present algorit=
+hm
+> is very inefficient and does a lot of unnecessary waiting.
+>=20
+> E.g. if the device is asked to read sectors 1 thru 18, and if sector 9
+> happens to be under the heads, the driver will proceed to read sectors 9
+> thru 18, but discard the results, while it waits for sector 1 to arrive.
+>=20
+> If sector 1 couldn't be read on the first attempt, and needs a retry, th=
+e
+> driver will proceed to read sectors 2 thru 18, but discard the results,
+> while it waits for sector 1 to come around again.
+>=20
+> In between reading sector 1 and sector 2, the driver needlessly calls
+> swim_track() and swim_head() again. But what's worse is that, on a 68030
+> system, re-enabling interrupts after each sector read can result in a fu=
+ll
+> rotation between sectors (that is a 3 ms wait).
+>=20
+> Floppy drivers often implement a track cache, that can be filled in a
+> single rotation, to solve problems like these. But I think this solution
+> is much simpler.
+>=20
+> For each request, use a sector bitmap to keep a record of sectors read
+> successfully. Read or retry, as necessary, the requested sectors in
+> whatever sequence they arrive in. Keep interrupts disabled until the
+> whole track has passed under the read head.
+>=20
+> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim_asm.S | 251 ++++++++++++++++++++-------------------
->   1 file changed, 128 insertions(+), 123 deletions(-)
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
+>   drivers/block/swim.c | 91 +++++++++++++++++++++++++-------------------
+>   1 file changed, 52 insertions(+), 39 deletions(-)
 >=20
-> diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-> index c17a25e1cd33..65b4e4658e10 100644
-> --- a/drivers/block/swim_asm.S
-> +++ b/drivers/block/swim_asm.S
-> @@ -14,33 +14,33 @@
->    * 2008-11-05 (lv) - add get_swim_mode
->    */
+> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+> index 0bab7ed3daa8..dae401e649d7 100644
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+> @@ -180,9 +180,9 @@ struct floppy_state {
+>   	enum media_type	 type;
+>   	int		 write_protected;
 >  =20
-> -	.equ	write_data,	0x0000
-> -	.equ	write_mark,	0x0200
-> -	.equ	write_CRC,	0x0400
-> -	.equ	write_parameter,0x0600
-> -	.equ	write_phase,	0x0800
-> -	.equ	write_setup,	0x0a00
-> -	.equ	write_mode0,	0x0c00
-> -	.equ	write_mode1,	0x0e00
-> -	.equ	read_data,	0x1000
-> -	.equ	read_mark,	0x1200
-> -	.equ	read_error,	0x1400
-> -	.equ	read_parameter,	0x1600
-> -	.equ	read_phase,	0x1800
-> -	.equ	read_setup,	0x1a00
-> -	.equ	read_status,	0x1c00
-> -	.equ	read_handshake,	0x1e00
-> -
-> -	.equ	o_side, 0
-> -	.equ	o_track, 1
-> -	.equ	o_sector, 2
-> -	.equ	o_size, 3
-> -	.equ	o_crc0, 4
-> -	.equ	o_crc1, 5
-> -
-> -	.equ	seek_time, 30000
-> -	.equ	max_retry, 40
-> -	.equ	sector_size, 512
-> +	.equ	.Lwrite_data,		0x0000
-> +	.equ	.Lwrite_mark,		0x0200
-> +	.equ	.Lwrite_CRC,		0x0400
-> +	.equ	.Lwrite_parameter,	0x0600
-> +	.equ	.Lwrite_phase,		0x0800
-> +	.equ	.Lwrite_setup,		0x0a00
-> +	.equ	.Lwrite_mode0,		0x0c00
-> +	.equ	.Lwrite_mode1,		0x0e00
-> +	.equ	.Lread_data,		0x1000
-> +	.equ	.Lread_mark,		0x1200
-> +	.equ	.Lread_error,		0x1400
-> +	.equ	.Lread_parameter,	0x1600
-> +	.equ	.Lread_phase,		0x1800
-> +	.equ	.Lread_setup,		0x1a00
-> +	.equ	.Lread_status,		0x1c00
-> +	.equ	.Lread_handshake,	0x1e00
+> -	int		 total_secs;
+> -	int		 secpercyl;
+> -	int		 secpertrack;
+> +	unsigned int	 total_secs;
+> +	unsigned int	 secpercyl;
+> +	unsigned int	 secpertrack;
+>  =20
+>   	/* in-use information */
+>  =20
+> @@ -455,68 +455,81 @@ static int floppy_eject(struct floppy_state *fs)
+>   	return 0;
+>   }
+>  =20
+> -static inline int swim_read_sector(struct floppy_state *fs,
+> -				   int side, int track,
+> -				   int sector, unsigned char *buffer)
+> +static unsigned int swim_read_sector_range(struct floppy_state *fs,
+> +					unsigned int side, unsigned int track,
+> +					unsigned int start, unsigned int count,
+> +					unsigned char *buffer)
+>   {
+>   	struct swim __iomem *base =3D fs->swd->base;
+>   	unsigned long flags;
+>   	struct sector_header header;
+> -	int ret =3D -1;
+> -	short i;
+> +	int i, bits =3D 0;
+>  =20
+> -	swim_track(fs, track);
+> -	swim_head(base, side);
+> +	for (i =3D 0; i < 18; i++) { /* A track has at most 18 sectors */
+> +		if (i >=3D count)
+> +			break;
+> +		bits |=3D BIT(i);
+> +	}
+>  =20
+>   	local_irq_save(flags);
+>   	for (i =3D 0; i < 36; i++) {
+> +		if (bits =3D=3D 0) /* All count sectors were read ok */
+> +			break;
 > +
-> +	.equ	.Lo_side,		0
-> +	.equ	.Lo_track,		1
-> +	.equ	.Lo_sector,		2
-> +	.equ	.Lo_size,		3
-> +	.equ	.Lo_crc0,		4
-> +	.equ	.Lo_crc1,		5
+>   		if (swim_read_sector_header(base, &header) ||
+>   		    swim_read(base, error) || header.track !=3D track ||
+>   		    header.side !=3D side || header.size !=3D 2)
+>   			continue;
+> -		if (header.sector =3D=3D sector) {
+> -			/* found */
+>  =20
+> -			ret =3D swim_read_sector_data(base, buffer);
+> -			if (swim_read(base, error))
+> -				ret =3D -EIO;
+> -			break;
+> +		if (header.sector >=3D start && header.sector < start + count) {
+> +			unsigned int offset =3D header.sector - start;
+> +			int ret;
 > +
-> +	.equ	.Lseek_time,		30000
-> +	.equ	.Lmax_retry,		40
-> +	.equ	.Lsector_size,		512
+> +			if ((bits & BIT(offset)) =3D=3D 0)
+> +				continue; /* This sector was already read ok */
+> +
+> +			ret =3D swim_read_sector_data(base, buffer + 512 * offset);
+> +			if (ret =3D=3D 512 && swim_read(base, error) =3D=3D 0)
+> +				bits &=3D ~BIT(offset);
+>   		}
+>   	}
+>   	local_irq_restore(flags);
 >  =20
->   	.equ	.Lmr_clear_fifo,	0x01
->   	.equ	.Lmr_action,		0x08
-> @@ -56,91 +56,96 @@ swim_read_sector_header:
->   	moveml	%d1-%d5/%a0-%a5,%sp@-
->   	movel	%a6@(0x0c), %a4
->   	moveq	#-1, %d0
-> -	bsr	mfm_read_addrmark
-> +	bsr	.Lmfm_read_addrmark
->   	moveml	%sp@+, %d1-%d5/%a0-%a5
->   	unlk	%a6
->   	rts
+> -	return ret;
+> +	return bits ? ffs(bits) - 1 : count; /* No. of contiguous ok sectors *=
+/
+>   }
 >  =20
-> -sector_address_mark:
-> +.Lsector_address_mark:
->   	.byte	0xa1, 0xa1, 0xa1, 0xfe
-> -sector_data_mark:
-> +.Lsector_data_mark:
->   	.byte	0xa1, 0xa1, 0xa1, 0xfb
->  =20
-> -mfm_read_addrmark:
-> +.Lmfm_read_addrmark:
->   	movel	%a6@(0x08), %a3
-> -	lea	%a3@(read_handshake), %a2
-> -	lea	%a3@(read_data), %a5
-> -	lea	%a3@(read_mark), %a3
-> -	movew	#seek_time, %d2
+>   static blk_status_t floppy_read_sectors(struct floppy_state *fs,
+> -			       int req_sector, int sectors_nb,
+> -			       unsigned char *buffer)
+> +					unsigned int req_sector,
+> +					unsigned int sectors_nb,
+> +					unsigned char *buffer)
+>   {
+>   	struct swim __iomem *base =3D fs->swd->base;
+> -	int ret;
+> -	int side, track, sector;
+> -	int i, try;
 > -
-> -wait_header_init:
-> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
-> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
-> -	tstb	%a3@(read_error - read_mark)
-> -	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+> +	unsigned int failures =3D 0;
+>  =20
+>   	swim_drive(base, fs->location);
+>   	swim_READY_timeout(base);
+>  =20
+> -	for (i =3D req_sector; i < req_sector + sectors_nb; i++) {
+> -		int x;
+> -		track =3D i / fs->secpercyl;
+> -		x =3D i % fs->secpercyl;
+> -		side =3D x / fs->secpertrack;
+> -		sector =3D x % fs->secpertrack + 1;
 > -
-> -	lea	sector_address_mark, %a0
-> +	lea	%a3@(.Lread_handshake), %a2
-> +	lea	%a3@(.Lread_data), %a5
-> +	lea	%a3@(.Lread_mark), %a3
-> +	movew	#.Lseek_time, %d2
-> +
-> +.Lwait_header_init:
-> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode1 - .Lread_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode0 - .Lread_mark)
-> +	tstb	%a3@(.Lread_error - .Lread_mark)
-> +	moveb	#.Lmr_action, %a3@(.Lwrite_mode1 - .Lread_mark)
-> +
-> +	lea	.Lsector_address_mark, %a0
->   	moveq	#3, %d1
->  =20
-> -wait_addr_mark_byte:
-> +.Lwait_addr_mark_byte:
->   	tstb	%a2@
-> -	dbmi	%d2, wait_addr_mark_byte
-> -	bpl	signal_nonyb
-> +	dbmi	%d2, .Lwait_addr_mark_byte
-> +	bpl	.Lsignal_nonyb
->  =20
->   	moveb	%a3@, %d3
->   	cmpb	%a0@+, %d3
-> -	dbne	%d1, wait_addr_mark_byte
-> -	bne	wait_header_init
-> +	dbne	%d1, .Lwait_addr_mark_byte
-> +	bne	.Lwait_header_init
->  =20
-> -	moveq	#max_retry, %d2
-> -amark0:	tstb	%a2@
-> -	dbmi	%d2, amark0
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lamark0:
-> +	tstb	%a2@
-> +	dbmi	%d2, .Lamark0
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_track)
-> +	moveb	%a5@, %a4@(.Lo_track)
->  =20
-> -	moveq	#max_retry, %d2
-> -amark1:	tstb	%a2@
-> -	dbmi	%d2, amark1
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lamark1:
-> +	tstb	%a2@
-> +	dbmi	%d2, .Lamark1
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_side)
-> +	moveb	%a5@, %a4@(.Lo_side)
->  =20
-> -	moveq	#max_retry, %d2
-> -amark2:	tstb	%a2@
-> -	dbmi	%d2, amark2
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lamark2:
-> +	tstb	%a2@
-> +	dbmi	%d2, .Lamark2
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_sector)
-> +	moveb	%a5@, %a4@(.Lo_sector)
->  =20
-> -	moveq	#max_retry, %d2
-> -amark3:	tstb	%a2@
-> -	dbmi	%d2, amark3
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lamark3:
-> +	tstb	%a2@
-> +	dbmi	%d2, .Lamark3
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_size)
-> +	moveb	%a5@, %a4@(.Lo_size)
->  =20
-> -	moveq	#max_retry, %d2
-> -crc0:	tstb	%a2@
-> -	dbmi	%d2, crc0
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lcrc0:
-> +	tstb	%a2@
-> +	dbmi	%d2, .Lcrc0
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_crc0)
-> +	moveb	%a5@, %a4@(.Lo_crc0)
->  =20
-> -	moveq	#max_retry, %d2
-> -crc1:	moveb	%a2@, %d5
-> -	dbmi	%d2, crc1
-> -	bpl	signal_nonyb
-> +	moveq	#.Lmax_retry, %d2
-> +.Lcrc1:	moveb	%a2@, %d5
-> +	dbmi	%d2, .Lcrc1
-> +	bpl	.Lsignal_nonyb
->  =20
-> -	moveb	%a5@, %a4@(o_crc1)
-> +	moveb	%a5@, %a4@(.Lo_crc1)
->  =20
->   	andb	#.Lhr_crc_error, %d5
-> -	bne	signal_nonyb
-> +	bne	.Lsignal_nonyb
->  =20
->   	moveq	#0, %d0
-> -signal_nonyb:
-> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> +.Lsignal_nonyb:
-> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
->   	rts
->  =20
->   	.global swim_read_sector_data
-> @@ -149,86 +154,86 @@ swim_read_sector_data:
->   	moveml	%d1-%d5/%a0-%a5,%sp@-
->   	movel	%a6@(0x0c), %a4
->   	moveq	#-1, %d0
-> -	bsr	mfm_read_data
-> +	bsr	.Lmfm_read_data
->   	moveml	%sp@+, %d1-%d5/%a0-%a5
->   	unlk	%a6
->   	rts
->  =20
-> -mfm_read_data:
-> +.Lmfm_read_data:
->   	movel	%a6@(0x08), %a3
-> -	lea	%a3@(read_handshake), %a2
-> -	lea	%a3@(read_data), %a5
-> -	lea	%a3@(read_mark), %a3
-> -	movew	#seek_time, %d2
+> -		try =3D 5;
+> -		do {
+> -			ret =3D swim_read_sector(fs, side, track, sector,
+> -						buffer);
+> -			if (try-- =3D=3D 0)
+> -				return BLK_STS_IOERR;
+> -		} while (ret !=3D 512);
 > -
-> -wait_data_init:
-> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
-> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
-> -	tstb	%a3@(read_error - read_mark)
-> -	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
-> -
-> -	lea	sector_data_mark, %a0
-> +	lea	%a3@(.Lread_handshake), %a2
-> +	lea	%a3@(.Lread_data), %a5
-> +	lea	%a3@(.Lread_mark), %a3
-> +	movew	#.Lseek_time, %d2
+> -		buffer +=3D ret;
+> +	while (sectors_nb) {
+> +		unsigned int cyl, x, head, sector, n, ret;
 > +
-> +.Lwait_data_init:
-> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode1 - .Lread_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode0 - .Lread_mark)
-> +	tstb	%a3@(.Lread_error - .Lread_mark)
-> +	moveb	#.Lmr_action, %a3@(.Lwrite_mode1 - .Lread_mark)
+> +		cyl =3D req_sector / fs->secpercyl;
+> +		x =3D req_sector % fs->secpercyl;
+> +		head =3D (x >=3D fs->secpertrack) ? 1 : 0;
+> +		sector =3D x % fs->secpertrack;
+> +		n =3D min(sectors_nb, fs->secpertrack - sector);
 > +
-> +	lea	.Lsector_data_mark, %a0
->   	moveq	#3, %d1
+> +		swim_track(fs, cyl);
+> +		swim_head(base, head);
+> +
+> +		ret =3D swim_read_sector_range(fs, head, cyl, sector + 1, n, buffer);
+> +		if (ret !=3D n)
+> +			++failures;
+> +		if (failures >=3D 5)
+> +			return BLK_STS_IOERR;
+
+Old code failed after 5 retries on the same sector, new code fails after 5=
+ incomplete ranges=20
+anywhere in it, even if earlier errors were recovered and request made pro=
+gress.
+
+Is this what you want?
+
+Thanks,
+Laurent
+
+> +
+> +		buffer +=3D 512 * ret;
+> +		sectors_nb -=3D ret;
+> +		req_sector +=3D ret;
+>   	}
 >  =20
->   	/* wait data address mark */
->  =20
-> -wait_data_mark_byte:
-> +.Lwait_data_mark_byte:
->   	tstb	%a2@
-> -	dbmi	%d2, wait_data_mark_byte
-> -	bpl	data_exit
-> +	dbmi	%d2, .Lwait_data_mark_byte
-> +	bpl	.Ldata_exit
->  =20
->   	moveb	%a3@, %d3
->   	cmpb	%a0@+, %d3
-> -	dbne	%d1, wait_data_mark_byte
-> -	bne	wait_data_init
-> +	dbne	%d1, .Lwait_data_mark_byte
-> +	bne	.Lwait_data_init
->  =20
->   	/* read data */
->  =20
-> -	movel	#sector_size - 1, %d4		/* sector size */
-> -read_new_data:
-> -	movew	#max_retry, %d2
-> -read_data_loop:
-> +	movel	#.Lsector_size - 1, %d4		/* sector size */
-> +.Lread_new_data:
-> +	movew	#.Lmax_retry, %d2
-> +.Lread_data_loop:
->   	moveb	%a2@, %d5
->   	andb	#(.Lhr_fifo_2bytes + .Lhr_fifo_1byte), %d5
->   	beq	1f
-> -	movew	#max_retry, %d2
-> +	movew	#.Lmax_retry, %d2
->   	moveb	%a5@, %a4@+
->   	dbra	%d4, 1f
-> -	bra	data_crc0
-> +	bra	.Ldata_crc0
->   1:	andb	#.Lhr_fifo_2bytes, %d5
-> -	dbne	%d2, read_data_loop
-> -	beq	data_exit
-> +	dbne	%d2, .Lread_data_loop
-> +	beq	.Ldata_exit
->   	moveb	%a5@, %a4@+
-> -	dbra	%d4, read_new_data
-> +	dbra	%d4, .Lread_new_data
->  =20
->   	/* read CRC */
->  =20
-> -	movew	#max_retry, %d2
-> -data_crc0:
-> +	movew	#.Lmax_retry, %d2
-> +.Ldata_crc0:
->   	tstb	%a2@
-> -	dbmi	%d2, data_crc0
-> -	bpl	data_exit
-> +	dbmi	%d2, .Ldata_crc0
-> +	bpl	.Ldata_exit
->  =20
->   	moveb	%a5@, %d2
->  =20
-> -	moveq	#max_retry, %d2
-> -data_crc1:
-> +	moveq	#.Lmax_retry, %d2
-> +.Ldata_crc1:
->   	moveb	%a2@, %d5
-> -	dbmi	%d2, data_crc1
-> -	bpl	data_exit
-> +	dbmi	%d2, .Ldata_crc1
-> +	bpl	.Ldata_exit
->  =20
->   	moveb	%a5@, %d2
->  =20
->   	andb	#.Lhr_crc_error, %d5
-> -	bne	data_exit
-> +	bne	.Ldata_exit
->  =20
->   	/* return number of bytes read */
->  =20
-> -	movel	#sector_size, %d0
-> +	movel	#.Lsector_size, %d0
->   	addw	#1, %d4
->   	subl	%d4, %d0
->  =20
-> -data_exit:
-> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> +.Ldata_exit:
-> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
->   	rts
+>   	return 0;
 
