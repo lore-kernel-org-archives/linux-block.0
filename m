@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19593CB918;
-	Sun, 26 Jul 2026 15:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310212405EB;
+	Sun, 26 Jul 2026 15:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785080882; cv=none; b=d1i+lzhm4k3EYPM477L13j+nXrLamcXXpNUvt1r80xSivCJ6oavzpGkJxt6qMPXfmj6t75H9vM1nP/uN/uOgCRm9/+Kt3vmX67YnD9LVJLJc4QZ9XCBnyENAaf9m7YzqUTidwNLn0s6OWoCaDLl7Sos6V7E8grkZTBbghk6y1DA=
+	t=1785081089; cv=none; b=jPGUSaz+6al3TUv1jOtq6Bf3tEwVUjSh8C9gqf0W2coMN6kQTv8uIg338R8QVZGTCOaV7uUasgc8iqMFJXlf3fdeyNRqZeyqyfgbMBkPQ2wvpXbwYXCIFCLWz+fVcjnIVMVjIjGBYTILGRAvva0bD88F+a+VY3uLW6kN+eZhyN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785080882; c=relaxed/simple;
-	bh=m6DxSiIK9ZxpN/SQrQNbUND39ISaCovRCYXi9OruYfc=;
+	s=arc-20240116; t=1785081089; c=relaxed/simple;
+	bh=H3F+p5i1MImsAYgmhpx641LsancnQJgeOBYKeT/R/C0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hm+TgtgTYRytiidxWztpeP8EPlhErQ5Ovwn+3aLzLdNz4fAEXGQF+cR6FjLMUhvXwcbeQwlFKMsLGq3Q4nsZTUvw7uMGqZFKo0RBUE9PuSw/99ft0+rPXgy4gcKZBlD2jhOfFbwO2F+juQzmHbNGvGqi41g0yhHum29Kw3UxZPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=BfvJJykU; arc=none smtp.client-ip=212.227.17.24
+	 In-Reply-To:Content-Type; b=t2XiYyF7kb7bD+1yM/q3aq0TVE1IaA7tgtXbyCqPT6ug1x1UWPiCO6VO0F26p2ly1R6VydwRXbotU1kpKzGVjWgLcfQYjhY92fKqYkiBT9D5LEDCm1aOapSs6sPDkf3UpWgJIKylPduV3yJIVpyFkJAc1MDfY+Qj6UVsuvki7bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=LmX90APd; arc=none smtp.client-ip=217.72.192.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="BfvJJykU"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="LmX90APd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1785080873; x=1785685673; i=laurent@vivier.eu;
-	bh=yLWqWlwL+SqsRubuhuRqLorhNRBwwIhoDqGUkKY18qs=;
+	s=s1-ionos; t=1785081080; x=1785685880; i=laurent@vivier.eu;
+	bh=Dpl5JW1rkP4pObqL/FcXPHbETqRkrvSHzK3bzbqpPIU=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=BfvJJykU1qbLR8UmPtMxzi0aZfC6O/7XvrUb8Z0JkLbqa/UN9wz1uur0tPLT5A4J
-	 4jTsGBja7zmiBpqvROVVvxF0+alI7SJAdNjQ2WbiB4Y9dVg0p6uHJlWAr1uzgVt7E
-	 /2Gc+FO5B79qYpratz8BpVNaVSSQAtII7+aT4EkAjBUoW8ev1eOTpC+mleXJT5ujc
-	 F5ZIS6/wNCYDOYKCI+Zz4w83wkGVnqm2kvgJnoMPQe3IgoFf/laFDn4l/KR2O+ZRQ
-	 XLtnqIXcmeiTPjtC8aSi/8EDlUZ3yM9h4Clv+hWEj46hs/9rDJru1KScRXqGlsRg0
-	 BINlHWUaF2MgxQxltg==
+	b=LmX90APdl6ZgJQ+44RYWyTwrbTB3oZOfk4cIoMublW1cx9IsaNqw0syqsSuREXhv
+	 uH6yHixezwCY4IK+tRa/CrIT2CPUe4qDiKdarJPqBrJ9/Y3AAtZJt+ePws5P/XBES
+	 Z0e+NlCT0xVwzPFKeLXL0tSpm4oSbc3AvSJnB95Ieue7CQ7C/9BMStwLRGaUhj7lO
+	 yT1Wz9QAS9TFpu0dJO6LQCW9hk11bogPu8U0gt2lRXkBkjctRcBs3VaDgz9d2161e
+	 eqbDQi4zTyhDaAG9PkPeJHB/38g7H02xTnDLSlImrl3q66mnPTMfcden4UmjqxQd4
+	 CZw48i1x2I4P+hWBDw==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1Mspu2-1x80u10F6O-0121WH; Sun, 26
- Jul 2026 17:47:53 +0200
-Message-ID: <14cee4e9-bf7c-4bab-b769-8e464bf8f328@vivier.eu>
-Date: Sun, 26 Jul 2026 17:47:52 +0200
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1MG9wg-1wkgfb3eqS-009qXu; Sun, 26
+ Jul 2026 17:51:19 +0200
+Message-ID: <33b70275-7642-48a6-9be5-0354d0e09217@vivier.eu>
+Date: Sun, 26 Jul 2026 17:51:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 30/31] swim: Define symbols for constants
+Subject: Re: [PATCH 31/31] swim: Unexport global symbols
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <c88ebe0f2d3d51bdab346451442b69b206845792.1784196135.git.fthain@linux-m68k.org>
+ <b1193c2e8e8850922bec72f7ea2b07710d9f0fdd.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,117 +94,400 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <c88ebe0f2d3d51bdab346451442b69b206845792.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <b1193c2e8e8850922bec72f7ea2b07710d9f0fdd.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:mHCb4BR9Kkp/IwgTlL7YawSOVnXcBh8XmDAZtlL8UnPqeVACrDT
- OLjlaU/HBGf17UVgzqPCzcU1NduidG86jZHzCXSylUGahIonjPWPm5HQ8PZrfP22UbS0I3K
- S5npNV8SVtye9ajqnSfSaPqxbCxOOkdyxX94KXQGwrAYZufCQo8Pu6XaRi6yGKqHa2R4ndh
- MwpMEeJnroI4Fzo0gUU/w==
+X-Provags-ID: V03:K1:g4/Abcto6ivGdW49HVkDfUOHP8DsotIBx+Ibvy613+sed3xVBTc
+ qW6qEsO0fzN7yc0nfItKo3FSTSBTwVoMXvKqmthsLXClnL2m0LQ7o290j10LkRfkEBHcX2L
+ LgSUCZS2NFdBOxA3r1hNQvUxHQQE+kEytPPh9gHaTkAT0ogG4AsDQkrSgoKDZeMVWYjOap5
+ VQWr48+DBIKQU38HkPrkg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6qs7nZDnudY=;VkUhKMHPGfYwzP+h7A9lHTQz0Ob
- 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
+UI-OutboundReport: notjunk:1;M01:P0:SgTRYBRY774=;N2bvybOuZySMoPccgnbmBMv3iev
+ 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
+ =
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> Define local symbols to give some meaning to anonymous constants.
+> These symbols aren't used outside of this file so use local ones.
 > No functional change.
 >=20
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim_asm.S | 24 ++++++++++++++----------
->   1 file changed, 14 insertions(+), 10 deletions(-)
+>   drivers/block/swim_asm.S | 251 ++++++++++++++++++++-------------------
+>   1 file changed, 128 insertions(+), 123 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 >=20
 > diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-> index 3d5ad525ccde..c17a25e1cd33 100644
+> index c17a25e1cd33..65b4e4658e10 100644
 > --- a/drivers/block/swim_asm.S
 > +++ b/drivers/block/swim_asm.S
-> @@ -42,6 +42,10 @@
->   	.equ	max_retry, 40
->   	.equ	sector_size, 512
+> @@ -14,33 +14,33 @@
+>    * 2008-11-05 (lv) - add get_swim_mode
+>    */
 >  =20
-> +	.equ	.Lmr_clear_fifo,	0x01
-> +	.equ	.Lmr_action,		0x08
-> +	.equ	.Lmr_write_action,	0x18
+> -	.equ	write_data,	0x0000
+> -	.equ	write_mark,	0x0200
+> -	.equ	write_CRC,	0x0400
+> -	.equ	write_parameter,0x0600
+> -	.equ	write_phase,	0x0800
+> -	.equ	write_setup,	0x0a00
+> -	.equ	write_mode0,	0x0c00
+> -	.equ	write_mode1,	0x0e00
+> -	.equ	read_data,	0x1000
+> -	.equ	read_mark,	0x1200
+> -	.equ	read_error,	0x1400
+> -	.equ	read_parameter,	0x1600
+> -	.equ	read_phase,	0x1800
+> -	.equ	read_setup,	0x1a00
+> -	.equ	read_status,	0x1c00
+> -	.equ	read_handshake,	0x1e00
+> -
+> -	.equ	o_side, 0
+> -	.equ	o_track, 1
+> -	.equ	o_sector, 2
+> -	.equ	o_size, 3
+> -	.equ	o_crc0, 4
+> -	.equ	o_crc1, 5
+> -
+> -	.equ	seek_time, 30000
+> -	.equ	max_retry, 40
+> -	.equ	sector_size, 512
+> +	.equ	.Lwrite_data,		0x0000
+> +	.equ	.Lwrite_mark,		0x0200
+> +	.equ	.Lwrite_CRC,		0x0400
+> +	.equ	.Lwrite_parameter,	0x0600
+> +	.equ	.Lwrite_phase,		0x0800
+> +	.equ	.Lwrite_setup,		0x0a00
+> +	.equ	.Lwrite_mode0,		0x0c00
+> +	.equ	.Lwrite_mode1,		0x0e00
+> +	.equ	.Lread_data,		0x1000
+> +	.equ	.Lread_mark,		0x1200
+> +	.equ	.Lread_error,		0x1400
+> +	.equ	.Lread_parameter,	0x1600
+> +	.equ	.Lread_phase,		0x1800
+> +	.equ	.Lread_setup,		0x1a00
+> +	.equ	.Lread_status,		0x1c00
+> +	.equ	.Lread_handshake,	0x1e00
 > +
->   	.equ	.Lhr_crc_error,		0x02
->   	.equ	.Lhr_fifo_2bytes,	0x40
->   	.equ	.Lhr_fifo_1byte,	0x80
-> @@ -70,11 +74,11 @@ mfm_read_addrmark:
->   	movew	#seek_time, %d2
+> +	.equ	.Lo_side,		0
+> +	.equ	.Lo_track,		1
+> +	.equ	.Lo_sector,		2
+> +	.equ	.Lo_size,		3
+> +	.equ	.Lo_crc0,		4
+> +	.equ	.Lo_crc1,		5
+> +
+> +	.equ	.Lseek_time,		30000
+> +	.equ	.Lmax_retry,		40
+> +	.equ	.Lsector_size,		512
 >  =20
->   wait_header_init:
-> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
-> -	moveb	#0x01, %a3@(write_mode1 - read_mark)
-> -	moveb	#0x01, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
->   	tstb	%a3@(read_error - read_mark)
-> -	moveb	#0x08, %a3@(write_mode1 - read_mark)
-> +	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+>   	.equ	.Lmr_clear_fifo,	0x01
+>   	.equ	.Lmr_action,		0x08
+> @@ -56,91 +56,96 @@ swim_read_sector_header:
+>   	moveml	%d1-%d5/%a0-%a5,%sp@-
+>   	movel	%a6@(0x0c), %a4
+>   	moveq	#-1, %d0
+> -	bsr	mfm_read_addrmark
+> +	bsr	.Lmfm_read_addrmark
+>   	moveml	%sp@+, %d1-%d5/%a0-%a5
+>   	unlk	%a6
+>   	rts
 >  =20
->   	lea	sector_address_mark, %a0
+> -sector_address_mark:
+> +.Lsector_address_mark:
+>   	.byte	0xa1, 0xa1, 0xa1, 0xfe
+> -sector_data_mark:
+> +.Lsector_data_mark:
+>   	.byte	0xa1, 0xa1, 0xa1, 0xfb
+>  =20
+> -mfm_read_addrmark:
+> +.Lmfm_read_addrmark:
+>   	movel	%a6@(0x08), %a3
+> -	lea	%a3@(read_handshake), %a2
+> -	lea	%a3@(read_data), %a5
+> -	lea	%a3@(read_mark), %a3
+> -	movew	#seek_time, %d2
+> -
+> -wait_header_init:
+> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
+> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+> -	tstb	%a3@(read_error - read_mark)
+> -	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+> -
+> -	lea	sector_address_mark, %a0
+> +	lea	%a3@(.Lread_handshake), %a2
+> +	lea	%a3@(.Lread_data), %a5
+> +	lea	%a3@(.Lread_mark), %a3
+> +	movew	#.Lseek_time, %d2
+> +
+> +.Lwait_header_init:
+> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode1 - .Lread_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode0 - .Lread_mark)
+> +	tstb	%a3@(.Lread_error - .Lread_mark)
+> +	moveb	#.Lmr_action, %a3@(.Lwrite_mode1 - .Lread_mark)
+> +
+> +	lea	.Lsector_address_mark, %a0
 >   	moveq	#3, %d1
-> @@ -136,7 +140,7 @@ crc1:	moveb	%a2@, %d5
+>  =20
+> -wait_addr_mark_byte:
+> +.Lwait_addr_mark_byte:
+>   	tstb	%a2@
+> -	dbmi	%d2, wait_addr_mark_byte
+> -	bpl	signal_nonyb
+> +	dbmi	%d2, .Lwait_addr_mark_byte
+> +	bpl	.Lsignal_nonyb
+>  =20
+>   	moveb	%a3@, %d3
+>   	cmpb	%a0@+, %d3
+> -	dbne	%d1, wait_addr_mark_byte
+> -	bne	wait_header_init
+> +	dbne	%d1, .Lwait_addr_mark_byte
+> +	bne	.Lwait_header_init
+>  =20
+> -	moveq	#max_retry, %d2
+> -amark0:	tstb	%a2@
+> -	dbmi	%d2, amark0
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lamark0:
+> +	tstb	%a2@
+> +	dbmi	%d2, .Lamark0
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_track)
+> +	moveb	%a5@, %a4@(.Lo_track)
+>  =20
+> -	moveq	#max_retry, %d2
+> -amark1:	tstb	%a2@
+> -	dbmi	%d2, amark1
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lamark1:
+> +	tstb	%a2@
+> +	dbmi	%d2, .Lamark1
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_side)
+> +	moveb	%a5@, %a4@(.Lo_side)
+>  =20
+> -	moveq	#max_retry, %d2
+> -amark2:	tstb	%a2@
+> -	dbmi	%d2, amark2
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lamark2:
+> +	tstb	%a2@
+> +	dbmi	%d2, .Lamark2
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_sector)
+> +	moveb	%a5@, %a4@(.Lo_sector)
+>  =20
+> -	moveq	#max_retry, %d2
+> -amark3:	tstb	%a2@
+> -	dbmi	%d2, amark3
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lamark3:
+> +	tstb	%a2@
+> +	dbmi	%d2, .Lamark3
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_size)
+> +	moveb	%a5@, %a4@(.Lo_size)
+>  =20
+> -	moveq	#max_retry, %d2
+> -crc0:	tstb	%a2@
+> -	dbmi	%d2, crc0
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lcrc0:
+> +	tstb	%a2@
+> +	dbmi	%d2, .Lcrc0
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_crc0)
+> +	moveb	%a5@, %a4@(.Lo_crc0)
+>  =20
+> -	moveq	#max_retry, %d2
+> -crc1:	moveb	%a2@, %d5
+> -	dbmi	%d2, crc1
+> -	bpl	signal_nonyb
+> +	moveq	#.Lmax_retry, %d2
+> +.Lcrc1:	moveb	%a2@, %d5
+> +	dbmi	%d2, .Lcrc1
+> +	bpl	.Lsignal_nonyb
+>  =20
+> -	moveb	%a5@, %a4@(o_crc1)
+> +	moveb	%a5@, %a4@(.Lo_crc1)
+>  =20
+>   	andb	#.Lhr_crc_error, %d5
+> -	bne	signal_nonyb
+> +	bne	.Lsignal_nonyb
 >  =20
 >   	moveq	#0, %d0
->   signal_nonyb:
-> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> -signal_nonyb:
+> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> +.Lsignal_nonyb:
+> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
 >   	rts
 >  =20
 >   	.global swim_read_sector_data
-> @@ -158,11 +162,11 @@ mfm_read_data:
->   	movew	#seek_time, %d2
+> @@ -149,86 +154,86 @@ swim_read_sector_data:
+>   	moveml	%d1-%d5/%a0-%a5,%sp@-
+>   	movel	%a6@(0x0c), %a4
+>   	moveq	#-1, %d0
+> -	bsr	mfm_read_data
+> +	bsr	.Lmfm_read_data
+>   	moveml	%sp@+, %d1-%d5/%a0-%a5
+>   	unlk	%a6
+>   	rts
 >  =20
->   wait_data_init:
-> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
-> -	moveb	#0x01, %a3@(write_mode1 - read_mark)
-> -	moveb	#0x01, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
-> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
->   	tstb	%a3@(read_error - read_mark)
-> -	moveb	#0x08, %a3@(write_mode1 - read_mark)
-> +	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
->  =20
->   	lea	sector_data_mark, %a0
+> -mfm_read_data:
+> +.Lmfm_read_data:
+>   	movel	%a6@(0x08), %a3
+> -	lea	%a3@(read_handshake), %a2
+> -	lea	%a3@(read_data), %a5
+> -	lea	%a3@(read_mark), %a3
+> -	movew	#seek_time, %d2
+> -
+> -wait_data_init:
+> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
+> -	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+> -	tstb	%a3@(read_error - read_mark)
+> -	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+> -
+> -	lea	sector_data_mark, %a0
+> +	lea	%a3@(.Lread_handshake), %a2
+> +	lea	%a3@(.Lread_data), %a5
+> +	lea	%a3@(.Lread_mark), %a3
+> +	movew	#.Lseek_time, %d2
+> +
+> +.Lwait_data_init:
+> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode1 - .Lread_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(.Lwrite_mode0 - .Lread_mark)
+> +	tstb	%a3@(.Lread_error - .Lread_mark)
+> +	moveb	#.Lmr_action, %a3@(.Lwrite_mode1 - .Lread_mark)
+> +
+> +	lea	.Lsector_data_mark, %a0
 >   	moveq	#3, %d1
-> @@ -226,5 +230,5 @@ data_crc1:
+>  =20
+>   	/* wait data address mark */
+>  =20
+> -wait_data_mark_byte:
+> +.Lwait_data_mark_byte:
+>   	tstb	%a2@
+> -	dbmi	%d2, wait_data_mark_byte
+> -	bpl	data_exit
+> +	dbmi	%d2, .Lwait_data_mark_byte
+> +	bpl	.Ldata_exit
+>  =20
+>   	moveb	%a3@, %d3
+>   	cmpb	%a0@+, %d3
+> -	dbne	%d1, wait_data_mark_byte
+> -	bne	wait_data_init
+> +	dbne	%d1, .Lwait_data_mark_byte
+> +	bne	.Lwait_data_init
+>  =20
+>   	/* read data */
+>  =20
+> -	movel	#sector_size - 1, %d4		/* sector size */
+> -read_new_data:
+> -	movew	#max_retry, %d2
+> -read_data_loop:
+> +	movel	#.Lsector_size - 1, %d4		/* sector size */
+> +.Lread_new_data:
+> +	movew	#.Lmax_retry, %d2
+> +.Lread_data_loop:
+>   	moveb	%a2@, %d5
+>   	andb	#(.Lhr_fifo_2bytes + .Lhr_fifo_1byte), %d5
+>   	beq	1f
+> -	movew	#max_retry, %d2
+> +	movew	#.Lmax_retry, %d2
+>   	moveb	%a5@, %a4@+
+>   	dbra	%d4, 1f
+> -	bra	data_crc0
+> +	bra	.Ldata_crc0
+>   1:	andb	#.Lhr_fifo_2bytes, %d5
+> -	dbne	%d2, read_data_loop
+> -	beq	data_exit
+> +	dbne	%d2, .Lread_data_loop
+> +	beq	.Ldata_exit
+>   	moveb	%a5@, %a4@+
+> -	dbra	%d4, read_new_data
+> +	dbra	%d4, .Lread_new_data
+>  =20
+>   	/* read CRC */
+>  =20
+> -	movew	#max_retry, %d2
+> -data_crc0:
+> +	movew	#.Lmax_retry, %d2
+> +.Ldata_crc0:
+>   	tstb	%a2@
+> -	dbmi	%d2, data_crc0
+> -	bpl	data_exit
+> +	dbmi	%d2, .Ldata_crc0
+> +	bpl	.Ldata_exit
+>  =20
+>   	moveb	%a5@, %d2
+>  =20
+> -	moveq	#max_retry, %d2
+> -data_crc1:
+> +	moveq	#.Lmax_retry, %d2
+> +.Ldata_crc1:
+>   	moveb	%a2@, %d5
+> -	dbmi	%d2, data_crc1
+> -	bpl	data_exit
+> +	dbmi	%d2, .Ldata_crc1
+> +	bpl	.Ldata_exit
+>  =20
+>   	moveb	%a5@, %d2
+>  =20
+>   	andb	#.Lhr_crc_error, %d5
+> -	bne	data_exit
+> +	bne	.Ldata_exit
+>  =20
+>   	/* return number of bytes read */
+>  =20
+> -	movel	#sector_size, %d0
+> +	movel	#.Lsector_size, %d0
+>   	addw	#1, %d4
 >   	subl	%d4, %d0
 >  =20
->   data_exit:
-> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
-> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> -data_exit:
+> -	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> +.Ldata_exit:
+> +	moveb	#.Lmr_write_action, %a3@(.Lwrite_mode0 - .Lread_mark)
 >   	rts
 
