@@ -1,41 +1,41 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93E3169AD2;
-	Sun, 26 Jul 2026 15:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19593CB918;
+	Sun, 26 Jul 2026 15:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785080781; cv=none; b=cv+0Y5QuhWToy8NTVxwBgPogXPAykNFq4qbhIJHSghY+En/csyATxQF68lAPCLdgYWBChyQ6OI2SQCz7jnrIENEpjLKH2SgQL1ULLP1zDFB6676ByF1wOuao12aDwOLG0Z0VH3oLtLoPbhz3NUEaDrK706PCSgkbLbS1N4huVvE=
+	t=1785080882; cv=none; b=d1i+lzhm4k3EYPM477L13j+nXrLamcXXpNUvt1r80xSivCJ6oavzpGkJxt6qMPXfmj6t75H9vM1nP/uN/uOgCRm9/+Kt3vmX67YnD9LVJLJc4QZ9XCBnyENAaf9m7YzqUTidwNLn0s6OWoCaDLl7Sos6V7E8grkZTBbghk6y1DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785080781; c=relaxed/simple;
-	bh=n7dhn7qE9jVag40HDcUTId5l7kGYRnvWaN24WZK4TzE=;
+	s=arc-20240116; t=1785080882; c=relaxed/simple;
+	bh=m6DxSiIK9ZxpN/SQrQNbUND39ISaCovRCYXi9OruYfc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AJapQo86dtON7PfwdXhI/ouh6TzW2nKPWZiJYEh4tKDA46rePPcop2cAOZwYh7KMbz0NBMuCfzpTnWez4PeE7CRy+byCaVRKIRuoQYPoFYcJtz5lKmnn/X05ztQF7L3D+gc1fsvInVbgskVc/+uxveNQpKEu0PB5kdTLop5pbqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=Q4sDxZqi; arc=none smtp.client-ip=212.227.17.10
+	 In-Reply-To:Content-Type; b=hm+TgtgTYRytiidxWztpeP8EPlhErQ5Ovwn+3aLzLdNz4fAEXGQF+cR6FjLMUhvXwcbeQwlFKMsLGq3Q4nsZTUvw7uMGqZFKo0RBUE9PuSw/99ft0+rPXgy4gcKZBlD2jhOfFbwO2F+juQzmHbNGvGqi41g0yhHum29Kw3UxZPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=BfvJJykU; arc=none smtp.client-ip=212.227.17.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="Q4sDxZqi"
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="BfvJJykU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
-	s=s1-ionos; t=1785080772; x=1785685572; i=laurent@vivier.eu;
-	bh=l1cJzNUZwpAXkY8+XZ7Vl98OAShBLpLlSidTOR8+wVU=;
+	s=s1-ionos; t=1785080873; x=1785685673; i=laurent@vivier.eu;
+	bh=yLWqWlwL+SqsRubuhuRqLorhNRBwwIhoDqGUkKY18qs=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=Q4sDxZqiPGFX30AYu1cZFlrQgb4UYz3S8Igv3kW5ES6ZxXFxGQs68DFV2sPEGwhn
-	 /Msna8jTV7gpgeaYpoBqfJE3oNG4ScQBl1cAkUQtHQ46jyuNtKWd+0/UTK64S+5pC
-	 6apZO4102iCRpEw8f4ThvOmFDWfn31IvEnmIvBEaE5IoWCYo6LNiTDBhkPgWc6ltK
-	 cM9d58PhDjIVM4byLYvZCYqmDcJQMWp0xLLowAS5dIuhUB30F7QNGujprBGNsTVZN
-	 La4FLh8+7BvZDZ7+VDM97BB2rTnhbbZ5oy4HqqMN4avcBPyEMgChqWiGpzFLfuvCx
-	 NdtAZTgX/kWeYzSttg==
+	b=BfvJJykU1qbLR8UmPtMxzi0aZfC6O/7XvrUb8Z0JkLbqa/UN9wz1uur0tPLT5A4J
+	 4jTsGBja7zmiBpqvROVVvxF0+alI7SJAdNjQ2WbiB4Y9dVg0p6uHJlWAr1uzgVt7E
+	 /2Gc+FO5B79qYpratz8BpVNaVSSQAtII7+aT4EkAjBUoW8ev1eOTpC+mleXJT5ujc
+	 F5ZIS6/wNCYDOYKCI+Zz4w83wkGVnqm2kvgJnoMPQe3IgoFf/laFDn4l/KR2O+ZRQ
+	 XLtnqIXcmeiTPjtC8aSi/8EDlUZ3yM9h4Clv+hWEj46hs/9rDJru1KScRXqGlsRg0
+	 BINlHWUaF2MgxQxltg==
 X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
 Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
- [213.165.67.119]) with ESMTPSA (Nemesis) id 1MlwFp-1xEEro3N1X-00aDni; Sun, 26
- Jul 2026 17:46:11 +0200
-Message-ID: <0e80449f-e315-42e7-b5a0-2cb2eb313256@vivier.eu>
-Date: Sun, 26 Jul 2026 17:46:11 +0200
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1Mspu2-1x80u10F6O-0121WH; Sun, 26
+ Jul 2026 17:47:53 +0200
+Message-ID: <14cee4e9-bf7c-4bab-b769-8e464bf8f328@vivier.eu>
+Date: Sun, 26 Jul 2026 17:47:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 29/31] swim: Define macros for constants
+Subject: Re: [PATCH 30/31] swim: Define symbols for constants
 To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
 References: <cover.1784196135.git.fthain@linux-m68k.org>
- <960a50d4c5b3b23f7198f4a3dae03bdeddbf098a.1784196135.git.fthain@linux-m68k.org>
+ <c88ebe0f2d3d51bdab346451442b69b206845792.1784196135.git.fthain@linux-m68k.org>
 Content-Language: fr
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; keydata=
@@ -94,91 +94,117 @@ Autocrypt: addr=laurent@vivier.eu; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-In-Reply-To: <960a50d4c5b3b23f7198f4a3dae03bdeddbf098a.1784196135.git.fthain@linux-m68k.org>
+In-Reply-To: <c88ebe0f2d3d51bdab346451442b69b206845792.1784196135.git.fthain@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:54ip6HaFgvuqlUOefZYbw3aeymkQDM5nnO76ohlg2xzrv/e5eDy
- RmmCvcQVEmmlUEZ9lgn5jamaZhkHJWugKo+rwjmobgXhBpXmG9b/5A/xcGGyIRgJkyhCQLR
- mS2ZRPC6urndPWBNrSRJ8rr+fvSApiwH+lCwVxdP1GDaTPMxnnheYqQR7A+6IswAu/P1u9f
- 8t6NU49ujyniqpVMXmIkw==
+X-Provags-ID: V03:K1:mHCb4BR9Kkp/IwgTlL7YawSOVnXcBh8XmDAZtlL8UnPqeVACrDT
+ OLjlaU/HBGf17UVgzqPCzcU1NduidG86jZHzCXSylUGahIonjPWPm5HQ8PZrfP22UbS0I3K
+ S5npNV8SVtye9ajqnSfSaPqxbCxOOkdyxX94KXQGwrAYZufCQo8Pu6XaRi6yGKqHa2R4ndh
+ MwpMEeJnroI4Fzo0gUU/w==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:J0xO8Ur0Rq8=;ubfuoH/VRGFLZhuABi6DRQDfqVz
- bkPwoM8YoXeQTUiKg+Eg2gyVowyFLf0KTgk6vtDb+IEhr2PYMmB4yAbm6ihvY/f5/RXFN6HOG
- 98IXz35JIPz6siGTaVE2+rhm0AmssUoNbxQQSxqFzHej0jBOy21jmRGHxcoQfpKNVZoPogbJn
- 8DOr+J4XJRYz/xbg5G0tiuEjUWvdtt92VCJw2nU7c+Ql7IVHd1bJJ0GTko9cYGcRRrpFEFBiQ
- 1+dHgWfrOjLEk2ICPVvTis16eb8jOj7SRlVg4gzgIbxzvZbQ6lm0FP93hJUr+7jnyr/4zK3io
- mU+3c75KyECLyYPGgj+CSgSGuv0Iqv22wFVSQ7jJcobFDdYPQeSB16Vjr4zQjqQacG/EOIBBB
- O2Ijzb1tCVF/zAjh0XTinsc0GHqpwQy1jz9AnQQw5vBhiJIxmgGa6DisyvorJpmfEW6/uFv+7
- tksN1GhuCZgGpvNuEfvSv37B6Njlu8c75Adawq/SOHFpUXMjuWZggsuChZOZ8clyJCTu+zYKi
- MCU8lWbrWag8I3LNCKTXzR5jl/MirBM4BtdCOqP3Rn00gDyH4lnu0WSZ1SgpNS4HwbLlucT//
- EGgRZBBrpMUpZya90knu0PV7UrEaVbiQQWyTqtu2UOqxeGnL8hAS7PC/gd7kZdLK9e3nPq4DG
- w+z+NlllcESRBH2oNo8CevFHh7slvaneotsj+8HrAFVyr3tZhA9sHuEFmtPiwyLTezTIzJSV8
- Vr60pd+3My4F9qArFBPheUP+Nt/ffHa/K7puGTavCnw1eNmfZ1exkmqGcBz6mwxannTUrYVFT
- 9cyzH58Ongibh9OH715AXR8TUP37WaPQR44m0vge+mAPWmj/JI10rlGVAra6wJW4K6SJB54dY
- 9ZUzwpKSg+7LEdKz8w3WegOVFEiisHNzgGqSrLbLhJG1qA8FYU2DCN0rXZTYpCsaHXxcAlsM2
- AVMRyaF+8IflVIKnD8bWHkVSBnym/XkTMrdltzvP8KABbMJJb/z6DAAgK4ldnk3IGvEHEZOxU
- RIRP/faqQomPPcCBs7bfSMJKVduQsDYxAnaboSJ59EIN08EvvqXJSiHjXgIEtPDhqYnBAr0NS
- dKrOa+aNX41M/E/R7AcJQ8kAhqZ4dD9tIks90IubfAda7UReakftHAWFX8Ndu6p7XIARjJ6ca
- zi1e7GQ8/KlzHCZIZiz3AgDDlpjVAhy9J5VwaXxHEffUPR58hd6wNj4Jtb/SLePHhA9vA74v2
- 2ChgVxTdJlCc7LGO1xFa58WHfYMXQhZfC2bndDcdx/ykHABeXwSKCv0HtZ4lExGUMnD0gEe18
- j6M7mK4FGcFI/BeaREx1jYNiU6QrCe25J+VzlWgq8RRdd1Vkd9klDCHta6wpqXHOckLeBIEIY
- vRiNQJA3cSOK4oka7aaqYesGXIX/D0CpKAV7/mYsVlYlQMlKIz7utORPkGPvoQjalNih5afmb
- FMVi3QDIxKAmOUf7G+a8iZA1KNVV6J260Z9i/u+hEh7DL120paZ8aOcZvMmxdQfdyMYsrBhFY
- CHmdqrSO3Cqj1CITgnN7foWZjxNlNmh9uNelfNqBQWlof1svygIAhP0JnIX3yiqFquZSn3S2j
- hZPQ4Hn3BikK0K66qlbz3pg3MUb2QTnbZLMyRO0d/j+Gav94ecnIfQnMrIJ8XCynDNRz5b7Za
- rL24jcHuwlezKuTPRNm4WjZHiOqSF1LaRK4M0DaTjdb/5/EoNGIIRwDm6hdSZzf8U2cMo+DJ6
- q16QmePLgCGt0UNDDXJjIHGqyfllX0G1OlmYf2BtwXKu7MQo1oD3UenAPcHmBnEcvQkKUuSW8
- SqkrurgdcU1el9aJWA8j0Js7GiSTZL5frW32Xpp+yZC3qIvCZQx1vDTqwWuv2sUvMwQuD4ioI
- awZPaztrn93lEMUQrM+gaTw4Fd0b4YNkVaFV+jLH0cLRfq0/snjSyxxb/bCnV1W8sTi5TnT13
- eTtnSt0rn4dWbF229LTgVZ4qgrNpldSnYxQVJwJQERNlL1ldmN
+UI-OutboundReport: notjunk:1;M01:P0:6qs7nZDnudY=;VkUhKMHPGfYwzP+h7A9lHTQz0Ob
+ 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
 
 Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
-> Define a SEL_MASK macro to name the anonymous constant. Define STEPPING
-> rather than re-use STEP because the latter is a command bit macro (see a=
-lso
-> GCR_MODE vs. SETGCR). No functional change, just better readability.
+> Define local symbols to give some meaning to anonymous constants.
+> No functional change.
 >=20
 > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->   drivers/block/swim.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
+>   drivers/block/swim_asm.S | 24 ++++++++++++++----------
+>   1 file changed, 14 insertions(+), 10 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 >=20
-> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-> index 406792952e7f..460f74c19cfd 100644
-> --- a/drivers/block/swim.c
-> +++ b/drivers/block/swim.c
-> @@ -112,9 +112,11 @@ struct iwm {
->   #define LSTRB		0x0F8
+> diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
+> index 3d5ad525ccde..c17a25e1cd33 100644
+> --- a/drivers/block/swim_asm.S
+> +++ b/drivers/block/swim_asm.S
+> @@ -42,6 +42,10 @@
+>   	.equ	max_retry, 40
+>   	.equ	sector_size, 512
 >  =20
->   #define CA_MASK		0x0F7
-> +#define SEL_MASK	0x100
+> +	.equ	.Lmr_clear_fifo,	0x01
+> +	.equ	.Lmr_action,		0x08
+> +	.equ	.Lmr_write_action,	0x18
+> +
+>   	.equ	.Lhr_crc_error,		0x02
+>   	.equ	.Lhr_fifo_2bytes,	0x40
+>   	.equ	.Lhr_fifo_1byte,	0x80
+> @@ -70,11 +74,11 @@ mfm_read_addrmark:
+>   	movew	#seek_time, %d2
 >  =20
->   /* Select values for swim_select and swim_readbit */
+>   wait_header_init:
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> -	moveb	#0x01, %a3@(write_mode1 - read_mark)
+> -	moveb	#0x01, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+>   	tstb	%a3@(read_error - read_mark)
+> -	moveb	#0x08, %a3@(write_mode1 - read_mark)
+> +	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
 >  =20
-> +#define STEPPING	0x0F1
->   #define READ_DATA_0	0x0F4
->   #define ONEMEG_DRIVE	0x0F5
->   #define SINGLE_SIDED	0x0F6
-> @@ -271,7 +273,7 @@ static inline void swim_select(struct swim __iomem *=
-base, int sel)
->   {
->   	swim_write(base, phase, RELAX);
+>   	lea	sector_address_mark, %a0
+>   	moveq	#3, %d1
+> @@ -136,7 +140,7 @@ crc1:	moveb	%a2@, %d5
 >  =20
-> -	via1_set_head(sel & 0x100);
-> +	via1_set_head(sel & SEL_MASK);
+>   	moveq	#0, %d0
+>   signal_nonyb:
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+>   	rts
 >  =20
->   	swim_write(base, phase, sel & CA_MASK);
->   }
-> @@ -369,7 +371,7 @@ static int swim_step(struct swim __iomem *base)
->   {
->   	swim_action(base, STEP);
->   	udelay(150);
-> -	return swim_readbit_timeout_atomic(base, STEP, false, 20 * 1000);
-> +	return swim_readbit_timeout_atomic(base, STEPPING, false, 20 * 1000);
->   }
+>   	.global swim_read_sector_data
+> @@ -158,11 +162,11 @@ mfm_read_data:
+>   	movew	#seek_time, %d2
 >  =20
->   static int swim_track00(struct swim __iomem *base)
+>   wait_data_init:
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> -	moveb	#0x01, %a3@(write_mode1 - read_mark)
+> -	moveb	#0x01, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
+> +	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+>   	tstb	%a3@(read_error - read_mark)
+> -	moveb	#0x08, %a3@(write_mode1 - read_mark)
+> +	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+>  =20
+>   	lea	sector_data_mark, %a0
+>   	moveq	#3, %d1
+> @@ -226,5 +230,5 @@ data_crc1:
+>   	subl	%d4, %d0
+>  =20
+>   data_exit:
+> -	moveb	#0x18, %a3@(write_mode0 - read_mark)
+> +	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+>   	rts
 
