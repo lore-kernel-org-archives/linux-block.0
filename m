@@ -1,168 +1,217 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4E933B6FB
-	for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 07:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB123242DF
+	for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 11:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785049684; cv=none; b=ruJYzDJ4685m8d2RwQhwxaSd15i/ShdI4gum/t1kbSEOJTlY2lHd3VIJwrXx0mIrl6eoIY8s+pekyZeDlTlupiH5jEb/ucUuTRJedThbBrqiPhDC79TafQ42nX+RpBqgl7Fd98TqW0esyssVjwVn7uuW4soiSY++lngnuU0YabI=
+	t=1785065559; cv=none; b=FENLTLnj39j3GUymNgKo00HeFhEY3j717vp8qtW4yhcuLg88ffhvsQ1PbaHnQ+QdimTHQLPefMyxbxJBjgW+K2dGklYnDyIXeztOV0O2cLTdoOBr7j5e1kY5bedYuWIjckv/7lvss4dOX7WENf+i5wAAye2mfGjXnw5FX6oZjG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785049684; c=relaxed/simple;
-	bh=MHoGe+90hZ9L09syldld3iRrVB9477XinVV/vSsaNLE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=jZSV+EW5gto3mQR1A2kUwHbPSJhRq8/hLzv5SQ7mnTHk3Q2FSUwxDpNsbb2IO4zstkhGroBvteeLUzlEMXaDVtcF2qMPUYfdDpEd1m7d52G+WSqrZH0QcbdyKlKhPGwF12+kM/mcH2GFWU25yvsHfzSArWXDB2lnko/ChUCFYjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7e6b59d85dcso3421022a34.3
-        for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 00:08:02 -0700 (PDT)
+	s=arc-20240116; t=1785065559; c=relaxed/simple;
+	bh=YgfpfgE1On3sKHo6BvwUe+munCme3srUBUyovRvl9UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dfS8yqnCrHX7R0pmB8Riu9kdPNdn/6P4vr4ewUJDpovcYqQmyZDghqG5pKGSsEInAbUncpa6WclTF5UMIJw6E6jUVnPl0+MnL3Kvfm9YYgKiZWDob+SnS1hitFOwUfxLgOaSpVlK+KT4ofJYS/r/BgdfN7A2Q5AWNj+EbAxINWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=OSGX6LbX; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="OSGX6LbX"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47db714766aso1442991f8f.0
+        for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 04:32:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=meshstor.io; s=google; t=1785065555; x=1785670355; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=1Z37TstzxvLPhvEDUnNTL3PywZ4xjkcbPX0WwT+YK50=;
+        b=OSGX6LbX76Zqq2kb96PLZpasCB9IkQdkf/FxFirQzWlppmHzHIkVwIkMSsVhlV6dzp
+         hrTvEif46cVHBUMJUlNw4bqMd6krHBUysk0fV0YAYkMNGSfr8sykr1Z50//XkyfrlKe5
+         jYvEEFYP1PWvArF6+PtPDYki+BXnDE8LmdhKkIdsFQ4aqwRVK38atattfvMqzPb83zT5
+         9SVUbFVu1pJ3JMDvjjuJZMHNvnMbTvPiwJ5y//1+Ye7wUn3g5FTJIdZhxwoYd9Ar9j2O
+         PWx9/bwXI56c0JOWOo/4xQkDTz1yFdB24O493/lMabcWNKT3hJ0vsuBuxRAcLpWXML4o
+         yatA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785049682; x=1785654482;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=XKW6kq58maKYt/2lW6GoOr8xzvWAewxyPhVuBDRpRgw=;
-        b=Xxd1REXpecWx6Y4VF5qDsL0ApOERYbAXgacV60HLTW8Tm3R0ZjFhLWkbF0Zfa0TK4B
-         Mh+7PbfVu/rHC10Wi9QZG0PMkDihoUKYXtqCU/bstWIMQ8E5AeFAVDEuGWdkNjDxiMVU
-         YsDlzBJGxDFiPnS6ByMr/wJWOwQbP9TwKLDZq2Z1uzkMQoPV6dEwYvjPNq0UIQSeZAvj
-         t3ILf2D59pLSjUhjHrkVPVHVAs2S+2amYKdbirO1wcyFnzr2fE27zszeqPyBBmXV+llf
-         7JKvf/VTAJPUMDuwRBXFF91qo8moAAbeJyvvFMSiNb7KRRsAsJdvb5GlSX7wdEHXiTfs
-         MqXA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro9yHDbzb+7ocb9Us+2s4Xp3GQ4jSwHkwdEiaqH42nX1mjnYABCylKZzjvGGQ4hmypK7eFsLHtjpwEVWQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLgken+ZQmQXC2zCPptmJvqNMaUcKSeFXcy7f29hPAbb3KxfnJ
-	uzEgRtKyyF9bG86MPCq9UBnV4I6x40dtGOAVCy9gMnsX1P4eBZA3GDftDF6yG1w5NJIY+CK23eD
-	5K99ssCUVOrvzBXFtKYlRFcRMBIXCtZ7XrwQtxBkh0Vt2wuztGqBhrG1pz8I=
+        d=1e100.net; s=20251104; t=1785065555; x=1785670355;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=1Z37TstzxvLPhvEDUnNTL3PywZ4xjkcbPX0WwT+YK50=;
+        b=QO/7jLcFYgT1/f5ACxHwgHyCO0Bb7lTIBqo6jgBbIslC2SB9jcT271NeZ/k4BFnb85
+         fuJg53856o+7h1qozSMPNQPUHYws0854cUjuGwG20s4zYcE+4XJJL4sBro211vH1uPyO
+         rHG+oHDtSB8E6pk6UXWGNzkhaZTu20DcjvletaeTW9+1ebOkkqAL/r8xZ16F56J6k0S/
+         p9Ryg+t5j7Pf0NJtV/HliTPUrT5wf9Fmo7O6XXT5RGNvlWgSSDjMG++pU+4EvIUnkK+G
+         qtX0gC/2+opDPfReZW8NjG/kNZ0sTUN/NhxORr54Zmlj5cwnQqZX+MAI98LIJYfY0OQs
+         amrQ==
+X-Forwarded-Encrypted: i=1; AHgh+Ro+40wAQYztSHqZIoy2HjxqmTpN4Cow0M7yURWwKl+lY9OEEjRyKwO3+A1IE7KbHOeCUCFwW2Tw1y27sA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YydKDV7s64E9lQyEnt9fSveheK+DnhPVoO17gYQ8X6mRBV53Quc
+	cjPfrCPE3pJ33IWy3RXWW/ADmX45JsFOlaFuFEZ33Yw6w9JeadJFzFJfP8wVmaGezg==
+X-Gm-Gg: AR+sD12Rbm449OcdPEJC3cY2zLvzlKANq93P/dq2HCRiqLzzFHAsYd0FrgIROxw7t/a
+	Ze1jzy9IIYDP2uaUIC8Z6R+IMf15W021GPxHmA5ypBO+JlIT13jyiOaSylSl+Kyisqd2wr9vecF
+	DvpB1u8wdUKsYUDsOlgC4FQM6k+k0SR9v4OGZv+md0k3Pqeub/IU1/pYH4GHQ/cbqFGGLKgyM8s
+	UdNb/txAwd9Tl3MHZFhplCCf/Y7YKTLqEVIAdZEGoJkQau5xmVsQmla/vPqIZx8huzvYPxtQ1NH
+	//kOu7Di0TX2yaEEq7Z6JwaxxAP9nOyzwB5PUFF6roMo5jgG+Lb7qoPXCKazUB6x8eRUu+M2UCS
+	/2GafQDqSGo2HfQjTNAVPKVk3lYhInE8cUAZWHI/5Fe0Gn6oKMUvu1h/1AxAIBe9RSmsAoL4O1M
+	ijVTxJK7t4CI546hGSHhvAbD8IqHDv2G6MXBZwUDN+ab9V0eMGdigICzVIuBr5q5zaPdo2yBDCU
+	exQdEQLt8cOSUiVBfsYuZj76UBr30L9YUlQvUw6uw==
+X-Received: by 2002:a05:6000:490b:b0:47f:9158:5924 with SMTP id ffacd0b85a97d-47f9fc9c6c8mr6246245f8f.9.1785065554907;
+        Sun, 26 Jul 2026 04:32:34 -0700 (PDT)
+Received: from meshstor-pc ([185.87.42.56])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85bb57cfsm40533083f8f.11.2026.07.26.04.32.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jul 2026 04:32:34 -0700 (PDT)
+From: Mykola Marzhan <mykola@meshstor.io>
+To: Jens Axboe <axboe@kernel.dk>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@fygo.io>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: Li Nan <magiclinan@didiglobal.com>,
+	Xiao Ni <xiao@kernel.org>,
+	Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Shivaji Kant <shivajikant@google.com>,
+	Pranjal Shrivastava <praan@google.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v6 00/12] block,md,nvme: correct handling of unsupported P2PDMA transfers
+Date: Sun, 26 Jul 2026 13:32:17 +0200
+Message-ID: <20260726113229.2154269-1-mykola@meshstor.io>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1385:b0:4a3:d383:b3ea with SMTP id
- 5614622812f47-4ab6a24e0cdmr4071021b6e.27.1785049681809; Sun, 26 Jul 2026
- 00:08:01 -0700 (PDT)
-Date: Sun, 26 Jul 2026 00:08:01 -0700
-In-Reply-To: <20260724123037.3004560-1-yukuai@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a65b251.073198cf.94f0f.0024.GAE@google.com>
-Subject: [syzbot ci] Re: blk-cgroup: protect blkgs with blkcg_mutex
-From: syzbot ci <syzbot+cic2326f0718d065ef@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, cengku@gmail.com, cgroups@vger.kernel.org, 
-	dongsheng.yang@linux.dev, hch@lst.de, josef@toxicpanda.com, 
-	linux-block@vger.kernel.org, ming.lei@redhat.com, nilay@linux.ibm.com, 
-	tj@kernel.org, yukuai@fygo.io, yukuai@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+md treats an unsupported P2PDMA transfer to a member as success, and
+nvme-rdma retries one forever.  Whether peer memory can be DMA-mapped
+depends on the PCIe topology between the two devices, and since v6.17
+the failure completes as BLK_STS_INVAL: retryable for multipath and
+deliberately ignored by md for member failures, so mirrors silently
+diverge.
 
-[v2] blk-cgroup: protect blkgs with blkcg_mutex
-https://lore.kernel.org/all/20260724123037.3004560-1-yukuai@kernel.org
-* [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of bio_set_dev
-* [RFC PATCH v2 2/8] blk-throttle: protect throttle state with td lock
-* [RFC PATCH v2 3/8] blk-cgroup: protect blkgs with blkcg_mutex
-* [RFC PATCH v2 4/8] blk-cgroup: remove blkg radix tree preloading
-* [RFC PATCH v2 5/8] blk-cgroup: allocate blkgs in blkg_create
-* [RFC PATCH v2 6/8] blk-cgroup: share blkg creation between lookup and config prep
-* [RFC PATCH v2 7/8] bfq: avoid blkg lookup from locked cgroup update
-* [RFC PATCH v2 8/8] block: fail nowait bio submit if blkg allocation can't sleep
+v1-v3 restored BLK_STS_TARGET for these failures and tagged P2PDMA
+bios in md.  Logan Gunthorpe proposed a dedicated BLK_STS_P2PDMA
+instead, so no consumer needs to know whether an I/O was P2P, and
+wrote the core patches; v4 onward is built on them.  Patches 1 and 5
+are his and keep his authorship.
 
-and found the following issue:
-general protection fault in blkcg_punt_bio_submit
+  1  block: add BLK_STS_P2PDMA (stable, v6.17)
+  2  md: ensure REQ_NOMERGE is set on P2PDMA bios
+  3  md/raid1: serialize non-write-behind writes on CollisionCheck
+     rdevs (pre-existing bug patch 4 would widen; stable)
+  4  md/raid1: no write-behind for P2PDMA bios
+  5  md/raid1,raid10: factor out raid1_write_error() helper
+  6  md/raid1,raid10: keep REQ_NOMERGE on narrow_write_error()
+     retry clones
+  7  md/raid1,raid10: skip futile retries on P2PDMA mapping
+     failures
+  8  md/raid1,raid10: set IO_BLOCKED in case of BLK_STS_P2PDMA
+  9  nvme-rdma: use ib_dma_map_sgtable_attrs() (stable, v7.1;
+     dependency of patch 10)
+ 10  nvme-rdma: return BLK_STS_P2PDMA (stable, v7.1; needs patches
+     1 and 9)
+ 11  nvme-rdma: ratelimit the map-failure error message (cleanup)
+ 12  nvme-rdma: factor out the scatterlist DMA mapping helper
+     (cleanup)
 
-Full report is available here:
-https://ci.syzbot.org/series/eece31b0-1f5d-4840-8a12-407d9a4d1c57
+Routing: patch 1 block, 2-8 md, 9-12 nvme; 7, 8 and 10 use the new
+status.  Patch 1 alone stops the divergence and the dm-multipath
+requeue loop; the nvme-rdma loop also needs 9-10; everything else
+refines the fallout, so the series bisects safely.  The md patches
+fix a v7.2-rc1 regression (02666132403a), except 3 (older bug,
+stable) and 5 (refactor).  11 and 12 are cleanup only and can be
+deferred if you would rather not carry them at -rc.
 
-***
+Tested with the QEMU raid1/raid10 error matrix and a ConnectX-4 Lx.
+After patch 1, block-layer error injection accepts status=P2PDMA, so
+the md completion paths can be exercised on any member with no P2P
+hardware.  The patches were developed with AI assistance (see the
+Assisted-by trailers); all code was human-reviewed and tested.
 
-general protection fault in blkcg_punt_bio_submit
+Against v7.2-rc4 (Logan's base).
 
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      093fbffe03f5c1bb9c10a9e5aa65b23250844403
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/2cc06765-4cf6-4329-9c0a-9fe326a5338e/config
-syz repro: https://ci.syzbot.org/findings/38efdd1d-4179-4903-8ade-04afbce263b2/syz_repro
+Changes in v6:
+ - patches 7, 9, 10: picked up Logan's Reviewed-by; on 7 it replaces
+   his now-stale Signed-off-by, as he asked
+ - patch 10: the map-failure ratelimit conversion moves out to its
+   own patch 11 (Logan); the stable note now names both prerequisites
+ - new patch 12: the data and the metadata mapping share a helper
+   (Logan's suggestion on patch 9).  Kept out of 9 so the
+   stable-tagged fix stays minimal
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-CPU: 0 UID: 0 PID: 26 Comm: kworker/u9:0 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: btrfs-worker btrfs_work_helper
-RIP: 0010:blkcg_punt_bio_submit+0x47/0x130 block/blk-cgroup.c:243
-Code: ae 13 fd 4c 8d 73 50 4c 89 f0 48 c1 e8 03 80 3c 28 00 74 08 4c 89 f7 e8 07 06 7f fd 4d 8b 36 4d 8d 7e 30 4c 89 f8 48 c1 e8 03 <80> 3c 28 00 74 08 4c 89 ff e8 eb 05 7f fd 49 83 3f 00 0f 84 ab 00
-RSP: 0000:ffffc90000a17a28 EFLAGS: 00010206
-RAX: 0000000000000006 RBX: ffff888117071348 RCX: ffff8881032f5940
-RDX: 0000000000000000 RSI: 0000000004000000 RDI: ffff888117071348
-RBP: dffffc0000000000 R08: ffff8881bb74406f R09: 1ffff110376e880d
-R10: dffffc0000000000 R11: ffffed10376e880e R12: ffff88816c5e6f08
-R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000030
-FS:  0000000000000000(0000) GS:ffff88818d9cb000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f05d5660000 CR3: 0000000172eb2000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- run_ordered_work fs/btrfs/async-thread.c:243 [inline]
- btrfs_work_helper+0x577/0xc50 fs/btrfs/async-thread.c:322
- process_one_work kernel/workqueue.c:3314 [inline]
- process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3397
- worker_thread+0xa47/0xfb0 kernel/workqueue.c:3478
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:blkcg_punt_bio_submit+0x47/0x130 block/blk-cgroup.c:243
-Code: ae 13 fd 4c 8d 73 50 4c 89 f0 48 c1 e8 03 80 3c 28 00 74 08 4c 89 f7 e8 07 06 7f fd 4d 8b 36 4d 8d 7e 30 4c 89 f8 48 c1 e8 03 <80> 3c 28 00 74 08 4c 89 ff e8 eb 05 7f fd 49 83 3f 00 0f 84 ab 00
-RSP: 0000:ffffc90000a17a28 EFLAGS: 00010206
-RAX: 0000000000000006 RBX: ffff888117071348 RCX: ffff8881032f5940
-RDX: 0000000000000000 RSI: 0000000004000000 RDI: ffff888117071348
-RBP: dffffc0000000000 R08: ffff8881bb74406f R09: 1ffff110376e880d
-R10: dffffc0000000000 R11: ffffed10376e880e R12: ffff88816c5e6f08
-R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000030
-FS:  0000000000000000(0000) GS:ffff8882a8fcb000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007efceadf26a8 CR3: 0000000115190000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	ae                   	scas   %es:(%rdi),%al
-   1:	13 fd                	adc    %ebp,%edi
-   3:	4c 8d 73 50          	lea    0x50(%rbx),%r14
-   7:	4c 89 f0             	mov    %r14,%rax
-   a:	48 c1 e8 03          	shr    $0x3,%rax
-   e:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1)
-  12:	74 08                	je     0x1c
-  14:	4c 89 f7             	mov    %r14,%rdi
-  17:	e8 07 06 7f fd       	call   0xfd7f0623
-  1c:	4d 8b 36             	mov    (%r14),%r14
-  1f:	4d 8d 7e 30          	lea    0x30(%r14),%r15
-  23:	4c 89 f8             	mov    %r15,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	4c 89 ff             	mov    %r15,%rdi
-  33:	e8 eb 05 7f fd       	call   0xfd7f0623
-  38:	49 83 3f 00          	cmpq   $0x0,(%r15)
-  3c:	0f                   	.byte 0xf
-  3d:	84                   	.byte 0x84
-  3e:	ab                   	stos   %eax,%es:(%rdi)
+Changes in v5:
+ - patch 7: From: is now Mykola, at Logan's request; patch 8 follows
+   for consistency.  Logan keeps Signed-off-by on both,
+   Co-developed-by on 8
+ - patch 8: raid10 declares bio up front and bi_status sits in a
+   blk_status_t local in both files.
+ - old patch 9 split: 9 is the mechanical sgtable conversion,
+   10 the -EREMOTEIO -> BLK_STS_P2PDMA translation; both stable
+   since 10 needs 9
+
+Changes in v4:
+ - new BLK_STS_P2PDMA (Logan) replaces restoring BLK_STS_TARGET; the
+   R1BIO_P2PDMA/R10BIO_P2PDMA state bits are gone and the md changes
+   shrink to completion-time status tests
+ - blk_dma_map_iter_start() gets the explicit
+   PCI_P2PDMA_MAP_NOT_SUPPORTED case (Logan's patch; v3 kept
+   default: only)
+ - write completions record the whole failed range as bad blocks
+   instead of narrow_write_error()'s per-block retries; v3's coarse
+   retry is gone -- the new status is deterministic, nothing to
+   re-attempt
+
+Link: https://lore.kernel.org/linux-raid/20260718162547.448892-1-mykola@meshstor.io/ [v1]
+Link: https://lore.kernel.org/linux-raid/20260719105327.864949-1-mykola@meshstor.io/ [v2]
+Link: https://lore.kernel.org/linux-raid/20260721174502.111503-1-mykola@meshstor.io/ [v3]
+Link: https://lore.kernel.org/linux-raid/20260722185841.449934-1-mykola@meshstor.io/ [v4]
+Link: https://lore.kernel.org/linux-raid/20260723204206.76930-1-mykola@meshstor.io/ [v5]
+Link: https://lore.kernel.org/linux-raid/9f846c85-f427-433a-b87d-8e9e3a4406e7@deltatee.com/ [Logan's proposal]
+
+Logan Gunthorpe (2):
+  block: add BLK_STS_P2PDMA for unsupported peer-to-peer transfers
+  md/raid1,raid10: factor out raid1_write_error() helper
+
+Mykola Marzhan (10):
+  md: ensure REQ_NOMERGE is set on P2PDMA bios
+  md/raid1: serialize non-write-behind writes on CollisionCheck rdevs
+  md/raid1: don't use write-behind for P2PDMA bios
+  md/raid1,raid10: keep REQ_NOMERGE on narrow_write_error() retry clones
+  md/raid1,raid10: skip futile retries on P2PDMA mapping failures
+  md/raid1,raid10: set IO_BLOCKED in case of BLK_STS_P2PDMA
+  nvme-rdma: use ib_dma_map_sgtable_attrs()
+  nvme-rdma: return BLK_STS_P2PDMA for unsupported P2P transfers
+  nvme-rdma: ratelimit the map-failure error message
+  nvme-rdma: factor out the scatterlist DMA mapping helper
+
+ block/blk-core.c          |  3 +++
+ block/blk-mq-dma.c        |  3 ++-
+ drivers/md/md.c           | 10 ++++++--
+ drivers/md/md.h           | 15 +++++++++++
+ drivers/md/raid1-10.c     | 16 ++++++++++++
+ drivers/md/raid1.c        | 47 ++++++++++++++++++++--------------
+ drivers/md/raid10.c       | 27 ++++++++++----------
+ drivers/nvme/host/rdma.c  | 54 +++++++++++++++++++++++++++------------
+ include/linux/blk_types.h | 10 ++++++++
+ 9 files changed, 134 insertions(+), 51 deletions(-)
 
 
-***
+base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
+-- 
+2.52.0
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
