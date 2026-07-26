@@ -1,197 +1,261 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB45A3AFCE8
-	for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 11:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F3526C3BD;
+	Sun, 26 Jul 2026 14:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785065585; cv=none; b=lxSspzCRrk+Mh30/JDrd03MQasSreta6qCEhPCIOI0WDslpNTN/EqlBCbfiro5gfno1oVTxlU9/JFLugEnM9CDv03Qc7CA186tzZ8HzeRDgkWQG6KdBxxTmw8YeoX4QO5C1q8w9FzSeannOSxzWMFsK+3M9hH4m7aC83KAzCxUY=
+	t=1785077037; cv=none; b=F/6T1OlHKbe/6U3qt/gEiqUK2/AgrZyqVtwKwgEY52PyWEilbcaidz/dvXZjg1QyHis3xH3FyseNlqJxjuSc49dtB9k8PtsnttPAsG1lXY1VNUDaF1jBgHuffGe1QJwsSMIllDcofDYIRrR1adQfGiFcVUMv50Na6vAbVBzsuR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785065585; c=relaxed/simple;
-	bh=H9P5Xbuz/sTn32viro02mVv351LoCChcVH807+lKGhQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OlPio67FO3LIh+rFq6pKUecbMVQmhPtQw0ao5Qx0UDhxyi0QtInU+yU1XWClXSoN5YseL57e/Fi8qQqWz/2FJCUlSH/tVzjiyh1aVUiOJvw9jMdO7vsYp0nwGjOi+4gRMiS/nzitqiEB4YMESQscAohD6jhi1VID93+MAyoOxQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io; spf=pass smtp.mailfrom=meshstor.io; dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b=YTGLQV5z; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meshstor.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meshstor.io
+	s=arc-20240116; t=1785077037; c=relaxed/simple;
+	bh=/Fe8UybNm9iVBYSjs91ZbLiPdEXI7i11aJgmVta0l2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eamMqxZmQbhUkvtse0tqtnZ/KRUu99MVFJ5pyC7CQpk0aRrKvurrYNssQoyXpKv413onqPIZW2w/9nJ2mnctJLHnWr2wbIfi1YKYrtckhYX1I3WP0/ev3kGU8dVQofbTC1Vx9LvM7tnBZiIK10EYSVzUBVvp2CSNkYY7sn/2c0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu; spf=pass smtp.mailfrom=vivier.eu; dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b=Zg3xyOKi; arc=none smtp.client-ip=217.72.192.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vivier.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivier.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meshstor.io header.i=@meshstor.io header.b="YTGLQV5z"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49557167508so18396615e9.1
-        for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 04:33:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=meshstor.io; s=google; t=1785065582; x=1785670382; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TkTyU0DB9gKJtEp9Pq/+q6fIrgCHRa+7wKH1kyBFfbo=;
-        b=YTGLQV5zeW+uWE5H5f45Ba8jX453Zgmqv7NyXudf1gGa5hHvageH3GW27rUl69YSyP
-         aH6aGIJIWVAbAFy9c7kgR8jUCVT2QyPJr2mvA9UMR+tjrbyTP5+Ly2eY7FNIYKCu8Eti
-         PSgR0rKjktTrKpZNbvXv36SYcssiPLsSEw6owHID6d5NZkG2WflkK/TGKvvcqc3HxzJ1
-         Zhi9eacNWuIJVltTn0T2H7uIpVSAr/gqyvZcHt87/TXppnkValvnNhjapQeBjYDSGAuU
-         XmL6bLNp2qtAAr9dKqjTsyDAd5+NhNJm9cVxBjy/XH4UOLGp+kQlIro+Q3HOlJIv1IgC
-         HH5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785065582; x=1785670382;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TkTyU0DB9gKJtEp9Pq/+q6fIrgCHRa+7wKH1kyBFfbo=;
-        b=DOeBjGZR1ZC2WmP9IEZEbr2d/VKEVj5yUODgcbr/o9/9en+jIreUP3ZaqRbxPSh48D
-         7enLO7rJhEEt9uWcTbCYXX8yn3N0zc8m5+sH2Yq1TUfTFA7TmQarYVVWGys1c2Jw/2vD
-         TM8oaJsO6TO9KeLHt+ygwFvSGX1qPsKVAxS2OLJk0mTxGlm18n1N/KpckWY6Sxtu7fLT
-         5m65z0HmmzmQs14bA7j2ibdT3L+SqJm+74rvxnR+Y7HlWLElpk+XWZRTOpGHrUadgfIA
-         lGWRPDHbrC3xKqdUinVM5pw+OE2voaphXoc4xi9DlnndzhlbQmIC0tH30KV5S6K2IFTK
-         ORUw==
-X-Forwarded-Encrypted: i=1; AHgh+Rp2B7cXAsjjpBz1PTrGNn8D/uZ1j6nAcdr56x2RGivYn2iCaP+r3MqgXmZbtTDArtsFtFaOR5XQ/Lcf+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwylPzyjpcTOW2fCw9/hM3xaRDFD29sbmFKnFF+BdTwixf+jyCp
-	uex+sUJz46dqDazFuQELFMh/lQOOP+KRPdtrx2kvt85wSl+w71noXWyWH5SjxrhztA==
-X-Gm-Gg: AR+sD11KTzU0SWU7D/5SDvUmnT9dg8zbWs6R6xpHmyuKYklOIzqmRI9capBxCorNFeY
-	40rSNpWHbtHq4sbVaqLNK5OBQxTtmu4C5LPottb/1KTs+9y7e8bFJMLmr27AWVcpG3yAK4LFyJI
-	uq3PLTn89Z00MxVQ8tloelkuYInLqEgYXw6sOPnkH6WA90wQ8EwhvLQ+3Ir1nE50sx54bFlKH3U
-	CcdbXxlK6SjH3pVFSLiaCN7Do5YTckeNs8eTtEj/+R0TOauJzEQkciITnPfMmfuAK4U+OnIeBu2
-	ldlNkmOHY5evMlXpsFRJDWiF3bPow+vPbQ/zMqRawMDATHo55rCtgrOENX+qiH1yvp3rX1BBIn/
-	Tzud0jzZaK3xJtwHiOmv/jNFpYaVsSq6aN3uyqbMV7Drq9pfIHEbfeIp+zbFaHfDAGLLe4CsdCH
-	/z1tnHYTzUjVxsfOCfioDzKiwX5oG2lIxcUhWI0P318zzGoFKgQ1oIwVe7J7AoHgvLkUt+sKgtZ
-	8xcCb2k/WkC4hq2OsH4OJh3YGtP2AtR7AyOYrJXh3o1NmcrCESlRlCIio0V3LY7PT0iHA492lSe
-	1a1wB1tU7osZJnb8s04IuSJq
-X-Received: by 2002:a05:600c:46cb:b0:493:f78f:cd70 with SMTP id 5b1f17b1804b1-496b76164b3mr52698745e9.18.1785065581534;
-        Sun, 26 Jul 2026 04:33:01 -0700 (PDT)
-Received: from meshstor-pc ([185.87.42.56])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85bb57cfsm40533083f8f.11.2026.07.26.04.32.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jul 2026 04:33:01 -0700 (PDT)
-From: Mykola Marzhan <mykola@meshstor.io>
-To: Jens Axboe <axboe@kernel.dk>,
-	Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>,
-	Guoqing Jiang <guoqing.jiang@linux.dev>,
-	Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Shivaji Kant <shivajikant@google.com>,
-	Pranjal Shrivastava <praan@google.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v6 12/12] nvme-rdma: factor out the scatterlist DMA mapping helper
-Date: Sun, 26 Jul 2026 13:32:29 +0200
-Message-ID: <20260726113229.2154269-13-mykola@meshstor.io>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260726113229.2154269-1-mykola@meshstor.io>
-References: <20260726113229.2154269-1-mykola@meshstor.io>
+	dkim=pass (2048-bit key) header.d=vivier.eu header.i=laurent@vivier.eu header.b="Zg3xyOKi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivier.eu;
+	s=s1-ionos; t=1785077019; x=1785681819; i=laurent@vivier.eu;
+	bh=iD1UXMsuVfMtnaeLHGcW7YF1GFuo713k3r5a6Boisp0=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=Zg3xyOKiHN4w762ZmWyrVnQxaf9k/0FuTqvibQQ99j+Fhuxzfph1vPksFLDVRveh
+	 ksThh+U0aYp+yDcjHxDoidUn/8I/1t2O8XSPEQWsbNGCh4SpmclZEvSP1KCJS10aa
+	 LAyNH/PRoMeKBsiMmlVIIDUyO92qWOv/FuJIHvBLRGigEhji6cLLutMTFgso3tvuS
+	 4ApvkaRV0aOgseVTYEvgOhEIzsK7sCDZeHQwruHgVr2HkIRNbzop9NWb5yNKtG0Ue
+	 UujEJ7/RD40lGquZdhEdU8Ju/IRZgnLSiwpslwZ0s055AEdn9KcZH9kI651phguBT
+	 c0eGe9SJOpD6WsVEOw==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
+ [213.165.67.119]) with ESMTPSA (Nemesis) id 1M8hR1-1wselv44XZ-00DUJM; Sun, 26
+ Jul 2026 16:43:39 +0200
+Message-ID: <ff1b3b6e-b69f-4081-b98e-ebd2fa31185f@vivier.eu>
+Date: Sun, 26 Jul 2026 16:43:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 19/31] swim: Deduplicate polling loops
+To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+ Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+References: <cover.1784196135.git.fthain@linux-m68k.org>
+ <7f0be2470206f78fb64d7df72e4d6948a21ec2ab.1784196135.git.fthain@linux-m68k.org>
+Content-Language: fr
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; keydata=
+ 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
+In-Reply-To: <7f0be2470206f78fb64d7df72e4d6948a21ec2ab.1784196135.git.fthain@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:mjSghRSvBOnkNn4zFmU55ace/ZnwegR53EVNjzhKXmHnIpUWfHa
+ aeFzkq9+QXpr3+z+Qjm8G0780fqq2pt56zFJNSSYgD7aRCNXQlm4fSlR52W4atU1S9jxW0S
+ 1P6RbskwdCYngcgDvDVFnp+f8tIEzxGowgPjvTAf6+qQWDD7jCNQrWxYnYanLvrD4hyvbHv
+ 4t+aTfgZ3p5xPcr/9thcg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:YDHs+EWiynQ=;XXJylcCxpq8J9C3D8QSReFuxbjb
+ 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
 
-The data and the metadata mapping do the same thing: describe the
-segments blk_rq_map_sg() produced in a local sg_table -- the embedded
-one's orig_nents is the allocated size, not the valid-segment count --
-map that, and hand back the DMA-mapped count.  Fold both into a
-helper.
+Le 16/07/2026 =C3=A0 12:02, Finn Thain a =C3=A9crit=C2=A0:
+> Replace duplicated polling loops with poll_timeout_us(). Change the
+> interruptible sleep to uninterruptible because signal delivery shouldn't
+> be allowed to shorten delays required by the drive hardware.
+>=20
+> Change the timeout for the !STEP transition to 20 ms in accordance with
+> the maximum interval required by the UPD72070 spec. The existing 1 secon=
+d
+> timeout is impractical considering the number of steps in a typical seek=
+.
+>=20
+> Change the return type of swim_readbit() to bool because that way the
+> bit names make sense i.e. the reader doesn't have to remember to invert
+> the active-low logic used for drive signals.
+>=20
+> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+> Signed-off-by: Finn Thain <fthain@linux-m68k.org>
+> ---
+>   drivers/block/swim.c | 42 +++++++++++-------------------------------
+>   1 file changed, 11 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+> index b4bf96a788db..c10ad1266c3b 100644
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+> @@ -19,6 +19,7 @@
+>   #include <linux/major.h>
+>   #include <linux/mutex.h>
+>   #include <linux/hdreg.h>
+> +#include <linux/iopoll.h>
+>   #include <linux/kernel.h>
+>   #include <linux/delay.h>
+>   #include <linux/platform_device.h>
+> @@ -296,7 +297,7 @@ static inline void swim_action(struct swim __iomem *=
+base, int action)
+>   	local_irq_restore(flags);
+>   }
+>  =20
+> -static inline int swim_readbit(struct swim __iomem *base, int bit)
+> +static inline bool swim_readbit(struct swim __iomem *base, int bit)
+>   {
+>   	int stat;
+>  =20
+> @@ -309,6 +310,12 @@ static inline int swim_readbit(struct swim __iomem =
+*base, int bit)
+>   	return (stat & SENSE) =3D=3D 0;
+>   }
+>  =20
+> +#define swim_readbit_timeout(base, bit, val, timeout_us) \
+> +	poll_timeout_us(, swim_readbit(base, bit) =3D=3D val, 1000, timeout_us=
+, false)
+> +
+> +#define swim_readbit_timeout_atomic(base, bit, val, timeout_us) \
+> +	poll_timeout_us_atomic(, swim_readbit(base, bit) =3D=3D val, 1, timeou=
+t_us, false)
+> +
+>   static inline void swim_drive(struct swim __iomem *base,
+>   			      enum drive_location location)
+>   {
+> @@ -331,16 +338,8 @@ static inline void swim_motor(struct swim __iomem *=
+base,
+>   			      enum motor_action action)
+>   {
+>   	if (action =3D=3D ON) {
+> -		int i;
+> -
+>   		swim_action(base, MOTOR_ON);
+> -
+> -		for (i =3D 0; i < 2*HZ; i++) {
+> -			if (swim_readbit(base, MOTOR_ON))
+> -				break;
+> -			set_current_state(TASK_INTERRUPTIBLE);
+> -			schedule_timeout(1);
+> -		}
+> +		swim_readbit_timeout(base, MOTOR_ON, true, 2000 * 1000);
+>   	} else if (action =3D=3D OFF) {
+>   		swim_action(base, MOTOR_OFF);
+>   		swim_write(base, phase, RELAX);
+> @@ -349,16 +348,8 @@ static inline void swim_motor(struct swim __iomem *=
+base,
+>  =20
+>   static inline void swim_eject(struct swim __iomem *base)
+>   {
+> -	int i;
+> -
+>   	swim_action(base, EJECT);
+> -
+> -	for (i =3D 0; i < 2*HZ; i++) {
+> -		if (!swim_readbit(base, DISK_IN))
+> -			break;
+> -		set_current_state(TASK_INTERRUPTIBLE);
+> -		schedule_timeout(1);
+> -	}
+> +	swim_readbit_timeout(base, DISK_IN, false, 2000 * 1000);
+>   }
+>  =20
+>   static inline void swim_head(struct swim __iomem *base, enum head head=
+)
+> @@ -373,19 +364,8 @@ static inline void swim_head(struct swim __iomem *b=
+ase, enum head head)
+>  =20
+>   static inline int swim_step(struct swim __iomem *base)
+>   {
+> -	int wait;
+> -
+>   	swim_action(base, STEP);
+> -
+> -	for (wait =3D 0; wait < HZ; wait++) {
+> -
+> -		set_current_state(TASK_INTERRUPTIBLE);
+> -		schedule_timeout(1);
+> -
+> -		if (!swim_readbit(base, STEP))
+> -			return 0;
+> -	}
+> -	return -1;
+> +	return swim_readbit_timeout_atomic(base, STEP, false, 20 * 1000);
 
-No functional change.
+I don't understand why we need _atomic() here.
 
-Suggested-by: Logan Gunthorpe <logang@deltatee.com>
-Assisted-by: Claude:claude-fable-5
-Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
----
- drivers/nvme/host/rdma.c | 42 +++++++++++++++++++++++++++-------------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+Anyway:
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 2f50509a7a61..525e5aea65a1 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1465,11 +1465,33 @@ static int nvme_rdma_map_sg_pi(struct nvme_rdma_queue *queue,
- 	return -EINVAL;
- }
- 
-+/*
-+ * Map the segments blk_rq_map_sg() produced.  They are described by a local
-+ * sg_table because the embedded one's orig_nents is the allocated size, not
-+ * the number of valid segments; rdma_rw_ctx_init() does the same.
-+ */
-+static int nvme_rdma_dma_map_sgl(struct ib_device *ibdev,
-+		struct scatterlist *sgl, int nents,
-+		enum dma_data_direction dir, int *count)
-+{
-+	struct sg_table sgt = {
-+		.sgl		= sgl,
-+		.orig_nents	= nents,
-+	};
-+	int ret;
-+
-+	ret = ib_dma_map_sgtable_attrs(ibdev, &sgt, dir, 0);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	*count = sgt.nents;
-+	return 0;
-+}
-+
- static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
- 		int *count, int *pi_count)
- {
- 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
--	struct sg_table sgt;
- 	int ret;
- 
- 	req->data_sgl.sg_table.sgl = (struct scatterlist *)(req + 1);
-@@ -1481,14 +1503,10 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
- 
- 	req->data_sgl.nents = blk_rq_map_sg(rq, req->data_sgl.sg_table.sgl);
- 
--	sgt = (struct sg_table) {
--		.sgl		= req->data_sgl.sg_table.sgl,
--		.orig_nents	= req->data_sgl.nents,
--	};
--	ret = ib_dma_map_sgtable_attrs(ibdev, &sgt, rq_dma_dir(rq), 0);
-+	ret = nvme_rdma_dma_map_sgl(ibdev, req->data_sgl.sg_table.sgl,
-+				    req->data_sgl.nents, rq_dma_dir(rq), count);
- 	if (unlikely(ret))
- 		goto out_free_table;
--	*count = sgt.nents;
- 
- 	if (blk_integrity_rq(rq)) {
- 		req->metadata_sgl->sg_table.sgl =
-@@ -1504,14 +1522,12 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
- 
- 		req->metadata_sgl->nents = blk_rq_map_integrity_sg(rq,
- 				req->metadata_sgl->sg_table.sgl);
--		sgt = (struct sg_table) {
--			.sgl		= req->metadata_sgl->sg_table.sgl,
--			.orig_nents	= req->metadata_sgl->nents,
--		};
--		ret = ib_dma_map_sgtable_attrs(ibdev, &sgt, rq_dma_dir(rq), 0);
-+		ret = nvme_rdma_dma_map_sgl(ibdev,
-+					    req->metadata_sgl->sg_table.sgl,
-+					    req->metadata_sgl->nents,
-+					    rq_dma_dir(rq), pi_count);
- 		if (unlikely(ret))
- 			goto out_free_pi_table;
--		*pi_count = sgt.nents;
- 	}
- 
- 	return 0;
--- 
-2.52.0
+>   }
+>  =20
+>   static inline int swim_track00(struct swim __iomem *base)
 
