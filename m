@@ -1,276 +1,105 @@
-Received: from va-2-48.ptr.blmpb.com (va-2-48.ptr.blmpb.com [209.127.231.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80108374A04
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 08:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E82C3EAC6D;
+	Mon, 27 Jul 2026 09:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785140212; cv=none; b=FfyMtvCo8qSx3F7pAFccpmB7oIpzIyKHmJpcJkpcnTcGvACI5CY4Lm2HZci3gtG/6ddDJ5/gTurjqN7yl/ien0FieEmSR53D9aZuVJm3Fa3M3Url32lw3vfHqRHqnIkR3RQQIUGbuje7JbaOqUJXGn11eVqOuwOOCZ6/f6zKzTY=
+	t=1785145419; cv=none; b=D/dRUIlvux2JfxFlPkx9BouBLlwL8o2ae38ZrO9/NxhTQD6w2gy4Vd4hJ9YHnlsGr44N8JnXZMr+LSe8sTo4082biQwZmhRe5Zz0kvkWnEBTWEB86S54zZgmgePpJHBnH64b53wDww0DkTtP5iC6eR1HK0kLkfWRQeMVzChC4sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785140212; c=relaxed/simple;
-	bh=KuHRlDjarSQ08uNy0zLz82jbfdYJRjCJ3DT7qLdTDic=;
-	h=Message-Id:Mime-Version:Content-Type:To:From:Date:References:Cc:
-	 Subject:In-Reply-To; b=CgZh9e23AJhj2tU4rE6HVbAO5Qpp50IMj6gnFJ7ILBMJohcdetFYi+mARuciBpFrUVaHSKGKojomBonm76zyoTk+XdatBBK4wC11pxGFex6pL7g87bpgFShNYA+YxolHrB7MRkkAEaKSU9QQrl/JdMJSd623MQKSw2M3eAaExH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=ot2chsKD; arc=none smtp.client-ip=209.127.231.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="ot2chsKD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785140195;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=Rx+FLoYEhtMyCSYJhgLIrEIG3yFh6Pm3NqgW6KwFN+w=;
- b=ot2chsKD7v8TJWld9oDrrRuYWH9OSFKotarTA6WHvJiPQ0OssGEZmLO3cf275lzn3AEShJ
- Ojos3HoGaH7ZwGBV1bhQXHqcxnnx47iyDStJuqoStR6oFbn05wrjJZlqjzeFN6mPZDGgOx
- 5Hc8ubcPosIttt3MqorlURFf9I6p+Oe8nc2DnXyMQQpdWRSrjdYzGHCrEWiOhaQLVnDpOm
- eUj+n7q7O91PzsMXhCTrxVFide/AZgDEXjeFaL/6x7oPx8nj5hKEYleRm6un+fyabJd8U+
- POwMlnjxJE9wqJqIF0DSS6FmAPSokosH4SSuJrHKDltWaZcoIixBFIFqIjPtOQ==
-Message-Id: <933b4285-1c85-4076-831a-0501d5c38e16@fygo.io>
+	s=arc-20240116; t=1785145419; c=relaxed/simple;
+	bh=2sw37Q+X0GL9JMimv8d33/SmYfG+9GDwZfrHM3D2rxM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DnK6KLFGjtb8bF7zIoMRhsxPVFL6mk0TEwODpoC84Sq7WFuZPpSkQi3y4XP5HvVN6D+246gfB6zzjD3tDM0W27wxU9Jf8GJr/7e8VVCBIApdDQRX4MPY2CvhCcAICkespWPFj6VTH5Zi+c8CLoSHSEG5OEPEF8E/FJhWOWjPd/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: a0427e28899f11f1aa26b74ffac11d73-20260727
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:e23e2abc-c4f4-4c11-9daa-cd5c55984fd8,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:e5c1714c7d1e9842402734d9955606ef,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:0
+	|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
+	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: a0427e28899f11f1aa26b74ffac11d73-20260727
+X-User: liuxixin@kylinos.cn
+Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liuxixin@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1174637161; Mon, 27 Jul 2026 17:43:30 +0800
+From: Xixin Liu <liuxixin@kylinos.cn>
+To: bvanassche@acm.org
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
+Subject: Re: [PATCH v1] block/mq-deadline: hold elevator_lock in debugfs next_rq show
+Date: Mon, 27 Jul 2026 17:45:00 +0800
+Message-ID: <reply-mq-deadline-next-rq-af98cabf.20260727.174500.liuxixin@kylinos.cn>
+In-Reply-To: <af98cabf-89a6-41b0-9929-ec3e24783503@acm.org>
+References: <2e689b2c4021.1784615432.git.liuxixin@kylinos.cn> <af98cabf-89a6-41b0-9929-ec3e24783503@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: yu kuai <yukuai@fygo.io>
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: <axboe@kernel.dk>, <tj@kernel.org>, "yu kuai" <yukuai@fygo.io>
-From: "yu kuai" <yukuai@fygo.io>
-User-Agent: Mozilla Thunderbird
-Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Mon, 27 Jul 2026 08:16:33 +0000
-Date: Mon, 27 Jul 2026 16:16:29 +0800
-References: <20260724123037.3004560-1-yukuai@kernel.org> <20260724123037.3004560-2-yukuai@kernel.org>
-Reply-To: yukuai@fygo.io
-Cc: <hch@lst.de>, <dongsheng.yang@linux.dev>, <cengku@gmail.com>, 
-	<josef@toxicpanda.com>, <nilay@linux.ibm.com>, <ming.lei@redhat.com>, 
-	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of bio_set_dev
-In-Reply-To: <20260724123037.3004560-2-yukuai@kernel.org>
-X-Lms-Return-Path: <lba+26a6713e2+3fa544+vger.kernel.org+yukuai@fygo.io>
+Content-Transfer-Encoding: 8bit
+X-Mailer: patches/scripts/send-local.py
 
-Hi,
+On Fri, 24 Jul 2026, Bart Van Assche wrote:
+> The following is missing from your patch:
+> - An explanation why q->elevator_lock is locked instead of dd->lock. I
+>    think that you are misunderstanding the purpose of these locks.
 
-=E5=9C=A8 2026/7/24 20:30, Yu Kuai =E5=86=99=E9=81=93:
-> From: Yu Kuai <yukuai@fygo.io>
->
-> bio_set_dev(), bio_init() and bio_reset() associate a bio with a blkg for
-> its target queue. That association may have to create a new blkg, and
-> currently there are lots of callers that are under atomic context.
->
-> Move the association out of those helpers and into the submit path, which
-> is always sleepable (submit_bio_noacct() already does might_sleep()):
->
->    - submit_bio() associates new I/O before bio_set_ioprio(), whose
->      blkcg_set_ioprio() reads the policy from bio->bi_blkg.
->
->    - submit_bio_noacct() (re)associates when a bio has no blkg yet or was
->      remapped to a different queue.  blk_throtl_bio() and the rq_qos
->      throttlers (iocost, iolatency) pair bio->bi_blkg with the queue of
->      bio->bi_bdev, so a remapped bio must be reassociated to the new queu=
-e.
->
->    - bio_set_dev() no longer associates; instead it drops the existing bl=
-kg
->      when the device changes, since that blkg is tied to the old queue.
->      bio_init()/bio_reset() leave bi_blkg NULL.
->
-> Introduce bio_disassociate_blkg() to drop a bio's blkg reference and use =
-it
-> from bio_set_dev(), bio_uninit() and the bio freeing path, replacing thei=
-r
-> open-coded blkg_put().
+Agreed on the distinction.  dd->lock protects mq-deadline's internal
+lists/trees; elevator_lock serializes q->elevator against switch/teardown.
 
-Turns out bio will be submitted by kworker for some drivers and for
-blkcg_punt_bio_submit(). Is it possible to record blkcg during bio initiali=
-zation,
-as blkcg must exist, and then covert it to blkg during submission? I can us=
-e union
-for blkcg and blkg to avoid new field in struct bio.
+The crash we hit is the latter: concurrent elevator switch clears
+q->elevator under elevator_lock, so next_rq_show can deref a NULL
+elevator before any dd->lock is reachable.  For this LIFE bug,
+elevator_lock is what can close the race; dd->lock cannot.
 
->
-> This is the first step to convert protecting blkg with blkcg_mutex.
->
-> Signed-off-by: Yu Kuai <yukuai@fygo.io>
-> ---
->   block/bio.c         | 18 ++----------------
->   block/blk-cgroup.c  | 18 ++++++++++++++++++
->   block/blk-core.c    | 21 +++++++++++++++++++++
->   include/linux/bio.h |  7 +++++--
->   4 files changed, 46 insertions(+), 18 deletions(-)
->
-> diff --git a/block/bio.c b/block/bio.c
-> index 6a2f6fc3413e..ea030c5e39a4 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -179,12 +179,7 @@ static inline gfp_t try_alloc_gfp(gfp_t gfp)
->  =20
->   void bio_uninit(struct bio *bio)
->   {
-> -#ifdef CONFIG_BLK_CGROUP
-> -	if (bio->bi_blkg) {
-> -		blkg_put(bio->bi_blkg);
-> -		bio->bi_blkg =3D NULL;
-> -	}
-> -#endif
-> +	bio_disassociate_blkg(bio);
->   	if (bio_integrity(bio))
->   		bio_integrity_free(bio);
->  =20
-> @@ -235,8 +230,6 @@ void bio_init(struct bio *bio, struct block_device *b=
-dev, struct bio_vec *table,
->   #ifdef CONFIG_BLK_CGROUP
->   	bio->bi_blkg =3D NULL;
->   	bio->issue_time_ns =3D 0;
-> -	if (bdev)
-> -		bio_associate_blkg(bio);
->   #ifdef CONFIG_BLK_CGROUP_IOCOST
->   	bio->bi_iocost_cost =3D 0;
->   #endif
-> @@ -280,8 +273,6 @@ void bio_reset(struct bio *bio, struct block_device *=
-bdev, blk_opf_t opf)
->   	atomic_set(&bio->__bi_remaining, 1);
->   	bio->bi_io_vec =3D bv;
->   	bio->bi_bdev =3D bdev;
-> -	if (bio->bi_bdev)
-> -		bio_associate_blkg(bio);
->   	bio->bi_opf =3D opf;
->   }
->   EXPORT_SYMBOL(bio_reset);
-> @@ -1803,17 +1794,12 @@ void bio_endio(struct bio *bio)
->   		goto again;
->   	}
->  =20
-> -#ifdef CONFIG_BLK_CGROUP
->   	/*
->   	 * Release cgroup info.  We shouldn't have to do this here, but quite
->   	 * a few callers of bio_init fail to call bio_uninit, so we cover up
->   	 * for that here at least for now.
->   	 */
-> -	if (bio->bi_blkg) {
-> -		blkg_put(bio->bi_blkg);
-> -		bio->bi_blkg =3D NULL;
-> -	}
-> -#endif
-> +	bio_disassociate_blkg(bio);
->  =20
->   	if (bio->bi_end_io)
->   		bio->bi_end_io(bio);
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index d9676126c5b5..618e5566fa52 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -2170,6 +2170,24 @@ void bio_clone_blkg_association(struct bio *dst, s=
-truct bio *src)
->   }
->   EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
->  =20
-> +/**
-> + * bio_disassociate_blkg - disassociate a bio from its blkg
-> + * @bio: target bio
-> + *
-> + * Drop the blkg reference held by @bio and clear the association.  This=
- is
-> + * used when a bio's target device changes (e.g. via bio_set_dev()): the=
- old
-> + * blkg is tied to the previous request_queue, so it is dropped here and=
- the
-> + * bio is reassociated to the new queue from the submit path.
-> + */
-> +void bio_disassociate_blkg(struct bio *bio)
-> +{
-> +	if (bio->bi_blkg) {
-> +		blkg_put(bio->bi_blkg);
-> +		bio->bi_blkg =3D NULL;
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
-> +
->   static int blk_cgroup_io_type(struct bio *bio)
->   {
->   	if (op_is_discard(bio->bi_opf))
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 365641266c9e..8103643b39fc 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -822,6 +822,20 @@ void submit_bio_noacct(struct bio *bio)
->  =20
->   	might_sleep();
->  =20
-> +	/*
-> +	 * Associate the bio with a blkg for its target queue here, where it is
-> +	 * safe to sleep, instead of in bio_set_dev()/bio_init() which may run
-> +	 * under a spinlock.  bio_set_dev() no longer associates, so a freshly
-> +	 * allocated or remapped bio has no blkg until it reaches the submit pa=
-th.
-> +	 * Reassociate only when the bio was remapped to a different queue sinc=
-e
-> +	 * it was last associated; blk_throtl_bio() and the rq_qos throttlers
-> +	 * rely on bio->bi_blkg matching the queue of bio->bi_bdev.
-> +	 */
-> +#ifdef CONFIG_BLK_CGROUP
-> +	if (!bio->bi_blkg || bio->bi_blkg->q !=3D q)
-> +		bio_associate_blkg(bio);
-> +#endif
-> +
->   	/*
->   	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
->   	 * if queue does not support NOWAIT.
-> @@ -958,6 +972,13 @@ void submit_bio(struct bio *bio)
->   		count_vm_events(PGPGOUT, bio_sectors(bio));
->   	}
->  =20
-> +	/*
-> +	 * bio_set_ioprio() -> blkcg_set_ioprio() reads the policy from
-> +	 * bio->bi_blkg, so associate the blkg (for new I/O, the first time) be=
-fore
-> +	 * it runs.  This is the sleepable entry point for new I/O; remapped bi=
-os
-> +	 * that reach submit_bio_noacct() directly are reassociated there.
-> +	 */
-> +	bio_associate_blkg(bio);
->   	bio_set_ioprio(bio);
->   	submit_bio_noacct(bio);
->   }
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 8f33f717b14f..7a7509c8a59a 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -507,6 +507,7 @@ void bio_associate_blkg(struct bio *bio);
->   void bio_associate_blkg_from_css(struct bio *bio,
->   				 struct cgroup_subsys_state *css);
->   void bio_clone_blkg_association(struct bio *dst, struct bio *src);
-> +void bio_disassociate_blkg(struct bio *bio);
->   void blkcg_punt_bio_submit(struct bio *bio);
->   #else	/* CONFIG_BLK_CGROUP */
->   static inline void bio_associate_blkg(struct bio *bio) { }
-> @@ -515,6 +516,7 @@ static inline void bio_associate_blkg_from_css(struct=
- bio *bio,
->   { }
->   static inline void bio_clone_blkg_association(struct bio *dst,
->   					      struct bio *src) { }
-> +static inline void bio_disassociate_blkg(struct bio *bio) { }
->   static inline void blkcg_punt_bio_submit(struct bio *bio)
->   {
->   	submit_bio(bio);
-> @@ -524,10 +526,11 @@ static inline void blkcg_punt_bio_submit(struct bio=
- *bio)
->   static inline void bio_set_dev(struct bio *bio, struct block_device *bd=
-ev)
->   {
->   	bio_clear_flag(bio, BIO_REMAPPED);
-> -	if (bio->bi_bdev !=3D bdev)
-> +	if (bio->bi_bdev !=3D bdev) {
->   		bio_clear_flag(bio, BIO_BPS_THROTTLED);
-> +		bio_disassociate_blkg(bio);
-> +	}
->   	bio->bi_bdev =3D bdev;
-> -	bio_associate_blkg(bio);
->   }
->  =20
->   /*
+Fifo and the other remaining debugfs attrs have the same LIFE gap on
+elevator switch: stock may take dd->lock for list walks, but still
+loads q->elevator unlocked first.  I will cover those in a separate
+follow-up.
 
---=20
+> - An explanation why locking q->elevator_lock from inside a debugfs
+>    attribute neither triggers lock inversion nor a deadlock.
+
+This next_rq show path takes only elevator_lock, briefly, and does not
+nest it with dd->lock.  Elevator switch takes the same mutex, so the
+reader serializes with teardown rather than deadlocking; there is no
+new elevator_lock <-> dd->lock nesting or inversion on this path.
+
+> - An explanation why the dd and per_prio assignments happen with the
+>    lock held. This seems unnecessary to me because neither
+>     e->elevator_data nor the address of dd->per_prio[] are modified while
+>    the mq-deadline debugfs attributes exist. Did I perhaps overlook
+>    something?
+
+On the width of the critical section we agree in part: holding the lock
+through the tree walk and seq show is wider than needed.  Loading only
+e and dd under elevator_lock, then unlocking, is enough; per_prio,
+deadline_from_pos, and the seq show can run after unlock.  v2 does:
+
+	ret = mutex_lock_interruptible(&q->elevator_lock);
+	...
+	e = q->elevator;
+	if (!e) {
+		mutex_unlock(&q->elevator_lock);
+		return 0;
+	}
+	dd = e->elevator_data;
+	mutex_unlock(&q->elevator_lock);
+	per_prio = &dd->per_prio[prio];
+	rq = deadline_from_pos(...);
+
 Thanks,
-Kuai
+Xixin
+
