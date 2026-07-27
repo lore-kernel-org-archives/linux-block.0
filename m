@@ -1,70 +1,70 @@
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C742175A94;
-	Mon, 27 Jul 2026 00:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496481DDC2B;
+	Mon, 27 Jul 2026 00:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785111559; cv=none; b=MWoHgleWO+ogUXP9qMpJdktwB2oZ6VnB35DFgIp4FJAN1GdedocddtOwlG4rMsB2n1HJVNJrtcfx/mckxpSAXiBo2oNhnhzT9DZy1Vaem3GZqz7ks5kTEScfPilTEj2cCT4+yzwUPg2MVhCPIbB7qFQXHkuNyo+AQL28Fw3zrb4=
+	t=1785112193; cv=none; b=ShcRs0JBuVPlUgE+LBoO49PjoDkT4teQWIddmu0sQievuMUllOVsyG0Kt6/tJuUHwEakFA9N35WSkWiQW0tokQJOMQUzaoPt87OXRdTBKTevO57gLDlaoY2Hkdo7YTUIhP22wLyhFdxjK+jC6bE089lRixgiKyGw0xX1Lp6FSpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785111559; c=relaxed/simple;
-	bh=iZlRmoeic/p3AfpCs/NEOxREPTOpH9lfFgO+T69KxOs=;
+	s=arc-20240116; t=1785112193; c=relaxed/simple;
+	bh=d3aLd2e1hu6klT2+8+/tT4xJrR8Y67BauQMMELIkhcA=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VlI53CSXNSo61SiAeJR2aK5crkbJgyKuO9IXcRTyID3oUNoicKqRGDXYsBfAYKdgSIyW80SRarbMEG+osMMyEOyha6D1T57xV+5zSPu7nwiJOBG+xfs/mw6z6GQN1Z7J/oBWUJwhfsyFvitRPQdrLANHD19BHgB+O+u+O23AsSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G/5C/A6S; arc=none smtp.client-ip=202.12.124.159
+	 MIME-Version:Content-Type; b=Nch1o1xRtyRDTqdexaImCXo63g6H+gE/tAGTs69sR2+k6rwDEQgc+DEmRvD4B8XkoYtce8nIWnsNs7R0ztsIlrP6SOFSpxOb+X/CNFGSmOQ/e687lQWCW+4jpcdtUTtGLagmxYihSzHkL7e9YD1cr1stpoRLLh6q4NERyn4k1ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S0ynm5JJ; arc=none smtp.client-ip=202.12.124.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G/5C/A6S"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4BF477A002D;
-	Sun, 26 Jul 2026 20:19:15 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S0ynm5JJ"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 76AEE1D000E6;
+	Sun, 26 Jul 2026 20:29:50 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Sun, 26 Jul 2026 20:19:15 -0400
+  by phl-compute-06.internal (MEProxy); Sun, 26 Jul 2026 20:29:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:content-type:date:date
 	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
 	:message-id:mime-version:references:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1785111555; x=1785197955; bh=dhPzoPnzg1nwG1ssoWkrgJiXvnq9RKTpMbu
-	id2V9zg8=; b=G/5C/A6S2xS/bLnvk1yKhePfZyEdsfaNUWVNo6pIBG2wcWpzQjZ
-	2mrgAyf7AZ99BiF+HTP8mEIUqvkuS+tuje6R6YaOJ9d4sffdkf1KYTwTPyM6XkkZ
-	2mYmDvcc30Dxja6wVif43eEyX793NNyC90txrvCRHmwm2PA0MfMYFg32mQb3NxYZ
-	1P5Pz/yszfqCE+z+oKZFloBMSYmpPlgoJcoov8/9N4gjHFsToyvgN4OfOnQgGZW6
-	CI5DpMkooaCFHetrxclOchl0uvGDxVSn4K0dyU7h4eRV8XgsVYFIB0aWnKgNixkv
-	2UuOE30+oWrKh28FLv3w1Sp7Qc1M7gv452Q==
-X-ME-Sender: <xms:AqRmanSK2bQXQ0oCJGStzjO0LZhgiqYXNHH754BDsNvcWC9oVd0lkA>
-    <xme:AqRmai2LQQDOBDDypRicvqqq699rUePzc-A8cZwJBtu3YUzG8THTP4-SOt9H2U3aJ
-    pYeqjWO3LDsNXZPX2l86eVbM9nkON-ibUsPhN9SGrcXLtgsNXBXdzOJ>
-X-ME-Received: <xmr:AqRmassLScaRls-i81EG4e-WsrCyAmp5eiibXWbPP32lLHi-g5TSTZOsage-ftsnvsBc12_HfsLJQzTReh5XjIK-gFpGJObbMyA>
-X-ME-Proxy-Cause: dmFkZTGNExzaVYxO1+jFO7L2ssBTlOFrPio2OAuVtiLJB78WFUXEzErArMuNBH+VZLi1Th
-    vtievJSsRqZNCB7C/uPmx/Xh2fD6lhOVBJmsiwr4C/eC+1uaqJo+mi6GySWCTC2xsM2bzt
-    xg40AQSRYoY68TJmxbHDtGS3Dea6EsxPOB+hEw3ziOW4sr148nsMmiZHELB/20z9tjHiAS
-    30mrVjzJYuzLQPhUvJq3kROSn6w6aMohLB3KyXUlxPTuSTuMXw/XbXccJijdC+D7cXenkV
-    p3T3x0rRcSWy0FYvGTrTXIAH4Qp8QDSLyOY8ETgMYh7E5EN17sgY1pa8wFamCZ7Yh/SEiX
-    NiD4d8BwD0jnFoBLIYgd3yLCq+fVOll79eyTZ0+K0W2F8tUOdGH2ezPSsVhU41CldDoK4z
-    Au9a9e38j+JW0e6GqcjevW8AHu1KcwPNA4pQFSOPZIwbnG+EImm4wmb4l7wvBUhpsAruMM
-    YjWhCiMIfadT2jQSkUOgDhVIpTcNkPlo1ZZopCKz7G6fvvLN8knIWnkcAcJX/jt+HUyki1
-    s2I2uv2M9aRw85/8QC/bf9Ww87Ihp3WDa/LsJNp8AHCZAsu+A2o7O/4aD6sqVNriwRjnO5
-    I/N0lcxnHqlv5LNP40txB1V/8Fnt/6++x39lnKMKAkIgDV8ae5DS3m6FQOQg
-X-ME-Proxy: <xmx:AqRmaohiP4U8FDZpGmrYxQdwYSli4e-KWCuEI6U72nlJ2UdFk7V7sQ>
-    <xmx:AqRmat_hbwe33dMQpX_RqDI9kG7kskfgLPPVomFhYaIr2N4yj7oBiw>
-    <xmx:AqRmarujDsAC5IZV816VfIw1P6Ywcd0Dx1BNpjWfGhpG8vs1Zz56EQ>
-    <xmx:AqRmahpH-C8HJ2og8BdJn21NLTUe3poCx_uQnsdUueshWL5TzCkS9Q>
-    <xmx:A6RmaoAo0j_mcHZknrgBe69NFQYImNv8-MFdQnCLXnVxhXWPeea9qpU_>
+	1785112190; x=1785198590; bh=F+SnelrTMU3bHo/TLv6ikqMlxzEuzwB/P/m
+	d9GJlbxA=; b=S0ynm5JJIm3NOSoh8xNXD3TeTMlw+OkbkEPjCh+W7UjV1a/VATd
+	7gPpPehj0D2j/Pu+nq9YAcRLOPttIfWM6PgR0e8dQ2KpXfMkeVXVnIPmYYlYMvTf
+	xNOLkTOxlLFcGriJCCkMGU4Rb/rt2YK8bA3iUvPuq1WcyIU3mtkTErCc4d4V0BkP
+	7m6ug1laNFgIfYT/Lka8M1keQnLHCyAJQqNfWLg6EvnlyII9NSUiHveAUVnT2L2w
+	+DnFmx966IgapULvagNv51KooSYWTEMGFVt0SQ9kORH7bzE6dG+Yym5Zvkk5/AJS
+	2puMxPG1bwad2OLM++KZlSOcENj/lbjtNZg==
+X-ME-Sender: <xms:faZmak5edH3hrT1jJcKTy7DS2k5xWoVwm5zhTjs9UnRK16hH4NIHCQ>
+    <xme:faZmav-ae93nGYFCO6p4Jkk23fkBsCGAKSpdXd3Z4vTAE8HC4OLb0wFLNa3-xseZc
+    z8N4jjgEfTsjV2Cb0zlE9Zaoh8VBRAKy6egKMaDgNG7NgdniEZ1mw>
+X-ME-Received: <xmr:faZmajV00NMLY2NviJHWLIiyo6Zvzu-MvAtISjTucYHzwBKoGzeA3cccE2hT>
+X-ME-Proxy-Cause: dmFkZTEOfa8u3QkVny6+TSQ1cVtGrCqeoPpgYAAmbUuyaUuQShhb1QnLegzPY/+0tw+tFP
+    0uQ2HzUFo4uZyUz7oLR/1Ug9lNCiBzetK3d/FdyV6FL66qePSK9bc/NuoPizjf3w3MKaDd
+    fpXmbPVchP0ejyEr8+haLI8aEclLHyKKaCLRxT6cuxeaFF8KjCIqGMnh2F0oI2FUcK78Ab
+    W5S9HRXzJwQ/QLvuVlqpipZ7X+juF1/hqwu6bh6D+qMuUXxuCUde9cOi/qRJ4xsEqaJ3jN
+    9XxacdF1A5eU+wPIt6wMCZrXODS4aPEp2MSc+c/ELF1SbP096LBv3fwiQshctNDZI/lmsc
+    OAw+W1mf+RFw7KUNcqx87zl8xEblJA8SI0lVax9aRdUD0/NstQZ1Oc2168ZVespz+LEe/+
+    a9zJw/7YrKjJWygqq32Nozr3udu3E8bb8+RGGbzAruvgVqIvfhx1UOFJ2twEa6QvYVB7Jr
+    cWo1Vni+lL29fT7V3XZZH+s8cXA+XjyKuZvwTf7Ck2TLcJVRPPvq2/+6iavBpZW4ttL02x
+    Qj2f/v9POiAA39SHMxgl+9kYHssqpWPnsTEe/zFVkCXfR64h17Ut8My90yq7OxILJvK76X
+    mIV4E+Xoq49Xx6tZyIDjG1T3aIt1sRdJOvSHkMEj03GSn8C5csZg+5KReveQ
+X-ME-Proxy: <xmx:faZmaqoTbh12p9AVBIMfvWxigg07ohYw5rEC47wXg7vBS3n4wkM5VQ>
+    <xmx:faZmalnZzY2PjPGy1G-45ay__AosW-aR0dj6a5NOnGyavEebbRI1mQ>
+    <xmx:faZmaq2e4FJUybDcS8JCmH9l17TD8NL0jEbhJCTPiPlPH3kmMevNGw>
+    <xmx:faZmaiSM7Y1_HxWNdgq2CNZGEghyiqbU5yS2zg6dXJW1572pdrrVRQ>
+    <xmx:fqZmavnQ7bmXJ_Ath2_Jm1Wd4AJSz9Fy_ZxynxXQt-QB5YpI6slpC4zq>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 26 Jul 2026 20:19:11 -0400 (EDT)
-Date: Mon, 27 Jul 2026 10:19:32 +1000 (AEST)
+ 26 Jul 2026 20:29:47 -0400 (EDT)
+Date: Mon, 27 Jul 2026 10:30:06 +1000 (AEST)
 From: Finn Thain <fthain@linux-m68k.org>
 To: Laurent Vivier <laurent@vivier.eu>
 cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>, 
     Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org, 
     linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 19/31] swim: Deduplicate polling loops
-In-Reply-To: <ff1b3b6e-b69f-4081-b98e-ebd2fa31185f@vivier.eu>
-Message-ID: <670c0289-e175-3e5e-b810-d2d2006b30fc@linux-m68k.org>
-References: <cover.1784196135.git.fthain@linux-m68k.org> <7f0be2470206f78fb64d7df72e4d6948a21ec2ab.1784196135.git.fthain@linux-m68k.org> <ff1b3b6e-b69f-4081-b98e-ebd2fa31185f@vivier.eu>
+Subject: Re: [PATCH 23/31] swim: Don't needlessly re-read sectors
+In-Reply-To: <34364739-9153-4538-aed3-7c71860bdf08@vivier.eu>
+Message-ID: <b5bf2f3f-d332-8d3f-1d73-ba40e411044b@linux-m68k.org>
+References: <cover.1784196135.git.fthain@linux-m68k.org> <740e314f4ff30796afa466c6a3d8cfa42e9b1af8.1784196135.git.fthain@linux-m68k.org> <34364739-9153-4538-aed3-7c71860bdf08@vivier.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,29 +76,50 @@ Content-Type: text/plain; charset=us-ascii
 
 On Sun, 26 Jul 2026, Laurent Vivier wrote:
 
-> > @@ -373,19 +364,8 @@ static inline void swim_head(struct swim __iomem *base,
-> > enum head head)
-> >   
-> >   static inline int swim_step(struct swim __iomem *base)
-> >   {
-> > -	int wait;
+> >    swim_drive(base, fs->location);
+> >    swim_READY_timeout(base);
+> >   -	for (i = req_sector; i < req_sector + sectors_nb; i++) {
+> > -		int x;
+> > -		track = i / fs->secpercyl;
+> > -		x = i % fs->secpercyl;
+> > -		side = x / fs->secpertrack;
+> > -		sector = x % fs->secpertrack + 1;
 > > -
-> >   	swim_action(base, STEP);
+> > -		try = 5;
+> > -		do {
+> > -			ret = swim_read_sector(fs, side, track, sector,
+> > -						buffer);
+> > -			if (try-- == 0)
+> > -				return BLK_STS_IOERR;
+> > -		} while (ret != 512);
 > > -
-> > -	for (wait = 0; wait < HZ; wait++) {
-> > -
-> > -		set_current_state(TASK_INTERRUPTIBLE);
-> > -		schedule_timeout(1);
-> > -
-> > -		if (!swim_readbit(base, STEP))
-> > -			return 0;
-> > -	}
-> > -	return -1;
-> > +	return swim_readbit_timeout_atomic(base, STEP, false, 20 * 1000);
+> > -		buffer += ret;
+> > +	while (sectors_nb) {
+> > +		unsigned int cyl, x, head, sector, n, ret;
+> > +
+> > +		cyl = req_sector / fs->secpercyl;
+> > +		x = req_sector % fs->secpercyl;
+> > +		head = (x >= fs->secpertrack) ? 1 : 0;
+> > +		sector = x % fs->secpertrack;
+> > +		n = min(sectors_nb, fs->secpertrack - sector);
+> > +
+> > +		swim_track(fs, cyl);
+> > +		swim_head(base, head);
+> > +
+> > +		ret = swim_read_sector_range(fs, head, cyl, sector + 1, n,
+> > buffer);
+> > +		if (ret != n)
+> > +			++failures;
+> > +		if (failures >= 5)
+> > +			return BLK_STS_IOERR;
 > 
-> I don't understand why we need _atomic() here.
+> Old code failed after 5 retries on the same sector, new code fails after 
+> 5 incomplete ranges anywhere in it, even if earlier errors were 
+> recovered and request made progress.
+> 
+> Is this what you want?
 > 
 
-You're right, it's not needed. This change used to take place before the 
-change from spinlock to mutex, but patches were re-arranged and its not 
-relevant now. I will address this in v2.
+No, it was an oversight. I've since revised this so that the failure 
+counter is only incremented when there is no progress and gets reset when 
+we proceeed to the next sector range on the next track.
