@@ -1,109 +1,161 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455D0425896
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 17:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C79B42A140
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 20:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785172148; cv=none; b=ac6DOhmj/CMhFjUNuiWKMHXxg5RehJp0DRxg1ftUsfEOrZwvYQGmEO+as+ZPk4HAmzG6vXakU2TjQxXsYM5X6L7zIbM2p1Q07JyLbK0Wh7zZOxbSoHd6Yb8SudtyQpRJZ5RUzxpjnRNHBZhZLItnMb1zse1q1Y1dXdlbsroBIQo=
+	t=1785183183; cv=none; b=HN+07ZLzZPMSINGaABiKVaQYyRS3SrpmDxDvG5nX3w6rzmJFzcXcvFNGZfuiy1LQT0M3ATsHJAqDrS+WVNW8l0feJ605xvGhOAXpVH6gdk9SPbkKTWw9fyvEOW5avzQTjwR86jGlCdNRXIhTTUsr+YxcScUzFPCsvKOrQZDbfks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785172148; c=relaxed/simple;
-	bh=FXdp9OQo4ALBepWPdxFlx1eYESgmKpUpw3e2ck8BZxg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EGnNT2JyPgtLSABmlCtX5lH1oEMsdUGXx6Jmh+3XSsToUi8AWJ0KT0IdEMn5cEKIEgq8Yi6xy6DZnkoD+c9TmTVmZpt8kgnepZFFSP5CJQU8n7b2MqCRsRtGophKw5tgJd487k6CSE4nqOwnlzdMbIKPU5xEpfs0K0BaR5coFYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=TW3ia6iE; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1785183183; c=relaxed/simple;
+	bh=docWMqbBkUFwWyy4rg9NlkSlcaz31+fJOtGssg3YJOo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dfHHfhI5jLxeGIscw4ocfhC13w7bK+rIbIknjQwC5ufZpUczi4kuyycbPi+RW5LP21j+ec9iPRyvsEW8co8s0gvFuxexmJSh3ojxfqBOtp+Ks174QQmwpMP41cMksS7by3cpgtCh3vp/3ubDFefPWDErAjGkn+sGqhALRvEvQSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oIqw6rIG; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="TW3ia6iE"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51c2149571dso28469951cf.3
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 10:09:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oIqw6rIG"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-81ed000b507so24587907b3.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 13:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785172145; x=1785776945; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4tN5F81l95SRX0lNSZtF4N3Sk0HbQflC2AEM0fGaV70=;
-        b=TW3ia6iE8u81oSlFifjhwmq4TPvvefQ2Udb01Q2//3fHHVrn+KpNyXAlWa5GzQxFb/
-         aOJQ4CJ0NMMcR0GhffNIxztiyYmhJNI51EsHxW/OyqTllAMWGbZjPpqYtsiHSjhIVOZl
-         jDUvdmeYgToLvwJaGIsjq01s/xz0HaoN37lmUOfYQ0n/uZoH4BPli9APp4mJPluHbN6A
-         pVtHs/vXjPMDLbnGIHjbPUAMHCurp3FSdE4SE6opWCX8yhKjBxWDGsC0T03bRg7cKXEv
-         z/fb+eYy5NdmfmyrSX+b1Y9Q0sfqi+p9dddaJZzOazZKTCBZ/KTJqbPvoahJ9VpZjR31
-         eGfg==
+        d=gmail.com; s=20251104; t=1785183179; x=1785787979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=tPyqnKihTlQFHdssVMVemAlIRLl39sgkift01DFBxTc=;
+        b=oIqw6rIG8zWI12+vzexd6o7lTDbtvu2copD8NZqmp21S2kMazA10XZEk7rFhrSZyTl
+         U6Q0DAFUKN4UGolc9NWIggCVFeXHJqnWdj8MwIhI9ohC9Qi0bssZLRFETaw6uE059wQP
+         jSmoHFiEXeaNG1dE2WJba4hg6+zCFP6ol7MGHrTI8iOg8pJFZCYg5aIV6jD9tiX/vJrg
+         URerTXiVB9rp9WNj00WH1feCM+u5OWAHmLOi9XodhwDk5sdwF1ZadH7O39K1Q+/skDhb
+         VzMS4RXr41dftGwMiuZxp+oNYMkP7T5f+z0U5h+9zxa7jryuLPtO3+7GMwJCNRqjqQBz
+         aTpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785172145; x=1785776945;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4tN5F81l95SRX0lNSZtF4N3Sk0HbQflC2AEM0fGaV70=;
-        b=KWD+nfe/0AfW9CqXzHYH+4a2BjIElKfC3c3+S+g/w5UalxzVf69UbcmLibptHBn/fJ
-         xsXoK8gdMDANUz8ukxM86MyeezCy4xI2NOh41aNN8VVkWJFg+9itH1FmzLR9ZCKzEsen
-         nawfpV2P2KujU0FKx0fhG4y6iOzsN+xFUdImf7EA0VSrQitInbwb3sZD/FHm8DE7+BAa
-         WaGYYIJ7Sa4h13kGJDFDGX3JZiL43ZwuhxyXIV8zYTiAW/nOlisfxanqhsUx/NZAeA2x
-         hSGnhT8Ex+F/fA6FKiuclA3I1lIyXRlMl/HHSQ2d2XkVIFOV5SzgFB5nxfbN3BmDBgbO
-         iX6A==
-X-Gm-Message-State: AOJu0Yw9hOsCkYyDEYbI1lv4X08UKiyf8+Err0xLMQAJCwsEIjZ5PUp+
-	CkodSfEtmC0whE/qsbhEkudi7c/OZ2eLK0u1Z8bQzVqJmv1TpJXNYbDL02ctTEo95Ew=
-X-Gm-Gg: AR+sD116xpPEZgdyllv1ev97nTm1X4dSbpnLr+Vc8onNRjx3hT/NuNVpgdSuIFIFzwd
-	7B4vI0keg1I65flUY6WIj1lvrB6LlJZTYPPNYalfmScGWAm6hvI37ZqD0hC0JoatBRIim2ouk75
-	9k2bxksqMqbkMcc7Yb7q2cECJV8j/aGWkImC05FpS1pSf+SwkfUMm1KgdiVQDQg8U7+DK+S9FRG
-	l7KtaulGQpdQcTrEI0gN4CsnWg6sYJBBT61sjZCkeLbbnR6PZuleSLnOg4EGHOsgf2C87nMZkgL
-	GRisRKmo/a81vjUwC74pGFu/GmJpNT36g6ERSEVR6/YFpIZG2oKSAMf8qAh82tSixByHEPp5UxZ
-	oWqXKe5UuFTire+8I9/NJCoyEFawx9EY3ta+9utNWOCdPyvel2Xmakqe7nKN124w4BOdquH1fUI
-	wz8i+6bkiPlbz8aOtr1kiwK+4kw17tUHDiOjxBX+h2RTaQdmCdWPU3pIA7
-X-Received: by 2002:ac8:7dcf:0:b0:51c:7b12:1211 with SMTP id d75a77b69052e-529a8754649mr97926101cf.79.1785172144843;
-        Mon, 27 Jul 2026 10:09:04 -0700 (PDT)
-Received: from [127.0.0.1] ([65.202.22.186])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529a2a0a7ffsm57646871cf.26.2026.07.27.10.09.03
+        d=1e100.net; s=20251104; t=1785183179; x=1785787979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=tPyqnKihTlQFHdssVMVemAlIRLl39sgkift01DFBxTc=;
+        b=T6OyMQJJFWjo+yS/slheQ6aANXQYf1K7UsxGJssAtmg5O9j1Dy2APpt8NrOkkXb4ML
+         SiHh0pYnbbk+8HIjtZA7YEEq43pHrVqDoxbc2Ks2EjaKRFT/imF6SgylHqtffIMiE5CV
+         NwXXq/LGgIR1DUUNdeGDsI5n3XcdM1A8nEXhdyEE/B4X5qAvGpWCKQKbnnYytZZoqkfP
+         rRRWFSHkWohpCpBTRua/JWPMwpCfV7k14nuAUqyDwgAdxIqDxIjrwFtl5cKuE8/OTRX8
+         YiaZryg5FklaJHDTsw7B+cm7EF8BjA1Q/AjPFv61SpJNwTpwQkkrHHjS4wbs2WcZfU4j
+         1ABg==
+X-Forwarded-Encrypted: i=1; AHgh+RrEh3iwzFz9jO8q854aGUBniYKimLU7JZouVmZ/YWJbhMhPKHBj5SK0Lo9rPDtvMVqtiVAKus9tZB+iKA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNJ9XNNG1D21poyYxvzgsxqhmhCqPEiby3rjRU42Tod8K8hz1N
+	N5dZkJNxZ1UabPofFK/VykV4W1hRu/dZSPVU/AIKzan7rlX8hqKhkOMhpiBY0HeHij4=
+X-Gm-Gg: AR+sD10+n7E8Hxj57qavD0mtJZ4qooh63+gBY6u4KKIVxnkUbBN4fsYS7Jrz3NrEeDx
+	mQczhxR+KrKIIyMQukHevjlrAruURIxwHE5cw5r8X55549T8eqhkHUbE5Q5pWS7yuctdyGBrQWr
+	a9jLA5xfenKwXQ3tI9swRXwn/DYFj/nfxIGmVUrHr77IsW1P7B7M7k9B7jQJcBDCYm+uRINw4SM
+	UmPH9inFCpfh/3dsRsPDmvbi0wBXLH5y5LbRsJ18O/Dmmc4uzKEhuf8QMpTSx24kPc5euf6sRxR
+	496lLEmZq9COsI1Mbfw6RY2OYyVqCV8mrTyN9c22HgVYBmqzwuozxZvMtIJPQuEtMgiM+Oab26M
+	1yzOpVxcZhgAVXt+er4viwsCaRdkPZiDgqvmUT+LoCPo1P0L5Rt17naGRw5VVIDhpB5iyrfx7aE
+	8Z8mRcs9/0bltWRCX+2jO5
+X-Received: by 2002:a05:690c:6f13:b0:812:a680:e10d with SMTP id 00721157ae682-81f69cdcb6cmr36911227b3.12.1785183178724;
+        Mon, 27 Jul 2026 13:12:58 -0700 (PDT)
+Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81f6592ec1asm36564237b3.45.2026.07.27.13.12.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2026 10:09:04 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>, stable@vger.kernel.org
-In-Reply-To: <20260726145025.1507383-1-tom.leiming@gmail.com>
-References: <20260726145025.1507383-1-tom.leiming@gmail.com>
-Subject: Re: [PATCH] ublk: reset kernel-owned dev_info fields in
- ublk_ctrl_add_dev()
-Message-Id: <178517214380.2192703.14950200230738719801.b4-ty@b4>
-Date: Mon, 27 Jul 2026 11:09:03 -0600
+        Mon, 27 Jul 2026 13:12:58 -0700 (PDT)
+From: Chao Shi <coshi036@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Weidong Zhu <weizhu@fiu.edu>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: stop the timeout timer when releasing a never added disk
+Date: Mon, 27 Jul 2026 16:12:57 -0400
+Message-ID: <20260727201257.211635-1-coshi036@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 
+disk_release() undoes blk_mq_init_allocated_queue() for a disk whose
+probe failed before add_disk(), but it only calls blk_mq_exit_queue().
+Nothing there stops q->timeout, and that timer rolls forward: it stays
+pending until it next expires, not until the last request completes.
+So if the driver issued any I/O before adding the disk, the
+request_queue is freed while still linked into a timer wheel bucket.
 
-On Sun, 26 Jul 2026 09:50:25 -0500, Ming Lei wrote:
-> ublk_ctrl_add_dev() memcpy()s the userspace ublksrv_ctrl_dev_info into
-> ub->dev_info and then fixes up the fields the driver owns, but misses
-> ->state and ->ublksrv_pid.
-> 
-> A device added with ->state = UBLK_S_DEV_LIVE passes the
-> "->state != UBLK_S_DEV_DEAD" test that ublk_stop_dev_unlocked() uses as its
-> proxy for "a disk is attached", while ->ub_disk is still NULL, so DEL_DEV
-> right after ADD_DEV oopses in del_gendisk().  UBLK_S_DEV_QUIESCED plus
-> UBLK_F_USER_RECOVERY dies one step earlier, in ublk_force_abort_dev().  A
-> poisoned ->state also gets START_USER_RECOVERY and the char device
-> read/write path onto a device that was never started, and wedges START_DEV
-> at -EEXIST.  A poisoned ->ublksrv_pid just makes GET_DEV_INFO report an
-> unrelated task as the ublk server.
-> 
-> [...]
+Commit 6f8191fdf41d ("block: simplify disk shutdown") dropped the
+blk_cleanup_queue() call that used to stop it.  __del_gendisk() and
+blk_mq_destroy_queue() still do; only the probe failure path lost it.
 
-Applied, thanks!
+nvme gets there because nvme_update_ns_info() submits Report Zones or
+FDP io-mgmt-recv on ns->queue before the disk is added, so a later
+failure - a concurrent reset setting NVME_CTRL_FROZEN, or
+device_add_disk() failing - lands in put_disk() with the timer armed:
 
-[1/1] ublk: reset kernel-owned dev_info fields in ublk_ctrl_add_dev()
-      commit: e65848e4ce352bac9e3465099354c8b8f845391f
+  BUG: KASAN: slab-use-after-free in detach_if_pending+0x30c/0x340
+  Write of size 8 at addr ffff888004d71310 by task kworker/u8:2/37
+   __timer_delete_sync+0x156/0x240 kernel/time/timer.c:1621
+   blk_sync_queue+0x22/0x40 block/blk-core.c:222
+   nvme_sync_queues+0x100/0x150 drivers/nvme/host/core.c:5362
+   nvme_reset_work+0x138/0x930 drivers/nvme/host/pci.c:3264
 
-Best regards,
+  Allocated by task 34:
+   __blk_mq_alloc_disk+0x33/0x100 block/blk-mq.c:4462
+   nvme_alloc_ns+0x290/0x3870 drivers/nvme/host/core.c:4146
+
+  Freed by task 0:
+   blk_free_queue_rcu+0x3a/0x50 block/blk-core.c:254
+   rcu_core+0xc10/0x1730 kernel/rcu/tree.c:2857
+
+The queue being synced there is ctrl->admin_q, only a victim sharing a
+timer wheel bucket with the freed queue's dangling entry; other runs
+tripped in enqueue_timer(), __run_timers() or blk_mq_timeout_work().
+Failing nvme_alloc_ns() with a debug patch makes it deterministic: one
+leaked timer trips KASAN within seconds, while 1987 patched releases
+produced no splat.
+
+Stop the timer and the queue work items before blk_mq_exit_queue(), like
+blk_mq_destroy_queue() does.
+
+Found by FuzzNvme.
+
+Fixes: 6f8191fdf41d ("block: simplify disk shutdown")
+Acked-by: Weidong Zhu <weizhu@fiu.edu>
+Signed-off-by: Chao Shi <coshi036@gmail.com>
+---
+ block/genhd.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index df2c3c69b467..e8ce0cabf392 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1281,14 +1281,18 @@ static void disk_release(struct device *dev)
+ 	/*
+ 	 * To undo the all initialization from blk_mq_init_allocated_queue in
+ 	 * case of a probe failure where add_disk is never called we have to
+-	 * call blk_mq_exit_queue here. We can't do this for the more common
+-	 * teardown case (yet) as the tagset can be gone by the time the disk
+-	 * is released once it was added.
++	 * call blk_mq_exit_queue here, after stopping the timer and work items
++	 * that I/O issued before add_disk may have left pending.  We can't do
++	 * this for the more common teardown case (yet) as the tagset can be
++	 * gone by the time the disk is released once it was added.
+ 	 */
+ 	if (queue_is_mq(disk->queue) &&
+ 	    test_bit(GD_OWNS_QUEUE, &disk->state) &&
+-	    !test_bit(GD_ADDED, &disk->state))
++	    !test_bit(GD_ADDED, &disk->state)) {
++		blk_sync_queue(disk->queue);
++		blk_mq_cancel_work_sync(disk->queue);
+ 		blk_mq_exit_queue(disk->queue);
++	}
+ 
+ 	blkcg_exit_disk(disk);
+ 
 -- 
-Jens Axboe
-
-
+2.43.0
 
