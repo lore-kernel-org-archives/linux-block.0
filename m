@@ -1,99 +1,171 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D26378D87
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 14:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7A837EFFC;
+	Mon, 27 Jul 2026 14:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785161854; cv=none; b=kw/tScAkLYeiS3o9p7u9iNIEyF7rc6Xk+CPmf7jvFTT4OYfkrCUm+jsJdgyUs1fX97amSruNZvoCCbBKmwhTfjHVysRpOlh5KhsvQhcdgiD8tqAQRoLpmJ01n1Wl9QpBmoYZ5IOakNFiRJjbmRBUyYC9kuEUpNxeR0Jm052C3dA=
+	t=1785162541; cv=none; b=rbIpkUFx8NdnullwSUawvryv89/bS0KA6zL9qYwqXAcxhd4/nw5//04YCjWXoeAs1VrC2eLjDYt95BFnkX59cWikT9FCc2PEWbi5U/shSU2relCTzq/3ejY5h5UaSKpaT7Nnbczq9lx1FUYOXz2tXEc5s/+daDTgQ+yFtKvkmqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785161854; c=relaxed/simple;
-	bh=YfdmKDMoYPEZCHasO3vceo4NYJMFc6xtTkJj5m+qSN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=dYiMdZRtabHhFWuNJ2gGEKe93t/z3qgXJs6lnKQRrN/AnlbPHUxr6Mr8GAII85PgAPsOdFNZvw004wKlSL2QNo6RVvC5mSDGD5tgrP+2xScGLLp2E7GswDCjn3Fi9w/waLfmos+K1SCvPTw5XW0ee2Hj93UKhz5KVN8PEV9h1hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ZuZNbcm6; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1785162541; c=relaxed/simple;
+	bh=BfGd7zKLm9twscX93NateSok5gG6Oqi0t8aVMYlbKqQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K7YcYyPD8MwDtm3QCHXh05H/jn4i8bjhM2ogGN3oDfWgW8L/Tr/dDpijO6dBwozvKF2Nci8UKreaxY5/HyZg0etzCBJqu+Fe0Fh45l+m0iRnumd+CHpfd/HnUf2kuxwuFnnW5TXBzGayFedWx2XgjN/3FVqKUiUK9lzZvDfiKlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PlMCoWSS; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ZuZNbcm6"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260727141731epoutp04ec64428ce67f2f0956764084dd955a4a~GKz7PFpYj2577725777epoutp04a
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 14:17:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260727141731epoutp04ec64428ce67f2f0956764084dd955a4a~GKz7PFpYj2577725777epoutp04a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1785161851;
-	bh=tIV12OnGWLcStnM19ejURF2KKLRf0IVkVUo2Fa2yrVQ=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=ZuZNbcm63KqLfrmEb6BCnPqNb6QdRqRPjuK2lJJ1mvsnZcNlH8B5bJdWyjTuSHpOB
-	 B7DSNALiVRtbNMF5zXQ5iP0zv2STORmtp7gCdMT1mJNzC9uwozZlrOtlVLpTklLcjT
-	 oNqg8Iknc8FZ+eXtTDOkfnve1fZx+ojm24k8mDZ0=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20260727141730epcas5p1a7fb7f3241f1eecfdf4e80d458570225~GKz6otSif2417524175epcas5p1U;
-	Mon, 27 Jul 2026 14:17:30 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.95]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4h80zY70Rxz3hhT4; Mon, 27 Jul
-	2026 14:17:29 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260727141729epcas5p3a9c500cd217bfa88587bb828203fb4f7~GKz5n-4ob1231912319epcas5p35;
-	Mon, 27 Jul 2026 14:17:29 +0000 (GMT)
-Received: from [107.122.10.194] (unknown [107.122.10.194]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260727141728epsmtip16cef9fbed94036b6928d79032eb51509~GKz4at9h-2086520865epsmtip1C;
-	Mon, 27 Jul 2026 14:17:27 +0000 (GMT)
-Message-ID: <1d08c3f3-29d6-42db-973b-1c544b436e15@samsung.com>
-Date: Mon, 27 Jul 2026 19:47:27 +0530
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PlMCoWSS"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66RDnWCL2292103;
+	Mon, 27 Jul 2026 14:28:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=daJVaG
+	PrvAQuxv+2ktFL9OCljrr9PH6hI6/vpb0iHfM=; b=PlMCoWSSCPl0xWGvSiikf5
+	vG9m3H8EZXqy2RI5FjAYaILqHKgrTPpHMrLoZyHlF1gapoLe5xcgn+W0OgMrEWv6
+	5LX3lJi03LA4gukILG9OsUOI/h3BLBPvRgRfWkMJIhSDk5t8QXHq5JneyMHpc9Js
+	zbZxPlqKi92YA/ca4U0m3FnVRZPnjr0oc2YLEGX94aKDKKtbFo4uHTGpnu0r3MXX
+	oKXvvXNvw9vjxB5BGjyPCW9h0sernsSC5TkGHG47ozrYCzPV3KRQxoXvfDA9IuME
+	N2/Xz6fdyh8bsG3LW4oojlxnrMm9TRackACuKltmnmsGdpQDe+ktTt+OJYEpPD/A
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmv0ng1yh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Jul 2026 14:28:56 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66REQHP0005436;
+	Mon, 27 Jul 2026 14:28:55 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fna5xwf0c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Jul 2026 14:28:55 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66RESneh50331970
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 27 Jul 2026 14:28:49 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B96E3200C8;
+	Mon, 27 Jul 2026 14:28:49 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9C4FE20103;
+	Mon, 27 Jul 2026 14:28:49 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 27 Jul 2026 14:28:49 +0000 (GMT)
+From: Stefan Haberland <sth@linux.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 3/3] s390/dasd: Fix undersized format-check buffer
+Date: Mon, 27 Jul 2026 16:28:40 +0200
+Message-ID: <20260727142840.567286-4-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260727142840.567286-1-sth@linux.ibm.com>
+References: <20260727142840.567286-1-sth@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/22] iomap: better read bounce buffering support
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
-	Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos
-	Maiolino <cem@kernel.org>
-Cc: Tal Zussman <tz2294@columbia.edu>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Language: en-US
-From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
-In-Reply-To: <20260723145000.116419-13-hch@lst.de>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260727141729epcas5p3a9c500cd217bfa88587bb828203fb4f7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260723145102epcas5p1b832a57cc20b821145a4814f29d4fee5
-References: <20260723145000.116419-1-hch@lst.de>
-	<CGME20260723145102epcas5p1b832a57cc20b821145a4814f29d4fee5@epcas5p1.samsung.com>
-	<20260723145000.116419-13-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI3MDEzNiBTYWx0ZWRfXwU4+9t3kH0XN
+ ReKQwio8/MWPaSTrSWCapzfZtFLxYj7+JZ43AL5Awie71XFXyaeSG1Z0Yv9hkhCZhXjU8j5Zy+p
+ nRU93wRar61GcVaIwfhwRI2DckoIJfU=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI3MDEzNiBTYWx0ZWRfX6GfQ+vA7e9Yw
+ ebWZQ48yJvFlwWnaJB5hAlmYltKBXAVKq9Br6/bRYYVQDEfCO9wVdE0imYaqvQTY3nAqJDxSrAn
+ T0r9hff0BFmtvyFHyogO5joiwp7nnx7w3PjEeYWOOu8rQs9lwz/vZvP7nt3U9IB1exFDNXE6XRW
+ sWZurJFoz6yxkhPj2h7/86G14Q8693p0r1vb/ZLidxgH1PxzuNydxzCr4DUJFdLml0lDYGHesrl
+ OtyGcVeDmvbPzd2CptPmmyrRhrtrBV7jWFQCkE021Xc0fbUeCwUFRBbKI50FfgiHGBvdyKeNeOn
+ PCxrJMbfKeZFnh02g9NkST9aYVm5wkHUtUebG+5ChMuFsgRrghe+tcjfin3uUeTKjwKYIeXYNOE
+ f3pIXabZSxjqRkKjSyvQ/oJz5tQOuI6szxAQjRL/nnNnOPZOYkwNMtQtvSPMgbbr3seUyCdEeCa
+ 2qp9OsZo9TCdRG7EZ+Q==
+X-Authority-Analysis: v=2.4 cv=b5WCJNGx c=1 sm=1 tr=0 ts=6a676b28 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=xGc9WWtXZu7sglNFPhkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: pAP8hfn1gpfNRA9NRMiYpkoy7bia7rwJ
+X-Proofpoint-ORIG-GUID: pAP8hfn1gpfNRA9NRMiYpkoy7bia7rwJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-27_04,2026-07-24_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 spamscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 clxscore=1011 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607270136
 
-On 7/23/2026 8:19 PM, Christoph Hellwig wrote:
-> +void iomap_bounce_read(struct iomap_ioend *orig_ioend, unsigned int minsize,
-> +		void (*submit_ioend)(struct iomap_ioend *ioend))
-> +{
-> +	struct inode *inode = orig_ioend->io_inode;
-> +	struct bio *orig_bio = &orig_ioend->io_bio;
-> +	loff_t file_offset = orig_ioend->io_offset;
-> +	sector_t sector = orig_ioend->io_sector;
-> +	size_t total_len = round_up(orig_ioend->io_size, minsize);
-> +
-> +	WARN_ON_ONCE(!(orig_ioend->io_flags & IOMAP_IOEND_DIRECT));
-> +
-> +	do {
-> +		struct iomap_ioend *ioend;
-> +		struct bio *bio;
-> +		int error;
-> +
-> +		bio = bio_alloc_bioset(orig_bio->bi_bdev,
-> +				min(total_len / minsize, BIO_MAX_VECS),
-> +				orig_bio->bi_opf, GFP_KERNEL,
-> +				&iomap_ioend_split_bioset);
+fmt_buffer_size in dasd_eckd_check_device_format() is declared as
+int, even though one of the multiplicands, sizeof(struct eckd_count),
+is a size_t. The expression
 
-thw new bio inherits REQ_POLLED via orig_bio->bi_opf but iocb->private 
-still points to the never submitted orig_bio; hanging polled reads.
-Maybe mask REQ_POLLED from the bounce bio?
+    trkcount * rpt_max * sizeof(struct eckd_count)
+
+is therefore correctly evaluated at 64-bit width, but the result is
+silently truncated when it is stored back into the 32-bit
+fmt_buffer_size variable. For a sufficiently large track range
+(start_unit/stop_unit are caller-controlled) this truncation
+yields a buffer size far smaller than the number of tracks actually
+requested. kzalloc() then succeeds with an undersized allocation,
+while the subsequent channel program build still operates on the
+untruncated track count and writes past the end of that buffer.
+
+Compute the buffer size with check_mul_overflow() and keep it in a
+size_t, so that a value that no longer fits results in -EINVAL
+instead of a silently truncated allocation size.
+
+Fixes: 8fd575200db5 ("s390/dasd: Add new ioctl BIODASDCHECKFMT")
+Cc: stable@vger.kernel.org #4.7
+Reviewed-by: Jan Höppner <hoeppner@linux.ibm.com>
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/dasd_eckd.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+index 74fe73b5738a..d356a9f8f016 100644
+--- a/drivers/s390/block/dasd_eckd.c
++++ b/drivers/s390/block/dasd_eckd.c
+@@ -20,6 +20,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/uaccess.h>
+ #include <linux/io.h>
++#include <linux/overflow.h>
+ 
+ #include <asm/css_chars.h>
+ #include <asm/machine.h>
+@@ -3475,11 +3476,11 @@ static int dasd_eckd_check_device_format(struct dasd_device *base,
+ {
+ 	struct dasd_eckd_private *private = base->private;
+ 	struct eckd_count *fmt_buffer;
+-	struct irb irb;
++	size_t fmt_buffer_size;
++	unsigned int trkcount;
+ 	int rpt_max, rpt_exp;
+-	int fmt_buffer_size;
++	struct irb irb;
+ 	int trk_per_cyl;
+-	int trkcount;
+ 	int tpm = 0;
+ 	int rc;
+ 
+@@ -3490,7 +3491,9 @@ static int dasd_eckd_check_device_format(struct dasd_device *base,
+ 	rpt_exp = recs_per_track(&private->rdc_data, 0, cdata->expect.blksize);
+ 
+ 	trkcount = cdata->expect.stop_unit - cdata->expect.start_unit + 1;
+-	fmt_buffer_size = trkcount * rpt_max * sizeof(struct eckd_count);
++	if (check_mul_overflow(trkcount, rpt_max, &fmt_buffer_size) ||
++	    check_mul_overflow(fmt_buffer_size, sizeof(struct eckd_count), &fmt_buffer_size))
++		return -EINVAL;
+ 
+ 	fmt_buffer = kzalloc(fmt_buffer_size, GFP_KERNEL | GFP_DMA);
+ 	if (!fmt_buffer)
+-- 
+2.53.0
+
