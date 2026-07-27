@@ -1,161 +1,276 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-48.ptr.blmpb.com (va-2-48.ptr.blmpb.com [209.127.231.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F91F3BE17B
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 07:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80108374A04
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 08:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785138982; cv=none; b=gQgf27O2pf52zi9LsuaSjAVIt5jItDC/+3Mcw5ZftGo1UpU9/F8GPoUn36yYEFhYvUbpfX5xSf581qdjeDzxFvaUxg3A4RVuzHmBgxFKjFObusCNuDQ0bn1hK/UoF2vne4oJTMXHf85zVnATczWDgZMNT3RPV1fI6zmIKpkQiYM=
+	t=1785140212; cv=none; b=FfyMtvCo8qSx3F7pAFccpmB7oIpzIyKHmJpcJkpcnTcGvACI5CY4Lm2HZci3gtG/6ddDJ5/gTurjqN7yl/ien0FieEmSR53D9aZuVJm3Fa3M3Url32lw3vfHqRHqnIkR3RQQIUGbuje7JbaOqUJXGn11eVqOuwOOCZ6/f6zKzTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785138982; c=relaxed/simple;
-	bh=IkTtbVWRFHJwOTI2T8kL6Oj1lKVAompi9lT4Npl4lyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=km6xTSRkTTXajVoA+O+wC6cyClLLc5o+X3t9z2SEj6u5VGpi2oMljHsU/oIGq2U5J7LU5WeOHG3NnAkfTvkGESW7u+O6qn6ZZZ3LCAQhz9bwfXPV+NJKZUVUK0AgrvATPj4gAN78vwUBpSY16475NuZi6B0UtdvCaBghd/c/gk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4h7rVy12K7zYQtwq
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 15:55:38 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 5FEC84058F
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 15:56:15 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkUbD2dqjEJ1AA--.26468S8;
-	Mon, 27 Jul 2026 15:56:15 +0800 (CST)
-From: Yang Erkun <yangerkun@huawei.com>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	yukuai@kernel.org
-Cc: yi.zhang@huawei.com,
-	chengzhihao1@huawei.com,
-	echo.chenlin@huawei.com,
-	leo.lilong@huaweicloud.com,
-	wangkefeng.wang@huawei.com,
-	huawei.libin@huawei.com,
-	leijitang@huawei.com,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org
-Subject: [PATCH v4 4/7] nbd: skip queue freeze when setting size at device startup
-Date: Mon, 27 Jul 2026 15:47:15 +0800
-Message-ID: <20260727074718.414868-5-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260727074718.414868-1-yangerkun@huawei.com>
-References: <20260727074718.414868-1-yangerkun@huawei.com>
+	s=arc-20240116; t=1785140212; c=relaxed/simple;
+	bh=KuHRlDjarSQ08uNy0zLz82jbfdYJRjCJ3DT7qLdTDic=;
+	h=Message-Id:Mime-Version:Content-Type:To:From:Date:References:Cc:
+	 Subject:In-Reply-To; b=CgZh9e23AJhj2tU4rE6HVbAO5Qpp50IMj6gnFJ7ILBMJohcdetFYi+mARuciBpFrUVaHSKGKojomBonm76zyoTk+XdatBBK4wC11pxGFex6pL7g87bpgFShNYA+YxolHrB7MRkkAEaKSU9QQrl/JdMJSd623MQKSw2M3eAaExH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=ot2chsKD; arc=none smtp.client-ip=209.127.231.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="ot2chsKD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785140195;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=Rx+FLoYEhtMyCSYJhgLIrEIG3yFh6Pm3NqgW6KwFN+w=;
+ b=ot2chsKD7v8TJWld9oDrrRuYWH9OSFKotarTA6WHvJiPQ0OssGEZmLO3cf275lzn3AEShJ
+ Ojos3HoGaH7ZwGBV1bhQXHqcxnnx47iyDStJuqoStR6oFbn05wrjJZlqjzeFN6mPZDGgOx
+ 5Hc8ubcPosIttt3MqorlURFf9I6p+Oe8nc2DnXyMQQpdWRSrjdYzGHCrEWiOhaQLVnDpOm
+ eUj+n7q7O91PzsMXhCTrxVFide/AZgDEXjeFaL/6x7oPx8nj5hKEYleRm6un+fyabJd8U+
+ POwMlnjxJE9wqJqIF0DSS6FmAPSokosH4SSuJrHKDltWaZcoIixBFIFqIjPtOQ==
+Message-Id: <933b4285-1c85-4076-831a-0501d5c38e16@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgC3pkUbD2dqjEJ1AA--.26468S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxGFWkZFWDXw4kJw4rGF4rXwb_yoW5KF13pF
-	W7Ca98KrW8KF4xur4DZFs5Ww45twn2k3sFg347G34F9F4qyrZayryIy34Sqa40qryDWFs8
-	G398KF40kw1UXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmGb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
-	AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E
-	4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGV
-	WUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_
-	Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj4
-	0_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8
-	JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbWxR3UUUUU==
-Sender: yangerkun@huaweicloud.com
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+Mime-Version: 1.0
+X-Original-From: yu kuai <yukuai@fygo.io>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+To: <axboe@kernel.dk>, <tj@kernel.org>, "yu kuai" <yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Mon, 27 Jul 2026 08:16:33 +0000
+Date: Mon, 27 Jul 2026 16:16:29 +0800
+References: <20260724123037.3004560-1-yukuai@kernel.org> <20260724123037.3004560-2-yukuai@kernel.org>
+Reply-To: yukuai@fygo.io
+Cc: <hch@lst.de>, <dongsheng.yang@linux.dev>, <cengku@gmail.com>, 
+	<josef@toxicpanda.com>, <nilay@linux.ibm.com>, <ming.lei@redhat.com>, 
+	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of bio_set_dev
+In-Reply-To: <20260724123037.3004560-2-yukuai@kernel.org>
+X-Lms-Return-Path: <lba+26a6713e2+3fa544+vger.kernel.org+yukuai@fygo.io>
 
-The commit 242a49e5c878 ("nbd: freeze the queue for queue limits
-updates") introduced freezing and unfreezing of the queue in
-nbd_set_size to prevent inflight commands from seeing inconsistent
-limits. However, this protection appears unnecessary during the nbd
-startup process because no I/O can occur before nbd_set_size is
-called (with zero capability and write cache disabled).
+Hi,
 
-To address this, nbd_set_size is split with a boolean parameter
-'freeze': the startup path nbd_start_device passes false, while
-runtime resize or reconfigure paths (such as ioctls and
-nbd_genl_size_set) pass true. Although nbd_genl_connect calls
-nbd_genl_size_set before nbd_start_device, nbd->pid is zero at that
-point, so nbd_set_size returns early before applying the limits
-commit. The 'true' parameter covers the nbd_genl_reconnect path,
-which operates on a live device where concurrent I/O may occur.
+=E5=9C=A8 2026/7/24 20:30, Yu Kuai =E5=86=99=E9=81=93:
+> From: Yu Kuai <yukuai@fygo.io>
+>
+> bio_set_dev(), bio_init() and bio_reset() associate a bio with a blkg for
+> its target queue. That association may have to create a new blkg, and
+> currently there are lots of callers that are under atomic context.
+>
+> Move the association out of those helpers and into the submit path, which
+> is always sleepable (submit_bio_noacct() already does might_sleep()):
+>
+>    - submit_bio() associates new I/O before bio_set_ioprio(), whose
+>      blkcg_set_ioprio() reads the policy from bio->bi_blkg.
+>
+>    - submit_bio_noacct() (re)associates when a bio has no blkg yet or was
+>      remapped to a different queue.  blk_throtl_bio() and the rq_qos
+>      throttlers (iocost, iolatency) pair bio->bi_blkg with the queue of
+>      bio->bi_bdev, so a remapped bio must be reassociated to the new queu=
+e.
+>
+>    - bio_set_dev() no longer associates; instead it drops the existing bl=
+kg
+>      when the device changes, since that blkg is tied to the old queue.
+>      bio_init()/bio_reset() leave bi_blkg NULL.
+>
+> Introduce bio_disassociate_blkg() to drop a bio's blkg reference and use =
+it
+> from bio_set_dev(), bio_uninit() and the bio freeing path, replacing thei=
+r
+> open-coded blkg_put().
 
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
----
- drivers/block/nbd.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+Turns out bio will be submitted by kworker for some drivers and for
+blkcg_punt_bio_submit(). Is it possible to record blkcg during bio initiali=
+zation,
+as blkcg must exist, and then covert it to blkg during submission? I can us=
+e union
+for blkcg and blkg to avoid new field in struct bio.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1a31e621b6f7..e2fb787248c8 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -331,7 +331,8 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
- 	nsock->sent = 0;
- }
- 
--static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
-+static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize,
-+			bool freeze)
- {
- 	struct queue_limits lim;
- 	int error;
-@@ -371,7 +372,13 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
- 
- 	lim.logical_block_size = blksize;
- 	lim.physical_block_size = blksize;
--	error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
-+
-+	if (freeze)
-+		error = queue_limits_commit_update_frozen(nbd->disk->queue,
-+				&lim);
-+	else
-+		error = queue_limits_commit_update(nbd->disk->queue, &lim);
-+
- 	if (error)
- 		return error;
- 
-@@ -1563,7 +1570,7 @@ static int nbd_start_device(struct nbd_device *nbd)
- 		args->index = i;
- 		queue_work(nbd->recv_workq, &args->work);
- 	}
--	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
-+	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config), false);
- }
- 
- static int nbd_start_device_ioctl(struct nbd_device *nbd)
-@@ -1631,13 +1638,13 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 	case NBD_SET_SOCK:
- 		return nbd_add_socket(nbd, arg, false);
- 	case NBD_SET_BLKSIZE:
--		return nbd_set_size(nbd, config->bytesize, arg);
-+		return nbd_set_size(nbd, config->bytesize, arg, true);
- 	case NBD_SET_SIZE:
--		return nbd_set_size(nbd, arg, nbd_blksize(config));
-+		return nbd_set_size(nbd, arg, nbd_blksize(config), true);
- 	case NBD_SET_SIZE_BLOCKS:
- 		if (check_shl_overflow(arg, config->blksize_bits, &bytesize))
- 			return -EINVAL;
--		return nbd_set_size(nbd, bytesize, nbd_blksize(config));
-+		return nbd_set_size(nbd, bytesize, nbd_blksize(config), true);
- 	case NBD_SET_TIMEOUT:
- 		nbd_set_cmd_timeout(nbd, arg);
- 		return 0;
-@@ -2092,7 +2099,7 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
- 		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
- 
- 	if (bytes != config->bytesize || bsize != nbd_blksize(config))
--		return nbd_set_size(nbd, bytes, bsize);
-+		return nbd_set_size(nbd, bytes, bsize, true);
- 	return 0;
- }
- 
--- 
-2.52.0
+>
+> This is the first step to convert protecting blkg with blkcg_mutex.
+>
+> Signed-off-by: Yu Kuai <yukuai@fygo.io>
+> ---
+>   block/bio.c         | 18 ++----------------
+>   block/blk-cgroup.c  | 18 ++++++++++++++++++
+>   block/blk-core.c    | 21 +++++++++++++++++++++
+>   include/linux/bio.h |  7 +++++--
+>   4 files changed, 46 insertions(+), 18 deletions(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index 6a2f6fc3413e..ea030c5e39a4 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -179,12 +179,7 @@ static inline gfp_t try_alloc_gfp(gfp_t gfp)
+>  =20
+>   void bio_uninit(struct bio *bio)
+>   {
+> -#ifdef CONFIG_BLK_CGROUP
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg =3D NULL;
+> -	}
+> -#endif
+> +	bio_disassociate_blkg(bio);
+>   	if (bio_integrity(bio))
+>   		bio_integrity_free(bio);
+>  =20
+> @@ -235,8 +230,6 @@ void bio_init(struct bio *bio, struct block_device *b=
+dev, struct bio_vec *table,
+>   #ifdef CONFIG_BLK_CGROUP
+>   	bio->bi_blkg =3D NULL;
+>   	bio->issue_time_ns =3D 0;
+> -	if (bdev)
+> -		bio_associate_blkg(bio);
+>   #ifdef CONFIG_BLK_CGROUP_IOCOST
+>   	bio->bi_iocost_cost =3D 0;
+>   #endif
+> @@ -280,8 +273,6 @@ void bio_reset(struct bio *bio, struct block_device *=
+bdev, blk_opf_t opf)
+>   	atomic_set(&bio->__bi_remaining, 1);
+>   	bio->bi_io_vec =3D bv;
+>   	bio->bi_bdev =3D bdev;
+> -	if (bio->bi_bdev)
+> -		bio_associate_blkg(bio);
+>   	bio->bi_opf =3D opf;
+>   }
+>   EXPORT_SYMBOL(bio_reset);
+> @@ -1803,17 +1794,12 @@ void bio_endio(struct bio *bio)
+>   		goto again;
+>   	}
+>  =20
+> -#ifdef CONFIG_BLK_CGROUP
+>   	/*
+>   	 * Release cgroup info.  We shouldn't have to do this here, but quite
+>   	 * a few callers of bio_init fail to call bio_uninit, so we cover up
+>   	 * for that here at least for now.
+>   	 */
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg =3D NULL;
+> -	}
+> -#endif
+> +	bio_disassociate_blkg(bio);
+>  =20
+>   	if (bio->bi_end_io)
+>   		bio->bi_end_io(bio);
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index d9676126c5b5..618e5566fa52 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -2170,6 +2170,24 @@ void bio_clone_blkg_association(struct bio *dst, s=
+truct bio *src)
+>   }
+>   EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
+>  =20
+> +/**
+> + * bio_disassociate_blkg - disassociate a bio from its blkg
+> + * @bio: target bio
+> + *
+> + * Drop the blkg reference held by @bio and clear the association.  This=
+ is
+> + * used when a bio's target device changes (e.g. via bio_set_dev()): the=
+ old
+> + * blkg is tied to the previous request_queue, so it is dropped here and=
+ the
+> + * bio is reassociated to the new queue from the submit path.
+> + */
+> +void bio_disassociate_blkg(struct bio *bio)
+> +{
+> +	if (bio->bi_blkg) {
+> +		blkg_put(bio->bi_blkg);
+> +		bio->bi_blkg =3D NULL;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
+> +
+>   static int blk_cgroup_io_type(struct bio *bio)
+>   {
+>   	if (op_is_discard(bio->bi_opf))
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 365641266c9e..8103643b39fc 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -822,6 +822,20 @@ void submit_bio_noacct(struct bio *bio)
+>  =20
+>   	might_sleep();
+>  =20
+> +	/*
+> +	 * Associate the bio with a blkg for its target queue here, where it is
+> +	 * safe to sleep, instead of in bio_set_dev()/bio_init() which may run
+> +	 * under a spinlock.  bio_set_dev() no longer associates, so a freshly
+> +	 * allocated or remapped bio has no blkg until it reaches the submit pa=
+th.
+> +	 * Reassociate only when the bio was remapped to a different queue sinc=
+e
+> +	 * it was last associated; blk_throtl_bio() and the rq_qos throttlers
+> +	 * rely on bio->bi_blkg matching the queue of bio->bi_bdev.
+> +	 */
+> +#ifdef CONFIG_BLK_CGROUP
+> +	if (!bio->bi_blkg || bio->bi_blkg->q !=3D q)
+> +		bio_associate_blkg(bio);
+> +#endif
+> +
+>   	/*
+>   	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
+>   	 * if queue does not support NOWAIT.
+> @@ -958,6 +972,13 @@ void submit_bio(struct bio *bio)
+>   		count_vm_events(PGPGOUT, bio_sectors(bio));
+>   	}
+>  =20
+> +	/*
+> +	 * bio_set_ioprio() -> blkcg_set_ioprio() reads the policy from
+> +	 * bio->bi_blkg, so associate the blkg (for new I/O, the first time) be=
+fore
+> +	 * it runs.  This is the sleepable entry point for new I/O; remapped bi=
+os
+> +	 * that reach submit_bio_noacct() directly are reassociated there.
+> +	 */
+> +	bio_associate_blkg(bio);
+>   	bio_set_ioprio(bio);
+>   	submit_bio_noacct(bio);
+>   }
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 8f33f717b14f..7a7509c8a59a 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -507,6 +507,7 @@ void bio_associate_blkg(struct bio *bio);
+>   void bio_associate_blkg_from_css(struct bio *bio,
+>   				 struct cgroup_subsys_state *css);
+>   void bio_clone_blkg_association(struct bio *dst, struct bio *src);
+> +void bio_disassociate_blkg(struct bio *bio);
+>   void blkcg_punt_bio_submit(struct bio *bio);
+>   #else	/* CONFIG_BLK_CGROUP */
+>   static inline void bio_associate_blkg(struct bio *bio) { }
+> @@ -515,6 +516,7 @@ static inline void bio_associate_blkg_from_css(struct=
+ bio *bio,
+>   { }
+>   static inline void bio_clone_blkg_association(struct bio *dst,
+>   					      struct bio *src) { }
+> +static inline void bio_disassociate_blkg(struct bio *bio) { }
+>   static inline void blkcg_punt_bio_submit(struct bio *bio)
+>   {
+>   	submit_bio(bio);
+> @@ -524,10 +526,11 @@ static inline void blkcg_punt_bio_submit(struct bio=
+ *bio)
+>   static inline void bio_set_dev(struct bio *bio, struct block_device *bd=
+ev)
+>   {
+>   	bio_clear_flag(bio, BIO_REMAPPED);
+> -	if (bio->bi_bdev !=3D bdev)
+> +	if (bio->bi_bdev !=3D bdev) {
+>   		bio_clear_flag(bio, BIO_BPS_THROTTLED);
+> +		bio_disassociate_blkg(bio);
+> +	}
+>   	bio->bi_bdev =3D bdev;
+> -	bio_associate_blkg(bio);
+>   }
+>  =20
+>   /*
 
+--=20
+Thanks,
+Kuai
