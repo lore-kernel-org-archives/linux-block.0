@@ -1,125 +1,206 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f65.google.com (mail-yx1-f65.google.com [74.125.224.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496481DDC2B;
-	Mon, 27 Jul 2026 00:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785112193; cv=none; b=ShcRs0JBuVPlUgE+LBoO49PjoDkT4teQWIddmu0sQievuMUllOVsyG0Kt6/tJuUHwEakFA9N35WSkWiQW0tokQJOMQUzaoPt87OXRdTBKTevO57gLDlaoY2Hkdo7YTUIhP22wLyhFdxjK+jC6bE089lRixgiKyGw0xX1Lp6FSpE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785112193; c=relaxed/simple;
-	bh=d3aLd2e1hu6klT2+8+/tT4xJrR8Y67BauQMMELIkhcA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Nch1o1xRtyRDTqdexaImCXo63g6H+gE/tAGTs69sR2+k6rwDEQgc+DEmRvD4B8XkoYtce8nIWnsNs7R0ztsIlrP6SOFSpxOb+X/CNFGSmOQ/e687lQWCW+4jpcdtUTtGLagmxYihSzHkL7e9YD1cr1stpoRLLh6q4NERyn4k1ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S0ynm5JJ; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533AB2045AD
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 00:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785113999; cv=pass; b=b89Q/Na7Fm3cWvX9ZPsEj9To1Fh88VL7zAbd7kvxWKN4PZLJ2XAz6ijcxSodCxPV2ga2XkEq6i3hVesijP0JmuGtNLN+J03lbrHq9T/q8zeHXSx/7eRH9EOnDqp/ENW7oP5dvn9cPUL9Axa/nYWQGZPIZzxUcnnJ3DqJsGXANts=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785113999; c=relaxed/simple;
+	bh=5xQ5wlyPzJPJBZyZbGy8HLnTPWuRdiO322KF/vvl+RA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z1Tf0cWMC50MGjWfws+THWPtxmkGoDjGmTpvqmqWrkLLTZU3xEe3tj/ZS4ZWYdEAIz2P/NuMoxVPXt9N8y24+Skhq0qiLnnce7d7iBx4oC86fCC6cdEwRourqEToYv7XA8y7DiKfhaV5TexRfaxYEj10C0G5yFlfOwtyFInjadM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IVNOAxzR; arc=pass smtp.client-ip=74.125.224.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S0ynm5JJ"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 76AEE1D000E6;
-	Sun, 26 Jul 2026 20:29:50 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Sun, 26 Jul 2026 20:29:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1785112190; x=1785198590; bh=F+SnelrTMU3bHo/TLv6ikqMlxzEuzwB/P/m
-	d9GJlbxA=; b=S0ynm5JJIm3NOSoh8xNXD3TeTMlw+OkbkEPjCh+W7UjV1a/VATd
-	7gPpPehj0D2j/Pu+nq9YAcRLOPttIfWM6PgR0e8dQ2KpXfMkeVXVnIPmYYlYMvTf
-	xNOLkTOxlLFcGriJCCkMGU4Rb/rt2YK8bA3iUvPuq1WcyIU3mtkTErCc4d4V0BkP
-	7m6ug1laNFgIfYT/Lka8M1keQnLHCyAJQqNfWLg6EvnlyII9NSUiHveAUVnT2L2w
-	+DnFmx966IgapULvagNv51KooSYWTEMGFVt0SQ9kORH7bzE6dG+Yym5Zvkk5/AJS
-	2puMxPG1bwad2OLM++KZlSOcENj/lbjtNZg==
-X-ME-Sender: <xms:faZmak5edH3hrT1jJcKTy7DS2k5xWoVwm5zhTjs9UnRK16hH4NIHCQ>
-    <xme:faZmav-ae93nGYFCO6p4Jkk23fkBsCGAKSpdXd3Z4vTAE8HC4OLb0wFLNa3-xseZc
-    z8N4jjgEfTsjV2Cb0zlE9Zaoh8VBRAKy6egKMaDgNG7NgdniEZ1mw>
-X-ME-Received: <xmr:faZmajV00NMLY2NviJHWLIiyo6Zvzu-MvAtISjTucYHzwBKoGzeA3cccE2hT>
-X-ME-Proxy-Cause: dmFkZTEOfa8u3QkVny6+TSQ1cVtGrCqeoPpgYAAmbUuyaUuQShhb1QnLegzPY/+0tw+tFP
-    0uQ2HzUFo4uZyUz7oLR/1Ug9lNCiBzetK3d/FdyV6FL66qePSK9bc/NuoPizjf3w3MKaDd
-    fpXmbPVchP0ejyEr8+haLI8aEclLHyKKaCLRxT6cuxeaFF8KjCIqGMnh2F0oI2FUcK78Ab
-    W5S9HRXzJwQ/QLvuVlqpipZ7X+juF1/hqwu6bh6D+qMuUXxuCUde9cOi/qRJ4xsEqaJ3jN
-    9XxacdF1A5eU+wPIt6wMCZrXODS4aPEp2MSc+c/ELF1SbP096LBv3fwiQshctNDZI/lmsc
-    OAw+W1mf+RFw7KUNcqx87zl8xEblJA8SI0lVax9aRdUD0/NstQZ1Oc2168ZVespz+LEe/+
-    a9zJw/7YrKjJWygqq32Nozr3udu3E8bb8+RGGbzAruvgVqIvfhx1UOFJ2twEa6QvYVB7Jr
-    cWo1Vni+lL29fT7V3XZZH+s8cXA+XjyKuZvwTf7Ck2TLcJVRPPvq2/+6iavBpZW4ttL02x
-    Qj2f/v9POiAA39SHMxgl+9kYHssqpWPnsTEe/zFVkCXfR64h17Ut8My90yq7OxILJvK76X
-    mIV4E+Xoq49Xx6tZyIDjG1T3aIt1sRdJOvSHkMEj03GSn8C5csZg+5KReveQ
-X-ME-Proxy: <xmx:faZmaqoTbh12p9AVBIMfvWxigg07ohYw5rEC47wXg7vBS3n4wkM5VQ>
-    <xmx:faZmalnZzY2PjPGy1G-45ay__AosW-aR0dj6a5NOnGyavEebbRI1mQ>
-    <xmx:faZmaq2e4FJUybDcS8JCmH9l17TD8NL0jEbhJCTPiPlPH3kmMevNGw>
-    <xmx:faZmaiSM7Y1_HxWNdgq2CNZGEghyiqbU5yS2zg6dXJW1572pdrrVRQ>
-    <xmx:fqZmavnQ7bmXJ_Ath2_Jm1Wd4AJSz9Fy_ZxynxXQt-QB5YpI6slpC4zq>
-Feedback-ID: i58a146ae:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 26 Jul 2026 20:29:47 -0400 (EDT)
-Date: Mon, 27 Jul 2026 10:30:06 +1000 (AEST)
-From: Finn Thain <fthain@linux-m68k.org>
-To: Laurent Vivier <laurent@vivier.eu>
-cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-    Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org, 
-    linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 23/31] swim: Don't needlessly re-read sectors
-In-Reply-To: <34364739-9153-4538-aed3-7c71860bdf08@vivier.eu>
-Message-ID: <b5bf2f3f-d332-8d3f-1d73-ba40e411044b@linux-m68k.org>
-References: <cover.1784196135.git.fthain@linux-m68k.org> <740e314f4ff30796afa466c6a3d8cfa42e9b1af8.1784196135.git.fthain@linux-m68k.org> <34364739-9153-4538-aed3-7c71860bdf08@vivier.eu>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVNOAxzR"
+Received: by mail-yx1-f65.google.com with SMTP id 956f58d0204a3-6682259cb3dso3274524d50.1
+        for <linux-block@vger.kernel.org>; Sun, 26 Jul 2026 17:59:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785113997; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eXrQRvJaHbHRL7Z2gZwBItIZy+/50gsoGG6UMlva7d716OmUIf+BImOsc67U/fX993
+         1VqtSfslulhOEjcr1Ng3OMmA2SIsMv/ywW8WSRa6qIWtRQpOTwHFiUY7O+NuBbY4kqA1
+         FebQux9qamdnvh3X7pXpgpGuG1+T6WpzB1liY6ql/Qq851dGKhGRZLhtq6jcouFPaUZq
+         efGd+44Im3hQvsx9s0+zCUVksd97nLnZtrkaPFD/EbeVbhXxZ3mz9jwpf0jvnrq/HGrh
+         bDsbjR1cRsT0HzXA6oRSgIs/iuwO2QcvEUQX8oYxhGtX/q4K4FG/pF5AwaAi00kyvuaI
+         KOVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=95YsidONp2kRhRwGHOy4CeEJEML/ngBb6skNrrEa7E4=;
+        fh=vzr/1Oby8Cqtpj/bxmF14T6z8Aj2t0OEv1vRbzTNLek=;
+        b=AIJq11KIv3YtnZcfyuZVNPyh7GeC4HI8WdVcCvrXmC81WyUN+cjfI+ZG2IPhNqo53e
+         FbSz4zEgVg5dzgpHkwklPKdTP4qJagBCCp7WZ8K5asA4KSmieYLWnrTGcYghHNlRmEwQ
+         m8KVkJEPLiht3ZM4rnWCUhu/vydSJiI8Vh2GHkccDk33GPwB9fO7iA2NcrisSuITZczM
+         iCLa4gr9pVfJPBO6US1+fyiPqBUFrWe1Fj2spXbVlzSkC5ayvk80ELK7o3hQjakBxBq7
+         L1c+rLbGhBAVYgTXMzi0lrm2JsUNkenrGd29J8hKitK44eIV5diWCSj2fLoQwq7GjkfA
+         5bLg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785113997; x=1785718797; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=95YsidONp2kRhRwGHOy4CeEJEML/ngBb6skNrrEa7E4=;
+        b=IVNOAxzRqRmxkfpXHLs3SxVfxnHl3ghOSJ/HT3/w/O6teD3qk54ZsVdj67XW+y/n8X
+         HxlXgY77eCRn8EjsVNcDz2lKIo4NKmX6CCRmwI0PQTN+I6i8qWsCM5jgF3HWNXUrNc6h
+         lVtBTzszPmk3Cq+AIen+DO4BSWP03RHJqyn34SRukjmw38URhW+4C9IOI6HKhnvameND
+         4GZdES/5rAW7i/Dkwy+4EqFg3Ojn7aF3q4ijSFMA5bNCcyf0zR3/2ddk/xaUu9G0x0FD
+         JiP0nGM9ydHFZdhLYDggkhv4dkwolb+/xlRWLBjhycGBvwxuHYzb6Ge4mb+t2oJuQu5b
+         pagA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785113997; x=1785718797;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=95YsidONp2kRhRwGHOy4CeEJEML/ngBb6skNrrEa7E4=;
+        b=nevXdXagyV2dT9Pffy8BDVcYB4AqvkTe6Nly3i47UEf9iqaPPdAGUIOHydHWGEscEX
+         y/1/MHV7cse4IAUeo1/TvEsaR33U0r2k645JiSLg/N23u8B52u5zhdA4eB2nktbPU5pM
+         3GghUIcZ0KtVjeqUxBq1UPYlaFUiJhs+0t4eaTk9gCNh4G5/WHOKqUtv0UVqU6zqIRrL
+         EIeMfmyABfhvosYvIxePaXoVx3SvEi5YjYXIXbQw/4sSR55w4F6vMLmjgcSymndyybLh
+         CdUrptuQ8Y5BMOIY3mCutfaeqcltStWuMG09j8kNG1A1GqFv76JYo04TP3J+p2WLtca0
+         vzmA==
+X-Forwarded-Encrypted: i=1; AHgh+Rq49I3a4vAXxMOl+Kpdt9AF/QMXOT+MkIBYiPfPuHvJBvX9aFOhyCRAPpsRe8HYX4mFLxp5qeBmOzouxg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywlv/NVrYZu9hjWhe2Td+ddpR+OrOa6AMWMC92q6Jog7rxXvkIh
+	xxvlvPOoSlEYBG896nE0LBAJbOyVfCR2DXxxuMe0BIJ046yk3ZTVWZvq+2fuyLPnPSshfT5CMRA
+	APD+C7kVXHM1Wnpm3Eb2ohRwIXjIKptm0KgTPMvZ/STTg9UE=
+X-Gm-Gg: AR+sD116UIVEp2nnTHJaZ5xGQqW8D19a3yYua8MX0+Xcpy19LYSSvbAhYimw6awZ0EM
+	v14+tg3jJBvkB2NKeNCZNF2gyntWDAX6z4DBb3SosiQCzgDZjL2fsbBSg88AJktPC0Z38GSJeNg
+	dKhjlIJnYBGHq7LsSNoKnBU/4UTBanFwaHQZ92tvtwLDjwo38MxoAs5iPATOAMnVvuxDXh8uM/s
+	rINDgsmsZijc8kA5Xbp1b1dU6d8nvR4QkvJj5tyBN+DvX5rJdLpyL+OtFrbihka
+X-Received: by 2002:a53:acc3:0:10b0:667:82d6:eb47 with SMTP id
+ 956f58d0204a3-668bfdb8ed8mr1709002d50.17.1785113997245; Sun, 26 Jul 2026
+ 17:59:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+References: <20260713120242.1284559-1-l1za0.sec@gmail.com>
+In-Reply-To: <20260713120242.1284559-1-l1za0.sec@gmail.com>
+From: Li Zao <l1za0.sec@gmail.com>
+Date: Mon, 27 Jul 2026 08:59:42 +0800
+X-Gm-Features: AUfX_mzbdtQ4GTIYSYfwvPeItDT_XgYEqauQJZGyj8All9Y13jYcDLJ-7tb3pxo
+Message-ID: <CAAwbnpfikLQUap0MLYFpk83BahLaiYZWP50hV1J6YTftkeGT2Q@mail.gmail.com>
+Subject: Re: [PATCH] nbd: do not reclassify userspace sockets
+To: josef@toxicpanda.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hello,
 
-On Sun, 26 Jul 2026, Laurent Vivier wrote:
+I'm just following up on this patch to see if you've had a chance to review=
+ it,
+or if there is any additional information I should provide.
 
-> >    swim_drive(base, fs->location);
-> >    swim_READY_timeout(base);
-> >   -	for (i = req_sector; i < req_sector + sectors_nb; i++) {
-> > -		int x;
-> > -		track = i / fs->secpercyl;
-> > -		x = i % fs->secpercyl;
-> > -		side = x / fs->secpertrack;
-> > -		sector = x % fs->secpertrack + 1;
-> > -
-> > -		try = 5;
-> > -		do {
-> > -			ret = swim_read_sector(fs, side, track, sector,
-> > -						buffer);
-> > -			if (try-- == 0)
-> > -				return BLK_STS_IOERR;
-> > -		} while (ret != 512);
-> > -
-> > -		buffer += ret;
-> > +	while (sectors_nb) {
-> > +		unsigned int cyl, x, head, sector, n, ret;
-> > +
-> > +		cyl = req_sector / fs->secpercyl;
-> > +		x = req_sector % fs->secpercyl;
-> > +		head = (x >= fs->secpertrack) ? 1 : 0;
-> > +		sector = x % fs->secpertrack;
-> > +		n = min(sectors_nb, fs->secpertrack - sector);
-> > +
-> > +		swim_track(fs, cyl);
-> > +		swim_head(base, head);
-> > +
-> > +		ret = swim_read_sector_range(fs, head, cyl, sector + 1, n,
-> > buffer);
-> > +		if (ret != n)
-> > +			++failures;
-> > +		if (failures >= 5)
-> > +			return BLK_STS_IOERR;
-> 
-> Old code failed after 5 retries on the same sector, new code fails after 
-> 5 incomplete ranges anywhere in it, even if earlier errors were 
-> recovered and request made progress.
-> 
-> Is this what you want?
-> 
+Thank you for your time and help.
 
-No, it was an oversight. I've since revised this so that the failure 
-counter is only incremented when there is no progress and gets reset when 
-we proceeed to the next sector range on the next track.
+Best regards,
+Haocheng
+
+On Mon, Jul 13, 2026 at 8:03=E2=80=AFPM <l1za0.sec@gmail.com> wrote:
+>
+> From: Haocheng Yu <l1za0.sec@gmail.com>
+>
+> A Syzkaller-based tool we developed reported a pvqspinlock warning when
+> one thread passes a TCP socket to NBD_SET_SOCK while another thread
+> concurrently calls setsockopt() on the same socket:
+>
+>   pvqspinlock: lock ... has corrupted value 0x0
+>   sockopt_lock_sock()
+>   do_ip_setsockopt()
+>   __sys_setsockopt()
+>
+> NBD gets the socket with sockfd_lookup(), so the socket remains a normal
+> userspace-visible file descriptor. Under CONFIG_DEBUG_LOCK_ALLOC,
+> nbd_add_socket() calls nbd_reclassify_socket(), which in turn calls
+> sock_lock_init_class_and_name(). This function resets sk_lock.owned,
+> reinitializes sk_lock.wq, and calls spin_lock_init() on sk_lock.slock.
+>
+> The sock_allow_reclassification() check only samples the current socket
+> lock state. It does not prevent a concurrent syscall from acquiring or
+> using the socket lock immediately after the check. Reinitializing the
+> socket lock while setsockopt() is using it can therefore clear the
+> queued spinlock state and make the later unlock trigger the corrupted-loc=
+k
+> warning.
+>
+> Only reclassify sockets that are private to the kernel before they are
+> published. NBD accepts sockets supplied by userspace and cannot make
+> that guarantee, so remove the NBD-specific reclassification.
+>
+> Signed-off-by: Haocheng Yu <l1za0.sec@gmail.com>
+> ---
+>  drivers/block/nbd.c | 37 -------------------------------------
+>  1 file changed, 37 deletions(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 8f10762e90ef..e2fe9e3308fc 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1238,42 +1238,6 @@ static struct socket *nbd_get_socket(struct nbd_de=
+vice *nbd, unsigned long fd,
+>         return sock;
+>  }
+>
+> -#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> -static struct lock_class_key nbd_key[3];
+> -static struct lock_class_key nbd_slock_key[3];
+> -
+> -static void nbd_reclassify_socket(struct socket *sock)
+> -{
+> -       struct sock *sk =3D sock->sk;
+> -
+> -       if (!sock_allow_reclassification(sk))
+> -               return;
+> -
+> -       switch (sk->sk_family) {
+> -       case AF_INET:
+> -               sock_lock_init_class_and_name(sk, "slock-AF_INET-NBD",
+> -                                             &nbd_slock_key[0],
+> -                                             "sk_lock-AF_INET-NBD",
+> -                                             &nbd_key[0]);
+> -               break;
+> -       case AF_INET6:
+> -               sock_lock_init_class_and_name(sk, "slock-AF_INET6-NBD",
+> -                                             &nbd_slock_key[1],
+> -                                             "sk_lock-AF_INET6-NBD",
+> -                                             &nbd_key[1]);
+> -               break;
+> -       case AF_UNIX:
+> -               sock_lock_init_class_and_name(sk, "slock-AF_UNIX-NBD",
+> -                                             &nbd_slock_key[2],
+> -                                             "sk_lock-AF_UNIX-NBD",
+> -                                             &nbd_key[2]);
+> -               break;
+> -       }
+> -}
+> -#else
+> -static inline void nbd_reclassify_socket(struct socket *sock) {}
+> -#endif
+> -
+>  static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+>                           bool netlink)
+>  {
+> @@ -1290,7 +1254,6 @@ static int nbd_add_socket(struct nbd_device *nbd, u=
+nsigned long arg,
+>         sock =3D nbd_get_socket(nbd, arg, &err);
+>         if (!sock)
+>                 return err;
+> -       nbd_reclassify_socket(sock);
+>
+>         /*
+>          * We need to make sure we don't get any errant requests while we=
+'re
+>
+> base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+> --
+> 2.51.0
+>
