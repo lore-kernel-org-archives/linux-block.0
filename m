@@ -1,163 +1,107 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1332239937C
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 15:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785166206; cv=pass; b=oAPPMV7ym0gtv0wSY2siSGn+aM/U5aLfBndq9oR/a1GZltPZX3/c+s2SsZFCyKtgIZTNIipGVjZirwU+GjF+0Uo7m2MXWTGG3OUkzNpoWHLoebJOVPnh9c2cFGCHlJ8Eq4N5OhFFdASgvv4Skg3A8BO9/HhYtgxv5nxfi5dMr4I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785166206; c=relaxed/simple;
-	bh=KMguZ7AVQEmAtXUkdgP4AMIA4pmOukTAaFsuTXrTTgQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VdhVE38rdXZbhnBg2u6Co+lWPVTUqE+GIpt9s6yJXipOMTzoCWS+sgoGBmVmXAKBOnLwGCfqTvTAf9RMbadyR+2Ktn4+WKg8Ph9yDHzISkUyQcxeF8lvAwoqlZ7HngDGyMDohC/e5+djBRlG1nJ0xai8uZLildjhSv3QGwrXkTM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EOE57eoe; arc=pass smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC1C329E55;
+	Mon, 27 Jul 2026 15:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785167320; cv=none; b=jDPYzYdbF99YjbsJ5hHwt9hwiP4dv2q9UypP4JeOIUO3XlI4mcfKzzkuSIQkQXgtayrk7fjtLFAL7rrbmWQW9G1T6jzOTXOYxmwQRwdHyWex0SVBvdhITQRlGFdAaqSBE7AqGlmq2sX2c92WVd21h83taOYQ/vsAM53T2wpHwOI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785167320; c=relaxed/simple;
+	bh=Y2/Z3LY/RmRJ8nKeH8GBXkQa5Aru9cXcqr6idaq4720=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=MBqHWcVPsK0fc9LnyWiZ3R3ncn4oFirdp+7NPejrP5n9zauUTLDbEomUs0JR7e7VSAhgpBxW7+okXLyyy+Dit9deMVT5PfrBLrl1ZOlH1tzqwvxEeWIiG2wrdo9ttYhTbwUX/7PANk47S0azsSEE1fo1QGRpU3X6gyqtNGtN6OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=d3Fyd20R; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EOE57eoe"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-4485b31257fso210495fac.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 08:30:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785166203; cv=none;
-        d=google.com; s=arc-20260327;
-        b=s4sX8nTSCLbc83TXhDCjLJBoaQB4OwbikjTzFzUn5UUhsqin219UxC8HrLfX30reSO
-         qHne8MKjoux1fCZt4SXrMcpwN/z6ST6ng8N+ZmX2bwne8kB+R2V/vqKNISkeKHofkmlw
-         dqY1hLRk/4QphjYoW0hGcLaAo6oHbsA6hxPd+Qe3Q2Azx3tdGsEYr30mui1vcS3M9GW1
-         keAzNBGtFyWYrXECfybDxEUpnnLD86brND3fl/2A5PgnlEak4nEY9jDH0J668m8CTB49
-         sfNOIPnfmcpO7CgN4fBAuvt4wLiUT2Bv3Ma6A/VpxuDrLUM/8QwJh2wT0KL4AS98M560
-         HX5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
-        fh=2o3XoCVn/lpdq6/XdrqwlXT8mKkXZO0hq6ri18tt504=;
-        b=oFBbZZsIc9vNmb3rEAMoSzdmMwLd8sbxougj8p1LmRCCDlFSKA4gscv8VyQ6RlNFrz
-         KoOI/R5643vEHcCGnlStYV7s8rULAyFllS0sjUsfxJHtDkqH6CRH9TKAp2z4BeCG9Wbj
-         W5yK/MFxNHYRP2bFk4h6vGYXN07yPvMwCjea11VP1jbtgfyjOPENLVPIESYTUPp1r6Mn
-         u9vmpe/zqcSsZVLRSGdAffDEHvfgGJ80aG580wnlbUchWBGIjp/XaCI9OFaJKPN+HIIl
-         1dF68KsoUTO39CaaaMnJ+cieCiSELjDdGGcf3jswuOG5URjcbC1eo74OBwwBKuY06xcJ
-         D4IQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1785166203; x=1785771003; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
-        b=EOE57eoeNmD5lt7GvS7wdQruqz1JvXYVkkkKLqR0hJPi0TUCUjWI/NgXgn/TqSt+oY
-         ABMajo/tBYw1NC5Z6V5rLR8bb8ye3RMgLYPp+g/+oP+IU07DBoyUBHh29zShovHuAMxo
-         sDwymuKe70m3M+vpIYMKDqKHpgERpNsc6l7l3ug+GyZR8obXfFHQ4lo0J5oKnC7oMy+2
-         JhS7KZOJZVw1CPdGAKQMxdP5WQ790yVoqfWSUaFmdg7fxCen60Y6CVGZj8Ki8GQRwGtG
-         BRJ0eBjm1oj9V5DEniNS5TblGdScpub1YMaNg3T0AXIfS5XU8cASKc8T5m2WvnzPhEeQ
-         ECpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785166203; x=1785771003;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
-        b=rei6AWk4beUvY7SRmnOwRbFb9dfeIib8B1EnEXrh2bbYsCXk4JbDoXmV36aw6GHpq/
-         I+hYtiRuMJSBO++Zugk+AuaO8Zs1Pn5erxjr8w1MfuVtm3tesWey3CHtnMJo4VpmpCzZ
-         bTktqNf3Ocbo3xpgaZt0rHQ4fWj22lsoBmroBykqS/Wig9/OjQSD6JV9dMCGV1z6yCYe
-         9xZHJOvbdwpOog8yZQjf/stsDTSqWH8bCnf+KD1dbBurPOmqRCjMDJ97s8xpHyvDrkYH
-         vUKJnhYhktX3i+e4FnbY/sfjpDn++tF7GxX0b7hqsWJ+kfVpSSh35f9x9nCUbwh8PgGx
-         zztg==
-X-Forwarded-Encrypted: i=1; AHgh+RqaiJMB9yDspef3Shw1LW5trDd6rBdeagm7gnNARXYCRMb3mPf5JLoRV4vxnUR7+6HPQhgc2MRNol+vHw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxsHH8fsZtXRIgo7URDs+L7pPRUxj0pGwmrNQTordWibhU3inq
-	nzzpTUa/O97eCZBr4kzS8c68gM7AVW1tHE7/xH0xe39WrDgDW3aQxlSaZGaJ2rI2hWnmPcyEL7N
-	MBRU8JzVYWoQmPtdI2bTocRrKpNaZuBtb2ltUKqf16g==
-X-Gm-Gg: AR+sD123IMeDBYQipW1xuFqG4Z5187vIBYw/8pJ/cxUh0lgUEnvbeY6mnce7IuE2Qvi
-	HbIvQPl3Cm2akJmCmlAThM0XYat/BYmexm0b61EdudeOc3isGhYpYTMCpeiHGqoOEmv5MU50agx
-	69dwMfdGmJWjGBEc4j3nds9tNrwLSLQWF83KYt0pC7QQuV6Jza4bvlOnQNYRW4RjcOWOIushdhd
-	ClYnEamxwXKddWFgXSmaZEEbouzXmGA9663PmoY0A3l5S2kU8Wconcz0JsGiA==
-X-Received: by 2002:a05:6870:7091:b0:452:112:77bf with SMTP id
- 586e51a60fabf-45858d0f099mr420820fac.6.1785166202726; Mon, 27 Jul 2026
- 08:30:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="d3Fyd20R"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=2oQhVvdv6KuXOiBD33tawm7L/XSNS3FQAeB02Lg3Rx8=; b=d3Fyd20RPqcZRPF+6seD52jrxs
+	yjAvCdAgZVrU+sB6XDX7ZFpDad4tBDiHMmPolG37tWjhImS68lymNdWNVbq9J4beIpy/cBR/bxo8C
+	Ytna5l7NYKOqJPyk3xHR9EqwZy5AC6F3y/euuHm/mzVeBVGKxrAT5xrDHREnCZOjH5l0iSWmZmyS4
+	synpvjnCQurud74bxxoVd9M+uK3tIW2m4w8sILjk9Jz2CAOU90M7KK5X27UR+N1VadQirb5CcXqHw
+	phpXliLE4QMi4LFi4tZay+vupgomU5LWUKrExwljuf3qPeTABUpKBzlME/M4Z5N3qYxAnGRC0DzwL
+	FZ/T295A==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <logang@deltatee.com>)
+	id 1woNYz-0000000GHSh-1tsM;
+	Mon, 27 Jul 2026 09:48:22 -0600
+Message-ID: <d3d1eb27-f743-4557-b47e-ec2f8ce0091c@deltatee.com>
+Date: Mon, 27 Jul 2026 09:48:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260726145025.1507383-1-tom.leiming@gmail.com>
-In-Reply-To: <20260726145025.1507383-1-tom.leiming@gmail.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 27 Jul 2026 08:29:50 -0700
-X-Gm-Features: AUfX_mwXrHK1kp2MH8JecsMREFrjHgs2ZEb-wIDc9x-ApCKJiMQoIb5IjLNQxtA
-Message-ID: <CADUfDZr9Rpz6BNrVLtEysJWCgPxb6C-3tj6O6VL0e1ZQWG_wyA@mail.gmail.com>
-Subject: Re: [PATCH] ublk: reset kernel-owned dev_info fields in ublk_ctrl_add_dev()
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+To: Mykola Marzhan <mykola@meshstor.io>, Jens Axboe <axboe@kernel.dk>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+ Guoqing Jiang <guoqing.jiang@linux.dev>, Leon Romanovsky <leon@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kiran Kumar Modukuri <kmodukuri@nvidia.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Shivaji Kant <shivajikant@google.com>, Pranjal Shrivastava
+ <praan@google.com>, Henrique Carvalho <henrique.carvalho@suse.com>,
+ stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+ Thorsten Leemhuis <regressions@leemhuis.info>, Martin Wilck <mwilck@suse.com>
+References: <20260726113229.2154269-1-mykola@meshstor.io>
+ <20260726113229.2154269-12-mykola@meshstor.io>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20260726113229.2154269-12-mykola@meshstor.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: mykola@meshstor.io, axboe@kernel.dk, song@kernel.org, yukuai@fygo.io, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org, magiclinan@didiglobal.com, xiao@kernel.org, guoqing.jiang@linux.dev, leon@kernel.org, jgg@ziepe.ca, kmodukuri@nvidia.com, kch@nvidia.com, bhelgaas@google.com, shivajikant@google.com, praan@google.com, henrique.carvalho@suse.com, stable@vger.kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, regressions@leemhuis.info, mwilck@suse.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH v6 11/12] nvme-rdma: ratelimit the map-failure error
+ message
+X-SA-Exim-Version: 4.2.1 (built Sun, 23 Feb 2025 07:57:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Sun, Jul 26, 2026 at 7:50=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wr=
-ote:
->
-> ublk_ctrl_add_dev() memcpy()s the userspace ublksrv_ctrl_dev_info into
-> ub->dev_info and then fixes up the fields the driver owns, but misses
-> ->state and ->ublksrv_pid.
->
-> A device added with ->state =3D UBLK_S_DEV_LIVE passes the
-> "->state !=3D UBLK_S_DEV_DEAD" test that ublk_stop_dev_unlocked() uses as=
- its
-> proxy for "a disk is attached", while ->ub_disk is still NULL, so DEL_DEV
-> right after ADD_DEV oopses in del_gendisk().  UBLK_S_DEV_QUIESCED plus
-> UBLK_F_USER_RECOVERY dies one step earlier, in ublk_force_abort_dev().  A
-> poisoned ->state also gets START_USER_RECOVERY and the char device
-> read/write path onto a device that was never started, and wedges START_DE=
-V
-> at -EEXIST.  A poisoned ->ublksrv_pid just makes GET_DEV_INFO report an
-> unrelated task as the ublk server.
->
-> Reset both after the memcpy(), as ublk_detach_disk() does.  Userspace onl=
-y
-> ever reads these back, so correcting them silently breaks nothing.
->
-> ADD_DEV has copied ->state in unsanitized since ublk was merged, but back
-> then it was harmless: the gendisk was allocated during ADD_DEV, and both
-> teardown and the START_DEV -EEXIST check keyed off disk_live() rather tha=
-n
-> ->state.  The oops became reachable once the disk allocation moved to
-> START_DEV and those checks switched to ->state.
->
-> Fixes: 6d9e6dfdf3b2 ("ublk: defer disk allocation")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+
+On 2026-07-26 05:32, Mykola Marzhan wrote:
+> A mapping failure is per-request and, for an unroutable P2P transfer,
+> deterministic: a workload that keeps issuing one turns this into a
+> log line per I/O.  Ratelimit it, as nvme's per-I/O error logging
+> (nvme_log_error()) already is.
+> 
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: Mykola Marzhan <mykola@meshstor.io>
+
+Thanks!
+
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
 > ---
->  drivers/block/ublk_drv.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 4ca6ec738c93..2a22f9dc1f2f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -4764,6 +4764,15 @@ static int ublk_ctrl_add_dev(const struct ublksrv_=
-ctrl_cmd *header)
->         /* update device id */
->         ub->dev_info.dev_id =3D ub->ub_number;
->
-> +       /*
-> +        * ->state and ->ublksrv_pid are owned by the driver and only rea=
-d back
-> +        * by userspace, but they come from the copied-in dev_info, so re=
-set
-> +        * them. Otherwise a device added with ->state !=3D DEAD looks li=
-ve while
-> +        * ->ub_disk is still NULL.
-> +        */
-> +       ub->dev_info.state =3D UBLK_S_DEV_DEAD;
-> +       ub->dev_info.ublksrv_pid =3D -1;
-> +
->         /*
->          * 64bit flags will be copied back to userspace as feature
->          * negotiation result, so have to clear flags which driver
-> --
-> 2.55.0
->
+>  drivers/nvme/host/rdma.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index c38d949502b7..2f50509a7a61 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -2040,8 +2040,8 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  
+>  	err = nvme_rdma_map_data(queue, rq, c);
+>  	if (unlikely(err < 0)) {
+> -		dev_err(queue->ctrl->ctrl.device,
+> -			     "Failed to map data (%d)\n", err);
+> +		dev_err_ratelimited(queue->ctrl->ctrl.device,
+> +				    "Failed to map data (%d)\n", err);
+>  		goto err;
+>  	}
+>  
+
