@@ -1,76 +1,74 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AEC3EFFCE
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 09:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFFB3E44EF;
+	Mon, 27 Jul 2026 10:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785146259; cv=none; b=Ab0ULzEa5oq85e2GW8rVbQEqreSp0F17T2isqiIxHONLh5CcW/icm2JZV9gvTdpbm2sOv+pYiuzxvCwNaSeida/sSn3X6SVkiXb5FOhrcpMfVkjCgHoyxgLSMhv4xjvnz11vPy/zQiREltYcwgsaWR00xAHOPtytx97u7VHNhDQ=
+	t=1785148642; cv=none; b=ICqRD2MyaAp3dHDSf9OhZVlE9H2ZW0BGRtHyOmmMscSKdJrkVcOY3MxYfvoJyUSLTJiawaoZnK9ajDfsDC90XtZUxWX1v5/KGxcbMVEYTI80U0TfMi9KHfzBSHkvCQAbDriUwAUH0GdPU+PBvq8DH2ipNjMFj2QB6jQHXNx04JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785146259; c=relaxed/simple;
-	bh=1VASKRYj8O3uyId+LEIuzz27LTt1kP8n8UWmQMWsKBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AWGsqbYBPTnDY0cmkLynf3HTY1u/CgDa33iFGKjxBSj1WAGe3pV9F1gU6656sDlkLqSd35wvz1W4YyYh8ioWW/qJhFVfdZcc0EhuikTwx0jMT42ilCjWd/o4Nx1SysALs+c9NEk5bcuC/L3qjHdTE1p4KUS8FA035Odhln1XUlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o+/Pm6ga; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o+/Pm6ga"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785146255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pTX5I1JY2W5dtBHTVDxDZLR6fbXEu3f2bbNEFgRRGMQ=;
-	b=o+/Pm6ganDINRk55NYnDu1gSHBAKmWKezsMa7HjZqYw1EmMfFKlaZATf3Cjd1GnSDH3Cf4
-	m+wZ2HJ/84rQMcItVfnF3SCz6vqtJ3FwxI9r/R5S/dGiqJE5RrX36xhINQQwMLHg28W2qQ
-	7+h9sH+4kX0OmEDmLc+eunuOO9EIYEw=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] block: Replace deprecated strcpy() in devt_from_devname()
-Date: Mon, 27 Jul 2026 11:57:13 +0200
-Message-ID: <20260727095712.409334-2-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1785148642; c=relaxed/simple;
+	bh=PfKqu2R7oO5a1NehM05V2fnlMnef4AVqzXwMk4A4toE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dkl3rBFtnFaGGJKYCnfbbNQ0G+lADXNpz95UKvzNfg0+IuetwnuKLlJncLv200CT0IkXZ0iB30PYoapyysq9TItqGCwA/7/phcFHaxLD6o05T5A9NhStu2xnkyfid8lRuXdpxd95Na3T7djtaVSt+vAwk7FBX5EeDjivK2ALBd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 1c20e8b689a711f1aa26b74ffac11d73-20260727
+X-CID-CACHE: Type:Local,Time:202607271743+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:0627ccfa-a07d-4f9a-943f-10d877152789,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:e5c1714c7d1e9842402734d9955606ef,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:0
+	|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
+	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 1c20e8b689a711f1aa26b74ffac11d73-20260727
+X-User: liuxixin@kylinos.cn
+Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liuxixin@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 681009878; Mon, 27 Jul 2026 18:37:04 +0800
+From: Xixin Liu <liuxixin@kylinos.cn>
+To: bvanassche@acm.org
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
+Subject: Re: [PATCH v1] block/mq-deadline: hold elevator_lock in debugfs next_rq show
+Date: Mon, 27 Jul 2026 18:25:00 +0800
+Message-ID: <reply-mq-deadline-next-rq-af98cabf-followup.20260727.182500.liuxixin@kylinos.cn>
+In-Reply-To: <reply-mq-deadline-next-rq-af98cabf.20260727.174500.liuxixin@kylinos.cn>
+References: <2e689b2c4021.1784615432.git.liuxixin@kylinos.cn> <af98cabf-89a6-41b0-9929-ec3e24783503@acm.org> <reply-mq-deadline-next-rq-af98cabf.20260727.174500.liuxixin@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1013; i=thorsten.blum@linux.dev; h=from:subject; bh=1VASKRYj8O3uyId+LEIuzz27LTt1kP8n8UWmQMWsKBc=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnp2hVOO9KzfUVWsZ7/Ef957WpbU7MVDW771v3hPv3E4 kBpQI55RykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEzk229GhrM3z154rXq2jndR NTPbMWG1b4WnXL9oS4fJHX8qvV6ZL4iR4Tjb7RmTWdv0g3hmT4rctIRLY8Li6fNO8sw4pCMvHRa 5kw8A
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Mailer: patches/scripts/send-local.py
 
-strcpy() is deprecated [1] and uses an additional strlen() internally;
-use memcpy() directly since we already know the length of name and that
-it is guaranteed to be NUL-terminated.  Also use strnlen() and sizeof()
-instead of the hard-coded size while at it.
+Hi Bart,
 
-[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy
+To add to my previous reply:
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- block/early-lookup.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This part needs dd->lock, for example:
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 3fb57f7d2b12..5c30a0cc85a0 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -155,10 +155,11 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 	int part;
- 	char s[32];
- 	char *p;
-+	size_t name_len = strnlen(name, sizeof(s));
- 
--	if (strlen(name) > 31)
-+	if (name_len == sizeof(s))
- 		return -EINVAL;
--	strcpy(s, name);
-+	memcpy(s, name, name_len + 1);
- 	for (p = s; *p; p++) {
- 		if (*p == '/')
- 			*p = '!';
+	per_prio = &dd->per_prio[prio];
+	rq = deadline_from_pos(...);
+
+because both the per-priority state selection and the subsequent
+deadline_from_pos() walk access mq-deadline internal state that is
+protected by dd->lock.
+
+Separately, q->elevator_lock is still needed earlier to stabilize
+q->elevator and obtain e->elevator_data safely during an elevator
+switch.
+
+Thanks,
+Xixin
+
