@@ -1,74 +1,97 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFFB3E44EF;
-	Mon, 27 Jul 2026 10:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B973931987D
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 14:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785148642; cv=none; b=ICqRD2MyaAp3dHDSf9OhZVlE9H2ZW0BGRtHyOmmMscSKdJrkVcOY3MxYfvoJyUSLTJiawaoZnK9ajDfsDC90XtZUxWX1v5/KGxcbMVEYTI80U0TfMi9KHfzBSHkvCQAbDriUwAUH0GdPU+PBvq8DH2ipNjMFj2QB6jQHXNx04JA=
+	t=1785161680; cv=none; b=s+x897tTcKoGaYUNtPzanvLos8+8hrM+aP5plEX5gsdLg4o7N7ISHTgR+B92JkHVM//MnDg9npdFETPWW4jJWz93eC+/KR0WryxUZ9gFjI1MnzEHu+otabLaLPK2bpghR/6cDyBNqns7p9FQ+T6Pe/xn5p1dNXwS5HggXloT654=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785148642; c=relaxed/simple;
-	bh=PfKqu2R7oO5a1NehM05V2fnlMnef4AVqzXwMk4A4toE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dkl3rBFtnFaGGJKYCnfbbNQ0G+lADXNpz95UKvzNfg0+IuetwnuKLlJncLv200CT0IkXZ0iB30PYoapyysq9TItqGCwA/7/phcFHaxLD6o05T5A9NhStu2xnkyfid8lRuXdpxd95Na3T7djtaVSt+vAwk7FBX5EeDjivK2ALBd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 1c20e8b689a711f1aa26b74ffac11d73-20260727
-X-CID-CACHE: Type:Local,Time:202607271743+08,HitQuantity:1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:0627ccfa-a07d-4f9a-943f-10d877152789,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:e5c1714c7d1e9842402734d9955606ef,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:0
-	|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
-	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 1c20e8b689a711f1aa26b74ffac11d73-20260727
-X-User: liuxixin@kylinos.cn
-Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <liuxixin@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 681009878; Mon, 27 Jul 2026 18:37:04 +0800
-From: Xixin Liu <liuxixin@kylinos.cn>
-To: bvanassche@acm.org
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
-Subject: Re: [PATCH v1] block/mq-deadline: hold elevator_lock in debugfs next_rq show
-Date: Mon, 27 Jul 2026 18:25:00 +0800
-Message-ID: <reply-mq-deadline-next-rq-af98cabf-followup.20260727.182500.liuxixin@kylinos.cn>
-In-Reply-To: <reply-mq-deadline-next-rq-af98cabf.20260727.174500.liuxixin@kylinos.cn>
-References: <2e689b2c4021.1784615432.git.liuxixin@kylinos.cn> <af98cabf-89a6-41b0-9929-ec3e24783503@acm.org> <reply-mq-deadline-next-rq-af98cabf.20260727.174500.liuxixin@kylinos.cn>
+	s=arc-20240116; t=1785161680; c=relaxed/simple;
+	bh=eKHFSO+ds2gOJiJYXNqitUVpph0pIlyv/tlBdPX2qlI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=cjYjiolTHKkhiSQmaMolVLuzEK3vAQxHHeIvZ3a6R9jNvVZisgS1B/wetGzL0bU21qDd1IblF9Vf1GqhlFShENaKzIxxYHbHad9gfK0ppopkmRzQHxW2ydBoN3wdUsJ2GyWG53EQ01d1GudKa2k8RolWLzUP1tLQhRJwiCSEILw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=CJq2OKHU; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="CJq2OKHU"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260727141436epoutp04deb9c1553590f29d0e6aa9e3f5de8942~GKxYlMgPm2018720187epoutp04K
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 14:14:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260727141436epoutp04deb9c1553590f29d0e6aa9e3f5de8942~GKxYlMgPm2018720187epoutp04K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1785161676;
+	bh=D/JMmRRYNZbh+t3oK1GKPHh/JRzQcE933XPUTJwvp3g=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=CJq2OKHUnj1AMnp2oYPopTtz4rkD6kUoMggBDKZPI1dyyioFPpf3mifNChVFazzUJ
+	 4TXk8PNRezTLeMhp7eRjURqdAWmMjhKDGcGjgN6ldEkWie8akXVw+QzjoB85y0Nk4K
+	 vA0R52UtnXK+XI8gjwD4lVgYvPJ3IfBdfQO2Arx4=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260727141435epcas5p46366ef6b355d50e3cf78b8504cacc0c0~GKxX4AFd-1610916109epcas5p4q;
+	Mon, 27 Jul 2026 14:14:35 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.90]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4h80wB6Ccwz2SSKY; Mon, 27 Jul
+	2026 14:14:34 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260727141434epcas5p4affbf1329c37edaeb20f1ac5ec2f247e~GKxWyvnQr3019630196epcas5p4B;
+	Mon, 27 Jul 2026 14:14:34 +0000 (GMT)
+Received: from [107.122.10.194] (unknown [107.122.10.194]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260727141433epsmtip10af5b3be92436c1bf32bf31d07f1c218~GKxVlR0cQ1873218732epsmtip1X;
+	Mon, 27 Jul 2026 14:14:33 +0000 (GMT)
+Message-ID: <65cd47a4-eef5-43c5-a336-0a5693e5e4f1@samsung.com>
+Date: Mon, 27 Jul 2026 19:44:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: patches/scripts/send-local.py
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 20/22] xfs: add support for lazy direct read bounce
+ buffering
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
+	Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos
+	Maiolino <cem@kernel.org>
+Cc: Tal Zussman <tz2294@columbia.edu>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Language: en-US
+From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
+In-Reply-To: <20260723145000.116419-21-hch@lst.de>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260727141434epcas5p4affbf1329c37edaeb20f1ac5ec2f247e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260723145144epcas5p4c78e8b6d81ed76935bff66479dff874e
+References: <20260723145000.116419-1-hch@lst.de>
+	<CGME20260723145144epcas5p4c78e8b6d81ed76935bff66479dff874e@epcas5p4.samsung.com>
+	<20260723145000.116419-21-hch@lst.de>
 
-Hi Bart,
+On 7/23/2026 8:19 PM, Christoph Hellwig wrote:
+> +static ssize_t
+> +read_bounce_store(
+> +	struct kobject	*kobj,
+> +	const char	*buf,
+> +	size_t		count)
+> +{
+> +	struct xfs_mount	*mp = csum_to_mp(kobj);
+> +
+> +	if (!strcmp(buf, "never"))
+> +		WRITE_ONCE(mp->m_read_bounce, XFS_READ_BOUNCE_NEVER);
+> +	else if (!strcmp(buf, "always"))
+> +		WRITE_ONCE(mp->m_read_bounce, XFS_READ_BOUNCE_ALWAYS);
+> +	else if (!strcmp(buf, "lazy"))
+> +		WRITE_ONCE(mp->m_read_bounce, XFS_READ_BOUNCE_LAZY);
+it returns a -EINVAL always.
 
-To add to my previous reply:
+# echo always > /sys/fs/xfs/nvme0n1/csum/read_bounce
+bash: echo: write error: Invalid argument
 
-This part needs dd->lock, for example:
-
-	per_prio = &dd->per_prio[prio];
-	rq = deadline_from_pos(...);
-
-because both the per-priority state selection and the subsequent
-deadline_from_pos() walk access mq-deadline internal state that is
-protected by dd->lock.
-
-Separately, q->elevator_lock is still needed earlier to stabilize
-q->elevator and obtain e->elevator_data safely during an elevator
-switch.
-
-Thanks,
-Xixin
+Maybe use sysfs_streq here?
 
