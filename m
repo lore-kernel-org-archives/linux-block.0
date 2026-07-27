@@ -1,163 +1,163 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEF9409635
-	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 14:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785164298; cv=none; b=JjBzJvAALYWenz64wQWAKAeSwLjAoIMUmqd/RBbKKu8BXV+oHKwLHnK8SfMavA4H9vEw2w44xD3BC/rsr0cvxKeGAovV6qrbuPJ8Rw50qFo2zniELjNYJOlTHaI0p1aeEdHL/dromh02m40ZJP4HFWsuUX9kTd2yuyoRISTFl64=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785164298; c=relaxed/simple;
-	bh=/pHEhqhHim6zbvXlXGSytIteuWLfY5Kr9gwBWC8fFio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XjuW+99uEnggCvVVNP7MWOWWwnScKqboQ3ATpqsmVftljFpHEZt8WysaMgS+RT0INucsT+ZEfGvgcRiMhE9X05xbJ2fvZmYZ8/psG/GuikpmCQ/aY4Ru4O+DK6AYxUUnYyUnGf8JG8kP29Vixi7imoeM8PCQdfRYEPrnQ7oRVoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WtIrJspU; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1332239937C
+	for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 15:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785166206; cv=pass; b=oAPPMV7ym0gtv0wSY2siSGn+aM/U5aLfBndq9oR/a1GZltPZX3/c+s2SsZFCyKtgIZTNIipGVjZirwU+GjF+0Uo7m2MXWTGG3OUkzNpoWHLoebJOVPnh9c2cFGCHlJ8Eq4N5OhFFdASgvv4Skg3A8BO9/HhYtgxv5nxfi5dMr4I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785166206; c=relaxed/simple;
+	bh=KMguZ7AVQEmAtXUkdgP4AMIA4pmOukTAaFsuTXrTTgQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VdhVE38rdXZbhnBg2u6Co+lWPVTUqE+GIpt9s6yJXipOMTzoCWS+sgoGBmVmXAKBOnLwGCfqTvTAf9RMbadyR+2Ktn4+WKg8Ph9yDHzISkUyQcxeF8lvAwoqlZ7HngDGyMDohC/e5+djBRlG1nJ0xai8uZLildjhSv3QGwrXkTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EOE57eoe; arc=pass smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WtIrJspU"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-49553515a8bso33186705e9.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 07:58:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EOE57eoe"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-4485b31257fso210495fac.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 08:30:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785166203; cv=none;
+        d=google.com; s=arc-20260327;
+        b=s4sX8nTSCLbc83TXhDCjLJBoaQB4OwbikjTzFzUn5UUhsqin219UxC8HrLfX30reSO
+         qHne8MKjoux1fCZt4SXrMcpwN/z6ST6ng8N+ZmX2bwne8kB+R2V/vqKNISkeKHofkmlw
+         dqY1hLRk/4QphjYoW0hGcLaAo6oHbsA6hxPd+Qe3Q2Azx3tdGsEYr30mui1vcS3M9GW1
+         keAzNBGtFyWYrXECfybDxEUpnnLD86brND3fl/2A5PgnlEak4nEY9jDH0J668m8CTB49
+         sfNOIPnfmcpO7CgN4fBAuvt4wLiUT2Bv3Ma6A/VpxuDrLUM/8QwJh2wT0KL4AS98M560
+         HX5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
+        fh=2o3XoCVn/lpdq6/XdrqwlXT8mKkXZO0hq6ri18tt504=;
+        b=oFBbZZsIc9vNmb3rEAMoSzdmMwLd8sbxougj8p1LmRCCDlFSKA4gscv8VyQ6RlNFrz
+         KoOI/R5643vEHcCGnlStYV7s8rULAyFllS0sjUsfxJHtDkqH6CRH9TKAp2z4BeCG9Wbj
+         W5yK/MFxNHYRP2bFk4h6vGYXN07yPvMwCjea11VP1jbtgfyjOPENLVPIESYTUPp1r6Mn
+         u9vmpe/zqcSsZVLRSGdAffDEHvfgGJ80aG580wnlbUchWBGIjp/XaCI9OFaJKPN+HIIl
+         1dF68KsoUTO39CaaaMnJ+cieCiSELjDdGGcf3jswuOG5URjcbC1eo74OBwwBKuY06xcJ
+         D4IQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1785164294; x=1785769094; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cdTAOusKdU7cIGVdiXhGRlX7Lluomu67uAna+oJrbLI=;
-        b=WtIrJspUFDv9uYL8E4OhCURfnCutsSkbOm+juL/6yCshO8FMCiFZrYMSEpcfsdW4Nh
-         iKdHsW3hXXVC8Pl4kUTysqT9Zr8oF1RzlXcRzFSGc2UBRbewwmpIc4cUdB8jmp3pl1An
-         f6O93wZ1uT86BMhjp0hkFyCYKEgWqWi968vQRJXARDoAz7+tu8TEFguRFWLq/na2hZxb
-         h+/lKgJgJ7KvEmuOlPlx1TgAEAOP3gxpUS2jY/c4WBF4cEndQhBSKAsMyUFZVAH/YqQT
-         oXvZ+5VFrjrP5i1FIj+Vs0SajlFsW+dWgVvOzDcsFpUW8FB2tzSLDDUFkca3REdCvM53
-         ZAVA==
+        d=purestorage.com; s=google2022; t=1785166203; x=1785771003; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
+        b=EOE57eoeNmD5lt7GvS7wdQruqz1JvXYVkkkKLqR0hJPi0TUCUjWI/NgXgn/TqSt+oY
+         ABMajo/tBYw1NC5Z6V5rLR8bb8ye3RMgLYPp+g/+oP+IU07DBoyUBHh29zShovHuAMxo
+         sDwymuKe70m3M+vpIYMKDqKHpgERpNsc6l7l3ug+GyZR8obXfFHQ4lo0J5oKnC7oMy+2
+         JhS7KZOJZVw1CPdGAKQMxdP5WQ790yVoqfWSUaFmdg7fxCen60Y6CVGZj8Ki8GQRwGtG
+         BRJ0eBjm1oj9V5DEniNS5TblGdScpub1YMaNg3T0AXIfS5XU8cASKc8T5m2WvnzPhEeQ
+         ECpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785164294; x=1785769094;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cdTAOusKdU7cIGVdiXhGRlX7Lluomu67uAna+oJrbLI=;
-        b=RREfEx24vORgnJ7sAoGxKvypPfdT7dos9D7PCIqYqzdOrSBhmDIxDc1l+B5aAxFgWe
-         lHTvhqhT+eisidPdhZAasac79FQpOEBmlvN/Dsiv5PKWAkstALqQcRs1lFbsLfEdzhKY
-         CVwp4sMIQcLpgHPw0RykknSX7Wgmo+6HSC9XZH2Y1AuPYNgtNFFPsiUSQq//+2M8knDg
-         uZJLrimymDvQ1dzsi5ABwMm1ctsaao1Yc4Geox8XvI3U3xuBbKRiZAaYrvDgMTwvDK7H
-         hueCUTXFaxi5HBOlysY4WkpZvibwFA/Iy5eX2p6Mey8XtLj7yavvjGbvmkiB9TMdwCVV
-         q48A==
-X-Forwarded-Encrypted: i=1; AHgh+Rr4wuB4tc1VtDd3Wsfy78uSlTNLzWs+T+ijHihXAkXfCnAUoAWpJ+YGfq5LAdxC+We5x6wmhHQPWfnnMw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTQdDUuhch9BahxM5XTT4DXPI5WopF0TbDkXPjxjO9bwUn8PpW
-	ODNbp5cmSr0uccQp/F1S+ZwsrxLoe8f7SdQpmtOJiPnRVorqxl60bzBOxh7vRinjQXU=
-X-Gm-Gg: AR+sD13JhcxcGGT7vIEXzyzaz5PvrxjXVWyJEXYENKjtl6Xbe33eusaCTmvJXPt3BoJ
-	6tqRzWKj8UfTx5WF6OJ4gzM2WVd1oSRgi4cspU8cBL/dZNx7cAIU/tqJzz3o/yLNoifvCrCDnao
-	C8dJuIuhK8Pm4R+/O4iDNqI0wmyYQX8LxGPKir4xAGtUpBmfLEQLr6NYhfrZha3h6HobpPCyUzO
-	s/s8e19fEjOL/VWzhFd4zDo2vtHxnbRfJ2HIIBPsU/j8+W/YXpdVwhnaiS3voFJWLMkyadCnMbj
-	ZIlcodNsTbXIxlV7wBry+BiIxLWF7mXwbRXuwMDeYFKXye3Fkg2pm754OAPeyDJeKn9AFwCZ75f
-	cs5DpWhEUv757Po2u4yccCGNlyVaXpalbdubODHn/t1GMnEgCr61Bqt59qwjNI8lw8DcPPUR7hs
-	purl18UOuhUbOf/BOgpmgwTOWwubbGecd/39+o3eU=
-X-Received: by 2002:a05:600c:1553:b0:493:e97c:216e with SMTP id 5b1f17b1804b1-496b5731987mr114339235e9.39.1785164294020;
-        Mon, 27 Jul 2026 07:58:14 -0700 (PDT)
-Received: from ?IPV6:2a07:de40:8100:0:fc6c:f9a2:4a0a:6354? ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b4ee0e91sm231594995e9.4.2026.07.27.07.58.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2026 07:58:13 -0700 (PDT)
-Message-ID: <ead73f81-26ef-4a46-9ad8-fcd2915563e1@suse.com>
-Date: Mon, 27 Jul 2026 16:58:11 +0200
+        d=1e100.net; s=20251104; t=1785166203; x=1785771003;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2aNw+I7ysKX1IKI/G2FfmFMuAGEfwm/hbtrWFVd8MHA=;
+        b=rei6AWk4beUvY7SRmnOwRbFb9dfeIib8B1EnEXrh2bbYsCXk4JbDoXmV36aw6GHpq/
+         I+hYtiRuMJSBO++Zugk+AuaO8Zs1Pn5erxjr8w1MfuVtm3tesWey3CHtnMJo4VpmpCzZ
+         bTktqNf3Ocbo3xpgaZt0rHQ4fWj22lsoBmroBykqS/Wig9/OjQSD6JV9dMCGV1z6yCYe
+         9xZHJOvbdwpOog8yZQjf/stsDTSqWH8bCnf+KD1dbBurPOmqRCjMDJ97s8xpHyvDrkYH
+         vUKJnhYhktX3i+e4FnbY/sfjpDn++tF7GxX0b7hqsWJ+kfVpSSh35f9x9nCUbwh8PgGx
+         zztg==
+X-Forwarded-Encrypted: i=1; AHgh+RqaiJMB9yDspef3Shw1LW5trDd6rBdeagm7gnNARXYCRMb3mPf5JLoRV4vxnUR7+6HPQhgc2MRNol+vHw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxsHH8fsZtXRIgo7URDs+L7pPRUxj0pGwmrNQTordWibhU3inq
+	nzzpTUa/O97eCZBr4kzS8c68gM7AVW1tHE7/xH0xe39WrDgDW3aQxlSaZGaJ2rI2hWnmPcyEL7N
+	MBRU8JzVYWoQmPtdI2bTocRrKpNaZuBtb2ltUKqf16g==
+X-Gm-Gg: AR+sD123IMeDBYQipW1xuFqG4Z5187vIBYw/8pJ/cxUh0lgUEnvbeY6mnce7IuE2Qvi
+	HbIvQPl3Cm2akJmCmlAThM0XYat/BYmexm0b61EdudeOc3isGhYpYTMCpeiHGqoOEmv5MU50agx
+	69dwMfdGmJWjGBEc4j3nds9tNrwLSLQWF83KYt0pC7QQuV6Jza4bvlOnQNYRW4RjcOWOIushdhd
+	ClYnEamxwXKddWFgXSmaZEEbouzXmGA9663PmoY0A3l5S2kU8Wconcz0JsGiA==
+X-Received: by 2002:a05:6870:7091:b0:452:112:77bf with SMTP id
+ 586e51a60fabf-45858d0f099mr420820fac.6.1785166202726; Mon, 27 Jul 2026
+ 08:30:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] time/jiffies: Include linux/sysctl.h for
- proc_int_u2k_conv_uop(), ...
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>,
- Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Jens Axboe <axboe@kernel.dk>, Johan Hovold <johan@kernel.org>,
- Alex Elder <elder@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Michal Januszewski <spock@gentoo.org>, Helge Deller <deller@gmx.de>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
- Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
- Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
- Joseph Qi <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
- Aaron Tomlin <atomlin@atomlin.com>, Pavel Machek <pavel@kernel.org>,
- Len Brown <lenb@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Danilo Krummrich <dakr@kernel.org>, Nikolay Aleksandrov
- <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Kentaro Takeda <takedakn@nttdata.co.jp>,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org,
- drbd-dev@lists.linux.dev, linux-block@vger.kernel.org,
- greybus-dev@lists.linaro.org, linuxppc-dev@lists.ozlabs.org,
- linux-acpi@vger.kernel.org, linux-fbdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
- linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
- cgroups@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-pm@vger.kernel.org, driver-core@lists.linux.dev,
- bridge@lists.linux.dev, netdev@vger.kernel.org, keyrings@vger.kernel.org,
- linux-security-module@vger.kernel.org
-References: <20260721131207.803760-1-petr.pavlu@suse.com>
- <20260721131207.803760-3-petr.pavlu@suse.com> <874ihmke0k.ffs@fw13>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <874ihmke0k.ffs@fw13>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260726145025.1507383-1-tom.leiming@gmail.com>
+In-Reply-To: <20260726145025.1507383-1-tom.leiming@gmail.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 27 Jul 2026 08:29:50 -0700
+X-Gm-Features: AUfX_mwXrHK1kp2MH8JecsMREFrjHgs2ZEb-wIDc9x-ApCKJiMQoIb5IjLNQxtA
+Message-ID: <CADUfDZr9Rpz6BNrVLtEysJWCgPxb6C-3tj6O6VL0e1ZQWG_wyA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: reset kernel-owned dev_info fields in ublk_ctrl_add_dev()
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/25/26 10:31 PM, Thomas Gleixner wrote:
-> On Tue, Jul 21 2026 at 15:11, Petr Pavlu wrote:
-> 
->> The kernel/time/jiffies.c file uses proc_int_u2k_conv_uop(),
-> 
-> jiffies.c uses ...
-> 
->> proc_int_k2u_conv_kop(), proc_int_conv(), proc_dointvec_conv() and
->> proc_doulongvec_minmax_conv(), which are declared in linux/sysctl.h. It
->> currently relies on this header being included indirectly through
->> linux/module.h -> linux/kmod.h. Add the missing include in preparation for
->> removing the linux/sysctl.h include from linux/kmod.h.
-> 
-> Can you please split that spaghetti sentence into paragraphs?
-> 
-> https://docs.kernel.org/process/maintainer-tip.html#changelog
+On Sun, Jul 26, 2026 at 7:50=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wr=
+ote:
+>
+> ublk_ctrl_add_dev() memcpy()s the userspace ublksrv_ctrl_dev_info into
+> ub->dev_info and then fixes up the fields the driver owns, but misses
+> ->state and ->ublksrv_pid.
+>
+> A device added with ->state =3D UBLK_S_DEV_LIVE passes the
+> "->state !=3D UBLK_S_DEV_DEAD" test that ublk_stop_dev_unlocked() uses as=
+ its
+> proxy for "a disk is attached", while ->ub_disk is still NULL, so DEL_DEV
+> right after ADD_DEV oopses in del_gendisk().  UBLK_S_DEV_QUIESCED plus
+> UBLK_F_USER_RECOVERY dies one step earlier, in ublk_force_abort_dev().  A
+> poisoned ->state also gets START_USER_RECOVERY and the char device
+> read/write path onto a device that was never started, and wedges START_DE=
+V
+> at -EEXIST.  A poisoned ->ublksrv_pid just makes GET_DEV_INFO report an
+> unrelated task as the ublk server.
+>
+> Reset both after the memcpy(), as ublk_detach_disk() does.  Userspace onl=
+y
+> ever reads these back, so correcting them silently breaks nothing.
+>
+> ADD_DEV has copied ->state in unsanitized since ublk was merged, but back
+> then it was harmless: the gendisk was allocated during ADD_DEV, and both
+> teardown and the START_DEV -EEXIST check keyed off disk_live() rather tha=
+n
+> ->state.  The oops became reachable once the disk allocation moved to
+> START_DEV and those checks switched to ->state.
+>
+> Fixes: 6d9e6dfdf3b2 ("ublk: defer disk allocation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 
-I will update it to:
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-    jiffies.c uses proc_int_u2k_conv_uop(), proc_int_k2u_conv_kop(),
-    proc_int_conv(), proc_dointvec_conv() and proc_doulongvec_minmax_conv(),
-    which are declared in linux/sysctl.h. It currently gets that header
-    indirectly through linux/module.h -> linux/kmod.h, but the latter no longer
-    needs to include linux/sysctl.h.
-
-    Include linux/sysctl.h directly in jiffies.c ahead of removing the
-    unnecessary include from linux/kmod.h.
-
-> 
->> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
-> 
-> Other than that.
-> 
-> Acked-by: Thomas Gleixner <tglx@kernel.org>
-
--- 
-Thanks,
-Petr
+> ---
+>  drivers/block/ublk_drv.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 4ca6ec738c93..2a22f9dc1f2f 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -4764,6 +4764,15 @@ static int ublk_ctrl_add_dev(const struct ublksrv_=
+ctrl_cmd *header)
+>         /* update device id */
+>         ub->dev_info.dev_id =3D ub->ub_number;
+>
+> +       /*
+> +        * ->state and ->ublksrv_pid are owned by the driver and only rea=
+d back
+> +        * by userspace, but they come from the copied-in dev_info, so re=
+set
+> +        * them. Otherwise a device added with ->state !=3D DEAD looks li=
+ve while
+> +        * ->ub_disk is still NULL.
+> +        */
+> +       ub->dev_info.state =3D UBLK_S_DEV_DEAD;
+> +       ub->dev_info.ublksrv_pid =3D -1;
+> +
+>         /*
+>          * 64bit flags will be copied back to userspace as feature
+>          * negotiation result, so have to clear flags which driver
+> --
+> 2.55.0
+>
