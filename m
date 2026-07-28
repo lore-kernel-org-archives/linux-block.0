@@ -1,128 +1,143 @@
-Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FD9438472
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 12:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.205
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785243506; cv=none; b=OLnY06zqTmdDphXCLKxqhJ242TR7NAhSWgo3xIg1NX/ZSI5OOz7bgmu6Tl4E/cAEdYKbNr+EmKCN+2tQT4Sal5zCRcbgOHF0QlE6omRJ+xNxFQoKm2/RV8hVtJFTvc5ZMXewAnygUNY0SySaadzOvrrrFPUFymi5mbWxGowih6I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785243506; c=relaxed/simple;
-	bh=ixas0KYKGbKQeKRHRc5bey5LfsdW4XoTh6cWp70bu+Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BO1xpPeozg+pNujozpcflbcRg3xIDWlHVO/1lOSmCIK3dJxta+clEvzFlsVinrp4XSJoNppBlfQXIpHKmeF1fX43SLKRGlLz4p6MO5cZg+Hc0zgMPmuniZJ/zAxgggv62diwWn864rsvFqpYvFbGHaGLuBfXtgoF+TjUgOd2GdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-49ab6a82cd5so5032963b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 05:58:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12DF4252A7
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 18:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785262936; cv=pass; b=VLQ+t8ae9GXNnbshWAJHvjXWxbXt1nI6BcgoF2R1AzfuWjGak0jBDuDBA3DtNlRkac5PNFz4KlcMB1wFcP6Xr0+sl7fKbjYTNWmpg7UJ+xCL9j5VYMuGbEr+CjoHnwa5uTKjXWH1Gv4tP+wogK/qDOAwhuGMmOpLzdhlASln9JM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785262936; c=relaxed/simple;
+	bh=7cydfJ0sibwTzwV/UbG0vSIq4k7dqiMulmc+vsRY6u0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rjkwS3jC03b3inzlqJ2cpr0xRX2FHg9wTFcORs7ULH85//7Ut3ts9DinlpghkUr7dY9I38BVjK4beWQpCPWUFxMOp1WYq/nwPkjU28BGNfpdZtfr66fk2vMxI0mJ20q8ukU/vtYLpRw64nkbtBTK0i4KwULSuDcsakWgAUe7puI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=S4SAMe1d; arc=pass smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="S4SAMe1d"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-4961446bee6so13376b6e.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 11:22:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785262932; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eX2C9SoYJxuoSIGG5X1PsdTQQIpFxobB7pbWm7E21UOhBVVa4L5jt+UThbgovzfIL9
+         NqZ2n2dpvIi9gBlyipQBzJnbiY7tIwYke/4D8cs+ERhdgvArCP8+yM1KEcEUvq8rW5T9
+         qm+QvGez5dF+8jxM3aGyfrcDBg2VEja+ezZj6GktwXTkFod56bwgtE4jw9oI+s9Fd0SH
+         AXtzWuNrClbwbFxbJQQzBKZa1WKBhJQ6QOOrzrcTKKdI1AQopyOaqGFAeahsCWkIHehZ
+         WC0zKhF1UF15J73/SqreUZ+3xu3MbfoD/MCvQsSX8Lc0dqETZXhLpOIECCKKyUV26Z0g
+         UIXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YOI5qsUQsIoINSZDzx6Z+4b7W8/5EoxUJ9RJGL7PhBA=;
+        fh=FPUz+SS7VFsY/zNx0t2kiNNGS5XuFRex9cKOyq6jeR0=;
+        b=hoRHWGcENNYXS8Rk6103pNRiu0u3kRQ6PuTKWVg97+3A1lYdcJq1Rr/9F9qs7wwI8V
+         dYxMmMHD0JrwsqB5y8IF5iqF7CBOoKsB1XD3k5Y90yTIN7FuEMm/uEErNjLnP8sR68NX
+         /nSBETL5qlT1/bOVaYjf+if/zrtmmf5kz/yryOxDYeM4GFn7JdlPktbImvlL2eE4yr78
+         l/EJp7NRQMO/HUc/btEqGyuyjQx9+hQoRGeK6tWREij2zKqr1e/PxpLxVRR9WhbNJxSc
+         S/wJCZZIvPRMVUDMiHhrAwGzH/Zrla53TNy0Bdqe1RBXpCpMvxzVOxZFfVm05RR0+R/9
+         ZtWA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1785262932; x=1785867732; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=YOI5qsUQsIoINSZDzx6Z+4b7W8/5EoxUJ9RJGL7PhBA=;
+        b=S4SAMe1dTOdf592gQ8JfZmOMtyaGy8lfR/1IIB7dt1pNBRaRfK0Wsf7pN+XYkSgPCt
+         xwhB8/HeGn9K80KHnFo7z29I8lG33dUUNEZCwqg3ZLj3R7b1CwxvQMaoSJyhbWrgK8gt
+         apnFK05CIe+a1Ybhcv1BAy4J+8z2IaWTSK2KNm/mDNQKLfPd0yjiyNXP1Hy4CtoZ2bDI
+         L7yQdJc5FMxIMZ0ilMcc3AQ0KCjlypPXr+YaAV4bqOgLUuWVHmI/76UNm5T6v1dmkHFC
+         VFMY/tENF8DWiXthB0kIK5k2+NOjXq7QhZgSP/FwgiiBoW8y41zCXoIy1BuqgwOkmFpq
+         9j7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785243503; x=1785848303;
-        h=content-type:to:from:subject:message-id:date:mime-version
+        d=1e100.net; s=20251104; t=1785262932; x=1785867732;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=QZLnj6zZUprtiqaAMGSQ88ksQ8rIQm7u/CEFtblZzPQ=;
-        b=i9ZK6qtNxPMXqhbmrZtEsUZMxojm0dKJSzQ2gi2WPsE9UU0Cwhd+aIFx03gJVTuszn
-         5lQR8bBvyx//JfzM77liTAmaK0TfG3eN8NqKgQUTjpG+CH8ktIRQlunz+q9oJ2WGXiTv
-         DkpA6Zxfm6zdhFokljwtSR9YFPMt8ScVG+clTLrDIKRGF9DJeaUJVdexTEh/ygT0UW6/
-         wBrQo4eD9OFno2bQRKPTh1s9Yza1u0qPmlfPHOOhm0bp8RAObQQHpa3WQqSlRrdXLvXh
-         Qc9UOBbEUhWvKmbc72I7PcBwJMMtPaXvRI/zN/XRUCKOL/tpUqnA6Zlf8Bahbzhk19rs
-         iz6w==
-X-Forwarded-Encrypted: i=1; AHgh+Ro00B80QYsQt+hMompiHXX7/ZBbqGJqiPu3/h7DUNUPhKyT5hP+2UBZ2Iw3gGh1UVA37r+BpiH1bMc06Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuUEYjxo2KMJ5mRQK6LilawmIIXDSR/mqdsbdRk1FJXHVp9axW
-	05hLW4as2l6gnKKPa4TrE6+P7ikBgxcopHvogG3gdn2vcCddmQIwoIYhNqnq9gWHmQgjo7Z/bYb
-	0kXt93+d7++C/O6yoLM+6zK7CpWewGuIdCjU3cPfAgDafzb6wuSnpkYldnJA=
+        bh=YOI5qsUQsIoINSZDzx6Z+4b7W8/5EoxUJ9RJGL7PhBA=;
+        b=qANkXeyDvIsg+6WjWfBFEkbZjvgWJh/w3IyUjO2MQFedmg8YlGe7UK7nmgoCoBWzVA
+         rEIj6mtx30MEMcJiamvyveGQjRtzUP8H+iw6SR+3TQDjJPkdC/gafJ0CqHcgTAda4fUR
+         zYaLr8HkzEO7zBxjmp8R/JgIYR2mNu6szhMMgcpA1fKJJQPVgHPRlTIjEsmybdud1vO6
+         qa/w+Act6tpl2KiaKgVkZDj7gCxgRbgyLB7Zw/GIfx43AX6ryktMBYTKNxOXR+zS+U8/
+         zClRqJhoNkztz5FhtFC0Q1exXr3H6s6N54pqTKTIttUn05zLX23b2QeyB5tQwrXJWcsN
+         AR5g==
+X-Forwarded-Encrypted: i=1; AHgh+RqRB18/gRVLH3uroIt0VH9GP/F11W/d11+vtsMARkCyPW0HGjal4WzEMi/iei2eP7vo742Q8fhAQllNmA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3OUL4T39FlxLeK638e5TZFo/6g3bYfyIrWprf8PMWX+5EtbSk
+	A/bOh2EPKDUDIrHw0aKq7kBmUohOBGt+eEvHiWVSGP0Cjjgb7dJjF67YveRHQeZ6MzRj3k17r5Q
+	gEks9dec5/mvX19Rf92lBZ9kHYOVSwJBho1Zm3HHp8g==
+X-Gm-Gg: AR+sD12m7PX+FGAC4rp15itq/f9+8jT1TpVvgX2slGdXYJqw+ffNCSCIu+nCNWP37r7
+	01JUOL7I9i4lgBQIysHjooUSt6nLZly454F4JJsemYBsICe6gtbCCjD1GR+K6/XSeiwYXANjpQs
+	sXQ94TNHP0CEY+BSjYqIoocqXunyEPieUUu4W/9QVVJWrUND968XqOa2ZCufI6xAaf+NIotUpD0
+	8OXqIflGFhlUPJTVD/wpbK3eEUn4oEkyLLKqDb5X2Yj+q5J2VGBLcCO6fO7o4U=
+X-Received: by 2002:a05:6870:898c:b0:455:9a0a:f403 with SMTP id
+ 586e51a60fabf-4586ce14424mr1403846fac.8.1785262931576; Tue, 28 Jul 2026
+ 11:22:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:23d4:b0:497:da7f:179e with SMTP id
- 5614622812f47-4ad5bbd9caamr1454130b6e.38.1785243503340; Tue, 28 Jul 2026
- 05:58:23 -0700 (PDT)
-Date: Tue, 28 Jul 2026 05:58:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a68a76f.4c659fcc.19cd90.001c.GAE@google.com>
-Subject: [syzbot] [block?] WARNING in blk_mq_alloc_tag_set
-From: syzbot <syzbot+18431bc7dccedc61778f@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20260727162450.2921500-1-csander@purestorage.com> <CACVXFVOaA_k+TCmeyrjguW5StdDb=zQsTCXWMBQ7QiNX1wuDzA@mail.gmail.com>
+In-Reply-To: <CACVXFVOaA_k+TCmeyrjguW5StdDb=zQsTCXWMBQ7QiNX1wuDzA@mail.gmail.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 28 Jul 2026 11:22:00 -0700
+X-Gm-Features: AUfX_myfrJKXBQP2SdXXmURfpWjqieiGynzvY1oktdCihrIe-TMkgRr_WSKhRGk
+Message-ID: <CADUfDZr5-scDrSe6X3AVz3pX9iD8Cvri6AWj6zQWNqqqnL6jrQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: remove WARN_ON_ONCE() in ublk_unmap_io()
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Jul 27, 2026 at 7:47=E2=80=AFPM Ming Lei <tom.leiming@gmail.com> wr=
+ote:
+>
+> On Mon, Jul 27, 2026 at 11:24=E2=80=AFAM Caleb Sander Mateos
+> <csander@purestorage.com> wrote:
+> >
+> > io->res is set from struct ublksrv_io_cmd's result field, which is
+> > controlled by the ublk server process, without any validation. It's thu=
+s
+> > possible for userspace to trigger the io->res > rq_bytes warning.
+> > ublk_copy_user_pages() already limits the copy length to the request
+> > data length, so drop the warning.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 4ca6ec738c93..4f30644756df 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -1492,12 +1492,10 @@ static unsigned int ublk_unmap_io(bool need_map=
+,
+> >
+> >         if (ublk_need_unmap_req(req)) {
+> >                 struct iov_iter iter;
+> >                 const int dir =3D ITER_SOURCE;
+> >
+> > -               WARN_ON_ONCE(io->res > rq_bytes);
+> > -
+> >                 import_ubuf(dir, u64_to_user_ptr(io->buf.addr), io->res=
+, &iter);
+> >                 return ublk_copy_user_pages(req, 0, &iter, dir);
+> >         }
+> >         return rq_bytes;
+>
+> The change may be fine, however access_ok() still can fail from import_ub=
+uf(),
+> so can we consolidate ublk_unmap_io() a bit?
 
-syzbot found the following issue on:
+Sorry, not quite sure what you mean by "consolidate". Are you saying
+there should be a check of the import_ubuf() return value in
+ublk_map_io() and ublk_unmap_io()?
 
-HEAD commit:    d326f83e819c Merge tag 'net-7.2-rc5' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=129f3bde580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5c4196ba0e33631d
-dashboard link: https://syzkaller.appspot.com/bug?extid=18431bc7dccedc61778f
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9359ac22935d/disk-d326f83e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c8a632e638dc/vmlinux-d326f83e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/db78e854ce3e/bzImage-d326f83e.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+18431bc7dccedc61778f@syzkaller.appspotmail.com
-
-blk-mq: failed to allocate request map
-------------[ cut here ]------------
-rcu_segcblist_n_cbs(&sdp->srcu_cblist)
-WARNING: kernel/rcu/srcutree.c:730 at cleanup_srcu_struct+0x369/0x470 kernel/rcu/srcutree.c:730, CPU#1: iou-wrk-11407/11411
-Modules linked in:
-CPU: 1 UID: 0 PID: 11411 Comm: iou-wrk-11407 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/10/2026
-RIP: 0010:cleanup_srcu_struct+0x369/0x470 kernel/rcu/srcutree.c:730
-Code: 7c 35 00 00 74 08 4c 89 ff e8 b3 44 89 00 49 c7 07 00 00 00 00 48 83 c4 28 5b 41 5c 41 5d 41 5e 41 5f 5d e9 34 80 65 ff cc 90 <0f> 0b 90 eb e6 90 0f 0b 90 eb e0 90 0f 0b 90 eb da 90 0f 0b 90 eb
-RSP: 0018:ffffc9001e1f7740 EFLAGS: 00010202
-RAX: 1ffffd1ffff92d11 RBX: 1ffffffff1c9f5de RCX: b62894e921e22600
-RDX: 0000000000000001 RSI: ffffffff8e4b12ee RDI: ffff888034b93e00
-RBP: ffffe8ffffc96888 R08: ffffe8ffffc96927 R09: 1ffffd1ffff92d24
-R10: dffffc0000000000 R11: fffff91ffff92d25 R12: ffff8880330a4160
-R13: 0000000000000000 R14: dffffc0000000000 R15: 0000607edad447c0
-FS:  00007f420a7846c0(0000) GS:ffff888125052000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000029000 CR3: 000000007d20d000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- blk_mq_alloc_tag_set+0xc77/0x1000 block/blk-mq.c:4928
- ublk_ctrl_add_dev+0x903/0xbc0 drivers/block/ublk_drv.c:4797
- ublk_ctrl_uring_cmd+0x696/0x7e0 drivers/block/ublk_drv.c:5783
- io_uring_cmd+0x2e6/0x8b0 io_uring/uring_cmd.c:271
- __io_issue_sqe+0x188/0x4d0 io_uring/io_uring.c:1395
- io_issue_sqe+0x16d/0x1020 io_uring/io_uring.c:1418
- io_wq_submit_work+0x7ab/0xc90 io_uring/io_uring.c:1534
- io_worker_handle_work+0x72e/0x10d0 io_uring/io-wq.c:652
- io_wq_worker+0x452/0xf10 io_uring/io-wq.c:706
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks,
+Caleb
