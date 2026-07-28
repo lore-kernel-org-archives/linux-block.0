@@ -1,138 +1,122 @@
-Received: from mail-ej2-f0.google.com (mail-ej2-f0.google.com [74.125.228.128])
+Received: from mail-pj2-f10.google.com (mail-pj2-f10.google.com [74.125.227.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ED040DB3F
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.128
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785229761; cv=pass; b=Zguv4O6IrTJj45a4pWqXy1ofIKMe0ZWmFPN3GnJhAfmQhT/2Z8d3IRZfeLlMryfl7zjJFujV9bjmwoK9Wvna9JGZ5O95V10MdBT+F6VpZQyFs8l7XPg8IAKzB2R0JIVQp9Rt+3g8glzMxmtXCLFAgL62WcQFRg8H7iTGcm003oY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785229761; c=relaxed/simple;
-	bh=7u0w9JMgfd9pCEcqnNs9Zp3pgDXhxuyxNH/nd1QEvdw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rEq+n8619DgY/++XpaWvK/JRC2Uqfp9ZTO4VioSgM1vLX0HFvQfdcp7iHlwWkzXDabaonzHH5EMa96/uZ5K3cP42wGOrsPK0qqCG2BO2RFhaICrL3NhgKz8lqqbizN7KeRw+qXpZM7xbefVDgLLoCsQQgKC5XrR72EtIRUBvqVc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z5bCVjC6; arc=pass smtp.client-ip=74.125.228.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57EA41D4FD
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.138
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785231003; cv=none; b=KSlNsajzclasoByokY4/68swU5mC3m/xsAvKCv63K/n43GXan7daXDhWxHLvqek5lwPiyAQDlObZJFaSiU0PoHXXHSsXTi3gwjNSbzaB2rwKKeN3AEOzfyuoTRFYMGpQDTh1+Ta/oM3B1A5NBgeEEM6WW5Hru50Jy4ykRTh7P3M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785231003; c=relaxed/simple;
+	bh=sUk8xvbVWwJWHjObCRgvbH27eEGL67yojoKdQ3lqHqc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QAYRtjQCIMz+f9acTylpylJ1ex0zzJAI0gmxrh5orG15wR3mTFXD+lnRS9ejZRn4YcqtQWJBxPkxNx0ejIKBrvA2gya7T4Ls98z3rHWhi/C9kW9pa9qmxdGu/dx3TYa0g1JptNrJpZymCUp7nFGWfNiCrbj0Hz6OyHxaGAiGm5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQUvibdS; arc=none smtp.client-ip=74.125.227.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5bCVjC6"
-Received: by mail-ej2-f0.google.com with SMTP id a640c23a62f3a-c166aef4f02so225381966b.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:09:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785229758; cv=none;
-        d=google.com; s=arc-20260327;
-        b=rDwLXSkkB82qCdA2W9hPkaLHd2KMEJd5KjzYnRnoK3nTNju1M+dEQ1gRzUQ4j/W/5w
-         wcKMxQWGtZ7sTiJhOO2Wv2IH8jbNZeqy2UfI1O5IjNHrN8rdsJtplcRsmF39S3zbbNbS
-         7/NgChhDhoj9RnQVRClnWJCn296rIDCnh6x8ei2a3/wSXUN4qJgVdGtSNd+fOdn88m0L
-         XBi4BZnVvqHMAra/lUMoGH25WdHRMbpfXRvXx8inp+Rkw04IbjICgD89PfeG28RlPRal
-         jYc0WV/y8odLuRkuWiY97B2E1oWxdKt513B2tswV0XS6J0oZ6sqdnwFvYsyTuFgVHz42
-         ySIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
-        fh=rQ9yW9hQmWyMNpWKPtMN5sYEDBNv6StfpXfjrLZC5NA=;
-        b=rIQq85pyAQXiyqM9uZN51mkQUy5XwSSxttWNfxzVvVK6aREKu1+RpyvdWJlZcaFDiD
-         WvrBhlNGFn/Hd6Vc64WbM6izsgPktWDfSiGBLDkAxGGSmZFGjuP5pPxiB1YsfgdIYFPR
-         ygNpovbJA6iDcNwb0I1CG3IOa2aGtZy7Ducoag8OoqTUXGDR9XqiUQVJaSg0PYVAua9B
-         UJH4QRY1Ll/XhtSUTbZvZzHdcKwPyNhwHTV5cJYjcQUW6VbZNwXExNDOtf9qCg5WRZ3/
-         KX8yr0ofO3sZcComRsYH7n5ASofUwfnPJgKHbNYpd2r1mXH0mXaQuCe7fkpYC4/31lyQ
-         ryqQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQUvibdS"
+Received: by mail-pj2-f10.google.com with SMTP id d9443c01a7336-2cf41b07aceso22712225ad.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785229758; x=1785834558; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
-        b=Z5bCVjC6HQAJBQ9dt7WkKe7gLa+nAr5SNUrHoomD8ScMiVdE/2bCOaktT8how7YQyk
-         TZLwQbWqj3KWgdycel8MvNSkeiUsUZ7oUtyRPyEsQyg335c98XYU9O8q88X30v4eV9Fd
-         iFjpupGZda1A/c2b/gkWoTIZ9qf9oU6rzMXeiNxXiIHpacIVo5czh6SmcfbsiN27OBpQ
-         //xBKLegiKvlJRa4f43NxDEykcTMgHY0xqt6AZ/uBdUyuxzMoNLpgwxNQG7X4PuGMOmV
-         yv76yuuOeW3mtyd0el3MzFCashXQHal4Y+wTE4ftYI4cwFOPSVGw3YZI7zCn4wJC8WRZ
-         xmNw==
+        d=gmail.com; s=20251104; t=1785231001; x=1785835801; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bMEMXNUMt5tIg4Lx7Edra+Fh/rYWldPNGAdzVoCdzX4=;
+        b=IQUvibdSFUSZsG8pAyhxrOthu+GeTO6ieaIayCS+hDi1QDOMHckW+5kSrIUooPXHnh
+         fC+NiH/n5lCjVFP2giufRFOtLc5E1M1GqanQEIqtzDz9V5D7SLo4opEu7Z4yKvZDaqgt
+         eFrCew6Xg6A9sd+mqYMWcjx90dbOkizvl3Pbz3snCNPuiDLCQ4Cezbt6O0mjHN63hSY6
+         duMQJ+Ab9TCZAkqlX6EY+rzRpAo6MUijwccMzYRTQOnGRLrHv0vqFAmN0j/a54ecJkAQ
+         GieQsbn0V4mLIqhto+oLumegRtn62ui4r7miTC1KRZkg3oUDyhfME4/RoeFZnn2oJSbu
+         kmWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785229758; x=1785834558;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
-        b=JChhPS1lVfhPhEYtNild/3j8eFaF+LcxWVnXtHYoWSjVt1KYuMP03jtwCoA0aZXnNo
-         neBLRz3F183zcLfy0+HV9J8cKACon9aIlBuChJQD2gWhqwVbmWEY3yFITtlMQBBoIypO
-         ZBue9S8wRYxcZDYIEBXq5Eg2a7TatuceD4d/fZispe9FFgfWaOfUyqBweTaqLch+CH1b
-         mnFft54LbOCedT+dksfAhMxHfpwfGzNvozDi7+EeMmahhNXC4se9+RlpjACL5JSNNYWy
-         EjtKKplCxVJjV7u4uhk2Os7SjO2OLwsM8fcp+Lc711K7selNAUDiy4Q0IVGxHzPqjt/H
-         bi4w==
-X-Forwarded-Encrypted: i=1; AHgh+Rrttkx6AXsaeVpNX49MXfGozkfkeagOWY+qF6LlIv7N7LCFiMnRyRpQLgrGen8pVhMi+rHX6a5i9b83YQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZKRCOns8/W6lxr9G9IyvEjp4Bk/aouFlXpuDLbAgz/ojfq4PI
-	L2CImLG/Kkw588jSpLwnd6g8zgCQAz+BPUr+EYRfmU2/VLYwGPUwuYgDLtusSsQUprmyJIpx/vr
-	wei3gNiLJL8lH5ek02eVKG55LGBCSH1k=
-X-Gm-Gg: AR+sD11NYKV1/04dijNikZ/NXqP+mCYoh6DizlQj/ufCujmDTA6QWd8YXqkAgCNTFfh
-	fwHevq6lKOkyhRRyANuQxUUthCALr1GGHU9oJUPpQfLYhrQCgB6K62979ug6XGmLLkYR62Za7nT
-	DGE9ciSjaCQQwayeKgYn7OqbVVV2MCBZDMAhlheTZ0sd/KXtsC9ZyV4XhpGsX7GEe4l4oTPfWQw
-	SRsbOjh6NNORwEm1wzPS/EYKDc3FLwylG7nbYGePflLGptqC+HMlP6Z9LWkcaQ=
-X-Received: by 2002:a17:907:1b1f:b0:c16:8404:4631 with SMTP id
- a640c23a62f3a-c1f720fddbbmr76680966b.26.1785229758194; Tue, 28 Jul 2026
- 02:09:18 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785231001; x=1785835801;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bMEMXNUMt5tIg4Lx7Edra+Fh/rYWldPNGAdzVoCdzX4=;
+        b=gpZHpXS9PYV15oP3Ohh7nMep8ElOn1jc8q/clv8+3fcZkqmboklG/sZQ3dGat/Nr1P
+         iNnVFmQI0CC2e8eeCht4hpCQiO8dQIqkLRfx3rRDVMfRxEjYc3pobDFzS8yv2zjVS2vj
+         FnqpbtJggSAeW3cRZnRHM/ac1r9y3C4J6KgdDrmUaBbKWagfMwCU2iIrw/6Gin1LobGD
+         lJ1kGKuShvV1SilfOkqJVax0yRNMEIedVN9XjL7XrFhxbd9sIDgKYF1E0Z1dBR755qvr
+         FVHznucn7d5JcUPhPtQG8NogNXiQteL67M+sNdiTho5RR6EP0QcxXrcRySF8Jf/F/sT2
+         Lfkw==
+X-Forwarded-Encrypted: i=1; AHgh+RpZtlnIAHKS2SQYtfgeW6d562iMZnlHeTagV70bIa1XFUfIsoe672cStZ6DFRf/nD0y/ew3Mg4PPN+8sw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKf8OrYXxZxAk+pu46UaktTMhkb8/jkmeMQe+D0pRnlx3d8JHI
+	H63BwXH0LRKhMR57/ahIHFDKmNCI3mTks2ePEmdPWAMrjmNo8Gs+tgnJ
+X-Gm-Gg: AR+sD109X6djmcRHAxvyWWbmx3ERBZkKa0AOy4Gip8qI74bVI2X479EOlBsR7jNrTFe
+	j1B0zyhomYwXPl1E01DIuGjfprxHqDqVdR58G5VGKGt/1ANvfB6kZLzqqsEYMg32Qf4YBuqLKsi
+	IoP4Vf1CRh+CaEybh2i+WY37NZigMR6qHrgq7wTJ1AdrvHXvvE1vEOqGzAG6vRctmFEAOw9Z6TN
+	mPkFEcEuwzuvl8jG+m+8w68fjJdFfO56MaZLjzB3JTt4sTBOWcwDkdLoCBuNHrTCHbCYHHWysUi
+	uCCNdKuZHTouXiNtBm7FTGyM3Kwur76CIdWjTccZ1IkgdkdSJUyfxmuLBgA+A0yDUONMNBXedL7
+	dcpnMbTnKHr3ZjQV+rqd1etF3mK3QTMrhfmsVYdurme000XK4RksauJvc1lV22QCTJ37FY/rraC
+	sIZQnwpEMSmVw/f+Me4bDYpXvpu3RCb3v9hdIfki4qRcOaPosuYL6CatJ7LA==
+X-Received: by 2002:a17:902:f64e:b0:2cf:b23d:79c with SMTP id d9443c01a7336-2d015ed00f6mr17607115ad.43.1785231001174;
+        Tue, 28 Jul 2026 02:30:01 -0700 (PDT)
+Received: from HAOQINHUANG-MC0.tencent.com ([43.132.141.21])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7f4b01sm49151225ad.71.2026.07.28.02.29.58
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 28 Jul 2026 02:30:00 -0700 (PDT)
+From: Haoqin Huang <haoqinhuang7@gmail.com>
+To: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Nick Terrell <terrelln@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Haoqin Huang <haoqinhuang@tencent.com>,
+	Rongwei Wang <zigiwang@tencent.com>
+Subject: [PATCH v2 1/5] zram: fix early release of global cdict/ddict in per-CPU error path
+Date: Tue, 28 Jul 2026 17:29:31 +0800
+Message-ID: <20260728092935.31139-1-haoqinhuang7@gmail.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20260627070216.13511-1-haoqinhuang7@gmail.com>
+References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260627070216.13511-2-haoqinhuang7@gmail.com> <amgE5z5QEYa5258-@google.com>
-In-Reply-To: <amgE5z5QEYa5258-@google.com>
-From: haoqin huang <haoqinhuang7@gmail.com>
-Date: Tue, 28 Jul 2026 17:09:06 +0800
-X-Gm-Features: AUfX_myDyieNySLdz0XlujHur2PjroAeYZyBEI3F3bupTTh5ZGiK3shMAfIo11U
-Message-ID: <CAEjiKS=SOTQFC4PrsV2VHkP9z3NxceuhUQavtvd7ZaZytWGDPQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] zram: add per-backend capability flags and validate
- parameters early
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: minchan@kernel.org, axboe@kernel.dk, terrelln@fb.com, dsterba@suse.com, 
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, rongwei.wrw@gmail.com, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 28, 2026 at 9:27=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (26/06/27 15:02), Haoqin Huang wrote:
-> [..]
->
-> > diff --git a/include/linux/zstd_lib.h b/include/linux/zstd_lib.h
-> > index e295d4125dde..f4b26844e53a 100644
-> > --- a/include/linux/zstd_lib.h
-> > +++ b/include/linux/zstd_lib.h
-> > @@ -1241,6 +1241,7 @@ ZSTDLIB_API size_t ZSTD_sizeof_DDict(const ZSTD_D=
-Dict* ddict);
-> >  #define ZSTD_SEARCHLOG_MIN        1
-> >  #define ZSTD_MINMATCH_MAX         7   /* only for ZSTD_fast, other str=
-ategies are limited to 6 */
-> >  #define ZSTD_MINMATCH_MIN         3   /* only for ZSTD_btopt+, faster =
-strategies are limited to 4 */
-> > +#define ZSTD_MAX_CLEVEL              22
-> >  #define ZSTD_TARGETLENGTH_MAX    ZSTD_BLOCKSIZE_MAX
-> >  #define ZSTD_TARGETLENGTH_MIN     0   /* note : comparing this constan=
-t to an unsigned results in a tautological test */
-> >  #define ZSTD_STRATEGY_MIN        ZSTD_fast
-> > diff --git a/lib/zstd/compress/clevels.h b/lib/zstd/compress/clevels.h
-> > index 6ab8be6532ef..db3b275b502e 100644
-> > --- a/lib/zstd/compress/clevels.h
-> > +++ b/lib/zstd/compress/clevels.h
-> > @@ -17,7 +17,6 @@
-> >
-> >  /*-=3D=3D=3D=3D=3D  Pre-defined compression levels  =3D=3D=3D=3D=3D-*/
-> >
-> > -#define ZSTD_MAX_CLEVEL     22
-> >
-> >  __attribute__((__unused__))
->
-> I think the zstd part wants to be a separate patch as well.
+From: Haoqin Huang <haoqinhuang@tencent.com>
 
-Agreed, I've split it into a standalone patch in v2:
-  [3/5] zstd: move ZSTD_MAX_CLEVEL to zstd_lib.h
+zstd_setup_params() creates global cdict and ddict stored in
+params->drv_data, shared across all per-CPU contexts. The per-CPU
+zstd_create() error path called zstd_release_params(), which freed
+those globally-shared objects. While the drv_data=NULL guard in
+zstd_release_params() prevents a double-free on the init failure
+path, this is still a layering violation: a per-CPU callback should
+only clean up its own context, not release resources owned by the
+compression lifecycle (zcomp_init / zcomp_destroy).
+
+Fix by removing zstd_release_params() from the per-CPU error path
+and replacing it with only zstd_destroy(), which properly cleans
+up the per-CPU context without touching the global params->drv_data.
+
+Fixes: 6a559ecd6e7e ("zram: add dictionary support to zstd backend")
+Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
+Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
+---
+ drivers/block/zram/backend_zstd.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index d00b548056dc..2584f47c9b3c 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -161,7 +161,6 @@ static int zstd_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
+ 	return 0;
+ 
+ error:
+-	zstd_release_params(params);
+ 	zstd_destroy(ctx);
+ 	return -EINVAL;
+ }
+-- 
+2.43.7
+
