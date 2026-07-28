@@ -1,104 +1,106 @@
-Received: from va-2-49.ptr.blmpb.com (va-2-49.ptr.blmpb.com [209.127.231.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495FC43BDB0
-	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 08:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF19F3AFD0D
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 08:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785313722; cv=none; b=mt+Fj5j9IZcHjn74PFF/C8dzDIjLzvrNCmoi2scSgCc+FpHrbqCLvFJHXbftTQyCxgxrtIsAITGpMpseZcNVpvTKYPSjw1pTcbblT27LqR5CBvNaSTGsbbvmHS3f1YKDdgoX6teHFbdrsKGf++E7qqL1nS7TUzoXR2Ibm6AxlJw=
+	t=1785314111; cv=none; b=hbyqUGSF6GD1QUhfihJC/sYCHEZu5IJLNhbGNzT94if7KP97QOnZUgx7k40r3rmCEmEvjiW4i4DaWJoMOO/lvWHfVLTUqMdPy63DVZK5CSMUTKrVr1NVer+dbe38Y0u9hXmafGC2fXhDtp7zQOfS8AFBYc2voPN9Fm6vUGV25I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785313722; c=relaxed/simple;
-	bh=8DaMrQkwSOLSYeVcgfkY+Hx0LSQoJH+0MZz/vGq60yo=;
-	h=Content-Type:To:Cc:Subject:Date:Mime-Version:In-Reply-To:
-	 Message-Id:References:From; b=NuMqkgTxKizInhKohnoNVGbOB3tQSi9/6PwI+Tm1kXvS6qEm0RkJFX7C/tEGO8PohQYy9jERXCxcaG7N4ZMlIm39A6zREnAc8VsjmUBJM0PkBLgJRkntNJZ3yp7PuvmVPhlVi4OLEG5hI1ZzRobGMQfuuX6dVlg2xm7gFvcJwK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=UKmrvVHf; arc=none smtp.client-ip=209.127.231.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1785314111; c=relaxed/simple;
+	bh=/lbc0ds/nEhSKq+pRS0v21OIZIp8lfmi/G5Th/cuNpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=R8I0nev9cJ73z8uxHxr9ZRSsASnpYrMEJRlCYout/jyR1WDAKDIizZuFqTsuKEUa2gfmyVyjOP2Yxr16yffmm7c+yGgkGlTNzD+KWzBDLtDN4aZnU9vTcoGBkVhjb5UPQAvSz28ed+ZBi3Zm692x0fham1yWoCLyv83Juyes+JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=saiJoAhy; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="UKmrvVHf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785313695;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=Ghe50mnkLmufIA92uEj2+BeiwIEyCvYnepEvsaqXqN0=;
- b=UKmrvVHfp0l0XvvMQNeEaztZ93Y5UMIwO4QXx/YxCRNGxoeULOCCjxW6PHDevdqyhdme2U
- IJSG7MFRQ0dWCyDN7AOeHRamqhNojIOUE5XJn7Eq2tX7X3lHWhFUO+vG87Xy7WWhxhvF8t
- YU+GgTZN7cZ0bToV2k6NTcXuU0DX3U4ERqnZMcAD73m37zxFDjAE1aQa5eMdp+WvZ9I4ql
- b2xzlbb5a6x67GBPvf1/DZ+Tud5X8RgwQH0QsTK+RnDckiE4oXN8BURJQlYuhUZf0V5fqN
- C0lAl/Cji+T83n8THM34/yMN7xK5lVtfaI3nPjOlhTbq4uDPL8T6ui18hXgnBg==
-User-Agent: Mozilla Thunderbird
-Content-Type: text/plain; charset=UTF-8
-To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Cc: <axboe@kernel.dk>, <tj@kernel.org>, <dongsheng.yang@linux.dev>, 
-	<cengku@gmail.com>, <josef@toxicpanda.com>, <nilay@linux.ibm.com>, 
-	<ming.lei@redhat.com>, <linux-block@vger.kernel.org>, 
-	<cgroups@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of bio_set_dev
-Date: Wed, 29 Jul 2026 16:28:10 +0800
-X-Lms-Return-Path: <lba+26a69b99e+696691+vger.kernel.org+yukuai@fygo.io>
-Reply-To: yukuai@fygo.io
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="saiJoAhy"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260729083503epoutp02e1d42d90fae8acc45153f26af3396cfb~GtbfVuE9A3000530005epoutp02Z
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 08:35:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260729083503epoutp02e1d42d90fae8acc45153f26af3396cfb~GtbfVuE9A3000530005epoutp02Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1785314103;
+	bh=nMumBf6pcwJN35QNg21EPnkz/AZt8LVlK2YGNnvhzR0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=saiJoAhy/r7KRwVHHR7YIjl+Nj7jXx0336/L9WpCTejiCSFqRiZqSbxMvaUbv8NU+
+	 kkSUaNQ8zh8zuU9bBheB7sAGTwYiYPlFaARqwxR9n2aNYqgqXqjBwiJx3DUq/t9TEv
+	 QBtUstpUNwLJo7RQ4CaoQbXAPVsNOYFEScxUaHCY=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260729083502epcas5p2956791f6317ffa4deaefdfb2eaa3c15c~Gtbeng5sa2833528335epcas5p2F;
+	Wed, 29 Jul 2026 08:35:02 +0000 (GMT)
+Received: from epcpadp1new (unknown [182.195.40.141]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4h95HV4cXxz6B9m7; Wed, 29 Jul
+	2026 08:35:02 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260728145333epcas5p427c6b6d72bff02de3f29e6a6a2108958~Ge8rj7-9K0791907919epcas5p40;
+	Tue, 28 Jul 2026 14:53:33 +0000 (GMT)
+Received: from green245.samsungds.net (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260728145330epsmtip1f20094ebf53bcd1bb08fe2dba866c798~Ge8oxGFnu0743207432epsmtip1b;
+	Tue, 28 Jul 2026 14:53:30 +0000 (GMT)
+From: Alok Rathore <alok.rathore@samsung.com>
+To: wangyang.guo@intel.com
+Cc: akpm@linux-foundation.org, axboe@fb.com, dan.liang@intel.com,
+	hch@lst.de, kbusch@kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	ming.lei@redhat.com, rrendec@redhat.com, sagi@grimberg.me,
+	tglx@linutronix.de, tianyou.li@intel.com, tim.c.chen@linux.intel.com,
+	virtualization@lists.linux-foundation.org, asml.silence@gmail.com,
+	cpgs@samsung.com, gost.dev@samsung.com, alokrathore20@gmail.com,
+	nitheshshetty@gmail.com, Alok Rathore <alok.rathore@samsung.com>
+Subject: Re: [PATCH v2] lib/group_cpus: make group CPU cluster aware
+Date: Tue, 28 Jul 2026 20:23:03 +0530
+Message-Id: <561480862.11785314102640.JavaMail.epsvc@epcpadp1new>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260113022958.3379650-1-wangyang.guo@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 29 Jul 2026 08:28:13 +0000
-In-Reply-To: <20260728042313.GA19817@lst.de>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Message-Id: <169a04be-2af6-4df3-9308-e2c0d5d4334a@fygo.io>
-References: <20260724123037.3004560-1-yukuai@kernel.org> <20260724123037.3004560-2-yukuai@kernel.org> <933b4285-1c85-4076-831a-0501d5c38e16@fygo.io> <20260728042313.GA19817@lst.de>
-From: "yu kuai" <yukuai@fygo.io>
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260728145333epcas5p427c6b6d72bff02de3f29e6a6a2108958
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CPGSPASS: Y
+X-Hop-Count: 3
+X-CMS-RootMailID: 20260728145333epcas5p427c6b6d72bff02de3f29e6a6a2108958
+References: <20260113022958.3379650-1-wangyang.guo@intel.com>
+	<CGME20260728145333epcas5p427c6b6d72bff02de3f29e6a6a2108958@epcas5p4.samsung.com>
 
-Hi,
+For higher number of jobs(>=64), we are seeing ~8% regression with this patch.
 
-=E5=9C=A8 2026/7/28 12:23, Christoph Hellwig =E5=86=99=E9=81=93:
-> On Mon, Jul 27, 2026 at 04:16:29PM +0800, yu kuai wrote:
->>> open-coded blkg_put().
->> Turns out bio will be submitted by kworker for some drivers and for
->> blkcg_punt_bio_submit(). Is it possible to record blkcg during bio initi=
-alization,
->> as blkcg must exist, and then covert it to blkg during submission? I can=
- use union
->> for blkcg and blkg to avoid new field in struct bio.
-> Mixing the two up sounds like a receipt for a lot of problems
-> unfortunately.  I wonder if we could switch to only store the blkcg in
-> the bio and look up the blkg as needed.  This assumes we can get away
-> with a relatively small numbers of lookups for typical setups.  I'm not
-> really sure how much the different users are combined - if not much this
-> might actually be a big net benefit, if on the other hand we'd have to
-> do a lot of separate lookups it might not work very well.
+Tool: fio with io_uring engine [1]
++------------+------------+-------------------+  
+| numjobs    | before     | after patch       |  
++------------+------------+-------------------+  
+| 1          | 89         | 88.8 (-0.22%)     |  
+| 2          | 169        | 168 (-0.59%)      |  
+| 4          | 338        | 337 (-0.30%)      |  
+| 8          | 533        | 533 (0.00%)       |  
+| 16         | 538        | 541 (+0.56%)      |  
+| 32         | 685        | 716 (+4.53%)      |  
+| 64         | 933        | 859 (-7.93%)      |  
+| 128        | 941        | 867 (-7.86%)      |  
++------------+------------+-------------------+  
+* Metric: IOPS (K) (Block device, QD = 1, bs = 4K, Random Read)  
 
-This sounds interesting, take a quick look, some places are using bi_blkg t=
-o get blkcg and
-this can be optimized, while other places are all related to blkcg policies=
-. And I think
-the blkg slow path radix tree lookup should be fine, because when we enable=
- blkcg policies,
-it's expected performance should already be affected.
+As shown in the table above, while performance is comparable at low job
+counts, there is a drop starting from 64 jobs after this patch.
 
-On the other hand, if no policies are enabled, looks like no blkg will be c=
-reated, and this
-will be beneficial as there should be many environments that blkcg policies=
- are not enabled.
+HW info:
+Intel(R) Core(TM) Ultra 7 265K
+CPU=20
+IRQ-CPU are 1:1 mapped.
 
-The only problem I see is rq_qos_merge(), where bi_blkg is deference with e=
-levator spinlock
-held. However, I think this can be avoided as well, we can only do fast pat=
-h blkg lookup, and
-skip merge if blkg do not exist, as we only require same blkcg bio merge, t=
-here is no IO to merge
-if this bio is the first blkcg bio.
+[1] fio -filename=/dev/nvme0n1 -direct=1 -size=4g -rw=randread \
+-numjobs=$(numjobs) -bs=4096 -ioengine=io_uring -iodepth=1 \
+-name=uring_test --registerfiles=1 --ramp_time=5 \
+--group_reporting --thread
 
-If you agree, I'll start to cook a new pre-set to convert bi_blkg to bi_blk=
-cg, and then convert
-queuelock to blkcg_mutex.
-
->
-> This could be combined with a way to do more efficient blkg lookups
-> using e.g. a rhashtable.
->
---=20
-Thanks,
-Kuai
