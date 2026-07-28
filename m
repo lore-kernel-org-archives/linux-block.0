@@ -1,70 +1,120 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5BD1FC8;
-	Tue, 28 Jul 2026 04:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666FB3B895F
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 06:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785214788; cv=none; b=NGEF1odSTRPmdFK74FCS078yUsi4r9xTUAaIWsqGzkv2eEeFI00WllYIY8lZFOmwMMiRHmD8tnXKMZHMCgXi4WhrM3oP/mcss+ZQ07/P256TzzIiZul9I16UDaOHXreG3bA+tNdoq8qOE0Z1L03WY7D89V9zT0E72bn+wfLCz3A=
+	t=1785220392; cv=none; b=HrRi7flV4MPjnsjq4CIkGmcK+3wZCXduRvoHA7K2sJjnFQBWbXr6HHb6u/USAi3rK06fp7GN/kNQqj1KVLn1Zy8lAnmNiU+s5aZ82aWwDIMWuph0A06ZzOJqFz+JtdHOn2h10+MKCz2DtgC/slIewKw2mlNGE87dGtSjEqu4WMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785214788; c=relaxed/simple;
-	bh=c+LPG7XmK+7U6N1YyS5FtIfmTwYnNLMmAV1mBECswK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CJSDTo+7Z5LMWqdJd9ZRF8WuvCIe8+rlgFrsV8De0XmwnbmFZqzTTnTfLqHUN0yxFI26KbnkVSemYYtgjwjM09YkZeZwwk2Ukt4k369eQstA01VSNRfK8WzrGMrzy9x2jT7vgiUNy3SpeVPd3WtdmFoHB1Bbbfu/ny/zBuLW090=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id DCE2F68AFE; Tue, 28 Jul 2026 06:59:44 +0200 (CEST)
-Date: Tue, 28 Jul 2026 06:59:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>,
-	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 12/22] iomap: better read bounce buffering support
-Message-ID: <20260728045944.GA20354@lst.de>
-References: <20260723145000.116419-1-hch@lst.de> <CGME20260723145102epcas5p1b832a57cc20b821145a4814f29d4fee5@epcas5p1.samsung.com> <20260723145000.116419-13-hch@lst.de> <1d08c3f3-29d6-42db-973b-1c544b436e15@samsung.com>
+	s=arc-20240116; t=1785220392; c=relaxed/simple;
+	bh=c+QanMDQWqnkKFxr8JFGZ51O71YLuYph1XqWpvERvmU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=Bw+zuO4Ntwtf9BT0STNeFI1Ae/cD048htAHFG3Bk4bUwMiGSob01+DjL+qR6gWVvceSZZCGDR3I35PneQcrta0A3YcNRefFbvXZtS6hPkL9isz8Nw+XwlSSbce4LMWhMAescy5asxtXOiAtAPYPhkfB+TaWdVjnR/z9wRTbbZS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=I6ezBDKR; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="I6ezBDKR"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=hp1m5/TUleZ8WC0xoVFFa3KhlylMd3xjMNoG3W1rIx0=;
+	b=I6ezBDKRimWvm5PYqlG+TaviAZLCFNGvjMROBYHDYuEQ55bRjrPxV3byuvzdULMm9AELl6XHY
+	lSK9kVZ7eZ8dIjymMmW2xXf0PFysDCnkpWk0qIUBqOU2c4S1MrPv/J571dugi4JqC+4isqGHXWJ
+	kfz/wG1fw1QHS1h0A7s3rrE=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4h8QQ51ybvz1T4Mc;
+	Tue, 28 Jul 2026 14:23:25 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 308434056D;
+	Tue, 28 Jul 2026 14:32:54 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 28 Jul 2026 14:32:53 +0800
+Message-ID: <b6d12ad8-7f6a-4a18-9138-81e9d2470003@huawei.com>
+Date: Tue, 28 Jul 2026 14:32:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1d08c3f3-29d6-42db-973b-1c544b436e15@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/7] nbd: eliminate queue freeze/unfreeze overhead in
+ connection setup
+From: yangerkun <yangerkun@huawei.com>
+To: <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@lst.de>,
+	<yukuai@kernel.org>
+CC: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>,
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>,
+	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>,
+	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+References: <20260727074718.414868-1-yangerkun@huawei.com>
+In-Reply-To: <20260727074718.414868-1-yangerkun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-On Mon, Jul 27, 2026 at 07:47:27PM +0530, Anuj Gupta/Anuj Gupta wrote:
-> On 7/23/2026 8:19 PM, Christoph Hellwig wrote:
-> > +void iomap_bounce_read(struct iomap_ioend *orig_ioend, unsigned int minsize,
-> > +		void (*submit_ioend)(struct iomap_ioend *ioend))
-> > +{
-> > +	struct inode *inode = orig_ioend->io_inode;
-> > +	struct bio *orig_bio = &orig_ioend->io_bio;
-> > +	loff_t file_offset = orig_ioend->io_offset;
-> > +	sector_t sector = orig_ioend->io_sector;
-> > +	size_t total_len = round_up(orig_ioend->io_size, minsize);
-> > +
-> > +	WARN_ON_ONCE(!(orig_ioend->io_flags & IOMAP_IOEND_DIRECT));
-> > +
-> > +	do {
-> > +		struct iomap_ioend *ioend;
-> > +		struct bio *bio;
-> > +		int error;
-> > +
-> > +		bio = bio_alloc_bioset(orig_bio->bi_bdev,
-> > +				min(total_len / minsize, BIO_MAX_VECS),
-> > +				orig_bio->bi_opf, GFP_KERNEL,
-> > +				&iomap_ioend_split_bioset);
+Hi,
+
+https://sashiko.dev/#/patchset/20260727074718.414868-1-yangerkun%40huawei.com
+
+Sashiko has identified some problems in this series. I will address them 
+in the next version. Please disregard this version. Thank you!
+
+Thanks,
+Erkun.
+
+在 2026/7/27 15:47, Yang Erkun 写道:
+> This series eliminates the blk_mq_freeze_queue()/unfreeze_queue()
+> overhead that currently occurs during nbd connection setup(nbd provide
+> ondemand and was using in AI sandbox e2b[1] to mount and attach rootfs).
+> Each freeze cycle will introduce a RCU grace which was significant
+> with multi-core system.
 > 
-> thw new bio inherits REQ_POLLED via orig_bio->bi_opf but iocb->private 
-> still points to the never submitted orig_bio; hanging polled reads.
-> Maybe mask REQ_POLLED from the bounce bio?
+> time nbd-client --name myexport --connections 96 127.0.0.1 1234
+> 
+> After this patchset:
+> real    0m0.090s
+> user    0m0.004s
+> sys     0m0.018s
+> 
+> Without this patchset:
+> real    0m2.195s
+> user    0m0.005s
+> sys     0m0.022s
+> 
+> v3->v4:
+> 
+> 1. factor out nbd_genl_foreach_sock to cleanup duplicated code
+> 2. rewrite some commit message to make what's going more clearly
+> 
+> v2->v3:
+> 1. Stop using xarray, and protect it by rejecting late NBD_SET_SOCKS
+> 2. Eliminate freeze in nbd_set_size when device setup
+> 3. Add module parameter to eliminate freeze for pre-created device
+> 
+> v1->v2:
+> 1. Rewrite cover letter
+> 2. Eliminate freeze call from blk_mq_update_nr_hw_queues in
+>     nbd_start_device for netlink path
+> 
+> 
+> Long Li (1):
+>    nbd: simplify find_fallback() by removing redundant logic
+> 
+> Yang Erkun (6):
+>    nbd: disallow NBD_SET_SOCK on an active device
+>    nbd: remove queue freeze in nbd_add_socket
+>    nbd: skip queue freeze when setting size at device startup
+>    nbd: factor out a nbd_genl_foreach_sock
+>    nbd: remove queue freeze for newly created nbd from netlink path
+>    nbd: add nr_hw_queues module parameter for pre-created devices
+> 
+>   drivers/block/nbd.c | 228 +++++++++++++++++++++++---------------------
+>   1 file changed, 121 insertions(+), 107 deletions(-)
+> 
 
-Yes.  And I need to come up with a good way to provide test coverage
-for polled I/O interactions like this.
