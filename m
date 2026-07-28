@@ -1,125 +1,169 @@
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB90420485
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894B43F8EB9
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785231032; cv=none; b=iF+iFKiaE/KdrL0cX5kLb+hC+9necux8NP/ziLItxqh3FMcukTXt0ER3zbrNFkHMKYUbo3pTIN7cfaNGvG24ATGPgSYN3iMXQ54ZoB9iwG+7XKM1txaIeAVEyz/LBuGCPDaaTOqHsMoKxju3J98DEeUby0O0h9khRRgS5rbLPRE=
+	t=1785232653; cv=none; b=PBeblI8I1j2NTeTFXlaJQisiqHCOLEp3PZb2o7yMdAODDV/Mgu/CWV2A/rUkKN064zE+iZpRhYCORy1qUzgI4DQ9iljZX+bISXw5KOKDD77plgfbozNUbSpCFpRce6eHP4Uatawrxy6U2vTdbHJiG0xThXZMRAe899ExdhILXRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785231032; c=relaxed/simple;
-	bh=n8MwGhJ/75pb4wpTgYDxyoaUrEFuPlhmcCBrrbftRMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RO0dugOv4rUNs2EAw+LjNiex3aEdBeI7Ki2ExrLmOAfHYigCdZeyvnqMh0iM8h4okKiHcjnDt92v+Mi+KI1O/QHEh0VUhd2ZfiXk3CQ6rxXNQiVWQByT0ena0RWNIdy942kV9D8WElzJLTopZPeO7TWvDlZa0goSvqaTlHXxkYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=behvWsYp; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785232653; c=relaxed/simple;
+	bh=NqIa1tP6CEdR4fPrhcTsaNT80aX6rwW5GkGWrsGVdEU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r4yCou05lGpGU9rHStdsFxYYBRP+A1ObPWXhqOJdZg3/DYu3RFH/075eVdmhm5IRzqK7XQqRhOUOdjlo1Po0gtp7wLIeadfq4e8ebwY81CiNSiuG7FcdW7jahQBQrisuiAb9Kx2j525HHELLkXH/tJfOvNTYkht1xn7vYevxQI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MU65/pcE; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="behvWsYp"
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2caced6038eso10734715ad.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:30:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785231031; x=1785835831; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=r7dyH5rulolS1I/mubT8f5+NvCip7tDn3m0HyPeyvx4=;
-        b=behvWsYpx379wJgPkxFb5JBgntriUahuScpy0GAgjYxSbWJVO8bhLDK1tctolyJn5f
-         26Yn0x4cMdcZ2ZHaVl0tvHsyAV2dyJwY7Dy3QdJjwRlQsQnXOm4PuXc/nRcnVY7L8RJN
-         GThR8jCt5jPp530DgDkGggz44qdDpteRYZ93w1IBILYSWBWmgEdg/hV3G/JpMTa9FPSB
-         Wd6B8s5IfjdLeEpLf3XRFNajajfXV4qA3wtZGBUG/uQnYI8DVAb9MUhpH5KyuEb2qrd+
-         o37ITuJTZaI3rN5ju+1yX5KHIjP2PHDaKbWjsOfmywaNSicX49lcAQhQNheFOIzAIUM4
-         EnsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785231031; x=1785835831;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=r7dyH5rulolS1I/mubT8f5+NvCip7tDn3m0HyPeyvx4=;
-        b=eBkx04wh2aOMJm7eVUtcqxHIW6Z5fSlQvJqB03kccME6bF0gvzH2cFem+3MeJ4fZ+w
-         beyFdH/7PutqVOZaq0BMNLRb17v/+phkBcsPDN9gV9y2yWQ7MtJXDnYPYNHGkcfyCr1V
-         YxQS36NdpX1/LmQY37VbfK3nK4qNgaPYcQ5mHvzIdWcQ3QhZqeRO3hXfQ0pRwK0W2+qb
-         OsXZdiUZYocTb/PLYtvb9MwkNPsjzeeALgOfMXuMjQ5ACe51bwt8IIMFQWgy+ah/1Gsr
-         9CalfkphRgJ+HDOlmXjjT37GCCjtEYIxqz0wHv8hsiD2xqOWzC18VafK/q0khJe8qbr4
-         jhDQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp0xOWbMECmmZ+M3HTzroVBtqYNW8FhLul/I5wxkF428jcOzA0++vUJP9SkxQRAT7H/oy6LHs27ERK2Hw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1wAfgZhAR08GlAJwThN8FYEwJ/Z6RfN2XWnu5LkCCgvoMDq3k
-	ICv7d/K9Wj3np7KO63xTisClJOeg8TjVPQNUYhFD5xS6WjV4SMdH9OUP
-X-Gm-Gg: AR+sD12II9wJuv9w9gSGemNPDi9aNFtc+zi1UkGksAxmxnHMwqWM20oJDmkYTyfOtZ1
-	0J39twZz2B2IIJdJkiSJfrWalBE+ihtHfPVURSvc7VnEqHOt0mtLCewKAs861ACKvH2OguvXX+T
-	s7TTAiOJv1Q/lhgkDqm1rXYQes2FOKthpj46NKaX5VZrAr28Qck3rQrYCpbrSt/bUkYFL+u7CoA
-	jLx0SxEGgyOnfinw7i8YWSEwOMoLOfGaYNkdaz50Z46ukcd1hv9SdsRNz7mO+/0F6IONIDhL5Cz
-	7FkVEAD65rwBz6vCT1yW3g4cNWuaAUncCBwubW8Ewp+rSynvhW48rd+qYoPsnIB9HOr00oiqOrT
-	dUua2PNlUUGZAgzQFPhRnWd/mq3c/pbZK3bORnW7hrJEecftCdstzS0Ky5Yl2Ki/1lwNReJu4c8
-	yHfWb62Grzp8pnZMNCiWAOjc3z099aeQhazAQ0j0C/zcJvPe0=
-X-Received: by 2002:a17:902:da90:b0:2cf:b23a:3e68 with SMTP id d9443c01a7336-2d015eec531mr17264045ad.25.1785231030886;
-        Tue, 28 Jul 2026 02:30:30 -0700 (PDT)
-Received: from HAOQINHUANG-MC0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7f4b01sm49151225ad.71.2026.07.28.02.30.27
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 28 Jul 2026 02:30:30 -0700 (PDT)
-From: Haoqin Huang <haoqinhuang7@gmail.com>
-To: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MU65/pcE"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785232648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tba99Tt7UimiNNcYdebhja5mXw6zYmOPg0uLJptQ66w=;
+	b=MU65/pcE9IJvcg6Agn8T0mmnwktpn4zs3vzIUESJkV0dNSOK7RBL/jTwYUHEl2sBjqwGQC
+	zcGgoM9bSnP879taiFtEy5bw4cntz0ee1wCGaoXIuFRdBDoP1iX26RKqwM2VfZZUQznI72
+	ffbHLjKhkA5/ChmueJKLiHhmtZJ1a80=
+From: Tao Cui <cui.tao@linux.dev>
+To: tj@kernel.org
+Cc: hannes@cmpxchg.org,
+	mkoutny@suse.com,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Haoqin Huang <haoqinhuang@tencent.com>,
-	Rongwei Wang <zigiwang@tencent.com>
-Subject: [PATCH v2 5/5] zram: reset per-priority params when changing algorithm before init
-Date: Tue, 28 Jul 2026 17:29:35 +0800
-Message-ID: <20260728092935.31139-5-haoqinhuang7@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20260728092935.31139-1-haoqinhuang7@gmail.com>
-References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260728092935.31139-1-haoqinhuang7@gmail.com>
+	linux-kernel@vger.kernel.org,
+	cuitao@kylinos.cn,
+	cui.tao@linux.dev
+Subject: [PATCH v4] Docs/admin-guide/cgroup-v2: document io.latency rotational vs non-rotational behavior
+Date: Tue, 28 Jul 2026 17:57:07 +0800
+Message-ID: <20260728095707.2398498-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Haoqin Huang <haoqinhuang@tencent.com>
+From: Tao Cui <cuitao@kylinos.cn>
 
-Parameters validated against one algorithm may be invalid for another
-(e.g. lz4 accepts level=65535 but zstd does not).  Although algorithm
-changes are blocked after disksize is set, they are allowed before
-device initialization.  Reset per-priority params on algorithm change
-so that stale parameters do not silently carry over.
+io.latency is documented only in terms of average latency and the avg_lat
+stat, which matches rotational devices.  On non-rotational devices a group
+misses its target once enough of the IOs in the window individually exceed
+it, and io.stat reports missed/total rather than avg_lat/win.
 
-Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
-Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Describe both cases: how a miss is detected, note that the avg_lat tuning
+guidance is rotational-only, and update the io.stat field list (mark
+avg_lat/win as rotational-only, document missed/total).
+
+Acked-by: Michal Koutný <mkoutny@suse.com>
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- drivers/block/zram/zram_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index d86f4eb06d58..da2921082712 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1661,6 +1661,8 @@ static void comp_algorithm_set(struct zram *zram, u32 prio, const char *alg)
- 	zram->comp_algs[prio] = alg;
- }
+Changes in v4:
+- Also drop the exact threshold value from the intro paragraph, so the
+  documentation does not bind to it anywhere.  This fully matches Michal's
+  "would not bind to the exact value in the docs"; v3 had only removed it
+  from the field list.  Michal's Acked-by is retained.
+
+Changes in v3:
+- Move the missing-target note to the missed field and avoid naming the
+  exact threshold there (Michal Koutný).
+- Add Acked-by from Michal Koutný.
+
+V3: https://lore.kernel.org/r/20260718020759.2272551-1-cui.tao@linux.dev
+---
+ Documentation/admin-guide/cgroup-v2.rst | 50 ++++++++++++++++++-------
+ 1 file changed, 36 insertions(+), 14 deletions(-)
+
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+index 6cd7623..04457f6 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -2260,9 +2260,12 @@ IO Latency
+ ~~~~~~~~~~
  
-+static void comp_params_reset(struct zram *zram, u32 prio);
+ This is a cgroup v2 controller for IO workload protection.  You provide a group
+-with a latency target, and if the average latency exceeds that target the
+-controller will throttle any peers that have a lower latency target than the
+-protected workload.
++with a latency target, and if the group misses its target the controller will
++throttle any peers that have a lower latency target than the protected
++workload.  How a miss is detected depends on the device: on rotational devices
++the average latency over the window must exceed the target, while on
++non-rotational devices a miss is counted once enough of the IOs in the window
++individually exceed the target.
+ 
+ The limits are only applied at the peer level in the hierarchy.  This means that
+ in the diagram below, only groups A, B, and C will influence each other, and
+@@ -2279,10 +2282,12 @@ So the ideal way to configure this is to set io.latency in groups A, B, and C.
+ Generally you do not want to set a value lower than the latency your device
+ supports.  Experiment to find the value that works best for your workload.
+ Start at higher than the expected latency for your device and, with
+-blkcg_debug_stats enabled, watch the avg_lat value in io.stat for your
+-workload group to get an idea of the latency you see during normal operation.
+-Use the avg_lat value as a basis for your real setting, setting at 10-15%
+-higher than the value in io.stat.
++blkcg_debug_stats enabled, observe io.stat for your workload group to get an
++idea of the latency you see during normal operation.  On rotational devices,
++use the avg_lat value as a basis for your real setting, setting it 10-15%
++higher.  On non-rotational devices io.stat reports no average latency; set
++the target based on your device and use the missed/total fields to verify it
++is being met.
+ 
+ How IO Latency Throttling Works
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@@ -2324,19 +2329,36 @@ IO Latency Interface Files
+ 	the blkcg_debug_stats module parameter is enabled (it is disabled by
+ 	default).
+ 
++	The reported latency fields depend on the device.  Rotational devices
++	report avg_lat and win; non-rotational devices report missed and total
++	instead.  missed and total are live counters for the current window and
++	may change between reads.
 +
- static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
- {
- 	const char *alg;
-@@ -1681,6 +1683,7 @@ static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
- 	}
+ 	  depth
+ 		This is the current queue depth for the group.
  
- 	comp_algorithm_set(zram, prio, alg);
-+	comp_params_reset(zram, prio);
- 	return 0;
- }
+ 	  avg_lat
+-		This is an exponential moving average with a decay rate of 1/exp
+-		bound by the sampling interval.  The decay rate interval can be
+-		calculated by multiplying the win value in io.stat by the
+-		corresponding number of samples based on the win value.
++		(Rotational devices only.)  This is an exponential moving
++		average with a decay rate of 1/exp bound by the sampling
++		interval.  The decay rate interval can be calculated by
++		multiplying the win value in io.stat by the corresponding number
++		of samples based on the win value.
  
+ 	  win
+-		The sampling window size in milliseconds.  This is the minimum
+-		duration of time between evaluation events.  Windows only elapse
+-		with IO activity.  Idle periods extend the most recent window.
++		(Rotational devices only.)  The sampling window size in
++		milliseconds.  This is the minimum duration of time between
++		evaluation events.  Windows only elapse with IO activity.  Idle
++		periods extend the most recent window.
++
++	  missed
++		(Non-rotational devices only.)  The number of IOs in the
++		current window whose latency exceeded the target.  A group is
++		considered to be missing its target once missed reaches a
++		certain ratio of total.
++
++	  total
++		(Non-rotational devices only.)  The total number of IOs
++		accounted in the current window.
+ 
+ IO Priority
+ ~~~~~~~~~~~
 -- 
-2.43.7
+2.43.0
 
