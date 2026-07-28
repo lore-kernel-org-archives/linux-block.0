@@ -1,108 +1,136 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236C627A477
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 01:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785202036; cv=none; b=JpigH2AS6M/15MJLK1zeIKgIDkIPiMUuiRp4GtabTYBB3S+KqcP+tGeWKe6NlTPOCWyhnWlqrUhWcBX5tChsAohYk2vR6GaomS+iy0prprddIXVxOgDQXHsYEdYJeXXjyaNaHAHC3h/hKUPVdNf0t0uVcpDs+ZNU3ZDrPdGH6QU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785202036; c=relaxed/simple;
-	bh=UIbZciPovUm2FwY/oWf6dRvFtb600ENTKS8OxWCoDaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iJRr4VbBU7sx1LE9yFzHFEOHhwz0DIEw3lH8W4XDhWnQiD3VmfSZjjCm+m8q+cnoAzwIRISXhijLhskQJZzMtZ+uDx8LKmleQe0sqQnVJ28EyvoOEDSzlzK2ykXphURV2yyJuMPtL9GFDqb61Zpw4nNxM4MZLdMtzR8H80WZoYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=QqoVBLAM; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78052F25F3
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785206865; cv=pass; b=tFQvs4tetbH+MHh3GytOBCjEK8PJUFOfrGPGMal/n8NZ2m9f54DbSht+JVgcJXCPddpgHWXuWdk0/GpFgj4SG/8uxjflQRTUVX+6ufMmhVC6QvdypbBGmwPNi3ld6926O4WDCL3piI2R6fsP7QcO4B3DVtS7jaNkKlyqz0ViNb8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785206865; c=relaxed/simple;
+	bh=0S6LZzWblhk9cBc+1RzRJZvyWZWMFxKZQyPBnlnlXMs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W6ZNwTW8ukCaG8ylXgbXBkho6qR2Z+oxECo9xD2crYBGwG44me2k3KBUCD9GP6Os1n10XvTbdUAUF1gHQtfuQijk9DEBF0Shvfd+I/tuxa3TCXTAEAewBp6lMhe9kzD1dlyUxhvDjlzOaY24YB0Jl3I1wLGaoLfjcPs3FAp6fGk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JNHKmtVg; arc=pass smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QqoVBLAM"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-381b831d535so4133323a91.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 18:27:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JNHKmtVg"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-4583b1703d3so581854fac.3
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2026 19:47:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785206862; cv=none;
+        d=google.com; s=arc-20260327;
+        b=lT/x5c9ZjeSEr0VwOgE1bo71URjYGwCjPSWrS/26QP7C6ub+nFg6l6FgK0R48/JvYe
+         nF/tcAlcQG/dNr3Oy1dJ8mxFQugFNDaxbhjdDTjVzOIcTJ67vYF70wqrIic/XQDDJLhJ
+         OCzzU/QhSks22Ij2BCecbLBqG25pnu4J8xUVTYre3hmsLo63r+mX8WP2HC9vNgoSJJqK
+         7tOcoIpOnj5Bf/wVtq9Jk0QzZZ2EV0pqhH0zcbB++r/4NUEiNsryt+xxV06yPzo2y4ru
+         N8vNQc4WT7+BUQY3Ka+Lvet2sOEMyKKmqjXkaBBrBIGjn1cEAtdCUhCjYBLls7FqGw5S
+         i4Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=i7boabVg6sBibLwOJmy91FtsLB8zy1zkhkDJExToXIw=;
+        fh=h3o+7K0vZ95+fUfYrpharBiwsh0DNOmPYnDCb1e/kmc=;
+        b=p9XJb1B75EmfBt7fnCtkbqKC/EhKs5RqX+yJMWRzHoabg9FuIZpIBhJK0KEylexkTv
+         J6ogHasXSWU3CsgYqSjjhInpGQyWZyieYC1zH634QCy51/PUQUUimW7JeJwWX4w234Ug
+         HPgCVhWZEvhvE7DLqatim2Fxph/6XGFhbli+AYz8pJpH8Un27c1F1CyvwfuHUwLccWk9
+         5gsPCzjm4chS4JNYojKoi7scWJw1T4IZl1AjZvDrXRRI/vyhKjH8ancGlG64OVip0tia
+         mIDk/ucARTXLbfd8WZfEb44XyRiYl4dM3yoJkkLjjLHmcEEuyfpizwnl+I/kn0MBlXwC
+         F98Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785202034; x=1785806834; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1785206862; x=1785811662; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=XzAhvapxVF1tYjqtCmxxMQq36wIjX9fnlT/lFh0XZW0=;
-        b=QqoVBLAME7tgqMKptMdgpuc7yrbhy11O1pOllLY/LR9kZL/gOqHwnP+WtrA8CuWFmv
-         IuYwENTI5yNJ+X8Q2Tg+LblyUz9/0SH/HOU5nddISksdQfE6rCzTZ4fRA52vhxSZqmDw
-         nMoCmfIgEdS/cRj2Ok+zBzNr9q20+Ibew6mrk=
+        bh=i7boabVg6sBibLwOJmy91FtsLB8zy1zkhkDJExToXIw=;
+        b=JNHKmtVgWgId3lVLvTX/SsOnmzG1yM2e2nlkrzUtKdg1h4xyhgiD0n8Iqih3731SQa
+         hbAQ14nVH08+ln7u75FHoe1JhmyObMhpXFaLO7FzgkTIYqmfy4hldgL3R84kusXXSLmT
+         abu2SewcS9j4LIN5ZBI9kksC4X5q4Tblv/mxHXe/f18cXSKyLu1aCyc7NgxILgSd1Ks2
+         obODfFJ0Ond7XZwHTy7EDepO/8coMqvUEqTPDsEDYhkmfrhR700VoTMhM6TwU4qSiDrq
+         /+tl9uoHgtad9H+jEH9wQVEcGCxCSMr5LS0fvlUeamV9Zb0r9LaHflFcWzrunF+NpgQb
+         afoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785202034; x=1785806834;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1785206862; x=1785811662;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=XzAhvapxVF1tYjqtCmxxMQq36wIjX9fnlT/lFh0XZW0=;
-        b=l56npIGWSbecI2VjqmZKxGJsqiGIJH+ATwYp9+HylxwLTU0fUvIZgqEjcYjAW6NnHP
-         czZYTad9t0mOl3pnWDxN1LywCrT4JGXObg2QKZ5yWYCje50HVvKrOW0T6drqoF+P8GFR
-         juN1Uj+/+SAR6i0zrUXVQJWtE391NUBO6yvLNIHGjk2Ze7xWHEdsL6DHh2+lCXcJvZaD
-         R+xVjKjggL5kmjFOpVZktQ0yUJysC5czSVBcZzkciACS7twYscA9Wbb3uIxkaDuAeTO5
-         +NWSA13lHbcVmacIRZ7y/FKlL8/98JI39ipu8bnTgO1oraBOS7BO9Bg6Nk9PJUMNeGub
-         6MFA==
-X-Forwarded-Encrypted: i=1; AHgh+RoTkfUX/YLaqNw7W1PhYcuB9utT2zw5po9kJKCM72rR179RWLCLrEZjSZv/pIbWadU3qo00IaQji7r3yg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9vzassuWtoUdOcCuoTYtHuZ7pv0Q/oOdWiPGlObutfWG4AU2r
-	QzDrTpfTbutLpk+VcTyP1yJbNz2uRZx+RnmZF7OiKcBEvegj6LsqZ9nChgxC/5ykXg==
-X-Gm-Gg: AR+sD10uhuTabQTTFfelq7P2f6c7nCyOuPHOfsWsABBJPb2kf171+yONomiP1tTmgcL
-	HJaexX7GG+s0rHc/obTmnPB5W2Yx/ZwVLbw/pmEx4qoarq2s8FoT7auGS151bG6cjfoDiumFZe5
-	J23wD9aSK82aDG6oO4j483eL2O8+21+MJ2M6BtF+DPWOpum14OOWpqCFUEMXJoED7bNjTd2kGhv
-	uInLlbZRfpWtQaH7kvBbi3QjtUHfOm0HK+BFmu4kAZf2v2x18tCQhmQgwhHvZE7UGwDb/KG/GCh
-	X47b1cxVAIXdnQvDtB3YNHseluJQzY9PsGc5pIHrM27+2YlCQlZcaqw7a6IaChCEIVS1JIaxrS1
-	TxGsiMJDWu26pjRv+gscTSpicn9YFGj2Sk3qsX79tkCAfaHLvNVFSk9H9ds26tH8yRFvpD1R0Nc
-	6FFZlwdx6V3Xp3/kocHrW155ld4OFnJTMSiG88Fcp/Qw==
-X-Received: by 2002:a17:90b:3a8d:b0:38e:6c37:d95a with SMTP id 98e67ed59e1d1-38f6a445e64mr273457a91.19.1785202034479;
-        Mon, 27 Jul 2026 18:27:14 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:f891:e0e8:e2c3:fb20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f1a759228sm2742180a91.1.2026.07.27.18.27.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2026 18:27:13 -0700 (PDT)
-Date: Tue, 28 Jul 2026 10:27:09 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	terrelln@fb.com, dsterba@suse.com, akpm@linux-foundation.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, rongwei.wrw@gmail.com, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH 2/3] zram: add per-backend capability flags and validate
- parameters early
-Message-ID: <amgE5z5QEYa5258-@google.com>
-References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260627070216.13511-2-haoqinhuang7@gmail.com>
+        bh=i7boabVg6sBibLwOJmy91FtsLB8zy1zkhkDJExToXIw=;
+        b=dZczTe3n4r05i9HTRkzDpPvDQhKDnBwl4V17IJBnWFv6blmOtRyvQwi7SmG9GaEi/I
+         +60gFjVy0pv5MysQZIwOs0237DK2D//dPsbgmtnTWOl0ekPuwQjaWT5K/r+8arCJNio7
+         76ZkWuH6v0Q9MOa3xAMBc3dziOxDGJ9FrEempWeou1wL/EA2Qf/VjjDHRby+koQmAyBF
+         UZSzzuv1vAmo6o4TB/jzy3YARzw5sCrL+SJdv5QgsTNtPYSfJTIKvPT84142M1cPhBRZ
+         lMLy09PlG+We83Z3Ew2VgeKfTBNVS7azH67Q6SVgEAfS7HGHA5w5mcUhS1UDIELHY4Zv
+         hheQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrsECSrD1PX608YDG1gbDvP60ntdRCe57Uwy91PJBsDdFx19G0wuRu0aBZhkctVoWejG0iAMN4nxZREyA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/XhzRezAfCyidQmgA0eM4SH57CLxnQ1wT5nM5G7BvlY/Wh3Xv
+	usy2EAA2fvu1bK85IOhFKZSkoI4pZ9LkgMvg3qsxzxMDz08Bo9qCYbFstoneXvMfunlMXEYMFWF
+	IdZDbbGAYQFo0iEEGSV0jzPAujHX23ZU=
+X-Gm-Gg: AR+sD11YETmpmu0IIQKd066jd1aUEovVbXLBqxSqtOAkKyyH2KK4r/CENNGZveftFnM
+	3SONpbb3YUvtLyq5irM7fR9q9YwNucU+Wnpb3EViJZpCXeTDHqDzRXuAMyRvC4yWnfW4saRQvXJ
+	sDLVeBrQ2vwlRsv3p0UbOtTIqVxNUo6YBCrjL7ufwJ9h05esdDsQgE4ck468xVI0uLf9ZXimleT
+	w2JBnp+3njTDnd/Vu0c1c2wjESPKCX7rEelv55f3E6GVazzeWSsI8+94Am5552d4xpYcWSOUzKO
+	VCCIygoiKJCx3ENEpe1VywqwIyw5Ao8KXxMlZZDRdufw82+GOgS9Q0h9fBHcmw==
+X-Received: by 2002:a05:6871:b22:b0:456:f7a5:384c with SMTP id
+ 586e51a60fabf-4586cf02eccmr340830fac.25.1785206862543; Mon, 27 Jul 2026
+ 19:47:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260627070216.13511-2-haoqinhuang7@gmail.com>
+References: <20260727162450.2921500-1-csander@purestorage.com>
+In-Reply-To: <20260727162450.2921500-1-csander@purestorage.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Mon, 27 Jul 2026 21:47:31 -0500
+X-Gm-Features: AUfX_myI3bbtqvS-Pb1eBONxxQzAWhnKQ5EdmbLtbDVEliZndPVY3tNVzBBD6dk
+Message-ID: <CACVXFVOaA_k+TCmeyrjguW5StdDb=zQsTCXWMBQ7QiNX1wuDzA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: remove WARN_ON_ONCE() in ublk_unmap_io()
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (26/06/27 15:02), Haoqin Huang wrote:
-[..]
+On Mon, Jul 27, 2026 at 11:24=E2=80=AFAM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
+>
+> io->res is set from struct ublksrv_io_cmd's result field, which is
+> controlled by the ublk server process, without any validation. It's thus
+> possible for userspace to trigger the io->res > rq_bytes warning.
+> ublk_copy_user_pages() already limits the copy length to the request
+> data length, so drop the warning.
+>
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 4ca6ec738c93..4f30644756df 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1492,12 +1492,10 @@ static unsigned int ublk_unmap_io(bool need_map,
+>
+>         if (ublk_need_unmap_req(req)) {
+>                 struct iov_iter iter;
+>                 const int dir =3D ITER_SOURCE;
+>
+> -               WARN_ON_ONCE(io->res > rq_bytes);
+> -
+>                 import_ubuf(dir, u64_to_user_ptr(io->buf.addr), io->res, =
+&iter);
+>                 return ublk_copy_user_pages(req, 0, &iter, dir);
+>         }
+>         return rq_bytes;
 
-> diff --git a/include/linux/zstd_lib.h b/include/linux/zstd_lib.h
-> index e295d4125dde..f4b26844e53a 100644
-> --- a/include/linux/zstd_lib.h
-> +++ b/include/linux/zstd_lib.h
-> @@ -1241,6 +1241,7 @@ ZSTDLIB_API size_t ZSTD_sizeof_DDict(const ZSTD_DDict* ddict);
->  #define ZSTD_SEARCHLOG_MIN        1
->  #define ZSTD_MINMATCH_MAX         7   /* only for ZSTD_fast, other strategies are limited to 6 */
->  #define ZSTD_MINMATCH_MIN         3   /* only for ZSTD_btopt+, faster strategies are limited to 4 */
-> +#define ZSTD_MAX_CLEVEL		22
->  #define ZSTD_TARGETLENGTH_MAX    ZSTD_BLOCKSIZE_MAX
->  #define ZSTD_TARGETLENGTH_MIN     0   /* note : comparing this constant to an unsigned results in a tautological test */
->  #define ZSTD_STRATEGY_MIN        ZSTD_fast
-> diff --git a/lib/zstd/compress/clevels.h b/lib/zstd/compress/clevels.h
-> index 6ab8be6532ef..db3b275b502e 100644
-> --- a/lib/zstd/compress/clevels.h
-> +++ b/lib/zstd/compress/clevels.h
-> @@ -17,7 +17,6 @@
->  
->  /*-=====  Pre-defined compression levels  =====-*/
->  
-> -#define ZSTD_MAX_CLEVEL     22
->  
->  __attribute__((__unused__))
+The change may be fine, however access_ok() still can fail from import_ubuf=
+(),
+so can we consolidate ublk_unmap_io() a bit?
 
-I think the zstd part wants to be a separate patch as well.
+
+Thanks,
+Ming Lei
