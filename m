@@ -1,251 +1,76 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5072D3D75A9;
-	Tue, 28 Jul 2026 08:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BFD41A938;
+	Tue, 28 Jul 2026 09:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785227959; cv=none; b=ocF7Oxacy0azF8bzROHsdkS7MexbbYatQ2F3a79PxO/bvvORDCOd1mRKqcjmV0eqS09n5GIVY+N2APVVwsCcI//aFffdy8hBLidfbJmNplMvoPSBuLoQycJSC0b2eCOqqvg+/HWALKJ3neWOstnRKr62J+L9uw8OJQL0tCr9OLY=
+	t=1785229547; cv=none; b=Ekjo0SWjPYKvFiLN/Rt2IFEir9RfPPzqDraH+AFUoiQl13/xd+Z+zLRP5JW3e9I0TNgPz3xaZWf+VKQ7+ryR6dW+QxPontHyokpYdl0g7mUpLi27vfeeLHf7H1xXeyt9yVHZD+je8Xuay3yqzrU644Cawl2Ayi9mQCCzID3hibs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785227959; c=relaxed/simple;
-	bh=CRg/Nh54HZ99tMwpElMnVNEMdGg+zKH3+U7LRFD/tYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqBHKO1dwoD2r2Oj8kVI02H1qOFidffjnjySXDiMMsdD5QV5ms+VR//BLDBqO/SY2yCjiDzeMud/EbVBkb/JFhn10M1Iy+P2pD0DlyHIloZZ6WtKGFRPQDVZZLPiwuwB1AVBhI3O5vezQy5okTe+dV0PWlV4Z9BMHmOkvuAVWl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D+tASYGg; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785229547; c=relaxed/simple;
+	bh=c68EiEBN0V+lnQbIJAo9ltizEXZfV3rYv2z9U0Ncyfg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ula1sTXD6XItMCf/e9YEF5dS30vOhZ41I0oaLcKvWAaZaVV/R+KsWcnhg8zO2QD1uXExNiNeNutQ8a51jm97p3yuZP8/jtKhpQ8q8NACl7DwK2Fou+dFnETD5Di4ilCOwsvSAzjoi2FHAleq2LVre0ASzmwZrNUIj51eWL7NxuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oScaIDnP; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D+tASYGg"
-Message-ID: <a9dde63a-5f2d-494b-95dd-7567879de38d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785227954;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QbXjOIDNQAqLnMcNmNhhIkcZFnXKaj7v9jSB+IKjoGY=;
-	b=D+tASYGgBFHhUl7vxy1SvTJuUlL1fyINBlClOvQ9K4T3edtuSqXNpaYIxcusYBqtHtCGKn
-	4YFV+wfUruytiAPKlK/iMkIxiHxJeSoVj5BDR22K0phFcndN0nozhMJatVZeJF2M3nsdd0
-	JVFwwEIRGf5pB3U4V6tfCHcV69RCL/I=
-Date: Tue, 28 Jul 2026 16:38:44 +0800
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oScaIDnP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=dZ
+	vgQ8yDjAtKBY6NS/1B57sF6P+AUVSJmuMxOaEr5G4=; b=oScaIDnPK6b0btMG5H
+	OOwLJcDl5q3oia4480/mcS8GuhXWibpqACQv4Mx1ozG0qc8n8//ts7Ar+BXqnXL0
+	Cbi/eV6F5KU2NhOPKCKXpXwHakywb3tOfVU5mFS1qrtPB41G349KScfdtRmS5Xox
+	rYKm1XZDYC6DMkR/ODTJcJT0o=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgBXhfzLcGhqt6JbKA--.64755S2;
+	Tue, 28 Jul 2026 17:05:18 +0800 (CST)
+From: Guo Tenglong <micronull@163.com>
+To: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guo Tenglong <micronull@163.com>
+Subject: [PATCH] drbd: fix typo in comment
+Date: Tue, 28 Jul 2026 17:05:06 +0800
+Message-Id: <20260728090507.16847-1-micronull@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v9 00/10] Fix missing fops.owner in Rust DRM/misc
- abstractions
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
- driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
- nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
- Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
- Aaron Tomlin <atomlin@atomlin.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
- <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
- Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
- Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
- Igor Korotin <igor.korotin@linux.dev>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
- Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
- Carlos Llamas <cmllamas@google.com>
-References: <20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Alvin Sun <alvin.sun@linux.dev>
-In-Reply-To: <20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PigvCgBXhfzLcGhqt6JbKA--.64755S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZFyxZw47JFyruF1xur45ZFb_yoWfJFg_Cw
+	4xGrs7Jr4kKF4fAryYyrySvw1vkw1DZFZ5Zr4SqF1rAFy7GFW2gwn7uFyjgasxW3WUWw4Y
+	qF12qw4S93Za9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjoUDtUUUUU==
+X-CM-SenderInfo: xplf20hqxozqqrwthudrp/xtbC+A4EO2pocM7nsAAA3i
 
-Hi Miguel,
+Correct "seperate" to "separate" in a comment.
 
-Back in v3, Gary suggested this series go via the rust tree.
-Would you be happy with that, or would you prefer a different
-path? If so, is there anything else needed from my side?
+Signed-off-by: Guo Tenglong <micronull@163.com>
+---
+ drivers/block/drbd/drbd_state.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best regards,
-Alvin
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+index adcba7f1d..98abd2351 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -1339,7 +1339,7 @@ _drbd_set_state(struct drbd_device *device, union drbd_state ns,
+ 
+ 	remember_new_state(state_change);
+ 
+-	/* put replicated vs not-replicated requests in seperate epochs */
++	/* put replicated vs not-replicated requests in separate epochs */
+ 	if (drbd_should_do_remote((union drbd_dev_state)os.i) !=
+ 	    drbd_should_do_remote((union drbd_dev_state)ns.i))
+ 		start_new_tl_epoch(connection);
+-- 
+2.25.1
 
-On 7/23/26 10:10, Alvin Sun wrote:
-> During tyr debugfs development, a kernel NULL pointer dereference was
-> encountered after `rmmod tyr` while gnome-shell still held /dev/card1 open:
->
-> ```
->    [158827.868132] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
->    [158827.868918] Mem abort info:
->    [158827.869177]   ESR = 0x0000000086000004
->    [158827.869519]   EC = 0x21: IABT (current EL), IL = 32 bits
->    [158827.870000]   SET = 0, FnV = 0
->    [158827.870281]   EA = 0, S1PTW = 0
->    [158827.870571]   FSC = 0x04: level 0 translation fault
->    [158827.871043] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000108dec000
->    [158827.871623] [0000000000000000] pgd=0000000000000000, p4d=0000000000000000
->    [158827.872242] Internal error: Oops: 0000000086000004 [#1]  SMP
->    [158827.872246] Modules linked in: tyr sunrpc snd_soc_simple_card rk805_pwrkey snd_soc_simple_card_utils rtw88_8822bu display_connector rtw88_usb rtw88_8822b snd_soc_rockchip_i2s_tdm snd_soc_hdmi_codec
->    rtw88_core]
->    [158827.872337] CPU: 4 UID: 1000 PID: 11276 Comm: gnome-s:disk$0 Tainted: G                 N  7.1.0-rc1+ #331 PREEMPT
->    [158827.880534] Tainted: [N]=TEST
->    [158827.880535] Hardware name: FriendlyElec NanoPi R6C/NanoPi R6C, BIOS v1.1 04/09/2025
->    [158827.880538] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->    [158827.880542] pc : 0x0
->    [158827.880547] lr : _RNvNtCs257m05FHVbX_3tyr2vm8pt_unmap+0x8c/0x12c [tyr]
->    [158827.880578] sp : ffff800083c236b0
->    [158827.880579] x29: ffff800083c236d0 x28: ffff00013f8a0000 x27: 0000000000000000
->    [158827.880585] x26: 000000000000007c x25: ffff000108e6ed80 x24: 0000000000401000
->    [158827.880590] x23: 0000000000000000 x22: 0000000040000000 x21: 0000000000001000
->    [158827.880595] x20: ffff00010f778138 x19: 0000000000400000 x18: 00000000ffffffff
->    [158827.880600] x17: 000000040044ffff x16: 045000f2b5503510 x15: 0720072007200720
->    [158827.880606] x14: 0720072007200720 x13: 0000000000401000 x12: 0000000000400000
->    [158827.880611] x11: ffff800083c239d0 x10: ffff000141e4fd88 x9 : 0000000000000000
->    [158827.880615] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000400000
->    [158827.880620] x5 : ffff00013f8a0000 x4 : 0000000000000000 x3 : 0000000000000001
->    [158827.880625] x2 : 0000000000001000 x1 : 0000000000400000 x0 : ffff00010f778138
->    [158827.880630] Call trace:
->    [158827.880632]  0x0 (P)
->    [158827.880635]  _RNvXs6_NtCs257m05FHVbX_3tyr2vmNtB5_9GpuVmDataNtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm11DriverGpuVm13sm_step_unmap+0x3c/0x120 [tyr]
->    [158827.891166]  _RNvMs4_NtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm6sm_opsINtB7_5GpuVmNtNtCs257m05FHVbX_3tyr2vm9GpuVmDataE13sm_step_unmapB13_+0x18/0x34 [tyr]
->    [158827.891187]  op_unmap_cb+0x78/0xb0
->    [158827.891196]  __drm_gpuvm_sm_unmap+0x18c/0x1b4
->    [158827.891204]  drm_gpuvm_sm_unmap+0x38/0x4c
->    [158827.891209]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm7exec_op+0x1cc/0x254 [tyr]
->    [158827.894085]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm11unmap_range+0x124/0x188 [tyr]
->    [158827.894105]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeNtNtCs257m05FHVbX_3tyr3gem8KernelBoEBK_+0x44/0xd8 [tyr]
->    [158827.894125]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel5alloc4kvec3VecNtNtCs257m05FHVbX_3tyr2fw7SectionNtNtBL_9allocator7KmallocEEB1r_+0x3c/0x100 [tyr]
->    [158827.894147]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel4sync3arc3ArcNtNtCs257m05FHVbX_3tyr2fw8FirmwareEEB1p_+0x94/0x190 [tyr]
->    [158827.894167]  _RNvMs4_NtNtCsgmSOfgXi5CZ_6kernel3drm6deviceINtB5_6DeviceNtNtCs257m05FHVbX_3tyr6driver12TyrDrmDriverE7releaseBW_+0x30/0x98 [tyr]
->    [158827.899550]  drm_dev_put.part.0+0x88/0xc0
->    [158827.899557]  drm_minor_release+0x18/0x28
->    [158827.899562]  drm_release+0x144/0x170
->    [158827.899567]  __fput+0xe4/0x30c
->    [158827.899573]  ____fput+0x14/0x20
->    [158827.899579]  task_work_run+0x7c/0xe8
->    [158827.899586]  do_exit+0x2a8/0xac4
->    [158827.899590]  do_group_exit+0x34/0x90
->    [158827.899594]  get_signal+0xaac/0xabc
->    [158827.899599]  arch_do_signal_or_restart+0x90/0x3e8
->    [158827.899606]  exit_to_user_mode_loop+0x140/0x1d0
->    [158827.899613]  el0_svc+0x2f4/0x2f8
->    [158827.899620]  el0t_64_sync_handler+0xa0/0xe4
->    [158827.899627]  el0t_64_sync+0x198/0x19c
->    [158827.899632] ---[ end trace 0000000000000000 ]---
-> ```
->
-> The root cause: `fops.owner` was `NULL` in Rust DRM drivers, so the kernel
-> never blocked module unloading while file descriptors were open. This leads to
-> use-after-free when drm_release (or other fops) is called on freed module code.
->
-> The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, threads it
-> through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates configfs
-> and rnull to use `this_module::<LocalModule>()`.
->
-> Assisted-by: opencode:glm-5.2
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-> ---
-> Changes in v9:
-> - Rename the binder commit prefix from `rust: binder:` to `rust_binder:`
->    to match the in-tree module name.
-> - Link to v8: https://lore.kernel.org/r/20260713-fix-fops-owner-v8-0-2495cfa82d47@linux.dev
->
-> Changes in v8:
-> - Remove unused `crate::LocalModule` import in rnull configfs.
-> - Link to v7: https://lore.kernel.org/r/20260627-fix-fops-owner-v7-0-33cd3990edf0@linux.dev
->
-> Changes in v7:
-> - Use `crate::LocalModule` in `configfs_attrs!` and silence `clippy::crate_in_macro_def`, per Gary's review.
-> - Link to v6: https://lore.kernel.org/r/20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev
->
-> Changes in v6:
-> - Update MAINTAINERS to cover the new `rust/kernel/module.rs`.
-> - Link to v5: https://lore.kernel.org/r/20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev
->
-> Changes in v5:
-> - Add `#[inline]` to the `this_module()` helper.
-> - Fix configfs doc comment to reference `crate::LocalModule` instead of
->    bare `LocalModule`.
-> - Link to v4: https://lore.kernel.org/r/20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev
->
-> Changes in v4:
-> - Move module-related types into a new `rust/kernel/module.rs`.
-> - Migrate binder from the `module!`-generated `THIS_MODULE` static to
->    `this_module::<LocalModule>()`.
-> - Reorganise the series so that every commit builds independently, and
->    drop the legacy `THIS_MODULE` static once all users are migrated.
-> - Link to v3: https://lore.kernel.org/r/20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev
->
-> Changes in v3:
-> - Renamed vtable associated type `ThisModule` to `OwnerModule`
-> - Added `this_module()` helper for ergonomic `THIS_MODULE` access
-> - Refined vtable macro implementation: one-liner detection and single `defined_items` set
-> - Reordered commits to place doctest fallback before vtable auto-insert
-> - Link to v2: https://lore.kernel.org/r/20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev
->
-> Changes in v2:
-> - Merged old `static THIS_MODULE` and v1's `MODULE_PTR` into a single
->    `ModuleMetadata::THIS_MODULE` const
-> - `#[vtable]` macro now auto-inserts `type ThisModule`, removing all per-driver
->    manual patches from v1
-> - Added configfs & rnull usage site updates and doctest `LocalModule` fallback
-> - Link to v1: https://lore.kernel.org/r/20260519-fix-fops-owner-v1-0-2ded9830da14@linux.dev
->
-> ---
-> Alvin Sun (10):
->        rust: module: move module types into `module.rs`
->        rust: module: add `THIS_MODULE` const to `ModuleMetadata` trait
->        rust: doctest: add LocalModule fallback for #[vtable] ThisModule
->        rust: macros: auto-insert OwnerModule in #[vtable]
->        rust: drm: set fops.owner from driver module pointer
->        rust: miscdevice: set fops.owner from driver module pointer
->        rust: configfs: use `LocalModule` for `THIS_MODULE`
->        rust_binder: use `LocalModule` for `THIS_MODULE`
->        rust: macros: remove `THIS_MODULE` static from `module!`
->        rust: module: update MAINTAINERS to cover module.rs
->
->   MAINTAINERS                                |  2 +-
->   drivers/android/binder/rust_binder_main.rs |  3 +-
->   drivers/block/rnull/configfs.rs            |  5 +-
->   rust/kernel/auxiliary.rs                   |  2 +-
->   rust/kernel/configfs.rs                    |  9 ++--
->   rust/kernel/drm/device.rs                  |  3 +-
->   rust/kernel/drm/gem/mod.rs                 |  4 +-
->   rust/kernel/i2c.rs                         |  2 +-
->   rust/kernel/lib.rs                         | 75 +++-------------------------
->   rust/kernel/miscdevice.rs                  |  4 +-
->   rust/kernel/module.rs                      | 80 ++++++++++++++++++++++++++++++
->   rust/kernel/net/phy.rs                     |  6 ++-
->   rust/kernel/pci.rs                         |  2 +-
->   rust/kernel/platform.rs                    |  2 +-
->   rust/kernel/usb.rs                         |  2 +-
->   rust/macros/lib.rs                         |  6 +++
->   rust/macros/module.rs                      | 34 ++++++-------
->   rust/macros/vtable.rs                      | 41 +++++++++++++--
->   scripts/rustdoc_test_gen.rs                | 16 ++++++
->   19 files changed, 189 insertions(+), 109 deletions(-)
-> ---
-> base-commit: b7e5ac83cb16f7ffd11dc23736f84276602100ed
-> change-id: 20260519-fix-fops-owner-e3a77bb27c6c
-> prerequisite-change-id: 20260519-miscdev-use-format-9ab7e83b1c11:v3
-> prerequisite-patch-id: 405b334ff0d48ad350014f05a2321bdbaa025400
-> prerequisite-patch-id: 604b631c81d5423f4ebb2e12ba2d22e9ce371bfc
-> prerequisite-patch-id: cb550d94cefe01920e0d3ced2b2bcbecd76f3907
-> prerequisite-patch-id: 3bc830839742591460cb86d9472c04f4686dc600
-> prerequisite-patch-id: 571058244bc8c7088638d2e3225713011246c7e9
-> prerequisite-patch-id: 347c5a3c6dbef9832bfce8419fc23e6e08ba477f
-> prerequisite-patch-id: 3e202d988b56b88446f7535e90d3f00cf5f15701
->
-> Best regards,
