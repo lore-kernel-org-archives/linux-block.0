@@ -1,63 +1,63 @@
-Received: from mail-pj2-f3.google.com (mail-pj2-f3.google.com [74.125.227.131])
+Received: from mail-pj2-f1.google.com (mail-pj2-f1.google.com [74.125.227.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0069B41DEE9
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C90840F74E
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785231015; cv=none; b=Gb9Z1oATrlG2ZOBqxoKBS1YSW+y5lE9Vq5LIXQSdSW8hqH5XUfAW042TlTA5vQhwN/MSj/5EO/vGPU7OBa5QsDi99ZUeodLwdCEMRY4FyPP6LhC9wAcxwrTI30mu4306x3EqzRih6o3sv2AIwdY7iYOCWPYogetH7NMJGtDnMOg=
+	t=1785231020; cv=none; b=O+DsY2fruBa3//Z+Wq8GOiAd/wzAwsnsUlrwjk2lDxa9sF9fr0ujRJkC6Gv5Enq123rZSJm21OYwlK3W5b6UUksj/rMJVyuqWvFMtN1zoyMrA5EM12ytu8r9h405Bz3fETgufLEK92dZiGWBkY0UICOThMzLAtkMeuoLJv/Rx0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785231015; c=relaxed/simple;
-	bh=p2KyV1M2I7pW89BPyORLMX0vJRqoCcGVml1ufIQfzm8=;
+	s=arc-20240116; t=1785231020; c=relaxed/simple;
+	bh=U/6msz6jpRBce7oIqvZKAd8mA9LkvtnjS4xe5LJkXaM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lcFluYB2rak5XKPGveq8M361363gdovRcniQlqPzfBVhWL3ZcKw/rqF/5Fni+WuCuNBK80+CVAs0jLgHGHpJjthfs+4To+xN5REFD96iHv87MmHJcIv6ErEsjo5mDyUOy6nYnJ4rY96J0+vrrpxsPQZf8ZWhQIgS1//fMXjnSj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OFeH43Vk; arc=none smtp.client-ip=74.125.227.131
+	 MIME-Version; b=EzWMh2gLQQ5D5qVrynJ5/PzrkGovR9U36LgIgSE8LXNnIBDd6m/booe6lQCbVkyhUaEJR1l413yjeBetybCCQscROrH6NH2Nzs8YFaCcLkW09NjTYbYkeEgNwqIXrBOV2JGWGx9O9vvkTZiZquTFCgeXo3bOs8tdz75X7f3MPb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XYHXE3zj; arc=none smtp.client-ip=74.125.227.129
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFeH43Vk"
-Received: by mail-pj2-f3.google.com with SMTP id d9443c01a7336-2ce7ac92dfcso32735655ad.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:30:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XYHXE3zj"
+Received: by mail-pj2-f1.google.com with SMTP id d9443c01a7336-2cabf1f1051so11282315ad.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:30:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785231013; x=1785835813; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785231019; x=1785835819; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=JO8m6+/OzqIxIcBgfk2F3Ds/epW9IkHld/mVwIN+JfU=;
-        b=OFeH43VkgaAq9VWvFIep7SiN3pW14SzlLnYTQARHmnaSz+QZKbsBQzJi9EaO9UE+hU
-         NlDUsnmpSXQmKKSX2eSuljVLvf7+7bD/9utMdZvrRrRaf7i33D+F8qG78GeYajoW6C4Q
-         LyTvAtdFlKl08t+wCVOhrmqCG2QMLE7CU5rkg6ZSySZ/dcPS4GSygD3qkFUUWETBRkza
-         uG6wlh6MVA0cr24K5yoKf+t7p5IiItusjeI+BenlYK2FX75JcDYxGpQu6gRFm7sl/BXU
-         C7kqIOBZOWdGJzniJFU/FgLXaw92qveOrJhbjI/MIiGyvcw/flgJVMh95hbt0qPVzpOf
-         /GuQ==
+        bh=JdUI5Gagd28mYaBC5Oq0wlI6BJHjCVxD5IqouGfzIgw=;
+        b=XYHXE3zjy8Sjv8PE/8tVWdpUhjuZzsUZcRTBC5qN6mzVYwgoSRitI/x9TNofZOI0G5
+         bpQE/5wVfDpDnSSNALywTLcnCZYFlnvey5oOPQI1fMaNS7EvipuJyqcjmE/1vy/nMNxc
+         5WrvvkdRylDsnknGFJFaOcr3ZQOBnrIne3vfALjTmjFWPrGkK961378dixTnqc8E2KbA
+         Ceok0uajvLBdyjzryRP7i34n9htv4I5OvFymBdOdjLkZYInEjYN+jTHZsysy97aOJfR7
+         nLHLWV6tjyMxfTJ4PSn+4GoyNdHbR/KeEfj7pCYISahK1EDSZBwNANRJTUceZkllwiqv
+         CvsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785231013; x=1785835813;
+        d=1e100.net; s=20251104; t=1785231019; x=1785835819;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JO8m6+/OzqIxIcBgfk2F3Ds/epW9IkHld/mVwIN+JfU=;
-        b=kx4AnzH+0a75k0xZWkzh03qjkhxIk7FR/Rarx1yRXy/IcHUBA2fATvRSUdS0gLvzI0
-         nz4VwDZrbT6LbAEN2GUFJW1I4KC96+LmnLlTxAi7CeHc3oa1ZkRY9cE64JTR3YpQvTu8
-         dR484ODd25j1ojCVeNEM2mQbWNx3SvpAuuCqX90N7SAKH2maTDOLYVgHJRmKuLGsPQSz
-         QMiFt/owMl/Iv+LEVzRquHgJ3PtBCKkKoqZcQe+ucyfsGxTb3TqdfCIPzgecfOLWQZb8
-         DS30HAxsNfgXxQ0CAL/R/Ez9YQ2dvl6xFV1iuTfwrMsxsIU8zxvt1Q8wpH7OAGQe4lXk
-         p7XQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpshRlvkWdYU2L0PUO74ez5K/PntrHTl0wdOPSoCwUJHI4Y6qXC9cBLWBIllGxbzfZoj7XHyM1WMzdOTw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg8Swahis2lPqq/IXyspIfHdRViBGQDhLemlRDhz+Tm50TvOGp
-	NxZU9XVZfhi5PO++tQDSSRE38kBjXSVRp0s20g+DxBrRC/dBwM0fECtP
-X-Gm-Gg: AR+sD131nVBGwu1KIyf3IoYHp7N/ALAcW85QXzFgmo6j7QF6qJaJyAw4dWBq2b9ga9J
-	ftkVKyD9KKXTPyEp9v59HPqnocAZxNkP5e184r4bP5fylEXuNIhBc88TA0abohd00G8V0J4u8OH
-	DTToili59z0uhf0rMhYXa+ODjrsWLTtJKJt7MGQwD2FYXHtBia+GV1xRoizmqDms/BSUzktIm1m
-	CIHoHk94xzGBfPOdQesJHZPNqdpJks+l7Jy/GxNypvGMif8GCc/+N8Em85J7ERI3Vn/i1M//Zl5
-	a3CyGmgucptIn23+sUtKiC6xjLbMd09ATD2vaRuFpEg7enqjO+l9bYPoHDYc4dVFDnZn9VGvRfz
-	uzmRXTTiLHbF3SsVA1wwD7p3DPE8IFdZ2l1Ka7xAUBCGq/a/tQT8CAe9Xe9NStFRCF3ss7XephD
-	WjKw6YKY3zulaotQe2Go16NIfMVrHMKLlRPwt+xknBDCACvO0=
-X-Received: by 2002:a17:902:cf41:b0:2c9:97a9:2097 with SMTP id d9443c01a7336-2d01605e5b6mr20073215ad.43.1785231012904;
-        Tue, 28 Jul 2026 02:30:12 -0700 (PDT)
+        bh=JdUI5Gagd28mYaBC5Oq0wlI6BJHjCVxD5IqouGfzIgw=;
+        b=bO96GN7a9iFEkn/Tmeg1guVTq00EKl88AQY5lytcQPNW3ZBESAd2vUWk+NJsfnS7Dk
+         Y7gzbh3M2NiWxypNBYGRbCFpH/hAivJe5+NBaXKgiVRuUtIJg2Ofg83zf0eFqYNojXVQ
+         5sCUiDkdtNObArL+S3YyQGaygMbaM3j/4YIGVjVDy0cYwWrarvCTdt4kFu6td4V+XOgH
+         RGi81DQwTJV85dw2M7SY8QmHAF9LwlBJ+1QepnzQr3JzMhkZrZvK8tn1cAjNe4mscFBF
+         S8gxlcSEvcicrIAQjxUw0b0YAvz5Z257MpIAX5gixs260YbhpH8qe5tJfwy1CWWKZeC+
+         0mjg==
+X-Forwarded-Encrypted: i=1; AHgh+RrMfIX8kvX9lBKEUZCwO3CrMYujMx9tRCNxj623fZzxNlmLfXbB/Ol2mscomznHOk0kI4higA3o/hOI4w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR3avgE8foXjkIFY5LbP474Jo9tBHYjoV8s8lkCjIAbLBnCOX3
+	0nQVh6SKQV5lQYdaoKxAa6waEZymfhhwgvTD+ZW0HYzKni/HnCVrhlpL
+X-Gm-Gg: AR+sD13hmYk1/oTBhz2FMjNyiWn446/wR+fmMOZw5XA/U39mL4anuo4DSimn4C1Gs55
+	05K3QX+dXGU0qx2HPp29IiVZeiqVGSols26uAdzrTkG0BHHKYE0g2IKd2bGiekR0TFr3uJ6jb2p
+	dZDkg1HaCAMssCZNzzAMdUIQMGFU0K2I6DAY1q98Ylghrme4FYnhSbmOTHq9lgxgtbJp/t7ZMUm
+	6R/ZNcv0HuoNRgPpFM5uqMoHA8yc5jpg7hjbye9ptRxQovFsudfoUO0rYxFAmHrlIYfXy8U58pZ
+	EljOi8op1IagO85UxTV48OCdDB2QYeQCTrOHQIkWqoMIczioy9PNQeNpBKWqPN8msoPgWbHZGdE
+	DnZjdNsIPnOxFMutrPe0oPTQRwVQ/k9xe+t8CWIMUiyHVKc6qVYsX+wBySfIjlZPM2u0Ij5eYHw
+	DLk8AVYNGjarOIfIJss342w237evdn4kL/Wq5Jrs2ZyxIPlZ8NhIXxOcw2wQ==
+X-Received: by 2002:a17:902:d4c3:b0:2c8:2808:3ec9 with SMTP id d9443c01a7336-2d015abd8f9mr19817535ad.12.1785231018844;
+        Tue, 28 Jul 2026 02:30:18 -0700 (PDT)
 Received: from HAOQINHUANG-MC0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7f4b01sm49151225ad.71.2026.07.28.02.30.09
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7f4b01sm49151225ad.71.2026.07.28.02.30.16
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 28 Jul 2026 02:30:12 -0700 (PDT)
+        Tue, 28 Jul 2026 02:30:18 -0700 (PDT)
 From: Haoqin Huang <haoqinhuang7@gmail.com>
 To: Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -69,9 +69,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Haoqin Huang <haoqinhuang@tencent.com>,
 	Rongwei Wang <zigiwang@tencent.com>
-Subject: [PATCH v2 2/5] zram: make dict update in comp_params_store() atomic
-Date: Tue, 28 Jul 2026 17:29:32 +0800
-Message-ID: <20260728092935.31139-2-haoqinhuang7@gmail.com>
+Subject: [PATCH v2 3/5] zstd: move ZSTD_MAX_CLEVEL to zstd_lib.h
+Date: Tue, 28 Jul 2026 17:29:33 +0800
+Message-ID: <20260728092935.31139-3-haoqinhuang7@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260728092935.31139-1-haoqinhuang7@gmail.com>
 References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
@@ -86,55 +86,43 @@ Content-Transfer-Encoding: 8bit
 
 From: Haoqin Huang <haoqinhuang@tencent.com>
 
-comp_params_store() resets old parameters before reading a new dict,
-so if kernel_read_file_from_path() fails the params are left broken
-and the actual error is swallowed. Fix by reading into a temporary
-buffer first, swapping only on success. Use sz <= 0 to also reject
-zero-size dicts.
+Move ZSTD_MAX_CLEVEL from lib/zstd/compress/clevels.h to
+include/linux/zstd_lib.h so that external users (e.g. the zram
+zstd backend) can reference it alongside ZSTD_TARGETLENGTH_MAX
+to define a valid level range.
 
 Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
 Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
 ---
- drivers/block/zram/zram_drv.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ include/linux/zstd_lib.h    | 1 +
+ lib/zstd/compress/clevels.h | 2 --
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ace65c586072..9ea7ba9d1ed0 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1699,21 +1699,23 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
- 			     const char *dict_path,
- 			     struct deflate_params *deflate_params)
- {
-+	void *new_dict = NULL;
- 	ssize_t sz = 0;
+diff --git a/include/linux/zstd_lib.h b/include/linux/zstd_lib.h
+index e295d4125dde..f4b26844e53a 100644
+--- a/include/linux/zstd_lib.h
++++ b/include/linux/zstd_lib.h
+@@ -1241,6 +1241,7 @@ ZSTDLIB_API size_t ZSTD_sizeof_DDict(const ZSTD_DDict* ddict);
+ #define ZSTD_SEARCHLOG_MIN        1
+ #define ZSTD_MINMATCH_MAX         7   /* only for ZSTD_fast, other strategies are limited to 6 */
+ #define ZSTD_MINMATCH_MIN         3   /* only for ZSTD_btopt+, faster strategies are limited to 4 */
++#define ZSTD_MAX_CLEVEL		22
+ #define ZSTD_TARGETLENGTH_MAX    ZSTD_BLOCKSIZE_MAX
+ #define ZSTD_TARGETLENGTH_MIN     0   /* note : comparing this constant to an unsigned results in a tautological test */
+ #define ZSTD_STRATEGY_MIN        ZSTD_fast
+diff --git a/lib/zstd/compress/clevels.h b/lib/zstd/compress/clevels.h
+index 6ab8be6532ef..06565e064456 100644
+--- a/lib/zstd/compress/clevels.h
++++ b/lib/zstd/compress/clevels.h
+@@ -17,8 +17,6 @@
  
--	comp_params_reset(zram, prio);
+ /*-=====  Pre-defined compression levels  =====-*/
+ 
+-#define ZSTD_MAX_CLEVEL     22
 -
- 	if (dict_path) {
--		sz = kernel_read_file_from_path(dict_path, 0,
--						&zram->params[prio].dict,
--						INT_MAX,
--						NULL,
--						READING_POLICY);
--		if (sz < 0)
--			return -EINVAL;
-+		sz = kernel_read_file_from_path(dict_path, 0, &new_dict,
-+						INT_MAX, NULL, READING_POLICY);
-+		if (sz <= 0) {
-+			vfree(new_dict);
-+			if (sz == 0)
-+				return -EINVAL;
-+			return sz;
-+		}
- 	}
+ __attribute__((__unused__))
  
-+	comp_params_reset(zram, prio);
- 	zram->params[prio].dict_sz = sz;
-+	zram->params[prio].dict = new_dict;
- 	zram->params[prio].level = level;
- 	zram->params[prio].deflate.winbits = deflate_params->winbits;
- 	return 0;
+ static const ZSTD_compressionParameters ZSTD_defaultCParameters[4][ZSTD_MAX_CLEVEL+1] = {
 -- 
 2.43.7
 
