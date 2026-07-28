@@ -1,147 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EC92FFF8B;
-	Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FD9438472
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 12:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785234339; cv=none; b=oMATasCK/SvEuTKQBKSJFvGN0D5Y2fYISh4CqXoG/yQYMOUBzchq0n/WhnjnQ2CwcRRh1bPAZN0o+0kkRYrIGb4drTUESEXbA6A+37wtB3AK9zuAXRmYHCBKk3uITPs/a7n//jHWw+FnYkaJDuwZPmF7D9DakkUHN02fsm0cxFA=
+	t=1785243506; cv=none; b=OLnY06zqTmdDphXCLKxqhJ242TR7NAhSWgo3xIg1NX/ZSI5OOz7bgmu6Tl4E/cAEdYKbNr+EmKCN+2tQT4Sal5zCRcbgOHF0QlE6omRJ+xNxFQoKm2/RV8hVtJFTvc5ZMXewAnygUNY0SySaadzOvrrrFPUFymi5mbWxGowih6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785234339; c=relaxed/simple;
-	bh=kcEkfz+ZCfXOsIXQnsOGf3nIuYdKTGxilPpWgHEMF58=;
-	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=r8xMayaoqULS/bsNXdXh4IWEvasFw0HMHBGFP3mB7mjO1Laov8h7MAwOdqtV6/kv0stBeDOGnWrq/5ny1MHPIwLge8cfSDQps2QGWtOhwk8krM2KL6TFefQaNb42OcAQtd2X10ogRWJKaWZCk0ZQxEC4Jx/DTx6DOOYsa/4dN18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cRqtQzUS; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cRqtQzUS"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 133301F000E9;
-	Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785234337;
-	bh=hJu0lR51o8IvVMj4GsYy7qbL2iP0dJ6hZ1TdUfXicZo=;
-	h=From:To:Cc:Subject:Date;
-	b=cRqtQzUSP2JpAg9qVda8W4+cWbnVJx4SMHm2bUrE1080ecz0HwcvoMsQa+/YTG0+t
-	 9hUUeULaJXAJx3OCsCcovDPCQ4qBQiCg0B+2p8RyEkgsam9PrGEuarm3waq8X4CR+R
-	 3Q2i4++NvNAByHzjUoTlAuPaF/QipU3EMYTE0cTzsGMtpcGClZ/qbNQb6/Ogz29aTM
-	 ZrBXbi9qOPc0sGH8/mE9o6HaWGJUxmRvuwsD43u6NpKDQOHNzNA/lP5w4n5yUMz/fr
-	 /AXqMJ5R4tFEGiH82GeEaiQyd/ScrpEiiqnas0brsvfqz6OVIul5FH7BcJWtst+WE8
-	 n+g7n2IC0BeVQ==
-From: "syzbot" <syzbot@kernel.org>
-To: syzkaller-bugs@googlegroups.com, Krystian Kaniewski <krystianmkaniewski@gmail.com>, "Jens Axboe" <axboe@kernel.dk>, "Josef Bacik" <josef@toxicpanda.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>, "Christoph Hellwig" <hch@lst.de>
-Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
-Subject: [PATCH] nbd: skip queue limits update for size-only reconfigure
-Message-ID: <1ec17dae-f9ac-424a-b597-b2794f157dbb@mail.kernel.org>
+	s=arc-20240116; t=1785243506; c=relaxed/simple;
+	bh=ixas0KYKGbKQeKRHRc5bey5LfsdW4XoTh6cWp70bu+Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BO1xpPeozg+pNujozpcflbcRg3xIDWlHVO/1lOSmCIK3dJxta+clEvzFlsVinrp4XSJoNppBlfQXIpHKmeF1fX43SLKRGlLz4p6MO5cZg+Hc0zgMPmuniZJ/zAxgggv62diwWn864rsvFqpYvFbGHaGLuBfXtgoF+TjUgOd2GdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-49ab6a82cd5so5032963b6e.2
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 05:58:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785243503; x=1785848303;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=QZLnj6zZUprtiqaAMGSQ88ksQ8rIQm7u/CEFtblZzPQ=;
+        b=i9ZK6qtNxPMXqhbmrZtEsUZMxojm0dKJSzQ2gi2WPsE9UU0Cwhd+aIFx03gJVTuszn
+         5lQR8bBvyx//JfzM77liTAmaK0TfG3eN8NqKgQUTjpG+CH8ktIRQlunz+q9oJ2WGXiTv
+         DkpA6Zxfm6zdhFokljwtSR9YFPMt8ScVG+clTLrDIKRGF9DJeaUJVdexTEh/ygT0UW6/
+         wBrQo4eD9OFno2bQRKPTh1s9Yza1u0qPmlfPHOOhm0bp8RAObQQHpa3WQqSlRrdXLvXh
+         Qc9UOBbEUhWvKmbc72I7PcBwJMMtPaXvRI/zN/XRUCKOL/tpUqnA6Zlf8Bahbzhk19rs
+         iz6w==
+X-Forwarded-Encrypted: i=1; AHgh+Ro00B80QYsQt+hMompiHXX7/ZBbqGJqiPu3/h7DUNUPhKyT5hP+2UBZ2Iw3gGh1UVA37r+BpiH1bMc06Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuUEYjxo2KMJ5mRQK6LilawmIIXDSR/mqdsbdRk1FJXHVp9axW
+	05hLW4as2l6gnKKPa4TrE6+P7ikBgxcopHvogG3gdn2vcCddmQIwoIYhNqnq9gWHmQgjo7Z/bYb
+	0kXt93+d7++C/O6yoLM+6zK7CpWewGuIdCjU3cPfAgDafzb6wuSnpkYldnJA=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Date: Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
+X-Received: by 2002:a05:6808:23d4:b0:497:da7f:179e with SMTP id
+ 5614622812f47-4ad5bbd9caamr1454130b6e.38.1785243503340; Tue, 28 Jul 2026
+ 05:58:23 -0700 (PDT)
+Date: Tue, 28 Jul 2026 05:58:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a68a76f.4c659fcc.19cd90.001c.GAE@google.com>
+Subject: [syzbot] [block?] WARNING in blk_mq_alloc_tag_set
+From: syzbot <syzbot+18431bc7dccedc61778f@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+Hello,
 
-Commit 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
-correctly added queue freezing for live updates of real queue limits.
-However, nbd_set_size() is also used for capacity-only generic netlink
-updates, so the freeze is unnecessarily broad for the reported request.
+syzbot found the following issue on:
 
-When an NBD server becomes unresponsive, it leaves I/O in flight. An
-unnecessary queue freeze during a size-only reconfigure will wait forever
-for these in-flight I/Os to complete while the global genl_mutex is held,
-leading to a global generic netlink stall.
+HEAD commit:    d326f83e819c Merge tag 'net-7.2-rc5' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=129f3bde580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5c4196ba0e33631d
+dashboard link: https://syzkaller.appspot.com/bug?extid=18431bc7dccedc61778f
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
 
-A size-only reconfigure can update config->bytesize and disk capacity
-directly because the effective block size and all other queue limits stay
-unchanged.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-This patch introduces nbd_size_set() to handle size-only updates directly
-without freezing the queue or committing queue limits. Capacity-only
-generic netlink reconfiguration no longer freezes the queue, while startup
-and real block-size changes continue to use the existing frozen limits
-update via nbd_set_size().
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9359ac22935d/disk-d326f83e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c8a632e638dc/vmlinux-d326f83e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/db78e854ce3e/bzImage-d326f83e.xz
 
-Fixes: 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
-Assisted-by: Gemini:gemini-3.5-flash Gemini:gemini-3.1-pro-preview syzbot
-Reported-by: syzbot <syzbot+f272bbfbf8498ddadea5@syzkaller.appspotmail.com>
-Closes: https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
-Link: https://syzkaller.appspot.com/ai_job?id=786b3bd0-fdad-4252-9e86-7a6a35c3b756
-Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+18431bc7dccedc61778f@syzkaller.appspotmail.com
+
+blk-mq: failed to allocate request map
+------------[ cut here ]------------
+rcu_segcblist_n_cbs(&sdp->srcu_cblist)
+WARNING: kernel/rcu/srcutree.c:730 at cleanup_srcu_struct+0x369/0x470 kernel/rcu/srcutree.c:730, CPU#1: iou-wrk-11407/11411
+Modules linked in:
+CPU: 1 UID: 0 PID: 11411 Comm: iou-wrk-11407 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/10/2026
+RIP: 0010:cleanup_srcu_struct+0x369/0x470 kernel/rcu/srcutree.c:730
+Code: 7c 35 00 00 74 08 4c 89 ff e8 b3 44 89 00 49 c7 07 00 00 00 00 48 83 c4 28 5b 41 5c 41 5d 41 5e 41 5f 5d e9 34 80 65 ff cc 90 <0f> 0b 90 eb e6 90 0f 0b 90 eb e0 90 0f 0b 90 eb da 90 0f 0b 90 eb
+RSP: 0018:ffffc9001e1f7740 EFLAGS: 00010202
+RAX: 1ffffd1ffff92d11 RBX: 1ffffffff1c9f5de RCX: b62894e921e22600
+RDX: 0000000000000001 RSI: ffffffff8e4b12ee RDI: ffff888034b93e00
+RBP: ffffe8ffffc96888 R08: ffffe8ffffc96927 R09: 1ffffd1ffff92d24
+R10: dffffc0000000000 R11: fffff91ffff92d25 R12: ffff8880330a4160
+R13: 0000000000000000 R14: dffffc0000000000 R15: 0000607edad447c0
+FS:  00007f420a7846c0(0000) GS:ffff888125052000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000029000 CR3: 000000007d20d000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ blk_mq_alloc_tag_set+0xc77/0x1000 block/blk-mq.c:4928
+ ublk_ctrl_add_dev+0x903/0xbc0 drivers/block/ublk_drv.c:4797
+ ublk_ctrl_uring_cmd+0x696/0x7e0 drivers/block/ublk_drv.c:5783
+ io_uring_cmd+0x2e6/0x8b0 io_uring/uring_cmd.c:271
+ __io_issue_sqe+0x188/0x4d0 io_uring/io_uring.c:1395
+ io_issue_sqe+0x16d/0x1020 io_uring/io_uring.c:1418
+ io_wq_submit_work+0x7ab/0xc90 io_uring/io_uring.c:1534
+ io_worker_handle_work+0x72e/0x10d0 io_uring/io-wq.c:652
+ io_wq_worker+0x452/0xf10 io_uring/io-wq.c:706
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
 
 ---
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fe63f3c55..567b031ec 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -331,6 +331,27 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
- 	nsock->sent = 0;
- }
- 
-+static void nbd_size_update(struct nbd_device *nbd)
-+{
-+	struct nbd_config *config = nbd->config;
-+
-+	if (max_part)
-+		set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
-+	if (!set_capacity_and_notify(nbd->disk, config->bytesize >> 9))
-+		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
-+}
-+
-+static int nbd_size_set(struct nbd_device *nbd, loff_t bytesize)
-+{
-+	if (bytesize < 0)
-+		return -EINVAL;
-+
-+	nbd->config->bytesize = bytesize;
-+	if (nbd->pid)
-+		nbd_size_update(nbd);
-+	return 0;
-+}
-+
- static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
- {
- 	struct queue_limits lim;
-@@ -375,10 +396,7 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
- 	if (error)
- 		return error;
- 
--	if (max_part)
--		set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
--	if (!set_capacity_and_notify(nbd->disk, bytesize >> 9))
--		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
-+	nbd_size_update(nbd);
- 	return 0;
- }
- 
-@@ -2062,11 +2080,19 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
- 	if (info->attrs[NBD_ATTR_SIZE_BYTES])
- 		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
- 
--	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES])
-+	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
- 		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
-+		if (!bsize)
-+			bsize = 1u << NBD_DEF_BLKSIZE_BITS;
-+		if (blk_validate_block_size(bsize))
-+			return -EINVAL;
-+	}
- 
--	if (bytes != config->bytesize || bsize != nbd_blksize(config))
--		return nbd_set_size(nbd, bytes, bsize);
-+	if (bytes != config->bytesize || bsize != nbd_blksize(config)) {
-+		if (bsize != nbd_blksize(config))
-+			return nbd_set_size(nbd, bytes, bsize);
-+		return nbd_size_set(nbd, bytes);
-+	}
- 	return 0;
- }
- 
-
-
-base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
--- 
-See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
-You can comment on the patch as usual, syzbot will try to address
-the comments and send a new version of the patch if necessary.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
 syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
