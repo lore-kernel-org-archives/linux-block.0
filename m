@@ -1,47 +1,35 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894B43F8EB9
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EC92FFF8B;
+	Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785232653; cv=none; b=PBeblI8I1j2NTeTFXlaJQisiqHCOLEp3PZb2o7yMdAODDV/Mgu/CWV2A/rUkKN064zE+iZpRhYCORy1qUzgI4DQ9iljZX+bISXw5KOKDD77plgfbozNUbSpCFpRce6eHP4Uatawrxy6U2vTdbHJiG0xThXZMRAe899ExdhILXRY=
+	t=1785234339; cv=none; b=oMATasCK/SvEuTKQBKSJFvGN0D5Y2fYISh4CqXoG/yQYMOUBzchq0n/WhnjnQ2CwcRRh1bPAZN0o+0kkRYrIGb4drTUESEXbA6A+37wtB3AK9zuAXRmYHCBKk3uITPs/a7n//jHWw+FnYkaJDuwZPmF7D9DakkUHN02fsm0cxFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785232653; c=relaxed/simple;
-	bh=NqIa1tP6CEdR4fPrhcTsaNT80aX6rwW5GkGWrsGVdEU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r4yCou05lGpGU9rHStdsFxYYBRP+A1ObPWXhqOJdZg3/DYu3RFH/075eVdmhm5IRzqK7XQqRhOUOdjlo1Po0gtp7wLIeadfq4e8ebwY81CiNSiuG7FcdW7jahQBQrisuiAb9Kx2j525HHELLkXH/tJfOvNTYkht1xn7vYevxQI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MU65/pcE; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785234339; c=relaxed/simple;
+	bh=kcEkfz+ZCfXOsIXQnsOGf3nIuYdKTGxilPpWgHEMF58=;
+	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=r8xMayaoqULS/bsNXdXh4IWEvasFw0HMHBGFP3mB7mjO1Laov8h7MAwOdqtV6/kv0stBeDOGnWrq/5ny1MHPIwLge8cfSDQps2QGWtOhwk8krM2KL6TFefQaNb42OcAQtd2X10ogRWJKaWZCk0ZQxEC4Jx/DTx6DOOYsa/4dN18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cRqtQzUS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MU65/pcE"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785232648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tba99Tt7UimiNNcYdebhja5mXw6zYmOPg0uLJptQ66w=;
-	b=MU65/pcE9IJvcg6Agn8T0mmnwktpn4zs3vzIUESJkV0dNSOK7RBL/jTwYUHEl2sBjqwGQC
-	zcGgoM9bSnP879taiFtEy5bw4cntz0ee1wCGaoXIuFRdBDoP1iX26RKqwM2VfZZUQznI72
-	ffbHLjKhkA5/ChmueJKLiHhmtZJ1a80=
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org
-Cc: hannes@cmpxchg.org,
-	mkoutny@suse.com,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cuitao@kylinos.cn,
-	cui.tao@linux.dev
-Subject: [PATCH v4] Docs/admin-guide/cgroup-v2: document io.latency rotational vs non-rotational behavior
-Date: Tue, 28 Jul 2026 17:57:07 +0800
-Message-ID: <20260728095707.2398498-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cRqtQzUS"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 133301F000E9;
+	Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785234337;
+	bh=hJu0lR51o8IvVMj4GsYy7qbL2iP0dJ6hZ1TdUfXicZo=;
+	h=From:To:Cc:Subject:Date;
+	b=cRqtQzUSP2JpAg9qVda8W4+cWbnVJx4SMHm2bUrE1080ecz0HwcvoMsQa+/YTG0+t
+	 9hUUeULaJXAJx3OCsCcovDPCQ4qBQiCg0B+2p8RyEkgsam9PrGEuarm3waq8X4CR+R
+	 3Q2i4++NvNAByHzjUoTlAuPaF/QipU3EMYTE0cTzsGMtpcGClZ/qbNQb6/Ogz29aTM
+	 ZrBXbi9qOPc0sGH8/mE9o6HaWGJUxmRvuwsD43u6NpKDQOHNzNA/lP5w4n5yUMz/fr
+	 /AXqMJ5R4tFEGiH82GeEaiQyd/ScrpEiiqnas0brsvfqz6OVIul5FH7BcJWtst+WE8
+	 n+g7n2IC0BeVQ==
+From: "syzbot" <syzbot@kernel.org>
+To: syzkaller-bugs@googlegroups.com, Krystian Kaniewski <krystianmkaniewski@gmail.com>, "Jens Axboe" <axboe@kernel.dk>, "Josef Bacik" <josef@toxicpanda.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>, "Christoph Hellwig" <hch@lst.de>
+Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
+Subject: [PATCH] nbd: skip queue limits update for size-only reconfigure
+Message-ID: <1ec17dae-f9ac-424a-b597-b2794f157dbb@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,120 +38,110 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Date: Tue, 28 Jul 2026 10:25:37 +0000 (UTC)
 
-From: Tao Cui <cuitao@kylinos.cn>
+From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
 
-io.latency is documented only in terms of average latency and the avg_lat
-stat, which matches rotational devices.  On non-rotational devices a group
-misses its target once enough of the IOs in the window individually exceed
-it, and io.stat reports missed/total rather than avg_lat/win.
+Commit 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
+correctly added queue freezing for live updates of real queue limits.
+However, nbd_set_size() is also used for capacity-only generic netlink
+updates, so the freeze is unnecessarily broad for the reported request.
 
-Describe both cases: how a miss is detected, note that the avg_lat tuning
-guidance is rotational-only, and update the io.stat field list (mark
-avg_lat/win as rotational-only, document missed/total).
+When an NBD server becomes unresponsive, it leaves I/O in flight. An
+unnecessary queue freeze during a size-only reconfigure will wait forever
+for these in-flight I/Os to complete while the global genl_mutex is held,
+leading to a global generic netlink stall.
 
-Acked-by: Michal Koutný <mkoutny@suse.com>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+A size-only reconfigure can update config->bytesize and disk capacity
+directly because the effective block size and all other queue limits stay
+unchanged.
+
+This patch introduces nbd_size_set() to handle size-only updates directly
+without freezing the queue or committing queue limits. Capacity-only
+generic netlink reconfiguration no longer freezes the queue, while startup
+and real block-size changes continue to use the existing frozen limits
+update via nbd_set_size().
+
+Fixes: 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
+Assisted-by: Gemini:gemini-3.5-flash Gemini:gemini-3.1-pro-preview syzbot
+Reported-by: syzbot <syzbot+f272bbfbf8498ddadea5@syzkaller.appspotmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
+Link: https://syzkaller.appspot.com/ai_job?id=786b3bd0-fdad-4252-9e86-7a6a35c3b756
+Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+
 ---
-
-Changes in v4:
-- Also drop the exact threshold value from the intro paragraph, so the
-  documentation does not bind to it anywhere.  This fully matches Michal's
-  "would not bind to the exact value in the docs"; v3 had only removed it
-  from the field list.  Michal's Acked-by is retained.
-
-Changes in v3:
-- Move the missing-target note to the missed field and avoid naming the
-  exact threshold there (Michal Koutný).
-- Add Acked-by from Michal Koutný.
-
-V3: https://lore.kernel.org/r/20260718020759.2272551-1-cui.tao@linux.dev
----
- Documentation/admin-guide/cgroup-v2.rst | 50 ++++++++++++++++++-------
- 1 file changed, 36 insertions(+), 14 deletions(-)
-
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 6cd7623..04457f6 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2260,9 +2260,12 @@ IO Latency
- ~~~~~~~~~~
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index fe63f3c55..567b031ec 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -331,6 +331,27 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
+ 	nsock->sent = 0;
+ }
  
- This is a cgroup v2 controller for IO workload protection.  You provide a group
--with a latency target, and if the average latency exceeds that target the
--controller will throttle any peers that have a lower latency target than the
--protected workload.
-+with a latency target, and if the group misses its target the controller will
-+throttle any peers that have a lower latency target than the protected
-+workload.  How a miss is detected depends on the device: on rotational devices
-+the average latency over the window must exceed the target, while on
-+non-rotational devices a miss is counted once enough of the IOs in the window
-+individually exceed the target.
- 
- The limits are only applied at the peer level in the hierarchy.  This means that
- in the diagram below, only groups A, B, and C will influence each other, and
-@@ -2279,10 +2282,12 @@ So the ideal way to configure this is to set io.latency in groups A, B, and C.
- Generally you do not want to set a value lower than the latency your device
- supports.  Experiment to find the value that works best for your workload.
- Start at higher than the expected latency for your device and, with
--blkcg_debug_stats enabled, watch the avg_lat value in io.stat for your
--workload group to get an idea of the latency you see during normal operation.
--Use the avg_lat value as a basis for your real setting, setting at 10-15%
--higher than the value in io.stat.
-+blkcg_debug_stats enabled, observe io.stat for your workload group to get an
-+idea of the latency you see during normal operation.  On rotational devices,
-+use the avg_lat value as a basis for your real setting, setting it 10-15%
-+higher.  On non-rotational devices io.stat reports no average latency; set
-+the target based on your device and use the missed/total fields to verify it
-+is being met.
- 
- How IO Latency Throttling Works
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@@ -2324,19 +2329,36 @@ IO Latency Interface Files
- 	the blkcg_debug_stats module parameter is enabled (it is disabled by
- 	default).
- 
-+	The reported latency fields depend on the device.  Rotational devices
-+	report avg_lat and win; non-rotational devices report missed and total
-+	instead.  missed and total are live counters for the current window and
-+	may change between reads.
++static void nbd_size_update(struct nbd_device *nbd)
++{
++	struct nbd_config *config = nbd->config;
 +
- 	  depth
- 		This is the current queue depth for the group.
- 
- 	  avg_lat
--		This is an exponential moving average with a decay rate of 1/exp
--		bound by the sampling interval.  The decay rate interval can be
--		calculated by multiplying the win value in io.stat by the
--		corresponding number of samples based on the win value.
-+		(Rotational devices only.)  This is an exponential moving
-+		average with a decay rate of 1/exp bound by the sampling
-+		interval.  The decay rate interval can be calculated by
-+		multiplying the win value in io.stat by the corresponding number
-+		of samples based on the win value.
- 
- 	  win
--		The sampling window size in milliseconds.  This is the minimum
--		duration of time between evaluation events.  Windows only elapse
--		with IO activity.  Idle periods extend the most recent window.
-+		(Rotational devices only.)  The sampling window size in
-+		milliseconds.  This is the minimum duration of time between
-+		evaluation events.  Windows only elapse with IO activity.  Idle
-+		periods extend the most recent window.
++	if (max_part)
++		set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
++	if (!set_capacity_and_notify(nbd->disk, config->bytesize >> 9))
++		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
++}
 +
-+	  missed
-+		(Non-rotational devices only.)  The number of IOs in the
-+		current window whose latency exceeded the target.  A group is
-+		considered to be missing its target once missed reaches a
-+		certain ratio of total.
++static int nbd_size_set(struct nbd_device *nbd, loff_t bytesize)
++{
++	if (bytesize < 0)
++		return -EINVAL;
 +
-+	  total
-+		(Non-rotational devices only.)  The total number of IOs
-+		accounted in the current window.
++	nbd->config->bytesize = bytesize;
++	if (nbd->pid)
++		nbd_size_update(nbd);
++	return 0;
++}
++
+ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
+ {
+ 	struct queue_limits lim;
+@@ -375,10 +396,7 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
+ 	if (error)
+ 		return error;
  
- IO Priority
- ~~~~~~~~~~~
+-	if (max_part)
+-		set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
+-	if (!set_capacity_and_notify(nbd->disk, bytesize >> 9))
+-		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
++	nbd_size_update(nbd);
+ 	return 0;
+ }
+ 
+@@ -2062,11 +2080,19 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
+ 	if (info->attrs[NBD_ATTR_SIZE_BYTES])
+ 		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
+ 
+-	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES])
++	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
+ 		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
++		if (!bsize)
++			bsize = 1u << NBD_DEF_BLKSIZE_BITS;
++		if (blk_validate_block_size(bsize))
++			return -EINVAL;
++	}
+ 
+-	if (bytes != config->bytesize || bsize != nbd_blksize(config))
+-		return nbd_set_size(nbd, bytes, bsize);
++	if (bytes != config->bytesize || bsize != nbd_blksize(config)) {
++		if (bsize != nbd_blksize(config))
++			return nbd_set_size(nbd, bytes, bsize);
++		return nbd_size_set(nbd, bytes);
++	}
+ 	return 0;
+ }
+ 
+
+
+base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
 -- 
-2.43.0
-
+See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
+You can comment on the patch as usual, syzbot will try to address
+the comments and send a new version of the patch if necessary.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
