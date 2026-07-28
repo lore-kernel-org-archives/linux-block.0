@@ -1,80 +1,80 @@
 Received: from mail-ej2-f0.google.com (mail-ej2-f0.google.com [74.125.228.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9833741B8E4
-	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ED040DB3F
+	for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 09:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.128
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785229638; cv=pass; b=lZnWXoWyjt/FxRUyXp8rsEEnVDdeTLNqT6TXoz7JlrBlBvqw3h/0gelOqOJ8Tm8z9EMRk5Qj5WhuhI2ujL1NdrqkagqWRVKRusK9Vsq57QxC6B4Hm8qjguNhIYV4mpAKeWhcZpa5p3M6UXNBZMqlLW3tXhzfiKQgvyekmHCdhVQ=
+	t=1785229761; cv=pass; b=Zguv4O6IrTJj45a4pWqXy1ofIKMe0ZWmFPN3GnJhAfmQhT/2Z8d3IRZfeLlMryfl7zjJFujV9bjmwoK9Wvna9JGZ5O95V10MdBT+F6VpZQyFs8l7XPg8IAKzB2R0JIVQp9Rt+3g8glzMxmtXCLFAgL62WcQFRg8H7iTGcm003oY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785229638; c=relaxed/simple;
-	bh=BzkmVaQlvoaPSg4R5e0sey1WW53XOeb6fyPbVfEuu8w=;
+	s=arc-20240116; t=1785229761; c=relaxed/simple;
+	bh=7u0w9JMgfd9pCEcqnNs9Zp3pgDXhxuyxNH/nd1QEvdw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TpwB6HK1C/V6VfUl8JgNxmVl3jeZn877npijkk9SD75DgxDe/ReUf2YaXBsWjc7R1UzqTW0dyodMABwKIdpWz2wrJ72ZM2W20d6VfHS4HOuoK2D+xdRHZFdzJqmDqOsIAQv+uUMiG2RAWaszWW457yf4KYcbFykdR85TswhYn9M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B8UGApZr; arc=pass smtp.client-ip=74.125.228.128
+	 To:Cc:Content-Type; b=rEq+n8619DgY/++XpaWvK/JRC2Uqfp9ZTO4VioSgM1vLX0HFvQfdcp7iHlwWkzXDabaonzHH5EMa96/uZ5K3cP42wGOrsPK0qqCG2BO2RFhaICrL3NhgKz8lqqbizN7KeRw+qXpZM7xbefVDgLLoCsQQgKC5XrR72EtIRUBvqVc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z5bCVjC6; arc=pass smtp.client-ip=74.125.228.128
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B8UGApZr"
-Received: by mail-ej2-f0.google.com with SMTP id a640c23a62f3a-c1c28af7b68so49448966b.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:07:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785229635; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5bCVjC6"
+Received: by mail-ej2-f0.google.com with SMTP id a640c23a62f3a-c166aef4f02so225381966b.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 02:09:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785229758; cv=none;
         d=google.com; s=arc-20260327;
-        b=MxTu5DhrMY1u0TUwBMCW7AzXltDwoaSYbO3ZRu2IBI3oljQ1AlF7zOYIMnuwoffe4z
-         rIzKj72jRHmHUjGFJD9yelYDjCeETZvw0MI9QVknjrHuaoBYcOMtu4ofvx2ZgRpV5M6L
-         TeaU6LJbjvVNegyBsjvzm1TzQ+aMpdgiPCaqvcVLI7eMM97LpTJaRdfg00XXiCDE+Sgd
-         RQJHcU5rDSRghyRRyhEQ50Owy+nMlxB4E3PuxgKJAc2NusIzGGSaVOwtRu369EG1OOH8
-         p8GorWLxQpWdNx9koPeYg+q7em+Ihy9UFKMjWt9V00QbF/d+znEMBkmsLiaMqYRByzMH
-         QYOw==
+        b=rDwLXSkkB82qCdA2W9hPkaLHd2KMEJd5KjzYnRnoK3nTNju1M+dEQ1gRzUQ4j/W/5w
+         wcKMxQWGtZ7sTiJhOO2Wv2IH8jbNZeqy2UfI1O5IjNHrN8rdsJtplcRsmF39S3zbbNbS
+         7/NgChhDhoj9RnQVRClnWJCn296rIDCnh6x8ei2a3/wSXUN4qJgVdGtSNd+fOdn88m0L
+         XBi4BZnVvqHMAra/lUMoGH25WdHRMbpfXRvXx8inp+Rkw04IbjICgD89PfeG28RlPRal
+         jYc0WV/y8odLuRkuWiY97B2E1oWxdKt513B2tswV0XS6J0oZ6sqdnwFvYsyTuFgVHz42
+         ySIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=lwoHhkNHWjMmK3fIidaZwkzYoYsP+0pbejgNyK7X5ao=;
-        fh=jduQmgjBzVdayYGDz/tKSbCD3GM4dJOn7Se0tlR7xhk=;
-        b=pzE3VpxAhcqmHwdN7tAIQbPE9eieCb3JR4VInl//udq26lQORbUDVFHyhxgSobgaqm
-         2nidV7QM2pcuc+/imbGUwz3N/+c7Ua8710rLxdsy0RvjP4z2KDd4a4OoXch1uuCxYExH
-         3BoYdt7u/xtwRIKx5KZ5At2P3ldfPIQEMJEWREnJPYwA0h3mpYed/xUmJZnMOz9eljUT
-         qRzKPKi8zqKdjEwpMN5AUsMRsxxflvuwT0InaPzXQsk9gWZv09jcNm4KrBxFASbG20KD
-         Oqyd/BFIs3u3so75AsgDlwOmLQlp8jaNOvaAhn3nfOU/mjl4yU7kvBoizeTtzR32PWRy
-         bBbw==;
+        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
+        fh=rQ9yW9hQmWyMNpWKPtMN5sYEDBNv6StfpXfjrLZC5NA=;
+        b=rIQq85pyAQXiyqM9uZN51mkQUy5XwSSxttWNfxzVvVK6aREKu1+RpyvdWJlZcaFDiD
+         WvrBhlNGFn/Hd6Vc64WbM6izsgPktWDfSiGBLDkAxGGSmZFGjuP5pPxiB1YsfgdIYFPR
+         ygNpovbJA6iDcNwb0I1CG3IOa2aGtZy7Ducoag8OoqTUXGDR9XqiUQVJaSg0PYVAua9B
+         UJH4QRY1Ll/XhtSUTbZvZzHdcKwPyNhwHTV5cJYjcQUW6VbZNwXExNDOtf9qCg5WRZ3/
+         KX8yr0ofO3sZcComRsYH7n5ASofUwfnPJgKHbNYpd2r1mXH0mXaQuCe7fkpYC4/31lyQ
+         ryqQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785229635; x=1785834435; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785229758; x=1785834558; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=lwoHhkNHWjMmK3fIidaZwkzYoYsP+0pbejgNyK7X5ao=;
-        b=B8UGApZrzBCFRPTyD4tPkNXXgNqi7ijG5CXMAg6bUbxU+DUNKT8vZUA4Bbyp1b82Dj
-         s7eyxc1i4ECR+S/ao5PFCSTpzMBiz/HdqLV67ih54p8ot1q1ms1FVXq6URluDlIPkQIA
-         I248cNE8aPT5APZ6q2XtJay/5k579FfvfVNDmihPZcTGYJUDLZqurrblTijf8tyhO+iN
-         pzW8vBg/+ha43PdoGXeSY+4JAnIMz3AXMv+Y+A2cXRQ95Y7kHH7q/HE2dbiZDIKXNUGv
-         sXrrqUKhfFYwf/mhGOBA5DXpn42Y6MolOueL9k1ap8IaVIXdm0cpG+Ym9B4kUydfp8xO
-         aXDA==
+        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
+        b=Z5bCVjC6HQAJBQ9dt7WkKe7gLa+nAr5SNUrHoomD8ScMiVdE/2bCOaktT8how7YQyk
+         TZLwQbWqj3KWgdycel8MvNSkeiUsUZ7oUtyRPyEsQyg335c98XYU9O8q88X30v4eV9Fd
+         iFjpupGZda1A/c2b/gkWoTIZ9qf9oU6rzMXeiNxXiIHpacIVo5czh6SmcfbsiN27OBpQ
+         //xBKLegiKvlJRa4f43NxDEykcTMgHY0xqt6AZ/uBdUyuxzMoNLpgwxNQG7X4PuGMOmV
+         yv76yuuOeW3mtyd0el3MzFCashXQHal4Y+wTE4ftYI4cwFOPSVGw3YZI7zCn4wJC8WRZ
+         xmNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785229635; x=1785834435;
+        d=1e100.net; s=20251104; t=1785229758; x=1785834558;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=lwoHhkNHWjMmK3fIidaZwkzYoYsP+0pbejgNyK7X5ao=;
-        b=IcabjF7ui4ET3wdW7KMws7cELEJdFxXfJZnJ6qwUCwc6GeKP2NLk1KvfRKq5gDUZ4L
-         uPh9l8rPHW3t0ythsLTwrZX6/dPr6H9dCRqypG0xZyROT+M9jrP74XMUEWaRxG1wQnBO
-         dYkkhnMs5O34+C8PPkTsxEmgLBCtEoynNNDYu2mQjP+i5hktIKnfo7nUqLN/WhZ0jCy+
-         Oxw/sbsTqQNj5Ms3XsjrfH4eC/t0/XA+Jbp+YVQF5YcPkAeWAtdKkCF9R4hcR75JUpFO
-         nZPK1aZNpJEWNT5NUzDtZtSRwu+fcAZPotAmT+vR0CgzNln2XTLlykNqE6jqcNj+qIuC
-         DT9g==
-X-Forwarded-Encrypted: i=1; AHgh+RovHO86IKDhruVX7aN9VmFgMDByYKwlrNKfPpruUDhlLG8qTIcB93dNUsVNbZJoNzFW7vsNb7O5MlvTgg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb3Ec/8i4bo/PpthRebovUaOqjaNm/hBlJuFzaQRnKRFxVqwJ5
-	+302tmA3pDy/j/NsMBHxioOcXJ+AdK1msG+Hypas+4OM2zV/Y3AG8Fn11PYNJN6gYYtogA0qNkN
-	rfu4FiL5E1JhWc7cufQXaYvvoqDH1oI8=
-X-Gm-Gg: AR+sD11QmqxdD31ZK/78WjyFKBUuFsLFWFbDNPcwt+6JERJ+mXBfBJnGvF4et2FFQvZ
-	o6ZMMqiuRdBrU3Nt2Mp1QQ490Sfuay5W4kJarpBrDGhyk8b8c5bmtSEzLPPXLX5yVP8SDKj/cgu
-	WH2OEjspXGCB3V42qevMP1VRIg2rvtv/E2hds9oLRtEDNessJEJ/WGRNfCzyhrSTYLrtXbGGdhB
-	Jwk6YOaX3IAAK9cvbRaIb4IEyhGxtHkWxZhfiLA0qklY5QJJSuo6hDE5XoqcRA=
-X-Received: by 2002:a17:907:7a89:b0:c1f:6539:3cac with SMTP id
- a640c23a62f3a-c1f71ca3465mr76349966b.12.1785229634516; Tue, 28 Jul 2026
- 02:07:14 -0700 (PDT)
+        bh=AAhm5OULc+8iEzNqpaSE/brnzZbvAo50kBAobxfR7Mw=;
+        b=JChhPS1lVfhPhEYtNild/3j8eFaF+LcxWVnXtHYoWSjVt1KYuMP03jtwCoA0aZXnNo
+         neBLRz3F183zcLfy0+HV9J8cKACon9aIlBuChJQD2gWhqwVbmWEY3yFITtlMQBBoIypO
+         ZBue9S8wRYxcZDYIEBXq5Eg2a7TatuceD4d/fZispe9FFgfWaOfUyqBweTaqLch+CH1b
+         mnFft54LbOCedT+dksfAhMxHfpwfGzNvozDi7+EeMmahhNXC4se9+RlpjACL5JSNNYWy
+         EjtKKplCxVJjV7u4uhk2Os7SjO2OLwsM8fcp+Lc711K7selNAUDiy4Q0IVGxHzPqjt/H
+         bi4w==
+X-Forwarded-Encrypted: i=1; AHgh+Rrttkx6AXsaeVpNX49MXfGozkfkeagOWY+qF6LlIv7N7LCFiMnRyRpQLgrGen8pVhMi+rHX6a5i9b83YQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZKRCOns8/W6lxr9G9IyvEjp4Bk/aouFlXpuDLbAgz/ojfq4PI
+	L2CImLG/Kkw588jSpLwnd6g8zgCQAz+BPUr+EYRfmU2/VLYwGPUwuYgDLtusSsQUprmyJIpx/vr
+	wei3gNiLJL8lH5ek02eVKG55LGBCSH1k=
+X-Gm-Gg: AR+sD11NYKV1/04dijNikZ/NXqP+mCYoh6DizlQj/ufCujmDTA6QWd8YXqkAgCNTFfh
+	fwHevq6lKOkyhRRyANuQxUUthCALr1GGHU9oJUPpQfLYhrQCgB6K62979ug6XGmLLkYR62Za7nT
+	DGE9ciSjaCQQwayeKgYn7OqbVVV2MCBZDMAhlheTZ0sd/KXtsC9ZyV4XhpGsX7GEe4l4oTPfWQw
+	SRsbOjh6NNORwEm1wzPS/EYKDc3FLwylG7nbYGePflLGptqC+HMlP6Z9LWkcaQ=
+X-Received: by 2002:a17:907:1b1f:b0:c16:8404:4631 with SMTP id
+ a640c23a62f3a-c1f720fddbbmr76680966b.26.1785229758194; Tue, 28 Jul 2026
+ 02:09:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,13 +82,12 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260627070216.13511-2-haoqinhuang7@gmail.com> <amL1-Q-HGLJj16rG@google.com>
- <CAEjiKSknejc9biofmnJu_3xamZj8kuvbxiPuKp6phQJdGwQPCQ@mail.gmail.com> <amgB3pPhKEmFkMEQ@google.com>
-In-Reply-To: <amgB3pPhKEmFkMEQ@google.com>
+ <20260627070216.13511-2-haoqinhuang7@gmail.com> <amgE5z5QEYa5258-@google.com>
+In-Reply-To: <amgE5z5QEYa5258-@google.com>
 From: haoqin huang <haoqinhuang7@gmail.com>
-Date: Tue, 28 Jul 2026 17:07:03 +0800
-X-Gm-Features: AUfX_mx0pjIBAsoVkv4saK4NSXbSdxJsHGr2GmiDvL7l9y0ixXCDEbKN8E8OiBE
-Message-ID: <CAEjiKSkZp_EL5j7=fYWfp+p8FPOQKeT8v6-Bzfe44vwaGgkHyw@mail.gmail.com>
+Date: Tue, 28 Jul 2026 17:09:06 +0800
+X-Gm-Features: AUfX_myDyieNySLdz0XlujHur2PjroAeYZyBEI3F3bupTTh5ZGiK3shMAfIo11U
+Message-ID: <CAEjiKS=SOTQFC4PrsV2VHkP9z3NxceuhUQavtvd7ZaZytWGDPQ@mail.gmail.com>
 Subject: Re: [PATCH 2/3] zram: add per-backend capability flags and validate
  parameters early
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -99,75 +98,41 @@ Cc: minchan@kernel.org, axboe@kernel.dk, terrelln@fb.com, dsterba@suse.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 28, 2026 at 9:19=E2=80=AFAM Sergey Senozhatsky
+On Tue, Jul 28, 2026 at 9:27=E2=80=AFAM Sergey Senozhatsky
 <senozhatsky@chromium.org> wrote:
 >
-> On (26/07/28 00:50), haoqin huang wrote:
-> > On Fri, Jul 24, 2026 at 1:28=E2=80=AFPM Sergey Senozhatsky
-> > <senozhatsky@chromium.org> wrote:
-> > >
-> > > On (26/06/27 15:02), Haoqin Huang wrote:
-> > > > Writing dict or level parameters for algorithms that don't support
-> > > > them was silently accepted but had no effect.  Out-of-range levels
-> > > > were silently clamped by the underlying library.  Dict read failure=
-s
-> > > > always lost the real error from kernel_read_file_from_path().
-> > > >
-> > > > Add caps, level_min and level_max to zcomp_ops and validate
-> > > > user-supplied parameters in algorithm_params_store() before storing=
-,
-> > > > giving immediate error feedback. Also fix comp_params_store() to
-> > > > read the new dict into a temporary buffer before resetting old
-> > > > parameters, making the update atomic.
-> > >
-> > > I probably would prefer not to add this.  Again, zram setup is almost
-> > > always automated, you figure out what you need to put into your init
-> > > script once and you never touch it again.
-> > >
-> >
-> > That's a fair point. The sysfs validation is admittedly defensive.
-> >
-> > My thinking was just that without any feedback, a misconfiguration can
-> > be hard to notice. For instance:
-> >
-> >  algo=3Dlzo dict=3D/data/dict    -> setup_params() silently discards it
-> >  algo=3Ddeflate dict=3D/data/dict -> same, silently ignored
-> >  algo=3Dzstd level=3D999         -> silently clamped to 22 by the libra=
-ry
-> >
-> > All of these succeed without a peep -- not a crash, but also no
-> > indication that anything was wrong.
+> On (26/06/27 15:02), Haoqin Huang wrote:
+> [..]
 >
-> We were thinking about moving from zcomp to crypto API acomp.  So I'm
-> not sure if we want to invest a lot of time into zcomp.  If you want
-> to have it then I'd ask to split caps and kernel_read_file_from_path()
-> zero i_size check into separate patches.  We also probably want some
-> pr_err() on failed validation, because just returning -EINVAL doesn't
-> explain the error and doesn't help the (supposedly) clueless user
-> who attempts to configure zram by throwing random numbers at it.
+> > diff --git a/include/linux/zstd_lib.h b/include/linux/zstd_lib.h
+> > index e295d4125dde..f4b26844e53a 100644
+> > --- a/include/linux/zstd_lib.h
+> > +++ b/include/linux/zstd_lib.h
+> > @@ -1241,6 +1241,7 @@ ZSTDLIB_API size_t ZSTD_sizeof_DDict(const ZSTD_D=
+Dict* ddict);
+> >  #define ZSTD_SEARCHLOG_MIN        1
+> >  #define ZSTD_MINMATCH_MAX         7   /* only for ZSTD_fast, other str=
+ategies are limited to 6 */
+> >  #define ZSTD_MINMATCH_MIN         3   /* only for ZSTD_btopt+, faster =
+strategies are limited to 4 */
+> > +#define ZSTD_MAX_CLEVEL              22
+> >  #define ZSTD_TARGETLENGTH_MAX    ZSTD_BLOCKSIZE_MAX
+> >  #define ZSTD_TARGETLENGTH_MIN     0   /* note : comparing this constan=
+t to an unsigned results in a tautological test */
+> >  #define ZSTD_STRATEGY_MIN        ZSTD_fast
+> > diff --git a/lib/zstd/compress/clevels.h b/lib/zstd/compress/clevels.h
+> > index 6ab8be6532ef..db3b275b502e 100644
+> > --- a/lib/zstd/compress/clevels.h
+> > +++ b/lib/zstd/compress/clevels.h
+> > @@ -17,7 +17,6 @@
+> >
+> >  /*-=3D=3D=3D=3D=3D  Pre-defined compression levels  =3D=3D=3D=3D=3D-*/
+> >
+> > -#define ZSTD_MAX_CLEVEL     22
+> >
+> >  __attribute__((__unused__))
 >
+> I think the zstd part wants to be a separate patch as well.
 
-Sounds good.  I'll add pr_err() on validation failures in the caps
-patch and post v2 with the split series.
-
-> > > The 0 i_size for CD-dict is something that simply should not happen.
-> > > If you insist on handling that then we can replace "sz < 0" with "sz =
-<=3D 0",
-> > > but that 0 len dictionary case is something purely theoretical.
-> >
-> > That's fine, I'll use sz <=3D 0 in v2.
-> >
-> > Anyway, let me split the original patch so the non-controversial part
-> > stands on its own:
-> >
-> >   [2/3] zram: make dict update in comp_params_store() atomic
-> >
-> >     Move comp_params_reset() after kernel_read_file_from_path(), so an
-> >     I/O error doesn't leave the old dict freed with nothing to replace
-> >     it.  Also preserve the actual error code.
-> >
-> >   [3/3] zram: add per-backend caps and validate parameters early
-> >
-> >     Optional -- happy to drop if you still feel it's unnecessary.
->
-> Sounds good.
+Agreed, I've split it into a standalone patch in v2:
+  [3/5] zstd: move ZSTD_MAX_CLEVEL to zstd_lib.h
