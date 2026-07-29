@@ -1,81 +1,81 @@
-Received: from mail-ed2-f0.google.com (mail-ed2-f0.google.com [74.125.228.64])
+Received: from mail-ej2-f2.google.com (mail-ej2-f2.google.com [74.125.228.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2EF2E738C
-	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 04:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49009285CAE
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 04:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.130
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785299140; cv=pass; b=tASEj+AaPy1uPDzXQXM1nSN5P+00wA5Xro+W8ZK+R9KNmYub+anu06FZrh+wH7KKibQk/te8b5sPzOvraox/jrb/1SSsCOa+6ywuj9yU5ldqmocMC8npqMwq1CwZqTSeTnQMtXsts39+9s2E0hrnYYzcAvpRM0rS4HR8srPe1KQ=
+	t=1785299575; cv=pass; b=gBLnqeTXjQL87pS+BRnR3zyCpjqB/rlZInDXEO/fuGd4AkYpgs4MD0R+C6war6WMTYiV+0Z2mmZoJGgVFb2WGcbGyxSwuyUrNiTsaz3UE9wzvx+EyopmJjyS9upAHZpgoAbuYT8L0CACSu64yj/FjVgHnPpnEwu+WjTv5gDpwIk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785299140; c=relaxed/simple;
-	bh=8SgI6SWa6CcPUq4s/IHE4WKcXu0Y0JOx4DOCGfadhSk=;
+	s=arc-20240116; t=1785299575; c=relaxed/simple;
+	bh=NCDu57/OAk0Skqrrys9FPJEDDMrY+lWRuumooiW8V24=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ovqb+Aa15Gt96RYcPbRVYBHzypSJDaWJxVuPQESwV3RyNTr8/OLGq+ZKnVd3LZ8ZRJo+95JpOzfroYmmV6DlJ5K92qRkrmINwHPER3URB2UQ9UqDsspIx/Wm9PDnH0BhRhSkwmvwi6Xxgd4oJg74DGUabO1VKuuIZgM/RX0nOOc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POBq/QRi; arc=pass smtp.client-ip=74.125.228.64
+	 To:Cc:Content-Type; b=G4kre+sHsSV0cFD9e0W2FrVx3JvTNFQ41IOk0zWLCXot9sswQdK0n0tlxwB5t+yrr/NqXowkNwGKbxp4Cs/WfWVQ2PtPe3mQE3VN+CWPv1L169tU5IgieXtBXtBTL87IH0kVlkUhDH8EceXvz41raZrsKz/jqdVQqb0/OTkfOs8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IK1I815W; arc=pass smtp.client-ip=74.125.228.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POBq/QRi"
-Received: by mail-ed2-f0.google.com with SMTP id 4fb4d7f45d1cf-698447ea5aeso182697a12.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 21:25:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785299137; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IK1I815W"
+Received: by mail-ej2-f2.google.com with SMTP id a640c23a62f3a-c159467cca6so16021166b.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2026 21:32:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785299572; cv=none;
         d=google.com; s=arc-20260327;
-        b=DY8ILDS7k0E56SF6B1+gkKB7vyRx46Gk0CtM+cSKC2e/8Afonhu515cKJM4rqSx4/k
-         XVvgBidRN+eNOKdNqE528UZekyoRiSwyfOFnoAYEgAgXpFkXT+/JCQ/vRKcUx/D1+HrI
-         dewSX+ANWgr0rS7lCcBHbEcBDHga/XZLL/qnm6l9cHZbJZJ1/Mhz2mXvh5ZW3B0BBVNz
-         l+xoXxqmozlnakXqlxwKXnQavB8eMkkjAwrTIOjH3DaIONtv2awTFAXRRwfgFtHzJlKK
-         c9mMko8dv1y/xA7bDrYt8PkicgqqMBymXDSoilcDnud66S/p52d+WJwZqACpOa9sV34c
-         e8XA==
+        b=qz/sQF5umURjz3lYulffFxMSAtdnZgXeAdCoKLeL6msiqG6HmeR6luKKOI7ua1OIP2
+         1UYh0BxNIQXBFk5J8H+nt62oMRehvCzp1xcmrmonqn0WIGvdbgP15KQJLBAkmIfV0A6g
+         9tsTHONrEe/0/sVKGU8LEG6vkelcEZu9yZLJJiTFvmx+BkHsR2Cx3jpks4Kj2LyBXk5R
+         vIKNtAS0vHpElv6M0KdVVj9/EBxKDkpFy7So5wjjVn4foqm3vcRSz8uqDWimJIueVjgn
+         ElVd1QtSbj6q/NlKkoE7XmIWnJr7T7b/v+u8nEM8OTwl6V5Xv27x0xNaoItMw3HWUcnz
+         sllA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=a9DT/U37lv32n95vDYPp+7XoaPzW0M/vlvn0D07QY/M=;
-        fh=BafWhCzNvtfW9sj/Qx2CKjQk+fuEK3toMlQQK/HBvFs=;
-        b=efM0Ihgt9i5bXpELkhTp7qGgF3xHMxkYhacaZ/+PreDlidDMXloMYXcy9pN2ioXFVn
-         oChY11tXFDVaOrmsit2ztdeZ9uyM+cDRRG+QLExm8Fgv2Z9AqicPhoCiBFM89Ht56Y4h
-         9HoZu9RICCGBTTvIVE6xeKAHas2UFJVJNvq90TSkfh+9MB0c3hSxFqpYTgr4ngObrB8+
-         vStMmqGwRY9wpQpnV52jS7xNCK9RoEGV/cF4m9Nu1yA03p2eOJyRCjAp64PEcLpHb0rQ
-         5EjRDaZlQqi/WQtCP43Eahyvs0t6ZJ6VD6i6UnHdse35qq4zYbujcwU86q0SiLmaHB72
-         VXOw==;
+        bh=ThKr9LA3UdkIRwXYmipZ/MXcVOpNhwe8tyVr42slfkk=;
+        fh=ZyCyIYxGu6fdUQx19J2mYZ4uLtsfbHDScJEtabAgUpY=;
+        b=pzoZTw1X2BJwtX1LzqNyjraZVugXU+/bw90dZKwoquhBORdWFTR1nfEIIAvM6gBvN1
+         iXpfxA7oinL8Ve53V2FddJ2RHbYeKjAVib8+gGIH8RAeFrX3LsENH6DrEIMNt4z+LJQg
+         bQCvYmvGMMWI5Ocl3xYtr5MV34xE9bvPl9YvntCQkrT7ynTgoRwqw+MIMq/NNRFMIh6q
+         4Qc2dc5s4JpSwkGouvuTpUXUa2EK35yoO1aukElocpGJa9HWXhRI7a1T2svX0h9yZ+6/
+         IawSGxMJT9yQ+0uoDIRcPULN1adVEHXzIAWYclNxin+ts6OYIE0uvUlgIu2Gl2H320xC
+         mdpg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785299137; x=1785903937; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785299572; x=1785904372; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=a9DT/U37lv32n95vDYPp+7XoaPzW0M/vlvn0D07QY/M=;
-        b=POBq/QRizFzBWhwwH7NQT4xvRm9yF7quM8Wae0yd/ejg/LEgu7FFdZOtF72PnBiVER
-         G42Of5VAGVJxOGwtDfM5fmJfoj4cKh/iN2jmvLjcicRVZgRjnzFAWxwY0+s3u9yj+4jw
-         ue1PTbnREu1pkudSK8OC0bRYOBbZm3HLDa7uw3NE4JmoSApk/NBIjIMfFvqTV/c8jvaf
-         /XDsusMsRvfTNRM9io22PnFsU+e/Cjpsqv8cJAGYoSlPcoVNITKk0HQ6Afvuk/+XtKom
-         onj40cXBKlxeFK6bbspjUAmGewYdfWLVR+R/3xwF0+k281kFj9kLSbcFKwsP33XrXeD4
-         SZtg==
+        bh=ThKr9LA3UdkIRwXYmipZ/MXcVOpNhwe8tyVr42slfkk=;
+        b=IK1I815WcF0f4UCs5P8Az6nLeeNwuR16p6LkZoqGE4e/BYrARY2TMsokkLM65jSfnA
+         MAOCrs5EvRDKIU4tViNB7W1ghp66hR+d22vbDZ1vlpoOkbKipSQUaufr/WeKwVhnDk4o
+         4Kc0q4F/fQwo8r57Si9op2sfkVtM3RJUod1BSw+M+BC1i6QEem712hnswL9jbbj48NFM
+         cry3IjMDzx/QIh9SfNidxMj1UoSj2ZXX3Uoyb983//g85Z9RCsYCeHLg44uOtlzT0tEy
+         WqE2YMn5FpWT3z4ImTKmEs3YDCYHTEv5SAJ6hIufDjelGY6tB1zj67Vs1NIWjOKDrWdu
+         5UsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785299137; x=1785903937;
+        d=1e100.net; s=20251104; t=1785299572; x=1785904372;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=a9DT/U37lv32n95vDYPp+7XoaPzW0M/vlvn0D07QY/M=;
-        b=CflO3sskXbfEX/S5EwIUzeC6ueOA+trsVPUN5ub7rgRVwx5kyNIIiWhswzA9L3ZSUP
-         EBgKSlce05BfcCziCaTPWy/PYGO+QrsZdzisXgfjw9ygG6bLuGGICMIOwuVueojJWV7q
-         j3iANoNTUN1k4/W/zk/6py3Womj4RGRsabjzsNtJDtYh8TATSRehLvB+Rr1vdUkl9Grk
-         U/EPupQmVaxSTWmkzAashSc/h6kW7eRolG5qKiGNQJFU7kTB9UZydXdNz7BUDH9Lm/LZ
-         YNDM//GXK5s72drmBT39iYI7L/pMLi2WLOyj/c+xT0C+GBF5SpkOhABAVSjtwuQtuSTY
-         BYOQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpbvAk6RzxgTDE+8cZ6T9YDyi4FwUfi9yiJ7Yt8ixEHGrZvuDJgulMwal03E6YKzW2t66MilwXGApiATA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtHymAPooJ9yjA4WfixWwr5Q3egYcejqrnI2d+R73f/WNAIGlz
-	5xjHfCegVFra70jzQLLxCbBUq8Mv32cvcleBrq5dCXIg8vUhtsvT1Opdkb6NlyCPn6B/oHPLIik
-	QX6VurMvOD+I9AGvVwREmgrH1RiYUZ8Q=
-X-Gm-Gg: AR+sD11+3E0umEXhl09MzRfij0LSkbmS2tA2OkWW72c+g7Ob1YAzyn7GJHqUZImHpma
-	nM8jxPrxq7e9xeucqEmaIPYY7ni3B7QfpjNFH8bTrCrDFn/1HQDB3qZLuE4JOKKLOiBD6mXjH4Z
-	atT6eX6aE5KAOc93SRJ3arA7gVEC28bGmezSyCw3ULy68hY0I0oqkyqXgMRxI/k4UaeywwNKhl9
-	wV7rGutm5KVBnaVk6AlGc6AWMiRmKwyXIKuZQ2Q4Q/kzhZBlFxI/t8gG4SbbxEktKH3QVtm4CTh
-	eoS9ripwDyrNvTZLd8buXv3xre/qheRIo3lmg74WKI80jQ==
-X-Received: by 2002:a17:907:94d5:b0:c12:86a5:3ada with SMTP id
- a640c23a62f3a-c1f72142f16mr296693466b.36.1785299137194; Tue, 28 Jul 2026
- 21:25:37 -0700 (PDT)
+        bh=ThKr9LA3UdkIRwXYmipZ/MXcVOpNhwe8tyVr42slfkk=;
+        b=fnVPoEWl2+p4bN4bOY7EI8dP3GB+WKAowTY1Hrwgvv+hSCCEEtX7jidLfTlBtrjdzR
+         7l1l/GiEraT6AS5MNVHx2iQqmhqQhMcUtYtkximVL6JgB/se2uSuCHJ0lAdMQogxySd2
+         EdWR1w9OFl01YyOYmutssippR7j8LVjzUNN6lR6W9zY8yYOSGDZW4lcFHPHOUU4ha45l
+         BVI6z8lVaUsaQlTrkM4lYK1ag2hnQNuI7WPJ+DmlJlQK35sc54xjSlT+6BuM1PLp4f2S
+         3S848cvHy8S/78m6LNoAFkgm6FBuy4FaUHJChw66U/Lq6fYCgwlJPRqRZNF9e7v4CcrF
+         GWeQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rr0LTXNPRryRHildenV91AkVUNfOcl8DPtN3GowzsqSNenQQxbADO6MeBrJ5fcy5FCEl/PH0nfNwO1XSQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6ZxYBY85RFedRJHjYuOSZF8PaYkrHGWtffZAyF0zSUZQ1bgnI
+	+5eh+GA0oQHSgNO8whTZNEBBt9PPp2e7RY32QIt9Icjg2zSi5dkUii4hmwC9Y62vsRdf+gb8ba9
+	bhlOqQItxtaaMvd88XzZPVVqPNQ58iOY=
+X-Gm-Gg: AR+sD12Pqltodkc5hNUzoohp1SBTthHLV8K5bWS0ZDb+GtW6tqIWKl2/jOsf0fSdZn+
+	6svog0T9fjsUjFzmcN+v1UUlq5iEPQjVJ8zNvuS66pCZi/U2OP04HnDVwnVWkFyFcFCq5JRZpF0
+	ek/vGCTfFQxao3oHFPLR6YoeGJkeaAtoPvZttycXJGMdRDN8aNdDIrOXcCv5Vg3W6wBI1iakJO0
+	fjFP8huV/ijv7DDQNYsxcX0hAJUHA2hwCO++AcF/gsuIcqghHyh5utLFNfw8S3tHrizkuvnZGkY
+	SDudpOt+HTrJtSpmKme2F6cCZPGQOspkqNsxT+cYa60QEx1v6a+Uj4RN
+X-Received: by 2002:a17:907:a684:b0:c16:5cdb:9f89 with SMTP id
+ a640c23a62f3a-c1f724ea507mr262299966b.64.1785299572277; Tue, 28 Jul 2026
+ 21:32:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,15 +83,15 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260627070216.13511-1-haoqinhuang7@gmail.com>
- <20260728092935.31139-1-haoqinhuang7@gmail.com> <20260728092935.31139-2-haoqinhuang7@gmail.com>
- <amlk3lqSbtfEOkbs@google.com> <CAEjiKSm_q1X4O9H44raKYYo8WQRxNRBUN4VFi7+-JW_JkWkbVw@mail.gmail.com>
- <aml9GPvZ3lUdnd6I@google.com>
-In-Reply-To: <aml9GPvZ3lUdnd6I@google.com>
+ <20260728092935.31139-1-haoqinhuang7@gmail.com> <20260728092935.31139-3-haoqinhuang7@gmail.com>
+ <amltU9PgLGZYCD-1@google.com> <CAEjiKSkotZQAwUGgAggpS0Ar8Ewo5suB1kDssDK7jw=1w7xDoQ@mail.gmail.com>
+ <aml_aEB6BDBqgIRH@google.com>
+In-Reply-To: <aml_aEB6BDBqgIRH@google.com>
 From: haoqin huang <haoqinhuang7@gmail.com>
-Date: Wed, 29 Jul 2026 12:25:24 +0800
-X-Gm-Features: AUfX_mzAte1rkVeXrYroIkGrwE99yrOx4hbStb9LMtbvlKUL1Vw05vtdxXl63Zw
-Message-ID: <CAEjiKSnj3C8n6CMrzyweMAYYv5qNAsd4iPk4zCbaSiwJqMUtmw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] zram: make dict update in comp_params_store() atomic
+Date: Wed, 29 Jul 2026 12:32:40 +0800
+X-Gm-Features: AUfX_mynGnuc6sv-ceJYto-arq136TMav-sQ_OW5MDtgNlL-Yzy7Gup1WuFAZJg
+Message-ID: <CAEjiKSmLSrfbtBukdC+fRqDY0tOVnyPtnxBEUyhrvrrwLbaxMA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] zstd: move ZSTD_MAX_CLEVEL to zstd_lib.h
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
 	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
@@ -100,56 +100,61 @@ Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 29, 2026 at 12:16=E2=80=AFPM Sergey Senozhatsky
+On Wed, Jul 29, 2026 at 12:23=E2=80=AFPM Sergey Senozhatsky
 <senozhatsky@chromium.org> wrote:
 >
-> On (26/07/29 12:06), haoqin huang wrote:
+> On (26/07/29 12:16), haoqin huang wrote:
 > > > On (26/07/28 17:29), Haoqin Huang wrote:
-> [..]
-> > > > @@ -1699,21 +1699,23 @@ static int comp_params_store(struct zram *z=
-ram, u32 prio, s32 level,
-> > > >                            const char *dict_path,
-> > > >                            struct deflate_params *deflate_params)
-> > > >  {
-> > > > +     void *new_dict =3D NULL;
-> > > >       ssize_t sz =3D 0;
+> > > [..]
+> > > >  #define ZSTD_MINMATCH_MAX         7   /* only for ZSTD_fast, other=
+ strategies are limited to 6 */
+> > > >  #define ZSTD_MINMATCH_MIN         3   /* only for ZSTD_btopt+, fas=
+ter strategies are limited to 4 */
+> > > > +#define ZSTD_MAX_CLEVEL              22
+> > > >  #define ZSTD_TARGETLENGTH_MAX    ZSTD_BLOCKSIZE_MAX
+> > > >  #define ZSTD_TARGETLENGTH_MIN     0   /* note : comparing this con=
+stant to an unsigned results in a tautological test */
+> > > >  #define ZSTD_STRATEGY_MIN        ZSTD_fast
+> > > > diff --git a/lib/zstd/compress/clevels.h b/lib/zstd/compress/clevel=
+s.h
+> > > > index 6ab8be6532ef..06565e064456 100644
+> > > > --- a/lib/zstd/compress/clevels.h
+> > > > +++ b/lib/zstd/compress/clevels.h
+> > > > @@ -17,8 +17,6 @@
 > > > >
-> > > > -     comp_params_reset(zram, prio);
+> > > >  /*-=3D=3D=3D=3D=3D  Pre-defined compression levels  =3D=3D=3D=3D=
+=3D-*/
+> > > >
+> > > > -#define ZSTD_MAX_CLEVEL     22
+> > > > -
+> > > >  __attribute__((__unused__))
 > > >
-> > > I don't see why is that a problem.  All you wanted to do here is to
-> > > handle zero i_size.  Why do we need dict setting to be atomic?
-> > >
+> > > Sashiko made a good point.  Can we use zstd_max_clevel() instead?
 > >
-> > comp_params_reset() calls vfree() on the old dict and resets level/
-> > winbits to NOT_SET before reading the new dict
+> > Good point, I'll drop this patch and use zstd_max_clevel() instead
+> > in v3.
+> >
+> > Since it's a runtime function and can't be used for static struct
+> > initialization, I plan to set backend_zstd's level_max to -1 as a
+> > sentinel value, and query the actual maximum in
+> > zcomp_validate_params():
+> >
+> >     s32 max =3D backend->level_max;
+> >     if (max < 0)
+> >         max =3D zstd_max_clevel();
+> >
+> > Do you think this approach is feasible?
 >
-> But what is the scenario here?  Who would have several dicts?
->
->   echo "dict=3D/etc/dict.foo prio=3D1" > algorithm_params
->
-> and if that fails then
->
->   echo "dict=3D/etc/dict.bar prio=3D1" > algorithm_params
->
-> I don't think this is something that we need to consider.  What am I
-> missing?
->
-> [..]
-> > The "atomic" in the subject is about all-or-nothing semantics: don't
-> > destroy valid state until the replacement is confirmed good.
->
-> I don't think that "valid state configuration replacement" ever happens.
+> Hmm, no, that doesn't look good. zcomp should not include
+> zstd.h or any other libs directly.  Should params validation
+> be a per-backend callback then?
 
-You're right, the scenario I had in mind was a bit far-fetched.  It require=
-s
-loading dict_a first, then trying to replace it with dict_b before init, wi=
-th
-the second read failing:
+Good point, zcomp.c shouldn't include library headers.  A per-backend
+callback would be cleaner.
 
-    echo "algo=3Dzstd dict=3D/path/dict_a" > algorithm_params
-    echo "algo=3Dzstd dict=3D/path/dict_b" > algorithm_params  # fails
+I'll add an optional validate_params to zcomp_ops: the zstd backend
+implements it using zstd_max_clevel() internally, while lzo/deflate
+and others just rely on the static caps check (no callback needed).
+zcomp.c stays free of any library headers.
 
-comp_params_reset() would free dict_a before dict_b fails to load. But in
-practice params are set once before init and never change.
-
-I'll simplify this to just the sz <=3D 0 change in v3.
+I'll send this in v3.
