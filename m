@@ -1,198 +1,273 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7325F3FF1C4;
-	Wed, 29 Jul 2026 07:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0C041DED0;
+	Wed, 29 Jul 2026 07:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785309702; cv=none; b=qXDCpTnGNCMpbXrLmMxgEGNet531nh1JefQiMm/gjiK6hsixsgptlSrKknb9U7rZHCNfjXH9TUPAIayfwXvJ84RiG3e0Zuksn4T0uB//oXA5CCalLsvt8GVSC56tTxEKeENZ/WgyjHYzZCxGhO/fkHYghvxOf+r1M2szpK2sjTU=
+	t=1785309863; cv=none; b=nd7M5O7LnSfDV6RCFbH5nxTiW71bn64IY1ituzLFAmFuc4j4mhRt1+AcIFWyVoscZnZONei0b9ZwRv+C3DRnVVlOiOZn1Nb00mshWHJP1V+WT0BRBP/OJmkbP0NIf1UH3gkTfD0tJzwMXElPHLcjDBg2A9sqZrlviASNGC642Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785309702; c=relaxed/simple;
-	bh=jm63ujggDGcJk+nobtNkRB8tEtWZgchyj+8aoHeZa7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JeFJf+FqGrOlXgiSnNbGZ/CWrOQymnlFbQsIuTjBdgynFi5iZTlYvn0WYhtFgKwpNvuHgSTv5m7uqvVHQ/Fgs8i2fql1A3Rk7HS8zUAURmFTTAXQ2sfCrPJWUPsljXGzzJco7w9q/QsbMLpWtMe6WEDXQKEW4rdcNTp9FWt7kaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id DC54468AFE; Wed, 29 Jul 2026 09:21:17 +0200 (CEST)
-Date: Wed, 29 Jul 2026 09:21:17 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
-	dm-devel@lists.linux.dev, nvdimm@lists.linux.dev,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org
-Subject: Re: [PATCH v4 09/14] nvme-pci: add SGL support for the dmabuf path
-Message-ID: <20260729072117.GI9534@lst.de>
-References: <cover.1785274111.git.asml.silence@gmail.com> <5c2e9c3bdd3e87c0c9a6e4395ea199002b83fd36.1785274111.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1785309863; c=relaxed/simple;
+	bh=SoAJyejZXL0gCLwGRJfkqETnV4x7TO3pNvXZBPwiTSQ=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ni9WoQ0uN2NnFbUH8gy4DkR5BqFz9HfykIyixoxCgHYoVUYD54sabCfSI98rlQrk9STRArwkiZdd5T6j3pmMvFB7u1Gtn4C6vzoJrLbEYWHJJ17HBFgwL0xKF7HRWd+GRzWR3VHdIyMfJsv2drDN/mIFtNqNdEVIL8gIYfCpdBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UY/LZLHn; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UY/LZLHn"
+Message-ID: <166abc44-f725-4181-9fc9-f808f4894a17@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785309846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OZtSbiAnS6rQTDFNl1WKWuT5KuTX1/3h5uLg/WVvQOo=;
+	b=UY/LZLHnfaubVs4/Z3UPrdU2csZYo5PVIhN49O7akvxqo2YH156NNrrUlYyGILviOqucCq
+	tEkRZM1B2gp7xJPGRVbUy0dRoQ0sqfBMwKuBQpZijjdVU4q3Z+3LS2d/dp1hfhZ9ThVrr5
+	zDA+ySs5o+2sUphVcgN0RzdInK5z/gM=
+Date: Wed, 29 Jul 2026 15:23:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5c2e9c3bdd3e87c0c9a6e4395ea199002b83fd36.1785274111.git.asml.silence@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Cc: cui.tao@linux.dev, hch@lst.de, dongsheng.yang@linux.dev,
+ cengku@gmail.com, josef@toxicpanda.com, nilay@linux.ibm.com,
+ ming.lei@redhat.com, yukuai@fygo.io, linux-block@vger.kernel.org,
+ cgroups@vger.kernel.org
+Subject: Re: [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of
+ bio_set_dev
+To: Yu Kuai <yukuai@kernel.org>, axboe@kernel.dk, tj@kernel.org
+References: <20260724123037.3004560-1-yukuai@kernel.org>
+ <20260724123037.3004560-2-yukuai@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20260724123037.3004560-2-yukuai@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 28, 2026 at 10:29:21PM +0100, Pavel Begunkov wrote:
-> From: Anuj Gupta <anuj20.g@samsung.com>
+
+
+在 2026/7/24 20:30, Yu Kuai 写道:
+> From: Yu Kuai <yukuai@fygo.io>
 > 
-> Add SGL support in addition to PRP for dmabuf-backed requests,
-> coalescing the mapping's sg_table into NVMe SGL data descriptors.
+> bio_set_dev(), bio_init() and bio_reset() associate a bio with a blkg for
+> its target queue. That association may have to create a new blkg, and
+> currently there are lots of callers that are under atomic context.
 > 
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> [pavel: rebased]
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Move the association out of those helpers and into the submit path, which
+> is always sleepable (submit_bio_noacct() already does might_sleep()):
+> 
+>   - submit_bio() associates new I/O before bio_set_ioprio(), whose
+>     blkcg_set_ioprio() reads the policy from bio->bi_blkg.
+> 
+>   - submit_bio_noacct() (re)associates when a bio has no blkg yet or was
+>     remapped to a different queue.  blk_throtl_bio() and the rq_qos
+>     throttlers (iocost, iolatency) pair bio->bi_blkg with the queue of
+>     bio->bi_bdev, so a remapped bio must be reassociated to the new queue.
+> 
+>   - bio_set_dev() no longer associates; instead it drops the existing blkg
+>     when the device changes, since that blkg is tied to the old queue.
+>     bio_init()/bio_reset() leave bi_blkg NULL.
+> 
+
+Hi Yu Kuai,
+
+Thanks for the v2 rework.  One thing I wanted to flag: with association
+moved out of bio_set_dev(), blkcg_punt_bio_submit() can be reached with
+bio->bi_blkg == NULL.  btrfs compressed writeback builds its bio without
+going through the generic submit_bio() (it uses btrfs_submit_bio()), so the
+new association never runs for it, and the bio_set_dev() in
+btrfs_submit_dev_bio() no longer fills bi_blkg in.
+
+I reproduced it on this tree -- btrfs with compress=zstd, write dirty data
+from a non-root cgroup, sync:
+
+  BUG: kernel NULL pointer dereference, address 0x30
+  Workqueue: btrfs-worker btrfs_work_helper
+  RIP: 0010:blkcg_punt_bio_submit+0xf/0x80
+  Call Trace:
+   btrfs_submit_bio+0x79/0x1a0
+   btrfs_work_helper+0x141/0x360
+
+0x30 is the offset of ->parent in struct blkcg_gq, and RBX (bio->bi_blkg)
+is NULL at the fault, so it's the `if (blkg->parent)` read.  Regular
+buffered writeback looked fine -- wbc_init_bio() sets bi_blkg early -- so it
+seems limited to the compressed path.
+
+> Introduce bio_disassociate_blkg() to drop a bio's blkg reference and use it
+> from bio_set_dev(), bio_uninit() and the bio freeing path, replacing their
+> open-coded blkg_put().
+> 
+> This is the first step to convert protecting blkg with blkcg_mutex.
+> 
+> Signed-off-by: Yu Kuai <yukuai@fygo.io>
 > ---
->  drivers/nvme/host/pci.c | 191 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 187 insertions(+), 4 deletions(-)
+>  block/bio.c         | 18 ++----------------
+>  block/blk-cgroup.c  | 18 ++++++++++++++++++
+>  block/blk-core.c    | 21 +++++++++++++++++++++
+>  include/linux/bio.h |  7 +++++--
+>  4 files changed, 46 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index f1b67c191892..cbb321fb7c50 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -1287,12 +1287,18 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
->  	return BLK_STS_IOERR;
+> diff --git a/block/bio.c b/block/bio.c
+> index 6a2f6fc3413e..ea030c5e39a4 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -179,12 +179,7 @@ static inline gfp_t try_alloc_gfp(gfp_t gfp)
+>  
+>  void bio_uninit(struct bio *bio)
+>  {
+> -#ifdef CONFIG_BLK_CGROUP
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg = NULL;
+> -	}
+> -#endif
+> +	bio_disassociate_blkg(bio);
+>  	if (bio_integrity(bio))
+>  		bio_integrity_free(bio);
+>  
+> @@ -235,8 +230,6 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+>  #ifdef CONFIG_BLK_CGROUP
+>  	bio->bi_blkg = NULL;
+>  	bio->issue_time_ns = 0;
+> -	if (bdev)
+> -		bio_associate_blkg(bio);
+>  #ifdef CONFIG_BLK_CGROUP_IOCOST
+>  	bio->bi_iocost_cost = 0;
+>  #endif
+> @@ -280,8 +273,6 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+>  	atomic_set(&bio->__bi_remaining, 1);
+>  	bio->bi_io_vec = bv;
+>  	bio->bi_bdev = bdev;
+> -	if (bio->bi_bdev)
+> -		bio_associate_blkg(bio);
+>  	bio->bi_opf = opf;
+>  }
+>  EXPORT_SYMBOL(bio_reset);
+> @@ -1803,17 +1794,12 @@ void bio_endio(struct bio *bio)
+>  		goto again;
+>  	}
+>  
+> -#ifdef CONFIG_BLK_CGROUP
+>  	/*
+>  	 * Release cgroup info.  We shouldn't have to do this here, but quite
+>  	 * a few callers of bio_init fail to call bio_uninit, so we cover up
+>  	 * for that here at least for now.
+>  	 */
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg = NULL;
+> -	}
+> -#endif
+> +	bio_disassociate_blkg(bio);
+>  
+>  	if (bio->bi_end_io)
+>  		bio->bi_end_io(bio);
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index d9676126c5b5..618e5566fa52 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -2170,6 +2170,24 @@ void bio_clone_blkg_association(struct bio *dst, struct bio *src)
+>  }
+>  EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
+>  
+> +/**
+> + * bio_disassociate_blkg - disassociate a bio from its blkg
+> + * @bio: target bio
+> + *
+> + * Drop the blkg reference held by @bio and clear the association.  This is
+> + * used when a bio's target device changes (e.g. via bio_set_dev()): the old
+> + * blkg is tied to the previous request_queue, so it is dropped here and the
+> + * bio is reassociated to the new queue from the submit path.
+> + */
+> +void bio_disassociate_blkg(struct bio *bio)
+> +{
+> +	if (bio->bi_blkg) {
+> +		blkg_put(bio->bi_blkg);
+> +		bio->bi_blkg = NULL;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
+> +
+>  static int blk_cgroup_io_type(struct bio *bio)
+>  {
+>  	if (op_is_discard(bio->bi_opf))
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 365641266c9e..8103643b39fc 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -822,6 +822,20 @@ void submit_bio_noacct(struct bio *bio)
+>  
+>  	might_sleep();
+>  
+> +	/*
+> +	 * Associate the bio with a blkg for its target queue here, where it is
+> +	 * safe to sleep, instead of in bio_set_dev()/bio_init() which may run
+> +	 * under a spinlock.  bio_set_dev() no longer associates, so a freshly
+> +	 * allocated or remapped bio has no blkg until it reaches the submit path.
+> +	 * Reassociate only when the bio was remapped to a different queue since
+> +	 * it was last associated; blk_throtl_bio() and the rq_qos throttlers
+> +	 * rely on bio->bi_blkg matching the queue of bio->bi_bdev.
+> +	 */
+> +#ifdef CONFIG_BLK_CGROUP
+> +	if (!bio->bi_blkg || bio->bi_blkg->q != q)
+> +		bio_associate_blkg(bio);
+> +#endif
+> +
+>  	/*
+>  	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
+>  	 * if queue does not support NOWAIT.
+> @@ -958,6 +972,13 @@ void submit_bio(struct bio *bio)
+>  		count_vm_events(PGPGOUT, bio_sectors(bio));
+>  	}
+>  
+> +	/*
+> +	 * bio_set_ioprio() -> blkcg_set_ioprio() reads the policy from
+> +	 * bio->bi_blkg, so associate the blkg (for new I/O, the first time) before
+> +	 * it runs.  This is the sleepable entry point for new I/O; remapped bios
+> +	 * that reach submit_bio_noacct() directly are reassociated there.
+> +	 */
+> +	bio_associate_blkg(bio);
+>  	bio_set_ioprio(bio);
+>  	submit_bio_noacct(bio);
+>  }
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 8f33f717b14f..7a7509c8a59a 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -507,6 +507,7 @@ void bio_associate_blkg(struct bio *bio);
+>  void bio_associate_blkg_from_css(struct bio *bio,
+>  				 struct cgroup_subsys_state *css);
+>  void bio_clone_blkg_association(struct bio *dst, struct bio *src);
+> +void bio_disassociate_blkg(struct bio *bio);
+>  void blkcg_punt_bio_submit(struct bio *bio);
+>  #else	/* CONFIG_BLK_CGROUP */
+>  static inline void bio_associate_blkg(struct bio *bio) { }
+> @@ -515,6 +516,7 @@ static inline void bio_associate_blkg_from_css(struct bio *bio,
+>  { }
+>  static inline void bio_clone_blkg_association(struct bio *dst,
+>  					      struct bio *src) { }
+> +static inline void bio_disassociate_blkg(struct bio *bio) { }
+>  static inline void blkcg_punt_bio_submit(struct bio *bio)
+>  {
+>  	submit_bio(bio);
+> @@ -524,10 +526,11 @@ static inline void blkcg_punt_bio_submit(struct bio *bio)
+>  static inline void bio_set_dev(struct bio *bio, struct block_device *bdev)
+>  {
+>  	bio_clear_flag(bio, BIO_REMAPPED);
+> -	if (bio->bi_bdev != bdev)
+> +	if (bio->bi_bdev != bdev) {
+>  		bio_clear_flag(bio, BIO_BPS_THROTTLED);
+> +		bio_disassociate_blkg(bio);
+> +	}
+>  	bio->bi_bdev = bdev;
+> -	bio_associate_blkg(bio);
 >  }
 >  
-> +static void nvme_pci_sgl_set_data_addr(struct nvme_sgl_desc *sge,
-> +				       dma_addr_t addr, u32 len)
-> +{
-> +	sge->addr = cpu_to_le64(addr);
-> +	sge->length = cpu_to_le32(len);
-> +	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
-> +}
-> +
->  static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
->  		struct blk_dma_iter *iter)
->  {
-> -	sge->addr = cpu_to_le64(iter->addr);
-> -	sge->length = cpu_to_le32(iter->len);
-> -	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
-> +	nvme_pci_sgl_set_data_addr(sge, iter->addr, iter->len);
->  }
-
-The naming is a bit confusing (and me passing the iter to
-nvme_pci_sgl_set_data is probably at faul for that).  So maybe
-spin out a prep patch to rename the old nvme_pci_sgl_set_data
-to nvme_pci_dma_iter_set_sgl or so, and then add the new one
-as nvme_pci_sgl_set_data (as before the dma_iter conversion).
-
->
-> +static unsigned int nvme_pci_dmabuf_sgl_nents(struct request *req,
-> +					      dma_addr_t *first_dma,
-> +					      u32 *first_len)
-
-This is a really good example why the aligning to the opening braces
-produces totally unreadble code..
-
-But I also don't understand what the use case for this function
-is to start with.  struct sg_table tells us how many segments
-exist on the DMA side in the nents member, which should be just
-fine for the SGL threshold calculation.
-
-> +{
-> +	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> +	struct bio *bio = req->bio;
-> +	struct nvme_dmabuf_map *map = to_nvme_dmabuf_map(bio->bi_dmabuf_map);
-> +	size_t length = blk_rq_payload_bytes(req);
-> +	struct nvme_sgl_desc *sg_list = NULL;
-> +	dma_addr_t sgl_dma = 0, last_end = 0;
-> +	unsigned int mapped = 0;
-> +	unsigned long tmp;
-> +	struct scatterlist *sg;
-> +	size_t offset, remaining;
-> +	bool have = false;
-> +
-> +	if (!entries)
-> +		return BLK_STS_IOERR;
-> +	if (entries > NVME_MAX_SEGS)
-> +		return BLK_STS_AGAIN;
-
-Given that the block layer enforced data in rw/command and the
-max_segments limit, why do we need the extra check here?
-
-> +			continue;
-> +		}
-> +
-> +		addr += offset;
-> +		sg_len -= offset;
-> +		offset = 0;
-> +
-> +		while (sg_len && remaining) {
-
-These can't be false on the first iteration, so maybe turn this into
-a do {} while loop?
-
-> +			u32 chunk = min_t(size_t, remaining, sg_len);
-> +
-> +			if (have && last_end == addr) {
-> +				u32 old = le32_to_cpu(sg_list[mapped - 1].length);
-> +
-> +				sg_list[mapped - 1].length = cpu_to_le32(old + chunk);
-
-Overly long line.
-
-> +			} else {
-> +				if (WARN_ON_ONCE(mapped == entries))
-> +					goto err_free;
-> +				nvme_pci_sgl_set_data_addr(&sg_list[mapped++],
-> +							   addr, chunk);
-> +			}
-
-Why do we need this merging?  dma_map_sg should have already done
-any interesting merging, or am I missing something?
-
-> +		if (use_sgl != SGL_UNSUPPORTED) {
-> +			dma_addr_t first_dma;
-> +			u32 first_len;
-> +			unsigned int entries;
-> +
-> +			entries = nvme_pci_dmabuf_sgl_nents(req, &first_dma,
-> +							    &first_len);
-> +
-> +			if (use_sgl == SGL_FORCED) {
-> +				ret = nvme_rq_setup_dmabuf_sgl(req, nvmeq,
-> +								entries, first_dma, first_len);
-> +				return ret == BLK_STS_AGAIN ? BLK_STS_IOERR : ret;
-> +			}
-> +
-> +			if (sgl_threshold && entries &&
-> +			    DIV_ROUND_UP(blk_rq_payload_bytes(req), entries) >=
-> +			    sgl_threshold) {
-> +				ret = nvme_rq_setup_dmabuf_sgl(req, nvmeq,
-> +								entries, first_dma, first_len);
-> +				if (ret != BLK_STS_AGAIN)
-> +					return ret;
-> +			}
-> +		}
-
-Various overly long lines.  Please factor out a helper for the
-decisions to use sgl vs not instead of open coding it here.
-
+>  /*
 
