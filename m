@@ -1,84 +1,138 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-58.ptr.blmpb.com (va-2-58.ptr.blmpb.com [209.127.231.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AB9432E68;
-	Wed, 29 Jul 2026 08:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA36B3BBFDD
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 09:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785314919; cv=none; b=gMcCOBlK7RtgEifNmDNwoXf7mCmMTe2or+ECAsGlNBmlyDINhXwNm2UKMFNVOEo7zxaVvmUJgPAhLnwnVq/uRPs4TDE3AJzUagyCDk0RlWOuste8yuquI/o1du/LiSwqNn5OT//74jNE0/F7F4+VAkYLRubPgTSQOagubO6OwfQ=
+	t=1785318592; cv=none; b=qw4akZykMVRfcScM/y+bbPazRNAKoUogk0ldTaa2RA3l3J47Tb+hJdR3f8G5x4hCZRF9fknqX6d+IjJ860lmpnMYaAggfqzz9cjxj3IgzukcPtH0PAunTbmdtE+Vt5dG9LTrpIT3u3KFF6fRP/y1scSN4k2xfaKUSIWK0tk18gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785314919; c=relaxed/simple;
-	bh=/narXh7pPOZ4O+pLXLRtRJ77mb3IERKycuMvFjLVUkw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mpEOjc6BoiClXjDtVOqjRDKDd8m/+Qmhod8kzohdp51CYliMbQsZ/WXQFvfFLzwDK8UA6x/6xmn0NqB9yYkLW6+/cXn8TjmncJ0TvJ2osqQJFFEYmwdmIrTYq1Q6sOxHaAjG/9Bhq3o2ttnybN0lLN6v8XDBE0Hm6oBWMNQaSh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RZXWSbw8; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1785318592; c=relaxed/simple;
+	bh=4zXhUVKUU3dqZSbnSYsl5Mg8T8MnIn7mL1cY5ZXVo+A=;
+	h=Cc:Subject:Content-Type:To:Message-Id:Mime-Version:In-Reply-To:
+	 From:Date:References; b=RyJDTlobyNSCX/VVAbpAdl537Ad0wKHo2iOaApYl76Fi0JOXM66YZT4nGNv2KU+BFYqD1zqUufp1RhE2QOkbJ4RbPwJe0SGvV0Givya3NYDVTWDD1f17If+JFja5agQhlW9p0PzwLP0NX5hoNfYEAwYcIeRlMdByGSbIPWHp8M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=SJQRO26a; arc=none smtp.client-ip=209.127.231.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RZXWSbw8"
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="SJQRO26a"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/narXh7pPOZ4O+pLXLRtRJ77mb3IERKycuMvFjLVUkw=; b=RZXWSbw8u1u57uY2shP/yxlNQq
-	R9nR/ZWG3r/ZX/a4kI4Mfv21+SVafHoH2rU0vvbVkGmIJZH2IlJCcji2wdKWfRuJ8OfosxNn8cbpK
-	qedUwm0QIZuWAVU77jOxQOOwWKucCQd3ioDZG1ObK5h2+2NDMQopLovEgyN4AWhujYyXeamM88il4
-	SlwyJcDysvtZmqntJ80ap8lu1o6rPHfLTN4lu2zXMFDdzOTm9vPiyAIBN6ya7nn+05AhUGk06oF/G
-	PJWiNoci1XtaL4F44iCmw+ZXYDSF8bReAknLuzJEAwQUk2moDmiClY7+5NPWTz8tqkHJovN2PTKX+
-	P9WdR9eQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wozxo-00000007HFQ-3Kwp;
-	Wed, 29 Jul 2026 08:48:32 +0000
-Date: Wed, 29 Jul 2026 01:48:32 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Tal Zussman <tz2294@columbia.edu>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
-Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
- infrastructure
-Message-ID: <amm-YHQJFUsj4AM6@infradead.org>
-References: <f1b8eeb6-2397-4f48-a21a-a023eb0c80ab@columbia.edu>
- <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
- <ahbq0RdUyLIPiItB@infradead.org>
- <80cb53f3-e7e5-4f96-bacc-f9fb7661d976@columbia.edu>
- <cuyklvhnt37xwk3jlr2iyyxxkzvt4bsf5iqv2gag4ixdicnbk2@rfqgjlclwesz>
- <4jtsjd2sbsn2w7fzfwb7wwowz72r4kc6345ckkkcjoxjbbwjwn@rkl44x3o3sgy>
- <cc58a101-6d09-4e42-b99d-673271934c29@columbia.edu>
- <amgrwn0yQoFvJP4u@infradead.org>
- <8124341f-3af2-4a16-897d-38db5ab5a9d4@columbia.edu>
- <4ahxusvs255ibn5unrayfeioqijbbidtn3l7joczxphwo2faee@3wtnw4nzu6wi>
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785318580;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=4zXhUVKUU3dqZSbnSYsl5Mg8T8MnIn7mL1cY5ZXVo+A=;
+ b=SJQRO26acjjhtQ6iKSu4G0tZhBQVGnjbgZ2l2tFDYubHzbQSE+c3ClwFUVxXGvDV6LaPYW
+ wvNkwyIV8mdW9sgmorV7KaAKC92LMCn2NsCak+sOGxYb5eGFftNoYJQvkmqFpOFTCpZu3d
+ 6g5s2wslE1ekKE59IUn9dlPwGkHaXfO/4Xemt4QgPcBo3yvcHHt1S98ipJOPVFwDcqGA/b
+ UJHrhXtDQkvpVftZHEBVzr39zvT/6/+SsIyAK6bL5Md2zt5XLqPXX1feUKx9cIAvky7esV
+ uSaQdbOV8sy9NNr7ti6PDceNkJouVlZtJ/XAJSlirW1+kTWb9aFSS2Z6YJMapg==
+Cc: <hch@lst.de>, <dongsheng.yang@linux.dev>, <cengku@gmail.com>, 
+	<josef@toxicpanda.com>, <ming.lei@redhat.com>, 
+	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 1/8] block: associate blkg in submit_bio instead of bio_set_dev
+User-Agent: Mozilla Thunderbird
+Reply-To: yukuai@fygo.io
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 29 Jul 2026 09:49:38 +0000
+Content-Type: text/plain; charset=UTF-8
+X-Lms-Return-Path: <lba+26a69ccb3+d4352d+vger.kernel.org+yukuai@fygo.io>
+To: "Nilay Shroff" <nilay@linux.ibm.com>, <axboe@kernel.dk>, <tj@kernel.org>, 
+	"yu kuai" <yukuai@fygo.io>
+Message-Id: <b9465ff1-3be6-4723-aa8b-1706eca09f7c@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ahxusvs255ibn5unrayfeioqijbbidtn3l7joczxphwo2faee@3wtnw4nzu6wi>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <8d5f5b83-dea7-47cd-ab0f-61d85a3d7ed9@linux.ibm.com>
+From: "yu kuai" <yukuai@fygo.io>
+Date: Wed, 29 Jul 2026 17:49:34 +0800
+References: <20260724123037.3004560-1-yukuai@kernel.org> <20260724123037.3004560-2-yukuai@kernel.org> <933b4285-1c85-4076-831a-0501d5c38e16@fygo.io> <8d5f5b83-dea7-47cd-ab0f-61d85a3d7ed9@linux.ibm.com>
+X-Original-From: yu kuai <yukuai@fygo.io>
 
-On Wed, Jul 29, 2026 at 10:41:40AM +0200, Jan Kara wrote:
-> This looks a bit hacky and at least deserves a comment. Ideally we'd get
-> rid of the xfs workqueue and rely on the generic offloading mechanism. But
-> as Christoph wrote maybe let's just get something good enough in and we can
-> work on improving that later. In particular if Christoph has a plan how to
-> clean this up :).
+Hi,
 
-The XFS workqueue can't just go away, as for writes that require
-completion time processing (unwritten extent conversion, i_size logging,
-zoned block mapping), we want to serialize the processing on a per-inode
-basis as otherwise the different helpers would just content on the xfs
-inode lock and burn cycles.
+=E5=9C=A8 2026/7/29 16:05, Nilay Shroff =E5=86=99=E9=81=93:
+> On 7/27/26 1:46 PM, yu kuai wrote:
+>> Hi,
+>>
+>> =E5=9C=A8 2026/7/24 20:30, Yu Kuai =E5=86=99=E9=81=93:
+>>> From: Yu Kuai<yukuai@fygo.io>
+>>>
+>>> bio_set_dev(), bio_init() and bio_reset() associate a bio with a=20
+>>> blkg for
+>>> its target queue. That association may have to create a new blkg, and
+>>> currently there are lots of callers that are under atomic context.
+>>>
+>>> Move the association out of those helpers and into the submit path,=20
+>>> which
+>>> is always sleepable (submit_bio_noacct() already does might_sleep()):
+>>>
+>>> =C2=A0=C2=A0=C2=A0 - submit_bio() associates new I/O before bio_set_iop=
+rio(), whose
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blkcg_set_ioprio() reads the policy from=
+ bio->bi_blkg.
+>>>
+>>> =C2=A0=C2=A0=C2=A0 - submit_bio_noacct() (re)associates when a bio has =
+no blkg yet=20
+>>> or was
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 remapped to a different queue.=C2=A0 blk=
+_throtl_bio() and the rq_qos
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 throttlers (iocost, iolatency) pair bio-=
+>bi_blkg with the=20
+>>> queue of
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bio->bi_bdev, so a remapped bio must be =
+reassociated to the=20
+>>> new queue.
+>>>
+>>> =C2=A0=C2=A0=C2=A0 - bio_set_dev() no longer associates; instead it dro=
+ps the=20
+>>> existing blkg
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 when the device changes, since that blkg=
+ is tied to the old=20
+>>> queue.
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bio_init()/bio_reset() leave bi_blkg NUL=
+L.
+>>>
+>>> Introduce bio_disassociate_blkg() to drop a bio's blkg reference and=20
+>>> use it
+>>> from bio_set_dev(), bio_uninit() and the bio freeing path, replacing=20
+>>> their
+>>> open-coded blkg_put().
+>> Turns out bio will be submitted by kworker for some drivers and for
+>> blkcg_punt_bio_submit(). Is it possible to record blkcg during bio=20
+>> initialization,
+>> as blkcg must exist, and then covert it to blkg during submission? I=20
+>> can use union
+>> for blkcg and blkg to avoid new field in struct bio.
+>
+> Since blkcg_punt_bio_submit() is the only deferred submission path,=20
+> and it seems to
+> me that all of its callers (btrfs mostly) appear to be in sleepable=20
+> context, would
+> it be sufficient to associate the blkg before punting the bio rather=20
+> than changing the
+> bio lifetime semantics?
 
-We want to get rid of it for read completions, and a patch for that is
-in the lazy bounce series I posted a few days ago.
+blkcg_punt_bio_submit() must be called in sleepable context, itself is not =
+a problem, we
+can definitely associate a blkg there.
+
+However, some drivers will also defer bio submission to kworker like dm and=
+ md raid5, dm
+is also the key participants to call bio_set_dev under atomic context. I li=
+ke the idea to
+just associate blkcg first, because most bio-based drivers will not enable =
+blk-throttle,
+which is the only blkcg policy for bio-based driver, hence blkg for bio-bas=
+ed drivers is
+not needed at all.
+
+>
+> Thanks,
+> --Nilay
+
+--=20
+Thanks,
+Kuai
