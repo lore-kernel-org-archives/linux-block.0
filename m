@@ -1,113 +1,140 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from va-2-19.ptr.blmpb.com (va-2-19.ptr.blmpb.com [209.127.231.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495AA3BB109
-	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 07:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785311746; cv=pass; b=lv31w2pRA0ViWx15NejhWFutd9ZXvTwRGxitaLe9/eX4bRs3jPlGrYtil9zCyeeTVVPYOfOLBvg5ev7V65bx9w7760by6x5AziZRXEZiU8++r9tSNC25vxFCp+CugOsBM2bolZ/1LIMLnN5png/92sIWn+KM1kIAZIlGAgRu7ys=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785311746; c=relaxed/simple;
-	bh=usrfVYHsOydTgFDHdwjdurPUbbzlE2oAC72hFVI74H4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MBqFAyBfPuxeATdXY657uQhZxiWZ22r+lgx7Z/LKu1dhazFjGbzRGcK16Z1KoEz/cKM3SbdhOCjOUavBd+jYk1TZx01BJRxDeMxrmgguA+eXhM7KtfiPUp1kD2cvqnaw3UmaIepcBXqN1DAfWHC64VKgr7BC2TsDlh3e6gJDkD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UhLVYD3e; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDBB3B8BD4
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 07:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785311795; cv=none; b=EqeQbwzlzUwvtNfsM7E/wZSWPeA6xtPhcxaHmySlzc7nRAeubNJh3QjMv0qaWYrVNtyp8JopBsRHwnCOoKL1IgbIHkkAdydWIH8geP1G1Aj7ncy07gZWZpLdESVaSunzAcpMF7H39UOWCsFFPe8TjSpZS+zDgYj4hCAaiyrfkCk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785311795; c=relaxed/simple;
+	bh=GFC6cvYFjCy8PcEpi9iezeUy+GTVK7D3TMjp65uxQPk=;
+	h=From:Message-Id:Mime-Version:In-Reply-To:References:To:Date:
+	 Content-Type:Cc:Subject; b=KPTj+sb1KobKReLag+6LcUGN64RmWF4me76HLZumbNLrgvoePL92OXDRpHgNBRBmkRSJTD3kRFWdNsemn//xNdHrUmg6Yl2+/AnInZs20x5V8Z+mCKpYPGbwxHZPponcMIt8oqBwPNVgo4GBRGnM+XPOsLmiKuMYR0yS/DkYkCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=lqqEy/uo; arc=none smtp.client-ip=209.127.231.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhLVYD3e"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-69fec980a30so637388a12.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 00:55:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785311741; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JH8M/Vqn4csh80wt9xDlaghYCUJ1GW0yX5sDUfA3uXTxT9hFig1DyEVk0VH5VvoAxC
-         lFbI5/OOoJGZm6sk+8/71Ryrtc0PjtS7b6exeoa0FTt81tJkZO75fd3kEtxWRTbnl60Y
-         sD81OtrogpRTdL4mxGY7QVR4mnB6sX/II1F7Cv5riZmT6tXeTvAwTM8EUCl+tjGVx1HQ
-         0F2KojIjH5ixH9/GXrrntIoRFwlPm02oI4jZWxFnPUXKfUuyNJKMhf8jFEx0PFxKSm9L
-         CVw2MfxwBlSod6Lw0uzXrYeO2DJRXXGxJpx1Kg7OyZpIf6AZw5LlocoPT5hFBfJGmS5O
-         ltkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=usrfVYHsOydTgFDHdwjdurPUbbzlE2oAC72hFVI74H4=;
-        fh=frMk0+wh8NN7iCzTPnBCE5+cXbp0rScws8PSc8Otszg=;
-        b=A/eu2OsOHlAFRuCjL6jo6hC1d01FhDaw1BLDsx911ClHLOXdqAS6Tkhle+GOLbPyvo
-         lzeA4K4d/nG4sy6Yjb6sO+Fc3rrG82mdOrnjwvWl/4iLtt4kqOt6brCKWpYjDqmR1vQi
-         SdXuKqIDWfZL4lG90ZkQsGetJ7cue3VPsbjQ7OtTeTvROCOhCneOKQFsq3Y7I3yDt5to
-         9nkGD1LKE88xE/cEenxKsCxL5tGAVMgsSDScEN6LyAQk6qOwfAMvjK8vHwhtmk696vFm
-         JEd3QPSX0On3+bc1af/1a5px1CWf/6OgY/VzpWejmMk+iReUo6Sb14CIyuMUsZAp4FIk
-         abeA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785311740; x=1785916540; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=usrfVYHsOydTgFDHdwjdurPUbbzlE2oAC72hFVI74H4=;
-        b=UhLVYD3e7yEYNYzxHDgQejinV/JUwNP4KfcnXI9Obr2aj91q16MQQu3muT9HMK2IIa
-         eJB9ujnX90U8oqvoA/oaDfVPrBn0PlZrsGZGw+DaDdnIceie9Z6tRCA73weT6IhZI4Xf
-         rPRU3rLv5zFuk03lASRdUSKUC/xsLjAxhI8x/GJ/l/BJ/PV1zPYtXxNxjD/QQT7dNFnY
-         njDsRDrfWovErpKJpqyqwpemOoC8FeyIfnzvM04w5XNa+gLhyPX24SrS9XHIOZVA9bCk
-         4HN4Zr00tfk1eknEWPOlLORVQMF6eQjZV5fi5anf5/eghwucdXcT1L0pVKMfVV4WEk9t
-         m6Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785311740; x=1785916540;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=usrfVYHsOydTgFDHdwjdurPUbbzlE2oAC72hFVI74H4=;
-        b=soG+s91kq6j6LxLLeUxu6UvjanO6I/g3xtnChIdYYAzepwL8qVroIxqFjzhL3ePwqL
-         kEbLlvM1y8l9hqS3URREZWdWHFcqt5eIqECbfm0itbadjlkwq+DEZZYkepUx8JBL666Z
-         02jeOs1xQNaagUSAmv0PnaZmEdsZYDzBY2ZM99dxbeot0dhHOs8Z4YzDSjSp7/m8WOD5
-         IyLCocN9gat5V+0R1N7ORrNOKSZ/+cpx9vMoALWellCw+RoPbKoHNi3h2Q+35SFl3L21
-         NhZvPuHIolO+Twfc9unxKs478bK2l4OiUD1mLxt4oiigscIlQhgAJ90txaDh83QKI/ES
-         VDtw==
-X-Forwarded-Encrypted: i=1; AHgh+RrJ6A+FKftp8dKn+93H1XODiWizTTA6JH2js1ONuY9uKM7P0k0QO7mdPXJ1p1e+CvXF5n+qbPj6TJ3aQw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGO7frzBsD07SvdajzkATxA7jHwKAU91m4AHlCphE9eFscQ7US
-	PMl/gb/tyRx4Eltph8HlAtDeieat2YrVZ+2bhY1Inh4n03VZfcrrREsPKwgvUc17LLjfgFU4M6m
-	BAE1wuLyAW0pAg3eWEOhafOuJAMOILvE=
-X-Gm-Gg: AR+sD13tH9cBrccbuypgavQRj+yoaSJWEjLSsWGLqAiZblXhR+b10XvcQwG6KPxzZZQ
-	x2488xLERqxDIOHvbMZVgnWq9PaS+FR3lvfAPsjDXaQyfJm8fgARtzMsFjxE/u/nzYvUuBU1fXB
-	/2SexjaqESGNcOS/4mhSM6eOJ7R0BZiTfTNn9EknMmEWHlWTmr+WxKbtcHGTuDgUP80EkBgV2+y
-	WNzW3TNFeZwpFs4hcBhZh2SmohPVC135foOb/IAeqxLhTtn4XXsMkbPCDT6zftXEcXgWafVIFOH
-	SWSOMIBssZySSGIWnCIiV6l8VJuYCrzz8mwquol8UuVNyX+uTzSqaJwsXSZvE7eXKJUvdve+pL3
-	D
-X-Received: by 2002:a05:6402:52c9:b0:69a:bba:a526 with SMTP id
- 4fb4d7f45d1cf-6a034a737e8mr2702089a12.29.1785311740595; Wed, 29 Jul 2026
- 00:55:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="lqqEy/uo"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785311781;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=kMuVRy2VKQURb6Pvns2GhsmiAIEC+KLV2+/wuVD8+2w=;
+ b=lqqEy/uo7EjZIfLXA6MOObVyXanQaAFlMpScOgGRtMGYw3FxS6bfy21K2IJEqBaadXKeqq
+ RMa0gTwpL3VujajaqtajIuKU6ESJEMwcx9m8Tv6ehhDvkNQQ9lKhqxcYe/I3GJj2nebEwH
+ zzqPaSG8IDNZ8xQDShXL5eJJuVCerMPp7MP6JmhRyO7jpLTuGWJ83DlU/pBi8u5kxZn1jX
+ 0kJbj+mCpVQwkgrjArjoSGcYPnpnzy7ceNEyHXxyRbOYcOY/lQPMvFLZroi1Mb5Vs7i+1h
+ VQ3Rsz4pkrKmLnO2lV9G7rF+M3MlB8u3K0rM9q9w6Hfz8jiuTAXMPkVDNFyLlA==
+X-Lms-Return-Path: <lba+26a69b224+a3cc13+vger.kernel.org+yukuai@fygo.io>
+From: "yu kuai" <yukuai@fygo.io>
+Message-Id: <4540fd5c-ecea-433a-9bfb-f314b3933e3f@fygo.io>
+Reply-To: yukuai@fygo.io
+User-Agent: Mozilla Thunderbird
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260727201257.211635-1-coshi036@gmail.com> <20260728042356.GA19874@lst.de>
-In-Reply-To: <20260728042356.GA19874@lst.de>
-From: Chris S <coshi036@gmail.com>
-Date: Wed, 29 Jul 2026 03:55:28 -0400
-X-Gm-Features: AUfX_myr7JpqXMkOy9tcHEjoMtEEuRi-rrvzumCtNMx_grG_fNvGn32KWtLiE5c
-Message-ID: <CACd_6n12dp2E7URMaEFtD-GUkL9K6viDWjU6JRd7ozu81BPJ=w@mail.gmail.com>
-Subject: Re: [PATCH] block: stop the timeout timer when releasing a never
- added disk
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Weidong Zhu <weizhu@fiu.edu>, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Original-From: yu kuai <yukuai@fygo.io>
+In-Reply-To: <45ea6216-a6f6-4828-afd3-8acea8b949ab@linux.dev>
+References: <20260724123037.3004560-1-yukuai@kernel.org> <20260724123037.3004560-8-yukuai@kernel.org> <45ea6216-a6f6-4828-afd3-8acea8b949ab@linux.dev>
+To: "Tao Cui" <cui.tao@linux.dev>, <axboe@kernel.dk>, <tj@kernel.org>, 
+	"yu kuai" <yukuai@fygo.io>
+Date: Wed, 29 Jul 2026 15:56:16 +0800
+Received: from [192.168.1.104] ([39.182.0.167]) by smtp.larksuite.com with ESMTPS; Wed, 29 Jul 2026 07:56:20 +0000
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Cc: <hch@lst.de>, <dongsheng.yang@linux.dev>, <cengku@gmail.com>, 
+	<josef@toxicpanda.com>, <nilay@linux.ibm.com>, <ming.lei@redhat.com>, 
+	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 7/8] bfq: avoid blkg lookup from locked cgroup update
 
-Thank you!
+Hi,
 
-Best,
-Chao
+=E5=9C=A8 2026/7/29 15:33, Tao Cui =E5=86=99=E9=81=93:
+>
+> =E5=9C=A8 2026/7/24 20:30, Yu Kuai =E5=86=99=E9=81=93:
+>> From: Yu Kuai <yukuai@fygo.io>
+>>
+>> bfq_bio_bfqg() is called while bfqd->lock is held from the merge and
+>> request insertion paths.  It walks bio->bi_blkg and its parent chain to
+>> find the closest online BFQ group, and re-associates the bio by looking
+>> the chosen blkg up again through bio_associate_blkg_from_css().
+>>
+>> Now that blkg creation runs under q->blkcg_mutex from the sleepable subm=
+it
+>> path, bio_associate_blkg_from_css() can sleep on a lookup miss, which BF=
+Q
+>> must not do while holding bfqd->lock.  The blkg BFQ wants is already in
+>> hand from the ancestry walk, so update bio->bi_blkg by swapping referenc=
+es
+>> to that existing blkg directly instead of looking it up again by css.
+>>
+> Just checking the new bfq helper that swaps a bio's blkg: it does the
+> blkg_put() without the NULL guard the old helper had.  Is there any path
+> where BFQ could see a bio that hasn't been associated yet (bi_blkg =3D=3D=
+ NULL)?
+> The fallback branch calls it unconditionally, so if such a path exists it
+> would crash.  My reading is the bio is always associated before it reache=
+s
+> BFQ, so it can't happen -- but wanted to ask in case I'm missing a path.
 
-On Tue, Jul 28, 2026 at 12:23=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
-te:
+You're not missing. Bio must associate a blkg before submitting, you can se=
+e
+lots of places will deference bio's blkg directly.
+
 >
-> Looks good:
+> Thanks,
+> Tao
 >
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
->
+>> Signed-off-by: Yu Kuai <yukuai@fygo.io>
+>> ---
+>>   block/bfq-cgroup.c | 16 +++++++++++++---
+>>   1 file changed, 13 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+>> index 42614aa78cd4..8a3ff9510386 100644
+>> --- a/block/bfq-cgroup.c
+>> +++ b/block/bfq-cgroup.c
+>> @@ -604,6 +604,16 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, st=
+ruct bfq_group *bfqg)
+>>   	}
+>>   }
+>>  =20
+>> +static void bfq_bio_update_blkg(struct bio *bio, struct blkcg_gq *blkg)
+>> +{
+>> +	if (bio->bi_blkg =3D=3D blkg)
+>> +		return;
+>> +
+>> +	blkg_get(blkg);
+>> +	blkg_put(bio->bi_blkg);
+>> +	bio->bi_blkg =3D blkg;
+>> +}
+>> +
+>>   struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+>>   {
+>>   	struct blkcg_gq *blkg =3D bio->bi_blkg;
+>> @@ -616,13 +626,13 @@ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bf=
+qd, struct bio *bio)
+>>   		}
+>>   		bfqg =3D blkg_to_bfqg(blkg);
+>>   		if (bfqg->pd.online) {
+>> -			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
+>> +			bfq_bio_update_blkg(bio, blkg);
+>>   			return bfqg;
+>>   		}
+>>   		blkg =3D blkg->parent;
+>>   	}
+>> -	bio_associate_blkg_from_css(bio,
+>> -				&bfqg_to_blkg(bfqd->root_group)->blkcg->css);
+>> +	blkg =3D bfqg_to_blkg(bfqd->root_group);
+>> +	bfq_bio_update_blkg(bio, blkg);
+>>   	return bfqd->root_group;
+>>   }
+>>  =20
+
+--=20
+Thanks,
+Kuai
