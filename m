@@ -1,224 +1,263 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3C44A33F1
-	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 13:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683334963D0
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 14:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785332628; cv=none; b=SspdQHVhK6e2qezgdHgVrjExaRBYHSnCJkRaHWTWV27t0B5h8ybLNFs/2BWwyBHZ9x9Ar3UxXgzJfzO5Wfl/OW8Pgr1Y1uwC8KpfWfP8Yb1aMN7QpU6wheMZNmtAOGAE851r56QVWrTRMkmZo8ZLJZtjw/xkIKPaxOIG7SNQoww=
+	t=1785336529; cv=none; b=tTzdnAjn8MYQ03K2HbGydbht4jGMEnzPzHndabL/tjGGnJOF9cVzzcBVUqQYqL41V52b9eTj/XTsEaNf1yO30q3V46FUazVDANPQCM74T4Lfu6GV9EMgTVYBRdB/U/GNoxSfF+Ar1xSnWwatqNaLSzpM0TksYmnEkGuhlnl8dWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785332628; c=relaxed/simple;
-	bh=eaGzEIkYl8mhH9FJsA+z0QYzoh5FgifdmAGDyRbtefg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S/6yhgEp6lhO++AA2brU0Z5cSzUvW5+q+XP3WJdLKanuItvlLo+4oree+LEz0VemN9GDx++RSN70JLmfBVtLdce/Xnx0272qypooV5rJtYLbNsx/pCQq1kSfpf2R+2c/3ZiW+x4LGmBVjd78dowCTJWboXRo8kqdLXY5J2mSa1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NkB6Ju3s; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1785336529; c=relaxed/simple;
+	bh=EFeljYUYULY/unXLtkmpPngEEZUifKl4vRFqpOCfQPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fIZIJaHxsZ/NhfF8CwfGr6xdoje4wgLQTQ7MmzSz09lNmRhmBoGp7TCk9Stb1QL6f5yWWMzIAsvpPfYYaFmi/TiZ3bV4zJNMqdE3hgbpTLG5sh+1SHhvvTq0e2hvL1dpU1Maexd5Rfcn9dQnyGWKrU9g12/usVATEBaB01euCoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MO963tK7; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkB6Ju3s"
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6984169c126so1590648a12.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 06:43:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MO963tK7"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7ff05e5d009so13590247b3.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 07:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785332624; x=1785937424; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GoC91kED98vuJAvVTLdEFxjWPhyWXTYJuu42/1RW6zQ=;
-        b=NkB6Ju3sR6t/04LfYOcf1isKoRwj6gashzuQqgP16ZraPJFZ3CxthU7KB7CaDi06Uc
-         OV+KK3R27aibqPqauHrjVAclLEu3h2W3M44GUXpElW0GFsm5UFqCvsfPDqjBxpg63uYZ
-         DdC1vsuHvRFktDtlx5Sf6xPt4LJGvH2d7JI+99RmcX293mY8nN15zRfHQqPW5HCj5xe6
-         TRTuhPfI7+U7ybhMZvkcH543PUnWZXFT+26Zq1ln1U5nH7Qu6C2M8bLp6sUsjkHprbXN
-         ddgRUBujvrsDPmIv7uI7IdmFAg1DBQzp7jOr+ymhaWRkv2OB1OeAiGWdRf93WHwGf6te
-         Qsng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785332624; x=1785937424;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1785336526; x=1785941326; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GoC91kED98vuJAvVTLdEFxjWPhyWXTYJuu42/1RW6zQ=;
-        b=DqbMbNFZD3be+tasyLg/iVK/MKFMINkJWeAzwQLMTNBAOl7McKsx94fdQoxZcmdYUA
-         iERI2JF3wNT24DZDT0z2fmUbKl124V43m/mwCJ2CRTmXAmOnDag0SqIoT0+lHlnB64Kj
-         YvRVnCARuCYfpoL9D0rH1zrNTqpFGRik5/jIkuHT+sN3CyUTsGuFfZrrKbAglNoEmyRD
-         RpzqEDELS9v5n5NQ/YIN9vmXKUv3G7Jyj/sKeLpxznpj5nNYCePwwht/BQoNcBuE+2Fw
-         RKPKnUgn3JedwXxHZLd1FzqYcj/wW9bwhO//eYB55bjbpMrAGJ1PXZta8uoGjlf9JxJy
-         nsEw==
-X-Forwarded-Encrypted: i=1; AHgh+Rqmm5QtM3YmgkSpXqRDlRfMlposjgnfm+NKAtOZmfcf5Gny23Ufz9NnMgCkxj7+rHRT4BQixFvLh+JDEQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyxQhsoHEuytdM0mNPshgsuxbvmO7R5fvRU1D3JtLJUtfLOakl
-	50vST/0aGo+gZq7jNouO2KR2qB6Ue81Nj5SS2zsrud+JAFWoJuxaT2qT
-X-Gm-Gg: AR+sD10zSYSs3VS+34PcFHNHQNf99F4QZWenRE9X6k9HDfgocu0YOf+GleQOBUNBhFF
-	bVmp64qlC3WaF/ATw1EUzdS68KG3V0KoIqFJ56gth0U6E6khMb1IHZCKF+FrX/i0XT7O9Srqvdq
-	0a3G2CTWa+hoWwEzJA4voMJbomFYpgm5l5xLaG63MWTzfHs4uInavL4t4Mdrb7Ja+EaqOuzWF+Q
-	axtHopj3QZ58cH7V6iZht1Q1HG84+tJsOAWeGpPX+wmPmk8hy9woflUm6jL8DwvVvdflCy9lxlh
-	diZrsKxFJrCZ595Ro7a/uJWlupOAsvf/tdwQxVaKUv9ligzqwDnmIxo1FiDZ6busMnikHcqZMx/
-	Blxsg2pNM8yd/aMV7LGPeTnlavok/AlQBWVSPrxH/GGsUe6Gtd+Q51pVU0+rIt89mCETx2kJIIB
-	Q6vVXHFcbr8XOUbu7bOuloKFHbJW+6AwtdXAyZVwmx+dGWcwBusEvkur+vVBaZVLgExIB+2iQL8
-	YeODArCVE5QjCK1cjULq1LlndpxY1bmeQny2c1znNi3lbmqJfCl+Py+b2NGfbTr3Anija3W6Fob
-	uIcSqTqop3IlooxEcvA=
-X-Received: by 2002:a05:6402:24c8:b0:697:ecb4:b86c with SMTP id 4fb4d7f45d1cf-6a034a0b240mr2761963a12.2.1785332624180;
-        Wed, 29 Jul 2026 06:43:44 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:640])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a050c49fb5sm868560a12.14.2026.07.29.06.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2026 06:43:43 -0700 (PDT)
-Message-ID: <0df2f832-e8a8-4fdd-a5b6-e08657c2891f@gmail.com>
-Date: Wed, 29 Jul 2026 14:43:34 +0100
+        bh=5+d1+lcN9nUQwDq0plTzKXR0JqkkFWWJ/qp+bjZmBRc=;
+        b=MO963tK70bVJWM6LMnCKU6likA5SoDf0d/X4tT64DLQGsMsy0KX38SS2vtQ5+QvEMT
+         i3/I6J36AcgkW3h8Bmih7wUtb2jEMlP13iolU2WZpmyB3SQHICo/K0fAi5FA4KxDHdFT
+         x/iSnzlRPawHgRkY6Nav9wQoj7xcIedH6Nh0iXY9IZBcHFYMlUr8bLvYGE5l7CDd4T+y
+         UEXYltq24UmIJYXxEX8UbLbo6SDLKjW7UDySLMaDcj0YRpdkednYxEtcr46/lBDXuGwF
+         a0kirxiVilKb70oUPCKCtFW1lu9cPx4cBUlM8aGPwP+BvA6zCFVLsLG0t4NixQChSADQ
+         YTjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785336526; x=1785941326;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5+d1+lcN9nUQwDq0plTzKXR0JqkkFWWJ/qp+bjZmBRc=;
+        b=UrfKlRxBW2i1sIxceDcIQW51lVh0ny8N4o34LmuVMWdaFoUzym0nLLtGdMye5g8KFA
+         jSKLt1ZuJgBIATIoVHgbHNCyBkiuTwBxMeo+d7O9RjfcqrWNijjmK0wwV7b0Xc3FAX3F
+         hxBnklVxx7RUm6EPMKXa/WsZ5xxknNKQBDpM3ACwmcydNO+cXq+6B63pSiEb792RIjcm
+         gRDcrzIqM79rBUELHnQoL7z0Ow/CxATeg47PVB8FKgCCmW1TLPFJjrqLinX74NJnpoNm
+         gCKzu4oB0Nhxa4N4yn4mqPX3l+7RUR4rLQzOxRC+xU1i1Nw9T9QxQVGsnxZLSAF6XJDE
+         kc1w==
+X-Forwarded-Encrypted: i=1; AHgh+RqwDOKC0ZHOXodOj3ZmnaX42xKmqzKIdq4cE+eC6HjMdz3PsPtN/SyIZYqmvpK3u8A075AlO/9fycIXAw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV3unlweyXWxt2fqe0xx82fffD0c0ARFF2SqsI4VfOOIXE/701
+	Asula/DleePS1Z8vUo15jyBKoNOUTg48EWzmNQZX0jPNA3gpmnTI/w1x
+X-Gm-Gg: AR+sD10ryPpl3tZBXlfm1Xa9irVSKZYPLmJP9q43OJTc3m90uT+Tvpmth3KL9sAv2pM
+	v8E2FQnFYhgzyyG3BJTA8tM5teF5FR948r+3spxBvo6V0QBmAMEf+chW2/qWac7bh1fGYY5HZe8
+	7ahFljB7WyHRyYLEx2MQ8UHAiGKf5AKThK+KXfJrZHGscqstqGJ5YqMEDm7bzmkujX4yTjux1N/
+	XVMjWp/UnSfZvgVHWOG8TBEXN+gM/M1nY2dPYXIIrReP2X3TgJ4ShqU3fJTtSo6Dgf1im3MOY5J
+	vqRoTb+RYGc76cx5gT/XadhsXr2x1606NV4vY0Zxx/71jBvf5qH/DIJd6x57TMCLvOPYBvmVC9U
+	LwcdyI65pkt7O6Qo9H6FTmqYoR93moZSij8PnRXmE/MvEqGdCZbV0ztw05A1pvJ8ANcPA+gr/ic
+	fU4m6fz+DCjV37OrP5Craz4DVnmmto4ccvdyDJOID865s4Jior7dyEHsHWzDGPmIV3VEjPXxtXn
+	I1lerG0b7iiWawznCJvECPt9VUguSWD7MGzKzCdm3d+5UJQCjtvKGhT83ympP6c3cZTunyQ54Mv
+	DaN3jypPlc9jAp6v
+X-Received: by 2002:a05:690c:4b0b:b0:7db:ccda:a409 with SMTP id 00721157ae682-81f991858eemr33391167b3.9.1785336526262;
+        Wed, 29 Jul 2026 07:48:46 -0700 (PDT)
+Received: from fedora-laptop.tail348456.ts.net ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fa2957751sm18917187b3.35.2026.07.29.07.48.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2026 07:48:45 -0700 (PDT)
+From: Ming Lei <tom.leiming@gmail.com>
+To: stable@vger.kernel.org
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	George Salisbury <gsalisbury@apnic.net>
+Subject: [PATCH 6.18.y] ublk: wait on ublk_dev_ready() instead of ub->completion
+Date: Wed, 29 Jul 2026 09:48:06 -0500
+Message-ID: <20260729144826.2214402-1-tom.leiming@gmail.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <2026072957-overdue-curing-588b@gregkh>
+References: <2026072957-overdue-curing-588b@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 14/14] io_uring/rsrc: add dmabuf backed registered
- buffers
-To: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe
- <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Damien Le Moal <dlemoal@kernel.org>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, David Sterba <dsterba@suse.com>,
- Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
- nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org
-References: <cover.1785274111.git.asml.silence@gmail.com>
- <CGME20260728213020epcas5p1721e72ba5544abf0b61482da005120d9@epcas5p1.samsung.com>
- <26dcd0ae5c87a3ada5710b14b6894ef343cec6fe.1785274111.git.asml.silence@gmail.com>
- <583fdfb2-5368-467f-a388-6d388859c995@samsung.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <583fdfb2-5368-467f-a388-6d388859c995@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/29/26 14:30, Anuj Gupta/Anuj Gupta wrote:
-> On 7/29/2026 2:59 AM, Pavel Begunkov wrote:
->> +static struct io_rsrc_node *io_register_dmabuf(struct io_ring_ctx *ctx,
->> +						struct io_uring_regbuf_desc *desc)
->> +{
->> +	struct io_rsrc_node *node = NULL;
->> +	struct io_mapped_ubuf *imu = NULL;
->> +	struct io_regbuf_dma *regbuf = NULL;
->> +	struct file *target_file = NULL;
->> +	struct dma_buf *dmabuf = NULL;
->> +	int ret;
->> +
->> +	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
->> +		return ERR_PTR(-EOPNOTSUPP);
->> +	if (ctx->flags & IORING_SETUP_IOPOLL)
->> +		return ERR_PTR(-EOPNOTSUPP);
->> +	if (desc->uaddr || desc->size)
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	ret = -ENOMEM;
->> +	node = io_rsrc_node_alloc(ctx, IORING_RSRC_BUFFER);
->> +	if (!node)
->> +		return ERR_PTR(-ENOMEM);
->> +	imu = io_alloc_imu(ctx, 0);
->> +	if (!imu)
->> +		goto err;
->> +	regbuf = kzalloc(sizeof(*regbuf), GFP_KERNEL);
->> +	if (!regbuf)
->> +		goto err;
->> +
->> +	ret = -EBADF;
->> +	target_file = fget(desc->target_fd);
->> +	if (!target_file)
->> +		goto err;
->> +
->> +	dmabuf = dma_buf_get(desc->dmabuf_fd);
->> +	if (IS_ERR(dmabuf)) {
->> +		ret = PTR_ERR(dmabuf);
->> +		dmabuf = NULL;
->> +		goto err;
->> +	}
->> +	if (dmabuf->size > SZ_1G) {
->> +		ret = -EINVAL;
->> +		goto err;
->> +	}
->> +
->> +	ret = dma_buf_io_ctx_create(target_file, &regbuf->ctx, dmabuf,
->> +				    DMA_BIDIRECTIONAL);
->> +	if (ret)
->> +		goto err;
->> +
->> +	regbuf->target_file = target_file;
->> +	imu->nr_bvecs = 1;
-> 
-> There is no bvec backing a dmabuf imu - should this be 0?
+ub->completion is only re-armed by a successful START_USER_RECOVERY. If
+the ublk server sends END_USER_RECOVERY without one - e.g. its START
+failed with -EBUSY and the error was ignored - the wait is satisfied by
+the stale completion of the previous recovery cycle, and the device is
+marked LIVE and the requeue list kicked while the FETCH stream is still
+running and ubq->canceling is still set. The kick redispatches a
+previously requeued request, __ublk_queue_rq_common() sees ->canceling
+and parks it again via __ublk_abort_rq(), and after the last FETCH
+clears ->canceling nothing ever kicks the requeue list again: the
+request is stranded there while holding its tag. If it is the flush
+machinery's flush_rq, every subsequent fsync piles up in uninterruptible
+sleep and teardown hangs on tag draining. This matches a report of a
+lost PREFLUSH with ext4 on top of ublk after daemon crash recovery.
 
-Doesn't really matter as it's not used. It's 1 to say that
-it's just 1 contig segment, but I can just zero it to avoid
-confusion.
+ub->completion is an edge-triggered latch used as a proxy for the level
+condition "every queue has fetched all I/O commands", which can regress
+(F_BATCH's UNPREP, daemon death) and whose re-arm can be skipped. Drop
+it and wait on the real condition instead: the new helper
+ublk_wait_dev_ready_and_lock() waits on ublk_dev_ready() via
+wait_var_event_interruptible(), woken from ublk_mark_io_ready(), then
+re-checks it under ub->mutex, waiting again on regression, and returns
+with the mutex held and readiness guaranteed.
 
-> 
->> +	imu->ubuf = 0;
->> +	imu->len = dmabuf->size;
->> +	imu->folio_shift = 0;
->> +	imu->release = io_release_reg_dmabuf;
->> +	imu->priv = regbuf;
->> +	imu->flags = IO_REGBUF_F_DMABUF;
->> +	imu->dir = IO_IMU_DEST | IO_IMU_SOURCE;
->> +	refcount_set(&imu->refs, 1);
->> +	node->buf = imu;
->> +	dma_buf_put(dmabuf);
->> +	return node;
->> +err:
->> +	kfree(regbuf);
->> +	if (imu)
->> +		io_free_imu(ctx, imu);
->> +	if (node)
->> +		io_cache_free(&ctx->node_cache, node);
->> +	if (target_file)
->> +		fput(target_file);
->> +	if (dmabuf)
->> +		dma_buf_put(dmabuf);
->> +	return ERR_PTR(ret);
->> +}
->> +
->> +
-> 
-> nit: extra newline here
-> 
->> +static int io_import_dmabuf(struct io_kiocb *req,
->> +			   int ddir, struct iov_iter *iter,
->> +			   struct io_mapped_ubuf *imu,
->> +			   size_t len, size_t offset,
->> +			   unsigned issue_flags)
->> +{
->> +	struct io_regbuf_dma *db = imu->priv;
->> +	struct dma_buf_io_map *map;
->> +
->> +	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
->> +		return -EOPNOTSUPP;
->> +	if (!len)
->> +		return -EFAULT;
->> +	if (req->file != db->target_file)
->> +		return -EBADF;
->> +
->> +	if (req->flags & REQ_F_DROP_DMABUF) {
->> +		map = req->dmabuf_map;
->> +		goto init_iter;
->> +	}
-> 
-> O_DIRECT is checked only during registration; we should recheck
-> (file->f_flags & O_DIRECT) per request.
+Readiness becomes true in the same ub->mutex critical section that
+clears the last queue's ->canceling, so END_USER_RECOVERY marks the
+device LIVE and kicks the requeue list strictly after ->canceling
+clears. The wait stays interruptible, so a server whose daemon died can
+still be signalled out. For ublk_ctrl_start_dev() this replaces the
+fail-fast -EINVAL on an F_BATCH ready->UNPREP regression with waiting
+until the device is ready again.
 
-Nobody should be able to clear O_DIRECT, unless I missed something?
-And fwiw, io_uring wouldn't be the right place to do it.
+Reported-by: George Salisbury <gsalisbury@apnic.net>
+Fixes: 728cbac5fe21 ("ublk: move device reset into ublk_ch_release()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Link: https://patch.msgid.link/20260719134540.120269-1-tom.leiming@gmail.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
+(cherry picked from commit 432a9b2780c0a01caf547bd1fc2fcf28aeb8d173)
+[ 6.18.y tracks readiness per fetched I/O command in ->nr_io_ready rather
+  than per queue in ->nr_queue_ready, so wait and wake on that counter;
+  ->canceling is cleared by ublk_reset_io_flags(), which stays in
+  ublk_mark_io_ready(). UBLK_F_BATCH_IO does not exist here, so
+  ublk_ctrl_start_dev() has no F_BATCH readiness re-check to replace, and
+  readiness can only regress via ublk_reset_ch_dev() on daemon death. ]
+---
+ drivers/block/ublk_drv.c | 52 ++++++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index c339222513b0..cb31e96f01cd 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -19,6 +19,7 @@
+ #include <linux/errno.h>
+ #include <linux/major.h>
+ #include <linux/wait.h>
++#include <linux/wait_bit.h>
+ #include <linux/blkdev.h>
+ #include <linux/init.h>
+ #include <linux/swap.h>
+@@ -26,7 +27,6 @@
+ #include <linux/compat.h>
+ #include <linux/mutex.h>
+ #include <linux/writeback.h>
+-#include <linux/completion.h>
+ #include <linux/highmem.h>
+ #include <linux/sysfs.h>
+ #include <linux/miscdevice.h>
+@@ -230,7 +230,6 @@ struct ublk_device {
+ 
+ 	struct ublk_params	params;
+ 
+-	struct completion	completion;
+ 	u32			nr_io_ready;
+ 	bool 			unprivileged_daemons;
+ 	struct mutex cancel_mutex;
+@@ -2150,9 +2149,13 @@ static void ublk_mark_io_ready(struct ublk_device *ub)
+ 
+ 	ub->nr_io_ready++;
+ 	if (ublk_dev_ready(ub)) {
+-		/* now we are ready for handling ublk io request */
++		/*
++		 * now we are ready for handling ublk io request, clear
++		 * device-level canceling flag and wake ublk_dev_ready()
++		 * waiters
++		 */
+ 		ublk_reset_io_flags(ub);
+-		complete_all(&ub->completion);
++		wake_up_var(&ub->nr_io_ready);
+ 	}
+ }
+ 
+@@ -2829,7 +2832,6 @@ static int ublk_init_queues(struct ublk_device *ub)
+ 			goto fail;
+ 	}
+ 
+-	init_completion(&ub->completion);
+ 	return 0;
+ 
+  fail:
+@@ -2966,6 +2968,26 @@ static bool ublk_validate_user_pid(struct ublk_device *ub, pid_t ublksrv_pid)
+ 	return ub->ublksrv_tgid == ublksrv_pid;
+ }
+ 
++/*
++ * Wait until all queues have fetched their I/O commands, and return with
++ * ub->mutex held and readiness guaranteed: then every queue's ->canceling
++ * is cleared. Ready may regress between wakeup and mutex_lock() (daemon
++ * death), so re-check it under the mutex and wait again.
++ */
++static int ublk_wait_dev_ready_and_lock(struct ublk_device *ub)
++{
++	while (true) {
++		if (wait_var_event_interruptible(&ub->nr_io_ready,
++						 ublk_dev_ready(ub)))
++			return -EINTR;
++
++		mutex_lock(&ub->mutex);
++		if (ublk_dev_ready(ub))
++			return 0;
++		mutex_unlock(&ub->mutex);
++	}
++}
++
+ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 		const struct ublksrv_ctrl_cmd *header)
+ {
+@@ -3031,13 +3053,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 		lim.max_segments = ub->params.seg.max_segments;
+ 	}
+ 
+-	if (wait_for_completion_interruptible(&ub->completion) != 0)
++	if (ublk_wait_dev_ready_and_lock(ub))
+ 		return -EINTR;
+ 
+-	if (!ublk_validate_user_pid(ub, ublksrv_pid))
+-		return -EINVAL;
+-
+-	mutex_lock(&ub->mutex);
++	if (!ublk_validate_user_pid(ub, ublksrv_pid)) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
+ 	if (ub->dev_info.state == UBLK_S_DEV_LIVE ||
+ 	    test_bit(UB_STATE_USED, &ub->state)) {
+ 		ret = -EEXIST;
+@@ -3549,7 +3571,6 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
+ 		goto out_unlock;
+ 	}
+ 	pr_devel("%s: start recovery for dev id %d.\n", __func__, header->dev_id);
+-	init_completion(&ub->completion);
+ 	ret = 0;
+  out_unlock:
+ 	mutex_unlock(&ub->mutex);
+@@ -3565,16 +3586,17 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+ 	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
+ 		 header->dev_id);
+ 
+-	if (wait_for_completion_interruptible(&ub->completion))
++	if (ublk_wait_dev_ready_and_lock(ub))
+ 		return -EINTR;
+ 
+ 	pr_devel("%s: All FETCH_REQs received, dev id %d\n", __func__,
+ 		 header->dev_id);
+ 
+-	if (!ublk_validate_user_pid(ub, ublksrv_pid))
+-		return -EINVAL;
++	if (!ublk_validate_user_pid(ub, ublksrv_pid)) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
+ 
+-	mutex_lock(&ub->mutex);
+ 	if (ublk_nosrv_should_stop_dev(ub))
+ 		goto out_unlock;
+ 
 -- 
-Pavel Begunkov
+2.55.0
 
