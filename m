@@ -1,263 +1,95 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683334963D0
-	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 14:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77071483825
+	for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 14:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785336529; cv=none; b=tTzdnAjn8MYQ03K2HbGydbht4jGMEnzPzHndabL/tjGGnJOF9cVzzcBVUqQYqL41V52b9eTj/XTsEaNf1yO30q3V46FUazVDANPQCM74T4Lfu6GV9EMgTVYBRdB/U/GNoxSfF+Ar1xSnWwatqNaLSzpM0TksYmnEkGuhlnl8dWY=
+	t=1785336679; cv=none; b=URLtAPJcpY3f+oTa/cn7bB/QIoP1BDnly+8EpHriV5gYB7ftFGcFBz+rdLvGNLjRifS/AJVqcCEksqMKpiHC0Ad28Lm+w8jFOt5hT1l1KzkF+6I3tXL6ceiI2HqSYxvbaH6pzqahdmf7ra1ew9fjsubnYq/trtxKN8RRkuBlINA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785336529; c=relaxed/simple;
-	bh=EFeljYUYULY/unXLtkmpPngEEZUifKl4vRFqpOCfQPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fIZIJaHxsZ/NhfF8CwfGr6xdoje4wgLQTQ7MmzSz09lNmRhmBoGp7TCk9Stb1QL6f5yWWMzIAsvpPfYYaFmi/TiZ3bV4zJNMqdE3hgbpTLG5sh+1SHhvvTq0e2hvL1dpU1Maexd5Rfcn9dQnyGWKrU9g12/usVATEBaB01euCoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MO963tK7; arc=none smtp.client-ip=209.85.128.182
+	s=arc-20240116; t=1785336679; c=relaxed/simple;
+	bh=PYDfl+F41hxq/6bv4+Ht5LZxugkjPCkp9xIdMHB4WZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WInkbmoOWlgsmaIFIu91/nMKMd//DmxZZ89Iye9zSjk3DWAwEYC/NTIHmITsXl4wGy4GHZeHrWHsqqhczs5orDiN6GAtX86mLtvY3XUYFSqLmevysJv7DseDNOZQDzhm2AtRQYsUPsdD24bJyZLBJ94F1t/zJvR/WaqJ5RsE2HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q+P97zgV; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MO963tK7"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7ff05e5d009so13590247b3.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 07:48:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+P97zgV"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7e9ecb1e13cso1119785a34.3
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 07:51:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785336526; x=1785941326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5+d1+lcN9nUQwDq0plTzKXR0JqkkFWWJ/qp+bjZmBRc=;
-        b=MO963tK70bVJWM6LMnCKU6likA5SoDf0d/X4tT64DLQGsMsy0KX38SS2vtQ5+QvEMT
-         i3/I6J36AcgkW3h8Bmih7wUtb2jEMlP13iolU2WZpmyB3SQHICo/K0fAi5FA4KxDHdFT
-         x/iSnzlRPawHgRkY6Nav9wQoj7xcIedH6Nh0iXY9IZBcHFYMlUr8bLvYGE5l7CDd4T+y
-         UEXYltq24UmIJYXxEX8UbLbo6SDLKjW7UDySLMaDcj0YRpdkednYxEtcr46/lBDXuGwF
-         a0kirxiVilKb70oUPCKCtFW1lu9cPx4cBUlM8aGPwP+BvA6zCFVLsLG0t4NixQChSADQ
-         YTjQ==
+        d=gmail.com; s=20251104; t=1785336675; x=1785941475; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=xHFMieRAasgbYmTSFjzwUgJo6vktMkwrcW3pgKwavBI=;
+        b=q+P97zgV85/XuT0CsJDnZhZtKY85nDqY5wQN0sCdLcmnmhW6z3/Okro7WfBRCl0dDz
+         DhE0DBNyj0HQgWb8SVDS7aZrf7Jbcj7a/ESUDzFw0TUKMNUYdJjn39VW31438+1yIlvg
+         Vszj4yvBuQYJnH5fjx9doT9tm3KVzU6gj5JCYsRagGe+ZZnp3zeeHKaBB0iGkOOfKCqD
+         iVimBw5RwP33sTF5d+vc3VGTCYFDRc78SR6s7+DxPI1zJ9SmLH8FjLMjg3Z7vAp7VmRN
+         WkQ9VYi4v2SeGrzIYwpPss5MwociFUfp2+WZ5Y7gwWc0YUOwh/xjYTS7lKMpxMVKBXN8
+         DkLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785336526; x=1785941326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5+d1+lcN9nUQwDq0plTzKXR0JqkkFWWJ/qp+bjZmBRc=;
-        b=UrfKlRxBW2i1sIxceDcIQW51lVh0ny8N4o34LmuVMWdaFoUzym0nLLtGdMye5g8KFA
-         jSKLt1ZuJgBIATIoVHgbHNCyBkiuTwBxMeo+d7O9RjfcqrWNijjmK0wwV7b0Xc3FAX3F
-         hxBnklVxx7RUm6EPMKXa/WsZ5xxknNKQBDpM3ACwmcydNO+cXq+6B63pSiEb792RIjcm
-         gRDcrzIqM79rBUELHnQoL7z0Ow/CxATeg47PVB8FKgCCmW1TLPFJjrqLinX74NJnpoNm
-         gCKzu4oB0Nhxa4N4yn4mqPX3l+7RUR4rLQzOxRC+xU1i1Nw9T9QxQVGsnxZLSAF6XJDE
-         kc1w==
-X-Forwarded-Encrypted: i=1; AHgh+RqwDOKC0ZHOXodOj3ZmnaX42xKmqzKIdq4cE+eC6HjMdz3PsPtN/SyIZYqmvpK3u8A075AlO/9fycIXAw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV3unlweyXWxt2fqe0xx82fffD0c0ARFF2SqsI4VfOOIXE/701
-	Asula/DleePS1Z8vUo15jyBKoNOUTg48EWzmNQZX0jPNA3gpmnTI/w1x
-X-Gm-Gg: AR+sD10ryPpl3tZBXlfm1Xa9irVSKZYPLmJP9q43OJTc3m90uT+Tvpmth3KL9sAv2pM
-	v8E2FQnFYhgzyyG3BJTA8tM5teF5FR948r+3spxBvo6V0QBmAMEf+chW2/qWac7bh1fGYY5HZe8
-	7ahFljB7WyHRyYLEx2MQ8UHAiGKf5AKThK+KXfJrZHGscqstqGJ5YqMEDm7bzmkujX4yTjux1N/
-	XVMjWp/UnSfZvgVHWOG8TBEXN+gM/M1nY2dPYXIIrReP2X3TgJ4ShqU3fJTtSo6Dgf1im3MOY5J
-	vqRoTb+RYGc76cx5gT/XadhsXr2x1606NV4vY0Zxx/71jBvf5qH/DIJd6x57TMCLvOPYBvmVC9U
-	LwcdyI65pkt7O6Qo9H6FTmqYoR93moZSij8PnRXmE/MvEqGdCZbV0ztw05A1pvJ8ANcPA+gr/ic
-	fU4m6fz+DCjV37OrP5Craz4DVnmmto4ccvdyDJOID865s4Jior7dyEHsHWzDGPmIV3VEjPXxtXn
-	I1lerG0b7iiWawznCJvECPt9VUguSWD7MGzKzCdm3d+5UJQCjtvKGhT83ympP6c3cZTunyQ54Mv
-	DaN3jypPlc9jAp6v
-X-Received: by 2002:a05:690c:4b0b:b0:7db:ccda:a409 with SMTP id 00721157ae682-81f991858eemr33391167b3.9.1785336526262;
-        Wed, 29 Jul 2026 07:48:46 -0700 (PDT)
-Received: from fedora-laptop.tail348456.ts.net ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fa2957751sm18917187b3.35.2026.07.29.07.48.37
+        d=1e100.net; s=20251104; t=1785336675; x=1785941475;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xHFMieRAasgbYmTSFjzwUgJo6vktMkwrcW3pgKwavBI=;
+        b=rdUHSlabX012Mdw0DDMpca5fgFzNljcRGMx+gZJCxEOnjusr3M/HIC4Mgab1yiYXMK
+         K8oQb7A2l7uETylRze3r0+pptObrWRl9RiR67Jy0w6L9lFDxPhAoj5O6Vnbd242/k8x7
+         iTTgwYF5GqC0FStL/Finb2jiadVoPuVXSzBEILMETW184dFY4OQFMODj24ks3MjIKwQ6
+         w4Bvs6OHLwwVhBPiFdv0TQsBJExpjUGM9d9aluWpy8FbpxwQR8+2s8/e10oZGJCcuGvP
+         TAkM/ZLkEY1InwsU5NFWrjorRKLqiFx1XfNh0efZaluBEe/dWYV017mAaF/eYlqg78xU
+         tlYA==
+X-Forwarded-Encrypted: i=1; AHgh+RohOPP+WUXzwEjrpqyWZcu0uRpSY3T9hhTmaWd8TaP8LV+sITX6EQb+zHSp0TQ/hMdIW/a36umgx4XzFw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCDcJC1LDxKTWN+GNDA9y0WnWfawr4Br23R3wEZ3A+cVZIK3fu
+	lr3ckh3tU8y78ZCHtDpNLSDOJGvbV/3K1BZTEvV2HH+5gdId6UZKzlDh
+X-Gm-Gg: AR+sD12Q2xkJiSO3/sf1oT3szNzaMbILA7kCgzGxscl91K/L+jfbEh5nWCnojh/dlvK
+	WWWzUCZaTA5E76gbBuq0o843a+4KsqwXNYUGG5fehVrF1I6v8xDCpblAQPeo0UwLXLHgA4Kqshv
+	T3ZsX8/kCRQvpzE6DdlDj9TpvxBxovquZDx+lr3ecPlboWjUfTRDoDZZR57tW/8OoV9OGoLq9OB
+	TJiAfWMVzNOIlU7K2B1oxZEXILTRvSMKtZXhqaml32rOT0VC7nMNrp1iqh10RCwkm12ozJoOah2
+	HKVJbLc54hf8ZJeTUtRDoDKhSqEY/0Xjp90kxfagmpdI7xbB9iXWb/7DyLdhKL3a7R1maPy3sf+
+	2vfA8uWomtwyA95Q8GplsPNOX+A0JZtaEmhHh1EjLz/sUHjI4LLbGRQlpAkfcsouBAq8+ORxLUA
+	wUehZoHJKdxRGO+kbBT2Z2MqZxmqYWUHhnJFheWR7sdHxkJW7ob/Yy88qjkMpGTEyXufzg06iX5
+	A3013B/PR3FYoRkz0wEehquBmw6uUvxdwVMhQrRoYUaZNg6X5LL3/C0FjLt/f25k4Td
+X-Received: by 2002:a05:6830:82e3:b0:7e9:ea28:4c1f with SMTP id 46e09a7af769-7efff0c0181mr4161623a34.8.1785336674711;
+        Wed, 29 Jul 2026 07:51:14 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f00d5f3aebsm2457915a34.9.2026.07.29.07.51.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 07:48:45 -0700 (PDT)
+        Wed, 29 Jul 2026 07:51:14 -0700 (PDT)
+Date: Wed, 29 Jul 2026 09:51:01 -0500
 From: Ming Lei <tom.leiming@gmail.com>
-To: stable@vger.kernel.org
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	George Salisbury <gsalisbury@apnic.net>
-Subject: [PATCH 6.18.y] ublk: wait on ublk_dev_ready() instead of ub->completion
-Date: Wed, 29 Jul 2026 09:48:06 -0500
-Message-ID: <20260729144826.2214402-1-tom.leiming@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <2026072957-overdue-curing-588b@gregkh>
-References: <2026072957-overdue-curing-588b@gregkh>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] ublk: consistently use u16 for queue and tag numbers
+Message-ID: <amoTVUNipvRDGvVu@fedora-laptop>
+References: <20260729012951.3744582-1-csander@purestorage.com>
+ <20260729012951.3744582-2-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260729012951.3744582-2-csander@purestorage.com>
 
-ub->completion is only re-armed by a successful START_USER_RECOVERY. If
-the ublk server sends END_USER_RECOVERY without one - e.g. its START
-failed with -EBUSY and the error was ignored - the wait is satisfied by
-the stale completion of the previous recovery cycle, and the device is
-marked LIVE and the requeue list kicked while the FETCH stream is still
-running and ubq->canceling is still set. The kick redispatches a
-previously requeued request, __ublk_queue_rq_common() sees ->canceling
-and parks it again via __ublk_abort_rq(), and after the last FETCH
-clears ->canceling nothing ever kicks the requeue list again: the
-request is stranded there while holding its tag. If it is the flush
-machinery's flush_rq, every subsequent fsync piles up in uninterruptible
-sleep and teardown hangs on tag draining. This matches a report of a
-lost PREFLUSH with ext4 on top of ublk after daemon crash recovery.
+On Tue, Jul 28, 2026 at 07:29:46PM -0600, Caleb Sander Mateos wrote:
+> The u16 nr_hw_queues and queue_depth fields of the ublk UAPI struct
+> ublksrv_ctrl_dev_info constrain the number of queues and queue depth of
+> each ublk device. However, the ublk driver is a bit inconsistent with
+> the type it uses to represent these values, mixing u16 with int and
+> unsigned int. Change all queue number, queue depth, q_id, and tag
+> variables/fields to u16 to save some space.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-ub->completion is an edge-triggered latch used as a proxy for the level
-condition "every queue has fetched all I/O commands", which can regress
-(F_BATCH's UNPREP, daemon death) and whose re-arm can be skipped. Drop
-it and wait on the real condition instead: the new helper
-ublk_wait_dev_ready_and_lock() waits on ublk_dev_ready() via
-wait_var_event_interruptible(), woken from ublk_mark_io_ready(), then
-re-checks it under ub->mutex, waiting again on regression, and returns
-with the mutex held and readiness guaranteed.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-Readiness becomes true in the same ub->mutex critical section that
-clears the last queue's ->canceling, so END_USER_RECOVERY marks the
-device LIVE and kicks the requeue list strictly after ->canceling
-clears. The wait stays interruptible, so a server whose daemon died can
-still be signalled out. For ublk_ctrl_start_dev() this replaces the
-fail-fast -EINVAL on an F_BATCH ready->UNPREP regression with waiting
-until the device is ready again.
-
-Reported-by: George Salisbury <gsalisbury@apnic.net>
-Fixes: 728cbac5fe21 ("ublk: move device reset into ublk_ch_release()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
-Link: https://patch.msgid.link/20260719134540.120269-1-tom.leiming@gmail.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-(cherry picked from commit 432a9b2780c0a01caf547bd1fc2fcf28aeb8d173)
-[ 6.18.y tracks readiness per fetched I/O command in ->nr_io_ready rather
-  than per queue in ->nr_queue_ready, so wait and wake on that counter;
-  ->canceling is cleared by ublk_reset_io_flags(), which stays in
-  ublk_mark_io_ready(). UBLK_F_BATCH_IO does not exist here, so
-  ublk_ctrl_start_dev() has no F_BATCH readiness re-check to replace, and
-  readiness can only regress via ublk_reset_ch_dev() on daemon death. ]
----
- drivers/block/ublk_drv.c | 52 ++++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c339222513b0..cb31e96f01cd 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -19,6 +19,7 @@
- #include <linux/errno.h>
- #include <linux/major.h>
- #include <linux/wait.h>
-+#include <linux/wait_bit.h>
- #include <linux/blkdev.h>
- #include <linux/init.h>
- #include <linux/swap.h>
-@@ -26,7 +27,6 @@
- #include <linux/compat.h>
- #include <linux/mutex.h>
- #include <linux/writeback.h>
--#include <linux/completion.h>
- #include <linux/highmem.h>
- #include <linux/sysfs.h>
- #include <linux/miscdevice.h>
-@@ -230,7 +230,6 @@ struct ublk_device {
- 
- 	struct ublk_params	params;
- 
--	struct completion	completion;
- 	u32			nr_io_ready;
- 	bool 			unprivileged_daemons;
- 	struct mutex cancel_mutex;
-@@ -2150,9 +2149,13 @@ static void ublk_mark_io_ready(struct ublk_device *ub)
- 
- 	ub->nr_io_ready++;
- 	if (ublk_dev_ready(ub)) {
--		/* now we are ready for handling ublk io request */
-+		/*
-+		 * now we are ready for handling ublk io request, clear
-+		 * device-level canceling flag and wake ublk_dev_ready()
-+		 * waiters
-+		 */
- 		ublk_reset_io_flags(ub);
--		complete_all(&ub->completion);
-+		wake_up_var(&ub->nr_io_ready);
- 	}
- }
- 
-@@ -2829,7 +2832,6 @@ static int ublk_init_queues(struct ublk_device *ub)
- 			goto fail;
- 	}
- 
--	init_completion(&ub->completion);
- 	return 0;
- 
-  fail:
-@@ -2966,6 +2968,26 @@ static bool ublk_validate_user_pid(struct ublk_device *ub, pid_t ublksrv_pid)
- 	return ub->ublksrv_tgid == ublksrv_pid;
- }
- 
-+/*
-+ * Wait until all queues have fetched their I/O commands, and return with
-+ * ub->mutex held and readiness guaranteed: then every queue's ->canceling
-+ * is cleared. Ready may regress between wakeup and mutex_lock() (daemon
-+ * death), so re-check it under the mutex and wait again.
-+ */
-+static int ublk_wait_dev_ready_and_lock(struct ublk_device *ub)
-+{
-+	while (true) {
-+		if (wait_var_event_interruptible(&ub->nr_io_ready,
-+						 ublk_dev_ready(ub)))
-+			return -EINTR;
-+
-+		mutex_lock(&ub->mutex);
-+		if (ublk_dev_ready(ub))
-+			return 0;
-+		mutex_unlock(&ub->mutex);
-+	}
-+}
-+
- static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 		const struct ublksrv_ctrl_cmd *header)
- {
-@@ -3031,13 +3053,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 		lim.max_segments = ub->params.seg.max_segments;
- 	}
- 
--	if (wait_for_completion_interruptible(&ub->completion) != 0)
-+	if (ublk_wait_dev_ready_and_lock(ub))
- 		return -EINTR;
- 
--	if (!ublk_validate_user_pid(ub, ublksrv_pid))
--		return -EINVAL;
--
--	mutex_lock(&ub->mutex);
-+	if (!ublk_validate_user_pid(ub, ublksrv_pid)) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
- 	if (ub->dev_info.state == UBLK_S_DEV_LIVE ||
- 	    test_bit(UB_STATE_USED, &ub->state)) {
- 		ret = -EEXIST;
-@@ -3549,7 +3571,6 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
- 		goto out_unlock;
- 	}
- 	pr_devel("%s: start recovery for dev id %d.\n", __func__, header->dev_id);
--	init_completion(&ub->completion);
- 	ret = 0;
-  out_unlock:
- 	mutex_unlock(&ub->mutex);
-@@ -3565,16 +3586,17 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
- 		 header->dev_id);
- 
--	if (wait_for_completion_interruptible(&ub->completion))
-+	if (ublk_wait_dev_ready_and_lock(ub))
- 		return -EINTR;
- 
- 	pr_devel("%s: All FETCH_REQs received, dev id %d\n", __func__,
- 		 header->dev_id);
- 
--	if (!ublk_validate_user_pid(ub, ublksrv_pid))
--		return -EINVAL;
-+	if (!ublk_validate_user_pid(ub, ublksrv_pid)) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
- 
--	mutex_lock(&ub->mutex);
- 	if (ublk_nosrv_should_stop_dev(ub))
- 		goto out_unlock;
- 
--- 
-2.55.0
-
+Thanks,
+Ming
