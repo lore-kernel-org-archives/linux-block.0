@@ -1,99 +1,173 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A285C613
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 14:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1D340FD86
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 14:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785422294; cv=none; b=X60IsDn+LlRz8uGQRZFtIPMP0xvgFc0B28t1MXT0X8vSZYRoY84+buM55CzjBzpBRrGU4w1ITr+07CXXB1R0kVj+C7ZY/sy+bdGGgS3WsY9cKI9Le6AmCFaqzRpGJfCWJJWMoUQq5oMDIu8fDg5xiK/EQ39FsDPsmMR9gH4fR5g=
+	t=1785423188; cv=none; b=oz/Uybdol9DdSEF/2/Y+eSjAr2gjJrVWeheo1rEgdDUQLfO7eFzNRAgKKhPbTx8yQ49/6K9hHis7rDvmNyPB4uEkTHlqrNAU58PFANr7ggw2YJWjBSPOil0mCStPtMdUkoHPGP5sbDvg6qxXRultcJcHSy70wUQnRTjq1hw66cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785422294; c=relaxed/simple;
-	bh=ljSc69aX7CTWHRJdJgdDl33WKuH5zjh5+KLUUrTuits=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=reElmOjbPpqauWAqzDMko/AmO6XtjRbvQxwOlYn64Ui1wFWHPaxHhHt+UOZfjVR0fgP5CXPCpgVD9RFDqrgyf0Y7DTaJqqpQg/kU7p6C6W/OkcPwRbrEP2Ldsy/YbOEl4M5kUy/G5mqhhTC2FEt7vujW6qEL7GCDh6b6l1paqnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsZNs6G6; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785423188; c=relaxed/simple;
+	bh=JFvzplvbus/2kYURLL1As5wrffPNUN1jD/Gn1VXQyfY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=ArFWiMZRkZqjr5ikduMetvt9q3mbmcrHO+RGfJQN3qIh2P8x4KsWB6g5bV1ZKzgbFu6BqTQOW2zzDlQuNwpiPe8mqY8x/wC6C/D8HmSsp8bMdJa3FHxYbm2PHzcPeJ4zEzhTfKlnh66cc4EC8N7GRdS0deKS3Jtr374cWMIxGDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QbrPcklU; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsZNs6G6"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-66843536f94so2661883d50.3
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 07:38:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785422292; x=1786027092; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1PX4tMMPrcdGijfVy8V6872YM9hf92en2GXQCdp9uYQ=;
-        b=hsZNs6G6om5mxPyofUaQROUzuJzPDM4SsMVyAjU78dawP6bxQ+CQklL1YsbOJLOy2z
-         MwCxbygrbrdfIQEpF8cwhAv/DtRktS/alddUAg5jsxb/bM1SYKwJvMuRaYWihQo8rosH
-         5Sgjwr4TfpLt6t/Pb/VEEGUr8QM84ymbAf9czuY6/CxKuTahmE4NJ7ygmhnvubb1pZUh
-         9eLxE/DZzLTpVlUWGfnNA8tMyMp3oKQaNTWJ6RCnVYD1PdJviVSjbwmHdDNIXwgVHluD
-         JLE87ix2Lw96RjLSR/3ip0mXYlBusowlze+DqyDhTNvk3YZGjG1jG1mvjCOckko79sod
-         LDCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785422292; x=1786027092;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1PX4tMMPrcdGijfVy8V6872YM9hf92en2GXQCdp9uYQ=;
-        b=PlZLWjmrDaD2hbtVMJZqxO6Zgk3v8pLJk8rD3uCK7KPytVr8u7sMKna4eoJfhaXFHX
-         YkJw7nTW5HLr2T4le8iz9T89rUNq4zAGWZ7qUKhRAop/KM8DoNVM0nee2CvcHVYUu3mY
-         FsvnLF4vutGHDVeSzx1UwPal9RtRAVQ6uqGa2sQxrReVAsTPbrejW2QbQ2JB4cyrJgyW
-         gPZEazBcsLXCXM39dyNeq2VHfrik+M8LaDkKUpt8y9kaRFf/dGG9H9zeXvt8vuFQ2irO
-         COa80G9z/a7R2+NdHA4JRwxYDYI6tphXQ8CC8DGKtbBSh6SBQUEoDaSSQNB3jUeP+597
-         GAaw==
-X-Forwarded-Encrypted: i=1; AHgh+Ro71ZT7JuxxXgybS0g7j/Y7beLV3E5AylR2R2Wjzw4YEgbXUesMM9Ld2lceN9EGVzXQTtePyPDl3u8yJw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu9cjhcO+M9i4sI6bWkChGJ9nlo4kVqcZ1xJiCU66qRiNIxVMF
-	gzIQAGoJujf5v2h/fADwvvtp6pevu1HyTo/kYahOxOF7KmwRk+sGXQCp
-X-Gm-Gg: AR+sD10IgIRxLKwgomLJT0abJniVOTC6VToFSkpTwIxCQBCnkonOdLif25IuzKZDeYn
-	U1yN5uoZasHXiLYcwHVmrVFf91De5YraCC6UCmvClbBglNLB3CRQgVO5F3hPrVG1lYFfez950ZR
-	R9LtwgZjZ78WAfinX876x/QLpqIb5AX1JKCZb+PvhFGZc3hv6LRkrUYpDbj3YCVvWyNjKm6Li/8
-	KqbhplqO+C2JgjrhPiSsWRghShl3yA39IgLWYb7a8ljeYBfDX4O5nmn5T1MYv8ICOGqR6qfYgxN
-	DDJDX/lJGyREdgD9x/cJRQfG/d+HZRnmkd8O/Q3T0AVLpVbOF+iVachRBwCv0E4yBzl65r9xLGr
-	CDxboyLaLEsEpXrKqnBvHhc/hv7UPL5Ls04MX96f7Ir8KWikmFnQi+xBRKfZNaDC1rpBikW1Mpa
-	Khy1HmKdxxm/Ofi1dSYodmWBVdmALS73jJets886J8NLNe2EAtrnsuh58CRaHfRJw2k6MS71Hnw
-	NPP0QcSBJhLkUB8sRN7QH+4VFbnHqidOoJDvn8nXxakw6LemqrnrINUUvnZNX8haqI6DxO3Kv67
-	Ifs=
-X-Received: by 2002:a05:690e:438b:b0:667:bb60:78af with SMTP id 956f58d0204a3-6692f7b02e6mr1322456d50.90.1785422291746;
-        Thu, 30 Jul 2026 07:38:11 -0700 (PDT)
-Received: from fedora-laptop ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6693b131342sm127756d50.19.2026.07.30.07.38.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 07:38:11 -0700 (PDT)
-Date: Thu, 30 Jul 2026 09:37:50 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] ublk: split request validation from io_desc init
-Message-ID: <amthvuMO8t9UHIv5@fedora-laptop>
-References: <20260729012951.3744582-1-csander@purestorage.com>
- <20260729012951.3744582-4-csander@purestorage.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QbrPcklU"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260730145256epoutp03122a523c8712c1a05d0d481047f3ce87~HGOtxJ3W81812318123epoutp03H
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 14:52:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260730145256epoutp03122a523c8712c1a05d0d481047f3ce87~HGOtxJ3W81812318123epoutp03H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1785423176;
+	bh=4xilCRaoznc9RobxFg1o+gyR5JVXgQvjMd852A/HQH4=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=QbrPcklUlggA3I2zBiY5rerioThQTxm7vLm+OT9Y61cuzjPu2dgWspEz73wDowtxP
+	 fqeaPUVLkGqcz1kBAP5GWbYtcxcE3YxlMvqPCpnswMiNsbb0tAb+CIcNlQ4M/bEeoT
+	 bbHP/8kUzQtb4D1C0n+ipcyKB+41h6i6y1uiTF0w=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20260730145255epcas5p191c9aef2712848a1834dc86e4444f9c9~HGOs8MzRf2930629306epcas5p10;
+	Thu, 30 Jul 2026 14:52:55 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.86]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4h9sd26j6tz2SSKX; Thu, 30 Jul
+	2026 14:52:54 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260730145254epcas5p1af021ebbff5009fe362522f33a622711~HGOroDPqy2929729297epcas5p17;
+	Thu, 30 Jul 2026 14:52:54 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260730145252epsmtip2cfb198552ce68aa76ff4c69eaed27064~HGOp4weFf1740717407epsmtip22;
+	Thu, 30 Jul 2026 14:52:52 +0000 (GMT)
+Message-ID: <71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com>
+Date: Thu, 30 Jul 2026 20:22:51 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260729012951.3744582-4-csander@purestorage.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: brauner@kernel.org, hch@lst.de, dgc@kernel.org, jack@suse.cz,
+	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
+	<anuj20.g@samsung.com>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260721030338.GU7380@frogsfrogsfrogs>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260730145254epcas5p1af021ebbff5009fe362522f33a622711
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319
+References: <20260717125538.508925-1-joshi.k@samsung.com>
+	<CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
+	<20260717125538.508925-2-joshi.k@samsung.com>
+	<20260721030338.GU7380@frogsfrogsfrogs>
 
-On Tue, Jul 28, 2026 at 07:29:48PM -0600, Caleb Sander Mateos wrote:
-> In preparation for moving the struct ublksrv_io_desc initialization from
-> the thread submitting ublk requests to the daemon thread receiving them,
-> split the fallible part of ublk_setup_iod{,_zoned}() into new helper
-> ublk_validate_req{,_zoned}(). Only ublk_setup_iod{,_zoned}() accesses
-> the io_desc and cannot error out.
-> 
-> Return a bool value from ublk_validate_req{,_zoned}() as the existing
-> error code ublk_setup_iod{,_zoned}() returns is only checked against
-> BLK_STS_OK.
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+On 7/21/2026 8:33 AM, Darrick J. Wong wrote:
+> On Fri, Jul 17, 2026 at 06:25:33PM +0530, Kanchan Joshi wrote:
+>> From: Anuj Gupta<anuj20.g@samsung.com>
+>>
+>> Wire up the userspace interface for write stream management via four
+>> ioctls:
+>>
+>>    FS_IOC_WRITE_STREAM_GET_MAX  query the max streams supported
+>>    FS_IOC_WRITE_STREAM_OPEN     open a stream id, returns a stream fd
+>>    FS_IOC_WRITE_STREAM_SET      attach the stream fd to an open file
+>>    FS_IOC_WRITE_STREAM_GET      query the stream id value set on a file
+>>
+>> Application should query the available streams by using
+>> FS_IOC_WRITE_STREAM_GET_MAX. If returned value is N, valid stream id for
+>> the file are 1 to N.
+>>
+>> Application calls FS_IOC_WRITE_STREAM_OPEN to get fd for a stream-id.
+>> By default, kernel picks an available stream-id and returns the fd for
+>> it. The flag FS_WRITE_STREAM_OPEN_EXACT can be used to request a
+>> specific stream_id. This is useful if application cares about keeping a
+>> stable stream-id-to-spatial-isolation-bucket mapping across restarts.
+> Hmm.  If FS_IOC_WRITE_STREAM_OPEN returns an fd that represents an open
+> stream id, then why does STREAM_SET below take a pointer to a signed
+> s32? 
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Not a pointer, that s32 is to pass the stream fd.
 
-Thanks, 
-Ming
+> And why does STREAM_GET take a pointer to a u32?
+
+This also is a scalar value and not a pointer. The returned stream-id is 
+a u32.
+
+> IOWs it'd be much easier to distinguish these things if the ioctls took
+> pointers to structs instead of u32/s32 pointers directly.
+
+Maybe IOCTL naming is the source of confusion, because we introduced 
+stream-fds alongside stream-ids. More on this below.
+> Also it's a little weird that STREAM_SET associates an open file with a
+> stream fd, but STREAM_GET returns the stream*id* (not the fd)
+> associated with an open file.
+
+The confusion stems from keeping symmetric names for different 
+operations. Let me explain the intent and propose revised names below.
+
+Christoph's idea was to use FD for a write-stream so that it remains 
+exclusive to the application and unrelated applications don't collide.
+
+So, in this version, write-stream ids are implemented as independent 
+resource:
+- To set a file's write-stream ID to X, the app must first obtain the fd 
+for stream X.
+- That stream/fd will be unavailable if some other application has 
+already opened it.
+- If applications gets the stream fd, it can use that to set stream id 
+for multiple files.
+- It can close the stream-fd and that does not change anything for the 
+file resource (i.e, its inode continue to carry the stream-id value that 
+was set).
+
+Christoph - does this match?
+
+Here are the revised names (suggestions?):
+
+1. FS_IOC_QUERY_MAX_WRITE_STREAM_IDS		_IOR('f', 135, __u32)
+
+Returns (in __u32) number of supported stream-ids.
+
+2. FS_IOC_OPEN_WRITE_STREAM_ID			_IOWR('f', 136, struct 
+fs_write_stream_open)
+
+Open the specific write-stream id (or any available one via a flag) and 
+return its FD. This gives right to use that stream-id.
+
+And the following manage setting/clearing/querying write-stream on the file:
+
+3. FS_IOC_SET_FILE_WRITE_STREAM_BY_FD		_IOW('f', 137, __s32)
+
+Sets a file's write-stream value (in inode) to whatever the stream fd 
+(passed as __s32) carries. So one never sets scalar values into a file 
+directly.
+
+4. FS_IOC_QUERY_FILE_WRITE_STREAM_ID		_IOR('f', 138, __u32)
+
+Queries the write-stream value (__u32) currently assigned to the file 
+(its inode).
+
+5. FS_IOC_CLEAR_FILE_WRITE_STREAM_ID		_IO('f', 139)
+
+To clear (zeroing) the write-stream value on the file's inode.
+
+
+> Can you extract the stream id from the fd that FS_IOC_WRITE_STREAM_OPEN
+> returns?
+
+Can be done by implementing the ioctl handler for that stream fd, but 
+did not feel the need of it. Do you see the utility? If yes, name can 
+potentially be FS_IOC_QUERY_WRITE_STREAM_ID_FROM_FD.
