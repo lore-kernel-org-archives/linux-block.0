@@ -1,109 +1,105 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE8C38886B;
-	Thu, 30 Jul 2026 08:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CE53B9DA2
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 08:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785399226; cv=none; b=d1k7fGLwH69UKEQWUU/RI5sSsjCpFgTCmIRvrOrXFQssf93+vaZg/zhRcEAfSE+fB/6CDIEPz2lgaPGY1keK+5P7ZtbSPe7FsRozSAtWcwjpEx9EAbiqE7QsnPdfG5nc4r7/mj6T0+PWCaLVPZ2yZwMFP+KST3+qsY1Raj72E3M=
+	t=1785400200; cv=none; b=bGiomz08T0OWE+gA/0P2Z8TAv/9S9iPpqY8TJnC79RMKwNsqIGDE47PD6+zBtCxI7qRqdpmekRwCFma6bhNByfzPjtn0UxKPpNOgwFusGOWO81GqxKmA9FLpC9HoyyPRQZLiy98Cwft8hd7LWn/MkL2cQ97sO2uzlG/SamgaBDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785399226; c=relaxed/simple;
-	bh=7d+OiMVibrNoHtU7HdP7nPkOx09h2+kzDzC5vlkrKDw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QQtXzEK3f/sImy/IGPi6IKAT1W6x6Z7xDV6F19oyLV5WHyHI/Z/YmgqqbyEQOKSfz+GfdNku235vj++l2zevSSVLgvDhWTI+Dn9SxqaihjCsUHXssWCwrBeIYrqyUdlarLiE1HZ6Su9X5tX8XYqfQHm61bMm29TaEhx632kDqIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HXnE18tZ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HXnE18tZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=STnZe2MMCF/BzC03VvW9KYRg64vjJ4C3hF7Nl3+7RDA=; b=HXnE18tZYg3z1yOR/vmkbR0e8+
-	owNT0191K6/UHsvHlua/zgTPNh+47Mrlet9VRkD9YOmskNQ/80p4l1obKzRYpCGKFK2MtYU7TtyBE
-	QK7pHvVOLyKoFlcEqf53voXwTboFbLoHobPt7cmSzgai4XWYpKfuBTiEBa8cJdaoV2k/2DjgijOrz
-	47Y58aaxz3ZmSK/0K3lIEgqq5eMANYzbG5Dun1BhAiFZooTUwdLf1QlnI3zuvXNZB5kjfpSVqgnsz
-	B1rb3EeP5hQ3vjcheeUz7cCvXG4m0YUzgFz2zFCUn8ORPE8USQ0kcGerQGWURqWi+FHR+hqLmdE8F
-	LLVAXE1g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wpLtV-00000009pHc-2Lu2;
-	Thu, 30 Jul 2026 08:13:33 +0000
-Date: Thu, 30 Jul 2026 01:13:33 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Chunhai Guo <guochunhai@vivo.com>, Dave Chinner <dgc@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hillf Danton <hdanton@sina.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-erofs@lists.ozlabs.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 3/5] iomap: use BIO_COMPLETE_IN_TASK for dropbehind
- writeback
-Message-ID: <amsHrVCJnuXzeGG1@infradead.org>
-References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
- <20260730-blk-dontcache-v7-3-3e8e6850068d@columbia.edu>
+	s=arc-20240116; t=1785400200; c=relaxed/simple;
+	bh=tXsqMdrw5s3A57Re3nu1Lvibgv/MTbvkc3N4Oy9Ealk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d5dNC4nnO2LixHBfp5OgBWuEIy3YXMFFNCDI25LKtR7DPQwaPYySG+B6s/ylBDmnZFpQJVpNVFRNIN7X3qpJLzmWL1pIJKYz9j7r+hL7a6lYscsYrAjtFFH7RZgz6GNgRoqBY+dEdjUkCp0GAATA0ps/ZqXFRPOmBFFz2vUGtNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j621LMszKHMgx
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:28:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 907CE40590
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:29:54 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S6;
+	Thu, 30 Jul 2026 16:29:54 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	yukuai@kernel.org
+Cc: yi.zhang@huawei.com,
+	chengzhihao1@huawei.com,
+	echo.chenlin@huawei.com,
+	leo.lilong@huaweicloud.com,
+	wangkefeng.wang@huawei.com,
+	huawei.libin@huawei.com,
+	leijitang@huawei.com,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: [PATCH v5 2/8] nbd: disallow NBD_SET_SOCK on an active device
+Date: Thu, 30 Jul 2026 16:20:40 +0800
+Message-ID: <20260730082046.3459239-3-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260730082046.3459239-1-yangerkun@huawei.com>
+References: <20260730082046.3459239-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730-blk-dontcache-v7-3-3e8e6850068d@columbia.edu>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrW3WFyUWw48Jw1kWF13CFg_yoWDCwb_Cr
+	yruw18Xws3GFW3u39093W5Zryjya1I9F4v9F12yrZ3XFy2vas3ZFn2vrZxAw1UXrWjgFsr
+	Aryj9ws7Ar4ftjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb9kYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M2
+	8IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK
+	021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F
+	4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
+	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
+	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+	WUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUv
+	cSsGvfC2KfnxnUUI43ZEXa7IU1VMKtUUUUU==
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-On Thu, Jul 30, 2026 at 02:57:53AM -0400, Tal Zussman wrote:
-> Set BIO_COMPLETE_IN_TASK on iomap writeback bios when a dropbehind folio
-> is added. This ensures that bi_end_io runs in task context, where
-> folio_end_dropbehind() can safely invalidate folios.
-> 
-> With the bio layer now handling task-context deferral generically,
-> IOMAP_IOEND_DONTCACHE is no longer needed, as XFS no longer needs to
-> route DONTCACHE ioends through its completion workqueue. Remove the flag
-> and its NOMERGE entry.
-> 
-> Without the NOMERGE, regular I/Os that get merged with a dropbehind
-> folio will also have their completion deferred to task context.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+We cannot add a socket to an already running nbd device, the reconfigure
+for netlink can only active an inactive socket. But for ioctl path, we can
+call NBD_SET_SOCK after NBD_DO_IT, reject this using nbd->pid which has
+been setted when NBD_DO_IT. Besides, it is the root cause for commit
+b98e762e3d71 ("nbd: freeze the queue while we're adding connections").
 
-This seems to be missing the bug fix you identified for the double
-deferral?
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/nbd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-I although thought a bit how that could be done cleaner, see below:
-
->  		ioend_flags |= IOMAP_IOEND_SHARED;
-> -	if (folio_test_dropbehind(folio))
-> -		ioend_flags |= IOMAP_IOEND_DONTCACHE;
-
-I'd keep this flag.
-
->  	if (pos == wpc->iomap.offset && (wpc->iomap.flags & IOMAP_F_BOUNDARY))
->  		ioend_flags |= IOMAP_IOEND_BOUNDARY;
->  
-> @@ -256,6 +254,9 @@ ssize_t iomap_add_to_ioend(struct iomap_writepage_ctx *wpc, struct folio *folio,
->  	if (!bio_add_folio(&ioend->io_bio, folio, map_len, poff))
->  		goto new_ioend;
->  
-> +	if (folio_test_dropbehind(folio))
-> +		bio_set_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-
-And move setting the flag to iomap_ioend_writeback_submit, and only
-for the case where no io_bio.bi_end_io is already assigned.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b1a5acd57426..7ec85f94f742 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1278,6 +1278,13 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	/* Arg will be cast to int, check it to avoid overflow */
+ 	if (arg > INT_MAX)
+ 		return -EINVAL;
++
++	if (nbd->pid) {
++		dev_err(disk_to_dev(nbd->disk),
++			"Cannot add socket to a running device\n");
++		return -EBUSY;
++	}
++
+ 	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
+-- 
+2.52.0
 
