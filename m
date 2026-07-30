@@ -1,96 +1,107 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9437A3BC685
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 07:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835BE3D093E;
+	Thu, 30 Jul 2026 07:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785396913; cv=none; b=TI3JC8SslId4BcbEg/b2QtN+ETf1wq965XfPdaF17t7SM8qpf/E9yrOt3caGzLQLTW6GczEW9Uco5hfWFZ+SeiZS0nZJxWL44ji6zT39gyWat3Sni26I2/9uM/GLVuFX38kH7nRyZMk5UkgVA/OSdjppL8j18tiI5gpptesd+4M=
+	t=1785397366; cv=none; b=lDIJQrJeJ2vEavSZv5kr6mswKDZnznqT3WuhZWm2R/677aJ5NpymVjtuNszQM7LlDDFxWY11utloRaBLE04siljb110wU6KG9HKVJCGpMSsw8gJqMUvs8PNm0PH54QIuoGfvbXeQkKI662z1i3/dK39f2d/Jx9VLFGhSxhNIpFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785396913; c=relaxed/simple;
-	bh=wLc4k1j1fXxZ0smM+8WIf1wx40c+WnorH2aWDTqpEfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GC3LvvtYIzlOc6+ux/wfIhWSwCyxNYuNuQEN1jYijOiDI2zd36M9iLeKk4RjtFt0FlNjgOclWjDnkA9jq56XBIvjxyPX5dVzujs/d3OvUfd+d7yA6uaKFdi0TQP2xhbwaDm6u+/OAmC08gBgJKWR0QlEjdBXYDFqUwvagB839is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jxEyzfN7; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785397366; c=relaxed/simple;
+	bh=LfVssSPLu41pmxjNa97dwR6I0RB4AYUgYUHqJ+vGL9E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MS6S3G1FeDAUNRTdYEXdELMMtvRGjZ0SvsWklWA10qIW2JMpUdkq3oprf99yTXQ0cUj3QglTkptVXR+iw1YDmcQ74WbuiZOZVs1yt/iU3lWwqpx7h4o99zOi5OJKJx/xQIszptPfQe9DdctVeRe7zGbKu1MoWyskW61TFnoNas0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ejfYby4V; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jxEyzfN7"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-382ef647e20so1839868a91.1
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 00:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785396911; x=1786001711; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vSElZmcx3GZLBTKn99h/682uKRLjwH085BtIe9qww84=;
-        b=jxEyzfN7LPB2vOdGGOuNzeNZy+wWnOGS2FLMiJ/MW359YQJC7h9/jE+8nHbnMfxnq1
-         OrmspWbG3o0j3sZDfiqp7LbAzjB38k8dhEiAxCp1/fl7oWwNM4Ub5n+LcA0B9bwnNckN
-         aTDMpIufMofh/C07vC9xEhS6N/Id+DU/0ro7U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785396911; x=1786001711;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vSElZmcx3GZLBTKn99h/682uKRLjwH085BtIe9qww84=;
-        b=RAF7nEg+1r5wEWa1yqSCACmtuDpPuXzxlYmNEotUBOhae7JkVPlCfVQ2Rf5w6vBF+U
-         KzqVyh4QR2Vm1a/T4vmXLDC7uwBgqgKv+6k7Hooh0LNhWmO7HaFg16ecC8iJoiv3/QQb
-         WkGQUZ2grzFuEdgahL+hD7jAEJEhTIH1fzUo/r4M/V4pSrSF/2KEu2AmVr+n8XrsWWEJ
-         qWj+4d0XRhKoYieQugIOhIpHdg2rEnUtxon5TILR4r5DhqXIEMAn7jZ+rklZPZiBQqTI
-         1AIjdHuBne8oeY0RkyQYvomBpEH28jGxkRnFa43soRmatGPLQXaSA4yV8V1j/hK2nCDE
-         W2pA==
-X-Forwarded-Encrypted: i=1; AHgh+RpDj0b95dINfsD6fRwRDFdM8nmUQPJ04E2NzU/SgJgVo0xbB+onAcfWgqTqjdBuBOeaJgzdXBzQJBOUOg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+xYP0qQqNyr2/HL770Vu9g49jQgkwK3B+w//5z0LjDEOIr0Jg
-	QgsDUJZuCpD29+Y5OeonNWFBhoWwKGIEtBJYS8ecb6yIs3+OYp04RYIOwzXSCsTU1Q==
-X-Gm-Gg: AR+sD11nENnBh9zCbUH0+qg01FvONE2fn3M2xb+JzBH47E3KnFP5a14M2Dy9nVd/vqq
-	WueR875k56+VRDXTEmJZQQfCAJU/EA5KJnOkI2NtW+y41G77/h8ml092PBCMbozdsdWUjCGVL6O
-	8f1Ke6y48T4cdtLDVx7UYcZUVyVqtqxaEBw9LVUwDGkujSKshWMwBb0bQ8WBsz/sytxyMJphQ98
-	fW+e5KY9PtoIQ6o4XH0klE7TyXfHFNSYgthiS6trUtol03KWD8EEZEqduN7pujzSLO1etVdBOrB
-	P8v8atqTJAnMw6E1oiHN5zuWlpy6BMZUIqjAkdeDDnFvMJfXiwjNEk5rlCjvkDvZRVCK5KssPi9
-	VJ93SIZ8DNOuqIfBSXx3Qunm6nYPiknMBUuGdiXkWBuezXMgK357vBSKSdTeHTvYD5y/Hr4VTUh
-	UjlwfLkgepcdiRu8TLCgtnCNSDLaYtVyJ2zQuZBqVhIQgwjawjSulbMAiDpqg6mBKKDZtu9eTRW
-	FW6VD56MoTM3bSKEuRqISqjFEnB
-X-Received: by 2002:a17:90b:17c4:b0:381:9028:5945 with SMTP id 98e67ed59e1d1-38f9bd86f5emr1327560a91.14.1785396910872;
-        Thu, 30 Jul 2026 00:35:10 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:fd2f:da94:c3be:e16c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f9b770e33sm589659a91.15.2026.07.30.00.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 00:35:09 -0700 (PDT)
-Date: Thu, 30 Jul 2026 16:35:05 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH v4 3/4] zram: validate parameters in each backend's
- setup_params
-Message-ID: <amr-WAM6pWhyVexY@google.com>
-References: <20260730025240.17724-1-haoqinhuang7@gmail.com>
- <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260730060133.80233-4-haoqinhuang7@gmail.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ejfYby4V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=KS
+	Heja0y0iYQH1F6ijinsPXTJ1F7zsG9HIKqwBvJ5DE=; b=ejfYby4Vh3A1+oRSRM
+	4zYcfWkVulW1sSzHV/LBaWdcXf/u1C65EuXIzQykd7gnldvNx3zmBpBS3sTZU6Xi
+	vhnBD7AYfPqg0A6ssUw6OtJTOooDHcWrxR+lVLaZhpH9QDC812omV1NNyrvfZqUE
+	sUB+2EgRWvHUQGW+8PwqHh6PE=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDXZZG9_2pqU6MsMw--.51474S2;
+	Thu, 30 Jul 2026 15:39:42 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	cuitao@kylinos.cn,
+	yizhou.tang@shopee.com,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH v2] block/cgroup: Drop stale -EBUSY retry from blkg_conf_prep()
+Date: Thu, 30 Jul 2026 15:39:39 +0800
+Message-Id: <20260730073939.1878598-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730060133.80233-4-haoqinhuang7@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXZZG9_2pqU6MsMw--.51474S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJr47WrWxKw1UXrWfGF1rJFb_yoW8AF4fpF
+	srCayfGFW5KF1DCFsru3W29wn2qa1DXry5JFZxWa4Ykr9Fyrn2vr4vyw1ktrnYvrZF9F4Y
+	qrW3ZrZYkr4j9aDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UG0PDUUUUU=
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwQBl9Wpq-8ApfQAA36
 
-On (26/07/30 14:01), Haoqin Huang wrote:
-> --- a/drivers/block/zram/backend_lz4.c
-> +++ b/drivers/block/zram/backend_lz4.c
-> @@ -30,6 +30,11 @@ static int lz4_setup_params(struct zcomp_params *params)
->  
->  	if (params->level == ZCOMP_PARAM_NOT_SET)
->  		params->level = LZ4_ACCELERATION_DEFAULT;
-> +	else if (params->level < LZ4_ACCELERATION_DEFAULT ||
-> +		 params->level > U16_MAX) {
+Drop the unreachable -EBUSY retry in blkg_conf_prep().
 
-Maybe there should be no upper bound check?  It kind of seems
-to me that lz4 doesn't define any clear upper bound.  Or am I
-missing something?
+Commit e56da7e28796 ("blkcg: don't allow or retain configuration of
+missing devices") added an msleep()/restart_syscall() retry for
+temporary queue bypass. After commit 8f4236d9008b ("block: remove
+QUEUE_FLAG_BYPASS and ->bypass"), nothing returns -EBUSY here
+anymore. Remove the dead code and the unused linux/delay.h include.
+
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Reviewed-by: Tao Cui <cuitao@kylinos.cn>
+Reviewed-by: Tang Yizhou <yizhou.tang@shopee.com>
+---
+Changes in v2:
+- Mention e56da7e28796 instead of vague "logic added in 2012"
+- Also drop unused #include <linux/delay.h>
+
+v1: https://lore.kernel.org/linux-block/20260622085623.520209-1-yangxiuwei@kylinos.cn/
+
+ block/blk-cgroup.c | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index d9676126c5b5..682faa486354 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -23,7 +23,6 @@
+ #include <linux/blkdev.h>
+ #include <linux/backing-dev.h>
+ #include <linux/slab.h>
+-#include <linux/delay.h>
+ #include <linux/wait_bit.h>
+ #include <linux/atomic.h>
+ #include <linux/ctype.h>
+@@ -917,16 +916,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	spin_unlock_irq(&q->queue_lock);
+ fail_exit:
+ 	mutex_unlock(&q->blkcg_mutex);
+-	/*
+-	 * If queue was bypassing, we should retry.  Do so after a
+-	 * short msleep().  It isn't strictly necessary but queue
+-	 * can be bypassing for some time and it's always nice to
+-	 * avoid busy looping.
+-	 */
+-	if (ret == -EBUSY) {
+-		msleep(10);
+-		ret = restart_syscall();
+-	}
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+-- 
+2.25.1
+
