@@ -1,64 +1,64 @@
-Received: from mail-pj2-f10.google.com (mail-pj2-f10.google.com [74.125.227.138])
+Received: from mail-pj2-f2.google.com (mail-pj2-f2.google.com [74.125.227.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B8536A004
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 06:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B24347BD9
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 06:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785391318; cv=none; b=uO7NMLPOsAjRTTmwo9CcCOy1ygKhYd1XroHu9zQINJPMFQ6z0uRD9K8qvvlZljzpmM5IUxv4Uw6lnnH+yqsRj/hSB3/YOx0IGCo2Qny0GBAP6oOkqPGsuOAiJl4Isl4InorH/NUlsRIFkB6kyT1YNHfDMNRulOHmJZ29vZXbg44=
+	t=1785391324; cv=none; b=bZICyvajbQz6KiWVH+wAPBRJWrgCMn/LvX6P7ytN7vH7HrHrsmkRN+rZ0OIMSEB9BRu7d6ReqkoS8V+NmgF7WAZ77aPHTcUUZISempK4RVHML1/pk9SwAfyjjlqKgQLe3rVioQr9hP2QYIYAQmP6R8ah28pXR95ubVkx3zE3CgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785391318; c=relaxed/simple;
-	bh=OTfgRB8h0h7em4vm2fdnCKl20mxuPIzN8t712TCBYr8=;
+	s=arc-20240116; t=1785391324; c=relaxed/simple;
+	bh=JHpJYTLLB2ZMJKT2oo9BGd65bnXRYxol6hW4wZLX1bY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QRNcdVIWu7F01ckxPtq00z8+gRJcUqZoXyeHdoAcNgwArBUfT4IwhNcHBzUtr9FH+AI8o+Qz8/VbF5urO9Z/9RC2OhS9vKoi3KhSRfohAqPvc0MfL7HKV98bFDRe6idTDm+hiN37J4P2n9rgsQFHCaYm9NM62bqyLRGkW7lGugk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxIpKWYO; arc=none smtp.client-ip=74.125.227.138
+	 MIME-Version; b=duni3unPWL1BJiTH6+YpUYmVtt1gbuEhSMnnd3KGqwWEv0QdtB3OwIPiwUlR0JQB8Ns1lsnbMpFLdOdRjX3V1s0Ql0NpVGutHUUvJMF+fWIT5HXcn5T5Xf2YcH/1bA+4d7kH9e5zgWPHJ3pPIlpJf7tKJmNHyQpCIXqB2/eMknk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPLPYKih; arc=none smtp.client-ip=74.125.227.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxIpKWYO"
-Received: by mail-pj2-f10.google.com with SMTP id 98e67ed59e1d1-38dc4f9462cso575727a91.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 23:01:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPLPYKih"
+Received: by mail-pj2-f2.google.com with SMTP id 98e67ed59e1d1-37fb1883f59so468888a91.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 23:01:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785391314; x=1785996114; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785391318; x=1785996118; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mNtOEOP0A98+7wj8AbU95BZxH6nnJ0eJ7KtLByvsqoY=;
-        b=HxIpKWYOXGuHDJ8uvQSkOQVCC2rtIhySTMde0FkTi1/MJq+r61SaUx9NR3QoiuCn+H
-         OxK6ZVdMMTuxlVBgkR0hT0HrM8IYwmjA2HdMkhBjCAXHerlO4KRxbcaQ/ZAhvCjctLfH
-         Y8TZ+IjJWQqnVpxl6YuBhuuDAIFY+cbP8vQfWrldVNkBX2DqY8LGGjn5eo5bg5KFIAYM
-         YtLQ0lLahd/+wYkAR2dR7kjaWX7g7RfMF+KGBiHSUSM6P4fHzh6P9XJ7U8J1Ux5fRNXa
-         SDA9vvew/R07RhHRD3+z5l7QREcwYx2I7k6qVNS04eocy3ChCKX96y/qVu/MmbTWZiwP
-         vEvA==
+        bh=cs489M3XU7xPRIbALvrKU2CC1mfn9Hj5q9oo8bImFmY=;
+        b=VPLPYKihKF9uZ8IbsUi63b/nA8IYLCbdKHv4QcsSZVzuPqvSMEmnLseMvq/1s3fa5+
+         2e2G2v+vN9AatG9CR38f6KzgEKrrjIjc6hLshpBbYA2sliowecUDyKZaKbckjW1rbhkH
+         NtS1bT/IuGpEQpjADDb4u37hlVx4drzz1b7uEt42DrOmX7r7gBUfmLHFwigXjc7AZRZh
+         T6XNmNPOBO721XY/906rfiiU7AjipvzHgMfy3cAMGPyZzLnVqraIg2SchzdOdwKS2x/V
+         L8f2pmcNyaWulyK0ZRo3sK0SdhorEIWbqJ5kup4rBLTFF1UkI5RqGH4pao7U5LCFJjCQ
+         YTJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785391314; x=1785996114;
+        d=1e100.net; s=20251104; t=1785391318; x=1785996118;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mNtOEOP0A98+7wj8AbU95BZxH6nnJ0eJ7KtLByvsqoY=;
-        b=Bv0/wd34OjptsnO91k6TsfD4UtyFa7p/gtoQa+alcXeTTKczsjL0C0Zawnh+A0VdV+
-         tvYwlyVpzF/byfnU4ILy9gzLuVrC1z8cFS/9Dnwk9B/DSNwMoMZ4vqgSnvd8ACrGFv4U
-         JPoT9zlLxgRM1nW2MxSY+qjBiSU4y/vFsQ+ImTbBFibCxWr0S5tDcGLPYrEb1HzL8GjX
-         LhU96l76aJlJmzNbZgeYXWX2AdgQp6zlWp+Y/l4c6D2UPFdQ3B52DmzkZZvkbGAXyFDo
-         FNy/1E0cvNOPjQU11ZMfQ8xg8WAvlOYs3mTsMP1+UMd6m89p9leVjQAmXVzJ4TtGrNkV
-         yk2A==
-X-Forwarded-Encrypted: i=1; AHgh+RoriT97I46bEjZe8Rvp7jvNR7V7dlGrG9gIXpBGX5FyVO62tVUBSqtb3762v6Vlaw2bU+dyqRJ5TeTenQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt/OC78fDtg6n+yk3cftQUrXPydXxj1mo3omrXJaZWmitqWwAE
-	Wn1T6V02JM1lX84nDBtk2FHQMhGqrsLzPsM6C2Ws0s7C3MwnfCX3ijsH
-X-Gm-Gg: AR+sD11oMvxI/V3rA/8w2SIQxAmqMEVD043ckrK0wCA1rFnYx8kO6OEfTMq6YhFZZvu
-	lv9z3dGwjLc89AmbAugoutl/OGo7uqJKahFivjNCqw3iwiXUvs77vlEEJN5SmIWiRRqFQUNk98F
-	L/t8lq6QhZ/BUCvD6GZn8En05u+EkYoMMGQKMpnIzrKalpDTvVHcf3YIlLjI/q4bpHcng6+4au8
-	eg86jXEEb6su145TJhFj7PL/dXbhzV2cp+MoJ62QR25Lw+HqMvj3nS0cul/0gB4cm6FQ+2ilL08
-	wozp3EH5KK41608lfDR4F2aN5HBbScvOkK9OsZBWoPY3nPNWvVE86I6bxLO3boApitLyA0woize
-	VrGPkfHh4inUYe/ec/ACdjEqT/XiLh9eCZ9U58q9TfNuEbViN5ILyMToivu0jt9hNyEfW2ujqLQ
-	FRucJx8/jCAHnE7MF8LcjlwdeJS90hCHiJTYPCWFJkCHC0cfRz+w5Xe+URJ8WajUXDi837UtX+S
-	9dOGyHBUTrPqcy8vonb1ivP000hGiqOlg==
-X-Received: by 2002:a17:90b:1ccb:b0:38e:85fb:71b9 with SMTP id 98e67ed59e1d1-38f9be2b6f9mr1235553a91.4.1785391313584;
-        Wed, 29 Jul 2026 23:01:53 -0700 (PDT)
+        bh=cs489M3XU7xPRIbALvrKU2CC1mfn9Hj5q9oo8bImFmY=;
+        b=RdqXrV3yT6wl7Nqli08ldzYV0aF/PCIRphP3RMHd3Kw/ULBa+UFFXyC1nY+SdBufdJ
+         ht13cd5k/YKZo6v0l+65RRvpJwrbfsiRJMtcS1lFCGs0yCOvzP8TTFHxoqNt2F9ME3qf
+         VKw1xcA/QVQXHYGPsxJiTYN3YZyYVR6euDDXC+HTJpJrXVM2tU4RCpNZ0K3S5t70J9K0
+         fs+B3F2MaesO1E+DGwKsR3bhQ4JqhJDrqHN2VbrzJzQa5tjpHVd2seM/kjpe5gLAF72g
+         2x9qxDQh9RY5CSAOaQ95qqUwhBuudqxK3+VsHOySNog5NDrIIfiAUOsTjH6tsoeUEYq/
+         O5UA==
+X-Forwarded-Encrypted: i=1; AHgh+RpXf7nbzAWkNN+HwxGwMob1TsXyT48mthUlmzz6gEER4ots0dAeIEANB1Wd0ZuFKIQyQ65Tnl4zivzazg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqC9yG11hb5UUgAhMGNdAicutQeke9zfNR8DIRwNWqqrx9LYQ3
+	xSHP2sxSAomNJT8bYa4evPURyja7VFfpMCwaFBjT5XNDq/fLi2gr1SjP
+X-Gm-Gg: AR+sD11vWBp+U7/iaYzPxgfckM0dnAs51nlrjY0aHwY4c5ZMmqIZqb9+DOeOFJuKCnc
+	sTIOsV2Y7UytdZAM16CQ3FeSxJnupR9KGNDPGkyvhqflw84hcFbTtj2l85OMP3ULXuiYP43yx8f
+	mg98DmJSb2l81fl+Xt5QGfp9tMh11ixTIs7L+7Wpvjd0yPhzAwm////MugZrDvDvHcgsWDYoZUg
+	wCryFpS6qSNE8sXvYkhO7tFsDHzjA3OJxkfB0JlPGiYkbjGdzIjAg/JwO7x/FNOvLvfcKr2naAD
+	kmy0DtfsM8fVkStOvfAvWMDDDm7em/+b1EgOeV1Y8OredVA+8uVAaLwbA7ysjGoEvJXCNQ2oFUs
+	UikPDMiHvEscSLSFRriMIaTGtYEhtNbf7Zj4jCcSgf15IbkeHy75x6H13MwIOHn7XT+ViA8ychw
+	D6qw+20dfPEq74rwsPYe+4aKHu39Fd5pUOzcVOkT4vxlU1fuzPUZmUIBZytBqIRSpyW18GqrLBc
+	y1djUSLxnn3w41TubJJlBWvgYPCQTDgsQ==
+X-Received: by 2002:a17:90b:534c:b0:38f:7f60:ba35 with SMTP id 98e67ed59e1d1-38f9be28c63mr1157408a91.5.1785391318132;
+        Wed, 29 Jul 2026 23:01:58 -0700 (PDT)
 Received: from HAOQINHUANG-MC0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f9b42d6c8sm430737a91.3.2026.07.29.23.01.50
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f9b42d6c8sm430737a91.3.2026.07.29.23.01.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 29 Jul 2026 23:01:53 -0700 (PDT)
+        Wed, 29 Jul 2026 23:01:57 -0700 (PDT)
 From: Haoqin Huang <haoqinhuang7@gmail.com>
 To: Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -68,13 +68,15 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Haoqin Huang <haoqinhuang@tencent.com>
-Subject: [PATCH v4 0/4] zram: fix zstd per-CPU error path and add parameter validation
-Date: Thu, 30 Jul 2026 14:01:29 +0800
-Message-ID: <20260730060133.80233-1-haoqinhuang7@gmail.com>
+	Haoqin Huang <haoqinhuang@tencent.com>,
+	Rongwei Wang <zigiwang@tencent.com>
+Subject: [PATCH v4 1/4] zram: do not release zstd params in per-CPU error path
+Date: Thu, 30 Jul 2026 14:01:30 +0800
+Message-ID: <20260730060133.80233-2-haoqinhuang7@gmail.com>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20260730025240.17724-1-haoqinhuang7@gmail.com>
+In-Reply-To: <20260730060133.80233-1-haoqinhuang7@gmail.com>
 References: <20260730025240.17724-1-haoqinhuang7@gmail.com>
+ <20260730060133.80233-1-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,42 +87,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Haoqin Huang <haoqinhuang@tencent.com>
 
-Patch 1 removes zstd_release_params() from the per-CPU zstd_create()
-error path since per-CPU callbacks should not free global resources.
+zstd_setup_params() creates global cdict and ddict stored in
+params->drv_data, shared across all per-CPU contexts. The per-CPU
+zstd_create() error path called zstd_release_params(), which freed
+those globally-shared objects. While the drv_data=NULL guard in
+zstd_release_params() prevents a double-free on the init failure
+path, this is still a layering violation: a per-CPU callback should
+only clean up its own context, not release resources owned by the
+compression lifecycle (zcomp_init / zcomp_destroy).
 
-Patch 2 rejects zero-size dictionaries and prints an error on dict
-load failure (currently errors are silently swallowed).
+Remove zstd_release_params() from the per-CPU error path and call
+only zstd_destroy(), which properly cleans up the per-CPU context
+without touching the global params->drv_data.
 
-Patch 3 moves parameter validation into each backend's .setup_params():
-dict/level support checks for backends that don't support them, and
-level bounds checking for those that do (zstd uses zstd_min_clevel()/
-zstd_max_clevel(), lz4hc uses LZ4HC_MIN/MAX_CLEVEL, etc.).
+Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
+Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
+---
+ drivers/block/zram/backend_zstd.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Patch 4 resets per-priority params on algorithm change before init.
-
-Changes since v3:
-  - Patch 3-4: dropped the generic caps + zcomp_validate_params()
-    approach in favor of per-backend .setup_params() validation,
-    keeping zcomp.c free of any library headers
-
-v3: https://lore.kernel.org/all/20260730025240.17724-1-haoqinhuang7@gmail.com/
-
-Haoqin Huang (4):
-  zram: do not release zstd params in per-CPU error path
-  zram: reject zero-size dictionary
-  zram: validate parameters in each backend's setup_params
-  zram: reset per-priority params when changing algorithm before init
-
- drivers/block/zram/backend_842.c     | 8 ++++++++
- drivers/block/zram/backend_deflate.c | 9 +++++++++
- drivers/block/zram/backend_lz4.c     | 5 +++++
- drivers/block/zram/backend_lz4hc.c   | 5 +++++
- drivers/block/zram/backend_lzo.c     | 8 ++++++++
- drivers/block/zram/backend_lzorle.c  | 8 ++++++++
- drivers/block/zram/backend_zstd.c    | 6 +++++-
- drivers/block/zram/zram_drv.c        | 8 +++++++-
- 8 files changed, 55 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index d00b548056dc..2584f47c9b3c 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -161,7 +161,6 @@ static int zstd_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
+ 	return 0;
+ 
+ error:
+-	zstd_release_params(params);
+ 	zstd_destroy(ctx);
+ 	return -EINVAL;
+ }
 -- 
 2.43.7
 
