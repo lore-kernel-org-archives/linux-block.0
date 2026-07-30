@@ -1,115 +1,130 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-ed2-f0.google.com (mail-ed2-f0.google.com [74.125.228.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC25364959
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 03:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785381271; cv=none; b=G7OAZ2ybiU0YuZytpVFbP3N1Z2QLGuaRDLuDfTqiwgHiY1SjpYXigmCnIdNC8snx+8g/p/Oy9SJjMuKsYML7NBlXtuSfCffzCjFr/K+0nKZTZkv6IsFy5EIQNS2ZNsxkAiEoiH8D5lt2+12+4j2R/SGXciNlwzav+3dW+cUalP0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785381271; c=relaxed/simple;
-	bh=AurNsHsMSUVlPvub8ynGvkrdYbslVOdpo2108EGST9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o2gjy2nacm81N9FzCzVP70O0en1xkf8rGubRVcvuFcCGaPaXTpxeRCmiP7KbpZHpT6k7w16vjJFSKlk58hbOx42lQmJT06WU3S5RqQaPYUZY+gJ//qEDWkJWKLNd5T/XvjuNXkhIqxSEkYAoSErpU737KgOTcI8rm2Qyla8yaj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ALuBn8ca; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7778D21254B
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 05:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785390938; cv=pass; b=T+Y/EG4bJ6HexNXl5LH/F/FCFk0Gd4wcZC9AtUNyFqA90xfqKBhFq3E9Wvx/w30zMcSLHIODkQQuaPlYKwzQTID8Q0lX9SPKf4yKMl4zL/0DXAo/TZT2nz8jcKruZPV4jh+QAkyuu8hBDV5VlOQrSWK/YZ4OmIUhtcHDjheh55c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785390938; c=relaxed/simple;
+	bh=5GSsupOU9t54Xfw61NW7vN4epn1H+KVSXnQgz+Sc7aY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KpVtHixEe1Wn0dJRpBrYF/EQln+geX4kGVU0ucmi9IlnJRk0B3F2dwOkHEwUR9XLfZunPjCNzX+1cHA/tPWxvKntVjvKQ1gzxeHJ9xm5m2wtfiTQPIyDYIL4emwVZufyYYg1o1p9/MsThA9Ff+Jvw3BjE/1J5gxN0qeCm2+pi0Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BuDm4o/E; arc=pass smtp.client-ip=74.125.228.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ALuBn8ca"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2cacb8416a1so17628635ad.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 20:14:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BuDm4o/E"
+Received: by mail-ed2-f0.google.com with SMTP id 4fb4d7f45d1cf-698447ea5aeso718580a12.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 22:55:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785390934; cv=none;
+        d=google.com; s=arc-20260327;
+        b=DttsxOmBxo4giIVEINl4DZRZSNib5LPJBH+rr/xVoarj6nxL3ZFKb+PP4i3M+Sqx09
+         iLUIXc4wg1TjTwv4TmtV8u997zGDWidys47edTNoaVlgAhsoHNN2n7CGkGnuCkd28edC
+         e/uTfdBSsf+xD/lg1fbzZuuH5AN+I9tSahJ1Xn09hDyhdW0f+8UDMAgzuKtdIEsueeiY
+         BZ0dD2DUR2cnkrFIWTON2USm+W+T7yNj/zeKwn6yzxTPvWw6IsSyid7wCxR/C0WlA4+G
+         0SR+GVK7/aEuD6jo/S3DtrygPxIiWtOG3jhDNj9Ky2SojKhcNskYD+AhknuZ7gKcVRD5
+         fyBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zguOIVFeZ2tKGDsSUWKoGzpiZyFKgfHE9jucwOKdIAg=;
+        fh=HUPFDc1uzYc2tWbvC/MTv48PwwlU91lsVLRSbULakOA=;
+        b=nO8w1PuUEdH90IJZYLNZoJJvaVc3J4cjtg1juvTZ09demfPjaLoVN8khonCRVRItT3
+         W0WwHB7Budra9m45SNHMaKq5ZRZk8lbIMnrZpdyna19Rw1hR9PImroAyWy5sVO4C0vYG
+         uVHfMkYIMczs9jhLHaRcnxY9Rtf+GwhUQF0CfksfGKtlVwcFxsrTZdNIybsDqNYRks9w
+         RDAGaYNebmSroBFzWS6Z/Gbt+9gFLGWQCXS5Pmuj5iNuNvgpp80ipMEf60CgntP1FbY7
+         Do5gnfEEzUMLgsW0JGvop4VMJxKnNADGEiEkkhkyxWRwtDTr5tgUBuGoJ4wgu9GBRQvQ
+         EUmg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785381270; x=1785986070; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1785390934; x=1785995734; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=F/XeoUnm6rgQUsPZD3FHsPIgt1M7s1BOWYimjFGH3CA=;
-        b=ALuBn8ca1smEELrbUus8+vrUFI6UxWJe8rcytFzBYmYDDbLGeG5xdOisN4yfhs4vtQ
-         IKW2gFaQM2OShKR4APhemEqnrhSPkOKZn6D8KRCXKZoD6WMzBrDMU67XWJHcpfbytXJn
-         6tpy36Pf+rB8QUvoDK2OFWIR0oMtWOxBjYrMg=
+        bh=zguOIVFeZ2tKGDsSUWKoGzpiZyFKgfHE9jucwOKdIAg=;
+        b=BuDm4o/EDUhTYbOPq0kBzOeiHDJXQLBAxya7Mq9jNDQWdzDkowehJOJbSTneCONHKa
+         S+AbnyDxIrH4b5gbiAE4aoCipUcVlF6zdp9mcUraUBDJ3yjhHx0dVfh3rsO8ImSTh23i
+         TcesYXWKf/Zy2888GwgEdExSC+dPhXaHsBT8nKRFxnZevX5ewyjyo1CKB1bfTF0rAv8A
+         FEb1fHf7nHQajsIfc8r2w3Zyay28Yey0goHnRSHvopr1L4YtzQ6T3SutC63n3/wkQHfV
+         yt4/veGTNLo9+XAvXwYnH3Gw8udFGGyG6pgN+K1duyHnhBB0luFnkLpQtMxUtTg0lQ2Q
+         4eSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785381270; x=1785986070;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1785390934; x=1785995734;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=F/XeoUnm6rgQUsPZD3FHsPIgt1M7s1BOWYimjFGH3CA=;
-        b=LcQrd4yrIVhYmFZgvZNmrRbPHXL8pW7xaaClDkw11QA79dt02eXFr7d8B3SxvmIaAQ
-         VdOWPm5skCCKG9pxvXC8UypSqW2zHzvS3E/75BmeqU0g4HRsTVRsWGGMnWfIlSlpSzAG
-         9pNe8SnTMJep8sJ2HBJbzQcofhN7jnYv8Qm/7nlIzNwll62mxFHl4JiZlvFpiNBu9e9D
-         XREpVd+LHYz93eATKQXMtRh+KIzZjCPa0SWXxV1q88VgBCuZTi4I4XWot5/pz7sKHAyZ
-         nJXX7sBONz+Ydl7qJHiEOa3SwFFpAYoZw3aJNtlehSzlMiQoa8yjVIr5T8R132dCk20P
-         2a6g==
-X-Forwarded-Encrypted: i=1; AHgh+RrKt9IsNkUmGTTuTwfHNMVw4xqHh9WLyGHdOHFbbr0klKa2RkvLddPWvcBlMPbDG14SxpF56vaMckf//g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzVVAi1cxpn0/8JF+OMZw/yXlLYFJRH+gqwUerhnsS9p875ISN
-	mtvEBkCNuqNLT8jfULkcwqGt4M64g7Bap/sSZ5ulBaw+HniZe88z5Qne3lqiauHsTw==
-X-Gm-Gg: AR+sD11B9mOayifjEEsiXmumz11Lk/XzYI2wr2MipZuX9TE+NM6IIwSBYwRFcKy2O16
-	iS8aPbUHe19R39YKncGWDe3f5w//FWmCZKmjDp8jfjWJXykmZ/msytVKAY2fG8KWrhg78iV17BV
-	/HOgHtlyr9g+cW8TYLyMh9mL1R/Db8COSf0X7ammmWl+mKQFrmpaE84bOCCWBCnFmL2OuNqsPLG
-	/pbv06DFJ5SaYIq7VAhNq0SM0x3+O9w7aEgVG6xp/jhL3e6EaftZes21q7f7AHqup57D73+0pJs
-	LMnPa/d+qZfx6dGb4fAhiFyfVRTREwMOxu/9mUOyGKrEDANYu+2UMIDYqLFSf8Y8M3I+hmWTwOR
-	cOFDR6g24+nT3s0Dw1NriQ0J8aQvO5axPC1aD61+5VzUsaJec/VN3RJ76/N2ZUplUWvcw52K8W7
-	AmgIVfwA2Ia6KwmqUuiGJSp3p8Vt8eNrmmyablF6bPS0v7C6TYsDcx/IZOi0TH4x+woxK/Ci/yn
-	S4Q0/zaP6REfIPFvSRgW3lhHHNW
-X-Received: by 2002:a17:902:ce8c:b0:2ca:1594:451e with SMTP id d9443c01a7336-2d035c918a5mr9857305ad.31.1785381269735;
-        Wed, 29 Jul 2026 20:14:29 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:fd2f:da94:c3be:e16c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d022a46270sm18748885ad.26.2026.07.29.20.14.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 20:14:29 -0700 (PDT)
-Date: Thu, 30 Jul 2026 12:14:25 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH v3 4/5] zram: add per-backend caps and validate
- parameters early
-Message-ID: <amrAyfqsKY2JH4zk@google.com>
-References: <20260728092935.31139-1-haoqinhuang7@gmail.com>
- <20260730025240.17724-1-haoqinhuang7@gmail.com>
- <20260730025240.17724-5-haoqinhuang7@gmail.com>
+        bh=zguOIVFeZ2tKGDsSUWKoGzpiZyFKgfHE9jucwOKdIAg=;
+        b=fpP5soZns5TXNdO3g6KswQ1aPRqMlqcsbL4IXapp9CC5ClDMbJ9duhsls/npy3FFQH
+         QqPa1TfrISHa/DDBr6ljRzfqSjQJL04+vWdzAKK1gFTw1b/P5DoXvdjrYErY41ElSC/c
+         rJFg1ThM3wR4K/uFUwJXkoD24iR9YHNyTLEhKtwvkEIadY5IxrlOo1M/L70ZEoiC2cVc
+         xkw3dpsH/0JcfOKpi/9YE8OFigsdBv8kqU3iAAdmim8IXCsur+SKSPHC62vuazZUcYTT
+         AuZ4VDN5IOFzXvvin+pWMNOxkmFwEqSuDbpXGKdPgqWAEYe1TYo1SM+87Ji/eFf8bOVV
+         NwFA==
+X-Forwarded-Encrypted: i=1; AHgh+RrrZtYOekftrUgDkPfj89ZXhf1ecQJW11rCKkBdDFXU0sBVTL2O/VZvV/qlNE49QWupQUOPsUch9Vq5pw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbzpcXaZnFWMerRl1aHk/D3oYFaRRUQM3KQEGrGSHeAIeQmsLA
+	ox1+AzMCt7rL2TCKvhNkR0MbBA0osvQ+k1FFNqkzmwR/gcXPFZQM7Cskc3bM0+DRJRDOlv18YfS
+	XIyaMEhHFcMxCS1i8kX+x28qcov9JLR0=
+X-Gm-Gg: AR+sD105V5B1/IrgfppohFIpV3TKrtrpKGxLiFXBK8/sm1MesFWrCp9WhfPtj1nz+NR
+	/A29ig+U5WEfXIeUlu5AscPh16OB4oEfl5yaRQBCDHNBqrSFJwsstXHlBD2unC15D/DhdYUWeLW
+	MkYMGPDj6gserjYwdLe+ByCJNrX/47KBo+8ya1nPZgdTxNxjBt4tR/Rq4Wk3dRhc47gptv2zfVb
+	jyRxlzyeg3Q/mrFzczIjfiN4nt+XzRfRB54OWY6fEgPPQ/yZJVkpjcDxDpdy6zPowTJyId/i+pN
+	LkyEHhl78o15l+jjkGf0kuwP+4SyqD/BoR7yC2o0ebxr
+X-Received: by 2002:a17:906:1009:10b0:c1c:200e:ecfc with SMTP id
+ a640c23a62f3a-c1fa57929c5mr33504266b.58.1785390934253; Wed, 29 Jul 2026
+ 22:55:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730025240.17724-5-haoqinhuang7@gmail.com>
+References: <20260728092935.31139-1-haoqinhuang7@gmail.com>
+ <20260730025240.17724-1-haoqinhuang7@gmail.com> <20260730025240.17724-4-haoqinhuang7@gmail.com>
+ <amrAUPqAqrSzKoNX@google.com>
+In-Reply-To: <amrAUPqAqrSzKoNX@google.com>
+From: haoqin huang <haoqinhuang7@gmail.com>
+Date: Thu, 30 Jul 2026 13:55:23 +0800
+X-Gm-Features: AUfX_mzsG6ODNSIWnETTvtV68pwl2OXe7JtVATlVtteMz6cDfpcYi2Oo_qr2EhA
+Message-ID: <CAEjiKSmMJ0C8Ge45BX0OgS0207AXFpa5dA6oP-K7yx9K1vVaJQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] zram: add level validation in zstd setup_params
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
+	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (26/07/30 10:52), Haoqin Huang wrote:
-[..]
-> +int zcomp_validate_params(const char *comp, s32 level, const char *dict_path)
-> +{
-> +	const struct zcomp_ops *backend = lookup_backend_ops(comp);
-> +
-> +	if (!backend)
-> +		return -EINVAL;
-> +
-> +	if (dict_path && !(backend->caps & ZCOMP_CAP_DICT)) {
-> +		pr_err("zram: %s does not support dictionary\n", comp);
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (level != ZCOMP_PARAM_NOT_SET) {
-> +		if (!(backend->caps & ZCOMP_CAP_LEVEL)) {
-> +			pr_err("zram: %s does not support level\n", comp);
-> +			return -EOPNOTSUPP;
-> +		}
-> +		/* level_max == -1 means validate in .setup_params() */
-> +		if (backend->level_max >= 0 &&
-> +		    (level < backend->level_min || level > backend->level_max)) {
-> +			pr_err("zram: invalid level %d for %s\n", level, comp);
-> +			return -EINVAL;
-> +		}
-> +	}
-> +	return 0;
-> +}
+On Thu, Jul 30, 2026 at 11:10=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> On (26/07/30 10:52), Haoqin Huang wrote:
+> [..]
+> > diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/bac=
+kend_zstd.c
+> > index 2584f47c9b3c..6febb366f76e 100644
+> > --- a/drivers/block/zram/backend_zstd.c
+> > +++ b/drivers/block/zram/backend_zstd.c
+> > @@ -60,6 +60,11 @@ static int zstd_setup_params(struct zcomp_params *pa=
+rams)
+> >       params->drv_data =3D zp;
+> >       if (params->level =3D=3D ZCOMP_PARAM_NOT_SET)
+> >               params->level =3D zstd_default_clevel();
+> > +     else if (params->level < -(int)ZSTD_TARGETLENGTH_MAX ||
+>
+> I was expecting to see zstd_min_clevel() here.  What is this
+> -(int)ZSTD_TARGETLENGTH_MAX?
+>
 
-I was thinking that you'd move all params validation to backend's
-.setup_params(), not just zstd, but for every backend.  Sorry if
-my message was not clear.  Can we move all validation to backends?
+Ah yes, that was an oversight, it should be zstd_min_clevel().
+Fixed in v4.
+
+> > +              params->level > zstd_max_clevel()) {
+> > +             pr_err("zstd: invalid compression level %d\n", params->le=
+vel);
+> > +             goto error;
+> > +     }
