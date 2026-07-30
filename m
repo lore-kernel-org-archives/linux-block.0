@@ -1,75 +1,74 @@
 Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B473BB9EB
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 06:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94883B4E9B
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 06:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785394756; cv=none; b=ZbgV2R9RDFryuoIh1vA/Z0E+/Fmvi7NnSQAFRB6mEqJ8zSA2Y2MWTtLeC0Yg+q+GIzBha4JEkuWhVSE96fAmSbd4b8aovZTxBFm21DJhvECZ+iGdDFqxQ3DJ8SJmUKlmXpOsygqtZC2pE7PH+DiWbUnxbZWHhG6eiXqzqr0yFQY=
+	t=1785394764; cv=none; b=YnMpQRFNoXCVhF3DII0VoV1gIlMRDPdA3HvJEeFjh/Yq5Fh9XmsVLSP0+moBhDM8pHzefSAqaPxLFIvWO1CKuCePDB5VvHXhy4v21obO+yfTADbh0XX2VuQNz555T2sDpFFCDlsHQsyI/uwGO01Wyv8IQwZgXP2UG1m8eRQFpHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785394756; c=relaxed/simple;
-	bh=VqAWR9drHd5aaagFAxsb9cXKpB8GAafaVAD01CXD178=;
+	s=arc-20240116; t=1785394764; c=relaxed/simple;
+	bh=Tk8jUyrOqQ7WXa1eqV1nq7SPxnPRM7zEp3j/WZJSWC8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IJiX+MFPgPhwBm0zyxNeRiFVgKXBed6zKM0ZLv5vBEMb4ppBd4qa+ZwpZYNHk6D9klHRqS2YiZFAbbhbcOemVA2Qr74PKDpWDXutniBGEXsQZ7xYqVOFYugNJefr34V9UV8LNVUz+cXyRPOgiGTXReB/+bfaJYw8NLOPKxJgKqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=MpKYlVJw; arc=none smtp.client-ip=148.163.135.74
+	 In-Reply-To:To:Cc; b=h1ahYeivTRwIaksXti5adgA0c0tbQywXLpXcBB4NFHMC/9UTFt0E0fKtrUVSq1/gvz2SC8R+yCaBy1Pe5wu7VUQX3qC73oH8mnfORqtGdxJahBKDD5ikoraSRWo418KenI1tPF4jZwT3yk+Xrh1EnOym8+QktEEexWwpSSIdovo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=i0qRx6nS; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="MpKYlVJw"
-Received: from pps.filterd (m0167068.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66U6astl2228356
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:06 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="i0qRx6nS"
+Received: from pps.filterd (m0167069.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66U6YRL91774320
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=VlLo
-	mZ2ihL9HFxlrx7gRVvKB0MpDdFuMFLp7qf/zQYY=; b=MpKYlVJwcHKHdws+WTax
-	xNY1KC8xJ5UwioqCDfrXm10hsZ38GifYdzzDgdp5k3EXoevWleyY1dFEYtamvhpJ
-	nWsGgJa6p/YoSuJF4WIywki9iMXIn1c5Wn4DkpQGgbayfJ6qYYenwE7IR3x6i5za
-	dwukXaXhPCmDnx00K9b63BM+126tHcyEXiVmjVGTroLxLwgeaoTkFFz5LrgjZQxx
-	gCxc77WryoG5AoO8xqG+CIpVGqcvPcJy1Hre/qmfzNh4Lg+NyHId2TO5o74a17H5
-	PMqGOiw2sWKl/vs2sNdLr6yI8HY3DLjU7PD9m6sqBVNHZv4IJI6fROiKcTd5+32Y
-	+Q==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4fqrjq25cb-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=Wwzd
+	h+lefzQ3Mewr3ag7PKLqaiugNuHuZ6D8zRZNNZY=; b=i0qRx6nSvdRp35M11yLi
+	zCDL5833R4xWz9ehYcDjCN+iJy81EVfUbRN08bHwKN4Sv0jCdbucXr7pPAXPrQxg
+	1n32YTlFzi84Wr18ittxMIrJzVdRnkygO8LEM7xlODihfBD+KKpFhVBicsOyZBR4
+	JD+7PIf6HomtCv8bssHFR2jU/sxf0CVVHqPgBDVeubE9hqpuQG2Q/5k475unjLYu
+	leSSOvM4xxdsLdk3pxUwcrvIJrrT21ENuMSN5TaP/FL7OVtRqYOQU+/M1DKF509J
+	66cfLiS/MOEbOYUmN638Fpjn7j7NmlsYIk9r74XBJWePIIUuy2ZYsp95KPo8t/ry
+	nw==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4fqrjxt511-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:06 -0400 (EDT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-92e66f9e2baso209336885a.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 23:59:04 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:08 -0400 (EDT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-92e55721a8cso206359785a.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 23:59:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785394742; x=1785999542;
+        d=1e100.net; s=20251104; t=1785394745; x=1785999545;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=VlLomZ2ihL9HFxlrx7gRVvKB0MpDdFuMFLp7qf/zQYY=;
-        b=MvpNj5Y99dP00bFDjBgCmlEK7odofUjf934zAT3ckjKxul/9OuC9lBG3BHvjqevbqf
-         KMxiIdNz1x5t7/81mJx1AEXKcr9sYayPYwGVHscvXo+iCR5samBUtFreUeGAvurZntCa
-         CK4SJBT7ESwAy+Khvy0bu9VldYj4QpMGEhIwkkXxT/bAFVJ1/Hp1v2gQxKVOr8mtIpxq
-         yT4fV2T2rfbLwJAUXuSNvG/zaWerO0GJvmjrHuylP61TJZHP7MdehHLMcgqMCP8ZOJ/l
-         Vh5EhBytirelEJB44NDy4Zyfz5jRXPKM+LGUnDNGTIgINfxgv/NImd848lG2JD+LWn0F
-         yXYg==
-X-Forwarded-Encrypted: i=1; AHgh+RrhLrAEvcMyZs5OmY+JsQdh05iYcY4U6FO4IQ0GX0jxRdTTyTb/qAjeyOp69EjgUJWcV2SjOWk0ruWUOg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvdQX10RX08OHxhc+FB6RrOCBmmIgrv/2+FlcH4lide4j2y8Aw
-	zjSiKRFt2jQEK9TpTjepjIsJ/PsaSzluCXViMYg+9WM7jWGBATlkXFxK6BZDaPOGg15kyXiIqS3
-	RJx0YzjC6bd25RiBVsWWOHu0MXxY1zxVpR+j9EKfbmLdZuwEqbuSULAX1w4kT
-X-Gm-Gg: AR+sD10cKfMpzR+enCyVo+/LWft8QaRtjRHG8c5gwAYaiJZhSLGxWW8Rj53uiHwaCYH
-	WRCy88FEWl/SDikCIXzrDp5krJXMUqom4tQMfH0ExsuroA4O45cHksAj4mMfqIiYAC38QtWaLqC
-	vtEbBuO4UOfSnz0p3bGy6Jtva5YfqINrGli2T9shCtvEuYo3RMDb9siYL4HcUJ+QDZxMep3fzq/
-	eO+ZawvMNKEq7z9+TwDOu2Bu1sb7ICtApNiBRuWpkRF4cFr7H2HUqrmm9AirbZhzR2GzId9gmo1
-	U9VX5wo+tjQLGVdwRwEpA7HkcklvnIE1J9+cySctbTcZXSgQblIKvFr+wkZsLzh/FuS1PploOnH
-	bs/p42Q5P7pVPk3Ebm6te5V0Y4E9ETRPJEn1bqWnOgaoqtw==
-X-Received: by 2002:a05:620a:4728:b0:92e:94a7:16e8 with SMTP id af79cd13be357-93485f9eb93mr142633285a.15.1785394742159;
-        Wed, 29 Jul 2026 23:59:02 -0700 (PDT)
-X-Received: by 2002:a05:620a:4728:b0:92e:94a7:16e8 with SMTP id af79cd13be357-93485f9eb93mr142629985a.15.1785394741655;
-        Wed, 29 Jul 2026 23:59:01 -0700 (PDT)
+        bh=Wwzdh+lefzQ3Mewr3ag7PKLqaiugNuHuZ6D8zRZNNZY=;
+        b=so0ra73jb+H8zB5J0cN35ONxhFsa3hjF4KqC+5+0xW3xKW7/byUovJfZA3bv4rWAxt
+         LnEAHngNAA0RvXvZvPsTGq7n8pvORPl2qAg2yED6Cd3U3mo5nbXA74k4LX8/XrDEufbo
+         Nk7zY0bdrgbgONPKP/PTF9VawjMHtiyrN7pmd/hvPZL+XnYxKOSj7Mxt+5DwB5afhtxA
+         tVfywUDjjMi2dGF7eov36QLJsPFE/0kUmsloftHnzUL3ZlSRll6FybGDkxtfcCNaDvh6
+         ugQYnIVzD6io6imhmb2CbuSEHp5izpjIgrrO8GtLEs0FypmFWZX+PR0oT3aCp3UB1z5e
+         cI1w==
+X-Forwarded-Encrypted: i=1; AHgh+RrqcQuXAllphyeTTYT6s8yQwTZcIuETE2MX89X8RTZRZpoeEwhO4dv71LAFpo1WY6tANsOWNkPL+jjX6Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0x+z8x7WxamAtInira+CFTV0EoK8K55yvuEHi8EqyUSvbsnzW
+	DEjs6xb6l5EoczDlTs6eiyHiojIjpvwLv1RLDD7ginCoevpP2SoWQltQv7lnRKUxgeYwwVAQIZm
+	ytpMcE+UW1G/h1NkFeA3t8c34sFJnkiAhxWuWih7wzkmJ0UqhDBt17cYvdxrp
+X-Gm-Gg: AR+sD11pJUc/bnjQwK6UXSYe54RTtQsqP9/MEFuefMo5NyGn576rOr3fBbj4bkF+ow+
+	LYFH90Le4cty+mb+wme7lz/67fyk4Ppyum/ESY+EtvFczREjcOmXcEHVRALaAeE/cTRPV4sO7MG
+	AG+S6/JK5EHVdrykVSCWuXlgveu1s8mSzC6kopfM8ruNML0j4b0G2Wsp3B7rNE27AUloshHni35
+	VMcazOEMq7AfwYoOxBWr8E0kroEfDH1bOcS/p7Lq101zHYycSxo/g50OhOUk9tbX2n6nUd1RA7x
+	W1tKMd2nwTg3abw7GIa95WRDibP7du9ITUiKxiSYHXO8wPm2WQ8ctofFfTH7b7X9zo9YVOLzpMX
+	IMBn4iq+5AiIm/QrB9orGaC59LagLmk9ON8tDsxIUmUvOtA==
+X-Received: by 2002:a05:620a:2886:b0:8cf:c106:faca with SMTP id af79cd13be357-93485fe35d1mr140937585a.36.1785394745164;
+        Wed, 29 Jul 2026 23:59:05 -0700 (PDT)
+X-Received: by 2002:a05:620a:2886:b0:8cf:c106:faca with SMTP id af79cd13be357-93485fe35d1mr140935685a.36.1785394744677;
+        Wed, 29 Jul 2026 23:59:04 -0700 (PDT)
 Received: from [127.0.1.1] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-933d3221bc7sm349752485a.7.2026.07.29.23.59.00
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-933d3221bc7sm349752485a.7.2026.07.29.23.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 23:59:00 -0700 (PDT)
+        Wed, 29 Jul 2026 23:59:03 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Thu, 30 Jul 2026 02:57:53 -0400
-Subject: [PATCH v7 3/5] iomap: use BIO_COMPLETE_IN_TASK for dropbehind
- writeback
+Date: Thu, 30 Jul 2026 02:57:55 -0400
+Subject: [PATCH v7 5/5] block: enable RWF_DONTCACHE for block devices
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,7 +77,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260730-blk-dontcache-v7-3-3e8e6850068d@columbia.edu>
+Message-Id: <20260730-blk-dontcache-v7-5-3e8e6850068d@columbia.edu>
 References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
 In-Reply-To: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
 To: Jens Axboe <axboe@kernel.dk>,
@@ -100,119 +99,72 @@ Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
         linux-mm@kvack.org, linux-erofs@lists.ozlabs.org,
         Christoph Hellwig <hch@lst.de>, Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.14.3-dev-d7477
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1785394735; l=3060;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785394735; l=1234;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=VqAWR9drHd5aaagFAxsb9cXKpB8GAafaVAD01CXD178=;
- b=vBSV9PuGaob7EwfUbiGv6fypiN4LKkZCFKVdXD+PIQv8LCcBMfs8U5vzkhknkhDiwC6C0Zrx+
- 5R4OEUS3RiTCHa0v/202zDRtO2dKByH8pttxUhsn6U5qKVyhcv1ODCk
+ bh=Tk8jUyrOqQ7WXa1eqV1nq7SPxnPRM7zEp3j/WZJSWC8=;
+ b=os6OKouVgqku2jRKGVaPk1noDMT3+eXOUJzWQsRazIMJ1bPae/JGJpIYkqGCxir04AYNo7/bT
+ w+Brhzebg6AAvdsxWkzbY3bN7osSNAQdnJPqVkijmqj/2VMhvYhfElf
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-ORIG-GUID: R2A9irvyO8_k3mWuzUl4K6eIkMUXhqOa
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfXyJvi9GKFtpb1
- k0ZF0WARkjO0yUUz73zbMlvcZ4xOdkxVkqN9PitiK6WUxQaPT7AjbEmVaCeu0BcKQcxbivjH+45
- 66E0ZOgJ5TKZXXBscDLE6Te4e28fmcLPwIfQWDfrwJrOKHs6UCHf
-X-Authority-Analysis: v=2.4 cv=S4PpBosP c=1 sm=1 tr=0 ts=6a6af63a cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfXwjrwCllRbu5G
+ Fgos3/Exoi8jSkAEkAfLtbD5IPxvsn8z54QNOpQYDUsqErb8G0bAf+fJsy4dYbiz34Ss3AGFK03
+ z0kawAVPTRDWKKvcQcjosRK6lWumtjk3QFmQ2JTAaZAGjtIkfo4c
+X-Proofpoint-ORIG-GUID: 4RD2uB6BY8Mr_MwEy6vKKPqjwdE5V3Ip
+X-Proofpoint-GUID: 4RD2uB6BY8Mr_MwEy6vKKPqjwdE5V3Ip
+X-Authority-Analysis: v=2.4 cv=ObCoyBTY c=1 sm=1 tr=0 ts=6a6af63c cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
  a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=usPcmh10W0ubT8QP8_c3:22
- a=aYi4XJYX91a15INjywwA:9 a=QEXdDO2ut3YA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-GUID: R2A9irvyO8_k3mWuzUl4K6eIkMUXhqOa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfXyw66NWaBVhVA
- 3jxSBwWFWd3LrieKeGHCr+SvkHbuqsTSLxWsTKX64jp8DLAZLjZvYcL8af8Krq7TaQ6ALByKlig
- 5l3mwTKistlYECsdOZj99VdLGaPa7r5MHKlT4yHhySz+BDfvsLwFYdNJ4IQAfh+vliQKMBRUo2B
- d4R7Dpbdw6psn3DvBeV9uFFZZOrRDLIQIrJjIQlCTOKvD+O3FFHtQkWvqxUbm0xJVnuDzQyB1wT
- ToBKa99IE4c7U565Hb7y4hZK0c0RIKqG8mhPoCW0cR/YoAjwMJIelWKg5gcbY0uLlzMEvvZB9xq
- QzlaqzWJpbVbCqoCyRZR2fx66x99LgpkhMB8zLMRM9Gza2ZMWRoRgodU1R85Qf4yUSXuBnLoNYE
- 5ubREAmfkjHSfIr45nGo1vHSS/6MBdpuSE0oi1g7avHvtbE2wHkkMPFoIrK1B88R00X7AB9bHIf
- jsiAXvdr9ZX5KsI3mVw==
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=JR4YdQiviy7OQf72WyZ1:22
+ a=J9_MS8zF8NN3zyd_QTgA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfX8tpZWtjfBsNb
+ /LSA5WhkzIc1HX8YW3EeYYQbmjNLYBlIRVoNbIX7yC30Xi7Szhx+VATqT7jy2iDkiJoQNAIjczk
+ qy6IDU7++PeLfunw132nDKJyiqRFR+hxs7yVk5ibsweYKQ7b2tyeY3lI4sYRlnsOjx+jVJoyRKn
+ /4vDhyVMbabqtAhTFPhFxLr4GtyOCllHJujZL9VPgqhqPqEK0JAT8xwGnP7itppeZ+jV0SEbKl5
+ 9hPTbVqJ7BRIsob6h984KU7c7c3d82dl2v4neAgbYMJ+8ArQeuO1F6MwQ6ErQ2QcNbs8ST0ONGt
+ 3OS45fNCRH1J1KoKXp6lws7tUWtrZn04hMlOIbhGRIm/THqliS3SU3Mkdx0yaT+Mul+VIluZE8P
+ F17KDiuOaUpgDSW04+lJhKlVZ84tEHxDYcA6+DI96YAHyDqobClzT+aCxstTGWjmRLdvs/kziUn
+ 0wBWfFBgPtIQhNA6V1w==
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11859
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=10 impostorscore=10
- clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0 bulkscore=10
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300048
+ suspectscore=0 spamscore=0 bulkscore=10 malwarescore=0 impostorscore=10
+ adultscore=0 priorityscore=1501 lowpriorityscore=10 clxscore=1015
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607300048
 
-Set BIO_COMPLETE_IN_TASK on iomap writeback bios when a dropbehind folio
-is added. This ensures that bi_end_io runs in task context, where
-folio_end_dropbehind() can safely invalidate folios.
+Block device buffered reads and writes already pass through
+filemap_read() and iomap_file_buffered_write() respectively, both of
+which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
+by setting FOP_DONTCACHE in def_blk_fops.
 
-With the bio layer now handling task-context deferral generically,
-IOMAP_IOEND_DONTCACHE is no longer needed, as XFS no longer needs to
-route DONTCACHE ioends through its completion workqueue. Remove the flag
-and its NOMERGE entry.
+For CONFIG_BUFFER_HEAD=y, writeback goes through buffer_head's
+__bh_submit() which sets BIO_COMPLETE_IN_TASK on dropbehind folios. For
+CONFIG_BUFFER_HEAD=n, writeback goes through iomap which handles it via
+BIO_COMPLETE_IN_TASK on the ioend bio.
 
-Without the NOMERGE, regular I/Os that get merged with a dropbehind
-folio will also have their completion deferred to task context.
+This support is useful for databases that operate on raw block devices,
+among other userspace applications.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
- fs/iomap/ioend.c      | 5 +++--
- fs/xfs/xfs_aops.c     | 4 ----
- include/linux/iomap.h | 5 +----
- 3 files changed, 4 insertions(+), 10 deletions(-)
+ block/fops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/iomap/ioend.c b/fs/iomap/ioend.c
-index 30468d51b5ad..1ae8a8fb8503 100644
---- a/fs/iomap/ioend.c
-+++ b/fs/iomap/ioend.c
-@@ -238,8 +238,6 @@ ssize_t iomap_add_to_ioend(struct iomap_writepage_ctx *wpc, struct folio *folio,
+diff --git a/block/fops.c b/block/fops.c
+index 15783a6180de..8b39c53b6393 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -941,7 +941,7 @@ const struct file_operations def_blk_fops = {
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= blkdev_fallocate,
+ 	.uring_cmd	= blkdev_uring_cmd,
+-	.fop_flags	= FOP_BUFFER_RASYNC,
++	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
+ };
  
- 	if (wpc->iomap.flags & IOMAP_F_SHARED)
- 		ioend_flags |= IOMAP_IOEND_SHARED;
--	if (folio_test_dropbehind(folio))
--		ioend_flags |= IOMAP_IOEND_DONTCACHE;
- 	if (pos == wpc->iomap.offset && (wpc->iomap.flags & IOMAP_F_BOUNDARY))
- 		ioend_flags |= IOMAP_IOEND_BOUNDARY;
- 
-@@ -256,6 +254,9 @@ ssize_t iomap_add_to_ioend(struct iomap_writepage_ctx *wpc, struct folio *folio,
- 	if (!bio_add_folio(&ioend->io_bio, folio, map_len, poff))
- 		goto new_ioend;
- 
-+	if (folio_test_dropbehind(folio))
-+		bio_set_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-+
- 	/*
- 	 * Clamp io_offset and io_size to the incore EOF so that ondisk
- 	 * file size updates in the ioend completion are byte-accurate.
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 51293b6f331f..cd8de8c82d78 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -522,10 +522,6 @@ xfs_ioend_needs_wq_completion(
- 	if (ioend->io_flags & (IOMAP_IOEND_UNWRITTEN | IOMAP_IOEND_SHARED))
- 		return true;
- 
--	/* Page cache invalidation cannot be done in irq context. */
--	if (ioend->io_flags & IOMAP_IOEND_DONTCACHE)
--		return true;
--
- 	return false;
- }
- 
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 56b43d594e6e..68af4935a107 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -404,16 +404,13 @@ sector_t iomap_bmap(struct address_space *mapping, sector_t bno,
- #define IOMAP_IOEND_BOUNDARY		(1U << 2)
- /* is direct I/O */
- #define IOMAP_IOEND_DIRECT		(1U << 3)
--/* is DONTCACHE I/O */
--#define IOMAP_IOEND_DONTCACHE		(1U << 4)
- 
- /*
-  * Flags that if set on either ioend prevent the merge of two ioends.
-  * (IOMAP_IOEND_BOUNDARY also prevents merges, but only one-way)
-  */
- #define IOMAP_IOEND_NOMERGE_FLAGS \
--	(IOMAP_IOEND_SHARED | IOMAP_IOEND_UNWRITTEN | IOMAP_IOEND_DIRECT | \
--	 IOMAP_IOEND_DONTCACHE)
-+	(IOMAP_IOEND_SHARED | IOMAP_IOEND_UNWRITTEN | IOMAP_IOEND_DIRECT)
- 
- /*
-  * Structure for writeback I/O completions.
+ static __init int blkdev_init(void)
 
 -- 
 2.39.5
