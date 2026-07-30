@@ -1,151 +1,180 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B103B892B;
-	Thu, 30 Jul 2026 19:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785440263; cv=none; b=DMl/1sUOWO/srrXf9eyVQzS7D4pOUiYbmikiXWJynvco6aYDVzcBsI4ohx9hxItSqzw2PbRFPheoxibBe3c1skuP/BSMAT4a0302n4aP+ntlNMeicwsBbac9ArLYN1NN8D3gzhHKGu9GcCCoSZYhLNODryQwygVPW57uKG/fFg0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785440263; c=relaxed/simple;
-	bh=0YUQnzLRm3wS1CGWiEU81s9G8CU7vAZgo/sVpvLcmVM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cz7mUjOPfyRNktEPgVrHnmjuLzjKeFh+4QKlhHr5fXGIOZvHObGpaUMgRmUa8gdH96t7fYyXedx/Hs2SoJMkadgOOkNDsU48n1dNsfubxKLMF8B5OIsQB1hgGsQT1skVkTFsgE3pU6Drr8H1d9BuA0mYIkBun8TnU3UkoYhAAlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fAMIev6s; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC79639E177
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 19:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785440589; cv=pass; b=Njn0dtcZDyqmk7vq8v8tPq4PIpMUJOyAxoBkG37MhNt/jcFMCqySFLmmEvZ1H3ICgVV4CT8dnaP/cAm9oS5P/7bvS7BAAb1eeIx8o+KBeWxuVr2sHysePRfU7AeLKNILWbJXQCbkG+3Pdfz789c2h7ngNcrlyojLiFTtz/Hk88I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785440589; c=relaxed/simple;
+	bh=hGzrY0H2pVacJyGeUAhyX0VXUSX7hmjVvlfOiRoOW0I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oisSOaARrjt5yspOofVefwpXQXsYXXShRJXiOQE2z+DHuEW9fPlD62bKTaAExH60tKlp7MO6rqGDzJe3285jjV8KJPIhtgUa2PooFQv+hFKghrnmSZ2AXDa3KVTmhel3tBN0L5CiaxjjUNuaZypCcDru0okQqkWmtF02PpkOn34=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pDWfIl1D; arc=pass smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fAMIev6s"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66UGlpF83485859;
-	Thu, 30 Jul 2026 19:37:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=X9gjsQ
-	fxB46lKz4FCmE3Dwab7rgVBkqkYhDSL27hK0s=; b=fAMIev6szPn5WR/c0PuGdh
-	hr7m/iZ6C7h5OpwgFNbQWnA1f7fCpIp+GRNTvWVcyROGhLv87PrWkUX1qi4Fejrc
-	8H0DH2NutSJ1+MyRkrqv4rkHHrCDe5G2sboTmgf9Jih5ZTGVtwb74P1kzURH9vpC
-	QCi6MJoN1bRbcUgDmv3cVMbxqcc9YExdmEj8fZHFZcQyIUisXSn3ssThG0vcKDhF
-	7t8mQK6wccQidkgiCVRuCfSCp9DYQ+pnF9KQ85lf2AKJpV0CH2Y07DcVImoXOR+V
-	9phNiCjdWqGJcgn+zGv6hYRPsLT5Y+AmAAIz3rq3NKiVaTPRXKSALUcVQmsoABDQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuyjgn04-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Jul 2026 19:37:38 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66UJR9t9024476;
-	Thu, 30 Jul 2026 19:37:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fn8fkcu9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Jul 2026 19:37:38 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66UJbZ6S44695992
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 Jul 2026 19:37:36 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CE17620040;
-	Thu, 30 Jul 2026 19:37:35 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E88120043;
-	Thu, 30 Jul 2026 19:37:35 +0000 (GMT)
-Received: from [9.87.140.128] (unknown [9.87.140.128])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 30 Jul 2026 19:37:35 +0000 (GMT)
-Message-ID: <bd8ef96d-a072-4082-81b0-a5d751e5f5d2@linux.ibm.com>
-Date: Thu, 30 Jul 2026 21:37:34 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pDWfIl1D"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6983f20a8bfso366569a12.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 12:43:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785440586; cv=none;
+        d=google.com; s=arc-20260327;
+        b=rm8a5YfE3leb/jvYYo71AvU4w5W026E5Zmgj+4vkrUzVMKuOLq+dQEubmdzgcGu8BA
+         tMZA2Vujiea7c4+jf+ELiz0VIzS2F7Nq+OopGCeibNyObxWPc475kWhdUc4svjgfhOnC
+         V5x2Kv6XLnFURb7BWya2pUEzsUii2SHHAVUrKUy2AlpSGDWhMzCrJRytb2JaJWEdEOos
+         G23kshiXwwZLm48hVPycvpQLaMNchgpP/meQWz3EMl4ySlc7PICIh5BtvPdir8/xPOOE
+         4hQtn+0gQhDBUq+PmZWyfX0/5NO5aiRypyd/kjSNNKp9/hExOheRPAm5cNurvbJxGqK+
+         6cWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
+        fh=nv0ebhOswkUV4BfYTrO4rtVdy75w1iGYuzeXTR2MRkU=;
+        b=JKRFSd039eB4F/nmOOxFBUcE1HUdhmrFnX/xQZHNpZ0IWrT3hXNot0pQj90nD3PwtP
+         OF2TqJX8TsDTCLq0fdamSS8HrYsvZ+gB6lGwO4eRdZnWN5TkhZSqGnMd9WUejGcd0moA
+         qTZXFbunfzurAgHnmbjOpMG5pOrQxistiBMM0SN98+/4JMT2X3BzidSd2nciG2RqT06u
+         pxUbMsVkBNCiy2nf/8RplmWVHRi977agkNnjxjFuk+3IrSSwoobCcVvv10uW7lcirPaw
+         TyUjR/VavENiRikgcVqhRjqItstiCWwomU2kbMzIGJnpstCnebl4A/yOxmFJ8RCQg9e6
+         JB0g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785440586; x=1786045386; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
+        b=pDWfIl1DME8i0fO4czGK96zPvxO0q3sS3UdKeSeJEQarlNsfwmGhZvpq5l7hFUQPZ+
+         vTD2EesLFIxbstGKZlqgUivH/4CCiffgncvOjQ6R0K/+vBng0Ax1J/5CLO+OSx6lVCIB
+         yLDWyma7B1yZH0YIScLolulcEXv4r1UAgnZvkWrFTntDJuT7r0hF5huRYKArVufJGNx9
+         hwXS9iiRllQEEfpDySkfxX+d945YMsoiyqX8xX7pLcnktHysC2Ps+/+sI/1vEoKLo3ez
+         Kv96rBpGU46RZZ6vpbsN+OL8IKltrZg24hTRSHDx6mWnt7Re+tyoLEaLq0rZ7AZSVi3f
+         7pUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785440586; x=1786045386;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
+        b=SJgak2oY1ZaH74HKbi9ED1ppCKJzOMIFX0i2HjSfMuV0OsfMlrJ97PC+pMhtuyUeTv
+         /7vzkJe4E5DLjhJQ59sGGm9cmAqlbrrPSkLDzu5sLDe9pTlzyaAEGg4VAgYoI8i7adFB
+         m5Yj2GTgtumAfMmQpSVpzOXsHuwP6c+RBYNnq9QBVfTZqr/jp2Bn90SzzEZoWhQB3UUt
+         5ZGoiLCY+OGBOxHzf/5x2g03GjF03RGbv9uUgpo0jS5tuDPrP7mSNNlE9Itzkvl4TBLe
+         LdygcznSMKD8V6BoubcjZWmYFkSxIe8lm2jgkkzsSuJj9nqoG6oDT1HoAUDEG+Cgvhgp
+         MMQQ==
+X-Forwarded-Encrypted: i=1; AHgh+Ro6Oo6eZjxAASD3kuD9mnnsw69c8PqnAWUiGIgre4cCyZIdeCekGrGRHpFiur9KuLRAyx7fc/4iHN7piQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUVFuNUGbBNqnVeNOWjVQsoRgn/cjG8mCacHVwfySuYj/LVsR3
+	Ne58P2vWVscPrxQe9mZZxC0aY62P3YYVafini0sxha0JpULp4/G6ps6/s/xppEMN854+BCWiask
+	pxf+i9Ypqv+3vdPuOg7MyMOVf0ko3mtWsV7SxdWh9tw==
+X-Gm-Gg: AR+sD12j+yeaFzwwsMRCpZ0svd9po39Suk5QegZXaNxS3GahP+5Q0YnrUohdORAgTsy
+	ZJQmcGHiV9FUgOA8LPu568o3n+mI4kUYOCk2q9Hn+mK10TqhWCoiTieVQ4lje0N7CpOYBdno+Im
+	HU6g1ClALp2qeqAQlwPldwlS3tnk8EbA4gJk+zaBoLOTCK1jrqXaHUQ9LygfAMhQMGbycC78f36
+	FuY3ZcRDg7aAeEHHHOL0hHZSASoVoHMOw7eVKmZmkkBtarFKpK1DtPANFX9VVbacBsou0ls+F9V
+	qZCW0ESlmhyQQNrFv7+aLpa6Zwh3RQ7+QGEXXu+w93p/Ul5oLFeAYfRy
+X-Received: by 2002:a05:6402:5191:b0:69c:794d:4862 with SMTP id
+ 4fb4d7f45d1cf-6a07b7c2ed2mr1788382a12.7.1785440585803; Thu, 30 Jul 2026
+ 12:43:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: model nowait as trylock for non-blocking queue
- enter
+References: <20260727201257.211635-1-coshi036@gmail.com> <178532422849.2568853.3142469605707392497.b4-ty@b4>
+In-Reply-To: <178532422849.2568853.3142469605707392497.b4-ty@b4>
+From: Chris S <coshi036@gmail.com>
+Date: Thu, 30 Jul 2026 15:42:53 -0400
+X-Gm-Features: AUfX_mxV3jqmHc6ady8mMlUy2DEKG0LSXNTFo-1cI8WmoWvjWUgkBWPSF8mq708
+Message-ID: <CACd_6n0PY0RYtrWb_FdC572J6Gh6t8GvaJhUHi6P3yA5_wmyRQ@mail.gmail.com>
+Subject: Re: [PATCH] block: stop the timeout timer when releasing a never
+ added disk
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20260730183005.444273-1-borntraeger@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20260730183005.444273-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDE0MSBTYWx0ZWRfX6yHc1p5WRIaX
- O7qOOoi6Rez6KeHXOU7NzZWWdvzpJ20DzoDGbNnkasYr07S3ut868eEHL+WRDlfIvsQNPPuUFvJ
- h3aobv/mF7xz2zyLzuZw5zTu2c6dd30=
-X-Proofpoint-GUID: VLK8GjL1TWG91E9qsD7dPWcRJmMykhi6
-X-Proofpoint-ORIG-GUID: VLK8GjL1TWG91E9qsD7dPWcRJmMykhi6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDE0MSBTYWx0ZWRfXxp+JnTC3awBB
- RS6y69B9yA/wGCmxNwKYSqVFZCyCs7YMQpCv/A1DVmAS6mnn9TK06wtRFNGccGRm4uAeqqXGE5q
- R0LsAPfSihY3QXV2yg0yDkxsRwlgUWLBjEuyKHBVNPMN5yfWhwqgnRh7DJVecK6Wd8wSxijkThd
- pPAlITFLcVxWk2w3HCOk1zUQjsvw9sxQY5ZEuHo3wuYTFDl5mA88mlXXhSKLkpfc8CSeaQfhdj5
- XKC4q4mxovcTT40CRIxiqAw1+4Sbc4UjvydFsGJgXz4s4NV3wpa7aUAYb2eTLufJnNo0s2QU48S
- AvkQ4/b5XIQlr9xte++BtUQe6EM7DDHfPJXt0BQGOJckXQzZ5RhepZCNy1UsQNGEjXGaho9Hpxe
- 6n+sv9ZqlY2XAA5F9h1yQvavHAlK/c5z9bQwxj7iSiV0PivInd4E7MRnQzaQ2ajf1dvk7OEO5Bj
- JcxsKizMdBYdc/b9VpQ==
-X-Authority-Analysis: v=2.4 cv=X5Vi7mTe c=1 sm=1 tr=0 ts=6a6ba802 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=SdYOVTMks7EqRTw1GucA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-30_05,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607300141
+Cc: Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Weidong Zhu <weizhu@fiu.edu>, 
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Will this actually fix the lockdep splat for REQ_NOWAIT bios?
-> Looking at the fast-path for bio submissions, bio_queue_enter() in
-> block/blk.h still unconditionally passes 0 for the trylock parameter:
-> block/blk.h:bio_queue_enter() {
-> 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-> 	if (blk_try_enter_queue(q, false)) {
-> 		rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
-> 		rwsem_release(&q->io_lockdep_map, _RET_IP_);
-> 		return 0;
-> 	}
-> 	return __bio_queue_enter(q, bio);
-> }
-> Any non-blocking bio submission to an unfrozen queue (the vast majority of
-> submissions) will hit this fast-path, causing lockdep to still falsely
-> record a blocking dependency and potentially trigger the splat.
-> Furthermore, is the updated annotation in __bio_queue_enter() ever
-> reachable for a NOWAIT bio? If the queue is frozen, blk_try_enter_queue()
-> fails, and the preceding loop immediately returns -EAGAIN for NOWAIT:
-> 		if (nowait) {
-> 			if (test_bit(GD_DEAD, &disk->state))
-> 				goto dead;
-> 			bio_wouldblock_error(bio);
-> 			return -EAGAIN;
-> 		}
-> Does this make the nowait parameter in rwsem_acquire_read() here
-> essentially dead code for bios?
+Hi Jan, I'm currently working on the changes we discussed.  Based on
+vfs.all now.  Four things came out of writing it that I would rather
+resolve before posting.
 
+1. mark_buffer_write_io_error() is not safe for jbd2's buffers yet.  It
+dereferences bh->b_folio->mapping directly (fs/buffer.c:1057), and
+jbd2_journal_write_metadata_buffer() points the temporary bh at
+virt_to_folio(jh->b_frozen_data), which is slab-backed.
+buffer_set_crypto_ctx() right next to it already uses folio_mapping() for
+exactly this reason.  So I would send a prerequisite converting
+mark_buffer_write_io_error() to folio_mapping() before the jbd2 change.
+Also worth noting the consequence of A2: in ordered mode the temp bh
+inherits the source folio, so the error lands on the bdev mapping and
+mapping_set_error() errseq_set()s s_wb_err - a later syncfs() on an
+unrelated fd of the same fs can then return EIO.
 
-Looks like sashiko is right on both counts. bio_queue_enter() in block/blk.h is
-the only caller of __bio_queue_enter() and carries its own trylock=0 annotation
-on the ▎ fast path, which is where practically every REQ_NOWAIT bio goes — so the
-__bio_queue_enter() hunk alone fixes nothing for bios.
+2. gfs2 already has what we are building: gfs2_end_log_write_bh()
+(fs/gfs2/lops.c:171) calls mark_buffer_write_io_error() and does not clear
+uptodate.  Which means fs/gfs2/log.c:110 and :324 are blind to log write
+errors today, and converting them is not behaviour-preserving - it makes
+them start catching those.  I think that is right, but say if you would
+rather it were separate.
 
-We need to annotate the fast path as well. Will do a v2.
+3. On the sticky BH_Write_EIO: I am adding it to BUFFER_FLAGS_DISCARD as
+you suggested.  That covers discard_buffer(), but there are four other
+clear_buffer_req() sites (fs/buffer.c:1687, fs/gfs2/aops.c:600,
+fs/jbd2/commit.c:1035, fs/jbd2/transaction.c:2462).  Three of them also
+clear_buffer_mapped() and NULL b_bdev, so __bh_submit()'s
+BUG_ON(!buffer_mapped(bh)) makes them unreachable.  Only
+clean_bdev_aliases() leaves the buffer writable, and I could not construct
+a workload that reaches it.  So I am not sending the ungating patch.  The
+one place it would matter is ocfs2: fs/ocfs2/journal.c:691 is nested
+inside an if (!buffer_uptodate(bh)) at :675 that goes dead once the clear
+is gone, so :691 has to be hoisted out, and it then becomes a pre-use
+check on a sticky flag rather than a post-write one. I will Cc ocfs2-devel
+on that patch.
 
+4. fs/jbd2/transaction.c:923, J_EXPECT_JH(jh, buffer_uptodate(bh)) in
+jbd2_freeze_jh_data(): after the series a failed write leaves the buffer
+uptodate, so this stops firing for write errors.  Arguably correct - the
+in-memory copy being frozen is still valid - but it is your assert.  Leave
+it, or convert it?  I instrumented it and ran ext4 with data=3Djournal unde=
+r
+injected write errors, forcing copy-out; it never saw a non-uptodate
+buffer, so I have no evidence either way.
 
-And yes, the __bio_queue_enter() annotation is near-unreachable for a NOWAIT
-bio: we only get there after the fast-path tryget already failed, and a second
-failure returns -EAGAIN. It is reachable only if the queue becomes enterable
-between the two attempts.
+One thing I did settle by testing.  fs/ext4/ext4_jbd2.c:416 open-codes
+buffer_req(bh) && !buffer_uptodate(bh) after sync_dirty_buffer(), which
+already returns -EIO.  On an instrumented kernel (ext4 without a journal,
+-o sync, injected write errors) the two agreed on all 40 occurrences and
+never diverged, with BH_Write_EIO set every time.  So that site just
+consumes the return value and the buffer_req() question goes away.
 
-For consistency we might want to keep it?
+Best,
+Chao
 
-Note the reported splat itself is on q_usage_counter(queue), via
-blk_queue_enter() from dm-mpath's blk_mq_alloc_request(BLK_MQ_REQ_NOWAIT).
-That path has no inline fast path so the fix should fix the report.
-
+On Wed, Jul 29, 2026 at 7:23=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
+>
+>
+> On Mon, 27 Jul 2026 16:12:57 -0400, Chao Shi wrote:
+> > disk_release() undoes blk_mq_init_allocated_queue() for a disk whose
+> > probe failed before add_disk(), but it only calls blk_mq_exit_queue().
+> > Nothing there stops q->timeout, and that timer rolls forward: it stays
+> > pending until it next expires, not until the last request completes.
+> > So if the driver issued any I/O before adding the disk, the
+> > request_queue is freed while still linked into a timer wheel bucket.
+> >
+> > [...]
+>
+> Applied, thanks!
+>
+> [1/1] block: stop the timeout timer when releasing a never added disk
+>       commit: 26cb8ebbfaf713c82e142d08828d4d765057633b
+>
+> Best regards,
+> --
+> Jens Axboe
+>
+>
+>
