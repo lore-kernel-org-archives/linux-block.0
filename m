@@ -1,27 +1,27 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DB23B9DBB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A75F3B9952
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 08:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785400201; cv=none; b=DbfoT+YhXdG1huANKh4u57O+APYW/yVe6ZsKqhxoRPmbKwucRAM5sN3+KlfI3bxJpT3Tb87mJabA0XohhYtGKMjG71O5tpzzbuXCstcquspzlisQGgONECnbWrosptbCCw42TR/hJDU9CJtIavLihUqz1HYww2nVe8dM+fgUpNA=
+	t=1785400202; cv=none; b=U8IVqqNPCeulK33XO1K7TBRlJt9nRsClfJIHLWNUjyT/mFNF9s9LLItzsTpHvox+uiCYAeumUh0GJxWV4L535WT6PN7CH6hi7Ix2wuMaITorrBJmdaYKuoGXPgzUVIq82qt/2I6attucUdAm/wWCyK4YaQimMGMJlO4xaLm6fmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785400201; c=relaxed/simple;
-	bh=BcwJ9+mY+Ya72BZsL6bADP+bK7GrkZN9uvwWwrKHiZQ=;
+	s=arc-20240116; t=1785400202; c=relaxed/simple;
+	bh=DVCovmRupmgJCRcPN/YhaOpu4bdNhdIx+5GYUs5a6DA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qY6bJZU/jq1RmpXJs2Iye8dSDeoIEakIb45HbrtkTWSRIZcx7+imsWhLIT/yMAw3gnEgse5YLVbzotYwUFgHgIsqprbuYTQIUjv6LxMh1E7FDHdhekFcl7ApVL9wIsWQ4Ksx01hjumMzNqc/xkTsfEn8YnaYefqjdmsz07+JVmg=
+	 MIME-Version; b=eQ7JGa5uVqpDeYaZ3j/BkAc//5yYezyaVPOfA7HCB11YKexIkxOcKGJ0Vt2z9sH1ULPKm6hRrwsQZVJpmgupvfmLCC5CPy2Gd6iADmcO+AsaWOxjwwEk6hRsi1hahSdosiAinWoNZ9ETajjUpVRUSBAaipvKZxGIQkZ/0JY0W8U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j62237TzKHMgj
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j623rdgzKHMgd
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:28:58 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id ACBBB40EB2
+	by mail.maildlp.com (Postfix) with ESMTP id EADE740EC9
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:29:54 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S7;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S10;
 	Thu, 30 Jul 2026 16:29:54 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,9 +37,9 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v5 3/8] nbd: reset write cache on disconnect
-Date: Thu, 30 Jul 2026 16:20:41 +0800
-Message-ID: <20260730082046.3459239-4-yangerkun@huawei.com>
+Subject: [PATCH v5 6/8] nbd: factor out a nbd_genl_foreach_sock
+Date: Thu, 30 Jul 2026 16:20:44 +0800
+Message-ID: <20260730082046.3459239-7-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260730082046.3459239-1-yangerkun@huawei.com>
 References: <20260730082046.3459239-1-yangerkun@huawei.com>
@@ -50,61 +50,208 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7urWxCw47Aw1DJw13CFW8Crg_yoW8WF1DpF
-	W3Ca47KryftF43AayUJayUGFy5CaykAFyxWa43A34Y9r95AryIkFZ0y34xtF1DJrn3JFW7
-	XFs5GFykAFykCr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmlb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ew
-	Av7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY
-	6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14
-	v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s026xCa
-	FVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_Jr
-	Wlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j
-	6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r
-	1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4U
-	JbIYCTnIWIevJa73UjIFyTuYvjxUFzVbDUUUU
+X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S10
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFWftFW3XryxXF17uw15Jwb_yoWrKF47pF
+	W8tFZ8Jr4DJr1xWF95Zw4kZa4SyF1xG3sIgay7Kw1fZr12kr43W3y8GryF9r45GryDCw1a
+	yF4Yqa1Ikw4DW3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmEb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
+	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
+	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
+	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
+	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
+	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+	xVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcI
+	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4U
+	JVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1-zstUUUUU==
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-An inactive nbd device may refuse any I/O operations. The nbd_config_put
-function calls invalidate_disk, which sets the device capacity to zero
-to reject all read and write I/O. For zero-sector flush I/O requests
-from blkdev_issue_flush, if the write cache is disabled, the zero-sector
-flush I/O immediately returns 0 in submit_bio_noacct. However, since
-nbd_config_put does not clear the write cache state, an inactive nbd
-device might still have the write cache enabled. In this situation,
-zero-sector flush I/O will return -EIO because there is no active socket.
-Although this does not cause any bugs, resetting the write cache state
-would make the behavior consistent.
+The NBD_ATTR_SOCKETS walk is duplicated in nbd_genl_connect (add sockets)
+and nbd_genl_reconfigure (reconnect).  Factor out a single helper that
+walks the list and calls a callback per fd; with a NULL callback it is a
+pure counter, used by a later patch to learn nr_hw_queues before the
+device exists.  Returns the number of fds walked (>= 0) or a negative
+errno; a callback >0 stops early as success (reconnect's -ENOSPC).
 
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- drivers/block/nbd.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/block/nbd.c | 137 +++++++++++++++++++++++---------------------
+ 1 file changed, 73 insertions(+), 64 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7ec85f94f742..da4b48ef3c79 100644
+index 3b7363b11d0b..34b84fc1c61f 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1469,8 +1469,13 @@ static void nbd_config_put(struct nbd_device *nbd)
- 	if (refcount_dec_and_mutex_lock(&nbd->config_refs,
- 					&nbd->config_lock)) {
- 		struct nbd_config *config = nbd->config;
-+		struct queue_limits lim;
- 		nbd_dev_dbg_close(nbd);
- 		invalidate_disk(nbd->disk);
-+		/* reset write cache */
-+		lim = queue_limits_start_update(nbd->disk->queue);
-+		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
-+		queue_limits_commit_update(nbd->disk->queue, &lim);
- 		if (nbd->config->bytesize)
- 			kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
- 		if (test_and_clear_bit(NBD_RT_HAS_PID_FILE,
+@@ -2108,6 +2108,58 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
+ 	return 0;
+ }
+ 
++/*
++ * Walk the NBD_ATTR_SOCKETS nested list can call @cb for each socket fd.
++ *
++ * Return the number of fds walked, or a negative errno.
++ */
++static int nbd_genl_foreach_sock(struct genl_info *info,
++		int (*cb)(struct nbd_device *nbd, int fd),
++		struct nbd_device *nbd)
++{
++	struct nlattr *attr;
++	int rem, count = 0;
++
++	if (!info->attrs[NBD_ATTR_SOCKETS])
++		return 0;
++
++	nla_for_each_nested(attr, info->attrs[NBD_ATTR_SOCKETS], rem) {
++		struct nlattr *socks[NBD_SOCK_MAX + 1];
++		int ret;
++
++		if (nla_type(attr) != NBD_SOCK_ITEM) {
++			pr_err("socks must be embedded in a SOCK_ITEM attr\n");
++			return -EINVAL;
++		}
++
++		if (nla_parse_nested_deprecated(socks, NBD_SOCK_MAX,
++						attr,
++						nbd_sock_policy,
++						info->extack)) {
++			pr_err("error processing sock list\n");
++			return -EINVAL;
++		}
++
++		if (!socks[NBD_SOCK_FD])
++			continue;
++
++		count++;
++		if (cb) {
++			ret = cb(nbd, (int)nla_get_u32(socks[NBD_SOCK_FD]));
++			if (ret > 0)
++				return count;
++			if (ret < 0)
++				return ret;
++		}
++	}
++	return count;
++}
++
++static int nbd_genl_connect_sock_cb(struct nbd_device *nbd, int fd)
++{
++	return nbd_add_socket(nbd, fd, true);
++}
++
+ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct nbd_device *nbd;
+@@ -2227,36 +2279,9 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 	}
+ 
+-	if (info->attrs[NBD_ATTR_SOCKETS]) {
+-		struct nlattr *attr;
+-		int rem, fd;
+-
+-		nla_for_each_nested(attr, info->attrs[NBD_ATTR_SOCKETS],
+-				    rem) {
+-			struct nlattr *socks[NBD_SOCK_MAX+1];
+-
+-			if (nla_type(attr) != NBD_SOCK_ITEM) {
+-				pr_err("socks must be embedded in a SOCK_ITEM attr\n");
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-			ret = nla_parse_nested_deprecated(socks, NBD_SOCK_MAX,
+-							  attr,
+-							  nbd_sock_policy,
+-							  info->extack);
+-			if (ret != 0) {
+-				pr_err("error processing sock list\n");
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-			if (!socks[NBD_SOCK_FD])
+-				continue;
+-			fd = (int)nla_get_u32(socks[NBD_SOCK_FD]);
+-			ret = nbd_add_socket(nbd, fd, true);
+-			if (ret)
+-				goto out;
+-		}
+-	}
++	ret = nbd_genl_foreach_sock(info, nbd_genl_connect_sock_cb, nbd);
++	if (ret < 0)
++		goto out;
+ 
+ 	if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
+ 		nbd->backend = nla_strdup(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
+@@ -2345,6 +2370,20 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
+ 	return 0;
+ }
+ 
++static int nbd_genl_reconnect_sock_cb(struct nbd_device *nbd, int fd)
++{
++	int ret = nbd_reconnect_socket(nbd, fd);
++
++	if (!ret) {
++		dev_info(nbd_to_dev(nbd), "reconnected socket\n");
++		return 0;
++	}
++
++	if (ret == -ENOSPC)
++		return 1;
++	return ret;
++}
++
+ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct nbd_device *nbd = NULL;
+@@ -2441,40 +2480,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 	}
+ 
+-	if (info->attrs[NBD_ATTR_SOCKETS]) {
+-		struct nlattr *attr;
+-		int rem, fd;
+-
+-		nla_for_each_nested(attr, info->attrs[NBD_ATTR_SOCKETS],
+-				    rem) {
+-			struct nlattr *socks[NBD_SOCK_MAX+1];
+-
+-			if (nla_type(attr) != NBD_SOCK_ITEM) {
+-				pr_err("socks must be embedded in a SOCK_ITEM attr\n");
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-			ret = nla_parse_nested_deprecated(socks, NBD_SOCK_MAX,
+-							  attr,
+-							  nbd_sock_policy,
+-							  info->extack);
+-			if (ret != 0) {
+-				pr_err("error processing sock list\n");
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-			if (!socks[NBD_SOCK_FD])
+-				continue;
+-			fd = (int)nla_get_u32(socks[NBD_SOCK_FD]);
+-			ret = nbd_reconnect_socket(nbd, fd);
+-			if (ret) {
+-				if (ret == -ENOSPC)
+-					ret = 0;
+-				goto out;
+-			}
+-			dev_info(nbd_to_dev(nbd), "reconnected socket\n");
+-		}
+-	}
++	ret = nbd_genl_foreach_sock(info, nbd_genl_reconnect_sock_cb, nbd);
++	/* foreach_sock returns a positive count on success; doit must return 0 */
++	if (ret >= 0)
++		ret = 0;
+ out:
+ 	mutex_unlock(&nbd->config_lock);
+ 	nbd_config_put(nbd);
 -- 
 2.52.0
 
