@@ -1,27 +1,27 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BD93B9D9E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DB23B9DBB
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 08:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785400200; cv=none; b=EhXx6TXY2N3RmxT1j0V8LKXzjvUbIyFIVUMsNST9tOhBfXvzGYGeRXQrrWaByWyxmdiYwZxXEGPhGaH9b13nipkG8h/RP4AdOcm+IqZXq/lZ26BGisX/UAkfoPxDNGBMUyHpDB68lx82Bj6Gl/gVScqEl7ey833zgv/97ZO6kTY=
+	t=1785400201; cv=none; b=DbfoT+YhXdG1huANKh4u57O+APYW/yVe6ZsKqhxoRPmbKwucRAM5sN3+KlfI3bxJpT3Tb87mJabA0XohhYtGKMjG71O5tpzzbuXCstcquspzlisQGgONECnbWrosptbCCw42TR/hJDU9CJtIavLihUqz1HYww2nVe8dM+fgUpNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785400200; c=relaxed/simple;
-	bh=vMkxh4PQy9rlmAxPxh5zUpWNaQ2aMtRhwJxkYyH+5as=;
+	s=arc-20240116; t=1785400201; c=relaxed/simple;
+	bh=BcwJ9+mY+Ya72BZsL6bADP+bK7GrkZN9uvwWwrKHiZQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uGU9WJvtKVV/leKlVAWuU1g/j6DT69i7L/2mr68Tpudg12Gmv/TW/ykI4Z4qH5Y8lhPclxxITGP5PRoLmQkxfN1z9cqzhCUHr7DoD4bFderAg3eBTBaz5irv62BzD7tDkGA4XzJmlrPcoMuwoUWrLU1PnO7J5Rc9l7wgwO9nxD4=
+	 MIME-Version; b=qY6bJZU/jq1RmpXJs2Iye8dSDeoIEakIb45HbrtkTWSRIZcx7+imsWhLIT/yMAw3gnEgse5YLVbzotYwUFgHgIsqprbuYTQIUjv6LxMh1E7FDHdhekFcl7ApVL9wIsWQ4Ksx01hjumMzNqc/xkTsfEn8YnaYefqjdmsz07+JVmg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j622zYKzKHMgv
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j62237TzKHMgj
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:28:58 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id CDD8540572
+	by mail.maildlp.com (Postfix) with ESMTP id ACBBB40EB2
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:29:54 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S8;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S7;
 	Thu, 30 Jul 2026 16:29:54 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,9 +37,9 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v5 4/8] nbd: remove queue freeze in nbd_add_socket
-Date: Thu, 30 Jul 2026 16:20:42 +0800
-Message-ID: <20260730082046.3459239-5-yangerkun@huawei.com>
+Subject: [PATCH v5 3/8] nbd: reset write cache on disconnect
+Date: Thu, 30 Jul 2026 16:20:41 +0800
+Message-ID: <20260730082046.3459239-4-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260730082046.3459239-1-yangerkun@huawei.com>
 References: <20260730082046.3459239-1-yangerkun@huawei.com>
@@ -50,84 +50,61 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S8
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF1xAF43Kw13CFyktw47Arb_yoW8try3pF
-	45Ga9rGF4UKr45uan5AFWkXFyrtwn7K347GayIq34YvrsxAFySvFyFy3WrWFyUAr95u3W7
-	Aay5Krs2kw18WrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmEb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
-	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
-	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
-	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
-	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
-	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
-	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
-	xVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcI
-	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4U
-	JVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1-zstUUUUU==
+X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S7
+X-Coremail-Antispam: 1UD129KBjvJXoW7urWxCw47Aw1DJw13CFW8Crg_yoW8WF1DpF
+	W3Ca47KryftF43AayUJayUGFy5CaykAFyxWa43A34Y9r95AryIkFZ0y34xtF1DJrn3JFW7
+	XFs5GFykAFykCr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmlb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
+	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ew
+	Av7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY
+	6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14
+	v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s026xCa
+	FVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_Jr
+	Wlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j
+	6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r
+	1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4U
+	JbIYCTnIWIevJa73UjIFyTuYvjxUFzVbDUUUU
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-nbd_add_socket() kreallocs config->socks, which a concurrent reader in
-nbd_handle_cmd() could UAF; commit b98e762e3d71 ("nbd: freeze the queue
-while we're adding connections") froze the queue to block that.  But
-the freeze costs an RCU grace period on every socket added, and setup
-adds them one by one.
-
-After the previous patch, nbd_add_socket() is rejected once nbd->pid is
-set, so it only runs during setup.  There the capacity is 0 and the
-write cache is off (cleared on disconnect by the preceding patch, and
-re-enabled only later in nbd_set_size), so submit_bio_noacct() rejects
-every bio before it reaches the driver -- non-zero-sector ones via
-bio_check_eod(), and flush-only ones via the !bdev_write_cache() branch.
-No I/O is in flight, so the freeze is unnecessary.
+An inactive nbd device may refuse any I/O operations. The nbd_config_put
+function calls invalidate_disk, which sets the device capacity to zero
+to reject all read and write I/O. For zero-sector flush I/O requests
+from blkdev_issue_flush, if the write cache is disabled, the zero-sector
+flush I/O immediately returns 0 in submit_bio_noacct. However, since
+nbd_config_put does not clear the write cache state, an inactive nbd
+device might still have the write cache enabled. In this situation,
+zero-sector flush I/O will return -EIO because there is no active socket.
+Although this does not cause any bugs, resetting the write cache state
+would make the behavior consistent.
 
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- drivers/block/nbd.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ drivers/block/nbd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index da4b48ef3c79..ce25c254e5fb 100644
+index 7ec85f94f742..da4b48ef3c79 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1272,7 +1272,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	struct socket *sock;
- 	struct nbd_sock **socks;
- 	struct nbd_sock *nsock;
--	unsigned int memflags;
- 	int err;
- 
- 	/* Arg will be cast to int, check it to avoid overflow */
-@@ -1290,12 +1289,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 		return err;
- 	nbd_reclassify_socket(sock);
- 
--	/*
--	 * We need to make sure we don't get any errant requests while we're
--	 * reallocating the ->socks array.
--	 */
--	memflags = blk_mq_freeze_queue(nbd->disk->queue);
--
- 	if (!netlink && !nbd->task_setup &&
- 	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
- 		nbd->task_setup = current;
-@@ -1335,12 +1328,10 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
- 	socks[config->num_connections++] = nsock;
- 	atomic_inc(&config->live_connections);
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
- 
- 	return 0;
- 
- put_socket:
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
- 	sockfd_put(sock);
- 	return err;
- }
+@@ -1469,8 +1469,13 @@ static void nbd_config_put(struct nbd_device *nbd)
+ 	if (refcount_dec_and_mutex_lock(&nbd->config_refs,
+ 					&nbd->config_lock)) {
+ 		struct nbd_config *config = nbd->config;
++		struct queue_limits lim;
+ 		nbd_dev_dbg_close(nbd);
+ 		invalidate_disk(nbd->disk);
++		/* reset write cache */
++		lim = queue_limits_start_update(nbd->disk->queue);
++		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
++		queue_limits_commit_update(nbd->disk->queue, &lim);
+ 		if (nbd->config->bytesize)
+ 			kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
+ 		if (test_and_clear_bit(NBD_RT_HAS_PID_FILE,
 -- 
 2.52.0
 
