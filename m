@@ -1,183 +1,142 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A03C36607D
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 20:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C1B3EC824
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 22:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785443955; cv=none; b=YsiYFLgEGO6eq9kDeqm1TX0CA30JNBXx6Cr+VDtI7lT2IlKOM4rMrHi9Ds48vLaxyLU4I25CfeCCd5PlvYy+lm+9FYGab9MOo487eIVJanHHAarEZYatoG5u3SmOlw0eqCiXxQXVtd2+AY+EBkg02Z91p1exg4ynJ8dAUNNWS6U=
+	t=1785452353; cv=none; b=PFDQ+YXxJnXTXKvphwJmWCofBDUFNPo/TqsKJDOTAIfLj+uFKCLNT7FnP6S2ZI74w3qmJZVmkM5EzOj5HpP9008+u88zaBkcIbpTOxH9rwKDYOVjNjmdXgKOcNwCVe9LnVQ1E5Y3KrdlomThsn1DQRRX4hd3i3ItwnHk6IIxUIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785443955; c=relaxed/simple;
-	bh=G/vRUOm8L2XZ3XeP9CnNcbxvMqQWrQcmwiBXs9OOzgw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BpmDybsot7d57wmNf6gZnNGY7Tcv4lV5btynDDtXRoxEy3xxj5zTioqVjiltFPXN5d81CF91lVGC1KwMkyWUPQl7BQN7pjSkE6iRPHvSR2wYvRB/rZUcwti4VofLFMz8lbaRDbqJbiPXz4K7HxUYJRFyJRCY9ua50dZxxTze52M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=WQ7HnPHx; arc=none smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1785452353; c=relaxed/simple;
+	bh=wpO1t/7FGPKrcFhoNcA92Vi0PmjZQCcIGe0oiSegWrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NRG+46nAQdJZuSAytedEEwTc0HIWI1NaWnCls3WV3oyXvtU3liTLlqov2JaXuobSYu6v5WE1RJPUopPIO8KkqWO8iWxew78PGGLZBPNAX9NHBb1Ej6L/WCbJKaCiWOhZeq1P+z7WGrsP4To3fSHosFcUaHQwFjfrJuZpxNZ6VMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UapOI+Vs; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XSo1hEXO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="WQ7HnPHx"
-Received: from pps.filterd (m0167075.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66UKXwgM3893252
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:39:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=T8e8
-	k+5EzrTp13lWK2mQytn9hp17i2RRCkab9M9He5A=; b=WQ7HnPHxqZL+jR81XllF
-	JTKnzPju6U39UyyWhhTcphUfZ+xAg2wqUa791ebQ1v5NhvW0IuF//dLqtiOJvHMi
-	fmyKW7M+TGXkdSy8yhCZpU5HL/IpFm8hExjB6Zd8ZTnCZBp0FfiM/4VmQMN3Nyjj
-	wy9qKWJdLe5TFEiS34dauGmL0aNhbdETHjmjDl6ehafIPC0BA5I6nCfjcLjVALJk
-	9EAViui9QVuK3SVhaPP15FKa4Vxbk1NUe/8NEuykcAZ7ZyTVvPKKcmrPB5R0nGP7
-	1xqHFPEmX+ojBlGjFW+JqGfOPxg4M0VGW9uE0F4ziDhKljsql7UvZhC9GapkEQy5
-	vw==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4frbc0h958-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:39:06 -0400 (EDT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-51c0f0a0760so3927941cf.2
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 13:39:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UapOI+Vs";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSo1hEXO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785452349;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sx+8dGfrU/EPbcECFTxS2R77qIQIIRmUdLHbVGAEsZE=;
+	b=UapOI+VsibK5Uol4nHBOSEdTA9wpIfbmOJE9owJgOqj18oejfhR0tdhrOvcPfJWMQakos2
+	0zbpMqx75FTdOZffgUEjJbveET9kAJqCtCUPMdHPuYS7P4eye73rqxP/rep2jPYTgYKEr0
+	ueZjqCJZR4wqGxvJ6mv31xHhOkZs3Co=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-523-RCiTUlKNPfqtEG7aAvjwDg-1; Thu, 30 Jul 2026 18:59:08 -0400
+X-MC-Unique: RCiTUlKNPfqtEG7aAvjwDg-1
+X-Mimecast-MFC-AGG-ID: RCiTUlKNPfqtEG7aAvjwDg_1785452347
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-495474a5fbcso2123315e9.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 15:59:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1785452347; x=1786057147; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Sx+8dGfrU/EPbcECFTxS2R77qIQIIRmUdLHbVGAEsZE=;
+        b=XSo1hEXOb3LtKVNxsec/0HaM3v/PCGYYphLYn3mS0cAteWMTyMZ3SFA4G8E9af7GBP
+         WiM7cNqAwP2b3kOgGdrwAhfkukyapsm/189bXSJL4tkMeGFlkPanRxHyQ3iJc3bA1RIy
+         lam0FQQefX8nG8lpRdjSrRpMPqaam7aarbi051z7FSSztYF+atKRr0spaJNxDxQqSjiK
+         tHMEbT/zglU6wZTUptL7mrKYIW8pH9em4pqVVTgR+kzWMGE+UvVhZWBqa1MJRcOUMc5g
+         TWtXk/6U5Vh18Q3ZFyDHAs/iQZrF9jgryJgRjmMYNHiDGLW6J1V1ygHCKCS/Evd9RSqc
+         PvTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785443945; x=1786048745;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=T8e8k+5EzrTp13lWK2mQytn9hp17i2RRCkab9M9He5A=;
-        b=qPR0ZXyrp7c5eFSp0MOTXz5Lyg2OPzhu2kRhm/u5862eDJ2E0YOtKjbuuKxLJM7wU+
-         /wYlAtKX+ENamdIQxL/8h2GKcWAbLDphBzWmo9LRs6EzUf48T0WrWCCVuAEOtP12QO0u
-         yFJ7NFyjer2ZI6njTMW5yEIc0HkWnO3RQLV1Am14f+OxbNI5pCetJQ9ALN5a3aYQ6MvT
-         pOSX1DMR9mIdZP6FlIURj4otVlo5dhtPYfuBpAyTP8OE3lpsuO5JDMnmgBhWhsXq+ER4
-         bPsqL1lsJqdkLRF8GcNbOmYMtMpVMoE4XTlovRjjh5Dhe1NTE4ylw7T2nKcs8Bd6CMTW
-         losg==
-X-Forwarded-Encrypted: i=1; AHgh+RrEr3/+aU13eG7jnYBDjrfTojr2yAIu0LJSscrhLE3lyV/kEHbcBHDvOxZ5s+Qu07pOTC7tcbqePfdj5g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+X5TogR4ng33ivo9aj+DXC9ZMFBMmjfZcAGke5RGwclohaoQP
-	ZAD/QMAXIr0tnGbaUe49wexV+Wux1ZQa39TEJdwJOI4m503mmkcCTgKl9jeS83qRrtGoiCYw6uQ
-	0YTqvRxFI7bR8PB/fynU2buOkVgZtWJabtV5oCeSCqp90p+K+UwSWDWfmkMcf
-X-Gm-Gg: AR+sD13ca/bubyW8gcDYA70zGl6hnWYxPJbyCbR8TDZ+GuTnvSPBwY0lV9XnCI/UsQU
-	uuusw/OnODIW2awf8cYTYzyq19mPsv8JjUPB+H4RZqy0CuT5EOz2w7Bm0+TWpmXIhRPfw1G2MBX
-	eAGkJtwONmUlCYU1GQ8b3Yt4568Xe/wcbG0/dkICWnLDZndfQmc88kpyFJfMX05BwEUiFQyfUcC
-	UAwX2G/Y8P9HTklxrFcRushOdITG62+9d1gqKT7gVTm0hIw4SMESVOywLkuums70rMsu2SvSkzs
-	4pk5saYxcMSYAu87fdAdG6VVedL/AmC3GMlrtmSw5nYFUYTXq/qn5fKbF6/heK97fC09NapjmnL
-	ZA/ySxvK4iI2D3c4=
-X-Received: by 2002:a05:622a:3d0:b0:51c:7b11:41a9 with SMTP id d75a77b69052e-52b38757e60mr44335541cf.86.1785443945531;
-        Thu, 30 Jul 2026 13:39:05 -0700 (PDT)
-X-Received: by 2002:a05:622a:3d0:b0:51c:7b11:41a9 with SMTP id d75a77b69052e-52b38757e60mr44335011cf.86.1785443945082;
-        Thu, 30 Jul 2026 13:39:05 -0700 (PDT)
-Received: from [10.206.71.35] ([129.236.231.134])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529e2d8251asm48127221cf.19.2026.07.30.13.39.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jul 2026 13:39:04 -0700 (PDT)
-Message-ID: <15506dc8-e5b8-4fa8-a85f-912a92edb83f@columbia.edu>
-Date: Thu, 30 Jul 2026 16:39:03 -0400
+        d=1e100.net; s=20251104; t=1785452347; x=1786057147;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Sx+8dGfrU/EPbcECFTxS2R77qIQIIRmUdLHbVGAEsZE=;
+        b=VEFnXSREKvRHhux8+awTp4lyb6xDadru+bICRhCiaoOzs2QqyhATtH6d678ppI35+3
+         5KqfyoNGfSKXURY81j3dAIX3ww9HUBu+oam1OFR6CLtWTGGDKJGjTuZOLthfmZX2rpTS
+         5GWydzVjBVggeavbr7PaiTfBR2AU2umEsC3XeHDlRviP34Fha4ba/d51OjB6OLOFe3SI
+         iikbFfeUy7SESFUjX1kMUsKFvUNCJFqFMIVtx6PQSjwnxn0Zm08LGkqzmt8VciwWJ5Yu
+         RWax90IN0ul27ZEfrzEr3aLzbWVy717KNZ0F8oowHDnELxDqVzzbhh4Z1dHNhij/17DS
+         VlIA==
+X-Forwarded-Encrypted: i=1; AHgh+RrTY4QZxcUj5h9SqUKKROswl36G6fGGZPZ14knF6I5FrrVFZvikmhTHS0xCmghpKVGUFtatwnXh9GpiXg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgtbSinbylRUFdPXODfCZ7y8YPXEfXVEOWqYMPZSgUTxpjoi0z
+	vBFvigo/YnYHcKfO1y4T7yhB28WaIdhnZ3klNVW9UOfLEzSog2VpyesUrZAjdnuxt+tQZWSVmDp
+	BHmdHMx5YxPqpaW3SyLjS1cv9v5pbeaGqimzjjMwlHMe0v9ATtibjK/Y5orPDLron
+X-Gm-Gg: AR+sD11NeTt0FA8bAwj4EWFrv8G7JTIyr36pwz+MOi8eaq8fRa2P7hoJVAkcGa4iRA0
+	qZATx0zGRgJYxWJv8b0XVXf2P88TdI2pBgHCAeu6p6gWinthDmnSoQVZDBBI81aodSBchYn2/jw
+	Zatwor+pO4L651MnHgTAIhOXORfTFu4Ash1Yg7cK13+ba9Rv2e3eiYV2u5wKmXSBhhntcVCq21j
+	X8ZhanyNIqmyErcHWH4wtwTG1bwMSmdlje4BmQaJxvbhz2Nu3p3hnNzLiFh0XxTBWH9MfQG8MuH
+	BX/rKMnYZugSNp1Xze6ByBg7jSmNJ9csjk40YnmXqrDTc5Ac6CiSAV11ZwXs6NGa2rztB5IbAsJ
+	sqh0agrZh/nbKP+G5AOt+AkY=
+X-Received: by 2002:a05:600c:1d15:b0:498:490:3bbe with SMTP id 5b1f17b1804b1-49804903c27mr34934985e9.16.1785452346897;
+        Thu, 30 Jul 2026 15:59:06 -0700 (PDT)
+X-Received: by 2002:a05:600c:1d15:b0:498:490:3bbe with SMTP id 5b1f17b1804b1-49804903c27mr34934755e9.16.1785452346444;
+        Thu, 30 Jul 2026 15:59:06 -0700 (PDT)
+Received: from redhat.com (ppp-94-66-118-61.home.otenet.gr. [94.66.118.61])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49800f1a91fsm89806315e9.6.2026.07.30.15.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jul 2026 15:59:05 -0700 (PDT)
+Date: Thu, 30 Jul 2026 18:59:02 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Octavian Purdila <tavip@google.com>, netdev@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	virtualization@lists.linux.dev,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH net v3 1/2] iov_iter: export iov_iter_restore
+Message-ID: <20260730185844-mutt-send-email-mst@kernel.org>
+References: <20260622222757.2130402-1-tavip@google.com>
+ <20260622222757.2130402-2-tavip@google.com>
+ <20260625-erstbesteigung-mundschutz-invalide-3b0d4cd4cbc9@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/5] iomap: use BIO_COMPLETE_IN_TASK for dropbehind
- writeback
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-        Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Sandeep Dhavale <dhavale@google.com>,
-        Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>,
-        Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        Hillf Danton <hdanton@sina.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-erofs@lists.ozlabs.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
- <20260730-blk-dontcache-v7-3-3e8e6850068d@columbia.edu>
- <amsHrVCJnuXzeGG1@infradead.org>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <amsHrVCJnuXzeGG1@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDE0OSBTYWx0ZWRfX+wQYqR7ePR+h
- lLw9kRJ9EavCa6ZKk9q6pn4sY75wnd+UBcXfFQOiZrQ5r9RyLNbBx1QNmPZ4eddyi9Rqw1Mtk9O
- x4kFGdtz9S8FPZktaDr78H889KtiDzw2ilkYibQJP1EYcR+89JM/vGS5Uzz1jMMmu9PmyXDAP0e
- j989Tnu2Veke72fgn2aEnAQtLDT8Sl/IsZuVkzMtQEnlFsbFxcElwgvZa9ub3TDTQvFXYhXPDMU
- eueD/Sfld4brSINmYnNo2kNyZ5PT7MDZlSYIG8E+evUnscL+ko5rBJ0sLmfyAycQSNaNZZVSbsY
- 5ta91ml8iTp4/c6NZ2ZqMMgojQ4VfFQ7s++TIxBuhei7I5fuzh2HdfKiRuBUzBYN5ClXbX5Y/2z
- aiehQhfLI1KlgOodIn+4BllO0Cmr8dDoaCRDVmACqybNQ9EK/Z8dji4PqXKCaUQsevNN9sppIoN
- SkfVlMGmIgAukd2C+iw==
-X-Proofpoint-ORIG-GUID: WpDB5uZzPfAwdVQwuAiE2aeTLsmZS2S9
-X-Authority-Analysis: v=2.4 cv=Ga4nWwXL c=1 sm=1 tr=0 ts=6a6bb66a cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=Mx06nvryMUGB95QVe9e23A==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=HpS3TJQ9O3Ob1ozEcmik:22
- a=qsXxR-sLYAu0WPx4Yu8A:9 a=QEXdDO2ut3YA:10 a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDE0OSBTYWx0ZWRfX66KQyydqTCXd
- dGb3gghtkOR9yZ9Kpsu9dPMdVu2C9ViBE44ccZ9Bief6JI7xoXhUcRx1gkzR8+XRVvh0o5DdMKQ
- Pn77QBAMdFVi8ii3hoWSI8JuB7PGVnN3S87SJf6cJp1schW53ONE
-X-Proofpoint-GUID: WpDB5uZzPfAwdVQwuAiE2aeTLsmZS2S9
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11860
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 priorityscore=1501 adultscore=0 spamscore=0
- malwarescore=0 impostorscore=10 bulkscore=10 lowpriorityscore=10 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300149
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260625-erstbesteigung-mundschutz-invalide-3b0d4cd4cbc9@brauner>
 
-On 7/30/26 4:13 AM, Christoph Hellwig wrote:
-> On Thu, Jul 30, 2026 at 02:57:53AM -0400, Tal Zussman wrote:
->> Set BIO_COMPLETE_IN_TASK on iomap writeback bios when a dropbehind folio
->> is added. This ensures that bi_end_io runs in task context, where
->> folio_end_dropbehind() can safely invalidate folios.
->> 
->> With the bio layer now handling task-context deferral generically,
->> IOMAP_IOEND_DONTCACHE is no longer needed, as XFS no longer needs to
->> route DONTCACHE ioends through its completion workqueue. Remove the flag
->> and its NOMERGE entry.
->> 
->> Without the NOMERGE, regular I/Os that get merged with a dropbehind
->> folio will also have their completion deferred to task context.
->> 
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+On Thu, Jun 25, 2026 at 12:43:18PM +0200, Christian Brauner wrote:
+> > Export iov_iter_restore so that it can be used by modules.
+> > 
+> > This is needed by the virtio vsock transport (which can be built as a
+> > module) to restore the msg_iter state when transmission fails.
+> > 
+> > Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+> > Signed-off-by: Octavian Purdila <tavip@google.com>
+> >
+> > diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> > index 273919b16161..f5df63961fb2 100644
+> > --- a/lib/iov_iter.c
+> > +++ b/lib/iov_iter.c
+> > @@ -1491,6 +1491,7 @@ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
+> >  		i->__iov -= state->nr_segs - i->nr_segs;
+> >  	i->nr_segs = state->nr_segs;
+> >  }
+> > +EXPORT_SYMBOL_GPL(iov_iter_restore);
 > 
-> This seems to be missing the bug fix you identified for the double
-> deferral?
+> At least only export it for the module that really needs it. For
+> example, see:
+> 
+> EXPORT_SYMBOL_FOR_MODULES(__kernel_write, "autofs4");
+> 
+> -- 
+> Christian Brauner <brauner@kernel.org>
 
-Sorry, I misunderstood and assumed you'd take care of it in a follow-up.
-I'll adjust it as below and send v8.
-
-> I although thought a bit how that could be done cleaner, see below:
-> 
->>  		ioend_flags |= IOMAP_IOEND_SHARED;
->> -	if (folio_test_dropbehind(folio))
->> -		ioend_flags |= IOMAP_IOEND_DONTCACHE;
-> 
-> I'd keep this flag.
-> 
->>  	if (pos == wpc->iomap.offset && (wpc->iomap.flags & IOMAP_F_BOUNDARY))
->>  		ioend_flags |= IOMAP_IOEND_BOUNDARY;
->>  
->> @@ -256,6 +254,9 @@ ssize_t iomap_add_to_ioend(struct iomap_writepage_ctx *wpc, struct folio *folio,
->>  	if (!bio_add_folio(&ioend->io_bio, folio, map_len, poff))
->>  		goto new_ioend;
->>  
->> +	if (folio_test_dropbehind(folio))
->> +		bio_set_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-> 
-> And move setting the flag to iomap_ioend_writeback_submit, and only
-> for the case where no io_bio.bi_end_io is already assigned.
-> 
-
-To confirm, this would only work because XFS provides its own task context
-and is the only consumer of iomap that sets its own io_bio.bi_end_io.
-If another filesystem set it and didn't provide task context, this would
-break, right? I can add a comment about this requirement, but I want to
-confirm the intent, as it feels a little fragile as-is.
+Octavian, you wanna try?
 
