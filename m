@@ -1,81 +1,81 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC79639E177
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 19:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E03CB2DA
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 19:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785440589; cv=pass; b=Njn0dtcZDyqmk7vq8v8tPq4PIpMUJOyAxoBkG37MhNt/jcFMCqySFLmmEvZ1H3ICgVV4CT8dnaP/cAm9oS5P/7bvS7BAAb1eeIx8o+KBeWxuVr2sHysePRfU7AeLKNILWbJXQCbkG+3Pdfz789c2h7ngNcrlyojLiFTtz/Hk88I=
+	t=1785440955; cv=pass; b=E4atd7t4IOguIlt+S6HqXG0WJ02YskF+y8IoASGX344xEssB37XsJuqDKd6meP/vPVRciA3TDnh2gwVSCQgA1spNDuKWzMXDZ9UJIPdREV3Zh2sOLmEeQjkv9QPqGAnfMEeH96exembnlvW2kL7Z9MgF5cCiheebO6PMk4owrJg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785440589; c=relaxed/simple;
-	bh=hGzrY0H2pVacJyGeUAhyX0VXUSX7hmjVvlfOiRoOW0I=;
+	s=arc-20240116; t=1785440955; c=relaxed/simple;
+	bh=IfLhSjG7Oi8HUcJ/zf4Zyf4nbV97n6T2JwE1KzDUjds=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oisSOaARrjt5yspOofVefwpXQXsYXXShRJXiOQE2z+DHuEW9fPlD62bKTaAExH60tKlp7MO6rqGDzJe3285jjV8KJPIhtgUa2PooFQv+hFKghrnmSZ2AXDa3KVTmhel3tBN0L5CiaxjjUNuaZypCcDru0okQqkWmtF02PpkOn34=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pDWfIl1D; arc=pass smtp.client-ip=209.85.208.44
+	 To:Cc:Content-Type; b=fQ8ba+bzuHITk3MZLGJ4e0Nh6pESH8eilQEY/cp0EX3jI+p0/VySCwOGkH2YVqo2qvo6WOQzKu7i/lpJRUDIERSUOTf2PBDtwG9R+DzkChVP89B3TOkRwVwyjNWrZhlmBJkig+PCUIZfa/4ec2W36QiPEiUyBms7iBi6hYGhBjQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D6/FW92t; arc=pass smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pDWfIl1D"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6983f20a8bfso366569a12.1
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 12:43:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785440586; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6/FW92t"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-697bd21fdc2so376935a12.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 12:49:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785440942; cv=none;
         d=google.com; s=arc-20260327;
-        b=rm8a5YfE3leb/jvYYo71AvU4w5W026E5Zmgj+4vkrUzVMKuOLq+dQEubmdzgcGu8BA
-         tMZA2Vujiea7c4+jf+ELiz0VIzS2F7Nq+OopGCeibNyObxWPc475kWhdUc4svjgfhOnC
-         V5x2Kv6XLnFURb7BWya2pUEzsUii2SHHAVUrKUy2AlpSGDWhMzCrJRytb2JaJWEdEOos
-         G23kshiXwwZLm48hVPycvpQLaMNchgpP/meQWz3EMl4ySlc7PICIh5BtvPdir8/xPOOE
-         4hQtn+0gQhDBUq+PmZWyfX0/5NO5aiRypyd/kjSNNKp9/hExOheRPAm5cNurvbJxGqK+
-         6cWA==
+        b=UPvP8DhXuu8QNkhuG6Y0QEZMQ7kFz2wng7IIIpf61/f5lJdUXv8Po/u8XlLFM6ej6d
+         54fP1LFXWxWOmHrLLGd786/2I5+NT0EkOfEhn+gGWqSZdhUmnHT2ehpCnEYrdu1QWC1Z
+         aaTOkKANvOg/euFwqgTYVvq6+m2XBcbSgQVdKdXFcrHwNOqW4TRFvU0UG9mSLZX99odW
+         g2JCzeyjKPcbwYuMPQ3GPQQPHxCVU2YqjlRX7jHOAJsDFGK0ukxLoigzbHIbjc4yrujg
+         4v3l1z4DlTBd/1X67VDrwwNMWHXbXOozgOR0mK/X1wRhSy5Q/LU1dQbFmgqpKqVgWVl2
+         gqWg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
-        fh=nv0ebhOswkUV4BfYTrO4rtVdy75w1iGYuzeXTR2MRkU=;
-        b=JKRFSd039eB4F/nmOOxFBUcE1HUdhmrFnX/xQZHNpZ0IWrT3hXNot0pQj90nD3PwtP
-         OF2TqJX8TsDTCLq0fdamSS8HrYsvZ+gB6lGwO4eRdZnWN5TkhZSqGnMd9WUejGcd0moA
-         qTZXFbunfzurAgHnmbjOpMG5pOrQxistiBMM0SN98+/4JMT2X3BzidSd2nciG2RqT06u
-         pxUbMsVkBNCiy2nf/8RplmWVHRi977agkNnjxjFuk+3IrSSwoobCcVvv10uW7lcirPaw
-         TyUjR/VavENiRikgcVqhRjqItstiCWwomU2kbMzIGJnpstCnebl4A/yOxmFJ8RCQg9e6
-         JB0g==;
+        bh=ixWJgT8hMudFvQmf9xO+ue0lQJczsuaDtkS4pNl60os=;
+        fh=hZi5nGioBIh/+z1cKl4DXenxH0QrDyY4eN8HgdE1QKs=;
+        b=lwRmgmi37YvBzCH63qWCQ+HLfSNv2YYsbbKOurTrNHvR/wlogv/upfYWaD3QFRcyk4
+         4APkpTTXvJYZ7gPVZx8RE4YWVPyHS/ZrPDMP9txiPR5xpqzbB3dTF1YRY44t1aASXjXQ
+         HpIJ5xnRCucb8ajfwkac64qDVacUihozQaoOE+JDouHpmJFLG4CmXQdnyC2imrMGt2Ru
+         LjW3Z6QRABE79+/LIn8zW9j9BEIagWPKr7YBPQSand2ujYKzg6DVweBVk96BvN85lqCl
+         p0qiZB1oK8PDAppDC7GMbQh19XnngCO6ICRNVdnbaKwjXgbDxhVS8omeJK3fCT/DHjRI
+         /ncg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785440586; x=1786045386; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785440942; x=1786045742; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
-        b=pDWfIl1DME8i0fO4czGK96zPvxO0q3sS3UdKeSeJEQarlNsfwmGhZvpq5l7hFUQPZ+
-         vTD2EesLFIxbstGKZlqgUivH/4CCiffgncvOjQ6R0K/+vBng0Ax1J/5CLO+OSx6lVCIB
-         yLDWyma7B1yZH0YIScLolulcEXv4r1UAgnZvkWrFTntDJuT7r0hF5huRYKArVufJGNx9
-         hwXS9iiRllQEEfpDySkfxX+d945YMsoiyqX8xX7pLcnktHysC2Ps+/+sI/1vEoKLo3ez
-         Kv96rBpGU46RZZ6vpbsN+OL8IKltrZg24hTRSHDx6mWnt7Re+tyoLEaLq0rZ7AZSVi3f
-         7pUA==
+        bh=ixWJgT8hMudFvQmf9xO+ue0lQJczsuaDtkS4pNl60os=;
+        b=D6/FW92t/v/fGIdVMTFPPrQIuiURO5xI11XfmG7Vip7H0CUD0U/rpUIi8gcn48/mYS
+         wgrpzlb/kn+49Wobk9uAyZSFCPrto02c0QfSYvH71lpFS/bHLZWXs7wYuqhvxFBNqjzl
+         NmGv79FWbp88jn5SLxtjqzh9+ibipjPrp/NUW/iG+cvjKcnjQ2TDH77FfAYBqd344K9w
+         wNrsOel6KoF04sDwIlUJQvgoSrcrWxeBaBlNZk+zVVRpruFZ35ReT+gqYLl1bEKrw2PL
+         LfJ6ZFOdZCgGeqD+elv0jvbWQvv/eD4ar2M5bWsCoxbRE6dgpDzr1WJzjde640mfG/q+
+         eQ+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785440586; x=1786045386;
+        d=1e100.net; s=20251104; t=1785440942; x=1786045742;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=t6BYf/vhUmmfT2XVF/nKwUPMf142vX+Enh9mieavPbw=;
-        b=SJgak2oY1ZaH74HKbi9ED1ppCKJzOMIFX0i2HjSfMuV0OsfMlrJ97PC+pMhtuyUeTv
-         /7vzkJe4E5DLjhJQ59sGGm9cmAqlbrrPSkLDzu5sLDe9pTlzyaAEGg4VAgYoI8i7adFB
-         m5Yj2GTgtumAfMmQpSVpzOXsHuwP6c+RBYNnq9QBVfTZqr/jp2Bn90SzzEZoWhQB3UUt
-         5ZGoiLCY+OGBOxHzf/5x2g03GjF03RGbv9uUgpo0jS5tuDPrP7mSNNlE9Itzkvl4TBLe
-         LdygcznSMKD8V6BoubcjZWmYFkSxIe8lm2jgkkzsSuJj9nqoG6oDT1HoAUDEG+Cgvhgp
-         MMQQ==
-X-Forwarded-Encrypted: i=1; AHgh+Ro6Oo6eZjxAASD3kuD9mnnsw69c8PqnAWUiGIgre4cCyZIdeCekGrGRHpFiur9KuLRAyx7fc/4iHN7piQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUVFuNUGbBNqnVeNOWjVQsoRgn/cjG8mCacHVwfySuYj/LVsR3
-	Ne58P2vWVscPrxQe9mZZxC0aY62P3YYVafini0sxha0JpULp4/G6ps6/s/xppEMN854+BCWiask
-	pxf+i9Ypqv+3vdPuOg7MyMOVf0ko3mtWsV7SxdWh9tw==
-X-Gm-Gg: AR+sD12j+yeaFzwwsMRCpZ0svd9po39Suk5QegZXaNxS3GahP+5Q0YnrUohdORAgTsy
-	ZJQmcGHiV9FUgOA8LPu568o3n+mI4kUYOCk2q9Hn+mK10TqhWCoiTieVQ4lje0N7CpOYBdno+Im
-	HU6g1ClALp2qeqAQlwPldwlS3tnk8EbA4gJk+zaBoLOTCK1jrqXaHUQ9LygfAMhQMGbycC78f36
-	FuY3ZcRDg7aAeEHHHOL0hHZSASoVoHMOw7eVKmZmkkBtarFKpK1DtPANFX9VVbacBsou0ls+F9V
-	qZCW0ESlmhyQQNrFv7+aLpa6Zwh3RQ7+QGEXXu+w93p/Ul5oLFeAYfRy
-X-Received: by 2002:a05:6402:5191:b0:69c:794d:4862 with SMTP id
- 4fb4d7f45d1cf-6a07b7c2ed2mr1788382a12.7.1785440585803; Thu, 30 Jul 2026
- 12:43:05 -0700 (PDT)
+        bh=ixWJgT8hMudFvQmf9xO+ue0lQJczsuaDtkS4pNl60os=;
+        b=fVa4KJ6OyhANfgzE3pjVBWzHU/1EmN6h84MzQAKTzSPn2UEAhLto3wfk8Q3bYWSSLM
+         1oz3h7D+mu+GgQYUu7BvxJc2YvQcLhJR6oG66TsTummPseHcVStzgxkP2sQqjQXP8Ot7
+         mYgQpKQCy7mrNkBmtMgGK6wGgVJjGfbnzbgul2dm82x2w/qIcsOvrJH4HcIuLQ/Jh9at
+         irZHeNth5AhjIRnMZUjTeagfuv/5M/rH+T4zCkMAEw6Um+yBegLQEMNoaniDsQ8GVUz5
+         q6U9fz9sFTz3Fs0IuEklg4+OnB9eg9U6/jL+IMVr66EqR3c6w3jk/IIUGKlv2qaG5kIX
+         Mc9Q==
+X-Forwarded-Encrypted: i=1; AHgh+RrN4axWF/l068xeJDf2xxxjrcfKMfIrtRqLNUEcd5cKoTNitiCBJ14buEqc2Auwri36MPbU1pwSiVJ8vg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWV2a/tirB++6iK35zprUpLGH1PvMGHSfF/DJ8AyltSPLaOAuC
+	sEZaKMflDPp/Wm3ponR1YS43jn0LwEZSwNuAsSik70OKtNYLqNRV5AKJguD4EfKb1x95MHHiF28
+	EFOm7k/XNwuYBrJNp9RaP2/N3y9iTkYc=
+X-Gm-Gg: AR+sD13Qcscpmh0JBwLQVVp4et4XaXKoRiSZHjNww/VaS5t171W+Z/iuH/i60hdLOo/
+	orQvI6ScpL2cl2TLmp96ToC6aerSgtLPbL6eLuPOkWZdtlgIiFjbOpXIKeRCXlEQHl3soG32dTg
+	9osXvkQZisyk4hnJOJZMErSXpNTVHDVx6NnkTd1FcZXhssSy44IbxhmlcUvPV8FxJhU1Sh/PSRc
+	2FUo81nRmj5Iw8YUrxYmCzt1L0jKA0Tv5opySUtljjlhr2/z3cp4bLrYYEqQ2GoMegfkYQD+s09
+	3k6axaGqg+JN2BZNt0JGXgX4HSlKT/P8thphX2UE7K4U
+X-Received: by 2002:a05:6402:3784:b0:69f:e3cd:5ae0 with SMTP id
+ 4fb4d7f45d1cf-6a07b7e2a4amr2228183a12.18.1785440942100; Thu, 30 Jul 2026
+ 12:49:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,9 +85,9 @@ MIME-Version: 1.0
 References: <20260727201257.211635-1-coshi036@gmail.com> <178532422849.2568853.3142469605707392497.b4-ty@b4>
 In-Reply-To: <178532422849.2568853.3142469605707392497.b4-ty@b4>
 From: Chris S <coshi036@gmail.com>
-Date: Thu, 30 Jul 2026 15:42:53 -0400
-X-Gm-Features: AUfX_mxV3jqmHc6ady8mMlUy2DEKG0LSXNTFo-1cI8WmoWvjWUgkBWPSF8mq708
-Message-ID: <CACd_6n0PY0RYtrWb_FdC572J6Gh6t8GvaJhUHi6P3yA5_wmyRQ@mail.gmail.com>
+Date: Thu, 30 Jul 2026 15:48:50 -0400
+X-Gm-Features: AUfX_mzw_brm-7pVnzrWVTk1rf99jQRwch2Ue0uN3fj_yO5c3bAG7uT9FU3XI0Q
+Message-ID: <CACd_6n372enkmZuXJnxXaDe-PA8o-t3Nmj86s_zCgGkdYTcanw@mail.gmail.com>
 Subject: Re: [PATCH] block: stop the timeout timer when releasing a never
  added disk
 To: Jens Axboe <axboe@kernel.dk>
@@ -98,58 +98,7 @@ Cc: Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>, Hannes Reine
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jan, I'm currently working on the changes we discussed.  Based on
-vfs.all now.  Four things came out of writing it that I would rather
-resolve before posting.
-
-1. mark_buffer_write_io_error() is not safe for jbd2's buffers yet.  It
-dereferences bh->b_folio->mapping directly (fs/buffer.c:1057), and
-jbd2_journal_write_metadata_buffer() points the temporary bh at
-virt_to_folio(jh->b_frozen_data), which is slab-backed.
-buffer_set_crypto_ctx() right next to it already uses folio_mapping() for
-exactly this reason.  So I would send a prerequisite converting
-mark_buffer_write_io_error() to folio_mapping() before the jbd2 change.
-Also worth noting the consequence of A2: in ordered mode the temp bh
-inherits the source folio, so the error lands on the bdev mapping and
-mapping_set_error() errseq_set()s s_wb_err - a later syncfs() on an
-unrelated fd of the same fs can then return EIO.
-
-2. gfs2 already has what we are building: gfs2_end_log_write_bh()
-(fs/gfs2/lops.c:171) calls mark_buffer_write_io_error() and does not clear
-uptodate.  Which means fs/gfs2/log.c:110 and :324 are blind to log write
-errors today, and converting them is not behaviour-preserving - it makes
-them start catching those.  I think that is right, but say if you would
-rather it were separate.
-
-3. On the sticky BH_Write_EIO: I am adding it to BUFFER_FLAGS_DISCARD as
-you suggested.  That covers discard_buffer(), but there are four other
-clear_buffer_req() sites (fs/buffer.c:1687, fs/gfs2/aops.c:600,
-fs/jbd2/commit.c:1035, fs/jbd2/transaction.c:2462).  Three of them also
-clear_buffer_mapped() and NULL b_bdev, so __bh_submit()'s
-BUG_ON(!buffer_mapped(bh)) makes them unreachable.  Only
-clean_bdev_aliases() leaves the buffer writable, and I could not construct
-a workload that reaches it.  So I am not sending the ungating patch.  The
-one place it would matter is ocfs2: fs/ocfs2/journal.c:691 is nested
-inside an if (!buffer_uptodate(bh)) at :675 that goes dead once the clear
-is gone, so :691 has to be hoisted out, and it then becomes a pre-use
-check on a sticky flag rather than a post-write one. I will Cc ocfs2-devel
-on that patch.
-
-4. fs/jbd2/transaction.c:923, J_EXPECT_JH(jh, buffer_uptodate(bh)) in
-jbd2_freeze_jh_data(): after the series a failed write leaves the buffer
-uptodate, so this stops firing for write errors.  Arguably correct - the
-in-memory copy being frozen is still valid - but it is your assert.  Leave
-it, or convert it?  I instrumented it and ran ext4 with data=3Djournal unde=
-r
-injected write errors, forcing copy-out; it never saw a non-uptodate
-buffer, so I have no evidence either way.
-
-One thing I did settle by testing.  fs/ext4/ext4_jbd2.c:416 open-codes
-buffer_req(bh) && !buffer_uptodate(bh) after sync_dirty_buffer(), which
-already returns -EIO.  On an instrumented kernel (ext4 without a journal,
--o sync, injected write errors) the two agreed on all 40 occurrences and
-never diverged, with BH_Write_EIO set every time.  So that site just
-consumes the return value and the buffer_req() question goes away.
+Sorry for the mistake, I think I replied to the wrong emails.
 
 Best,
 Chao
