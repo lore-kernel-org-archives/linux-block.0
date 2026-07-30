@@ -1,27 +1,27 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481E33B8D75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482793B9601
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 08:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785400204; cv=none; b=gz20x1h0EhGbCboAS4hWH8CJDS+3ewdQZ2Zp5Svw3q96tKNJrYRLkxgqKP4gRDxwwwx7F8u5RNPEump8UXpV0HJzzy/YwrYOZMxVPeUN/CxEj28jR+REyaAho+2ZtKf3GjoOCsEwSDFlZgwW2UuMYhsm2epw10RbSSPDo4EgiWA=
+	t=1785400204; cv=none; b=l6P3Mml+0WhtozOv0jNKVXwJNg1OBg/hPEWFNSjMw+4M4WncB4BMPSOyEF6MxMBdUzWc1/1j69VXSF19zZo9bTGN++pYrmy12aMLb5AbnPYbWIPkERrXcUXoNur+YlXUZgJhZ0dilDTbg0FGRRZpcNNyjwY2h10vlsVtTyYrfA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785400204; c=relaxed/simple;
-	bh=+Eqb96YjxjzQqSKoHvZ8G85ZVQ72ozLrMHmkNgWtbzM=;
+	bh=WjJD/8PjLMwS5siUDguvYZnvopvVVZ9H0vkzAKHd7/Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nMvw/93mke+2hl7iwnkFaTpBaS5WcGBkNdR3gJM/bekzKYs6IPDtyXXKjZP/6cDIPoY1gg5nRAyCn225Bvf+xtM5zWIenqZZSP76ffOtHt6zggSQejVCVZ7L9qh6KasAfHsPYT6KowZdBv3oTGiEFe6Xmln4KlJbHfFQGVNjMtU=
+	 MIME-Version; b=c7Cz9DHyhT0u704dFyN/99KCJWKE7FTaaDsnVt9VcLBFkppxqveAAIB8AaDYH5qItXHmzBu7ok4V0dF+t30PyUXF/qvFzcyRqPrKVESnazTNm+avm2q89ViUBrfXPoUVpIA4WkRv4vNKTU3mL6jH/nR/Rc44BksmkFJz6KP69As=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j624TBczKHMh9
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h9j624t1nzKHMPf
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:28:58 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 0BFA540590
+	by mail.maildlp.com (Postfix) with ESMTP id 1A91D40EDD
 	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 16:29:55 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S11;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkV9C2tqwObjAQ--.20420S12;
 	Thu, 30 Jul 2026 16:29:54 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,9 +37,9 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v5 7/8] nbd: remove queue freeze for newly created nbd from netlink path
-Date: Thu, 30 Jul 2026 16:20:45 +0800
-Message-ID: <20260730082046.3459239-8-yangerkun@huawei.com>
+Subject: [PATCH v5 8/8] nbd: add nr_hw_queues module parameter for pre-created devices
+Date: Thu, 30 Jul 2026 16:20:46 +0800
+Message-ID: <20260730082046.3459239-9-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260730082046.3459239-1-yangerkun@huawei.com>
 References: <20260730082046.3459239-1-yangerkun@huawei.com>
@@ -50,10 +50,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S11
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF45XF4DuFW5Xr48Ww17Wrg_yoW5Gry8pF
-	Z8Ka95trW8tF4Iga4UJFs3WFn8G3W8J3srW347G3yjkrnxZrZavrW0qa45Aa1UZF9YyF4a
-	yan8XF4vva1UArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:_Ch0CgCnlkV9C2tqwObjAQ--.20420S12
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4rXrW5WryUtF1DAFyDAwb_yoW8tr4DpF
+	W5JFZrKFWxKr43ZaykXws7WF1UJa4UCa4xWF1xt3y8ur1rZ3ZavF97tFW5X3yUtF9xAa1Y
+	y3Z8AFs7Cr1UArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUQjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
@@ -71,73 +71,65 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxJF45XF4DuFW5Xr48Ww17Wrg_yoW5Gry8pF
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-Previous commits has removed the queue freeze in nbd_add_socket and
-nbd_set_size during nbd device setup. However, a queue freeze can still
-occur when nbd_start_device calls blk_mq_update_nr_hw_queues if the
-socket connection count does not match nbd->tag_set->nr_hw_queues.
+The function blk_mq_update_nr_hw_queues in nbd_start_device may causes a
+queue freeze. The previous commit addressed this issue for newly created
+nbd device via setting the expected nr_hw_queues in nbd_dev_add.
+However, when reusing an old inactive nbd device, the queue freeze can
+still occur when old nbd->tag_set->nr_hw_queues not match the new socket
+connection count. Inactive nbd devices can originate from two sources:
+loading the nbd module with nbds_max, which sets the default nr_hw_queues
+to 1, and the netlink method, which sets nr_hw_queues according to the
+expected number of socket connections. For the first case, we can add a
+module parameter to allow changing the default nr_hw_queues. This way,
+users who know their expected number of connections can prevent queue
+freezes on pre-created devices via nbds_max.
 
-The nbd_start_device function can be invoked through either the ioctl or
-netlink paths. The ioctl path only allows reusing an existing inactivate
-nbd device, there is nothing more we can do to prevent the queue freeze
-since the old nbd->tag_set->nr_hw_queues may not match the new socket
-connection count. Similarly, the netlink path can reuse a preferred
-inactivate nbd device, and again, we cannot do more in this scenario.
-However, the netlink path can also add a new nbd device using
-nbd_dev_add. In this case, we can obtain the new number of socket
-connections, and by adding a new argument representing the expected
-nr_hw_queues in nbd_dev_add, we can ensure the queue freeze is avoided
-for this situation.
+Before this patchset:
+real    0m2.195s
+user    0m0.005s
+sys     0m0.022s
+
+After this patchset:
+real    0m0.090s
+user    0m0.004s
+sys     0m0.018s
 
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- drivers/block/nbd.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ drivers/block/nbd.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 34b84fc1c61f..6369a409e10c 100644
+index 6369a409e10c..2194c7d7b2ea 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1942,7 +1942,8 @@ static const struct blk_mq_ops nbd_mq_ops = {
- 	.timeout	= nbd_xmit_timeout,
- };
+@@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
  
--static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
-+static struct nbd_device *nbd_dev_add(int index, unsigned int refs,
-+				       int nr_hw_queues)
- {
- 	struct queue_limits lim = {
- 		.max_hw_sectors		= 65536,
-@@ -1959,7 +1960,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 		goto out;
+ static unsigned int nbds_max = 16;
+ static int max_part = 16;
++static int nr_hw_queues = 1;
+ static int part_shift;
  
- 	nbd->tag_set.ops = &nbd_mq_ops;
--	nbd->tag_set.nr_hw_queues = 1;
-+	nbd->tag_set.nr_hw_queues = nr_hw_queues;
- 	nbd->tag_set.queue_depth = 128;
- 	nbd->tag_set.numa_node = NUMA_NO_NODE;
- 	nbd->tag_set.cmd_size = sizeof(struct nbd_cmd);
-@@ -2212,7 +2213,11 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	mutex_unlock(&nbd_index_mutex);
- 
- 	if (!nbd) {
--		nbd = nbd_dev_add(index, 2);
-+		ret = nbd_genl_foreach_sock(info, NULL, NULL);
-+		if (ret < 0)
-+			return ret;
-+
-+		nbd = nbd_dev_add(index, 2, ret > 0 ? ret : 1);
- 		if (IS_ERR(nbd)) {
- 			pr_err("failed to add new device\n");
- 			return PTR_ERR(nbd);
-@@ -2736,7 +2741,7 @@ static int __init nbd_init(void)
+ static int nbd_dev_dbg_init(struct nbd_device *nbd);
+@@ -2740,8 +2741,10 @@ static int __init nbd_init(void)
+ 	}
  	nbd_dbg_init();
  
++	if (nr_hw_queues < 1)
++		nr_hw_queues = 1;
  	for (i = 0; i < nbds_max; i++)
--		nbd_dev_add(i, 1);
-+		nbd_dev_add(i, 1, 1);
+-		nbd_dev_add(i, 1, 1);
++		nbd_dev_add(i, 1, nr_hw_queues);
  	return 0;
  }
  
+@@ -2802,3 +2805,6 @@ module_param(nbds_max, int, 0444);
+ MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
+ module_param(max_part, int, 0444);
+ MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
++module_param(nr_hw_queues, int, 0444);
++MODULE_PARM_DESC(nr_hw_queues,
++"number of hardware queues for devices pre-created at module load (default: 1). ");
 -- 
 2.52.0
 
