@@ -1,214 +1,153 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4CB3AEF44
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 07:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A253BAD81
+	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 07:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395588; cv=none; b=TqFkqjVxTAc8rD1OBxxV9j3jC2yrkU4Y/7lVK/BQVaD42m7kYWtdSLKTpZR4COgcpxuEUyBvKEdkiXXRBAKYyzMTv+J0OFwmPWUhzCKnqErJ2xqtHeH7d7dz2/npDY8qM9NcRaNo5U4n9mAibXIunWfKVtY1Q5KGxUNo/DnaFaA=
+	t=1785396263; cv=none; b=LkEJalWUis/dcABKsAjs9xuMbCw7qPY4wjxUAv06RiH4P1Nu3oERLcNmjRxPZrzVjKgulMmsA9ssPSqg6vy2eEbFGilRoZ9Dyd19lPAOAMY9SzV5UP6OoPdfJZs/qy38B91to52V5bv1H1l2zrQ0azu2yIQALFUbdXQBRegJkTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785395588; c=relaxed/simple;
-	bh=hHCEZENfCfsEpOmC0wBfWJMFm3C20nG7DjOTxirSTUU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rPmSyUgxo46NmFzq7M61GNCWImYVBFkXL2a2kY4ZN3VxmntuPFiASS53HjqFHVHmijPkG1DtJEGGeYJt1Tzc6pe3kxUT67IK5sdXAxkF1ezSEh55b0En83DsYOII29SkUFtnt94NwTG4yiLGekl1ox9+82YV5xx884YMG+oJakw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=hv0PcEo8; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1785396263; c=relaxed/simple;
+	bh=rHQZ0mK3QjCE1DISbQlcq4BVcYBfs5RNZJrtzlebC6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u92A2r1HZYR3yRsP99KfiOQ1Hy47XatVUTwurs2DIdtAkFai6Yl9IC+fPosHFEuilsTrojUUucurivB2JA2pS9caj+A6krYWo84NlXTfZPmEdKW4XkHKXe+vKtOj6Jp67cKN9bz+vpo6zz6Amja1+YcQ52ojXRbI4n+g/1sIohU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ckFazdI4; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="hv0PcEo8"
-Received: from pps.filterd (m0167068.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66U6l16s2248582
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Aj3+
-	ozneKRFxvyRKEW1x+foEkavllzfM2NqbtLKj8IA=; b=hv0PcEo8AAPDJ3qmRsyH
-	3+KWRKhUuio5bu6v7AnsbOIMwgD7rZbWuZCbxPJ8NOtDT/6jnTzUMipJ0mF7QfZu
-	3vHsZW0WXTeqgG2leuJy+YHuFK/7Aze+PS0kNPRJ77w6BASuAor/BNbvhZ+06gWE
-	lwCff028FYqKbvLsbLBzqyFKUem7txf57ogPxPRAOr5qdW2T8loIUHnw0K1cQz09
-	7P9wendgVQQF2uUVmf24BxrK1lwd44WBWwC/SjBvLCM7Ae8WAwMxAh2mgghG2Jea
-	q0yZqxPC9eTBItVbYtNcMTqXiTV+yoGFDSs/zzZjapWZTUnHFT7gf1vSP1LKyFZq
-	dA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4fqrjq25by-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 02:59:01 -0400 (EDT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-92e55721a8cso206353685a.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2026 23:59:01 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ckFazdI4"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ceaf8a1265so23054425ad.2
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2026 00:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1785396262; x=1786001062; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=1+WbTy4voezVhA/fXo6JCCCgngPgLHEDcKTQGEErv+s=;
+        b=ckFazdI4kXG4a0/AnZE6sEgnx5pw2rrzaxkNqfVMe3vRlFSxvqSVPx54rACrnVZoPO
+         B22LNHi371w1RCk9Swumf1mgX7hhVkHvAxHAwIfW+V79JmJDwQy2wwQEiyVoFbS8WwUv
+         rujG2LZRw2ksYnzsEG2Toikba80Nrpro5OXjU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785394739; x=1785999539;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
+        d=1e100.net; s=20251104; t=1785396262; x=1786001062;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Aj3+ozneKRFxvyRKEW1x+foEkavllzfM2NqbtLKj8IA=;
-        b=ioSXG0Qtt99vKpOF1RyLMupvf7FEIDAv1EZrayfeGPXNdDwt7+URlXELwpjI6rRADx
-         icOiMJfhdQJoixvy89PvfsYvrD+aL1mKdYw281NBEa8A4LqVN/5qMjifWLi45pRSTqja
-         zUbKFzBafloH0PbsBkKfNIpkY+j6xHTKaMAHez5ED4FaUcrYJgUT5pofoUP3im1Vags+
-         V1hExY6/TYxa0WZCR72745uqUVpoeFSFmHVTO5Xxn4mM9WhoRhSluH/d6SPOBy9UzIEM
-         diYoacKKE9pgeaxfNTPAFYRmKs3uErltnbcbcA3JhDi6AFelrHY7EMB4ZogLwJLWOoZf
-         TBmg==
-X-Forwarded-Encrypted: i=1; AHgh+RoSquEqMqujzwEQZn5Dj/aKCXkj7DE+iipctLvuQ/tRGsS8d3g/CWC4px5lC/wEgr34pKhVRffoRDDePw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5tsiSlPRL8UmY6CMkdK36BttgUT0oxDMsOEOQ/wqcbwy80NOz
-	0bWotBV7B6QqTOADMM266F4tjEjYO/YzIjG4CDTRRInpzqKNBW9l09eZfw6jUyi3vtT7mbtjk4B
-	CNyvDD2+j/S2J9BD4dqnfZFHyf2b4/1ekv/xr4p+D8uwRnGTnci/Bf1P7Y+3U
-X-Gm-Gg: AR+sD11L78v66v8hkIc15S/bqoFyzZlAqW/MVKSu0kaydurjJnodLv4gBJP9YvSRcLM
-	PJbvtXazqdsvAKlm7IluKMk5UGhT5XvHu4ZViB5E++hDWz1DWmMBzdkrOADvKvyhbgqOzf9KcUp
-	XPJW7WyviRR0wOejUN8Y1D7b7K83rqPhmCT+xLGGoCwDskjBiJZeBrOQAw0L89RpS/e9lgFBs3R
-	VxoI+3T8YPhp8LqJkLS4JVmRC8FV82UvvBC0jakGuX87siQ213L0Insha3PSv7Tw8qQtUJirXjg
-	OtQdOSYs/c1mgEphIkZTI0/sApyLCJC6kmCYZBlXMVOT+9HSi68IvOAcEbcWu9PjO1sQd3Er0XY
-	Iex5QHR23Ro8Zz8s/bIII83rO5m5hsB5ZvIwAqImCEzlDgw==
-X-Received: by 2002:a05:620a:3709:b0:930:f852:6daf with SMTP id af79cd13be357-93487207b6emr145582285a.87.1785394739072;
-        Wed, 29 Jul 2026 23:58:59 -0700 (PDT)
-X-Received: by 2002:a05:620a:3709:b0:930:f852:6daf with SMTP id af79cd13be357-93487207b6emr145579585a.87.1785394738610;
-        Wed, 29 Jul 2026 23:58:58 -0700 (PDT)
-Received: from [127.0.1.1] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-933d3221bc7sm349752485a.7.2026.07.29.23.58.57
+        bh=1+WbTy4voezVhA/fXo6JCCCgngPgLHEDcKTQGEErv+s=;
+        b=l5cA9zCaaLNtCs5EZI6f8vP9+hHDbD7mdUsjoF8zybz/ceUTo5ZkXLsqSNaN0yM0xa
+         R/WTuDeTAP6spsJe/F1dYmyn8jrrQfQRyNGSaxk2O//M0VyQWGIxV7Z0J72umkOct7t3
+         4lSw9afjVewTDUJ/IxtGvZG36QZQFVhymStmkaeje0AewcrOi3B5vJBFQbdIDGdLEq9W
+         qvdAHMEBHA04PEe1VkdtbJoYcOV5ilBxYRIrjpXlIUARS9byG5zwoccnXVG9c1MpY29w
+         eEDSm6K26xc8LP/wYomen5XcSM3ySbjfwLC95Z4IdyhMV1UkreNCwso1+rr/w293UWd3
+         nvWQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoMm/ZQokDso0jE2Xk3tPfKp+lEkQxyVo04q6+mk3VEyx95Z1uW1A5v3Y2zeHwp6u6nPO7N43N6HcGyBA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyioRBHnIvTnvKhaSTLBbpjcANS3iJz9qmax2fgT50CcZbmHbOf
+	oXP9fo9NozTrRSjzEYykOJ/965927W7XR3P5Ujqaemte3uyLYYM2mL2ZswfE2TaYjg==
+X-Gm-Gg: AR+sD11ry3Ned6pYskO5iluhZk0OUS1KlymvdTZgaOpExdBAHh/Ao4qVXaqHnEiTfA5
+	0ZlQ3R6An9bCz2ISvLVo2TKcZ3Czb4OtTTOI1naM+aoFwIjreUdo2dxNZgmgzhO1fh44dWEBp5b
+	U6OUE86sbhHd3MAm/l/CIchaJb7qqLCb5tFie1UozZTvMLhJcVLTQ/NfKDsOCTla7+Ure2xSN3b
+	S5O+zZygcj8Gc4i8oWzmpphRQz4bw/CSFPlGLJ1qWCNlIo90BZiOiKE5xN07k2CXy0n9DkznaPn
+	eNCVkne/s647Xtpjz0IYu2vNKn5zRghxRICxPRMvHHxBHwMgWczPiXHTs+kIfSfFPalbmr1vAd7
+	1O86IQFijXDaVDcBCRPvGuYqqtqno0c6/EmwRwK3ebNJEaXdoYNrLQYe55lsyI8796GB+Owx9t7
+	JRRBNjqhccmIq1EJzTDbWyAqTmHL/jUT/dJ0bS4O840kVK+2qTYuI8GjfPCuhzvA8z7QQtLukxD
+	PH4pd7Mtt/3OyvneEVoxn9OkZ/3
+X-Received: by 2002:a17:902:f543:b0:2ca:bb7e:29a7 with SMTP id d9443c01a7336-2d035d3bf1amr15298915ad.41.1785396261766;
+        Thu, 30 Jul 2026 00:24:21 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:fd2f:da94:c3be:e16c])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d022a48858sm21918825ad.30.2026.07.30.00.24.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 23:58:57 -0700 (PDT)
-From: Tal Zussman <tz2294@columbia.edu>
-Date: Thu, 30 Jul 2026 02:57:51 -0400
-Subject: [PATCH v7 1/5] block: introduce bio_in_atomic()
+        Thu, 30 Jul 2026 00:24:21 -0700 (PDT)
+Date: Thu, 30 Jul 2026 16:24:17 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Haoqin Huang <haoqinhuang7@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
+	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
+Subject: Re: [PATCH v4 3/4] zram: validate parameters in each backend's
+ setup_params
+Message-ID: <amr3P_4zxX2w7ZNR@google.com>
+References: <20260730025240.17724-1-haoqinhuang7@gmail.com>
+ <20260730060133.80233-1-haoqinhuang7@gmail.com>
+ <20260730060133.80233-4-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260730-blk-dontcache-v7-1-3e8e6850068d@columbia.edu>
-References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
-In-Reply-To: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
-To: Jens Axboe <axboe@kernel.dk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Sandeep Dhavale <dhavale@google.com>,
-        Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>
-Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        Hillf Danton <hdanton@sina.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-erofs@lists.ozlabs.org,
-        Tal Zussman <tz2294@columbia.edu>
-X-Mailer: b4 0.14.3-dev-d7477
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1785394735; l=2716;
- i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=hHCEZENfCfsEpOmC0wBfWJMFm3C20nG7DjOTxirSTUU=;
- b=0SI7Xl8K46e0uZlTQGRMH9PF2VforZ2ADnod5gEhiUnACnwVjnxh4x+kTnl1qD5D6oyl3rPbF
- pLBs0BjnLHtCNXNT9pp0MnVsyv5sMsoS/rOivi/TnyaG9EJUxZTJlIh
-X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
- pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-ORIG-GUID: H1c6S96lHWAr5RYghuXf_MjFGyMhOVMl
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfX8HiGy2Uc4rRp
- Vxj2aQd5YtMetWmufLMftSngm6k047XgAklLZEWbjNlVdLzxBbrDgct98czBjjkDppUf6clE57T
- 5dQfykn7zVIYF9wO4HdLutVd9tZvC7nGeaIWPBSvkgXa9PtVHRod
-X-Authority-Analysis: v=2.4 cv=S4PpBosP c=1 sm=1 tr=0 ts=6a6af635 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=usPcmh10W0ubT8QP8_c3:22
- a=JfrnYn6hAAAA:8 a=i_Ns0s3d_2HFdJHkmwAA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22 a=1CNFftbPRP8L7MoqJWF3:22
-X-Proofpoint-GUID: H1c6S96lHWAr5RYghuXf_MjFGyMhOVMl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDA0OCBTYWx0ZWRfXwB6pFPTNwwvV
- gS11TfDlUWQuGWuXrTb2Jk7outf4iLMrTw/VUW+K8yk7FaQoFIwNw3Jyq7nrFc84IcP9i27TWr+
- kKNMYITEEzUr9SOHk4F2v6VfoYYQJfBxZHCCKlrTqiapkr2kT4HN1hUKxhQ5bb2Put45RhbENBS
- ihN1NqK0JeQUhWEo6inDi+O0oCAxcnigdpSpSTeeRnPLrulVk1pzzletPyr1ydgYe8jOa4rUg8E
- BjfmgSu5W0+MzG5NlyUXsRp+nw/A59xLswxD0Ulv5VCJ54B6d8zxDzg7UbFmsGAfNZTKGqQNpFH
- hHtuHYGwUxgh0N8b/BfWq32hD76dFOKqSdYKqpTXJsBjDZA3Of7x12NgUZRWip36tdvt5SiXuYy
- vlVOKZpDVVhCEM4rFd1yItsFmmVUpkq2ioNULs4zq6mp/46AXpfx3CFke1J2FPoIzZdnsWLg5pL
- dpUJF/VJgr59oXJ0cYA==
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11859
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=10 impostorscore=10
- clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0 bulkscore=10
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300048
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260730060133.80233-4-haoqinhuang7@gmail.com>
 
-Move the atomic context detection logic from erofs's z_erofs_in_atomic()
-into the block layer as bio_in_atomic(). This helper returns true when
-the current context is unsafe for sleeping bio completion handlers (e.g.,
-hard/soft IRQ, preempt-disabled).
+On (26/07/30 14:01), Haoqin Huang wrote:
+[..]
+>  static int deflate_setup_params(struct zcomp_params *params)
+>  {
+> +	if (params->dict_sz) {
+> +		pr_err("deflate: dictionary is not supported\n");
+> +		return -EOPNOTSUPP;
+> +	}
+>  	if (params->level == ZCOMP_PARAM_NOT_SET)
+>  		params->level = Z_DEFAULT_COMPRESSION;
+> +	else if (params->level < Z_DEFAULT_COMPRESSION ||
+> +		 params->level > Z_BEST_COMPRESSION) {
+> +		pr_err("deflate: invalid compression level %d\n", params->level);
+> +		return -EINVAL;
+> +	}
+>  	if (params->deflate.winbits == ZCOMP_PARAM_NOT_SET)
+>  		params->deflate.winbits = DEFLATE_DEF_WINBITS;
 
-The logic was originally added to erofs in commit c99fab6e80b7 ("erofs:
-fix atomic context detection when !CONFIG_DEBUG_LOCK_ALLOC"). A
-subsequent patch will use it in the block layer's bio completion
-infrastructure, so move it to include/linux/bio.h where both subsystems
-can share it.
+This will conflict with winbits validation change that we landed
+yesterday.  Can I trouble you with a rebase request (either on top
+of linux-next, when winbits patch hits it, or on top of Andrew's mm
+tree)?
 
-Convert erofs to call the new bio_in_atomic() directly.
+[..]
+> diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
+> index f6a336acfe20..5d551d165213 100644
+> --- a/drivers/block/zram/backend_lz4hc.c
+> +++ b/drivers/block/zram/backend_lz4hc.c
+> @@ -20,6 +20,11 @@ static int lz4hc_setup_params(struct zcomp_params *params)
+>  {
+>  	if (params->level == ZCOMP_PARAM_NOT_SET)
+>  		params->level = LZ4HC_DEFAULT_CLEVEL;
+> +	else if (params->level < LZ4HC_MIN_CLEVEL ||
+> +		 params->level > LZ4HC_MAX_CLEVEL) {
+> +		pr_err("lz4hc: invalid compression level %d\n", params->level);
+> +		return -EINVAL;
+> +	}
 
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Tal Zussman <tz2294@columbia.edu>
----
- fs/erofs/zdata.c    | 11 +----------
- include/linux/bio.h | 15 +++++++++++++++
- 2 files changed, 16 insertions(+), 10 deletions(-)
+So...  lib/lz4/lz4hc_compress.c supports levels 1 and 2.  However,
+LZ4HC_MIN_CLEVEL is set to 3, but clearly the compression library
+supports levels lower than LZ4HC_MIN_CLEVEL.  In fact, LZ4HC_MIN_CLEVEL
+is never used in the lz4 code.  Maybe here we need to just hardcode
+"< 1" and put a comment:
 
-diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
-index 74520e910259..f796bb3ef53b 100644
---- a/fs/erofs/zdata.c
-+++ b/fs/erofs/zdata.c
-@@ -1427,15 +1427,6 @@ static void z_erofs_decompressqueue_kthread_work(struct kthread_work *work)
- }
- #endif
- 
--/* Use (kthread_)work in atomic contexts to minimize scheduling overhead */
--static inline bool z_erofs_in_atomic(void)
--{
--	if (IS_ENABLED(CONFIG_PREEMPTION) && rcu_preempt_depth())
--		return true;
--	if (!IS_ENABLED(CONFIG_PREEMPT_COUNT))
--		return true;
--	return !preemptible();
--}
- 
- static void z_erofs_decompress_kickoff(struct z_erofs_decompressqueue *io,
- 				       int bios)
-@@ -1452,7 +1443,7 @@ static void z_erofs_decompress_kickoff(struct z_erofs_decompressqueue *io,
- 
- 	if (atomic_add_return(bios, &io->pending_bios))
- 		return;
--	if (z_erofs_in_atomic()) {
-+	if (bio_in_atomic()) {
- 		/* See `sync_decompress` in sysfs-fs-erofs for more details */
- 		if (sbi->sync_decompress == EROFS_SYNC_DECOMPRESS_AUTO)
- 			sbi->sync_decompress = EROFS_SYNC_DECOMPRESS_FORCE_ON;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8f33f717b14f..62a983758e09 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -368,6 +368,21 @@ static inline struct bio *bio_alloc(struct block_device *bdev,
- 
- void submit_bio(struct bio *bio);
- 
-+/**
-+ * bio_in_atomic - check if the current context is unsafe for bio completion
-+ *
-+ * Return: %true in atomic contexts (e.g. hard/soft IRQ, preempt-disabled);
-+ * %false when a bio can be safely completed in the current context.
-+ */
-+static inline bool bio_in_atomic(void)
-+{
-+	if (IS_ENABLED(CONFIG_PREEMPTION) && rcu_preempt_depth())
-+		return true;
-+	if (!IS_ENABLED(CONFIG_PREEMPT_COUNT))
-+		return true;
-+	return !preemptible();
-+}
-+
- extern void bio_endio(struct bio *);
- 
- /**
+      } else if (params->level < 1 || params->level > LZ4HC_MAX_CLEVEL) {
+              /*
+               * Not LZ4HC_MIN_CLEVEL: that constant is advisory, and
+               * LZ4HC_compress_generic() only clamps levels below 1.
+               * Levels 1-2 are valid.
+               */
+              pr_err("lz4hc: invalid compression level %d\n", params->level);
+              return -EINVAL;
+      }
 
--- 
-2.39.5
+[..]
+> diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+> index 2584f47c9b3c..4d19d6089f13 100644
+> --- a/drivers/block/zram/backend_zstd.c
+> +++ b/drivers/block/zram/backend_zstd.c
+> @@ -60,6 +60,11 @@ static int zstd_setup_params(struct zcomp_params *params)
+>  	params->drv_data = zp;
+>  	if (params->level == ZCOMP_PARAM_NOT_SET)
+>  		params->level = zstd_default_clevel();
+> +	else if (params->level < zstd_min_clevel() ||
+> +		 params->level > zstd_max_clevel()) {
+> +		pr_err("zstd: invalid compression level %d\n", params->level);
+> +		goto error;
 
+Should we also remove "zstd_release_params(params);" from here?
+Same reason as with zstd_create().
