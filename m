@@ -1,137 +1,181 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D821234EF07;
-	Fri, 31 Jul 2026 09:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2C03FC5B1
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 10:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785489946; cv=none; b=ZhCxiWipPby7vLsYyfMzXztO1q/uDRof8EL21GiBTTDeWqraSkJiSrBvsbQ9CffvdIcC/Yg9eG6Yiz8RWWWEvNebRplK/EGDArUQ3Nrj4AYWJpto6rxecHIHzAxUbneItvBq5hga0oDMHIY4a3EGBUH77CjwGzFRLP3AYYqp9aA=
+	t=1785492058; cv=none; b=WI40q8gn//6lkDYIr9/VIZKRS8d6Z1J5mrxZGLDiXhLUzs44McAERVM2G1w87ahQWIF/yFVcGsohubDiwYcPgEG78LYxPvKSm9wfL3RISHmoTjG37iJ0/rdJWKf/B1f7NaQr3K9g93ZGmspzNxqaH0P4HXJT1SKlLdTxxSl4fmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785489946; c=relaxed/simple;
-	bh=yVbIrq0JGJ/tqGL3Y2ZY9dwrwUyLWURgmK/GfIDOQUE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=CM+uawkSrmVXbiv1ntMLthzBi8LGpL534t6lvChVy5qSoubtfl8ds0Opsu+n6efecapdqaSMmyhBgTyq/Tzhr2kcyEqqH0rMWTs7dW7QRTcgkFqrCw226rusZP+s4Q7TrDTDHVPNxJGgpdpk3A3NncIgtKmvfW0ZRhe9Ao490NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=pGH/iuBq; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1785492058; c=relaxed/simple;
+	bh=FWJS0BRJJbz86ilEO+/1XN8E/OSQOh7YdKlSB9th7YU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HVekPJPcJpeAHxF359OtmCmo2XUw3fYn5N0vCe5CcwHM4BeMtrZmyzLTDL+c3VsMDQ2ZWC1VmzHixJaewrAB43w2/esuwVhWbAnDMCuh/QPS4vS6vpXNd/PnHYGxAruYStBMBGZX8bcYsl+jLd++0DtKSBhIf51nxVdrW9J7Y00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=eDKZ4oxH; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="pGH/iuBq"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ezWBjEQSDcXQyHNe5BtmlwrccUN5BrvMs10Em0adCSs=;
-	b=pGH/iuBqURK83Z9lqsED7R+rUKVpsyDWjl2LbSCMHb2XBN7DYhttOPvhP/sgiSnPBvN9k8Kv+
-	1vwaN6cVm5mLh96ZLRwrDGQy1ctxHKpM4Sezks2e6Kj2oImPH2Y1LtP3AOB916FEbd3grAXOjNN
-	prlqTCjU1tgOYVoGnHZ/zZ4=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hBL660wbZzRhR0;
-	Fri, 31 Jul 2026 17:16:14 +0800 (CST)
-Received: from kwepemf200012.china.huawei.com (unknown [7.202.181.238])
-	by mail.maildlp.com (Postfix) with ESMTPS id 19F504057D;
-	Fri, 31 Jul 2026 17:25:41 +0800 (CST)
-Received: from kwepemq500011.china.huawei.com (7.202.194.193) by
- kwepemf200012.china.huawei.com (7.202.181.238) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 31 Jul 2026 17:25:40 +0800
-Received: from kwepemq500011.china.huawei.com ([7.202.194.193]) by
- kwepemq500011.china.huawei.com ([7.202.194.193]) with mapi id 15.02.1544.011;
- Fri, 31 Jul 2026 17:25:40 +0800
-From: shimiaofeng <shimiaofeng@huawei.com>
-To: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hch@lst.de"
-	<hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>, "hare@suse.de"
-	<hare@suse.de>, "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
-	<leon@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-CC: luolongmin <luolongmin@huawei.com>, haoweiheng <haoweiheng@huawei.com>,
-	"chenjianfei (D)" <chenjianfei3@huawei.com>
-Subject: Nvme-rdma: Long IO HANG (~4.8h) during link failure with dm-multipath
- (Kernel 6.6)
-Thread-Topic: Nvme-rdma: Long IO HANG (~4.8h) during link failure with
- dm-multipath (Kernel 6.6)
-Thread-Index: Ad0gzmSELVSC6brVS1yCYXt27TkCxQ==
-Date: Fri, 31 Jul 2026 09:25:40 +0000
-Message-ID: <2139a37510154a98a614c3c37941a13b@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="eDKZ4oxH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=CS
+	1YypMXzJVokfYZhU7/rTA4rzuqPoQfTUcXlmDo6jg=; b=eDKZ4oxHNUGGV7TPPa
+	wsy20b3TyeKgvWH2m4khZ6fv2mmE3/6BVtBxqqLB79S0QjqSiAiZlkWnv2souIVj
+	x72XSWlCHQ1rvq/X/j2uBnVig3ZfnV97fFRqUY2HyeIrwz/fFvzZR8Q+qAQOAnmW
+	OAlUAjpP583fYFt8uJ7hS/sxA=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wB3+1wScmxqu5ThLA--.441S2;
+	Fri, 31 Jul 2026 17:59:48 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: Denis Efremov <efremov@linux.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH v2] floppy: avoid stale cont use after BH is queued
+Date: Fri, 31 Jul 2026 17:59:44 +0800
+Message-Id: <20260731095944.1939179-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wB3+1wScmxqu5ThLA--.441S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZry7Cry3XFWDKr4xWw17Wrg_yoWrCr4kpr
+	W5uFs0gF48JF4SyayxXw18Ary5ArnIkay2k39Fk34Fk3W8trn8Gr1kK342vFZF9rW8XayY
+	vws2qrya93W2g3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwhVX52pschWNWwAA3Q
 
-Hi all,
-We encountered a severe I/O hang issue during NVMe-oF (RoCEv2) link failure=
- when native multipath is disabled and dm-multipath is used instead.
-Based on our test results, this issue is highly likely located within the r=
-econnect/backoff mechanism of the vendor's out-of-tree driver (NVIDIA DOCA-=
-Host 3.3.0). The attachment contains the logs captured when the fault occur=
-s.
-We look forward to the vendor analyzing this driver-side issue, but we woul=
-d also like to seek advice from community experts regarding potential optim=
-ization suggestions for the block layer and NVMe-oF (NOF) collaboration mec=
-hanisms to guard against such behavior.
+reset_fdc() arms do_floppy = reset_interrupt; the IRQ handler then
+queues that function via schedule_bh(). If unlock_fdc() or do_wakeup()
+clears cont before the work runs, reset_interrupt() dereferences a NULL
+cont and oopses.
 
-Environment
-*	Kernel: 6.6.0 (openEuler 24.03 LTS SP4 baseline)
-*	Hardware: Intel Xeon Gold 5220R / Mellanox ConnectX-5 (MT27800, FW: 26.01=
--1.0.0)
-*	Storage: Huawei OceanStor Dorado (NVMe over RoCEv2)
-*	Configuration: nvme_core.multipath=3DN, dm-multipath enabled.
-*	Fabric Parameters: reconnect_delay =3D 10, ctrl_loss_tmo =3D 600 (or ctrl=
-_loss_tmo =3D 10 for testing)
+Example crash excerpt:
 
-Problem Description & Observations
-When we manually inject a link fault on one of the paths and restart multip=
-athd, the multipathd process gets stuck in the D state (the path detection =
-I/O does not return). Application I/O hangs for a very long time due to a r=
-equeue ping-pong loop.
-1.	The Requeue Ping-Pong: After the link goes down, the NVMe controller tra=
-nsitions to the NVME_CTRL_CONNECTING state. During this time, nvme_fail_non=
-ready_command() returns BLK_STS_RESOURCE. Upon receiving this, the block la=
-yer (blk-mq) immediately requeues the request. This causes the I/O to endle=
-ssly "ping-pong" between the block layer and nvme-core.
-2.	Abnormal Retry Interval: Based on ctrl_loss_tmo / reconnect_delay =3D 60=
-0 / 10, the subsystem is expected to retry 60 times. However, the actual me=
-asured interval between two consecutive retries is stretched to 288s - 290s=
-, completely ignoring the configured reconnect_delay =3D 10. The total hang=
- time reaches 17,340 seconds (~4.8 hours).
-3.	Single Retry Test: To isolate the issue, we set ctrl_loss_tmo =3D 10 (wh=
-ich triggers only 1 retry before tearing down the controller). Even in this=
- case, the I/O still HANGS for exactly ~290 seconds. This indicates that th=
-e problem is not cumulative retry multiplication, but rather that the very =
-first reconnect attempt or the single reconnect worker itself is being bloc=
-ked/delayed internally for ~290 seconds by the underlying driver stack.
+[ 1070.468148] status=80
+[ 1070.468152] fdc_busy=1
+[ 1070.468158] cont=          (null)
+[ 1070.468161] current_req=          (null)
+[ 1070.468162] command_status=-1
+[ 1070.468163]
+[ 1070.557051] floppy0: floppy timeout called
+[ 1070.557053] no cont in shutdown!
+[ 1070.557056] floppy0: floppy_shutdown: timeout handler died.
+[ 1074.419509] floppy0: FDC access conflict!
+[ 1074.419782] BUG: unable to handle kernel NULL pointer dereference at
+0000000000000008
+[ 1074.421969] PGD 0 P4D 0
+[ 1074.422320] Oops: 0000 [#1] SMP NOPTI
+[ 1074.422648] CPU: 10 PID: 3269 Comm: kworker/u256:4 Kdump: loaded
+[ 1074.423830] Hardware name: inspur Standard PC (i440FX + PIIX, 1996),
+BIOS 0.0.0 02/06/2015
+[ 1074.424284] Workqueue: floppy floppy_work_workfn [floppy]
+[ 1074.424757] RIP: 0010:reset_interrupt+0x3a/0xa0 [floppy]
 
-In-box Driver Contrast
-If we switch back to the kernel in-box (mainline upstream) mlx5 driver, thi=
-s issue DOES NOT occur. The NVMe controller status updates rapidly upon lin=
-k failure, and failover finishes within seconds. This further confirms that=
- the 290-second blocking behavior is specific to the DOCA driver stack.
+The same NULL deref has also been reported by syzbot on upstream.
 
-Technical Consultation
-The most appropriate solution is for the vendor to fix this issue within th=
-eir driver. However, if the vendor driver cannot technically resolve it, ar=
-e there any potential optimization mechanisms within the block layer or the=
- multipath subsystem to mitigate this?
-For example:
-1.	Block Layer: During the NVME_CTRL_CONNECTING state, if requests continuo=
-usly receive BLK_STS_RESOURCE, should the block layer introduce an exponent=
-ial backoff mechanism or a maximum retry threshold? Blindly requeuing these=
- requests seems to create an infinite loop that leaves the system vulnerabl=
-e to worker starvation or long hangs if the underlying driver blocks.
-2.	Multipath Subsystem: The multipath subsystem's path detection mechanism =
-for NVMe devices could be optimized. I believe that path-checking I/Os (suc=
-h as those sent by multipathd to verify link sanity) should not be allowed =
-to retry indefinitely under these conditions, as it completely stalls the f=
-ailover process.
+While a stale reset_interrupt() sits in result(), unlock_fdc() can
+also clear cont and let a new request install another continuation, so
+a plain !cont check after result() is not enough. Bump cont_seq when
+clearing cont, sample it in schedule_bh() as bh_seq, and use cont in
+reset_interrupt() only when the sequences still match.
 
-Any insights or architectural suggestions on how the block layer can better=
- handle or guard against such non-responsive driver behavior would be great=
-ly appreciated.
+Reported-by: syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=619e27617b2abe6b9b72
+Link: https://lore.kernel.org/linux-block/00000000000093c4d105f9aa34d6@google.com/
+Link: https://lists.openwall.net/linux-kernel/2021/10/27/56
+Assisted-by: Cursor:Composer
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+---
+Changes in v2:
+- Use cont_seq/bh_seq instead of a plain !cont check
+v1: https://lore.kernel.org/linux-block/20260723073512.11120-1-yangxiuwei@kylinos.cn/
 
-Thanks.
+ drivers/block/floppy.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index f04397b8e381..ec17625b8c08 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -536,6 +536,25 @@ static const struct cont_t {
+ 				 * succeeded/failed */
+ } *cont;
+ 
++static atomic_t cont_seq = ATOMIC_INIT(0);
++static unsigned int bh_seq;
++
++static void cont_invalidate(void)
++{
++	WRITE_ONCE(cont, NULL);
++	atomic_inc_return_release(&cont_seq);
++}
++
++static const struct cont_t *cont_for_bh(void)
++{
++	unsigned int seq = atomic_read_acquire(&cont_seq);
++	const struct cont_t *c = READ_ONCE(cont);
++
++	if (seq != bh_seq || !c)
++		return NULL;
++	return c;
++}
++
+ static void floppy_ready(void);
+ static void floppy_start(void);
+ static void process_fd_request(void);
+@@ -907,7 +926,7 @@ static void unlock_fdc(void)
+ 	command_status = FD_COMMAND_NONE;
+ 	cancel_delayed_work(&fd_timeout);
+ 	do_floppy = NULL;
+-	cont = NULL;
++	cont_invalidate();
+ 	clear_bit(0, &fdc_busy);
+ 	wake_up(&fdc_wait);
+ }
+@@ -997,6 +1016,7 @@ static void schedule_bh(void (*handler)(void))
+ {
+ 	WARN_ON(work_pending(&floppy_work));
+ 
++	bh_seq = atomic_read(&cont_seq);
+ 	floppy_work_fn = handler;
+ 	queue_work(floppy_wq, &floppy_work);
+ }
+@@ -1782,13 +1802,18 @@ static void recalibrate_floppy(void)
+  */
+ static void reset_interrupt(void)
+ {
++	const struct cont_t *c;
++
+ 	debugt(__func__, "");
+ 	result(current_fdc);		/* get the status ready for set_fdc */
++	c = cont_for_bh();
++	if (!c)
++		return;
+ 	if (fdc_state[current_fdc].reset) {
+-		pr_info("reset set in interrupt, calling %ps\n", cont->error);
+-		cont->error();	/* a reset just after a reset. BAD! */
++		pr_info("reset set in interrupt, calling %ps\n", c->error);
++		c->error();	/* a reset just after a reset. BAD! */
+ 	}
+-	cont->redo();
++	c->redo();
+ }
+ 
+ /*
+@@ -1988,7 +2013,7 @@ static void floppy_start(void)
+ static void do_wakeup(void)
+ {
+ 	reschedule_timeout(MAXTIMEOUT, "do wakeup");
+-	cont = NULL;
++	cont_invalidate();
+ 	command_status += 2;
+ 	wake_up(&command_done);
+ }
+-- 
+2.25.1
+
