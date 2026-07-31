@@ -1,181 +1,132 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2C03FC5B1
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 10:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9FE417BE5;
+	Fri, 31 Jul 2026 10:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785492058; cv=none; b=WI40q8gn//6lkDYIr9/VIZKRS8d6Z1J5mrxZGLDiXhLUzs44McAERVM2G1w87ahQWIF/yFVcGsohubDiwYcPgEG78LYxPvKSm9wfL3RISHmoTjG37iJ0/rdJWKf/B1f7NaQr3K9g93ZGmspzNxqaH0P4HXJT1SKlLdTxxSl4fmI=
+	t=1785493244; cv=none; b=qvAamZD/OTspg3LXl2FzNJNUzKgSv1SPQ0IvOY8KRQrCU8nB4tKE3bcxivp5gykzZRKsgq1eAGJg6Jtd6SmsUC0rbpQjGEmjSpGRRxyv0RYAggrj/OJtEQRMKhVtKzgoJHhIKzLmOTay23k5LIGUopsDF3sp1QyC72/qwD7T9uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785492058; c=relaxed/simple;
-	bh=FWJS0BRJJbz86ilEO+/1XN8E/OSQOh7YdKlSB9th7YU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HVekPJPcJpeAHxF359OtmCmo2XUw3fYn5N0vCe5CcwHM4BeMtrZmyzLTDL+c3VsMDQ2ZWC1VmzHixJaewrAB43w2/esuwVhWbAnDMCuh/QPS4vS6vpXNd/PnHYGxAruYStBMBGZX8bcYsl+jLd++0DtKSBhIf51nxVdrW9J7Y00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=eDKZ4oxH; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1785493244; c=relaxed/simple;
+	bh=9oObe4UkwkAA6IDKQjqiWTf+YPNcboRDCXYFGZGNBU0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Nz28qPSv234AE2j1JHKzgRtiwnRhnwX9WgH0t5Y42laYHGNdF/Jyyvu6vPoETxCV3Q2wAoOZE56ZWLwNOfNEbW1xf0sBTOD2uCuv8IwNz5hhRdJmQPW5z7/fKHx3xgUkAQhiB/W5Hqa234ip97S6ecNrbwxk2J+vh3ugoOeGHDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=azEpcH8M; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="eDKZ4oxH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=CS
-	1YypMXzJVokfYZhU7/rTA4rzuqPoQfTUcXlmDo6jg=; b=eDKZ4oxHNUGGV7TPPa
-	wsy20b3TyeKgvWH2m4khZ6fv2mmE3/6BVtBxqqLB79S0QjqSiAiZlkWnv2souIVj
-	x72XSWlCHQ1rvq/X/j2uBnVig3ZfnV97fFRqUY2HyeIrwz/fFvzZR8Q+qAQOAnmW
-	OAlUAjpP583fYFt8uJ7hS/sxA=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wB3+1wScmxqu5ThLA--.441S2;
-	Fri, 31 Jul 2026 17:59:48 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v2] floppy: avoid stale cont use after BH is queued
-Date: Fri, 31 Jul 2026 17:59:44 +0800
-Message-Id: <20260731095944.1939179-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="azEpcH8M"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66V8Hphx1230298;
+	Fri, 31 Jul 2026 10:20:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=BeEpoR
+	TcX0OR0VppOYdTB6AIhVDDsaWHi6x0ZASvTlY=; b=azEpcH8MEerZJAlUYVCQZE
+	oZD4x02XUW98P0E1XZpKjv8DM9SK6KHIrM4iLQWpVWEpaUx4vEEd9sjYW5wBmRTJ
+	/qc2XC0nkdMDUJOt45RsF1V/Jp3sBAwI/wQvkuOU6EJR70xIm9+GR7+ka45F2xDU
+	kFw47rprzBMqJHJR2Cbf6KoVHm8zKWJmlaEHypX4wxZggLZ3EazCrcl3Q7zthp99
+	KIdVHob/vF9jo04nUbezmN9eIn+mDMTqzPEE4RnTi5Rv700bBfhelaDJR2FxJVK1
+	mugyjeuZ1naEAC0WVKavAOySwfKncyYKr0+2cVV8Ka1u+ks+ObMAs2+18WjJfetg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuyjkg2w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 10:20:29 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VABLxQ029388;
+	Fri, 31 Jul 2026 10:20:28 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fna5yf77j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 10:20:28 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VAKMUq27591040
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 Jul 2026 10:20:22 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E3842006C;
+	Fri, 31 Jul 2026 10:20:22 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF3C32006A;
+	Fri, 31 Jul 2026 10:20:21 +0000 (GMT)
+Received: from [9.87.137.132] (unknown [9.87.137.132])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 Jul 2026 10:20:21 +0000 (GMT)
+Message-ID: <769d7245-dcb9-4019-bb5c-ff5130f4f28a@linux.ibm.com>
+Date: Fri, 31 Jul 2026 12:20:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] s390/dasd: fixes
+From: Stefan Haberland <sth@linux.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20260727142840.567286-1-sth@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <20260727142840.567286-1-sth@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wB3+1wScmxqu5ThLA--.441S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxZry7Cry3XFWDKr4xWw17Wrg_yoWrCr4kpr
-	W5uFs0gF48JF4SyayxXw18Ary5ArnIkay2k39Fk34Fk3W8trn8Gr1kK342vFZF9rW8XayY
-	vws2qrya93W2g3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwhVX52pschWNWwAA3Q
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDA3NyBTYWx0ZWRfX9XaP+4JmOLym
+ DDBY8Q28fRs8BTxireKZ0TquULZURJVXOeVfKooLVWTnqGcQWxjG7Hh7nH1EhG4ZB/hPYc2bIBr
+ kAzXHiDjZ6q8WfVUfr9km61Znehi2BE=
+X-Proofpoint-GUID: Lt7iJOUxsy4dum0txE8QKFO-7Ga9D-Gr
+X-Proofpoint-ORIG-GUID: Lt7iJOUxsy4dum0txE8QKFO-7Ga9D-Gr
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDA3NyBTYWx0ZWRfX9hrAoWYsxjhx
+ FH5RlfgjRyJg3oXXdIKuZg+WRpfg1s6YQVECDH3pmjqXhaj9Ja36U/x+Y/6D1HagDG0H6Wjx98r
+ 7nVR+wRCwoWepVZKjun4Kb/BJq4qCoKM7eTN7HSfrSpRMg+QaGf2Iyr3Fe9ngHocCNE6Cq6a41V
+ BcD2+8V+//JBy+Mq7UHVfDvb0nAoTrerk6wYjzIYHGC9gBxA9bKdM0rBjKSSG/LmtFYBInxg9t8
+ u5yT9jZoK3bGSazwYQm28+06vwYI2QOb/iwNLjKcz5JLSSsPeSnJ7SrQAgd6cYmmp80tbO7P9U+
+ bpyEF24ChyBPVvH4rE9fEM3ycXzgaoylpnAKpyzndKz0wtwFrLhuPcAM6ASuwwMSWYmVQWre3eJ
+ fAlEnN40eyFjmvB2aQrauYnc+b+yWq/O9oJIWcAe0poE/FcNiaIHR4xUq2PoGTdyQJ2wr//BFh8
+ qIohGSiULLpNMO02SxQ==
+X-Authority-Analysis: v=2.4 cv=X5Vi7mTe c=1 sm=1 tr=0 ts=6a6c76ed cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=vMJE824UCUDTa55BMMQA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-31_03,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607310077
 
-reset_fdc() arms do_floppy = reset_interrupt; the IRQ handler then
-queues that function via schedule_bh(). If unlock_fdc() or do_wakeup()
-clears cont before the work runs, reset_interrupt() dereferences a NULL
-cont and oopses.
+Am 27.07.26 um 16:28 schrieb Stefan Haberland:
+> Hi Jens,
+> 
+> please apply the following 3 patches that partially address rather
+> important issues in the DASD driver.
+> Thanks.
+> 
+> Jan Höppner (1):
+>   s390/dasd: Fix potential NULL pointer dereference
+> 
+> Stefan Haberland (2):
+>   s390/dasd: Fix path verification interrupted by concurrent
+>     dasd_sleep_on_immediatly
+>   s390/dasd: Fix undersized format-check buffer
+> 
+>  drivers/s390/block/dasd.c       | 14 +++++++++++++-
+>  drivers/s390/block/dasd_eckd.c  | 11 +++++++----
+>  drivers/s390/block/dasd_ioctl.c |  2 +-
+>  3 files changed, 21 insertions(+), 6 deletions(-)
+> 
 
-Example crash excerpt:
+Hi Jens,
 
-[ 1070.468148] status=80
-[ 1070.468152] fdc_busy=1
-[ 1070.468158] cont=          (null)
-[ 1070.468161] current_req=          (null)
-[ 1070.468162] command_status=-1
-[ 1070.468163]
-[ 1070.557051] floppy0: floppy timeout called
-[ 1070.557053] no cont in shutdown!
-[ 1070.557056] floppy0: floppy_shutdown: timeout handler died.
-[ 1074.419509] floppy0: FDC access conflict!
-[ 1074.419782] BUG: unable to handle kernel NULL pointer dereference at
-0000000000000008
-[ 1074.421969] PGD 0 P4D 0
-[ 1074.422320] Oops: 0000 [#1] SMP NOPTI
-[ 1074.422648] CPU: 10 PID: 3269 Comm: kworker/u256:4 Kdump: loaded
-[ 1074.423830] Hardware name: inspur Standard PC (i440FX + PIIX, 1996),
-BIOS 0.0.0 02/06/2015
-[ 1074.424284] Workqueue: floppy floppy_work_workfn [floppy]
-[ 1074.424757] RIP: 0010:reset_interrupt+0x3a/0xa0 [floppy]
+do you see a chance that this will make it into rc6?
 
-The same NULL deref has also been reported by syzbot on upstream.
-
-While a stale reset_interrupt() sits in result(), unlock_fdc() can
-also clear cont and let a new request install another continuation, so
-a plain !cont check after result() is not enough. Bump cont_seq when
-clearing cont, sample it in schedule_bh() as bh_seq, and use cont in
-reset_interrupt() only when the sequences still match.
-
-Reported-by: syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=619e27617b2abe6b9b72
-Link: https://lore.kernel.org/linux-block/00000000000093c4d105f9aa34d6@google.com/
-Link: https://lists.openwall.net/linux-kernel/2021/10/27/56
-Assisted-by: Cursor:Composer
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
-Changes in v2:
-- Use cont_seq/bh_seq instead of a plain !cont check
-v1: https://lore.kernel.org/linux-block/20260723073512.11120-1-yangxiuwei@kylinos.cn/
-
- drivers/block/floppy.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f04397b8e381..ec17625b8c08 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -536,6 +536,25 @@ static const struct cont_t {
- 				 * succeeded/failed */
- } *cont;
- 
-+static atomic_t cont_seq = ATOMIC_INIT(0);
-+static unsigned int bh_seq;
-+
-+static void cont_invalidate(void)
-+{
-+	WRITE_ONCE(cont, NULL);
-+	atomic_inc_return_release(&cont_seq);
-+}
-+
-+static const struct cont_t *cont_for_bh(void)
-+{
-+	unsigned int seq = atomic_read_acquire(&cont_seq);
-+	const struct cont_t *c = READ_ONCE(cont);
-+
-+	if (seq != bh_seq || !c)
-+		return NULL;
-+	return c;
-+}
-+
- static void floppy_ready(void);
- static void floppy_start(void);
- static void process_fd_request(void);
-@@ -907,7 +926,7 @@ static void unlock_fdc(void)
- 	command_status = FD_COMMAND_NONE;
- 	cancel_delayed_work(&fd_timeout);
- 	do_floppy = NULL;
--	cont = NULL;
-+	cont_invalidate();
- 	clear_bit(0, &fdc_busy);
- 	wake_up(&fdc_wait);
- }
-@@ -997,6 +1016,7 @@ static void schedule_bh(void (*handler)(void))
- {
- 	WARN_ON(work_pending(&floppy_work));
- 
-+	bh_seq = atomic_read(&cont_seq);
- 	floppy_work_fn = handler;
- 	queue_work(floppy_wq, &floppy_work);
- }
-@@ -1782,13 +1802,18 @@ static void recalibrate_floppy(void)
-  */
- static void reset_interrupt(void)
- {
-+	const struct cont_t *c;
-+
- 	debugt(__func__, "");
- 	result(current_fdc);		/* get the status ready for set_fdc */
-+	c = cont_for_bh();
-+	if (!c)
-+		return;
- 	if (fdc_state[current_fdc].reset) {
--		pr_info("reset set in interrupt, calling %ps\n", cont->error);
--		cont->error();	/* a reset just after a reset. BAD! */
-+		pr_info("reset set in interrupt, calling %ps\n", c->error);
-+		c->error();	/* a reset just after a reset. BAD! */
- 	}
--	cont->redo();
-+	c->redo();
- }
- 
- /*
-@@ -1988,7 +2013,7 @@ static void floppy_start(void)
- static void do_wakeup(void)
- {
- 	reschedule_timeout(MAXTIMEOUT, "do wakeup");
--	cont = NULL;
-+	cont_invalidate();
- 	command_status += 2;
- 	wake_up(&command_done);
- }
--- 
-2.25.1
-
+regards,
+Stefan
