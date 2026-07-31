@@ -1,74 +1,75 @@
-Received: from mail-oa2-f1.google.com (mail-oa2-f1.google.com [74.125.231.65])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2BE35CB81
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 14:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0236235AC01
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 14:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785507090; cv=none; b=orJvXlkA/7opkmBZe3SrhZ4MOwIrJsrGxDbhHLgW4GrPJg9Cmi1cbTBqgNWYbHEmePIVgtY3LXkvKSFbfsflxTaaSPU9/2ucyyh/p/sSRN1mBF1dIq57Hxx8OZzrjjdwb1EZkiIXFpPDINONDXPyMgM4+7fXUnVjE6Lw1JPbOPM=
+	t=1785508150; cv=none; b=ghz/kRG6yqVzM//6+Gdrz0Ceti6GdGbtNCOHxDJujrRTyYZ3AhrOZpjOND63G2FpcMINqn9OO5BVGAlBo77LXEcP4Q808fw9F2rDK5JXTBhiGhQsJ7PX1NYUECikr6PCCBuUUDOJBAOBkkjPgV1D7jcQ6tvvPtFvhOQB55P61GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785507090; c=relaxed/simple;
-	bh=4ZdjWakCq/Aqizx6AFYC1adkwgp2P7rM4QX9GlA4i94=;
+	s=arc-20240116; t=1785508150; c=relaxed/simple;
+	bh=irMpV9a/2qawDXmp6ztz+nswVSbGCihY5H3HF6baxUk=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ICyUmnhvxnXK1lyUGJjYEr54+/viC10TIdxyLE9oB5A0J+VkVn11RmmY1seZn/PDV1tY2RYRmUHQOROOPIyIeHD9Ab48IVJInyf8f0uXjXLDjz4bmexyJfytGnJupS9NIWc93yl63wliocX7J+/2pqI0ZOnFoASVjqU7kU8OTMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=OASmQ7sW; arc=none smtp.client-ip=74.125.231.65
+	 MIME-Version:Content-Type; b=uL7ST+GONjQgHtYnqI4tvVbX3DknYFQnOHKDFMR1aFUOQG1y6wdOARXGHBTlN/8dRwQRLtzjyoYA3dT8+UxbJdq1x+0MAnfo9KK79fCW62SkU2S7VyMoOi5WiWG+qLoq3jdQJG6PghLmehcyuZ1cIyseB3TeBGV7qWjGLhrQyBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=h0moRNIj; arc=none smtp.client-ip=209.85.161.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="OASmQ7sW"
-Received: by mail-oa2-f1.google.com with SMTP id 586e51a60fabf-451e22b4773so82947fac.0
-        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 07:11:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="h0moRNIj"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-6ac83a09781so578363eaf.1
+        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 07:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785507087; x=1786111887; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785508148; x=1786112948; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=SUpW3doNTk9ZVDYiQz02iPdiZ/HzJ9pbPw8kgbFuw4Y=;
-        b=OASmQ7sWtme8vdy9ZeOxOfqadf1ySSahE6U18q4xv78UPiX10WES9aUK/APpGVTZnt
-         bVWB66lfMxa9GVrHuaCauvFh3hroZB7UXNJQABlZWxQIl+WDEOkfg6+jtVnvp6jkFrvw
-         /2zQH5igkODASSoiCdZaFF1OBTd6pmmyPPuvttpkIPf9nRS0HuZpRis4pKehTdAdYxbo
-         OU2bJOcPNm2KUwT7718uOV/9Dr5T2CbO2pgtny29hNvi9FAS2BLVKvQNcSqZQxeo7hDi
-         7xHqdXgphMdwR5IAVgqiyA80gowYPlOeVg/XikUWYFk1OBxXXpaCa21cRWVTRh7MiTOf
-         IiXA==
+        bh=RjhPOZ3bdgpAm7mKb0QctoHN9xX2G/6IKethU/a6XIM=;
+        b=h0moRNIjCXcEMLCUfTSV65tAHFN5X1N+a7unU64JTlXbMFYofo4dDQtGy7SwmrzPFo
+         /RjhyIiEVU5v/JQiP5O/BxGqwJR6TbiZsRnnf4vnV7gkJ3NDyCZxW72DNQVVyWVNlLuB
+         6re+4PTeqpzV7R1qReCd8MMBOeaC2/3L49PDN9zNKipnnqwPSCbistNa8KTWPph0n6p9
+         PuO8zG5qbXalWihDCKMaHqe9lmX85noCeko+2ktwiY2gtorhysYIhW0NkDRbpD+keX4U
+         Q7x8FOjx9qycPESYi+f2nIRS0NKRNZ+Hi2wgMPpclXUZNgpOlYtVvXNowhaE0tCpQKTf
+         yHaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785507087; x=1786111887;
+        d=1e100.net; s=20251104; t=1785508148; x=1786112948;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=SUpW3doNTk9ZVDYiQz02iPdiZ/HzJ9pbPw8kgbFuw4Y=;
-        b=VqBgrU8mD+fPVVgbLlrg+/AwvuBXV2afcrlhx93Z5nFIZRElIFdRndaAWNrma6R9wg
-         NztH77cfdWnyyvaewgMzl8fb+NW4kw+vtLj5w2FSbO7n5wE4ecYDHdvT1UY+K0/1W9jY
-         pSEub3anBdx3XSXYf8GiifoSSLz2JjpSsXdF4nMXDA0an7G3L6NPt9FVXViLqG9dno6r
-         HAtyazcmh1ObIt+O0DKkMaJ8545YUUKT/9oes/l8V9W9+KRDvIx8sNn45NgiRzIk3IAE
-         vyo6emxtPK0UI7DI3ePnKihsaBpYLvG+ngDFr0SfPV4N0FUPpI6XjjiFNtkrnqpnEdPY
-         WpLw==
-X-Gm-Message-State: AOJu0YwXkKUMiOzEFz2vKT0M1FHBBZlFW7Mv7LWtFhS2H3vCVA/cxE6/
-	Ho4xScNu9pfSJS0F5XDRDnUEDkvAoe3sP0y50B0PVraTHIq6JxrfdPki4GbjfVL4hLs=
-X-Gm-Gg: AR+sD12G0YFuaj+19hAX5XFpHP9t5vSgajWJ04EqYVTUY9Sp9i654Fb3RecJN1JblQK
-	1Dv9N9dyzuYJ7IT4SbMxjcDdua50wbYK71vS7JE7zeyaVODsP9e2BzfjVBSZmvNbhTxf58X7S8u
-	rT6VqKitzispR+xi5DeOc3uVcaRxmcFG7nkLqf029TcZNYGUHpjgXTscBR9ywEzRjBaF3q1MZwW
-	nbHbq/zmE55pPs744EqjGb+LoFpt7WltQHBtwc7zYwr3j35mrsSRParnGCaW3Pkv+m/KhL2fzkL
-	GV/wuWQGvuMVj6YvHpb3WiLx/eMsol8zkBMLAxGaHk795UgBzx/udDn11RKMC5wUsHKKC11WoVy
-	/QRDQTv6e5xEUv/QZj5i7Z+IbT+EVM08lhfjNJbjsJh7BgRi7ADu/bL8WqM7apclKBdG7BHE7tY
-	cl1GQfYfEIIMXpYDA3JOBllF3ERulvJQFzwKnG2mBup6BU3tjuQ9VWDqf+3hkIbyHHY47XJD7YE
-	leaXs81p10ymty5sYktmUVMJJW9ebWWsEcVL4Yboyo=
-X-Received: by 2002:a05:6870:d40d:b0:448:a0cf:5afd with SMTP id 586e51a60fabf-4590572cc6cmr526052fac.4.1785507087079;
-        Fri, 31 Jul 2026 07:11:27 -0700 (PDT)
+        bh=RjhPOZ3bdgpAm7mKb0QctoHN9xX2G/6IKethU/a6XIM=;
+        b=nt7TJsWjKl6kBko/8omV3rFT37gBfSB/aoWRQqNoT1EETIBtoYAp1mMUY0lKORW716
+         FfrK+EAC2rh+OXyau/AVDBSeMVAxb/EUYomeumGc8DSDoiXC0d0dzTNTUAGmokMR8XSR
+         aI1LXbdp6L9tcQ+J9uY3kfRTf4m+jmx/JBjr/y4Dzf3aZWLzX+fY7ifbYPA+YngpKdIL
+         4t9bwbo6vn4USJvnxrmCpL8QcuJ5OJ35ICXN+JsiD93ck7jS1HR5qjguUQAcl8gv9Awx
+         Fujyh19puYpjuOqIp/3a68ag43jo49ZDmlaBE7Lj0Qjje7xulvOUwm0wQiQ3lNnVxtIp
+         wotw==
+X-Gm-Message-State: AOJu0Yzy8lWKxMp+X72S7T8YelrqeUaFvFzQdKxVkA8Lee1mocY5Y3q+
+	kyvgFKSRoETO5ZLBcYqRRWmXRG01U9M2DIk7q0S82a6k+Z0g+WWCn6/oF/DqBc3NilQ=
+X-Gm-Gg: AR+sD11X6oVi0OuDjZF/wcBSfUPvrEgkoGufZSCVaHc75WpKFSfr3Y7s0KgpQrHQpX5
+	tGn1/CmUtlM9Ks/OMrOeP5djSSmzNNkrVpXVUak0pTKnLEFlR8hyin2b+G+c7JihlXpfRTiqnMN
+	UiV0uJp4oO5CENM5jZjGEGvhOxj1MOjUrl4dYuZNJaQhvzPL++F6k/Kj8rPqD3DYoATTBLj/l8F
+	GeY8spcW6IrIoTHVr7yPmhx1ddlo6QkpcGJC5yzFT14uAO7CfBsdLGvYXj6BhsZdtUvTciZjgkR
+	5tyYlrxLLVY//N5ce9khcffSiHyLSuEpqD0SJi1d1dMICdkN/vqnjv+SfaEEDCx42PmBqumX/uH
+	0sgzaqRIIN9HNMpbL5CBtw1kPgUg+DOQhzbfMO70wija3IdP9wmRc29o3x5yKngmaqfjuqGXrQ4
+	9LuetnAqT1s2+PcrI0gsj1diBhJuNJtURz0AOz2CJvmmiCeaVImXC/c8RWX9EQilNJFbGN6IRZF
+	2SAnrOLE0j7i+zIH9F+oACwen9dLe3qApvZz2EtRw==
+X-Received: by 2002:a05:6820:1985:b0:6aa:e267:f11 with SMTP id 006d021491bc7-6ae38364f69mr2910597eaf.12.1785508147887;
+        Fri, 31 Jul 2026 07:29:07 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f66c1fe3sm1162982fac.14.2026.07.31.07.11.25
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f664d884sm1179699fac.12.2026.07.31.07.29.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 07:11:26 -0700 (PDT)
+        Fri, 31 Jul 2026 07:29:07 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- Keith Busch <kbusch@meta.com>
-Cc: dm-devel@lists.linux.dev, hch@lst.de, brauner@kernel.org, 
- djwong@kernel.org, viro@zeniv.linux.org.uk, Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20260720201057.1862857-1-kbusch@meta.com>
-References: <20260720201057.1862857-1-kbusch@meta.com>
-Subject: Re: [PATCH RESEND 0/5] block: validate direct I/O memory alignment
-Message-Id: <178550708596.3329022.10599196691426679849.b4-ty@b4>
-Date: Fri, 31 Jul 2026 08:11:25 -0600
+To: Stefan Haberland <sth@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+ Vasily Gorbik <gor@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20260727142840.567286-1-sth@linux.ibm.com>
+References: <20260727142840.567286-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/3] s390/dasd: fixes
+Message-Id: <178550814683.6950.1912092779211953730.b4-ty@b4>
+Date: Fri, 31 Jul 2026 08:29:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,34 +77,28 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 20 Jul 2026 13:10:52 -0700, Keith Busch wrote:
-> Resending in case this got lost.
+On Mon, 27 Jul 2026 16:28:37 +0200, Stefan Haberland wrote:
+> please apply the following 3 patches that partially address rather
+> important issues in the DASD driver.
+> Thanks.
 > 
-> This addresses the misaligned direct-io problem behind various threads:
-> 
->  https://lore.kernel.org/linux-xfs/20260610145218.141369-1-cem@kernel.org/
->  https://lore.kernel.org/all/CAC_j7i1R7oy+nRhxEjCTba=DUgn02w9X+p94DCu0aHv5+5tKnQ@mail.gmail.com/
->  https://lore.kernel.org/linux-block/ai7rnH20IYeSmY8s@gallifrey/
->  https://lore.kernel.org/linux-block/20260616154009.2123183-1-kbusch@meta.com/
+> Jan Höppner (1):
+>   s390/dasd: Fix potential NULL pointer dereference
 > 
 > [...]
 
 Applied, thanks!
 
-[1/5] block: use blkdev_iov_iter_get_pages status for errors
-      commit: 75ae18ca942674f9d5b55d7e8a2975485125f715
-[2/5] block: fix dio leak on metadata mapping error
-      commit: 702a2a9f3dfe066a7481698c858371112f3cb697
-[3/5] loop: set dma_alignment from the backing file for direct I/O
-      commit: 6c8dec275ccc35e8f86cb9287283d31c5d8e9ab7
-[4/5] zloop: set dma_alignment from the backing files for direct I/O
-      commit: c5059c1af2bd22bc1435b99d27d800164162cb72
-[5/5] block: validate user space vectors during extraction
-      commit: 14b007e178811db72fbb1ebb3535160db6ec1e6a
+[1/3] s390/dasd: Fix path verification interrupted by concurrent dasd_sleep_on_immediatly
+      commit: dcba277d119af323c267d1f27f61b868dac62753
+[2/3] s390/dasd: Fix potential NULL pointer dereference
+      commit: 9973026f572db6b67570cadc30942f3014e41079
+[3/3] s390/dasd: Fix undersized format-check buffer
+      commit: 7f40b346462f563a0d6e841a77b5163d2a882a04
 
 Best regards,
 -- 
