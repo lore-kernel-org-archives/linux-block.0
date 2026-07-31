@@ -1,75 +1,87 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0236235AC01
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 14:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182021E1DF0
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 15:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785508150; cv=none; b=ghz/kRG6yqVzM//6+Gdrz0Ceti6GdGbtNCOHxDJujrRTyYZ3AhrOZpjOND63G2FpcMINqn9OO5BVGAlBo77LXEcP4Q808fw9F2rDK5JXTBhiGhQsJ7PX1NYUECikr6PCCBuUUDOJBAOBkkjPgV1D7jcQ6tvvPtFvhOQB55P61GY=
+	t=1785510073; cv=none; b=J3K3j5iVmnHgJude6wuE6atrq+C0SCzsVbqTO08MfD5UAy4jB7vOnGO3e40rEKI1oBmaQ1RPDR8LZNi8U3gkSc4ZOFTQ13P83EzmioLHfIoNKo97NTySrqDNuc0LKRuhKgtiq7BL3yj098+w+8XAEKTIQQLEzEy98qWFLilinpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785508150; c=relaxed/simple;
-	bh=irMpV9a/2qawDXmp6ztz+nswVSbGCihY5H3HF6baxUk=;
+	s=arc-20240116; t=1785510073; c=relaxed/simple;
+	bh=jCwR7UagNch/98g5M6Z4T9zNj9d+3bCJlJdwHm8NK5I=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=uL7ST+GONjQgHtYnqI4tvVbX3DknYFQnOHKDFMR1aFUOQG1y6wdOARXGHBTlN/8dRwQRLtzjyoYA3dT8+UxbJdq1x+0MAnfo9KK79fCW62SkU2S7VyMoOi5WiWG+qLoq3jdQJG6PghLmehcyuZ1cIyseB3TeBGV7qWjGLhrQyBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=h0moRNIj; arc=none smtp.client-ip=209.85.161.44
+	 MIME-Version:Content-Type; b=mGXJMEUnG9+WwUAiAqkWyT29fp/0Nt7h9DIymzMd8ML4hiO7cfQ0vNjrVOMguWDkIyEx8JJig9UGGDdeIEp6jMvZoCisH1iAdYO+qXHk6k5NS9vJWkWY84UKoOWypJ77ivWwIs6cZbNvtWw/2h4r8DBhHfuViQ9e5/3IBKxsnEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=d4tCqrO5; arc=none smtp.client-ip=209.85.160.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="h0moRNIj"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-6ac83a09781so578363eaf.1
-        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 07:29:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="d4tCqrO5"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-455ca262ccbso769622fac.1
+        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785508148; x=1786112948; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785510070; x=1786114870; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=RjhPOZ3bdgpAm7mKb0QctoHN9xX2G/6IKethU/a6XIM=;
-        b=h0moRNIjCXcEMLCUfTSV65tAHFN5X1N+a7unU64JTlXbMFYofo4dDQtGy7SwmrzPFo
-         /RjhyIiEVU5v/JQiP5O/BxGqwJR6TbiZsRnnf4vnV7gkJ3NDyCZxW72DNQVVyWVNlLuB
-         6re+4PTeqpzV7R1qReCd8MMBOeaC2/3L49PDN9zNKipnnqwPSCbistNa8KTWPph0n6p9
-         PuO8zG5qbXalWihDCKMaHqe9lmX85noCeko+2ktwiY2gtorhysYIhW0NkDRbpD+keX4U
-         Q7x8FOjx9qycPESYi+f2nIRS0NKRNZ+Hi2wgMPpclXUZNgpOlYtVvXNowhaE0tCpQKTf
-         yHaw==
+        bh=0QWMMe323FpJCSMO/+srY4nRAHRMTDbNnpPaXX/8/JA=;
+        b=d4tCqrO52DeJTRWTIViEZUdlMomE5Z3+CvCFedNxYTPGMVMBDDkesM3kDS4PldKomW
+         I3zHUSctZfXAUQ5yF4GJvWFyNhdl1pdoKgSKPy4HeXXdvnC6GEE9p9mFrBtFSzbNZ0e0
+         MeU/ntCOEbYzhnSrfYzGWiewfJZDfjypVHovXAnSZBZxCcWOZfytK4czPrMGpMeQVj5B
+         8kRAAJHLCr30sXEQ3iRvurUK9ypImGPfGw30SCwE+ziPSE4+hyfCm0Ts8xMh10Im2EtK
+         VGm+Sq2DFb7skc7myo/B4If0YBj4QGU9Kb/SbStk5sNoKf1+3rC6Tr//3lHJShhlEuHS
+         TzyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785508148; x=1786112948;
+        d=1e100.net; s=20251104; t=1785510070; x=1786114870;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=RjhPOZ3bdgpAm7mKb0QctoHN9xX2G/6IKethU/a6XIM=;
-        b=nt7TJsWjKl6kBko/8omV3rFT37gBfSB/aoWRQqNoT1EETIBtoYAp1mMUY0lKORW716
-         FfrK+EAC2rh+OXyau/AVDBSeMVAxb/EUYomeumGc8DSDoiXC0d0dzTNTUAGmokMR8XSR
-         aI1LXbdp6L9tcQ+J9uY3kfRTf4m+jmx/JBjr/y4Dzf3aZWLzX+fY7ifbYPA+YngpKdIL
-         4t9bwbo6vn4USJvnxrmCpL8QcuJ5OJ35ICXN+JsiD93ck7jS1HR5qjguUQAcl8gv9Awx
-         Fujyh19puYpjuOqIp/3a68ag43jo49ZDmlaBE7Lj0Qjje7xulvOUwm0wQiQ3lNnVxtIp
-         wotw==
-X-Gm-Message-State: AOJu0Yzy8lWKxMp+X72S7T8YelrqeUaFvFzQdKxVkA8Lee1mocY5Y3q+
-	kyvgFKSRoETO5ZLBcYqRRWmXRG01U9M2DIk7q0S82a6k+Z0g+WWCn6/oF/DqBc3NilQ=
-X-Gm-Gg: AR+sD11X6oVi0OuDjZF/wcBSfUPvrEgkoGufZSCVaHc75WpKFSfr3Y7s0KgpQrHQpX5
-	tGn1/CmUtlM9Ks/OMrOeP5djSSmzNNkrVpXVUak0pTKnLEFlR8hyin2b+G+c7JihlXpfRTiqnMN
-	UiV0uJp4oO5CENM5jZjGEGvhOxj1MOjUrl4dYuZNJaQhvzPL++F6k/Kj8rPqD3DYoATTBLj/l8F
-	GeY8spcW6IrIoTHVr7yPmhx1ddlo6QkpcGJC5yzFT14uAO7CfBsdLGvYXj6BhsZdtUvTciZjgkR
-	5tyYlrxLLVY//N5ce9khcffSiHyLSuEpqD0SJi1d1dMICdkN/vqnjv+SfaEEDCx42PmBqumX/uH
-	0sgzaqRIIN9HNMpbL5CBtw1kPgUg+DOQhzbfMO70wija3IdP9wmRc29o3x5yKngmaqfjuqGXrQ4
-	9LuetnAqT1s2+PcrI0gsj1diBhJuNJtURz0AOz2CJvmmiCeaVImXC/c8RWX9EQilNJFbGN6IRZF
-	2SAnrOLE0j7i+zIH9F+oACwen9dLe3qApvZz2EtRw==
-X-Received: by 2002:a05:6820:1985:b0:6aa:e267:f11 with SMTP id 006d021491bc7-6ae38364f69mr2910597eaf.12.1785508147887;
-        Fri, 31 Jul 2026 07:29:07 -0700 (PDT)
+        bh=0QWMMe323FpJCSMO/+srY4nRAHRMTDbNnpPaXX/8/JA=;
+        b=QXnoiAkFE+XscRmrzpyEjwGRmZyhhndGsAhSfkhpNHwqG9OONxOkd2neYZCTb9eob4
+         yr1wYNE6oR79Hey/HBlp8RTdu3l9D8D50wSyi/Hz3WL5oQOR+85j1oJYC9S3S8zZHgn4
+         bftqXO6BY/VHyqZ7R1xr2uSZJUmVB1OQab5UCitGBy1S/x1YdjRnIZqblIIRRcF89hkD
+         3pqstPefjrrPCx6fHk8cP81hdJlStRkCC6MTN4FGCB72zshoxsHgEdBHoUTzCUtD/fLd
+         PIW4FW4D/75oAPDBKCKPK0aSJ+Dgf6TyVpcN4m4oEd/3pHJJItXaKl42Lu0R5qby1M2I
+         CW8g==
+X-Forwarded-Encrypted: i=1; AHgh+RoqVl44BYLDgFFQVFot04tNPKlTACbkp2fFSCBrhLNDH3xpmeuH1Z8m58xDWsbIHm2Xvx67AetnEgFb1w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOiDNVUHeYXfOzyamGtFXFLW/KgdVY6JDwA9grH7CXQf3wznCm
+	b3HHhzBKOc3g/7a9aHj6T4ykOTi+hLqrTy+SNxKskmBT3ABpboxrnrUardAvb/nXaHQ=
+X-Gm-Gg: AR+sD11ZZjkVXkAvTANYdd207INNgTVxfP8BYXaFLviJk8j0fhv+ZazkIwHuAmHopcU
+	4mAzEzKEZdffypIzIZGM6h8wFU9iV35u1n9JHNaL854odBMq2CbztZjiLuhf1386uHNUF2ntWmi
+	B1vD/JMMH4skNXTjlI9T13oxDHPfhFFr981g1QQ+rqyZIsfmjHK4DbQo0MWNUK4djWVDUyunxlr
+	FmgeNjb5tGmis6PgfbkfcuPNy5oAOZQUexA9qyLpLgiH/4eYlHac57r7mBxWLjBi2XeMhkchTmF
+	21JE5zwLi+HX4Q/EPnv67TtC54GQqMO5i4goCW7eaFoDqYx5rFpE29cT0t1aAMKX5n5FVed0A7E
+	QTUbzK1YON2Z/PBqcl1JKzf+9LI66Zu4FmmYlUjOcSQwkiKWoGxJ+D4eU1LwQFazDLA2FyCq+gf
+	3hjQ3oIseo/pfdpL1l+yAN5UdZkuQPIudBBd/hAF19hpUYz+u8qXfU+AnjsDCSuT0xhwT3FJhfQ
+	FVeQuVELOiEnaCe2JLhcQ6DCbX16wugh/QynbCtaA==
+X-Received: by 2002:a05:6870:92c2:b0:455:9e4c:6bd8 with SMTP id 586e51a60fabf-4590572d113mr843225fac.2.1785510069701;
+        Fri, 31 Jul 2026 08:01:09 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f664d884sm1179699fac.12.2026.07.31.07.29.06
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f67655fesm1139402fac.18.2026.07.31.08.01.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 07:29:07 -0700 (PDT)
+        Fri, 31 Jul 2026 08:01:08 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20260727142840.567286-1-sth@linux.ibm.com>
-References: <20260727142840.567286-1-sth@linux.ibm.com>
-Subject: Re: [PATCH 0/3] s390/dasd: fixes
-Message-Id: <178550814683.6950.1912092779211953730.b4-ty@b4>
-Date: Fri, 31 Jul 2026 08:29:06 -0600
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>, 
+ Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
+ Jeffle Xu <jefflexu@linux.alibaba.com>, 
+ Sandeep Dhavale <dhavale@google.com>, Hongbo Li <lihongbo22@huawei.com>, 
+ Chunhai Guo <guochunhai@vivo.com>, Tal Zussman <tz2294@columbia.edu>
+Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
+ Hillf Danton <hdanton@sina.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-mm@kvack.org, linux-erofs@lists.ozlabs.org, 
+ Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
+References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
+Subject: Re: [PATCH v7 0/5] block: enable RWF_DONTCACHE for block devices
+Message-Id: <178551006694.14426.18417795913299417263.b4-ty@b4>
+Date: Fri, 31 Jul 2026 09:01:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,28 +89,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 27 Jul 2026 16:28:37 +0200, Stefan Haberland wrote:
-> please apply the following 3 patches that partially address rather
-> important issues in the DASD driver.
-> Thanks.
+On Thu, 30 Jul 2026 02:57:50 -0400, Tal Zussman wrote:
+> Add support for using RWF_DONTCACHE with block devices.
 > 
-> Jan Höppner (1):
->   s390/dasd: Fix potential NULL pointer dereference
+> Dropbehind pruning needs to be done in non-IRQ context, but block
+> devices complete writeback in IRQ context. To fix this, we defer
+> dropbehind invalidation to task context. Add infrastructure that lets
+> bi_end_io callbacks run from a worker, in two forms:
 > 
 > [...]
 
 Applied, thanks!
 
-[1/3] s390/dasd: Fix path verification interrupted by concurrent dasd_sleep_on_immediatly
-      commit: dcba277d119af323c267d1f27f61b868dac62753
-[2/3] s390/dasd: Fix potential NULL pointer dereference
-      commit: 9973026f572db6b67570cadc30942f3014e41079
-[3/3] s390/dasd: Fix undersized format-check buffer
-      commit: 7f40b346462f563a0d6e841a77b5163d2a882a04
+[1/5] block: introduce bio_in_atomic()
+      commit: 8ed0831b5263e1aa48d99063795a1f20e4e69b50
+[2/5] block: add task-context bio completion infrastructure
+      commit: 77e73fa61b3888c9765a549af02c928372522cc9
+[3/5] iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback
+      commit: efbde6f9f449da3306f5b5d32f08829954ffb44d
+[4/5] buffer: set BIO_COMPLETE_IN_TASK for dropbehind writeback
+      commit: a2c924c240e74dc2dd14ff763245dc86b93db714
+[5/5] block: enable RWF_DONTCACHE for block devices
+      commit: 8b5ffb43ae9d27eed9165e1962963d685d879219
 
 Best regards,
 -- 
