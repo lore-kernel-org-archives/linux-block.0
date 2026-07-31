@@ -1,124 +1,103 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182021E1DF0
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 15:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D492B2E0B5C
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 16:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785510073; cv=none; b=J3K3j5iVmnHgJude6wuE6atrq+C0SCzsVbqTO08MfD5UAy4jB7vOnGO3e40rEKI1oBmaQ1RPDR8LZNi8U3gkSc4ZOFTQ13P83EzmioLHfIoNKo97NTySrqDNuc0LKRuhKgtiq7BL3yj098+w+8XAEKTIQQLEzEy98qWFLilinpo=
+	t=1785514265; cv=none; b=feCkRzdGmwW+UnO5zbY8zkXKej6tfDijMEIQYkD8AsldUsf8JCQvH7mtFZmce83xoMA2kd8LTykPjVhLewTt2lvXFBgx7pkBbUoLEo52GaE7RXFvo7w86c/1K7kEzy+8JsbMZRc2Naiwd59GIm0SGO6zDSjfGufky6pFFUjEXeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785510073; c=relaxed/simple;
-	bh=jCwR7UagNch/98g5M6Z4T9zNj9d+3bCJlJdwHm8NK5I=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mGXJMEUnG9+WwUAiAqkWyT29fp/0Nt7h9DIymzMd8ML4hiO7cfQ0vNjrVOMguWDkIyEx8JJig9UGGDdeIEp6jMvZoCisH1iAdYO+qXHk6k5NS9vJWkWY84UKoOWypJ77ivWwIs6cZbNvtWw/2h4r8DBhHfuViQ9e5/3IBKxsnEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=d4tCqrO5; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1785514265; c=relaxed/simple;
+	bh=x9RJ7SMSgLg5w8jqdPtEfg3L/BzThYw+TbjPvp47GTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S8fmnbKjrJFW0pJKvEEt8LuGSKPfziCl4Xb9R1XbsrJSbLCJFllr6TNhtAoWeHC/QFH+FY7ZmXMAEzk3hQ4hKJDcG6Io5uYAxWUhVzH3WwQsMY/1ZtbmIx4t4wJ91lamZSvNEnCzKLH3GN2YZMYPJwfYVbh7F3SpkLABopmfn84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FvjGV++v; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="d4tCqrO5"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-455ca262ccbso769622fac.1
-        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:01:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvjGV++v"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-81dfdbd86d1so12298117b3.1
+        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 09:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785510070; x=1786114870; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=0QWMMe323FpJCSMO/+srY4nRAHRMTDbNnpPaXX/8/JA=;
-        b=d4tCqrO52DeJTRWTIViEZUdlMomE5Z3+CvCFedNxYTPGMVMBDDkesM3kDS4PldKomW
-         I3zHUSctZfXAUQ5yF4GJvWFyNhdl1pdoKgSKPy4HeXXdvnC6GEE9p9mFrBtFSzbNZ0e0
-         MeU/ntCOEbYzhnSrfYzGWiewfJZDfjypVHovXAnSZBZxCcWOZfytK4czPrMGpMeQVj5B
-         8kRAAJHLCr30sXEQ3iRvurUK9ypImGPfGw30SCwE+ziPSE4+hyfCm0Ts8xMh10Im2EtK
-         VGm+Sq2DFb7skc7myo/B4If0YBj4QGU9Kb/SbStk5sNoKf1+3rC6Tr//3lHJShhlEuHS
-         TzyQ==
+        d=gmail.com; s=20251104; t=1785514263; x=1786119063; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=MBBdrgEiiLcHMNev7v4q80tW52HBpHM4ov5sou+TpNc=;
+        b=FvjGV++vI7toAfsmZ47f6dDKWqmD65apM8Z2uo+zXCyXM8AGDJsiepkda5gncT3AtP
+         bY/yGT7yjM9PwNJhMybPDcLVSe/l40fF4FBWqvTfuMACifLu6Kn5hB2GgbR5fyxTBTqY
+         /9km0FLbArxCojGl0ltg0FbUjrLIijfcOisaAn68EC07B5SIUIApJLnToa5Y174F4hxw
+         5qErzDCy8MQzCIZdr8i/4PEjnP3i7Xf7y+JsGNW4L/r60PJB7HAQ3/1dA2wJW5anljI/
+         EK6UlW06K7JPSGL0tV4QIO1z4T8h252DaAe0mWrByaDFRu8TcrZIix3jumlPYhkSGT+1
+         LTjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785510070; x=1786114870;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+        d=1e100.net; s=20251104; t=1785514263; x=1786119063;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=0QWMMe323FpJCSMO/+srY4nRAHRMTDbNnpPaXX/8/JA=;
-        b=QXnoiAkFE+XscRmrzpyEjwGRmZyhhndGsAhSfkhpNHwqG9OONxOkd2neYZCTb9eob4
-         yr1wYNE6oR79Hey/HBlp8RTdu3l9D8D50wSyi/Hz3WL5oQOR+85j1oJYC9S3S8zZHgn4
-         bftqXO6BY/VHyqZ7R1xr2uSZJUmVB1OQab5UCitGBy1S/x1YdjRnIZqblIIRRcF89hkD
-         3pqstPefjrrPCx6fHk8cP81hdJlStRkCC6MTN4FGCB72zshoxsHgEdBHoUTzCUtD/fLd
-         PIW4FW4D/75oAPDBKCKPK0aSJ+Dgf6TyVpcN4m4oEd/3pHJJItXaKl42Lu0R5qby1M2I
-         CW8g==
-X-Forwarded-Encrypted: i=1; AHgh+RoqVl44BYLDgFFQVFot04tNPKlTACbkp2fFSCBrhLNDH3xpmeuH1Z8m58xDWsbIHm2Xvx67AetnEgFb1w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOiDNVUHeYXfOzyamGtFXFLW/KgdVY6JDwA9grH7CXQf3wznCm
-	b3HHhzBKOc3g/7a9aHj6T4ykOTi+hLqrTy+SNxKskmBT3ABpboxrnrUardAvb/nXaHQ=
-X-Gm-Gg: AR+sD11ZZjkVXkAvTANYdd207INNgTVxfP8BYXaFLviJk8j0fhv+ZazkIwHuAmHopcU
-	4mAzEzKEZdffypIzIZGM6h8wFU9iV35u1n9JHNaL854odBMq2CbztZjiLuhf1386uHNUF2ntWmi
-	B1vD/JMMH4skNXTjlI9T13oxDHPfhFFr981g1QQ+rqyZIsfmjHK4DbQo0MWNUK4djWVDUyunxlr
-	FmgeNjb5tGmis6PgfbkfcuPNy5oAOZQUexA9qyLpLgiH/4eYlHac57r7mBxWLjBi2XeMhkchTmF
-	21JE5zwLi+HX4Q/EPnv67TtC54GQqMO5i4goCW7eaFoDqYx5rFpE29cT0t1aAMKX5n5FVed0A7E
-	QTUbzK1YON2Z/PBqcl1JKzf+9LI66Zu4FmmYlUjOcSQwkiKWoGxJ+D4eU1LwQFazDLA2FyCq+gf
-	3hjQ3oIseo/pfdpL1l+yAN5UdZkuQPIudBBd/hAF19hpUYz+u8qXfU+AnjsDCSuT0xhwT3FJhfQ
-	FVeQuVELOiEnaCe2JLhcQ6DCbX16wugh/QynbCtaA==
-X-Received: by 2002:a05:6870:92c2:b0:455:9e4c:6bd8 with SMTP id 586e51a60fabf-4590572d113mr843225fac.2.1785510069701;
-        Fri, 31 Jul 2026 08:01:09 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f67655fesm1139402fac.18.2026.07.31.08.01.06
+        bh=MBBdrgEiiLcHMNev7v4q80tW52HBpHM4ov5sou+TpNc=;
+        b=anOUthIr6yw19KFQ2xQ/pN6vC9u79xzTw7B4WpFidtTUv5AnSRheaRBhx9rg4SEnXx
+         1y4+QpHn1VSKbtZRjZR6lQQGeU/GJT92nnKZ3DPaYTpGocKbG9X+ItbPhrBW+Q+v7cV7
+         wi6sHi4u0/yV9s2JDaiVB2hDak2DiyRt5SDxOPyUFAefpLbx+Bfy+ujZLBpGQdSyTjFV
+         0Mykoo8gdWcwnpJwH0GemJs8uyUiRp7WUtcsqpHW22BRqn3alns9APoMnnltpvSt7My5
+         1iP5dnlxpGg3VRz2N/46FaQ0c/oQV6NfQgEdQieLhfFi2TVOoapg49BQ7sDJOT77Y9KR
+         rr2g==
+X-Forwarded-Encrypted: i=1; AHgh+RqchAZu86CDPMMLxgEtiE64xAUBDPHoQJz9N0ZjIfd1i9nKab0sBA8aDtM0fap00r65TYcZpKyxw74ScA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbn6biCxleofTYrIf1Z9eFdYFnZoNMI/KOSLvRuPDlYQh+8vUm
+	VwW3RsD6H3nnQ/h8rg9+ph8sAFMHlQ7mNJrkN7Uw33R5hG3EHmyCgrHzmd2+sNSk
+X-Gm-Gg: AR+sD131D6LLRyE0kkA4pb8Wy9j7jNioZD27n3jiM8hMfHiz/o/tQOIXCXk/oDNdqTX
+	j/O50OnJ4E/22sSt0fU2brjqBMDrBHJ9T/61qWfSalYuPhGlS4XCM3IyUYbRtPStlCXypp1fYrM
+	LHX07UUouMVp2Ds5IzgeZyMxjpNxNXgEE26MIrhIBSWPEQCfxW30XlUGNBVX5d1RTxcKZM3ITRd
+	f83GHdNj4u/Ds8Kxux4VnXjgpsR7D1uYvzTMldGtMXtcs4Jb0yi3JyrcaBBMRK7f8QfMAAMiMCy
+	frpICKE9y9iy22CIbilQkn1Hw2EhTG9IkaJn2SP1CmFa+QSeGmb61Gyfn1j9XHF8Sgr8dZT9+tS
+	pWJRO++shxW6/gOsvombNTmBdqo87HdtMWJlYvwVmiRIEFmPlR++cO4ZzTp22pRJEqAQyMUFbTK
+	h2YHb4SdIls8jbksE17FA65PHajebrKTz7Yc/fARfF4UqdhRbekWOKOJM1WkOYVDPgFv/F6iYZ4
+	kJ+b3Uxd7GFHDtqp+1ZWLkAy2d+LUwRLqhNKrZzgIyta2XtFajzaZt0CeLDoeT/3W8Q
+X-Received: by 2002:a05:690c:b95:b0:81e:4e5d:484a with SMTP id 00721157ae682-81fd49d80camr6175327b3.2.1785514262639;
+        Fri, 31 Jul 2026 09:11:02 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fcd133d96sm8958217b3.44.2026.07.31.09.10.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 08:01:08 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
- Christian Brauner <brauner@kernel.org>, 
- "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>, 
- Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
- Jeffle Xu <jefflexu@linux.alibaba.com>, 
- Sandeep Dhavale <dhavale@google.com>, Hongbo Li <lihongbo22@huawei.com>, 
- Chunhai Guo <guochunhai@vivo.com>, Tal Zussman <tz2294@columbia.edu>
-Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
- Hillf Danton <hdanton@sina.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-mm@kvack.org, linux-erofs@lists.ozlabs.org, 
- Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
-References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
-Subject: Re: [PATCH v7 0/5] block: enable RWF_DONTCACHE for block devices
-Message-Id: <178551006694.14426.18417795913299417263.b4-ty@b4>
-Date: Fri, 31 Jul 2026 09:01:06 -0600
+        Fri, 31 Jul 2026 09:11:02 -0700 (PDT)
+Date: Fri, 31 Jul 2026 11:10:53 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH v2 1/2] ublk: validate auto buf reg before taking
+ uring_cmd
+Message-ID: <amzJDfYFOL44eMe3@fedora-laptop>
+References: <20260730010910.799346-1-yangxiuwei@kylinos.cn>
+ <20260730010910.799346-2-yangxiuwei@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260730010910.799346-2-yangxiuwei@kylinos.cn>
 
-
-On Thu, 30 Jul 2026 02:57:50 -0400, Tal Zussman wrote:
-> Add support for using RWF_DONTCACHE with block devices.
+On Thu, Jul 30, 2026 at 09:09:09AM +0800, Yang Xiuwei wrote:
+> With UBLK_F_AUTO_BUF_REG, invalid sqe->addr can fail after
+> ublk_fill_io_cmd() has set UBLK_IO_FLAG_ACTIVE. The uring_cmd is
+> completed while the tag stays active, which can hang teardown.
 > 
-> Dropbehind pruning needs to be done in non-IRQ context, but block
-> devices complete writeback in IRQ context. To fix this, we defer
-> dropbehind invalidation to task context. Add infrastructure that lets
-> bi_end_io callbacks run from a worker, in two forms:
+> Split validation from buffer apply so the check has no side effects,
+> then take the uring_cmd and store the already-validated buffer. Apply
+> the same order in FETCH so io->buf is not written before __ublk_fetch()
+> state checks.
 > 
-> [...]
+> Fixes: 52460dda3a77 ("ublk: move auto buffer register handling into one dedicated helper")
+> Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
+> Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
 
-Applied, thanks!
+Nice catch!
 
-[1/5] block: introduce bio_in_atomic()
-      commit: 8ed0831b5263e1aa48d99063795a1f20e4e69b50
-[2/5] block: add task-context bio completion infrastructure
-      commit: 77e73fa61b3888c9765a549af02c928372522cc9
-[3/5] iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback
-      commit: efbde6f9f449da3306f5b5d32f08829954ffb44d
-[4/5] buffer: set BIO_COMPLETE_IN_TASK for dropbehind writeback
-      commit: a2c924c240e74dc2dd14ff763245dc86b93db714
-[5/5] block: enable RWF_DONTCACHE for block devices
-      commit: 8b5ffb43ae9d27eed9165e1962963d685d879219
-
-Best regards,
--- 
-Jens Axboe
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
 
-
+Thanks,
+Ming
