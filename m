@@ -1,199 +1,77 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D04377ABF
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B573C1998;
+	Fri, 31 Jul 2026 08:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785485770; cv=none; b=l9yZJ8YV+gSb0FnM0VKTMjRW7Uez1zdwpVenGMBllBd/fyrha2THkOpxaWicOwPt/Ms8pzn45IZJa3s/KmfUcuNbjXt2aIt2XFhnk/6KHV9DZ2ym+GWs44gK+IFaFa3tZzpAiQdsJfcc7Ww1gmBgcComZ0c2ylIY57bjtuqbK/4=
+	t=1785486256; cv=none; b=TlbImwy7X8BpSUAX6Opr3yN5q76zcU5VD0XaiWN5X2XAbv3lik/d7HQWG1YBkaibu2GNLvCSgun6KL0pbgIGqd9f/xNqCa+yI/rvsiUMtcA3P+pZSxXcLZNobuo1NJraw1nhOhVSb3cMb90Fsw+NxJTlSKwibTzbQSezHlV/3ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785485770; c=relaxed/simple;
-	bh=LEGCFb+NElwuY3sTf2zJ//Qtom6ZMlFLd44MD8RZ83E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=e+8mgCm2QhoFrbRZ518sKfgiRNNRHsVZClsyfDpnB3F5VayuiqMvOU7dsEE5IkCSlZYTpLqh5V6q9VPIMPt4q9QEgQtUyM+U4Es+duLWykruxQ0zQx6tAEL0fWUXZyUrAg95ormQUmYGtEKINlqRniJsj2W/wiAMKJXgW7pOl1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=IUprD2T2; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="IUprD2T2"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260731081553epoutp029e713390ecfa97a5f99a2b3115c87b18~HUdU5axO50809108091epoutp02l
-	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:15:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260731081553epoutp029e713390ecfa97a5f99a2b3115c87b18~HUdU5axO50809108091epoutp02l
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1785485753;
-	bh=igCw0tl9fFz2FsduIL+NR+krbiu+Jm5zFdOTxS/v3h8=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=IUprD2T2ZSo7RaVkjXYwp8ON6a6hp/6y5f23qF30bLDBMTBf4XBZmBf+/Ygrq+SF3
-	 eT0ENz+nKr4UlvsGvTRONDQBNY5Ug+sjMsX8gTm4QF/zjFl8i1+ULmT4tmzm98UDAU
-	 vz/UB3DQLPB6JJSlYOuNXXOxoZp+SP/jguDO78SY=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260731081552epcas5p4b76823bb0e23008f96a1a924c5c5f3d9~HUdUXAjer1602916029epcas5p4y;
-	Fri, 31 Jul 2026 08:15:52 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.88]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4hBJmR66Y0z2SSKY; Fri, 31 Jul
-	2026 08:15:51 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260731081551epcas5p174f7d23ac92db47b6786cd6c046a086d~HUdS1JQ-b0068600686epcas5p1L;
-	Fri, 31 Jul 2026 08:15:51 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260731081549epsmtip2dcc8941b67878e07e55eadec0e4fa9f5~HUdQzy1_U0681106811epsmtip2f;
-	Fri, 31 Jul 2026 08:15:48 +0000 (GMT)
-Message-ID: <6bb9e510-577d-4730-b0e1-c3f95c95ff1e@samsung.com>
-Date: Fri, 31 Jul 2026 13:45:48 +0530
+	s=arc-20240116; t=1785486256; c=relaxed/simple;
+	bh=rluc8i/Zl9lCBStyuXlWmXrybrCA2JmGlbdo5xZOZoA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o4JvUx3b9rTKZ7BTXON+ZSv+m6wUBbCRQJGVF+yyXDB9hz4B0LtqJ0Yjuoo7eMuPD3jPOjVQ0P/ZYkhWpfuNMADPFJCLs0jHOZ4c2R0b5NgdypJiI2433hKqIJUlk2DvmqlO4yrVIUFq1HUhy8OWU4i+s3NNHNGZlAaGwUb1jNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 2f68db128cb911f1aa26b74ffac11d73-20260731
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:06d64418-1188-4c0e-9c3b-97a842079762,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:56855669f31567fae26ca31122dd314a,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|136|865|898,TC:nil,Conte
+	nt:0|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 2f68db128cb911f1aa26b74ffac11d73-20260731
+X-User: liuxixin@kylinos.cn
+Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liuxixin@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 458950696; Fri, 31 Jul 2026 16:24:01 +0800
+From: Xixin Liu <liuxixin@kylinos.cn>
+To: mst@redhat.com
+Cc: linux-block@vger.kernel.org, virtualization@lists.linux.dev, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
+Subject: Re: [PATCH v1 2/2] virtio-blk: mark disk dead on ERS permanent failure
+Date: Fri, 31 Jul 2026 11:29:00 +0800
+Message-ID: <reply-virtio-blk-ers-mst.20260731.112900.liuxixin@kylinos.cn>
+In-Reply-To: <20260730190926-mutt-send-email-mst@kernel.org>
+References: <cover.virtio-blk-ers-v1.1780449274.git.liuxixin@kylinos.cn> <4740ae91d5be.1780449274.git.liuxixin@kylinos.cn> <20260730190926-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: brauner@kernel.org, hch@lst.de, dgc@kernel.org, jack@suse.cz,
-	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260730172211.GF3556460@frogsfrogsfrogs>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260731081551epcas5p174f7d23ac92db47b6786cd6c046a086d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319
-References: <20260717125538.508925-1-joshi.k@samsung.com>
-	<CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
-	<20260717125538.508925-2-joshi.k@samsung.com>
-	<20260721030338.GU7380@frogsfrogsfrogs>
-	<71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com>
-	<20260730172211.GF3556460@frogsfrogsfrogs>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Mailer: patches/scripts/send-local.py
 
-On 7/30/2026 10:52 PM, Darrick J. Wong wrote:
-> On Thu, Jul 30, 2026 at 08:22:51PM +0530, Kanchan Joshi wrote:
->> On 7/21/2026 8:33 AM, Darrick J. Wong wrote:
->>> On Fri, Jul 17, 2026 at 06:25:33PM +0530, Kanchan Joshi wrote:
->>>> From: Anuj Gupta<anuj20.g@samsung.com>
->>>>
->>>> Wire up the userspace interface for write stream management via four
->>>> ioctls:
->>>>
->>>>     FS_IOC_WRITE_STREAM_GET_MAX  query the max streams supported
->>>>     FS_IOC_WRITE_STREAM_OPEN     open a stream id, returns a stream fd
->>>>     FS_IOC_WRITE_STREAM_SET      attach the stream fd to an open file
->>>>     FS_IOC_WRITE_STREAM_GET      query the stream id value set on a file
->>>>
->>>> Application should query the available streams by using
->>>> FS_IOC_WRITE_STREAM_GET_MAX. If returned value is N, valid stream id for
->>>> the file are 1 to N.
->>>>
->>>> Application calls FS_IOC_WRITE_STREAM_OPEN to get fd for a stream-id.
->>>> By default, kernel picks an available stream-id and returns the fd for
->>>> it. The flag FS_WRITE_STREAM_OPEN_EXACT can be used to request a
->>>> specific stream_id. This is useful if application cares about keeping a
->>>> stable stream-id-to-spatial-isolation-bucket mapping across restarts.
->>> Hmm.  If FS_IOC_WRITE_STREAM_OPEN returns an fd that represents an open
->>> stream id, then why does STREAM_SET below take a pointer to a signed
->>> s32?
->> Not a pointer, that s32 is to pass the stream fd.
-> Oh, but that third argument to ioctl()/is/ supposed to be a pointer to
-> some data.  From ioctl(2):
-> 
-> "The third argument is an untyped pointer to memory.  It's traditionally
-> char  *argp (from the days before void * was valid C), and will be so
-> named for this discussion."
-> 
-> You can also see this reflected in the discussion of the R/W/WR variants
-> of _IO:
-> https://docs.kernel.org/driver-api/ioctl.html
-> 
-> "[data_type] may be a pointer to data to be passed into the kernel
-> (_IOW), out of the kernel (_IOR), or both (_IOWR)"
-> 
-> Granted your kernel code can treat that argp as an integer and not a
-> __user pointer if it wants to, but that goes against most ioctl
-> implementations.  Further, subsystems that marshal ioctl information for
-> passing through to another layer (e.g. fuse) assume that the third
-> argument is a pointer and that it can copy sizeof(data_type) bytes at
-> that address in and out of the kernel as part of marshalling.
+Hi,
 
-Next version will refactor all ioctls to use pointer to struct.
+On Thu, 30 Jul 2026, Michael S. Tsirkin wrote:
+> Can you tell me was this written with use of AI? I ask because not many
+> people go out of their way to put in unicode dashes. Next step is what
+> emojis? Let's not go there pls.
+> And if yes pls disclose that as per Documentation.
 
->>> And why does STREAM_GET take a pointer to a u32?
->> This also is a scalar value and not a pointer. The returned stream-id is
->> a u32.
->>
->>> IOWs it'd be much easier to distinguish these things if the ioctls took
->>> pointers to structs instead of u32/s32 pointers directly.
->> Maybe IOCTL naming is the source of confusion, because we introduced
->> stream-fds alongside stream-ids. More on this below.
->>> Also it's a little weird that STREAM_SET associates an open file with a
->>> stream fd, but STREAM_GET returns the stream*id* (not the fd)
->>> associated with an open file.
->> The confusion stems from keeping symmetric names for different
->> operations. Let me explain the intent and propose revised names below.
->>
->> Christoph's idea was to use FD for a write-stream so that it remains
->> exclusive to the application and unrelated applications don't collide.
->>
->> So, in this version, write-stream ids are implemented as independent
->> resource:
->> - To set a file's write-stream ID to X, the app must first obtain the fd
->> for stream X.
->> - That stream/fd will be unavailable if some other application has
->> already opened it.
->> - If applications gets the stream fd, it can use that to set stream id
->> for multiple files.
->> - It can close the stream-fd and that does not change anything for the
->> file resource (i.e, its inode continue to carry the stream-id value that
->> was set).
->>
->> Christoph - does this match?
->>
->> Here are the revised names (suggestions?):
->>
->> 1. FS_IOC_QUERY_MAX_WRITE_STREAM_IDS		_IOR('f', 135, __u32)
->>
->> Returns (in __u32) number of supported stream-ids.
->>
->> 2. FS_IOC_OPEN_WRITE_STREAM_ID			_IOWR('f', 136, struct
->> fs_write_stream_open)
->>
->> Open the specific write-stream id (or any available one via a flag) and
->> return its FD. This gives right to use that stream-id.
->>
->> And the following manage setting/clearing/querying write-stream on the file:
->>
->> 3. FS_IOC_SET_FILE_WRITE_STREAM_BY_FD		_IOW('f', 137, __s32)
->>
->> Sets a file's write-stream value (in inode) to whatever the stream fd
->> (passed as __s32) carries. So one never sets scalar values into a file
->> directly.
->>
->> 4. FS_IOC_QUERY_FILE_WRITE_STREAM_ID		_IOR('f', 138, __u32)
->>
->> Queries the write-stream value (__u32) currently assigned to the file
->> (its inode).
->>
->> 5. FS_IOC_CLEAR_FILE_WRITE_STREAM_ID		_IO('f', 139)
->>
->> To clear (zeroing) the write-stream value on the file's inode.
->>
->>
->>> Can you extract the stream id from the fd that FS_IOC_WRITE_STREAM_OPEN
->>> returns?
->> Can be done by implementing the ioctl handler for that stream fd, but
->> did not feel the need of it. Do you see the utility? If yes, name can
->> potentially be FS_IOC_QUERY_WRITE_STREAM_ID_FROM_FD.
-> Why not reuse FS_IOC_QUERY_FILE_WRITE_STREAM_ID?
+Yes. I will add Assisted-by for the LLM help in v2.
 
-That's for the file (with data), it requires regular file-fd. It's not 
-working on the stream-fd. You asked for knowing the stream-id associated 
-to stream-fd.
+> Do we need this? virtqueue add will fail anyway.
+
+For a broken vq, yes, virtqueue_add already fails. The useful part is
+the !vblk->vqs check: after reset_prepare/freeze_priv the vqs pointer
+can be NULL, and virtio_queue_rq would deref it before add. v2 drops
+disk_live() and keeps only the NULL guards.
+
+> why not break first?
+
+Agreed. v2 calls virtio_break_device() before flush_work().
+
+Thanks,
+Xixin
+
