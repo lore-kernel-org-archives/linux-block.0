@@ -1,149 +1,92 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D40F3CA4A1;
-	Fri, 31 Jul 2026 08:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF41E3D8103
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785486494; cv=none; b=HVFwRuH8W78Mg1S7w6X7WHkxxn4dBngJhT7tW6I5CzD1VacIeTzF8Zlag7nPGt4CoO3nATnNnbEK+aTT89i6onbtpm2IkaduEski3VQ6YC+vwuiNNYOQAK3k8FiEFkokESJMCwkw2ig9+rAHIcBC40z4M6uOGw71WhRRzDrv6Rg=
+	t=1785487163; cv=none; b=nF09RhNACeP/zf05sHo9xCvB0jN9PRyNBlmcXeztr39ic2EYV0kKwtB/on0qNF8k3YMiVgtZyD4P29iq1uC+VLVzR18kCV7LlN+yFrgNf+ue5Sn1k8tG3XvBhE7+dF0QfAc0yq58BBG1PhnAw2ygBb1wME/k1O2XRKv4r2gCLgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785486494; c=relaxed/simple;
-	bh=FQUPIAbssfpQ9jLczp7dPjjNnSntGlBzBK6tvTkXyR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lMAHQiSBETedgiV3bHmekrV+Kv5y+aGPQDFVqMjInNGNo7hEBlNYO4xrP1lRqkSq4wv1Uo446BcPHXhPqlc7P+DkmezqmrA2R3PAa1daUWDTKSpnABFrJ50nqesfjdGwbYHknaiNn5Nmse3uJJLZDsMM39ioylKS9/g6E1AI0kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c0f33cb28cb911f1aa26b74ffac11d73-20260731
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:3bff46a1-0fd1-4718-9f95-36be00e2dfd5,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:e7bac3a,CLOUDID:406ff3e5adb88fbb9168c29cee2fced8,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|136|865|898,TC:nil,Content:0|1
-	5|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI
-	:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c0f33cb28cb911f1aa26b74ffac11d73-20260731
-X-User: liuxixin@kylinos.cn
-Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <liuxixin@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1694241203; Fri, 31 Jul 2026 16:28:05 +0800
-From: Xixin Liu <liuxixin@kylinos.cn>
-To: linux-block@vger.kernel.org
-Cc: virtualization@lists.linux.dev, mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
-Subject: [PATCH v2 2/2] virtio-blk: mark disk dead on ERS permanent failure
-Date: Fri, 31 Jul 2026 11:19:00 +0800
-Message-ID: <4740ae91d5be.v2.1785468000.git.liuxixin@kylinos.cn>
-In-Reply-To: <cover.virtio-blk-ers-v2.1785468000.git.liuxixin@kylinos.cn>
-References: <cover.virtio-blk-ers-v1.1780449274.git.liuxixin@kylinos.cn> <cover.virtio-blk-ers-v2.1785468000.git.liuxixin@kylinos.cn>
+	s=arc-20240116; t=1785487163; c=relaxed/simple;
+	bh=9twirzm5nktw8mCQZKCsisWF22u3KfRsBskDwndW4Kk=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nweak+nxBq7AMOG9WooGl8VKgccXsrzzJDliNreHNAoEbvyT2Zc4ybAUQmB/cdnaCyfmB+Lm3E3Ym7l1ByNc3trV23NJQiMgk4PuymWCmRwXctxCelF5wk+dTVHukfja2kWJglFxPi2hro1NzXCr0PHbLm9CvFf2GrWqYOWDXKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cjb/dd+5; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cjb/dd+5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B614D1F00A3A
+	for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 08:39:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785487161;
+	bh=9twirzm5nktw8mCQZKCsisWF22u3KfRsBskDwndW4Kk=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=cjb/dd+51J8KLsvFQz1XCBr/Eh1elTDHf+94E8yxXnjPA5Myp3+d9527UZ63cP7DX
+	 A/uoKegoL+ZNdNCEWYYyIKjekXBIQn+ciLwfj17ngQElOo0YP1TstGOhIa3UwLRfij
+	 9RJ5sDQoLVxRcS5HEXowRGtJAUGRaCfTfuhjwJsOXK0kqIdRBuIAJRXaWOELobG7+p
+	 RFrL3UjoS19yoc2drI2021i472x/CxOXQCElYIFZVtqMoP3Fu9NjZ8nKxH1sK1CCXA
+	 ST31OZhhFcckXXFUZ5hsL05RIUGw79RMw7GKySri7MEgHiUGOWpmg/P+5Kc+w9jyAU
+	 FyHv+39gTplaw==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-39c7ac9b8c3so6373641fa.0
+        for <linux-block@vger.kernel.org>; Fri, 31 Jul 2026 01:39:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrAVkAUKUxBu7CUyN1GPIdripZrUJLpNDrnqXAtx6+lnQjHyZ8nsRXYp6j0DoJ+dgA1xBsK8p9ajDMl4Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi0ZZL6W72EMQwqwCejfmuro5d9DhfXGjIHlSTyadOMWPiA2Np
+	GdQTozCWeh8vR6INZB74hfGMlCCL791nJoVU9vSNa8TTBAz6jsR+yVYYvTAW23fSDCdiyZHV+HV
+	eElJRzaA46ewO8g8clahqNUVGkqPNUFFItcaI8TLm3A==
+X-Received: by 2002:a2e:a806:0:b0:39a:fec6:efd0 with SMTP id
+ 38308e7fff4ca-39f7e3b70e1mr2581091fa.23.1785487160524; Fri, 31 Jul 2026
+ 01:39:20 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 31 Jul 2026 01:39:17 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 31 Jul 2026 01:39:17 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260730-block-as-nvmem-v9-1-f72935817dbf@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: patches/scripts/send-local.py
+References: <20260730-block-as-nvmem-v9-0-f72935817dbf@oss.qualcomm.com> <20260730-block-as-nvmem-v9-1-f72935817dbf@oss.qualcomm.com>
+Date: Fri, 31 Jul 2026 01:39:17 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MdRd-FgAa+NMf-GZLi05G8PrGjD9LB2h7dQ=9iXiLh9sw@mail.gmail.com>
+X-Gm-Features: AUfX_myHE9QF2TZrMuCq1Fl8GoUB-sokgcKRRxyeNwASqhiRSWL8Z59R0TWE-vo
+Message-ID: <CAMRc=MdRd-FgAa+NMf-GZLi05G8PrGjD9LB2h7dQ=9iXiLh9sw@mail.gmail.com>
+Subject: Re: [PATCH v9 01/10] dt-bindings: mmc: Document fixed-layout NVMEM
+ provider support
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-After ERS reports pci_channel_io_perm_failure, virtio-pci must ask the
-virtio driver to tear down the block device, not only mark virtqueues
-broken.  Call the virtio driver shutdown hook from virtio-pci on
-perm_failure; virtio-blk implements shutdown with blk_mark_disk_dead().
+On Thu, 30 Jul 2026 18:00:31 +0200, Loic Poulain
+<loic.poulain@oss.qualcomm.com> said:
+> Allow an eMMC hardware partition node to describe an NVMEM layout so the
+> partition can be exposed as an NVMEM provider. This lets a partition
+> (e.g. an eMMC boot partition) store device-specific information such as a
+> WiFi MAC address or a Bluetooth BD address and reference it through NVMEM
+> cells.
+>
+> Accept "fixed-layout" as the partition node compatible, in addition to
+> "fixed-partitions", so the layout can be described directly on the
+> partition node.
+>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-Fail new requests early in virtio_queue_rq when virtqueues were removed
-during frozen reset_prepare (vqs == NULL).  A broken vq already fails in
-virtqueue_add; no separate disk_live() check is needed.
-
-Assisted-by: DeepSeek:deepseek-v3
-Signed-off-by: Xixin Liu <liuxixin@kylinos.cn>
----
- drivers/block/virtio_blk.c         | 31 ++++++++++++++++++++++++++++++
- drivers/virtio/virtio_pci_common.c | 10 +++++++++-
- 2 files changed, 40 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 32bf3ba07a9d..fda2d4f3c7c6 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -435,6 +435,12 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t status;
- 	int err;
- 
-+	/* VQs may be gone after frozen reset_prepare; avoid NULL deref. */
-+	if (unlikely(!vblk->vqs || !vblk->vdev)) {
-+		blk_mq_start_request(req);
-+		return BLK_STS_IOERR;
-+	}
-+
- 	status = virtblk_prep_rq(hctx, vblk, req, vbr);
- 	if (unlikely(status))
- 		return status;
-@@ -1561,6 +1567,30 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	return err;
- }
- 
-+
-+/* Stop I/O and mark the gendisk dead (ERS perm_failure or system shutdown). */
-+static void virtblk_shutdown(struct virtio_device *vdev)
-+{
-+	struct virtio_blk *vblk = vdev->priv;
-+	struct request_queue *q;
-+	unsigned int memflags;
-+
-+	if (!vblk || !vblk->disk)
-+		return;
-+
-+	virtio_break_device(vdev);
-+	flush_work(&vblk->config_work);
-+
-+	q = vblk->disk->queue;
-+	memflags = blk_mq_freeze_queue(q);
-+	blk_mq_quiesce_queue_nowait(q);
-+
-+	blk_mark_disk_dead(vblk->disk);
-+
-+	blk_mq_unquiesce_queue(q);
-+	blk_mq_unfreeze_queue(q, memflags);
-+}
-+
- static void virtblk_remove(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk = vdev->priv;
-@@ -1684,6 +1714,7 @@ static struct virtio_driver virtio_blk = {
- 	.probe				= virtblk_probe,
- 	.remove				= virtblk_remove,
- 	.config_changed			= virtblk_config_changed,
-+	.shutdown			= virtblk_shutdown,
- #ifdef CONFIG_PM_SLEEP
- 	.freeze				= virtblk_freeze,
- 	.restore			= virtblk_restore,
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index fff6b6e2d0c5..957b3282865c 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -849,7 +849,15 @@ static pci_ers_result_t virtio_pci_error_detected(struct pci_dev *pci_dev,
- 	case pci_channel_io_perm_failure:
- 		dev_warn(&pci_dev->dev,
- 			 "permanent failure, disconnecting device\n");
--		virtio_break_device(&vp_dev->vdev);
-+		{
-+			struct virtio_driver *drv =
-+				drv_to_virtio(vp_dev->vdev.dev.driver);
-+
-+			if (drv && drv->shutdown)
-+				drv->shutdown(&vp_dev->vdev);
-+			else
-+				virtio_break_device(&vp_dev->vdev);
-+		}
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	default:
- 		break;
--- 
-2.43.0
-
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
