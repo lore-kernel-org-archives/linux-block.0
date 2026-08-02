@@ -1,503 +1,313 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D1E3546DE
-	for <linux-block@vger.kernel.org>; Sat,  1 Aug 2026 15:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F82C171CD
+	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 00:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785599554; cv=none; b=CRWVngHBHS+ogjb3B0b8CTe8sJckAIMN3FZjxoGsECq9awNHHLneu7WoasBZ+kZWC2EY92sQUzMWoYHM40GNg/zu7IK6bzzQ4aGWBOoJpEpBP2bHOeWQoBw8MQRzszozE3bu2ll4eSTrBh4KvrXENhVfa0UypdjA1zWOSIaHogA=
+	t=1785629193; cv=none; b=KeJAtVD7fEKvkChUjZ8cNT4FfliUSpdFIW+8q8SiZ9T6COUvCXajGI5DZdryHla6nX5xflewhd19qOwMmrE/mQnQ3bLLq73ZELD1P/aA//ozrJ27odLZNxtplaYKLQOl/kBbNu9Kp3xGm/ExiYxxQjlh4g8mueUuF5mHY06kUpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785599554; c=relaxed/simple;
-	bh=xQSghJzaUYqDPB1ggORLjLa8iy+vN2lmRYgeYFBaKdE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c2UJIeXs5gomJqHQw3ZpEoVmusl/a+mCYCxxRx0phNrch7b3+z5nwkxTXCMk3G9WFRF4ynq9T7IL6RALr/EbIPScaI0ZkwUsc8OlXccvpVr16XI1Xmwf6yplHcz+nTXWKdIqig8ppQqU3nrrTx39Y/w93hh9s4Dm/3BdWNdCMBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G8iTKkgT; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G8iTKkgT"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2cacb8416a1so20117055ad.1
-        for <linux-block@vger.kernel.org>; Sat, 01 Aug 2026 08:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785599551; x=1786204351; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xsD2wsQNoOd5TnS/nE5N1rbXimmf2sYMA/5eIflw47E=;
-        b=G8iTKkgT8TIOThO29caVbsRYEAJmzY1HjfZgbrNb9vDFlq5XV/jo6toSmh6e3CDasa
-         juKI/CTqz3Zlirc4eje9DflMGLV4JrnDRIyQbEWqa/rFLOznV87WWYHQEl4sz3j2YMBP
-         NvawH46IZWOM0d1+kxmAFnM9fnhMVJcmoSD6jWQtnGYqd8SMvWC3UG6CCilaQZ30smIG
-         /Fn2jdv3rGMb/I0b25pe9I2XWMkO8yV8p0InyHJXFXlX8L1ZGlDQudjdEwmkMA928ePM
-         GAteNWoSlKiyC7qbc8OY0Wof4Vz+CGE5pfQ1YMAjW4xzQnHNHdwD+7erROpvsKmnK7sx
-         KV6g==
+	s=arc-20240116; t=1785629193; c=relaxed/simple;
+	bh=MF3qNT5JzshShpOon7g/o1a6DDefgrhAn7k+5nhdDJQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=czvmqSnJ0n8SYq0uXrrlSA7YdudKWPAkaeNVaLVL0QRLhp8IgtGA6rzFeWOHa1i/rYq3vHI5Z6BK5fe8bWP31HvCKGcs950GZnrYa04GrC5LjaWMwmC8JjA2TOIBV51lU5oX8GqLN4/jYxuzCeaneKVBM5VSJTR3nb0FAAwoKFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-4a49f09233dso1556774b6e.2
+        for <linux-block@vger.kernel.org>; Sat, 01 Aug 2026 17:06:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785599551; x=1786204351;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xsD2wsQNoOd5TnS/nE5N1rbXimmf2sYMA/5eIflw47E=;
-        b=KtgZVRJ39lyoc0Vqeym6SC84g7Bv6roqktDNOd0WUyhvLg8r8Xbpwe3VG7J/py9K07
-         0u1xucc1hh71IqGYtRPNa/FGSVTIFd3/g9f6KKUKhWr6jTgKmLWngILGIxHK01FLV4Em
-         iFI8eNn/bP8s5FZ/Su8wHM0yAEHLL8bLXv4ux1C7hX65KqB/Nw1GBgFNnhiQFUvb12Od
-         FgjQqZrFiAKDHe/HZfPKv1tNlJUHCPH+3Ahr52Gvy1BCxXTOmYZH2gw6vB/w7xzW07XP
-         J3yt0fPNxp3oh3k8JRFDwcwcNdrfhefVD93ph6VeKC6RqfdbKVQmREVfZTz65WKWpwWe
-         fZkw==
-X-Forwarded-Encrypted: i=1; AHgh+RrnSxKUkJjyAfSSH5HFQcckP6LvXgDl8MLq4Z+ugzvGHOs2it63IwUoJc+4wxa8g+bpQTE2q7XVtogkMw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLrf24K3Ilw7UFPb966vX/X7HD4CsCDsZLADGHEQHsfyBTfTRO
-	bAvcLwhIBGbw6TexOV7wdR+/kHOOGii6dFC1v3HMdfG6D2ALazSVDLAl
-X-Gm-Gg: AR+sD10zBX00K2yvDGufyPkjKVmCgASqvdAyT+zL/OS5Sk6kwuPU51wHgf+0sFQx/T3
-	1rTqfXAwyU9Yrgv4EJYLV4LtWZbB0ApZrglMJKW+j+fPWTTrnY2LoNc5CLLqiIVvAIyyFgYwoPp
-	tA79rQfyBb60ptoiQLRn15UCgJ9TC/4uxMLdXiRUUpXNcjPCeQQQEUapOpkYN/GzgaYN4V/F9xu
-	2/SWYXU+q7nM0E00dFKuH/82IDC/3A6PF7hqlQQ6yZThGpsi3/fYL1tYkeH/2JPSJyO2TRxtCR+
-	nn/kVCCDryYetZrmXWRsZwOiRjjIWFb/oi0p2aQ0dhb6ex0MBrGtKYw3bl9gDxoFMncU9yQBJqD
-	4/hzr3AqGgTA5NnqsKV1LVQhySS8dm+/JzWu0EUtAgWCKbElvoVLeFZPaeBXiTXa8kPeB5oGCle
-	JTOODS8E0Xm/ZNl3sa3H4H2iTv4jlT1pArPtGtPosSvcYBZE7eJCk4681A1/p6yJnFUGgGty3eP
-	cLBLwDPywFqjMB0yF7ZWUgv4G7R9tuOKEpPKfD8yfQoRUQ=
-X-Received: by 2002:a17:902:cecf:b0:2c9:97a8:aff4 with SMTP id d9443c01a7336-2d0523f7772mr36487975ad.45.1785599550923;
-        Sat, 01 Aug 2026 08:52:30 -0700 (PDT)
-Received: from 127.net ([2620:10d:c092:600::1:61d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d04b12202bsm18287605ad.66.2026.08.01.08.52.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Aug 2026 08:52:30 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org
-Cc: asml.silence@gmail.com,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	David Sterba <dsterba@suse.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	dm-devel@lists.linux.dev,
-	nvdimm@lists.linux.dev,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org
-Subject: [PATCH v5 16/16] io_uring/rsrc: add dmabuf backed registered buffers
-Date: Sat,  1 Aug 2026 16:46:28 +0100
-Message-ID: <830cd62ae8958351a9fcd6d663dea3430921f95b.1785596451.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <cover.1785596451.git.asml.silence@gmail.com>
-References: <cover.1785596451.git.asml.silence@gmail.com>
+        d=1e100.net; s=20251104; t=1785629190; x=1786233990;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=50u/CnI98VFK97GPV5K7XtkLtAPhB1tnW1eSYuEqTLg=;
+        b=EwUryNcg2TGhOQtvo5Cv3mylBPJaUVrZ33WC9yW8m6g4umGv6md4pv+jPF9rZiwCu0
+         rRP+Ts5/ulEG0e7E+YOUtrKBYFC28l3LOVaCbIpj3litxLc0JXKliQAJHAy0cUmPV9Os
+         4DFZLFhhXIHSpLzrScTbl7afMZH8o6PguGZ+1zcdio+dc7Eax7PQVWAvfhL3ZK5otQ8L
+         b6RgVcD2wpOhZEWLVahyN+jNSNts71odFycK+Xh5mLMK0BdgQbTLqLlA9v4IFvi5lLdt
+         RWGMszJJ09bXYY/r1i3y9ejFBCmhR2IOzRdawxf2HinLS27S2Uxko7nalXEdr6MfzJhc
+         PoxA==
+X-Forwarded-Encrypted: i=1; AHgh+RpQex/vXxHEQkvOiD2twxXWbdv16GjjdRyG1IwNEinIU+uuyFE7lTUlqT29GUfpGpJg/kRzs6atZg7Aow==@vger.kernel.org
+X-Gm-Message-State: AOJu0YypXeKdii1v9o/+ggLgj8IpgXy1rOz6P/YCSvXB2OYTgqplPKmq
+	V9qsYcGrgFMtMqQXdTrEaqSjaHtGjBgnhlKvLahN5/EJgvHKJPRkNXvekFFeu6+lKbE+kaGTFrk
+	tE7LOG/LmViTuR2ul11T/NoW4ZbQzYYZd3l036ihG7ca1qrDD3IKOtUIYEaU=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:1a21:b0:496:fd2:94e8 with SMTP id
+ 5614622812f47-4af5e1b5af2mr8007488b6e.12.1785629190418; Sat, 01 Aug 2026
+ 17:06:30 -0700 (PDT)
+Date: Sat, 01 Aug 2026 17:06:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a6e8a06.6ce73036.24301b.0015.GAE@google.com>
+Subject: [syzbot] [block?] [cgroups?] possible deadlock in blkcg_deactivate_policy
+ (2)
+From: syzbot <syzbot+14254d81dd19ba7d7e41@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Implement dmabuf backed registered buffers. To register them, the user
-should specify IO_REGBUF_TYPE_DMABUF for the regitration and pass the
-desired dmabuf fd and a file for which it should be registered.
+Hello,
 
-From there, it can be used with io_uring read/write requests
-IORING_OP_{READ,WRITE}_FIXED) as normal. The requests should be issued
-against the file specified during registration, and otherwise they'll be
-failed. The user should also be prepared to handle spurious -EAGAIN by
-reissuing the request.
+syzbot found the following issue on:
 
-Internally, dmabuf registered buffers is an optin feature for io_uring
-request opcodes and they should pass a special flag on import to use it.
+HEAD commit:    3708dd948844 Merge tag 'pm-7.2-rc6' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11fa7a49580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=145fa60d73086782
+dashboard link: https://syzkaller.appspot.com/bug?extid=14254d81dd19ba7d7e41
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
 
-Suggested-by: David Wei <dw@davidwei.uk>
-Suggested-by: Vishal Verma <vishal1.verma@intel.com>
-Suggested-by: Tushar Gohad <tushar.gohad@intel.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/aa997b3eeef4/disk-3708dd94.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1ab7e579d11e/vmlinux-3708dd94.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7038f45d2e15/bzImage-3708dd94.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+14254d81dd19ba7d7e41@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L     
+------------------------------------------------------
+syz.9.12466/9015 is trying to acquire lock:
+ffff8880283a3bc0 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkcg_deactivate_policy+0x167/0x600 block/blk-cgroup.c:1681
+
+but task is already holding lock:
+ffff8880553aa8b8 (&eq->sysfs_lock){+.+.}-{4:4}, at: elevator_exit+0x88/0xf0 block/elevator.c:160
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #5 (&eq->sysfs_lock){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       elevator_exit+0x88/0xf0 block/elevator.c:160
+       elevator_switch+0x3a7/0x7e0 block/elevator.c:580
+       elevator_change+0x352/0x530 block/elevator.c:681
+       elevator_set_none+0x92/0xf0 block/elevator.c:769
+       blk_unregister_queue+0x178/0x310 block/blk-sysfs.c:1073
+       __del_gendisk+0x2e3/0xb20 block/genhd.c:739
+       del_gendisk+0x10e/0x1b0 block/genhd.c:819
+       loop_remove drivers/block/loop.c:2112 [inline]
+       loop_control_remove drivers/block/loop.c:2171 [inline]
+       loop_control_ioctl+0x4f8/0x620 drivers/block/loop.c:2213
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #4 (&q->elevator_lock){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       elevator_change+0x1bc/0x530 block/elevator.c:679
+       elv_iosched_store+0x3be/0x460 block/elevator.c:826
+       queue_attr_store+0x25f/0x2f0 block/blk-sysfs.c:906
+       sysfs_kf_write+0xf2/0x150 fs/sysfs/file.c:145
+       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
+       new_sync_write fs/read_write.c:595 [inline]
+       vfs_write+0x6ac/0x1050 fs/read_write.c:687
+       ksys_write+0x12a/0x250 fs/read_write.c:739
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #3 (&q->q_usage_counter(io)#17){++++}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       blk_alloc_queue+0x610/0x790 block/blk-core.c:504
+       blk_mq_alloc_queue+0x174/0x290 block/blk-mq.c:4420
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4467
+       loop_add+0x498/0xb60 drivers/block/loop.c:2041
+       loop_init+0x1d3/0x200 drivers/block/loop.c:2280
+       do_one_initcall+0x11d/0x700 init/main.c:1347
+       do_initcall_level init/main.c:1409 [inline]
+       do_initcalls init/main.c:1425 [inline]
+       do_basic_setup init/main.c:1445 [inline]
+       kernel_init_freeable+0x6ea/0x7b0 init/main.c:1658
+       kernel_init+0x1f/0x1e0 init/main.c:1548
+       ret_from_fork+0x72b/0xd50 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #2 (fs_reclaim){+.+.}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       __fs_reclaim_acquire mm/page_alloc.c:4329 [inline]
+       fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4343
+       might_alloc include/linux/sched/mm.h:317 [inline]
+       prepare_alloc_pages+0x166/0x5f0 mm/page_alloc.c:5048
+       __alloc_frozen_pages_noprof+0x1af/0x2dc0 mm/page_alloc.c:5293
+       __alloc_pages_noprof+0xb/0x110 mm/page_alloc.c:5338
+       __alloc_pages_node_noprof include/linux/gfp.h:291 [inline]
+       alloc_pages_node_noprof include/linux/gfp.h:318 [inline]
+       pcpu_alloc_pages mm/percpu-vm.c:95 [inline]
+       pcpu_populate_chunk+0x118/0x990 mm/percpu-vm.c:285
+       pcpu_alloc_noprof+0x881/0x1ca0 mm/percpu.c:1876
+       bpf_map_alloc_percpu+0x9a/0xf0 kernel/bpf/syscall.c:584
+       prealloc_init kernel/bpf/hashtab.c:339 [inline]
+       htab_map_alloc+0x1054/0x14e0 kernel/bpf/hashtab.c:639
+       map_create_alloc kernel/bpf/syscall.c:1523 [inline]
+       map_create+0x874/0x3120 kernel/bpf/syscall.c:1640
+       __sys_bpf+0x2a6e/0x4e80 kernel/bpf/syscall.c:6395
+       __do_sys_bpf kernel/bpf/syscall.c:6537 [inline]
+       __se_sys_bpf kernel/bpf/syscall.c:6534 [inline]
+       __x64_sys_bpf+0xce/0x140 kernel/bpf/syscall.c:6534
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (pcpu_alloc_mutex){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       pcpu_alloc_noprof+0xe87/0x1ca0 mm/percpu.c:1788
+       percpu_ref_init+0x37/0x3f0 lib/percpu-refcount.c:72
+       blkg_alloc+0xf0/0xf80 block/blk-cgroup.c:313
+       blkg_conf_prep+0x46e/0xf10 block/blk-cgroup.c:873
+       tg_set_conf.isra.0+0x1ed/0x500 block/blk-throttle.c:1373
+       cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4316
+       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
+       new_sync_write fs/read_write.c:595 [inline]
+       vfs_write+0x6ac/0x1050 fs/read_write.c:687
+       ksys_write+0x12a/0x250 fs/read_write.c:739
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&q->blkcg_mutex){+.+.}-{4:4}:
+       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3165
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x136c/0x1a40 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       blkcg_deactivate_policy+0x167/0x600 block/blk-cgroup.c:1681
+       bfq_exit_queue+0x29d/0x430 block/bfq-iosched.c:7165
+       blk_mq_exit_sched+0x20e/0x4e0 block/blk-mq-sched.c:702
+       elevator_exit+0x93/0xf0 block/elevator.c:161
+       elevator_switch+0x3a7/0x7e0 block/elevator.c:580
+       elevator_change+0x352/0x530 block/elevator.c:681
+       elevator_set_none+0x92/0xf0 block/elevator.c:769
+       blk_unregister_queue+0x178/0x310 block/blk-sysfs.c:1073
+       __del_gendisk+0x2e3/0xb20 block/genhd.c:739
+       del_gendisk+0x10e/0x1b0 block/genhd.c:819
+       loop_remove drivers/block/loop.c:2112 [inline]
+       loop_control_remove drivers/block/loop.c:2171 [inline]
+       loop_control_ioctl+0x4f8/0x620 drivers/block/loop.c:2213
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &q->blkcg_mutex --> &q->elevator_lock --> &eq->sysfs_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&eq->sysfs_lock);
+                               lock(&q->elevator_lock);
+                               lock(&eq->sysfs_lock);
+  lock(&q->blkcg_mutex);
+
+ *** DEADLOCK ***
+
+3 locks held by syz.9.12466/9015:
+ #0: ffff8880283cc3a0 (&set->update_nr_hwq_lock){++++}-{4:4}, at: del_gendisk+0x106/0x1b0 block/genhd.c:818
+ #1: ffff8880283a3d68 (&q->elevator_lock){+.+.}-{4:4}, at: elevator_change+0x1bc/0x530 block/elevator.c:679
+ #2: ffff8880553aa8b8 (&eq->sysfs_lock){+.+.}-{4:4}, at: elevator_exit+0x88/0xf0 block/elevator.c:160
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 9015 Comm: syz.9.12466 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/16/2026
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+ print_circular_bug.cold+0x178/0x1c7 kernel/locking/lockdep.c:2043
+ check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
+ check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3165
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x136c/0x1a40 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5825
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+ blkcg_deactivate_policy+0x167/0x600 block/blk-cgroup.c:1681
+ bfq_exit_queue+0x29d/0x430 block/bfq-iosched.c:7165
+ blk_mq_exit_sched+0x20e/0x4e0 block/blk-mq-sched.c:702
+ elevator_exit+0x93/0xf0 block/elevator.c:161
+ elevator_switch+0x3a7/0x7e0 block/elevator.c:580
+ elevator_change+0x352/0x530 block/elevator.c:681
+ elevator_set_none+0x92/0xf0 block/elevator.c:769
+ blk_unregister_queue+0x178/0x310 block/blk-sysfs.c:1073
+ __del_gendisk+0x2e3/0xb20 block/genhd.c:739
+ del_gendisk+0x10e/0x1b0 block/genhd.c:819
+ loop_remove drivers/block/loop.c:2112 [inline]
+ loop_control_remove drivers/block/loop.c:2171 [inline]
+ loop_control_ioctl+0x4f8/0x620 drivers/block/loop.c:2213
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f266f39e019
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2670208028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f266f625fa0 RCX: 00007f266f39e019
+RDX: 0000000000000000 RSI: 0000000000004c81 RDI: 0000000000000003
+RBP: 00007f266f43500c R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f266f626038 R14: 00007f266f625fa0 R15: 00007ffd3333f748
+ </TASK>
+
+
 ---
- include/linux/io_uring_types.h |   5 +
- include/uapi/linux/io_uring.h  |   6 +-
- io_uring/io_uring.c            |   3 +-
- io_uring/rsrc.c                | 167 ++++++++++++++++++++++++++++++++-
- io_uring/rsrc.h                |  18 ++++
- io_uring/rw.c                  |   6 +-
- 6 files changed, 197 insertions(+), 8 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
-index a2c623a67a25..f90586d353c1 100644
---- a/include/linux/io_uring_types.h
-+++ b/include/linux/io_uring_types.h
-@@ -10,6 +10,7 @@
- 
- struct iou_loop_params;
- struct io_uring_bpf_ops;
-+struct dma_buf_io_map;
- 
- enum {
- 	/*
-@@ -594,6 +595,7 @@ enum {
- 	REQ_F_IMPORT_BUFFER_BIT,
- 	REQ_F_SQE_COPIED_BIT,
- 	REQ_F_IOPOLL_BIT,
-+	REQ_F_DROP_DMABUF_BIT,
- 
- 	/* not a real bit, just to check we're not overflowing the space */
- 	__REQ_F_LAST_BIT,
-@@ -689,6 +691,8 @@ enum {
- 	REQ_F_SQE_COPIED	= IO_REQ_FLAG(REQ_F_SQE_COPIED_BIT),
- 	/* request must be iopolled to completion (set in ->issue()) */
- 	REQ_F_IOPOLL		= IO_REQ_FLAG(REQ_F_IOPOLL_BIT),
-+	/* there is a dma map attached to request that needs to be dropped */
-+	REQ_F_DROP_DMABUF	= IO_REQ_FLAG(REQ_F_DROP_DMABUF_BIT),
- };
- 
- struct io_tw_req {
-@@ -811,6 +815,7 @@ struct io_kiocb {
- 	/* custom credentials, valid IFF REQ_F_CREDS is set */
- 	const struct cred		*creds;
- 	struct io_wq_work		work;
-+	struct dma_buf_io_map		*dmabuf_map;
- 
- 	struct io_big_cqe {
- 		u64			extra1;
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 98b259901185..c39297e8beb6 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -810,6 +810,7 @@ enum io_uring_rsrc_reg_flags {
- enum io_uring_regbuf_type {
- 	IO_REGBUF_TYPE_EMPTY,
- 	IO_REGBUF_TYPE_UADDR,
-+	IO_REGBUF_TYPE_DMABUF,
- 
- 	__IO_REGBUF_TYPE_MAX,
- };
-@@ -819,7 +820,10 @@ struct io_uring_regbuf_desc {
- 	__u32 flags;
- 	__u64 size;
- 	__u64 uaddr;
--	__u64 __resv[7];
-+
-+	__s32 dmabuf_fd;
-+	__s32 target_fd;
-+	__u64 __resv[6];
- };
- 
- /* Skip updating fd indexes set to this value in the fd table */
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 4c83a94b4bdc..d1d748b5c5dc 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -109,7 +109,7 @@
- 
- #define IO_REQ_CLEAN_SLOW_FLAGS (REQ_F_REFCOUNT | IO_REQ_LINK_FLAGS | \
- 				 REQ_F_REISSUE | REQ_F_POLLED | \
--				 IO_REQ_CLEAN_FLAGS)
-+				 IO_REQ_CLEAN_FLAGS | REQ_F_DROP_DMABUF)
- 
- #define IO_TCTX_REFS_CACHE_NR	(1U << 10)
- 
-@@ -1114,6 +1114,7 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
- 				io_queue_next(req);
- 			if (unlikely(req->flags & IO_REQ_CLEAN_FLAGS))
- 				io_clean_op(req);
-+			io_req_drop_dmabuf(req);
- 		}
- 		io_put_file(req);
- 		io_req_put_rsrc_nodes(req);
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index fcdc4edd2858..5074b1e4b050 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -10,6 +10,7 @@
- #include <linux/compat.h>
- #include <linux/io_uring.h>
- #include <linux/io_uring/cmd.h>
-+#include <linux/dma-buf-io.h>
- 
- #include <uapi/linux/io_uring.h>
- 
-@@ -881,6 +882,94 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
- 	return true;
- }
- 
-+struct io_regbuf_dma {
-+	struct dma_buf_io_ctx		ctx;
-+	struct file			*target_file;
-+};
-+
-+static void io_release_reg_dmabuf(void *priv)
-+{
-+	struct io_regbuf_dma *db = priv;
-+
-+	fput(db->target_file);
-+	dma_buf_io_ctx_release(&db->ctx);
-+}
-+
-+static struct io_rsrc_node *io_register_dmabuf(struct io_ring_ctx *ctx,
-+						struct io_uring_regbuf_desc *desc)
-+{
-+	struct io_rsrc_node *node = NULL;
-+	struct io_mapped_ubuf *imu = NULL;
-+	struct io_regbuf_dma *regbuf = NULL;
-+	struct file *target_file = NULL;
-+	struct dma_buf *dmabuf = NULL;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		return ERR_PTR(-EOPNOTSUPP);
-+	if (ctx->flags & IORING_SETUP_IOPOLL)
-+		return ERR_PTR(-EOPNOTSUPP);
-+	if (desc->uaddr || desc->size)
-+		return ERR_PTR(-EINVAL);
-+
-+	ret = -ENOMEM;
-+	node = io_rsrc_node_alloc(ctx, IORING_RSRC_BUFFER);
-+	if (!node)
-+		return ERR_PTR(-ENOMEM);
-+	imu = io_alloc_imu(ctx, 0);
-+	if (!imu)
-+		goto err;
-+	regbuf = kzalloc(sizeof(*regbuf), GFP_KERNEL);
-+	if (!regbuf)
-+		goto err;
-+
-+	ret = -EBADF;
-+	target_file = fget(desc->target_fd);
-+	if (!target_file)
-+		goto err;
-+
-+	dmabuf = dma_buf_get(desc->dmabuf_fd);
-+	if (IS_ERR(dmabuf)) {
-+		ret = PTR_ERR(dmabuf);
-+		dmabuf = NULL;
-+		goto err;
-+	}
-+	if (dmabuf->size > SZ_1G) {
-+		ret = -EINVAL;
-+		goto err;
-+	}
-+
-+	ret = dma_buf_io_ctx_create(target_file, &regbuf->ctx, dmabuf,
-+				    DMA_BIDIRECTIONAL);
-+	if (ret)
-+		goto err;
-+
-+	regbuf->target_file = target_file;
-+	imu->nr_bvecs = 0;
-+	imu->ubuf = 0;
-+	imu->len = dmabuf->size;
-+	imu->folio_shift = 0;
-+	imu->release = io_release_reg_dmabuf;
-+	imu->priv = regbuf;
-+	imu->flags = IO_REGBUF_F_DMABUF;
-+	imu->dir = IO_IMU_DEST | IO_IMU_SOURCE;
-+	refcount_set(&imu->refs, 1);
-+	node->buf = imu;
-+	dma_buf_put(dmabuf);
-+	return node;
-+err:
-+	kfree(regbuf);
-+	if (imu)
-+		io_free_imu(ctx, imu);
-+	if (node)
-+		io_cache_free(&ctx->node_cache, node);
-+	if (target_file)
-+		fput(target_file);
-+	if (dmabuf)
-+		dma_buf_put(dmabuf);
-+	return ERR_PTR(ret);
-+}
-+
- static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
- 						   struct io_uring_regbuf_desc *desc)
- {
-@@ -899,6 +988,12 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
- 	if (!mem_is_zero(&desc->__resv, sizeof(desc->__resv)) || desc->flags)
- 		return ERR_PTR(-EINVAL);
- 
-+	if (desc->type == IO_REGBUF_TYPE_DMABUF)
-+		return io_register_dmabuf(ctx, desc);
-+
-+	if (desc->dmabuf_fd || desc->target_fd)
-+		return ERR_PTR(-EINVAL);
-+
- 	if (desc->type == IO_REGBUF_TYPE_EMPTY) {
- 		if (uaddr || size)
- 			return ERR_PTR(-EFAULT);
-@@ -1170,9 +1265,64 @@ static int io_import_kbuf(int ddir, struct iov_iter *iter,
- 	return 0;
- }
- 
--static int io_import_fixed(int ddir, struct iov_iter *iter,
-+void io_drop_dmabuf_node(struct io_kiocb *req)
-+{
-+	struct io_mapped_ubuf *imu;
-+
-+	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		return;
-+	if (WARN_ON_ONCE(req->buf_node->type != IORING_RSRC_BUFFER))
-+		return;
-+	imu = req->buf_node->buf;
-+	if (WARN_ON_ONCE(!(imu->flags & IO_REGBUF_F_DMABUF)))
-+		return;
-+	dma_buf_io_map_drop(req->dmabuf_map);
-+	req->flags &= ~REQ_F_DROP_DMABUF;
-+}
-+
-+static int io_import_dmabuf(struct io_kiocb *req,
-+			   int ddir, struct iov_iter *iter,
-+			   struct io_mapped_ubuf *imu,
-+			   size_t len, size_t offset,
-+			   unsigned issue_flags)
-+{
-+	struct io_regbuf_dma *db = imu->priv;
-+	struct dma_buf_io_map *map;
-+
-+	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		return -EOPNOTSUPP;
-+	if (!len)
-+		return -EFAULT;
-+	if (req->file != db->target_file)
-+		return -EBADF;
-+
-+	if (req->flags & REQ_F_DROP_DMABUF) {
-+		map = req->dmabuf_map;
-+		goto init_iter;
-+	}
-+
-+	map = dma_buf_io_get_map(&db->ctx);
-+	if (unlikely(!map)) {
-+		if (!(issue_flags & IO_URING_F_IOWQ))
-+			return -EAGAIN;
-+		map = dma_buf_io_create_map(&db->ctx);
-+		if (IS_ERR(map))
-+			return PTR_ERR(map);
-+	}
-+
-+	req->dmabuf_map = map;
-+	req->flags |= REQ_F_DROP_DMABUF;
-+init_iter:
-+	iov_iter_dmabuf_map(iter, ddir, map, offset, len);
-+	return 0;
-+}
-+
-+static int io_import_fixed(struct io_kiocb *req,
-+			   int ddir, struct iov_iter *iter,
- 			   struct io_mapped_ubuf *imu,
--			   u64 buf_addr, size_t len)
-+			   u64 buf_addr, size_t len,
-+			   unsigned issue_flags,
-+			   unsigned import_flags)
- {
- 	const struct bio_vec *bvec;
- 	size_t folio_mask;
-@@ -1192,6 +1342,12 @@ static int io_import_fixed(int ddir, struct iov_iter *iter,
- 
- 	offset = buf_addr - imu->ubuf;
- 
-+	if (imu->flags & IO_REGBUF_F_DMABUF) {
-+		if (!(import_flags & IO_REGBUF_IMPORT_ALLOW_DMABUF))
-+			return -EFAULT;
-+		return io_import_dmabuf(req, ddir, iter, imu, len, offset,
-+					issue_flags);
-+	}
- 	if (imu->flags & IO_REGBUF_F_KBUF)
- 		return io_import_kbuf(ddir, iter, imu, len, offset);
- 
-@@ -1254,7 +1410,8 @@ int __io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
- 	node = io_find_buf_node(req, issue_flags);
- 	if (!node)
- 		return -EFAULT;
--	return io_import_fixed(ddir, iter, node->buf, buf_addr, len);
-+	return io_import_fixed(req, ddir, iter, node->buf, buf_addr, len,
-+				issue_flags, import_flags);
- }
- 
- static int io_buffer_acct_cloned_hpages(struct io_ring_ctx *ctx,
-@@ -1676,7 +1833,9 @@ int __io_import_reg_vec(int ddir, struct iov_iter *iter,
- 	iovec_off = vec->nr - nr_iovs;
- 	iov = vec->iovec + iovec_off;
- 
--	if (imu->flags & IO_REGBUF_F_KBUF) {
-+	if (imu->flags & IO_REGBUF_F_DMABUF) {
-+		return -EOPNOTSUPP;
-+	} else if (imu->flags & IO_REGBUF_F_KBUF) {
- 		int ret = io_kern_bvec_size(iov, nr_iovs, imu, &nr_segs);
- 
- 		if (unlikely(ret))
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index f12abaf63270..3cb9b57f159b 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -31,6 +31,11 @@ enum {
- enum {
- 	IO_REGBUF_F_KBUF		= 1 << 0,
- 	IO_REGBUF_F_UNCLONEABLE		= 1 << 1,
-+	IO_REGBUF_F_DMABUF		= 1 << 3,
-+};
-+
-+enum {
-+	IO_REGBUF_IMPORT_ALLOW_DMABUF		= 1 << 1,
- };
- 
- struct io_mapped_ubuf {
-@@ -173,4 +178,17 @@ static inline void io_alloc_cache_vec_kasan(struct iou_vec *iv)
- 		io_vec_free(iv);
- }
- 
-+void io_drop_dmabuf_node(struct io_kiocb *req);
-+
-+static inline void io_req_drop_dmabuf(struct io_kiocb *req)
-+{
-+	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		return;
-+	if (!(req->flags & REQ_F_DROP_DMABUF))
-+		return;
-+	if (WARN_ON_ONCE(!(req->flags & REQ_F_BUF_NODE)))
-+		return;
-+	io_drop_dmabuf_node(req);
-+}
-+
- #endif
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 95038cfda615..11ff7b5a1164 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -380,8 +380,8 @@ static int io_init_rw_fixed(struct io_kiocb *req, unsigned int issue_flags,
- 	if (io->bytes_done)
- 		return 0;
- 
--	ret = io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
--				issue_flags);
-+	ret = __io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
-+				  issue_flags, IO_REGBUF_IMPORT_ALLOW_DMABUF);
- 	iov_iter_save_state(&io->iter, &io->iter_state);
- 	return ret;
- }
-@@ -591,6 +591,8 @@ static void io_complete_rw(struct kiocb *kiocb, long res)
- 	struct io_rw *rw = container_of(kiocb, struct io_rw, kiocb);
- 	struct io_kiocb *req = cmd_to_io_kiocb(rw);
- 
-+	io_req_drop_dmabuf(req);
-+
- 	__io_complete_rw_common(req, res);
- 	io_req_set_res(req, io_fixup_rw_res(req, res), 0);
- 	req->io_task_work.func = io_req_rw_complete;
--- 
-2.54.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
