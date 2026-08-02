@@ -1,212 +1,207 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15F91DFFB
-	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 17:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959A3314A9E
+	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 20:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785690708; cv=none; b=OtXBEqkVlSnEN+CTBNzla6/wv1tLzxdYWkv1OaSMZo1LWfBEmtXX/gdTUGotxh/Bv+RZonvhFl4fFrWfAsoKgTs/ENBEfzK1Y8/P0g4llLOcGc0BJ1T1fy5hTH/pQjJPymlWAceJqYfKSe0SLuuU6p1eeizrEyS3AFisH/yEYgU=
+	t=1785704358; cv=none; b=gQVtlKQiM8NxLE5f34xzKwvwgK771jM5A83zgy6eGkOA7VBl5eL2po5sz+vDro3ZP9L663eIuVVhWiVZTl2Fhx3KltCTOT4pj+xKFmvu+UrSGhb612sBSveip37puZ9KInkCyqhQsfpC5otL8IgYS12Nou7YMTkS8MbgzOpwixk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785690708; c=relaxed/simple;
-	bh=CMX0EZV2hWQxQLVH/UG8BA3cwwyHuQu0HjpjkTcAGc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XIh5YqHhQdnr6ANL1WaH3r3b6I9xWXUNNbpaRpK/KU7jXUeeSeq+7yce/2qZYykn5xzYOugnlRoixju+gDKks0lHL+u3+kerbYr3G8FVbchOpS0UgEBD/uOoIgMEr8Z0gBjl1ZPHBWXvYM8rUqnVW22z2Po1LbuRPozK3KQ+mWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=o7m4ryRm; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1785704358; c=relaxed/simple;
+	bh=TufCBztkTKH3AfRWjBpjd3FHGRl2lwcK9tWuFaY9Wt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3RqteyIscS0VhGtVotNWAO/FHzC5fFvGLwVDgxdwCefpliyNqVVkBFD3yDCMatQl+a7XIrfk/JGGV8Xwc02M8W6yBmmSqUzUjkh1zd2C+wUlNWCpxKFIjYkAeGqFg3bq2llmzYZIQxy5cd/AElLg2t5EoZvsu3oBPg0QB5/bvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iu/TRm2g; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=C7tAgSXW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="o7m4ryRm"
-Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672CZ6EA3463105
-	for <linux-block@vger.kernel.org>; Sun, 2 Aug 2026 13:11:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Ps1N
-	dme4Z8yzxBPud+CccRFlofuGVlEw6M8+5+mc6s0=; b=o7m4ryRmqus5Rv8QbAnz
-	4CYHEo8bq++0ujcZR0TaQTFtN6EbhSaYRUfJ0C4hEnh4bwoSX26kFqYmm7DTbUvH
-	J/PVLHSsKzVLhstVzG6f3pufL1RgkiYTiDLcZJS/VWDxtd31u13cvhEoAUS4+oJ1
-	Y4nZMqAe07k9r1/7cAy8WMTxWTM8Bvcw5dsp9X4JOSlVtGmj2gfME03vJqOYClju
-	oEFR2P7CVJhhrWbrzAFLMUiQFrX+/+LxKazfFvATukQ4VmcxHkZ1TtqwYriytu+B
-	o5UJ7XCxfxflyFRx+VrwDiwwkDYfGZLRQF+6WmIcOGIoNzceI8mR9FlmMLHwts9r
-	KQ==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4fscyp5kwv-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Sun, 02 Aug 2026 13:11:46 -0400 (EDT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-51bfe3fa93bso24459941cf.2
-        for <linux-block@vger.kernel.org>; Sun, 02 Aug 2026 10:11:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iu/TRm2g";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7tAgSXW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785704355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B6aw/MfyvAQ+UMZOr4YxAOduk77RukTa3bw+TseKJQI=;
+	b=Iu/TRm2gKNWTtW8CZohusyZ5Zr2KptEO4jXFrDfxfdgcBrnhAb/+5wqjfF8f3WkpdcDX8O
+	VZXmaHmtfH01IVw5sNQ4ddT0PdyrwWPRKxVtabz4T85POj5nAE1e5yKLsuIAc1iMowaITY
+	SbuHIRtHhVftfqEMAsW0AuOI9Z1j43w=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-454-lZXLpDBRPH6OgMYkPcIgZw-1; Sun, 02 Aug 2026 16:59:14 -0400
+X-MC-Unique: lZXLpDBRPH6OgMYkPcIgZw-1
+X-Mimecast-MFC-AGG-ID: lZXLpDBRPH6OgMYkPcIgZw_1785704353
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4955ce558d8so14780815e9.3
+        for <linux-block@vger.kernel.org>; Sun, 02 Aug 2026 13:59:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1785704353; x=1786309153; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=B6aw/MfyvAQ+UMZOr4YxAOduk77RukTa3bw+TseKJQI=;
+        b=C7tAgSXWDXBaC5qpsYC13AmtUbPzOWCumGi9FQr9sXC3RetsxEA8A9Nq+JlwNSfMmy
+         CPAdsSqM0qGHPAR5r/uYn3ui2+23zHxFvY3TAC7CoRNNqEUbTsz7bdzVegq/bNEe3Gxj
+         zD2AWZKRLpVFisHfLP2esXRmvQ/pSf62yE3THx+/UqvDnL/7irolKQ20/2m2bQwbZtf7
+         5hNiXnAz2tE/lJOSsqVK9XRjLHozTFYBLhHVCYFVCS6i0GZdyOpUDLh1LQgpH4hjU5gG
+         6TeSAnk4VfYVDJF8FmVqyzpxkRQdQC0sk1eRnNojU/IGwAPuS7DezEv/pnxTvlK/vhHe
+         PaAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785690705; x=1786295505;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ps1Ndme4Z8yzxBPud+CccRFlofuGVlEw6M8+5+mc6s0=;
-        b=nYtxeQE7wUGf5jAJqYNLyBmh4tTvm0aweA7yR+mqvCQ0Nwjel/f7xomfXliBy2zNET
-         grXyJeL8nff3OuzIapRbnizwTYCxpN/lTq1oDkudQAn2i3pEdsaBhSDOZtvP0YDYnlwd
-         psAqkD/Mu6tqbUMQ8ljZJ7vQqF4kEKBkVQKKLfg7V66J8C0ewRBN8rNqWeHG/YpST9yt
-         HqaPc82X/ODJNMguR7t2xXwsJayFNSQHuytZEGRMKPByBT/XPRiLt6O4VyWsH+FLuIJ4
-         f5VrXvUy5P8vVEG7u6ZtC3R19wj9U6K7rA0Ucbua2PkSsLtaqef8CRuUWUqbdfdSx6Mo
-         Ju0g==
-X-Gm-Message-State: AOJu0Yxsi9Wd6K4Iy+J+cltrK91omlYd/0XkGphhay90GeFqSG/Kv6Ls
-	mzD/hnDj5gpbl+94iGJvM5372f3YHR3TvjkmbQ+XH/E98+dAplEIgPoiZBYrLb1mOpD2aL9sfk7
-	oErQwbriQbXKMoZvFJN+BRZDlAO0O0IDPUAArWkNP5wKR7dKFWbfOP/PbxaYE
-X-Gm-Gg: AR+sD11+h1IpTF405C7QE6G8Fe0tvRDyM5ZWQfaIAMj6QZD9DWDKkramrBDHYRkMEyt
-	55TeFpUuGiuJesYsf1PjbDYr7HFkw5rxPUIyqqoUxeNHb1jwGjmBjypixaUatUFlAQNRBQ97Lql
-	TnmkGFEIQVnkqxo0AxrTAnInttOpmiFY9phV7eUT6PySulQujKLgFiAXFjIYclsW8jR9AlYKvla
-	fofBSIZ6jWpUhFUip1vAtDvqXmc1NZJK8cy02N3Hl1CZGEn6nfJWeReXLbVkH0eP12F31fl3NI4
-	bKT0YmL2WAxBuI6tze2Vvrpi5msFpI1or82z5iXjl5k6AEHdkRqHt4L0pWl9EUr8vbbkXjm1KcU
-	hh68FXt6AWotdsv1S3QGBEwx9Jf0Ckfd+XzJ2jAAxVyK/JQdzwglArKGW
-X-Received: by 2002:ac8:6f0a:0:b0:517:8011:3a4b with SMTP id d75a77b69052e-52b5682e629mr147092591cf.21.1785690705032;
-        Sun, 02 Aug 2026 10:11:45 -0700 (PDT)
-X-Received: by 2002:ac8:6f0a:0:b0:517:8011:3a4b with SMTP id d75a77b69052e-52b5682e629mr147092151cf.21.1785690704534;
-        Sun, 02 Aug 2026 10:11:44 -0700 (PDT)
-Received: from [10.100.102.30] (CBL217-132-158-98.bb.netvision.net.il. [217.132.158.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49807b98284sm154307425e9.12.2026.08.02.10.11.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Aug 2026 10:11:43 -0700 (PDT)
-Message-ID: <d30b6c9f-e479-4cca-8dfa-576d7562d2fc@columbia.edu>
-Date: Sun, 2 Aug 2026 20:11:41 +0300
+        d=1e100.net; s=20251104; t=1785704353; x=1786309153;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=B6aw/MfyvAQ+UMZOr4YxAOduk77RukTa3bw+TseKJQI=;
+        b=aDp2TUMMdm6cs/YAq201nWMJ5c70HpGMiQvDdnE7SRRCm7+6r50GUWo9o11Sy11fC5
+         qFQjKz9+hUaZ3xvgw+wVvRvfdack08GjlfcaCKOnK5pU2x5FfpM/ck4P2vvjFG8iKLdB
+         74NgR4YP75gFqxkMMVebMmPuaMnv10nT7bCbl8UZyRoHUexetcbVLvzwP0Ni86g8NWB0
+         dXZpOjTeXY5z7nJy8II7CFTK8JTPXLGjRxlVggii+o3KfsIP+k6k1qyJFoa1+SI+FYkJ
+         pGQxG9y08SzvNkxUK1173embqnC6oZPidQmV5t7c8S6ktdNwGsTPNAHifqOf+xcaAM3H
+         37ow==
+X-Gm-Message-State: AOJu0YzuoPauUR7j7knEf1oAWi+/H4BNdqrp6AphOcsvtL0e5bRMFla0
+	Bcj3ZId3m1ZJZnHaj/ektNJMM3Ji+hNXU/ohx9X/fNQNohLKNGNtBcyXwbt0xShxzL+4w6m6Whm
+	qRPZ1XaLkVg/2Kdbdgw56JqZpVcHcwj/yFCwLSHRdqHCPuf85fy+5ffuFIE1k2QBvubXIyjCh
+X-Gm-Gg: AR+sD13zJD41AFbxBNbiw12rr0z82GzG7ZQMiwTOF4yUcT3DgJTpwFIMwKAXILGNxvX
+	ivZO1JWIIRGlyB61TJeEm/Byo+fltTJV8ekQt3JUeKJSU4/MvMu8itpa0mcDsSvM4mTnN23gy7Q
+	VpZxdFKwO7D6qHsmAiFfYbO+jDbUcpsMh+/c6dBpG27rwrI1yXLI78UAPgEKwRfO0DgQ/qpKGNi
+	T+c9XMdrwUF75rCErFttI8HBiZ5VtHRnJCGYsBDyHkQcntsVY7OFDhXvX9Fcdc6vVhHPybDpUWl
+	oA8OiJIP54/0Vh9Rzb62A4Z5+3/ODQ1LuWRttwqOi+HsUWJv0k0EEMGDASDp/7Bqnxja4mfJdRH
+	qRcY3xEAJuqMQfiso/h3ueg==
+X-Received: by 2002:a05:600c:6990:b0:495:4d00:2fc0 with SMTP id 5b1f17b1804b1-4980c673907mr169358165e9.12.1785704353034;
+        Sun, 02 Aug 2026 13:59:13 -0700 (PDT)
+X-Received: by 2002:a05:600c:6990:b0:495:4d00:2fc0 with SMTP id 5b1f17b1804b1-4980c673907mr169357715e9.12.1785704352602;
+        Sun, 02 Aug 2026 13:59:12 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-28-14.inter.net.il. [80.230.28.14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fd45a0c8bsm25273135f8f.34.2026.08.02.13.59.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Aug 2026 13:59:12 -0700 (PDT)
+Date: Sun, 2 Aug 2026 16:59:08 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xixin Liu <liuxixin@kylinos.cn>
+Cc: linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
+	axboe@kernel.dk, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] virtio-blk: mark disk dead on ERS permanent
+ failure
+Message-ID: <20260802165703-mutt-send-email-mst@kernel.org>
+References: <cover.virtio-blk-ers-v1.1780449274.git.liuxixin@kylinos.cn>
+ <cover.virtio-blk-ers-v2.1785468000.git.liuxixin@kylinos.cn>
+ <4740ae91d5be.v2.1785468000.git.liuxixin@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: take i_rwsem for the direct I/O write fallback
-To: Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sashiko <sashiko-bot@kernel.org>
-References: <20260802-blkdev-fixes-v1-0-a82fc549fd74@columbia.edu>
- <20260802-blkdev-fixes-v1-2-a82fc549fd74@columbia.edu>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <20260802-blkdev-fixes-v1-2-a82fc549fd74@columbia.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: rLcVH5HkgzWOdaBa2hNY-ja1SZZloVKm
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAyMDE1NiBTYWx0ZWRfX6YAWieS3UsE/
- Q25EtMhA7DG0a5MsAWN2UaaDTcIeciWUjRkYcBB6H7ChZ2nkApW6nqqgY4av+Bck0725/BSIggf
- pCf8s0aT5e7UO5nChvs4wM1cu7Xtv+9MNB93xXAu4YIm7K+jh0UY
-X-Proofpoint-ORIG-GUID: rLcVH5HkgzWOdaBa2hNY-ja1SZZloVKm
-X-Authority-Analysis: v=2.4 cv=LJ9WhpW9 c=1 sm=1 tr=0 ts=6a6f7a52 cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=C4zMR0+CEq2lM/mtmjScOA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
- a=NEAV23lmAAAA:8 a=c92rfblmAAAA:8 a=VwQbUJbxAAAA:8 a=S9fP7Kau7zZPj3qnxsEA:9
- a=QEXdDO2ut3YA:10 a=dawVfQjAaf238kedN5IG:22 a=GvGzcOZaWPEFPQC_NcjD:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAyMDE1NiBTYWx0ZWRfX7JkhCRbWlV2Z
- aPRKYtePO3J0SDI8HMHngxyc09d6NaBGbBnkr5M4lq7riq/YRioQSc5YcM4DUTeNOcJoKMoeK1Y
- KAA9MXyrOb4QdQqfQjVNQYmFPT3DiSTQ2Sy4sJTCiiHixxXyxNbLfs2pEuO7S8K+ZqM6CFmiPpD
- YuFM/7PrsLY9U7D9F3NDrbVJEQponJarNdPYOUJzTI8tjKS9K35fS7dt+ifLGHfZJKCIfrElAcr
- uhkcIRARBwZ0vyRFe8ry4wqkZGVY+pKZTjr0W0czL0UqW708UuO+ErKWkaWkFHQLbAovHSB1Pbq
- 0ODLJrR+0Eak++MgQjrJHCVSMOuItGbei0r4Uib1hL8z4b/jDowgKeAwtNuZss2dBOFksgQzM+m
- l47+T2GbEmJ+004IcnsW+FaNdf2QYNIfK+UxFnwIiAJWC1rlL+X0rZXZzUZTsQ22K2ukqSOA1Xf
- /A4zZ3dr0q8gwbT1F3g==
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11863
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=10 phishscore=0 bulkscore=10 impostorscore=10 spamscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608020156
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4740ae91d5be.v2.1785468000.git.liuxixin@kylinos.cn>
 
-On 8/2/26 7:14 AM, Tal Zussman wrote:
-> Commit c0e473a0d226 ("block: fix race between set_blocksize and read
-> paths") closed a race between set_blocksize() and block device I/O: with
-> large sector size support, set_blocksize() can change i_blkbits and the
-> mapping's minimum folio order while a concurrent reader still holds a
-> folio of the old, smaller order, leading to crashes. In particular, it
-> made blkdev_write_iter() wrap buffered writes in inode_lock_shared().
+On Fri, Jul 31, 2026 at 11:19:00AM +0800, Xixin Liu wrote:
+> After ERS reports pci_channel_io_perm_failure, virtio-pci must ask the
+> virtio driver to tear down the block device, not only mark virtqueues
+> broken.  Call the virtio driver shutdown hook from virtio-pci on
+> perm_failure; virtio-blk implements shutdown with blk_mark_disk_dead().
 > 
-> However, the direct I/O fallback path was missed in that conversion.
-> blkdev_write_iter() passes blkdev_buffered_write() as an argument to
-> direct_write_fallback() with no lock held. A direct write that completes
-> only partially then finishes as a buffered write with no protection.
+> Fail new requests early in virtio_queue_rq when virtqueues were removed
+> during frozen reset_prepare (vqs == NULL).  A broken vq already fails in
+> virtqueue_add; no separate disk_live() check is needed.
 > 
-> This can cause a BUG by racing partial direct writes against
-> ioctl(BLKBSZSET). Writer threads issue O_DIRECT pwritev() with a
-> two-segment iovec whose second segment is an unreadable PROT_NONE
-> mapping. The direct path then writes the first segment, fails to pin the
-> second, and returns short, entering the fallback. A second thread keeps
-> toggling the second segment's protection so that some fallbacks get past
-> fault_in_iov_iter_readable() and reach the page cache, a third thread
-> populates the page cache with folios of the current block size via
-> pread() and readahead(), and a fourth thread toggles the block size
-> between 512 bytes and 64K with BLKBSZSET. The minimum folio order only
-> moves with block sizes above PAGE_SIZE, i.e. with
-> CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K.
-> 
-> On a CONFIG_DEBUG_VM kernel this yields the following BUG:
-> 
->   page dumped because: VM_BUG_ON_FOLIO(folio_order(folio) < mapping_min_folio_order(mapping))
->   kernel BUG at mm/filemap.c:858!
->   Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
->   RIP: 0010:__filemap_add_folio+0x860/0x8d0
->   Call Trace:
->    filemap_add_folio+0xc9/0x1f0
->    __filemap_get_folio_mpol+0x240/0x660
->    iomap_write_begin+0xa87/0xd70
->    iomap_file_buffered_write+0x304/0x6a0
->    blkdev_write_iter+0x255/0x510
->    do_iter_readv_writev+0x23d/0x3c0
->    vfs_writev+0x211/0x7d0
->    do_pwritev+0x121/0x190
->    do_syscall_64+0x121/0x630
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> The same workload also trips WARN_ON_ONCE(pos >= folio_pos(folio) +
-> fsize) in iomap_trim_folio_range().
-> 
-> Fix this by calling blkdev_buffered_write() in the fallback path under
-> inode_lock_shared(), matching the plain buffered-write branch. With the
-> fix the same workload runs clean.
-> 
-> The reproducer used was written by an LLM, and is available at [1].
-> 
-> [1] https://gist.github.com/tzussman/69d06bc57d42a42989eb038b1b5aeb74
-> 
-> Fixes: c0e473a0d226 ("block: fix race between set_blocksize and read paths")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Link: https://sashiko.dev/#/patchset/20260730-blk-dontcache-v7-0-3e8e6850068d%40columbia.edu?part=5
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> Assisted-by: DeepSeek:deepseek-v3
+> Signed-off-by: Xixin Liu <liuxixin@kylinos.cn>
 > ---
->  block/fops.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  drivers/block/virtio_blk.c         | 31 ++++++++++++++++++++++++++++++
+>  drivers/virtio/virtio_pci_common.c | 10 +++++++++-
+>  2 files changed, 40 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/fops.c b/block/fops.c
-> index 5b938f673d4f..26711cc239d5 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -763,9 +763,14 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 32bf3ba07a9d..fda2d4f3c7c6 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -435,6 +435,12 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	blk_status_t status;
+>  	int err;
 >  
->  	if (iocb->ki_flags & IOCB_DIRECT) {
->  		ret = blkdev_direct_write(iocb, from);
-> -		if (ret >= 0 && iov_iter_count(from))
-> -			ret = direct_write_fallback(iocb, from, ret,
-> -					blkdev_buffered_write(iocb, from));
-> +		if (ret >= 0 && iov_iter_count(from)) {
-> +			ssize_t ret2;
+> +	/* VQs may be gone after frozen reset_prepare; avoid NULL deref. */
+> +	if (unlikely(!vblk->vqs || !vblk->vdev)) {
+> +		blk_mq_start_request(req);
+> +		return BLK_STS_IOERR;
+> +	}
 > +
-> +			inode_lock_shared(bd_inode);
-> +			ret2 = blkdev_buffered_write(iocb, from);
-> +			inode_unlock_shared(bd_inode);
-> +			ret = direct_write_fallback(iocb, from, ret, ret2);
+>  	status = virtblk_prep_rq(hctx, vblk, req, vbr);
+>  	if (unlikely(status))
+>  		return status;
+> @@ -1561,6 +1567,30 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	return err;
+>  }
+>  
+> +
+> +/* Stop I/O and mark the gendisk dead (ERS perm_failure or system shutdown). */
+> +static void virtblk_shutdown(struct virtio_device *vdev)
+> +{
+> +	struct virtio_blk *vblk = vdev->priv;
+> +	struct request_queue *q;
+> +	unsigned int memflags;
+> +
+> +	if (!vblk || !vblk->disk)
+> +		return;
+> +
+> +	virtio_break_device(vdev);
+> +	flush_work(&vblk->config_work);
+> +
+> +	q = vblk->disk->queue;
+> +	memflags = blk_mq_freeze_queue(q);
+> +	blk_mq_quiesce_queue_nowait(q);
+> +
+> +	blk_mark_disk_dead(vblk->disk);
+> +
+> +	blk_mq_unquiesce_queue(q);
+> +	blk_mq_unfreeze_queue(q, memflags);
+> +}
+> +
+>  static void virtblk_remove(struct virtio_device *vdev)
+>  {
+>  	struct virtio_blk *vblk = vdev->priv;
+
+what happens with requests already outstanding in the queues?
+e.g. does this leak memory?
+
+> @@ -1684,6 +1714,7 @@ static struct virtio_driver virtio_blk = {
+>  	.probe				= virtblk_probe,
+>  	.remove				= virtblk_remove,
+>  	.config_changed			= virtblk_config_changed,
+> +	.shutdown			= virtblk_shutdown,
+>  #ifdef CONFIG_PM_SLEEP
+>  	.freeze				= virtblk_freeze,
+>  	.restore			= virtblk_restore,
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index fff6b6e2d0c5..957b3282865c 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -849,7 +849,15 @@ static pci_ers_result_t virtio_pci_error_detected(struct pci_dev *pci_dev,
+>  	case pci_channel_io_perm_failure:
+>  		dev_warn(&pci_dev->dev,
+>  			 "permanent failure, disconnecting device\n");
+> -		virtio_break_device(&vp_dev->vdev);
+> +		{
+> +			struct virtio_driver *drv =
+> +				drv_to_virtio(vp_dev->vdev.dev.driver);
+> +
+> +			if (drv && drv->shutdown)
+> +				drv->shutdown(&vp_dev->vdev);
+> +			else
+> +				virtio_break_device(&vp_dev->vdev);
 > +		}
->  	} else {
->  		/*
->  		 * Take i_rwsem and invalidate_lock to avoid racing with
-> 
+>  		return PCI_ERS_RESULT_DISCONNECT;
 
-I seem to have stumbled into a Sashiko rabbit hole of issues with IOCB_NOWAIT
-and IOCB_ATOMIC here... [1].
-I'll wait a day or two and send an update along with some additional fixes
-I've spotted.
+So this is blk specifically, I am somewhat lost as to why
+is blk treated differently from other drivers here.
 
-[1] https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
+
+>  	default:
+>  		break;
+> -- 
+> 2.43.0
 
