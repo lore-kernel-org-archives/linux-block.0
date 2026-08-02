@@ -1,159 +1,100 @@
-Received: from va-2-51.ptr.blmpb.com (va-2-51.ptr.blmpb.com [209.127.231.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC763AE712
-	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 11:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6963947B8;
+	Sun,  2 Aug 2026 11:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785671116; cv=none; b=M3hUKI3UhcyETK+hpybLjNx61nMdX4JQvniFAkfSzTEVt501fMUInaY+LHl6vyHVXPAydUkP7QyIMMiYyaO5iduC5QAbI1JXeX94dm1+r/CBiFvU+fUFHrjta5/hSIEobiiLnJsrK5wHiOYtXm4F6Dtv6S5gTg2EyVmvXf2h4TU=
+	t=1785671126; cv=none; b=ESZ6iNLjACMsFeDuFA8y0Qt7xXD0IbJqzC1GzE5OEJpnD28gAT3PU1SZT27lXnPIF+dn21gL+9VvuluKlFdcmTx60q2TutUqBVxqlvFgvTjOXmAGuIUhIfdHdOAQlO9XJX4/SbS/OmriHAj4T20o6ivi9vZUK9mEmy5eVOeuihg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785671116; c=relaxed/simple;
-	bh=36vievNjZ8GtLIxqOCucLWvF1Vi3VnXYxsq60rHBAM8=;
-	h=Mime-Version:Subject:References:To:Cc:From:Content-Type:
-	 In-Reply-To:Date:Message-Id; b=uFDO7KJ62Zvnr0wmjW1z536DkyF2eoh47z8h9kxwYZYDV0HrjhyqKX5p7bRJnzRZ1wYtWXmIkOUI9+e+q8apbr1go3+IBc6zfxr3QTIjOh5A8x103SzaBhrgscVQFwo4QBVIfdO8fsXnvdCwaUcC0iq4U24WqRDA0QgumIJdu/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=TlfeCN05; arc=none smtp.client-ip=209.127.231.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1785671126; c=relaxed/simple;
+	bh=39A3E7wJo16khZLOY2hMQifeGyc+3LA8sx4hDyNyyrg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=Q+58dT8A+Tu+10UEIP/OSw8Pvx2PmDDUPnF1ZT/cVFTXSJHbl9LdcTvOIgL0jPhwcn0NWEW77Ygp+Ng11r5GZxMgKSCA1Udz7EfP1hbZpvyBLTCQdgNDBKjku/fDmW9jHx5w+LHU/lK1so8OWx/+3MPwNDxXEAxDkaVtHvFQ19E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lFNPmjkM; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="TlfeCN05"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785671107;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=uKZn2mPcYWu8Kef9zrdD2C1ss+TXfPgOpNBBCqk7y7o=;
- b=TlfeCN05uWMu4cT3yB/HD3P3d94jEMLSb6SdlYYJakLKPJUMqhHKLwrIqt3yRmoNp0zjdq
- Btmf8ScS547AcSYUUJnDX97gs+dsvvyAhi01OgqWftvVST3XOonsAAG+zXLeaRMz6ol4AF
- 11Knto8iLuAF81QYHU/8nkJA5FcJNo1A+Z9PImdaHIhbVYasOlY+xdsj5gm0wAcHPV6YXz
- HBXO74WUAjX/J3t4oJaT7E5Bx6ljEQ4EFbxrheLthB3RIgbOtTNaW/oSCMfhi/od6e5kd6
- Gwz38Ko26FUal+A8F5mitAcFW4i6+Vl8xVu2L2vvHdwe/YLtUP7cPfY4XBK+tg==
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lFNPmjkM"
+Date: Sun, 02 Aug 2026 19:45:10 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785671119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+mDW7WpHG3ulNmaHGNLiaJxDMfEUyA2HyZwUhZmNgAs=;
+	b=lFNPmjkM8RufZnPTS9BrXnGW612+kF/ugKUnbVDMKxfcSFHIxgDtwBZom4T6OrtQGF81Z9
+	gAz7RNM8zTGJInVpKRIrnPHymB0jLqUaSdmJiaUxyuKA/chB5g0TEwZGNc450mGCyV5Xo7
+	kOQBibp/6mneUiQY+s4E5cHzvfFrcSk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Cui <cui.tao@linux.dev>
+To: Yu Kuai <yukuai@kernel.org>, tj@kernel.org, axboe@kernel.dk
+CC: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhengqixing@huawei.com, hch@lst.de,
+ yizhou.tang@shopee.com, yukuai@fygo.io, nilay@linux.ibm.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4_1/4=5D_blk-cg?=
+ =?US-ASCII?Q?roup=3A_protect_q-=3Eblkg=5Flis?=
+ =?US-ASCII?Q?t_iteration_in_blkg=5Fdestroy=5Fall=28=29_with_blkcg=5Fmutex?=
+In-Reply-To: <20260802112525.3933753-2-yukuai@kernel.org>
+References: <20260802112525.3933753-1-yukuai@kernel.org> <20260802112525.3933753-2-yukuai@kernel.org>
+Message-ID: <CAE3254D-EDFA-4465-B215-34C4B61D427C@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/8] nbd: skip queue freeze when setting size at device startup
-References: <20260730082046.3459239-1-yangerkun@huawei.com> <20260730082046.3459239-6-yangerkun@huawei.com>
-To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
-	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>, 
-	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, 
-	<nbd@other.debian.org>
-From: "yu kuai" <yukuai@fygo.io>
-X-Lms-Return-Path: <lba+26a6f2dc2+03270b+vger.kernel.org+yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.181]) by smtp.larksuite.com with ESMTPS; Sun, 02 Aug 2026 11:45:06 +0000
-Content-Type: text/plain; charset=UTF-8
-In-Reply-To: <20260730082046.3459239-6-yangerkun@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Reply-To: yukuai@fygo.io
-Date: Sun, 2 Aug 2026 19:45:01 +0800
-Message-Id: <75ff5ace-a4bb-4960-a992-dddb235fd2ca@fygo.io>
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
 
-=E5=9C=A8 2026/7/30 16:20, Yang Erkun =E5=86=99=E9=81=93:
-> Commit 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
-> added the freeze to keep in-flight commands from seeing torn
-> queue_limits.  But at startup the capacity is still 0
-> (invalidate_disk cleared it) and the write cache is off (the previous
-> patch cleared it on disconnect, and nbd_set_size sets it back only after
-> the commit), so submit_bio_noacct() rejects any bio before it reaches
-> the driver and no I/O is in flight.  Drop the freeze there.
+
+=E4=BA=8E 2026=E5=B9=B48=E6=9C=882=E6=97=A5 GMT+08:00 19:25:17=EF=BC=8CYu =
+Kuai <yukuai@kernel=2Eorg> =E5=86=99=E9=81=93=EF=BC=9A
+>From: Yu Kuai <yukuai@fygo=2Eio>
 >
-> Split nbd_set_size() with a bool: nbd_start_device() passes false, the
-> runtime resize/reconfigure paths (ioctls and nbd_genl_size_set) keep
-> passing true.  nbd->pid is still 0 when nbd_genl_connect calls
-> nbd_genl_size_set, so the early return in nbd_set_size keeps that path
-> from applying limits before startup; the true covers the reconnect path
-> on a live device.
+>blkg_destroy_all() iterates q->blkg_list without holding blkcg_mutex,
+>which can race with blkg_free_workfn() that removes blkgs from the list
+>while holding blkcg_mutex=2E
 >
-> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
-> ---
->   drivers/block/nbd.c | 21 ++++++++++++++-------
->   1 file changed, 14 insertions(+), 7 deletions(-)
-
-Can you just checking if size is 0 and write cache is disabled first, and j=
-ust
-skip freeze in this case. I think this is simpler and straightforward, as y=
-ou
-don't have to modify all the callers.
-
+>Add blkcg_mutex protection around the q->blkg_list iteration to prevent
+>potential list corruption or use-after-free issues=2E
 >
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index ce25c254e5fb..3b7363b11d0b 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -331,7 +331,8 @@ static void nbd_mark_nsock_dead(struct nbd_device *nb=
-d, struct nbd_sock *nsock,
->   	nsock->sent =3D 0;
->   }
->  =20
-> -static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t =
-blksize)
-> +static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t =
-blksize,
-> +			bool freeze)
->   {
->   	struct queue_limits lim;
->   	int error;
-> @@ -371,7 +372,13 @@ static int nbd_set_size(struct nbd_device *nbd, loff=
-_t bytesize, loff_t blksize)
->  =20
->   	lim.logical_block_size =3D blksize;
->   	lim.physical_block_size =3D blksize;
-> -	error =3D queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
-> +
-> +	if (freeze)
-> +		error =3D queue_limits_commit_update_frozen(nbd->disk->queue,
-> +				&lim);
-> +	else
-> +		error =3D queue_limits_commit_update(nbd->disk->queue, &lim);
-> +
->   	if (error)
->   		return error;
->  =20
-> @@ -1568,7 +1575,7 @@ static int nbd_start_device(struct nbd_device *nbd)
->   		args->index =3D i;
->   		queue_work(nbd->recv_workq, &args->work);
->   	}
-> -	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
-> +	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config), false);
->   }
->  =20
->   static int nbd_start_device_ioctl(struct nbd_device *nbd)
-> @@ -1636,13 +1643,13 @@ static int __nbd_ioctl(struct block_device *bdev,=
- struct nbd_device *nbd,
->   	case NBD_SET_SOCK:
->   		return nbd_add_socket(nbd, arg, false);
->   	case NBD_SET_BLKSIZE:
-> -		return nbd_set_size(nbd, config->bytesize, arg);
-> +		return nbd_set_size(nbd, config->bytesize, arg, true);
->   	case NBD_SET_SIZE:
-> -		return nbd_set_size(nbd, arg, nbd_blksize(config));
-> +		return nbd_set_size(nbd, arg, nbd_blksize(config), true);
->   	case NBD_SET_SIZE_BLOCKS:
->   		if (check_shl_overflow(arg, config->blksize_bits, &bytesize))
->   			return -EINVAL;
-> -		return nbd_set_size(nbd, bytesize, nbd_blksize(config));
-> +		return nbd_set_size(nbd, bytesize, nbd_blksize(config), true);
->   	case NBD_SET_TIMEOUT:
->   		nbd_set_cmd_timeout(nbd, arg);
->   		return 0;
-> @@ -2097,7 +2104,7 @@ static int nbd_genl_size_set(struct genl_info *info=
-, struct nbd_device *nbd)
->   		bsize =3D nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
->  =20
->   	if (bytes !=3D config->bytesize || bsize !=3D nbd_blksize(config))
-> -		return nbd_set_size(nbd, bytes, bsize);
-> +		return nbd_set_size(nbd, bytes, bsize, true);
->   	return 0;
->   }
->  =20
-
---=20
-Thanks,
-Kuai
+>Reviewed-by: Tang Yizhou <yizhou=2Etang@shopee=2Ecom>
+>Signed-off-by: Yu Kuai <yukuai@fygo=2Eio>
+>---
+> block/blk-cgroup=2Ec | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+>diff --git a/block/blk-cgroup=2Ec b/block/blk-cgroup=2Ec
+>index d9676126c5b5=2E=2Eeb0cfb10b859 100644
+>--- a/block/blk-cgroup=2Ec
+>+++ b/block/blk-cgroup=2Ec
+>@@ -569,6 +569,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+> 	int i;
+>=20
+> restart:
+>+	mutex_lock(&q->blkcg_mutex);
+> 	spin_lock_irq(&q->queue_lock);
+> 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+> 		struct blkcg *blkcg =3D blkg->blkcg;
+>@@ -587,6 +588,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+> 		if (!(--count)) {
+> 			count =3D BLKG_DESTROY_BATCH_SIZE;
+> 			spin_unlock_irq(&q->queue_lock);
+>+			mutex_unlock(&q->blkcg_mutex);
+> 			cond_resched();
+> 			goto restart;
+> 		}
+>@@ -606,6 +608,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+>=20
+> 	q->root_blkg =3D NULL;
+> 	spin_unlock_irq(&q->queue_lock);
+>+	mutex_unlock(&q->blkcg_mutex);
+>=20
+> 	wake_up_var(&q->root_blkg);
+> }
+Reviewed-by: Tao Cui <cuitao@kylinos=2Ecn>
