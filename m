@@ -1,265 +1,158 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759D33AC0D3;
-	Sun,  2 Aug 2026 11:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785668814; cv=fail; b=ppzvH8xgZ+cvolvXSA9HkX+HWq2M5FEF6PSDeMkOk/mI8Y7/2+ocNkbdjT0dKQWSMvfaR3/6Yvdw03pvEj6UOhBkQ/aMSi8v1RzXtO6PjzzIlYYBsxJKcO2HydOlK//duicZg2nOWujN0A15Dw9cABFoymLKYsrCfSVe8MqL2Fw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785668814; c=relaxed/simple;
-	bh=RI5d2SYAiaG93Rm/b3VbPktCt2yoT88PVi4DElfVtU4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hSqQBrYqfSi4gLhpglw27YLMhP744g3JAqyEvuH1BUfK41iZdFAlFt4dz6Nswez/td2QcQU0NuSKHYSaEGsgwpbuHTBVUSUDH/+/zAPyGmE+7WdvHdBrF7AcenyTU6iVFgJ1ii/9/XlOxRTEJpTGiT3RtV+X8inua6oM5o+na6s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=pEgOSq/5; arc=fail smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91E13AC0C3
+	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 11:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785669305; cv=none; b=ibObJGGk/wgELoCBR7GZ8WbJgH4r0vxwhW3KG2jwGIMnAiSkPSyqI53MlaChwCS7HydZOXF8ylwp1uFkJR8qdQXlxWsighzrQjax68lwzDuTnJeIDMA6e3boJNOGbl7JbNRhwjJhHClOKgAiZK3TH0xZPWSucAwmq3cX1u2IK2s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785669305; c=relaxed/simple;
+	bh=nqi5SVdPgj60DLFNV8hMjaRd+M1KFnZMQ4Z04XcbmX8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TCYoTusVJl0t9uN+E0KY2FuAMp//6o/BCePLOFcu4U1QiRvFgfjiL25IdW7FwnO/BbtUTEcPyqtLTHn6r8FbX8tCKyqyJ3Z3Q9XfExk2UMLeK1FdvRw0Gw6OvpYkzAsqsa0VpddfPge0JImovFMoIUUjtJeNyZU7V3S9egZaXTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=BDBkrbYr; arc=none smtp.client-ip=148.163.135.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="pEgOSq/5"
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672Awf9n2853383;
-	Sun, 2 Aug 2026 04:06:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=QdzXo41W9/i2heGgI8NLZscx5d+vrU8Pmq4hVFFH0o0=; b=
-	pEgOSq/5vjpVY7Zhzx2HsbtszSCNTWdjKXi/FYZXTpAF9uLwVHS/cjJKoXrfBf7D
-	W/fGarvDHjMJLtX43uH1KpQlubXATlnpCWA2Sp6CFX98XVfIleaxCGAZwqijKEvb
-	i6DNB8fn3L6/stcbMVKAjUA0DAHHQ+dobZQl//WAfDBcoBpySCcE8imp0mMGe6ho
-	cXxv8l12CzOpAhXKa0zWbS34KraczxN2jiYSUQFgTC9tcHGuqcWdtGvpfR83gm7G
-	XV8FVdScpMtV++wunuzZh3eYpiUpqjkatPdnXSFuuG9BmBb5y6gi+9FvzTnG7Aea
-	vyh7RgPxXHnEDix2TpTyDg==
-Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11011026.outbound.protection.outlook.com [40.93.194.26])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4fsc31h2db-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 02 Aug 2026 04:06:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dpWxmgku+6X8uM/kuFMm5SWSdCfs0gPFlcxZ3fIlDC4ngB5OgEQJodIBR32IczGtryeffaIECIBm/06Ov3xcP9RertsLKOhuAO4gsn0eby+wuiRX77DMsPkrS3Y2r6NeCi+Z+8FUGqtw5fChBSe1kUZTOak+DjKEklRakF/Xm1B9zh1hCPSLYPX/rjP9dnHnymxE/7sRq7SxVmEAdoj/b4HVJZAXW+dn+zYzeRSVlzVIf2LQABLOkA8+Go9oy0tbG9BYx1ToIYJmF2ClcXiS0w3tsvtO8bG7r3mmBDWVEEi4+CpuLvFbkbwWz3VBA4D8kASejpaCQw5GrWyoRNIGbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QdzXo41W9/i2heGgI8NLZscx5d+vrU8Pmq4hVFFH0o0=;
- b=NLyW5AQ2gXLweF4o5vtV6pda+0AQpTPWRWt56UeKP3pc9mJNLLcP9pgliMjq2zOj/3UcpFdOUmbAmQOExZp3fgqiD8um70Y1YzBfm0/Nx5z81diSar5W2QyI8gUCj7WxS8PWj7LCUAw0rMIvCLi5pSoqciDp+mYdSE8G+Z5vtat7GZwoXIW+NyZUndsUFyepwzsEfs7fngsXu1knbGclxYWBhHcyTdC83EAaQn6wb6i59WLQ6K1vKfAIQkObdwRhMTGNPYJf1cJI3WMkZt1hAsqHPDX7tLDhFaJtFlJXNvb0tklXTdm5DwK0OtyKa4YvbPKLiE0ZAqKE0vkUZFctCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from SJ2PR11MB7546.namprd11.prod.outlook.com (2603:10b6:a03:4cc::8)
- by LV2PR11MB6048.namprd11.prod.outlook.com (2603:10b6:408:178::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.270.17; Sun, 2 Aug
- 2026 11:06:25 +0000
-Received: from SJ2PR11MB7546.namprd11.prod.outlook.com
- ([fe80::ca9b:dcf:8881:bced]) by SJ2PR11MB7546.namprd11.prod.outlook.com
- ([fe80::ca9b:dcf:8881:bced%4]) with mapi id 15.21.0270.016; Sun, 2 Aug 2026
- 11:06:25 +0000
-From: Ionut Nechita <ionut.nechita@windriver.com>
-To: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Joel Colledge <joel.colledge@linbit.com>,
-        Ionut Nechita <ionut.nechita@windriver.com>, drbd-dev@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] drbd: fix off-by-one in netlink NUL-string policy lengths
-Date: Sun,  2 Aug 2026 14:05:51 +0300
-Message-ID: <20260802110552.50757-2-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260802110552.50757-1-ionut.nechita@windriver.com>
-References: <20260802110552.50757-1-ionut.nechita@windriver.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1P189CA0004.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:802:2a::17) To SJ2PR11MB7546.namprd11.prod.outlook.com
- (2603:10b6:a03:4cc::8)
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="BDBkrbYr"
+Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672A0FR73146342
+	for <linux-block@vger.kernel.org>; Sun, 2 Aug 2026 07:14:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps01; bh=OXHOQJXSYXpIJM0xdhOE9lspGw
+	2ZMSlGLW2FlW8SCII=; b=BDBkrbYr6PIV+rfhIgek7RHchg1+Dyg9fS6UPkkaZf
+	VehfN8TL9oyieCGPmxryoffga2fKUtcW/Lg63Wrlc4G2BQ1jtN0nrpMntoK5PXpf
+	thGjYtVz8K3v62uoyTZLVbXkKDLRctViJxA1kRweKntokcrf/qw7taizzBnFanR2
+	xYOkDxOomAv78zrnsbyB9QwWjNo71oDfhLU+z72HvDaYxwlxy95beuJic1BHiLws
+	HqfdAapO3qgD3qfczK5cvSYQhfoErrLu9iuDp6DZC46dFuEC09tho4wmKu/nlFeH
+	SzwUG77QAo6diIxKmORs0UyEW7IC8rAenov5Igetwm8Q==
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4fscyp4957-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Sun, 02 Aug 2026 07:14:54 -0400 (EDT)
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8efe7db1c42so28041316d6.3
+        for <linux-block@vger.kernel.org>; Sun, 02 Aug 2026 04:14:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785669293; x=1786274093;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=OXHOQJXSYXpIJM0xdhOE9lspGw2ZMSlGLW2FlW8SCII=;
+        b=QwO7O1bjAxypSgfMWB6lqnWzkrv0EiT+58WoZNS03ZFEhUmM7c5tC5tiD9TpWyCZkk
+         WyPKNl0xgSavo1zkzW/S1hUt6O35VebBghQLgiOxYkqyb19yBzEP2vImwqMPz16DJfKr
+         qRd1r9uV1KrIkKZnKgMpgb2nSeLqntNMQrkhY2TAKQZy2ANB32X1gK+fryTrBigoHKhK
+         erAkIshYpRGqWfumJWJAugVAiSE7AQe8vHEtNheOSv/X8YPbMheWenGTkKvF1LlfXmKv
+         CQOGO1C4ZI7hpXfniLqnxpeHwfyAjO+znIEeqWlQI+Pg8AyNeXizrecF+Lrteq//1A/U
+         3QsQ==
+X-Gm-Message-State: AOJu0YyPSfMFVjMfQMcvj5RZXZJd9E+NSdOE1iaTSsyFMgt9p/zSPF9F
+	kP8BygGL1EdpCDQcWIZTq3KRsBpwbBwKnrlhpA1apbUxGAI8iU/v244t4GQ2HgwYOWunZrNyFNL
+	D2FdNY/8agplAdgNQuwhLlvCX0vmDHgsaSqTBuIsowhztLgLvBcMS8IkBZkZn
+X-Gm-Gg: AR+sD12NVly2Sher58Lz3zV7Hh6iykxsp9YMdfE4OYLQ9YfMZq9stwpniCBVT8dIFoN
+	o818SYSgtt1l5YkzoJu5uZXLZXpnb+W8PI0XQ0VNRgwFyxApjA9u2hd+P7DTlAMFps9C9K3vZia
+	gfJzaJIi9aqeRAW5fAr0dB2bGrox1wGb5jyVIamTe6OKQex1ZTU4ebFKxNIU9C05NBv2HO5CmVk
+	HqpaJvhRln1/Jpb+UklGfMjbbIKv/U3B9StzwYCRwWfuJ94KKZ8Xn+tITYLxLYcvWIUcF6PfIoy
+	DRKb0wwMzSJzJh6bpsxARtUAd3zrbV8Dq45gNm/+B4nYPoIl9KUrdSFOchY0I76YOHP80BSRSMx
+	76Z+exLEFxk3DHVMI9YX2pLBZ9H+o6d4sGYuzt5xcqjf/xWMYZWQ=
+X-Received: by 2002:a05:622a:1e0f:b0:51c:21d1:3852 with SMTP id d75a77b69052e-52b5676001fmr131469911cf.5.1785669293672;
+        Sun, 02 Aug 2026 04:14:53 -0700 (PDT)
+X-Received: by 2002:a05:622a:1e0f:b0:51c:21d1:3852 with SMTP id d75a77b69052e-52b5676001fmr131469531cf.5.1785669293198;
+        Sun, 02 Aug 2026 04:14:53 -0700 (PDT)
+Received: from [127.0.1.1] (CBL217-132-158-98.bb.netvision.net.il. [217.132.158.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49807b917efsm208062155e9.11.2026.08.02.04.14.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Aug 2026 04:14:52 -0700 (PDT)
+From: Tal Zussman <tz2294@columbia.edu>
+Subject: [PATCH 0/2] block device write path fixes
+Date: Sun, 02 Aug 2026 07:14:25 -0400
+Message-Id: <20260802-blkdev-fixes-v1-0-a82fc549fd74@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7546:EE_|LV2PR11MB6048:EE_
-X-MS-Office365-Filtering-Correlation-Id: de22c2c2-7da0-4020-7fb5-08def08617f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|52116014|376014|23010399003|1800799024|366016|6133799003|18002099003|22082099003|11063799006|56012099006|3023799007|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	A1FBljSUb46rVn2cuoYz+V0CfjnwEVdVG/YbvFgogX+6Q37+nl3+iIPiZwCAWukgxdkbCru8fWyLOI7V9B0vUq7bYkG1GuO4hG76n3L0+w+N8Uj+iQvcjkUI0DuPLBBnf96hYLivtDzctfrFKacsPT0IaV8r14hQZw0G0DrawUyDaqyvbII/QGT6z/OadI/rOpM82EeeVsJaTOrPZwGXphhmIlM7PsgBKn8PEMuwadZkquzkqrfJBMTtqmiJuuICKNU+glv8/sUS4WY/dpmC7ppIBS98v+60DFv/biuu4MzIfdIoTuziREantXksoRBRH9xzwTaeMLC4QHE16gTmOcGkyv/REdaknOefTmiynhGOFb3nF1GbvRLjS9i0m4PfS66WNOBnJfXqrE8r6HVC+CoLCyg9vggRQ36dakuMG3aUynXyMCRRO78Ux5vFaTYeq5uTvA8NR8GShYn+RQG5mLFPQAeig7uC3D/3XjjAlEETpaiEeKwoCpZOaE9MH/I9mPWEjBura86zlJgZAf3NhIxbqXyF1zIddCcAQQVgknw5XZgzEIed7TkrPlAayqzj9j+0lbTZR83mjheEwgN2deCUhfdKVpGF/BupuLZCEUDS4aDcT855trGQG/yRZI9+o/oiDLUv7stKR1XzPnlU+2aFzggDIeW00gWN+KshVHM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7546.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(52116014)(376014)(23010399003)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(11063799006)(56012099006)(3023799007)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?j0As9+r2R/wNwjUJZySZ2jbv1qd/8DnTg168Ic45hgHs7JrAdbD//fFdqcCC?=
- =?us-ascii?Q?3kPjc5NQq3RFHpozytVhmFu+ktiIWYq1SiCCofd/x3FFPx8vU2ZGTr5NBD5x?=
- =?us-ascii?Q?irsyST/ORlkJQpXBXUDMTkzWziMoJKYE0m+8cOa7IGMWeXrBnRQmEtKHuIl4?=
- =?us-ascii?Q?yb50rvOG071HJN05WmBJFOsczD1Z/2Yn96bT+6jhJIi8P9cBpAMn0cgWvw5c?=
- =?us-ascii?Q?1Yfz5vY+iCLnztB8cw9WZuQ8jWEVsNGpO9yqlmTJH/95uuBpzG/tacuSst6O?=
- =?us-ascii?Q?/JeBIJKT6zEiJIYtDhyLHLY5QZeQRl+txf/lOMra6tp1pF59mr3I3xSAi+g7?=
- =?us-ascii?Q?NB6e2WvUIrAGxD5KSCVV/W322qGxx7ftp3LWcCQR4dpiL9sy8ahyb+kgum2V?=
- =?us-ascii?Q?dAUHvUQ04RFVkr2MVy0B9wk4/4sxw/qrg63VEkdcikcJbNwjQSgQUG7e3K5L?=
- =?us-ascii?Q?2fGCyPqV1jBaYM/jJosSJZGAynqpCACxRDabbUyAhcQc0EJCzry3IpQiJJBw?=
- =?us-ascii?Q?tWGLKf4v2n0XCheEyueqZoNayRPynTdwHhPMG89b6JEP14vhOGA+TwHZylXf?=
- =?us-ascii?Q?Cdsi5f/V/0b53mlJq42QnfOPWooA8tjvkT88CkqneODe/jpW+0PkzwGE6BVE?=
- =?us-ascii?Q?ahXcrzjzOT4pHmX2mQDvuKSSBAoXtSIyrJ1Ufs0tc/uKhJVRSQjhYlYIYRrN?=
- =?us-ascii?Q?uHjhzuKugsFUYD3KS9TNvcRs2aUdL8Or+AcB1pmwV4uVkU+btE5f/xn23TeX?=
- =?us-ascii?Q?XBVUp6UDW4tpqKSCpWqOquBHD3YdgI4QStUPHwdPwNrtOfDc/aQszBxaOtqt?=
- =?us-ascii?Q?49GpIX/9NeVEzfWtqggsIWnBcUyzzBumy6U06N26jYEyXrdF1Xd6tZoOpRDV?=
- =?us-ascii?Q?wYR8Y6TShJ/1gH8GUVAom7VsGPb3LFY4SAHdeilHA3Fm41ASYkgfetXBR0lO?=
- =?us-ascii?Q?vdD9tHvT4yYJpXUAGgn5W1PkAG/uqjCbsuHPBVuH3g2Fn6aLlNGHnBZPW9Ck?=
- =?us-ascii?Q?MS51MLdOkMWbC09cGg0cypIKX/v5VQRyrgTgvwRQYnTm0NMizUKA0lgMDGUN?=
- =?us-ascii?Q?GpQ+cY23Eva1Lq3MRo3+t7K8VV9tFppQPECUczXXMyxCXN3oV+elJuGWrfN7?=
- =?us-ascii?Q?iElm+plXvvPICVLLC5TMP3qmwqJLolPGziBV8hlDZo0zKJiAsLk+rZE8g0Xq?=
- =?us-ascii?Q?5hkyKa21Oa6hjiUn8glvXNJdNf5ZtCD19aEzavOg+jJzqisWZFCVPoGPyc6N?=
- =?us-ascii?Q?kuWzUK4elkcxCqXChpwHgf3SXS2JiRmHedXnDiXAbN+/K0OBofJrjImj14Iv?=
- =?us-ascii?Q?N9tYT2NPQ+uMr/NtlCyQsPPMSGodB4D/SIM33IrhQtkPkn1FKE/VC+YZ4N6l?=
- =?us-ascii?Q?XfWR8ihtg2+eWxhdJw1WuRfWJ1K36XhqOiexVVGmAfM9VLeqAldJPHWQBQj6?=
- =?us-ascii?Q?M1K/lYCVWJcfSCe90cAguMCbiuLcNbhfPSER/SGwHH040OLSbMIv/jpLKx7E?=
- =?us-ascii?Q?+vFZt/AwJZCWrDWcPYh+g2jXYr5yYQgHGf+EhV+ldcR/h/qUwhdLVaAsM0oK?=
- =?us-ascii?Q?+6MqraYINooaxw6gif2B1y0mJ4PWurXd9OLZcTaCK+y07LtXwxiKcPtDwHg7?=
- =?us-ascii?Q?AO0buQ6cxbvHNg3NEusBF97PyXLhogoCjYuqU+/U/2gmNjcyatcG6cxnIZtj?=
- =?us-ascii?Q?tqPWgSi9UtzNA4wgCG64pWfazmB3RyUFqM8zDXzEBa99+2jwyeqwGJV84BRN?=
- =?us-ascii?Q?syfTkA/xshJPi/cBqn7gCUei4oYd80E6meSSPTunq2x6KVPSxPKebHM0agbJ?=
-X-MS-Exchange-AntiSpam-MessageData-1: 5Npyq9z7a1zIKZgllgjGY0KssWZTJULn7oM=
-X-Exchange-RoutingPolicyChecked:
-	mYWA0n7qTP/rkXK3uf+t7FzL0zPXL39kucxCyLSygI2imlVAHLWxAOhsUJLhtcjG74V5JXxLK2s40hePZ1XWH6+46mE7RWq1k8TfWmCAqYBCpMWCLozPb5E72aSjqG2K1YF3aPQ/n0793NSXwK9ETv/CUWqYHUONNZdggxW+hn8mf/IacQ2dv71huJfGM+Uac5iSQqC5VDyx/+Fx0LKXwUMq4RTIa1p7jjS6BOAFl59XpswGuQQmY9pmOoxzalwqxz3/EM57KpwHNOGHlmhYOimyit1Ml8/ZzM8navUPZrzRnqU12TmiQU8JLphEhI9/0RQBLmGOI4aUsqmtwnkgEQ==
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de22c2c2-7da0-4020-7fb5-08def08617f3
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7546.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2026 11:06:25.5264
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uNyaYHTKra6i00wvxKToSIfzttcoEq94qIsbJT2aiE1cXwUNrywBNMWeGfkd/5qM9usmisVShQF3iNqgVm3tSwojPXzjNI03iTktnLPdspY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB6048
-X-Proofpoint-GUID: Iwrm0J-NATpN5XU9PKA4N-pGrQiHHMSJ
-X-Proofpoint-ORIG-GUID: Iwrm0J-NATpN5XU9PKA4N-pGrQiHHMSJ
-X-Authority-Analysis: v=2.4 cv=afFRWxot c=1 sm=1 tr=0 ts=6a6f24b3 cx=c_pps
- a=HGE+/hAEzspoXCOliImplg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
- a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=xqWC_Br6kY4A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=bi6dqmuHe4P4UrxVR6um:22 a=HK-ge7EqtdluswH-FwHe:22 a=t7CeM3EgAAAA:8
- a=_DDItCzNFMEctcKwLBMA:9 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAyMDA5NSBTYWx0ZWRfX8OrOcBiSgB2S
- PnJiUwTu1k/XqYfpQ5Bx9/32ilMUoZFw0W8VfttP4XOV3eXvbl5KdmPZJujfeI8ZnKIH15SN8G+
- w/Zz7nIb8SSBYvmvj0yQ3DpyNmaH0NtuQi0oU1AoS73Q75sJMNG/jDTdBDXzBnvywzUEXnKnT8y
- N3B8ZbhJGL0IP/jJWjTytFQcZEQTRb3acDe/w2n522WEOAQSO7P86SF0DW1a3ZVYkeZW6SD8Zyl
- ouPViQtL17WGfS3F9DB0wA8gOI2o/rw1rTtygXGeCpFUr5VzbUBL6i1DzCXplTxjy9BcagDKxxu
- XyIi7ZKFTlIiaRFgQSoB0KIxKWT0lcJ7p1vRNH9rhWZnAOPplTOj48sX14Hnj904Dj7FT/q30OS
- 8dmL2bK3TqnH6cytPnJh7+OQ2f7sn/IA8g2YcYIGr1lPzH3cbOjjVyfPlXuVzDMZq9vaH3rsBhS
- tOwyPrUSLtXwGtkHQPQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAyMDA5NSBTYWx0ZWRfXy1c5zQRMy6bk
- 6/psvPOZtEJLZsT/w3VslxPDAlovCqTM59mx5Na76TMyx5Uhr7+szN3FrYZ+b8AQens+3WF1Qvk
- l8A+KXqfehfjCRrQnzEQY8ZWQS3YwbS4zXh5e0JZ4lhA24/e8j/5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-02_03,2026-07-30_01,2025-10-01_01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJEmb2oC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDCwND3aSc7JTUMt20zIrUYl1zc8Mkw2RjQ5PUpCQloJaColSwBFBHdCy
+ EX1yalJWaXAIyQ6m2FgD3nb7rcAAAAA==
+X-Change-ID: 20260801-blkdev-fixes-771b1c314ebb
+To: Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tal Zussman <tz2294@columbia.edu>, Sashiko <sashiko-bot@kernel.org>
+X-Mailer: b4 0.14.3-dev-d7477
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785669291; l=1456;
+ i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
+ bh=nqi5SVdPgj60DLFNV8hMjaRd+M1KFnZMQ4Z04XcbmX8=;
+ b=d9AErRvGwo1lUJ92LIPfsJlRo3HzhJudn+bijpjys+m3YIMM2zOBVnOksQKR2piG5erwJROsu
+ cSe/4U3lOddBYzLDF3b+YWpbR681o2wTmRG7JhR86uZDto0tkuujKID
+X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
+ pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
+X-Proofpoint-GUID: BODg6PlvK7Y7GMwuyVVaLzXGDc6x8IYm
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAyMDA5NSBTYWx0ZWRfX2ZwC8Awiga32
+ K7nCBBB6EWlSXb1R9SWfD6yBoa0BdIVMHcynQekoNSIA0o5LQWCBqU1SgcPzB/2ppnInYzOLKsW
+ 6tXgQF3cPyuJ9WMD7ghydjjAl9go8l78O2QC3kvnx2Ni4yyNEwLF
+X-Proofpoint-ORIG-GUID: BODg6PlvK7Y7GMwuyVVaLzXGDc6x8IYm
+X-Authority-Analysis: v=2.4 cv=LJ9WhpW9 c=1 sm=1 tr=0 ts=6a6f26ae cx=c_pps
+ a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=C4zMR0+CEq2lM/mtmjScOA==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
+ a=VwQbUJbxAAAA:8 a=VfL1AaAevc5-fGJ07oQA:9 a=QEXdDO2ut3YA:10
+ a=pJ04lnu7RYOZP9TFuWaZ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAyMDA5NSBTYWx0ZWRfX0AosIAHXz7eR
+ B4h3ND638x9Myn2pP3luQwxpO4MBrlo0R7s8yNVEqHCHXRj/ZYsf11POoxfy6jCR+lfK7jZis8c
+ 5Ak4XM695U8PL/aQd3Tz9j2XY2yaBRrYfDX0VSQ4kRp5+nY/8PRgCk3lj41OV8P6C3LNlCWmV3k
+ ksojgMOec9HVrVwy+pVc6gixVz9yfBuFJbl5p5mZ/bfM60PTj0UgL7ClLxOrBvv/f6xzg36h2DU
+ n3CPDnJ+E28LT8VvHHzmw4exbDV1vV4RGDaAPMLMrHAOtCtEvgJOqvqQRVkoc5kPRqw3H8SQV6x
+ Ep+bBL3gcyOPsZlVqTGSm9U0rR3LIjJxRjDyouz8Xzxgm5V6N2WU5vvaOFQJsXstpY4UOjneYsK
+ 3BqgpVjIB/2HZ827XldomqDhZbFcBZcTLbUgkSzvvOW42E64M9N2nAqHhz9E/kd5iasHUMXw30O
+ P0EPPvDa1xcAqYPDk+Q==
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11862
+ signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 clxscore=1011 priorityscore=1501 phishscore=0
- adultscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ lowpriorityscore=10 phishscore=0 bulkscore=10 impostorscore=10 spamscore=0
+ priorityscore=1501 malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608020095
 
-For NLA_NUL_STRING attributes, nla_policy.len is the maximum length of
-the string excluding the terminating NUL, as documented in
-include/net/netlink.h. The genl_magic infrastructure encoded that as
+Two independent fixes for the block device write path. Both issues were
+found by Sashiko during review of the "block: enable RWF_DONTCACHE for
+block devices" series [1] and are independent of it.
 
-	.len = maxlen - (nla_type == NLA_NUL_STRING)
+Patch 1 fixes silently lost mmap writes with CONFIG_BUFFER_HEAD=n:
+def_blk_aops uses filemap_dirty_folio, which does not set the
+per-block dirty bits in the folio's iomap_folio_state, so writeback
+finds no dirty blocks and submits no I/O.
 
-but the hand-written policies that replaced it set .len to the full size
-of the destination buffer. Every NUL-string attribute therefore accepts
-a string that is one byte too long for the buffer it is copied into.
+Patch 2 makes blkdev_write_iter() take i_rwsem shared around the
+buffered-write fallback for a partial direct I/O write. The fallback
+currently runs with no lock held and races set_blocksize() changing
+i_blkbits and the mapping's minimum folio order, which can trip
+VM_BUG_ON_FOLIO in __filemap_add_folio() on kernels with block sizes
+above PAGE_SIZE.
 
-For such a string validate_nla() succeeds and nla_strscpy() truncates it
-and returns -E2BIG. The return value is stored without being checked in
-the corresponding unsigned length member, e.g.
+Both issues are currently unlikely to be hit in practice due to the
+specific configurations required to trigger them.
 
-	s->cpu_mask_len = nla_strscpy(s->cpu_mask, nla, DRBD_CPU_MASK_SIZE);
+[1] https://lore.kernel.org/all/20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu/
 
-set_resource_options() copies the whole struct into resource->res_opts,
-so a later dump of the resource options reaches res_opts_to_skb() with
-cpu_mask_len set to (__u32)-E2BIG. The payload length handed to
-nla_put() is computed there as
-
-	min_t(int, DRBD_CPU_MASK_SIZE,
-	      s->cpu_mask_len + (s->cpu_mask_len < DRBD_CPU_MASK_SIZE))
-
-which evaluates to a negative int. __nla_reserve() then stores
-nla_attr_size() of that negative value in the u16 nla_len, and
-__nla_put() calls memcpy() with an underflowed size argument.
-
-The five net_conf algorithm names, both disk_conf device paths, the
-configuration context resource name and the resource cpu-mask are all
-affected. The shared secret is the one most likely to be hit in
-practice: SHARED_SECRET_MAX is 64, a secret of exactly 64 characters is
-what "openssl rand -hex 32" produces, and nla_put_status_info() feeds
-the unsanitized net_conf to net_conf_to_skb() for any caller holding
-CAP_SYS_ADMIN. The sanitized path clears both the secret and its length,
-so an unprivileged status dump is not affected.
-
-Restore the bound the generated code used to emit. With the policy
-corrected nla_strscpy() can no longer truncate, so the unchecked return
-values become harmless again.
-
-Reaching any of the affected attributes requires CAP_NET_ADMIN. Found by
-inspection while looking at the cpu-mask length limit; no user report.
-
-Fixes: 8098eeb693c4 ("drbd: replace genl_magic with explicit netlink serialization")
-Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
- drivers/block/drbd/drbd_nl_gen.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Tal Zussman (2):
+      block: use iomap_dirty_folio for block devices
+      block: take i_rwsem for the direct I/O write fallback
 
-diff --git a/drivers/block/drbd/drbd_nl_gen.c b/drivers/block/drbd/drbd_nl_gen.c
-index fb44b948cec8..5b668e78051b 100644
---- a/drivers/block/drbd/drbd_nl_gen.c
-+++ b/drivers/block/drbd/drbd_nl_gen.c
-@@ -51,8 +51,8 @@ const struct nla_policy drbd_disconnect_parms_nl_policy[DRBD_A_DISCONNECT_PARMS_
- };
- 
- const struct nla_policy drbd_disk_conf_nl_policy[DRBD_A_DISK_CONF_DISABLE_WRITE_SAME + 1] = {
--	[DRBD_A_DISK_CONF_BACKING_DEV] = { .type = NLA_NUL_STRING, .len = 128, },
--	[DRBD_A_DISK_CONF_META_DEV] = { .type = NLA_NUL_STRING, .len = 128, },
-+	[DRBD_A_DISK_CONF_BACKING_DEV] = { .type = NLA_NUL_STRING, .len = 128 - 1, },
-+	[DRBD_A_DISK_CONF_META_DEV] = { .type = NLA_NUL_STRING, .len = 128 - 1, },
- 	[DRBD_A_DISK_CONF_META_DEV_IDX] = { .type = NLA_U32, },
- 	[DRBD_A_DISK_CONF_DISK_SIZE] = { .type = NLA_U64, },
- 	[DRBD_A_DISK_CONF_MAX_BIO_BVECS] = { .type = NLA_U32, },
-@@ -80,17 +80,17 @@ const struct nla_policy drbd_disk_conf_nl_policy[DRBD_A_DISK_CONF_DISABLE_WRITE_
- 
- const struct nla_policy drbd_drbd_cfg_context_nl_policy[DRBD_A_DRBD_CFG_CONTEXT_CTX_PEER_ADDR + 1] = {
- 	[DRBD_A_DRBD_CFG_CONTEXT_CTX_VOLUME] = { .type = NLA_U32, },
--	[DRBD_A_DRBD_CFG_CONTEXT_CTX_RESOURCE_NAME] = { .type = NLA_NUL_STRING, .len = 128, },
-+	[DRBD_A_DRBD_CFG_CONTEXT_CTX_RESOURCE_NAME] = { .type = NLA_NUL_STRING, .len = 128 - 1, },
- 	[DRBD_A_DRBD_CFG_CONTEXT_CTX_MY_ADDR] = NLA_POLICY_MAX_LEN(128),
- 	[DRBD_A_DRBD_CFG_CONTEXT_CTX_PEER_ADDR] = NLA_POLICY_MAX_LEN(128),
- };
- 
- const struct nla_policy drbd_net_conf_nl_policy[DRBD_A_NET_CONF_SOCK_CHECK_TIMEO + 1] = {
--	[DRBD_A_NET_CONF_SHARED_SECRET] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX, },
--	[DRBD_A_NET_CONF_CRAM_HMAC_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX, },
--	[DRBD_A_NET_CONF_INTEGRITY_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX, },
--	[DRBD_A_NET_CONF_VERIFY_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX, },
--	[DRBD_A_NET_CONF_CSUMS_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX, },
-+	[DRBD_A_NET_CONF_SHARED_SECRET] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX - 1, },
-+	[DRBD_A_NET_CONF_CRAM_HMAC_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX - 1, },
-+	[DRBD_A_NET_CONF_INTEGRITY_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX - 1, },
-+	[DRBD_A_NET_CONF_VERIFY_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX - 1, },
-+	[DRBD_A_NET_CONF_CSUMS_ALG] = { .type = NLA_NUL_STRING, .len = SHARED_SECRET_MAX - 1, },
- 	[DRBD_A_NET_CONF_WIRE_PROTOCOL] = { .type = NLA_U32, },
- 	[DRBD_A_NET_CONF_CONNECT_INT] = { .type = NLA_U32, },
- 	[DRBD_A_NET_CONF_TIMEOUT] = { .type = NLA_U32, },
-@@ -143,7 +143,7 @@ const struct nla_policy drbd_peer_device_statistics_nl_policy[DRBD_A_PEER_DEVICE
- };
- 
- const struct nla_policy drbd_res_opts_nl_policy[DRBD_A_RES_OPTS_ON_NO_DATA + 1] = {
--	[DRBD_A_RES_OPTS_CPU_MASK] = { .type = NLA_NUL_STRING, .len = DRBD_CPU_MASK_SIZE, },
-+	[DRBD_A_RES_OPTS_CPU_MASK] = { .type = NLA_NUL_STRING, .len = DRBD_CPU_MASK_SIZE - 1, },
- 	[DRBD_A_RES_OPTS_ON_NO_DATA] = { .type = NLA_U32, },
- };
- 
+ block/fops.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+---
+base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
+change-id: 20260801-blkdev-fixes-771b1c314ebb
+
+Best regards,
 -- 
-2.55.0
+Tal Zussman <tz2294@columbia.edu>
 
