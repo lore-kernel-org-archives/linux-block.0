@@ -1,96 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-51.ptr.blmpb.com (va-2-51.ptr.blmpb.com [209.127.231.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0377B3ACA61;
-	Sun,  2 Aug 2026 11:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7071A37C926
+	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 11:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785669962; cv=none; b=H+JD+aBWJhesVXV3Nh4wkjJiBp8qim+lX4SLolVHMAuBM/yROQwo+mPBMUTB2Owy/B48U3rhq9A8F/gmY4UieU+JqEzpMDQr82G5nnH8TewcG2Mh5WsUIFU1mgDJRGwoRn4E2Z801TbWiMP1B5lrbI8SU3kYEnUFAxohSbX0nJ4=
+	t=1785670092; cv=none; b=Rrzo7rzpLyrPj5d29eYfVpTyTVG5e+W2YOjXYUUaiHfT+6sM3fsP/oDJTQc0yFOgyCZoFk+dO000q7D5Xfax883/dESbuk1w8G44/fVEukWiXiKsuT2KdPMuWDGhGk7PIqTSOtVEpYbwUqca1GcAV2BPHJADv7/mk4Pj5OsViP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785669962; c=relaxed/simple;
-	bh=dBrl1Pp9HQ4n78J1Ir0K119S/z+p2hrZdQg7yU7uW/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l7awa/w9T05X3jddVQrhaPRaFDQU1A0cLQ3khTkMNrklCCApoJ1cPpSx5bblXJKbX1l/5rP0bRkb0EV7KrrKDikpqhvywPUYj/8ETrtZKfDixM9tEsQSMm+SJmBbCivMuEWXZodUM5KMfWyNkDQiIq0hyPTL2qzu4vsuIV5zn7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJdQENa3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785670092; c=relaxed/simple;
+	bh=/jfDPOlPywN/4La9Tg7jDK9wdYv8HkorZJUF1w+xw5c=;
+	h=Subject:Message-Id:From:In-Reply-To:To:Date:References:Cc:
+	 Mime-Version:Content-Type; b=Um8XlO+AFJRmUeqJCN96tRO4P3M+M5cgqntbeUkms68Su3o+H/tbZ+3cnmcFAxKiDAIMIN9Rt4YT0SdZLekv/XJGbxhkOLbqYaaCh6wdpgdYtxU3jhvtYlaUmFeaLYProFYQhXoWj2RgdDat9df/r38G10nH9oIi+rgPRuehMsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=Bc3fqa8X; arc=none smtp.client-ip=209.127.231.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJdQENa3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9157D1F000E9;
-	Sun,  2 Aug 2026 11:25:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785669960;
-	bh=mfWYTY/Qd1tUhLyp54yJEpcWt0Lp1lIRHIVNWZlerm4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MJdQENa3gvXxFzb1ifGAgZFWH1Fs4NkjvxzI06IEm3p3yi//ZaALKOdXeNgKPenjZ
-	 hBPyQlsdyS58oFquIzbTiGufWyzgIeuUpe1CZqLrccryYZZ8rj9RKL0OY3NV8v5/iU
-	 Z2fStEmCMi+OEipXIJP855oZ3AQZYh4gUXHsQXTgIgwKtBtTBTNEEsNbcpyMQJzOQ6
-	 aDykoS0aRTCC8+AZfO4nWPE7T7pHefIxLi1swTAO0VOE3Kk4Q+WkFdJd7K1z8a97AG
-	 uEwwl1MSZr2cvmbSSsJx5stgJ7Ttc3vaYTeB2LnlZCf/B8TKDHrxgJ2/U/DFYne5da
-	 S95j6tGStPVtQ==
-From: Yu Kuai <yukuai@kernel.org>
-To: tj@kernel.org,
-	axboe@kernel.dk
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhengqixing@huawei.com,
-	hch@lst.de,
-	yizhou.tang@shopee.com,
-	yukuai@fygo.io,
-	nilay@linux.ibm.com
-Subject: [PATCH v4 0/4] blk-cgroup: fix blkg list and policy data races
-Date: Sun,  2 Aug 2026 19:25:21 +0800
-Message-ID: <20260802112525.3933753-6-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260802112525.3933753-1-yukuai@kernel.org>
-References: <20260802112525.3933753-1-yukuai@kernel.org>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="Bc3fqa8X"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785670076;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=ihlRfsPOSM0uReND4oanKeryCV7yyvMe6vhP6nUWyug=;
+ b=Bc3fqa8Xwyir0Xr1yZn2RtdrEMyEVkbQLWr2ZpjUlQrowIZsho4NoJkxr6WVtqLru1RzXu
+ x9po7ljvvTEGK+0NhvjNsUriAPBgCZkdhCj4O6vkk5/r8kYLLsziZdBPDVRWzkgsVrQnrI
+ umbPmXs4/wHxr/T3expwHyUEtkX6txj+pk1p0KmKnEscL3ahQv9NNzJj3j42VxUm1MDJee
+ 0/ySLL5Um8Pz5Sck3FobjVQFUOmoSDnZIYwOz66k6w8TJD4KrrjK98rDN/jZasgmQQmN+F
+ /yIfY3nSj+otT0wmOa5NvidDg1hMELzQek715YEZ7PjyXuAPRSqeh+4p2mDH8A==
+Reply-To: yukuai@fygo.io
+Subject: Re: [PATCH v5 2/8] nbd: disallow NBD_SET_SOCK on an active device
+Message-Id: <bf15d6e6-3a1d-4140-b659-8d47f645d713@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+Content-Transfer-Encoding: quoted-printable
+From: "yu kuai" <yukuai@fygo.io>
+In-Reply-To: <20260730082046.3459239-3-yangerkun@huawei.com>
+User-Agent: Mozilla Thunderbird
+To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+Date: Sun, 2 Aug 2026 19:27:51 +0800
+References: <20260730082046.3459239-1-yangerkun@huawei.com> <20260730082046.3459239-3-yangerkun@huawei.com>
+X-Lms-Return-Path: <lba+26a6f29bc+5383fc+vger.kernel.org+yukuai@fygo.io>
+Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
+	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>, 
+	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, 
+	<nbd@other.debian.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Received: from [192.168.1.104] ([39.182.0.181]) by smtp.larksuite.com with ESMTPS; Sun, 02 Aug 2026 11:27:55 +0000
+Content-Type: text/plain; charset=UTF-8
 
-From: Yu Kuai <yukuai@fygo.io>
+=E5=9C=A8 2026/7/30 16:20, Yang Erkun =E5=86=99=E9=81=93:
 
-This set fix some problems that are reported long time ago with minimal changes,
-the blkcg_mutex refactor I'm working on can fix these problems as well, but it's
-complicated and may not land in this merge window. So I think this set should land
-in this merge window first.
+> We cannot add a socket to an already running nbd device, the reconfigure
+> for netlink can only active an inactive socket. But for ioctl path, we ca=
+n
+> call NBD_SET_SOCK after NBD_DO_IT, reject this using nbd->pid which has
+> been setted when NBD_DO_IT. Besides, it is the root cause for commit
+> b98e762e3d71 ("nbd: freeze the queue while we're adding connections").
+>
+> Signed-off-by: Yang Erkun<yangerkun@huawei.com>
+> ---
+>   drivers/block/nbd.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
 
-Patch 1 protects blkg_destroy_all()'s q->blkg_list walk with
-blkcg_mutex.
-
-Patches 2-3 fix races between blkcg_activate_policy() and concurrent
-blkg destruction.
-
-Patch 4 factors the policy data teardown loop into a helper after the
-race fixes.
-
-Changes since v3:
-- Rebase on the latest for-7.3/block branch.
-
-Changes since v2:
-- Rebase on the latest block-7.2 branch.
-
-Changes since v1:
-- Drop the BFQ q->blkg_list patch because the current block tree already
-  has a stronger fix in commit 17b2d950a3c0 ("block, bfq: protect async
-  queue reset with blkcg locks").
-- Add Reviewed-by tags from Tang Yizhou.
-
-Yu Kuai (1):
-  blk-cgroup: protect q->blkg_list iteration in blkg_destroy_all() with
-    blkcg_mutex
-
-Zheng Qixing (3):
-  blk-cgroup: fix race between policy activation and blkg destruction
-  blk-cgroup: skip dying blkg in blkcg_activate_policy()
-  blk-cgroup: factor policy pd teardown loop into helper
-
- block/blk-cgroup.c | 65 +++++++++++++++++++++++++---------------------
- 1 file changed, 35 insertions(+), 30 deletions(-)
-
--- 
-2.51.0
-
+--=20
+Thanks,
+Kuai
