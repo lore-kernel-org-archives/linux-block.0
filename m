@@ -1,80 +1,79 @@
-Received: from va-2-54.ptr.blmpb.com (va-2-54.ptr.blmpb.com [209.127.231.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC016396D1C
-	for <linux-block@vger.kernel.org>; Sun,  2 Aug 2026 12:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31713BBFA7;
+	Sun,  2 Aug 2026 15:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785674972; cv=none; b=bPyaRPpORGGBnG8RdimXfo+zXzP+iFb+FzF4ruy58LNaNaVS/i1Mh64ePbeHIjdhqWpwcPzbf5MlKCL+wYGgO5rZUdMXSYzqt/jnhDZh5MI5+Q19YRRZooNTtrJAy8Hz3t/LwHFJIddVA+aPn1sBH5QGi6ZO+2QP8ZLyY+WVZ+w=
+	t=1785683087; cv=none; b=QeQhJKpaZvsoi8aIXgs8z7/f7R8IGprfHme4PyW2FlMPWOTRSVe0Db+5E7qzuCft+vaECaTvM6H/zAJePu3VqfOJPNb+zeG4KrmU0PZQzvEZJF4DoIfzG1cILbmDRsL1n+UDDa2VsotK8gdVT9mOLVvq8Zf5ruLNH3VblXK16v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785674972; c=relaxed/simple;
-	bh=GhyU+I4AObATmube0HVJJl5NTQHluwYkJadT+SOSx2g=;
-	h=Subject:Mime-Version:Cc:Content-Type:From:Message-Id:References:
-	 To:Date:In-Reply-To; b=mXxulWrguR5t1STFWjMwPgCY9JuHy1pnXDwdBAbn1KJ++A2syaziCGRCUcGc3vugPeKs5yr9okLuyWO7ozio+HmnuXGghTLVteAjC4QFVUsu/iblg569l4ARSpDQGSYp4dgYumUI9gZF0q9t8mxmHiu7P1CMajTO4+sV4D6IknA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=HpzolgWz; arc=none smtp.client-ip=209.127.231.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1785683087; c=relaxed/simple;
+	bh=PNImhYUF+IBH1SnJQQV6VVaaSWz80MXr0dLREmGyW/M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bNdttYLQ/UzYyqlGPAHmSdZ++OCDP6aPV07G1G/jnhshpZqRec9kfoyHPucHQdN5Q37xQpqy4HUbu6I8wgYp73wPtx6YssyokxJVQ/KyHXL1FkobBKVzWBj0kZ5ylY5ZCOBw4xVPEFkeXr1fB/gudSid9TA8tFqOL0mx0Bz5eJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vvIFGNv/; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="HpzolgWz"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785674960;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=n9lZR9qf3kptXY4+jbcwUniPvs3a4Q+wtE0w9TCgWJI=;
- b=HpzolgWzd5pGnT2/ThxJoHKxhY8c7Z0myyXH35sZDkhMEO90bC3M8nyN/rirM9A6AVvfmP
- Q+cXNt5nOFDinypumHjapeowlBJuPsncNbxvRGDVpSN4NpcOVTSSkKP0J7m5Ynt1XNBIhj
- GmEoU36ca0EjEsjmO5qoExj4FNGfPLpKH5KpTVj8aaRKFW+cwvbSlx2lgVTZi/u97TvNoA
- LZd+Ri4yN5WO66j32PoizbmTiEkD0Gm+Lt6ok9tQeni6D0qSskEjdU4idiLqyp8IrWgK2G
- JHPnTxdXJwaeyJhfM/uNxpLyE21T7y8lDNzVckBesi3g0WDv14nwd5OByekXgA==
-X-Original-From: yu kuai <yukuai@fygo.io>
-Reply-To: yukuai@fygo.io
-Subject: Re: [PATCH] blk-throttle: remove dead field last_check_time from throtl_grp
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vvIFGNv/"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785683072;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fNqPIMi1h+CgUvqJUxjQG3eAhWqTrsnnu3OCxhWLRis=;
+	b=vvIFGNv/cVAe+VIyTugn7OGAVxjLXg1HeQV6m3E03rHSnv1qTae4500/d+FI9SP3S0EUCM
+	I2reLsHEfEMEPqMqqvIMH6VBM0ez1fRSvVJGzl5RA77SYCK5mavZivERKUqxCjg4YGqC51
+	RD4i8mlCPmlT7nOGIy8+TRcZayMkPzs=
+From: Tao Cui <cui.tao@linux.dev>
+To: axboe@kernel.dk
+Cc: tj@kernel.org,
+	josef@toxicpanda.com,
+	yukuai@fygo.io,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cui.tao@linux.dev,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH] block/blk-cgroup-rwstat: use data_race() for online test
+Date: Sun,  2 Aug 2026 23:04:13 +0800
+Message-ID: <20260802150413.29789-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: <tj@kernel.org>, <josef@toxicpanda.com>, <yukuai3@huawei.com>, 
-	<cgroups@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	"Tao Cui" <cuitao@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.181]) by smtp.larksuite.com with ESMTPS; Sun, 02 Aug 2026 12:49:19 +0000
-Content-Transfer-Encoding: quoted-printable
-From: "yu kuai" <yukuai@fygo.io>
-Message-Id: <da74ba48-334f-4637-bebf-d394b72a13f7@fygo.io>
-X-Lms-Return-Path: <lba+26a6f3ccf+11c1d9+vger.kernel.org+yukuai@fygo.io>
-References: <20260717054855.2018578-1-cui.tao@linux.dev>
-To: "Tao Cui" <cui.tao@linux.dev>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>
-Date: Sun, 2 Aug 2026 20:49:15 +0800
-In-Reply-To: <20260717054855.2018578-1-cui.tao@linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-=E5=9C=A8 2026/7/17 13:48, Tao Cui =E5=86=99=E9=81=93:
+From: Tao Cui <cuitao@kylinos.cn>
 
-> From: Tao Cui<cuitao@kylinos.cn>
->
-> The last_check_time field in throtl_grp was used by the
-> CONFIG_BLK_DEV_THROTTLING_LOW mechanism (in throtl_upgrade_check() and
-> the downgrade logic) to timestamp the last upgrade/downgrade check.
->
-> Commit bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW"=
-)
-> removed all five of its uses in blk-throttle.c and the surrounding LOW
-> fields (latency_target, last_finish_time, checked_last_finish_time,
-> avg_idletime, idletime_threshold, bio_cnt, bad_bio_cnt,
-> bio_cnt_reset_time), but missed the field definition itself.
->
-> It has been a dead field since then: zero references in blk-throttle.c
-> and the whole tree.  Remove it.
->
-> Signed-off-by: Tao Cui<cuitao@kylinos.cn>
-> ---
->   block/blk-throttle.h | 2 --
->   1 file changed, 2 deletions(-)
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
+blkg_rwstat_recursive_sum() reads pos_blkg->online without the queue
+lock that its doc comment requires, since blkcg_print_blkgs() stopped
+holding it in 56cc24f59c14.  Concurrent blkg_create/destroy flips
+->online, tripping KCSAN.  The race is harmless (RCU-protected, stale
+online only causes minor stat noise).  Use data_race() to annotate
+the intentional lockless read.
 
---=20
-Thanks,
-Kuai
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+---
+ block/blk-cgroup-rwstat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index aae910713814..71f74052ae03 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -107,7 +107,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+ 	blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
+ 		struct blkg_rwstat *rwstat;
+ 
+-		if (!pos_blkg->online)
++		if (!data_race(pos_blkg->online))
+ 			continue;
+ 
+ 		if (pol) {
+-- 
+2.43.0
+
