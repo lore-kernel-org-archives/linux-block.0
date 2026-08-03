@@ -1,64 +1,64 @@
-Received: from mail-pz2-f9.google.com (mail-pz2-f9.google.com [74.125.228.9])
+Received: from mail-pz2-f1.google.com (mail-pz2-f1.google.com [74.125.228.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8E536A377
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7637F358D37
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785766414; cv=none; b=mTjFoRMxZcf+DSxbdvvC2M0lmAJbt0lW7AC/tYHLmSJQjND7jYxRjyZ5OYRMISEZ1/XyDDfEmWPxeMECT4KuDkphMVk5zM2KwoBWfIj/0qvxxhnmiFI1C0poW4AoMBzJ9u0NEF4b3rQFCOdwnmGnZPzMRdn9LGESSqXEPIm3mko=
+	t=1785766420; cv=none; b=SqxIOyOxgxOL6Kq3+vsM76rHjpglNxHM/atK0uApeMg7KmcetTmeFnOi7jvCaiTKmP6s7/i5R6Lga+KfuatCa5HSHRezNa6ipAu17MTwgXoBohOYIeBIiptldPnzRJ0SOeHh1jL+thgP9EcQ9EBbyIGt1UqyY7x2yW6aF18o0v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785766414; c=relaxed/simple;
-	bh=D1O3BtqXhi2bbxwPO54hut6y0QtxHvtDzf+Ku4Ih2rY=;
+	s=arc-20240116; t=1785766420; c=relaxed/simple;
+	bh=snCwLlHVwdQDYtlAPvwM1n1QYprJfHmXHL9lGUbcfg4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S9vcNX+NQ359/TsJ8Oq2k50GNHDLePm3G6SbMRbs7QkKU/IWpGP4HtbxfpqU3pS0an9fo9BFdqviyWZd6F0R0alYM9Is1zy/Hg1jJ1mH6sYZapHNeQabDdIvp+HnMr56eEzdMs96ciUqzpt/YcMh7+QlHVTTTv4sNmbRiUOKkPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RxhZZzAn; arc=none smtp.client-ip=74.125.228.9
+	 MIME-Version; b=SwOJQdbz/H2/ANUKkidlK8r0bpg41WKEiKbRYaGGN+3x2WAULlOTzpeI/3FUGfVZhdopby4tH1y+gB/krCu8LiMKTK6S2x3daj99zWRoWtCTxRyhvH11bzwGXHl+fa3VmC/dwZeE8YwmnOT/B45VpktXBdVDCLoiwm8nyEA5ZU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JwMztbCZ; arc=none smtp.client-ip=74.125.228.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxhZZzAn"
-Received: by mail-pz2-f9.google.com with SMTP id 41be03b00d2f7-cbbc9e6e637so1902043a12.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 07:13:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JwMztbCZ"
+Received: by mail-pz2-f1.google.com with SMTP id 41be03b00d2f7-ca00ea47337so1266907a12.0
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 07:13:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785766413; x=1786371213; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785766419; x=1786371219; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Vl3fhYiohrdIlS9g/uSFV7y+uIWeNZ5gxUBY7VDbnfU=;
-        b=RxhZZzAn6FR1biQ/Lju8tYQBYPReGYQzpK0wljSfF3EQO3VHyEHgxcf/TslfDgO/Kb
-         PY6fH6pTl8BgLpq0SC+MWU8za4dby4z+KUSMk5Po/qyz8CzUH5g9df14yIM35L5JwFgf
-         6tOCtxSCybRj0BEzklZwsEoZlwh3CApxx7CF5harsNA1OaO8ksI0f+OoSGpkB7wVulJu
-         cTKkk0kjVzBJNOiNtVFi7ObRhKV01cQmDD3cROYqzjpAF5XW8kwY3+sTkFsR9Ar6kESC
-         3diGKJWxiBUyyeRl3URUpyNsw4ZBj88L5dteJGFk7ML+Epye2y4OvOvBiQULqCE6gQcY
-         NrHA==
+        bh=Axodgx8kBdbHlZ8xxUIltU+O0hU6tw0N0qpmn8u1aps=;
+        b=JwMztbCZaovPJd7OVfwZcCOrlp8RDQddwWz5s4hbC2StmEs0mrfEz3YZjdwQFDwCl1
+         +gGCTe7sE5K5dk9QJpFyVedhw80V6LSkGjJ+psz33/YqdK9YdbI/qFGtQc9BPkIWRKLo
+         pt2R8BxuRwWmbHgG2AMkolucoQ96q26iSwqUmyt1YAn13mW9LKT6jo6K2GGG4/OQJVbI
+         Pr4J9eURllod+KgMBjBrCFG+GQ593zHgEVblbASlhDoHDAZ9mlzS5wZ0O9gmmzbtBTVg
+         vWkMEauQHHSU8oyZA1zl/r5V8EPJYaB+MHOJKmeR3UN9XsCLaJmCwLC9s/Be6YVDEcOv
+         AQpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785766413; x=1786371213;
+        d=1e100.net; s=20251104; t=1785766419; x=1786371219;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vl3fhYiohrdIlS9g/uSFV7y+uIWeNZ5gxUBY7VDbnfU=;
-        b=F1Rado7b+IRkuPuCylIyOAiYhURwDgARwOve+N1wb1AuvKvNB6BZm0Zy2p6/TjuGJ2
-         YYQ5jo7YkzAAYr2bS03Es2xIVf1BrP72D7C6TLcSGSIfyMKHnEGbsLupzu7e3to0vm3q
-         1bF/NLq+exN1wwTWkzeJQWayyJHVIT6sIMOvQhNIdjxOHKXcyh/YcgCD7qeaZ03g6XJD
-         vTR9221G10hBzYh7suye+RlHt33SgrsbqyrHzMfjzHUjrxrld5cKWPxkBSvzIagn/fXU
-         SkzFEmQ6+Gr2S7RD1t+J2oefrNaq5yFXn6eXKLCgKY2ULXm7Yj3xD1s0i2kbNubk3WN7
-         hHgg==
-X-Forwarded-Encrypted: i=1; AHgh+RrvtEzsnWsYC5Trz4+vWF4tuSEd7JCB3/P7acydp5YmJcrZuVX/sQBbJt8Z6JM36CF4L58Wa2gpHGofZw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUmQqReisAnEwSh7XnrSX2LlAPS1iNSw+xlZAmx5JuT32UGzyR
-	qFHjuVSI5nRU2poXxTmFyeIhIPnzw5k5aah8+fAeRr9jwVjJ/YS9jWcm
-X-Gm-Gg: AR+sD11Yod7LbhBo+Fkvx4aNIJxXyowI9DcivsudRQ5BeQ0m/1a+kvKq6W6ZfMKdXdQ
-	sgl640mX6g6oigBjso2mqgmyffgKuitl8n3Q3ZtmcAI+uWQz7Jx3lq1vZaL2lxbZDeReciFJzED
-	OpKgvpOQm/gMmp50bU9gDGuBuBhiqf5A70L2uBNMrfHCYyZ/dudH/K1PgIgLSoANBUOy2p4xQhw
-	agVAiu7Pt59uckn+0zFpPFq+XGsqMD+utImNTJ0B6sqzzAZrEy2RYKDj9zyN72SQk8ky5fXpVC0
-	b6e6Cn5xV2QRvB2PpT6g5eqfz7uT+gViGfhlBnnSTXPLsW1wjPK77VPVinhcWwmcGJ1lNDCMdXu
-	tzbkw3MtfJbptf/v8sxE1+xhdOiaOHZx+91jhziAecvb/XJDjrkxrmui4Jy5V+Zawt66qx55B9a
-	TiOYsLe+MoZ6BFHJSRl07aSTLcBa+qzZ5TndV47BQX65tqRTM0zzwtvgIFbE9095EsQmaUIQaBv
-	7wDCTn0Npt52cu1Y31tAow1acNrwfMblBReVJ8tVj+G
-X-Received: by 2002:a05:6a00:1da7:b0:848:2f6e:e537 with SMTP id d2e1a72fcca58-84ee4906dcfmr8420957b3a.75.1785766413022;
-        Mon, 03 Aug 2026 07:13:33 -0700 (PDT)
+        bh=Axodgx8kBdbHlZ8xxUIltU+O0hU6tw0N0qpmn8u1aps=;
+        b=aiGDZImPIpw6Sh1JWcs7T1U3F8M6/WhFHo9inYeGoghqSOxDo/F408X0czDcYhjgIv
+         jjJgp8gJTfLwVzLHy5C1yTVOmMKXzDUFWZsxMpdveMd8D7E9fjWrAn2iUJX/C6rTOgF0
+         67FwzcSU6KtKib6HvB7tnhZ7+3Ab9ActxiEhwuxbaJsq5UUH2cwH1iT3EFVw4OLbf3P3
+         iZDkSgCGqs4Mwqe/kVmzImysr/ULkuipapMO5vwWzghlzmph+zims80M7PDP6MmiJhqv
+         6lIrDB1IOZLC127vAMWxEQZvLSPPG4SgO+V3oiCokAI6p1+O5Ok7UWw5SW6/NtDrKCQz
+         RT1A==
+X-Forwarded-Encrypted: i=1; AHgh+RqD1i12IuhEA8EGdAywnwf7GrlzrroHfcDAGMBjcK72jCslgh5toPHnaJFGwOdsd/PyNhUXmmWPK0lNOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywcdc+kNrYABsPBScgdLKUREs9lJnld3KIaRM6o1lAQZ+EzhE5u
+	RTGZYh6t2leHA1tsFhfeDQYouMD2HBRCd8XexbsY8rpDaNQbsjeDAZ7O
+X-Gm-Gg: AR+sD116I1SO9FFNGSQ009F5NoTcFo+ITa/cJNan+8eltQ+uAzg8e13kex5o/TUyNgi
+	9CLjED5pCOnmtPFgBN5AssO7LGjO+PIMNc5rtV/XK30p0+wEu1R04GIwCbH8D5eEJTex+SuKDne
+	0lGWgf73FfFu5K/Ev1bI4IPHPlhGR7Ln0ZVF/k06V5HRpfHKGttlBFkx5Ser6TM1U+mGIns+Ovx
+	6/AdVkx+h3KS0dzsxwsHljWOhJ4J2fHdDTTTxTJFPhyko/lkVqsYiZMVUNF8WaWYrxd51LnBeKl
+	ggB4L5CpI6arM3ySf01n3pm7WaeyNb07dgBSvl9JRXV69S2/OfB8FIuVDkQ+3bFRowUhAyQ3/mX
+	9mA5DvFNWNzIfQD11TPz1HUg+/U1BDH20yd4tXEtugOwzGeSLQGKV9RCJF+D1xRgvU+bOkMenGo
+	LOsUH8b+7J+4kkpXUQWcLWyFpKjUwcW17eB2JQT5t7C8ySZHJPMUoDQfNOLUN3n0EijIYQk84Mv
+	h2drFp3+AXf2v70L8x3rn7g/+bV2+CFKQ==
+X-Received: by 2002:a05:6a00:8d6:b0:848:8027:cb6 with SMTP id d2e1a72fcca58-84ee48bc736mr10168089b3a.45.1785766418665;
+        Mon, 03 Aug 2026 07:13:38 -0700 (PDT)
 Received: from HAOQINHUANG-MC0.tencent.com ([2409:8a00:1a20:7370:cd52:f161:9c8a:ee77])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edc29ebeasm3818360b3a.30.2026.08.03.07.13.28
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edc29ebeasm3818360b3a.30.2026.08.03.07.13.34
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 03 Aug 2026 07:13:31 -0700 (PDT)
+        Mon, 03 Aug 2026 07:13:37 -0700 (PDT)
 From: Haoqin Huang <haoqinhuang7@gmail.com>
 To: Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -70,9 +70,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Haoqin Huang <haoqinhuang@tencent.com>,
 	Rongwei Wang <zigiwang@tencent.com>
-Subject: [PATCH v5 2/4] zram: reject zero-size dictionary
-Date: Mon,  3 Aug 2026 22:12:54 +0800
-Message-ID: <20260803141256.60599-3-haoqinhuang7@gmail.com>
+Subject: [PATCH v5 3/4] zram: validate parameters in each backend's setup_params
+Date: Mon,  3 Aug 2026 22:12:55 +0800
+Message-ID: <20260803141256.60599-4-haoqinhuang7@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260803141256.60599-1-haoqinhuang7@gmail.com>
 References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
@@ -87,35 +87,150 @@ Content-Transfer-Encoding: 8bit
 
 From: Haoqin Huang <haoqinhuang@tencent.com>
 
-kernel_read_file_from_path() already rejects empty files (i_size <= 0)
-and returns -EINVAL, but the current implementation only checks for
-sz < 0 without logging any information. Use sz <= 0 to cover the
-zero-size case and print an error message if dictionary loading fails.
+Dict and level parameters are silently accepted even for backends
+that do not support them. Validate these parameters in each backend's
+.setup_params() to reject unsupported combinations and out-of-range
+levels with a specific error message.
 
 Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
 Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
 ---
- drivers/block/zram/zram_drv.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/block/zram/backend_842.c     |  8 ++++++++
+ drivers/block/zram/backend_deflate.c | 11 +++++++++++
+ drivers/block/zram/backend_lz4.c     |  4 ++++
+ drivers/block/zram/backend_lz4hc.c   |  4 ++++
+ drivers/block/zram/backend_lzo.c     |  8 ++++++++
+ drivers/block/zram/backend_lzorle.c  |  8 ++++++++
+ drivers/block/zram/backend_zstd.c    |  5 +++++
+ 7 files changed, 48 insertions(+)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index cfa98846ac48..68e60c9eb8b3 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1700,8 +1700,12 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
- 						INT_MAX,
- 						NULL,
- 						READING_POLICY);
--		if (sz < 0)
-+		if (sz <= 0) {
-+			pr_err("failed to load dictionary %s (err=%zd)\n",
-+			       dict_path, sz);
-+
- 			return -EINVAL;
-+		}
- 	}
+diff --git a/drivers/block/zram/backend_842.c b/drivers/block/zram/backend_842.c
+index 10d9d5c60f53..91a22313fe82 100644
+--- a/drivers/block/zram/backend_842.c
++++ b/drivers/block/zram/backend_842.c
+@@ -13,6 +13,14 @@ static void release_params_842(struct zcomp_params *params)
  
- 	zram->params[prio].dict_sz = sz;
+ static int setup_params_842(struct zcomp_params *params)
+ {
++	if (params->dict_sz) {
++		pr_err("842: dictionary is not supported\n");
++		return -EOPNOTSUPP;
++	}
++	if (params->level != ZCOMP_PARAM_NOT_SET) {
++		pr_err("842: compression level is not supported\n");
++		return -EOPNOTSUPP;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/zram/backend_deflate.c b/drivers/block/zram/backend_deflate.c
+index b3f7d08b49d9..b2074c44b2d0 100644
+--- a/drivers/block/zram/backend_deflate.c
++++ b/drivers/block/zram/backend_deflate.c
+@@ -22,8 +22,19 @@ static void deflate_release_params(struct zcomp_params *params)
+ 
+ static int deflate_setup_params(struct zcomp_params *params)
+ {
++	if (params->dict_sz) {
++		pr_err("deflate: dictionary is not supported\n");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (params->level == ZCOMP_PARAM_NOT_SET)
+ 		params->level = Z_DEFAULT_COMPRESSION;
++	else if (params->level < Z_DEFAULT_COMPRESSION ||
++		 params->level > Z_BEST_COMPRESSION) {
++		pr_err("deflate: invalid compression level %d\n", params->level);
++		return -EINVAL;
++	}
++
+ 	if (params->deflate.winbits == ZCOMP_PARAM_NOT_SET) {
+ 		params->deflate.winbits = DEFLATE_DEF_WINBITS;
+ 	} else {
+diff --git a/drivers/block/zram/backend_lz4.c b/drivers/block/zram/backend_lz4.c
+index c449d511ba86..f4f5111220c7 100644
+--- a/drivers/block/zram/backend_lz4.c
++++ b/drivers/block/zram/backend_lz4.c
+@@ -30,6 +30,10 @@ static int lz4_setup_params(struct zcomp_params *params)
+ 
+ 	if (params->level == ZCOMP_PARAM_NOT_SET)
+ 		params->level = LZ4_ACCELERATION_DEFAULT;
++	else if (params->level < LZ4_ACCELERATION_DEFAULT) {
++		pr_err("lz4: invalid compression level %d\n", params->level);
++		return -EINVAL;
++	}
+ 
+ 	if (!params->dict || !params->dict_sz)
+ 		return 0;
+diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
+index f6a336acfe20..d7cd97b898bd 100644
+--- a/drivers/block/zram/backend_lz4hc.c
++++ b/drivers/block/zram/backend_lz4hc.c
+@@ -20,6 +20,10 @@ static int lz4hc_setup_params(struct zcomp_params *params)
+ {
+ 	if (params->level == ZCOMP_PARAM_NOT_SET)
+ 		params->level = LZ4HC_DEFAULT_CLEVEL;
++	else if (params->level < 1 || params->level > LZ4HC_MAX_CLEVEL) {
++		pr_err("lz4hc: invalid compression level %d\n", params->level);
++		return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+diff --git a/drivers/block/zram/backend_lzo.c b/drivers/block/zram/backend_lzo.c
+index 4c906beaae6b..cdbb89aaa0de 100644
+--- a/drivers/block/zram/backend_lzo.c
++++ b/drivers/block/zram/backend_lzo.c
+@@ -12,6 +12,14 @@ static void lzo_release_params(struct zcomp_params *params)
+ 
+ static int lzo_setup_params(struct zcomp_params *params)
+ {
++	if (params->dict_sz) {
++		pr_err("lzo: dictionary is not supported\n");
++		return -EOPNOTSUPP;
++	}
++	if (params->level != ZCOMP_PARAM_NOT_SET) {
++		pr_err("lzo: compression level is not supported\n");
++		return -EOPNOTSUPP;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/zram/backend_lzorle.c b/drivers/block/zram/backend_lzorle.c
+index 10640c96cbfc..58f7ddf5a55f 100644
+--- a/drivers/block/zram/backend_lzorle.c
++++ b/drivers/block/zram/backend_lzorle.c
+@@ -12,6 +12,14 @@ static void lzorle_release_params(struct zcomp_params *params)
+ 
+ static int lzorle_setup_params(struct zcomp_params *params)
+ {
++	if (params->dict_sz) {
++		pr_err("lzo-rle: dictionary is not supported\n");
++		return -EOPNOTSUPP;
++	}
++	if (params->level != ZCOMP_PARAM_NOT_SET) {
++		pr_err("lzo-rle: compression level is not supported\n");
++		return -EOPNOTSUPP;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index 5fabc3e7e975..e071fa584f6b 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -60,6 +60,11 @@ static int zstd_setup_params(struct zcomp_params *params)
+ 	params->drv_data = zp;
+ 	if (params->level == ZCOMP_PARAM_NOT_SET)
+ 		params->level = zstd_default_clevel();
++	else if (params->level < zstd_min_clevel() ||
++		 params->level > zstd_max_clevel()) {
++		pr_err("zstd: invalid compression level %d\n", params->level);
++		goto error;
++	}
+ 
+ 	zp->cprm = zstd_get_params(params->level, PAGE_SIZE);
+ 
 -- 
 2.43.7
 
