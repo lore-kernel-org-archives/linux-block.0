@@ -1,196 +1,153 @@
-Received: from mail-ej2-f2.google.com (mail-ej2-f2.google.com [74.125.228.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6A7369D55
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 12:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.130
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785759631; cv=pass; b=s1C7G03qXatpn0JRNzC7AHAQGiFs4Q33ZNhdbvwfOttm8tbV4/DpjwUdWuo0mvtuXHU0rCTYyDgClOoxfoxM/CnIDdn2vNxE65TOPUf4GvyQZs3FKqyQDN9AFwDx7znGnzeUD09bSuowEvl/2Vnaq7nBCj8qkF+DkEZ8ukaCRQw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785759631; c=relaxed/simple;
-	bh=rgGsDvmUPa6QzH1Rljaw/U++4UstqmFZJyTRj2fxItI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fY6Kt9qjEBxQjJehAnWywAhEtBZqAoaYLDW2S1LQNB6x4ZLnUGXzkIT75MyxS9kPCEoJx6dHdaM37t8AZAwB2P0x0gjGxOMkYtEVFwO91soSlvCtPja6nYX8RvswbBXKPlsDBLBdjmYrRZrkt27Llha2NZrYUhtOFg/IHV/FwHg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+kzyY5r; arc=pass smtp.client-ip=74.125.228.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE0635C183
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 12:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785761642; cv=none; b=H7m1b1lQSxU47Mjq632L/uPRiest/U/GfHhlC4FQjQUQvmndCyBeMxGpIaswDHpCn1Hrl3QRV9+HAxxRr7fiDpIzoSWdc/DprpOTuqPeeuJO8CBpF6YNDyh6hrq2QbcXmH8jaD2BccKUFBxlc4DXCBYnkU9YdkW7Ib8SCkUGgW4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785761642; c=relaxed/simple;
+	bh=Iji8GvWTCitUoLAz/wbBssN+rZqqGGiNJ+gj6EJDlFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IOyu6InUu/16m26CAuaLzF+IAmrZKlvDaYQvXKe6cR2H9t9kgodXCjqSWyvBGMamfmwM3Wlb0iozvJd8BeQkCjjhhUI8OTLNdlxWKSuozOMfU4i4+rxKZvXszaTkojFJrrGKRWIfG+/4gGJ81rjqLL2RptvadSkoS7Ye6UqvNN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LaSCj4q2; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+kzyY5r"
-Received: by mail-ej2-f2.google.com with SMTP id a640c23a62f3a-c1c5cb0f9f1so124130166b.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 05:20:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785759629; cv=none;
-        d=google.com; s=arc-20260327;
-        b=q6/tpLyEdpW0/X0iVdIXBZClY9P+VZ0n0SwOOWaCLCMujJtztaAmDSkJQXBfOEzmrW
-         tkKJnauqRbpcFz9DY5hIovJBcwi3EMEntlkzakIkKx2iU9NoSWPFTZaR54I/7BM2bKYz
-         R1eYiNm7zUYETirA9SxprJa8e5UmlU1GfCV56D+C4ZF1SM914IgzXJKbmDSB7ZqekTXQ
-         KiuW9slkbav7tMSHokxekXPCDO/Zb5l1FvoNk7ekwwhgNB2jurFaLe1bUzA/rCvrZGSw
-         kjqardUyF4G3a1AXUlOTWd6NCRfTChjDoPlvqiGKGBUAvvd283fe0/rCL2kbvn80i0Ht
-         mMGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=L3HM/ke/Ra6qi4GyYjAzQ0jHHVFpTHL0tRAJZUWJXFQ=;
-        fh=q57qE8qCApUNqdp2bfOZ7N4ofXDtlFO61fRz0WDGvvY=;
-        b=dH5CAh2AWGniuTSpzXcmLA86Rbrjk1tgFBcAvfi2OQyYZ3u7/EnY9NXZ5pfcwlvbvO
-         Af+0nv7thfQs50uOiLJWzL/HpBtoqxPs8P68fuPV2yPtlxI42KdrcTIe6hGYQ3ZDO6LR
-         0AZhqKK+ilGFh1wP2MEcpq3vD3UiOeTwRf+LBiuPhkAbgAW7Wh1N/g02to2GIpXT+B4+
-         Uz5PuGPuU/bSPQiC2ifwvORX+4VSqvM9MG4NL96G9vm5WTFcRp/JQfEkOfhcIj92gMLh
-         he/4gdA3OLYj9TsBsawS3nrDLZgVkxE4ckUAYXPj0pTd1Ban/K/HZ04qy0unVvrly4e4
-         Ekeg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785759629; x=1786364429; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=L3HM/ke/Ra6qi4GyYjAzQ0jHHVFpTHL0tRAJZUWJXFQ=;
-        b=i+kzyY5rZ4R7d+BVWu9Y4pl+2gawWzh080z7HtA5plQ7EJCdUDfeFGsgUmSO6YBqXJ
-         GsW9pkS6bw/ou6hwiBnUAzpEHtPIHOxxSJfj9LBo8HiIBHRHl6OnAa25zL51EzfgwVpw
-         tDbCVkkB0lvD2ciQAPGJBKMDQk1hszBndVMQ6KDErRnWQhzMUXY4Q3AeA2XLmYNqHYut
-         Zkufk0jmMzFXsuGYe0tMUsscW/uYz5PTLirKGSAo1WJzwm9sMFiY4HCjbnw0NPQMAJM2
-         koWV3BtWQCMAn/V2vCtf58k6JEAfNoY4axrpLIq+bPtv02pNy3rXmx+KvlSs5UFInav2
-         UkKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785759629; x=1786364429;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=L3HM/ke/Ra6qi4GyYjAzQ0jHHVFpTHL0tRAJZUWJXFQ=;
-        b=YZLXPIx1o4jDfbLbtbtuC26lz+BvCsFt9o/qX9eVbouaJNHSEkpFp0bu3bDSaGvM6y
-         KwXvSw32OtpabGNmsdt5e8EKJezt9f9d0fWJHxIDJoJerh5EUjr2be6vtSAGCeElA/4z
-         NBqOFmEXhDv7lRqlr89ynQyvf2hirHfSgY25rl+zwyjKO1PwAWob62HvZ104b0/M9EJp
-         P2Nf9R5TylbTrAMSb7BSYHzt+GriAOfC6Jn7xt5VCwV88RnjnV//sC7eZc0Ms3BbJ7fd
-         IHtl51t9zAaFEOG6PYEDlA6uBRYvDtEwP2P7Iv4eV+ja0lV7Ag8fBH37/nNT00KW0iDr
-         TS/g==
-X-Forwarded-Encrypted: i=1; AHgh+RrqFpl0biC6ysMMgRereKwrxwPGwsAZtOb8NfiVg1W9AMbYpSAmGagVTimNF/qcxkEXwN4F5du9MPatIA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwADH7EaNr8cIBanTNw+yyxbk20CN7Pe6ibX0IplJWhrjLcur91
-	tSVsf1XyI2jlpBefbTxUSZim6dMoVYhh2R70S2lBjXSYovJvktOJn56nVjlzh4Nf8PwUZMwf1xW
-	GOUz+I7MBbf4ogtB169XPJmYX7KVgSmS6YlayVESr1w==
-X-Gm-Gg: AR+sD11nckPdME/ovUVQSDEi6ZedRA4RXJYnOfvWjR60A9D9jRZwh48a5NXnVWts0qQ
-	8IXHl7FnYMWasCDvdDQc3VlBXFQWy3Ax2AAYuqaBq1/kCqlQYXgJSl/ST0yXpSllXOATHpNgKhn
-	NKZqKdGdvYuazGgJMLZ+tUEJ24NZAt2OtbI4tW5anCmEGvy3LxKmI2kBkSwpIdKTMh1+E5Cbd2P
-	osMOgkGetgbqubKtoreLg6K8qkamu3OgGI+Lmggy6wosczFrUMiBSv1/QnggnkOYaL+53UT5l95
-	ZW0E3eoFyjEU0lxuqA9BzVw44mGMll+WTEdIK7wSZKlmgA==
-X-Received: by 2002:a17:907:3e0a:b0:c12:6632:e7f0 with SMTP id
- a640c23a62f3a-c1fe813d8d4mr763972366b.24.1785759628378; Mon, 03 Aug 2026
- 05:20:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LaSCj4q2"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 673CHeJh2018378;
+	Mon, 3 Aug 2026 12:53:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=EE1fs8
+	+82DvUPU0+AgQt7JvV5iwIaNIvrg53RCsLRto=; b=LaSCj4q2Ubn09qepieK29E
+	xgE5DZPiUpcsx4X2z79J9PxeJWS76x/OBwyXyeakD/NtmD8/IlDt7dxMvtdVohgB
+	h2Qxj6UllirSuebXCc18LYKJr6+qQeRuxRsR61/GUJJfGWuYvF0J0IPohnm2ChzJ
+	vnoKaRMrAw+gR5RP5coQQLbmpWcqKD4DdwQuQxmppLNlp/O44AR2UQJnR9Xfw3vm
+	edtFqW0pDdPsc13dV3jmfVkBdS9InY6dv9VAYEhs5OBvWvj7QFaj0yjQ3mqXF+7z
+	E9IibEEndouVa31lh0/hFZb1xrgQbSGUegZzvfVmoZrYl7mfdn557SXS1kcFFoUQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8h4rsu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 12:53:42 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673CfS6p019495;
+	Mon, 3 Aug 2026 12:53:41 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsugvwfng-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 12:53:41 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673Crfwa62128542
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Aug 2026 12:53:41 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 44F6958043;
+	Mon,  3 Aug 2026 12:53:41 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CACC58059;
+	Mon,  3 Aug 2026 12:53:38 +0000 (GMT)
+Received: from [9.123.7.57] (unknown [9.123.7.57])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Aug 2026 12:53:38 +0000 (GMT)
+Message-ID: <38edbd6c-c0bc-4d87-af0b-ec5f6be27f0d@linux.ibm.com>
+Date: Mon, 3 Aug 2026 18:23:36 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730025240.17724-1-haoqinhuang7@gmail.com>
- <20260730060133.80233-1-haoqinhuang7@gmail.com> <20260730060133.80233-4-haoqinhuang7@gmail.com>
- <amr3P_4zxX2w7ZNR@google.com>
-In-Reply-To: <amr3P_4zxX2w7ZNR@google.com>
-From: haoqin huang <haoqinhuang7@gmail.com>
-Date: Mon, 3 Aug 2026 20:20:16 +0800
-X-Gm-Features: AUfX_mzL-WIZeHM99nsy5pfsjGzvVGdRmInAWR1Z9pHEkSZqlkCfmIJP3Iv_1bE
-Message-ID: <CAEjiKSkExTnRc77Va-cOSpoNJ4S0i_-r2-iGFyxoSw2mqh1Diw@mail.gmail.com>
-Subject: Re: [PATCH v4 3/4] zram: validate parameters in each backend's setup_params
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/12] aoe: Enable lock context analysis
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
+        Christoph Hellwig <hch@lst.de>, Justin Sanders <justin@coraid.com>
+References: <cover.1785440858.git.bvanassche@acm.org>
+ <a5fdc2b4d52006c20e2519f2c395d5d5102cb52b.1785440858.git.bvanassche@acm.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <a5fdc2b4d52006c20e2519f2c395d5d5102cb52b.1785440858.git.bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDExNSBTYWx0ZWRfX4VbVL5nrbpgA
+ DN/s/f9OT2mhreavh906c80gDAoT0zCqfN6/4+hlvMcK+dr3WC7OxVQ+qJ9W8wOBzAF7DLyGXQK
+ z9YY7BFvxlH8Bql0yCV1YbbuQO+v7eA=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDExNSBTYWx0ZWRfX2r/VICnjXdeH
+ zrntxF3StVSPahBb/ewvweRWxWSzhYSKD9Xwu0q7Kf63obTLShqT/TAyNVHCFPtevV1rJviMN3y
+ gu0N2UyFDIW9NPyLz5C7mez4TcKrwGRiIEepjzXtsO9sSj3lZWxtbrfYdBqtGOIjk97T94aMC4s
+ IUNiyDX4bgO14OZFQnmx5zJFbr6YFb8meDeOLRHSmIpsDxQEJn25f21MrRyVjEMrZ4NrFe/7laf
+ ke8CaDAXhXRI+bFhO+iC0Kf4TdPb9ZeWeg2KErxuAMw23xvVYk4E+PJBhUcUGsA7n6Cf0lewbK7
+ coT/rjxhPDE0v6Rv3etKtJQH3McznlbrVCkF8Xr1tW83Ma+JabJUntRg+OWIBADtw9p28Ey6UyC
+ IcTf3bsBi9iM9fqYFlrtSTcEo9UaEi9Yu6AVnT07jUzpA87e/dvPlvsBxMniu1M4ZB9uFbXPoYN
+ 9Sy2/zlTbEfoK4xrlhg==
+X-Authority-Analysis: v=2.4 cv=SI1ykuvH c=1 sm=1 tr=0 ts=6a708f57 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=N54-gffFAAAA:8
+ a=J4q1TFsJvW6VmrfiHvAA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: DIT4FXbT7q8cCdjTaoG7BmpWURqM8BsE
+X-Proofpoint-GUID: rMs8xQDiwCexdW9TI0K0H5OVLnmWK5j_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-03_03,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0
+ phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608030115
 
-On Thu, Jul 30, 2026 at 3:24=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (26/07/30 14:01), Haoqin Huang wrote:
-> [..]
-> >  static int deflate_setup_params(struct zcomp_params *params)
-> >  {
-> > +     if (params->dict_sz) {
-> > +             pr_err("deflate: dictionary is not supported\n");
-> > +             return -EOPNOTSUPP;
-> > +     }
-> >       if (params->level =3D=3D ZCOMP_PARAM_NOT_SET)
-> >               params->level =3D Z_DEFAULT_COMPRESSION;
-> > +     else if (params->level < Z_DEFAULT_COMPRESSION ||
-> > +              params->level > Z_BEST_COMPRESSION) {
-> > +             pr_err("deflate: invalid compression level %d\n", params-=
->level);
-> > +             return -EINVAL;
-> > +     }
-> >       if (params->deflate.winbits =3D=3D ZCOMP_PARAM_NOT_SET)
-> >               params->deflate.winbits =3D DEFLATE_DEF_WINBITS;
->
-> This will conflict with winbits validation change that we landed
-> yesterday.  Can I trouble you with a rebase request (either on top
-> of linux-next, when winbits patch hits it, or on top of Andrew's mm
-> tree)?
->
+On 7/31/26 1:28 AM, Bart Van Assche wrote:
+> Add a missing __must_hold() annotation. Enable lock context analysis in the
+> Makefile.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   drivers/block/aoe/Makefile | 2 ++
+>   drivers/block/aoe/aoecmd.c | 1 +
+>   2 files changed, 3 insertions(+)
+> 
+> diff --git a/drivers/block/aoe/Makefile b/drivers/block/aoe/Makefile
+> index b7545ce2f1b0..27bff6359a56 100644
+> --- a/drivers/block/aoe/Makefile
+> +++ b/drivers/block/aoe/Makefile
+> @@ -3,5 +3,7 @@
+>   # Makefile for ATA over Ethernet
+>   #
+>   
+> +CONTEXT_ANALYSIS := y
+> +
+>   obj-$(CONFIG_ATA_OVER_ETH)	+= aoe.o
+>   aoe-y := aoeblk.o aoechr.o aoecmd.o aoedev.o aoemain.o aoenet.o
+> diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+> index a4744a30a8af..54c57b9f8894 100644
+> --- a/drivers/block/aoe/aoecmd.c
+> +++ b/drivers/block/aoe/aoecmd.c
+> @@ -1193,6 +1193,7 @@ noskb:		if (buf)
+>    */
+>   static int
+>   ktio(int id)
+> +	__must_hold(&iocq[id].lock)
+>   {
+>   	struct frame *f;
+>   	struct list_head *pos;
 
-Sorry for the delayed response, I'll rebase on linux-next for v5.
+As I see, iocq->lock guards iocq->head. So shouldn't we annotate
+iocq->head with __guarded_by(iocq->lock)? For instance,
 
-> [..]
-> > diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/ba=
-ckend_lz4hc.c
-> > index f6a336acfe20..5d551d165213 100644
-> > --- a/drivers/block/zram/backend_lz4hc.c
-> > +++ b/drivers/block/zram/backend_lz4hc.c
-> > @@ -20,6 +20,11 @@ static int lz4hc_setup_params(struct zcomp_params *p=
-arams)
-> >  {
-> >       if (params->level =3D=3D ZCOMP_PARAM_NOT_SET)
-> >               params->level =3D LZ4HC_DEFAULT_CLEVEL;
-> > +     else if (params->level < LZ4HC_MIN_CLEVEL ||
-> > +              params->level > LZ4HC_MAX_CLEVEL) {
-> > +             pr_err("lz4hc: invalid compression level %d\n", params->l=
-evel);
-> > +             return -EINVAL;
-> > +     }
->
-> So...  lib/lz4/lz4hc_compress.c supports levels 1 and 2.  However,
-> LZ4HC_MIN_CLEVEL is set to 3, but clearly the compression library
-> supports levels lower than LZ4HC_MIN_CLEVEL.  In fact, LZ4HC_MIN_CLEVEL
-> is never used in the lz4 code.  Maybe here we need to just hardcode
-> "< 1" and put a comment:
->
+struct iocq_ktio {
+	struct list_head head;
+                 __guarded_by(&lock);
+	spinlock_t lock;
+};
 
-My bad, completely missed that LZ4HC_MIN_CLEVEL is advisory and the
-library actually accepts 1-2.  Will hardcode < 1 in v5.
-
-Btw, would it make sense to fix LZ4HC_MIN_CLEVEL to 1 in the lz4
-header as a separate cleanup?  It seems misleading as-is.
-
->       } else if (params->level < 1 || params->level > LZ4HC_MAX_CLEVEL) {
->               /*
->                * Not LZ4HC_MIN_CLEVEL: that constant is advisory, and
->                * LZ4HC_compress_generic() only clamps levels below 1.
->                * Levels 1-2 are valid.
->                */
->               pr_err("lz4hc: invalid compression level %d\n", params->lev=
-el);
->               return -EINVAL;
->       }
->
-> [..]
-> > diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/bac=
-kend_zstd.c
-> > index 2584f47c9b3c..4d19d6089f13 100644
-> > --- a/drivers/block/zram/backend_zstd.c
-> > +++ b/drivers/block/zram/backend_zstd.c
-> > @@ -60,6 +60,11 @@ static int zstd_setup_params(struct zcomp_params *pa=
-rams)
-> >       params->drv_data =3D zp;
-> >       if (params->level =3D=3D ZCOMP_PARAM_NOT_SET)
-> >               params->level =3D zstd_default_clevel();
-> > +     else if (params->level < zstd_min_clevel() ||
-> > +              params->level > zstd_max_clevel()) {
-> > +             pr_err("zstd: invalid compression level %d\n", params->le=
-vel);
-> > +             goto error;
->
-> Should we also remove "zstd_release_params(params);" from here?
-> Same reason as with zstd_create().
-
-Right, same reasoning as patch 1, zstd_setup_params() shouldn't do
-its own teardown since zcomp_init() already calls release_params() on
-failure.  Will merge this into patch 1 in v5.
+Thanks,
+--Nilay
