@@ -1,130 +1,142 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200B5312826
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 13:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785763011; cv=none; b=VdIgusOVgV7sVXGTiDQMAah3vlU8WCXnbDj1fKpqCFEnQqJxJMeWCIhEv1f0HapCeWqB68VSWycM6oLUakrQb+uSFEUXWfeNf3yNZqedNyQOX4Ac4FJN0wY5oEBRhCa1Wx5+jI0R8H4tCocqd0r1BOa3hlwCU5kdPWH6u9Ss3og=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785763011; c=relaxed/simple;
-	bh=tao8YYa4885jOKKxFmvmts9XjV+qsPEtzOwhHgFmJ9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OlHUjbRmGLzgBLfyX8M0blQVXuq94R2nzOgFzlORPV3b7F1PojDg29Fx+2dWm6LN3oK2sEvU/cTvMnHLXmQhQzdYxKDtc55aNh2DTRrUZr1wymQEQkcDSW1z1TIVlLcg1xvucnTpxHStFEe5BXHuQfSIe6SCWkFPgLNb6ItFM6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IP/O8Mp8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F49409293
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 13:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785763312; cv=pass; b=bTok5FkI6VeXtqvOHMQc7Hwrh6OLFy0unFCNs78Q4wBU4hE91xJnyUNOEWMNLZ3HcESmllPrJk7CoLNvG5SzTk4QKcdpyNucmkuRq4tu2OoAyPVZOSx8JDjTDiEf08hCkmM69AgNRNtm9kqaBie2zRGorTIRLCz4tIg9S5+7pI4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785763312; c=relaxed/simple;
+	bh=Pgl5mTcqFOqWGOQn2TZduStirxwuSm2pRwIjZSucJwE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p1+JRWmvrygw29tvrysxZGvX7RAJ9EfdOXUR5WMvohLJYCslIb673l21mjmNoWVIM+4sVRyFbznIMEHZix8OMEkYD8t0fLMbBY4jI1WIRYvWiiTumO5YcD4ZLAHNcQ25QCqyMwtugkYdyWB/HYz8CQ9fG/FBTQIUDotg/+tOcII=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvxRm/Zc; arc=pass smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IP/O8Mp8"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 673CHpa0151601;
-	Mon, 3 Aug 2026 13:16:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=gtRv9c
-	6XK58aYqC9FHzMi3s1UAScFzqX9ZhQTCJrbmE=; b=IP/O8Mp8ApwWMfQXmYI4ls
-	cC5QpXlq22ni9ZdG2jSapoya+a6R8Ct9Nk8Fcx9GWQbY9xpL8oCuf7xYR5CgMRs+
-	vDiQHXsIgclusHiDSY/ahWBHvsf/rZ4DbvCDg9wcyLyqc+yfA6ChnhzGDoXiKgBO
-	I3/dCS/umGGRK+B47QrpN2m3pOiccwzv9p4z0bJpsjl4qh5h/nKs8URinnNaiP8j
-	tlpuWFM3pk8wvgyuFNrqFNIeFjT8xaUebUnipwVsMJVZ/IMTFnHuhCQdr9/UBhR3
-	Fx1UqlsQBFUMYJuoyrrh4wiuX7bq/uO/3Ox/14cUwIanbcfMP4RFYKT3zkykd+jA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8fqgvru-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 13:16:27 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673DBG3p017151;
-	Mon, 3 Aug 2026 13:16:27 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswtyd8dn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 13:16:26 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673DGQtD6619884
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Aug 2026 13:16:26 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 29DA358059;
-	Mon,  3 Aug 2026 13:16:26 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 141C35805F;
-	Mon,  3 Aug 2026 13:16:23 +0000 (GMT)
-Received: from [9.123.7.57] (unknown [9.123.7.57])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Aug 2026 13:16:22 +0000 (GMT)
-Message-ID: <5952c14e-1d8f-4672-8153-2e150120a5cd@linux.ibm.com>
-Date: Mon, 3 Aug 2026 18:46:21 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvxRm/Zc"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6983f20a8bfso5522352a12.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 06:21:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785763289; cv=none;
+        d=google.com; s=arc-20260327;
+        b=XQZWFjFIjc9GZszSsMIjpfptY1Pd+sLM2BY8R4+5sTgDGtG6QtkcEYNtQ8Cex8fGrg
+         BHMCUIW9j/lJUriZ7PsDwA0wZQn9aFds0d8LTlMIMC6Ttvz6VPahezIfMvZIv9GhoeKm
+         86xoMEbeBe8R6vba8j2wjFfiuv/+K5oV5fH3o6l47Logq0nVkDBVotLFy0ci2AwmF1pI
+         GUySzOq2BcpfV+0bbHMCvAJ79jC474bXmhI+8KXIBRkivjEQZ5wqKaEhNf1WNZb75++8
+         Pz7MgwFEZZQWC9QGzC4zY+ZM8xF4ZKTvRBylaHr75s4KT7REaEQL6y8nPyU2in2x8Q4d
+         H40w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Y/+lXFVTL8yRFLlIHwc83PXR9zbnjKq/x3zTQK5cH9A=;
+        fh=TaQ5daE9/9gFXjId19jQtLH3G/4mukmxTKJO82Jz6Bc=;
+        b=pTnjJYmdmu36CD0zqla3i6VrdBeIsDWYU15WdWTVUrl1O2q7u78ElTP3tTryuo2DOb
+         4O6EvwiL0fbloHdET0EwsVPGcfmzJ8MiYWhA3fXgUwoc23vLfeRkZV51vC9HsW2kFvmL
+         l8W9vvwZvG3+BTrZlB/lK57y34DDiAUwHGCC/Uea/sG2OGuXJmAi4kVXDKnqRy3oGEtB
+         xKJJaLwzLth8qRiYhUAUCxhZzR4pD41Ydnj5ldzn6PHjwtRr6s4C2d32vG/yIWjvHIp+
+         tqRKYp8v3RpZdMUaBBF81JMm6mjcUKSJIVEMEBUCme/jY8eBd2Q3zjh00GuOcl8EG2XD
+         TlXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785763289; x=1786368089; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Y/+lXFVTL8yRFLlIHwc83PXR9zbnjKq/x3zTQK5cH9A=;
+        b=dvxRm/ZcGYR2VElqHNvrbIbP9OvHsQkpvLJObV5wRx/fXOfUt29OLPtE+JvxWK2AOQ
+         3VhaxWdK9wr8VU9F7OpdHh93UyXYln1zJIFeKxpY8byuq8uH5aOk6evZeGjO9IkqTptd
+         6pqSXC4iIsTM5Q5hI3ihgFCpFYQmHAIH17jBmK2nWesFrnXCN+cLlB30cVLoPE7iBxPq
+         YNZUhtvw1JycZThdfbfdyNVwsIyNlqZahx8PqEto4vhXRgRne7m4fkHUxVzQMxB0N/A0
+         77oJ0UDkdALZBQIED3QKAmbqVImouGpGGwdcCJe4RsLDjGD4I5xyy4Jr8+HbjvOIgaqa
+         GxCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785763289; x=1786368089;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Y/+lXFVTL8yRFLlIHwc83PXR9zbnjKq/x3zTQK5cH9A=;
+        b=nQcqWlksfaPKofp5rQTL8bXioSXXEEL9xux8/mMCWArCXuXix2b/xh2JVEDY6SA/xx
+         ocUfcCXtQRT7MGt7fVFxvHTiugLJEbPNylqgsyCaVp5ZLwPDcp8Z7pjAWXv+RciWiY2U
+         /m8xTU47So95Uhu9ojw6C9VUYXhpLHaQg3oPTKwwy1Kw52uQ7TcBxorha+ZsOQaQX45A
+         jJ09fa+PlvqW/8UuP/ExNfl2rHNzH/UKmCsSGu53Vy1NooqlbO3MS5vx26U6E6z9h7MO
+         qW5VRUfRvPX/Qxb6ZEleHktODmmj791mJd02Y4VmRPwmuRfEGOvIoBHnVlEilALfB7iq
+         oiZQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrH8mpIPa0A2o5KemAvny7cXdMj5vX/lgePGmIAVeTTYju/wtxEBG9KFE53P5x6ce1RCkTxnDAstAACWA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvmbOF3b16PsybpUVem2aVARRRXQIC9DzE9ApCpBcym3cjtoQh
+	bISStz2rM/EPplI96CQPOXoco2NqWkGyZIE0AThDSBLJS6nqLjdzmGz6Gg5+W4CsCeJiciIyodM
+	nUo9VpOgIJ5x9anochnx6Ed8P0heoyQ==
+X-Gm-Gg: AR+sD11MQV1/qXgueF+FHAmMrpQ10OikA8eRRiKEAW3oFayMz69U4m8DRBDjA+GrOua
+	KBnROpy5mWNSiHuDyMkLcVAjgRWazdP0DYqmy8r6/79QRDHt1dLqYjOcxY9oaBjexiYE8lxpTBT
+	cY55YgoVwmd8NMYDVGpe2QaqH1ja48W5AzdQnlK3naUJi94HNOQoDgjllPyYgbnpO8l89rLtJye
+	Sax3L/DrX0iU0+IabVCMwS9oDDjT+KWjUH7OpVQUooC2EiHYcB8CbY/GcWRoetgH1b0hp4IDIJF
+	s0y73wF62gp/Xh9+wKVEvbDzkUGXpcjVQ7eOrmNc0LLLlCSx1ggcnXjza+94sXuJUTmSWE1TLls
+	6hhRYAaPJI/fFuh4=
+X-Received: by 2002:a05:6402:21d9:b0:69c:794d:4862 with SMTP id
+ 4fb4d7f45d1cf-6a0a7c614f9mr7875783a12.7.1785763288576; Mon, 03 Aug 2026
+ 06:21:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/12] mtip32: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <cover.1785440858.git.bvanassche@acm.org>
- <ee97a457fa3dc450215bb813b8dd9b0c488ec9b2.1785440858.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <ee97a457fa3dc450215bb813b8dd9b0c488ec9b2.1785440858.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: cMiCIyjrLB4m9TUKQOctFNjAxlGpgGni
-X-Proofpoint-ORIG-GUID: HZpNqYoVFdu63-kJl58JZiQShKT4cO7z
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDExNSBTYWx0ZWRfX1mqpbSaQKpXJ
- NFNJfh5DJcs0Do33RydLttxW7Upj32JrlHUNCj6aZxcPg/kIV8kjUlLUCPMrFKIhubiwIy8rzwe
- cdl9+Y9Dmn1dc8JVRhZXXbz0DKIVF4M=
-X-Authority-Analysis: v=2.4 cv=K8cS2SWI c=1 sm=1 tr=0 ts=6a7094ac cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=N54-gffFAAAA:8
- a=VnNF1IyMAAAA:8 a=lWicLDMDnwgBfgFa_PAA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDExNSBTYWx0ZWRfX24g0XVxNPPQN
- /TW1dZniWcipy9zfi9mEPr7Dbevff1xchXvoPlyjKnUe7bMFYcI4PNAkphyiDwRVSUD1kG+VX1V
- UZG5KCfgaxLgWODzmGq94me9hvVvE1XNQX4rRV6AZX4P1wjbVc4h8kKF1SSfDST9HaK2x5mxgBq
- IurtqfmCR0y0L1gk0gtrRAkQ+wEQNc5vYcjhkmiQRt+3ogsOWBWFz/Po88S57glglG1UAepfTCd
- tycnumoC5oSZ2FvpnFGbScrJ9XBN+/0/tUnEP8OH04G9Pr1rnVRtb3/inXb3hw4hJ/NzcD7RcCo
- kjZ7MRh5RfxqeYVZIBNBCPk+bAivAT2GxHb9r6csjNhtukxD+FVMqtM9l3qWUP3WnD4M7q1apT3
- HaERGCvmM/yb8ggtIAHlc2JyvcGscJxLiD2JkQfXFMqloqbn6SM8aAYOw889qHVwMILmvrgQwBg
- qdIKF5SnkIIYl23aeRQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-03_03,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608030115
+References: <cover.1785596451.git.asml.silence@gmail.com> <c1ab6c0db3853b339a89aee0b1a9c5ac0c48b79e.1785596451.git.asml.silence@gmail.com>
+In-Reply-To: <c1ab6c0db3853b339a89aee0b1a9c5ac0c48b79e.1785596451.git.asml.silence@gmail.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Mon, 3 Aug 2026 18:50:50 +0530
+X-Gm-Features: AUfX_mwnLWCAPfRurFp37qU73Xc2KDpD6en6Q3cA2kgelroMq6uNFVC_YKEZqSE
+Message-ID: <CACzX3AvwBF32_ODomei3XHSZ=KtRaWLN-_Tfkwv7sV3Ssc3wmw@mail.gmail.com>
+Subject: Re: [PATCH v5 02/16] iov_iter: add iterator type for dmabuf maps
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
+	Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>, 
+	William Power <william.power@intel.com>, Phil Cayton <phil.cayton@intel.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Damien Le Moal <dlemoal@kernel.org>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
+	Benjamin Marzinski <bmarzins@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev, 
+	nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/31/26 1:28 AM, Bart Van Assche wrote:
-> Let the compiler verify lock and unlock calls. Enable lock context analysis
-> in the Makefile.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/block/mtip32xx/Makefile | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/block/mtip32xx/Makefile b/drivers/block/mtip32xx/Makefile
-> index bff32b5d3c19..233961fdb41b 100644
-> --- a/drivers/block/mtip32xx/Makefile
-> +++ b/drivers/block/mtip32xx/Makefile
-> @@ -3,4 +3,6 @@
->   # Makefile for  Block device driver for Micron PCIe SSD
->   #
->   
-> +CONTEXT_ANALYSIS := y
-> +
->   obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX) += mtip32xx.o
+On Sat, Aug 1, 2026 at 9:19=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+> @@ -841,7 +857,7 @@ static unsigned long iov_iter_alignment_bvec(const st=
+ruct iov_iter *i)
+>
+>  unsigned long iov_iter_alignment(const struct iov_iter *i)
+>  {
+> -       if (likely(iter_is_ubuf(i))) {
+> +       if (likely(iter_is_ubuf(i)) || iov_iter_is_dmabuf_map(i)) {
+>                 size_t size =3D i->count;
+>                 if (size)
+>                         return ((unsigned long)i->ubuf + i->iov_offset) |=
+ size;
 
-Looks good to me.
+dmabuf_map shares the same union slot as ubuf, so this reads the map
+pointer as a user address. gap_alignment() below already returns 0
+correctly for dmabuf - this should too. Checked the rest of this patch
+(advance/revert/restore) - none of them dereference the union pointer
+for dmabuf, so it's isolated to this one spot. Doesn't affect the
+current series, nothing reaches this with a dmabuf iter yet.
 
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> @@ -872,7 +888,7 @@ unsigned long iov_iter_gap_alignment(const struct iov=
+_iter *i)
+>         size_t size =3D i->count;
+>         unsigned k;
+>
+> -       if (iter_is_ubuf(i))
+> +       if (iter_is_ubuf(i) || iov_iter_is_dmabuf_map(i))
+>                 return 0;
