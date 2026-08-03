@@ -1,123 +1,122 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3342430D40B
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573BF2EA75E;
+	Mon,  3 Aug 2026 14:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785766961; cv=none; b=ABM9/gsGfwAFDS2vsaAIbncUHveyn+BCpJMH9B8arOnjOOIUeYjk+2hnvn9vJbYUlXv7egjgyRZ9/c5soTLReMWwWPNiPY2/JbY8aowmuw59juaewyl3xAIjqh3/gss6ta89X7ZCQxdESCHr30WeJ4UwadXVPgXhOBSbutlcAjw=
+	t=1785767430; cv=none; b=OnGlB0GbHndK+zOnSBve3OiT07JbgCiUTTIQk/UM+bA4EWsm4asG8Iah2C+At2a3IN2Gp4OaI4PBB3zVV4AcC6eqj+dDW89qB7II7fg8KvsD3uRs8fQAknsCCfaSUPJpkqKnZGifVj7YUn86yRa+VIJoBWbkeQeo7D73V2p+kK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785766961; c=relaxed/simple;
-	bh=YtaZwWJqS5CvG+wONyrzaRAjQm4+TRuNrXngMlAeyqg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A7PyDl7GggCXz72rZVASbaiXALxJTorX0dSjd0oyMg1dua7Ehe1kaHfT/qOlntEcYol2kL+DFERUNJIZCLQVv4tpqdX2lUX4LbzhMGFi2A8IdodIqgATRsTb5csQ5lRdlXLdWQYdSRNMRH1VbYJPxM6tDvUFye91tYb4fOIRe0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jCT8PIWq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785767430; c=relaxed/simple;
+	bh=0ylbr2e+UhF90GrPAgiwQl2i+ENO0yXSLMl5gsN/X0I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lr0khSfu8/IS99ytZ01ufHrMR4N/4wQIVqRSkvdXyuYcNFJX6gs81HGklWPfY7htCLwjIQkE08Eq5MFftHmFsVPXB5jeHYHXF9YnQdQCLKWTKtTk+dFVuetSzRT6DXIXvYANDT8cDMWQou2iAGCsQ5ulIj/RMOnH6FAE/E6fKQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hegr8Cz8; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jCT8PIWq"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 673EHUNv2282268;
-	Mon, 3 Aug 2026 14:22:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pHTthZ
-	uBE7ZME7wvxEg49fsTuqtRmbomuOOg/QiuW+4=; b=jCT8PIWqQo2u6QidV1HPvi
-	FyI1EuIljBRvS8TY2GPHcaXfLWKQc8jqrr7jxJRs0q6FrKx4oPcvtTltjGcyseDH
-	69d3bNn7P9qjSjjmdZbfqxWSrvLtS/lUYVYONps+xOKExsqCGrElxJvE4kIkUJo/
-	j4H6kCVqV1lz02CFoWikkgi8vAVecUOzDXdQf3ocHoXNqz3dhNz9glZ4Nl8rGdR/
-	85JrBv5kEjmmgU1tZW+3ajficD5qKT1aExlO1QJ0mos01wbTCByXG/Y9cptOkS3N
-	rI9IJ53uv+jjAOgNlqUh/pv4aVMZ/BuF3/vw2uWU3nTaaRJ9ZWuvuZqHa2gM8BgQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8h4s7ug-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 14:22:29 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673EDMJd029815;
-	Mon, 3 Aug 2026 14:22:28 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsv4jwrs9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 14:22:28 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673EMSw023265950
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Aug 2026 14:22:28 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 141B958054;
-	Mon,  3 Aug 2026 14:22:28 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C97B858045;
-	Mon,  3 Aug 2026 14:22:25 +0000 (GMT)
-Received: from [9.123.7.57] (unknown [9.123.7.57])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Aug 2026 14:22:25 +0000 (GMT)
-Message-ID: <04fd9f6d-9032-4833-becd-5465c3b2b95e@linux.ibm.com>
-Date: Mon, 3 Aug 2026 19:52:23 +0530
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hegr8Cz8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1785767428; x=1817303428;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0ylbr2e+UhF90GrPAgiwQl2i+ENO0yXSLMl5gsN/X0I=;
+  b=Hegr8Cz8lQVxt/SOqenDeIxuToDcfSqW431Db2OypHN9ZKxL4M1n1LDL
+   D4EP6z/HFdi9cqtVX4wm8vuTJaq3fi8zM2o45H19ZH6NBR/ElSLhQVx4M
+   /rVsJNRjmJwChK3Alp1zV0oJX1xMATMuQ10Iy0PjFify2gYmuQxJ/pu8V
+   //e5njiFr82SiRjYULCTvbfMgSCsMyKyBJpIKv+MeLTno93Wo7gz+dOxI
+   rcTNjkfWKU04jhOEAOdb++H/PCerm+qknKOUSJHfOtb7tU7U9LVDr/fiY
+   qCo9V3dO1ii68lF4WXf2pJsicGc4dgyh0xMCyW8eXeezuN8fREO7yb2Ee
+   Q==;
+X-CSE-ConnectionGUID: QEp2I2YvSzaTNKaxiSmO6w==
+X-CSE-MsgGUID: p4Z/SJGvRoG5/df4MTdcwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11864"; a="96958818"
+X-IronPort-AV: E=Sophos;i="6.25,202,1779174000"; 
+   d="scan'208";a="96958818"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2026 07:30:19 -0700
+X-CSE-ConnectionGUID: Mg2PfLUTTgaiZdjDlK/WMA==
+X-CSE-MsgGUID: vBbIqnJoR5urgr7iZYpsTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,202,1779174000"; 
+   d="scan'208";a="291165749"
+Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 03 Aug 2026 07:30:12 -0700
+Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wqtfv-0000000077Z-35zH;
+	Mon, 03 Aug 2026 14:29:56 +0000
+Date: Mon, 3 Aug 2026 22:29:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Trevor Chan <trev@trevrosa.dev>, gregkh@linuxfoundation.org,
+	rafael@kernel.org, dakr@kernel.org, ojeda@kernel.org,
+	a.hindborg@kernel.org, paul@paul-moore.com, aliceryhl@google.com,
+	airlied@gmail.com, simona@ffwll.ch, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, igor.korotin@linux.dev, vireshk@kernel.org,
+	nm@ti.com, sboyd@kernel.org, m.wilczynski@samsung.com,
+	boqun@kernel.org, gary@garyguo.net, axboe@kernel.dk,
+	daniel.almeida@collabora.com, shankari.ak0208@gmail.com,
+	lyude@redhat.com, j@jananu.net, lossin@kernel.org,
+	acourbot@nvidia.com, markus.probst@posteo.de,
+	driver-core@lists.linux.dev, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v6] rust: aref: make `AlwaysRefCounted::inc_ref` an
+ associated function
+Message-ID: <202608032252.nPlw6icN-lkp@intel.com>
+References: <20260628095132.47753-1-trev@trevrosa.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/12] Enable lock context analysis in drivers/block/
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>
-References: <cover.1785440858.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <cover.1785440858.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDEyOCBTYWx0ZWRfX/cwuUH3wi6Ct
- mjbw1dTvvv5TvCJebvlTCqlvz9u3rwKzO8PnPc9g8oJ4y/jpdFu8GrcaOhP/+Q9YmAKBSU6QsRn
- 4BUZX80mzGD2T5nfZbHc/qPnWC5+010=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDEyOCBTYWx0ZWRfX5ItENMUCyYKZ
- urGZ6kmbKNrA19usaLJX+C+TDR33enmKLuHlCJIbB1JPhj5r1KIKZgHG/ZXndY0cnNoCOTb1TmK
- 7Ni7mh6Cne2TLr8orQjlt4Dk2kGbcOAvAI5ucjYIiFp+j5LPAvVohWlmtJ9T0VgkU7U+g1n/snA
- 3pz+vGa4WFtTutinrzDbRHlxgg+zG6n6V3mu/acydr/TyUXzJBrSIVjgVDpnr6E+m4tZUOLqWRB
- rM0SL+P13qApkfNnAQRQpLQeKfRYqFnbbe8xmNth467l1M9lgEABcKMJCMSn27Ix3nku0qSJs5n
- oRQgY5IJv3ELXAe4NrFT5rB912YP0M4nQ/O6Pckov+chSqWSlGozMY85UO+TbRhhfAOBgtxVy44
- qIwsxZ5eo4/n3cMbuTABfPPdbi4OGa4zmJxQ4KPWfdlnDVx3xcdUoVXRD4UoVu/AUx86ImB83jW
- PrYTnC4ewjttkh9SBhw==
-X-Authority-Analysis: v=2.4 cv=SI1ykuvH c=1 sm=1 tr=0 ts=6a70a425 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=tutTO12i5-LwSZ318QYA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: ecXr_9g78y6ijegj_sbYvggXS1rKHYMB
-X-Proofpoint-GUID: J0LscyxrWLh66RFo04dCqOYx6K3cNNPx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-03_03,2026-08-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608030128
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260628095132.47753-1-trev@trevrosa.dev>
 
-Hi Bart,
+Hi Trevor,
 
-On 7/31/26 1:28 AM, Bart Van Assche wrote:
-> Hi Jens,
-> 
-> This patch series enables lock context analysis in all block drivers in the
-> drivers/block/ directory except DRBD. Please consider these patches for the
-> next merge window.
-> 
+kernel test robot noticed the following build errors:
 
-One general comment I have about this series is that there are several functions
-across these drivers that use the lockdep_assert_*() APIs. I think these functions
-should also be annotated with the corresponding Clang lock context annotations,
-such as __must_hold(...) or __must_not_hold(...), depending on the lockdep assertion
-being used. This would help keep the runtime lockdep assertions and the Clang lock
-context annotations consistent.
+[auto build test ERROR on rust/rust-next]
+[also build test ERROR on driver-core/driver-core-testing driver-core/driver-core-next driver-core/driver-core-linus drm/drm-next drm-misc/drm-misc-next akpm-mm/mm-everything linus/master v7.2-rc6]
+[cannot apply to next-20260731]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks,
---Nilay
+url:    https://github.com/intel-lab-lkp/linux/commits/Trevor-Chan/rust-aref-make-AlwaysRefCounted-inc_ref-an-associated-function/20260803-160221
+base:   https://github.com/Rust-for-Linux/linux rust-next
+patch link:    https://lore.kernel.org/r/20260628095132.47753-1-trev%40trevrosa.dev
+patch subject: [PATCH v6] rust: aref: make `AlwaysRefCounted::inc_ref` an associated function
+config: x86_64-buildonly-randconfig-001-20260803 (https://download.01.org/0day-ci/archive/20260803/202608032252.nPlw6icN-lkp@intel.com/config)
+compiler: clang version 22.1.3 (https://github.com/llvm/llvm-project e9846648fd6183ee6d8cbdb4502213fcf902a211)
+rustc: rustc 1.96.0 (ac68faa20 2026-05-25)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260803/202608032252.nPlw6icN-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202608032252.nPlw6icN-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> error[E0424]: expected value, found module `self`
+   --> rust/kernel/pwm.rs:637:50
+   |
+   634 |     fn inc_ref(obj: &Self) {
+   |        ------- this function doesn't have a `self` parameter
+   ...
+   637 |         unsafe { bindings::get_device(&raw mut (*self.0.get()).dev) };
+   |                                                  ^^^^ `self` value is a keyword only available in methods with a `self` parameter
+   |
+   help: add a `self` receiver parameter to make the associated `fn` a method
+   |
+   634 |     fn inc_ref(&self, obj: &Self) {
+   |                ++++++
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
