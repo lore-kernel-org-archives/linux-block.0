@@ -1,131 +1,121 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22F53BBFDA
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 09:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A82736074F;
+	Mon,  3 Aug 2026 09:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785748209; cv=none; b=ZWaWk6HwncgdzJ0BMXpF6CtUH19Y7jv9AglMbl4UyWIz64fkEYhRKEB3PPa2cmCFPmPiWbKWlBp68d+yiQZ7r+By8WOu6f6AmoaFfjEOXwea1VE/AdL+1m+OVCM4NYqYX4lFVx26jlyHMOEL8Igjhey6N2NzTrd4Vr6xbwhQ2wE=
+	t=1785751146; cv=none; b=RDeUw0f+24+zEqiGhbZXrOm1rRL0dOfILA4h1Wwch5S8z3M3vyF3KhnwRQMx/Ci3JuitwKrsLtmK51fR7f7CVtZYUQyEawwQ3qhxMf4eFKpgFttAHAdCv0TbuwXQVP3dzSO7q102Jf0GsIRMF+Fd3U53X8jINOfIyoODmBz7+Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785748209; c=relaxed/simple;
-	bh=y6lUUJwNmJwWDTpMLkBp1YAtLV9LN/nEevAEE/TK01Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IqtZ7AOUlSvxMXrZEp2i6w+1Ty2V8qT0IN0c+Zq44345KgV8noTuW5OyXWHrCsQjYt3nQShYyD9MRJHzWTChj8tJnyIARO/fuhWE+mRnSzIErrvVsmQIK3v/Loy/4nxJSJ44+uPnrHYWB6ypvCMGwXhwhUjhPe/01VRFhuuEpsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aWMcZFWZ; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1785751146; c=relaxed/simple;
+	bh=ij8qwM6falBiMraCi7v/dNAvK4O5CauB/ZyL8bwjjkI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=njjHpfYrOjORZjEYDWL7l+v+HFhVfYlfAcZnRY3fIT0jELuTHzChi9DFJ3t5pxmGwDhrGW2+sP/E1dRp80oDceZvj7SB5YlcTCBwlMWyKrVszQHfou+V5yOCFHwNdPwPCrmyyz4YGECCnzO4VvlsGy8eRRC9HB2NrqXHflXyzO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=EEqZvqv+; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aWMcZFWZ"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47fe2d179e2so367168f8f.1
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 02:10:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1785748205; x=1786353005; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Z1GNJHA/wk3B/tLgEj5BiBlQSmADQEGBijFgHvx9KdQ=;
-        b=aWMcZFWZ15JXnt8TWF2uo+PYSu1Q4FwWy0fwoZaGosqKIlt418xFk+VR4t9hDsVAC1
-         LqT9/tS86SxoqYGBrA8ABKv89rYQCylPYSfPhPJVItK1RW2zd1IJscbOIsra7EOf1niA
-         nuBdYIWug9bzklmwD5xesOxJ2rWvfQMuZlUf8DrwEWCjwlRS3ANQDDsBjzkK2pKDlp15
-         p++v35a3BZsBlqfxUuqJsFSZ2I91/gfiZY+rUxGUEpXyI7IgCEEspukuBRHyvsNIFU+n
-         f8X5VDjoi/O/ykIdAFiBMJBEaP6Kly5ExCCJK0TsyUcejhB3Xl/870e2IhQOQLFxEPE9
-         PnNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785748205; x=1786353005;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z1GNJHA/wk3B/tLgEj5BiBlQSmADQEGBijFgHvx9KdQ=;
-        b=gcaTLFgMDXvGfpv0LZJGI8BfxpguHqvA0x2qZS18XVOWB8IHhnG+ftNCL0+3PoAbeJ
-         UeTo4OnEGfq4bkIz0NENUl6ZxIaGAz4I7OgcGvAJ6BQ4ZOb4fngg5Cnj4SMQGj/aS5jI
-         Ptwvly6+qrVBYz3wVFcfeRH3vZYnDC9wjXoev8upLFQjEP+bKCTh1E7pwkya0sMcexQ/
-         q0FvH/wBJ4q1nYNQVYNCHnuJshRAaXCIfTXu1TazFq67ktQFDFsjty826EeAAab34ybW
-         nXyAkuWEsTbveo3mGZttWCSj+g5T/ToBBcQoy0mZSErBbID+tO3iwEa262Qk5gazsTCH
-         +/uA==
-X-Forwarded-Encrypted: i=1; AHgh+RoH6W+nh+Hg5PBkGoRw3kCzgWpJAywt60SSqaB7A8wxBRWGKgQbgvKpvtAN9BNU3JYALBrsVWxyQunkrA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7cVyu7dALMXleGcb7GU6sWMogwew/wbnXf6dwq4hr3qYEE5tW
-	O3brGpQ54VRoy0GTR3ypnt5IH9md9z4aVQEkP6+3/4XjjAj80RTVqHLOgimUyLbZMX0=
-X-Gm-Gg: AR+sD13uoIfP+GMWYTm8MUzcM3+3zwJofHQ3wJFqLW5UdS3zLJT3dnfE4qctIk7mGRN
-	yPRwSS+GH94PR9uCqorPK0ZBs2+PQlO6tw9NlKcitA9fyiW3+PUfncD13rWBdAi9hU/Ifbw0Jsc
-	N56ESk6GNBvbMTx6NNn+M50/UJHAGHob9w0ukrzrOiRnsN4eG6H2pwuWZ7RlCQ7iQJ5rEPIF+qI
-	knMceWA2RsB+dhRrgAT5MA1lgdbUnTeOwafBQJ9jTfK2IQp/04qB0TZnCQ+0EsXc/PiiuOACcjq
-	VcuoBs8OsD+wdyn6UHlgQYJyqmpcV9oNxpIPEiiuVfOEWl6L1U3szPdLlmTsnagSfqZ7iNsAxds
-	C7wOEEDhZ7EpZqC0G/i1v9WxAAlVJem7rYH+teAyOW9AIJ0ACABu20731pGgAaS2bUsU+6uqEFj
-	GBqv40Ow9UHh0M722sySuy2KYPrSF/NxVx3+ac6235vcLMK4SsHBm3dKrAUgGWdIJ7g2NuEJYkk
-	nY3G02eVhbqMrcHmvJQDtojTv5zKr+fcOgKbmAaVT1dVD4TuNG92yyufuoj8+1X8I0KSnsAVK2i
-	XRKc6Q45yZpFfsLy/7t20jBF6+qU6i4=
-X-Received: by 2002:a5d:46c1:0:b0:47f:8b9e:f457 with SMTP id ffacd0b85a97d-47fd72b0552mr16078486f8f.17.1785748204889;
-        Mon, 03 Aug 2026 02:10:04 -0700 (PDT)
-Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fd456a6cbsm28027816f8f.23.2026.08.03.02.10.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Aug 2026 02:10:04 -0700 (PDT)
-Message-ID: <e8733203-29e9-4a3f-b41c-198dcf1d5273@suse.com>
-Date: Mon, 3 Aug 2026 11:10:02 +0200
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="EEqZvqv+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1785751115;
+	bh=OLEVm8TO/1Scx1yAbnYVnfztcxCCRe2wZb3acAYk6Cs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=EEqZvqv+KvXS1jomgmxl13HZawVIIQ89QuSJL2J/dah7IrMQ8l3wiyPntcQnNQZgt
+	 kfGjpg7R9Urri/z1x/d8nwnLO+vzz9NMGISEYIBTnqAjgA+9xUoqmL7Ss1etWTGcRX
+	 FayRdq/U2KkrSBlB2xlUsJjptMD0hO0o77wXskoU=
+X-QQ-mid: esmtpgz12t1785751098t9c2b8f08
+X-QQ-Originating-IP: 42Ut8n/sSo9F8XCAJB8UfWtryBHL2WLrAtIe3PcXGos=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 03 Aug 2026 17:58:17 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 11125041212163992465
+EX-QQ-RecipientCnt: 7
+From: raoxu <raoxu@uniontech.com>
+To: dlemoal@kernel.org
+Cc: axboe@kernel.dk,
+	hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	raoxu@uniontech.com,
+	stable@vger.kernel.org
+Subject: [PATCH] zloop: round capacity up to a zone-size multiple
+Date: Mon,  3 Aug 2026 17:58:10 +0800
+Message-ID: <906CDA1B6AAAD5B8+20260803095810.3453016-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 00/10] Fix missing fops.owner in Rust DRM/misc
- abstractions
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
- Alvin Sun <alvin.sun@linux.dev>
-Cc: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
- linux-modules@vger.kernel.org, driver-core@lists.linux.dev,
- dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
- Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
- Aaron Tomlin <atomlin@atomlin.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
- <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
- Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
- Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
- Igor Korotin <igor.korotin@linux.dev>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
- Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
- Carlos Llamas <cmllamas@google.com>
-References: <20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev>
- <a9dde63a-5f2d-494b-95dd-7567879de38d@linux.dev>
- <CANiq72kkuKsRAF-r+2OyZbjjgvC+jvqMSXR=LgmqTNRaWQZ-nw@mail.gmail.com>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <CANiq72kkuKsRAF-r+2OyZbjjgvC+jvqMSXR=LgmqTNRaWQZ-nw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NxzhVD/1TxpMeUIaCeN7uDyfyaPNfcETCzhcOVE54SWV1JrIN6k2cpSZ
+	1zUHZLhm6ub1/S3kFXXZt+Cg5Rulv796Jdkoqh8LOwPUSppoA21WaJONaBpNLXiDBONijpy
+	pyVh09jS0Fl0IKEetwjGdf/BidfRRh08qz6GHDHAesxvu6h1cX+9tf3QSSC7kzCphDyG3Do
+	y5cHMqhvf0jKu9VaxjNij20KmqMcNorMBTfBC/WIO47zRxoP0fsvbCmbJ5vys/ACScn0xEv
+	y4Kky6LCzXlH3ZMIBk7R8Zv9tyVEbD6cp1QIIA8IwlQ2YfiKfMYy6i99A8C2L7KFyucHi30
+	+NH/aVO9MA9C33eSNE0mgWACc9ZZHudim1PLbs+t2SJub8ZRaYoMcRb9lS6CEWWtumu4FOt
+	gZMl1rrLPDs2pEvONDAxRZycLM909jNEZqMABXWvwSOyGsokBpyPXX/dkwcxVFHLhIqPJS8
+	RSaC6eSP9+REqGPzCtTqLXzKrMXknWqY43f9dNZ+hug0jU4pMcnEipPY4FQxTLpkWm2dLhJ
+	lBrfVI0viA3OvkJ9l+JEueOvt/Dh/1QnDcapPB0gsZlB1pd3/s1OeAWLT6Z69vc+jG0Lkm1
+	Ung2cIX0Uvbiye4QzU8ZVp6y0JHweoy2BMtKq2jiucml8myOb45FkbhjzDfe4cM71GsnZ4X
+	7K1g/WgqQTgml9Aut2P9ql9WCSI31nOt7CYkPU4oH8FrxhO3tANLIxAUW1pgwGVoHyHZOh5
+	F6J2lmvVGpKZeafGbEXHYu5tkizuUptX9NTI05bk8DQ+F+VbLbmMeDucgU6Nmn6JeWW/OgP
+	06cp767NXdAmZl6FwETsxRElzQQT9x1Euk8zkSYqhnjWF3uVzIhMPjyTnl+6zsHiS89R+M8
+	UPvZDGHPUxVuSc3mCkwDv0dXmoANtL3U64GSqDBHGWak+Dvu/pF/03CiervmKCtV6SjSOSj
+	0GUuAehXsFxKeYRuedE0RdXqYrdUkBU1t0FPG0U+u0cCAgxzwiObs+yQYzkadoQC87fEEqt
+	D+3v7dYuEBqWZ8PvJxBbNRVE0RQCftQLWfTXaoXA8hwZBpI2K+vpMfwjFM2sx35wg7OkOWa
+	FrD2a1vX5F9WrONguE7m5tHFYdYUEeUNw==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 
-On 7/31/26 8:29 AM, Miguel Ojeda wrote:
-> On Tue, Jul 28, 2026 at 10:39 AM Alvin Sun <alvin.sun@linux.dev> wrote:
->>
->> Back in v3, Gary suggested this series go via the rust tree.
->> Would you be happy with that, or would you prefer a different
->> path? If so, is there anything else needed from my side?
-> 
-> That is fine with me, but let's see what the modules maintainers think...
-> 
-> Luis, Petr, Daniel, Sami: what would you like to do? This touches your
-> entry, so it would be nice to know what your thoughts are /
-> Acked-by's.
-Looks good to me. I've replied with Acked-bys for the relevant patches.
+From: Xu Rao <raoxu@uniontech.com>
 
--- 
-Thanks,
-Petr
+zloop_ctl_add() derives the number of zones by shifting the requested
+capacity by ilog2(zone_size). Since zone_size is validated as a power of
+two, this is equivalent to integer division and discards any remainder.
+However, Documentation/admin-guide/blockdev/zoned_loop.rst specifies that
+capacity_mb is always rounded up to the nearest higher multiple of the
+zone size.
+
+Only configurations whose requested capacity is not aligned to the zone
+size are affected. Aligned configurations, including the defaults of
+16384 MiB capacity and 256 MiB zones, keep the same geometry. An affected
+device is also internally consistent and remains usable, but it is
+smaller than requested. For example, capacity_mb=130 with
+zone_size_mb=64 currently creates two zones and exposes 128 MiB instead
+of the documented three zones and 192 MiB. Since this does not cause an
+error or an I/O failure, and normal test configurations generally use an
+integral number of zones, the discrepancy can remain unnoticed.
+
+Calculate the number of zones with DIV_ROUND_UP_SECTOR_T() so a partial
+final zone request is represented by one additional full zone. This
+matches the documented control interface while preserving the existing
+sector_t handling on both 32-bit and 64-bit architectures.
+
+Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+ drivers/block/zloop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index b69d798f203c..e29d82ff52ae 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -1187,7 +1187,7 @@ static int zloop_ctl_add(struct zloop_options *opts)
+
+ 	__module_get(THIS_MODULE);
+
+-	nr_zones = opts->capacity >> ilog2(opts->zone_size);
++	nr_zones = DIV_ROUND_UP_SECTOR_T(opts->capacity, opts->zone_size);
+ 	if (opts->nr_conv_zones >= nr_zones) {
+ 		pr_err("Invalid number of conventional zones %u\n",
+ 		       opts->nr_conv_zones);
+--
+2.50.1
+
