@@ -1,64 +1,64 @@
-Received: from mail-pj2-f0.google.com (mail-pj2-f0.google.com [74.125.227.128])
+Received: from mail-pz2-f9.google.com (mail-pz2-f9.google.com [74.125.228.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5240F757
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8E536A377
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785766407; cv=none; b=ZwrWSwX5QCAfx9lREUY3bracvxCgModbj+g4WrQl+1zEniY2++gxhOkM4ZQcir9kuHguaw8A1cXhcGwfUQqg+fP1x++h5iRgq4MGaKX9urLbOWQR8t2f6ovt8+5Iz4/aPArt+cTYgI9GPcLE/MaKp/FKlfW2jNVZU6eljUaDgE8=
+	t=1785766414; cv=none; b=mTjFoRMxZcf+DSxbdvvC2M0lmAJbt0lW7AC/tYHLmSJQjND7jYxRjyZ5OYRMISEZ1/XyDDfEmWPxeMECT4KuDkphMVk5zM2KwoBWfIj/0qvxxhnmiFI1C0poW4AoMBzJ9u0NEF4b3rQFCOdwnmGnZPzMRdn9LGESSqXEPIm3mko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785766407; c=relaxed/simple;
-	bh=SXp/5/NEZwyQ2T6u0pa5PIg41eZcqZD/pweYtKijIkA=;
+	s=arc-20240116; t=1785766414; c=relaxed/simple;
+	bh=D1O3BtqXhi2bbxwPO54hut6y0QtxHvtDzf+Ku4Ih2rY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DRc5FqLqDTVYHMfmF0BccB5uuhA9Ev6zv4G2PHnaPfBOHpFeyq91/gSLHi6i0VxhdEOpoLqe/A74DjGcgGFZNF+VobXodcRXyU6Cp6JSrCKa07uRuc4mGJAYr+5EL+zd2lRXBWXoni+vh3LqUcLfJjbGJocNmAd2QURFc+2zLlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGGhO4e3; arc=none smtp.client-ip=74.125.227.128
+	 MIME-Version; b=S9vcNX+NQ359/TsJ8Oq2k50GNHDLePm3G6SbMRbs7QkKU/IWpGP4HtbxfpqU3pS0an9fo9BFdqviyWZd6F0R0alYM9Is1zy/Hg1jJ1mH6sYZapHNeQabDdIvp+HnMr56eEzdMs96ciUqzpt/YcMh7+QlHVTTTv4sNmbRiUOKkPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RxhZZzAn; arc=none smtp.client-ip=74.125.228.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGGhO4e3"
-Received: by mail-pj2-f0.google.com with SMTP id d9443c01a7336-2cc6bb7476dso4922985ad.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 07:13:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxhZZzAn"
+Received: by mail-pz2-f9.google.com with SMTP id 41be03b00d2f7-cbbc9e6e637so1902043a12.0
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 07:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785766405; x=1786371205; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785766413; x=1786371213; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=u40wfBemGswFY3vLVA1SulOXv0qgjlAi2ZUYZH01yXg=;
-        b=UGGhO4e3FLuJaWaVXL3qg9GXTr2Lo0y+6EHe0EqbGl1yuDT6ipHhUq5qJx92ncCe9f
-         oQtgw+A/zFSN7uiOTav+FndFUn+hqpkC0BWG0oKJ3mqETKN5qLPGN/hA5ioGoP6nWn+Y
-         XTBwF5LzDa1DOL1Kw1XVTE5gXt3b7vPqrzYJ9x5azdyT/o7NEPMkZeAoCsRtkgONVFHR
-         LIDn6jhCao6/xkdn1qE7yZugQJNBkxY58Jl2XHswmAKKdkewvf5d/HlaxC+7gg81FF5p
-         h8lmCJnKqlMGWkExheMJEUm3vTjvno9XZTFIZK65TReNV6SH1OiQeN8hM8CMl1V6yI/l
-         AJkg==
+        bh=Vl3fhYiohrdIlS9g/uSFV7y+uIWeNZ5gxUBY7VDbnfU=;
+        b=RxhZZzAn6FR1biQ/Lju8tYQBYPReGYQzpK0wljSfF3EQO3VHyEHgxcf/TslfDgO/Kb
+         PY6fH6pTl8BgLpq0SC+MWU8za4dby4z+KUSMk5Po/qyz8CzUH5g9df14yIM35L5JwFgf
+         6tOCtxSCybRj0BEzklZwsEoZlwh3CApxx7CF5harsNA1OaO8ksI0f+OoSGpkB7wVulJu
+         cTKkk0kjVzBJNOiNtVFi7ObRhKV01cQmDD3cROYqzjpAF5XW8kwY3+sTkFsR9Ar6kESC
+         3diGKJWxiBUyyeRl3URUpyNsw4ZBj88L5dteJGFk7ML+Epye2y4OvOvBiQULqCE6gQcY
+         NrHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785766405; x=1786371205;
+        d=1e100.net; s=20251104; t=1785766413; x=1786371213;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=u40wfBemGswFY3vLVA1SulOXv0qgjlAi2ZUYZH01yXg=;
-        b=eadRk8f1hkbJ3c1hanPWy8I169Odonlg+U5mfz+hTi7lpYb0waKSeBwNG7ZUKXEs1j
-         iOu7UB5/nAQZCB3FaayVhmv5jHFlvMDhHX5p+dmxxvWTcR0/FXh9KZMfFkGbDTglMaRT
-         Ri2g6GEBETW2KJuLmZvkVZl+h2HRyHR93kRhzSYkSblOqfQZd6LhCtI5OlkFhuUPygPk
-         0RivZuXwFt6RWvEh5o4kihFgh52Y7Hs6NXG/0BWFVAJykfv48IeyCjbYAGIPZPdWnNyQ
-         zbzMueOba54YWIDX31YkQiDFOB4ABCKvpfyfEbQo9xYLqE9af662facYsdzTVco0C+2v
-         f1mg==
-X-Forwarded-Encrypted: i=1; AHgh+Rpi6HQdCMuRDWlBPHRPZrdeG7EArjlwx2+4z/SsP39FHPBRLAlw0hYWE7SMaHnawEwTz+CkBMsi3ggN4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuP3t4CqM1dTw1o6fEARN23P+q8Q4HqXrMwOPywUsEMa/v2Ev3
-	MmCzMfKZcWyVqw40lgUQOJDK2VJYpTnzLhkdOrDwTzZ/GnY9IDuteUU/
-X-Gm-Gg: AR+sD10JE8LGhuiuainLbJba/Jgnuk8c8KHYw1HYzL44updeDGmilHg0L01WXsGGqr1
-	lefhdLKL5xoT9NKnbZTL8YscP4wrrC08DH263eaFBBHazoPvk97UN2UcJD5X+y7ftYdD60/gKkq
-	ASq8k5nSFeA/VOA+YGujqPc0kwwe7Q2m8c3gQFLvJGMDVWw+S3kOceQN7e6rYH04ChNu5L9Xlrz
-	lrr8bITr4Ikj17AHyaPN1sE1GFT8UYZQqjIVGFKaNkHwAyJ1L09H8W8MQYzhexSR/dTPqS+sWv1
-	1abUBQ+fbu3j8HlE2UEAn+82LXaA+qhx2v9m1BMAT6xAk2IiPlE8AcRT3ux0y7SnjUWj3zMYUSc
-	bWNkdj3gWQkmNjp0gDVylOyORg6ScmXlPsPR/LNcY8UG5FD/kVwdOtJo1p19cEQL1GOfZ5RC2ZW
-	cj+QuV0EQ4mVMaYRNfkick+tUMT52FnSX8SX9zLttXP7WSH/5DWVsm601lnfe3zm7+XVCldqKKd
-	mdmd5E/3EfMurZlTrVhSSE8BrR7gW1XHJqT5LoG1Zmn
-X-Received: by 2002:a05:6a00:338c:b0:848:7bcf:9a9a with SMTP id d2e1a72fcca58-84ee4811e12mr8876358b3a.1.1785766405283;
-        Mon, 03 Aug 2026 07:13:25 -0700 (PDT)
+        bh=Vl3fhYiohrdIlS9g/uSFV7y+uIWeNZ5gxUBY7VDbnfU=;
+        b=F1Rado7b+IRkuPuCylIyOAiYhURwDgARwOve+N1wb1AuvKvNB6BZm0Zy2p6/TjuGJ2
+         YYQ5jo7YkzAAYr2bS03Es2xIVf1BrP72D7C6TLcSGSIfyMKHnEGbsLupzu7e3to0vm3q
+         1bF/NLq+exN1wwTWkzeJQWayyJHVIT6sIMOvQhNIdjxOHKXcyh/YcgCD7qeaZ03g6XJD
+         vTR9221G10hBzYh7suye+RlHt33SgrsbqyrHzMfjzHUjrxrld5cKWPxkBSvzIagn/fXU
+         SkzFEmQ6+Gr2S7RD1t+J2oefrNaq5yFXn6eXKLCgKY2ULXm7Yj3xD1s0i2kbNubk3WN7
+         hHgg==
+X-Forwarded-Encrypted: i=1; AHgh+RrvtEzsnWsYC5Trz4+vWF4tuSEd7JCB3/P7acydp5YmJcrZuVX/sQBbJt8Z6JM36CF4L58Wa2gpHGofZw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUmQqReisAnEwSh7XnrSX2LlAPS1iNSw+xlZAmx5JuT32UGzyR
+	qFHjuVSI5nRU2poXxTmFyeIhIPnzw5k5aah8+fAeRr9jwVjJ/YS9jWcm
+X-Gm-Gg: AR+sD11Yod7LbhBo+Fkvx4aNIJxXyowI9DcivsudRQ5BeQ0m/1a+kvKq6W6ZfMKdXdQ
+	sgl640mX6g6oigBjso2mqgmyffgKuitl8n3Q3ZtmcAI+uWQz7Jx3lq1vZaL2lxbZDeReciFJzED
+	OpKgvpOQm/gMmp50bU9gDGuBuBhiqf5A70L2uBNMrfHCYyZ/dudH/K1PgIgLSoANBUOy2p4xQhw
+	agVAiu7Pt59uckn+0zFpPFq+XGsqMD+utImNTJ0B6sqzzAZrEy2RYKDj9zyN72SQk8ky5fXpVC0
+	b6e6Cn5xV2QRvB2PpT6g5eqfz7uT+gViGfhlBnnSTXPLsW1wjPK77VPVinhcWwmcGJ1lNDCMdXu
+	tzbkw3MtfJbptf/v8sxE1+xhdOiaOHZx+91jhziAecvb/XJDjrkxrmui4Jy5V+Zawt66qx55B9a
+	TiOYsLe+MoZ6BFHJSRl07aSTLcBa+qzZ5TndV47BQX65tqRTM0zzwtvgIFbE9095EsQmaUIQaBv
+	7wDCTn0Npt52cu1Y31tAow1acNrwfMblBReVJ8tVj+G
+X-Received: by 2002:a05:6a00:1da7:b0:848:2f6e:e537 with SMTP id d2e1a72fcca58-84ee4906dcfmr8420957b3a.75.1785766413022;
+        Mon, 03 Aug 2026 07:13:33 -0700 (PDT)
 Received: from HAOQINHUANG-MC0.tencent.com ([2409:8a00:1a20:7370:cd52:f161:9c8a:ee77])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edc29ebeasm3818360b3a.30.2026.08.03.07.13.20
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edc29ebeasm3818360b3a.30.2026.08.03.07.13.28
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 03 Aug 2026 07:13:23 -0700 (PDT)
+        Mon, 03 Aug 2026 07:13:31 -0700 (PDT)
 From: Haoqin Huang <haoqinhuang7@gmail.com>
 To: Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -70,9 +70,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Haoqin Huang <haoqinhuang@tencent.com>,
 	Rongwei Wang <zigiwang@tencent.com>
-Subject: [PATCH v5 1/4] zram: do not release zstd global params from error paths
-Date: Mon,  3 Aug 2026 22:12:53 +0800
-Message-ID: <20260803141256.60599-2-haoqinhuang7@gmail.com>
+Subject: [PATCH v5 2/4] zram: reject zero-size dictionary
+Date: Mon,  3 Aug 2026 22:12:54 +0800
+Message-ID: <20260803141256.60599-3-haoqinhuang7@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260803141256.60599-1-haoqinhuang7@gmail.com>
 References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
@@ -87,45 +87,35 @@ Content-Transfer-Encoding: 8bit
 
 From: Haoqin Huang <haoqinhuang@tencent.com>
 
-zstd_setup_params() creates global cdict and ddict stored in
-params->drv_data, shared across all per-CPU contexts. The per-CPU
-zstd_create() error path called zstd_release_params(), which freed
-those globally-shared objects. This is a layering violation: a
-per-CPU callback should only clean up its own context, not release
-resources owned by the compression lifecycle.
-
-zstd_setup_params() called zstd_release_params() on its own error
-path as well, but zcomp_init() already calls release_params() when
-setup fails, so this is redundant.
-
-Remove zstd_release_params() from both error paths.
+kernel_read_file_from_path() already rejects empty files (i_size <= 0)
+and returns -EINVAL, but the current implementation only checks for
+sz < 0 without logging any information. Use sz <= 0 to cover the
+zero-size case and print an error message if dictionary loading fails.
 
 Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
 Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
 ---
- drivers/block/zram/backend_zstd.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/block/zram/zram_drv.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
-index d00b548056dc..5fabc3e7e975 100644
---- a/drivers/block/zram/backend_zstd.c
-+++ b/drivers/block/zram/backend_zstd.c
-@@ -85,7 +85,6 @@ static int zstd_setup_params(struct zcomp_params *params)
- 	return 0;
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index cfa98846ac48..68e60c9eb8b3 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1700,8 +1700,12 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
+ 						INT_MAX,
+ 						NULL,
+ 						READING_POLICY);
+-		if (sz < 0)
++		if (sz <= 0) {
++			pr_err("failed to load dictionary %s (err=%zd)\n",
++			       dict_path, sz);
++
+ 			return -EINVAL;
++		}
+ 	}
  
- error:
--	zstd_release_params(params);
- 	return -EINVAL;
- }
- 
-@@ -161,7 +160,6 @@ static int zstd_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
- 	return 0;
- 
- error:
--	zstd_release_params(params);
- 	zstd_destroy(ctx);
- 	return -EINVAL;
- }
+ 	zram->params[prio].dict_sz = sz;
 -- 
 2.43.7
 
