@@ -1,148 +1,123 @@
-Received: from mail-pz2-f0.google.com (mail-pz2-f0.google.com [74.125.228.0])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87B1DFFB
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:13:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3342430D40B
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 14:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785766427; cv=none; b=h/z0bEqfYdk1GUYLJ8r2wD0g+0gesK3rNhlziJtMsSExbTqaexwcDW8OQeJmbvNt76rDMNQVaCZpVQO+TqhME76+Oo7WRtf8OxjTPUJ5Wi42x1GAoM62+Z8Sd+PCx59hwgR60u65M7hbCMYQ0wWg8omNnM/x4JW5Tm4uu1z3mUo=
+	t=1785766961; cv=none; b=ABM9/gsGfwAFDS2vsaAIbncUHveyn+BCpJMH9B8arOnjOOIUeYjk+2hnvn9vJbYUlXv7egjgyRZ9/c5soTLReMWwWPNiPY2/JbY8aowmuw59juaewyl3xAIjqh3/gss6ta89X7ZCQxdESCHr30WeJ4UwadXVPgXhOBSbutlcAjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785766427; c=relaxed/simple;
-	bh=IuMLjQaPfv4JXSeDcgATZz8vte9WUWSgWRND4Yp1uDY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JGPeY9lekI9S7wHf+PKUYsCbw2CqQCAik5ufN1Hf+OhnRSsIAbBv8WS+XaJvAcCa39R6Dk2DH8lSnsb+0r6Jf5bQL4zXHK43foonbwC0h1IMv4L++PqISpIUFDyeVDeMOzp8FeP5fJlZ6yWO7qYsVckEh/SQc0G/6kCaM33rcc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ThLV1SyB; arc=none smtp.client-ip=74.125.228.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785766961; c=relaxed/simple;
+	bh=YtaZwWJqS5CvG+wONyrzaRAjQm4+TRuNrXngMlAeyqg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A7PyDl7GggCXz72rZVASbaiXALxJTorX0dSjd0oyMg1dua7Ehe1kaHfT/qOlntEcYol2kL+DFERUNJIZCLQVv4tpqdX2lUX4LbzhMGFi2A8IdodIqgATRsTb5csQ5lRdlXLdWQYdSRNMRH1VbYJPxM6tDvUFye91tYb4fOIRe0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jCT8PIWq; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ThLV1SyB"
-Received: by mail-pz2-f0.google.com with SMTP id 41be03b00d2f7-ca7fcfe1669so1956595a12.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 07:13:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785766426; x=1786371226; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DSnGUH2En7/Tp3ArvxF3zOvp2fk2CBZx8ROlX+KL6MQ=;
-        b=ThLV1SyB7tSmgxZIcYkDjMMnhY4p6Uf4vZgm79wgQVPqEm1WP0trBL4UZAH3rM1nQ5
-         2HVdXN2S7o3sWnB5+LroAvQE2CqJz4dl/Ernu1KsJcOUl/IhsqOjnaC3fV10lFAkc/Cm
-         /NF9mesY7Y0dOfT3tk2ZbUyksCR7aqjHNJzr9FhJRoX7kX+gqwm294gWtXm3K7GtPYIg
-         Eq0mAQ1hI+qGSvfgYHgCJcgznWIX1RozZ00XukzPfVw0vWpYPKFoesJ/xCnA2/RKTY6k
-         TwlQJJ8oYQGuM2H+MzfKjfTdxhQNkuPiF0NgaRdfyCqmOLfHabyrzI1VkH2eQcbN7oVT
-         9tSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785766426; x=1786371226;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DSnGUH2En7/Tp3ArvxF3zOvp2fk2CBZx8ROlX+KL6MQ=;
-        b=k+AxWF/IuTL0RfF2BB8AWrTC4MGVBJe6tmRGgIKoh+9uPuYWf9CKIfewMF6z7i5q4E
-         F/wMiT2xMCYTEme+V+GFbPssBTW+rgeYgjRl/vWaGndNfJtDnppLVftHjcJ+0ZyeTwnm
-         UcoMpMoyuPNVOVTFhxPiFZeCc07bsTqGLabjOPFn3hcBb3Yem1GEHEYEkPJZxPePYixM
-         YQ1nTJqkx0qKYNvCpNOErJmHcp745U0TsBu0xXBN9Jr6K6xX7cXk5m2m7OGmEHGS4Ew4
-         QtEBDAeb/wh7ERRzIEg+ykR+y0tblTICs6+HukuI3GK4bPVrXjxwpmPzPCor1678HcJj
-         gUmw==
-X-Forwarded-Encrypted: i=1; AHgh+RrvBXA/PAee+SFE8NxC4NB59bCm7XBtzoDK0hqX4Vi2qodk5KeIq8/6iEtnsK7iniYCu1A2yUyFc8Uadg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpjpTQcNSpyOs6M+Y806ps99EovYQd44eaWtCnOvCG242S6rkj
-	nDHINgWq1CBbbv8AfHVeeuZr/ZMyxk7gXluMMZZnnQ+ynSFJgXbOzXvY
-X-Gm-Gg: AR+sD13gWlAE0lXeuQ1UnD+QxLnkdIVbeEKZSkcWnYQ4KTI6GZfwT4iVIKpgtdEDuPW
-	E1jCWUycm9EJZFahmXJCeYsJKR3i6JrzHZ4QW3yAmHE4EnkKoQNqZ3PnRwJqAeFk6CPEQA2p1Su
-	6o3qm/OjjnD5u//Ydyq6nDClKXTPrQsam6bWhnZwlUP/MRc7Okdul+IVo9FB1rjTVuq3Z4Gm4/e
-	kkI3IiD8F3Cz9BWWnb32EUFUO+0Oq5Irxr4F293hL+SRDwh1rO06+WOX4541JF9cR1WTAmQD7eB
-	ZfcxCiBaabYkVPBmdRjn0S1fMebxZWMg53V/XD4e8tUimOs+ycFjo0StkyVGmcS2OJzOdKX07Qm
-	Y5il+WpDt+PhgXj0m9AgPenkFYsJkgww+WIHPw/AgJHs/3iL/HTy3aGLh/BZCtAz+2e7H4RPqiv
-	wUGzMUhw/yfj/g1DSNuQ404yt8jYC15y6SAc253qaKvCQbE0AGHNwUpHi9fVeRiOXBuHPhA5JUl
-	3v0bjbuvCEKAP5VIZ+678hhWv7YKA2xcg==
-X-Received: by 2002:a05:6a00:94f4:b0:848:2f73:9002 with SMTP id d2e1a72fcca58-84ee493f64fmr9115123b3a.75.1785766425596;
-        Mon, 03 Aug 2026 07:13:45 -0700 (PDT)
-Received: from HAOQINHUANG-MC0.tencent.com ([2409:8a00:1a20:7370:cd52:f161:9c8a:ee77])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edc29ebeasm3818360b3a.30.2026.08.03.07.13.42
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 03 Aug 2026 07:13:45 -0700 (PDT)
-From: Haoqin Huang <haoqinhuang7@gmail.com>
-To: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Haoqin Huang <haoqinhuang@tencent.com>,
-	Rongwei Wang <zigiwang@tencent.com>
-Subject: [PATCH v5 4/4] zram: reset per-priority params when changing algorithm before init
-Date: Mon,  3 Aug 2026 22:12:56 +0800
-Message-ID: <20260803141256.60599-5-haoqinhuang7@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20260803141256.60599-1-haoqinhuang7@gmail.com>
-References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-1-haoqinhuang7@gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jCT8PIWq"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 673EHUNv2282268;
+	Mon, 3 Aug 2026 14:22:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pHTthZ
+	uBE7ZME7wvxEg49fsTuqtRmbomuOOg/QiuW+4=; b=jCT8PIWqQo2u6QidV1HPvi
+	FyI1EuIljBRvS8TY2GPHcaXfLWKQc8jqrr7jxJRs0q6FrKx4oPcvtTltjGcyseDH
+	69d3bNn7P9qjSjjmdZbfqxWSrvLtS/lUYVYONps+xOKExsqCGrElxJvE4kIkUJo/
+	j4H6kCVqV1lz02CFoWikkgi8vAVecUOzDXdQf3ocHoXNqz3dhNz9glZ4Nl8rGdR/
+	85JrBv5kEjmmgU1tZW+3ajficD5qKT1aExlO1QJ0mos01wbTCByXG/Y9cptOkS3N
+	rI9IJ53uv+jjAOgNlqUh/pv4aVMZ/BuF3/vw2uWU3nTaaRJ9ZWuvuZqHa2gM8BgQ
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8h4s7ug-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 14:22:29 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673EDMJd029815;
+	Mon, 3 Aug 2026 14:22:28 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsv4jwrs9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 14:22:28 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673EMSw023265950
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Aug 2026 14:22:28 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 141B958054;
+	Mon,  3 Aug 2026 14:22:28 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C97B858045;
+	Mon,  3 Aug 2026 14:22:25 +0000 (GMT)
+Received: from [9.123.7.57] (unknown [9.123.7.57])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Aug 2026 14:22:25 +0000 (GMT)
+Message-ID: <04fd9f6d-9032-4833-becd-5465c3b2b95e@linux.ibm.com>
+Date: Mon, 3 Aug 2026 19:52:23 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/12] Enable lock context analysis in drivers/block/
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>
+References: <cover.1785440858.git.bvanassche@acm.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <cover.1785440858.git.bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDEyOCBTYWx0ZWRfX/cwuUH3wi6Ct
+ mjbw1dTvvv5TvCJebvlTCqlvz9u3rwKzO8PnPc9g8oJ4y/jpdFu8GrcaOhP/+Q9YmAKBSU6QsRn
+ 4BUZX80mzGD2T5nfZbHc/qPnWC5+010=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDEyOCBTYWx0ZWRfX5ItENMUCyYKZ
+ urGZ6kmbKNrA19usaLJX+C+TDR33enmKLuHlCJIbB1JPhj5r1KIKZgHG/ZXndY0cnNoCOTb1TmK
+ 7Ni7mh6Cne2TLr8orQjlt4Dk2kGbcOAvAI5ucjYIiFp+j5LPAvVohWlmtJ9T0VgkU7U+g1n/snA
+ 3pz+vGa4WFtTutinrzDbRHlxgg+zG6n6V3mu/acydr/TyUXzJBrSIVjgVDpnr6E+m4tZUOLqWRB
+ rM0SL+P13qApkfNnAQRQpLQeKfRYqFnbbe8xmNth467l1M9lgEABcKMJCMSn27Ix3nku0qSJs5n
+ oRQgY5IJv3ELXAe4NrFT5rB912YP0M4nQ/O6Pckov+chSqWSlGozMY85UO+TbRhhfAOBgtxVy44
+ qIwsxZ5eo4/n3cMbuTABfPPdbi4OGa4zmJxQ4KPWfdlnDVx3xcdUoVXRD4UoVu/AUx86ImB83jW
+ PrYTnC4ewjttkh9SBhw==
+X-Authority-Analysis: v=2.4 cv=SI1ykuvH c=1 sm=1 tr=0 ts=6a70a425 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=tutTO12i5-LwSZ318QYA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: ecXr_9g78y6ijegj_sbYvggXS1rKHYMB
+X-Proofpoint-GUID: J0LscyxrWLh66RFo04dCqOYx6K3cNNPx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-03_03,2026-08-03_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0
+ phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608030128
 
-From: Haoqin Huang <haoqinhuang@tencent.com>
+Hi Bart,
 
-Parameters validated against one algorithm may be invalid for another
-(e.g. lz4 accepts level=65535 but zstd does not).  Although algorithm
-changes are blocked after disksize is set, they are allowed before
-device initialization.  Reset per-priority params on algorithm change
-so that stale parameters do not silently carry over.
+On 7/31/26 1:28 AM, Bart Van Assche wrote:
+> Hi Jens,
+> 
+> This patch series enables lock context analysis in all block drivers in the
+> drivers/block/ directory except DRBD. Please consider these patches for the
+> next merge window.
+> 
 
-Signed-off-by: Haoqin Huang <haoqinhuang@tencent.com>
-Signed-off-by: Rongwei Wang <zigiwang@tencent.com>
----
- drivers/block/zram/zram_drv.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+One general comment I have about this series is that there are several functions
+across these drivers that use the lockdep_assert_*() APIs. I think these functions
+should also be annotated with the corresponding Clang lock context annotations,
+such as __must_hold(...) or __must_not_hold(...), depending on the lockdep assertion
+being used. This would help keep the runtime lockdep assertions and the Clang lock
+context annotations consistent.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 68e60c9eb8b3..cc96b18bf647 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1652,6 +1652,17 @@ static void comp_algorithm_set(struct zram *zram, u32 prio, const char *alg)
- 	zram->comp_algs[prio] = alg;
- }
- 
-+static void comp_params_reset(struct zram *zram, u32 prio)
-+{
-+	struct zcomp_params *params = &zram->params[prio];
-+
-+	vfree(params->dict);
-+	params->level = ZCOMP_PARAM_NOT_SET;
-+	params->deflate.winbits = ZCOMP_PARAM_NOT_SET;
-+	params->dict_sz = 0;
-+	params->dict = NULL;
-+}
-+
- static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
- {
- 	const char *alg;
-@@ -1672,20 +1683,10 @@ static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
- 	}
- 
- 	comp_algorithm_set(zram, prio, alg);
-+	comp_params_reset(zram, prio);
- 	return 0;
- }
- 
--static void comp_params_reset(struct zram *zram, u32 prio)
--{
--	struct zcomp_params *params = &zram->params[prio];
--
--	vfree(params->dict);
--	params->level = ZCOMP_PARAM_NOT_SET;
--	params->deflate.winbits = ZCOMP_PARAM_NOT_SET;
--	params->dict_sz = 0;
--	params->dict = NULL;
--}
--
- static int comp_params_store(struct zram *zram, u32 prio, s32 level,
- 			     const char *dict_path,
- 			     struct deflate_params *deflate_params)
--- 
-2.43.7
-
+Thanks,
+--Nilay
