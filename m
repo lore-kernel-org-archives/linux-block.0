@@ -1,335 +1,133 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D98F26982C
-	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 19:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFDF3B5304
+	for <linux-block@vger.kernel.org>; Mon,  3 Aug 2026 21:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785786386; cv=none; b=Bfako1HVC4CRbdEWwmnZoqV0anfTpiU2hC0bKAvPnxI7Yi6IwxoJ2jQVstTp925eWh/R6ig1j2d+LuZi6ZkfPKSlSAU2+2WtBvZYpRnTr03XQGjIkzSw2aRp+3/dI/+02rSxDX1BL07jrIgmYzYSmWk+qfgujUmD9KNOV9KsBHs=
+	t=1785791688; cv=none; b=kUhA1439Fp2d222Tfp+doKWaGQDDe+5uBMwUBZdcYJoQHbWumxAR+IWs3Yn56hqGayl7HZ/LLxGCM4TxjqQ3xo4sCHLos7XMetMNJKrix+YMulVz1q2dlbT6TqDnl6pAK/DyKuE4TLUjtQ6TKVDPLzxCdqLLwlPqA58dh9PPNi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785786386; c=relaxed/simple;
-	bh=QJUKYYZ+Ngu9vrXeW6sVXKrHqsfzwb4pP0yav050pYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JsoZn74jL1xEIFnXi9JZtA6jJVhLlWfiQblbULbxRn7Q4W/9dQ0Sf+F8YOWwXCJnQ6kpJwE2O5kJipkq2+LU+mNCU4V+3m/2NwtLfl/J3XInQveA/RGtXwjW6o4NquqZrx0M5n2qBQw9GxsTjlYkAzi9xsjtMiSKeCjxW7f/xaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=n0LP0m2O; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1785791688; c=relaxed/simple;
+	bh=Ay8po0D/dJHtAAlv8sLttVFqYoCzGVXCHK3T6K0atNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S483cvh3InbOwqRAqPYcewuTP0Ow58I/XWiSLv3i9QbMa8eVARgOyDT8LFK6Nd/gJ+zO69du/euYEd8rS1mOw1N8CtyAWSQVssKBneVBtI3gBr6boXtiBfNjlGN3PpyeXRhSN/sTdMD+6mRGG2ZaBR77Tg2F+NLax9dCv4M6SK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Jiwybz+F; arc=none smtp.client-ip=209.85.214.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="n0LP0m2O"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hDRxq5sMfzlfvq4;
-	Mon,  3 Aug 2026 19:46:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1785786374; x=1788378375; bh=+hlXBh64IxqDdDshtqGR4r+v
-	KYC4xtrHPiY7HEc2nRI=; b=n0LP0m2OFQOknlZbbTDhZJG2UYIDfTzKF9yLpoKA
-	OvXCuK4pi+dBBYEKTjiljcz+lh1uZr1uOhyEeLvzDcNHzV4rMaN3o5RX1i/22SIt
-	79Mw4m7UK4ZP8W+ZYcaObbQgRT+kFbAPN5e/7gP/DjUieggfSn9K5vha/sToKRPD
-	6nz6ushAXAQU2VnVDXc5jhuMyPg5KgN2Jsyd+Kifb30SOJhDEyngalpUFfbCUVng
-	b5UzPCFhKi2KH/Iof0oYIppJeutHWjv+KehHNcbvpY1wZYGPuabyJOPVpdY0y6Xc
-	NA/G6y//M9IQhRmIPokKUP8FQi9iPn9j5FMWii3yvy/u5w==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id jTFElilFC8UF; Mon,  3 Aug 2026 19:46:14 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hDRxc5qVxzlfvpH;
-	Mon,  3 Aug 2026 19:46:12 +0000 (UTC)
-Message-ID: <83968777-6f3a-4c21-ac89-fe9ebcbf254d@acm.org>
-Date: Mon, 3 Aug 2026 12:46:11 -0700
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Jiwybz+F"
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2cf420670bbso3337575ad.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 14:14:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1785791685; x=1786396485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Z5Tn8GDAuHvEBSiHkYSZKLLT9+XXk8tB1iGEjxC739I=;
+        b=Jiwybz+FSeaIf2bntyTV8xi7prosYp13/nYqEYW0eZJtyiDkyN8xnEZt0ApjWdqutQ
+         RrcNc8cRdDWEgOh/yX4FjS3xq+8MSBo7JWiYj8cNglat3GyiQX2pbIVgJcUKt7hKLB4w
+         KL+TDMCvm/K8hW2KFOJyMUiTZD39oRhmIy4Lr3eg6tz5emshanD3iAH4Fo0Zo4k01PKT
+         rMwWLny5pU9ZIDv8ion+ApvCKssogSvfEb2D7jW0T03sW1qgu31oNU03rxM/jBNXPhZt
+         wkS2iPnyxOGs5zo0NAgcgima2qz0sJjBVgsZcBWbrXMAfqim0+FiOh5jf56CQ884KaIQ
+         AJcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785791685; x=1786396485;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Z5Tn8GDAuHvEBSiHkYSZKLLT9+XXk8tB1iGEjxC739I=;
+        b=LadLjdH3VCFbtPL8JizUY6GgdrnS+RN95wpRpccZlJHnLZ+iKqw+HJFRJDCtbE41yE
+         nsX7+ONu4mM/SebTi8+Okjw1Jv+zv0ZJEnOub/r0qGqq/wun+Y0nseIek7A8xsfh12+P
+         RtIOKs92JkIeAgY14iSiSOAnLAq/S9ucJYJv2Owvj8b5O60NTfc8hNq2mscoVf4qHi0G
+         +sP0G6UsLYNf7veuT9ZDT6H2wLUn2Bbxig5vfKUU31bbi5OxFCJpyiTQ0qg8LbpMKXMs
+         8pY0hvsNS1NMRRN49etZ9CkyjIC0qPbXBlJzoLO8eGjpDkEmzsumLDa0P5hF8GRnh0qG
+         ebcQ==
+X-Gm-Message-State: AOJu0Yy4X+mNUpX9iYgRvVB0q+qbswmffSI4wjALdxu1TA8ZQ9uF1MMz
+	VAnzHwEHQVibwQSzSi5kld2Gyae9k8WlYbgQgyuNaqGhlY/x52V2ZECSCE/1h7fagwnwkdpehN3
+	tarU3DsaVFcoppEYfAqWxgk2vuAqKyoIrSencZVXB7x7Rd2eaXDZw
+X-Gm-Gg: AR+sD128YbJm7L03lVJ9g6HX7tfpC9XVVo+h9bBieuYDqn86yC72VUAw2Nt4JWyylbi
+	fqJXQr93YvdRpDWDuAG1jyV/WsSz2q7W0qRoHKgUTue2Z4TQx432EmFgL7yWdrVVhaNHUtsPpw/
+	bxchF93XDjrflj2m5Np7oTyWndYrk2t3PNjn6Q8Tgisx2SIs45oM2Af4glu6taHIEzty1D4IObW
+	dtChRUZ+ou5cOonxiQK4bPg4SOHjtIbpWXKSj5vAMxli51Q6IxxN23GkM/l9O+8CzGrqlT/DYvz
+	LRYnjBRJ/kmU8q/Kv98svKAr/G+lwwY3DXny92RO7qwLzo7N3YzDWT5sSYt2BhEzSGO27IdClJv
+	Q0XuYLIjdy++IZOXM9A==
+X-Received: by 2002:a17:903:2443:b0:2cf:9e90:8be with SMTP id d9443c01a7336-2d0524799d8mr154463345ad.4.1785791685120;
+        Mon, 03 Aug 2026 14:14:45 -0700 (PDT)
+Received: from c7-smtp-2026.dev.purestorage.com ([2620:125:9017:12:36:3:6:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2d04b136acfsm10910745ad.39.2026.08.03.14.14.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Aug 2026 14:14:45 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.12.104])
+	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 62F3C402A0;
+	Mon,  3 Aug 2026 15:14:44 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 52883E4041D; Mon,  3 Aug 2026 15:14:44 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Shuah Khan <shuah@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH v2 0/8] ublk: io_desc optimizations
+Date: Mon,  3 Aug 2026 15:14:32 -0600
+Message-ID: <20260803211441.2538144-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/12] rbd: Enable lock context analysis
-To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
- Ilya Dryomov <idryomov@gmail.com>
-References: <cover.1785440858.git.bvanassche@acm.org>
- <0b2988ca05e8a2733352a447e0810104b878376a.1785440858.git.bvanassche@acm.org>
- <487841d2-9d55-4873-ab6b-dbd94aa7bb71@linux.ibm.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <487841d2-9d55-4873-ab6b-dbd94aa7bb71@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 8/3/26 7:03 AM, Nilay Shroff wrote:
-> In addition to the above annotations, it looks like several variables=20
-> and structure members
-> are consistently protected by specific locks:
->=20
-> 1. rbd_dev_list is guarded by rbd_dev_list_lock.
-> 2. rbd_client_list is guarded by rbd_client_list_lock.
-> 3. rbd_device::acquiring_list and rbd_device::running_list are guarded =
-by
->  =C2=A0=C2=A0 rbd_device::lock_lists_lock.
-> 4. rbd_device::object_map is guarded by rbd_device::object_map_lock.
-> 5. rbd_device::watch_cookie, rbd_device::watch_state, and=20
-> rbd_device::watch_handle
->  =C2=A0=C2=A0 are guarded by rbd_device::watch_mutex.
-> 6. rbd_device::lock_state and rbd_device::lock_cookie are guarded by=20
-> rbd_device::lock_rwsem.
->=20
-> So I think we should add the corresponding `__guarded_by(...)`=20
-> annotations for these
-> fields as part of enabling lock context analysis for this driver.
+This series is based on the "ublk: harden user buffer handling" series.
 
-Hi Nilay,
+ublk passes the parameters of incoming I/O in memory shared between the
+kernel ublk driver and userspace ublk server in struct ublksrv_io_desc.
 
-Thank you for having looked this up. I took a closer look at the rbd
-driver and came up with the patch below. Some observations:
-- Some code obtains pointers to acquiring_list, running_list and
-   object_map before the corresponding synchronization objects are
-   acquired. Hence, I have not tried to annotate these struct members
-   with __guarded_by().
-- The locking convention followed by rbd_img_object_requests() is not
-   a good fit for what Clang supports.
+The thread submitting the ublk I/O writes to the io_desc, while the ublk
+server thread handling the I/O reads the io_desc. This basically
+guarantees a cache miss on both threads for each ublk I/O. Avoid the
+cache misses by writing the io_desc on the server thread in the kernel
+before dispatching the I/O to userspace.
 
-Further feedback is welcome.
+The size of each io_desc is currently fixed to 24 bytes, which has been
+an obstacle to extending it with additional fields [1]. Additionally,
+with multiple ublk server threads handling I/Os from the same ublk queue
+(possible with UBLK_F_PER_IO_DAEMON or UBLK_F_BATCH_IO), false sharing
+results from adjacent io_descs sharing the same cache line. Add a
+UBLK_F_IO_DESC_SIZE feature allowing the ublk server to increase the
+size of the io_descs for its ublk devices.
 
-Thanks,
+[1]: https://lore.kernel.org/linux-block/aV8QfvaNO5P6vOs6@fedora/
 
-Bart.
+v2:
+- Cap io_desc_size arbitrarily at 256 (Ming)
+- Add kublk list support, selftest (Ming)
+- Add Reviewed-by tags, Suggested-by tag (Ming)
 
-These are the changes I came up with (relative to the above patch):
+v1: https://lore.kernel.org/linux-block/20260729012951.3744582-1-csander@purestorage.com/
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index f0f7a94e3e3e..4c9f566b7a91 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -406,26 +406,26 @@ struct rbd_device {
-  	struct mutex		watch_mutex;
-  	enum rbd_watch_state	watch_state;
-  	struct ceph_osd_linger_request *watch_handle;
--	u64			watch_cookie;
-+	u64			watch_cookie __guarded_by(&watch_mutex);
-  	struct delayed_work	watch_dwork;
+Caleb Sander Mateos (8):
+  ublk: consistently use u16 for queue and tag numbers
+  ublk: remove struct ublk_zoned_report_desc's operation field
+  ublk: split request validation from io_desc init
+  ublk: initialize io_desc on daemon task
+  ublk: add UBLK_F_IO_DESC_SIZE
+  selftests: ublk: add support for --io_desc_size
+  selftests: ublk: add UBLK_F_IO_DESC_SIZE test
+  ublk: lift checks out of ublk_{,un}map_io()
 
-  	struct rw_semaphore	lock_rwsem;
--	enum rbd_lock_state	lock_state;
--	char			lock_cookie[32];
-+	enum rbd_lock_state	lock_state __guarded_by(&lock_rwsem);
-+	char			lock_cookie[32] __guarded_by(&lock_rwsem);
-  	struct rbd_client_id	owner_cid;
-  	struct work_struct	acquired_lock_work;
-  	struct work_struct	released_lock_work;
-  	struct delayed_work	lock_dwork;
-  	struct work_struct	unlock_work;
-  	spinlock_t		lock_lists_lock;
--	struct list_head	acquiring_list;
--	struct list_head	running_list;
-+	struct list_head	acquiring_list; /* __guarded_by(&lock) */
-+	struct list_head	running_list; /* __guarded_by(&lock) */
-  	struct completion	acquire_wait;
-  	int			acquire_err;
-  	struct completion	quiescing_wait;
+ drivers/block/ublk_drv.c                     | 261 ++++++++++---------
+ include/uapi/linux/ublk_cmd.h                |   5 +-
+ tools/testing/selftests/ublk/Makefile        |   1 +
+ tools/testing/selftests/ublk/kublk.c         |  30 ++-
+ tools/testing/selftests/ublk/kublk.h         |   6 +-
+ tools/testing/selftests/ublk/test_loop_08.sh |  25 ++
+ 6 files changed, 188 insertions(+), 140 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_loop_08.sh
 
-  	spinlock_t		object_map_lock;
--	u8			*object_map;
-+	u8			*object_map; /*__guarded_by(&object_map_lock)*/
-  	u64			object_map_size;	/* in objects */
-  	u64			object_map_flags;
-
-@@ -464,11 +464,13 @@ enum rbd_dev_flags {
-
-  static DEFINE_MUTEX(client_mutex);	/* Serialize client creation */
-
--static LIST_HEAD(rbd_dev_list);    /* devices */
-+/* devices */
-  static DEFINE_SPINLOCK(rbd_dev_list_lock);
-+static __guarded_by(&rbd_dev_list_lock) LIST_HEAD(rbd_dev_list);
-
--static LIST_HEAD(rbd_client_list);		/* clients */
-+/* clients */
-  static DEFINE_SPINLOCK(rbd_client_list_lock);
-+static __guarded_by(&rbd_client_list_lock) LIST_HEAD(rbd_client_list);
-
-  /* Slab caches for frequently-allocated structures */
-
-@@ -521,6 +523,7 @@ static bool rbd_is_snap(struct rbd_device *rbd_dev)
-  }
-
-  static bool __rbd_is_lock_owner(struct rbd_device *rbd_dev)
-+	__must_hold_shared(&rbd_dev->lock_rwsem)
-  {
-  	lockdep_assert_held(&rbd_dev->lock_rwsem);
-
-@@ -1645,6 +1648,7 @@ static void __rbd_object_map_index(struct=20
-rbd_device *rbd_dev, u64 objno,
-  }
-
-  static u8 __rbd_object_map_get(struct rbd_device *rbd_dev, u64 objno)
-+	__must_hold(&rbd_dev->object_map_lock)
-  {
-  	u64 index;
-  	u8 shift;
-@@ -1655,6 +1659,7 @@ static u8 __rbd_object_map_get(struct rbd_device=20
-*rbd_dev, u64 objno)
-  }
-
-  static void __rbd_object_map_set(struct rbd_device *rbd_dev, u64=20
-objno, u8 val)
-+	__must_hold(&rbd_dev->object_map_lock)
-  {
-  	u64 index;
-  	u8 shift;
-@@ -3431,6 +3436,7 @@ static bool need_exclusive_lock(struct=20
-rbd_img_request *img_req)
-  }
-
-  static bool rbd_lock_add_request(struct rbd_img_request *img_req)
-+	__must_hold_shared(&img_req->rbd_dev->lock_rwsem)
-  {
-  	struct rbd_device *rbd_dev =3D img_req->rbd_dev;
-  	bool locked;
-@@ -3448,6 +3454,7 @@ static bool rbd_lock_add_request(struct=20
-rbd_img_request *img_req)
-  }
-
-  static void rbd_lock_del_request(struct rbd_img_request *img_req)
-+	__must_hold_shared(&img_req->rbd_dev->lock_rwsem)
-  {
-  	struct rbd_device *rbd_dev =3D img_req->rbd_dev;
-  	bool need_wakeup =3D false;
-@@ -3472,6 +3479,8 @@ static int rbd_img_exclusive_lock(struct=20
-rbd_img_request *img_req)
-  	if (!need_exclusive_lock(img_req))
-  		return 1;
-
-+	__assume_ctx_lock(&img_req->rbd_dev->lock_rwsem);
-+
-  	if (rbd_lock_add_request(img_req))
-  		return 1;
-
-@@ -3490,6 +3499,12 @@ static void rbd_img_object_requests(struct=20
-rbd_img_request *img_req)
-  	struct rbd_obj_request *obj_req;
-
-  	rbd_assert(!img_req->pending.result && !img_req->pending.num_pending);
-+	/*
-+	 * The caller either obtains an exclusive lock or obtains
-+	 * rbd_dev->lock_rwsem. Since this cannot be represented accurately
-+	 * using lock context annotations, add an __assume_ctx_lock() statement=
-.
-+	 */
-+	__assume_ctx_lock(&rbd_dev->lock_rwsem);
-  	rbd_assert(!need_exclusive_lock(img_req) ||
-  		   __rbd_is_lock_owner(rbd_dev));
-
-@@ -3533,6 +3548,7 @@ static void rbd_img_object_requests(struct=20
-rbd_img_request *img_req)
-  }
-
-  static bool rbd_img_advance(struct rbd_img_request *img_req, int *resul=
-t)
-+	__must_hold(&img_req->state_mutex)
-  {
-  	int ret;
-
-@@ -3651,6 +3667,7 @@ static struct rbd_client_id rbd_get_cid(struct=20
-rbd_device *rbd_dev)
-   */
-  static void rbd_set_owner_cid(struct rbd_device *rbd_dev,
-  			      const struct rbd_client_id *cid)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	dout("%s rbd_dev %p %llu-%llu -> %llu-%llu\n", __func__, rbd_dev,
-  	     rbd_dev->owner_cid.gid, rbd_dev->owner_cid.handle,
-@@ -3666,6 +3683,7 @@ static void format_lock_cookie(struct rbd_device=20
-*rbd_dev, char *buf)
-  }
-
-  static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct rbd_client_id cid =3D rbd_get_cid(rbd_dev);
-
-@@ -3679,6 +3697,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev,=20
-const char *cookie)
-   * lock_rwsem must be held for write
-   */
-  static int rbd_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct ceph_osd_client *osdc =3D &rbd_dev->rbd_client->client->osdc;
-  	char cookie[32];
-@@ -3702,6 +3721,7 @@ static int rbd_lock(struct rbd_device *rbd_dev)
-   * lock_rwsem must be held for write
-   */
-  static void rbd_unlock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct ceph_osd_client *osdc =3D &rbd_dev->rbd_client->client->osdc;
-  	int ret;
-@@ -3840,6 +3860,7 @@ static int rbd_request_lock(struct rbd_device=20
-*rbd_dev)
-   * (i.e. "rbd map").
-   */
-  static void wake_lock_waiters(struct rbd_device *rbd_dev, int result)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct rbd_img_request *img_req;
-
-@@ -3950,6 +3971,7 @@ static struct ceph_locker=20
-*get_lock_owner_info(struct rbd_device *rbd_dev)
-
-  static int find_watcher(struct rbd_device *rbd_dev,
-  			const struct ceph_locker *locker)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct ceph_osd_client *osdc =3D &rbd_dev->rbd_client->client->osdc;
-  	struct ceph_watch_item *watchers;
-@@ -3999,6 +4021,7 @@ static int find_watcher(struct rbd_device *rbd_dev,
-   * lock_rwsem must be held for write
-   */
-  static int rbd_try_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	struct ceph_client *client =3D rbd_dev->rbd_client->client;
-  	struct ceph_locker *locker, *refreshed_locker;
-@@ -4217,6 +4240,7 @@ static void rbd_pre_release_action(struct=20
-rbd_device *rbd_dev)
-  }
-
-  static void __rbd_release_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
-  {
-  	rbd_assert(list_empty(&rbd_dev->running_list));
-
-@@ -4256,6 +4280,7 @@ static void rbd_release_lock_work(struct=20
-work_struct *work)
-  }
-
-  static void maybe_kick_acquire(struct rbd_device *rbd_dev)
-+	__must_hold_shared(&rbd_dev->lock_rwsem)
-  {
-  	bool have_requests;
-
-@@ -5302,6 +5327,7 @@ static void rbd_spec_free(struct kref *kref)
-  }
-
-  static void rbd_dev_free(struct rbd_device *rbd_dev)
-+	__context_unsafe(cleanup function that does not need locking)
-  {
-  	WARN_ON(rbd_dev->watch_state !=3D RBD_WATCH_STATE_UNREGISTERED);
-  	WARN_ON(rbd_dev->lock_state !=3D RBD_LOCK_STATE_UNLOCKED);
-@@ -5338,6 +5364,7 @@ static void rbd_dev_release(struct device *dev)
-  }
-
-  static struct rbd_device *__rbd_dev_create(struct rbd_spec *spec)
-+	__context_unsafe(initialization function that does not need locking)
-  {
-  	struct rbd_device *rbd_dev;
-
+-- 
+2.54.0
 
