@@ -1,129 +1,135 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pj2-f10.google.com (mail-pj2-f10.google.com [74.125.227.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33D43E081
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 09:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785835593; cv=pass; b=dVREZx8Sq26m1vMe76WTb86myyFE3DmIhk8LngUXbmtxE9RxAWWoeFOIsFHwaqYKjaxvjXkh4pqeUwceCbXPoK/nZbmtr7qcLh8w/03dWc0YovWMTLd08Ie7Dk+p0WvT0VIE1owhda8Jb1wq+07FRi4cYgx4gK2kGcYIm66kruE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785835593; c=relaxed/simple;
-	bh=K50AO3QCnLnerddofNAF2BYrfsY11pOOebsc9zmParw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPXH8a8ym8fvJGsISBUxWOCSFPQk50AITC/DjDiXt3hi0xiFFPbb5fG6IkxuhNaaEYJgYelkM2uaiYeodwJLzDsZ3ALLg4BTuBUeQfbfoi+IRQ3kN9vaSVV0KTV/nehZQWagjxtbxArTpeJ4eIX7vQk7dK5Ul1HeRB60fqKGA0E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3Ndk3hK; arc=pass smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09CE3F4858
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 09:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.138
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785836335; cv=none; b=gbo7zlOv+x8UMB036Iv5tGRQrsUghg/IIf0lyeDAjQSgOduSNJwjMy4qju0cwRNxiLWhNGuaVbuDPOFOgyl+vDu9Qm2VZEf6t8SUkwXRzvgWv475F5qU24jC/o9UF6Oxk8gqQfp+r2jrp/Yd5IUmjjnAva4Ws6ey/hwmXmsVSvQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785836335; c=relaxed/simple;
+	bh=f7NqEchHgytQan2vuAYcxhw/Xs0Y5SEngUuoKv4fVFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mLDg1ZvQLRm2NWcmvh/Z9XoEpQT1C+TftG+++wn6K6Ycks1uE3JfQg0ysjAwTdkE0/xOvNS1T8fJ3jjHJVsy8zP+pmXmuu9Cx9Ic4URAJeo1hNcF7yZqFzJfvE2a3yhK97S0lFJUE8gx3agIPKMVNZ+DuacsaykogWvSKkf7lnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nhspXNMR; arc=none smtp.client-ip=74.125.227.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3Ndk3hK"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ccf2360620so38976745ad.3
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 02:26:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785835589; cv=none;
-        d=google.com; s=arc-20260327;
-        b=U7qDzBu5FcyPVuiqH1+r/l4RKgxRga4WKNhBKzR8L+RNRBXNXqly5d3NE4PUi6gTHE
-         InCby2Gc4RZAi/aBBMfzXGDfOYaDNdltn93m9RA/+Zm/TKgazgB6UBgqH8hFBpg5U+Xb
-         +/D7SMvqQAATn9mUe0Ho8ZkTyarNzdkBrDEjREDHWe5uWGGYGS3xc5PvpRYc5RfMTYLF
-         nKVFzNKbuwQq9wyUT8x5PejOJYT549p1EeeRzDbeacXNjt0CTY1KTlZYRTHFsfD4pLOK
-         GvHBdDCQKSOKUa7+AEq8yE7Ud51yf7iSCKSPxacga4WE84521usicsjbZX/Xbox7hTM0
-         UsuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=YLthe8qQ9/fcrV5VYLyjQQxFU86K7sG+SJQSb+OqWOI=;
-        fh=friCt3m6ONNsBwFHQiO7P/fRGPjVvIM8PaJqLYgajNU=;
-        b=QYAyiuGHORBxRiYi6qB2IBkfyWJu+7JAe8oBCAY+ubbmJ1v4xNUEkk0MGh4Nd9wdSF
-         wPF/XIFcMsDAkOf+koTmwgNSIEkeLg2jqSoUvv7+rZ1hiHRdjOYSB5qYdizL4Y8jOptu
-         7IMXyuImNTfHjkQkDLFDSSzCk5pflwzek3+AGw4uoYj/Fe+7Q/kcKW5/a+iMC/KNWfC7
-         VXoKJ3XlpenZw4KV79LHg5+YZkxXFCj2eN64m18GsIyXWjQ9ztI6PF/Ur+1eIr/KWcvh
-         zCmmz18i+liYqTmlp1y6DejO6S/wTnhASlKH3pBm+dpVrpeEX2fjNudOizy9ZLQbIszQ
-         VL9Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nhspXNMR"
+Received: by mail-pj2-f10.google.com with SMTP id 98e67ed59e1d1-38dc4f9462cso1297281a91.0
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 02:38:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785835589; x=1786440389; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YLthe8qQ9/fcrV5VYLyjQQxFU86K7sG+SJQSb+OqWOI=;
-        b=c3Ndk3hKrrWIWXUxHifc6gIrXDWUaxChB4uXZCJUwRuDtpRiD5hsuHT7UeeE5ZGmAI
-         uq0AFGcI1DrESgiEldGUJfbRuKXLcbw/nOo6E83bzIIoT8GAmHpUrP7H1u6uL5Zh30A/
-         paNJTbqhfpDvkyJ6lawQ99n4zecfY5SORPvm/EK/4R/IYDs6NwbAuUZoLJwILM99vkNf
-         c36dDh4xCP0XiaTyJp9LTNR1vsmbpKJeRmooxRO5LAc5NJ1gZxWEFgmv8T3gB9noYr1B
-         DwrWCtNLyiIrpAgU0W8cEl/WOlv4vedf749cqhx03Obch+Vfxwhb+7XFsj92xiN8MMju
-         P4cQ==
+        d=gmail.com; s=20251104; t=1785836330; x=1786441130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=JwqX8rqzfSDO3fbrOPC2Za3ssipdqnBrQbik6fwA0Dg=;
+        b=nhspXNMRzpnjSE6YhDe+6ApW2zLb+KT08OwxRTB2fbyvzJ8fFfnr940NfU62+NqV3x
+         0PnYZtWpirHpY/HjTFQOpMlZMbtWQSF/WjK8SSztf5xKIkHEJ5bTedod5K54eKImTHq6
+         ++aLpEmhMz6gzg66pnACc8rwOelB6z+5jU4TnVDn71uh/YPJfwi+E35z9n+dUo9/3z4T
+         /+xsMU8tD9etsg/zNpfy6ZYzlb9yvwMyEkJ2ve0qB3wdWNRrX7FsCA0ZCGrAsccPwemU
+         VDZHH8qa6j+AiTiwaLwKwMnvLhn5JuPgMuw62CsSfYo5ss1cnkcRRxD+DW4BiFxadEYe
+         FziQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785835589; x=1786440389;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=YLthe8qQ9/fcrV5VYLyjQQxFU86K7sG+SJQSb+OqWOI=;
-        b=X2D1O0nXOwMVjCDjPMuwmCI8jqMqPbBSkgxVGSX2ydjvA8JRdVpW1YpSXPEVzx8hZ3
-         nAjz35po3TLoCcWdLq5UvaoiL07dwBb006llBi87VAb3sXvuNFS/7FaawUZqz0UC8nLt
-         c4zeek+iWH3pC+5RoYChYyL8hR8jiA5A6fY4IJVCLR6y9Zqt8MVtezPyddWrOGwSPm45
-         HlFBMFJ45XPE3PIe4qAXdOM+rvbXcYesq4sXlle4VHOeBZbJDBfytl0QrtieBlLDs2+2
-         /lJyCaQI02RdNGLaV52YrN0s+HJhy4by28i2DEW6bRjPtCWCEV6PGdrjsraN6Eh1J+Rd
-         T6aw==
-X-Forwarded-Encrypted: i=1; AHgh+RpfTzWWBo8JEWPk7hr6aQFd+Z2h9EUke4RylTpWVCymH22vTp+TlizaQqaLic2h3xDjg3+tC8+YKo4r8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh//0GlRlK+kI5XTjKd+N4OERXSaoU8BeL8vDwCzFtJyqgY8uR
-	1EUD3dT+qhNQ6c0J5AlI3l0tvelBKrr0qIPNHVP4dqRzIqF1venDFoJcc3G14eihrI6HhPOcVD7
-	iillgQ4iZBEocY2rlklR2ioSiJU2LoPQmW60tnvMC
-X-Gm-Gg: AR+sD11oZPNCS0xgCHsGMHZ9V586RKA0fmxDc65xGm8dRgdw/P6xPLP0fcQXHA8A21L
-	BIPhpIf3nw2SED7t1s8tG3rzh5TQujkjgJCBFEj5gy5VIkQVXzcC3ahavDs+Krkpco+7t2PfJaR
-	DUOT3dQSiKoXAyyR9/Y4O1zsqy6LM0tlPsDn3IFSo0NeznCyw2WvdTXt7UI9b/JIz+No7kIocnU
-	iFea7E1Qx9zlTtF82lvWIxKRknvM2ZbKElW5VcAZcw9WLd0N9EuCbCJMj3DYu4zT04/SXa1RoW+
-	B1AhVNB8VMbvPpndRbcy1znzX6CCuC6M9FNWGNzqqC1Xas2HH37204Ek/0VxWyjHLmyJt+6u7Pc
-	d
-X-Received: by 2002:a05:6a21:4cca:b0:3b5:489c:7bb5 with SMTP id
- adf61e73a8af0-3c92a830fa7mr12023714637.28.1785835588470; Tue, 04 Aug 2026
- 02:26:28 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785836330; x=1786441130;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JwqX8rqzfSDO3fbrOPC2Za3ssipdqnBrQbik6fwA0Dg=;
+        b=RUC+EhoRAyn0Md03SiIP42mAVaL+1s11PpnecPj5LvP6LeUkgEhbHCsMXfbUGfPQB4
+         ASCAikWoqhJAmY5dLLSlXbohkMGCbvPWkGCLUI351kK7Qup1OQmMx8OtOsXr6PpvIiO8
+         bp3oBTkqaYj9ejSvr6AD61s/XpVZFydkXMlI8h/Z34B58B83XcUZ2u+NsADLmVzM+xfp
+         gKVHgutCZpvidrcakGg2Cm0VDakJ5/E+RA93MXM8CmWnmslyAivqKjS4TW2MDMKhWUGs
+         mvh9OxcIcain8+jqwCA+D+pyra/ngrLPWUh1g2w93xPB96Fg/kx+fnttPkYJ0raEnSnS
+         8W6w==
+X-Forwarded-Encrypted: i=1; AHgh+RoXG/iH7PgWTfzNE8vWa9rXM4UJKKvdTcoksQrUawLf3fZc5d412H7kUH5PFmooklaxeUgQQjTUo2FHLw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmlGc8h2fxl5YNePwWof/eRFhqurFix9O20iKlsmpzwLymh589
+	CuleINlVjHaJuKDsKnpbWw76YGASpGqCLuVCuSubzfNoIZiFASoau8nm
+X-Gm-Gg: AR+sD113aGj3Npx3p6wP9b1Dto5SSbv8Mf+cJvmwg+kKwJ7VRL32/0LX5f3Odh5BEkN
+	+ZMKsfnfqbou4dv/bI8YeeCIPX9ioh1mirK9qAxl3eU+W38rO6fazmStJlJ+KZzDzqe/PUsT639
+	DVOdvIyyb7UNhRtXwFbms0sa7GW3V1TjVNdh5MYq1yL9zypzUUMDdOLO2P9MYa7Wfw6ydYaWT1V
+	kqAJsmcixp+qgDpQKOeUXn3ecTFpxZiZw9Xyit8Cf5TRt83pFUVAwMKoz1WgoX342wcYS1AqHMk
+	wdXdpJUR28W2GycamMGrj67B6ofDQ6/rzOfyjp2xn48T9hZkHPOqbgLKss2XA6fgKdJzVsH7r9F
+	5KYc1Z59/ko5wMikSnE1C7hMJNQ5gJym6cSZaMqgWqFLicYLSeWAJSXmJ5tYDhhiZGMZsbrIb8N
+	nBVNhkr6UG3ni25yCeFzXMBvelZVeOMnUqfC2AyewhHwu+TplgzuY8PG8r9fSkBOp/BLy6ZLJxQ
+	4kJeucjtY+m3jXAvWoXmknaZ094Sl2Vk/tTnhVyrs/S
+X-Received: by 2002:a17:90b:5627:b0:387:e0bb:57ff with SMTP id 98e67ed59e1d1-38fbc58d37fmr11279418a91.38.1785836329931;
+        Tue, 04 Aug 2026 02:38:49 -0700 (PDT)
+Received: from HAOQINHUANG-MC0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38fee06b438sm1042633a91.16.2026.08.04.02.38.47
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 04 Aug 2026 02:38:49 -0700 (PDT)
+From: Haoqin Huang <haoqinhuang7@gmail.com>
+To: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Nick Terrell <terrelln@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Haoqin Huang <haoqinhuang@tencent.com>
+Subject: [PATCH v6 0/5] zram: fix zstd error paths and add parameter validation
+Date: Tue,  4 Aug 2026 17:38:36 +0800
+Message-ID: <20260804093841.67920-1-haoqinhuang7@gmail.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20260803141256.60599-1-haoqinhuang7@gmail.com>
+References: <20260803141256.60599-1-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1785440858.git.bvanassche@acm.org> <5e1f54d3826b0d479242a9886ca2c7b6eb8cedaf.1785440858.git.bvanassche@acm.org>
- <a438f0ba-e2b0-4fa5-920c-bdbf49769674@linux.ibm.com> <7d5c9498-c471-4715-a264-17a4df4c2559@acm.org>
-In-Reply-To: <7d5c9498-c471-4715-a264-17a4df4c2559@acm.org>
-From: Marco Elver <elver@google.com>
-Date: Tue, 4 Aug 2026 11:25:51 +0200
-X-Gm-Features: AUfX_my8yHhiDl1Dl_yhnt4DhYyKV12bHqr2BN2E-c43E-TwA9dgWorP1pVCXFw
-Message-ID: <CANpmjNM3-WQNo9djX+P3bWxg24x7jrymiFGJMyJuRrzXBLUHOQ@mail.gmail.com>
-Subject: Re: [PATCH v2 05/12] nbd: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Christoph Hellwig <hch@infradead.org>, Damien Le Moal <dlemoal@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 3 Aug 2026 at 20:03, Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 8/3/26 6:26 AM, Nilay Shroff wrote:
-> > On 7/31/26 1:28 AM, Bart Van Assche wrote:
-> >> @@ -2773,7 +2776,11 @@ static void __exit nbd_cleanup(void)
-> >>       /* Also wait for nbd_dev_remove_work() completes */
-> >>       destroy_workqueue(nbd_del_wq);
-> >> -    idr_destroy(&nbd_index_idr);
-> >> +    {
-> >> +        __assume_ctx_lock(&nbd_index_mutex);
-> >> +        idr_destroy(&nbd_index_idr);
-> >> +    }
-> >> +
-> >
-> > Could we instead introduce a scoped __assume_ctx_lock() helper so we
-> > don't need the explicit scope here? Alternatively, would annotating
-> > nbd_cleanup() with __context_unsafe be a better fit?
-> There is code in nbd_cleanup() that must be protected by a mutex so I
-> think that we shouldn't annotate nbd_cleanup() with __context_unsafe().
+From: Haoqin Huang <haoqinhuang@tencent.com>
 
-Just 'context_unsafe(idr_destroy(&nbd_index_idr)); /* comment */'
-would be fine here I think. I've used that elsewhere for destructors.
-It makes sure that the rest of the code is still checked and is as
-simple as it gets.
+Patch 1 removes zstd_release_params() from both zstd_create() and
+zstd_setup_params() error paths -- the former is a layering violation
+in a per-CPU callback, the latter is redundant as zcomp_init() already
+calls release_params() on setup failure.
 
-> Introducing a scoped __assume_ctx_lock() might be overkill.
+Patch 2 rejects zero-size dictionaries and prints distinct error
+messages for sz < 0 (returns the original error code) and sz == 0
+("empty file"). Currently errors are silently swallowed.
 
-Agree. Note that __assume_ctx_lock() leaks outside the scope, so a
-real scoped __assume_ctx_lock() would just do no-op __acquire() and
-__release() using the cleanup.h infrastructure (similar to the init
-guards I suppose).
+Patch 3 adds pr_fmt to each backend file so that pr_err() messages
+are auto-prefixed with the algorithm name.
+
+Patch 4 validates dict and level parameters in each backend's
+.setup_params(), rejecting unsupported combinations and out-of-range
+levels.
+
+Patch 5 resets per-priority params on algorithm change before init.
+
+Changes since v5:
+  - Patch 2: split pr_err into sz < 0 and sz == 0 branches
+  - New patch 3: add pr_fmt to all backends; tweak winbits message;
+    add missing SPDX headers to lz4 and lz4hc
+  - Patch 4: removed inline algo-name prefixes (now handled by pr_fmt);
+    added comment for lz4hc < 1 lower bound; added braces to if
+    branches for consistency
+
+v5: https://lore.kernel.org/all/20260803141256.60599-1-haoqinhuang7@gmail.com/
+
+Haoqin Huang (5):
+  zram: do not release zstd global params from error paths
+  zram: reject zero-size dictionary
+  zram: add pr_fmt to backend files
+  zram: validate parameters in each backend's setup_params
+  zram: reset per-priority params when changing algorithm before init
+
+ drivers/block/zram/backend_842.c     | 10 +++++++++
+ drivers/block/zram/backend_deflate.c | 17 ++++++++++++--
+ drivers/block/zram/backend_lz4.c     | 10 ++++++++-
+ drivers/block/zram/backend_lz4hc.c   | 16 +++++++++++++-
+ drivers/block/zram/backend_lzo.c     | 10 +++++++++
+ drivers/block/zram/backend_lzorle.c  | 10 +++++++++
+ drivers/block/zram/backend_zstd.c    | 11 +++++++---
+ drivers/block/zram/zram_drv.c        | 33 ++++++++++++++++++----------
+ 8 files changed, 98 insertions(+), 19 deletions(-)
+
+-- 
+2.43.7
+
