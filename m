@@ -1,122 +1,143 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2281E3F1ABE
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 02:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEC223D7F4;
+	Tue,  4 Aug 2026 02:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785810761; cv=none; b=JqwRkeTncjCvbxywKMdYZMFOuySMj2Mn529jITxX2uCzFn5bAq0Lj+Z3qkJXiLqwKnUIBSpyYMt/qqUXyKVmqRh6w/af8X2x6SzDXe6PPFgOSYTih12zCKmmRxxU5ZehdamhXSgsO3iacyjF7wblmJBljZ1POUIqnLLV7moSQzM=
+	t=1785810942; cv=none; b=fYnStYS4WxChJFMvMXfsudH6ETyja/7yUNxzAYFHnwrkonIo9XmKQKj5XxeumUNK7qE6FU3Qql7bMjnCQfMSgHYAqVwWwj+rX7TBkGf+VEdeEAPFEuwIq/IsnI/Dg75dtqAFYJc+86et10wvk5o2e0UELS3wZBWTcHxc2e2w+E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785810761; c=relaxed/simple;
-	bh=fBeh1O4v9avKYsqlzpe0SpoW9v0F8R6Nqhz52syL9gU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=D48BKEQdwhi9T5Y1FtxP+sriW0dJFc2E6qQsPINt5WGRjlW/8tIPDwL8/iKbiHSuxAsPRa3OX5+4FUvPY7U3p74dvLMDAhHuTPwx93h5xLRx00S7kWMGEQcfFJyeAyCUjtIG2H5ey3tAquK8CE7wz/GgJnp6PNoWR6A2psdGnl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=QJOaIHGl; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1785810942; c=relaxed/simple;
+	bh=+AUUM2CWf4bZ2TzGdu2/PRLqjjjioY2Cxl0PuJ3O1Z8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cIhYng2a1s1FpsneoAHYUw/awbrKf2a0wfJlGYDbqiQ2mjw31sCtlZ0qNlHr4WSNXTEx8gFg43llnsWBytKaCgTnR39Zw7XrvleX46LA9J2AWvwINxK3FhiD6+BJ7RWEsL5+COJp3I9fczodiCJg5G1NhgwAt5yXX8mVguotnSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=DVaupEJs; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="QJOaIHGl"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6acb51944d6so2262615eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 19:32:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785810758; x=1786415558; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=LJctEvW30tSWQkftroA0CEnZmB/pHZEQAoCkYmBNvzw=;
-        b=QJOaIHGlzHI/889d8JR9a16k4arVZUxQuBN7QdATFPopsrN76bYezrD8zJy6OpZyHC
-         pgUAYExDEJqfoKfPwc2axpsh7lPHaeBHIohpBZngZqeEhBCX7eywXMrlhwhztWTtFg22
-         uxMR4pNznfjcKoMCLY9srjdcrLBSOfzmZqLHaQR9FxUYfeNiw25Og9/00SoEcx195Sj5
-         JchthVB9XdQ09RqviN7t8x18Y9JtcSoQr4gaRzGcqS8gaOgZbHHO43/TRElHE+sxW0cI
-         jzuo/wqW9nHy5t9qRo4csKDi/lBS8mwuJm1cZ/HzI9JB0aBgUMSLXMXnPqwdgTmsNu7V
-         sUrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785810758; x=1786415558;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LJctEvW30tSWQkftroA0CEnZmB/pHZEQAoCkYmBNvzw=;
-        b=eGaascCjt1gTmIXGz2iIH+fXwsYl6/OEm1FTHFqM1Y1NTIcsCbtnr7PC6YuEGh3LDl
-         4q97MtU0+VxSBsHWq/MDRqc7kP2ib79xUOCZ5EANG0vpUFdZPqfuR8IGLmBNPcD3L7py
-         yyByZQleUDaOukL8+Ge31TwM4Ag7HJCSIo3OoqPKa56L84wAzjO/lKkdpa0aJ6pg8EUt
-         A3SJWz3htpygdsCwQzFIloJhH0UnDDRR/eR7wyF4EKZ0urQM3RiY08w2r6aobUsR7/GI
-         OSxRD0BSfbnm79pMcz6HA5d1FAST7wBU0ZSmeauqE7UQ2dOd7hrrJtqBgx2Yzq8HDQ9B
-         86jQ==
-X-Gm-Message-State: AOJu0YyYY2rDnxb7frCZw8FzMda06wcqOzTB2XLA8hihTTgRwX0iq3s+
-	ro/ivXmfmq32n8z9ocGmjuVuWLPRzlYy9uSJj+R1a/j8Qro5NGY+4xFyBXk8b0K9tx5/BqZ/YP3
-	6ZgOO3zh26g==
-X-Gm-Gg: AR+sD11mgdx4kxai1gdNKwcvfkySvaz3zw02DrSG9pwSUjD3WDCxrgQHxIizb0sulbe
-	scFiX25Mn2P3jEn4ZJGMEe+0C3HKnZqErxl6AMGhgANSFIfmthFY4PWo7tynR2Wcg1NGeRuQNA+
-	aa84xR41f4Pfyx8LSX/zAk9KVyQi1j9MC19fiY0FTh+cPIfuxH6wyTrESt/kA2gEgC0hVljI0Bz
-	iWeRAgV/AUtlg8g2WJyljGJ8+YY1g//XQRM0gd19eBrsVmUOwbafvt7s5VxnJSAu/Gmc5GQLgZz
-	zm6kBitWJtEhDBcB/BrT86Kp8fTsPf3xtioKtOd9Hh8xj/8PVJNaFq3y2ZVVLrmmOWpU/KeCl1Z
-	KPRtmgU16XC7UNbCIQoYUdrSWqiuVgW6s3bx8rwW63pOMarT+gpE+WvcLWgP66+1je7QhsPzKiG
-	CiChYz5q6OPnk3PMHh2s0uFWogqyn/zDfjiihyn9P0IyziJe3QvEJcva9SmUxMljLxkZjGqKcV+
-	ctqDZqY4NE6pxcLth0e2dGoSaGr9HQEAf3eana+7g==
-X-Received: by 2002:a05:6820:83c2:10b0:6aa:fe65:4cd1 with SMTP id 006d021491bc7-6ae434add96mr13794024eaf.36.1785810757940;
-        Mon, 03 Aug 2026 19:32:37 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f66c1fe3sm10700195fac.14.2026.08.03.19.32.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 19:32:33 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260803211441.2538144-1-csander@purestorage.com>
-References: <20260803211441.2538144-1-csander@purestorage.com>
-Subject: Re: [PATCH v2 0/8] ublk: io_desc optimizations
-Message-Id: <178581075261.549250.11096322353386419848.b4-ty@b4>
-Date: Mon, 03 Aug 2026 20:32:32 -0600
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="DVaupEJs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1785810895;
+	bh=41ybH304Ss0xjqoeVXnypj4vQr/vpDo3e+WOlxxag+A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=DVaupEJsL5sgchWPVWjq3RR+oz17AOLluPD0m1AF/ZKOUxWUvSSAoPfr2V5UZRyul
+	 gRJ4iN6aIW2FWls2k18H9ZBNlmMe3/8G4mQ0ztgddvPJJ/nVJW7tgiVfkqoO45OvVB
+	 fxZoK8T6fIF+A3+++mWOMpbpem4WJ4SvP6Eu5U4k=
+X-QQ-mid: esmtpsz16t1785810878te39423aa
+X-QQ-Originating-IP: NylD66GE/BR+UmkQQcEiCIehO6p+Pu+b+Ijm65kBfY8=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 04 Aug 2026 10:34:36 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 5437765750704406172
+EX-QQ-RecipientCnt: 7
+From: raoxu <raoxu@uniontech.com>
+To: dlemoal@kernel.org
+Cc: axboe@kernel.dk,
+	hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	raoxu@uniontech.com,
+	stable@vger.kernel.org
+Subject: [PATCH v2] zloop: truncate finished zones to zone capacity
+Date: Tue,  4 Aug 2026 10:34:03 +0800
+Message-ID: <B39E5FD81D1A07F4+20260804023403.939767-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <78d0627b-e711-4ce2-84ac-6e501898407c@kernel.org>
+References: <78d0627b-e711-4ce2-84ac-6e501898407c@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NSkpWZrWmABAtR1+stc4QQ3uJnmuQK60AgLzhYwvjQjJHZwlZR3hh9m+
+	p7WSVsU4nx45BtTh9319/BtrzaFZR0k90S/gckBqXsbJEuUg0qGXcIkr8PEo0ZDbTBk4QKw
+	oRQvIA3mKLh0ixLdYppFdKqaRLhXj4Nrd7zcJO9pYIxwNQSrwPlEYB9x2SBWRI+1stscTOO
+	7HsRf7VNWnUyCGtGfbmlAmJ4L7ElbAXgq7qx0+NJ56oCpQ0MEOrtjPg5ki5mKH7lVnTPcir
+	RFqclfQfh0k6eUM7OlgJ1UPrvvUBctSIyb7naCX/YBcnUoRBk3MYnDTnu8WpMkmXOC45i/x
+	+r91CadqjcZrczs0Smn1PeZgza9j7vYI3YmGIo2JhZTNGcaRILZIkBbQPe2+/ep3Q+UiHYn
+	GpsJ/CPN6zlaQeAv5C2zGEWaspEg4NZfJvqoRk3PKFpcszXi6jM3v3k3FyGE2lk5Gd1pBbO
+	QDEdYAXgy0RxiIaGb6rRXeJhGGlsnNdzvfJqi8dSI+GYKu71JldfGCl73doUlRaubgxxhOA
+	g/UpwNw2/uLw1LyRBCXbHBiHywsrABSFebDRALKq9blDe+LmwD0GAocDJ3KYP1+4pFS8TDO
+	6wJuGdxVke+p38dFmTH6xuVqKpsyFGp1kQT4gwgPxjUxvks0Fe/GehMCUpiYDljXWDvNXTi
+	/jk1L826g7ga9gSyzrdAVAK2wdjIApUbHW3kDc/PJy2CEULvfxBK4PYSD414jdi3e7NHv01
+	AAYnwNnUXJ8EgJQtfSeyTIaQYOGqtQOMbDoAVVgXuHKZBlr6se9foQp4Jfc+ZUQgd9yFBMk
+	4Z4wRp0pbn+FOMmub9qRkWHPzldfjBysoCVs0MaMi1zLaucgcVBut6vpmt8sZJqgHhhki97
+	k/el9VFXdg2l92RX0x8UYvYelKyy5wvjd8vLAz1oF6NhQZ+q4+WFAJCKMxCMgkjCrhfr2B6
+	36qent5+eVzo2pmJFSHdnkGb69cpeCklYYzYJgWwM1IKjNtunEwMYiH/eFWsZ2o9aopJwoQ
+	XoOITI4hUWy2f3UQCUpa6JGgtErURPVp1DrEsoZphcAhDPfZHX
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
 
+From: Xu Rao <raoxu@uniontech.com>
 
-On Mon, 03 Aug 2026 15:14:32 -0600, Caleb Sander Mateos wrote:
-> This series is based on the "ublk: harden user buffer handling" series.
-> 
-> ublk passes the parameters of incoming I/O in memory shared between the
-> kernel ublk driver and userspace ublk server in struct ublksrv_io_desc.
-> 
-> The thread submitting the ublk I/O writes to the io_desc, while the ublk
-> server thread handling the I/O reads the io_desc. This basically
-> guarantees a cache miss on both threads for each ublk I/O. Avoid the
-> cache misses by writing the io_desc on the server thread in the kernel
-> before dispatching the I/O to userspace.
-> 
-> [...]
+The size of a sequential zone backing file records the amount of data
+written and is used to restore the zone state. A backing file whose size
+is equal to the zone capacity is restored as a full zone, while a file
+larger than the zone capacity is rejected as invalid.
 
-Applied, thanks!
+However, zloop_finish_zone() currently truncates the backing file to the
+zone size. For devices with a reduced zone capacity, finishing a zone
+therefore creates a backing file larger than the zone capacity. After the
+device is removed and later re-added, that zone file is rejected instead
+of being restored as a full zone.
 
-[1/8] ublk: consistently use u16 for queue and tag numbers
-      commit: f510198855b6ddac0ffe62684dc407c56d3e0f24
-[2/8] ublk: remove struct ublk_zoned_report_desc's operation field
-      commit: 3a00b782a7b63b1876261ab883e1d8e1aa0e09fb
-[3/8] ublk: split request validation from io_desc init
-      commit: 8c76625ff9360cbe9ce0c47a624877aea14b3499
-[4/8] ublk: initialize io_desc on daemon task
-      commit: 735409f58b3da45094f2dfd7c18fb9e1937431f1
-[5/8] ublk: add UBLK_F_IO_DESC_SIZE
-      commit: 5c0958d80190822c4614ca00478d9acd9671bba6
-[6/8] selftests: ublk: add support for --io_desc_size
-      commit: fc01b96d74b3a9eec2b558d49ec9f5176473766a
-[7/8] selftests: ublk: add UBLK_F_IO_DESC_SIZE test
-      commit: d61d0f95e686be015cfaf193c0ae15156d1a0cc4
-[8/8] ublk: lift checks out of ublk_{,un}map_io()
-      commit: a8a79eba22dc4c11f2877bcf9e8557f6d95541ac
+Truncate finished sequential zones to the zone capacity, matching the
+persistent representation accepted by zloop_update_seq_zone() for a full
+zone.
 
-Best regards,
--- 
-Jens Axboe
+Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+Changes in v2:
+- Fix zloop_finish_zone() instead of accepting oversized backing files in
+  zloop_update_seq_zone(), as suggested by Damien.
+- Update documentation to describe the corrected backing file size.
 
+ Documentation/admin-guide/blockdev/zoned_loop.rst | 9 ++++-----
+ drivers/block/zloop.c                             | 3 ++-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
+index f4f1f3121bf9..95974425ca05 100644
+--- a/Documentation/admin-guide/blockdev/zoned_loop.rst
++++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
+@@ -30,11 +30,10 @@ indicates the position of the write pointer of the zone.
 
+ When resetting a sequential zone, its backing file size is truncated to zero.
+ Conversely, for a zone finish operation, the backing file is truncated to the
+-zone size. With this, the maximum capacity of a zloop zoned block device created
+-can be larger configured to be larger than the storage space available on the
+-backing file system. Of course, for such configuration, writing more data than
+-the storage space available on the backing file system will result in write
+-errors.
++zone capacity. With this, a zloop zoned block device can be configured with a
++larger capacity than the storage space available on the backing file system. Of
++course, for such configuration, writing more data than the storage space
++available on the backing file system will result in write errors.
+
+ The zoned loop block device driver implements a complete zone transition state
+ machine. That is, zones can be empty, implicitly opened, explicitly opened,
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 55eeb6aac0ea..1333fae05ac5 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -478,7 +478,8 @@ static int zloop_finish_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 	    zone->cond == BLK_ZONE_COND_FULL)
+ 		goto unlock;
+
+-	if (vfs_truncate(&zone->file->f_path, zlo->zone_size << SECTOR_SHIFT)) {
++	if (vfs_truncate(&zone->file->f_path,
++			 zlo->zone_capacity << SECTOR_SHIFT)) {
+ 		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
+ 		ret = -EIO;
+ 		goto unlock;
+--
+2.50.1
