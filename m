@@ -1,371 +1,523 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3208744DB69
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 10:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6B8453A24
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 10:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785840505; cv=none; b=BE1nsXNVJuz578UPB1e0DIHe8DXzTomDHF55qt5zYh4GfNiK104DNnYgohAe5cGsXCkOSFGOWn2tEgoJdgpUx/mhpN3ZMjW6jamhBwyyxOeDHY2TqnH/jg9ZZ4aDme5jd5epGt3aCLTtKpddTHTmIO4nhP/oZo11XxpbjH7c4UY=
+	t=1785840752; cv=none; b=mgmtPNRx8NI1EP60YfDI5WcZO3Zzo7Q7vCI3eLgUtgY23W1MQKtSNl3eGPztvn01ejmRXyR28bxraYjlUcrBxYI0IunGos5jddn0w5w6qMzQlB/29hoq0m94j5XHgCqcv48F6tzz9NqIUIcfCDsETAwsLPVNMY2OZ/BLzepoD34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785840505; c=relaxed/simple;
-	bh=Ms5XvmYpu8xu4cCzus2T+LX3n6btAtaXEHKgn1q2ay4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DZVybNCCujCuqzgmTZC0VHAjIBG7mnt2qVe80t4HmcrPAxtZJweEGGpCO1pX4fR1noUceVL2kYlIlQi8rLgZoq9txrE7A6WIgBYDCoCBw9hTzz+lnhLpOnJxmVMobLgtr32D+P8qvqUe040z/ifUvsBl2bo9purjhNS+emVIYx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LQ3vjYRj; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785840752; c=relaxed/simple;
+	bh=CIkB7Fq0Wg1b7+56ASqIt9EC8jylOw3X85as1126IFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IVsrz3bsP3lo121xLe1Bsjj8R3zhyq0OLZAdr8000nDgp0OoTOCkLs4dSG+nQiVWuYHyboEO0OrNwOZHGajtrOqpB1d1lL7MLrksPWPJzcuJC4PgLzkBc3WHj2U+0FSNKBry2AJZb2dY3oOJUbxLisxD19EB6jdn+hQD0nbiymw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fmfNYzjB; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=b7wjcnyJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=y1C6LIc/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8v/5kBe1; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LQ3vjYRj"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6748IGGt235647;
-	Tue, 4 Aug 2026 10:48:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=BA27/A
-	WrUyIZmebU1Yp8CRO9BXxobNSsZ1CQt1DE4l8=; b=LQ3vjYRj1Hre6C7DxOtSKo
-	hxS5l+KKyqLOx8SzPwFRoPDRZQs++JZlPnRchyQkQ3FCuZc7riOrwzgE0yBpLGwf
-	zDIrO44VKIG4NIcuyKXglUB90VpsQ1ecES1VB1b+GcpeSJStwKOG8vCaS47w0PIw
-	iTfMv/sppsokkCJclat5HVayKpTYoPOFYexn3D5MM1MKL4dDk4wRrsHtFPVpiPP2
-	WHzqIJDT6lyfBrtB1P3v6Witp01rLlEWqoldAAz8AhVq6u4B1+ElwR37VqP0DRHG
-	udi0Gubri6lrO0KcKgO0C5G6d/o/615O5Xvx+/jejBr9XIa6i+18M0JPMt0+nBjg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hn9ty-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 10:48:13 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 674AfJmt029979;
-	Tue, 4 Aug 2026 10:48:12 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswbg9buf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 10:48:12 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 674AmCNk24445482
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Aug 2026 10:48:12 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3161A58062;
-	Tue,  4 Aug 2026 10:48:12 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 784C558052;
-	Tue,  4 Aug 2026 10:48:09 +0000 (GMT)
-Received: from [9.43.105.125] (unknown [9.43.105.125])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Aug 2026 10:48:09 +0000 (GMT)
-Message-ID: <4f4a40a4-082c-4b3a-9fec-5b7fa54c6a62@linux.ibm.com>
-Date: Tue, 4 Aug 2026 16:18:07 +0530
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fmfNYzjB";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="b7wjcnyJ";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="y1C6LIc/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8v/5kBe1"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AE48D632AC;
+	Tue,  4 Aug 2026 10:52:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1785840740; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xx9RSAlyQBvstAY/xFI6SjBJ0rTAwuhs4IlUI3BJo2Y=;
+	b=fmfNYzjBPJMJ+rSOHUGUlCpzkAzO8vJ6aA+4JsK3bknHwa3yMYrxWH124/H52lGG2QMfMg
+	H2WrEaXYz5DRitEMDPU0Wr1HXsQ+mS9YHqUNJPXttU62PINKnVwr4zCVVTSO4ZGtonbgXx
+	CWAjOlbYMrLbLAZMkP/mJZkBYHjOF4c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1785840740;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xx9RSAlyQBvstAY/xFI6SjBJ0rTAwuhs4IlUI3BJo2Y=;
+	b=b7wjcnyJzyhn2N3Z3DNaHuU3xZ8DzO6ROcEfsEZWFFQnEe7xpwMaXckk66iuu+Vdj/CBDg
+	xncOP9G0Eu4LZkAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1785840736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xx9RSAlyQBvstAY/xFI6SjBJ0rTAwuhs4IlUI3BJo2Y=;
+	b=y1C6LIc/gCXaW97d2rCpnR0Y0wSM+fEBIYX5TJ49DiHXtZgmBuMguEh8FTYlUBIh/Fz+qx
+	g/MN9vUOXG/YouM5x7IiCsc9cZ/UWjfffcXznZFlEex1Rk3Q+AtuP59DTdIY3mdxvJ46wn
+	ebnmztpongDxwm4kew4oYSyl9q+GJMU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1785840736;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xx9RSAlyQBvstAY/xFI6SjBJ0rTAwuhs4IlUI3BJo2Y=;
+	b=8v/5kBe12DZdzEP2UKvu4w2ouXYL7nnh1eQXlARHJZMmm2BKUCGefku33YQQz1RsKGfsnL
+	6SkQJqJOmbhFvMBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A42C779BE;
+	Tue,  4 Aug 2026 10:52:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NYakJWDEcWr4aQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 04 Aug 2026 10:52:16 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 3DD48A13A6; Tue, 04 Aug 2026 12:52:16 +0200 (CEST)
+Date: Tue, 4 Aug 2026 12:52:16 +0200
+From: Jan Kara <jack@suse.cz>
+To: Yu Kuai <yukuai@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Yu Kuai <yukuai@fygo.io>, Josef Bacik <josef@toxicpanda.com>, 
+	Coly Li <colyli@fygo.io>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, 
+	Song Liu <song@kernel.org>, Dan Williams <djbw@kernel.org>, 
+	Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+	Alison Schofield <alison.schofield@intel.com>, Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>, Tao Cui <cui.tao@linux.dev>, 
+	cgroups@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, virtualization@lists.linux.dev, 
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 1/3] blk-cgroup: add helpers for bio cgroup state
+Message-ID: <prx5s4rwbgoeh7wtgyo7vwydh5iwqn6qc2utamowirsplspfmp@e3eteq5xwuyf>
+References: <20260804065313.2092022-1-yukuai@kernel.org>
+ <20260804065313.2092022-2-yukuai@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/12] rbd: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
-        Ilya Dryomov <idryomov@gmail.com>
-References: <cover.1785440858.git.bvanassche@acm.org>
- <0b2988ca05e8a2733352a447e0810104b878376a.1785440858.git.bvanassche@acm.org>
- <487841d2-9d55-4873-ab6b-dbd94aa7bb71@linux.ibm.com>
- <83968777-6f3a-4c21-ac89-fe9ebcbf254d@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <83968777-6f3a-4c21-ac89-fe9ebcbf254d@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA0MDA4NSBTYWx0ZWRfX2aI5vqbsCqwK
- T00Pk+0MS84B6apk6fgpzMH3HiZAEwFAJTPM21tWDqZ9bdzrfXqukH/l4Lz2dmZ6KgPhaJCTOIv
- ctoTqTAC4Gn1bUdwYTPrCljSBZvy5PI=
-X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a71c36d cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=-7OqevHddCzZRwe139EA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA0MDA4NSBTYWx0ZWRfX3bxnlegspjtQ
- 9SQtPuIcZ/qDSLcIxieYaZRACfe6ovx57RTqqGALBxbNgXxozm+4zwwqnO9/qCX9Vv6heXP+CZJ
- TwccUN6qC9ATe/QSuAiCcXuuuwS+5sq625/2kppBKqnSssu6utXD/xzbl4V/ZEzpv1UOac8skvb
- +AEWWFK9TZmfPtY+4RTH2d8J9HbEohonYjZPIBvcVaeHsxBwLqIme6cqBm883v/NRmhkhwwhzg+
- MXnXcNUB6GPVEUnL10KyBIvOwTid7iul4Bp3wjIT8KFPsNgnfgybgK9YlWUIRrrA/L57IaPR8Oo
- f6qFwN0W18pI77am1rLpWt8R38orxs02cFYsQXwS0N2/FlUuKxNXJH2hnBHXH4bmrXfW1Yz0Ekc
- ItIuBJYJH6uYgwuobOFOc5IqoBNhKKBBENEtXw3z3ZP1e0MvphWqVxmXz3CFwXBzvCLLoykjflc
- K1oT9ZLhGnhOL7D2WLQ==
-X-Proofpoint-ORIG-GUID: uSt1xfCRDo10mZXU1i5kDKh9iDin1qqC
-X-Proofpoint-GUID: Z4UJMcqSv3ISFidGJWImOQvK9t-wAgDH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-04_02,2026-08-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608040085
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260804065313.2092022-2-yukuai@kernel.org>
+X-Spam-Score: -2.29
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.29 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.19)[-0.962];
+	MIME_GOOD(-0.10)[text/plain];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,fygo.io:email,suse.com:email];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RL1yzqk935fhsmgf5duqcbiqr7)];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,cmpxchg.org,suse.com,lwn.net,fygo.io,toxicpanda.com,linux.dev,redhat.com,intel.com,gmail.com,infradead.org,suse.cz,linux-foundation.org,tencent.com,lst.de,linux.ibm.com,vger.kernel.org,lists.linux.dev,kvack.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,fygo.io:email,suse.com:email]
 
-On 8/4/26 1:16 AM, Bart Van Assche wrote:
-> On 8/3/26 7:03 AM, Nilay Shroff wrote:
->> In addition to the above annotations, it looks like several variables and structure members
->> are consistently protected by specific locks:
->>
->> 1. rbd_dev_list is guarded by rbd_dev_list_lock.
->> 2. rbd_client_list is guarded by rbd_client_list_lock.
->> 3. rbd_device::acquiring_list and rbd_device::running_list are guarded by
->>     rbd_device::lock_lists_lock.
->> 4. rbd_device::object_map is guarded by rbd_device::object_map_lock.
->> 5. rbd_device::watch_cookie, rbd_device::watch_state, and rbd_device::watch_handle
->>     are guarded by rbd_device::watch_mutex.
->> 6. rbd_device::lock_state and rbd_device::lock_cookie are guarded by rbd_device::lock_rwsem.
->>
->> So I think we should add the corresponding `__guarded_by(...)` annotations for these
->> fields as part of enabling lock context analysis for this driver.
+On Tue 04-08-26 14:53:11, Yu Kuai wrote:
+> From: Yu Kuai <yukuai@fygo.io>
 > 
-> Hi Nilay,
+> blk-cgroup users open-code bio->bi_blkg throughout the policy and
+> accounting paths.  Some users need the blkg itself, while others
+> immediately dereference it to get the associated blkcg.  The bio release
+> paths also open-code the CONFIG_BLK_CGROUP guarded blkg reference drop
+> and field clear.
 > 
-> Thank you for having looked this up. I took a closer look at the rbd
-> driver and came up with the patch below. Some observations:
-> - Some code obtains pointers to acquiring_list, running_list and
->    object_map before the corresponding synchronization objects are
->    acquired. Hence, I have not tried to annotate these struct members
->    with __guarded_by().
-> - The locking convention followed by rbd_img_object_requests() is not
->    a good fit for what Clang supports.
+> Add bio_blkg(), bio_blkcg() and bio_clear_blkg() helpers.  Convert the
+> read-side users to use the accessors, and use bio_clear_blkg() from
+> bio_uninit() and bio_endio() so the release path no longer needs to know
+> about CONFIG_BLK_CGROUP.  Keep the direct bio->bi_blkg stores in the
+> association and initialization paths, as those paths still assign the
+> stored association.
 > 
-> Further feedback is welcome.
+> This keeps the current behavior unchanged while preparing for changing
+> what cgroup state a bio stores internally.
 > 
-> Thanks,
+> Signed-off-by: Yu Kuai <yukuai@fygo.io>
+
+Mostly looks good. Just I think bio_blkcg() should gracefully handle the
+case where bio->bi_blkg is NULL (and return NULL in that case). That way
+you can also get rid of somewhat odd pattern:
+
+	if (!bio_blkg(bio))
+		return ...;
+	do something with bio_blkcg(bio)
+
+You can then just check bio_blkcg(bio) directly which is much more obvious.
+
+								Honza
+
+> ---
+>  block/bfq-cgroup.c          |  4 ++--
+>  block/bio.c                 | 14 ++------------
+>  block/blk-cgroup-fc-appid.c | 11 +++++++++--
+>  block/blk-cgroup.c          | 19 ++++++++++---------
+>  block/blk-cgroup.h          | 19 ++++++++++++++++++-
+>  block/blk-iocost.c          |  6 +++---
+>  block/blk-iolatency.c       |  6 +++---
+>  block/blk-ioprio.c          |  2 +-
+>  block/blk-throttle.c        |  2 +-
+>  block/blk-throttle.h        |  2 +-
+>  include/linux/bio.h         | 10 ++++++++++
+>  11 files changed, 60 insertions(+), 35 deletions(-)
 > 
-> Bart.
-> 
-> These are the changes I came up with (relative to the above patch):
-> 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index f0f7a94e3e3e..4c9f566b7a91 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -406,26 +406,26 @@ struct rbd_device {
->       struct mutex        watch_mutex;
->       enum rbd_watch_state    watch_state;
->       struct ceph_osd_linger_request *watch_handle;
-> -    u64            watch_cookie;
-> +    u64            watch_cookie __guarded_by(&watch_mutex);
->       struct delayed_work    watch_dwork;
-> 
->       struct rw_semaphore    lock_rwsem;
-> -    enum rbd_lock_state    lock_state;
-> -    char            lock_cookie[32];
-> +    enum rbd_lock_state    lock_state __guarded_by(&lock_rwsem);
-> +    char            lock_cookie[32] __guarded_by(&lock_rwsem);
->       struct rbd_client_id    owner_cid;
->       struct work_struct    acquired_lock_work;
->       struct work_struct    released_lock_work;
->       struct delayed_work    lock_dwork;
->       struct work_struct    unlock_work;
->       spinlock_t        lock_lists_lock;
-> -    struct list_head    acquiring_list;
-> -    struct list_head    running_list;
-> +    struct list_head    acquiring_list; /* __guarded_by(&lock) */
-> +    struct list_head    running_list; /* __guarded_by(&lock) */
->       struct completion    acquire_wait;
->       int            acquire_err;
->       struct completion    quiescing_wait;
-> 
->       spinlock_t        object_map_lock;
-> -    u8            *object_map;
-> +    u8            *object_map; /*__guarded_by(&object_map_lock)*/
->       u64            object_map_size;    /* in objects */
->       u64            object_map_flags;
-> 
-> @@ -464,11 +464,13 @@ enum rbd_dev_flags {
-> 
->   static DEFINE_MUTEX(client_mutex);    /* Serialize client creation */
-> 
-> -static LIST_HEAD(rbd_dev_list);    /* devices */
-> +/* devices */
->   static DEFINE_SPINLOCK(rbd_dev_list_lock);
-> +static __guarded_by(&rbd_dev_list_lock) LIST_HEAD(rbd_dev_list);
-> 
-> -static LIST_HEAD(rbd_client_list);        /* clients */
-> +/* clients */
->   static DEFINE_SPINLOCK(rbd_client_list_lock);
-> +static __guarded_by(&rbd_client_list_lock) LIST_HEAD(rbd_client_list);
-> 
->   /* Slab caches for frequently-allocated structures */
-> 
-> @@ -521,6 +523,7 @@ static bool rbd_is_snap(struct rbd_device *rbd_dev)
->   }
-> 
->   static bool __rbd_is_lock_owner(struct rbd_device *rbd_dev)
-> +    __must_hold_shared(&rbd_dev->lock_rwsem)
->   {
->       lockdep_assert_held(&rbd_dev->lock_rwsem);
-> 
-> @@ -1645,6 +1648,7 @@ static void __rbd_object_map_index(struct rbd_device *rbd_dev, u64 objno,
->   }
-> 
->   static u8 __rbd_object_map_get(struct rbd_device *rbd_dev, u64 objno)
-> +    __must_hold(&rbd_dev->object_map_lock)
->   {
->       u64 index;
->       u8 shift;
-> @@ -1655,6 +1659,7 @@ static u8 __rbd_object_map_get(struct rbd_device *rbd_dev, u64 objno)
->   }
-> 
->   static void __rbd_object_map_set(struct rbd_device *rbd_dev, u64 objno, u8 val)
-> +    __must_hold(&rbd_dev->object_map_lock)
->   {
->       u64 index;
->       u8 shift;
-> @@ -3431,6 +3436,7 @@ static bool need_exclusive_lock(struct rbd_img_request *img_req)
->   }
-> 
->   static bool rbd_lock_add_request(struct rbd_img_request *img_req)
-> +    __must_hold_shared(&img_req->rbd_dev->lock_rwsem)
->   {
->       struct rbd_device *rbd_dev = img_req->rbd_dev;
->       bool locked;
-> @@ -3448,6 +3454,7 @@ static bool rbd_lock_add_request(struct rbd_img_request *img_req)
->   }
-> 
->   static void rbd_lock_del_request(struct rbd_img_request *img_req)
-> +    __must_hold_shared(&img_req->rbd_dev->lock_rwsem)
->   {
->       struct rbd_device *rbd_dev = img_req->rbd_dev;
->       bool need_wakeup = false;
-> @@ -3472,6 +3479,8 @@ static int rbd_img_exclusive_lock(struct rbd_img_request *img_req)
->       if (!need_exclusive_lock(img_req))
->           return 1;
-> 
-> +    __assume_ctx_lock(&img_req->rbd_dev->lock_rwsem);
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index e82ff03bda02..7e65fe6844ee 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -363,7 +363,7 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg)
+>  
+>  void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq)
+>  {
+> -	struct bfq_group *bfqg = blkg_to_bfqg(rq->bio->bi_blkg);
+> +	struct bfq_group *bfqg = blkg_to_bfqg(bio_blkg(rq->bio));
+>  
+>  	if (!bfqg)
+>  		return;
+> @@ -606,7 +606,7 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
+>  
+>  struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+>  {
+> -	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+>  	struct bfq_group *bfqg;
+>  
+>  	while (blkg) {
+> diff --git a/block/bio.c b/block/bio.c
+> index 6a2f6fc3413e..c207b248edba 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -179,12 +179,7 @@ static inline gfp_t try_alloc_gfp(gfp_t gfp)
+>  
+>  void bio_uninit(struct bio *bio)
+>  {
+> -#ifdef CONFIG_BLK_CGROUP
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg = NULL;
+> -	}
+> -#endif
+> +	bio_clear_blkg(bio);
+>  	if (bio_integrity(bio))
+>  		bio_integrity_free(bio);
+>  
+> @@ -1803,17 +1798,12 @@ void bio_endio(struct bio *bio)
+>  		goto again;
+>  	}
+>  
+> -#ifdef CONFIG_BLK_CGROUP
+>  	/*
+>  	 * Release cgroup info.  We shouldn't have to do this here, but quite
+>  	 * a few callers of bio_init fail to call bio_uninit, so we cover up
+>  	 * for that here at least for now.
+>  	 */
+> -	if (bio->bi_blkg) {
+> -		blkg_put(bio->bi_blkg);
+> -		bio->bi_blkg = NULL;
+> -	}
+> -#endif
+> +	bio_clear_blkg(bio);
+>  
+>  	if (bio->bi_end_io)
+>  		bio->bi_end_io(bio);
+> diff --git a/block/blk-cgroup-fc-appid.c b/block/blk-cgroup-fc-appid.c
+> index 3ec21333f393..b2e16e9a7a6c 100644
+> --- a/block/blk-cgroup-fc-appid.c
+> +++ b/block/blk-cgroup-fc-appid.c
+> @@ -50,8 +50,15 @@ EXPORT_SYMBOL_GPL(blkcg_set_fc_appid);
+>   */
+>  char *blkcg_get_fc_appid(struct bio *bio)
+>  {
+> -	if (!bio->bi_blkg || bio->bi_blkg->blkcg->fc_app_id[0] == '\0')
+> +	struct blkcg *blkcg;
 > +
->       if (rbd_lock_add_request(img_req))
->           return 1;
+> +	if (!bio_blkg(bio))
+>  		return NULL;
+> -	return bio->bi_blkg->blkcg->fc_app_id;
+> +
+> +	blkcg = bio_blkcg(bio);
+> +	if (blkcg->fc_app_id[0] == '\0')
+> +		return NULL;
+> +
+> +	return blkcg->fc_app_id;
+>  }
+>  EXPORT_SYMBOL_GPL(blkcg_get_fc_appid);
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 354637f3b158..753a3bdd0e8c 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -239,7 +239,7 @@ static void blkg_async_bio_workfn(struct work_struct *work)
+>   */
+>  void blkcg_punt_bio_submit(struct bio *bio)
+>  {
+> -	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+>  
+>  	if (blkg->parent) {
+>  		spin_lock(&blkg->async_bio_lock);
+> @@ -275,9 +275,9 @@ subsys_initcall(blkcg_punt_bio_init);
+>   */
+>  struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+>  {
+> -	if (!bio || !bio->bi_blkg)
+> +	if (!bio || !bio_blkg(bio))
+>  		return NULL;
+> -	return &bio->bi_blkg->blkcg->css;
+> +	return &bio_blkcg(bio)->css;
+>  }
+>  EXPORT_SYMBOL_GPL(bio_blkcg_css);
+>  
+> @@ -2118,8 +2118,8 @@ static inline struct blkcg_gq *blkg_tryget_closest(struct bio *bio,
+>  void bio_associate_blkg_from_css(struct bio *bio,
+>  				 struct cgroup_subsys_state *css)
+>  {
+> -	if (bio->bi_blkg)
+> -		blkg_put(bio->bi_blkg);
+> +	if (bio_blkg(bio))
+> +		blkg_put(bio_blkg(bio));
+>  
+>  	if (css && css->parent) {
+>  		bio->bi_blkg = blkg_tryget_closest(bio, css);
+> @@ -2146,7 +2146,7 @@ void bio_associate_blkg(struct bio *bio)
+>  	if (blk_op_is_passthrough(bio->bi_opf))
+>  		return;
+>  
+> -	if (bio->bi_blkg) {
+> +	if (bio_blkg(bio)) {
+>  		css = bio_blkcg_css(bio);
+>  		bio_associate_blkg_from_css(bio, css);
+>  	} else {
+> @@ -2170,7 +2170,7 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
+>   */
+>  void bio_clone_blkg_association(struct bio *dst, struct bio *src)
+>  {
+> -	if (src->bi_blkg)
+> +	if (bio_blkg(src))
+>  		bio_associate_blkg_from_css(dst, bio_blkcg_css(src));
+>  }
+>  EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
+> @@ -2186,7 +2186,8 @@ static int blk_cgroup_io_type(struct bio *bio)
+>  
+>  void blk_cgroup_bio_start(struct bio *bio)
+>  {
+> -	struct blkcg *blkcg = bio->bi_blkg->blkcg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+> +	struct blkcg *blkcg = bio_blkcg(bio);
+>  	int rwd = blk_cgroup_io_type(bio), cpu;
+>  	struct blkg_iostat_set *bis;
+>  	unsigned long flags;
+> @@ -2199,7 +2200,7 @@ void blk_cgroup_bio_start(struct bio *bio)
+>  		return;
+>  
+>  	cpu = get_cpu();
+> -	bis = per_cpu_ptr(bio->bi_blkg->iostat_cpu, cpu);
+> +	bis = per_cpu_ptr(blkg->iostat_cpu, cpu);
+>  	flags = u64_stats_update_begin_irqsave(&bis->sync);
+>  
+>  	/*
+> diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+> index 615390f751aa..1e80b0a73233 100644
+> --- a/block/blk-cgroup.h
+> +++ b/block/blk-cgroup.h
+> @@ -124,6 +124,11 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
+>  	return css ? container_of(css, struct blkcg, css) : NULL;
+>  }
+>  
+> +static inline struct blkcg *bio_blkcg(struct bio *bio)
+> +{
+> +	return bio_blkg(bio)->blkcg;
+> +}
+> +
+>  /*
+>   * A blkcg_gq (blkg) is association between a block cgroup (blkcg) and a
+>   * request_queue (q).  This is used by blkcg policies which need to track
+> @@ -343,6 +348,16 @@ static inline void blkg_put(struct blkcg_gq *blkg)
+>  	percpu_ref_put(&blkg->refcnt);
+>  }
+>  
+> +static inline void bio_clear_blkg(struct bio *bio)
+> +{
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+> +
+> +	if (blkg) {
+> +		blkg_put(blkg);
+> +		bio->bi_blkg = NULL;
+> +	}
+> +}
+> +
+>  /**
+>   * blkg_for_each_descendant_pre - pre-order walk of a blkg's descendants
+>   * @d_blkg: loop cursor pointing to the current descendant
+> @@ -455,7 +470,7 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
+>   */
+>  static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio)
+>  {
+> -	return rq->bio->bi_blkg == bio->bi_blkg &&
+> +	return bio_blkg(rq->bio) == bio_blkg(bio) &&
+>  		bio_issue_as_root_blkg(rq->bio) == bio_issue_as_root_blkg(bio);
+>  }
+>  
+> @@ -481,6 +496,7 @@ struct blkcg_policy {
+>  struct blkcg {
+>  };
+>  
+> +static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
+>  static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg, void *key) { return NULL; }
+>  static inline void blkg_init_queue(struct request_queue *q) { }
+>  static inline int blkcg_init_disk(struct gendisk *disk) { return 0; }
+> @@ -497,6 +513,7 @@ static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
+>  static inline struct blkcg_gq *pd_to_blkg(struct blkg_policy_data *pd) { return NULL; }
+>  static inline void blkg_get(struct blkcg_gq *blkg) { }
+>  static inline void blkg_put(struct blkcg_gq *blkg) { }
+> +static inline void bio_clear_blkg(struct bio *bio) { }
+>  static inline void blk_cgroup_bio_start(struct bio *bio) { }
+>  static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio) { return true; }
+>  
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 8b2aeba2e1e3..d4470476bcd0 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2686,7 +2686,7 @@ iocg_handle_over_budget(struct rq_qos *rqos, struct ioc_gq *iocg,
+>  
+>  static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+>  {
+> -	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+>  	struct ioc *ioc = rqos_to_ioc(rqos);
+>  	struct ioc_gq *iocg = blkg_to_iocg(blkg);
+>  	struct ioc_now now;
+> @@ -2775,7 +2775,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+>  static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+>  			   struct bio *bio)
+>  {
+> -	struct ioc_gq *iocg = blkg_to_iocg(bio->bi_blkg);
+> +	struct ioc_gq *iocg = blkg_to_iocg(bio_blkg(bio));
+>  	struct ioc *ioc = rqos_to_ioc(rqos);
+>  	sector_t bio_end = bio_end_sector(bio);
+>  	struct ioc_now now;
+> @@ -2833,7 +2833,7 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+>  
+>  static void ioc_rqos_done_bio(struct rq_qos *rqos, struct bio *bio)
+>  {
+> -	struct ioc_gq *iocg = blkg_to_iocg(bio->bi_blkg);
+> +	struct ioc_gq *iocg = blkg_to_iocg(bio_blkg(bio));
+>  
+>  	if (iocg && bio->bi_iocost_cost)
+>  		atomic64_add(bio->bi_iocost_cost, &iocg->done_vtime);
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index cef02b6c5fa9..c0d8d5f6bdba 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -463,7 +463,7 @@ static void check_scale_change(struct iolatency_grp *iolat)
+>  static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
+>  {
+>  	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+> -	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+>  	bool issue_as_root = bio_issue_as_root_blkg(bio);
+>  
+>  	if (!blkiolat->enabled)
+> @@ -590,11 +590,11 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+>  	bool issue_as_root = bio_issue_as_root_blkg(bio);
+>  	int inflight = 0;
+>  
+> -	blkg = bio->bi_blkg;
+> +	blkg = bio_blkg(bio);
+>  	if (!blkg || !bio_flagged(bio, BIO_QOS_THROTTLED))
+>  		return;
+>  
+> -	iolat = blkg_to_lat(bio->bi_blkg);
+> +	iolat = blkg_to_lat(blkg);
+>  	if (!iolat)
+>  		return;
+>  
+> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+> index 8fa8bca35062..5e3f8e49550d 100644
+> --- a/block/blk-ioprio.c
+> +++ b/block/blk-ioprio.c
+> @@ -132,7 +132,7 @@ static struct blkcg_policy ioprio_policy = {
+>  
+>  void blkcg_set_ioprio(struct bio *bio)
+>  {
+> -	struct ioprio_blkcg *blkcg = blkcg_to_ioprio_blkcg(bio->bi_blkg->blkcg);
+> +	struct ioprio_blkcg *blkcg = blkcg_to_ioprio_blkcg(bio_blkcg(bio));
+>  	u16 prio;
+>  
+>  	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index ffc3b70065d4..3828c3857900 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -1792,7 +1792,7 @@ static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, bool rw)
+>  bool __blk_throtl_bio(struct bio *bio)
+>  {
+>  	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+> -	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct blkcg_gq *blkg = bio_blkg(bio);
+>  	struct throtl_qnode *qn = NULL;
+>  	struct throtl_grp *tg = blkg_to_tg(blkg);
+>  	struct throtl_service_queue *sq;
+> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+> index 9d7a42c039a1..609a126c7ccb 100644
+> --- a/block/blk-throttle.h
+> +++ b/block/blk-throttle.h
+> @@ -173,7 +173,7 @@ static inline bool blk_should_throtl(struct bio *bio)
+>  	if (!blk_throtl_activated(bio->bi_bdev->bd_queue))
+>  		return false;
+>  
+> -	tg = blkg_to_tg(bio->bi_blkg);
+> +	tg = blkg_to_tg(bio_blkg(bio));
+>  	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+>  		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
+>  			bio_set_flag(bio, BIO_CGROUP_ACCT);
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 8f33f717b14f..dc4baa3602b7 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -503,12 +503,22 @@ static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
+>  	disk_devt((bio)->bi_bdev->bd_disk)
+>  
+>  #ifdef CONFIG_BLK_CGROUP
+> +static inline struct blkcg_gq *bio_blkg(struct bio *bio)
+> +{
+> +	return bio->bi_blkg;
+> +}
+> +
+>  void bio_associate_blkg(struct bio *bio);
+>  void bio_associate_blkg_from_css(struct bio *bio,
+>  				 struct cgroup_subsys_state *css);
+>  void bio_clone_blkg_association(struct bio *dst, struct bio *src);
+>  void blkcg_punt_bio_submit(struct bio *bio);
+>  #else	/* CONFIG_BLK_CGROUP */
+> +static inline struct blkcg_gq *bio_blkg(struct bio *bio)
+> +{
+> +	return NULL;
+> +}
+> +
+>  static inline void bio_associate_blkg(struct bio *bio) { }
+>  static inline void bio_associate_blkg_from_css(struct bio *bio,
+>  					       struct cgroup_subsys_state *css)
+> -- 
+> 2.51.0
 > 
-> @@ -3490,6 +3499,12 @@ static void rbd_img_object_requests(struct rbd_img_request *img_req)
->       struct rbd_obj_request *obj_req;
-> 
->       rbd_assert(!img_req->pending.result && !img_req->pending.num_pending);
-> +    /*
-> +     * The caller either obtains an exclusive lock or obtains
-> +     * rbd_dev->lock_rwsem. Since this cannot be represented accurately
-> +     * using lock context annotations, add an __assume_ctx_lock() statement.
-> +     */
-> +    __assume_ctx_lock(&rbd_dev->lock_rwsem);
->       rbd_assert(!need_exclusive_lock(img_req) ||
->              __rbd_is_lock_owner(rbd_dev));
-> 
-> @@ -3533,6 +3548,7 @@ static void rbd_img_object_requests(struct rbd_img_request *img_req)
->   }
-> 
->   static bool rbd_img_advance(struct rbd_img_request *img_req, int *result)
-> +    __must_hold(&img_req->state_mutex)
->   {
->       int ret;
-> 
-> @@ -3651,6 +3667,7 @@ static struct rbd_client_id rbd_get_cid(struct rbd_device *rbd_dev)
->    */
->   static void rbd_set_owner_cid(struct rbd_device *rbd_dev,
->                     const struct rbd_client_id *cid)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       dout("%s rbd_dev %p %llu-%llu -> %llu-%llu\n", __func__, rbd_dev,
->            rbd_dev->owner_cid.gid, rbd_dev->owner_cid.handle,
-> @@ -3666,6 +3683,7 @@ static void format_lock_cookie(struct rbd_device *rbd_dev, char *buf)
->   }
-> 
->   static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct rbd_client_id cid = rbd_get_cid(rbd_dev);
-> 
-> @@ -3679,6 +3697,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
->    * lock_rwsem must be held for write
->    */
->   static int rbd_lock(struct rbd_device *rbd_dev)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
->       char cookie[32];
-> @@ -3702,6 +3721,7 @@ static int rbd_lock(struct rbd_device *rbd_dev)
->    * lock_rwsem must be held for write
->    */
->   static void rbd_unlock(struct rbd_device *rbd_dev)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
->       int ret;
-> @@ -3840,6 +3860,7 @@ static int rbd_request_lock(struct rbd_device *rbd_dev)
->    * (i.e. "rbd map").
->    */
->   static void wake_lock_waiters(struct rbd_device *rbd_dev, int result)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct rbd_img_request *img_req;
-> 
-> @@ -3950,6 +3971,7 @@ static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
-> 
->   static int find_watcher(struct rbd_device *rbd_dev,
->               const struct ceph_locker *locker)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
->       struct ceph_watch_item *watchers;
-> @@ -3999,6 +4021,7 @@ static int find_watcher(struct rbd_device *rbd_dev,
->    * lock_rwsem must be held for write
->    */
->   static int rbd_try_lock(struct rbd_device *rbd_dev)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       struct ceph_client *client = rbd_dev->rbd_client->client;
->       struct ceph_locker *locker, *refreshed_locker;
-> @@ -4217,6 +4240,7 @@ static void rbd_pre_release_action(struct rbd_device *rbd_dev)
->   }
-> 
->   static void __rbd_release_lock(struct rbd_device *rbd_dev)
-> +    __must_hold(&rbd_dev->lock_rwsem)
->   {
->       rbd_assert(list_empty(&rbd_dev->running_list));
-> 
-> @@ -4256,6 +4280,7 @@ static void rbd_release_lock_work(struct work_struct *work)
->   }
-> 
->   static void maybe_kick_acquire(struct rbd_device *rbd_dev)
-> +    __must_hold_shared(&rbd_dev->lock_rwsem)
->   {
->       bool have_requests;
-> 
-> @@ -5302,6 +5327,7 @@ static void rbd_spec_free(struct kref *kref)
->   }
-> 
->   static void rbd_dev_free(struct rbd_device *rbd_dev)
-> +    __context_unsafe(cleanup function that does not need locking)
->   {
->       WARN_ON(rbd_dev->watch_state != RBD_WATCH_STATE_UNREGISTERED);
->       WARN_ON(rbd_dev->lock_state != RBD_LOCK_STATE_UNLOCKED);
-> @@ -5338,6 +5364,7 @@ static void rbd_dev_release(struct device *dev)
->   }
-> 
->   static struct rbd_device *__rbd_dev_create(struct rbd_spec *spec)
-> +    __context_unsafe(initialization function that does not need locking)
->   {
->       struct rbd_device *rbd_dev;
-> 
-> 
-The above change look good.
-
-However, I still think acquiring_list, running_list, and object_map should
-ideally be guarded by their respective locks. The fact that some code obtains
-pointers to these objects before acquiring the corresponding lock makes the
-locking pattern worth looking at more closely rather than simply leaving
-these fields unannotated.
-
-Could you perhaps Cc the RBD maintainers and mailing list on the next revision
-and ask for their feedback on these locking patterns? They may be able to clarify
-whether obtaining these pointers outside the lock is intentional and safe, or
-whether there are existing races that have gone unnoticed.
-
-Thanks,
---Nilay
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
