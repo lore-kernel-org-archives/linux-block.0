@@ -1,135 +1,137 @@
-Received: from mail-ej2-f3.google.com (mail-ej2-f3.google.com [74.125.228.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47A3353EDF
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 07:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.131
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785827771; cv=pass; b=BBuNXHvtfHx98X/ezakPKlTz8CrLwX7dMGwPG1SLK3RohEVIVCMNCUBTMS12s1sYYEUtt2DMhDSUKmwr3lw8DAH0zwgv7Z0lozKS/I6aWrQJ8owRpLHRw8y1oEDEC/1frnUjgtIpZpsYkoDLUbYKUJ+L/IHAEf0oQA5Mo+xYBmM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785827771; c=relaxed/simple;
-	bh=tTzPrUry5IGzotmZfDFxxBUYvLMZOgIPH5TS8QRdYPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RUvl87XOeEI5MFm/IeBU9dEb+RwyiVFF8BWJ2OXE4jq3OHS4P3srjwhALlt+a5lFqBMovfAweqiDLHdH6H8JoogJTu7VoY7L3C6pqDRb7UZN0xjdnru5BKxo8C6gEDrmZJiCtsEk0JqO1bbDBftIbr0HYH85NaE4hzUj6/Yu4Ek=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzDegfON; arc=pass smtp.client-ip=74.125.228.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC06F29346F
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 07:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785828564; cv=none; b=sWcjQH/Ih2D+1hJzGg8ETowxLgADB2jeaH9fOEVd4yjIJnZ9XTV0eg08tRO1TbQBMwNS7O9+7DYa3TqaD05l+RgXVB5gpi1XrvrDiEca6+ASpeXt6kBpppDEt3fLX5n5aY4gtDPm3ttlrSBFiea3rG2Je4XdhudQ3i1vs/yCwM0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785828564; c=relaxed/simple;
+	bh=u4QIQZTdswptGzA7Ts6wBB+sdxAXlbuqrjMHMB4he5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=ARswejvN+qvczckBFMOTRdo7F7ZB82g6ITXkz0OGYJ0Gr/SCxlaF3CcJJxJwCKkJWE/OibXxlPHfUjDm48jqsNS+hgt77xBW5X6Tr/lKntHsGs2iNaUsztKnmcFakhHEBnOkINxmU0Z7futKUS/a7LTKyUtxwX6Yh2vLGObChEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YuL9mR3P; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzDegfON"
-Received: by mail-ej2-f3.google.com with SMTP id a640c23a62f3a-c15e9a2f51aso234934066b.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 00:16:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785827768; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JwERfA5tsqhaw9w84S+ZoxDNxpzBX4j07wXLvW83tl7LYbgvB5UDMCM4DSWAMd7WZ1
-         TyCydg4TUQ3ekC88rILaBrPWP3zCfIJqL0zA5rHg8zJpg5D8QfyfG+eA8qtRbIYhA3i1
-         kCZO6AVYMAq6gi1HEiyoCrErA/SoNolD+47uB3LxreW0NWfd5y08cXn+ldPqAZi//QeS
-         ey3Ky2xWufgHGMIl3BRLL6ft0lZJxz9V/9INlkiSuBh1PLT9LZ9FwQd1mausE0MEzc8b
-         BHmzlmlgz8j2ggaTftd94g5ogTE9a8P/5wa1aXd4TRHP9JOzbyORdOpvwGwRqgBwfm/I
-         veYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=K/bnHR74RIuJoZ4/iE4Zw1Cub3IO3OZ6HeJ8V4YWjSg=;
-        fh=E3Qj3mUdVpLhmuM7Zy/QxvBv/wfxCTXmMZa3aYFT2SU=;
-        b=OJVuRAewYJflDgPISkAoTnHaAJHe/5a08s+ht7n5M1DEJmPG0l8GImGwBNsdz0OG97
-         NvvXWMSStWiy16IoyXxLOLS3t0G0YeMCDbNm471g3QjIfw8678jq0QVKNpEJRza4mCTe
-         K8+Tq4nImG1vVusH7RogbgB+pnh8JUXGknSfKDDMRYEIS8CTNQkrWlUq4DPtQYLnXDTN
-         UnMQlICWqUzjehaOEi/+rukkYEZFU7W28fXJFGe4bQjtxJIcrASjbO/Tds93sInn4gzz
-         Di0dXXa4FPhzB0k2wxJCpL9DjKnakeM3UFjDtWogEdRz20X8tkT2cNM8fLGJf5PYvst8
-         5NXw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785827768; x=1786432568; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=K/bnHR74RIuJoZ4/iE4Zw1Cub3IO3OZ6HeJ8V4YWjSg=;
-        b=IzDegfONN8jbhTMG8vVjqrK0LGpJyYIR5sAz0SP02NG5kwt2jAe7vZycwDPeilNuqo
-         xztZUHfVIdLGOpDD1GuT+MkJSQaGPWmqdl4DGpMueAFsnDDS/0qeG3MrZeNzNDDssQ6e
-         PAuqfKSZ2dUTedTv+qq7AWY4RJGyQjYOEwhP/xmpsUWQ3bIUahJr8Yi5f9bF02mwgwur
-         FSfscYrym9xJ6p6xvRvUokhJWqW/Bo4L2XyktBgrf/pBbnHPgqLaADsn4fdqOQPfgbJy
-         H/+CPw8KcYHF/5wHcnyEtTarpfabIiZtaufJ5OSLcbQ5FVEBC/TEVd9hBaO0bR01UNps
-         ARZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785827768; x=1786432568;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=K/bnHR74RIuJoZ4/iE4Zw1Cub3IO3OZ6HeJ8V4YWjSg=;
-        b=fpiMVlJ0P+5N/7ZZVHaGGpwXv5it+4kMTWYYMOcYwDB8nk3uTKKSmeM5e/z41KEGKa
-         KavrgJnFzz2N/8Z9C6qsd+KREsMjQRYD3i6EB9oCNnfFu4CmmILgHK0pdP/Ax2skumZs
-         AjNxUQyQ8AyRnxpgQu0NF4h1WLwo47P5tbEvRNEIg/izlUe2qJ8UbUzLwqIkYfJ2b1bZ
-         i0me+42ntvUJPUWrNwhmNJbDsIG4JepsPmkMxDAdqzDV6HMM9ejgs3E/F2sktFS6c7xz
-         mWNtVxB9D4ctkkbMRsVwkK0MfpiVQHoqyyuxTvDo4Z2FPTdTh1X6YE4ilMVvkgT3swGy
-         jWWA==
-X-Forwarded-Encrypted: i=1; AHgh+RpaWABDvscxoFqd19AFPthxetN8Xh7aLIX6pSH/WHH4UKiCfVyKnpBZ4U3TU2ati0fCne5UbrIJx/uMTg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkAISCjpFQ77Gd4MMmmCkqkHcHBusJLmtuiUHkL/HrPxWXGlY+
-	MVsPATXRRPgDuRot4JSFHA7WGiZk535kvNdi4Uu17GPxe2Muy9GjcwrqL/PPZigxsZoS9eKwyA4
-	tqQWg8NRSIkJDYcFihZ1GfaMcbWQbSpE=
-X-Gm-Gg: AR+sD11g/46aojf/bzYXY10cmZ7h75b8/iIlNxMj4Ybj3523QWUYPRTi3CuchCC7max
-	3U2M96CNfKazgDPUNAqBX5fcKLD2vNqiSdWe1anYVvgy57/oBJ7LxWfNxV9B345L8SzGPr7lqJd
-	jJsrE96UKlvvZNER2mAXiyzv9XV2pS0Q2im69FfSK4dtIB/h70Tg04tWmUusKoo+LRreBXM0osr
-	34hPd7J3F4kHMk+gBX9olV/s4eTHL9+J9AtQs2nextMOQNmVujTS4uxrIFGFpx0Ix+vHbcqcKOD
-	Ykxu1Zc8HTRfsgSEX652Bp4ov9OPD91GWRUrtGYpDixse9b8E3cclMvPKOyiUJNE+L5k
-X-Received: by 2002:a17:906:fe4a:b0:c16:7097:4708 with SMTP id
- a640c23a62f3a-c1fe8167babmr1257493766b.3.1785827767919; Tue, 04 Aug 2026
- 00:16:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YuL9mR3P"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260804072913epoutp03ad491950835561369931a749bff26d18~IiZuPtzIi1286512865epoutp03F
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 07:29:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260804072913epoutp03ad491950835561369931a749bff26d18~IiZuPtzIi1286512865epoutp03F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1785828553;
+	bh=oq3WXJu/SsF/yYJkxmJpNIikAfWrsHK6PFkUbOrSyxQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=YuL9mR3PGb2opeFZiYN0zNin1lKqXZc/cCNGngvIs07OjuKhr0shXabI7kR3ToXg4
+	 m9eu0VhaMLeIMH0kAURIYdc6jWK1UzL4Ga89eE+9NWPW/uLnZVQbYCgfFY8TbDhK0f
+	 rLSzDKGyEGvDXov2c9EdXQ2JUy6DIGmt0glyRSes=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260804072912epcas5p2adb2d94e9dbee254b808fbe3e7596043~IiZtxp_B41422314223epcas5p25;
+	Tue,  4 Aug 2026 07:29:12 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.94]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4hDlXm00m2z2SSKd; Tue,  4 Aug
+	2026 07:29:12 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260804072911epcas5p11ac571c654cc6f9181d41e68c1d776f7~IiZsQAmmo3024630246epcas5p1l;
+	Tue,  4 Aug 2026 07:29:11 +0000 (GMT)
+Received: from [107.122.10.194] (unknown [107.122.10.194]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260804072906epsmtip1f5a677211ba3b877f3e13174d1789292~IiZnod7M11634816348epsmtip18;
+	Tue,  4 Aug 2026 07:29:06 +0000 (GMT)
+Message-ID: <c4cec417-24b8-428a-853f-4e1ff1e29a6a@samsung.com>
+Date: Tue, 4 Aug 2026 12:59:05 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-1-haoqinhuang7@gmail.com> <20260803141256.60599-3-haoqinhuang7@gmail.com>
- <anF4sw4jTDu5xUd9@google.com>
-In-Reply-To: <anF4sw4jTDu5xUd9@google.com>
-From: haoqin huang <haoqinhuang7@gmail.com>
-Date: Tue, 4 Aug 2026 15:15:56 +0800
-X-Gm-Features: AUfX_mwg8akhIy_U3ReIxoYURI9EnmFsl3JbPowfaAwXlube1yYkaQLkxBknfNo
-Message-ID: <CAEjiKSkWPM3viBXNnFniukc9-OxXPgbmCbmxy-+7vrwVcog7yg@mail.gmail.com>
-Subject: Re: [PATCH v5 2/4] zram: reject zero-size dictionary
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 09/16] nvme-pci: implement dma-buf backed requests
+To: Pavel Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi
+	Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner
+	<brauner@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sumit
+	Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?=
+	<christian.koenig@amd.com>, Nitesh Shetty <nj.shetty@samsung.com>, Kanchan
+	Joshi <joshi.k@samsung.com>, Jason Gunthorpe <jgg@nvidia.com>, Damien Le
+	Moal <dlemoal@kernel.org>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer
+	<snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Benjamin
+	Marzinski <bmarzins@redhat.com>, David Sterba <dsterba@suse.com>, Ilya
+	Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
+	nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org
+Content-Language: en-US
+From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
+In-Reply-To: <9e3dd1b2d71dc0f9bd556b6a6d6e48fb6a8d727b.1785596451.git.asml.silence@gmail.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260804072911epcas5p11ac571c654cc6f9181d41e68c1d776f7
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260801155005epcas5p4ecdcdf532aa2c2ff4e94638eedaa435b
+References: <cover.1785596451.git.asml.silence@gmail.com>
+	<CGME20260801155005epcas5p4ecdcdf532aa2c2ff4e94638eedaa435b@epcas5p4.samsung.com>
+	<9e3dd1b2d71dc0f9bd556b6a6d6e48fb6a8d727b.1785596451.git.asml.silence@gmail.com>
 
-On Tue, Aug 4, 2026 at 1:32=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (26/08/03 22:12), Haoqin Huang wrote:
-> [..]
-> > @@ -1700,8 +1700,12 @@ static int comp_params_store(struct zram *zram, =
-u32 prio, s32 level,
-> >                                               INT_MAX,
-> >                                               NULL,
-> >                                               READING_POLICY);
-> > -             if (sz < 0)
-> > +             if (sz <=3D 0) {
-> > +                     pr_err("failed to load dictionary %s (err=3D%zd)\=
-n",
-> > +                            dict_path, sz);
->
-> So for empty file this will read
->
->         "failed to load dictionary foo-bar (err=3D0)"
->
-> which might be confusing.  I wonder if we want to separate these two:
->
->         if (sz < 0) {
->                 pr_err("failed to load dictionary %s (err=3D%zd)\n",
->                        dict_path, sz);
->                 return sz;
->         }
->         if (sz =3D=3D 0) {
->                 pr_err("failed to load dictionary %s (empty file)\n",
->                        dict_path);
->                 return -EINVAL;
->         }
+On 8/1/2026 9:16 PM, Pavel Begunkov wrote:
+> +	map = kmalloc_flex(*map, dma_list, nr_entries);
+> +	if (!map)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	sgt = dma_buf_map_attachment(attach, ctx->dir);
+> +	if (IS_ERR(sgt)) {
+> +		ret = PTR_ERR(sgt);
+> +		sgt = NULL;
+> +		goto err;
+> +	}
+> +
+> +	for_each_sgtable_dma_sg(sgt, sg, tmp) {
+> +		dma_addr_t dma_addr = sg_dma_address(sg);
+> +		unsigned long sg_len = sg_dma_len(sg);
+> +
+> +		if (sg_len % NVME_CTRL_PAGE_SIZE) {
+> +			ret = -EINVAL;
+> +			goto err;
+> +		}
+> +		seg_shift = min(seg_shift, __ffs(sg_len));
+> +
+> +		while (sg_len) {
+> +			map->dma_list[i++] = dma_addr;
+> +			dma_addr += NVME_CTRL_PAGE_SIZE;
+> +			sg_len -= NVME_CTRL_PAGE_SIZE;
+> +		}
+> +	}
+> +
+> +	if (WARN_ON_ONCE(seg_shift < NVME_CTRL_PAGE_SHIFT))
+> +		return ERR_PTR(-EFAULT);
 
-Good idea, much clearer. I will split them in v6. Thanks.
+This should be 'goto err;' instead of a direct return. If this ever 
+triggers, it leaks the map and already established sgt mapping.
+
+> +
+> +	ret = dma_buf_io_init_map(ctx, &map->base);
+> +	if (ret)
+> +		goto err;
+> +	map->base.seg_shift = seg_shift;
+> +	map->nr_entries = nr_entries;
+> +	map->sgt = sgt;
+> +	return &map->base;
+> +err:
+> +	if (sgt)
+> +		dma_buf_unmap_attachment(attach, sgt, ctx->dir);
+> +	kfree(map);
+> +	return ERR_PTR(ret);
+> +}
+
