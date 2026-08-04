@@ -1,190 +1,957 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C75841D21F
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 06:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6C03F8714;
+	Tue,  4 Aug 2026 06:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785826439; cv=none; b=OBDdCSeBV6QUle5e8A2XeJHpJXgNzKGFYZtZ8XEwZGP8kDpSeGNlgtZ53AUjVPqCbVrW5ATQjM2b2NDCCZnDk9M3dHn5EAZOjrtVCVzcQH7JHcRSiPtCabPk4Jev8LCC2/xT0cO6jRSPG7GxaUrG3KJ4asMtgCGnuSTqppDgADw=
+	t=1785826449; cv=none; b=B/7YzCKYdzNRJa/l2CI/F/omGRlgF5uG1AIQX/cLsxebrMkizpGiVukKebw/dR5tQl7sxaRoq76EMe2nnRzgrAKE6kRxyrYUwG9IW4V++E3tW6WjW4WgkWqeGAwUjLWOvLsJ8qafiVl4MuG0Jm1FQ5gxucYX8GevXPCBDZOfqck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785826439; c=relaxed/simple;
-	bh=n9q6rCd6YQ1pvMnCwo1K95+qdtzPiaWYP2d5vJWLUcw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Og6Rwjo6C0cGAfXfFPX83btRxS3UJN2x6p1P14gXqOc0UCoXAPGM8MrnorpA528/pcUF6Uxrvo7MbrpKtu4LHel3JID/eiIBstGYdF6HyQikW8/VejCSuqwDVU10Qae/PmT/3U7ukSB7jtIPkheV/4KDYc7NAHaOsWq3Dz65ofE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VDGMHKNW; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785826449; c=relaxed/simple;
+	bh=dhmnZcrOpC/RymjrtmWO6vFjGzu8mO222pyanalsQ98=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=S1r4kZXhG3AvXefFD7SKhkSikb976DeRa53DzhEWubmwfd0TW0uuwJGg58pCJPEKuC4to6Sm20HZZ00a54MXM7FbMnMFZmL5ZBQ0OPc1RTwE6kobAKjQ+DNYon7GeAztnkVBezZ4yNjvwZbTj1JCq3ykZfJgW5kr9KaQKsvRxTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xy/tDSP+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VDGMHKNW"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6741Hgn63576191;
-	Tue, 4 Aug 2026 06:53:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=mY3uTX
-	0MXR0Xa1XZuKeXXmv7V34MZHAiVg3x8460xT0=; b=VDGMHKNWSdFh1MTaPDHwNE
-	8IeDCJA6Ca8jqWdfVSakfOKhuPbkzPQGJCmmq+FLunojz6S0XghOfACH149ZDuHG
-	eQ9ePfAZfB6koghF7p74fZD1nX2YFSdMQoTLppJ28mXTpYMsOJcKCt2p7fdT4MBg
-	PyHDsTS3QopSMfze5NNJhEb/iNBMYv8VoO6mfUUaWq5hjFGuOsAOo6jM5SXTRMXo
-	g0AE6WzDHb5Xsn6bUdJz8pKXp0tEFZuoJ1oZdnxEsk02Dpt5o0TpdM0lZUBHRP5e
-	EaBAtJrBZeb6ZXbradbdfNoLGBtLwleDva3e2T5eTE/xzAS1cfkMGtc9CzYcaMzw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs77g4a36-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 06:53:45 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6746fQgM016765;
-	Tue, 4 Aug 2026 06:53:44 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsv4k0tqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 06:53:44 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6746riof46268826
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Aug 2026 06:53:44 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3CD4A5805A;
-	Tue,  4 Aug 2026 06:53:44 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E93A858056;
-	Tue,  4 Aug 2026 06:53:40 +0000 (GMT)
-Received: from [9.43.105.125] (unknown [9.43.105.125])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Aug 2026 06:53:40 +0000 (GMT)
-Message-ID: <96b0b123-8062-40c6-a2f3-9b6baa7d2612@linux.ibm.com>
-Date: Tue, 4 Aug 2026 12:23:39 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xy/tDSP+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6DCC1F000E9;
+	Tue,  4 Aug 2026 06:53:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785826446;
+	bh=X0DWde6zYk+gUKI+dAPZqUpQqQiQHHuCy61d3LhBkcw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Xy/tDSP+geeVWx3qptQzY67BXWki2gi40Z0f0byBNGTfRigSpyjS3NxrzuGXkN/GQ
+	 rF9rhl/cA/ScPI7nfdLip7m5mJ/ds0sFBA+CMliue05AK1bhUzkcZth/eAo0h2dapv
+	 PpcHMW6gwBsevSS5ZNn6KcbJArRWseWuaDEIeNrVo/HL77sxCYb+UB/ln44wJFtOk3
+	 IpH42F2UG5gzZWH4YMFoPVHekndWSAuzihG8vOb3ZTJOQIzelgdfYvlGgmD+3At/4f
+	 44Fpjzm+RkIQ71kZFtIYunQCPVVJIHG+lhFJ88wvoAZE+NkWcFCwWZgaj0x48MZRQp
+	 AKSut6EtJcZRA==
+From: Yu Kuai <yukuai@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Yu Kuai <yukuai@fygo.io>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Coly Li <colyli@fygo.io>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Song Liu <song@kernel.org>,
+	Dan Williams <djbw@kernel.org>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Tao Cui <cui.tao@linux.dev>,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	virtualization@lists.linux.dev,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [RFC PATCH v1 2/3] blk-cgroup: store blkcg in bio instead of blkg
+Date: Tue,  4 Aug 2026 14:53:12 +0800
+Message-ID: <20260804065313.2092022-3-yukuai@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260804065313.2092022-1-yukuai@kernel.org>
+References: <20260804065313.2092022-1-yukuai@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/12] loop: Remove the "bool global" function argument
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
-        Haris Iqbal <haris.iqbal@linux.dev>
-References: <cover.1785440858.git.bvanassche@acm.org>
- <d5142cf35b04e88939c4aed2debf6f3716d540ae.1785440858.git.bvanassche@acm.org>
- <f3d93315-c7cc-4200-b6c7-5b75ad02290d@linux.ibm.com>
- <437c4abb-0f63-43f9-a283-2687c374d3e2@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <437c4abb-0f63-43f9-a283-2687c374d3e2@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfX98Psfqwte90c
- QRpvyO4YcpHW+KX2XdJu8jeUnGdK4DYWE8sEmzbwAsAoZnhMg09eZ3fLwxi1YKnTkJp0w3G2PRe
- bgkhSCTiwTH2Dkntq8UHeDW9hYD4Pbzc0otr33CflRz2F53AwYIda152Bm0fJnk3xVse84Dkpt+
- fEfiE/pmGJLWKPIkU5upbxVfXqvPy95w7OY1mmM95PZ0rSqpiYqssP8JrLktSyx+EUrn0AotL5A
- J9KK3JTB5nsWSIIr1kiNlHRRdQmlJqTU6rOVm5P59o8eWEsG7XeXz82MdafQxa0Iz3S1T1qIR+q
- pZaMs6HCxfmdXm+ywWkrYSgdl9lquDn9I1wzcdNmWlCfk0BTF7BFhFUMYudjN1ChM+afnQRzboh
- tMeZXLuovYl1SjHKusJ8GHAIIZ2cKiKU4u3pfUlzN1zfnNdNz4W/n3h5JW9qDIoVBBPm2Al/xQs
- cyVHJc4+rymoqTGPQSQ==
-X-Authority-Analysis: v=2.4 cv=WIFPmHsR c=1 sm=1 tr=0 ts=6a718c79 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=aJ2jEGXGeZ_ZiVYQvR0A:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: YkmLyKbHSJnUrPcoV6FOoBkDJVA4SmbA
-X-Proofpoint-ORIG-GUID: oeOAsQd2fbgEEIzVHTi7_k6pT1crtn9i
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfXwCApYWulpJIY
- HlWpbDQdGps1Xzssw0u7vZyPKROxWov1p2uyZROePQhwhlYuKrXP36he+yJnv8oE4qF1jE/Zgu7
- mGUgvIIpVc70L0kHng4kkPtdcgAJjmo=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-04_01,2026-08-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- suspectscore=0 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608040052
 
-On 8/3/26 11:11 PM, Bart Van Assche wrote:
-> On 8/3/26 6:05 AM, Nilay Shroff wrote:
->> Overall this change looks good to me. But I see, lo->lo_lock
->> is used to protect lo->lo_backing_file. so shall we annotate
->> the lo->lo_backing_file using __guarded_by(&lo_lock)?
-> 
-> I don't think so. It seems to me that the strategy in the loop driver
-> for serializing accesses to lo->lo_backing_file is too complicated for
-> lock context annotations. My understanding is as follows:
-> * lo->lo_mutex serializes configuration and state changes on an
->    individual loop device.
-> * loop_validate_mutex serializes concurrent loop_configure(),
->    loop_change_fd(), and loop_clr_fd() calls across all loop devices to
->    safely execute loop_validate_file() when loop devices are stacked
->    or nested.
-> * The blk_mq_freeze_queue() call in __loop_change_fd() serializes I/O
->    request processing and the code in __loop_change_fd() that is executed
->    while the queue is frozen.
-> 
+From: Yu Kuai <yukuai@fygo.io>
 
-Yes, you're right about the locking being more complicated here. However,
-I think there may be another issue: a race between the sysfs read in
-loop_attr_backing_file_show() and replacement of the backing file in
-__loop_change_fd().
+A bio currently stores a queue-local blkg reference.  This forces bio
+association and remap paths to look up or create a blkg even when the bio
+will never enter a blkcg policy.
 
-__loop_change_fd() replaces lo->lo_backing_file through loop_assign_backing_file(),
-but loop_assign_backing_file() does not take lo->lo_lock. Hence, the sysfs path
-could read the old lo_backing_file pointer while __loop_change_fd() replaces it
-and subsequently drops the old file reference with fput().
+Store the blkcg css association in the bio instead, and derive the blkg
+from the bio's blkcg and current bdev when a policy needs it.  The first
+successful policy lookup pins the blkg, records the pin with BIO_BLKG_REF,
+and drops it from bio_clear_blkcg() or when bio_set_dev() changes the
+lookup key.
 
-Since loop_attr_backing_file_show() does not take its own reference to the file,
-this looks like it could result in a use-after-free.
+Keep lookup-only users from creating missing blkgs by using
+bio_blkg_lookup(), and rename the bio cgroup association helpers to match
+the stored blkcg state.
 
-Initially, I thought we could fix this by consistently protecting publication/removal
-of lo->lo_backing_file with lo->lo_lock and taking a temporary file reference from
-the sysfs path, e.g.:
+Signed-off-by: Yu Kuai <yukuai@fygo.io>
+---
+ Documentation/admin-guide/cgroup-v2.rst |   2 +-
+ block/bfq-cgroup.c                      |  14 +-
+ block/bfq-iosched.c                     |  18 ++-
+ block/bio.c                             |  12 +-
+ block/blk-cgroup-fc-appid.c             |   5 +-
+ block/blk-cgroup.c                      | 206 +++++++++++++++---------
+ block/blk-cgroup.h                      |  23 ++-
+ block/blk-crypto-fallback.c             |   2 +-
+ block/blk-iocost.c                      |  10 +-
+ block/blk-iolatency.c                   |   7 +-
+ drivers/md/bcache/request.c             |   2 +-
+ drivers/md/dm.c                         |   2 +-
+ drivers/md/md.c                         |   2 +-
+ drivers/nvdimm/nd_virtio.c              |   2 +-
+ fs/gfs2/lops.c                          |   3 +-
+ include/linux/bio.h                     |  30 ++--
+ include/linux/blk_types.h               |   9 +-
+ include/linux/writeback.h               |   2 +-
+ mm/page_io.c                            |  10 +-
+ 19 files changed, 218 insertions(+), 143 deletions(-)
 
-static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
-{
-	struct file *file;
-	...
-
-	spin_lock_irq(&lo->lo_lock);
-	file = lo->lo_backing_file;
-	if (file)
-		get_file(file);
-	spin_unlock_irq(&lo->lo_lock);
-
-	if (!file)
-		return -ENOENT;
-
-	...
-	fput(file);
-}
-```
-
-and similarly protect the assignment in loop_assign_backing_file().
-
-static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
-{
-         spin_lock_irq(&lo->lo_lock);
-         lo->lo_backing_file = file;
-         spin_unlock_irq(&lo->lo_lock);
-         ...
-}
-
-However, looking further through the code, I wonder whether we can instead get rid of
-lo->lo_lock entirely and use lo->lo_mutex to serialize the sysfs access to lo->lo_backing_file.
-
-__loop_change_fd() is already called with lo->lo_mutex held, so the update path would not
-need any additional locking. We would only need to acquire lo->lo_mutex in
-loop_attr_backing_file_show() while accessing lo->lo_backing_file.
-
-Similarly, for the clear path in __loop_clr_fd(), it looks like the existing device teardown
-serialization may already be sufficient, in which case the lo->lo_lock protection around
-clearing lo->lo_backing_file could potentially be removed as well.
-
-If that's correct, we could simplify the locking and remove lo->lo_lock altogether rather than
-adding more users of it.
-
-Thanks,
---Nilay
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+index 14b8c571c0d1..bbd79931d5ab 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -3235,7 +3235,7 @@ the configuration, the bio may be executed at a lower priority and if
+ the writeback session is holding shared resources, e.g. a journal
+ entry, may lead to priority inversion.  There is no one easy solution
+ for the problem.  Filesystems can try to work around specific problem
+-cases by skipping wbc_init_bio() and using bio_associate_blkg()
++cases by skipping wbc_init_bio() and using bio_associate_blkcg()
+ directly.
+ 
+ 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 7e65fe6844ee..3ac3b4c05402 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -363,11 +363,13 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg)
+ 
+ void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq)
+ {
+-	struct bfq_group *bfqg = blkg_to_bfqg(bio_blkg(rq->bio));
++	struct blkcg_gq *blkg = bio_blkg_lookup(rq->bio);
++	struct bfq_group *bfqg;
+ 
+-	if (!bfqg)
++	if (!blkg)
+ 		return;
+ 
++	bfqg = blkg_to_bfqg(blkg);
+ 	blkg_rwstat_add(&bfqg->stats.bytes, rq->cmd_flags, blk_rq_bytes(rq));
+ 	blkg_rwstat_add(&bfqg->stats.ios, rq->cmd_flags, 1);
+ }
+@@ -606,7 +608,7 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ 
+ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+ {
+-	struct blkcg_gq *blkg = bio_blkg(bio);
++	struct blkcg_gq *blkg = bio_blkg_lookup(bio);
+ 	struct bfq_group *bfqg;
+ 
+ 	while (blkg) {
+@@ -614,14 +616,16 @@ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+ 			blkg = blkg->parent;
+ 			continue;
+ 		}
++
+ 		bfqg = blkg_to_bfqg(blkg);
+ 		if (bfqg->pd.online) {
+-			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
++			bio_associate_blkcg_from_css(bio, &blkg->blkcg->css);
+ 			return bfqg;
+ 		}
+ 		blkg = blkg->parent;
+ 	}
+-	bio_associate_blkg_from_css(bio,
++
++	bio_associate_blkcg_from_css(bio,
+ 				&bfqg_to_blkg(bfqd->root_group)->blkcg->css);
+ 	return bfqd->root_group;
+ }
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 0f75301b3115..3d51d743552c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -128,6 +128,7 @@
+ 
+ #include "elevator.h"
+ #include "blk.h"
++#include "blk-cgroup.h"
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
+ #include "bfq-iosched.h"
+@@ -2452,15 +2453,15 @@ static bool bfq_bio_merge(struct request_queue *q, struct bio *bio,
+ 	struct request *free = NULL;
+ 	bool ret;
+ 
++#ifdef CONFIG_BFQ_GROUP_IOSCHED
++	if (bic && bio_blkg_lookup(bio) == NULL)
++		return false;
++#endif
++
+ 	spin_lock_irq(&bfqd->lock);
+ 
+ 	if (bic) {
+-		/*
+-		 * Make sure cgroup info is uptodate for current process before
+-		 * considering the merge.
+-		 */
+ 		bfq_bic_update_cgroup(bic, bio);
+-
+ 		bfqd->bio_bfqq = bic_to_bfqq(bic, op_is_sync(bio->bi_opf),
+ 					     bfq_actuator_index(bfqd, bio));
+ 	} else {
+@@ -6245,6 +6246,13 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	LIST_HEAD(free);
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
++	/*
++	 * Pin the blkg used to look up bfqg.  If this is the first IO for
++	 * the blkcg on this queue, create the bfqg before holding bfqd->lock.
++	 */
++	if (rq->bio && !bio_flagged(rq->bio, BIO_BLKG_REF))
++		bio_blkg(rq->bio);
++
+ 	if (!cgroup_subsys_on_dfl(io_cgrp_subsys) && rq->bio)
+ 		bfqg_stats_update_legacy_io(q, rq);
+ #endif
+diff --git a/block/bio.c b/block/bio.c
+index c207b248edba..db33c993c296 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -179,7 +179,7 @@ static inline gfp_t try_alloc_gfp(gfp_t gfp)
+ 
+ void bio_uninit(struct bio *bio)
+ {
+-	bio_clear_blkg(bio);
++	bio_clear_blkcg(bio);
+ 	if (bio_integrity(bio))
+ 		bio_integrity_free(bio);
+ 
+@@ -228,10 +228,10 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+ 	bio->bi_end_io = NULL;
+ 	bio->bi_private = NULL;
+ #ifdef CONFIG_BLK_CGROUP
+-	bio->bi_blkg = NULL;
++	bio->bi_blkcg = NULL;
+ 	bio->issue_time_ns = 0;
+ 	if (bdev)
+-		bio_associate_blkg(bio);
++		bio_associate_blkcg(bio);
+ #ifdef CONFIG_BLK_CGROUP_IOCOST
+ 	bio->bi_iocost_cost = 0;
+ #endif
+@@ -276,7 +276,7 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+ 	bio->bi_io_vec = bv;
+ 	bio->bi_bdev = bdev;
+ 	if (bio->bi_bdev)
+-		bio_associate_blkg(bio);
++		bio_associate_blkcg(bio);
+ 	bio->bi_opf = opf;
+ }
+ EXPORT_SYMBOL(bio_reset);
+@@ -860,7 +860,7 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+ 		if (bio->bi_bdev == bio_src->bi_bdev &&
+ 		    bio_flagged(bio_src, BIO_REMAPPED))
+ 			bio_set_flag(bio, BIO_REMAPPED);
+-		bio_clone_blkg_association(bio, bio_src);
++		bio_clone_blkcg_association(bio, bio_src);
+ 	}
+ 
+ 	if (bio_crypt_clone(bio, bio_src, gfp) < 0)
+@@ -1803,7 +1803,7 @@ void bio_endio(struct bio *bio)
+ 	 * a few callers of bio_init fail to call bio_uninit, so we cover up
+ 	 * for that here at least for now.
+ 	 */
+-	bio_clear_blkg(bio);
++	bio_clear_blkcg(bio);
+ 
+ 	if (bio->bi_end_io)
+ 		bio->bi_end_io(bio);
+diff --git a/block/blk-cgroup-fc-appid.c b/block/blk-cgroup-fc-appid.c
+index b2e16e9a7a6c..7589c6209989 100644
+--- a/block/blk-cgroup-fc-appid.c
++++ b/block/blk-cgroup-fc-appid.c
+@@ -50,12 +50,11 @@ EXPORT_SYMBOL_GPL(blkcg_set_fc_appid);
+  */
+ char *blkcg_get_fc_appid(struct bio *bio)
+ {
+-	struct blkcg *blkcg;
++	struct blkcg *blkcg = bio_blkcg(bio);
+ 
+-	if (!bio_blkg(bio))
++	if (!blkcg)
+ 		return NULL;
+ 
+-	blkcg = bio_blkcg(bio);
+ 	if (blkcg->fc_app_id[0] == '\0')
+ 		return NULL;
+ 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 753a3bdd0e8c..93ab57e0a9f1 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -241,13 +241,13 @@ void blkcg_punt_bio_submit(struct bio *bio)
+ {
+ 	struct blkcg_gq *blkg = bio_blkg(bio);
+ 
+-	if (blkg->parent) {
++	if (blkg && blkg->parent) {
+ 		spin_lock(&blkg->async_bio_lock);
+ 		bio_list_add(&blkg->async_bios, bio);
+ 		spin_unlock(&blkg->async_bio_lock);
+ 		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
+ 	} else {
+-		/* never bounce for the root cgroup */
++		/* Never bounce if there is no non-root blkg to queue on. */
+ 		submit_bio(bio);
+ 	}
+ }
+@@ -275,7 +275,7 @@ subsys_initcall(blkcg_punt_bio_init);
+  */
+ struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+ {
+-	if (!bio || !bio_blkg(bio))
++	if (!bio || !bio_blkcg(bio))
+ 		return NULL;
+ 	return &bio_blkcg(bio)->css;
+ }
+@@ -2051,129 +2051,181 @@ void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta)
+ 	atomic64_add(delta, &blkg->delay_nsec);
+ }
+ 
+-static inline struct blkcg_gq *blkg_lookup_tryget(struct blkcg_gq *blkg)
++/*
++ * Return the blkg pinned by @bio through BIO_BLKG_REF.  The returned blkg is
++ * already owned by @bio and no extra reference is acquired.  If the pinned
++ * blkg can't be found, fall back to the root blkg.
++ */
++static struct blkcg_gq *bio_pinned_blkg(struct bio *bio)
+ {
+-retry:
+-	if (blkg_tryget(blkg))
+-		return blkg;
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
++	struct blkcg_gq *blkg;
+ 
+-	blkg = blkg->parent;
+-	if (blkg)
+-		goto retry;
++	rcu_read_lock();
++	blkg = blkg_lookup(bio_blkcg(bio), q);
++	rcu_read_unlock();
+ 
+-	return NULL;
++	if (WARN_ON_ONCE(!blkg))
++		return q->root_blkg;
++	return blkg;
+ }
++
+ /**
+- * blkg_tryget_closest - try and get a blkg ref on the closet blkg
++ * bio_blkg_lookup - look up a blkg associated with a bio
+  * @bio: target bio
+- * @css: target css
+  *
+- * As the failure mode here is to walk up the blkg tree, this ensure that the
+- * blkg->parent pointers are always valid.  This returns the blkg that it ended
+- * up taking a reference on or %NULL if no reference was taken.
++ * Look up the queue-local blkg for @bio's current device and blkcg without
++ * creating a missing blkg.  The first successful lookup pins the blkg to @bio;
++ * later lookups reuse the bio-owned reference.
+  */
+-static inline struct blkcg_gq *blkg_tryget_closest(struct bio *bio,
+-		struct cgroup_subsys_state *css)
++struct blkcg_gq *bio_blkg_lookup(struct bio *bio)
+ {
+-	struct request_queue *q = bio->bi_bdev->bd_queue;
+-	struct blkcg *blkcg = css_to_blkcg(css);
++	struct blkcg *blkcg = bio_blkcg(bio);
++	struct request_queue *q;
+ 	struct blkcg_gq *blkg;
+ 
++	if (bio_flagged(bio, BIO_BLKG_REF))
++		return bio_pinned_blkg(bio);
++
++	if (!blkcg || !bio->bi_bdev)
++		return NULL;
++
++	q = bdev_get_queue(bio->bi_bdev);
+ 	rcu_read_lock();
+ 	blkg = blkg_lookup(blkcg, q);
+-	if (likely(blkg))
+-		blkg = blkg_lookup_tryget(blkg);
++	if (blkg && blkg_tryget(blkg))
++		bio_set_flag(bio, BIO_BLKG_REF);
++	else
++		blkg = NULL;
+ 	rcu_read_unlock();
+ 
+-	if (blkg)
+-		return blkg;
++	return blkg;
++}
++EXPORT_SYMBOL_GPL(bio_blkg_lookup);
++
++/**
++ * bio_put_blkg_ref - drop the blkg reference pinned by a bio
++ * @bio: target bio
++ *
++ * Drop the bio-owned blkg reference acquired by bio_blkg(), if any.
++ */
++void bio_put_blkg_ref(struct bio *bio)
++{
++	if (bio_flagged(bio, BIO_BLKG_REF)) {
++		struct blkcg_gq *blkg = bio_pinned_blkg(bio);
++
++		blkg_put(blkg);
++		bio_clear_flag(bio, BIO_BLKG_REF);
++	}
++}
++EXPORT_SYMBOL_GPL(bio_put_blkg_ref);
++
++/**
++ * bio_blkg - look up the blkg associated with a bio
++ * @bio: target bio
++ *
++ * Look up the queue-local blkg for @bio's current device and blkcg.  If this
++ * is the first policy use of @bio, create the missing blkg hierarchy if
++ * necessary, pin the exact blkg, and mark @bio so bio_clear_blkcg() can drop
++ * the reference when the bio completes.
++ */
++struct blkcg_gq *bio_blkg(struct bio *bio)
++{
++	struct blkcg *blkcg = bio_blkcg(bio);
++	struct gendisk *disk;
++	struct request_queue *q;
++	struct blkcg_gq *blkg;
++
++	if (!blkcg || !bio->bi_bdev)
++		return NULL;
++
++	if (bio_flagged(bio, BIO_BLKG_REF))
++		return bio_pinned_blkg(bio);
++
++	disk = bio->bi_bdev->bd_disk;
++	q = disk->queue;
+ 
+-	/*
+-	 * Fast path failed, we're probably issuing IO in this cgroup the first
+-	 * time, hold lock to create new blkg.
+-	 */
+ 	spin_lock_irq(&q->queue_lock);
+-	blkg = blkg_lookup_create(blkcg, bio->bi_bdev->bd_disk);
+-	if (blkg)
+-		blkg = blkg_lookup_tryget(blkg);
++	blkg = blkg_lookup_create(blkcg, disk);
++	if (blkg && blkg->blkcg == blkcg && blkg_tryget(blkg))
++		bio_set_flag(bio, BIO_BLKG_REF);
++	else
++		blkg = NULL;
+ 	spin_unlock_irq(&q->queue_lock);
+ 
+ 	return blkg;
+ }
++EXPORT_SYMBOL_GPL(bio_blkg);
+ 
+ /**
+- * bio_associate_blkg_from_css - associate a bio with a specified css
++ * bio_associate_blkcg_from_css - associate a bio with a specified css
+  * @bio: target bio
+  * @css: target css
+  *
+- * Associate @bio with the blkg found by combining the css's blkg and the
+- * request_queue of the @bio.  An association failure is handled by walking up
+- * the blkg tree.  Therefore, the blkg associated can be anything between @blkg
+- * and q->root_blkg.  This situation only happens when a cgroup is dying and
+- * then the remaining bios will spill to the closest alive blkg.
++ * Associate @bio with the blkcg found from @css.  The queue-local blkg is
++ * created and pinned by bio_blkg() when blkcg policies need it.
+  *
+- * A reference will be taken on the blkg and will be released when @bio is
++ * A reference will be taken on the blkcg and will be released when @bio is
+  * freed.
+  */
+-void bio_associate_blkg_from_css(struct bio *bio,
++void bio_associate_blkcg_from_css(struct bio *bio,
+ 				 struct cgroup_subsys_state *css)
+ {
+-	if (bio_blkg(bio))
+-		blkg_put(bio_blkg(bio));
++	struct blkcg *blkcg;
+ 
+-	if (css && css->parent) {
+-		bio->bi_blkg = blkg_tryget_closest(bio, css);
+-	} else {
+-		blkg_get(bdev_get_queue(bio->bi_bdev)->root_blkg);
+-		bio->bi_blkg = bdev_get_queue(bio->bi_bdev)->root_blkg;
+-	}
++	if (!css || !css->parent)
++		css = &blkcg_root.css;
++
++	blkcg = css_to_blkcg(css);
++	if (bio_blkcg(bio) == blkcg)
++		return;
++
++	css_get(css);
++	bio_clear_blkcg(bio);
++	bio->bi_blkcg = blkcg;
+ }
+-EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
++EXPORT_SYMBOL_GPL(bio_associate_blkcg_from_css);
+ 
+ /**
+- * bio_associate_blkg - associate a bio with a blkg
++ * bio_associate_blkcg - associate a bio with a blkcg
+  * @bio: target bio
+  *
+- * Associate @bio with the blkg found from the bio's css and request_queue.
+- * If one is not found, bio_lookup_blkg() creates the blkg.  If a blkg is
+- * already associated, the css is reused and association redone as the
+- * request_queue may have changed.
++ * Associate @bio with the blkcg found from the bio's css.  If a blkcg is
++ * already associated, keep it as blkcg association is not queue-local.
+  */
+-void bio_associate_blkg(struct bio *bio)
++void bio_associate_blkcg(struct bio *bio)
+ {
+ 	struct cgroup_subsys_state *css;
+ 
+ 	if (blk_op_is_passthrough(bio->bi_opf))
+ 		return;
+ 
+-	if (bio_blkg(bio)) {
+-		css = bio_blkcg_css(bio);
+-		bio_associate_blkg_from_css(bio, css);
+-	} else {
+-		rcu_read_lock();
+-		css = blkcg_css();
+-		if (!css_tryget_online(css))
+-			css = NULL;
+-		rcu_read_unlock();
++	if (bio_blkcg(bio))
++		return;
+ 
+-		bio_associate_blkg_from_css(bio, css);
+-		if (css)
+-			css_put(css);
+-	}
++	rcu_read_lock();
++	css = blkcg_css();
++	if (!css_tryget_online(css))
++		css = NULL;
++	rcu_read_unlock();
++
++	bio_associate_blkcg_from_css(bio, css);
++	if (css)
++		css_put(css);
+ }
+-EXPORT_SYMBOL_GPL(bio_associate_blkg);
++EXPORT_SYMBOL_GPL(bio_associate_blkcg);
+ 
+ /**
+- * bio_clone_blkg_association - clone blkg association from src to dst bio
++ * bio_clone_blkcg_association - clone blkcg association from src to dst bio
+  * @dst: destination bio
+  * @src: source bio
+  */
+-void bio_clone_blkg_association(struct bio *dst, struct bio *src)
++void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
+ {
+-	if (bio_blkg(src))
+-		bio_associate_blkg_from_css(dst, bio_blkcg_css(src));
++	if (bio_blkcg(src))
++		bio_associate_blkcg_from_css(dst, bio_blkcg_css(src));
+ }
+-EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
++EXPORT_SYMBOL_GPL(bio_clone_blkcg_association);
+ 
+ static int blk_cgroup_io_type(struct bio *bio)
+ {
+@@ -2186,19 +2238,25 @@ static int blk_cgroup_io_type(struct bio *bio)
+ 
+ void blk_cgroup_bio_start(struct bio *bio)
+ {
+-	struct blkcg_gq *blkg = bio_blkg(bio);
+ 	struct blkcg *blkcg = bio_blkcg(bio);
++	struct blkcg_gq *blkg;
+ 	int rwd = blk_cgroup_io_type(bio), cpu;
+ 	struct blkg_iostat_set *bis;
+ 	unsigned long flags;
+ 
+ 	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
+ 		return;
++	if (!blkcg)
++		return;
+ 
+ 	/* Root-level stats are sourced from system-wide IO stats */
+ 	if (!cgroup_parent(blkcg->css.cgroup))
+ 		return;
+ 
++	blkg = bio_blkg_lookup(bio);
++	if (!blkg)
++		return;
++
+ 	cpu = get_cpu();
+ 	bis = per_cpu_ptr(blkg->iostat_cpu, cpu);
+ 	flags = u64_stats_update_begin_irqsave(&bis->sync);
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 1e80b0a73233..b6fb85db4d3d 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -126,7 +126,7 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
+ 
+ static inline struct blkcg *bio_blkcg(struct bio *bio)
+ {
+-	return bio_blkg(bio)->blkcg;
++	return bio->bi_blkcg;
+ }
+ 
+ /*
+@@ -281,6 +281,9 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
+ 	return blkg;
+ }
+ 
++struct blkcg_gq *bio_blkg_lookup(struct bio *bio);
++struct blkcg_gq *bio_blkg(struct bio *bio);
++
+ /**
+  * blkg_to_pd - get policy private data
+  * @blkg: blkg of interest
+@@ -348,13 +351,15 @@ static inline void blkg_put(struct blkcg_gq *blkg)
+ 	percpu_ref_put(&blkg->refcnt);
+ }
+ 
+-static inline void bio_clear_blkg(struct bio *bio)
++static inline void bio_clear_blkcg(struct bio *bio)
+ {
+-	struct blkcg_gq *blkg = bio_blkg(bio);
++	struct blkcg *blkcg = bio_blkcg(bio);
++
++	bio_put_blkg_ref(bio);
+ 
+-	if (blkg) {
+-		blkg_put(blkg);
+-		bio->bi_blkg = NULL;
++	if (blkcg) {
++		css_put(&blkcg->css);
++		bio->bi_blkcg = NULL;
+ 	}
+ }
+ 
+@@ -470,7 +475,7 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
+  */
+ static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio)
+ {
+-	return bio_blkg(rq->bio) == bio_blkg(bio) &&
++	return bio_blkcg(rq->bio) == bio_blkcg(bio) &&
+ 		bio_issue_as_root_blkg(rq->bio) == bio_issue_as_root_blkg(bio);
+ }
+ 
+@@ -497,6 +502,8 @@ struct blkcg {
+ };
+ 
+ static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
++static inline struct blkcg_gq *bio_blkg_lookup(struct bio *bio) { return NULL; }
++static inline struct blkcg_gq *bio_blkg(struct bio *bio) { return NULL; }
+ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg, void *key) { return NULL; }
+ static inline void blkg_init_queue(struct request_queue *q) { }
+ static inline int blkcg_init_disk(struct gendisk *disk) { return 0; }
+@@ -513,7 +520,7 @@ static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
+ static inline struct blkcg_gq *pd_to_blkg(struct blkg_policy_data *pd) { return NULL; }
+ static inline void blkg_get(struct blkcg_gq *blkg) { }
+ static inline void blkg_put(struct blkcg_gq *blkg) { }
+-static inline void bio_clear_blkg(struct bio *bio) { }
++static inline void bio_clear_blkcg(struct bio *bio) { }
+ static inline void blk_cgroup_bio_start(struct bio *bio) { }
+ static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio) { return true; }
+ 
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index 2a5c52ab74b4..5ef4baab444b 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -187,7 +187,7 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
+ 	bio->bi_write_hint	= bio_src->bi_write_hint;
+ 	bio->bi_write_stream	= bio_src->bi_write_stream;
+ 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
+-	bio_clone_blkg_association(bio, bio_src);
++	bio_clone_blkcg_association(bio, bio_src);
+ 
+ 	/*
+ 	 * Move page array up in the allocated memory for the bio vecs as far as
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index d4470476bcd0..62ffd759bb95 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2775,7 +2775,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+ 			   struct bio *bio)
+ {
+-	struct ioc_gq *iocg = blkg_to_iocg(bio_blkg(bio));
++	struct ioc_gq *iocg = blkg_to_iocg(bio_blkg_lookup(bio));
+ 	struct ioc *ioc = rqos_to_ioc(rqos);
+ 	sector_t bio_end = bio_end_sector(bio);
+ 	struct ioc_now now;
+@@ -2833,9 +2833,13 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+ 
+ static void ioc_rqos_done_bio(struct rq_qos *rqos, struct bio *bio)
+ {
+-	struct ioc_gq *iocg = blkg_to_iocg(bio_blkg(bio));
++	struct ioc_gq *iocg;
++
++	if (!bio->bi_iocost_cost)
++		return;
+ 
+-	if (iocg && bio->bi_iocost_cost)
++	iocg = blkg_to_iocg(bio_blkg_lookup(bio));
++	if (iocg)
+ 		atomic64_add(bio->bi_iocost_cost, &iocg->done_vtime);
+ }
+ 
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index c0d8d5f6bdba..7ad18a538d7e 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -590,8 +590,11 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	bool issue_as_root = bio_issue_as_root_blkg(bio);
+ 	int inflight = 0;
+ 
+-	blkg = bio_blkg(bio);
+-	if (!blkg || !bio_flagged(bio, BIO_QOS_THROTTLED))
++	if (!bio_flagged(bio, BIO_QOS_THROTTLED))
++		return;
++
++	blkg = bio_blkg_lookup(bio);
++	if (!blkg)
+ 		return;
+ 
+ 	iolat = blkg_to_lat(blkg);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 3fa3b13a410f..c0f945b8d941 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -848,7 +848,7 @@ static CLOSURE_CALLBACK(cached_dev_read_done)
+ 		s->iop.bio->bi_iter.bi_sector =
+ 			s->cache_miss->bi_iter.bi_sector;
+ 		s->iop.bio->bi_iter.bi_size = s->insert_bio_sectors << 9;
+-		bio_clone_blkg_association(s->iop.bio, s->cache_miss);
++		bio_clone_blkcg_association(s->iop.bio, s->cache_miss);
+ 		bch_bio_map(s->iop.bio, NULL);
+ 
+ 		bio_copy_data(s->cache_miss, s->iop.bio);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index d413bfaf3527..cd68eec77f5a 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1373,7 +1373,7 @@ void dm_submit_bio_remap(struct bio *clone, struct bio *tgt_clone)
+ 	if (!tgt_clone)
+ 		tgt_clone = clone;
+ 
+-	bio_clone_blkg_association(tgt_clone, io->orig_bio);
++	bio_clone_blkcg_association(tgt_clone, io->orig_bio);
+ 
+ 	/*
+ 	 * Account io->origin_bio to DM dev on behalf of target
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index d1465bcd86c8..af55f8efa46b 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -9355,7 +9355,7 @@ void md_submit_discard_bio(struct mddev *mddev, struct md_rdev *rdev,
+ 		return;
+ 
+ 	bio_chain(discard_bio, bio);
+-	bio_clone_blkg_association(discard_bio, bio);
++	bio_clone_blkcg_association(discard_bio, bio);
+ 	mddev_trace_remap(mddev, discard_bio, bio->bi_iter.bi_sector);
+ 	submit_bio_noacct(discard_bio);
+ }
+diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
+index 4176046627be..54e4adb0ccb7 100644
+--- a/drivers/nvdimm/nd_virtio.c
++++ b/drivers/nvdimm/nd_virtio.c
+@@ -121,7 +121,7 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+ 
+ 		if (!child)
+ 			return -ENOMEM;
+-		bio_clone_blkg_association(child, bio);
++		bio_clone_blkcg_association(child, bio);
+ 		child->bi_iter.bi_sector = -1;
+ 		bio_chain(child, bio);
+ 		submit_bio(child);
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index 6dabe73ad790..6512dbd9516f 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -484,7 +484,7 @@ static struct bio *gfs2_chain_bio(struct bio *prev, unsigned int nr_iovecs,
+ 	struct bio *new;
+ 
+ 	new = bio_alloc(prev->bi_bdev, nr_iovecs, opf, GFP_NOIO);
+-	bio_clone_blkg_association(new, prev);
++	bio_clone_blkcg_association(new, prev);
+ 	new->bi_iter.bi_sector = sector;
+ 	bio_chain(new, prev);
+ 	submit_bio(prev);
+@@ -1114,4 +1114,3 @@ const struct gfs2_log_operations *gfs2_log_ops[] = {
+ 	&gfs2_revoke_lops,
+ 	NULL,
+ };
+-
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index dc4baa3602b7..e5799fdf431d 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -503,28 +503,20 @@ static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
+ 	disk_devt((bio)->bi_bdev->bd_disk)
+ 
+ #ifdef CONFIG_BLK_CGROUP
+-static inline struct blkcg_gq *bio_blkg(struct bio *bio)
+-{
+-	return bio->bi_blkg;
+-}
+-
+-void bio_associate_blkg(struct bio *bio);
+-void bio_associate_blkg_from_css(struct bio *bio,
++void bio_associate_blkcg(struct bio *bio);
++void bio_associate_blkcg_from_css(struct bio *bio,
+ 				 struct cgroup_subsys_state *css);
+-void bio_clone_blkg_association(struct bio *dst, struct bio *src);
++void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
++void bio_put_blkg_ref(struct bio *bio);
+ void blkcg_punt_bio_submit(struct bio *bio);
+ #else	/* CONFIG_BLK_CGROUP */
+-static inline struct blkcg_gq *bio_blkg(struct bio *bio)
+-{
+-	return NULL;
+-}
+-
+-static inline void bio_associate_blkg(struct bio *bio) { }
+-static inline void bio_associate_blkg_from_css(struct bio *bio,
++static inline void bio_associate_blkcg(struct bio *bio) { }
++static inline void bio_associate_blkcg_from_css(struct bio *bio,
+ 					       struct cgroup_subsys_state *css)
+ { }
+-static inline void bio_clone_blkg_association(struct bio *dst,
++static inline void bio_clone_blkcg_association(struct bio *dst,
+ 					      struct bio *src) { }
++static inline void bio_put_blkg_ref(struct bio *bio) { }
+ static inline void blkcg_punt_bio_submit(struct bio *bio)
+ {
+ 	submit_bio(bio);
+@@ -534,10 +526,12 @@ static inline void blkcg_punt_bio_submit(struct bio *bio)
+ static inline void bio_set_dev(struct bio *bio, struct block_device *bdev)
+ {
+ 	bio_clear_flag(bio, BIO_REMAPPED);
+-	if (bio->bi_bdev != bdev)
++	if (bio->bi_bdev != bdev) {
++		bio_put_blkg_ref(bio);
+ 		bio_clear_flag(bio, BIO_BPS_THROTTLED);
++	}
+ 	bio->bi_bdev = bdev;
+-	bio_associate_blkg(bio);
++	bio_associate_blkcg(bio);
+ }
+ 
+ /*
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c..5f95c2e0e90b 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -246,12 +246,10 @@ struct bio {
+ 	void			*bi_private;
+ #ifdef CONFIG_BLK_CGROUP
+ 	/*
+-	 * Represents the association of the css and request_queue for the bio.
+-	 * If a bio goes direct to device, it will not have a blkg as it will
+-	 * not have a request_queue associated with it.  The reference is put
+-	 * on release of the bio.
++	 * Represents the blkcg css association for the bio.  The reference is
++	 * put on release of the bio.
+ 	 */
+-	struct blkcg_gq		*bi_blkg;
++	struct blkcg		*bi_blkcg;
+ 	/* Time that this bio was issued. */
+ 	u64			issue_time_ns;
+ #ifdef CONFIG_BLK_CGROUP_IOCOST
+@@ -309,6 +307,7 @@ enum {
+ 	BIO_TRACE_COMPLETION,	/* bio_endio() should trace the final completion
+ 				 * of this bio. */
+ 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
++	BIO_BLKG_REF,		/* bio pins the associated blkg */
+ 	BIO_QOS_THROTTLED,	/* bio went through rq_qos throttle path */
+ 	/*
+ 	 * This bio has completed bps throttling at the single tg granularity,
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index 62552a2ce5b9..4f869fe9cc90 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -262,7 +262,7 @@ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
+ 	 * regular writeback instead of writing things out itself.
+ 	 */
+ 	if (wbc->wb)
+-		bio_associate_blkg_from_css(bio, wbc->wb->blkcg_css);
++		bio_associate_blkcg_from_css(bio, wbc->wb->blkcg_css);
+ }
+ 
+ void inode_switch_wbs_work_fn(struct work_struct *work);
+diff --git a/mm/page_io.c b/mm/page_io.c
+index b23f494fcc83..112e50475605 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -316,7 +316,7 @@ static inline void count_swpout_vm_event(struct folio *folio)
+ }
+ 
+ #if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
+-static void bio_associate_blkg_from_page(struct bio *bio, struct folio *folio)
++static void bio_associate_blkcg_from_page(struct bio *bio, struct folio *folio)
+ {
+ 	struct cgroup_subsys_state *css;
+ 	struct mem_cgroup *memcg;
+@@ -331,12 +331,12 @@ static void bio_associate_blkg_from_page(struct bio *bio, struct folio *folio)
+ 		css = NULL;
+ 	rcu_read_unlock();
+ 
+-	bio_associate_blkg_from_css(bio, css);
++	bio_associate_blkcg_from_css(bio, css);
+ 	if (css)
+ 		css_put(css);
+ }
+ #else
+-#define bio_associate_blkg_from_page(bio, folio)		do { } while (0)
++#define bio_associate_blkcg_from_page(bio, folio)	do { } while (0)
+ #endif /* CONFIG_MEMCG && CONFIG_BLK_CGROUP */
+ 
+ struct swap_iocb {
+@@ -436,7 +436,7 @@ static void swap_writepage_bdev_sync(struct folio *folio,
+ 	bio.bi_iter.bi_sector = swap_folio_sector(folio);
+ 	bio_add_folio_nofail(&bio, folio, folio_size(folio), 0);
+ 
+-	bio_associate_blkg_from_page(&bio, folio);
++	bio_associate_blkcg_from_page(&bio, folio);
+ 	count_swpout_vm_event(folio);
+ 
+ 	folio_start_writeback(folio);
+@@ -456,7 +456,7 @@ static void swap_writepage_bdev_async(struct folio *folio,
+ 	bio->bi_end_io = end_swap_bio_write;
+ 	bio_add_folio_nofail(bio, folio, folio_size(folio), 0);
+ 
+-	bio_associate_blkg_from_page(bio, folio);
++	bio_associate_blkcg_from_page(bio, folio);
+ 	count_swpout_vm_event(folio);
+ 	folio_start_writeback(folio);
+ 	folio_unlock(folio);
+-- 
+2.51.0
 
