@@ -1,117 +1,113 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from va-2-51.ptr.blmpb.com (va-2-51.ptr.blmpb.com [209.127.231.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBD5330B0B
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2321A9F96
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785822532; cv=none; b=OSQkqL6P17BXG7bECP77JlTKF5VeHzONHTs42jOg3Y6LnvPRrzlWMJJEe/cOpGaQjdHUIX2A4OA5ebHXKkf/TQRsc/iuDbd2s9RQ+k2vLYHM0HaPXu/4NUqldbST2sNYZr88wskdkLTWL1bUH8TOB/rAry6mUsxAnkgM2eWbsvw=
+	t=1785822610; cv=none; b=txugSo+PhpdnInyjWwI8Jd5g0zYVPvPoJ9R3EiXoxNS2ZIb6fFYFUKmhNZKm1QlrmJfX/QlAirODqVUhGxXIMcXcu/Ro8Xx0GNGTjgmj9KpBiDqh4xbn9G7737FbomrFal6XP0xNX5dQWUYKtazjkP7OguoreyNPzgGCs9ifNw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785822532; c=relaxed/simple;
-	bh=sxFoyKksCsg3HT1PlhW8h6Lfy/Q/jixcDgP0/OOYbJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CkcfZP8eWkbeGft1XmnePFVOcg0TbItiW7kIWQVc4zHQyyNA54C5k2Ou414VR2PG52igNPigEFtDtrnPc2aZQsttuTH9PYC2EoY4cC0emcePTtqZemd2FgYXklwWqrktTum8biBe8bPaCo9/bYu1rKyWp9GSKMnR2nB/5uOxr5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CzSSG5ya; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785822610; c=relaxed/simple;
+	bh=setEX5VUZqq2mU00+0B4wqkLWq9dPw5V+xuu+oaTezU=;
+	h=Date:Content-Type:To:Cc:In-Reply-To:From:Subject:Message-Id:
+	 Mime-Version:References; b=cN+9Revf5IQW7ej31M4CC2hYpLvk1Einiw30eMEnF6xoAOQB9HrBM83OsjT1g2VmcHk55DnZQ2Y+c6adUaB9puAKF8xB4qlwGINz7+6WwvJI5kx5Wdpc1JyDIpX35lruPsxlcrwLZL9NMw+yZO2+SRXa6j56msmj52QvE/ijH8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=ZStOKxyp; arc=none smtp.client-ip=209.127.231.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CzSSG5ya"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-38dd55ad76cso644553a91.1
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 22:48:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785822531; x=1786427331; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=cKx66oI5obDqMQbX+S9eMb08Q3adMK8gfdU4AgEOKOQ=;
-        b=CzSSG5yamTM053ltu9h4NCb0xGXBXOVBbR61yrT4uYNyjRtQfoSka4MVenTcafa6xf
-         k8yEkWRrz/+zBbZQuR+ed5ncyCa1OsnOXGnb1AaDUIuWlDP5fpHoTcfjpslfidETEP6b
-         Nx+rMshpnFMm5xowYSNDk3bAji0W9hZaJxX3s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785822531; x=1786427331;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cKx66oI5obDqMQbX+S9eMb08Q3adMK8gfdU4AgEOKOQ=;
-        b=fQFdyIn9B2HUBdIo+fdvSZ1B1X1GOkUvHSOUELsyV7lbigfpsLkhb0RTwoGQY34K9n
-         spdRZ4gMI1pnAJUhlzsFAIeKVumU0WOQAAOHHEWp7pmSOhgpoVAnzD+2rTMeEhrAGSA9
-         eCRItmGsdBIb9kUEz4qS/hfFQR0ScqyMdkSCtLZ8Aidj1UWT/FX1Y1wimsFEaRFVjHnT
-         mEDCrgmvCzZRC9ta4FRDrp/q5FsRhvUxtGN8Za/7c6gci0sYlXyWcMIXtw0byyq38lDC
-         61EQE96H1kf2SllcIGS56rvvx+oSoOfNxSaem4unsWsgKYdwKRwbKR2HoXdntOIFfkxz
-         JuHQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpBejakxdsQb50fyhTO9O74r/4pgg2pkjKlAvBF82PU9IwgkXfFHU8lTYlMEsvsN6YnJJvWbOYmQS+djw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YygrXqmRNXpO0jX3WKz6KvQ1SUSQJ5NOw/5TkUFxl6UFClzs5j6
-	rFg/MEYNSZwFESmcEfC6Nchpt5ODyivIBUYNGpBjQT+mPlWOaky3ka83OpkfYDjeoYRVwqRI0FT
-	53OU=
-X-Gm-Gg: AR+sD13SERehibzy+ialuXKhdPuVM4Oe1sQ23QSLzkWlMqbOtmY+9789CLgwJF7Laom
-	5u7nWCEZ18XoWL9AuQo8XgtgVVXemkiVy21KaKIQWWsJkt52Fo+4D+gxQbmKdiC798esL/0G90N
-	DVEDImgbQ8BYcCZfXdM8VCB7OBAYRAWfxrSsWlk7kzRmnK8hEgzPEcmLrkmoGFaGvF1M64nZM8r
-	oLrSh7WyNgonw/0Mdi5W9UT0lm22RN1N8TnHuaDB1zqLQvYCtRQ5JYMWScjQy3hwkDzHkS2DXCQ
-	xKqE8MIujf7B1lS1aETM3IMzsNcGl2VfojcGsk0i9xXY2cuLwZqgnEORFmW43eYTXbQLVkqyCA9
-	lElb4GlehJKlTDPDKc61cRfROxq0yNBrXk9jB0ToG+NmE3l3cqYyFLuB37m3AFxz7gOuEMfhp7J
-	3wp3Pv1Sc1MPm+AfqBm+/wpeMalamrbQ8NHagB+uU64CuWFpjqRb4D7Y7Ve/4Hv+CGMD0CEhkii
-	uAANiuYkSFMFZKEzo3+2PuyrFv3
-X-Received: by 2002:a17:90b:4a4d:b0:384:927f:3db9 with SMTP id 98e67ed59e1d1-38febfcab02mr1689590a91.1.1785822530693;
-        Mon, 03 Aug 2026 22:48:50 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:fcb5:533d:198b:8d48])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38fedc650a0sm710924a91.14.2026.08.03.22.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 22:48:50 -0700 (PDT)
-Date: Tue, 4 Aug 2026 14:48:44 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH v5 3/4] zram: validate parameters in each backend's
- setup_params
-Message-ID: <anF8tcbifysw7v9_@google.com>
-References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-4-haoqinhuang7@gmail.com>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="ZStOKxyp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785822600;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=ZdMj9iR8e+/zdokJq2DgMHJ5s3j4S0Svxt7B4p4M8bs=;
+ b=ZStOKxypx/DD8l+L5oOrxxeGtjAowix5Rf9cX8hbh7y0jF60ao0loXShGxmA4+4U0T+8Yx
+ Qkf+EVpMI5fca4Ie1nkI+0dKV4CfbWn8+95ee+m0oiDQBl8obhfVqwetNAUadlbgcKNvyv
+ LNhi8EIrgcQwG5h7rz/hneefZrF4POAatbimik54r/aW1xJF8SQYTE5M1iivZwtsVly/VK
+ WNlKoQfpd04H6VKAKW937tFH9TjOCvlPzOkpf4VqbY3Qjmr8zJUvJPbcJtHbFGUpY95LuH
+ 2VHqBjtmaiKPsjRNsmHi0Aha+edAD37OKvtmUQ4xn96633cBij/VQseqOdtCZQ==
+Date: Tue, 4 Aug 2026 13:49:46 +0800
+X-Original-From: Coly Li <colyli@fygo.io>
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
+Content-Type: text/plain; charset=UTF-8
+To: "Ramesh Adhikari" <adhikari.resume@gmail.com>
+Cc: <axboe@kernel.dk>, <gregkh@linuxfoundation.org>, 
+	<linux-block@vger.kernel.org>, <stable@vger.kernel.org>
+In-Reply-To: <CAC-THR8O=g=566evNCA-fmiprLaCL2f15w3dEjz8MSgAG4cMRw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Received: from smtpclient.apple ([120.245.64.97]) by smtp.larksuite.com with ESMTPS; Tue, 04 Aug 2026 05:49:59 +0000
+From: "Coly Li" <colyli@fygo.io>
+Subject: Re: [PATCH v7 0/2] badblocks: fix rounding bug and validate input range
+Message-Id: <FB5BB136-7491-4B3A-AFA4-D56CAED8F9C6@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260803141256.60599-4-haoqinhuang7@gmail.com>
+Mime-Version: 1.0
+X-Lms-Return-Path: <lba+26a717d88+433ad5+vger.kernel.org+colyli@fygo.io>
+References: <20260709131904.596684-3-adhikari.resume@gmail.com> <20260721164027.637078-1-adhikari.resume@gmail.com> <CAC-THR8O=g=566evNCA-fmiprLaCL2f15w3dEjz8MSgAG4cMRw@mail.gmail.com>
 
-On (26/08/03 22:12), Haoqin Huang wrote:
-[..]
->  static int setup_params_842(struct zcomp_params *params)
->  {
-> +	if (params->dict_sz) {
-> +		pr_err("842: dictionary is not supported\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +	if (params->level != ZCOMP_PARAM_NOT_SET) {
-> +		pr_err("842: compression level is not supported\n");
-> +		return -EOPNOTSUPP;
-> +	}
->  	return 0;
->  }
-[..]
->  static int deflate_setup_params(struct zcomp_params *params)
->  {
-> +	if (params->dict_sz) {
-> +		pr_err("deflate: dictionary is not supported\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->  	if (params->level == ZCOMP_PARAM_NOT_SET)
->  		params->level = Z_DEFAULT_COMPRESSION;
-> +	else if (params->level < Z_DEFAULT_COMPRESSION ||
-> +		 params->level > Z_BEST_COMPRESSION) {
-> +		pr_err("deflate: invalid compression level %d\n", params->level);
-> +		return -EINVAL;
-> +	}
+Hi Ramesh,
 
-This is purely optional, if you add per-backend pr_fmt() with backend
-name e.g. "zstd:","lz4:" and so on (in a separate patch) then you don't
-need to explicitly prefix every pr_err().
+I will review the 2nd patch soon.
+
+Thanks.
+
+Coly Li
+
+> 2026=E5=B9=B48=E6=9C=884=E6=97=A5 13:41=EF=BC=8CRamesh Adhikari <adhikari=
+.resume@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> Hi Jens, Coly,
+>=20
+> Gentle ping on this series. Patch 1/2 has Coly's Reviewed-by, and
+> both patches address:
+>=20
+> - an RCU stall / kernel hang reachable via the nvdimm ioctl path
+>  (badblocks_check() looping with a non-advancing cursor)
+> - a 32-bit (arm/i386) build break from 64-bit division helpers,
+>  reported by the kernel test robot
+>=20
+> Both are tagged Fixes: and Cc: stable, so happy to resend or rebase
+> if anything's needed on my end  just let me know.
+>=20
+> Thanks,
+> Ramesh
+>=20
+> On Tue, Jul 21, 2026 at 10:11=E2=80=AFPM Ramesh Adhikari
+> <adhikari.resume@gmail.com> wrote:
+>>=20
+>> Two related fixes to block/badblocks.c:
+>>=20
+>> Patch 1/2 fixes the actual reported bug: round_up()/round_down() don't
+>> modify their argument in place, they return the rounded value, and the
+>> callers in _badblocks_set()/_badblocks_clear()/badblocks_check() were
+>> discarding that return value. Depending on caller alignment this could
+>> leave sectors unrounded or, in the reported case, stall the CPU with a
+>> non-advancing cursor when reached via the nvdimm ioctl path. It also
+>> fixes a 32-bit build breakage reported by kernel test robot, since the
+>> old rounddown()/roundup() macros pull in 64-bit division helpers not
+>> linked on 32-bit builds. Unchanged since v6.
+>>=20
+>> Patch 2/2 hardens the same three functions against the input-range and
+>> shift edge cases the round_up/round_down fix exposed: s + sectors
+>> overflow, and rounding itself wrapping past ULLONG_MAX. Revised in v7
+>> per Coly's review of v6 =E2=80=94 see the changelog in that patch for de=
+tails.
+>> The remaining open item, bounding bb->shift where it's populated from
+>> the on-disk MD superblock in drivers/md/md.c, is being sent separately
+>> since it's a different file and a different root cause (missing input
+>> validation, not a rounding bug).
+>>=20
+>> Ramesh Adhikari (2):
+>>  badblocks: fix in-place round_up/round_down usage bug
+>>  badblocks: validate sector range and shift before rounding
+>>=20
+>> block/badblocks.c         | 40 ++++++++++++++++++++++++++++++++-------
+>> include/linux/badblocks.h |  6 +++++-
+>> 2 files changed, 38 insertions(+), 8 deletions(-)
+>>=20
+>> --
+>> 2.43.0
+>>
