@@ -1,27 +1,26 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8402642A7AF
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 08:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A8A41E6A8
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 08:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785833340; cv=none; b=qrLzMUqxNSdKO4vDzNF2NR5DBsO4XM9OCdVji+n1R3alWoRhDO81rBhrWigSsOB7zY6iiuaN77xosbkTUqKsJefrfXqoOa71iMoLl8Jd1sZshfDptuSSM7NcCMYZOftbgUXqiJm7WLiAVk4jrY50yvnsx439yJZNyXd9jwzhUH8=
+	t=1785833340; cv=none; b=uUnODJxenrR6XJz78TnVwyTF4Nu4ZrLftKx8ZU2VKRvgszHhjnXRlmmJoXCd1a+MvBXIsytEpkPRlxDW9zZ/Nhkxhp+Va53T/hQPlnqnJxUu9ESJqVBh0ts5gcn+nVIzOQL3g0zmSXdykFSd3MPUZpUOvIho/zNIKFWgX/brwnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785833340; c=relaxed/simple;
-	bh=fVD1L8jqoB1IdJi+m2z92qmKK3p9EosAYuIm0kDSfVY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XFQGE5gD2Ig45uK+KDDNlnlG9qSoaFbfDSCrYGvnjTNF6ODx5BPji25jRHQ/NJB8jHWZGm6ly417OWMOWNi9Ao/MlKfwRuyGJh94NIIBsVoivO9Ain01AvcEK9lG8kkSpxEoSwm02sbEjssAh8YU3LEJM4pM5hzf5PxC7lZLZs0=
+	bh=AD5qyR3wOXQhlR+fKMAnX6/bgFIXObOVwWP7vpAwenc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S7Hkll6OyNT+W1dl9gJSpiH9eNDpcTBAEO8AXgbHqV0zu7K3UofxZwB03nSbUBtomxcGvVPUcrlsSAE/oCYFWAemyESa/M+4u1fA66gFb55drmQ2nUU/Jb0odufdKGRxizd4cHUySqtCgiXL823RzJ3rE+ehAWw2/hPMwijVA/w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hDnHc6JKlzYQv73
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hDnHc5113zYQv3d
 	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 16:47:56 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id E8A2040592
+	by mail.maildlp.com (Postfix) with ESMTP id BCD2340A87
 	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 16:48:47 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgD35kVrp3Fq71VIBA--.52677S7;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgD35kVrp3Fq71VIBA--.52677S4;
 	Tue, 04 Aug 2026 16:48:47 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,12 +36,10 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v6 3/8] nbd: clear queue limits on disconnect
-Date: Tue,  4 Aug 2026 16:39:17 +0800
-Message-ID: <20260804083922.1927105-4-yangerkun@huawei.com>
+Subject: [PATCH v6 0/8] nbd: eliminate queue freeze/unfreeze overhead in connection setup
+Date: Tue,  4 Aug 2026 16:39:14 +0800
+Message-ID: <20260804083922.1927105-1-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260804083922.1927105-1-yangerkun@huawei.com>
-References: <20260804083922.1927105-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,117 +47,85 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgD35kVrp3Fq71VIBA--.52677S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxZr4UGw1rWFy7uryruF1xXwb_yoWrXFyUpa
-	17C3W7KayrtF47Aa1rWrWUZF45K34kC34I9Fy7Ga45ZwsYkw1SyF9Iy34fJFy8JF9rZa15
-	Ga9YkF92yryku37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
-	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
-	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
-	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
-	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr
-	0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUv
-	cSsGvfC2KfnxnUUI43ZEXa7IU14CJPUUUUU==
+X-CM-TRANSID:_Ch0CgD35kVrp3Fq71VIBA--.52677S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFyxArWkJrWDXw48Gr4xCrg_yoW8Cw15pF
+	WfKFy3Kr40qF43XrsxZw18W3WYqw4kCr9xGF17J340kF1Yka4vqFWIv34Fyay7Ar9a9w12
+	va1YqrZ7Cayj9FJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9qb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I
+	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
+	GVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
+	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
+	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJbIYCTnIWIevJa73UjIFyTuYvjxUF0PfDUUUU
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-An inactive nbd device may refuse any I/O operations. The nbd_config_put
-function calls invalidate_disk, which sets the device capacity to zero
-to reject all read and write I/O. For zero-sector flush I/O requests
-from blkdev_issue_flush, if the write cache is disabled, the zero-sector
-flush I/O immediately returns 0 in submit_bio_noacct. However, since
-nbd_config_put does not clear the write cache state, an inactive nbd
-device might still have the write cache enabled. In this situation,
-zero-sector flush I/O will return -EIO because there is no active socket.
-Additionally, BLK_FEAT_FUA and BLK_FEAT_ROTATIONAL flags may also remain
-stale, resetting all of them ensures consistent behavior.
+This series eliminates the blk_mq_freeze_queue()/unfreeze_queue()
+overhead that currently occurs during nbd connection setup(nbd provide
+ondemand and was using in AI sandbox e2b[1] to mount and attach rootfs).
+Each freeze cycle will introduce a RCU grace which was significant
+with multi-core system.
 
-The limits update uses queue_limits_commit_update() (the non-freezing
-variant) because config_refs == 0 here means every fd is closed and recv
-threads have drained, so no in-flight I/O can read q->limits concurrently.
+time nbd-client --name myexport --connections 96 127.0.0.1 1234
 
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
----
- drivers/block/nbd.c | 43 ++++++++++++++++++++++++++-----------------
- 1 file changed, 26 insertions(+), 17 deletions(-)
+After this patchset:
+real    0m0.090s
+user    0m0.004s
+sys     0m0.018s
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7ec85f94f742..45e58191c5d7 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -331,6 +331,26 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
- 	nsock->sent = 0;
- }
- 
-+static void nbd_apply_limits(struct queue_limits *lim, u32 flags)
-+{
-+	lim->features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA | BLK_FEAT_ROTATIONAL);
-+	lim->max_hw_discard_sectors = 0;
-+	lim->max_write_zeroes_sectors = 0;
-+
-+	if (flags & NBD_FLAG_SEND_TRIM)
-+		lim->max_hw_discard_sectors = UINT_MAX << SECTOR_SHIFT;
-+	if (flags & NBD_FLAG_SEND_FLUSH) {
-+		lim->features |= BLK_FEAT_WRITE_CACHE;
-+		if (flags & NBD_FLAG_SEND_FUA)
-+			lim->features |= BLK_FEAT_FUA;
-+	}
-+
-+	if (flags & NBD_FLAG_ROTATIONAL)
-+		lim->features |= BLK_FEAT_ROTATIONAL;
-+	if (flags & NBD_FLAG_SEND_WRITE_ZEROES)
-+		lim->max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
-+}
-+
- static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
- {
- 	struct queue_limits lim;
-@@ -352,23 +372,7 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
- 		return 0;
- 
- 	lim = queue_limits_start_update(nbd->disk->queue);
--	if (nbd->config->flags & NBD_FLAG_SEND_TRIM)
--		lim.max_hw_discard_sectors = UINT_MAX >> SECTOR_SHIFT;
--	else
--		lim.max_hw_discard_sectors = 0;
--	if (!(nbd->config->flags & NBD_FLAG_SEND_FLUSH)) {
--		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
--	} else if (nbd->config->flags & NBD_FLAG_SEND_FUA) {
--		lim.features |= BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA;
--	} else {
--		lim.features |= BLK_FEAT_WRITE_CACHE;
--		lim.features &= ~BLK_FEAT_FUA;
--	}
--	if (nbd->config->flags & NBD_FLAG_ROTATIONAL)
--		lim.features |= BLK_FEAT_ROTATIONAL;
--	if (nbd->config->flags & NBD_FLAG_SEND_WRITE_ZEROES)
--		lim.max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
--
-+	nbd_apply_limits(&lim, nbd->config->flags);
- 	lim.logical_block_size = blksize;
- 	lim.physical_block_size = blksize;
- 	error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
-@@ -1469,8 +1473,13 @@ static void nbd_config_put(struct nbd_device *nbd)
- 	if (refcount_dec_and_mutex_lock(&nbd->config_refs,
- 					&nbd->config_lock)) {
- 		struct nbd_config *config = nbd->config;
-+		struct queue_limits lim;
- 		nbd_dev_dbg_close(nbd);
- 		invalidate_disk(nbd->disk);
-+		/* reset queue limits to default */
-+		lim = queue_limits_start_update(nbd->disk->queue);
-+		nbd_apply_limits(&lim, 0);
-+		queue_limits_commit_update(nbd->disk->queue, &lim);
- 		if (nbd->config->bytesize)
- 			kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
- 		if (test_and_clear_bit(NBD_RT_HAS_PID_FILE,
+Without this patchset:
+real    0m2.195s
+user    0m0.005s
+sys     0m0.022s
+
+v5->v6:
+1. patch 3, reset stale FEAT*, not only write cache
+2. patch 5, using the way Kuai advise to skip freeze
+3. patch 6, adopt kuai's suggestion
+4. patch 8, rename nr_hw_queues and add some comments
+
+v4->v5:
+1. add patch 3 to reset write cache on disconnect
+2. fix ("nbd: factor out a nbd_genl_foreach_sock")
+
+v3->v4:
+1. factor out nbd_genl_foreach_sock to cleanup duplicated code
+2. rewrite some commit message to make what's going more clearly
+
+v2->v3:
+1. Stop using xarray, and protect it by rejecting late NBD_SET_SOCKS
+2. Eliminate freeze in nbd_set_size when device setup
+3. Add module parameter to eliminate freeze for pre-created device
+
+v1->v2:
+1. Rewrite cover letter
+2. Eliminate freeze call from blk_mq_update_nr_hw_queues in
+   nbd_start_device for netlink path
+
+
+Long Li (1):
+  nbd: simplify find_fallback() by removing redundant logic
+
+Yang Erkun (7):
+  nbd: disallow NBD_SET_SOCK on an active device
+  nbd: clear queue limits on disconnect
+  nbd: remove queue freeze in nbd_add_socket
+  nbd: skip queue freeze when setting size at device startup
+  nbd: factor out a nbd_genl_foreach_sock
+  nbd: remove queue freeze for newly created nbd from netlink path
+  nbd: add pre_defined_connections module parameter for pre-created
+    devices
+
+ drivers/block/nbd.c | 255 +++++++++++++++++++++++---------------------
+ 1 file changed, 136 insertions(+), 119 deletions(-)
+
 -- 
 2.52.0
 
