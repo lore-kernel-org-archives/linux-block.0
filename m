@@ -1,202 +1,114 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f4.google.com (mail-oo2-f4.google.com [74.125.231.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F65D3DC87A
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 12:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2663E44F0
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 13:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785848287; cv=none; b=CuGE4X20ttKgao66CSJQ7g0k2/Q6Pju/euHbFVSSaqBY+sbQ9txKVII1rvE00+gm0uqwuZHq72JEoUapfywDBPRJOvt9u+eNRv52/Lqfr0DOO6+dNX/bahc5xkLSTO6b63IhEwdU91nMEbdWtc2Fjft9ajltWRiiGQfJTKnaBio=
+	t=1785848421; cv=none; b=HOu2n8hKNsWmujvro6C6QmvdnXSdnCNN0QiYYQbk+LJAoR6QyjzLf5HdOrYXpyEZew+dntw89I6hVV+g4zO+fz6nZuoOsQJjE7MVbsf03ToNemiUdtbFrpMPIMDmJVxHapWkXr3akWoIhbX8hHTbR/C6ZSbe+lfMnoe8PHUFUOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785848287; c=relaxed/simple;
-	bh=gjkD20a30W3BdUIrpM0P5+ypCIkdEKOWXhz7PqeBvbI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RphFDzCuIC3XWhU15KR2vw9Bquc+84UMHsTWke3uGT0ZUUmEnqqU1Q6tCz7elsKx4upR1RCVJ4onyQ9R/ejpcqZLOV2/eK7L/+Xn8qN92UdprPRqGF+xmaBXyEqAtfbH+x4ZN4sM4IISMOOgCb2vMQKyTOG1R0iArhWeJW/wVIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 17ea3186900411f1aa26b74ffac11d73-20260804
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
-	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:409e89c0-317e-480c-8f55-860c7aaa9fa8,IP:10,
-	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:30
-X-CID-INFO: VERSION:1.3.12,REQID:409e89c0-317e-480c-8f55-860c7aaa9fa8,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:30
-X-CID-META: VersionHash:e7bac3a,CLOUDID:ae8c97d57958c40ca2212b39014dd110,BulkI
-	D:260804205752U3O34YN3,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|136
-	|850|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk
-	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
-	BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 17ea3186900411f1aa26b74ffac11d73-20260804
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1657834874; Tue, 04 Aug 2026 20:57:48 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: tom.leiming@gmail.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Yao Sang <sangyao@kylinos.cn>
-Subject: [PATCH] ublk: avoid teardown retry loop on xarray allocation failure
-Date: Tue,  4 Aug 2026 20:57:36 +0800
-Message-Id: <20260804125736.2011774-1-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1785848421; c=relaxed/simple;
+	bh=XLRSb6L6okHQBaejlEPLkXThc9+M67XMopiLNGrZd8c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P5287ODu4/k1SZvas6NhUat2xnV550Sswp01D3gCaRKdmhfje9FOQebJi+oj56TCmaqH1aLRZ8dZm3hqXn9B5ZP6+rIngXIri7sHrVmimYaNkeDs2CtiDXCIy/1f+g7lKLMntwJb940xlzl5eoW2YgfpOuyw5j4LWvNZxZnE3sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Z5dQJIWD; arc=none smtp.client-ip=74.125.231.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Z5dQJIWD"
+Received: by mail-oo2-f4.google.com with SMTP id 46e09a7af769-7e9f9a3167aso1500892a34.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 06:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1785848418; x=1786453218; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9XZ/r2/VyuSPo973uko6yyIonoRUHPTACZI/0tixoT0=;
+        b=Z5dQJIWDb0gCmH0HHVCj+/FK/GD1+fJb2sAMfRXvNV6qr1YFuHe3Do9C4LGYwVX4iG
+         Yg71ojJzF3Ck653DSAj0e2X+cotlX/6b8am7IDFza+z8VhuucNr2D7IulvHr/3lMwos9
+         JHOt3UZmIpDrrINRHcasKmEjdWdIPe3s22QNiaOsbDlBxeyYpAN8fpQd6BcAEIjDbUlO
+         GK7pJvmdvd84poTZtxCWxAfKUbj9NcX/Vzpp+Q6irjoIg1d7jnxNlQdA5DiEH22cIRTj
+         8AGBFqqZoiJhSg0/iljy01sIhx43lDDVO0DVnFhgsyY4FmxUJSX6KsXCKbS+1xV+GOuQ
+         LFhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785848418; x=1786453218;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=9XZ/r2/VyuSPo973uko6yyIonoRUHPTACZI/0tixoT0=;
+        b=XRvuqNumNgELXClPw/lXUQ0XXRYSBggL1ipGQxwzSkO3pqmu1/iCO9i6wE7PvZCoFr
+         A9QF0PWle/9q0STRQOYoNRL0kbzCOH8jSwJJ3YJZ2ePz1YbsyCXy04FqdFQvkC0Jrn0S
+         TRpWUmzYNCbYzyLI8ayre0pS34FHZ+4tOK8+E/T+X1ekRXLZxJFkw004SfZGW2oApjng
+         BMukfPiGbrSylGiK8lH/7WXIKFS9XOaidnEDhZB/YrL8+J47o5nMa5gPjUSolkSWdVGz
+         7FFHzZUtZbns5eXs6mKOVuptkX1Nat5GVjqBT+3o+mEHBGGmxUrRsaD80ju9W/9DHZeN
+         cz6A==
+X-Forwarded-Encrypted: i=1; AHgh+RphTqFG4/JYc70CiofyBH7hcNReCEa5TXja7r6w2hfm4I6kQKwpZ8NDcBK0hv7XB4HcLt+EUH2e0+fSHw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz60ub/Qv7SVYkmLl57NT/78YHnpmCmggZzGWz0Ev8UrCXakbLo
+	A552SLmlQuLiadr8B0zclNwud3SdO5LsRQRAFiB70aqVmqIFCUkY2CcPy/L0ilZB7gs=
+X-Gm-Gg: AR+sD130Rtz2e/mHPuvRkpy/rj+NRstb9j41X6foE5qWg/lNGUaK3sWGqVdutYVjWyN
+	jzslEM3AzMvLZrYtYeSqegrWVLWbncmB8HrKCVlx9W075GR2pPDwMABSltNjjdoBfkzi6QcpIhA
+	w0hMbWfiVXd1ujKkWdHLuF2J75huNboJuB1YwR25fCrKuvtjWM+z5CjK52e2KZzwz+95kFwDpwF
+	2hBoa8ifzfLyaizrKJC9Y4ex/AjYo1X+3mFjCRoJFpcftVIKI65U7O4Juau/MQeU/QDf0RfJXIf
+	R/Yzf4QDYkhappUtzns/f19TEpY5dSFLoJ0KZNoa5DZIzkvK6Dtsml2joYpRyvEy5QQMoMNGnJD
+	QsWwrTWGfRffSuhZCsUG6lpjWnhzth/RMfm0WanYVB6JmqOlXrQ3e6cX6QgSx3fOJU82qbbuU9P
+	KAYFqtAyUnr5/MwQ+mYpqYem8Lx2xH+zMkSXwIQE08k/FDpBy5J0DT2RcE9Z7JHQ8hHPBZVOcW3
+	iOozDuASvTCTnCZDvX82FC9xhkgMiruNRIJ+3fS6vazwtQ=
+X-Received: by 2002:a05:6830:3498:b0:7dc:e37b:b5d3 with SMTP id 46e09a7af769-7f196c0a081mr23593639a34.7.1785848417733;
+        Tue, 04 Aug 2026 06:00:17 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f1df2fd101sm724604a34.2.2026.08.04.06.00.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2026 06:00:17 -0700 (PDT)
+Message-ID: <b0c53f03-6386-4d36-b7dc-28df02ce71b4@kernel.dk>
+Date: Tue, 4 Aug 2026 07:00:15 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests: ublk: add rotating auto_buf index regression
+ test
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Cc: tom.leiming@gmail.com, csander@purestorage.com, shuah@kernel.org,
+ linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260730024050.1062354-1-yangxiuwei@kylinos.cn>
+ <178581121634.578215.15829017092257405641.b4-ty@b4>
+ <20260804063201.3740465-1-yangxiuwei@kylinos.cn>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260804063201.3740465-1-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-__ublk_shmem_remove_ranges() removes matching maple tree ranges in
-batches, but first stores each range into a temporary xarray so that the
-pages can be unpinned after dropping the maple tree lock.
+On 8/4/26 12:32 AM, Yang Xiuwei wrote:
+> Hi Jens,
+> 
+> On Mon, Aug 03, 2026 at 08:40:16PM -0600, Jens Axboe wrote:
+>> Applied, thanks!
+>>
+>> [1/1] selftests: ublk: add rotating auto_buf index regression test
+>>       commit: d507d3cb19e71f10336e41deeac517cdc21c34ea
+> 
+> Thanks for picking this up, and also patch 1/2 of the driver series.
+> 
+> I notice for-7.3/block is still missing patch 2/2:
+> 
+>   ublk: clear auto buf reg before updating io->buf in batch commit
+> 
+> The rotating-index selftest depends on that clear-before-store fix.
+> Could you please pick up 2/2 as well? It already has Ming's Reviewed-by.
+> 
+> https://lore.kernel.org/linux-block/20260730010910.799346-3-yangxiuwei@kylinos.cn/
 
-That temporary xarray is filled under the maple tree lock with
-xa_store(..., GFP_ATOMIC). If the store fails before mas_erase(), the
-current range is left in the tree and the helper returns false. The
-outer ublk_shmem_remove_ranges() loop then immediately retries the same
-range. While the atomic allocation keeps failing, the teardown path has
-no forward progress.
+It's because your postings end up being broken, I had to explicitly grab
+1/2 of this series too (which is why the reply looks odd.
 
-The issue can be reproduced with radix_tree_node failslab injection after
-a SHMEM_ZC buffer has already been registered:
+Added manually now.
 
-  # Kernel config:
-  #   CONFIG_BLK_DEV_UBLK=y
-  #   CONFIG_DEBUG_FS=y
-  #   CONFIG_FAULT_INJECTION=y
-  #   CONFIG_FAULT_INJECTION_DEBUG_FS=y
-  #   CONFIG_FAILSLAB=y
-
-  echo 10 > /proc/sys/vm/nr_hugepages
-  mkdir -p /tmp/htlb
-  mount -t hugetlbfs none /tmp/htlb
-  fallocate -l 4M /tmp/htlb/ublk_buf
-
-  dev_id=$(kublk add -t null --shmem_zc \
-		--htlb /tmp/htlb/ublk_buf |
-	   awk -F '[ :]' '/dev id/ {print $3}')
-
-  echo 1 > /sys/kernel/slab/radix_tree_node/failslab
-  echo Y > /sys/kernel/debug/failslab/cache-filter
-  echo Y > /sys/kernel/debug/failslab/ignore-gfp-wait
-  echo 1 > /sys/kernel/debug/failslab/interval
-  echo -1 > /sys/kernel/debug/failslab/times
-  echo 100 > /sys/kernel/debug/failslab/probability
-
-  kublk del -n "$dev_id"
-
-On the unfixed kernel the delete command was still running after 3
-seconds. Disabling failslab made it return. The fault-injection stack
-showed:
-
-  should_failslab
-  kmem_cache_alloc_lru_noprof
-  __xas_nomem
-  __xa_store
-  xa_store
-  __ublk_shmem_remove_ranges
-  ublk_cdev_rel
-  ublk_ctrl_del_dev
-
-Remove the allocation from the teardown loop. Keep the existing batch
-limit, but collect {base_pfn, nr_pages} pairs in a fixed-size stack array.
-Once a matching range is found, the range is erased from the maple tree
-before dropping the lock, so each successful scan makes progress without
-depending on any GFP_ATOMIC allocation.
-
-With the same failslab settings, the fixed kernel completed
-"kublk del -n $dev_id" successfully in about 45 ms.
-
-Fixes: 309e02dccf64 ("ublk: avoid unpinning pages under maple tree spinlock")
-Signed-off-by: Yao Sang <sangyao@kylinos.cn>
----
- drivers/block/ublk_drv.c | 31 ++++++++++++++-----------------
- 1 file changed, 14 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 66f10a49509f..00a661146243 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -5519,39 +5519,36 @@ static void ublk_unpin_range_pages(unsigned long base_pfn,
- 
- /*
-  * Inner loop: erase up to UBLK_REMOVE_BATCH matching ranges under
-- * mas_lock, collecting them into an xarray. Then drop the lock and
-- * unpin pages + free ranges outside spinlock context.
-+ * mas_lock, collecting the page ranges in a fixed-size array. Then
-+ * drop the lock and unpin pages + free ranges outside spinlock context.
-  *
-  * Returns true if the tree walk completed, false if more ranges remain.
-- * Xarray key is the base PFN, value encodes nr_pages via xa_mk_value().
-  */
- #define UBLK_REMOVE_BATCH	64
- 
-+struct ublk_unpin_range {
-+	unsigned long base_pfn;
-+	unsigned long nr_pages;
-+};
-+
- static bool __ublk_shmem_remove_ranges(struct ublk_device *ub,
- 					int buf_index, int *ret)
- {
- 	MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
- 	struct ublk_buf_range *range;
--	struct xarray to_unpin;
--	unsigned long idx;
-+	struct ublk_unpin_range to_unpin[UBLK_REMOVE_BATCH];
- 	unsigned int count = 0;
-+	unsigned int i;
- 	bool done = false;
--	void *entry;
--
--	xa_init(&to_unpin);
- 
- 	mas_lock(&mas);
- 	mas_for_each(&mas, range, ULONG_MAX) {
--		unsigned long nr;
--
- 		if (buf_index >= 0 && range->buf_index != buf_index)
- 			continue;
- 
- 		*ret = 0;
--		nr = mas.last - mas.index + 1;
--		if (xa_err(xa_store(&to_unpin, mas.index,
--				    xa_mk_value(nr), GFP_ATOMIC)))
--			goto unlock;
-+		to_unpin[count].base_pfn = mas.index;
-+		to_unpin[count].nr_pages = mas.last - mas.index + 1;
- 		mas_erase(&mas);
- 		kfree(range);
- 		if (++count >= UBLK_REMOVE_BATCH)
-@@ -5561,9 +5558,9 @@ static bool __ublk_shmem_remove_ranges(struct ublk_device *ub,
- unlock:
- 	mas_unlock(&mas);
- 
--	xa_for_each(&to_unpin, idx, entry)
--		ublk_unpin_range_pages(idx, xa_to_value(entry));
--	xa_destroy(&to_unpin);
-+	for (i = 0; i < count; i++)
-+		ublk_unpin_range_pages(to_unpin[i].base_pfn,
-+				       to_unpin[i].nr_pages);
- 
- 	return done;
- }
 -- 
-2.25.1
+Jens Axboe
 
