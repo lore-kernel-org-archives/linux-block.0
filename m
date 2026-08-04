@@ -1,92 +1,118 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EE435C193;
-	Tue,  4 Aug 2026 03:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DFA3ED3CA;
+	Tue,  4 Aug 2026 03:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785812677; cv=none; b=p7U0h0JidFw2YRL8vDNTpI5gDT8ToaeVE9dNkOacGzcEEr5gOf4qpceW89NexKtjCfhlBUpCd9I7rPD8JxxY05zvK/ledbbbRKsJfYg0Nl0n3yqqrAs3qaMgA2EttaitANuRz0th3yoflg1N0IyT1rrRV5RkxLhsO445IYhpibs=
+	t=1785814958; cv=none; b=QsyEBVBpCV6heJ3kwzdH9BCcwkM7iqVcWpCevkJzchciope3ojX3elcTYdybt98k0bDlkDcQfNidZ+2TtTmwXnoP5xueZ0L8BlfPwvqbyjieuqcsAd/c9JeslISrlU13HCZs+NgWtrOdf2gWXLQt2BitfXsRWrUZBxVmWu9aLns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785812677; c=relaxed/simple;
-	bh=kRFK7580e1CcIoU2822dEAp+Pcu/IXB7M3lmZ6scRr4=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DleZf0AmFNPdtpW3OG68uoTCmXaCJtUYSzH4Wa+ywnAoc6ECRwiOVt4Iv8b6OaJoINOj0h2GEfqHKzgoRd5a2kLTlCPEb3FtgiwIX2zpf9arnTgJms9Dpaeoy+kNfjRusLJ3aDIOTq+TrtNfaZt2//8QnZ3FPk5BSTl4/YN0C58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c/o3e5sB; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785814958; c=relaxed/simple;
+	bh=LzhjBNRML2rvdGmtYckjNRqZvdFukhnA3bPTncSsrG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cbLditCc4g1y9wcggfXrhfMYLM8xUeR/MjKSFivL1oe5i4J0Crwlb89sKuv+6cVRHncbsgz/Vv5V+0MmkRdQ6Za83LW9pjGEfJWCsoE+HtfspIxFOloTIANucuNQycpcOAes65VhJyEUWnMrcO87BSc70CzXJijkRoW4lOeu6/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=FwWJi1gj; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c/o3e5sB"
-Message-ID: <1fab77c9-517f-4bc2-946b-faaa3c4c657c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785812663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iHxk3Q7e4n4R4q2FXGesDSAwgXhh1lLUhZaLTjv1OAs=;
-	b=c/o3e5sBL6TgQJotiM9v4T+6iJOpAlfli95axyGN4uqQc10MvYFSLThSe9JQbCa+US7OSe
-	lifgMm97M7RFlqjh87LHGHaleD3N7/F2Gdf6iAbi/Mbmp41XfJVoXy5br4gqFTxy8zWCiJ
-	hw9AGdL1tykL6EmP7P23QED9GPhUyng=
-Date: Tue, 4 Aug 2026 11:04:10 +0800
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="FwWJi1gj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1785814917;
+	bh=Z4yQEQFXFRJNBAaK94dLNr5B7DXT4Gto84Nxkf0fkCc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=FwWJi1gjFZ8vZpQb4uzCE2vv+jB+0+/aX1mBxjZSKcCeVILqhSh2stB9JL7feRwSe
+	 3AIWbsvfq0wM+YgCEC0XnUi/jvubJ1kA5GEIuaaamGX+ARxfA1bFE24P2o+KPW8dS5
+	 oOO3WpZGo7hneXg70W0TmrDDzExWWG2PmSBTJONk=
+X-QQ-mid: esmtpsz21t1785814900t47a0c24b
+X-QQ-Originating-IP: 9vkOhPgYsB97kQ24m2OnD9TrnPmOI1Of/w7rjYN1nMo=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 04 Aug 2026 11:41:38 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6654981945826137558
+EX-QQ-RecipientCnt: 7
+From: raoxu <raoxu@uniontech.com>
+To: dlemoal@kernel.org
+Cc: axboe@kernel.dk,
+	hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	raoxu@uniontech.com,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Documentation: block: zloop: clarify capacity alignment
+Date: Tue,  4 Aug 2026 11:41:21 +0800
+Message-ID: <8100621B7A58105B+20260804034121.1036479-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <0be2d538-8e18-45ad-9181-f7e3fb7e02ed@kernel.org>
+References: <0be2d538-8e18-45ad-9181-f7e3fb7e02ed@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Cc: cui.tao@linux.dev, axboe@kernel.dk, josef@toxicpanda.com,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH v2] block/blk-iocost: read ioc_pd_stat params inside
- ioc->lock
-To: Tejun Heo <tj@kernel.org>
-References: <20260803132201.135355-1-cui.tao@linux.dev>
- <anDGH6An5b_HI8pj@slm.duckdns.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <anDGH6An5b_HI8pj@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MMwjR1C73eIs7bLdl6V6vVajvobjZOUbIRyVqhkmNC8tYrzwYxCAQryb
+	AaZD8kf7WZk+rvlpxdKTJ1JSsVmOSzCKNLOtrzVw6kY8B9IAQixSj0imQg/431a3DSKcd6y
+	7Jgh743MKAg4KlOmZVthJEZ83DTeZILErAeehdRlqG5IAk6bceFx4AGWySi6gnSf/ALfvII
+	W+gKBMjfTFGu9FzVmYbvIVSRvSMdx+vFJBakCviWRCWXGTO+epFryi8UxI5GBtAqgtZC6Zh
+	frjJ+ZDuce2QnOuLXzdBDVB915S+NmE6f5W7wEsOu7beZqICvNYPzNfhExkFha6eUmqSFCZ
+	mGfwfVwspKnWBiQq/abaKorKTmeTDrkQpplQz3do8HgnncCQMDJ0XWFe5ThQ1YKlp57WAZ0
+	pUoSMsoF0A/TeKu74f8Msb14obuZ2Xfhb+6NJrzAJmAkVEC3BSN07RKGCMl2HpBAbsHfFYP
+	Tzr5tEVsNTHfKKfXZwNWJTOZII8XeuvE4ZDyt+BPkEunoSfQqBVybzy9mfzIXnka5F+FGUC
+	AGyWQl5wTpAPopMKZbbCzcqDKQiEfZovf1Nkbxz0YEfxaInZR6Ool9FSGHG2wg/lmZ1NjIM
+	cxt9OVL6MUnTgxhEA3FaD8dn81IkQaYoHG4IrUfhurto4tAu0PyZlLwgFrACiT7/vbYr73o
+	Zr8ExYPZZXQ5UkhL64gq5SClnkmHALs+Xrq6tNFZXiFx65iQdg2eJNE/QH4wzsjx6I6Tqm1
+	k9+vkaoQf1NG5czteZL3IomqOneCXvu1reE/dKO8Fgv5OfoYJQx/zH/4ly8gl2Xqn/CjeB/
+	wald5HmbcwaYung52vfaDibIyoLkCJzHETCSRc7pbROyqCTAzERWO3GxROVD6Hs6h5Fhb7b
+	LmyxwZgvkb9YZw9W1eDL+cxmZ/n2YaIznvDD+sxournSpkr/6mN/kXDOivvxKHzMxgHetfI
+	s/cn45veJ1GMPelbPZopFs/t+wgb5eMNRUEv+vzvsa1168GCgRYo9prl5BREiPrDRRg7F2U
+	eLFEpVTJYE7DsvMpfEXG6u30eR5hCTOKa0ioma474LR5z+l0kM2qqpjejhccjUlh3Pdls1/
+	9b+0QVrZdqMfEENA3+QOZcuR+YjGSaTpg==
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 
+From: Xu Rao <raoxu@uniontech.com>
 
+zloop divides the requested capacity by the zone size to determine the
+number of zones. Since it uses one zone size for all zones, a smaller last
+zone is not supported and an unaligned capacity is rounded down.
 
-在 2026/8/4 00:47, Tejun Heo 写道:
-> On Mon, Aug 03, 2026 at 09:22:01PM +0800, Tao Cui wrote:
->> @@ -3092,9 +3092,12 @@ static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
->>  {
->>  	struct ioc_gq *iocg = pd_to_iocg(pd);
->>  	struct ioc *ioc = iocg->ioc;
->> +	unsigned long flags;
->> +
->> +	spin_lock_irqsave(&ioc->lock, flags);
->>  
->>  	if (!ioc->enabled)
->> -		return;
->> +		goto out;
->>  
->>  	if (iocg->level == 0) {
->>  		unsigned vp10k = DIV64_U64_ROUND_CLOSEST(
->> @@ -3110,6 +3113,8 @@ static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
->>  			iocg->last_stat.wait_us,
->>  			iocg->last_stat.indebt_us,
->>  			iocg->last_stat.indelay_us);
->> +out:
->> +	spin_unlock_irqrestore(&ioc->lock, flags);
->>  }
-> 
-> There's nothing in this function that requires synchronized reads. Might as
-> well just annotate them with data_race(). Otherwise, this can lead to a lot
-> of lock operations when there are a lot of cgroups and high frequency stat
-> reads.
-> 
-Agreed, there's nothing in this function that requires synchronized
-reads, these are all stat values where stale reads are harmless.
-Will switch to data_race() in v3.
+The capacity_mb description incorrectly states that the capacity is rounded
+up. Correct it to document the actual behavior.
 
-Thanks,
-Tao
+Fixes: 9e4f11c1228c ("Documentation: Document the new zoned loop block device driver")
+Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+Changes in v2:
+- Replace the code change with a documentation correction.
+- State that a smaller last zone is unsupported and that an unaligned
+  capacity is rounded down.
 
-> Thanks.
-> 
+ Documentation/admin-guide/blockdev/zoned_loop.rst | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
+index f4f1f31..fd99e5c 100644
+--- a/Documentation/admin-guide/blockdev/zoned_loop.rst
++++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
+@@ -71,8 +71,9 @@ follows.
+ ===================   =========================================================
+ id                    Device number (the X in /dev/zloopX).
+                       Default: automatically assigned.
+-capacity_mb           Device total capacity in MiB. This is always rounded up
+-                      to the nearest higher multiple of the zone size.
++capacity_mb           Device total capacity in MiB. A smaller last zone is not
++                      supported, so an unaligned value is rounded down to a
++                      zone-size multiple.
+                       Default: 16384 MiB (16 GiB).
+ zone_size_mb          Device zone size in MiB. Default: 256 MiB.
+ zone_capacity_mb      Device zone capacity (must always be equal to or lower
+--
+2.47.3
+
 
