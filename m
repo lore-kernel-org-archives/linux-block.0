@@ -1,60 +1,60 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6F21A5B8C
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 07:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1495F418A46
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 07:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785826991; cv=none; b=MuUlEZpw11EZIOV0f3A0NJIgyTqadfKwHug6TwYVvokFT1ZNlTgItZVRpsr1LnDFg3MGoJiOlCCrHTz7090I6FsJaPtBMUXEbTO42k/W/bECHA3V6HK1X9eXIlrjABDrILrdHDkkkXxVfqxNSjfMivk6hIoY+s70el5/vvLVoUc=
+	t=1785827475; cv=none; b=otRBkv2WgUbpsDSR/y5Bt/p95l5nvgKHdBaSVIkoQk1PT5MW+UJ4aTTgsnOtWZBP0ve0/hdpv+A1xfd0ZkZ8djR86QEyukPJCOiC7Y3Sm5oz5XHAFnhFZP8m3IBVd3CXSPptPPcLEOOzijXor6J9rCKWdEzwJl9A6IpSoj0TO5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785826991; c=relaxed/simple;
-	bh=RnKE325XRBMYNaTSq28on7DV+uykXZH5M+1+VrLxbxU=;
+	s=arc-20240116; t=1785827475; c=relaxed/simple;
+	bh=Z+FzHFxytDRM7xHiP3VOyGj6DOdt/cHxturthpvQJAk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cfr1fWDqAaK+CvMIPvJ8ucqXpGQ3JajISCFD3UPRdAZ30nyAQJi1rTDYe99hiFQV2Tt6GZkNvyvCV+jj+Zq+a0u+uBJFpyldWUVW5gYg1rx4mo6Yey6iioUBbtulfjDekGF/PyPYCjqC6kkcV9NwyMZaa7O8nKgXB5n1VyanoPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HW/oyJd+; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=EAIU29XSCPTa8TPyfBrqLAI6TybOjekJEIhc3aQvSV0InG5d19wBcTcRWK3LAbz38I5jYuVUXJkpzCQgVz+p5S4Ur+SAkEaS9nXsB+iwNHpYqK+27Ux3N2FficIpOIK401j/ffrDte4wvBWJHNC6yp63kXBDe/pU+TW/XYacjBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iXbyfstx; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HW/oyJd+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iXbyfstx"
 Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6741HxPa3656474;
-	Tue, 4 Aug 2026 07:02:59 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6741HjcS3656285;
+	Tue, 4 Aug 2026 07:11:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=yKLw6S
-	Nh3AiCMyrkebW2F2qkc3cEoFPoE11fCSggqXA=; b=HW/oyJd+cS5idu3D53wjqC
-	GbhMo/xGrKhmOUJVJ58inO8l46iZxaBi//KUBUIJDtLDx+tHrzdUu3HlM2Fw3U3z
-	q60JA0wkd2CJVJZlNBtkSR11fX/xWN9GSQZioq2XFC4zsWP9LAgHfJ876YLbVz99
-	1MfXh+s9syDHsEzJ6cqED/utehQRg4Cabur357N8L/PdH2bdNoGJggLmy6AsK8vP
-	Fj+6ksfuFHiUdhOxAfRPwq/n2I86r0NUQqHymxsFvG5mu8vzkoUrl+FZb9h+JNKM
-	k3Cg6g8ojOmg1U2dDVurvYb09mO1tJZeL9lKA/Vg0AQzHKLU4xYXzFtW5asS7dRA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PVcO6I
+	jQ0i4ilbaOz14g5O3YRFZHs7jsgNQs9bTIeR0=; b=iXbyfstx0sUOIVRSG7pl9N
+	tsPfzWoqDSRTjz3/eFhUbWGX6aG7y891nzP+C77Ov6dhZe2BUuVOslBLvJyFCvl/
+	SQYEvIFlan5FBeol6uCEVyVw+tSKftdaVtx8tij43B7FmnnNugaJrTxhdUrd+Zwf
+	OJHFmPRRk3GU67DsLFWIOaC17zLt63V2FikENUQKPP8+DHY7NdEInBdX+m3n/xF0
+	niyqCPXU+XUNbP4YDdg4WGDKQJ1c6JAEARoma+BWkz/5xNb57nK/t0zY8V924TKC
+	MJftJZCSdB1dYobdpqMTKChgW6+WlT3mvrtoWhbRKWGd6JZoNHGha6miTGjc4HWg
 	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8h4vjxs-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8h4vm24-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 07:02:59 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6746uHaw012688;
-	Tue, 4 Aug 2026 07:02:58 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsugw0xwb-1
+	Tue, 04 Aug 2026 07:11:03 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6746uG0t029573;
+	Tue, 4 Aug 2026 07:11:02 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswtygn8b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 07:02:58 +0000 (GMT)
+	Tue, 04 Aug 2026 07:11:02 +0000 (GMT)
 Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67472vP330605978
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6747AOiE32309608
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Aug 2026 07:02:57 GMT
+	Tue, 4 Aug 2026 07:10:24 GMT
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DC0658065;
-	Tue,  4 Aug 2026 07:02:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8B6F05805E;
+	Tue,  4 Aug 2026 07:11:01 +0000 (GMT)
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9CB3158052;
-	Tue,  4 Aug 2026 07:02:52 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id BCD5458056;
+	Tue,  4 Aug 2026 07:10:57 +0000 (GMT)
 Received: from [9.43.105.125] (unknown [9.43.105.125])
 	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Aug 2026 07:02:52 +0000 (GMT)
-Message-ID: <84f608a9-8f2e-4ce8-b23d-e07c133297fe@linux.ibm.com>
-Date: Tue, 4 Aug 2026 12:32:50 +0530
+	Tue,  4 Aug 2026 07:10:57 +0000 (GMT)
+Message-ID: <e9e782ea-1bd5-4aa0-879b-923772f4cc5d@linux.ibm.com>
+Date: Tue, 4 Aug 2026 12:40:55 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,41 +62,40 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/12] loop: Add lock context annotations
+Subject: Re: [PATCH v2 05/12] nbd: Enable lock context analysis
 To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
-        Nathan Chancellor <nathan@kernel.org>
+        Josef Bacik <josef@toxicpanda.com>
 References: <cover.1785440858.git.bvanassche@acm.org>
- <db7c5b870df403fe97229f6bb59144122e16aa41.1785440858.git.bvanassche@acm.org>
- <a41ebd1f-f115-477b-a3b0-5ca9247ce465@linux.ibm.com>
- <3f42cecd-98e1-4db7-b026-f673e38d54d3@acm.org>
+ <5e1f54d3826b0d479242a9886ca2c7b6eb8cedaf.1785440858.git.bvanassche@acm.org>
+ <a438f0ba-e2b0-4fa5-920c-bdbf49769674@linux.ibm.com>
+ <7d5c9498-c471-4715-a264-17a4df4c2559@acm.org>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <3f42cecd-98e1-4db7-b026-f673e38d54d3@acm.org>
+In-Reply-To: <7d5c9498-c471-4715-a264-17a4df4c2559@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfXyrRoSeM0wZrp
- TPLExmF6lMeTpxUxVROTU3/9g4Z9ImES/5L6slTtR0BxX01k7FUcb2sPnjHgdBDKJhmuVoupdc6
- W3pR4z1jo++5Ap9S24S2ic3cFVcZrSk=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfX6QSLkFMKv7yF
- W9Q6UdlX4KPViJILLSW62RUxfgufCj2hlPXe36HWzgOuq221DdfgHKjfk5GBRuivl6oe3F1uoUW
- EZVshle00X0hFcEscD/neOTJWTKbjJRPQhS/0rEfEBHb2I2HRe/jw7S2hgTaNybgRIfHr3YIOKl
- YNr2SaHlP1mGHKO7C++9d6ASTcVFFlQaGMqfed2KSDNLNtPIAZx3d3Vhp/fSClRaYaScAJuTSig
- dlOaudsobLmT0NapENNYfokaRc8M/oTQe4RlI7nWsRrvQPI/tk8TfMPhK/FsVDuviGSvg42kAwq
- 3alDJiaMCGkc+yXSpJTbpcxcvcUDRVo9slwP46FL4lD9gHtpgTVeWv3C0rmMv8O5GpEIdFA9hbm
- ALffJSpaxtqNhy3HxXrviaBQj6QsXPJYMiPfgQ0ag6+TgrPpSzN0nWl2Dlli+DFanE9vy4J2uGZ
- 8raszXdS/CxZs6o77Cw==
-X-Authority-Analysis: v=2.4 cv=SI1ykuvH c=1 sm=1 tr=0 ts=6a718ea3 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfXzD71qWgOM/Ix
+ bOTgJ4szDCDn22Of7NJKnttjIfe86JBRxpd9a9bqM6Lp+BzfY8qwOSXmYa0iNBA5YEcfa6tKdA+
+ m9dYX0uF1OIBxQvFOyaqFUjog5DwTv8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA0MDA1MiBTYWx0ZWRfXwBxcKIGt+Isl
+ seHNypy/DerEvUm1fyJpt33Zc5fXo+eZYFPkpLAMOGHyfnH2hacvn9Sgq0gP24FhB+hjEaHYirS
+ PSLjTgFEplFrzuGxC5VKew6Xvd+lHA9JQKv7zD2W9KgxtglF7rfvC08odE3mErg+VXWInHZbYXq
+ VmMJE9D00BYyMpl+3JD3AyQzsDsfkkRBlIk8ITWcWOwu0SY2SIISdD/4XxMj9PcV4NrVua8L214
+ Nlpz5hSen6NxilgHCJnV+tfz1U6EklBxD+n4pBYsodF+bYe1AlmhITsDQ59DG5N/D5L8KVndr75
+ 3jDlwKY5fKMrkJYdoFu5cu2TwBP8uiy938ItySFeniX9phFSZU2qxdo82k9/cZ4hv1tJrq5DbgF
+ NPLAU+7ejyOmfxuRk9tZ95o4PPyiGdextBK3nUTJb2WAFkU41zWQliGNVgvvVGH5iaTeozlIGQv
+ 1sq6VORhJOUi7AWHUyA==
+X-Authority-Analysis: v=2.4 cv=SI1ykuvH c=1 sm=1 tr=0 ts=6a719087 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=N54-gffFAAAA:8 a=cAVbNgA2QUCpr7qhOzgA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: TCXW1fE5BhYTYtj9EOEseCTj7-Zq4phv
-X-Proofpoint-GUID: 243P8l3jVk7amOqdwFcMeVV_0ZJCwu_G
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=3OkR0YcW-PD--22fjUkA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: eweIiqiiSj5-GNWuB4uPXvEpcK5CFBaS
+X-Proofpoint-GUID: NXcbVltgNpLgEggoml5Via_SZ4C0dqMj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-04_01,2026-08-03_02,2025-10-01_01
@@ -107,46 +106,38 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
  definitions=main-2608040052
 
-On 8/3/26 11:13 PM, Bart Van Assche wrote:
-> On 8/3/26 6:11 AM, Nilay Shroff wrote:
+On 8/3/26 11:33 PM, Bart Van Assche wrote:
+> On 8/3/26 6:26 AM, Nilay Shroff wrote:
 >> On 7/31/26 1:28 AM, Bart Van Assche wrote:
->>> Add lock context annotations that are compatible with Clang. Swap the
->>> loop_ctl_mutex and loop_index_idr declarations such that __guarded_by()
->>> can be used.
->>>
->>> Cc: Nilay Shroff <nilay@linux.ibm.com>
->>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
->>> ---
->>>   drivers/block/loop.c | 7 ++++++-
->>>   1 file changed, 6 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
->>> index a71fe763c933..e2ac19de11f4 100644
->>> --- a/drivers/block/loop.c
->>> +++ b/drivers/block/loop.c
->>> @@ -90,8 +90,8 @@ struct loop_cmd {
->>>   #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
->>>   #define LOOP_DEFAULT_HW_Q_DEPTH 128
->>> -static DEFINE_IDR(loop_index_idr);
->>>   static DEFINE_MUTEX(loop_ctl_mutex);
->>> +static __guarded_by(&loop_ctl_mutex) DEFINE_IDR(loop_index_idr);
+>>> @@ -2773,7 +2776,11 @@ static void __exit nbd_cleanup(void)
+>>>       /* Also wait for nbd_dev_remove_work() completes */
+>>>       destroy_workqueue(nbd_del_wq);
+>>> -    idr_destroy(&nbd_index_idr);
+>>> +    {
+>>> +        __assume_ctx_lock(&nbd_index_mutex);
+>>> +        idr_destroy(&nbd_index_idr);
+>>> +    }
+>>> +
 >>
->> Can we define helper macro here, which is more readable?
->>
->> # define DEFINE_IDR_GUARDED(name, lock)\
->>          __guarded_by(&(lock)) DEFINE_IDR(name);
->>
->> This is similar to what we have defined for guarded LIST_HEAD here:
->> https://lore.kernel.org/all/20260713115444.465704-2-nilay@linux.ibm.com/
+>> Could we instead introduce a scoped __assume_ctx_lock() helper so we
+>> don't need the explicit scope here? Alternatively, would annotating
+>> nbd_cleanup() with __context_unsafe be a better fit?
+> There is code in nbd_cleanup() that must be protected by a mutex so I
+> think that we shouldn't annotate nbd_cleanup() with __context_unsafe().
 > 
-> Maybe I missed something but it's not clear to me how such a short macro
-> helps? It doesn't seem to improve code readability to me?
-> 
-I think the helper makes the relationship between the IDR and its protecting
-lock a little more explicit, so this is mostly a matter of readability/style.
+That's fair enough.
 
-I'm fine either way. Let's see if others have a preference.
+> Introducing a scoped __assume_ctx_lock() might be overkill.
+> 
+Adding an explicit scope around __assume_ctx_lock() just to suppress a
+false-positive context warning still looks a bit awkward to me. At this
+point we know that the IDR is being destroyed and that there can no longer
+be any concurrent users, so holding nbd_index_mutex is unnecessary.
+If a scoped __assume_ctx_lock() helper is considered overkill, perhaps we
+should have an IDR teardown helper for this case, e.g. idr_destroy_unlocked()
+or similar, with the implementation annotated with __context_unsafe. That
+would make the teardown semantics explicit without having individual callers
+pretend that the protecting lock is held.
 
 Thanks,
 --Nilay
-
