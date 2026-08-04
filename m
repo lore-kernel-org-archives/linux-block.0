@@ -1,78 +1,40 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B8A3F8714;
-	Tue,  4 Aug 2026 06:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA4421767D;
+	Tue,  4 Aug 2026 06:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785826464; cv=none; b=TiLAAiaL2FlU5rWlY8Di2BydzfTljNme6A3Gf4jLlAEc1T1rrG7n4q0lizhohezWoT6kP1cL9yMVbOO35bBI9P/gFFqJehEtPv8Ks0bTnlZQa9ZWbydOLaEGChridGP/Wb9GGxaZlSO52f5QQ4KYE2QFArRoldGkCeRsZo/JfIE=
+	t=1785826798; cv=none; b=OJLelUGNHckWt8SUMQZbhHGmrzfVuWEYL3SkiR+1fadPlCvtf+K3FgyECdYGnVpKS6Z4tltpyjdkUqR3DHbfauybijUpCcWLBN7iQtMJLJ5aEs+P72eI0z8OF5sOdir6kjGm7WeLBITPoLi8voCD+qIYDxvAJT4Src06yx8Bgws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785826464; c=relaxed/simple;
-	bh=LGmf2KEi1vOYJnUZpZkGgA11jUahqBwgWVCT9Sl6bzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kyT35DAmIoo90yH+0IvlSEjlbFsGWWaIQyDweHO9KlJ8O5mfjbvJ7MJo4iIEMGdpl5Ib7Wvki9jOtzsv81InoJVwTqZE9tevkf5+eiwvEtNxNdd82JyCuC5/O4ptr7bMuA6B4XwUQxY8TFmwEDL8s6/FK2Xvl3eIlPpXlv1ArBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhpRjq1T; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785826798; c=relaxed/simple;
+	bh=kbHP2i7vkemjR3HAVVxYVnyyHvZfDBdyyg6SWgyZEy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jqcfn53NEo3Zi3l3q8c+l1pfJncV0pkGyoYctqSP84kn7es+ljltMVu4TDp3bpZGlPIZJXkPYbIe1NbZV/tNkUt3kbBBrCAIkMqKA3KaEqh/aDaspCKOqPSoUM4RVefXsIw5tXEjlouRPhDyg04hYVw0cnIdavsjKVXE/IKu7Xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lbPbMecm; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhpRjq1T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1950E1F00A3A;
-	Tue,  4 Aug 2026 06:54:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785826462;
-	bh=0W+d2BSTkxNT+SthfX82FpSr/h0ZeS2Jo82xnGDi01I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EhpRjq1T7kHiQezjtfNCoscixE9MILZKN5AQAeuLfpl0CdFGwVYQTGV+wNKnrHM1r
-	 JrCkeWZ6d06vYOvkvnShsD053dLwqlqovCi8VdrTs6xOXSWs5xZyvvJv0+eeTuvsrr
-	 UjxsnEfXKMZbAY4xrGUC1ZY81kkxGCs6MR03zQf4P0zM/zg8Ufripxogr4rVuRBK6o
-	 J4vbWfQENrvlcBCqfeojeulJL4POIHcg1HvJbPr8DzbRolG6hlwUW458Nvj71gn44d
-	 NxB5XhSONuT9fI07DPIJdGnu5q8FNDVjyU1hLJPrJ5um9XXuJiqETrmLraKLEI7cFj
-	 xqC7LknjuY70A==
-From: Yu Kuai <yukuai@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Yu Kuai <yukuai@fygo.io>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Coly Li <colyli@fygo.io>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Song Liu <song@kernel.org>,
-	Dan Williams <djbw@kernel.org>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Tao Cui <cui.tao@linux.dev>,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lbPbMecm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=rl
+	ts6FRGWQPc7PzhKhKXPEyH/qtfVTl1BIuIlpqm3Rg=; b=lbPbMecmmO4u/IvnZC
+	Gg27JqY9gfJYd69P/d9j1nptLin7C0dOlenPvjT3cgxs0VCPQiVnUiMOUe04zrf8
+	2DGAMXr33IBBfFwdHF2psd8bCWo+Old+WUXG3vYJTOQPPf6M0VvlAYuXSQm4z3Dx
+	IDATEDDtHkprpzoUl/2m6W4uU=
+Received: from XLL-9950X.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wAnD2LOjXFqfGujNQ--.47278S2;
+	Tue, 04 Aug 2026 14:59:26 +0800 (CST)
+From: Longlong Xia <xialonglong2025@163.com>
+To: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	virtualization@lists.linux.dev,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [RFC PATCH v1 3/3] blk-cgroup: move async bio punt state to blkcg
-Date: Tue,  4 Aug 2026 14:53:13 +0800
-Message-ID: <20260804065313.2092022-4-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260804065313.2092022-1-yukuai@kernel.org>
-References: <20260804065313.2092022-1-yukuai@kernel.org>
+	linux-kernel@vger.kernel.org,
+	Longlong Xia <xialonglong@kylinos.cn>
+Subject: [PATCH 0/2] zram: fix stale scan bounds after reinitialization
+Date: Tue,  4 Aug 2026 14:59:17 +0800
+Message-ID: <20260804065919.3970386-1-xialonglong2025@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,160 +42,40 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAnD2LOjXFqfGujNQ--.47278S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrtFWxtw4UJr1fXw1DGw17Wrg_yoWDKrX_ua
+	s2qr97Ga18KFZIyF1fJFn8AryIkr4j9345Zrn8AF9xX3yxX34kZFyDWrnYvF1kGa9xuFyf
+	Cr90va1Ykwn7ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8SdgJUUUUU==
+X-CM-SenderInfo: x0ldz0pqjo00rjsqjki6rwjhhfrp/xtbC3A6Nhmpxjc4q8wAA3Y
 
-From: Yu Kuai <yukuai@fygo.io>
+From: Longlong Xia <xialonglong@kylinos.cn>
 
-blkcg_punt_bio_submit() currently queues punted bios on blkg->async_bios,
-so it has to call bio_blkg() to find or create a queue-local blkg.  Bios
-now carry and pin the blkcg css, so punted bio lifetime no longer needs to
-be anchored by a blkg.
+Both writeback_store() and read_block_state() derive their table scan
+bounds from zram->disksize before acquiring dev_lock. If the device is
+reset and reinitialized with a smaller disksize between that read and lock
+acquisition, the bound can describe the old table while the scan operates
+on the new one. This can lead to out-of-bounds slot accesses.
 
-Keeping the punt state in blkg can instantiate a blkg even when no blkcg
-policy is enabled, just to bounce submission from a shared kthread.  Move
-async_bio_lock, async_bios and async_bio_work to struct blkcg, and queue
-punted bios on bio_blkcg() for non-root cgroups.  Root or unassociated bios
-are submitted directly.
+Move both bound calculations under dev_lock so each bound remains
+consistent with the table throughout its scan. Keep the fixes separate
+because the affected interfaces originate from different commits and can
+be backported independently.
 
-This preserves the priority-inversion avoidance while preventing
-blkcg_punt_bio_submit() from creating blkgs that are not needed by any
-policy.
+The series has been checked with:
 
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
----
- block/blk-cgroup.c | 44 +++++++++++++++++++++-----------------------
- block/blk-cgroup.h | 14 ++++++--------
- 2 files changed, 27 insertions(+), 31 deletions(-)
+  scripts/checkpatch.pl --strict <patches>
+  make M=drivers/block/zram modules
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 93ab57e0a9f1..236220db8578 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -170,10 +170,6 @@ static void __blkg_release(struct rcu_head *rcu)
- {
- 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
- 
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	WARN_ON(!bio_list_empty(&blkg->async_bios));
--#endif
--
- 	blkg_free(blkg);
- }
- 
-@@ -206,19 +202,18 @@ static void blkg_release(struct percpu_ref *ref)
- #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
- static struct workqueue_struct *blkcg_punt_bio_wq;
- 
--static void blkg_async_bio_workfn(struct work_struct *work)
-+static void blkcg_async_bio_workfn(struct work_struct *work)
- {
--	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
--					     async_bio_work);
-+	struct blkcg *blkcg = container_of(work, struct blkcg, async_bio_work);
- 	struct bio_list bios = BIO_EMPTY_LIST;
- 	struct bio *bio;
- 	struct blk_plug plug;
- 	bool need_plug = false;
- 
--	/* as long as there are pending bios, @blkg can't go away */
--	spin_lock(&blkg->async_bio_lock);
--	bio_list_merge_init(&bios, &blkg->async_bios);
--	spin_unlock(&blkg->async_bio_lock);
-+	/* as long as there are pending bios, @blkcg can't go away */
-+	spin_lock(&blkcg->async_bio_lock);
-+	bio_list_merge_init(&bios, &blkcg->async_bios);
-+	spin_unlock(&blkcg->async_bio_lock);
- 
- 	/* start plug only when bio_list contains at least 2 bios */
- 	if (bios.head && bios.head->bi_next) {
-@@ -239,15 +234,15 @@ static void blkg_async_bio_workfn(struct work_struct *work)
-  */
- void blkcg_punt_bio_submit(struct bio *bio)
- {
--	struct blkcg_gq *blkg = bio_blkg(bio);
-+	struct blkcg *blkcg = bio_blkcg(bio);
- 
--	if (blkg && blkg->parent) {
--		spin_lock(&blkg->async_bio_lock);
--		bio_list_add(&blkg->async_bios, bio);
--		spin_unlock(&blkg->async_bio_lock);
--		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-+	if (blkcg && cgroup_parent(blkcg->css.cgroup)) {
-+		spin_lock(&blkcg->async_bio_lock);
-+		bio_list_add(&blkcg->async_bios, bio);
-+		spin_unlock(&blkcg->async_bio_lock);
-+		queue_work(blkcg_punt_bio_wq, &blkcg->async_bio_work);
- 	} else {
--		/* Never bounce if there is no non-root blkg to queue on. */
-+		/* Never bounce if there is no non-root blkcg to queue on. */
- 		submit_bio(bio);
- 	}
- }
-@@ -325,11 +320,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
- 	blkg->iostat.blkg = blkg;
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spin_lock_init(&blkg->async_bio_lock);
--	bio_list_init(&blkg->async_bios);
--	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
--#endif
- 
- 	u64_stats_init(&blkg->iostat.sync);
- 	for_each_possible_cpu(cpu) {
-@@ -1360,6 +1350,9 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 
- 	mutex_unlock(&blkcg_pol_mutex);
- 
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	WARN_ON(!bio_list_empty(&blkcg->async_bios));
-+#endif
- 	free_percpu(blkcg->lhead);
- 	kfree(blkcg);
- }
-@@ -1409,6 +1402,11 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
- 	refcount_set(&blkcg->online_pin, 1);
- 	INIT_RADIX_TREE(&blkcg->blkg_tree, GFP_NOWAIT);
- 	INIT_HLIST_HEAD(&blkcg->blkg_list);
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spin_lock_init(&blkcg->async_bio_lock);
-+	bio_list_init(&blkcg->async_bios);
-+	INIT_WORK(&blkcg->async_bio_work, blkcg_async_bio_workfn);
-+#endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	INIT_LIST_HEAD(&blkcg->cgwb_list);
- #endif
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index b6fb85db4d3d..b457c2b4ac7c 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -73,14 +73,7 @@ struct blkcg_gq {
- 	struct blkg_iostat_set		iostat;
- 
- 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spinlock_t			async_bio_lock;
--	struct bio_list			async_bios;
--#endif
--	union {
--		struct work_struct	async_bio_work;
--		struct work_struct	free_work;
--	};
-+	struct work_struct		free_work;
- 
- 	atomic_t			use_delay;
- 	atomic64_t			delay_nsec;
-@@ -111,6 +104,11 @@ struct blkcg {
- 	 */
- 	struct llist_head __percpu	*lhead;
- 
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spinlock_t			async_bio_lock;
-+	struct bio_list			async_bios;
-+	struct work_struct		async_bio_work;
-+#endif
- #ifdef CONFIG_BLK_CGROUP_FC_APPID
- 	char                            fc_app_id[FC_APPID_LEN];
- #endif
+Longlong Xia (2):
+  zram: fix out-of-bounds access in writeback_store()
+  zram: fix out-of-bounds access in read_block_state()
+
+ drivers/block/zram/zram_drv.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+
+base-commit: 848acc8ffe1b7cd5f1bf427b93069becfebc2c9d
 -- 
-2.51.0
+2.43.0
 
