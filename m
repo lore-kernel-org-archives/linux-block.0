@@ -1,113 +1,77 @@
-Received: from va-2-51.ptr.blmpb.com (va-2-51.ptr.blmpb.com [209.127.231.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2321A9F96
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6B2931D0;
+	Tue,  4 Aug 2026 06:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785822610; cv=none; b=txugSo+PhpdnInyjWwI8Jd5g0zYVPvPoJ9R3EiXoxNS2ZIb6fFYFUKmhNZKm1QlrmJfX/QlAirODqVUhGxXIMcXcu/Ro8Xx0GNGTjgmj9KpBiDqh4xbn9G7737FbomrFal6XP0xNX5dQWUYKtazjkP7OguoreyNPzgGCs9ifNw0=
+	t=1785825158; cv=none; b=ofpQYOwD7tX+mGS1W2AnbBPfBwVCoKeRx6IFNHy5PEDlw+MhOkJfim8y0z/g72tueXDSBy3RNErYdUIBxZBS4spcv4saBHVS8Y8UBevAj05AXXSQQTovSDbQ4Om/0l5l+MF0JIwGIt5Ul0Ty6S6TSPEtawcJEyMmlU6YppK2F64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785822610; c=relaxed/simple;
-	bh=setEX5VUZqq2mU00+0B4wqkLWq9dPw5V+xuu+oaTezU=;
-	h=Date:Content-Type:To:Cc:In-Reply-To:From:Subject:Message-Id:
-	 Mime-Version:References; b=cN+9Revf5IQW7ej31M4CC2hYpLvk1Einiw30eMEnF6xoAOQB9HrBM83OsjT1g2VmcHk55DnZQ2Y+c6adUaB9puAKF8xB4qlwGINz7+6WwvJI5kx5Wdpc1JyDIpX35lruPsxlcrwLZL9NMw+yZO2+SRXa6j56msmj52QvE/ijH8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=ZStOKxyp; arc=none smtp.client-ip=209.127.231.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1785825158; c=relaxed/simple;
+	bh=jhi1nC7l/++E+UDsPuGo7Gh98rUrGxhUa/6tWOb7E10=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=O50+8TtZmYs+D3l8DafOJE3IBA715mhMuYvJNiPjaVFLIhauZikScFOm7E7pDMiDIjc9a1o9w5Q6iy51cXnU2Qxyywc1GPbvs48txtz022w6Xg050CKBKWMKAe2d5Yx23wdXfV6WvwwWo3BFMkMcRLBUxsXJ6lmSdH4N6/9mUTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IhHcNObU; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="ZStOKxyp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785822600;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=ZdMj9iR8e+/zdokJq2DgMHJ5s3j4S0Svxt7B4p4M8bs=;
- b=ZStOKxypx/DD8l+L5oOrxxeGtjAowix5Rf9cX8hbh7y0jF60ao0loXShGxmA4+4U0T+8Yx
- Qkf+EVpMI5fca4Ie1nkI+0dKV4CfbWn8+95ee+m0oiDQBl8obhfVqwetNAUadlbgcKNvyv
- LNhi8EIrgcQwG5h7rz/hneefZrF4POAatbimik54r/aW1xJF8SQYTE5M1iivZwtsVly/VK
- WNlKoQfpd04H6VKAKW937tFH9TjOCvlPzOkpf4VqbY3Qjmr8zJUvJPbcJtHbFGUpY95LuH
- 2VHqBjtmaiKPsjRNsmHi0Aha+edAD37OKvtmUQ4xn96633cBij/VQseqOdtCZQ==
-Date: Tue, 4 Aug 2026 13:49:46 +0800
-X-Original-From: Coly Li <colyli@fygo.io>
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
-Content-Type: text/plain; charset=UTF-8
-To: "Ramesh Adhikari" <adhikari.resume@gmail.com>
-Cc: <axboe@kernel.dk>, <gregkh@linuxfoundation.org>, 
-	<linux-block@vger.kernel.org>, <stable@vger.kernel.org>
-In-Reply-To: <CAC-THR8O=g=566evNCA-fmiprLaCL2f15w3dEjz8MSgAG4cMRw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Received: from smtpclient.apple ([120.245.64.97]) by smtp.larksuite.com with ESMTPS; Tue, 04 Aug 2026 05:49:59 +0000
-From: "Coly Li" <colyli@fygo.io>
-Subject: Re: [PATCH v7 0/2] badblocks: fix rounding bug and validate input range
-Message-Id: <FB5BB136-7491-4B3A-AFA4-D56CAED8F9C6@fygo.io>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IhHcNObU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=h3
+	PSLjp0j8Tepq1b0TAb1dnNlyLzYbS8AZCQmjDnKD8=; b=IhHcNObUrJvioqZGyv
+	WfFMsAlGIXyK/mIrbtyveX3zO3Pg0W12dcuf0CYmq7x33EnkeVEcOBU50GqxrYCj
+	ff+pTarbKwU7EPidPqz5DX2+/ZkcA2HQiUZrQJYZVOxkd1uz/3fQmCwSn0JI75m8
+	1n0cbWKxkb2FIspijaFqWNq9s=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgDnrJBjh3Fquyx7JA--.32550S2;
+	Tue, 04 Aug 2026 14:32:04 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: axboe@kernel.dk
+Cc: tom.leiming@gmail.com,
+	csander@purestorage.com,
+	shuah@kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] selftests: ublk: add rotating auto_buf index regression test
+Date: Tue,  4 Aug 2026 14:32:01 +0800
+Message-Id: <20260804063201.3740465-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <178581121634.578215.15829017092257405641.b4-ty@b4>
+References: <20260730024050.1062354-1-yangxiuwei@kylinos.cn> <178581121634.578215.15829017092257405641.b4-ty@b4>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Lms-Return-Path: <lba+26a717d88+433ad5+vger.kernel.org+colyli@fygo.io>
-References: <20260709131904.596684-3-adhikari.resume@gmail.com> <20260721164027.637078-1-adhikari.resume@gmail.com> <CAC-THR8O=g=566evNCA-fmiprLaCL2f15w3dEjz8MSgAG4cMRw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PCgvCgDnrJBjh3Fquyx7JA--.32550S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1ktFykKF4ktrWrWrWDtwb_yoWxCrgEkF
+	WqyrW8Jr48CF1UCa13KF4UJrZayFZrWrySgr1rZrZ5Za43Xr4fKa95Xr1kWr17WrWvy3W2
+	krnxGr1qgr1qvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjT5l7UUUUU==
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6gfxgmpxh2drAwAA3N
 
-Hi Ramesh,
+Hi Jens,
 
-I will review the 2nd patch soon.
+On Mon, Aug 03, 2026 at 08:40:16PM -0600, Jens Axboe wrote:
+> Applied, thanks!
+>
+> [1/1] selftests: ublk: add rotating auto_buf index regression test
+>       commit: d507d3cb19e71f10336e41deeac517cdc21c34ea
 
-Thanks.
+Thanks for picking this up, and also patch 1/2 of the driver series.
 
-Coly Li
+I notice for-7.3/block is still missing patch 2/2:
 
-> 2026=E5=B9=B48=E6=9C=884=E6=97=A5 13:41=EF=BC=8CRamesh Adhikari <adhikari=
-.resume@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hi Jens, Coly,
->=20
-> Gentle ping on this series. Patch 1/2 has Coly's Reviewed-by, and
-> both patches address:
->=20
-> - an RCU stall / kernel hang reachable via the nvdimm ioctl path
->  (badblocks_check() looping with a non-advancing cursor)
-> - a 32-bit (arm/i386) build break from 64-bit division helpers,
->  reported by the kernel test robot
->=20
-> Both are tagged Fixes: and Cc: stable, so happy to resend or rebase
-> if anything's needed on my end  just let me know.
->=20
-> Thanks,
-> Ramesh
->=20
-> On Tue, Jul 21, 2026 at 10:11=E2=80=AFPM Ramesh Adhikari
-> <adhikari.resume@gmail.com> wrote:
->>=20
->> Two related fixes to block/badblocks.c:
->>=20
->> Patch 1/2 fixes the actual reported bug: round_up()/round_down() don't
->> modify their argument in place, they return the rounded value, and the
->> callers in _badblocks_set()/_badblocks_clear()/badblocks_check() were
->> discarding that return value. Depending on caller alignment this could
->> leave sectors unrounded or, in the reported case, stall the CPU with a
->> non-advancing cursor when reached via the nvdimm ioctl path. It also
->> fixes a 32-bit build breakage reported by kernel test robot, since the
->> old rounddown()/roundup() macros pull in 64-bit division helpers not
->> linked on 32-bit builds. Unchanged since v6.
->>=20
->> Patch 2/2 hardens the same three functions against the input-range and
->> shift edge cases the round_up/round_down fix exposed: s + sectors
->> overflow, and rounding itself wrapping past ULLONG_MAX. Revised in v7
->> per Coly's review of v6 =E2=80=94 see the changelog in that patch for de=
-tails.
->> The remaining open item, bounding bb->shift where it's populated from
->> the on-disk MD superblock in drivers/md/md.c, is being sent separately
->> since it's a different file and a different root cause (missing input
->> validation, not a rounding bug).
->>=20
->> Ramesh Adhikari (2):
->>  badblocks: fix in-place round_up/round_down usage bug
->>  badblocks: validate sector range and shift before rounding
->>=20
->> block/badblocks.c         | 40 ++++++++++++++++++++++++++++++++-------
->> include/linux/badblocks.h |  6 +++++-
->> 2 files changed, 38 insertions(+), 8 deletions(-)
->>=20
->> --
->> 2.43.0
->>
+  ublk: clear auto buf reg before updating io->buf in batch commit
+
+The rotating-index selftest depends on that clear-before-store fix.
+Could you please pick up 2/2 as well? It already has Ming's Reviewed-by.
+
+https://lore.kernel.org/linux-block/20260730010910.799346-3-yangxiuwei@kylinos.cn/
+
+Thanks,
+Yang Xiuwei
+
