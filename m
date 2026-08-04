@@ -1,97 +1,166 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E834C43F4D5
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 08:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8402642A7AF
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 08:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785832952; cv=none; b=tjec0fsDXHCjgGM0UujrU3lpTKw80QiwkhRP8BTuk828mw04AgwSgqeST/jic4wGwYU4P0Ih4lGvkmLejsIWLHyhpcwySqndDy4XpBRi7gWpuOM0wvf7c2Fn8oDctx9Xgm37C4Xuk9ExcI1vH4/AssBES/YR309tM+lDNFkDoog=
+	t=1785833340; cv=none; b=qrLzMUqxNSdKO4vDzNF2NR5DBsO4XM9OCdVji+n1R3alWoRhDO81rBhrWigSsOB7zY6iiuaN77xosbkTUqKsJefrfXqoOa71iMoLl8Jd1sZshfDptuSSM7NcCMYZOftbgUXqiJm7WLiAVk4jrY50yvnsx439yJZNyXd9jwzhUH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785832952; c=relaxed/simple;
-	bh=+t9We9CHhq5QIISRp6hFIb2HR/+6MY+ToLEhAlYRB8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u8X8OMLzXqDWnxX4fMFS2VYx9rmxeTH8tage60w6/XfyOKf3komUMtYUuOcpjzItntKw19RHLcOmTb2ku9U4VAr9Im/GEbBS7OJAlM2D0+hIUn1BnF0THOZFCSdYXYpyBsdIs9BapubvSX0te2eiXrcpv3rfX6mfqT4D/jlo49w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JLFMkr8B; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JLFMkr8B"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8486ac3f347so754058b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 01:42:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785832950; x=1786437750; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Msf4BCiiq7h8sHc+GDuq/av89v8kUaD3jKqA6c2u6wo=;
-        b=JLFMkr8BJcz3cfAuglwhBaNDDfVRhFMmg0016XMxPxAjtEekh0j6Zjd596K901Re0J
-         Gx5Agtl5gfiqbMlcAU3umbrt4A0p2DrEcegf1JvZQQkLV/HrMuSeRq+VjA201rD7zBLa
-         QECvhmEc+6XVBu947abshUAjjmdqkv5g8kTCE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785832950; x=1786437750;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Msf4BCiiq7h8sHc+GDuq/av89v8kUaD3jKqA6c2u6wo=;
-        b=fqbujoUcrVWGvkd64s9P6M9XKR9fRB5Pd5yXQYP+pFlsGjXWBHXoSJyYJ1QMDQRyiD
-         VUcFlbLZRnxE/O9boKiVvmCtNGpBSWAcAXJFQf6x8ThzO0w2H4tWJhkypxyhMv7UIgpw
-         WIyNxLeoCpX22nyUNIh7avWP0Vp1unoppkUPR0xhEgbcuMb+NoPewwhavLyBuapMLii6
-         bAxFVpstrBGtTY1IC2TskSgyd5xrmLGqid/cY9mmPsjYKapu7eZGPHFk1HhmGTd0EA4J
-         yG2NMPs/8n1UmHBz0nwtAXRKhkAOflw3eEySv88KBYNccAfECtabOvmkepmJz+Ch/FDL
-         bCRQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp6awGGSLVWlOjNc6dJIRj5MfZumv2hI0VlNYgfpMi3azoUBE06LgjZ5txyI23fm3LqZOo3WY6pTZmezQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8m08YeU91ssTVTXHOrSUP6ZwL095GrkNMxi7IU4qZFiG+jPUP
-	vnNE8ipLhNtma/RdcDPkEpNH7W2lUWI8Sl8nTIZNa4UMEvhKqRu+urRb584lJfjGGg==
-X-Gm-Gg: AR+sD11c2ey6dtxGxW5o+8gk2HGLSM54eKvWVrRd6z1tYwMJ2QXclFQa+4To+50Q289
-	zdO930B+5D9VBOd0yNuSyg91fLyv9lSZDOAKK+OYX3KB8+LDKTrH7WJZuwU6hNhx4mY6yoQdyZU
-	lqy42EH/NIA9sOr8htfGQN/e/+GKkJ2UlzpAICTtTR5laobvRXeXMCUWLoJe2ZclEludTqzKVlH
-	4dXKhSU8O36oIaKnJPouioC5iet5VhMWRxarvoNYFmrQ9MhVZIkOBGjqzaIyaPmNGnASanlBBFp
-	cBDx57F8HYnjWl60OqC2TcMLv4eVQZKGDImJI/MnnAhELLyRL7SGGDy6Ha8rsa0ux4aHznYTy/Y
-	cSQ+dYBy1aySrnQzpBMWFMGAB9EUaUGuW2kk5Qy+A8JnkGXZOZD1A09yWDZmxzK9S84IQ/FSrfw
-	xHCYalQyvLEOociiZAgNOXo6pjW6DJDBrAtEGuHX+mwBkUyYJEpbLCDTrlq8OnXeO0galkGItHS
-	CzCsqxVseUVWXXP+iH0qaif7ttV
-X-Received: by 2002:a05:6a00:4fd4:b0:847:b45b:fef3 with SMTP id d2e1a72fcca58-84f1cb227b4mr2528791b3a.27.1785832950153;
-        Tue, 04 Aug 2026 01:42:30 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:32eb:b46b:e9eb:65c5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84edbd35a4esm4854159b3a.10.2026.08.04.01.42.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2026 01:42:29 -0700 (PDT)
-Date: Tue, 4 Aug 2026 17:42:26 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Longlong Xia <xialonglong2025@163.com>, 
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Longlong Xia <xialonglong@kylinos.cn>, stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] zram: fix out-of-bounds access in read_block_state()
-Message-ID: <anGlv6GhiDL8gQI1@google.com>
-References: <20260804065919.3970386-1-xialonglong2025@163.com>
- <20260804065919.3970386-3-xialonglong2025@163.com>
+	s=arc-20240116; t=1785833340; c=relaxed/simple;
+	bh=fVD1L8jqoB1IdJi+m2z92qmKK3p9EosAYuIm0kDSfVY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XFQGE5gD2Ig45uK+KDDNlnlG9qSoaFbfDSCrYGvnjTNF6ODx5BPji25jRHQ/NJB8jHWZGm6ly417OWMOWNi9Ao/MlKfwRuyGJh94NIIBsVoivO9Ain01AvcEK9lG8kkSpxEoSwm02sbEjssAh8YU3LEJM4pM5hzf5PxC7lZLZs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hDnHc6JKlzYQv73
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 16:47:56 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id E8A2040592
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 16:48:47 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgD35kVrp3Fq71VIBA--.52677S7;
+	Tue, 04 Aug 2026 16:48:47 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	yukuai@kernel.org
+Cc: yi.zhang@huawei.com,
+	chengzhihao1@huawei.com,
+	echo.chenlin@huawei.com,
+	leo.lilong@huaweicloud.com,
+	wangkefeng.wang@huawei.com,
+	huawei.libin@huawei.com,
+	leijitang@huawei.com,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: [PATCH v6 3/8] nbd: clear queue limits on disconnect
+Date: Tue,  4 Aug 2026 16:39:17 +0800
+Message-ID: <20260804083922.1927105-4-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260804083922.1927105-1-yangerkun@huawei.com>
+References: <20260804083922.1927105-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260804065919.3970386-3-xialonglong2025@163.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgD35kVrp3Fq71VIBA--.52677S7
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr4UGw1rWFy7uryruF1xXwb_yoWrXFyUpa
+	17C3W7KayrtF47Aa1rWrWUZF45K34kC34I9Fy7Ga45ZwsYkw1SyF9Iy34fJFy8JF9rZa15
+	Ga9YkF92yryku37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
+	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
+	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
+	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr
+	0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUv
+	cSsGvfC2KfnxnUUI43ZEXa7IU14CJPUUUUU==
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-On (26/08/04 14:59), Longlong Xia wrote:
-> read_block_state() calculates nr_pages before taking dev_lock. If the
-> device is reset and reinitialized with a smaller disksize before lock
-> acquisition, nr_pages still describes the old table. The subsequent
-> loop can then call slot_lock() past the end of the newly allocated
-> table.
-> 
-> Read disksize after acquiring dev_lock and checking that the device is
-> initialized. The read lock then keeps the table and its bound stable for
-> the duration of the scan.
-> 
-> Fixes: c0265342bff4 ("zram: introduce zram memory tracking")
-> Cc: <stable@vger.kernel.org>
-> Assisted-by: Codex:gpt-5.6-sol
-> Signed-off-by: Longlong Xia <xialonglong@kylinos.cn>
+An inactive nbd device may refuse any I/O operations. The nbd_config_put
+function calls invalidate_disk, which sets the device capacity to zero
+to reject all read and write I/O. For zero-sector flush I/O requests
+from blkdev_issue_flush, if the write cache is disabled, the zero-sector
+flush I/O immediately returns 0 in submit_bio_noacct. However, since
+nbd_config_put does not clear the write cache state, an inactive nbd
+device might still have the write cache enabled. In this situation,
+zero-sector flush I/O will return -EIO because there is no active socket.
+Additionally, BLK_FEAT_FUA and BLK_FEAT_ROTATIONAL flags may also remain
+stale, resetting all of them ensures consistent behavior.
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+The limits update uses queue_limits_commit_update() (the non-freezing
+variant) because config_refs == 0 here means every fd is closed and recv
+threads have drained, so no in-flight I/O can read q->limits concurrently.
+
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/nbd.c | 43 ++++++++++++++++++++++++++-----------------
+ 1 file changed, 26 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7ec85f94f742..45e58191c5d7 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -331,6 +331,26 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
+ 	nsock->sent = 0;
+ }
+ 
++static void nbd_apply_limits(struct queue_limits *lim, u32 flags)
++{
++	lim->features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA | BLK_FEAT_ROTATIONAL);
++	lim->max_hw_discard_sectors = 0;
++	lim->max_write_zeroes_sectors = 0;
++
++	if (flags & NBD_FLAG_SEND_TRIM)
++		lim->max_hw_discard_sectors = UINT_MAX << SECTOR_SHIFT;
++	if (flags & NBD_FLAG_SEND_FLUSH) {
++		lim->features |= BLK_FEAT_WRITE_CACHE;
++		if (flags & NBD_FLAG_SEND_FUA)
++			lim->features |= BLK_FEAT_FUA;
++	}
++
++	if (flags & NBD_FLAG_ROTATIONAL)
++		lim->features |= BLK_FEAT_ROTATIONAL;
++	if (flags & NBD_FLAG_SEND_WRITE_ZEROES)
++		lim->max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
++}
++
+ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
+ {
+ 	struct queue_limits lim;
+@@ -352,23 +372,7 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
+ 		return 0;
+ 
+ 	lim = queue_limits_start_update(nbd->disk->queue);
+-	if (nbd->config->flags & NBD_FLAG_SEND_TRIM)
+-		lim.max_hw_discard_sectors = UINT_MAX >> SECTOR_SHIFT;
+-	else
+-		lim.max_hw_discard_sectors = 0;
+-	if (!(nbd->config->flags & NBD_FLAG_SEND_FLUSH)) {
+-		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
+-	} else if (nbd->config->flags & NBD_FLAG_SEND_FUA) {
+-		lim.features |= BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA;
+-	} else {
+-		lim.features |= BLK_FEAT_WRITE_CACHE;
+-		lim.features &= ~BLK_FEAT_FUA;
+-	}
+-	if (nbd->config->flags & NBD_FLAG_ROTATIONAL)
+-		lim.features |= BLK_FEAT_ROTATIONAL;
+-	if (nbd->config->flags & NBD_FLAG_SEND_WRITE_ZEROES)
+-		lim.max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
+-
++	nbd_apply_limits(&lim, nbd->config->flags);
+ 	lim.logical_block_size = blksize;
+ 	lim.physical_block_size = blksize;
+ 	error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
+@@ -1469,8 +1473,13 @@ static void nbd_config_put(struct nbd_device *nbd)
+ 	if (refcount_dec_and_mutex_lock(&nbd->config_refs,
+ 					&nbd->config_lock)) {
+ 		struct nbd_config *config = nbd->config;
++		struct queue_limits lim;
+ 		nbd_dev_dbg_close(nbd);
+ 		invalidate_disk(nbd->disk);
++		/* reset queue limits to default */
++		lim = queue_limits_start_update(nbd->disk->queue);
++		nbd_apply_limits(&lim, 0);
++		queue_limits_commit_update(nbd->disk->queue, &lim);
+ 		if (nbd->config->bytesize)
+ 			kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
+ 		if (test_and_clear_bit(NBD_RT_HAS_PID_FILE,
+-- 
+2.52.0
+
