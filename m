@@ -1,77 +1,73 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6B2931D0;
-	Tue,  4 Aug 2026 06:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42B441A90F;
+	Tue,  4 Aug 2026 06:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785825158; cv=none; b=ofpQYOwD7tX+mGS1W2AnbBPfBwVCoKeRx6IFNHy5PEDlw+MhOkJfim8y0z/g72tueXDSBy3RNErYdUIBxZBS4spcv4saBHVS8Y8UBevAj05AXXSQQTovSDbQ4Om/0l5l+MF0JIwGIt5Ul0Ty6S6TSPEtawcJEyMmlU6YppK2F64=
+	t=1785825733; cv=none; b=f2WWKowr7DeM6HUrgfQm2YYjMh7Ef9EbHPC9hm0DR/ITJnPWT1GOJlPJ0hpBP2dIhuW1WwFXYU5d0MllOWp9zC4hrVh9VS88P90CpRRPi1FJx6x5kqmK8eCKiZKJ/WsK/65wERZR3CiXGtRRzYjARwiIv1VJFegH5EzlDM7jL3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785825158; c=relaxed/simple;
-	bh=jhi1nC7l/++E+UDsPuGo7Gh98rUrGxhUa/6tWOb7E10=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O50+8TtZmYs+D3l8DafOJE3IBA715mhMuYvJNiPjaVFLIhauZikScFOm7E7pDMiDIjc9a1o9w5Q6iy51cXnU2Qxyywc1GPbvs48txtz022w6Xg050CKBKWMKAe2d5Yx23wdXfV6WvwwWo3BFMkMcRLBUxsXJ6lmSdH4N6/9mUTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IhHcNObU; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1785825733; c=relaxed/simple;
+	bh=7o9Q7tCtCO8aBexHY8oOQQlyZGnGWROdUlh7smopJmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=biKolZcbwYObA/Xq3/j79QsnLCZWKVcM90v14Zo/20AyBahzIV6esvI05PlS7e3+qzaZNDGw7O7rZZ/d1kYKP/fVvuUfy9i8Kq7M/pMwCm1ghRmXaMZPv0YCeUOc8jfaTqBrRJHaQtmpohTPYxtnZJNspdKOCIiVTy+L8ts+9p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVT+gB5q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IhHcNObU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=h3
-	PSLjp0j8Tepq1b0TAb1dnNlyLzYbS8AZCQmjDnKD8=; b=IhHcNObUrJvioqZGyv
-	WfFMsAlGIXyK/mIrbtyveX3zO3Pg0W12dcuf0CYmq7x33EnkeVEcOBU50GqxrYCj
-	ff+pTarbKwU7EPidPqz5DX2+/ZkcA2HQiUZrQJYZVOxkd1uz/3fQmCwSn0JI75m8
-	1n0cbWKxkb2FIspijaFqWNq9s=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgDnrJBjh3Fquyx7JA--.32550S2;
-	Tue, 04 Aug 2026 14:32:04 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com,
-	csander@purestorage.com,
-	shuah@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: ublk: add rotating auto_buf index regression test
-Date: Tue,  4 Aug 2026 14:32:01 +0800
-Message-Id: <20260804063201.3740465-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <178581121634.578215.15829017092257405641.b4-ty@b4>
-References: <20260730024050.1062354-1-yangxiuwei@kylinos.cn> <178581121634.578215.15829017092257405641.b4-ty@b4>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVT+gB5q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C061F000E9;
+	Tue,  4 Aug 2026 06:42:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785825732;
+	bh=huKePqtjcexK29SuqJiiQzSq65pPX+WtW/Qxb5eH4/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=OVT+gB5qtwY+Lm6wnXLNda6EXui9BiIC7LTUH52nzFYNYjMDx0qcSk5VG7IWXCG1g
+	 40X5Oh9MUTNSaPPIrNKf8TeOynwK0VJMXlxjullNCsvgKWY2Kp9qk3nsL+WPoNVbgD
+	 ok+MtVU6eE6wikZwi/PP5T8DDmMqj6cxdA/yxvpniKKi5RUi2zl0r9MCQCY9lG5L7o
+	 6n4TgVmaeBaMl9ulyzpAUUZWNZ08O8Ui0Au8ADA+sm0mwogPTWAmOy9Vd3R6tr1PSw
+	 5WOgLcRLflKbygb6RN+VyyNUFgx+mJ3UTyewCkY+TfZ9oWHHje2J2MaIhaThweUjWT
+	 WN8KrYF9Ozosg==
+Date: Mon, 3 Aug 2026 20:42:11 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Tao Cui <cui.tao@linux.dev>
+Cc: axboe@kernel.dk, josef@toxicpanda.com, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: Re: [PATCH v3] block/blk-iocost: annotate ioc_pd_stat reads with
+ data_race()
+Message-ID: <anGJw59r98X_inKi@slm.duckdns.org>
+References: <20260804054120.161933-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgDnrJBjh3Fquyx7JA--.32550S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1ktFykKF4ktrWrWrWDtwb_yoWxCrgEkF
-	WqyrW8Jr48CF1UCa13KF4UJrZayFZrWrySgr1rZrZ5Za43Xr4fKa95Xr1kWr17WrWvy3W2
-	krnxGr1qgr1qvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjT5l7UUUUU==
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6gfxgmpxh2drAwAA3N
+In-Reply-To: <20260804054120.161933-1-cui.tao@linux.dev>
 
-Hi Jens,
+On Tue, Aug 04, 2026 at 01:41:20PM +0800, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> ioc_pd_stat() reads ioc->enabled, ioc->vtime_base_rate, and
+> iocg->last_stat without holding ioc->lock, which trips KCSAN since
+> ioc_adjust_base_vrate() and iocg_flush_stat_upward() write those
+> fields under ioc->lock.
+> 
+> Commit 35198e323001 fixed the same issue in ioc_qos_prfill() and
+> ioc_cost_model_prfill() by adding spin_lock_irq(&ioc->lock).  However,
+> those functions read configuration parameters (qos/model) that need
+> synchronized reads.  In contrast, ioc_pd_stat() only reads stat
+> values (vrate, usage) where stale reads are harmless, so data_race()
+> is more appropriate — it silences the KCSAN warning without adding
+> lock contention during high-frequency stat reads.
+> 
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 
-On Mon, Aug 03, 2026 at 08:40:16PM -0600, Jens Axboe wrote:
-> Applied, thanks!
->
-> [1/1] selftests: ublk: add rotating auto_buf index regression test
->       commit: d507d3cb19e71f10336e41deeac517cdc21c34ea
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Thanks for picking this up, and also patch 1/2 of the driver series.
+Thanks.
 
-I notice for-7.3/block is still missing patch 2/2:
-
-  ublk: clear auto buf reg before updating io->buf in batch commit
-
-The rotating-index selftest depends on that clear-before-store fix.
-Could you please pick up 2/2 as well? It already has Ming's Reviewed-by.
-
-https://lore.kernel.org/linux-block/20260730010910.799346-3-yangxiuwei@kylinos.cn/
-
-Thanks,
-Yang Xiuwei
-
+-- 
+tejun
