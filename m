@@ -1,118 +1,80 @@
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DFA3ED3CA;
-	Tue,  4 Aug 2026 03:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE42C331EB3;
+	Tue,  4 Aug 2026 04:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785814958; cv=none; b=QsyEBVBpCV6heJ3kwzdH9BCcwkM7iqVcWpCevkJzchciope3ojX3elcTYdybt98k0bDlkDcQfNidZ+2TtTmwXnoP5xueZ0L8BlfPwvqbyjieuqcsAd/c9JeslISrlU13HCZs+NgWtrOdf2gWXLQt2BitfXsRWrUZBxVmWu9aLns=
+	t=1785817587; cv=none; b=gFnC4QzAM0ibYVyswkTTD1KLuB155DdFP+mrFABaKD1aGMrvrlUzGIfpecc1NCp3ViqYoi8nD7FTF2ucXEJvBFRjuJ0MKkOBV6NQBnBcEJ7Uf3iz6wZmxcZTrtgHXfbv6vwPkSz669u+R1ToONd4VbTumSoUQv1M/uJT4JL56KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785814958; c=relaxed/simple;
-	bh=LzhjBNRML2rvdGmtYckjNRqZvdFukhnA3bPTncSsrG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cbLditCc4g1y9wcggfXrhfMYLM8xUeR/MjKSFivL1oe5i4J0Crwlb89sKuv+6cVRHncbsgz/Vv5V+0MmkRdQ6Za83LW9pjGEfJWCsoE+HtfspIxFOloTIANucuNQycpcOAes65VhJyEUWnMrcO87BSc70CzXJijkRoW4lOeu6/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=FwWJi1gj; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1785817587; c=relaxed/simple;
+	bh=NDN5i+21ZiXNRpVcLgM8HNqRRa6JSypSrTNYWNCtqCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A5G6zdfyycxBdlgRwH2/5u/27ly6kdUbSDqDsb44QxejiVr2jPnzx1GQSulIn/hJPfk+V4D72n3QMABr5JU+kiDpaq2OT6zd5Kj5cxUWg4ZzYN2h5S/Edq8LSIVMVxZrTc0XesBFordjYAqe91jTiJelhecJrRlLNbKk65B0mYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZTiM29G; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="FwWJi1gj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1785814917;
-	bh=Z4yQEQFXFRJNBAaK94dLNr5B7DXT4Gto84Nxkf0fkCc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=FwWJi1gjFZ8vZpQb4uzCE2vv+jB+0+/aX1mBxjZSKcCeVILqhSh2stB9JL7feRwSe
-	 3AIWbsvfq0wM+YgCEC0XnUi/jvubJ1kA5GEIuaaamGX+ARxfA1bFE24P2o+KPW8dS5
-	 oOO3WpZGo7hneXg70W0TmrDDzExWWG2PmSBTJONk=
-X-QQ-mid: esmtpsz21t1785814900t47a0c24b
-X-QQ-Originating-IP: 9vkOhPgYsB97kQ24m2OnD9TrnPmOI1Of/w7rjYN1nMo=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 04 Aug 2026 11:41:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6654981945826137558
-EX-QQ-RecipientCnt: 7
-From: raoxu <raoxu@uniontech.com>
-To: dlemoal@kernel.org
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	raoxu@uniontech.com,
-	stable@vger.kernel.org
-Subject: [PATCH v2] Documentation: block: zloop: clarify capacity alignment
-Date: Tue,  4 Aug 2026 11:41:21 +0800
-Message-ID: <8100621B7A58105B+20260804034121.1036479-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <0be2d538-8e18-45ad-9181-f7e3fb7e02ed@kernel.org>
-References: <0be2d538-8e18-45ad-9181-f7e3fb7e02ed@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZTiM29G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5C8B1F000E9;
+	Tue,  4 Aug 2026 04:26:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785817586;
+	bh=VnBJBJMIDrb/JKr4D5tBdD125cHurgOHJqMUgwB/roc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=oZTiM29GC8RZGnmXsuMCRqhiFleK0rO1lFw0Ij1PxSzm1SUVda3AWZ/CVR8rUh06A
+	 YFeN1AGmYjLjZhhIGfXcvhQ8rItKQX6Z1dGepM5x7S/vtxnk1Pdd5qGCerck8VaPgT
+	 qSiBcZG8j+omeDjEo+6/bNWMkbxaVTAjKXagCY/dgX3OC4uSOyC0xmGLLRSkJ8g6Cx
+	 LX1PnCqCR1QrSSQBtMFfsmaHijL/p40nO2lr7tHDm6NY3TrVAWAgT4J0cCASEQkzi+
+	 k0loXjjAK2d88WKoakgz5k9vOD4OBz1m3pPwWXrV3R20rJ+Tn4LJAhaklpamRq1jV+
+	 YSLFXcV28LXqQ==
+Message-ID: <3a6a55c1-65c1-4fc3-a511-b962b4d29190@kernel.org>
+Date: Tue, 4 Aug 2026 13:26:24 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MMwjR1C73eIs7bLdl6V6vVajvobjZOUbIRyVqhkmNC8tYrzwYxCAQryb
-	AaZD8kf7WZk+rvlpxdKTJ1JSsVmOSzCKNLOtrzVw6kY8B9IAQixSj0imQg/431a3DSKcd6y
-	7Jgh743MKAg4KlOmZVthJEZ83DTeZILErAeehdRlqG5IAk6bceFx4AGWySi6gnSf/ALfvII
-	W+gKBMjfTFGu9FzVmYbvIVSRvSMdx+vFJBakCviWRCWXGTO+epFryi8UxI5GBtAqgtZC6Zh
-	frjJ+ZDuce2QnOuLXzdBDVB915S+NmE6f5W7wEsOu7beZqICvNYPzNfhExkFha6eUmqSFCZ
-	mGfwfVwspKnWBiQq/abaKorKTmeTDrkQpplQz3do8HgnncCQMDJ0XWFe5ThQ1YKlp57WAZ0
-	pUoSMsoF0A/TeKu74f8Msb14obuZ2Xfhb+6NJrzAJmAkVEC3BSN07RKGCMl2HpBAbsHfFYP
-	Tzr5tEVsNTHfKKfXZwNWJTOZII8XeuvE4ZDyt+BPkEunoSfQqBVybzy9mfzIXnka5F+FGUC
-	AGyWQl5wTpAPopMKZbbCzcqDKQiEfZovf1Nkbxz0YEfxaInZR6Ool9FSGHG2wg/lmZ1NjIM
-	cxt9OVL6MUnTgxhEA3FaD8dn81IkQaYoHG4IrUfhurto4tAu0PyZlLwgFrACiT7/vbYr73o
-	Zr8ExYPZZXQ5UkhL64gq5SClnkmHALs+Xrq6tNFZXiFx65iQdg2eJNE/QH4wzsjx6I6Tqm1
-	k9+vkaoQf1NG5czteZL3IomqOneCXvu1reE/dKO8Fgv5OfoYJQx/zH/4ly8gl2Xqn/CjeB/
-	wald5HmbcwaYung52vfaDibIyoLkCJzHETCSRc7pbROyqCTAzERWO3GxROVD6Hs6h5Fhb7b
-	LmyxwZgvkb9YZw9W1eDL+cxmZ/n2YaIznvDD+sxournSpkr/6mN/kXDOivvxKHzMxgHetfI
-	s/cn45veJ1GMPelbPZopFs/t+wgb5eMNRUEv+vzvsa1168GCgRYo9prl5BREiPrDRRg7F2U
-	eLFEpVTJYE7DsvMpfEXG6u30eR5hCTOKa0ioma474LR5z+l0kM2qqpjejhccjUlh3Pdls1/
-	9b+0QVrZdqMfEENA3+QOZcuR+YjGSaTpg==
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-X-QQ-RECHKSPAM: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] zloop: truncate finished zones to zone capacity
+To: raoxu <raoxu@uniontech.com>
+Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <78d0627b-e711-4ce2-84ac-6e501898407c@kernel.org>
+ <B39E5FD81D1A07F4+20260804023403.939767-1-raoxu@uniontech.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <B39E5FD81D1A07F4+20260804023403.939767-1-raoxu@uniontech.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Xu Rao <raoxu@uniontech.com>
+On 8/4/26 11:34, raoxu wrote:
+> From: Xu Rao <raoxu@uniontech.com>
+> 
+> The size of a sequential zone backing file records the amount of data
+> written and is used to restore the zone state. A backing file whose size
+> is equal to the zone capacity is restored as a full zone, while a file
+> larger than the zone capacity is rejected as invalid.
+> 
+> However, zloop_finish_zone() currently truncates the backing file to the
+> zone size. For devices with a reduced zone capacity, finishing a zone
+> therefore creates a backing file larger than the zone capacity. After the
+> device is removed and later re-added, that zone file is rejected instead
+> of being restored as a full zone.
+> 
+> Truncate finished sequential zones to the zone capacity, matching the
+> persistent representation accepted by zloop_update_seq_zone() for a full
+> zone.
+> 
+> Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+> Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Xu Rao <raoxu@uniontech.com>
 
-zloop divides the requested capacity by the zone size to determine the
-number of zones. Since it uses one zone size for all zones, a smaller last
-zone is not supported and an unaligned capacity is rounded down.
+Looks good.
 
-The capacity_mb description incorrectly states that the capacity is rounded
-up. Correct it to document the actual behavior.
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Fixes: 9e4f11c1228c ("Documentation: Document the new zoned loop block device driver")
-Suggested-by: Damien Le Moal <dlemoal@kernel.org>
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
----
-Changes in v2:
-- Replace the code change with a documentation correction.
-- State that a smaller last zone is unsupported and that an unaligned
-  capacity is rounded down.
-
- Documentation/admin-guide/blockdev/zoned_loop.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
-index f4f1f31..fd99e5c 100644
---- a/Documentation/admin-guide/blockdev/zoned_loop.rst
-+++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
-@@ -71,8 +71,9 @@ follows.
- ===================   =========================================================
- id                    Device number (the X in /dev/zloopX).
-                       Default: automatically assigned.
--capacity_mb           Device total capacity in MiB. This is always rounded up
--                      to the nearest higher multiple of the zone size.
-+capacity_mb           Device total capacity in MiB. A smaller last zone is not
-+                      supported, so an unaligned value is rounded down to a
-+                      zone-size multiple.
-                       Default: 16384 MiB (16 GiB).
- zone_size_mb          Device zone size in MiB. Default: 256 MiB.
- zone_capacity_mb      Device zone capacity (must always be equal to or lower
---
-2.47.3
-
-
+-- 
+Damien Le Moal
+Western Digital Research
