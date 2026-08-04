@@ -1,94 +1,103 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-56.ptr.blmpb.com (va-2-56.ptr.blmpb.com [209.127.231.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14B33AD527;
-	Tue,  4 Aug 2026 14:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7D8456E06
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 15:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785854364; cv=none; b=lk6E9oESy28GhjHrnvvShFUtOe57VUs7A40TCMqrzT+WFWZ5xxP8lHi1+onsaBY8S2RI03uYZic0aNCHM9VchzSAVadWErXbx4DOEUItekNeMtCX3sRxrtuKcTmmNLC9vm8UrNdE0W84vLpKmo0R741XkXZRG75ea/ziknzOto4=
+	t=1785856049; cv=none; b=m/fpcIdABGLzwoC4uPB+3oNxnVI9ofLLIEak52wTdVU1HHY+djIeDOXcXrBk9lKEb5oVzFFUrhAXhuAy42b0kyb+8oHvCVvFiKm24VtirJmAhuSyp4IQtaVWwU2WP1q7uFf5gpkUfrgrVeWHnC1458tPWm8FzUqk8oVo2+Y9Bxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785854364; c=relaxed/simple;
-	bh=4X1tPzJigVvr40BdaDBDCLhEpe1kcYx6kA9UvOTX4DY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fI8iiHKJheeV8fc/IzeEl/z6HfPkzUOQoxho2KSvUGAAcYVTzwBV+zhP0uLNPhWIRXYQDtHwEouSCui+yb2JBSfZKJyMriLtgZ4npC4vov2r1cMIhV8Z2y3JAZL7wv2mFr2X4FOiQN5ukbbpChkMYI4zbYzlld4ukcL2kqcno1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JsMPjO7g; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1785856049; c=relaxed/simple;
+	bh=3vCX73HTin8OMhCLrL4mg1udeBnAS0Z1tTY+9wzBoW4=;
+	h=To:Content-Type:In-Reply-To:Date:From:Message-Id:References:Cc:
+	 Subject:Mime-Version; b=NinTsf2V7l3K9/Ak0v+72Yrp4gTdedNIq26cAS3Y1eZppVu1dD5DGbpBxRwnc/GDm4nsws/eZzb7D8GtZeTjPyVv1RAHvXhizY1LodylNb1dW/kBWL+ceXYpipDjT+HNQEvFMXU9puuI1uysO1bGcAwDfDL1K4v1tRGleEQDn50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=hWciGx/n; arc=none smtp.client-ip=209.127.231.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JsMPjO7g"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=WY
-	+pSK9kVlYwbHQ/s3RtNIXYh4tZ60x6d6fkvs7Kgos=; b=JsMPjO7gsGMZkn+DqH
-	TcxGK5eEkmS7j3oo73DZS3g1Iotu5CzPFmCgIaFGenow0olFkRU8iZESlyHTUhAh
-	GtnVGx0N78ejqgsE7IF2v+vcTyvVyGiOOWAmdcfxEnqkFVYR4aIDq1aoIPokvFOX
-	M0iXt0hMDy6G+gvgt20FY/XPI=
-Received: from XLL-9950X.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wB3hVZs+XFq6UfaMA--.60636S2;
-	Tue, 04 Aug 2026 22:38:36 +0800 (CST)
-From: Longlong Xia <xialonglong2025@163.com>
-To: minchan@kernel.org,
-	senozhatsky@chromium.org
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Longlong Xia <xialonglong@kylinos.cn>
-Subject: [PATCH 1/1] zram: reject disksizes that exceed slot index range
-Date: Tue,  4 Aug 2026 22:38:32 +0800
-Message-ID: <20260804143832.146129-1-xialonglong2025@163.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="hWciGx/n"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1785856033;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=aTkMnMJBZbmBk8aXgbvQ0jabgPpSOlUfMkXtPY+IHFY=;
+ b=hWciGx/nfSr6Hw5Z64Z2T3Z5ANa+tTAGOmZIvBkd9YhOh9q5nVKiFYBbmu2+8mwtGf7Rpr
+ v6ZKlDEVMbUd6752vqSdIZxr8aGtnx1gp0KOOfPc8CfEMIv3l6xB9LaL1gDEGxnvxtzFd3
+ 2DiI/V4z0yWJYiCRcKLnrhkdkO0/7v42/ljEU3GGL6rMpqB4ztTeOOz9wQXY0lHQuXTiPD
+ 2ZKXLeD7kBDLDrn3KoKExk/wd5Y6haSQlj89wFXxRZTGCJEWmyaL/sZcTiMGqgw+jjbNgo
+ Su7dhb354fuaJvhWkgCzW4p0RJXstOl7HrscXFC91/s8ZMUNAlouz74tYp59Gw==
+To: "Christoph Hellwig" <hch@lst.de>, "Jan Kara" <jack@suse.cz>, 
+	"yu kuai" <yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20260804132527.GA8078@lst.de>
+X-Original-From: yu kuai <yukuai@fygo.io>
+Date: Tue, 4 Aug 2026 23:07:03 +0800
+Content-Transfer-Encoding: quoted-printable
+Reply-To: yukuai@fygo.io
+From: "yu kuai" <yukuai@fygo.io>
+Message-Id: <a780016f-8f94-4337-b700-786f5487ca3f@fygo.io>
+X-Lms-Return-Path: <lba+26a720020+773d21+vger.kernel.org+yukuai@fygo.io>
+References: <20260804065313.2092022-1-yukuai@kernel.org> <20260804065313.2092022-2-yukuai@kernel.org> <prx5s4rwbgoeh7wtgyo7vwydh5iwqn6qc2utamowirsplspfmp@e3eteq5xwuyf> <20260804132527.GA8078@lst.de>
+Cc: "Yu Kuai" <yukuai@kernel.org>, "Jens Axboe" <axboe@kernel.dk>, 
+	"Tejun Heo" <tj@kernel.org>, "Johannes Weiner" <hannes@cmpxchg.org>, 
+	=?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	"Jonathan Corbet" <corbet@lwn.net>, "Josef Bacik" <josef@toxicpanda.com>, 
+	"Coly Li" <colyli@fygo.io>, 
+	"Kent Overstreet" <kent.overstreet@linux.dev>, 
+	"Alasdair Kergon" <agk@redhat.com>, "Mike Snitzer" <snitzer@kernel.org>, 
+	"Mikulas Patocka" <mpatocka@redhat.com>, 
+	"Benjamin Marzinski" <bmarzins@redhat.com>, "Song Liu" <song@kernel.org>, 
+	"Dan Williams" <djbw@kernel.org>, 
+	"Vishal Verma" <vishal.l.verma@intel.com>, 
+	"Dave Jiang" <dave.jiang@intel.com>, 
+	"Alison Schofield" <alison.schofield@intel.com>, 
+	"Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, 
+	"Andreas Gruenbacher" <agruenba@redhat.com>, 
+	"Matthew Wilcox" <willy@infradead.org>, 
+	"Andrew Morton" <akpm@linux-foundation.org>, 
+	"Chris Li" <chrisl@kernel.org>, "Kairui Song" <kasong@tencent.com>, 
+	"Nilay Shroff" <nilay@linux.ibm.com>, "Tao Cui" <cui.tao@linux.dev>, 
+	<cgroups@vger.kernel.org>, <linux-doc@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-bcache@vger.kernel.org>, <dm-devel@lists.linux.dev>, 
+	<linux-raid@vger.kernel.org>, <nvdimm@lists.linux.dev>, 
+	<virtualization@lists.linux.dev>, <gfs2@lists.linux.dev>, 
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: Re: [RFC PATCH v1 1/3] blk-cgroup: add helpers for bio cgroup state
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wB3hVZs+XFq6UfaMA--.60636S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7AF15Aw1kGFW8WFW7GrW8Xrb_yoW8Wr4rpF
-	WUGFyYkrW8K3WUZw1jg3y8tF1ru395A3y5GFyYyws2vryrGF97Ca4UJFyFga47Zrn5AFWa
-	qFn0ya95WFWkXrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jrdb8UUUUU=
-X-CM-SenderInfo: x0ldz0pqjo00rjsqjki6rwjhhfrp/xtbC2wyQiWpx+Wz8SwAA33
+Mime-Version: 1.0
+Received: from [192.168.1.104] ([39.182.0.181]) by smtp.larksuite.com with ESMTPS; Tue, 04 Aug 2026 15:07:11 +0000
 
-From: Longlong Xia <xialonglong@kylinos.cn>
+Hi,
 
-zram uses u32 slot indexes, while disksize_store() accepts a u64
-size. On 32-bit systems, a disksize larger than U32_MAX pages is
-truncated when zram_meta_alloc() assigns the page count to size_t.
-array_size() then sees only the truncated count, so a small table can
-be allocated while the original capacity is published. Valid I/O
-within that capacity can subsequently access beyond zram->table.
+=E5=9C=A8 2026/8/4 21:25, Christoph Hellwig =E5=86=99=E9=81=93:
+> On Tue, Aug 04, 2026 at 12:52:16PM +0200, Jan Kara wrote:
+>> Mostly looks good. Just I think bio_blkcg() should gracefully handle the
+>> case where bio->bi_blkg is NULL (and return NULL in that case). That way
+>> you can also get rid of somewhat odd pattern:
+>>
+>> 	if (!bio_blkg(bio))
+>> 		return ...;
+>> 	do something with bio_blkcg(bio)
+>>
+>> You can then just check bio_blkcg(bio) directly which is much more obvio=
+us.
+> Yes.  Looking at the whole series I'm also not sure that this makes too
+> much sense as a split out patch as the next one touches more than half
+> of the callsite anyway.
 
-The same oversized capacity also lets full-device scanners compare a
-u32 index with an upper bound larger than U32_MAX, so the index can
-wrap instead of terminating.
+Yes, this make sense, I'm trying not to cook a huge patch, but patch 2 is g=
+row
+much bigger than I was expected. Unless I figure out a nicer way to split p=
+atch 2,
+I'll merge them in the next version.
 
-Reject disksizes larger than U32_MAX pages before aligning and
-allocating the table. This keeps the table size, published capacity and
-slot index range consistent.
-
-Fixes: 33863c21e69e ("Staging: zram: Replace ioctls with sysfs interface")
-Cc: <stable@vger.kernel.org>
-Assisted-by: Codex:gpt-5.6-sol
-Signed-off-by: Longlong Xia <xialonglong@kylinos.cn>
----
- drivers/block/zram/zram_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ace65c586072..2728a8a826d4 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2876,6 +2876,9 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
- 		return -EBUSY;
- 	}
- 
-+	if (disksize > (u64)U32_MAX << PAGE_SHIFT)
-+		return -EINVAL;
-+
- 	disksize = PAGE_ALIGN(disksize);
- 	if (!zram_meta_alloc(zram, disksize))
- 		return -ENOMEM;
--- 
-2.43.0
-
+>
+--=20
+Thanks,
+Kuai
