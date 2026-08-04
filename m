@@ -1,47 +1,102 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDC9218AB9;
-	Tue,  4 Aug 2026 12:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337503502A7;
+	Tue,  4 Aug 2026 12:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785847029; cv=none; b=Dtfvg4rRPDSBIwZ6iFvu7ZDGFAXOcgUutPrr/1GJvhF7aXdXLfL1wec+slVOLYjyWYzLihhOyLGQrO4LztXnimzTqUMm3Jg74/R7RWZBrO3vetJneEcf4CLo8H/+lkxgCZHDt0DF9yHCW3mp1ffPFlhSc0pJMVMRf3b5rxNUL/4=
+	t=1785847198; cv=none; b=f7nJCq0OYG9AeqKpNzIWZuRryGHjdjiadzukSt98Y9pBQ53gZ2bWh/MDtwnTNlrzaQbSgMPEU4yO69nKFPK5OI/O70h4iMw5f2mhq+wbttZDSxihLBbN0jmnGNA/fhNrMbhkBXpGAOIwYWgJkAn5byQOSvzE8egAxvpCy40dqlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785847029; c=relaxed/simple;
-	bh=XTbeljmmfukiimPbfaeWLblmeEISsxfbCz+AYuvfj3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MoHWuHYyCoro5lwEhp6/H3VZtac9VThk7Cp5LuV/0cl4u05nr9a5DVJIerhAVXYx7CwpEt1m242ryJVdB+TPRVDEdDMsTH2X/RIe8NEaLmsv/Tqm0xRffqn42L7mFfXM/xUbiF5o9iIMtVUnYHcMtOQCBRNJGO1AQdTkyW3ZHZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 762236732A; Tue,  4 Aug 2026 14:37:03 +0200 (CEST)
-Date: Tue, 4 Aug 2026 14:37:03 +0200
+	s=arc-20240116; t=1785847198; c=relaxed/simple;
+	bh=gIyMP8qziDMPI1WkDFO/ZNKeSsyFWsqliQt+kuJVClI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uWkRrM9noIdiV+/NvOcUlM2pNjjqPcQDTllzkeI+5XKsX74lWnTJK/6ik1R4ccdKVVamXH/hdebUyWNwGiZst3xdCzHOKjTzsCQRdj9yvOHCBezLmQyxTWhPzzfjRsN8l6NGcpqipoNwTufICe7epWZ7v8NsVVpe/IjTgQzKI4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ImrIYVD4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ImrIYVD4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=qq9K0yOs00rawT9v7sg5f9KMXNPMI/X9Nnxwdde3otU=; b=ImrIYVD4qruvTekPIJEXd1c0ea
+	dyvgc59BqbxieQheyh8e2zc7HNasexAvkbpoCwoi3Oqj8sfbuWydn98dXZgsEqkGc8mApk0zettzH
+	/7vwXgruaaKInduR0oGXpYaaSyIORVolpQquH5m+ySB0mXjO4o59uVE96QvzUkwwWWqXEVE1RSKzG
+	q3yYMZUM+lWlUZ7z3wx/vvHRxnkujcX6roeVIzifbSmMrlyauzfozOPe/A/YXQcMXmtsbzfpd3Axl
+	0WaBvAq/O0al7BiAEWJblL2XYkynoiaLJPVfF0BqccY5pGcajIx8M7A/mOc6Y+P/vAEOjFRB7q1/p
+	Pv8SFl+Q==;
+Received: from [93.123.20.94] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wrEQz-00000001pwN-0Qev;
+	Tue, 04 Aug 2026 12:39:53 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: raoxu <raoxu@uniontech.com>
-Cc: dlemoal@kernel.org, axboe@kernel.dk, hch@lst.de,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] zloop: truncate finished zones to zone capacity
-Message-ID: <20260804123703.GB6661@lst.de>
-References: <78d0627b-e711-4ce2-84ac-6e501898407c@kernel.org> <B39E5FD81D1A07F4+20260804023403.939767-1-raoxu@uniontech.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH 1/3] block: remove bip_should_check
+Date: Tue,  4 Aug 2026 05:39:23 -0700
+Message-ID: <20260804123928.736596-2-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260804123928.736596-1-hch@lst.de>
+References: <20260804123928.736596-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B39E5FD81D1A07F4+20260804023403.939767-1-raoxu@uniontech.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Aug 04, 2026 at 10:34:03AM +0800, raoxu wrote:
-> However, zloop_finish_zone() currently truncates the backing file to the
-> zone size. For devices with a reduced zone capacity, finishing a zone
-> therefore creates a backing file larger than the zone capacity. After the
-> device is removed and later re-added, that zone file is rejected instead
-> of being restored as a full zone.
+There is no benefit in using this helper over the simple flags check.
 
-Can you add a blktests test case for this?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+---
+ block/bio-integrity-auto.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/block/bio-integrity-auto.c b/block/bio-integrity-auto.c
+index b1c733ecfd2e..43ac9f338183 100644
+--- a/block/bio-integrity-auto.c
++++ b/block/bio-integrity-auto.c
+@@ -45,10 +45,6 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ }
+ 
+ #define BIP_CHECK_FLAGS (BIP_CHECK_GUARD | BIP_CHECK_REFTAG | BIP_CHECK_APPTAG)
+-static bool bip_should_check(struct bio_integrity_payload *bip)
+-{
+-	return bip->bip_flags & BIP_CHECK_FLAGS;
+-}
+ 
+ /**
+  * __bio_integrity_endio - Integrity I/O completion function
+@@ -66,7 +62,7 @@ bool __bio_integrity_endio(struct bio *bio)
+ 		container_of(bip, struct bio_integrity_data, bip);
+ 
+ 	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
+-	    bip_should_check(bip)) {
++	    (bip->bip_flags & BIP_CHECK_FLAGS)) {
+ 		INIT_WORK(&bid->work, bio_integrity_verify_fn);
+ 		queue_work(kintegrityd_wq, &bid->work);
+ 		return false;
+@@ -99,7 +95,7 @@ void bio_integrity_prep(struct bio *bio, unsigned int action)
+ 		bio_integrity_setup_default(bio);
+ 
+ 	/* Auto-generate integrity metadata if this is a write */
+-	if (bio_data_dir(bio) == WRITE && bip_should_check(&bid->bip))
++	if (bio_data_dir(bio) == WRITE && (bid->bip.bip_flags & BIP_CHECK_FLAGS))
+ 		bio_integrity_generate(bio);
+ 	else
+ 		bid->saved_bio_iter = bio->bi_iter;
+-- 
+2.53.0
 
