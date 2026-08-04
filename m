@@ -1,121 +1,110 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED76E3921E4;
-	Tue,  4 Aug 2026 05:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E00A32C957
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785821447; cv=none; b=cs2IA1etSXXgjQAanKfgvPw/2PMbV7W4ukcDZZZlekM/HY2zvkVMUV7cW3X+hs5Og6DqV2KxUjuN1DWWrpeqVpYb9XmvTTCszsFHC9Pig4O0whl7YmIFpoEB07xgC7IsUi/oXWod5lI1I6YBUjaJKAZ3dfcB3SwIAaUDllyEYOk=
+	t=1785821531; cv=none; b=YeRn+gmhcYdkx5wM6qn7uI8zkYUMA6n4V8+Vziv5MmK2L7irzcfdgv9c4946j3mo8ccf5YwcKTC8AEq6uR1sMch4HPJGW/wP0cN38FhqyVj7Umf+uQFCWG2V7KrWN/M7d7TqoY9kVHAMBsHoE6P47SNG+PQN/48F5/b6x7gGoPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785821447; c=relaxed/simple;
-	bh=P8iP43eDHt81LvqSdy5d14cpEOzQE4Tm0N/yRPrNnWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Whndp7fPD69z+OtKZMYGkw3EAS9KEaDuDNDlTUeY9VYmz/s1X/6XTLe9DmT0jahOZTj6Awaq/UEpBt5biZzB+hp1FEi+ppXS+9H25a2IDRk1tokve57s2k0lVko0Dj212VeX+yDOPWxxFgc2n6h5B472O/GmedeYsv+TcRhJ5oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=cDuhGcJB; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1785821531; c=relaxed/simple;
+	bh=IAA8nFUZpC/UPplaX0lplMjH/PVZvv2wQ41dchLY7OA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WBID4mADk9VWFAHyFQJhP5RrDUPQYWZnXCvT2pcipfGdQh9/lvDnsh7m0/w+407n9liD4vOIPJo6UOiTvBt1ltKH3aRq/BJWU069XqCoPFWDjcSyMbJ6E6YuLuXursjWl0fxoJA3DenRpShzD08F9uEM/Z8XHbXra0VtkidMitE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WNEYCCst; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="cDuhGcJB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1785821403;
-	bh=WVerJCQIBbfiADNTn0JWm/8YAIyeBAG4QNqQ9jmnNh8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=cDuhGcJBzXIzIkkCRA1O6S6KW6A86Q5rnB91rN7/Q7/nIRpp7qQZsqk03PrgGUjF1
-	 Tcni29/yhdMsfdOsx4E6Xve6EAQC723RBFEyDmNQ2yPfol/ZV6iRfQg21mWYOrYPLs
-	 /9uoAz0vbjN0WpfJBKG9QACqxRF/lyCu888eGU+E=
-X-QQ-mid: zesmtpgz1t1785821386taa50e78a
-X-QQ-Originating-IP: ysEyymIQepnshwAmNpH4FCVePOmiVYrgVFJoIm0GVdE=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 04 Aug 2026 13:29:43 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16598172742338723589
-EX-QQ-RecipientCnt: 7
-From: raoxu <raoxu@uniontech.com>
-To: dlemoal@kernel.org
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	raoxu@uniontech.com,
-	stable@vger.kernel.org
-Subject: [PATCH v3] Documentation: block: zloop: clarify capacity alignment
-Date: Tue,  4 Aug 2026 13:29:41 +0800
-Message-ID: <4659F8F0C6C328EA+20260804052942.1186727-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <8da2a239-e074-41f8-8d8d-552b1652edfd@kernel.org>
-References: <8da2a239-e074-41f8-8d8d-552b1652edfd@kernel.org>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WNEYCCst"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2caf228a910so30828585ad.2
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 22:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1785821530; x=1786426330; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+B3M0tFqnJnc29FP5kYp7HH8DS15buEwgObTWQDsxOU=;
+        b=WNEYCCstOc6FR/4rzM5giabmLGkghOcM3gEw+PneE1r2m0g9eHFH+KBjBcp3iGkJN2
+         62krzBuhI4ffpyqkDAVwPeedacXFLZ99jpQTVdBaqgSE7AuHg6zGpH7qLVRKC/TiLkT1
+         1YtOTipG26gxOxteSiMyPo2MB3C379iGKsNLc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785821530; x=1786426330;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+B3M0tFqnJnc29FP5kYp7HH8DS15buEwgObTWQDsxOU=;
+        b=hro/ut1TIy1GtZr/a5WJ3YBTRCaQpaWIT0OZ7dVqUNwlNTZY3Ndg/DXni6uL0UTqwA
+         D3gcXkCLbOK4yxJ73sCAckdf+iahkEl/VzUCy4omm6za041oX/QJcIrtC3U/zn5qOYXo
+         KH3vEpnWpNgmmhrNTTBSQGq5KObI7FdLDiab6aVlQDhbJV2fGX3lrdBi90dzWm753nFp
+         5yFKoiQLjV4frrxR9wn7oH30p8lGk2qGvwE4+U9FYDFl+zuPb1lnypMSURVQkwGe3/xV
+         1h99e88KwjyMPQqebAcCDSHMx3UbzYjkyYOhSZ48NBMVUkwJrwz9zVDB3WX1w9DDBAiW
+         z3UQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpt9onzV/3rrYghzCYW514dVwE0oxA2HfeussmjiP7deyPGdtg7Iw9ZajJ7JlnuVfaROk2DuGiVONPbSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yypc0mqb8TA/HH4Rwtc5HQzGi4phOxZESs9KxfaxNH6USvNLIlf
+	ZRN7WgxRI9sVdQVXPi6LM/GyXcwlFNgGqHBKIYuhQuW9EIEpdqMcLinhXpuEtCRNrWhNd+ZvHIg
+	VynA=
+X-Gm-Gg: AR+sD12MFy6Uo7RIeQ0/1Ow0W9WJReKtF0QCmarR9JT0FlGhfcqz8mlg63zb2D85Ms4
+	sPZvfp/W5xOgXN+h2cH7iKxEgfU6UhS98mbh4xgaMEMrg8hA+Am3IACEVbZiWJnY4VqYuGP95Kn
+	+Ol2gRC7ZqKCf+nY11yDrBaXrel0/le6MRFIqVbVhJvVGONDEDU8e22k5luHZpYhsHex5v6rQjC
+	13vre4jgncKz91yxaUBvLb69i7uOU8j0wQa8VEPRItFgc+NOjDUiibkm2ZPxKjMqkbVDPq1dPQH
+	WrUjD9DQW/tHHn7q3mf5A7holT6TXYCaYgb1vepqBwgSbTZf8p/wBPaUur2ByD3cDK7qKCXtF4L
+	qS9gyVVSJYJ04XheUjNS0KX91oWMdCXhUtQew1AlvTuFcFuTZpxanhg2/Q/B6qIgmLM2aSs3hwD
+	oPiyHRsitxeY9vio/SbASYbwFexItXr/f7IhQClis9RG7FvUnO/kejawwuBmm3N0EJ4sIrnHOv4
+	hcKyfWTv0VU/Qy479WkkJb5ryze
+X-Received: by 2002:a17:902:d98b:b0:2ca:20b1:3e0a with SMTP id d9443c01a7336-2d05219bb8fmr144584255ad.3.1785821529951;
+        Mon, 03 Aug 2026 22:32:09 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:fcb5:533d:198b:8d48])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d04ae5ea02sm46456715ad.28.2026.08.03.22.32.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Aug 2026 22:32:09 -0700 (PDT)
+Date: Tue, 4 Aug 2026 14:32:04 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Haoqin Huang <haoqinhuang7@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
+	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
+Subject: Re: [PATCH v5 2/4] zram: reject zero-size dictionary
+Message-ID: <anF4sw4jTDu5xUd9@google.com>
+References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
+ <20260803141256.60599-1-haoqinhuang7@gmail.com>
+ <20260803141256.60599-3-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MiUxkXieYO8R4H+o4MTIDg/qbrK2PMkkZOqgsvGSt2/Rtb5pj212i2sh
-	YsYU0oMdpJJ5CZvcuZeqxSwkeMLEdJm/ZT///wo4vSkjlGbGiYx9CtzCfvkvtGkCOcilvfg
-	MonkCaZGP1miZXM8g0YVSoidquV/lQWfSDx22Zm0KwPqwLVVUT82kySZiBfzVuwSqscDJS1
-	7WhmXKHt5FWFqDQIWl3l/gI1aHlP73X9qD2DbqVeT2maKl/rPamkLz763WLN0XP8Jr3oi7k
-	Q38VMfpMfdzx4Y+4xHq7fVhh5txb5QVLONPTti65/TOlIUrEqVhIEVJ+pYqqZZBie+Q8PC/
-	PdlHqocg+FdqvVLREGqEfh3nrbyTzJ3gEP+RuJvHumVBZg39ke8OlW3V/q2lm9VIwsoLljg
-	dxMteyA8ZJCSAKmesRcAq7iXAxEgUgpShvVmRqUBgVicb3m/8hpqzT467/SFPUioaoEWpZC
-	VPy65Bodtx2CbET4k5mDrt6zvsSNabefUENLpy5uQTmolA4tbxofjChxjLgkYavwcKbdr57
-	uGTwjyby8LrVx4Qe+TekDYT5JC+fHQ0PDb7MT39SxfA3YvCHNi4StqddVXsFMq+yLdEHYrb
-	r7MFvLHlfOSC0PSTBb1u+/i92EkQZ2SGyKqFCZOCRtZrXhKtHLBiwJaP4pMv3s5jFn7e3gd
-	XGB/QEtGOoImMo1PHhB4v7qivjBJ0EC2JSSLbH1vNV/U0sCVyr5AObUMvCabxZNXe1oy8zZ
-	6S4pui49JmitNR6SHF7jg6UK9hyTm/0uou6z5BWjIRtqIVVL1cPpZ8zptKTWa4bZDoBURfU
-	gwNxyd/ZubCNJtrKDLt4tg4lDB7IjilV0lWFKlp1Sq0s5tFSgQjUljlha7RYQgR1/Hzi2az
-	PysNOSq7hH6/KJXOyB4pXCCrqzm3hIkV6I0xMA3grPC/H02yvpcYYkDTeYqGlxHX+Kx6hWV
-	BtGVbCaqa8x2OGnkmybBk5f6EHHlKJ2HaeuGeRCD4IJo+FkYEyQU5GzKdijNdy614vq8Mts
-	g1/8weC3/1HL/rx9d52FJCezVgv3kjK/43kwKkg9UInn5G94eS3fefHJZKy6ectj0r7XMxp
-	+Mlzea/cMUiKF+zSO6s+RrfZDYifYFGPffSccyHoiIl
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260803141256.60599-3-haoqinhuang7@gmail.com>
 
-From: Xu Rao <raoxu@uniontech.com>
+On (26/08/03 22:12), Haoqin Huang wrote:
+[..]
+> @@ -1700,8 +1700,12 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
+>  						INT_MAX,
+>  						NULL,
+>  						READING_POLICY);
+> -		if (sz < 0)
+> +		if (sz <= 0) {
+> +			pr_err("failed to load dictionary %s (err=%zd)\n",
+> +			       dict_path, sz);
 
-zloop divides the requested capacity by the zone size to determine the
-number of zones. Since it uses one zone size for all zones, a smaller last
-zone is not supported and an unaligned capacity is rounded down.
+So for empty file this will read
 
-The capacity_mb description incorrectly states that the capacity is rounded
-up. Correct it to document the actual behavior.
+	"failed to load dictionary foo-bar (err=0)"
 
-Fixes: 9e4f11c1228c ("Documentation: Document the new zoned loop block device driver")
-Suggested-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
----
-Changes in v2:
-- Replace the code change with a documentation correction.
-- State that a smaller last zone is unsupported and that an unaligned
-  capacity is rounded down.
+which might be confusing.  I wonder if we want to separate these two:
 
-Changes in v3:
-- Reword the capacity_mb description as suggested by Damien.
-
- Documentation/admin-guide/blockdev/zoned_loop.rst | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
-index f4f1f3121bf9..abaf36f21945 100644
---- a/Documentation/admin-guide/blockdev/zoned_loop.rst
-+++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
-@@ -71,8 +71,10 @@ follows.
- ===================   =========================================================
- id                    Device number (the X in /dev/zloopX).
-                       Default: automatically assigned.
--capacity_mb           Device total capacity in MiB. This is always rounded up
--                      to the nearest higher multiple of the zone size.
-+capacity_mb           Device total capacity in MiB. A smaller last zone is not
-+                      supported, so a capacity value that is not a multiple of
-+                      the zone size is rounded down to the closest multiple of
-+                      the zone size.
-                       Default: 16384 MiB (16 GiB).
- zone_size_mb          Device zone size in MiB. Default: 256 MiB.
- zone_capacity_mb      Device zone capacity (must always be equal to or lower
---
-2.50.1
+	if (sz < 0) {
+		pr_err("failed to load dictionary %s (err=%zd)\n",
+		       dict_path, sz);
+		return sz;
+	}
+	if (sz == 0) {
+		pr_err("failed to load dictionary %s (empty file)\n",
+		       dict_path);
+		return -EINVAL;
+	}
