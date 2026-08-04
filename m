@@ -1,112 +1,150 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57672F549F
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785821828; cv=none; b=PhFbROyLvJDtOha6XmQl+qoAd3ugVOCbcHUZNU5oVzCUCleZsiYBnTAYothy9Uzkgbue/42EukocoVa/0GdxbsgqOHkBbFfXCqztIxjRqdbVKRkkX9hKxOwTmm62HYGI3lXLjTWDGohDvj7cJmJbwu5ww+Y6vRk2q6J3jRaiJCY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785821828; c=relaxed/simple;
-	bh=yD3cgIiagIgqlzaUUHpVETjAxdNWdFZWkRrPnWKa1mM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z1Nv+uOzQekCQ2V0PNBfLwDW4tb+XznviGJ5XRa7s3/Qa87w6rKd8PgRn5ddyP76x3/rDj49RoQ5EdtVySZfQ7gy9To2VhN4akkT+gjqu3HIZ9AVpdBT1TVwnwLY+6CLTpCbp4AKI5rkynrrezpA9hfllvVvu8Q4TDLSwHGpuoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jM1mpY59; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F523D566B
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785822104; cv=pass; b=r0UDIAXbjcYMV7zpFBUCFeodLfBnKTMPi0KVvynzck8J3/Qgvgsb4kyk8Z8w1tSW44FFKOyZTCapTHwk+ZH1blPbxY9l++DWAXwKdZl7qCgP2BKs2726BY/McsGuUiBHswgSz4HJMKp3o4e6TAyuoWJBz0n9U6Z5dFS6Jh+WU5E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785822104; c=relaxed/simple;
+	bh=rc9GeNxYacpB0CYdtKD5SwN4Gkn3z306jaLlyKihy/0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mZjnmVZ4k/IVH+wRQYJ4wJogLuxFuYIyrRoV4zPolZsSWh69KOQ+4ryzDF07seaI0UBsZAR+kYfAGq5qSvCLX2Wiy50mt5Lk7GLYVykLpKMpyPvV+/J98FDzug9nvoKBhjhXN1mUcFQXseR/4Nt79KUej8r+f+slmVrfM95ZLk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArA/7I1e; arc=pass smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jM1mpY59"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2cf27856f9cso41895965ad.2
-        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 22:37:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArA/7I1e"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5bf9466412fso3536389e0c.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 22:41:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785822100; cv=none;
+        d=google.com; s=arc-20260327;
+        b=goqm+pyzKWwP2bOrOAAfYVDBJAZNxGXXOfWH3Esm5YVssgwoC/UJ+0w8tPSlH9oFaU
+         qtBfG+ntlDuYhJW6emP5qcsHdcFPQIWRtA3/fdnoM7oQtqU33NMsgeFEfT4j/REKQmzo
+         XIyOlMhitEZVmDjSGDJAaj1SXKyHIGbdBXPQXeV+Q6CPhFHAiRsjEPoOUPOkIofHvgA4
+         w0ivinlc6QTysYtYSesGDdQFqgZCt2leVw4xszN74b7b3HmOAH1lDTZWU9bdBBOtNdd9
+         9Q7s2h0O++lRjPTYjwHmCnRAFV8h9wPjbD3nH8jdW1tbUDGoEP22lD21+lsT0Oe03+XP
+         kYBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rInnpLn4lCoCkOv7jPR28G7eG35rChpZ+1ECCyGIUL0=;
+        fh=x+oHhfXK3wSMbNhK7dttym1lgiBfv5Nr7YatwvCsSy8=;
+        b=ApNBS2fj9kKDRjIzV8+m7uXDjC0ZyeC1gBzMqAFX65pEt9Y9Fc52qNKfrhCxhsEd7/
+         KJbb/p5ft7znRzl85+r329rU0qpRY+D+003O1D/w/8nBc3AizbKucs75UmKcXf2zoitJ
+         /8toWDMgtuFhQPu4mR906KpWlcewRT17aMjJTL8aQbVlpGi98YRPW++0V+wOnjOGB4X/
+         kEK0GBUa+34WoMX9NIl1ZFl10taCembW6Pgq9dfI8eGXXvGEOlb3UJ4GFfS3smpnBgee
+         n39X5C0vFnysYy8bHy9LqAPgWpvxxqjRK60Drz1qW85i+L+awAxVoWqkRdSk/6DS2y5S
+         YAXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785821826; x=1786426626; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1785822100; x=1786426900; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=G1i0D2KmfuookTim9/62kIxo50WcIEe/kK0FsOm7UkM=;
-        b=jM1mpY59KaPZQ7yl2oY8emNk3BSQTIG+yYKIuRZxw1PtmufivHQ40Pq8QtIn7rn6Ov
-         fixPgpO0MB3/g7lNe8obKlmYpyZM0dz/OfS+7kSjS73PEIQD2vfS69S9xNGupD/XgxZx
-         LmFdE2fE3mTthdK79Lgv83iZWl24e4roapT6c=
+        bh=rInnpLn4lCoCkOv7jPR28G7eG35rChpZ+1ECCyGIUL0=;
+        b=ArA/7I1epmEq1FcuR0jPbRr+NDW4ixF65EgSLV+Q55l2e4pgWImltE6JVVzTwwdbFK
+         SdOH44qoNMMbRwhtRKjJBhhzVpNlDCejhxpggxElI09K9pQsEF7VieRBRpKc1/0vrgGL
+         zJPxm71lgp1sKJiwB/sgtppoQaDvmnPLuv3IRU/aJFZo1AYWGWdL882H4KpXju2paxTG
+         GNvjz20DmOGy7s1dXQQceJ5NyRYIKW+euAkFvvrr3xUlXUCeyktSQ+TNqvTpl1I5p8vL
+         kSa15CkulS/Kk3hD/khk52wgSjEaisyEmgfOI4XxRpxSQ8yVgh+KzPFPRWHbRFsYwsTA
+         DQSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785821826; x=1786426626;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1785822100; x=1786426900;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=G1i0D2KmfuookTim9/62kIxo50WcIEe/kK0FsOm7UkM=;
-        b=JlLLPLFjL9uMasJrlevh11Om6GCSPJWVJnOIWrROPd6VLpSJyOjmn0IAxlZHQGBZ3P
-         74GQnl7M0Mg7q+h4lA66aJZufCuuzflLXZI8xmwdTcuY52stn2Hjc8UVy0wUdZSlBY7L
-         FS+eh95CL4Nk2hOVBT5ACWJcokWxNkLAEcb63RIBL2+zS37eR03lVW9LEGr7BZPZQ8i8
-         EV56ItBJFAOXwd/3HAoxqgG0q7Zspu2EQPeJGMd8fAcP9+pZLVd/1aGWo2Uf4JJAUbSE
-         x/53EwK9FTpqJp9nOlKRGixWtSHKsYnmQrY6FIrKfKOqKfQdRV/kHX9auaTW19ugB7lM
-         dO2Q==
-X-Forwarded-Encrypted: i=1; AHgh+RoXS/4iaXFqZMZZMqjFzaNSo5Y6Ers1RAlcdfO1A3fGGl6uImoCQFPpFAP2rGop9UWXEqe8/Xxf1ASDGw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgh0hwoXItFuNY3GQPlmyfH616gKfvfMCbBpYRVbWpEV8q/wdN
-	iqhmt35BrN3IzHGzIII3kB0+UUnIQdpLxz6Zfa/aBCaBwpPFCnK6oL5g7tewEK2eDfFhtxIr10A
-	mRyo=
-X-Gm-Gg: AR+sD12bOWVg5Buz9KmKDZopapVednm+dMX4fjmkFx4QLKzHK+OdgMd2xCZ0iTCgk8D
-	dYycP823mjHHlPe6kmZ+W49G2vzKULxeWL0IIO8pR/bJkWbNkWmenWBHUfPftFNJi6au9Srk9mk
-	SytgInsBFfqWKFpX+GUbcoUC7vG3P8WT6kz8GjRftc4sWbzcoyuiva2VbPRQ1GtU8ByWWL6JVnd
-	tFLN4zz4ycui7y2yupotVo4gP1h5j/hOzJ1uOgUlej0h4OkfjvJVTU2r5RtIFbyMIk6oIN7tQL9
-	UnsTQneFxyhRFNex2n3ei6j+90D6CLkyS2YE6YcdSqfut7/DIbZP9Of8yGpJKgppGRzYnD3DXx4
-	3xg2p/ive8H0970C7/cC67CzNN0NgQG0C7d9Htt1jAtHhfrkQ5JonLM34/lLbJJgIBCGaTqOAa4
-	8Qkomfp52lrMwQLtJ9mN5vRVsb+t97Pf7CbFguP2lVRc3u29iJ+FdepStYpsnq4bu73aft//oAY
-	ykjLbKBHebfYSelFFFNThDW0aTH
-X-Received: by 2002:a17:902:fd8b:b0:2cf:b68a:8b5 with SMTP id d9443c01a7336-2d05222b928mr128876165ad.14.1785821826166;
-        Mon, 03 Aug 2026 22:37:06 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:fcb5:533d:198b:8d48])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d04b1216bdsm47129115ad.69.2026.08.03.22.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 22:37:05 -0700 (PDT)
-Date: Tue, 4 Aug 2026 14:36:59 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Haoqin Huang <haoqinhuang7@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
-Subject: Re: [PATCH v5 3/4] zram: validate parameters in each backend's
- setup_params
-Message-ID: <anF5ZikFOgS1hp6I@google.com>
-References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-1-haoqinhuang7@gmail.com>
- <20260803141256.60599-4-haoqinhuang7@gmail.com>
+        bh=rInnpLn4lCoCkOv7jPR28G7eG35rChpZ+1ECCyGIUL0=;
+        b=B/NanOdlKoe/OiavOswtEBjGsngew27siy/n4c+1JItleZLBB5rcjdhH/Oq808YIWY
+         dIKobmtaDB8BjFO/3N+wiXfQUs4CKR4vQs9iSErWFQ9gFuPMG9urPGJbscUHrSnyweo1
+         cWzQhWc/vy0SthBq3f4149HsO+XiR9VP4WjGT7Mg+EqP1C5qgapvFlXO6BjJnQMAjI5j
+         uApgpWmPJVBu83Q0FhTTi9ftT9fvv+hCCQXnUiEOrPbYscDdK/bfShjYJGRWT9fDGzFT
+         g+/QgPcU8BwKvYg2lKxvStwrIbCu94o84zAvV5IWfHfcGRC5SXhNmsNWi10qYXUNMkpO
+         0wQg==
+X-Forwarded-Encrypted: i=1; AHgh+RpBAFT9ithEB/PnMxb+ITfDQ4Wt6vQ5/hraWUOuOOmV4KidvUQtzEnUUjXn2sDh3gaVkM3GWKufVFVnlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgNqCXI/rOQBhyugbLLj6nOZ7/xxlFYFw6Mxw4b+kkco3k/LNA
+	8SUyB/SWBlxH5wvz/UQPPzxB08WTZEEYxiZGVIi5ov5SYLN+vK6A+2aBzUja0HtL82knBJI4B2i
+	23FlA/R67sNjkhXAqCivyDBsAW7V0l0L2UDBJxA==
+X-Gm-Gg: AR+sD13pP2SNDDYO/I2upg2+e9/LkOSCejGq45jQVeveS0MOBk427l0vCK09gRsIgbF
+	AFvRThaHxQczX6q37hWOFxZDFBfDOU3DEZ+AwKYr+KnLdemmwkxn1zQ6HD4B1iaImg2reaQfgrT
+	4BGFEJMstlzQ1DqPgOfps9QwqIn8s3jBlm390x0Qz4HUbsh8m8G1FuxvF/aeQpqLFS0Pec1cWpt
+	gjjXTmMGjgwvaVErwURHe5bKmW/9Cs8hvyOFhP5n9UYeMI2y46oYkkpE1fqW1ODXD2OzE9IK46g
+	GeObzImXmx+KkmAdeqbBj87SMbdMlzRk7Ol+x1aKJG5sITOQSgRwpZB3IOcqpQN7fwCLUg10dtD
+	hECHJROFDfSA=
+X-Received: by 2002:a05:6123:161:b0:59b:396b:cea7 with SMTP id
+ 71dfb90a1353d-5c3877df378mr4440525e0c.9.1785822100407; Mon, 03 Aug 2026
+ 22:41:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260803141256.60599-4-haoqinhuang7@gmail.com>
+References: <20260709131904.596684-3-adhikari.resume@gmail.com> <20260721164027.637078-1-adhikari.resume@gmail.com>
+In-Reply-To: <20260721164027.637078-1-adhikari.resume@gmail.com>
+From: Ramesh Adhikari <adhikari.resume@gmail.com>
+Date: Tue, 4 Aug 2026 11:11:29 +0530
+X-Gm-Features: AUfX_mwfI0PujMCVMpuXqdjToL4iEJ74LCkACizhvZz_t7EWwXIGY2aXg00R9eA
+Message-ID: <CAC-THR8O=g=566evNCA-fmiprLaCL2f15w3dEjz8MSgAG4cMRw@mail.gmail.com>
+Subject: Re: [PATCH v7 0/2] badblocks: fix rounding bug and validate input range
+To: colyli@fygo.io
+Cc: axboe@kernel.dk, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (26/08/03 22:12), Haoqin Huang wrote:
->  static int deflate_setup_params(struct zcomp_params *params)
->  {
-> +	if (params->dict_sz) {
-> +		pr_err("deflate: dictionary is not supported\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->  	if (params->level == ZCOMP_PARAM_NOT_SET)
->  		params->level = Z_DEFAULT_COMPRESSION;
+Hi Jens, Coly,
 
-If we want to be pedantic, then {} should also be added to the "if"
-in this case.  And in other similar cases.
+Gentle ping on this series. Patch 1/2 has Coly's Reviewed-by, and
+both patches address:
 
-> +	else if (params->level < Z_DEFAULT_COMPRESSION ||
-> +		 params->level > Z_BEST_COMPRESSION) {
-> +		pr_err("deflate: invalid compression level %d\n", params->level);
-> +		return -EINVAL;
-> +	}
-> +
+- an RCU stall / kernel hang reachable via the nvdimm ioctl path
+  (badblocks_check() looping with a non-advancing cursor)
+- a 32-bit (arm/i386) build break from 64-bit division helpers,
+  reported by the kernel test robot
 
-[..]
-> +	else if (params->level < 1 || params->level > LZ4HC_MAX_CLEVEL) {
-> +		pr_err("lz4hc: invalid compression level %d\n", params->level);
-> +		return -EINVAL;
-> +	}
+Both are tagged Fixes: and Cc: stable, so happy to resend or rebase
+if anything's needed on my end  just let me know.
 
-Let's add a small comment justifying/explaining that "1" constant?
+Thanks,
+Ramesh
+
+On Tue, Jul 21, 2026 at 10:11=E2=80=AFPM Ramesh Adhikari
+<adhikari.resume@gmail.com> wrote:
+>
+> Two related fixes to block/badblocks.c:
+>
+> Patch 1/2 fixes the actual reported bug: round_up()/round_down() don't
+> modify their argument in place, they return the rounded value, and the
+> callers in _badblocks_set()/_badblocks_clear()/badblocks_check() were
+> discarding that return value. Depending on caller alignment this could
+> leave sectors unrounded or, in the reported case, stall the CPU with a
+> non-advancing cursor when reached via the nvdimm ioctl path. It also
+> fixes a 32-bit build breakage reported by kernel test robot, since the
+> old rounddown()/roundup() macros pull in 64-bit division helpers not
+> linked on 32-bit builds. Unchanged since v6.
+>
+> Patch 2/2 hardens the same three functions against the input-range and
+> shift edge cases the round_up/round_down fix exposed: s + sectors
+> overflow, and rounding itself wrapping past ULLONG_MAX. Revised in v7
+> per Coly's review of v6 =E2=80=94 see the changelog in that patch for det=
+ails.
+> The remaining open item, bounding bb->shift where it's populated from
+> the on-disk MD superblock in drivers/md/md.c, is being sent separately
+> since it's a different file and a different root cause (missing input
+> validation, not a rounding bug).
+>
+> Ramesh Adhikari (2):
+>   badblocks: fix in-place round_up/round_down usage bug
+>   badblocks: validate sector range and shift before rounding
+>
+>  block/badblocks.c         | 40 ++++++++++++++++++++++++++++++++-------
+>  include/linux/badblocks.h |  6 +++++-
+>  2 files changed, 38 insertions(+), 8 deletions(-)
+>
+> --
+> 2.43.0
+>
