@@ -1,120 +1,117 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3D433688B
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBD5330B0B
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 05:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785822114; cv=none; b=GAgNCtlhbPHyEt9bdXM/Iy1wULraDIQkPQaKgH87l6d3kQNzbuuVrI1wf6mrFo0bDNN5QB6Lb5KJ2eTO45fyMU1yDQF9DDTDk68j9wmKqU0hE7fQNPqoegQaxFi/B1efQaYG2Rcj/pT5hKwm7MDofPy5nkZSSicUULluZPJ0PKU=
+	t=1785822532; cv=none; b=OSQkqL6P17BXG7bECP77JlTKF5VeHzONHTs42jOg3Y6LnvPRrzlWMJJEe/cOpGaQjdHUIX2A4OA5ebHXKkf/TQRsc/iuDbd2s9RQ+k2vLYHM0HaPXu/4NUqldbST2sNYZr88wskdkLTWL1bUH8TOB/rAry6mUsxAnkgM2eWbsvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785822114; c=relaxed/simple;
-	bh=9LfKyQfrbGnA2ELgqEBoSZcMckFFI0+09wJSO6E/B9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m/3tqYymCItCvlYFcU1cH0bamAsg2MfcuxA2bkah3TMngpixjH2zkPaH0YoLunjTnbt10kpmO4Unu6Z0IPiHqbfDKIaVBTAN0/0wkaStKFnn7PtA3vhhZooqEuDyZLkRew+AFf2dCUxICmtLCGb3RxMI2W3ky7CqoVNwtza0lsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HU/+EQi3; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785822532; c=relaxed/simple;
+	bh=sxFoyKksCsg3HT1PlhW8h6Lfy/Q/jixcDgP0/OOYbJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CkcfZP8eWkbeGft1XmnePFVOcg0TbItiW7kIWQVc4zHQyyNA54C5k2Ou414VR2PG52igNPigEFtDtrnPc2aZQsttuTH9PYC2EoY4cC0emcePTtqZemd2FgYXklwWqrktTum8biBe8bPaCo9/bYu1rKyWp9GSKMnR2nB/5uOxr5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CzSSG5ya; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HU/+EQi3"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785822100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iNnbESC5ApGqSzB0x27jNNkxmlJXxLOjT5/nbE6X/uk=;
-	b=HU/+EQi3HpiA0xdE29JFezOpR4HA7LcB8xPJbkD6rojriNjV12SDGmJVN/dTSHpnnzAf/4
-	DhRlIUbMFn6nlhHjvsewDk9U9QSqZrXmzsHtgB26gHK1J9b9As8fDyMEcby9Oipj0OZQW0
-	JBnETCVxzLu5h2lWsFhOj4wCkOY/M14=
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org,
-	axboe@kernel.dk
-Cc: josef@toxicpanda.com,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH v3] block/blk-iocost: annotate ioc_pd_stat reads with data_race()
-Date: Tue,  4 Aug 2026 13:41:20 +0800
-Message-ID: <20260804054120.161933-1-cui.tao@linux.dev>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CzSSG5ya"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-38dd55ad76cso644553a91.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Aug 2026 22:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1785822531; x=1786427331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cKx66oI5obDqMQbX+S9eMb08Q3adMK8gfdU4AgEOKOQ=;
+        b=CzSSG5yamTM053ltu9h4NCb0xGXBXOVBbR61yrT4uYNyjRtQfoSka4MVenTcafa6xf
+         k8yEkWRrz/+zBbZQuR+ed5ncyCa1OsnOXGnb1AaDUIuWlDP5fpHoTcfjpslfidETEP6b
+         Nx+rMshpnFMm5xowYSNDk3bAji0W9hZaJxX3s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785822531; x=1786427331;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cKx66oI5obDqMQbX+S9eMb08Q3adMK8gfdU4AgEOKOQ=;
+        b=fQFdyIn9B2HUBdIo+fdvSZ1B1X1GOkUvHSOUELsyV7lbigfpsLkhb0RTwoGQY34K9n
+         spdRZ4gMI1pnAJUhlzsFAIeKVumU0WOQAAOHHEWp7pmSOhgpoVAnzD+2rTMeEhrAGSA9
+         eCRItmGsdBIb9kUEz4qS/hfFQR0ScqyMdkSCtLZ8Aidj1UWT/FX1Y1wimsFEaRFVjHnT
+         mEDCrgmvCzZRC9ta4FRDrp/q5FsRhvUxtGN8Za/7c6gci0sYlXyWcMIXtw0byyq38lDC
+         61EQE96H1kf2SllcIGS56rvvx+oSoOfNxSaem4unsWsgKYdwKRwbKR2HoXdntOIFfkxz
+         JuHQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpBejakxdsQb50fyhTO9O74r/4pgg2pkjKlAvBF82PU9IwgkXfFHU8lTYlMEsvsN6YnJJvWbOYmQS+djw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YygrXqmRNXpO0jX3WKz6KvQ1SUSQJ5NOw/5TkUFxl6UFClzs5j6
+	rFg/MEYNSZwFESmcEfC6Nchpt5ODyivIBUYNGpBjQT+mPlWOaky3ka83OpkfYDjeoYRVwqRI0FT
+	53OU=
+X-Gm-Gg: AR+sD13SERehibzy+ialuXKhdPuVM4Oe1sQ23QSLzkWlMqbOtmY+9789CLgwJF7Laom
+	5u7nWCEZ18XoWL9AuQo8XgtgVVXemkiVy21KaKIQWWsJkt52Fo+4D+gxQbmKdiC798esL/0G90N
+	DVEDImgbQ8BYcCZfXdM8VCB7OBAYRAWfxrSsWlk7kzRmnK8hEgzPEcmLrkmoGFaGvF1M64nZM8r
+	oLrSh7WyNgonw/0Mdi5W9UT0lm22RN1N8TnHuaDB1zqLQvYCtRQ5JYMWScjQy3hwkDzHkS2DXCQ
+	xKqE8MIujf7B1lS1aETM3IMzsNcGl2VfojcGsk0i9xXY2cuLwZqgnEORFmW43eYTXbQLVkqyCA9
+	lElb4GlehJKlTDPDKc61cRfROxq0yNBrXk9jB0ToG+NmE3l3cqYyFLuB37m3AFxz7gOuEMfhp7J
+	3wp3Pv1Sc1MPm+AfqBm+/wpeMalamrbQ8NHagB+uU64CuWFpjqRb4D7Y7Ve/4Hv+CGMD0CEhkii
+	uAANiuYkSFMFZKEzo3+2PuyrFv3
+X-Received: by 2002:a17:90b:4a4d:b0:384:927f:3db9 with SMTP id 98e67ed59e1d1-38febfcab02mr1689590a91.1.1785822530693;
+        Mon, 03 Aug 2026 22:48:50 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:fcb5:533d:198b:8d48])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38fedc650a0sm710924a91.14.2026.08.03.22.48.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Aug 2026 22:48:50 -0700 (PDT)
+Date: Tue, 4 Aug 2026 14:48:44 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Haoqin Huang <haoqinhuang7@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
+	David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Haoqin Huang <haoqinhuang@tencent.com>, Rongwei Wang <zigiwang@tencent.com>
+Subject: Re: [PATCH v5 3/4] zram: validate parameters in each backend's
+ setup_params
+Message-ID: <anF8tcbifysw7v9_@google.com>
+References: <20260730060133.80233-1-haoqinhuang7@gmail.com>
+ <20260803141256.60599-1-haoqinhuang7@gmail.com>
+ <20260803141256.60599-4-haoqinhuang7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260803141256.60599-4-haoqinhuang7@gmail.com>
 
-From: Tao Cui <cuitao@kylinos.cn>
+On (26/08/03 22:12), Haoqin Huang wrote:
+[..]
+>  static int setup_params_842(struct zcomp_params *params)
+>  {
+> +	if (params->dict_sz) {
+> +		pr_err("842: dictionary is not supported\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +	if (params->level != ZCOMP_PARAM_NOT_SET) {
+> +		pr_err("842: compression level is not supported\n");
+> +		return -EOPNOTSUPP;
+> +	}
+>  	return 0;
+>  }
+[..]
+>  static int deflate_setup_params(struct zcomp_params *params)
+>  {
+> +	if (params->dict_sz) {
+> +		pr_err("deflate: dictionary is not supported\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	if (params->level == ZCOMP_PARAM_NOT_SET)
+>  		params->level = Z_DEFAULT_COMPRESSION;
+> +	else if (params->level < Z_DEFAULT_COMPRESSION ||
+> +		 params->level > Z_BEST_COMPRESSION) {
+> +		pr_err("deflate: invalid compression level %d\n", params->level);
+> +		return -EINVAL;
+> +	}
 
-ioc_pd_stat() reads ioc->enabled, ioc->vtime_base_rate, and
-iocg->last_stat without holding ioc->lock, which trips KCSAN since
-ioc_adjust_base_vrate() and iocg_flush_stat_upward() write those
-fields under ioc->lock.
-
-Commit 35198e323001 fixed the same issue in ioc_qos_prfill() and
-ioc_cost_model_prfill() by adding spin_lock_irq(&ioc->lock).  However,
-those functions read configuration parameters (qos/model) that need
-synchronized reads.  In contrast, ioc_pd_stat() only reads stat
-values (vrate, usage) where stale reads are harmless, so data_race()
-is more appropriate — it silences the KCSAN warning without adding
-lock contention during high-frequency stat reads.
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-
----
-
-Changes in v3:
-- Use data_race() instead of spin_lock_irqsave/irqrestore, since
-  these are stat values that don't require synchronized reads — the
-  goal is just to silence KCSAN, not to guarantee consistency.
-  (Tejun Heo)
-
-Changes in v2:
-- Use spin_lock_irqsave/irqrestore instead of spin_lock_irq/irq,
-  since the caller (blkcg_print_stat) may already have IRQs disabled.
-
-Link: https://lore.kernel.org/all/20260802150913.31977-1-cui.tao@linux.dev/
----
- block/blk-iocost.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 8b2aeba2e1e3..bc47ed034b25 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3093,23 +3093,23 @@ static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
- 	struct ioc_gq *iocg = pd_to_iocg(pd);
- 	struct ioc *ioc = iocg->ioc;
- 
--	if (!ioc->enabled)
-+	if (!data_race(ioc->enabled))
- 		return;
- 
- 	if (iocg->level == 0) {
- 		unsigned vp10k = DIV64_U64_ROUND_CLOSEST(
--			ioc->vtime_base_rate * 10000,
-+			data_race(ioc->vtime_base_rate) * 10000,
- 			VTIME_PER_USEC);
- 		seq_printf(s, " cost.vrate=%u.%02u", vp10k / 100, vp10k % 100);
- 	}
- 
--	seq_printf(s, " cost.usage=%llu", iocg->last_stat.usage_us);
-+	seq_printf(s, " cost.usage=%llu", data_race(iocg->last_stat.usage_us));
- 
- 	if (blkcg_debug_stats)
- 		seq_printf(s, " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
--			iocg->last_stat.wait_us,
--			iocg->last_stat.indebt_us,
--			iocg->last_stat.indelay_us);
-+			data_race(iocg->last_stat.wait_us),
-+			data_race(iocg->last_stat.indebt_us),
-+			data_race(iocg->last_stat.indelay_us));
- }
- 
- static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
--- 
-2.43.0
-
+This is purely optional, if you add per-backend pr_fmt() with backend
+name e.g. "zstd:","lz4:" and so on (in a separate patch) then you don't
+need to explicitly prefix every pr_err().
