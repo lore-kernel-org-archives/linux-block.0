@@ -1,114 +1,127 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B37C3A3804
-	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 09:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF34B4457C3
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 10:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785837361; cv=none; b=j1m8N3wy6Bypcg0R1O4x317ERZn6dRtXwxcoGjK4XRuSaiFwHxqaT3+aAGiJOrd1FHP4gd+LXgZwpAslVKpg3KdDtl4r/fBsT4eRXRaKz7s+pWHCoiFuja3iuiasB2Mb3Cc2SK4EcgKVbnK+TQH8zgUG/M+P1mTozvWx3/c1Klw=
+	t=1785837803; cv=none; b=i+fiCPSsCAeM/cZjNsT9N2nWyggPaSNtO76qw3EfkyYvmI16xN7E19SnjjgQ30UEfdER+fi54CYsBugKJx0PauAH51KOLpgmT5D3gCgUtoqtfCjS6zbs4fHzin1GtiJOjgJU7bNsXJUfk+PDUPJBYSFZZeNXlr3EeXHfQx24Ems=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785837361; c=relaxed/simple;
-	bh=BdCQ7B6ms8+cZLFi44DRH277ZqfecQSQ8JhTAxDQzhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmP0V3gdG0vs/3IZOlFGSlLON7tQn3Sxb2Ff/EJa5jWDjgIlmmecsfKADnoCSYefHjvZoOzX5iMJ15tr+1AReV779nX67MphTG3fZrZ4p2/pokOFliBJcmDJP4rblztTUkcAobW7jkvbPQdYT86QnhxDMZJWWnk8kfesFaSZ79U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=niUJn22K; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785837803; c=relaxed/simple;
+	bh=W2r34cI+XaaQUdqCi3aOgKHvzlTyAT8XuHNk4YjX+HU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aR5flr87sLz4Ju5AbHuHRQx2eXXWUOKCy86d0ixPmesP/LSo+g99545bD56jnW9iTnlmMnToRSqJWIJY1xzt/8fKKOVfCi40pY2jcJ7aKEtMLao35vGxMf4RHJZygK5lj8eJd7cGlejbckrJiDIyCxHeRFvSaFmzpi3joMTj79k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Av/KuRcP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="niUJn22K"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38e69bdb0fcso3142693a91.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 02:55:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785837352; x=1786442152; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=jbdEx1M+4FfJ4IeX59PvZeBMByZsH3JmFbsrDkmiAU8=;
-        b=niUJn22Koi10Nv5ckuGGscWiUTsAG6SkXtcmbzYUbYnr05t2fmMiEQj0I2Rggn/XSz
-         PBgrcBLL+G0WPTpw9lEz3yAU7ANDMy2iKCnWA/30Aj6m56CIvrrwC2f71NuT/OuLhNTx
-         DE0CD3kEcq921lRunzveBvcMr4ZgJfNyZug0o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785837352; x=1786442152;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jbdEx1M+4FfJ4IeX59PvZeBMByZsH3JmFbsrDkmiAU8=;
-        b=sGggytPjZIWz1vW08dO4jT6Em9SdPuBoORCvmAasA8+oORxnVy3R1Sq936EMChGyK7
-         KDPg52wkDc6alanAe7NQnY7uXOpCiqnUoCmX8cEz3Zwh1NP3pXrBD3ZfvGupYRCUcQoi
-         zMK5xTV1qHwI5DfDPsAFXcFgYSvA+imTHgsxF+ctmbtcsBCyJTCrS1wMoeUQ9rsOI4np
-         auIaHgVOAYZHmAxvsGr+gLdPQjRZ3zumMWW20cA/0XZprVIPfdrQKXCrZOqHnHx57d8V
-         X/9yYKrocbDjorn29rvAdm2jjd9YcgdC4Hbu/mq02qgVHt0uV5iPykwNI/x4LItebynA
-         PKPw==
-X-Forwarded-Encrypted: i=1; AHgh+Ro8SMfHHQ+M1IsKcoXc/1VUNp1Xxe9mslWOGiBTwnG7eIPgl3vWAM665CycF+YHljpNdK06Y0aYaADzJw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJfMx25JXoxcHzD4FDISEfopnB/c15Kq/+qGsg38Tvhiw77Ocd
-	+Yyb8wnkp4aDnPRr0HMSea3IqDA5C1Mkpy7CSSIJxjx5/e1XR56pnZzVprH4nwiYjiu+vbbuOVc
-	ePbk=
-X-Gm-Gg: AR+sD11KJ5ZlTx0FvkqpBDlpaAldbM+SIReCaHsCMR5+Rh+vMz28igBDjAjidi4YYpV
-	wyE+3tmHahGVAFyC0nYTOgR39lFn3X2BpBSaCDDKy0fFd5N/6BniQgAu5/hy6l0vRzR4D/tpLtI
-	XBCmxvio/S75z2AK+NFX/xgco3iemVDAh0BDMCTm5dLUuVP+rQ+CtzCc3qc/okptb3Po3I4ZH3p
-	UPFr1aY0YsbNBnfAjLwerF37HU3hwsIvM78C677pEZ8+n20+cYSwcgJNruf44+ZsJiGw2t4yMpj
-	XaRjg0FEKaTnNanTttJ7i/A6H5vDjec4vL1mr0Z16hlaet/9DQNCliVvf9AH4iM2+4YICBmwGoV
-	x9kf5l6WCRFHLLAFkDUna5jGDMZGN9q7H7TwQ2qLbnppMiXTQkUlanhJ3zTrq0J22b6yX7Peu2u
-	MwcZwhRue6fLe+8ynByRKFl6vioFN5L6k9cd2i+dcXtjYov4rsaHzYObwGGPpjjl824Qr4yHaIN
-	BUpzWRa97N8g/qSIWgFgqKI4CY6
-X-Received: by 2002:a17:90b:3bc8:b0:38e:6497:ca45 with SMTP id 98e67ed59e1d1-38fbc59b19fmr11657536a91.39.1785837352272;
-        Tue, 04 Aug 2026 02:55:52 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:32eb:b46b:e9eb:65c5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38febff7eedsm1076407a91.5.2026.08.04.02.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2026 02:55:51 -0700 (PDT)
-Date: Tue, 4 Aug 2026 18:55:48 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Haoqin Huang <haoqinhuang7@gmail.com>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>, 
-	David Sterba <dsterba@suse.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Haoqin Huang <haoqinhuang@tencent.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH v6 0/5] zram: fix zstd error paths and add parameter
- validation
-Message-ID: <anG27GxIP_oEufv1@google.com>
-References: <20260803141256.60599-1-haoqinhuang7@gmail.com>
- <20260804093841.67920-1-haoqinhuang7@gmail.com>
- <anG0liocTV6U2VV5@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Av/KuRcP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785837801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=forfFVNHXdcKUrAO6tYWFvQxC3xkWQUr9XOJVlaCNVg=;
+	b=Av/KuRcP1vd7T05FDWvD/n9kTfwGO9OyMNFtfM9MoYmwbw+EtwhSGRyG05gbg/UkiplleZ
+	V42BKYZrgBeX7strMTrHLNXjn/uWIX28AZE+BV4YtCmaEBMQbg7XC1VI91vrC1zG2JoAQ1
+	WXsVK7DL9A5JgMwgWTHjA47tAzSK53M=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-D9vewdzqPTqtYuFKpPv8iQ-1; Tue,
+ 04 Aug 2026 06:03:09 -0400
+X-MC-Unique: D9vewdzqPTqtYuFKpPv8iQ-1
+X-Mimecast-MFC-AGG-ID: D9vewdzqPTqtYuFKpPv8iQ_1785837786
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 247EA1956096;
+	Tue,  4 Aug 2026 10:03:06 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.32.44])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 514F430001B9;
+	Tue,  4 Aug 2026 10:02:58 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v8 03/25] Add a function to kmap one page of a multipage bio_vec
+Date: Tue,  4 Aug 2026 11:01:58 +0100
+Message-ID: <20260804100224.2748935-4-dhowells@redhat.com>
+In-Reply-To: <20260804100224.2748935-1-dhowells@redhat.com>
+References: <20260804100224.2748935-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <anG0liocTV6U2VV5@google.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On (26/08/04 18:53), Sergey Senozhatsky wrote:
-> > Patch 1 removes zstd_release_params() from both zstd_create() and
-> > zstd_setup_params() error paths -- the former is a layering violation
-> > in a per-CPU callback, the latter is redundant as zcomp_init() already
-> > calls release_params() on setup failure.
-> > 
-> > Patch 2 rejects zero-size dictionaries and prints distinct error
-> > messages for sz < 0 (returns the original error code) and sz == 0
-> > ("empty file"). Currently errors are silently swallowed.
-> > 
-> > Patch 3 adds pr_fmt to each backend file so that pr_err() messages
-> > are auto-prefixed with the algorithm name.
-> > 
-> > Patch 4 validates dict and level parameters in each backend's
-> > .setup_params(), rejecting unsupported combinations and out-of-range
-> > levels.
-> > 
-> > Patch 5 resets per-priority params on algorithm change before init.
-> > 
-> > Changes since v5:
-> >   - Patch 2: split pr_err into sz < 0 and sz == 0 branches
-> >   - New patch 3: add pr_fmt to all backends; tweak winbits message;
-> >     add missing SPDX headers to lz4 and lz4hc
-> >   - Patch 4: removed inline algo-name prefixes (now handled by pr_fmt);
-> >     added comment for lz4hc < 1 lower bound; added braces to if
-> >     branches for consistency
-> 
-> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-Oh, and also
-Tested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 92837e2743f1..53cf36e73967 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+ }
+ 
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
+
