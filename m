@@ -1,239 +1,163 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EEB479895;
-	Tue,  4 Aug 2026 16:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8260848C8A3
+	for <linux-block@vger.kernel.org>; Tue,  4 Aug 2026 17:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785861374; cv=none; b=BDURYSHr2N11G75Vq1cYmPsKuEnnh4Xjmt38Ql84PeRL6PXThuMuZ3VlkcsvGmxdeOFlDW7i7nQ+ErLbnGS5frEfv1Jnav/WEztlTyvouy0So2DGT48FVO/oUgY9y4OJm+qGoY2XLMfQE2a8m3dIVg6Ong1xru+1pXQNSV0xZlw=
+	t=1785863958; cv=none; b=A5DAefG3IY6N6EY0VKR6MN62hVm8ODzYxxM9Raoal11VJboTUdPLMfh5/ZaTuVCk7ka+conZH0oeadX+KH2Kx+FuNpcCr6tWMRClp7BzveHA4BKS5cHbV2h5uFDGlR3hRdKWcKVTNnJND1rS0CZbO/pLXiMwKzUj1CBR7bpiuLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785861374; c=relaxed/simple;
-	bh=1OehUdJ53tVLxlPsRLeAgB9SH2XB7mrQ0auW96D5it8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ts/KeSdY/iMCnaV6BxjeqJonEux9zIeDzuxyXsdPWsaL/WhjbnGRR1j3j9ThanpcZsZ+C2BxjuFstb5NNQBe2XvG/Dbd1DhXtfLptFvH8563lMtDARqMBD02PFmJ2ehpwI/9TTecFJ/g+8l9PqKNAKiGkYJPMH+jFwLzhEbU/FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ku8aZn8d; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1785863958; c=relaxed/simple;
+	bh=fiynAW9WpUzgt3N4BHN/WeqgVQsTYwv6Egh7edSdGZk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jcnvXHMy5yeps8sgEck8U0FYpvTbtz2hq/cWrw0gyEwF3kTo6lzUCKDDjM+m63Y09NuCU9aZaog0SmuKRWBq+B330F1rvXCBxa/gymGbxKOW2OCY/SEqD2TVnR4NKfjug4IlBF8k36MvCcG3uZUa7DXt4E0YT3VIbejiZhvBJ5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gB9JzHh/; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ku8aZn8d"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+phEtP839OmAXTAezANS2diupL0Drcp1+juhMBWBlYs=; b=ku8aZn8dwi2K8skwzigc5WZi+F
-	sGbkZQW9yPiF+Kdu3Yoz5X6M2D7aQZZd+Jpd/rZZjFGCN8At0x2aWiGAoj48JVD+ScNKu4nPi1M2f
-	BcwiziDIYhuAMSRGqJWL+W4WWLYMc86R7t2i4gYkpo8uaSszVtJmDGRTzoCM8TpGqz3rBT8kzz0jU
-	/nZyhx9clYVpEAKCzPLeeDhk6fPubdVM5pQfO3uZjMYurcf74js1uVqUizFWNvXjk21BlIBM8/Kro
-	SmpF9fydW3/wZr5b3xHPGM0rXAVgb+XvpViaXHFoTMjL+fnQgb+V31w0aniIm4wyKVEEPtbrtMCwl
-	jpr+p/Vw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wrI7Q-00000002LWG-0afw;
-	Tue, 04 Aug 2026 16:35:56 +0000
-Date: Tue, 4 Aug 2026 09:35:56 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	daniel@makrotopia.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v9 06/10] block: implement NVMEM provider
-Message-ID: <anIU7FSBT6VMzsf3@infradead.org>
-References: <20260730-block-as-nvmem-v9-0-f72935817dbf@oss.qualcomm.com>
- <20260730-block-as-nvmem-v9-6-f72935817dbf@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gB9JzHh/"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-47de0093c42so32984f8f.3
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 10:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785863949; x=1786468749; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kJpsobbV6cDtzB2hYIU7sj8yXmkuFvAex2Z4hVps0ns=;
+        b=gB9JzHh/xNwbsxwl/HtsyKUVQn66uJpc4fGE3xWBbRBF8Bj789qpQkHuQYRZUI1uZH
+         y1ATPiDHs+timfWEFxnQ8qOmZjfmmj3xYlVR86qIr174/WUoTBm8CWOktDfOtHh+vEqo
+         FY7kiI/3/FOvVzA03rCNK2f7HteezMqmQ/yylnkzHyLH/U1gz6yngtU+KTnWdrdMlvY2
+         +SSMhgpAcY3pILj1UPd1xvW/yHxQFHlVeFWGr+ikEeeL+JufTVT7HIo7ghRoQCOubnyt
+         juvM34xc6zLxIMGU01B9wEc7AUyyF6GPpYwVIJ6J3IpHXum3mOowlhaN36AJ36Z1POyc
+         EhVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785863949; x=1786468749;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kJpsobbV6cDtzB2hYIU7sj8yXmkuFvAex2Z4hVps0ns=;
+        b=SSEx2wlbuuRZFRwtgp8EDPds74SF+c5p8wn5fIk9cPNo1MzWy9dikkHdeOOCdqYgjm
+         r3OpeV+7JgzQcrw7fbk1fGypJBYTPgy+NxzhOQt2K5LeK+2+UEUw0Tf/Ul3APocJqnTt
+         ogPNCgoGBEA/4/3h+rzglB4afuCwPzViSiIOqRWwICOeTxAcvdmWj1S80kseX6NozRl9
+         xVUh8wInhus3yqs5qrXFJVp+cXcL/NMeLyQI3fgbn3XX0RUHQva4oeAiQYVB9g4SOvx4
+         Yu47+5KEUpmanX9ErfMtADHZbg8RbadAyerdZaoxwCJ4CF5x7j3qFf51oLXHtren2OkE
+         xb9w==
+X-Forwarded-Encrypted: i=1; AHgh+Rr3tfOJSxqgql/p/J/0SIU/x0fDjsn1mUBTI1NI4kCC17mOBPSsPD1HZr4pg71C2/7ldky4TaavvOkKIA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpmp+5S44M3ab2s831ZFSK5YwM5OezED/qUTY0eoQUYBgiwEof
+	OcXSMLeIUT+EsXNWxOJTg7EDE7bDtGVH5YJT0DL3YvV3FDieMbmnh+5i
+X-Gm-Gg: AR+sD12RS56o857y5AxB81JB1pib9EitkE2DkV/ZTtPGIiNlRae3KhF2vWfDQNbQ8MS
+	lKvIU5AA4W2xllfRz3MsEbFo0oLAkk82ZIzod9LOAm7gKeVcKbG84JPN4OErOsWZURfybLTGlff
+	yx2EuJRMchlD8sXE3cgGpc2MMFtJvW/Hz1ggHHmqC3UYsLSSEehA03zOA0uhjCey0/Jhal8X+di
+	Nhm7xnfDVq9QQ06Sd5owopCnzf7hJIORl1LDxAIwZEX+rFHIlRaRjOsbOAsTiGV2D4L8PIsrP3l
+	Gueo/E9fpRHUwg1yhkE+DoBm990uQWJAuErVsu5edJBYKS7PEe431x4LDT8F56u7MfEJNYq8ANw
+	NBm+VPwG/BTgYmYNieMzTiFL8aRx038HUugTDbou7yim4Ab1stuhtV8vjyTEceBvblzKEpb1JjJ
+	5ZBmH9fSqgHLI4ql6PEvNz6YH+XaEoqGf4nEYlfudWRNi9drUF058oQhMBG//7TJExN9x4GGrGE
+	XcEEsOrs4Qld2JyL68sSGKnH2NOgRW5LEPtHlzgmE4BSD1M/Wq2wakJCTELF9AkIORpCh7eCH+f
+	SSCJqQfLy8j3lxYQkGcF/VH4dDej5/Y2x3py758=
+X-Received: by 2002:adf:fe49:0:b0:47f:941a:796d with SMTP id ffacd0b85a97d-47fec4fa3admr1381301f8f.12.1785863948785;
+        Tue, 04 Aug 2026 10:19:08 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47febfda6afsm1357370f8f.3.2026.08.04.10.19.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2026 10:19:07 -0700 (PDT)
+Message-ID: <38163009-770f-4596-abe2-249efc113f59@gmail.com>
+Date: Tue, 4 Aug 2026 18:19:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730-block-as-nvmem-v9-6-f72935817dbf@oss.qualcomm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/16] block: introduce dma map backed bio type
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, David Sterba <dsterba@suse.com>,
+ Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
+ nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org
+References: <cover.1785596451.git.asml.silence@gmail.com>
+ <e26aefbcb383be7092dc76343ce745013e671334.1785596451.git.asml.silence@gmail.com>
+ <20260804162440.GB12292@lst.de>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260804162440.GB12292@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 30, 2026 at 06:00:36PM +0200, Loic Poulain wrote:
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
+On 8/4/26 17:24, Christoph Hellwig wrote:
+> On Sat, Aug 01, 2026 at 04:46:19PM +0100, Pavel Begunkov wrote:
+>> Premapped buffers don't require a generic bio_vec since these have
+>> already been dma mapped. Repurpose the bi_io_vec space to strore dmabuf
+>> maps as they are mutually exclusive.
+>>
+>> Suggested-by: Keith Busch <kbusch@kernel.org>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+...>>   
+>> +static inline int bio_split_io_at_dmabuf(struct bio *bio,
+>> +		const struct queue_limits *lim, unsigned *segs,
+>> +		unsigned max_bytes, unsigned len_align_mask,
+>> +		unsigned start_align_mask)
+>> +{
+>> +	unsigned bytes = min(bio->bi_iter.bi_size, max_bytes);
+>> +	unsigned seg_shift = bio->bi_dmabuf_map->seg_shift;
+>> +	unsigned offset = bio->bi_iter.bi_offset & ((1U << seg_shift) - 1);
+>> +
+>> +	if ((bio->bi_iter.bi_offset & start_align_mask) ||
+>> +	    (bio->bi_iter.bi_size & len_align_mask))
+>> +		return -EINVAL;
+>> +
+>> +	/* single contiguous range into the dma-buf */
+>> +	*segs = 1;
+>> +
+>> +	bytes = min(bytes, ((unsigned)lim->max_segments << seg_shift) - offset);
 > 
-> NVMEM is registered for a block device whose OF node describes an NVMEM
-> layout, either via an "nvmem-layout" child or by being a "fixed-layout"
-> node itself (e.g. an eMMC boot partition associated through its mmc-card
-> node).
-> 
-> The NVMEM device is a read-only side channel: the block device stays
-> fully usable, reads are performed with a non-exclusive BLK_OPEN_READ
-> open, and no synchronization is done against concurrent writes to the
-> same region. This is acceptable for the intended use case of write-once,
-> factory-provisioned data.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  block/Kconfig             |  11 +++++
->  block/Makefile            |   1 +
->  block/blk-nvmem.c         | 104 ++++++++++++++++++++++++++++++++++++++++++++++
->  block/blk.h               |   8 ++++
->  block/genhd.c             |   4 ++
->  block/partitions/core.c   |   5 +++
->  include/linux/blk_types.h |   4 ++
->  7 files changed, 137 insertions(+)
-> 
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 70e4a66d941ff66ecb0ec34f4f7eff7fd1e4be40..4899ad572c71ffdbb62460d57623216254893ddc 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -209,6 +209,17 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
->  	  by falling back to the kernel crypto API when inline
->  	  encryption hardware is not present.
->  
-> +config BLK_NVMEM
-> +	bool "Block device NVMEM provider"
-> +	depends on OF
-> +	depends on NVMEM
-> +	help
-> +	  Allow block devices (or partitions) to act as NVMEM providers,
-> +	  exposing factory-provisioned data such as MAC addresses or Wi-Fi
-> +	  calibration blobs to the drivers that consume them. This is
-> +	  typically used on embedded devices where such data is stored in a
-> +	  dedicated area of an eMMC, instead of a separate EEPROM or OTP.
-> +
->  source "block/partitions/Kconfig"
->  
->  config BLK_PM
-> diff --git a/block/Makefile b/block/Makefile
-> index e7bd320e3d6971a8abf584f5de42776bb54e8216..8200297fbcbab304beb4239d0c33da07011c3ed9 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -39,3 +39,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
->  					   blk-crypto-sysfs.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
->  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
-> +obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
-> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..05bc35b9b8f373ccb606bdca35d211c41d2764fe
-> --- /dev/null
-> +++ b/block/blk-nvmem.c
-> @@ -0,0 +1,104 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * block device NVMEM provider
-> + *
-> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + *
-> + * Useful on devices using a whole disk or a partition (e.g. an eMMC boot
-> + * partition) to store MAC addresses, Bluetooth addresses or Wi-Fi
-> + * calibration EEPROM data.
-> + *
-> + * The NVMEM device is a side channel onto a block device that stays fully
-> + * usable. This is somewhat mitigated by opening the device exclusively.
-> + */
-> +
-> +#include <linux/cleanup.h>
-> +#include <linux/device.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/nvmem-provider.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of.h>
-> +#include <linux/property.h>
-> +
-> +#include "blk.h"
-> +
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
-> +			      void *val, size_t bytes)
-> +{
-> +	struct block_device *bdev = priv;
-> +	struct file *bdev_file;
-> +	loff_t pos = from;
-> +	ssize_t ret;
-> +
-> +	/* open and prevent other exclusive openers */
-> +	bdev_file = bdev_file_open_by_dev(bdev->bd_dev,
-> +					  BLK_OPEN_READ | BLK_OPEN_EXCL,
-> +					  blk_nvmem_reg_read, NULL);
-> +	if (IS_ERR(bdev_file))
-> +		return PTR_ERR(bdev_file);
-> +
-> +	ret = kernel_read(bdev_file, val, bytes, &pos);
-> +	if (ret >= 0 && ret != bytes)
-> +		ret = -EIO;
-> +
-> +	fput(bdev_file);
-> +
-> +	return ret < 0 ? ret : 0;
+> I guess ->seg_shift is some sort of encoding of a max
+> segment size?
 
-The error handling here is a bit weird as you seem to handle the
-positive/negative values twice.  What about something like this instead?
+I'll add a comment.
 
-	bdev_file = bdev_file_open_by_dev(bdev->bd_dev,
-					  BLK_OPEN_READ | BLK_OPEN_EXCL,
-					  blk_nvmem_reg_read, NULL);
-	if (IS_ERR(bdev_file))
-		return PTR_ERR(bdev_file);
-	ret = kernel_read(bdev_file, val, bytes, &pos);
-	fput(bdev_file);
+We rather need the minimum segment size, you can always split large
+ones. I calculated it even stricter as the least common multiple
+pow2 to avoid divs here.
 
-	if (ret < 0)
-		return ret;
-	if (ret != bytes)
-		return -EIO;
-	return 0;
+If the device supports N segments and we know that each segment is
+at least M bytes, then we should be able to issue IO of size N*M
+of full segments. The line above truncates the bio size using
+that + offset adjustments.
 
-?
+I guess it might be more straightforward to calculate the worst
+case number of segments and then adjust the splitting size, but
+since we don't return the number of segments it's more
+computations. E.g.
 
-> +	struct device_node *child __free(device_node) =
-> +			of_get_child_by_name(np, "nvmem-layout");
+seg_size = 1U << seg_shift;
+nsegs = (bio->bi_iter.bi_size + offset + seg_size - 1) / seg_size;
 
-Please avoid the __cleanups stuff as it doesn't interact well with
-the goto basd cleanups usually used in block drivers.
+if (nsegs > lim->max_segments) {
+	nsegs = lim->max_segments; // unused after the block
+	bytes = seg_size * nsegs - offset;
+}
 
-> +	config.id = NVMEM_DEVID_NONE;
-> +	config.dev = dev;
-> +	config.name = dev_name(dev);
-> +	config.owner = THIS_MODULE;
-> +	config.priv = bdev;
-> +	config.reg_read = blk_nvmem_reg_read;
-> +	config.size = bdev_nr_bytes(bdev);
-> +	config.word_size = 1;
-> +	config.stride = 1;
-> +	config.read_only = true;
-> +	config.root_only = true;
-> +	config.ignore_wp = true;
-> +	config.of_node = np;
-
-Maybe initialize all the static information at declaration time
-here?
-
-> +	bdev->bd_nvmem = nvmem;
-
-What guards access to this pointer?
+-- 
+Pavel Begunkov
 
