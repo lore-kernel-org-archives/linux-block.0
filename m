@@ -1,112 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2579B298CAB;
-	Wed,  5 Aug 2026 01:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B157D2D876B
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 01:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785893177; cv=none; b=cmIigCv1XhTiVhLp+94QEAhhTgfJC076K0LDOUba10FGl56CBIySeNeK1WAc6TfSnvtSz2HGKbJ6OkrLRycpG4xRu/2kp8tRH/aHS4KIH8em2Y1UGTMCx9K2ie5b0wI66CFwmWSsBaKGhmJvvdQffxlpYBvzP44RfWaBJgga9QU=
+	t=1785893301; cv=none; b=CICctFUJlAXTQToVYBWRjzVdZWPBZl/hHSpUon3ki3zeCFyFKaTRBBHsvfYYbIzZvDL4zFhv9y33Su+qYysXmpX6VQvN+EJDoYM6JY44iD8LK/gYbejkP7BUQXW50H431D8s/d3qNcz6DFgcDuA38piK/Qkym8M49+xHJKnM3pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785893177; c=relaxed/simple;
-	bh=Y+tnwVr2Ja8lR+QQuUGWvw4oSWgxy5ozpDEskatU/VU=;
+	s=arc-20240116; t=1785893301; c=relaxed/simple;
+	bh=LP/CPsWWk7JdhdkRUgVX64RFY6Mb6ULuSPlD2yzQEHk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JbUg8BnaVRQ6iDlhches1RLytYNTMtzPrnuL3/8dU0d94la08AzzTLGcBUoQie3RdXkYCras1ObiRySlVSZWJRFosN0utT89Fyb0Wz+8HRvA+rfpga77c0sWBF1Nmt1bthqI05b5BLY9V9bFl81A3JiCUns+rctje8sg3bQ1jqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7mNLcDr; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=oyPWjKPvxuIXj/VmJ3rGBDz9BMeYmimzxpbTLQFjMyz1oQZhg9k9TzdAB88ZkM92zxD3itoJA08Zip35OXnHqLriwymBbHl0fqTs00vmz2N7BKTJxbHwxv9H6hb7NnBnLmQJKS9LvB5KEJtKVFmTJVfXvGsjN1PWrmCq5zLKNr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hvADBIN7; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7mNLcDr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B8F1F000E9;
-	Wed,  5 Aug 2026 01:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785893175;
-	bh=RjB5UbMgEH+fadVKrw/dy/5s6yUledcJxc4bfMv8qu4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=X7mNLcDrFEB4Tf3nzdJw55mPnMIZp3XUBD7jrTkOsH6adrH6BL1evXW1XK3Vu5FOT
-	 zzzkAetM2iMyNP6D+G66whLHr6feZu66vjZwnwDLy0CFnnrb3RMZyg1EY/cYnAniWe
-	 Ej96D1Dxc4lVBd4Q392xs81mKauUOi8lwX/xGIf3QDaPgbnkMiz3lyFCr83X7q5+vO
-	 BZKTODrV/A9grZiJt9FvvKqpah6A3qiaMED29xAGMFKF6Hm1hNqmqYMtyp6Z8xnNCO
-	 JtHjB/bkLXcMyMWc095EQVrpN2TZECxdSc4UIovy70v0N/LsepnQ4iX1i3Rm7j+zru
-	 f6LeBViG7AUCQ==
-Date: Wed, 5 Aug 2026 01:26:13 +0000
-From: Jaegeuk Kim <jaegeuk@kernel.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: haoqin huang <haoqinhuang7@gmail.com>, Minchan Kim <minchan@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Haoqin Huang <haoqinhuang@tencent.com>,
-	Rongwei Wang <zigiwang@tencent.com>, Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net
-Subject: Re: [PATCH v4 3/4] zram: validate parameters in each backend's
- setup_params
-Message-ID: <anKRNeeIKO9K7Z2r@google.com>
-References: <20260730025240.17724-1-haoqinhuang7@gmail.com>
- <20260730060133.80233-1-haoqinhuang7@gmail.com>
- <20260730060133.80233-4-haoqinhuang7@gmail.com>
- <amr3P_4zxX2w7ZNR@google.com>
- <CAEjiKSkExTnRc77Va-cOSpoNJ4S0i_-r2-iGFyxoSw2mqh1Diw@mail.gmail.com>
- <anFspPi023HFlwwE@google.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hvADBIN7"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cad8076b01so5589965ad.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2026 18:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1785893299; x=1786498099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=hDRA8RaOryE0v7n4VH+L8tqsdWogJTvOgNRaAuqsLwI=;
+        b=hvADBIN7rloNVJUcjZwSAi9T70JUdSa0z/QU4PX57XNrGiSXe/61ezs7CjBU5JwkcO
+         KIpJUfnjj7UaaYLaJAf7f2zqFLKhLAwmMXknBvLrVtybaF6d4WEoL1Y4AvyQhnMCQxdB
+         uQ4DbY182uXwI+CJAzKyJ1javMr2Es1Aeo2AM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785893299; x=1786498099;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=hDRA8RaOryE0v7n4VH+L8tqsdWogJTvOgNRaAuqsLwI=;
+        b=BO6PBt9R8SU1L9kKp9/YogCEqXHspMxe7tJlgtyplT5kwwTEU2h51Cqv4+h4dMTRYM
+         oanMLwy+TbslQ5jRFO+R2Zdh8G4jEKDfAg1nZzZyeQKLIEGMI2/XVKQRcpzgqaDDCuEW
+         XUC+1Bq4Ex140cjoblG3/RzJgtaMaZLAZcG4q5rX6f8yRq7EXK+IN2B0SVz15ZtUMoQ2
+         oaVMGuZt18OFuhDyF2QsW5p40m33xNV/sYBWodZDYtSd6kcaB+nVbgaSXJa9Krb3Og4S
+         rL/ZD5PAIQv1iSXjOgTYROQHbVs1igPAXBltWZmA61FBheAEjKiK2m8oBY2j0MQ1xeGt
+         q7lg==
+X-Forwarded-Encrypted: i=1; AHgh+Ro+BA7dNIZD7sjoxOAoS57grydgvOYVwz/gX3Vi3qT0AEYTQR2J7ieY5G2Js+o0XcrjD/tsmO8bhdwBJg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY6RnLfVcuMqAySoWcoiD0mIqYDOwTKi0qwC1sPfcGA/xEY9wK
+	Hc/nFb1QePU/NsWxp1zw5fEYdTIEF9tbqBpw4+JML2/+ZzaAsoHedKr4YO5FHbXB7A==
+X-Gm-Gg: AR+sD13aVrLpjms+kWc1B4Lu8tLG7V4PbqWhdz8Hx6CTFL6ue4Z4hnGlBz9ro+go42O
+	N9Sr8aM0+npEjnOvK8oJlP70dkCFXRtbsPnmspLbDYkn7TRjAYa/FoPIDhjYx4MXAdSNbqKkBjV
+	DbBJhdSoZAsW4GSylrPObUYKJ/giYcwH3K7sXcfIlEWOPYSPAX3n1gnq3iyZVvcwGlo8sf6MjRc
+	zrMrjiPuo2sLDFvYR6yhlAklkuUy/cjnt8b3eGNINLUkxIkJ0faXjclRDRTJizE41e4T2lpZlWv
+	hOTz0ebKwAbhoEYujT6dKrtjztsZcOtZu99TbhUzBgwmAr3B8iVzvtAJC9s1j9JfgYKONvigOan
+	fW907bjzPXIbJhfjjHAPM1gAWp7w0szt0o94GrW4KKT4fyW0TN6/iMyrIBVAzVzDWj8KUOdboTG
+	FqR1z6zBd8LGPI7xWCMwQ7P8rK5XOoshKUivKaRpaXpTDcA/HfNuerDGRM7mM5v76t/WzIXoM8c
+	PNTxQyb6rsb2XYRe4xoypKXYpKR7fjdcR6RJxw=
+X-Received: by 2002:a17:90b:5447:b0:380:83fc:4315 with SMTP id 98e67ed59e1d1-3903c66b3bfmr3047061a91.21.1785893298950;
+        Tue, 04 Aug 2026 18:28:18 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:32eb:b46b:e9eb:65c5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3903d183dadsm554776a91.0.2026.08.04.18.28.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 18:28:18 -0700 (PDT)
+Date: Wed, 5 Aug 2026 10:28:14 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Longlong Xia <xialonglong2025@163.com>, 
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Longlong Xia <xialonglong@kylinos.cn>
+Subject: Re: [PATCH 1/1] zram: reject disksizes that exceed slot index range
+Message-ID: <anKRhIPsWUwvCzm_@google.com>
+References: <20260804143832.146129-1-xialonglong2025@163.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <anFspPi023HFlwwE@google.com>
+In-Reply-To: <20260804143832.146129-1-xialonglong2025@163.com>
 
-On 08/04, Sergey Senozhatsky wrote:
-> On (26/08/03 20:20), haoqin huang wrote:
-> > On Thu, Jul 30, 2026 at 3:24 PM Sergey Senozhatsky
-> > <senozhatsky@chromium.org> wrote:
-> > > > diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
-> > > > index f6a336acfe20..5d551d165213 100644
-> > > > --- a/drivers/block/zram/backend_lz4hc.c
-> > > > +++ b/drivers/block/zram/backend_lz4hc.c
-> > > > @@ -20,6 +20,11 @@ static int lz4hc_setup_params(struct zcomp_params *params)
-> > > >  {
-> > > >       if (params->level == ZCOMP_PARAM_NOT_SET)
-> > > >               params->level = LZ4HC_DEFAULT_CLEVEL;
-> > > > +     else if (params->level < LZ4HC_MIN_CLEVEL ||
-> > > > +              params->level > LZ4HC_MAX_CLEVEL) {
-> > > > +             pr_err("lz4hc: invalid compression level %d\n", params->level);
-> > > > +             return -EINVAL;
-> > > > +     }
-> > >
-> > > So...  lib/lz4/lz4hc_compress.c supports levels 1 and 2.  However,
-> > > LZ4HC_MIN_CLEVEL is set to 3, but clearly the compression library
-> > > supports levels lower than LZ4HC_MIN_CLEVEL.  In fact, LZ4HC_MIN_CLEVEL
-> > > is never used in the lz4 code.  Maybe here we need to just hardcode
-> > > "< 1" and put a comment:
-> > >
-> > 
-> > My bad, completely missed that LZ4HC_MIN_CLEVEL is advisory and the
-> > library actually accepts 1-2.  Will hardcode < 1 in v5.
+On (26/08/04 22:38), Longlong Xia wrote:
+> zram uses u32 slot indexes, while disksize_store() accepts a u64
+> size. On 32-bit systems, a disksize larger than U32_MAX pages is
+> truncated when zram_meta_alloc() assigns the page count to size_t.
+> array_size() then sees only the truncated count, so a small table can
+> be allocated while the original capacity is published. Valid I/O
+> within that capacity can subsequently access beyond zram->table.
 > 
-> No worries, that LZ4HC_MIN_CLEVEL thing is difficult to spot.
+> The same oversized capacity also lets full-device scanners compare a
+> u32 index with an upper bound larger than U32_MAX, so the index can
+> wrap instead of terminating.
 > 
-> > Btw, would it make sense to fix LZ4HC_MIN_CLEVEL to 1 in the lz4
-> > header as a separate cleanup?  It seems misleading as-is.
+> Reject disksizes larger than U32_MAX pages before aligning and
+> allocating the table. This keeps the table size, published capacity and
+> slot index range consistent.
 > 
-> I'm afraid we cannot do that.  f2fs uses LZ4HC_MIN_CLEVEL, I assume
-> compression level is stored per-inode?  So if we change LZ4HC_MIN_CLEVEL
-> then newer f2fs will start accepting compression levels that older kernels
-> don't support.  Cc-ed Jaegeuk and Chao just for visibility.
+> Fixes: 33863c21e69e ("Staging: zram: Replace ioctls with sysfs interface")
+> Cc: <stable@vger.kernel.org>
+> Assisted-by: Codex:gpt-5.6-sol
+> Signed-off-by: Longlong Xia <xialonglong@kylinos.cn>
 
-Yeah, since we have
-
- 239         clevel = le16_to_cpu(ri->i_compress_flag) >>
- 240                                 COMPRESS_LEVEL_OFFSET;
-
- 255 #ifdef CONFIG_F2FS_FS_LZ4
- 256 #ifdef CONFIG_F2FS_FS_LZ4HC
- 257                 if (clevel &&
- 258                    (clevel < LZ4HC_MIN_CLEVEL || clevel > LZ4HC_MAX_CLEVEL))
- 259                         goto err_level;
- 260 #else
- 261                 if (clevel)
- 262                         goto err_level;
- 263 #endif
- 264 #endif
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
