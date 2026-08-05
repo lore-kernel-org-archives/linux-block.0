@@ -1,87 +1,93 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5B342B310
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 11:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13F1439903;
+	Wed,  5 Aug 2026 11:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785929217; cv=none; b=HN+hP8kz0HVoN/7tJ4nKuXD0v4OxARCyUOp0YyXQDHncFUdK49e6s7Dg31GbumNYhz8/kKEzFmZg46clT/J9BR1kFsWFvfRkpbq8ozDhjb5QdWW+Ke434KM5hT9bTEGqWEloWFytedUH3YuZZ96w7EAQ01LzQPRdbRyZTPy0gOs=
+	t=1785930483; cv=none; b=odHmnnCJqMGWl2jUbRZSOKF4yjIKT+Q8xQvoze6RXG7zK7PnDCsNCw8paYrqO7Vb7SSr/5RPVuBYwHeOJL+3884MClziIQxw4ZaDGlkHrDJD1wks3HP9PDj7YNPbJR1sDH/sZskRbLzOGW7d03k89ynu2OL9ktJUqKyHA/hxq+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785929217; c=relaxed/simple;
-	bh=JlvhUDwnRsmJuGIJfu2RAFP7l7jWwFFl8s2ejpgMDDw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/J3qBDvu9MDhjxcrcLnPYpyjQQRRWhghPa8ZBBAyRyMxGz+tc+zK3F3aX1EWOI5REEEF6dMe6W5vRkq86EZNrsYNIOiMXkdRuhHgD0UNpzb/2rSFYvtIEk0igDjpvYmAwWI8zwKkg7td/K9rlrPQIF/15FpRJ6JtuHryN2NzOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dEfv9Enw; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785930483; c=relaxed/simple;
+	bh=/i23X/GCA0qH7i2TPHbNsGAzQOFTIgZzx9YRfnv2leU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LdacGZS4UhL6sUKQA+vHD846TteYVSqoNSM3LN/9BTZggT9HwnmZMGh5AnQoR2Wuf26jVyMdibE76k+MrVjMiXRUruAgjzoz67BElLIa2tC83sjpIIAGcw75rhSCgr7k2EKjXO6CYsVSDvxqyQdA4iFJmwoabqURWZIMaNVnwn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKQte5ce; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dEfv9Enw"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38e041ea211so967156a91.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 04:26:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785929215; x=1786534015; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hk7zSpsVAMsj5hapJzjDxC/by63XNDGUaS2i07kGkes=;
-        b=dEfv9EnwieeasPxKYldwNlambEWBB1enONnROHMqhwzgxA8746PxmSsJLQAHj1blbg
-         sq31R8iq+YaZW756UIM0oBrBiLhdqFaZ5FUngRpK8Nya6YCfZo2uYzIChxgysB6xU5xb
-         L2BZQQwWPRm8VZxcVSHneKLKlj9jzyCSfHP14=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785929215; x=1786534015;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hk7zSpsVAMsj5hapJzjDxC/by63XNDGUaS2i07kGkes=;
-        b=WpNzMQopcH1MM98v4SGq5yyNMOdLz78HFBz0fD/U76U0ayxEu0pQcBhjv9V7qtJ8BZ
-         jkGjPcSF1dFf4rc2/jaqsKFsT3yapYbb7DDHFOH1dAOFduFVIXYckrkVanEW06wucg4R
-         NE5WtU69dWVq0Vhwawg2Vk6kl3hMFJP084phD8pZfuK74TOUhAmPJkrVYyGY0ZtHDvbG
-         +ppZZV5Ovi2WBJI8+hZuoLwA/nx3FRp+CrdHXwmvlPmtbf9UCffgq+wAK08GeuFnrGBa
-         UZxue6Bk4YALIqvjw9ecrfyroFYYQbz2+k/Frchw5DRrzUIiTS3ykE6lAwfq3OTFB4D2
-         05cA==
-X-Forwarded-Encrypted: i=1; AHgh+RoD0/dvsVFbbdeELcCHmAc6ZStXOXZReARSpMxW39tL5w6pz1/rc0FzqfFiwAthXEaAYnP05zubPMdKEA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVG/VjpxtOHgYiQgVDLF3UhMrkMPhZqp/FsY3sla9gZzMkCnS0
-	R+Xd+/QHHf+PABcwFVFo14w81Zue756p2ANU9d0A1Yl+nIUDi7Nds8QTYryNEluK/3eG+tdp7o3
-	q6pk=
-X-Gm-Gg: AR+sD127nUCoSDeFaxpIAT5iSYeSKsEwZMmCZaDVZi53ZSIec0Mc6sRE9kAyqaS16m6
-	GNb8w9HynvSMp1Cot1qc0ZlumfSdp1EMl2vGbLaE65lC55nOLfXD6llSLtJPW7lSXeq3F7OY4ib
-	WjnWdvmZNKku9XVdEkID89+J3bhNv0Kd4HtX6hI8mY/qrnaU0UEqorNczNwFZlaeBcZOSKWyPv3
-	fnYakQbqW+3pIB0Ll8VLRR4pOOsMBlbbGRU+bEx9g3wzXhGjAyPHmUSkVVC2aRcSssOTcizrVjy
-	/gDMKBq5uau2dLsZttDhnE2iP5C5aLkk2eHQ9nfs6iy/p4adVAyImRUO+4+reouHjOSmFJVPmCB
-	NklVB8l7JqCGHwUEjIILsSPDn8KyIEfc20uq6HLHQ9qDcPRPKQGVngKdSn45nk8KV1ORKJWlNam
-	U9/LSsLG4kM8PL35cBrjhQwu/ajo4S7jAV4x2EghGIM3ARw5gDaQegz6F+A0dfi5fS+fOD/0JCq
-	soI1Ts8oTSY4lQoCXAzAEo4atgs
-X-Received: by 2002:a17:90b:528c:b0:37f:bfd6:8b40 with SMTP id 98e67ed59e1d1-3903c5993cemr6583221a91.5.1785929215205;
-        Wed, 05 Aug 2026 04:26:55 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:8002:2a47:a704:5a58])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-390392aef87sm2964341a91.13.2026.08.05.04.26.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 04:26:54 -0700 (PDT)
-Date: Wed, 5 Aug 2026 20:26:50 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Longlong Xia <xialonglong2025@163.com>, Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Longlong Xia <xialonglong@kylinos.cn>
-Subject: Re: [PATCH 0/2] zram: fix stale scan bounds after reinitialization
-Message-ID: <anMd5GBmYmq81coH@google.com>
-References: <20260804065919.3970386-1-xialonglong2025@163.com>
- <20260804131046.7c485858542d586bb7c51857@linux-foundation.org>
- <anKUG5B3qfZRVf8n@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKQte5ce"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE3BA1F00A3A;
+	Wed,  5 Aug 2026 11:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785930481;
+	bh=K0ep+ZnNOPvfw8zQifj80jRcgTPYp36FlFjtfpO4Ds4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=iKQte5ceo4mIljjIwbPBtY9OAVmR5FcnsbkNZv+JkIwe2ticCMtLCyaI7vgfUdZGy
+	 UVV4NaHRQLmKJBEoLCrGKGY/YtKxrFP0+SlHMWCF6N9HKLZNIJkLVly4HPpBHgA5Bn
+	 e8VD9/4ki5dR86ytYiABzmCi4INq/Axj3Lh6k5YMOsFW3ohj+VHn7rPhklp5rnIZHF
+	 zNUkSRC+VivpPCQlUAO59/pnSrSKx0nGtUhAorbP5WjER15UyxJkuzHrY9k/6QEXgP
+	 qQprlkyuesLcKf5JXuUKqZeCYIS8rSLc/ERyuua/qEazI59L26yE6I4j7a3oC4h2w9
+	 g627mlPMpfesA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Guru Das Srinagesh <linux@gurudas.dev>,
+	Alvin Sun <alvin.sun@linux.dev>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, Guru Das
+ Srinagesh <linux@gurudas.dev>, Boqun Feng <boqun@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>,
+	Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?=
+ <work@onurozkan.dev>,
+	Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+Subject: Re: [PATCH] block: rnull: use vertical import style
+In-Reply-To: <20260705-rfl-vert-imp-2-v1-1-e6ab69c55095@gurudas.dev>
+References: <tguZBuXyXFqmsEfvLLtcNT06DfKq3-W45Yo19lRFsggGLQgvRRa6wA6rv6ntiX1Q8nAgQj88-PDbjh2gLdetbg==@protonmail.internalid>
+ <20260705-rfl-vert-imp-2-v1-1-e6ab69c55095@gurudas.dev>
+Date: Wed, 05 Aug 2026 13:47:50 +0200
+Message-ID: <877bm494bd.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <anKUG5B3qfZRVf8n@google.com>
+Content-Type: text/plain
 
-On (26/08/05 10:42), Sergey Senozhatsky wrote:
-> 
-> - read_block_state() tear-down is something to look into.
+"Guru Das Srinagesh" <linux@gurudas.dev> writes:
 
-Likely false report.
+> Convert `use` imports to vertical layout for better readability and
+> maintainability.
+>
+> Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+> ---
+> Came across a recent commit bc58905eb07 ("samples: rust_misc_device: use
+> vertical import style") and found a few more locations that could
+> benefit from this cleanup. No functional changes.
+>
+> Separating out patches per-subsystem as per the review feedback in [0].
+>
+> Tested via:
+>
+> 	$ make LLVM=1 rustfmtcheck || echo "fail"
+> 	$
+>
+> Initially thought that rust-for-linux/rust-block-next was the right base
+> branch to use, which is why I didn't group this with [1] based on
+> rust-next that I sent out a short while ago. Using rust-next as base for
+> this patch.
+>
+> [0]: https://lore.kernel.org/lkml/20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev/
+> [1]: https://lore.kernel.org/lkml/20260705-rfl-vert-imp-v1-1-2f07946a905f@gurudas.dev/
+
+I think this patch was already submitted by Alvin back in May [1].
+
+Best regards,
+Andreas Hindborg
+
+[1] https://lore.kernel.org/r/20260521-miscdev-use-format-v3-6-56240ca70d0c@linux.dev
+
