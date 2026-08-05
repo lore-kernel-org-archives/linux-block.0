@@ -1,63 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5FE46DFE7;
-	Tue,  4 Aug 2026 20:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207601A682C;
+	Wed,  5 Aug 2026 00:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785874248; cv=none; b=eiqwn92zavJ2f2jz3bNBfd0IWBFHof9WaC7Ur8cv5WmgIx2jTgFo42YmmrfU1c9wwewikm2fnlMLGA9iaDLKQU1oWypvWJWKsM4XjzOsLcqs7lEyi4cs4dPUry9svB4aOCDCBvO0vlP2EMOweVlvScNgrPsDZeuxcmGiNCGXi08=
+	t=1785890651; cv=none; b=FGs3BDgDRLfp5Dyu1/UHauJqLUJjdr4a3R7hf9BV+PXFY4BZOLN+cAjMD6i8v6/XBfQ2lUZCbhJh95L5+cN7dGSfs1YzXTLIb41yFBzxc8A1HCPNzeJbRKQ4+BU3Kh699+YyE2YG9UpxPfkGKIo1XyhqZV4/8EEZLlQcy2HHkkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785874248; c=relaxed/simple;
-	bh=EfibkzaErMQMpa2DaC51mT0iheQTOmvxBRBMTCxprNc=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=HvTxJHLvpy7PcNm59ilT+T4JJVmGHS4+WYjQCFqBx+keu9HDyehMdsMshbBR2cxlCoQ2kXZZSvDmZO3wl2ZIKSY9EZxi1BPcvkK2RLhwhCmx+f6AUJIRXhZhrfIwfEw2o/OXFEIqapVlrSwSZK4jpdSx7FDyY2GF0bN3XAurup8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=gjQ0Gtdv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785890651; c=relaxed/simple;
+	bh=A/KaithGFpCu/Xix9Ievp82PIz5fUqa2CmC/L4wSBDA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ftbgjieW+OeYi+ASEsrL1+C23m/apt0IFAuACJoA01thAR7JQPcp63+h+ymr2b6z0p9lPPwgLRJLpnSs0OEDU+u8oJKsIlBQpdTqZv2ZnBCcvQkOejKzsIG8wDur7vO/HKZmensuJT+GcUwiigThC9g0X1+t4mkbYaLa2g5QDKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=gAIW2kjU; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="gjQ0Gtdv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAEDB1F000E9;
-	Tue,  4 Aug 2026 20:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux-foundation.org; s=korg; t=1785874246;
-	bh=LiA+i9mh7z1w8TWb05qob900VSB5xbB2w3Aq0oqzIfU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gjQ0GtdvjaXjGhLdYxl+DGa3rST3Ct0Sh/CcazHn6tlU71I4SOXEZLkLkkjuh6Yw4
-	 TstqaZbjxUEdd2ymSixplCay7VE07DXfU2fueRFfNE6D6nKlm+uaKhvIGNfFK0D3Vu
-	 pp9KOCAJKnUPK9OKxoGVq/yMy/LxYTlDYNmMfUK8=
-Date: Tue, 4 Aug 2026 13:10:46 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Longlong Xia <xialonglong2025@163.com>
-Cc: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
- <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, Longlong Xia
- <xialonglong@kylinos.cn>
-Subject: Re: [PATCH 0/2] zram: fix stale scan bounds after reinitialization
-Message-Id: <20260804131046.7c485858542d586bb7c51857@linux-foundation.org>
-In-Reply-To: <20260804065919.3970386-1-xialonglong2025@163.com>
-References: <20260804065919.3970386-1-xialonglong2025@163.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="gAIW2kjU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=A/
+	KaithGFpCu/Xix9Ievp82PIz5fUqa2CmC/L4wSBDA=; b=gAIW2kjUN/l8TcJt7I
+	nyVN22iY470B+XR6umjut6WysFiXO1/74CGCitem4qXM506nJdB68yCg0NgrTy+o
+	Rueh1xTVJlBj7MQwuF3ZKol/J04HaiNLJZmJkzvEDhaIMENTQp367/9AyVpqxNgs
+	5I/e/hIGscAcVzgBKM04uaSPQ=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wA34ewzh3JqJqQfMQ--.61178S2;
+	Wed, 05 Aug 2026 08:43:32 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] selftests: ublk: add rotating auto_buf index regression test
+Date: Wed,  5 Aug 2026 08:43:30 +0800
+Message-Id: <20260805004330.1712178-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <b0c53f03-6386-4d36-b7dc-28df02ce71b4@kernel.dk>
+References: <20260730024050.1062354-1-yangxiuwei@kylinos.cn> <178581121634.578215.15829017092257405641.b4-ty@b4> <20260804063201.3740465-1-yangxiuwei@kylinos.cn> <b0c53f03-6386-4d36-b7dc-28df02ce71b4@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wA34ewzh3JqJqQfMQ--.61178S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUeuWLUUUUU
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6RQmtmpyhzS+xwAA3-
 
-On Tue,  4 Aug 2026 14:59:17 +0800 Longlong Xia <xialonglong2025@163.com> wrote:
+Hi Jens,
 
-> Both writeback_store() and read_block_state() derive their table scan
-> bounds from zram->disksize before acquiring dev_lock. If the device is
-> reset and reinitialized with a smaller disksize between that read and lock
-> acquisition, the bound can describe the old table while the scan operates
-> on the new one. This can lead to out-of-bounds slot accesses.
-> 
-> Move both bound calculations under dev_lock so each bound remains
-> consistent with the table throughout its scan. Keep the fixes separate
-> because the affected interfaces originate from different commits and can
-> be backported independently.
+On Tue, Aug 04, 2026 at 07:00:15AM -0600, Jens Axboe wrote:
+> It's because your postings end up being broken, I had to explicitly grab
+> 1/2 of this series too (which is why the reply looks odd.
+>
+> Added manually now.
 
-Thanks.  AI review found several things to be worried about, all are
-pre-existing.
+Thanks for the explanation and for picking up 2/2. I'll keep the
+selftest in the same series next time.
 
-	https://sashiko.dev/#/patchset/20260804065919.3970386-1-xialonglong2025@163.com
+Thanks,
+Yang Xiuwei
+
