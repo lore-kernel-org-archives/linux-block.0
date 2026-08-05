@@ -1,27 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C6D3EA979
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 12:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153E84657F5
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 12:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785933545; cv=none; b=ugVJH9085jY2/+lFxJFg1apmh+jEwHkvquCdIflV3JXRUD3et+S5SRBmzbP9HCYJXu6AkRA5yqtmnDvaW2Gcz6Cf7SBombkT8eiLCr9eCL4lxN3jeIhrU9DSJ8JchrMJCv8L+kBixDpIaJa8JAZwtK6SgxMxdQlH6KPgZ9ESRMA=
+	t=1785933546; cv=none; b=AgVJzLuAdQQWfx1Wl0i6aF4Z07aOrV8gcjm8mrivx1OY5mTLogPkaSVeHx0/hoNOG6USq27vGF5UwsdD08n51csQ2TLjOdZvBlBEkQUJzorKkQ4jJS6yuwhHILmRTbwHd2Mx5XPuf98IprH1IbeCasCirUybEnIrCXprDgAZNL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785933545; c=relaxed/simple;
-	bh=5DHaZpcGBnavuDFMYhbEy+0kcnFt7s31kEpLK8oMMzQ=;
+	s=arc-20240116; t=1785933546; c=relaxed/simple;
+	bh=N5biFNBr62yZe8gEJEP404p720ir8MesthgLLy3nc+o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A5lJCTakDzclIEB48FnBPvnVLt0XaD8K52RRjzMJcz3ubyODN196hl0yW3/7BhbVYtAgL5iTfiZuL7Q2oq3DgaOT2eDeBX8EUYRaNHq5+RdetfUtFvIg6fxqLrotZmfAzdR+Q7rXKqgrv+rcqQOpqdKaf9+ycaW5rzL7nTsQqao=
+	 MIME-Version; b=Uj7UnJFj85OTiZVO2g9ROhME+uTFGvmQ5bXELGGVCbcsdm9qoTiwZvKdQgyIYjY9FZUdLKsAFcu0xPRZXcZ5fbgIrbIrp4lIVQu15q8gtIXifKZXCJOkQv4QxLApTNB4j6MyQEnzd+zp6EXrZ0ntPS+2puGymova8j+a49nWuXI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hFVLj33PDzYQvY9
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hFVLj2GCyzYQvVd
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:38:05 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 77BFB4056E
+	by mail.maildlp.com (Postfix) with ESMTP id 571C84087D
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:38:58 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkXfLnNqRJjWBA--.10386S8;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkXfLnNqRJjWBA--.10386S5;
 	Wed, 05 Aug 2026 20:38:58 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,9 +37,9 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v8 4/8] nbd: remove queue freeze in nbd_add_socket
-Date: Wed,  5 Aug 2026 20:29:26 +0800
-Message-ID: <20260805122930.57647-5-yangerkun@huawei.com>
+Subject: [PATCH v8 1/8] nbd: simplify find_fallback() by removing redundant logic
+Date: Wed,  5 Aug 2026 20:29:23 +0800
+Message-ID: <20260805122930.57647-2-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260805122930.57647-1-yangerkun@huawei.com>
 References: <20260805122930.57647-1-yangerkun@huawei.com>
@@ -50,85 +50,99 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgC3pkXfLnNqRJjWBA--.10386S8
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF1xAF43Kw13CFyktw47Arb_yoW8tFyUpF
-	s8Ga9rGF4Utr45Wa1kAFWkXFyrtwn7K347GayxX34YvrsxAFySvFyft3WrWFyUArykZ3W7
-	AFW5Krs2kw18WrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmKb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x02
-	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
-	80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
-	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
-	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s02
-	6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
-	I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
-	6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7
-	xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j
-	6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUoF4EDUUUU
+X-CM-TRANSID:_Ch0CgC3pkXfLnNqRJjWBA--.10386S5
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr15ur1kWrW8uw1UKr45ZFb_yoW8tF1UpF
+	WfZFyfKryUXF13ur43Za1UuF1rCws3Ga1UGFW8Ja4xuryDCryUuFZ3tF1ftayUJrZxZF9F
+	vF1UGFy2kFn8Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
+	A2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
+	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
+	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+	WUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUv
+	cSsGvfC2KfnxnUUI43ZEXa7IU8epB3UUUUU==
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-nbd_add_socket() kreallocs config->socks, which a concurrent reader in
-nbd_handle_cmd() could UAF; commit b98e762e3d71 ("nbd: freeze the queue
-while we're adding connections")froze the queue to block that.  But the
-freeze costs an RCU grace period on every socket added, and setup adds
-them one by one.
+From: Long Li <leo.lilong@huawei.com>
 
-After the previous patch, nbd_add_socket() is rejected once nbd->pid is
-set, so it only runs during setup.  There the capacity is 0 and the
-write cache is off (cleared on disconnect by the preceding patch, and
-re-enabled only later in nbd_set_size), so submit_bio_noacct() rejects
-every bio before it reaches the driver -- non-zero-sector ones via
-bio_check_eod(), and flush-only ones via the !bdev_write_cache() branch.
-No I/O is in flight, so the freeze is unnecessary.
+The second conditional checking nsock->fallback_index validity is the
+logical inverse of the first, so drop it and let execution fall through
+naturally. Consolidate the two identical dev_err_ratelimited() + return
+paths into a single no_fallback label to reduce duplication.
 
 Reviewed-by: Yu Kuai <yukuai@fygo.io>
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+Signed-off-by: Long Li <leo.lilong@huawei.com>
 ---
- drivers/block/nbd.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ drivers/block/nbd.c | 37 ++++++++++++++-----------------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 78df6f459da6..cb7c1f8502f4 100644
+index 8f10762e90ef..b1a5acd57426 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1276,7 +1276,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	struct socket *sock;
- 	struct nbd_sock **socks;
- 	struct nbd_sock *nsock;
--	unsigned int memflags;
- 	int err;
+@@ -1061,40 +1061,31 @@ static int find_fallback(struct nbd_device *nbd, int index)
+ 	int new_index = -1;
+ 	struct nbd_sock *nsock = config->socks[index];
+ 	int fallback = nsock->fallback_index;
++	int i;
  
- 	/* Arg will be cast to int, check it to avoid overflow */
-@@ -1294,12 +1293,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 		return err;
- 	nbd_reclassify_socket(sock);
+ 	if (test_bit(NBD_RT_DISCONNECTED, &config->runtime_flags))
+ 		return new_index;
  
--	/*
--	 * We need to make sure we don't get any errant requests while we're
--	 * reallocating the ->socks array.
--	 */
--	memflags = blk_mq_freeze_queue(nbd->disk->queue);
--
- 	if (!netlink && !nbd->task_setup &&
- 	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
- 		nbd->task_setup = current;
-@@ -1339,12 +1332,10 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
- 	socks[config->num_connections++] = nsock;
- 	atomic_inc(&config->live_connections);
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+-	if (config->num_connections <= 1) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Dead connection, failed to find a fallback\n");
+-		return new_index;
+-	}
++	if (config->num_connections <= 1)
++		goto no_fallback;
  
- 	return 0;
+ 	if (fallback >= 0 && fallback < config->num_connections &&
+ 	    !config->socks[fallback]->dead)
+ 		return fallback;
  
- put_socket:
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
- 	sockfd_put(sock);
- 	return err;
+-	if (nsock->fallback_index < 0 ||
+-	    nsock->fallback_index >= config->num_connections ||
+-	    config->socks[nsock->fallback_index]->dead) {
+-		int i;
+-		for (i = 0; i < config->num_connections; i++) {
+-			if (i == index)
+-				continue;
+-			if (!config->socks[i]->dead) {
+-				new_index = i;
+-				break;
+-			}
+-		}
+-		nsock->fallback_index = new_index;
+-		if (new_index < 0) {
+-			dev_err_ratelimited(disk_to_dev(nbd->disk),
+-					    "Dead connection, failed to find a fallback\n");
+-			return new_index;
++	for (i = 0; i < config->num_connections; i++) {
++		if (i != index && !config->socks[i]->dead) {
++			new_index = i;
++			break;
+ 		}
+ 	}
+-	new_index = nsock->fallback_index;
++	nsock->fallback_index = new_index;
++	if (new_index >= 0)
++		return new_index;
++
++no_fallback:
++	dev_err_ratelimited(disk_to_dev(nbd->disk),
++			    "Dead connection, failed to find a fallback\n");
+ 	return new_index;
  }
+ 
 -- 
 2.52.0
 
