@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653533C1406
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 02:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F53630E84F
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 02:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785896864; cv=none; b=gogppFNh7R340aZsrK0AWvSdLJuWtimRRAfTlf0fALK7xrufW/0Mu0v4fgMfSpT/GBFlpBlMl1wKP0oJ4dq4nkEXxO3Xaw6BRD756OiAQc1y51E+rdwRQnkNfSySWuZhS6855sPcKE5/OdYDwnC1zO2O1Pp8ccC0S8lwkLmMN/c=
+	t=1785896865; cv=none; b=PBbApKpqs3xPx3XqYG9/NUGKHVVeuqL4Ew2DMg8OkrOLPH/TnbbnRYpDyy395RFhYFalOxmqpI0LF8VHcxnNy1FXg3/cfzNGVj3MzVj4cNFFv0bPEx5tO/EQe1Gx1YN7WkEjjpKuRXlbeodhAdtWz07H5bRGswYGt/tl2CWBciM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785896864; c=relaxed/simple;
-	bh=hXEyG0QGXfiTXKoPx0bHA1me64MiAwrYNikesH2CFKg=;
+	s=arc-20240116; t=1785896865; c=relaxed/simple;
+	bh=t2+B+lvNbpfuYhPog6jddBpA22+OxO99qdZsR+gcPnQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lcyj7sVe5chwsjuJ8F0PJeOlyAToDTgBp4DoSLE0hFMfgZy/zMlA6OXhL/Nt+Qf3Xvz0SksPXau2VCwhI9X2leH7kHY/h4hbIFfAvOJNceVL4co8a7PVLUVunoEtgpciLnmbIPjTgepLNXp/pixa34OcvSgp7b9U4WL3T7VCVPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gM0JJQDi; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Q5ms02yc6ctEY6AoTaq0oTjhqdc0KCjww5tLWlRutOsuOQDUddR8r5SzK82dYVUEHFA//24QtwAK7tWYDVNwvJKMNabdFNFWMlimP/qu4FWCdU4Rs8OXhaXV+SmKlxcopNA3umHzEd+eacnPQs+r4nxJp0V/9vTjCCWLzGaCliA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TCp2pY96; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gM0JJQDi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF1361F000E9;
-	Wed,  5 Aug 2026 02:27:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TCp2pY96"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF4C1F00A3A;
+	Wed,  5 Aug 2026 02:27:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785896863;
-	bh=m7vn8uMI+qZ5F4XX0by/WTTpLHb7gGLXPaE/DfLrBYU=;
+	s=k20260515; t=1785896864;
+	bh=ranPTEh7AKfmtndcufM4QwY7bQ0yYS5QDYyh0UNAcgE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gM0JJQDik4cgvFCXvfwKulKJaxq2DOAG3Ze2AoDgpFisbJMk1+mZuP6IGJeDVdGWu
-	 Fo8fIE4L+WXLP5KGRRBiIqLrb52hQ0ZmBQxGqPNQdVZW4+2TypuNESBTetboANfGoN
-	 YvEFY71cq39gX9kc+Hax7uYZh+0jP4zWp6aU9phvYGknpm7lwqdVAznt0uCkdcDHbM
-	 Xy7fAh5q8fkLg3yyYWJGPIwIg78Ut/tNZ4ycCcpAZXqgn/uP7Ycpi4LhCKj6WaSDsI
-	 r9qwgPfnuK7ChILrOVj9nHSwdKagkVlWtovGRFUdgo9ignJuNNcDHI1MLE2xzDFYar
-	 qwBQOprwQuRzw==
+	b=TCp2pY96/FpYAftZpbqUzfTl2oWAAUv2ErgS8rPog8wU+dm/gvrp1xB83Kl0FAFX4
+	 6yYaEdzQMfqA36RSMza0oPcypXP/jyHztybgIrjKz1f39OQGvNTgBj54gV5oSUB6dY
+	 TqhIARDqW8SrNlTdTbXHurW8dFBhC7IEGbiS8QU+g0pT09Ir1xpyZu06b3GMLctfKF
+	 AHs1HbahCLR5E9nXe8qkN0dcu2JCnWy0qymgU1Yrw+kwYY+5NbLch/KyKRp4zLlOSc
+	 d6uUQW4vDHknfF8CDu1GtZFZoga9vTKDTIE1p5YjKd+kFDMsYhWn8xwT9HV0zQXQXW
+	 Ho5gnrhGfDmRQ==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 12/14] block: simplify disk_zone_set_cond()
-Date: Wed,  5 Aug 2026 11:27:17 +0900
-Message-ID: <20260805022719.735323-13-dlemoal@kernel.org>
+Subject: [PATCH 13/14] block: flag zoned disks with GENHD_FL_NO_PART
+Date: Wed,  5 Aug 2026 11:27:18 +0900
+Message-ID: <20260805022719.735323-14-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260805022719.735323-1-dlemoal@kernel.org>
 References: <20260805022719.735323-1-dlemoal@kernel.org>
@@ -44,73 +44,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-disk_zone_set_cond() is used to set a zone condition afer a reset, a
-finish or a reset all operation. For a single zone reset or finish, we are
-guaranteed that the target zone is a sequential one that is not offline
-nor read-only (otherwise, the operation would have failed). For a reset
-all operation, there is no point in calling this function for offline and
-read-only zones since the condition checks in disk_zone_set_cond() will
-result in nothing being done.
+Zoned block devices do not support partitions. However, the partition
+table is nevertheless still inspected, and any partition found ignored
+with a warning in add_partition(). While this is generally not a problem,
+and in fact beneficial to the user as it indicates an invalid use of a
+zoned block device, scanning for a partition table on the device may
+result in issuing read operations to offline zones (e.g. after a disk head
+is depopulated for disks that support head management operations).
 
-Simplify all this using disk_zone_is_offline_or_readonly() in
-blk_zone_reset_all_bio_endio() to skip zones that are offline or
-read-only. This change allows simplifying disk_zone_set_cond() by removing
-the zone condition checks. This change is also consistent with the fact
-that conventional zones can now have the offline or read-only condition.
+Since partitions are ignored anyway, completely disable partition scanning
+for zoned gendisks by setting the flag GENHD_FL_NO_PART in __add_disk().
+The existing check in add_partition() is left as-is to ensure that we
+still get a warning if for whatever reason, despite GENHD_FL_NO_PART, we
+still endup trying to add partitions.
+
+Flagging zoned disks with GENHD_FL_NO_PART also has the benefit to expose
+through sysfs the ext_range attribute with the value of 1 instead of the
+default DISK_MAX_PARTS, thus correctly advertizing the fact that zoned
+disks do not support partitions.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- block/blk-zoned.c | 26 ++++++--------------------
- 1 file changed, 6 insertions(+), 20 deletions(-)
+ block/genhd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 3494f06ec3f1..e900c5d14414 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -235,29 +235,14 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
- static void disk_zone_set_cond(struct gendisk *disk, sector_t sector,
- 			       enum blk_zone_cond cond)
- {
-+	unsigned int zno = disk_zone_no(disk, sector);
- 	u8 *zones_state;
- 
- 	rcu_read_lock();
- 	zones_state = rcu_dereference(disk->zones_state);
--	if (zones_state) {
--		unsigned int zno = disk_zone_no(disk, sector);
--
--		/*
--		 * The condition of a conventional, readonly and offline zones
--		 * never changes, so do nothing if the target zone is in one of
--		 * these conditions.
--		 */
--		switch (zones_state[zno] & BLK_ZSTATE_COND_MASK) {
--		case BLK_ZSTATE_NOT_WP:
--		case BLK_ZSTATE_READONLY:
--		case BLK_ZSTATE_OFFLINE:
--			break;
--		default:
--			blk_zstate_set(zones_state, zno, cond,
--				       blk_zstate_flags(zones_state[zno]));
--			break;
--		}
--	}
-+	if (likely(zones_state && zno < disk->nr_zones))
-+		blk_zstate_set(zones_state, zno, cond,
-+			       blk_zstate_flags(zones_state[zno]));
- 	rcu_read_unlock();
- }
- 
-@@ -1304,7 +1289,8 @@ static void blk_zone_reset_all_bio_endio(struct bio *bio)
- 	/* Update the cached zone conditions. */
- 	for (sector = 0; sector < get_capacity(disk);
- 	     sector += bdev_zone_sectors(bio->bi_bdev)) {
--		if (disk_zone_is_offline_or_readonly(disk, sector))
-+		if (!disk_zone_is_seq(disk, sector) ||
-+		    disk_zone_is_offline_or_readonly(disk, sector))
- 			continue;
- 		disk_zone_set_cond(disk, sector, BLK_ZONE_COND_EMPTY);
+diff --git a/block/genhd.c b/block/genhd.c
+index e8ce0cabf392..34a64077ba02 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -447,6 +447,13 @@ static int __add_disk(struct device *parent, struct gendisk *disk,
+ 		bdev_set_flag(disk->part0, BD_HAS_SUBMIT_BIO);
  	}
+ 
++	/*
++	 * We do not support partitions with zoned block devices, so do not try
++	 * to scan the partitions table.
++	 */
++	if (blk_queue_is_zoned(disk->queue))
++		disk->flags |= GENHD_FL_NO_PART;
++
+ 	/*
+ 	 * If the driver provides an explicit major number it also must provide
+ 	 * the number of minors numbers supported, and those will be used to
 -- 
 2.55.0
 
