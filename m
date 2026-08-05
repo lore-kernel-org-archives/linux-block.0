@@ -1,99 +1,229 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9483F42252A
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 10:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781AC42B73B
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 10:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785927141; cv=none; b=usC7mQ/dYpyuWrNGq681KYBAyVdU1ruBDX7lRtBZLmG9pBU0f00G2Pt+NBZHHN9AWQCYb5Z3EU7faNJkj5gYIAT1JVovA14Z+YkKYEgXVv0LsGXSEMYOE6KBexWIROu7ct/VqRaDRN6wZ6LuUtWeCu5MBy6j/TDcwTPH3B1VFQc=
+	t=1785927553; cv=none; b=WdPs0WTFEUvufcue/D6m5dcL1uuHa1p3iea3ZWGDJUku9uv4+6lDcOjLUsbbfHsXtUo0hCk+8N28dZgO+zc0KfD9PFqXlCx44CgODFfPl886LPthR/QDK6I52tfTXCnNlbbHj3Elmg8xw3zFCT5MplAqy6cV3nhs8MBBJYILuY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785927141; c=relaxed/simple;
-	bh=eP5zT19otmavZYh5jnGMqz0ktdAeVJgmyjcd+gz8ImY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pvm4JWxkGqmGrJABBeyqUsFAwq/N165uEDX9dXnaUXoTKrg7NBCvW7FfbdjQdX95WvcZTbiM/aovY0nMled1na62F5CiN9ly9PqT2I7tQmtmPSp9nfOnRIhujPvAajFqZ5TMhHEERHx42+QE5AxnBUFkvyPoKso+cRmETLOrF0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=V0u4IeNp; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785927553; c=relaxed/simple;
+	bh=/1dtEFjUK+P0pvRVxCDasuHqjQBqBeraGQRhegPMj5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ISFVpk6tSRrQNTrZEZrEyfKE/DDCpJbyQXmzvIQ4+1PjUX8PpXbuk5JwNCDLLdcfiKLZT+/vk/TGR/3+ZbinfpZKpHJH7GrR5WMoXU8ROepsPas7WYbRtIVyuTK8Aue/3LuDPKnFndoJaRom7dPIIH0nZo/2YJvmWLz6deou9IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SZEXOh1K; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="V0u4IeNp"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-ca7c1176317so700394a12.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 03:52:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SZEXOh1K"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-498028b3d5eso7946925e9.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 03:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785927138; x=1786531938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=41H3P09sKw8wwkKnWV642RHA7jFSxWcxJqByp/NmDs0=;
-        b=V0u4IeNpm0UBpYa8FDO0F7/a5R1KA1+Wpn44fLWP5imSktgLrFafUz1pXukG5ttxWk
-         GHqaKugXaJ4P1Jl6HLJztnU/JpxaghXo59+7I5THv0zLn8Y7ZPTkT2yhpMmdoCxmM/0d
-         8l5uUACRbbpoNAzbMoSEZcYrsjh8HTLLRLIxw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785927138; x=1786531938;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1785927546; x=1786532346; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=41H3P09sKw8wwkKnWV642RHA7jFSxWcxJqByp/NmDs0=;
-        b=qBhaRicdPzTEC0N3qDBblznm5hWg4VBSwHmIaDSSy84wNSooimwG3o5jGQ9diFEOtM
-         97jdSQISmPzzb6Ce3HR4Z5f4/Q8N4Sf/wVKul2slWhs/AovmJ8jii9x6eOu3WOOCpI6t
-         89bKukTsPvQ1a7o10Nk3y+NfQ6Nj9DYFfuTZ4epBX8W5nLc4GHS0i2kfgX0OPt/wKAr8
-         VYq8uxOqS28nnFzJz10iGGrJ3Dgvjm2rH/wgSBq3yDN/RttAefEvkVsiVRlpdrzky8sf
-         srUFtu+dvzxOp2ZiPMvXbWCARqz54x5CVArUUuNHqKb3SDkkvSZQsvbKVYBPORCpYdiK
-         ndRg==
-X-Forwarded-Encrypted: i=1; AHgh+Rp4r7IQTBqyfr5bV4WG0O2r/wpv/yRoVi2FkEQVJ5DutCc0UDvOjAek4wHMPUgQ0lGbGQclvGAJ5qUuzw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6epw2u9reYrbfuc34vDOdZi7AEJb6ZAdUnzpgffHzWfMSOj7z
-	XSOASgLoMBNDKS9QZgI6s2/NzkdBJfA+4zzyTGj4sM+GqRpW/xjwpBV1W0BWqsSBkQ==
-X-Gm-Gg: AR+sD12jWdWg8nRuJrd7mPUriIAR0Hd2IpxNKMQXKtrrQgH1xBWiAHCgjTaF+QasHr1
-	PHoz0LwLrLOBursQblJsHv6SPhsZ4wJ7frGDaBUO0Wl3RNcS8xxQpNAvcWGOb+DtfJnAIsnv3CA
-	YFg72RnrGkishYrwIcuj0dkn0qMNlzNmXPykpeoapudCRB7qQGHCqJ2tHIwqeBXlzGOZSKw/00S
-	zkYr2SGLuY49u236OcUXt8DFhoKANvUtyfv5gq/y1Q/BNSGfRjUurcMEVkGdfoDHBg84gYy/2HG
-	qSg40oa6SnaXGUOGm9pmPFw7uJr3wDVV2aZwAGg492mA8anATGiLyzNxlSQJ1q2ToLfNlSWG0HX
-	nTbiy6ywEd2yUG25jiMT6WpBzzJdsWg8xeAP0beqCenujIMkuNzjdoZquPF5yZ8sA/jft/15b7I
-	WI7V5W9Lncm16C++N8WyyktC81RWNpi16h5nYyjxAY8GBl2w2sKhOYH4nJHskOGpxXb5V/ubKF7
-	pRpDXLGrvgkQuJdsN5eI1M5qzY8edB4JgmSiVE=
-X-Received: by 2002:a05:6a21:4685:b0:3c4:3321:4fe8 with SMTP id adf61e73a8af0-3cb85dbd1ffmr7117853637.14.1785927137918;
-        Wed, 05 Aug 2026 03:52:17 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:8002:2a47:a704:5a58])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cbe708c0e7fsm1281577a12.21.2026.08.05.03.52.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 03:52:17 -0700 (PDT)
-Date: Wed, 5 Aug 2026 19:52:13 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, Longlong Xia <xialonglong@kylinos.cn>, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] zram: freeze device queue before device reset
-Message-ID: <anMVoqIwmubZj3wY@google.com>
-References: <20260805021854.1057715-1-senozhatsky@chromium.org>
- <anMQTJeiBZUHX2Y_@google.com>
+        bh=qChqnXEV/RUrII3F6FtB3OpL17H6S0GQj9i1G4DFOPk=;
+        b=SZEXOh1KpuYJfaF3im7hVoma9sONKG+vqzLlaf7ooZ3+DAVgQF2n8nHiu3IBzKzRRw
+         dp61JCqy4D2c2x5T+fFsho0Kc4LPfYzRhYnaRPQxTWRUmJNY2O3uEtNUJ9g0jtsQzB78
+         acwHo/V/p7Z+a/CycbdYZGZ0/BQXrBPXtv82DmWLOJ6CXmegiDSc5Vpr9pIheKRjGqMF
+         r+UcPmzDpbWcI8H13x2BkfrjOdsL8Xsy75IrRzcWKT2gi+twbWrzsVK/oIe0qJM2wJoa
+         yEryF/AJxdc6tNkssc5mLthTAMvFEWY1cWRMtRboKcJGJ7HfUeRlxV4Ne690/an9Vv8/
+         6wYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785927546; x=1786532346;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=qChqnXEV/RUrII3F6FtB3OpL17H6S0GQj9i1G4DFOPk=;
+        b=N7AR85TQ/hZgasiYAoA4Bh0bJS+dTt035lHHx7LJ/y9BBlOjzLmHvdu+7P+eWvSOyz
+         6XX2ZZA6wLMVLofrCgEl8huvS2BpfZZ6DV9AnJ3lK9IqsI+DQ4mb5ZBiwZZmc8WxYJ4y
+         HNjNVbogfgsgZ/vOhuUVZZv0lhY68KwljfPkgNRVLi8fOPJCy2/KbjspJi8shV90Czld
+         N8kds8ssJoifzMka7tqjaW0nyHRginlVnmbqZ9QHvvHDjdys3QvVNcnHDSWdcSvGzggK
+         euHB2ePhyVfUFCP75dltVJBeKP2mJeo/E4Kr/YNu/EoxdUnHahSGXmUWmkWMzk2LHxaE
+         3RUA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp8BfFl/tdRBinRU0+p1Q/CLBNB4gepElz6uDk5SiOyA3Y4OibB0laprgj60rA0+Gxf4L2J+TGkrp6R0Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGqc2lN9Jozxody9lzhLyGsZyVClok4sI1c/ESXrz3E+cluWbv
+	JxR45BxCHhKXTnErAyTiSI+iPgxUwZqoDmTSK6Csp5fe9wBz14aNgNcm
+X-Gm-Gg: AR+sD105cQVbfRmtjinC9wizvMJ4J4w9jp/hh1YrrbTHXJ9Kc3ruvni3KwgcTeGEt4p
+	eAzs32vw6c1cz1kPk7Wj1g9hwob7pltZ9wjALC3twhheBUs9iW+QQHZcDz4vtWX9Su8vm/3ELh9
+	sMxqeAxx4q6DfZoVWST2t8HCKK35R1QdA3dKXJvTyfmiMKgZY+XcTPYoAyHW5E/RIqu6n79uUv9
+	ZyOfLuQ+r9PTX8vt4NTaiGzO/6krO9ZJVVdn4t1q6xHI/glXqltK+gamfVRNUhG/FuhqSL3yB/w
+	5Szsc+epy4VvZmoHxbt++U+qj/EZi9aAbfoLfN4rXxFsUdzDGuxvsugeL/kdBFiVkF4di6RuHif
+	DA2Hu7YZGN0UkW8fUjJJefmKTnfR24j3w/XZOBh15r5VPyglSNH/5S8DG1n4WRIyoeFoVWTs16C
+	Vyw2GwOKiP6Mp0kytdFLThshHcarrIU1HKiTipo6v9+OGPbOsZdPQKyTXhajbFtqveNCgtBOUU1
+	94ciZrUhqVVKsx9/yEfxAuDH7Jf89Ilf92fXM5qyrQODBngnx04tmYBii7G4V3qmOfyNaBAPDk2
+	0WsFu/Bqmdbg8NvJ4Rtm761SYKw4MDyU/v48T0hwg1GUXD2g
+X-Received: by 2002:a05:600c:4e94:b0:497:ff73:68d5 with SMTP id 5b1f17b1804b1-4994e6c5eafmr60022735e9.0.1785927545848;
+        Wed, 05 Aug 2026 03:59:05 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4994e035900sm80665575e9.11.2026.08.05.03.59.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Aug 2026 03:59:05 -0700 (PDT)
+Message-ID: <8285ede8-bebb-403a-8a37-b9987cd37a8f@gmail.com>
+Date: Wed, 5 Aug 2026 11:59:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <anMQTJeiBZUHX2Y_@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/14] dma-buf: introduce initial file I/O
+ infrastructure
+To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Nitesh Shetty
+ <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, David Sterba <dsterba@suse.com>,
+ Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
+ nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org
+References: <cover.1785274111.git.asml.silence@gmail.com>
+ <bc20381e8daf85ac58811c344325d8192cde9d1e.1785274111.git.asml.silence@gmail.com>
+ <181b08be-04bc-4ae9-bb88-15321a82440f@amd.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <181b08be-04bc-4ae9-bb88-15321a82440f@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On (26/08/05 19:29), Sergey Senozhatsky wrote:
-> On (26/08/05 11:18), Sergey Senozhatsky wrote:
-> > Device reset does not take into account in-flight async IO
-> > requests so we can free meta table and reset device concurrently
-> > with those requests being executed. The block layer guidelines
-> > indicate that queue state should be protected by blk_mq_freeze_queue()
-> > during teardown.  Freeze zram queue before device reset.
-> > 
-> > Fixes: cd67e10ac699 ("zram: promote zram from staging")
-> > Link: https://sashiko.dev/#/patchset/20260804065919.3970386-1-xialonglong2025@163.com
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+On 8/5/26 09:27, Christian König wrote:
+...>> +struct dma_buf_io_fence {
+>> +	struct dma_fence base;
+>> +	spinlock_t lock;
+>> +};
 > 
-> lockdep doesn't seem to be happy...
-> Let me look into it.
+> Upstream has change to allow embedding the spinlock into the dma_fence, so this structure here is most likely not necessary any more.
 
-Actually I need to look at the report again.  I suspect that we
-maybe don't even need any patches for that "async IO vs reset"
-sashiko report.
+ok
+
+>> +static const char *dma_buf_io_fence_drv_name(struct dma_fence *fence)
+>> +{
+>> +	/* default fence release kfree's the base pointer */
+>> +	BUILD_BUG_ON(offsetof(struct dma_buf_io_fence, base));
+>> +
+>> +	return "dma-buf-io-ctx";
+>> +}
+...>> +static void dma_buf_io_map_release_work(struct work_struct *work)
+>> +{
+>> +	struct dma_buf_io_map *map = container_of(work, struct dma_buf_io_map,
+>> +						  release_work);
+>> +	struct dma_buf_io_fence *fence = map->fence;
+>> +	struct dma_buf_io_ctx *ctx = map->ctx;
+>> +	struct dma_buf *dmabuf = ctx->dmabuf;
+>> +
+>> +	/* the release path must wait for fences */
+>> +	if (WARN_ON_ONCE(refcount_read(&ctx->refs) == 0))
+>> +		return;
+> 
+> Stuff like that is usually illegal.
+
+Should be fine, it's just a warning. The map holds a ctx
+reference so can't be 0. IIRC, it was synchronised a bit
+differently before. I can kill it, refcount_inc() has the
+same warning anyway.
+
+> And why are you using refcount directly instead of kref?
+
+Not sure it'd make much difference here.
+
+> 
+>> +
+>> +	/* Prevent from destoying the ctx while unmapping */
+>> +	refcount_inc(&ctx->refs);
+> 
+>> +
+>> +	/*
+>> +	 * There are no more requests using the map, we can signal the fence.
+>> +	 * It should be done before taking the resv lock as someone could be
+>> +	 * waiting for the fence while holding the lock.
+>> +	 */
+>> +	dma_fence_signal(&fence->base);
+> 
+> Signaling fences has a whole bunch of very strict rules associated with it. E.g. you can't alocate memory for example.
+> 
+> Are you sure you actually need and want a dma_fence here?
+
+Waiting for potentially a ton of IO synchronously on invalidate
+sounds like a bad idea though. Hmm.
+
+>> +
+>> +	dma_resv_lock(dmabuf->resv, NULL);
+>> +	ctx->dev_ops->unmap(ctx, map);
+>> +	dma_resv_unlock(dmabuf->resv);
+>> +
+>> +	dma_fence_put(&fence->base);
+> 
+> You should probably set map->fence to NULL after that.
+
+The map is freed two lines below, but I can add it as
+a defensive measure.
+
+>> +	percpu_ref_exit(&map->refs);
+>> +	kfree(map);
+
+...>> +struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
+>> +{
+>> +	struct dma_buf *dmabuf = ctx->dmabuf;
+>> +	struct dma_buf_io_map *map;
+>> +	long ret;
+>> +
+>> +retry:
+>> +	/*
+>> +	 * ->dmabuf_map() will be calling dma_buf_map_attachment(), for which
+>> +	 * we'll need to wait for fences. Do a bit nicer and try to wait
+>> +	 * without the resv lock first.
+>> +	 */
+> 
+> Clear NAK to that. Always wait while holding the resv lock if you can!
+> 
+> It is absolutely not beneficial to do this outside of the lock and usually just hides problems instead and prevent fixing them.
+
+Ok
+
+...
+>> +	ret = dma_resv_reserve_fences(dmabuf->resv, 1);
+>> +	if (WARN_ON_ONCE(ret)) {
+>> +		struct dma_fence *fence = &map->fence->base;
+>> +
+>> +		dma_fence_get(fence);
+>> +		percpu_ref_kill(&map->refs);
+>> +		dma_fence_wait(fence, false);
+>> +		dma_fence_put(fence);
+>> +		return;
+>> +	}
+>> +
+>> +	dma_resv_add_fence(dmabuf->resv, &map->fence->base,
+>> +			   DMA_RESV_USAGE_KERNEL);
+> 
+> That sequence is clearly incorrect!
+> 
+> The fence must be created after dma_resv_reserve_fences(), otherwise you definately have an illegal memory operation here.
+
+I'm not sure what you mean, can you elaborate? I only cared about
+pre-allocating it to avoid allocations here. We add / signal the fence
+only once, no reuse. The map is going to be killed here, and if we
+create a new map, it'll have its own fence.
+
+I can move the dma_fence_init() call here if that makes a difference?
+
+-- 
+Pavel Begunkov
+
