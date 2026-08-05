@@ -1,67 +1,67 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C508137923;
-	Wed,  5 Aug 2026 11:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9073435512;
+	Wed,  5 Aug 2026 11:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785928590; cv=none; b=IZ+shbybmKoFXA2XHPKkzvkLLIPXAQIBOk6ID2Aq0bfBPtumRvzFgtRWOlYy40j8Bycg7WYt2xQyQs9NQkktlK5ecORVauwAwqAYXnxkV/Bf2i+VX5XcbQ/8pA67U4fIte2E+GdWXrnAR2TG7jIWA9bg4HLo8435dH+hbSrBIhU=
+	t=1785928592; cv=none; b=SydCapmMmpTZL+ivfBsCD99G0VejZvoGT7XgwlBgDJAuHO99OawaMBY35mWfNKy+tpN0sJ+NtSNOZo/4izZoeVBG1/VjRjqAVl1brcKgZ0b8I8DKXX0FZ4lS2zasuiDSfKCWX+8Jyh8NYSkJ9w3tWFcq2D75CxNNxF2P6TB46/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785928590; c=relaxed/simple;
-	bh=+bwqcI3KwprWHmyUHDfGlwKyahSoh8jLjC/SKg7ATR4=;
+	s=arc-20240116; t=1785928592; c=relaxed/simple;
+	bh=1nkbS4t0z/jNRIPvt15xVo/n2dUlxGg0BuXBYg2XhL0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iqtiymoSWkdNIpp2WRMMperZOrDhn1KwYP2NNt91tmozER3FLdLsGw+iOMExc4N/VkiFa29PqTO8QJ8IMThVAUYcddxqO+Gez69yxrqsuXukdDTDJzvs698QfZDuK1Jntn/4d8OgwWzzKgHTZxunQ/B6XLhYgsZuiPsOqYbi94U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tif94OMx; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version:Content-Type; b=kGOn3wpbq1sBFgeJD1b17EFT+mkm9BNSGn+YhqKBgs3c/vE9Six8yaiP7qL5xwn2mWgTI6qyZzTwyMIFtJiwl7ZgilcAbQ8OqCbupjlZpt2GrHht3mAdVK5K5AcylXjBdKxtTGtaXvY7v7vA0b8y4g0/F/VexE5xLhTqlWJQdvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=loRwHMsA; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tif94OMx"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6758lmab1503298;
-	Wed, 5 Aug 2026 11:16:24 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="loRwHMsA"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6758m5NM3355781;
+	Wed, 5 Aug 2026 11:16:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=8yESEo
-	KBead9Q3Bq7tgEml9GbVrdKzCFm6n5g720IGQ=; b=tif94OMxt/+QmcoWtfC8la
-	TxpWWYA9KbGZi8pXNx23xkwp8104vk4Clnb8MOHJQT1nSO/nQiaBkLu+VsC12AZZ
-	90WNihaNvcylgWG4aoviln4DGyiSUiFoChucBgkDTZBrows2Uxf2o1Mnh6yxdM7G
-	azDyIb1O7ptiFK2lvqZd7AvQLs9sSijbz4BS+pRDbhkHh32uA5RTBCx9VPGvNYFF
-	tPYDsmCcuiFx59FBfBcRxVn+T0RgvdwDD/jxwu2ThVJ60agmg1z6bEKtN30WjdBT
-	R5FYNDoRFqnQKU2b+sWBJ+3afPHRc9RHRnDfWEQ+HNkpe/c/lKehWVHwwkP6OMWg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=qPeZ8L
+	meuKfX5O8qbmPQCZbpm6RTF4pXptsGoiEH3rs=; b=loRwHMsA9QvOpzjnaW456i
+	30CpE0ujpDzidb26HHgLtNK5Je1GWrJn8ANr1/+oP7H1w9Hd/KcG1c3GW9vFVR2B
+	9ZirBf1sbc/aqFcuE81tviw6ZjlHrg5ztkl0GRgQHsmteWqhYzlaw0GnIfCinozu
+	XLg9f30NFrdLlDE/q38grqt+V+D2QSK4mW9+56TNQdF2LqFDVBgCcfXEZPavsB2n
+	XzLdkASDnwygjZU7ddR2N0I6IYgwlAe1sXkJjy1VceOEe++NRzZb9AxYpjcrd1Ve
+	USyQXcZMMYBluLrtEv56OkgtoVscB9+UAoHieY9bWfTukUdAIrSJ9StMNbgCqCPA
 	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8fqtm6y-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8a42prh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 05 Aug 2026 11:16:24 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 675BBE20012703;
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 675AfZPm006300;
 	Wed, 5 Aug 2026 11:16:23 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswtyp0ux-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsv4k685g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 05 Aug 2026 11:16:23 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 675BGH9u49676722
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 675BGHKC45941120
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 5 Aug 2026 11:16:17 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2089820043;
+	by IMSVA (Postfix) with ESMTP id 6C43920043;
 	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0330B2004F;
+	by IMSVA (Postfix) with ESMTP id 45DF52005A;
 	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Aug 2026 11:16:16 +0000 (GMT)
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
 From: Stefan Haberland <sth@linux.ibm.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 03/19] s390/dasd: Guard sysfs discipline callbacks against unallocated private data
-Date: Wed,  5 Aug 2026 13:15:56 +0200
-Message-ID: <20260805111612.1285190-4-sth@linux.ibm.com>
+Subject: [PATCH 05/19] s390/dasd: Optimize max blocks per request for track alignment
+Date: Wed,  5 Aug 2026 13:15:58 +0200
+Message-ID: <20260805111612.1285190-6-sth@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260805111612.1285190-1-sth@linux.ibm.com>
 References: <20260805111612.1285190-1-sth@linux.ibm.com>
@@ -74,180 +74,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gjITN24cvWARj90i9WlD-L6L_HKIl-sm
-X-Proofpoint-ORIG-GUID: gjITN24cvWARj90i9WlD-L6L_HKIl-sm
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX079eEcqHBQUc
- 6T2QzWzsAYhIg8dJZWu10+V2HzxdgJYvW5i2FWsDpLtmfcz7lmSGl5RFN+qRiQUp5udPOa3mOL/
- bNIsIpStmB3vUpA+62d+uJXO98N8MOI=
-X-Authority-Analysis: v=2.4 cv=K8cS2SWI c=1 sm=1 tr=0 ts=6a731b88 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+X-Authority-Analysis: v=2.4 cv=E6P9Y6dl c=1 sm=1 tr=0 ts=6a731b88 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=otpBJI0RWbrHn9utmiEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX4AVddGyKWssC
- mE+pNFiXREaLUboEkrOzqcGn9RSnWPoC74huP58Aa3WX0hYOGyMKB0/vWUM7/i98o2BPywUAnbC
- OEyBxrouAyf+KJFnRaRnzhyH4ZBcfjO4mKbe8f9b9FcdgiW8tE5UJESEPRDNQsCOv/v0qLwAnQq
- XcQPxyQYisaA5/h2lwtwA/IfeNvQDfwX64EHSXT0q+gxcgERKmLYRbJmOHRDKA3+6CNS/qXAaUr
- mnmUJipcFlKKgmCxNpso3nnXX22Y9a4wO8h3pmt0H37VIrbUe+xbrYeSJI7JI9iVT37qdpclA9X
- lqWrcMToS/bi8Tt26epdNlaEFB3GgaKMBLxobHSnm5TiPpwekBlhAdyB5cpDlyxnEtJdVGDEzYY
- L2DiaBR/cR+qdtvEG6hcY5diwTAeVZIRD6MQKZhkt3SNPX081klw97sqN8+aeFb8T5bbksIxlRV
- VGa7GlS7w2ArXoy2kSA==
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=8f17mpASHZ0i51vZi0YA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: eohPgSB3xjQpL-3mKLQWEnGLSYi6fr_q
+X-Proofpoint-GUID: eohPgSB3xjQpL-3mKLQWEnGLSYi6fr_q
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX/up+JZzU4IDL
+ 5bFMXzVXD+vMjxgOiBidu/lJQVDb1TRGRptA51VzYBghOWRifGbZ2tJRWWo+GejHw/d+FvvEcL+
+ oOBj9nYv8J32YY7HzhBgUwduX4opqpg=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfXxDJhCRWX2N16
+ LWiFTdVHLHQ8rXG1IDU2Exn4yOCje1gksma4oWXc/EtS8Gyg35KPyBQG9b5iyw/uQDhwL0GPSWP
+ 0NsJ4yJ737SCzYTYqadtYdg++Tb6HwPm35VxDSD4X6LYC53CtgzwKqmBhuTEHvqeuXcjv7jNOZl
+ kDPv7Z332p715Y7jv6+zShUrSi8N9zSN2zjXVbfvUApeNZSCHmkqu0zByN3SbKFEkTgJDczmY7Y
+ sFm/K+uLCTqZKsKrWwkADLmnZV0u/fd+fVVAQwil9bjD6R5nAEIDm+09bK8YMxwqjzUSHxypQvA
+ LdCtGqIMAb4CQy5JHaQNyM4EhkFWLubEQUvhDwHC7xmFe+cbmT/Zd3pGGrB0Tv8BYNsmEjkNN5F
+ qsFawjTu2w/t9b20jR88vAPx6b4FFCuzqBnkmsOvl9bzVs9JXrDtbq/H/h0qVoUH6SDw4lHggXc
+ GD3h43FQJ8vo8nVR4hg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-05_03,2026-08-04_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608050086
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 adultscore=0 spamscore=0 malwarescore=0 impostorscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608050086
 
-Several sysfs show/store handlers call a discipline callback that
-dereferences device->private, either directly or through the
-DASD_DEFINE_ATTR() macro. During dasd_generic_set_online() the discipline
-is assigned before check_device() allocates device->private, so an
-unprivileged read of one of these world-readable attributes in that window
-dereferences a NULL pointer and panics.
+With 4096-byte blocks a full ECKD track holds exactly 12 records. Lower
+DASD_ECKD_MAX_BLOCKS from 190 to 180 so requests align to track
+boundaries (15 full tracks); full-track I/O is more efficient than
+partial-track writes, and 190 had no alignment significance and could
+let a request cross a track boundary.
 
-Guard the dereference inside each callback that actually touches
-device->private.
-
-Fixes: c729696bcf8b ("s390/dasd: Recognise data for ESE volumes")
-Cc: stable@vger.kernel.org
 Reviewed-by: Jan Höppner <hoeppner@linux.ibm.com>
 Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- drivers/s390/block/dasd_eckd.c | 40 ++++++++++++++++++++++++++++++++--
- 1 file changed, 38 insertions(+), 2 deletions(-)
+ drivers/s390/block/dasd_eckd.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
-index d356a9f8f016..b64ca714b53e 100644
---- a/drivers/s390/block/dasd_eckd.c
-+++ b/drivers/s390/block/dasd_eckd.c
-@@ -1492,6 +1492,8 @@ static void dasd_eckd_reset_path(struct dasd_device *device, __u8 pm)
- 	struct dasd_eckd_private *private = device->private;
- 	unsigned long flags;
+diff --git a/drivers/s390/block/dasd_eckd.h b/drivers/s390/block/dasd_eckd.h
+index f9299bd184ba..763733bcc4d2 100644
+--- a/drivers/s390/block/dasd_eckd.h
++++ b/drivers/s390/block/dasd_eckd.h
+@@ -131,7 +131,7 @@
+ /*
+  * Maximum number of blocks to be chained
+  */
+-#define DASD_ECKD_MAX_BLOCKS		 190
++#define DASD_ECKD_MAX_BLOCKS		 180
+ #define DASD_ECKD_MAX_BLOCKS_RAW	 256
  
-+	if (!private)
-+		return;
- 	if (!private->fcx_max_data)
- 		private->fcx_max_data = get_fcx_max_data(device);
- 	spin_lock_irqsave(get_ccwdev_lock(device->cdev), flags);
-@@ -1647,6 +1649,9 @@ static int dasd_eckd_is_ese(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->vsq.vol_info.ese;
- }
- 
-@@ -1654,6 +1659,9 @@ static int dasd_eckd_ext_pool_id(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->vsq.extent_pool_id;
- }
- 
-@@ -1667,6 +1675,9 @@ static int dasd_eckd_space_configured(struct dasd_device *device)
- 	struct dasd_eckd_private *private = device->private;
- 	int rc;
- 
-+	if (!private)
-+		return 0;
-+
- 	rc = dasd_eckd_read_vol_info(device);
- 
- 	return rc ? : private->vsq.space_configured;
-@@ -1681,6 +1692,9 @@ static int dasd_eckd_space_allocated(struct dasd_device *device)
- 	struct dasd_eckd_private *private = device->private;
- 	int rc;
- 
-+	if (!private)
-+		return 0;
-+
- 	rc = dasd_eckd_read_vol_info(device);
- 
- 	return rc ? : private->vsq.space_allocated;
-@@ -1690,6 +1704,9 @@ static int dasd_eckd_logical_capacity(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->vsq.logical_capacity;
- }
- 
-@@ -1832,7 +1849,11 @@ static int dasd_eckd_read_ext_pool_info(struct dasd_device *device)
- static int dasd_eckd_ext_size(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
--	struct dasd_ext_pool_sum eps = private->eps;
-+	struct dasd_ext_pool_sum eps;
-+
-+	if (!private)
-+		return 0;
-+	eps = private->eps;
- 
- 	if (!eps.flags.extent_size_valid)
- 		return 0;
-@@ -1848,6 +1869,9 @@ static int dasd_eckd_ext_pool_warn_thrshld(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->eps.warn_thrshld;
- }
- 
-@@ -1855,6 +1879,9 @@ static int dasd_eckd_ext_pool_cap_at_warnlevel(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->eps.flags.capacity_at_warnlevel;
- }
- 
-@@ -1865,6 +1892,9 @@ static int dasd_eckd_ext_pool_oos(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->eps.flags.pool_oos;
- }
- 
-@@ -5938,8 +5968,11 @@ static int dasd_eckd_query_host_access(struct dasd_device *device,
- 	struct ccw1 *ccw;
- 	int rc;
- 
-+	if (!private)
-+		return -ENODEV;
-+
- 	/* not available for HYPER PAV alias devices */
--	if (!device->block && private->lcu->pav == HYPER_PAV)
-+	if (!device->block && private->lcu && private->lcu->pav == HYPER_PAV)
- 		return -EOPNOTSUPP;
- 
- 	/* may not be supported by the storage server */
-@@ -6804,6 +6837,9 @@ static int dasd_eckd_hpf_enabled(struct dasd_device *device)
- {
- 	struct dasd_eckd_private *private = device->private;
- 
-+	if (!private)
-+		return 0;
-+
- 	return private->fcx_max_data ? 1 : 0;
- }
- 
+ /*****************************************************************************
 -- 
 2.53.0
 
