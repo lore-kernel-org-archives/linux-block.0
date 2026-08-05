@@ -1,26 +1,27 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B0C305687
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BC53546F6
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 12:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785933543; cv=none; b=L74eaimUPjSj0Fh/Nc++botUGihjsSJNOCmQnIIJOokUJn3/MSs9KLxoLE7fDAfYntfbIK57kI6bbyMlERW4uDQj7L7xzDWczyvs1qV+8PFNTdLBJg0K7T0NLO7y20cVRahk0Is2vEFNyxezlcQD2Y/0D1Ah/WX1fbP8f2uJ4Ok=
+	t=1785933543; cv=none; b=u5FgzR1p3Dl6bQFQ8uCqkvNgFR6330SaCGRmUqg8gSwPXOEIdDtWy67fFIdQCFoymkxInP56AykYCIaQh4+MbmFz/mH2j7+B5juLle5c/M6tUh72TWaOonuYyBJZMGFIMEAfQ8an3qJWTKxbYZV+V2XJdGU0o+WDxohfaURO/+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785933543; c=relaxed/simple;
-	bh=/FeF0zEqGruxeYyeQpQh3tttT2s14eSc5b+bFto/Yzw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rogd5Kzm2IjjJN2+Q3AG+3K0vH6HDQfuMapwCxzHF+nAwkuEDBR23msgfKMuIEphebLe7dbUF7hrzxUi6EDgf/Ym/eazbF2Anm1J4flJCTzWOmVdNLUrCAE8dOIKQugzIlusHp3s2G7LnuXpKFjAswQorvim/qXx1cYwI+t99Pw=
+	bh=toYtBXVbUZjBnG0M/PpJrUwMEPeavmuVoZ/4CMgCAOI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oKE42KGsEjEGHxw7pqgVfb19nXcG5mdzTjLdFRYP7kTjMMHUsH7aP0zjI8QIxP8QjwpsImWJdoecJCUYAGn77VS0Og33Gw+AZq5wEV+G8PMxL0cZ+ZxLwH7fnbEAlpINQZlufDklTSaNESPLouQzDR7Ey6HcPHr6ywfij3EWm4Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hFVMc0NN5zKHNQK
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hFVMc1wqyzKHNQN
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:38:52 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 4B23C40572
+	by mail.maildlp.com (Postfix) with ESMTP id 7F61340996
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:38:58 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkXfLnNqRJjWBA--.10386S4;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkXfLnNqRJjWBA--.10386S9;
 	Wed, 05 Aug 2026 20:38:58 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -36,10 +37,12 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v8 0/8] nbd: eliminate queue freeze/unfreeze overhead in connection setup
-Date: Wed,  5 Aug 2026 20:29:22 +0800
-Message-ID: <20260805122930.57647-1-yangerkun@huawei.com>
+Subject: [PATCH v8 5/8] nbd: skip queue freeze when setting size at device startup
+Date: Wed,  5 Aug 2026 20:29:27 +0800
+Message-ID: <20260805122930.57647-6-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260805122930.57647-1-yangerkun@huawei.com>
+References: <20260805122930.57647-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,91 +50,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgC3pkXfLnNqRJjWBA--.10386S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFyxArW3Xry7ArWruFy8Xwb_yoW8ur17pr
-	WftFy3Kr40qF43uFs3Z3W8Ww13tw4kAr9xGF17Jw10kF15Ca4vqFyI9r1Fy3y7Ar9a9w12
-	qa1YqrZ7u3WjkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9mb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr
-	0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UQBMtUUUUU=
+X-CM-TRANSID:_Ch0CgC3pkXfLnNqRJjWBA--.10386S9
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr4UuF1fZw1ktry8CF1fCrg_yoW8XF1Dpr
+	Wq9ayDK3y0gF43ZF97Xr47Za4rJayDCry2gFy7J3sI9FZxAF1SgrZxZFyfWFZ7Xryktw4a
+	kF4DKaykA3W8Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmKb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x02
+	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
+	80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
+	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
+	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s02
+	6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
+	I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
+	6r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7
+	xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j
+	6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUoF4EDUUUU
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-This series eliminates the blk_mq_freeze_queue()/unfreeze_queue()
-overhead that currently occurs during nbd connection setup(nbd provide
-ondemand and was using in AI sandbox e2b[1] to mount and attach rootfs).
-Each freeze cycle will introduce a RCU grace which was significant
-with multi-core system.
+Commit 242a49e5c878 ("nbd: freeze the queue for queue limits updates")
+added the freeze to keep in-flight commands from seeing
+torn queue_limits.  But at startup the capacity is still 0
+(invalidate_disk cleared it) and the write cache is off (the previous
+patch cleared it on disconnect, and nbd_set_size sets it back only after
+the commit), so submit_bio_noacct() rejects any bio before it reaches
+the driver and no I/O is in flight.  Drop the freeze by checking
+capacity and write cache state in nbd_set_size.
 
-time nbd-client --name myexport --connections 96 127.0.0.1 1234
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/nbd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-After this patchset:
-real    0m0.090s
-user    0m0.004s
-sys     0m0.018s
-
-Without this patchset:
-real    0m2.195s
-user    0m0.005s
-sys     0m0.022s
-
-v7->v8:
-1. clean some code for patch 7
-2. reject invalid pre_defined_connections for patch 8
-
-v6->v7:
-1. fix patch 3(sorry again for mistake in v6)
-
-v5->v6:
-1. patch 3, reset stale FEAT*, not only write cache
-2. patch 5, using the way Kuai advise to skip freeze
-3. patch 6, adopt kuai's suggestion
-4. patch 8, rename nr_hw_queues and add some comments
-
-v4->v5:
-1. add patch 3 to reset write cache on disconnect
-2. fix ("nbd: factor out a nbd_genl_foreach_sock")
-
-v3->v4:
-1. factor out nbd_genl_foreach_sock to cleanup duplicated code
-2. rewrite some commit message to make what's going more clearly
-
-v2->v3:
-1. Stop using xarray, and protect it by rejecting late NBD_SET_SOCKS
-2. Eliminate freeze in nbd_set_size when device setup
-3. Add module parameter to eliminate freeze for pre-created device
-
-v1->v2:
-1. Rewrite cover letter
-2. Eliminate freeze call from blk_mq_update_nr_hw_queues in
-   nbd_start_device for netlink path
-
-Long Li (1):
-  nbd: simplify find_fallback() by removing redundant logic
-
-Yang Erkun (7):
-  nbd: disallow NBD_SET_SOCK on an active device
-  nbd: clear queue limits on disconnect
-  nbd: remove queue freeze in nbd_add_socket
-  nbd: skip queue freeze when setting size at device startup
-  nbd: factor out a nbd_genl_foreach_sock
-  nbd: remove queue freeze for newly created nbd from netlink path
-  nbd: add pre_defined_connections module parameter for pre-created
-    devices
-
- drivers/block/nbd.c | 257 +++++++++++++++++++++++---------------------
- 1 file changed, 137 insertions(+), 120 deletions(-)
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index cb7c1f8502f4..cb662ae4b91d 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -375,7 +375,11 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
+ 	nbd_apply_limits(&lim, nbd->config->flags);
+ 	lim.logical_block_size = blksize;
+ 	lim.physical_block_size = blksize;
+-	error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
++	/* No need freeze with 0 capacity and write cache disabled */
++	if (!get_capacity(nbd->disk) && !blk_queue_write_cache(nbd->disk->queue))
++		error = queue_limits_commit_update(nbd->disk->queue, &lim);
++	else
++		error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
+ 	if (error)
+ 		return error;
+ 
 -- 
 2.52.0
 
