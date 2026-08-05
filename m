@@ -1,87 +1,83 @@
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAC23DAAC8
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEA73D79E9
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 20:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785961958; cv=none; b=TyUJjTYOsi0oYQ1VFaOkfokGeWodzcmP8lLDQ/tkOTCfiJGlzywvLp7GPOPFYQ7cJE3t0xYZ4mr+43YrAm+1l9isKYxnzrSJHEmVH/y+T5OnPZTz0IXwyoXEAq7mdEys/0Rbps+tx0SfLYZOoJnoiKdXPwNsiMCUcJVugFG7PtA=
+	t=1785963430; cv=none; b=otMbHhZr9oyjh9uqMZ6+9M2jzKyrqOGFsymBDwLZQGBiGofCybkhEAYI2LCfD+INebwRvQz5G7knEzu4AGwMKCFlcS5C6v3cMfO5+Gqnc0MqCbLNX+65pga+lwSS0hUOHaVWXQmg3a3JMKMU5MXLa0mEvvOwjXfA54iFWRrsqTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785961958; c=relaxed/simple;
-	bh=57m/DmLVn9XGkraXgZRSbNV1Qh0yLzEdJV1bOrLPwUc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CMbVkQ6wPYhxu024XCSSGSeiiAAER/B0LkcJdUJNh/P1BYaSRKEYxy+uyXox/oVR0AsdprPmZRYJqpiJZiL8LrVcb92qtASkjxs6KtLrBmY+UWTAkOuPE6y67vDNCN8NGCetXWJB6c9MVHVOpDIIIYFQn8xRe7fO6yILoClbh3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e9fbcd3a0eso1333614a34.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 13:32:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785961956; x=1786566756;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=pI79W1QOhGf6g+79s8ZQlJP5xO6zYN2eFYomTXYAmMQ=;
-        b=rOkiLnJZWgI3l+PmHA3ikbn7kl1zpXPKtiZxRlFEQ7GeS/RnFJZ9XgE+8Qn4qo4YgJ
-         UTKD3Z/gXzt/jT/Z/pcnG7UADlKc6icUwhPG4IwX85mZFISn5AqBznvmqPWwsLWF3PUw
-         j8sHHaoCo2xr0oVw46+jI/mEWY3TwCB5Uihd7t+1wpFj4HFy1cDjyuNI5QVBAooFKToW
-         AChM22eiQQ0oo8WGC18hlwy7VL8fFfItujJnmb3r8MLVODZW528/ok7dcYPCwIz9Vg/W
-         h6EEw4muLnvZguSouhcUJuRHakT9LkIW/MpREqLsdqnOcQbbqWs/KTItCgHKorgUT2FR
-         V4lQ==
-X-Gm-Message-State: AOJu0YxQaHPLMqnUFxmK+IKX6iM63pa2uOdLgOVSTnLgiR25pJPjChbb
-	yCqNoEIq4zJhgjT2Y1TLhHOBnrKFoYyakal6Hd8SzZMCGAi1d02nGWY2DB3kHqDBHQ6d/BoT9Ou
-	tseLQeKEN1lTjAmQTnRC5ka4c7so0sAGvVye1eIjANLwkDi9G4BSJ0mfwYYM=
+	s=arc-20240116; t=1785963430; c=relaxed/simple;
+	bh=aumyFFwkemCDdr7E1AxUs2HzKJCAnrXd8WLinwCdIms=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X+ikDHVLK/h99wuXiPgS0LGutAkSgCSOe89maIJ8Ze6Zl/+PBu+nlElIpzwIyAheGAtYuIIbsUvOCxzyqYIB3zWP7fkpMoL9EsgV48YN0fNAj1H/yn2FxrlGagvjAqMPkd7Xi1Aq5KWodd3NBO/F+2tXjXgobOr5hYqsu7LXpJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BZ2V/BoW; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BZ2V/BoW"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hFjKx5l9lzlfvpy;
+	Wed,  5 Aug 2026 20:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1785963187; x=1788555188; bh=FtARwnAW34jCTabJf+9NEItO
+	TOh6DobvqL7P+oRh02c=; b=BZ2V/BoWQ2H+8hDeHyZuJQcdgrZw3nj8p0+MS3a3
+	u8/AAQfsPGTpqTSTTlBYvhU74ZxcGXxDG0yKc0ALACPF88tIYP5VcqNFdjsQcqZL
+	foWyCUBuMkfFjG6mfbfe3GTVe8XV04RQ4VU1xo7+AdC8ptNldMUVKqqfTAvi3/d6
+	gKxxOkAFrUU/YEi6B64umk7k+njLgYbRiXRY74aZyi6COFlHiQbuKDISW6XX2qvY
+	uJReqQ1Mtyp52xCf7REGmDYevUJ2bMFrtPc0toi/yz7E5vZvptAARcUbW7GItgP0
+	CKzYbnqOdL0hJv/qpRsm+7wPjklD3TXMsFq2Ebk04tqOBQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 9rRw1vl2DM5h; Wed,  5 Aug 2026 20:53:07 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hFjKt1z3JzlfvpN;
+	Wed,  5 Aug 2026 20:53:05 +0000 (UTC)
+Message-ID: <c7e9ffab-468a-430f-b64b-a385ce0c282b@acm.org>
+Date: Wed, 5 Aug 2026 13:53:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:ee87:0:b0:6a1:82f5:b009 with SMTP id
- 006d021491bc7-6ae96cbf078mr5167577eaf.13.1785961955883; Wed, 05 Aug 2026
- 13:32:35 -0700 (PDT)
-Date: Wed, 05 Aug 2026 13:32:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a739de3.9c11d2ce.289b96.0091.GAE@google.com>
-Subject: [syzbot] Monthly block report (Aug 2026)
-From: syzbot <syzbot+list467a7b6dca8093de900b@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/14] block: remove disk_free_zone_resources()
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20260805022719.735323-1-dlemoal@kernel.org>
+ <20260805022719.735323-2-dlemoal@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260805022719.735323-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello block maintainers/developers,
+On 8/4/26 7:27 PM, Damien Le Moal wrote:
+>   destroy_pool:
+>   	mempool_destroy(disk->zone_wplugs_pool);
+>   	disk->zone_wplugs_pool = NULL;
+> +stop_worker:
+> +	kthread_stop(disk->zone_wplugs_worker);
+> +	disk->zone_wplugs_worker = NULL;
+>   free_hash:
+>   	kfree(disk->zone_wplugs_hash);
+>   	disk->zone_wplugs_hash = NULL;
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+With this patch applied the kernel thread and workqueue are created
+after the mempool has been created. Shouldn't the kthread_stop() call
+occur before the mempool_destroy() call such that the mempool is
+destroyed if workqueue allocation fails?
 
-During the period, 3 new issues were detected and 0 were fixed.
-In total, 20 issues are still open and 113 have already been fixed.
-There are also 25 low-priority issues.
+Thanks,
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 1938    No    general protection fault in lo_rw_aio
-                  https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28
-<2> 1741    Yes   INFO: task hung in blkdev_fallocate
-                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<3> 53      No    INFO: task hung in read_cache_folio (6)
-                  https://syzkaller.appspot.com/bug?extid=9db0864859224b833108
-<4> 1       No    WARNING in blk_mq_alloc_tag_set
-                  https://syzkaller.appspot.com/bug?extid=18431bc7dccedc61778f
-<5> 92      Yes   INFO: rcu detected stall in kjournald2 (2)
-                  https://syzkaller.appspot.com/bug?extid=14c6ac6811273526cfa5
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Bart.
