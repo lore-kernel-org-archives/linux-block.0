@@ -1,67 +1,67 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5EB435A85;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19C0435EDE;
 	Wed,  5 Aug 2026 11:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785928593; cv=none; b=nTIxek6y4IboLTO02xb/miyTfCg+aSo56z0EizuycOlcPs4puv4Cf0YagBNhT4bQCW4hmuSn0W1Z6xOnpALihHYB2X6sSK4NiCcUZXywxd8goM2okaog3QM1smRVNXAtkgIOMByA3qS2j/GIhVI4iI/3bfkM+SgjIvhEv0jZcJw=
+	t=1785928596; cv=none; b=dP80UI5lkzN3P2L9DZMhaeRnWpZRP2v+LzIWzMkWrEXaR5N/ZTkUuyxgQCAW+fKIsOztrvLwgnF7jRIceUXqv/0bdXvkApNcStoYq0hJ8BbtJkTr2xgwcLoqUQMdaRfsX3skDS9AGyUFImOpMjitkVsqGJfnMeRkCUXtdylKDIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785928593; c=relaxed/simple;
-	bh=TVpZdNgR+BIThsyaWICjVyBPZXuNCijx/J7+JZ1Ka0I=;
+	s=arc-20240116; t=1785928596; c=relaxed/simple;
+	bh=ZLdFZMXCkL1g04/S0burMyQKnzIxIQ/1JLcoSBLznPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ivAMfSCGzomZjBACalPoNxL9DiG6ARdrBsOgQ8Bls/TZh6zXvsvDakHthW7+r7BeErHpJ6YELiIwFVx6jEw30eXya2mZFAEUdSO4MqAmRcLyiIqJBFCgkXpOG+/QMMaQSo3lC+UXRscTCoO/EaSgHwSSKVJrbWLFiqecPlK3jbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UEVPPG/Q; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version:Content-Type; b=mObsU+e6W3DAgMGvbJEpDml4Nbs8nfqjaORNRpkX/D4mYHRtuvIBymaRXi68MebtVRmd5+gEF2jMWtNpRhLcPnkG4DcDYLJj8rRYKhgRqoCdb3PxtlVqOeU9uZ6vLGc2JLgs/ToV7+zADBfDESh0qCsvAm8/v2Q7mizi3fp8BtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JJKWDKa6; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UEVPPG/Q"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6758mK0S3438952;
-	Wed, 5 Aug 2026 11:16:26 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JJKWDKa6"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6758liDv3288495;
+	Wed, 5 Aug 2026 11:16:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2NdLWL
-	wQywciX89w2MU/0Ux92OhnRp73NSoX6o+x9R8=; b=UEVPPG/QcuLWGSkXjtt7Ou
-	rheoaXECbxty7UJcpaiUKQWoBxOHRQAKpu78D/qpPaT9JDWzG4Wqo9FKCUK0pBWE
-	X2fx/7Ae2y80VE5PkQTvmn53z+LCRgfzmn5c8ZwPj3qwC5Yh5ShtOPAQwzyRT3dG
-	Ugx7L1tK7MuHs6CUpNQLEPEzZxwKPuGnmT9K0v2dAljk14hIu9aBSVC7h7KGdAQj
-	Pfic2xsUjAYtEH7x0WMmeTvK/jbdOFoZiQRbfgt9NirJ4qn1eHkEiBC1WF3G5iLz
-	xbvgxPzGbdLGhxliQiEAk7ZNFmQuNpMpMKnew9zqTBKxiFcjsnUbLNx7cbWTJdRA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=XynE2r
+	19BFTsEjIQ5hwvWT1zC/Qwq9n8kV6OWN04hJQ=; b=JJKWDKa69kV2GHKdvdXyXA
+	K79IEKTFMxq3y1JZO4dSgIRvW+EzqUYER2efeABl7vol5e/rau4/iQBMvM8Fp1Gf
+	fZcegX9sfNHRHTV6dB/CiFSQJEl9A+6qPPo/NGp7yAUin4UOo4TBWe9UKNAILgK5
+	AgBCNfPXXKKTHFdEr/9S9uBGaMy+qxanuA1CymPLPa9Ip/6FXOE2yv+D/WyawGag
+	x4lGoOmKfjzOdB+iD2A+ZbB8roSpQjwVJe1w5m0BGjuZxV40p9NMnVbi8cUThCXX
+	EPnZ7GiXdkJNPdGW2auZ1BWvGzCV2rhPQ56sBYYROzB6xEQkT7cFvAG3APmp4YCA
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8eut64n-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs77gab6u-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Aug 2026 11:16:25 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 675BBKKN005785;
+	Wed, 05 Aug 2026 11:16:24 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 675BBH7f012725;
 	Wed, 5 Aug 2026 11:16:24 GMT
 Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswbge2cr-1
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswtyp0v4-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 05 Aug 2026 11:16:24 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 675BGIbr32375240
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 675BGIxe31195496
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 5 Aug 2026 11:16:18 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 57A0220043;
+	by IMSVA (Postfix) with ESMTP id 0C1DC20043;
 	Wed,  5 Aug 2026 11:16:18 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 314642004E;
-	Wed,  5 Aug 2026 11:16:18 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id D9EDA2004D;
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Aug 2026 11:16:18 +0000 (GMT)
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
 From: Stefan Haberland <sth@linux.ibm.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 11/19] s390/dasd: Add dasd_eckd_build_cp_tpm_writefulltrack()
-Date: Wed,  5 Aug 2026 13:16:04 +0200
-Message-ID: <20260805111612.1285190-12-sth@linux.ibm.com>
+Subject: [PATCH 09/19] s390/dasd: Add range-based format-track collision detection
+Date: Wed,  5 Aug 2026 13:16:02 +0200
+Message-ID: <20260805111612.1285190-10-sth@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260805111612.1285190-1-sth@linux.ibm.com>
 References: <20260805111612.1285190-1-sth@linux.ibm.com>
@@ -74,423 +74,294 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: G8VkCnFpfI7IlvraIQxPnmUMyYkqcVVy
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX4FvYXXH6d1N/
- dDsXM1eKq/9JvPzdGusui8/hS6i8Ekoic//2LlADzU5v8P9LhiDof9gRV4HouSVhgGchFDPTJPN
- rD+5GZjt3LbTzf8Y0sEZdrlqDQzKdGc=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX1tdcojkLiHN+
- PfR+9KirNcjFYn/OVo7skho+JaPPAUHxr4pchha7ymU6HOIrrcJ86T6GQrjhr5ZhEcccqD4gn6W
- WSnvPd4Pe/Ejz3MrcuNnzsfqRtbb/yaFYYT+6xHWR2qWD/BSIUsdx08NoO/zfritZr++Ya3tKqZ
- cSQMOuuWEjnhKpzwcRZqJX7bCtjfDGlrRDShT3o2lsgWgXSnGLusDudlYtKAdYUpREEdjAwskSK
- X2XNsu7TqiLZmUqO7D/VvYR/RMPE+DZdjhBJziQyT7FzDf3l1ttSg4bJajJaz/XnI+uuhnWZhzo
- daHtmr1g0Ll58iWN4Q/LGZ9VLh8vdPYivaRIlUkZHZiD5FFon6wUZ0/TRttRRWmg3Nf828uT8hH
- finax3p6NAG3+QKgolhlaz9OYkIX6nm3dZ742vwUGpllvtIWgu1H9fJ2gS/bj2r9pX9cgeyTxEO
- aXSuiawYV2fbhT+I9ew==
-X-Proofpoint-GUID: G8VkCnFpfI7IlvraIQxPnmUMyYkqcVVy
-X-Authority-Analysis: v=2.4 cv=KfzidwYD c=1 sm=1 tr=0 ts=6a731b89 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX7Z7KKuLmx+lX
+ HD1TuWKMYeRDsCd4FZjLlA5xrtd3oS3eZvcDbGhN0bZ9uWwAHQm13AyW3ZvjzqzHoSSRigKzphM
+ 3i2AJW+AaJvdkp9iuo0HZCykDumJgBphxT7R7nnMFu8Uj4zYBV8urowOHglGdPJIzSHsKnhBxBN
+ hQNdwmUOhICsYzDsSsRabgdc/JfVJmCQrIK9aE7/pB+ILhOOt1I5XMN19OCYrbTR8B8BPS3/pbT
+ ux/tTRTKnBDSAvwCJtyITwM90kJahfXGfS6CW/J334ui4gueGZ4TemVNU52nkxjOm/Kqqm0OmIZ
+ IsesQEShDMQnVXwoq7iy4yaRz6xbgodmaFQIhp9b4TvCqnevho4JfFEfHPTznMs67ywT6+V4abX
+ gpq96GRt8Y5LtdRTB1WQnFocNgerFgLuAulW+r2WiLs1Xs6fsRIt3kmYPv9RTmrKfR+lxjA3JZk
+ iSlwEXc/jrXg9Sxq/Tw==
+X-Authority-Analysis: v=2.4 cv=WIFPmHsR c=1 sm=1 tr=0 ts=6a731b88 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
- a=N88Q6yKB32gPlXi9WnIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=GaJKkLePmxIg6gA0iAYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: GW4E2XV1_IaTKNSW4PmR8lfn3VRedGMj
+X-Proofpoint-ORIG-GUID: GW4E2XV1_IaTKNSW4PmR8lfn3VRedGMj
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX0SQoi/o3gLF4
+ Bqwh/de3NSrySyPcz4/gWIsvI0u3gX/QeoBqrPOmGP5o86fmjCEQLl74Opu/M2aJBA5C5e0V9qB
+ hUx4XJYW2UxYSMFHIyIIprLPLwNIkHU=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-05_03,2026-08-04_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 bulkscore=0 impostorscore=0 suspectscore=0 malwarescore=0
- adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0 spamscore=0
+ spamscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ suspectscore=0 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608050086
 
-Add the channel program builder for WRITE_FULL_TRACK requests, used
-by dasd_eckd_ese_format() (next patch) to format and write a set of
-tracks atomically and avoid the format cycle on ESE devices.
+Replace the single per-device format_entry slot with an array of 16
+slots so multiple format requests can be in flight at once, and extend
+struct dasd_format_entry with a start_trk/end_trk/cqr range (replacing
+the single track field).
 
-The program is an ITCW with a TIDAW list. Per track it emits an eckd_r0
-header, an eckd_count + data pair for every record (pad records before
-and after the caller's data window use device->nulldata, records in the
-window point into the bio payload), and a terminating 0xFF pseudo-count
-with TIDAW_FLAGS_INSERT_CBC. The descriptors come from the per-device
-fill_chunks pool so they can be freed in bulk in __dasd_cleanup_cqr().
+Rewrite test_and_set_format_track() to scan the array for range overlaps
+instead of a trkcount snapshot, honour the early-collision flag, and
+return the allocated slot to the caller.
 
-Add inline helpers crosses_page() and reserve_nocross(), to keep each
-descriptor within one page since TIDAW addressing must not cross a page
-boundary.
+Add dasd_req_conflict() and extend dasd_return_cqr_cb() to mark in-flight
+data CQRs that overlap a just-completed format range, so the next
+test_and_set_format_track() detects the conflict early.
+
+Remove the now-obsolete trkcount snapshot in dasd_start_IO().
+
+The detection added here only becomes active together with the
+WRITE_FULL_TRACK ESE format handler later in the series: that patch routes
+the format request through dasd_return_cqr_cb() (so completion runs the
+overlap hook with cqr->format set) and records each request's
+start_trk/end_trk range. Until then the array and the conflict check are in
+place but dormant.
 
 Reviewed-by: Jan Höppner <hoeppner@linux.ibm.com>
 Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- drivers/s390/block/dasd_eckd.c | 344 ++++++++++++++++++++++++++++++++-
- 1 file changed, 343 insertions(+), 1 deletion(-)
+ drivers/s390/block/dasd.c      | 29 ++++++++++++----
+ drivers/s390/block/dasd_eckd.c | 62 +++++++++++++++++++++++-----------
+ drivers/s390/block/dasd_int.h  | 19 +++++++++--
+ 3 files changed, 81 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
-index ae122fbdca3e..8379c8a40382 100644
---- a/drivers/s390/block/dasd_eckd.c
-+++ b/drivers/s390/block/dasd_eckd.c
-@@ -124,6 +124,14 @@ static int prepare_itcw(struct itcw *, unsigned int, unsigned int, int,
- 			unsigned int, unsigned int);
- static int dasd_eckd_query_pprc_status(struct dasd_device *,
- 				       struct dasd_pprc_data_sc4 *);
-+static struct dasd_ccw_req *dasd_eckd_build_cp_tpm_writefulltrack(struct dasd_device *,
-+								  struct dasd_block *,
-+								  struct request *,
-+								  sector_t, sector_t,
-+								  sector_t, sector_t,
-+								  unsigned int, unsigned int,
-+								  unsigned int, unsigned int,
-+								  struct dasd_ccw_req *);
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index 761d559101a9..243dec4b4484 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -1402,13 +1402,6 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
+ 		if (!cqr->lpm)
+ 			cqr->lpm = dasd_path_get_opm(device);
+ 	}
+-	/*
+-	 * remember the amount of formatted tracks to prevent double format on
+-	 * ESE devices
+-	 */
+-	if (cqr->block)
+-		cqr->trkcount = atomic_read(&cqr->block->trkcount);
+-
+ 	if (cqr->cpmode == 1) {
+ 		rc = ccw_device_tm_start(device->cdev, cqr->cpaddr,
+ 					 (long) cqr, cqr->lpm);
+@@ -2880,6 +2873,28 @@ static void __dasd_process_block_ccw_queue(struct dasd_block *block,
  
- /* initial attempt at a probe function. this can be simplified once
-  * the other detection code is gone */
-@@ -205,7 +213,7 @@ static void set_ch_t(struct ch_t *geo, __u32 cyl, __u8 head)
- 	geo->head |= head;
- }
- 
--static __maybe_unused void set_chr_t(void *addr, __u32 cyl, __u8 head, __u8 record)
-+static void set_chr_t(void *addr, __u32 cyl, __u8 head, __u8 record)
+ static void dasd_return_cqr_cb(struct dasd_ccw_req *cqr, void *data)
  {
- 	struct chr_t *geo = addr;
- 
-@@ -4745,6 +4753,340 @@ static struct dasd_ccw_req *dasd_eckd_build_cp_tpm_track(
- 	return ERR_PTR(ret);
- }
- 
-+static __always_inline bool crosses_page(const void *addr, size_t len)
-+{
-+	return len && (offset_in_page(addr) + len > PAGE_SIZE);
-+}
++	struct dasd_ccw_req *temp_cqr;
++	struct dasd_block *block;
 +
-+static __always_inline void *reserve_nocross(char **p, size_t *space, size_t len)
-+{
-+	size_t pad = crosses_page(*p, len) ? PAGE_SIZE - offset_in_page(*p) : 0;
-+	void *ret;
++	/* only format CQRs are candidates */
++	if (!cqr->block || unlikely(!cqr->format))
++		goto out;
 +
-+	if (*space < pad + len)
-+		return NULL;	/* out of space */
-+
-+	*p += pad;
-+	*space -= pad;
-+	ret = *p;
-+	*p += len;
-+	*space -= len;
-+	return ret;
-+}
-+
-+/*
-+ * Helpers for dasd_eckd_build_cp_tpm_writefulltrack(): append the TIDAWs for
-+ * one track-image element (R0 header, a count + data record, or the trailing
-+ * pseudo track end count) to the itcw. Return the last TIDAW, or NULL on failure.
-+ */
-+static struct tidaw *add_track_r0(struct itcw *itcw, char **fill,
-+				  size_t *fillsize, u32 cyl, u16 head)
-+{
-+	struct tidaw *tidaw;
-+	struct eckd_r0 *r0;
-+
-+	r0 = reserve_nocross(fill, fillsize, sizeof(*r0));
-+	if (WARN_ON_ONCE(!r0))
-+		return NULL;
-+	set_chr_t(r0, cyl, head, 0);
-+	r0->count.dl = 8;
-+	tidaw = itcw_add_tidaw(itcw, 0, r0, sizeof(*r0));
-+	return IS_ERR_OR_NULL(tidaw) ? NULL : tidaw;
-+}
-+
-+static struct tidaw *add_track_record(struct itcw *itcw, char **fill,
-+				      size_t *fillsize, u32 cyl, u16 head,
-+				      u8 rec, void *data, u32 dl)
-+{
-+	struct eckd_count *count;
-+	struct tidaw *tidaw;
-+
-+	count = reserve_nocross(fill, fillsize, sizeof(*count));
-+	if (WARN_ON_ONCE(!count))
-+		return NULL;
-+	set_chr_t(count, cyl, head, rec);
-+	count->dl = dl;
-+	tidaw = itcw_add_tidaw(itcw, 0, count, sizeof(*count));
-+	if (IS_ERR_OR_NULL(tidaw))
-+		return NULL;
-+	tidaw = itcw_add_tidaw(itcw, 0, data, dl);
-+	return IS_ERR_OR_NULL(tidaw) ? NULL : tidaw;
-+}
-+
-+static struct tidaw *add_track_end(struct itcw *itcw, char **fill,
-+				   size_t *fillsize)
-+{
-+	struct eckd_count *count;
-+	struct tidaw *tidaw;
-+
-+	count = reserve_nocross(fill, fillsize, sizeof(*count));
-+	if (WARN_ON_ONCE(!count))
-+		return NULL;
-+	count->cyl = 0xffff;
-+	count->head = 0xffff;
-+	count->dl = 0xffff;
-+	count->record = 0xff;
-+	count->kl = 0xff;
-+	tidaw = itcw_add_tidaw(itcw, TIDAW_FLAGS_INSERT_CBC, count, sizeof(*count));
-+	return IS_ERR_OR_NULL(tidaw) ? NULL : tidaw;
-+}
-+
-+static __maybe_unused struct dasd_ccw_req *
-+dasd_eckd_build_cp_tpm_writefulltrack(struct dasd_device *startdev,
-+				      struct dasd_block *block,
-+				      struct request *req,
-+				      sector_t first_rec,
-+				      sector_t last_rec,
-+				      sector_t first_trk,
-+				      sector_t last_trk,
-+				      unsigned int first_offs,
-+				      unsigned int last_offs,
-+				      unsigned int blk_per_trk,
-+				      unsigned int blksize,
-+				      struct dasd_ccw_req *ocqr)
-+{
-+	struct dasd_eckd_private *private = block->base->private;
-+	unsigned int seg_len, part_len, len_to_track_end;
-+	unsigned int count, count_to_trk_end, offs;
-+	unsigned int trkcount, ctidaw, tlf;
-+	int itcw_op, rec_count, datasize;
-+	struct tidaw *last_tidaw = NULL;
-+	sector_t recid, trkid, curr_trk;
-+	unsigned char cmd, new_track;
-+	struct dasd_device *basedev;
-+	size_t itcw_size, fillsize;
-+	struct dasd_ccw_req *cqr;
-+	struct req_iterator iter;
-+	char *dst, *filldata;
-+	unsigned long flags;
-+	struct itcw *itcw;
-+	struct bio_vec bv;
-+	int ret = -EINVAL;
-+	void *nullrecord;
-+	u16 heads, head;
-+	u32 cyl;
-+	u8 rec;
-+
-+	basedev = block->base;
-+	cmd = DASD_ECKD_CCW_WRITE_FULL_TRACK;
-+	itcw_op = ITCW_OP_WRITE;
-+
++	block = cqr->block;
 +	/*
-+	 * trackbased I/O needs address all memory via TIDAWs,
-+	 * not just for 64 bit addresses. This allows us to map
-+	 * each segment directly to one tidaw.
-+	 * In the case of write requests, additional tidaws may
-+	 * be needed when a segment crosses a track boundary.
-+	 * Per track we emit one R0 tidaw, two tidaws per record (count field
-+	 * plus data - a record never crosses a track or page boundary, as
-+	 * part_len is clamped to both blksize and the track end), and one track
-+	 * end tidaw: 2 * blk_per_trk + 2.
-+	 * Round the +2 up to blk_per_trk-independent headroom via 2 * (blk_per_trk + 2).
++	 * Mark in-flight (IN_IO) CQRs that overlap this just-completed format
++	 * range so they re-check in test_and_set_format on completion; FILLED
++	 * or QUEUED CQRs re-check the format_list on their next round anyway.
 +	 */
-+	trkcount = last_trk - first_trk + 1;
-+	ctidaw = trkcount * 2 * (blk_per_trk + 2);
-+
-+	/*
-+	 * build_cp (ocqr == NULL): the request owns its CCW program - block in
-+	 * the pdu, ITCW in ccw_chunks. ese_format (ocqr != NULL): the failing
-+	 * origin still owns its pdu, so take the replacement from ese_chunks.
-+	 */
-+	itcw_size = itcw_calc_size(0, ctidaw, 0);
-+	if (ocqr)
-+		cqr = dasd_fmalloc_request(DASD_ECKD_MAGIC, 0, itcw_size, startdev);
-+	else
-+		cqr = dasd_smalloc_request(DASD_ECKD_MAGIC, 0, itcw_size, startdev,
-+					   blk_mq_rq_to_pdu(req));
-+	if (IS_ERR(cqr))
-+		return cqr;
-+	fillsize = trkcount * (sizeof(struct eckd_r0) +
-+			       (sizeof(struct eckd_count) * (blk_per_trk + 2)));
-+	/*
-+	 * reserve_nocross() pads elements away from page boundaries and draws
-+	 * that padding from fillsize; budget one element per page the buffer
-+	 * may span so it never runs short.
-+	 */
-+	fillsize += (fillsize / PAGE_SIZE + 1) * sizeof(struct eckd_r0);
-+	spin_lock_irqsave(&startdev->mem_lock, flags);
-+	filldata  = dasd_alloc_chunk(&startdev->fill_chunks, fillsize);
-+	spin_unlock_irqrestore(&startdev->mem_lock, flags);
-+	if (!filldata) {
-+		ret = -ENOMEM;
-+		goto out_error;
-+	}
-+	memset(filldata, 0, fillsize);
-+	cqr->filldata = filldata;
-+
-+	nullrecord = startdev->nulldata;
-+
-+	/* count + data for each record, plus r0 and the pseudo count */
-+	tlf = blk_per_trk * (blksize + sizeof(struct eckd_count));
-+	tlf += sizeof(struct eckd_r0) + sizeof(struct eckd_count);
-+
-+	itcw = itcw_init(cqr->data, itcw_size, itcw_op, 0, ctidaw, 0);
-+	if (IS_ERR(itcw)) {
-+		ret = -EINVAL;
-+		goto out_error;
-+	}
-+	cqr->cpaddr = itcw_get_tcw(itcw);
-+	datasize = trkcount * tlf;
-+	if (prepare_itcw(itcw, first_trk, last_trk,
-+			 cmd, basedev, startdev,
-+			 0,
-+			 trkcount, blksize,
-+			 datasize,
-+			 tlf,
-+			 blk_per_trk) == -EAGAIN) {
-+		/* Clock not in sync and XRC is enabled.
-+		 * Try again later.
-+		 */
-+		ret = -EAGAIN;
-+		goto out_error;
-+	}
-+	heads = private->rdc_data.trk_per_cyl;
-+	/*
-+	 * A tidaw can address 4k of memory, but must not cross page boundaries
-+	 * We can let the block layer handle this by setting seg_boundary_mask
-+	 * to page boundaries and max_segment_size to page size when setting up
-+	 * the request queue.
-+	 */
-+	curr_trk = first_trk;
-+	recid = first_rec;
-+	trkid = recid;
-+	offs = sector_div(trkid, blk_per_trk);
-+	count = blk_per_trk;
-+	len_to_track_end = count * blksize;
-+	recid += count - first_offs;
-+	new_track = 0;
-+
-+	/* the R0 header of the first track */
-+	cyl = curr_trk / heads;
-+	head = curr_trk % heads;
-+	last_tidaw = add_track_r0(itcw, &filldata, &fillsize, cyl, head);
-+	if (!last_tidaw)
-+		goto out_error;
-+
-+	/* empty records before the first data record */
-+	for (int i = 1; i <= first_offs; i++) {
-+		len_to_track_end -= blksize;
-+		last_tidaw = add_track_record(itcw, &filldata, &fillsize,
-+					      cyl, head, i, nullrecord, blksize);
-+		if (!last_tidaw)
-+			goto out_error;
-+	}
-+
-+	/* process data records */
-+	rec = first_offs + 1;
-+	rec_count = 0;
-+	rq_for_each_segment(bv, req, iter) {
-+		dst = bvec_virt(&bv);
-+		seg_len = bv.bv_len;
-+		while (seg_len) {
-+			if (new_track) {
-+				trkid = recid;
-+				offs = sector_div(trkid, blk_per_trk);
-+				count_to_trk_end = blk_per_trk - offs;
-+				count = min((last_rec - recid + 1),
-+					    (sector_t)count_to_trk_end);
-+				/*
-+				 * Size to the physical track end: a short last
-+				 * track is padded in out_skip, so the track-end
-+				 * marker must not be emitted early here.
-+				 */
-+				len_to_track_end = count_to_trk_end * blksize;
-+				recid += count;
-+				new_track = 0;
-+				/* the R0 header of the next track */
-+				cyl = curr_trk / heads;
-+				head = curr_trk % heads;
-+				last_tidaw = add_track_r0(itcw, &filldata,
-+							  &fillsize, cyl, head);
-+				if (!last_tidaw)
-+					goto out_error;
-+				rec = 1;
-+			}
-+			/*
-+			 * One count + data record per block: a bvec segment can
-+			 * be up to a page, so clamp to blksize - otherwise the
-+			 * count field would describe one oversized record instead
-+			 * of several blksize ones for sub-page block sizes.
-+			 */
-+			part_len = min(seg_len, len_to_track_end);
-+			part_len = min(part_len, blksize);
-+			seg_len -= part_len;
-+			len_to_track_end -= part_len;
-+			/*
-+			 * This block ends the track; the next one starts a new
-+			 * track. The track-end marker emitted below carries the
-+			 * CBC flag.
-+			 */
-+			if (!len_to_track_end)
-+				new_track = 1;
-+
-+			last_tidaw = add_track_record(itcw, &filldata, &fillsize,
-+						      cyl, head, rec, dst, part_len);
-+			if (!last_tidaw)
-+				goto out_error;
-+
-+			if (new_track) {
-+				/* add track end marker */
-+				last_tidaw = add_track_end(itcw, &filldata,
-+							   &fillsize);
-+				if (!last_tidaw)
-+					goto out_error;
-+				curr_trk++;
-+			}
-+			rec++;
-+			dst += part_len;
-+			rec_count++;
-+			if (rec_count >= (last_rec - first_rec + 1))
-+				goto out_skip;
++	list_for_each_entry(temp_cqr, &block->ccw_queue, blocklist) {
++		if (temp_cqr != cqr &&
++		    temp_cqr->status != DASD_CQR_FILLED &&
++		    temp_cqr->status != DASD_CQR_QUEUED &&
++		    dasd_req_conflict(cqr, temp_cqr)) {
++			WRITE_ONCE(temp_cqr->collision, true);
 +		}
 +	}
-+
-+out_skip:
-+	new_track = 0;
-+	/* empty records after the last data record */
-+	for (int i = last_offs + 2; i <= blk_per_trk; i++) {
-+		len_to_track_end -= blksize;
-+		last_tidaw = add_track_record(itcw, &filldata, &fillsize,
-+					      cyl, head, i, nullrecord, blksize);
-+		if (!last_tidaw)
-+			goto out_error;
-+		new_track = 1;
++out:
+ 	dasd_schedule_block_bh(cqr->block);
+ }
+ 
+diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+index 8a1eac8aa63e..be54c356dc24 100644
+--- a/drivers/s390/block/dasd_eckd.c
++++ b/drivers/s390/block/dasd_eckd.c
+@@ -3151,32 +3151,44 @@ static int dasd_eckd_format_device(struct dasd_device *base,
+ 					     0, NULL);
+ }
+ 
+-static bool test_and_set_format_track(struct dasd_format_entry *to_format,
+-				      struct dasd_ccw_req *cqr)
++static bool test_and_set_format_track(sector_t start, sector_t end,
++				      struct dasd_ccw_req *cqr,
++				      struct dasd_block *block,
++				      struct dasd_device *device,
++				      struct dasd_format_entry **entry)
+ {
+-	struct dasd_block *block = cqr->block;
+-	struct dasd_format_entry *format;
++	struct dasd_format_entry *to_format, *format;
+ 	unsigned long flags;
+ 	bool rc = false;
++	int i = 0;
+ 
++	/* marked as a collision by dasd_return_cqr_cb last round: retry */
++	if (cqr && READ_ONCE(cqr->collision)) {
++		WRITE_ONCE(cqr->collision, false);
++		return true;
 +	}
+ 	spin_lock_irqsave(&block->format_lock, flags);
+-	if (cqr->trkcount != atomic_read(&block->trkcount)) {
+-		/*
+-		 * The number of formatted tracks has changed after request
+-		 * start and we can not tell if the current track was involved.
+-		 * To avoid data corruption treat it as if the current track is
+-		 * involved
+-		 */
++	while (i < DASD_NR_FORMAT_ENTRIES &&
++	       READ_ONCE(device->format_entry[i].cqr))
++		i++;
 +
-+	/* add track end marker */
-+	if (new_track) {
-+		last_tidaw = add_track_end(itcw, &filldata, &fillsize);
-+		if (!last_tidaw)
-+			goto out_error;
++	if (i >= DASD_NR_FORMAT_ENTRIES) {
+ 		rc = true;
+ 		goto out;
+ 	}
++
+ 	list_for_each_entry(format, &block->format_list, list) {
+-		if (format->track == to_format->track) {
++		if (!(end < format->start_trk || format->end_trk < start)) {
+ 			rc = true;
+ 			goto out;
+ 		}
+ 	}
++	to_format = &device->format_entry[i];
++	to_format->start_trk = start;
++	to_format->end_trk = end;
++	to_format->cqr = cqr;
+ 	list_add_tail(&to_format->list, &block->format_list);
++	*entry = to_format;
+ 
+ out:
+ 	spin_unlock_irqrestore(&block->format_lock, flags);
+@@ -3184,13 +3196,13 @@ static bool test_and_set_format_track(struct dasd_format_entry *to_format,
+ }
+ 
+ static void clear_format_track(struct dasd_format_entry *format,
+-			      struct dasd_block *block)
++			       struct dasd_block *block)
+ {
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&block->format_lock, flags);
+-	atomic_inc(&block->trkcount);
+ 	list_del_init(&format->list);
++	format->cqr = NULL;
+ 	spin_unlock_irqrestore(&block->format_lock, flags);
+ }
+ 
+@@ -3212,8 +3224,8 @@ static struct dasd_ccw_req *
+ dasd_eckd_ese_format(struct dasd_device *startdev, struct dasd_ccw_req *cqr,
+ 		     struct irb *irb)
+ {
++	struct dasd_format_entry *format = NULL;
+ 	struct dasd_eckd_private *private;
+-	struct dasd_format_entry *format;
+ 	struct format_data_t fdata;
+ 	unsigned int recs_per_trk;
+ 	struct dasd_ccw_req *fcqr;
+@@ -3232,7 +3244,6 @@ dasd_eckd_ese_format(struct dasd_device *startdev, struct dasd_ccw_req *cqr,
+ 	private = base->private;
+ 	blksize = block->bp_block;
+ 	recs_per_trk = recs_per_track(&private->rdc_data, 0, blksize);
+-	format = &startdev->format_entry;
+ 
+ 	first_trk = blk_rq_pos(req) >> block->s2b_shift;
+ 	sector_div(first_trk, recs_per_trk);
+@@ -3249,9 +3260,9 @@ dasd_eckd_ese_format(struct dasd_device *startdev, struct dasd_ccw_req *cqr,
+ 			      curr_trk, first_trk, last_trk);
+ 		return ERR_PTR(-EINVAL);
+ 	}
+-	format->track = curr_trk;
++
+ 	/* test if track is already in formatting by another thread */
+-	if (test_and_set_format_track(format, cqr)) {
++	if (test_and_set_format_track(curr_trk, curr_trk, cqr, block, startdev, &format)) {
+ 		/* this is no real error so do not count down retries */
+ 		cqr->retries++;
+ 		return ERR_PTR(-EEXIST);
+@@ -3263,17 +3274,28 @@ dasd_eckd_ese_format(struct dasd_device *startdev, struct dasd_ccw_req *cqr,
+ 	fdata.intensity = private->uses_cdl ? DASD_FMT_INT_COMPAT : 0;
+ 
+ 	rc = dasd_eckd_format_sanity_checks(base, &fdata);
+-	if (rc)
++	if (rc) {
++		if (format)
++			clear_format_track(format, block);
+ 		return ERR_PTR(-EINVAL);
 +	}
+ 
+ 	/*
+ 	 * We're building the request with PAV disabled as we're reusing
+ 	 * the former startdev.
+ 	 */
+ 	fcqr = dasd_eckd_build_format(base, startdev, &fdata, 0);
+-	if (IS_ERR(fcqr))
++	if (IS_ERR(fcqr)) {
++		if (format)
++			clear_format_track(format, block);
+ 		return fcqr;
++	}
+ 
++	if (format) {
++		/* occupancy marker; the free-slot scan reads it with READ_ONCE */
++		WRITE_ONCE(format->cqr, fcqr);
++		fcqr->format = format;
++	}
+ 	fcqr->callback = dasd_eckd_ese_format_cb;
+ 	fcqr->callback_data = (void *) format;
+ 
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index cab16907ea5a..b342237b84de 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -545,9 +545,17 @@ struct dasd_profile {
+ 	spinlock_t lock;
+ };
+ 
++/*
++ * concurrent ESE format ranges in flight; also caps a WRITE_FULL_TRACK's
++ * track count, which the LRE track bitmask limits to 16
++ */
++#define DASD_NR_FORMAT_ENTRIES	16
 +
-+	last_tidaw->flags |= TIDAW_FLAGS_LAST;
-+	last_tidaw->flags &= ~TIDAW_FLAGS_INSERT_CBC;
-+	itcw_finalize(itcw);
-+
-+	if (blk_noretry_request(req) ||
-+	    block->base->features & DASD_FEATURE_FAILFAST)
-+		set_bit(DASD_CQR_FLAGS_FAILFAST, &cqr->flags);
-+	cqr->cpmode = 1;
-+	cqr->startdev = startdev;
-+	cqr->memdev = startdev;
-+	cqr->block = block;
-+	cqr->expires = startdev->default_expires * HZ;	/* default 5 minutes */
-+	cqr->lpm = dasd_path_get_ppm(startdev);
-+	cqr->retries = startdev->default_retries;
-+	cqr->buildclk = get_tod_clock();
-+	cqr->status = DASD_CQR_FILLED;
-+
-+	return cqr;
-+out_error:
-+	/* dasd_sfree_request frees from the right pool via cqr->mem_chunk */
-+	dasd_sfree_request(cqr, startdev);
-+	return ERR_PTR(ret);
+ struct dasd_format_entry {
+ 	struct list_head list;
+-	sector_t track;
++	struct dasd_ccw_req *cqr;
++	sector_t start_trk;
++	sector_t end_trk;
+ };
+ 
+ struct dasd_device {
+@@ -617,7 +625,7 @@ struct dasd_device {
+ 	struct dentry *debugfs_dentry;
+ 	struct dentry *hosts_dentry;
+ 	struct dasd_profile profile;
+-	struct dasd_format_entry format_entry;
++	struct dasd_format_entry format_entry[DASD_NR_FORMAT_ENTRIES];
+ 	struct kset *paths_info;
+ 	struct dasd_copy_relation *copy;
+ 	unsigned long aq_mask;
+@@ -834,6 +842,13 @@ static inline void *dasd_get_callback_data(struct dasd_ccw_req *cqr)
+ 	return cqr->callback_data;
+ }
+ 
++static inline bool dasd_req_conflict(struct dasd_ccw_req *cqr1,
++				     struct dasd_ccw_req *cqr2)
++{
++	return !(cqr1->format->end_trk < cqr2->start_trk ||
++		 cqr2->end_trk < cqr1->format->start_trk);
 +}
 +
- static struct dasd_ccw_req *dasd_eckd_build_cp(struct dasd_device *startdev,
- 					       struct dasd_block *block,
- 					       struct request *req)
+ /* externals in dasd.c */
+ #define DASD_PROFILE_OFF	 0
+ #define DASD_PROFILE_ON 	 1
 -- 
 2.53.0
 
