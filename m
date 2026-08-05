@@ -1,229 +1,150 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781AC42B73B
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 10:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61586432BCA;
+	Wed,  5 Aug 2026 11:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785927553; cv=none; b=WdPs0WTFEUvufcue/D6m5dcL1uuHa1p3iea3ZWGDJUku9uv4+6lDcOjLUsbbfHsXtUo0hCk+8N28dZgO+zc0KfD9PFqXlCx44CgODFfPl886LPthR/QDK6I52tfTXCnNlbbHj3Elmg8xw3zFCT5MplAqy6cV3nhs8MBBJYILuY8=
+	t=1785928589; cv=none; b=CjOSq+RjfPNCh9LxuiJNFGqVOIE/XLlG4MzweH2xBcSQtxY3Yr+VpsmSukxlP0dzaCOnGCck9ls2V6gHOoCJL9y8UI3TH0VGrpHshb4+RWssu6lL/tvd9359VSLCVePItVIyA+zk4i1hLbjzOmiUtH4fAFxn+/zwCggICiv2kJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785927553; c=relaxed/simple;
-	bh=/1dtEFjUK+P0pvRVxCDasuHqjQBqBeraGQRhegPMj5o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ISFVpk6tSRrQNTrZEZrEyfKE/DDCpJbyQXmzvIQ4+1PjUX8PpXbuk5JwNCDLLdcfiKLZT+/vk/TGR/3+ZbinfpZKpHJH7GrR5WMoXU8ROepsPas7WYbRtIVyuTK8Aue/3LuDPKnFndoJaRom7dPIIH0nZo/2YJvmWLz6deou9IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SZEXOh1K; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785928589; c=relaxed/simple;
+	bh=wIyedExe1pyyRydPxzOc84SFY3Np1UdmSJTH1GPHuaU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BekPLqhfFBwUD+C0lhvO9wA/N21X5tpF0Tw+YQdATNhaaXM4t/dkcvENZ/WlrLumNfK8Dn/iowrp13N1IcRO0BY6sLDEIWDU4sZX64xP9zhK8thIPfDZw7SfZbcTrW2wFK9bQDN7SsS2RA6oWny1R+VZOiQqMFWzWcN3kKYE4Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MwO99/Xo; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SZEXOh1K"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-498028b3d5eso7946925e9.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 03:59:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785927546; x=1786532346; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qChqnXEV/RUrII3F6FtB3OpL17H6S0GQj9i1G4DFOPk=;
-        b=SZEXOh1KpuYJfaF3im7hVoma9sONKG+vqzLlaf7ooZ3+DAVgQF2n8nHiu3IBzKzRRw
-         dp61JCqy4D2c2x5T+fFsho0Kc4LPfYzRhYnaRPQxTWRUmJNY2O3uEtNUJ9g0jtsQzB78
-         acwHo/V/p7Z+a/CycbdYZGZ0/BQXrBPXtv82DmWLOJ6CXmegiDSc5Vpr9pIheKRjGqMF
-         r+UcPmzDpbWcI8H13x2BkfrjOdsL8Xsy75IrRzcWKT2gi+twbWrzsVK/oIe0qJM2wJoa
-         yEryF/AJxdc6tNkssc5mLthTAMvFEWY1cWRMtRboKcJGJ7HfUeRlxV4Ne690/an9Vv8/
-         6wYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785927546; x=1786532346;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qChqnXEV/RUrII3F6FtB3OpL17H6S0GQj9i1G4DFOPk=;
-        b=N7AR85TQ/hZgasiYAoA4Bh0bJS+dTt035lHHx7LJ/y9BBlOjzLmHvdu+7P+eWvSOyz
-         6XX2ZZA6wLMVLofrCgEl8huvS2BpfZZ6DV9AnJ3lK9IqsI+DQ4mb5ZBiwZZmc8WxYJ4y
-         HNjNVbogfgsgZ/vOhuUVZZv0lhY68KwljfPkgNRVLi8fOPJCy2/KbjspJi8shV90Czld
-         N8kds8ssJoifzMka7tqjaW0nyHRginlVnmbqZ9QHvvHDjdys3QvVNcnHDSWdcSvGzggK
-         euHB2ePhyVfUFCP75dltVJBeKP2mJeo/E4Kr/YNu/EoxdUnHahSGXmUWmkWMzk2LHxaE
-         3RUA==
-X-Forwarded-Encrypted: i=1; AHgh+Rp8BfFl/tdRBinRU0+p1Q/CLBNB4gepElz6uDk5SiOyA3Y4OibB0laprgj60rA0+Gxf4L2J+TGkrp6R0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGqc2lN9Jozxody9lzhLyGsZyVClok4sI1c/ESXrz3E+cluWbv
-	JxR45BxCHhKXTnErAyTiSI+iPgxUwZqoDmTSK6Csp5fe9wBz14aNgNcm
-X-Gm-Gg: AR+sD105cQVbfRmtjinC9wizvMJ4J4w9jp/hh1YrrbTHXJ9Kc3ruvni3KwgcTeGEt4p
-	eAzs32vw6c1cz1kPk7Wj1g9hwob7pltZ9wjALC3twhheBUs9iW+QQHZcDz4vtWX9Su8vm/3ELh9
-	sMxqeAxx4q6DfZoVWST2t8HCKK35R1QdA3dKXJvTyfmiMKgZY+XcTPYoAyHW5E/RIqu6n79uUv9
-	ZyOfLuQ+r9PTX8vt4NTaiGzO/6krO9ZJVVdn4t1q6xHI/glXqltK+gamfVRNUhG/FuhqSL3yB/w
-	5Szsc+epy4VvZmoHxbt++U+qj/EZi9aAbfoLfN4rXxFsUdzDGuxvsugeL/kdBFiVkF4di6RuHif
-	DA2Hu7YZGN0UkW8fUjJJefmKTnfR24j3w/XZOBh15r5VPyglSNH/5S8DG1n4WRIyoeFoVWTs16C
-	Vyw2GwOKiP6Mp0kytdFLThshHcarrIU1HKiTipo6v9+OGPbOsZdPQKyTXhajbFtqveNCgtBOUU1
-	94ciZrUhqVVKsx9/yEfxAuDH7Jf89Ilf92fXM5qyrQODBngnx04tmYBii7G4V3qmOfyNaBAPDk2
-	0WsFu/Bqmdbg8NvJ4Rtm761SYKw4MDyU/v48T0hwg1GUXD2g
-X-Received: by 2002:a05:600c:4e94:b0:497:ff73:68d5 with SMTP id 5b1f17b1804b1-4994e6c5eafmr60022735e9.0.1785927545848;
-        Wed, 05 Aug 2026 03:59:05 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4994e035900sm80665575e9.11.2026.08.05.03.59.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Aug 2026 03:59:05 -0700 (PDT)
-Message-ID: <8285ede8-bebb-403a-8a37-b9987cd37a8f@gmail.com>
-Date: Wed, 5 Aug 2026 11:59:10 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MwO99/Xo"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6758llZB3437977;
+	Wed, 5 Aug 2026 11:16:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=xAkSbN
+	GW2ch2RshrfZ8DeSEHCakw6tnWwc4kMUB0Ap8=; b=MwO99/XoUu3DeXxHnTsnMq
+	D+CMFCeeOQhSap67Wh3DoDq0y2FktAXk7CBCy095UGd4PVWbaCxAS0EinHXEKJHs
+	q0F1IMWjBhb4cuTzKq5s4go5Uj9WlVGYlM09qoTpW7mT7yRavNGjWoyJIPqOU2/B
+	3aqX3e1GMfDeUfy9L+CTHPOEj0P+zHFgjCYL8hDybYZUXy8QWKwyerBuqNL4GIZM
+	8u073za4Qp5UbqOg1gAL8OC9ltWDtBHGXWrONB5ga7VHeuidokhvKnZxjSMHPqfk
+	uC9uzekAFsaUxSNSYHGLL0PL8sFumh9c4HXrHC92WqJ90DKxYPF2HkOGZY9dDFjg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8eut64j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Aug 2026 11:16:24 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 675AfZNO006305;
+	Wed, 5 Aug 2026 11:16:23 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsv4k685f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Aug 2026 11:16:23 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 675BGHmx49676724
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Aug 2026 11:16:17 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 421AF2004F;
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 259B42004B;
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Aug 2026 11:16:17 +0000 (GMT)
+From: Stefan Haberland <sth@linux.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 04/19] s390/dasd: Snapshot intrc before freeing the request block
+Date: Wed,  5 Aug 2026 13:15:57 +0200
+Message-ID: <20260805111612.1285190-5-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260805111612.1285190-1-sth@linux.ibm.com>
+References: <20260805111612.1285190-1-sth@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/14] dma-buf: introduce initial file I/O
- infrastructure
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Nitesh Shetty
- <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Damien Le Moal <dlemoal@kernel.org>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>,
- Vishal Verma <vishal.l.verma@intel.com>, David Sterba <dsterba@suse.com>,
- Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
- nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org
-References: <cover.1785274111.git.asml.silence@gmail.com>
- <bc20381e8daf85ac58811c344325d8192cde9d1e.1785274111.git.asml.silence@gmail.com>
- <181b08be-04bc-4ae9-bb88-15321a82440f@amd.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <181b08be-04bc-4ae9-bb88-15321a82440f@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: anNSvy9D8ApuPR2i_l9Via0-V0SmqYpS
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfX/D1/Gc2ETwjv
+ 66au0DWy6k0fD86xDUy8XCgpHwryb+oew6lkueZkCpRGmXVrQFjTznrwMa+wcApACo+JH7c804A
+ MZP4RXXoHNpI4RWGYVOhyQMc8of+nPg=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA4NiBTYWx0ZWRfXycdiq9/UoZbK
+ puOFBpsD570yp5xowBmLqELg1twNjN1h2sGkAqMZmKeP5EzMvHE4gL0MaTfJdw7189VMlo3o/BU
+ FPCEsYOZbE8mAI68m0Ygr1VzDjfN7+Zx1+a61j78e1a6EQbSv3Q+6/ehSlHJz4v9/yQMhk+eah/
+ 2xKEMYJQDgaOSajtOiXeXA7l/Ygh1V5zGaPFPW5OVOFPkoT2shv1cqMgmkgkmXHnkfITX0mlqsD
+ /eRJmKKhf2Sz2UEUpRvIYFVVzmIK9Vr0UM6HjLWZruxujgmZuF1keDXNXtfI5nNGsNz6FrSOas8
+ kRACLU8mEZ/Ru7GRKnbMMsMgfNEOVOMPHq2/aFLFLE7JE6sVIju0dXgouZi68zq0GgZoy7RFnal
+ mI26REU5vtX5iIQJgQvp34ZFs0xl7ClQbRG3UGVpm5MR9eXr6pHPTueTVUMcSruwO1nLTn8aDJ6
+ NS4hPGT+KEUbecj6IFg==
+X-Proofpoint-GUID: anNSvy9D8ApuPR2i_l9Via0-V0SmqYpS
+X-Authority-Analysis: v=2.4 cv=KfzidwYD c=1 sm=1 tr=0 ts=6a731b88 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
+ a=QORe2UURYKPq8wpwqioA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-05_03,2026-08-04_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608050086
 
-On 8/5/26 09:27, Christian König wrote:
-...>> +struct dma_buf_io_fence {
->> +	struct dma_fence base;
->> +	spinlock_t lock;
->> +};
-> 
-> Upstream has change to allow embedding the spinlock into the dma_fence, so this structure here is most likely not necessary any more.
+__dasd_cleanup_cqr() maps the completion result to a block status by
+reading cqr->intrc, but only after discipline->free_cp() has returned the
+request block to its memory pool (dasd_eckd_free_cp() ends in
+dasd_sfree_request()). On SMP another CPU can reallocate that block and
+overwrite cqr->intrc before it is read, completing the request with the
+wrong error. proc_bytes is already snapshotted before free_cp() for the
+same reason; do the same for intrc.
 
-ok
+Reviewed-by: Jan Höppner <hoeppner@linux.ibm.com>
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/dasd.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
->> +static const char *dma_buf_io_fence_drv_name(struct dma_fence *fence)
->> +{
->> +	/* default fence release kfree's the base pointer */
->> +	BUILD_BUG_ON(offsetof(struct dma_buf_io_fence, base));
->> +
->> +	return "dma-buf-io-ctx";
->> +}
-...>> +static void dma_buf_io_map_release_work(struct work_struct *work)
->> +{
->> +	struct dma_buf_io_map *map = container_of(work, struct dma_buf_io_map,
->> +						  release_work);
->> +	struct dma_buf_io_fence *fence = map->fence;
->> +	struct dma_buf_io_ctx *ctx = map->ctx;
->> +	struct dma_buf *dmabuf = ctx->dmabuf;
->> +
->> +	/* the release path must wait for fences */
->> +	if (WARN_ON_ONCE(refcount_read(&ctx->refs) == 0))
->> +		return;
-> 
-> Stuff like that is usually illegal.
-
-Should be fine, it's just a warning. The map holds a ctx
-reference so can't be 0. IIRC, it was synchronised a bit
-differently before. I can kill it, refcount_inc() has the
-same warning anyway.
-
-> And why are you using refcount directly instead of kref?
-
-Not sure it'd make much difference here.
-
-> 
->> +
->> +	/* Prevent from destoying the ctx while unmapping */
->> +	refcount_inc(&ctx->refs);
-> 
->> +
->> +	/*
->> +	 * There are no more requests using the map, we can signal the fence.
->> +	 * It should be done before taking the resv lock as someone could be
->> +	 * waiting for the fence while holding the lock.
->> +	 */
->> +	dma_fence_signal(&fence->base);
-> 
-> Signaling fences has a whole bunch of very strict rules associated with it. E.g. you can't alocate memory for example.
-> 
-> Are you sure you actually need and want a dma_fence here?
-
-Waiting for potentially a ton of IO synchronously on invalidate
-sounds like a bad idea though. Hmm.
-
->> +
->> +	dma_resv_lock(dmabuf->resv, NULL);
->> +	ctx->dev_ops->unmap(ctx, map);
->> +	dma_resv_unlock(dmabuf->resv);
->> +
->> +	dma_fence_put(&fence->base);
-> 
-> You should probably set map->fence to NULL after that.
-
-The map is freed two lines below, but I can add it as
-a defensive measure.
-
->> +	percpu_ref_exit(&map->refs);
->> +	kfree(map);
-
-...>> +struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
->> +{
->> +	struct dma_buf *dmabuf = ctx->dmabuf;
->> +	struct dma_buf_io_map *map;
->> +	long ret;
->> +
->> +retry:
->> +	/*
->> +	 * ->dmabuf_map() will be calling dma_buf_map_attachment(), for which
->> +	 * we'll need to wait for fences. Do a bit nicer and try to wait
->> +	 * without the resv lock first.
->> +	 */
-> 
-> Clear NAK to that. Always wait while holding the resv lock if you can!
-> 
-> It is absolutely not beneficial to do this outside of the lock and usually just hides problems instead and prevent fixing them.
-
-Ok
-
-...
->> +	ret = dma_resv_reserve_fences(dmabuf->resv, 1);
->> +	if (WARN_ON_ONCE(ret)) {
->> +		struct dma_fence *fence = &map->fence->base;
->> +
->> +		dma_fence_get(fence);
->> +		percpu_ref_kill(&map->refs);
->> +		dma_fence_wait(fence, false);
->> +		dma_fence_put(fence);
->> +		return;
->> +	}
->> +
->> +	dma_resv_add_fence(dmabuf->resv, &map->fence->base,
->> +			   DMA_RESV_USAGE_KERNEL);
-> 
-> That sequence is clearly incorrect!
-> 
-> The fence must be created after dma_resv_reserve_fences(), otherwise you definately have an illegal memory operation here.
-
-I'm not sure what you mean, can you elaborate? I only cared about
-pre-allocating it to avoid allocations here. We add / signal the fence
-only once, no reuse. The map is going to be killed here, and if we
-create a new map, it'll have its own fence.
-
-I can move the dma_fence_init() call here if that makes a difference?
-
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index 56ef38243f82..34b563917098 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -2699,17 +2699,23 @@ static void __dasd_cleanup_cqr(struct dasd_ccw_req *cqr)
+ 	struct request *req;
+ 	blk_status_t error = BLK_STS_OK;
+ 	unsigned int proc_bytes;
+-	int status;
++	int status, intrc;
+ 
+ 	req = (struct request *) cqr->callback_data;
+ 	dasd_profile_end(cqr->block, cqr, req);
+ 
++	/*
++	 * free_cp() returns the request block to its memory pool, so snapshot
++	 * everything still needed from cqr before calling it - another CPU can
++	 * reallocate and overwrite the block right after.
++	 */
+ 	proc_bytes = cqr->proc_bytes;
++	intrc = cqr->intrc;
+ 	status = cqr->block->base->discipline->free_cp(cqr, req);
+ 	if (status < 0)
+ 		error = errno_to_blk_status(status);
+ 	else if (status == 0) {
+-		switch (cqr->intrc) {
++		switch (intrc) {
+ 		case -EPERM:
+ 			/*
+ 			 * DASD doesn't implement SCSI/NVMe reservations, but it
 -- 
-Pavel Begunkov
+2.53.0
 
