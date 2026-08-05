@@ -1,157 +1,106 @@
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFA1374A0A
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 06:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8175D3E1D14
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 07:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785911235; cv=none; b=JFYbi/Shn8/8a/XwDlKEvZPIXawAZ4NfiIYb0i03KjFRL+3w8Rz85YZ7ZFG/mRFOuDkEt7LIzpb25qbFeYXU0lC0BFRptleaPaTs30z99wFu6cxzsIkPL1DOvQ3Aj2mPEKqQZLKHJNTtSBLyd/TOSCrah1A+GAiGjAYOgIbyAnA=
+	t=1785913698; cv=none; b=tXi3L5BUndl7nwwWRwSY3Rjk/UzkGpoko2AvlyI5XHeut1fDi8a24RCwQyn39UlM/yJeFRzgFDlCUVs3N3zvH0Rc8bl6Kj0B2aHzuYFLAC2OB4b8QcpzSEqHhFT3TGp92ABlcqljSm03cqmAziL7TNLbFWQdEjqiLFQu28g06k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785911235; c=relaxed/simple;
-	bh=hLbKGFFaVlFdKJRIso3KOlMakXDAeYJcyF3ttzPX4VU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=Jl1/maobcIMMG4boBjlH+K8t//Vvw6/9cYaLfOiIxehds/jbZZQp/pcja+WAixa3sXlkQMei+EDR/NTDsDsacw/0QC/xC+vteh1RM1OOMftS+2+nn8YUXl1fVKvRNecd2fb4zW17hWcsTTEI9OljZZlFRKbt00hb6gu6oQPoVCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=c1Obcdry; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="c1Obcdry"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=j/aVuiY9bylWkxOHhkPJbPR8kXYX1ueguX/r6g26rbc=;
-	b=c1Obcdry/3lUlJieZaYRZD8bJE/4sVc8GqB5IiHJSGIJFSaMxdV4/ET5xW2eIX55NZojeuqRB
-	soNDsQ0zmoHbqnq2AOKNTYpn5fydEK8v7qh1ZmA/xSjnL/+1SK9GP1uBD5MxcCZMBpcDhMKSksk
-	2iq9omdAe3iZSvId5+TOfIg=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4hFKvS2kQrz1T4Lb;
-	Wed,  5 Aug 2026 14:17:24 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id 99D9C40561;
-	Wed,  5 Aug 2026 14:27:04 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 5 Aug 2026 14:27:03 +0800
-Message-ID: <97948333-9e42-4443-8297-ed6c3455bac6@huawei.com>
-Date: Wed, 5 Aug 2026 14:27:02 +0800
+	s=arc-20240116; t=1785913698; c=relaxed/simple;
+	bh=7U3y1LGc3pky/EE5P/s6JSSJK4/nPlhre3BDTQVjvKM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YH0QZQ3Vr+ROfNI/xas1g1bkiOFRYshIgcvUcSgjAqszks5CtZOQPhww9nV/dSZUr1HSEpUrkKvoHMmPz/JJm4ARNRLxdn+hfrbH2LiFU1B3UneiZMAofqGykI+wTA9RG6KP7w6rRB0OuBYT0t7vuHsFV71Tro6zwqp+cFH2gi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hFM1x2GKszKHNWG
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 15:08:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 2FB5040597
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 15:08:11 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgBXR0ZW4XJqGly6BA--.6211S6;
+	Wed, 05 Aug 2026 15:08:10 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	yukuai@kernel.org
+Cc: yi.zhang@huawei.com,
+	chengzhihao1@huawei.com,
+	echo.chenlin@huawei.com,
+	leo.lilong@huaweicloud.com,
+	wangkefeng.wang@huawei.com,
+	huawei.libin@huawei.com,
+	leijitang@huawei.com,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: [PATCH v7 2/8] nbd: disallow NBD_SET_SOCK on an active device
+Date: Wed,  5 Aug 2026 14:58:37 +0800
+Message-ID: <20260805065843.3332859-3-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260805065843.3332859-1-yangerkun@huawei.com>
+References: <20260805065843.3332859-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/8] nbd: clear queue limits on disconnect
-From: yangerkun <yangerkun@huawei.com>
-To: <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@lst.de>,
-	<yukuai@kernel.org>
-CC: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>,
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>,
-	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>,
-	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-References: <20260804083922.1927105-1-yangerkun@huawei.com>
- <20260804083922.1927105-4-yangerkun@huawei.com>
-In-Reply-To: <20260804083922.1927105-4-yangerkun@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+X-CM-TRANSID:_Ch0CgBXR0ZW4XJqGly6BA--.6211S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrW3WFyUWw48Jw1kWF13CFg_yoWDKrg_Cr
+	y8uw18Xws3CFW5u39093W5Zryjya129FsY9F12yrZ3XFy2vasaqFn2vrZxAw1UXrWjgFsr
+	Aryj9w4xAr4fJjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb9xYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M2
+	8IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK
+	021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F
+	4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
+	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
+	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+	WUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
+	CTnIWIevJa73UjIFyTuYvjxUF6pBDUUUU
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
+We cannot add a socket to an already running nbd device, the reconfigure
+for netlink can only active an inactive socket. But for ioctl path, we can
+call NBD_SET_SOCK after NBD_DO_IT, reject this using nbd->pid which has
+been setted when NBD_DO_IT. Besides, it is the root cause for commit
+b98e762e3d71 ("nbd: freeze the queue while we're adding connections").
 
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/nbd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-在 2026/8/4 16:39, Yang Erkun 写道:
-> An inactive nbd device may refuse any I/O operations. The nbd_config_put
-> function calls invalidate_disk, which sets the device capacity to zero
-> to reject all read and write I/O. For zero-sector flush I/O requests
-> from blkdev_issue_flush, if the write cache is disabled, the zero-sector
-> flush I/O immediately returns 0 in submit_bio_noacct. However, since
-> nbd_config_put does not clear the write cache state, an inactive nbd
-> device might still have the write cache enabled. In this situation,
-> zero-sector flush I/O will return -EIO because there is no active socket.
-> Additionally, BLK_FEAT_FUA and BLK_FEAT_ROTATIONAL flags may also remain
-> stale, resetting all of them ensures consistent behavior.
-> 
-> The limits update uses queue_limits_commit_update() (the non-freezing
-> variant) because config_refs == 0 here means every fd is closed and recv
-> threads have drained, so no in-flight I/O can read q->limits concurrently.
-> 
-> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
-> ---
->   drivers/block/nbd.c | 43 ++++++++++++++++++++++++++-----------------
->   1 file changed, 26 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 7ec85f94f742..45e58191c5d7 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -331,6 +331,26 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
->   	nsock->sent = 0;
->   }
->   
-> +static void nbd_apply_limits(struct queue_limits *lim, u32 flags)
-> +{
-> +	lim->features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA | BLK_FEAT_ROTATIONAL);
-> +	lim->max_hw_discard_sectors = 0;
-> +	lim->max_write_zeroes_sectors = 0;
-> +
-> +	if (flags & NBD_FLAG_SEND_TRIM)
-> +		lim->max_hw_discard_sectors = UINT_MAX << SECTOR_SHIFT;
-
-I am so sorry there is a mistake here... Should be UINT_MAX >> SECTOR_SHIFT
-
-> +	if (flags & NBD_FLAG_SEND_FLUSH) {
-> +		lim->features |= BLK_FEAT_WRITE_CACHE;
-> +		if (flags & NBD_FLAG_SEND_FUA)
-> +			lim->features |= BLK_FEAT_FUA;
-> +	}
-> +
-> +	if (flags & NBD_FLAG_ROTATIONAL)
-> +		lim->features |= BLK_FEAT_ROTATIONAL;
-> +	if (flags & NBD_FLAG_SEND_WRITE_ZEROES)
-> +		lim->max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
-> +}
-> +
->   static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
->   {
->   	struct queue_limits lim;
-> @@ -352,23 +372,7 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize)
->   		return 0;
->   
->   	lim = queue_limits_start_update(nbd->disk->queue);
-> -	if (nbd->config->flags & NBD_FLAG_SEND_TRIM)
-> -		lim.max_hw_discard_sectors = UINT_MAX >> SECTOR_SHIFT;
-> -	else
-> -		lim.max_hw_discard_sectors = 0;
-> -	if (!(nbd->config->flags & NBD_FLAG_SEND_FLUSH)) {
-> -		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
-> -	} else if (nbd->config->flags & NBD_FLAG_SEND_FUA) {
-> -		lim.features |= BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA;
-> -	} else {
-> -		lim.features |= BLK_FEAT_WRITE_CACHE;
-> -		lim.features &= ~BLK_FEAT_FUA;
-> -	}
-> -	if (nbd->config->flags & NBD_FLAG_ROTATIONAL)
-> -		lim.features |= BLK_FEAT_ROTATIONAL;
-> -	if (nbd->config->flags & NBD_FLAG_SEND_WRITE_ZEROES)
-> -		lim.max_write_zeroes_sectors = UINT_MAX >> SECTOR_SHIFT;
-> -
-> +	nbd_apply_limits(&lim, nbd->config->flags);
->   	lim.logical_block_size = blksize;
->   	lim.physical_block_size = blksize;
->   	error = queue_limits_commit_update_frozen(nbd->disk->queue, &lim);
-> @@ -1469,8 +1473,13 @@ static void nbd_config_put(struct nbd_device *nbd)
->   	if (refcount_dec_and_mutex_lock(&nbd->config_refs,
->   					&nbd->config_lock)) {
->   		struct nbd_config *config = nbd->config;
-> +		struct queue_limits lim;
->   		nbd_dev_dbg_close(nbd);
->   		invalidate_disk(nbd->disk);
-> +		/* reset queue limits to default */
-> +		lim = queue_limits_start_update(nbd->disk->queue);
-> +		nbd_apply_limits(&lim, 0);
-> +		queue_limits_commit_update(nbd->disk->queue, &lim);
->   		if (nbd->config->bytesize)
->   			kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
->   		if (test_and_clear_bit(NBD_RT_HAS_PID_FILE,
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b1a5acd57426..7ec85f94f742 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1278,6 +1278,13 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	/* Arg will be cast to int, check it to avoid overflow */
+ 	if (arg > INT_MAX)
+ 		return -EINVAL;
++
++	if (nbd->pid) {
++		dev_err(disk_to_dev(nbd->disk),
++			"Cannot add socket to a running device\n");
++		return -EBUSY;
++	}
++
+ 	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
+-- 
+2.52.0
 
