@@ -1,27 +1,27 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8BA30B53A
-	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 07:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1FF3E0754
+	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 07:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785913700; cv=none; b=DDwqaLScX+ea0ktCdXI1O6yYQUM2wfFDz3hKGy7os6ozqF+ccvPMi8S8HaUeANybe5stcmVCwmqhMG5HL+SVv0i8c8yaSp4ULUKmmbAAdZiPjPnFe5De+ZnQCkn2Tawh1uR2IEKH9hEfGQbg3SP6DUbB9DL9kzzTprZNjJ8zWJk=
+	t=1785913700; cv=none; b=Cy3HiuD3pmoQgPAv4MjKVErTdzswXPeuwmDBZ02chOpFKE54h4L2kRNunu0rWF95KBtv5+8fcQ6UDtxoHOaRZP5XL6mdYt/OoP0/qlIvedV2hya/CtT3q6F4ztHt4WTF18HQGwKIhRsvim4UZ3YWeOZ7VV0RBbkuZIrv6KDjyYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785913700; c=relaxed/simple;
-	bh=5wcpxqBuzMZmb02uZGGgTBQkHmC0JtL2kgAp52qOKD4=;
+	bh=gdfeOw22YLIlFVJ9GNGfz1M0aS8DQb5NvU6r2IVKsQw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DoEiwMc23p7zJ4tPhofZvwXKMBihhsfDf2gFMYSMobPXWPnp+oQhEmGZ2lPBT5lvCw29UC9TGr/7nqkrx67M2QH8ZKR3esdLSeWPNMix2doo/XWd25dxdXWJZ6RS6YJQaVIC8wrN8fQiI2kUYAYwgjoicWEjJUynECj4Q5i+70c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=RHT36+jeRW/zyoRjJNY/+Y9DsuIsN/VQNvKEx/RnVUzz1poAghHalrSpP7T2D/k2ee1wK8NmgJC20wFzJQpAWvahl9XyOoE+Uw+/XA+MZ6X0zsift7bP8bAD79QKfXhi9oUMQcNKOnIRqFeYMO7I/LUjWe2Bjyb4xHn30Dp9wmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hFM1x4s0pzKHNWM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hFM1x4yCQzKHNV5
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 15:08:05 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 862AE40593
+	by mail.maildlp.com (Postfix) with ESMTP id 5AB4040711
 	for <linux-block@vger.kernel.org>; Wed,  5 Aug 2026 15:08:11 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgBXR0ZW4XJqGly6BA--.6211S11;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgBXR0ZW4XJqGly6BA--.6211S8;
 	Wed, 05 Aug 2026 15:08:11 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: josef@toxicpanda.com,
@@ -37,9 +37,9 @@ Cc: yi.zhang@huawei.com,
 	leijitang@huawei.com,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org
-Subject: [PATCH v7 7/8] nbd: remove queue freeze for newly created nbd from netlink path
-Date: Wed,  5 Aug 2026 14:58:42 +0800
-Message-ID: <20260805065843.3332859-8-yangerkun@huawei.com>
+Subject: [PATCH v7 4/8] nbd: remove queue freeze in nbd_add_socket
+Date: Wed,  5 Aug 2026 14:58:39 +0800
+Message-ID: <20260805065843.3332859-5-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260805065843.3332859-1-yangerkun@huawei.com>
 References: <20260805065843.3332859-1-yangerkun@huawei.com>
@@ -50,95 +50,84 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgBXR0ZW4XJqGly6BA--.6211S11
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF45XF4DuFW5Xr48Ww17Wrg_yoW5GF4xpF
-	45Kay8trW8tF4xWa4UJFs3WFn8G3W8J3srWry7G34qkrnxXrZavr40qFyYya1UZF9YyF4a
-	yFs8XF4vvw4UJrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUQjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID:_Ch0CgBXR0ZW4XJqGly6BA--.6211S8
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF1xAF43Kw13CFyktw47Arb_yoW8try3pF
+	s8Ga9rGF4UKr45Wan5AFWkXFySywn7Ka47GayxX34YvrsxCFySvFySya4rWFyUAr95u3W7
+	Aay5Krs2kw18urDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmCb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
 	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
-	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
-	C2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
-	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
-	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
-	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
-	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
-	xVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20x
-	vaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8
-	Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZyCLUUUUU=
+	AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x02
+	67AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I
+	80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCj
+	c4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4
+	kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s02
+	6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
+	I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
+	6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7
+	xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_
+	Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZyCLUUUUU=
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-Previous commits has removed the queue freeze in nbd_add_socket and
-nbd_set_size during nbd device setup. However, a queue freeze can still
-occur when nbd_start_device calls blk_mq_update_nr_hw_queues if the
-socket connection count does not match nbd->tag_set->nr_hw_queues.
+nbd_add_socket() kreallocs config->socks, which a concurrent reader in
+nbd_handle_cmd() could UAF; commit b98e762e3d71 ("nbd: freeze the queue
+while we're adding connections")froze the queue to block that.  But the
+freeze costs an RCU grace period on every socket added, and setup adds
+them one by one.
 
-The nbd_start_device function can be invoked through either the ioctl or
-netlink paths. The ioctl path only allows reusing an existing inactivate
-nbd device, there is nothing more we can do to prevent the queue freeze
-since the old nbd->tag_set->nr_hw_queues may not match the new socket
-connection count. Similarly, the netlink path can reuse a preferred
-inactivate nbd device, and again, we cannot do more in this scenario.
-However, the netlink path can also add a new nbd device using
-nbd_dev_add. In this case, we can obtain the new number of socket
-connections, and by adding a new argument representing the expected
-nr_hw_queues in nbd_dev_add, we can ensure the queue freeze is avoided
-for this situation.
+After the previous patch, nbd_add_socket() is rejected once nbd->pid is
+set, so it only runs during setup.  There the capacity is 0 and the
+write cache is off (cleared on disconnect by the preceding patch, and
+re-enabled only later in nbd_set_size), so submit_bio_noacct() rejects
+every bio before it reaches the driver -- non-zero-sector ones via
+bio_check_eod(), and flush-only ones via the !bdev_write_cache() branch.
+No I/O is in flight, so the freeze is unnecessary.
 
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- drivers/block/nbd.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ drivers/block/nbd.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 6f4e9fabe52a..b316129b9a17 100644
+index 78df6f459da6..cb7c1f8502f4 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1944,7 +1944,8 @@ static const struct blk_mq_ops nbd_mq_ops = {
- 	.timeout	= nbd_xmit_timeout,
- };
+@@ -1276,7 +1276,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	struct socket *sock;
+ 	struct nbd_sock **socks;
+ 	struct nbd_sock *nsock;
+-	unsigned int memflags;
+ 	int err;
  
--static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
-+static struct nbd_device *nbd_dev_add(int index, unsigned int refs,
-+				       int nr_hw_queues)
- {
- 	struct queue_limits lim = {
- 		.max_hw_sectors		= 65536,
-@@ -1961,7 +1962,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 		goto out;
+ 	/* Arg will be cast to int, check it to avoid overflow */
+@@ -1294,12 +1293,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 		return err;
+ 	nbd_reclassify_socket(sock);
  
- 	nbd->tag_set.ops = &nbd_mq_ops;
--	nbd->tag_set.nr_hw_queues = 1;
-+	nbd->tag_set.nr_hw_queues = nr_hw_queues;
- 	nbd->tag_set.queue_depth = 128;
- 	nbd->tag_set.numa_node = NUMA_NO_NODE;
- 	nbd->tag_set.cmd_size = sizeof(struct nbd_cmd);
-@@ -2214,7 +2215,11 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	mutex_unlock(&nbd_index_mutex);
+-	/*
+-	 * We need to make sure we don't get any errant requests while we're
+-	 * reallocating the ->socks array.
+-	 */
+-	memflags = blk_mq_freeze_queue(nbd->disk->queue);
+-
+ 	if (!netlink && !nbd->task_setup &&
+ 	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
+ 		nbd->task_setup = current;
+@@ -1339,12 +1332,10 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
+ 	socks[config->num_connections++] = nsock;
+ 	atomic_inc(&config->live_connections);
+-	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
  
- 	if (!nbd) {
--		nbd = nbd_dev_add(index, 2);
-+		ret = nbd_genl_foreach_sock(info, NULL, NULL);
-+		if (ret < 0)
-+			return ret;
-+
-+		nbd = nbd_dev_add(index, 2, ret > 0 ? ret : 1);
- 		if (IS_ERR(nbd)) {
- 			pr_err("failed to add new device\n");
- 			return PTR_ERR(nbd);
-@@ -2729,7 +2734,7 @@ static int __init nbd_init(void)
- 	nbd_dbg_init();
- 
- 	for (i = 0; i < nbds_max; i++)
--		nbd_dev_add(i, 1);
-+		nbd_dev_add(i, 1, 1);
  	return 0;
- }
  
+ put_socket:
+-	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+ 	sockfd_put(sock);
+ 	return err;
+ }
 -- 
 2.52.0
 
