@@ -1,244 +1,145 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from va-2-45.ptr.blmpb.com (va-2-45.ptr.blmpb.com [209.127.231.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDFC430CD1
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 09:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B2A42B73F
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 09:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786008144; cv=none; b=oGFOKwrFt5Ba+hifTf+9YWyaKMWSh+V/UvUmCZiUkgLeJFBxNcMxswh5CIXwsiHZfuM+n1vM8LGz6tbS/GoDLUP8L66fsoQiAas7Le2ZVUyXNEHYMGDUSzN6nnqQ3qDQqK4ZWkTNd5jcBWflzUFoRiWTdCQCZjDyrXnbh/2GDSw=
+	t=1786008390; cv=none; b=CJhW3as87cseKBSvgaskCinqHClyxEjURObAY67oNWUCUdZ+PDc4wl5PPEJzF0SNVzs+BsIrgzd8OcfIL458VBZfIA5pwMyuh2byT7yFWDRi/7ts0jzck6KX2Cf+sR3shs/GLJ20HhmPv3oVptIG9o4XeNNwLIoZre0tfDhT+ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786008144; c=relaxed/simple;
-	bh=eAkOXZtlwNYjPhDGjyZtRke2iyDCQ2QqdzoXZFHQk1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=peYCzunsIpHhDshU1aF5XVT+lomJrzEhIgdwsnO/Eor2xAAPFseNaM3dlZNUiRYHirpt4JsD9Olr9tbXxw7qo9cbiKqYkqljlTY3XPIaetOVOiueUsa8qSXWueQpVj5N9q4n1Shv6XyJI/MjGUQw/GH6Jnz54qFDWB1MEfO9QGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XrnD5ycW; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1786008390; c=relaxed/simple;
+	bh=DXLdrPvGF3vaOeWnsc3TTzDLOy2G1e+dIo40cRAFjoo=;
+	h=From:Message-Id:Mime-Version:Cc:Date:To:References:In-Reply-To:
+	 Subject:Content-Type; b=ezoVPKMScxPVKpPpVOFfq8sRN0HPIUvb8t6T+Li94E3CzQapDJUlNkQw4obIFOIkhlwPN/NvBHLX6LTafzQL9YQsnVSeiXJL5HDm6FUMR0p1GFLSFslqIcaNIyCI0OYp8JGXSA2SlFr722QGpIgIwyedpfx9Rkzu/99wpNDKJKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=c8u9fUY4; arc=none smtp.client-ip=209.127.231.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XrnD5ycW"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47f703a9e5dso975609f8f.0
-        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 02:22:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1786008140; x=1786612940; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Pcnhqt0EtUylxXGbjqsf+1Pc4DS5YZiCgI0VutNek2Q=;
-        b=XrnD5ycWprfq6ZXTgx/sPzXa5ZnxABDwcpmPqfn9GG88R1oeKt24y55hESrkuenR00
-         nCKpfv3AkKfF4BEvNi1Np0lFOrYCUwYWexMxsBnhPOx2mxRlL7ydg2m/kBT+aiUV3Zd3
-         VESkJ5GGNCSExJTW9D+DzbWi1fVcVr4NwLIFru+84F1HhDvhmChS2J0YqoM0vX1T/1cK
-         iAluYuFr7ppe3xH4njcLfGLfuvucdrfjmvVOh34RYec6puIycELs/LS1OFCHdSinjMYe
-         umcNKcyjctdczgVSItKFxhC6REpSN1RTegig96f/He4KlWghfvQV4c9yOrOSyHOvsfie
-         Z3iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786008140; x=1786612940;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Pcnhqt0EtUylxXGbjqsf+1Pc4DS5YZiCgI0VutNek2Q=;
-        b=nYTbXkAq/3d9TF0VBEzwpJ08gq6uWCN1g4KUMxta7pM/DTpcFEkXg9yKX0gP5FU69A
-         H5kapNMrL2poVUpKnTWHvoFxAftuVk6t0aBD95X+eVZC21mnUfvn/RGnXP+XtWDG80p1
-         lb1fYQw29QCwuXpQTnqSTUUBQvIcE0W0wmb0ZfGGDY6/r2EVrDQYf5CfQpXwLuFcfTgb
-         viD6PAguIzXi1mclCY3NM5QbNQDwKH3oW8C1EE3cpwkhfOQ39YbBkT7osLc9ZIs9kSX5
-         Txxjfue7ExQ7GJGKfEQMUuXjGgvgHexTX4hASsk3dZVD2Xat6nZ7lzTRAL4twe6VKWnZ
-         2BMA==
-X-Forwarded-Encrypted: i=1; AHgh+Rpkzeoqqkz03EgQ62E1KDsnZ2mBK+ihkbIbVCuRTZaSQtDZ4vQxbo91Z4yEX3eVG3Ad6XbWceeRTC/bXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsQ19oQB1PaMxF1XoqGecj3hzNKtkZwGGOSTxGMflaCXcNvecA
-	wR0EwC5yYTwfOUrBudygj4Qh/6CEx6pH9HhqgK/OajiLBMWbqs5mebXlF6I1Ly4F2d8=
-X-Gm-Gg: AR+sD12TfrO4WwOfoJBSWJQPrTXHDJsDa8Z4CoqWPRzKsGrnC+cyB7Jzj9eii8Ub+t+
-	nq/pEAx52InvecYcL1SdcBHZ7E+nUjLT3Gr7xRlYhD8zWrhe8JnnF9SZVF1OvsGqwjcFwVPzsaU
-	M4OSpmxwmLT7pNEBHyu1CMIzLWTph9DnYcRkPHhOQHxrjHH4obvotAFoOhJO/n+8jB0xKtJ8NBC
-	slhAX7juNSp7xJEPB0+WSMrBX1FcieBuZ5WMpjMRtAYM/DomJ+ty0D7EeWvAhUam4tJhGY1BPAp
-	NGSctAWjeqxuKO7iadGoGmBRvvuWplOxliWCm/qOdYLYMIZ+Nv5ZXZKnbzvW4QUCyA1bqou+COr
-	d/tl0NMBQ+oMj0gPuIhOJZO5cEw0pxKepMSwCvdO3vNxyUfm/LaruFhhbF1+qAtSzVeVHpQl8x0
-	8J5ueEpoYaSJqdg6mhReUzowGkoW5KSLCu+qC8D4rgLIAYzK8IsrK3uHynceCiXlug
-X-Received: by 2002:a5d:624a:0:b0:47f:9750:26cc with SMTP id ffacd0b85a97d-47fec630b5cmr16574414f8f.23.1786008139632;
-        Thu, 06 Aug 2026 02:22:19 -0700 (PDT)
-Received: from localhost.localdomain ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47ff7b31975sm4112794f8f.33.2026.08.06.02.22.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 02:22:18 -0700 (PDT)
-Date: Thu, 6 Aug 2026 11:22:16 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Yu Kuai <yukuai@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Jonathan Corbet <corbet@lwn.net>, Yu Kuai <yukuai@fygo.io>, 
-	Josef Bacik <josef@toxicpanda.com>, Coly Li <colyli@fygo.io>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, Alasdair Kergon <agk@redhat.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
-	Benjamin Marzinski <bmarzins@redhat.com>, Song Liu <song@kernel.org>, Dan Williams <djbw@kernel.org>, 
-	Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Alison Schofield <alison.schofield@intel.com>, Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
-	Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>, Tao Cui <cui.tao@linux.dev>, 
-	cgroups@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
-	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, virtualization@lists.linux.dev, 
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 2/3] blk-cgroup: store blkcg in bio instead of blkg
-Message-ID: <anRPSKHWo59GPIA0@localhost.localdomain>
-References: <20260804065313.2092022-1-yukuai@kernel.org>
- <20260804065313.2092022-3-yukuai@kernel.org>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="c8u9fUY4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1786008380;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=+FzkfknCu1KhUUf7iiomqJBMijrdNVG9Uw9CHQcYxEw=;
+ b=c8u9fUY4U9bxew/mMiyPNOQ5j+3qnrLZypQCf33i85m+bGmKcYIqWNEv3OY+gVW2CeQONe
+ 2OSUg4Kk4sFhc0yUo34PpLd1inlJuL+5fXVMCgwIzp908pCptgSeX+Zkx1MX+PBT5vBYAL
+ mr6LgDsNU0jarM9HhriK+LRWsEmFUVDZ4JrOrfzYYtHz5MvJl4mLfwFitzUg7I6va7ywvn
+ ieuKPYPkO6wIc7Z3OmGdYhl2NJqbHWTpYrlIP1S+5xTWmAtQKcqv5agqbYHKZ/mffmPHOT
+ z15GnEQfqWSIKEfcYaJmVNxs96AJvtv3LCytVYXVxPi7n7qiRTjNZLaaAL2jXw==
+X-Lms-Return-Path: <lba+26a74533b+c7f53f+vger.kernel.org+yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Received: from [192.168.1.104] ([39.182.0.170]) by smtp.larksuite.com with ESMTPS; Thu, 06 Aug 2026 09:26:18 +0000
+From: "yu kuai" <yukuai@fygo.io>
+Message-Id: <22a4c13f-517a-42c3-9079-15dd20940424@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ltojthlavrpt3nkl"
-Content-Disposition: inline
-In-Reply-To: <20260804065313.2092022-3-yukuai@kernel.org>
-
-
---ltojthlavrpt3nkl
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+Mime-Version: 1.0
+Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
+	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>, 
+	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, 
+	<nbd@other.debian.org>
+Date: Thu, 6 Aug 2026 17:26:12 +0800
+X-Original-From: yu kuai <yukuai@fygo.io>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [RFC PATCH v1 2/3] blk-cgroup: store blkcg in bio instead of blkg
-MIME-Version: 1.0
+Reply-To: yukuai@fygo.io
+To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+References: <20260805122930.57647-1-yangerkun@huawei.com> <20260805122930.57647-9-yangerkun@huawei.com>
+In-Reply-To: <20260805122930.57647-9-yangerkun@huawei.com>
+Subject: Re: [PATCH v8 8/8] nbd: add pre_defined_connections module parameter for pre-created devices
+Content-Type: text/plain; charset=UTF-8
 
-Hi Kuai.
+Hi,
 
-On Tue, Aug 04, 2026 at 02:53:12PM +0800, Yu Kuai <yukuai@kernel.org> wrote:
-> From: Yu Kuai <yukuai@fygo.io>
->=20
-> A bio currently stores a queue-local blkg reference.  This forces bio
-> association and remap paths to look up or create a blkg even when the bio
-> will never enter a blkcg policy.
->=20
-> Store the blkcg css association in the bio instead, and derive the blkg
-> from the bio's blkcg and current bdev when a policy needs it.  The first
-> successful policy lookup pins the blkg, records the pin with BIO_BLKG_REF,
-> and drops it from bio_clear_blkcg() or when bio_set_dev() changes the
-> lookup key.
->=20
-> Keep lookup-only users from creating missing blkgs by using
-> bio_blkg_lookup(), and rename the bio cgroup association helpers to match
-> the stored blkcg state.
+=E5=9C=A8 2026/8/5 20:29, Yang Erkun =E5=86=99=E9=81=93:
+> blk_mq_update_nr_hw_queues() in nbd_start_device() may cause a queue
+> freeze.  The previous commit addressed this for newly created nbd
+> devices by setting the expected nr_hw_queues in nbd_dev_add().  However,
+> when reusing an old inactive nbd device, the queue freeze can still
+> occur if the old nbd->tag_set->nr_hw_queues does not match the new
+> socket connection count.  Inactive nbd devices can originate from two
+> sources: loading the nbd module with nbds_max, which sets the default
+> nr_hw_queues to 1, and the netlink method, which sets nr_hw_queues
+> according to the expected number of socket connections.  For the first
+> case, add a module parameter so the default nr_hw_queues can be
+> changed.  Users who know their expected number of connections can then
+> prevent queue freezes on pre-created devices via nbds_max.
+>
+> Before this patchset:
+> real    0m2.195s
+> user    0m0.005s
+> sys     0m0.022s
+>
+> After this patchset:
+> real    0m0.090s
+> user    0m0.004s
+> sys     0m0.018s
+>
+> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+> ---
+>   drivers/block/nbd.c | 16 +++++++++++++++-
+>   1 file changed, 15 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 6c4aa19ea11a..ffce519bf008 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
+>  =20
+>   static unsigned int nbds_max =3D 16;
+>   static int max_part =3D 16;
+> +static int pre_defined_connections =3D 1;
+>   static int part_shift;
+>  =20
+>   static int nbd_dev_dbg_init(struct nbd_device *nbd);
+> @@ -2712,6 +2713,12 @@ static int __init nbd_init(void)
+>   	if (nbds_max > 1UL << (MINORBITS - part_shift))
+>   		return -EINVAL;
+>  =20
+> +	/* An excessively large value will be adjusted in blk_mq_alloc_tag_set =
+*/
+> +	if (pre_defined_connections < 1) {
+> +		pr_err("pre_defined_connections must be >=3D 1\n");
 
-I assume this should be OK due to limited lifetime of bios -- this would
-not lead no possibly indefinite accumulation of offlined blkcgs,
-correct?
+It's also better to add NR_CPUS checking for upper bound, because the nr_hw=
+_queues is passed
+directly to __blk_mq_realloc_hw_ctxs() for memory allocation.
 
-> -void bio_associate_blkg_from_css(struct bio *bio,
-> +void bio_associate_blkcg_from_css(struct bio *bio,
->  				 struct cgroup_subsys_state *css)
->  {
-> -	if (bio_blkg(bio))
-> -		blkg_put(bio_blkg(bio));
-> +	struct blkcg *blkcg;
-> =20
-> -	if (css && css->parent) {
-> -		bio->bi_blkg =3D blkg_tryget_closest(bio, css);
-> -	} else {
-> -		blkg_get(bdev_get_queue(bio->bi_bdev)->root_blkg);
-> -		bio->bi_blkg =3D bdev_get_queue(bio->bi_bdev)->root_blkg;
-> -	}
-> +	if (!css || !css->parent)
-> +		css =3D &blkcg_root.css;
+> +		return -EINVAL;
+> +	}
 > +
-> +	blkcg =3D css_to_blkcg(css);
-> +	if (bio_blkcg(bio) =3D=3D blkcg)
-> +		return;
-> +
-> +	css_get(css);	<---
-> +	bio_clear_blkcg(bio);
-> +	bio->bi_blkcg =3D blkcg;
->  }
-> -EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-> +EXPORT_SYMBOL_GPL(bio_associate_blkcg_from_css);
+>   	if (register_blkdev(NBD_MAJOR, "nbd"))
+>   		return -EIO;
+>  =20
+> @@ -2728,8 +2735,12 @@ static int __init nbd_init(void)
+>   	}
+>   	nbd_dbg_init();
+>  =20
+> +	/*
+> +	 * Set to the intended connection count so nbd_start_device() can skip
+> +	 * the queue-freezing blk_mq_update_nr_hw_queues() call.
+> +	 */
+>   	for (i =3D 0; i < nbds_max; i++)
+> -		nbd_dev_add(i, 1, 1);
+> +		nbd_dev_add(i, 1, pre_defined_connections);
+>   	return 0;
+>   }
+>  =20
+> @@ -2790,3 +2801,6 @@ module_param(nbds_max, int, 0444);
+>   MODULE_PARM_DESC(nbds_max, "number of network block devices to initiali=
+ze (default: 16)");
+>   module_param(max_part, int, 0444);
+>   MODULE_PARM_DESC(max_part, "number of partitions per device (default: 1=
+6)");
+> +module_param(pre_defined_connections, int, 0444);
+> +MODULE_PARM_DESC(pre_defined_connections,
+> +"number of connections for devices pre-created at module load (default: =
+1)");
 
-[skip to next comment below now]
-
-And here yet another (any) reference to same css is taken 2nd time.
-
-[skip after next comment below :)]
-
-
-> =20
->  /**
-> - * bio_associate_blkg - associate a bio with a blkg
-> + * bio_associate_blkcg - associate a bio with a blkcg
->   * @bio: target bio
->   *
-> - * Associate @bio with the blkg found from the bio's css and request_que=
-ue.
-> - * If one is not found, bio_lookup_blkg() creates the blkg.  If a blkg is
-> - * already associated, the css is reused and association redone as the
-> - * request_queue may have changed.
-> + * Associate @bio with the blkcg found from the bio's css.  If a blkcg is
-> + * already associated, keep it as blkcg association is not queue-local.
->   */
-> -void bio_associate_blkg(struct bio *bio)
-
-
-> +void bio_associate_blkcg(struct bio *bio)
->  {
->  	struct cgroup_subsys_state *css;
-> =20
->  	if (blk_op_is_passthrough(bio->bi_opf))
->  		return;
-> =20
-> -	if (bio_blkg(bio)) {
-> -		css =3D bio_blkcg_css(bio);
-> -		bio_associate_blkg_from_css(bio, css);
-> -	} else {
-> -		rcu_read_lock();
-> -		css =3D blkcg_css();
-> -		if (!css_tryget_online(css))
-> -			css =3D NULL;
-> -		rcu_read_unlock();
-> +	if (bio_blkcg(bio))
-> +		return;
-> =20
-> -		bio_associate_blkg_from_css(bio, css);
-> -		if (css)
-> -			css_put(css);
-> -	}
-> +	rcu_read_lock();
-> +	css =3D blkcg_css();
-> +	if (!css_tryget_online(css))	<---
-> +		css =3D NULL;
-> +	rcu_read_unlock();
-> +
-> +	bio_associate_blkcg_from_css(bio, css);
-> +	if (css)
-> +		css_put(css);
->  }
-> -EXPORT_SYMBOL_GPL(bio_associate_blkg);
-> +EXPORT_SYMBOL_GPL(bio_associate_blkcg);
-
-next:
-Here you take (online) reference to the blkcg->css.
-
-[return back to previous comment]
-
-
-after:
-Ideally, no tasks should be in offlined (blk)cgs, so the `current` would
-not resolve to blkcg_css() returning an offlined blkcgs. OTOH, it's
-generally good not to do _new_ associations to an offlined blkcg.
-Which is why I think this logic would better fit to
-bio_associate_blkcg_from_css()
-
-
-0.02=E2=82=AC,
-Michal
-
-
---ltojthlavrpt3nkl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCanRSRBsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+Ahf+gEA5FtU8iXyQA9tlhJdWJEf
-nyf1IBDUt4tisH7UDE8KiSEBAP5BK6FXkSftml/wn918ol1iwizfBzFhephd2gZc
-e3UL
-=GgwG
------END PGP SIGNATURE-----
-
---ltojthlavrpt3nkl--
+--=20
+Thanks,
+Kuai
