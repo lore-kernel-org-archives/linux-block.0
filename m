@@ -1,83 +1,198 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A063E4248A0;
-	Thu,  6 Aug 2026 09:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F1E3D9557
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 09:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786007295; cv=none; b=pG44HjFfQACB0KtzlJYfMaRpIGsSz/JS+9rCbxONIU4ja2T7Wol8VBKXQNtsHz8QC79gYv0tBLlB6YO8WgePPdA0hop+pygyv8KVQ50CFaIY2rGurnO5x+InQBhTwnK/Y/wVHyrMtgZgiEDEwIFnBkY0nMlWOBVKaTMXbhw0PXM=
+	t=1786007425; cv=none; b=ct1q14MOPlUw5qq5KVQ2+A9fUyogfGwsYbBcrxOQa3PBBCdqsOMqljJIjuJxbXloz2En+83Jjk57toEGa7rftAyyqjpAvY6SBbUrcInil5x3RsFDn3AuwB+eZ5b/O7Gjj31/N/hhnYgnuqhROcJHlSARyHRA24yjPe0cDlF4maA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786007295; c=relaxed/simple;
-	bh=3bicg5ORZDq72OfBoeTcOeYRJc6o7mFDrz62Q7IALxA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CI2U+p8R74d4vWlOrJZMRuwCW8Y9mTT2BJYR7ooHnKP0gRii0a6WLfDvic8m1aA66SLl4l82d89L6u9AEI/ZOvUyP1FS7giOrrbpA54C/8XffffdjNlFrl49MhUNATQg04VbMX92ri5SmWIdO9tHpxLc9cvJDUbqseX023uUPbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBpzU+3H; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786007425; c=relaxed/simple;
+	bh=7G++yVM850WACl/SY6RzM4/AnpU60dkSeWAOSsjF/Ds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GaE5pjwCWIbF6evRkgfOagNHXT38kQBO1gUzdNdrkAQOqUWG/uZa4LMVMe1AwQfkKVrb+cuGTzCQfbtgVZaukfXFXkYVEBOWoQr5ceHemTXSjMXv/MkuxUfa2MEOQu3gOoiDU1LfFw/TN5yYydjXQrn62VE0rYWVVFlajvcfONg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QYPDehb7; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBpzU+3H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87FFF1F000E9;
-	Thu,  6 Aug 2026 09:08:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786007294;
-	bh=c4YQ4eAwJRsD3hueQPNwT8y097gGy2FPUFHvT2YMrGQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=nBpzU+3HnAiAV9v6gVEL7FlftXr4KwbfEqTPr2E/7q4QCgdiR9nM9YaCU0bHMV/rT
-	 rtyhNqdg9KLtU1vYmvbkYlLhoR1APKVEZQcEKlOlrjL7lC70FSpZVwoevXV2vSBR0l
-	 F6/OfCgojtwcea62VNOUmaukYzpLddwV0Xp1yRAOvX1tU+Egsso894Y+uD1ygJQo5H
-	 dYHEpu8toipmJl9wTLPnvyUXAFI4W0N5UKdClOqEx7NR6sZDx8S34R8Iv+3XrsZMRq
-	 3aKkj38vq18A6Fs7lYzUHJ+ELfIlUsPG1whyt6mNpE3QwX2k2cKUk7zS5PU/tKkLow
-	 qHSEPCbGF+7UA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Adarsh Das <adarshdas950@gmail.com>, adarshdas950@gmail.com
-Cc: acourbot@nvidia.com, aliceryhl@google.com, axboe@kernel.dk,
- bjorn3_gh@protonmail.com, boqun@kernel.org, dakr@kernel.org,
- daniel.almeida@collabora.com, gary@garyguo.net,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- lossin@kernel.org, ojeda@kernel.org, rust-for-linux@vger.kernel.org,
- tamird@kernel.org, tmgross@umich.edu, work@onurozkan.dev
-Subject: Re: [PATCH v2] rust: block: set GenDisk
- block_device_operations.owner to THIS_MODULE
-In-Reply-To: <20260806083655.23161-1-adarshdas950@gmail.com>
-References: <20260805192020.107601-1-adarshdas950@gmail.com>
- <HxcdCGoRqPsQe1B2W6AuOT-Gsob7jMsUKVOjssQEAOVChpwJ7vPp1bwsGiQ9PzvRT-tq6HvhO98nEw64UY90NQ==@protonmail.internalid>
- <20260806083655.23161-1-adarshdas950@gmail.com>
-Date: Thu, 06 Aug 2026 11:08:05 +0200
-Message-ID: <87bjbf4nwq.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QYPDehb7"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4955158f26aso12493185e9.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 02:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1786007420; x=1786612220; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=S4yMZH32nJIYDfBv8jXcdhwhM4mQya/pkJRPHRaGp/I=;
+        b=QYPDehb7OmdfNLaCntDGpdox9SD0fLWIgdR685XCsAYW7qrG2VRsauUpFBzFYJsK1X
+         JDXgArm+VqpyRhwVG0JvF4+Y0imJ1dkPwApwiXX7L8A2a1g6h1ynMCAg8g1Qu5LmemPV
+         pPJy0w/p6I3lMRQVkRnxzNFfhxtXv/FVklNJLeXrdcqUlZLKn0gp62B5mSBXFg+kIBjN
+         6DakEHd836hkF1SUWBrGOuH7mSZPTLvwTqSrUYBtyzINyTU87eBurrGVMitYyCZnLio2
+         7sP/mXpvChYhjKfcf631Hv0ryrxlHb4CnWfFAbTKlA+Aa/qcy6lFOXx7C9crzCiKZSgA
+         OoDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786007420; x=1786612220;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=S4yMZH32nJIYDfBv8jXcdhwhM4mQya/pkJRPHRaGp/I=;
+        b=jmUV0d87J5lpytiwqBqk8HpqToZQ6WyegCJyTcNjdtuGzJvQ0o2zjOBIKfhKR879if
+         qJRyIRYJHH1HjcCzMxXGDV5lmRPEL+OWPa+BGo3liSLyn98mkemS4IbSBNszXkhrdTKs
+         AsZg9SuXrS92poNWs3ziToMD7BNYQDniu61l/ZHF4BCr+LjIDG6E1b+xN8SX17gNqD4a
+         8BwDDaMo3QWLZzwWW3GqMEAVPfnf3Xo6EwtMv1PP7cyQRj8WXSuU1V+YwrFvJLFwtn5O
+         CGDWy8JDvF+QoCbhML2xqxpj62PxsmnOZhrUX7ySOr9knjUA4zfYPV/aMfYB03un8KPs
+         O7cA==
+X-Forwarded-Encrypted: i=1; AHgh+RrP2Ggu8YmefiSzWUZp8lcbSL/htfn5l3CtLLJmNcXxpyVcNnkPmzZHqNKZnLh+21Q7AiW2kFSnUKfl5Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWtko5n/LAlMh+YzfqaLCP9HhCWvEPNNhRVFp6+KL7WayEpjfp
+	/yuR8tJocE+I24RLOgm5RIgZSwhXNLETvr9FN5TwYY7SBQ3p5OPhPvneN/1ED8St4g8=
+X-Gm-Gg: AR+sD13j/ifSRZP8bE/gv6sBosIRCpOjKKOjwM9aIIFidelAXB9Z8dSQXEFDrT/zPTD
+	GnY+al/TI+lALjHoEEmkwAzC1Bev2nigUbAYuSNhPPLilE+7dP4fUu3hntSe4j9++JuQuk3xBiJ
+	TRKgiOpGwjBvH6r4qCc/FtUCnSc/Ex904A0S+V5SCN/KCI7ADXf2QmZXSIvcHqmbDkPUShM/JFI
+	3b8G70OASNAYaYvBROIVcfxJ82UQZyGZTajHA08gEe1NRDtYXU38hIpLKylSkRqTn3JZt2dtKeS
+	R14HdN4QGZrwzspGfgrFyoaR3be87RngGC4Fr76R0taD694eaK0CfcZsVihmP4ir60XKEiH4Mu0
+	HtT3QKunWt1ZB6+QjZuB621znBHkBYX+VbdNdSqL8qxahrHB/lhqyQiiGOBO68suD93iuAgU6KW
+	/d4oc+QhmfIAhJIkXQhgqHpt++eLHNmCcO/bDcHM+mBYghw4Jr2oT6nA==
+X-Received: by 2002:a05:600c:a597:b0:499:4d50:7230 with SMTP id 5b1f17b1804b1-4994e7d9c03mr109493145e9.18.1786007419802;
+        Thu, 06 Aug 2026 02:10:19 -0700 (PDT)
+Received: from [172.16.0.229] ([159.196.52.54])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31586401507sm25592325eec.9.2026.08.06.02.10.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Aug 2026 02:10:18 -0700 (PDT)
+Message-ID: <2f43370d-0319-479d-998e-8cf09c84675f@suse.com>
+Date: Thu, 6 Aug 2026 18:40:10 +0930
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/7] btrfs: unlock inode and extent in caller when
+ uring read extent fails
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Mark Harmstone <maharmstone@fb.com>, Qu Wenruo <quwenruo.btrfs@gmx.com>,
+ linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
+ <20260806085041.1410576-6-yangxiuwei@kylinos.cn>
+Content-Language: en-US
+From: Qu Wenruo <wqu@suse.com>
+Autocrypt: addr=wqu@suse.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
+ FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
+ Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
+ fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
+ 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
+ V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
+ rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
+ rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
+ Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
+ E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
+ vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
+ g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
+ AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
+ cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
+ qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
+ /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
+ o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
+ JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
+In-Reply-To: <20260806085041.1410576-6-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-"Adarsh Das" <adarshdas950@gmail.com> writes:
-
-> GenDiskBuilder left block_device_operations.owner NULL. Pass the driver's
-> ThisModule into GenDiskBuilder::build(), heap-allocate the operations
-> table, and keep it alive until the gendisk is released via free_disk.
-> Update rnull as the in-tree caller.
->
-> v2:
-> - Free fops in free_disk instead of GenDisk::drop to fix use-after-free
->   when the device stays open after removal. (Sashiko)
-> - Install the cleanup guard before fops allocation to avoid leaking gendisk
->   on -ENOMEM. (Sashiko)
-> - Link to v1: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
->
-> Signed-off-by: Adarsh Das <adarshdas950@gmail.com>
-
-The reason `owner` is not set is that we want to keep the vtable const.
-But with Alvins recent series [1], we should be able to set owner in
-const context.
-
-Can you rebase on his series and see if you can make it work in const context?
 
 
-Best regards,
-Andreas Hindborg
+在 2026/8/6 18:20, Yang Xiuwei 写道:
+> btrfs_uring_read_extent() runs only after btrfs_encoded_read() has
+> taken the inode shared lock and the extent lock.  On failure it used to
+> unlock in out_fail, and a pages-array allocation failure returned
+> -ENOMEM without unlocking at all.
+> 
+> Unlock in the caller instead, matching the copy_to_user() error path.
+> out_fail only frees the local priv/pages allocations, and the pages
+> array failure joins that path.
+> 
+> Fixes: 34310c442e17 ("btrfs: add io_uring command for encoded reads (ENCODED_READ ioctl)")
+> Suggested-by: Qu Wenruo <quwenruo.btrfs@gmx.com>
+> Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+> ---
+>   fs/btrfs/ioctl.c | 21 ++++++++++++---------
+>   1 file changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+> index 939c4a9d47b6..b576887469bb 100644
+> --- a/fs/btrfs/ioctl.c
+> +++ b/fs/btrfs/ioctl.c
+> @@ -4552,7 +4552,7 @@ static void btrfs_uring_read_finished(struct io_tw_req tw_req, io_tw_token_t tw)
+>   	size_t page_offset;
+>   	ssize_t ret;
+>   
+> -	/* The inode lock has already been acquired in btrfs_uring_read_extent.  */
+> +	/* The inode lock has already been acquired in btrfs_encoded_read(). */
+>   	btrfs_lockdep_inode_acquire(inode, i_rwsem);
+>   
+>   	if (priv->err) {
+> @@ -4618,7 +4618,6 @@ static int btrfs_uring_read_extent(struct kiocb *iocb, struct iov_iter *iter,
+>   				   struct iovec *iov, struct io_uring_cmd *cmd)
+>   {
+>   	struct btrfs_inode *inode = BTRFS_I(file_inode(iocb->ki_filp));
+> -	struct extent_io_tree *io_tree = &inode->io_tree;
+>   	struct page **pages = NULL;
+>   	struct btrfs_uring_priv *priv = NULL;
+>   	unsigned long nr_pages;
+> @@ -4626,8 +4625,10 @@ static int btrfs_uring_read_extent(struct kiocb *iocb, struct iov_iter *iter,
+>   
+>   	nr_pages = DIV_ROUND_UP(disk_io_size, PAGE_SIZE);
+>   	pages = kzalloc_objs(struct page *, nr_pages, GFP_NOFS);
+> -	if (!pages)
+> -		return -ENOMEM;
+> +	if (!pages) {
+> +		ret = -ENOMEM;
+> +		goto out_fail;
 
+Why go to that label? We have nothing to release, the old return -ENOMEM 
+works completely fine now.
 
-[1] https://lore.kernel.org/r/20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev
+Otherwise looks good to me.
 
-
+> +	}
+>   	ret = btrfs_alloc_page_array(nr_pages, pages, GFP_NOFS);
+>   	if (ret) {
+>   		ret = -ENOMEM;
+> @@ -4674,12 +4675,12 @@ static int btrfs_uring_read_extent(struct kiocb *iocb, struct iov_iter *iter,
+>   	return -EIOCBQUEUED;
+>   
+>   out_fail:
+> -	btrfs_unlock_extent(io_tree, start, lockend, &cached_state);
+> -	btrfs_inode_unlock(inode, BTRFS_ILOCK_SHARED);
+>   	kfree(priv);
+> -	for (int i = 0; i < nr_pages; i++) {
+> -		if (pages[i])
+> -			__free_page(pages[i]);
+> +	if (pages) {
+> +		for (int i = 0; i < nr_pages; i++) {
+> +			if (pages[i])
+> +				__free_page(pages[i]);
+> +		}
+>   	}
+>   	kfree(pages);
+>   	return ret;
+> @@ -4819,6 +4820,8 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
+>   					      data->iov, cmd);
+>   		if (ret == -EIOCBQUEUED)
+>   			goto out_acct;
+> +		btrfs_unlock_extent(io_tree, start, lockend, &cached_state);
+> +		btrfs_inode_unlock(inode, BTRFS_ILOCK_SHARED);
+>   	}
+>   
+>   out_free:
 
