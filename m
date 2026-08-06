@@ -1,133 +1,136 @@
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC0E25A2DD
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 06:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D9C3DE452
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 06:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785996310; cv=none; b=U6KxDBOGOHNf176ByJ7j2pdBgKpNbQQkwemrsfL/biu7lsmw81oq01vv+SGeJcRO1sIcMOsxMDLFD19Y7Ssrusb800XTTWUMMq3bDNwJ/BHuWgd8w7ddLiYG2OIFvhM19ZXF/Dj20jaRctWVNXxbxVwocQTuIqDZ9SUN59M4NGw=
+	t=1785998389; cv=none; b=uGiB6xNY/GR/JKvFURnj7Z1GMrBPetFdrpKRqqLtnwfeVGGeXI9cLWm/onCvaG4LQeoQDOadnFATmpCG4ORLVQczyF3SQkDOcRV+BIAG+zGiNpKH0p7E7HCxPQ//3QXXYNPNQOYJn71rrKj+JaJuoCyXZffDPJ+05HTfHGuqhx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785996310; c=relaxed/simple;
-	bh=D0jxbcB7of1MNyozyUI9VTXVdLrAuN1V+QQdQZmtCRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JqMKpQU8kA6SXJPFWHVWDZ+qvbZUDEsJ1ksjydhxe8YJrpamG+hvLcL2x7/T66m4mCj+6rUu8ZF3IN7XLzUlnH8VvWOGXBlCP7qrnZXoKvzd7aGOVCBaeDpDUXaEznCtgHg5CeJ4/xttuR1A5UkQIwXG4zRkIXgoFpSt2c/Y6/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=l8+PXWaA; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="l8+PXWaA"
-Received: from LAPTOP-99KJFSET (unknown [36.153.54.46])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 48fb94a0f;
-	Thu, 6 Aug 2026 14:04:54 +0800 (GMT+08:00)
-From: Hongyan Xu <getshell@seu.edu.cn>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Hongyan Xu <getshell@seu.edu.cn>
-Subject: [PATCH] block: mtip32xx: synchronize ioctls with device removal
-Date: Thu,  6 Aug 2026 14:04:41 +0800
-Message-ID: <20260806060441.676-1-getshell@seu.edu.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1785998389; c=relaxed/simple;
+	bh=X04kfEHDpRK/6+9yh+0noeQWVS9wD5LI8iT5s32zjhk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PK/jqQo1ypXKUYdOuQL7rhXZFoNC57hKPvxkevrWVH52pMpfOkDRb8IRGMX+GF/tJ4aXxJH+yCt5mQmKiflgncYoVXs9Frnz6QBam7GSsZtw89hsQc40871hFMOaedz81c3kvT9hFoOo8Z55MVc2B/QlXIG6/aMvWbyxzheJhpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hFyKZ0PTzzYQtph
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 14:38:42 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 5FCCC40898
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 14:39:36 +0800 (CST)
+Received: from [10.174.176.179] (unknown [10.174.176.179])
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgCnlkUmLHRq324yBQ--.24202S3;
+	Thu, 06 Aug 2026 14:39:36 +0800 (CST)
+Message-ID: <27b84502-9239-4a21-b38c-a44697764d57@huaweicloud.com>
+Date: Thu, 6 Aug 2026 14:39:34 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] block: fix BLKSECDISCARD zero-length range causing
+ page cache invalidation
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
+ hch@lst.de, yukuai@fygo.io, linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com, chengzhihao1@huawei.com
+References: <20260725002355.347485-1-wozizhi@huaweicloud.com>
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+In-Reply-To: <20260725002355.347485-1-wozizhi@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9fd5acabf603a1kunmc012de0c289298
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDSR1IVk5CSx5NHxkZTUtDTlYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlITVVKTkhVTk9VT01ZV1kWGg8SFR0UWUFZT0tIVUpLSEpPSE
-	xVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=l8+PXWaAUiRHoA5ZdtKAR3hZdkBb/JLXeCqfjZ1N6wQvSXqeCHqQksMDv6hkWclJ5ohGbW3W6TunsEPJUD6pqJngB+0uXvtvMHXkP146vAM57S4s5KfysYpmCeoV6t0siXRcRVe1e8otQCh5Y1eHTroNoNpWUc2RI1pM9ThvB/A=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=cK1qcdFqMaA9K2xKPBm4tZmn60ftPKT5i1PScX/IiSE=;
-	h=date:mime-version:subject:message-id:from;
+X-CM-TRANSID:_Ch0CgCnlkUmLHRq324yBQ--.24202S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGw4kurW7WFyrZw1ftw1kKrg_yoW5XF1xpr
+	WUGFy5Gr4DWr9ruF48K3ZrZFyq93WUKF4xA345trnxZrZFvrnFgFyrGrySgayvvr97t3y8
+	XF4jvFyxK3429a7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkv14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAVWU
+	twCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-The ioctl handlers only test REMOVE_PENDING before entering
-mtip_hw_ioctl(). Removal can set that bit immediately afterwards and free
-dd->port in mtip_hw_exit() while an ioctl still dereferences it. An already
-open block device can reach the handlers while del_gendisk() is in
-progress.
+friendly ping...
 
-Serialize both native and compat ioctls with removal. Set REMOVE_PENDING
-before taking the mutex so new callers fail after an in-flight ioctl has
-drained, and hold the mutex until the port has been torn down.
-
-Fixes: 88523a61558a ("block: Add driver for Micron RealSSD pcie flash cards")
-Signed-off-by: Hongyan Xu <getshell@seu.edu.cn>
----
- drivers/block/mtip32xx/mtip32xx.c | 7 +++++++
- drivers/block/mtip32xx/mtip32xx.h | 2 ++
- 2 files changed, 9 insertions(+)
-
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f214a616386c..113bdb868c46 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3048,6 +3048,8 @@ static int mtip_block_ioctl(struct block_device *dev,
- 	if (!dd)
- 		return -ENOTTY;
- 
-+	guard(mutex)(&dd->ioctl_mutex);
-+
- 	if (unlikely(test_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag)))
- 		return -ENOTTY;
- 
-@@ -3086,6 +3088,8 @@ static int mtip_block_compat_ioctl(struct block_device *dev,
- 	if (!dd)
- 		return -ENOTTY;
- 
-+	guard(mutex)(&dd->ioctl_mutex);
-+
- 	if (unlikely(test_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag)))
- 		return -ENOTTY;
- 
-@@ -3721,6 +3725,7 @@ static int mtip_pci_probe(struct pci_dev *pdev,
- 	dd = kzalloc_node(sizeof(struct driver_data), GFP_KERNEL, my_node);
- 	if (!dd)
- 		return -ENOMEM;
-+	mutex_init(&dd->ioctl_mutex);
- 
- 	/* Attach the private data to this PCI device.  */
- 	pci_set_drvdata(pdev, dd);
-@@ -3887,6 +3892,7 @@ static void mtip_pci_remove(struct pci_dev *pdev)
- 	}
- 
- 	set_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag);
-+	mutex_lock(&dd->ioctl_mutex);
- 
- 	if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
- 		del_gendisk(dd->disk);
-@@ -3915,6 +3921,7 @@ static void mtip_pci_remove(struct pci_dev *pdev)
- 
- 	/* De-initialize the protocol layer. */
- 	mtip_hw_exit(dd);
-+	mutex_unlock(&dd->ioctl_mutex);
- 
- 	if (dd->isr_workq) {
- 		destroy_workqueue(dd->isr_workq);
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index f7328f19ac5c..0963c07b5845 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -12,6 +12,7 @@
- #define __MTIP32XX_H__
- 
- #include <linux/spinlock.h>
-+#include <linux/mutex.h>
- #include <linux/rwsem.h>
- #include <linux/ata.h>
- #include <linux/interrupt.h>
-@@ -432,6 +433,7 @@ struct driver_data {
- 	struct request_queue *queue; /* Our request queue. */
- 
- 	struct blk_mq_tag_set tags; /* blk_mq tags */
-+	struct mutex ioctl_mutex;
- 
- 	struct mtip_port *port; /* Pointer to the port data structure. */
- 
--- 
-2.50.1.windows.1
+在 2026/7/25 8:23, Zizhi Wo 写道:
+> From: Zizhi Wo <wozizhi@huawei.com>
+> 
+> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
+> the start+len overflow via check_add_overflow() but did not handle the
+> start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
+> and truncate_bdev_range()->truncate_inode_pages_range() is then called with
+> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+> the entire page cache is invalidated.
+> 
+> Fix this by replacing the validation with blk_validate_byte_range(), which
+> already rejects a zero-length range and is what BLKDISCARD uses. This also
+> switches the alignment check from a hardcoded 512 to
+> bdev_logical_block_size().
+> 
+> Fixes: 0bd1ed4860d0 ("block: pass inclusive 'lend' parameter to truncate_inode_pages_range")
+> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+> Reviewed-by: Yu Kuai <yukuai@fygo.io>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+> v2:
+> Add the fixtag.
+> 
+> v1: https://lore.kernel.org/all/20260704073942.3760597-1-wozizhi@huaweicloud.com/
+> ---
+>   block/ioctl.c | 13 +++++--------
+>   1 file changed, 5 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 3d4ea1537457..3b7d33a737e8 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -174,12 +174,11 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+>   }
+>   
+>   static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+>   		void __user *argp)
+>   {
+> -	uint64_t start, len, end;
+> -	uint64_t range[2];
+> +	uint64_t range[2], start, len;
+>   	int err;
+>   
+>   	if (!(mode & BLK_OPEN_WRITE))
+>   		return -EBADF;
+>   	if (!bdev_max_secure_erase_sectors(bdev))
+> @@ -187,19 +186,17 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+>   	if (copy_from_user(range, argp, sizeof(range)))
+>   		return -EFAULT;
+>   
+>   	start = range[0];
+>   	len = range[1];
+> -	if ((start & 511) || (len & 511))
+> -		return -EINVAL;
+> -	if (check_add_overflow(start, len, &end) ||
+> -	    end > bdev_nr_bytes(bdev))
+> -		return -EINVAL;
+> +	err = blk_validate_byte_range(bdev, start, len);
+> +	if (err)
+> +		return err;
+>   
+>   	inode_lock(bdev->bd_mapping->host);
+>   	filemap_invalidate_lock(bdev->bd_mapping);
+> -	err = truncate_bdev_range(bdev, mode, start, end - 1);
+> +	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+>   	if (!err)
+>   		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+>   						GFP_KERNEL);
+>   	filemap_invalidate_unlock(bdev->bd_mapping);
+>   	inode_unlock(bdev->bd_mapping->host);
 
