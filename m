@@ -1,246 +1,185 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAFB3E9C32;
-	Thu,  6 Aug 2026 08:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786003454; cv=fail; b=DVleOxxcjCtK7FXRsBqI4vVH8hFn0KOE9GsD8H9e6phXcNCEMy81A+q3kNv9yKqhPaENcNJqXmWkm/hohL1byufwnVwaplGOzUqgEaCYAOUsTr7NuQf8d5qZS3vmHMKg+3xfxB3RLglZDtONtvVMQuoHqkXdlXMtUwsQZiyqB+4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786003454; c=relaxed/simple;
-	bh=ROrfI40do/rrpwwUrHiC2mSnMA7SNmEC/glvTY3iMQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AJCUBGzwTEkn8+DiaWUVvxfJTxOV1suOmWImfQ1oVyeCI0H4f1OSUoAPZRfJuLUd39nwB2U8Z/Z2c24bO35x7FXjHtWZWvqjRmqs2SW6JSUmiBb+MEgmFtuxzsNgz2wo2jGQXTPiSIWzuJzgUfzRu7QmcEq4aDD/JldKumlJ08M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=RenxTttm; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=RHXqy2vp; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RenxTttm";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="RHXqy2vp"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1786003450; x=1817539450;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ROrfI40do/rrpwwUrHiC2mSnMA7SNmEC/glvTY3iMQg=;
-  b=RenxTttmHWI9o9s2hsUqMN3A1i/rzIqncev9o3NvBFH6yz569v0ak8tr
-   4qrgQJjuL8eyXoLrL+tLN1HSIbNFBJVi8NGfskyyLPf4NPScfhunOPDXj
-   gzpMf77+6qRLPHYqu+HKTymPvg0JwRWhH6CwYWjQ6YpbJKjSX5pE6BAv1
-   FL7HFc4l1GZFCw5rDhECNLao1PxrU8FojD5OIWLzpmplafSJ+Iz7sOYNV
-   C6HYG1n0Z7ekwfTl9yeSeWFUmd9W12gqaJU1f6T6q4zB7d+giKus88TMb
-   v2H5j26lGfrjpcGgU9ruc7X8BDG/793sGdQZk5SHkmsM/2Lcnocbq7rMI
-   Q==;
-X-CSE-ConnectionGUID: rOVhungaQwmZ4J8EA9GtfA==
-X-CSE-MsgGUID: cHL7qiz0RyG67bSRD+BFxA==
-X-IronPort-AV: E=Sophos;i="6.25,208,1779120000"; 
-   d="scan'208";a="152316259"
-Received: from mail-centralusazon11011003.outbound.protection.outlook.com (HELO DM5PR21CU001.outbound.protection.outlook.com) ([52.101.62.3])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Aug 2026 16:04:03 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ckvI1irpB1bmJqmM6iyyRX817uv9U2EdxVoBVGbuASk8xCWaX1Egz4cZlfUISvMMH+q2ovkAVtHeKOSa/BuLJGUz3s6BjjUsTQum9O4JoqAEp64AbcynPi0bQ4dYuIHWhGDYP/bnRIlGICUANdV1SDzwqlkjrvQ9olZ+LQLpS4f493/X1/Z261kK/DP9uZax4RvX7EOGgbUvsDTIKRxS7yt3OGwzjqYzU9tXysW9/5ucmbtPyDtJ/8KkxtRfvEX5zs6FTUn4rgvwnikFRIxvsyZZCIEg2fommEX7e7uutDMkCcCvH1SOFm4s/I9HR5lCalJ3yVyHHWNKoENjjtpsbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gkp1WrvtPYfyewV3GMAWyLZq7ubfwBxr1VMdOV5B7y4=;
- b=bqE/2AC+A8k1ifWc2hClzGZVyeh00prAZKDcALgSEyryIdiXPJUKmL7yq8AJyzLSa/e5lZyrNPU+3fsFnLi7AjJsL0m9yAH+PDMTO6yKdhQkllt2vdDuHBEeVDXb+ezu0/R/u2jdIHd3+/UXm+Po9C2tt9qp9eF8v1+WL6SnjenwH4BPuopYTJrvwcyvmHnVD1wx86yUrVlFL+1BhAYVtW0G2hbghsMcRL2G1sE4P2CFB4yoEmivCdGTT/SjxTPQpbwyBsSJ2mEcT1azlQFyDjaDy49RGK9ZnsExnpoiEEIEsAyafvtQ1TC3pGKFu9dYcLR8DSvLLe09beSkaIWNPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gkp1WrvtPYfyewV3GMAWyLZq7ubfwBxr1VMdOV5B7y4=;
- b=RHXqy2vpEd9QFaV367OTsOmCFN3k0vpvxd7ffQcJ+cArmeOS/2YYAKe2ltGvKt9oesxBpWlGOeL5ldnNMlhC7qsRqcti/roLCmNrU3yTbx0etJdQJtxS0PvgtSRbpR7MIoqZupiA+TYk+cD6O9Ki7KPcGeSRgrRP7Y+CfUVaRPE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by DS1PR04MB9096.namprd04.prod.outlook.com
- (2603:10b6:8:1df::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.20; Thu, 6 Aug
- 2026 08:04:00 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%4]) with mapi id 15.21.0292.018; Thu, 6 Aug 2026
- 08:04:00 +0000
-Date: Thu, 6 Aug 2026 17:03:53 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	dm-devel@lists.linux.dev, hch@lst.de, axboe@kernel.dk, brauner@kernel.org, 
-	djwong@kernel.org, viro@zeniv.linux.org.uk, Keith Busch <kbusch@kernel.org>, 
-	stable@vger.kernel.org, Hannes Reinecke <hare@kernel.org>, 0wnerD1ed <l7z@0b1t.tech>
-Subject: Re: [PATCH RESEND 5/5] block: validate user space vectors during
- extraction
-Message-ID: <anQ-28nxOqBmQjxu@shinmob>
-References: <20260720201057.1862857-1-kbusch@meta.com>
- <20260720201057.1862857-6-kbusch@meta.com>
- <anMscoGkR5BYjSGy@shinmob>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <anMscoGkR5BYjSGy@shinmob>
-X-ClientProxiedBy: TYCP286CA0170.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:3c6::11) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08243EE1F2
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 08:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786004609; cv=none; b=NWe4yORDtwWlMRIRR1i3SltPRd1knxEWD1lUkdDZT1nIcroTeiINq7xKkX4sid519uXwLf+2d9l5WtVF/pobz+bejPXIKRJQQBzfRpeZ12QE/B4HyQXeLM0qeN43MNUkdT2Iw2auG9YNLFP3mAdMAgwC7NfTaZ2R//Uq4i5xUO4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786004609; c=relaxed/simple;
+	bh=UO+o/95epXEW/Av3Ob3eDNhBrn8sus0iRXBFpH2iPlA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=twaMFGtVjjpFhscqxO3Wf5PwIRCx3teBU/hadLcW4SOFAVS67VZZk3XEOtzQfK4zM+hvGcdDNTLVeenfhoteHMaPmVZ3IaWZdEC11XcljlWe1b7PnKgrBw28XE5RGe9+z0FV77xdASDWsWdA6Dej6AZ413sCjcnimezdXDLNH04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-6a196857c7aso2067204eaf.2
+        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 01:23:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786004607; x=1786609407;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=G5QgnN1c3jhVM8B0M3msjTGTt0Ije+vyz+04BR9YD9E=;
+        b=oosFDf2Mpu3m6mBdITq67XvCZFl+hK8yUiueaDINzDMz4fTWZ7c3SdmnMldgB8AMdN
+         fVfAYIiuZ94xULE1AWLkNh9ap6K0VWc4kiz64J21aoGWzYRbB4F7UW6nCwxddULJabsu
+         tFbANlKZh9H0UC2GfDuvRFK2Bj0e79LNhZiOf+MAnlPy8e9+vW+hxCnEE6SJHaJ0SGFl
+         5kKaa+lTnsY7Z1QLnm15ELMW8Ip02sSgwQmqOaP6mNidgTvElOyUCRZvrQtwVkCGR1cL
+         MwITU3ruQ26KK3YqQBDY9Oo9GHiqYRdFLBb1K3cnKMzhCTPofxlLVAcLuHWWThT//+tC
+         cHrg==
+X-Forwarded-Encrypted: i=1; AHgh+RoO+diNDj1snrwBl+PlEB0ImBg12/29kNduHCdB3cmUkU8NE3Iz43meph+zUSPpTVRzuO9K96PzvdSATQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ2YNMQAS1X4XN+t8D6z5w/8NSo4ErKxyZ03hceacNT5mQvF1P
+	e5dmbNMD9TC9jpXbiCsLWSm63D+ETNUgpixSnoohwOTPBy67IK3tPKdbR+H7jnpmp1cENZpHDeh
+	7N4PqrBQvPEHxNbMpvlNuNOk1mGBNehskOMZFMZrczN5uBDCq+a7ePvxsGjA=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|DS1PR04MB9096:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3f48aa6-8830-46c0-8e10-08def39145e6
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|23010399003|366016|376014|7416014|1800799024|6133799003|56012099006|11063799006|10067099003|4143699003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	P/N2HL9w28hfKbS799/iVv3npUMdWEnGC3w40uIwJTinsvWDxyCzK+7RhCvCIR+x8ehlsCSPvLl/d/Sadr+PwzeP8L8SMCTaLGg+GNixY55u51ccKWLluJZWQsudkxivSD6UVkUP2N2Nch5OQ6EwrOYatYODee9GZkGby4oalJwZ/NiRvcvkPgOX9xR6bs5LpnTR72VKShafH0pX3PoPzeLRtGAmVpwCf2JR6bJjBImQ8kqdS8DwlXqS22H5Nbl2mzBCrM+xKYItsE7EH/NrUy2MqoS8boLNqVnqYtfsMEInpuEb9KDmMPSrvWO1josQsaKhJnYVZb9dOP3Mfe8pW1dKTOQ2d+DkM5hFMKhh3+cV7ME+HIBjZPkknGpzpCVHYCs2/QRKRCzInXWIFqrhXBauP1jV/wgKzwKSrCL340vEvLBfZFzxR2MIl8yRj9A0pXpAZ58rwGDdx8g11enJIMA2yjPoW+h4/fj+dqXNdUioiUeqRd5YlwTmu+TeMjqgxu38en7GdJg/hOvFdpw40+pFD1JZWtGibfb4I5isWzyeWnTjazXO141vhze1pRHwF4k3mQla3NuSJbKtQk1IRihmh2n92JK0NAlANfDjzEeg/u9qoKtmChfGUzfxO3mssHJffJHS1/Cs2bhkCsn8ireKigTTYjey3xBXU+ZF00A=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(23010399003)(366016)(376014)(7416014)(1800799024)(6133799003)(56012099006)(11063799006)(10067099003)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HHU6ZI7vAUMuWWk5GMqZBM0Jw9CjjnDBJ1pVA9Hb0qpbvlu2xJOlvHnmQ+CL?=
- =?us-ascii?Q?NMl+LL72DV7XpMXS5TKq2d0Zf0SRf19C09da6wP/+XHjknyqvnislj86NeYY?=
- =?us-ascii?Q?c1biMSGyOtuM2wipa4ERBaCrHGTZ2ePl+iwYUMSSkt8DVV9pccN/OpJEWHrb?=
- =?us-ascii?Q?HcCd0IyVIj7OnkQ6lH00B85eznj4MjHiZqFQjTx0aAtwrqUZrEsylPnUaJej?=
- =?us-ascii?Q?hRxR8hpOug+Zdpdbngx1aeN9YLsug+2oSQ8OXZEQ7opHO7pXrlHQOi2WiWdf?=
- =?us-ascii?Q?pc9KXKOHHi7qtMw1dWTaP0viyRhjAubANx8XrO+uMI5axskzKFnRXnTZjcPr?=
- =?us-ascii?Q?rfp6+repVBYIBuRTFzGIg4H80JBoSaKSBz135yXfyatnGHZpJsfqICyI1xoB?=
- =?us-ascii?Q?cOvIceggmx7bvQ1gmMtGu6vjfgVA/AFVPPK8Xo/Pg8VceBWwQrjsK6D+92Ob?=
- =?us-ascii?Q?U01D0YQCYsNuPz7tGTbAnCR19rEkpSiqBIsBxNwnoxW2WWn0fnfMiQ5C8YQj?=
- =?us-ascii?Q?V0U4stxXhir+u15B9a7/STzbkiKgKKirXGO0puhEK24MaoLX2vonySPoK4wo?=
- =?us-ascii?Q?I6ajchebZjIIW9YktneVScycC+36CX0Be39d2+BueC6uEUwe2R2+q0ExGJaD?=
- =?us-ascii?Q?TiS2nFX8KLP76jFEEUwA8sYHvIwsa3Zfto68CPM1d6lU5XAJ1xXoE5PgBXKw?=
- =?us-ascii?Q?rG2PJNJvnVr/tkkRsXVb4FtnogeyqmYCZKha5UixaB4KQ+vUpxv3x+V1stzn?=
- =?us-ascii?Q?Dmb9fRv/uOQeT0GyMDUyypY/rAfdenfiYJkI8nbOe6qCStU45wxPHIgakS0H?=
- =?us-ascii?Q?Y2RsLJe649zqtvanBej0MNM+ULgjSJIyu9dwt+XG1cfx5GINoLqSjniGf1n8?=
- =?us-ascii?Q?k7QvnJ5y5w0irwlL4VO5ofBObyKG4zccXmoKvrChnuPL8naKfuINntLD4ggS?=
- =?us-ascii?Q?3AzxJc78HF8SmyPRYJSthbm9ETYpP9wS6Qj5bKuk0r+9JxU9f5Mvo3yIKlfh?=
- =?us-ascii?Q?6AnhDCT0gUQC+je9QW7s3FzIZSMb+9kN/PhB/tWewa9zNiuuXPi5H1LHSLOW?=
- =?us-ascii?Q?nhxBca/QXfX7AxXXWCzVudGgps3714nRU0feUaGp4k3Zprl+ofZ+9eyrr1Un?=
- =?us-ascii?Q?d4IEM+JH4CSsnM3KaQQM62thGqyXvX0GU+PDWndgc/0ZKh0XMt5JtHLV9EjH?=
- =?us-ascii?Q?x4bth+OFUuT1xRcGaAgphIZS/nlzQtvEO8gr0cJvXscSTGHp1gdyxF+ZRiUn?=
- =?us-ascii?Q?mgTwdUOgZtVNk2WHNMZHdXHstWY7QeKdpcYsL3OzLZIEhsS6j4Er8IewlvcR?=
- =?us-ascii?Q?RDYg2S1cQnvPouawWo4GIdAUt13lBmVGoE577VAAbAu1592UE2QTwT78cKqA?=
- =?us-ascii?Q?16IUbX2tA/wd+aKHTnI9onTgmuHihPbtHta93DXRp1KODNqtw3ahPYDy7YiC?=
- =?us-ascii?Q?5vYapnFvEqgziJEan4FK+hS5HykUlo/QlK4Azju+6EQpYJEM5UQ/F6RNdyzx?=
- =?us-ascii?Q?fUUn0fFFlmwykgUiOa0f1+T8HCHheel+sXvQjt4dq2dHM34fyOFHMixGX1og?=
- =?us-ascii?Q?HhUKcmAiaNZJB351eiUeWRNBIVQ7xEbFEdJNme4K2uiTjO9pMRaul8EEOkTy?=
- =?us-ascii?Q?bTft0jkoagIwgKxCzHCFbcYGlsmyChHmP4vbbvJLS77ds7zCs+55QT05BfnO?=
- =?us-ascii?Q?VgRDr8/jjJc0YA5xR2k7p6YDydBeKdZiaFBCmvlb8J/M4NYdkKnbDwh22m7z?=
- =?us-ascii?Q?fGKG5RgjyZHrDFndjrCf4eOt1+QiWMw=3D?=
-X-Exchange-RoutingPolicyChecked:
-	O7ZAzqV6Jq3106eNKe5mGTAUv1ou+/kp3hSdQiMjPnWi3Q17eJkH314iV9Bg3PnmXbvxs5TspaaiKBlH+JQX3gJnwpj9LJvIzecexm0CS93+zueOYC51uoByLG3aw/8TPtBV8VLHg+UERcolBhWK6a3joUgiEP1dC8a4Rn4uLUXrI3RRa0kUYJ4iAnxp5bxoIBIw6j2JAJUMnweWhxWKdopl4VSziQnZtEQLwrUmvtuAULz1My/NbcO35NmfiMHvrkBRPlqprhoGT8Gu2QlRykbx7zcgaLWKNiAsqpJW7YCiGgTT1NWQxB7BqaK1/OIl28RSoKPBJ3VIvfH6C7Nhiw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	lraHDGijr08mm6EXYiB1yFwWbhknxVqquarq9N3MnNgEolLxrusw97nzUSrdAK43IsDnVNbxFpQULyLqIdTPzOiCgun5BkTzTwiM4ORoFOVab6BOdzt2MlihpW3GdTv2XESYK1jL8416Dw3dvmTzf1fJF1+4EK5wockkGIdp/W4QIoPiXUHwoMn9ebyevnVvgj6F0+4aVkQJhi1qHKNGoOJbPbrUyrVhYLhmr+jaeSthfocZUwHQf2i5O4wOFYz9Fc66sRwdjjo6/bxpaqy2qMV4Dtt51swnrSlqN20zT7T0HmwszVPOBt4wJ+KYXQr3Qj6sPrz5jte5l6D3uTi+ZeryB+1RIpn8UzEPLVUX5VqB64zWM4a1QN7sNsCpy58g6E8b8j/1+WBfrJqr2HVO5QMcM3+pPNKCb487JlKzYPCvplIp0e2QRXIbyDGYwe2sdoxdEk1ke8YvXQ0Vcm1Tr3RZGjdJkxRMha0PUYqLn6hEda1Ac1HINCLLvzqWLj1q4Jq7cqZkrMgftu1iePFl2f9zyXbOoAeLVhinbBgE7UY+h9mKht/gAp+s54ikYwadkJ23Jv83mOntduw1xbzj+wBcwutUYIahstOK9B/SJdTaWk0GEnI5WLzsii/umusL
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3f48aa6-8830-46c0-8e10-08def39145e6
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2026 08:04:00.3948
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nwxZtXyW550yTRFwO390nnbtnp6yyp8q+basO1WOa6C0AV+p2FYJTflbQeJ9KmHwWdoBjw5eQn5MZk1IjcN9dgalfN5mo5OOlFbIq6RS/so=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS1PR04MB9096
+X-Received: by 2002:a05:6820:4b07:b0:6a3:7a25:c09b with SMTP id
+ 006d021491bc7-6ae96ef02c6mr7118674eaf.20.1786004606747; Thu, 06 Aug 2026
+ 01:23:26 -0700 (PDT)
+Date: Thu, 06 Aug 2026 01:23:26 -0700
+In-Reply-To: <69ea5ab9.a00a0220.17a17.0046.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a74447e.9c11d2ce.289b96.0098.GAE@google.com>
+Subject: Re: [syzbot] [block?] KASAN: slab-out-of-bounds Read in blk_mq_free_rqs
+From: syzbot <syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Aug 05, 2026 / 21:46, Shin'ichiro Kawasaki wrote:
-> Cc+: 0wnerD1ed
-> 
-> On Jul 20, 2026 / 13:10, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > The bio-based drivers don't necessarily check the alignment split, and
-> > stacking block drivers don't always handle a misalignment detected after
-> > submitting the bio. Validate user vectors against the device's
-> > dma_alignment as the bio is built from the iov_iter, rejecting
-> > misaligned early with -EINVAL.
-> 
-> Recently, the new test case block/045 was added to blkests through a GitHub PR
-> [1]. The test case passes with the Linux master branch tags v7.2-rcX. Today, I
-> found that it fails with block/for-next branch tip [2]. I bisected and found
-> that this patch triggers the failure.
-> 
-> 0wnerDied, Keith, may I ask your help to resolve the failure? I'm guessing
-> the test case needs to care device's dma alignment, but not so sure.
+syzbot has found a reproducer for the following issue on:
 
-I took a closer look. I modified the test case to respect the dma alignment [*],
-and now the test case passes. This approach looks working. Will post the change
-as a formal patch for review.
+HEAD commit:    0d8395707651 Merge tag 'soc-fixes-7.2-2' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13aa729e580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cde12eeb298bab70
+dashboard link: https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16a58e49580000
 
-[*] fix trial patch for blktests
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com
 
-diff --git a/src/bio-full-trim.c b/src/bio-full-trim.c
-index e304b2c..7cea3f9 100644
---- a/src/bio-full-trim.c
-+++ b/src/bio-full-trim.c
-@@ -12,20 +12,38 @@
- #include <sys/mman.h>
- #include <unistd.h>
- 
-+int msb(unsigned int v)
-+{
-+	unsigned int b = 0;
-+
-+	while (v >>= 1)
-+		b++;
-+
-+	return b;
-+}
-+
- int main(int argc, char **argv)
- {
- 	unsigned int block_size;
- 	unsigned char *p;
- 	long page_size;
-+	unsigned int dma_alignment;
-+	unsigned int dma_aligned_offset;
- 	ssize_t ret;
- 	int fd;
- 
--	if (argc != 2)
-+	if (argc != 3)
- 		return EXIT_FAILURE;
-+
- 	page_size = sysconf(_SC_PAGESIZE);
- 	if (page_size <= 0)
- 		errx(EXIT_FAILURE, "invalid page size");
- 
-+	dma_alignment = atoi(argv[2]);
-+	dma_aligned_offset = 1 << (msb(dma_alignment) + 1);
-+	if (dma_aligned_offset >= page_size)
-+		err(EXIT_FAILURE, "unexpected dma_alignment");
-+
- 	fd = open(argv[1], O_RDONLY | O_DIRECT);
- 	if (fd < 0)
- 		err(EXIT_FAILURE, "open %s", argv[1]);
-@@ -40,7 +58,7 @@ int main(int argc, char **argv)
- 		err(EXIT_FAILURE, "mprotect");
- 
- 	errno = 0;
--	ret = pread(fd, p + page_size - 1, block_size, 0);
-+	ret = pread(fd, p + page_size - dma_aligned_offset, block_size, 0);
- 	if (ret == -1 && errno == EFAULT)
- 		return EXIT_SUCCESS;
- 	errx(EXIT_FAILURE, "pread returned %zd (errno %d)", ret, errno);
-diff --git a/tests/block/045 b/tests/block/045
-index 65bfcb9..6e112b6 100755
---- a/tests/block/045
-+++ b/tests/block/045
-@@ -25,7 +25,8 @@ test() {
- 		return 1
- 	fi
- 
--	if ! src/bio-full-trim /dev/nullb1; then
-+	if ! src/bio-full-trim /dev/nullb1 \
-+	     $(< /sys/block/nullb1/queue/dma_alignment); then
- 		echo "bio-full-trim helper failed"
- 	fi
- 
--- 
-2.55.0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffc11fd08a0
+R13: 00007ffc11fd08c0 R14: 0000000000000007 R15: 00007ffc11fd08e0
+ </TASK>
+block nbd7: shutting down sockets
+==================================================================
+BUG: KASAN: slab-out-of-bounds in blk_mq_free_rqs+0xde/0x680 block/blk-mq.c:-1
+Read of size 8 at addr ffff888026385588 by task syz-executor425/5940
 
+CPU: 0 UID: 0 PID: 5940 Comm: syz-executor425 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ blk_mq_free_rqs+0xde/0x680 block/blk-mq.c:-1
+ blk_mq_free_map_and_rqs+0x40/0xf0 block/blk-mq.c:4148
+ blk_mq_free_sched_tags block/blk-mq-sched.c:425 [inline]
+ blk_mq_free_sched_res+0xeb/0x280 block/blk-mq-sched.c:436
+ elevator_change_done+0x1d2/0x5c0 block/elevator.c:639
+ elevator_change+0x34f/0x480 block/elevator.c:685
+ elv_iosched_store+0x504/0x630 block/elevator.c:826
+ queue_attr_store+0x207/0x2b0 block/blk-sysfs.c:906
+ kernfs_fop_write_iter+0x3a5/0x540 fs/kernfs/file.c:345
+ new_sync_write fs/read_write.c:595 [inline]
+ vfs_write+0x61e/0xbb0 fs/read_write.c:687
+ ksys_write+0x156/0x270 fs/read_write.c:739
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f3427ac2437
+Code: 48 89 fa 4c 89 df e8 88 15 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007ffc11fd0710 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000555594bc4400 RCX: 00007f3427ac2437
+RDX: 0000000000000004 RSI: 00007f3427afdc5b RDI: 0000000000000007
+RBP: 0000000000000007 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 00007f3427afdc5b
+R13: 00007ffc11fd08c0 R14: 0000000000000007 R15: 00007ffc11fd08e0
+ </TASK>
+
+Allocated by task 1:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __do_kmalloc_node mm/slub.c:5334 [inline]
+ __kmalloc_node_noprof+0x584/0x7d0 mm/slub.c:5346
+ _kmalloc_array_node_noprof include/linux/slab.h:1294 [inline]
+ blk_mq_alloc_tag_set+0x533/0x1000 block/blk-mq.c:4894
+ nbd_dev_add+0x30e/0xb60 drivers/block/nbd.c:1970
+ nbd_init+0x15f/0x1e0 drivers/block/nbd.c:2729
+ do_one_initcall+0x250/0x870 init/main.c:1347
+ do_initcall_level+0x10a/0x1a0 init/main.c:1409
+ do_initcalls+0x59/0xa0 init/main.c:1425
+ kernel_init_freeable+0x29d/0x3e0 init/main.c:1658
+ kernel_init+0x1d/0x1d0 init/main.c:1548
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+The buggy address belongs to the object at ffff888026385580
+ which belongs to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes to the right of
+ allocated 8-byte region [ffff888026385580, ffff888026385588)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888026385f80 pfn:0x26385
+flags: 0x80000000000200(workingset|node=0|zone=1)
+page_type: f5(slab)
+raw: 0080000000000200 ffff88801a017500 ffffea0000972d90 ffffea0000a02cd0
+raw: ffff888026385f80 0000000800800075 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2c00(GFP_NOIO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 7259242334, free_ts 0
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f9/0x250 mm/page_alloc.c:1859
+ prep_new_page mm/page_alloc.c:1867 [inline]
+ get_page_from_freelist+0x262a/0x26a0 mm/page_alloc.c:3946
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5304
+ alloc_slab_page mm/slub.c:3266 [inline]
+ allocate_slab+0x79/0x5e0 mm/slub.c:3380
+ new_slab mm/slub.c:3426 [inline]
+ refill_objects+0x2d8/0x350 mm/slub.c:7310
+ refill_sheaf mm/slub.c:2804 [inline]
+ __pcs_replace_empty_main+0x330/0x690 mm/slub.c:4675
+ alloc_from_pcs mm/slub.c:4773 [inline]
+ slab_alloc_node mm/slub.c:4905 [inline]
+ __do_kmalloc_node mm/slub.c:5333 [inline]
+ __kmalloc_node_track_caller_noprof+0x62d/0x7c0 mm/slub.c:5471
+ __kmemdup_nul mm/util.c:64 [inline]
+ kstrdup+0x42/0x100 mm/util.c:84
+ kobject_set_name_vargs+0x61/0x110 lib/kobject.c:274
+ device_create_groups_vargs drivers/base/core.c:4450 [inline]
+ device_create+0x23d/0x300 drivers/base/core.c:4493
+ bdi_register_va+0x9c/0x7d0 mm/backing-dev.c:1099
+ bdi_register+0xe2/0x140 mm/backing-dev.c:1131
+ __add_disk+0x7da/0xe30 block/genhd.c:529
+ add_disk_fwnode+0x100/0x3a0 block/genhd.c:593
+ add_disk include/linux/blkdev.h:800 [inline]
+ nbd_dev_add+0x733/0xb60 drivers/block/nbd.c:2021
+ nbd_init+0x15f/0x1e0 drivers/block/nbd.c:2729
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff888026385480: fa fc fc fc 07 fc fc fc 05 fc fc fc 05 fc fc fc
+ ffff888026385500: 05 fc fc fc 00 fc fc fc fa fc fc fc 00 fc fc fc
+>ffff888026385580: 00 fc fc fc 07 fc fc fc 07 fc fc fc 07 fc fc fc
+                      ^
+ ffff888026385600: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
+ ffff888026385680: fa fc fc fc 02 fc fc fc 05 fc fc fc 00 fc fc fc
+==================================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
