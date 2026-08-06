@@ -1,30 +1,30 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7DF3DDAFD;
-	Thu,  6 Aug 2026 08:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D754E3DDDD1;
+	Thu,  6 Aug 2026 08:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786006298; cv=none; b=k171eYxwqq98wcdGdty7Ld9tTAfxC2uSM2IUxZTgcnY3TAuoe6tPsosnNrXgAS43193rDhRA60gvwUT+90acCbrEU+iVvkmKJa6lwl8rBeBjw6M6In1q+pE1VTNoac4O08mpIF7lMwUp/yS+zlHHru5HPpHlpA893kHy0nNQShM=
+	t=1786006300; cv=none; b=uTSpsNBiHbIkEBRJZtGSc3zS2QG+Jfb+JHu7ThkpYNSG/QGWpcbHEdnbe1Uufio6Um7hht+MSllqczfL7hxskK+WyDoQmJgz6xl0nfGXrT3GuOW1Ww9kR3y07onc1Z4s7zxjpNgwUFgRGoCLwAh7EVHFAODjX2XcG+Qp4iHn9ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786006298; c=relaxed/simple;
-	bh=OMVgJ4Xdw0JHvZYd1QbVV/IrRfTrplrOtOhOa58KW64=;
+	s=arc-20240116; t=1786006300; c=relaxed/simple;
+	bh=Im/Ms/iMEeJEid+fXr3LhiLKYI3NdybImUMBj7zpzG8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HwYxuJRXSaixYL6rZftqhHz6dMOYbbR2p0RW6EpXeIslvoIsdQXDp2erRHW9xv+vJpfoL1UZhLuzbXb7LYxkasQNOGy3oonVJ3Md2BH2961VKkfg2/5YO9IpwcJkgR5f1on7tQ+jpyKPX8Z9p4JMBFM9HqgNouwdvRibTJaTXtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=XHVQN7ak; arc=none smtp.client-ip=117.135.210.3
+	 MIME-Version; b=o+7g38Ba4ftkO7k4Dl86iATFjbIfhQxJHDlw/QkPnPA7xvVZMR3WiW0L6dh84p2pjwVJukvRDjplpFSm+oTfUFvfLut/rAG5qanJc7sqiDNaQbcYiih928cu791m8AfNSpnrrkn0ds1jMMngCs4VjjwDdyFSqQftngT1HitqqhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lRG4e1GF; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="XHVQN7ak"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lRG4e1GF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Mu
-	Pq1XQTtCjXHAH64tPDFXn9oXPOY+WqiHnIU4tJGtA=; b=XHVQN7akmiJ51P4zz5
-	+pa0UJoQvSDgndJKmODWlT7IzY+3lkq+VxrMDByf8XkcTtM+scjLpvU+f7LgkWHF
-	dHO2lj4+sajLUUtvf2UsBCWCYI26dSxMH+Ie8gNg5raZkvN2SKG8z0G78KA49jSB
-	J8jSdLfx3Mw+p0G3obm+eZQQY=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=WG
+	wqu3iaLyjczKS1gm1uSbNl8hnv5+61oZ8Rzt0KTtI=; b=lRG4e1GFlI2BwBUho8
+	KXOYh37qfSqZ8HnUDfi/AV/INfITz3mAByIA6gjUYJ0gpNaaC8jBOe8SMWl3JG6x
+	XmWA4/rwoyTNKi42cTWx1w/AkfaqLCypn5psQsyG62zPvS727V8Rc2WwC+7eQ+ak
+	PR5UIE6ViofC4PxXXnZfezi4k=
 Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wDXGqvjSnRqmYLmMA--.78S8;
-	Thu, 06 Aug 2026 16:50:56 +0800 (CST)
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wDXGqvjSnRqmYLmMA--.78S6;
+	Thu, 06 Aug 2026 16:50:53 +0800 (CST)
 From: Yang Xiuwei <yangxiuwei@kylinos.cn>
 To: Chris Mason <clm@fb.com>,
 	David Sterba <dsterba@suse.com>,
@@ -37,9 +37,9 @@ Cc: Mark Harmstone <maharmstone@fb.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v2 6/7] btrfs: don't stash uring encoded data across -EAGAIN
-Date: Thu,  6 Aug 2026 16:50:40 +0800
-Message-Id: <20260806085041.1410576-7-yangxiuwei@kylinos.cn>
+Subject: [PATCH v2 4/7] btrfs: use IO_URING_F_COMPAT for uring encoded iovec import
+Date: Thu,  6 Aug 2026 16:50:38 +0800
+Message-Id: <20260806085041.1410576-5-yangxiuwei@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
 References: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
@@ -50,90 +50,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXGqvjSnRqmYLmMA--.78S8
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJF1rZrW5ZryfKF47Jw43ZFb_yoW8KF4kpr
-	WYkF98trW5Arn7JF95JFs5GFWFg395ta17C3y3ArWxAryayFn8ta4S9w1rKr10kFy0yFyj
-	vF4aga98Cw1qyaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5xhLUUUUU=
+X-CM-TRANSID:_____wDXGqvjSnRqmYLmMA--.78S6
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tF4xKr1DCFy3tw1fZF13urg_yoW8Cr4Dpr
+	yYkr43JFWDArsFyrykAay09w18ursIkayDC34xAF1xJryYyryftr4xKas5KFy0yFWkA3WU
+	tryjvr90yw4qvw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j53ktUUUUU=
 Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwhCGF2p0SvB8xgAA3d
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwg2FFmp0Su18iQAA3Q
 
-Returning -EAGAIN while leaving btrfs_uring_encoded_data in the cmd PDU
-leaks if the request is cancelled or the ring exits before reissue.
-io_uring does not free driver PDU allocations on cleanup.
+The uring encoded paths select args32 from IO_URING_F_COMPAT, but then
+call import_iovec() for the iovec array. import_iovec() keys off
+in_compat_syscall(), which is false when first issued from SQPOLL or
+io-wq, so a compat ring can misread the iovec list as native layout.
 
-Write: io_queue_sqe() always issues with IO_URING_F_NONBLOCK first, so
-return -EAGAIN before allocating and free data on every exit.
-
-Read: free on nowait -EAGAIN too; only -EIOCBQUEUED keeps the
-allocation for btrfs_uring_read_finished().
+Pass the same IO_URING_F_COMPAT flag into __import_iovec() instead.
 
 Fixes: 34310c442e17 ("btrfs: add io_uring command for encoded reads (ENCODED_READ ioctl)")
 Fixes: e32dcdb0af9f ("btrfs: add io_uring interface for encoded writes")
 Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
 ---
- fs/btrfs/ioctl.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ fs/btrfs/ioctl.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index b576887469bb..995a84ca86b7 100644
+index 39bd9788e895..939c4a9d47b6 100644
 --- a/fs/btrfs/ioctl.c
 +++ b/fs/btrfs/ioctl.c
-@@ -4790,7 +4790,7 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
- 	ret = btrfs_encoded_read(&kiocb, &data->iter, &data->args, &cached_state,
- 				 &disk_bytenr, &disk_io_size);
- 	if (ret == -EAGAIN)
--		goto out_acct;
-+		goto out_free;
- 	if (ret < 0 && ret != -EIOCBQUEUED)
- 		goto out_free;
- 
-@@ -4832,8 +4832,10 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
- 		add_rchar(current, ret);
- 	inc_syscr(current);
- 
--	if (ret != -EIOCBQUEUED && ret != -EAGAIN)
-+	if (ret != -EIOCBQUEUED) {
- 		kfree(data);
-+		bc->data = NULL;
-+	}
- 
- 	return ret;
- }
-@@ -4862,6 +4864,11 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
- 		goto out_acct;
- 	}
- 
-+	if (issue_flags & IO_URING_F_NONBLOCK) {
-+		ret = -EAGAIN;
-+		goto out_acct;
-+	}
-+
- 	if (!data) {
- 		data = kzalloc_obj(*data, GFP_NOFS);
- 		if (!data) {
-@@ -4931,11 +4938,6 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
+@@ -4759,9 +4759,10 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
  		}
- 	}
  
--	if (issue_flags & IO_URING_F_NONBLOCK) {
--		ret = -EAGAIN;
--		goto out_acct;
--	}
--
- 	pos = data->args.offset;
- 	ret = rw_verify_area(WRITE, file, &pos, data->args.len);
- 	if (ret < 0)
-@@ -4961,8 +4963,8 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
- 		add_wchar(current, ret);
- 	inc_syscw(current);
+ 		data->iov = data->iovstack;
+-		ret = import_iovec(ITER_DEST, data->args.iov, data->args.iovcnt,
+-				   ARRAY_SIZE(data->iovstack), &data->iov,
+-				   &data->iter);
++		ret = __import_iovec(ITER_DEST, data->args.iov, data->args.iovcnt,
++				     ARRAY_SIZE(data->iovstack), &data->iov,
++				     &data->iter,
++				     !!(issue_flags & IO_URING_F_COMPAT));
+ 		if (ret < 0)
+ 			goto out_acct;
  
--	if (ret != -EAGAIN)
--		kfree(data);
-+	kfree(data);
-+	bc->data = NULL;
- 	return ret;
- }
+@@ -4914,9 +4915,10 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
+ 			goto out_acct;
+ 
+ 		data->iov = data->iovstack;
+-		ret = import_iovec(ITER_SOURCE, data->args.iov, data->args.iovcnt,
+-				   ARRAY_SIZE(data->iovstack), &data->iov,
+-				   &data->iter);
++		ret = __import_iovec(ITER_SOURCE, data->args.iov, data->args.iovcnt,
++				     ARRAY_SIZE(data->iovstack), &data->iov,
++				     &data->iter,
++				     !!(issue_flags & IO_URING_F_COMPAT));
+ 		if (ret < 0)
+ 			goto out_acct;
  
 -- 
 2.25.1
