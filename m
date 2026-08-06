@@ -1,30 +1,30 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851E8421228;
-	Thu,  6 Aug 2026 08:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD9F408617;
+	Thu,  6 Aug 2026 08:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786006291; cv=none; b=LAcDl+GuMEwXsxkon7GPDCtmvaVoSALIQVULhRZdT4RaTCM7vblVWnIwgM8eNDGDO6dUz7TtPGGvYP/Di19lltuk7TMhL0bn2/mBneAzz7H4+fy3O9kbeY2IKnPQNaw+zSM04oza2QF0h37ZlLhg/kNaWQHMLRXw/6QHBSB0c30=
+	t=1786006293; cv=none; b=WDJoL8N/pOkDogBT3JpI9QV7bi+M/dFRmRbyEaGCH+flJaatJWcQna5jHSIy1f0Qv3zUtFGjJ2JIsPSVDxLeA8LV/QtOwJDRTjNg6rFQAZsZ83sq+azeToVRhF9EnTv1NTLHcyPXv1ZtpB/RqFtHXu3xs90mecRbiCaKyYqJxo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786006291; c=relaxed/simple;
-	bh=UR6Q75kaIoRh0QC3MX6poxK17wa2d1T+dd6T+zwZwC8=;
+	s=arc-20240116; t=1786006293; c=relaxed/simple;
+	bh=e/79A/cwUa9HGzKCrjbpE6mBwRBap/v5khoTsadY6uI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pu2BB12own0ekzNV49hVeHKQxxw0IkAUsqBOTrrQlzAARocg2kL9bxijJN2woVV8sv+G89yYVx9w7i8MKXVbR4j2kh/JP93WlSUswIyMbEyk/XlTiX6Yw4/kgkYvIjQTlgjF4iM8midiQ/E9QKuiV+tZPgwhw09V5idAWNxW0Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HpoWAvVR; arc=none smtp.client-ip=117.135.210.3
+	 MIME-Version; b=SQVrvj/6sjqvCOjm0+yCnUU08ec+NybNG+OBxFL+gxM8BM/ou2c0yiLnEoqgKychRvheufiaMwKj85kNYGPDpAs3wr87vJZhdeFKIbk6qjuqir5Ns2kh/4SluceUdxwNisSv/aFDwv7sXOT8wmq0gDfMzYniZlTq6yuapxJ/px4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=gVYTAje8; arc=none smtp.client-ip=220.197.31.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HpoWAvVR"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="gVYTAje8"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ez
-	9HrIE9e6r7XA5Om/8+sgqbjIrbte6YDzvu6Y22ZFc=; b=HpoWAvVR0XXnuUzMNG
-	Ai0nzVtQ/D29s/CFAdKzoSzEM5WVtKLZE/ukEjpryCHXud8f7fxmS2LyZSgIfaiH
-	5XhQoOeMzoTq2f5v4bXYIVswLnrzXLjyNOLoPmqaaKTmZ3O+B4Lv6s7LWf36H0zK
-	QCDGeGQzKs2ynfSLldF4OzyCo=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Zn
+	XYmtN5R0nuWkD3C5jT0uJOcyku4gTWD8FpcntouqA=; b=gVYTAje8C4CpuOm4le
+	Pg+//FNFq9GZzs2Umy7y7hacY7rQi7b6sLjAuNJ6AEgNYJ7IKolTz8jjsQFiCfHe
+	3A8la6dCyTd5VFmNv3EfOu+klDfj0nSkzTpnVWxXv6kaNUa+xO/4GFwLppEmbg6o
+	z4IZ2B03le4MEy5XzqAnFu1xo=
 Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wDXGqvjSnRqmYLmMA--.78S3;
-	Thu, 06 Aug 2026 16:50:49 +0800 (CST)
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wDXGqvjSnRqmYLmMA--.78S9;
+	Thu, 06 Aug 2026 16:50:57 +0800 (CST)
 From: Yang Xiuwei <yangxiuwei@kylinos.cn>
 To: Chris Mason <clm@fb.com>,
 	David Sterba <dsterba@suse.com>,
@@ -36,12 +36,10 @@ Cc: Mark Harmstone <maharmstone@fb.com>,
 	io-uring@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>,
-	Yue Sun <samsun1006219@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 1/7] btrfs: always return -EIOCBQUEUED after btrfs_uring_read_extent_endio
-Date: Thu,  6 Aug 2026 16:50:35 +0800
-Message-Id: <20260806085041.1410576-2-yangxiuwei@kylinos.cn>
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH v2 7/7] btrfs: drop unused uring encoded IO REISSUE stash helpers
+Date: Thu,  6 Aug 2026 16:50:41 +0800
+Message-Id: <20260806085041.1410576-8-yangxiuwei@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
 References: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
@@ -52,57 +50,76 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXGqvjSnRqmYLmMA--.78S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4rCw13KF43JryDAw1xGrg_yoW8Ww4Dpr
-	1DCFy5Gw4DA34vvFWkKa1qgFyfJa1kJa9rXFZYk3y3A3W7tFnIvryIkFyYgr1qqr97CrWY
-	vrWY9ryDu3W7ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UK1v-UUUUU=
+X-CM-TRANSID:_____wDXGqvjSnRqmYLmMA--.78S9
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Zw4rKF47uFyDXw1rCrW5trb_yoW8ur4xpr
+	WYyFn8tFW5JrnrGFWkCws5CayFqws8tw4UArZ3uF4fJ347Arn3tFyF93WrCF92yFZ0yF1j
+	vF40qFy5Zw1qyaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5xhLUUUUU=
 Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6QmEFWp0SukrVgAA3x
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwRGGF2p0SvF5wQAA3c
 
-If all bios finish before btrfs_encoded_read_regular_fill_pages()
-returns, it calls btrfs_uring_read_extent_endio() and previously
-returned the I/O status.  A negative errno then made
-btrfs_uring_read_extent() unlock and free while
-btrfs_uring_read_finished() did the same again.
+After not keeping state across -EAGAIN, restoring bc->data on REISSUE is
+dead.  Remove it, stop using the cmd PDU on the write path, and fold the
+read -EAGAIN check into the existing error path.
 
-Return -EIOCBQUEUED so only the deferred path cleans up.
-
-Reported-by: Yue Sun <samsun1006219@gmail.com>
-Closes: https://lore.kernel.org/linux-btrfs/20260630091609.3414-1-samsun1006219@gmail.com/
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Fixes: 34310c442e17 ("btrfs: add io_uring command for encoded reads (ENCODED_READ ioctl)")
 Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
 ---
- fs/btrfs/inode.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ fs/btrfs/ioctl.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index b446c3014b24..8e3cee3845e6 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -9411,7 +9411,6 @@ int btrfs_encoded_read_regular_fill_pages(struct btrfs_inode *inode,
- 	struct completion sync_reads;
- 	unsigned long i = 0;
- 	struct btrfs_bio *bbio;
--	int ret;
+diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+index 995a84ca86b7..1065416bcb1d 100644
+--- a/fs/btrfs/ioctl.c
++++ b/fs/btrfs/ioctl.c
+@@ -4704,9 +4704,6 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
+ 	struct io_btrfs_cmd *bc = io_uring_cmd_to_pdu(cmd, struct io_btrfs_cmd);
+ 	struct btrfs_uring_encoded_data *data = NULL;
  
- 	/*
- 	 * Fast path for synchronous reads which completes in this call, io_uring
-@@ -9458,10 +9457,10 @@ int btrfs_encoded_read_regular_fill_pages(struct btrfs_inode *inode,
+-	if (cmd->flags & IORING_URING_CMD_REISSUE)
+-		data = bc->data;
+-
+ 	if (!capable(CAP_SYS_ADMIN)) {
+ 		ret = -EPERM;
+ 		goto out_acct;
+@@ -4789,8 +4786,6 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
  
- 	if (uring_ctx) {
- 		if (refcount_dec_and_test(&priv->pending_refs)) {
--			ret = blk_status_to_errno(READ_ONCE(priv->status));
--			btrfs_uring_read_extent_endio(uring_ctx, ret);
-+			int err = blk_status_to_errno(READ_ONCE(priv->status));
-+
-+			btrfs_uring_read_extent_endio(uring_ctx, err);
- 			kfree(priv);
--			return ret;
+ 	ret = btrfs_encoded_read(&kiocb, &data->iter, &data->args, &cached_state,
+ 				 &disk_bytenr, &disk_io_size);
+-	if (ret == -EAGAIN)
+-		goto out_free;
+ 	if (ret < 0 && ret != -EIOCBQUEUED)
+ 		goto out_free;
+ 
+@@ -4847,12 +4842,8 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 	void __user *sqe_addr;
+-	struct io_btrfs_cmd *bc = io_uring_cmd_to_pdu(cmd, struct io_btrfs_cmd);
+ 	struct btrfs_uring_encoded_data *data = NULL;
+ 
+-	if (cmd->flags & IORING_URING_CMD_REISSUE)
+-		data = bc->data;
+-
+ 	if (!capable(CAP_SYS_ADMIN)) {
+ 		ret = -EPERM;
+ 		goto out_acct;
+@@ -4876,8 +4867,6 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
+ 			goto out_acct;
  		}
  
- 		return -EIOCBQUEUED;
+-		bc->data = data;
+-
+ 		if (issue_flags & IO_URING_F_COMPAT) {
+ #if defined(CONFIG_64BIT) && defined(CONFIG_COMPAT)
+ 			struct btrfs_ioctl_encoded_io_args_32 args32;
+@@ -4964,7 +4953,6 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
+ 	inc_syscw(current);
+ 
+ 	kfree(data);
+-	bc->data = NULL;
+ 	return ret;
+ }
+ 
 -- 
 2.25.1
 
