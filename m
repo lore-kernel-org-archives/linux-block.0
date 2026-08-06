@@ -1,109 +1,83 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D754E3DDDD1;
-	Thu,  6 Aug 2026 08:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A063E4248A0;
+	Thu,  6 Aug 2026 09:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786006300; cv=none; b=uTSpsNBiHbIkEBRJZtGSc3zS2QG+Jfb+JHu7ThkpYNSG/QGWpcbHEdnbe1Uufio6Um7hht+MSllqczfL7hxskK+WyDoQmJgz6xl0nfGXrT3GuOW1Ww9kR3y07onc1Z4s7zxjpNgwUFgRGoCLwAh7EVHFAODjX2XcG+Qp4iHn9ng=
+	t=1786007295; cv=none; b=pG44HjFfQACB0KtzlJYfMaRpIGsSz/JS+9rCbxONIU4ja2T7Wol8VBKXQNtsHz8QC79gYv0tBLlB6YO8WgePPdA0hop+pygyv8KVQ50CFaIY2rGurnO5x+InQBhTwnK/Y/wVHyrMtgZgiEDEwIFnBkY0nMlWOBVKaTMXbhw0PXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786006300; c=relaxed/simple;
-	bh=Im/Ms/iMEeJEid+fXr3LhiLKYI3NdybImUMBj7zpzG8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o+7g38Ba4ftkO7k4Dl86iATFjbIfhQxJHDlw/QkPnPA7xvVZMR3WiW0L6dh84p2pjwVJukvRDjplpFSm+oTfUFvfLut/rAG5qanJc7sqiDNaQbcYiih928cu791m8AfNSpnrrkn0ds1jMMngCs4VjjwDdyFSqQftngT1HitqqhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lRG4e1GF; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1786007295; c=relaxed/simple;
+	bh=3bicg5ORZDq72OfBoeTcOeYRJc6o7mFDrz62Q7IALxA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CI2U+p8R74d4vWlOrJZMRuwCW8Y9mTT2BJYR7ooHnKP0gRii0a6WLfDvic8m1aA66SLl4l82d89L6u9AEI/ZOvUyP1FS7giOrrbpA54C/8XffffdjNlFrl49MhUNATQg04VbMX92ri5SmWIdO9tHpxLc9cvJDUbqseX023uUPbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBpzU+3H; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lRG4e1GF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=WG
-	wqu3iaLyjczKS1gm1uSbNl8hnv5+61oZ8Rzt0KTtI=; b=lRG4e1GFlI2BwBUho8
-	KXOYh37qfSqZ8HnUDfi/AV/INfITz3mAByIA6gjUYJ0gpNaaC8jBOe8SMWl3JG6x
-	XmWA4/rwoyTNKi42cTWx1w/AkfaqLCypn5psQsyG62zPvS727V8Rc2WwC+7eQ+ak
-	PR5UIE6ViofC4PxXXnZfezi4k=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wDXGqvjSnRqmYLmMA--.78S6;
-	Thu, 06 Aug 2026 16:50:53 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Mark Harmstone <maharmstone@fb.com>,
-	Qu Wenruo <quwenruo.btrfs@gmx.com>,
-	linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v2 4/7] btrfs: use IO_URING_F_COMPAT for uring encoded iovec import
-Date: Thu,  6 Aug 2026 16:50:38 +0800
-Message-Id: <20260806085041.1410576-5-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
-References: <20260806085041.1410576-1-yangxiuwei@kylinos.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBpzU+3H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87FFF1F000E9;
+	Thu,  6 Aug 2026 09:08:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786007294;
+	bh=c4YQ4eAwJRsD3hueQPNwT8y097gGy2FPUFHvT2YMrGQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=nBpzU+3HnAiAV9v6gVEL7FlftXr4KwbfEqTPr2E/7q4QCgdiR9nM9YaCU0bHMV/rT
+	 rtyhNqdg9KLtU1vYmvbkYlLhoR1APKVEZQcEKlOlrjL7lC70FSpZVwoevXV2vSBR0l
+	 F6/OfCgojtwcea62VNOUmaukYzpLddwV0Xp1yRAOvX1tU+Egsso894Y+uD1ygJQo5H
+	 dYHEpu8toipmJl9wTLPnvyUXAFI4W0N5UKdClOqEx7NR6sZDx8S34R8Iv+3XrsZMRq
+	 3aKkj38vq18A6Fs7lYzUHJ+ELfIlUsPG1whyt6mNpE3QwX2k2cKUk7zS5PU/tKkLow
+	 qHSEPCbGF+7UA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Adarsh Das <adarshdas950@gmail.com>, adarshdas950@gmail.com
+Cc: acourbot@nvidia.com, aliceryhl@google.com, axboe@kernel.dk,
+ bjorn3_gh@protonmail.com, boqun@kernel.org, dakr@kernel.org,
+ daniel.almeida@collabora.com, gary@garyguo.net,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lossin@kernel.org, ojeda@kernel.org, rust-for-linux@vger.kernel.org,
+ tamird@kernel.org, tmgross@umich.edu, work@onurozkan.dev
+Subject: Re: [PATCH v2] rust: block: set GenDisk
+ block_device_operations.owner to THIS_MODULE
+In-Reply-To: <20260806083655.23161-1-adarshdas950@gmail.com>
+References: <20260805192020.107601-1-adarshdas950@gmail.com>
+ <HxcdCGoRqPsQe1B2W6AuOT-Gsob7jMsUKVOjssQEAOVChpwJ7vPp1bwsGiQ9PzvRT-tq6HvhO98nEw64UY90NQ==@protonmail.internalid>
+ <20260806083655.23161-1-adarshdas950@gmail.com>
+Date: Thu, 06 Aug 2026 11:08:05 +0200
+Message-ID: <87bjbf4nwq.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXGqvjSnRqmYLmMA--.78S6
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tF4xKr1DCFy3tw1fZF13urg_yoW8Cr4Dpr
-	yYkr43JFWDArsFyrykAay09w18ursIkayDC34xAF1xJryYyryftr4xKas5KFy0yFWkA3WU
-	tryjvr90yw4qvw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j53ktUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwg2FFmp0Su18iQAA3Q
+Content-Type: text/plain
 
-The uring encoded paths select args32 from IO_URING_F_COMPAT, but then
-call import_iovec() for the iovec array. import_iovec() keys off
-in_compat_syscall(), which is false when first issued from SQPOLL or
-io-wq, so a compat ring can misread the iovec list as native layout.
+"Adarsh Das" <adarshdas950@gmail.com> writes:
 
-Pass the same IO_URING_F_COMPAT flag into __import_iovec() instead.
+> GenDiskBuilder left block_device_operations.owner NULL. Pass the driver's
+> ThisModule into GenDiskBuilder::build(), heap-allocate the operations
+> table, and keep it alive until the gendisk is released via free_disk.
+> Update rnull as the in-tree caller.
+>
+> v2:
+> - Free fops in free_disk instead of GenDisk::drop to fix use-after-free
+>   when the device stays open after removal. (Sashiko)
+> - Install the cleanup guard before fops allocation to avoid leaking gendisk
+>   on -ENOMEM. (Sashiko)
+> - Link to v1: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
+>
+> Signed-off-by: Adarsh Das <adarshdas950@gmail.com>
 
-Fixes: 34310c442e17 ("btrfs: add io_uring command for encoded reads (ENCODED_READ ioctl)")
-Fixes: e32dcdb0af9f ("btrfs: add io_uring interface for encoded writes")
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
- fs/btrfs/ioctl.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+The reason `owner` is not set is that we want to keep the vtable const.
+But with Alvins recent series [1], we should be able to set owner in
+const context.
 
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index 39bd9788e895..939c4a9d47b6 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -4759,9 +4759,10 @@ static int btrfs_uring_encoded_read(struct io_uring_cmd *cmd, unsigned int issue
- 		}
- 
- 		data->iov = data->iovstack;
--		ret = import_iovec(ITER_DEST, data->args.iov, data->args.iovcnt,
--				   ARRAY_SIZE(data->iovstack), &data->iov,
--				   &data->iter);
-+		ret = __import_iovec(ITER_DEST, data->args.iov, data->args.iovcnt,
-+				     ARRAY_SIZE(data->iovstack), &data->iov,
-+				     &data->iter,
-+				     !!(issue_flags & IO_URING_F_COMPAT));
- 		if (ret < 0)
- 			goto out_acct;
- 
-@@ -4914,9 +4915,10 @@ static int btrfs_uring_encoded_write(struct io_uring_cmd *cmd, unsigned int issu
- 			goto out_acct;
- 
- 		data->iov = data->iovstack;
--		ret = import_iovec(ITER_SOURCE, data->args.iov, data->args.iovcnt,
--				   ARRAY_SIZE(data->iovstack), &data->iov,
--				   &data->iter);
-+		ret = __import_iovec(ITER_SOURCE, data->args.iov, data->args.iovcnt,
-+				     ARRAY_SIZE(data->iovstack), &data->iov,
-+				     &data->iter,
-+				     !!(issue_flags & IO_URING_F_COMPAT));
- 		if (ret < 0)
- 			goto out_acct;
- 
--- 
-2.25.1
+Can you rebase on his series and see if you can make it work in const context?
+
+
+Best regards,
+Andreas Hindborg
+
+
+[1] https://lore.kernel.org/r/20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev
+
+
 
