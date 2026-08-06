@@ -1,106 +1,88 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56312BEFFD;
-	Thu,  6 Aug 2026 13:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA72C39022B
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 14:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786021762; cv=none; b=AOKYXxnnYEajEeYQTF0VR8IFhDaQI2LVfi2KXzs44GXFlRsqD/CGot99IoBkZ2O0AV/3uZYaPh/QzADAUwyeBiqVfHyDy3OqQ451gJiNEtEhRaD6g5mvZANGGN7NOB1wWdeOFP3juxyoGw3eoORs6WcmiV2BJw3KXwutx5a9/Lg=
+	t=1786025675; cv=none; b=TRNpI/6NVlH7WBpqKS/71LBWmzGb9u5yU5Tr4twUytTbcNdJB4Ya2zia/iPO2WPeNDKhX6NwpVpia78iyAxiXJoyZbW4LiOwRio7dgsPkkh4sqNEXLKLPixmVqew1rh8+De67H2UCH6EhdtRUkPd9qxNoTw0lMYLs2EKr4LX/64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786021762; c=relaxed/simple;
-	bh=1zD3/psbF7azCCj46B2fW7e/srSl8SY13vaYTiO76uk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gCQVs9vyjUGlCKsRDTRMQAfbVS3/+JwzFRf42W6etCThJHg+YdMvoi7L7M5gLTEUibrdQXEN9u+oBEywxlUTQGzjMNVBqom6yEXMYoF+LUKu0/IkFkns3fjZge0HI3hyba+gmYhAZme1PwVXuK7hdoaX+ZG7O7WLH3et9yGhq7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gN0ps6j/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1786025675; c=relaxed/simple;
+	bh=k89shtWZG3PmZqgVkzNtFWdlVRYC43lom7EmtnfML1s=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Fb2Mh3mba0T3zpY7xOAnHu5WHMRrkHy9mfldLkxFHtYKS6zdeUJKTFaEh45MIJgIgONT2E9trqBB82IErrW42R6LEjyOuiwszsjkBVQazyvHvAtjuEenn/ZPBlu4LwqBpzD0Jj/JYuJ3kh+QAM5ZomItotPsdqAHB3SyOD0N0Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Z/L0+Ofd; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gN0ps6j/"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 675Nlgkr993067;
-	Thu, 6 Aug 2026 13:09:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=rtGYn0
-	/u1VFGdi2N0WA5Ry7fGTrpuaZB/L5YrmAXZig=; b=gN0ps6j/+1XbQBNibBIhUP
-	DwWlGVfQgOhClDRLmXfXxxrWTB71wT1eVNaYIKI8dW9+6HKsiJVXQnnu/oFhubOH
-	gI1mTr46DOHVJhHZ5wc3vr5lJk9IVJBxq6RioeM7v2pFZPVLTB+rTwY66gOVSFUI
-	BzUHyKpkBP7VnJBznuHGamFCcrHycEVpXj6mMXlLdsf8zT0IMTv5Zw+u8qu8lHrM
-	zalXv8Kqm8aoKs5mCizZFWxo9GU8KtVUGxeaJq2Sgfy93+MeRX5Y4zlEjpM220em
-	GhkRCoub7oE0P+fEbOiKs0YwZwFzMef0J3hswYi1JnfPVj0vSAw2yAdyLHrUeRNw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs77gfu2s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Aug 2026 13:09:18 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 676CuL2Z022039;
-	Thu, 6 Aug 2026 13:09:18 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsvmhk5xc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Aug 2026 13:09:18 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 676D9EWk26608252
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Aug 2026 13:09:14 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E6ED12004B;
-	Thu,  6 Aug 2026 13:09:13 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ADC4020043;
-	Thu,  6 Aug 2026 13:09:13 +0000 (GMT)
-Received: from [9.111.83.204] (unknown [9.111.83.204])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  6 Aug 2026 13:09:13 +0000 (GMT)
-Message-ID: <6ecb4cb8-b138-4fa8-b8d2-32cc1224460e@linux.ibm.com>
-Date: Thu, 6 Aug 2026 15:09:13 +0200
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Z/L0+Ofd"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51bfa429aa6so6239561cf.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 07:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786025671; x=1786630471; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lz/ain/HwZmKc61xBLitsuffKEvoWYLNaeOuRF6K5Gs=;
+        b=Z/L0+Ofdnm9QnMlqDZ0lySSbbHvwpLVuFUrEwPeNjz9JhHSKC5fYMXX437HODQOp8S
+         UK2FTshxVXkFUWTCcUz88If7ikNi57FfdlLi6d3g1GiWEMdwslCQ2kSg+Uiy8t6wVJgH
+         +6+DL6PlcKuRFjEdopQlrhC4ctk9AgHNhe8bl64WTNuNX2bopg9DaWzhMSVFAwjgVetI
+         0dDvN1wtx6unXC/G28QFA7kSQ82SbdYUbVUpFJh80hS3U0So0xEH/56xQ4IDiDw2jjvW
+         n7DjH81h0PLnOfTSiU4AjrqWTwnKiO98EpKXt06yUi3/+WqVMxntGOJFg45Md/eULa/8
+         H+Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786025671; x=1786630471;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lz/ain/HwZmKc61xBLitsuffKEvoWYLNaeOuRF6K5Gs=;
+        b=SSPedc6n2uKWCbZbcsLskorAvDoY88P/dlalA3pIp5Fo1Gxeu7OULjhSHWFHhr4LC+
+         PGxklWZWrFCwlkO8Zw8x0sFdjAzrnv/355Wy+sorxGxCZrRWh6RAo2T8RrGFRWA12x6u
+         f/qa9K0dCGj8zhk6wWQeCXiUskD70WUcYi98hVnORDPRJ1/WNjcnQdmh/chuxLoNCAHf
+         uqn+/hdmTZ5xnMAP9kRvQt3eFQ84VtEjiOQ413qjWiecMyAQqfsywGPqKF+BmSdW0kEi
+         09ONrYqdCXOjgwS06p5KOU+Pgd0BGJuCxVTmfEYhiW97riNqIdGMc62jT8L3OrWMarOn
+         s89g==
+X-Forwarded-Encrypted: i=1; AHgh+RprV4UMOH/ZAfbnTqn76mkMj9tJyBTroDQ8jBpKw+C0h9ow8P/3B4mHfJZI1IcGjwk5Fz6GhEQddlffnw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIYQPuiczGzYDZ8Qn0cqINtjWBe4eRDnlXpSLHUeNRT610eBOv
+	97oq5xE5ZUvOl2QfMUrLynWW6N2O7MXjaSm3uuje0Qe76W/hvY3Ov/LFOPePJKhuhzX0DWh0BIN
+	N8IwvBbImDw==
+X-Gm-Gg: AR+sD11JqOjashA8Qki8NApck86lfKPk90AaN8MK7d/oEdPR68mu3S1s5drnpoJmg31
+	JwIEOVSAGTO+9Uvt0bfgBgYg/gVl/z0aUf5Upu/djh+vYZ/B2LaICJHqgqgESPxN/0qtvZScgEi
+	bVxFzBMXIbmoHw8qeEvNASI1mlwUm3Xz2hKpDXsZMmvZndbHkTOeqzSwUYS0q0M2v5q9DrUhyQP
+	+YsXLoZyMvpfmOZbPA0vRkHVUOgYzM7WME32Z/QpMwfG2t1B7QZa5zswbpmnpYsC0zKY01eOhYQ
+	XIG9hjZKv3LsvRxdNhFDT+asen4bAgPYsKiiQ4L1MAhaW76/Qdy5hBQeEKtvazVX6BVomd/8cz/
+	D2Q82fMQhD9Dhn/eOzfC2zrr4qsWisKkZdi2zM5n09m28O+tJDpDGstg/bVKP3Uxd3Z8kKamP5I
+	uJD94AdQ3cBKu8+ivfVAjRdc/dg0Gcl14kL3WIcfU9gULFzMoauVbeN3wdAwQIMt3PJSXA1CkaA
+	ydPvwsUF7tfNHH6v5NxaWIBwsIK/w6oAX3kAM54MRGvy8s=
+X-Received: by 2002:a05:622a:11c7:b0:51c:4f35:81b8 with SMTP id d75a77b69052e-52d0039fafcmr38878621cf.7.1786025670556;
+        Thu, 06 Aug 2026 07:14:30 -0700 (PDT)
+Received: from [127.0.0.1] ([2605:59ca:42bb:f910:6d9f:8dfb:ae1:441b])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52ce8972e90sm38317191cf.27.2026.08.06.07.14.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2026 07:14:29 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Stefan Haberland <sth@linux.ibm.com>, 
+ =?utf-8?q?Jan_H=C3=B6ppner?= <hoeppner@linux.ibm.com>, 
+ Heiko Carstens <hca@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20260806130050.2057443-1-hca@linux.ibm.com>
+References: <20260806130050.2057443-1-hca@linux.ibm.com>
+Subject: Re: [PATCH 0/2] s390/block: Enable CONTEXT_ANALYSIS
+Message-Id: <178602566921.2156166.6463069299091775817.b4-ty@b4>
+Date: Thu, 06 Aug 2026 08:14:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] s390/block: Enable CONTEXT_ANALYSIS
-To: Heiko Carstens <hca@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?Q?Jan_H=C3=B6ppner?= <hoeppner@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-block@vger.kernel.org
-References: <20260806130050.2057443-1-hca@linux.ibm.com>
-Content-Language: en-US
-From: Stefan Haberland <sth@linux.ibm.com>
-In-Reply-To: <20260806130050.2057443-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA2MDEwMSBTYWx0ZWRfX2Wi1xi/FRwAj
- jpdxX13flKZK7HHhDiEskND3BMwvQe8f576a5uzHbODYW/l/6U4VNrWm/lNDusRewHgA1mEeueR
- vAondWb7f6gY3CeKYKSXqzcA2jPi766H3/PIAqMw/SqJgA5pGYHAECxjTNbFaw2hsdfV1K0r0Qn
- PJSpu5nq8FK1AK+iHw0aO+RzRbiY7sgudE13wdsO4NS06x0IFUSRUGko7QC7opbRYcSnKiThS9y
- MwWiaZFY99scPfGmpZU86zhZmoWx0TfijPSwkd8uCNBnuXcfm4yFkwm7SjJ2nYD6VzIMiwuHNhA
- IXfqMjhcOmFhFn99y0TGxDlphJTlBBAO6kmEtAuX6mWUCGzc2bz6GBZq1qO6JwiuxXK4v1xvOKC
- i2gvlvWHfqtaK25u1OKmVFQNg1YGp5B7dJAlX86LWImyDHJlI30rjhO1vNPcAuxz7B3dBzG4YeD
- hngjolSCSDs5CIYSEGA==
-X-Authority-Analysis: v=2.4 cv=WIFPmHsR c=1 sm=1 tr=0 ts=6a74877f cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
- a=gP54STInbiGPwzblvxgA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 475Ag63VRHTVO2d8YSKFqAcoMML_Tpjk
-X-Proofpoint-ORIG-GUID: 475Ag63VRHTVO2d8YSKFqAcoMML_Tpjk
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA2MDEwMSBTYWx0ZWRfX/sKs+3B5ccVN
- RI+LNEE2aqhcKBI7vlrc94MM7eyMOm6a8htQ7++fx6yUB86GLL8Zz/TPdV3isctnH3K/Wg07lFW
- 9N70nTZ//Ea+dnXgWHk83RHB8+xhJxc=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-05_06,2026-08-05_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- suspectscore=0 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608060101
+X-Mailer: b4 0.15.2
 
-Am 06.08.26 um 15:00 schrieb Heiko Carstens:
+
+On Thu, 06 Aug 2026 15:00:48 +0200, Heiko Carstens wrote:
 > Enable CONTEXT_ANALYSYS for drivers/s390/block.
 > 
 > Static code checking for acquiring and releasing locks used to be done
@@ -108,32 +90,18 @@ Am 06.08.26 um 15:00 schrieb Heiko Carstens:
 > approach [2]. The new approach requires that each subsystem needs to be
 > explicitly enabled for checking.
 > 
-> Do that for drivers/s390/block. In order to avoid false positives due to
-> conditional locking, disable context analysis for specific functions of
-> the dasd driver.
-> 
-> Disabling context analysis for specific functions keeps analysis enabled
-> for the rest of a file.
-> 
-> Jens, if you and Stefan agree to the dasd patches, I think it would be
-> best if this would be routed via your tree.
-> 
-> Thanks,
-> Heiko
-> 
+> [...]
 
-Sounds good to me.
-Acked-by: Stefan Haberland <sth@linux.ibm.com>
+Applied, thanks!
 
-> [1] 5b63d0ae94cc ("compiler-context-analysis: Remove Sparse support")
-> [2] 3269701cb256 ("compiler-context-analysis: Add infrastructure for Context Analysis with Clang")
-> 
-> Heiko Carstens (2):
->   s390/dasd: Add __context_unsafe() attribute to various functions
->   s390/block: Enable CONTEXT_ANALYSIS
-> 
->  drivers/s390/block/Makefile    | 2 ++
->  drivers/s390/block/dasd_eckd.c | 7 +++++++
->  2 files changed, 9 insertions(+)
-> 
+[1/2] s390/dasd: Add __context_unsafe() attribute to various functions
+      commit: 11d4f5e69fe25bc76e27eca75b4ef6f7aae53214
+[2/2] s390/block: Enable CONTEXT_ANALYSIS
+      commit: 30df3ab3c92d0e7854c54df6ae66f4aa6eb5b3d2
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
