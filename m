@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04B499F03;
-	Thu,  6 Aug 2026 22:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5684A499F04;
+	Thu,  6 Aug 2026 22:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786054278; cv=none; b=LeiABot8FjHstqlswf82r7ZdzCCBhOLIOXxFFpH5eS6PDlPYmPXogbnabiKbxm/wVW199K96Pb62Px+YyI0v0C0aMDaXVIK89b9RMb5i3HxClNQC8PWSNFwPDqb/V+4LZtxtLz5Gz29Sh2wLX7G3brWQTr5M86jY4OHr1Mznl5M=
+	t=1786054278; cv=none; b=p4huW36YVKzIHZ4MQ5wv9BZir9OtEA/5YTk2IQ3FeJviIRNU9qNWfTEfV7SMnilm9L+oInPGOZ1U0w44/wYKQF7wsjaENpxc1gjklek4etTqTzMr2EjeyKaxMOThFRaZBPUH2e5KeNcbUEH608ct7sjt65Miy1G/OZj63JTi4go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786054278; c=relaxed/simple;
-	bh=hNAFkLhkHf+S4mcBt9/aY9A5BzWfXcPmGSRJl7/4BL8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r97FTQkwLZUQi3lstFv9+3/o/ABIk2bpEIavrTN/65sNzJOPooIhw2h4Zram99ESp1BBG4VGHbR9/LZswfxIEH7oWjfYR+LK3IEzKjUJhD3P5tsMhE+IXQwbazLAxFtpySEh1Bd+Gax3JtIuX4u7hrMzQBlKaX7DKXUXr9Pm3xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ca5Kmi3T; arc=none smtp.client-ip=100.103.45.18
+	bh=PaCvyeejmDewGRTU85xVmeascWSScxTIR/HR5uyXI+Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pbYrjoHtiy6NfRj2GstPOJ08s/qreg3OFFpW00D//DYoJ2PQbRfKYxuylBjE9cZaLNYVXDJ9O5gc8k8L/8fNbG5uXPu7JCblGOoeKafbcitcNDw4iAQQ/0d++QlzKuP7oWAP79XzgpMIAd/Is70dID6KQ4UVY/kUwKk1TSupbD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VhNgyyDz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ca5Kmi3T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2721F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VhNgyyDz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42BD1F00A3A;
 	Thu,  6 Aug 2026 22:11:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786054276;
-	bh=bkfyYt0nKyeTEUyq1ZBeSX2vfTy+B2vXRuyImjcb0Ys=;
-	h=From:To:Cc:Subject:Date;
-	b=ca5Kmi3ToCwGiK0ES26yioe2ZZdSHsut3ZzWxubTNg7D1FtnC+GMmd5x7OhzF7KD2
-	 2YWdBp6jHFa437dcbPVjZEcuxXMyOrjNp0u6r015ZgvsUevz3v6JxBYP9vbiiKfu6Q
-	 WrXb4OHUFoGbCyhoo/kUnbm4NipW/N5vHCmfaI736zjbsVE+6tyG1FgRW3skRd+tsm
-	 jDGNjYaa9mnfJxDLHnZNmVJTrJMQIjG//8la98pHYmIee4BWmd73JsFZG8BGnfwZvR
-	 9aPhJ4M457RiiNXJrHZXJJVSJ/rOO7vCpfKqbhdijyn2zzaSsdNHbvVwKobJgRVKl6
-	 Wvn3cHzZ3qJTg==
+	s=k20260515; t=1786054277;
+	bh=ALqdWlhOmobFYoiIgybtTERTMEIMR50Vcx9ZTHxD4mw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VhNgyyDzAnz16w2KjkGXFqJ4NevnTu0Hme24rsaD8WC6ilSlc7KfMrTNPwi1PAfRf
+	 +5J+DbDttRI1C/Wy10u4XJFBRaVjum5vHND1qr4OhfWsIJ5Dy7vRADyTYiPaFxXyJe
+	 hXo+slcmLXW4iLh/Jx7ahVIvtZ0OnbFcYjyITzt1d6Jc0/w5FIv7nCzUDtvbkgN7MD
+	 2IujzTQpT1++BOithsvZdn3HMd3/4eKN2xdpQeT70iMTwqfgCGt1BXK6rRtpB1vNvX
+	 +2g1tBY0QOaWU3K7uJd1d2wj60dcwPmVkyqu3WXyua5YYgZAxMW3W28OzOrZcQb4f5
+	 gP+6TCoz1LNNg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-block@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -39,10 +40,12 @@ Cc: linux-mm@kvack.org,
 	David Rientjes <rientjes@google.com>,
 	Roman Gushchin <roman.gushchin@linux.dev>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/3] Fix a deadlock in blk-crypto-fallback
-Date: Thu,  6 Aug 2026 15:10:28 -0700
-Message-ID: <20260806221031.79050-1-ebiggers@kernel.org>
+Subject: [PATCH 1/3] mm: make mempool_alloc_from_pool() return bool
+Date: Thu,  6 Aug 2026 15:10:29 -0700
+Message-ID: <20260806221031.79050-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260806221031.79050-1-ebiggers@kernel.org>
+References: <20260806221031.79050-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,27 +54,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes a deadlock in blk-crypto-fallback that could occur
-when a large WRITE bio was submitted to dm-inlinecrypt.
+mempool_alloc_from_pool() is intentionally all-or-nothing, so make it
+return a bool rather than the number of elements allocated.
 
-As a prerequisite, it makes mempool_alloc_bulk() support fallible
-allocations in the same way that mempool_alloc() does.
+Then make mempool_alloc_bulk() return right away if
+mempool_alloc_from_pool() succeeds, rather than jumping back to the
+retry_alloc label to allocate nothing and then returning.
 
-Please consider this series for the block tree for 7.3.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ mm/mempool.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Eric Biggers (3):
-  mm: make mempool_alloc_from_pool() return bool
-  mm: support fallible mempool_alloc_bulk()
-  blk-crypto-fallback: Fix deadlock when encrypting large bio in dm
-    layer
-
- block/blk-crypto-fallback.c | 72 +++++++++++++++++++++++++++++++++----
- include/linux/mempool.h     |  4 +--
- mm/mempool.c                | 50 +++++++++++++++++---------
- 3 files changed, 100 insertions(+), 26 deletions(-)
-
-
-base-commit: 0d839570765118029aa8bf4a95444c6a11aacf85
+diff --git a/mm/mempool.c b/mm/mempool.c
+index 473a029fa31f..d454bc9f39e9 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -409,7 +409,7 @@ int mempool_resize(struct mempool *pool, int new_min_nr)
+ }
+ EXPORT_SYMBOL(mempool_resize);
+ 
+-static unsigned int mempool_alloc_from_pool(struct mempool *pool, void **elems,
++static bool mempool_alloc_from_pool(struct mempool *pool, void **elems,
+ 		unsigned int count, unsigned int allocated,
+ 		gfp_t gfp_mask)
+ {
+@@ -432,7 +432,7 @@ static unsigned int mempool_alloc_from_pool(struct mempool *pool, void **elems,
+ 	 */
+ 	for (i = 0; i < count; i++)
+ 		kmemleak_update_trace(elems[i]);
+-	return allocated;
++	return true;
+ 
+ fail:
+ 	if (gfp_mask & __GFP_DIRECT_RECLAIM) {
+@@ -454,7 +454,7 @@ static unsigned int mempool_alloc_from_pool(struct mempool *pool, void **elems,
+ 		spin_unlock_irqrestore(&pool->lock, flags);
+ 	}
+ 
+-	return allocated;
++	return false;
+ }
+ 
+ /*
+@@ -519,8 +519,8 @@ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
+ 	return 0;
+ 
+ use_pool:
+-	allocated = mempool_alloc_from_pool(pool, elems, count, allocated,
+-			gfp_temp);
++	if (mempool_alloc_from_pool(pool, elems, count, allocated, gfp_temp))
++		return 0;
+ 	gfp_temp = gfp_mask;
+ 	goto repeat_alloc;
+ }
 -- 
 2.55.0
 
