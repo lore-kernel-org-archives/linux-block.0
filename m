@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315183B813D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E327A478865
 	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 16:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786032302; cv=none; b=VQ1B/ZZPT060QvuWm0juCvKthoFdJyQ5t8ym3iP47NeXdXKjkReoEy6Q3l/B2YG4HYJy72TszxMy0l31yYc220uTRQjk7SrbWfVtl7Kw+mGoCQENazOB9sWbEWvFat/MImtEHr3zFUg6D/pHmg2IKVTCtCLQlLfM4xXL7tWYnlc=
+	t=1786032303; cv=none; b=qeG77Gqupx2it/pgQ6kR/OTEUGuBuv/T9FmaDVYgVnV9Es0j6HO38GTzj/MxrvzGiED0GdfVPRdrxW9aO+qy/pdF6TqoQofZ8YkXD5p38i5ZOGEb75CxMZCrRLumzX0fhCdYuhQORTynNB+oD324CVlIiaxyVtdBXGaA81LNykQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786032302; c=relaxed/simple;
-	bh=quPUuF/eVO2SkaSJ6T0OG+vmWcCqrRXv5svh0NU6XTU=;
+	s=arc-20240116; t=1786032303; c=relaxed/simple;
+	bh=s//su08orCENwksiJxDZTePnuxQ2/DO7BM5wjVKtrUA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BdZgxubBwhdrOUt33dMRcLVzE2BtLZUA+PvO/BA1HF6fLQV34J5f+ChNNaqoz4nIJIp4yMFOoptaM4Xqn89Q4V5fWM6+kOh8tBmrPMl7eLed3wOWEV1/a8x6qvKeGTG7aINZ0M2ZVVM2XOrqKjDg4niqeRSBU3iU1uQ7IzYjtxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaT/Dkd/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=dWpu0NdeIVEEFpQsx56m9D+ZLJvgaXPGxLpGVoi5GUFYKeM1Edd2cLbuXBv0O7V4Zlhf/KbJDUDpo89yslYGslA2/mwKUj1k23tluAp0ztLXqXsths/TPwc8KH53rRX/2s8FyrV2emYvaVFAJktmWd0FQFyAl2S21RRcgR1n+Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBKT1Xag; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaT/Dkd/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A32451F00A3D;
-	Thu,  6 Aug 2026 16:05:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBKT1Xag"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F8E1F000E9;
+	Thu,  6 Aug 2026 16:05:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1786032301;
-	bh=Kr7nni49KafcHS+goFEt7zaSwspWmj8jBMzrlbt+lWI=;
+	bh=lZeBvuufVU0f+eo7q7cg37inMiPfeknwC9DeLMO4Odw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IaT/Dkd/bA9c8BNEH0q5Muqtzf7l+a1ZOGZZX51jCcCCO9erCTf7Du27prFma7JTu
-	 wjGmnGSXI6g/GUS6YN/+SD3EOAYPlSwVSKXjqGv66uwJE+YoChMs2JcTEqfDRAgltG
-	 1MkvV7oZWhTqACcV+tX1VyfZeOrV1Blpvh1BShutkeCqaDMg4dzWoyGHfVHgmuzh3y
-	 Tuz8d/IhSZv0GrLzipr5bF5R4v1xuugq74TBakFupP96JN8bIdff0uVKa2Xc51U8vP
-	 B3TdNjaFdBfSHBu8L3um4+vC5Ka8V1wZehr7jHFtxIXm12dO6f+6AMJhwgJo1r6kJ3
-	 3HDT95spQqq+A==
+	b=eBKT1XagJYvcQqwk/WYblftu5L0yajMDjow2NHIH4Q5HJdo3F6kjaBEL2e/aw9LD/
+	 kB3PY8W8+YFg5w/fvWUx8wZzEtN6pBjkiDQs5O2+0Cn6AQXaiSTmCpQcsvaOQX99Of
+	 mFgkg5Y4MS6QpofYekDt9Lg+0uuYM6IWPM+9kqas0YHgM7aI374U4egGn+pBslmGXZ
+	 60fX/MYUSSeYJ4PS5nFoVv1CiPlafgq9a9zNnLa4xPz2wCNxQMi+D5u9u8R9fEn0KB
+	 b81MT0c8zVluNVk3oopUjKyoAq2pN9ma9KL1eh02JyFWS5f981RbylgTjHBNFTfqIZ
+	 N+Fov18nxR1SA==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 05/13] block: refactor bdev_zone_is_seq()
-Date: Fri,  7 Aug 2026 01:04:37 +0900
-Message-ID: <20260806160445.848337-6-dlemoal@kernel.org>
+Subject: [PATCH v2 06/13] block: introduce disk_for_all_zone_wplugs()
+Date: Fri,  7 Aug 2026 01:04:38 +0900
+Message-ID: <20260806160445.848337-7-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260806160445.848337-1-dlemoal@kernel.org>
 References: <20260806160445.848337-1-dlemoal@kernel.org>
@@ -44,81 +44,126 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define the helper function disk_zone_is_seq() and use it to refactor
-bdev_zone_is_seq(). disk_zone_is_seq() is also used in
-blk_zone_wplug_handle_write().
+Introduce the helper function disk_for_all_zone_wplugs() to allow
+executing an actor function on all hashed zone write plugs. This helper
+is used to simplify the implementation of blk_zone_reset_all_bio_endio()
+and queue_zone_wplugs_show().
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c | 38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+ block/blk-zoned.c | 68 +++++++++++++++++++++++++----------------------
+ 1 file changed, 36 insertions(+), 32 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 50b98c394b50..c1090155d961 100644
+index c1090155d961..53c43a9413a1 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -261,6 +261,29 @@ static void disk_zone_set_cond(struct gendisk *disk, sector_t sector,
- 	rcu_read_unlock();
+@@ -662,6 +662,26 @@ static inline struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
+ 	return disk_get_hashed_zone_wplug(disk, sector);
  }
  
-+static inline u8 disk_zone_get_state(struct gendisk *disk, sector_t sector)
++static void disk_for_all_zone_wplugs(struct gendisk *disk,
++				     void (*actor)(struct blk_zone_wplug *,
++						   void *),
++				     void *data)
 +{
-+	unsigned int zno = disk_zone_no(disk, sector);
-+	u8 *zones_state, zs;
++	struct blk_zone_wplug *zwplug;
++	unsigned int i;
++
++	if (!disk->zone_wplugs_hash)
++		return;
 +
 +	rcu_read_lock();
-+	zones_state = rcu_dereference(disk->zones_state);
-+	if (likely(zones_state && zno < disk->nr_zones))
-+		zs = zones_state[zno];
-+	else
-+		zs = 0;
++	for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++) {
++		hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[i],
++					 node)
++			actor(zwplug, data);
++	}
 +	rcu_read_unlock();
-+
-+	return zs;
 +}
 +
-+static bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
-+{
-+	u8 zs = disk_zone_get_state(disk, sector);
-+
-+	return !blk_zstate_is_conv(zs);
-+}
-+
- /**
-  * bdev_zone_is_seq - check if a sector belongs to a sequential write zone
-  * @bdev:       block device to check
-@@ -270,21 +293,10 @@ static void disk_zone_set_cond(struct gendisk *disk, sector_t sector,
-  */
- bool bdev_zone_is_seq(struct block_device *bdev, sector_t sector)
+ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
  {
--	struct gendisk *disk = bdev->bd_disk;
--	unsigned int zno = disk_zone_no(disk, sector);
--	bool is_seq = false;
--	u8 *zones_state;
+ 	struct blk_zone_wplug *zwplug =
+@@ -1200,32 +1220,26 @@ static void blk_zone_reset_bio_endio(struct bio *bio)
+ 	}
+ }
+ 
++static void disk_zone_wplug_reset_wp(struct blk_zone_wplug *zwplug, void *data)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&zwplug->lock, flags);
++	disk_zone_wplug_set_wp_offset(zwplug->disk, zwplug, 0);
++	spin_unlock_irqrestore(&zwplug->lock, flags);
++}
++
+ static void blk_zone_reset_all_bio_endio(struct bio *bio)
+ {
+ 	struct gendisk *disk = bio->bi_bdev->bd_disk;
+-	sector_t capacity = get_capacity(disk);
+-	struct blk_zone_wplug *zwplug;
+-	unsigned long flags;
+ 	sector_t sector;
+-	unsigned int i;
+ 
+-	if (atomic_read(&disk->nr_zone_wplugs)) {
+-		/* Update the condition of all zone write plugs. */
+-		rcu_read_lock();
+-		for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++) {
+-			hlist_for_each_entry_rcu(zwplug,
+-						 &disk->zone_wplugs_hash[i],
+-						 node) {
+-				spin_lock_irqsave(&zwplug->lock, flags);
+-				disk_zone_wplug_set_wp_offset(disk, zwplug, 0);
+-				spin_unlock_irqrestore(&zwplug->lock, flags);
+-			}
+-		}
+-		rcu_read_unlock();
+-	}
++	/* Update the condition of all zone write plugs. */
++	if (atomic_read(&disk->nr_zone_wplugs))
++		disk_for_all_zone_wplugs(disk, disk_zone_wplug_reset_wp, NULL);
+ 
+ 	/* Update the cached zone conditions. */
+-	for (sector = 0; sector < capacity;
++	for (sector = 0; sector < get_capacity(disk);
+ 	     sector += bdev_zone_sectors(bio->bi_bdev))
+ 		disk_zone_set_cond(disk, sector, BLK_ZONE_COND_EMPTY);
+ 	clear_bit(GD_ZONE_APPEND_USED, &disk->state);
+@@ -2508,8 +2522,9 @@ EXPORT_SYMBOL_GPL(blk_zone_issue_zeroout);
+ 
+ #ifdef CONFIG_BLK_DEBUG_FS
+ static void queue_zone_wplug_show(struct blk_zone_wplug *zwplug,
+-				  struct seq_file *m)
++				  void *data)
+ {
++	struct seq_file *m = data;
+ 	unsigned int zwp_wp_offset, zwp_flags;
+ 	unsigned int zwp_zone_no, zwp_ref;
+ 	unsigned int zwp_bio_list_size;
+@@ -2534,19 +2549,8 @@ static void queue_zone_wplug_show(struct blk_zone_wplug *zwplug,
+ int queue_zone_wplugs_show(void *data, struct seq_file *m)
+ {
+ 	struct request_queue *q = data;
+-	struct gendisk *disk = q->disk;
+-	struct blk_zone_wplug *zwplug;
+-	unsigned int i;
 -
- 	if (!bdev_is_zoned(bdev))
- 		return false;
+-	if (!disk->zone_wplugs_hash)
+-		return 0;
  
 -	rcu_read_lock();
--	zones_state = rcu_dereference(disk->zones_state);
--	if (zones_state && zno < disk->nr_zones)
--		is_seq = !blk_zstate_is_conv(zones_state[zno]);
+-	for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++)
+-		hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[i],
+-					 node)
+-			queue_zone_wplug_show(zwplug, m);
 -	rcu_read_unlock();
--
--	return is_seq;
-+	return disk_zone_is_seq(bdev->bd_disk, sector);
++	disk_for_all_zone_wplugs(q->disk, queue_zone_wplug_show, m);
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(bdev_zone_is_seq);
- 
-@@ -1522,7 +1534,7 @@ static bool blk_zone_wplug_handle_write(struct bio *bio, unsigned int nr_segs)
- 	}
- 
- 	/* Conventional zones do not need write plugging. */
--	if (!bdev_zone_is_seq(bio->bi_bdev, sector)) {
-+	if (!disk_zone_is_seq(disk, sector)) {
- 		/* Zone append to conventional zones is not allowed. */
- 		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
- 			bio_io_error(bio);
 -- 
 2.55.0
 
