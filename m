@@ -1,65 +1,72 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC5A145A1F
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 02:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159F91A9FBA
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 03:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785984480; cv=none; b=H4iHvvCqlMh4BafdocqOADFXKU5Id7Yp1ZQKrLu48qWb1IBr0miMh2hvykeAxlNTxMsGT55H+b5V7bM/b0JnxcIrdU0Ao90sNqjUjfNNADTRxJ2ImnYVbrwLjU5IZgH/smz4+wrv+qa6zNSdu0oodAERUQGGAzxtgDCzGPGc4Js=
+	t=1785986210; cv=none; b=oT3bG4VVRDv+KdOZCDILCZKXOomBNotLJA0A5SGVPkm0xK8qmOSbKszNIQwDpZ95Za21ogBNFvHbQymlitLguWeqJ0dBG55zOzrxWV4pmUDgyZvIGs3pbDHMhMWmrY956WD2n/YP7QK8IytDx6xADsrCN/3NqKgQBMxq+dmCtUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785984480; c=relaxed/simple;
-	bh=zMUneItkQT4ap6NHXrIGS3NLD2eqq50u/DIsyQnmPsM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fn4WtGzgtFvLDL+HFgVqW6aSJTCFa1esfbu5Ef4RavJcSWDegxCk413QhkDWqUqa3kHm5F1acydpdRdvVmQUePHVek6gpZ3z7ZjsRHOhber23SzXRDTlTVEi9ANyyGGD2AcZR87SKvxv32HEHfkb8u1e09E23SEvo5ot5egjH6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 3684f8cc914111f1aa26b74ffac11d73-20260806
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4f58fb76-ed6c-45e0-9ceb-17c53064162f,IP:10,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:5
-X-CID-INFO: VERSION:1.3.12,REQID:4f58fb76-ed6c-45e0-9ceb-17c53064162f,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:5
-X-CID-META: VersionHash:e7bac3a,CLOUDID:5c52547a3a1c626f87d5a788f3e6c566,BulkI
-	D:26080610475311K4PVD8,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
-	27|850|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
-	ulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR
-	:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 3684f8cc914111f1aa26b74ffac11d73-20260806
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 445037446; Thu, 06 Aug 2026 10:47:49 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Yao Sang <sangyao@kylinos.cn>
-Subject: [PATCH v2 4/4] block, nvme: use lower-level limit helpers for namespace heads
-Date: Thu,  6 Aug 2026 10:46:58 +0800
-Message-Id: <20260806024658.4193386-5-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260806024658.4193386-1-sangyao@kylinos.cn>
-References: <20260806024658.4193386-1-sangyao@kylinos.cn>
+	s=arc-20240116; t=1785986210; c=relaxed/simple;
+	bh=RF7iVdvejG0KIkTleZoHOTi63b55T799Z7z64kHVEXE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M+mp1vB2stCUsmRoMicGvWsgrYkcrmh01k+fQUe47vN+7eXA5cAqHR/9BGLMUiUAu8AEWEm4sEtlTQWWBb/iKWxSrwWPDvGLCUKgJTlphtX+GaHbWkzs0quVSX51xjp4jcNLMDLXABh9LnIdv/TSS35HrBHhjnLG74U1b1i36kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TO5MpKGs; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TO5MpKGs"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8487088510aso2282676b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 20:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1785986207; x=1786591007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bQKutsuyXmC3mcIgGGyZh8v3K7WcGuLFo1jhwq9sGxU=;
+        b=TO5MpKGs187q5TfXt2fBUgtJnO9s6V3oSMqhC+nqFgK6Jbe3PJ44/Tyi+TNMOnQ4DE
+         nDtWCIEvyToDbGHRgNVSCzZ1bGafba+HRy1vuhdnzKPfHZac9/K2pL+DfQSPsnwe78dz
+         0eO+qUJ/wLel7YIjhyF3/P+Jb/jVNX/bayhDs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785986207; x=1786591007;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bQKutsuyXmC3mcIgGGyZh8v3K7WcGuLFo1jhwq9sGxU=;
+        b=Gplj9z3rX43s6ILFG0S7SpJKtAlxWSK7Xzm+ic2TB4Ja4GASnszPL+iN0oGCFSjUUf
+         fxcPHdwaRXaOSUBnJY5GGWuyy4vYHHFGxAnYCGXDI+/HPkD4bS/oE0fZVfYHmKZrw7pk
+         mTheezSIRwau9v8HhCdAu7ge5eq5JJqYN1bvRMY+1RZZ6HML4r1cHUPhUN3YzJcWptLM
+         Dp9wVPBLKcyr6XXPaZZ1F+r8r0RflOrZfd+Tq/XvS3xPBeyYnAAUbWNCDUeqnDJkd+Um
+         36K9L/P+3OQPT2Vo5i6l3evL6YUomp/viMDYMsdPGmj5YsNgjHRFPImEmbkEGXi1YEnu
+         1MBQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqIJ7XH9U3rBzrweiuuznUhMDqUlS0m3L1oFcbFeoU7SxopbGcZ2EzdQVTStZ9cVax8ZnMFf25JSE/1zw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvs3kR9zcAIahnV1r4IOT0KjNFAiURcPhlgA5npchKXhdqRE9Y
+	EGu4PR8hEyK93U/BbWkxti5uSHpKFlaMmVJgCOXpV8cHvJEqKtOnDl738/BPlJpp8R5LfnTgHpu
+	EBi8=
+X-Gm-Gg: AR+sD13Q6JYY1eqC29Vh2SLEieJ/jbSVWiATBOVXXWXmwpcceJdfWF9mBIGLwxVZT1M
+	b27ShxBdSeJTqkH9jcttJbUy4qnhwwaTlATLgfHt6po4tR26BS6ZAh9l5pSTjX3LPoqfnfu37v4
+	JPb6Aeg6VyJCkP10RlGw4phOGO3vycZMa17z0Z73CI+mfs0fDTR577X1tMLEk/ijsneuMUXSNyd
+	bA3+A+iSVZPnepjyCtjHtokXOXmBBLZbCS31IuCC2xo5FLcQgbd9aSYc7yH1anl3ESvto4PIp+b
+	14fqefQZycgwtgK+NQ4Unr1Edi5YsqQTuuT7mVo5p2huPmTkv7UGGXNQJsWbW11IPGiQcnfSHrR
+	HEEGqZVeWOhwtkcM+rxRqPNNWHHio9JhdrVlQfS9BWvQ101KT6npVmx4EaH33p0q/5opRtMOAnd
+	ZODq9TB82/HXPEyx3hFc490YtfRV/aOU+Ihd+M1ByCczxPVbOUyX3xswK4nsUYd1O1gxOJFanel
+	cGNPcAeoA1GjaZtMDnodp/7uP83+YW6Ev9Z/FB1iT9iy/zO4Qrs
+X-Received: by 2002:a05:6a00:94e7:b0:848:3f91:da82 with SMTP id d2e1a72fcca58-84f2e12c1fcmr13358442b3a.32.1785986207378;
+        Wed, 05 Aug 2026 20:16:47 -0700 (PDT)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:8002:2a47:a704:5a58])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84f45bc9facsm373901b3a.60.2026.08.05.20.16.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2026 20:16:46 -0700 (PDT)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Longlong Xia <xialonglong2025@163.com>,
+	Minchan Kim <minchan@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] zram: switch to unsigned long indexing
+Date: Thu,  6 Aug 2026 12:16:32 +0900
+Message-ID: <20260806031640.536615-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.55.0.629.g250fe7f194-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,250 +75,519 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-An NVMe namespace head and each path refer to the same namespace.
-queue_limits_stack_bdev() treats the path as a bottom-device range and
-applies all of blk_stack_limits(), including topology rules and start-based
-atomic write checks. These mapped-device rules should not be used when
-updating the namespace head.
+zram has always used "unsigned int" for (page) index calculations,
+which unnecessarily limited max zram disksize.
 
-Make blk_stack_path_limits() and the existing
-blk_stack_atomic_writes_limits() public when adding their first caller
-outside the block layer. Keep the existing names and parameter types.
+Switch to "unsigned long" and permit much larger zram devices.
 
-Refresh logical_block_size, physical_block_size, io_min, io_opt,
-discard_granularity, zone_write_granularity and the write stream limits
-from the namespace that was just scanned. Keep chunk_sectors conservative
-for non-zoned namespaces because NVME_QUIRK_STRIPE_SIZE can make it
-controller-specific, while zoned namespaces refresh the zone size directly.
-
-Use blk_stack_path_limits() for the all-path execution feature bits and
-hardware limits that must work for every path, and use
-blk_stack_atomic_writes_limits() with a zero start sector. Keep the
-non-path feature handling in NVMe: the namespace head needs only inherited
-features that can describe an NVMe path. Zoned is handled with the
-namespace layout, and RAID partial stripes are not an NVMe namespace-head
-property.
-
-Keep max_user_* from queue_limits_start_update(), rebuild the integrity
-profile with nvme_init_integrity(), and retain the existing write zeroes,
-discard and zone resource updates in NVMe.
-
-Signed-off-by: Yao Sang <sangyao@kylinos.cn>
+Suggested-by: Andrew Morton <akpm@linux-foundation.org>
+Co-developed-by: Longlong Xia <xialonglong2025@163.com>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- block/blk-settings.c     |  23 +++++++-
- drivers/nvme/host/core.c | 115 +++++++++++++++++++++++++++++----------
- include/linux/blkdev.h   |   4 ++
- 3 files changed, 109 insertions(+), 33 deletions(-)
+ drivers/block/zram/zram_drv.c | 137 +++++++++++++++++++---------------
+ 1 file changed, 77 insertions(+), 60 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 40cd3490f168..877834e88745 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -726,8 +726,14 @@ static bool blk_stack_atomic_writes_head(struct queue_limits *t,
- 	return true;
- }
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 56183c827e1b..6af977dbc6fd 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -56,7 +56,7 @@ static size_t huge_class_size;
  
--static void blk_stack_atomic_writes_limits(struct queue_limits *t,
--				struct queue_limits *b, sector_t start)
-+/**
-+ * blk_stack_atomic_writes_limits - stack atomic write limits
-+ * @t: the stacking driver limits (top device)
-+ * @b: the underlying queue limits (bottom device)
-+ * @start: first data sector within bottom device
-+ */
-+void blk_stack_atomic_writes_limits(struct queue_limits *t,
-+		struct queue_limits *b, sector_t start)
- {
- 	if (!(b->features & BLK_FEAT_ATOMIC_WRITES))
- 		goto unsupported;
-@@ -755,8 +761,18 @@ static void blk_stack_atomic_writes_limits(struct queue_limits *t,
- 	t->atomic_write_hw_unit_min = 0;
- 	t->atomic_write_hw_boundary = 0;
- }
-+EXPORT_SYMBOL_GPL(blk_stack_atomic_writes_limits);
+ static const struct block_device_operations zram_devops;
  
--static void blk_stack_path_limits(struct queue_limits *t,
-+/**
-+ * blk_stack_path_limits - update limits that must hold for every I/O path
-+ * @t: the queue limits to update
-+ * @b: the queue limits for an I/O path
-+ *
-+ * Clear BLK_FEAT_NOWAIT, BLK_FEAT_POLL and BLK_FEAT_PCI_P2PDMA when they
-+ * are not set in @b. Stack the sector, segment, integrity segment and DMA
-+ * alignment limits that every path must support.
-+ */
-+void blk_stack_path_limits(struct queue_limits *t,
- 		const struct queue_limits *b)
- {
- 	/*
-@@ -785,6 +801,7 @@ static void blk_stack_path_limits(struct queue_limits *t,
- 					   b->max_segment_size);
- 	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
- }
-+EXPORT_SYMBOL_GPL(blk_stack_path_limits);
+-static void slot_free(struct zram *zram, u32 index);
++static void slot_free(struct zram *zram, unsigned long index);
  
  /*
-  * Stack and check logical_block_size, physical_block_size, io_min, io_opt,
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index e3d27c0440db..181394380510 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -11,6 +11,7 @@
- #include <linux/compat.h>
- #include <linux/delay.h>
- #include <linux/errno.h>
-+#include <linux/gcd.h>
- #include <linux/hdreg.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-@@ -2520,12 +2521,89 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+  * entry locking rules:
+@@ -70,7 +70,7 @@ static void slot_free(struct zram *zram, u32 index);
+  * 4) Use TRY lock variant when in atomic context
+  *    - must check return value and handle locking failers
+  */
+-static __must_check bool slot_trylock(struct zram *zram, u32 index)
++static __must_check bool slot_trylock(struct zram *zram, unsigned long index)
+ {
+ 	unsigned long *lock = &zram->table[index].__lock;
+ 
+@@ -83,7 +83,7 @@ static __must_check bool slot_trylock(struct zram *zram, u32 index)
+ 	return false;
+ }
+ 
+-static void slot_lock(struct zram *zram, u32 index)
++static void slot_lock(struct zram *zram, unsigned long index)
+ {
+ 	unsigned long *lock = &zram->table[index].__lock;
+ 
+@@ -92,7 +92,7 @@ static void slot_lock(struct zram *zram, u32 index)
+ 	lock_acquired(&zram->table_lock_map, _RET_IP_);
+ }
+ 
+-static void slot_unlock(struct zram *zram, u32 index)
++static void slot_unlock(struct zram *zram, unsigned long index)
+ {
+ 	unsigned long *lock = &zram->table[index].__lock;
+ 
+@@ -110,55 +110,56 @@ static inline struct zram *dev_to_zram(struct device *dev)
+ 	return (struct zram *)dev_to_disk(dev)->private_data;
+ }
+ 
+-static unsigned long get_slot_handle(struct zram *zram, u32 index)
++static unsigned long get_slot_handle(struct zram *zram, unsigned long index)
+ {
+ 	return zram->table[index].handle;
+ }
+ 
+-static void set_slot_handle(struct zram *zram, u32 index, unsigned long handle)
++static void set_slot_handle(struct zram *zram, unsigned long index,
++			    unsigned long handle)
+ {
+ 	zram->table[index].handle = handle;
+ }
+ 
+-static bool test_slot_flag(struct zram *zram, u32 index,
++static bool test_slot_flag(struct zram *zram, unsigned long index,
+ 			   enum zram_pageflags flag)
+ {
+ 	return zram->table[index].attr.flags & BIT(flag);
+ }
+ 
+-static void set_slot_flag(struct zram *zram, u32 index,
++static void set_slot_flag(struct zram *zram, unsigned long index,
+ 			  enum zram_pageflags flag)
+ {
+ 	zram->table[index].attr.flags |= BIT(flag);
+ }
+ 
+-static void clear_slot_flag(struct zram *zram, u32 index,
++static void clear_slot_flag(struct zram *zram, unsigned long index,
+ 			    enum zram_pageflags flag)
+ {
+ 	zram->table[index].attr.flags &= ~BIT(flag);
+ }
+ 
+-static size_t get_slot_size(struct zram *zram, u32 index)
++static size_t get_slot_size(struct zram *zram, unsigned long index)
+ {
+ 	return zram->table[index].attr.flags & (BIT(ZRAM_FLAG_SHIFT) - 1);
+ }
+ 
+-static void set_slot_size(struct zram *zram, u32 index, size_t size)
++static void set_slot_size(struct zram *zram, unsigned long index, size_t size)
+ {
+ 	unsigned long flags = zram->table[index].attr.flags >> ZRAM_FLAG_SHIFT;
+ 
+ 	zram->table[index].attr.flags = (flags << ZRAM_FLAG_SHIFT) | size;
+ }
+ 
+-static inline bool slot_allocated(struct zram *zram, u32 index)
++static inline bool slot_allocated(struct zram *zram, unsigned long index)
+ {
+ 	return get_slot_size(zram, index) ||
+ 		test_slot_flag(zram, index, ZRAM_SAME) ||
+ 		test_slot_flag(zram, index, ZRAM_WB);
+ }
+ 
+-static inline void set_slot_comp_priority(struct zram *zram, u32 index,
+-					  u32 prio)
++static inline void set_slot_comp_priority(struct zram *zram,
++					  unsigned long index, u32 prio)
+ {
+ 	prio &= ZRAM_COMP_PRIORITY_MASK;
+ 	/*
+@@ -170,14 +171,14 @@ static inline void set_slot_comp_priority(struct zram *zram, u32 index,
+ 	zram->table[index].attr.flags |= (prio << ZRAM_COMP_PRIORITY_BIT1);
+ }
+ 
+-static inline u32 get_slot_comp_priority(struct zram *zram, u32 index)
++static inline u32 get_slot_comp_priority(struct zram *zram, unsigned long index)
+ {
+ 	u32 prio = zram->table[index].attr.flags >> ZRAM_COMP_PRIORITY_BIT1;
+ 
+ 	return prio & ZRAM_COMP_PRIORITY_MASK;
+ }
+ 
+-static void mark_slot_accessed(struct zram *zram, u32 index)
++static void mark_slot_accessed(struct zram *zram, unsigned long index)
+ {
+ 	clear_slot_flag(zram, index, ZRAM_IDLE);
+ 	clear_slot_flag(zram, index, ZRAM_PP_SLOT);
+@@ -284,7 +285,7 @@ static void release_pp_ctl(struct zram *zram, struct zram_pp_ctl *ctl)
+ }
+ 
+ static bool place_pp_slot(struct zram *zram, struct zram_pp_ctl *ctl,
+-			  u32 index)
++			  unsigned long index)
+ {
+ 	struct zram_pp_slot *pps;
+ 	u32 bid;
+@@ -418,7 +419,7 @@ static void mark_idle(struct zram *zram, ktime_t cutoff)
+ {
+ 	int is_idle = 1;
+ 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+-	int index;
++	unsigned long index;
+ 
+ 	for (index = 0; index < nr_pages; index++) {
+ 		/*
+@@ -485,8 +486,9 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+ #define INVALID_BDEV_BLOCK		(~0UL)
+ 
+ static int read_from_zspool_raw(struct zram *zram, struct page *page,
+-				u32 index);
+-static int read_from_zspool(struct zram *zram, struct page *page, u32 index);
++				unsigned long index);
++static int read_from_zspool(struct zram *zram, struct page *page,
++			    unsigned long index);
+ 
+ struct zram_wb_ctl {
+ 	/* idle list is accessed only by the writeback task, no concurency */
+@@ -522,7 +524,7 @@ struct zram_rb_req {
+ 		/* error status (sync read) */
+ 		int error;
+ 	};
+-	u32 index;
++	unsigned long index;
+ };
+ 
+ #define FOUR_K(x) ((x) * (1 << (PAGE_SHIFT - 12)))
+@@ -910,7 +912,7 @@ static void zram_account_writeback_submit(struct zram *zram)
+ 
+ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+ {
+-	u32 index = req->pps->index;
++	unsigned long index = req->pps->index;
+ 	int err;
+ 
+ 	err = blk_status_to_errno(req->bio.bi_status);
+@@ -1032,7 +1034,7 @@ static int zram_writeback_slots(struct zram *zram,
+ 	struct zram_wb_req *req = NULL;
+ 	struct zram_pp_slot *pps;
+ 	int ret = 0, err = 0;
+-	u32 index = 0;
++	unsigned long index = 0;
+ 
+ 	while ((pps = select_pp_slot(ctl))) {
+ 		if (zram->wb_limit_enable && !zram->bd_wb_limit) {
+@@ -1198,7 +1200,7 @@ static void scan_slots_for_writeback(struct zram *zram, u32 mode,
+ 				     unsigned long lo, unsigned long hi,
+ 				     struct zram_pp_ctl *ctl)
+ {
+-	u32 index = lo;
++	unsigned long index = lo;
+ 
+ 	while (index < hi) {
+ 		bool ok = true;
+@@ -1235,7 +1237,7 @@ static ssize_t writeback_store(struct device *dev,
+ 			       const char *buf, size_t len)
+ {
+ 	struct zram *zram = dev_to_zram(dev);
+-	u64 nr_pages = zram->disksize >> PAGE_SHIFT;
++	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+ 	unsigned long lo = 0, hi = nr_pages;
+ 	struct zram_pp_ctl *pp_ctl = NULL;
+ 	struct zram_wb_ctl *wb_ctl = NULL;
+@@ -1333,7 +1335,8 @@ static ssize_t writeback_store(struct device *dev,
  	return ret;
  }
  
--static void nvme_stack_zone_resources(struct queue_limits *t,
--				      const struct queue_limits *b)
-+static void nvme_apply_ns_head_identify_limits(struct queue_limits *lim,
-+		const struct queue_limits *ns_lim)
+-static int decompress_bdev_page(struct zram *zram, struct page *page, u32 index)
++static int decompress_bdev_page(struct zram *zram, struct page *page,
++				unsigned long index)
  {
--	t->max_open_zones = min_not_zero(t->max_open_zones, b->max_open_zones);
--	t->max_active_zones =
--		min_not_zero(t->max_active_zones, b->max_active_zones);
-+	/*
-+	 * The namespace scan sets these values from Identify data and limits
-+	 * calculated from it. Refresh them instead of combining them with values
-+	 * left from an earlier namespace scan.
-+	 */
-+	lim->features &= ~BLK_FEAT_ZONED;
-+	lim->features |= ns_lim->features & BLK_FEAT_ZONED;
-+	lim->logical_block_size = ns_lim->logical_block_size;
-+	lim->physical_block_size = ns_lim->physical_block_size;
-+	lim->io_min = ns_lim->io_min;
-+	lim->io_opt = ns_lim->io_opt;
-+	/* A non-zoned path may have a controller-specific stripe size. */
-+	if (ns_lim->features & BLK_FEAT_ZONED)
-+		lim->chunk_sectors = ns_lim->chunk_sectors;
-+	else if (ns_lim->chunk_sectors)
-+		lim->chunk_sectors = gcd(lim->chunk_sectors,
-+					 ns_lim->chunk_sectors);
-+	lim->alignment_offset = 0;
-+	lim->discard_alignment = 0;
-+	lim->flags &= ~BLK_FLAG_MISALIGNED;
-+	lim->discard_granularity = ns_lim->discard_granularity;
-+	lim->zone_write_granularity = ns_lim->zone_write_granularity;
-+	lim->max_write_streams = ns_lim->max_write_streams;
-+	lim->write_stream_granularity = ns_lim->write_stream_granularity;
-+}
-+
-+static void nvme_apply_ns_head_operation_limits(struct queue_limits *lim,
-+		const struct queue_limits *ns_lim)
-+{
-+	/* Keep the existing minimums for controller command limits. */
-+	lim->max_write_zeroes_sectors =
-+		min(lim->max_write_zeroes_sectors,
-+		    ns_lim->max_write_zeroes_sectors);
-+	lim->max_hw_wzeroes_unmap_sectors =
-+		min(lim->max_hw_wzeroes_unmap_sectors,
-+		    ns_lim->max_hw_wzeroes_unmap_sectors);
-+	lim->max_discard_segments =
-+		min_not_zero(lim->max_discard_segments,
-+			     ns_lim->max_discard_segments);
-+	if (ns_lim->discard_granularity)
-+		lim->max_hw_discard_sectors =
-+			min_not_zero(lim->max_hw_discard_sectors,
-+				     ns_lim->max_hw_discard_sectors);
-+	blk_stack_atomic_writes_limits(lim, ns_lim, 0);
-+}
-+
-+static void nvme_apply_ns_head_zone_limits(struct queue_limits *lim,
-+		const struct queue_limits *ns_lim)
-+{
-+	/*
-+	 * Zone geometry was set above. max_hw_zone_append_sectors must work
-+	 * for every path, while max_open_zones and max_active_zones are
-+	 * namespace resources.
-+	 */
-+	lim->max_hw_zone_append_sectors =
-+		min(lim->max_hw_zone_append_sectors,
-+		    ns_lim->max_hw_zone_append_sectors);
-+	lim->max_open_zones = min_not_zero(lim->max_open_zones,
-+					   ns_lim->max_open_zones);
-+	lim->max_active_zones =
-+		min_not_zero(lim->max_active_zones,
-+			     ns_lim->max_active_zones);
-+}
-+
-+static void nvme_apply_ns_head_limits(struct queue_limits *lim,
-+		const struct queue_limits *ns_lim)
-+{
-+	nvme_apply_ns_head_identify_limits(lim, ns_lim);
-+	/*
-+	 * Keep inherited non-path features that can describe an NVMe path.
-+	 * Zoned was handled as namespace layout above, and the RAID partial
-+	 * stripes flag is not an NVMe namespace-head property.
-+	 */
-+	lim->features |= ns_lim->features &
-+		(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA |
-+		 BLK_FEAT_ROTATIONAL | BLK_FEAT_STABLE_WRITES);
-+	blk_stack_path_limits(lim, ns_lim);
-+	nvme_apply_ns_head_operation_limits(lim, ns_lim);
-+	if (lim->features & BLK_FEAT_ZONED)
-+		nvme_apply_ns_head_zone_limits(lim, ns_lim);
+ 	struct zcomp_strm *zstrm;
+ 	unsigned int size;
+@@ -1375,7 +1378,7 @@ static void zram_deferred_decompress(struct work_struct *w)
+ 	struct zram_rb_req *req = container_of(w, struct zram_rb_req, work);
+ 	struct page *page = bio_first_page_all(req->bio);
+ 	struct zram *zram = req->zram;
+-	u32 index = req->index;
++	unsigned long index = req->index;
+ 	int ret;
+ 
+ 	ret = decompress_bdev_page(zram, page, index);
+@@ -1426,7 +1429,7 @@ static void zram_async_read_endio(struct bio *bio)
  }
  
- static int nvme_update_ns_head_limits(struct nvme_ns *ns,
-@@ -2539,35 +2617,12 @@ static int nvme_update_ns_head_limits(struct nvme_ns *ns,
- 
- 	lim = queue_limits_start_update(head_q);
- 	memflags = blk_mq_freeze_queue(head_q);
--	/*
--	 * queue_limits mixes values that are the hardware limitations
--	 * for bio splitting with what is the device configuration.
--	 *
--	 * For NVMe the device configuration can change after e.g. a
--	 * Format command, and we really want to pick up the new format
--	 * value here. But we must still stack the queue limits to the
--	 * least common denominator for multipathing to split the bios
--	 * properly.
--	 *
--	 * To work around this, we explicitly set the device
--	 * configuration to those that we just queried, but only stack
--	 * the splitting limits in to make sure we still obey possibly
--	 * lower limitations of other controllers.
--	 */
--	lim.logical_block_size = ns_lim->logical_block_size;
--	lim.physical_block_size = ns_lim->physical_block_size;
--	lim.io_min = ns_lim->io_min;
--	lim.io_opt = ns_lim->io_opt;
--	queue_limits_stack_bdev(&lim, ns->disk->part0, 0,
--				ns->head->disk->disk_name);
--	if (lim.features & BLK_FEAT_ZONED)
--		nvme_stack_zone_resources(&lim, ns_lim);
-+
-+	nvme_apply_ns_head_limits(&lim, ns_lim);
- 	if (unsupported)
- 		ns->head->disk->flags |= GENHD_FL_HIDDEN;
- 	else
- 		nvme_init_integrity(ns->head, &lim, info);
--	lim.max_write_streams = ns_lim->max_write_streams;
--	lim.write_stream_granularity = ns_lim->write_stream_granularity;
- 	ret = queue_limits_commit_update(head_q, &lim);
- 	if (ret)
- 		goto unfreeze_head_queue;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9213a5716f95..b89930f1f7a6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1153,6 +1153,10 @@ static inline void blk_queue_disable_write_zeroes(struct request_queue *q)
+ static int read_from_bdev_async(struct zram *zram, struct page *page,
+-				u32 index, unsigned long blk_idx,
++				unsigned long index, unsigned long blk_idx,
+ 				struct bio *parent)
+ {
+ 	struct zram_rb_req *req;
+@@ -1476,8 +1479,8 @@ static void zram_sync_read(struct work_struct *w)
+  * chained IO with parent IO in same context, it's a deadlock. To avoid that,
+  * use a worker thread context.
   */
- extern void blk_set_queue_depth(struct request_queue *q, unsigned int depth);
- extern void blk_set_stacking_limits(struct queue_limits *lim);
-+void blk_stack_path_limits(struct queue_limits *t,
-+		const struct queue_limits *b);
-+void blk_stack_atomic_writes_limits(struct queue_limits *t,
-+		struct queue_limits *b, sector_t start);
- extern int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			    sector_t offset);
- void queue_limits_stack_bdev(struct queue_limits *t, struct block_device *bdev,
+-static int read_from_bdev_sync(struct zram *zram, struct page *page, u32 index,
+-			       unsigned long blk_idx)
++static int read_from_bdev_sync(struct zram *zram, struct page *page,
++			       unsigned long index, unsigned long blk_idx)
+ {
+ 	struct zram_rb_req req;
+ 
+@@ -1496,8 +1499,9 @@ static int read_from_bdev_sync(struct zram *zram, struct page *page, u32 index,
+ 	return decompress_bdev_page(zram, page, index);
+ }
+ 
+-static int read_from_bdev(struct zram *zram, struct page *page, u32 index,
+-			  unsigned long blk_idx, struct bio *parent)
++static int read_from_bdev(struct zram *zram, struct page *page,
++			  unsigned long index, unsigned long blk_idx,
++			  struct bio *parent)
+ {
+ 	atomic64_inc(&zram->stats.bd_reads);
+ 	if (!parent) {
+@@ -1509,8 +1513,9 @@ static int read_from_bdev(struct zram *zram, struct page *page, u32 index,
+ }
+ #else
+ static inline void reset_bdev(struct zram *zram) {};
+-static int read_from_bdev(struct zram *zram, struct page *page, u32 index,
+-			  unsigned long blk_idx, struct bio *parent)
++static int read_from_bdev(struct zram *zram, struct page *page,
++			  unsigned long index, unsigned long blk_idx,
++			  struct bio *parent)
+ {
+ 	return -EIO;
+ }
+@@ -1538,7 +1543,8 @@ static ssize_t read_block_state(struct file *file, char __user *buf,
+ 				size_t count, loff_t *ppos)
+ {
+ 	char *kbuf;
+-	ssize_t index, written = 0;
++	unsigned long index;
++	ssize_t written = 0;
+ 	struct zram *zram = file->private_data;
+ 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+ 
+@@ -1560,7 +1566,7 @@ static ssize_t read_block_state(struct file *file, char __user *buf,
+ 			goto next;
+ 
+ 		copied = snprintf(kbuf + written, count,
+-			"%12zd %12u.%06d %c%c%c%c%c%c\n",
++			"%12lu %12u.%06d %c%c%c%c%c%c\n",
+ 			index, zram->table[index].attr.ac_time, 0,
+ 			test_slot_flag(zram, index, ZRAM_SAME) ? 's' : '.',
+ 			test_slot_flag(zram, index, ZRAM_WB) ? 'w' : '.',
+@@ -1967,8 +1973,8 @@ static ssize_t debug_stat_show(struct device *dev,
+ 
+ static void zram_meta_free(struct zram *zram, u64 disksize)
+ {
+-	size_t num_pages = disksize >> PAGE_SHIFT;
+-	size_t index;
++	unsigned long num_pages = disksize >> PAGE_SHIFT;
++	unsigned long index;
+ 
+ 	if (!zram->table)
+ 		return;
+@@ -1985,7 +1991,7 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
+ 
+ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ {
+-	size_t num_pages;
++	unsigned long num_pages;
+ 
+ 	num_pages = disksize >> PAGE_SHIFT;
+ 	zram->table = vzalloc(array_size(num_pages, sizeof(*zram->table)));
+@@ -2008,7 +2014,7 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ 	return true;
+ }
+ 
+-static void slot_free(struct zram *zram, u32 index)
++static void slot_free(struct zram *zram, unsigned long index)
+ {
+ 	unsigned long handle;
+ 
+@@ -2062,7 +2068,7 @@ static void slot_free(struct zram *zram, u32 index)
+ }
+ 
+ static int read_same_filled_page(struct zram *zram, struct page *page,
+-				 u32 index)
++				 unsigned long index)
+ {
+ 	void *mem;
+ 
+@@ -2073,7 +2079,7 @@ static int read_same_filled_page(struct zram *zram, struct page *page,
+ }
+ 
+ static int read_incompressible_page(struct zram *zram, struct page *page,
+-				    u32 index)
++				    unsigned long index)
+ {
+ 	unsigned long handle;
+ 	void *src, *dst;
+@@ -2088,7 +2094,8 @@ static int read_incompressible_page(struct zram *zram, struct page *page,
+ 	return 0;
+ }
+ 
+-static int read_compressed_page(struct zram *zram, struct page *page, u32 index)
++static int read_compressed_page(struct zram *zram, struct page *page,
++				unsigned long index)
+ {
+ 	struct zcomp_strm *zstrm;
+ 	unsigned long handle;
+@@ -2113,7 +2120,8 @@ static int read_compressed_page(struct zram *zram, struct page *page, u32 index)
+ }
+ 
+ #if defined CONFIG_ZRAM_WRITEBACK
+-static int read_from_zspool_raw(struct zram *zram, struct page *page, u32 index)
++static int read_from_zspool_raw(struct zram *zram, struct page *page,
++				unsigned long index)
+ {
+ 	struct zcomp_strm *zstrm;
+ 	unsigned long handle;
+@@ -2145,7 +2153,8 @@ static int read_from_zspool_raw(struct zram *zram, struct page *page, u32 index)
+  * Reads (decompresses if needed) a page from zspool (zsmalloc).
+  * Corresponding ZRAM slot should be locked.
+  */
+-static int read_from_zspool(struct zram *zram, struct page *page, u32 index)
++static int read_from_zspool(struct zram *zram, struct page *page,
++			    unsigned long index)
+ {
+ 	if (test_slot_flag(zram, index, ZRAM_SAME) ||
+ 	    !get_slot_handle(zram, index))
+@@ -2157,8 +2166,8 @@ static int read_from_zspool(struct zram *zram, struct page *page, u32 index)
+ 		return read_incompressible_page(zram, page, index);
+ }
+ 
+-static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+-			  struct bio *parent)
++static int zram_read_page(struct zram *zram, struct page *page,
++			  unsigned long index, struct bio *parent)
+ {
+ 	int ret;
+ 
+@@ -2180,7 +2189,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+ 
+ 	/* Should NEVER happen. Return bio error if it does. */
+ 	if (WARN_ON(ret < 0))
+-		pr_err("Decompression failed! err=%d, page=%u\n", ret, index);
++		pr_err("Decompression failed! err=%d, page=%lu\n", ret, index);
+ 
+ 	return ret;
+ }
+@@ -2190,7 +2199,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+  * always expects a full page for the output.
+  */
+ static int zram_bvec_read_partial(struct zram *zram, struct bio_vec *bvec,
+-				  u32 index, int offset)
++				  unsigned long index, int offset)
+ {
+ 	struct page *page = alloc_page(GFP_NOIO);
+ 	int ret;
+@@ -2205,7 +2214,7 @@ static int zram_bvec_read_partial(struct zram *zram, struct bio_vec *bvec,
+ }
+ 
+ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+-			  u32 index, int offset, struct bio *bio)
++			  unsigned long index, int offset, struct bio *bio)
+ {
+ 	if (is_partial_io(bvec))
+ 		return zram_bvec_read_partial(zram, bvec, index, offset);
+@@ -2213,7 +2222,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ }
+ 
+ static int write_same_filled_page(struct zram *zram, unsigned long fill,
+-				  u32 index)
++				  unsigned long index)
+ {
+ 	slot_lock(zram, index);
+ 	slot_free(zram, index);
+@@ -2228,7 +2237,7 @@ static int write_same_filled_page(struct zram *zram, unsigned long fill,
+ }
+ 
+ static int write_incompressible_page(struct zram *zram, struct page *page,
+-				     u32 index)
++				     unsigned long index)
+ {
+ 	unsigned long handle;
+ 	void *src;
+@@ -2268,7 +2277,8 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
+ 	return 0;
+ }
+ 
+-static int zram_write_page(struct zram *zram, struct page *page, u32 index)
++static int zram_write_page(struct zram *zram, struct page *page,
++			   unsigned long index)
+ {
+ 	int ret = 0;
+ 	unsigned long handle;
+@@ -2335,7 +2345,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+  * This is a partial IO. Read the full page before writing the changes.
+  */
+ static int zram_bvec_write_partial(struct zram *zram, struct bio_vec *bvec,
+-				   u32 index, int offset)
++				   unsigned long index, int offset)
+ {
+ 	struct page *page = alloc_page(GFP_NOIO);
+ 	int ret;
+@@ -2353,7 +2363,7 @@ static int zram_bvec_write_partial(struct zram *zram, struct bio_vec *bvec,
+ }
+ 
+ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+-			   u32 index, int offset)
++			   unsigned long index, int offset)
+ {
+ 	if (is_partial_io(bvec))
+ 		return zram_bvec_write_partial(zram, bvec, index, offset);
+@@ -2421,8 +2431,9 @@ static void scan_slots_for_recompress(struct zram *zram, u32 mode, u32 prio,
+  *
+  * Corresponding ZRAM slot should be locked.
+  */
+-static int recompress_slot(struct zram *zram, u32 index, struct page *page,
+-			   u64 *num_recomp_pages, u32 threshold, u32 prio)
++static int recompress_slot(struct zram *zram, unsigned long index,
++			   struct page *page, u64 *num_recomp_pages,
++			   u32 threshold, u32 prio)
+ {
+ 	struct zcomp_strm *zstrm = NULL;
+ 	unsigned long handle_old;
+@@ -2674,7 +2685,7 @@ static ssize_t recompress_store(struct device *dev,
+ static void zram_bio_discard(struct zram *zram, struct bio *bio)
+ {
+ 	size_t n = bio->bi_iter.bi_size;
+-	u32 index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++	unsigned long index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 	u32 offset = (bio->bi_iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
+ 			SECTOR_SHIFT;
+ 
+@@ -2715,7 +2726,7 @@ static void zram_bio_read(struct zram *zram, struct bio *bio)
+ 	struct bvec_iter iter = bio->bi_iter;
+ 
+ 	do {
+-		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++		unsigned long index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
+ 				SECTOR_SHIFT;
+ 		struct bio_vec bv = bio_iter_iovec(bio, iter);
+@@ -2746,7 +2757,7 @@ static void zram_bio_write(struct zram *zram, struct bio *bio)
+ 	struct bvec_iter iter = bio->bi_iter;
+ 
+ 	do {
+-		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++		unsigned long index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
+ 				SECTOR_SHIFT;
+ 		struct bio_vec bv = bio_iter_iovec(bio, iter);
+@@ -2860,6 +2871,7 @@ static void zram_reset_device(struct zram *zram)
+ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
+ 			      const char *buf, size_t len)
+ {
++	unsigned long num_pages;
+ 	u64 disksize;
+ 	struct zcomp *comp;
+ 	struct zram *zram = dev_to_zram(dev);
+@@ -2877,6 +2889,11 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
+ 	}
+ 
+ 	disksize = PAGE_ALIGN(disksize);
++	num_pages = disksize >> PAGE_SHIFT;
++	/* Slots are addressed by an unsigned long index */
++	if (!num_pages || ((u64)num_pages << PAGE_SHIFT) != disksize)
++		return -EINVAL;
++
+ 	if (!zram_meta_alloc(zram, disksize))
+ 		return -ENOMEM;
+ 
 -- 
-2.25.1
+2.55.0.629.g250fe7f194-goog
 
