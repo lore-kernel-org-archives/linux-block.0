@@ -1,48 +1,48 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF5B360EDC;
-	Thu,  6 Aug 2026 16:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91C037AA91;
+	Thu,  6 Aug 2026 16:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786034101; cv=none; b=FNVQBBKg+NXinfc4zvXV0xoffGKoPpA5lBgYAMsnRPI24mnUzxg6fqKr507HYMo3aMJBWzkTku9MdJlQv5bfx4MyVtkbWXMMA6tBxLPr4AqHPImBKP2XMTO0O6KLhpbzZoRpBz+g0oerM0b9t6ohE4Arx0jWfHlGAdgUMirSR2g=
+	t=1786034928; cv=none; b=rbZnqCkIsn1sixZAxQzxGRUTnQa2FcESz4nO1E2351XYWyWFmTGvudUDtv2j8byBy0zHgmXk5Jphe5CdOfut4AUmM4KFIhpEcV6ycrwYI1q690Zmxv10NLjEIDbynXahvzJxDq5m4W4iI8GO0vJ3SBOd6KHKaoJpujA6q3VCZRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786034101; c=relaxed/simple;
-	bh=+t6oBooyxxCt/WhMuEFsfbfpkDraEEFl8aTloOlr54w=;
+	s=arc-20240116; t=1786034928; c=relaxed/simple;
+	bh=lkWJDWE/13dDJ/o/Q9HThhV/306dHlcfcrii65xwv94=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=omcamjkh6Pzb1r3I8OybtaNFEcap8htC2ijnqtiISZjFRxQSECcaWDwXjiCUY6aB6Dnk72Me1+zLFB/V00d4vHmEbsiQc1rL8Q9byhxcvmrBCVegfnPp+DDCIs9oirpLKM8Jg6t3GUj0uWknQgTyM4ymZ6GtmT1NNOmvh1+Iojo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=LXIRQYc6; arc=none smtp.client-ip=199.89.1.16
+	 In-Reply-To:Content-Type; b=PbtREVtU6uKG9JkbKJFw9PWnkPlkMeNr9omIP0TXP6wpltU5xAB/9SlDKk+Sg6SWuDHqBCdSBtz5GXxt+LyjdVZ2Kq2mLUnLOY6lLxy+66t0o+kZYcLwch0sm6WhBaf2+FlgfMUWFCCkXrTa3aX6xvPJ0FOFkxy+XKPHs14sSjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=MS8TKdyt; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="LXIRQYc6"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="MS8TKdyt"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hGCYb6WdGzlfwHS;
-	Thu,  6 Aug 2026 16:34:59 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hGCsN5rfqz1XM6JY;
+	Thu,  6 Aug 2026 16:48:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1786034097; x=1788626098; bh=gRPkFtd381SkTyfYOt+73oBP
-	WQJRAc1GCQ7h5u4mo0A=; b=LXIRQYc6FjiG/iDiOeBv64l6bz1HuGYSllZScFO4
-	iMJVeWDLQnFW5eVWKhs1ZdOwX6PRP414OfKQo7svdRQXOLOuz+S4PWh8whdmAN1/
-	CWTXRB8LxAQS5gWB9y/oFXxJhZPtd5qV/muzzbe6NVHkLYNwGagcmVDKza1XaMp4
-	atR6lDHIV8NKTQUuGVNzgEBP1wcAcKHS7TST6g5SmpZ3eC60CsBBtkdLUKSQYNw3
-	Vs5QpbtOYZYEgLb3NenWB4T0g7U4Ql4g2qg12gAT3+4LrZuNB5RKKY7RM5MU2tib
-	5uBFj+jqj2CgtI98xlZzMhz7xg/YNGvMvdXJB4i0MJa/qg==
+	 s=mr01; t=1786034917; x=1788626918; bh=lkWJDWE/13dDJ/o/Q9HThhV/
+	306dHlcfcrii65xwv94=; b=MS8TKdyt4a+2u5zIGFGwsXfybqFmsZyzI6GeMzWb
+	RmOM+NjH/M6yujoZKTgo9Eo0pveWjgMtc572p0J+fZsCa4J6rAtWdBPFGPTJrHnz
+	e5b9pLlblw0k8/aKHRB2urdtK56SCLfLsA0KRYKm0XlnjGjw050Tm1aNa6WFpK45
+	Rq57033hmEI9drLKD72zkk6b0K4QwCGKN0pXrGqp51JfJRdf576ZNvF+3aTATT0D
+	uciDbFAmVdpjBf8/cSI1WRBScwNtCeCf5WbgrtYn/IZcOaQxZXn+KzufPRAWjfHi
+	fyZ0hcoow3xoRbN69cWdIdw6gB/8Tbjs0Kpm6hUviGiFAw==
 X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ubCPup1xK1WE; Thu,  6 Aug 2026 16:34:57 +0000 (UTC)
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Oo0JCsl_6_UP; Thu,  6 Aug 2026 16:48:37 +0000 (UTC)
 Received: from [100.119.48.131] (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hGCYX0GMfzlfvqS;
-	Thu,  6 Aug 2026 16:34:55 +0000 (UTC)
-Message-ID: <7b48d806-0453-429c-aa99-616ce4c5159e@acm.org>
-Date: Thu, 6 Aug 2026 09:34:55 -0700
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hGCsG4kF4z1XM31H;
+	Thu,  6 Aug 2026 16:48:34 +0000 (UTC)
+Message-ID: <91e60d3d-4143-452a-a391-ca17df01e650@acm.org>
+Date: Thu, 6 Aug 2026 09:48:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,31 +50,22 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] s390/block: Enable CONTEXT_ANALYSIS
-To: Heiko Carstens <hca@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
- Stefan Haberland <sth@linux.ibm.com>, =?UTF-8?Q?Jan_H=C3=B6ppner?=
- <hoeppner@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-block@vger.kernel.org
-References: <20260806130050.2057443-1-hca@linux.ibm.com>
- <20260806130050.2057443-3-hca@linux.ibm.com>
+Subject: Re: [PATCH 0/2] loop, nbd: drop partitions left behind by the
+ GD_NEED_PART_SCAN removal
+To: daan@amutable.com, Jens Axboe <axboe@kernel.dk>,
+ Christian Brauner <brauner@kernel.org>,
+ Daan De Meyer <daan.j.demeyer@gmail.com>, Josef Bacik <josef@toxicpanda.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ nbd@other.debian.org, stable@vger.kernel.org
+References: <20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260806130050.2057443-3-hca@linux.ibm.com>
+In-Reply-To: <20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/6/26 6:00 AM, Heiko Carstens wrote:
-> --- a/drivers/s390/block/Makefile
-> +++ b/drivers/s390/block/Makefile
-> @@ -3,6 +3,8 @@
->   # S/390 block devices
->   #
->   
-> +CONTEXT_ANALYSIS := y
-> +
->   dasd_eckd_mod-objs := dasd_eckd.o dasd_3990_erp.o dasd_alias.o
->   dasd_fba_mod-objs  := dasd_fba.o
->   dasd_diag_mod-objs := dasd_diag.o
+On 8/6/26 3:36 AM, Daan De Meyer via B4 Relay wrote:
+> These two patches fix the two remaining places that relied on the same
+> lazy cleanup, LOOP_CHANGE_FD and NBD_CLEAR_SOCK.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-
