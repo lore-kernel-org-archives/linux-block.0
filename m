@@ -1,88 +1,133 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0598C314D18
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 03:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC0E25A2DD
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 06:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785986582; cv=none; b=iRrSAVVHAOZK2WR1/iFgDHBOivN01b1ihQds41d1C4Q/ugz45PUs2j1Ee4nYKFxEY3GrvbWxoXBcacTVFYB0cIL23tV70huzCOhWZxxL49MWdmPNZI4Ppt5NRSBFS2xK35H/2BAsGDHoj96B6ZlbgVCmkmK4De4gjtME5YlEZnI=
+	t=1785996310; cv=none; b=U6KxDBOGOHNf176ByJ7j2pdBgKpNbQQkwemrsfL/biu7lsmw81oq01vv+SGeJcRO1sIcMOsxMDLFD19Y7Ssrusb800XTTWUMMq3bDNwJ/BHuWgd8w7ddLiYG2OIFvhM19ZXF/Dj20jaRctWVNXxbxVwocQTuIqDZ9SUN59M4NGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785986582; c=relaxed/simple;
-	bh=lONY8w2fmvTBw5LlswnRi5d1jrGIBDffmxXTe7DfvEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aJ/tKjoM6YiFRQiF7dzzF7yMypeMBb6p7D3PHG7YAAUk376hemqej6K8LAlA3nte1Vicy6ajyZPPUPV36hHoStdMVlUEhhEHZHXQBldNI/v8ijWeqhFQTbaKv7vnbP7IDDUMlFFDIoWsczONMK61mxDMzCo2QbcDbuAFixjaydo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MTjbk7an; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1785996310; c=relaxed/simple;
+	bh=D0jxbcB7of1MNyozyUI9VTXVdLrAuN1V+QQdQZmtCRg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JqMKpQU8kA6SXJPFWHVWDZ+qvbZUDEsJ1ksjydhxe8YJrpamG+hvLcL2x7/T66m4mCj+6rUu8ZF3IN7XLzUlnH8VvWOGXBlCP7qrnZXoKvzd7aGOVCBaeDpDUXaEznCtgHg5CeJ4/xttuR1A5UkQIwXG4zRkIXgoFpSt2c/Y6/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=l8+PXWaA; arc=none smtp.client-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MTjbk7an"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-84862b0d5aeso2077544b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2026 20:23:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1785986580; x=1786591380; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=LK229z3Oli/D7ny26DNtak6xHVe6My0e7uPt/sOAXlA=;
-        b=MTjbk7anTY/ZLQbF//CrU1L0DanXLrgOJIWh2ipSf2jBEn19M5+2Cv03VB/hUiV8H5
-         q7CJ/DGnPGo93IBLiEZzFOt1eYPjJzmLWvRaPk0Ih/iXaYeCVabMDS1P6EZpjOX6PHpC
-         pSj2cDtkcRV7AbOkYGe7DlOLhaYg1F0c5yews=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785986580; x=1786591380;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LK229z3Oli/D7ny26DNtak6xHVe6My0e7uPt/sOAXlA=;
-        b=DkHv7ljnyCRt+4BnnGA5dz2vfsbjrHQgVTtMzaEyi0AnfFTaSM2zkOcPs/I7lkx1sr
-         +S+UBlpyl0SQaHWXN+vArREtZBtSOtZ2fQppIIGJAARL/9qnO3xgJa+aZXzlFwNzV00H
-         L84EyCA9oqWm5uEe2U4HOD7WHcD0BZlFEAiPVqQTMYVyt06VZWC3K24ecc62lw4XAgua
-         QXtO+15ETPYB9+TQs+pzharr7JINB07W+uVGuYNbugH3BO/7fbK3xnmlgV/l3HBH6GBj
-         n6oxmrDwI4CC2bihS6G5RdLvmhXZ+nlE0bPrdt//vKyLaf0ZEOuy36WlI0FyS8qbWQIA
-         y2NQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqJEm8z6tizKat22/EG1yffKSV5+73RYIyI11Qa2KDBinfRXMhfvCvbAdQSQuN/qjB69Srt6ijJTvgIgQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA8nHUNh1RdeI6lHOSpTWbBx/MIeF67dJyaJTMHFZdUk1rNEdi
-	1TE52PadI9NdQok7b1PUtntJEfznEpTgdC5b+aBKZocKLN7ghe3iEWtmwNsjjSDjFw==
-X-Gm-Gg: AR+sD12X2c6QijAGkUVKEsQc1vh37ppbYzq9OjVP2piaqFe/SAPG80BD8dIW1lKjI3c
-	RaNQWnws6yfKih4CaK81PnzLJTzicwKxxvLUCnGekHjbAHVoB23SfU1uuJiXD1Ta42kitMCdvUT
-	lfaMghpr//YAkdfd38P6N1zI8vaYRFe3NfJI52WfmvpUAqme7SQMw8bODFhZdbFAMZpSDErRFPI
-	IY1ZhtPCl6QfJTuRJnbXF4AMj/9jn3lPv9jJFKwo2O2tGrlJ4ee/jh+b5wA+MHnAWWfY15SvV+S
-	X1dvU+xtfDA8WqaR+0/LLLawIT8NZ4+VKo4fPpzCx8DVtMERNRO13TP2tGIHQtNcn3BCKPAvIfB
-	cf3OY0mtfbTG79IGG3OS5biiyfFoduQd/nL5ZmnlAZcyrty+c3wiSogsRPIM3lLM+MCv0qrrgRK
-	fiPfb7ibZHB6Q+aEj/Jj7OlLnAz5s5x2C76ydsYfrT9QW/gYGIzkKfKc/brd28z4n2htJDu4yoj
-	ytGAbFNizGk1j8c9HXb9qPxClsj
-X-Received: by 2002:a05:6a00:2e19:b0:845:4928:8655 with SMTP id d2e1a72fcca58-84f2e0edaddmr10872408b3a.39.1785986580270;
-        Wed, 05 Aug 2026 20:23:00 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:8002:2a47:a704:5a58])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84f4538bb3bsm397524b3a.12.2026.08.05.20.22.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 20:22:59 -0700 (PDT)
-Date: Thu, 6 Aug 2026 12:22:55 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Longlong Xia <xialonglong2025@163.com>, Minchan Kim <minchan@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] zram: switch to unsigned long indexing
-Message-ID: <anP9rQB1EgHkLC4J@google.com>
-References: <20260806031640.536615-1-senozhatsky@chromium.org>
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="l8+PXWaA"
+Received: from LAPTOP-99KJFSET (unknown [36.153.54.46])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 48fb94a0f;
+	Thu, 6 Aug 2026 14:04:54 +0800 (GMT+08:00)
+From: Hongyan Xu <getshell@seu.edu.cn>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Hongyan Xu <getshell@seu.edu.cn>
+Subject: [PATCH] block: mtip32xx: synchronize ioctls with device removal
+Date: Thu,  6 Aug 2026 14:04:41 +0800
+Message-ID: <20260806060441.676-1-getshell@seu.edu.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260806031640.536615-1-senozhatsky@chromium.org>
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9fd5acabf603a1kunmc012de0c289298
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDSR1IVk5CSx5NHxkZTUtDTlYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlITVVKTkhVTk9VT01ZV1kWGg8SFR0UWUFZT0tIVUpLSEpPSE
+	xVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=l8+PXWaAUiRHoA5ZdtKAR3hZdkBb/JLXeCqfjZ1N6wQvSXqeCHqQksMDv6hkWclJ5ohGbW3W6TunsEPJUD6pqJngB+0uXvtvMHXkP146vAM57S4s5KfysYpmCeoV6t0siXRcRVe1e8otQCh5Y1eHTroNoNpWUc2RI1pM9ThvB/A=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=cK1qcdFqMaA9K2xKPBm4tZmn60ftPKT5i1PScX/IiSE=;
+	h=date:mime-version:subject:message-id:from;
 
-On (26/08/06 12:16), Sergey Senozhatsky wrote:
-> Date: Thu,  6 Aug 2026 12:16:32 +0900
-> From: Sergey Senozhatsky <senozhatsky@chromium.org>
-> To: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Longlong Xia <xialonglong2025@163.com>,  Minchan Kim
->  <minchan@kernel.org>, linux-block@vger.kernel.org,
->  linux-kernel@vger.kernel.org,  linux-mm@vger.kernel.org
+The ioctl handlers only test REMOVE_PENDING before entering
+mtip_hw_ioctl(). Removal can set that bit immediately afterwards and free
+dd->port in mtip_hw_exit() while an ioctl still dereferences it. An already
+open block device can reach the handlers while del_gendisk() is in
+progress.
 
-Ugh, linux-mm@vger.kernel.org is not a thing...  apparently it's
-linux-mm@kvack.org.
+Serialize both native and compat ioctls with removal. Set REMOVE_PENDING
+before taking the mutex so new callers fail after an in-flight ioctl has
+drained, and hold the mutex until the port has been torn down.
+
+Fixes: 88523a61558a ("block: Add driver for Micron RealSSD pcie flash cards")
+Signed-off-by: Hongyan Xu <getshell@seu.edu.cn>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 7 +++++++
+ drivers/block/mtip32xx/mtip32xx.h | 2 ++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index f214a616386c..113bdb868c46 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3048,6 +3048,8 @@ static int mtip_block_ioctl(struct block_device *dev,
+ 	if (!dd)
+ 		return -ENOTTY;
+ 
++	guard(mutex)(&dd->ioctl_mutex);
++
+ 	if (unlikely(test_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag)))
+ 		return -ENOTTY;
+ 
+@@ -3086,6 +3088,8 @@ static int mtip_block_compat_ioctl(struct block_device *dev,
+ 	if (!dd)
+ 		return -ENOTTY;
+ 
++	guard(mutex)(&dd->ioctl_mutex);
++
+ 	if (unlikely(test_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag)))
+ 		return -ENOTTY;
+ 
+@@ -3721,6 +3725,7 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 	dd = kzalloc_node(sizeof(struct driver_data), GFP_KERNEL, my_node);
+ 	if (!dd)
+ 		return -ENOMEM;
++	mutex_init(&dd->ioctl_mutex);
+ 
+ 	/* Attach the private data to this PCI device.  */
+ 	pci_set_drvdata(pdev, dd);
+@@ -3887,6 +3892,7 @@ static void mtip_pci_remove(struct pci_dev *pdev)
+ 	}
+ 
+ 	set_bit(MTIP_DDF_REMOVE_PENDING_BIT, &dd->dd_flag);
++	mutex_lock(&dd->ioctl_mutex);
+ 
+ 	if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
+ 		del_gendisk(dd->disk);
+@@ -3915,6 +3921,7 @@ static void mtip_pci_remove(struct pci_dev *pdev)
+ 
+ 	/* De-initialize the protocol layer. */
+ 	mtip_hw_exit(dd);
++	mutex_unlock(&dd->ioctl_mutex);
+ 
+ 	if (dd->isr_workq) {
+ 		destroy_workqueue(dd->isr_workq);
+diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
+index f7328f19ac5c..0963c07b5845 100644
+--- a/drivers/block/mtip32xx/mtip32xx.h
++++ b/drivers/block/mtip32xx/mtip32xx.h
+@@ -12,6 +12,7 @@
+ #define __MTIP32XX_H__
+ 
+ #include <linux/spinlock.h>
++#include <linux/mutex.h>
+ #include <linux/rwsem.h>
+ #include <linux/ata.h>
+ #include <linux/interrupt.h>
+@@ -432,6 +433,7 @@ struct driver_data {
+ 	struct request_queue *queue; /* Our request queue. */
+ 
+ 	struct blk_mq_tag_set tags; /* blk_mq tags */
++	struct mutex ioctl_mutex;
+ 
+ 	struct mtip_port *port; /* Pointer to the port data structure. */
+ 
+-- 
+2.50.1.windows.1
+
