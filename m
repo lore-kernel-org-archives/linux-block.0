@@ -1,49 +1,48 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4097B3AD522
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 18:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04B499F03;
+	Thu,  6 Aug 2026 22:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786041500; cv=none; b=XuNPp8vF259F2ijD1LoVFvOcpJv2SkpDFsshrr3v3o0zUqBlwZ0hTF6sT/1M/M+Ew421Ug0CUDoWPnPvPPrmX4Ny4KQXt5czmnj5qWdpVaeDQh1iYJ0YM0TMjHk6lhYJC9t0td6xyMOmePR7QLhyoIw0C3b+ztYUqI96mUrOXk0=
+	t=1786054278; cv=none; b=LeiABot8FjHstqlswf82r7ZdzCCBhOLIOXxFFpH5eS6PDlPYmPXogbnabiKbxm/wVW199K96Pb62Px+YyI0v0C0aMDaXVIK89b9RMb5i3HxClNQC8PWSNFwPDqb/V+4LZtxtLz5Gz29Sh2wLX7G3brWQTr5M86jY4OHr1Mznl5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786041500; c=relaxed/simple;
-	bh=3STlD0WPXYKSL4esrs0oWJNHpZYXmpUe5bZ411q890s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NEDHIaG5YhQCWEDJXZwyznQ2DSeB6GyhuUl9QHK1GKTHkYVXsT3nLABSQdphcJeyA+3VLY7EyQ8b3bk92Rj7JsCnukHVDPAe5DrEfsQo/LzchWi/+iNUYEK8HoPU9x18ZhOKZwVWsLiaNAqQLvyrxRXks1UrTIMkA5VhzUucXjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ATKLBYRo; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786054278; c=relaxed/simple;
+	bh=hNAFkLhkHf+S4mcBt9/aY9A5BzWfXcPmGSRJl7/4BL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r97FTQkwLZUQi3lstFv9+3/o/ABIk2bpEIavrTN/65sNzJOPooIhw2h4Zram99ESp1BBG4VGHbR9/LZswfxIEH7oWjfYR+LK3IEzKjUJhD3P5tsMhE+IXQwbazLAxFtpySEh1Bd+Gax3JtIuX4u7hrMzQBlKaX7DKXUXr9Pm3xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ca5Kmi3T; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ATKLBYRo"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786041491;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NzWVKAlXgbLri8mDj6PSzWVwpKabqcrOs8M8q+EKsLU=;
-	b=ATKLBYRoOu39nF9WPvvoqLVrnPqiSI49EFWPD8uLJDDQqBaJlTJtVUVu3+FgVyJGU/62E8
-	lmVIfA/rZf8rpWGOgDQfI9vMHcyc19wZUC/otVcDd5NI7mTcS8m1xmKp04LyYunBN9BFay
-	k9Pb/9MJrF9dIVwc2pfpDSFOl6qV888=
-From: Usama Arif <usama.arif@linux.dev>
-To: axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	josef@toxicpanda.com,
-	linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ca5Kmi3T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2721F000E9;
+	Thu,  6 Aug 2026 22:11:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786054276;
+	bh=bkfyYt0nKyeTEUyq1ZBeSX2vfTy+B2vXRuyImjcb0Ys=;
+	h=From:To:Cc:Subject:Date;
+	b=ca5Kmi3ToCwGiK0ES26yioe2ZZdSHsut3ZzWxubTNg7D1FtnC+GMmd5x7OhzF7KD2
+	 2YWdBp6jHFa437dcbPVjZEcuxXMyOrjNp0u6r015ZgvsUevz3v6JxBYP9vbiiKfu6Q
+	 WrXb4OHUFoGbCyhoo/kUnbm4NipW/N5vHCmfaI736zjbsVE+6tyG1FgRW3skRd+tsm
+	 jDGNjYaa9mnfJxDLHnZNmVJTrJMQIjG//8la98pHYmIee4BWmd73JsFZG8BGnfwZvR
+	 9aPhJ4M457RiiNXJrHZXJJVSJ/rOO7vCpfKqbhdijyn2zzaSsdNHbvVwKobJgRVKl6
+	 Wvn3cHzZ3qJTg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-block@vger.kernel.org
+Cc: linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org,
-	tj@kernel.org
-Cc: shakeel.butt@linux.dev,
-	hannes@cmpxchg.org,
-	riel@surriel.com,
-	kernel-team@meta.com,
-	Usama Arif <usama.arif@linux.dev>
-Subject: [PATCH 3/3] block: skip blkcg walk in blk_cgroup_congested() when nothing throttled
-Date: Thu,  6 Aug 2026 11:37:20 -0700
-Message-ID: <20260806183742.946953-4-usama.arif@linux.dev>
-In-Reply-To: <20260806183742.946953-1-usama.arif@linux.dev>
-References: <20260806183742.946953-1-usama.arif@linux.dev>
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Harry Yoo <harry@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Hao Li <hao.li@linux.dev>,
+	Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/3] Fix a deadlock in blk-crypto-fallback
+Date: Thu,  6 Aug 2026 15:10:28 -0700
+Message-ID: <20260806221031.79050-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,175 +50,28 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-blk_cgroup_congested() walks the current task's blkcg ancestor chain on
-every readahead decision and, once swap is in use, on every anonymous and
-shmem folio allocation.  The answer is almost always "no", but finding that
-out costs two loads per level on two cold cache lines, plus an out-of-line
-kthread_blkcg() and an RCU read-side pair.  On a fleet profile of hosts
-running containers with 5-10 level hierarchies it costs about as much as
-all of mutex_lock(), 99.4% of it under __folio_throttle_swaprate().
+This series fixes a deadlock in blk-crypto-fallback that could occur
+when a large WRITE bio was submitted to dm-inlinecrypt.
 
-Gate the walk on a global count of blkcgs with a non-zero
-congestion_count.  The counter only moves on the 0 <-> 1 transitions of
-each blkcg's congestion_count, so the extra atomic stays in the throttle
-arm/disarm paths and never appears in steady state. When something is
-throttled the counter is non-zero and the walk runs as before.
+As a prerequisite, it makes mempool_alloc_bulk() support fallible
+allocations in the same way that mempool_alloc() does.
 
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
----
- block/blk-cgroup.c         | 15 ++++++++++++++-
- block/blk-cgroup.h         | 25 +++++++++++++++++++++----
- include/linux/blk-cgroup.h | 23 ++++++++++++++++++++++-
- 3 files changed, 57 insertions(+), 6 deletions(-)
+Please consider this series for the block tree for 7.3.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 354637f3b158c..ff25e7da29373 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -53,6 +53,9 @@ EXPORT_SYMBOL_GPL(blkcg_root);
- struct cgroup_subsys_state * const blkcg_root_css = &blkcg_root.css;
- EXPORT_SYMBOL_GPL(blkcg_root_css);
- 
-+/* number of blkcgs with a non-zero congestion_count */
-+atomic_t blkcg_congested_blkcgs __read_mostly = ATOMIC_INIT(0);
-+
- static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
- static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
-@@ -1350,6 +1353,16 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 	struct blkcg *blkcg = css_to_blkcg(css);
- 	int i;
- 
-+	/*
-+	 * Every blkg holds a reference on this css and drops any delay it
-+	 * still has from pd_free_fn(), so this is expected to be zero.  Should
-+	 * a policy ever leave one behind, drop it here rather than let it pin
-+	 * blkcg_congested_blkcgs and disable the fast path for the rest of the
-+	 * boot.  Nothing can race with us at this point.
-+	 */
-+	if (atomic_xchg(&blkcg->congestion_count, 0) > 0)
-+		atomic_dec(&blkcg_congested_blkcgs);
-+
- 	mutex_lock(&blkcg_pol_mutex);
- 
- 	list_del(&blkcg->all_blkcgs_node);
-@@ -2228,7 +2241,7 @@ void blk_cgroup_bio_start(struct bio *bio)
- 	put_cpu();
- }
- 
--bool blk_cgroup_congested(void)
-+bool __blk_cgroup_congested(void)
- {
- 	struct blkcg *blkcg;
- 	bool ret = false;
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index 615390f751aa2..09e47a4a07f48 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -375,12 +375,29 @@ static inline void blkg_put(struct blkcg_gq *blkg)
- 		if (((d_blkg) = blkg_lookup(css_to_blkcg(pos_css),	\
- 					    (p_blkg)->q)))
- 
-+/*
-+ * blkcg_congested_blkcgs gates the hierarchy walk in blk_cgroup_congested().
-+ * These two helpers keep it in step with each blkcg's congestion_count in
-+ * normal operation; blkcg_css_free() drops a residual count as a backstop.
-+ */
-+static inline void blkcg_inc_congestion_count(struct blkcg *blkcg)
-+{
-+	if (atomic_inc_return(&blkcg->congestion_count) == 1)
-+		atomic_inc(&blkcg_congested_blkcgs);
-+}
-+
-+static inline void blkcg_dec_congestion_count(struct blkcg *blkcg)
-+{
-+	if (atomic_dec_return(&blkcg->congestion_count) == 0)
-+		atomic_dec(&blkcg_congested_blkcgs);
-+}
-+
- static inline void blkcg_use_delay(struct blkcg_gq *blkg)
- {
- 	if (WARN_ON_ONCE(atomic_read(&blkg->use_delay) < 0))
- 		return;
- 	if (atomic_add_return(1, &blkg->use_delay) == 1)
--		atomic_inc(&blkg->blkcg->congestion_count);
-+		blkcg_inc_congestion_count(blkg->blkcg);
- }
- 
- static inline int blkcg_unuse_delay(struct blkcg_gq *blkg)
-@@ -405,7 +422,7 @@ static inline int blkcg_unuse_delay(struct blkcg_gq *blkg)
- 	if (old == 0)
- 		return 0;
- 	if (old == 1)
--		atomic_dec(&blkg->blkcg->congestion_count);
-+		blkcg_dec_congestion_count(blkg->blkcg);
- 	return 1;
- }
- 
-@@ -424,7 +441,7 @@ static inline void blkcg_set_delay(struct blkcg_gq *blkg, u64 delay)
- 
- 	/* We only want 1 person setting the congestion count for this blkg. */
- 	if (!old && atomic_try_cmpxchg(&blkg->use_delay, &old, -1))
--		atomic_inc(&blkg->blkcg->congestion_count);
-+		blkcg_inc_congestion_count(blkg->blkcg);
- 
- 	atomic64_set(&blkg->delay_nsec, delay);
- }
-@@ -441,7 +458,7 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
- 
- 	/* We only want 1 person clearing the congestion count for this blkg. */
- 	if (old && atomic_try_cmpxchg(&blkg->use_delay, &old, 0))
--		atomic_dec(&blkg->blkcg->congestion_count);
-+		blkcg_dec_congestion_count(blkg->blkcg);
- }
- 
- /**
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index dd5841a42c331..1dbb08a436b51 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -14,6 +14,8 @@
-  * 	              Nauman Rafique <nauman@google.com>
-  */
- 
-+#include <linux/atomic.h>
-+#include <linux/compiler.h>
- #include <linux/types.h>
- 
- struct bio;
-@@ -24,10 +26,29 @@ struct gendisk;
- 
- #ifdef CONFIG_BLK_CGROUP
- extern struct cgroup_subsys_state * const blkcg_root_css;
-+extern atomic_t blkcg_congested_blkcgs;
- 
- void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay);
- void blkcg_maybe_throttle_current(void);
--bool blk_cgroup_congested(void);
-+bool __blk_cgroup_congested(void);
-+
-+/**
-+ * blk_cgroup_congested - is the current task in a throttled blkcg?
-+ *
-+ * Called from mm hot paths where the answer is almost always false, so keep
-+ * that case to a load and a branch and only walk the hierarchy out of line
-+ * when something in the system really is throttled.
-+ *
-+ * Return: %true if the current task's blkcg or any of its ancestors is
-+ * throttled, %false otherwise.
-+ */
-+static inline bool blk_cgroup_congested(void)
-+{
-+	if (likely(!atomic_read(&blkcg_congested_blkcgs)))
-+		return false;
-+	return __blk_cgroup_congested();
-+}
-+
- void blkcg_pin_online(struct cgroup_subsys_state *blkcg_css);
- void blkcg_unpin_online(struct cgroup_subsys_state *blkcg_css);
- struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css);
+Eric Biggers (3):
+  mm: make mempool_alloc_from_pool() return bool
+  mm: support fallible mempool_alloc_bulk()
+  blk-crypto-fallback: Fix deadlock when encrypting large bio in dm
+    layer
+
+ block/blk-crypto-fallback.c | 72 +++++++++++++++++++++++++++++++++----
+ include/linux/mempool.h     |  4 +--
+ mm/mempool.c                | 50 +++++++++++++++++---------
+ 3 files changed, 100 insertions(+), 26 deletions(-)
+
+
+base-commit: 0d839570765118029aa8bf4a95444c6a11aacf85
 -- 
-2.53.0-Meta
+2.55.0
 
