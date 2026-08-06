@@ -1,114 +1,314 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7002E43F4D7;
-	Thu,  6 Aug 2026 10:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B7B43F0BA
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 10:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786012636; cv=none; b=tt8GyEKqhyokU6kFupgokox7CQ7seT4o2Ls+LKclneUPv79Hyvo/BrbwXZk4vY7+MBVZWDFKwhmtwy0CNKQjVkOBPXN3vVeKGFQSWOAYyhOnwhGySV7rkyO6r4Dr0mN8S8pqA8eH/IApmUTP/kwA05b5TA/EVrTxmB63R7JqMTA=
+	t=1786012849; cv=none; b=t9LZ05HwP5iyc583kBaqPV+Hgu0LG6pqW9WbLeMPQsoBYmH2GSOhigySLkC/e7ao/DAphzFun1FK/lU/hKbNsK7N29t3Jqp6ELxg4/8QSXPz17eNQkN6GyOAemYB/GSHx+wfEOgb+cUYJltfxyduDCVhILqxKEtvAQojDGQI4bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786012636; c=relaxed/simple;
-	bh=2UN5bVSsLcRwVZBbPTmNXh9Gzb+lT78X32fNrSgsuGY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BoQfv0bAiOQ1WDE2UFnwZiI1mAjmm8Wvu0OlQOUaytiyOMeW3NaJDRnZWwdY4612BkVCSPjfMcNKIDP0qCL0MIcjmJaPOYwF1B/OgoEex0STdMEilTiG6o9GchRFUJaZReZTUTqzvFB8Ah1vcMleIdnwHg2oZicLlc7lvxU0s5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qXEqN6Id; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1786012849; c=relaxed/simple;
+	bh=tRfdsI9jyfAUpbfjwgHz3vA8D9iLRveb6evE1cckkuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lNwlTg+Vcic17CMlb8ZYsV1rhPXnjgs0xEgWuWNb92y0xljg2odRK79kVruNEevR2FL83St2rqGQfpIJc3ZL1+8gdpZgwnTIx/g5EaPea92Q9mnE04zDU0deo241PJn9YYhGZU3elrszzlU6I8iMcMdpGQopcN8JKCPHOAxEu+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cmfT4Wnu; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXEqN6Id"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 04E56C2BCB9;
-	Thu,  6 Aug 2026 10:37:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786012636;
-	bh=2UN5bVSsLcRwVZBbPTmNXh9Gzb+lT78X32fNrSgsuGY=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=qXEqN6Idv15p9VSWtgMtXUbK5kcyOVTQ38rxE7ys8Pz3Y2V87MjRLkXYQ7PtUa322
-	 dvdPqInUdDh3eI5IgWVcw1mr+GeimMyHrJ5KPJpOVhENd3pacBvmncMgeXuTUdcz3U
-	 4Oj6M+En5cRQ75hh45XhCs/iAzhocLEclk8oH1R82Dm1p3ISxq2u4xpTqkuwWliVHP
-	 oI1Wfw1JY+dmhUqWdpJBo/02lR6j3ChGCcoCZH/5ia12gsVuQPuWlIs8tQ86Nzv7nN
-	 NQ96eHOvLwkS64ZyxdD+gx1H2xEUUiE4fd6eT2cwHy01hyPCLHfQdvdxc5K243nJCG
-	 WmjBW1tZqlcyg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AD3C5AC67;
-	Thu,  6 Aug 2026 10:37:15 +0000 (UTC)
-From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Subject: [PATCH 0/2] loop, nbd: drop partitions left behind by the
- GD_NEED_PART_SCAN removal
-Date: Thu, 06 Aug 2026 12:36:56 +0200
-Message-Id: <20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmfT4Wnu"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c9e0b89e228so1304313a12.1
+        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 03:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786012847; x=1786617647; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=aHhG+liuZTafcPBdaHPAIlQHTjNuSYOZDbFN67Y2dRk=;
+        b=cmfT4Wnu6akDEB0lEmy/TKIcp8XKNy3n4AQKj7EM5FF9mxC1tptqSFsuaLLZTdew6n
+         QUFaUl6Z/1xchVvwl+STnPzgRhjFzO397ZKRz0BSRD+bL1onx0CoOAuhslDQVlDagjmm
+         AlavUSf89ezB0fTm0XNlZpnWpXStLf0KPvumGYnTpu6SfFaaecF8foMe+wUbKLFxyBC2
+         WsNMdtl+TV98BIn37FSvTGO25P10sWcpsylfbkoa4/OHo+gvpki1xihDMx/wP5sMCggI
+         UEf5wE78yprPPG169rBcMWK6J3Xv/RCV2mQbOFi0ascNknMtNYkwOQd8fq1rOAG5SS8R
+         0Sjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786012847; x=1786617647;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=aHhG+liuZTafcPBdaHPAIlQHTjNuSYOZDbFN67Y2dRk=;
+        b=mFpupfJJBa97EaAsJXKw+GSpNMfsKObdU8qftEeg7JlNQ2wfHO2aJK3XFPVOMs4tSb
+         DdFyeYnQJjao5YwYALYicdadxyYHnRFnbjwbiIvGO5tHXDyeI/uEB7YFaj2t8/GJJO3N
+         zIF2TxSRfhfPSHlWoz5+FUpUSUlmSsokBIp5n8CXLOSRicCiFnYu1rxkP84Jzk8PmJ9e
+         WsbO3OY5leTOyhWRvSeTOhKdNHNbViJ4eE9fvEaqGu5gMCsNwvfD/lUh79U3F/140Fd8
+         AQ6sjrUjmTy4jgjCA9eysYP70Z6c5mUZ2qgdqjHBxvQFBLzNoqHP7TfOQKhU5S/xDQYz
+         Awsw==
+X-Forwarded-Encrypted: i=1; AHgh+RrxS9tQd1PTEvE48bvUZkXW+qLk5K4R3/InAVMi6NfPP2BYe6KhFg816cVUtwH3cv1BOiQTnE1LUU27/g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+WPcR55RXVoHlpudx9GJ66qf4PhaZ3UkdTrpMqBM/9QmUuQtd
+	9njh6UwgFy84qlrITQGWKPIDcbEpFq/+AxWW+5KAv0rAFdPut+HEQGpG
+X-Gm-Gg: AR+sD10PPTI4cMqPq30hcT0Mn5qouBcsHvUvHWoHa9+jXY0V0NJoGmRzBGwWCixat9z
+	db4eoRsRPqTUEPOMFAc8jbY9vkWt20M8E8FASUlBvHEcr+Qy5OlDuv/W/0jIDU4OHPv6ipS3CUs
+	cx+876IrYRjnTbeVeN5N4bqzAD+pkavt0igAO2HGVs0e1rtgnWB7bdY8n/dE3um06iO3Z8Wphe1
+	zi3+c7NpsK4sPP4UUxbuSDXS6r1fBSmLfgtgWpn2xz0ucX4rCzFxF4ru4gCsugIUIE0v2mPIN6k
+	Y+VoFD2dJZPHxM7s3dzxWnFWH3Xy7OJtRA9mY+Ft+At1sRniqXylO5bfRrzWpmb1Il23ly4cchI
+	mDU7yfxP8iFZjRrUcuH8u8NQUgI3nI8emDO/aTny3pJ2HtQW6PEO8+3vIMKK6zOGKmjSj38xPu6
+	XV4HHjm8w4rOEJ5i7NEHQ4/bPv3Fo7o8d3Qc1TWiSYLiy63n0fYoYbA4atZE0r1Q==
+X-Received: by 2002:a05:6a20:6a10:b0:3bf:6237:4d46 with SMTP id adf61e73a8af0-3cb85ef7e35mr15288484637.28.1786012847127;
+        Thu, 06 Aug 2026 03:40:47 -0700 (PDT)
+Received: from archlinux ([2402:e280:411b:ec:aa93:b1ec:5a6b:5fce])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315863b761asm39061397eec.1.2026.08.06.03.40.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2026 03:40:46 -0700 (PDT)
+From: Adarsh Das <adarshdas950@gmail.com>
+To: adarshdas950@gmail.com
+Cc: a.hindborg@kernel.org,
+	acourbot@nvidia.com,
+	aliceryhl@google.com,
+	axboe@kernel.dk,
+	bjorn3_gh@protonmail.com,
+	boqun@kernel.org,
+	dakr@kernel.org,
+	daniel.almeida@collabora.com,
+	gary@garyguo.net,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lossin@kernel.org,
+	ojeda@kernel.org,
+	rust-for-linux@vger.kernel.org,
+	tamird@kernel.org,
+	tmgross@umich.edu,
+	work@onurozkan.dev
+Subject: [PATCH v3] rust: block: set GenDisk block_device_operations.owner to THIS_MODULE
+Date: Thu,  6 Aug 2026 16:10:27 +0530
+Message-ID: <20260806104027.83940-1-adarshdas950@gmail.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260806083655.23161-1-adarshdas950@gmail.com>
+References: <20260806083655.23161-1-adarshdas950@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQrCMBBFr1Jm7UASpIpXEReTZLQjNSmZVITSu
- 5vo8n3+exsoF2GFy7BB4beo5NTAHgYIE6UHo8TG4IwbzdmM6I8457xg8hG10sy4UKlSm6foojU
- c+WTJEbTEUvgun1/+evuzrv7JofZmf3hSRl8ohalPL9LKBfb9C31TrjGZAAAA
-X-Change-ID: 20260806-b4-loop-nbd-stale-partitions-2d10ede71a2a
-To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, 
- Josef Bacik <josef@toxicpanda.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- nbd@other.debian.org, Daan De Meyer <daan@amutable.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1786012634; l=2033;
- i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=2UN5bVSsLcRwVZBbPTmNXh9Gzb+lT78X32fNrSgsuGY=;
- b=B9ExN1sNpe5Df1yt64T76mW0spT0jluy5FnkBH61VKFQkUJm1IvGm3x8cIY6U0ckHpYeMYX1l
- AtQnLTykOCIDTUCzrQFUOkVRf9adg3KwFx80gIjzH9oQNmLsh8gof1K
-X-Developer-Key: i=daan@amutable.com; a=ed25519;
- pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
-X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
- auth_id=868
-X-Original-From: Daan De Meyer <daan@amutable.com>
-Reply-To: daan@amutable.com
+Content-Transfer-Encoding: 8bit
 
-Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from setting
-GD_NEED_PART_SCAN. The caller audit in that commit only considered the bit
-as a request to rescan partitions, but it did more than that:
-bdev_disk_changed() drops every entry in disk->part_tbl before it consults
-disk_has_partscan(), and only the re-adding half is gated on partition
-scanning being enabled. The lazy scan on the next open was therefore also
-the only thing removing partitions from a device that has partitions but
-no partition scanning.
+GenDiskBuilder left block_device_operations.owner NULL. Set owner from a
+const block_device_operations table using this_module::<M>() and update
+rnull to pass NullBlkModule.
 
-Loop devices without LO_FLAGS_PARTSCAN are exactly such devices, and they
-are not unusual. bdev_add_partition() only rejects GENHD_FL_NO_PART disks,
-so BLKPG_ADD_PARTITION works while GD_SUPPRESS_PART_SCAN is set, and
-parted, libfdisk and systemd all fall back to BLKPG when BLKRRPART fails
-with -EINVAL, which is what a loop device without LO_FLAGS_PARTSCAN
-returns.
+Add ModuleMetadata::THIS_MODULE and this_module() so the owner pointer is
+available in const context. Rebased on Alvins fix-fops-owner series [1].
 
-Commit c4f4c0fc551c ("loop: remove manually added partitions on detach")
-fixed the detach path after this was reported as loop devices picking up
-partition devices from a previously built image:
+Link: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
 
-  https://bugs.debian.org/1141434
+v2:
+- Free fops in free_disk instead of GenDisk::drop to fix use-after-free
+  when the device stays open after removal. (Sashiko)
+- Install the cleanup guard before fops allocation to avoid leaking gendisk
+  on -ENOMEM. (Sashiko)
+- Link to v1: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
 
-These two patches fix the two remaining places that relied on the same
-lazy cleanup, LOOP_CHANGE_FD and NBD_CLEAR_SOCK.
+v3:
+- Use const fops with this_module::<M>() instead of heap allocation
+  (as suggested by Andreas).
+- Integrate ModuleMetadata::THIS_MODULE from [1].
+- Dismiss recover_data before fallible build steps after the cleanup guard.
+  (Sashiko)
+- Link to v2: https://lore.kernel.org/all/20260806083655.23161-1-adarshdas950@gmail.com/
 
-Both were tested with the blktests loop and nbd groups on 7.2-rc5. New
-cases covering the two paths fail without these patches and pass with
-them; they will be submitted to blktests separately.
+[1] https://lore.kernel.org/r/20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev
 
-Signed-off-by: Daan De Meyer <daan@amutable.com>
+Signed-off-by: Adarsh Das <adarshdas950@gmail.com>
 ---
-Daan De Meyer (2):
-      loop: drop stale partitions on LOOP_CHANGE_FD
-      nbd: drop stale partitions on NBD_CLEAR_SOCK
+ drivers/block/rnull/rnull.rs     |  2 +-
+ rust/kernel/block/mq.rs          | 13 ++++++--
+ rust/kernel/block/mq/gen_disk.rs | 56 +++++++++++++++++---------------
+ rust/kernel/lib.rs               |  9 +++++
+ rust/macros/module.rs            | 16 +++++++++
+ 5 files changed, 65 insertions(+), 31 deletions(-)
 
- drivers/block/loop.c | 10 ++++++----
- drivers/block/nbd.c  |  7 +++++++
- 2 files changed, 13 insertions(+), 4 deletions(-)
----
-base-commit: 248951ddc14de84de3910f9b13f51491a8cd91df
-change-id: 20260806-b4-loop-nbd-stale-partitions-2d10ede71a2a
-
-Best regards,
---  
-Daan De Meyer <daan@amutable.com>
-
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 0ca8715febe8..912526be4ec2 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -61,7 +61,7 @@ fn new(
+             .logical_block_size(block_size)?
+             .physical_block_size(block_size)?
+             .rotational(rotational)
+-            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
++            .build::<NullBlkModule, Self>(fmt!("{}", name.to_str()?), tagset, queue_data)
+     }
+ }
+ 
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 1fd0d54dd549..faa9fcbac935 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -8,8 +8,8 @@
+ //! - Implement [`Operations`] for a type `T`.
+ //! - Create a [`TagSet<T>`].
+ //! - Create a [`GenDisk<T>`], via the [`GenDiskBuilder`].
+-//! - Add the disk to the system by calling [`GenDiskBuilder::build`] passing in
+-//!   the `TagSet` reference.
++//! - Add the disk to the system by calling [`GenDiskBuilder::build`], passing in
++//!   the module type, the disk name, the `TagSet`, and queue data.
+ //!
+ //! The types available in this module that have direct C counterparts are:
+ //!
+@@ -86,9 +86,16 @@
+ //!
+ //! let tagset: Arc<TagSet<MyBlkDevice>> =
+ //!     Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
++//! # struct MyModule;
++//! # impl kernel::ModuleMetadata for MyModule {
++//! #     const NAME: &'static kernel::str::CStr = c"myblk";
++//! #     // SAFETY: Doctest stub; no module is loaded.
++//! #     const THIS_MODULE: ThisModule =
++//! #         unsafe { ThisModule::from_ptr(core::ptr::null_mut()) };
++//! # }
+ //! let mut disk = gen_disk::GenDiskBuilder::new()
+ //!     .capacity_sectors(4096)
+-//!     .build(fmt!("myblk"), tagset, ())?;
++//!     .build::<MyModule, MyBlkDevice>(fmt!("myblk"), tagset, ())?;
+ //!
+ //! # Ok::<(), kernel::error::Error>(())
+ //! ```
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index fc97dd873974..4a503f183cc9 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -15,8 +15,34 @@
+     str::NullTerminatedFormatter,
+     sync::Arc,
+     types::{ForeignOwnable, ScopeGuard},
++    ModuleMetadata,
+ };
+ 
++struct BlockFops<M: ModuleMetadata>(core::marker::PhantomData<M>);
++
++impl<M: ModuleMetadata> BlockFops<M> {
++    const TABLE: bindings::block_device_operations = bindings::block_device_operations {
++        submit_bio: None,
++        open: None,
++        release: None,
++        ioctl: None,
++        compat_ioctl: None,
++        check_events: None,
++        unlock_native_capacity: None,
++        getgeo: None,
++        set_read_only: None,
++        swap_slot_free_notify: None,
++        report_zones: None,
++        devnode: None,
++        alternative_gpt_sector: None,
++        get_unique_id: None,
++        owner: crate::this_module::<M>().as_ptr(),
++        pr_ops: core::ptr::null_mut(),
++        free_disk: None,
++        poll_bio: None,
++    };
++}
++
+ /// A builder for [`GenDisk`].
+ ///
+ /// Use this struct to configure and add new [`GenDisk`] to the VFS.
+@@ -95,7 +121,7 @@ pub fn capacity_sectors(mut self, capacity: u64) -> Self {
+     }
+ 
+     /// Build a new `GenDisk` and add it to the VFS.
+-    pub fn build<T: Operations>(
++    pub fn build<M: ModuleMetadata, T: Operations>(
+         self,
+         name: fmt::Arguments<'_>,
+         tagset: Arc<TagSet<T>>,
+@@ -125,30 +151,8 @@ pub fn build<T: Operations>(
+             )
+         })?;
+ 
+-        const TABLE: bindings::block_device_operations = bindings::block_device_operations {
+-            submit_bio: None,
+-            open: None,
+-            release: None,
+-            ioctl: None,
+-            compat_ioctl: None,
+-            check_events: None,
+-            unlock_native_capacity: None,
+-            getgeo: None,
+-            set_read_only: None,
+-            swap_slot_free_notify: None,
+-            report_zones: None,
+-            devnode: None,
+-            alternative_gpt_sector: None,
+-            get_unique_id: None,
+-            // TODO: Set to `THIS_MODULE`.
+-            owner: core::ptr::null_mut(),
+-            pr_ops: core::ptr::null_mut(),
+-            free_disk: None,
+-            poll_bio: None,
+-        };
+-
+-        // SAFETY: `gendisk` is a valid pointer as we initialized it above
+-        unsafe { (*gendisk).fops = &TABLE };
++        // SAFETY: `gendisk` is a valid pointer as we initialized it above.
++        unsafe { (*gendisk).fops = &BlockFops::<M>::TABLE };
+ 
+         let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
+             // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
+@@ -159,8 +163,6 @@ pub fn build<T: Operations>(
+             drop(unsafe { T::QueueData::from_foreign(data) });
+         });
+ 
+-        // The failure guard now owns both pieces of cleanup; the early guard
+-        // must not run on this path anymore.
+         recover_data.dismiss();
+ 
+         let mut writer = NullTerminatedFormatter::new(
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 9512af7156df..9bbabaf84e20 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -185,6 +185,15 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, error::Erro
+ pub trait ModuleMetadata {
+     /// The name of the module as specified in the `module!` macro.
+     const NAME: &'static crate::str::CStr;
++
++    /// The module's `THIS_MODULE` pointer.
++    const THIS_MODULE: ThisModule;
++}
++
++/// Returns the [`ThisModule`] pointer for the given module type.
++#[inline]
++pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
++    &M::THIS_MODULE
+ }
+ 
+ /// Equivalent to `THIS_MODULE` in the C API.
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index 06c18e207508..8df38718224b 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -519,6 +519,22 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+ 
+         impl ::kernel::ModuleMetadata for #type_ {
+             const NAME: &'static ::kernel::str::CStr = #name_cstr;
++
++            #[cfg(MODULE)]
++            const THIS_MODULE: ::kernel::ThisModule = {
++                extern "C" {
++                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
++                }
++
++                // SAFETY: `__this_module` is constructed by the kernel at load time and lives
++                // until the module is unloaded.
++                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
++            };
++
++            #[cfg(not(MODULE))]
++            const THIS_MODULE: ::kernel::ThisModule = unsafe {
++                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
++            };
+         }
+ 
+         // Double nested modules, since then nobody can access the public items inside.
+-- 
+2.55.0
 
