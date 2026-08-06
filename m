@@ -1,314 +1,160 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B7B43F0BA
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 10:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FC8389116
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 11:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786012849; cv=none; b=t9LZ05HwP5iyc583kBaqPV+Hgu0LG6pqW9WbLeMPQsoBYmH2GSOhigySLkC/e7ao/DAphzFun1FK/lU/hKbNsK7N29t3Jqp6ELxg4/8QSXPz17eNQkN6GyOAemYB/GSHx+wfEOgb+cUYJltfxyduDCVhILqxKEtvAQojDGQI4bM=
+	t=1786015400; cv=none; b=IVgh/w0qta3QUztz4g7vBVb1KY2G6LpFuHLzux6xYzphmFL/xQvTOPa19gyh7yQMwGgpbxxMrkyDrDg3jl+EHoahwb09+KPEGMLzo7t20bPvAVLdZY+9y+h85SmBW849b7IEuni512SLI4WpkXFsqp91wYcZFX1qB6eROpMN0n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786012849; c=relaxed/simple;
-	bh=tRfdsI9jyfAUpbfjwgHz3vA8D9iLRveb6evE1cckkuc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lNwlTg+Vcic17CMlb8ZYsV1rhPXnjgs0xEgWuWNb92y0xljg2odRK79kVruNEevR2FL83St2rqGQfpIJc3ZL1+8gdpZgwnTIx/g5EaPea92Q9mnE04zDU0deo241PJn9YYhGZU3elrszzlU6I8iMcMdpGQopcN8JKCPHOAxEu+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cmfT4Wnu; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786015400; c=relaxed/simple;
+	bh=tUau9zLaFGcMETtx4tvcFGr3xsttVDYt4gsO9//I/nI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iIibCDkXcOPiRhCKVbaN0s2Ckb8TSNIsScIhRi29zUMdxFLlor2G+u+AaNdZgr8nphA0PhFmcpQuqqVC4dKhR2nY5eqyniyQVFnogxi0jYIRMEpuLwxKHMm+X2Jps9TBDdD3R8q80gkBqX/KaMYeNQokxfCrYiMjkQIQVHTMe4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=hkJU9qRC; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmfT4Wnu"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c9e0b89e228so1304313a12.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 03:40:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786012847; x=1786617647; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=aHhG+liuZTafcPBdaHPAIlQHTjNuSYOZDbFN67Y2dRk=;
-        b=cmfT4Wnu6akDEB0lEmy/TKIcp8XKNy3n4AQKj7EM5FF9mxC1tptqSFsuaLLZTdew6n
-         QUFaUl6Z/1xchVvwl+STnPzgRhjFzO397ZKRz0BSRD+bL1onx0CoOAuhslDQVlDagjmm
-         AlavUSf89ezB0fTm0XNlZpnWpXStLf0KPvumGYnTpu6SfFaaecF8foMe+wUbKLFxyBC2
-         WsNMdtl+TV98BIn37FSvTGO25P10sWcpsylfbkoa4/OHo+gvpki1xihDMx/wP5sMCggI
-         UEf5wE78yprPPG169rBcMWK6J3Xv/RCV2mQbOFi0ascNknMtNYkwOQd8fq1rOAG5SS8R
-         0Sjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786012847; x=1786617647;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aHhG+liuZTafcPBdaHPAIlQHTjNuSYOZDbFN67Y2dRk=;
-        b=mFpupfJJBa97EaAsJXKw+GSpNMfsKObdU8qftEeg7JlNQ2wfHO2aJK3XFPVOMs4tSb
-         DdFyeYnQJjao5YwYALYicdadxyYHnRFnbjwbiIvGO5tHXDyeI/uEB7YFaj2t8/GJJO3N
-         zIF2TxSRfhfPSHlWoz5+FUpUSUlmSsokBIp5n8CXLOSRicCiFnYu1rxkP84Jzk8PmJ9e
-         WsbO3OY5leTOyhWRvSeTOhKdNHNbViJ4eE9fvEaqGu5gMCsNwvfD/lUh79U3F/140Fd8
-         AQ6sjrUjmTy4jgjCA9eysYP70Z6c5mUZ2qgdqjHBxvQFBLzNoqHP7TfOQKhU5S/xDQYz
-         Awsw==
-X-Forwarded-Encrypted: i=1; AHgh+RrxS9tQd1PTEvE48bvUZkXW+qLk5K4R3/InAVMi6NfPP2BYe6KhFg816cVUtwH3cv1BOiQTnE1LUU27/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+WPcR55RXVoHlpudx9GJ66qf4PhaZ3UkdTrpMqBM/9QmUuQtd
-	9njh6UwgFy84qlrITQGWKPIDcbEpFq/+AxWW+5KAv0rAFdPut+HEQGpG
-X-Gm-Gg: AR+sD10PPTI4cMqPq30hcT0Mn5qouBcsHvUvHWoHa9+jXY0V0NJoGmRzBGwWCixat9z
-	db4eoRsRPqTUEPOMFAc8jbY9vkWt20M8E8FASUlBvHEcr+Qy5OlDuv/W/0jIDU4OHPv6ipS3CUs
-	cx+876IrYRjnTbeVeN5N4bqzAD+pkavt0igAO2HGVs0e1rtgnWB7bdY8n/dE3um06iO3Z8Wphe1
-	zi3+c7NpsK4sPP4UUxbuSDXS6r1fBSmLfgtgWpn2xz0ucX4rCzFxF4ru4gCsugIUIE0v2mPIN6k
-	Y+VoFD2dJZPHxM7s3dzxWnFWH3Xy7OJtRA9mY+Ft+At1sRniqXylO5bfRrzWpmb1Il23ly4cchI
-	mDU7yfxP8iFZjRrUcuH8u8NQUgI3nI8emDO/aTny3pJ2HtQW6PEO8+3vIMKK6zOGKmjSj38xPu6
-	XV4HHjm8w4rOEJ5i7NEHQ4/bPv3Fo7o8d3Qc1TWiSYLiy63n0fYoYbA4atZE0r1Q==
-X-Received: by 2002:a05:6a20:6a10:b0:3bf:6237:4d46 with SMTP id adf61e73a8af0-3cb85ef7e35mr15288484637.28.1786012847127;
-        Thu, 06 Aug 2026 03:40:47 -0700 (PDT)
-Received: from archlinux ([2402:e280:411b:ec:aa93:b1ec:5a6b:5fce])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315863b761asm39061397eec.1.2026.08.06.03.40.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 03:40:46 -0700 (PDT)
-From: Adarsh Das <adarshdas950@gmail.com>
-To: adarshdas950@gmail.com
-Cc: a.hindborg@kernel.org,
-	acourbot@nvidia.com,
-	aliceryhl@google.com,
-	axboe@kernel.dk,
-	bjorn3_gh@protonmail.com,
-	boqun@kernel.org,
-	dakr@kernel.org,
-	daniel.almeida@collabora.com,
-	gary@garyguo.net,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lossin@kernel.org,
-	ojeda@kernel.org,
-	rust-for-linux@vger.kernel.org,
-	tamird@kernel.org,
-	tmgross@umich.edu,
-	work@onurozkan.dev
-Subject: [PATCH v3] rust: block: set GenDisk block_device_operations.owner to THIS_MODULE
-Date: Thu,  6 Aug 2026 16:10:27 +0530
-Message-ID: <20260806104027.83940-1-adarshdas950@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260806083655.23161-1-adarshdas950@gmail.com>
-References: <20260806083655.23161-1-adarshdas950@gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="hkJU9qRC"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=xowRjgjVD/YwKVvxtgaeuKeraYLluwgjfyKEiKbHvds=;
+	b=hkJU9qRCmwib9O4D8TBFQl/N99wtknDcme8N4sXSXm2KNRPYjdS+95vp81qRRSGvWl7CDHnho
+	r2KeZF9XBOHSfMXt1yi/+boqE9UtbJmByZGDwjhy4sY5ISttdizU8B93MpTwIf4zSeIHNJsRqk4
+	gO2fZ1ewefIykSRuUz3ailM=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hG4Pc5NXSzRhQt;
+	Thu,  6 Aug 2026 19:12:36 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6E47140537;
+	Thu,  6 Aug 2026 19:23:08 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 6 Aug 2026 19:23:07 +0800
+Message-ID: <ac98320c-fa54-42d9-b792-ed0c8841920f@huawei.com>
+Date: Thu, 6 Aug 2026 19:23:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 8/8] nbd: add pre_defined_connections module parameter
+ for pre-created devices
+To: <yukuai@fygo.io>, <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@lst.de>
+CC: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>,
+	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>,
+	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>,
+	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+References: <20260805122930.57647-1-yangerkun@huawei.com>
+ <20260805122930.57647-9-yangerkun@huawei.com>
+ <22a4c13f-517a-42c3-9079-15dd20940424@fygo.io>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <22a4c13f-517a-42c3-9079-15dd20940424@fygo.io>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-GenDiskBuilder left block_device_operations.owner NULL. Set owner from a
-const block_device_operations table using this_module::<M>() and update
-rnull to pass NullBlkModule.
 
-Add ModuleMetadata::THIS_MODULE and this_module() so the owner pointer is
-available in const context. Rebased on Alvins fix-fops-owner series [1].
 
-Link: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
+在 2026/8/6 17:26, yu kuai 写道:
+> Hi,
+> 
+> 在 2026/8/5 20:29, Yang Erkun 写道:
+>> blk_mq_update_nr_hw_queues() in nbd_start_device() may cause a queue
+>> freeze.  The previous commit addressed this for newly created nbd
+>> devices by setting the expected nr_hw_queues in nbd_dev_add().  However,
+>> when reusing an old inactive nbd device, the queue freeze can still
+>> occur if the old nbd->tag_set->nr_hw_queues does not match the new
+>> socket connection count.  Inactive nbd devices can originate from two
+>> sources: loading the nbd module with nbds_max, which sets the default
+>> nr_hw_queues to 1, and the netlink method, which sets nr_hw_queues
+>> according to the expected number of socket connections.  For the first
+>> case, add a module parameter so the default nr_hw_queues can be
+>> changed.  Users who know their expected number of connections can then
+>> prevent queue freezes on pre-created devices via nbds_max.
+>>
+>> Before this patchset:
+>> real    0m2.195s
+>> user    0m0.005s
+>> sys     0m0.022s
+>>
+>> After this patchset:
+>> real    0m0.090s
+>> user    0m0.004s
+>> sys     0m0.018s
+>>
+>> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+>> ---
+>>    drivers/block/nbd.c | 16 +++++++++++++++-
+>>    1 file changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 6c4aa19ea11a..ffce519bf008 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -166,6 +166,7 @@ static struct dentry *nbd_dbg_dir;
+>>    
+>>    static unsigned int nbds_max = 16;
+>>    static int max_part = 16;
+>> +static int pre_defined_connections = 1;
+>>    static int part_shift;
+>>    
+>>    static int nbd_dev_dbg_init(struct nbd_device *nbd);
+>> @@ -2712,6 +2713,12 @@ static int __init nbd_init(void)
+>>    	if (nbds_max > 1UL << (MINORBITS - part_shift))
+>>    		return -EINVAL;
+>>    
+>> +	/* An excessively large value will be adjusted in blk_mq_alloc_tag_set */
+>> +	if (pre_defined_connections < 1) {
+>> +		pr_err("pre_defined_connections must be >= 1\n");
+> 
+> It's also better to add NR_CPUS checking for upper bound, because the nr_hw_queues is passed
+> directly to __blk_mq_realloc_hw_ctxs() for memory allocation.
 
-v2:
-- Free fops in free_disk instead of GenDisk::drop to fix use-after-free
-  when the device stays open after removal. (Sashiko)
-- Install the cleanup guard before fops allocation to avoid leaking gendisk
-  on -ENOMEM. (Sashiko)
-- Link to v1: https://lore.kernel.org/all/20260805192020.107601-1-adarshdas950@gmail.com/
+Hi,
 
-v3:
-- Use const fops with this_module::<M>() instead of heap allocation
-  (as suggested by Andreas).
-- Integrate ModuleMetadata::THIS_MODULE from [1].
-- Dismiss recover_data before fallible build steps after the cleanup guard.
-  (Sashiko)
-- Link to v2: https://lore.kernel.org/all/20260806083655.23161-1-adarshdas950@gmail.com/
+Like the comment above said, nbd_dev_add->blk_mq_alloc_tag_set
 
-[1] https://lore.kernel.org/r/20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev
+4876         if (set->nr_maps == 1 && set->nr_hw_queues > nr_cpu_ids)
+4877                 set->nr_hw_queues = nr_cpu_ids;
 
-Signed-off-by: Adarsh Das <adarshdas950@gmail.com>
----
- drivers/block/rnull/rnull.rs     |  2 +-
- rust/kernel/block/mq.rs          | 13 ++++++--
- rust/kernel/block/mq/gen_disk.rs | 56 +++++++++++++++++---------------
- rust/kernel/lib.rs               |  9 +++++
- rust/macros/module.rs            | 16 +++++++++
- 5 files changed, 65 insertions(+), 31 deletions(-)
+this will help do the same thing. So I does not the check here.
 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 0ca8715febe8..912526be4ec2 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -61,7 +61,7 @@ fn new(
-             .logical_block_size(block_size)?
-             .physical_block_size(block_size)?
-             .rotational(rotational)
--            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
-+            .build::<NullBlkModule, Self>(fmt!("{}", name.to_str()?), tagset, queue_data)
-     }
- }
- 
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 1fd0d54dd549..faa9fcbac935 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -8,8 +8,8 @@
- //! - Implement [`Operations`] for a type `T`.
- //! - Create a [`TagSet<T>`].
- //! - Create a [`GenDisk<T>`], via the [`GenDiskBuilder`].
--//! - Add the disk to the system by calling [`GenDiskBuilder::build`] passing in
--//!   the `TagSet` reference.
-+//! - Add the disk to the system by calling [`GenDiskBuilder::build`], passing in
-+//!   the module type, the disk name, the `TagSet`, and queue data.
- //!
- //! The types available in this module that have direct C counterparts are:
- //!
-@@ -86,9 +86,16 @@
- //!
- //! let tagset: Arc<TagSet<MyBlkDevice>> =
- //!     Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
-+//! # struct MyModule;
-+//! # impl kernel::ModuleMetadata for MyModule {
-+//! #     const NAME: &'static kernel::str::CStr = c"myblk";
-+//! #     // SAFETY: Doctest stub; no module is loaded.
-+//! #     const THIS_MODULE: ThisModule =
-+//! #         unsafe { ThisModule::from_ptr(core::ptr::null_mut()) };
-+//! # }
- //! let mut disk = gen_disk::GenDiskBuilder::new()
- //!     .capacity_sectors(4096)
--//!     .build(fmt!("myblk"), tagset, ())?;
-+//!     .build::<MyModule, MyBlkDevice>(fmt!("myblk"), tagset, ())?;
- //!
- //! # Ok::<(), kernel::error::Error>(())
- //! ```
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index fc97dd873974..4a503f183cc9 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -15,8 +15,34 @@
-     str::NullTerminatedFormatter,
-     sync::Arc,
-     types::{ForeignOwnable, ScopeGuard},
-+    ModuleMetadata,
- };
- 
-+struct BlockFops<M: ModuleMetadata>(core::marker::PhantomData<M>);
-+
-+impl<M: ModuleMetadata> BlockFops<M> {
-+    const TABLE: bindings::block_device_operations = bindings::block_device_operations {
-+        submit_bio: None,
-+        open: None,
-+        release: None,
-+        ioctl: None,
-+        compat_ioctl: None,
-+        check_events: None,
-+        unlock_native_capacity: None,
-+        getgeo: None,
-+        set_read_only: None,
-+        swap_slot_free_notify: None,
-+        report_zones: None,
-+        devnode: None,
-+        alternative_gpt_sector: None,
-+        get_unique_id: None,
-+        owner: crate::this_module::<M>().as_ptr(),
-+        pr_ops: core::ptr::null_mut(),
-+        free_disk: None,
-+        poll_bio: None,
-+    };
-+}
-+
- /// A builder for [`GenDisk`].
- ///
- /// Use this struct to configure and add new [`GenDisk`] to the VFS.
-@@ -95,7 +121,7 @@ pub fn capacity_sectors(mut self, capacity: u64) -> Self {
-     }
- 
-     /// Build a new `GenDisk` and add it to the VFS.
--    pub fn build<T: Operations>(
-+    pub fn build<M: ModuleMetadata, T: Operations>(
-         self,
-         name: fmt::Arguments<'_>,
-         tagset: Arc<TagSet<T>>,
-@@ -125,30 +151,8 @@ pub fn build<T: Operations>(
-             )
-         })?;
- 
--        const TABLE: bindings::block_device_operations = bindings::block_device_operations {
--            submit_bio: None,
--            open: None,
--            release: None,
--            ioctl: None,
--            compat_ioctl: None,
--            check_events: None,
--            unlock_native_capacity: None,
--            getgeo: None,
--            set_read_only: None,
--            swap_slot_free_notify: None,
--            report_zones: None,
--            devnode: None,
--            alternative_gpt_sector: None,
--            get_unique_id: None,
--            // TODO: Set to `THIS_MODULE`.
--            owner: core::ptr::null_mut(),
--            pr_ops: core::ptr::null_mut(),
--            free_disk: None,
--            poll_bio: None,
--        };
--
--        // SAFETY: `gendisk` is a valid pointer as we initialized it above
--        unsafe { (*gendisk).fops = &TABLE };
-+        // SAFETY: `gendisk` is a valid pointer as we initialized it above.
-+        unsafe { (*gendisk).fops = &BlockFops::<M>::TABLE };
- 
-         let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
-             // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
-@@ -159,8 +163,6 @@ pub fn build<T: Operations>(
-             drop(unsafe { T::QueueData::from_foreign(data) });
-         });
- 
--        // The failure guard now owns both pieces of cleanup; the early guard
--        // must not run on this path anymore.
-         recover_data.dismiss();
- 
-         let mut writer = NullTerminatedFormatter::new(
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index 9512af7156df..9bbabaf84e20 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -185,6 +185,15 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, error::Erro
- pub trait ModuleMetadata {
-     /// The name of the module as specified in the `module!` macro.
-     const NAME: &'static crate::str::CStr;
-+
-+    /// The module's `THIS_MODULE` pointer.
-+    const THIS_MODULE: ThisModule;
-+}
-+
-+/// Returns the [`ThisModule`] pointer for the given module type.
-+#[inline]
-+pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
-+    &M::THIS_MODULE
- }
- 
- /// Equivalent to `THIS_MODULE` in the C API.
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index 06c18e207508..8df38718224b 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -519,6 +519,22 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
- 
-         impl ::kernel::ModuleMetadata for #type_ {
-             const NAME: &'static ::kernel::str::CStr = #name_cstr;
-+
-+            #[cfg(MODULE)]
-+            const THIS_MODULE: ::kernel::ThisModule = {
-+                extern "C" {
-+                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
-+                }
-+
-+                // SAFETY: `__this_module` is constructed by the kernel at load time and lives
-+                // until the module is unloaded.
-+                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
-+            };
-+
-+            #[cfg(not(MODULE))]
-+            const THIS_MODULE: ::kernel::ThisModule = unsafe {
-+                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-+            };
-         }
- 
-         // Double nested modules, since then nobody can access the public items inside.
--- 
-2.55.0
+Thanks,
+Erkun.
+
+> 
+>> +		return -EINVAL;
+>> +	}
+>> +
+>>    	if (register_blkdev(NBD_MAJOR, "nbd"))
+>>    		return -EIO;
+>>    
+>> @@ -2728,8 +2735,12 @@ static int __init nbd_init(void)
+>>    	}
+>>    	nbd_dbg_init();
+>>    
+>> +	/*
+>> +	 * Set to the intended connection count so nbd_start_device() can skip
+>> +	 * the queue-freezing blk_mq_update_nr_hw_queues() call.
+>> +	 */
+>>    	for (i = 0; i < nbds_max; i++)
+>> -		nbd_dev_add(i, 1, 1);
+>> +		nbd_dev_add(i, 1, pre_defined_connections);
+>>    	return 0;
+>>    }
+>>    
+>> @@ -2790,3 +2801,6 @@ module_param(nbds_max, int, 0444);
+>>    MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
+>>    module_param(max_part, int, 0444);
+>>    MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
+>> +module_param(pre_defined_connections, int, 0444);
+>> +MODULE_PARM_DESC(pre_defined_connections,
+>> +"number of connections for devices pre-created at module load (default: 1)");
+> 
 
