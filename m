@@ -1,166 +1,95 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D37E72630
-	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 16:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786033736; cv=pass; b=MIN4BEG7fAKkScoXYQvcUil5M+zI0oplEdevakjZu6McMFkjUelqmPOx8bzHW9sSxwNckIL/HDJlEuQi8FOk3PzyCcrJ6O93Wxbgr04KvO2wnMx86BFqiQjnPXqhOjydve/Z2NHCFz/1sczq8KAJaKeo2PgabygGsFTIc0zh8oY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786033736; c=relaxed/simple;
-	bh=lVtttX0DzcbNoip3+pABR2VEbh4QnI/gjbjrOBn9+DM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nc7Cp31tFSMB3DO5vhRwMfQ4kOFz/ETNiiR2tXOq4oxpnyFkQKCGOjDidNEiBVQak81k3PCrly4Go9ElfUiZgFAwCZAIzKkllHZ9HfxZpBBOmUQUF6ZxcRJAdScNMt9nsuBSrhhOznIq9BaBH1Ia0IKWOYInGUs2OHtF61fyrfI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LtUfVVZx; arc=pass smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E282363C6F;
+	Thu,  6 Aug 2026 16:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786034054; cv=none; b=qjL2nLCPBChDj5G7FnFpNzD4AiczscNn9nU/SrsKxfz19f/pbLoMfjzZHMKdKjPi3Dpwc7Qye345v05E1nxrU5BNicysOvLprzJNDiErWvKknb4th6C9DA+3KEQ3SH+0ME9QIN14ibcHWczKQTa7OmTFXkzB26S51G6HMC7824M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786034054; c=relaxed/simple;
+	bh=TAJOsangZEjkB/qJxZuTNSMztDlfw+XlfrFAYaWpbmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SuA7zwb7HA5zrc0nXlTy7OIRc0aVqWZI9aTBLlYm7JxAizy7N4jUcVO01iSS998i5e+z7GZu2/RMTchgdF9FV3vCX0N/CkF1nDsQT6rZyTPQZaMjJwHFYACktji1EDShhM2umLggOc2e8PgBoWAzoEzr1WuGt27CPhskc2CBD0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2Mc7G642; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LtUfVVZx"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-495b27007d0so1452124b6e.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2026 09:28:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786033734; cv=none;
-        d=google.com; s=arc-20260327;
-        b=M7RUXRdFXS29O2eM+xm1Fjp2XPrdbsRV66tQMA8Quc0H6Zd9XG2T8C9dugqHkBtgqK
-         QiNscplFu2cOJt35Rhx9kY+FoZgMzEfy1MAD/dAs2EL6bfp+o7WBhc06QWWRGwsaoGLV
-         ft60EU6s7W/NX00UkDVrjRxsTdCOpLNGApJ+Dfw/XMT6c+7HI8cTClCQiHyGOdMNiLH+
-         ife28EJEkY0RKTTgMg89NqWmedyjd6heZht5L3xXtqnuySKSYZloNAwZKNwoCzmr9kp2
-         UIAWVkn2qGhTA+NePmhEUVZe2TUN8tVszJBFx6ct/P5V3/1UaMJcPAUvmuvpVti5ohVH
-         nDcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=orDEibAEujnNc9Q2xRVZqj100QoyLPb7T1VtzpVgq8s=;
-        fh=YNUjK3w9Dcux9OcU+JsZ2vIJ7ZbwhSI/st2lbsqwo9E=;
-        b=pMcMYjrbUYqibtUogqjPalylpzrfrXUXgKzvIDeU0SAuFbcaUKDwL6EQdFXp/dTETo
-         vpnn9enFcdo8otcunbXFodNt1mH9TQSWim3oHUnSvcF+G+KbSIX7MEz1yd/GZUhPdBbD
-         lzaFuQUV5u7f1VCEIzWrHHeHE89dci3eIxwQ+wlxh5NJcGYjDb5c/MLjNHVSuj44nnBU
-         gns5PFgrmPoBjBOGjaZxzDoWgsTogz8HuZn19RjrheZQq88Pi6pAISJz3vqNidbvD6Th
-         hsX6pqpJxZ1/7a/ZEYVaZSAr0390b+14My8dnroPeZzIopBGkeYRCAHZf9dFuDFxhhcA
-         ZyNg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786033734; x=1786638534; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=orDEibAEujnNc9Q2xRVZqj100QoyLPb7T1VtzpVgq8s=;
-        b=LtUfVVZx31jrUGbT/A1glmwte/QI8wrjG30x9G+m2NUW7gpNgKTznwPhZ/wdIjhrXv
-         0f+BwcPp3W9Nc/0GY4JvYF6EwX7E70nmTzSCIFkZZE33nmx7y7BGOHdohD9hqt5glsXl
-         Cy3CLC8/kixwVfj66uRH0aOMs/xnqUifHri9AWKR2djbTKioRt2DepDbnBMvn8/pIrSR
-         y46tBXINTO91gerqAOfDkLSB64ehdvKMPzfsE7Mgv31Un68TQrAgkTEJU7aw8AyNFdan
-         H9uCrwx2pcTPKGRlMxE946yHdu9hJWPF0XyV8nI6rno7E2dPKOdwQ7XWdY0eskKIn6g4
-         XJ7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786033734; x=1786638534;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=orDEibAEujnNc9Q2xRVZqj100QoyLPb7T1VtzpVgq8s=;
-        b=W3/a/sMfgkSXZTQH5YihvbQDRWPALLlWLV0SlAjct85RG+XN+uPNvlWxgR1ROxOXm7
-         Jsh/IjFTyn6Y7fnDKTHColJyXjI9GEnJzR1bcwRd2vIUmg8affztY32YEY5mQa4PrGtm
-         F5bzntrhzP4jnMyt5RU5vkBaB5g5eWwzBLpTkd0mMiJPmfQlnkjgSQIkc8cRb81XjQW3
-         njfLXsZLSQ7j5evPz+mTxqvpu0AM3cStB7u0dF/RkFi/gYZOVnaoI9+c2jrR2EZpCe3i
-         CDx77UQ2JBaVdAezQB3kG+Iv+453f+l/M0Mxj2filI2R0frZkzT8xcufmOgWLCHNen/G
-         P1Eg==
-X-Forwarded-Encrypted: i=1; AHgh+RrCxrVUilz3eHdYp3oZ4yjPXI2sjAbbN93qwzkXph6elhPLd7Cuq2Q0F9wgeAnKpJk2eGH1eQc460Vvow==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT8AZtrgxemgfVUnrVVE+A6KqHCzyBtoB4chVzyKfrW0XipMxo
-	qiOYt7iTlMCLCVJWI99FdH3A1eSK6Lfdf8wDDg0nTMuIpykNXuPoUzTF2F2qmneYBVc2OgLRF+4
-	zh2LA/qcNEwlQsy3boG/izWsU1jyOXXpehw1i
-X-Gm-Gg: AR+sD11MRo7vRjnp0PacsAwf78NsKsDJ3qVnjRJFhok8E5tsVpxmoIYzDvAAi5XL3gq
-	F5Az3unpabEH99T79NrcYmblw1DUjYbqdu4eHLoFCH7HpMDcs4CCB5MhztKORnWPxxwnpd5NTqS
-	UDTnHk1y5L4tCTz7xbbhB7Gx8HRF22OoY6ghh1pRN0uEMt0dkY3VjUJK/p8XLTOz9aYA9g9M0HW
-	dtVRY0hwE5czb1XOjRNs0829fF5ssULqyKkewEkwAs+uzlIFTDpXtA/FVj7LHzP73uG1kxhfzaU
-	xq66V7/tYP192jToOdKVLB994QYiAzGaPLfdDeTxfjhkkmUIgrVRs1FlpHIvjtJ7Xsnl2KNJdQS
-	9oqW8JT5qPNJzQXizZfjEA/xzXvhr82OB8cA2IJU6ccxC
-X-Received: by 2002:a05:6820:1c88:b0:6a3:f41c:de81 with SMTP id
- 006d021491bc7-6b02169ba70mr1487214eaf.35.1786033733969; Thu, 06 Aug 2026
- 09:28:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2Mc7G642"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hGCXh4xtdzlfwHS;
+	Thu,  6 Aug 2026 16:34:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1786034049; x=1788626050; bh=WMEdtdTMk8wU30+g6elPhGo/
+	XKRCXrqMtw4Ci5rUXKg=; b=2Mc7G642ydcd7CUeSZcvOe+DmrjwNhKOsp+VCS8d
+	YpZori0n62LJEDMYQPy24+eLHruIYw4ev32cbJ94EZZnDyIYA0XYHdOvrk1kO2Bj
+	XJPawMMbsbujzkMMJXJsxzLAnQKoL75Qh/1i/a1KDme48bJZOofK7ltOFMIEqo26
+	jKWb6jGCTiDj+rBhp8k4kn/1gXd4fvPeLOxhh6z58Irz1/P6DOEftDm/Ds80m5Fx
+	N8hhvbOeSdzOmlVgiM+JDRjHllHKI+2Ja1wHFve5eOl2ABXpKwK/58WvM9fVT7bX
+	TiXaF4QfQJsrvnnT26r2wtzcH3Z63rN24/L6silc919Gwg==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id eZKIT27DlorZ; Thu,  6 Aug 2026 16:34:09 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hGCXc03xSzlfvqS;
+	Thu,  6 Aug 2026 16:34:07 +0000 (UTC)
+Message-ID: <f6ec3927-cf77-484c-a3d8-c0417f2f2870@acm.org>
+Date: Thu, 6 Aug 2026 09:34:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260804125736.2011774-1-sangyao@kylinos.cn>
-In-Reply-To: <20260804125736.2011774-1-sangyao@kylinos.cn>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 6 Aug 2026 11:28:40 -0500
-X-Gm-Features: AUfX_mzXw6LeFGPyMPl-amHszJY-KjPag8wb51yRMpcG0iZjWc5OHA89_3DXZUI
-Message-ID: <CACVXFVO000kDV6CnuBKRs=NALPXK+QMLM0y_d2mZz=KwD-yKiQ@mail.gmail.com>
-Subject: Re: [PATCH] ublk: avoid teardown retry loop on xarray allocation failure
-To: Yao Sang <sangyao@kylinos.cn>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] s390/dasd: Add __context_unsafe() attribute to
+ various functions
+To: Heiko Carstens <hca@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
+ Stefan Haberland <sth@linux.ibm.com>, =?UTF-8?Q?Jan_H=C3=B6ppner?=
+ <hoeppner@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-block@vger.kernel.org
+References: <20260806130050.2057443-1-hca@linux.ibm.com>
+ <20260806130050.2057443-2-hca@linux.ibm.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260806130050.2057443-2-hca@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 4, 2026 at 7:57=E2=80=AFAM Yao Sang <sangyao@kylinos.cn> wrote:
->
-> __ublk_shmem_remove_ranges() removes matching maple tree ranges in
-> batches, but first stores each range into a temporary xarray so that the
-> pages can be unpinned after dropping the maple tree lock.
->
-> That temporary xarray is filled under the maple tree lock with
-> xa_store(..., GFP_ATOMIC). If the store fails before mas_erase(), the
-> current range is left in the tree and the helper returns false. The
-> outer ublk_shmem_remove_ranges() loop then immediately retries the same
-> range. While the atomic allocation keeps failing, the teardown path has
-> no forward progress.
->
-> The issue can be reproduced with radix_tree_node failslab injection after
-> a SHMEM_ZC buffer has already been registered:
->
->   # Kernel config:
->   #   CONFIG_BLK_DEV_UBLK=3Dy
->   #   CONFIG_DEBUG_FS=3Dy
->   #   CONFIG_FAULT_INJECTION=3Dy
->   #   CONFIG_FAULT_INJECTION_DEBUG_FS=3Dy
->   #   CONFIG_FAILSLAB=3Dy
->
->   echo 10 > /proc/sys/vm/nr_hugepages
->   mkdir -p /tmp/htlb
->   mount -t hugetlbfs none /tmp/htlb
->   fallocate -l 4M /tmp/htlb/ublk_buf
->
->   dev_id=3D$(kublk add -t null --shmem_zc \
->                 --htlb /tmp/htlb/ublk_buf |
->            awk -F '[ :]' '/dev id/ {print $3}')
->
->   echo 1 > /sys/kernel/slab/radix_tree_node/failslab
->   echo Y > /sys/kernel/debug/failslab/cache-filter
->   echo Y > /sys/kernel/debug/failslab/ignore-gfp-wait
->   echo 1 > /sys/kernel/debug/failslab/interval
->   echo -1 > /sys/kernel/debug/failslab/times
->   echo 100 > /sys/kernel/debug/failslab/probability
->
->   kublk del -n "$dev_id"
->
-> On the unfixed kernel the delete command was still running after 3
-> seconds. Disabling failslab made it return. The fault-injection stack
-> showed:
->
->   should_failslab
->   kmem_cache_alloc_lru_noprof
->   __xas_nomem
->   __xa_store
->   xa_store
->   __ublk_shmem_remove_ranges
->   ublk_cdev_rel
->   ublk_ctrl_del_dev
->
-> Remove the allocation from the teardown loop. Keep the existing batch
-> limit, but collect {base_pfn, nr_pages} pairs in a fixed-size stack array=
-.
-> Once a matching range is found, the range is erased from the maple tree
-> before dropping the lock, so each successful scan makes progress without
-> depending on any GFP_ATOMIC allocation.
->
-> With the same failslab settings, the fixed kernel completed
-> "kublk del -n $dev_id" successfully in about 45 ms.
->
-> Fixes: 309e02dccf64 ("ublk: avoid unpinning pages under maple tree spinlo=
-ck")
-> Signed-off-by: Yao Sang <sangyao@kylinos.cn>
+On 8/6/26 6:00 AM, Heiko Carstens wrote:
+> diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+> index bacf770c0e1f..b4dcef06edaa 100644
+> --- a/drivers/s390/block/dasd_eckd.c
+> +++ b/drivers/s390/block/dasd_eckd.c
+> @@ -1468,6 +1468,7 @@ static void dasd_eckd_path_available_action(struct dasd_device *device,
+>   }
+>   
+>   static void do_pe_handler_work(struct work_struct *work)
+> +__context_unsafe(/* Conditional locking */)
+>   {
+>   	struct pe_handler_work_data *data;
+>   	struct dasd_device *device;
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+__context_unsafe() should be avoided if there is a better solution. For
+this driver I propose to make the following changes:
+- Change dasd_pe_handler_mutex into a semaphore. This driver locks this
+   mutex from one kernel thread and unlocks it from another kernel
+   thread. That's not allowed!
+- Split the dasd_eckd_read_vol_info(), dasd_eckd_release(), ...
+   functions. Move the code between the mutex_lock() and mutex_unlock()
+   calls into a new function. Rework both functions such that the
+   mutex_lock() and mutex_unlock() calls end up in the same branch of an
+   if-statement.
+
+Thanks,
+
+Bart.
+
