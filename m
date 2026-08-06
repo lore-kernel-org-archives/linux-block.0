@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A1C499F07;
-	Thu,  6 Aug 2026 22:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BC6499F17;
+	Thu,  6 Aug 2026 22:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786054279; cv=none; b=VWC5Ubg32N08w5RvCiWOQZ6rBIXkBvXGjRgpOsnBPzJwNpWWUfDCw3+9794VSm4Rj6UGOi70Im70nifcU+yRJlNWQ64g1OsJOcFh8LsVy5U+cQGASBsAQ1GXGRIQUSFp1I7K6bKPf5kGCwF+LnYRqO71uACp4PSSdXvEPf0Qy7g=
+	t=1786054279; cv=none; b=eVlbY0+9t3PO48m53ljwjQqfJP9zw7thSvYo+9hTJrgxMrlBfGI3jClk2aHpNhDhLs8lruVvJS8GhLDjilD4l5TnLXQwvLBPcER4+MR2tt5/gyn7rQgjvDvVIWYft9io7IIf+7zhrRj05AAQJThIMHTxDE301krJA3kGb+NfihI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786054279; c=relaxed/simple;
-	bh=vgMOaqJzIBKKoeCRVxRjp5mWXlzNJZvkPQF0pfoZq+M=;
+	bh=ggaa+gmfFIkkiVFF/Ob2FccLorGTeOk5Ry8DwgzH8zQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KRu2yKCSgibkLxfZMlT92ExxYX0lY0+YWbBU3//oQhaMGHCYJ137dLp4RYWRhBeFnegH17ZncOnQKVQNwnJgN1zR+S/GFaw+aXjneEnlV6aN8Ad7+99f5zwDcjk57DvPV8pxEkdse9Ihl0yVWQEY/CH1giO6QKTODjnHVQWXGnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NPUsZw4y; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=mKPIg/MVxcZNGb4ZcQHJyFZxwp68o8tVEBWbnb7podZd94aYHSpNhQ1cfo2Gkq1RSTXaXG3xJycicXh5V5sKg5LynEfmIWETvtHkvBBibGnNDCQxK0nI47wIb0sHRdZDNtaRd8pLEAMw/75l8nJcKAXNdcPmjwp2+XJ5QaqLNiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZnkpvn1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NPUsZw4y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F6101F00A3D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZnkpvn1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B176A1F00AC4;
 	Thu,  6 Aug 2026 22:11:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786054277;
-	bh=792LT4+1Tv2pX39OSancINytl7JfR1u67Mihl21iXxI=;
+	s=k20260515; t=1786054278;
+	bh=yVWHI8/1skgVJ+ec3VtXE3a9tnGijqupyiNVrxJ5Ktc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NPUsZw4yuUWpxsOGrZoU88oVspSTpuVo5cBuKXt8yvd1vNfpIgd298DSVVS1X+rIq
-	 NyPee7Qhmm5nAcDVco+hSzND73pUYCziKRr5/fnM2BmiwT5sw62WpITHox98h0RggS
-	 jUoUxBoO8sCAXAg1qKbtsMHaLijURdBBbw3saDL1fVv75ESo/RR1G5sroWw08FMSje
-	 XLDaBW4L45kAc7moY6pGxnNoCJTwGmKLWAkHAG1KYzt/vdIr/T/dFOuLqZlcUJFBuD
-	 4XP/w86pPEDL4Z1Aqr4YHuNJ9KKz4PFVgYuIRmHBqHfNrERP64PEBsRYPlVZBF752+
-	 GGoSGh+pkLEBQ==
+	b=HZnkpvn1X+qHxyThxrT/hCl2xVOfGsW4qmXXMGptuyE/AxJjzpUgj76i8VP+wzB0z
+	 nXumiFq0ofUB9MyuvAY1Y1aizHcNpfhLXuXChs+SzFNq9KNdmVwWn8/Vtnr0Tdq0LU
+	 MAOddrsRNYV/StfTjNx2UzR37UsjXEc9L/zdo2Tiw/2oGPnFUM5GBExVFhdT9ZLYxY
+	 u0Yq1QJyn0wwfKmklFKf04t+64x1yyeEEJIeNf+KtNvY5b1p2tPh1rQijX1ze1N+SY
+	 JhgJbi9ie21Ir098or+VjcDv2eKVUYmlUt3ltidFWMs8x3ceOt3ihrrABZjodaYY+6
+	 +KOg6rnbMhhUA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-block@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -39,10 +39,11 @@ Cc: linux-mm@kvack.org,
 	Christoph Lameter <cl@gentwo.org>,
 	David Rientjes <rientjes@google.com>,
 	Roman Gushchin <roman.gushchin@linux.dev>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/3] mm: support fallible mempool_alloc_bulk()
-Date: Thu,  6 Aug 2026 15:10:30 -0700
-Message-ID: <20260806221031.79050-3-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 3/3] blk-crypto-fallback: Fix deadlock when encrypting large bio in dm layer
+Date: Thu,  6 Aug 2026 15:10:31 -0700
+Message-ID: <20260806221031.79050-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260806221031.79050-1-ebiggers@kernel.org>
 References: <20260806221031.79050-1-ebiggers@kernel.org>
@@ -54,140 +55,150 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To fix a deadlock, blk-crypto-fallback needs to be able to make fallible
-mempool_alloc_bulk() allocations.  But mempool_alloc_bulk() hardcodes
-GFP_KERNEL and infinite retries, which differs from mempool_alloc()
-which supports fallible allocations via its gfp_mask argument.
+Encrypting a large bio with more than BIO_MAX_VECS pages can still
+deadlock, even after it was attempted to be fixed by
+commit b37fbce460ad ("blk-crypto: optimize bio splitting in
+blk_crypto_fallback_encrypt_bio") and commit 3d939695e682 ("blk-crypto:
+use mempool_alloc_bulk for encrypted bio page allocation").
 
-Therefore, add a gfp_mask argument to mempool_alloc_bulk().  As with
-mempool_alloc(), the presence of __GFP_DIRECT_RECLAIM in the mask
-selects between the fallible and infallible modes.
+This is because __blk_crypto_fallback_encrypt_bio() assumes that the
+bounce bios that it submits will eventually complete, unblocking it from
+allocating additional bounce bios and pages.  However, dm-inlinecrypt.c
+calls __blk_crypto_submit_bio() from within submit_bio() itself.  In
+this case, the recursive submit_bio() simply adds the bounce bio to
+current->bio_list without actually submitting it yet.  That breaks the
+guarantee that forward progress is being made.
 
-For now it just provides all-or-nothing semantics and returns a bool,
-similar to kmem_cache_alloc_bulk().
+To fix this, allocate the bio and bounce pages with GFP_NOWAIT if
+current->bio_list is set.  If it fails, punt the encryption of the
+remaining part of the bio to a kworker.
 
+Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- block/blk-crypto-fallback.c |  6 ++----
- include/linux/mempool.h     |  4 ++--
- mm/mempool.c                | 42 +++++++++++++++++++++++++------------
- 3 files changed, 33 insertions(+), 19 deletions(-)
+ block/blk-crypto-fallback.c | 70 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 65 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 2a5c52ab74b4..bda913c39381 100644
+index bda913c39381..973399011d5a 100644
 --- a/block/blk-crypto-fallback.c
 +++ b/block/blk-crypto-fallback.c
-@@ -172,7 +172,6 @@ static void blk_crypto_fallback_encrypt_endio(struct bio *enc_bio)
- static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
- 		unsigned int nr_segs, struct page ***pages_ret)
- {
--	unsigned int memflags = memalloc_noio_save();
+@@ -83,6 +83,10 @@ static struct workqueue_struct *blk_crypto_wq;
+ static mempool_t *blk_crypto_bounce_page_pool;
+ static struct bio_set enc_bio_set;
+ 
++static DEFINE_SPINLOCK(enc_rescue_list_lock);
++static struct bio_list enc_rescue_list;
++static struct work_struct enc_rescue_work;
++
+ /*
+  * This is the key we set when evicting a keyslot. This *should* be the all 0's
+  * key, but AES-XTS rejects that key, so we use some random bytes instead.
+@@ -175,9 +179,23 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
  	unsigned int nr_allocated;
  	struct page **pages;
  	struct bio *bio;
-@@ -206,12 +205,11 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
++	gfp_t gfp_mask;
++
++	/*
++	 * During recursive bio submission (current->bio_list != NULL) any
++	 * submitted bounce bios just get added to current->bio_list; they
++	 * cannot complete and release resources yet.  Therefore, to avoid
++	 * deadlocks, don't wait indefinitely for additional resources.
++	 */
++	if (current->bio_list)
++		gfp_mask = GFP_NOWAIT;
++	else
++		gfp_mask = GFP_NOIO;
+ 
+ 	bio = bio_alloc_bioset(bio_src->bi_bdev, nr_segs, bio_src->bi_opf,
+-			GFP_NOIO, &enc_bio_set);
++			       gfp_mask, &enc_bio_set);
++	if (unlikely(!bio))
++		return NULL;
+ 	if (bio_flagged(bio_src, BIO_REMAPPED))
+ 		bio_set_flag(bio, BIO_REMAPPED);
+ 	bio->bi_private		= bio_src;
+@@ -205,11 +223,15 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
  	 * any non-zero slot already contains a valid allocation.
  	 */
  	memset(pages, 0, sizeof(struct page *) * nr_segs);
--	nr_allocated = alloc_pages_bulk(GFP_KERNEL, nr_segs, pages);
-+	nr_allocated = alloc_pages_bulk(GFP_NOIO, nr_segs, pages);
- 	if (nr_allocated < nr_segs)
- 		mempool_alloc_bulk(blk_crypto_bounce_page_pool,
+-	nr_allocated = alloc_pages_bulk(GFP_NOIO, nr_segs, pages);
+-	if (nr_allocated < nr_segs)
+-		mempool_alloc_bulk(blk_crypto_bounce_page_pool,
++	nr_allocated = alloc_pages_bulk(gfp_mask, nr_segs, pages);
++	if (unlikely(nr_allocated < nr_segs) &&
++	    !mempool_alloc_bulk(blk_crypto_bounce_page_pool,
  				(void **)pages + nr_allocated,
--				nr_segs - nr_allocated);
--	memalloc_noio_restore(memflags);
-+				nr_segs - nr_allocated, GFP_NOIO);
+-				nr_segs - nr_allocated, GFP_NOIO);
++				nr_segs - nr_allocated, gfp_mask)) {
++		free_pages_bulk(pages, nr_allocated);
++		bio_put(bio);
++		return NULL;
++	}
  	*pages_ret = pages;
  	return bio;
  }
-diff --git a/include/linux/mempool.h b/include/linux/mempool.h
-index a0fa6d43e0dc..f7898cd1512b 100644
---- a/include/linux/mempool.h
-+++ b/include/linux/mempool.h
-@@ -65,8 +65,8 @@ void mempool_destroy(struct mempool *pool);
- void *mempool_alloc_noprof(struct mempool *pool, gfp_t gfp_mask) __malloc;
- #define mempool_alloc(...)						\
- 	alloc_hooks(mempool_alloc_noprof(__VA_ARGS__))
--int mempool_alloc_bulk_noprof(struct mempool *pool, void **elem,
--		unsigned int count);
-+bool mempool_alloc_bulk_noprof(struct mempool *pool, void **elem,
-+		unsigned int count, gfp_t gfp_mask);
- #define mempool_alloc_bulk(...)						\
- 	alloc_hooks(mempool_alloc_bulk_noprof(__VA_ARGS__))
- 
-diff --git a/mm/mempool.c b/mm/mempool.c
-index d454bc9f39e9..d741e5f62554 100644
---- a/mm/mempool.c
-+++ b/mm/mempool.c
-@@ -473,25 +473,28 @@ static inline gfp_t mempool_adjust_gfp(gfp_t *gfp_mask)
- /**
-  * mempool_alloc_bulk - allocate multiple elements from a memory pool
-  * @pool:	pointer to the memory pool
-- * @elems:	partially or fully populated elements array
-- * @count:	number of entries in @elem that need to be allocated
-+ * @elems:	pointer to array into which the element pointers will be stored
-+ * @count:	number of elements to allocate
-+ * @gfp_mask:	GFP_* flags.  %__GFP_ZERO is not supported.  If this mask
-+ *		includes %__GFP_DIRECT_RECLAIM, then the allocation is retried
-+ *		indefinitely until it succeeds and the return value is always
-+ *		%true.  If the mask doesn't include %__GFP_DIRECT_RECLAIM, then
-+ *		failure is allowed and %false can be returned.
-  *
-  * Allocate @count elements into @elems.  This is done by first calling into the
-  * alloc_fn supplied at pool initialization time, and dipping into the reserved
-- * pool when alloc_fn fails to allocate an element.
-- *
-- * On return all @count elements in @elems will be populated.
-+ * pool to atomically allocate the remaining elements if alloc_fn fails.
-  *
-- * Return: Always 0.  If it wasn't for %$#^$ alloc tags, it would return void.
-+ * Return: %true if the allocation succeeded, or %false if it failed.
-  */
--int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
--		unsigned int count)
-+bool mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
-+		unsigned int count, gfp_t gfp_mask)
- {
--	gfp_t gfp_mask = GFP_KERNEL;
- 	gfp_t gfp_temp = mempool_adjust_gfp(&gfp_mask);
- 	unsigned int allocated = 0;
- 
- 	VM_WARN_ON_ONCE(count > pool->min_nr);
-+	VM_WARN_ON_ONCE(gfp_mask & __GFP_ZERO);
- 	might_alloc(gfp_mask);
- 
- 	/*
-@@ -516,13 +519,26 @@ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
- 		allocated++;
- 	}
- 
--	return 0;
-+	return true;
- 
- use_pool:
-+	/* Try to atomically allocate the remaining elements from the pool. */
- 	if (mempool_alloc_from_pool(pool, elems, count, allocated, gfp_temp))
--		return 0;
--	gfp_temp = gfp_mask;
--	goto repeat_alloc;
-+		return true;
-+	/* Retry if this was just the opportunistic first pass. */
-+	if (gfp_temp != gfp_mask) {
-+		gfp_temp = gfp_mask;
-+		goto repeat_alloc;
-+	}
-+	/* Retry indefinitely if __GFP_DIRECT_RECLAIM is set. */
-+	if (gfp_mask & __GFP_DIRECT_RECLAIM)
-+		goto repeat_alloc;
-+	/* On failure, roll back any successful allocations from ->alloc(). */
-+	while (allocated--) {
-+		pool->free(elems[allocated], pool->pool_data);
-+		elems[allocated] = NULL;
-+	}
-+	return false;
+@@ -237,6 +259,25 @@ static void blk_crypto_dun_to_iv(const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
+ 		iv->dun[i] = cpu_to_le64(dun[i]);
  }
- EXPORT_SYMBOL_GPL(mempool_alloc_bulk_noprof);
  
++static void blk_crypto_fallback_encrypt_bio(struct bio *src_bio);
++
++/* Encrypt a list of bios whose encryption was punted to a kworker. */
++static void blk_crypto_fallback_encrypt_work_fn(struct work_struct *work)
++{
++	struct bio_list list;
++	struct bio *src_bio;
++
++	WARN_ON_ONCE(current->bio_list);
++
++	spin_lock(&enc_rescue_list_lock);
++	list = enc_rescue_list;
++	bio_list_init(&enc_rescue_list);
++	spin_unlock(&enc_rescue_list_lock);
++
++	while ((src_bio = bio_list_pop(&list)))
++		blk_crypto_fallback_encrypt_bio(src_bio);
++}
++
+ static void __blk_crypto_fallback_encrypt_bio(struct bio *src_bio,
+ 		struct crypto_sync_skcipher *tfm)
+ {
+@@ -271,6 +312,23 @@ static void __blk_crypto_fallback_encrypt_bio(struct bio *src_bio,
+ new_bio:
+ 	nr_enc_pages = min(bio_segments(src_bio), BIO_MAX_VECS);
+ 	enc_bio = blk_crypto_alloc_enc_bio(src_bio, nr_enc_pages, &enc_pages);
++	if (unlikely(!enc_bio)) {
++		/*
++		 * Failed to allocate a bounce bio during recursive bio
++		 * submission.  We might be blocked on bios in current->bio_list
++		 * holding mempool elements.  To enable forward progress, punt
++		 * the remaining encryption work for src_bio to a kworker.
++		 *
++		 * The DUN may have been advanced, so make sure to update it.
++		 */
++		WARN_ON_ONCE(!current->bio_list);
++		memcpy(bc->bc_dun, curr_dun, sizeof(curr_dun));
++		spin_lock(&enc_rescue_list_lock);
++		bio_list_add(&enc_rescue_list, src_bio);
++		spin_unlock(&enc_rescue_list_lock);
++		queue_work(blk_crypto_wq, &enc_rescue_work);
++		return;
++	}
+ 	enc_idx = 0;
+ 	for (;;) {
+ 		struct bio_vec src_bv =
+@@ -589,6 +647,8 @@ static int blk_crypto_fallback_init(void)
+ 	if (!bio_fallback_crypt_ctx_pool)
+ 		goto fail_free_crypt_ctx_cache;
+ 
++	INIT_WORK(&enc_rescue_work, blk_crypto_fallback_encrypt_work_fn);
++
+ 	blk_crypto_fallback_inited = true;
+ 
+ 	return 0;
 -- 
 2.55.0
 
