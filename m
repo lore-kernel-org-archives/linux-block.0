@@ -1,30 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B83A3A7584;
-	Thu,  6 Aug 2026 18:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF3B3AD503
+	for <linux-block@vger.kernel.org>; Thu,  6 Aug 2026 18:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786041490; cv=none; b=Np2SNEdi5VDY8tkGTCrAPMlkDRDhZ3NhI2ggN9kL1nS2DXlDeuWb+mp+6ibrzvg7kwUsOD7getShqLCqj1Vyix+DXYD7kXr3LpmC31j2B3papBEjskH+OtE2ub2a6FjrDI3XHXL3YrC49dSt3qC7P9+2ROB7sEutWoy+kI0Kktc=
+	t=1786041493; cv=none; b=dZTQAA7IA6onYcgryDgQtVhotalg0MANjsmx2ohtwYqoQyWJQovywT8GVHhz2sm5rXZd7RA8eP6gtLRnrGPO15/H4b3zI6ICHeKlFqbMCZc4CzsX+ILdhH3/sO+sv/t4AVUPmBYOs+fBDnsosVOd6HMlxwPHTUWRLJP7LIx/nqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786041490; c=relaxed/simple;
-	bh=pATEb7+A37imqMe9bf+I3NwYXUwlnPI/rW+mU57goWs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KzJF3NuP5CilMXjQTwIv2SRiew7mNxvl6b+z2XUeGzsCCA3KCbpc+BeOrwP+lwtrZ05oiFGTTMwLny91Z+vJnTxFBsMOFUr1kP8a6MfxJmI3P1sBKHYQW8s0B1rEQ60p8WVXwB/+uo4G55RAL1DBzDJIiDXxvjpHqXcQ8TrdGUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JehLxJuA; arc=none smtp.client-ip=95.215.58.187
+	s=arc-20240116; t=1786041493; c=relaxed/simple;
+	bh=MgdIR1gKCaB7HmkjICzTGmBtenY5gqEIgSXJG/amQ6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gnqNEzbKdMqpBSMLC5ishHbWmVdIpKVmVWnCVsyi4xOXmeJF9Y5ZgLcG+2weEKdO31TZANQjEgPtN7qS/ip3Wa8JjeFs/n1IYfX8qiaFtgCU4QLJIubuisnilGU/QdUNUYbxEk/rujBRxk+dZG16U3EacoGDoDSlO5PX7AXbQOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XaXpJ6vH; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JehLxJuA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XaXpJ6vH"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786041472;
+	t=1786041480;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+UJ/qH6m8w+SsoyS5gEBbGmGoBm9dLVAYOMv5Qfn9kA=;
-	b=JehLxJuAPVsscMZe6Zw8hzRC1wOioAdbV7rwLWw3n+VGuTPkoYTrjYkGoUUodGKyG1QNru
-	a173htTGBJ2qQjj5g7BabXb/eWI91ps7bgw/f9bHY0sHfwqvydOhT9IRnZb7BGkBpZhNgm
-	SbS/+0+GTrFPAO3UK9rG2c0Mr8z2M50=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0FJ71k4IbTtXKn0TabOcxFSTkx7pIeozk1jZbpeVTno=;
+	b=XaXpJ6vHiElnALhknjfYZwX7U02IVS/L738rs68+A1PBPzbwRbK3uJgvJbNs45uDBAQ+p6
+	rr4Qivbp9AzILq1qvbHhhYLepJTJR3j6zRGzc2kVMIcK4vW1Pnn0XuWK43mOOLaO30Af01
+	BVxfVgh47Ae0Do/Rh/h9PeO2F94rmFk=
 From: Usama Arif <usama.arif@linux.dev>
 To: axboe@kernel.dk,
 	cgroups@vger.kernel.org,
@@ -37,9 +39,11 @@ Cc: shakeel.butt@linux.dev,
 	riel@surriel.com,
 	kernel-team@meta.com,
 	Usama Arif <usama.arif@linux.dev>
-Subject: [PATCH 0/3] block: skip the blkcg walk in blk_cgroup_congested() when nothing is throttled
-Date: Thu,  6 Aug 2026 11:37:17 -0700
-Message-ID: <20260806183742.946953-1-usama.arif@linux.dev>
+Subject: [PATCH 2/3] blk-iocost: clear delay state when freeing policy data
+Date: Thu,  6 Aug 2026 11:37:19 -0700
+Message-ID: <20260806183742.946953-3-usama.arif@linux.dev>
+In-Reply-To: <20260806183742.946953-1-usama.arif@linux.dev>
+References: <20260806183742.946953-1-usama.arif@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,38 +53,59 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-blk_cgroup_congested() walks the current task's blkcg ancestor chain on every
-readahead decision and, once swap is in use, on every anonymous and shmem
-folio allocation.  The answer is almost always "no", but finding that out
-costs two loads *per level* on two cold cache lines, plus an out-of-line
-kthread_blkcg() and an RCU read-side pair.  On a fleet profile of hosts
-running containers with 5-10 level hierarchies it costs about as much as all
-of mutex_lock(), 99.4% of it under __folio_throttle_swaprate().
+iocg_kick_delay() turns sufficiently large debt into an explicit
+block-cgroup delay with blkcg_set_delay(), setting blkg->use_delay to
+-1 and incrementing blkcg->congestion_count.  Clearing it again depends
+on iocg_kick_delay() running from the period timer, the waitq timer or
+the issue path.
 
-Patch 3 gates the walk on a global count of blkcgs with a non-zero
-congestion_count, so the common case is a load and a predicted branch.
+ioc_pd_free() removes the iocg from active_iocgs and cancels its waitq
+timer, and no further bios can arrive, so once it has run nothing is
+left which can reduce the debt and clear the delay.  The blkcg stays
+marked congested for the rest of its life.
 
-That only works if the count is correctly maintained, currently two teardown
-paths can leave a blkcg permanently marked congested.  Today that only hurts
-tasks in the affected cgroup, but it hurts them for the life of the cgroup -
-readahead cut to a single page, async readahead skipped, and a throttle
-scheduled on every anonymous folio allocation.  With a global gate it would
-cost every other task on the machine the walk as well.  Patches 1 and 2 fix
-those two paths and stand on their own as bugfixes; patch 3 depends on them.
+blk_cgroup_congested() then returns true for every task in that cgroup
+and its descendants: page_cache_sync_ra() cuts readahead to a single
+page, page_cache_async_ra() skips it altogether, and
+__folio_throttle_swaprate() takes swap_avail_lock and schedules a
+throttle on anonymous folio allocation.
+
+Clear it explicitly, after the list removal and the synchronous
+hrtimer_cancel() so that neither timer processing nor an I/O path can
+re-arm it.  The free callback can also see policy data which was never
+attached to a blkg, hence the pd->blkg check.
+
+Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
+Signed-off-by: Usama Arif <usama.arif@linux.dev>
+---
+ block/blk-iocost.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index b60625613e095..64b92aa3e5d48 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3063,6 +3063,7 @@ static void iocg_release(struct rcu_head *rcu)
+ static void ioc_pd_free(struct blkg_policy_data *pd)
+ {
+ 	struct ioc_gq *iocg = pd_to_iocg(pd);
++	struct blkcg_gq *blkg = pd_to_blkg(pd);
+ 	struct ioc *ioc = iocg->ioc;
+ 	unsigned long flags;
  
-Usama Arif (3):
-  blk-iolatency: clear delay state when freeing policy data
-  blk-iocost: clear delay state when freeing policy data
-  block: skip blkcg walk in blk_cgroup_congested() when nothing
-    throttled
-
- block/blk-cgroup.c         | 15 ++++++++++++++-
- block/blk-cgroup.h         | 25 +++++++++++++++++++++----
- block/blk-iocost.c         |  7 +++++++
- block/blk-iolatency.c      |  9 +++++++++
- include/linux/blk-cgroup.h | 23 ++++++++++++++++++++++-
- 5 files changed, 73 insertions(+), 6 deletions(-)
-
+@@ -3085,6 +3086,12 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
+ 		hrtimer_cancel(&iocg->waitq_timer);
+ 	}
+ 
++	/* off ->active_iocgs and timer gone, so nothing can re-arm the delay */
++	iocg->delay = 0;
++	iocg->indelay_since = 0;
++	if (blkg)
++		blkcg_clear_delay(blkg);
++
+ 	call_rcu(&pd->rcu_head, iocg_release);
+ }
+ 
 -- 
 2.53.0-Meta
 
