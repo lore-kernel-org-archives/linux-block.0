@@ -1,89 +1,140 @@
-Received: from va-2-59.ptr.blmpb.com (va-2-59.ptr.blmpb.com [209.127.231.59])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B78633262B
-	for <linux-block@vger.kernel.org>; Fri,  7 Aug 2026 08:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69DF207E00
+	for <linux-block@vger.kernel.org>; Fri,  7 Aug 2026 09:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786090380; cv=none; b=NHnNVjxWyl/MuTE+gYP1iGHs5idph9YVa4/t7UzrcEqupS8L4e1Ry0LIjm/Du99OdHaYhdGoL7wAdi7RxP98sp5E0wg9nksXBT0YHQ7lZzey/NPIXeLnwGQMtfICleZ9bVjX062XdzAb6og9YbOrvYcJCXXuCtziLUwyC6AYIRQ=
+	t=1786093436; cv=none; b=A017LLApbFNuNG0sTRpK6RC9RnLFfOgKticGar6bTmPogSfX+SdkNiyOaYrQPNXPE970bkNwF+ijlr/YtK2WreCj1iZww0hzzk6JjN9XvBfkqNwuItXT6k8aEvVQbUzE6XX0gRmRTR/aHB7Sh6vS0hFzwmLfVwBijcu4MTadm70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786090380; c=relaxed/simple;
-	bh=rnKxrWOjKXqj9c355UP75BYy+gEpLiXB6sdrH3IBDQc=;
-	h=Subject:Date:Mime-Version:Content-Type:From:Message-Id:
-	 In-Reply-To:References:To:Cc; b=jKSTlZriD/H02paxl9/Una8EiZfYtNi8zqBKSAfMmkpFhLKwPf5xujRq4ijNHrA8dBwFyie1kKry2gTBwNgPMLxsvLubSrqwiOx11yJr5hTciRZwHoQ4jIo9/o4yIj92cBLNOtaWf9jd3vN7HE1f1bLV+OomyLyRSXu/7NDF700=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=CgzcKVoG; arc=none smtp.client-ip=209.127.231.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1786093436; c=relaxed/simple;
+	bh=NImULWQBLQjbPXwbdhJrLHg6pDkiJkX8Pz/wMx10UO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M+tBnN8q39izwTIICNKlF+0sOFd5je3t65JfhqqczoRTan26LqVbNPUs3dj8wXAh7B1foFo5EwO7ZSDoQH5fiIC02bf4UGFmnJeSOiFA1h3umYRk609trWgaR/EJZWpwUj4E6pJVvAwf8SGAXPfkH1FSNM9qgGMggqoyckW9x1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aDlDBpdG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pIst1ZLJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dn4J6xOS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=SF7qTBPM; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="CgzcKVoG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1786090356;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=GMUnD1C44aJAVaU6J6KgGOtm7mD3DGQAze672X2mOAU=;
- b=CgzcKVoGn8Nx6vye68MP2sYN3cwPs2e+3RwD7dEHPN5wpxDin4ogbSb2/Xj1JFYBz9R15i
- d3TgTZIv4GJHeWqarnz4DQgYlyqodrxw4Q2fEWRuAZWmiL2csXImgdZWR45SaHpKecTBXf
- 8nvZ/OoglmSAtgtG5DKhg1J5Y7nYLf8zsIsl502dOQIWzmdRE4PHKyz7GG6ydZdT28RW6z
- 8nN/L5S0/cRX23PPpmBWouNTiSyt7a4Ev/VDyOC3/xMFv019vSsWW10JMugWF6weHpnuhd
- X0ehKTL4/gXiqq6Oo18PQzULt4siFjfhgF4TRkn/X+NXyvGQWWwOVF/l189mtw==
-Received: from [192.168.1.104] ([39.182.0.170]) by smtp.larksuite.com with ESMTPS; Fri, 07 Aug 2026 08:12:34 +0000
-X-Original-From: yu kuai <yukuai@fygo.io>
-Subject: Re: [PATCH v8 8/8] nbd: add pre_defined_connections module parameter for pre-created devices
-Date: Fri, 7 Aug 2026 16:12:30 +0800
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aDlDBpdG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pIst1ZLJ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dn4J6xOS";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="SF7qTBPM"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 968828050F;
+	Fri,  7 Aug 2026 09:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1786093428; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oiXgSUoH6+gEzkHOKU2pb8Pb9Y5LDqe3y7MzP39VzqA=;
+	b=aDlDBpdG7kUdGp/R28IkWbmy+9PAabgZAJKR2eO3qLTUE2iL1uW41CfNBuOFwRRYWP36Pu
+	0zwJeU62FhBCMV7XzXgZaXbhcDxjcAFpOefmPmCLJIbHeXlc8HNP3KiRcPP0zQYPQO1EPn
+	qVo7kNQS4n1f2UotlZPt+VTD7iS8b/c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1786093428;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oiXgSUoH6+gEzkHOKU2pb8Pb9Y5LDqe3y7MzP39VzqA=;
+	b=pIst1ZLJfaoD/5VLajkr7eCYGfzymbQeq27Esg/FTBYNVdx1RkK4O4c864H5VFVAeku3Sm
+	7uIPRpD19xthCYBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1786093424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oiXgSUoH6+gEzkHOKU2pb8Pb9Y5LDqe3y7MzP39VzqA=;
+	b=dn4J6xOSaSjiMznZp+qb/6Fd2hzVF18YlgFjLFenMkhnP3tTmGCJ6a/mZu62xG4PVFEPLI
+	DW7zqVg5JTrF3M3vKNNgmpQvUzTC0aq8JI3R4AB2uo1sPOYJ8izv/KeELvKOWiwkmoAPhE
+	RzxaUHloOvlhE7jplNf9xZmVhbLzCWs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1786093424;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oiXgSUoH6+gEzkHOKU2pb8Pb9Y5LDqe3y7MzP39VzqA=;
+	b=SF7qTBPMXDisTGUnA9n1o3kdz/UXZMcdlrH/hnBbxpPJ0iGwxuejf325HAq86Xe8nKz/l2
+	Dp84zXFFi+s2OhDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 853B2779C3;
+	Fri,  7 Aug 2026 09:03:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 6rEfIHCfdWojcAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 07 Aug 2026 09:03:44 +0000
+Message-ID: <f0f36b47-59bb-4add-bee6-19fda2834602@suse.de>
+Date: Fri, 7 Aug 2026 11:03:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-From: "yu kuai" <yukuai@fygo.io>
-Message-Id: <b75f1941-1083-424d-9bf9-29f1fa63f88b@fygo.io>
-In-Reply-To: <20260805122930.57647-9-yangerkun@huawei.com>
-X-Lms-Return-Path: <lba+26a759373+dfcccc+vger.kernel.org+yukuai@fygo.io>
-References: <20260805122930.57647-1-yangerkun@huawei.com> <20260805122930.57647-9-yangerkun@huawei.com>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@fygo.io
-To: "Yang Erkun" <yangerkun@huawei.com>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>, <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Cc: <yi.zhang@huawei.com>, <chengzhihao1@huawei.com>, 
-	<echo.chenlin@huawei.com>, <leo.lilong@huaweicloud.com>, 
-	<wangkefeng.wang@huawei.com>, <huawei.libin@huawei.com>, 
-	<leijitang@huawei.com>, <linux-block@vger.kernel.org>, 
-	<nbd@other.debian.org>
+Subject: Re: [PATCH v2 03/13] block: refactor disk_update_zone_resources()
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20260806160445.848337-1-dlemoal@kernel.org>
+ <20260806160445.848337-4-dlemoal@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260806160445.848337-4-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.29
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.29 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.19)[-0.973];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
 
-=E5=9C=A8 2026/8/5 20:29, Yang Erkun =E5=86=99=E9=81=93:
-
-> blk_mq_update_nr_hw_queues() in nbd_start_device() may cause a queue
-> freeze.  The previous commit addressed this for newly created nbd
-> devices by setting the expected nr_hw_queues in nbd_dev_add().  However,
-> when reusing an old inactive nbd device, the queue freeze can still
-> occur if the old nbd->tag_set->nr_hw_queues does not match the new
-> socket connection count.  Inactive nbd devices can originate from two
-> sources: loading the nbd module with nbds_max, which sets the default
-> nr_hw_queues to 1, and the netlink method, which sets nr_hw_queues
-> according to the expected number of socket connections.  For the first
-> case, add a module parameter so the default nr_hw_queues can be
-> changed.  Users who know their expected number of connections can then
-> prevent queue freezes on pre-created devices via nbds_max.
->
-> Before this patchset:
-> real    0m2.195s
-> user    0m0.005s
-> sys     0m0.022s
->
-> After this patchset:
-> real    0m0.090s
-> user    0m0.004s
-> sys     0m0.018s
->
-> Signed-off-by: Yang Erkun<yangerkun@huawei.com>
+On 8/6/26 6:04 PM, Damien Le Moal wrote:
+> Since the function disk_update_zone_resources() does a lot of checks
+> beside updating a zoned disk limits and resources, rename this function
+> to disk_revalidate_zone_resources(). To keep all checks together, move
+> the capacity check in blk_revalidate_disk_zones() to this function and
+> simplify it by moving the check on the number of zones before the call to
+> queue_limits_start_update().
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 > ---
->   drivers/block/nbd.c | 16 +++++++++++++++-
->   1 file changed, 15 insertions(+), 1 deletion(-)
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
+>   block/blk-zoned.c | 46 +++++++++++++++++++---------------------------
+>   1 file changed, 19 insertions(+), 27 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
---=20
-Thanks,
-Kuai
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
