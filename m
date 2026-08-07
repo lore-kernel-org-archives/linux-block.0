@@ -1,204 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BC6499F17;
-	Thu,  6 Aug 2026 22:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1548C44A3F2;
+	Fri,  7 Aug 2026 06:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786054279; cv=none; b=eVlbY0+9t3PO48m53ljwjQqfJP9zw7thSvYo+9hTJrgxMrlBfGI3jClk2aHpNhDhLs8lruVvJS8GhLDjilD4l5TnLXQwvLBPcER4+MR2tt5/gyn7rQgjvDvVIWYft9io7IIf+7zhrRj05AAQJThIMHTxDE301krJA3kGb+NfihI=
+	t=1786085856; cv=none; b=SAmrnCnXCMZhhOn9SmXsbOYqMNzy4RHRlOesc5RnbrxLPXjHQynvcWg5i0uvjyS4oXmc72MKQOIM5idocbStP3nFPr7z2+k79EeBxH0MBt8qpk0wTSxY4YNllqzXrsoZexZ75wTBmp5uPM33gmDw/UZ76rOMkwfvqcRepUkEAkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786054279; c=relaxed/simple;
-	bh=ggaa+gmfFIkkiVFF/Ob2FccLorGTeOk5Ry8DwgzH8zQ=;
+	s=arc-20240116; t=1786085856; c=relaxed/simple;
+	bh=dc6jcfvy7vglyuHlPrwaKsCY9clZBY3rTocwJo/NisY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mKPIg/MVxcZNGb4ZcQHJyFZxwp68o8tVEBWbnb7podZd94aYHSpNhQ1cfo2Gkq1RSTXaXG3xJycicXh5V5sKg5LynEfmIWETvtHkvBBibGnNDCQxK0nI47wIb0sHRdZDNtaRd8pLEAMw/75l8nJcKAXNdcPmjwp2+XJ5QaqLNiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZnkpvn1; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZnkpvn1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B176A1F00AC4;
-	Thu,  6 Aug 2026 22:11:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786054278;
-	bh=yVWHI8/1skgVJ+ec3VtXE3a9tnGijqupyiNVrxJ5Ktc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HZnkpvn1X+qHxyThxrT/hCl2xVOfGsW4qmXXMGptuyE/AxJjzpUgj76i8VP+wzB0z
-	 nXumiFq0ofUB9MyuvAY1Y1aizHcNpfhLXuXChs+SzFNq9KNdmVwWn8/Vtnr0Tdq0LU
-	 MAOddrsRNYV/StfTjNx2UzR37UsjXEc9L/zdo2Tiw/2oGPnFUM5GBExVFhdT9ZLYxY
-	 u0Yq1QJyn0wwfKmklFKf04t+64x1yyeEEJIeNf+KtNvY5b1p2tPh1rQijX1ze1N+SY
-	 JhgJbi9ie21Ir098or+VjcDv2eKVUYmlUt3ltidFWMs8x3ceOt3ihrrABZjodaYY+6
-	 +KOg6rnbMhhUA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Harry Yoo <harry@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hao Li <hao.li@linux.dev>,
-	Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] blk-crypto-fallback: Fix deadlock when encrypting large bio in dm layer
-Date: Thu,  6 Aug 2026 15:10:31 -0700
-Message-ID: <20260806221031.79050-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260806221031.79050-1-ebiggers@kernel.org>
-References: <20260806221031.79050-1-ebiggers@kernel.org>
+	 MIME-Version:Content-Type; b=bcJZmbTvs6VRISZLDmHt9sBcUGepB2fiXlSrSVCqbVjoZzmmZOn0oct4OevnsBLkW9e6w005W8OsBeBU0+vNWzikLXxTRtXlX5Kwlh/EDj/XDiVP/ieaP0taHXZBCe1cAyAKqMm+OPALmD9+jAJKkp0YbT9Zni+6GmtJq48g5FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 3f2e8474922d11f1aa26b74ffac11d73-20260807
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:6e5058bf-50fe-412c-b516-5a6d946d3ff8,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:e7bac3a,CLOUDID:85864ecb076565b23df8d881dfd2a629,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|136|865|898,TC:nil,Conte
+	nt:0|15|50,EDM:-3|-100,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:ni
+	l,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 3f2e8474922d11f1aa26b74ffac11d73-20260807
+X-User: liuxixin@kylinos.cn
+Received: from [127.0.1.1] [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liuxixin@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 721897004; Fri, 07 Aug 2026 14:57:25 +0800
+From: Xixin Liu <liuxixin@kylinos.cn>
+To: mst@redhat.com
+Cc: linux-block@vger.kernel.org, virtualization@lists.linux.dev, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk, linux-kernel@vger.kernel.org, liuxixin@kylinos.cn
+Subject: Re: [PATCH v2 1/2] virtio-pci: add error_detected for PCI AER recovery
+Date: Fri, 7 Aug 2026 14:15:00 +0800
+Message-ID: <reply-v3-mst-1-2.20260807.141500.liuxixin@kylinos.cn>
+In-Reply-To: <20260802165915-mutt-send-email-mst@kernel.org>
+References: <cover.virtio-blk-ers-v1.1780449274.git.liuxixin@kylinos.cn> <cover.virtio-blk-ers-v2.1785468000.git.liuxixin@kylinos.cn> <e2dda946e70e.v2.1785468000.git.liuxixin@kylinos.cn> <20260802165915-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Mailer: patches/scripts/send-local.py
 
-Encrypting a large bio with more than BIO_MAX_VECS pages can still
-deadlock, even after it was attempted to be fixed by
-commit b37fbce460ad ("blk-crypto: optimize bio splitting in
-blk_crypto_fallback_encrypt_bio") and commit 3d939695e682 ("blk-crypto:
-use mempool_alloc_bulk for encrypted bio page allocation").
+Hi Michael,
 
-This is because __blk_crypto_fallback_encrypt_bio() assumes that the
-bounce bios that it submits will eventually complete, unblocking it from
-allocating additional bounce bios and pages.  However, dm-inlinecrypt.c
-calls __blk_crypto_submit_bio() from within submit_bio() itself.  In
-this case, the recursive submit_bio() simply adds the bounce bio to
-current->bio_list without actually submitting it yet.  That breaks the
-guarantee that forward progress is being made.
+Thanks for the review.  I will post a v3 with the following.
 
-To fix this, allocate the bio and bounce pages with GFP_NOWAIT if
-current->bio_list is set.  If it fails, punt the encryption of the
-remaining part of the bio to a kworker.
+On Sun, Aug 02, 2026 at 05:10:21PM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jul 31, 2026 at 11:17:00AM +0800, Xixin Liu wrote:
+> > virtio-pci only registered reset_prepare/reset_done.  The PCI error
+> > recovery core treats devices without error_detected as NO_AER_DRIVER and
+> > does not deliver pci_channel_io_perm_failure to the driver after a failed
+> > recovery.
+>
+> Maybe it should?
 
-Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- block/blk-crypto-fallback.c | 70 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 65 insertions(+), 5 deletions(-)
+Agreed that the current PCI core behaviour is awkward for drivers that
+only wire reset_prepare/reset_done.
 
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index bda913c39381..973399011d5a 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -83,6 +83,10 @@ static struct workqueue_struct *blk_crypto_wq;
- static mempool_t *blk_crypto_bounce_page_pool;
- static struct bio_set enc_bio_set;
- 
-+static DEFINE_SPINLOCK(enc_rescue_list_lock);
-+static struct bio_list enc_rescue_list;
-+static struct work_struct enc_rescue_work;
-+
- /*
-  * This is the key we set when evicting a keyslot. This *should* be the all 0's
-  * key, but AES-XTS rejects that key, so we use some random bytes instead.
-@@ -175,9 +179,23 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
- 	unsigned int nr_allocated;
- 	struct page **pages;
- 	struct bio *bio;
-+	gfp_t gfp_mask;
-+
-+	/*
-+	 * During recursive bio submission (current->bio_list != NULL) any
-+	 * submitted bounce bios just get added to current->bio_list; they
-+	 * cannot complete and release resources yet.  Therefore, to avoid
-+	 * deadlocks, don't wait indefinitely for additional resources.
-+	 */
-+	if (current->bio_list)
-+		gfp_mask = GFP_NOWAIT;
-+	else
-+		gfp_mask = GFP_NOIO;
- 
- 	bio = bio_alloc_bioset(bio_src->bi_bdev, nr_segs, bio_src->bi_opf,
--			GFP_NOIO, &enc_bio_set);
-+			       gfp_mask, &enc_bio_set);
-+	if (unlikely(!bio))
-+		return NULL;
- 	if (bio_flagged(bio_src, BIO_REMAPPED))
- 		bio_set_flag(bio, BIO_REMAPPED);
- 	bio->bi_private		= bio_src;
-@@ -205,11 +223,15 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
- 	 * any non-zero slot already contains a valid allocation.
- 	 */
- 	memset(pages, 0, sizeof(struct page *) * nr_segs);
--	nr_allocated = alloc_pages_bulk(GFP_NOIO, nr_segs, pages);
--	if (nr_allocated < nr_segs)
--		mempool_alloc_bulk(blk_crypto_bounce_page_pool,
-+	nr_allocated = alloc_pages_bulk(gfp_mask, nr_segs, pages);
-+	if (unlikely(nr_allocated < nr_segs) &&
-+	    !mempool_alloc_bulk(blk_crypto_bounce_page_pool,
- 				(void **)pages + nr_allocated,
--				nr_segs - nr_allocated, GFP_NOIO);
-+				nr_segs - nr_allocated, gfp_mask)) {
-+		free_pages_bulk(pages, nr_allocated);
-+		bio_put(bio);
-+		return NULL;
-+	}
- 	*pages_ret = pages;
- 	return bio;
- }
-@@ -237,6 +259,25 @@ static void blk_crypto_dun_to_iv(const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
- 		iv->dun[i] = cpu_to_le64(dun[i]);
- }
- 
-+static void blk_crypto_fallback_encrypt_bio(struct bio *src_bio);
-+
-+/* Encrypt a list of bios whose encryption was punted to a kworker. */
-+static void blk_crypto_fallback_encrypt_work_fn(struct work_struct *work)
-+{
-+	struct bio_list list;
-+	struct bio *src_bio;
-+
-+	WARN_ON_ONCE(current->bio_list);
-+
-+	spin_lock(&enc_rescue_list_lock);
-+	list = enc_rescue_list;
-+	bio_list_init(&enc_rescue_list);
-+	spin_unlock(&enc_rescue_list_lock);
-+
-+	while ((src_bio = bio_list_pop(&list)))
-+		blk_crypto_fallback_encrypt_bio(src_bio);
-+}
-+
- static void __blk_crypto_fallback_encrypt_bio(struct bio *src_bio,
- 		struct crypto_sync_skcipher *tfm)
- {
-@@ -271,6 +312,23 @@ static void __blk_crypto_fallback_encrypt_bio(struct bio *src_bio,
- new_bio:
- 	nr_enc_pages = min(bio_segments(src_bio), BIO_MAX_VECS);
- 	enc_bio = blk_crypto_alloc_enc_bio(src_bio, nr_enc_pages, &enc_pages);
-+	if (unlikely(!enc_bio)) {
-+		/*
-+		 * Failed to allocate a bounce bio during recursive bio
-+		 * submission.  We might be blocked on bios in current->bio_list
-+		 * holding mempool elements.  To enable forward progress, punt
-+		 * the remaining encryption work for src_bio to a kworker.
-+		 *
-+		 * The DUN may have been advanced, so make sure to update it.
-+		 */
-+		WARN_ON_ONCE(!current->bio_list);
-+		memcpy(bc->bc_dun, curr_dun, sizeof(curr_dun));
-+		spin_lock(&enc_rescue_list_lock);
-+		bio_list_add(&enc_rescue_list, src_bio);
-+		spin_unlock(&enc_rescue_list_lock);
-+		queue_work(blk_crypto_wq, &enc_rescue_work);
-+		return;
-+	}
- 	enc_idx = 0;
- 	for (;;) {
- 		struct bio_vec src_bv =
-@@ -589,6 +647,8 @@ static int blk_crypto_fallback_init(void)
- 	if (!bio_fallback_crypt_ctx_pool)
- 		goto fail_free_crypt_ctx_cache;
- 
-+	INIT_WORK(&enc_rescue_work, blk_crypto_fallback_encrypt_work_fn);
-+
- 	blk_crypto_fallback_inited = true;
- 
- 	return 0;
--- 
-2.55.0
+Without .error_detected the recovery core votes NO_AER_DRIVER on the
+first broadcast, and report_perm_failure_detected skips the driver
+callback whenever overall status is not RECOVERED.  That skip covers
+NO_AER_DRIVER even when subordinate reset succeeded.  uevent DISCONNECT
+is still emitted.
+
+Changing the core would be a PCI-wide policy change.  This series
+registers .error_detected and joins the existing ERS contract the same
+way other ERS-aware drivers do.  Happy to follow up on the PCI side if
+that is preferred.
+
+> > +	 * permanent failure break virtqueues (follow-up may call driver
+> > +	 * .shutdown for block teardown).
+>
+> block specifically? this is common code.
+
+Right, that wording was wrong for virtio-pci.  On perm_failure the
+common path only calls virtio_break_device() and returns DISCONNECT.
+Same for every virtio device.
+
+> > +		return PCI_ERS_RESULT_NEED_RESET;
+>
+> so I guess pci will do slot reset? but what will call driver reset
+> later? confused.
+
+NEED_RESET asks for a PCI bus or slot reset.  On AER that is
+aer_root_reset() then pci_bus_error_reset().  That path does not call
+.reset_prepare or .reset_done; those hooks still serve FLR.  Driver
+restore after a successful reset is .slot_reset.  v3 adds that hook and
+it restores config then calls virtio_device_reset_done().  Quiesce stays
+in error_detected on frozen via virtio_device_reset_prepare().  If the
+PCI reset fails, .slot_reset is skipped and perm_failure only breaks
+the device.
+
+> > +	default:
+> > +		break;
+> > +	}
+> > +	return PCI_ERS_RESULT_NEED_RESET;
+>
+> here, too, and we didn't virtio_device_reset_prepare either.
+
+Right.  pci_channel_state_t today is only normal, frozen, and
+perm_failure.  In v3 frozen and default share one path: quiesce via
+virtio_device_reset_prepare(), then NEED_RESET.
+
+Thanks,
+Xixin
 
