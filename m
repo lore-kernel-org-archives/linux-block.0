@@ -1,123 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07505436BFB;
-	Mon, 10 Aug 2026 18:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCDA43440F
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 18:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786386823; cv=none; b=UlzrG48SeJr2EfphKdyOM03G52i6nizkmHcd15U46+FHgjO6dXflVqqHMSGmQTKdUaz0rwR2cY57BtfAe21F/TzDPH1cbObRJbZlJu9f8aLLkjMyFaj+yeGt3DNcpfUcgAeyMSkhkyTfXBIaa0FU7fBFCdVGu1HVASNm0LJi/Q4=
+	t=1786386904; cv=none; b=AgSky6J4EKgT1DUe52FPV1PfvJOtpf3yUt0bM97MPEe3hxRi87OqopHhWBgwalox14N1mRSHfrVsB/d2W+Jq/OziGWlHG2KAqs1FZCPIIwzkp5DuzW3lWwjOd9i9RDu6m1Vt2ltf9C/BxTKojF09sDMc45U8t1037o/ZKJm8DYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786386823; c=relaxed/simple;
-	bh=lgxVAfY6gebRrEmX6A68ZLj0anJ+wt4eJ1UBftq5IVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHQfg6hq14Htsi5l23txhrqADt28QAXbwLygHKOEido9UoYp3f21h/XYJQEh5XY69gbSQHGp716/PQpw1TyLvDFqUtakTev5FTFMJ9R+Domo/Q1aTjkeTdHZ3VzfB2/Nky76KHx6bWRGtSx/8xIOoiua4q92Fkg8cWQHsxB7/nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SO6sMt6+; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SO6sMt6+"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 8CDCA1F000E9;
-	Mon, 10 Aug 2026 18:33:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786386821;
-	bh=P+QII8ZKvaQfkVfr9AxrovrvQB4Skg9pDqF1L2zyIcM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=SO6sMt6+vHopMH71sCFaOis9vqgkT0ZRd2fRBtR09eDrpxPNd4b94V+tYmMeZWBIq
-	 wezIItJ/GyGKyJaMxS1e11n5guhsd+Z+VSfeZpdDup+ZroK69wkYKcfa7miOQHo4wl
-	 d1BY1DNQYnmbsIYfSKqFb9C7iFdq+6WsvQNNfPUYj6DCMuoRaHNs8PYnzml/Gj/PE1
-	 HLkf+l3UBsZEztqbFt3jFBNCOIDyO6Ci4LDvIWF5I4kdE9c71nyXmr6bMDhohhQ2ng
-	 JUpMwWm+TXBaTXqpsuqOUR2wtaRIUj0giAqQ1mKPFEkUFjDq0cbY4jO1s9IeGl89Ir
-	 m+uth/ywpIvBg==
-Date: Mon, 10 Aug 2026 11:33:41 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Carlos Maiolino <cem@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] xfs: avoid double deferrals for RWF_DONTCACHE writes
-Message-ID: <20260810183341.GZ3556460@frogsfrogsfrogs>
-References: <20260810-xfs-dontcache-double-defer-v1-1-aea7484b3e49@columbia.edu>
+	s=arc-20240116; t=1786386904; c=relaxed/simple;
+	bh=x+fWtxlNaiJvjuYVYcXM4gnB1taPeu7t7BSZ9JkbVzA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=laWW6/2FAkxgqL1BE8YoXqtsPukLh/cvdFAEU+aB5r28IKCeGdNsSFF0U07FJbsw9U+3xhzpFO1peSEyDtghwJPapbdsNquaP+xaDi7UwpwV9Cb+2qX2HIxIHnynSidZXUhT0xO3Qq1CQhJCuLqZkQWn7nl0j99WBE/D76HvyXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4ad778bacbeso2665744b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 11:35:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786386902; x=1786991702;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=K7uKpe4M8mbcOSEAL2qZIxK+YA+YklNLgZvtiAydeSc=;
+        b=M8WK0OobsXUZQyjF7a+/xWlFjHtLJpNtKhxReck9bJddb7AK0nmXMPTsPRzzpxS498
+         Qhshvv4/A0AUi4DfXP3/VYyoEnyxGfXFZSgiSSRsERgoVdmhrt+VUCTFBrfh5BsFLkPJ
+         TWsXRtZQ7YFnMJI0GB5FJwZaQa5X6aispvv1yur5XK/6DMomPjsEJIQJAXTIxjQF4R6V
+         tRJkmyTLu9aDkdOSWW3vX19I1SF8NphBGEA6R1traJ7k8RmrsR5VPPkibKjjZLbBa9ua
+         Xr9a+G0YpwL8FmEU/qG0SppmcHcQxYGqDW91Dg3KXaHVXI9Vz9jm/aNiQ1yrFhKI8eTN
+         yh6w==
+X-Forwarded-Encrypted: i=1; AHgh+RoZLMNjRA9ORbxV+VNOJPC7rpomtfOBP91iW+5zxUrxacUVrWNbirgh9j5DKBfTQQPLa+8D+ObHf8NK4g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyCjkLUEs4OyeYi4efBm3S2UwAi8WWoZcDbhoKqCzIhOCDv0cd
+	yMaos0zPVGnxs2Xx5dpDxX1xCib2RvycCB2tVrn9rXYETrjeHPrTKyddRqoizjOK9NBegy3JeJ/
+	ucoHnFspoZZ+pNRz/AF3IIih0P12Ng1QrxJt1DAjpOw/FBDscbd7OHmXC6NU=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260810-xfs-dontcache-double-defer-v1-1-aea7484b3e49@columbia.edu>
+X-Received: by 2002:a05:6808:6703:b0:496:a36:b5e5 with SMTP id
+ 5614622812f47-4b1ab9e3c75mr12458498b6e.17.1786386902031; Mon, 10 Aug 2026
+ 11:35:02 -0700 (PDT)
+Date: Mon, 10 Aug 2026 11:35:02 -0700
+In-Reply-To: <68dea1d7.050a0220.25d7ab.07bc.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a7a19d6.b50370da.49fe0.0058.GAE@google.com>
+Subject: Re: [syzbot] [jfs?] general protection fault in rtlock_slowlock_locked
+From: syzbot <syzbot+08df3e4c9b304b37cb04@syzkaller.appspotmail.com>
+To: almaz.alexandrovich@paragon-software.com, axboe@kernel.dk, 
+	dave.kleikamp@oracle.com, eadavis@qq.com, hdanton@sina.com, 
+	jfs-discussion@lists.sourceforge.net, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	ntfs3@lists.linux.dev, shaggy@kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 10, 2026 at 12:39:19PM -0400, Tal Zussman wrote:
-> XFS already defers some writes to a workqueue when transactions are
-> needed to process the I/O completion. Disable the block layer bio task
-> completion in this case to avoid a major performance drop.
-> 
-> Fixes: efbde6f9f449 ("iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback")
+syzbot suspects this issue was fixed by commit:
 
-What commit is this?
+commit b15e4310633f90072d66cc9b6692acbf6b4d7d00
+Author: Edward Adam Davis <eadavis@qq.com>
+Date:   Tue Dec 16 13:57:51 2025 +0000
 
-(If we're fixing something that's not in Linus' tree then I think the
-fixes tags aren't required)
+    jfs: Set the lbmDone flag at the end of lbmIODone
 
-> Link: https://lore.kernel.org/all/8124341f-3af2-4a16-897d-38db5ab5a9d4@columbia.edu/
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
-> Follow-up fix for the RWF_DONTCACHE task-completion series. This is
-> targeting the block tree. [1]
-> 
-> [1]: https://lore.kernel.org/linux-block/annkDbhXBEeMoNVT@infradead.org/
-> ---
->  fs/xfs/xfs_aops.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-> index cd8de8c82d78..74a6089abadf 100644
-> --- a/fs/xfs/xfs_aops.c
-> +++ b/fs/xfs/xfs_aops.c
-> @@ -549,10 +549,14 @@ xfs_writeback_submit(
->  	}
->  
->  	/*
-> -	 * Send ioends that might require a transaction to the completion wq.
-> +	 * Send ioends that might require a transaction to the completion wq,
-> +	 * and disable the block layer task completion for them as there is no
-> +	 * need to defer twice.
->  	 */
-> -	if (xfs_ioend_needs_wq_completion(ioend))
-> +	if (xfs_ioend_needs_wq_completion(ioend)) {
->  		ioend->io_bio.bi_end_io = xfs_end_bio;
-> +		bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-> +	}
->  
->  	return iomap_ioend_writeback_submit(wpc, error);
->  }
-> @@ -663,7 +667,14 @@ xfs_zoned_writeback_submit(
->  {
->  	struct iomap_ioend		*ioend = wpc->wb_ctx;
->  
-> +	/*
-> +	 * Defer all completions to our workqueue as all zoned writes require a
-> +	 * transaction to be persisted. This also means we never need the block
-> +	 * layer in-task completion for a task context.
-> +	 */
->  	ioend->io_bio.bi_end_io = xfs_end_bio;
-> +	bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17b1a079580000
+start commit:   6bd9ed02871f Merge tag 'cgroup-for-6.19-rc8-fixes' of git:..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=151a39927f1e10b4
+dashboard link: https://syzkaller.appspot.com/bug?extid=08df3e4c9b304b37cb04
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ad7322580000
 
-This makes sense to me;
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+If the result looks correct, please mark the issue as fixed by replying with:
 
---D
+#syz fix: jfs: Set the lbmDone flag at the end of lbmIODone
 
-> +
->  	if (error) {
->  		ioend->io_bio.bi_status = errno_to_blk_status(error);
->  		bio_endio(&ioend->io_bio);
-> 
-> ---
-> base-commit: 30df3ab3c92d0e7854c54df6ae66f4aa6eb5b3d2
-> change-id: 20260810-xfs-dontcache-double-defer-ae3fa50ba02c
-> 
-> Best regards,
-> -- 
-> Tal Zussman <tz2294@columbia.edu>
-> 
-> 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
