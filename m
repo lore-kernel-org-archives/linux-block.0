@@ -1,182 +1,83 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF61C42DA52
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 16:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786380811; cv=pass; b=Y15mEALeoYVzHVZn4Tfidv72RjVZyfray/22iVE2KD1DXPWbwl5CHMFwUqLCW9dkJISdWoro65ib9pfgkWnOytxUdd+4srjEPQxBB0LmzxgyAjcbcpvKmRUvc6EunvHd1kKEnnu42FsbjzY13jgFiU8aKRw9eZtTRM8Y4CE7a5I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786380811; c=relaxed/simple;
-	bh=hrTBjMU5ss08E8NzVEAVH6LfpDvtAnBYsIwgUDaw6sA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HpZ3AS9OK2AA/Vr9+ts3+I00EJ+XO+4d7BWRS/fdlqruPezyC8IOWOMHmgT8dkyIdyLXAIoy2+EsdIUN339f+2xkUGQSy5ODFTy6Hd0VVHQRk/jfbb0BMCk484tjSXxu6q/35BUYUm/4GmWVIVNPNFIm3v6lecwSZxLOj3nOhfU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/3125D6; arc=pass smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAD542BE86;
+	Mon, 10 Aug 2026 17:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786382484; cv=none; b=VSiSmpn1N7RUXI2kD9EQW384cQ35dSqAXW7H471a3TZg0aa9mLnsaA39/Tss1JxEtQ3shL9C3TjOhwEEbCgX3jjGabi9EUl6kwmMmG7Kw5AN8MNGZoWuuNqbfWW7pDln0JrxzAVrJkaFTieOIbIYQ7+7mf9Hk55xQpK6Yv2+KH0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786382484; c=relaxed/simple;
+	bh=JhpdVEbfz/21zcyUV3J8BF/mD6Jj6WsaUyzmLRX0Sfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZh084FGZpsvtHx9WWNByCE4tT1SnTYETv5wRT8Lw1loKfNBPJxrjZS+JNf35Bf2jSEVLaGzNLTnDef9LPOta0CGfAm5mQYY7SsKQfeVpv3I48pk8I9rxwAv4h2r2Sz+xxm52FW9f2ezwpZA1AW4hodNeoOZqeHvbTB4VES9ldY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=w4/MCNU5; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/3125D6"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b00d083818so78251e87.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:53:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786380807; cv=none;
-        d=google.com; s=arc-20260327;
-        b=pxZ0JzgbINNDUkMEETqNlS9s4t2lRJVJ/dZF4P0kjdwOhPLniklCcGFmngkhMFBp7f
-         dpfMKz+9eg3WgB+f07ScCII94wCamGFpdmRqlMaPmYRid11/k6VONH1aHFN7hha9doTz
-         fsJvlqYL1+ynu15Rj87lo5Km25kPjQvt6qpui/ONm0mKVSniL8Bd3q9QFuhBzL0TWoYa
-         NHe+Vpz6HiDZRMTUcT7ct/rQWHVmen8e7JRvGegRpIS/mBz4j6Oz48Q+6ofR3lfWfzDL
-         8qYoKb+916qlk9HBMnlXCu2LP7xRYzWnmhUZk1O06LTCxPt8sppx2ZtIx+8ES8yAU6M/
-         70dA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
-        fh=BPymAXMxTtMCYGi6NcRB4edzyWmuBVphZv7OKwYuQe0=;
-        b=PzV+7eZm/pPT89Rf2OZkWXoDlgjW/xDyq5FojsT0dZ6I2evPWQMwp8KZa86jt+tKTB
-         6mXh2mwiAzlb+/xQKli+t4QfgQVrPiPDkVyMPSB2BaykxvPK33Rlres9x42AypfF44ZM
-         eQYzhWPvrAEl3240zjrXvvhjVC5cDSu4g3Zp/MVYc6heVI15FwKsVrd2r6Zy3g5eGk3U
-         vPH+llMhAveAFzDoj9zHpiQT6Iwa6PV7jhowJIN0RRyTFpTmxtsnfXAnXxEuB922QxWo
-         BwSGpRrdy7ZdqEWKVMwmk7pXwam/WylmU8OtXvfq5qK/VFBEXu7M8OV+q92UvO3dKkYB
-         n3Kg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786380807; x=1786985607; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
-        b=l/3125D6/+JkYuTGDdviT529e3skBZUjgHelNWQBqKyVHWClDOUViZg4O1tqvvTmx1
-         ORHup6Xbwva4Ct0TI4LPF2uoDsyTMxyPBxQiHfXU2PujCHPV01eA4YrtJH0K8ORTFnTQ
-         4+uWwch9JBSaE1hErh/5TEAff+RXPUG82EfpTbAAIupp7yEhSdKKcTc8C7D/aIAht2d2
-         v9KtWSeNd5jDHyeIuF2yZHdAbimElKH10HAaBO5J4cBXrVOuBqae9elzwpXdU2WqgrKj
-         u5fcf2E32U6o0tPnO08Y8/dh4T3xtgHaAdfh9Ns1vayvX301iWBzQXdifOsGuWC9wdYp
-         PVmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786380807; x=1786985607;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
-        b=pCyqvewij7NxrgnCvMTDcYJvhC2jOJ1bIiqyPrr7kJLrxRi7NNH2h4CNenHX+LT32Q
-         X2b71ubj4186DnfF4kLbM2soDoajEa0wfQ7B7uVb5etxJZgsw1xyQQSEJSpzIK24ME3V
-         4/KL8cz0CkhiHPXxu5ssOFT8DaBF7jfO01jevzHsLFF/C1a2mQj5jZhK5ql1iq79mfjd
-         zvAi8gj4oqeccaOvGjsQ2C8Iyc9LRqE9s0mr+CvK+8uhqTqfVzykJETzjHRF9+TwnFPS
-         MObfNn07kJBM15XIDcRUqjYvcCZdfwn+FG9hplb16WciaXsDjRbC1MNxX1WyfEvHiiFS
-         OPNg==
-X-Forwarded-Encrypted: i=1; AHgh+RoDYINV1ctyQfIOj6qQ9cy3oN21Ps/Mk4NKwVx4hgk0Brio9CZlXdA2jt0tNirb55wHItR95BVYjAYm/A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxr53VyNfCHhlJ5ccO9Lk389ItnmES0m7Im9ubpLfnAUGCyuC2L
-	bYbyNi54LJ8F62Kx0GRpI1oSr3aSONznhqEUQGvhsNGTKqGK5sK+ERWzZoVC0vjImpPe8CJ3vlu
-	btu/YWMgXlNCNcCfod369tJ8CmBhVpBY=
-X-Gm-Gg: AR+sD117LzydG7l80sTaYYkzEEHsRgMH0oZf3SKKkO9A0JXjqVfluF1oOu1XgXN1kNf
-	4W7s+kt3PiCLKbLibNBpzjdxF+p9R/5WZeQyCb3RYwAjXBYJcoNNS/jNVHYPYy0deStMJpxTcAJ
-	nYtPS2701AbTZWKlEXr+aM4SnbtIKwX72X9MxulSSlqsFWNG6gAHEr1IcaP271+zenai07XF67n
-	e2Wi44NniVel89/0lrFRpzpVSbz4CVuQNipI7+2PFZimgrCzrFtvW7eaTgXU7sHaJhTBs0zxBFl
-	HwD4yyuZg/2+MM4Nsep7dMjBv/KB1QjO2lNPIONSelpNTSIRany+xfBAA9FitqPkQ2cY2sO3Kfj
-	KFoAhXSE1ALvgGNdyWubqtUyAR/yzfzGBkDyE53Jo/MGGBg==
-X-Received: by 2002:a2e:a589:0:b0:39f:af21:75d7 with SMTP id
- 38308e7fff4ca-39fe8316b4cmr28346751fa.2.1786380807071; Mon, 10 Aug 2026
- 09:53:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="w4/MCNU5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cy7OYoW3PJUmnKukrwcZFQ3hLQc7isy+xcCx8NMp1l8=; b=w4/MCNU5K681S4PdttIQArlltd
+	aplhwsp6XCU4p2gSmBzQF63vxrK4SGZ9xboYcrehjzg4Zr3lNxMHnAh0pJ0dg4kHYPhyd2NSBYLJD
+	lZ8DB176sohHR4/o2j152C12lB5eVjKKA8KsNzmqLL2eOpSYJ36jGbd2dNJB9CE5puTWOt1qH+lc9
+	YarURFLhH+UEkLQ/d1iU53sByUUn4us6p3VCMUzCh6/mtbn9U6LFvLJpg/+TJu9+BmsC04586zYRK
+	WOakoINSy5YfcXOZ/OZP6tDomANg7HvVvbMmQNq0UDAaig+srKF/YjsKaSG2KN9JJbYYYdGZXa4XG
+	JMbvD+IQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wtTgZ-0000000CVLf-1MO6;
+	Mon, 10 Aug 2026 17:21:15 +0000
+Date: Mon, 10 Aug 2026 10:21:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Vlastimil Babka <vbabka@kernel.org>,
+	Harry Yoo <harry@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>
+Subject: Re: [PATCH 2/3] mm: support fallible mempool_alloc_bulk()
+Message-ID: <anoIiy0V-m-05yZc@infradead.org>
+References: <20260806221031.79050-1-ebiggers@kernel.org>
+ <20260806221031.79050-3-ebiggers@kernel.org>
+ <ann1i5VjTmgChjs7@infradead.org>
+ <20260810161404.GA1930@sol>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260806170108.2100312-1-daeho43@gmail.com> <ann0OPPglToV_hjs@infradead.org>
- <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
-In-Reply-To: <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
-From: Daeho Jeong <daeho43@gmail.com>
-Date: Mon, 10 Aug 2026 09:53:14 -0700
-X-Gm-Features: AUfX_myHa-HGIxfGx31VEif489SQOdZ1JWJCG5M4SLT2WDWvbOhVQ3bd6pEJrl8
-Message-ID: <CACOAw_zqOS0vHdQV6WoUJyxnDf=kdDAz27pNGDLdQLUdUYOzBQ@mail.gmail.com>
-Subject: Re: [PATCH v2] f2fs: quiesce background threads during system suspend
- using PM notifier
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, kernel-team@android.com, 
-	Daeho Jeong <daehojeong@google.com>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260810161404.GA1930@sol>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Aug 10, 2026 at 9:34=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> On 8/10/26 8:54 AM, Christoph Hellwig wrote:
-> > On Thu, Aug 06, 2026 at 10:01:08AM -0700, Daeho Jeong wrote:
-> >> From: Daeho Jeong <daehojeong@google.com>
-> >>
-> >> During system suspend, a race condition can cause f2fs_gc and f2fs_dis=
-card
-> >> threads to call submit_bio() while the underlying block device (e.g., =
-UFS)
-> >> is in Runtime PM suspend. Because Runtime PM worker threads are alread=
-y
-> >> frozen during task freezing, the threads become trapped in
-> >> __bio_queue_enter() waiting on mq_freeze_wq, leading to a PM freezer
-> >> timeout.
-> >
-> > That does sound like a general issue with our block device / threading
-> > handling.
->
-> Daeho's description above mixes up unrelated topics. A runtime suspended
-> UFS device is resumed automatically by the block layer if necessary. The
-> issue Daeho is trying to solve is unrelated to runtime suspend according
-> to my understanding.
->
-> >> To prevent this deadlock, register a PM notifier to set SBI_IS_SUSPEND=
-ING
-> >> during PM_SUSPEND_PREPARE. Background GC and discard threads check thi=
-s
-> >> flag and immediately stop issuing new bios, allowing them to enter a
-> >> freezable sleep state cleanly before process freezing begins.
-> >>
-> >> In addition, check freezing() as a fast path to stop issuing new I/O
-> >> when non-PM freezing (e.g. dm-snapshot or cgroup freezer) is requested=
-.
-> >
-> > .. which means that we really sould have all the relevant parties
-> > invited into figuring out whast is happening here, rather than
-> > band-aiding something that looks like a horrible hack inside a
-> > file system.
-> >
-> > Unfortunately I see this a lot with f2fs.  Please reach out to all
-> > relevant maintainers for something that does not look strictly local
-> > to f2fs.
->
-> This information was shared earlier with Daeho
-> (https://b.corp.google.com/issues/515470309#comment45): [ ... ]
-> Register a Freezable Kernel Thread (Recommended) [ ... ]
-> Why this works: During suspend, freezer stops freezable kernel threads
-> before devices and block queues enter their PM suspend phases. When the
-> queue freezes later, your thread is already safely sleeping in
-> try_to_freeze() and will not attempt submit_bio(). [ ... ]
+On Mon, Aug 10, 2026 at 09:14:04AM -0700, Eric Biggers wrote:
+> On Mon, Aug 10, 2026 at 09:00:11AM -0700, Christoph Hellwig wrote:
+> > On Thu, Aug 06, 2026 at 03:10:30PM -0700, Eric Biggers wrote:
+> > > To fix a deadlock, blk-crypto-fallback needs to be able to make fallible
+> > > mempool_alloc_bulk() allocations.
+> > 
+> > It doesn't.  fallible mempool allocations are a concept that doesn't
+> > make much sense.  Please just go straight to the backing page allocator
+> > instead for callers that do not need the mempool guarantees.
+> 
+> It does make sense.  When alloc_pages_bulk() doesn't completely succeed,
+> there still might be pages available in the mempool.
 
-Hi Bart,
+But they should not go to a caller that does not need the mempool.
 
-To clarify it:
+> blk_crypto_alloc_enc_bio() should try to take them before falling back
+> to scheduling the rescuer kworker.  The rescuer encounters scheduling
+> overhead and is single-threaded, so it's slow and should be used only
+> when absolutely necessary.
 
-f2fs threads are already freezable: f2fs_gc and f2fs_discard are
-already registered with set_freezable() and call try_to_freeze().
-However, a race window exists: a thread checks freezing() (false),
-calls submit_bio(), and gets trapped inside __bio_queue_enter().
-Because it gets blocked before reaching try_to_freeze(), it triggers a
-PM freezer timeout.
+No, it should just try a regular non-bulk alloc_pages (and eventually
+alloc_pages_bulk should do that fallback for the callers, but that's
+a separate discussion).
 
-Hi Christoph,
-
-Point taken. Aside from this f2fs patch, I agree that addressing this
-at the block layer or PM subsystem level would be a much cleaner,
-system-wide solution.
-I=E2=80=99ll give more thought to how we can properly solve this race
-condition for the entire system, and I'll loop in the relevant
-PM/block maintainers if a viable generic approach emerges.
-
-Thank you,
-
->
-> PS: I'm no longer subscribed to the f2fs-devel mailing list.
->
-> Bart.
