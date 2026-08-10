@@ -1,70 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC933D7D8E;
-	Mon, 10 Aug 2026 16:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F446426D2B;
+	Mon, 10 Aug 2026 16:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786378568; cv=none; b=tr0P3qWhW6ZLrQnscdPZEFZtvGIeq4CXFiD6T7TPelYtpO+951UOLqJ3Ajtth+ON6oiXNLeK8qmeKcXeg/k0E81PAMQuoBqgJU9wze5H+CVIrYpqNVwUv+b6Fj6lNpyI1+Pw7S41JIy6vFWH5L873pDAETP/UqWSS/vCyY15Vek=
+	t=1786379693; cv=none; b=nyaPITvp2eFvd0H6wwfE/D3HWgpmZuc85I529aK2Y0dVtvmeJVGnXbsZIymLBV8W2RmcrxBEOjA+0y3oY3jR8m71YkJKUZS/5DQeiXOVjv3JfXI32EElHQ68SnZdc2HMYkEm2/B0G1Tf+JPnKNtr+EzxqJzwPS57wK12SrOlLek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786378568; c=relaxed/simple;
-	bh=6YgOh4T1ngsn6Wkr+zwOdAFXM78a5rt+eJRtMTIu7YM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rpSJvkeaqrQD3P6mjUQmEz6cUXsTANAWc/T0tc6hndtwPAcEf5QuQ7UU7paM0RPUyPde3Fz3GwpUy0ETEba3APjJ68cdYvsI11kXSqtwxDbzPYH5YzH7wweiQ+cDuK0vsWQXLeu/sXc8eYXG8c6kK+ZQl04AyMXW7U25BlZw4EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S9NHwTND; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786379693; c=relaxed/simple;
+	bh=1n5weGA3xtEKw6UG7igLss/eE5+zLKS9ArDekgYueoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tiy0FWKnDKQNlLIwnJEodK6xQl8HW/buJGHVM1IHj/ePoGfxshK8KuzWr4uRukRctQkj9XfwJEKa8tCJlqHYvpTn+o4k0tdiUO3R2nPSVH0NoEGulam3aTruMxHqqJiPK+gjDmc6wTU2KWoSN1DhFJTYNmRRSz2cUF6bYi9TXwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=wuedhpCe; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S9NHwTND"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D851F000E9;
-	Mon, 10 Aug 2026 16:16:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786378567;
-	bh=BlVAueKovJSaHcWrWN4BTIc7QYuuIT53QjtjPZuWPck=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=S9NHwTNDd9FQ7nrl98XA7oP4Xhhu9sW1p80y37Wvsam2MFSlFDytGjYX3OIkStyo7
-	 p/eIxc7hR5jr2cbZSwWmhxbgkjBzYLTO6LvWXTJbV7+snMR67wQ0U1HNS9oFJ32wjw
-	 7sU+MOjodVdh2R0vtbjB/aIIOtnk91e8foUNXT4fOlRLv4wg8Ys3wLl485NPfz+0wU
-	 Rd7Qb0/MG6//xCyA6jZeM8iCaSWF61OaxIfh64qEzZCouvk9Zx9765Icn/gjxsFDSv
-	 1MdwCH+mN0HGa1n0dOoAExjIEb2LBKn48i4fdPQc4BE80KpoCJxc/f8pqA6DlHlBrH
-	 etCJDghhLcyTw==
-Date: Mon, 10 Aug 2026 09:14:04 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Vlastimil Babka <vbabka@kernel.org>, Harry Yoo <harry@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>
-Subject: Re: [PATCH 2/3] mm: support fallible mempool_alloc_bulk()
-Message-ID: <20260810161404.GA1930@sol>
-References: <20260806221031.79050-1-ebiggers@kernel.org>
- <20260806221031.79050-3-ebiggers@kernel.org>
- <ann1i5VjTmgChjs7@infradead.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="wuedhpCe"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hJgMT3mvLz1XM30j;
+	Mon, 10 Aug 2026 16:34:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1786379677; x=1788971678; bh=GA+WLiTlvjArbsYCWEM0t+Rl
+	0HCxi12K1ZGpQe+GWcs=; b=wuedhpCelYOQX8TPOIHXkV5XLSVA1UJyIgx33s5G
+	5lryYVaJasvQZFr5DJRF4ipPBcwUQnCnA3r48yAA1QGh3FRvUGX7j0QBAx42zeJ6
+	TloGPaoDshk2iyFKL8yWCAT47Sst0fLEV5LKKQpc2xaF99DBA0tuQvNSlT0QqL/x
+	WyB+VnkUwOIHwz79BGCUVJynMCK76wCGRkiPhgNOYnQsF0mD6GiMvLdeAUU+3S9v
+	qdopmSEe1npfMEOQhjLGtEEogYPxMLRAyR+IxoczkjSg2qWzBwa1bk3ySusLkBI1
+	AFtjcUEygrtdZcIdKwwvZivpC+Q7OPp4O3WI6Z/oyHHJVg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id sk6PZJJKqySN; Mon, 10 Aug 2026 16:34:37 +0000 (UTC)
+Received: from [IPV6:2a00:79e0:2e3b:8:bf02:1d5:26f3:7213] (unknown [104.135.204.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hJgMG2MbTz1XM30h;
+	Mon, 10 Aug 2026 16:34:34 +0000 (UTC)
+Message-ID: <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
+Date: Mon, 10 Aug 2026 09:34:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ann1i5VjTmgChjs7@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] f2fs: quiesce background threads during system suspend
+ using PM notifier
+To: Christoph Hellwig <hch@infradead.org>, Daeho Jeong <daeho43@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ kernel-team@android.com, Daeho Jeong <daehojeong@google.com>,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>,
+ Len Brown <lenb@kernel.org>, linux-pm@vger.kernel.org
+References: <20260806170108.2100312-1-daeho43@gmail.com>
+ <ann0OPPglToV_hjs@infradead.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ann0OPPglToV_hjs@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 10, 2026 at 09:00:11AM -0700, Christoph Hellwig wrote:
-> On Thu, Aug 06, 2026 at 03:10:30PM -0700, Eric Biggers wrote:
-> > To fix a deadlock, blk-crypto-fallback needs to be able to make fallible
-> > mempool_alloc_bulk() allocations.
+On 8/10/26 8:54 AM, Christoph Hellwig wrote:
+> On Thu, Aug 06, 2026 at 10:01:08AM -0700, Daeho Jeong wrote:
+>> From: Daeho Jeong <daehojeong@google.com>
+>>
+>> During system suspend, a race condition can cause f2fs_gc and f2fs_discard
+>> threads to call submit_bio() while the underlying block device (e.g., UFS)
+>> is in Runtime PM suspend. Because Runtime PM worker threads are already
+>> frozen during task freezing, the threads become trapped in
+>> __bio_queue_enter() waiting on mq_freeze_wq, leading to a PM freezer
+>> timeout.
 > 
-> It doesn't.  fallible mempool allocations are a concept that doesn't
-> make much sense.  Please just go straight to the backing page allocator
-> instead for callers that do not need the mempool guarantees.
+> That does sound like a general issue with our block device / threading
+> handling.
 
-It does make sense.  When alloc_pages_bulk() doesn't completely succeed,
-there still might be pages available in the mempool.
-blk_crypto_alloc_enc_bio() should try to take them before falling back
-to scheduling the rescuer kworker.  The rescuer encounters scheduling
-overhead and is single-threaded, so it's slow and should be used only
-when absolutely necessary.
+Daeho's description above mixes up unrelated topics. A runtime suspended 
+UFS device is resumed automatically by the block layer if necessary. The
+issue Daeho is trying to solve is unrelated to runtime suspend according
+to my understanding.
 
-- Eric
+>> To prevent this deadlock, register a PM notifier to set SBI_IS_SUSPENDING
+>> during PM_SUSPEND_PREPARE. Background GC and discard threads check this
+>> flag and immediately stop issuing new bios, allowing them to enter a
+>> freezable sleep state cleanly before process freezing begins.
+>>
+>> In addition, check freezing() as a fast path to stop issuing new I/O
+>> when non-PM freezing (e.g. dm-snapshot or cgroup freezer) is requested.
+> 
+> .. which means that we really sould have all the relevant parties
+> invited into figuring out whast is happening here, rather than
+> band-aiding something that looks like a horrible hack inside a
+> file system.
+> 
+> Unfortunately I see this a lot with f2fs.  Please reach out to all
+> relevant maintainers for something that does not look strictly local
+> to f2fs.
+
+This information was shared earlier with Daeho 
+(https://b.corp.google.com/issues/515470309#comment45): [ ... ]
+Register a Freezable Kernel Thread (Recommended) [ ... ]
+Why this works: During suspend, freezer stops freezable kernel threads 
+before devices and block queues enter their PM suspend phases. When the 
+queue freezes later, your thread is already safely sleeping in 
+try_to_freeze() and will not attempt submit_bio(). [ ... ]
+
+PS: I'm no longer subscribed to the f2fs-devel mailing list.
+
+Bart.
