@@ -1,135 +1,146 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020083.outbound.protection.outlook.com [52.101.195.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6E63BBFA7
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 11:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786360437; cv=none; b=DGfspDqEiS0ydAk2GyJLzs/q38BcWSRhkl9FoRKWkl1VFP8FWt8+tJV9sfTnf4hpIpf+1gR2ZXqFdKOW7MXpnJWbKhgNRxc6pIOtV5ei71xOiS3n8basi9+QWqiDCNak1M6EehPbX9oDX+Xf1GHOxfrmPg06iJws+XszBZJGezM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786360437; c=relaxed/simple;
-	bh=0XX0nQa29jS3BYsHX3yCOvRVKWgcJVuXtxuezaUS77g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MKiAHLpG9ICh5yacJWtUwHms8KitHMYEJB+zLv0e5hCSAVoJ4OmfAr5qGsptr0Ip5/ndqh1ga+XW55FcqxjgTroYE5A9cCvBZ4DNvUmsDNPR1uig4+X/0QyvrUuuT629zrkH8KMNvgsou7kdcwhPX2tiWg2r5aCeobmTbqtQkvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=RUGM+Zko; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="RUGM+Zko"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-480033bdcf4so944789f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 04:13:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1786360434; x=1786965234; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0yLoMsGvnzZxwm4ZKw1RwkA/Sg9gcuHMRtAJWOOKK/U=;
-        b=RUGM+ZkoL4qfmS6tu/HkuXIwfnWYDSnpvjhwTUV4D0TeNIoTBL7snHGQnMw1LCZ9AV
-         EjBSSiHfEmyNW3gV6ggDOqd1NouwkOZsVrXosQEm+X52LTBfwqAHuCiXKtghVGuVc7/n
-         Z9sFUZ72r/BmWR6GzLIOeGTzaVcAiTs6OarHzqFyIhknu9OXiIfItiCpVaeZLGu5oHdP
-         WRlgDlqekfVAe0nW0rXdE9ZDRyPZWzZiqgvth6tBIJPXyX87+0XgZqwMs/NN682/jmdQ
-         tg7vfLIbWH8twib/hjcvu107xD0o+XTXBIatP73FjfeiQ/okeG5a96v2hyrkfF7WR2mk
-         /umA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786360434; x=1786965234;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=0yLoMsGvnzZxwm4ZKw1RwkA/Sg9gcuHMRtAJWOOKK/U=;
-        b=hyWRx/a2YNa6iWqlkKS6lDZFtXWB+8s9wC1T+GxgslDIbTruLgAfFMPDRBAHxg45Ap
-         fvxzWvAw77L+WptcUohT8U4TFsifbumWLm9zYceYhGRfMkMIoXEasgdlEkU128Ho9Wte
-         6UG03iuxpV7eydliZH6grNW0o76NM48UkFfpbwwU+O4HeuY/CfSi1MC9Hy2p5K0Uwa4H
-         LoAHv0r8x6tYDo+Ez3ySfWBM+w59DObiramylHUzuL1gO2Ovf7d53E9Gr7s6i2FLY1VO
-         QWW31/BEme+OCACqL295AwSXRq+lVDIR4U/Xnas9oIXRxn+RjEXY3aGQA1t6kzFe3Gtu
-         gW4g==
-X-Forwarded-Encrypted: i=1; AHgh+Rpk1SgmomjTTBClval0un2UQzqPmwoyA5Rd8+Y2GD1De4hQP+EvUlgM6LHZD0mM3Yy3ZoqbWx5qllN8SA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YypJgkT3E3+hsCMqMRYMs0x/RBRxE+r6B3Vd8uINnqScXAC3NMi
-	Aza9g3MbWrpu34ZtYe4w5AJFCW/f1/6PkDgWrJ4toyEgqCHIiZ0/nJkBikJiB4u/+NmnYi2uu1q
-	kClXg
-X-Gm-Gg: AR+sD121UyBpkiYgyNXoLwgYSlTxHvDoqZ915B1scsANzlkTSfF1qYEFkRXeFkpl0ZO
-	J6n3/O8ExeYcEoRiucMQEwWuy+pO7aSdVYk2sEWF+pkjiKDufr33hbqswZu/zSa8hZS4eQ+nkxu
-	+nuZpoHAuMH6EZ7TNazYV6XA+NjfIvKEykNeDVygBrJkbLIP6ZVR2eHAexOH468uz//Tzo/smAg
-	DzD2kwJviHR6D7sWjjYhO7GereSjKF1HOlHjAZKQzagSLLs7sma/gzVFENmf0FMg3F8yikQR0Hm
-	SJSyFv6EFCbsLPM1/YkE3yUubppP4EQuf0iJIufFizOxSgKqsIJrQoTWlacfNBXACwjrjD0563F
-	ENb1T83LyFwYgxXa75+edt/0SZDsKBl4R6wIMYWYx6BSvtHPGIuG9dIGNR9AenL3JuaBojt60j/
-	yE8mJiBapQlbuf8i54XgxhlBtNzW+dhRj/kEodROiZlFnfivORFKfplKeHwOknkygkyDeGStsCr
-	lQF3yFpu/4UNy0GZ44mODJMGUzwVh7dcsG0bULezQ==
-X-Received: by 2002:a5d:5985:0:b0:47f:973b:71c8 with SMTP id ffacd0b85a97d-48145639a80mr1747572f8f.21.1786360434119;
-        Mon, 10 Aug 2026 04:13:54 -0700 (PDT)
-Received: from [192.168.178.55] (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-480021fd392sm31807386f8f.31.2026.08.10.04.13.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Aug 2026 04:13:53 -0700 (PDT)
-Message-ID: <04df5445-167d-4ab6-95f5-dec123fdff1a@linbit.com>
-Date: Mon, 10 Aug 2026 13:13:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601113DCD9B;
+	Mon, 10 Aug 2026 13:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786368158; cv=fail; b=n9ApjjPlrQ+bdhZQCHq4MY9ldN50+3lrZD8gULegGEQJB6OPM4Iukp0tRzIgILsbw7Svkf9lAqZpP3Eg3Ak1dZyblVrKjZpl/UdCBxcdkjKyemFPG8iolfKw3/XjGw+D4YXFMtfA51rk2rTw+lSfYZKNRtgCQFKMAANtXg/R/kU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786368158; c=relaxed/simple;
+	bh=csHdrjJ0ZwiJhgZu3pOc0lADicTmiNJRh9fINqgnDRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jzU+vU999pX3MKkpAk3IA5p5srej9ZhaMFGeksxkjrXl4ohiK3Bj74EEmqsuyVNUvJWMeDrcadX/CZHJLElgxYitP/BkoCWNTc0hboHqCndDMAdAxjctddIobsRfHv7QFBAgf0SRLo9ue6q7AtAad3jSPtKYrEz8OAcuRDucEV8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.195.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xBW6N94Ii2dF7GaNnxDCU5lXHH9BJynOWkSMjUybZGNsGGMAvMTA4S59Lhvsl9mgoEsUxwV2K5deBTAn8YBcdLxJJJ1i3aVjL+P7VngZUd0ricaQKPhXqWt6IgDnUYvWvOw2g2m+X5uAUKXvFWUEesXuPpFqLqQ+mrXPLhg+BDu0zlOObXRvC7QUXZRb8/IZNwZYpk51y3ns+jYsynQVZ5xsYPANM9Uic2jzMWGxfy1GKClYR3AwS00zb/dpoSs98JXEkXQXojNiKFqrGrLEhDABRAl0KgsT58qz8jZv3j95XS+IMuT9PxueF+G5gEYJ29xowdFhCZRsPCidE2F9/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
+ bh=O+K8c1MIgIEjwD9QSM2otRO0L6V+ry+0qYEtbE8GoC4=;
+ b=i/OMv/le05gd8G1NqkE+BbQawQxrmpVS3/aMHrsw8p/0bjpc2Klbml3OQrIGvMlBNN3XHZviYw2iPIWIUWq6KJqTNMaZq3D/iGL2JrDbZmBPqg0KXir1LvTI2aKK1qiqr499ZfxQt7rSxA0l6dikQdvvYuiMOWNPpejX9bPEu6tkWWe6VRCQG3nt9j0G+awS50oAh8x1N0J98RP2FOsG8TfC2Ww4cKExfKHYmJx5FMJEjIT5eXtXVyZXgQySS6ziS61bP/1BM0kd1RUjFs5bs5bvmdOWq+qWHgH7ngTipL3/JkGLVksd2pQHfUE1TTeU/kORFcZcbkATluZHoHbusQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
+ by LO4P123MB6610.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:279::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.25; Mon, 10 Aug
+ 2026 13:22:32 +0000
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0292.024; Mon, 10 Aug 2026
+ 13:22:31 +0000
+Date: Mon, 10 Aug 2026 09:22:27 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
+	bigeasy@linutronix.de, wagi@kernel.org, marco.crivellari@suse.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v15 0/8] blk: honor isolcpus configuration
+Message-ID: <k2lz7cbhtzlx23qk2nhii46znecytdfrcyoctvpqgu2ibttdbz@v2y6jttq2h6l>
+References: <20260521232956.553287-1-atomlin@atomlin.com>
+ <20260807142105.382726-1-ionut.nechita@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260807142105.382726-1-ionut.nechita@windriver.com>
+X-ClientProxiedBy: MN2PR03CA0027.namprd03.prod.outlook.com
+ (2603:10b6:208:23a::32) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:183::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drm/radeon: fix typo in comments
-To: Guo Tenglong <micronull@163.com>,
- Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
- drbd-dev@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260728090507.16847-1-micronull@163.com>
- <20260728090507.16847-2-micronull@163.com>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <20260728090507.16847-2-micronull@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LO4P123MB6610:EE_
+X-MS-Office365-Filtering-Correlation-Id: 859af3db-8955-4392-65c9-08def6e26e96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|7416014|10067099003|56012099006|4143699003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	wrov1gL0nqFs7qQtBMBeeVKq+tQ1YXKd+4M8jjj1MwyzCXR/LG8A+7H2SlRWDZm+QUt1isRqKAT7TJOOcWFEERLtqciK7S80mH1Q9t8uz4vtyc0H1bqtkUPYf3NELQgNvcwW7tX6VJA4lqFEeB4qupUL8zwp21+hy46079hjWeuZ+ml6ZVifmQTr96zTSSrwIMW1QKQ8aHywqdWQ89Q10AWvDyAt8n4jYiqoWGNSXKez9fzlJCFJKMBFqUNWszxxIg4kvoidsXiTnd2mFAkMGkg8JzSuBEO0DdDVqKIcEvE6HRHyiSZ/DbG5ubk5JQlVIhpq+iOVYKAVrMDl14yJ9FVY+dHXQm308cvkoSeO3cUCTfj/hE0eNPzOHrHZTXpCEfRYMZlORDF1fgBkTIkQXe52GF7MMwzAk5t9MnWQHI6u5N82gvY2acxK4RqhslDtXcZ5dO32U7RmZ0C014B0W1DUKyToaJiGPrwBcQll7MChzhcRHlo1FncUsiHVzWmrV+DjQ14wajJicXvgRwshPqxjD3JhJn8yB7Lv5mDFaOdA7cYFgu+eFnDVlVlvJTc4RoDvWRBj9vuBAj7WBFVak7tMfxibVD/bTnClRTXRyN3mMaIbGU1XSHV1s88PDKCIcEVAFKzeXg2FJ2MtpUXzO7KDnPASSfsFf91icfOqk/Q=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(7416014)(10067099003)(56012099006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dWFTWmlHYlNvNEtTNVhFaEY2c2lrTGY1eGYvRFNRbkFTcEhFRGFkMjNGY0Fa?=
+ =?utf-8?B?UGdRdGpPZmZESWtKTW5TQjk0Qlk0SWY2RzV1TTZVM0syMnpDdE9zOGdTKzVS?=
+ =?utf-8?B?Zmg1MHYxM3h4VWZ0RTRCb3Eyam0yUFBwbTdBM1NzeUlNY0ZvSFFEM3VzMi9k?=
+ =?utf-8?B?UUpDVGxicnl3L2J3VDlWQitudWNaSUhTY21heXVZTC9jWVVyaVVkNkRKUlRw?=
+ =?utf-8?B?OWNtWks1NWNDZGZqblY1bzkyRHlDaHp6NE9tbVJtdGxsSVVhQmtLc1d0S3Fh?=
+ =?utf-8?B?a3dzTTlsSXJoaVFyZzRmeGRhazNBbnh6Njd6SjRSNlVTUk9iK2pydExTckRt?=
+ =?utf-8?B?UEpiOHAvR1NQTWpMVm0rdlovQmdOQnFXd3lEbUpTYkF4WWpTY0FlYlFIZjZZ?=
+ =?utf-8?B?MUJiKzBqZXpLZkg4U3NlV1BQSGtxejd5RjZtdG9MMUNQUHVLM29VcmxDTmhp?=
+ =?utf-8?B?d3BUc0V5b2xxdkR5REdJVUNYa21LZmdjZXBlUTBTT3BqbzJxOU9NeTdqWnQ1?=
+ =?utf-8?B?SUtnMkhsbk5XNkVCcDljZHJZcEo2dytPYlVONTlFdHBoU1dqRWRhNHM1MlU2?=
+ =?utf-8?B?czFZQUJ5VE9ybzlsT2l1WGp1Yzd0SmZJbmNyWWZsWHB0M09XR1F2aG80RUxl?=
+ =?utf-8?B?YTNRa2phdXZZdlN0ZmlCbmYvYnBPcVFla2wvbVlyZ0RBVGtmOHpTNlMxaXVL?=
+ =?utf-8?B?aWpNUGY0amRGVC9UT0dTSGdTR01mRGdHYWRTMzdxVEdVVTVHZytETUNKWW5R?=
+ =?utf-8?B?VG41U1BrQm5UU2pjWGNLV2FZWXJ4bXZSSG5mbUlQZkJqUkhVOGJGK1N3OVVs?=
+ =?utf-8?B?UjFCM2VEZnpDQ0U0aklBcWFmU3dxYVBscGlNMHpEYlFLVzVjNkZDVDlRYi9Z?=
+ =?utf-8?B?MktDdTJSaFUyYmUvN0xsdVNVd2hNSmE5dnNLVitWaHNqRDQ2TXZaYU40d0tz?=
+ =?utf-8?B?dTJDZTdHZnAxUHExc1NtVVJvZ3dwTjZ1MEVWbk9xc1pLRnNqZkxFb25ZbjBz?=
+ =?utf-8?B?ZDVmZnFIdFM0MFJ5bzdZYmdkK3lxTW8yY3JSVTJxRU50N2JkUmRpUUJXekhT?=
+ =?utf-8?B?TkRpUjNLdzJhQlBEdjh2UkRXc1FIMHpPTHpiV2dpQUZSeFNVckRNTlUxQ3ZE?=
+ =?utf-8?B?cjNxdjdSWGhGY0J1L0NYWWFKUngwVkllMDNoK2F2ckV5KzJULzIwVHU1b2Vm?=
+ =?utf-8?B?c0NISlR1OHF1U0V0TG96bk9HNmFab2hQZGNPRUpXbDBIZTQ5RHRzU1B0bjdn?=
+ =?utf-8?B?VXk2TFl6Z1hrczFFK1A5ZFlCcWxuQlExWXZHRGl0S0pqR1h6bG5rQmtkeS9Q?=
+ =?utf-8?B?YXdGc3o1YUVYRjlYbDhaRzlicjFaWlJLbGF2K3JYMkFMZCtqSys3MnlkSGFF?=
+ =?utf-8?B?TFlPZnZSV3l3L05OWjh2OTBMVEs2d1BiNnd2dlRaaWJWL2QrVjU5bGZPQnk3?=
+ =?utf-8?B?YVJNenBNZlh5UFk3VHBDUFZsOWFuRnROR0o4cy9UMCtzTzJpMm8zK1Bzc0JQ?=
+ =?utf-8?B?bGRmOVRNNkdoaWdvTm5UYTMzZWVsbXl1Y3hEd01YZmtZQi9peWNJSklXWEI1?=
+ =?utf-8?B?SnRNazlmaW9DamlHczlxMlhvSVJlKy9tT2F5cVQyb1pJZjdYSENnWnFBcmwy?=
+ =?utf-8?B?VWRlZGVta3VZL1lVS3UydXZWMDBaWDZ0R01ZcnJJaFl2eTUzdmgwMHVRZ1hP?=
+ =?utf-8?B?RFhndDdJUU41SzRDWXl5RGZnVzRJZHdGdUp5VHBjUGFDVVdlTHRNTnpwUm1B?=
+ =?utf-8?B?Lzdzd1BGdlBGN3NYQndhNEZTRDdFKysrRk80dVFaOC83c2lNSHg4Z3F3VXZE?=
+ =?utf-8?B?YnRjVUJEQ1BRREFKMHBneGJWVUhSMFdySGNGRnFQMW1xWGhiVDVTM0ZES0VN?=
+ =?utf-8?B?N3B4VktuZi9tZU82UkRrbUFmL3JmdmJ3YmtXVlNUdzFlaC93a0FaeEthaXpS?=
+ =?utf-8?B?ZHhneFozWFJrbFNTS1dTeS82WTl3OGVudVRGM0J6S1FtclU3VkpsejNsZW1m?=
+ =?utf-8?B?cE5LY2xLMUppREs2ek9QRVdlRExjdUViaStwM0NpZU5nYVQ0T2t5Z1FIdVBi?=
+ =?utf-8?B?OHloZmVDMmNGTTJIRlRxT2NqRlpNZHIrMkFBN3RuNWZEa3hDUUlERmFFbUFE?=
+ =?utf-8?B?d3N2TFJRTm5OMUtmVnJ0ZC9LTXdsVnV6N01MZmZQclpmNkd2YWtGWDhqSFRv?=
+ =?utf-8?B?dzJqQWp5UmZxaWNBOVRyKy9xcFl1Vy9YWkJ4SmYrV0k2Q2hrbFFTM2JmcTB6?=
+ =?utf-8?B?MGtnWGZxQUlNMkRnazJkVXlTSkRnRmh1TDUyaHhxRVBieUtZK2R1NUtYMWxE?=
+ =?utf-8?B?ZWgyUGNua0p5bjVIYWxrN2xpWWxQS3Y3UEJ2WlBCNnB2ZHJzcVdPUT09?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 859af3db-8955-4392-65c9-08def6e26e96
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2026 13:22:31.4693
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1akXS+l09ID9tsMxOwuue5ZFXd/DoOshYZlafDHbVwMRSq9E4QwATnaPE8dhlgHK4jlX3sdO2W6TLL5yqFi7Iw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P123MB6610
 
-Am 28.07.26 um 11:05 schrieb Guo Tenglong:
-> Correct "sucess" to "success" in function comments.
+On Fri, Aug 07, 2026 at 05:20:45PM +0300, Ionut Nechita (Wind River) wrote:
+> Hi Aaron,
 > 
-> Signed-off-by: Guo Tenglong <micronull@163.com>
-> ---
->  drivers/gpu/drm/radeon/radeon_device.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> We're tracking this series downstream -- the managed_irq best-effort
+> gap for blk-mq/NVMe queue mapping is exactly the limitation we hit on
+> PREEMPT_RT telecom controllers with narrow housekeeping pools (GNR-D
+> 144T, most cores isolated, 24 ice PFs + 2 NVMe).
 > 
-> diff --git a/drivers/gpu/drm/radeon/radeon_device.c b/drivers/gpu/drm/radeon/radeon_device.c
-> index 705c012fc..fb79c990a 100644
-> --- a/drivers/gpu/drm/radeon/radeon_device.c
-> +++ b/drivers/gpu/drm/radeon/radeon_device.c
-> @@ -777,7 +777,7 @@ bool radeon_boot_test_post_card(struct radeon_device *rdev)
->   * Allocate the dummy page used by the driver (all asics).
->   * This dummy page is used by the driver as a filler for gart entries
->   * when pages are taken out of the GART
-> - * Returns 0 on sucess, -ENOMEM on failure.
-> + * Returns 0 on success, -ENOMEM on failure.
->   */
->  int radeon_dummy_page_init(struct radeon_device *rdev)
->  {
-> @@ -969,7 +969,7 @@ static uint32_t cail_ioreg_read(struct card_info *info, uint32_t reg)
->   *
->   * Initializes the driver info and register access callbacks for the
->   * ATOM interpreter (r4xx+).
-> - * Returns 0 on sucess, -ENOMEM on failure.
-> + * Returns 0 on success, -ENOMEM on failure.
->   * Called at driver startup.
->   */
->  int radeon_atombios_init(struct radeon_device *rdev)
-> @@ -1045,7 +1045,7 @@ void radeon_atombios_fini(struct radeon_device *rdev)
->   * @rdev: radeon_device pointer
->   *
->   * Initializes the driver info for combios (r1xx-r3xx).
-> - * Returns 0 on sucess.
-> + * Returns 0 on success.
->   * Called at driver startup.
->   */
->  int radeon_combios_init(struct radeon_device *rdev)
+> When the next revision lands (with the naming/integration changes from
+> Sebastian's and Marco's feedback), we'd be happy to test it on that
+> hardware and report back with effective_affinity + NVMe queue mapping
+> data.
+> 
+> Thanks for driving this forward.
+> 
+> Ionut
 
-This seems to have been sent to the wrong maintainers. But I suspect
-they would have the same reasoning as me about the usefulness of these
-fixes.
+Hi Ionut,
 
+Thank you! I would appreciate that.
+
+Kind reards,
 -- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
-
+Aaron Tomlin
