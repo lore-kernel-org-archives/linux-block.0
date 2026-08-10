@@ -1,259 +1,247 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8B8442FA6
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 20:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786394360; cv=none; b=S3PW953eZtgpnuqLeJvWuBRJknu6ShPtM9TSuU0cadb7/nc9s4M5EpffKp7HnNx9XW+0Zzv5AAdukBlKzGv9biNHvfc1GWzPKbxlWz4fIGLyG8g8WM6Wlhfb0NK6WbkMwM70TFXrSfJvaAS3DABJafcKcFNunku22VPMIRzLcgQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786394360; c=relaxed/simple;
-	bh=khTbQWWFV9bOrfXG+iqpW/ZtxmkD74y/07pmEqhXD30=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9VNvufTsykF+CBFI0dlryEZ2+w4gB1VKkyo89YUdVGeCAxRiAr+k/WbYO8V9UU7AUt187Ijr0QamXHN1PBMphrWEzadfwGLhwHXTDB52hR6TsdrmktLmaELKxmAFhS46vMWt0iuKFnoEJpiNBYugqgkujSn4FurAQwDOJR6Qxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OqFe98qp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FA536C581
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 21:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786396381; cv=pass; b=KBh46IW38TK/7mBnZpzfILGdOeKNBIaP5y62k3mndghoP7K5l6721pH70AJfg2kx39VqQFq77IBgoXBOmynbFv5kLpVL0wM5T+EY91K4Sn8StR9I7RbZVnjrLZlI2ztnJe2dx5Opzy4JIlCqp8edi1aIwwavwRCP8vU6+G/6rWI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786396381; c=relaxed/simple;
+	bh=f8GfeBohCHWYFat06tO5BjRXSUJwYHC1J/dpM2VvgkU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uCsy8TQe3f8mvPYEUqFKTnfp27n47gNWHzaVdt/YNRsWvYrvMFRl38boFsM5sUAAryqNTu/kmupSVZRNTXHwyUXliFPvSBHYfSJg6aeWwQeARrJOC37BgE0EDvXeJa19WZDfGySnqumWBWL5LQB/6n+RZJ6uM1lxqukGHlz9WaM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nyj6r1aI; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqFe98qp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786394357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hBu07eFdsAaRS4DouGyS0AD72vCjFyZu2g7jKIa4PTw=;
-	b=OqFe98qpMnud7hO8pIWnn5QPfUJWhEQaFYu5NvBxBLhp7mGx0sIrLqy5A5GIZ07Kb/6ucJ
-	RDThuz059QWZYARR0r1jjltwQ2NH9kguDZH2JJWToaOn7LJMTFLm7mXskAGNal4iwF2Hb5
-	XmMe2/mS9MRskTBSZ2DvZgMlxrJUnCQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-144-VnfPPCRKObiAty1uR5NNVQ-1; Mon,
- 10 Aug 2026 16:39:10 -0400
-X-MC-Unique: VnfPPCRKObiAty1uR5NNVQ-1
-X-Mimecast-MFC-AGG-ID: VnfPPCRKObiAty1uR5NNVQ_1786394348
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C00A19560BB;
-	Mon, 10 Aug 2026 20:39:07 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7FE851800347;
-	Mon, 10 Aug 2026 20:39:05 +0000 (UTC)
-Date: Mon, 10 Aug 2026 16:39:01 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: Jason Wang <jasowangio@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Alex Williamson <alex@shazbot.org>,
-	David Airlie <airlied@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	dri-devel@lists.freedesktop.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Feng Liu <feliu@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nh-open-source@amazon.com,
-	nvdimm@lists.linux.dev, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Parav Pandit <parav@nvidia.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	virtualization@lists.linux.dev,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [RFC PATCH 00/12] virtio: support devices that own their
- virtqueue memory
-Message-ID: <20260810203901.GA35278@fedora>
-References: <20260809182010.32931-1-graf@amazon.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nyj6r1aI"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6a17cb94b26so3653404a12.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 14:12:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786396378; cv=none;
+        d=google.com; s=arc-20260327;
+        b=OPKnYgU9Fs3xMVHlYPkYRQS+VqKk5JcP4V8b/oENQ9s14giQ/bBAimLIsN3cYe0tfO
+         whh3aKDVWcWg9DeOwD/Z8s40usbSWbIT31x/XARwwfJmy/Y79mjOQcK1QboI/awGi/vo
+         VEem63cITY9Dq6rz6d9NC3R7OYGSgmQVvj49/gBHpFZ9uLcx1mo1XbsSiaBoPLXhJ+aO
+         7y+3qTcIGRckO7y28MubROcnMemb05ykBAXm6oEwz4OLK26C2goQM+BGdf26UgN0hLA9
+         xpyGtxY7xbHXjtcz+8V4aWTR6XO0mF45ny+x0fUX337vOMqrnV8GUc1afHWzce6olmBC
+         vEgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4s9mQ3DkJJifPOKJnOS5mdERe/d6CjgCqbbWdO6jwj4=;
+        fh=K85UXy/05wnR64EefsbR7kRJzZjvn75GTiufZVQtZXw=;
+        b=ssjvIvyP8ih14omB7mrxkk0fWtKlnki1Vk5Ir96GGlnDw3vApIxr/QVV703Rbw0VfO
+         fyK9H8DaJtLQX0oaHqTn6Rg9rHiKxjkBAkpWmj6XDqxepe66W0yTk+DklOBTfysrRX5G
+         NPIENytITB/gI8U6WB0WSbNpbVqMAw+4WZNbeLjgaTTgTb9W1T7DBNIl2D0VhmCKQRF/
+         cucvuB0WyS+3b/pGzM58AuXXxOhU+RVmEzVjf1L1CAaGZ9Ho9zpfDCb4IDd4eRFKoEYR
+         DnlNgrenPciA0R/OVbDxmdGA9PVSGwW0E5tSJUSjiMOcvPCO9TKdsBAN8UQqq7mzaWHw
+         S7mg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786396378; x=1787001178; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=4s9mQ3DkJJifPOKJnOS5mdERe/d6CjgCqbbWdO6jwj4=;
+        b=Nyj6r1aI+zovkhVh+UPq4+YmPzBW2wb1AAqlygKrD9zpBMjiSdCOrtAfujvrS2Rv3b
+         B9uOfUpg5bCNv52qfzFSiuudEVUvX6k+EElkpIzDg/yKVVGPi5NxP/vZnLFHOLsuKAmK
+         QqGgZ5BlPRTjdPPgKohtPZiL+LT+C7h4fxO01jK5BTqoYhaLuiYxJzdipLhAhkqLPQmb
+         KktalEZepBbiLpe+c/HgP/Qo2AtDdthlcQIcoc5aLHpmQGgBebYg9k/rx7QilE3CNJom
+         1kQdh6uHlWNt1/XkoBcFcInRM05bqY29YFYRJYVPS0/p5TQoTVzEmO9WCKTNUOIcuPWu
+         GZzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786396378; x=1787001178;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4s9mQ3DkJJifPOKJnOS5mdERe/d6CjgCqbbWdO6jwj4=;
+        b=fcihz8nJLooZpJosw8SdReXb0V1kTmubkcbU18BrAWxrpUIHT7EqnXuVUS5sjfiJyz
+         hWPNIEoQdNF4nTfI6kQ8Dgf7Tu47T9c2kFcPNlp1OlQOTLkMo0EytbKEZ6Xa+YXde+UU
+         0IjrosVk+xjf0wLZBfwHszQ8TjRT/DJFoJt/9AY79by82R7Oep28s2xqHbW/sdzV7dr3
+         4ZwlyPjf/WMP/dB9+SS1C26c37iQ15bC8tFWd7zzdZLuQ4wXn2gB3Ly7KwuBdTNXEO/u
+         bAsSS+uEjgHJb1z9Wy+dqAQnL31kU//bp+rHj+erdK9NbWtvbbQBBdMw93b8JZo6jfzi
+         WJ6A==
+X-Gm-Message-State: AOJu0YxmNkBgYQMbY6KvI0RMtT2At0EsNEkWX5uvVX9mtmcIxbIGCAWs
+	1jSPRxpZ4bdy3q+CnvQ1stTs0aOIGzwkWw97OH+qLdmnqqCzP9Sog6KxEM7OYIZVGuSMsL+Y+O7
+	QPY32fAhGKAO2NNaYDkOuYo9J/hch7n8=
+X-Gm-Gg: AR+sD12bt2P589BeoR+WURpd6ba5e44V8fCwDmUk02rT87TbRm5xQJVtot/92bdjVGm
+	thRao3FSPaSf21EeytvjV5E9qnuXgwULRO/3iSKqRlA5dtltHQq6ZaaSAge9+zV4uV3qaqBxmKz
+	KZnXAtGdlB81WW0CTVRyAeBGdKJHpmQ3HF41DbYyMuDxPxMX2gGsSU0HiG1U9KkyPPIeH8JOZsi
+	hK97GuRLjYxLtzFPX54nHAWFlatZNo1NE6FavcR0sxZRFTakCf9ZXIh0gKKx3aOM5ZqHOk+FVxw
+	HmLVrRPmcaBDJBnjZ1oZMvkAysIGoXijUSCXnowL049e
+X-Received: by 2002:a05:6402:504e:b0:69f:2c1d:d83c with SMTP id
+ 4fb4d7f45d1cf-6a1e62d8b29mr12930000a12.21.1786396377743; Mon, 10 Aug 2026
+ 14:12:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="E1944FrHRiu7HOOY"
-Content-Disposition: inline
-In-Reply-To: <20260809182010.32931-1-graf@amazon.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-
---E1944FrHRiu7HOOY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20260519172326.3462354-1-kbusch@meta.com> <20260519172326.3462354-4-kbusch@meta.com>
+In-Reply-To: <20260519172326.3462354-4-kbusch@meta.com>
+From: Chris S <coshi036@gmail.com>
+Date: Mon, 10 Aug 2026 17:12:45 -0400
+X-Gm-Features: AUfX_mzNv25W_1qVDbnXAMrPYIPaAVX7Rm_Mr4yXO-SFDG25EsvlS7LE2Un-0EY
+Message-ID: <CACd_6n2jNS9Msd_N-idPx3ijgN8NUxT1U1m2OrJu=e+GToB+ZA@mail.gmail.com>
+Subject: Re: [PATCH RFC 3/5] block: validate bio bounds in the queue entered context
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	axboe@kernel.dk, hch@lst.de, tom.leiming@gmail.com, Igor.Achkinazi@dell.com, 
+	dlemoal@kernel.org, Keith Busch <kbusch@kernel.org>, Weidong Zhu <weizhu@fiu.edu>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Aug 09, 2026 at 06:19:58PM +0000, Alexander Graf wrote:
-> Virtio drivers use guest memory to back virtqueues and their buffers.
-> That means a VMM needs to be able to map guest memory. That is ok in the
-> normal virt case. It gets icky with confidential computing (where we use
-> swiotlb as workaround) and it defeats the purpose of isolated vhost-user
-> backing devices, because they end up with full RAM access to the guest.
->=20
-> So instead, I'm proposing an extension to virtio which allows it to give
-> each virtio device its own dedicated memory region to communicate with the
-> host, called DMB (Device Memory Buffer). A trusted hypervisor can force
-> DMB to be present, which then enables safer, more isolated and resilient
-> communication between guest and host.
->=20
-> With DMB, the device provides a shared memory region that both parties
-> agree is the full memory map both have access to. All memory offsets
-> that previously would have been into guest RAM, are then offsets into
-> this shared memory buffer region. One nice property of this is that it
-> is a generic mechanism in the virtio transport layer, so higher level
-> drivers work unmodified.
+On 2026/05/20 9:25, Damien Le Moal wrote:
+>> Should this be a pr_err_ratelimited() ?
 
-This is similar to VIRTIO's Shared Memory Regions. A problem with this
-kind of approach is that guest software that depends on zero-copy,
-O_DIRECT, the ability to mmap, etc may break when passing an address
-=66rom one device to another device.
+FWIW, I think pr_info is deliberate and worth keeping.  The comment this
+patch removes together with bio_check_eod() gave the reason:
 
-For example, a guest userspace application writing to a virtio-blk
-device with O_DIRECT can pass any source memory buffer. One VIRTIO
-device will be unable to address another VIRTIO device's DMB. This
-problem also extends to vhost-user where one back-end cannot access
-another back-end's DMB or Shared Memory Regions.
+  /*
+   * Check whether this bio extends beyond the end of the device or
+   * partition.  This may well happen - the kernel calls bread() without
+   * checking the size of the device, e.g., when mounting a file system.
+   */
 
-Maybe your use case will never hit this problem because you can rely on
-the guest software never to assume zero-copy/O_DIRECT/etc works.
-virtiofs hit it with its DAX Shared Memory Regions.
+So it fires on a legitimate and expected pattern, and pr_err would be
+noisy for it.  It may be worth carrying that comment over to the new
+location so the reason for the level does not get lost.
 
-I'm mentioned it in case this is something you want to think about
-before deploying this approach.
+Keith, I checked this patch against the nvme_setup_rw() WARN I reported
+(the second link in your cover letter).  __bio_split_to_limits() is
+called from blk_mq_submit_bio() after bio_queue_enter(), on both the
+cached-request path and the newly-allocated-request path, so the bounds
+check is now serialized against the freeze window in
+nvme_update_ns_info_block().  With the capacity forced to 0, the bio is
+failed here and can no longer reach nvme_queue_rq(), which is exactly
+the race I hit.  Thanks for picking it up, and sorry for the slow reply.
 
->=20
-> I was exploring to use swiotlb instead to create individual pools. But
-> that approach has multiple downsides:
->=20
-> 1. Swiotlb is an OS primitive which is not available in all Operating
-> Systems. DMB however lives in the virtio transport layer, which means we
-> can add support for it in any OS independent of generic layers. This
-> helps with Windows support.
->=20
-> 2. We munge DMA space together. DMB provides a separate DMA space per
-> virtio device. This means we can for example implement a device in
-> vhost-user and give the implementing process only visibility to the DMB
-> region, not all of guest memory. That reduces the exposure the
-> vhost-user provider has, improving security.
+I'll drop my own "nvme: don't WARN on I/O to a namespace revalidated to
+unusable metadata" patch in favour of this.
 
-Connor Kite is working on a different approach for vhost-user memory
-isolation here:
-https://lore.kernel.org/qemu-devel/20260723-vhost-user-isolated-memory-v1-0=
--6b97c439eb28@gmail.com/T/#t
+Reviewed-by: Chao Shi <coshi036@gmail.com>
 
-It involves a bounce buffer at the VMM level. Unmodified vhost-user
-back-ends never sees guest RAM. Guest drivers are also unmodified. The
-cost of doing this is that the VMM has to intercept kick and call
-eventfds in order to copy between the bounce buffer and guest RAM.
+Best,
+Chao
 
-I don't see DMB or vhost-user memory isolation as conflicting features.
-There can be two ways of solving the same problem with different
-trade-offs. I just wanted to share a link to Connor's ongoing work.
-
->=20
-> 3. Devices can opt-in. A hypervisor can choose to use standard virtio
-> semantics for self-implemented devices (e.g. NSM), while requiring DMB
-> for devices implemented by less trustworthy providers. The
-> non-trustworthy devices do not get any visibility into the trustworthy
-> ones, even with DMB in place for both.
->=20
-> =3D=3D Limitations =3D=3D
->=20
->   - Only PCI is wired up.
->   - Feature bit 44 and the shared memory id register at offset 0x40 of the
->     PCI common configuration are provisional: the OASIS technical
->     committee has the specification and has allocated neither.
->=20
->   https://lore.kernel.org/virtio-comment/20260804161202.38619-1-graf@amaz=
-on.com/
->=20
->   - The device I ran this against is not public, so you cannot reproduce
->     the numbers below. The KUnit test you can.
->=20
-> =3D=3D Testing =3D=3D
->=20
-> Without patches 10 and 12 a receive refill livelocks and queues starve
-> each other: 29,319,791 receive softirqs in five seconds with not one
-> packet received, against 4 with them, and 2 of 7 receive queues that never
-> see a buffer, against none. Earlier revisions moved 512 MiB of O_DIRECT
-> block I/O and 2.7 GB of verified vsock through a region with no error.
->=20
-> The KUnit test for patch 12's guarantee you can run yourself, and two of
-> its five cases fail if I take the fix out:
->=20
->   tools/testing/kunit/kunit.py run --arch=3Dx86_64 \
->       --kconfig_add CONFIG_VIRTIO_MMIO=3Dy \
->       --kconfig_add CONFIG_VIRTIO_DMB=3Dy virtio_dmb
->=20
-> Patch 1 can be taken on its own: a stale worked example in a vdpa
-> comment. Patch 10 fixes something older than this series too, a failed
-> mapping arriving as -EIO from a packed ring, failing an I/O that on a
-> split ring is only back-pressure, but it does not apply alone: it wants
-> patch 2, and patch 9 for the file its documentation hunk edits. Both
-> carry Fixes:. Patch 12 wants 10 first.
->=20
-> I wrote this series with an AI coding assistant, which drafted the code,
-> the changelogs and this cover letter. I reviewed and reworked all of it,
-> and every commit carries an Assisted-by: trailer.
->=20
-> Alex
->=20
-> Alexander Graf (12):
->   vdpa: correct the VIRTIO_DEVICE_F_MASK example value
->   virtio_ring: validate premapped addresses through the device's map
->   virtio: add the VIRTIO_F_DMB feature bit
->   virtio_pci: read the device memory buffer shared memory id
->   virtio_pci: create virtqueues with the device's mapping token
->   virtio: add a device memory buffer region allocator
->   virtio: locate the device memory buffer after feature negotiation
->   virtio_pci: support VIRTIO_F_DMB
->   Documentation: virtio: describe the device memory buffer
->   virtio_ring: report a bounded pool's exhaustion as -ENOSPC
->   virtio: expose device memory buffer occupancy over debugfs
->   virtio: guarantee a virtqueue can publish its first descriptor chain
->=20
->  Documentation/driver-api/virtio/index.rst     |    1 +
->  .../driver-api/virtio/virtio-dmb.rst          |  803 ++++++++
->  drivers/vdpa/vdpa.c                           |    2 +-
->  drivers/virtio/Kconfig                        |   29 +
->  drivers/virtio/Makefile                       |    3 +-
->  drivers/virtio/virtio.c                       |   15 +-
->  drivers/virtio/virtio_dmb.c                   | 1719 +++++++++++++++++
->  drivers/virtio/virtio_dmb.h                   |   34 +
->  drivers/virtio/virtio_dmb_test.c              |  279 +++
->  drivers/virtio/virtio_pci_modern.c            |  100 +-
->  drivers/virtio/virtio_pci_modern_dev.c        |   23 +-
->  drivers/virtio/virtio_ring.c                  |  216 ++-
->  include/linux/virtio.h                        |    3 +
->  include/linux/virtio_config.h                 |   41 +
->  include/linux/virtio_pci_modern.h             |    1 +
->  include/uapi/linux/virtio_config.h            |   17 +-
->  include/uapi/linux/virtio_pci.h               |   10 +
->  17 files changed, 3254 insertions(+), 42 deletions(-)
->  create mode 100644 Documentation/driver-api/virtio/virtio-dmb.rst
->  create mode 100644 drivers/virtio/virtio_dmb.c
->  create mode 100644 drivers/virtio/virtio_dmb.h
->  create mode 100644 drivers/virtio/virtio_dmb_test.c
->=20
->=20
-> base-commit: fc02acf6ac0ccde0c805c2daa9148683cdd01ba8
->=20
-
---E1944FrHRiu7HOOY
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmp6NuUACgkQnKSrs4Gr
-c8h0ggf9EhOgsO3HluDcAxl3LjRyKeWbnNqK/dzD/aM1tcO8azZNHWFtAJ2p4lRl
-tdNT844A8krTR2ljwTsyQ0A5RDiSb1bG78G03NSmTWjTXp9o8czKuB9vppbMVcPE
-cbTditRQwpwQNt2xKLg1jkObOA5IZj7NMDSZPsDGrdWsRZN3q2zOorsyykwSGLVv
-fnfdz5V0COWy+6Y1PR0sfOpW++T5hV2YPCs0B/s99hdMkCC0j9K42jkhcMTJK5eT
-aBQTdNsanuH6DeW6YTIoikD01SLzLy1sJvvJx0Slw00aA1QsPXxEK51YkQZqSnkn
-pgJmmLt2/LwAxoWM3zZC5sUiv5kkpQ==
-=R2aw
------END PGP SIGNATURE-----
-
---E1944FrHRiu7HOOY--
-
+On Tue, May 19, 2026 at 1:23=E2=80=AFPM Keith Busch <kbusch@meta.com> wrote=
+:
+>
+> From: Keith Busch <kbusch@kernel.org>
+>
+> bio_check_eod() in submit_bio_noacct() validates that a bio does not
+> extend beyond the partition's available sectors. This check runs before
+> bio_queue_enter(), so it is not serialized against queue limit updates.
+> A driver that freezes the queue, updates limits, changes the capacity,
+> and unfreezes can race with a bio that passed the early check under the
+> old capacity.
+>
+> Remove bio_check_eod() and replace it with a bounds check in
+> __bio_split_to_limits(), which runs after the queue usage reference has
+> been acquired. The check uses partition-aware arithmetic to validate
+> both partition bounds and disk capacity in a single comparison that
+> works correctly on the post-remap sector values.
+>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/blk-core.c | 26 --------------------------
+>  block/blk.h      | 14 ++++++++++++++
+>  2 files changed, 14 insertions(+), 26 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 92a802dc8042c..c200d0fc44fe7 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -547,30 +547,6 @@ int should_fail_bio(struct bio *bio)
+>  }
+>  ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
+>
+> -/*
+> - * Check whether this bio extends beyond the end of the device or partit=
+ion.
+> - * This may well happen - the kernel calls bread() without checking the =
+size of
+> - * the device, e.g., when mounting a file system.
+> - */
+> -static inline int bio_check_eod(struct bio *bio)
+> -{
+> -       sector_t maxsector =3D bdev_nr_sectors(bio->bi_bdev);
+> -       unsigned int nr_sectors =3D bio_sectors(bio);
+> -
+> -       if (nr_sectors &&
+> -           (nr_sectors > maxsector ||
+> -            bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+> -               if (!maxsector)
+> -                       return -EIO;
+> -               pr_info_ratelimited("%s: attempt to access beyond end of =
+device\n"
+> -                                   "%pg: rw=3D%d, sector=3D%llu, nr_sect=
+ors =3D %u limit=3D%llu\n",
+> -                                   current->comm, bio->bi_bdev, bio->bi_=
+opf,
+> -                                   bio->bi_iter.bi_sector, nr_sectors, m=
+axsector);
+> -               return -EIO;
+> -       }
+> -       return 0;
+> -}
+> -
+>  /*
+>   * Remap block n of partition p to block n+start(p) of the disk.
+>   */
+> @@ -802,8 +778,6 @@ void submit_bio_noacct(struct bio *bio)
+>                 goto end_io;
+>         bio_check_ro(bio);
+>         if (!bio_flagged(bio, BIO_REMAPPED)) {
+> -               if (unlikely(bio_check_eod(bio)))
+> -                       goto end_io;
+>                 if (bdev_is_partition(bdev) &&
+>                     unlikely(blk_partition_remap(bio)))
+>                         goto end_io;
+> diff --git a/block/blk.h b/block/blk.h
+> index bf1a80493ff1c..e70acb2d358e3 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -423,6 +423,17 @@ static inline bool bio_may_need_split(struct bio *bi=
+o,
+>  static inline struct bio *__bio_split_to_limits(struct bio *bio,
+>                 const struct queue_limits *lim, unsigned int *nr_segs)
+>  {
+> +       if (unlikely(bio_end_sector(bio) > bdev_nr_sectors(bio->bi_bdev) =
++
+> +                                          bio->bi_bdev->bd_start_sect)) =
+{
+> +               pr_info_ratelimited("%s: attempt to access beyond end of =
+device\n"
+> +                                   "%pg: rw=3D%d, sector=3D%llu, nr_sect=
+ors =3D %u limit=3D%llu\n",
+> +                                   current->comm, bio->bi_bdev, bio->bi_=
+opf,
+> +                                   bio->bi_iter.bi_sector, bio_sectors(b=
+io),
+> +                                   bdev_nr_sectors(bio->bi_bdev) +
+> +                                       bio->bi_bdev->bd_start_sect);
+> +               goto ioerr;
+> +       }
+> +
+>         switch (bio_op(bio)) {
+>         case REQ_OP_READ:
+>         case REQ_OP_WRITE:
+> @@ -442,6 +453,9 @@ static inline struct bio *__bio_split_to_limits(struc=
+t bio *bio,
+>                 *nr_segs =3D 0;
+>                 return bio;
+>         }
+> +ioerr:
+> +       bio_io_error(bio);
+> +       return NULL;
+>  }
+>
+>  /**
+> --
+> 2.53.0-Meta
+>
