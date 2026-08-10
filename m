@@ -1,57 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABD837F01C;
-	Mon, 10 Aug 2026 20:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA04242FCB8;
+	Mon, 10 Aug 2026 20:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786392057; cv=none; b=Uv2d7voMHODCksx5dIuYoNnLoUfsMI5q9plMtEU9iG5tOmxMIp2s9/7kvyaVkbQOQdrkIFMeJ252AJAcRitPs0D4eNBeyk6lLwEfCYTkq1/D3kCoo89LB9fOZlQ2nIFwdLvoa8B9USwY+D29WnGXlJOfTRsu8BxsSx0Gva4AhEc=
+	t=1786392552; cv=none; b=sQUr2RRZEATTwSTqvzJUOwtxP+uqgmX4B1CXxi0e/RBUnP/fHxHjrUynEWyTY9r0tIpYo72+Cisg17dv2aaS1Bp8hpNCjj3AA4VSKu8Amfs3UFlOF4E07Xn93aIN8it9WwOinL2gYB5VpVXFHIMvnZdvoA6vZtxxbJZErqKXz/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786392057; c=relaxed/simple;
-	bh=HGRKtzF8/V4AsFCqnY3RDFsxWWDIEH9PipcvJ2CNS7U=;
+	s=arc-20240116; t=1786392552; c=relaxed/simple;
+	bh=cK6Z2eFxMtYWEYMtKNKG58PVTCus14JkzK21bMM/BRU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=py+LUYrmUcWR01y8zum+tOwQX7xwFiLkMI/g+gZPgfllpcjmysYtEjubkoRu9CnCof4CCfvcCewcLbDf8y81csHEnaqbVbB1VOhEW7tBlMhGtG1vySvZR5mCPe98zBwNj3yZ9NrxIzq04srKwthAtEQy5aSUudSaLt699D0V14Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHHSSgrX; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3k4DiBPpDRIkToGBDHTTlcTz1b6b2UF0Ryv523ozdOTFh1Fr5PtGt/BEyva/Rtmk2p9T52j13SLo7fmEfZaj3/DCOT55ruV6EizflxmoICbUYwyvBvmRMEnSmSfBRKsnJOSONEwBWVgn+89A8IXKvrtQP+MA7nF09CKOmXtZEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WyOU0EKD; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHHSSgrX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33231F000E9;
-	Mon, 10 Aug 2026 20:00:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786392055;
-	bh=fPgod6egbm1Ih0JWPiMV1OogLXmanmpK4kPFNamx3Fc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kHHSSgrX5fZxR2bZ2ZpoIM+he0qDIsjQ3MlQEQLndstfgRa3O4PgvSlxigjQi4Ae2
-	 8B7nREP/KvkznEqvFdZRdpSo4GHt/5dnofF3adSCEp0+0o6GBqHPy0vY3pmRJP5Ys1
-	 +bnoglFgq98hwCdIx27nnugT1aNB0d6wxzk0JOlVE9urqUHKxUfwOA0BuJRf/eT1iU
-	 /wXhGSInwuxQ+qMrvVOHC9Xf9SPvcDrvZTpNrySrNrq6RMgIMzMRfkdcowmohgJFOH
-	 mcE9gfxL6b2xVXlauL208ZzJtfDfjhVnNxt4M+foWO1BAZ8tNjith9iZuciWa2KvBG
-	 We24FeD28CInw==
-Date: Mon, 10 Aug 2026 10:00:55 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ziyang Men <ziyang.meme@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, kernel-team@meta.com,
-	linux-block@vger.kernel.org, bpf@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: add BPF kfuncs to read blkcg io.stat
-Message-ID: <anot9w6mg9538RWm@slm.duckdns.org>
-References: <20260807193732.4073299-1-ziyang.meme@gmail.com>
- <20260807193732.4073299-2-ziyang.meme@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WyOU0EKD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=w8yXT5X28jD8ZzH4O3pAXcMg6o723h3Ulp37jcRX8zM=; b=WyOU0EKDsMOUdYmkMDteNK0iH7
+	F7H7rskf1JokJLT1sQ+3xAt1pEzIgkcKhjpvQMcjn+SPkJuP24dAXc+GS5rOQWk3hyGKxtSvEnmBQ
+	pdSulUxOSO+5Ikl81Z6EJqFs1Z5Fe5ZdnwawU1wzR32ZA4dea55YLGSTXpEslBD5OWVpqJMwHiwW0
+	yAp7+IHx0GoJ+uRa2276XVR5u1tSr7g87aYgAVkRYjCRDfobiAsEyLcLUYHMeLGTRdnqN5Ecdwc2B
+	Bk6L64D/tgDrL4L6zUmRIYHoGlnCWfC9pUN73VJQM6UkqdDR48ZANjy8hz4tUKzR4rOLjtpRRUJ2B
+	qLnlp2Zg==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wtVn9-00000000ss5-2mP1;
+	Mon, 10 Aug 2026 19:36:11 +0000
+Date: Mon, 10 Aug 2026 20:36:11 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Christoph Hellwig <hch@infradead.org>,
+	Paulo Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v9 04/26] Add a function to kmap one page of a multipage
+ bio_vec
+Message-ID: <anooK9-UCNTmoSAq@casper.infradead.org>
+References: <20260810144746.574036-1-dhowells@redhat.com>
+ <20260810144746.574036-5-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,30 +60,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260807193732.4073299-2-ziyang.meme@gmail.com>
+In-Reply-To: <20260810144746.574036-5-dhowells@redhat.com>
 
-Hello,
+On Mon, Aug 10, 2026 at 03:47:21PM +0100, David Howells wrote:
+> Add a function to kmap one page of a multipage bio_vec by offset (which is
+> added to the offset in the bio_vec internally).  The caller is responsible
+> for calculating how much of the page is then available.
 
-On Fri, Aug 07, 2026 at 12:37:31PM -0700, Ziyang Men wrote:
-> +__bpf_kfunc struct blkcg *bpf_get_root_blkcg(void)
-> +__bpf_kfunc struct blkcg *bpf_get_blkcg(struct cgroup_subsys_state *css)
-> +__bpf_kfunc void bpf_put_blkcg(struct blkcg *blkcg)
-> +__bpf_kfunc void bpf_blkcg_flush_stats(struct blkcg *blkcg)
+I think this should be kmap_local_bvec().  Living in bvec.h makes sense,
+but keeping it in the kmap_local_ namespace is better than putting it in
+the bvec_ namespace.
 
-I wonder whether making the above deal with css's would make more sense so
-that we don't end up with per-subsystem iterators. If casting to per-subsys
-type is necessary, we can provide RCU protected cast kfucns.
+The bvec should be const-qualified.  We're not very good at
+being const-clean, but let's try harder ;-)
 
-> +__bpf_kfunc u64 bpf_blkg_iostat_bytes(struct blkcg_gq *blkg,
-> +				      enum blkg_iostat_type rw)
-> +__bpf_kfunc u64 bpf_blkg_iostat_ios(struct blkcg_gq *blkg,
-> +				    enum blkg_iostat_type rw)
-> +__bpf_kfunc u64 bpf_blkg_dev(struct blkcg_gq *blkg)
+I think it's better to steal the same terminology for the kernel-doc
+used in highmem.h, just for consistency:
 
-Ignoring 32bit split reads (do we really care for BPF accesses?), the above
-can easily be done with BPF_CORE_READ(), right?
+/**
+ * kmap_local_bvec - Map a page in this bvec for temporary usage
+ * @bvec: The bvec containing the page.
+ * @offset: The first byte within the bvec to map.
+ *
+ * This will not map the entire bvec, only the page containing @offset
+ * from the start of @bvec.  Unmap the address with kunmap_local().
+ * See kmap_local_page() for nesting rules.
+ *
+ * Context: Interrupt or process context.
+ * Return: A pointer to a temporary mapping.
+ */
 
-Thanks.
-
--- 
-tejun
+> +/**
+> + * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
+> + * @bvec: bvec to map
+> + * @offset: Offset into bvec
+> + *
+> + * Map the page containing the byte at @offset into the kernel virtual address
+> + * space.  The caller is responsible for making sure this doesn't overrun.
+> + *
+> + * Call kunmap_local on the returned address to unmap.
+> + */
+> +static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
+> +{
+> +	offset += bvec->bv_offset;
+> +
+> +	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
+> +		(offset & ~PAGE_MASK);
+> +}
+> +
+>  #endif /* __LINUX_BVEC_H */
+> 
+> 
