@@ -1,107 +1,124 @@
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.6])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5323E0C75;
-	Mon, 10 Aug 2026 13:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4023F39CB;
+	Mon, 10 Aug 2026 14:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786369850; cv=none; b=HFl8MuQF0BQDIc+SciQFUg7ifxf1DMx6SeSXUbNfEp6D2NiYMHiyDvuPg5uiYGS4W/kRXTE5HEuCG6GfOG/xuEZF53aQMKC4G9Y2RHVea7Z0KdvJbhrxGiYo4Lc6AaL46cu/ShYGSowUwRFhiTo5LlS7p2k4Ke7rvC4XTlef5RU=
+	t=1786373164; cv=none; b=BXWWdEps3bTd+v728REG23xhriwIQ3zzYItovtl9jOw4k6mEK62J2P06XfyGtMLtS6sSVK4wdIRoaNl3EHQJT8wQJfEy4tfphRZtHd1BpcZ9rA2wmU8uTuMY/mLdkzaVskOr1B7niLzAgKtAGAfeTZQ6ZdF4oRSp5NOBsa4wmrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786369850; c=relaxed/simple;
-	bh=2c/74vcYuq3haLHE9qZ74R12UsGFitB4fgGT4P+rT4k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YIyhPN5UxTkElAY4lr45WSk1GL8u4JiuBidcra+1qonmCX+lrfPm2XA9l4Yya21IR4smpYSUYm+zA/eaw6qcP/9JpRVDQvC9ur6YP2UxiHi+B/Indr4SVVL5v/PBJMCl48S39uOqRDJGRHwJJlAxnag+J6ZpP3PSbKtdtepGLac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=LkgusO6q; arc=none smtp.client-ip=220.197.31.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+	s=arc-20240116; t=1786373164; c=relaxed/simple;
+	bh=ubvtpYsrYWmH9jz19PeR1V+LHbnbiyhArbvyhk7FgDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ji5KCxvlfjVjq1AlBeXVOLm6F6RAKaT6gVPXXaY27HafDmGu8uU6Oh53emRzAvsFVuxiItWEaOrvHKLmTjsc9XqgBLEUFIKab2e/FRSnAl9ZcJNjYBWY7oS72eeW9Wm6KbXTMtLnVDC1vcCIhUySR4H/MmK2HvSFFBiQ7g627VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZjlpOaxc; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="LkgusO6q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=nv
-	Tv0ABNXhDdfal8hsXko1aeKEpgAMbDhnoUnQwh+0A=; b=LkgusO6qjGXgSJayJs
-	dd0Uwlp1MNHyD58AR492u/aae3FzqT0txL6Z0BdCYGrnBnbuDOoI+QG/Euu/CFXV
-	ODEsFXme5H6KGMytMs5JmgXYS3j7eM4SYh7/4M5DDWhskI99oKjfAU5KMt5Uiibi
-	1+pVUb7tBnvCZnwIDmMdxfENM=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCkvCgDXr4H21nlqU2ADEw--.17246S4;
-	Mon, 10 Aug 2026 21:49:59 +0800 (CST)
-From: Genjian <zhanggenjian@126.com>
-To: axboe@kernel.dk
-Cc: hannes@cmpxchg.org,
-	akpm@linux-foundation.org,
-	schatzberg.dan@gmail.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhanggenjian@126.com,
-	Genjian Zhang <zhanggenjian@kylinos.cn>
-Subject: [PATCH] loop: fix memcg css leak on read-only I/O path
-Date: Mon, 10 Aug 2026 21:49:05 +0800
-Message-Id: <20260810134905.3230681-1-zhanggenjian@126.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZjlpOaxc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=1Lmb88p+cpryq5HXWLXRKXYmtZimwxaBhgeOhNY3PzE=; b=ZjlpOaxcjkG2f9OfkwELBNEzTf
+	ggKbF5B/67GpDWQrfUEvvWOm6N35oevLeRO+6030iJHPj2PMWXpaVJNv2DIyP+hoYeHLmSGhctapb
+	XIWAc93R4BkxMMeHs/qT7cJ04hcrL1srn8hMzvbpo27fVKLTPh9o17t71xQv1LzenM628CCqDIVCM
+	0PPEM3Fzl2tBQIgkvF7VFgp+VT6O6s/c5dYBFz1uP5ISwD07DTcy8DmnF5TwTbrxwV4pvYGuhKH0v
+	XX+DTw51mufx9Ucgtu6kXV8a8QyxeZIQAMXvdBM9tD4QHFcET45iUo8jbR02cL5G8JYBbwoWtRyNV
+	sLfeSgLw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wtRFt-0000000C3l2-13Nj;
+	Mon, 10 Aug 2026 14:45:35 +0000
+Date: Mon, 10 Aug 2026 07:45:33 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>,
+	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Hongbo Li <lihongbo22@huawei.com>,
+	Chunhai Guo <guochunhai@vivo.com>, Dave Chinner <dgc@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hillf Danton <hdanton@sina.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-erofs@lists.ozlabs.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: RWF_DONTCACHE regression fix for xfs
+Message-ID: <annkDbhXBEeMoNVT@infradead.org>
+References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCkvCgDXr4H21nlqU2ADEw--.17246S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZF4kKFyfCry7Gr1fXrWUurg_yoW8Ar1UpF
-	WDKFyUGFWFk3WUWF47G3s7Wa45C3Wxtr9xK3ya934FvrW3JrnxAr45JayYqFWDJrZ2qa1Y
-	9F4DtryUuF1YkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0ziWrWxUUUUU=
-X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/xtbBpgfvbmp51wchsQAA3z
+In-Reply-To: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Genjian Zhang <zhanggenjian@kylinos.cn>
+Below is Tal's suggested fixup for xfs with the whitespace damage fixeѕ.
+It should probably be attributed to Tal instead.  Can you handled it
+from here and send it to Jens with your signoff/authorship to avoid
+the performance regression in XFS?
 
-loop_queue_rq() takes a reference on the effective memcg css via
-cgroup_get_e_css() and stores it in cmd->memcg_css. loop_handle_cmd()
-is supposed to drop that reference after use, but the early exit for
-writes to a read-only loop device jumps past css_put().
+From: Christoph Hellwig <hch@lst.de>
+Subject: xfs: avoid double deferrals for RWF_DONTCACHE writes
 
-When testing on cgroup v2, stack a dm-linear device on a read-only
-loop and issue writes to it from a child cgroup, then remove that
-cgroup: nr_dying_subsys_memory in cgroup.stat increases and never goes
-back down until reboot. The same test no longer shows the leak with
-this patch.
+XFS already defers some writes to a workqueue when transactions are
+needed to process the I/O completion.  Disable the block layer bio
+task completion in this case to avoid a major performance drop.
 
-Fix by moving css_put() onto the shared exit path so the read-only
-failure case drops the reference as well.
-
-Fixes: c74d40e8b5e2 ("loop: charge i/o to mem and blk cg")
-Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
+Fixes: efbde6f9f449 ("iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback")
 ---
- drivers/block/loop.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ fs/xfs/xfs_aops.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1faecef33009..66eaf912c013 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1895,7 +1895,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
--		goto failed;
-+		goto out;
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index f73e26d9c9f9..059846a8d65c 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -372,10 +372,14 @@ xfs_writeback_submit(
  	}
  
- 	/* We can block in this context, so ignore REQ_NOWAIT. */
-@@ -1919,11 +1919,12 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	if (cmd_blkcg_css)
- 		kthread_associate_blkcg(NULL);
+ 	/*
+-	 * Send ioends that might require a transaction to the completion wq.
++	 * Send ioends that might require a transaction to the completion wq,
++	 * and disable the block layer task completion for them as there is no
++	 * need to defer twice.
+ 	 */
+-	if (xfs_ioend_needs_wq_completion(ioend))
++	if (xfs_ioend_needs_wq_completion(ioend)) {
+ 		ioend->io_bio.bi_end_io = xfs_end_bio;
++		bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
++	}
  
--	if (cmd_memcg_css) {
-+	if (cmd_memcg_css)
- 		set_active_memcg(old_memcg);
-+out:
-+	if (cmd_memcg_css)
- 		css_put(cmd_memcg_css);
--	}
-- failed:
+ 	return iomap_ioend_writeback_submit(wpc, error);
+ }
+@@ -481,7 +485,14 @@ xfs_zoned_writeback_submit(
+ {
+ 	struct iomap_ioend		*ioend = wpc->wb_ctx;
+ 
++	/*
++	 * Defer all completions to our workqueue as all zoned writes require a
++	 * transaction to be persisted.  This also means we never need the block
++	 * layer in-task completion for a task context.
++	 */
+ 	ioend->io_bio.bi_end_io = xfs_end_bio;
++	bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
 +
- 	/* complete non-aio request */
- 	if (ret != -EIOCBQUEUED) {
- 		if (ret == -EOPNOTSUPP)
+ 	if (error) {
+ 		ioend->io_bio.bi_status = errno_to_blk_status(error);
+ 		bio_endio(&ioend->io_bio);
 -- 
-2.25.1
+2.53.0
 
