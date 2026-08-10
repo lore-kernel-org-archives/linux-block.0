@@ -1,161 +1,182 @@
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B381E0E14
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 16:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786380695; cv=none; b=J+ZkgYh5hphr+ITcoGjyHRrSRrTolG/fjj+VJ20QW56s2HJaSYmfnxaOdhshBvH1gJTunyloxIwodpuRO77+ZqK7LBWKLMIOUu1lU9zjXeSKeOJO6LTlFxp/+mDMsWVUWOjxpekxGnbizpwW5BR5m1JtrdA/Scbob/SF99pC0S0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786380695; c=relaxed/simple;
-	bh=6sqH55ep68Ya6IEwe16g+wGjVSX2q8UmDCx5cSQ5KSw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZGuQjThMZmPt3AF7XEqZmNyLqulkO9Q6Mabn5Nebf96QCVUWIIies4N5uLbnPCoTGAYVLmYWRrpEhoZJDjZrVYIVfkVJmEd+QeD0K4Wkm9pJDEoVZlNZoMGmjPccqKQMvlWplqBDol2woBkzyT5+IPJMj15McTQLjAM/UKZOBn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-6acaccb8b0cso1436651eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:51:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF61C42DA52
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 16:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786380811; cv=pass; b=Y15mEALeoYVzHVZn4Tfidv72RjVZyfray/22iVE2KD1DXPWbwl5CHMFwUqLCW9dkJISdWoro65ib9pfgkWnOytxUdd+4srjEPQxBB0LmzxgyAjcbcpvKmRUvc6EunvHd1kKEnnu42FsbjzY13jgFiU8aKRw9eZtTRM8Y4CE7a5I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786380811; c=relaxed/simple;
+	bh=hrTBjMU5ss08E8NzVEAVH6LfpDvtAnBYsIwgUDaw6sA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HpZ3AS9OK2AA/Vr9+ts3+I00EJ+XO+4d7BWRS/fdlqruPezyC8IOWOMHmgT8dkyIdyLXAIoy2+EsdIUN339f+2xkUGQSy5ODFTy6Hd0VVHQRk/jfbb0BMCk484tjSXxu6q/35BUYUm/4GmWVIVNPNFIm3v6lecwSZxLOj3nOhfU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/3125D6; arc=pass smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/3125D6"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b00d083818so78251e87.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:53:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786380807; cv=none;
+        d=google.com; s=arc-20260327;
+        b=pxZ0JzgbINNDUkMEETqNlS9s4t2lRJVJ/dZF4P0kjdwOhPLniklCcGFmngkhMFBp7f
+         dpfMKz+9eg3WgB+f07ScCII94wCamGFpdmRqlMaPmYRid11/k6VONH1aHFN7hha9doTz
+         fsJvlqYL1+ynu15Rj87lo5Km25kPjQvt6qpui/ONm0mKVSniL8Bd3q9QFuhBzL0TWoYa
+         NHe+Vpz6HiDZRMTUcT7ct/rQWHVmen8e7JRvGegRpIS/mBz4j6Oz48Q+6ofR3lfWfzDL
+         8qYoKb+916qlk9HBMnlXCu2LP7xRYzWnmhUZk1O06LTCxPt8sppx2ZtIx+8ES8yAU6M/
+         70dA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
+        fh=BPymAXMxTtMCYGi6NcRB4edzyWmuBVphZv7OKwYuQe0=;
+        b=PzV+7eZm/pPT89Rf2OZkWXoDlgjW/xDyq5FojsT0dZ6I2evPWQMwp8KZa86jt+tKTB
+         6mXh2mwiAzlb+/xQKli+t4QfgQVrPiPDkVyMPSB2BaykxvPK33Rlres9x42AypfF44ZM
+         eQYzhWPvrAEl3240zjrXvvhjVC5cDSu4g3Zp/MVYc6heVI15FwKsVrd2r6Zy3g5eGk3U
+         vPH+llMhAveAFzDoj9zHpiQT6Iwa6PV7jhowJIN0RRyTFpTmxtsnfXAnXxEuB922QxWo
+         BwSGpRrdy7ZdqEWKVMwmk7pXwam/WylmU8OtXvfq5qK/VFBEXu7M8OV+q92UvO3dKkYB
+         n3Kg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786380807; x=1786985607; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
+        b=l/3125D6/+JkYuTGDdviT529e3skBZUjgHelNWQBqKyVHWClDOUViZg4O1tqvvTmx1
+         ORHup6Xbwva4Ct0TI4LPF2uoDsyTMxyPBxQiHfXU2PujCHPV01eA4YrtJH0K8ORTFnTQ
+         4+uWwch9JBSaE1hErh/5TEAff+RXPUG82EfpTbAAIupp7yEhSdKKcTc8C7D/aIAht2d2
+         v9KtWSeNd5jDHyeIuF2yZHdAbimElKH10HAaBO5J4cBXrVOuBqae9elzwpXdU2WqgrKj
+         u5fcf2E32U6o0tPnO08Y8/dh4T3xtgHaAdfh9Ns1vayvX301iWBzQXdifOsGuWC9wdYp
+         PVmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786380692; x=1786985492;
-        h=content-type:to:from:subject:message-id:date:mime-version
+        d=1e100.net; s=20251104; t=1786380807; x=1786985607;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=PC9GWSk76hEJ1F+5OzpZ9Uz/1Ud8LBhqu7/qzPG48E4=;
-        b=RJ8Z54EzMOr0gvlG75BTf22MLX8LFF3d9/BWihCMNoZVG+/b89IW/hEOERs8cs1iip
-         eiQaeKM29xHZDcc8CVQq5oM8sKEZuVXAUd+LsAverEFPcVcXvpeGJiyasGpINEF6xorx
-         ufQuDyXPGHxY788ZMaBcgNvmr055lveuAhV+W3J3v4Y36QbwoQD6VG72t+0n/pw9iq1n
-         Oc1DFbd5YvIkaIdV+DzZMkDJ6PezVIGor+w3dWs1SgQTOTzULYjpeuVqKhLSysxx1f+l
-         FEuvX3eNKoiwKDQ/Rnly0cUtUgCLeLdoDRE4mxJgzuf/ntfAHO56etLqKEBLqGolKO81
-         pEZQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqTctmPv53gJOqw7JxA2XpUuN7gZ7yedLh2R7pLnWbQ5Iz+wFngyea7fQhuvmViv6prAWdDTdCAoJAcJQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBLgDUyXesh56zjoR6kp8SHkklsVHXhAJhWJWIKpOd5nUNOSKS
-	Nh2Jd+ba5NCeQtK2wXvDURSwv5+00GBXvPVNGyytldfR1adMeX2En/qSLDd3Zn0b/5ek/MghilW
-	11cw9gmi02Fzi+TV5YruKqqD4qNp2cRnZlNwelYGlOhe2kB1qo/T2WOPC+rc=
+        bh=0bO/4kz8Aib9NVgfYR/0fvWYSJJ+gEF2SgfiBtwRXyI=;
+        b=pCyqvewij7NxrgnCvMTDcYJvhC2jOJ1bIiqyPrr7kJLrxRi7NNH2h4CNenHX+LT32Q
+         X2b71ubj4186DnfF4kLbM2soDoajEa0wfQ7B7uVb5etxJZgsw1xyQQSEJSpzIK24ME3V
+         4/KL8cz0CkhiHPXxu5ssOFT8DaBF7jfO01jevzHsLFF/C1a2mQj5jZhK5ql1iq79mfjd
+         zvAi8gj4oqeccaOvGjsQ2C8Iyc9LRqE9s0mr+CvK+8uhqTqfVzykJETzjHRF9+TwnFPS
+         MObfNn07kJBM15XIDcRUqjYvcCZdfwn+FG9hplb16WciaXsDjRbC1MNxX1WyfEvHiiFS
+         OPNg==
+X-Forwarded-Encrypted: i=1; AHgh+RoDYINV1ctyQfIOj6qQ9cy3oN21Ps/Mk4NKwVx4hgk0Brio9CZlXdA2jt0tNirb55wHItR95BVYjAYm/A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr53VyNfCHhlJ5ccO9Lk389ItnmES0m7Im9ubpLfnAUGCyuC2L
+	bYbyNi54LJ8F62Kx0GRpI1oSr3aSONznhqEUQGvhsNGTKqGK5sK+ERWzZoVC0vjImpPe8CJ3vlu
+	btu/YWMgXlNCNcCfod369tJ8CmBhVpBY=
+X-Gm-Gg: AR+sD117LzydG7l80sTaYYkzEEHsRgMH0oZf3SKKkO9A0JXjqVfluF1oOu1XgXN1kNf
+	4W7s+kt3PiCLKbLibNBpzjdxF+p9R/5WZeQyCb3RYwAjXBYJcoNNS/jNVHYPYy0deStMJpxTcAJ
+	nYtPS2701AbTZWKlEXr+aM4SnbtIKwX72X9MxulSSlqsFWNG6gAHEr1IcaP271+zenai07XF67n
+	e2Wi44NniVel89/0lrFRpzpVSbz4CVuQNipI7+2PFZimgrCzrFtvW7eaTgXU7sHaJhTBs0zxBFl
+	HwD4yyuZg/2+MM4Nsep7dMjBv/KB1QjO2lNPIONSelpNTSIRany+xfBAA9FitqPkQ2cY2sO3Kfj
+	KFoAhXSE1ALvgGNdyWubqtUyAR/yzfzGBkDyE53Jo/MGGBg==
+X-Received: by 2002:a2e:a589:0:b0:39f:af21:75d7 with SMTP id
+ 38308e7fff4ca-39fe8316b4cmr28346751fa.2.1786380807071; Mon, 10 Aug 2026
+ 09:53:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e84a:0:b0:6a3:7ee4:11c7 with SMTP id
- 006d021491bc7-6ae96f9d0e9mr21439965eaf.29.1786380692411; Mon, 10 Aug 2026
- 09:51:32 -0700 (PDT)
-Date: Mon, 10 Aug 2026 09:51:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a7a0194.b50370da.49fe0.0056.GAE@google.com>
-Subject: [syzbot] [io-uring?] [block?] memory leak in io_submit_sqes (6)
-From: syzbot <syzbot+a4ccdd7ebf452e4d4701@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20260806170108.2100312-1-daeho43@gmail.com> <ann0OPPglToV_hjs@infradead.org>
+ <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
+In-Reply-To: <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
+From: Daeho Jeong <daeho43@gmail.com>
+Date: Mon, 10 Aug 2026 09:53:14 -0700
+X-Gm-Features: AUfX_myHa-HGIxfGx31VEif489SQOdZ1JWJCG5M4SLT2WDWvbOhVQ3bd6pEJrl8
+Message-ID: <CACOAw_zqOS0vHdQV6WoUJyxnDf=kdDAz27pNGDLdQLUdUYOzBQ@mail.gmail.com>
+Subject: Re: [PATCH v2] f2fs: quiesce background threads during system suspend
+ using PM notifier
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, kernel-team@android.com, 
+	Daeho Jeong <daehojeong@google.com>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, linux-pm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Aug 10, 2026 at 9:34=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 8/10/26 8:54 AM, Christoph Hellwig wrote:
+> > On Thu, Aug 06, 2026 at 10:01:08AM -0700, Daeho Jeong wrote:
+> >> From: Daeho Jeong <daehojeong@google.com>
+> >>
+> >> During system suspend, a race condition can cause f2fs_gc and f2fs_dis=
+card
+> >> threads to call submit_bio() while the underlying block device (e.g., =
+UFS)
+> >> is in Runtime PM suspend. Because Runtime PM worker threads are alread=
+y
+> >> frozen during task freezing, the threads become trapped in
+> >> __bio_queue_enter() waiting on mq_freeze_wq, leading to a PM freezer
+> >> timeout.
+> >
+> > That does sound like a general issue with our block device / threading
+> > handling.
+>
+> Daeho's description above mixes up unrelated topics. A runtime suspended
+> UFS device is resumed automatically by the block layer if necessary. The
+> issue Daeho is trying to solve is unrelated to runtime suspend according
+> to my understanding.
+>
+> >> To prevent this deadlock, register a PM notifier to set SBI_IS_SUSPEND=
+ING
+> >> during PM_SUSPEND_PREPARE. Background GC and discard threads check thi=
+s
+> >> flag and immediately stop issuing new bios, allowing them to enter a
+> >> freezable sleep state cleanly before process freezing begins.
+> >>
+> >> In addition, check freezing() as a fast path to stop issuing new I/O
+> >> when non-PM freezing (e.g. dm-snapshot or cgroup freezer) is requested=
+.
+> >
+> > .. which means that we really sould have all the relevant parties
+> > invited into figuring out whast is happening here, rather than
+> > band-aiding something that looks like a horrible hack inside a
+> > file system.
+> >
+> > Unfortunately I see this a lot with f2fs.  Please reach out to all
+> > relevant maintainers for something that does not look strictly local
+> > to f2fs.
+>
+> This information was shared earlier with Daeho
+> (https://b.corp.google.com/issues/515470309#comment45): [ ... ]
+> Register a Freezable Kernel Thread (Recommended) [ ... ]
+> Why this works: During suspend, freezer stops freezable kernel threads
+> before devices and block queues enter their PM suspend phases. When the
+> queue freezes later, your thread is already safely sleeping in
+> try_to_freeze() and will not attempt submit_bio(). [ ... ]
 
-syzbot found the following issue on:
+Hi Bart,
 
-HEAD commit:    06cf61899d64 Merge tag 'x86-urgent-2026-08-08' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=118c1132580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6843f8fd2336602d
-dashboard link: https://syzkaller.appspot.com/bug?extid=a4ccdd7ebf452e4d4701
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128c5fb9580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b37fb9580000
+To clarify it:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e023ff6ad9bc/disk-06cf6189.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ea49527ba5df/vmlinux-06cf6189.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e3d6468d0490/bzImage-06cf6189.xz
+f2fs threads are already freezable: f2fs_gc and f2fs_discard are
+already registered with set_freezable() and call try_to_freeze().
+However, a race window exists: a thread checks freezing() (false),
+calls submit_bio(), and gets trapped inside __bio_queue_enter().
+Because it gets blocked before reaching try_to_freeze(), it triggers a
+PM freezer timeout.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a4ccdd7ebf452e4d4701@syzkaller.appspotmail.com
+Hi Christoph,
 
-BUG: memory leak
-unreferenced object 0xffff888112726000 (size 248):
-  comm "syz.0.17", pid 5956, jiffies 4294942148
-  hex dump (first 32 bytes):
-    80 5d 3a 0e 81 88 ff ff d0 03 59 15 81 88 ff ff  .]:.......Y.....
-    04 75 20 c0 02 00 00 80 00 00 00 00 00 00 00 00  .u .............
-  backtrace (crc e2966ca0):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4597 [inline]
-    kmem_cache_alloc_bulk_noprof+0x272/0x3f0 mm/slub.c:7435
-    __io_alloc_req_refill+0x4a/0x150 io_uring/io_uring.c:988
-    io_alloc_req io_uring/io_uring.h:536 [inline]
-    io_submit_sqes.cold+0x16e/0x20b io_uring/io_uring.c:2046
-    __do_sys_io_uring_enter+0x56d/0xd60 io_uring/io_uring.c:2646
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xf8/0x610 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Point taken. Aside from this f2fs patch, I agree that addressing this
+at the block layer or PM subsystem level would be a much cleaner,
+system-wide solution.
+I=E2=80=99ll give more thought to how we can properly solve this race
+condition for the entire system, and I'll loop in the relevant
+PM/block maintainers if a viable generic approach emerges.
 
-BUG: memory leak
-unreferenced object 0xffff8881155903c0 (size 192):
-  comm "syz.0.17", pid 5956, jiffies 4294942148
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    2e 20 00 00 03 00 00 00 04 75 20 c0 00 00 00 00  . .......u .....
-  backtrace (crc db88fe21):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4597 [inline]
-    slab_alloc_node mm/slub.c:4917 [inline]
-    __do_kmalloc_node mm/slub.c:5333 [inline]
-    __kmalloc_noprof+0x3bf/0x550 mm/slub.c:5359
-    _kmalloc_noprof include/linux/slab.h:992 [inline]
-    io_cache_alloc_new+0x20/0x80 io_uring/alloc_cache.c:40
-    io_cache_alloc io_uring/alloc_cache.h:61 [inline]
-    io_uring_alloc_async_data io_uring/io_uring.h:355 [inline]
-    io_uring_cmd_prep+0x157/0x1f0 io_uring/uring_cmd.c:208
-    io_init_req io_uring/io_uring.c:1842 [inline]
-    io_submit_sqe io_uring/io_uring.c:1889 [inline]
-    io_submit_sqes+0x446/0xd00 io_uring/io_uring.c:2057
-    __do_sys_io_uring_enter+0x56d/0xd60 io_uring/io_uring.c:2646
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xf8/0x610 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Thank you,
 
-BUG: memory leak
-unreferenced object 0xffff888112726100 (size 248):
-  comm "syz.0.18", pid 5972, jiffies 4294942449
-  hex dump (first 32 bytes):
-    80 d7 55 02 81 88 ff ff d0 a0 50 15 81 88 ff ff  ..U.......P.....
-    04 75 20 c0 02 00 00 80 00 00 00 00 00 00 00 00  .u .............
-  backtrace (crc dcaddc4c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4597 [inline]
-    kmem_cache_alloc_bulk_noprof+0x272/0x3f0 mm/slub.c:7435
-    __io_alloc_req_refill+0x4a/0x150 io_uring/io_uring.c:988
-    io_alloc_req io_uring/io_uring.h:536 [inline]
-    io_submit_sqes.cold+0x16e/0x20b io_uring/io_uring.c:2046
-    __do_sys_io_uring_enter+0x56d/0xd60 io_uring/io_uring.c:2646
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xf8/0x610 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+> PS: I'm no longer subscribed to the f2fs-devel mailing list.
+>
+> Bart.
