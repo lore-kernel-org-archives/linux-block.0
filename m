@@ -1,181 +1,153 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E468B426D37
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 16:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4A9414A1F
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 16:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786379986; cv=none; b=IMHwgPrccutUN7z2xkHp73jq2kQExY/NYzebIp65CfdIXXPB11huQNWUdeTKFdzWozRWdMnh4zW/J1DtE53aU1Ium0fi/e6unL+kSgMY4Vysa05cCLBqTWm2v8dlse1dcXaXNhC90naTAuAaBPKo9B9d0EQuZU56hAyf461SIOg=
+	t=1786380182; cv=none; b=SAObULYDHq6NTZ/OcTk7VKD8UQ/vJdC0x3hmZVM6Hv/eSmyf5152Ts9o4glzFBkl3XRpo+KSiQA0rAJ8YV2h9LvPbA6/ku39RSkmvwW4cnH0Beu9JdejwSR3wD1G8/88jIwXlj2k46MNTnZ+WN73ln22nBuTyeWnnQDMCH0So1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786379986; c=relaxed/simple;
-	bh=1dVw8nrbAkxuia8Ac49iB4K1gs7YkCKauVwA5PiTKg4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=D+VrkhEXpDQgGO7vbqDvARAvNFcqHpDvjUYT7N2nP4FCjOBqcWW6WMVMHoNAIF90pS3TLzY7MfVvxu+tT5aKkMxHoTo7wM+DZdDPFBX65E6cZXIcLThmjUMHIdCR7iy5jVyc01kmJnme5FYMEhSVonGMrWVWze8wtdXa0K/IhhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=gK4/09uf; arc=none smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1786380182; c=relaxed/simple;
+	bh=njPWa+VQ6dJJES63WuP7C/QeJUVXmTKDEQ1US3l+Aao=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=szoXokggj+xGbV8LpfUuj4aCm/MYCgPLFoOktIPfqx27u0QS1ic0ULIF34UT8BFpGJ90wB9/R41VeZ1STqfqkJYPTQ4QsPYGs5bCntvU/yG/gZJbMF1W5cDMqJGhLMqh3LZv3GgJYU1R/zC+gElN6e4wKhwWus5Rfd01obZW7fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=AjV0qs+c; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="gK4/09uf"
-Received: from pps.filterd (m0167076.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67AGZKP53614967
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 12:39:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pps01; bh=e+BPPtqOvSp2f4p9hlj0HukM/4
-	EvcLMV9fvq8zY/jWg=; b=gK4/09ufjiH+PjNIxNIToysgyH3VTFluCwCJrtSPf2
-	n/H+xqxPD5N/2VMqd0mP0lXQyBpXqEta74UfG66EGNHpcdqvIkh4CkLWq0ibG4U/
-	cANtQQUjRnrslosC+Mji6YUWBYpAeQ+HiDh4Gd9f83UkkNKdb96mTFxcWdp/RZNm
-	PJHi4uXsj3VGAkFwBgh4AxP/GreuFB62DuGuISvncmMUpSe2+PgJjxi6ZlYDCxgQ
-	EF61hn2BNm5ZCKMKG6yMOZRWbmAqDKPLFd5UHusjl4MpFm3gE5Al3B0C4MGsDgaG
-	tPHHPF0+oSXfhIzvAHMMNbHjwRkbcjQiYGQifU+l9Ftg==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4fyj6h02qh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 12:39:42 -0400 (EDT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-52827090cc5so1193341cf.0
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:39:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786379982; x=1786984782;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=e+BPPtqOvSp2f4p9hlj0HukM/4EvcLMV9fvq8zY/jWg=;
-        b=by6Mx2vYhszMO/VnO9uJOvQEhGsTQhB6sYusi/mVNnP+3MpWBBJ+xNO9tj6d4Qp5N5
-         WLXD7BHUtwRRxnfNBN4kmO5wKm1Gh+AUd+Qdf61HcjQK2fR5anXbcq3HcE4Ns/cpCxnO
-         AbYZ1LM8jn91K6tGsZBi4Hdz5GzF+ylINueZRFqFfO64Xo+Dk3Qj9xjXNwiLvf/jfYXi
-         BevTCuOVv3slJXMwgqkXLAqwdZMqQI6yD90e8rqrIGx6EP3XHH2SYiymNdNAXAlAMP9W
-         A8IzF78Iytey5H83CWHKzplsBKRDQjMQS4iush7uZV98UpMrZF1klf1ShVCATkG3yIIr
-         TC+w==
-X-Gm-Message-State: AOJu0YySaVUgbP5McbZNZhazVCD/kFciPB0dkj406/ChFd4ifRpWRWaC
-	OmQKknKrH7JkP8M/3QDA/jAjWDuuNl8XrYeMpwsr0I8txRpnTSiQkHipQ4waczhs1zBaGKqNp3+
-	WbLotGAHaOD8m512qL/jcsCiQiHjkKKCEp0DgFbyTCUSWI+IKZbdjFmFSdPZ0
-X-Gm-Gg: AR+sD13AtKcP4VzoTRg5NZJ7JKH4mo1lZdw7tjajibMCzZM13QGe6bR2IWSspwx2Dij
-	QMykay4uy4/EwWiKuEK4XDWQu9oYKSXppkAt4NIaiB6O1hK0obQEUSuqeR1hNjl+dyeoDj6AtO1
-	g2dJxz++S7J6LE+6Gx/6geMNuTZyz/8JpU/HMHi9A1WSRElZiQvEqbLWAe86095bIAfvagWMHh8
-	v9AUw0bj6Air83TpSYf9HO1uAgDSxZ0Tfh9Jq+LMTkftgNj04srPWer4I+tGfovamPmvjmXVEZD
-	tGZHvsDNt2C9dnU+Pi5RxLjk+6HnJ3MoXEhyIbcqVgaC7jpf4kYm1O+1uvmETALM2MH0lYpNMtp
-	M2sAoKif1hy0/YIINWoGwj4OiJd2NCVpEVLJVnIqn1UA=
-X-Received: by 2002:a05:622a:2cc:b0:517:146d:2cb5 with SMTP id d75a77b69052e-52d23825fffmr193169661cf.20.1786379981912;
-        Mon, 10 Aug 2026 09:39:41 -0700 (PDT)
-X-Received: by 2002:a05:622a:2cc:b0:517:146d:2cb5 with SMTP id d75a77b69052e-52d23825fffmr193169081cf.20.1786379981496;
-        Mon, 10 Aug 2026 09:39:41 -0700 (PDT)
-Received: from [127.0.1.1] (bzq-79-179-7-133.red.bezeqint.net. [79.179.7.133])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-480021506c0sm33475204f8f.11.2026.08.10.09.39.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Aug 2026 09:39:40 -0700 (PDT)
-From: Tal Zussman <tz2294@columbia.edu>
-Date: Mon, 10 Aug 2026 12:39:19 -0400
-Subject: [PATCH] xfs: avoid double deferrals for RWF_DONTCACHE writes
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="AjV0qs+c"
+Received: from pps.filterd (m0528007.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67AGWDPl1256800
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:42:54 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps82601-s2048-2026-q3; bh=RM/i3Aj+C
+	uXgrfwxXdHkQzfSrvQP6n4P899foFoS0Ns=; b=AjV0qs+cKwZfytepI5+AF1awA
+	71wbRKgPyjcywyAc8ZN+8r9orH0NhDrGW1QJIytApUSp28YeXQQ2d1x9dOz7Su2r
+	OIoveP0bRrGfJDTwqxtji0SYq5WENAV5lMiU+bJCnsisdcthi/DFN0QtOdmOcDSw
+	CYTKDbR0sAhLxmlxx3g/QEjSuanKgknSf8Ni6dRhWO5GGrewVoShU2SWn+k+GvR9
+	XbYvdJ/HcyEeIuzMdgEucYT+/Ijvlt1y9aWhO72zlM+e0byC7ubKgE69QjJR2NPE
+	mcWobLB9l1HhpdZX1ga4lmjaDW1DgqgASmwP5oxziDO/Ada7nLk1zooo02AlA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4fxrftedar-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:42:53 -0700 (PDT)
+Received: from twshared17359.34.frc3.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.45; Mon, 10 Aug 2026 16:42:51 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id EB3FF278E868D; Mon, 10 Aug 2026 09:42:20 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC: Keith Busch <kbusch@kernel.org>,
+        <syzbot+ac00e7bf7ac8c91af921@syzkaller.appspotmail.com>
+Subject: [PATCH] loop, zloop: fix dma_alignment for large or unreported limits
+Date: Mon, 10 Aug 2026 09:42:17 -0700
+Message-ID: <20260810164218.3721636-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260810-xfs-dontcache-double-defer-v1-1-aea7484b3e49@columbia.edu>
-X-B4-Tracking: v=1; b=H4sIALb+eWoC/yXMQQrCQAyF4auUrB1IRxTxKuIik2baiExl0pZC6
- d2NdvXev/k2MKkqBvdmgyqLmo7Foz01wAOVXoJ23hAxXvHWYlizhW4sExMP4m9Obx/JUgPJOdM
- FE2FkcOBTJev6xx/Po21OL+HpJ8K+fwEx2RpgfgAAAA==
-X-Change-ID: 20260810-xfs-dontcache-double-defer-ae3fa50ba02c
-To: Carlos Maiolino <cem@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>
-X-Mailer: b4 0.14.3-dev-d7477
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1786379979; l=2117;
- i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=1dVw8nrbAkxuia8Ac49iB4K1gs7YkCKauVwA5PiTKg4=;
- b=J2RtFKGjmGGQZlE9chrI+urEUn9ROGe+QzTLmqzAsEYbReC3BuS6IvwP3bkhsK+eJgE4g9vHG
- sxrYq9ROhdjAiJ3p/0Lved0ky9kPpSwjM9eNM4uvkOYziZVUIFUUiuT
-X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
- pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEwMDE0MiBTYWx0ZWRfX4t0Zy70T7wiu
- 5DvQmDx2xjmKCPOoOwYrUcjh8jvag4v/f+E2t1NHI2f5At7OecAjqawLm5qKf3b4nIeG9S4ZYVt
- 0zm03dNgKQ17ViQuB5prDFvbWw2QRbwmHNGG8fT5N2UX5/LDpicDL6JACIpexmmthUAmxnGziRv
- 7BHCw9PgEra0w/P/yvGy6gMv6oBk2R1HpkGtsAduTI/Ouq14NpfXNzM67xunwuYsEJW54v/Be1l
- NtK2plOCVLsWI/sEomuBoYYMoGzEWUIH3GUlwbHizl8hLnjYB0pZ02/OAgkncHDwacGfZ+ZKQAP
- SI9eoSof/tdRwiTI8HHkF89W9GC8beNX8UgGGPPnQ8EaxDrBoUjFW/FxORwkmXtsJX6U++GpInx
- 8QfmYuIksDxj9PRBYtbMh7wNc1+QpLDx63/+OQcTZuB7IJzMCXa7Jmi0GFmrsjW+natA3dzO0pU
- Fe8Mve5H8SydfsuHXRQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEwMDE0MiBTYWx0ZWRfX3gPbWvzC043/
- 8dWLfdtbKdzTgrtZlfpNU9wZvY4Zz5cd7GCuVtnZWvP5EV7GO+sU+nbVtYBwWsmn1jw4vpq+Qbu
- InpJzIpiOIYim1K66/XiSm3GLK1j6LOAOZ8t+bdPOsxornJA15fN
-X-Proofpoint-ORIG-GUID: 6lwOq_h3r2ReEtvCcYHdJNf-1ZmbD2iM
-X-Authority-Analysis: v=2.4 cv=QY9WeMbv c=1 sm=1 tr=0 ts=6a79fece cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=LRATYcvZeiQrLRB5MfbBvg==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=Qm0qsxP7aFY2tkT6R2MF:22
- a=VwQbUJbxAAAA:8 a=JfrnYn6hAAAA:8 a=YmEKMl2L6wtdMVtX8_UA:9 a=QEXdDO2ut3YA:10
- a=dawVfQjAaf238kedN5IG:22 a=1CNFftbPRP8L7MoqJWF3:22
-X-Proofpoint-GUID: 6lwOq_h3r2ReEtvCcYHdJNf-1ZmbD2iM
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11871
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=10 priorityscore=1501 phishscore=0
- impostorscore=10 adultscore=0 malwarescore=0 suspectscore=0 spamscore=0
- bulkscore=10 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608100142
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEwMDE0MyBTYWx0ZWRfX4LM4iXy2Lq+w
+ I4JgWby1GSg8Z+JUZ/ow2dipD80F01yOhZ/mVpP4qosxgLkhl/Ckjzb3MOL4KK/ffrO1K7yHDqz
+ MJqFfDbdmLyL6G1cUBZoFesbYtec0BRUK+mxpZw/kQmch/+F3sjdg5HvBjvAUisZBVtbQx6E+SF
+ o9mfJ/FJCd98I5btQaoLy+TRJZ/keBzB8sv3H4nZ1A2123lJPVNzQwD4yHqbupuhyF4YfIWOc5U
+ ahCCD4/xlwko4FnUPY9tHjUuc5pAdt4x0jlUm5q7Wua3Y++Z1KMQ38eJAQmrCMH85xade2+JDxQ
+ BKItEGKBkjNj8TNGU/XSOGpZoU5WQ4nIrxsf2fx9i3a3/VPW4d5GVptErf2000DNXoWfG1oRzNT
+ nIuxwTSHBK8Ee86WEOM+QkTCxtf9WTgG+TgsbiCtJKEjdieziLrRAtB3pQgi41ekTOwhLJzfJfQ
+ GdwgM7NVTU5s70E3dJA==
+X-Proofpoint-GUID: mCKF3EhCtFAvCaEe2n7KSgnE4L-fYEgK
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEwMDE0MyBTYWx0ZWRfX12I0L8LJTu2m
+ XJMnxnlxF/aHK5ApyICxgoA9JUpi+yGRBt2kNB6lrtm+A2SG1wtw+MxY0Yy5pdqOvORfu+KsXXz
+ gtWTgoYEMY+NH88JcrwkfsMwxIjzZU8=
+X-Authority-Analysis: v=2.4 cv=c8Wbhx9l c=1 sm=1 tr=0 ts=6a79ff8d cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=4h92JMTCafKA-fb_NiOh:22 a=edf1wS77AAAA:8 a=VwQbUJbxAAAA:8 a=hSkVLCK3AAAA:8
+ a=FuhZsodB_9_TbugH65AA:9 a=DcSpbTIhAlouE1Uv7lRv:22 a=cQPPKAXgyycSBL8etih5:22
+X-Proofpoint-ORIG-GUID: mCKF3EhCtFAvCaEe2n7KSgnE4L-fYEgK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-10_04,2026-08-10_02,2025-10-01_01
 
-XFS already defers some writes to a workqueue when transactions are
-needed to process the I/O completion. Disable the block layer bio task
-completion in this case to avoid a major performance drop.
+From: Keith Busch <kbusch@kernel.org>
 
-Fixes: efbde6f9f449 ("iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback")
-Link: https://lore.kernel.org/all/8124341f-3af2-4a16-897d-38db5ab5a9d4@columbia.edu/
-Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+A file system sets STATX_DIOALIGN with zeroed alignments when the file
+can't be used for direct I/O. The zero underflowed to UINT_MAX and
+triggered a queue limits validation warning. Fall back to the block
+device's limits when dio_mem_align isn't reported.
+
+A file system with a block size larger than PAGE_SIZE may also report a
+memory alignment that can't be expressed as a queue limit. File systems
+fall back to buffered I/O for requests that don't meet their alignment,
+so cap the reported limit to the largest possible value.
+
+Fixes: 6c8dec275ccc ("loop: set dma_alignment from the backing file for d=
+irect I/O")
+Fixes: c5059c1af2bd ("zloop: set dma_alignment from the backing files for=
+ direct I/O")
+Reported-by: syzbot+ac00e7bf7ac8c91af921@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3Dac00e7bf7ac8c91af921
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
-Follow-up fix for the RWF_DONTCACHE task-completion series. This is
-targeting the block tree. [1]
+ drivers/block/loop.c  | 8 +++++---
+ drivers/block/zloop.c | 8 +++++---
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-[1]: https://lore.kernel.org/linux-block/annkDbhXBEeMoNVT@infradead.org/
----
- fs/xfs/xfs_aops.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index cd8de8c82d78..74a6089abadf 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -549,10 +549,14 @@ xfs_writeback_submit(
- 	}
- 
- 	/*
--	 * Send ioends that might require a transaction to the completion wq.
-+	 * Send ioends that might require a transaction to the completion wq,
-+	 * and disable the block layer task completion for them as there is no
-+	 * need to defer twice.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 8639fa34b8470..cbf1e2ce27126 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -458,12 +458,14 @@ static void loop_update_dio_alignment(struct loop_d=
+evice *lo)
+ 	 * Use the dio alignment of the file system if provided.  The incomoing
+ 	 * request's bio_vec is forwarded to the backing file unchanged, so its
+ 	 * required memory alignment becomes the device's dma_alignment when
+-	 * used for direct-io.
++	 * used for direct-io.  The file system reports zeroed alignments if th=
+e
++	 * file can't be used for direct-io at all, so fall back to the block
++	 * device limits in that case.
  	 */
--	if (xfs_ioend_needs_wq_completion(ioend))
-+	if (xfs_ioend_needs_wq_completion(ioend)) {
- 		ioend->io_bio.bi_end_io = xfs_end_bio;
-+		bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-+	}
- 
- 	return iomap_ioend_writeback_submit(wpc, error);
- }
-@@ -663,7 +667,14 @@ xfs_zoned_writeback_submit(
- {
- 	struct iomap_ioend		*ioend = wpc->wb_ctx;
- 
-+	/*
-+	 * Defer all completions to our workqueue as all zoned writes require a
-+	 * transaction to be persisted. This also means we never need the block
-+	 * layer in-task completion for a task context.
-+	 */
- 	ioend->io_bio.bi_end_io = xfs_end_bio;
-+	bio_clear_flag(&ioend->io_bio, BIO_COMPLETE_IN_TASK);
-+
- 	if (error) {
- 		ioend->io_bio.bi_status = errno_to_blk_status(error);
- 		bio_endio(&ioend->io_bio);
-
----
-base-commit: 30df3ab3c92d0e7854c54df6ae66f4aa6eb5b3d2
-change-id: 20260810-xfs-dontcache-double-defer-ae3fa50ba02c
-
-Best regards,
--- 
-Tal Zussman <tz2294@columbia.edu>
+ 	if (!vfs_getattr(&file->f_path, &st, STATX_DIOALIGN, 0) &&
+-	    (st.result_mask & STATX_DIOALIGN)) {
++	    (st.result_mask & STATX_DIOALIGN) && st.dio_mem_align) {
+ 		lo->lo_min_dio_size =3D st.dio_offset_align;
+-		lo->lo_dio_mem_align =3D st.dio_mem_align - 1;
++		lo->lo_dio_mem_align =3D min(st.dio_mem_align - 1, PAGE_SIZE - 1);
+ 		return;
+ 	}
+=20
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 4323ac108cae8..f0ca221524db6 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -1042,12 +1042,14 @@ static int zloop_get_block_size(struct zloop_devi=
+ce *zlo,
+ 	 * Use the dio alignment of the file system if provided.  The incoming
+ 	 * request's bio_vec is forwarded to the backing file unchanged, so its
+ 	 * required memory alignment becomes the device's dma_alignment when
+-	 * used for direct-io.
++	 * used for direct-io.  The file system reports zeroed alignments if th=
+e
++	 * file can't be used for direct-io at all, so fall back to the block
++	 * device limits in that case.
+ 	 */
+ 	if (!vfs_getattr(&zone->file->f_path, &st, STATX_DIOALIGN, 0) &&
+-	    (st.result_mask & STATX_DIOALIGN)) {
++	    (st.result_mask & STATX_DIOALIGN) && st.dio_mem_align) {
+ 		zlo->block_size =3D st.dio_offset_align;
+-		zlo->dio_mem_align =3D st.dio_mem_align - 1;
++		zlo->dio_mem_align =3D min(st.dio_mem_align - 1, PAGE_SIZE - 1);
+ 	} else if (sb_bdev) {
+ 		zlo->block_size =3D bdev_physical_block_size(sb_bdev);
+ 		zlo->dio_mem_align =3D bdev_dma_alignment(sb_bdev);
+--=20
+2.53.0-Meta
 
