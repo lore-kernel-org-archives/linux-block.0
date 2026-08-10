@@ -1,38 +1,67 @@
-Received: from mta1.migadu.com (out-97.mta1.migadu.com [95.215.58.97])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DA635C695
-	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 09:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18E83BE659
+	for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 11:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786355034; cv=none; b=X671U1DOGTMiu5vVR7xk0ITgLraY+W11/vVVvyUDDRTseqmzlAKAmh4eExie8VRfGp6JbP5/HH+9pc8J3lTc/lGOA8lwWTznkWdKG1tc5QJLOEqD/RDl4lFCCOsU1xynvfJ2iNR/10O+4psCrv59lSz5DxDunEh5IgnrKFvmZ6o=
+	t=1786360305; cv=none; b=c8D3imNrGCL8jE+UUGgxxm0OOz6+e/hGs+4kD4DPmQiBl9SegucBU6lNCPga8c/a3CyQAgnqte25FH8Pyt6jUea8vzQBiTKJHzKZlBo3kDIGmZ069znorW8FXq3QhbYMfkJDstG7ahuBZN3+XLiCwxx/eqsqOVuDPYkPV9P9KUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786355034; c=relaxed/simple;
-	bh=oM0nShtvENJ/IoYuzI4EAurH6RtVncCAM7zuaIO1J30=;
+	s=arc-20240116; t=1786360305; c=relaxed/simple;
+	bh=qJ82c9Cn5GE2uSYDfs/YSLF402V0W4hUGT95elD2vio=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b9RDgnX3DQTXvpLBGQMrdrXPzRMXEkelZZm5Ki+sxxrXMvfGCU79Tr0JLYGmv+2gPbTClC4/yYeWF7AAWZElkoWlkrxmAc3dlG6AZ/K9qQsfqKlUiaAsGi6ez81fKvQMfa85kstMVP+DZLCgXU9HSKI/DEDuU0VapBqkOBVvYoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MYaqsu/H; arc=none smtp.client-ip=95.215.58.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=n1Nh88kptzpJ9DfVkNpDGSrzQjIrRPrzA88dM/LRIWqTzCg6ADGbDQgOsiTXVdiV0eiMTpfIm8SciOFIBen9FM6vmbsf/gT8fZO1rmtRYRRQCnMaztFYFupMa1WREkGkIzoJwmoNbNHJV/hBP57E5SQc5qk2Uhe06TfpmENJBaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=RTlldNOA; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MYaqsu/H"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=oM0nShtvENJ/IoYuzI4EAurH6RtVncCAM7zuaIO1J30=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1786355031; v=1; x=1786959831;
- b=MYaqsu/H3U0KVOKCCen3mzHz8hT/6YK+6UUVA4iT+gKdsbqa82CVA1DmRqRUUAHtCHKNyJ+j
- 56MOpFxJDVwapfWReUKuZFWyj9gJ0cGKpPTPhJ0r0D1/7XpOepj5S6zYhh+/Al/BVQFi6xlcekx
- 9rCNgfYRtxes5DL7YleMLhzU=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: from [10.0.11.3] (2a11:3:200::10a9)
-	by mta10.migadu.com with ESMTPS id fe8757a2b2912904;
-	Mon, 10 Aug 2026 09:43:51 +0000
-X-Migadu-Scanner: mta10.migadu.com
-Authentication-Results: mta10.migadu.com;
-	none
-Message-ID: <a99bc12d-0103-4780-94b0-ecc82e4e0b95@linux.dev>
-Date: Mon, 10 Aug 2026 17:43:28 +0800
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="RTlldNOA"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c1c4c7ddaf6so246811666b.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 04:11:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1786360302; x=1786965102; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WfFZI35gm0XCR0CnUVv4i1tCLoVGdO5xJXudlgRQOYg=;
+        b=RTlldNOADE1KSDBuhN+hvgG7KueRWORCTbmrYVaRHSir4owQXU85yzRtblXWNDR8cW
+         BT/PthFAmLSTNHqz7dY/HQsl+Yog1NT85FsQVYwMTxKg8pxdzN/7Ptlodl8SFaJ8FTrt
+         u5o+Yl3gV00ug53dSvJi0vj5FUC9JzgFTtIlaH8Lwjxhk2hZGaaxql3569RMtFI5Igs6
+         O4UMGDjuVinjAUesqyJDfmKlMrI8wIdSDgCKFptgh8RDsy11dpJ4IztjVnQ7wVkSxNnp
+         V7g5GF8SyuPoIpmoo8tAtF6BZdDPgZqvTxyg6dG7E7Rc91wcD2UP0BHLPIfUTwsGHlgb
+         wung==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786360302; x=1786965102;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WfFZI35gm0XCR0CnUVv4i1tCLoVGdO5xJXudlgRQOYg=;
+        b=ipp55L1ovsvS6hBzqxTwORvB+v9LwZAhYAhxpFf9pAkm3zvp6A4lF+/WmO16JJ0N0X
+         /0aFiYuSKWE6YQgStJz950NymZ1DhSnHRGpJgsPwJssdPXti+nspU4RU11O3c3yTNq5C
+         TczsUJ6yI5F526s1A6to5Z2ASCvPJ4mJJR1FxTzo2UPi4veZjEyv3VM7bhwmx4htBiAf
+         mLimhSICzo3U31iiVSWXelSTyU3gnoWrTAoNIy/chKRqYjVeUKlvbObTLrWmFs9fyC0O
+         qw0O0UfS/QnGzG805geDS0qqqxiJwzyqybPaCOdgEwYW5t7ivrK/QxLiiGiy7WBrzQey
+         CjDw==
+X-Forwarded-Encrypted: i=1; AHgh+RrkuIwXRXkJTGF2iQtHSJY/CMqi3MK2kvSu2e61uEOLLH4lG5jN6W4wZ2GRmgqqcV72Ngm10DjEdoQ5sg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXj6g/JsBfYCkRI2kMl2rtuZFogV3mjvdeT/KCEnaurj0wh/5V
+	LQDOY4npBKu8A11XgNQUfR672yYAEqrG1SXlQQIlPqLUgGZPTpTMgs+bMOQsUN1wI2E=
+X-Gm-Gg: AR+sD12ygOLRisB1YVc1WTtXh/JBXgJE442q15h2LjsLGOEMxvI+qltExfWvSBYDfr5
+	4utno1121Z1GHMKc7NxMIjOO1yKVJrx2rxYmna6Mqk/z2S9C0UI7b/tJg/gi1WDzkiRL9VOTtgm
+	9uvnNUXpfto8xrFO6yDaFE5nHwNwoOClxN6OSdNYPGunWh35vkXk7Y8rHeNLHLlDwJ7BJ4Gk/VM
+	Pjha4BYqhNm29d7IK3N1gnsJq+8lxxB1DNmYrtnIJM0TJp768AxhfgnoYYhHmPhjltBDzKZdd88
+	09KqHwHPbNA9NCYFkcscYf2EVlTdzsYg2Jp+K7yXcmnqQRgds1DYhJw2mRSn7hHtTFtBGoPe3Rc
+	D4lWDXHV1ApBpH/opGf1OrthgifRjYdBm2ihbWZMKNNn3c+S1AlkX2n4LKk39oVe6vcsNPBiOpp
+	HyPmH+wWn2GVcYSW5+ZuwKCqtzmIgIKZi0ol4f9O1Yc2a1Ckbpv9HTUUi6YRxlER8agEz4vZ5FC
+	fPLySjZJiCLHKLjAIGvmkUfEGY4sBMZ5S/vKG0uGQ==
+X-Received: by 2002:a17:907:c0e:b0:c1f:8021:deef with SMTP id a640c23a62f3a-c20c68f356bmr33616966b.10.1786360302073;
+        Mon, 10 Aug 2026 04:11:42 -0700 (PDT)
+Received: from [192.168.178.55] (h082218129081.host.wavenet.at. [82.218.129.81])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2080a29a79sm367601266b.11.2026.08.10.04.11.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Aug 2026 04:11:41 -0700 (PDT)
+Message-ID: <a95689f2-4965-4387-a7d3-64dcd5594f26@linbit.com>
+Date: Mon, 10 Aug 2026 13:11:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,63 +69,54 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/7] rust: use vertical import style and remove
- redundant imports
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
- rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>
-References: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
- <CANiq72k3cjgHiimYqGfuQjPy+A3oOUEoMxUJCS-FgBm25D4MLA@mail.gmail.com>
-From: Alvin Sun <alvin.sun@linux.dev>
-In-Reply-To: <CANiq72k3cjgHiimYqGfuQjPy+A3oOUEoMxUJCS-FgBm25D4MLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH] drbd: fix typo in comment
+To: Guo Tenglong <micronull@163.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+ drbd-dev@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260728090507.16847-1-micronull@163.com>
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Content-Language: en-US
+In-Reply-To: <20260728090507.16847-1-micronull@163.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
-On 5/26/26 01:51, Miguel Ojeda wrote:
-> On Thu, May 21, 2026 at 8:57 AM Alvin Sun <alvin.sun@linux.dev> wrote:
->> Adopt the vertical import style and drop redundant imports already
->> re-exported via `kernel::prelude`.
-> I can take this if block and misc Ack. The changes are straightforward anyway.
 
-Hi Miguel,
+Am 28.07.26 um 11:05 schrieb Guo Tenglong:
+> Correct "seperate" to "separate" in a comment.
+> 
+> Signed-off-by: Guo Tenglong <micronull@163.com>
+> ---
+>  drivers/block/drbd/drbd_state.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+> index adcba7f1d..98abd2351 100644
+> --- a/drivers/block/drbd/drbd_state.c
+> +++ b/drivers/block/drbd/drbd_state.c
+> @@ -1339,7 +1339,7 @@ _drbd_set_state(struct drbd_device *device, union drbd_state ns,
+>  
+>  	remember_new_state(state_change);
+>  
+> -	/* put replicated vs not-replicated requests in seperate epochs */
+> +	/* put replicated vs not-replicated requests in separate epochs */
+>  	if (drbd_should_do_remote((union drbd_dev_state)os.i) !=
+>  	    drbd_should_do_remote((union drbd_dev_state)ns.i))
+>  		start_new_tl_epoch(connection);
 
-I would like to follow up on the remaining patches from this series:
+Thanks for the patch.
+Typo fixes like this are generally only worth it if they come with a
+"real" fix in the same general reason. On their own, they just cause
+more work for the maintainers involved with no real benefit --
+especially in this case, where I initially struggled to even see the
+difference.
 
-   rust: block: mq: use vertical import style
-   rust: block: mq: remove redundant imports and format
-   rust: block: rnull: use vertical import style
-   rust: doctest: use vertical import style
+NAK.
 
-As far as I can tell, these have not been merged yet. Andreas already
-acked the block parts [1][2][3] and David Gow acked the doctest change
-[4]. Is there anything else needed from my side before they can be
-picked up, such as a rebase onto a newer base?
+-- 
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
 
-[1] 
-https://lore.kernel.org/rust-for-linux/87v7bgf8f3.fsf@t14s.mail-host-address-is-not-set/
-[2] 
-https://lore.kernel.org/rust-for-linux/87se6kf8af.fsf@t14s.mail-host-address-is-not-set/
-[3] 
-https://lore.kernel.org/rust-for-linux/87pl1of7ve.fsf@t14s.mail-host-address-is-not-set/
-[4] 
-https://lore.kernel.org/rust-for-linux/5748f9ca-e684-42a0-9297-e587b178a47c@davidgow.net/
-
-Best regards,
-Alvin
-
->
-> Thanks!
->
-> Cheers,
-> Miguel
