@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EABF327BFC;
-	Mon, 10 Aug 2026 15:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3387E339365;
+	Mon, 10 Aug 2026 16:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786377548; cv=none; b=GXVvIPgbl/XbciYoYoFppGLVZs9EuD6EljNaD2QOlUZPn5vq8yQv1UpiA6BjrN33vnO+B8PvRnBn1YN2MCuQk5Nob4LIyTKCAvqXRoO166W2Of7L4rWAeaAhUtFRcXIv427wgb3yxrC9mQahQ8ZOmkqDl9X3qPYymiuOmzoYeCU=
+	t=1786377614; cv=none; b=dyXXyZ5l/yI200oA2c/qaKpZgRekQp/5LceAPcln65O9Er8lyo5EXgObu34b8Nf+k1J39rEp7FqkFlPIiHuwZcy17zOe5ZlFCT2C8T5cc4Xjxc9I20lTIzYPCUajW5CqtdVt+gAR4m7fq7+p8tiUGjetu1+YD7+fOk92OxyKHiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786377548; c=relaxed/simple;
-	bh=Fk75NUD/BmoiB1CyVr2P7UQ2xkUj1UE45Y6IWow9sxo=;
+	s=arc-20240116; t=1786377614; c=relaxed/simple;
+	bh=/g0yLnciYPu4uQFtlKMlHL32ZKKryw6X8Rapw23u+9g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKi3QpW4UK7zmtxdU1B0iavQLpcgLcsjVnjkbR6XOzbGa+gmjdFS5J8X2x3nN3j+wp1IaE6+CYG2e+Dq9dfxkxwN3oEojFHGyJzyHwLjjdVdJsZerrfhWYmXzBFsAUyoMJxj3e4yoVCd3rXW5zdLA4WqfbZYEDx3Nj1GfFXnUdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZJ3qN0ej; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=TPw3iKMn+B/rZ9Ib3iFJ9IokELhXdX0RbC+YQbXQ/zyAaGIFc3rWsjyhcxHi0QzE3dRr/L42iQk2P0Rwq4BwLjADz+xNyyXCs9M9DwJleGOPR3KtxNXEMByp+A0Al8gEWEjnHMClwbyyH6ssYF46K9EDsAeRD+f3wa8FykKeOKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pSFqQ1IK; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZJ3qN0ej"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pSFqQ1IK"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Fk75NUD/BmoiB1CyVr2P7UQ2xkUj1UE45Y6IWow9sxo=; b=ZJ3qN0ejtXFSKHlhFx934iM4Mc
-	NVQuNBntP9qwBdLgfzWCZ0K1a4LCDWTQVcLlW4GR8N2CQXWq8GB8ONYKMBfAN8+2O+725VzA7YCYE
-	QkfoiSrDe5P7CocJOj3zxI7aRR1Wcm/Efb1NCHQlRLn1w7HOpZ3gE5jk75om9tkj1spkhMfWhdGgv
-	kgEwBmnPZsYCaLb8nvky3FizzWwqoCfJRJ1PyhERMQBiaICMuT/6KxoM3DkQM0/vbyrYtsD/Erlgs
-	vtoIY5EkkMxBzet3M4Bd8/LDDf66I0mQPXwHoAXowOuG1bivYa98kO7QV8MuvvuLIQpjfJV18eE3b
-	KkGdZqNg==;
+	bh=fM1TmwL+V6afntTWcbDSTRYQvzGnvPI5cULUs8c5LhA=; b=pSFqQ1IKQaxnP5/zrtrDlgaL1e
+	yB42zQ70EPHn0xvIxANDJF0HL6Fo29/IHA+ehHzvFAflZDSpVaXw5tlLZc+Z4I2KDnaXNygIbZdg8
+	YxQPls9GmlbnMcE+/DSJLIdj5I3X+QpMzbCXEU2le7e/lylqahd5QagvZOFArxXDhBHKwpX1r0dne
+	q5gLD+gVrfFiJWdFVSYsr6HYoM3JcqtKlNd69o8rhrErGiZhnKAT1sqcVOlYr68+fegUzHXNsGoFS
+	6andjJc4az9aRVoQpoh51/AY6y3pkUOgO3lL7N89+Lsy90qrvWMeoZtFsHA5VNvndKl0a2dH4EPER
+	rM2szIGw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wtSP3-0000000CKCT-2eON;
-	Mon, 10 Aug 2026 15:59:05 +0000
-Date: Mon, 10 Aug 2026 08:59:05 -0700
+	id 1wtSQ7-0000000CKMy-3kRJ;
+	Mon, 10 Aug 2026 16:00:11 +0000
+Date: Mon, 10 Aug 2026 09:00:11 -0700
 From: Christoph Hellwig <hch@infradead.org>
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-block@vger.kernel.org, linux-mm@kvack.org,
@@ -40,10 +40,10 @@ Cc: linux-block@vger.kernel.org, linux-mm@kvack.org,
 	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
 	David Rientjes <rientjes@google.com>,
 	Roman Gushchin <roman.gushchin@linux.dev>
-Subject: Re: [PATCH 1/3] mm: make mempool_alloc_from_pool() return bool
-Message-ID: <ann1SXYaljourJMP@infradead.org>
+Subject: Re: [PATCH 2/3] mm: support fallible mempool_alloc_bulk()
+Message-ID: <ann1i5VjTmgChjs7@infradead.org>
 References: <20260806221031.79050-1-ebiggers@kernel.org>
- <20260806221031.79050-2-ebiggers@kernel.org>
+ <20260806221031.79050-3-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,10 +52,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260806221031.79050-2-ebiggers@kernel.org>
+In-Reply-To: <20260806221031.79050-3-ebiggers@kernel.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good and matches what I recently did on the slab side:
+On Thu, Aug 06, 2026 at 03:10:30PM -0700, Eric Biggers wrote:
+> To fix a deadlock, blk-crypto-fallback needs to be able to make fallible
+> mempool_alloc_bulk() allocations.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+It doesn't.  fallible mempool allocations are a concept that doesn't
+make much sense.  Please just go straight to the backing page allocator
+instead for callers that do not need the mempool guarantees.
 
