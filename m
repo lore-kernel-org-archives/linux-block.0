@@ -1,86 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C5B330D2A;
-	Tue, 11 Aug 2026 20:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4042D416844
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 20:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786480978; cv=none; b=dv6NyNfJiudlJRDCZi9lT9ifDy1LFGh+9cfM14q1DmfS0hKj6L7eiFcoaY8QQ/J7w6PDl7TkUnCK/7k5hxdGkbYfQJLlGTXKRXgrg7qJtuGRKxPvGppbcypUomTzspoHbMopjdMcvKAeykN0fa4IZFGCwhUbwwtMmfUN3ODtr9g=
+	t=1786481307; cv=none; b=qvfmFgg8prx/G+9fF5sHYzIgTTUFkoqHs2yMRyo7NMXUCBRCjzyCwrG0dWh06RmYMAWX/JMmHkUtOHru6TnmJRliI5SlLMEakBIEWvC2k09GxEd4eM0LoOOfiC20+4pRsBJLQjSjLmQSKZ4k0p3Mv9VGBLJ8gXFujerkB59Ohe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786480978; c=relaxed/simple;
-	bh=rGPztItlD7FpNWUP2rSJQo4uVTriv4EBJjLqbM2K2OQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=auzYFT7V8HWorWgGon+YHhEbciQOYW+/h0yHJCPSpKpsDUzg2OZ/aD1cX7eWS+aFe0E8FEL+U5rr1biTK1ir8baE0wg2jefrHdXAUOBgsjy4sefO7uB+LkeJucyRvaRIB75SKRh4Pdx2SWXNXSxs8W65LWazQlAKfYoyfSc4Vb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YFbw3h+9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786481307; c=relaxed/simple;
+	bh=r2c3+jU4lmDdIvRIGjJAf//rnst5NVtf9b/Vhmkr4E4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=F3EopoRT1Y2/3Z1GRkpUSjXDfpR36Lt4FHFjmdjzviMybI3mkeyVhhD89MCYmEznnIwmrzE7nu1Zvg0KBR8MtsZ8+G6emoy+/VhK6qInKtvSua7clgkGVw0U6UEZvP89CUOcVd+60UT5juNjmYCUpw8WYE842sqtYtojIwByCwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sudarsanm.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dc+QJFwE; arc=none smtp.client-ip=209.85.216.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sudarsanm.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YFbw3h+9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 567121F000E9;
-	Tue, 11 Aug 2026 20:42:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786480976;
-	bh=Q2cmqbvAu79K9Kh5ZQbzK7San2QVikfsoxkJansBbyA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YFbw3h+9VF05FaKzac6jPhVAB835l5JVJCUXwTuCJl9eBG9OxW5fKgFOyQF10rSIs
-	 Rgq6rp9K/wNatLZMxgnw+8SQTYxaj5qCHkPCVPj8jXdsouEZl9VaZRvXBw0dMIBa6x
-	 La/Vnqz6TyhYtdIgig7ILqO+Anbl8J7EAPvQoslguHUfQToKMag/6mr36B/Z5d5EFQ
-	 7Ei32ZvBOy+CXDbLKzIFn/cV4a89TQgxbRXxT4CmVrMwMNVTb22vZ5YVO7r7r+vSAM
-	 fnC6ojfziByZLUBR3ARp7EA9Ev2hTaKW9tHtHKRzruJ4TgVas53yW+1Vy++v8vy+cX
-	 1xJyovjvpNzyw==
-Date: Tue, 11 Aug 2026 14:42:54 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Chris S <coshi036@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Weidong Zhu <weizhu@fiu.edu>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] nvme: refuse an unsolicited format change on a
- namespace that is in use
-Message-ID: <anuJTi4sZiCBuMzb@kbusch-mbp>
-References: <20260811192111.2058140-1-coshi036@gmail.com>
- <ant4bioGLl4B35n_@kbusch-mbp>
- <CACd_6n1=oS_Jdq6s=u2jNmtP9n0Yc13BkKqJHSpsjbWHy=X5cA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dc+QJFwE"
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-38e7ff7b375so323605a91.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 13:48:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1786481304; x=1787086104; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JRMZT7Mqa3AuvQteyaNLXjW3SaaVbTDWA+KghRiAEJw=;
+        b=dc+QJFwE8uLqxiB4VdhXdYKndQ0g+tVCb1NzvKac5LdZt0GyphneEfG1hVdG6Ua/7C
+         529wsqDcnzrm39kT05HEmyV4Hu4Zr0G5xEc2hfCv0VwDMLNH2l4dkoCVdEJfPavyRRts
+         VbnK9BXEG3IyX5R2upJ0eN1hC/bbHf7yuZSCBq3ByX/F0qTSvPse0FiPeZfTaaSuKKHy
+         45JZOjHg+VwM7qcA4T84ugQu/mQc52wnQLpu3Rdpuw4la+K62dP2ouRTykqEK2+3Ij4K
+         6BofWRuwE2uja7cXfL8trAVSav+C+J1xdM3uhj/dcwJgJ6DewyV+YADhzhTmEP7Yg+ft
+         NMLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786481304; x=1787086104;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JRMZT7Mqa3AuvQteyaNLXjW3SaaVbTDWA+KghRiAEJw=;
+        b=giewm4icBVT9b8Le4QX+CiCxgDfvzrFGN+QuI7kxS8JMXStwV9P1sLd7fjH4kdPq7V
+         ezFAvWP52veyOfyB9bg2MYbys+xC3SK8MbA3q1i6D+dpLYAiMs4ZqSt6htMa6tnu9VUL
+         eHw7zQ8niynjiln7vtk/ZSMVlAuOm2NEa2Q8GZ+e1Y5qo8qdM+Ag4THcVPUAvL7fWxPN
+         aK14gCYv3tJSLYBjQompWkg26458lhD5Mj10Bv0hy5E5xjexW2vLJQGylB/70nfSN8Tn
+         f5LFAnuIyQgXerDeAXDEbH2axSkUsQ2pn2fKGyhNl86dhzVTFOAfxhK8Wygv/PXg5rgG
+         8AGA==
+X-Forwarded-Encrypted: i=1; AHgh+RrhgKHc+URnNTHSyewNAsaCSChnxixKC4v42iDpMfEcomF2vpPVNf+JNHI5iTFjMK/rbCII722QZoqdgg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTA70j+7e9CMhq6LLoSW5Ge2/haRZCXNIw4vaYenA8Y+7sobk+
+	JKSYUytO5VKHCvr6az3pi0lcP2Pz8sCWV4Vsyucr3diizE8Cyf4r3DOlG7y3/Z7JTGjcGMxDJPX
+	3YzSFyrWe5p/LRNGhXw==
+X-Received: from dlbrl7.prod.google.com ([2002:a05:7022:f507:b0:13e:6c87:9564])
+ (user=sudarsanm job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:280d:b0:38f:240d:b857 with SMTP id 98e67ed59e1d1-392ec393372mr7602326a91.2.1786481304070;
+ Tue, 11 Aug 2026 13:48:24 -0700 (PDT)
+Date: Tue, 11 Aug 2026 13:48:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACd_6n1=oS_Jdq6s=u2jNmtP9n0Yc13BkKqJHSpsjbWHy=X5cA@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.679.g6767b8d81c-goog
+Message-ID: <20260811204803.3770208-1-sudarsanm@google.com>
+Subject: [PATCH] blk-cgroup: fix circular locking dependency in blkg_conf_prep
+From: Sudarsan Mahendran <sudarsanm@google.com>
+To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Khazhy Kumykov <khazhy@google.com>, 
+	Sudarsan Mahendran <sudarsanm@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 11, 2026 at 04:29:51PM -0400, Chris S wrote:
-> On Tue, Aug 11, 2026 at 01:30:54PM -0600, Keith Busch wrote:
-> > Refusing to acknowledge the new format doesn't mean you get to continue
-> > using the old format. You're going to corrupt memory and data this way.
-> 
-> You're right - the teardown is the problem, not the refusal.
-> 
-> nvme_ns_remove() never sets GD_DEAD, so del_gendisk() takes the
-> non-surprise path and asks the filesystem to write back.  Those bios
-> go through nvme_setup_rw() with the stale lba_shift.  set_capacity(0)
-> doesn't catch them on a partition, which keeps its own bd_nr_sectors.
-> 
-> So it should mark the disk dead first and drop the cache instead:
-> 
->         blk_mark_disk_dead(ns->disk);
->         ret = NVME_SC_INVALID_NS | NVME_STATUS_DNR;
-> 
-> Multipath needs more than that - the openers are on head->disk, and
-> only the path gets removed.
-> 
-> Is that the direction, or is refuse-and-remove wrong here to begin
-> with?
+In blkg_conf_prep, we may do IO when allocating while
+holding blkcg_mutex, however this presents a deadlock
+scenario since we may grab sysfs_lock while IO is
+suspended in elevator_exit, and an existing chain
+exists from sysfs_mutex -> blkcg_mutex.
 
-You need a nvme spec level change for this to work. There's nothing we
-can do today to close every race where the driver attempts to use a
-stale LBA shift when the format was changed externally.
+We can fix this by performing only GFP_NOIO allocations within
+blkg_conf_prep when blkcg_mutex is held.
+This patch fixes our reproducer.
 
-What I proposed in the past was that the device has to return a new
-error code for all new IO until the host queries the appropriate
-Namespace identification to acknowledge the new LBA format. Kind of like
-a SCSI "Check Condition Parameters Changed". An enlightend host could
-trigger a queue freeze and namespace rescan after seeing this status,
-clearing the device's latch and resume IO after setting up the new queue
-limits.
+Full lockdep splat:
+
+[ 3795.003422] ======================================================
+[ 3795.009595] WARNING: possible circular locking dependency detected
+[ 3795.015773] 6.18.20-dbg-DEV #1 Tainted: G                 N
+[ 3795.021432] ------------------------------------------------------
+[ 3795.027604] kpython3/435194 is trying to acquire lock:
+[ 3795.032744] ffffffffa36959b8 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_noprof+0x49/0x5c0
+[ 3795.041260]
+[ 3795.041260] but task is already holding lock:
+[ 3795.047086] ffff98c8a06477b0 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_conf_prep+0x71/0x5e0
+[ 3795.055257]
+[ 3795.055257] which lock already depends on the new lock.
+[ 3795.055257]
+[ 3795.063422]
+[ 3795.063422] the existing dependency chain (in reverse order) is:
+[ 3795.070893]
+[ 3795.070893] -> #4 (&q->blkcg_mutex){+.+.}-{4:4}:
+[ 3795.076986]        __mutex_lock+0x92/0xb70
+[ 3795.081085]        blkcg_deactivate_policy+0x7f/0x230
+[ 3795.086137]        bfq_exit_queue+0xe1/0x110
+[ 3795.090401]        blk_mq_exit_sched+0xd1/0x170
+[ 3795.094935]        elevator_exit+0x50/0x70
+(...)
+[ 3795.135019]
+[ 3795.135019] -> #3 (&eq->sysfs_lock){+.+.}-{4:4}:
+[ 3795.141110]        __mutex_lock+0x92/0xb70
+[ 3795.145211]        elevator_exit+0x45/0x70
+[ 3795.149308]        elevator_switch+0x98/0x290
+[ 3795.153660]        elevator_change+0x109/0x190
+[ 3795.158106]        elv_iosched_store+0x198/0x240
+(...)
+[ 3795.185276]
+[ 3795.185276] -> #2 (&q->elevator_lock){+.+.}-{4:4}:
+[ 3795.191541]        __mutex_lock+0x92/0xb70
+[ 3795.195642]        elevator_change+0xb6/0x190
+[ 3795.200001]        elv_iosched_store+0x198/0x240
+(...)
+[ 3795.227179]
+[ 3795.227179] -> #1 (&q->q_usage_counter(io)#19){++++}-{0:0}:
+[ 3795.234224]        blk_alloc_queue+0x33e/0x370
+(...)
+[ 3795.266621]
+[ 3795.266621] -> #0 (fs_reclaim){+.+.}-{0:0}:
+[ 3795.272280]        __lock_acquire+0x157c/0x2980
+[ 3795.276813]        lock_acquire+0xd3/0x2a0
+[ 3795.280904]        fs_reclaim_acquire+0x55/0xc0
+[ 3795.285435]        kmem_cache_alloc_noprof+0x49/0x5c0
+[ 3795.290481]        __radix_tree_preload+0xef/0x250
+[ 3795.295273]        blkg_conf_prep+0x2aa/0x5e0
+[ 3795.299633]        tg_set_conf+0xa5/0x1a0
+(...)
+[ 3795.330808]
+[ 3795.330808] other info that might help us debug this:
+[ 3795.330808]
+[ 3795.338806] Chain exists of:
+[ 3795.338806]   fs_reclaim --> &eq->sysfs_lock --> &q->blkcg_mutex
+[ 3795.338806]
+[ 3795.349146]  Possible unsafe locking scenario:
+[ 3795.349146]
+[ 3795.355057]        CPU0                    CPU1
+[ 3795.359590]        ----                    ----
+[ 3795.364121]   lock(&q->blkcg_mutex);
+[ 3795.367691]                                lock(&eq->sysfs_lock);
+[ 3795.373776]                                lock(&q->blkcg_mutex);
+[ 3795.379862]   lock(fs_reclaim);
+[ 3795.383006]
+[ 3795.383006]  *** DEADLOCK ***
+
+Reviewed-by: Khazhy Kumykov <khazhy@google.com>
+Signed-off-by: Sudarsan Mahendran <sudarsanm@google.com>
+---
+ block/blk-cgroup.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index d9676126c5b5..b981a80bbd94 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -867,7 +867,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			parent = blkcg_parent(parent);
+ 		}
+ 
+-		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
+ 		spin_unlock_irq(&q->queue_lock);
+ 
+ 		new_blkg = blkg_alloc(pos, disk, GFP_NOIO);
+@@ -876,7 +875,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			goto fail_exit;
+ 		}
+ 
+-		if (radix_tree_preload(GFP_KERNEL)) {
++		if (radix_tree_preload(GFP_NOIO)) {
+ 			blkg_free(new_blkg);
+ 			ret = -ENOMEM;
+ 			goto fail_exit;
+-- 
+2.55.0.679.g6767b8d81c-goog
+
