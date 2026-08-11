@@ -1,162 +1,115 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86CC43B6D2
-	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 12:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786450627; cv=none; b=d7gd8+OIm1brTbO0r7uCVz0kWhibNzY6Fl2Mfu0hw7ENypA03lDuUOeQQ7W5wBwnRiBiIRHyFl3rbPqIXALTFNGhGbVGnXNcGUl/Ua6TCi52sJCxZ9lwD/k1Limy5Yz686hF1yCSZzURi81pX+hknncJWnwJCJno/YNScEQAfMw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786450627; c=relaxed/simple;
-	bh=A/AwD+Msfz1JmLsW5PzsZyqSvfr4DtKm9DguA4rAeBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BNxpmmoljSae35QSwbMc1XqijuWWd1Yh0jHeZ+AimXaQI1cDLQiAlajmuuE85+BO2jkqhmNVc72Yd78ZhdqCuhfCWFnz/WKdvABVHAd0yFUYA009kLYqvna++QxDG8Cstx16aMX2+QdYGxopY8FJXRMOvPuKo4u455rSvHippfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pxth5Nd6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vC+u61KA; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OKcXnOhi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=z5iOkn7l; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EE342C4FD
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 12:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786450865; cv=pass; b=o/Ek8vwYHwAdOgHRBdeiSF4GLYXFPFRPNyO8+FmYtTS3dBot/64RiF18UPUBnMmrybKnJYU1IVYww8gTx74T34arnn4cRzGvlxWa2sk3GkzSxyXbNjN9XE23LkgJ9SMP4rMKdTnsOus2qe0wFY2tUcGgb0C4J77eWmqNtBbBQ7g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786450865; c=relaxed/simple;
+	bh=ql8A3rtHM+NQUqrzlSVzJ05Y2ne9Oefs6MH1bVuRUnM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lb0/4oyRx9/GPOaVIiFPK8tHwLIDMFnCn4TM9xCdOofotLiB7+DgOM89ND1ixiEossvhmb96wqHRwCWQsRdHPpNMBrxztzXnmvSj/INvDUxTj1p9DmiPiMzjT8/DMLVruvjXbmYjYufMRqX2hsbG1LJApY95ICghbOzBwF08TQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jgwV61aI; arc=pass smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pxth5Nd6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vC+u61KA";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OKcXnOhi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="z5iOkn7l"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A38103E21;
-	Tue, 11 Aug 2026 12:16:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1786450619; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=53eImeORfGMNylLa/5R91lKYnKC2HxVQUOXoPjXW4hw=;
-	b=pxth5Nd6As4/3m8LO7UKaG0d7z723QyDMWiCCcXuew5ceBthyca551RHBXayBSjFU3bfBw
-	EUZDY8iqdo+JBkxV5JB9Mo0i0ZREONUGu68h94up4r9kjJjenOa0Id6Zgim7YcyPCucDzp
-	eMgsAKR8WO5RXzAm5bJo+QbzstM2u3A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1786450619;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=53eImeORfGMNylLa/5R91lKYnKC2HxVQUOXoPjXW4hw=;
-	b=vC+u61KA1YvYryBjo+yT5ruWQXiWTTXDwaLeaOdvDnkrOn1AddqmaY8w/Lfm+u721WR1Nu
-	llqtVFgWNjSW0GAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1786450615; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=53eImeORfGMNylLa/5R91lKYnKC2HxVQUOXoPjXW4hw=;
-	b=OKcXnOhixX/xrdimIw8ZLKjqU/h5VFxx9ILZaexDG3bZbELeZrzdAF2/hmkOvPbKWBQwkD
-	FbPmB3G+SIej3ej8uOqYFP+T/r/kExlR9fmGpSlP9aXwU9+q47B6HAmNwNN2xXbHkmHy96
-	f7OIfjIahxxraUNEty+qVjXvIBiXHo8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1786450615;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=53eImeORfGMNylLa/5R91lKYnKC2HxVQUOXoPjXW4hw=;
-	b=z5iOkn7l0Ax1QX+aTXvcoI03RM2F4uhLpVfY+eXIsLLttvH1mWO5bVYB47VvNAJjfYM2zP
-	s+nImIAbr+gphAAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 93E6B779B2;
-	Tue, 11 Aug 2026 12:16:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4kqzI7cSe2qNIQAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 11 Aug 2026 12:16:55 +0000
-Message-ID: <84d641dd-2234-4327-9b86-93f8109e8c25@suse.de>
-Date: Tue, 11 Aug 2026 14:16:55 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgwV61aI"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2cf110997efso7175525ad.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 05:21:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786450863; cv=none;
+        d=google.com; s=arc-20260327;
+        b=nXQst64HpcDdcR1gaxQdqkNr2MpFfxq8/zuCjr14NQT0PphabbYwbJ8ffsENaldeR0
+         2Hmjx+QvqSgOorDqjVhAcM+ucPhZ7oSMLYRaesCmYyv3CK/r3h9dar6uRvZrNtFsPG7a
+         GMytd3kUHDS1soVok+fJLHXESzl1R4QRFgXHXYJ5qKOdcsIS7gJgTa/VUBhMw7UK6S2t
+         bgQYTAaesDZeNAvzeWAKukmVi/b9tBBaFfDzrKc4yIBZZMEstqJmtrC3UkuMjaapRTcF
+         gRsfP/e214GwkOg97WD0SkxLZ9O9kAZZxwXYr0mNP2yFmBHLHzTpGXYypu5FFpKzEnkB
+         zeXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ql8A3rtHM+NQUqrzlSVzJ05Y2ne9Oefs6MH1bVuRUnM=;
+        fh=rTzmfz/GKSxLdOmwpw1K7xtX7AUqJ+ier/0HAede1QE=;
+        b=m9DTNfe0cf6dvLsXqaSp3L/QsI6aIL0I21+qD5eAMkjGMRcNjrOlX0s6bsH6DJcuNY
+         1LNeSHEz5Vp9SE5K0tOrHZIzxTrl8GcmEXUJv5kEPCRSVosyT1JB2ohjhQUoCI2Vag+o
+         lpFq2PlNLo0/pXZoOSpiYGOY/h9mlj4wEofaDVFeviK0wKrMPf0W3qAcoOrxd2aAmD+G
+         Br/xPJ3Fn70YcqhMBR0ejq6dlsXF/k3UYhx4BgEwRnMxSSOObpKdDhUtIGY0BK17sMk0
+         TMElVG8reDDDNKY5du6jDiBhfakvDy+XO3c4KQqiW9NiAwe73oJW5kIJEo/My3YytUOa
+         IAgw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786450863; x=1787055663; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ql8A3rtHM+NQUqrzlSVzJ05Y2ne9Oefs6MH1bVuRUnM=;
+        b=jgwV61aI49T8CTwsNMQgTMM5NHJSH/+xg8JK+oxmoZXXwZDq5+ARrVFHvzTex1R5pF
+         UcbbuDK14RET/luK8VwV5Ix+5cIEit19wGH0A9LqMEkSc0aRYWrvMdhhIywKt3NJIzJ+
+         xipa4N+KZYk0BrxZBevyJZIIeed8y+SUH9fG561eDxKXVzp3/HUM0C6PHRzUfFrAWy9M
+         A1Y6O5oLvEN/4ZgP99ztGeo3T/Cu2e5a08e5Iv/1XAx8aFvhKVBvja7ilaULk8eHoS5B
+         zn9SFM5odi3KOhS20wJ44Tu/EEqNCjcrqOa1Pp37qjqchQK+iPwh63+T1JmVeG1aO0pd
+         awog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786450863; x=1787055663;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ql8A3rtHM+NQUqrzlSVzJ05Y2ne9Oefs6MH1bVuRUnM=;
+        b=bx1D0YG3KXUTnSGY5oiqOQZj5s/b0Dzsawo0SGfNkdNfTaqG4C/qZUhakW057kpz+x
+         vU0dYHBd2xpaMAelpAnrvvG91zdFP1FsJwEKWWj/s9yWxOYulc4rpRcSS/1luEKS7lwb
+         WbFCOHtCq9y3MS+BQJjFJw+1HJx6XnyxH0HlROoH8d04pdoG7RncQHxJs+/aPlWVtU9g
+         HZ/fJ81EA3Q/uaLVPaHi3xZqAnYdT5eZJpdS5lb/eLVAWzkkLJ8z+WCNJOWBPUgMCza7
+         CQsxAsWKxioKKQCOYyUzSf46CwdluoVHk6++XsVUQ3n16Dz9ZjkumAad83+FDnMDlaga
+         721Q==
+X-Forwarded-Encrypted: i=1; AHgh+RrthQjnqXFG8xqydgw7N6OyBik1zlaiemmTNhjEP12yS7SrlRH2huhVwKU/EoY+aDLdS4owXPmVZJZc5w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8BcEpQ9oyikj6BUI/gfKGMOFnwE/cOm6wRZHzy79kO7suuJYk
+	zpZCSpmnRzHi31humv7pS37jf1FoaSmpYBwzJtnsJZqMHjy2oK7mHTFAGn/6h7KnR8IwQSoaRT+
+	hxg45IwXlyxvj/0O7zPghIHTRc4YfPpA=
+X-Gm-Gg: AR+sD132DnXtLLygdtPQWnOXLxgTVuHkhF6Su2/G/KcGvTXPzWN37W/wHr8OgfojWCr
+	i/MQfFkYXa8r1on9f1+KK+rSfn9C0Gd2bLhV9AHt7GnNYZUG5RaR/liNIh0tg1GV5csAPmTjS1e
+	EY5BTN25KaZrNuV48zEs/W3Tmcvt43h37NnTN5CCrZCAma/sBWxf8efAboZb1czuAqPhQqxtKC8
+	TneFndYj+qfkgzpYW2rLTrZSACdW34+2CSf9YWkgAAr/eLEgnw8Rup5PSQa4qWzvk2AvBZCtLL6
+	sPixaYLi4YxZUIZZB9HTM/9l+2E1Iw566l0QxOkMgNhvW8q6A+P05PYxlg7wFkYJXlNDAQPKTRW
+	9rnsVV01Q9/vaOXbBJ9aVj/ucNdy4zLDIjs0ZVAvDx1x9MN3LMvO1XNE0rcixG7HHZjjAICY=
+X-Received: by 2002:a17:903:234c:b0:2d3:b3e:711f with SMTP id
+ d9443c01a7336-2d3176158bamr22126975ad.0.1786450863209; Tue, 11 Aug 2026
+ 05:21:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/13] block: fail zone management operations to
- read-only and offline zones
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20260811105852.1245357-1-dlemoal@kernel.org>
- <20260811105852.1245357-11-dlemoal@kernel.org>
- <e7b9dd5d-4385-4ae4-90c7-08d20a223ad6@suse.de>
- <427819c1-a827-478d-a260-a1ecbde09015@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <427819c1-a827-478d-a260-a1ecbde09015@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.989];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,acm.org:email,suse.de:email,suse.de:mid]
+References: <20260811-fix-gendisk-owner-v1-1-c0fe4a449ecb@linux.dev>
+In-Reply-To: <20260811-fix-gendisk-owner-v1-1-c0fe4a449ecb@linux.dev>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 11 Aug 2026 14:20:50 +0200
+X-Gm-Features: AUfX_mwgX858ISyRxSrju8_-iXIGhuGuoOPR0M9UUR6UmwVl7OxBtn1Y5PK_2mc
+Message-ID: <CANiq72nmthEu5HQG9B2yOgLvhEJ+PMO7OBG-ki2uUQiUTTgciw@mail.gmail.com>
+Subject: Re: [PATCH] rust: block: gen_disk: set fops.owner from driver module pointer
+To: Alvin Sun <alvin.sun@linux.dev>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/11/26 2:13 PM, Damien Le Moal wrote:
-> On 2026/08/11 4:41, Hannes Reinecke wrote:
->> On 8/11/26 12:58 PM, Damien Le Moal wrote:
->>> Any zone management operation targeting a zone that is in the read-only
->>> or offline condition will fail. So there is no point in issuing such
->>> BIO. Modify the check in submit_bio_noacct() to use the new helper
->>> function bdev_check_zone_mgmt() to check that a zone is sequential (as was
->>> checked before) and also that the zone is not offline nor read-only.
->>>
->>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->>> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->>> ---
->>>    block/blk-core.c  |  7 +++++--
->>>    block/blk-zoned.c | 24 ++++++++++++++++++++++++
->>>    block/blk.h       |  6 ++++++
->>>    3 files changed, 35 insertions(+), 2 deletions(-)
->>>
->> Hmm. But that checks the in-kernel zone state only,
->> so I would expect that we still can see failures if
->> the zone state has not been updated (yet) while
->> the command has been issued.
->> What harm would it do to just run the command and
->> deal with the results?
-> 
-> NCQ errors are painful with SATA due to the queue drain they cause. So I am all
-> for avoiding them as much as possible. This is not the hot path and this check
-> is not a heavy one, so I added it.
-> 
-Ah yes, these are NCQ commands. That's of course painful.
+On Tue, Aug 11, 2026 at 8:51=E2=80=AFAM Alvin Sun <alvin.sun@linux.dev> wro=
+te:
+>
+> This patch was meant to be sent separately, but I forgot to send it.
 
-So:
+Do you mean "not separately"? i.e. in the series?
 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+I asked Andreas for his Acked-by.
 
 Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Miguel
