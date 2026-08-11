@@ -1,60 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFCD2931E2;
-	Tue, 11 Aug 2026 16:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F487368D79;
+	Tue, 11 Aug 2026 18:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786467289; cv=none; b=anOJ7TZznYP98YpdKUhwxAiURCMexnjO14GWV6yYVaKNRtAjPLbxN6J+NvW2GTHah6YfYqFUa0NLebuCK4+8766R7szku6o2WGB6lOwuslvxw8j9jnV/PfI93/FfJNaTW+uy+9OY+1ZSgu5wabuS5Fm+PbK55UiuPY9Jg1rUjgM=
+	t=1786471457; cv=none; b=hjCdSFNra7hPS76/NEq94lfBvqb1XjGAhkebibqvvyw2GvfDry099JEqjlHe47fOM8jEZ3jDY+3RrR3wwzwxQvRBBafXV1XgOxenkyEaS13CSWMj3KXbK+j3EUnOjnE1b5DuOf44NfwpetwXxsAIc3+HfWp5k1Lx8iRMXcEFDHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786467289; c=relaxed/simple;
-	bh=30LKNeNd4i8Elpft8MpybJD3r2hXHB7da18wxz4zo7s=;
+	s=arc-20240116; t=1786471457; c=relaxed/simple;
+	bh=9MqyFy5qbyTdmXiJHR4voj/pzytxkv9gPneieS532Uw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aErrMQzh8bOcKI5Fh0WfxGc4P7Flm4Cux/pRl/xP5y9hEI1CRESoF/HzyubfUW+1uinCHjBYBIRgCp+ORgFt7rUJmBtrIzu4WLe3pCgUPFi3HER67/caLOL4C0Wvy+rvs1DA1VCT4MaNe6WWarN0n6iq2zFuK3HUqvsfoVzPGLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lb/zXqFF; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOt5MP71aCl9yTAZdckK7hYbadpSh+ZFTG6ODeh6b7VoWGN5Iv+QEYDLy2odnHB/eKTR6sReUHi0E1IDhCl2D5eZS94zm2HnvMzssQhJmQtUJTUJ9YiWj464eJ1rYu88dZhl6EmaRpbiapPtQ/ehDSo9q5KzcROgEVO+6n5qF8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ews4KBL/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lb/zXqFF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F20A71F000E9;
-	Tue, 11 Aug 2026 16:54:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ews4KBL/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E8D91F000E9;
+	Tue, 11 Aug 2026 18:04:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786467288;
-	bh=Z2TXg7aZhG/KrelMhIYVJ99hwjE63n3U7HIFuhBajkY=;
+	s=k20260515; t=1786471455;
+	bh=CCXYUWfaQmVmTc4INn+t522+Y+UjSzJVsGmbRsWsMQE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lb/zXqFFP7B4P6AJvYySOls7y5MVu/gyDEHC+8hQqAxjmcIVfBmEi7CUjvJfbSA4X
-	 U9IyNeDtDulGYBYj7Sra7AdBq6fRofOlSj8wO2NoWYig59yuOkvM0nAdfjbYxHKcKt
-	 wF6Bs2D+x2a9S/XnqJf2FjvQI1Be9wKIn/mQCepQ4RXp4loOVx7sTRjRPQlsV9Of+Z
-	 ZNeX7hqCuhimvkIucEKB2Gx0scaWdpKzLz1Cbwo6D97CX1JrVZV6LNtMTdsqjj3Vwt
-	 kSiIKMFUS6gg8MArFb09BL1h+PzSlLLlGtsqUUg/iBNPPibFgVQHbmugfGLcHy3CBH
-	 +iS/9a4/xIdIg==
-Date: Tue, 11 Aug 2026 06:54:47 -1000
-From: Tejun Heo <tj@kernel.org>
-To: JP Kobryn <jp.kobryn@linux.dev>
-Cc: Ziyang Men <ziyang.meme@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Mykola Lysenko <mykolal@meta.com>, kernel-team@meta.com,
-	linux-block@vger.kernel.org, bpf@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: add BPF kfuncs to read blkcg io.stat
-Message-ID: <antT1wtJEZ02CDx1@slm.duckdns.org>
-References: <20260807193732.4073299-1-ziyang.meme@gmail.com>
- <20260807193732.4073299-2-ziyang.meme@gmail.com>
- <anot9w6mg9538RWm@slm.duckdns.org>
- <anpU4oV46MDVDixj@devvm16600.scu0.facebook.com>
- <4306439e-a00f-4b10-b8a0-9be6e046873d@linux.dev>
+	b=ews4KBL/NG6I/XZFa+YJuqD0O1o5vmAY20ZvXzDnNOIRkvLOHdWW4RNZc51t+Ew1d
+	 RAI4431LXFOyhWiGc9gTmgjV5F+1JxZzlLCM7ZmWLFpvdOwXjDft01aP917AGnLtf9
+	 0hGeyCo+1YzXtKJxC9fibxEcbKCk2Cy1zou8j3tjRgn2/QWWSGjbBOY0z4uDEyEGug
+	 cWzq/Ow2uPzS0phA4ToFbCBqmvQnTlaLiCepreHEDediHD4GAHe1WBNwU5XQm0kn3y
+	 sDBCoTBR9c3HZUeipE9maCyUrtqL4YgTD4tkiW5LucjIAR0fD1CnlkArUrshUpA4a5
+	 kvKQx1kvqItfA==
+Date: Tue, 11 Aug 2026 18:04:13 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-fscrypt@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Zhang Yi <yi.zhang@huawei.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>
+Subject: Re: [PATCH v3 00/17] fscrypt: Standardize on blk-crypto
+Message-ID: <20260811180413.GA2895176@google.com>
+References: <20260713023708.9245-1-ebiggers@kernel.org>
+ <20260720174323.GA1865@quark>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,24 +50,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4306439e-a00f-4b10-b8a0-9be6e046873d@linux.dev>
+In-Reply-To: <20260720174323.GA1865@quark>
 
-Hello,
+On Mon, Jul 20, 2026 at 10:43:23AM -0700, Eric Biggers wrote:
+> On Sun, Jul 12, 2026 at 10:36:51PM -0400, Eric Biggers wrote:
+> > Eric Biggers (17):
+> >   blk-crypto: Simplify check for fallback support
+> >   blk-crypto: Fold __blk_crypto_cfg_supported() into its caller
+> >   blk-crypto: Allow control over whether hardware is used
+> >   fscrypt: Fully disallow IV_INO_LBLK_32 with s_blocksize != PAGE_SIZE
+> >   fscrypt: Always use blk-crypto for contents on block-based filesystems
+> >   Documentation: fscrypt: Update docs for inlinecrypt
+> >   ext4: Remove fs-layer file contents en/decryption code
+> >   ext4: Make ext4_bio_write_folio() return void
+> >   ext4: Further de-generalize the bio postprocessing code
+> >   f2fs: Remove fs-layer file contents en/decryption code
+> >   fs/buffer: Remove fs-layer decryption code
+> >   fscrypt: Replace calls to fscrypt_inode_uses_inline_crypto()
+> >   fscrypt: Remove fscrypt_dio_supported()
+> >   fscrypt: Remove fs-layer zeroout code
+> >   fscrypt: Remove unused functions and workqueue
+> >   fscrypt: Merge bio.c and inline_crypt.c into block.c
+> >   fscrypt: Add safety checks to non-block-based en/decryption
+> 
+> Applied to https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=for-next
+> 
+> But I'd still like acks on the ext4 and f2fs patches.
 
-On Mon, Aug 10, 2026 at 05:17:26PM -0700, JP Kobryn wrote:
-...
-> The get/put kfuncs above use KF_ACQUIRE/RELEASE so the verifier can
-> reject memcg access after the put. Replacing them with a generic API
-> would call for tracking a new lifetime relationship between the css and
-> memcg (or other derived) pointer.
+Ted and Jaegeuk, any chance for Acks on the ext4 and f2fs patches?
 
-So, if you need css -> memcg casting, I think that can just be RCU
-protected. In fact, even for the iteration and access, RCU protection
-probably makes more sense then KF_ACQUIRE/RELEASE. It's simpler and less
-overhead especially given that most bpf progs that people care about are
-non-sleepable and already in RCU critical section anyway.
-
-Thanks.
-
--- 
-tejun
+- Eric
