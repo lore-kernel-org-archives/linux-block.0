@@ -1,109 +1,122 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D0D3D9538;
-	Tue, 11 Aug 2026 20:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786479223; cv=none; b=ucyOIbFdqL+aW7glc4vr2I/9l/JC0kYYP4Iv6kZx2H2ISN23W5uQ0VRnqir8pdUO7HkvpP59j5wyBNZiYTpY/JDfnuAEZ0gn5YsiUGmvWxmS2wj9AutO0k+fP6sbBsScdn9DExJ4uleWjEFLIp3RW29r49GJBM5/R2PN2X6UnqU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786479223; c=relaxed/simple;
-	bh=bq7lSt327yN6cPego3JXagRu6oA3DciB03eeo4BSRqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XU4OQYoX5MlJmseNPDXq1Ws6kXjzf2BkILW8GVKWVdfrFPr2IHgBRmpQJEugCpvdLhYREn16bjfU7JS01aitg+DigOo2xpPcl+E22/ebc7vDN+mqEKQ+8Ernynfp6xdrFJjfBgTLO7Wg/6VFJJmqa/hx1+kWW8QX3Av1IkXD2YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=a066R9N2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35255400DE8
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 20:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786480206; cv=pass; b=JqS4qD+RRR7IociCyZGI1cCDLVAvWAdaXyDLXFpubyME8ivFP/sGvrDK5ELnD7vpbIo4Yni7zEYn5Lbid6NaXiziixoXbUCKWtfjdrhX5c5i8WmgIDlpk4eHY2190ke0i7bNQIxppsevCd0z3Og93ndFmHZkJKy5QKq7s3WSpq0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786480206; c=relaxed/simple;
+	bh=X8QNUXB/Uq4WmIU/R0XnTWunz3D+Qk5IHhscFew5Vys=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T8REkYGnrGAKiddFF6FvBUFk0SGCqNQ6MTbx0mBCEXcefnJZUDzkphqiHaUXfqTKO8dvJ/dH7+uJH3Ss6c6/Hk72Mci741m7rjP8/i43oTgECIOWTAa0cV3YSuWKUiKEm+3zWRQvWshzlSZAgNv/K5lY6LJnGRgRFcVdiRfMlx4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rJVWDF29; arc=pass smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a066R9N2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6YbFpOmvNf504sQf2QihriBMoey+d8zmHbwInFB/oZQ=; b=a066R9N27OIM70SnmDCVlfwHs2
-	rp6/CjIfME+lq/Ia17LZWz0DPG2aQd4osZzsfh7lVX8KAHTxuZmNpwJN22+GUNTvvmLyG33knvKbM
-	MMO7XW0ko3H0+JYBjpl7KiSy8lfZrYft/YosON0EcQDPhbhnYDmHgieQdiOVTJWgjVLY2NFYCcYu2
-	0d1AU4mwSZ7yM3nXMw9LBiBE1nPDWH0nfOZXEr6O3BRa4l08i0yi2mNsxyls97QNGzqpJNoQNDiLv
-	Y5nANGdXeP9R68PIbwE3/TkrA0r9rqzQEHT83oU3RVE2W/IgcdOPEuE0unTx/lET+1Ht/eYEECl00
-	MUPAtPXQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wtsqv-0000000Etzg-1riU;
-	Tue, 11 Aug 2026 20:13:37 +0000
-Date: Tue, 11 Aug 2026 13:13:37 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Vlastimil Babka <vbabka@kernel.org>,
-	Harry Yoo <harry@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>
-Subject: Re: [PATCH 2/3] mm: support fallible mempool_alloc_bulk()
-Message-ID: <anuCcb-Cma6JOAb0@infradead.org>
-References: <20260806221031.79050-1-ebiggers@kernel.org>
- <20260806221031.79050-3-ebiggers@kernel.org>
- <ann1i5VjTmgChjs7@infradead.org>
- <20260810161404.GA1930@sol>
- <anoIiy0V-m-05yZc@infradead.org>
- <20260810182215.GA270444@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJVWDF29"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6a20319d030so376247a12.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 13:30:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786480203; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ZHFXQz8kG7K5gya6OM7a3yTqE/AQ/TitON/ZX45M/Pgni4Be5ycV/+0btZFSbktB60
+         y/IAcaSMW+WI2xN8EJs4QT0s4UB0XvEhV4NuVs1/FBVfR7wkmMjcgQF4cuQw/vCdRdFN
+         Gjl/xBTf2KXmxpV/33jUvgeFAIkW+oclx7H5xBiMcM0VYygjU6PYkhTaXqMYo3IP4mw2
+         MgmvBUiozrYnDgjVXD6hlj++jhcxy/Thr27NMQpzyt0bQMDeW6e44GXYlWcrTo8T+3r+
+         uO18JbuV3yVinAPqWaJ/kN9TLUr7Fq9L3pt5ec3zkVIgEW8vaFb7R6s1TBWQ5UiIamwW
+         8X3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Od64kOXlsBw7l33MxioNZlnpLtczMNN+mPBlqshAfSg=;
+        fh=9+XWoSh9zFHBA597SsawPi5SNFxR0kT5BUNHiiqmhkE=;
+        b=jF7Bf5X+Smns5D566Knukr5KdEIa2o6xFRVPv0hpnG5gOKDirp1bzbYR+RMEkVwoe+
+         wUoDx8/uRqFmSYFYN9nRB55kOAfQxLmiuSajdeTo9ro826jEEKTtsVEH9DGEBCy489zb
+         eB/vwItibm+P2ApdjKyKiynZumceYZsbRyDyRfzO5mAf34yFemQaeTgcqpyrSeeIfZj+
+         etcLqyAb2NT2b3qMsgADrY0YGJI43jdff4KddH+THv7LXg1Dht85oI4EqrQq03JGG5fu
+         /gVpwqqJmTqdXR4Hx+kUSbz6PQWfjjHQbIxmOY0GZrriWA6PLTwFAli/DU7lFLLUbwns
+         mq9Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786480203; x=1787085003; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Od64kOXlsBw7l33MxioNZlnpLtczMNN+mPBlqshAfSg=;
+        b=rJVWDF29pSdWUeVe3NCTLhVb3EHYo2Xiv0fGlD9QCl2habiVaNCkcbUW1x+JYOcRqk
+         uiicaKqHoVLXZHUJCMIs4eANMJH1HHuMLs9IthJsNWKmnrZMPQQ8MLdsWZ9oxScmtjlw
+         FZRecc/f60r0OFqWuR2Eanue5ZrpmrZ81ShVldVJZkhIuUaSA0PmXJW9cp/Y/DFih19X
+         StH1KqQYIwTA/Af+i03PmJZZKe9EckVH6A+q9n5MZKp/c2B2Kc1BlsU12/+t1edbNK01
+         DaAt69BPMXutC6DZndHc2gYxi4HV/77zqluJEc2JwNeUZkzzoSOTi3Uos039J4kjXiVt
+         4VSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786480203; x=1787085003;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Od64kOXlsBw7l33MxioNZlnpLtczMNN+mPBlqshAfSg=;
+        b=sNIclNlI7YZgSUTHWBzr41HqSq5+vL4glOPXvOn8b5j1Zawv9bDUGrnTFJI4KzKoOo
+         Indtf7xYMOSbU2Q36w8W6unZv9E8Dt0nUfPUTb680R3Zp00dsTmYQzBrrFTV4P7xuahG
+         L6N9FkeGIGV3emkp8XBHP8Wza16eh4D1kN8pua5nBhTJC9/PdKe2+G0+pxy4BoSs520H
+         VCX7ac6x46ZkJNj8L3nRZMFqowJlmVfeVzR+jmO4H6C269EPms2TBjWUZKuuQmiTHIgS
+         SDCK+GsHC/4q2eWXy5KZAeMLuKAJQoMksrU5PxqAsun/dZk01+qdlg6sqJQ9kZjZbebn
+         jOww==
+X-Forwarded-Encrypted: i=1; AHgh+Rr97FUUGwAh5L74QuFsikO6fw/mM+nJQJSrbFnjLJsFD5OWD/jnC/d8z3vvJWUyGZuododSvI31aBgJMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfxfnzaSDhD6R6sa0r/+aXuR0QXw5/INKCOKIQIMl+d1mTXCOH
+	fX3M57AYna7p0Y3FRoXqPmzieWVp6dRas40ecNk9tUXbpUhhtaHwjT5GjiOnz1j/gLcSoROs/sX
+	Psf8JOBwAn3gqxiw/UaGjE2F5fgXu3y8=
+X-Gm-Gg: AR+sD11736WIqlwraztzvwEFjU6Bb8QCOw0O4JuWT3C66AfNf+XYJ1wpr0Eb/2cE9qb
+	wGDw6cqoCkWwgbeBwP/408kQbz6ToDZlMA6JBcq7bxSgh41ThLgXnDAZmeKoYy+/6E+oilOiHlH
+	s+XGF8Mh/7JVu/Xm/HNiSkozmne/NGIXF06Doehs1dPVV+1GSKRvLuk6SfUXLCixu1gS+VCbG8G
+	qe2oPZw4uu2UhXmr92PL4FzpxEJiP+ASbcO9CLs5eqPFyq+GxmOKSKVP3fKvkPB7GxiCLzbPmGA
+	dbMGOSU/6xWk2kSTSw4QfbXQK0pEmO8fp6XXKKtzW7N1
+X-Received: by 2002:a05:6402:c43:b0:6a1:4458:7f2d with SMTP id
+ 4fb4d7f45d1cf-6a36448b12emr3342728a12.5.1786480203030; Tue, 11 Aug 2026
+ 13:30:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260810182215.GA270444@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20260811192111.2058140-1-coshi036@gmail.com> <ant4bioGLl4B35n_@kbusch-mbp>
+In-Reply-To: <ant4bioGLl4B35n_@kbusch-mbp>
+From: Chris S <coshi036@gmail.com>
+Date: Tue, 11 Aug 2026 16:29:51 -0400
+X-Gm-Features: AUfX_mx5rnEmlFvuiMPBF-UBljjUMrJ0w3-4yrHSeb9aLUfcWEhgJ5oe1jx6xO8
+Message-ID: <CACd_6n1=oS_Jdq6s=u2jNmtP9n0Yc13BkKqJHSpsjbWHy=X5cA@mail.gmail.com>
+Subject: Re: [RFC PATCH] nvme: refuse an unsolicited format change on a
+ namespace that is in use
+To: Keith Busch <kbusch@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	linux-nvme@lists.infradead.org, 
+	"Martin K . Petersen" <martin.petersen@oracle.com>, Weidong Zhu <weizhu@fiu.edu>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 10, 2026 at 06:22:15PM +0000, Eric Biggers wrote:
-> On Mon, Aug 10, 2026 at 10:21:15AM -0700, Christoph Hellwig wrote:
-> > On Mon, Aug 10, 2026 at 09:14:04AM -0700, Eric Biggers wrote:
-> > > On Mon, Aug 10, 2026 at 09:00:11AM -0700, Christoph Hellwig wrote:
-> > > > On Thu, Aug 06, 2026 at 03:10:30PM -0700, Eric Biggers wrote:
-> > > > > To fix a deadlock, blk-crypto-fallback needs to be able to make fallible
-> > > > > mempool_alloc_bulk() allocations.
-> > > > 
-> > > > It doesn't.  fallible mempool allocations are a concept that doesn't
-> > > > make much sense.  Please just go straight to the backing page allocator
-> > > > instead for callers that do not need the mempool guarantees.
-> > > 
-> > > It does make sense.  When alloc_pages_bulk() doesn't completely succeed,
-> > > there still might be pages available in the mempool.
-> > 
-> > But they should not go to a caller that does not need the mempool.
-> 
-> The caller does need the mempool.
+On Tue, Aug 11, 2026 at 01:30:54PM -0600, Keith Busch wrote:
+> Refusing to acknowledge the new format doesn't mean you get to continue
+> using the old format. You're going to corrupt memory and data this way.
 
-If it does not specify a blocking GFP_* mask, it by definition does not.
+You're right - the teardown is the problem, not the refusal.
 
-> Now, as I explained in this patchset, whether this code can wait forever
-> for the mempool actually depends on whether it's a recursive bio
-> submission or not.  If it is, then it cannot wait, but ultimately it
-> does still need to use the mempool to get a guaranteed allocation.
-> 
-> Falling back to the rescuer kthread (which can wait on the mempool)
-> solves that.  But before taking that slow fallback, it's much more
-> efficient to check the mempool directly first, since pages may be
-> available there (and in fact it's fairly likely that they will be, since
-> regular allocations are always used first).  The whole point of the
-> mempool is that it can be used when the regular allocation fails.
+nvme_ns_remove() never sets GD_DEAD, so del_gendisk() takes the
+non-surprise path and asks the filesystem to write back.  Those bios
+go through nvme_setup_rw() with the stale lba_shift.  set_capacity(0)
+doesn't catch them on a partition, which keeps its own bd_nr_sectors.
 
-What is actually efficient is do skip the mempool entirely from the
-original submission context and do a non-mempool GFP_NOIO allocation,
-and only in the extremely unlikely case that this fails fall back to
-the rescruer thread.
+So it should mark the disk dead first and drop the cache instead:
 
-> This is also the only caller of mempool_alloc_bulk().  So I'm kind of
-> confused why it would not be allowed to implement the behavior that is
-> desired here, especially when the non-bulk API offers it already.
+        blk_mark_disk_dead(ns->disk);
+        ret = NVME_SC_INVALID_NS | NVME_STATUS_DNR;
 
-Because passing GFP_ flags with all their warts is a bad idea where
-we can avoid, as is using up mempool resources where not needed, and as
-is having a possible failure path from a function that can only happen
-for non-standard flags.  (having a return value at all is also stupid,
-but that is forced on us by the braindead alloc_hooks).
+Multipath needs more than that - the openers are on head->disk, and
+only the path gets removed.
 
+Is that the direction, or is refuse-and-remove wrong here to begin
+with?
+
+Best,
+Chao
