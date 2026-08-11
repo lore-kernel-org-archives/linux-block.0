@@ -1,136 +1,142 @@
-Received: from va-2-28.ptr.blmpb.com (va-2-28.ptr.blmpb.com [209.127.231.28])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4763587A2
-	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 11:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8553C1D57
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 11:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786446896; cv=none; b=Prpa7oQQ/tATmjEi25d1BGgzDk9irFoJaN3nwocNDMhaxz15Bxkn6lGscmyjMqsIhMU/fD6i9HLGydc4+IOLDxlEnkYescmSwxpXrwuNeIAx+3GHfbUNPVsTX7qyu4Elm/G94XKS1BfuRrpxTbNssFvoB8QdjWCcExmIyhO7/mA=
+	t=1786447694; cv=none; b=h/8HS0Wxm30/cKVvqtCeqw8SyatC6UOsHNNgCehJqkVRUP/ScsK3jKw/ilC4M8kY5aL6N3FeTYI4VjxB7TzHFBS+E7liDxk5VY8ZPkvmsA77aCxieAuSWoYVmsD75fg2AzqL3Iz+LsWndix96J8ba5j/uWQZTtovATh01Krz4a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786446896; c=relaxed/simple;
-	bh=vvGtubF+LHzhsPrhCzpSkyEkBg0wKIJwF5S46WmPDa8=;
-	h=Cc:Date:Mime-Version:Content-Type:References:From:Subject:
-	 Message-Id:In-Reply-To:To; b=LsXC/DFrYOlui9sOSWrhqQYznI73uIpVxzCHrfMBk5SA3GNFEL6+ur+FddeIY+YJ9Tr3L5HRQz/bQPtBlNzwAlDtIPfOooWzcUHuuzOio2Jdq615UJHK8QEKDG5h+roD+ONlH3b1EdHYTFJPd2rK1dOh0gHcO/T5M2mQXOUjg/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=nW7pG0Tr; arc=none smtp.client-ip=209.127.231.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1786447694; c=relaxed/simple;
+	bh=DrMvIEiZxkBtAdR1BtMIMf6dcCqEfn2axGsdesKWw2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LZ72LoRcoElpidDO2KDCo+gIE2C1CO3014pKAyqSHmYSiaAcTrHaC0gwaFtWsmW0fYRA/MZzMPTk9I1zsJdzQfRMK/uMQdlpOjpCGeIfglvO3klMNkaDa1/Rbhvzxnsk9PcUIR+/4lCw6OCOK8J9iQg890xOQlLs3JkIgn3Hp/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yLHm9Ij6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hPR/GrWg; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YGIOpoDL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ptX/N7DO; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="nW7pG0Tr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1786446882;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=4wQVN/c3V/3ItnNofRy0nhlREIYYvh6hcQ0qbtXwUO0=;
- b=nW7pG0Trn1vodSzur+vxayHyEW+H0EEldfDBwJnSUauEFdsLp6Hxp99FokFyhDSc7JcTqr
- tKTIw8pJAsyajDPRGao4dnar7WLj1pwdFQpGggftXxkpYMGs8863Nli6UzU/BWZtyldkKe
- rT11PV/z6Vl8oGtY8FFHkkKJYHPVfNoI7zrJVqOqb1IHoxbicIb+1yq4JbeSQvBrAQg6Ir
- CegPDEtwBB0wguVoPG15yQnVJZPAV1c+zeVSAurCLuUG6NCcRJei4LtlqLHbePNYrMYsR3
- et5zC92KEM3Rour3JnuxeVf9h6fMSSjIDeRH3fhWIzlaKkWjTwjw2ahhsZCSsg==
-Received: from [192.168.1.104] ([39.182.0.170]) by smtp.feishu.cn with ESMTPS; Tue, 11 Aug 2026 19:14:40 +0800
-Cc: "Ming Lei" <ming.lei@redhat.com>, "Christoph Hellwig" <hch@lst.de>, 
-	"Yi Zhang" <yi.zhang@redhat.com>, <cgroups@vger.kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<stable@vger.kernel.org>
-Date: Tue, 11 Aug 2026 19:14:37 +0800
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yLHm9Ij6";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hPR/GrWg";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YGIOpoDL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ptX/N7DO"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 46F2081B50;
+	Tue, 11 Aug 2026 11:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1786447687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tDwsl8Ewx6m0mMpk/yXGZHANMoRBKBOigYb1/1aWwLY=;
+	b=yLHm9Ij6n3+qIbgaagn+BEQU9rvjqTG2kLnSOQAUMy3lvFHAzDmlhewSsRX+jhXwTOjIEC
+	R67s2fDmQLXDxmePFLAjmlxL4ct2249tPYbUeEPJBa80dXdwBYiK7lSOUpCmo8bNguM5aQ
+	UAGoQBcmKaPMZKNnhnaGQ5phJIxU6Qo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1786447687;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tDwsl8Ewx6m0mMpk/yXGZHANMoRBKBOigYb1/1aWwLY=;
+	b=hPR/GrWgpxAinikCUNk/Mhv8Onb/PNGVn/yeC7ACHRw3hZt4rEi/Z7NloiQMWfYTPC4ob/
+	nqlwxhn+3o4WnYBQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1786447683; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tDwsl8Ewx6m0mMpk/yXGZHANMoRBKBOigYb1/1aWwLY=;
+	b=YGIOpoDLlMD7Yu7fWuOcxfnLTv7faEeSzKechWHm2PpY1h1k7K7TqIu2YphLV2wt1uGtDZ
+	/BNSLZKytsKHWkB2JKvgTIux8LpmCfCa3rzSE3lCxuUPU/BXajGQBRaLTv6JRghVDuVbpM
+	F2SZ5qwwRxSNJZ32eXvwXKR2IXmKZdk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1786447683;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tDwsl8Ewx6m0mMpk/yXGZHANMoRBKBOigYb1/1aWwLY=;
+	b=ptX/N7DObbKFGoSJExgO+KSkg7uKkBjwqklb8gW1AFheKd/25VEOlDC531O0CqCxYn3/Uo
+	MEPLAZtCZdDkJXBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 30CFD779B2;
+	Tue, 11 Aug 2026 11:28:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Bb2uCkMHe2oWcAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 11 Aug 2026 11:28:03 +0000
+Message-ID: <d6d725c9-4730-4c23-b971-197533fb9067@suse.de>
+Date: Tue, 11 Aug 2026 13:28:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-References: <20260811110421.50747-1-kmehltretter@gmail.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH] blk-cgroup: fix lost wakeup in blkg_destroy_all()
-Message-Id: <0898e560-73a8-4f1e-af13-65042cec0c7d@fnnas.com>
-X-Lms-Return-Path: <lba+26a7b0420+419c9e+vger.kernel.org+yukuai@fnnas.com>
-In-Reply-To: <20260811110421.50747-1-kmehltretter@gmail.com>
-Reply-To: yukuai@fygo.io
-To: "Karl Mehltretter" <kmehltretter@gmail.com>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>, 
-	"yu kuai" <yukuai@fygo.io>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/13] block: refactor disk_update_zone_resources()
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20260811105852.1245357-1-dlemoal@kernel.org>
+ <20260811105852.1245357-4-dlemoal@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260811105852.1245357-4-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.28
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.28 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.18)[-0.914];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[acm.org:email,lst.de:email,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
 
-Hi,
-
-=E5=9C=A8 2026/8/11 19:04, Karl Mehltretter =E5=86=99=E9=81=93:
-> wake_up_var() requires a full barrier between making the wait condition
-> true and its lockless waitqueue check. spin_unlock_irq() has only
-> release semantics, so it does not order q->root_blkg =3D NULL against
-> that check.
->
-> During disk rebind, blkcg_init_disk() can therefore miss the wakeup and
-> sleep indefinitely. Add the required smp_mb(). Also mark the store with
-> WRITE_ONCE() since the waiter reads root_blkg locklessly with
-> READ_ONCE(). An LKMM model permits the missed-wakeup outcome without
-> the barrier and forbids it with the barrier.
->
-> Fixes: 3dbaacf6ab68 ("blk-cgroup: wait for blkcg cleanup before initializ=
-ing new disk")
-
-Looks like this will be fixed by following patch as well:
-
-[RFC PATCH v2 1/4] blk-cgroup: wait for old blkgs to leave queue before=20
-disk rebind - Yu Kuai=20
-<https://lore.kernel.org/all/20260811064744.1139446-2-yukuai@kernel.org/>
-
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+On 8/11/26 12:58 PM, Damien Le Moal wrote:
+> Since the function disk_update_zone_resources() does a lot of checks
+> beside updating a zoned disk limits and resources, rename this function
+> to disk_revalidate_zone_resources(). To keep all checks together, move
+> the capacity check in blk_revalidate_disk_zones() to this function and
+> simplify it by moving the check on the number of zones before the call to
+> queue_limits_start_update().
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > ---
-> LKMM (herdtools7 7.58), with the store modeled by WRITE_ONCE(). flag
-> is q->root_blkg (1 =3D set), lk the queue_lock, wq the var waitqueue
-> occupancy. To model the fixed code, insert smp_mb() in P0 between
-> smp_store_release(lk, 0) and READ_ONCE(*wq):
->
->    C blkcg-rebind-buggy
->    { flag=3D1; }
->    P0(int *flag, int *lk, int *wq)
->    {
->    	int r0;
->    	WRITE_ONCE(*flag, 0);
->    	smp_store_release(lk, 0);
->    	r0 =3D READ_ONCE(*wq);
->    }
->    P1(int *flag, int *lk, int *wq)
->    {
->    	int r1;
->    	WRITE_ONCE(*wq, 1);
->    	smp_mb();
->    	r1 =3D READ_ONCE(*flag);
->    }
->    exists (0:r0=3D0 /\ 1:r1=3D1)
->
->    herd7 -conf linux-kernel.cfg blkcg-rebind-buggy.litmus
->
->    without smp_mb(): Sometimes
->    with smp_mb():    Never
->
->   block/blk-cgroup.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index d9676126c5b5d..2b3cf9caeaa31 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -604,9 +604,11 @@ static void blkg_destroy_all(struct gendisk *disk)
->   			__clear_bit(pol->plid, q->blkcg_pols);
->   	}
->
-> -	q->root_blkg =3D NULL;
-> +	WRITE_ONCE(q->root_blkg, NULL);
->   	spin_unlock_irq(&q->queue_lock);
->
-> +	/* Order q->root_blkg store before wake_up_var()'s waitqueue check */
-> +	smp_mb();
->   	wake_up_var(&q->root_blkg);
->   }
->
-> --
-> 2.53.0
->
---=20
-Thanks,
-Kuai
+>   block/blk-zoned.c | 46 +++++++++++++++++++---------------------------
+>   1 file changed, 19 insertions(+), 27 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
