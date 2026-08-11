@@ -1,158 +1,280 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EF33921FA;
-	Tue, 11 Aug 2026 06:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A337C3921FA;
+	Tue, 11 Aug 2026 06:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786431099; cv=none; b=jAzhCm2TMSBaKU3Tyh+jQQMECzhuzdyfXjE6xOCcFQ92DiDwZNbXG0u5VY1sfOzsuE7X0my1PJjg1m10PXRNgP/xb4ddhAOKPBk8kHvoXjo+SggILTUrrPJCFPKWnRCc210v4pxU0DaRyEgTD+hbhqHCtQgFSyPqoA3r3z8UipI=
+	t=1786431106; cv=none; b=C98bmsqU+jtiqDWxil3RDYiC2AE47L7Fmt9LNWTSRmFUAWSSkezW9YAQSry09bHt42i60vM3phLBTW5+KoMZAwWxAXKI7G8OK9KMdHdM5v+6l8armiCQ/8NlG1CDpSQwP3wbcyp2gdTWdjjzjQadHffWxyKmzlLRdyt35QsSbVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786431099; c=relaxed/simple;
-	bh=pbm5nJARrive7EbKpkhyo8U1Z4SlieWC4PcXBCGvFvM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EoKourZ6+WNiv5AukXoMEmmPE8mLheMyz8C7z3igLvHqXgGmBZs3+fJgFZQFj4MIcdRAfD6OxgSONeFaL0iyKZf3Xde9wVWMPSRzeGiiSHE6ak1e3aWk0aogfx9KuxMoqXzhNHvd+q/swZGP0YtZ7k6isRD+pUI6La3T2cqzK5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Yqf4+z4b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1786431106; c=relaxed/simple;
+	bh=R5vbx5TW9uZArHfFmDM2Vbf3lvk8FCMvkPXbapp6onc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AVppqlV+1IStZHjkPJH4n+spUMov66RJSuVZzWtyOffHzpJ0hZoLRYUJXSZuxdcpKmV3tsTkhIQm4zX/qbNfg8+4YNZZZhfb2FDDwFKEJgSUy9V1kClqzTIGVH8x4Rbfoiy7ivLcYlBDSqx6IM6FT8qCqg3MZuU5gEFXCzGMmbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iczf3uij; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Yqf4+z4b"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C528C2BCF4;
-	Tue, 11 Aug 2026 06:51:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1786431099; bh=pbm5nJARrive7EbKpkhyo8U1Z4SlieWC4PcXBCGvFvM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Yqf4+z4bUvdRvBRVTD3YjNXNRpqTWK5xKh7aKBQdIMsGFlKRbKQ99euVVZnbLhMUJ
-	 I02sbV9DOJzX0lspOb1yhVgSrw6iPdarLFsEghUBeg7CAgZHH9Xl4+Yuyk+dKfmnPj
-	 likAEiDNS9FS6YoqsZXs86eNd4KUbNsqpeCJISMw=
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07901C5B570;
-	Tue, 11 Aug 2026 06:51:39 +0000 (UTC)
-From: Alvin Sun <alvin.sun@linux.dev>
-Date: Tue, 11 Aug 2026 14:51:36 +0800
-Subject: [PATCH] rust: block: gen_disk: set fops.owner from driver module
- pointer
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iczf3uij"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 097C91F000E9;
+	Tue, 11 Aug 2026 06:51:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786431104;
+	bh=Z0ui+uRBvO4M0yd8KG2s22NLotks3BCDPbqh+26w/yM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Iczf3uijRgzjcA6B/j/Tqrmvx+RsfZ3ic3oyBMPLcYvnCHOsXKyP9Uc1mt+/kKnnw
+	 aCg+5WRQK3xX+vxyURFmuUZHcSElN7klIvjPQE6mDsVw1YZ5AFDf1AAtA0XwzjL8wn
+	 +V2QyfyO6vno/fnpnsGTHl2ZEAO2dG8ITTJty28KpY7y6myWHuzx9uKF6XML/6ocWn
+	 xvqP6MKXEWsqi/kbkY12AbVGGUnwkZKeU30q1clDS3JVvAqF5/4amoYAcBdl8PAJcy
+	 L5zGAiYTsbSph5NkP7VwbiyncINSGTTNYAtDbuitLlkDswP1sKH01tBnohL9UMffqh
+	 dcTwXOi8G8ajw==
+From: Yu Kuai <yukuai@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: Yu Kuai <yukuai@fygo.io>,
+	Christoph Hellwig <hch@lst.de>,
+	Tao Cui <cui.tao@linux.dev>,
+	Jan Kara <jack@suse.cz>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Coly Li <colyli@fygo.io>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Song Liu <song@kernel.org>,
+	Li Nan <magiclinan@didiglobal.com>,
+	Xiao Ni <xiao@kernel.org>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Dan Williams <djbw@kernel.org>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	Ira Weiny <iweiny@kernel.org>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Baoquan He <baoquan.he@linux.dev>,
+	Barry Song <baohua@kernel.org>,
+	Youngjun Park <youngjun.park@lge.com>,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	virtualization@lists.linux.dev,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [RFC PATCH v2 4/4] blk-cgroup: move async bio punt state to blkcg
+Date: Tue, 11 Aug 2026 14:47:44 +0800
+Message-ID: <20260811064744.1139446-5-yukuai@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260811064744.1139446-1-yukuai@kernel.org>
+References: <20260811064744.1139446-1-yukuai@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260811-fix-gendisk-owner-v1-1-c0fe4a449ecb@linux.dev>
-X-B4-Tracking: v=1; b=H4sIAHfGemoC/02OS47CMBBEr2L1eoz8SdKOr4JY2J02WCMSsENmJ
- MTdxwqzYPlKXdXvCZVL5gpePKHwlmte5gb6SwBdwnxmmafGYJQZlNNKpvwrzzxPuX7L5WfmIoP
- rJoWmD9FEaL1b4Xa0bx5Pby58f7Tp9R1CDJUlLddrXr3Y8GBkIdyrYaVL++iF7ZD6YGmYIqfRW
- RMTsev0mMhYHli5GDrEBJ+iXuyavR53zbTc6r8j24AYo0EayG9awen1+gPRm4Dd/AAAAA==
-X-Change-ID: 20260810-fix-gendisk-owner-a84d0725ab2b
-To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- Alvin Sun <alvin.sun@linux.dev>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1786431097; l=3831;
- i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=pbm5nJARrive7EbKpkhyo8U1Z4SlieWC4PcXBCGvFvM=;
- b=T2ZchLdFCUfJ9WJciOwxNBzqrG3yMEJJcvWk+STpLw942FWZhVz/5uiYk3Bkx3TefgwMt8OcQ
- S8YbB8njRigC12DooF4toA7GBCkvnR5XylzIjA7XUofshKJlfno4VZ5
-X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
- pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
-X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
- auth_id=684
+Content-Transfer-Encoding: 8bit
 
-Set `fops.owner` from the driver module pointer via
-`this_module::<T::OwnerModule>().as_ptr()` instead of defaulting to
-null, so the module cannot be unloaded while a block device is still
-in use.
+From: Yu Kuai <yukuai@fygo.io>
 
-Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+blkcg_punt_bio_submit() currently queues punted bios on blkg->async_bios,
+so it has to call bio_blkg() to find or create a queue-local blkg.  Bios
+now carry and pin the blkcg css, so punted bio lifetime no longer needs to
+be anchored by a blkg.
+
+Keeping the punt state in blkg can instantiate a blkg even when no blkcg
+policy is enabled, just to bounce submission from a shared kthread.  Move
+async_bio_lock, async_bios and async_bio_work to struct blkcg, and queue
+punted bios on bio_blkcg() for non-root cgroups.  Root or unassociated bios
+are submitted directly.
+
+This preserves the priority-inversion avoidance while preventing
+blkcg_punt_bio_submit() from creating blkgs that are not needed by any
+policy.
+
+Signed-off-by: Yu Kuai <yukuai@fygo.io>
 ---
-The fops.owner fix series [1] covered DRM, miscdevice, configfs and
-binder, but missed the block layer's `GenDisk` abstraction.
+ block/blk-cgroup.c | 44 +++++++++++++++++++++-----------------------
+ block/blk-cgroup.h | 14 ++++++--------
+ 2 files changed, 27 insertions(+), 31 deletions(-)
 
-This patch was meant to be sent separately, but I forgot to send it.
-
-[1] https://lore.kernel.org/r/20260723-fix-fops-owner-v9-0-c1c3af7f7bcb@linux.dev/
----
- rust/kernel/block/mq/gen_disk.rs | 34 ++++++++++------------------------
- 1 file changed, 10 insertions(+), 24 deletions(-)
-
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index fc97dd8739746..215c407d466df 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -125,30 +125,9 @@ pub fn build<T: Operations>(
-             )
-         })?;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 1de2f2433d11..e76e9a52f95d 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -177,14 +177,10 @@ static void blkg_free(struct blkcg_gq *blkg)
  
--        const TABLE: bindings::block_device_operations = bindings::block_device_operations {
--            submit_bio: None,
--            open: None,
--            release: None,
--            ioctl: None,
--            compat_ioctl: None,
--            check_events: None,
--            unlock_native_capacity: None,
--            getgeo: None,
--            set_read_only: None,
--            swap_slot_free_notify: None,
--            report_zones: None,
--            devnode: None,
--            alternative_gpt_sector: None,
--            get_unique_id: None,
--            // TODO: Set to `THIS_MODULE`.
--            owner: core::ptr::null_mut(),
--            pr_ops: core::ptr::null_mut(),
--            free_disk: None,
--            poll_bio: None,
--        };
+ static void __blkg_release(struct rcu_head *rcu)
+ {
+ 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
+ 
+-#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+-	WARN_ON(!bio_list_empty(&blkg->async_bios));
+-#endif
 -
--        // SAFETY: `gendisk` is a valid pointer as we initialized it above
--        unsafe { (*gendisk).fops = &TABLE };
-+        // SAFETY: `gendisk` is a valid pointer. We have exclusive access,
-+        // since the disk is not added to the VFS yet.
-+        unsafe { (*gendisk).fops = &GenDisk::<T>::VTABLE };
- 
-         let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
-             // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
-@@ -211,6 +190,13 @@ pub struct GenDisk<T: Operations> {
-     gendisk: *mut bindings::gendisk,
+ 	blkg_free(blkg);
  }
  
-+impl<T: Operations> GenDisk<T> {
-+    const VTABLE: bindings::block_device_operations = bindings::block_device_operations {
-+        owner: crate::module::this_module::<T::OwnerModule>().as_ptr(),
-+        ..pin_init::zeroed()
-+    };
-+}
-+
- // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
- // `TagSet` It is safe to send this to other threads as long as T is Send.
- unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
-
----
-base-commit: 2ee859ebf156157609f71060ae472711c8cbc326
-change-id: 20260810-fix-gendisk-owner-a84d0725ab2b
-prerequisite-patch-id: 347c5a3c6dbef9832bfce8419fc23e6e08ba477f
-prerequisite-change-id: 20260519-fix-fops-owner-e3a77bb27c6c:v10
-prerequisite-patch-id: 347c5a3c6dbef9832bfce8419fc23e6e08ba477f
-prerequisite-patch-id: 190cfd53d3430ade053b15db36cac9e372e2566d
-prerequisite-patch-id: fdb2387ea1074c3bf16028b58c3df73e2e1783b1
-prerequisite-patch-id: f38222c64f7d29781036ae8673808cf4e9a9d430
-prerequisite-patch-id: da94d5d3af25778145b976f65f7eac281dc6ae79
-prerequisite-patch-id: e5c034ff639d7eebe730922db0ed02492f401dd0
-prerequisite-patch-id: 502035d4e05da3ed939b8bd65801a6fd8a01d788
-prerequisite-patch-id: 0ccf22bbdee039964cb064f33a8c7a0925dbd57b
-prerequisite-patch-id: e0595d6120868cdf3e87fa335a81e10f0e346c80
-prerequisite-patch-id: f27fc645020b296d289c31fc73dbfef993294464
-prerequisite-patch-id: 159f88cf73892b94117070090a58c7b68e08b8c1
-
-Best regards,
+ /*
+  * A group is RCU protected, but having an rcu lock does not mean that one
+@@ -218,23 +214,22 @@ static void blkg_release(struct percpu_ref *ref)
+ }
+ 
+ #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+ static struct workqueue_struct *blkcg_punt_bio_wq;
+ 
+-static void blkg_async_bio_workfn(struct work_struct *work)
++static void blkcg_async_bio_workfn(struct work_struct *work)
+ {
+-	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
+-					     async_bio_work);
++	struct blkcg *blkcg = container_of(work, struct blkcg, async_bio_work);
+ 	struct bio_list bios = BIO_EMPTY_LIST;
+ 	struct bio *bio;
+ 	struct blk_plug plug;
+ 	bool need_plug = false;
+ 
+-	/* as long as there are pending bios, @blkg can't go away */
+-	spin_lock(&blkg->async_bio_lock);
+-	bio_list_merge_init(&bios, &blkg->async_bios);
+-	spin_unlock(&blkg->async_bio_lock);
++	/* as long as there are pending bios, @blkcg can't go away */
++	spin_lock(&blkcg->async_bio_lock);
++	bio_list_merge_init(&bios, &blkcg->async_bios);
++	spin_unlock(&blkcg->async_bio_lock);
+ 
+ 	/* start plug only when bio_list contains at least 2 bios */
+ 	if (bios.head && bios.head->bi_next) {
+ 		need_plug = true;
+ 		blk_start_plug(&plug);
+@@ -251,19 +246,19 @@ static void blkg_async_bio_workfn(struct work_struct *work)
+  * cgroup.  Use this helper instead of submit_bio to punt the actual issuing to
+  * a dedicated per-blkcg work item to avoid such priority inversions.
+  */
+ void blkcg_punt_bio_submit(struct bio *bio)
+ {
+-	struct blkcg_gq *blkg = bio_blkg(bio);
++	struct blkcg *blkcg = bio_blkcg(bio);
+ 
+-	if (blkg && blkg->parent) {
+-		spin_lock(&blkg->async_bio_lock);
+-		bio_list_add(&blkg->async_bios, bio);
+-		spin_unlock(&blkg->async_bio_lock);
+-		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
++	if (blkcg && cgroup_parent(blkcg->css.cgroup)) {
++		spin_lock(&blkcg->async_bio_lock);
++		bio_list_add(&blkcg->async_bios, bio);
++		spin_unlock(&blkcg->async_bio_lock);
++		queue_work(blkcg_punt_bio_wq, &blkcg->async_bio_work);
+ 	} else {
+-		/* Never bounce if there is no non-root blkg to queue on. */
++		/* Never bounce if there is no non-root blkcg to queue on. */
+ 		submit_bio(bio);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(blkcg_punt_bio_submit);
+ 
+@@ -342,15 +337,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 	blkg->q = disk->queue;
+ 	INIT_LIST_HEAD(&blkg->q_node);
+ 	blkg->blkcg = blkcg;
+ 	blkg->blkcg_id = blkcg->css.id;
+ 	blkg->iostat.blkg = blkg;
+-#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+-	spin_lock_init(&blkg->async_bio_lock);
+-	bio_list_init(&blkg->async_bios);
+-	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
+-#endif
+ 
+ 	u64_stats_init(&blkg->iostat.sync);
+ 	for_each_possible_cpu(cpu) {
+ 		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
+ 		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
+@@ -1370,10 +1360,13 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
+ 		if (blkcg->cpd[i])
+ 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
+ 
+ 	mutex_unlock(&blkcg_pol_mutex);
+ 
++#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
++	WARN_ON(!bio_list_empty(&blkcg->async_bios));
++#endif
+ 	free_percpu(blkcg->lhead);
+ 	kfree(blkcg);
+ }
+ 
+ static struct cgroup_subsys_state *
+@@ -1418,10 +1411,15 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ 	}
+ 
+ 	spin_lock_init(&blkcg->lock);
+ 	refcount_set(&blkcg->online_pin, 1);
+ 	INIT_HLIST_HEAD(&blkcg->blkg_list);
++#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
++	spin_lock_init(&blkcg->async_bio_lock);
++	bio_list_init(&blkcg->async_bios);
++	INIT_WORK(&blkcg->async_bio_work, blkcg_async_bio_workfn);
++#endif
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	INIT_LIST_HEAD(&blkcg->cgwb_list);
+ #endif
+ 	list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
+ 
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 3d113f6f6d25..efef0967d39e 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -74,18 +74,11 @@ struct blkcg_gq {
+ 
+ 	struct blkg_iostat_set __percpu	*iostat_cpu;
+ 	struct blkg_iostat_set		iostat;
+ 
+ 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
+-#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+-	spinlock_t			async_bio_lock;
+-	struct bio_list			async_bios;
+-#endif
+-	union {
+-		struct work_struct	async_bio_work;
+-		struct work_struct	free_work;
+-	};
++	struct work_struct		free_work;
+ 
+ 	atomic_t			use_delay;
+ 	atomic64_t			delay_nsec;
+ 	atomic64_t			delay_start;
+ 	u64				last_delay;
+@@ -110,10 +103,15 @@ struct blkcg {
+ 	/*
+ 	 * List of updated percpu blkg_iostat_set's since the last flush.
+ 	 */
+ 	struct llist_head __percpu	*lhead;
+ 
++#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
++	spinlock_t			async_bio_lock; /* protects async_bios */
++	struct bio_list			async_bios;
++	struct work_struct		async_bio_work;
++#endif
+ #ifdef CONFIG_BLK_CGROUP_FC_APPID
+ 	char                            fc_app_id[FC_APPID_LEN];
+ #endif
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	struct list_head		cgwb_list;
 -- 
-Alvin Sun <alvin.sun@linux.dev>
-
+2.51.0
 
