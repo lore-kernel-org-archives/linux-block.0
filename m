@@ -1,96 +1,116 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79902352C28
-	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 02:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CDD299931
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 04:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786414009; cv=none; b=fU26n6tGoimqQwI5//1x3/MH1i90JNRPZzcCdkda7NfdeWb7Ix/2J6jHfbZebxJhh6tXQ+p3Ickmv3gqBLHEqyN850/kNWWcJ1xsWhlYfguQ3be9Y3m1tPNtmEza0oYZmHy3NF8WC65SD5m+JvcXRzRDEsMjdMGjbZdXulp6YZI=
+	t=1786421059; cv=none; b=FEbuz1YaB91YbnfqMrNBKssbSyzWk+Zro22j4hUE6+3AZi5jaGERZwl0looK6zS2t+9hDHbQ8BR2DxzrYh6TA5PmFMeMP3BNQJWw55wqrzZp4HfyQRBpM6o+09xAjWyYGoELtak01wrbDPPZNQrYRSBNyRr+QOwuD5IF+5EXGIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786414009; c=relaxed/simple;
-	bh=NPkKek9tVbr2Alb7M6x4U7WeXxJD1FMWAbkqHKuzxYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dvEyEQ1mllVueFjnnneTQ5F868AtjU3XtkdBK8XVKn/SD6JZwIxB5k1xHjRzlQrtxWns87C5v0XzI35PVzLSbC8uOLmoVtE+Za7Wije7WEb/n3d1luXy68o1tFldpLxFGyN3BqvwvKYrm9JG0jiz9Xb76BuZxtcZR+datg0WEMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JNH5xUl2; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1786421059; c=relaxed/simple;
+	bh=lyeK9aBbtnh8MHhK0QlEi5A9QY6Umptk7fn2lOsOJDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EEdCGldK+k5gLHySd+3cIJoMOQwBv6QS5SohC04xU4ppq5Zb2Y230rkZZ3PiBYQEjovtu5CEwq/IaG9QBx6qB3X6enAebban2iGRnIx5S6x4PNab147N7PzVq1Mj9w80HwnPQcg8widjLJheqwZSc0jHysUTlUetl1xNRIQUPiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCb5Xtfk; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JNH5xUl2"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2cca0c5799eso25075875ad.0
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 19:06:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCb5Xtfk"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-81ed2a00f12so36130107b3.2
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2026 21:04:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1786414006; x=1787018806; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=XNoTPBmi5ooOPVWeRqi5RL/3itbRAm49mArkGvygYC0=;
-        b=JNH5xUl2RMQdyEiRWmDg9q5EAVDIhaCSkVDUWlZlchrqgPEQv5/AYhssqZz9Zb8pox
-         yLNQR5CiTA9KTO/Nk9OQNf9WTWyUpBgLI0IX4E3TUCFtUB246N6zec/urdbtCSr9MGLh
-         Aly2eUXmahiiOD4a1yi5jKVNlTPfv0s+y/96I=
+        d=gmail.com; s=20251104; t=1786421057; x=1787025857; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=y3vyjW0DTZeOqW+IpPjwitbNL4KqPKpkFiayP6aBYFc=;
+        b=bCb5Xtfk17WNgU6jTO4ceeZG7c8LcW6MRktSc8kGuXHbJ8+UhamgfQqSiMRr41yhr8
+         bsn6gGInXe+FKbtRqUpIaBCC7vm3opu0pK0IPPQIvlYhaCjFJckgMPV/4mLfV7gVgaHj
+         OqUDPX+Kpa5vjPVn3GmsFqZSxpyniwy2FUZYFFrdaOYK1xXmQDcQnzOpvpBgD15Ja0fj
+         XlirUspDH3RLDOquhi1xATRIV8ICbZOKkyXwB/qLZmfA/xrTZEVm2sNHgrpJE+pHWH1d
+         7205fGmJvIIHXpmyPpktZYMW3RbB4GVhCTjD8HPJUmwidhU1SrQgNbeTcDtKy+F+0NZl
+         x0kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786414006; x=1787018806;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=XNoTPBmi5ooOPVWeRqi5RL/3itbRAm49mArkGvygYC0=;
-        b=tJoiYl6IU6hHkcKZWDSOf1bDQUB8Id7hM2QwccAWs+b7lEtEvCJAW5ZLls508tp6dn
-         DNA+7sEMXS7a/E6gGht6hnMwctGP15P1458+uyEDeX2DNYF8U8haOpv2QOrZO4slRNr+
-         qBLf0HpOc4Bt6+zhZKRa8ejwYLLp1RLJ6pvF4d5vFa4ucqJYHauToWPQHKac1s89Qe4u
-         4BPX9GtgCI7ZRbvCQlr32xs2+zwU5m1jpl0XBMw2OhsDt/6HpfIjqgMfeQVIDImgISnL
-         rlefx7XfAAaYlba+6/nX4LbxCJNMCng/ChfWUvbvKT/A9zrpCDAZyMEXe9KTFVbl0s7m
-         ul0Q==
-X-Forwarded-Encrypted: i=1; AHgh+RryP7F0JtpHsaEzS4ugrCKD0q8ohIYBFrYZeWfFXTaYlmGXGbaYfWzEwYqj+YpyGVHe3b1Fv+pHxa6eIA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE1WuIr3UlfdDnrCEOjHEViK8X/AjUcwX3mWCQ6zfxH/JE98w5
-	wLbCSEvrzFQ6+CgzuZddQCz2/AOl+wFu4nKL5ydcHa/k2pFuu3QFKYo3B67hBcXGIA==
-X-Gm-Gg: AR+sD11w9PgxDqisG6CuVXsnExeyV8iOpmRRD1OzDKoFEDZAtlLKMtNZiF6p0i7q0+f
-	1LnLllO3yO12nbLe4b/lZERcy8VpCU2HNmUdJD2KBS5upHiEQCxEm2XQUIPSKBX/YsvCENE3ijP
-	ReDFWClezDgSQpmeAZEY3hIn8nuW7T/XLyy24l6hUKKRBMWitiJF5XaUBDJyusXQEYL1M6Wel0p
-	Q1f+d/n2AEkbTF6m1DbBs73c/YOnucw9SKGn5Md3dguloK/l9GPOFSb2yWYrbhgkxVseiavTcvY
-	g/rETPOfheRtq80jTLJQ1VAB28vhKHuwuF9jYaTRPstGDdRNuxATRMv5EWNF5vic1I1bS+CxmIi
-	j0A2Y7G31QCrXDu3GcB+Zkn+M1alXWzhKpIP90QXLyVzKCGT92vT5cLQNVnEGp5eexOQOJ5FjrD
-	xCTgh1bw02/r1LvhF6PSVF45EUEdl6hOjQdK61kQvUHEXdgGj4rm9dHp1m04O2FAriKx1AwUBSu
-	igHL9jEyqRsb2taCb6kNFoG0Z0h6w7uoA==
-X-Received: by 2002:a17:90b:57cd:b0:380:21b7:e727 with SMTP id 98e67ed59e1d1-392823c808fmr23452524a91.14.1786414005723;
-        Mon, 10 Aug 2026 19:06:45 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:ddfb:e755:8f7f:81af])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-392d4050827sm1513560a91.2.2026.08.10.19.06.43
+        d=1e100.net; s=20251104; t=1786421057; x=1787025857;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=y3vyjW0DTZeOqW+IpPjwitbNL4KqPKpkFiayP6aBYFc=;
+        b=Q0oUraOWgUOYnIqEoFIJPQFlbuHt8zLGxYQ+5rOvnjAI+lgMBsbQ267rJYeq7toe0I
+         Tm3iy7pmqcymMX0duAQ9hNvHImeBbXZi2Lde4Y4etiORiabF6kdnvo2iHmjhslOshmjc
+         p+pQgFIBzDx3WCO0RpU0TRpzzZK2/jQvHxmi1Crc1WL6UwOH4dacSaI3sadz7U9HtXua
+         HsL6OKjo0rqtWGEr1cgmx3pNPHVRIzf/lzh2GPxM0yiZjrLmwkr3h/Yvgo5UriXSvD3x
+         3YQmesUmhabd4RLhaQY0LphRrNVEj8dFrqg4bQTCKBGi1M2MgVdKTqmHCmczdevhjqET
+         oKrA==
+X-Forwarded-Encrypted: i=1; AHgh+RqWHjWJyiJ/RGAxI9bGo7KPjXyaeT9BUufhCFU59DVLubbxcwTJAXMfK+KmLAxXbTod0wIPMa91tHccFg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YydxgU4ehNc6OmEla20qARijURPFTIrW2z4qOIQsvyCXtTIAPuy
+	YCaHKjf6tiNtOrbYT8KoOx4Iaetagx1oEqq/dimDskFsz31dQlBcAtU5
+X-Gm-Gg: AR+sD13JWVhm1PQWgDW1X1tbYOkt6NudubnV3GCAtPQWQAQFlexbJsJF443Y1t4jpDy
+	vuE3ctIN4VxOZxEcURgcekDvdkXDDV0VF8rWT0aICfq1OVgDoo//VC8RBd1gh+Iwa9czOIjdkcY
+	CRtL2OboJ6kYygrTW7fxGHd8X6+fvdZ3k+5lO1r3YMdm3eetvQ33FPfurbP5CNNxBGiMTrRqbfR
+	goxIsh9ZVEnQa2GfCKBOqkBx01cyLGJZNalj5Cu2iBmNpm9qoB4fn1DPOGAqFaxXfI8R2bLDywf
+	Cu2VCcmiQBkyP41uEmGYEbS58NBEAShSOljS8TPCQUjY76q1GzQfQDGUFJIBxSDIfcK8os50Uqa
+	8SQ98xzZsTr0UClh6gdBw+89rvaRiP/O16J4JQkzLR9Ci4FtQYJH9CBXPiJY9iQYC+nsKmDLkGi
+	wDnhXcVnfUwAsFeGdtp3yYRQ3qEzjIOojpNYZikXmkhiuzUskg112syNxYzI+D612cjklanj98t
+	4rEmzkxduQeDDTxIQ==
+X-Received: by 2002:a05:690c:4b10:b0:81f:e85b:f9da with SMTP id 00721157ae682-82f2f103751mr571547b3.33.1786421056694;
+        Mon, 10 Aug 2026 21:04:16 -0700 (PDT)
+Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-82ec39021f5sm2842817b3.32.2026.08.10.21.04.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Aug 2026 19:06:45 -0700 (PDT)
-Date: Tue, 11 Aug 2026 11:06:41 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: David Carlier <devnexen@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] zram: fix slot lock bit position on big-endian 64-bit
-Message-ID: <anqDmZKiVfyNB5FL@google.com>
-References: <20260810202241.2436603-1-devnexen@gmail.com>
+        Mon, 10 Aug 2026 21:04:16 -0700 (PDT)
+From: Chao Shi <coshi036@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Samin Y. Chowdhury" <samin_c@outlook.com>,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Dave Tian <daveti@purdue.edu>,
+	Weidong Zhu <weizhu@fiu.edu>,
+	Ruimin Sun <rsun@fiu.edu>
+Subject: Re: [PATCH RFC] blk-integrity: fix slab-out-of-bounds in t10_pi_verify on namespace revalidation
+Date: Tue, 11 Aug 2026 00:04:09 -0400
+Message-ID: <20260811040415.1968239-1-coshi036@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <ah03bXpgFLQjOUt8@infradead.org>
+References: <20260531-blk-integrity-fix-v1-1-cc7084f42cf1@outlook.com> <ah03bXpgFLQjOUt8@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260810202241.2436603-1-devnexen@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On (26/08/10 21:22), David Carlier wrote:
-> The slot lock is a bit operation on the whole __lock word, which
-> flags and ac_time alias as two u32s. On little-endian the lock bit
-> lands in the position ZRAM_ENTRY_LOCK reserves in flags, so the
-> aliasing works out. On 64-bit big-endian it lands in ac_time
-> instead: with ZRAM_TRACK_ENTRY_ACTIME enabled, storing the access
-> time from mark_slot_accessed() or slot_free() wipes out the held
-> lock bit, letting another CPU take the same slot lock; an access
-> time value with that bit set makes the slot look locked forever.
-> 
-> Shift the lock bit into the flags half of the word on big-endian
-> 64-bit.
-> 
-> Fixes: 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: David Carlier <devnexen@gmail.com>
+On Mon, Jun 01, 2026 at 09:40:29AM +0200, Christoph Hellwig wrote:
+> I don't think changing fundamental device properies such as the LBA
+> or integrity tag size under a live device is a good model.  So instead
+> of coming up with bandaids like this, we should probably just fail
+> any such revalidation when there are openers instead of trying to deal
+> with the fallout.
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Agreed, and sorry for the long silence.  Samin and I are in the same
+group and I am picking this up from him.  We are dropping the
+blk-integrity patch rather than respinning it.
+
+Before writing anything on the nvme side I would like to get the shape
+right, because "fail the revalidation" can mean a few things and one of
+them looks worse than the splat.
+
+If a namespace really was reformatted out of band and we refuse to adopt
+the new geometry, the host keeps issuing I/O with the old LBA format and
+metadata size to a device that has already changed underneath it.  That
+is silent corruption rather than a KASAN report.  So I assume refusing
+the update has to be paired with taking the namespace out of service.
+Did you have in mind
+
+  (a) refuse the update and mark the namespace dead, like a surprise
+      removal,
+  (b) refuse only while the disk has openers and redo the revalidation
+      on last close, or
+  (c) something else?
+
+Chao
