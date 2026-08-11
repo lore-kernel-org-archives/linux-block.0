@@ -1,126 +1,78 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9DC13C908
-	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 00:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C82331EBC
+	for <linux-block@vger.kernel.org>; Tue, 11 Aug 2026 00:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786407457; cv=none; b=kQxh5rNINFKm7Hd58atCyDKSzP8KOp4smCg/XTnDhYoDeWrzJoX4QP1YbrcR/jG3LpIjovnnUrY7QeyL87mRm/Fvowm7jv5gP7HvyJaBCn6cJZCZT5djbKI5R72enOOxO3si9KgegTF6nWYcFfZq2OZJhcWHQtUP05fun1yu1Hg=
+	t=1786409754; cv=none; b=S6wT+1qjdmEuZZS0ucL8exRP/AzWjj+/UL87ZlCiY3US86xJ/QJ2CS/hk/JVradbdWv1s/ruskSfabDAC8GhGg/KRyvhXnzlI/t8iMJhonoOwEmq6bISa7Hm3c/0F57IG7yRZrdVkNdBsUfPoN/YrrIQgtOCcVbFyNWZCAHd22o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786407457; c=relaxed/simple;
-	bh=fKO3PCwqdUycjDKKA3zllYcKF3xrw5UX5mN0GnoqEfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aE3kcNZoOEqpOLfTZw7HnSugAnimJqk7lNo7LV98Zet4rUqydQ9sdaZ4xD6gD/w5ThOZKyHiNPoALrrJy8zvzEIiZTm+iIQ+MRld8lqT+QMiBhGTK01fsJ4vDke2Nbpr/o+W4lkREGTodNHHC4SkrUpqNuNoIKzH48HlIEYFIK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Nkv7Mbhf; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786409754; c=relaxed/simple;
+	bh=j9gnFNhzOx6O7He/zjHLWAcaW2sDXyhn2hFK9rMlai4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kV1KwXd5MBGzcGBmnYsIjEIk8qkwyMWLpXWJWDZ5prMnc3WdQeod4nRMhNrbN0LENzBMry05WCAYuHoyeUihGJ6XFGYIlBz7YhM/h+TjB8efOOZL2cJ88OxRWtk1YKcc8ylFKkz+bZh4S6pEsjPPXcqqlNM6l8Rl3yuo+Go4A4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h976ZzrA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Nkv7Mbhf"
-Message-ID: <4306439e-a00f-4b10-b8a0-9be6e046873d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786407453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0FbObMeyvKUb5vzu1M8X9q3Z4AyeRD9aHK9DZu6JVXk=;
-	b=Nkv7MbhfNGLeWCuNuA5m4yIf98dnAV8j3uWTkYacuGjz1nVr3UsBKPl+FP+pL9Hf+negcf
-	jUuapBpEk7D2VDreJEeEnwEzc5uQ6yR2LshtaMI2WL2eQw4FlR62cNByaQ8IRDfp8Ub/qZ
-	QuW51Nlt5bC3MIA79WeGOYCC74gYfrk=
-Date: Mon, 10 Aug 2026 17:17:26 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h976ZzrA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DE071F000E9;
+	Tue, 11 Aug 2026 00:55:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786409745;
+	bh=YXDPeV0frzKO1XCETmGtDDKJhEwmiS95+OxrQDY2p/o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=h976ZzrArYIP/kUdX6Ae/iQclmMCtoZe2sp9rmhfqBiHqJnvhrj5jazg7mSagtQkk
+	 Z8g3esSrZLX7LR461IfdwO1fU8M3G29hcTU8i3GOYN2oqmq0qYuTdn9IoPWsp5y6OU
+	 q1+JR1GQJwREi1lNUH0oz5B6055YVdODXmHJo9jjXFWyB7EcqFK4vV0HLng3cYwltg
+	 896GO6dFXHfcvXhORgs2XCwOtLbe1cbmKIInlFZvwz2Nu2IDviDuYrV61cTJQhWgTR
+	 5B/Rkc4ejsDKjEd9ac/r7ZUW1cjXXC5+4wbF/X4bSU/uJzjw9IjzLHdTW/O3xfhqF+
+	 D22gHZs3RJ+ZA==
+Date: Mon, 10 Aug 2026 18:55:43 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: John Garry <john.garry@linux.dev>, Christoph Hellwig <hch@lst.de>,
+	sagi@grimberg.me, axboe@fb.com, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH RFC] nvme-multipath: fix diskstats for partitions
+Message-ID: <anpzD5PaOn-_K5hn@kbusch-mbp>
+References: <20260721114553.1657841-1-john.g.garry@oracle.com>
+ <20260724050152.GA3680@lst.de>
+ <987782a9-e12a-4098-b438-a54a5765c2ae@oracle.com>
+ <amNegPEvRX99EvPN@kbusch-mbp>
+ <f76e9466-4b66-4a32-a491-728e24d34052@linux.dev>
+ <amOGxr3rxvDflHLv@kbusch-mbp>
+ <94ed42ce-895d-4197-994b-60fc1d3f040c@linux.dev>
+ <d3058b64-e162-4bfc-990d-13ff5f03143a@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] block: add BPF kfuncs to read blkcg io.stat
-To: Ziyang Men <ziyang.meme@gmail.com>, Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
- Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Mykola Lysenko <mykolal@meta.com>,
- kernel-team@meta.com, linux-block@vger.kernel.org, bpf@vger.kernel.org,
- cgroups@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260807193732.4073299-1-ziyang.meme@gmail.com>
- <20260807193732.4073299-2-ziyang.meme@gmail.com>
- <anot9w6mg9538RWm@slm.duckdns.org>
- <anpU4oV46MDVDixj@devvm16600.scu0.facebook.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: JP Kobryn <jp.kobryn@linux.dev>
-In-Reply-To: <anpU4oV46MDVDixj@devvm16600.scu0.facebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3058b64-e162-4bfc-990d-13ff5f03143a@oracle.com>
 
-On 8/10/26 3:46 PM, Ziyang Men wrote:
-> Hi Tejun,
+On Thu, Jul 30, 2026 at 01:52:00PM +0100, John Garry wrote:
 > 
-> Thanks for your review and suggestions!
+> With that, /sys/class/block/ looks a bit different (with the per-path
+> partitions):
 > 
-> On Mon, Aug 10, 2026 at 10:00:55AM -1000, Tejun Heo wrote:
->> Hello,
->>
->> On Fri, Aug 07, 2026 at 12:37:31PM -0700, Ziyang Men wrote:
->>> +__bpf_kfunc struct blkcg *bpf_get_root_blkcg(void)
->>> +__bpf_kfunc struct blkcg *bpf_get_blkcg(struct cgroup_subsys_state 
->>> *css)
->>> +__bpf_kfunc void bpf_put_blkcg(struct blkcg *blkcg)
->>> +__bpf_kfunc void bpf_blkcg_flush_stats(struct blkcg *blkcg)
->>
->> I wonder whether making the above deal with css's would make more 
->> sense so
->> that we don't end up with per-subsystem iterators. If casting to per- 
->> subsys
->> type is necessary, we can provide RCU protected cast kfucns.
->>
+> #ls -l /sys/class/block/ | grep nvme0
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0c0n1 ->
+> ../../devices/virtual/nvme-fabrics/ctl/nvme0/nvme0c0n1
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0c0n1p1
+> -> ../../devices/virtual/nvme-fabrics/ctl/nvme0/nvme0c0n1/nvme0c0n1p1
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0c1n1 ->
+> ../../devices/virtual/nvme-fabrics/ctl/nvme1/nvme0c1n1
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0c1n1p1
+> -> ../../devices/virtual/nvme-fabrics/ctl/nvme1/nvme0c1n1/nvme0c1n1p1
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0n1 ->
+> ../../devices/virtual/nvme-subsystem/nvme-subsys0/nvme0n1
+> lrwxrwxrwx    1 root     root             0 Jul 30 12:39 nvme0n1p1 ->
+> ../../devices/virtual/nvme-subsystem/nvme-subsys0/nvme0n1/nvme0n1p1
 > 
-> Good idea! These do nothing block specific and we already have some common
-> helpers for it such as the bpf_get_root_blkcg(). What is missing is a 
-> way to get
-> one controller's css from a cgroup with a reference held, and the cast. So
-> I would add in kernel/cgroup/
-> 
->    struct cgroup_subsys_state *bpf_cgroup_css(struct cgroup *cgrp, int 
-> ssid);
->    void bpf_css_release(struct cgroup_subsys_state *css);
-> 
-> where the @ssid is an enum cgroup_subsys_id value. Afterwards, the only 
-> piece for
-> blkcg left is:
->    struct blkcg *bpf_css_to_blkcg(struct cgroup_subsys_state *css);
-> 
-> Note the bpf_blkcg_flush_stats may keep its current shape as it mirrors the
-> blkcg_print_stat() which skips the root.
-> 
-> With these helpers we can also replace the existing ones in
-> mm/bpf_memcontrol.c as well:
->      bpf_get_mem_cgroup()
->      bpf_put_mem_cgroup()
->      bpf_mem_cgroup_flush_stats()
-> 
-> they map onto bpf_cgroup_css() plus a bpf_css_to_memcg() cast the same way.
-> 
-> Hi Roman, JP, Shakeel: Do you think it is worth applying above changes for
-> the memory controller as well? If you are happy with the direction I am 
-> glad to
-> send the conversion as a follow-up once the generic kfuncs are in. Would 
-> you
-> take it?
+> Thoughts?
 
-The get/put kfuncs above use KF_ACQUIRE/RELEASE so the verifier can
-reject memcg access after the put. Replacing them with a generic API
-would call for tracking a new lifetime relationship between the css and
-memcg (or other derived) pointer.
-
-For generic flushing, css_rstat_flush() is already a kfunc. The
-memcontrol version above uses memcg_vmstats_needs_flush() for skipping
-as needed so that should remain intact.
+Yes, looks good to me, though I don't really know why partition scanning
+was skipped in the first place. I always thought the important part was
+the HIDDEN devices don't automatically enumerate in /dev/.
