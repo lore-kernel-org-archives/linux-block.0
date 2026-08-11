@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8107640B397;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2756B40B0FF;
 	Tue, 11 Aug 2026 06:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786430468; cv=none; b=Vj2+1hVQnw1JuVIxNELZWxEpOwU3i1hdCq2Yb7NK43SEuwD2ibSPvrI1UupRgygOA6CayRYZVqYibvQSKOxmHB8a08u+CAO48Yjr/JPjeAgd1Y7bwnsdOnk64Lh+2aB4DHfbUCm7CZD7zb72/Wx4SsfBV4oYRojhCT7XzSCeJcc=
+	t=1786430468; cv=none; b=AQetlsa+s6h1z2dIrntqeBrx9yC4OB/LvINlgOxpR73QMIe5mbYMopbegqOR4R7R94rAiXFqJ64esNyXuQWeLd4iSDo2353ojkvvZaSSR7hlRSpIYBDWwI/ogGa6Ek7L4s4vdSqiYgHz5Lw0l+rC4JJnNSLWWNJjPV1ZsIxIAvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786430468; c=relaxed/simple;
-	bh=t9D2Px8pUwrEcOg/YTzMXGqqQKBGT5HfYznSBGN9YqI=;
+	bh=zEzC1bDm4qRA6ByKIEshYxS19LhaxWKaqPARicYVbSg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CUdwvtm++oeKDhB9CkXDiw89JBF2opyaVEEqIue1d52jWiVbhAL6mFTY0Nus/BdwzcJSumc8Wm3rseMDk5gIY5oObYt9aMMLSvR9FzOE5TxZC4cgvsa3MUJrdJTiS8nCqORQ0XAg1eJL8HoKdeauhRrPd+k9nnWQJV0xk3LQKaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JFSor2hS; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=k88C4J7kmyvZNHYyh04U8vClG1V2frcwy0sqHn3zDxPmkiKiyDGF4gCWtvWAb/MqzirlEaFFYpoCxhvbL064gwVG8MyuJ6fJAHRRw2I6MfGaePBIUK/wkI/h4LM96RCn17K9DaipiQt3w5EwiLSnSJ+K0/Mjm7uC3E52d9yDN6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gVnrPEdQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JFSor2hS"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67B00C2BCFA;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gVnrPEdQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CA27C2BCFB;
 	Tue, 11 Aug 2026 06:41:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1786430466; bh=t9D2Px8pUwrEcOg/YTzMXGqqQKBGT5HfYznSBGN9YqI=;
+	t=1786430466; bh=zEzC1bDm4qRA6ByKIEshYxS19LhaxWKaqPARicYVbSg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=JFSor2hS5saK23uNOWSFZthothWmaXMnxBe0i93x7kOdIMBPvKjJhM1NXYcp18763
-	 ePvhNPHsnbi1K/5lHMTjAJGU1XH2ord61ZCfKBgqfcdj/JfWaTyjr6aUIsi3E2q77R
-	 ZNad6prv175RY5/mqFrJ49LkUWPd2DHKCUfiZcYs=
+	b=gVnrPEdQyYQrhY0CGZgW9mqhSovyj0KXiXIkzCwjd8sZL6dnbOx4Qt9e+wbfmZ4ck
+	 GoOuW+qMngYtkZ3LGsKH3eoemVxWp5u5uTu0wejFg5X91LisNDXCfzagmjCuutvUQh
+	 RXON1VjUvXChdcDxP5WTnym5S7OIxQtS8edlyhD8=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EE1C5B569;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74074C5B573;
 	Tue, 11 Aug 2026 06:41:06 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Tue, 11 Aug 2026 14:39:49 +0800
-Subject: [PATCH v10 07/10] rust: configfs: use `LocalModule` for
- `THIS_MODULE`
+Date: Tue, 11 Aug 2026 14:39:51 +0800
+Subject: [PATCH v10 09/10] rust: macros: remove `THIS_MODULE` static from
+ `module!`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260811-fix-fops-owner-v10-7-7e71776f9dbe@linux.dev>
+Message-Id: <20260811-fix-fops-owner-v10-9-7e71776f9dbe@linux.dev>
 References: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
 In-Reply-To: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -70,88 +70,60 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1786430463; l=2926;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1786430463; l=1900;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=t9D2Px8pUwrEcOg/YTzMXGqqQKBGT5HfYznSBGN9YqI=;
- b=qtMV7yeXqhaYZVvul4NqGhUUdcVoBe2tah6MnJR9lmmRAMqMf9KCsSFMqum5YtQXu+Xwjb+DI
- 5rNSgQBEO78AV7CBlIRkWjPfI8WZtXa/o3bEw/LNmfHh2b/LISgMfT0
+ bh=zEzC1bDm4qRA6ByKIEshYxS19LhaxWKaqPARicYVbSg=;
+ b=1SXXwL7/69fdog+H6q3ZRl9P8x/rjYjfRmiehW4bWBKNYp4nPWk+Je87t4b4KfsnjyrypfK/1
+ Lxu1/mVohceBQLDHbZR5t5DJznfUigOJPExFIKwJMlSTyvnqql21+v2
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
-macro with `this_module::<LocalModule>()`, and update
-rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
-with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
+All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
+`this_module::<LocalModule>()` helper. The `static THIS_MODULE`
+generated by the `module!` macro is no longer referenced anywhere,
+so remove it to avoid having two sources of the same `ThisModule`
+pointer.
 
 Assisted-by: opencode:glm-5.2
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Acked-by: Danilo Krummrich <dakr@kernel.org>
 Reviewed-by: Gary Guo <gary@garyguo.net>
-Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+Acked-by: Danilo Krummrich <dakr@kernel.org>
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Acked-by: Petr Pavlu <petr.pavlu@suse.com>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- drivers/block/rnull/configfs.rs | 5 +----
- rust/kernel/configfs.rs         | 9 ++++++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ rust/macros/module.rs | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index c10a55fc58948..9b28be2150933 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -1,9 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index aa9a618d5d19e..23b6a1b456b80 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -497,22 +497,6 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+         /// Used by the printing macros, e.g. [`info!`].
+         const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
  
--use super::{
--    NullBlkDevice,
--    THIS_MODULE, //
--};
-+use super::NullBlkDevice;
- use kernel::{
-     block::mq::gen_disk::{
-         GenDisk,
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 2339c6467325d..cd082b83e9e74 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -875,13 +875,14 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
- ///                 configfs::Subsystem<Configuration>,
- ///                 Configuration
- ///                 >::new_with_child_ctor::<N,Child>(
--///             &THIS_MODULE,
-+///             ::kernel::module::this_module::<crate::LocalModule>(),
- ///             &CONFIGURATION_ATTRS
- ///         );
- ///
- ///     &CONFIGURATION_TPE
- /// }
- /// ```
-+#[allow(clippy::crate_in_macro_def)]
- #[macro_export]
- macro_rules! configfs_attrs {
-     (
-@@ -1021,7 +1022,8 @@ macro_rules! configfs_attrs {
- 
-                     static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
-                         $crate::configfs::ItemType::<$container, $data>::new::<N>(
--                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                            $crate::module::this_module::<crate::LocalModule>(),
-+                            &[<$ data:upper _ATTRS >]
-                         );
-                 )?
- 
-@@ -1030,7 +1032,8 @@ macro_rules! configfs_attrs {
-                         $crate::configfs::ItemType<$container, $data>  =
-                             $crate::configfs::ItemType::<$container, $data>::
-                             new_with_child_ctor::<N, $child>(
--                                &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                                $crate::module::this_module::<crate::LocalModule>(),
-+                                &[<$ data:upper _ATTRS >]
-                             );
-                 )?
- 
+-        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
+-        // freed until the module is unloaded.
+-        #[cfg(MODULE)]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            extern "C" {
+-                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
+-            };
+-
+-            ::kernel::ThisModule::from_ptr(__this_module.get())
+-        };
+-
+-        #[cfg(not(MODULE))]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+-        };
+-
+         /// The `LocalModule` type is the type of the module created by `module!`,
+         /// `module_pci_driver!`, `module_platform_driver!`, etc.
+         type LocalModule = #type_;
 
 -- 
 2.43.0
