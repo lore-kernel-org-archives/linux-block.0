@@ -1,75 +1,86 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7293AAF54;
-	Tue, 11 Aug 2026 15:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFCD2931E2;
+	Tue, 11 Aug 2026 16:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786463721; cv=none; b=aXyCSL1EZWdSKDtj9dXwV1i6P+iXjezg/AmRr9uPm/V6Xmj20Vep1LGsn9473Eb8J6RzPxftJTjenzbtPkqkuKZuUJqdlY6AtfI8gAbH7RYUCBmksdZRfbYs+KbTuUYjRpHJ02wRx0AZMAuwJcA8IHpg72YJztkym4FoZZSGNfs=
+	t=1786467289; cv=none; b=anOJ7TZznYP98YpdKUhwxAiURCMexnjO14GWV6yYVaKNRtAjPLbxN6J+NvW2GTHah6YfYqFUa0NLebuCK4+8766R7szku6o2WGB6lOwuslvxw8j9jnV/PfI93/FfJNaTW+uy+9OY+1ZSgu5wabuS5Fm+PbK55UiuPY9Jg1rUjgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786463721; c=relaxed/simple;
-	bh=o7pKqL+V8jHvqIC3uuLlht86aS8zCzuhVWtdTYXWgJg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nMYMObSeYlVMZUqO8krEeE8bnnhnkeiqMh8XsvjwKE1XOak4TdWqZC9W3hs2mhLTPAqXS+ImXHEuC2UgEioKhNQSHaGne+wjfueMSHoU84ZCUxgUofbzWAbTCpVp6jzaThDic+nUKn55SuQ0P37/Cwtf1DwxajgsPC7vE/OXQW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4UcMMjaG; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1786467289; c=relaxed/simple;
+	bh=30LKNeNd4i8Elpft8MpybJD3r2hXHB7da18wxz4zo7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aErrMQzh8bOcKI5Fh0WfxGc4P7Flm4Cux/pRl/xP5y9hEI1CRESoF/HzyubfUW+1uinCHjBYBIRgCp+ORgFt7rUJmBtrIzu4WLe3pCgUPFi3HER67/caLOL4C0Wvy+rvs1DA1VCT4MaNe6WWarN0n6iq2zFuK3HUqvsfoVzPGLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lb/zXqFF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4UcMMjaG"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hKGRP5qyvzlfvqH;
-	Tue, 11 Aug 2026 15:55:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1786463708; x=1789055709; bh=/7jOoadU4RSr2ETMx8L1HcKC
-	tEGOBpPdsrhuLKe1I1c=; b=4UcMMjaGp8XynFfNXvWqBF2MnrqrCG04lkKpQlnR
-	f/EI6qut5eUVNApzyoMGOD5vKS7rHAi3uMA59PqLFUQT4WmT2/S9/TtMvgp5+4os
-	McInG2g59g4M10/3rXPqKi14h6emTDR8A1o/HKDeF0ypjCX6/SmwzQ72Bfgc2NDb
-	eNs4ztXRCwHtrcW61jmKsd8AOR9U+3/c6Wiox9cSa/WzR+JF/TEl/wldKahHIG66
-	bt4dnbBYUNXMa51j/6DdYdksbudKzhPFquhnqIBvkPSd8AxPR5R3ARz4Y+cPerGN
-	C9aA6dhVOFdazmHp1KTTH4cesDqaCcMEcElTB7Un7zESCw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id g1OgSEKNaeRt; Tue, 11 Aug 2026 15:55:08 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hKGRB6Czfzlfvq7;
-	Tue, 11 Aug 2026 15:55:01 +0000 (UTC)
-Message-ID: <aa55e215-34be-44b7-b489-5dc71b34fa97@acm.org>
-Date: Tue, 11 Aug 2026 08:54:59 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lb/zXqFF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F20A71F000E9;
+	Tue, 11 Aug 2026 16:54:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786467288;
+	bh=Z2TXg7aZhG/KrelMhIYVJ99hwjE63n3U7HIFuhBajkY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lb/zXqFFP7B4P6AJvYySOls7y5MVu/gyDEHC+8hQqAxjmcIVfBmEi7CUjvJfbSA4X
+	 U9IyNeDtDulGYBYj7Sra7AdBq6fRofOlSj8wO2NoWYig59yuOkvM0nAdfjbYxHKcKt
+	 wF6Bs2D+x2a9S/XnqJf2FjvQI1Be9wKIn/mQCepQ4RXp4loOVx7sTRjRPQlsV9Of+Z
+	 ZNeX7hqCuhimvkIucEKB2Gx0scaWdpKzLz1Cbwo6D97CX1JrVZV6LNtMTdsqjj3Vwt
+	 kSiIKMFUS6gg8MArFb09BL1h+PzSlLLlGtsqUUg/iBNPPibFgVQHbmugfGLcHy3CBH
+	 +iS/9a4/xIdIg==
+Date: Tue, 11 Aug 2026 06:54:47 -1000
+From: Tejun Heo <tj@kernel.org>
+To: JP Kobryn <jp.kobryn@linux.dev>
+Cc: Ziyang Men <ziyang.meme@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Mykola Lysenko <mykolal@meta.com>, kernel-team@meta.com,
+	linux-block@vger.kernel.org, bpf@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: add BPF kfuncs to read blkcg io.stat
+Message-ID: <antT1wtJEZ02CDx1@slm.duckdns.org>
+References: <20260807193732.4073299-1-ziyang.meme@gmail.com>
+ <20260807193732.4073299-2-ziyang.meme@gmail.com>
+ <anot9w6mg9538RWm@slm.duckdns.org>
+ <anpU4oV46MDVDixj@devvm16600.scu0.facebook.com>
+ <4306439e-a00f-4b10-b8a0-9be6e046873d@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/mq-deadline: Drop unused dd parameters
-To: Hongfu Li <hongfu.li@linux.dev>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Hongfu Li <lihongfu@kylinos.cn>
-References: <20260811065401.87147-1-hongfu.li@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260811065401.87147-1-hongfu.li@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4306439e-a00f-4b10-b8a0-9be6e046873d@linux.dev>
 
-On 8/10/26 11:54 PM, Hongfu Li wrote:
->   static struct request *
-> -deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
-> +deadline_fifo_request(struct dd_per_prio *per_prio,
->   		      enum dd_data_dir data_dir)
+Hello,
 
-The above does not follow the Linux kernel coding style. Please run "git 
-clang-format HEAD^" to fix this.
+On Mon, Aug 10, 2026 at 05:17:26PM -0700, JP Kobryn wrote:
+...
+> The get/put kfuncs above use KF_ACQUIRE/RELEASE so the verifier can
+> reject memcg access after the put. Replacing them with a generic API
+> would call for tracking a new lifetime relationship between the css and
+> memcg (or other derived) pointer.
 
-Thanks,
+So, if you need css -> memcg casting, I think that can just be RCU
+protected. In fact, even for the iteration and access, RCU protection
+probably makes more sense then KF_ACQUIRE/RELEASE. It's simpler and less
+overhead especially given that most bpf progs that people care about are
+non-sleepable and already in RCU critical section anyway.
 
-Bart.
+Thanks.
+
+-- 
+tejun
