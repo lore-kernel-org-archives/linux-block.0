@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63504484253
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 18:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E7E48381D
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 18:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786558434; cv=none; b=c+dr+DsJsoRQ327KhWbj9NwKgLs+Bwn1UxpdrSU/WJG3505Cd4i9LBIikpKcqohDIkLzCC2QwrTJYlDsm9eGmP2tZzP+Id6zWibcAK4NqPLhBkPHoe1azBPk6y2StwXTIntQOVUPWomEyE9L8sya8zBtPLhUbcMhEaeynhsN/uM=
+	t=1786558449; cv=none; b=HMCWLxDw10yzM7OtNk0anC37EA+HJ7s17sZwon6o8VQQEciCxb0KToT/8OnTzRoY5dx1Vnuz8AzAUXFucukxi1FIPOxBVx9j8mYGU+oadPSDwJs7dpZv4gCMKu4PwvE9AUxqB2m7xja7APcp8UTnvZL8zIojrGFkpfy6f/S+qWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786558434; c=relaxed/simple;
-	bh=pXmsgew6LHplNFdkV6enDJUmqQO4wZCvzVIbfHl6bcw=;
+	s=arc-20240116; t=1786558449; c=relaxed/simple;
+	bh=4CHPSMtLkZkn+ALCdY42GhONGELxuDRtBOKdsP1nyEo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lz07dmqJziiBvH/HR8OOO+MBMl+bToeSGp2q/UAb9thIFcsIifjmuKqYg1Ai6y+zuzKsWoU3UAxRcItBylnpk/8MMU2eBi6wBI7QQLeTpjlb+coeG6EgarVpWBmDEXH/FtF931XUo4zCNuNcsI96srvjSJlOGKIaeCxTaJ/1awM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BWBUPHQ3; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=OpLsSTxoTUM0At6dAiZ672mDxNJ7iRap1t5PwkdtbFEi6eWAKRJXk+toOviqzV7n5Jxnn3XJ2mdtnZ2mFj2vjI0RkvSx6VuTZ0hMErbZhj5W2D+e2t2YvqzQez8k/TdTwCkLni0AanKL/mebWNttkP9RsGdwNlkVjWAwal3hQ2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKa9IDAS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWBUPHQ3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKa9IDAS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786558432;
+	s=mimecast20190719; t=1786558447;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Vcu9PbtDT1pNYoR33movkVcPOA1p/h5oinwfvgSmomU=;
-	b=BWBUPHQ3Jdz5qTjzRWiRfrQUmDvdpvkd290NhPi6zNW8VdnPCS3QJbnRQpQFOEfptJmJ6h
-	0YjAmbTdUy2V4TkDU0sVePkHeAOsbFNEpH6VoeeRVPWqRoFUAfz5P36hrSwZKeJ/WqXEww
-	lF5nWQXNfY0/hROnL9GYjkR20lJ5y0M=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=woRBEeCuMp7hyrBJ2Q40BtYs80iQwOB8q8GOznjCNqM=;
+	b=AKa9IDASlSU2E2FKhZfEd1uKcANTvEuu3GU7qqARrBCg+uxhWnT5X/v2VqXePgkRQFXsI0
+	JNoDTpD2m7NKXbnhrWSfMf1fdi7dhVlac1fE2ZV8M2KmlbQl+YnDgfKWOeTm7DvniKf1vI
+	6SxGgbqu8BYU1PB4JnBrV1voXe4jcAI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-258--3g3ShMDN3KjRurcw1SDwA-1; Wed,
- 12 Aug 2026 14:13:46 -0400
-X-MC-Unique: -3g3ShMDN3KjRurcw1SDwA-1
-X-Mimecast-MFC-AGG-ID: -3g3ShMDN3KjRurcw1SDwA_1786558414
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-471-5lW4P-fXMsK4jTInPoZ6QA-1; Wed,
+ 12 Aug 2026 14:14:01 -0400
+X-MC-Unique: 5lW4P-fXMsK4jTInPoZ6QA-1
+X-Mimecast-MFC-AGG-ID: 5lW4P-fXMsK4jTInPoZ6QA_1786558437
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0849C195604B;
-	Wed, 12 Aug 2026 18:13:34 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 380B81800747;
+	Wed, 12 Aug 2026 18:13:57 +0000 (UTC)
 Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.22.88.181])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 41C3E180034F;
-	Wed, 12 Aug 2026 18:13:28 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 777AB18005BC;
+	Wed, 12 Aug 2026 18:13:51 +0000 (UTC)
 From: Jesse Taube <jtaubepe@redhat.com>
 To: linux-scsi@vger.kernel.org
 Cc: Jonathan Corbet <corbet@lwn.net>,
@@ -70,9 +70,9 @@ Cc: Jonathan Corbet <corbet@lwn.net>,
 	linux-kernel@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 04/13] nvme-multipath: queue-depth support for marginal paths
-Date: Wed, 12 Aug 2026 14:12:51 -0400
-Message-ID: <20260812181300.3712426-5-jtaubepe@redhat.com>
+Subject: [PATCH 08/13] scsi: scsi_transport_fc: user support for clearing NVME_CTRL_MARGINAL
+Date: Wed, 12 Aug 2026 14:12:55 -0400
+Message-ID: <20260812181300.3712426-9-jtaubepe@redhat.com>
 In-Reply-To: <20260812181300.3712426-1-jtaubepe@redhat.com>
 References: <20260812181300.3712426-1-jtaubepe@redhat.com>
 Precedence: bulk
@@ -86,76 +86,99 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
 From: John Meneghini <jmeneghi@redhat.com>
 
-Exclude marginal paths from queue-depth io policy. In the case where all
-paths are marginal and no optimized or non-optimized path is found, we
-fall back and select the best marginal path.
+Refactor and fc_rport_set_marginal_state smp safe by holding
+`shost->host_lock` around all `rport->port_state` accesses.
 
-Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
+Call nvme_fc_modify_rport_fpin_state() when FC_PORTSTATE_MARGINAL is set
+or cleared.  This allows the user to quickly set or clear the
+NVME_CTRL_MARGINAL state from sysfs.
+
+E.g.:
+
+ echo "Marginal" > /sys/class/fc_remote_ports/rport-13:0-5/port_state
+ echo "Online" > /sys/class/fc_remote_ports/rport-13:0-5/port_state
+
+Note: nvme_fc_modify_rport_fpin_state() will only affect rports that
+      have FC_PORT_ROLE_NVME_TARGET set.
+
 Signed-off-by: John Meneghini <jmeneghi@redhat.com>
 ---
 V10 -> V11:
- - New commit
+ - No change
 ---
- drivers/nvme/host/multipath.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ drivers/scsi/scsi_transport_fc.c | 42 +++++++++++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 02936c580a37..dc34634842be 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -453,7 +453,9 @@ static struct nvme_ns *nvme_round_robin_path(struct nvme_ns_head *head)
- static struct nvme_ns *nvme_queue_depth_path(struct nvme_ns_head *head)
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index df1edf3c23fa..af309a7bdc22 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -1251,34 +1251,58 @@ static ssize_t fc_rport_set_marginal_state(struct device *dev,
+ 						const char *buf, size_t count)
  {
- 	struct nvme_ns *best_opt = NULL, *best_nonopt = NULL, *ns;
--	unsigned int min_depth_opt = UINT_MAX, min_depth_nonopt = UINT_MAX;
-+	int min_depth_opt = INT_MAX, min_depth_nonopt = INT_MAX;
-+	bool opt_is_marginal = true, nonopt_is_marginal = true, marginal;
+ 	struct fc_rport *rport = transport_class_to_rport(dev);
++	struct Scsi_Host *shost = rport_to_shost(rport);
++	struct fc_internal *i = to_fc_internal(shost->transportt);
+ 	enum fc_port_state port_state;
+ 	int ret = 0;
++	unsigned long flags;
+ 
+ 	ret = get_fc_port_state_match(buf, &port_state);
+ 	if (ret)
+ 		return -EINVAL;
+-	if (port_state == FC_PORTSTATE_MARGINAL) {
 +
- 	unsigned int depth;
- 
- 	list_for_each_entry_srcu(ns, &head->list, siblings,
-@@ -462,28 +464,40 @@ static struct nvme_ns *nvme_queue_depth_path(struct nvme_ns_head *head)
- 			continue;
- 
- 		depth = atomic_read(&ns->ctrl->nr_active);
-+		marginal = nvme_ctrl_is_marginal(ns->ctrl);
- 
- 		switch (ns->ana_state) {
- 		case NVME_ANA_OPTIMIZED:
--			if (depth < min_depth_opt) {
-+			if (is_best_distance(opt_is_marginal, marginal,
-+					     min_depth_opt, depth)) {
- 				min_depth_opt = depth;
- 				best_opt = ns;
-+				opt_is_marginal = marginal;
- 			}
- 			break;
- 		case NVME_ANA_NONOPTIMIZED:
--			if (depth < min_depth_nonopt) {
-+			if (is_best_distance(nonopt_is_marginal, marginal,
-+					     min_depth_nonopt, depth)) {
- 				min_depth_nonopt = depth;
- 				best_nonopt = ns;
-+				nonopt_is_marginal = marginal;
- 			}
- 			break;
- 		default:
- 			break;
- 		}
- 
--		if (min_depth_opt == 0)
-+		if (min_depth_opt == 0 && !opt_is_marginal)
- 			return best_opt;
- 	}
- 
-+	/*
-+	 * Prefer non-marginal non-optimized path
-+	 * over a marginal optimized path.
-+	 */
-+	if (opt_is_marginal && !nonopt_is_marginal && best_nonopt)
-+		return best_nonopt;
++	spin_lock_irqsave(shost->host_lock, flags);
 +
- 	return best_opt ? best_opt : best_nonopt;
++	switch (port_state) {
++	case FC_PORTSTATE_MARGINAL:
+ 		/*
+ 		 * Change the state to Marginal only if the
+ 		 * current rport state is Online
+ 		 * Allow only Online->Marginal
+ 		 */
+-		if (rport->port_state == FC_PORTSTATE_ONLINE)
++		if (rport->port_state == FC_PORTSTATE_ONLINE) {
+ 			rport->port_state = port_state;
+-		else if (port_state != rport->port_state)
+-			return -EINVAL;
+-	} else if (port_state == FC_PORTSTATE_ONLINE) {
++			spin_unlock_irqrestore(shost->host_lock, flags);
++			if (i->f->set_rport_marginal)
++				i->f->set_rport_marginal(rport, true);
++			return count;
++		}
++		break;
++
++	case FC_PORTSTATE_ONLINE:
+ 		/*
+ 		 * Change the state to Online only if the
+ 		 * current rport state is Marginal
+ 		 * Allow only Marginal->Online
+ 		 */
+-		if (rport->port_state == FC_PORTSTATE_MARGINAL)
++		if (rport->port_state == FC_PORTSTATE_MARGINAL) {
+ 			rport->port_state = port_state;
+-		else if (port_state != rport->port_state)
+-			return -EINVAL;
+-	} else
++			spin_unlock_irqrestore(shost->host_lock, flags);
++			if (i->f->set_rport_marginal)
++				i->f->set_rport_marginal(rport, false);
++			return count;
++		}
++		break;
++	default:
++		break;
++	}
++
++	if (port_state != rport->port_state) {
++		spin_unlock_irqrestore(shost->host_lock, flags);
+ 		return -EINVAL;
++	}
++
++	spin_unlock_irqrestore(shost->host_lock, flags);
+ 	return count;
  }
  
 -- 
