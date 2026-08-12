@@ -1,385 +1,371 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C823176EF
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 12:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEB7314A8D
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 12:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786538071; cv=pass; b=IKRpv/QRwhL1vOrbtl+zaDXc0KuwTveCfBe6T5yeFjSEL5qp+f2acmDg4Ir4DYTAS7uHwb46ESd/fUf7emfuGXfDMPV5/8MbJw4OPVlDFWrUUiDlH5pD/zsUMJbrDiF8DAoWYWMrYMOp9c+wsI1hg7KVYCXpG5+VtctDd3OV6+I=
+	t=1786538262; cv=pass; b=d2+PfB6GoDjpbHHpluyKqLySONdvm33eFbUS8slaKYv7qqHTbMiyXaPXGMXVD8Z9C9cEIbBvMUR7NN3uozrewwk0vU8U1b+lCv2pDy6xjgmW2NLiZ+J0aPiAxc83Dj/a8sl1lHsSdd2kNHjTc1fZDgsBIQXjaWAxiH61F4XNQg8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786538071; c=relaxed/simple;
-	bh=mrOZn5cMBgBkTmxJvPXerAODjZxJShf/148YuJ6IEXg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E2Ig2KubTUt9nco2VAVS5CYJhrUNgicLqAArIlxbUdrEuhgM+pO3y7ljkLFUr32+qNYR7OwHS/3VgqP1YHpvV8Vd4ZQvnIMJZWA5ZZ9FGA3Y7BsIu2rxQc4epXwwqh6MFrBoGjqwYPfXWmgPCzHkfA3723f6+7sN0Kro0x0jxz0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dwVIh00t; arc=pass smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1786538262; c=relaxed/simple;
+	bh=MTcFyLg1LULIm8PA9y1XAE/q3UTEKaJqkbhAUy68EEo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=oeB46Fukc6pVcq0deQBvBeFLwxH8xMjNwvTjWb4Am0C1u6kDyadDtoB2D+RP8qTNVMCH1VbN5BlRO7t/AMBaOOIyo3sf3ha+sMgWr8fzNI8HF/2VfnXpGMuTV4B4VAHog5kvN2aLmYU4eJWer5W3tOc0SWXbUhdhMtmOHNPttZg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OQW9HoEK; arc=pass smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dwVIh00t"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-47fd66a094eso316217f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 05:34:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786538067; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQW9HoEK"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8ff5d1b0f91so4563036d6.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 05:37:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786538260; cv=none;
         d=google.com; s=arc-20260327;
-        b=K7upikxFUEWzFQTOkuiZSJZ2atGFZP7MxJIDrEz1abmJxUQ7lUW0sUYkxN9C/cCq01
-         NtDXzFPwxwt9O0xaXiHnqMMXuK2wPAxKoyJSJDT90bbGGykbTvGvMdPGCRSvgNyJoFHa
-         k6OTjSJ7IhG/a2k2dgXqyhJjY7SJ46s2Dng0i4sHeMr4hVSarH/0TJiO2kJ58xFhCNzZ
-         SRsjjgWXzFjSU2JGZqp4XWvFPi6/UzrBL9RxL/zVMfMis8dt0BvvEcqub0kmM1o8/kl9
-         Wv2gnxXZRQeoTzjbPC/av/051zLI8SZrF5YqI1VD8USwGdhuV82XEx5qV254wwPUZe9g
-         sTyA==
+        b=slnFLzdW58jkA3ioXtqsDYjI/vXt/WuoxKb34fB2GgTmbUiI+czrnxz6A6zSDetFpr
+         rVsapr2AXGpRB2ceAypGueDr82YjXqXZjMOPvfukpBoY1F2r6+WpRDitvFWAuILvkJiP
+         jSGd7/Udo3o6xpC2NZh14JKyGITK9rJhd1rb3vTNtya9CYwCDlcUvHm27XFdydvFdlyr
+         3kQoEdoiWJEXKUYHSXb8b+hVgqfvz4ietfEMvpQ+nQ2jqVGcZfVkDzTalrYBPIt2VzXK
+         M9WJOXtfqQEqbvG0Iypwzyinml8de+HYReG7d8ZLGr03GWSrjmpztMUq9fKNKPpoy6qs
+         aedg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=TBNKU7ZE2LSdhYyJUE7G5IOGyqcEFX6KHdz6ddJ3YBI=;
-        fh=S9tbkCqfoWcmAC7cZ2JRNfMVX7160CTdTEiuldYfBQk=;
-        b=bXboiG5fD3menwk1S1p9LX2qDcWX5UxO0vFxW2inA8DLxx7lQu2BcLWveHxSjwQLQB
-         qeJr7Rk28hVJenj34vmgn67xSzFvww8GcnobGlnvkrAuEznctYQBvyy0o6KgtL13RdNh
-         LtTTUw8+aBNkS0KcBV/aQTio5fQKe4hnvF7pXnADt0B6DB16tMEiZG8yTYj4Xyh9OCOL
-         74OGRlt/0XuN9KywdetoNfEjC9qk2AEuCI9r35xxQG0tW26KK4Dh++7hHG9Zr8ZAAgTJ
-         X9lJwIsz5dW/MWeqEgcd6n6LAxhRx/CltNo9t+jEjvbU9mJJT4tM9h09A/okBNBeBDSa
-         sZ4g==;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=V3/It0aGaWTKj8kEn8UZVkPRoGnX3EJ9qDdn9PyWZPs=;
+        fh=mLLgPi4CETxr/tgg1Jt6ep4vUjVYrAVpX/SOWH2q9zE=;
+        b=cWPgPER6V3tTKFtMaVKBos4LZbtcitFvQvow9Lcs9wFpTT/eftNINYLDt491uOsM/w
+         mK/cG3H7woqKTpT8ms5U8Q2qoYmfJ3oqVx1j+7tDaJspeAfGtvqHp383Ad00GS5PtqGh
+         C/3IsEu8zXb+bXqzttzmC0Va3qZEiiHjnMU9GJNRrEmb2ltXP17c+Ox1W2DQsF+dwbtW
+         mIM83LELlm5DId0915f9EJvggr2Apz7hOShgvV2Bgg3RkmMF8CY+O2c8/sn1QlqYmBV6
+         ySLVv8NxaiIXCqDhSwwutE+x+sWpImAL1twBBOXrTytD3/7iYQaqPHcZRrLuDhPksQei
+         XF1Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1786538067; x=1787142867; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TBNKU7ZE2LSdhYyJUE7G5IOGyqcEFX6KHdz6ddJ3YBI=;
-        b=dwVIh00td1tPqV6rgJAND1gavykKruH33Fsw5njZ0pvUNFqOCfxZFKu2TN5wsoaiNl
-         0wwcO6s9jArADkfj9bxiJ7WiF9SsAu5Ic0jZ6Mc7hcs7pRyOaGjpaCgO3tkTS/jxlFbW
-         JknEwzj7sAsPujsielpSlB/exgoqJnkpSWy9T3PcmjyRH7wo5ZiHhBhrYBZN1odyzmeE
-         ktsHp4KmUFrJ8Ul9s7GXWKjYYWs+hOrpxDgdqFu+XGsUBK8KenEi4mqPchjL/KpDlZXx
-         P3PFEjFm/+/lqh5gdZ2aKmymEi3caqbayLRie2Pk8zd+SSMPyxy1zw/fXE0n9gHiD9IR
-         xSVw==
+        d=gmail.com; s=20251104; t=1786538260; x=1787143060; darn=vger.kernel.org;
+        h=content-type:to:subject:message-id:date:from:mime-version:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=V3/It0aGaWTKj8kEn8UZVkPRoGnX3EJ9qDdn9PyWZPs=;
+        b=OQW9HoEKFWYZd91QX9bANurMPX62ixfM883zumNOg8DVZirVRt1zTeJYBJoD09j+Oe
+         m1NEX10V6CJarfN/rOJka2L77f0UzaVgG40ZqBEoAESiYl2HykZRN8YaHCRE6kp3F0js
+         v1oeslExPTqTEtSvpI7NrQcFppWD8RlJrt24Q0rKDOZBDOZKR4pPpgzk59ioDxZDHbc0
+         hp2L4KUAHXbe5Cx4g/eTE4EvwI7j5bwJZfNFnQp1Xc1moAP3uB2LUyXpd8t+HPyZC0ew
+         MCqHFyPizOIEq/BBKuAHrebFikZoKyOoa7r6liB04eGeN0q7mEM7v+mHg6iKC0tDJI+h
+         r+Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786538067; x=1787142867;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=TBNKU7ZE2LSdhYyJUE7G5IOGyqcEFX6KHdz6ddJ3YBI=;
-        b=jj3/yeF6AdDVc5oWuJnjaxQ6CqCD6HQYuS4W89c6tRV6kWZLnsGxpIku2SYYB/5iHd
-         y6DrZ+m5tcX32acF2BRpDoYri2bENO8rp+HlcEmnKb73II5owk+wnj+hutvtBL5NcSUY
-         gdkGieHk826LLVt4C5/2fYk2BcIxeORWpvqGHvUSYSoCwjnF0khb408+EVICWGRPjaBc
-         zAc6MDqFaH9p2X4DEiolyspRJhFWVhc4m/7cDTwwj8pu2+120GDbodA7MMoAJ8j+FENx
-         mFvI4/rQq/N8VKOuCKA4v19DaXciC4kdq8B/6QussbeN2sgAt4rFDb8PC5HfVxbRBDW+
-         gKWA==
-X-Forwarded-Encrypted: i=1; AHgh+RrhUyV1fXPuTEPDMNYjBidQsGjzMxCnizYBOD4qLoGt92acK8jSnkYysl9BM1NRW/VWsVFwP7SQ6gyHuA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDrFxT21E6oX280XyVPj/ytTPyR2/ES0UtXaW6MxvhFn1h6QN0
-	Pcw9wZvmmr8WqF1ZG0tDSo+xftmgh0x44CzuzYrp14sVfWCZtngq/XYkYKWT7iL6wqp6scaUF/Q
-	AIRwEbq+E5cpfzv8Ysc3oroTSibTqQvoJbxYR4O0nJQ==
-X-Gm-Gg: AR+sD10D2Y2u3Wc5Nd/BwcSReeUZk7V3dlsvKCk1G1SgzKvAzcKrpDNgWES+1v3iyih
-	SeqrZXv6WxoND9pqn2NGgEp/3E5vDU/HKjk1P9TOhZpTFh7CjkRKxOKTGo/Wg1TPzuK+zldmZ7g
-	dAUq5/l4V9Fmbe1SUBWP4Y8aIio1yEAc0in+2EQ5+SG9zraKy4tN5HPd6ukbO/LI5utum/am/N/
-	E20iIaSciCARo/oHyp3/9G7snHb6N8pE1/O8JK2Ec8b5wqSGF8gEKU4KQcgv8cuvRAccVzFfy0r
-	uNJ6pwsEuWIAuoa5bOjfZ/QbUtfN/Bnhk2afFEaCbTi660XFFYPiOvMuE2qBHv/JR3HUs6pfAoL
-	rBH2reqx7/V97+sht2wKYQRgw6dEbJhAlULOwIbwIiQ==
-X-Received: by 2002:a05:6000:982:b0:47e:9f16:c0bf with SMTP id
- ffacd0b85a97d-48152c892c8mr6794932f8f.30.1786538067366; Wed, 12 Aug 2026
- 05:34:27 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1786538260; x=1787143060;
+        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=V3/It0aGaWTKj8kEn8UZVkPRoGnX3EJ9qDdn9PyWZPs=;
+        b=UHiS+LbZIYTOqtwmzSIyjZzq4RxsU0M3Ks7I+C2xR3uD3Llp4X+3qD3imXqFS/zS9W
+         Lqctud6j1PN2cdhKjBOvQ8M7Ie60LvkaNMKPtYXXaygdHHGkDcG8ob6Qm8wqMELAvtOD
+         AySEuszrcQNFa5gOiYFjeQBehvdk19wJwrpRey2531NUC1nKMtz77bkCR7Xj+uQhtkAV
+         AfNIcIPPniQ3vpkIxYzSSY8S3blJc1SM9evLhyK8UGI3PFkAlFlU4zKnXbkKS1fewjEW
+         1IAsrUqEhBMIlDVbEEWT6y7INy3q8E3orNf1H4cHVzkQH/CDS1kSRuh98Aew7Efg6Zmv
+         awNQ==
+X-Gm-Message-State: AOJu0YxT33K0uSL2XtW530L2tScCvBeR27A80TlztlCOep6kAq0Q5gRn
+	7iRTJ4AbEhO2N2XKULdC+clhsebNcT91gPGz1M5OA5z2FKDj4bQAUoA9U3agJeLtPM3x2RbSz8P
+	2t4qeeO4Kphyf1qvHCWpFz7mSAAyzUlApCw==
+X-Gm-Gg: AR+sD11a/MZLNki9i1qGX2bXw3EfI6tT4ZADKdwuKP7xt3f1pSbQ4wKbZ41uAu+eVRk
+	Qt2445Dpruk9Q1R0ZlJ35HrFNlLfUAbBS88KkZis265qtL19iEzqyv8nvrglLehdaJ6ibTy/I5T
+	T9hAXxyTtSvN59S9cK7fRWydIvRDNqrHrYjdaq4P/Z++V2PT1UfNXYx88qAb/GrKcUcZYT+ToYb
+	6rzIOR7DPbF+HywIws9ULHJgxY9FpavHOY+ilIq6L/sqKQSSgP8DBAJeBIJKOZ4qO51vjtme/y7
+	cdOUt7fqV7fMeiYgeqxacyYej55arLYKGmjmVNuOqDk=
+X-Received: by 2002:a05:6214:e62:b0:908:23fd:813f with SMTP id
+ 6a1803df08f44-90a6ffc86e5mr38590176d6.15.1786538259691; Wed, 12 Aug 2026
+ 05:37:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-2-neelx@suse.com>
- <20260601224431.GA25574@quark> <CAPjX3Fe4yfrOWjZa-pW2AhBNG=6sfcrt82a8C9_cBzA5BkUbEg@mail.gmail.com>
-In-Reply-To: <CAPjX3Fe4yfrOWjZa-pW2AhBNG=6sfcrt82a8C9_cBzA5BkUbEg@mail.gmail.com>
-From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 12 Aug 2026 14:34:16 +0200
-X-Gm-Features: AUfX_mz9_9I_V7Suqp4uWFJciR3Fb6lbIm7Ta-rdfcxGsoSYznyaiSoQLpIf-es
-Message-ID: <CAPjX3Ff5_EaAVJv++_huk3Uw5sjJ5QfoZm0DzJx_UdObNChuiw@mail.gmail.com>
-Subject: Re: [PATCH v7 01/43] fscrypt: add per-extent encryption support
-To: Eric Biggers <ebiggers@kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Cc: Chris Mason <clm@fb.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+From: Ricardo AlgRicSpain <algricspain@gmail.com>
+Date: Wed, 12 Aug 2026 14:37:28 +0200
+X-Gm-Features: AUfX_mxqHciaPYF7TuMzd4zoRPjyMJafYjjsg0RRU9XPtvgTILSn7ot7Z4kKtTQ
+Message-ID: <CAOeC6wqyPMoUohXg9v=BxHYWmPncR_243CC2P=bptAaPvQXp+Q@mail.gmail.com>
+Subject: block/t10-pi.c: blk_integrity_interval() prot_iter misalignment with
+ extended metadata
+To: linux-block@vger.kernel.org
+Content-Type: multipart/mixed; boundary="00000000000058d9130658d8da0d"
+
+--00000000000058d9130658d8da0d
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 12 Aug 2026 at 12:34, Daniel Vacek <neelx@suse.com> wrote:
-> On Tue, 2 Jun 2026 at 00:44, Eric Biggers <ebiggers@kernel.org> wrote:
-> > On Wed, May 13, 2026 at 10:52:35AM +0200, Daniel Vacek wrote:
-> > > From: Josef Bacik <josef@toxicpanda.com>
-> > >
-> > > This adds the code necessary for per-extent encryption.  We will store a
-> > > nonce for every extent we create, and then use the inode's policy and
-> > > the extents nonce to derive a per-extent key.
-> > >
-> > > This is meant to be flexible, if we choose to expand the on-disk extent
-> > > information in the future we have a version number we can use to change
-> > > what exists on disk.
-> > >
-> > > The file system indicates it wants to use per-extent encryption by
-> > > setting s_cop->has_per_extent_encryption.  This also requires the use of
-> > > inline block encryption.
-> > >
-> > > The support is relatively straightforward, the only "extra" bit is we're
-> > > deriving a per-extent key to use for the encryption, the inode still
-> > > controls the policy and access to the master key.
-> > >
-> > > Since extent based encryption uses a lot of keys, we're requiring the
-> > > use of inline block crypto if you use extent-based encryption.  This
-> > > enables us to take advantage of the built in pooling and reclamation of
-> > > the crypto structures that underpin all of the encryption.
-> >
-> > The whole reason for extent-based encryption is that extents can be
-> > shared between inodes.  So the repeated mentions of "the inode" are
-> > really confusing.  This shows up in a lot of different places.
-> >
-> > What's actually implemented is that each extent stores its own
-> > (encryption_mode, master_key_identifier, nonce), but for now the
-> > invariant is maintained that all inodes that reference an extent share
-> > the same (encryption_mode, master_key_identifier) as the extent.
-> >
-> > It would be helpful to document this stuff accordingly.
->
-> Yeah, that makes sense. I believe this is what we want - any file is
-> unlocked by one key. Not that you would need multiple keys for
-> unlocking different parts of a file.
->
-> > > +/*
-> > > + * fscrypt_extent_context - the encryption context of an extent
-> > > + *
-> > > + * This is the on-disk information stored for an extent.  The nonce is used as a
-> > > + * KDF input in conjuction with the inode context to derive a per-extent key for
-> > > + * encryption.  This is used only when the filesystem uses per-extent encryption.
-> > > + *
-> >
-> > Basically the same issue here.  The master_key_identifier is actually
-> > stored in the extent.  Just the current implementation enforces that
-> > when the filesystem accesses the extent through some inode, that inode
-> > also has the same master_key_identifier.  How about replacing the second
-> > sentence with something like: "The nonce and master_key_identifier are
-> > used to derive the key which encrypts the extent."
->
-> Right, this sounds better.
->
-> > > + * With the current implementation, master_key_identifier and encryption mode
-> > > + * must match the inode context.  These are here for future expansion where we
-> > > + * may want the option of mixing different keys and encryption modes for the
-> > > + * same file.
-> > > + */
-> >
-> > Likewise.  Something like: With the current implementation,
-> > master_key_identifier and encryption_mode always match the corresponding
-> > values from the fscrypt_context in each inode that shares the extent.
->
-> Do we actually want this freedom or should we drop the encryption_mode
-> and master_key_identifier and consider them implicit from
-> inode/fscrypt_context?
-> That would mean storing only the nonce in the extent context. The
-> version field still remains, preserving the flexibility to eventually
-> add them back later if we decide to.
->
-> > > +struct fscrypt_extent_context {
-> > > +     u8 version; /* FSCRYPT_EXTENT_CONTEXT_V1 */
-> > > +     u8 encryption_mode;
-> > > +     u8 master_key_identifier[FSCRYPT_KEY_IDENTIFIER_SIZE];
-> > > +     u8 nonce[FSCRYPT_FILE_NONCE_SIZE];
-> > > +};
-> >
-> > Well, it's an extent nonce, not a file nonce.  It seems it's handled
-> > completely separately from the existing file nonce, so it probably
-> > should get its own size constant FSCRYPT_EXTENT_NONCE_SIZE.
->
-> This actually sounds more confusing to me. They are both the same
-> thing. My understanding was that extent is "kind of file" on it's own.
-> If anything I'd argue for FSCRYPT_NONCE_SIZE used in both places. But
-> a FSCRYPT_FILE_NONCE_SIZE used in inode context as well as in extent
-> context sounds fine to me.
->
-> > > +/**
-> > > + * fscrypt_set_bio_crypt_ctx_from_extent() - prepare a file contents bio for
-> > > + *                                        inline crypto with extent
-> > > + *                                        encryption
-> > > + * @bio: a bio which will eventually be submitted to the file
-> > > + * @ei: the extent's crypto info
-> >
-> > @ei: the extent's crypto info, or NULL if the extent is unencrypted
->
-> True, the @ei is optional. I'll fix that.
->
-> > > + * If the contents of the file should be encrypted (or decrypted) with inline
-> > > + * encryption, then assign the appropriate encryption context to the bio.
-> >
-> > "If the contents of the file should be encrypted (or decrypted) with
-> > inline encryption" => "If the extent should be encrypted (or decrypted)"
-> >
-> > There's no "file" here.  And inline encryption is the only option for
-> > extents.
->
-> OK.
->
-> > > +/**
-> > > + * fscrypt_mergeable_extent_bio() - test whether data can be added to a bio
-> > > + * @bio: the bio being built up
-> > > + * @ei: the fscrypt_extent_info for this extent
-> >
-> > @ei: the extent's crypto info, or NULL if the extent is unencrypted
->
-> True.
->
-> > > + * @pos: the next extent logical offset (in bytes) in the I/O
-> > > + *
-> > > + * When building a bio which may contain data which should undergo inline
-> > > + * encryption (or decryption) via fscrypt,
-> >
-> > When building a bio which may contain data which should undergo extent
-> > encryption (or decryption)
->
-> Ack.
->
-> > > +static struct fscrypt_extent_info *
-> > > +setup_extent_info(struct inode *inode, const u8 nonce[FSCRYPT_FILE_NONCE_SIZE])
-> > > +{
-> > > +     struct fscrypt_extent_info *ei;
-> > > +     struct fscrypt_inode_info *ci;
-> > > +     struct fscrypt_master_key *mk;
-> > > +     u8 derived_key[FSCRYPT_MAX_RAW_KEY_SIZE];
-> > > +     int keysize;
-> > > +     int err;
-> > > +
-> > > +     ci = *fscrypt_inode_info_addr(inode);
-> >
-> > fscrypt_get_inode_info_raw()
->
-> That would add a useless VFS_WARN_ON_ONCE() which will never trigger;
-> otherwise, the next line would crash.
-> But I guess that's OK.
->
-> > > +/**
-> > > + * fscrypt_prepare_new_extent() - prepare to create a new extent for a file
-> > > + * @inode: the encrypted inode
-> > > + *
-> > > + * If the inode is encrypted, setup the fscrypt_extent_info for a new extent.
-> > > +
-> > > + * This will include the nonce and the derived key necessary for the extent to
-> > > + * be encrypted.  This is only meant to be used with inline crypto and on inodes
-> > > + * that need their contents encrypted.
-> >
-> > This is ambiguous and contradictory about what type of @inode is
-> > required.  It should be something like:
-> >
-> > * @inode: an encrypted regular file with its key already set up, on a
-> > *        filesystem that uses per-extent encryption
-> > *
-> > * Prepare to encrypt a new extent by generating a new extent nonce,
-> > * deriving an extent key, and allocating an fscrypt_extent_info.
->
-> OK.
->
-> > > * This doesn't persist the new extents encryption context, this is done later
-> > > * by calling fscrypt_set_extent_context().
-> >
-> > There's no function with that name
->
-> That should be fscrypt_context_for_new_extent(). I see it was renamed
-> in v5 but this one (and the one below) was forgotten.
-> Will fix.
->
-> > > +     if (WARN_ON_ONCE(!*fscrypt_inode_info_addr(inode)))
-> > > +             return ERR_PTR(-EOPNOTSUPP);
-> > > +     if (WARN_ON_ONCE(!fscrypt_inode_uses_inline_crypto(inode)))
-> > > +             return ERR_PTR(-EOPNOTSUPP);
-> >
-> > I'm confused what these checks are trying to do.  The first part checks
-> > for the inode's encryption key, but setup_extent_info() does that
-> > anyway.
->
-> setup_extent_info() dereferences ci right away. Without this check it
-> would crash if the inode was not encrypted.
->
-> > ... The second part is maybe intended to check that the file uses
-> > extent encryption, but it doesn't do it correctly.  That would require:
-> > fscrypt_needs_contents_encryption(inode) &&
-> > inode->i_sb->s_cop->has_per_extent_encryption.
->
-> This may be better. The comment says this is only meant to be used
-> with inline crypto but that actually looks fishy. We ensure this in
-> btrfs but fscrypt itself does not need to.
->
-> > It probably would make sense to check that directly in
-> > setup_extent_info(), so that it's closer to the call to
-> > fscrypt_hkdf_expand() which would has a *very* bad failure mode when
-> > !has_per_extent_encryption.
->
-> I think it makes sense to check before consuming entropy.
-> setup_extent_info() can have a second check if needed, though perhaps
-> it was not needed so far?
->
-> > > +/**
-> > > + * fscrypt_load_extent_info() - create an fscrypt_extent_info from the context
-> > > + * @inode: the inode
-> > > + * @ctx: the context buffer
-> > > + * @ctx_size: the size of the context buffer
-> > > + *
-> > > + * Create the fscrypt_extent_info and derive the key based on the
-> > > + * fscrypt_extent_context buffer that is provided.
-> > > + *
-> > > + * Return: The newly allocated fscrypt_extent_info on success, -EOPNOTSUPP if
-> > > + *      we're not encrypted, or another -errno code
-> > > + */
-> >
-> > What context is this expected to be called in?  I see the caller uses
-> > memalloc_nofs_save().  This would require making ->mk_sem nofs-safe; is
-> > there a plan to do that?  (Sashiko noticed this too, by the way.)
->
-> Honestly, I have to admit I was puzzled by Sashiko's explanation and I
-> did not trust it. It sounded rather off.
->
-> Trying to dig up the origin of that memalloc_nofs_save() - it is there
-> since the very beginning of Josef's [v1] posting. This was around the
-> time of Linux v6.6 but the code is still similar.
-> So far I don't see if it is really needed or why it was implemented
-> this way in the first place. It is called from
-> btrfs_do_readpage()->btrfs_get_extent() to set up the key context.
-> IIUC, this should not be called from a reclaim path. Hence, I think
-> that that memalloc_nofs_save() is redundant and it should be OK to
-> simply remove it.
+Hi,
 
-And removing it and testing with stress-ng induced memory pressure
-seems to confirm the memalloc_nofs_save() is not needed in this code
-path.
+blk_integrity_interval() (block/t10-pi.c:270-305) advances prot_iter
+inconsistently:
 
-@Josef: By any chance, do you recall why this was originally put in?
+- fast path (t10-pi.c:282): advances metadata_size - pi_offset bytes
+- split-tuple path (t10-pi.c:285-287, 296-299): advances only
+  pi_tuple_size bytes via blk_integrity_copy_to_tuple/copy_from_tuple
 
---nX
+When metadata_size - pi_offset > pi_tuple_size (e.g. NVMe extended
+metadata) and the tuple splits across bvec segments, prot_iter
+under-advances by the trailing opaque bytes, and the offset accumulates
+across subsequent intervals, breaking guard/data correspondence on
+verify and generate.
 
-> [v1] https://lore.kernel.org/linux-btrfs/de7dec18d4dd440ebf3c538af5c765d747e1d3ef.1695750478.git.josef@toxicpanda.com/
->
-> > > +     const struct fscrypt_inode_info *ci = *fscrypt_inode_info_addr(inode);
-> >
-> > fscrypt_get_inode_info_raw(inode)
->
-> OK.
->
-> > > +/**
-> > > + * fscrypt_set_extent_context() - Set the fscrypt extent context of a new extent
-> >
-> > It seems the function name and semantics changed at some point, but the
-> > kerneldoc wasn't updated.
->
-> As mentioned above, I see V4 -> v5 rename. No semantics changes.
->
-> > > + * @inode: the inode this extent belongs to
-> >
-> > The inode that the extent will initially belong to, I guess?
->
-> Yes, at this point it's a new extent for this inode.
->
-> > > +ssize_t fscrypt_context_for_new_extent(struct inode *inode,
-> > > +                                    struct fscrypt_extent_info *ei, u8 *buf)
-> > > +{
-> > > +     struct fscrypt_extent_context *ctx = (struct fscrypt_extent_context *)buf;
-> > > +     const struct fscrypt_inode_info *ci = *fscrypt_inode_info_addr(inode);
-> >
-> > fscrypt_get_inode_info_raw(inode)
->
-> Again, adds an useless WARN_ON_ONCE, but won't hurt.
->
-> Thanks!
->
-> --nX
->
-> > - Eric
+Suggested fix: after copy_to_tuple/copy_from_tuple, advance the
+remaining bytes:
+
+    bvec_iter_advance(iter->bip->bip_vec, &iter->prot_iter,
+            iter->bi->metadata_size - iter->bi->pi_offset -
+            iter->bi->pi_tuple_size);
+
+...matching what blk_tuple_remap_end() already does (t10-pi.c:426-436).
+
+Standalone C PoC reproducing the misalignment attached (poc.c).
+
+Thanks,
+
+--00000000000058d9130658d8da0d
+Content-Type: application/octet-stream; name="poc.c"
+Content-Disposition: attachment; filename="poc.c"
+Content-Transfer-Encoding: base64
+Content-ID: <f_msq2mhl60>
+X-Attachment-Id: f_msq2mhl60
+
+LyoKICogUG9DIOKAlCBibGtfaW50ZWdyaXR5X2ludGVydmFsKCk6IHByb3RlY3Rpb24gaXRlcmF0
+b3IgbWlzYWxpZ25tZW50CiAqIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogKiBSZXByb2R1Y2VzIGluIHVzZXJz
+cGFjZSB0aGUgZXhhY3QgbG9naWMgb2YgdDEwLXBpLmM6CiAqCiAqICAgYmxrX2ludGVncml0eV9p
+bnRlcnZhbCgpICAodDEwLXBpLmM6MjcwKQogKiAgIGJsa19pbnRlZ3JpdHlfY29weV90b190dXBs
+ZSgpIC8gYmxrX2ludGVncml0eV9jb3B5X2Zyb21fdHVwbGUoKSAodDEwLXBpLmM6OTMpCiAqICAg
+YnZlY19pdGVyX2FkdmFuY2Vfc2luZ2xlKCkgLyBidmVjX2l0ZXJfYWR2YW5jZSgpIChpbmNsdWRl
+L2xpbnV4L2J2ZWMuaCkKICogICBtcF9idmVjX2l0ZXJfYnZlYygpIChpbmNsdWRlL2xpbnV4L2J2
+ZWMuaCkKICoKICogYW5kIGRlbW9uc3RyYXRlcyB0aGUgZGl2ZXJnZW5jZSBpbiBob3cgYHByb3Rf
+aXRlcmAgaXMgYWR2YW5jZWQgYmV0d2VlbiB0aGUKICogZmFzdCBwYXRoIChhbGlnbmVkIHR1cGxl
+KSBhbmQgdGhlIHNwbGl0LXR1cGxlIHBhdGgsIHdoZW4gdGhlIG1ldGFkYXRhCiAqIGZvcm1hdCBo
+YXMgdHJhaWxpbmcgcGFkZGluZy9vcGFxdWUgYnl0ZXMgKG1ldGFkYXRhX3NpemUgPiBwaV9vZmZz
+ZXQgKwogKiBwaV90dXBsZV9zaXplKS4KICoKICogU3BlY2lmaWNhbGx5LCBmb3IgYSBiaW8gd2hv
+c2UgbWV0YWRhdGEgYmxvY2sgaXMgc3BsaXQgYWNyb3NzIHR3byBidmVjczoKICogICAtIGludGVy
+dmFsIDAgaXMgcHJvY2Vzc2VkIHZpYSB0aGUgc2xvdyBwYXRoICAtPiBwcm90X2l0ZXIgYWR2YW5j
+ZXMgT05MWSBwaV90dXBsZV9zaXplCiAqICAgLSBpbnRlcnZhbCAxIGlzIHByb2Nlc3NlZCB2aWEg
+dGhlIGZhc3QgcGF0aCAgLT4gcHJvdF9pdGVyIGFkdmFuY2VzIG1ldGFkYXRhX3NpemUtcGlfb2Zm
+c2V0CiAqIEludGVydmFsIDEgZW5kcyB1cCBtaXNhbGlnbmVkOiBpdHMgdHVwbGUgaXMgcmVhZC93
+cml0dGVuIGF0IHRoZSB3cm9uZwogKiBvZmZzZXQgKG92ZXJsYXBwaW5nIHdpdGggdGhlIG9wYXF1
+ZSBieXRlcyBvZiBpbnRlcnZhbCAwKSwgYW5kIHRoZSBlcnJvcgogKiBhY2N1bXVsYXRlcyBvdmVy
+IHN1YnNlcXVlbnQgaW50ZXJ2YWxzLgogKgogKiBJdCBhbHNvIGRlbW9uc3RyYXRlcyB0aGUgdmlv
+bGF0aW9uIG9mIHRoZSBwcmVjb25kaXRpb24gb2YKICogYGJ2ZWNfaXRlcl9hZHZhbmNlX3Npbmds
+ZWAgKGJ5dGVzIDw9IGJ2W2ktPmJpX2lkeF0uYnZfbGVuKSBvbiB0aGUgZmFzdAogKiBwYXRoIHdo
+ZW4gbWV0YWRhdGFfc2l6ZSAtIHBpX29mZnNldCA+IHBidi5idl9sZW4sIHdoaWNoIGxlYXZlcyB0
+aGUKICogaXRlcmF0b3IgaW4gYW4gaW5jb25zaXN0ZW50IHN0YXRlIChPT0Igb24gdGhlIG5leHQg
+YWNjZXNzKS4KICoKICogQnVpbGQgYW5kIHJ1bjoKICogICBnY2MgLU8wIC1XYWxsIC1XZXh0cmEg
+LW8gcG9jIHBvYy5jICYmIC4vcG9jCiAqCiAqIE91dHB1dDogMCBpZiB0aGUgYnVnIHJlcHJvZHVj
+ZXMgKG1pc21hdGNoIGRldGVjdGVkKSwgMSBvdGhlcndpc2UuCiAqLwoKI2luY2x1ZGUgPHN0ZGlv
+Lmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHN0cmluZy5oPgojaW5jbHVkZSA8c3Rk
+Ym9vbC5oPgoKLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tICovCi8qIE1pbmltYWwgbW9kZWwgb2Ygc3RydWN0IGJpb192
+ZWMgLyBidmVjX2l0ZXIgKGluY2x1ZGUvbGludXgvYnZlYy5oKSAqLwovKiAtLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gKi8K
+CnR5cGVkZWYgdW5zaWduZWQgaW50IHUzMjsKCnN0cnVjdCBiaW9fdmVjIHsKCXZvaWQgICAqYnZf
+cGFnZTsgICAvKiBpbiB1c2Vyc3BhY2U6IGJhc2Ugb2YgdGhlIGJ1ZmZlciAqLwoJdTMyICAgICBi
+dl9sZW47Cgl1MzIgICAgIGJ2X29mZnNldDsKfTsKCnN0cnVjdCBidmVjX2l0ZXIgewoJdTMyICAg
+ICBiaV9zaXplOyAgICAgICAvKiBieXRlcyByZW1haW5pbmcgKi8KCXUzMiAgICAgYmlfaWR4OyAg
+ICAgICAgLyogY3VycmVudCBidmVjICovCgl1MzIgICAgIGJpX2J2ZWNfZG9uZTsgIC8qIGJ5dGVz
+IGNvbnN1bWVkIGZyb20gdGhlIGN1cnJlbnQgYnZlYyAqLwp9OwoKc3RhdGljIGlubGluZSB1MzIg
+YnZfbWluKHUzMiBhLCB1MzIgYikgeyByZXR1cm4gYSA8IGIgPyBhIDogYjsgfQoKc3RhdGljIGlu
+bGluZSBzdHJ1Y3QgYmlvX3ZlYwptcF9idmVjX2l0ZXJfYnZlYyhjb25zdCBzdHJ1Y3QgYmlvX3Zl
+YyAqYnZlY3MsIHN0cnVjdCBidmVjX2l0ZXIgaXRlcikKewoJY29uc3Qgc3RydWN0IGJpb192ZWMg
+KmIgPSAmYnZlY3NbaXRlci5iaV9pZHhdOwoJc3RydWN0IGJpb192ZWMgb3V0ID0gewoJCS5idl9w
+YWdlICAgPSBiLT5idl9wYWdlLAoJCS5idl9sZW4gICAgPSBidl9taW4oYi0+YnZfbGVuIC0gaXRl
+ci5iaV9idmVjX2RvbmUsIGl0ZXIuYmlfc2l6ZSksCgkJLmJ2X29mZnNldCA9IGItPmJ2X29mZnNl
+dCArIGl0ZXIuYmlfYnZlY19kb25lLAoJfTsKCXJldHVybiBvdXQ7Cn0KCi8qIFNpbmdsZS1wYWdl
+IHZlcnNpb24gKHQxMC1waS5jIHVzZXMgYnZlY19pdGVyX2J2ZWMpOyB3aXRob3V0IHBhZ2luZyB0
+aGUKICogcmVzdWx0IGlzIGlkZW50aWNhbCB0byBtcF9idmVjX2l0ZXJfYnZlYy4gKi8Kc3RhdGlj
+IGlubGluZSBzdHJ1Y3QgYmlvX3ZlYwpidmVjX2l0ZXJfYnZlYyhjb25zdCBzdHJ1Y3QgYmlvX3Zl
+YyAqYnZlY3MsIHN0cnVjdCBidmVjX2l0ZXIgaXRlcikKewoJcmV0dXJuIG1wX2J2ZWNfaXRlcl9i
+dmVjKGJ2ZWNzLCBpdGVyKTsKfQoKLyoKICogYnZlY19pdGVyX2FkdmFuY2Vfc2luZ2xlKCkg4oCU
+IGxpdGVyYWwgcG9ydCBvZiBpbmNsdWRlL2xpbnV4L2J2ZWMuaC4KICogRG9jdW1lbnRlZCBQUkVD
+T05ESVRJT046IGJ5dGVzIDw9IGJ2W2ktPmJpX2lkeF0uYnZfbGVuIChtdXN0IG5vdCBjcm9zcwog
+KiBidmVjIGJvdW5kYXJpZXMpLiBUaGUgZmFzdCBwYXRoIG9mIGJsa19pbnRlZ3JpdHlfaW50ZXJ2
+YWwgdmlvbGF0ZXMgaXQKICogKHNlZSDCpzQpLgogKi8Kc3RhdGljIGlubGluZSB2b2lkCmJ2ZWNf
+aXRlcl9hZHZhbmNlX3NpbmdsZShjb25zdCBzdHJ1Y3QgYmlvX3ZlYyAqYnYsIHN0cnVjdCBidmVj
+X2l0ZXIgKml0ZXIsCgkJCSB1bnNpZ25lZCBpbnQgYnl0ZXMpCnsKCXVuc2lnbmVkIGludCBkb25l
+ID0gaXRlci0+YmlfYnZlY19kb25lICsgYnl0ZXM7CgoJaWYgKGRvbmUgPT0gYnZbaXRlci0+Ymlf
+aWR4XS5idl9sZW4pIHsKCQlkb25lID0gMDsKCQlpdGVyLT5iaV9pZHgrKzsKCX0KCWl0ZXItPmJp
+X2J2ZWNfZG9uZSA9IGRvbmU7CglpdGVyLT5iaV9zaXplIC09IGJ5dGVzOwp9CgovKiBidmVjX2l0
+ZXJfYWR2YW5jZSgpIOKAlCBsaXRlcmFsIHBvcnQ7IERPRVMgY3Jvc3MgYnZlYyBib3VuZGFyaWVz
+LiBUaGlzIGlzCiAqIHRoZSBvbmUgYmxrX3R1cGxlX3JlbWFwX2VuZCgpIHVzZXMgdG8gY29uc3Vt
+ZSB0aGUgZnVsbCBtZXRhZGF0YSBibG9jay4gKi8Kc3RhdGljIGlubGluZSB2b2lkCmJ2ZWNfaXRl
+cl9hZHZhbmNlKGNvbnN0IHN0cnVjdCBiaW9fdmVjICpidiwgc3RydWN0IGJ2ZWNfaXRlciAqaXRl
+ciwKCQkgIHVuc2lnbmVkIGludCBieXRlcykKewoJdW5zaWduZWQgaW50IGlkeCA9IGl0ZXItPmJp
+X2lkeDsKCglpZiAoYnl0ZXMgPiBpdGVyLT5iaV9zaXplKSB7CgkJaXRlci0+Ymlfc2l6ZSA9IDA7
+CgkJcmV0dXJuOwoJfQoJaXRlci0+Ymlfc2l6ZSAtPSBieXRlczsKCWJ5dGVzICs9IGl0ZXItPmJp
+X2J2ZWNfZG9uZTsKCgl3aGlsZSAoYnl0ZXMgJiYgYnl0ZXMgPj0gYnZbaWR4XS5idl9sZW4pIHsK
+CQlieXRlcyAtPSBidltpZHhdLmJ2X2xlbjsKCQlpZHgrKzsKCX0KCglpdGVyLT5iaV9pZHggPSBp
+ZHg7CglpdGVyLT5iaV9idmVjX2RvbmUgPSBieXRlczsKfQoKLyogLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovCi8qIFBv
+cnQgb2YgYmxrX2ludGVncml0eV9jb3B5X3RvX3R1cGxlIC8gY29weV9mcm9tX3R1cGxlICh0MTAt
+cGkuYykgICAqLwovKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gKi8KCi8qIFRoZSBjb3BpZXMgYWR2YW5jZSBleGFjdGx5
+IGB0dXBsZV9zaXplYCBieXRlcyAoc3VtIG9mIGxlbiBhY3Jvc3MgYnZlY3MpLiAqLwpzdGF0aWMg
+dm9pZApibGtfaW50ZWdyaXR5X2NvcHlfdG9fdHVwbGUoY29uc3Qgc3RydWN0IGJpb192ZWMgKmJ2
+ZWNzLCBzdHJ1Y3QgYnZlY19pdGVyICppdGVyLAoJCQkgICAgdW5zaWduZWQgaW50IHR1cGxlX3Np
+emUpCnsKCXdoaWxlICh0dXBsZV9zaXplKSB7CgkJc3RydWN0IGJpb192ZWMgcGJ2ID0gYnZlY19p
+dGVyX2J2ZWMoYnZlY3MsICppdGVyKTsKCQl1bnNpZ25lZCBpbnQgbGVuID0gYnZfbWluKHR1cGxl
+X3NpemUsIHBidi5idl9sZW4pOwoKCQkvKiBtZW1jcHkocHJvdF9idWYsIHR1cGxlLCBsZW4pIOKA
+lCBjb250ZW50IGlzIG5vdCBtb2RlbGVkICovCgkJYnZlY19pdGVyX2FkdmFuY2Vfc2luZ2xlKGJ2
+ZWNzLCBpdGVyLCBsZW4pOwoJCXR1cGxlX3NpemUgLT0gbGVuOwoJfQp9CgpzdGF0aWMgdm9pZApi
+bGtfaW50ZWdyaXR5X2NvcHlfZnJvbV90dXBsZShjb25zdCBzdHJ1Y3QgYmlvX3ZlYyAqYnZlY3Ms
+IHN0cnVjdCBidmVjX2l0ZXIgKml0ZXIsCgkJCSAgICAgIHVuc2lnbmVkIGludCB0dXBsZV9zaXpl
+KQp7Cgl3aGlsZSAodHVwbGVfc2l6ZSkgewoJCXN0cnVjdCBiaW9fdmVjIHBidiA9IGJ2ZWNfaXRl
+cl9idmVjKGJ2ZWNzLCAqaXRlcik7CgkJdW5zaWduZWQgaW50IGxlbiA9IGJ2X21pbih0dXBsZV9z
+aXplLCBwYnYuYnZfbGVuKTsKCgkJLyogbWVtY3B5KHR1cGxlLCBwcm90X2J1ZiwgbGVuKSAqLwoJ
+CWJ2ZWNfaXRlcl9hZHZhbmNlX3NpbmdsZShidmVjcywgaXRlciwgbGVuKTsKCQl0dXBsZV9zaXpl
+IC09IGxlbjsKCX0KfQoKLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovCi8qIFBvcnQgb2YgYmxrX2ludGVncml0eV9p
+bnRlcnZhbCAodDEwLXBpLmM6MjcwKSAgICAgICAgICAgICAgICAgICAgICAqLwovKiAtLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0gKi8KCi8qCiAqIFJldHVybnMgdGhlIG9mZnNldCAod2l0aGluIHRoZSBtZXRhZGF0YSBidWZm
+ZXIpIGF0IHdoaWNoIHRoZSBpbnRlcnZhbCdzCiAqIHR1cGxlIHdhcyBhY2Nlc3NlZCwgb3IgLTEg
+aWYgdGhlIGl0ZXJhdG9yIHN0YXRlIGlzIGluY29uc2lzdGVudC4KICogYHZlcmlmeWAgPSB0cnVl
+IC0+IHZlcmlmaWNhdGlvbiBwYXRoOyBmYWxzZSAtPiBnZW5lcmF0ZSBwYXRoLgogKi8Kc3RhdGlj
+IGxvbmcKYmxrX2ludGVncml0eV9pbnRlcnZhbF9yZXBsaWNhKGNvbnN0IHN0cnVjdCBiaW9fdmVj
+ICpidmVjcywKCQkJICAgICAgIHN0cnVjdCBidmVjX2l0ZXIgKnByb3RfaXRlciwKCQkJICAgICAg
+IHUzMiBwaV9vZmZzZXQsIHUzMiBwaV90dXBsZV9zaXplLAoJCQkgICAgICAgdTMyIG1ldGFkYXRh
+X3NpemUsIGJvb2wgdmVyaWZ5LAoJCQkgICAgICAgdTMyICpjc3VtX29mZnNldF9hdF9lbnRyeSkK
+ewoJLyogb2Zmc2V0IG9mIHByb3RfaXRlciBvbiBlbnRyeSAoaG93IG11Y2ggaGFzIGFscmVhZHkg
+YmVlbiBjb25zdW1lZCkgKi8KCXUzMiBjb25zdW1lZCA9IGJ2ZWNzWzBdLmJ2X29mZnNldDsgLyog
+dW51c2VkOiB3ZSBtZWFzdXJlIHZpYSBiaV9zaXplICovCgkodm9pZCljb25zdW1lZDsKCgkvKgoJ
+ICogYmxrX2ludGVncml0eV9jc3VtX29mZnNldCgpOiBjb25zdW1lcyBgcGlfb2Zmc2V0YCBieXRl
+cyAoZnJvbnQKCSAqIHBhZGRpbmcpIHdoaWxlIGNvbXB1dGluZyB0aGUgY2hlY2tzdW0gb3ZlciB0
+aGVtLiBXZSBvbmx5IG1vZGVsCgkgKiB0aGUgYWR2YW5jZSBoZXJlLgoJICovCgl1bnNpZ25lZCBp
+bnQgb2Zmc2V0ID0gcGlfb2Zmc2V0OwoJc3RydWN0IGJ2ZWNfaXRlciBpdGVyID0gKnByb3RfaXRl
+cjsKCXdoaWxlIChvZmZzZXQgPiAwKSB7CgkJc3RydWN0IGJpb192ZWMgcGJ2ID0gYnZlY19pdGVy
+X2J2ZWMoYnZlY3MsIGl0ZXIpOwoJCXVuc2lnbmVkIGludCBsZW4gPSBidl9taW4ocGJ2LmJ2X2xl
+biwgb2Zmc2V0KTsKCgkJYnZlY19pdGVyX2FkdmFuY2Vfc2luZ2xlKGJ2ZWNzLCAmaXRlciwgbGVu
+KTsKCQlvZmZzZXQgLT0gbGVuOwoJfQoJKmNzdW1fb2Zmc2V0X2F0X2VudHJ5ID0gaXRlci5iaV9i
+dmVjX2RvbmU7CgoJLyogYWJzb2x1dGUgb2Zmc2V0IG9mIHRoZSB0dXBsZSA9IGJ5dGVzIGNvbnN1
+bWVkIGZyb20gdGhlIHN0YXJ0LgoJICogVGhlIGJ1ZmZlciBzdGFydHMgYXQgdGhlIGZpcnN0IGJ2
+ZWM7IHRoZSBidmVjcyBhcmUgY29udGlndW91cyBpbgoJICogdGhpcyBQb0MsIHNvIHdlIGNvbXB1
+dGUgdGhlIGFic29sdXRlIHBvc2l0aW9uIGJ5IHN1bW1pbmcgdGhlbSB1cC4gKi8KCXUzMiBjb25z
+dW1lZF9hYnMgPSAwOwoJZm9yICh1MzIgaSA9IDA7IGkgPCBpdGVyLmJpX2lkeDsgaSsrKQoJCWNv
+bnN1bWVkX2FicyArPSBidmVjc1tpXS5idl9sZW47Cgljb25zdW1lZF9hYnMgKz0gaXRlci5iaV9i
+dmVjX2RvbmU7Cgljb25zdW1lZF9hYnMgLT0gcGlfb2Zmc2V0OyAvKiBzdWJ0cmFjdCB0aGUgcGFk
+ZGluZyBhbHJlYWR5IHRyYXZlcnNlZCAqLwoKCXN0cnVjdCBiaW9fdmVjIHBidiA9IGJ2ZWNfaXRl
+cl9idmVjKGJ2ZWNzLCBpdGVyKTsKCWlmIChwYnYuYnZfbGVuID49IHBpX3R1cGxlX3NpemUpIHsK
+CQkvKiBGQVNUIFBBVEgg4oCUIGFkdmFuY2VzIG1ldGFkYXRhX3NpemUgLSBwaV9vZmZzZXQgKi8K
+CQlidmVjX2l0ZXJfYWR2YW5jZV9zaW5nbGUoYnZlY3MsICZpdGVyLAoJCQkJCSBtZXRhZGF0YV9z
+aXplIC0gcGlfb2Zmc2V0KTsKCX0gZWxzZSBpZiAodmVyaWZ5KSB7CgkJLyogU0xPVyBQQVRIICh2
+ZXJpZnkpIOKAlCBhZHZhbmNlcyBPTkxZIHBpX3R1cGxlX3NpemUgKi8KCQlibGtfaW50ZWdyaXR5
+X2NvcHlfdG9fdHVwbGUoYnZlY3MsICZpdGVyLCBwaV90dXBsZV9zaXplKTsKCX0gZWxzZSB7CgkJ
+LyogU0xPVyBQQVRIIChnZW5lcmF0ZSk6IGJsa19pbnRlZ3JpdHlfc2V0IHdyaXRlcyBpbnRvIHRo
+ZQoJCSAqIG9uLXN0YWNrIHR1cGxlIGFuZCBjb3B5X2Zyb21fdHVwbGUgYWR2YW5jZXMgcGlfdHVw
+bGVfc2l6ZS4gKi8KCQlibGtfaW50ZWdyaXR5X2NvcHlfZnJvbV90dXBsZShidmVjcywgJml0ZXIs
+IHBpX3R1cGxlX3NpemUpOwoJfQoKCSpwcm90X2l0ZXIgPSBpdGVyOwoJcmV0dXJuIChsb25nKWNv
+bnN1bWVkX2FiczsKfQoKLyoKICogRklYRUQgdmVyc2lvbjogYWZ0ZXIgdGhlIHNsb3cgcGF0aCwg
+Y29uc3VtZXMgdGhlIHJlc3Qgb2YgdGhlIGJsb2NrCiAqIChtZXRhZGF0YV9zaXplIC0gcGlfb2Zm
+c2V0IC0gcGlfdHVwbGVfc2l6ZSksIHNhbWUgYXMgYmxrX3R1cGxlX3JlbWFwX2VuZC4KICovCnN0
+YXRpYyBsb25nCmJsa19pbnRlZ3JpdHlfaW50ZXJ2YWxfZml4ZWQoY29uc3Qgc3RydWN0IGJpb192
+ZWMgKmJ2ZWNzLAoJCQkgICAgIHN0cnVjdCBidmVjX2l0ZXIgKnByb3RfaXRlciwKCQkJICAgICB1
+MzIgcGlfb2Zmc2V0LCB1MzIgcGlfdHVwbGVfc2l6ZSwKCQkJICAgICB1MzIgbWV0YWRhdGFfc2l6
+ZSwgYm9vbCB2ZXJpZnksCgkJCSAgICAgdTMyICpjc3VtX29mZnNldF9hdF9lbnRyeSkKewoJdW5z
+aWduZWQgaW50IG9mZnNldCA9IHBpX29mZnNldDsKCXN0cnVjdCBidmVjX2l0ZXIgaXRlciA9ICpw
+cm90X2l0ZXI7Cgl3aGlsZSAob2Zmc2V0ID4gMCkgewoJCXN0cnVjdCBiaW9fdmVjIHBidiA9IGJ2
+ZWNfaXRlcl9idmVjKGJ2ZWNzLCBpdGVyKTsKCQl1bnNpZ25lZCBpbnQgbGVuID0gYnZfbWluKHBi
+di5idl9sZW4sIG9mZnNldCk7CgoJCWJ2ZWNfaXRlcl9hZHZhbmNlX3NpbmdsZShidmVjcywgJml0
+ZXIsIGxlbik7CgkJb2Zmc2V0IC09IGxlbjsKCX0KCSpjc3VtX29mZnNldF9hdF9lbnRyeSA9IGl0
+ZXIuYmlfYnZlY19kb25lOwoKCXUzMiBjb25zdW1lZF9hYnMgPSAwOwoJZm9yICh1MzIgaSA9IDA7
+IGkgPCBpdGVyLmJpX2lkeDsgaSsrKQoJCWNvbnN1bWVkX2FicyArPSBidmVjc1tpXS5idl9sZW47
+Cgljb25zdW1lZF9hYnMgKz0gaXRlci5iaV9idmVjX2RvbmU7Cgljb25zdW1lZF9hYnMgLT0gcGlf
+b2Zmc2V0OwoKCXN0cnVjdCBiaW9fdmVjIHBidiA9IGJ2ZWNfaXRlcl9idmVjKGJ2ZWNzLCBpdGVy
+KTsKCWlmIChwYnYuYnZfbGVuID49IHBpX3R1cGxlX3NpemUpIHsKCQlidmVjX2l0ZXJfYWR2YW5j
+ZV9zaW5nbGUoYnZlY3MsICZpdGVyLCBtZXRhZGF0YV9zaXplIC0gcGlfb2Zmc2V0KTsKCX0gZWxz
+ZSB7CgkJLyogc2xvdyBwYXRoOiBjb3B5ICsgY29uc3VtZSB0aGUgcmVzdCBvZiB0aGUgYmxvY2sg
+Ki8KCQlpZiAodmVyaWZ5KQoJCQlibGtfaW50ZWdyaXR5X2NvcHlfdG9fdHVwbGUoYnZlY3MsICZp
+dGVyLCBwaV90dXBsZV9zaXplKTsKCQllbHNlCgkJCWJsa19pbnRlZ3JpdHlfY29weV9mcm9tX3R1
+cGxlKGJ2ZWNzLCAmaXRlciwgcGlfdHVwbGVfc2l6ZSk7CgkJLyogRklYOiBhZHZhbmNlIHRoZSBy
+ZXN0IG9mIHRoZSBtZXRhZGF0YSBibG9jayAqLwoJCXUzMiByZXN0ID0gbWV0YWRhdGFfc2l6ZSAt
+IHBpX29mZnNldCAtIHBpX3R1cGxlX3NpemU7CgkJaWYgKHJlc3QgPiAwKQoJCQlidmVjX2l0ZXJf
+YWR2YW5jZShidmVjcywgJml0ZXIsIHJlc3QpOwoJfQoKCSpwcm90X2l0ZXIgPSBpdGVyOwoJcmV0
+dXJuIChsb25nKWNvbnN1bWVkX2FiczsKfQoKLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovCi8qIFRlc3QgaGVscGVy
+cyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAq
+LwovKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0gKi8KCnN0YXRpYyBpbnQgZmFpbHVyZXM7CnN0YXRpYyBib29sIGJ1Z19y
+ZXByb2R1Y2VkOwoKI2RlZmluZSBDSEVDSyhjb25kLCBmbXQsIC4uLikJCQkJCQlcCglkbyB7CQkJ
+CQkJCQlcCgkJaWYgKGNvbmQpIHsJCQkJCQlcCgkJCXByaW50ZigiICBbT0sgXSAiIGZtdCAiXG4i
+LCAjI19fVkFfQVJHU19fKTsJXAoJCX0gZWxzZSB7CQkJCQkJXAoJCQlwcmludGYoIiAgW0JVR10g
+IiBmbXQgIlxuIiwgIyNfX1ZBX0FSR1NfXyk7CVwKCQkJZmFpbHVyZXMrKzsJCQkJCVwKCQl9CQkJ
+CQkJCVwKCX0gd2hpbGUgKDApCgovKgogKiBTY2VuYXJpbzogYSBtZXRhZGF0YSBidWZmZXIgb2Yg
+YG5faW50ZXJ2YWxzICogbWV0YWRhdGFfc2l6ZWAgYnl0ZXMgc3BsaXQKICogaW50byB0d28gY29u
+dGlndW91cyBidmVjcy4gVGhlIHNwbGl0IHBvaW50IGlzIGF0IGBzcGxpdGAgYnl0ZXMsIHNvIHRo
+YXQKICogdGhlIGZpcnN0IG1ldGFkYXRhIGJsb2NrICgwLi5tZXRhZGF0YV9zaXplKSBlbmRzIHVw
+IGRpdmlkZWQgYW5kIGl0cwogKiB0dXBsZSAoaWYgc3BsaXQgPCBwaV90dXBsZV9zaXplKSBpcyBw
+cm9jZXNzZWQgdmlhIHRoZSBzbG93IHBhdGguCiAqLwpzdGF0aWMgdm9pZApydW5fc2NlbmFyaW8o
+Y29uc3QgY2hhciAqbmFtZSwgdTMyIG1ldGFkYXRhX3NpemUsIHUzMiBwaV9vZmZzZXQsCgkgICAg
+IHUzMiBwaV90dXBsZV9zaXplLCB1MzIgbl9pbnRlcnZhbHMsIHUzMiBzcGxpdCwKCSAgICAgYm9v
+bCBleHBlY3RfbWlzYWxpZ24pCnsKCWNoYXIgKmJ1ZiA9IGNhbGxvYygxLCAoc2l6ZV90KW5faW50
+ZXJ2YWxzICogbWV0YWRhdGFfc2l6ZSk7CglzdHJ1Y3QgYmlvX3ZlYyBidmVjc1syXSA9IHsKCQl7
+IC5idl9wYWdlID0gYnVmLCAuYnZfbGVuID0gc3BsaXQsIC5idl9vZmZzZXQgPSAwIH0sCgkJeyAu
+YnZfcGFnZSA9IGJ1ZiwgLmJ2X2xlbiA9ICh1MzIpbl9pbnRlcnZhbHMgKiBtZXRhZGF0YV9zaXpl
+IC0gc3BsaXQsCgkJICAuYnZfb2Zmc2V0ID0gc3BsaXQgfSwKCX07CglzdHJ1Y3QgYnZlY19pdGVy
+IGJ1Z2d5ID0gewoJCS5iaV9zaXplID0gKHUzMiluX2ludGVydmFscyAqIG1ldGFkYXRhX3NpemUs
+CgkJLmJpX2lkeCA9IDAsIC5iaV9idmVjX2RvbmUgPSAwLAoJfTsKCXN0cnVjdCBidmVjX2l0ZXIg
+Zml4ZWQgPSBidWdneTsKCXUzMiBvZmZfYnVnZ3lbMTZdLCBvZmZfZml4ZWRbMTZdOwoJdTMyIGNz
+dW1fZTsKCglwcmludGYoIlxuPT09ICVzID09PVxuIiwgbmFtZSk7CglwcmludGYoIiAgICBtZXRh
+ZGF0YV9zaXplPSV1IHBpX29mZnNldD0ldSBwaV90dXBsZV9zaXplPSV1ICIKCSAgICAgICAiaW50
+ZXJ2YWxzPSV1IHNwbGl0PSV1IGV4cGVjdF9taXNhbGlnbj0lc1xuIiwKCSAgICAgICBtZXRhZGF0
+YV9zaXplLCBwaV9vZmZzZXQsIHBpX3R1cGxlX3NpemUsIG5faW50ZXJ2YWxzLCBzcGxpdCwKCSAg
+ICAgICBleHBlY3RfbWlzYWxpZ24gPyAieWVzIiA6ICJubyIpOwoKCWJvb2wgcmVwcm8gPSBmYWxz
+ZTsKCWZvciAodTMyIGl2ID0gMDsgaXYgPCBuX2ludGVydmFsczsgaXYrKykgewoJCW9mZl9idWdn
+eVtpdl0gPSAodTMyKWJsa19pbnRlZ3JpdHlfaW50ZXJ2YWxfcmVwbGljYSgKCQkJYnZlY3MsICZi
+dWdneSwgcGlfb2Zmc2V0LCBwaV90dXBsZV9zaXplLAoJCQltZXRhZGF0YV9zaXplLCB0cnVlLCAm
+Y3N1bV9lKTsKCQlvZmZfZml4ZWRbaXZdID0gKHUzMilibGtfaW50ZWdyaXR5X2ludGVydmFsX2Zp
+eGVkKAoJCQlidmVjcywgJmZpeGVkLCBwaV9vZmZzZXQsIHBpX3R1cGxlX3NpemUsCgkJCW1ldGFk
+YXRhX3NpemUsIHRydWUsICZjc3VtX2UpOwoJfQoKCWZvciAodTMyIGl2ID0gMDsgaXYgPCBuX2lu
+dGVydmFsczsgaXYrKykgewoJCXUzMiBleHBlY3RlZCA9IGl2ICogbWV0YWRhdGFfc2l6ZTsKCQlw
+cmludGYoIiAgICBpbnRlcnZhbCAldTogYnVnZ3kgdHVwbGVAJXUgIGZpeGVkIHR1cGxlQCV1ICAo
+Y29ycmVjdD0ldSklc1xuIiwKCQkgICAgICAgaXYsIG9mZl9idWdneVtpdl0sIG9mZl9maXhlZFtp
+dl0sIGV4cGVjdGVkLAoJCSAgICAgICBvZmZfYnVnZ3lbaXZdICE9IGV4cGVjdGVkID8gIiAgPC0t
+IE1JU0FMSUdOIiA6ICIiKTsKCQlpZiAob2ZmX2J1Z2d5W2l2XSAhPSBleHBlY3RlZCkKCQkJcmVw
+cm8gPSB0cnVlOwoJfQoKCWlmIChleHBlY3RfbWlzYWxpZ24pIHsKCQlpZiAocmVwcm8pCgkJCWJ1
+Z19yZXByb2R1Y2VkID0gdHJ1ZTsKCQlDSEVDSyhyZXBybywgIiVzOiBidWcgcmVwcm9kdWNlZCAo
+dHVwbGUgYXQgd3Jvbmcgb2Zmc2V0KSIsIG5hbWUpOwoJfSBlbHNlIHsKCQlDSEVDSyghcmVwcm8s
+ICIlczogbm8gb3BhcXVlLCBib3RoIHBhdGhzIGFncmVlIChubyBidWcpIiwgbmFtZSk7Cgl9CgoJ
+ZnJlZShidWYpOwp9CgovKiBGYXN0IHBhdGg6IHByZWNvbmRpdGlvbiB2aW9sYXRpb24gb2YgYnZl
+Y19pdGVyX2FkdmFuY2Vfc2luZ2xlICovCnN0YXRpYyB2b2lkCnJ1bl9mYXN0cGF0aF9wcmVjb25k
+X3Zpb2xhdGlvbih2b2lkKQp7CgljaGFyIGJ1ZlszMl07CglzdHJ1Y3QgYmlvX3ZlYyBidmVjc1sx
+XSA9IHsgeyAuYnZfcGFnZSA9IGJ1ZiwgLmJ2X2xlbiA9IDEyLCAuYnZfb2Zmc2V0ID0gMCB9IH07
+CglzdHJ1Y3QgYnZlY19pdGVyIGl0ZXIgPSB7IC5iaV9zaXplID0gMTIsIC5iaV9pZHggPSAwLCAu
+YmlfYnZlY19kb25lID0gMCB9OwoJdTMyIHBpX29mZnNldCA9IDAsIHBpX3R1cGxlX3NpemUgPSA4
+LCBtZXRhZGF0YV9zaXplID0gMTY7IC8qIG9wYXF1ZT04ICovCgl1MzIgY3N1bV9lOwoKCXByaW50
+ZigiXG49PT0gRmFzdCBwYXRoOiBidmVjX2l0ZXJfYWR2YW5jZV9zaW5nbGUgcHJlY29uZGl0aW9u
+ID09PVxuIik7CglwcmludGYoIiAgICBidmVjWzBdLmJ2X2xlbj0xMiBwaV90dXBsZV9zaXplPTgg
+bWV0YWRhdGFfc2l6ZT0xNlxuIik7CglwcmludGYoIiAgICBwYnYuYnZfbGVuKDEyKSA+PSBwaV90
+dXBsZV9zaXplKDgpIC0+IGZhc3QgcGF0aFxuIik7CglwcmludGYoIiAgICBidXQgYWR2YW5jZT1t
+ZXRhZGF0YV9zaXplLXBpX29mZnNldD0xNiA+IHBidi5idl9sZW49MTJcbiIpOwoKCWxvbmcgb2Zm
+ID0gYmxrX2ludGVncml0eV9pbnRlcnZhbF9yZXBsaWNhKAoJCWJ2ZWNzLCAmaXRlciwgcGlfb2Zm
+c2V0LCBwaV90dXBsZV9zaXplLCBtZXRhZGF0YV9zaXplLCB0cnVlLAoJCSZjc3VtX2UpOwoKCXBy
+aW50ZigiICAgIHJlc3VsdDogYmlfaWR4PSV1IGJpX2J2ZWNfZG9uZT0ldSAoYnZlY19sZW49MTIp
+XG4iLAoJICAgICAgIGl0ZXIuYmlfaWR4LCBpdGVyLmJpX2J2ZWNfZG9uZSk7CglDSEVDSyhpdGVy
+LmJpX2J2ZWNfZG9uZSA+IGJ2ZWNzWzBdLmJ2X2xlbiwKCSAgICAgICJidmVjX2l0ZXJfYWR2YW5j
+ZV9zaW5nbGUoKSBsZWZ0IGJpX2J2ZWNfZG9uZT0ldSA+IGJ2X2xlbj0ldSAiCgkgICAgICAiKHBy
+ZWNvbmRpdGlvbiB2aW9sYXRpb24gYnl0ZXMgPD0gYnZbaV0uYnZfbGVuIC0+IE9PQiBvbiB0aGUg
+IgoJICAgICAgIm5leHQgYWNjZXNzKSIsCgkgICAgICBpdGVyLmJpX2J2ZWNfZG9uZSwgYnZlY3Nb
+MF0uYnZfbGVuKTsKCSh2b2lkKW9mZjsKfQoKLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovCi8qIG1haW4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAq
+LwovKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0gKi8KCmludCBtYWluKHZvaWQpCnsKCXByaW50ZigiUG9DOiBibGtfaW50
+ZWdyaXR5X2ludGVydmFsKCkg4oCUIHByb3RfaXRlciBtaXNhbGlnbm1lbnRcbiIpOwoJcHJpbnRm
+KCIgICAgIHJlcGxpY2Egb2YgdDEwLXBpLmMgb3ZlciBidmVjX2l0ZXIgKHVwc3RyZWFtIG1hc3Rl
+cilcbiIpOwoKCS8qIE5WTWUtbGlrZSBjYXNlOiAxNkIgbWV0YWRhdGEsIDhCIHR1cGxlIGF0IHRo
+ZSBzdGFydCwgOEIgb3BhcXVlLgoJICogV0lUSCB0cmFpbGluZyBvcGFxdWUgLT4gdGhlIHNsb3cg
+cGF0aCBhZHZhbmNlcyBsZXNzIC0+IG1pc2FsaWdubWVudC4gKi8KCXJ1bl9zY2VuYXJpbygibnZt
+ZS1leHRlbmRlZCAxNkIvOEIrOEIiLCAxNiwgMCwgOCwgNCwgNCwgdHJ1ZSk7CgkvKiBDUkM2NC1s
+aWtlOiAxNkIgbWV0YWRhdGEsIDE2QiB0dXBsZSwgbm8gb3BhcXVlIC0+IHNob3VsZCBub3QgZmFp
+bC4gKi8KCXJ1bl9zY2VuYXJpbygiY3JjNjQgMTZCLzE2QiAobm8gb3BhcXVlKSIsIDE2LCAwLCAx
+NiwgNCwgOCwgZmFsc2UpOwoJLyogd2l0aCBwaV9vZmZzZXQ6IDI0QiBtZXRhZGF0YSwgOEIgdHVw
+bGUgYXQgb2Zmc2V0IDggKDgrOCBvcGFxdWUpLiAqLwoJcnVuX3NjZW5hcmlvKCJwaV9vZmZzZXQg
+MjRCLzhCQDgiLCAyNCwgOCwgOCwgMywgMTAsIHRydWUpOwoKCXJ1bl9mYXN0cGF0aF9wcmVjb25k
+X3Zpb2xhdGlvbigpOwoKCS8qIENvbnRyb2wgY2FzZTogcGxhaW4gVDEwIDhCIChubyBvcGFxdWUp
+IC0+IG5vIGJ1Zy4gKi8KCXByaW50ZigiXG49PT0gQ29udHJvbDogcGxhaW4gVDEwIDhCIChubyBv
+cGFxdWUpID09PVxuIik7CglydW5fc2NlbmFyaW8oImZsYXQtOEIiLCA4LCAwLCA4LCA0LCA0LCBm
+YWxzZSk7CgoJcHJpbnRmKCJcbiVzXG4iLCBmYWlsdXJlcyA/ICI9PT4gU09NRSBDSEVDSyBGQUlM
+RUQgKHVuZXhwZWN0ZWQgYmVoYXZpb3IpIgoJCQkJICA6ICI9PT4gYWxsIGV4cGVjdGVkIGNoZWNr
+cyBwYXNzZWQiKTsKCXByaW50ZigiJXNcbiIsIGJ1Z19yZXByb2R1Y2VkCgkJICAgICAgID8gIj09
+PiBCVUcgQ09ORklSTUVEOiBwcm90X2l0ZXIgbWlzYWxpZ25zIHdpdGggZXh0ZW5kZWQgbWV0YWRh
+dGEgKHRyYWlsaW5nIG9wYXF1ZSkiCgkJICAgICAgIDogIj09PiBidWcgbm90IHJlcHJvZHVjZWQi
+KTsKCXJldHVybiBidWdfcmVwcm9kdWNlZCA/IDAgOiAxOwp9Cg==
+--00000000000058d9130658d8da0d--
