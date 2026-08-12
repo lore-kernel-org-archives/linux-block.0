@@ -1,164 +1,376 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B04040D588
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AA3424D7C
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 10:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786530477; cv=fail; b=n/2GuJxGKtMA5R6LZ3XfmLSgzRIpSPs9thnGwRpX/hGd9PGzxL6Aom/2DLx5dn7lFQYJqQLAmxfgqruG9idB46lAN1O5KlJbmxZ/vkMsVWTwuHXA9vpK+b8bC98XEwOckHZps2th4WbqifFEGPkTGNEeTCdul2z9ihxc+mPsKic=
+	t=1786530866; cv=pass; b=WLMPd8SvS8hpWPvY4EPThJKM6CeGZ3LD9Au44OUT+1rJ1mDszGX4lDITQ2Bo3bIdkrXw8HuZrEOgbfQJMV7RsmoO5aYq8kf5hVfw/znW4h8FuiFxsjvxG9rIcKRbAVZt5oyWvPRsrbivpn8gtAvUPgY4SmYGsVixuGudWKvxKbs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786530477; c=relaxed/simple;
-	bh=0hFm4yO+V2KgeQG0ik8lLOHczCQdLX2syeEcd394fgI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=snqV1bXWT2mDJd5yxzEMy9rdh9BujrES89D6uzFCC6cJIL2KCNl93lkuJkpEK6TyiMdKzKZRbKpxzFFtbyNDpSDjM6/rJ7IvKlsogmLLxXMsDSdEivRwfzXI9Bk1zm6ZCQrCO6dlpZs5EFN4ou7iL1uOZtV5Ur50DSGps9klt7g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=AwlA0nJ4; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=yIBiE8pz; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1786530866; c=relaxed/simple;
+	bh=Mrnv8sptG1Ixrth/QH2KNpCMMGrMlDSEWTfDRFXg9Y4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J5bU+BbonwOpCUrCTBop7DDcTWVfIuR2zE1u9wK8tO8WxaSTbpSRydsCqLImx34cpxW5KclYJh9rEISyjdLTB62ictvz6alCmVuIRi5/R7ATvrke0ldomRVMcSftMFr3TqUP0d/T79YM5/nHizQhGTebwYKUpzNzfih+U8P5W8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PzFpQfz+; arc=pass smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AwlA0nJ4";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="yIBiE8pz"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1786530479; x=1818066479;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0hFm4yO+V2KgeQG0ik8lLOHczCQdLX2syeEcd394fgI=;
-  b=AwlA0nJ4OCSPEQScHzMrideOQaI+VExKhJdJWT2ifMs92ixg8CRW3mSC
-   ivPxIok6uIDmfotc0KYU5zUzPbkHrvlkdvRtiawsM3hTDHIPYCqaJf2iW
-   pA011fycl3xOCxHbadtRnsVd6HvdCqXWBHFm9NiOcZYnY2GIMuh5NI0dL
-   somrsEMX2E2d+9Y1T6Gg1GehLAs5cr3xgz/u0rwxwkkePz1UL1uR0lQSM
-   G1eYR6v0cZlblHTYFb7eK1cLx0odgTc7u2vzwMYeqQD7cz/NMzl+E0yzn
-   sUglVrlYEqYemfXt8QsnKQCkFArkJ+Pj5uLNz7N/ysMTGpYzcW/3D2Jk9
-   A==;
-X-CSE-ConnectionGUID: 5iYjGZ3qSl6rZSnOGfV/sg==
-X-CSE-MsgGUID: ebw4ceQmRral7Um94Birvg==
-X-IronPort-AV: E=Sophos;i="6.25,219,1779120000"; 
-   d="scan'208";a="153002852"
-Received: from mail-northcentralusazon11012035.outbound.protection.outlook.com (HELO CH5PR02CU005.outbound.protection.outlook.com) ([40.107.200.35])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2026 18:26:50 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GU0lF6PdDWWgMTVIApbOq8+MpqpQO/ZnZ4xxXLn9xSWMkXGYBJus0xtHvGwkhA9Es0aL99cCGG7wvoUrzMGlMAPC/r1xLpZh+neNSwx1p5RhgCNRE3xSwNKorGIPSaois/1dtrzWug97O1SszspZXfKNMmkRp7bN7i3C45gA2eDUREjIdLYap48UaL81/I4slchhhH+Cw1Eg5S5NQVTRVM87NjEnlbsJbyX/OvFp245hbFn59xBMbhYPqL9ZbnYB3SqYzJ9PC4NVt1WG4qmhDPkheaQ39/34dF8yCENmhneIQzNLqXtWzoR+djyN/tPn/7nb0afu6EhSLEokB1MD8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0hFm4yO+V2KgeQG0ik8lLOHczCQdLX2syeEcd394fgI=;
- b=Y2H/S5IGrJcU8qMKU8ZpFQ6kzQJ7Esu1UFlSeebuoWgRYornE3OLGN4Q8EXojFjC2IB+zab7oj4cl7UCR2TJlvtRZJ3FcVc86UxpJ8cZxwYrgSkjlv8zqKqawk/OG2CoL1AgKw3rEmQfsMMCBVWSe54cpsFw1fBZjFt+j9wg9QPyKv9YTvoQS66WZ9b3HwnPmDUPZyVk5QfA43xE7vdXli/2YQmwNQdrIt88mYOXJYgJzFrc8mzdeZ2F3zN94hH6/pH4AHw9ROiVuWd+eEer7JG3lDm/A9gy3PTfhU5dfJcgzz1um07M2jg1uMoWTeL8OXyCZIvY5WI8dspwm10VAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PzFpQfz+"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4954a9e8490so12284215e9.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 03:34:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786530862; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MfbkSE8aVEbDDM1pliyqdhkLH7Q+uTNM7VFv3cZZrcZgm8FIFErqr+d8V4W44KoqQF
+         Ut07WxDR9rz3ZNXujNOxMHAQuKbb9v5472hjCubwOanGvXaqgzj2jKZbyj74f1V+HPes
+         nVscpter9ujgoWCI9lghtJRpGFumS6ZJvv38IBTL1v3bHjQ67lcC6mLyEpNMKtBO6zWe
+         Qm5mI8zW37LtbpIug6g/lE9Q/YvZCC2Mj6b+kRN63Bd9kRnk/p/capQfia2M9Sku+TrQ
+         9lHHibNibXF28iSsgjQQ5ffuCuiQ6B2TgSRi7M3UdFcO2siuzKgmf3kUfvjxSsTPyaZN
+         pNPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=0opKHY0hArTd0tLmaIUqxiwMIhkUQB0s3SgD4CDSLQE=;
+        fh=hjUjTupf2Y4NWdYnqV0aJ9NfdeJtIwD4Zcx/d7wM9UE=;
+        b=qkMT2iLsPMhsgJ1Sw0EwWs4QaTL55TwhQdMLcXllOMTJde9KqD61WntdXpkPZsK2o2
+         7XXLDUOKd+SJvNmyLsIHGMLUscbTGITwhqYKdPE6KBPsyIWKidbTd6DYvMkbuTYWkf7m
+         zmqbwrU5mRbARhchCDB6V+7g02wE1XAhSBOjYc051+2I5PHhYFvZMCM3y3lAfd3FUuyA
+         EalfQTuvPGyv1WKb1Rfv4lUy6/vlrcGKX1IQu2biYhGsMrtGbHNpQGkRrfW0FBc32U3u
+         qqcr+nQnpVvP+nWzQ7WpGb3ZfUbiYBjYGWOV8tSl+SiewtbcSA1Rm/NJZNsZh4cHpIGy
+         hR1g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0hFm4yO+V2KgeQG0ik8lLOHczCQdLX2syeEcd394fgI=;
- b=yIBiE8pzhdyQhTDLMox63meoAkXMDdECsoXtIAfq7S9NFjVZVSPJ7poQnK5nA6c2kH3pVwJUq4kzPho3tF0voQ5lFwZlkpVLtXNmm2REa/dFUMw2rANlGrY+8a31vbs3h/xsFPgSydqCViVkp3mVKs2fi6cMqoRy4gMSlXio+Xs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA6PR04MB9447.namprd04.prod.outlook.com (2603:10b6:806:436::21)
- by PH7PR04MB8633.namprd04.prod.outlook.com (2603:10b6:510:245::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.12; Wed, 12 Aug
- 2026 10:26:44 +0000
-Received: from SA6PR04MB9447.namprd04.prod.outlook.com
- ([fe80::14c6:1c14:485f:1825]) by SA6PR04MB9447.namprd04.prod.outlook.com
- ([fe80::14c6:1c14:485f:1825%6]) with mapi id 15.21.0315.014; Wed, 12 Aug 2026
- 10:26:44 +0000
-Message-ID: <97a022d6-01b0-4220-ad87-9535f0257296@wdc.com>
-Date: Wed, 12 Aug 2026 12:26:40 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/13] block: introduce disk_for_all_zone_wplugs()
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20260811105852.1245357-1-dlemoal@kernel.org>
- <20260811105852.1245357-7-dlemoal@kernel.org>
-Content-Language: en-US
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-In-Reply-To: <20260811105852.1245357-7-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0426.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d1::9) To SA6PR04MB9447.namprd04.prod.outlook.com
- (2603:10b6:806:436::21)
+        d=suse.com; s=google; t=1786530862; x=1787135662; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=0opKHY0hArTd0tLmaIUqxiwMIhkUQB0s3SgD4CDSLQE=;
+        b=PzFpQfz+OwwVKHKttuRsZ7YV6zAePuAq84R1i8RDKBAGu02vNrgnKFzYGEx3URWAKK
+         2VPb/3tMjSRUH5MX9Baw8KByEv6mslhJ9o8zDn9S9kZ60DZOObssBfUmiKzQvqRJpAjD
+         YPqRp5XzR8kw3VGrBLYozqkU1wQnc2aZFXRds7ozjyFwNKFkuROBQIswg+N9ZRLQz/ix
+         dsy2roUSFdxa9bogb4SUlDHcbp7byT/ZPdEBo8UJ8wr+VwfboT/yOPVHvdEeGC6xOrGp
+         f0PKZxsQyKrlcrD3YEH4OvqQ35PdojMKX29L4R4oRuOqVVZM4ksuuaAX92mh7i7vt3m1
+         dd6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786530862; x=1787135662;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=0opKHY0hArTd0tLmaIUqxiwMIhkUQB0s3SgD4CDSLQE=;
+        b=pmpZgroEmV0uYzCXEJYiCdZLIXBvYvJpDV5ALnW0ToOVGedQH9vFjQZJb2VYtLwRIz
+         BWb1wmybnOK9RW9S1mHeIDJ5yI7vmJaldUr3vvVYlQ6yUKSBA82ya8GCPqpWN9AeyHDL
+         UfyGrTms8NJqxOwq4QBdSH7dpD1A7fsZk/TqsWDEYVJs12N12dDbohGcZ9ZanJmXG4og
+         05yu2F8X3V8R2F/AaBee/8C9CopS3M4MISRNlUcFfY9KTroxJs1VoI3i4rSjq9YS267Y
+         43hS/1EHWOdcQu0FNtyKFesCXhtIafXvxvWCD2IX/I2yKa97ENhXN7pdWCht6Q3nXNhJ
+         DSlw==
+X-Forwarded-Encrypted: i=1; AHgh+Rryy5J9ZEF/5OJip3w3j4gPtgDbXP1J51aWpqUXgb3lX7z4iW5gdzfqgnL+DK5kTuro9rJz/zcihpm0ow==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu/ESC3ab17ZComzWV7XFRbJL0NQSBtawyulFAUlDrXMVRZ41O
+	nERLwDXJybEbmpFDc8fh+0PkM94uOuOZ3sYRls0KJ+4WKj3SimNTnkvJVI8pTXCilI8NVberWPk
+	lijaf6MBxrPMhHs/8O7dJMgEPkQKkL3XKP3pDsJX9ug==
+X-Gm-Gg: AR+sD1373GQOz6lEC7teyzLfFdEIrKNgVqyJlE+cP5J+nkc5V5Y2Bs7X8dnb/Asygfa
+	8IyMHepL4hcEeMOAJ6Yzoiy4AOqMXT82fkniOWS4d2jpFqFEMDvdu6sGXSYC/8tTePZ0oBVnuZh
+	2g0xdazcp0bQK6fVhpU6Zv34+irEpAAMT/3Z5o2Et9pyiCVH+ZBK8ysxKQ/VM4LJIU2IrkegHL0
+	PkirwmZTDjpUReehW09uupr/Jal9r4o155r45PBi66aIWh8bnW/lJC4qGeop4qilup5xBtlzTgg
+	sd+E7k7g1Ps8OBej3ZSCJJqiIGVJrIfVmbcbIXql7s6DIjXxZUjFIkP+K50UL70m199HMIB8tuV
+	SZTTZXjshEFKVGLGHRHlndBfCt/eZNquinV+ynZdLqw==
+X-Received: by 2002:a05:600c:37ce:b0:495:58fe:88e5 with SMTP id
+ 5b1f17b1804b1-4997ac86c84mr89340595e9.2.1786530862046; Wed, 12 Aug 2026
+ 03:34:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA6PR04MB9447:EE_|PH7PR04MB8633:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12f77d4d-1be1-4489-6bd1-08def85c3529
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|10070799003|19092799006|376014|23010399003|22082099003|18002099003|56012099006|11063799006|4143699003|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	Lf5JtfHTj0By1v+GkBJ6Zr6H2nEMkY3kJ8uU9B43pB7K1OswR7xSRgEFjNCM850TX8rr/Ln8XizV38R4P2A9EUfHxm1keV7dVmsOvrehPaIzM/06FfejhwLFDy38Wu1YTRKtlDVmph3xZ3QuXaf0Rw5Y9XxAQfmumoiE6b0uoZf7fCEE7dOrREFSBwCpzCvUNWg7Sr+kOtS4/1tsrbXdmapgbF7ZqNGBeO9SqIPQmsY29Ewwq5S2Xfx1VanPd2OSuYvN+q3r/26kXipd+lyJF9JFpmCZWUC9ZoyRbAjCu/Ng9b3OitoqXAb+e++DoqUaZCuS2F4pmcUfN9JN++TjREscDoSEWfjX+Yg7p2T4GZLa7klMD0AXp2aafjOyT0emVwhuhSxZ6CpOn4dpJEsOhn5Les4gJw6+s/LnD/HQMgvnTJNMPBgkI9PRoiiiW56KBlKRlgtjyzaX2fGqGQc3nUKJJ1fSVZpGadO9mjWTv/ki7nn3QdQskmTIndsYQ+sbBvGLAw2UUfmL1JpqxLJfImFWwxYStyrsBYp2i57ga4LCqJDN+L9yw/EPfp0Y4LHgusJVXFIo2n8BESYah+Bva0zPLVT2mQkGErSX8QLjqZZrTTeI+pbYZv1yQ5wUXq71/L1C5MEy1Z1HmbHzzDlBtqFpYOo+UFaEiAH9pCJv4nk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(10070799003)(19092799006)(376014)(23010399003)(22082099003)(18002099003)(56012099006)(11063799006)(4143699003)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cWFkaTRzOHc2U3N1R29iSlp0dUxlZnNZM081enAwd3FMZWdKMEZOUUVuMVVu?=
- =?utf-8?B?elpKbXllTFU1eFhqQnRHT29yREdNeDlwaElrWisyWFdrSjJLTDBlMUJCNUtO?=
- =?utf-8?B?VHlVdU1NQzF2YS8rek9GWUJpRzNDcm5vL2xMOHVZNmlWRE4rZzZGYldrc08w?=
- =?utf-8?B?aFE1a1VTaFZjZHcrZ2lZQlpnbWQ4U0JHM012NTNxcXZlT3RzRmVVeUJUOUV6?=
- =?utf-8?B?b0VnTTAxVnNOSjAzMFF5aWF4R2FrSjZBN0hlR2YySG45SUhwaUtoUFVueFpN?=
- =?utf-8?B?Wk13cmpQNE9xbkpNNElqQVphY0xzdU0vREJoT0NIN01xMTRNdTRNWDk1S3h1?=
- =?utf-8?B?aHgwTmdHekc3R0dqK3lCMnNBZHdUUWxVRGNXd0pMa3pYemduUXVpbEo1QzEy?=
- =?utf-8?B?NnpYWncxKzR2YXNhd0dkMDRmZ00ycmlHMzdHc2l1RVEvMXFQSFoycm9RaHUx?=
- =?utf-8?B?K2Z3cTlnNlJNdFhIZ212QU5nTmFseFZic2wybDFkdHF5NEU4NisvYlJSbHA2?=
- =?utf-8?B?L3FIbjZjbkxxVjMvUUV5cC9BdzYrbmZTVXRxalg5REhUcWxWc0RrYWJvMERm?=
- =?utf-8?B?MjJ2WCs5VnZyVnlCNDdPbXYweUhXemlVNyswWlM4TjZxWWNTWEYrYk5uSVkv?=
- =?utf-8?B?ak9FOHhrcTVwQW1MYWx0bEpGelljam92MFNBRWVqdDExY2ZlUkFWYnpvV0dL?=
- =?utf-8?B?VjZnVjdzQjdIL01KazlyY0FQUmJYZnBvRkFDdmx4QksvdjBPY0s5OUUveHBs?=
- =?utf-8?B?VnVscUFUblNsVENDZ0liVm5HRG9RaG5BWWlIajdMbXcrQ2lmUm54cXFxS1g1?=
- =?utf-8?B?UTV5WkNUK2V5L1QvWHVjKzZwK2VuQUVmSUNMamg2VzU4SVJYcFhXQmZ3dXlz?=
- =?utf-8?B?LzdVRXY1SStZejBoaCs3TkwzZDBGd25sdzczMDBpMkNJRERHRVdDS1pRYzlF?=
- =?utf-8?B?ZW9iQm9QUEZIZjZQUGxsdm5Dc1cwWVRSTjdTbGJ0bWpjbHY2YXMxSEJvSWNO?=
- =?utf-8?B?eEQvdCtMYlUvblNZT25JZ2h1WTNUdWowQkNKWks4Vm4ycTRKTGRwMjlmL1da?=
- =?utf-8?B?YjlDQlh3SGdWUlYrS1NVSFhTanlVS1lhRXEyRy82Vy9zRTlVMnJYWXViaFR4?=
- =?utf-8?B?M05aNmtIaTdOYUhpd0RLYlJvYWhVbXFBUTkraUIyVlRWZW50bW5uVHUwbXRu?=
- =?utf-8?B?SzJYVU1rUW5ldi96V2h4WGplNnVpdFRuSGViNHVDa1VGdmQ4Z1NHY2xDbTMx?=
- =?utf-8?B?T2RReGErVTZ6TndGV2t5R3JFSXJ4ZmVST3FVeDkyanhTcmh3VnlaR25Qdk1n?=
- =?utf-8?B?V00yRFhOaHNTeUdNbFVmRVpqeldJS2UycTJyRGtwZ21aTUxwS0hyaFBJNCs0?=
- =?utf-8?B?czVyVm5CQTMzR1RRNnQwZ2RDOEU2QUszL1RjSXg5N3g5eis1SkJQT01ZU0s1?=
- =?utf-8?B?a0YzNUZFL3dmWEVLQnhSL2M2SnVBSkJuc3d2UXdLQmpMb2VFN2ZYMFA2ZGVQ?=
- =?utf-8?B?L3NlVVRtUTJWQWsvTmJISjBrYmdXK0JXN1R2MXFseXZUZkJWU0pjeklYRU0z?=
- =?utf-8?B?c3dFTE5HV2FCRVIydE51VDM4c3JhRGM4ZTBCYW4wQWFQMHZ3a051SWtpcDNr?=
- =?utf-8?B?Y2NmVzNDaWxYTVhiY1ZnRXVjQ2JBK3diNzdWSWI1WFhRSzNSUm90QmwxbDkv?=
- =?utf-8?B?MGZpRFJJY2U1d3RQczVkYWZvNWY0UVRNK0dMVytEcFA0K2ZQM2J2ZkIzeDZH?=
- =?utf-8?B?MG5sWVlmbWg0MU05a1hIKzFYSHM2aDJHR1VhRk9IY1I5VEdNKzBDaGhqdkpJ?=
- =?utf-8?B?SkFadGUweGxSczlybDcwRHpMbmR2SWVMa2JOdDhUWEFDeEZKSlN4MnB1WjVE?=
- =?utf-8?B?SEhXTlpRL1JTVk9RMEhiVlRubWRycm9XY1VPVWcyY3dKNFUyTDFOYzkrWlB3?=
- =?utf-8?B?S29Rb3FCa1dxa3IwMkRrT3pQYmJBYkttMFdGa1J1dmw1bUN2SXQ0UjV5OGJ0?=
- =?utf-8?B?UnRESlVPd2pQb083ME9ENDlTZmFQSm5TK2ZBUVgzNksxelRiemU2dTJKd29x?=
- =?utf-8?B?WlVIcHYySVc3SXlYemtjd3RBN1RkWXdra205MHp6NTlaa1F4WmRqZEx0dWVZ?=
- =?utf-8?B?ZW9GME8rMnE0Z2NyOHJob2ZEVU9FdmtHU0swQUpvb1pPemM4TVBhL0cza3lP?=
- =?utf-8?B?aGdmekN6c3M4b09oL1FDMTJPRC9UaVBvVmtDeEpTckcwcmV5dDJubkppTGhI?=
- =?utf-8?B?cVE2cVMxUFJPOWRCT2NmcjArZmRGaGdaL0p3WUYzSGF3Q1VrVWJVUU5JQkla?=
- =?utf-8?B?ejljWm5lNGVORXhIYjhka3hkaUNaOG9KR3RsR3hSanpyeVRHWVpxckZCWnJy?=
- =?utf-8?Q?Xj1p+TPKSG3dgVNJ4H58dAZcc3Bz2DaG0gtUEygiQ2TOv?=
-X-MS-Exchange-AntiSpam-MessageData-1: +pQfDtsN3X4OQdu4KBOf+ryN3oLzZggEcOc=
-X-Exchange-RoutingPolicyChecked:
-	LbUr/xN+Qw83UV+VkZ6UP5i9wm1TFoBxAPSI+Z2jgiHVqKPCjLMf4W7DR4/uwdMSMoll7Vc/3FjTe/eO/lZa8zEXFpcRckSHFwTkJwM6JMrKsy6Tee/CnOHZ39VXIvQeKlat9/iLhD4zdUIDZ+AQ3hUhRyENSWUsKNlN20kfeKOKxU4DvO1POs55RsdyOsyg6ZfFoJ3j9JcfTs3F8opxrbLMLRVO9tK3nVmGwAmz/2VkmgykoKa3UjsZMCF0LCtnQYmhwjqAdd9ydzrSez8TV4J0x0u58jPzn5vyaj3kPtWcE0v/FiOqmNZuLyEd8LK5TB54kKcijfxfr1NWkwwI/g==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	FBwZYaxU2W7KLgT3uuq+f8f0X1A58Dt9UFvJwAwaQbqhF1MIzS1peLZxgAE2H50JrQ1DZsrfxuuomKElS9k3ZGGjjMTyHRz41W17qFg9N+I1sQg13w3XoKwJ40lgkfjEoq/0evXZw/VQdMbPu/YQBTjX01N4H2VO/QoqANe0pmz1FaRBpn9/wiUCz4rGF7PjLEH2BVkDdO1EbH+llbS7oBk4o5/w6tYzkQoc7NKWqigXH5Xpk0VxCXXpJHCyxc2jNHWL57RbiK4qOUbEblJxKJ8cB1BbxNJuREXBGfncG8WLXX+DFOEUgQbUNeaUo8MHLOeBCVt1HD5Lvi2d2e6Exgs6vP7WhPtO8JAka2L8PKOHXm8yzkjJ0znF/fga60cpH70gXohqeGdQtaFBpGxeJlTUiN/ZTYkYwe/EXeQo6INz6Tr0YQDCbgZQfzj0Sy8wtdIo+FFQNqpt9Cw4wQf9XwRvJKYuCK7atMzW87ela6BVpc1jiLeMiidVGBdw1WNqglgHHICUb/QWWHYelRlkh0u+IL57Q8ZPCMYhnVxcWq0dYBJzAjNTs9g81pAt/us5uw1cmu31jztlMLnlT7BzJx2aejhn74IPYdd03fHYdJxysV9e1cL55a38A5mbU8yX
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12f77d4d-1be1-4489-6bd1-08def85c3529
-X-MS-Exchange-CrossTenant-AuthSource: SA6PR04MB9447.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2026 10:26:44.6334
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1L8Vsysb5/fiktcadcbj0XCyZMUnSrDXuIzSKpvS7gPeJ2yQY8wrDquaV9FdxK3hSPQBIa33IlHux37Le78aur0WYZZ+L5kQQLNvZwfZ/Tg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR04MB8633
+References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-2-neelx@suse.com>
+ <20260601224431.GA25574@quark>
+In-Reply-To: <20260601224431.GA25574@quark>
+From: Daniel Vacek <neelx@suse.com>
+Date: Wed, 12 Aug 2026 12:34:10 +0200
+X-Gm-Features: AUfX_mxapy1E6op8rEV2muUvuERnqCVwq3frUPTyyKjpA2GztEOk9ondTwecjNA
+Message-ID: <CAPjX3Fe4yfrOWjZa-pW2AhBNG=6sfcrt82a8C9_cBzA5BkUbEg@mail.gmail.com>
+Subject: Re: [PATCH v7 01/43] fscrypt: add per-extent encryption support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>, 
+	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Looks good,
+On Tue, 2 Jun 2026 at 00:44, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, May 13, 2026 at 10:52:35AM +0200, Daniel Vacek wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
+> >
+> > This adds the code necessary for per-extent encryption.  We will store a
+> > nonce for every extent we create, and then use the inode's policy and
+> > the extents nonce to derive a per-extent key.
+> >
+> > This is meant to be flexible, if we choose to expand the on-disk extent
+> > information in the future we have a version number we can use to change
+> > what exists on disk.
+> >
+> > The file system indicates it wants to use per-extent encryption by
+> > setting s_cop->has_per_extent_encryption.  This also requires the use of
+> > inline block encryption.
+> >
+> > The support is relatively straightforward, the only "extra" bit is we're
+> > deriving a per-extent key to use for the encryption, the inode still
+> > controls the policy and access to the master key.
+> >
+> > Since extent based encryption uses a lot of keys, we're requiring the
+> > use of inline block crypto if you use extent-based encryption.  This
+> > enables us to take advantage of the built in pooling and reclamation of
+> > the crypto structures that underpin all of the encryption.
+>
+> The whole reason for extent-based encryption is that extents can be
+> shared between inodes.  So the repeated mentions of "the inode" are
+> really confusing.  This shows up in a lot of different places.
+>
+> What's actually implemented is that each extent stores its own
+> (encryption_mode, master_key_identifier, nonce), but for now the
+> invariant is maintained that all inodes that reference an extent share
+> the same (encryption_mode, master_key_identifier) as the extent.
+>
+> It would be helpful to document this stuff accordingly.
 
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Yeah, that makes sense. I believe this is what we want - any file is
+unlocked by one key. Not that you would need multiple keys for
+unlocking different parts of a file.
 
+> > +/*
+> > + * fscrypt_extent_context - the encryption context of an extent
+> > + *
+> > + * This is the on-disk information stored for an extent.  The nonce is used as a
+> > + * KDF input in conjuction with the inode context to derive a per-extent key for
+> > + * encryption.  This is used only when the filesystem uses per-extent encryption.
+> > + *
+>
+> Basically the same issue here.  The master_key_identifier is actually
+> stored in the extent.  Just the current implementation enforces that
+> when the filesystem accesses the extent through some inode, that inode
+> also has the same master_key_identifier.  How about replacing the second
+> sentence with something like: "The nonce and master_key_identifier are
+> used to derive the key which encrypts the extent."
 
+Right, this sounds better.
+
+> > + * With the current implementation, master_key_identifier and encryption mode
+> > + * must match the inode context.  These are here for future expansion where we
+> > + * may want the option of mixing different keys and encryption modes for the
+> > + * same file.
+> > + */
+>
+> Likewise.  Something like: With the current implementation,
+> master_key_identifier and encryption_mode always match the corresponding
+> values from the fscrypt_context in each inode that shares the extent.
+
+Do we actually want this freedom or should we drop the encryption_mode
+and master_key_identifier and consider them implicit from
+inode/fscrypt_context?
+That would mean storing only the nonce in the extent context. The
+version field still remains, preserving the flexibility to eventually
+add them back later if we decide to.
+
+> > +struct fscrypt_extent_context {
+> > +     u8 version; /* FSCRYPT_EXTENT_CONTEXT_V1 */
+> > +     u8 encryption_mode;
+> > +     u8 master_key_identifier[FSCRYPT_KEY_IDENTIFIER_SIZE];
+> > +     u8 nonce[FSCRYPT_FILE_NONCE_SIZE];
+> > +};
+>
+> Well, it's an extent nonce, not a file nonce.  It seems it's handled
+> completely separately from the existing file nonce, so it probably
+> should get its own size constant FSCRYPT_EXTENT_NONCE_SIZE.
+
+This actually sounds more confusing to me. They are both the same
+thing. My understanding was that extent is "kind of file" on it's own.
+If anything I'd argue for FSCRYPT_NONCE_SIZE used in both places. But
+a FSCRYPT_FILE_NONCE_SIZE used in inode context as well as in extent
+context sounds fine to me.
+
+> > +/**
+> > + * fscrypt_set_bio_crypt_ctx_from_extent() - prepare a file contents bio for
+> > + *                                        inline crypto with extent
+> > + *                                        encryption
+> > + * @bio: a bio which will eventually be submitted to the file
+> > + * @ei: the extent's crypto info
+>
+> @ei: the extent's crypto info, or NULL if the extent is unencrypted
+
+True, the @ei is optional. I'll fix that.
+
+> > + * If the contents of the file should be encrypted (or decrypted) with inline
+> > + * encryption, then assign the appropriate encryption context to the bio.
+>
+> "If the contents of the file should be encrypted (or decrypted) with
+> inline encryption" => "If the extent should be encrypted (or decrypted)"
+>
+> There's no "file" here.  And inline encryption is the only option for
+> extents.
+
+OK.
+
+> > +/**
+> > + * fscrypt_mergeable_extent_bio() - test whether data can be added to a bio
+> > + * @bio: the bio being built up
+> > + * @ei: the fscrypt_extent_info for this extent
+>
+> @ei: the extent's crypto info, or NULL if the extent is unencrypted
+
+True.
+
+> > + * @pos: the next extent logical offset (in bytes) in the I/O
+> > + *
+> > + * When building a bio which may contain data which should undergo inline
+> > + * encryption (or decryption) via fscrypt,
+>
+> When building a bio which may contain data which should undergo extent
+> encryption (or decryption)
+
+Ack.
+
+> > +static struct fscrypt_extent_info *
+> > +setup_extent_info(struct inode *inode, const u8 nonce[FSCRYPT_FILE_NONCE_SIZE])
+> > +{
+> > +     struct fscrypt_extent_info *ei;
+> > +     struct fscrypt_inode_info *ci;
+> > +     struct fscrypt_master_key *mk;
+> > +     u8 derived_key[FSCRYPT_MAX_RAW_KEY_SIZE];
+> > +     int keysize;
+> > +     int err;
+> > +
+> > +     ci = *fscrypt_inode_info_addr(inode);
+>
+> fscrypt_get_inode_info_raw()
+
+That would add a useless VFS_WARN_ON_ONCE() which will never trigger;
+otherwise, the next line would crash.
+But I guess that's OK.
+
+> > +/**
+> > + * fscrypt_prepare_new_extent() - prepare to create a new extent for a file
+> > + * @inode: the encrypted inode
+> > + *
+> > + * If the inode is encrypted, setup the fscrypt_extent_info for a new extent.
+> > +
+> > + * This will include the nonce and the derived key necessary for the extent to
+> > + * be encrypted.  This is only meant to be used with inline crypto and on inodes
+> > + * that need their contents encrypted.
+>
+> This is ambiguous and contradictory about what type of @inode is
+> required.  It should be something like:
+>
+> * @inode: an encrypted regular file with its key already set up, on a
+> *        filesystem that uses per-extent encryption
+> *
+> * Prepare to encrypt a new extent by generating a new extent nonce,
+> * deriving an extent key, and allocating an fscrypt_extent_info.
+
+OK.
+
+> > * This doesn't persist the new extents encryption context, this is done later
+> > * by calling fscrypt_set_extent_context().
+>
+> There's no function with that name
+
+That should be fscrypt_context_for_new_extent(). I see it was renamed
+in v5 but this one (and the one below) was forgotten.
+Will fix.
+
+> > +     if (WARN_ON_ONCE(!*fscrypt_inode_info_addr(inode)))
+> > +             return ERR_PTR(-EOPNOTSUPP);
+> > +     if (WARN_ON_ONCE(!fscrypt_inode_uses_inline_crypto(inode)))
+> > +             return ERR_PTR(-EOPNOTSUPP);
+>
+> I'm confused what these checks are trying to do.  The first part checks
+> for the inode's encryption key, but setup_extent_info() does that
+> anyway.
+
+setup_extent_info() dereferences ci right away. Without this check it
+would crash if the inode was not encrypted.
+
+> ... The second part is maybe intended to check that the file uses
+> extent encryption, but it doesn't do it correctly.  That would require:
+> fscrypt_needs_contents_encryption(inode) &&
+> inode->i_sb->s_cop->has_per_extent_encryption.
+
+This may be better. The comment says this is only meant to be used
+with inline crypto but that actually looks fishy. We ensure this in
+btrfs but fscrypt itself does not need to.
+
+> It probably would make sense to check that directly in
+> setup_extent_info(), so that it's closer to the call to
+> fscrypt_hkdf_expand() which would has a *very* bad failure mode when
+> !has_per_extent_encryption.
+
+I think it makes sense to check before consuming entropy.
+setup_extent_info() can have a second check if needed, though perhaps
+it was not needed so far?
+
+> > +/**
+> > + * fscrypt_load_extent_info() - create an fscrypt_extent_info from the context
+> > + * @inode: the inode
+> > + * @ctx: the context buffer
+> > + * @ctx_size: the size of the context buffer
+> > + *
+> > + * Create the fscrypt_extent_info and derive the key based on the
+> > + * fscrypt_extent_context buffer that is provided.
+> > + *
+> > + * Return: The newly allocated fscrypt_extent_info on success, -EOPNOTSUPP if
+> > + *      we're not encrypted, or another -errno code
+> > + */
+>
+> What context is this expected to be called in?  I see the caller uses
+> memalloc_nofs_save().  This would require making ->mk_sem nofs-safe; is
+> there a plan to do that?  (Sashiko noticed this too, by the way.)
+
+Honestly, I have to admit I was puzzled by Sashiko's explanation and I
+did not trust it. It sounded rather off.
+
+Trying to dig up the origin of that memalloc_nofs_save() - it is there
+since the very beginning of Josef's [v1] posting. This was around the
+time of Linux v6.6 but the code is still similar.
+So far I don't see if it is really needed or why it was implemented
+this way in the first place. It is called from
+btrfs_do_readpage()->btrfs_get_extent() to set up the key context.
+IIUC, this should not be called from a reclaim path. Hence, I think
+that that memalloc_nofs_save() is redundant and it should be OK to
+simply remove it.
+
+[v1] https://lore.kernel.org/linux-btrfs/de7dec18d4dd440ebf3c538af5c765d747e1d3ef.1695750478.git.josef@toxicpanda.com/
+
+> > +     const struct fscrypt_inode_info *ci = *fscrypt_inode_info_addr(inode);
+>
+> fscrypt_get_inode_info_raw(inode)
+
+OK.
+
+> > +/**
+> > + * fscrypt_set_extent_context() - Set the fscrypt extent context of a new extent
+>
+> It seems the function name and semantics changed at some point, but the
+> kerneldoc wasn't updated.
+
+As mentioned above, I see V4 -> v5 rename. No semantics changes.
+
+> > + * @inode: the inode this extent belongs to
+>
+> The inode that the extent will initially belong to, I guess?
+
+Yes, at this point it's a new extent for this inode.
+
+> > +ssize_t fscrypt_context_for_new_extent(struct inode *inode,
+> > +                                    struct fscrypt_extent_info *ei, u8 *buf)
+> > +{
+> > +     struct fscrypt_extent_context *ctx = (struct fscrypt_extent_context *)buf;
+> > +     const struct fscrypt_inode_info *ci = *fscrypt_inode_info_addr(inode);
+>
+> fscrypt_get_inode_info_raw(inode)
+
+Again, adds an useless WARN_ON_ONCE, but won't hurt.
+
+Thanks!
+
+--nX
+
+> - Eric
