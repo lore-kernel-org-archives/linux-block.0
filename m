@@ -1,75 +1,83 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA1546EC7F
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 16:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F0F481658
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 17:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786552955; cv=none; b=LleLJxtazSNIOSt5RNM2PYj6Lj60fa+BqpMS1oMcEEFUy1ts9z0KivCD3+SeFEAslya7Bp0FpsFHnNCLzF5rCkyhKyE4O/hewHXXto+Y/NJDIvLQxAhsmiUlkJ7Th7d1ilYyqf5+I7zrNh9y/Ufnroeni6T5OhweoYFAhodpDL4=
+	t=1786556718; cv=none; b=mGdTKlxY7SyK4TW015iB+Wb9f/swSp3hE5bH2sLuCHN2HmHO/3eLqGcC4uEJlQAg5AFAPs9Xzoa67m1J2kKo9Gn/yfz0fT0CII63m3RCQiFdOLIdBDt/ovp0DmYzlDfRUDwwr1LKt+fRv8O4kZZsH5lrOP8Sei3GhGZUNavzJns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786552955; c=relaxed/simple;
-	bh=VCF2MY1+kIo1Tw1P6EI2FDgUHxg+MJ/dvPqj1xGd3AQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lHaPfoJCaZ9hz3IjMwAwb5R+x8AK/5BfPHSXpGrl0vt7D3JaxUDzOLNkt6/QMRUPQ/eFfhaqviY+JurbKM7a2EyjkrSPMp9zGK2qiHPTuJgQ9OMVNnIfeExd8XnRiyv0SYK47esNebYawKgzVVtoMH5hMKY6AoCxUe6Y0EYY3x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=xZo2asio; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1786556718; c=relaxed/simple;
+	bh=vBVDxabF0fYe7uGeadTgSZMnd6NJftBLwhRzerfduHk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kUhNpIksujkgUrmR9QyeV8Fucl7pRy7B9cRVOYR2YTmJhohexOpLod+iVsroGKerYlFLb9YxJ8wXWnSqxlRHi4DNKslxTGIOxYSKMB9rshmt4Lnaxfo2boZwfEf1wjVJ2PhNQQsUQ5mimHOJnnEAOqRyWFcviuoD7rRsPPC5Jc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2QFiBZc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xZo2asio"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zYyVv/VSkCBeNUPda/8HISzWhGOHn8iVKa5zI9HhCI8=; b=xZo2asioaIKCmZIrbYPLgQIL2y
-	DkClwmBkCjDth54b1ExW8T7Zs5ZBt9s5QUDgojHMBgQqPYqK/aQEM+gbq9Wjt0m8PHMNnwsbR8gCs
-	BifuM1o8xwz8QYFgKgFJyvcLPsq2HzMk0RHLzrrsR9bq/alRpNed71T1alr67Uyf1g4jv2LTVVFCT
-	0atExC/Bjg3fQCGF6WIHNI0KOK4S7BgY/eK9a7EzhBGQntoUsHQR4D6dmA/vYa918nTHzySoThlf3
-	A0bWOpSHrUdljbVJaxTKjb4uW1Po5VhXs6K187CJEQ/U9brQgyS4NH01IvExBhhYVKBkGIup5Q7LN
-	nQ6qLmTg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wuC24-0000000Gc3W-0fyc;
-	Wed, 12 Aug 2026 16:42:24 +0000
-Date: Wed, 12 Aug 2026 09:42:24 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Zhenxian Ma <mzx199711@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Zhenxian Ma <mazhenxian@xiaohongshu.com>
-Subject: Re: [PATCH] block: skip redundant flush for O_DSYNC direct writes
-Message-ID: <anyicCnbACxAiTTD@infradead.org>
-References: <20260812130335.60354-1-mzx199711@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2QFiBZc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786556715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Lm41zW9D1y3E4PwZafbwiXqMQCx3MNP6JwnBey25G+k=;
+	b=a2QFiBZc548Na9ab0Spq9nMVEqjUl39Rcv7/rjSKl96St+OjsThpWp4j2x8b/mAp/dpchr
+	3Ln0Fw7GYnRTJMHGq5NsF2/9uarREY/3a6O/y9Iz2h6oFDtNqtyGoK4RpYBDZxOltau6zO
+	uYYXRcDlXTjy1DIBC//jp4HEBWY4nAc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-6E8z-0dTMc2bHr-BnevhVw-1; Wed,
+ 12 Aug 2026 13:45:10 -0400
+X-MC-Unique: 6E8z-0dTMc2bHr-BnevhVw-1
+X-Mimecast-MFC-AGG-ID: 6E8z-0dTMc2bHr-BnevhVw_1786556709
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E19418009C8;
+	Wed, 12 Aug 2026 17:45:08 +0000 (UTC)
+Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.22.88.181])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 469FB195DF98;
+	Wed, 12 Aug 2026 17:45:06 +0000 (UTC)
+From: Jesse Taube <jtaubepe@redhat.com>
+To: linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+	shinichiro.kawasaki@wdc.com,
+	John Meneghini <jmeneghi@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	Jesse Taube <jtaubepe@redhat.com>
+Subject: [PATCH blktests 0/2] Test multipath and marginal ports
+Date: Wed, 12 Aug 2026 13:45:01 -0400
+Message-ID: <20260812174503.3705830-1-jtaubepe@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260812130335.60354-1-mzx199711@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-> +	bool dio_fua_done = false;
->  	ssize_t ret;
->  
->  	if (bdev_read_only(bdev))
-> @@ -763,9 +764,13 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  
->  	if (iocb->ki_flags & IOCB_DIRECT) {
->  		ret = blkdev_direct_write(iocb, from);
-> -		if (ret >= 0 && iov_iter_count(from))
-> +		if (ret >= 0 && iov_iter_count(from)) {
->  			ret = direct_write_fallback(iocb, from, ret,
->  					blkdev_buffered_write(iocb, from));
-> +		} else if (ret > 0 && iocb_is_dsync(iocb)) {
-> +			/* FUA from dio_bio_write_op() already made it durable */
-> +			dio_fua_done = true;
+Tests for the upcoming nvme-fc: FPIN link integrity handling set.
+It tests for various multipath and marginal port
+scenarios, while confirming the port usage and state. The test is
+intended to emulate receiving an FPIN event in a multipath environment.
 
-This is kinda the wrong way aroud, it should just have a need_sync
-variable that is only set for the fallback.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220329
+Link: https://github.com/linux-blktests/blktests/pull/264
 
-But looking at this, the original logic here actually is very fishy.
-If we have a driver that does not actually support FUA, emulating it
-for every write command is a bad idea.  So this should be fixed to
-only do FUA when actually useful, and then return from the non-fallback
-implementations if that actually happened.
+Jesse Taube (2):
+  nvme: Add _setup_nvmet_port_marginal
+  nvme/070: Test multipath and marginal ports
+
+ common/nvme        |  30 +++
+ tests/nvme/070     | 521 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/070.out |  43 ++++
+ 3 files changed, 594 insertions(+)
+ create mode 100755 tests/nvme/070
+ create mode 100644 tests/nvme/070.out
+
+-- 
+2.54.0
 
