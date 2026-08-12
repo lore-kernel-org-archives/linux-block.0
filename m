@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E325486B8A
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 18:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235B4483803
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 18:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786558466; cv=none; b=fsH1mr8YuNxEG7QgcvhIicslIBI1F4TJFR77V+TnWGxYv8YLKAKnKTRS8e055nyFIa0XgA76Xe4UxyX9nhqxEZxKDS7xtDEfMy/W076VM6bAEE7N0B+BIV/8KI4onaZdg8N2EQHSXFNPjhUNffl+DSQiBMdiUZy9ylEAVc5Vn+E=
+	t=1786558471; cv=none; b=rea7toISLgrbMY0T6uOrAShx0UmAjcC8shAPSUJthLIcd/Ip2AzREgyP3kFuKve33Eacg1t9lsKgpmaTjzupQCF6ExTxOl0FgyNCmTOUvzEGvoMYn4Z5CNo0FIMTvL2RSvESLBIcX1ZQ+8hTb4vdx68h69C/wx9N17vMeKIWd/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786558466; c=relaxed/simple;
-	bh=Ej/ju0eoxUDvqOyYIbXYarc0aQqfSSydX8Z1cVSU0oM=;
+	s=arc-20240116; t=1786558471; c=relaxed/simple;
+	bh=EL7ZsU4nhSz7U7K66ArlbistoNCGHNGrlvoJ8RVm2I8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pxgx86DfxTrR0A5K2I9y0vHU3bJTy+717+xIMFAHk5QnZOLOeL4gk5Do+PhL+jHNDwESAa0mPfEY+einwaOcpKEgZvGUFwblNnroBEOUUWzPRB8Y/un4VXGhC0DRrXEdqPKNYDdUZbpeUVoYQnIJ84T3rhFlikSigyqIkt/z2nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HHBx8c2y; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=t/U+Ae+NU8TRezFFn47G1VhMECklGblAL4jrtpPwv27sWLuw5SsZX1VRvVvxqryzQdgc/pDg37nO4NhuW/avQLzX6pv0DbsXjnUlhn78x9pFFebV+41bhVBmtDOZ1mn6nmKjCbczCVccQ8PolHGD6rNBljyhbS4Zsuf8TIVY3NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HqtQDAgh; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHBx8c2y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqtQDAgh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786558463;
+	s=mimecast20190719; t=1786558469;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o8Vm2d0HmZn6yHF6SDZo37n0cyZKJwfRhArj8eZSh5c=;
-	b=HHBx8c2yWnLMdgXjsKzQRYp015fXNK6KEVTIRSHXnnduI42h2plowKZfywkOiaRBySsOHX
-	MhbcRFjGD1mZ7+aAc3UFKQWj7zGOa0OpFNRO5Sjk6FaOr8epJhTyi06WevL6Wq7Gdh7OTy
-	schTg2++AEAQppII2gYO/xpu1fxaJ6s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=H0zxaeAVSjXTNhTujVd3ws3OMZKb9NKMAq0h549TWrQ=;
+	b=HqtQDAgh0SX1++mJl8QkIYQSFMgFq1oEwwR3NTOclc5L27AcA0J9/sY61cxQZthtAXk9RY
+	+qft0QDFBjIB1MMIxFV3hmhhn0T+X0DLASzfX8IxwFgP7YtQfByv7vLTzWRUqVfE8PWdho
+	ysjtAIp99WnLxH3esMCpCFobyCt0L3Y=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-642--1tVOwXyPkSB9oZ3Oq5F1g-1; Wed,
- 12 Aug 2026 14:14:19 -0400
-X-MC-Unique: -1tVOwXyPkSB9oZ3Oq5F1g-1
-X-Mimecast-MFC-AGG-ID: -1tVOwXyPkSB9oZ3Oq5F1g_1786558448
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-5ZS0RTWTP72E3Tbr9Bx9aA-1; Wed,
+ 12 Aug 2026 14:14:17 -0400
+X-MC-Unique: 5ZS0RTWTP72E3Tbr9Bx9aA-1
+X-Mimecast-MFC-AGG-ID: 5ZS0RTWTP72E3Tbr9Bx9aA_1786558453
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE4961954B01;
-	Wed, 12 Aug 2026 18:14:07 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E13F18002F8;
+	Wed, 12 Aug 2026 18:14:13 +0000 (UTC)
 Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.22.88.181])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 69AFA18005BB;
-	Wed, 12 Aug 2026 18:14:02 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 17B07180034C;
+	Wed, 12 Aug 2026 18:14:07 +0000 (UTC)
 From: Jesse Taube <jtaubepe@redhat.com>
 To: linux-scsi@vger.kernel.org
 Cc: Jonathan Corbet <corbet@lwn.net>,
@@ -70,9 +70,9 @@ Cc: Jonathan Corbet <corbet@lwn.net>,
 	linux-kernel@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 10/13] scsi: qla2xxx: enable FPIN notification for NVMe
-Date: Wed, 12 Aug 2026 14:12:57 -0400
-Message-ID: <20260812181300.3712426-11-jtaubepe@redhat.com>
+Subject: [PATCH 11/13] scsi: lpfc: enable FPIN notification for NVMe
+Date: Wed, 12 Aug 2026 14:12:58 -0400
+Message-ID: <20260812181300.3712426-12-jtaubepe@redhat.com>
 In-Reply-To: <20260812181300.3712426-1-jtaubepe@redhat.com>
 References: <20260812181300.3712426-1-jtaubepe@redhat.com>
 Precedence: bulk
@@ -89,50 +89,65 @@ nvme_fc_set_remoteport_fpin() to enable FPIN notifications for NVMe.
 
 Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
 ---
-V10 -> V11:
+V10 -> V11
  - Rewrite
 ---
- drivers/scsi/qla2xxx/qla_attr.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/scsi/lpfc/lpfc_attr.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/drivers/scsi/qla2xxx/qla_attr.c b/drivers/scsi/qla2xxx/qla_attr.c
-index a4ca22024ede..92db7d584eeb 100644
---- a/drivers/scsi/qla2xxx/qla_attr.c
-+++ b/drivers/scsi/qla2xxx/qla_attr.c
-@@ -2789,6 +2789,15 @@ qla2x00_set_rport_loss_tmo(struct fc_rport *rport, uint32_t timeout)
- 					       rport->dev_loss_tmo);
+diff --git a/drivers/scsi/lpfc/lpfc_attr.c b/drivers/scsi/lpfc/lpfc_attr.c
+index f4e8164b94ab..d54899cceed9 100644
+--- a/drivers/scsi/lpfc/lpfc_attr.c
++++ b/drivers/scsi/lpfc/lpfc_attr.c
+@@ -7134,6 +7134,30 @@ lpfc_set_rport_loss_tmo(struct fc_rport *rport, uint32_t timeout)
+ #endif
  }
  
-+static inline void
-+qla2x00_set_rport_marginal(struct fc_rport *rport, bool marginal)
++static void
++lpfc_set_rport_marginal(struct fc_rport *rport, bool marginal)
 +{
-+	fc_port_t *fcport = *(fc_port_t **)rport->dd_data;
++	struct lpfc_rport_data *rdata = rport->dd_data;
++	struct lpfc_nodelist *ndlp = rdata->pnode;
++	struct lpfc_nvme_rport *nrport = NULL;
 +
-+	if (IS_ENABLED(CONFIG_NVME_FC) && fcport && fcport->nvme_remote_port)
-+		nvme_fc_set_remoteport_fpin(fcport->nvme_remote_port, marginal);
++	/* Break early if NVME_FC is not enabled */
++	if (!IS_ENABLED(CONFIG_NVME_FC))
++		return;
++
++	if (!ndlp) {
++		dev_info(&rport->dev, "Cannot find remote node to ");
++		dev_info(&rport->dev, "set rport marginal, port_id x%x\n",
++			 rport->port_id);
++		return;
++	}
++
++	nrport = lpfc_ndlp_get_nrport(ndlp);
++
++	if (nrport && nrport->remoteport)
++		nvme_fc_set_remoteport_fpin(nrport->remoteport, marginal);
 +}
 +
- static void
- qla2x00_dev_loss_tmo_callbk(struct fc_rport *rport)
- {
-@@ -3379,6 +3388,8 @@ struct fc_function_template qla2xxx_transport_functions = {
- 	.set_rport_dev_loss_tmo = qla2x00_set_rport_loss_tmo,
+ /*
+  * lpfc_rport_show_function - Return rport target information
+  *
+@@ -7244,6 +7268,8 @@ struct fc_function_template lpfc_transport_functions = {
+ 	.set_rport_dev_loss_tmo = lpfc_set_rport_loss_tmo,
  	.show_rport_dev_loss_tmo = 1,
  
-+	.set_rport_marginal = qla2x00_set_rport_marginal,
++	.set_rport_marginal = lpfc_set_rport_marginal,
 +
- 	.issue_fc_host_lip = qla2x00_issue_lip,
- 	.dev_loss_tmo_callbk = qla2x00_dev_loss_tmo_callbk,
- 	.terminate_rport_io = qla2x00_terminate_rport_io,
-@@ -3427,6 +3438,8 @@ struct fc_function_template qla2xxx_transport_vport_functions = {
- 	.set_rport_dev_loss_tmo = qla2x00_set_rport_loss_tmo,
+ 	.get_starget_port_id  = lpfc_get_starget_port_id,
+ 	.show_starget_port_id = 1,
+ 
+@@ -7315,6 +7341,8 @@ struct fc_function_template lpfc_vport_transport_functions = {
+ 	.set_rport_dev_loss_tmo = lpfc_set_rport_loss_tmo,
  	.show_rport_dev_loss_tmo = 1,
  
-+	.set_rport_marginal = qla2x00_set_rport_marginal,
++	.set_rport_marginal = lpfc_set_rport_marginal,
 +
- 	.issue_fc_host_lip = qla2x00_issue_lip,
- 	.dev_loss_tmo_callbk = qla2x00_dev_loss_tmo_callbk,
- 	.terminate_rport_io = qla2x00_terminate_rport_io,
+ 	.get_starget_port_id  = lpfc_get_starget_port_id,
+ 	.show_starget_port_id = 1,
+ 
 -- 
 2.54.0
 
