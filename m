@@ -1,82 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-67.mta1.migadu.com [95.215.58.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C657141A4FE;
-	Wed, 12 Aug 2026 09:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A559241D224
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 09:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786528288; cv=none; b=TapEgB2SKFW/NzIPI/y2axEnxFHOVkWbJSvOW7q7Age6MGgTK6bMabykow/61GiRuvUMEN2JUmTaFZ5Cy4gNAfk6eSfPYoiJsLD6aaG6YzOxA+7+ix8nyf6sfa5Vl/tSVZsTBygmk7LM0uRgRPquGY89WgbMpzCO1cxXvYjKx3Y=
+	t=1786528574; cv=none; b=KAlb9hr+QIWcBuAgNYEkOFoisiCbnqjKdXzAxL8eWC59WGcub+Z+UD94CX47LXx8nE60AtgzPPImA5iMVVx0fjE9TCn+4Ci6vjU3Acj5zwZTqdJvb4+O4LsS1AQ0UmGy1ut9WqAcKNIMDzWiqEB4CTA5gOSGsmObn0/JV/mEInY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786528288; c=relaxed/simple;
-	bh=6e0PbF6YXiTK0vtHWdzePjNYGqU6fdtZgcPCjDRQqvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mQqZBWTBQLVI9tokEpgIZSDR5POemiV7+anl3+a7gUoWXy25dONIibs2VboWO7cYPBcZ+vrdE7djVwA7V4iED6Ddc7Te+AydgMtOUXSmDayoO/ZE5rPaDw9p5TlJL0Pxa31YZ/5I9iSsHcRNCpS/+WfY6U9pe025/cpIruYU7qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHrYA48G; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786528574; c=relaxed/simple;
+	bh=YBnyvyc75sBYBQiEBfOzBDUagZL06PaEKMK/eukkudM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IMxEUPDOQIPtAQ1jL4R9BFpir8qvfF3nQt7p+hvnM+z6aMgSp/FZw5RhbiOjO7CO7HVFc/bFZiw6W2i0GHd6QKQvybnEVC1Q6Yu3gjzk93b8XRXzepE36zrP95rzc8pfu2kgUzsuCil0X5UIWm96L/xQwwuhh0cchxvldGNIjbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OT0ff2fZ; arc=none smtp.client-ip=95.215.58.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHrYA48G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC9381F000E9;
-	Wed, 12 Aug 2026 09:51:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786528287;
-	bh=qQ46ywu3kTNDLFT+jQQ87fTZhvSQH5n+X8XdHSB6bo0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FHrYA48GX/Hq4ZOwuW8IjjDsgZb6B84w3WP4dF8FtEPmTsWrpol7UIyFMUpCGGxe+
-	 xl+DOjdx2TnNM+UwV6JFzhsU/pQxewVXJ+enGwfOg8VA24LqKiLNFOFNnLZ5UzZD6B
-	 uJ3mBB92x7yQ2u9dzvLoIQ6ed4tgNUXGm29jdLN+as7E5qvV54FPRX2bhSlAVvxySq
-	 LQwCfoqyWw7LU6trBM4Whnr5iQF2qgKjUguWX1aCJbTno9f94JzGmAeVY9b+b3s5C5
-	 uPETEwdoSAqlks+T/34DLVux9XUwVKOogjOMq6fuIhDZQAhWfE4/Mf1f8vtOCb0PMX
-	 tRd7lBOAElMDQ==
-Date: Wed, 12 Aug 2026 11:51:22 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: daan@amutable.com
-Cc: Jens Axboe <axboe@kernel.dk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	nbd@other.debian.org, stable@vger.kernel.org
-Subject: Re: [PATCH 0/2] loop, nbd: drop partitions left behind by the
- GD_NEED_PART_SCAN removal
-Message-ID: <20260812-weckt-allesamt-lehrinhalt-b9b85bf7445c@brauner>
-References: <20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OT0ff2fZ"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=YBnyvyc75sBYBQiEBfOzBDUagZL06PaEKMK/eukkudM=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786528569; v=1; x=1787133369;
+ b=OT0ff2fZCfFdSktLAlVqlOqYofb78NwJQ0vpAxIswGQdvoD+axqyaWMrdO72/7n++HuoRHHb
+ o+RhjFQ51tiOBVkU3/LJm2HSH9t5hq0ArRvRzi5fmfCLKTFhGtPcrgI/bFy3N/8deccLoNo/nUV
+ 9orFarMLEcVTBjaatSYGmZQA=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: from [IPV6:2a02:6b6f:e75b:1900:855:edd6:ce7b:4965] (2a02:6b6f:e75b:1900:855:edd6:ce7b:4965)
+	by smtp.migadu.com with ESMTPS id 7f9ab11aacc6e042;
+	Wed, 12 Aug 2026 09:55:59 +0000
+X-Migadu-Scanner: mta11.migadu.com
+Authentication-Results: mta11.migadu.com;
+	none
+Message-ID: <25b34f95-ca45-451e-9efe-3509788b37ce@linux.dev>
+Date: Wed, 12 Aug 2026 10:55:50 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] blk-iolatency: clear delay state when freeing policy
+ data
+To: Tejun Heo <tj@kernel.org>
+Cc: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ shakeel.butt@linux.dev, hannes@cmpxchg.org, riel@surriel.com,
+ kernel-team@meta.com
+References: <20260806183742.946953-1-usama.arif@linux.dev>
+ <20260806183742.946953-2-usama.arif@linux.dev>
+ <anodES1Ht7shMCTr@slm.duckdns.org>
+Content-Language: en-US
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <anodES1Ht7shMCTr@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 06, 2026 at 12:36:56PM +0200, Daan De Meyer via B4 Relay wrote:
-> Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-> loop_reread_partitions()") stopped disk_force_media_change() from setting
-> GD_NEED_PART_SCAN. The caller audit in that commit only considered the bit
-> as a request to rescan partitions, but it did more than that:
-> bdev_disk_changed() drops every entry in disk->part_tbl before it consults
-> disk_has_partscan(), and only the re-adding half is gated on partition
-> scanning being enabled. The lazy scan on the next open was therefore also
-> the only thing removing partitions from a device that has partitions but
-> no partition scanning.
-> 
-> Loop devices without LO_FLAGS_PARTSCAN are exactly such devices, and they
-> are not unusual. bdev_add_partition() only rejects GENHD_FL_NO_PART disks,
-> so BLKPG_ADD_PARTITION works while GD_SUPPRESS_PART_SCAN is set, and
-> parted, libfdisk and systemd all fall back to BLKPG when BLKRRPART fails
-> with -EINVAL, which is what a loop device without LO_FLAGS_PARTSCAN
-> returns.
-> 
-> Commit c4f4c0fc551c ("loop: remove manually added partitions on detach")
-> fixed the detach path after this was reported as loop devices picking up
-> partition devices from a previously built image:
-> 
->   https://bugs.debian.org/1141434
-> 
-> These two patches fix the two remaining places that relied on the same
-> lazy cleanup, LOOP_CHANGE_FD and NBD_CLEAR_SOCK.
-> 
-> Both were tested with the blktests loop and nbd groups on 7.2-rc5. New
-> cases covering the two paths fail without these patches and pass with
-> them; they will be submitted to blktests separately.
-> 
-> Signed-off-by: Daan De Meyer <daan@amutable.com>
 
-Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
+
+On 10/08/2026 19:48, Tejun Heo wrote:
+> On Thu, Aug 06, 2026 at 11:37:18AM -0700, Usama Arif wrote:
+>>  static void iolatency_pd_free(struct blkg_policy_data *pd)
+>>  {
+>> +	struct blkcg_gq *blkg = pd_to_blkg(pd);
+>> +
+>> +	/*
+>> +	 * Groups throttled as collateral have min_lat_nsec == 0, so
+>> +	 * iolatency_pd_offline() leaves their delay set.  Drop it here, where
+>> +	 * no in-flight bio can re-arm it via check_scale_change().
+>> +	 */
+>> +	if (blkg)
+> 
+> When can blkg be NULL here?
+> 
+> Thanks.
+> 
+
+Not in the normal case.
+
+pd->blkg is only set when the pd is attached to a blkg.
+blkcg_activate_policy() pre-allocates one outside the queue_lock when the
+GFP_NOWAIT allocation fails, and frees it through pd_free_fn() if it ends up
+unused — both at the retry and at the out: label. That pd never had ->blkg assigned.
+It reads as NULL rather than garbage because iolatency_pd_alloc() uses kzalloc_node().
+
+Good to keep as a guard in this case?
