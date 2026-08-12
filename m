@@ -1,120 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2DE1DDC1B;
-	Wed, 12 Aug 2026 14:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786543667; cv=none; b=D2kyHVx6OXXhYnZjps8TyCHA/TDV3vPR2u9N2+vifHNeJSDPT2m3D983LNeRq3rt9NF5Qoi5OQbisS1drPmQBz1zXNMEqbn/LrhWyeQv5eM6p2+0tI2RVZPhhV5hw+OLQ9CSrf48hRuLdetD/1bTR+J6K7n6LnNH5zAKrjCVH9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786543667; c=relaxed/simple;
-	bh=wIemVK06fnY461hoIzQ1/b8v0cE9rjeuZZSTkSmuPW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e1UbIYhxejWAF/WgXqrSPXGM/7wzeauUHCZ4h3fF88MktkactCbn/1uWGLecjPjzb2E1u3Q5nQCK3rNvgmpB10X22N11Bw3fUchTg+z2HY6Rso8n4RddAeKzCYXdDYgQf615XxYqJML41SQaw9W0BtyIU1wVEEIKasxQSRIB8FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWMCipKg; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCF638DC59
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 16:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786552425; cv=pass; b=ljaK40QTX4UQy8xoRsv2Bb1pBT4n6UsA7u6t4vTcLXiXga0fos+k19BrVQGx4HdTtouP8OakUmT+ljrLYk7+FHMXJ1VZ6dcuNCpzxeDtGfDD+Bh3l5LmuJk2Pgsg93+LSLvCyePb22VoWyrIp1JRyJo8lP01VJUbv5SrER2vQ6U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786552425; c=relaxed/simple;
+	bh=gOIsyGGYeGZsd7+1t35VENt6hUZ6tCz5k0UwrPgrJB8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NVvvWg/retkM3IxYkuAO9E2shsz8keQn9rD8V2x1H6Dm8ztmWcqqcSxT30JfLJ07K3h86abyTBmWogCdPFqkFU5qupqPH/Bo1fW6+qSVU6NTjytC9ah+6ukIMwQ4zXCxHGQK0XUjp0Rsu6INwZADMtbMUwJcRbpFKx2eMzKRamU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Al5TqyfU; arc=pass smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWMCipKg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 271671F00A3A;
-	Wed, 12 Aug 2026 14:07:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786543666;
-	bh=6wvqPUZV09YEWu6OC+X+pUdXitC3iJPIgcdLhA3zZ8Y=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To;
-	b=PWMCipKgALqakX1jRyxVPEmSUuLCAnFWXxRZ/MpxTP/UtI9UqzS8Jpa9Kny+FoYYq
-	 Jkp3gCe1/oR+F8VhtKzvhseFRwbY8Dli3+K1vfxDqQjqvUjrsjoDxAvGBP4pMkw5T/
-	 95jdJTcCjXuH8+wayLuaW9fMMSM+XZTkovXAWVi13EJDpjjWa2Ir3Ruj6FBP/fktTw
-	 Gp2UwCBqKpfFRYLVX88BGdTulK81itEkSy91PpmSpYRlj0LOCeJBGZk6E1DoF7irgr
-	 r1IDKVAp5vbDZXpUUupXAqbOwzSsc9lJuSy65ROpGdY+1k6jZ8wFbtynUz3/jMPzDS
-	 6R9rFbyec/EKQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id F1667CE0EBE; Wed, 12 Aug 2026 07:07:45 -0700 (PDT)
-Date: Wed, 12 Aug 2026 07:07:45 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Zqiang <qiang.zhang@linux.dev>
-Subject: Re: [PATCH] blk-mq: add missing call to srcu_barrier() in
- blk_mq_free_tag_set()
-Message-ID: <2236bac8-f5a8-4a5c-a304-c74c52381a71@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <CGME20260812060521eucas1p109a53a37ed0557d06aa7a68b613352aa@eucas1p1.samsung.com>
- <20260812060510.3220294-1-m.szyprowski@samsung.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Al5TqyfU"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2cf420670bbso2637305ad.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 09:33:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786552423; cv=none;
+        d=google.com; s=arc-20260327;
+        b=rTtX/6q+C+AXoVtsqUd4KFSU9GQOxs/xL0hYIusCW2GW/JEN0vR26kathVW7CPUKVl
+         wAZ6NhoeW7o8RcecZ4PUisIezN5v0mwwjQfL2hagZIzS1//Mn8Z/T/6jdThPnC/Bx5ou
+         IZsid9NVMlVh0+12sXduy9tLFxtmCQ3oBADYox9QpAEA2BEGyJ8JygxJcqCkQGTiM983
+         lhqmkbZYzIVWfR7asrPAjx+hq2e3+GLBHSIbPmexm5Kcko0meLCspndLzFixEhL20hm3
+         tJ6N9JLvElbmu+sRevEH9TDuS2MdeIrMxljyHgt7Q4dnOa3LHDeRHGOy4BCK8GcZyYFS
+         E69w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=D4SZ6u0V1SghQBdqtC98mKtc1SLMxMH5ah0RWt1B7vw=;
+        fh=c32lBnqRkbuC7FfvXOJVGDOllwOj038G70uW/P/REW8=;
+        b=S0PiFKn4b2URzUtDRzRQAQPLAV43knuArrS1dg5XJPVLIYTYpFak54sUW0eVEddMvM
+         rLF9AI2vhTCTzQmlOvHcG22a4haV8uup5sO/AcbN07/Eki8ndYMP5wureGrQmryQQHMh
+         A2nD6F1Ua8qVf36ldl1YCTtRvKJWxkTB4YaTlyd0lETn9S8WjYW5D5rwQv+Sw1UDQexd
+         TeZ02XJvlHeBkVoJuRYb/UAXSEH9aAHgOaYottNey/7i8xhYSwYGNMd/cOFQ3xw8vIrM
+         6/Fu7OHqUm1DBlmBAAu9bQ4Ppwy3CeqnFQhcfV+ScwlFEyhQBjV4gR2FzBdRr+rt2fpS
+         yhsA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786552423; x=1787157223; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=D4SZ6u0V1SghQBdqtC98mKtc1SLMxMH5ah0RWt1B7vw=;
+        b=Al5TqyfUu+23OQeZiYehEwCKw9h7n1GWuwvFfs5W/FN6ixV7O12veg3o/+6+ecIG5q
+         gi77Jv50TJJVfBr5tK78wp8gBVgj+5Y7A46NSJQiMg9vf/b+171Ld/CV/ytLNCLuYUX5
+         JGnwl6csWpus6UXO9bC2cOxNn79Q6o54bdsEtVRm7+6yYsLP6x21sneKJH7rILfD6V6Q
+         tMWciyTleAT2pJLtlHf4Ke1yqhLx3FZDQ5GOYVRZdJPiPy5U/KlYo5NBcXMa/AeygtYc
+         /sE48ZwkvJJt8DLXaboqm3a/tld2DEUcqAqzzQ8WWBf/PsfhZ7ZNON80nFOWRsL+Ksc3
+         WL8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786552423; x=1787157223;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=D4SZ6u0V1SghQBdqtC98mKtc1SLMxMH5ah0RWt1B7vw=;
+        b=QdVN0rb/uDw8O95CSWBoR8CpVOhl1ZQ4mrtEwrTDQ8ubzKjx8nZUhHIB79VR+MtWjr
+         +57ShfZUqeYAH5sR9gF6U8ddOqfPSVVBIrWHdAlJSmrayQObOqlfWn/BL4VfE/iHMlGM
+         phh1X4qUPp2WrPwdtEkAyzRdlzGavclOKPOef9/D1CHVXQ5Epp3KWh2NiCOQ0FisKwl2
+         9tiCQ4wnNkwrh7e9iXoOfblXzElfVLWsIs82nmLgTjCdzmrDyBdv0V5eVzWfSkQHkKiB
+         vXylx61CsPYN5UzFQXEaRbBHka+AdUDxwRwr512z52D5eOJp0tuYXKnoTsF2RbiwxcFJ
+         bK6g==
+X-Forwarded-Encrypted: i=1; AHgh+RpfDP54cyK3PLxzlyKwV08MmNAh6Wb1zDk4ILmjpf/58uiu1z7PvD9aiexZoYn97r/+iXG1U+13GpKVBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEq6x18S9i9rCkwQ9Z/NTyowQFvy4Dup6XmcimstF5AJhrFSVi
+	5PBspdlOMMc1gDJDRxIgRTTrfl/GZxhl3K4wbsfGTQU5Q9raWaZQGihMPaCx/zIQemnLbUM2Edz
+	mHOF3lzByGyBzwlxE96oqNZw/SzrPkt8=
+X-Gm-Gg: AR+sD132IztHmZVfqEB1nTH453invkE4bow/yD2N215k71OqzkucTb/kmrgw5kPLAmq
+	YXfU97JACK+lbOMJ/G4G3MgZTdgOjMiCEw+bpenW5Znrs1d1bCs7MMe3CJS7t+2wov9oPaU3REY
+	aVJAUP/nCwcgKvlnqsMk2DU22cT/nLYYfrL8oUJiCWKaW6qA6Uuoe9T4mxGybRTVZTm8Iih+MMO
+	wQP1XJgjicAP3AVZllAgs5jWfCtpkpwZr093WGhAHEF8g3kvE/mF2UQcsZbfRzV9HM5PinBDq/K
+	SO192F8jKDNS1I5EnPPN/Ebe0EYzF8uEaaqTFO3jLcaD3EvqDqy1lKinBgZ/fuoSnEPtWKaJYrS
+	D57fRVoatjphSfSlKktyez7yPLiVUCfG5939kFKUPywimkGNmgXlpgd+aOG8d
+X-Received: by 2002:a17:902:d552:b0:2cf:9e90:8be with SMTP id
+ d9443c01a7336-2d3456e7622mr58880125ad.4.1786552423044; Wed, 12 Aug 2026
+ 09:33:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260812060510.3220294-1-m.szyprowski@samsung.com>
+References: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
+In-Reply-To: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 12 Aug 2026 18:33:27 +0200
+X-Gm-Features: AUfX_mzHM3XF1m8TGRbbbrVs79_o_CCgi7jI9gpogE6umN7ICq8ixcdhm-skrqA
+Message-ID: <CANiq72=bhfofrbdf1qeA380-eWeKj5yXhC0NzaU_nbB9SpxYHA@mail.gmail.com>
+Subject: Re: [PATCH v10 00/10] Fix missing fops.owner in Rust DRM/misc abstractions
+To: Alvin Sun <alvin.sun@linux.dev>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Aaron Tomlin <atomlin@atomlin.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
+	Rae Moar <raemoar63@gmail.com>, Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
+	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+	Igor Korotin <igor.korotin@linux.dev>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, rust-for-linux@vger.kernel.org, 
+	linux-modules@vger.kernel.org, driver-core@lists.linux.dev, 
+	dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 12, 2026 at 08:05:08AM +0200, Marek Szyprowski wrote:
-> Commit 05c3e88488ed ("srcu: Queue sdp->work when the delay timer is
-> successfully deleted") added a check in cleanup_srcu_struct() if the
-> call to srcu_barrier() has been made before calling it, which
-> revealed a missing call to srcu_barrier() before calling
-> cleanup_srcu_struct(set->srcu). Fix this.
-> 
-> Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+On Tue, Aug 11, 2026 at 8:41=E2=80=AFAM Alvin Sun <alvin.sun@linux.dev> wro=
+te:
+>
+> The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, thre=
+ads it
+> through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates co=
+nfigfs
+> and rnull to use `this_module::<LocalModule>()`.
 
-Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+Applied to `rust-next` -- thanks everyone!
 
-> ---
-> This fixes the following issue observed recently in linux-next:
-> ------------[ cut here ]------------
->  WARNING: kernel/rcu/srcutree.c:706 at cleanup_srcu_struct+0x194/0x3d4, CPU#1: kworker/1:2/156
->  Modules linked in: s5p_mfc exynos_gsc s5p_jpeg videobuf2_dma_contig v4l2_mem2mem videobuf2_memops videobuf2_v4l2 videobuf2_common videodev mc
->  CPU: 1 UID: 0 PID: 156 Comm: kworker/1:2 Not tainted 7.2.0-rc3-00006-g05c3e88488ed-dirty #13430 PREEMPT
->  Hardware name: Samsung Exynos (Flattened Device Tree)
->  Workqueue: usb_hub_wq hub_event
->  Call trace:
->   unwind_backtrace from show_stack+0x10/0x14
->   show_stack from dump_stack_lvl+0x6c/0x8c
->   dump_stack_lvl from __warn+0x90/0x204
->   __warn from warn_slowpath_fmt+0x1b4/0x1bc
->   warn_slowpath_fmt from cleanup_srcu_struct+0x194/0x3d4
->   cleanup_srcu_struct from blk_mq_free_tag_set+0x138/0x158
->   blk_mq_free_tag_set from scsi_mq_free_tags+0x10/0x1c
->   scsi_mq_free_tags from scsi_remove_host+0x14c/0x170
->   scsi_remove_host from uas_disconnect+0x70/0x84
->   uas_disconnect from usb_unbind_interface+0x78/0x2b4
->   usb_unbind_interface from device_release_driver_internal+0x194/0x208
->   device_release_driver_internal from bus_remove_device+0xf8/0x1c8
->   bus_remove_device from device_del+0x138/0x3b0
->   device_del from usb_disable_device+0xec/0x22c
->   usb_disable_device from usb_disconnect+0xf8/0x2bc
->   usb_disconnect from hub_event+0x9a8/0x1c3c
->   hub_event from process_one_work+0x258/0x798
->   process_one_work from worker_thread+0x1bc/0x3cc
->   worker_thread from kthread+0x138/0x16c
->   kthread from ret_from_fork+0x14/0x28
->  Exception stack(0xf0dfdfb0 to 0xf0dfdff8)
->  dfa0:                                     00000000 00000000 00000000 00000000
->  dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
->  dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
->  irq event stamp: 23097
->  hardirqs last  enabled at (23109): [<c0100bf8>] __irq_svc+0xb8/0xd0
->  hardirqs last disabled at (23118): [<c0100b94>] __irq_svc+0x54/0xd0
->  softirqs last  enabled at (23094): [<c013ef54>] handle_softirqs+0x32c/0x58c
->  softirqs last disabled at (23065): [<c013f360>] __irq_exit_rcu+0x144/0x1f0
->  ---[ end trace 0000000000000000 ]---
-> ---
->  block/blk-mq.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 2c850330a32b..a26a11c73ee3 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4975,6 +4975,7 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
->  	srcu_barrier(&set->tags_srcu);
->  	cleanup_srcu_struct(&set->tags_srcu);
->  	if (set->flags & BLK_MQ_F_BLOCKING) {
-> +		srcu_barrier(set->srcu);
->  		cleanup_srcu_struct(set->srcu);
->  		kfree(set->srcu);
->  	}
-> -- 
-> 2.43.0
-> 
+    [ Fixed `clippy::undocumented_unsafe_blocks` lint by wrapping with
+      a block. Added interim `#[allow(dead_code)]`. - Miguel ]
+
+    [ Fixed `rusttest` by adding a dummy `LocalModule`. Removed interim
+      `#[allow(dead_code)]`. - Miguel ]
+
+    [ Rebased to avoid the imports cleanup patch. - Miguel ]
+
+    [ Removed Acked-by and Cc. - Miguel ]
+
+By the way, I removed the Acked-by in that last patch since I think it
+came from an older version as a series-tag that didn't have the patch.
+Please let me know if I should re-add it.
+
+And since I was editing that commit for that reason, I took the chance
+to remove the Cc because Petr already gave the Acked-by which you
+collected, so normally you don't need to keep both in that case.
+
+I hope that clarifies! :)
+
+Cheers,
+Miguel
