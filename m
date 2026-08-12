@@ -1,181 +1,153 @@
-Received: from va-2-56.ptr.blmpb.com (va-2-56.ptr.blmpb.com [209.127.231.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EE9279DB6
-	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 01:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC41537FF75
+	for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 04:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786498124; cv=none; b=SU4zwjZoXuIZJV3kT28i57vuK5U6KJDR+vDu7gPigxQ5vYcBWSKpaVZmG5jo8Ea3F3mYZ7ijnV6uaW9FQDgqj/xv3D7W5NlX9DLaWW0wqWxSyjiDq7wUmoWnhyWEKzstavb9EiM86N7eP7HVPNiYqyb1uODP4W/ka+R3y9/5DII=
+	t=1786507685; cv=none; b=aPDXY290KKzYyaPQML9sGgU/5+T/O1H6K1Srb4LZE+/w3/sNhvY+vJu77CxKOlJP8MZnMWsikiZowtwuzt3AhSFrL0NR0+aVPIjmGNXu3auK8B3UwkVFnYkQp/W+mgwK2F+/M2yKxE+FqLs3ulusSWGxCnYB+MjBoH12ohLr3+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786498124; c=relaxed/simple;
-	bh=pI8NWKivLdNs4T9TIQzGfYzUHRLKNpkxaCgnJkaWReA=;
-	h=Cc:From:Subject:Mime-Version:In-Reply-To:To:Message-Id:References:
-	 Date:Content-Type; b=LYhbuOvJQnVI9PAih1XVJeiXvZKoLOVA722LiPB/KrbHF6qGs914lXvxsM81Vl4SH32cDpvvdxXa7gkK2V2V+84oUhjsaSP4pDVz055BsftEv/w/J7BOs2k2OT6ZmVQjDa+1QoaDyxiCCp75EfMaz5TTVlRTQxDPOwoha3HwRnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=GZ5+3e/N; arc=none smtp.client-ip=209.127.231.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1786507685; c=relaxed/simple;
+	bh=nDkVpRCvrp68mja4VZcN608/AoFR2Rwr9LfUsHEBzh4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dF/CmK4jWJV+sYohEzK5N0xvCwtGgeBB4MFqMW30BgkKEApRbr9jj6ZSrhQ6Zp1ebwNya0CGJF68pfZYBLJauPPCfooXJOqHSru82YZDR468KYFAZmftgy1JH7YfZ1uJXAts/XlmuM3DPK/h6Ujq10Yj9bQkrMAkPlyRMvENN68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AQGaMh1h; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="GZ5+3e/N"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1786498112;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=js62KYIi4WGyt09W67v/lmLZ+mgT/5ejgsww9hjGIM4=;
- b=GZ5+3e/NKLTejFZQQHJkEUX4lAzoEm9vfHuUWo6HaAkVIHvgc+mlnFIQ60UD+rj1M6zEV+
- EuUsuvOq2rbjmyQELI71hMBu+jNKk9Ab6MxpTCK8LBUtWC6sCJWlEuSnKNfKWE9MUEGB67
- c68pP3cKnxAk+ddqktZuX6lp0xxv3++eFkg+gAqLyuSWvCLBVwWupbX0usuET0NvFIWcB7
- wbHYt25jG7YM/JHGOZV8ZVxOVKVVVDsq0ir/V5HeUlRuCP1kiOSe7gZzPChrilGvDdMMwc
- CRJpWRZigJJvNZsimFvk2z6a3urFDJokMTf6X+1QK/y/yXS1VNLl3tlLENg7LQ==
-X-Lms-Return-Path: <lba+26a7bcc3f+f4b44d+vger.kernel.org+yukuai@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.170]) by smtp.larksuite.com with ESMTPS; Wed, 12 Aug 2026 01:28:30 +0000
-Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>, "Khazhy Kumykov" <khazhy@google.com>
-From: "yu kuai" <yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Subject: Re: [PATCH] blk-cgroup: fix circular locking dependency in blkg_conf_prep
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AQGaMh1h"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1786507681;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=P8K7GHrWP7F1k+UpCzMLZSmw8Tl4U2IKt5xr9zslkHE=;
+	b=AQGaMh1hkjOmVADKRT5gXT8Pi+8+7nWtee8miFZ6Hzv1lUIgUsoNG8PjYvFNNwEPti5IHm
+	dgUHE5QfHVEWyAXx6uBI82BmJfF/dBGbT5RNcl37zskLLXJy28N672VyZP1K2noIXJJXVR
+	SRMTm5ciiRKCCsHQQddIv8qyD5uFBbE=
+From: Hongfu Li <hongfu.li@linux.dev>
+To: axboe@kernel.dk,
+	bvanassche@acm.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hongfu.li@linux.dev,
+	Hongfu Li <lihongfu@kylinos.cn>
+Subject: [PATCH v2] block/mq-deadline: Drop unused dd parameters
+Date: Wed, 12 Aug 2026 12:07:29 +0800
+Message-ID: <20260812040729.27551-1-hongfu.li@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-In-Reply-To: <20260811204803.3770208-1-sudarsanm@google.com>
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Mozilla Thunderbird
-To: "Sudarsan Mahendran" <sudarsanm@google.com>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>, 
-	"yu kuai" <yukuai@fygo.io>
-Message-Id: <8929741f-9d8d-471d-9519-d97a9b878b1f@fygo.io>
-References: <20260811204803.3770208-1-sudarsanm@google.com>
-Reply-To: yukuai@fygo.io
-Date: Wed, 12 Aug 2026 09:28:26 +0800
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+From: Hongfu Li <lihongfu@kylinos.cn>
 
-=E5=9C=A8 2026/8/12 4:48, Sudarsan Mahendran =E5=86=99=E9=81=93:
-> In blkg_conf_prep, we may do IO when allocating while
-> holding blkcg_mutex, however this presents a deadlock
-> scenario since we may grab sysfs_lock while IO is
-> suspended in elevator_exit, and an existing chain
-> exists from sysfs_mutex -> blkcg_mutex.
->
-> We can fix this by performing only GFP_NOIO allocations within
-> blkg_conf_prep when blkcg_mutex is held.
-> This patch fixes our reproducer.
->
-> Full lockdep splat:
->
-> [ 3795.003422] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [ 3795.009595] WARNING: possible circular locking dependency detected
-> [ 3795.015773] 6.18.20-dbg-DEV #1 Tainted: G                 N
-> [ 3795.021432] ------------------------------------------------------
-> [ 3795.027604] kpython3/435194 is trying to acquire lock:
-> [ 3795.032744] ffffffffa36959b8 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_=
-alloc_noprof+0x49/0x5c0
-> [ 3795.041260]
-> [ 3795.041260] but task is already holding lock:
-> [ 3795.047086] ffff98c8a06477b0 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_c=
-onf_prep+0x71/0x5e0
-> [ 3795.055257]
-> [ 3795.055257] which lock already depends on the new lock.
-> [ 3795.055257]
-> [ 3795.063422]
-> [ 3795.063422] the existing dependency chain (in reverse order) is:
-> [ 3795.070893]
-> [ 3795.070893] -> #4 (&q->blkcg_mutex){+.+.}-{4:4}:
-> [ 3795.076986]        __mutex_lock+0x92/0xb70
-> [ 3795.081085]        blkcg_deactivate_policy+0x7f/0x230
-> [ 3795.086137]        bfq_exit_queue+0xe1/0x110
-> [ 3795.090401]        blk_mq_exit_sched+0xd1/0x170
-> [ 3795.094935]        elevator_exit+0x50/0x70
-> (...)
-> [ 3795.135019]
-> [ 3795.135019] -> #3 (&eq->sysfs_lock){+.+.}-{4:4}:
-> [ 3795.141110]        __mutex_lock+0x92/0xb70
-> [ 3795.145211]        elevator_exit+0x45/0x70
-> [ 3795.149308]        elevator_switch+0x98/0x290
-> [ 3795.153660]        elevator_change+0x109/0x190
-> [ 3795.158106]        elv_iosched_store+0x198/0x240
-> (...)
-> [ 3795.185276]
-> [ 3795.185276] -> #2 (&q->elevator_lock){+.+.}-{4:4}:
-> [ 3795.191541]        __mutex_lock+0x92/0xb70
-> [ 3795.195642]        elevator_change+0xb6/0x190
-> [ 3795.200001]        elv_iosched_store+0x198/0x240
-> (...)
-> [ 3795.227179]
-> [ 3795.227179] -> #1 (&q->q_usage_counter(io)#19){++++}-{0:0}:
-> [ 3795.234224]        blk_alloc_queue+0x33e/0x370
-> (...)
-> [ 3795.266621]
-> [ 3795.266621] -> #0 (fs_reclaim){+.+.}-{0:0}:
-> [ 3795.272280]        __lock_acquire+0x157c/0x2980
-> [ 3795.276813]        lock_acquire+0xd3/0x2a0
-> [ 3795.280904]        fs_reclaim_acquire+0x55/0xc0
-> [ 3795.285435]        kmem_cache_alloc_noprof+0x49/0x5c0
-> [ 3795.290481]        __radix_tree_preload+0xef/0x250
-> [ 3795.295273]        blkg_conf_prep+0x2aa/0x5e0
-> [ 3795.299633]        tg_set_conf+0xa5/0x1a0
-> (...)
-> [ 3795.330808]
-> [ 3795.330808] other info that might help us debug this:
-> [ 3795.330808]
-> [ 3795.338806] Chain exists of:
-> [ 3795.338806]   fs_reclaim --> &eq->sysfs_lock --> &q->blkcg_mutex
-> [ 3795.338806]
-> [ 3795.349146]  Possible unsafe locking scenario:
-> [ 3795.349146]
-> [ 3795.355057]        CPU0                    CPU1
-> [ 3795.359590]        ----                    ----
-> [ 3795.364121]   lock(&q->blkcg_mutex);
-> [ 3795.367691]                                lock(&eq->sysfs_lock);
-> [ 3795.373776]                                lock(&q->blkcg_mutex);
-> [ 3795.379862]   lock(fs_reclaim);
-> [ 3795.383006]
-> [ 3795.383006]  *** DEADLOCK ***
->
-> Reviewed-by: Khazhy Kumykov <khazhy@google.com>
-> Signed-off-by: Sudarsan Mahendran <sudarsanm@google.com>
-> ---
->   block/blk-cgroup.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index d9676126c5b5..b981a80bbd94 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -867,7 +867,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
->   			parent =3D blkcg_parent(parent);
->   		}
->  =20
-> -		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
->   		spin_unlock_irq(&q->queue_lock);
->  =20
->   		new_blkg =3D blkg_alloc(pos, disk, GFP_NOIO);
-> @@ -876,7 +875,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
->   			goto fail_exit;
->   		}
->  =20
-> -		if (radix_tree_preload(GFP_KERNEL)) {
-> +		if (radix_tree_preload(GFP_NOIO)) {
+Commit c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
+left the dd parameter unused in deadline_move_request().
 
-Thanks for the patch, however, there is a pending patchset that this radix_=
-tree_preload will be removed,
-I think which is a better solution:
+Commit fde02699c242 ("block: mq-deadline: Remove support for zone
+write locking") left dd unused in deadline_fifo_request() and
+deadline_next_request().
 
-[RFC PATCH v2 2/4] blk-cgroup: use a request_queue rhashtable for blkg=20
-lookup - Yu Kuai <https://lore.kernel.org/all/20260811064744.1139446-3-yuku=
-ai@kernel.org/>
+Remove these unused function parameters.
 
->   			blkg_free(new_blkg);
->   			ret =3D -ENOMEM;
->   			goto fail_exit;
+Signed-off-by: Hongfu Li <lihongfu@kylinos.cn>
+---
+v2:
+- Adjust code formatting.
+- No functional changes.
+---
+ block/mq-deadline.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
---=20
-Thanks,
-Kuai
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 824bfc17b2c6..5f643c0ce2a8 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -233,9 +233,8 @@ static void dd_merged_requests(struct request_queue *q, struct request *req,
+ /*
+  * move an entry to dispatch queue
+  */
+-static void
+-deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+-		      struct request *rq)
++static void deadline_move_request(struct dd_per_prio *per_prio,
++				  struct request *rq)
+ {
+ 	/*
+ 	 * take it off the sort and fifo list
+@@ -269,9 +268,8 @@ static inline bool deadline_check_fifo(struct dd_per_prio *per_prio,
+  * For the specified data direction, return the next request to
+  * dispatch using arrival ordered lists.
+  */
+-static struct request *
+-deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+-		      enum dd_data_dir data_dir)
++static struct request *deadline_fifo_request(struct dd_per_prio *per_prio,
++					     enum dd_data_dir data_dir)
+ {
+ 	if (list_empty(&per_prio->fifo_list[data_dir]))
+ 		return NULL;
+@@ -283,9 +281,8 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+  * For the specified data direction, return the next request to
+  * dispatch using sector position sorted lists.
+  */
+-static struct request *
+-deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+-		      enum dd_data_dir data_dir)
++static struct request *deadline_next_request(struct dd_per_prio *per_prio,
++					     enum dd_data_dir data_dir)
+ {
+ 	return deadline_from_pos(per_prio, data_dir,
+ 				 per_prio->latest_pos[data_dir]);
+@@ -334,7 +331,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	rq = deadline_next_request(dd, per_prio, dd->last_dir);
++	rq = deadline_next_request(per_prio, dd->last_dir);
+ 	if (rq && dd->batching < dd->fifo_batch) {
+ 		/* we have a next request and are still entitled to batch */
+ 		data_dir = rq_data_dir(rq);
+@@ -349,7 +346,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+ 	if (!list_empty(&per_prio->fifo_list[DD_READ])) {
+ 		BUG_ON(RB_EMPTY_ROOT(&per_prio->sort_list[DD_READ]));
+ 
+-		if (deadline_fifo_request(dd, per_prio, DD_WRITE) &&
++		if (deadline_fifo_request(per_prio, DD_WRITE) &&
+ 		    (dd->starved++ >= dd->writes_starved))
+ 			goto dispatch_writes;
+ 
+@@ -379,14 +376,14 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	next_rq = deadline_next_request(dd, per_prio, data_dir);
++	next_rq = deadline_next_request(per_prio, data_dir);
+ 	if (deadline_check_fifo(per_prio, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = deadline_fifo_request(dd, per_prio, data_dir);
++		rq = deadline_fifo_request(per_prio, data_dir);
+ 	} else {
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+@@ -409,7 +406,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+ 	 * rq is the selected appropriate request.
+ 	 */
+ 	dd->batching++;
+-	deadline_move_request(dd, per_prio, rq);
++	deadline_move_request(per_prio, rq);
+ 	return dd_start_request(dd, data_dir, rq);
+ }
+ 
+-- 
+2.54.0
+
