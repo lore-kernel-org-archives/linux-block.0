@@ -1,153 +1,121 @@
-Received: from mta1.migadu.com (out-216.mta1.migadu.com [95.215.58.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835F6480DE0
-	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 14:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7632948988A
+	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 15:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786632065; cv=none; b=RFTl0NVmes5QRgueGBsAT4lOFPfZc8pr07jjuR7sNXa8FtqlvJXRNFLHcGEPoXXfq1syh09dhjV95wAGpWVNrPiXPy2l+Eu4SK3geIexb+fuPn7Qo80UuwFDhOnA9+Y5XHTKPT+YZlCLUmGYVYXY88Fk/6pBbkv/z1slOIXsoOo=
+	t=1786634550; cv=none; b=s0B/gDJ31TCp2w17z0ID2beHTpCZ0TDEIosSHNF8je85PCcMzrNp5hXm1fK3Qi+52G82sND8SedFEeVpn/ypmqS0RELh0pSPqgHxyOyHMf926YDznhhlyd3gisRzlYzg3HYFaqmQM2Cdh/2kY9NamSML2/rAjR+8E/ZscAY6AqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786632065; c=relaxed/simple;
-	bh=DJIPumNwszO12ziGPknv5wNE8CM0NkVTDYB78EnjgvU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HTjjJn9c+N101BE2T1nVTYwa6Kd5FQuZK0/9XSElDR1pvL/ujf23MoL50vTRFAgZFlTz2f68x7MMSBOkSaE/1mWo1CahRY5QUduvV6/KYtNqG45e2U0mQ+F55Bx8ScPEMATSboturbwrdoDkbZtTGhWgSI1ikQb3sNEYo+jb01g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Syk2/DWn; arc=none smtp.client-ip=95.215.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786634550; c=relaxed/simple;
+	bh=ITIC2ORuWtwGAwGgy6PmqjyuE8/xFtZXnbwKnzadr3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J/HO74BJVCseSfUJKlHe2omJLnx76dyjI6Vmm6/DMfq1Cf5nbK9gLnLtbv4Pqtp2Nj5veE9VpFHbKzz/bF0YNN9cWu0PMcKPnOKZ5G8n6wZY8TuHmTNRLRi82lxPFzF+9DIpzIbX2fVkKJUwjhD5I2yR5oEBKAjLRqnF3qR3GX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2LE+6fF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Syk2/DWn"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=DJIPumNwszO12ziGPknv5wNE8CM0NkVTDYB78EnjgvU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1786632058; v=1; x=1787236858;
- b=Syk2/DWnCnpWS/E1HkafD9610Ny2T2VvtT2iCg3HD7kf3wIPW1zNukb6gO+ZfDo2ha8lPD33
- H/xFBvEhRrMAkdnEvAQvKlwa6Az9Dh6aubOjzxwORxki/hvlSmqwm+BrRoDP0jGkhCz/rAZqwdZ
- DOhu96AO6bv4pbV8JFdpy1CY=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: from ctao-book.. (111.162.215.50)
-	by smtp.migadu.com with ESMTPS id 2968fc17ef0d4a5f;
-	Thu, 13 Aug 2026 14:40:58 +0000
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: linux-block@vger.kernel.org,
-	shinichiro.kawasaki@wdc.com
-Cc: hch@lst.de,
-	yukuai@kernel.org,
-	cui.tao@linux.dev,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH blktests] tests/throtl: add a new test 009
-Date: Thu, 13 Aug 2026 22:40:41 +0800
-Message-ID: <20260813144041.1715866-1-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2LE+6fF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9021F00A3D;
+	Thu, 13 Aug 2026 15:22:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786634549;
+	bh=Hy3Fv4aJ+ACbSi3m6G2lTLz84Opw4hWd/ZOYE3w9+OQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=a2LE+6fF2tvM+OC1gppdIbBHTqhLHb5EwyAWQVGoWk1TCkdrI5Xk3NLktAZSBkH04
+	 bKZ8J/d0QDo8paKICRU/Ter3WODu1Nm3jKzn8UKVfOlOKTzJz8r1PWZvF+DIsVrUfM
+	 G/X/j4ahLklaLfIop1mCNj05K9XVjH2er9kH1G39J3ujjypHE39zAar8wk6ifKx4wr
+	 Z+kTPnb8G/NcojXL3V5ZlGETbfIw9lV65HmrRccFXmhjqJCJQzJO7DOawimkp21TtY
+	 UHM6aC1ymGEpIeilKYXIKS6ZSQjnlgGSinyFrlcE+4f1oAHuFAEUNyk4wKTWnD45NP
+	 2wkpoxLdySquA==
+Date: Thu, 13 Aug 2026 17:22:25 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@fb.com>,
+	Kyungchan Koh <kkc6196@fb.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] null_blk: serialize configfs attribute updates with
+ device setup
+Message-ID: <an3hMSr9MiQzDC-9@ryzen>
+References: <20260813141456.1625857-2-cassel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260813141456.1625857-2-cassel@kernel.org>
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Thu, Aug 13, 2026 at 04:14:56PM +0200, Niklas Cassel wrote:
+> The attribute store methods generated with NULLB_DEVICE_ATTR() refuse to
+> change the configuration of a live device by testing
+> NULLB_DEV_FL_CONFIGURED, but that flag is only set by
+> nullb_device_power_store() after null_add_dev() has returned, and the
+> store methods take no lock at all. configfs only serializes writes to
+> the same open file (buffer->mutex), so a write to any attribute can run
+> concurrently with null_add_dev() and change the device configuration
+> while it is being used.
+> 
+> null_add_dev() reads the configuration several times, e.g. dev->zoned is
+> read once to set up the queue limits and once to initialize the zone
+> resources:
+> 
+>   CPU0: echo 1 > nullb0/power         CPU1: echo 1 > nullb0/zoned
+>   nullb_device_power_store()
+>     mutex_lock(&lock)
+>     null_add_dev()
+>       if (dev->zoned) -> false
+>         /* no BLK_FEAT_ZONED */       nullb_device_zoned_store()
+>                                         test_bit(FL_CONFIGURED) -> 0
+>                                         dev->zoned = true
+>       blk_mq_alloc_disk()
+>         /* queue is not zoned */
+>       if (nullb->dev->zoned) -> true
+>         null_register_zoned_dev()
+>           blk_revalidate_disk_zones()
+> 
+> blk_revalidate_disk_zones() is then called for a queue that does not
+> have BLK_FEAT_ZONED set, which triggers its WARN_ON_ONCE() and fails the
+> device setup with -EIO:
+> 
+>   WARNING: CPU: 2 PID: 322 at block/blk-zoned.c:2357 blk_revalidate_disk_zones+0x4c/0x560
+> 
+> Clearing dev->zoned in the same window is worse: the queue is created
+> with BLK_FEAT_ZONED but the zone resources are never initialized, so
+> add_disk() succeeds for a zoned disk that has no zones. And a store that
+> lands after the last dev->zoned test leaves dev->zoned set while
+> dev->zones is still NULL, which null_process_zoned_cmd() dereferences on
+> the first write.
+> 
+> Fix this by taking the global lock, which nullb_device_power_store()
+> already holds across null_add_dev() and null_del_dev(), around both the
+> NULLB_DEV_FL_CONFIGURED test and the update of the device configuration.
+> The submit_queues and poll_queues apply callbacks are now called with
+> that lock held, so remove the locking they did themselves.
+> 
+> Since the store methods can run as soon as configfs_register_subsystem()
+> returns, that is, before null_init() gets to mutex_init(&lock), also
+> initialize the lock statically with DEFINE_MUTEX().
+> 
+> Fixes: 3bf2bd20734e ("nullb: add configfs interface")
+> Reported-by: syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/linux-block/6a7d0b3f.ac361c09.22ff0a.004c.GAE@google.com/
+> Signed-off-by: Niklas Cassel <cassel@kernel.org>
 
-Test the boundary condition of removing a cgroup while it still has IO
-queued in the blk-throttle queue.  The queued bios must be flushed through
-without any blk-cgroup or blk-throttle warning.
+Patch was verified using reproducer:
 
-The dmesg check matches any blk-cgroup / blk-throttle warning rather than a
-single call site, so it is not tied to one symbol.
+$ while :; do echo 1 > /sys/kernel/config/nullb/nullb0/power; echo 0 > /sys/kernel/config/nullb/nullb0/power; done &
+$ while :; do echo 1 > /sys/kernel/config/nullb/nullb0/zoned; echo 0 > /sys/kernel/config/nullb/nullb0/zoned; done &
 
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
-See also the related blkcg "store blkcg in bio" RFC:
-https://lore.kernel.org/r/20260804065313.2092022-1-yukuai@kernel.org
 
- tests/throtl/009     | 67 ++++++++++++++++++++++++++++++++++++++++++++
- tests/throtl/009.out |  2 ++
- 2 files changed, 69 insertions(+)
- create mode 100755 tests/throtl/009
- create mode 100644 tests/throtl/009.out
+With the fix patch in $subject:
+No WARNING after 1 minute of running.
 
-diff --git a/tests/throtl/009 b/tests/throtl/009
-new file mode 100755
-index 0000000..1f4ed67
---- /dev/null
-+++ b/tests/throtl/009
-@@ -0,0 +1,67 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Tao Cui <cuitao@kylinos.cn>
-+#
-+# Regression test for removing a cgroup while IO is still queued in the
-+# blk-throttle queue.  The queued bios must be flushed without any
-+# blk-cgroup or blk-throttle warning, and without leaking the blkg
-+# reference they pin.
-+
-+. tests/throtl/rc
-+
-+THROTL_BLKDEV_TYPES="nullb"
-+
-+DESCRIPTION="queued throttled IO vs. cgroup removal must not warn"
-+QUICK=1
-+
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _set_up_throtl; then
-+		return 1
-+	fi
-+
-+	# Throttle reads so the bio queues in the throttle queue.
-+	_throtl_set_limits rbps=4096
-+
-+	(
-+		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
-+		exec dd if=/dev/"$THROTL_DEV" of=/dev/null bs=1M count=1 status=none
-+	) &
-+	local io_pid=$!
-+	sleep 2
-+
-+	# Move the reader to the cgroup2 root so the throttle cgroup can be
-+	# removed while its bio is still queued.  $CGROUP2_DIR has +io in its
-+	# subtree_control and so cannot hold processes.
-+	echo "$io_pid" > "$(_cgroup2_base_dir)/cgroup.procs"
-+
-+	# Remove the throttle cgroup while its bio is still queued.
-+	rmdir "$CGROUP2_DIR/$THROTL_DIR"
-+	sleep 3
-+
-+	kill "$io_pid" 2>/dev/null
-+	wait "$io_pid" 2>/dev/null
-+
-+	# $THROTL_DIR is already gone; tear down the rest by hand.
-+	if [[ $THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO == true ]]; then
-+		echo "-io" > "$CGROUP2_DIR/cgroup.subtree_control"
-+	fi
-+	if [[ $THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO == true ]]; then
-+		echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-+	fi
-+	_exit_cgroup2
-+	_exit_throtl_blkdev
-+
-+	if _dmesg_since_test_start | grep -qE "WARNING:.*(blk-cgroup|blk-throttle)"; then
-+		echo "WARNING: blkcg/blk-throttle warning on cgroup removal with queued IO"
-+		_dmesg_since_test_start | grep -A 12 -E "WARNING:.*(blk-cgroup|blk-throttle)" \
-+			>> "$FULL"
-+	fi
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/throtl/009.out b/tests/throtl/009.out
-new file mode 100644
-index 0000000..be675dd
---- /dev/null
-+++ b/tests/throtl/009.out
-@@ -0,0 +1,2 @@
-+Running throtl/009
-+Test complete
--- 
-2.43.0
+Without the fix patch in $subject:
+[ 1120.067545] WARNING: block/blk-zoned.c:2357 at blk_revalidate_disk_zones+0x274/0x2b0 
+within 1 second of running.
 
+
+Kind regards,
+Niklas
