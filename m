@@ -1,242 +1,140 @@
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+Received: from mail-pj2-f3.google.com (mail-pj2-f3.google.com [74.125.227.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA858314B95
-	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 05:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.208
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786598258; cv=none; b=mjgQQggVOlAaS44K1YKjDaKTtnKBXVczohL3AsiE8iKL/OoLEFTuUJTqkVx9YT9440Qfhv2rkzLyVg3hxU31+Q/t48DYj5BkwB/l/rYuEbvBArBnm5MVSIy2pcH+P+GULWq/KITvH9hSQgQqEcVY/z7/sdzULeu61ingroG0kNU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786598258; c=relaxed/simple;
-	bh=DTlfCt/dnTqT1iwlYFLOnUTSZeZf1RNhF41VMf81wks=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BXA2ZLIEhpDnHYvJbOFCdu+M/pGkg5sEFYPfdl7H/GdywbYy0PXW7QFL7cyu373BJc9Wojs3gUTrJ7YoPvIU0GlBOen24fWRDzMSFZvxrMzoAam59sfFU6Beu5e+VP7VxBTt0ALvNXpg2N6a3fIMHhIAm3+b3edt1Jy2BcuPV68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-4ab260600easo745069b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 22:17:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B497D36A03F
+	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 07:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786606527; cv=pass; b=B0lGfgbS78+spetVpi/KHBJOfFf3qEMpxqrk72gnrGmQ325S+mEiCx6io/hEx75nmfFwcOdrwJD091GB8JALZCX7wFiFqzaH8j9zwROIQPvcgwBeZa2WkQHCOowyafatDGCUMgCOftDN/zn7JQv5kk6vvHhkb77s+A8YMKy9mpo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786606527; c=relaxed/simple;
+	bh=y7qJ7hwfM2XRLr6JodOHK6g7YYZSMVnnUqSagm20tAE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Neyna0KhW6QDvsCANQAVSAZ/sSL8GOfM+ny4yUcVULvxEUpxu7kHZQx/8FtndU2QgcF2VzANbw4ct4AvVne6tSdSd2rdNiq2nFt95fYIHkwBAjmTQZ5brNI0gz4RWkVeuuLNVId8RLkz0ZvKTnjUYxlFEEKjthf536ZidgrlhfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMqV4zLb; arc=pass smtp.client-ip=74.125.227.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMqV4zLb"
+Received: by mail-pj2-f3.google.com with SMTP id d9443c01a7336-2ce7ac92dfcso19680695ad.1
+        for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 00:35:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786606525; cv=none;
+        d=google.com; s=arc-20260327;
+        b=YXompxpcW9McAoICDQwYCnKH+gKsv4qgf/vM4/WlaOcoLoWVUJkkx+0CfkvJZZkEaF
+         j4lQOqfFnvNliKGQLzFcveqVdaf2nG/cjsWON3UQtrY6U8NXB3oGZU7biRh1n5LomwnR
+         9GqNznzQT+ck9JryZZ12gWSlrIXYPhGGTQXzT7HDfS0brKZVyAilX46LtK9P/1TeYVqu
+         9Ajj630taigPAho1xVE6ZqDovxxm7jrUzeNe+3ndjqoul9V/ICEfppHyilPLU4iqwEZ+
+         zk6kLsUKJytfDhgJ1PTHbxs48IQV9ToZSSNPkPIjF72yBmPHzLs4haDC+d/v1M35tM5L
+         nloA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
+        fh=2K9xecXyb/phhm5de45Fag1Z6EOZT58YVmO47daZDlc=;
+        b=o2EGW4vwTWDZP0v/P0rDNZUJNYnofzxFJffqczjhmj85GkPPaycdfyrRUA8rJYUhD5
+         l0OpgYfrmzPlno+P4qfq96/+w4ZScv9070aFp271t/jLC2/Mm4FS/fh3yFFWEAJUKUSq
+         yR+bw75bqUvGPDZ5FuiHtmcWv3oGWC+gcZsTBP4EBTWS94dvAFTjT9uh55kejD1hlg7e
+         VaER++H0SayzHBqAjQRm36JShjqjY+dRMucLzfrV+Wrggf7w5Amo8lWDYfAhFCUUQnDx
+         iaBurwUY+3QMg/WsVtziQ/OlJ6hrkaIOPVDuPp4Fi64T6/9GZLz73Y4x6FpaqERrvr7D
+         QXtQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786606525; x=1787211325; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
+        b=dMqV4zLb++wNJ+fs9J68zljo5NVaMp7IiF/O6GCxqeQ/PoLNlsPIfhquBJofn1bTFC
+         T/RyJtyUmjftJOyiM+eJJhvMnBTgDN0WOIHh/4QT8Rm9ZtXMdWPQiG/9wccTM3oR7U84
+         8hdjt26GmuUIFvvOB19yDWCMUj5DSHmTsVEl26H836rZ+m1q1ajyN08KTgqGTY6rPvkw
+         uRNUW22O2vIfJF7gd8Fjcc2jyeGMsaLCZmPurVSVSI/ptoeqyddLxOI0eXi9+JpstiEL
+         9P9DhPB/PCPsMid9d7vGsq7FQ7TSalJLeVrHPsoWUG7kYv20tJIL4h6Iq07yg5YarfVU
+         K2WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786598248; x=1787203048;
-        h=content-type:to:from:subject:message-id:date:mime-version
+        d=1e100.net; s=20251104; t=1786606525; x=1787211325;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=hM5DZqNTFKbSdqexd8s5sfaEc9sprn3Y/lejP2IpkLo=;
-        b=V53SjV2gLHS08Ul2d/Ez4i88PIy1otwkOB8QM68YybgF31sRSjENvmmpwvFSsWtZwD
-         mpP/cwgZAusNErB+vMPVWAf8colH0ow1Fl19BIincE78jaksF3wa1PD3UlcFOYFiMLKD
-         /dNoekEZdR9qk2cdOZs+WCb9iQn6uGpWZ6Qwy0Vpmoo0dyzkE8xbWm+O7/Y5PUUEzt+3
-         TB9bqYXLmNIT2+lgfXQRW+8m4jMtHKy/pj44F4ZQ79CezaZm/MSDe8zZW6RA+fdWwYGr
-         QIzqXHFuQkiNyveLXREFDjV5iTi3viapfN4eyFc4uDnBcZS5g/UxaRKNRf+6TN17Ha8F
-         51ew==
-X-Forwarded-Encrypted: i=1; AHgh+Rqj8boM+LNNySJWftIyNoejwbAU/jPPZs96UerI0byCO+eWJMeQZtpdbg9nwPqsQeO8tEdtN/GJW9jmjQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBqzWgNhUgquhrwTzRd01Jt1xPYPXFKTBDIqD46SzbD5usvL1w
-	U3UX44CbYGKjCkKOZ7dIvMevP9bXr1eUqJNaW1ft8WTtV9vhIZL+tnWmjXQyJR7LVGY/K1fAGrF
-	m073slZJafiP6jJuNmkmX2wOTXQHJ4gkjy95TdF8oMz+IXRsNQhpYjTNpzwM=
+        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
+        b=Uo8CCpFNdLOrL3VbulL3QjFNig3DCIH+8XGZzJ89AzmGosxurjeYn0AjMy0hNxG1En
+         bDnaQCwlCI9zzCIx3Z6/3pw69nexb1bUeT3x9LLbMKdz7F8D3h9hGV/z7oiS8REe/tCe
+         zQgh4D66I8TghonXiS9gFCJrg14Mtvk2pEvVvbaKxiUCPbDbvLNEnTALMJ23EtcaPNdn
+         Wzg+giR+eVR8gZl2AM5EhaUKfyvAjmFn9SoSF8sCffU0jZEU4XM/GEoFDtV08bWrkA8u
+         id6yKykBq4D3cjkhvVcHLxNu29MWenj14s2YyUpPKDus1/d1vzzSJ7vw6bkOSkcODhf7
+         JgAg==
+X-Forwarded-Encrypted: i=1; AHgh+RoTISGpNr95OCn6w33WvIGwrPX2FEdvwiRLNQmSBHrYC1afUhO/iaUi4ugVa1QLUvptZafUZtlwo5Lfrg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUYR6ghb4+4d7ozxv6iycOPgPhp8oYnwEAapMvz13hMjoTWiUE
+	tudJAJUkD4HXNGPUv8PzMJy6UP4W7NdvNlffw0WSyKl2z108E3TvMJvXoWL8K0K1I9j2vbELbPA
+	8EN1mi1koG3al447AD0wl9FDxXrr5O/Y=
+X-Gm-Gg: AR+sD12r/x6tZd502RX9Xgc8Bxp0Q/uikbNUIfu2Yqex1pZIxrcA9VPQflnK6ZtEGwy
+	nY2uomh37UXtq4mWlqdpM6dGxZzXpfT/B3qGU7tALn20D3QBGPEpjp/wdJnd0UYBNcWUm64qHad
+	TiL0jjJrykYkUs6tyG3yuU62ZqkWl6+/9zP0XOMQkzb9Lf9axwXtOUYMODKJ7YTErUcSGXdURi9
+	n94Wh4EhTlRNvywI/9U3ZJweoV22qfU7NtsevBcmp+cVeYwZAklDCdDmzIYgk53SE2a5V1eJb+c
+	ipginKAwOsuyYY1xO/u37fk8pjXhQ62dc3dTfdxHSJE=
+X-Received: by 2002:a05:6a21:6a0d:b0:3c3:bb13:438 with SMTP id
+ adf61e73a8af0-3cc553e0a42mr5885845637.32.1786606524794; Thu, 13 Aug 2026
+ 00:35:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:148b:b0:495:ca1b:7865 with SMTP id
- 5614622812f47-4b228202540mr2579042b6e.11.1786598248105; Wed, 12 Aug 2026
- 22:17:28 -0700 (PDT)
-Date: Wed, 12 Aug 2026 22:17:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a7d5368.d5f0ebe7.22d851.0013.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in lo_ioctl
-From: syzbot <syzbot+cc0de396bac84da51919@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20260812130335.60354-1-mzx199711@gmail.com> <anyicCnbACxAiTTD@infradead.org>
+In-Reply-To: <anyicCnbACxAiTTD@infradead.org>
+From: =?UTF-8?B?6ams5oyv5YWI?= <mzx199711@gmail.com>
+Date: Thu, 13 Aug 2026 15:35:13 +0800
+X-Gm-Features: AUfX_mzcrYN5r9tMwJ-6xPHLnaflX0j1EFC0fZLU-0EJpZumje8IJdjuzY9HFWw
+Message-ID: <CAAth02BEXd7uy4LpXS7t42bH2kvkFDEcsLdHHAUizaV++zWzEQ@mail.gmail.com>
+Subject: Re: [PATCH] block: skip redundant flush for O_DSYNC direct writes
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Zhenxian Ma <mazhenxian@xiaohongshu.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Aug 13, 2026 at 12:42=E2=80=AFAM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+>
+> > +     bool dio_fua_done =3D false;
+> >       ssize_t ret;
+> >
+> >       if (bdev_read_only(bdev))
+> > @@ -763,9 +764,13 @@ static ssize_t blkdev_write_iter(struct kiocb *ioc=
+b, struct iov_iter *from)
+> >
+> >       if (iocb->ki_flags & IOCB_DIRECT) {
+> >               ret =3D blkdev_direct_write(iocb, from);
+> > -             if (ret >=3D 0 && iov_iter_count(from))
+> > +             if (ret >=3D 0 && iov_iter_count(from)) {
+> >                       ret =3D direct_write_fallback(iocb, from, ret,
+> >                                       blkdev_buffered_write(iocb, from)=
+);
+> > +             } else if (ret > 0 && iocb_is_dsync(iocb)) {
+> > +                     /* FUA from dio_bio_write_op() already made it du=
+rable */
+> > +                     dio_fua_done =3D true;
+>
+> This is kinda the wrong way aroud, it should just have a need_sync
+> variable that is only set for the fallback.
 
-syzbot found the following issue on:
+Agreed, that reads much cleaner, I'll modify the flag in v2.
 
-HEAD commit:    6b8c8af514d7 Add linux-next specific files for 20260807
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1615c079580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6d343b54cc50df0f
-dashboard link: https://syzkaller.appspot.com/bug?extid=cc0de396bac84da51919
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+> But looking at this, the original logic here actually is very fishy.
+> If we have a driver that does not actually support FUA, emulating it
+> for every write command is a bad idea.  So this should be fixed to
+> only do FUA when actually useful, and then return from the non-fallback
+> implementations if that actually happened.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Let me make sure:
+     blkdev_write_iter() then only skips generic_write_sync() when
+     the direct-IO path actually issued REQ_FUA (i.e. iocb_is_dsync(iocb)
+     && bdev_fua(bdev) && the write completed without falling back to
+     buffered).  Is that the direction you had in mind?  If yes, I'll send =
+patch
+     v2 later.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/71ff4edcb608/disk-6b8c8af5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1f5fa331d8f2/vmlinux-6b8c8af5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f993558ec63b/bzImage-6b8c8af5.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cc0de396bac84da51919@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-syz.4.8555/6352 is trying to acquire lock:
-ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
-ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: loop_set_dio drivers/block/loop.c:1460 [inline]
-ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
-ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
-
-but task is already holding lock:
-ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
-ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
-ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
-ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&q->q_usage_counter(io)#26){++++}-{0:0}:
-       bio_queue_enter block/blk.h:95 [inline]
-       blk_mq_submit_bio+0x7fa/0x2a40 block/blk-mq.c:3127
-       __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-       submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-       bh_submit fs/buffer.c:1146 [inline]
-       __bread_slow fs/buffer.c:1157 [inline]
-       __bread_gfp+0x1e9/0x380 fs/buffer.c:1403
-       sb_bread include/linux/buffer_head.h:344 [inline]
-       fat12_ent_bread+0x156/0x570 fs/fat/fatent.c:77
-       fat_ent_read_block+0x391/0x4b0 fs/fat/fatent.c:450
-       fat_alloc_clusters+0x434/0xe30 fs/fat/fatent.c:498
-       fat_alloc_new_dir+0x160/0xb90 fs/fat/dir.c:1184
-       vfat_mkdir+0x13a/0x300 fs/fat/namei_vfat.c:861
-       vfs_mkdir+0x40c/0x620 fs/namei.c:5410
-       filename_mkdirat+0x285/0x510 fs/namei.c:5443
-       __do_sys_mkdirat fs/namei.c:5464 [inline]
-       __se_sys_mkdirat+0x35/0x150 fs/namei.c:5461
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&sbi->fat_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
-       lock_fat fs/fat/fatent.c:285 [inline]
-       fat_count_free_clusters+0x157/0xb40 fs/fat/fatent.c:729
-       fat_statfs+0x135/0x400 fs/fat/inode.c:874
-       statfs_by_dentry fs/statfs.c:66 [inline]
-       vfs_statfs+0x147/0x2d0 fs/statfs.c:90
-       loop_get_discard_config drivers/block/loop.c:774 [inline]
-       loop_update_limits+0x375/0x920 drivers/block/loop.c:984
-       loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
-       lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
-       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&q->limits_lock){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3181 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
-       validate_chain kernel/locking/lockdep.c:3924 [inline]
-       __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
-       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
-       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
-       loop_set_dio drivers/block/loop.c:1460 [inline]
-       lo_simple_ioctl drivers/block/loop.c:1528 [inline]
-       lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
-       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &q->limits_lock --> &sbi->fat_lock --> &q->q_usage_counter(io)#26
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->q_usage_counter(io)#26);
-                               lock(&sbi->fat_lock);
-                               lock(&q->q_usage_counter(io)#26);
-  lock(&q->limits_lock);
-
- *** DEADLOCK ***
-
-locks held by syz.4.8555/6352: 3, last CPU#1:
- #0: ffff8880267e7430 (&lo->lo_mutex){+.+.}-{4:4}, at: lo_simple_ioctl drivers/block/loop.c:1520 [inline]
- #0: ffff8880267e7430 (&lo->lo_mutex){+.+.}-{4:4}, at: lo_ioctl+0x7c4/0x2150 drivers/block/loop.c:1594
- #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
- #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
- #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
- #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
- #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
- #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
- #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
- #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 6352 Comm: syz.4.8555 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2059
- check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2191
- check_prev_add kernel/locking/lockdep.c:3181 [inline]
- check_prevs_add kernel/locking/lockdep.c:3300 [inline]
- validate_chain kernel/locking/lockdep.c:3924 [inline]
- __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
- lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
- __mutex_lock_common kernel/locking/mutex.c:646 [inline]
- __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
- queue_limits_start_update include/linux/blkdev.h:1101 [inline]
- loop_set_dio drivers/block/loop.c:1460 [inline]
- lo_simple_ioctl drivers/block/loop.c:1528 [inline]
- lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
- blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f450119e0d9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f45020e0028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f4501426090 RCX: 00007f450119e0d9
-RDX: 0000000000000000 RSI: 0000000000004c08 RDI: 0000000000000008
-RBP: 00007f4501235024 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f4501426128 R14: 00007f4501426090 R15: 00007ffee924f4a8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks for the review,
+Zhenxian
