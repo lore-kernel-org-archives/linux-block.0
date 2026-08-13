@@ -1,137 +1,199 @@
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B3633993
-	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 00:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178DD19A288;
+	Thu, 13 Aug 2026 00:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786579778; cv=none; b=OfdJ0qFiVUMP6NjPL8uxCkRDZFFh5xHjxl6HqXW6j4wuR+CM75QZAlLADJ1QqpOrTCj/e7+tjfHb3yygm+cYafAkV7HS/oVyXwH7X97Jpf8cANjZQJzqn6tXsPoZr4SCHFFd1OgH7W6Adw8Lj/KgZYt35FkdnM4ztcSc/R9+EFY=
+	t=1786580347; cv=none; b=huKWB2XCDjnTHi6ZL7FFapICyakzbvk0i4EjS6mjZ1o3qhxDbNcd9EVrl0lghAONj/DrT9LLoDEQtyRNtAInwNm4Jm1pQ0BvnCPkRErzSp0X0wgT263gubrCB9TflDgdPtDzgek3Eyl8Zvzm1X2yxs9B1vyL9BSF8pBGP/RIa1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786579778; c=relaxed/simple;
-	bh=W0Q1bpZD3t3n+SGI5Ea8+Gwd9eOwnTOdNnBajhjQB/0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HDAu0nBRbg6kQyc/bopPO3hB8lCVD/cnUGcGLHr4iKUt+JFyHq5xXMuC/FI2TmF67Dq/DNPDN+zF3z8NQMiP0CAqMOsIBirDfoa8XAUtEH7jN+oW9xqQe/k+lZSVjYpUmoLYZuf1NxkJYMNZTLqRzkGc4ZAh3/EFE+lF08Aq6V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-7e9dc0f5900so728859a34.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 17:09:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786579775; x=1787184575;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hJNI0d+L/kW58SMi8YpL1wxJse/mqRbOAQMOBroOL18=;
-        b=h05N+yGNRjZmox853/I35nyZarcf27KDR5EMSSljhi9XpHS4tGjTN7+97SoQxqGmrw
-         cRQGFvX66j/A0kOu+3DeFjjKKXf3/LGYVM9uEEfTN110vDQj0CgdTA+vdoOyobiuy7+7
-         CFq8mKnkxf3lnb/MBXQ0C5gvWiRv5j1hj93U3S+5tcdAcFOF2eacSnDPNbYVVVxO7X9E
-         DUeoLkm/uXY/S/OiHItIvycUvd8k9vDkkmLbtjRuSKs/UArr/jR74Mo+3AJNsr9SuchN
-         p/gsDNN+8dozNRLQIQEK55i6/O9/nW+Y+N1BF4VaBjp3ECkMi3GgGhMpGbDVdVjW3fqm
-         VgPw==
-X-Forwarded-Encrypted: i=1; AHgh+RqfpDwHpvSkzmeWn8BOquDJU4FyA+8xCBbJQOsPl1QE7uSxUODNzg0qRuaViOAR4dkOqyzNQvuSvNv6VQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwWX8wkvoFPE0HOE0Fx7P16EvwivVyHU56UmLKiXZaeHex/kaz
-	rRHWLcFWeQD8qM2/gK8qcDZlQS6tSnQXzzmCF50CLxKz2ilGWsOjqhOqRnN5EGPd1btDW5YA8jd
-	jlEb85uQ/CFSyAyVfMIWoQlQfQQQbmk0OfurUXetl79NvjWF062PvQTB0Zfs=
+	s=arc-20240116; t=1786580347; c=relaxed/simple;
+	bh=p9RdFBhv1eoyUw5/knwomMhrJLw+gkl8caK5fR6eOwg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=ikaYzo4wukUNe/2t6Qz4cGAe2qxg7QsTMyCLqeHYPbpt4ty1n4Wu5vpJMpa5kQpizvxJB89fii9WOCcyeQ2jJMpWhRcAuVuMm0gRCiwEngTbdWqU7Um+TUkyzWskBQ0WccdiBXiQDLburT2p+Ku39cIrmXlelEmY5W75q8HaiHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1brDirC; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1brDirC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C350A1F000E9;
+	Thu, 13 Aug 2026 00:18:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786580345;
+	bh=+SlSGOuNX1TZ7M6MiLLHH9rezuBa5FVnB0SFZWu5/6o=;
+	h=Date:Cc:To:From:Subject:References:In-Reply-To;
+	b=N1brDirC0ImWaLb3a2YVySmvKaz7pWOflIfKKF8P0n72nR1p0zLOePB0ZKFYKqZr4
+	 bunv6c/FSpcRYVq8g+YQeBLlRTeqKFQjA6HxDI8SdTL8H6d9awmOw/8MQzpr38SqjY
+	 Lawp0Om/x9H4M9FT7gX7SC+6LSEehgj6QAuWW6yo4T9KMvPEEi6fKYDbZNgBta3/k6
+	 GIUXRNnxXiQrJIORha31qqvLNtvvDGSHKcl+Q4C5EPelt9GeDy4C4cRExXnd9thRih
+	 7i9Djv0c32P5iPz7s5DIZLPgomlJWibBbR4zWDJXxv756SliUUeCAdSYDFhxWmrNfB
+	 +/8eT3reSQ3mg==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:198b:b0:6ae:4959:e1ba with SMTP id
- 006d021491bc7-6b0c5b8be01mr1559651eaf.10.1786579775508; Wed, 12 Aug 2026
- 17:09:35 -0700 (PDT)
-Date: Wed, 12 Aug 2026 17:09:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a7d0b3f.ac361c09.22ff0a.004c.GAE@google.com>
-Subject: [syzbot] [block?] WARNING in blk_revalidate_disk_zones
-From: syzbot <syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, dlemoal@kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 13 Aug 2026 02:18:55 +0200
+Message-Id: <DKNDVFGPA2T4.1VRWDIHTBOROT@kernel.org>
+Cc: "Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com>, "Mark Brown"
+ <broonie@kernel.org>, "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Luis
+ Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>,
+ "Daniel Gomez" <da.gomez@kernel.org>, "Sami Tolvanen"
+ <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
+ <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
+ Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Leon Romanovsky" <leon@kernel.org>, "Igor
+ Korotin" <igor.korotin@linux.dev>, "FUJITA Tomonori"
+ <fujita.tomonori@gmail.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
+ <tkjos@android.com>, "Christian Brauner" <brauner@kernel.org>, "Carlos
+ Llamas" <cmllamas@google.com>, <rust-for-linux@vger.kernel.org>,
+ <linux-modules@vger.kernel.org>, <driver-core@lists.linux.dev>,
+ <dri-devel@lists.freedesktop.org>, <nova-gpu@lists.linux.dev>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>
+To: "Gary Guo" <gary@garyguo.net>
+From: "Danilo Krummrich" <dakr@kernel.org>
+Subject: Re: [PATCH v10 00/10] Fix missing fops.owner in Rust DRM/misc
+ abstractions
+References: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
+ <CANiq72=bhfofrbdf1qeA380-eWeKj5yXhC0NzaU_nbB9SpxYHA@mail.gmail.com>
+ <DKNAS52KYWLD.M15VEC6U0F6R@kernel.org>
+ <DKNDF3WD27GM.5VP6RBRXZBUS@garyguo.net>
+In-Reply-To: <DKNDF3WD27GM.5VP6RBRXZBUS@garyguo.net>
 
-Hello,
+On Thu Aug 13, 2026 at 1:57 AM CEST, Gary Guo wrote:
+> On Wed Aug 12, 2026 at 10:53 PM BST, Danilo Krummrich wrote:
+>> (Cc: Mark)
+>>
+>> On Wed Aug 12, 2026 at 6:33 PM CEST, Miguel Ojeda wrote:
+>>> On Tue, Aug 11, 2026 at 8:41=E2=80=AFAM Alvin Sun <alvin.sun@linux.dev>=
+ wrote:
+>>>>
+>>>> The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, t=
+hreads it
+>>>> through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates=
+ configfs
+>>>> and rnull to use `this_module::<LocalModule>()`.
+>>>
+>>> Applied to `rust-next` -- thanks everyone!
+>>
+>> This series has a semantic conflict with both the driver-core and the dr=
+m-rust
+>> tree:
+>>
+>> @Mark: When you merge driver-core-next after rust-next (which I think is=
+ the
+>> case) then you need to include the diff in [1] into the merge.
+>>
+>> In drm-rust-next the build fails with:
+>>
+>> 	error[E0425]: cannot find type `LocalModule` in the crate root
+>> 	   --> rust/kernel/drm/gem/shmem.rs:628:5
+>> 	    |
+>> 	628 |     #[vtable]
+>> 	    |     ^^^^^^^^^ not found in the crate root
+>> 	    |
+>> 	    =3D note: this error originates in the attribute macro `vtable` (in=
+ Nightly builds, run with -Z macro-backtrace for more info)
+>>
+>> which is because the kunit test in rust/kernel/drm/gem/shmem.rs uses the
+>> #[vtable] macro.
+>>
+>> This should be fixed up with a patch on top of this series in rust-next.
+>>
+>> I came up with to potential solutions [2] and [3]. I think with the new =
+build
+>> system we want [3], but I'm not entirely sure this works correctly with =
+the
+>> current build system in all cases (at least it did survive my tests).
+>>
+>> Alternatively, we could just open-code a dummy module as in [2] for now.
+>>
+>> [1] driver-core-next merge fixup
+>>
+>> diff --git a/rust/kernel/serdev.rs b/rust/kernel/serdev.rs
+>> index a4927452016e..17ca504b7f8d 100644
+>> --- a/rust/kernel/serdev.rs
+>> +++ b/rust/kernel/serdev.rs
+>> @@ -87,7 +87,7 @@ unsafe fn register(
+>>          }
+>>
+>>          // SAFETY: `sdrv` is guaranteed to be a valid `DriverType`.
+>> -        to_result(unsafe { bindings::__serdev_device_driver_register(sd=
+rv.get(), module.0) })
+>> +        to_result(unsafe { bindings::__serdev_device_driver_register(sd=
+rv.get(), module.as_ptr()) })
+>
+> `module.0` shouldn't be used in the first place, it just happens to be vi=
+sible
+> due to the unfortunate placement at crate root.
+>
+> Perhaps you can update driver-core tree to use `as_ptr()`? It was already=
+ there
+> and not newly introduced in the series.
 
-syzbot found the following issue on:
+Heh, I just remembered that patch 1 of this series did fix this in a couple=
+ of
+places and assumed that it was introduced in the same patch without looking
+further.
 
-HEAD commit:    d58772d8520c Merge tag 'regmap-fix-v7.2-rc7' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=160ad132580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c44651ea7dd2f307
-dashboard link: https://syzkaller.appspot.com/bug?extid=643a6dd130546afdf1fb
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+In that case I can throw in a patch in the driver-core tree; will send it
+tomorrow.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+>>      }
+>>
+>>      unsafe fn unregister(sdrv: &Opaque<Self::DriverType>) {
+>>
+>> [2] Open-coded dummy module
+>>
+>> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+>> index c04e6c5aa7e0..274924cfcc05 100644
+>> --- a/rust/kernel/lib.rs
+>> +++ b/rust/kernel/lib.rs
+>> @@ -157,6 +157,15 @@
+>>  /// Prefix to appear before log messages printed from within the `kerne=
+l` crate.
+>>  const __LOG_PREFIX: &[u8] =3D b"rust_kernel\0";
+>>
+>> +/// Dummy module type for `#[vtable]` impl blocks within the kernel cra=
+te (e.g. kunit tests).
+>> +struct LocalModule;
+>> +
+>> +impl ModuleMetadata for LocalModule {
+>> +    const NAME: &'static str::CStr =3D c"rust_kernel";
+>> +    // SAFETY: `try_module_get`/`module_put` handle null module pointer=
+s gracefully.
+>> +    const THIS_MODULE: ThisModule =3D unsafe { ThisModule::from_ptr(cor=
+e::ptr::null_mut()) };
+>> +}
+>> +
+>>  #[cfg(not(testlib))]
+>>  #[panic_handler]
+>>  fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
+>
+> IMO this is the correct way, also consistent with
+>
+> https://lore.kernel.org/rust-for-linux/20260811-fix-fops-owner-v10-3-7e71=
+776f9dbe@linux.dev/
+>
+> It might make sense to add this to rust-next.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cef626cbb901/disk-d58772d8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/99faa1c91124/vmlinux-d58772d8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/cf8806baff68/bzImage-d58772d8.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com
-
-null_blk: nullb1: using native zone append
-------------[ cut here ]------------
-!blk_queue_is_zoned(q)
-WARNING: block/blk-zoned.c:2357 at blk_revalidate_disk_zones+0x962/0xce0 block/blk-zoned.c:2357, CPU#1: syz.4.694/8600
-Modules linked in:
-CPU: 1 UID: 0 PID: 8600 Comm: syz.4.694 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/16/2026
-RIP: 0010:blk_revalidate_disk_zones+0x962/0xce0 block/blk-zoned.c:2357
-Code: e8 73 15 fc fc 49 81 fe 00 f0 ff ff 0f 87 00 02 00 00 e8 c1 1a fc fc 4c 89 f7 e8 c9 c2 c9 fc e9 ce fa ff ff e8 af 1a fc fc 90 <0f> 0b 90 41 be fb ff ff ff e9 d5 fb ff ff e8 2b a9 6c fd e9 5c f7
-RSP: 0018:ffffc9000388f918 EFLAGS: 00010287
-RAX: 0000000000004d06 RBX: ffff88804bda7000 RCX: ffffc900063c1000
-RDX: 0000000000080000 RSI: ffffffff850e58d1 RDI: ffff888079178000
-RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff88802b726670
-R13: 0000000000000000 R14: ffff88807e08e018 R15: ffff88804bda7090
-FS:  00007f108a7486c0(0000) GS:ffff888123eec000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd5511556c8 CR3: 0000000056586000 CR4: 00000000003526f0
-DR0: ffffffffffffffff DR1: 00000000000001f8 DR2: 0000000000000083
-DR3: ffffffffefffff15 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- null_add_dev+0x125f/0x1df0 drivers/block/null_blk/main.c:2047
- nullb_device_power_store+0x29d/0x350 drivers/block/null_blk/main.c:501
- flush_write_buffer fs/configfs/file.c:207 [inline]
- configfs_write_iter+0x302/0x4e0 fs/configfs/file.c:229
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x6ac/0x1050 fs/read_write.c:687
- ksys_write+0x12a/0x250 fs/read_write.c:739
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f108979e0d9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f108a748028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f1089a25fa0 RCX: 00007f108979e0d9
-RDX: 0000000000000002 RSI: 0000200000000700 RDI: 0000000000000005
-RBP: 00007f1089835024 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1089a26038 R14: 00007f1089a25fa0 R15: 00007ffc5551d348
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I feel like [3] is the superior solution (just unsure about the build syste=
+m
+implications); once we have the new build system some subsystem crates will=
+ be
+actual modules, some will be always built-in. So, in general I think we wan=
+t to
+use the module!() macro.
