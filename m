@@ -1,140 +1,92 @@
-Received: from mail-pj2-f3.google.com (mail-pj2-f3.google.com [74.125.227.131])
+Received: from mta0.migadu.com (out-43.mta0.migadu.com [91.218.175.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B497D36A03F
-	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 07:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.131
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786606527; cv=pass; b=B0lGfgbS78+spetVpi/KHBJOfFf3qEMpxqrk72gnrGmQ325S+mEiCx6io/hEx75nmfFwcOdrwJD091GB8JALZCX7wFiFqzaH8j9zwROIQPvcgwBeZa2WkQHCOowyafatDGCUMgCOftDN/zn7JQv5kk6vvHhkb77s+A8YMKy9mpo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786606527; c=relaxed/simple;
-	bh=y7qJ7hwfM2XRLr6JodOHK6g7YYZSMVnnUqSagm20tAE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Neyna0KhW6QDvsCANQAVSAZ/sSL8GOfM+ny4yUcVULvxEUpxu7kHZQx/8FtndU2QgcF2VzANbw4ct4AvVne6tSdSd2rdNiq2nFt95fYIHkwBAjmTQZ5brNI0gz4RWkVeuuLNVId8RLkz0ZvKTnjUYxlFEEKjthf536ZidgrlhfQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMqV4zLb; arc=pass smtp.client-ip=74.125.227.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506E643F0B4
+	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 08:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786608914; cv=none; b=ARLjatDqR1n0VbqeJBf2l0GcEDxIWlduWan0iOWzKkMN+C2E8uaA2y5GXHmVHHrKACQdfwyDtjSEinHqGtL1uWlUi6ONyJ09K+ZXXG1k+eQEXjZgXD3oI4XO2hc+NosVtwFanU+WSnwYFQrCQazWz52/uE5LcILJBwgnG/zWOwE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786608914; c=relaxed/simple;
+	bh=HJkkjybnc95eKMUgffBgUHHJLr8cPHCSSaxuPE45BEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g2v+3I0GTWsH5tYNPor7lxZ8IhsShIRPPya852UXi/DcSfIDdeGMoN/kNhzbXV6JejCYcN6pxMZ21jtAab04cJQhwdk8+Iq7y9ATAo9C18J7ORBFMJDNEzqOXlZuHyQzoA7BhDghiriQewtKyhZ8XLCA4/GnP7fsCe1WaEcWh9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UHai7FBN; arc=none smtp.client-ip=91.218.175.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMqV4zLb"
-Received: by mail-pj2-f3.google.com with SMTP id d9443c01a7336-2ce7ac92dfcso19680695ad.1
-        for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 00:35:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786606525; cv=none;
-        d=google.com; s=arc-20260327;
-        b=YXompxpcW9McAoICDQwYCnKH+gKsv4qgf/vM4/WlaOcoLoWVUJkkx+0CfkvJZZkEaF
-         j4lQOqfFnvNliKGQLzFcveqVdaf2nG/cjsWON3UQtrY6U8NXB3oGZU7biRh1n5LomwnR
-         9GqNznzQT+ck9JryZZ12gWSlrIXYPhGGTQXzT7HDfS0brKZVyAilX46LtK9P/1TeYVqu
-         9Ajj630taigPAho1xVE6ZqDovxxm7jrUzeNe+3ndjqoul9V/ICEfppHyilPLU4iqwEZ+
-         zk6kLsUKJytfDhgJ1PTHbxs48IQV9ToZSSNPkPIjF72yBmPHzLs4haDC+d/v1M35tM5L
-         nloA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
-        fh=2K9xecXyb/phhm5de45Fag1Z6EOZT58YVmO47daZDlc=;
-        b=o2EGW4vwTWDZP0v/P0rDNZUJNYnofzxFJffqczjhmj85GkPPaycdfyrRUA8rJYUhD5
-         l0OpgYfrmzPlno+P4qfq96/+w4ZScv9070aFp271t/jLC2/Mm4FS/fh3yFFWEAJUKUSq
-         yR+bw75bqUvGPDZ5FuiHtmcWv3oGWC+gcZsTBP4EBTWS94dvAFTjT9uh55kejD1hlg7e
-         VaER++H0SayzHBqAjQRm36JShjqjY+dRMucLzfrV+Wrggf7w5Amo8lWDYfAhFCUUQnDx
-         iaBurwUY+3QMg/WsVtziQ/OlJ6hrkaIOPVDuPp4Fi64T6/9GZLz73Y4x6FpaqERrvr7D
-         QXtQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786606525; x=1787211325; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
-        b=dMqV4zLb++wNJ+fs9J68zljo5NVaMp7IiF/O6GCxqeQ/PoLNlsPIfhquBJofn1bTFC
-         T/RyJtyUmjftJOyiM+eJJhvMnBTgDN0WOIHh/4QT8Rm9ZtXMdWPQiG/9wccTM3oR7U84
-         8hdjt26GmuUIFvvOB19yDWCMUj5DSHmTsVEl26H836rZ+m1q1ajyN08KTgqGTY6rPvkw
-         uRNUW22O2vIfJF7gd8Fjcc2jyeGMsaLCZmPurVSVSI/ptoeqyddLxOI0eXi9+JpstiEL
-         9P9DhPB/PCPsMid9d7vGsq7FQ7TSalJLeVrHPsoWUG7kYv20tJIL4h6Iq07yg5YarfVU
-         K2WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786606525; x=1787211325;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=P9Otx6ZqxAiVjNNzOLpF0kwD6Aer9gVo/rRXt1r2Kpk=;
-        b=Uo8CCpFNdLOrL3VbulL3QjFNig3DCIH+8XGZzJ89AzmGosxurjeYn0AjMy0hNxG1En
-         bDnaQCwlCI9zzCIx3Z6/3pw69nexb1bUeT3x9LLbMKdz7F8D3h9hGV/z7oiS8REe/tCe
-         zQgh4D66I8TghonXiS9gFCJrg14Mtvk2pEvVvbaKxiUCPbDbvLNEnTALMJ23EtcaPNdn
-         Wzg+giR+eVR8gZl2AM5EhaUKfyvAjmFn9SoSF8sCffU0jZEU4XM/GEoFDtV08bWrkA8u
-         id6yKykBq4D3cjkhvVcHLxNu29MWenj14s2YyUpPKDus1/d1vzzSJ7vw6bkOSkcODhf7
-         JgAg==
-X-Forwarded-Encrypted: i=1; AHgh+RoTISGpNr95OCn6w33WvIGwrPX2FEdvwiRLNQmSBHrYC1afUhO/iaUi4ugVa1QLUvptZafUZtlwo5Lfrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUYR6ghb4+4d7ozxv6iycOPgPhp8oYnwEAapMvz13hMjoTWiUE
-	tudJAJUkD4HXNGPUv8PzMJy6UP4W7NdvNlffw0WSyKl2z108E3TvMJvXoWL8K0K1I9j2vbELbPA
-	8EN1mi1koG3al447AD0wl9FDxXrr5O/Y=
-X-Gm-Gg: AR+sD12r/x6tZd502RX9Xgc8Bxp0Q/uikbNUIfu2Yqex1pZIxrcA9VPQflnK6ZtEGwy
-	nY2uomh37UXtq4mWlqdpM6dGxZzXpfT/B3qGU7tALn20D3QBGPEpjp/wdJnd0UYBNcWUm64qHad
-	TiL0jjJrykYkUs6tyG3yuU62ZqkWl6+/9zP0XOMQkzb9Lf9axwXtOUYMODKJ7YTErUcSGXdURi9
-	n94Wh4EhTlRNvywI/9U3ZJweoV22qfU7NtsevBcmp+cVeYwZAklDCdDmzIYgk53SE2a5V1eJb+c
-	ipginKAwOsuyYY1xO/u37fk8pjXhQ62dc3dTfdxHSJE=
-X-Received: by 2002:a05:6a21:6a0d:b0:3c3:bb13:438 with SMTP id
- adf61e73a8af0-3cc553e0a42mr5885845637.32.1786606524794; Thu, 13 Aug 2026
- 00:35:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UHai7FBN"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=HJkkjybnc95eKMUgffBgUHHJLr8cPHCSSaxuPE45BEc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786608910; v=1; x=1787213710;
+ b=UHai7FBNVrl0ZSe+2mNdxKwYssAUVvc8lLsNDvxwVJM9F25wBLYV5Nekeg3/FEgeXSbEloJt
+ ZUh6B0rVaU2nqJACkfxm66O77x++fBtgRcll4Gv0xFHv1ZqOU6grQX9i/Mwzt/PjWYN5IIfrGkF
+ LJ4WiabhJaVR4BgMgGXFog+A=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: from [10.0.11.3] (2a11:3:200::10a9)
+	by smtp.migadu.com with ESMTPS id 549bb4bc2be94b73;
+	Thu, 13 Aug 2026 08:15:10 +0000
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <0102f153-154b-430d-a3da-2c8423fb3f1f@linux.dev>
+Date: Thu, 13 Aug 2026 16:14:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260812130335.60354-1-mzx199711@gmail.com> <anyicCnbACxAiTTD@infradead.org>
-In-Reply-To: <anyicCnbACxAiTTD@infradead.org>
-From: =?UTF-8?B?6ams5oyv5YWI?= <mzx199711@gmail.com>
-Date: Thu, 13 Aug 2026 15:35:13 +0800
-X-Gm-Features: AUfX_mzcrYN5r9tMwJ-6xPHLnaflX0j1EFC0fZLU-0EJpZumje8IJdjuzY9HFWw
-Message-ID: <CAAth02BEXd7uy4LpXS7t42bH2kvkFDEcsLdHHAUizaV++zWzEQ@mail.gmail.com>
-Subject: Re: [PATCH] block: skip redundant flush for O_DSYNC direct writes
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Zhenxian Ma <mazhenxian@xiaohongshu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 00/10] Fix missing fops.owner in Rust DRM/misc
+ abstractions
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
+ Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
+ <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
+ Igor Korotin <igor.korotin@linux.dev>,
+ FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, rust-for-linux@vger.kernel.org,
+ linux-modules@vger.kernel.org, driver-core@lists.linux.dev,
+ dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20260811-fix-fops-owner-v10-0-7e71776f9dbe@linux.dev>
+ <CANiq72=bhfofrbdf1qeA380-eWeKj5yXhC0NzaU_nbB9SpxYHA@mail.gmail.com>
+From: Alvin Sun <alvin.sun@linux.dev>
+In-Reply-To: <CANiq72=bhfofrbdf1qeA380-eWeKj5yXhC0NzaU_nbB9SpxYHA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 13, 2026 at 12:42=E2=80=AFAM Christoph Hellwig <hch@infradead.o=
-rg> wrote:
->
-> > +     bool dio_fua_done =3D false;
-> >       ssize_t ret;
-> >
-> >       if (bdev_read_only(bdev))
-> > @@ -763,9 +764,13 @@ static ssize_t blkdev_write_iter(struct kiocb *ioc=
-b, struct iov_iter *from)
-> >
-> >       if (iocb->ki_flags & IOCB_DIRECT) {
-> >               ret =3D blkdev_direct_write(iocb, from);
-> > -             if (ret >=3D 0 && iov_iter_count(from))
-> > +             if (ret >=3D 0 && iov_iter_count(from)) {
-> >                       ret =3D direct_write_fallback(iocb, from, ret,
-> >                                       blkdev_buffered_write(iocb, from)=
-);
-> > +             } else if (ret > 0 && iocb_is_dsync(iocb)) {
-> > +                     /* FUA from dio_bio_write_op() already made it du=
-rable */
-> > +                     dio_fua_done =3D true;
->
-> This is kinda the wrong way aroud, it should just have a need_sync
-> variable that is only set for the fallback.
 
-Agreed, that reads much cleaner, I'll modify the flag in v2.
+On 8/13/26 00:33, Miguel Ojeda wrote:
+> By the way, I removed the Acked-by in that last patch since I think it
+> came from an older version as a series-tag that didn't have the patch.
+> Please let me know if I should re-add it.
 
-> But looking at this, the original logic here actually is very fishy.
-> If we have a driver that does not actually support FUA, emulating it
-> for every write command is a bad idea.  So this should be fixed to
-> only do FUA when actually useful, and then return from the non-fallback
-> implementations if that actually happened.
+Hi Miguel,
 
-Let me make sure:
-     blkdev_write_iter() then only skips generic_write_sync() when
-     the direct-IO path actually issued REQ_FUA (i.e. iocb_is_dsync(iocb)
-     && bdev_fua(bdev) && the write completed without falling back to
-     buffered).  Is that the direction you had in mind?  If yes, I'll send =
-patch
-     v2 later.
+Thanks for applying the series and catching the stray Acked-by.
+It was a v5 series-tag, from before the MAINTAINERS patch existed,
+so no need to re-add it. I'll be more careful with tags in future
+submissions.
 
-Thanks for the review,
-Zhenxian
+Best regards,
+Alvin
