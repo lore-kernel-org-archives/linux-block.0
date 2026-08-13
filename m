@@ -1,377 +1,242 @@
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96AE2E88A4;
-	Thu, 13 Aug 2026 04:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786596866; cv=fail; b=sj8iePbJUHaTqhGnrzGmeF7YKl4KKQRp3X+g01ZS71eggXz7spxGFsI/AJ7ST0QiHeQSyC0AozWqHIyCWMeONSCcOa2Md1HerwDR9ArVMGjphZX4+Qo6Y/W0jClrn1UY8WauUP3k6G4TtzTbUg3Uehh3gcPWotSC0Sb53dLy0lc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786596866; c=relaxed/simple;
-	bh=ftELuavy0dsdnV5LBPL8RauxEy61gTFb9EgIfVda+1E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E02fnEXiZyAHgTGYWy3JaGOnxi6vWRI3/7xz97x7ovCzTer2WHF+Vq7ezgOUjdRM+LMvekoHV1qXxdHSrqa+TfSHUd0510rAVY5WSWDB1e5wd2gQIG6bTOlrDd5BM5NK5AKl1BZ+JDfpOkyXIaXA+aoGWw1QGPWnjzPkXkigAkQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=HNhs92AK; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="HNhs92AK"
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67D2KORh4004277;
-	Wed, 12 Aug 2026 21:53:21 -0700
-Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11021130.outbound.protection.outlook.com [52.101.62.130])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4g0v4xa6gn-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 21:53:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AtCKe26ZsjFkKhGeOyjSkhGpeu/yGrE4eF3gPNZHpBBLai64a7UV9qKgaVsMvSwaUl+VZ8rU6xzStgvGEtx6/+6Mh15wzBpmQt2jxEoPQx7Lqd8J9x4mett2xmbKDv93EY3HCiwwWkdifN87wAhoNk39XW5gBxoMhIV3VW+6kyDkCKaahZUqPRMB28Vc3MR2YlzO56TqdSwPTW1n9zKYsrwAUZ9VkBybfudxstwmD5fauRtLK5Utav1/VX5gShbDGhniuxyW6XEm7SoDExapEa5vv2zfdeZzambisQ0zEDQT2DmHbiv41ucy6eZ+0IACW9uK9UY0a0WR7o9swu0EoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=meJHJ7L9HtGthrDdv5wA9A2lv31U2l6JA9UyGXSuZs8=;
- b=EzlBGC8/b4jDd16sCt/b6da4vnIcNvFFoy+BpBue7qiBiyoFlW+TgNEgsdVptoACZ4ot+Lizjw8pRuaqGu22myDMD0GWCpfyt5TZXNwiORdLznN7gY/5Ls5PhXeKSCochelzFf24/yqBeJcvlxJ2BoV4mMiDCp7OL4a2xHQWmo2z9evYL/E6abAk0J/NWDCTY5kvczZnNvTaa/kQ4jWUqvfaR/DAYKY13Za1l3Rg4wNGWJYKSj+1H0LNI8byXgPNn+AqvnDqCTIoQSwH98rtxH7DC95snVEe9DTZAd5YjoTvdM+KlyPO9GbC/MYFqiGHPBAsUVVAzoFpb6zPBRblxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=meJHJ7L9HtGthrDdv5wA9A2lv31U2l6JA9UyGXSuZs8=;
- b=HNhs92AKha6ZKLq1qpsHh7TuUh6yc4w1vOLdU9SIwuUTZQKikOH3q8+PYtXKkNvjXUWVo1CtmZ03B6QPxycPqkN7UoOvL8FZggZrJwx/oClXLdLFNDFGnlfLzwNv1wrHuV/RK/m03+X7+aQAraywis1vom61FR67eeep4HtH2nM=
-Received: from CO6PR18MB4500.namprd18.prod.outlook.com (2603:10b6:5:356::24)
- by MN2PR18MB3685.namprd18.prod.outlook.com (2603:10b6:208:26b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.14; Thu, 13 Aug
- 2026 04:53:18 +0000
-Received: from CO6PR18MB4500.namprd18.prod.outlook.com
- ([fe80::7648:89b2:ca39:5522]) by CO6PR18MB4500.namprd18.prod.outlook.com
- ([fe80::7648:89b2:ca39:5522%2]) with mapi id 15.21.0315.014; Thu, 13 Aug 2026
- 04:53:17 +0000
-From: Nilesh Javali <njavali@marvell.com>
-To: Jesse Taube <jtaubepe@redhat.com>,
-        "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>
-CC: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph
- Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Justin Tee
-	<justin.tee@broadcom.com>,
-        Naresh Gottumukkala
-	<nareshgottumukkala83@gmail.com>,
-        Paul Ely <paul.ely@broadcom.com>, Chaitanya
- Kulkarni <kch@nvidia.com>,
-        "James E.J. Bottomley"
-	<James.Bottomley@HansenPartnership.com>,
-        "Martin K. Petersen"
-	<martin.petersen@oracle.com>,
-        "GR-QLogic-Storage-Upstream@marvell.com"
-	<GR-QLogic-Storage-Upstream@marvell.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        John Meneghini
-	<jmeneghi@redhat.com>,
-        Bryan Gurney <bgurney@redhat.com>, Chris Leech
-	<cleech@redhat.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: RE: [EXTERNAL] [PATCH 00/13] nvme-fc: FPIN link integrity handling
-Thread-Topic: [EXTERNAL] [PATCH 00/13] nvme-fc: FPIN link integrity handling
-Thread-Index: AQHdKoZLm6HyzhVxaEma4tXQxpXv6babZ7Bw
-Date: Thu, 13 Aug 2026 04:53:17 +0000
-Message-ID:
- <CO6PR18MB450084465A542D9DF1E46C51AFDB2@CO6PR18MB4500.namprd18.prod.outlook.com>
-References: <20260812181300.3712426-1-jtaubepe@redhat.com>
-In-Reply-To: <20260812181300.3712426-1-jtaubepe@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO6PR18MB4500:EE_|MN2PR18MB3685:EE_
-x-ms-office365-filtering-correlation-id: 7ef62a9f-121e-4538-84fb-08def8f6ca9a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|23010399003|376014|366016|1800799024|38070700021|10067099003|6133799003|11063799006|56012099006|18002099003|22082099003|4133799003;
-x-microsoft-antispam-message-info:
- VIl6w+WEt9fnTv76msr6h0d27hvrPl+uvAg0gEtLQn5aaBz6t+ZNFqN3jpx6sboCB2igfc5ys3vZwI50dFb8PI1S8hRkaxv+rB5cU7H8YDHWUxuAgPplDI+Hoe1kM0CR1pGiFe+WFio1ymLpWk8Kg6sgUtjIkccc5o7lvPRGHnh0xuZjh6fgwDPliGyejpVwkcG2dWELWG9jFTbUo/uyCSf2k1h9kSk+6qRuslFIeYlri4DMjpVgf+ULm7quVxGo1mhjZfoJyd9b+AIzACrtc0qHiheqYd6/xUofH3ZM+GcC78WedlsZNM/PGyqx7U2/6zB0K9WLdDCLwGd77NnaU3XvkhjPyaIupFgnsfafC2oJ0ikZ+0IkUwqzRgoKvCWdpOmZV6Hbm3I1S66kPhmoSc/RCtXXNOMHPqEntj6kO1yTFiK3m9HN5z88mcScKZIC2MNfjdaYuQm3JZos8Rvfp7HHFmBMQgBE8yw50Z2zRkpTeq+FBt6eD27LT7jnYQMzlceSjiCNnmooqnjdxKcgKYYP50oNKIBNZ1FFvOSs8wG5mrg4+5c729H9qGh3GJxIV12UJP0oFEjpMgxxUAuot7hT6eHRpBsh8c4u4Kgk97okZ3DD0lF7B+9pWRUvhCBVdpmjfYYN38euIZjmi6Y3nuzqtr+RCzJyxRUdjfiCfg3unE4RSV+xG1KMVE42wa3MxFhtSaHIcTIK5hSWFgiRS80fGzyNampfR9Tqpn4OhFA=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR18MB4500.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(376014)(366016)(1800799024)(38070700021)(10067099003)(6133799003)(11063799006)(56012099006)(18002099003)(22082099003)(4133799003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?windows-1256?Q?aPvczPgAboz93KbskNS72hB4bOHLdTFnS2FXb25fiae6+gmSYYIPwFja?=
- =?windows-1256?Q?Cdl729ORLUFOKiwreCXwHG+Yg+GbfftxdygaJ7rmC2zwjmel5znrjLeD?=
- =?windows-1256?Q?NCUulNoqxUWHGhjNMLK43AqfURLbFkc2nCmtOYuegyaDMY1OaYVPGm/o?=
- =?windows-1256?Q?0u9RfZsI/epDUatN3RfcmD3YCvAwa4/BPjkI3U8pf99/+fc8xJBbgj/L?=
- =?windows-1256?Q?ziKHywmOn3tRghpfeW3OqFBNBS7XYA9UVid55JpERGL9FHI0FLS/pQmx?=
- =?windows-1256?Q?2VGecIh3dFrO90C/iGO8M3pTyAo7rHG/jmbpxwsI+DpV/aQSvGiajxif?=
- =?windows-1256?Q?EADl2MbchP47nE24q9orEV9HuajLje4c0QpAcplynIDBGQ1sj9D/X5BV?=
- =?windows-1256?Q?zKJGT4iRFGp/UBl6Wqw5a5y85G8b059U5FN+K8zRA79BiByj/7YozMan?=
- =?windows-1256?Q?19bQxWsc/PBHyqBh7oOC63SdSZtn1BEzQT9r6bPLtCcaIwdDGAtYGDJu?=
- =?windows-1256?Q?6IJm/8oW5sWECKWPOA48yIILmaIiQxiLohhmcbASHuYyt/siO5Y8+URF?=
- =?windows-1256?Q?Elti376qKOwUkEFpKvqKxUWmqmMu4Gov0rSZQAO7P5CmLbMEsvUjdKbK?=
- =?windows-1256?Q?7/Iv4LbRSBeaayGkRzsNk/GusQ9ddIiCXCivXtOlFDERHJCTbuDgqJ+V?=
- =?windows-1256?Q?XNJymo013PuXnQSkot/qMgIp8e8b6gvBQoA0IHjkDa+fXhGq+8mRTcCU?=
- =?windows-1256?Q?WyD4Fsvj0MlcSMQi98VH28GdDTjLrV1h/7I+QilSWowxnwzOO+5jnM+A?=
- =?windows-1256?Q?jVNPEE3rzocf86c59Ark2cZfkUjWhvVK7p0E71Ocq6zlv5LvQq0h2x7a?=
- =?windows-1256?Q?x3YWpIvB5LdyDMp38rir3Cbe/q7G5UVH/7s9iXVcM3EJsL8RplpkZEAi?=
- =?windows-1256?Q?bds0wbsvME6QeGDDd7Q0E02hefB/FetxV2KmfhkCmiIw/hRrj5KIIA63?=
- =?windows-1256?Q?4KPt19ng9OtYszsVGvKfIFw3S5oQqNRmakNoiNDWigKpsCPY8gxrTKcl?=
- =?windows-1256?Q?uPleU+ibj5CZ0tN2NaWyAv6+ZnFiMbqcNi0UTzvM1u2znhejasoX64Ox?=
- =?windows-1256?Q?0glXUYXhJa4cbUPWYxJp5TA1DaKRCkcQtg+k2zUQFF2OH00Pwa/syf3U?=
- =?windows-1256?Q?1+AMHY9h9vbcnyiGzgpN5MKW/wuUoD8R+CGHB6QKJ+jM7mlv9fZ8kd1e?=
- =?windows-1256?Q?PZCTlFwG9vxlUYlvohb9qy4382r5b7nuRYl5hdTpav+5aR7PZ1mCN+z7?=
- =?windows-1256?Q?++jp9uHwYsOy0699KbzbAglPiwKgXkfYry0b6FfoXszJQumFF5al+PR4?=
- =?windows-1256?Q?+5jlZlCNyPLq3xjoKeJeE/KZkVBdXUKal2d+h5lyNUv7BUnmtKkb6++n?=
- =?windows-1256?Q?MnkMYQcrH4Sy4bwK4ZdXOaagxX4T/BkGlpKECtt37GQadYlWrcqwb16V?=
- =?windows-1256?Q?UrQEN1loy0C8kSv7o5lF28XKQzp3khgoKSQrP+aOA1s25nOjeNuxQ79I?=
- =?windows-1256?Q?bvkuKzKlbYxYvsojgxYsR/+5D4FyCyOXMwdOoFt/WglPAJruaK+rQl5Y?=
- =?windows-1256?Q?Tp+ozbrYRZ6a2/8JiaCjLZvgdFqkZgEPmU4TUKaKdItqeQmLVFAth5WH?=
- =?windows-1256?Q?FNuyaiZKeTTGixjMlxta5x/3NUm+jlf7t108RpNUZjb+Uy77zBm25PEC?=
- =?windows-1256?Q?NPoQvo+9PpGPWLYw+DGJmS+dWvwY/o3Y1e2eH8C5wzOweSTR7Wi4Y+xx?=
- =?windows-1256?Q?73bUKz61AiM5E6ohOYRATTaGNC7HBDsHOLROdL4GuQmc4jLz?=
-Content-Type: text/plain; charset="windows-1256"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA858314B95
+	for <linux-block@vger.kernel.org>; Thu, 13 Aug 2026 05:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786598258; cv=none; b=mjgQQggVOlAaS44K1YKjDaKTtnKBXVczohL3AsiE8iKL/OoLEFTuUJTqkVx9YT9440Qfhv2rkzLyVg3hxU31+Q/t48DYj5BkwB/l/rYuEbvBArBnm5MVSIy2pcH+P+GULWq/KITvH9hSQgQqEcVY/z7/sdzULeu61ingroG0kNU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786598258; c=relaxed/simple;
+	bh=DTlfCt/dnTqT1iwlYFLOnUTSZeZf1RNhF41VMf81wks=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BXA2ZLIEhpDnHYvJbOFCdu+M/pGkg5sEFYPfdl7H/GdywbYy0PXW7QFL7cyu373BJc9Wojs3gUTrJ7YoPvIU0GlBOen24fWRDzMSFZvxrMzoAam59sfFU6Beu5e+VP7VxBTt0ALvNXpg2N6a3fIMHhIAm3+b3edt1Jy2BcuPV68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-4ab260600easo745069b6e.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2026 22:17:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786598248; x=1787203048;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=hM5DZqNTFKbSdqexd8s5sfaEc9sprn3Y/lejP2IpkLo=;
+        b=V53SjV2gLHS08Ul2d/Ez4i88PIy1otwkOB8QM68YybgF31sRSjENvmmpwvFSsWtZwD
+         mpP/cwgZAusNErB+vMPVWAf8colH0ow1Fl19BIincE78jaksF3wa1PD3UlcFOYFiMLKD
+         /dNoekEZdR9qk2cdOZs+WCb9iQn6uGpWZ6Qwy0Vpmoo0dyzkE8xbWm+O7/Y5PUUEzt+3
+         TB9bqYXLmNIT2+lgfXQRW+8m4jMtHKy/pj44F4ZQ79CezaZm/MSDe8zZW6RA+fdWwYGr
+         QIzqXHFuQkiNyveLXREFDjV5iTi3viapfN4eyFc4uDnBcZS5g/UxaRKNRf+6TN17Ha8F
+         51ew==
+X-Forwarded-Encrypted: i=1; AHgh+Rqj8boM+LNNySJWftIyNoejwbAU/jPPZs96UerI0byCO+eWJMeQZtpdbg9nwPqsQeO8tEdtN/GJW9jmjQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBqzWgNhUgquhrwTzRd01Jt1xPYPXFKTBDIqD46SzbD5usvL1w
+	U3UX44CbYGKjCkKOZ7dIvMevP9bXr1eUqJNaW1ft8WTtV9vhIZL+tnWmjXQyJR7LVGY/K1fAGrF
+	m073slZJafiP6jJuNmkmX2wOTXQHJ4gkjy95TdF8oMz+IXRsNQhpYjTNpzwM=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	hpX9JiTzFBVO7b7OcM32v4H/1rkFEPJ1S3YsffZYKemr2jjZ0qQgx8LxKW5cRa+9MmPX1qeIqjS9e0Z9Ytc1a6xRIaQLUZJH/Qc4eNlhceEl610jejNBAHC+zJ92yrwaMuvHAT5PlLyItUCbuq2T9g/3sr5MVXYoL4Hb6A+sP/qHmJir2/QiWKXNXDVaJHvzlLIzyWWU+Dji4xnAfLtJR+hjwXI+ow84006xMduJNsXogQKlbYREeJgRzbNgjQwehXQbWEWo77k5Sxx9aqzr52DTXS2Q12QMGvuevW/TD3tvKyh5/omU60WgccxQVfUqLcoxA//mLfwwDNsxPUjVUg==
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR18MB4500.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ef62a9f-121e-4538-84fb-08def8f6ca9a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2026 04:53:17.7350
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cRYj2oFHllsBjeQsloDz1sYXrHz7VXerJOielWK++pKPCry/5tJnVfyjvEU8OMQBcX0D3R3N2eAZNqxuvV6Srg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3685
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEzMDAzMSBTYWx0ZWRfX4xmIpMG1XGVK
- k1uWwLWK5O/aC1uQOn481Uq8Gv0iBCy+cz/zaNtlTW/nWFRHUNErCsiAMsah4Xzj4iTEcn8WtzS
- t20zxo0IM/I5l6wwhXnX6E9YZXgvo97hx1+Z8BzsiMtU10Poeg5E60IsITEiivP9m6M1EqaDblK
- CZAicykX5DAkJZ/E19QTClbYAtvA4nS7EOBd86EHv8u6dBnMNWkXQbGRnRnUOjPr6hgbm18MWq9
- D5tlUSmRZUZPWA4Z7XV1MhdzF84PZ85KDzKbtKidtAqTNPSvsykwolT03601jYlzzdjSiJYr/SC
- frPtifAokhfYovfWfdNgV7pDhOU/fMPd2euocddhMyqHVhFQnXNELVyp6PU/s97zJlpJXUXuBvw
- rBUGMTLQxEoObSDcYYflUSDcCe0T+rx+a6KKubtez1K/Z24Lza4dVVQPY3FYQ6nxLA+etdEQw3k
- wh+ID06AwklJPLBcVsQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEzMDAzMSBTYWx0ZWRfX6DxGf/ePbHR5
- 2tjgi9jwN19atg53l7sJKPkZ9jAp+N/88FpqdRiZOWWc+ferMNbYjg6GTFCTD8GoKEI6ERZYj5F
- pgrKuvhlhxGbAhvAth4TXgF3MzZ2EKw=
-X-Proofpoint-ORIG-GUID: mIcEyRLkbLlFE8QnEsrgRkDEUqER_F9b
-X-Authority-Analysis: v=2.4 cv=B/yJFutM c=1 sm=1 tr=0 ts=6a7d4dc1 cx=c_pps
- a=7kgNGXaSmB15KJ6u7rEBag==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=eoNxP8pz9j0A:10
- a=Sv0fKeRqtYgA:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=RpNjiQI2AAAA:8
- a=20KFwNOVAAAA:8 a=NEAV23lmAAAA:8 a=VwQbUJbxAAAA:8 a=_Wotqz80AAAA:8
- a=07d9gI8wAAAA:8 a=ag1SF4gXAAAA:8 a=Q-fNiiVtAAAA:8 a=pGLkceISAAAA:8
- a=Ikd4Dj_1AAAA:8 a=bLk-5xynAAAA:8 a=yPCof4ZbAAAA:8 a=M5GUcnROAAAA:8
- a=JF9118EUAAAA:8 a=JfrnYn6hAAAA:8 a=xvHX0tUy_BGRiQz1GnAA:9 a=PRpDppDLrCsA:10
- a=RFXaeJp-pwgA:10 a=buJP51TR1BpY-zbLSsyS:22 a=e2CUPOnPG4QKp8I52DXD:22
- a=Yupwre4RP9_Eg_Bd0iYG:22 a=zSyb8xVVt2t83sZkrLMb:22 a=OBjm3rFKGHvpk9ecZwUJ:22
- a=xVlTc564ipvMDusKsbsT:22 a=1CNFftbPRP8L7MoqJWF3:22
-X-Proofpoint-GUID: BW5nthy5p4FYG0EnKi2zOQANFSxG2dyR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-13_01,2026-08-12_01,2025-10-01_01
+X-Received: by 2002:a05:6808:148b:b0:495:ca1b:7865 with SMTP id
+ 5614622812f47-4b228202540mr2579042b6e.11.1786598248105; Wed, 12 Aug 2026
+ 22:17:28 -0700 (PDT)
+Date: Wed, 12 Aug 2026 22:17:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a7d5368.d5f0ebe7.22d851.0013.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in lo_ioctl
+From: syzbot <syzbot+cc0de396bac84da51919@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    6b8c8af514d7 Add linux-next specific files for 20260807
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1615c079580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d343b54cc50df0f
+dashboard link: https://syzkaller.appspot.com/bug?extid=cc0de396bac84da51919
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/71ff4edcb608/disk-6b8c8af5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1f5fa331d8f2/vmlinux-6b8c8af5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f993558ec63b/bzImage-6b8c8af5.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cc0de396bac84da51919@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L     
+------------------------------------------------------
+syz.4.8555/6352 is trying to acquire lock:
+ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: loop_set_dio drivers/block/loop.c:1460 [inline]
+ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+ffff88802688d118 (&q->limits_lock){+.+.}-{4:4}, at: lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
+
+but task is already holding lock:
+ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
+ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
+
+which lock already depends on the new lock.
 
 
-From: Jesse Taube <jtaubepe@redhat.com>=20
-Sent: Wednesday, August 12, 2026 11:43 PM
-To: linux-scsi@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>; Shuah Khan <skhan@linuxfoundation.org=
->; Keith Busch <kbusch@kernel.org>; Jens Axboe <axboe@kernel.dk>; Christoph=
- Hellwig <hch@lst.de>; Sagi Grimberg <sagi@grimberg.me>; Justin Tee <justin=
-.tee@broadcom.com>; Naresh Gottumukkala <nareshgottumukkala83@gmail.com>; P=
-aul Ely <paul.ely@broadcom.com>; Chaitanya Kulkarni <kch@nvidia.com>; James=
- E.J. Bottomley <James.Bottomley@HansenPartnership.com>; Martin K. Petersen=
- <martin.petersen@oracle.com>; Nilesh Javali <njavali@marvell.com>; GR-QLog=
-ic-Storage-Upstream@marvell.com; Hannes Reinecke <hare@suse.de>; Jesse Taub=
-e <jtaubepe@redhat.com>; Gustavo A. R. Silva <gustavoars@kernel.org>; John =
-Meneghini <jmeneghi@redhat.com>; Bryan Gurney <bgurney@redhat.com>; Chris L=
-eech <cleech@redhat.com>; Ewan D . Milne <emilne@redhat.com>; shinichiro.ka=
-wasaki@wdc.com; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org; li=
-nux-nvme@lists.infradead.org; linux-block@vger.kernel.org
-Subject: [EXTERNAL] [PATCH 00/13] nvme-fc: FPIN link integrity handling
+the existing dependency chain (in reverse order) is:
 
-FPIN LI (link integrity) messages are received when the attached fabric det=
-ects hardware errors. In response to these messages I/O should be directed =
-away from the affected ports, and only used as a last resort. This patch ad=
-ds a new controller
-ZjQcmQRYFpfptBannerStart
-Prioritize security for external emails:=20
-Confirm sender and content safety before clicking links or opening attachme=
-nts=20
-=A0=A0https://us-phishalarm-ewt.proofpoint.com/EWT/v1/CRVmXkqW!te3Z1f8UYnTa=
-1E-duf06bvZlnS-1FrR2Jkcx8WQcjCWqN2c_NKqyKXnJoJcD4hWMKkUnua_-glfm3m67hWRah9K=
-f0UTKp-APm3w$=A0=A0=9D=20
+-> #2 (&q->q_usage_counter(io)#26){++++}-{0:0}:
+       bio_queue_enter block/blk.h:95 [inline]
+       blk_mq_submit_bio+0x7fa/0x2a40 block/blk-mq.c:3127
+       __submit_bio_noacct_mq block/blk-core.c:756 [inline]
+       submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
+       bh_submit fs/buffer.c:1146 [inline]
+       __bread_slow fs/buffer.c:1157 [inline]
+       __bread_gfp+0x1e9/0x380 fs/buffer.c:1403
+       sb_bread include/linux/buffer_head.h:344 [inline]
+       fat12_ent_bread+0x156/0x570 fs/fat/fatent.c:77
+       fat_ent_read_block+0x391/0x4b0 fs/fat/fatent.c:450
+       fat_alloc_clusters+0x434/0xe30 fs/fat/fatent.c:498
+       fat_alloc_new_dir+0x160/0xb90 fs/fat/dir.c:1184
+       vfat_mkdir+0x13a/0x300 fs/fat/namei_vfat.c:861
+       vfs_mkdir+0x40c/0x620 fs/namei.c:5410
+       filename_mkdirat+0x285/0x510 fs/namei.c:5443
+       __do_sys_mkdirat fs/namei.c:5464 [inline]
+       __se_sys_mkdirat+0x35/0x150 fs/namei.c:5461
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&sbi->fat_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       lock_fat fs/fat/fatent.c:285 [inline]
+       fat_count_free_clusters+0x157/0xb40 fs/fat/fatent.c:729
+       fat_statfs+0x135/0x400 fs/fat/inode.c:874
+       statfs_by_dentry fs/statfs.c:66 [inline]
+       vfs_statfs+0x147/0x2d0 fs/statfs.c:90
+       loop_get_discard_config drivers/block/loop.c:774 [inline]
+       loop_update_limits+0x375/0x920 drivers/block/loop.c:984
+       loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
+       lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
+       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&q->limits_lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3181 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+       validate_chain kernel/locking/lockdep.c:3924 [inline]
+       __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+       loop_set_dio drivers/block/loop.c:1460 [inline]
+       lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+       lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
+       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &q->limits_lock --> &sbi->fat_lock --> &q->q_usage_counter(io)#26
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#26);
+                               lock(&sbi->fat_lock);
+                               lock(&q->q_usage_counter(io)#26);
+  lock(&q->limits_lock);
+
+ *** DEADLOCK ***
+
+locks held by syz.4.8555/6352: 3, last CPU#1:
+ #0: ffff8880267e7430 (&lo->lo_mutex){+.+.}-{4:4}, at: lo_simple_ioctl drivers/block/loop.c:1520 [inline]
+ #0: ffff8880267e7430 (&lo->lo_mutex){+.+.}-{4:4}, at: lo_ioctl+0x7c4/0x2150 drivers/block/loop.c:1594
+ #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
+ #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+ #1: ffff88802688cae0 (&q->q_usage_counter(io)#26){++++}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
+ #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: loop_set_dio drivers/block/loop.c:1455 [inline]
+ #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+ #2: ffff88802688cb18 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: lo_ioctl+0x1688/0x2150 drivers/block/loop.c:1594
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 6352 Comm: syz.4.8555 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2059
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2191
+ check_prev_add kernel/locking/lockdep.c:3181 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+ validate_chain kernel/locking/lockdep.c:3924 [inline]
+ __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+ queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+ loop_set_dio drivers/block/loop.c:1460 [inline]
+ lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+ lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
+ blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x510 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f450119e0d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f45020e0028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f4501426090 RCX: 00007f450119e0d9
+RDX: 0000000000000000 RSI: 0000000000004c08 RDI: 0000000000000008
+RBP: 00007f4501235024 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f4501426128 R14: 00007f4501426090 R15: 00007ffee924f4a8
+ </TASK>
 
 
-ZjQcmQRYFpfptBannerEnd
-FPIN LI (link integrity) messages are received when the attached fabric
-detects hardware errors. In response to these messages I/O should be
-directed away from the affected ports, and only used as a last resort.
-This patch adds a new controller flag 'NVME_CTRL_MARGINAL' which will be
-checked during multipath path selection, causing the path to be skipped
-when checking for paths. If no other paths are available the 'marginal'
-paths are considered for path selection.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-The testing for this patch set was performed by Bryan Gurney, using the
-process outlined by John Meneghini's presentation at LSFMM 2024, where
-the fibre channel switch sends an FPIN notification on a specific switch
-port, and the following is checked on the initiator:
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-1. The controllers corresponding to the paths on the port that has
-received the notification are showing a set NVME_CTRL_MARGINAL flag.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-   \
-    +- nvme4 fc traddr=3Dc,host_traddr=3De live optimized
-    +- nvme5 fc traddr=3D8,host_traddr=3De live non-optimized
-    +- nvme8 fc traddr=3De,host_traddr=3Df marginal optimized
-    +- nvme9 fc traddr=3Da,host_traddr=3Df marginal non-optimized
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-2. The I/O statistics of the test namespace show no I/O activity on the
-controllers with NVME_CTRL_MARGINAL set.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-   Device             tps    MB_read/s    MB_wrtn/s    MB_dscd/s
-   nvme4c4n1         0.00         0.00         0.00         0.00
-   nvme4c5n1     25001.00         0.00        97.66         0.00
-   nvme4c9n1     25000.00         0.00        97.66         0.00
-   nvme4n1       50011.00         0.00       195.36         0.00
-
-
-   Device             tps    MB_read/s    MB_wrtn/s    MB_dscd/s
-   nvme4c4n1         0.00         0.00         0.00         0.00
-   nvme4c5n1     48360.00         0.00       188.91         0.00
-   nvme4c9n1      1642.00         0.00         6.41         0.00
-   nvme4n1       49981.00         0.00       195.24         0.00
-
-
-   Device             tps    MB_read/s    MB_wrtn/s    MB_dscd/s
-   nvme4c4n1         0.00         0.00         0.00         0.00
-   nvme4c5n1     50001.00         0.00       195.32         0.00
-   nvme4c9n1         0.00         0.00         0.00         0.00
-   nvme4n1       50016.00         0.00       195.38         0.00
-
-Link: https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__people.redhat.=
-com_jmeneghi_LSFMM-5F2024_LSFMM-5F2024-5FNVMe-5FCancel-5Fand-5FFPIN.pdf&d=
-=3DDwIDAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D7My57sfPbDDcMFJyBD6G2keJbhsQZV7WIf=
-8SjB-450c&m=3DViZhyiiF6nkaVXOE1PpaKWe2JBe94gTGHA24wKzPP99uuwXoNoSYqcE55NQRq=
-t6_&s=3D0jhQeJW2swbeXGSnNtXSHqXkNX1eVjXmU7QSm6m2IpU&e=3D
-
-Testing has been performed by sending all FPIN LI ELS messages from the
-switch to the Host and verifying the proper nvme multi-pathing behavior
-is effected with each of the eight different FPIN link integrity events.
-Results were verified with iostat and with the nvme list-subsys command.
-
-These tests were run with all scenarios including where there were only
-non-optimized paths available, and where all paths were
-marginal/degraded. All multi-path io-policies were tested including:
-numa, round-robin and queue-depth. When all paths on the host are
-marginal/degraded, I/O continues on the optimized path that was most
-recently non-marginal.  If both of the optimized paths are down, I/O
-properly continues on one of the marginal/degraded non-optimized paths.
-
-Testing has been complete with both Broadcom (lpfc) and Marvell (qla2xx)
-32GB HBAs.  Both HBAs successfully complete all tests.
-
-For a complete description of the tests that were run, please see
-bugzilla 220329.
-
-To test the path handeling use:
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__github.com_linux-2Db=
-lktests_blktests_pull_264&d=3DDwIDAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D7My57sf=
-PbDDcMFJyBD6G2keJbhsQZV7WIf8SjB-450c&m=3DViZhyiiF6nkaVXOE1PpaKWe2JBe94gTGHA=
-24wKzPP99uuwXoNoSYqcE55NQRqt6_&s=3DXKJyyaOO9_UGG6uH5fv88U7bAke7X9H5Xz0qa39q=
-ubs&e=3D
-or
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kernel.org_linu=
-x-2Dnvme_20260812174503.3705830-2D1-2Djtaubepe-40redhat.com_&d=3DDwIDAg&c=
-=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D7My57sfPbDDcMFJyBD6G2keJbhsQZV7WIf8SjB-450c&m=
-=3DViZhyiiF6nkaVXOE1PpaKWe2JBe94gTGHA24wKzPP99uuwXoNoSYqcE55NQRqt6_&s=3DqPf=
-emamvpsdH9yAG-9CRAILRyvMrzEaa_xjIaJTo1Ds&e=3D
-
-To test the full set including FPIN decoding use:
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__github.com_johnmeneg=
-hini_fpin-5Fli-5Ftests&d=3DDwIDAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D7My57sfPbD=
-DcMFJyBD6G2keJbhsQZV7WIf8SjB-450c&m=3DViZhyiiF6nkaVXOE1PpaKWe2JBe94gTGHA24w=
-KzPP99uuwXoNoSYqcE55NQRqt6_&s=3DSzJUICtyPkmr7xYyCu6_gZb5itPn8MZRQm4z0Zoewak=
-&e=3D
-
-Closes: https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__bugzilla.ker=
-nel.org_show-5Fbug.cgi-3Fid-3D220329&d=3DDwIDAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&=
-r=3D7My57sfPbDDcMFJyBD6G2keJbhsQZV7WIf8SjB-450c&m=3DViZhyiiF6nkaVXOE1PpaKWe=
-2JBe94gTGHA24wKzPP99uuwXoNoSYqcE55NQRqt6_&s=3DYbu1spaO4qBWAVWu7hq8KHIP73xHR=
-mGPfJCrZVoqacY&e=3D
-
-New refactored implementation enables administrators to manually control
-port marginal states via sysfs. For example:
-
-# Set remote port to marginal state
-echo "Marginal" > /sys/class/fc_remote_ports/rport-4:0-1/port_state
-
-# Clear marginal state (set to online)
-echo "Online" > /sys/class/fc_remote_ports/rport-4:0-1/port_state
-
-Changes to the original submission:
-- Changed flag name to 'marginal'
-- Do not block marginal path; influence path selection instead
-  to de-prioritize marginal paths
-
-Changes to v2:
-- Split off driver-specific modifications
-- Introduce 'union fc_tlv_desc' to avoid casts
-
-Changes to v3:
-- Include reviews from Justin Tee
-- Split marginal path handling patch
-
-Changes to v4:
-- Change 'u8' to '__u8' on fc_tlv_desc to fix a failure to build
-- Print 'marginal' instead of 'live' in the state of controllers
-  when they are marginal
-
-Changes to v5:
-- Minor spelling corrections to patch descriptions
-
-Changes to v6:
-- No code changes; added note about additional testing
-
-Changes to v7:
-- Split nvme core marginal flag addition into its own patch
-- Add patch for queue_depth marginal path support
-
-Changes to v8:
-- Rebased patch series to nvme-6.17.
-- Added patch from Gustavo Silva, "scsi: qla2xxx: Fix memcpy field-spanning
-  write issue", which resolves the field-spanning write issue
-- We decided to leave the "marginal" state as is, because the transport
-  driver uses the term "marginal".
-
-Changes to v9:
-- Rebased patch series to nvme-6.18.
-- Refactor and fix a patch from Gustavo Silva, "scsi: qla2xxx: Fix 2 memcpy
-  field-spanning write issue", which resolves the field-spanning write
-  issue.
-  This new version of Gustavo's patch fixes a bug found in testing.
-
-[NJ:] I could not find this qla2xxx fix in this series. Am I missing someth=
-ing.
-This fix is certainly required to avoid few call traces reported, as discus=
-sed here,
-https://lore.kernel.org/linux-nvme/97526d45-ec7d-48a0-bdc6-659f75839f53@emb=
-eddedor.com/#t
-
-Thanks,
-Nilesh
+If you want to undo deduplication, reply with:
+#syz undup
