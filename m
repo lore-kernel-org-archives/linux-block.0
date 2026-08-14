@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A08340DB8
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E82A3438A1
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786715287; cv=none; b=raNai45ne0ICjrqIXyTIQpYfo4QzPEowl+jMIjCwiGwt6O/G/5JRP5aZbq+b8RQr/hYLMRR7YzJ7s010xDJenyZf+V0CrOrircPQScAhUJPY92sVQ5CFzegfNoRwPclGW4FgvTyLVmw7JlTlb4zv4kziITnJRtJQrHk1OTYlFHo=
+	t=1786715288; cv=none; b=dqO3dZ+2jAWi00wSwrS7XKeU1uXEk4tv+xenJsvY1hqDPPVRJaeWolrg0Fv6e9IwPCcDfv72nYGVWVLBD3gulmjMOuuV0GaDgxixkoiYbnSXTRBuahhFhQaMMdqPYGZWMST1kS6SWmPPsr6akpndnn9GY3mv/hp7e2bJPDCOxek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786715287; c=relaxed/simple;
-	bh=F+obadVbMfQP9YVLyX63lzqqT/UQfqG1wVKou7smUU4=;
+	s=arc-20240116; t=1786715288; c=relaxed/simple;
+	bh=gcdqKgFiUVttCH+VQ/R3iZ+1mrRhAkssPcHu/KBc9Wo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BEgm6b/92CFQplesL9KqDqtdzdYR7x5j7BmZOVyyrsDDJWwLiS0nAk59XurGlwXUGLyENhZ4v7IRGYrPLHRF+dwFLnCb6TXv0e/UfA+bz5ng+trxb4JJJ589yzUcmNEOJJ4k0rd1mrK4PRfZgGkF/T/hhRIGGbCV5tBoAKrAItI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjiNLqXP; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Vr4omrLt4vd34CAok5UcxhK8x9+/CjThI06kxb5ItyDeFfSKOvBjZ4zBgGNbUe9Xf/sQRoXC1qzb71b+IzJEkuuhOxjl73cpjYIU9nIy0qk2MLPCQKmWeHjwNdR7NJaLru7tfyQsVFUGQo/AswOOlSQUeKAiopiMy7aAxVq7REg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aoIgOYrz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjiNLqXP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 099EB1F00A3E;
-	Fri, 14 Aug 2026 13:48:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aoIgOYrz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB0DA1F000E9;
+	Fri, 14 Aug 2026 13:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786715286;
-	bh=Ve3aG5/QoBdk2IqgI8h0tKOG7aV7G0i74O6hjVMziQY=;
+	s=k20260515; t=1786715287;
+	bh=3CaoJxXdgPkWRfNm6L4FGtXfnM/Po2tkJXFqrpYplBM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EjiNLqXPatz/MiamFyo5aLmrqraqMYBba5gFli37YLjb3lPX5xqsHZq+EFHodbGvX
-	 4G+IchccX9pB60TTyaYr4qKrSsj4oWJupMnK2wHGbnRdypYSrEz8P8h3m0244JDjL2
-	 /gV83KVfM8rf3F5B5I3FTXcnATZ9nMmJw6lqUSIzG+KJ1YMAqRH1Uq57IPynijbbvO
-	 I0UGytVQXwxa/gSv/JHmMV2k//yPKfusRkLkHoELsZVR9EMNrdcxMC+YrGgA3CRhQs
-	 8rXWsFNc62XfG0gc5wjUl2/53B/xOmlkcYAe+MvYqYrYGmf/yawCJtz3OQEbKf8Tll
-	 xljXmsrjI+lmA==
+	b=aoIgOYrzN/pwp8y1O8BSE6pKkBs1AJQRLQZ/YTn7owwwbbx2G8GTK6BoqqJ5HUs/l
+	 MdJhZ0yNsKAgUJZrsXVU4bh7ot6au4EbBJaagN9D1KInBOqb8Ksxt4uQrEZ0D55vnd
+	 AkkvwPaXptZwRaitzdirouS2D4xrQ3DnnghHeCy0Eawjg3UYjT/kJm/IcW8GYDpSEi
+	 +xuHUINJLHA9P3zhV9918J5vAn8nBwXfjcs0IadqDEPVv/FV307HaRte1Jdx8gtzRu
+	 gytDgj4cBYtcE/Y4NL24ri9oc73iGOWmvqBMiKKp2xj/tww7MJD5vMhUtma+E9RIgP
+	 zxTNrKWMCgg0A==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v5 06/13] block: introduce disk_for_all_zone_wplugs()
-Date: Fri, 14 Aug 2026 22:47:43 +0900
-Message-ID: <20260814134750.2100304-7-dlemoal@kernel.org>
+Subject: [PATCH v5 07/13] block: drop all zone write plugs on capacity changes
+Date: Fri, 14 Aug 2026 22:47:44 +0900
+Message-ID: <20260814134750.2100304-8-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260814134750.2100304-1-dlemoal@kernel.org>
 References: <20260814134750.2100304-1-dlemoal@kernel.org>
@@ -44,10 +44,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce the helper function disk_for_all_zone_wplugs() to allow
-executing an actor function on all hashed zone write plugs. This helper
-is used to simplify the implementation of blk_zone_reset_all_bio_endio()
-and queue_zone_wplugs_show().
+If during revalidation, we detect a capacity change for a zoned block
+device, e.g. due to a storage element removal on an HDD, we can assume
+that the device was reformatted, which implies that all sequential zones
+are empty. For such case, we can remove and free all zone write plugs in
+the gendisk hash table by marking them as dead, thus avoiding also to
+leave zone write plugs for zones that are beyond the new device capacity
+in the disk hash table.
+
+Introduce the function disk_revalidate_capacity() to do this and call this
+new function at the beginning of blk_revalidate_disk_zones(), so that the
+zone revalidation process can re-create, if needed, any zone write plug
+for sequential zones that are not empty.
+
+The checks on the capacity and zone size that were in
+blk_revalidate_disk_zones() are moved to disk_revalidate_capacity() and
+if true, also trigger dropping all zone write plugs.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
@@ -55,118 +67,110 @@ Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c | 68 +++++++++++++++++++++++++----------------------
- 1 file changed, 36 insertions(+), 32 deletions(-)
+ block/blk-zoned.c | 74 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 58 insertions(+), 16 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index e3c28db5690c..83737c9a92d8 100644
+index 83737c9a92d8..b153bed9d576 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -662,6 +662,26 @@ static inline struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
- 	return disk_get_hashed_zone_wplug(disk, sector);
+@@ -2222,6 +2222,59 @@ static int disk_revalidate_zone_resources(struct gendisk *disk,
+ 	return ret;
  }
  
-+static void disk_for_all_zone_wplugs(struct gendisk *disk,
-+				     void (*actor)(struct blk_zone_wplug *,
-+						   void *),
-+				     void *data)
-+{
-+	struct blk_zone_wplug *zwplug;
-+	unsigned int i;
-+
-+	if (!disk->zone_wplugs_hash)
-+		return;
-+
-+	rcu_read_lock();
-+	for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++) {
-+		hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[i],
-+					 node)
-+			actor(zwplug, data);
-+	}
-+	rcu_read_unlock();
-+}
-+
- static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
- {
- 	struct blk_zone_wplug *zwplug =
-@@ -1200,32 +1220,26 @@ static void blk_zone_reset_bio_endio(struct bio *bio)
- 	}
- }
- 
-+static void disk_zone_wplug_reset_wp(struct blk_zone_wplug *zwplug, void *data)
++static void disk_drop_zone_wplug(struct blk_zone_wplug *zwplug, void *data)
 +{
 +	unsigned long flags;
 +
 +	spin_lock_irqsave(&zwplug->lock, flags);
-+	disk_zone_wplug_set_wp_offset(zwplug->disk, zwplug, 0);
++	disk_zone_wplug_abort(zwplug);
++	disk_mark_zone_wplug_dead(zwplug);
 +	spin_unlock_irqrestore(&zwplug->lock, flags);
 +}
 +
- static void blk_zone_reset_all_bio_endio(struct bio *bio)
++static int disk_revalidate_capacity(struct gendisk *disk)
++{
++	struct queue_limits *lim = &disk->queue->limits;
++	sector_t zone_sectors = lim->chunk_sectors;
++	unsigned int nr_zones = disk_get_nr_zones(disk);
++	unsigned int memflags;
++	int ret = -ENODEV;
++
++	if (!get_capacity(disk) || !nr_zones)
++		goto drop_all_zwplugs;
++
++	/*
++	 * Checks that the device driver indicated a valid zone size and that
++	 * the max zone append limit is set.
++	 */
++	if (!zone_sectors || !is_power_of_2(zone_sectors)) {
++		pr_warn("%s: Invalid non power of two zone size (%llu)\n",
++			disk->disk_name, zone_sectors);
++		goto drop_all_zwplugs;
++	}
++
++	/*
++	 * Check if the capacity has changed. If it did, assume that the device
++	 * was reformatted and that all sequential zones are now empty. So drop
++	 * all zone write plug.
++	 */
++	if (disk->nr_zones && disk->nr_zones != nr_zones) {
++		pr_warn("%s: Number of zones changed (%u -> %u)\n",
++			disk->disk_name, disk->nr_zones, nr_zones);
++		ret = 0;
++		goto drop_all_zwplugs;
++	}
++
++	return 0;
++
++drop_all_zwplugs:
++	memflags = blk_mq_freeze_queue(disk->queue);
++	disk_for_all_zone_wplugs(disk, disk_drop_zone_wplug, NULL);
++	blk_mq_unfreeze_queue(disk->queue, memflags);
++
++	return ret;
++}
++
+ static int blk_revalidate_zone_cond(struct blk_zone *zone, unsigned int idx,
+ 				    struct blk_revalidate_zone_args *args)
  {
- 	struct gendisk *disk = bio->bi_bdev->bd_disk;
--	sector_t capacity = get_capacity(disk);
--	struct blk_zone_wplug *zwplug;
--	unsigned long flags;
- 	sector_t sector;
--	unsigned int i;
- 
--	if (atomic_read(&disk->nr_zone_wplugs)) {
--		/* Update the condition of all zone write plugs. */
--		rcu_read_lock();
--		for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++) {
--			hlist_for_each_entry_rcu(zwplug,
--						 &disk->zone_wplugs_hash[i],
--						 node) {
--				spin_lock_irqsave(&zwplug->lock, flags);
--				disk_zone_wplug_set_wp_offset(disk, zwplug, 0);
--				spin_unlock_irqrestore(&zwplug->lock, flags);
--			}
--		}
--		rcu_read_unlock();
--	}
-+	/* Update the condition of all zone write plugs. */
-+	if (atomic_read(&disk->nr_zone_wplugs))
-+		disk_for_all_zone_wplugs(disk, disk_zone_wplug_reset_wp, NULL);
- 
- 	/* Update the cached zone conditions. */
--	for (sector = 0; sector < capacity;
-+	for (sector = 0; sector < get_capacity(disk);
- 	     sector += bdev_zone_sectors(bio->bi_bdev))
- 		disk_zone_set_cond(disk, sector, BLK_ZONE_COND_EMPTY);
- 	clear_bit(GD_ZONE_APPEND_USED, &disk->state);
-@@ -2514,8 +2528,9 @@ EXPORT_SYMBOL_GPL(blk_zone_issue_zeroout);
- 
- #ifdef CONFIG_BLK_DEBUG_FS
- static void queue_zone_wplug_show(struct blk_zone_wplug *zwplug,
--				  struct seq_file *m)
-+				  void *data)
+@@ -2411,31 +2464,20 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+  */
+ int blk_revalidate_disk_zones(struct gendisk *disk)
  {
-+	struct seq_file *m = data;
- 	unsigned int zwp_wp_offset, zwp_flags;
- 	unsigned int zwp_zone_no, zwp_ref;
- 	unsigned int zwp_bio_list_size;
-@@ -2540,19 +2555,8 @@ static void queue_zone_wplug_show(struct blk_zone_wplug *zwplug,
- int queue_zone_wplugs_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
--	struct gendisk *disk = q->disk;
--	struct blk_zone_wplug *zwplug;
--	unsigned int i;
+-	struct request_queue *q = disk->queue;
+-	sector_t zone_sectors = q->limits.chunk_sectors;
+ 	struct blk_revalidate_zone_args args = { };
+ 	struct blk_report_zones_args rep_args = {
+ 		.cb = blk_revalidate_zone_cb,
+ 		.data = &args,
+ 	};
+ 	unsigned int noio_flag;
+-	int ret = -ENOMEM;
++	int ret;
+ 
+-	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
++	if (WARN_ON_ONCE(!blk_queue_is_zoned(disk->queue)))
+ 		return -EIO;
+ 
+-	if (!get_capacity(disk))
+-		return -ENODEV;
 -
--	if (!disk->zone_wplugs_hash)
--		return 0;
+-	/*
+-	 * Checks that the device driver indicated a valid zone size and that
+-	 * the max zone append limit is set.
+-	 */
+-	if (!zone_sectors || !is_power_of_2(zone_sectors)) {
+-		pr_warn("%s: Invalid non power of two zone size (%llu)\n",
+-			disk->disk_name, zone_sectors);
+-		return -ENODEV;
+-	}
++	ret = disk_revalidate_capacity(disk);
++	if (ret)
++		return ret;
  
--	rcu_read_lock();
--	for (i = 0; i < disk_zone_wplugs_hash_size(disk); i++)
--		hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[i],
--					 node)
--			queue_zone_wplug_show(zwplug, m);
--	rcu_read_unlock();
-+	disk_for_all_zone_wplugs(q->disk, queue_zone_wplug_show, m);
- 
- 	return 0;
- }
+ 	/*
+ 	 * Allocate zone resources if they are needed and we have not done
 -- 
 2.55.0
 
