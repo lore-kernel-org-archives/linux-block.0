@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C216333343C
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9699133B966
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786715285; cv=none; b=fh2FDz/SlJm6C7PX7Ogi15+JZJ35djSeoM5l3BItR5ISyj8wcw1la3S1ReRj5mUb7yVZ38p8GJGbruNNMNPvzvVLP4c7uKaLoj95ZtsKgpvqTkHazEZNqHjrkCnpYTvXCDViAuTZDZ/r8KMcGQBVaG2OpM11hFgw1sOmGcW1wLg=
+	t=1786715285; cv=none; b=S+dl+ixso8zkMzhr/K8FpN6Cdakb/Ir+pSBgJQHV+UmJw5wJnm6YCcPbo5+SDTU57x/kdNZWB6swIBFrGUb0IeASg5gPkP9VwyJ2DX5fMd/Wi4zqZYdqQ6WP49J2uDVnz4PL0ycruGdOaVSqhNf1D8ORL6HivmtWObZ0n2GSw3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786715285; c=relaxed/simple;
-	bh=QE/0/buNleJmT+y1KEGXz08vWmURzH0i9KQjIBek8x8=;
+	bh=BiqXUxOAimfUnEO3pizTpA5IhqZqr2LRtgr1VUm4A8g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C+EOqfO43QkTWD3w+BcIWasTCMf4Up+XQYqyp1xPc+Nj9QL5MjSgpJS7nqXxCzlS6rY28rA2R6D0OSgTvYdWsHSXDEO1yaUPQJTEk6ysXGLKLKp2BSFeID5+kR0A7ZqkiuM6j1d4XFhu2BmoVpPJO7j+/Dm4ium74IsKW7pTNa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4+P85Rx; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=iMGTIjn3BSwpx1LBQkEm8GJe7acqOseuLT2+8CIbsh4Cw3wsxUdSbQFFVyLyrFMviIqflwlEClWMcR4t95xluWXoPGmloxBrRlUcDkIfrdV7sedJvfJyjv0h9+YJbAENixiyx69hAw6m3XMAVsjrLdQrAAp/5Q1GVglkJAAusMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=joAYXA3W; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4+P85Rx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071481F00A3D;
-	Fri, 14 Aug 2026 13:48:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="joAYXA3W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C071D1F000E9;
+	Fri, 14 Aug 2026 13:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786715283;
-	bh=087VlQrVhyik0dLWAyQOED0pwFJ8AKPvkH4Z+LEusaM=;
+	s=k20260515; t=1786715284;
+	bh=29yrWh05NMYzdonMP6seb06QiUpdL/Jeq3kYqy8hITA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=n4+P85Rx0k6vbIP5jhxT2+fa6tRGd07iVpp1LJ4ZO+mxI6kUUUXLP+Bo/SWszpc6l
-	 zaEO/dqbuOhA7ltc13q14PSUT9XwR3bFK3m9q6EckIFKZSQQLxjFJtoffUHMPjuosu
-	 xBJs+ZJju9fiMKsEsRkfaAldRrbDCZYr/eN2+0c8xGN139laMeA8by9GHCi7t4F1VI
-	 kq5FjCPyP5oh1zAlTN61zyw7pROfn74zYlG997/U+YTfY67n+fWVwOWz1gMeE6ZIT5
-	 mWWz7t9JV4NFyX8dKvjwx4JbIYUQTw8vjcV+YbuCMbqm1HXfXEjW1cCGrqzc1k8GwF
-	 QpueDmeIc9LKA==
+	b=joAYXA3W3Fw8GcAKauPNj2DJ9za2ACq9+WvOVXW0AvP5FcBqC2+Oyjd9yIfnO2jVH
+	 +njTbB0tCifJLufXhN75Yg6lSNr4zONk237OIuBix7MlGf86C4bGCtzbyVvJGIjPLW
+	 BgcffGH5UkgGIuP5AZmka6cFbGENwePLJiZSOYM94hYBtNbWaeWw50kATY7owKioRu
+	 PRCfoDUvvD8pK2w5mX4uU54VdlWmT2dY46XCyTlN3mwyD6buIWCABt83KdXIoctFDb
+	 E+0ecL8IGiCxGNV8orHdrF9XqWds7sc5h44pVNRUgDZtN1h2a/xrr9VWfEHR4KmQiW
+	 Y5wJ3p2qrHVFA==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v5 02/13] block: refactor disk_revalidate_zone_resources()
-Date: Fri, 14 Aug 2026 22:47:39 +0900
-Message-ID: <20260814134750.2100304-3-dlemoal@kernel.org>
+Subject: [PATCH v5 03/13] block: refactor disk_update_zone_resources()
+Date: Fri, 14 Aug 2026 22:47:40 +0900
+Message-ID: <20260814134750.2100304-4-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260814134750.2100304-1-dlemoal@kernel.org>
 References: <20260814134750.2100304-1-dlemoal@kernel.org>
@@ -44,155 +44,120 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function disk_revalidate_zone_resources() is misnamed as it does not
-revalidate anything but rather allocates the revalidation arguments and
-then calls disk_alloc_zone_resources() to initialize the disk zone
-resources if they are needed and not already allocated.
-
-Make this function less confusing by renaming it
-disk_init_revalidate_args() and moving the call to
-disk_alloc_zone_resources() into blk_revalidate_disk_zones(). As before,
-this function is only called if the zone resources are needed and not yet
-allocated. The initialization of the atomic nr_zone_wplugs is also moved
-to the function disk_init_zone_resources() so that this is done once and
-not on all revalidation.
+Since the function disk_update_zone_resources() does a lot of checks
+beside updating a zoned disk limits and resources, rename this function
+to disk_revalidate_zone_resources(). To keep all checks together, move
+the capacity check in blk_revalidate_disk_zones() to this function and
+simplify it by moving the check on the number of zones before the call to
+queue_limits_start_update().
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-zoned.c | 75 ++++++++++++++++++++++++++---------------------
- 1 file changed, 42 insertions(+), 33 deletions(-)
+ block/blk-zoned.c | 46 +++++++++++++++++++---------------------------
+ 1 file changed, 19 insertions(+), 27 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index b47e32bf4602..0c298fefecf8 100644
+index 0c298fefecf8..f96953befcb6 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -1854,12 +1854,23 @@ static int disk_zone_wplugs_worker(void *data)
- 
- void disk_init_zone_resources(struct gendisk *disk)
- {
-+	atomic_set(&disk->nr_zone_wplugs, 0);
- 	spin_lock_init(&disk->zone_wplugs_hash_lock);
- 	spin_lock_init(&disk->zone_wplugs_list_lock);
- 	INIT_LIST_HEAD(&disk->zone_wplugs_list);
- 	init_completion(&disk->zone_wplugs_worker_bio_done);
+@@ -2038,11 +2038,11 @@ static int disk_init_revalidate_args(struct gendisk *disk,
  }
  
-+static unsigned int disk_get_nr_zones(struct gendisk *disk)
-+{
-+	struct queue_limits *lim = &disk->queue->limits;
-+
-+	if (!lim->chunk_sectors)
-+		return 0;
-+
-+	return DIV_ROUND_UP_ULL(get_capacity(disk), lim->chunk_sectors);
-+}
-+
  /*
-  * For the size of a disk zone write plug hash table, use the size of the
-  * zone write plug mempool, which is the maximum of the disk open zones and
-@@ -1869,13 +1880,24 @@ void disk_init_zone_resources(struct gendisk *disk)
- #define BLK_ZONE_WPLUG_MAX_HASH_BITS		9
- #define BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE	128
- 
--static int disk_alloc_zone_resources(struct gendisk *disk,
--				     unsigned int pool_size)
-+static int disk_alloc_zone_resources(struct gendisk *disk)
+- * Update the disk zone resources information and device queue limits.
+- * The disk queue is frozen when this is executed.
++ * Revalidate and update the disk zone resources information and device queue
++ * limits.
+  */
+-static int disk_update_zone_resources(struct gendisk *disk,
+-				      struct blk_revalidate_zone_args *args)
++static int disk_revalidate_zone_resources(struct gendisk *disk,
++					  struct blk_revalidate_zone_args *args)
  {
--	unsigned int i;
-+	struct queue_limits *lim = &disk->queue->limits;
-+	unsigned int nr_zones, pool_size, i;
- 	int ret = -ENOMEM;
+ 	struct request_queue *q = disk->queue;
+ 	unsigned int nr_seq_zones;
+@@ -2050,19 +2050,24 @@ static int disk_update_zone_resources(struct gendisk *disk,
+ 	struct queue_limits lim;
+ 	int ret = 0;
  
--	atomic_set(&disk->nr_zone_wplugs, 0);
-+	nr_zones = disk_get_nr_zones(disk);
-+	if (!nr_zones)
++	/* Make sure that the entire disk capacity has been checked. */
++	if (args->sector != get_capacity(disk)) {
++		pr_warn("%s: Missing zones from sector %llu\n",
++			disk->disk_name, args->sector);
 +		return -ENODEV;
-+
-+	/*
-+	 * If the device has no limit on the maximum number of open and active
-+	 * zones, use BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE.
-+	 */
-+	pool_size = max(lim->max_open_zones, lim->max_active_zones);
-+	if (!pool_size)
-+		pool_size = min(BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE, nr_zones);
-+
- 	disk->zone_wplugs_hash_bits =
- 		min(ilog2(pool_size) + 1, BLK_ZONE_WPLUG_MAX_HASH_BITS);
- 
-@@ -2001,41 +2023,18 @@ struct blk_revalidate_zone_args {
- 	sector_t	sector;
- };
- 
--static int disk_revalidate_zone_resources(struct gendisk *disk,
-+static int disk_init_revalidate_args(struct gendisk *disk,
- 				struct blk_revalidate_zone_args *args)
- {
--	struct queue_limits *lim = &disk->queue->limits;
--	unsigned int pool_size;
--	int ret = 0;
--
- 	args->disk = disk;
--	args->nr_zones =
--		DIV_ROUND_UP_ULL(get_capacity(disk), lim->chunk_sectors);
-+	args->nr_zones = disk_get_nr_zones(disk);
- 
- 	/* Cached zone conditions: 1 byte per zone */
- 	args->zones_cond = kzalloc(args->nr_zones, GFP_NOIO);
- 	if (!args->zones_cond)
- 		return -ENOMEM;
- 
--	if (!disk_need_zone_resources(disk))
--		return 0;
--
--	/*
--	 * If the device has no limit on the maximum number of open and active
--	 * zones, use BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE.
--	 */
--	pool_size = max(lim->max_open_zones, lim->max_active_zones);
--	if (!pool_size)
--		pool_size =
--			min(BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE, args->nr_zones);
--
--	if (!disk->zone_wplugs_hash) {
--		ret = disk_alloc_zone_resources(disk, pool_size);
--		if (ret)
--			kfree(args->zones_cond);
--	}
--
--	return ret;
-+	return 0;
- }
- 
- /*
-@@ -2328,11 +2327,21 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	}
- 
- 	/*
--	 * Ensure that all memory allocations in this context are done as if
--	 * GFP_NOIO was specified.
-+	 * Allocate zone resources if they are needed and we have not done
-+	 * so yet, and initialize the revalidation arguments passed to report
-+	 * zones. Ensure that all memory allocations in this context are done as
-+	 * if GFP_NOIO was specified.
- 	 */
- 	noio_flag = memalloc_noio_save();
--	ret = disk_revalidate_zone_resources(disk, &args);
-+	if (disk_need_zone_resources(disk) && !disk->zone_wplugs_hash) {
-+		ret = disk_alloc_zone_resources(disk);
-+		if (ret) {
-+			memalloc_noio_restore(noio_flag);
-+			return ret;
-+		}
 +	}
 +
-+	ret = disk_init_revalidate_args(disk, &args);
- 	if (ret) {
- 		memalloc_noio_restore(noio_flag);
- 		return ret;
++	if (args->nr_conv_zones >= args->nr_zones) {
++		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
++			disk->disk_name, args->nr_conv_zones, args->nr_zones);
++		return -ENODEV;
++	}
++
+ 	lim = queue_limits_start_update(q);
+ 
+ 	memflags = blk_mq_freeze_queue(q);
+ 
+ 	disk->nr_zones = args->nr_zones;
+-	if (args->nr_conv_zones >= disk->nr_zones) {
+-		queue_limits_cancel_update(q);
+-		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
+-			disk->disk_name, args->nr_conv_zones, disk->nr_zones);
+-		ret = -ENODEV;
+-		goto unfreeze;
+-	}
+-
+ 	disk->zone_capacity = args->zone_capacity;
+ 	disk->last_zone_capacity = args->last_zone_capacity;
+ 	disk_set_zones_cond_array(disk, args->zones_cond);
+@@ -2106,7 +2111,6 @@ static int disk_update_zone_resources(struct gendisk *disk,
+ commit:
+ 	ret = queue_limits_commit_update(q, &lim);
+ 
+-unfreeze:
+ 	blk_mq_unfreeze_queue(q, memflags);
+ 
+ 	return ret;
+@@ -2301,7 +2305,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	sector_t zone_sectors = q->limits.chunk_sectors;
+-	sector_t capacity = get_capacity(disk);
+ 	struct blk_revalidate_zone_args args = { };
+ 	struct blk_report_zones_args rep_args = {
+ 		.cb = blk_revalidate_zone_cb,
+@@ -2313,7 +2316,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
+ 		return -EIO;
+ 
+-	if (!capacity)
++	if (!get_capacity(disk))
+ 		return -ENODEV;
+ 
+ 	/*
+@@ -2357,18 +2360,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	if (ret <= 0)
+ 		goto free_args;
+ 
+-	/*
+-	 * If zones where reported, make sure that the entire disk capacity
+-	 * has been checked.
+-	 */
+-	if (args.sector != capacity) {
+-		pr_warn("%s: Missing zones from sector %llu\n",
+-			disk->disk_name, args.sector);
+-		ret = -ENODEV;
+-		goto free_args;
+-	}
+-
+-	ret = disk_update_zone_resources(disk, &args);
++	ret = disk_revalidate_zone_resources(disk, &args);
+ 	if (ret)
+ 		goto free_args;
+ 
 -- 
 2.55.0
 
