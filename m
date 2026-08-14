@@ -1,41 +1,139 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-30.ptr.blmpb.com (va-2-30.ptr.blmpb.com [209.127.231.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22905419FCC
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 07:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B163B423EAE
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 07:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786692680; cv=none; b=FcJ+C87STGFi7t+S/if88G6Q4gVXvIK6J/t+8iqo6LElD2h8wyrR+j0DeAYpnA0m/j94+WbgJxx0lYUmMMYi74BiiKmuLruFdFH7KA74THtAKGkFvWjEzuOG7Pf2zb0YIqxAs0D4qkhVDbw8z62rilfzcTWzW50ahkFage+JlYM=
+	t=1786693828; cv=none; b=VPyBwDcB9f3Q6EoNvLslysU8A1tAL3l67bzy0YYS/xmAEhY/VDjfyWIaXNm+ZVUbl16eQUIKHvo0c/e2gclc5++Yy7DHc4gfZLF+LPk5GseGgZg3Aqa90A4pionQAcm7DTvvjeqiXE6pYAhi1Xywl7piQ8SjkRenPRsoTXPNFM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786692680; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVmRzqGPcq5BG5ZPYV04SUZBNfTef8c+eewoF2Bv/5KsWYKExQd+FcX306y0ZD4x0OTNa6Cp6Pw63sxJwt/wxdy+3hyBwNzDSIzb2b4ipVb+5FqJr8kXKiihcnFFBQ6Um0uApvY+XQQWASw3n/SEAwzfI+EHBFvk7Ba6ASDLDFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3E24568B05; Fri, 14 Aug 2026 09:31:09 +0200 (CEST)
-Date: Fri, 14 Aug 2026 09:31:08 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v4 05/13] block: refactor bdev_zone_is_seq()
-Message-ID: <20260814073108.GB10268@lst.de>
-References: <20260814063201.1762743-1-dlemoal@kernel.org> <20260814063201.1762743-6-dlemoal@kernel.org>
+	s=arc-20240116; t=1786693828; c=relaxed/simple;
+	bh=Y2jZkZG5IdEinfxaABKa1bNtQfxrrDOJa1w7kxN9I5Y=;
+	h=Content-Type:References:In-Reply-To:To:Message-Id:Mime-Version:Cc:
+	 From:Subject:Date; b=pSxWFQ4YE6UrpkA+6YXQ6ktqbc+UH28xLwIHFIGMlObx8ZfTSPGgzPwwOVqKB2I0y7W+rnHaak5fw0B3ohGiV5WI+4G+cyZN+ure8FGESpY03sLiH/vaDlwHE3Q3mKIoaNP9P6ixu1NPTJKWF3pfvD0yIXpNMJe8/RiTTJuQAx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=L7/Sqr2Y; arc=none smtp.client-ip=209.127.231.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="L7/Sqr2Y"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1786693811;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=JbnLgklqOUcOfZtgfE8qoZAa4WQi1t4pHM8VNSJ95PY=;
+ b=L7/Sqr2YloWcCd+CLuHsctvb17T7wRA1u8EeyL71rexTLznirImCcRNGShoamsifvNP838
+ CY/EyFMwObsNum1JoF8LIjq/RFrSC8vStettKoF6i51yLAW07hcudtN3mivQCrsafYgAl4
+ KkT7BYhMbbM5oNRcU+Nh6x34Y1KgWh9in+oxdMjmqF45CRc0eLxrise6z06fzJ7uQc/NuN
+ 0y1mz0aUe8jnT/KsiQ+e1V3qFagpdJUZGm3swFRJLfIImlS3w1nJI9e2LTDiiVEW9uIaYp
+ UatwlhWuY5fbRtuq6gNXTOQ7brg2wieqFZPdJEkCgsBRf04R6+onPRRTelpNfw==
+Reply-To: yukuai@fygo.io
+User-Agent: Mozilla Thunderbird
+Received: from [192.168.1.104] ([39.182.0.156]) by smtp.feishu.cn with ESMTPS; Fri, 14 Aug 2026 15:50:07 +0800
+X-Lms-Return-Path: <lba+26a7ec8b1+cb17c5+vger.kernel.org+yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+References: <20260811064744.1139446-1-yukuai@kernel.org> <20260811064744.1139446-3-yukuai@kernel.org> <20260814071232.GA9784@lst.de>
+In-Reply-To: <20260814071232.GA9784@lst.de>
+Content-Transfer-Encoding: quoted-printable
+To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+Message-Id: <f7350050-062a-4ced-9396-05ac33ac3e60@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260814063201.1762743-6-dlemoal@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Mime-Version: 1.0
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Cc: "Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>, 
+	"Josef Bacik" <josef@toxicpanda.com>, 
+	"Johannes Weiner" <hannes@cmpxchg.org>, 
+	=?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	"Yu Kuai" <yukuai@fygo.io>, "Tao Cui" <cui.tao@linux.dev>, 
+	"Jan Kara" <jack@suse.cz>, "Ming Lei" <ming.lei@redhat.com>, 
+	"Jonathan Corbet" <corbet@lwn.net>, 
+	"Shuah Khan" <skhan@linuxfoundation.org>, "Coly Li" <colyli@fygo.io>, 
+	"Kent Overstreet" <kent.overstreet@linux.dev>, 
+	"Alasdair Kergon" <agk@redhat.com>, "Mike Snitzer" <snitzer@kernel.org>, 
+	"Mikulas Patocka" <mpatocka@redhat.com>, 
+	"Benjamin Marzinski" <bmarzins@redhat.com>, "Song Liu" <song@kernel.org>, 
+	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
+	"Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, 
+	"Dan Williams" <djbw@kernel.org>, 
+	"Vishal Verma" <vishal.l.verma@intel.com>, 
+	"Dave Jiang" <dave.jiang@intel.com>, 
+	"Alison Schofield" <alison.schofield@intel.com>, 
+	"Ira Weiny" <iweiny@kernel.org>, 
+	"Andreas Gruenbacher" <agruenba@redhat.com>, 
+	"Matthew Wilcox" <willy@infradead.org>, 
+	"Andrew Morton" <akpm@linux-foundation.org>, 
+	"Chris Li" <chrisl@kernel.org>, "Kairui Song" <kasong@tencent.com>, 
+	"Kemeng Shi" <shikemeng@huaweicloud.com>, 
+	"Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>, 
+	"Barry Song" <baohua@kernel.org>, 
+	"Youngjun Park" <youngjun.park@lge.com>, <cgroups@vger.kernel.org>, 
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-block@vger.kernel.org>, <linux-bcache@vger.kernel.org>, 
+	<dm-devel@lists.linux.dev>, <linux-raid@vger.kernel.org>, 
+	<nvdimm@lists.linux.dev>, <virtualization@lists.linux.dev>, 
+	<gfs2@lists.linux.dev>, <linux-fsdevel@vger.kernel.org>, 
+	<linux-mm@kvack.org>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Subject: Re: [RFC PATCH v2 2/4] blk-cgroup: use a request_queue rhashtable for blkg lookup
+Date: Fri, 14 Aug 2026 15:50:04 +0800
 
-Looks good:
+Hi=EF=BC=8C
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+=E5=9C=A8 2026/8/14 15:12, Christoph Hellwig =E5=86=99=E9=81=93:
+> On Tue, Aug 11, 2026 at 02:47:42PM +0800, Yu Kuai wrote:
+>> Keep q->blkg_list for ordered policy and scheduler walks. Initialize and
+>> destroy the hash with request_queue, and remove the radix-tree preload
+>> paths which are no longer needed.
+> Are these fast path operations?  Otherwise we can walk all rhashtable
+> entries without an extra list, but it might be slower.
 
+All users are from sysfs/cgroupfs API, I think they can be considered slow =
+path,
+however currently spinlock is held in these procedures, I think it's better=
+ to
+convert them to blkg_lookup based iterate after spinlock is converted to th=
+e
+blkcg_mutex.
+
+>
+>> @@ -191,10 +198,15 @@ static void blkg_release(struct percpu_ref *ref)
+>>   {
+>>   	struct blkcg_gq *blkg =3D container_of(ref, struct blkcg_gq, refcnt);
+>>   	struct blkcg *blkcg =3D blkg->blkcg;
+>>   	int cpu;
+>>  =20
+>> +	if (!list_empty(&blkg->q_node))
+>> +		WARN_ON_ONCE(rhashtable_remove_fast(&blkg->q->blkg_hash,
+>> +						    &blkg->q_hash_node,
+>> +						    blkg_hash_params));
+>> +
+> The list_empty case is for initialization failure?  Or can we end up
+> with that by other means?
+
+Yes, this is for initialization failure, blkg_alloc() failure after percpu_=
+ref_init(),
+or blkg_create() failure before rhashtable_insert succeed.
+
+>
+>> + * Lookup a blkg for the @blkcg - @q pair, whether it is online or dyin=
+g.
+>> + *
+>> + * Must be called in a RCU critical section.
+>> + */
+> Please add must_hold and/or lockdep annotations for this instead of just
+> a comment.
+>
+> Also maybe mention that this does not acquire a reference and the caller
+> must already hold one?
+
+Perhaps it's more accurate that the blkg is pinned by IO or caller already
+hold one?
+
+>
+>
+--=20
+Thanks,
+Kuai
