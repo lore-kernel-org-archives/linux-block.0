@@ -1,178 +1,275 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3BB481AAE
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 15:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0301371049;
+	Fri, 14 Aug 2026 15:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786720613; cv=none; b=tjlWe5yD31wRc8lrfh7WJHXaCDFT6UFpPnuJcauKsVBlUBs2s2/hqQ2OGUzNyBFNDXKGXvWlojtbEQmAXNTopOFeoLJlgXUdR6T/ThL25BDkfbqp4XWeSQkTwDCqhqJ6f1latP8glSgnQD21irnkokZSXn9YOzLQCA4+hTSKjcg=
+	t=1786720771; cv=none; b=YPojs2X/V7KgXDud5qwWBbqdJrnHAUFBtLNRUSneGppZbnqQQNmgsSLj1caSBxEIX4/LKMRW6EIRBF0AyZ2t2s8gx+0Y00gWuHJBEtPVVoLxasGPX0K56gojasuoNhDrgMwI55VFEWh71O2xSv9r2Tn9UJ5umg5Vb3k+laVNlQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786720613; c=relaxed/simple;
-	bh=6dgBdo0kz8D0VhXyVT7VOnoNHF/p9ue86NPOyUvtC7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hoWWpkvsq9nLCcKWFZp3PtiZJUbaEgd4w+jnmXX4DnR+xpWUB3w0AiRZtetKLD00Q0kL56LMNR2YvHssPZ0oTHsumPmv4ov0yXLVFVbf1HPNOv51/S5AY79Mdz/pqx+eoI6xYDuFI6NJHWPXYT+tPfvrdxNrZm9Uli53iFhnMvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=E828Ctgn; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1786720771; c=relaxed/simple;
+	bh=jbJyzGZ3fwQRcrNkA1167Kvzd1fz7sJ+ClanBLAh270=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3N5/t4S853fnz4k1xofONejAs2NMA0IRvt3Rdv5QwpE5N6LO5LPKvjXHa94T4ihLstDwRcWIcZCBHHuSOsOmxq0TCJL8TKbA1c6cfWqEXRZnhqTejklrnerctx/LbZPOSWYDXha+UGe1rF+BZRp/1jknqS5bG6TsuueNvLKfZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sh6Ix6p8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="E828Ctgn"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47362928f65so1073364f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 08:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1786720609; x=1787325409; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=IRB4JuBVbvsbT/EXF82Pi+P9sAHp5M7GCKevXhSfrjU=;
-        b=E828Ctgn2560U8y9tUZMK/kvTH7LoYmylKBd1MOwWk/84rhLT4B+MBybWFZHMUD3Y5
-         /ElN8tBMQCVypJTA+KYGYcKffjnaiwLltspDkdpnqzQb4MSjun7BKvEwIjIcr0obaR32
-         wtoC3cfNKdo14HR4cE1Dz1+zErweKHKjP/a1zm8N/bb5AlDURWTJZavmPzCzQhHGIcSa
-         UHL/t2AhhHfT8ERXAF4t4cAC9cGou6IfCkjWeOZgaKb6R9D/Kaf8PefDL04n5s4qV09Y
-         BI18PUiIMni0OwM62rExn7xI9Lm6XXwNNrw7p+SR4esKxRr5hcdpJN9Ai8DxaU11af/d
-         MiAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786720609; x=1787325409;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=IRB4JuBVbvsbT/EXF82Pi+P9sAHp5M7GCKevXhSfrjU=;
-        b=hzxGtYqIZRHtZbhaC2mrJd1e7BRD+nvQGnLbu3HbmYwiHu8/1kV+QeYzyXKboOxvSa
-         1Xq3VCwgYvScoINlH9x9xcd6wPwQmILLvOzJS47TJszsuCV03DQSMEl9KDy47dJJMa8j
-         9QA+r/WKQETEudiCHR5MpKitbsKw1W5oUOmBm2qSHr+vCtjL+BBsYz670GHJPPi6MhaB
-         3ZaP/y+cYf9gnsHvVlIrjjW/IXhe2TFBceYTfMczqCf92hTroJnPBxMvIxmIin48UVVJ
-         4RapQ5MmenNIjLAzUHeag8iwxhUKR1bdgGF7lvSfe1Vy2V6rwfaLLODdCLVFAUGobZB0
-         9sgA==
-X-Forwarded-Encrypted: i=1; AHgh+RrhYaAq8kYhFXXHHJGEDnkd667D/GaAF6bdeztWNJFl3tl9icF61wzst3ewrQONi81TWz8l5fR6dbT9jg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLy22OW2vLHnrkLMmN0vyjAqjeuZjEzilr5LvRYF+Rd9/sCc+G
-	GVgGWolg2P1Y+IVChfS1PYgnkCsbxzZ8P6t2/lIsagoget/XDrMfwWI3x0eFmNc2Af4=
-X-Gm-Gg: AR+sD11Lsc3zRyeUhvLEIGIr8o8e71V3DJwuN0VfYy5LeokBvSeO2ofk/yDj+wzufSB
-	MX5wnf9o2KD/QoEGlihM+ceqqSQowppu7/KEW38GiiWPB305kezVbT0sUR5QFfDy8ReWgZRiPQV
-	V9ZVz9nAQ5VOCNIyAPTfJ9cKDNjpTeKuAjHmbEIJUGR2PhFnobXlurIqezp1JoJ2hgV9iGmpesy
-	Jkw/8ee6bUzwzKF4+SVJl2i7y/8uFrJIcK5XDhsosNJucWrab5D/5Y3kUtRV8bUHmUlEM8Gwo2q
-	pFQb7uGX1tyIizBPNy/+HfbjqDBQfhA29ZRZ4sgqG41alb+ChxCWc1HFJqRzVrnRVVB8sDKrCmG
-	wGFNeRbqDhDDkIxiXgKSzrdRN0y3r6jvndUbHSC//nzkKjH4+7hK873pYKeEIw6tqGbcfzkW2Xt
-	9SItudAAHksIi54Kerfw3bEUkMsfEqxFNxJTXKiZRMV3ig6IRadpIzONIxlRUFVqUE91lh1FuFo
-	OIBhrRhrLDaikdGuZtXYN2X3se7uAL/6jyT0+gdc9ps6Q==
-X-Received: by 2002:a05:6000:2c01:b0:47f:86af:8fe7 with SMTP id ffacd0b85a97d-48160760c23mr9039764f8f.22.1786720609341;
-        Fri, 14 Aug 2026 08:16:49 -0700 (PDT)
-Received: from linbit.com (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f219f7bsm8742381f8f.13.2026.08.14.08.16.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Aug 2026 08:16:48 -0700 (PDT)
-From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	linux-block@vger.kernel.org,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Vivek Parikh <vivek.parikh@breachx.ai>
-Subject: [PATCH] drbd: don't leak the shared secret to unprivileged netlink dumps
-Date: Fri, 14 Aug 2026 17:16:17 +0200
-Message-ID: <20260814151617.73752-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sh6Ix6p8"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3CBF01F000E9;
+	Fri, 14 Aug 2026 15:19:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786720770;
+	bh=0klogLjyyrJ7xYZT2XeSv/GSN01RIwWoJwmz22NNlKY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Sh6Ix6p8w0rMY21l/SyGhDH/Puiq3KCD2ZfqRtXlwaGKVe6mzlRjCAHUhwv2CbZSF
+	 gzTExqrBONIkQS0VqKcDbn/v5Uq9qR1dZsaaGWz+H1CbqcVlW2/bIFDRhUr6v0febU
+	 oDlzCW2QCbye8SdY7FhtKp6nk+DofT/YnjdAOntIlEW62h07hjCttKo00tEvILyd7q
+	 aayX+e8EXQS9E4WypU/Peskdb/uQTtLVWZ5Ti6nSF9HZ2fWHt+r0NpFkI0SyFR4kxh
+	 BVdlsVK8QglbY3yG2ZuijNh7PjXezokYiIS3BCeT7TQeQ63mVKl51d/g6uKpkiefMd
+	 xVswMRUtWLDSA==
+Date: Fri, 14 Aug 2026 08:19:29 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Andrey Albershteyn <aalbersh@kernel.org>
+Cc: ebiggers@kernel.org, hch@lst.de, Jens Axboe <axboe@kernel.dk>,
+	Carlos Maiolino <cem@kernel.org>, fsverity@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-btrfs@vger.kernel.org, david@fromorbit.com,
+	Tal Zussman <tz2294@columbia.edu>
+Subject: Re: [PATCH v15 18/25] xfs: make xfs_free_eofblocks() work with
+ fsverity inodes
+Message-ID: <20260814151929.GH3556460@frogsfrogsfrogs>
+References: <20260814092448.1818082-1-aalbersh@kernel.org>
+ <20260814092448.1818082-19-aalbersh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260814092448.1818082-19-aalbersh@kernel.org>
 
-The conversion to explicit netlink serialization dropped the
-exclude_sensitive parameter from net_conf_to_skb(), so each caller has
-to sanitize by hand. Two dump paths were missed:
-drbd_nl_get_connections_dumpit() and the volume-less connection branch
-of get_one_status(). Neither op carries GENL_ADMIN_PERM, so any
-unprivileged local user could read the CRAM-HMAC secret.
+On Fri, Aug 14, 2026 at 11:24:35AM +0200, Andrey Albershteyn wrote:
+> xfs_free_eofblocks() removes any preallocations and unwritten extents
+> beyond EOF. This is undesired for fsverity as it stores metadata beyond
+> EOF. However, while merkle tree is being built delayed preallocation and
 
-Add a net_conf_to_skb_sanitized() wrapper and route all three callers
-through it.
+grammar nit: "... is being built, delayed preallocations..."
 
-Fixes: 8098eeb693c4 ("drbd: replace genl_magic with explicit netlink serialization")
-Reported-by: Vivek Parikh <vivek.parikh@breachx.ai>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
-Intended for 7.2 if at all possible. Sorry for the short notice, we only
-learned of this today.
+> unwritten extents are used. After metadata construction is done,
+> fsverity inodes becomes read-only and won't be changed anymore, none of
+> these unwritten extents or preallocations in post EOF region will be
+> used.
+> 
+> Add XFS_BMAPI_UNWRITTEN and change xfs_bunmapi_range to remove only
+> unwritten extents sitting beyond EOF and set it for fsverity inodes.
+> 
+> The xfs_free_eofblocks() will be called on fsverity inode as usual.
+> However, inodes which are undergoing merkle tree construction need to
+> be skipped in case reclaim takes place.
+> 
+> Signed-off-by: Andrey Albershteyn <aalbersh@kernel.org>
 
- drivers/block/drbd/drbd_nl.c | 39 +++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+Looks good to me, thanks for revising the commit message :)
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index f9ffcd67607b..b77f901fc3ef 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -3306,6 +3306,26 @@ static int nla_put_drbd_cfg_context(struct sk_buff *skb,
- 	return -EMSGSIZE;
- }
- 
-+/*
-+ * net_conf_to_skb() serializes the shared secret verbatim. Any path that can
-+ * answer a request from an unprivileged process must pass exclude_sensitive,
-+ * so the secret is blanked in a private copy before it reaches the skb.
-+ */
-+static int net_conf_to_skb_sanitized(struct sk_buff *skb, struct net_conf *nc,
-+				     bool exclude_sensitive)
-+{
-+	struct net_conf nc_clean;
-+
-+	if (!exclude_sensitive)
-+		return net_conf_to_skb(skb, nc);
-+
-+	nc_clean = *nc;
-+	memset(nc_clean.shared_secret, 0, sizeof(nc_clean.shared_secret));
-+	nc_clean.shared_secret_len = 0;
-+
-+	return net_conf_to_skb(skb, &nc_clean);
-+}
-+
- /*
-  * The generic netlink dump callbacks are called outside the genl_lock(), so
-  * they cannot use the simple attribute parsing code which uses global
-@@ -3621,7 +3641,8 @@ int drbd_nl_get_connections_dumpit(struct sk_buff *skb, struct netlink_callback
- 			goto out;
- 		net_conf = rcu_dereference(connection->net_conf);
- 		if (net_conf) {
--			err = net_conf_to_skb(skb, net_conf);
-+			err = net_conf_to_skb_sanitized(skb, net_conf,
-+							!capable(CAP_SYS_ADMIN));
- 			if (err)
- 				goto out;
- 		}
-@@ -3842,18 +3863,8 @@ static int nla_put_status_info(struct sk_buff *skb, struct drbd_device *device,
- 		struct net_conf *nc;
- 
- 		nc = rcu_dereference(first_peer_device(device)->connection->net_conf);
--		if (nc) {
--			if (exclude_sensitive) {
--				struct net_conf nc_clean = *nc;
--
--				memset(nc_clean.shared_secret, 0,
--				       sizeof(nc_clean.shared_secret));
--				nc_clean.shared_secret_len = 0;
--				err = net_conf_to_skb(skb, &nc_clean);
--			} else {
--				err = net_conf_to_skb(skb, nc);
--			}
--		}
-+		if (nc)
-+			err = net_conf_to_skb_sanitized(skb, nc, exclude_sensitive);
- 	}
- 	rcu_read_unlock();
- 	if (err)
-@@ -4058,7 +4069,7 @@ static int get_one_status(struct sk_buff *skb, struct netlink_callback *cb)
- 				struct net_conf *nc;
- 
- 				nc = rcu_dereference(connection->net_conf);
--				if (nc && net_conf_to_skb(skb, nc) != 0)
-+				if (nc && net_conf_to_skb_sanitized(skb, nc, true) != 0)
- 					goto cancel;
- 			}
- 			goto done;
+--D
 
-base-commit: c7c76f9232bd34835d821f14abdc5fafc17bc938
--- 
-2.55.0
-
+> ---
+>  fs/xfs/libxfs/xfs_bmap.c | 55 +++++++++++++++++++++++++++++-----------
+>  fs/xfs/libxfs/xfs_bmap.h |  6 ++++-
+>  fs/xfs/xfs_bmap_util.c   | 25 +++++++++++++++---
+>  3 files changed, 67 insertions(+), 19 deletions(-)
+> 
+> diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
+> index cc48f6e20e80..a2d9cef952c4 100644
+> --- a/fs/xfs/libxfs/xfs_bmap.c
+> +++ b/fs/xfs/libxfs/xfs_bmap.c
+> @@ -6144,15 +6144,12 @@ xfs_bmap_validate_extent(
+>  			XFS_IS_REALTIME_INODE(ip), whichfork, irec);
+>  }
+>  
+> -/*
+> - * Used in xfs_itruncate_extents().  This is the maximum number of extents
+> - * freed from a file in a single transaction.
+> - */
+> -#define	XFS_ITRUNC_MAX_EXTENTS	2
+> -
+>  /*
+>   * Unmap every extent in part of an inode's fork.  We don't do any higher level
+>   * invalidation work at all.
+> + *
+> + * The XFS_BMAPI_UNWRITTEN could be passed to remove only unwritten extents,
+> + * leaving out normal extents in place.
+>   */
+>  int
+>  xfs_bunmapi_range(
+> @@ -6162,23 +6159,51 @@ xfs_bunmapi_range(
+>  	xfs_fileoff_t		startoff,
+>  	xfs_fileoff_t		endoff)
+>  {
+> -	xfs_filblks_t		unmap_len = endoff - startoff + 1;
+> +	xfs_filblks_t           unmap_len;
+>  	int			error = 0;
+> +	int			nimaps = 1;
+> +	int			done = 0;
+> +	struct xfs_bmbt_irec	imap;
+> +	int			read_flags =
+> +			flags & (XFS_BMAPI_ATTRFORK | XFS_BMAPI_ENTIRE);
+>  
+>  	xfs_assert_ilocked(ip, XFS_ILOCK_EXCL);
+>  
+> -	while (unmap_len > 0) {
+> -		ASSERT((*tpp)->t_highest_agno == NULLAGNUMBER);
+> -		error = __xfs_bunmapi(*tpp, ip, startoff, &unmap_len, flags,
+> -				XFS_ITRUNC_MAX_EXTENTS);
+> +	while (startoff < endoff) {
+> +		nimaps = 1;
+> +
+> +		error = xfs_bmapi_read(ip, startoff, endoff - startoff + 1,
+> +				&imap, &nimaps, read_flags);
+>  		if (error)
+>  			goto out;
+>  
+> -		/* free the just unmapped extents */
+> -		error = xfs_defer_finish(tpp);
+> -		if (error)
+> +		if (nimaps == 0)
+>  			goto out;
+> -		cond_resched();
+> +
+> +		if ((flags & XFS_BMAPI_UNWRITTEN) &&
+> +				imap.br_state != XFS_EXT_UNWRITTEN) {
+> +			startoff = imap.br_startoff + imap.br_blockcount;
+> +			continue;
+> +		}
+> +
+> +		unmap_len = min(endoff - imap.br_startoff + 1,
+> +				imap.br_blockcount);
+> +		done = 0;
+> +		while (!done) {
+> +			ASSERT((*tpp)->t_highest_agno == NULLAGNUMBER);
+> +			error = xfs_bunmapi(*tpp, ip, imap.br_startoff,
+> +					unmap_len, flags, nimaps, &done);
+> +			if (error)
+> +				goto out;
+> +
+> +			/* free the just unmapped extent */
+> +			error = xfs_defer_finish(tpp);
+> +			if (error)
+> +				goto out;
+> +			cond_resched();
+> +		}
+> +
+> +		startoff = imap.br_startoff + unmap_len;
+>  	}
+>  out:
+>  	return error;
+> diff --git a/fs/xfs/libxfs/xfs_bmap.h b/fs/xfs/libxfs/xfs_bmap.h
+> index d5f2729305fa..0f36431d9936 100644
+> --- a/fs/xfs/libxfs/xfs_bmap.h
+> +++ b/fs/xfs/libxfs/xfs_bmap.h
+> @@ -90,6 +90,9 @@ struct xfs_bmalloca {
+>  /* Try to align allocations to the extent size hint */
+>  #define XFS_BMAPI_EXTSZALIGN	(1u << 11)
+>  
+> +/* Process unwritten extents only. Used for unmapping */
+> +#define XFS_BMAPI_UNWRITTEN	(1u << 12)
+> +
+>  #define XFS_BMAPI_FLAGS \
+>  	{ XFS_BMAPI_ENTIRE,	"ENTIRE" }, \
+>  	{ XFS_BMAPI_METADATA,	"METADATA" }, \
+> @@ -102,7 +105,8 @@ struct xfs_bmalloca {
+>  	{ XFS_BMAPI_COWFORK,	"COWFORK" }, \
+>  	{ XFS_BMAPI_NODISCARD,	"NODISCARD" }, \
+>  	{ XFS_BMAPI_NORMAP,	"NORMAP" },\
+> -	{ XFS_BMAPI_EXTSZALIGN,	"EXTSZALIGN" }
+> +	{ XFS_BMAPI_EXTSZALIGN,	"EXTSZALIGN" }, \
+> +	{ XFS_BMAPI_UNWRITTEN,	"UNWRITTEN" }
+>  
+>  
+>  static inline int xfs_bmapi_aflag(int w)
+> diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
+> index c88b9ade7389..36ac18df5743 100644
+> --- a/fs/xfs/xfs_bmap_util.c
+> +++ b/fs/xfs/xfs_bmap_util.c
+> @@ -31,6 +31,7 @@
+>  #include "xfs_rtbitmap.h"
+>  #include "xfs_rtgroup.h"
+>  #include "xfs_zone_alloc.h"
+> +#include <linux/fsverity.h>
+>  
+>  /* Kernel only BMAP related definitions and functions */
+>  
+> @@ -553,6 +554,13 @@ xfs_can_free_eofblocks(
+>  	if (last_fsb <= end_fsb)
+>  		return false;
+>  
+> +	/*
+> +	 * Don't clean fsverity inodes which have merkle tree being built, the
+> +	 * merkle tree is written beyond EOF
+> +	 */
+> +	if (xfs_iflags_test(ip, XFS_VERITY_CONSTRUCTION))
+> +		return false;
+> +
+>  	/*
+>  	 * Check if there is an post-EOF extent to free.  If there are any
+>  	 * delalloc blocks attached to the inode (data fork delalloc
+> @@ -579,6 +587,9 @@ xfs_free_eofblocks(
+>  	struct xfs_trans	*tp;
+>  	struct xfs_mount	*mp = ip->i_mount;
+>  	int			error;
+> +	int			bmapi_flags = XFS_BMAPI_NODISCARD;
+> +	bool			has_verity =
+> +			ip->i_diflags2 & XFS_DIFLAG2_VERITY;
+>  
+>  	/* Attach the dquots to the inode up front. */
+>  	error = xfs_qm_dqattach(ip);
+> @@ -593,15 +604,20 @@ xfs_free_eofblocks(
+>  	 *
+>  	 * Note that this means we also leave speculative preallocations in
+>  	 * place for preallocated files.
+> +	 *
+> +	 * Clean up delalloc reservations for fsverity too as those won't be
+> +	 * used
+>  	 */
+> -	if (ip->i_diflags & (XFS_DIFLAG_PREALLOC | XFS_DIFLAG_APPEND)) {
+> +	if (ip->i_diflags & (XFS_DIFLAG_PREALLOC | XFS_DIFLAG_APPEND) ||
+> +			has_verity) {
+>  		if (ip->i_delayed_blks) {
+>  			xfs_bmap_punch_delalloc_range(ip, XFS_DATA_FORK,
+>  				round_up(XFS_ISIZE(ip), mp->m_sb.sb_blocksize),
+>  				LLONG_MAX, NULL);
+>  		}
+>  		xfs_inode_clear_eofblocks_tag(ip);
+> -		return 0;
+> +		if (!has_verity)
+> +			return 0;
+>  	}
+>  
+>  	error = xfs_trans_alloc(mp, &M_RES(mp)->tr_itruncate, 0, 0, 0, &tp);
+> @@ -613,6 +629,9 @@ xfs_free_eofblocks(
+>  	xfs_ilock(ip, XFS_ILOCK_EXCL);
+>  	xfs_trans_ijoin(tp, ip, 0);
+>  
+> +	if (has_verity)
+> +		bmapi_flags |= XFS_BMAPI_UNWRITTEN;
+> +
+>  	/*
+>  	 * Do not update the on-disk file size.  If we update the on-disk file
+>  	 * size and then the system crashes before the contents of the file are
+> @@ -620,7 +639,7 @@ xfs_free_eofblocks(
+>  	 * bug).
+>  	 */
+>  	error = xfs_itruncate_extents_flags(&tp, ip, XFS_DATA_FORK,
+> -				XFS_ISIZE(ip), XFS_BMAPI_NODISCARD);
+> +				XFS_ISIZE(ip), bmapi_flags);
+>  	if (error)
+>  		goto err_cancel;
+>  
+> -- 
+> 2.54.0
+> 
+> 
