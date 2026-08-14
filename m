@@ -1,139 +1,160 @@
-Received: from va-2-30.ptr.blmpb.com (va-2-30.ptr.blmpb.com [209.127.231.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B163B423EAE
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 07:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E510F42049C;
+	Fri, 14 Aug 2026 07:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786693828; cv=none; b=VPyBwDcB9f3Q6EoNvLslysU8A1tAL3l67bzy0YYS/xmAEhY/VDjfyWIaXNm+ZVUbl16eQUIKHvo0c/e2gclc5++Yy7DHc4gfZLF+LPk5GseGgZg3Aqa90A4pionQAcm7DTvvjeqiXE6pYAhi1Xywl7piQ8SjkRenPRsoTXPNFM0=
+	t=1786694098; cv=none; b=d2357y11NLjHAU4F1ubLz+2Kh+AfOZBUz79y3h598fJ7+uRXG0dsgi0s0uwjHw8lTiYn4Cv9nsea9/Ha3bb3JjLB5e+85njNJmXFT6gDp6eFLoQdTwqKHT/cW7JhsCF+IiqEN/ZcH8Y4LnYWZf6K5kBfFpDlsSfQ38CuAQL7LCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786693828; c=relaxed/simple;
-	bh=Y2jZkZG5IdEinfxaABKa1bNtQfxrrDOJa1w7kxN9I5Y=;
-	h=Content-Type:References:In-Reply-To:To:Message-Id:Mime-Version:Cc:
-	 From:Subject:Date; b=pSxWFQ4YE6UrpkA+6YXQ6ktqbc+UH28xLwIHFIGMlObx8ZfTSPGgzPwwOVqKB2I0y7W+rnHaak5fw0B3ohGiV5WI+4G+cyZN+ure8FGESpY03sLiH/vaDlwHE3Q3mKIoaNP9P6ixu1NPTJKWF3pfvD0yIXpNMJe8/RiTTJuQAx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=L7/Sqr2Y; arc=none smtp.client-ip=209.127.231.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1786694098; c=relaxed/simple;
+	bh=wop70r+nhC9TKgE7R7tCAxqnFhreUO/dQAKbmrHO9lA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gEVwnvg34YnDeFB4rRNJCX7jbcxSj1FgPLZhvGiUJXUH455z3jVXIb3i/72bupbE7v1U2eFK2FMcsI/LgMofbY4U/cHo0gn9/I//1rm3TgxJTKsWWC7iusrNhPBgpY+TFUYBHLK/BesC9jh2Y2EK5oE2QYbf0DwUKLQ7JwMUi+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Q6VD96bX; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="L7/Sqr2Y"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1786693811;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=JbnLgklqOUcOfZtgfE8qoZAa4WQi1t4pHM8VNSJ95PY=;
- b=L7/Sqr2YloWcCd+CLuHsctvb17T7wRA1u8EeyL71rexTLznirImCcRNGShoamsifvNP838
- CY/EyFMwObsNum1JoF8LIjq/RFrSC8vStettKoF6i51yLAW07hcudtN3mivQCrsafYgAl4
- KkT7BYhMbbM5oNRcU+Nh6x34Y1KgWh9in+oxdMjmqF45CRc0eLxrise6z06fzJ7uQc/NuN
- 0y1mz0aUe8jnT/KsiQ+e1V3qFagpdJUZGm3swFRJLfIImlS3w1nJI9e2LTDiiVEW9uIaYp
- UatwlhWuY5fbRtuq6gNXTOQ7brg2wieqFZPdJEkCgsBRf04R6+onPRRTelpNfw==
-Reply-To: yukuai@fygo.io
-User-Agent: Mozilla Thunderbird
-Received: from [192.168.1.104] ([39.182.0.156]) by smtp.feishu.cn with ESMTPS; Fri, 14 Aug 2026 15:50:07 +0800
-X-Lms-Return-Path: <lba+26a7ec8b1+cb17c5+vger.kernel.org+yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-References: <20260811064744.1139446-1-yukuai@kernel.org> <20260811064744.1139446-3-yukuai@kernel.org> <20260814071232.GA9784@lst.de>
-In-Reply-To: <20260814071232.GA9784@lst.de>
-Content-Transfer-Encoding: quoted-printable
-To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
-Message-Id: <f7350050-062a-4ced-9396-05ac33ac3e60@fnnas.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Q6VD96bX"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=nN3Xr4d2ouubrK5bbdRzjTkGu4rlKnCelNUWWTSgOaM=;
+	b=Q6VD96bX72jHvH04euXsKof6ZOSmjaFemOTjo/mLI5/Crg120EIsmVShUZSqqlfII8jgeMfsN
+	qarGpLhTXA/vMjgKxiTJEfhdoYFNBF6ETyPIsq25COAPYhuZ163Id7g64XuOKGMTOdJSDYcWsCO
+	mL5DwBru7imlofFPSkA+oV4=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4hLvPc1bmsz12LG0;
+	Fri, 14 Aug 2026 15:44:20 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3BE8C20333;
+	Fri, 14 Aug 2026 15:54:44 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 14 Aug 2026 15:54:43 +0800
+Message-ID: <87f85f83-5514-429b-8dec-8ca4da39a3d6@huawei.com>
+Date: Fri, 14 Aug 2026 15:54:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Cc: "Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, 
-	"Johannes Weiner" <hannes@cmpxchg.org>, 
-	=?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	"Yu Kuai" <yukuai@fygo.io>, "Tao Cui" <cui.tao@linux.dev>, 
-	"Jan Kara" <jack@suse.cz>, "Ming Lei" <ming.lei@redhat.com>, 
-	"Jonathan Corbet" <corbet@lwn.net>, 
-	"Shuah Khan" <skhan@linuxfoundation.org>, "Coly Li" <colyli@fygo.io>, 
-	"Kent Overstreet" <kent.overstreet@linux.dev>, 
-	"Alasdair Kergon" <agk@redhat.com>, "Mike Snitzer" <snitzer@kernel.org>, 
-	"Mikulas Patocka" <mpatocka@redhat.com>, 
-	"Benjamin Marzinski" <bmarzins@redhat.com>, "Song Liu" <song@kernel.org>, 
-	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
-	"Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, 
-	"Dan Williams" <djbw@kernel.org>, 
-	"Vishal Verma" <vishal.l.verma@intel.com>, 
-	"Dave Jiang" <dave.jiang@intel.com>, 
-	"Alison Schofield" <alison.schofield@intel.com>, 
-	"Ira Weiny" <iweiny@kernel.org>, 
-	"Andreas Gruenbacher" <agruenba@redhat.com>, 
-	"Matthew Wilcox" <willy@infradead.org>, 
-	"Andrew Morton" <akpm@linux-foundation.org>, 
-	"Chris Li" <chrisl@kernel.org>, "Kairui Song" <kasong@tencent.com>, 
-	"Kemeng Shi" <shikemeng@huaweicloud.com>, 
-	"Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>, 
-	"Barry Song" <baohua@kernel.org>, 
-	"Youngjun Park" <youngjun.park@lge.com>, <cgroups@vger.kernel.org>, 
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-bcache@vger.kernel.org>, 
-	<dm-devel@lists.linux.dev>, <linux-raid@vger.kernel.org>, 
-	<nvdimm@lists.linux.dev>, <virtualization@lists.linux.dev>, 
-	<gfs2@lists.linux.dev>, <linux-fsdevel@vger.kernel.org>, 
-	<linux-mm@kvack.org>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [RFC PATCH v2 2/4] blk-cgroup: use a request_queue rhashtable for blkg lookup
-Date: Fri, 14 Aug 2026 15:50:04 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] nbd: is the add_socket queue freeze needed on the initial
+ (pre-start) connect path?
+To: Zhichao Huang <huangzhichao.1@bytedance.com>, <josef@toxicpanda.com>
+CC: <hch@lst.de>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <CANUnaiYZNj2n40HitJFJnzg1GSFg-VXZJSGEEHL5E7YqL3EHhA@mail.gmail.com>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <CANUnaiYZNj2n40HitJFJnzg1GSFg-VXZJSGEEHL5E7YqL3EHhA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-Hi=EF=BC=8C
+Hi Zhichao,
 
-=E5=9C=A8 2026/8/14 15:12, Christoph Hellwig =E5=86=99=E9=81=93:
-> On Tue, Aug 11, 2026 at 02:47:42PM +0800, Yu Kuai wrote:
->> Keep q->blkg_list for ordered policy and scheduler walks. Initialize and
->> destroy the hash with request_queue, and remove the radix-tree preload
->> paths which are no longer needed.
-> Are these fast path operations?  Otherwise we can walk all rhashtable
-> entries without an extra list, but it might be slower.
+Thanks for your attention to this issue. I have try fix this with this 
+patchset. Please check does it solve your problem.
 
-All users are from sysfs/cgroupfs API, I think they can be considered slow =
-path,
-however currently spinlock is held in these procedures, I think it's better=
- to
-convert them to blkg_lookup based iterate after spinlock is converted to th=
-e
-blkcg_mutex.
+https://lore.kernel.org/all/20260805122930.57647-1-yangerkun@huawei.com/
 
->
->> @@ -191,10 +198,15 @@ static void blkg_release(struct percpu_ref *ref)
->>   {
->>   	struct blkcg_gq *blkg =3D container_of(ref, struct blkcg_gq, refcnt);
->>   	struct blkcg *blkcg =3D blkg->blkcg;
->>   	int cpu;
->>  =20
->> +	if (!list_empty(&blkg->q_node))
->> +		WARN_ON_ONCE(rhashtable_remove_fast(&blkg->q->blkg_hash,
->> +						    &blkg->q_hash_node,
->> +						    blkg_hash_params));
->> +
-> The list_empty case is for initialization failure?  Or can we end up
-> with that by other means?
-
-Yes, this is for initialization failure, blkg_alloc() failure after percpu_=
-ref_init(),
-or blkg_create() failure before rhashtable_insert succeed.
-
->
->> + * Lookup a blkg for the @blkcg - @q pair, whether it is online or dyin=
-g.
->> + *
->> + * Must be called in a RCU critical section.
->> + */
-> Please add must_hold and/or lockdep annotations for this instead of just
-> a comment.
->
-> Also maybe mention that this does not acquire a reference and the caller
-> must already hold one?
-
-Perhaps it's more accurate that the blkg is pinned by IO or caller already
-hold one?
-
->
->
---=20
 Thanks,
-Kuai
+Erkun.
+
+在 2026/8/14 15:14, Zhichao Huang 写道:
+> To: Josef Bacik <josef@toxicpanda.com>
+> Cc: Christoph Hellwig <hch@lst.de>,
+>      Jens Axboe <axboe@kernel.dk>,
+>      Ming Lei <ming.lei@redhat.com>,
+>      linux-block@vger.kernel.org,
+>      linux-kernel@vger.kernel.org
+> 
+> Hi all,
+> 
+> This is a question / RFC, not a patch -- I'd like your opinion before
+> proposing anything, because the code in question is a deliberate,
+> stable-tagged UAF fix and I don't want to weaken it.
+> 
+> Background / motivation
+> -----------------------
+> We run large numbers of Firecracker microVMs whose block devices are
+> backed by NBD. On the VM-create hot path each microVM does an initial
+> NBD connect (netlink NBD_CMD_CONNECT), and we launch many of them
+> concurrently on the same many-core host. Profiling the create path
+> shows a large chunk of kernel time is spent in blk_mq_freeze_queue()
+> during the connect: each freeze waits for a full RCU grace period, which
+> on these many-core hosts we measure at roughly 35-50ms. Because several
+> connects run concurrently, these grace-period waits stack up and become
+> a visible tail-latency contributor on VM start.
+> 
+> One of the freezes on that path is in nbd_add_socket(), added by
+> 
+>    b98e762e3d71 ("nbd: freeze the queue while we're adding connections")
+> 
+> with the comment "We need to make sure we don't get any errant requests
+> while we're reallocating the ->socks array." I understand this freeze
+> fences the krealloc() of config->socks[] against a concurrent
+> nbd_queue_rq() -> nbd_handle_cmd(), which dereferences
+> config->socks[index] and config->num_connections -- i.e. it prevents a
+> use-after-free / out-of-bounds read, and it was Cc: stable. I am *not*
+> questioning that this is needed while the device is live.
+> 
+> Observation about the *initial* connect
+> ----------------------------------------
+> On the initial connect, before the device is started (nbd->pid == 0),
+> nbd_add_socket() runs while:
+> 
+>    - capacity is still 0. set_capacity_and_notify() is only reached in
+>      nbd_set_size() after the "if (!nbd->pid) return 0;" early return,
+>      and on both the netlink and ioctl paths nbd_add_socket() runs
+>      strictly before nbd_start_device() sets nbd->pid; and
+> 
+>    - the queue advertises no write cache / discard / write-zeroes yet
+>      (those queue_limits features are also only set in the nbd->pid
+>      branch of nbd_set_size()).
+> 
+> Walking submit_bio_noacct() with capacity == 0 and no features, every
+> I/O op seems to be rejected before it can become a request that reaches
+> nbd_handle_cmd():
+> 
+>    - READ/WRITE with sectors: bio_check_eod() -> -EIO (maxsector == 0);
+>    - flush (REQ_PREFLUSH): !bdev_write_cache() path strips the flush and
+>      completes a zero-sector bio with BLK_STS_OK without dispatch;
+>    - DISCARD / WRITE_ZEROES / SECURE_ERASE / ZONE_*: not_supported since
+>      the corresponding limits are 0 / not set;
+>    - passthrough (DRV_IN/OUT): not_supported on the bio submit path, and
+>      nbd issues none itself.
+> 
+> The only theoretical gap I can see is a zero-length, non-flush data bio
+> (bio_check_eod() skips the check when nr_sectors == 0), but the VFS /
+> direct-IO layers don't actually submit zero-length data bios.
+> 
+> The question
+> ------------
+> Given the above, is the nbd_add_socket() freeze effectively redundant on
+> the *initial*, pre-start (!nbd->pid) connect, where no I/O can reach the
+> driver? If so, would any of the following be acceptable, or is the
+> freeze intentionally kept unconditional for robustness?
+> 
+>    1) Skip the freeze only when (!nbd->pid && get_capacity(disk) == 0),
+>       falling back to the stock freeze otherwise (fail-shut);
+>    2) Some cheaper barrier than a full-queue-freeze RCU grace period for
+>       this "no I/O possible yet" case;
+>    3) Leave it as-is -- the "no I/O reaches the driver" property relies on
+>       a non-local invariant spanning bio_check_eod(), the flush filter,
+>       the pre-start queue_limits, and the set_capacity() ordering, and you
+>       consider that too fragile to build on.
+> 
+> My instinct is that (3) is a legitimate answer and that the invariant is
+> fragile, which is exactly why I'm asking rather than sending a patch. If
+> there's a direction you'd be willing to take, I'm happy to do the work
+> and the testing.
+> 
+> Thanks,
+> Zhichao Huang <huangzhichao.1@bytedance.com>
+> 
+
