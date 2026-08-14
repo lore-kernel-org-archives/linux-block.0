@@ -1,90 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6EF3630B7;
-	Fri, 14 Aug 2026 19:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF4F3C0619
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 22:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786736710; cv=none; b=ECL5xcnDx/HdBfh8wF4SsPBZxVP2ynr+uN1dtozYoSPTFoUwelFrREpt/Ldz+PqbT2WU+Kyh5JckbGROFpKFt/BO2ei34XRBNabxLnM+E2S5ZfBOnkaqm5RPAOYlg2E5iQDu1+YnEJQJ73hHQS4ogPckpu8/T/GFs9jSW2BLy2o=
+	t=1786745116; cv=none; b=GbUoxa4o33pyIcT5BwJVHQHcuVdtMItvPIxnS1JLisM+bLC97jTScZz0G/nZgSwuMdqTC+8pl5RgtDRK1DAxvu6XkSIrmYsKsLpBrFsVDkvvAvIvIktIEmLSoBX9uwCcPWKKorupKlvRgAxCKBCz2YjfD1CyALnkV1FQoToEn6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786736710; c=relaxed/simple;
-	bh=3MyQl4wJgu7ROdZ3CfxzcNvbKwIp/cC1gFY0F1d8qtg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pWAzM0p2BWID2FaS5S2aC0WTJ1qyRT42LdzCtmNwSUtxtfhAXoAlEUrcKvxiEsrT4LSlPYQXksvoTWODWo1IS+tDcAqDBWMgJjja7+tg1aVYdthZVHdjWzsqISzCp7PO3mx8Jn8y1z5Nb6SsqQIYtYp4DSjlIFStjj/cbe64xU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKju9zwC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786745116; c=relaxed/simple;
+	bh=O67pmowHWgU9F4aYcvvzY0blvwu6WfZnDRzj7fLaGd8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tKbS0WodP9Juet1xW/XmmyuYCSrYc8XDjCClopjNgne0DlXYU0l7Pd5sCtZRA5zJhOH5bhpJzouDU2ZiYFXj342LVQtDq6/NS+Daweib1WfrfAGcOZyYs3fWHCIt3sbdwQANSlNlvJNuVJcqgn8vNfiYcqSi+xMFGgbZR4ax//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dt/JkCXe; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKju9zwC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 902581F000E9;
-	Fri, 14 Aug 2026 19:45:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786736708;
-	bh=npc598iUFDBk93SNBYPj3uUy6PeDDfOU+Bj+owwxRcU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RKju9zwCpBAX9U5ddZN10ApU6++sqkdd2H6la+dMXd/w2Y522GVlW4PBzOYS7iLDq
-	 qqVgGANoTplV4VyI2cGUKnr+4xU2iqWuZd4WOtMeybrGohiqYrbXPr9vuE/0IU8neU
-	 YZ2iyZKCtjex+fCzXVIVengd6M95Qm/HzZ7KQRLjEynS2tuEUWd7p/0HIoVhszYjx9
-	 7hduW0b5W1vE/ut/oR09dFHsEJbaaVzKoCFonMa6PJpLtruFXpQiWVgtJHDtFaLrDZ
-	 uBepRCOv3bVcW/lvQoLRp6HBj7E+ZORdZTpXxQltAnEhDtrjvg+SUMS+vgap+BBOYw
-	 N1eQsc+aRn3mA==
-Date: Fri, 14 Aug 2026 19:45:07 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dt/JkCXe"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-8edda5d56a5so15765016d6.3
+        for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 15:05:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786745114; x=1787349914; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+byDgTzEgx4Gr3ZSkskCbtI+EfBHPCCCfhKahAfUKes=;
+        b=dt/JkCXeb4jMZ7ptoYn6JAe7wFpCpPmbR7hf9Q4CpOr94tcSererFirBGqS2Yqf6Ku
+         4EBcGR3B5mJMaV69RX+Y6mS+zdjHah/HWlXnu/FXjMnqgs5HAVLVVnW2PZp8Z3/ClJG3
+         4aYdgewtBZqEITYQNIHeiG5GjA+VOXFNKRj/tnJdBFLD7bZe8Mnk6Rt3hsxPFPUDEu2h
+         3BSo7GMV8nhuADwYaFHWHSObKXofwXN2Tt+fzWfHKZN+ZBj4WWakedO5giXmxaRXo/vZ
+         OV7fbRLK9IxvVPvQAJNpBncAEK1TXzMsj/aCVMz7a2iwUInbiJvE+2oIv6mrYH9CbQWV
+         4V1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786745114; x=1787349914;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+byDgTzEgx4Gr3ZSkskCbtI+EfBHPCCCfhKahAfUKes=;
+        b=U0RMETjbrpMamNL82J+B75WclQpYHqY0oWezGFLOuvHPQtHFXuiv1NiPsYY9WppXre
+         WUB0vfI2GAjCn+qxqxGQL/hGZ7PGOC7yJDaXrxps31j5HBYo3WSf4t1SMNNZud267vAR
+         GnuT7pTbVcNr7zvv6tVPtc9hDIfQGww+c6ytUjDsY71xytLYQF21vKu1z+4jmDMM7jDZ
+         4UxtyAuXK5NqOoKhHxBJD41qTxlgLSA9REtyS1oFftEX7hHu7JAMwmn9Iv/70/a7n+rI
+         EfK+ghJMy294F412NLbYMlSOxQ5mRcDgGKWtNX5KDuI2en9y0v0hFw4BIrmzveRpk/zq
+         nTNg==
+X-Gm-Message-State: AOJu0YzidZSLqkwL7t05+VLsiHVCUnyyNtV+6Ruec4eHOJry1Ejf2teg
+	rh0wktWNc98FHuVMVV5BELMSrFIjPnThhIT6OjjDMFAd58apyk2FEf9l
+X-Gm-Gg: AR+sD10ZIy96Re2jpvcBIelZU5XdzotpmYd3+0lg4QXI9b+tc3/hXYoiswKxfoYHCWj
+	XZq2DilP5H3K14tOBEkxvipQnnRZyJrZUjuRGSKCoPp9dPlXEqLl6jfvNWMqwECOrM/77QBwpJe
+	SqrLBVBPguM++d3HrFFLVosH5FDZ8awsGBA0YOaOgb3BOfNie6x9lmFynAWRflRJMXuUI7Wtdk3
+	yzPgLMm8xF6jXYJ8yV01Rcv8jFZ/T/h5AhFiEJH6FYdn9AqB/yi2dgKxnWahl9bUl4TyfqEJgwt
+	xbKujkNiOMrjLENFGCacFzKKNRDYbcBErsCIDRQoveMqfKDd9ORwqwC5JhYswrscy0MTFA4GrsH
+	MeZ7TYBZQBIHp7VgJWy4sPgLgh4aCH4EbFQOLm0E1OMOPUwTSyknckTggyhpV8uzJ/Gk6gInwiI
+	gSAkaaJ6/+SCc8MoItJl5qzvxbsqKRRLNqz6XcKuU4aaM0Xe2c+s/qbQXfpiweFDK7427A9lSAv
+	zgIidJf8KCkNHHRiQ==
+X-Received: by 2002:a05:6214:428a:b0:908:951f:415 with SMTP id 6a1803df08f44-90a91d350efmr118520916d6.13.1786745113943;
+        Fri, 14 Aug 2026 15:05:13 -0700 (PDT)
+Received: from i4-l-hqh5357-03.ad.psu.edu ([130.203.139.71])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90a9350678esm26867806d6.26.2026.08.14.15.05.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Aug 2026 15:05:13 -0700 (PDT)
+From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shuangpeng Bai <shuangpeng.kernel@gmail.com>,
 	stable@vger.kernel.org
-Subject: Re: [PATCH v2] blk-crypto-fallback: Fix deadlock when encrypting
- large bio in dm layer
-Message-ID: <20260814194507.GA2644249@google.com>
-References: <20260811220318.58331-1-ebiggers@kernel.org>
- <an63CV2_cS3VqPE-@infradead.org>
+Subject: [PATCH] block: clear ia_ranges on sysfs registration failure
+Date: Fri, 14 Aug 2026 18:04:48 -0400
+Message-ID: <20260814220448.4085032-1-shuangpeng.kernel@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <an63CV2_cS3VqPE-@infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 13, 2026 at 11:34:49PM -0700, Christoph Hellwig wrote:
-> On Tue, Aug 11, 2026 at 03:03:18PM -0700, Eric Biggers wrote:
-> > Encrypting a large bio with more than BIO_MAX_VECS pages can still
-> > deadlock, even after it was attempted to be fixed by
-> > commit b37fbce460ad ("blk-crypto: optimize bio splitting in
-> > blk_crypto_fallback_encrypt_bio") and commit 3d939695e682 ("blk-crypto:
-> > use mempool_alloc_bulk for encrypted bio page allocation").
-> > 
-> > This is because __blk_crypto_fallback_encrypt_bio() assumes that the
-> > bounce bios that it submits will eventually complete, unblocking it from
-> > allocating additional bounce bios and pages.  However, dm-inlinecrypt.c
-> > calls __blk_crypto_submit_bio() from within submit_bio() itself.  In
-> > this case, the recursive submit_bio() simply adds the bounce bio to
-> > current->bio_list without actually submitting it yet.  That breaks the
-> > guarantee that forward progress is being made.
-> > 
-> > To fix this, allocate the bio and bounce pages with GFP_NOWAIT if
-> > current->bio_list is set.  If it fails, punt the encryption of the
-> > remaining part of the bio to a kworker.
-> > 
-> > Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-> 
-> No, it dos not fix that commit.  I "fixes" the misguided attempt to use
-> this from inside stackable drivers.  Let's drop the dm-inlinecrypt
-> target instead as this just shows up one more reason why that is a
-> broken idea.
-> 
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > ---
-> > 
-> > Changed in v2:
-> > - Switched to the less efficient approach preferred by Christoph
-> 
-> This is in no way the approach I prefer or even advocated for.
+disk_register_independent_access_ranges() clears disk->ia_ranges when
+creating the top-level kobject fails. However, if adding one of the range
+kobjects fails, the cleanup drops the final reference to iars and frees it
+while disk->ia_ranges still points at it.
 
-It is what you asked for on v1 and you've now changed your position, as
-far as I can tell.  I can change the Fixes commit to e7f57d2c47e2.
-dm-inlinecrypt is useful and it does not make sense to drop it.
+A concurrent disk revalidation can wait for q->sysfs_lock and then call
+disk_unregister_independent_access_ranges(), which dereferences the stale
+pointer after registration releases the mutex.
 
-- Eric
+Clear disk->ia_ranges before dropping the kobject references on the child
+registration error path, matching the top-level error handling.
+
+Fixes: a2247f19ee1c ("block: Add independent access ranges support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+---
+ block/blk-ia-ranges.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
+index 7be8b58893c9..2430e475a8e7 100644
+--- a/block/blk-ia-ranges.c
++++ b/block/blk-ia-ranges.c
+@@ -135,6 +135,7 @@ int disk_register_independent_access_ranges(struct gendisk *disk)
+ 					   &blk_ia_range_ktype, &iars->kobj,
+ 					   "%d", i);
+ 		if (ret) {
++			disk->ia_ranges = NULL;
+ 			while (--i >= 0)
+ 				kobject_del(&iars->ia_range[i].kobj);
+ 			kobject_del(&iars->kobj);
+-- 
+2.43.0
+
