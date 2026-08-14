@@ -1,28 +1,61 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72303E00A5
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 08:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD9B448388;
+	Fri, 14 Aug 2026 08:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786695130; cv=none; b=bTkh+mBNlRlQQXhJHjyOScbNHH0vzSGQcXZ4Dfhhec9e2tyc96A8ApL/GUeNrdl4/thFbSTMJSplVtciMgthiF5G285wLEkExhuXjSohYXHbQR4nDivae9gyl6pTIi4wR579BSyaIkGVfBaBkoFxe/Rr+fsZkSW5RmoC+Q97Rug=
+	t=1786695343; cv=none; b=KSpI3p792LEN6n4x6ct2ec5B2F9WvPDerzRpIAl6TeTvQhtUqgkt0xKfHVPAyYPO3C33Gc/GSYSKhgscI29m3zV66GOb7xly+GL2WjEhRKNkpCUVP+jLGoRhXZLPznrmakvILptV5/DoCByiyQooSWpE07k1D+NshHg7mOVIZnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786695130; c=relaxed/simple;
-	bh=9JYfE6tnahry8X0k+IgN6EW/bHkh7IZx52Pa3bkGtgE=;
+	s=arc-20240116; t=1786695343; c=relaxed/simple;
+	bh=JB32DLYALZLS4AXuuV0NyWqb6KOX2SUFTZ+RIuKwbCQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GUNw/L4Fz3DPfcPPizQSQtEs/G9f9UoYNzZT02iJJhSoA+yVo+goHHM8MxHARxM0ez/y04P2UK5qN8IxT/9+QGr2z6KFeJ+Xsc/2/5pXT8ZxlEXdD8Xu25EXvfzJBXr1qDGDSofrrEHd8gUkngjt7q7TpJfnfiNNc/daP2g9x8Y=
+	 Content-Type:Content-Disposition:In-Reply-To; b=I/yfVZcljhMe3VT9NL/7GEM8irhYtdXsXFxDwuGQtYxJYbDMQvZFpISx3nIr6a7ogXfCdxoWwoK2zRHzWk+UAehR6s4y/s/TIKVdHeNF5EJJy66+2XWAs1Hj5SZAawRUGTbZkk+W395V+OiM4wFOogAbvoKZgmnSEqYiXSpzaI0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 689C768B05; Fri, 14 Aug 2026 10:12:05 +0200 (CEST)
-Date: Fri, 14 Aug 2026 10:12:05 +0200
+	id CDE7568B05; Fri, 14 Aug 2026 10:15:31 +0200 (CEST)
+Date: Fri, 14 Aug 2026 10:15:31 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 13/13] block: flag zoned disks with GENHD_FL_NO_PART
-Message-ID: <20260814081205.GH12566@lst.de>
-References: <20260814063201.1762743-1-dlemoal@kernel.org> <20260814063201.1762743-14-dlemoal@kernel.org>
+To: yukuai@fygo.io
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Tao Cui <cui.tao@linux.dev>, Jan Kara <jack@suse.cz>,
+	Ming Lei <ming.lei@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, Coly Li <colyli@fygo.io>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Song Liu <song@kernel.org>, Li Nan <magiclinan@didiglobal.com>,
+	Xiao Ni <xiao@kernel.org>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Dan Williams <djbw@kernel.org>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	Ira Weiny <iweiny@kernel.org>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>,
+	Barry Song <baohua@kernel.org>,
+	Youngjun Park <youngjun.park@lge.com>, cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev,
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH v2 2/4] blk-cgroup: use a request_queue rhashtable
+ for blkg lookup
+Message-ID: <20260814081531.GA13546@lst.de>
+References: <20260811064744.1139446-1-yukuai@kernel.org> <20260811064744.1139446-3-yukuai@kernel.org> <20260814071232.GA9784@lst.de> <f7350050-062a-4ced-9396-05ac33ac3e60@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -31,38 +64,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260814063201.1762743-14-dlemoal@kernel.org>
+In-Reply-To: <f7350050-062a-4ced-9396-05ac33ac3e60@fnnas.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Aug 14, 2026 at 03:32:01PM +0900, Damien Le Moal wrote:
-> Zoned block devices do not support partitions. However, the partition
-> table is nevertheless still inspected, and any partition found ignored
-> with a warning in add_partition(). While this is generally not a problem,
-> and in fact beneficial to the user as it indicates an invalid use of a
-> zoned block device, scanning for a partition table on the device may
-> result in issuing read operations to offline zones (e.g. after a disk head
-> is depopulated for disks that support head management operations).
+On Fri, Aug 14, 2026 at 03:50:04PM +0800, Yu Kuai wrote:
+> > Are these fast path operations?  Otherwise we can walk all rhashtable
+> > entries without an extra list, but it might be slower.
 > 
-> Since partitions are ignored anyway, completely disable partition scanning
-> for zoned gendisks by setting the flag GENHD_FL_NO_PART in __add_disk().
-> The existing check in add_partition() is left as-is to ensure that we
-> still get a warning if for whatever reason, despite GENHD_FL_NO_PART, we
-> still endup trying to add partitions.
-> 
-> Flagging zoned disks with GENHD_FL_NO_PART also has the benefit to expose
-> through sysfs the ext_range attribute with the value of 1 instead of the
-> default DISK_MAX_PARTS, thus correctly advertizing the fact that zoned
-> disks do not support partitions.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Hannes Reinecke <hare@kernel.org>
+> All users are from sysfs/cgroupfs API, I think they can be considered slow path,
+> however currently spinlock is held in these procedures, I think it's better to
+> convert them to blkg_lookup based iterate after spinlock is converted to the
+> blkcg_mutex.
 
-This really should get a Fixes for my original patch that skipped
-partitions and go to -stable (and into 7.3 even if Jens won't take
-the whole series) as it causes totally pointless I/O.  I also suspect
-the partition scanning and blkid interaction might be related to some
-of the weirdo xfstests failure I see where blkid doesn't detect
-xfs file systems in synthetic devices.
+Sounds good.  Maybe put that into the commit log?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Please add must_hold and/or lockdep annotations for this instead of just
+> > a comment.
+> >
+> > Also maybe mention that this does not acquire a reference and the caller
+> > must already hold one?
+> 
+> Perhaps it's more accurate that the blkg is pinned by IO or caller already
+> hold one?
+
+Sounds good.
+
