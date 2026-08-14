@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D25933F5B0
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520F2282F03
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 13:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786715290; cv=none; b=ahn5Gtb6JelbANbsbtxYjlt6UdSRQjfnp6OYnxHoPWGUyPJ6Mnchg0VvLtmOBXSDc3WGX9ZjrRrqMOdogxC2wrmGItkeFPKoKqF822me3fTuvfBtDeTe+PSVK7i5i/7kgHvr2g4QQKua11JrfGJo5luvWamPCcmF6hQ51Ba+/t0=
+	t=1786715291; cv=none; b=e5Cf/wIlcJgHpGcwKExbMKjfXPZ3gyMaMHhWGerRXqu3PSYdsF5nek9cruMvjXiWMmlB83VyzDjUQlGQDMh58W1hh2T8h06pyz7IRDCD0GGWbOcJ0MiV0wqDV8Ntz66VsmgW1MdpMe0xrnBhy8OHjFXnP3aXAAOv7wLtorJGf4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786715290; c=relaxed/simple;
-	bh=96dAcMSbXeKbmqT+LsgdzhEXhEEwqTa3hMSL1SfCrNA=;
+	s=arc-20240116; t=1786715291; c=relaxed/simple;
+	bh=EshWiRYz5dro+U2nOxa6ZPwmw0BCB3Nm0jgvag9bc3Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VcRuilqJaccL50iomHqRLo37ay/tbyN5U+v3b0ZEATYHNmEvh+Viy4gzADsBLj36S77E6UCzhWqEBnvzBvW7wWetEfLQ9xbZjFX4+DDfmso/+ltr3klW4r9AJOpDD00WTcpd5poJmIGPzC1Hy7nDMSQXwm1EKqjPrK41y8T2TK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iU+2h/xC; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=RrRZda/8P4ZdY/za+j157v+GUsN/Bu8EjLA1QrW7d+CLh/hgzu1ZSOMMFotBLi+XGnW6EOhvuY9qqzoNSTrgIIJqc36SmhGWsW054IF1WK5cfPIz8B3024+AKTkl9MVmxxTZDqrNaWdqjGX6Ab+Rk/X362yeT2RexDjTepc+4k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIhamXHj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iU+2h/xC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A7161F000E9;
-	Fri, 14 Aug 2026 13:48:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIhamXHj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C34BC1F00A3E;
+	Fri, 14 Aug 2026 13:48:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786715289;
-	bh=CTfUWRH2IR05AyLOlRfrre4xf/aRkQmOOhmHRekgZBs=;
+	s=k20260515; t=1786715290;
+	bh=7PdA6ZzgRQkSpdgDso8mPsCmuHSzDIzsfMIrZKgFJOw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iU+2h/xCH8WbNfGe+yBX7I9Mm6Zij1tkuQ62R35GkTGFW3jF2WFhVHUeYiyTKnGI0
-	 V7rId7jxfRGWHUpkDRStjW6NLgFh00cXTaEQFMSSVWcZITZhLAHCisWAOWe4wEkAQx
-	 yGjaScneKGu1r37IJ939Vnb6bgBmgPPFBdHIFU2oYgIOLmIQDksvkQcSoP6+icemyE
-	 YiQmj386BUTwc6u5sbgvj1QeXdOn1yXsUAenU7mMBwW+yUtowkuubMgNCq58V9S6mB
-	 O/B3qYPgcoMKfnvIEO95hAg9HzQmeStef7lxr22+KIJdfT7UFGIAZ5Cef/uct0ikeP
-	 t6TXXG063a7YA==
+	b=gIhamXHjnGkwKCD+Bxk0VhmLFTs7dzmaNSvp+XUMG3RnF1cCWb92FatziVsOLyETT
+	 BAujC9606ZFm5Z6v2uJjGgr+M6uf3TcIJgERMxpyeUORcdlSl2oHuEhyBm8dj0NE6l
+	 6E5ywhuSUaWIJWdV9iLLF7dv+uugWWi0geLgNxTxgUnAE5R4MJMyjdBzIsK7lC9Cwc
+	 QYyxG4l42b6/Zjhh0Tq+RuusEvvfmNLoCsTl+cVEnhDSmnJVEhIFrQ4jBrYKiHzmeg
+	 AlivZCN1uoQmGC0pOOFL3ZDMAEfhwVznDSLrxvhiLUFPMF9Lsk4cOXE9nVDfC6C/XZ
+	 /kv5lBJ+af1hQ==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v5 10/13] block: fail zone management operations to read-only and offline zones
-Date: Fri, 14 Aug 2026 22:47:47 +0900
-Message-ID: <20260814134750.2100304-11-dlemoal@kernel.org>
+Subject: [PATCH v5 11/13] block: allow read-only and offline conventional zones
+Date: Fri, 14 Aug 2026 22:47:48 +0900
+Message-ID: <20260814134750.2100304-12-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260814134750.2100304-1-dlemoal@kernel.org>
 References: <20260814134750.2100304-1-dlemoal@kernel.org>
@@ -44,100 +44,138 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Any zone management operation targeting a zone that is in the read-only
-or offline condition will fail. So there is no point in issuing such
-BIO. Modify the check in submit_bio_noacct() to use the new helper
-function bdev_zone_mgmt_allowed() to check that a zone is sequential (as
-was checked before) and also that the zone is not offline nor read-only.
+With SCSI and ATA SMR HDDs, the storage element depopulation feature can
+change the condition of conventional zones to read-only (if a write head
+is depopulated) or to offline (if a read head is depopulated).
+However, the function blk_revalidate_zone_cond() currently does not allow
+these conditions for conventional zones, causing a zone revalidation
+failure.
+
+Remove blk_revalidate_zone_cond() and move the zone condition checks for
+conventional zones to blk_revalidate_conv_zone(), allowing the regular
+BLK_ZONE_COND_NOT_WP condition as well as the BLK_ZONE_COND_OFFLINE and
+BLK_ZONE_COND_READONLY conditions to match the conditions that can be
+seen from a zoned device with depopulated storage elements.
+
+The zone condition checks for sequential write required zones are moved
+to blk_revalidate_seq_zone() without any change to the conditions allowed.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c  |  7 +++++--
- block/blk-zoned.c | 25 +++++++++++++++++++++++++
- block/blk.h       |  6 ++++++
- 3 files changed, 36 insertions(+), 2 deletions(-)
+ block/blk-zoned.c | 66 +++++++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 39 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 196bccf27f58..13dc70e8f55d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -901,8 +901,11 @@ void submit_bio_noacct(struct bio *bio)
- 	case REQ_OP_ZONE_CLOSE:
- 	case REQ_OP_ZONE_RESET:
- 	case REQ_OP_ZONE_FINISH:
--		/* Zone management operations require sequential zones. */
--		if (!bdev_zone_is_seq(bio->bi_bdev, bio->bi_iter.bi_sector))
-+		/*
-+		 * Zone management operations require sequential zones that are
-+		 * not offline nor read-only.
-+		 */
-+		if (!bdev_zone_mgmt_allowed(bdev, bio->bi_iter.bi_sector))
- 			goto end_io;
- 		break;
- 	case REQ_OP_ZONE_RESET_ALL:
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index b88860cf5864..a4678a9e180b 100644
+index a4678a9e180b..22c47c73414d 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -323,6 +323,31 @@ bool bdev_zone_is_seq(struct block_device *bdev, sector_t sector)
+@@ -2345,57 +2345,32 @@ static int disk_revalidate_capacity(struct gendisk *disk)
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(bdev_zone_is_seq);
  
-+/**
-+ * bdev_zone_mgmt_allowed - check if management operations are allowed on a zone
-+ * @bdev:       block device to check
-+ * @sector:     sector number
-+ *
-+ * Check if the zone containing @sector on @bdev can be a target for a zone
-+ * management operation, that is, if the zone is a sequential write required
-+ * zone that is not offline nor read-only.
-+ */
-+bool bdev_zone_mgmt_allowed(struct block_device *bdev, sector_t sector)
-+{
-+	enum blk_zone_cond cond;
-+	u8 zs;
-+
-+	if (!bdev_is_zoned(bdev))
-+		return false;
-+
-+	zs = disk_zone_get_state(bdev->bd_disk, sector);
-+	if (blk_zstate_is_conv(zs))
-+		return false;
-+
-+	cond = blk_zstate_to_zone_cond(zs);
-+	return !disk_zone_cond_is_offline_or_readonly(cond);
-+}
-+
- /*
-  * Zone report arguments for block device drivers report_zones operation.
-  * @cb: report_zones_cb callback for each reported zone.
-diff --git a/block/blk.h b/block/blk.h
-index 50abfd932886..2cc03aa54c53 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -577,6 +577,7 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
- 		unsigned long arg);
- int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		unsigned int cmd, unsigned long arg);
-+bool bdev_zone_mgmt_allowed(struct block_device *bdev, sector_t sector);
- #else /* CONFIG_BLK_DEV_ZONED */
- static inline void disk_init_zone_resources(struct gendisk *disk)
+-static int blk_revalidate_zone_cond(struct blk_zone *zone, unsigned int idx,
++static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
+ 				    struct blk_revalidate_zone_args *args)
  {
-@@ -619,6 +620,11 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
- {
- 	return -ENOTTY;
- }
-+static inline bool bdev_zone_mgmt_allowed(struct block_device *bdev,
-+					  sector_t sector)
-+{
-+	return false;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
+-	enum blk_zone_cond cond = zone->cond;
+-	u8 flags = 0;
++	struct gendisk *disk = args->disk;
  
- struct block_device *bdev_alloc(struct gendisk *disk, u8 partno);
+-	/* Check that the zone condition is consistent with the zone type. */
+-	switch (cond) {
++	/* Check the zone condition. */
++	switch (zone->cond) {
+ 	case BLK_ZONE_COND_NOT_WP:
+-		if (zone->type != BLK_ZONE_TYPE_CONVENTIONAL)
+-			goto invalid_condition;
+-		flags = BLK_ZFLAG_CONV;
+-		break;
+-	case BLK_ZONE_COND_IMP_OPEN:
+-	case BLK_ZONE_COND_EXP_OPEN:
+-	case BLK_ZONE_COND_CLOSED:
+-	case BLK_ZONE_COND_EMPTY:
+-	case BLK_ZONE_COND_FULL:
+ 	case BLK_ZONE_COND_OFFLINE:
+ 	case BLK_ZONE_COND_READONLY:
+-		if (zone->type != BLK_ZONE_TYPE_SEQWRITE_REQ)
+-			goto invalid_condition;
+ 		break;
+ 	default:
+-		pr_warn("%s: Invalid zone condition 0x%X\n",
+-			args->disk->disk_name, cond);
++		pr_warn("%s: Invalid conv. zone condition 0x%X at sector %llu\n",
++			disk->disk_name, zone->cond, zone->start);
+ 		return -ENODEV;
+ 	}
+ 
+-	blk_zstate_set(args->zones_state, args->nr_zones, idx, cond, flags);
+-
+-	return 0;
+-
+-invalid_condition:
+-	pr_warn("%s: Invalid zone condition 0x%x for type 0x%x\n",
+-		args->disk->disk_name, cond, zone->type);
+-
+-	return -ENODEV;
+-}
+-
+-static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
+-				    struct blk_revalidate_zone_args *args)
+-{
+-	struct gendisk *disk = args->disk;
+-
+ 	if (zone->capacity != zone->len) {
+ 		pr_warn("%s: Invalid conventional zone capacity\n",
+ 			disk->disk_name);
+ 		return -ENODEV;
+ 	}
+ 
++	blk_zstate_set(args->zones_state, args->nr_zones, idx,
++		       zone->cond, BLK_ZFLAG_CONV);
++
+ 	if (disk_zone_is_last(disk, zone))
+ 		args->last_zone_capacity = zone->capacity;
+ 
+@@ -2411,6 +2386,24 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
+ 	struct blk_zone_wplug *zwplug;
+ 	unsigned int wp_offset;
+ 
++	/* Check the zone condition. */
++	switch (zone->cond) {
++	case BLK_ZONE_COND_IMP_OPEN:
++	case BLK_ZONE_COND_EXP_OPEN:
++	case BLK_ZONE_COND_CLOSED:
++	case BLK_ZONE_COND_EMPTY:
++	case BLK_ZONE_COND_FULL:
++	case BLK_ZONE_COND_OFFLINE:
++	case BLK_ZONE_COND_READONLY:
++		break;
++	default:
++		pr_warn("%s: Invalid seq. zone condition 0x%X at sector %llu\n",
++			disk->disk_name, zone->cond, zone->start);
++		return -ENODEV;
++	}
++
++	blk_zstate_set(args->zones_state, args->nr_zones, idx, zone->cond, 0);
++
+ 	/*
+ 	 * Remember the capacity of the first sequential zone and check
+ 	 * if it is constant for all zones, ignoring the last zone as it can be
+@@ -2493,11 +2486,6 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+ 		return -ENODEV;
+ 	}
+ 
+-	/* Check zone condition */
+-	ret = blk_revalidate_zone_cond(zone, idx, args);
+-	if (ret)
+-		return ret;
+-
+ 	/* Check zone type */
+ 	switch (zone->type) {
+ 	case BLK_ZONE_TYPE_CONVENTIONAL:
 -- 
 2.55.0
 
