@@ -1,129 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342274657EA
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 15:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29CE3C9EEF;
+	Fri, 14 Aug 2026 15:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786720219; cv=none; b=GAjoO8oPQIUSeZrOzc08exIHMT1/hRBzwXipUqpBtPWz+8tWjEAyiaRsfqhMA1mJpPabf4LCamZIgQBdwsTDMNcADJATBV3Drf5xf0+vwmTPf5IsJW4gOTUqVHOfNLcFPNSaZfX15WqY6wfwCwYf8SoBLoXpi+sBJbWzncQuGUs=
+	t=1786720427; cv=none; b=mH6c2OeoI5CaRouGJNqnMuxdseIHQ/iwwLqhSQUq0TTyOL8jS+AjH25zUxgNug+P06JXuVMnwzAAQH8ShhivLhdA2n3orACPVuZzIhaDZTg5Pc+IdGGRIX5gfQDyaa5w2Pm+mtyBYns1inCZnkyR9w0UhH6wdWTTmTrvazPobrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786720219; c=relaxed/simple;
-	bh=aY70QCxUdQ0hzm74LlvRBUgc9sJqiCBiI8yiOJz0QD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iNb/cDW1U+q1//ubz6IrRIS4pjN14xXmMG7hUIxB1S9B+mtq5li5YqWOG0YY1rJiMYEmiLE4pZFjVqArDFS/DSBY5YVrNis7Ww1mSCzX2LuC3HzTrFdnPQ6ufksGaqGapVfwvmofVANX8wppdyUs0ZvtRXrARG4wCfS9zKabeMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBULrIvt; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786720427; c=relaxed/simple;
+	bh=qSYxeWnvIPw1FX9I9xs3aYxdKA3PzrvMo2ghmEhfBDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyYaVsnLXrm7cA50w9teHc7mvg7t1OVOk+N1td9qOnob8geBWgu4pTPsQ4LFVqi2PWpnrqDxQ5P84ANFTtMKmwHbX40nJTfWOIhZh9xcjfOAk8fdSRO+drSRY/NzgInNtmFpSLyi9nafmnm5ZxdJkMkSjCOThwHjMXGoygWdu2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUMYZfCl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBULrIvt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786720217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v1GRrOlyN9nkOUdimeoCQpzY7og1lchpuM501N4iN80=;
-	b=GBULrIvt6FT9uNqWQX0Mk1mncAuV2m6qhWzxFBETIDb6cBJ5CN1h+5yfVMQ/JafFabtMLj
-	RnrrwTFa6NcHT+rrfL82+pl8oPdrNsp1pKCe/juzMe/2hOtKCBDWboWf4alBq7PcPSv1Xo
-	zid35UZmRPNw6GwhwpdZgnDbClzP6Tg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-36-DvatqclWMhiECNPA0A51Jg-1; Fri,
- 14 Aug 2026 11:10:13 -0400
-X-MC-Unique: DvatqclWMhiECNPA0A51Jg-1
-X-Mimecast-MFC-AGG-ID: DvatqclWMhiECNPA0A51Jg_1786720212
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 969F8195608D;
-	Fri, 14 Aug 2026 15:10:11 +0000 (UTC)
-Received: from [10.22.64.139] (unknown [10.22.64.139])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 62CE830001A2;
-	Fri, 14 Aug 2026 15:10:09 +0000 (UTC)
-Message-ID: <3ca229d2-aaa3-46e0-8714-21cd67810153@redhat.com>
-Date: Fri, 14 Aug 2026 11:10:08 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUMYZfCl"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 5A5701F00A3D;
+	Fri, 14 Aug 2026 15:13:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786720426;
+	bh=/KgPiqew/xPu1U7F+Angxp7pjTC09MZg7T4BSyNrCSI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=HUMYZfClAIgTKe5Kt88p0xj6wI82y+f7yTwwOfpIWVsa+jQ8KPZZtwWbnBwjPYfQh
+	 EmoIC5bhNxmpvsSuK7M5ZhbnfnT8xRLXe7Wn32dtpOoNGMi7aKHYmHImNc1/RCvaxU
+	 mw9bNEAHIYjlmCesaLrXSAdY4oWlgfMTk/Kh31/G/Jcj2e8KLW1DYOz8aI0ryId/Ny
+	 1Dk7dT9cw/d1E01tBWqRxTTsKDruu3wXbzu/Al0tpGQ0uRWdC6z4lEg+z45dTTSHj2
+	 0YbNgBDrxF8pzhd5QpFNJrfv+8Nd8x48SGZaMN3OMUNNEG6DIa8jqHa5EWFtHHxZx+
+	 U87rPOuPqinxQ==
+Date: Fri, 14 Aug 2026 08:13:45 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Andrey Albershteyn <aalbersh@kernel.org>
+Cc: ebiggers@kernel.org, hch@lst.de, Jens Axboe <axboe@kernel.dk>,
+	Carlos Maiolino <cem@kernel.org>, fsverity@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-btrfs@vger.kernel.org, david@fromorbit.com,
+	Tal Zussman <tz2294@columbia.edu>
+Subject: Re: [PATCH v15 15/25] xfs: don't report dio_mem_align and
+ dio_offset_align for fsverity files
+Message-ID: <20260814151345.GF3556460@frogsfrogsfrogs>
+References: <20260814092448.1818082-1-aalbersh@kernel.org>
+ <20260814092448.1818082-16-aalbersh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 2/2] nvme/070: Test multipath and marginal ports
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Jesse Taube <jtaubepe@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Daniel Wagner <dwagner@suse.de>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-References: <20260812174503.3705830-1-jtaubepe@redhat.com>
- <20260812174503.3705830-3-jtaubepe@redhat.com> <an78AkXI1SUHXBwg@shinmob>
-Content-Language: en-US
-From: John Meneghini <jmeneghi@redhat.com>
-Organization: RHEL Core Storge Team
-In-Reply-To: <an78AkXI1SUHXBwg@shinmob>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260814092448.1818082-16-aalbersh@kernel.org>
 
-On 8/14/26 07:47, Shin'ichiro Kawasaki wrote:
-> On Aug 12, 2026 / 13:45, Jesse Taube wrote:
->> Add tests/nvme/070 to test various multipath and marginal port
->> scenarios, while confirming the port useage and state. This test is
->> intended to emulate receiving an FPIN event in a multipath environment.
+On Fri, Aug 14, 2026 at 11:24:32AM +0200, Andrey Albershteyn wrote:
+> Sashiko.dev reported that while fsverity files falls back to the
+> buffered IO for Direct I/O, they should not report non-zero values in
+> dio_mem_align and dio_offset_align, meaning it's not supported.
 > 
-> The test contents are comprehensive, which looks good to me. 
->>
->> Suggested-by: John Meneghini <jmeneghi@redhat.com>
-
-Please remove the above line.
-
->> Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
-
-Co-authored-by: John Menehgini <jmeneghi@redhat.com>
-Signed-off-by: John Meneghini <jmeneghi@redhat.com>
-
-I've tested these patches and they work.
-
-Tested-by: John Meneghini <jmeneghi@redhat.com>
-
-Note: These patches require the kernel changes introduced by the "FPIN Link integrity handling" patches[1],
-and they should not be merged until the kernel patches are merged.
-
-[1] https://lore.kernel.org/linux-scsi/20260814063616.GA9231@lst.de/T/#m1e8c728cf2dcdfd70d1b50a2fc2f278ea0832c36
-
-
->> diff --git a/tests/nvme/070 b/tests/nvme/070
->> new file mode 100755
->> index 0000000..a8002f8
->> --- /dev/null
->> +++ b/tests/nvme/070
->> @@ -0,0 +1,521 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-3.0+
->> +# Copyright (C) 2024 John Meneghini <jmeneghi@redhat.com>
+> The STATX_DIOALIGN | STATX_DIO_READ_ALIGN flags are used to explicitly
+> report if DIO is supported or not. They can not indicate that fallback
+> to the buffered IO is used in this case. The zero alignment values also
+> mean that DIO is not supported on this file, see statx(2).
 > 
-> This patch's author is Jesse, which looks inconstent with the copyright above.
-> Also, please reconfirm the copyright year 2024. Should it be "2026" or
+> Signed-off-by: Andrey Albershteyn <aalbersh@kernel.org>
+> Acked-by: Eric Biggers <ebiggers@kernel.org>
 
-Yes, this is because the original version of this script was authored by me.
+This is consistent with what I saw in the manpage, so
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Jesse took my first version and greatly improved it.  She got it working.
+--D
+
+> ---
+>  fs/xfs/xfs_iops.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> When I ran this test case on the kernel without the patch series
-> "nvme-fc: FPIN link integrity handling", this test case just failed.
-> I think it should be skipped if the kernel does not have set_marginal_rport
-> sysfs attribute. I suggest to add the check below:
-
-Good suggestion.
-
->         if [[ ! -w /sys/class/fcloop/ctl/set_marginal_rport ]]; then
->                 SKIP_REASONS+=("fcloop does not support set_marginal_rport")
->                 return 1
->         fi
+> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
+> index 55667cc762f8..70637cdcc299 100644
+> --- a/fs/xfs/xfs_iops.c
+> +++ b/fs/xfs/xfs_iops.c
+> @@ -35,6 +35,7 @@
+>  #include <linux/security.h>
+>  #include <linux/iversion.h>
+>  #include <linux/fiemap.h>
+> +#include <linux/fsverity.h>
+>  
+>  /*
+>   * Directories have different lock order w.r.t. mmap_lock compared to regular
+> @@ -580,6 +581,10 @@ xfs_report_dioalign(
+>  	struct block_device	*bdev = target->bt_bdev;
+>  
+>  	stat->result_mask |= STATX_DIOALIGN | STATX_DIO_READ_ALIGN;
+> +
+> +	if (fsverity_active(VFS_I(ip)))
+> +		return;
+> +
+>  	stat->dio_mem_align = bdev_dma_alignment(bdev) + 1;
+>  
+>  	/*
+> -- 
+> 2.54.0
 > 
-
-/John
-
-
+> 
