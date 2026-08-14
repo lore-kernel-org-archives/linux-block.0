@@ -1,134 +1,135 @@
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F248437476
-	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 10:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605F23515EE
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 10:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786702059; cv=pass; b=C33v4bHHc5F0RiwPlIJJ8Ht4Jm9nnzVTP8tWnyt+00OYg9NNwbu25Z7r2QxPncNNmPFyuBTF9rKkNfPc5WopIkPatH8/mIUdn4o2cvyVoCtUJ9E4hHXJCPhAIy2T3OimKaD/0DQI9UFSVHXxQDw+QwayIyGLtuISgG9uol+zZBk=
+	t=1786702531; cv=pass; b=uiSrU0gYvJfnNfODrpmvNvJxopgS9dCQyyKDD4gsKFqUDBkeACo5/lZLpuQeQhxmJzLx3TrvbBNcA6TNFV8AqDfqSfjBNRTfbBoD0OI16dTzW+pK5B6xuk/WqOT9DfETyc1PFwBOf85ZpRMjfKPZP2+/gnhLDlXjsPqUcOgvgwI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786702059; c=relaxed/simple;
-	bh=dih5yfhVzD9YOCDkAqWifhHeNamtD5unYv0nZnZHxAE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i+PH9o9azWzItnv1mi92V35VNUU2RvKQuiUQj3n14ONJrVk/YEIz1Y+YEtTcPLCWFu6Whq53FREV0CRZIpsN249iuEtpf5ltTOpAO1tIz/dPPJIA/SDQIka2mg+MNb1BQxuYRGzCNoEkQjHlHb6X1K/7d0OV4Qbnb34MI0kHy+E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hyy3XGcB; arc=pass smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786702531; c=relaxed/simple;
+	bh=kcqD2LBz28PigiZgtItz05HD6+kelhc5LWa7cOtVR3k=;
+	h=In-Reply-To:Mime-Version:References:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qsI031qVwCTNgS1HKbpUtIsJexiMJFGSdIlV3f8766RBFW+oAkZqgQWO3CJPX0tkaD/RpvzStjIhgDCGGSXZiRS+nOuu7dqFmSUoOPWcHgOKz3R0lEfRWfrRdamg48AVzYlzreoxyN388Dj3dlxaO05i4hWS4pzajJj1Xqv1j0Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=NuT5bd0S; arc=pass smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyy3XGcB"
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6b051516aaaso512066eaf.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 03:07:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786702044; cv=none;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="NuT5bd0S"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-38e041ea211so899454a91.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 03:15:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786702503; cv=none;
         d=google.com; s=arc-20260327;
-        b=MFOoXlvhLsgseGo8PDBB7kfCJE13l9tJuHs9PA2Q+tW5TYUQZjAW05v9sKu3+1wQeX
-         e1LCeRYbDyo9AzIqPHZEcUhx6O3A1RAjoKJO29AzSjKAxoCkF6C+jAoxFbzAQAJXR5kM
-         WK1A0wz44rnXNAQxTRwxHS4u3cxTPRXuLK6R7Ene/t7dizevSyGgm/OR8k1VCBM4vO6A
-         2/v/3vZd5Cp7hVGGWmh+ftief8vzTMxwb/6Z9xtCN7n2ZhTnP717QKwOJWuKXMINJ9Gn
-         9rOR67+yoA6MdA5DjvWPXhOohyaB3ELTKZMwQz9VUBciJ7+ko1T2ieZ8Zlgd8N2ECh0C
-         xh9w==
+        b=nUWgZskCTBhP5tNmPzQsakIKpzdbkUiajdZ0RVXKuryylpWCXbGnKE4RJEjG6Q6h70
+         4/VRbPgXrg8Pay+9ZjB7lj1bH02Sf1L1O5gTY3CqZAol8JZKLhF39Hm4rN0P5qU/rOJ6
+         +517L857vzkI3/MjvTo3KZqYb/3x77UuU+L1ICCpkFx0Tbi8wSmwfzjyAlaitQPQNZ1A
+         Lz7HfvpbFP3qTjBSzHIzEeQUIWxCiX3LTdwrg52o5U8UtJJH4c63bO5cUnGUfnsXgxu7
+         N8LpAoc199P1Q4vHPVe7aAFukeUWo5fy8YvbXxyPVJutBBqtqIkbp3pnhHQecanZf0JF
+         JKMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1RkqMsDi42d8/QAfB18WfJfpcXU8KgxUsUMWb6sZViE=;
-        fh=QWuhAgqzypks5D4k1Jgd7f/7FGPGZimKj5fOr0dWamE=;
-        b=FfCq4V/1qFZ8BRqHVTmnHw20Pe11AZxmoIGT+1jwlPP7rOY2MIISuUuShGRqz2kO23
-         XP9Nno5Ng6XI3gSa6S1lpOYbQpljL9octATw0Vph9J+OU0J1faIv7/a/2Vh+JekGUx51
-         8vZ/dDtHYBDH9bMKeB/Y7sYnoAJdOH78yoF6+ZBcK3zKoEPiFRBdK/Wg91WxX8LilNY4
-         zrzZNB0akdDiK9nS/NcRp505VO7vzgYLRT7tglsxmgOXBQd+WnMacaHMBlC1CdruQCdV
-         pl8o/1vnUnyC+0f81xnS7CwjDBHMqcmDITXpYH0PaTM888yDjr/5vGpItrpawOYXumhS
-         AiYw==;
+        h=cc:to:subject:message-id:date:from:references:mime-version
+         :in-reply-to:dkim-signature;
+        bh=kcqD2LBz28PigiZgtItz05HD6+kelhc5LWa7cOtVR3k=;
+        fh=qwCrOrbarZlUR5Rd0ncRdvCwA63oHHI+J+Y+P9sfvM4=;
+        b=d5h0vT6JNnZUxRR8WnhK9DK7QVnJOeQVVJb8BGKIo/g1A0hJN/7PNe/4yLYZJAXWgN
+         PHk1ZP+zCacLlI6mbyu7jcfoUadWJR/v+ra7z8kNrtWTeQC7gB6zAUHIGletwWp7mKty
+         /uopxyPAm+m2Gu4sXPzi5YAwUqJNcQ7Wnan12E9qZhtVgzaguW1Vjj2/R7dFXaDWQXrD
+         xVODp3iKNT+hXeFSrG6QU22/nswEsnMISi5j8Yd46XGcx8wCg0oU2j0XaYy+aprZUe5B
+         QDfsg+P1f9sxd1YLuRxe4MBxSESbKNKZEHRthXfQZyXnwGhIRE7wXf9nUJ09dEvaB3NV
+         FwPg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786702044; x=1787306844; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1RkqMsDi42d8/QAfB18WfJfpcXU8KgxUsUMWb6sZViE=;
-        b=hyy3XGcBRRqZx31yc5djGg/7v/jyP209uS0NeP+s9bDYYFxSlpTYs6ToLMIeQCAi6f
-         gntgpUOQnIFaOiffJER7giwOT51tUdM1bVBm92qqhNCyHzXKz+FxwJNdkYWa1Op9qMVu
-         CKwIln4y+FHTqMlb+NfI9Lv4PDSWZ+0Olok7Dh35mecojyEa1UvnZXpvBoCCLFtHv5X2
-         jdjz4ZZhDQpZIDyRXN6v7AXBVMDFJKl6z+O1B3C1QIRVy2jjGvVDEQEYdWD1UL6E0hUn
-         urpwh8j/xt2RCwH8Khp4hg6GKGP1FWg5gP5/VggjjAFVcuKzJzb5XbV0u+XuwjdQ4K3x
-         eEkA==
+        d=bytedance.com; s=google; t=1786702503; x=1787307303; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:references
+         :mime-version:in-reply-to:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=kcqD2LBz28PigiZgtItz05HD6+kelhc5LWa7cOtVR3k=;
+        b=NuT5bd0Sv3Ia7Q1EXkdfWj/fx2nRYGiBEZLBRUMbVYp+fHLIGrzB+VLjcUDVZuBCUr
+         UlPRgGdU7HQ6G/MfLq57x08SaTcFK0NsHa+n5iiZaywjD1Ae+qU16q1u7BgqA/GXxcB8
+         8C/5KAchnqsHlTwuJIVNX/p4ito7mXNJz0Lvv99kzr4qTUSAct15xqxmZKZt+c+Q9uvd
+         G5CdVRviqjRapckdpEcdu6uYo4rWqFSFcAezCGMfKyw7loLjWvQMP/ZOd2qtCI0AF+md
+         z+sHRM9j4kxeJgjofvMNXh7iox5C1Pf1qqQT+WETsaf1+9rQ0WCejJlWwyo4wNloEoJw
+         5Jxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786702044; x=1787306844;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1RkqMsDi42d8/QAfB18WfJfpcXU8KgxUsUMWb6sZViE=;
-        b=QXG5g/ujP4JwHOwbQ7ViQmIjZ0/lsiVfYEddYX64Vkn/lIt/mhctZ69bS8oMHKnFv2
-         hVWeM4JQKqVE8ishbInVQVj/c7fM0SWrUbPfXQDzVlZxGjNRl/+FMzxVrWbIMeJGp/m3
-         3PSGEKGLCrMFxIqiipL8e9Ye1QS6S1KMRwoosal6QLvM7I2QEQ8Fn6fuD99O0pLpD2ac
-         yhgEZDU6Ty958gJBGSopyfsgNXfjObSfE2fKD6I8Qh6JscYxS+AdeAsqcWEPHZAlp41o
-         44zupA4mA35pxbJaqldoC0HAxyWgM5s7/Pu5IhpZ2RxROQIJY5zb9YYMND9vLS1+SGIW
-         lLWg==
-X-Forwarded-Encrypted: i=1; AHgh+Ro5bHckS/go+B8CsxSBsc2zZET+GdkROJK7+hfhZCnVH4Tr8Hgt/QoliRXvtLJIRyyTJOPnpE43i3ulXQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE+zcylN4/elxMeUVXiLevfGXfsy7OzqmEMsdYV1npLlE4xzEp
-	xPb2zB3RJG84LjPTDCHwfbsJE9/N9bcu01oCD1M9RyfxOy0d7WgFQrROnfPIE0pDYEfEVCQPWvd
-	KiAv/AqrkFfau11TyU8efpbZWRq+xHpdEfhiOooQ=
-X-Gm-Gg: AR+sD11DU/B7geqcBwpKmhEUIVp0i1Blyxtqhw5Iyp+T+hDkRWDwtdDyEu4Ju2I56s5
-	lFgXj8E8ZoZvoYVRaJxAvlu3fPIPLxfTR2drfDcWrql2mvIA0f4qrP5UjxRzmL/KMlg1yem8jKW
-	aTuSfLx+VrrQE0DJjdN9pKgWULCyzY5MGnTc+K+b+YO4Fs1a21bulj7wC5ZPtdDuau583+4kFOq
-	fdc+FkqlHkDfTXqG7/qImHr2Uph6VX21d2Q2BCE3M7HI7TSJVvhuX1HQa24SKamqUjMP8Zm92uq
-	mH6caA4IoNMmrdr6/HnHuD8QRzpPXCOkOJ+8eMWaCqRMWEGdb/Eg3B3A3KlTBYtmVcMbtpcAYh/
-	4kPAOf1QNU08uNmUAuJ95Y4oXqfyTLwE0RoptzBNVZtD+MAH1nw5FBpUAE5I+
-X-Received: by 2002:a05:6820:151f:b0:6ac:a9c6:92c with SMTP id
- 006d021491bc7-6b0d6147261mr4169707eaf.10.1786702044534; Fri, 14 Aug 2026
- 03:07:24 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1786702503; x=1787307303;
+        h=content-type:cc:to:subject:message-id:date:from:references
+         :mime-version:in-reply-to:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=kcqD2LBz28PigiZgtItz05HD6+kelhc5LWa7cOtVR3k=;
+        b=pAW26jSCYtegiiqQpP6FBsE8Mu/z2gBkWYkgQS5UtMZR0CCLdXajx0VScEcvyHvfeC
+         tJWMEl02jtpyH0HIDB97j71XD9FiZsaUnIuHXaHf4TS8IIa8XvvX10EOF1tHDSwJd7I/
+         cT8sOJvF9O1DgIsvOkYB4x5Wg2zABN/z5ZVxl9pedzEvCGsEynZGlEz25xIGhnxmQeoz
+         n1VZP7C0QUi8KN0YpUmXBIjHmcq6xl1qxz+KpmOh00WYZP+gymltLxSN2nngXqGz669r
+         jUSXQ4mDHr1faPHhgWW8rOjaPtVxXam5dJUyMPOzIY6wNUtSn1ZGCqXpJmkyzke0iJzJ
+         72Hw==
+X-Gm-Message-State: AOJu0Yy6yrERVhfXdu1g+l5zLrl0gClHcuDYo0urH7OMtBQI2JXShy2v
+	UrW0bNfsGavS2o2L3K0fkpziGGPpgNiMFsRdX6sCXiduShCUwhlYPuRkR3lCZgiKRja4eLOhdJ0
+	iL9QnEuvCT5tda3C90A67qpb5eYwV1tb6SAsGr8fqoA==
+X-Gm-Gg: AR+sD13fkU6mB9IRBflkRYGqk0ckUoqXxuENkH4kWSlelzVusQjcvCQfkMZiadygEU3
+	A7ichD9LSSjPJbJDLXMaPVMB2zY8LlGa6jOOljv9G6m09zBXnYGzQK2ak6gb7Ab8swoMc9Dthf0
+	0LocnXIu4uNewS/epQ/c+Cyz8tVqA6zS11+qC8fo4ggK5wbJbhDr1CYeCU2qef9jp9xULznwE9X
+	4/RQ8NgUBcwdmsYxoAuZfw4YL7YxLOtkZ1q/RSTrmocgE8UUIRlTWcjd4DEhgYA4f5R1Rn0beHd
+	iZ2l2ziuIh43n32O9q4nkKTbLOlnPs/6SggfUmt523I=
+X-Received: by 2002:a17:90b:2248:b0:392:c80b:8eff with SMTP id
+ 98e67ed59e1d1-3933b87a743mr4376567a91.11.1786702502389; Fri, 14 Aug 2026
+ 03:15:02 -0700 (PDT)
+Received: from 44278815321 named unknown by gmailapi.google.com with HTTPREST;
+ Fri, 14 Aug 2026 03:15:01 -0700
+Received: from 44278815321 named unknown by gmailapi.google.com with HTTPREST;
+ Fri, 14 Aug 2026 03:15:01 -0700
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20260805122930.57647-1-yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260814023226.354288-1-sangyao@kylinos.cn> <20260814023226.354288-2-sangyao@kylinos.cn>
-In-Reply-To: <20260814023226.354288-2-sangyao@kylinos.cn>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Fri, 14 Aug 2026 05:07:13 -0500
-X-Gm-Features: AUfX_mwosHxYX949eUiz_Z3hdmKgMSdPKtoCpIYLwL8VKHEYDal_oR3cLeG7K3c
-Message-ID: <CACVXFVP1gc3arTkP8eStdokYZCUU-KEFJ7dJ_VNiF8i0j1o1jA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] ublk: reject non-power-of-2 zone sizes in SET_PARAMS
-To: Yao Sang <sangyao@kylinos.cn>
-Cc: Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org
+Mime-Version: 1.0
+References: <20260805122930.57647-1-yangerkun@huawei.com>
+X-Original-From: Zhichao Huang <huangzhichao.1@bytedance.com>
+From: Zhichao Huang <huangzhichao.1@bytedance.com>
+Date: Fri, 14 Aug 2026 03:15:01 -0700
+X-Gm-Features: AUfX_mxHJXAcDA4dpAkkajkjnuTH7E-evpPwbklipP85hLwaZXg6SHWDfCbuSwI
+Message-ID: <CANUnaibYL+jqiMMKOpC6myS73WKYhog9ozEc2TG-AVe7LYLGBQ@mail.gmail.com>
+Subject: Re: [PATCH v8 0/8] nbd: eliminate queue freeze/unfreeze overhead in
+ connection setup
+To: Yang Erkun <yangerkun@huawei.com>, Jens Axboe <axboe@kernel.dk>, yukuai@kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org, yi.zhang@huawei.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 13, 2026 at 9:33=E2=80=AFPM Yao Sang <sangyao@kylinos.cn> wrote=
-:
->
-> UBLK_F_ZONED uses params.basic.chunk_sectors as zone size. ublk uses
-> ilog2(chunk_sectors) to get number of zones, so the value must be power
-> of 2.
->
-> If chunk_sectors is 96 and dev_sectors is 96 * 16, userspace asks for
-> 16 zones. But the shift calculation gets 24 zones.
->
-> Block layer rejects such zone size when the disk is started. But
-> SET_PARAMS has already returned success, which is confusing for
-> userspace. Reject it in SET_PARAMS with other zoned parameter checks.
->
-> Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
-> Signed-off-by: Yao Sang <sangyao@kylinos.cn>
-> ---
->  drivers/block/ublk_drv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 853cd40a3403..193f6ebc3b37 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -980,7 +980,7 @@ static int ublk_validate_params(const struct ublk_dev=
-ice *ub)
->                 if (p->max_sectors < PAGE_SECTORS)
->                         return -EINVAL;
->
-> -               if (ublk_dev_is_zoned(ub) && !p->chunk_sectors)
-> +               if (ublk_dev_is_zoned(ub) && !is_power_of_2(p->chunk_sect=
-ors))
+Hi Yang, Kuai, Jens,
 
-Looks fine,  and is_power_of_2() returns false for 0.
+I'm writing as another production user of exactly the workload this
+series targets. We run AI sandboxes on Firecracker microVMs whose
+rootfs is attached over NBD, and we launch many microVMs concurrently
+on many-core hosts. We independently traced the same problem this
+series fixes: the blk_mq_freeze_queue() calls on the connect path each
+wait a full RCU grace period (~35-50ms on our many-core hosts), and
+because many connects run concurrently at VM-create time these stack up
+into a significant create tail-latency contributor. So this is a real,
+independently-hit problem on our side, not a synthetic one -- thanks
+for working on it.
+
+FWIW I had separately narrowed it down to the same two spots (the
+nbd_add_socket() freeze from b98e762e3d71 and the nbd_set_size() freeze
+from 242a49e5c878) and was about to ask the list whether the add_socket
+freeze could be conditionalized on the initial connect. Your approach
+is cleaner: patch 2 removing the freeze's root cause by rejecting
+NBD_SET_SOCK on an active device -- rather than relying on the
+capacity==0 / bio_check_eod invariant to keep holding -- is exactly the
+right way to make patch 4 safe, and patches 7-8 also cover the
+blk_mq_update_nr_hw_queues() freeze in nbd_start_device() that I had
+not addressed.
+
+The whole direction has my strong support. If it's useful, I'm happy to
+apply the series on our Firecracker + many-core setup and follow up with
+a Tested-by and our create-latency numbers -- just let me know whether
+that would help before it's applied.
+
+Jens, as a second, independent production site hitting this: we'd
+really like to see this land.
 
 Thanks,
-Ming Lei
+Zhichao Huang <huangzhichao.1@bytedance.com>
