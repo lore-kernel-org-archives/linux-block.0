@@ -1,86 +1,99 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2177233938B;
-	Fri, 14 Aug 2026 06:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B8D377006
+	for <linux-block@vger.kernel.org>; Fri, 14 Aug 2026 06:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786689036; cv=none; b=IpFCPFLp/fzvIXvXyqYLb/twDhBeGTQEPiiw+A+P0VDQlV8xCjCvW2Co35BZm1wsfabsBahwUVNsGZLj+QCQKYZIrv5IYYr+nkotCxHy+3EjB8MYKAcoWyZrTc28/b5dBI2b8h8f/+zQURKGa12miXii68VH1UcIedCAdVJzJLE=
+	t=1786689136; cv=none; b=NdK56/dFHXuEL9xmTEcqlbr8Ki514+haF1BULlnjfi/af8YvkPDZ+5tKfAYq2DQxO3qI098jquSD/0JiKYVWvM/0HWEwz7MxVbZSj3N6lZymXp+VhK2lAPl4XJDbqnENlp54NzcuG5wRWcysrnq7qny5a7w+l2KuSSMvBxlHKuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786689036; c=relaxed/simple;
-	bh=00WqtERUtnYBEUzQd0/SsEG+LWqmr6egKXeBQhrAo2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t028Cac6kVHo1GIfHFe3j4mnRMcmtslVwvR9zYQypMCz6184HTKEL/ddOynpnD++Z59cevY8gdVAkf7EU7Qs7ltRy69tEGK7c8Z8zP2KeCp+0ToMhhb8rPO213ek8sReFDlOkUv2F3PmjXgqq34WC5M9Jo88zTwv3OUmRXbkrMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WsNtQ8Tn; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1786689136; c=relaxed/simple;
+	bh=+w606DjRr/35m0l6ODBGKrHTGBTwm2PFTJNTwFr73Fo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lJhBhnC8lef9bCYB/DlwyCJBAtEkAbKYG8L/NFc7YdWR+RVQoKN1UlXxhD49uhltGqCiwmJWhNEEpIruP9vFbNq4lEtho4TmvihpsHDLQQF41oybvJxIZ8rIxlJr/W7Rt8Fxd7RXoluXtr2SqQAg8H6GgmihZuSizYH24tdBu1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCGFvEH8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WsNtQ8Tn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=00WqtERUtnYBEUzQd0/SsEG+LWqmr6egKXeBQhrAo2I=; b=WsNtQ8TniakQxZNdnuggvJh74C
-	OE+4sgkHXEZuda9o7TCIN8ZpLZKayt5lMhfPBdi9qDc9BllPvmwc41LE3Qr0O6NB/jVAV2LwQuFig
-	FlIYI5FxGw1AG6pjRP5HOMuYO5WfUr8kHRcZ5XmnhP5l608QVpHTXsW/QRiOF9QYwFUb+EdK34tUE
-	XdU8zGpWXJQx8aCNuUFimFxp5McV/biDcAuI44NAc+pepbC7nfgSfQjLeLxMmXbAsHtq7BhOwpN9J
-	r7MJ/rT1jha6cCGI6WlKmC2yAcqtpZJ5m7y8EPyTIiQMCzeTMqJ9JXrKo+i+hgy46uCKXsdA/qzEI
-	gu1YioiQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wulR0-000000022L3-2Xh4;
-	Fri, 14 Aug 2026 06:30:31 +0000
-Date: Thu, 13 Aug 2026 23:30:30 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Daeho Jeong <daeho43@gmail.com>
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, kernel-team@android.com,
-	Daeho Jeong <daehojeong@google.com>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
-	linux-pm@vger.kernel.org
-Subject: Re: [PATCH v2] f2fs: quiesce background threads during system
- suspend using PM notifier
-Message-ID: <an62BorNrc-IX228@infradead.org>
-References: <20260806170108.2100312-1-daeho43@gmail.com>
- <ann0OPPglToV_hjs@infradead.org>
- <ff74edb1-43c7-485f-ab78-ec13b500a0bb@acm.org>
- <CACOAw_zqOS0vHdQV6WoUJyxnDf=kdDAz27pNGDLdQLUdUYOzBQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCGFvEH8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3328F1F000E9;
+	Fri, 14 Aug 2026 06:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786689133;
+	bh=l6AxwQXGf008PaDX9PUmqJOTcrpHr78kky6iYWF6dTI=;
+	h=From:To:Cc:Subject:Date;
+	b=KCGFvEH8Y+g7Uma+tD6Geuk5flSGeXlMK4iUIg3bLwZqm0RPOa8dpc2m+W2MKTnHr
+	 9EyhjFPDswqBYSiD+Z0860azqYpriq6V/9bZCVYMmz1D2Iat7GO7N9aJipYozIv82A
+	 lcS5tFvrtcLfFR0V3E/R+HTb8bYQN0URBAQ2Ia6h8pUuoMKWaBzHlSXDEbyrFEJMPK
+	 wkuBIryn5aY0VoTy4Z11AbJ/MsgJ7a8lmFKRACo6a+NfWFJaoXPu0z9Q/Am3Olyh0R
+	 SPmmvpWG4uvQvayey517Akx7pcSKeusIOdDo5qwDjnQ9DE2xuh32qzHxejhYHolb+k
+	 LOOB5sYST1WBg==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 00/13] Improve handling of offline and read-only zones
+Date: Fri, 14 Aug 2026 15:31:48 +0900
+Message-ID: <20260814063201.1762743-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACOAw_zqOS0vHdQV6WoUJyxnDf=kdDAz27pNGDLdQLUdUYOzBQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Aug 10, 2026 at 09:53:14AM -0700, Daeho Jeong wrote:
-> On Mon, Aug 10, 2026 at 9:34 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> > This information was shared earlier with Daeho
-> > (https://b.corp.google.com/issues/515470309#comment45): [ ... ]
+Jens,
 
-This does not seem to be information available to the public.
+This patch series refactor some zone related code and improves the
+caching iof zone information and the management of zone write plugs in
+preparation for fully supporting storage element depopulation.
+Most of the functional changes here are around the management of zone
+write plugs to better handle read-only and offline zones as these
+conditions can become more common with storage element being depopulated.
 
-> f2fs threads are already freezable: f2fs_gc and f2fs_discard are
-> already registered with set_freezable() and call try_to_freeze().
-> However, a race window exists: a thread checks freezing() (false),
-> calls submit_bio(), and gets trapped inside __bio_queue_enter().
-> Because it gets blocked before reaching try_to_freeze(), it triggers a
-> PM freezer timeout.
+Changes from v3:
+ - Rebased on latest block/for-next
+ - Small modification to patch 4 to address Sashiko review comments
+   complaining about the potential for out of bound accesses to the zone
+   state array.
+ - Added review tags
 
-This does sound very much like a block layer freezing issue.
+Changes from v2:
+ - Minor changes to patches 1, 5, 7 and 8 to address some of the Sashiko
+   review comments (a lot of these comments point to cases that cannot
+   happen in practice or that are non-fatal and would generate errors due
+   to a user invalid use of the device).
+ - Applied review tags
 
-> Point taken. Aside from this f2fs patch, I agree that addressing this
-> at the block layer or PM subsystem level would be a much cleaner,
-> system-wide solution.
-> I’ll give more thought to how we can properly solve this race
-> condition for the entire system, and I'll loop in the relevant
-> PM/block maintainers if a viable generic approach emerges.
+Changes from v1:
+ - Fixup error path change in patch 1
+ - Use WARN_ON_ONCE in patch 4
+ - Dropped patch 14
+ - Applied review tags
 
-Thanks, it would be great to fix this properly.
+Damien Le Moal (13):
+  block: remove disk_free_zone_resources()
+  block: refactor disk_revalidate_zone_resources()
+  block: refactor disk_update_zone_resources()
+  block: remember a zone type regardless of its condition
+  block: refactor bdev_zone_is_seq()
+  block: introduce disk_for_all_zone_wplugs()
+  block: drop all zone write plugs on capacity changes
+  block: propagate readonly and offline conditions to zone write plugs
+  block: always treat offline and read-only zones as dead
+  block: fail zone management operations to read-only and offline zones
+  block: allow read-only and offline conventional zones
+  block: simplify disk_zone_set_cond()
+  block: flag zoned disks with GENHD_FL_NO_PART
+
+ block/blk-core.c       |   7 +-
+ block/blk-zoned.c      | 790 +++++++++++++++++++++++++----------------
+ block/blk.h            |   6 +
+ block/genhd.c          |   7 +
+ include/linux/blkdev.h |   2 +-
+ 5 files changed, 498 insertions(+), 314 deletions(-)
+
+
+base-commit: 413ba2c89c48abdd0bafd5115806d43e1f414df5
+-- 
+2.55.0
 
