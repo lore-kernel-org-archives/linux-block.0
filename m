@@ -1,30 +1,30 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CDC1632E7
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 02:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCA224DFF9
+	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 02:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786759638; cv=none; b=iRlmstB32Lr5nPI31QfmWPnBV6C/tcNBZRTqTWA+Q4tlqK6l6wQV1xm58bWo2yghUV6rhHzlW+ZMJv9IqdLdsP1AVGaCyTt7gIRjyAi66IYOQcUuMCAhuNAZn5IF/yRU1aHv26GdKJbmm0vG9Ck3uzJIKg0U7t0S3gxgRx0JbxQ=
+	t=1786760015; cv=none; b=KlpzrNCrMwBmuayFCEGHwI/HzBixsMVkS8nrwfyDDq8DEMndbEMTmpdgwXWzj0tugDgCHWZZD1OesaU2QZBDAZzOlKdcdrTvGvTws5F6QMK974kXUzXcCBUrt2yBzo1jZZghM/52CTLLHIvi6a7kbUKY2AwXgMz0sYUZFaE4qek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786759638; c=relaxed/simple;
-	bh=Q2a5ZcCPbsCZ/5jg31PhFGnD0Fi5Vp/Tk8Gpb3zi8NM=;
+	s=arc-20240116; t=1786760015; c=relaxed/simple;
+	bh=7WddneGnSlf5HimcHNS1oz2C+7kFiRdMg8VIR++jEFc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HrL98Sl/lxjoO48c8neKAAoLSBuG6LJkCMQMlVjUFzQg9t1zUj4m6Dv4EaexOMbCWoQS0SLNa4UKU0tiXwh9gvzNSUlQ+b09AxM0NHuwCplGYYMQThyUuS5S1GT+St0pViTvCRzJIOgijnCcs8ydZUtUoEECDDdQ9w926DL3Ht0=
+	 In-Reply-To:Content-Type; b=bevjmltwFctpOLOdY8kdGL7sDUrTgcEqpIZsptKOYwcgbvIkxf93yqnGQzefRF0DVcRdaMM9ka7yT8HThfb9V4Gsd1YU0Hf/Ihfqe0066h4V7EUae7Dz6wLpb9SwUhDdDRyAAsiRkyoQGmE+9wZA8sh8jO10rKnobEpAAxPzcQQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hMMsw2JN3zYQtpf
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:07:00 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hMN1D2YZ2zYQtmJ
+	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:13:20 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id B579D40750
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:07:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id C1DCF4056D
+	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:13:29 +0800 (CST)
 Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgC3pkXMyX9qc_JrCQ--.6508S3;
-	Sat, 15 Aug 2026 10:07:09 +0800 (CST)
-Message-ID: <4591d9cc-3dcb-46b8-833e-4a98a0bbdc8e@huaweicloud.com>
-Date: Sat, 15 Aug 2026 10:07:08 +0800
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgBXR0ZHy39qG31sCQ--.6543S3;
+	Sat, 15 Aug 2026 10:13:29 +0800 (CST)
+Message-ID: <d16887c3-8ebe-4bf3-8a11-9cecb39e315b@huaweicloud.com>
+Date: Sat, 15 Aug 2026 10:13:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,215 +32,103 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] null_blk: serialize configfs attribute updates with
- device setup
-To: Niklas Cassel <cassel@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Shaohua Li <shli@fb.com>, Kyungchan Koh <kkc6196@fb.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
- syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com,
- linux-block@vger.kernel.org
-References: <20260813141456.1625857-2-cassel@kernel.org>
+Subject: Re: [PATCH V6 00/10] null_blk: fix init/exit races and memleaks
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, dlemoal@kernel.org,
+ nilay@linux.ibm.com, bvanassche@acm.org, yukuai@fygo.io, kch@nvidia.com,
+ johannes.thumshirn@wdc.com, kbusch@kernel.org, linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com, chengzhihao1@huawei.com
+References: <20260725022509.714271-1-wozizhi@huaweicloud.com>
 From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <20260813141456.1625857-2-cassel@kernel.org>
+In-Reply-To: <20260725022509.714271-1-wozizhi@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgC3pkXMyX9qc_JrCQ--.6508S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Ww47ZFW3Cry5ur4fur18Grg_yoWxAr4rpF
-	W0ga1Ygry8GF17Za4qvw1DuFy5Cw1kZryxGryfA34fC3WDZr9YyryvkF45X3W8G3ykCF4r
-	Xa1DuFsxCFWUur7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x
-	0267AKxVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
-	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0E
-	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
-	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
-	xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UpyxiUUUUU=
+X-CM-TRANSID:_Ch0CgBXR0ZHy39qG31sCQ--.6543S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr47Gry5AryDtw15Cr1rZwb_yoW5Ar17pa
+	9I93W5Kw4DKr47ArZFkw13ua4rZws5G3yUWrnrJw1rCFWY9F109rn7Cr45XryDJ393WrZI
+	qanFv3s5Aa4qv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUb_Ma5UUUUU==
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hi Niklas,
+Hi Jens, all,
 
-在 2026/8/13 22:14, Niklas Cassel 写道:
-> The attribute store methods generated with NULLB_DEVICE_ATTR() refuse to
-> change the configuration of a live device by testing
-> NULLB_DEV_FL_CONFIGURED, but that flag is only set by
-> nullb_device_power_store() after null_add_dev() has returned, and the
-> store methods take no lock at all. configfs only serializes writes to
-> the same open file (buffer->mutex), so a write to any attribute can run
-> concurrently with null_add_dev() and change the device configuration
-> while it is being used.
-> 
-> null_add_dev() reads the configuration several times, e.g. dev->zoned is
-> read once to set up the queue limits and once to initialize the zone
-> resources:
-> 
->    CPU0: echo 1 > nullb0/power         CPU1: echo 1 > nullb0/zoned
->    nullb_device_power_store()
->      mutex_lock(&lock)
->      null_add_dev()
->        if (dev->zoned) -> false
->          /* no BLK_FEAT_ZONED */       nullb_device_zoned_store()
->                                          test_bit(FL_CONFIGURED) -> 0
->                                          dev->zoned = true
->        blk_mq_alloc_disk()
->          /* queue is not zoned */
->        if (nullb->dev->zoned) -> true
->          null_register_zoned_dev()
->            blk_revalidate_disk_zones()
-> 
-> blk_revalidate_disk_zones() is then called for a queue that does not
-> have BLK_FEAT_ZONED set, which triggers its WARN_ON_ONCE() and fails the
-> device setup with -EIO:
-> 
->    WARNING: CPU: 2 PID: 322 at block/blk-zoned.c:2357 blk_revalidate_disk_zones+0x4c/0x560
-> 
-> Clearing dev->zoned in the same window is worse: the queue is created
-> with BLK_FEAT_ZONED but the zone resources are never initialized, so
-> add_disk() succeeds for a zoned disk that has no zones. And a store that
-> lands after the last dev->zoned test leaves dev->zoned set while
-> dev->zones is still NULL, which null_process_zoned_cmd() dereferences on
-> the first write.
-> 
-> Fix this by taking the global lock, which nullb_device_power_store()
-> already holds across null_add_dev() and null_del_dev(), around both the
-> NULLB_DEV_FL_CONFIGURED test and the update of the device configuration.
-> The submit_queues and poll_queues apply callbacks are now called with
-> that lock held, so remove the locking they did themselves.
-> 
-> Since the store methods can run as soon as configfs_register_subsystem()
-> returns, that is, before null_init() gets to mutex_init(&lock), also
-> initialize the lock statically with DEFINE_MUTEX().
-> 
-> Fixes: 3bf2bd20734e ("nullb: add configfs interface")
-> Reported-by: syzbot+643a6dd130546afdf1fb@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/linux-block/6a7d0b3f.ac361c09.22ff0a.004c.GAE@google.com/
-> Signed-off-by: Niklas Cassel <cassel@kernel.org>
-> ---
->   drivers/block/null_blk/main.c | 39 ++++++++++++++++-------------------
->   1 file changed, 18 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index f8c0fd57e041..2e8f99873956 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -66,7 +66,7 @@ struct nullb_page {
->   #define NULLB_PAGE_FREE (MAP_SZ - 2)
->   
->   static LIST_HEAD(nullb_list);
-> -static struct mutex lock;
-> +static DEFINE_MUTEX(lock);
->   static int null_major;
->   static DEFINE_IDA(nullb_indexes);
->   static struct blk_mq_tag_set tag_set;
-> @@ -340,7 +340,15 @@ static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
->   	return count;
->   }
->   
-> -/* The following macro should only be used with TYPE = {uint, ulong, bool}. */
-> +/*
-> + * The following macro should only be used with TYPE = {uint, ulong, bool}.
-> + *
-> + * The device configuration is modified under the global lock to serialize
-> + * attribute changes against null_add_dev() and null_del_dev(): without this,
-> + * an attribute could be changed while null_add_dev() is running, that is,
-> + * before NULLB_DEV_FL_CONFIGURED is set, which would let null_add_dev()
-> + * observe inconsistent values for the device configuration.
-> + */
->   #define NULLB_DEVICE_ATTR(NAME, TYPE, APPLY)				\
->   static ssize_t								\
->   nullb_device_##NAME##_show(struct config_item *item, char *page)	\
-> @@ -360,13 +368,16 @@ nullb_device_##NAME##_store(struct config_item *item, const char *page,	\
->   	ret = nullb_device_##TYPE##_attr_store(&new_value, page, count);\
->   	if (ret < 0)							\
->   		return ret;						\
-> +	mutex_lock(&lock);						\
->   	if (apply_fn)							\
->   		ret = apply_fn(dev, new_value);				\
->   	else if (test_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags)) 	\
->   		ret = -EBUSY;						\
-> +	if (ret >= 0)							\
-> +		dev->NAME = new_value;					\
-> +	mutex_unlock(&lock);						\
->   	if (ret < 0)							\
->   		return ret;						\
-> -	dev->NAME = new_value;						\
->   	return count;							\
->   }									\
->   CONFIGFS_ATTR(nullb_device_, NAME);
-> @@ -379,6 +390,8 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
->   	struct blk_mq_tag_set *set;
->   	int ret, nr_hw_queues;
->   
-> +	lockdep_assert_held(&lock);
-> +
->   	if (!dev->nullb)
->   		return 0;
->   
-> @@ -421,25 +434,13 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
->   static int nullb_apply_submit_queues(struct nullb_device *dev,
->   				     unsigned int submit_queues)
->   {
-> -	int ret;
-> -
-> -	mutex_lock(&lock);
-> -	ret = nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
-> -	mutex_unlock(&lock);
-> -
-> -	return ret;
-> +	return nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
->   }
->   
->   static int nullb_apply_poll_queues(struct nullb_device *dev,
->   				   unsigned int poll_queues)
->   {
-> -	int ret;
-> -
-> -	mutex_lock(&lock);
-> -	ret = nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
-> -	mutex_unlock(&lock);
-> -
-> -	return ret;
-> +	return nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
->   }
->   
->   NULLB_DEVICE_ATTR(size, ulong, NULL);
-> @@ -2166,8 +2167,6 @@ static int __init null_init(void)
->   	if (ret)
->   		return ret;
->   
-> -	mutex_init(&lock);
-> -
->   	null_major = register_blkdev(0, "nullb");
->   	if (null_major < 0) {
->   		ret = null_major;
-> @@ -2211,8 +2210,6 @@ static void __exit null_exit(void)
->   
->   	if (tag_set.ops)
->   		blk_mq_free_tag_set(&tag_set);
-> -
-> -	mutex_destroy(&lock);
->   }
->   
->   module_init(null_init);
+Gentle ping on this series.
 
-Thanks for the patch. This issue has already been addressed in my 
-null_blk series posted back in July:
+It's been a while since I posted it back in July. The series fixes
+several issues in null_blk. Most of the patches have already collected
+Reviewed-by tags.
 
-https://lore.kernel.org/all/20260725022509.714271-1-
-wozizhi@huaweicloud.com/
-
-This includes DEFINE_MUTEX and the serialization, but this series hasn't
-been merged yet. It has already collected some Reviewed-by tags, and I'm
-hoping it can be picked up for mainline soon.
+In the meantime, I've noticed others starting to send patches for the
+same problems, which suggests these fixes may have gone unnoticed.
+Reviews on the remaining patches would be very welcome so the series can
+move forward.
 
 Thanks,
 Zizhi Wo
 
-
-
-
+在 2026/7/25 10:24, Zizhi Wo 写道:
+> From: Zizhi Wo <wozizhi@huawei.com>
+> 
+> This series fixes several issues in null_blk around lock initialization,
+> memory leaks, concurrent configfs access, and module init/exit.
+> 
+> See the individual patch descriptions for details.
+> 
+> Changes since v5:
+> - Add a new patch converting the file-scope mutex users to gaurd(mutex).
+> - Simplify the last two patches accordingly.
+> https://lore.kernel.org/all/20260714041805.1088702-1-wozizhi@huaweicloud.com/
+> 
+> Changes since v4:
+> - Modified patch 5 to fix the check-and-deref race on dev->zones in
+>    zone_cond_store().
+> - Simplified the fix in patch 7.
+> https://lore.kernel.org/all/20260709100452.3520482-1-wozizhi@huaweicloud.com/
+> 
+> Changes since v3:
+> - Added patch 5 (zones array memleak) and patch 6 (cleanup).
+> - Added patch 7 (NULL-ptr-deref on shared tag_set queue shrink).
+> - Patch 9: reworked the fix from v3's patch 6 to take the file-scope
+>    lock in _store instead of scattering READ_ONCE/WRITE_ONCE.
+> https://lore.kernel.org/all/20260708073917.2172392-1-wozizhi@huaweicloud.com/
+> 
+> Changes since v2:
+> - Dropped the lock rename patch; the rename and locking rework will be
+>    sent as a separate series (per Damien's suggestion).
+> - Patch 3: fixed the tense in the commit message.
+> - Patch 4: also update dev->NAME in the "!dev->nullb" path, which was
+>    previously lost.
+> https://lore.kernel.org/all/20260707025542.1299859-1-wozizhi@huaweicloud.com/
+> 
+> Changes since v1:
+> - Added patches 4-6, and modify the lock name in patch 2.
+> https://lore.kernel.org/all/20260706123507.3809871-1-wozizhi@huaweicloud.com/
+> 
+> 
+> Zizhi Wo (10):
+>    null_blk: use DEFINE_MUTEX for the file-scope mutex
+>    null_blk: register configfs subsystem after creating default devices
+>    null_blk: move unregister_blkdev() after destroying dev in null_exit()
+>    null_blk: free global tag_set on init error path
+>    null_blk: free zones array on device power-off
+>    null_blk: clean up null_del_dev() to use cached dev pointer
+>    null_blk: reject per-device queue resize for shared tag set
+>    null_blk: convert file-scope mutex users to guard(mutex)
+>    null_blk: serialize configfs attribute stores with the lock
+>    null_blk: serialize configfs attribute shows with the lock
+> 
+>   drivers/block/null_blk/main.c | 92 ++++++++++++++++-------------------
+>   1 file changed, 43 insertions(+), 49 deletions(-)
+> 
 
