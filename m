@@ -1,134 +1,118 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f3.google.com (mail-pj2-f3.google.com [74.125.227.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCA224DFF9
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 02:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536DE3403EC
+	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 09:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786760015; cv=none; b=KlpzrNCrMwBmuayFCEGHwI/HzBixsMVkS8nrwfyDDq8DEMndbEMTmpdgwXWzj0tugDgCHWZZD1OesaU2QZBDAZzOlKdcdrTvGvTws5F6QMK974kXUzXcCBUrt2yBzo1jZZghM/52CTLLHIvi6a7kbUKY2AwXgMz0sYUZFaE4qek=
+	t=1786784822; cv=none; b=PmPjmMC1qoSkb+854OkJRyd0VpkFIStQNWYafUKNoptKzPl6vAZc3GBSdp+lsplkX70X7kW4iLT5U1UpE52iXe4/t/XUzNLNV1eoISWqHnqWrZTYZyt/SzFG3In+RjG0fIa/O59VfWLd96XvuStCgX5kHau0gsstyyxKNE4+4DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786760015; c=relaxed/simple;
-	bh=7WddneGnSlf5HimcHNS1oz2C+7kFiRdMg8VIR++jEFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bevjmltwFctpOLOdY8kdGL7sDUrTgcEqpIZsptKOYwcgbvIkxf93yqnGQzefRF0DVcRdaMM9ka7yT8HThfb9V4Gsd1YU0Hf/Ihfqe0066h4V7EUae7Dz6wLpb9SwUhDdDRyAAsiRkyoQGmE+9wZA8sh8jO10rKnobEpAAxPzcQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hMN1D2YZ2zYQtmJ
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:13:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id C1DCF4056D
-	for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 10:13:29 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgBXR0ZHy39qG31sCQ--.6543S3;
-	Sat, 15 Aug 2026 10:13:29 +0800 (CST)
-Message-ID: <d16887c3-8ebe-4bf3-8a11-9cecb39e315b@huaweicloud.com>
-Date: Sat, 15 Aug 2026 10:13:27 +0800
+	s=arc-20240116; t=1786784822; c=relaxed/simple;
+	bh=wAiFwujyIjterOkwZFCo7R721Gkn7VU2TRwqe0C9g/o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=D6MstbkpLnpJ+9p1zOSL4aFD4sWlr0visVUCK3wTQ9XTKjRlgXYLoZfrx3tyJ/Gnm0GQrbbj5zf9TNLEbGsxmko/mb4DDpANKJHIO2lfF04LugaOPAVXQ7uUxIEQljL1WraxrEYfgbTai2lY7o+C5MXMTro0PcSbNczGNAyekyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQIFL1CY; arc=none smtp.client-ip=74.125.227.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQIFL1CY"
+Received: by mail-pj2-f3.google.com with SMTP id d9443c01a7336-2ca4f02483cso2358995ad.1
+        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 02:07:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786784821; x=1787389621; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=J3MBy4u760QCW0mvzUP5qVWLRhrqqvCOKuIcB/tU0/o=;
+        b=cQIFL1CYeOQyUSnOnYDnh7k6/75ra6U3Pr7pXcONCbKWHTM8tQ96sdsn2lqsk03tgH
+         IJ0EO+fUJmy4+UPzyD9m/KyRVUduKfHIJ3hUN6Nyfb0ytZ7JrOL0Y4hOP2fcHgTcWKay
+         eFLGA3YMnjj5eZ5AeSWE8cxQUcVCCDYsXMWfNW3b7sqh9cyr50sgXTQBLHtdgo6JD8Ub
+         9TiuewEo/3DV8Fk5+9vXp+Zt31j8MdRoyFEGUwUsmC+iLh7jHgc2OiW+yRAsxlIQUteD
+         eGpq//i5LbTRSKeOdOi+CSOEiA3bqTxLW+qkaakXnI/6eD5k9FQ55zTo3fxkox7t4Qqh
+         s8bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786784821; x=1787389621;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=J3MBy4u760QCW0mvzUP5qVWLRhrqqvCOKuIcB/tU0/o=;
+        b=AXg64PBKAT1unmsf5WXC+o16maUWuVRD8fofZXb6wVq6axpYU1rCzn6C8exUq3tnBN
+         w2WhDrD1I6kAneMkg0nwfYoNefY9Y5GbIVjik2euGdM1dGVdsxDBJpYHcCmNoOoj+CMZ
+         iOFa1HgPTn13idWxaVyAt5Npr9zlWbOarZZyRgS/ut9td0S2gnIV+NA4UrexguQspfHN
+         GiEBSUIxgP5M6x+Ytl9up5fCOQmkBehA/J5be0fUmCyhv2FLAgWpCqz5TavZm/NMxLty
+         UGw5Kc4e2DTjX734WCzp96WQOKt6aeP0lcYtE14ALGENtJpl6/KdpoZBUrA0NZlxO4uQ
+         t+ZA==
+X-Forwarded-Encrypted: i=1; AHgh+RpnwscrJ+ztofRVMq2Vojt6dmQK2hU5JlGHHpGddxw6rSf+f6aTyeAo00EuB/HlWg9Ik9f+UP9SdnElKw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4MjlOMQW+tWBbiCZXIVR7evsrY6tfl/QYteikYMCmbDJeDLto
+	5bGGlqoa1aV5/Jz4W9N9KkrAVJdTCuF+ayUkkz9RfVw9cZc6K2eFcw8f
+X-Gm-Gg: AR+sD11TIlvoPJC4/3vTnZez0mSsbM4f8kZfzac/dphKMcmgn/fDgr6CU7TrhqAxqTy
+	p3G7zOJkOVhYl3ZkfZFEAeGv0aXJWItcIHkOFNCLXWEo3duvlEO7zGSmThZwKTZcP+0W8Ze4ZCW
+	MQNsRDUWO/TIGCS4Itcv5ZD6Fdvt8TmGrBTFx97tQBtLC6B+rj529E9dAxZMZSj0SonB8e7rkrq
+	gIqpfhKuhA3GROL6qdKfjG9xYgknVWimTweiZjqdVQtL3is+uC0BRI4QmkYvZ2rs6S3JQFmT/Xp
+	PNQwglhNJk3Qtk+C8auAx8nzgplnqLIG/BrD3Qfu8YRfKearmyD7B3OHSqJZqWy0CALXlBda2Bi
+	3B5I5yLb9wUR+IMEGNS8f0zWmxCWIezEw6JkLevXbqOdmE2OFR+1q1k0JI3/8oE8ad152GeLyJu
+	DgN7FAkwOt+ZmvGVYV6tC786/EKc/+dKl/6gmquteChuUE2gc2xr3W4hO0fFe3+blOeQ==
+X-Received: by 2002:a17:90b:574d:b0:38e:5828:a446 with SMTP id 98e67ed59e1d1-3933b1091eemr9809868a91.19.1786784820512;
+        Sat, 15 Aug 2026 02:07:00 -0700 (PDT)
+Received: from localhost.localdomain ([61.8.202.166])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-394eaca2959sm5587140a91.9.2026.08.15.02.06.57
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 15 Aug 2026 02:07:00 -0700 (PDT)
+From: Zhenxian Ma <mzx199711@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org,
+	Zhenxian Ma <mazhenxian@xiaohongshu.com>
+Subject: [PATCH v2 0/2] block: avoid redundant flushes for O_DSYNC direct writes 
+Date: Sat, 15 Aug 2026 17:06:51 +0800
+Message-Id: <cover.1786782832.git.mzx199711@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20260812130335.60354-1-mzx199711@gmail.com>
+References: <20260812130335.60354-1-mzx199711@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 00/10] null_blk: fix init/exit races and memleaks
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, dlemoal@kernel.org,
- nilay@linux.ibm.com, bvanassche@acm.org, yukuai@fygo.io, kch@nvidia.com,
- johannes.thumshirn@wdc.com, kbusch@kernel.org, linux-block@vger.kernel.org
-Cc: yangerkun@huawei.com, chengzhihao1@huawei.com
-References: <20260725022509.714271-1-wozizhi@huaweicloud.com>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <20260725022509.714271-1-wozizhi@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgBXR0ZHy39qG31sCQ--.6543S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr47Gry5AryDtw15Cr1rZwb_yoW5Ar17pa
-	9I93W5Kw4DKr47ArZFkw13ua4rZws5G3yUWrnrJw1rCFWY9F109rn7Cr45XryDJ393WrZI
-	qanFv3s5Aa4qv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUb_Ma5UUUUU==
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hi Jens, all,
+This series removes redundant cache flushes on the O_DIRECT | O_DSYNC
+write path to a block device, following Christoph's review of v1.
 
-Gentle ping on this series.
+  Patch 1 skips generic_write_sync() when the direct write was already
+  made durable by REQ_FUA.
 
-It's been a while since I posted it back in July. The series fixes
-several issues in null_blk. Most of the patches have already collected
-Reviewed-by tags.
+  Patch 2 stops setting REQ_FUA on synchronous O_DSYNC direct writes to
+  devices without FUA support, relying on generic_write_sync() instead
+  and avoiding per-bio POSTFLUSH emulation.  Asynchronous writes keep
+  REQ_FUA, since they cannot fall back to generic_write_sync().
 
-In the meantime, I've noticed others starting to send patches for the
-same problems, which suggests these fixes may have gone unnoticed.
-Reviews on the remaining patches would be very welcome so the series can
-move forward.
+Changes since v1
+[https://lore.kernel.org/linux-block/20260812130335.60354-1-mzx199711@gmail.com/]:
 
-Thanks,
-Zizhi Wo
+  - Split into two patches per Christoph's suggestion.
+  - Patch 1 tracks need_sync (default false) instead of dio_fua_done.
+  - Added Patch 2 for the no-FUA case; asynchronous submitters stay at
+    parity with mainline.
 
-在 2026/7/25 10:24, Zizhi Wo 写道:
-> From: Zizhi Wo <wozizhi@huawei.com>
-> 
-> This series fixes several issues in null_blk around lock initialization,
-> memory leaks, concurrent configfs access, and module init/exit.
-> 
-> See the individual patch descriptions for details.
-> 
-> Changes since v5:
-> - Add a new patch converting the file-scope mutex users to gaurd(mutex).
-> - Simplify the last two patches accordingly.
-> https://lore.kernel.org/all/20260714041805.1088702-1-wozizhi@huaweicloud.com/
-> 
-> Changes since v4:
-> - Modified patch 5 to fix the check-and-deref race on dev->zones in
->    zone_cond_store().
-> - Simplified the fix in patch 7.
-> https://lore.kernel.org/all/20260709100452.3520482-1-wozizhi@huaweicloud.com/
-> 
-> Changes since v3:
-> - Added patch 5 (zones array memleak) and patch 6 (cleanup).
-> - Added patch 7 (NULL-ptr-deref on shared tag_set queue shrink).
-> - Patch 9: reworked the fix from v3's patch 6 to take the file-scope
->    lock in _store instead of scattering READ_ONCE/WRITE_ONCE.
-> https://lore.kernel.org/all/20260708073917.2172392-1-wozizhi@huaweicloud.com/
-> 
-> Changes since v2:
-> - Dropped the lock rename patch; the rename and locking rework will be
->    sent as a separate series (per Damien's suggestion).
-> - Patch 3: fixed the tense in the commit message.
-> - Patch 4: also update dev->NAME in the "!dev->nullb" path, which was
->    previously lost.
-> https://lore.kernel.org/all/20260707025542.1299859-1-wozizhi@huaweicloud.com/
-> 
-> Changes since v1:
-> - Added patches 4-6, and modify the lock name in patch 2.
-> https://lore.kernel.org/all/20260706123507.3809871-1-wozizhi@huaweicloud.com/
-> 
-> 
-> Zizhi Wo (10):
->    null_blk: use DEFINE_MUTEX for the file-scope mutex
->    null_blk: register configfs subsystem after creating default devices
->    null_blk: move unregister_blkdev() after destroying dev in null_exit()
->    null_blk: free global tag_set on init error path
->    null_blk: free zones array on device power-off
->    null_blk: clean up null_del_dev() to use cached dev pointer
->    null_blk: reject per-device queue resize for shared tag set
->    null_blk: convert file-scope mutex users to guard(mutex)
->    null_blk: serialize configfs attribute stores with the lock
->    null_blk: serialize configfs attribute shows with the lock
-> 
->   drivers/block/null_blk/main.c | 92 ++++++++++++++++-------------------
->   1 file changed, 43 insertions(+), 49 deletions(-)
-> 
+Tested on Linux 7.2.0-rc7 with a Seagate ST20000NM007D (fua=1), 4 KiB
+O_DSYNC direct writes, mainline vs this series:
+
+  Sequential: 119.7 -> 7497.0 IOPS
+  Random:     156.1 ->  666.4 IOPS
+
+On a loop device without FUA there was no regression, and async
+O_DSYNC direct writes were verified durable with fio verify=crc32c
+(262144 IOs, no errors).
+
+Zhenxian Ma (2):
+  block: skip redundant flush for O_DSYNC direct writes
+  block: only use REQ_FUA for direct writes if the device supports it
+
+ block/fops.c | 40 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 7 deletions(-)
+
+-- 
+2.43.5
 
