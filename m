@@ -1,74 +1,73 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6BBC2EA
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 00:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951C14B0497
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 00:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786838546; cv=none; b=iB/ilsoIAyQONud7qZSfqSsC2S1kDAvkIOiIviI+sYBmhA8be9isNz0bfert6WXsus6ZKgXqScyVNgQ0exMjvjs4+znqeVJ2BcOGsWd8YDO7yoHy5JnIKL/+0zM0e66SQbeHkci/LddVPgKFhY3T8z+z5pp7JogBg7kvaXx6a2Y=
+	t=1786838552; cv=none; b=aVvq9K5jEqA8lhmE7bpcwA/cVxW/5lT48GLyfEN1vifn9ZVO4xskJteswO3sCz2o10nxq52oJYncN6wLtGKKXAnT4+ngsrNAGSVxIr8ft4xRWacMttOwYo6aMm2s2ruc28gjKhXJkIYiP42xt/62kkddKFY47Wac3nwr5L8EYcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786838546; c=relaxed/simple;
-	bh=uXchtAgIJ0fURM9ygukRqhjROnhWDMmRQ7wlREF2dTo=;
+	s=arc-20240116; t=1786838552; c=relaxed/simple;
+	bh=K/ARUTpBpXqbP35eA1H0VvAiuYE/UpFOcyaZrCvbfVY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LmAdCRwNoqrybvWA0FJwclHfAqHoXWDOtsPrCVNS/dVSpqS9ebm7NIEdPMBq+3LsTbHFVudWNkEjGEUYatcILw974psJW3GEkeeLb4rlihvZMpmV8EY0a1afcNHAsEH29OBLeMYy3HGJkGhYFBaQd9fpqQtjRgM0BKvNmdcQBmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=wKF9FK4C; arc=none smtp.client-ip=209.85.167.177
+	 MIME-Version:Content-Type; b=TmdFGHPbZcLsHnOycVLGNfkm7+nuhkgp8mo+fiEGTZ8FSlOcAcEq7mfnctXs6XHKv8evu9TmTeXNcEPCucZiSZrLYLe3bGgwJGZXYuSfyXwUMpQE+F2HNjHkvEWRbMVa5il6iEUh0nLWCBxXl4+YRPuMElCe6VxbjIa/PoKH1+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Q021mY2c; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="wKF9FK4C"
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-4a45b3f0becso1491894b6e.1
-        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 17:02:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Q021mY2c"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4a45b3f0becso1491903b6e.1
+        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 17:02:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786838544; x=1787443344; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786838549; x=1787443349; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=d6liC8uD3F6/S6ZJfKuSXQx8GeoIfO2pZ4/+PmXMPPM=;
-        b=wKF9FK4CbPXJJtkrxhSXVfyAaFw/G1dFG9qGWNv3SuLl9afv3L4Ro2JD4WizODXvRJ
-         UC4AuigLKvTJ1yK2/jGJ+iMyijPz1qtLC/eoNdq3bG6Kra245qPKL3cNPI1xBkcijD1w
-         b0cc4A6+3SIcLZ0tUTKJRZO5KCGtXLMMr2LIXteGamMuz9vH4756Jz6mKawS6bTx7g7e
-         S1umDhYilud8n2CMAZEfts9HzY2t85X6CCXItwWpkQF/AReGrtUYZ3mU9JmoOFUTuy7O
-         wi+WdwANFSlOZXmgtYQcX5WyMXxRVEQtZUGOuSRHHg7KdQkpjfksExVT7dd/xWecqP1C
-         UJPw==
+        bh=WYmCcXIgtJhZ7sa5k7zB7n+SMsUIkJx3UOjxv84yY3Q=;
+        b=Q021mY2ckxt2KbG1Zy53wBDg0ahoyl2PYygYHPUI4mf3EDddm4QUEsRpAzPbEkVVkp
+         uYm6lYQiKSpBzlMQcKDReEXbV5Cuk04mQN7CW4HaDdHj7A8ca+mY2nkfHvhpSPclukdj
+         DRfTk0koUwDHZgsKYecyZKFDPB/spFZGyl3fiE0WKwAlo2QVvyX+FMyr8gbEDoAb82Ps
+         KHHIYaI+XemnrFGYBvU2kmm09J0nFHFPsQV5dqyRBDQGR3jXrTjbaXzUx5dnYXghfe+X
+         Wqh2dhojzQZSqTH4gA3U3GpvA4c9k4zF40wqQbfI+GgfXxTbscfcx7o3T/XkDO6l9Ei4
+         +5VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786838544; x=1787443344;
+        d=1e100.net; s=20251104; t=1786838549; x=1787443349;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=d6liC8uD3F6/S6ZJfKuSXQx8GeoIfO2pZ4/+PmXMPPM=;
-        b=Mfaq3HAaNG29qKPdWwG/xHB8qsihdonncRv2Rvuh6vG05AgvgE1a8CO3sjjAlPl2Tn
-         3IB0G5AEj/eXvS4tGP9+InYU6P1W+t3DMp0bLSPZKEE05rXSxVwVQzTWhs1EAVBXahRC
-         bhC9BKVSpWDCIjDE32RB6v57JR4GstIOIIYxTGNLqFq06aqYemQEv8EbIPOwFs8QGZiQ
-         k2Tlh3X6UucOplzPAFNlkBKJbxvh4nPfu9xF9AmqJ2hwaI8Gz0MwV4jAVklKtPiyhfOi
-         vwXBofTUHaM5IvfvZRo7V0EC46JTmY7RxgC8LCpfr5DjP5hjkZjqYsSiti1sO/c8ke2Q
-         Wk9Q==
-X-Gm-Message-State: AOJu0Yx8TbIGRLLDJ5h5bzPBmAT/5CzC1RbOGxxr8CGRiqjEgOtsdUiD
-	OQKpqGOwkfWWx0eYFBobT+BcxyxMm2AIzWc794ID7gY5KwWamRFT5iEebcBtr/yTf68=
-X-Gm-Gg: AR+sD12jZ6+9wXdG8IYS8M+bwLTKR2S5fprsYQhfJwGRQQsbp8LLXfwhtyw+bLckMMP
-	M9Rqvby5iW4t5DMV1j7vPtqwKLRIIJs6eVJtEu7Tp/J8b74lXdEgi4CfX00c/tg2KGsuXPVEz7l
-	pdAbTHCnaCyDzdO4h6o8gkWYwThbxUO5kmy2AQfk7QGfrW3JSKFt1TgcX5y8Hu6WRadKM0FBPdU
-	OSHvmM7Jw1u/9HdIcSp/+qo6/VHd78auslZNDRA4x2Oe+steGFo/qgcOjSVqumEoTvYeTtq8FzI
-	iQ4N83BmctUQLNbrfjscpCOO5gHFbpf483Ghf9VfrkJALYKw4MzghjVJmnZJZ1aXZPjbRAs0vSv
-	mqjcn9B0EKyd1avRrG1Lg7GQckt45BlzhPFyowROcC85AQis07EYYTh7oerp+x9Zud4oNGNI74t
-	AFNofD1dfoLk2Z4AFbWiKDfGySJwfA9QzaJZWS7Mo53LTrqAbncuniOe0NumtH3weYTTayvPBfc
-	ABU8e1scRVtWmspL9EO3YrAz1OKHbDm64wwGTFgBw==
-X-Received: by 2002:a05:6808:1918:b0:4ab:32ea:95f6 with SMTP id 5614622812f47-4b241e5f0c0mr15455005b6e.13.1786838543975;
-        Sat, 15 Aug 2026 17:02:23 -0700 (PDT)
+        bh=WYmCcXIgtJhZ7sa5k7zB7n+SMsUIkJx3UOjxv84yY3Q=;
+        b=EPAntAzp6afU9vI3ZJtWJPYvyyW+Sc9gsS+YHQcKyD3ddTEPU95v7+XUtMXnRJcnig
+         y3n0tUOzuyl3UWnzTV1oSx8hyXZYdA+2gkDVE1hd7UQuhN0QKyDA60LySt1n2hud9QKu
+         nyavdT1RHB4z+qe+hAsPngSAdTkajvA6kMl00yqVHCq5qVZwD9eHlpKvjYUvzXR9M2H+
+         MQwj/3p/tHm//iDAuoftuiXNKX/NXZAp295XnFx7L/R42q/DhKsgx3P2+T3c1vIQaYwL
+         jEd7o02C6tgW1Cz8aLPxvZwlJUg7BMW96UONQ9/ZbCcEBlS6kCR9Y4x1Lbh+Xy7uSeWe
+         AL/Q==
+X-Gm-Message-State: AOJu0Yw1bf40ooZeOuAl6tILXONN91lQcZsj+ly9k1Eqe0tvOiRwLZD0
+	RXbdit0u++a6lZ5WBAoWlvh1hejYTuwJX0doLxwdXEphlZK4tVctbC09Ud60tWxMCUZCX2QL7Ah
+	KoVw1uvYLUA==
+X-Gm-Gg: AR+sD10bLOw8JBd8t0M9AMuHOTTZevtPY+WvNOdMCaQeUHHks4kNrYoyVdjT9XaThEA
+	62lk3+poCgeFbFUQJXfr8gsEOM88cvOQYEv4AvV3Lyhx0X/IwWW8ByAtX2wSLYw2yxlepaxZIQD
+	4mXg+Wb+mYfQTZJZv0KfsHDzc+wZBpX/EoF7+gwbCv1xJvq18etAIhewOL9UHVKnukl4s+zG63X
+	E2O9gEhyFfKtTl3Omkn8rSQox5052Fplc+nQLcwn3hGhYkCsh9lmkBO8YsxjB/me6p21Y+CYoCG
+	plBjxZyy9MhdFfWeqRSbpIj6BiA3jutLgNTAUW0WHFKoOJ2vZER8gImsShv8jdNNJojSyDzDsXn
+	agciSqSZDJv7tn+s0E/ISS0e/Xnp9AVSQfcpLSiQKlioa6Ss9BUciReGneA/xFyMH2inmzB0SbG
+	TPj26BsayBoWKS16cSHYQ3LPAGHhud2zQ5Hq3Rol964nYiZR0lwjUWhl6lR/sCCP84WUn7ft7V6
+	+0c5dOdq98h/QWmZTne2eapJ4Q8ZnhLRaiAt09BVA==
+X-Received: by 2002:a05:6808:3086:b0:490:315d:e0d5 with SMTP id 5614622812f47-4b241ed317amr15551288b6e.16.1786838549543;
+        Sat, 15 Aug 2026 17:02:29 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b24d92462dsm4347729b6e.5.2026.08.15.17.02.18
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b24d92462dsm4347729b6e.5.2026.08.15.17.02.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 17:02:19 -0700 (PDT)
+        Sat, 15 Aug 2026 17:02:25 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Carlos Maiolino <cem@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
- Jan Kara <jack@suse.cz>, Tal Zussman <tz2294@columbia.edu>
-Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260810-xfs-dontcache-double-defer-v1-1-aea7484b3e49@columbia.edu>
-References: <20260810-xfs-dontcache-double-defer-v1-1-aea7484b3e49@columbia.edu>
-Subject: Re: [PATCH] xfs: avoid double deferrals for RWF_DONTCACHE writes
-Message-Id: <178683853844.1984298.10537884425177679953.b4-ty@b4>
-Date: Sat, 15 Aug 2026 18:02:18 -0600
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20260810144603.453283-1-hch@lst.de>
+References: <20260810144603.453283-1-hch@lst.de>
+Subject: Re: [PATCH] block: don't include blk-integrity.h in bdev.c
+Message-Id: <178683854415.1984298.3969271116846186515.b4-ty@b4>
+Date: Sat, 15 Aug 2026 18:02:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,15 +79,13 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 10 Aug 2026 12:39:19 -0400, Tal Zussman wrote:
-> XFS already defers some writes to a workqueue when transactions are
-> needed to process the I/O completion. Disable the block layer bio task
-> completion in this case to avoid a major performance drop.
+On Mon, 10 Aug 2026 07:45:59 -0700, Christoph Hellwig wrote:
+> Not needed, probably since this file was split out.
 
 Applied, thanks!
 
-[1/1] xfs: avoid double deferrals for RWF_DONTCACHE writes
-      commit: 913dcbc5670cb772bddf9799d17f975e020e8326
+[1/1] block: don't include blk-integrity.h in bdev.c
+      commit: 13c251b2b7fb150f22b55d652ee66c2a39c6635e
 
 Best regards,
 -- 
