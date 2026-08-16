@@ -1,119 +1,216 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBE7175A5
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 13:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A595346E58
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 15:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786886154; cv=none; b=cc62AmrPVSV6k50fbvSgeieAZzkcjcXDt5oI6UWLaiuT5wuEb+oR3zfuINMzQ3e8q2Jyzu5eMRTyBWTGYn5Kcl+jGrGMQNuap0oYViFcgukLt/cW6oOuxiZ1uS2YNojTsEXFugFBcHF5lRe0/QdX3tbun6qFKr3ghNLTiyXQCCQ=
+	t=1786892979; cv=none; b=F23QqLPcSGWQC09uUPdh+ytTZPHJGuMEK0ykPj7blnd0dPOL10xVDBZ31GbN+i9JuFyyKsWVVmw9LGJeMheAN69CJ2RVB5qE3QGL4GCGsTP4AQpZliT9VuzEdDTed1CGC4gxanhb1ZbBB0vQY44JiMXHcW3em6tvSxKadXTMklw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786886154; c=relaxed/simple;
-	bh=SXwcc6wU3Fbmvo5fCXIMJbPx2OeDA/b5+lepK2dVpFU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dkuz+px7S+y1MYNdtTjvnaR4IuwL60PRApDk6UezYUxQWVQfoW4p2BVbNM21seiI/8rVHEPEWOB+c5mGh8675PaVfoyA3OoYoYTY2FMo3OxYohNDxHofswnAfnOYdwCM9qEffja2awRgcxlxI3I5eT/77Y9uHKRLD8o2+P+xqOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eextGSR3; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eextGSR3"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-47f96c5b722so1570085f8f.0
-        for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 06:15:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786886152; x=1787490952; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mRIowMI6uQjCzFm50OiGoln3J1co3Pj4cxbC9/mQPCg=;
-        b=eextGSR3u+24B3aRGIrvwES/9MdjpFBjXQQ7Y2vzpkEMniMZQao8X/sWL7AfQ9uyEc
-         YVyq0/rVy2RJGdCJCsdggs6C5Hl0LBYZqXa5WNXhzwnYfFoWw9zq9OksMKs27LJbU9MG
-         1SCtvHwdA5H5K5Nga662CRFyS4HyACDA9JbFqQRD53kmUYgaT2mN2Mn/ZFNRu49g1MWd
-         jWPiA/EqQ5r22RoKjRbWE71xrVEwvXGmNQaHw1EVLYR3RJDXmxnaV57A+5CHraVHhDBO
-         Hqvh+ptUGVcTqLjom+Yljyh/7kUlkQgMSKYomU4Rh4uY/D4mq14tU48S5OF8rfUWmEL8
-         MPZg==
+	s=arc-20240116; t=1786892979; c=relaxed/simple;
+	bh=JlCT7Tjz2b9m7+URJCo3zLEgfl+7Y78A4svG4WZIAis=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=eiuPnD6YppiwIIHcsTv6H/rdcOb+y9hAiJXobil6JUfF2dUNScqmL7lqpibWqK5lttgC86+5yxIBdgXyfDBO4cIjNNWyfWulHKo8KiZ9Hw/YWqZP65mpOMu1Evy/gtHxyVY/+LQvvhjsN9mtN3txXOdmOnpAfIbTcoyGpKNOBdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-4519fdc5145so3105152fac.1
+        for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 08:09:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786886152; x=1787490952;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mRIowMI6uQjCzFm50OiGoln3J1co3Pj4cxbC9/mQPCg=;
-        b=KNgrBBinkl3NTtVbrbgznarqWrUY/svq4VBJ1bgVxlEdyg6KZStTb/UzJbqjcrZgwj
-         LSILZLz0i9ICKqDPb53TDhUPX2BX2v37JV7u2jEsRKJafEJLp1dQ6Q2yCtBxyWnecTTE
-         pd29vmgFYgzyjG68CAu5DW6uBSFVblpf8msIKn2d6WQauDB+A31uypy6rWWcONw3JkUn
-         3d3U1hUYFSmXZH0t9l2E/TvnwyzJy1cF7ixVXEzkU19xSI/ogiJds9Gcl0CE+qKlCAk0
-         MFvNd517V4T/Ijw6hzgU+tVZMesonUwWFU4d7dp2acz9lXCZ5mxGcvl1fVY7ZdXWSD/S
-         4KFA==
-X-Gm-Message-State: AOJu0YwjUWcp58q9F8QDPHfaXktKesJEoJTO5ECKBDXXgn+lC8Vz+u+y
-	28RHIAlQmaLNZTy2YYo78+VAtvcdYOEQxYqAH3qzGUTfv9c8the+7gh4FBga80qG
-X-Gm-Gg: AR+sD13w2lmEalzW8ErPfak/sQY1WWWV/EnpjV0YSc9T5YSubuSwBg6c7YEubaPSnu9
-	zw6lt6HWE8/kwFbOXHbdc3X5f/W0AlZR9SJsbkOe1IXIaibjQ/udiwL8YeXUqLd/YxBQTCW6HFF
-	WDgVNf7PRreg3nb0lQim12xR9oUCSagc4A9vrNRBaPOlkw+9J+ZIesfl/bHOigC7YAWvUMwxqtI
-	2os7gTYugaDKtRTw9AFymDiKeMcBG/4oRjnYAtZobBvP7+tzNlna8Ntopd44CLld31LwWmTBEJM
-	QMf80v0cF5pGcbRM8KsWW4yKGfPSFECicB4QAyVW2ZBd54QT2znTOqvDSkqazPLKL6CQUUll6dS
-	zzVceSZvZkV3lpWf0ZaVpY3D60qqaYy91UvYXDrV+dptX/n6++9c3j8CzjrKDldpQ+lPYhLg/mD
-	4C9upSFk0otuwl2HcldaImEud02Beia2NLUwOlXBSHc7ma+Gsq0y9v3P5B6mhMqJPb3SoCrDdPv
-	Rm6yiXGVWayP9epC4UZukNdLUkccocseBGWiVGKWPJoH9p7utU1jHQuM6wO9xzApiriRmY3w9HY
-	peS0ofuFYw==
-X-Received: by 2002:a5d:638f:0:b0:47f:9d0e:f8f with SMTP id ffacd0b85a97d-481607bcab5mr21796166f8f.26.1786886151544;
-        Sun, 16 Aug 2026 06:15:51 -0700 (PDT)
-Received: from macbook-pro-de-bryan.home ([2a01:e0a:d7f:f4f0:306b:5f99:5378:73e0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f2cc81csm24721295f8f.34.2026.08.16.06.15.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Aug 2026 06:15:51 -0700 (PDT)
-From: Bryan Boquel <boquelbryan6@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bryan Boquel <boquelbryan6@gmail.com>
-Subject: [PATCH 2/2] blk-mq-dma: fix typo in DMA iterator kernel-doc
-Date: Sun, 16 Aug 2026 15:14:56 +0200
-Message-Id: <20260816131456.16374-3-boquelbryan6@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
-In-Reply-To: <20260816131456.16374-1-boquelbryan6@gmail.com>
-References: <20260816131456.16374-1-boquelbryan6@gmail.com>
+        d=1e100.net; s=20251104; t=1786892976; x=1787497776;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=UrfefYR3alXM+nZyPeL2keqEf+3xxZ4A+CBJes0IpY0=;
+        b=f4wzb+9K1eTT1BLwGQFZWv//A1sVB6gA+FpmNnIAEbgY005Zi2qx3j63m3OYd/JtUI
+         jAU2MLXrKRy4jKUw0+y3r961p6qCrdFQjabO1ZwJqUyCLoIbIutprSCvwuKvfdhHut5D
+         McWRcfX+8a4uJF3D4sM3WKtewNslr2ExWNi66QIqQMyrEMD8gHmcXj3OeJar0tjkiam0
+         QIJ7seljzLtxO38D9XR4swKPl3e433wz0e6dyRm3Xqak6O1AFGscpZMKgdrfj2if6saY
+         OOPbas6j8eXC6XZVHJI/ovfWy3Yed8gsSm+s/0VkqfluXMu2bWiUvKZp80r/92pFXSZT
+         Qhig==
+X-Forwarded-Encrypted: i=1; AHgh+RrgAO3bK8PWV3P8fwsgpcwZ4BtcIPHv2Tc0ozIWCz5L7m1MaaSt7ZW4uzdaE/ovUQZffrLVHdiun2ftpQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjdVTP99APjV+F70QdrEuNvJvKad1FYxcZYkMwcfdSOsjVfY9G
+	f/JRb5sBYSJ3chHrGtzWBgzUlKuP89WAB/lZhjqo2a5e2tgkcbOsXo3K2WuejP6Sfb9DZ2c9T4x
+	uBP+ZTfgTOEHEJ03qmavrhVtlDPs1iY96GSI0+It2k2G9ki0X+LpkilA0ImI=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:3447:b0:4af:88b7:94a5 with SMTP id
+ 5614622812f47-4b2412b0729mr16974943b6e.5.1786892976599; Sun, 16 Aug 2026
+ 08:09:36 -0700 (PDT)
+Date: Sun, 16 Aug 2026 08:09:36 -0700
+In-Reply-To: <68b016f0.a00a0220.1337b0.0004.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a81d2b0.dbb3a75c.20434b.0035.GAE@google.com>
+Subject: Re: [syzbot] [block?] INFO: task hung in queue_limits_commit_update_frozen
+From: syzbot <syzbot+f272bbfbf8498ddadea5@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, hch@lst.de, josef@toxicpanda.com, 
+	krystianmkaniewski@gmail.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, netdev@vger.kernel.org, 
+	syzbot@kernel.org, syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com, 
+	syzkaller-upstream-moderation@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-blk_rq_dma_map_iter_start() and blk_rq_dma_map_iter_next() both
-document their return value as "%true ft it did map a segment", where
-"ft" should read "if".  The two integrity variants further down spell
-it correctly.
+syzbot has found a reproducer for the following issue on:
 
-No functional change.
+HEAD commit:    e6a5d573d24c net: dsa: drop explicit NULL comparisons
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17149949580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2baeae6059376eb
+dashboard link: https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=135696c6580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15dd4679580000
 
-Fixes: 858299dc6160 ("block: add scatterlist-less DMA mapping helpers")
-Assisted-by: Claude:claude-opus-5
-Signed-off-by: Bryan Boquel <boquelbryan6@gmail.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ec03d2a9ef9c/disk-e6a5d573.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4d46598728d1/vmlinux-e6a5d573.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/cae584a81da1/bzImage-e6a5d573.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f272bbfbf8498ddadea5@syzkaller.appspotmail.com
+
+INFO: task syz-executor261:5647 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor261 state:D stack:24224 pid:5647  tgid:5646  ppid:5643   task_flags:0x480140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5510 [inline]
+ __schedule+0x17d9/0x56c0 kernel/sched/core.c:7234
+ __schedule_loop kernel/sched/core.c:7311 [inline]
+ schedule+0x164/0x2b0 kernel/sched/core.c:7326
+ blk_mq_freeze_queue_wait+0x101/0x180 block/blk-mq.c:191
+ blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
+ nbd_set_size+0x454/0x680 drivers/block/nbd.c:374
+ nbd_genl_size_set drivers/block/nbd.c:2106 [inline]
+ nbd_genl_reconfigure+0x7e9/0x1e80 drivers/block/nbd.c:2410
+ genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+ __sock_sendmsg net/socket.c:790 [inline]
+ ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+ __sys_sendmsg net/socket.c:2770 [inline]
+ __do_sys_sendmsg net/socket.c:2775 [inline]
+ __se_sys_sendmsg net/socket.c:2773 [inline]
+ __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f289ec90aa9
+RSP: 002b:00007f289ec611d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f289ed3bb88 RCX: 00007f289ec90aa9
+RDX: 0000000000080000 RSI: 0000200000000c40 RDI: 0000000000000006
+RBP: 00007f289ed3bb80 R08: 35203a6b63617473 R09: 35203a6b63617473
+R10: 35203a6b63617473 R11: 0000000000000246 R12: 00007f289ed0c4a0
+R13: 0000200000000c00 R14: 0000200000000c50 R15: 0000200000000c40
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #0: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:840 [inline]
+ #0: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
+2 locks held by kworker/u9:0/50:
+ #0: ffff888026e67940 ((wq_completion)nbd0-recv){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3297 [inline]
+ #0: ffff888026e67940 ((wq_completion)nbd0-recv){+.+.}-{0:0}, at: process_scheduled_works+0xa20/0x14e0 kernel/workqueue.c:3405
+ #1: ffffc90000bb7c40 ((work_completion)(&args->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3297 [inline]
+ #1: ffffc90000bb7c40 ((work_completion)(&args->work)){+.+.}-{0:0}, at: process_scheduled_works+0xa20/0x14e0 kernel/workqueue.c:3405
+7 locks held by kworker/u8:4/62:
+ #0: ffff88801b06c140 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3297 [inline]
+ #0: ffff88801b06c140 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0xa20/0x14e0 kernel/workqueue.c:3405
+ #1: ffffc9000203fc40 ((work_completion)(&(&kfence_timer)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3297 [inline]
+ #1: ffffc9000203fc40 ((work_completion)(&(&kfence_timer)->work)){+.+.}-{0:0}, at: process_scheduled_works+0xa20/0x14e0 kernel/workqueue.c:3405
+ #2: ffffffff8e9e75f0 (cpu_hotplug_lock){++++}-{0:0}, at: lock_timer_base kernel/time/timer.c:1004 [inline]
+ #2: ffffffff8e9e75f0 (cpu_hotplug_lock){++++}-{0:0}, at: __mod_timer+0x1a9/0xed0 kernel/time/timer.c:1085
+ #3: ffffffff9a991198 (&obj_hash[i].lock){-.-.}-{2:2}, at: debug_object_activate+0xb7/0x420 lib/debugobjects.c:873
+ #4: ffffffff8e9fd1a0 (text_mutex){+.+.}-{4:4}, at: arch_jump_label_transform_apply+0x17/0x30 arch/x86/kernel/jump_label.c:145
+ #5: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #5: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:840 [inline]
+ #5: ffffffff8eb59c60 (rcu_read_lock){....}-{1:3}, at: __pte_offset_map+0x29/0x240 mm/pgtable-generic.c:290
+ #6: ffff88801b060618 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ #6: ffff88801b060618 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: pte_offset_map_lock+0x13d/0x210 mm/pgtable-generic.c:404
+2 locks held by getty/5362:
+ #0: ffff88803616f0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900032332e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x45a/0x1360 drivers/tty/n_tty.c:2211
+1 lock held by udevd/5644:
+ #0: ffff888026e70350 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0xde/0xd70 block/bdev.c:948
+6 locks held by syz-executor261/5647:
+ #0: ffffffff90099b68 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
+ #1: ffffffff900999a0 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
+ #1: ffffffff900999a0 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
+ #1: ffffffff900999a0 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
+ #2: ffff888026e60260 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_genl_reconfigure+0x4bc/0x1e80 drivers/block/nbd.c:2401
+ #3: ffff888026f747c8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1103 [inline]
+ #3: ffff888026f747c8 (&q->limits_lock){+.+.}-{4:4}, at: nbd_set_size+0x263/0x680 drivers/block/nbd.c:354
+ #4: ffff888026f74190 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ #4: ffff888026f74190 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
+ #5: ffff888026f741c8 (&q->q_usage_counter(queue)#33){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+ #5: ffff888026f741c8 (&q->q_usage_counter(queue)#33){+.+.}-{0:0}, at: queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x274/0x2d0 lib/nmi_backtrace.c:122
+ nmi_trigger_cpumask_backtrace+0x17a/0x380 lib/nmi_backtrace.c:65
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ __sys_info lib/sys_info.c:157 [inline]
+ sys_info+0x135/0x170 lib/sys_info.c:165
+ check_hung_uninterruptible_tasks kernel/hung_task.c:353 [inline]
+ watchdog+0xfd7/0x1030 kernel/hung_task.c:561
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:64
+Code: bb 7c 02 c3 cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d b3 ce 15 00 fb f4 <e9> 4c 07 03 00 cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90
+RSP: 0018:ffffffff8e807de0 EFLAGS: 00000246
+RAX: 00000000000de999 RBX: ffffffff819b433c RCX: 0000000080000001
+RDX: 0000000000000001 RSI: ffffffff8e23666e RDI: ffffffff8c4bbf80
+RBP: ffffffff8e807eb8 R08: ffff8880b86338db R09: 1ffff110170c671b
+R10: dffffc0000000000 R11: ffffed10170c671c R12: 0000000000000000
+R13: 1ffffffff1d11de8 R14: 1ffffffff1d00fc4 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff888124f4c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000561f5d89e168 CR3: 000000000e946000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ arch_safe_halt arch/x86/kernel/process.c:767 [inline]
+ default_idle+0x9/0x20 arch/x86/kernel/process.c:768
+ default_idle_call+0x72/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:199 [inline]
+ do_idle+0x1cc/0x540 kernel/sched/idle.c:355
+ cpu_startup_entry+0x43/0x60 kernel/sched/idle.c:454
+ rest_init+0x2de/0x300 init/main.c:717
+ start_kernel+0x392/0x3e0 init/main.c:1175
+ x86_64_start_reservations+0x24/0x30 arch/x86/kernel/head64.c:310
+ x86_64_start_kernel+0x137/0x1b0 arch/x86/kernel/head64.c:291
+ common_startup_64+0x13e/0x157
+ </TASK>
+
+
 ---
- block/blk-mq-dma.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index fca7ac01e73..4a4ae2f806a 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -213,7 +213,7 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
-  * at unmap time, @iter is only needed at map time.
-  *
-  * Returns %false if there is no segment to map, including due to an error, or
-- * %true ft it did map a segment.
-+ * %true if it did map a segment.
-  *
-  * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-  * the length in @iter.len.  If no segment was mapped the status code is
-@@ -243,7 +243,7 @@ EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
-  * arguments.
-  *
-  * Returns %false if there is no segment to map, including due to an error, or
-- * %true ft it did map a segment.
-+ * %true if it did map a segment.
-  *
-  * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-  * the length in @iter.len.  If no segment was mapped the status code is
--- 
-2.39.2 (Apple Git-143)
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
