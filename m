@@ -1,73 +1,75 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951C14B0497
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 00:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AED4B0481
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 00:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786838552; cv=none; b=aVvq9K5jEqA8lhmE7bpcwA/cVxW/5lT48GLyfEN1vifn9ZVO4xskJteswO3sCz2o10nxq52oJYncN6wLtGKKXAnT4+ngsrNAGSVxIr8ft4xRWacMttOwYo6aMm2s2ruc28gjKhXJkIYiP42xt/62kkddKFY47Wac3nwr5L8EYcQ=
+	t=1786838556; cv=none; b=IXBDsUhQ0X0JejlkR7sYufJCbnbt4nMtqyPxiPhoft+haZAoRyKpaCHVVErTFKCZtc1xuh40aLM26m1+2K05+kXA+eP0vK3YIvk+MMfHQAbONsUxR7tsmov8RfK2wYAuKjFLUgPiE/OVUwZBD130hoG40LDazuzCS+3S3/gBg2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786838552; c=relaxed/simple;
-	bh=K/ARUTpBpXqbP35eA1H0VvAiuYE/UpFOcyaZrCvbfVY=;
+	s=arc-20240116; t=1786838556; c=relaxed/simple;
+	bh=Zn196x3d0wSbtWFOR3OG78ZF+/Asp+o8YjFe7MCRVsc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=TmdFGHPbZcLsHnOycVLGNfkm7+nuhkgp8mo+fiEGTZ8FSlOcAcEq7mfnctXs6XHKv8evu9TmTeXNcEPCucZiSZrLYLe3bGgwJGZXYuSfyXwUMpQE+F2HNjHkvEWRbMVa5il6iEUh0nLWCBxXl4+YRPuMElCe6VxbjIa/PoKH1+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Q021mY2c; arc=none smtp.client-ip=209.85.167.171
+	 MIME-Version:Content-Type; b=Ap+Yj7GXD1IwwmufdvlLV2n1GT/knQ4JYpNlqvxca6XBFiIBGJUAWNOmBKD9e3zNr+rMisrBQm8os/wzAmHIyQ23m1sV1lDlPMsm5sDwMSXF2QqqTXHnQ1DNaNwJxPgRrKX3UrLJHvwgqwAoGwbqp7jy7xVRmzkRm7AIeweLuSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=wSoJAT0A; arc=none smtp.client-ip=209.85.167.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Q021mY2c"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4a45b3f0becso1491903b6e.1
-        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 17:02:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="wSoJAT0A"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4a071495be0so1205066b6e.0
+        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 17:02:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786838549; x=1787443349; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786838553; x=1787443353; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WYmCcXIgtJhZ7sa5k7zB7n+SMsUIkJx3UOjxv84yY3Q=;
-        b=Q021mY2ckxt2KbG1Zy53wBDg0ahoyl2PYygYHPUI4mf3EDddm4QUEsRpAzPbEkVVkp
-         uYm6lYQiKSpBzlMQcKDReEXbV5Cuk04mQN7CW4HaDdHj7A8ca+mY2nkfHvhpSPclukdj
-         DRfTk0koUwDHZgsKYecyZKFDPB/spFZGyl3fiE0WKwAlo2QVvyX+FMyr8gbEDoAb82Ps
-         KHHIYaI+XemnrFGYBvU2kmm09J0nFHFPsQV5dqyRBDQGR3jXrTjbaXzUx5dnYXghfe+X
-         Wqh2dhojzQZSqTH4gA3U3GpvA4c9k4zF40wqQbfI+GgfXxTbscfcx7o3T/XkDO6l9Ei4
-         +5VA==
+        bh=XJhIT00Xk3opxRkWaBfTA1WZjrUVFx52bT+h0b6nSS0=;
+        b=wSoJAT0Au1f9WSli8HIkadOyJH/gYD6xSBAlKopfWN1lFMBx3Mp2Pu3iktgJNzfAIA
+         1rFje03ZtDeNKBakBXTO922O+L/zZ2JxTEoGwMr0qIwqIzpuBZV9zrTXyOiQQgc8ZWrT
+         LlWXZg3TTqCpiU65EwJRflJ3NrBxqgBRJaHln5BbaGz3zlLRFJogRR+DkURYJv05naXq
+         8t9vBiVUSIWvrkHobSwshJ+1p2r4+0p/K9CZWGIOhPywGvz7rvi3HB94mYS3E8JU2pme
+         GmEouddb+46mIrDhV7Ly/xQkurEAECGQcMyj8TbtAexzxS2FL6mmtcEBQm/Rwyiy85cn
+         hyew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786838549; x=1787443349;
+        d=1e100.net; s=20251104; t=1786838553; x=1787443353;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=WYmCcXIgtJhZ7sa5k7zB7n+SMsUIkJx3UOjxv84yY3Q=;
-        b=EPAntAzp6afU9vI3ZJtWJPYvyyW+Sc9gsS+YHQcKyD3ddTEPU95v7+XUtMXnRJcnig
-         y3n0tUOzuyl3UWnzTV1oSx8hyXZYdA+2gkDVE1hd7UQuhN0QKyDA60LySt1n2hud9QKu
-         nyavdT1RHB4z+qe+hAsPngSAdTkajvA6kMl00yqVHCq5qVZwD9eHlpKvjYUvzXR9M2H+
-         MQwj/3p/tHm//iDAuoftuiXNKX/NXZAp295XnFx7L/R42q/DhKsgx3P2+T3c1vIQaYwL
-         jEd7o02C6tgW1Cz8aLPxvZwlJUg7BMW96UONQ9/ZbCcEBlS6kCR9Y4x1Lbh+Xy7uSeWe
-         AL/Q==
-X-Gm-Message-State: AOJu0Yw1bf40ooZeOuAl6tILXONN91lQcZsj+ly9k1Eqe0tvOiRwLZD0
-	RXbdit0u++a6lZ5WBAoWlvh1hejYTuwJX0doLxwdXEphlZK4tVctbC09Ud60tWxMCUZCX2QL7Ah
-	KoVw1uvYLUA==
-X-Gm-Gg: AR+sD10bLOw8JBd8t0M9AMuHOTTZevtPY+WvNOdMCaQeUHHks4kNrYoyVdjT9XaThEA
-	62lk3+poCgeFbFUQJXfr8gsEOM88cvOQYEv4AvV3Lyhx0X/IwWW8ByAtX2wSLYw2yxlepaxZIQD
-	4mXg+Wb+mYfQTZJZv0KfsHDzc+wZBpX/EoF7+gwbCv1xJvq18etAIhewOL9UHVKnukl4s+zG63X
-	E2O9gEhyFfKtTl3Omkn8rSQox5052Fplc+nQLcwn3hGhYkCsh9lmkBO8YsxjB/me6p21Y+CYoCG
-	plBjxZyy9MhdFfWeqRSbpIj6BiA3jutLgNTAUW0WHFKoOJ2vZER8gImsShv8jdNNJojSyDzDsXn
-	agciSqSZDJv7tn+s0E/ISS0e/Xnp9AVSQfcpLSiQKlioa6Ss9BUciReGneA/xFyMH2inmzB0SbG
-	TPj26BsayBoWKS16cSHYQ3LPAGHhud2zQ5Hq3Rol964nYiZR0lwjUWhl6lR/sCCP84WUn7ft7V6
-	+0c5dOdq98h/QWmZTne2eapJ4Q8ZnhLRaiAt09BVA==
-X-Received: by 2002:a05:6808:3086:b0:490:315d:e0d5 with SMTP id 5614622812f47-4b241ed317amr15551288b6e.16.1786838549543;
-        Sat, 15 Aug 2026 17:02:29 -0700 (PDT)
+        bh=XJhIT00Xk3opxRkWaBfTA1WZjrUVFx52bT+h0b6nSS0=;
+        b=K9yOKhYRMiY50PM4RQ10VcMgIekYgWq/H7TSDi3OTDE0pGPqxS6ncOrKi/deFkhtmZ
+         B4HRs7O+ExYAdLDi7i6AjIlfbC6dVEs3TEn/gWxy6PIadJyMBpHlBT1Hoph165KT7IJl
+         3ZBS3Gq7birHjK8Qitn5bZ+40yx5xG0v8y/7P/SrX29l6WH2He4fATwcd+9xSgnOyZR+
+         V/XlIOvGaQc1dNvjjcwSXYkjOsLu6LyKTjMYts7IAEzMuMDuLbe5gVrOnloxJcfDAsyl
+         1CaACPclw5nnMZRE5tfxM7YPccvmNjue+cZH8ysKE6WNA7/ITxrfsWhF2lfrYDFkiPuQ
+         3I7w==
+X-Forwarded-Encrypted: i=1; AHgh+RprJ3lQL193uM6EqVfTtcYpGRTAMJn2jodoDkMn1+u+2345c3eqm235ejkGNeS+3m+s6kN/sATCMaMtTg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YynauIXjAk915Td4C6jhWE9YEgmDHsZRFbt6a5bAS+vqAla/Pg/
+	I6iL4fi8qGIaE9TFD2cpJwMS6mnMkYPyQAkjnC0G9aMN0jnGevF+4kSUwlUvmM638oE=
+X-Gm-Gg: AR+sD10f+qYRIcyvY9NyCO3YqNq4agvasHcBAsaneWjbwI/Z6/bstMQKH9amTc+8RU9
+	ARX3zmuSD9+kGqZV6WdUfGHC7XSaZtF1pYukrBdpRsKA0gzOextCR1Emt9Fk9gL3Ibdu0tkURBu
+	WQXWO2H4Bf6P5Pma2ZRos0Y+x5jKpO5IDiCI878appmVDAYQBe8pCiCFEgF7DSLIdFpXh86a+fT
+	J91mbaBiezNS+s60Xlc4F9Ofl67eLbkXFIf7cdWyigwdCO+P+FEcMEsCBXlAl5roFGDgIUIeezA
+	aoE/vty8RYZpdwxrXJWSmnaZdF5lBlVGXmm91LTISPbO8ZI6ypnCUXrmYEMGITI+v+dKZHnCbHa
+	ruoMC7eVn11hH3nZl7KYaXJDzVzfN98EFFgeGWOHx0VVBCd10f7W978VT1P/J5IBMeswkFdEsTb
+	rl5S0Iyywibk8CL+Mr1peLcQOYceYhV6M0NWnMGIZ2jgH67fMB7UJc8DUt4tx0evUc2aBIl11ls
+	bS66g7Lz9LJ4B936AGy0Y59RFsuvl0n6gKlGMOghP9b2sc+cpV8u6i2X77g4w4P
+X-Received: by 2002:a05:6808:3190:b0:495:eb9f:53c4 with SMTP id 5614622812f47-4b241726af3mr12183258b6e.9.1786838553218;
+        Sat, 15 Aug 2026 17:02:33 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b24d92462dsm4347729b6e.5.2026.08.15.17.02.24
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b24d92462dsm4347729b6e.5.2026.08.15.17.02.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 17:02:25 -0700 (PDT)
+        Sat, 15 Aug 2026 17:02:30 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20260810144603.453283-1-hch@lst.de>
-References: <20260810144603.453283-1-hch@lst.de>
-Subject: Re: [PATCH] block: don't include blk-integrity.h in bdev.c
-Message-Id: <178683854415.1984298.3969271116846186515.b4-ty@b4>
-Date: Sat, 15 Aug 2026 18:02:24 -0600
+To: Rik van Riel <riel@surriel.com>
+Cc: Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260808114239.69167f68@fangorn>
+References: <20260808114239.69167f68@fangorn>
+Subject: Re: RFC PATCH] null_blk: fix UBSAN shift-out-of-bounds when
+ zone_size is 0 or overflows
+Message-Id: <178683854966.1984298.9103781823601303342.b4-ty@b4>
+Date: Sat, 15 Aug 2026 18:02:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,13 +81,42 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 10 Aug 2026 07:45:59 -0700, Christoph Hellwig wrote:
-> Not needed, probably since this file was split out.
+On Sat, 08 Aug 2026 11:42:39 -0400, Rik van Riel wrote:
+> null_zone_no() does sect >> ilog2(dev->zone_size_sects). When
+> zone_size_sects is 0, ilog2(0) returns -1, producing shift exponent -1
+> which UBSAN reports as shift-out-of-bounds.
+> 
+>   UBSAN: shift-out-of-bounds in drivers/block/null_blk/zoned.c:21:14
+>   shift exponent -1 is negative
+>   Call Trace:
+>    null_zone_no drivers/block/null_blk/zoned.c:21 [inline]
+>    null_process_zoned_cmd+0xf76/0xf80 drivers/block/null_blk/zoned.c:728
+>    null_handle_cmd drivers/block/null_blk/main.c:1455 [inline]
+>    null_queue_rq+0x8bc/0xe70 drivers/block/null_blk/main.c:1703
+>    __blk_mq_issue_directly block/blk-mq.c:2694 [inline]
+>    blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2754
+>    blk_mq_submit_bio+0x20c0/0x2a40 block/blk-mq.c:3208
+>    submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
+>    block_read_full_folio+0x7a6/0x810 fs/buffer.c:2463
+>    filemap_read_folio+0x12c/0x3a0 mm/filemap.c:2510
+>    read_part_sector+0xb6/0x2b0 block/partitions/core.c:724
+>    adfspart_check_ICS+0xb1/0x960 block/partitions/acorn.c:357
+>    check_partition block/partitions/core.c:143 [inline]
+>    blk_add_partitions block/partitions/core.c:591 [inline]
+>    bdev_disk_changed+0x851/0x17a0 block/partitions/core.c:695
+>    blkdev_get_whole+0x372/0x510 block/bdev.c:751
+>    add_disk_final block/genhd.c:412 [inline]
+>    add_disk_fwnode+0x24b/0x3a0 block/genhd.c:606
+>    null_add_dev+0x130b/0x1d70 drivers/block/null_blk/main.c:2052
+>    nullb_device_power_store+0x240/0x380 drivers/block/null_blk/main.c:501
+>    configfs_write_iter+0x337/0x430 fs/configfs/file.c:229
+> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: don't include blk-integrity.h in bdev.c
-      commit: 13c251b2b7fb150f22b55d652ee66c2a39c6635e
+[1/1] RFC PATCH] null_blk: fix UBSAN shift-out-of-bounds when zone_size is 0 or overflows
+      commit: 95491fb05105b61050cb623a5e0227eb26aa3525
 
 Best regards,
 -- 
