@@ -1,112 +1,146 @@
-Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2A922689C
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 03:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CD39460
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 04:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786849415; cv=none; b=cgv34gyXHSOKFtGW6lCGmTSQud4t4zE5Z6tU2H/Q78Tg3Dy7qMv0tRx3KOaKY02lM1KOOGg7MemQgkPLxAKDI51+eMOkQqeDs1owhhbquRhUSN8fOloI5hq1X/bVEMRaBQYZ3begOh4mCEFktS9eYkNVeHJks6cs9nmOn7F2ACk=
+	t=1786853515; cv=none; b=lUJO/pqJntaWYDGyb1oKTAVbj9dJVvonSbZDHDPyC9hwIawcvDqi/RGi+avDGeW5mwIW6kpFLZPmlS01AlWulopaHGwqXPOMI5ccPr7MAD3g/j49FQb3gWS5fuyvF7aOrFtYzvukLrM+EVDJ9I6TK3JByV1zIAT0lusCs48QuKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786849415; c=relaxed/simple;
-	bh=9Zr3oCqKsjfKHvPkErESJvY3JHuOxioptcAeMnpZfJA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=IX8qMT7TZSnl9gM63EuUzbxdT2Nxw4Luh2enjI8F17X8/QZ3zt/vAxbNPgdU4+rJqq5SL9NdOOnvlvq0gVTGsVbG48QcKn5EqQws9KyB6EmXsrCmt5PypSdo//+3XZcAuX/yei7TMu9LC0K/ry+csrlrBzQikgyJvuIK7AIRpTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=AGuWaK9H; arc=none smtp.client-ip=209.85.161.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1786853515; c=relaxed/simple;
+	bh=Yz589XEB95nrMlaKNE2uNEJora2fvRgX0MLCCPvYLh0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LUXjRABhD22uRnN+u9IRrLwxl1HOCzeaCXq0V66yZsDNT3LhWYBpHQ/NZqSxPzAo+3Yqk/xpQ9SXNns19DbKbU53c6GfeOJQjYkhhlnho5jzUxaDlN1LYn3Civ/VQAkUlExA5V3m2upug7eTyPeK6VI2EwfveYYDbn1+cNpzDnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y626Wpze; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="AGuWaK9H"
-Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-6ac83a09781so2104684eaf.1
-        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 20:03:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786849412; x=1787454212; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qvILHGTq6ALuiBcDr7I3qpZrjxscKNG6kSv9PiqDWtE=;
-        b=AGuWaK9HEOggywe6RnhZJgyw+n6uhaETUtup3DOWJC8zB3Vfjod4JDLpvrgNWw9XPZ
-         4qhlFIncGRLuFAEH/uLhBCr2AsdH2YlE9d8lW0//8fwgSrlG6C7crWq0RR5W/qSQ1TCv
-         yXDyg4eFeNmw/p8lzVCE/17c9GFTeRQRo5KAHy12vv6+XuYKU5m3jQQ5XMnQwhaYjM1X
-         dornVb/qw2nxQ3b7CpWaobk8ge31zNXA/hqYwpxjHJnaCN4vfLTLaWlOD52LRrW6FLbq
-         vApLThApCa9rM65hJC+J5/oeLAiLWgn2MY2X4lYcxvHnnV4bkdO/c8W5vkeFDJPhCE52
-         wWjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786849412; x=1787454212;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qvILHGTq6ALuiBcDr7I3qpZrjxscKNG6kSv9PiqDWtE=;
-        b=ohPU4LbFx3Hs8uIOEZa33qbkg9GnSRQs5qowocMJ3AIrK71TYYASzZLygNBO0G87rf
-         /x9SpFZxzq4Tduu58HYwmDBeNXa/cVtlRbvP+CaQ/2o99BYLlHM08pGmEBK2xkdV/lhu
-         JC7/OT0DLBZrdfcIGVWya6Sj0o1/hfuKKCKuMNvfBcNpeWaWIlq4Uvkl2TQPx+a/jaRu
-         XdiCBMNvptiJTb92IZGgYgTBS4fF1FW9XMb5C233MB3Fylc6UG9xX4isaaIgCJfpa08N
-         OIcD5MvWpG+coIBu4D3JHa5SDFlBPjLjmuX+P5o44IS4hx4f9YquZOuPvi+Oz24vzggN
-         uvqA==
-X-Gm-Message-State: AOJu0Yyl3uzkEFF3CnUFxj6/298Pc8HAOGDmcst7AniKdVgWOwlQynkD
-	8KX5I04awbvDhzoIHOD6/zaTEGe0eaKuuqB+1pZo0+hzvHT174Lbsc1b9tfmKVBcRp5D5wyJk2E
-	72is5+sEjTgq6
-X-Gm-Gg: AR+sD10SH7uBRbNVQzBKqJZ3JEVHUAm6oKwn349tul5L4AC0akDbaRfevuHUn924m03
-	NnlzUsqTFD0wNoi2Gu00PK7UiRhVxbktPjmT9+dsrzH5Mu5iusm3IWTOQhNNeBAWVe19/DOPXyI
-	cjvYukJwGAJjyqlXGATyWk/Qw+xOc8Z0hms3ZYRWWJWqTpoPvpUzip6SosiyEImpQZdLNEO5ewf
-	6tcJQl6H6bT3x84yfTNCRYsV9Ton0esuHd9igIAqynul0UU6mcVv1ew72YYq75ApexhsV9H2Xlz
-	W9vPsZkYTFLH74AFNm/c23zLoLHcQkoHHL4CbZfG7jJAVd7G5x8n5UbOldiTv3u2lRqXSivlfy6
-	L7z+IfaZmFSvQ/dpfGOVhQ4eK16IuWccOTpHQueeTNEdSEWnypNhjLt0IqiZwrza0UuwqzRSlsV
-	65nGMYuAq7RNhFqtDEAgb4DG3W/hlXk1ZEKEtMs3BkxpZ9nyGcoivkl1j4jLrg4/dLaFC3vaQcp
-	P/2J18/nt6cLTunPH2gmr4iWai+OZx0q3aV95sa2nIFfjY0oBgom1jMgw==
-X-Received: by 2002:a05:6820:f02d:b0:6b0:594c:32a7 with SMTP id 006d021491bc7-6b0c5cc53b3mr14893741eaf.20.1786849411751;
-        Sat, 15 Aug 2026 20:03:31 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-45e8f9594d7sm5920240fac.5.2026.08.15.20.03.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 15 Aug 2026 20:03:30 -0700 (PDT)
-Message-ID: <503e7149-b7d0-45db-b1cf-258c02898518@kernel.dk>
-Date: Sat, 15 Aug 2026 21:03:29 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y626Wpze"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952941F00A3F
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 04:11:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786853513;
+	bh=cFHs8gvxJX+p37ht/u6mq8BW9d9iCfeT6c4xmXd4hIo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Y626Wpze5eush5ifesQlMpXEC+DZ+SYMxPDh1c/gdX6JMAVrOzh84A0RPXO84FrIc
+	 +QUNB0m88JUb5shuHgka5W9YxR1k1riSwdzWNNMs3CbQCe+ircgB2uEvvu+QPFpu+X
+	 aLsU6FzFU4sygvmMnAFLzvLVHGEdOqVpnnfV6lmvaE/UGmevtAvoedMtZxTHYal1k1
+	 /ERR09Lp+Af06TDPHCogWWCbaj0GztIfngM2ONMOIVX6FGqnwPjrIRqOpjDJCuKOyi
+	 YtJQrt07/fE+F+3nn3GvSiK+Eoi6ZGtFAwxHv09mFwL5m1JZLIeQO0uY23SOk+1lHw
+	 eo9bZQWlY2HBQ==
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c05dcdf49so26892761cf.0
+        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 21:11:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Ro7SGA1KHNIGxA+2s7CQ7i24hxJATu2xh4tYrSz4FtAhuBmlIFjf2fneGgcpFCKNyP98Uf6zzkT5lPLbA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhe5hWnWM2S+e5d1rhBKV6sbn4Zygwg/ro92zLd6UIQSCEaoek
+	HLOevZkA7SkotpgU5InE72wZf+g5sYzTwb+ZYcmdL4QAvBQfOWX4+5JHBUMQnc0gWUIknVyN7I5
+	fnVAC1rTiI1sPUyCe7rSdekJ6OcvGzow=
+X-Received: by 2002:a05:6214:459b:b0:8ee:fbc5:8110 with SMTP id
+ 6a1803df08f44-90a91e850e0mr202646836d6.32.1786853512973; Sat, 15 Aug 2026
+ 21:11:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 7.2-final
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu> <20260730-blk-dontcache-v7-2-3e8e6850068d@columbia.edu>
+In-Reply-To: <20260730-blk-dontcache-v7-2-3e8e6850068d@columbia.edu>
+From: Barry Song <baohua@kernel.org>
+Date: Sun, 16 Aug 2026 12:11:42 +0800
+X-Gmail-Original-Message-ID: <CAGsJ_4wUvLoKGafR3U-ji1kUUaz6K_QdN6QxMT-apSaO5tXp0A@mail.gmail.com>
+X-Gm-Features: AcwNN1WZkB-TbbPYLGbQZDybzjU1BQWX9MmsjrOiq9haH_bC38JheVA30gQpXP8
+Message-ID: <CAGsJ_4wUvLoKGafR3U-ji1kUUaz6K_QdN6QxMT-apSaO5tXp0A@mail.gmail.com>
+Subject: Re: [PATCH v7 2/5] block: add task-context bio completion infrastructure
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
+	Sandeep Dhavale <dhavale@google.com>, Hongbo Li <lihongbo22@huawei.com>, 
+	Chunhai Guo <guochunhai@vivo.com>, Dave Chinner <dgc@kernel.org>, 
+	Bart Van Assche <bvanassche@acm.org>, Hillf Danton <hdanton@sina.com>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-erofs@lists.ozlabs.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Linus,
+On Thu, Jul 30, 2026 at 3:37=E2=80=AFPM Tal Zussman <tz2294@columbia.edu> w=
+rote:
+>
+> Some bio completion handlers need to run from preemptible task context,
+> but bio_endio() may be called from IRQ context (e.g., buffer_head
+> writeback). Callers need a way to ensure their callback eventually runs
+> from a sleepable context. Add infrastructure for that, in two forms:
+>
+>   1. BIO_COMPLETE_IN_TASK, a bio flag the submitter sets when it knows
+>      in advance that its callback needs task context (e.g., dropbehind
+>      writeback). bio_endio() sees the flag and offloads completion to a
+>      worker automatically.
+>
+>   2. bio_complete_in_task(), a helper that completion callbacks can
+>      invoke from within bi_end_io() when the deferral decision is
+>      dynamic (e.g., fserror reporting).
+>
+> Both share a per-CPU list drained by a work item on a WQ_PERCPU
+> workqueue. Producers push the bio onto the local CPU's list and schedule
+> the work item, which then dispatches each bio's bi_end_io() from task
+> context.
+>
+> Both methods are gated on bio_in_atomic(), which returns true in any
+> context where a sleeping bi_end_io() is unsafe, including
+> non-preemptible task context.
+>
+> Two CPU hotplug callbacks are used to drain remaining bios from the
+> departing CPU's batch, while maintaining the per-CPU behavior. The
+> CPUHP_AP_ONLINE_DYN callback disables the per-CPU work item while the
+> CPU is still online, preventing it from running on an unbound worker
+> later. CPUHP_BP_PREPARE_DYN then drains any bios added between disabling
+> the work item and CPU offline.
 
-A single fix for a regression in this cycle, where drbd would leak
-shared secrets over netlink. This restores the behavior to match what we
-had before.
 
-Please pull!
+Hi Tal,
 
+Thanks very much for the patch. I=E2=80=99m just a bit confused that
+folio_end_dropbehind() only requires in_task(), and nothing more.
 
-The following changes since commit 7f40b346462f563a0d6e841a77b5163d2a882a04:
+void folio_end_dropbehind(struct folio *folio)
+{
+        if (!folio_test_dropbehind(folio))
+                return;
 
-  s390/dasd: Fix undersized format-check buffer (2026-07-31 08:28:08 -0600)
+        /*
+         * Hitting !in_task() should not happen off RWF_DONTCACHE writeback=
+,
+         * but can happen if normal writeback just happens to find dirty fo=
+lios
+         * that were created as part of uncached writeback, and that writeb=
+ack
+         * would otherwise not need non-IRQ handling. Just skip the
+         * invalidation in that case.
+         */
+        if (in_task() && folio_trylock(folio)) {
+                filemap_end_dropbehind(folio);
+                folio_unlock(folio);
+        }
+}
 
-are available in the Git repository at:
+But we=E2=80=99re applying a much stricter check with bio_in_atomic():
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.2-20260815
++static inline bool bio_in_atomic(void)
++{
++     if (IS_ENABLED(CONFIG_PREEMPTION) && rcu_preempt_depth())
++           return true;
++     if (!IS_ENABLED(CONFIG_PREEMPT_COUNT))
++           return true;
++      return !preemptible();
++}
 
-for you to fetch changes up to c71bf113dfdf426bdaf106636f573ef87b6613a0:
+I feel like something may be missing either in
+folio_end_dropbehind() itself or somewhere in the
+filesystem/block-device path.
 
-  drbd: don't leak the shared secret to unprivileged netlink dumps (2026-08-15 20:00:10 -0600)
+Do you know why they don=E2=80=99t match each other?
 
-----------------------------------------------------------------
-block-7.2-20260815
-
-----------------------------------------------------------------
-Christoph Böhmwalder (1):
-      drbd: don't leak the shared secret to unprivileged netlink dumps
-
- drivers/block/drbd/drbd_nl.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
-
--- 
-Jens Axboe
-
+Best Regards
+Barry
