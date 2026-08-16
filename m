@@ -1,146 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CD39460
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 04:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5567742050
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 13:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786853515; cv=none; b=lUJO/pqJntaWYDGyb1oKTAVbj9dJVvonSbZDHDPyC9hwIawcvDqi/RGi+avDGeW5mwIW6kpFLZPmlS01AlWulopaHGwqXPOMI5ccPr7MAD3g/j49FQb3gWS5fuyvF7aOrFtYzvukLrM+EVDJ9I6TK3JByV1zIAT0lusCs48QuKI=
+	t=1786886140; cv=none; b=nc7T699CqGkbFlUX83FI2Z+b7SdBhMUebSNqBQ8He7tQiU5g4wUNyHqveiHyNnLBAMXRAEWrmBAjmbQrfGyvx78OQp00XzJ33D9I/vAJtDNnn1F3WbZAVeh1NdFEF/pnYCCNeDCt1vP9BCzj+nrA8Ziydnm6Y1yuPC9ePCPw7nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786853515; c=relaxed/simple;
-	bh=Yz589XEB95nrMlaKNE2uNEJora2fvRgX0MLCCPvYLh0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LUXjRABhD22uRnN+u9IRrLwxl1HOCzeaCXq0V66yZsDNT3LhWYBpHQ/NZqSxPzAo+3Yqk/xpQ9SXNns19DbKbU53c6GfeOJQjYkhhlnho5jzUxaDlN1LYn3Civ/VQAkUlExA5V3m2upug7eTyPeK6VI2EwfveYYDbn1+cNpzDnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y626Wpze; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786886140; c=relaxed/simple;
+	bh=BXac47jawx3iX5KRiX+sl0th2Nct+GIA+FieEpjeq6k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dsGuSd3JZZICIgc9skb/jvei3t3/cIcJa7rEMI1Z8EJSvRxUn2g4AZi1BrpKu/pYjzLxqTQgpVhNfikZXxP4nkoF8HDjVdCp69OgU1FSGO1RD/FOhDpAAG1v2hfxLk8mtYgpmxRA+65zMOSUDzihOZoIA3ZOR+4fPzOBhgkJ0w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6gYs4t4; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y626Wpze"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952941F00A3F
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 04:11:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786853513;
-	bh=cFHs8gvxJX+p37ht/u6mq8BW9d9iCfeT6c4xmXd4hIo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Y626Wpze5eush5ifesQlMpXEC+DZ+SYMxPDh1c/gdX6JMAVrOzh84A0RPXO84FrIc
-	 +QUNB0m88JUb5shuHgka5W9YxR1k1riSwdzWNNMs3CbQCe+ircgB2uEvvu+QPFpu+X
-	 aLsU6FzFU4sygvmMnAFLzvLVHGEdOqVpnnfV6lmvaE/UGmevtAvoedMtZxTHYal1k1
-	 /ERR09Lp+Af06TDPHCogWWCbaj0GztIfngM2ONMOIVX6FGqnwPjrIRqOpjDJCuKOyi
-	 YtJQrt07/fE+F+3nn3GvSiK+Eoi6ZGtFAwxHv09mFwL5m1JZLIeQO0uY23SOk+1lHw
-	 eo9bZQWlY2HBQ==
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c05dcdf49so26892761cf.0
-        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 21:11:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro7SGA1KHNIGxA+2s7CQ7i24hxJATu2xh4tYrSz4FtAhuBmlIFjf2fneGgcpFCKNyP98Uf6zzkT5lPLbA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzhe5hWnWM2S+e5d1rhBKV6sbn4Zygwg/ro92zLd6UIQSCEaoek
-	HLOevZkA7SkotpgU5InE72wZf+g5sYzTwb+ZYcmdL4QAvBQfOWX4+5JHBUMQnc0gWUIknVyN7I5
-	fnVAC1rTiI1sPUyCe7rSdekJ6OcvGzow=
-X-Received: by 2002:a05:6214:459b:b0:8ee:fbc5:8110 with SMTP id
- 6a1803df08f44-90a91e850e0mr202646836d6.32.1786853512973; Sat, 15 Aug 2026
- 21:11:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6gYs4t4"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4799b3f7c83so1806052f8f.2
+        for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 06:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786886136; x=1787490936; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=eq6iUASZc+iLA5Cv0/JGhI084DB8b2Fr3EMA+PEhPik=;
+        b=E6gYs4t42QGiFIHx1/zgWn84yJCLpKhWsmnRFDduZnosJvxqBEze8Ib3N/dYJJQqkk
+         p/WENxEWBIeGnyh5ap7IUg3CN+K9Y48+aDcb7fzOsMhbtG7IW3ZbVWxjbVV7tV+FDfmo
+         r4FeQIayLSbBI5xGwXiKL7D86++TnE/GceWlb6IwqF/Uw9ZFgi1wpfVZBCoZ11nZ0aT0
+         9N8lfPvMTUdHIBiCHeHUthwCmuuAvKOGJcAbxFQMjHxgazP1qt5je7k4W2Kc1mCnvDLK
+         pGYcfYkN2fwJeooVH/AiUfS7mpYdQTYA3e7d9ZzCdhbVvcmkBbVyfVS3D1CN40gUM1Zm
+         eJIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786886136; x=1787490936;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eq6iUASZc+iLA5Cv0/JGhI084DB8b2Fr3EMA+PEhPik=;
+        b=Pml34MdRTRlGyh7Mol73mPhws4hsoiVYqXu8OLsPiphKKDHCY/oHBvEZ3Zeo3HjucN
+         rqoR6zdTUm6mXpXVHdTrrZrUFu6tQCVWOPA8elchkjbh0Z2nZunp+RaqmmdFYMNizTK/
+         2i8rEDcBObwMCMy6tCfIBlqfDaEPtUWObaibtITFbj48/o4DQo5OlLVAqitrGQdY09vV
+         0rG2yhCi9c7c4OuQ8ErbXEbrVu2b4R29gT1nd+w9NoMJKVXO7LTrOpKkAb8fzOnHpCHr
+         FbnnPvUF+iAcexrLiQpq0s9FUop0RksF7pgy0/41XR6lCrtndT4u18UpIZYmMy6k1/8s
+         HP+g==
+X-Gm-Message-State: AOJu0YwJQzbLvy8Lfp9VbuhWVNb1ZT50Kv8HlENy5vMzg2t4rV9op7Iz
+	PY9neCY0vu2YHxpHrbF87O2xc6vH9/okSz8BL+eeIWFP/ei90V6pXBXuHa0Hspy9
+X-Gm-Gg: AR+sD13iwcH2OO11rJ2nF8fO8sj1Xmkaur8SmUAJX2vYZNoDpM7hz/qNTtxMit3jGac
+	gWwuCo1P2lQ+DqPX2PBNNGbtDZNZbd/4cjy3TSdOmRjXTXEZ6/eWrSMsxKp64OEsndKFk3Q5JO7
+	zWxjlU+Zkf5rFg3AP/48/gMtLO0Yhc3+98vVPC39x4yVWBA5HfqHLKpEopR2vOfeOuZ6SGDPsk7
+	o4j8KQp+jOnWgOg1Hyt8XeXDxalneB0mNdJdGniav4AxJobvcfPja9GtPlfl06hlFvBvniZsFhy
+	QRQ7A0ar/IA++PfU8Q8HPwPe7nDeyBBwISC4Vs6SyHvM98yUGQip5XV0is6TVPI5CzMmixBUrSV
+	qWC18yglXMcLr1/MzMs9g69bMOcBFaDAzI3USE1J10MRY3+J1cxCSeApb6EzXP1kAZ3Kt6oUjsc
+	djYGcvPEDIHH1fcuenBozXdsLpmfjYqf8M+4Kd36/v9oiX+o3X3ggsVFEkqF74LvZ8poQ9P1MFx
+	YiIoBKMQYJwzmPAjBCKRBW4377LS9zQQMI6NzBh760IxIGHoj7Gt9KOCoGvf4VC6d+sZbWYow+q
+	Tp22u5KaAw==
+X-Received: by 2002:a5d:644c:0:b0:47f:c62e:9cca with SMTP id ffacd0b85a97d-48160798113mr22090627f8f.22.1786886136309;
+        Sun, 16 Aug 2026 06:15:36 -0700 (PDT)
+Received: from macbook-pro-de-bryan.home ([2a01:e0a:d7f:f4f0:306b:5f99:5378:73e0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f2cc81csm24721295f8f.34.2026.08.16.06.15.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Aug 2026 06:15:35 -0700 (PDT)
+From: Bryan Boquel <boquelbryan6@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bryan Boquel <boquelbryan6@gmail.com>
+Subject: [PATCH 0/2] blk-mq-dma: kernel-doc fixes
+Date: Sun, 16 Aug 2026 15:14:54 +0200
+Message-Id: <20260816131456.16374-1-boquelbryan6@gmail.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu> <20260730-blk-dontcache-v7-2-3e8e6850068d@columbia.edu>
-In-Reply-To: <20260730-blk-dontcache-v7-2-3e8e6850068d@columbia.edu>
-From: Barry Song <baohua@kernel.org>
-Date: Sun, 16 Aug 2026 12:11:42 +0800
-X-Gmail-Original-Message-ID: <CAGsJ_4wUvLoKGafR3U-ji1kUUaz6K_QdN6QxMT-apSaO5tXp0A@mail.gmail.com>
-X-Gm-Features: AcwNN1WZkB-TbbPYLGbQZDybzjU1BQWX9MmsjrOiq9haH_bC38JheVA30gQpXP8
-Message-ID: <CAGsJ_4wUvLoKGafR3U-ji1kUUaz6K_QdN6QxMT-apSaO5tXp0A@mail.gmail.com>
-Subject: Re: [PATCH v7 2/5] block: add task-context bio completion infrastructure
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Christoph Hellwig <hch@infradead.org>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
-	Sandeep Dhavale <dhavale@google.com>, Hongbo Li <lihongbo22@huawei.com>, 
-	Chunhai Guo <guochunhai@vivo.com>, Dave Chinner <dgc@kernel.org>, 
-	Bart Van Assche <bvanassche@acm.org>, Hillf Danton <hdanton@sina.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-erofs@lists.ozlabs.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 30, 2026 at 3:37=E2=80=AFPM Tal Zussman <tz2294@columbia.edu> w=
-rote:
->
-> Some bio completion handlers need to run from preemptible task context,
-> but bio_endio() may be called from IRQ context (e.g., buffer_head
-> writeback). Callers need a way to ensure their callback eventually runs
-> from a sleepable context. Add infrastructure for that, in two forms:
->
->   1. BIO_COMPLETE_IN_TASK, a bio flag the submitter sets when it knows
->      in advance that its callback needs task context (e.g., dropbehind
->      writeback). bio_endio() sees the flag and offloads completion to a
->      worker automatically.
->
->   2. bio_complete_in_task(), a helper that completion callbacks can
->      invoke from within bi_end_io() when the deferral decision is
->      dynamic (e.g., fserror reporting).
->
-> Both share a per-CPU list drained by a work item on a WQ_PERCPU
-> workqueue. Producers push the bio onto the local CPU's list and schedule
-> the work item, which then dispatches each bio's bi_end_io() from task
-> context.
->
-> Both methods are gated on bio_in_atomic(), which returns true in any
-> context where a sleeping bi_end_io() is unsafe, including
-> non-preemptible task context.
->
-> Two CPU hotplug callbacks are used to drain remaining bios from the
-> departing CPU's batch, while maintaining the per-CPU behavior. The
-> CPUHP_AP_ONLINE_DYN callback disables the per-CPU work item while the
-> CPU is still online, preventing it from running on an unbound worker
-> later. CPUHP_BP_PREPARE_DYN then drains any bios added between disabling
-> the work item and CPU offline.
+Two comment-only fixes for block/blk-mq-dma.c.  Neither changes the
+generated code.
 
+Patch 1 removes a @state parameter description from
+blk_rq_integrity_dma_map_iter_next(), which has never taken that
+argument, and fixes the tab-after-"* " alignment checkpatch complains
+about in the two integrity summary lines.
 
-Hi Tal,
+Patch 2 fixes "ft" -> "if" in the return value description of
+blk_rq_dma_map_iter_start() and blk_rq_dma_map_iter_next().
 
-Thanks very much for the patch. I=E2=80=99m just a bit confused that
-folio_end_dropbehind() only requires in_task(), and nothing more.
+Per Documentation/process/generated-content.rst, disclosure of the
+tooling used:
 
-void folio_end_dropbehind(struct folio *folio)
-{
-        if (!folio_test_dropbehind(folio))
-                return;
+ - The defects were found by running scripts/kernel-doc and
+   scripts/checkpatch.pl over block/ and comparing the resulting
+   warnings against the function prototypes.
+ - An AI coding assistant (Claude, claude-opus-5) was used across an
+   interactive session to run those scripts, cross-check the
+   signatures in include/linux/blk-integrity.h, identify the
+   introducing commits for the Fixes: tags, and draft these
+   changelogs.  The code changes themselves are confined to comment
+   text and whitespace.
+ - Verification: scripts/kernel-doc reports no warnings for
+   block/blk-mq-dma.c after the series; scripts/checkpatch.pl reports
+   no errors or warnings on either patch; both apply cleanly to
+   for-next.  The series has not been compile-tested, as it was
+   prepared on a non-Linux host; it touches only comments.
 
-        /*
-         * Hitting !in_task() should not happen off RWF_DONTCACHE writeback=
-,
-         * but can happen if normal writeback just happens to find dirty fo=
-lios
-         * that were created as part of uncached writeback, and that writeb=
-ack
-         * would otherwise not need non-IRQ handling. Just skip the
-         * invalidation in that case.
-         */
-        if (in_task() && folio_trylock(folio)) {
-                filemap_end_dropbehind(folio);
-                folio_unlock(folio);
-        }
-}
+Bryan Boquel (2):
 
-But we=E2=80=99re applying a much stricter check with bio_in_atomic():
+  blk-mq-dma: fix kernel-doc for integrity DMA iterators
+  blk-mq-dma: fix typo in DMA iterator kernel-doc
 
-+static inline bool bio_in_atomic(void)
-+{
-+     if (IS_ENABLED(CONFIG_PREEMPTION) && rcu_preempt_depth())
-+           return true;
-+     if (!IS_ENABLED(CONFIG_PREEMPT_COUNT))
-+           return true;
-+      return !preemptible();
-+}
+ block/blk-mq-dma.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-I feel like something may be missing either in
-folio_end_dropbehind() itself or somewhere in the
-filesystem/block-device path.
+-- 
+2.39.2 (Apple Git-143)
 
-Do you know why they don=E2=80=99t match each other?
-
-Best Regards
-Barry
