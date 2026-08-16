@@ -1,104 +1,104 @@
-Received: from mail3-165.sinamail.sina.com.cn (mail3-165.sinamail.sina.com.cn [202.108.3.165])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C5D37F333
-	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 01:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2FE18BC3B
+	for <linux-block@vger.kernel.org>; Sun, 16 Aug 2026 02:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786845004; cv=none; b=GVrZpAdlK8NiqDk+x0lcQ/SCt6Rb1RLv7ejCAnS+sWGEVGuGPVgD8BaUeI+8Ic1gl4Qn4TYt4Bqx+jJc9R21OQkdR7P2wUKW5rlLvckBm1w0nrGqxHD7BVkT1gS04/OIDRdmmis50Zp7LGsnlU66eAo8mWKR+qi/Ua1WNGFdW5U=
+	t=1786846002; cv=none; b=SLZuMH9oQ5jSjqh7046RfXZGU5AsAPmF/trSsLWajqvynzWcnuBeM2Ql6AmGa1P83XHQastwcmWBTCeOHm5n8q4hW9j1xpTpQvUhqP5m9GHVpmii6f1n16GuZ4jFk+QgwwjtTcjkzBvpGC2yuMloWriJYMFGYU4gZNcyJlGA0IE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786845004; c=relaxed/simple;
-	bh=TWlS5zFIu289frGRky4GN2nfYmKi3GQnzV49j8uW/fQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pa2g/1kCHr3feTj6cePXeWF3vhTdm3tbAJok0oluFfh6lrUkprlkfEZm5mbrWi3et//caiVq6d3xEGz2FRA0ed/kj5P822uVCf4dibBLwLNq/mM16rs5uqdmN1XYDaQBo42TjXQ1AK/mu4PskwkHtdanSSoFR5JADr4vETW8I54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=aLqUal54; arc=none smtp.client-ip=202.108.3.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1786846002; c=relaxed/simple;
+	bh=lZfxHpFBdWa1iLbzHA25AIy2MET5BfNuJPZ9Tl9kvWc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=m28Dj6YpPN+HvwfDbW16fYWVpZk7Gp24PK71kf37/g8yzeU3rN+6p2p68B9q4P9C/PVVMyg4ExFMKjdzBRn4F9L412HykcGcx9wyr+Ycn0+iEZ2kY7//XOJhoskMoo76HnnarACxptAgewcYmb2Pqt/7EiwMLrGDKB4kNQP9y7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=HvJ/xxa4; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="aLqUal54"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1786845001;
-	bh=I9ZB69rxpG5yGVVd1SwS1so5aS1ZT3ZSsmnetbYFDSQ=;
-	h=From:Subject:Date:Message-ID;
-	b=aLqUal54i9hw0tER0kwK+t9UxQaIv9SI4l/2NwitBBKnydaLfFHUD4uxgsEAeXBzL
-	 DqUS1fMLtmjWLXflqvpc/LlA7PEgREaRZeHF3tXIvlXw5Yi0EOL7Jh/kZQ2Jzvq/K1
-	 nsmRGUhmHlNOZ6CZhcLPhS0GWaVFZRn/h21aLVj4=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([221.216.154.155])
-	by sina.com (10.54.253.33) with ESMTP
-	id 6A81171900005780; Sun, 16 Aug 2026 09:49:16 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 1283266685140
-X-SMAIL-UIID: CC96787B58FF46BCBA5FADAB203329A0-20260816-094916-1
-From: Hillf Danton <hdanton@sina.com>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+6b85d1e39a5b8ed9a954@syzkaller.appspotmail.com
-Subject: Re: [PATCH] nbd: don't warn when reclassifying a busy socket lock
-Date: Sun, 16 Aug 2026 09:49:04 +0800
-Message-ID: <20260816014906.1149-1-hdanton@sina.com>
-In-Reply-To: <20260802081922.840-1-hdanton@sina.com>
-References: 
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="HvJ/xxa4"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-451a49abd8aso1503223fac.3
+        for <linux-block@vger.kernel.org>; Sat, 15 Aug 2026 19:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1786845999; x=1787450799; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=I9P8vip1vNBFbupp9TxQonKy9AWwrPAT4+ukh9ygonw=;
+        b=HvJ/xxa4qCLjeP2rmXBa/I9DaFrhByPi4R+jtSgsr5dWfcjjYnaw89D+l4NtBw2/Dz
+         1z24XbOOfpEFB8XEuyZSDtDcIYTa5uyKr/YpvVNRY2DBDargP5CrV3+aUH63ymvlUoO4
+         S10D7FJSiaMs6k2XaMS2wE2RQkjmf0Lr3IU57943PEEWKAOSodrJyE9hqxHms3hFeOJN
+         akgIDfSyBoI6YAXANxSGftdflnTkKSquC9nnJDefnEbADAPY1zcedqP6xsXVe66cWYrU
+         IArnlJ+hwBXBsmmXhJtLOg1qVzGLK1UobockBfPVlcxWSey0xjH/zEChxXJzSw9FWaEi
+         SodA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786845999; x=1787450799;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=I9P8vip1vNBFbupp9TxQonKy9AWwrPAT4+ukh9ygonw=;
+        b=PfyTMvqJL8/Pq5n2BAyECm7wEOaujUbsIKd9Q0yHWHrniWIT/xTsjSoy0GjyAmOhVl
+         1AD81uTdT27K/mvFDPAWWqYj2EUdDV5ltZ8uiVzD+UzEH6zArK68k8vwFAqi0VzpyOsJ
+         TB3bfsIzLQfEYUYeZDA4tYJcNu+suseOuT1XzTv2Cy/UTactoMb2B+JOtlRITJ/CdEa/
+         RoxilpeZ41FCZ9m5UXIRGV3K0rqQe32sQg9tFfg9wsULs0D6Jn8oTHAijYousmJFy3Oo
+         S9Y3kZMu9TGKLPTHmg5HKRN8k4Q4ipuQ3n8gt8vNGP9q2aQVd4FzaYCmvGG+CIc6S8U/
+         BCAA==
+X-Gm-Message-State: AOJu0YwuDKoX7EOoyyUFli+XM+ikx5b9MbrvZIDc+Cc6NQVph1nrAvzc
+	rwh7NaSJQXyb1SSmcA+leOfgtKKt/84Yh6CytZoN368agTj7u9Rlf3yewlfaOoz2M/A=
+X-Gm-Gg: AR+sD13qru0aZ7lNPbGnqDl9m0NekAWx5vMqYHHLIwL8Vutd5QlKqJd4C36wWsjaZp+
+	L2gDe3+QhDBXjW9B9DeMpvl9vSWa56TPff1c9ag0LB4ews4PV1ov3LBSAPWG6wXK6wMWjIcDanC
+	QSFJWpXCTt4RXwT6IlyCyPGW6UAYikglHfj37z+4euiiqQ4UPTaZ6gwu/Cu/QBqWegpp1FwoiTn
+	Aj65py22+wkrEdHOAGXiyB+79Aikn2J4b36tvxNPaG5w01rqmKpa5hzShaInmMbJgK58Is66QTL
+	SvYE+rl8ncA0Id+jKYB6N7xqiASDesPFv0Ywpw+Ox0wvWZ2aS3wsqvJKUsjUUe641T47D2hrzHG
+	eKlvCCAoYqHBTX0k0wKjiVb8kdr6mN44SYwJ7yulhh3fezQTCIJ24dOQl/fQVnhNepMi8Ey9rC0
+	3Q0SxB0J7A05DT09xE4/plDEc7hieSRexj/3KMMNz+LSBPH4fqS2rrXFfhUxWJUVTFKPw5w1fex
+	h1yBaM0ItptD5od+Ria3cp7Sn6AE4DNRSNieKNk6A==
+X-Received: by 2002:a05:6820:1614:b0:6b0:ab1f:ec0c with SMTP id 006d021491bc7-6b0d6959804mr14536936eaf.34.1786845998981;
+        Sat, 15 Aug 2026 19:06:38 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b0db1e9f89sm5686279eaf.9.2026.08.15.19.06.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Aug 2026 19:06:37 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Zqiang <qiang.zhang@linux.dev>, 
+ "Paul E . McKenney" <paulmck@kernel.org>
+In-Reply-To: <20260812060510.3220294-1-m.szyprowski@samsung.com>
+References: <20260812060510.3220294-1-m.szyprowski@samsung.com>
+Subject: Re: [PATCH] blk-mq: add missing call to srcu_barrier() in
+ blk_mq_free_tag_set()
+Message-Id: <178684599676.2049660.7519009311232353360.b4-ty@b4>
+Date: Sat, 15 Aug 2026 20:06:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On Sun,  2 Aug 2026 16:19:20 +0800 Hillf Danton wrote:
->On Tue, 28 Jul 2026 12:53:37 +0800 Hillf Danton wrote:
->>On Mon, 20 Jul 2026 10:39:17 +0800 Hillf Danton wrote:
->>>On Mon, 20 Jul 2026 10:23:43 +0800 Hillf Danton wrote:
->>>>On Sun, Jun 28, 2026 at 10:29 PM Hillf Danton <hdanton@sina.com> wrote:
->>>>> For archive purpose, syzbot report [1] where udp was not invovled defies
->>>>> what is fixed in d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep
->>>>> circular dependency") -- "Since the UDP socket and the NBD TCP/TLS socket
->>>>> are different, this is a false positive."
->>>>>
->>>>>
->>>>> [1] Subject: [syzbot] [net?] possible deadlock in inet_shutdown (3)
->>>>> https://lore.kernel.org/lkml/69c37e6a.a70a0220.234938.0045.GAE@google.com/
->>>>>
->>>>For archive purpose, syzbot report [2] shows deadlock without either udp or
->>>>tcp invovled. But it sounds false positive because kernfs node is removed
->>>>while the filesystem is filling super block.
->>>>
->>>>[2] Subject: [syzbot] [kernfs?] possible deadlock in kernfs_remove_by_name_ns (2)
->>>>https://lore.kernel.org/lkml/6a5ca0b7.f1649fcc.2a4208.03f3.GAE@google.com/
->>>>
->>>For archive purpose, syzbot reports [3,4] show deadlock without either udp or
->>>tcp invovled.
->>>
->>>[3] Subject: [syzbot] [kernfs?] possible deadlock in kernfs_iop_permission (2)
->>>https://lore.kernel.org/lkml/6a5d14b8.42649fcc.6186.0078.GAE@google.com/
->>>
->>>[4] Subject: [syzbot] [kernel?] possible deadlock in netif_reset_xps_queues_gt (3)
->>>https://lore.kernel.org/lkml/6a5d14b9.42649fcc.6186.0079.GAE@google.com/
->>>
->>For archive purpose, syzbot report [5] shows deadlock without lock_sock invovled.
->>
->>[5] Subject: [syzbot] [pm?] possible deadlock in thermal_zone_device_set_mode
->>https://lore.kernel.org/lkml/6a676313.073198cf.94f0f.0033.GAE@google.com/
->>
->For archive purpose, syzbot report [6] shows deadlock without nbd invovled.
->
->[6] Subject: [syzbot] [block?] [cgroups?] possible deadlock in blkcg_deactivate_policy (2)
->https://lore.kernel.org/lkml/6a6e8a06.6ce73036.24301b.0015.GAE@google.com/
->
-For archive purpose, syzbot report [7] shows deadlock without socket invovled.
 
-[7] Subject: [syzbot] [block?] [cgroups?] possible deadlock in blkg_conf_prep
-https://lore.kernel.org/lkml/6a807bfd.f7a79266.2f965f.0008.GAE@google.com/
+On Wed, 12 Aug 2026 08:05:08 +0200, Marek Szyprowski wrote:
+> Commit 05c3e88488ed ("srcu: Queue sdp->work when the delay timer is
+> successfully deleted") added a check in cleanup_srcu_struct() if the
+> call to srcu_barrier() has been made before calling it, which
+> revealed a missing call to srcu_barrier() before calling
+> cleanup_srcu_struct(set->srcu). Fix this.
+> 
+> 
+> [...]
 
-BTW do you still have any interest/minute fixing it Eric?
+Applied, thanks!
+
+[1/1] blk-mq: add missing call to srcu_barrier() in blk_mq_free_tag_set()
+      commit: 1207dbb91c111e2422e94b2e75091367369e6476
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
