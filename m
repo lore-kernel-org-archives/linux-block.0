@@ -1,59 +1,59 @@
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47A3313527;
-	Mon, 17 Aug 2026 01:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79CC31D730;
+	Mon, 17 Aug 2026 01:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931679; cv=none; b=CcXhrGWDXu91N94ps5lZxbgRj4soG1lxnZ89uqw6BCW4BqtcwJXqkB/XXlYOFdkXn5oxeYS1WiU4sNDp5fXXSa7/gCe7WzTnShz9tsjuZBZH5ElUWWngRp1AAQvuFW2Tqg3hvoyuycfl6o6qTMCIvADLDLM1/jdzEywKo5AinpM=
+	t=1786931690; cv=none; b=qDzaxtbocC250dOdvHvxXbPZ4wuYUJkTOkBGxY+GgGsDfPt2TxsUpkHUak/kJtJ8aZ1gPUe2fsqvL0ifPmWI9WtGcJwa8e89azCmiNxrV9Oz9Wc6U87cOhAFFp+LU1xz1RAFQGHx8Ga0goXLCWdGfJyy4244jFsYUYohsIXWFNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931679; c=relaxed/simple;
-	bh=zLTL0XSX377Q5uxNjt9iEMwwDbPUSFjdEiz/iPykOT4=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=msnP8IErwzbn3TDhLOtu1UJCXkx5/NAkIXyueM5t46HBAmDkz+dpHAFB/btnSugLPCV827vw5B7vjWCxvP38Pc3udMrvuc7/JDBMCtqy9P2KuFDifCRmeTLT6Qoq+Cy2llNXXB4m8WTCIzeAXSoxiqiE31gH+EGecHCscimzLXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ccmUt68Q; arc=none smtp.client-ip=103.168.172.156
+	s=arc-20240116; t=1786931690; c=relaxed/simple;
+	bh=TRCASMM7eelgWS4DcL5aA99Epa/8OLjxiXSiA4njPe0=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=I8gW3dcDydZUMRxpeLDZ2xiWTLFqwI78tj8oClZuHa8anJJ6RoJjwQjikxeKrW2LW7i2lcnwCSrK+dw1N2m+HNzF4szwxSbc+RNlYBigaWLHCg6GZEgfivs3JPKA/tvdXxIUqTV+wZEAfouSzat08Sk32iO2chV6PgNHWwjEyXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dchVLJ/m; arc=none smtp.client-ip=103.168.172.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ccmUt68Q"
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 0562F14000F8;
-	Sun, 16 Aug 2026 21:54:37 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dchVLJ/m"
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 11A19EC0218;
+	Sun, 16 Aug 2026 21:54:47 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Sun, 16 Aug 2026 21:54:37 -0400
+  by phl-compute-02.internal (MEProxy); Sun, 16 Aug 2026 21:54:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931677; x=
-	1787018077; bh=6enK1e/BFMkuBg8+irnlLj0CqFHztSRmCrF0cLMxqjM=; b=c
-	cmUt68QrFGdRPwHn6tQZ8ODpQ+8Iez3Xti7AQt+sYE8vDWvWSfprkecOytblx1Ng
-	VEpzp47o49qYrqYJXAVWk+NUsjBc4drOraAH1QagDc24i7cFdeUKqBuCF61FiN3y
-	stIVg9PpIbWLS4qOJSxaMdpY7EEDsApDmzel8rp9yHzDLPvhoksxWgCJ4ZANaj8b
-	ijd9wnVGgMR46ZHNgrxa5rewxsJr+EJYMAEKoQidPHG6eKWm2YbxQf0sZU3f7gNz
-	nUQt0KO62kQeNotVOJs6XbiQynUTDGK4YVhcj+IUkQdtcoUdeCd+qy6gvbdJ8oGD
-	HBsjaXmhSAr0Cfv7QqseQ==
-X-ME-Sender: <xms:3GmCahibZeHzI7KOi2ngU9lrz7Q5FFjkBP4exfQ_r2YvNcpa5tkBcg>
-    <xme:3GmCagH5B164QuRTMtphxD_s-MTOR84Kz1fPoP0dmNpgkRyVUTisQwpEthD3FV9oq
-    c3OUIE0r9vXIDKDi3FjtEHYsEO_al4D8AyjyVl9F8E8JquJPHJKvyMc>
-X-ME-Received: <xmr:3GmCag9H4hHNqXSPOPrq06oYeS6TaDRlYPFuoteJzrOIc5GkBy--ajlZZr5yq9c5c6fNThFGbeEWFXMWhDnZRV_Oe8ovyUGjHb4>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931687; x=
+	1787018087; bh=RppOGoUsMSAGAcgwd3QV2Wk6AOZv4y+7OKDIjYynE4A=; b=d
+	chVLJ/mUha6YoQvZLZ9zIiASkesdKXZbl2YPDTUjSUPeo+HXy82VCHwi3Kn2e2fB
+	vWaOm389zaHBmAG1fUQFwyNXeHdBCs0N9DkUZ0LdFPhPi6elYIkTYcyGU8pmTdGf
+	h8fVAC+JNa3xiM+fU7TYzzPeTtl5yJGCyEHg8KobJ+EW7Asc1+m9YVwH56zhdJ/4
+	wdFKQ6kmvH1+S2zqegEAZIcTg5c/36FF+Da3pfllnJmGWBGtZOCmD9BYoK9IQU95
+	M04v1851GlHh03s3AkNCPgnTHkYgPM4jXI1Zums/KRNzD8YUAx2NgvDL3qWPG33n
+	8s1KGTNni1xBYpVxwluqQ==
+X-ME-Sender: <xms:5mmCasnWl5tyaxcXqZs4iGxywxdaNsC9Rwamw6YvmE8wvLllxreqpQ>
+    <xme:5mmCal5pOExTALZTetuL2gHaLs6a-Skwrb76CIYKifwA2UqHqATNLmtsgdcn_oSQu
+    hHH84m33d0nDyfpTdDRP8YiPtE1TP_tI7D9oQq5hrwklR9DSZhQq2E>
+X-ME-Received: <xmr:5mmCaqisMT1PTJas8AKY5_Y9NXz82RlXe4kqRpT4VSH9_pdivYol_Fo5JFwL0BF32pfjeyanpIpkgh-Jn8PsO1XBzubCxF3F1Jk>
 X-ME-Proxy-Cause: dmFkZTE4hc50xdhPXg/illULTp+C8DYFyqEdlu6WRFncsb6QnuuT/gcUnwV28CSittpzBY
     CanXMgLJ3D2f99+6fhcgPhKU62j4D/361qP39o0jreF8A1XJd9tbHbTT3THo+0Ngxn+KIR
     xmSykI00CRbwgNWRv8pmFJk9w9o4Guyae/9OdRSlW4+G/cXS4TLBuEOOa7VrQ1zx7uzt0k
     aiRQ8f78TROqGsNBFEeFBQ0S+1oq+UQzE0LFPz+xu5GHoHcx5q9+AQ38+8xzR6IOKHtWR9
-    dd2Vu8AeIxRK7b1SVEdgm5fqxWGAl0hW++r8vV0P6QNaTx9jFo8LB1mZXd3D6ux6m/Q5nJ
-    2V8/AeMgpE1uL7O5Xzeuwofsai0nR7KOW61a23EwoI3IQ4xylk4XZKkETDkcfU2Ln0BCmw
-    oB3yijbdkpGCVS60IfhnXMVRjf4mksml96udoxalV+zAinioyrBBw2nhCQgQARSzXboTiw
-    FwIVFx4G/eUWYlpYR8dHEj8HN6CiyMSk6d91rE5fA3LNDt7ZC46LgKf9rS1XftewQEE5z7
-    dL/VCUV+qH1y8h9wi9posM6+m8ko269Ik/5Jr1PuRxEmuwcOH2xnygf9ibqerwYD+A07rM
-    RCI4KXy1HSj7KfsejzJLA1i7vU688CY2akbGRKrz2Zv6Vt3uAD79TAafN6Ug
-X-ME-Proxy: <xmx:3GmCany2bPs5HtwHeBSqKj-5mq5dGMhnxvEHh5gtbnNd1nyIon-aIg>
-    <xmx:3GmCasPYGQ8hThYH2HlHOntWI5fVusogU9J6MXPIzjM193WMrJ2_yw>
-    <xmx:3GmCas-abQk-SN8TW_IBVJrZIlGtaICFpbshIqYqFQilbyhAhaFnkw>
-    <xmx:3GmCap5y093pBe-hzBpblusj4wfJF-XXfgvlTOeqN4YNDnb04-FeMw>
-    <xmx:3WmCaqRPtwFGicGzJ7WpDSn5Em6WjociSL88-p0IzcbDAPrFrNepBtMp>
+    dd2Vu8AeIxRK7b1SVEdgm5fqxWGAl0hW++r8vV0P6QNaTx9jFo8LB1mZXd3D6ux6m/Q5me
+    THjWiT+VMA1Ltq4sOgLLJoLEWYhvba+VQFstjRHuyHcmohW5XCOM5uwMnpQff78cE2NPG2
+    opFKy+ubeYWiVqVNcl/2wuI16WaAjkHJP3OTQXXM74hsSZU9UxJm5+xr2wgubPkQJR8jpN
+    MFEsb3RNYAyQ5Y7Ys72DCWbkEXLyPWim2XHdlcHXCezDqJndO8W//Rht5Q9aVBxKaGK1hp
+    O/7i5tu0GCWcYwnSyrmamVekAMEqP6U+NNsgpqUiOETDqK8plaGtvkdYbzH96kHTbXLb1B
+    0jT2QYcA7FQPdJe9BAOfGDSCDL9x3t/HcwWa/LjKYrrv/+3uw8BWHWzyTw6A
+X-ME-Proxy: <xmx:5mmCaqFujhimqt1-ooc5BTEA3rJ6dY0ihLQbU04be96pvbfm1RSJvQ>
+    <xmx:5mmCaoR-ApqBENi1qov0EKgd7YmR50A0sq_zwG5HnhuhP2as_7-S2g>
+    <xmx:5mmCavyTU1_9rCDiMAOKzKtx9Jn-G_avfpbzzC2W3e_0fViYBljQ2w>
+    <xmx:5mmCasf4GMqjTvcCMMDpmx3rJIg9XXBpLBzNONCegwZqAVm6aAyTzQ>
+    <xmx:52mCarhO1KEqeJE1Sw82oncN8yB7-bsGmAEnaSbwQN_MYajgXSl8we8u>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:54:34 -0400 (EDT)
+ 16 Aug 2026 21:54:44 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <26581501013da0b5174d0108d0a552675de5eb61.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <4e4872708c26a128962a9a2e08fd364b5a8319cf.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 02/32] swim: Select appropriate drive once only
+Subject: [PATCH v2 03/32] swim: Enable the drive when probing
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,42 +73,86 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Before turning off the spindle motor, call swim_drive() to select the
-appropriate drive. Remove the swim_drive() call from swim_add_floppy()
-because it was already called by swim_floppy_init().
+According to the ISM spec, the MOTON bit "causes the Enable 1 and Enable 2
+signals to be turned on to the drive." It doesn't actually turn on the
+motor. When selecting a drive, enable MOTON. Disable it upon eject or
+release. This fixes detection of the Sony FDHD drive.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/swim.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 5d89e7813049..4721e073a874 100644
+index 4721e073a874..4ddb87977fe1 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -679,8 +679,10 @@ static void floppy_release(struct gendisk *disk)
+@@ -154,8 +154,9 @@ struct iwm {
+ /*----------------------------------------------------------------------------*/
+ 
+ enum drive_location {
+-	INTERNAL_DRIVE = 0x02,
+-	EXTERNAL_DRIVE = 0x04,
++	NO_DRIVE = 0,
++	INTERNAL_DRIVE = BIT(1),
++	EXTERNAL_DRIVE = BIT(2),
+ };
+ 
+ enum media_type {
+@@ -311,9 +312,15 @@ static inline void swim_drive(struct swim __iomem *base,
+ 	if (location == INTERNAL_DRIVE) {
+ 		swim_write(base, mode0, EXTERNAL_DRIVE); /* clear drive 1 bit */
+ 		swim_write(base, mode1, INTERNAL_DRIVE); /* set drive 0 bit */
++		swim_write(base, mode1, MOTON);
+ 	} else if (location == EXTERNAL_DRIVE) {
+ 		swim_write(base, mode0, INTERNAL_DRIVE); /* clear drive 0 bit */
+ 		swim_write(base, mode1, EXTERNAL_DRIVE); /* set drive 1 bit */
++		swim_write(base, mode1, MOTON);
++	} else {
++		swim_write(base, mode0, INTERNAL_DRIVE);
++		swim_write(base, mode0, EXTERNAL_DRIVE);
++		swim_write(base, mode0, MOTON);
+ 	}
+ }
+ 
+@@ -447,6 +454,7 @@ static int floppy_eject(struct floppy_state *fs)
+ 	swim_drive(base, fs->location);
+ 	swim_motor(base, OFF);
+ 	swim_eject(base);
++	swim_drive(base, NO_DRIVE);
+ 
+ 	fs->disk_in = 0;
+ 	fs->ejected = 1;
+@@ -652,8 +660,10 @@ static int floppy_open(struct gendisk *disk, blk_mode_t mode)
  	else if (fs->ref_count > 0)
  		--fs->ref_count;
  
 -	if (fs->ref_count == 0)
 +	if (fs->ref_count == 0) {
-+		swim_drive(base, fs->location);
  		swim_motor(base, OFF);
++		swim_drive(base, NO_DRIVE);
 +	}
- 	mutex_unlock(&swim_mutex);
+ 	return err;
  }
  
-@@ -752,8 +754,6 @@ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
+@@ -682,6 +692,7 @@ static void floppy_release(struct gendisk *disk)
+ 	if (fs->ref_count == 0) {
+ 		swim_drive(base, fs->location);
+ 		swim_motor(base, OFF);
++		swim_drive(base, NO_DRIVE);
+ 	}
+ 	mutex_unlock(&swim_mutex);
+ }
+@@ -804,6 +815,7 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 	if (swim_readbit(base, DRIVE_PRESENT) &&
+ 	    !swim_readbit(base, ONEMEG_DRIVE))
+ 		swim_add_floppy(swd, EXTERNAL_DRIVE);
++	swim_drive(base, NO_DRIVE);
  
- 	fs->location = location;
+ 	/* register floppy drives */
  
--	swim_drive(base, location);
--
- 	swim_motor(base, OFF);
- 
- 	fs->type = HD_MEDIA;
 -- 
 2.52.0
 
