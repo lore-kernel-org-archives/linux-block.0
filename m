@@ -1,59 +1,59 @@
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235ED3B1B4;
-	Mon, 17 Aug 2026 01:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE181A683A;
+	Mon, 17 Aug 2026 01:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931754; cv=none; b=lq5ZHlAFL7n79h4CiKEV3CS8r8lpL66zg2+Z8Nldc1i//ieOmukhVthX4PK2+15P50Sh+jlzkbczxTY+6u/p5XTPPYsSZtFT7bHQ8N3yUfLHMBz8LveOQxgtaAX7jatdrxn6qkhx9j5oO4SAWEPw5I8N8JhTZ7Yj/DOc+Y6jAxI=
+	t=1786931764; cv=none; b=nH9vl0B4IEZ6B6ywFJYADGJPZ3n6/OhM4gdM2UvFGQUvhtMAlk8mCr2SoX6hXNHGCqOXi78+Wr0TTKfG9iYms4wwhzXMuQU4yMg7Rr9RwklW2Ep4M3bINxIKiXzTKtT/GO1M4OVhxqU3/LIwiDGKtOAvyQfc6LlhpENl1+MCgEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931754; c=relaxed/simple;
-	bh=dWPrkfs/YBpk5pIzLBQ3Ca5UUgv304wkOM2A4qhnC2w=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=uAnVYw+VFXvAYeX+JXDBSVq30FYgDfuEsnwPX0bZ5DmN7zzdv6lrYiTheTntD3a+9JWSj+nAgMWX3gwS05VprDX8eiz++r5YYdsiAerYAEZRbnRyxWtCz6Qw7034+kPAtwe9IX//hjUErQDl3yIOwzWsyHSI/i4igMgQbsF5WsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QfIUwvQJ; arc=none smtp.client-ip=103.168.172.150
+	s=arc-20240116; t=1786931764; c=relaxed/simple;
+	bh=nJY7w7cEh+7c64BYyL0LKpy2zDQj/yRgCMwLxC8ocPY=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=G/s06AHS6rlA+sTvOVDeE4Mybz3cj4OTQIhk2QAO/EwbaFmHy3onXULt+yJfXXorimQ+0PSEsV4eNr3q+VKxA9DbsuhgW0exQV0oj3oqazGcRsGd/xRqJaearwa3Z3tBD5aviwhgcTY2pxuzsFgZjWnbbO3fbpLPzjgfCeS1mTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mPfE/3uK; arc=none smtp.client-ip=103.168.172.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QfIUwvQJ"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 61BDDEC021D;
-	Sun, 16 Aug 2026 21:55:52 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mPfE/3uK"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 681941400031;
+	Sun, 16 Aug 2026 21:56:02 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Sun, 16 Aug 2026 21:55:52 -0400
+  by phl-compute-06.internal (MEProxy); Sun, 16 Aug 2026 21:56:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931752; x=
-	1787018152; bh=lfZv3tllxNBkGbGrLZLjcEZUu+aYZBb8E3RrIcvdebA=; b=Q
-	fIUwvQJotlvsTreuTYukKy6LYSu0XX0BO89x/pCdcuD1Uzv/F+HrGt9YQ51Recw+
-	BrPY7I3sMPOjcSWfmEi8nz3jdnk2TwCTv+tmCKFHWseHytFL/Pt9kwTrQxniWpAH
-	vDoR+cpqlmlj3ptQ9kwESuPD35ZtHNIp0390kqltZbHFkuPc1vCkvICvs/NnuXku
-	9sNO/6skEowgcFtcJyw53Lo2SpJSrqMIhpAA86A8q2kkYZ8I3k+7BJMW90RtCAez
-	72sPJElOeNHR1XXhkRmx2QqSL3jLTIMmkNpcpahjZrEMmwprRwrLsXZMNJZGbK9P
-	J35XTr0djXYjpSLkRO1vg==
-X-ME-Sender: <xms:KGqCaoAavR5jIRT58-PpDyxgWkXveSRcqzgeyThhY8LUOUIj9m_Q_A>
-    <xme:KGqCakmooLx_ngZPlxZjzCFZh4trPnwfL5ueDX07aTnbsGdeuVdC1pFSJqSUlfYHR
-    xqR72MY0lpe31wP7PitBlddwq7sRp4dxCmXIDRcUOZDW4O84F8wXO2u>
-X-ME-Received: <xmr:KGqCareYv4zDkx4DcTJ7qXPGqES-iUFjIn8RNxv5ZY-Kb93HxUlPueNjhck_0msFAmsHl5OiidWUszPanCG8M3vgvgnI6bA4MG0>
-X-ME-Proxy-Cause: dmFkZTGNmzENqalxDTfCkkFc7mFU+8/8u51l4usXC2H+kPVL/IH2s2NYJxgIYjtBYtArJA
-    YWtyuDuajqQPlQd9d39HppQGgAciKWsN5vaSeS8TTvkVHVx1RLPosXGbRFJQPSd5BLLYVy
-    eC1VIy4/prdxHqOKz9F9XzgS4LWYfaliKe2CMViR9dDdyGPbLM90F38TD9YW2MkJ0tIv5F
-    Ml4DBCJ2CjSI2ieswFMFy7Ro4IzVcMw8i8Or1S6KLLExG4iRUFFS7PoCzWwG3m0EJF7GAr
-    uN2VwdTVv1tA6XFTaF1EIrNDccscfKI9P6vDWUSZluIhB0JYi7lhYJmYYZKiGnpyDh4kJd
-    SDeJ83XA+cDklCNjM/In18HHxC3Ci3BrVAl/ftjyuaIQvYge0qp9vDZHt78h7bSeCnL1Sn
-    Zf58VHdIFidOQbBHR22SOYTmhgU9J2rLEvnlv12fqazee1m/E/t6HknhE49dNCpb9japh2
-    T7MceQCf8POf0Gbb/nHkc4O0gIjtH6I0E99Cp7dqiKToxc+R4Ge+WVn/FwlNs0pcFwctkt
-    boH7ASiE71oupPMOz2vJFUfBz6We8Nw4cQKpKsrJEzc8ALVoLeB/VFwyLDr9FuVLwnXJBd
-    4dq5VQud60a9YTS+qiAKxb+r0/EEgdoVZNVlZHZHlciQuECWK2RAID+MlQ1Q
-X-ME-Proxy: <xmx:KGqCagRr5Rnm85V5BJQmG6BZg4-drPhQ3aVb6BKgr_ngUynzuvD29w>
-    <xmx:KGqCaqvmENiSsfkTv-gvtHRv-IfFz2zh7vbFAG-oZBGShIUCU4Pntw>
-    <xmx:KGqCapf2_JIgRvh44e4tc6iMgykh065CMb8lUY1AryhvxgTgFHFsxw>
-    <xmx:KGqCasY2s0iN24dUsFzbBpow4NT-1As72hyaUuu8cqtdqTPxkFwWwA>
-    <xmx:KGqCaoMkwKLKWIyfEEQQkrfUTfnhwwP3yL1ZGMZmT4H2MxfinCGOcGvv>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931762; x=
+	1787018162; bh=C0D7P8G6hTvt2FE5SH/vyr6jLBpriqH6H04iEj3x/3Y=; b=m
+	PfE/3uK6SPRJn5iEend28lghiBAtoaA+UtWOjMDu9LxAsTbHkkGA8DeQ0dgcjOgf
+	2bqMnWyu/yEAk53SonwJaWAKq2aJNRwvHYxGvLvNdCxAcNTyhDmXt7CMysikVbmg
+	t79ex910osHnPwUlVdFE1xubwwT+wWhSIRzx9aEFteMt0MJ1i3FCecLB4Y056DMq
+	Xcov7UyK1umECRm/lido+y7nmS7Ioh8sqQNGy6IVnZfba4WaE8U9gZZlxQU5k/F+
+	o5DIV5joqDr4Pq89CsqSMh/chb0q2wC9nlGrdzd5s8CgaaYKKBcaRaMYBvERPmm9
+	FDdMjMV9M+SQLSOwM440Q==
+X-ME-Sender: <xms:MmqCanxadYTH0nPbx1uIThJTufZ4GbzAytuFexS9lIcOhFO5xybnIQ>
+    <xme:MmqCapVO4Blb3nhnbhINC3u016ovfYn4mFtcEkgCakJyksLaIWdl0-SVkuzQfOvL0
+    UEXpXVcUOMGy2gtTAUkk_0yOEloYDMI58OeqHEMs1HLsjbK8sNMxokN>
+X-ME-Received: <xmr:MmqCahOvUaavQs4e6cwKFTiDrPQsUyhfgyBc1kte3KNNjpPB18RY4-u__i8dnCQ1PY2MiPZhHI-PhIjjdZ9Y2PdZ9_Rd4495kTw>
+X-ME-Proxy-Cause: dmFkZTE1zBPzp57EvI2WKCa7xOaCPMCOsnXZwbAcoEmj89wsUSdGt4GdBKxObmiMx5fcBp
+    oypA2ZnWqmNfQHyLmgxVrQMcSmueK9FdyVbmzq7gcarPcOKIILF6wzhnATo24VW++U4bpr
+    H/QRyZHAzEFnt2ybb1uKoVu70f7UxZRvsSsh3NqJpyFBtN9ZF+RelgIUc1c09+DZsY84pi
+    EI1TKCZbprgJbTC2I6+Tci8LWUg14CgVvKLIKZgqG1lXgt7dQKZ4oclWRDyn7xEZQn1FVL
+    lHur/i8a25kfG09je15e0Arc8jCgfeXyJqv4H+/huMUpP2k1jpTXuNoi3NegLnN4iF7ypZ
+    pi2DFaF5FS5iOoYoM7rq/ms0yxnRVMNUpX4YF6ekyQ6ZrxoOUfHlZFru41YSd8dfx/iRqL
+    3aFNH29LfPK14Lj6qiJ+cgTN86xsvlIwNHZqawzQVM9GG7Ixe2XQFg7yiFSBcS0rh9B7XM
+    ZMhlT+YV7MzzATHBWLo6qKIR76qiAJJHRMo10ZKMOfjjCiQQ2+7b6nvN187Cr1gluqV2FE
+    KExQrGxOFbHjhoFpnoV5DJud9c5b20d4Nuanvy3cAMhloHJh1qbEXTW9HqPNJ3U+g1Sm3/
+    B9gUo0rt6FCIYSJcDecKDGLm3XADVD4+MzAWX072SStw2lzYLwoi/rT52A1g
+X-ME-Proxy: <xmx:MmqCajCY_6HJismubI0fyJqNWydD1485DVVZ9dCivSY3GUVvfnoRjw>
+    <xmx:MmqCameqWxzjwRhB8DZZxInwIQPKj64JOqAia79KkgQN3W9e-KMZaQ>
+    <xmx:MmqCaqM1_Uu2xI2GoISFq9Cg2Ob_gM0xUWT9ouGG6m63TmYQokxO9w>
+    <xmx:MmqCauLWgs0W6QQisXTM1mHw_UOZWKw404MM50zD_VlWXxkrLc_VxA>
+    <xmx:MmqCak9KECbKaQkbVKu-zNz2sGBcwwLe74yissC60rbXauXpR9PqO4SR>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:55:50 -0400 (EDT)
+ 16 Aug 2026 21:56:00 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <45b77aeeec9775000f46750766ae1186f76c879e.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <36bdb4dea76a9277765149755ea3a6ee23f96873.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 10/32] swim: Add track zero recalibration delay
+Subject: [PATCH v2 11/32] swim: Handle FIFO timeout error
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,43 +73,37 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-The UPD72070 spec indicates that the track zero sensor can take 3 ms
-to stabilize following a STEP command so add a call to msleep().
-Remove the duplicate swim_readbit() call as there's no need for that
-once the sensor signal has stabilized.
+When polling the FIFO for a mark byte in the sector header, don't
+return zero if the timeout counter has expired, return an error code.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/block/swim_asm.S | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 9abf93bc0980..c9cd0748c878 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -402,16 +402,15 @@ static inline int swim_track00(struct swim __iomem *base)
- 	for (try = 0; try < 100; try++) {
+diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
+index 3d7a2d87595a..208622ac4aeb 100644
+--- a/drivers/block/swim_asm.S
++++ b/drivers/block/swim_asm.S
+@@ -79,7 +79,7 @@ wait_addr_mark_byte:
  
- 		swim_select(base, RELAX);
-+		msleep(3);
-+
- 		if (swim_readbit(base, TRACK_ZERO))
--			break;
-+			return 0;
+ 	tstb	%a2@
+ 	dbmi	%d2, wait_addr_mark_byte
+-	bpl	header_exit
++	bpl	signal_nonyb
  
- 		if (swim_step(base))
--			return -1;
-+			break;
- 	}
+ 	moveb	%a3@, %d3
+ 	cmpb	%a0@+, %d3
+@@ -136,7 +136,6 @@ crc1:	tstb	%a2@
  
--	if (swim_readbit(base, TRACK_ZERO))
--		return 0;
--
- 	pr_err("swim: track zero recalibration failed\n");
- 	return -1;
- }
+ 	tstb	%a3@(read_error - read_mark)
+ 
+-header_exit:
+ 	moveq	#0, %d0
+ 	moveb	#0x18, %a3@(write_mode0 - read_mark)
+ 	rts
 -- 
 2.52.0
 
