@@ -1,125 +1,89 @@
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+Received: from mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A16439F9B
-	for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 13:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8095743C7A8
+	for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 14:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786974133; cv=none; b=VOsLnpNJ2TgsLGJvHUxy7Na5ZiHFxFNqjXBj9hlpAFByBmETMIHw1vw6GPsz6LtQX1UgKugaUTu7FniZaJFbVEfN9zJ/yuaU2ryapUMAJu8tvS60YtBuTdy+VzcAq10XTLs2xFllMwp21hOf92HcDaA6CgwtLwC2PVVZij1kscQ=
+	t=1786975856; cv=none; b=JCLpaKVzVVXxxXQKZFnTfer7mFOnTpmVv6T1FRmn0ICzfudtHsuIcshaC16eajmZOI4Y1t+uA25noZoXrg+SJDtBcJL7xtGRt70dkMywTcXZHIC9wgFMddL7Dp+4eQ9YVnOzI4MJFnyNCyFKMjz36F3SIWs521qkL2tXwfajxU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786974133; c=relaxed/simple;
-	bh=O/bTkpfxDK7wgp8C77ivdtmEVT3RkPujsiRjYOIdbTQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mwBIKnLgpE5p36G3h3OUXdB35V35Ba3B8blNvJ1eWDfaICY7WA4cRtOhnSgMWGMuUnuNfKmzYRHrM90VRgmX0cb9QeFF0WUgvR/YoSDx5maPfyFCk9tF8IJxYxbfwJzva+Nj77IKeDkOnlBiWJVBbPUEoo+hq3/PznE+sKSl4z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hNcX1XWv; arc=none smtp.client-ip=209.85.128.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com
+	s=arc-20240116; t=1786975856; c=relaxed/simple;
+	bh=WC6FwVcdTcvnbXOAaaKr7EIZTaS1+kvj6D3uYnj1BAQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K6zpfy4c8BNDCUFGh2EPAC8kFF45m1M5Y3IW4N9siyAOT8c/CrErj0NLWwx9vKnQJwXsMQ25XqtnR9UJM8oPPgR2NBDApVcf8dcYg/VkNPSL063JT3I7voKr2JZe1jhFMGDiT7WXecgNhrasHNwHB+CjKTmPyUW7o4v9p3YCMpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HTSsQI6B; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hNcX1XWv"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-499900c9d99so16213085e9.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 06:42:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786974130; x=1787578930; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+a64Ot6/PzSxx+bPX9pOVSI6enVUF78QeyJyJScORM8=;
-        b=hNcX1XWvdiq5zZuWJ0mZuv2FhIbTsh3IAiZyVp/WJ/2BAfn+NvgujeDbj2YTk8i/Xj
-         m7e4eMVopaL+WJeRXyYrlam6ScAqJkfd4N9fwIcaU0NMcArfC00p+PN5BM3r9onKo1ik
-         AnSbYQWdwBzRoGPllK3o6l705FWqhTm0d9Li6prC2m4PuM73KSLAivHb5CQj0m9qQkJB
-         kXnLlG92RxmJ0SyFSpqAJxyoHVCI/Nk8L2Wx6uodAqL0pnNdDUqo9HtMHUttkmefoQB2
-         ujRU2cY1ZV1AGn2LqF8qzxWoDDxEta/XUygzQY/ZmiTEqYVB7UfjjRy5Q/OnpTQz31fC
-         OBAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786974130; x=1787578930;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+a64Ot6/PzSxx+bPX9pOVSI6enVUF78QeyJyJScORM8=;
-        b=LE636S0tNQ94HWqtjYi7Jg/4R5bAHoduJMX0N6XdvB4pWw8uGbxFUkwEIJLBlTJmQO
-         3IBJZtT48AeRFuZ5JJhp+UOQOPA1PbcSi5GAKhrV2AYOVHrG2nfWjP+hoxQ3wH/1JzUA
-         8EpfIkBsxrIZykyQBuEcPqxLFUDvn9dWy8UNgzRUJhoa2+MJpgqKY5J9zMDqW5l7rz9+
-         k49Sr5h/nca8y5DWhoVAUMTNTFdOn70JtdNiC6ENT4nF7XBAflEhhD3oPfEC943hnUpz
-         YUcxt57rkG6fowIdCGRToO9M52+NVHVCWbk03/h1OydgFlXyNlk7ZFiA7eTJa5z8g59w
-         2x9A==
-X-Forwarded-Encrypted: i=1; AHgh+RrmE64Ojtnz3ZaYOz5YBpL23/ftOnrN30+b6AT3Sr1nOgDG7GxMxY5JYGsARYSY09x7Po0BWxg780oyZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw00rj5gH1Ic2OMJEqQgWJnDzQxo9dWzF8GH5wPbWNMsywb/vo0
-	DmoZJZQuJibHHGEVWrbx8DyRHXC2Lnbc39/wERzpJweGCjZJKR+alukd0zTzSVd3n9kx6TorjcQ
-	KQU7DS/UrWQkReUXjExl37dTEAr5anQKDDg==
-X-Received: from wmbes12.prod.google.com ([2002:a05:600c:810c:b0:495:713d:cc69])
- (user=sergiiushakov job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4003:b0:495:3de8:33a6 with SMTP id 5b1f17b1804b1-4998798db40mr336981795e9.16.1786974129626;
- Mon, 17 Aug 2026 06:42:09 -0700 (PDT)
-Date: Mon, 17 Aug 2026 15:42:02 +0200
-In-Reply-To: <20260814105954.4060627-1-sergiiushakov@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HTSsQI6B"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=WC6FwVcdTcvnbXOAaaKr7EIZTaS1+kvj6D3uYnj1BAQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786975852; v=1; x=1787580652;
+ b=HTSsQI6BhGk1n2cZ4D8Fdn+HOIH7VTdhaHV2MJMLSMyCp6ksFFZ/xkhGh2cvJlgDp4tpwqRO
+ +rwoFGkskABJfcKrr4OVX5uv3TspbR/KysS5ssNRPgwb/YWAkXRvn/jDcKl7WE9asiFsCXG7jYZ
+ ijeO+uzB6vm0EptYSRPhfHQc=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: from ctao-book.. (223.70.160.239)
+	by smtp.migadu.com with ESMTPS id 839f979253890219;
+	Mon, 17 Aug 2026 14:10:42 +0000
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	yukuai@kernel.org,
+	linux-block@vger.kernel.org
+Cc: nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	mchristi@redhat.com,
+	cui.tao@linux.dev,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH] nbd: clamp the timeout before converting it to jiffies
+Date: Mon, 17 Aug 2026 22:10:27 +0800
+Message-ID: <20260817141027.48423-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260814105954.4060627-1-sergiiushakov@google.com>
-X-Mailer: git-send-email 2.55.0.691.gc56d675ccc-goog
-Message-ID: <20260817134202.160669-1-sergiiushakov@google.com>
-Subject: [PATCH v2] virtio-blk: clamp max_segments when indirect descriptors
- are disabled
-From: Sergii Ushakov <sergiiushakov@google.com>
-To: virtualization@lists.linux.dev, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Christoph Hellwig <hch@infradead.org>, 
-	"Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowangio@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Sergii Ushakov <sergiiushakov@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-When VIRTIO_RING_F_INDIRECT_DESC is not negotiated by the host, every
-scatter-gather segment in a request must consume a physical slot in
-the virtqueue ring.
+From: Tao Cui <cuitao@kylinos.cn>
 
-If the host does not advertise VIRTIO_BLK_F_SEG_MAX and provides a small
-virtqueue (e.g. 128 descriptors on QNX Hypervisor), the block layer
-defaults max_segments to BLK_MAX_SEGMENTS (1024). When a multi-page
-compound bio arrives from the page cache, virtqueue_add_split() rejects
-the request with -ENOSPC and triggers:
+nbd_set_cmd_timeout() stores timeout * HZ into tag_set.timeout, an
+unsigned int, and passes the same product to blk_queue_rq_timeout()
+without any range check.  A large timeout (2^32 seconds, say)
+truncates to 0 instead of being a very long timeout.
 
-  WARNING: at drivers/virtio/virtio_ring.c:1493 virtqueue_add+...
-  WARN_ON_ONCE(total_sg > vq->split.vring.num && !vq->indirect);
+Clamp the timeout to UINT_MAX / HZ seconds first.
 
-This permanently wedges the blk-mq queue and blocks all subsequent disk
-I/O in uninterruptible sleep (D state).
+Setting NBD_SET_TIMEOUT to 2^32 left the debugfs timeout at 0 before
+this change and at 4294967000 after it.
 
-Automatically clamp sg_elems to (ring_size - 2) when indirect
-descriptors are disabled.
-
-Signed-off-by: Sergii Ushakov <sergiiushakov@google.com>
+Fixes: 55313e92bd17 ("nbd: add set cmd timeout helper")
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
-v1 -> v2:
-- Drop max_segments module parameter and rely solely on automatic clamping
-  when indirect descriptors are disabled (suggested by Christoph Hellwig).
-- Guard (ring_size - 2) calculation with ring_size > 2 to prevent underflow.
-- Update commit description accordingly.
+ drivers/block/nbd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- drivers/block/virtio_blk.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 32bf3ba07a9d..8f5a2d5323a6 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1267,6 +1267,13 @@ static int virtblk_read_limits(struct virtio_blk *vblk,
- 	/* Prevent integer overflows and honor max vq size */
- 	sg_elems = min_t(u32, sg_elems, VIRTIO_BLK_MAX_SG_ELEMS - 2);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 8f10762e90ef..1874c1a81d3a 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1619,6 +1619,10 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
  
-+	if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC)) {
-+		u32 ring_size = virtqueue_get_vring_size(vblk->vqs[0].vq);
+ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
+ {
++	/* clamp so that timeout * HZ fits in an unsigned int */
++	if (timeout > UINT_MAX / HZ)
++		timeout = UINT_MAX / HZ;
 +
-+		if (ring_size > 2)
-+			sg_elems = min(sg_elems, ring_size - 2);
-+	}
-+
- 	/* We can handle whatever the host told us to handle. */
- 	lim->max_segments = sg_elems;
- 
+ 	nbd->tag_set.timeout = timeout * HZ;
+ 	if (timeout)
+ 		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
 -- 
-2.55.0.691.gc56d675ccc-goog
+2.43.0
 
