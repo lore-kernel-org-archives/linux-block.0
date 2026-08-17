@@ -1,59 +1,59 @@
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99F81A683A;
-	Mon, 17 Aug 2026 01:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A34325494;
+	Mon, 17 Aug 2026 01:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931712; cv=none; b=G8SePgeGS59IW1igKlIfi1yKQVVRPaM9EswrwL6Ew6Vo07XJARKPV0NAeXyEpArbXxCl7EDymuVKTBvkSqAynBG58tnclVHtWrvD2Y0n9LiIrthuxbuOLE9IjgXbhpJdBUwY8pAehfaBYYh8qYVEMTgHM0XOkrZDWY6N7bRYpPo=
+	t=1786931722; cv=none; b=uMFzJUgRv9S9KrJdkvgIOZx17ksMfpKPtN0cO3jCTJGbC95M9+nPbYhKX9nVR+5+1tXLcuyeb49Nsxq+tPmZVlky8WHQB/Ywv9kS2T+LDYU1D9Zenc4T0M9mAoJSqAlhw905jmbntIVTaEkzik+k5U2SyWA/eVTnarkjiBo5hI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931712; c=relaxed/simple;
-	bh=y2aq5s8D/L5khZxRe/cFjwbxbHS1B0FaloGAs2bTUlw=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=huuPnOca2P6MDnm1uVYyRFwGozXyqiBNWh9yaKhsilctx9tcubmDhAkcO73E/kxX2rF12jitMKOSLt0USKgX5CQjUw1tn4wxVHDG2A/LC1cbDbcrvQviPttFoN+ZYgeyOrWdGSwHPMOJOxFd9cNKiEwX3bhnYwygu9RgC9JRXxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=D3TsYzBQ; arc=none smtp.client-ip=103.168.172.150
+	s=arc-20240116; t=1786931722; c=relaxed/simple;
+	bh=aJKOZOWoXveCddxLIqL10UrkhvVmgi/l2ePVG1uejgU=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=RSX/fhd8q/sxlZIhAskSMCHcXS1MhzQySulsznjsteSMzaWEPHcbJrhl66RVDxQ7IH2fAl2NrmmFclvVpH9cOZ5sYp0lZkYZCWEN+76vJ1iyiD9Qb93kgnOOTIXSQzBkkACJwElH28YAv/cKWpP4avsc1VIoXbWYjYKj9R0oSCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hu5NZrEH; arc=none smtp.client-ip=103.168.172.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="D3TsYzBQ"
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4F818EC0217;
-	Sun, 16 Aug 2026 21:55:07 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hu5NZrEH"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id B84831400031;
+	Sun, 16 Aug 2026 21:55:16 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Sun, 16 Aug 2026 21:55:07 -0400
+  by phl-compute-06.internal (MEProxy); Sun, 16 Aug 2026 21:55:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931707; x=
-	1787018107; bh=0HLz2220nu44BKt2ov/hAQqSq0Y4djEeSPVWO+Yzb0M=; b=D
-	3TsYzBQaaGUbYAH7BJfMFzo7uSs/8igaRXjSecBc9lFXo6agtlidti//moY0ya6G
-	ponbhQp/xIcFbLe8Q86xqm7vnKqiZHqv7zm+xFFL72KkRK5L2bOTFgors2KZUM0J
-	u80W6cAkYaQ+XQE0+Br2KiY2dbb76vhLUqqx+3s8ulFDvvEzrH9k3BsmddIu3/Nn
-	3Dm0fwag5tVN7VkInjpzaX2PXFYZFYwZncQEsIrrxvv38PGck+oLkMGBlkYQnGQI
-	UCbTPw0eSA7cMkf3GN01ltOFdyLu4f4rB21ZFecHByM6rm8zw8IQe41y/bhHMRwx
-	gNmzS4hi+KAPoP0NMMAOg==
-X-ME-Sender: <xms:-2mCanUUSRyY6LOZs4If3Fj3SExMJHNx1k711KthnpQ1yIYdWTRq-A>
-    <xme:-2mCapozqFfyYAqcV7AvYF3exOMJqC6fu91vg1vEeQqgd8vUw-BC9VlZgivLYBwcx
-    LiAYd_YtNm7oKvAXuBU3Ekyg0D6nWocvt6jh7yvj9u_DgyyLYH9irY>
-X-ME-Received: <xmr:-2mCajSwzAJJL7q1muidR-hpiJ9rgXAMrTvo8H9d-aG1uo2z_bOh6GfxnvstUt0_rMp-QtDYuw6bPJxYd_3DfBL7zFkcwNAJKuc>
-X-ME-Proxy-Cause: dmFkZTGNmzENqalxDTfCkkFc7mFU+8/8u51l4usXC2H+kPVL/IH2s2NYJxgIYjtBYtArJA
-    YWtyuDuajqQPlQd9d39HppQGgAciKWsN5vaSeS8TTvkVHVx1RLPosXGbRFJQPSd5BLLYVy
-    eC1VIy4/prdxHqOKz9F9XzgS4LWYfaliKe2CMViR9dDdyGPbLM90F38TD9YW2MkJ0tIv5F
-    Ml4DBCJ2CjSI2ieswFMFy7Ro4IzVcMw8i8Or1S6KLLExG4iRUFFS7PoCzWwG3m0EJF7GAr
-    uN2VwdTVv1tA6XFTaF1EIrNDccscfKI9P6vDWUSZluIhB0JYi7lhYJmYYZKiGnpyDh4knY
-    wsfHphzCC1qYfQUHzuIwXxXBvEqyDEkW5YeX+6pYP8VMNR/hBkKjCdkVRB6+zfG91XhNkC
-    n9gbgHbSh/ZmultLMvQBWYtboa9CCSlbPqEJdxQPlqiJAm6RjGcP6KQdunB1Cf4B074rYW
-    q+y0eIjjtM6loReTpoC1HA9meXym9K0/Z7SpZ/Pk63NHYC+2cwlJ9v2prbuF0jF9kNaBqB
-    ItsqRXOS9YeZpVi6vWyKPvUpf392JZaKKnAQGs12BfdZMSRRYgRmlH69phM/PprmTDzb9K
-    p64g+9ME+CUsWeWXl90204qeS8LIDAIl1jcrqB6QecFvFALMLMjc7ZxQNOAA
-X-ME-Proxy: <xmx:-2mCaj25zi0UQ2LhZM-BHDYFOraVDS9EVTKxgHk1jaVOxJmbiszziA>
-    <xmx:-2mCavBqOnn8s52-dW5FkSnDwKf0iRbb4ulDEwGZWTuEc4YIclsS0Q>
-    <xmx:-2mCavhFHEQ0yJL9DKcM2eHdp3g1jYEWCBTCP7J5iqQ8J_heHiV9Jg>
-    <xmx:-2mCahMpxR9wIr29G35xCQ-Q6bir6Wkv-Fu1NU4rH1kDEp-_dLn7xg>
-    <xmx:-2mCanROXuMeoK6AknSKN5gL81actuRl98k3xgm7M4uGUOQ7kLZIr9QL>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931716; x=
+	1787018116; bh=xUoVj+IinLNg7uHC8by8czUyQwiMCVAzf8OSJGcKYhg=; b=h
+	u5NZrEHRUdVkh6FxSz83zb2kb6WgXwaWgnFpbLrmuBVPh4iZdjn57pGn8Jf+UD+g
+	LnliotZByGKPmlREzUoQLl099l5dCgl9aFeI0mHfkskQiFHkfWa7Y/sZ1AeKkRB9
+	WXpkOPG14ZXg55oxhMIDg2GkzVk1sVA5p3U8khAEZk9JSy8/08BHm8IXKnSKRouv
+	4ePCkNeHvNOpvk/wLSI+ZxIXPbNkuLsItqmHgJGmcIZMRDLH+pfkv6NGQnJvUMsa
+	gAnpNHDFNswjlQLy8tDeH4m+7cn0T2FbEYGf9aqoiKjmq88nVKgNqHmUpFjVxWGI
+	0E9//5Eh16RvdDon73S7A==
+X-ME-Sender: <xms:BGqCasVkF09EG6gs4F2-PGArMi2rEflSLTqcnsMkPd6yXbjBCvRPCw>
+    <xme:BGqCaoNB9eC12pFpmamQ4hYpDc0RbmDBFY9w38PvzYAK_1HxOoSGRqQZswE4nLfW9
+    myHA82mqL4ikO8ykIGXhM5gUB_uBubfr9kn5UDxAqwWgEaZKTkZcwRK>
+X-ME-Received: <xmr:BGqCauCRda6GJeVKsr7r02vIpmwtimypDR5cadOFKGPsdvT5r5_IomuHGoIxZukS_WrvPu76CddbS3ov_Y4f8B8yEMO7HJSx5Yg>
+X-ME-Proxy-Cause: dmFkZTE4hc50xdhPXg/illULTp+C8DYFyqEdlu6WRFncsb6QnuuT/gcUnwV28CSittpzBY
+    CanXMgLJ3D2f99+6fhcgPhKU62j4D/361qP39o0jreF8A1XJd9tbHbTT3THo+0Ngxn+KIR
+    xmSykI00CRbwgNWRv8pmFJk9w9o4Guyae/9OdRSlW4+G/cXS4TLBuEOOa7VrQ1zx7uzt0k
+    aiRQ8f78TROqGsNBFEeFBQ0S+1oq+UQzE0LFPz+xu5GHoHcx5q9+AQ38+8xzR6IOKHtWR9
+    dd2Vu8AeIxRK7b1SVEdgm5fqxWGAl0hW++r8vV0P6QNaTx9jFo8LB1mZXd3D6ux6m/Q5E8
+    uvWxtEZoMMZpY9HdayMAGqzvF1TB8jQUKNoq7nonerJPHLCssG+6cKFubfqrIQ+G5BM2DO
+    kg0vMt7oUM8RSfRu0O9geTe23mDtykPQYBa8U134dxB4mXsvRwdi4yp9+JZe4egRihEyu9
+    nTasSenVI0H5uFf4zL5NDqkc0TIICcNkXlZMWuBTZWRqVzTza80XAIiqv0hPYoTdXHSt2F
+    Ml/d/u2iMIuOv7adwFj+rpE1yf3cJngh4thUTK2pN6YkrPvGEggDIFjV0uq71kUrBSntmC
+    ITP4A0Uw/RHWj6U3n2leNNKCep7Emfe3JfU1eJqis+MuyoZ8nsd3VFNXujNA
+X-ME-Proxy: <xmx:BGqCalcaKzc46xnX13oteSb_juvzkD0crUcKEzPfJQnZHFHESrUM9g>
+    <xmx:BGqCatN-IWabhj_Sae2PrH7ef1bl30-1o3VF9D8IjMPDHkAoPEEljg>
+    <xmx:BGqCalIg96D2ZFhKJEU7vLulY6psZte8PQnHvCmrH9O41qeXqyJkKw>
+    <xmx:BGqCatJskljElfcOt42ywI4JSIHQK7M90oJcrsGFrFjw5I5cUEEWvA>
+    <xmx:BGqCavk1pOFijNR2XgoOsMn4CykPP9jh50f4si77Woz9ECONk8Io6hDa>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:55:04 -0400 (EDT)
+ 16 Aug 2026 21:55:14 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,12 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <873207193565455585f3116bb0d4ce95b600ce3e.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <ac0d80ac0af32f69a5b0f06845de267d8459b361.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 05/32] swim: Perform ISM/IWM mode switching according to
- specs
+Subject: [PATCH v2 06/32] swim: Configure parameter memory
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -74,59 +73,54 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-The SWIM spec says, "MOTOREN must be low to switch modes" and "after
-switching from ISM to IWM, the very first command must be a clear L7".
+The original SWIM chip has a 16 byte memory to store parameters which
+control read/write timing. The SWIM 2 chip retains the last 4 parameters
+which control write pre-compensation, but omits the first 12. Hence
+SWIM 2 can perform reads without any parameter memory setup but SWIM 1
+cannot.
 
-The ISM spec says, MOTOREN "must not be cleared until after the Action
-bit is cleared". Perform those operations in the correct sequence.
-
-When switching to ISM mode, the Mode register has to be selected with a
-particular sequence of bit flips. Set q7 low then q6 low then mtrOff.
+Configure the SWIM parameter memory with the appropriate values so that
+SWIM 1 can read too. The parameters used here were observed in SWIM chip
+memory, using Macsbug, while MacOS was reading from an MFM floppy disk.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/block/swim.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 3f92677ad127..190b2e1b5b0e 100644
+index 190b2e1b5b0e..c2d7ad3f065c 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -149,6 +149,7 @@ struct iwm {
- #define ACTION		0x08
- #define WRITE_MODE	0x10
- #define HEDSEL		0x20
-+#define ISM_SELECT	0x40
- #define MOTON		0x80
+@@ -796,6 +796,17 @@ static void swim_cleanup_floppy_disk(struct floppy_state *fs)
+ 	blk_mq_free_tag_set(&fs->tag_set);
+ }
  
- /*----------------------------------------------------------------------------*/
-@@ -223,18 +224,21 @@ extern int swim_read_sector_data(struct swim __iomem *base,
- static DEFINE_MUTEX(swim_mutex);
- static inline void set_swim_mode(struct swim __iomem *base, int enable)
++static void swim_set_parameters(struct swim __iomem *base)
++{
++	unsigned int i;
++	static const u8 mem[] = { 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b, 0x1b,
++				  0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57, 0x3b, };
++
++	swim_write(base, mode0, 0); /* reset parameter memory index */
++	for (i = 0; i < 16; ++i)
++		swim_write(base, parameter, mem[i]);
++}
++
+ static int swim_floppy_init(struct swim_priv *swd)
  {
--	struct iwm __iomem *iwm_base;
-+	struct iwm __iomem *iwm_base = (struct iwm __iomem *)base;
- 	unsigned long flags;
+ 	struct queue_limits lim = {
+@@ -805,6 +816,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 	int drive;
+ 	struct swim __iomem *base = swd->base;
  
- 	if (!enable) {
--		swim_write(base, mode0, 0xf8);
-+		swim_write(base, mode0, ACTION);
-+		swim_write(base, mode0, ENBL1 | ENBL2 | MOTON);
-+		swim_write(base, mode0, ISM_SELECT);
-+		iwm_read(iwm_base, q7L);
- 		return;
- 	}
++	swim_set_parameters(base);
++
+ 	/* scan floppy drives */
  
--	iwm_base = (struct iwm __iomem *)base;
- 	local_irq_save(flags);
- 
- 	iwm_read(iwm_base, q7L);
-+	iwm_read(iwm_base, q6L);
- 	iwm_read(iwm_base, mtrOff);
- 	iwm_read(iwm_base, q6H);
- 
+ 	swim_drive(base, INTERNAL_DRIVE);
 -- 
 2.52.0
 
