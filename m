@@ -1,59 +1,59 @@
 Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8F52771B;
-	Mon, 17 Aug 2026 01:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA27155A5D;
+	Mon, 17 Aug 2026 01:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931908; cv=none; b=UuX/8IWV+HIIxLIoVvEcBzzX+LI0bPsecXEEDZK5QHOym0J6kOL3Pii1vEm+X7tJNwMeRk/RCg7s0tLvD/HuA+iR7cyQ2v7Vqwo+1CyuUbW6PvU3YlQri2gWWge9Ac3Lqc5/+uYEdibGFz18z9geEuoTvf6yvw4GkGOzEevWc7U=
+	t=1786931927; cv=none; b=aHR736iKBgkcQxgYKQC5KxWawgTHU50EJRqYQ1wt2oy7PYpPK8x6DbpCEcF49sTYDOSRuyMdIY7uuzIhdoYjTZDc9ccXAs9WZ2d/Jgt3AjEKKFfnAKdAgRwSt9c8EGuE03D3iitohlV3M2twAh0wdowzIfO5nafz/KKtrDZN1Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931908; c=relaxed/simple;
-	bh=aXLo1JK6qFUgLHFQIIM/r09ViSkkI2l1Vbvy0xub9j0=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Gz49vIwsoy5iVtvNm6b1z/224FvLlTl6+cAIuHyc4AM1TzYSWQZBML9hapAz+tJmjYmfNeRAtb088D+C0tIBOeWnryc3nzWxckUm38qg1L9KKIxCyJ+hL5V/bVSalHcgl0qL1uNkG/pyk9/8nlHjH5KFbbEHVBB6FA7OOpsHTko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jIH9uMGO; arc=none smtp.client-ip=103.168.172.150
+	s=arc-20240116; t=1786931927; c=relaxed/simple;
+	bh=HWkyZHRyWrtpf7FWd6YnGFTMjfjQtzKT9uRvwHZoCQQ=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=th/phc+JxQVN0rGUdaLp9AT0F+SoIL3qP6isVyWgUbgLYMFl+S6wO2fw4jfQb8h5NTJ132b9HFrZGSiuO683LX5uAIjeGX/febMOsX1WnreesrTjQA084H7N1nbcTAmdjK0xnlLKD9rDiVpwkhli/+PR1Sn+oABaLoRbLMee94k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Gxr09Ao+; arc=none smtp.client-ip=103.168.172.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jIH9uMGO"
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id ABEC1EC0203;
-	Sun, 16 Aug 2026 21:58:26 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Gxr09Ao+"
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 4E803EC0203;
+	Sun, 16 Aug 2026 21:58:35 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Sun, 16 Aug 2026 21:58:26 -0400
+  by phl-compute-08.internal (MEProxy); Sun, 16 Aug 2026 21:58:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931906; x=
-	1787018306; bh=K1LULaoZc5SGoxvsL/uTCXlF5BYDi1pVX97BP2zuHTw=; b=j
-	IH9uMGO6BX4VipXBgEY8bZ7VikQ3Q11bGCrnyArMIDviKFrQFARq9tPA3JXE8RNa
-	w+6em2i+gfR+zfLkCkJWMUEkyuj+gPw4rKvoTO+SXpIED3k0SQRHHK+xDDp0U9Dk
-	P/KDs38ajZc71KyUJTapDk/MamPTCs6ibiHNYvTEfEuW7UEFZXnnOPp1Y/B7ZtLU
-	bkO1JKJmqBYsYTEAN0eWHROj6caLRM37p0jCOpCYDoFncSYDb7lIvUXIoLn2cjtg
-	YZ9eCL93eQxw8LfnDlaGJzyOfLjjkCWyS6aVq88LeBG5dsfGznfh9e7Q0I7+ggOb
-	z1BkVUYeZ6dOa6l3oOlPg==
-X-ME-Sender: <xms:wmqCapYaQGwceI3ip_3eWS9ZHW4s6P4emUEA_L9PQQO4fwyRQ1_ofg>
-    <xme:wmqCaqd1w5fdQEsMU_o17_ETCporTqU1Cxd6GkLdDFQN3VM-1wHVOwYpx2LP6QT3z
-    9DRGGHrI1a9Tt1HAtifqdx4UBJF3hYKuexo_9HJwS5a1oZfU2TFA0U>
-X-ME-Received: <xmr:wmqCar19u_VdfXtZho6zykw2RMMDv0z7l5aHiU6NtFqK6HTPS99-mg0Bnc3MYHDeHg3qaqrCPcfqN8U1p-jMI10MW8dzAINt0LA>
-X-ME-Proxy-Cause: dmFkZTGGfSHbL2fI02qi3PxN23Kck6mI5WuUw/IvRcvpbY119ewffFmgrLaJZrOewmv0V9
-    +yVjmNFRAF5v6NwN93pp2/ef5Xe4c3LI9irOXMRuZYHRPaDMJE6WMter/2+BypR/48/QT6
-    HY5IjuzvgSjmo92SyO1FOx3Pzj+F3Bo7QzXF7kAkGOLlhjpoHeFsUQfm7dkDIAS3zbzZQZ
-    kdzEEhr46dUOQtvTauSfnNDphJtrhISaD9OmmoKzjI1J4txcn9eV52lgr1VrqNf0UkcCn2
-    OchZn8Fy5DmAdO0OzTlRhd5sxDSBZbWOqIe4VCopfX4yIdP6r//KsVzdicR3q2dH2I0XrH
-    U95mLLql20IiJ6F1orgyA0rNkl4tL+Una+djqMYtvAdpRj+9+dZFc353ODd3HEb3pcKQmt
-    GKd+moC1J3lRiQDubiGRhrMO1zl/U0GodMKmBQ4es1frXO7w75LL6Ra5kWV51fSpIyKNNS
-    H5B2p1gjAZqm/Jm0P1YEJv/JrZ+4L53OTZwlT8tgE8vRWIlJ095Z02IIY6MoCENLAk5CYq
-    6KU1CkAwpUZBsaZlQrfbMVzfE/PlqD8gBoU4I2toN0I4rVpF6NpFM5HVKWpZHd3FHRXUi+
-    yYo+BslZXhFcRaLOx0DJ3kKgutk6YTS0+2U+k71hrqXLdzkPeGWW3kJO0ehg
-X-ME-Proxy: <xmx:wmqCapJScXIbKGnIGQDiv-XcWEdftlmDKvVWiMDy1-uwbMULCq0bZg>
-    <xmx:wmqCaiESlNgXAPkF-6ojQp7TjdElxztFMuvBcSFUHrngtGlw0dBK4g>
-    <xmx:wmqCatV7qggYYgw6SDm450oYBO5KsO3dW63NTOlYu3JnPN7lS2lbqw>
-    <xmx:wmqCaiymcuIMkHM1Xynmnuv17ELkuMZmYtxJM_z5ZKv3hQ84oO5LUg>
-    <xmx:wmqCauLlYxYbaVigBn6VYuXFPvPvbj5ZMHyLfRgpHKSkmzKJ4LGbD072>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931915; x=
+	1787018315; bh=8eo/+n4lyCg/6TAXGck/31U5uUVgWUR3kI+EQkD9Tdw=; b=G
+	xr09Ao+jPeH/UlQGGzzP2ngbhy0woJVjzBt+aeMnPCAsZPVrJxOIDNbKvrFY/pNh
+	zywwJP5cVGQEcF2G5n/pPJHOy7+zgMXtjnq6L/nNHVA6SyDilUD9w3VD7UZGsFtb
+	s4Gjcsps7zweazd64BNiIJ8GppBwY54bYgS88AKnBF3/sJ8X7d1wMBOPAGoD3Z8K
+	hFL/IJDkwiVkG1ly8d9l27re6xsUMNFXwo/QvricJR9d4Q9QK+F4QbmsykZFDo0/
+	w7t4LY5S4Xp0RVG4bdGQJD/kax2d12MBRAXd152msKEkzYHIhDbUc3CkFmO28DBh
+	E4NQ2P9SjKxrkNAsR0hwQ==
+X-ME-Sender: <xms:y2qCaskf8kRAb47cBIyP7EAR2yiiN_FseyP-z5zAgb1M8SYqDAwVOQ>
+    <xme:y2qCal5-P9E7OfOPXP5TLOLMiEMb80-udCY_xJjb3r2IBp6HNmqcvVozxv6xcmM9u
+    AeEpIf7hV_1ssdkMr4IRD18toYEWjcbr6Sl2jLvQLJ1g4pacqr5XTg>
+X-ME-Received: <xmr:y2qCaqidE5ojnTBgawiBGpAIbbSDH0B67tckKPo2dMMYsQr6XfX3w3JcwHkSWKBYX-GFXc15APDEQB3zIeYipyf6QkMYLsuuSKI>
+X-ME-Proxy-Cause: dmFkZTFZjhdRphDnLxi+EiC+UjlbVLklrWdi+UybHaosTezjB2ZKWMGxBbpbKJYI8cz0VH
+    CGJ0X/MYpe0L34T/rx8Izbv4joS66ns4i0E3ZQJBDO62LB9tEs5vYMuKUhO64naQDl8Th4
+    QxG9JsCNTPWdAqIV21+NY4iXot0J8pyq5i3cIKh2KcvISy2fhdyxm0Nwb66hFUncaGsllW
+    nddZux2ajhUpbLVK9IvIalEPPIts6Zn4VZmUl9ZRmcgSxO7UZxviA5px3hYEyHasA5LPXQ
+    Z7JUOZBuH6yi+nnvLJHjm2ZEkIGw7YB6gJlCGB7eojPkjz177huLlOppXLolj6IGdkT6kp
+    zkSLQDEf49QsykJltzP6ZqFEK6k2USCUG3mnVK4uAsfJ0WsXUT06pSMjDBjoPjhjp84/6F
+    apmJQD0tLtX3xkbI/9ASGBQs/3H3A+6lnOj03WsIhAGTieKyI2oReaKu8gixXOVNVY/ZK+
+    pLiDb9DQL8eRMmnseV8d0U3pvLiEgs/MIZ/lEcMFh5J03Z4u+BQCrLeCTKuvVK1me8cRdO
+    hldlQEoJsxiSi4VxpOzhzTIqlMU77OmTYiTxnaDGMvRgENxuMLRr0sdagyTCRSpJm9nbYc
+    InYd28DiQf89WReZ34qNN0zZaekz1E3MIazsrHkt7HdPDDmVtrtJno7Tm8dw
+X-ME-Proxy: <xmx:y2qCaqELSM9LpXJdHQAPUv0AB_Zxs7todFz_Kb_xvCAiW5W74fu8wA>
+    <xmx:y2qCaoRXGOam0czbZyuvBJS-BjYCUgFbGWtJBrfmSoyevuDvLFfF9w>
+    <xmx:y2qCavz4lnFQrVep8RdPoH3IxJo-l7sSsjveKkvSMkXEmVSvukhlTA>
+    <xmx:y2qCasf5iDmJzLsmmmEEyj05sEJOpBt4RIPSo_ZkWi2SUKrLFsFiLA>
+    <xmx:y2qCavXOzq-l4jvR1U_T4_K9APAECoKMEEJKuu07F6x4zb9gLigd9JWv>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:58:24 -0400 (EDT)
+ 16 Aug 2026 21:58:33 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <2edba6fa539e96afc0e9412ea81843b3523b60b4.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <3a8f6f7252e44358bd366ccc28d837a5cf7b5080.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 26/32] swim: Move swd initialization
+Subject: [PATCH v2 27/32] swim: Add some helpful references
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,36 +73,34 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-For better readability, initialize the swd backpointer along with the
-other floppy_state struct members. No functional change.
+These documents relate to the IWM, ISM, SWIM 1, 2, 3 and associated
+disk drives. No functional change.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/swim.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index ae31b302dac4..c204108c50f0 100644
+index c204108c50f0..d7182f95c21d 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -761,6 +761,7 @@ static void swim_add_floppy(struct swim_priv *swd, enum drive_location location)
- 	if (swim_track00(base))
- 		goto out;
- 
-+	fs->swd = swd;
- 	fs->location = location;
- 
- 	fs->type = HD_MEDIA;
-@@ -849,8 +850,6 @@ static int swim_floppy_init(struct platform_device *pdev)
- 			err = PTR_ERR(swd->unit[drive].disk);
- 			goto exit_put_disks;
- 		}
--
--		swd->unit[drive].swd = swd;
- 	}
- 
- 	for (drive = 0; drive < swd->floppy_count; drive++) {
+@@ -8,6 +8,14 @@
+  * based on SWIM3 driver (c) Paul Mackerras, 1996
+  * based on netBSD IWM driver (c) 1997, 1998 Hauke Fath.
+  *
++ * See also:
++ * Inside Macintosh, vol. III, ch. 2
++ * https://archive.org/details/SWIMDesignDocs
++ * NEC uPD72070 FDC datasheet
++ * mkLinux source file swimiiicommonhal.c
++ * http://www.mac.linux-m68k.org/devel/iwm.php.html
++ * MAME source file sonydriv.cpp
++ *
+  * 2004-08-21 (lv) - Initial implementation
+  * 2008-10-30 (lv) - Port to 2.6
+  */
 -- 
 2.52.0
 
