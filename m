@@ -1,59 +1,59 @@
 Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A34325494;
-	Mon, 17 Aug 2026 01:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF20319601;
+	Mon, 17 Aug 2026 01:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931722; cv=none; b=uMFzJUgRv9S9KrJdkvgIOZx17ksMfpKPtN0cO3jCTJGbC95M9+nPbYhKX9nVR+5+1tXLcuyeb49Nsxq+tPmZVlky8WHQB/Ywv9kS2T+LDYU1D9Zenc4T0M9mAoJSqAlhw905jmbntIVTaEkzik+k5U2SyWA/eVTnarkjiBo5hI0=
+	t=1786931733; cv=none; b=fxqRoI/itfxCM+h/gD7UxYPC9Cg6eiF6h4/Rnm+6lG48bBu4LS7riuTzUFEU4vb1NfArPU4quZl4d4e1sEPyp71zZCrjWcX0Z73G6ZusdkPjNImpfzwVqgPZ9feZag+mZEArNZx2eSQJnB/8N4Ypvukfst83pja20LbKP9P3su0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931722; c=relaxed/simple;
-	bh=aJKOZOWoXveCddxLIqL10UrkhvVmgi/l2ePVG1uejgU=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=RSX/fhd8q/sxlZIhAskSMCHcXS1MhzQySulsznjsteSMzaWEPHcbJrhl66RVDxQ7IH2fAl2NrmmFclvVpH9cOZ5sYp0lZkYZCWEN+76vJ1iyiD9Qb93kgnOOTIXSQzBkkACJwElH28YAv/cKWpP4avsc1VIoXbWYjYKj9R0oSCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hu5NZrEH; arc=none smtp.client-ip=103.168.172.156
+	s=arc-20240116; t=1786931733; c=relaxed/simple;
+	bh=OGJprNUbnOVm7FXYJuR/t71hmh8wpnE5/IGNNpjmDqU=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=fLEvrerSRLAO45WgtF+iohB2fLLbMvGOUkoccziO4NP6rVL08q0lkQBYnvBnZ2+Mt+8Ousrnua+MNZN69XHWn2bJsGXncQbJc/LzM3OmeUVh1wBIaV9yQtPoGYCu0XJoEgS4PJw2FzuA+p/Vymql5FqvsOPrgJ1qC8gT2ldnaes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dz3RIM7e; arc=none smtp.client-ip=103.168.172.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hu5NZrEH"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id B84831400031;
-	Sun, 16 Aug 2026 21:55:16 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dz3RIM7e"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id BCB1E14000FB;
+	Sun, 16 Aug 2026 21:55:26 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Sun, 16 Aug 2026 21:55:16 -0400
+  by phl-compute-03.internal (MEProxy); Sun, 16 Aug 2026 21:55:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931716; x=
-	1787018116; bh=xUoVj+IinLNg7uHC8by8czUyQwiMCVAzf8OSJGcKYhg=; b=h
-	u5NZrEHRUdVkh6FxSz83zb2kb6WgXwaWgnFpbLrmuBVPh4iZdjn57pGn8Jf+UD+g
-	LnliotZByGKPmlREzUoQLl099l5dCgl9aFeI0mHfkskQiFHkfWa7Y/sZ1AeKkRB9
-	WXpkOPG14ZXg55oxhMIDg2GkzVk1sVA5p3U8khAEZk9JSy8/08BHm8IXKnSKRouv
-	4ePCkNeHvNOpvk/wLSI+ZxIXPbNkuLsItqmHgJGmcIZMRDLH+pfkv6NGQnJvUMsa
-	gAnpNHDFNswjlQLy8tDeH4m+7cn0T2FbEYGf9aqoiKjmq88nVKgNqHmUpFjVxWGI
-	0E9//5Eh16RvdDon73S7A==
-X-ME-Sender: <xms:BGqCasVkF09EG6gs4F2-PGArMi2rEflSLTqcnsMkPd6yXbjBCvRPCw>
-    <xme:BGqCaoNB9eC12pFpmamQ4hYpDc0RbmDBFY9w38PvzYAK_1HxOoSGRqQZswE4nLfW9
-    myHA82mqL4ikO8ykIGXhM5gUB_uBubfr9kn5UDxAqwWgEaZKTkZcwRK>
-X-ME-Received: <xmr:BGqCauCRda6GJeVKsr7r02vIpmwtimypDR5cadOFKGPsdvT5r5_IomuHGoIxZukS_WrvPu76CddbS3ov_Y4f8B8yEMO7HJSx5Yg>
-X-ME-Proxy-Cause: dmFkZTE4hc50xdhPXg/illULTp+C8DYFyqEdlu6WRFncsb6QnuuT/gcUnwV28CSittpzBY
-    CanXMgLJ3D2f99+6fhcgPhKU62j4D/361qP39o0jreF8A1XJd9tbHbTT3THo+0Ngxn+KIR
-    xmSykI00CRbwgNWRv8pmFJk9w9o4Guyae/9OdRSlW4+G/cXS4TLBuEOOa7VrQ1zx7uzt0k
-    aiRQ8f78TROqGsNBFEeFBQ0S+1oq+UQzE0LFPz+xu5GHoHcx5q9+AQ38+8xzR6IOKHtWR9
-    dd2Vu8AeIxRK7b1SVEdgm5fqxWGAl0hW++r8vV0P6QNaTx9jFo8LB1mZXd3D6ux6m/Q5E8
-    uvWxtEZoMMZpY9HdayMAGqzvF1TB8jQUKNoq7nonerJPHLCssG+6cKFubfqrIQ+G5BM2DO
-    kg0vMt7oUM8RSfRu0O9geTe23mDtykPQYBa8U134dxB4mXsvRwdi4yp9+JZe4egRihEyu9
-    nTasSenVI0H5uFf4zL5NDqkc0TIICcNkXlZMWuBTZWRqVzTza80XAIiqv0hPYoTdXHSt2F
-    Ml/d/u2iMIuOv7adwFj+rpE1yf3cJngh4thUTK2pN6YkrPvGEggDIFjV0uq71kUrBSntmC
-    ITP4A0Uw/RHWj6U3n2leNNKCep7Emfe3JfU1eJqis+MuyoZ8nsd3VFNXujNA
-X-ME-Proxy: <xmx:BGqCalcaKzc46xnX13oteSb_juvzkD0crUcKEzPfJQnZHFHESrUM9g>
-    <xmx:BGqCatN-IWabhj_Sae2PrH7ef1bl30-1o3VF9D8IjMPDHkAoPEEljg>
-    <xmx:BGqCalIg96D2ZFhKJEU7vLulY6psZte8PQnHvCmrH9O41qeXqyJkKw>
-    <xmx:BGqCatJskljElfcOt42ywI4JSIHQK7M90oJcrsGFrFjw5I5cUEEWvA>
-    <xmx:BGqCavk1pOFijNR2XgoOsMn4CykPP9jh50f4si77Woz9ECONk8Io6hDa>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931726; x=
+	1787018126; bh=j/FDfXXuUbpthgBP/bWV0xdeiffmbGuM3aGx/1Q1gEQ=; b=d
+	z3RIM7efpe+iW2FFtBmicZo3ceMKZkpeDLuHpYxwJNejGawU1FOXsbslzV6paKP9
+	CqabtPuSRxwymbtpsItVpgMaSwaJqsEwj9PKrD48uaAtUHq5fRWzOSV916Mcy1Ct
+	QnkQ0SGiS4Fam99cnH5R9Yrw6JcuwozQRVxrtOJt1GyNEoFO5F64GcX0Ey6bmr7o
+	VHG/Y0JIy8MvBlSQXevFWObqprl88ryx3hj1KvZ3Jf40w/13UOUE4Mu2338auhKR
+	rTjzbuJEMiW6YpzJj8PQFFl6ciNTvooVQ5Hsv1I1qb/camPfWTj47ro7neIu4lWE
+	HpbKNH03oJyBnBPcvt65w==
+X-ME-Sender: <xms:DmqCaobzwvd2q0ZtVTCkw-B2unpX38gGRadZqrHuGyvxnkvYV1QhOw>
+    <xme:DmqCarBvLsy2UtZYm-1x1eHKj3YLjenojH4Z1-mTqvBLLvcChi1o7lbSXvA2UwutP
+    L0G00P_ZmLm_nD8qAayzmnqyazcvVPXEjMwZSiuL4YPGwCpKHdQryU>
+X-ME-Received: <xmr:DmqCagmpxsyCyEXOigzJYdsulSiXxQBzyPcxYZ5Zj3mi0x68nGEut6w5goM2cAoil05uhPuY6BF4VSZsAIdtOAAOe_3tseLarz0>
+X-ME-Proxy-Cause: dmFkZTGGfSHbL2fI02qi3PxN23Kck6mI5WuUw/IvRcvpbY119ewffFmgrLaJZrOewmv0V9
+    +yVjmNFRAF5v6NwN93pp2/ef5Xe4c3LI9irOXMRuZYHRPaDMJE6WMter/2+BypR/48/QT6
+    HY5IjuzvgSjmo92SyO1FOx3Pzj+F3Bo7QzXF7kAkGOLlhjpoHeFsUQfm7dkDIAS3zbzZQZ
+    kdzEEhr46dUOQtvTauSfnNDphJtrhISaD9OmmoKzjI1J4txcn9eV52lgr1VrqNf0UkcCn2
+    OchZn8Fy5DmAdO0OzTlRhd5sxDSBZbWOqIe4VCopfX4yIdP6r//KsVzdicR3q2dH2I0XFc
+    2AIk5MgcQih3StdVHrsCyxPvCofzkcyWqZXh7o3REXgnakbHxKyNt9puAD/TLNkkJkcgDl
+    9tPKNPr4498ClPIipqW+17nukpnW0tnZE0PSklFa2qiFsMEn9vHfRNLZIqMKJzN4iAud3p
+    fRV1P+FAEN2yPZGsCVbSyH2m1HCObIQPYW7fjrXIycs4szTj0fqoDu7mekjXoG/OfO9ONV
+    pfzzbRcbi8i5zKQI3pyEHrIjcmjCXOlR+JSPqN3tQk3BxRAwa5z6IbDUirSgQ/JwddqHZC
+    7RwjWOKisw9eHetC84ZOkAXZLpeNxZck1mZH5LBocXYTYEdkhXQbueTpDjkA
+X-ME-Proxy: <xmx:DmqCaszMTOLi4nQkhtBUaNbV9_i2myJoBcT7mO8rxo2eb8jwIdI_Bw>
+    <xmx:DmqCaqSYq4N2Yfb5exLVHryPfB8y4CiQQptyk0WUWUf1XncQVmfzNA>
+    <xmx:DmqCak_koVLq8i-a1stDbpjJ6HxjO6jCzP6W5GjBu7p-UAOQa5jwNg>
+    <xmx:DmqCaostmX1D85VX29qq6f-RaxQjSQJ2A-wnztVNpucq8i9U7wtdWw>
+    <xmx:DmqCauARxaBdW3VdZdWQIrWaobX9g1UYU_adsa46OBMZ1x0jump1z1CA>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:55:14 -0400 (EDT)
+ 16 Aug 2026 21:55:23 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <ac0d80ac0af32f69a5b0f06845de267d8459b361.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <1e349506a7cc6aa574aacbd4c69c240b5a1e3eb8.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 06/32] swim: Configure parameter memory
+Subject: [PATCH v2 07/32] swim: Enable clock divider only where appropriate
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,54 +73,113 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-The original SWIM chip has a 16 byte memory to store parameters which
-control read/write timing. The SWIM 2 chip retains the last 4 parameters
-which control write pre-compensation, but omits the first 12. Hence
-SWIM 2 can perform reads without any parameter memory setup but SWIM 1
-cannot.
+Some models have a 16 MHz FCLK oscillator and others 32 MHz. Put this
+information into the swim device platform_data so that the driver can
+correctly enable the clock divider. When this is enabled incorrectly,
+nothing can be read and failures from the Error Correction Machine are
+flagged in the error register.
 
-Configure the SWIM parameter memory with the appropriate values so that
-SWIM 1 can read too. The parameters used here were observed in SWIM chip
-memory, using Macsbug, while MacOS was reading from an MFM floppy disk.
+This is chip initialization, so do this in swim_floppy_init() rather
+than floppy_open(). Drop the udelay() which was apparently copied and
+pasted from swim3.c, where it relates to interrupts (of which this chip
+has none).
 
+Cc: Joshua Thompson <funaho@jurai.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/m68k/mac/config.c | 31 ++++++++++++++++++++++++++++++-
+ drivers/block/swim.c   | 11 +++++++----
+ 2 files changed, 37 insertions(+), 5 deletions(-)
 
+diff --git a/arch/m68k/mac/config.c b/arch/m68k/mac/config.c
+index c0033f885ed4..dba3de21c3c4 100644
+--- a/arch/m68k/mac/config.c
++++ b/arch/m68k/mac/config.c
+@@ -984,8 +984,37 @@ static int __init mac_platform_init(void)
+ 			.start = swim_base,
+ 			.end   = swim_base + 0x1FFF,
+ 		};
++		unsigned int data = 0;
++
++		/* Models in this list are supposed to run FCLK at 32 MHz */
++		switch (macintosh_config->ident) {
++		case MAC_MODEL_CCL:
++		case MAC_MODEL_CCLII:
++		case MAC_MODEL_LCIII:
++		case MAC_MODEL_Q605:
++		case MAC_MODEL_Q605_ACC:
++		case MAC_MODEL_Q610:
++		case MAC_MODEL_Q630:
++		case MAC_MODEL_Q650:
++		case MAC_MODEL_Q800:
++		case MAC_MODEL_P460:
++		case MAC_MODEL_P475:
++		case MAC_MODEL_P475F:
++		case MAC_MODEL_P520:
++		case MAC_MODEL_P550:
++		case MAC_MODEL_P575:
++		case MAC_MODEL_P588:
++		case MAC_MODEL_TV:
++		case MAC_MODEL_C610:
++		case MAC_MODEL_C650:
++		case MAC_MODEL_PB190:
++		case MAC_MODEL_PB520:
++			data = 1;
++			break;
++		}
+ 
+-		platform_device_register_simple("swim", -1, &swim_rsrc, 1);
++		platform_device_register_resndata(NULL, "swim", -1, &swim_rsrc, 1,
++						  &data, sizeof(data));
+ 	}
+ 
+ 	/*
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 190b2e1b5b0e..c2d7ad3f065c 100644
+index c2d7ad3f065c..597d35b514ae 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -796,6 +796,17 @@ static void swim_cleanup_floppy_disk(struct floppy_state *fs)
- 	blk_mq_free_tag_set(&fs->tag_set);
+@@ -628,8 +628,7 @@ static int floppy_open(struct gendisk *disk, blk_mode_t mode)
+ 		fs->ref_count = -1;
+ 	else
+ 		fs->ref_count++;
+-	swim_write(base, setup, S_IBM_DRIVE  | S_FCLK_DIV2);
+-	udelay(10);
++
+ 	swim_drive(base, fs->location);
+ 	swim_motor(base, ON);
+ 	swim_action(base, SETMFM);
+@@ -807,8 +806,10 @@ static void swim_set_parameters(struct swim __iomem *base)
+ 		swim_write(base, parameter, mem[i]);
  }
  
-+static void swim_set_parameters(struct swim __iomem *base)
-+{
-+	unsigned int i;
-+	static const u8 mem[] = { 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b, 0x1b,
-+				  0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57, 0x3b, };
-+
-+	swim_write(base, mode0, 0); /* reset parameter memory index */
-+	for (i = 0; i < 16; ++i)
-+		swim_write(base, parameter, mem[i]);
-+}
-+
- static int swim_floppy_init(struct swim_priv *swd)
+-static int swim_floppy_init(struct swim_priv *swd)
++static int swim_floppy_init(struct platform_device *pdev)
  {
++	struct swim_priv *swd = platform_get_drvdata(pdev);
++	unsigned int *data = pdev->dev.platform_data;
  	struct queue_limits lim = {
-@@ -805,6 +816,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 		.features		= BLK_FEAT_ROTATIONAL,
+ 	};
+@@ -816,6 +817,8 @@ static int swim_floppy_init(struct swim_priv *swd)
  	int drive;
  	struct swim __iomem *base = swd->base;
  
-+	swim_set_parameters(base);
++	swim_write(base, setup, S_IBM_DRIVE | (*data ? S_FCLK_DIV2 : 0));
 +
- 	/* scan floppy drives */
+ 	swim_set_parameters(base);
  
- 	swim_drive(base, INTERNAL_DRIVE);
+ 	/* scan floppy drives */
+@@ -930,7 +933,7 @@ static int swim_probe(struct platform_device *dev)
+ 
+ 	swd->base = swim_base;
+ 
+-	ret = swim_floppy_init(swd);
++	ret = swim_floppy_init(dev);
+ 	if (ret)
+ 		goto out_kfree;
+ 
 -- 
 2.52.0
 
