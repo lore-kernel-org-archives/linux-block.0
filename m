@@ -1,59 +1,59 @@
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4515C18DB35;
-	Mon, 17 Aug 2026 01:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D949F1A3029;
+	Mon, 17 Aug 2026 01:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786931833; cv=none; b=u6xciFqPCu/NBDBFjbiYS6ZGIjITQQLM8r7+yGC+qDDFbmx3rkLb7r1ZUSjOowqb9ogCRZ5VgtPQjRZJgByeflICU9vhSCjjizp5vdhRcf3o+HG+pXjwK1fff7htChgMxbB9FFOKeR6AUsivjYoWeAgqmf7xrEC2Zaz9pnnwnbQ=
+	t=1786931844; cv=none; b=oLZ1jL00yV46DqzHNNAY4yA+vTPoCyEmAh0j7S11WxEaQb81Y7/1Fy1y6N5bBZY6wZt7rRkfN28NdC5AebnMZLtuANxPNa6TiD4vl9k9r7QwTuwf3K9LOaxfKRWBmalSp5EwGlEiVWqjZ86Y/ad707zClLnUxSPi6A5cGokqbdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786931833; c=relaxed/simple;
-	bh=l/qF4glc5PoZL52mcooNohJpMSiRF7vh9YBAUblwifk=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Yv2VPBplVVx/IlbOyDbX1dGqbmiHaRpHzv0ByeJ6U6Km0UuNqkvJcXD0KcACxBAo+KBM1RY5YPfiLOR9msC/0sShqGnAnbzDkHX5rdGSjYc2OT/XheSbOpbd9giHJsfGlogZvZscMNxEtv/eIptyE8oLWTRbu2Lf6zrX5F0ThIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YF3aX+5t; arc=none smtp.client-ip=103.168.172.156
+	s=arc-20240116; t=1786931844; c=relaxed/simple;
+	bh=xqtJQev9uhpvVN8FSaMA3KHGnstMHKHWTjDRSheaoKE=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=HmXA/vMO5rNcgVSChGCFtxX2a9rL4Y7/5iuwmyfPc7FinooDLpO+jyAHFjASo0XuHs/u0o4VQsMC2mj4ObMo4iO1OsHZQgWjdq1bzPIbzCxGTteLHPBffdcdNUYSk24O8UkyiAXwhmU/u9C4zjv4PyFiPPT/v0eUkUDXK4MuwUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OV1d4fu/; arc=none smtp.client-ip=103.168.172.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YF3aX+5t"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 72BC9140003D;
-	Sun, 16 Aug 2026 21:57:11 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OV1d4fu/"
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 24141EC01FD;
+	Sun, 16 Aug 2026 21:57:22 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Sun, 16 Aug 2026 21:57:11 -0400
+  by phl-compute-10.internal (MEProxy); Sun, 16 Aug 2026 21:57:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931831; x=
-	1787018231; bh=TkP38yZucR67TzySuCJiwBsl1Gd3dIOVglZIr0Jkeag=; b=Y
-	F3aX+5tSnvPJQNwaZFY0MQgGJL6w4ng2KzZ0HfCoyGtRO5jStzShRnm3RTCV7joU
-	pDPZwMhvEqqCDHcNytubJfqlFGPwb2n0bCXhdyFUiGIsVqfuk63R6+E3tTNtAMYO
-	88JCZqOUxyvAsuw/nsW0KXs9uFzNYd1Zw4NdexKjzw57lxfX+AT5twXAe2C5l4VG
-	2u20K85liFzNlKndVc39PCOPFtirGid7JJfPyi8Qc/DPYFa8H4aY4g/Ko5NFr/Ah
-	xrec+LeG/ZXU5MjtuezfqMBFL2mvEWjWY3EUP8TIIhMieK1oYMgQGedtwBg1d8JU
-	hMEav3W34pn6olELKaadA==
-X-ME-Sender: <xms:d2qCauchnBf7SHHwsvJON2L3N1yBlzRCFEQw3af8-r-4FIWmtKFmjA>
-    <xme:d2qCaiRZMTm56IvWRb4xb7YCSqMNIA-sAgJ1Dhw0k_LWHqwyorJLN6OUOgUJAFsHN
-    Lfj2nB-8JKUcU6dTVGzt4hf3PmerlhO9R5l-S1J2Yp1ci9cxcUpeHr_>
-X-ME-Received: <xmr:d2qCavanI4nACX0qYnBtYELbUqWhxstHYBbLup5DRO6HSlSOQE1BldyU_oM5nhshHOSdQkki1s-ROE2mTt-idWNT7ziixZzBYcA>
-X-ME-Proxy-Cause: dmFkZTGGfSHbL2fI02qi3PxN23Kck6mI5WuUw/IvRcvpbY119ewffFmgrLaJZrOewmv0V9
-    +yVjmNFRAF5v6NwN93pp2/ef5Xe4c3LI9irOXMRuZYHRPaDMJE6WMter/2+BypR/48/QT6
-    HY5IjuzvgSjmo92SyO1FOx3Pzj+F3Bo7QzXF7kAkGOLlhjpoHeFsUQfm7dkDIAS3zbzZQZ
-    kdzEEhr46dUOQtvTauSfnNDphJtrhISaD9OmmoKzjI1J4txcn9eV52lgr1VrqNf0UkcCn2
-    OchZn8Fy5DmAdO0OzTlRhd5sxDSBZbWOqIe4VCopfX4yIdP6r//KsVzdicR3q2dH2I0XRq
-    aF44g2C8oNTPcsNGczlwTTQcs+MxL5x/UGA3BfMT0RkBWRKz19sqaOamdCFqs7Ja/J4zQk
-    ZhKzVBv0VsNY8w6prT0SI1NlAZnaIt4UCwoMpy5n+go4Uv+5NnegWtGErSaDaug+mMCLIy
-    Cmq2913LdRiC5cZio+RuhxwBdQqNTrMDmfGAYKRImTyYiGNRLiXMSZ9y0tmdvPih7Bp4tW
-    uFRE1IR8YEAZLCBD+VFlQnyf8jxhDKbVuYJwJHFYZsJeBFnC6Vvp2kPrP5f5BFRoM5H9O9
-    x27sXi5BmRrxbcPFrYTU+n+9Zq9/0zxOO+cVMEbKgOQpEW1oJiljHSgbd/sg
-X-ME-Proxy: <xmx:d2qCateCRiYWRsZdwvIGDX8JVEZbppqp8Zb61l0WeqPFdPhSKjCUDA>
-    <xmx:d2qCaoKdU0l2u-RYYIqAJ88M155KP1rgxB1FgAm3FULYiDuXj6Z32Q>
-    <xmx:d2qCaiL63bwfNkOccNOGl_xFm7n176Wmbtrord5no71RJya8sQVOEQ>
-    <xmx:d2qCavWa1BQA-cTsXEJ_dWDUuZUCTn_b4oR5sdAc4dyor4MHKbuqug>
-    <xmx:d2qCatML9MIouQpot4t88OLl8SKQDv1RyeVFi8cVv9qwzyN-hHy4Bndn>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786931842; x=
+	1787018242; bh=pzXDTelpVr6jSOvH67+qkoLTiRHO9b0TevyHvWmS/I0=; b=O
+	V1d4fu/hW7j5Q8g4L9bUkMFIb67N5RHqJ+10TqjPhmdq33Q3Pql598HAj3Ug1ZXR
+	kwe2BQEXO82qGDxlOmaGZtMbQ0zlu/OvO1terGZJebu4/VaS9qglriEWXsZR09q8
+	GZLpqGmZqE0gkSUDIUQHvgdVRtLX5eWOlsYJl6JBaC/k61iZe+WfG2dmYl+mrNIb
+	wQWPBwn5hgYEwq7tIDtmnDKy5gl7H8sJOGGaNiPf9ZRPZXNkpaS4xlhsIz4zRdmU
+	4tt3EXm906mHQxkm5H4Jiror73txX9JzVUPeqWVL63uDdpj9H6mDyCyfy+UgwN3C
+	Ynk7ApqcLsga/lHJ4VOqw==
+X-ME-Sender: <xms:gWqCatydEOouG1VD5sH_zmdMV26PfZKpcS9MiteoQ3IcNj98DBBIUQ>
+    <xme:gWqCanU-BDgjXnXos4gH6yyEeelWqrgE49EjUpa5tubb38ht3sLbf5ddu5p9KrMMH
+    Lwhqb2iTzF1ItlCWFUHmOk1krrt0ILKxPHWjQS8cNitLulmGcwfvLE>
+X-ME-Received: <xmr:gWqCanMRoievcPKFNuRVxupjO-8sACIbSqCcttx3AWtZQ_TtJjIYrA21pWu5u7uOwwMDOwCqG7Jv2wJFMy-Lx7F1awF0WZsLp-o>
+X-ME-Proxy-Cause: dmFkZTE4hc50xdhPXg/illULTp+C8DYFyqEdlu6WRFncsb6QnuuT/gcUnwV28CSittpzBY
+    CanXMgLJ3D2f99+6fhcgPhKU62j4D/361qP39o0jreF8A1XJd9tbHbTT3THo+0Ngxn+KIR
+    xmSykI00CRbwgNWRv8pmFJk9w9o4Guyae/9OdRSlW4+G/cXS4TLBuEOOa7VrQ1zx7uzt0k
+    aiRQ8f78TROqGsNBFEeFBQ0S+1oq+UQzE0LFPz+xu5GHoHcx5q9+AQ38+8xzR6IOKHtWR9
+    dd2Vu8AeIxRK7b1SVEdgm5fqxWGAl0hW++r8vV0P6QNaTx9jFo8LB1mZXd3D6ux6m/Q5Fn
+    sbWIUzwmLq6iHoQN4dDsunW73vw/urlfWbCTIQxCFA/CtdpOk1SWRtIaqkg5RAAsSs9ql+
+    EDePXUKkvctxGotP88VvT9igRrnqTu9pRsC+runuH6WmdNO1AQIDrP9FHZOeCOZjCtegbE
+    Pdw5DTyLwTkoFmZxaj1MdtAvs7cz0koN8C9bovV89MpMC22YBYOyDavHwbWeo7RbNGsaoO
+    1C3BRwHwPFXsWGRkFAnCuNMAvtQLj5D3cPM2KOeDs7IDq1ogbFl12R7OudwQMnNBbRyZOp
+    xJQnWpjHrTBy/4arxjtBuq2Vrra7XuIqqN/cTowU1P5mjd9aMbGRnRHEVeOQ
+X-ME-Proxy: <xmx:gWqCahC7G9qw9fzACXM_XkQYpZTpeuTHtmdRozuhLGvVTeVJGlQedQ>
+    <xmx:gWqCasfDK66hMx3B55FtAz2hOozFTTJJPDvDQxlEH9Ey2N90bmlhzA>
+    <xmx:gWqCaoND5Py3dFfMXxoAhAU5-flnNxUn1LkTJJ4guSfKMiN2ee3GOw>
+    <xmx:gWqCakL_2sA8PCzz5SlQj_1XI2tPwnQKlGygFyRTB0nXkI7CA2PLyw>
+    <xmx:gmqCaug8ZG_-_1ssvCiHfU6FYGxIxq5sw9nja0UyPUjT0bCXOe9PWNOa>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Aug 2026 21:57:08 -0400 (EDT)
+ 16 Aug 2026 21:57:19 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <20acc6e4cb6f7b0090b294ab39d2913b40fd2731.1786929430.git.fthain@linux-m68k.org>
+Message-ID: <282df3d29b34298051d3427c37fb1a39c310e6aa.1786929430.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1786929430.git.fthain@linux-m68k.org>
 References: <cover.1786929430.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v2 18/32] swim: Remove redundant RELAX actions
+Subject: [PATCH v2 19/32] swim: Deduplicate polling loops
 Date: Mon, 17 Aug 2026 11:17:10 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,75 +73,116 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Wherever we have a swim_select() or swim_readbit() call there is an
-implicit RELAX. That means the caller doesn't have to do it. Remove the
-redundant code.
+Replace duplicated polling loops with poll_timeout_us(). Change the
+interruptible sleep to uninterruptible because signal delivery shouldn't
+be allowed to shorten delays required by the drive hardware.
 
-BTW, Inside Macintosh says, "Be sure [...] that CA0 and CA1 are set high
-before changing SEL." Hence the RELAX found in swim_select(). The SwimIII
-driver in mkLinux also has that. But the swim3.c driver in Linux is odd:
-it scatters RELAX actions around as though SEL was not actually under its
-control... In anycase, swim.c really does control SEL so there's no need
-for that here.
+Change the timeout for the !STEP transition to 20 ms in accordance with
+the maximum interval required by the UPD72070 spec. The existing 1 second
+timeout is impractical considering the number of steps in a typical seek.
 
+Change the return type of swim_readbit() to bool because that way the
+bit names make sense i.e. the reader doesn't have to remember to invert
+the active-low logic used for drive signals.
+
+Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+Changed since v1:
+ - Dropped swim_readbit_timeout_atomic() as it's no longer needed.
+---
+ drivers/block/swim.c | 39 ++++++++-------------------------------
+ 1 file changed, 8 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 8c8b157e2d74..9635f4df3fc0 100644
+index 9635f4df3fc0..36e28a766a5a 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -336,7 +336,6 @@ static inline void swim_motor(struct swim __iomem *base,
- 		swim_action(base, MOTOR_ON);
- 
- 		for (i = 0; i < 2*HZ; i++) {
--			swim_select(base, RELAX);
- 			if (swim_readbit(base, MOTOR_ON))
- 				break;
- 			set_current_state(TASK_INTERRUPTIBLE);
-@@ -344,7 +343,7 @@ static inline void swim_motor(struct swim __iomem *base,
- 		}
- 	} else if (action == OFF) {
- 		swim_action(base, MOTOR_OFF);
--		swim_select(base, RELAX);
-+		swim_write(base, phase, RELAX | PHASE_PIN_DIR);
- 	}
+@@ -19,6 +19,7 @@
+ #include <linux/major.h>
+ #include <linux/mutex.h>
+ #include <linux/hdreg.h>
++#include <linux/iopoll.h>
+ #include <linux/kernel.h>
+ #include <linux/delay.h>
+ #include <linux/platform_device.h>
+@@ -296,7 +297,7 @@ static inline void swim_action(struct swim __iomem *base, int action)
+ 	local_irq_restore(flags);
  }
  
-@@ -355,13 +354,11 @@ static inline void swim_eject(struct swim __iomem *base)
- 	swim_action(base, EJECT);
+-static inline int swim_readbit(struct swim __iomem *base, int bit)
++static inline bool swim_readbit(struct swim __iomem *base, int bit)
+ {
+ 	int stat;
  
- 	for (i = 0; i < 2*HZ; i++) {
--		swim_select(base, RELAX);
- 		if (!swim_readbit(base, DISK_IN))
- 			break;
- 		set_current_state(TASK_INTERRUPTIBLE);
- 		schedule_timeout(1);
- 	}
--	swim_select(base, RELAX);
+@@ -309,6 +310,9 @@ static inline int swim_readbit(struct swim __iomem *base, int bit)
+ 	return (stat & SENSE) == 0;
+ }
+ 
++#define swim_readbit_timeout(base, bit, val, timeout_us) \
++	poll_timeout_us(, swim_readbit(base, bit) == val, 1000, timeout_us, false)
++
+ static inline void swim_drive(struct swim __iomem *base,
+ 			      enum drive_location location)
+ {
+@@ -331,16 +335,8 @@ static inline void swim_motor(struct swim __iomem *base,
+ 			      enum motor_action action)
+ {
+ 	if (action == ON) {
+-		int i;
+-
+ 		swim_action(base, MOTOR_ON);
+-
+-		for (i = 0; i < 2*HZ; i++) {
+-			if (swim_readbit(base, MOTOR_ON))
+-				break;
+-			set_current_state(TASK_INTERRUPTIBLE);
+-			schedule_timeout(1);
+-		}
++		swim_readbit_timeout(base, MOTOR_ON, true, 2000 * 1000);
+ 	} else if (action == OFF) {
+ 		swim_action(base, MOTOR_OFF);
+ 		swim_write(base, phase, RELAX | PHASE_PIN_DIR);
+@@ -349,16 +345,8 @@ static inline void swim_motor(struct swim __iomem *base,
+ 
+ static inline void swim_eject(struct swim __iomem *base)
+ {
+-	int i;
+-
+ 	swim_action(base, EJECT);
+-
+-	for (i = 0; i < 2*HZ; i++) {
+-		if (!swim_readbit(base, DISK_IN))
+-			break;
+-		set_current_state(TASK_INTERRUPTIBLE);
+-		schedule_timeout(1);
+-	}
++	swim_readbit_timeout(base, DISK_IN, false, 2000 * 1000);
  }
  
  static inline void swim_head(struct swim __iomem *base, enum head head)
-@@ -385,7 +382,6 @@ static inline int swim_step(struct swim __iomem *base)
- 		set_current_state(TASK_INTERRUPTIBLE);
- 		schedule_timeout(1);
+@@ -373,19 +361,8 @@ static inline void swim_head(struct swim __iomem *base, enum head head)
  
--		swim_select(base, RELAX);
- 		if (!swim_readbit(base, STEP))
- 			return 0;
- 	}
-@@ -399,8 +395,6 @@ static inline int swim_track00(struct swim __iomem *base)
- 	swim_action(base, SEEK_NEGATIVE);
- 
- 	for (try = 0; try < 100; try++) {
+ static inline int swim_step(struct swim __iomem *base)
+ {
+-	int wait;
 -
--		swim_select(base, RELAX);
- 		msleep(3);
+ 	swim_action(base, STEP);
+-
+-	for (wait = 0; wait < HZ; wait++) {
+-
+-		set_current_state(TASK_INTERRUPTIBLE);
+-		schedule_timeout(1);
+-
+-		if (!swim_readbit(base, STEP))
+-			return 0;
+-	}
+-	return -1;
++	return swim_readbit_timeout(base, STEP, false, 20 * 1000);
+ }
  
- 		if (swim_readbit(base, TRACK_ZERO))
+ static inline int swim_track00(struct swim __iomem *base)
 -- 
 2.52.0
 
