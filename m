@@ -1,72 +1,93 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F5337DEBC
-	for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 19:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CE536493F
+	for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 21:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786996725; cv=none; b=QyVhG3gy/O7iPSUJG5E0NuzOG96ne6zls0bGoAYMWKpyB1VQE8MPDbn+J5++87XVBTePQ+cuaW/f360wZXnf+0iO/3egCtva/CfqtxDbbDkYDZob2fIRgAdhYjue0D5yaRSnnsIm0yMYc1fogjN4+AWMlxxBS9YYIWjDfiISBmg=
+	t=1787002942; cv=none; b=PGFtUCUhjjbKTG8e0kmp4jPNlnBbLEMSv5UYC6Bt9AmyyoBsxBjiJ8lQHdaq24mU6efdMhPjuxl17JHPzPKM41qgHf0L+7IhT3XZJq+B1ngtyBE5N5SKjws75rgEnP1KINqzS87ekxFdjOAvAhsggfWrI9vrahrW3kUBTsOdTF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786996725; c=relaxed/simple;
-	bh=3kdGur1RV6b92ftSlCHAV13+42PYybUnG0pG+ZcVj9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fxGlQjMgXJpCwX3Tap5dNmJ5VK16Hd45uYSHOoptRHBHpMtAt3trtO7II6DXs9pvKAQA3Fe2Uj5qunAj3GUWVkOlFyJ4N6MC+uLFwZcWhbAz8Tp5MKQ8Pwbkbpqjp6Jbu4MYf/FIgbHB7UrzjmnVjPIhBUpVi89wSKn17cd9+Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6X6SXYK; arc=none smtp.client-ip=74.125.224.53
+	s=arc-20240116; t=1787002942; c=relaxed/simple;
+	bh=PCpGwbY4BrW2K7EHaYVaxP+3UwgpYAMPsqatWFu5N2o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+cQGrJ6o+HI9j9J8iXxWx0nVqTE7QXqnba3MAxzonNokGpFnsrDSkszb37ZDmH8ziR7uNEjOJocpLu9bw7rTejmi2rCN1zpX/RsxAx2EUIfMUJvPielLP4V+ltFrUf8ybbzeGu+lQRghmXF3hC18HLU4NWevGLxxu/0wou0g/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HuU38USQ; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6X6SXYK"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66bd7857841so2853394d50.3
-        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 12:58:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuU38USQ"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2cc891373e0so51042355ad.2
+        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2026 14:42:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786996723; x=1787601523; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787002940; x=1787607740; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DNgthOkzOIwSYoONFQE8WtRQQRfyd1d/NaQ7aCZcivc=;
-        b=U6X6SXYKISsrmEBmieGTzaG2qy/PLzxX3ziZQzUZCqLrd0CCoaJ2AVM6I67b9IMZxX
-         hSGzclkXTzgaAr0vqh8A4zSxcVbHIAKYl/JX9WmB8tR3ARlOEgel2mOQLO5iUnFe5tAm
-         /pteWoWam2WllVB/XvgWpwLUJGcPCbvj+7aJT7Mt1FY1jpa6xcvuWwlgsVckg2lwbJiU
-         ZFAmimkx4wqbVnI5T2MuoVKLFUvTRGs7rYIv335Vf9xS7YSzn2HSdiF1KmjHoVVgxRJJ
-         U0hm7MOKl+yaISjvjkzH/TJkmeVck1BuijV0x3NqU+R6vcjxGyUBXCBtgoI6lp2vCq7l
-         +S0Q==
+        bh=y+y60PoeOcJzJyhWvC9Eh/WUb1AnWEbvZFwtNlrzZtU=;
+        b=HuU38USQmpE1GGeGsf2eFjCIwwTXNaq9l1Fy99LNeTlUAfNnzBk6EGKWqzJu/kgPQl
+         QYXGWUV20owvYPadq7RN4tJbpIG0t3KNt7JMUMfWXNuIGJ5deimJQeDNnggPlbNqOF3U
+         KPY1zeCN13g1yEaSw/IgCvG26+rbpJnpu+DfUXEBiE8VbS5eMrGy4014aJk+NfJeZUVs
+         sHkDFTdOSsZJ9OCByg9qiYxfwqgsx64M3j3qS7TG0iIF1rxxH2UNcntZdPr+vz6pVGIF
+         Un4uCScu+lWUBfKv7E+LbF31whvB1lPm8SPKzo1aF8BNY8yfXjgNXwzy5pZzlsyWT3Gw
+         8jcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786996723; x=1787601523;
+        d=1e100.net; s=20251104; t=1787002940; x=1787607740;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DNgthOkzOIwSYoONFQE8WtRQQRfyd1d/NaQ7aCZcivc=;
-        b=g0JV/VafhzcCr8ZW9ZBiJ2L0lGicXZRqgT6sD+PCacTF2CQV+0bd4AmQCgkBvxS/Cd
-         00f5QMMPl//DCzmib0H8HriIJQeuiu+ogU5GLhYuvOn0211usgIkKOSSKsTW5HKdui7X
-         ybzyLF+dLgBZteJNLeNff4MGLIgNZT11PP+5ScnXsqIchAO6aQpAhOsIq+DEfl90DvBs
-         luMLu/hATTHrQ+DlBcu/71u2/LnDV00q1P68MY7JKg7Kg9tFnDOed2msrbrWXmEibHT2
-         5SWIIACNqOtIHMsRz5RRUxgu2LR/+SHLTxGtZ8pSFL74cfPmvP1qvJOT4z2qeg7otyI8
-         IDVA==
-X-Forwarded-Encrypted: i=1; AHgh+RqhWH8zO91pW6jpnaKbT2wNAulh1Zn/zGpzmSQ4l4AH+sRvM/ho1t4qpsL1WcuxI0bgfXa5GyT/8woDxQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDWf4BtEhbw+njUTp7sueN0W3WfHmb/D40C4dPTh6g2zzGQkon
-	AieXF18+K+yvfVmp1GvK0CxlYKQEiveuh8OcfKDTjqbtxg+fNRq3pEDEYtwKY1nw
-X-Gm-Gg: AR+sD11LukD4IR7zJscizjZY7fR+3byVTHPRXZh6VsDrpNKxRzen1jrLjIWNdvRT7e9
-	Qgv1+JTtLVvKDVIE9IARCzo6Is0N6Qr4+DbKSP/Zh75bpbLYUZCfd52P91HbJFRVHOy/CHjZszw
-	mo4ajQYeD3UqYzqOkuwPIQQPQt+gkX+2ciHSbjBSc5qWOgPS6h1jPulyHkwJwWOTyKBwGC8yOuj
-	vQbYZudjo+prnbLCsBJXuTKgJMpj6wvgWF55g3gmTadKntOsap54obdh2Gk/myQVs262oSNJvFp
-	Z6ZGO/Yu82ttBiZxdnsaFeCteu4NevhP4yhvoqidQypcFP2xYXlCMziJT0NNb4aKLkcE+0XUmTf
-	WnXM0YakuOYr/mtrAKKXmv+ojDDNvWmOkQgFmJ+TnBuyXFhM+dqQBcFORcE/T+mcUipanQ6KQhU
-	ke9leqGpH6dVbH8nJd2baZnRFvX5ABXNRzgldPCJDHxXDfAQ8zEVaPwlBWva46V9K/B4kEBBBKM
-	afgC8s=
-X-Received: by 2002:a05:690e:150e:b0:66b:3633:c31c with SMTP id 956f58d0204a3-66c72d2e7c9mr8499167d50.46.1786996723031;
-        Mon, 17 Aug 2026 12:58:43 -0700 (PDT)
-Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66cb3eb8367sm1280628d50.4.2026.08.17.12.58.42
+        bh=y+y60PoeOcJzJyhWvC9Eh/WUb1AnWEbvZFwtNlrzZtU=;
+        b=ALjk9zxgeXu/dvo3r7mJrBXtYt0Re53rtTyYph8OANfGOKEKToex+TeZC43SRiugoI
+         GQzJMNk2o4qaNA3Tyw9u6hfhaCCyPC22mPlOTjSWMQwiulGEdkZcvnonQHqpdsjxCKyC
+         cP5eg1bBC0ZVAZjDkEZuFiEiHCKietouklRlldI2clgaUPSkSP5npq8QNyhy/4wi0tKr
+         Yqic6fo/0m/lpDBQtE88+I1aSMHT5HhqKATiGrM2HUQZlBG3nCtiUsuW+vGkR57dcbfS
+         lolnTvGS5nr4HREy0/ytOI375OgRcVrfVV07+nyv6JLp+oHY1ctpzBK0557UVOP7gY1j
+         msKQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoTbqwrfE19cgcJ9fGpUhHt6y6ZY3Ybei8sWouXeQt1HH+qbLZCncwNBKyoZKH4WL0yf5vl4yJcz6uztQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQMPPtu+1+AtQQNKsVbYlF8/m/r89zB/XkCCaBeYysqyZYa30x
+	HOqG+lWTnRS1wd75rRluiXptPxmBEyGbPqbf8hM2CAmE5eXNqH3aX8Io
+X-Gm-Gg: AR+sD11uG2pBRLxJbqVHwtA606TFnQnVvpdN+0I+hR0l64lQsiuQM3ay+1USQh29C3w
+	1CPQS6gg9Qd6JhTTOiUjQCgWAqBG6yQQ6nqjdNXV4ekBfLmNWNsx2zHWdxcA5L+hSy+UiKhYld1
+	UXJd/7jEK2+DfwihLboPSEdcNX+AV51X98U96Jst9KH+FVIBzpkbJcd62Zp5aM8ciYRk/jDA6/F
+	nLofYNUKVG58vv+bgfEtA0ub6pHojt1rO96zL8bFohP9txCFlmrLoeMkbU5t5kMgjDBhCmoUCku
+	03WxwcvHN3+78z+Ju25nxI6PgyH90C09lP1Dhz8w4oebtc3GB043vW5XsRGNug+/uOyqnmZQtEh
+	C7WiMaerAnJs4DkBT0Z5mRbSFn+nuxCklr6fk5LXpJL/cZwbe6vQIMiew5jIVb3210WZkPLTF/S
+	ix1AZ2sXZmXDb9xgOGgBi4iCtveE+T41yL6nClYORofcjifrFOyD8BW/Q=
+X-Received: by 2002:a17:903:2c0f:b0:2c7:ebfb:618f with SMTP id d9443c01a7336-2d3b0eec2f6mr336847755ad.14.1787002940100;
+        Mon, 17 Aug 2026 14:42:20 -0700 (PDT)
+Received: from localhost ([2a03:2880:9ff:64::])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-32678dd08d6sm13507028eec.4.2026.08.17.14.42.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2026 12:58:42 -0700 (PDT)
-From: Chao Shi <coshi036@gmail.com>
-To: stable@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Weidong Zhu <weizhu@fiu.edu>,
-	linux-block@vger.kernel.org
-Subject: [stable request] block: stop the timeout timer when releasing a never added disk
-Date: Mon, 17 Aug 2026 15:58:27 -0400
-Message-ID: <20260817195833.2971170-1-coshi036@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 17 Aug 2026 14:42:19 -0700 (PDT)
+From: Ziyang Men <ziyang.meme@gmail.com>
+To: kernel-team@meta.com,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Mykola Lysenko <mykolal@meta.com>,
+	Ziyang Men <ziyang.meme@gmail.com>,
+	linux-block@vger.kernel.org,
+	bpf@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] block: expose blkcg io.stat to BPF
+Date: Mon, 17 Aug 2026 14:42:03 -0700
+Message-ID: <20260817214205.723267-1-ziyang.meme@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,59 +96,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Collecting cgroup statistics is expensive: the existing method is to
+open and parse a cgroup file for every cgroup of interest. The memory
+controller already has an efficient alternative through BPF; this series
+extends that model to the block I/O controller's per-device io.stat.
 
-Please consider the following mainline commit for the stable trees:
+Patch 1 adds the blkcg flush and per-device iterator.
 
-  26cb8ebbfaf7 ("block: stop the timeout timer when releasing a never
-  added disk")
+Patch 2 adds a selftest that performs direct I/O on a private loop
+device and compares every counter read by BPF with io.stat.
 
-It first appeared in v7.2-rc6 and shipped in v7.2.
+===
+Changes since v1.
 
-Why it should be applied
-------------------------
+- Drop the blkcg acquire/release helpers. The program reads the io
+  controller's css from cgroup->subsys[] under RCU instead.
+- Remove the kfuncs that read the blkg device ID and counters; BPF
+  programs can read those fields with BPF_CORE_READ().
+- Keep the flush sleepable. It now takes a struct cgroup * and pins its
+  CSS internally.
+- Make the blkg iterator take an RCU-protected CSS.
 
-disk_release() undoes blk_mq_init_allocated_queue() for a disk whose
-probe failed before add_disk(), but it only calls blk_mq_exit_queue().
-Nothing there stops q->timeout, and that timer rolls forward: it stays
-pending until it next expires, not until the last request completes.  So
-if the driver issued any I/O before adding the disk, the request_queue
-is freed while still linked into a timer wheel bucket.
+Tested on VM with v7.2-rc5. 
 
-That is a use-after-free.  With KASAN it is reported in
-detach_if_pending(), enqueue_timer() or __run_timers(); without KASAN it
-shows up as a general protection fault in the timer wheel, in a task
-unrelated to the driver that leaked the timer.
+Ziyang Men (2):
+  block: add BPF kfuncs to read blkcg io.stat
+  selftests/bpf: add test for blkcg io.stat BPF kfuncs
 
-  BUG: KASAN: slab-use-after-free in detach_if_pending+0x30c/0x340
-  Write of size 8 at addr ffff888004d71310 by task kworker/u8:2/37
-   __timer_delete_sync+0x156/0x240 kernel/time/timer.c:1621
-   blk_sync_queue+0x22/0x40 block/blk-core.c:222
-   nvme_sync_queues+0x100/0x150 drivers/nvme/host/core.c:5362
-   nvme_reset_work+0x138/0x930 drivers/nvme/host/pci.c:3264
+ MAINTAINERS                                   |   1 +
+ block/Makefile                                |   3 +
+ block/blk-cgroup.c                            |   2 +-
+ block/blk-cgroup.h                            |   1 +
+ block/bpf_blkcg.c                             | 154 ++++++++++
+ tools/testing/selftests/bpf/cgroup_iter_io.h  |  17 ++
+ tools/testing/selftests/bpf/config            |   1 +
+ .../selftests/bpf/prog_tests/cgroup_iter_io.c | 277 ++++++++++++++++++
+ .../selftests/bpf/progs/cgroup_iter_io.c      |  99 +++++++
+ 9 files changed, 554 insertions(+), 1 deletion(-)
+ create mode 100644 block/bpf_blkcg.c
+ create mode 100644 tools/testing/selftests/bpf/cgroup_iter_io.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
+ create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_io.c
 
-nvme reaches it because nvme_update_ns_info() submits Report Zones or
-FDP io-mgmt-recv on ns->queue before the disk is added, so a later
-failure lands in put_disk() with the timer still armed.
+-- 
+2.53.0-Meta
 
-Which trees
------------
-
-All supported branches from 6.1.y up: 7.1.y, 6.18.y, 6.12.y, 6.6.y and
-6.1.y.
-
-The regression was introduced by 6f8191fdf41d ("block: simplify disk
-shutdown"), which is v6.0, so 5.15.y and 5.10.y are not affected and
-should be skipped.
-
-Backport notes
---------------
-
-The commit applies cleanly to all five branches (checked with
-git apply --check against block/genhd.c from each branch), so no
-backport is needed.  The two helpers it adds calls to, blk_sync_queue()
-and blk_mq_cancel_work_sync(), are already called from block/genhd.c on
-every one of those branches.
-
-Thanks,
-Chao
