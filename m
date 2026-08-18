@@ -1,68 +1,144 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5423803E1
-	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 13:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA573B101C
+	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 15:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787058937; cv=none; b=LxI6P82R2eDFWc0l/dvfPa4J8OBLrwIDequ05qsOc8l0Jlb2VBU6CXqw8dIViKg9TWFGq7g+2dkOlpsrVq5FWYsaZaRpvmxyZq86gL3oL6cgTEEjjWba/Ptt1XGSTIHkDYNl1tgtH0eDcAJpNUYanyyO0QaCxzsLb5P0D5D4eZU=
+	t=1787065750; cv=none; b=BJvT6Di6hNltARPMFUueDuydBcRSSChC03ZNNXY1isHExmOi+bTqlV/VzLZAXegZ/lK5Md8lA08UniLVu4VgENZ5fuC/tLX9IlI6n+WemCfsjTNypszmWlYOpUcyNzqN4jMeqSdc60tBky/XS9HBZxquEzGb/LGLxVC6QLv7/yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787058937; c=relaxed/simple;
-	bh=iEp19t/EtrTz951yyUHrxVufHwZDyFdlnh694G64KBA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Uo5UMf3zFrHaH5ZvLkREucKpJwIdjSTYUyzHuSqOQOjQikgQK4dPl1AmkmMrOYrY09vlGpFWSVXRG4o6otVv1wG91bjjXsY+ziqLrAIAblS88jvDireozr+K+7DxCAFrtnqh1JhfQMkr+v4OJEz07bkfx20pK1TSmBO/25GXVdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e0a454329b0611f19a56ed5b684f684d-20260818
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:f21e0a2f-297d-450d-9afe-4a3cf08adcef,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:35
-X-CID-INFO: VERSION:1.3.19,REQID:f21e0a2f-297d-450d-9afe-4a3cf08adcef,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:35
-X-CID-META: VersionHash:7db8b62,CLOUDID:0f5adf245986fb97d2b323c6bccaaeac,BulkI
-	D:2608171614060D7QSHQU,BulkQuantity:3,SF:10|66|78|81|82|83|102|127|850|865
-	|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:n
-	il,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC
-	:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: e0a454329b0611f19a56ed5b684f684d-20260818
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 920006891; Tue, 18 Aug 2026 21:15:26 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: Christoph Hellwig <hch@lst.de>
-Cc: John Garry <john.g.garry@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2 4/4] block, nvme: use lower-level limit helpers for namespace heads
-Date: Tue, 18 Aug 2026 21:14:59 +0800
-Message-Id: <20260818131459.2448720-1-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260817081355.GD21461@lst.de>
-References: <20260817081355.GD21461@lst.de>
+	s=arc-20240116; t=1787065750; c=relaxed/simple;
+	bh=vjFoh0HcmhBVPT5/d1SyMXHta8/RgJh136Og8Vd2Qek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N7QgVBwv+NfzlIcx9xWmAnP9zGtWCyQP7zGtA4RGxQ2bVYsQVmigX4NqRbCgH58cQykk1Vo1TylVsKAFt9EXi6yjX10zl+P7MeAXS2s9T87aWIeFWUof9sAW2xoXDgExftczSIdjQc8zRpEctjdWv60yGiZCzRzgLLKO9c7BDXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O6QgFocM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hRpcXuj+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6QgFocM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRpcXuj+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787065747;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZlX+X1VWu30n4FQxr2jVaIi0+ztBEd4ppgKRk/Z28YY=;
+	b=O6QgFocMGdG9ZTci3966K+tpaLb3Hcio36kzJCKCHjwQVvW1gN9A8nbujycLf0Krh5FU3+
+	AhYgDRVz0nR1FNUYmasDOrh1iX9MiSQg0qygSrFiGBpStclOVRUJf/1iZ1K5/ZG1shPuJr
+	J5q5W2Jeyz0dcy5KjQd1eLgl+doOEP0=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-573-TRJIvbw2NAG4s-mL3iF7_w-1; Tue, 18 Aug 2026 11:09:06 -0400
+X-MC-Unique: TRJIvbw2NAG4s-mL3iF7_w-1
+X-Mimecast-MFC-AGG-ID: TRJIvbw2NAG4s-mL3iF7_w_1787065745
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6a18e266026so4777831a12.3
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 08:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1787065745; x=1787670545; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ZlX+X1VWu30n4FQxr2jVaIi0+ztBEd4ppgKRk/Z28YY=;
+        b=hRpcXuj+mIrkUPeuEcNw2S8467aK8NJSWqkYDvcd3wtruoWm13ksJuybIsif5JNVv7
+         3WSQ/NBwRYQ4nraZpaIosLYp75uSYMfyS8Z6PIZPAklN2I3FLiRX1VbSxXwv9FZfStqr
+         mnrSGpclxy5WO/CsmXXCYrAg4zwUcyr6nnYOR7lcgviM399IW3rv3Qwbq9EmRtxGyNkY
+         an9CeGq4ciG4eDcsXo4hiXuTLWTyDm6R6xZHIAwb7fZ6DH2tvY//zHmR70sY1z7FXPrh
+         DQ6yvZaAnR8UantNGwJo+2pJz87r247Cj1X6L3QftQXQpVk1+vdyBsGiu3yXdP9TchU0
+         +c+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787065745; x=1787670545;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ZlX+X1VWu30n4FQxr2jVaIi0+ztBEd4ppgKRk/Z28YY=;
+        b=GK8UyhbIesRZqpRzRh0fqVNWu/2mlVmY8NYAkXa6YxkAe8JdlQGoW7+zL4hV1sRF/m
+         tNk8stpDSde/nXxJJqfcly3/FvIXDvgRAwCx0ElCa8RESFHoUp059NOxoZNKiuAEVqDl
+         dRL49MO+2oyOKgFPO64ZtJI5plefgRp9dKCjuatSzjRG5bqJ96eMoxRO+UG8oS+l4iiL
+         Hk9ilS06iADzbgsKp+96GtBYi3MnO92/HNS4YLo0gjiT/2/GTp70PreGZFXrYmK9BYd3
+         1B7hcUG9rXmumYzePetSANZ3RCQo7Vyr27FfYyBmfzC1eyVEuWOb9CuPGpCZ8GwogAcQ
+         sMAQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrDSiUIrJy6BngFrVryrMfPxAjNE2vMH8xE7THlupOwnKGvBEIZa07XTbet0ZiwHbdHxZHbxkbacDMvEw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyqSoj9gGEke+8FWgqCFqNJkQHCI4Ps2Nt5yg41sBoU8zQkTw4
+	QImArcKj8rUKxoLFjfYh3kZeGhsiHx8RAgzc9h7QP8zkphqu3w5W6t2VHYXw5pA/d+BX3G7vFrn
+	nfmmR2j6dh205GPVziRkbgGhFyrNg7LVbbjag0hjfty9Udm/Bcq15WTHrmilGlgy5VGCeYZLJ
+X-Gm-Gg: AR+sD106RFM1oEX8qmogrEi46MtY9LnHp37DfUAoVpx7EN+WqVIoL+ALK7E5o5Z8Olp
+	Zdqq2KLGc1p6TG8hLjVD92NGwP86Tiphul0I0Ps+McVwAzKDY0CDI9ZeGZdOZI3CkOdNTRE9z0+
+	mLb/9ubDm0+be4DZl3lEcdjKfO6s0vqykEOaAFquzm2jzasr4m4Q/xjZ8/oTXg6iuyWFT4178jK
+	h5SwM3EQN3AvIMaZ4eDWOA6tmAYDTZe2zKIuD//n7ISGrYmh5Ai29y5s/kpyNDDzyOd8d9E+k9L
+	A4AyRBOY0CjxK/NOdO9FfawAOMGU8UVgsl2LEshWEkrpouqI0JRKNCZHOQM1ayHP/W0fUqAAhNT
+	Ps1ZYaWcbEjHNuu+d1ZOvjdvp0VFFfMzoD7wxjg2r9ic=
+X-Received: by 2002:a05:6402:4015:b0:6a3:714e:f5b4 with SMTP id 4fb4d7f45d1cf-6a38a946e29mr16198335a12.9.1787065744743;
+        Tue, 18 Aug 2026 08:09:04 -0700 (PDT)
+X-Received: by 2002:a05:6402:4015:b0:6a3:714e:f5b4 with SMTP id 4fb4d7f45d1cf-6a38a946e29mr16198193a12.9.1787065744294;
+        Tue, 18 Aug 2026 08:09:04 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a3d8531625sm2079715a12.12.2026.08.18.08.09.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Aug 2026 08:09:03 -0700 (PDT)
+Message-ID: <08105f8f-c7b7-4921-a907-b4a9a625ee20@redhat.com>
+Date: Tue, 18 Aug 2026 17:09:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: save page offset gaps in cloned bio
+Content-Language: en-US
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, hch@lst.de, Keith Busch <kbusch@kernel.org>
+References: <20260817165908.137682-1-kbusch@meta.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20260817165908.137682-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for the review.
+Hi Keith,
 
-Agreed. I'll factor this into a block-layer helper in v3 so it can be
-reused by NVMe and SCSI multipath.
+On 8/17/26 6:59 PM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The cloned bio needs to inherit the accumulated gaps between vectors so
+> that we can know if this bio can subscribe to the iova coalescing
+> optimization. The split remainder meanwhile can reset its gaps to 0
+> since it advanced beyond it and will start accounting from there.
+> 
+> Fixes: 2f6b2565d43c ("block: accumulate memory segment gaps per bio")
+> Reported-by: Eric Auger <eauger@redhat.com>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 
-Thanks,
-Yao
+Tested-by: Eric Auger <eric.auger@redhat.com>
+
+Many Thanks!
+
+Eric
+
+> ---
+>  block/bio.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 898b2f5ef8c81..33aa439c1bae2 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -859,6 +859,7 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+>  	bio->bi_ioprio = bio_src->bi_ioprio;
+>  	bio->bi_write_hint = bio_src->bi_write_hint;
+>  	bio->bi_write_stream = bio_src->bi_write_stream;
+> +	bio->bi_bvec_gap_bit = bio_src->bi_bvec_gap_bit;
+>  	bio->bi_iter = bio_src->bi_iter;
+>  	bio->bi_io_vec = bio_src->bi_io_vec;
+>  
+> @@ -1971,6 +1972,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+>  		bio_integrity_trim(split);
+>  
+>  	bio_advance(bio, split->bi_iter.bi_size);
+> +	bio->bi_bvec_gap_bit = 0;
+>  
+>  	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
+>  		bio_set_flag(split, BIO_TRACE_COMPLETION);
+
