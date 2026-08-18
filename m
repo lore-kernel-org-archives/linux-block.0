@@ -1,96 +1,77 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C05226D18
-	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 17:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38FD3EC69A
+	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 18:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787074336; cv=none; b=LjBAeZnC8A2UOuGCtYqg4EnkUDvm4NBrQF4YdzaDPL17ZypcW6wqu9HycucD1nToo7vyUdzfHNRmrlseboP4FZJ06TyO0m8hrvvh4lEBH2qxVmMoahlD5Zly5CRDncokP+I/xzYtfwB0t9qpnM+5tNFbQJiSClC917MW1nrsYwk=
+	t=1787078535; cv=none; b=Nd6dcawDOxOOCBiccZ5gZ/qlxVw+YYQUT7gCKz7Zy1vbOm1TIYbMtKB0ryvPX131/pKVQjraHnyBS8PvSznEQsm4E37oP3BFnipDQ/6U9vdTiZ3DIiuIICBRFBBu50daKVelBkKTe6jvf0SX9l5n/Rlq3m4P3s0/GJkuo7oCPww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787074336; c=relaxed/simple;
-	bh=4X3X595DlJ3Fl46k1OE/Cu89WR2kbDCEKULaEFnTVKA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PcpmTaBBG0eceyp7dnTLERZypUlMx8EgSU7Ml11QPs6Ajt6Kzm73d7kZpAMQcPTY0+stRh0sf1KPrpaK5QrNILwjzlOlUMcSpn77EYEfWNDF73UsZJee6eTNpCm5IoOLET09z4peZnRkLa3uGYbTZN33tbUQb1/4Nypjx3/dv7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gXvhhSAl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787078535; c=relaxed/simple;
+	bh=N1PwiA3l9sN+V/4bbYu2eCDS2YepexRNNqOhf785bQ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TXHwXFzXLhyFPLlastJcvNdt3o3hhViXQA7aZBjJzVmFooy6Ux450Itoo3aQFHarJVVxs7aGSuSmkjEuTvPvf9ARPzCyc6bQWOqwi7BiMuCj2itaqKsHVG95mbAD1SGccZZ3Cve4VwD6aFvMc4vUBzbU1wF7Pr+XC8b8U84N0hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZUCYF7a; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXvhhSAl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787074333;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZsigVlxc1Yx5xrsa1S52pC/wAn87RkEo7OEJR846FGI=;
-	b=gXvhhSAlLhNQpYBlE7mGTUpS6NFEdIzUFe9NGCOThnPfJjo5SPrEQxkc48DY0FK0K4ijBH
-	G7tryQGx3YXiNGpLW7ctWnFskkU7Hds5Pt6wVXYHoJiu6MPa7HAEFe3eFBaDMTdeea1/OU
-	AaonNZQf3ttvZZD74z5BzgZJTCkLf8Y=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-Vk-8hWHsO6qKZAjiypooVQ-1; Tue,
- 18 Aug 2026 13:32:12 -0400
-X-MC-Unique: Vk-8hWHsO6qKZAjiypooVQ-1
-X-Mimecast-MFC-AGG-ID: Vk-8hWHsO6qKZAjiypooVQ_1787074331
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C7BE1800869;
-	Tue, 18 Aug 2026 17:32:10 +0000 (UTC)
-Received: from [10.17.17.225] (unknown [10.17.17.225])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4AF383000239;
-	Tue, 18 Aug 2026 17:32:09 +0000 (UTC)
-Message-ID: <3e9c2a03-9a8f-4e20-9c7d-1b55edc58a9d@redhat.com>
-Date: Tue, 18 Aug 2026 13:32:08 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZUCYF7a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7721A1F00A3D;
+	Tue, 18 Aug 2026 18:42:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787078533;
+	bh=oFGib0CJDAkN2xFfALWXvO221aWfjs+b0TGw1MXk1BU=;
+	h=From:To:Cc:Subject:Date;
+	b=XZUCYF7aMFXf1gWkOZQoctVLwKjnmGa+utF6US+MsffCwOXjAHLoecTN9d2DOfKcp
+	 CHy9N1bqI3HQOBmNKxsuz7ShLKaq+tORywYeoQoftas17IMZbV3PSxPBDSZNA+U8EL
+	 TdKDTr4VSDYeasPMnHbB+cYSf8bYofekcJSJQv9DWG2HKHhkvQVXvGSpyToNkM7GqR
+	 Ymi0MyD/8m34pDq4Qwrot2LWt2YQZXcvz8stQ9OHcvDIicuI3fcUuh81PQrz0zfjTv
+	 eLs0e1igWh6WzRM8q2l95c/TXJcOF5UmUkhvbSojlpeTryAUnmRtuOJXtRyTb9dvgz
+	 EdQMosuGr6JBw==
+From: Mark Brown <broonie@kernel.org>
+To: Miklos Szeredi <mszeredi@redhat.com>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH] io_uring: Add missing include for ITER_SOURCE and ITER_DEST
+Date: Tue, 18 Aug 2026 19:41:34 +0100
+Message-ID: <20260818184134.384991-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 0/2] Test multipath and marginal ports
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Jesse Taube <jtaubepe@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Daniel Wagner <dwagner@suse.de>
-References: <20260812174503.3705830-1-jtaubepe@redhat.com>
- <an75bRJc8J6NexeH@shinmob>
- <CADRr4beUeZo9ZA9TZVmWQ9Vegm2LvTXkW0wGNxYA6_7z_njMEA@mail.gmail.com>
- <aoK5sfNpxIUz7C02@shinhome>
-Content-Language: en-US
-From: John Meneghini <jmeneghi@redhat.com>
-Organization: RHEL Core Storge Team
-In-Reply-To: <aoK5sfNpxIUz7C02@shinhome>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-On 8/17/26 03:38, Shin'ichiro Kawasaki wrote:
-> Yes, it happnes always I run the test case. After I rebased to v7.2 kernel, it
-> shows a bit different message:
-> 
-> nvme/070 (tr=fc) (test nvme-fc marginal path handling)       [failed]
->      runtime  37.200s  ...  38.926s
->      --- tests/nvme/070.out      2026-08-17 11:13:53.073000000 +0900
->      +++ /home/shin/Blktests/blktests/results/nodev_tr_fc/nvme/070.out.bad       2026-08-17 16:34:17.997000000 +0900
->      @@ -3,10 +3,14 @@
->       Testing iopolicy: numa
->       Changing FC links to online
->       Set all online: pass
->      -One host marginal: pass
->      +FC port on (/sys/class/nvme-subsystem/nvme-subsys6/nvme6) is being used, expected no use.
->      +One host marginal: fail
->       All marginal: pass
->      ...
->      (Run 'diff -u tests/nvme/070.out /home/shin/Blktests/blktests/results/nodev_tr_fc/nvme/070.out.bad' to see the entire diff)
+Fix IWYU issues:
 
+/tmp/next/build/include/linux/io_uring_types.h:56:32: error: 'ITER_DEST'
+undeclared here (not in a function)
+   56 |         IO_BUF_DEST     = 1 << ITER_DEST,
+      |                                ^~~~~~~~~
+/tmp/next/build/include/linux/io_uring_types.h:57:32: error: 'ITER_SOURCE'
+undeclared here (not in a function)
+   57 |         IO_BUF_SOURCE   = 1 << ITER_SOURCE,
+      |                                ^~~~~~~~~~~
 
-I'm seeing this same issue on my QEMU based test bed.  This is a timing problem and the issue does not appear on a high CPU count system.
+Fixes: 95961b72c57b2 ("io_uring/rsrc: rename and export IO_IMU_DEST / IO_IMU_SOURCE")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ include/linux/io_uring_types.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Jesse and I will work on a fix and update the patch series.
-
-/John
+diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+index b516d9feb0f14..39629ee77b911 100644
+--- a/include/linux/io_uring_types.h
++++ b/include/linux/io_uring_types.h
+@@ -6,6 +6,7 @@
+ #include <linux/task_work.h>
+ #include <linux/bitmap.h>
+ #include <linux/llist.h>
++#include <linux/uio.h>
+ #include <uapi/linux/io_uring.h>
+ 
+ struct iou_loop_params;
+-- 
+2.47.3
 
