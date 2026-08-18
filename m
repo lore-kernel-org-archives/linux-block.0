@@ -1,78 +1,81 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5F33E123C;
-	Tue, 18 Aug 2026 11:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2540344031
+	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 12:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787053839; cv=fail; b=HFT9rHeHr1PbL92xaYVlbm36GymvdpcQ61S8/wGRYFPerJT9mNIraGLngM4jDcm0PWYUMnVN4t7AWtqqd+RsyBPs4/zw0ilAW3xd21Sp5oSPxsGZ5uXF42pXagXp95/nI5vln1T6B2/v0QvjBG0Xob0OrbQb60gv6DATXZt17lQ=
+	t=1787054973; cv=fail; b=XzHCr/BD3Es70JCAZLhN2mTR4zp0lc1YxjNCQ29EEYkMPL/b4T6n/KqQ6nI4/l1b7fBB4eHL8c08/Y7gLTXHUmkWEyRrXk4qsN/GlIdir/BbCkzOnue63N8hD75PFD8Xo98wqHYDyJqwVz2SAIL3cVRyZBQj9cf4CiSMSc+1Sd8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787053839; c=relaxed/simple;
-	bh=beM3YvChpJR127E5gs8TQgg1AssCZ9fb8zqjcJ0pFaw=;
-	h=Date:From:To:Subject:Message-ID:Content-Type:Content-Disposition:
-	 MIME-Version; b=fPCwrdW3BlYZhmlMg3D86vPJQr3MOnt9ktzSAXhjidkO+LscZkw/jXIQCDU8jSnrszTq+adXxj7z+JsvGO/UShqi4yUvS9hzVqjRydlaHPTuM6fhDvdwAUFg437gf2S/Hppq7ShThLDhk9ebvH3uHAwbE20/5DHvaCDI0LwlBaA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ec8xNWd1; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=gNoi5UXw; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1787054973; c=relaxed/simple;
+	bh=elBW546rMibSQ+xl7tOrBiSQCar5NRA+lvplIkW5jZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MYkMA88Z0vv3mzTiUo1OKqxThfajEj0kqT4OnLt3Irgki6PTGSy/odA4Tw5C0RpE/bnCvCcVIAK9BT8Kj0CizkdhR26hVAsSaJgR6WfjgQMIBN/1gYNbjMB5tK09AThwzyG8EETka2Ad1Rm0iEvQ7xa4CRgZdktyjlJqlAIaRRQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Xwsl7hKT; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=XC7GVSpD; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ec8xNWd1";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="gNoi5UXw"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1787053837; x=1818589837;
-  h=date:from:to:subject:message-id:mime-version;
-  bh=beM3YvChpJR127E5gs8TQgg1AssCZ9fb8zqjcJ0pFaw=;
-  b=ec8xNWd1aJm4iOLwnXJg96cozHBJH9DseRPEYUeWr/Ap0umubKxH3YHR
-   1+7NeL5tYYlcKovLIvZ1f9QT4ZlUH2UhRraRbcNfE68yZdoIq00PCEjSW
-   NJta7amiCDyGgelWFoBaQFg3muiNUf/Asjk2D0qMbhztY5G6JCmFPy70H
-   4zXwmLmQeasPwl9OIazDBwzNuLWExNuZIS7d3RWm5UhBVylVZOUUmrW3o
-   lInLx6J4rGbXL4kUaretkc6FWpVscoocfe8H/8oU2ia3mXdhtTDTA6sON
-   VjaQg4kYzZB/OR+BqaIhERMRWLtm4C5LvW1pLYPYlk1JHbDuxkV7Wgb/q
-   A==;
-X-CSE-ConnectionGUID: srxIxemvThyVVPAGs95nOQ==
-X-CSE-MsgGUID: wZObdZbERZORdVLQLPRhbA==
-X-IronPort-AV: E=Sophos;i="6.25,230,1779120000"; 
-   d="scan'208";a="153302062"
-Received: from mail-northcentralusazon11013005.outbound.protection.outlook.com (HELO CH4PR04CU002.outbound.protection.outlook.com) ([40.107.201.5])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Aug 2026 19:50:22 +0800
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Xwsl7hKT";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="XC7GVSpD"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67I9YQ3G1702955;
+	Tue, 18 Aug 2026 12:09:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=corp-2025-04-25; bh=f6cCk3P6dlQdVFmp
+	A7OI4imTnhc2YXG7E0hEbvORuFo=; b=Xwsl7hKT6bGmclkEJHyd7Gm35m2pY60r
+	a1mVuhJJkCEQHz/qw9a+KX+WeG2zpLaNbwu8rG36KN1LsJNqD4QQ/akEDltHEH6M
+	7a4VkGTC//KdVHeCXUyzUzYVPI2ui5+Vs5DX6/6XMp6uAI70TODuz9JVOrJZ22u+
+	XH9m+NnSnytJuU1ZZQbj3s7q8rozVO4o/Mmgu4r8QFo9TURms4tjLV8Yb++2DRgR
+	hZq+XAhAmlUW5Ro9RZtaCwkUl6J/DCmeamxpLzOI00EvZq9JhZCrGr+l5PluB+p8
+	H0204yICGvxDj0JA4XsfyeajfHcK7nt+WlZCXF40uMpwwY1tgP+zeg==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4g2g07mh40-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Aug 2026 12:09:09 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 67IC67p9039145;
+	Tue, 18 Aug 2026 12:09:07 GMT
+Received: from bl2pr02cu003.outbound.protection.outlook.com (mail-eastusazon11011021.outbound.protection.outlook.com [52.101.52.21])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4g32hqpqjv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 18 Aug 2026 12:09:07 +0000 (GMT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gL3zZXLx9J6Gv0ntpgOcVgghsLiuP8IdJt4yr+FqnTg7LNXTFz8EBAkOt9qpBdFXbdDKIBe0nQiAIxcvkXwYJ8zawtg3QlIT+D1LHhRG5aubostG7L7q9VWv4cyl2KBUbxdnG/Zi44B/RJVq4qikPfauSAlchxqiKlAOKRUGpknLsRr5J3IsXjSAifer/qvxod2L5Ejg5+QvzDoNBkGuXoZxopPDmYfKJOjLOnyPy4K04jGOzLAJG5WZNyXJcdN9SDyCRznUmxV0ca4KzdWuTtUYcdh0NnkO0ouBcMirZ/WaOanm5dBLZ36bVqnAvGz2bVgFxxiVqMGixg9W7N1hxw==
+ b=PSemyGWVBxcwQW+Ghhntd8JC4dFOfFCAxwPMFgentOg4L7kX1cqwVLI3+J+223nc7Ipuqo1bXMB+6SKpPPcOqvBCrdFazoy/DDV5g2f3kBlYUTfAiw2wSV14J+srYY/5pv+K3OccN8VFUhfEoA1gVVsvmy7uEnJCuQk2/bLgW3AXhr3OEwuvvmC9OC19tmdOueg1a8082OZdGQKebwx/AbkaUaKbXNuToprlqba7pfYnsfEinb141EvnKivhHgOO9QV/MkHaIDHKPdDv2XHhg278CNQl5QHqAWuYVkcuPYkWc2gtelZcKBFDLwJLMWiHfpqFQgmxWd2VRRD9Q59iDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KizE1bCne7yp/rt69UfQpZUXJdgSTz0n3V2Kqaj9adQ=;
- b=sTiHGSuH4rfbRMopE2VnD/BtTRdkNr8pIHrlWRXVPiG7sgiCl+yXE0t4UVDH3OlOMpUgdZVoObeI1G4lXjUw1q4/dmlZDdTqOX8loxR3vxAECVJJ5V0FEbnUjMqvFSGielq6+lhKqCplEML9mBhrfgFLVBTpQCu4L2T1g0tErdA1I27w08zUgPrDt3gjXKxmt/JdilYPZ0bWYkOR4Esvm2fvhR2Tyc4FkFWNU4ekgsRELEEFlXyNdcs8x/zBJ3xgnAy9Fv9p7pEUD6BRRbL879lvCsWVkTnC87vPzME6Am2oFzpWNdSpJzhxt9klqnsXWhk14V0PPrMs17ngpjwoEQ==
+ bh=f6cCk3P6dlQdVFmpA7OI4imTnhc2YXG7E0hEbvORuFo=;
+ b=mzm+8R2f1hujhqonHYX5JweYfG7D0+TRrqE3Uo32sjmIVunjWCSAg4azgczVZF0y9xA7ei7DqrdZPxelVrjRF/AE/DvoPDDgMViJ8/qPuNrt/SYSOBxXuKh+DV7xENjks9vGs4THDsQltxCVT8k7cVBkDjMhoNHeWpGlwCR2TiELoSoki1GiZNpWsp8qRcKwczTvYn9Qbd3b6hXtG5SAH1hhIDffjY3EvGg9oMdDRYH0QBI6kYHBJ+/dswTnApI2Tn5Nv4CAnn+ZKRXJZWKqFj5sX+9VtLiXr/cHE7pcvYCDukz3pNVE7xrWpE/sI+krgEWpyYb+sRCpbo2HcThdzA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KizE1bCne7yp/rt69UfQpZUXJdgSTz0n3V2Kqaj9adQ=;
- b=gNoi5UXwXo1A1zF+tGlXcLL7g/yMVMjHcRpOvOxxGJ+xxi1+swcoTnoAztogAD2wUAe0910uIFl4HCa5Hp8pfK4MIhVzmQr03R658YTqf8uDOnt1vNQ6XjmTnWcL61yzzAQNLXJtPXsRXRmYi5ndSPxzdGDt69aw32o3cMLvN9o=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by BY5PR04MB7042.namprd04.prod.outlook.com
- (2603:10b6:a03:22f::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.8; Tue, 18 Aug
- 2026 11:50:19 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%4]) with mapi id 15.21.0315.016; Tue, 18 Aug 2026
- 11:50:19 +0000
-Date: Tue, 18 Aug 2026 20:50:14 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	nbd@other.debian.org, linux-rdma@vger.kernel.org
-Subject: blktests failures with v7.2 kernel
-Message-ID: <aoRGbVB70YCcxoxF@shinhome>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-ClientProxiedBy: TY4P301CA0050.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:36b::9) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+ bh=f6cCk3P6dlQdVFmpA7OI4imTnhc2YXG7E0hEbvORuFo=;
+ b=XC7GVSpDHGCY83Vrj8AXTYwI5tCoguMfgn0Ynn7rXCi8ocrpfHzlhZoaqN8QGFgWTLQ400ij5KDd13eX4av+vZbr24uiVncGwoEh1sa90YHfj3sk1HLYgxQ9jOt8mcyjQZD6DKpUW4qXehBx6yqTq/hahaotdrotyOUD0PiSnCg=
+Received: from DM4PR10MB6229.namprd10.prod.outlook.com (2603:10b6:8:8c::12) by
+ EAYPR10MB997949.namprd10.prod.outlook.com (2603:10b6:303:2d6::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.17; Tue, 18 Aug
+ 2026 12:09:03 +0000
+Received: from DM4PR10MB6229.namprd10.prod.outlook.com
+ ([fe80::867:63e7:13fa:fa7d]) by DM4PR10MB6229.namprd10.prod.outlook.com
+ ([fe80::867:63e7:13fa:fa7d%6]) with mapi id 15.21.0315.016; Tue, 18 Aug 2026
+ 12:09:03 +0000
+From: John Garry <john.g.garry@oracle.com>
+To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        John Garry <john.g.garry@oracle.com>
+Subject: [PATCH RFC v2 0/2] fix NVMe multipath partition diskstats
+Date: Tue, 18 Aug 2026 12:08:52 +0000
+Message-ID: <20260818120854.3151628-1-john.g.garry@oracle.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH5P220CA0009.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:34a::14) To DM4PR10MB6229.namprd10.prod.outlook.com
+ (2603:10b6:8:8c::12)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,291 +83,129 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|BY5PR04MB7042:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2460821-a0ba-4d6b-14a4-08defd1ee082
-WDCIPOUTBOUND: EOP-TRUE
+X-MS-TrafficTypeDiagnostic: DM4PR10MB6229:EE_|EAYPR10MB997949:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0cab4aa3-3326-4da2-5ff3-08defd217eb2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|1800799024|376014|366016|23010399003|10067099003|56012099006|6133799003|3023799007|11063799006|18002099003;
+	BCL:0;ARA:13230040|23010399003|376014|1800799024|366016|10067099003|56012099006|5023799004|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	feC6SuUZUIuCaGC5jXGxVfArZ5x7pongxYWvpsRcuhN7IAzjU5hpneA/fmBSW1SH+LdjXbp0BA8S3nwic6g2Zh+cIJ4r7A0Hz/j5Sxw9SooBCTWjhTZqF8867F/Ot3N6Y5pONqiNKSwKPC2QhTA87dhoTJIC3JrKJKkCIW4FxKzjor62ZBDPEZ+Zk4pRRyxCCf0cZRcngYO8luIBf5MhpeUdWarfHhGXrfLWTBkUI7HA/OHDg+Cr0zi8CKgT4IM8gVjwBELuevNwDwKNQXosXVbwakjpgaYJBrEBOhQFYdk6uoe0wZ37Z+KC80PxZ1YAELFIITLYKCg+3yeMERbdxChluRiIR58sK8ngBEIQyV5GxRXB7vhsxykpv1PdaLxHpeL1MuFZG3ryoihdB6rgg7uhh9LUQJ6G9MoWj+fcZlf+6HcFuXGbbyHbXLizoL2tjk3bR842i1zEJBOOM9gHRvzsPwSs6pImjmX0v7yaV/jeRgIIdmy+1M1/5JGk/psRJhZslBpUMHq0I8fOl+wARRk2U/uu/UPMdOPmS51wWEpx4L1F0paI6gEJqXx0mzOSUJ2IQ4q7y36WZAEENllvNtMrAsW6XK0aLN/2oTyasT6hF4uLUMsRNcEMs0Y4zyTRrwuA968EbQmR7WT/Vn7yzAaknAUw+fHbnH7NKPSQzDk=
+	6eKwd5jvM30ASls4geqcXORd7w6VoNKdM7GqEmd6MgQ4QpSDff/to7tNocrs0TUC9dZP15buZO/yCXZtVih043Z35ck/Hgma1u5KHPqTfo/KxnxKdI0Q4HBFjIcZi9OHSsRaA2p0+jBlN/BWqM8+GSn4iCw0Wwiszaq00kY0bUAvLene5ln8crHVpnve0Fc/Qc+Nq+ZITGPtZseLQMENir2dydcx99VEhjKYQbsGNGk4HFjC+giBIar6TtguVo89NH4r5iJD7GPnR8VJYtxP7OUYWvlZZNGta/j7NUVHoJgsiGTEqTzKRagBdry8GMOF6hQs6r0IFoeh6LSdjIAyHCBYczTyj1aWhwU3PyWY9qRcel74l9re+HUCl3WTJwO0C08lWvUhGHE8yYa0/UoriTSNeSPViifg90fgBJusAJgC2TVHplP5EFlrwx2isYhK4S2Kjohg6CeBvFm3iKJ9LNxlX7uo7IB+re7YFXN/DQvlVHkdURHudgwyKFIXwsA7Yz/70WjpNQBaAeSOosfVOIfvsKjhOq4GCeKl38Okyn7Nz+wZ70K8mQ9GwbsEhFuybRXyphaDD4EVFMXB6hEn7sYkzaEvljAuuOwveOElKV+1c7WqKiNGo81WcWyjGhor5eGj58eXsSCS6GiDLIdBC+mGnGotx8xRwVuqJpgTZRk=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(376014)(366016)(23010399003)(10067099003)(56012099006)(6133799003)(3023799007)(11063799006)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB6229.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(366016)(10067099003)(56012099006)(5023799004)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oJ/5SWLu2oGDGC53YEwER/m2N5qBz9JBvxQU0twXzXe23O3tpSbAxghRvdF/?=
- =?us-ascii?Q?2cRDxcucDozIE/aSqsArdkm9wuNZsaC01czmd6hGsjVcB7aMF2NVEzvQYpNG?=
- =?us-ascii?Q?KWU+dyiGJQRntIVxIf4QLkcbTU5VUiXQorGGrrYp7ec/70OruHtAiV+dH2r8?=
- =?us-ascii?Q?aLd5ovqz090lk9R6REr+V8SEdkhj1RqMZ7Xmc9qHQBVouxaPpaD3K2T+qJiy?=
- =?us-ascii?Q?Ubq3wpm3C5qtFXS8UQ1frx+2GtHeL8mKAtbcBdaTBGk19vspFdLbXEp7LNhn?=
- =?us-ascii?Q?Xt+hP5afDqPHB3sxgQk9RnNtm+syT00ylCl1npnl6S0hBGdHeH3lylRmijHx?=
- =?us-ascii?Q?DdaS+O3MqXdgbdXPU7rNDAXci/UqeYg/2ItYJOpp4Wl9JONOkb8PnVjtiewW?=
- =?us-ascii?Q?57c0qdRawbpkwj8HBsHfVWew88LLCEAVkAlSp2oWt6f3rY7ZgXhOI9rJqP2o?=
- =?us-ascii?Q?oofb3Falb8JC6TOCsOsuN36h8onbqo6HtJBjaAxNso3nZ8SBTqJfhzG8Jsuq?=
- =?us-ascii?Q?8Vd323WONf9pbN1D6t811KyhwuqW4zuExfc3dkhLXQlZqiRgKL9U/dApWCQP?=
- =?us-ascii?Q?fGm+lSgbysY0tceGflMda3OjGIyOSlUvypPRcq+uWw7hlfTWEYkb2stntslO?=
- =?us-ascii?Q?ifiwnp2HGRYR+RoBT8Bd/2Odcj+Ds5CUSB2GQamUIgupvxTdXfqsNlD+BfH8?=
- =?us-ascii?Q?m3DW95OW/6P/BZGzKhNh8XgAXE6Ltw55njH5dJOKAqSAJfH9vNbgbQOzLFGN?=
- =?us-ascii?Q?rjMZYzUDyu04XfJlZGFtMyHQGTQmZZiEWVuOFlO+OjpR6/k/i3pDqFhEH7sM?=
- =?us-ascii?Q?VCGdRvlwmP6SJiKewoqN41M5QjQM4i0z5x6/CqcPEfddGzV9Dtn+Csi7Xrya?=
- =?us-ascii?Q?A48sh5BPUOqhhYid61s6dDvtZ3GxqbnS3I3IedPkGKAzkzMOW7N95LnMvCKy?=
- =?us-ascii?Q?5QOGPQJUQPLpuIc51XwENxFCajIhXCESjed3MA6zbPhx1AoDPpN/WtAxmRs/?=
- =?us-ascii?Q?NRfjtRl+q1y/FZAvSzAMQXlvGISULCF3oLF7G06Hz7v9itlXuYb7vqoAPfzP?=
- =?us-ascii?Q?57yo6oizJou8+NHDjrhPZQr0BThEyYIq3tvlFfEiy6QhUZKK8vxVebx4agGS?=
- =?us-ascii?Q?yiKJfHMS1aeNwY7OAtEM7OH5eAhXNP2M4iSHtDUbYV7zW1lyWPOppitSxubC?=
- =?us-ascii?Q?PfiHCmaSEQxvMr5fDCvaSaVYU9xTPMfcR9M29l+ZmCp9za+IWSiWO/NICjSQ?=
- =?us-ascii?Q?PaxLoLT0RLUpjWbule7oBk014eddWmXRBHMtDsp7ncgLn2WihUheUt+li3yV?=
- =?us-ascii?Q?Sswo9cVCBB9UB/GggY+5tlNb/J0PnS3sTsPWVR4TBdK89cXvhjBR9tZnZNi8?=
- =?us-ascii?Q?VBjYHDazaHhFaZmjSz6pqqyTmxhn+5+It26Z1PArjxAl+gFXuuzfkMSMTh3Q?=
- =?us-ascii?Q?dT375NhL6H5tvXCuSVQZgHWLGrn/v33ELyyq+12H4J6RlksmdZvf/qTt8nMD?=
- =?us-ascii?Q?RZtnJlgBONbClnOHg//h/xS5PsFynYPCj/xAxZi65ZsroOis9PKL5GzzKMbo?=
- =?us-ascii?Q?GAIps85KZk15qImMGQCbJRb9WlGiHWOY3EvQ00wT7q+GP9VkQLNFfiH17mxW?=
- =?us-ascii?Q?1bnGGYFBt0fj9BRzGlWXMlGVTbqcW9Pw+Bsk5iNO+Cp4H2PasNf7GsN9Tz7M?=
- =?us-ascii?Q?ycpLmrFB/TBgab/6a6rKEK1ZRh81kIAzE1vPdd8Bw6Auw2AW3cujW9Lx5uVm?=
- =?us-ascii?Q?9jQBJukkkqFG8Gyy0s44+nanvdI2EHw=3D?=
+	=?us-ascii?Q?ABE47KTbX4r+n3Sn3fqnLPqHqJCu/aJwRpqjm3w/EiPv/eXHOD4WI4W7QE7d?=
+ =?us-ascii?Q?zbwR4MmEYOZxhL95rpqEzVJ+eYO+GdroR5XPM6NpvERkeBjFKySCffNO+e7x?=
+ =?us-ascii?Q?SmB2UwwjmrkLMnfHLumblBqRoNxIXTslqxQgKRkb1kApVG/e52R2EI6zSKLE?=
+ =?us-ascii?Q?jcuOPyXz1r46eTIFlzPiyPS9Tf9zBlqq9SFEwPrmb2LlLrcxgb7oVayPRMwW?=
+ =?us-ascii?Q?8Bw2a3xbWaFVoflMIelPDEQT+MO6mRx4rHYbmNLX6GbHdnQkR/t4Qg8/xQUU?=
+ =?us-ascii?Q?QNEUfXTa320ANH0Qj23DJdjMLsWk2q2rmmWyLsdMz3AJT3O9OKHorGq+6npX?=
+ =?us-ascii?Q?ne5cY4UHwWwt1i72YJxSgPlwP2SlV0M5R1RXuQBCJMEjtVim1wURTo36sd2f?=
+ =?us-ascii?Q?qjAaHKXHNj+BfUza+TJzSLTi1DEscnFLmrRxOZFZBL3lKfztC2TEdT1MpLNN?=
+ =?us-ascii?Q?1gdmkvyk/ZXMgWe1i63IxPJNfgQTrCv9ylAeJsQ+12MPzarzsMDsNMxl1hi1?=
+ =?us-ascii?Q?5XSZ6RS6cDbbXt7F2+xaSlV/mrVixIjFAGzmoKKuYzv06e2yXAo82eSxhC1x?=
+ =?us-ascii?Q?K/yjsAoKQPh+aGLJ1UGe2jQOYGPbOtNbkHbQIjxqbYZRWsECDJvZ10VFeUgX?=
+ =?us-ascii?Q?gS1ScCxCmqsICGGXHwoc57EpQXNylI45YskeG5Q72RkIqFHeiBU6QRQTVHf6?=
+ =?us-ascii?Q?Z74vef0bjjZv8L5hhzgw3k8CRJtoBaMYXgmIhGK7ywg4UaIDLwvE0KMwFJ+D?=
+ =?us-ascii?Q?fTRA0A01IchvBJngcrrOibCdSUgODiaBxKX4gb0UqezOdYBAtLvhahQ0zYjj?=
+ =?us-ascii?Q?Bk6vYNSOzPFjKFD6ksLodRBmt3uqhMukD9XsFYszLpmwqIMth8xPzPFoUnKH?=
+ =?us-ascii?Q?JXsmIlQo6tdKs1Xf46IFM9iVoWVouF9IqOQy+m6g+lVE1OW93a7dyrQ76RzR?=
+ =?us-ascii?Q?X0fFGrlE1C/9kqyZkGWP9Gpv2q7+Ia8JTZV1DixAHqCB36T23Rqvg8ccL0ZQ?=
+ =?us-ascii?Q?4eZjvET3cmhJ4n1YF68o5ICyRJVh9sHUbhqyw+Vx6OOJrdzScZ7XmYBN1opg?=
+ =?us-ascii?Q?4G2/bXnz8e9qE/QWUPHhujUMkeuLzea7BY8R2obrrZwhpq7qanYnqCaNjZ7u?=
+ =?us-ascii?Q?NATKvGoHENP5nh3sjaqrMsTDXfKt+5UhVShquqirm+vyZ3oOnZj9ik33jZx2?=
+ =?us-ascii?Q?RiFvMn4xNHKiFfkDoDtdoFbUAr3M8FRcWEu/b+5a6PsIUlvjpLJF05w/oZaB?=
+ =?us-ascii?Q?dgV2+XNWlxdjTvsuCGWT2aF9xhnQ7RpK8AnZRk4kTrCHt5qbfuj+KEx1SPZR?=
+ =?us-ascii?Q?MPLvg76hltpAJRne105ExxIdJAbLcsRKDkOEOUwUCJtG+crK7Zs3BlP1sG8j?=
+ =?us-ascii?Q?H1ZbAYbtgClQwcolocG9IgZAEFstOXCcdS8d5lj7FzREsFKyaTbTIw2l3vBb?=
+ =?us-ascii?Q?X+xq1Pw9o7Tn9otn31CD/+FWLBfcN7sflmidLgl3BtH61/MMbvbE/YjKLJYa?=
+ =?us-ascii?Q?k0Shi+ylJ/5QGfDZhqNbcUla9RCRiJ+j66g1YFaMKwfRM4GDasy61/c+EVXw?=
+ =?us-ascii?Q?Au0G8JGjZ/9NlGSCbi0Mn8F6xmYtWtF7Kw05VHDNsgY7fwzi1y0Ahw6mTR1a?=
+ =?us-ascii?Q?nVOUMGG6f/qI9FXHSO3CkGCBMSacu9bPcWghn+Fx+2617dTAXulYSRTDvtaz?=
+ =?us-ascii?Q?RPqi3GA0MKcaMuq8dfJhmUTAxXfTRtCxEuvPBjNLv6PCn+L4lcw9wSgUdZk9?=
+ =?us-ascii?Q?CP/sOLEsXDjGmgJhXjI9SJr/uoe0xAY=3D?=
 X-Exchange-RoutingPolicyChecked:
-	jF6SebQF0rEdlMCz3YMMUlJQDqRlGe5BPLzm0zmTiQSQ7Zih9/HPy/cY1DCxxQ+/16emKwZLuUsck9Bd6ufGwOKBlOK9M2xrkw3XnFFABUrlFlymymjVVh73HNivdjHysXcWwo3kX8w5aaVkcE4mqnaJ6OeZe8oMIer/vKcRT485yT3QgSQEqYUg/l8yD4th2UsBmT1u/nQ0rZ3q12hazJf5TjEaBH8HlnFrkeS59AY7jdecaPD6WZ4qRNoH259Wm4PybBgRI2QYaD4I61e7MHmKlDigSONvEw84bYCKKNM2YYYu8hS3qReZy/H3dq7k0cwEzQA1QUJqv8LbEhN5bA==
+	YnNtgzGRWuClWF9Qy5OF8ed6yQBuCuPzmP7/2nCnDutLgrsVTrHsZWp40ewRqTvjH2oA66579Nj4fbuaNHXjFup/tcemHZ/Ck330QYJcye1OQWe9QXNjc+BZ8OnaGVfjqKLYhtUqwKs/+7HeXcW+RuiLGTJbDFVu9k0zR1vcdGUStG3sm0yeoBVXpNMIJPvVSyiLmokmftIUzWA/GIjhcPCDGgXiVacgdkXRy4zodYtJOhO2tfxraLfQszSppZ67E/szjqJzCbXg+LLSiQrv9h0auX3hyQLA6//mU0Th45fsoSUElRdiD39pYahloyehV0Z/LTdy9KqZ+8D6xb9aAA==
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	ZfWiFkmZwy9DQif0TDd2h00naeWlNabvFBhy4Yv6YgCISFoG9HBhpk4sQ/7KTNepmtCU6qdfxh7zqUxTU2vyYFTiWStZM+8RTC2gMi3jZQYC2p7NSkLomwQEhlCIoEM48q38uL0AQ/wBqcOdzJi7KOEOMDjwN/8Cx8Ba4h2rj4OuMmrT+ALAXRjOeEn28ClDuFf46uZ0RqrzmXB0t7a8+CgOe3hTLZg1ZfywdfVfRi9oJqAQPRAzCsnOmUtfn88wLyb7B3hgL3w3Un1O4q1qlG8P2/dSlx+ECS0T1kcBLpdvmXBPtb7yotEqgv9UzvBKr3FJEZKjlOy8+7zXhIhS9O4WzsL18/OiZ1phoY1N4bLcbLTodryS4QC/SD7Y8vZH+HChTkK/QLgIHhsQI5HpXOSC7bEA9ywrPb9pO+PdL4Cu0rBjtfiBoMoD372fqkFY1pYWNhsa4bIoYcVoil4XQQ1/M17wT2NGSMajOJyCReMZczrpiqhbiaILDkC43nGF+/J2Xim+t1lMxuQbfl3UG3mVtCWz8gwHoW9ONB/1Bk4V2230TB8xRXtW1JNtkemLSghl+EA2EAdaDH41LbOZp40CAaNwsrLVVugR30zmEtpn0ZK/Lky+NRdwmlz+PGS1
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2460821-a0ba-4d6b-14a4-08defd1ee082
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+	pBvOnKpG9xA7Gzz/Waf6Cp6pGiHBRyg8WJg/l5M6odNVnY6xPCJboNWWCIaEGBJm0ovD8q9T5fjkbHenKAm13ubfGxJG/U6VGPUV6BGgP/YE9utjefvTdm5iJNNPb6JqIi8n6UcNscM47JdpzfQyZfQ4visW/sYAJ+cxyWkSs1rklKV216p0VtE7TJzK228VZQTQY9xVUd2fVRZdyVniSWwTvWV/TVi+X4gnXlT8fsK8T/l1RVUYvTqSvdmq72tVapIn6D14NR6KOZ7V8gGNQViFBa83ZESmZ+S0tbC65hCicC5SQLEvo930ge/Eyp45y0plq7rGkAvByc8Kssn2OMShyLPK1gFyyqpwDc4Cpfcxh55AsD+on7EMUt4lvFzTeUgv8x7MKeJDMMrAL+2ue7XlAikoUTUjf87cIKA1s0VkkhEw+lsjD59HLg+CJuIkwur1bwnLvM8BJFRbI3EGWL5F5R4VB+wfkPrsLQ7B7hxSwoZ4M9TpDIyyhrU2m1kf9tjj2VmQsKEyMU6sRBeVfNo9oaAHDUr73Uz9s7R5HED4qShchvId4qejobzCaOZrANIU5QvF51skH9+DTTHgMBNzsWHv8q2iZsZrNiWeXPs=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cab4aa3-3326-4da2-5ff3-08defd217eb2
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB6229.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2026 11:50:19.1665
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2026 12:09:03.6764
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dI+2lO92QsvRzbQ+lXYjKOVY8g6CR7igFjccF07gZZ2/60SIARubdNf5Mwk/8/7TTUw/EkG/HVVq79iZrZPLD/HTkB8bgPuwxqbqcIVscxQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB7042
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5B6aPp8AK7AxEvHdTBdEjhAmc22dVHi0pphxfUIxOwstAj+X6NuZeM0g8C3Yu5MrsVm5z/W3J2by2xlwvDun9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: EAYPR10MB997949
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-18_01,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2606160000 definitions=main-2608180089
+X-Proofpoint-GUID: wKvDDZaVbnt3V_RE-besmg-dmjDP7zg5
+X-Authority-Analysis: v=2.4 cv=Hu9G3UTS c=1 sm=1 tr=0 ts=6a844b65 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=Sv0fKeRqtYgA:10
+ a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=EIcjfB9IiI4px24ztqRk:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=HIHkP1-6fSMB_94SzQkA:9 a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22
+ cc=ntf awl=host:12099
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE4MDA4OSBTYWx0ZWRfX5qQ5bVvHEr9u
+ GtXYmSus/dP1S7+Y9tTqn6n6hbp3TUYoM2w5nXmC2IVgqKlrWrt/B3K2JF6clM9HZGWZYomO7It
+ /TWKrhNi1MAa3FL86jUmhD+ZHOx4wr3c8uKx6n8DGjeaLMI921M+
+X-Proofpoint-ORIG-GUID: wKvDDZaVbnt3V_RE-besmg-dmjDP7zg5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE4MDA4OSBTYWx0ZWRfXxY+ogqsNe8Ee
+ 47gzh92AL6vWNfsJgRwYQrCF8TP3zxgigrk9+QD+DEqJDbyOGDf1lBX6UV6vqILX1IQXlsC1tIZ
+ xC+l8upZ30G25V9FprfjsNLEDeeVgqPBEUquIAmnxZRZaCoAc+Nk470idO6+qqnMc/9ms6f1xxZ
+ j8Y1UOqb/bF7jFuAZyRDAKTFLrVrBT6vydNYliAIFeePAx16Rqd+xBOCUrEJ8/7MD/efoHEUFNo
+ yEipb7A7RiF6fLz1ayf5001XVT7DcTrM/vxQMGcMnY5GNJHiR0mAD+dALP8m4GCCMUxUObzRMWc
+ 2a8qNIBLGJPBfN4XsqHPKUaQZh50Q+E4MW+u6ov2R03fRWCTN3eeRwg9dtxUOJ/2T/bcZ6dmUqA
+ zYPOITA7NTkk7OuXTpDhBH5Mwf2wrLPiqEo8TNk2ZiaKSUNS0kB2vNGyLEgvqJPTiNotIQzu1Vr
+ J3ZDdHdAUgqkLyjWtPfgxv0FPzTiNjFL4o+MPgrw=
 
-Hi all,
+Currently the NVMe multipath partition diskstats are not maintained.
+This is because the functionality to update the diskstats only updates
+for the whole disk (and not per partition).
 
-I ran the latest blktests (git hash: ddc0babaccc4) with the v7.2 kernel. I
-observed 4 failures listed below. Comparing with the previous report for the
-v7.2-rc1 kernel [1], 4 failures are no longer observed (block/005,
-nvme/033,036,037, nvme/058 fc transport and nvme/063 tcp transport), and 2
-failures are new (nvme/068 and nvme/069).
+As an example:
+$ ./fio_read nvme1n1p1 # run traffic on /dev/nvme1n1p1
+...
+$ more /proc/diskstats | grep nvme1
+ 259       2 nvme1c1n1 49857 0 400344 768565 0 0 0 0 0 2334 768565 0 0 0 0 0 0
+ 259       3 nvme1n1 99710 0 800680 1599285 0 0 0 0 0 2346 1599285 0 0 0 0 0 0
+ 259       5 nvme1n1p1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 259       4 nvme1c2n1 49853 0 400336 831472 0 0 0 0 0 2315 831472 0 0 0 0 0 0
 
-[1] https://lore.kernel.org/linux-block/akryKgCjof_7d9na@shinmob/
+Notice how all values are 0 for nvme1n1p1.
 
+This series addressed that problem by first updating the gendisk code to
+create the partition table for hidden disks, as suggested by Keith.
 
-List of failures
-================
-#1: nvme/061 (rdma transport, siw driver)(kmemleak)
-#2: nvme/062 (tcp transport)
-#3: nvme/068 (new)
-#4: nvme/069 (new)
+Secondly the NVMe multipath functionality to handle the diskstats is
+modified to handle the gendisk partition, by looking up this partition
+from the per-path disk partition.
 
+Original RFC is at the following:
+https://lore.kernel.org/linux-nvme/20260721114553.1657841-1-john.g.garry@oracle.com/
 
-Failure description
-===================
+John Garry (2):
+  block: scan partitions for hidden disks
+  nvme-multipath: fix diskstats for partitions
 
-#1: nvme/061 (rdma transport, siw driver)(kmemleak)
+ block/genhd.c                 | 20 ++++++++++----------
+ block/partitions/core.c       |  5 +++--
+ drivers/nvme/host/core.c      |  4 ----
+ drivers/nvme/host/multipath.c | 31 +++++++++++++++++++++++++------
+ include/linux/blkdev.h        |  2 +-
+ 5 files changed, 39 insertions(+), 23 deletions(-)
 
-    When the test case nvme/061 is repeated twice for the rdma transport and the
-    siw driver on the kernel with CONFIG_DEBUG_KMEMLEAK enabled, it causes
-    kmemleak that is detected at the beginning of the 2nd run. A fix patch is
-    queued for v7.3-rc1 kernel [2].
+-- 
+2.43.7
 
-    [2] https://lore.kernel.org/linux-nvme/20260629051529.810925-1-shinichiro.kawasaki@wdc.com/
-
-#2: nvme/062 (tcp transport)
-
-    The test case nvme/062 fails for tcp transport due to the lockdep WARN
-    related to the three locks root->kernfs_rwsem, sparse_irq_lock and
-    root->kernfs_supers_rwsem [1]. Fix discussion is ongoing [3] (Thank goes to
-    Xixin Liu).
-
-    [3] https://lore.kernel.org/linux-nvme/cover.1782436781.git.liuxixin@kylinos.cn/
-
-
-#3: nvme/068 (new)
-
-    When it is repeated several times, the test case nvme/068 fails with the
-    message below:
-
-    nvme/068 (tr=rdma) (NVMe multipath delayed removal test)     [failed]
-        runtime  10.979s  ...  10.975s
-        --- tests/nvme/068.out      2026-05-21 11:44:28.070959369 +0900
-        +++ /home/shin/Blktests/blktests/results/nodev_tr_rdma/nvme/068.out.bad     2026-08-18 17:51:30.262228567 +0900
-        @@ -1,3 +1,4 @@
-         Running nvme/068
-         pwrite: Input/output error
-        +module refcount not as original
-         Test complete
-
-    The failure is spoladic. I'm not sure if recent kernel changes triggered
-    the failure or not.
-
-    The failure looks dependent on test nodes. It was observed with loop
-    transport and rdma transport, but was not observed with tcp transport.
-    This needs further debug.
-
-#4: nvme/069 (new)
-
-    The test case nvme/069 fails with the KASAN slab-use-after-free in
-    cdev_put() regardless of transport types [4]. This failure is expected since
-    the test case was added to confirm the kernel side fix [5] for the failure.
-    The fix is queued for v7.3-rc1 kernel.
-
-    [5] https://lore.kernel.org/linux-nvme/20260713104238.3034640-1-john.g.garry@oracle.com/
-
-
-[4] dmesg during nvme/069
-
-Aug 18 15:18:43 testnode2 unknown: run blktests nvme/069 at 2026-08-18 15:18:43
-Aug 18 15:18:43 testnode2 kernel: loop0: detected capacity change from 0 to 2097152
-Aug 18 15:18:43 testnode2 kernel: nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-Aug 18 15:18:43 testnode2 kernel: nvmet: Created nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
-Aug 18 15:18:43 testnode2 kernel: nvme nvme5: creating 4 I/O queues.
-Aug 18 15:18:43 testnode2 kernel: nvme nvme5: new ctrl: "blktests-subsystem-1"
-Aug 18 15:18:44 testnode2 kernel: nvme nvme5: Removing ctrl: NQN "blktests-subsystem-1"
-Aug 18 15:18:45 testnode2 kernel: ==================================================================
-Aug 18 15:18:45 testnode2 kernel: BUG: KASAN: slab-use-after-free in cdev_put+0x54/0x60
-Aug 18 15:18:45 testnode2 kernel: Read of size 8 at addr ffff888128968170 by task nvme-delay-ioct/1178
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: CPU: 2 UID: 0 PID: 1178 Comm: nvme-delay-ioct Not tainted 7.2.0 #660 PREEMPT(full) 
-Aug 18 15:18:45 testnode2 kernel: Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-10.fc44 06/10/2025
-Aug 18 15:18:45 testnode2 kernel: Call Trace:
-Aug 18 15:18:45 testnode2 kernel:  <TASK>
-Aug 18 15:18:45 testnode2 kernel:  dump_stack_lvl+0x6a/0x90
-Aug 18 15:18:45 testnode2 kernel:  print_report+0x14b/0x4b0
-Aug 18 15:18:45 testnode2 kernel:  ? __virt_addr_valid+0x150/0x4d0
-Aug 18 15:18:45 testnode2 kernel:  ? __virt_addr_valid+0x228/0x4d0
-Aug 18 15:18:45 testnode2 kernel:  kasan_report+0xd5/0x100
-Aug 18 15:18:45 testnode2 kernel:  ? cdev_put+0x54/0x60
-Aug 18 15:18:45 testnode2 kernel:  ? cdev_put+0x54/0x60
-Aug 18 15:18:45 testnode2 kernel:  cdev_put+0x54/0x60
-Aug 18 15:18:45 testnode2 kernel:  __fput+0x749/0xae0
-Aug 18 15:18:45 testnode2 kernel:  fput_close_sync+0xda/0x1b0
-Aug 18 15:18:45 testnode2 kernel:  ? __pfx_fput_close_sync+0x10/0x10
-Aug 18 15:18:45 testnode2 kernel:  ? do_raw_spin_unlock+0x55/0x230
-Aug 18 15:18:45 testnode2 kernel:  __x64_sys_close+0x87/0xf0
-Aug 18 15:18:45 testnode2 kernel:  do_syscall_64+0xdf/0x790
-Aug 18 15:18:45 testnode2 kernel:  ? lock_acquire+0x199/0x320
-Aug 18 15:18:45 testnode2 kernel:  ? lock_acquire+0x1a9/0x320
-Aug 18 15:18:45 testnode2 kernel:  ? find_held_lock+0x2b/0x80
-Aug 18 15:18:45 testnode2 kernel:  ? nvme_ns_head_chr_ioctl+0x142/0x2e0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  ? lock_release+0x1b5/0x340
-Aug 18 15:18:45 testnode2 kernel:  ? nvme_numa_path+0xd5/0x190 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  ? nvme_ns_head_chr_ioctl+0x152/0x2e0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  ? rcu_is_watching+0x11/0xb0
-Aug 18 15:18:45 testnode2 kernel:  ? do_syscall_64+0x1ec/0x790
-Aug 18 15:18:45 testnode2 kernel:  ? trace_hardirqs_on_prepare+0x139/0x180
-Aug 18 15:18:45 testnode2 kernel:  ? lockdep_hardirqs_on+0x8c/0x130
-Aug 18 15:18:45 testnode2 kernel:  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Aug 18 15:18:45 testnode2 kernel:  ? do_syscall_64+0x20a/0x790
-Aug 18 15:18:45 testnode2 kernel:  ? rcu_read_unlock+0x17/0x60
-Aug 18 15:18:45 testnode2 kernel:  ? lock_release+0x1b5/0x340
-Aug 18 15:18:45 testnode2 kernel:  ? find_held_lock+0x2b/0x80
-Aug 18 15:18:45 testnode2 kernel:  ? exc_page_fault+0x94/0x140
-Aug 18 15:18:45 testnode2 kernel:  ? lock_release+0x1b5/0x340
-Aug 18 15:18:45 testnode2 kernel:  ? rcu_is_watching+0x11/0xb0
-Aug 18 15:18:45 testnode2 kernel:  ? trace_hardirqs_on+0x14/0x190
-Aug 18 15:18:45 testnode2 kernel:  ? preempt_count_add+0x7f/0x190
-Aug 18 15:18:45 testnode2 kernel:  ? do_syscall_64+0x5d/0x790
-Aug 18 15:18:45 testnode2 kernel:  ? do_syscall_64+0x8d/0x790
-Aug 18 15:18:45 testnode2 kernel:  ? irqentry_exit+0xfc/0x810
-Aug 18 15:18:45 testnode2 kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Aug 18 15:18:45 testnode2 kernel: RIP: 0033:0x7fa5379ab08e
-Aug 18 15:18:45 testnode2 kernel: Code: 4d 89 d8 e8 94 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
-Aug 18 15:18:45 testnode2 kernel: RSP: 002b:00007fffd32959b0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-Aug 18 15:18:45 testnode2 kernel: RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fa5379ab08e
-Aug 18 15:18:45 testnode2 kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-Aug 18 15:18:45 testnode2 kernel: RBP: 00007fffd32959c0 R08: 0000000000000000 R09: 0000000000000000
-Aug 18 15:18:45 testnode2 kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000001
-Aug 18 15:18:45 testnode2 kernel: R13: 0000000000000002 R14: 00007fa537b87000 R15: 0000000000402e00
-Aug 18 15:18:45 testnode2 kernel:  </TASK>
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: Allocated by task 88:
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_stack+0x2b/0x50
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_track+0x10/0x30
-Aug 18 15:18:45 testnode2 kernel:  __kasan_kmalloc+0x96/0xb0
-Aug 18 15:18:45 testnode2 kernel:  __kmalloc_noprof+0x2fa/0x870
-Aug 18 15:18:45 testnode2 kernel:  nvme_alloc_ns+0x8af/0x2ce0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_scan_ns+0x647/0x7b0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  async_run_entry_fn+0x93/0x550
-Aug 18 15:18:45 testnode2 kernel:  process_one_work+0x8b2/0x15e0
-Aug 18 15:18:45 testnode2 kernel:  worker_thread+0x5fd/0xfe0
-Aug 18 15:18:45 testnode2 kernel:  kthread+0x367/0x460
-Aug 18 15:18:45 testnode2 kernel:  ret_from_fork+0x655/0x9d0
-Aug 18 15:18:45 testnode2 kernel:  ret_from_fork_asm+0x1a/0x30
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: Freed by task 1178:
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_stack+0x2b/0x50
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_track+0x10/0x30
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_free_info+0x37/0x60
-Aug 18 15:18:45 testnode2 kernel:  __kasan_slab_free+0x68/0x90
-Aug 18 15:18:45 testnode2 kernel:  kfree+0x273/0x6e0
-Aug 18 15:18:45 testnode2 kernel:  nvme_ns_head_chr_release+0x3d/0x60 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  __fput+0x36f/0xae0
-Aug 18 15:18:45 testnode2 kernel:  fput_close_sync+0xda/0x1b0
-Aug 18 15:18:45 testnode2 kernel:  __x64_sys_close+0x87/0xf0
-Aug 18 15:18:45 testnode2 kernel:  do_syscall_64+0xdf/0x790
-Aug 18 15:18:45 testnode2 kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: Last potentially related work creation:
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_stack+0x2b/0x50
-Aug 18 15:18:45 testnode2 kernel:  kasan_record_aux_stack+0xbb/0xf0
-Aug 18 15:18:45 testnode2 kernel:  insert_work+0x3c/0x2f0
-Aug 18 15:18:45 testnode2 kernel:  __queue_work+0x9e6/0xf50
-Aug 18 15:18:45 testnode2 kernel:  queue_work_on+0xc8/0xd0
-Aug 18 15:18:45 testnode2 kernel:  kblockd_schedule_work+0x19/0x30
-Aug 18 15:18:45 testnode2 kernel:  nvme_mpath_put_disk+0x46/0xb0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_free_ns_head+0x22/0x170 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_ns_head_chr_release+0x3d/0x60 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  __fput+0x36f/0xae0
-Aug 18 15:18:45 testnode2 kernel:  fput_close_sync+0xda/0x1b0
-Aug 18 15:18:45 testnode2 kernel:  __x64_sys_close+0x87/0xf0
-Aug 18 15:18:45 testnode2 kernel:  do_syscall_64+0xdf/0x790
-Aug 18 15:18:45 testnode2 kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: Second to last potentially related work creation:
-Aug 18 15:18:45 testnode2 kernel:  kasan_save_stack+0x2b/0x50
-Aug 18 15:18:45 testnode2 kernel:  kasan_record_aux_stack+0xbb/0xf0
-Aug 18 15:18:45 testnode2 kernel:  insert_work+0x3c/0x2f0
-Aug 18 15:18:45 testnode2 kernel:  __queue_work+0x9e6/0xf50
-Aug 18 15:18:45 testnode2 kernel:  queue_work_on+0xc8/0xd0
-Aug 18 15:18:45 testnode2 kernel:  kblockd_schedule_work+0x19/0x30
-Aug 18 15:18:45 testnode2 kernel:  nvme_remove_head+0x40/0xc0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_ns_remove+0x50c/0x9e0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_remove_namespaces+0x289/0x3f0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_do_delete_ctrl+0xf6/0x160 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_delete_ctrl_sync.cold+0x8/0xd [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  nvme_sysfs_delete+0xb7/0xe0 [nvme_core]
-Aug 18 15:18:45 testnode2 kernel:  kernfs_fop_write_iter+0x3d6/0x5e0
-Aug 18 15:18:45 testnode2 kernel:  vfs_write+0x4b3/0xf40
-Aug 18 15:18:45 testnode2 kernel:  ksys_write+0x112/0x250
-Aug 18 15:18:45 testnode2 kernel:  do_syscall_64+0xdf/0x790
-Aug 18 15:18:45 testnode2 kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: The buggy address belongs to the object at ffff888128968000
-                                   which belongs to the cache kmalloc-4k of size 4096
-Aug 18 15:18:45 testnode2 kernel: The buggy address is located 368 bytes inside of
-                                   freed 4096-byte region [ffff888128968000, ffff888128969000)
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: The buggy address belongs to the physical page:
-Aug 18 15:18:45 testnode2 kernel: page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x128968
-Aug 18 15:18:45 testnode2 kernel: head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-Aug 18 15:18:45 testnode2 kernel: flags: 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
-Aug 18 15:18:45 testnode2 kernel: page_type: f5(slab)
-Aug 18 15:18:45 testnode2 kernel: raw: 0017ffffc0000040 ffff888100043040 dead000000000100 dead000000000122
-Aug 18 15:18:45 testnode2 kernel: raw: 0000000000000000 0000000800040004 00000000f5000000 0000000000000000
-Aug 18 15:18:45 testnode2 kernel: head: 0017ffffc0000040 ffff888100043040 dead000000000100 dead000000000122
-Aug 18 15:18:45 testnode2 kernel: head: 0000000000000000 0000000800040004 00000000f5000000 0000000000000000
-Aug 18 15:18:45 testnode2 kernel: head: 0017ffffc0000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
-Aug 18 15:18:45 testnode2 kernel: head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-Aug 18 15:18:45 testnode2 kernel: page dumped because: kasan: bad access detected
-Aug 18 15:18:45 testnode2 kernel: 
-Aug 18 15:18:45 testnode2 kernel: Memory state around the buggy address:
-Aug 18 15:18:45 testnode2 kernel:  ffff888128968000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Aug 18 15:18:45 testnode2 kernel:  ffff888128968080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Aug 18 15:18:45 testnode2 kernel: >ffff888128968100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Aug 18 15:18:45 testnode2 kernel:                                                              ^
-Aug 18 15:18:45 testnode2 kernel:  ffff888128968180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Aug 18 15:18:45 testnode2 kernel:  ffff888128968200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Aug 18 15:18:45 testnode2 kernel: ==================================================================
-Aug 18 15:18:45 testnode2 kernel: Disabling lock debugging due to kernel taint
