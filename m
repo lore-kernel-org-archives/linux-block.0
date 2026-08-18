@@ -1,84 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B287A2D5937;
-	Tue, 18 Aug 2026 17:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C05226D18
+	for <linux-block@vger.kernel.org>; Tue, 18 Aug 2026 17:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787073699; cv=none; b=JoL2JsWC2gMKau+9g3f8+4iUoCBt6/cYy06ajrjenZsxr2CXlFXmaNMosXrBrp3pMpzhs9AfarGu2iQv2Z83MYgobH6TF3IKI94WBcqqA28u6Y2jfJ8yo9dvQTmkkPH2nYyE+kYT3Ne0RM/xuAwRXCsPe6ofZYyzJq+bY4L85HQ=
+	t=1787074336; cv=none; b=LjBAeZnC8A2UOuGCtYqg4EnkUDvm4NBrQF4YdzaDPL17ZypcW6wqu9HycucD1nToo7vyUdzfHNRmrlseboP4FZJ06TyO0m8hrvvh4lEBH2qxVmMoahlD5Zly5CRDncokP+I/xzYtfwB0t9qpnM+5tNFbQJiSClC917MW1nrsYwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787073699; c=relaxed/simple;
-	bh=cFC9S6F2TS8WyV/RTtNYURA/EWXNWWvCFVpcPQO4wgY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ME0dbbSOR+Sc2fpd4gt4MuDSZo7q/eGBbTH3XaecLiqr+Tdfc+2uKp5gTx3DCbfu3SNEjO0t7QVmtCfQiF50IQXNet2Ikk4DM2zSjtLd2ICbgIJHDc5neN8Rb47d2EhjeCZa69wEj26JGGf3p49FNSvzipoJb18qfwwYBG0ijG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ObzzZEAm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787074336; c=relaxed/simple;
+	bh=4X3X595DlJ3Fl46k1OE/Cu89WR2kbDCEKULaEFnTVKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PcpmTaBBG0eceyp7dnTLERZypUlMx8EgSU7Ml11QPs6Ajt6Kzm73d7kZpAMQcPTY0+stRh0sf1KPrpaK5QrNILwjzlOlUMcSpn77EYEfWNDF73UsZJee6eTNpCm5IoOLET09z4peZnRkLa3uGYbTZN33tbUQb1/4Nypjx3/dv7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gXvhhSAl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ObzzZEAm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA511F000E9;
-	Tue, 18 Aug 2026 17:21:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787073698;
-	bh=s5DqaLQOyk1g4n+z2rMMhuxlOljgDJU8+GEr7IkwEx4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ObzzZEAmoeqFNsGCmnYMAnDtxQbSjKPMhQnq45YhDOXyBFwvcW0CRDPCS4G4ZaO8w
-	 aE8Mlrb0s51xBE6odWD2j7W7sUnCQp28a22q1P5U2tMDwkd0+602FlByuaFE6GW4AS
-	 YPkwtaBWZXbNQFISY6H5yGa7q0fNgbzK1J7UNwx6Ciw0CuNLMAU6iSlB1UkPZfTw9o
-	 7YWNIN0MGDfrfNDkJ5b9YQwGV1JLGD3o/QLkWgKMidYtOCLWr1pRhJQbhi1PTM5GiX
-	 dSWsbg40UhdrKJtlS2EYpSu3RtUGVZAsLBTf4h2ryMFvLc8rfPg7Kc2qPRFm9eEoN2
-	 bNa9t5aBwqQug==
-Date: Tue, 18 Aug 2026 07:21:37 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ziyang Men <ziyang.meme@gmail.com>
-Cc: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] block: add BPF kfuncs to read blkcg io.stat
-Message-ID: <aoSUob1s8WBQ3buO@slm.duckdns.org>
-References: <20260817214205.723267-1-ziyang.meme@gmail.com>
- <20260817214205.723267-2-ziyang.meme@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXvhhSAl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787074333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZsigVlxc1Yx5xrsa1S52pC/wAn87RkEo7OEJR846FGI=;
+	b=gXvhhSAlLhNQpYBlE7mGTUpS6NFEdIzUFe9NGCOThnPfJjo5SPrEQxkc48DY0FK0K4ijBH
+	G7tryQGx3YXiNGpLW7ctWnFskkU7Hds5Pt6wVXYHoJiu6MPa7HAEFe3eFBaDMTdeea1/OU
+	AaonNZQf3ttvZZD74z5BzgZJTCkLf8Y=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-Vk-8hWHsO6qKZAjiypooVQ-1; Tue,
+ 18 Aug 2026 13:32:12 -0400
+X-MC-Unique: Vk-8hWHsO6qKZAjiypooVQ-1
+X-Mimecast-MFC-AGG-ID: Vk-8hWHsO6qKZAjiypooVQ_1787074331
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C7BE1800869;
+	Tue, 18 Aug 2026 17:32:10 +0000 (UTC)
+Received: from [10.17.17.225] (unknown [10.17.17.225])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4AF383000239;
+	Tue, 18 Aug 2026 17:32:09 +0000 (UTC)
+Message-ID: <3e9c2a03-9a8f-4e20-9c7d-1b55edc58a9d@redhat.com>
+Date: Tue, 18 Aug 2026 13:32:08 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260817214205.723267-2-ziyang.meme@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests 0/2] Test multipath and marginal ports
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Jesse Taube <jtaubepe@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Daniel Wagner <dwagner@suse.de>
+References: <20260812174503.3705830-1-jtaubepe@redhat.com>
+ <an75bRJc8J6NexeH@shinmob>
+ <CADRr4beUeZo9ZA9TZVmWQ9Vegm2LvTXkW0wGNxYA6_7z_njMEA@mail.gmail.com>
+ <aoK5sfNpxIUz7C02@shinhome>
+Content-Language: en-US
+From: John Meneghini <jmeneghi@redhat.com>
+Organization: RHEL Core Storge Team
+In-Reply-To: <aoK5sfNpxIUz7C02@shinhome>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hello,
+On 8/17/26 03:38, Shin'ichiro Kawasaki wrote:
+> Yes, it happnes always I run the test case. After I rebased to v7.2 kernel, it
+> shows a bit different message:
+> 
+> nvme/070 (tr=fc) (test nvme-fc marginal path handling)       [failed]
+>      runtime  37.200s  ...  38.926s
+>      --- tests/nvme/070.out      2026-08-17 11:13:53.073000000 +0900
+>      +++ /home/shin/Blktests/blktests/results/nodev_tr_fc/nvme/070.out.bad       2026-08-17 16:34:17.997000000 +0900
+>      @@ -3,10 +3,14 @@
+>       Testing iopolicy: numa
+>       Changing FC links to online
+>       Set all online: pass
+>      -One host marginal: pass
+>      +FC port on (/sys/class/nvme-subsystem/nvme-subsys6/nvme6) is being used, expected no use.
+>      +One host marginal: fail
+>       All marginal: pass
+>      ...
+>      (Run 'diff -u tests/nvme/070.out /home/shin/Blktests/blktests/results/nodev_tr_fc/nvme/070.out.bad' to see the entire diff)
 
-On Mon, Aug 17, 2026 at 02:42:04PM -0700, Ziyang Men wrote:
-> +/**
-> + * bpf_blkcg_flush_stats - Flush a block cgroup's io statistics
-> + * @cgrp: cgroup to flush
-> + *
-> + * Propagate I/O statistics up the cgroup tree. Root statistics come from
-> + * block devices and include all cgroups' I/O.
-> + */
-> +__bpf_kfunc void bpf_blkcg_flush_stats(struct cgroup *cgrp)
 
-Either @css or @blkcg, probably the latter so that each operation doesn't
-have to verify subsys again. I'd make this and the cpu ppatches into a
-single series. Add blkcg cast there too.
+I'm seeing this same issue on my QEMU based test bed.  This is a timing problem and the issue does not appear on a high CPU count system.
 
-Thanks.
+Jesse and I will work on a fix and update the patch series.
 
--- 
-tejun
+/John
+
