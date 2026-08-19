@@ -1,61 +1,52 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6831D37DAAE;
-	Wed, 19 Aug 2026 03:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B1A25D53B
+	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 05:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787110354; cv=none; b=aoHfJSkWc3E4NsIQTd1SQ2kl2YhZOx4VnYfXutf0Lr45QjZRhhJpc8WGNWoUfUowoqNUVAzdgNsIu8h/6Y7Lho+5mvPmwtLYjg8/kHcX8wVlg3Rhbm81qnAiz8y0x1mius5E6utp/ItzIEbT+1pZQL1Lt+t93MPrK5boRaNkJiM=
+	t=1787116999; cv=none; b=AFO5qY7SQTVbMmjh2Xqs+l5ZYaLaUCNIcQIzUQ4EABmsDD1T6V1yXFKhvyLq152DeOWSpvvHDFxj2kDtf7vRDM8ncYGFm5S3QU5OGvKJhi7YahTTJRL8MtVah9BpkIjf2rph40D6uiVH2j50ydEwhXez+0h7O/dKfZ0uw6Rl+ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787110354; c=relaxed/simple;
-	bh=Z6yTlG0UMFfArXLh5lgmcLP9n4twNCqgrT+M8qitUBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gb1vBT7IfVCtO1nfTZ/KbvwISkzmkOhNsCWRuMjvzwl+GYcyhwLg6BwPyHhG2tzUjYB5exuILt0dDgEbuBcPbKJbPicH6bdbSZF2yFcOFa2ZvvaLSD2MvdZ1AZT2ru+zJBjGkF12L+64MNDVZh9+LKlPRgvtNF9knKmr7VEGFCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrJSi9I1; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrJSi9I1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486091F000E9;
-	Wed, 19 Aug 2026 03:32:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787110353;
-	bh=BtQbj+u+MUQexSxtJ0tuVp5UZEsWTY/w6sB3Bs6NvNo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=YrJSi9I1Cuf00pkoaLESEI0pc4ydP7v1lDllYIwPSSxpsCkAi/gKg3Rj0QpYK2jac
-	 7Iz00981BsqjbJKc+lOQMjjdPU4JI9cai+fjjKkhA3TV0rAz3S4IC6q+E0qkH4I7pm
-	 fDs9MG2Xy7sf7mDdSmWlBSgdwMg4we8Nx1Kx49kRGdOJY1x+Yc3v8WaA/IK+bVnBek
-	 82Yo1z3tSSLjIm+4rmG/RfdNYgRvAZBS1XM+Inm4ug+Od5VfDYlnCbuB7ezGyR5lV6
-	 04MB1pAgdB2+GHre1ffEau7f5yI0Sp1+zbVVJpLJXWZhsWqhaX8dToeK1CAKOVoZ13
-	 4ZcE2w+VVq6pg==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Weidong Zhu <weizhu@fiu.edu>,
-	linux-block@vger.kernel.org,
-	Chao Shi <coshi036@gmail.com>
-Subject: Re: [stable request] block: stop the timeout timer when releasing a never added disk
-Date: Tue, 18 Aug 2026 23:32:15 -0400
-Message-ID: <20260818220420.1@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260817195833.2971170-1-coshi036@gmail.com>
-References: <20260817195833.2971170-1-coshi036@gmail.com>
+	s=arc-20240116; t=1787116999; c=relaxed/simple;
+	bh=QG471TA2+P6//MHVlB1P/L1lYGOs/aahz2Rf2O7MmiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pDfwrWZSlElrrGl/+A0AMu3JpDBg+PPZTfgXtjz/UXi0qw7QyJ6X31RrYlG8qNCqKQ+4GfYGJuwJ7gSGwNQm645WWJMv1Z4JUCjclgGHf3ZGDzNBSBEqx/VZbIHXASZdoVKx9NJW2XwgV8/umHveSZqemG9eu5zW5+eH8Inc3vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4E69368C7B; Wed, 19 Aug 2026 07:23:06 +0200 (CEST)
+Date: Wed, 19 Aug 2026 07:23:06 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+	Keith Busch <kbusch@kernel.org>, Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH] block: save page offset gaps in cloned bio
+Message-ID: <20260819052306.GA32364@lst.de>
+References: <20260817165908.137682-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260817165908.137682-1-kbusch@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Aug 17, 2026 at 03:58:27PM -0400, Chao Shi wrote:
-> Please consider the following mainline commit for the stable trees:
->
->   26cb8ebbfaf7 ("block: stop the timeout timer when releasing a never
->   added disk")
+On Mon, Aug 17, 2026 at 09:59:08AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The cloned bio needs to inherit the accumulated gaps between vectors so
+> that we can know if this bio can subscribe to the iova coalescing
+> optimization.
 
-Queued for 7.1, 6.18, 6.12, 6.6 and 6.1, thanks.
+Makes sense.
 
--- 
-Thanks,
-Sasha
+> The split remainder meanwhile can reset its gaps to 0
+> since it advanced beyond it and will start accounting from there.
+
+I don't really understand this part, though.  As in I don't even
+understand what you mean here..
+
