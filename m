@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2811436C0CD
-	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 20:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7689369997
+	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 20:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787169881; cv=none; b=Bqky6ecUNgun/TRAsgv4Yue862hBBDcYm73yW6v6Vap07DVcgW57U2JprQ79WcSrXK+n1veszykQi+t7egJGasyu4Kumee8mLfxv4SCVsviqlV/Ehx9RaK++mwFFnm5+TyNb+ppF7eKMx+SrpXIvXHtPdbxbSb22TBxs485/zLA=
+	t=1787169882; cv=none; b=NGPewmCoReHNdf0Ub5GI0qRJuCeCjGMybn9Floow+D0GOESRVrYwXbgWrwv0CLfLDs4AqUFBvLeM5Y5Vbh/qLu5r7s6yviHGLj4cyZCARelBK33GN2oJ/OV/cR7Pq/9ppvVkKd/QWP4ZOX6htarJXvvt9tD7Bo2S9q1PB3Vc3IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787169881; c=relaxed/simple;
-	bh=Bi/YVCKPfLb1bI1Z9QNXbWduwRwvtUiKR2XC2PoouNk=;
+	s=arc-20240116; t=1787169882; c=relaxed/simple;
+	bh=0dvk4nk5gpsKMIq8BEv5Po7+q6RDympHso3neZQkkas=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j4ZsSalE4oCcTu7K4fAnj4SKMgV6nO6FL4ahkz0SfB5O6jGQVDp12c7AfqMxlsdvHhswbi0bcQAAtYmlHRSkNqzNCGjbsbWRc3Th0FWxWRwY7EvV6CX1vpWECnc7NOVtDvMWL8Pc4xRmKjIRwF1eV9XA8sj59Mwi1nRMdzFrLr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LFamMCuJ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=K0ZNC9i48uWIZol1wf6VnDFcdNrk7aBmnEZZ98tR+Zpn58cs+nQr9wf94CWWGXeHBRI548p5X360lgHlK373p0eTUgDksY60pJXptV0TBoIXkfON8Lx/xIr7CJBRfofdTB+7vwtGkQwJVSas6c6SRpN81aU3pxaofZVEBGiVIJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L/xzzQQh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFamMCuJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/xzzQQh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787169878;
+	s=mimecast20190719; t=1787169879;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PM6tP3uBKBzP23Ce2YdlzIOFvUAsQt98loyF4m3Ma6k=;
-	b=LFamMCuJxKNLCuFzjF6gXzZiKOTnHMAqb4hTVDJyNngeqFBCCpILEWGuiFBp1CSP335KNd
-	ve53BDdhuatioq7xJgQ2NbjDq2YksNpo3kRSmzL24Dpuz43rhpvaerdQy7HW5wYBVm8Dt3
-	bNw3gjlD1Sz1AcHS5HnPZV4MzE4NXks=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=IARjiBP/HesLaf/M73N36h/GTjovCKkTmivEOztlIIc=;
+	b=L/xzzQQhdVTd1t1UQCf95C1KC8qvOuMcLwG5IdNq3UMHiJZHlKtIp7Hl5ZOe/ldMv5w+3G
+	tQpls0ZmyWL1Dh6JC9MPHQ/MusLNZ0dy/eY9uTE7150Q1w5aZoLxRXAQngv1oU/e2vloTN
+	7iGDkiMSYPZHDRaPX3dnjlhCHcbNXz0=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-440-kiB8o0kdNXuQhnkcZu6gkg-1; Wed,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-186-xbWcBtjCOnicHS6lRgetfA-1; Wed,
  19 Aug 2026 16:04:33 -0400
-X-MC-Unique: kiB8o0kdNXuQhnkcZu6gkg-1
-X-Mimecast-MFC-AGG-ID: kiB8o0kdNXuQhnkcZu6gkg_1787169872
+X-MC-Unique: xbWcBtjCOnicHS6lRgetfA-1
+X-Mimecast-MFC-AGG-ID: xbWcBtjCOnicHS6lRgetfA_1787169871
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53DCC18001E3;
-	Wed, 19 Aug 2026 20:04:32 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED04B195609F;
+	Wed, 19 Aug 2026 20:04:30 +0000 (UTC)
 Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.17.17.11])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 437301800577;
-	Wed, 19 Aug 2026 20:04:31 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 90EDE1800347;
+	Wed, 19 Aug 2026 20:04:29 +0000 (UTC)
 From: Jesse Taube <jtaubepe@redhat.com>
 To: linux-block@vger.kernel.org
 Cc: linux-nvme@lists.infradead.org,
@@ -49,9 +49,9 @@ Cc: linux-nvme@lists.infradead.org,
 	John Meneghini <jmeneghi@redhat.com>,
 	Daniel Wagner <dwagner@suse.de>,
 	Jesse Taube <jtaubepe@redhat.com>
-Subject: [PATCH v2 2/2] nvme/070: Test multipath and marginal ports
-Date: Wed, 19 Aug 2026 16:04:25 -0400
-Message-ID: <20260819200425.194743-3-jtaubepe@redhat.com>
+Subject: [PATCH v2 1/2] nvme: Add _setup_nvmet_port_marginal
+Date: Wed, 19 Aug 2026 16:04:24 -0400
+Message-ID: <20260819200425.194743-2-jtaubepe@redhat.com>
 In-Reply-To: <20260819200425.194743-1-jtaubepe@redhat.com>
 References: <20260819200425.194743-1-jtaubepe@redhat.com>
 Precedence: bulk
@@ -63,705 +63,71 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add tests/nvme/070 to test various multipath and marginal port
-scenarios, while confirming the port useage and state. This test is
-intended to emulate receiving an FPIN event in a multipath environment.
+Adds functionality to set up a NVME port in marginal state.
+This is useful for testing the behavior of the NVME driver when a port
+is in a marginal state.
 
-Co-authored-by: John Menehgini <jmeneghi@redhat.com>
 Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
-Signed-off-by: John Meneghini <jmeneghi@redhat.com>
+Reviewed-by: John Meneghini <jmeneghi@redhat.com>
 Tested-by: John Meneghini <jmeneghi@redhat.com>
 ---
 V1 -> V2:
- - Add John's tags
- - Add _rport_check_use_opt
- - Add _rport_is_not_in_use to allow for checking with a timeout
- - Add _rport_num_in_use - Wrap lines over 80col
- - Add timeout functionality to _rport_is_marginal, is_online,
-     in_use.
- - Fix path state setup to have one optimized and one non-optimized port
-     for each host
- - Fix test_set_all_marginal to correctly check non-numa iopolicy
- - Remove _rport_check_opt as it was redundant
- - Rename _rport_optimized to _rport_is_optimized
- - Skip test if /sys/class/fcloop/ctl/set_marginal_rport does not exist
- - Use grep --quiet instead of grep -q
- - Use local -a for arrays
+ - Added john's review and test-by tags
+ - Use != instead of ! ==
+ - Wrap lines over 80col
 ---
- tests/nvme/070     | 613 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/070.out |  43 ++++
- 2 files changed, 656 insertions(+)
- create mode 100755 tests/nvme/070
- create mode 100644 tests/nvme/070.out
+ common/nvme | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/tests/nvme/070 b/tests/nvme/070
-new file mode 100755
-index 0000000..f8117ef
---- /dev/null
-+++ b/tests/nvme/070
-@@ -0,0 +1,613 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 John Meneghini <jmeneghi@redhat.com>
-+#
-+# Test nvme-fc marginal path handling with fcloop
+diff --git a/common/nvme b/common/nvme
+index f399937..a6d6b28 100644
+--- a/common/nvme
++++ b/common/nvme
+@@ -153,6 +153,16 @@ _nvme_fcloop_add_tport() {
+ 	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/add_target_port
+ }
+ 
++_nvme_fcloop_set_rport_marginal() {
++	local wwnn="$1"
++	local wwpn="$2"
++	local marginal="$3"
++	local loopctl=/sys/class/fcloop/ctl
 +
-+. tests/nvme/rc
-+
-+TIMEOUT=10
-+
-+DESCRIPTION="test nvme-fc marginal path handling"
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_have_fio
-+	_require_nvme_trtype fc
++	echo "wwnn=${wwnn},wwpn=${wwpn},marginal=${marginal}" \
++	     > ${loopctl}/set_marginal_rport
 +}
 +
-+set_conditions() {
-+	_set_nvme_trtype "$@"
-+}
+ _nvme_fcloop_del_rport() {
+ 	local local_wwnn="$1"
+ 	local local_wwpn="$2"
+@@ -763,6 +773,27 @@ _create_nvmet_port() {
+ 	echo "${port}"
+ }
+ 
++_setup_nvmet_port_marginal() {
++	local -i port="$1"
++	local state="${2}"
 +
-+_subsys_rport_addr() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
++	if [[ "${nvme_trtype}" != "fc" ]]; then
++		echo "FAIL _setup_nvmet_port_marginal() only supports fc transport"
++		exit 1
++	fi
 +
-+	cat "$RPORT"/address
-+	# traddr=nn-0x2047d039ea98949e:pn-0x2048d039ea98949e,host_traddr=nn-0x200000109b9b7e4e:pn-0x100000109b9b7e4e
-+}
-+
-+_subsys_get_port() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local port
-+	local address
-+
-+	address=$(_subsys_rport_addr "$RPORT")
-+	port=$(echo "$address" | sed -n 's/.*pn-\(.*\),.*/\1/p')
-+	echo $(( port - $(_remote_wwpn 0) ))
-+	# a number representing the port number, e.g. 0, 1, 2, 3
-+}
-+
-+_rport_set_iopolicy() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local POLICY=$2 # numa queue-depth round-robin
-+
-+	echo "$POLICY" | sudo tee "$RPORT"/iopolicy > /dev/null
-+	# Returns none
-+}
-+
-+_rport_set_marginal() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	_setup_nvmet_port_marginal "$(_subsys_get_port "$RPORT")" "marginal"
-+}
-+
-+_rport_set_online() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	_setup_nvmet_port_marginal "$(_subsys_get_port "$RPORT")" "live"
-+}
-+
-+_rport_is_online_raw() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	[[ "$(cat "$RPORT"/state)" == "live" ]]
-+	# Returns Success or Fail
-+}
-+
-+_rport_is_marginal_raw() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	[[ "$(cat "$RPORT"/state)" == "marginal" ]]
-+	# Returns Success or Fail
-+}
-+
-+_rport_in_use_raw() {
-+	local SUBSYS_PATH=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# there should only be one "nvme3c9n1" afaik
-+	[[ "$(cat "$SUBSYS_PATH"/nvme*/stat | awk '{print $9}')" != "0" ]]
-+	# Returns exit code 0 if in use, 1 if not in use
-+}
-+
-+_rport_is_optimized() {
-+	local SUBSYS_PATH=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# there should only be one "nvme3c9n1" afaik
-+	[[ "$(cat "$SUBSYS_PATH"/nvme*/ana_state)" == "optimized" ]]
-+	# Returns exit code 0 if optimized, 1 if not optimized
-+}
-+
-+_rport_is_online() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i time_passed=0
-+
-+	for (( time_passed=0; time_passed < TIMEOUT; time_passed++ )); do
-+		_rport_is_online_raw "$RPORT" && return 0 || true
-+		sleep 1
-+	done
-+	return 1
-+	# Returns Success or Fail
-+}
-+
-+_rport_is_marginal() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i time_passed=0
-+
-+	for (( time_passed=0; time_passed < TIMEOUT; time_passed++ )); do
-+		_rport_is_marginal_raw "$RPORT" && return 0 || true
-+		sleep 1
-+	done
-+	return 1
-+	# Returns Success or Fail
-+}
-+
-+_rport_in_use() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i time_passed=0
-+
-+	for (( time_passed=0; time_passed < TIMEOUT; time_passed++ )); do
-+		_rport_in_use_raw "$RPORT" && return 0 || true
-+		sleep 1
-+	done
-+	return 1
-+	# Returns exit code 0 if in use, 1 if not in use
-+}
-+
-+_rport_not_in_use() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i time_passed=0
-+
-+	for (( time_passed=0; time_passed < TIMEOUT; time_passed++ )); do
-+		_rport_in_use_raw "$RPORT" || return 0
-+		sleep 1
-+	done
-+	return 1
-+	# Returns exit code 0 if in not use, 1 if in use
-+}
-+
-+# check if link is marginal or not
-+_rport_check_online() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local STATE=$2 # "Online"
-+
-+	if [[ "$STATE" == "Online" ]]; then
-+		if ! _rport_is_online "$RPORT"; then
-+			echo  FC port \("$RPORT"\) is not online, expteced online.
-+			return 1
-+		fi
++	if [[ "${state}" == "live" ]]; then
++		_nvme_fcloop_set_rport_marginal "$(_remote_wwnn $port)" \
++					"$(_remote_wwpn $port)" 0
++	elif [[ "${state}" == "marginal" ]]; then
++		_nvme_fcloop_set_rport_marginal "$(_remote_wwnn $port)" \
++					"$(_remote_wwpn $port)" 1
 +	else
-+		if ! _rport_is_marginal "$RPORT"; then
-+			echo FC port \("$RPORT"\) is not marginal, expteced marginal.
-+			return 1
-+		fi
-+	fi
-+	# Returns Success or Fail
-+}
-+
-+# check if link is in use
-+_rport_check_use() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local STATE=$2 # "Online"
-+
-+	if [[ "$STATE" == "Online" ]]; then
-+		if ! _rport_in_use "$RPORT" ; then
-+			echo FC port on \("$RPORT"\) is not being used, expected use.
-+			return 1
-+		fi
-+	else
-+		if ! _rport_not_in_use "$RPORT" ; then
-+			echo FC port on \("$RPORT"\) is being used, expected no use.
-+			return 1
-+		fi
-+	fi
-+	# Returns Success or Fail
-+}
-+
-+# check if all link is in state and use state if optimized
-+_rport_check_use_opt() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Only optimized paths will be in use
-+	if _rport_is_optimized "$RPORT"; then
-+		_rport_check_use "$RPORT" Online || return 1
-+	else
-+		_rport_check_use "$RPORT" Marginal || return 1
-+	fi
-+	# Returns Success or Fail
-+}
-+
-+# check if all link is in state and use state
-+_rport_check() {
-+	local RPORT=$1 # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local STATE=$2 # "Online"
-+
-+	_rport_check_online "$RPORT" "$STATE" || return 1
-+	_rport_check_use "$RPORT" "$STATE"
-+	# Returns Success or Fail
-+}
-+
-+_rport_num_in_use() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i num_in_use=0
-+
-+	# Check if one of the marginal paths is in use
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		_rport_in_use_raw "$subsys_path" || continue
-+		num_in_use=$((num_in_use + 1))
-+	done
-+
-+	echo "$num_in_use"
-+	# Returns number of links in use
-+}
-+
-+# Check if one of the paths is in use
-+_rport_check_one_use() {
-+	local STATE=$1
-+	shift
-+	local -a RPORTS_PATHS=("$@") #  /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -i time_passed=0
-+	local -i count_in_use=0
-+
-+	for (( time_passed=0; time_passed < TIMEOUT; time_passed++ )); do
-+		# Check if one of the online paths is in use
-+		count_in_use=$(_rport_num_in_use "${RPORTS_PATHS[@]}")
-+		if [ $count_in_use -eq 1 ]; then
-+			return 0
-+		fi
-+		sleep 1
-+	done
-+
-+	if [ $count_in_use -gt 1 ]; then
-+		echo More than one FC port is being used, expected only one in use when all are "$STATE" in numa mode.
-+		return 1
-+	fi
-+
-+	echo No FC ports are being used, expected atleast one in use when all are "$STATE" in numa mode.
-+	# None of the online paths were in use
-+	return 1
-+
-+	# Returns Success or Fail
-+}
-+
-+test_set_all_online() {
-+	local IOPOLICY=$1 # "numa" "queue-depth" "round-robin"
-+	shift
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		_rport_set_online "$subsys_path" || return 1
-+		_rport_check_online "$subsys_path" Online || return 1
-+	done
-+
-+	if [ "$IOPOLICY" == "numa" ]; then
-+		_rport_check_one_use online "${RPORTS_PATHS[@]}" || return 1
-+	else
-+		for subsys_path in "${RPORTS_PATHS[@]}"; do
-+			# Only optimized paths will be in use
-+			_rport_check_use_opt "$subsys_path" || return 1
-+		done
++		echo "FAIL _setup_nvmet_port_marginal() invalid state: ${state}"
++		exit 1
 +	fi
 +}
 +
-+test_set_one_host_marginal() {
-+	local HOST=$1 # host1
-+	shift
-+	local -a ARGS=("$@")
-+	local RPORTS_CNT="$(( $# / 2 ))"
-+	local PATHS_POS # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local HOSTS_POS # host1 host2
-+
-+	for (( PATHS_POS=0; PATHS_POS < RPORTS_CNT; PATHS_POS++ )); do
-+		HOSTS_POS="$(( RPORTS_CNT + PATHS_POS ))"
-+		if [[ "${ARGS[$HOSTS_POS]}" == "$HOST" ]]; then
-+			_rport_set_marginal "${ARGS[$PATHS_POS]}" || return 1
-+		fi
-+	done
-+
-+	# check if all links are of expected state on hosts
-+	for (( PATHS_POS=0; PATHS_POS < RPORTS_CNT; PATHS_POS++ )); do
-+		HOSTS_POS="$(( RPORTS_CNT + PATHS_POS ))"
-+		if [[ "${ARGS[$HOSTS_POS]}" == "$HOST" ]]; then
-+			_rport_check "${ARGS[$PATHS_POS]}" "Marginal" || return 1
-+		else
-+			_rport_check_online "${ARGS[$PATHS_POS]}" "Online" || return 1
-+			_rport_check_use_opt "${ARGS[$PATHS_POS]}" || return 1
-+		fi
-+	done
-+}
-+
-+test_set_all_marginal() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		_rport_set_marginal "$subsys_path" || return 1
-+		_rport_check_online "$subsys_path" Marginal || return 1
-+	done
-+
-+	if [ "$IOPOLICY" == "numa" ]; then
-+		_rport_check_one_use marginal "${RPORTS_PATHS[@]}" || return 1
-+	else
-+		for subsys_path in "${RPORTS_PATHS[@]}"; do
-+			# Only optimized paths will be in use
-+			_rport_check_use_opt "$subsys_path" Marginal || return 1
-+		done
-+	fi
-+}
-+
-+test_set_one_non_optimized_online() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Set one non-optimized online
-+	# First set one non-optimized online to online then check optimized paths
-+	local next_marginal=0
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if ! _rport_is_optimized "$subsys_path"; then
-+			if [ $next_marginal == 1 ]; then
-+				_rport_check "$subsys_path" Marginal || return 1
-+				break
-+			fi
-+			_rport_set_online "$subsys_path" || return 1
-+			_rport_check "$subsys_path" Online || return 1
-+			next_marginal=1
-+		fi
-+	done
-+	# Check optimized paths
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if _rport_is_optimized "$subsys_path"; then
-+			# Optimized paths will not be in use
-+			_rport_check "$subsys_path" Marginal || return 1
-+		fi
-+	done
-+}
-+
-+test_set_all_non_optimized_online() {
-+	local IOPOLICY=$1 # "numa" "queue-depth" "round-robin"
-+	shift
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Set all non-optimized online
-+	local numa_in_use=0
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if _rport_is_optimized "$subsys_path"; then
-+			_rport_check "$subsys_path" Marginal || return 1
-+		else
-+			_rport_set_online "$subsys_path" || return 1
-+			if [ "$IOPOLICY" == "numa" ] && [ $numa_in_use == 0 ]; then
-+				_rport_check "$subsys_path" Online || return 1
-+				numa_in_use=1
-+			elif [ "$IOPOLICY" == "numa" ] && [ $numa_in_use == 1 ]; then
-+				_rport_check_online "$subsys_path" Online || return 1
-+				# Only one of the online paths should be in use
-+				_rport_check_use "$subsys_path" Marginal || return 1
-+			else
-+				_rport_check "$subsys_path" Online || return 1
-+			fi
-+		fi
-+	done
-+}
-+
-+set_one_optimized_online() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Set one optimized online
-+	local next_marginal=0
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if _rport_is_optimized "$subsys_path"; then
-+			if [ $next_marginal == 1 ]; then
-+				_rport_check "$subsys_path" Marginal || return 1
-+				break
-+			fi
-+			_rport_set_online "$subsys_path" || return 1
-+			_rport_check "$subsys_path" Online || return 1
-+			next_marginal=1
-+		fi
-+	done
-+}
-+
-+test_set_all_non_one_optimized_online() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Set one optimized online
-+	# First set one optimized online to online then check non-optimized paths
-+	set_one_optimized_online "${RPORTS_PATHS[@]}" || return 1
-+
-+	# Check non-optimized paths
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if ! _rport_is_optimized "$subsys_path"; then
-+			_rport_check_online "$subsys_path" Online || return 1
-+			# Only optimized paths will be in use
-+			_rport_check_use "$subsys_path" Marginal || return 1
-+		fi
-+	done
-+}
-+
-+test_set_one_optimized_online() {
-+	local -a RPORTS_PATHS=("$@") # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+
-+	# Set one optimized online
-+	# First set one optimized online to online then check non-optimized paths
-+	set_one_optimized_online "${RPORTS_PATHS[@]}" || return 1
-+
-+	# Check non-optimized paths
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if ! _rport_is_optimized "$subsys_path"; then
-+			# Only optimized paths will be in use
-+			_rport_check "$subsys_path" "Marginal" || return 1
-+		fi
-+	done
-+}
-+
-+test_set_two_optimized_online() {
-+	local IOPOLICY=$1 # "numa" "queue-depth" "round-robin"
-+	shift
-+	local -a RPORTS_PATHS=("$@")
-+
-+	# Set two optimized online
-+	local numa_in_use=0
-+	for subsys_path in "${RPORTS_PATHS[@]}"; do
-+		if _rport_is_optimized "$subsys_path"; then
-+			_rport_set_online "$subsys_path" || return 1
-+			if [ "$IOPOLICY" == "numa" ] && [ $numa_in_use == 0 ]; then
-+				_rport_check "$subsys_path" Online || return 1
-+				numa_in_use=1
-+			elif [ "$IOPOLICY" == "numa" ] && [ $numa_in_use == 1 ]; then
-+				_rport_check_online "$subsys_path" Online || return 1
-+				# Only one of the online paths should be in use
-+				_rport_check_use "$subsys_path" Marginal || return 1
-+			else
-+				_rport_check "$subsys_path" Online || return 1
-+			fi
-+		else
-+			_rport_check "$subsys_path" Marginal || return 1
-+		fi
-+	done
-+}
-+
-+run_test() {
-+	local IOPOLICY=$1 # "numa" "queue-depth" "round-robin"
-+	shift
-+	local -a ARGS=("$@")
-+	local RPORTS_CNT="$(( $# / 2 ))"
-+	local -a RPORTS_PATHS # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -a RPORTS_HOSTS # host1 host2
-+	local PATHS_POS # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local HOSTS_POS # host1 host2
-+
-+	# recrate the arrays
-+	for (( PATHS_POS=0; PATHS_POS < RPORTS_CNT; PATHS_POS++ )); do
-+		HOSTS_POS+="$(( RPORTS_CNT + PATHS_POS ))"
-+		RPORTS_PATHS+=("${ARGS[$PATHS_POS]}")
-+		RPORTS_HOSTS+=("${ARGS[$HOSTS_POS]}")
-+	done
-+
-+
-+	echo Changing FC links to online
-+	# Initial check to see if FC is operational and set ports to online
-+	test_set_all_online "$IOPOLICY" "${RPORTS_PATHS[@]}" \
-+		&& echo "Set all online: pass" || echo "Set all online: fail"
-+
-+	test_set_one_host_marginal "${RPORTS_HOSTS[0]}" "${RPORTS_PATHS[@]}" \
-+		"${RPORTS_HOSTS[@]}" && echo "One host marginal: pass" \
-+		|| echo "One host marginal: fail"
-+	test_set_all_marginal "${RPORTS_PATHS[@]}" \
-+		&& echo "All marginal: pass" || echo "All marginal: fail"
-+
-+	test_set_one_non_optimized_online "${RPORTS_PATHS[@]}" \
-+		&& echo "One remote non-optimized online: pass" \
-+		|| echo "One remote non-optimized online: fail"
-+	test_set_all_non_optimized_online "$IOPOLICY" "${RPORTS_PATHS[@]}" \
-+		&& echo "Two remote non-optimized online: pass" \
-+		|| echo "Two remote non-optimized online: fail"
-+
-+	test_set_all_non_one_optimized_online "${RPORTS_PATHS[@]}" \
-+		&& echo "Two remote non-optimized, One remote optimized: pass" \
-+		|| echo "Two remote non-optimized, One remote optimized: fail"
-+	test_set_all_online "$IOPOLICY" "${RPORTS_PATHS[@]}" \
-+		&& echo "Set all online: pass" || echo "Set all online: fail"
-+
-+	test_set_all_marginal "${RPORTS_PATHS[@]}" \
-+		&& echo "All marginal: pass" || echo "All marginal: fail"
-+
-+	test_set_one_optimized_online "${RPORTS_PATHS[@]}" \
-+		&& echo "One remote optimized online: pass" \
-+		|| echo "One remote optimized online: fail"
-+	test_set_two_optimized_online "$IOPOLICY" "${RPORTS_PATHS[@]}" \
-+		&& echo "Two remote optimized online: pass" \
-+		|| echo "Two remote optimized online: fail"
-+	test_set_all_online "$IOPOLICY" "${RPORTS_PATHS[@]}" \
-+		&& echo "All online: pass" || echo "All online: fail"
-+}
-+
-+_nvmet_get_rport() {
-+	local PORT="$1"
-+
-+	local dev
-+	for dev in /sys/class/nvme/nvme*; do
-+		grep --quiet "io" "$dev/cntrltype" || continue
-+		[ -e "$dev" ] || continue
-+		dev="$(basename "$dev")"
-+		grep --quiet traddr="$(_fc_traddr "$PORT")" "/sys/class/nvme/$dev/address" && echo "$dev" || true
-+	done
-+	# nvme9
-+}
-+
-+run_tests() {
-+	local SUBSYS_PATH="$1"
-+	shift
-+	local -a PORTS=("$@")
-+	local -a RPORTS_PATHS # /sys/devices/virtual/nvme-subsystem/nvme-subsys3/nvme9
-+	local -a RPORTS_HOSTS # host1 host2
-+	local rport
-+
-+	for port in "${PORTS[@]}"; do
-+		RPORTS_HOSTS+=("$(_get_fc_host_port "$port")")
-+		rport="$(_nvmet_get_rport "$port")"
-+		if [ -z "$rport" ]; then
-+			echo "Could not find rport for port $port"
-+			return 1
-+		fi
-+		if [[ "$( echo "$rport" | sed -n '$=' )" -gt 1 ]]; then
-+			# One traddr has multiple /sys/class/nvme/nvme devices
-+			echo "Port $port has multiple rports with address"
-+			grep traddr="$(_fc_traddr "$port")" /sys/class/nvme/nvme*/address
-+			return 1
-+		fi
-+		RPORTS_PATHS+=( "${SUBSYS_PATH}/$rport")
-+	done
-+
-+	local IOPOLICYS="numa queue-depth round-robin"
-+	for IOPOLICY in $IOPOLICYS; do
-+		_rport_set_iopolicy "$SUBSYS_PATH" "$IOPOLICY"
-+		echo "Testing iopolicy: $IOPOLICY"
-+		run_test "$IOPOLICY" "${RPORTS_PATHS[@]}" "${RPORTS_HOSTS[@]}"
-+	done
-+}
-+
-+_find_nvme_subsys() {
-+	local subsys=$1
-+	local subsysnqn
-+	local subsys_path
-+	for subsys_path in /sys/class/nvme-subsystem/nvme-subsys*; do
-+		[ -e "$subsys_path" ] || continue
-+		subsysnqn="$(cat "${subsys_path}/subsysnqn" 2>/dev/null)"
-+		if [[ "$subsysnqn" == "$subsys" ]]; then
-+			echo "$subsys_path"
-+			return
-+		fi
-+	done
-+}
-+
-+test() {
-+	local -a ports
-+	local ns
-+	local fio_pid
-+	local -i first_host1=0
-+	local -i first_host2=0
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet 2
-+
-+	if [[ ! -w /sys/class/fcloop/ctl/set_marginal_rport ]]; then
-+		SKIP_REASONS+=("fcloop does not support set_marginal_rport")
-+		_nvmet_target_cleanup
-+		return 1
-+	fi
-+
-+	_nvmet_target_setup --ports 2
-+	_nvmet_target_add_ports --host_port 1 --ports 2
-+
-+	_get_nvmet_ports "${def_subsysnqn}" ports
-+
-+	for port in "${ports[@]}"; do
-+		_setup_nvmet_port_ana "${port}" 1 "non-optimized"
-+		if [[ $(_get_fc_host_port "${port}") == 0 ]]; then
-+			if [ $first_host1 -eq 1 ]; then
-+				continue
-+			fi
-+			first_host1=1
-+		else
-+			if [ $first_host2 -eq 1 ]; then
-+				continue
-+			fi
-+			first_host2=1
-+		fi
-+		_setup_nvmet_port_ana "${port}" 1 "optimized"
-+	done
-+
-+	for port in "${ports[@]}"; do
-+		_nvme_connect_subsys --port "${port}" --no-wait-ns || return 1
-+	done
-+
-+	# start fio job
-+	ns=$(_find_nvme_ns "$def_subsys_uuid")
-+	echo "Starting background I/O"
-+	_run_fio_verify_io --filename="/dev/${ns}" \
-+			   --group_reporting --ramp_time=5 \
-+			   --time_based --runtime=1m &> "$FULL" &
-+	fio_pid=$!
-+	sleep 10
-+
-+	run_tests "$(_find_nvme_subsys "${def_subsysnqn}")" "${ports[@]}"
-+
-+	# Stop background I/O
-+	echo "Stopping background I/O"
-+	{ kill "$fio_pid"; wait; } &> /dev/null
-+
-+	_nvme_disconnect_subsys
-+	_nvmet_target_cleanup
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/070.out b/tests/nvme/070.out
-new file mode 100644
-index 0000000..61d5173
---- /dev/null
-+++ b/tests/nvme/070.out
-@@ -0,0 +1,43 @@
-+Running nvme/070
-+Starting background I/O
-+Testing iopolicy: numa
-+Changing FC links to online
-+Set all online: pass
-+One host marginal: pass
-+All marginal: pass
-+One remote non-optimized online: pass
-+Two remote non-optimized online: pass
-+Two remote non-optimized, One remote optimized: pass
-+Set all online: pass
-+All marginal: pass
-+One remote optimized online: pass
-+Two remote optimized online: pass
-+All online: pass
-+Testing iopolicy: queue-depth
-+Changing FC links to online
-+Set all online: pass
-+One host marginal: pass
-+All marginal: pass
-+One remote non-optimized online: pass
-+Two remote non-optimized online: pass
-+Two remote non-optimized, One remote optimized: pass
-+Set all online: pass
-+All marginal: pass
-+One remote optimized online: pass
-+Two remote optimized online: pass
-+All online: pass
-+Testing iopolicy: round-robin
-+Changing FC links to online
-+Set all online: pass
-+One host marginal: pass
-+All marginal: pass
-+One remote non-optimized online: pass
-+Two remote non-optimized online: pass
-+Two remote non-optimized, One remote optimized: pass
-+Set all online: pass
-+All marginal: pass
-+One remote optimized online: pass
-+Two remote optimized online: pass
-+All online: pass
-+Stopping background I/O
-+Test complete
+ _setup_nvmet_port_ana() {
+ 	local port="$1"
+ 	local anagrpid="${2:-$def_anagrpid}"
 -- 
 2.54.0
 
