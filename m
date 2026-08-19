@@ -1,128 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28CC3A4F51
-	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 21:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020932253EE;
+	Wed, 19 Aug 2026 22:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787176243; cv=none; b=q0kPZt7OIT2C0c8Iqd8vK+mIZIOzBclS3ib8EYNKeV5i3/stKh0QFi8vpKjBiPXqe3cIHTwYEfLPGUQe5CystnPibD0kT4su/dyYdegS1xlSB8arKhtA2GlGb8GU02xsT0cLxmf6ldotZ6YyvqsXwQ9rawaD/q7jApnxxuxlX14=
+	t=1787177130; cv=none; b=DABf+rb4EOWpFBuqYVVtiHNsnpYub6gk5i7MEikLEStFVseb6cKk/FOKnaAUNzDHLXGTEJRxObTF+nj/S5DQM0U1VnypyJYMiw5vC1P9XxZmn8tSMuD00e/AJf/k5poZ7eYQ5qlgQgtv3mqDNDszkJAroHkoKBJXIHRXxru9jCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787176243; c=relaxed/simple;
-	bh=2Am3osv0wvO7os0MJJsASZd1ZN25DhzEOV9MFm5mr78=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q3Y1VOVGYwfGuADGmqGcNmI1U9MJH6sqkBGPGEtNF6m0g7DxvKrc0XzaCBrHSWmFzhGJMc4xOALaxCrFQTL5qNtP48GJCqRJHzKyKjbcJU1ynmQ58tWheBCUqHU9nnTZheq1kdPgWnHJKG4QxikbIIVEGcw7lA0/RWHr07cPQac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bU+0ty+6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787177130; c=relaxed/simple;
+	bh=amlO3pZxDveDsBMyjyke3jbIvSD16eZRY2UnPUqYt+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=USQaJr46KsH0cKOSyqWlhgwD2gufT7hNl4sl2HeAzkZjiB5kC/8S4qKhAaRYLJaXZE3bB/F4BddmWQmA5JDLKrDOsq2wy3eH2tzTjSOoU7wIeVj7jpmLMDps6P9D4s6E1wou/bEXQASe/qEggpemLIaP2YuRd15IQGgmhU+EbKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFkMJNmL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bU+0ty+6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787176240;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+TzkIkXJy7hGwyp9eR+gqjG98fv/6iQ4VO/4i7ImQRQ=;
-	b=bU+0ty+6IzUyc+acphoUEgMQ5RD166g5mfAnFhZ+L9XE18sq1xXMAbCcNcCLBYR2NYnOmE
-	1sXDNcuYYqhXuUwIUsqy5xUx4KfVMg4gp/lFiEYDGgXWysxreho/ccks1TTtudSgTmx1Sh
-	2LNW/KI4+OTh4WPsVJUw3thec5zk/po=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-fUnlG3QFNg6XXCeSxXtZ2g-1; Wed,
- 19 Aug 2026 17:50:39 -0400
-X-MC-Unique: fUnlG3QFNg6XXCeSxXtZ2g-1
-X-Mimecast-MFC-AGG-ID: fUnlG3QFNg6XXCeSxXtZ2g_1787176238
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D00E0192053E;
-	Wed, 19 Aug 2026 21:49:57 +0000 (UTC)
-Received: from [10.22.80.117] (unknown [10.22.80.117])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C65CB18005B1;
-	Wed, 19 Aug 2026 21:49:54 +0000 (UTC)
-Message-ID: <0d3cb83e-a4b6-414d-8756-fafd4a8238bc@redhat.com>
-Date: Wed, 19 Aug 2026 17:49:53 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFkMJNmL"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7BFA61F000E9;
+	Wed, 19 Aug 2026 22:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787177128;
+	bh=fge+ShvnwiYT1Doh0GK03BMgG9R/LqtD7hQ0xgGzmzw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=nFkMJNmLnBT0sjuF8f6Md38Z4k8eTjUYqrHply4/KBJRRtmcjz7ZeWGzjjqhQgnwp
+	 +nn399loO9YCgtkpEece5q6CTDBw4lawtjIwnnO6HitR1Z09WLWcbf9MlLGEuaJINu
+	 8sIt2kuWi105bzQEpy5b02YxIkFug3MNIaSKYGmj6VjYM4RwvLQUpAL2uJFBXuaf8J
+	 NBCd+NjWfw3fivg84HcuddK69Fz9mvqp6vF+WUALzUkH3Rxflzs4atVObGNUR86iPq
+	 K6WWLFTdRPmhS9rTbCbhckyIAugE0VRkQ8HUWwH2k+WOu61LbkoPRaXCsI9EWXYonG
+	 CxoUGh365lt6g==
+Date: Wed, 19 Aug 2026 15:05:26 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, brauner@kernel.org, dgc@kernel.org,
+	jack@suse.cz, cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org,
+	ritesh.list@gmail.com, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
+Message-ID: <20260819220526.GA6072@frogsfrogsfrogs>
+References: <20260717125538.508925-1-joshi.k@samsung.com>
+ <CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
+ <20260717125538.508925-2-joshi.k@samsung.com>
+ <20260721030338.GU7380@frogsfrogsfrogs>
+ <71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com>
+ <20260730172211.GF3556460@frogsfrogsfrogs>
+ <20260819070459.GA1541@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/2] Test multipath and marginal ports
-To: Jesse Taube <jtaubepe@redhat.com>, linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com,
- Daniel Wagner <dwagner@suse.de>
-References: <20260819200425.194743-1-jtaubepe@redhat.com>
-Content-Language: en-US
-From: John Meneghini <jmeneghi@redhat.com>
-Organization: RHEL Core Storge Team
-In-Reply-To: <20260819200425.194743-1-jtaubepe@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260819070459.GA1541@lst.de>
 
-This is a great improvement and we now have a functioning blkstest 070 to test the FPIN LI kernel patches.
-
-The problem is: I don't think we are done yet.  In my own private testing and development with these patches I've been working on a next-version test that combines the ANA states from test/nvme/057 with test/nvme/070. So I am working on a test 071.
-
-The good news is: everything now works with test/nvme/070.  The bad news is: the kernel patches are not done.
-
-What I've found is: a long as the ANA states are all optimized or non-optimized everything works.  However, once we throw in an inaccessible state to the mix, we run into serious problems.
-
-At this point in development I don't care about the test failures in my test/nvme/071 script. I expect the script to bug out because it doesn't understand the inaccessible state. The test sill continues flipping rports in and out of the marginal state and keeps going. That's what it is designed to do. That means it is testing all of the code paths in the kernel patches.
-
-The problem is: when turning marginal paths on and off with controllers that are in the inaccessible state, the path selection algorithm in the kernel fails and we end up with the following:
-
-[Wed Aug 19 16:25:42 2026] nvme_ns_head_submit_bio: 6 callbacks suppressed
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
-
-At this point the fio jobs are still running but there is no progress.  This means no path was found and ALL of the IOs got re-queued. And if we flip the marginal state off on all of the controllers IO continues to be hung.  The IO scheduler is hung and there is no possibility of getting it restarted again.
-
-So this is a really serious bug in the kernel patches and we can't ship this stuff until we fix the problem.
-
-This IO re-requeing problem should NEVER happen - no matter what the state of the marginal paths.
-
-So I can recommend that Shinichiro test these patches with the current upstream kernel patches:
-
-   https://lore.kernel.org/linux-nvme/20260812181300.3712426-1-jtaubepe@redhat.com/
-   
-But there will be another version of Kernel patches and a V3 of this patch set will be forth coming.
-  
-John A. Meneghini
-Senior Principal Platform Storage Engineer
-RHEL SST - Platform Storage Group
-jmeneghi@redhat.com
-
-On 8/19/26 16:04, Jesse Taube wrote:
-> Tests for the upcoming nvme-fc: FPIN link integrity handling set.
-> It tests for various multipath and marginal port
-> scenarios, while confirming the port usage and state. The test is
-> intended to emulate receiving an FPIN event in a multipath environment.
+On Wed, Aug 19, 2026 at 09:04:59AM +0200, Christoph Hellwig wrote:
+> On Thu, Jul 30, 2026 at 10:22:11AM -0700, Darrick J. Wong wrote:
+> > "The third argument is an untyped pointer to memory.  It's traditionally
+> > char  *argp (from the days before void * was valid C), and will be so
+> > named for this discussion."
 > 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=220329
-> Link: https://github.com/linux-blktests/blktests/pull/264
+> That documentation is wrong or at least very incomplete.  A pointer
+> is the typical use, but there are plenty of ioctls passing scalar
+> values <= sizeof(long), going all the way back to early UNIX days.
 > 
-> Jesse Taube (2):
->    nvme: Add _setup_nvmet_port_marginal
->    nvme/070: Test multipath and marginal ports
+> > You can also see this reflected in the discussion of the R/W/WR variants
+> > of _IO:
+> > https://docs.kernel.org/driver-api/ioctl.html
 > 
->   common/nvme        |  31 +++
->   tests/nvme/070     | 613 +++++++++++++++++++++++++++++++++++++++++++++
->   tests/nvme/070.out |  43 ++++
->   3 files changed, 687 insertions(+)
->   create mode 100755 tests/nvme/070
->   create mode 100644 tests/nvme/070.out
-> 
+> _IO* are optional helpers, and plenty especially older ioctls are
+> defined without using them.
 
+Well, yeah, we don't force anyone to use the _IOR/_IOW/_IOWR helpers.
+But since they were used here, I thought it worth pointing out.
+
+> > Granted your kernel code can treat that argp as an integer and not a
+> > __user pointer if it wants to, but that goes against most ioctl
+> > implementations.  Further, subsystems that marshal ioctl information for
+> > passing through to another layer (e.g. fuse) assume that the third
+> > argument is a pointer and that it can copy sizeof(data_type) bytes at
+> > that address in and out of the kernel as part of marshalling.
+> 
+> That is not a good assumption and things will break.
+
+I know; fuse is a total mess w.r.t. ioctl handling because it assumes
+that it can just go ahead and do the userspace accesses.
+
+--D
