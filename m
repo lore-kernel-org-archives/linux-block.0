@@ -1,90 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60282C21FD;
-	Wed, 19 Aug 2026 20:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28CC3A4F51
+	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 21:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787172233; cv=none; b=hNmPP2jRqarOi1425wW8pRZ4UaG7BsYfVXxZeTLkotr49ddsuGV2EEYNSDhokmf152fAv10blYJj9dh/B1HlEFbctr54G4BWkrTRNC8w12DYmSPOel9HjPl4fZLwza+QezegbgiSUvb9H9e0vrX4c+Sy6yjmLqqfmdGpuUBSqZA=
+	t=1787176243; cv=none; b=q0kPZt7OIT2C0c8Iqd8vK+mIZIOzBclS3ib8EYNKeV5i3/stKh0QFi8vpKjBiPXqe3cIHTwYEfLPGUQe5CystnPibD0kT4su/dyYdegS1xlSB8arKhtA2GlGb8GU02xsT0cLxmf6ldotZ6YyvqsXwQ9rawaD/q7jApnxxuxlX14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787172233; c=relaxed/simple;
-	bh=Fid7AxH9uI6nvxUFpdzYl7i92YyXJIdOCxhlEymPNPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qWcKftuH2WVZYQL7qiYeXZqsGVXXJiREV1PjXVjheqJk3LsVqEncll4Bh/rVtoqPUYQ6GuvDLdXzvOs0V05ciL5YJI90Lb8kCVU11caWYILklgwl/wsPnunQz7eZgUK1yOZBmU/Qt3fdE40gfr6wfD08bQGZV4kMRYV1PYd2sxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HYfNASxW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787176243; c=relaxed/simple;
+	bh=2Am3osv0wvO7os0MJJsASZd1ZN25DhzEOV9MFm5mr78=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q3Y1VOVGYwfGuADGmqGcNmI1U9MJH6sqkBGPGEtNF6m0g7DxvKrc0XzaCBrHSWmFzhGJMc4xOALaxCrFQTL5qNtP48GJCqRJHzKyKjbcJU1ynmQ58tWheBCUqHU9nnTZheq1kdPgWnHJKG4QxikbIIVEGcw7lA0/RWHr07cPQac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bU+0ty+6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HYfNASxW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61BB71F000E9;
-	Wed, 19 Aug 2026 20:43:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787172232;
-	bh=9PLl4id7OxDfMv9esI2Tn9DhkQb0PtEscSkhXUWvpuI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HYfNASxW583tyR26TIXYW6Vm4HWHwbeqgtgcTYRALVVsnxaLyC2WTlWtZOBv/zRi3
-	 CU/We1yx51+muTOGLm1Ohoq7F2UU6m24gM62dwNFHT2bzRH27gxDAqFANaLlbspgtq
-	 5F/0/EMuwhwtmC0+MvXsl7SURZjfK/DZv6vj6udq1+Mn9SnN4OWo0skGa0LNaXnmBT
-	 Bp7/hE4rJ2uAgarqLPXuG7jpDBGgcfyA6G977Ujk5xxX0cIoEGWSJ6+3kzNB2uTU3G
-	 b/WByGAFtjeHNKcL03eJxa1+Ie153RDmcBZizzOfqO8Z0mqP0rVYzhFa1by8On2/qn
-	 zXDHVKf5kXSdQ==
-Date: Wed, 19 Aug 2026 10:43:51 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ziyang Men <ziyang.meme@gmail.com>
-Cc: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] block: add BPF kfuncs to read blkcg io.stat
-Message-ID: <aoYVh1ihBH-TWvi3@slm.duckdns.org>
-References: <20260817214205.723267-1-ziyang.meme@gmail.com>
- <20260817214205.723267-2-ziyang.meme@gmail.com>
- <aoSUob1s8WBQ3buO@slm.duckdns.org>
- <aoTdQeLZZuRirNHE@devvm16600.scu0.facebook.com>
- <aoTf7u20mo9s6ADj@slm.duckdns.org>
- <aoTkZhQDoaQKpPe3@devvm16600.scu0.facebook.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bU+0ty+6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787176240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+TzkIkXJy7hGwyp9eR+gqjG98fv/6iQ4VO/4i7ImQRQ=;
+	b=bU+0ty+6IzUyc+acphoUEgMQ5RD166g5mfAnFhZ+L9XE18sq1xXMAbCcNcCLBYR2NYnOmE
+	1sXDNcuYYqhXuUwIUsqy5xUx4KfVMg4gp/lFiEYDGgXWysxreho/ccks1TTtudSgTmx1Sh
+	2LNW/KI4+OTh4WPsVJUw3thec5zk/po=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-fUnlG3QFNg6XXCeSxXtZ2g-1; Wed,
+ 19 Aug 2026 17:50:39 -0400
+X-MC-Unique: fUnlG3QFNg6XXCeSxXtZ2g-1
+X-Mimecast-MFC-AGG-ID: fUnlG3QFNg6XXCeSxXtZ2g_1787176238
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D00E0192053E;
+	Wed, 19 Aug 2026 21:49:57 +0000 (UTC)
+Received: from [10.22.80.117] (unknown [10.22.80.117])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C65CB18005B1;
+	Wed, 19 Aug 2026 21:49:54 +0000 (UTC)
+Message-ID: <0d3cb83e-a4b6-414d-8756-fafd4a8238bc@redhat.com>
+Date: Wed, 19 Aug 2026 17:49:53 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aoTkZhQDoaQKpPe3@devvm16600.scu0.facebook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] Test multipath and marginal ports
+To: Jesse Taube <jtaubepe@redhat.com>, linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com,
+ Daniel Wagner <dwagner@suse.de>
+References: <20260819200425.194743-1-jtaubepe@redhat.com>
+Content-Language: en-US
+From: John Meneghini <jmeneghi@redhat.com>
+Organization: RHEL Core Storge Team
+In-Reply-To: <20260819200425.194743-1-jtaubepe@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hello,
+This is a great improvement and we now have a functioning blkstest 070 to test the FPIN LI kernel patches.
 
-On Tue, Aug 18, 2026 at 04:01:58PM -0700, Ziyang Men wrote:
-> On Tue, Aug 18, 2026 at 12:42:54PM -1000, Tejun Heo wrote:
-> > On Tue, Aug 18, 2026 at 03:31:29PM -0700, Ziyang Men wrote:
-> > > Ok I will add the casts bpf_get_blkcg() and bpf_put_blkcg(), and remove the
-> > > check of css->ss in above functoins.
-> > 
-> > RCU_PROTECTED is probably better than get/put().
+The problem is: I don't think we are done yet.  In my own private testing and development with these patches I've been working on a next-version test that combines the ANA states from test/nvme/057 with test/nvme/070. So I am working on a test 071.
+
+The good news is: everything now works with test/nvme/070.  The bad news is: the kernel patches are not done.
+
+What I've found is: a long as the ANA states are all optimized or non-optimized everything works.  However, once we throw in an inaccessible state to the mix, we run into serious problems.
+
+At this point in development I don't care about the test failures in my test/nvme/071 script. I expect the script to bug out because it doesn't understand the inaccessible state. The test sill continues flipping rports in and out of the marginal state and keeps going. That's what it is designed to do. That means it is testing all of the code paths in the kernel patches.
+
+The problem is: when turning marginal paths on and off with controllers that are in the inaccessible state, the path selection algorithm in the kernel fails and we end up with the following:
+
+[Wed Aug 19 16:25:42 2026] nvme_ns_head_submit_bio: 6 callbacks suppressed
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+[Wed Aug 19 16:25:42 2026] block nvme2n1: no usable path - requeuing I/O
+
+At this point the fio jobs are still running but there is no progress.  This means no path was found and ALL of the IOs got re-queued. And if we flip the marginal state off on all of the controllers IO continues to be hung.  The IO scheduler is hung and there is no possibility of getting it restarted again.
+
+So this is a really serious bug in the kernel patches and we can't ship this stuff until we fix the problem.
+
+This IO re-requeing problem should NEVER happen - no matter what the state of the marginal paths.
+
+So I can recommend that Shinichiro test these patches with the current upstream kernel patches:
+
+   https://lore.kernel.org/linux-nvme/20260812181300.3712426-1-jtaubepe@redhat.com/
+   
+But there will be another version of Kernel patches and a V3 of this patch set will be forth coming.
+  
+John A. Meneghini
+Senior Principal Platform Storage Engineer
+RHEL SST - Platform Storage Group
+jmeneghi@redhat.com
+
+On 8/19/26 16:04, Jesse Taube wrote:
+> Tests for the upcoming nvme-fc: FPIN link integrity handling set.
+> It tests for various multipath and marginal port
+> scenarios, while confirming the port usage and state. The test is
+> intended to emulate receiving an FPIN event in a multipath environment.
 > 
-> Yes we can make the blkcg* RCU_PROTECTED but then the bpf_blkcg_flush_stats()
-> needs to take the @cgroup* since it is SLEEPABLE. Does this work for you?
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=220329
+> Link: https://github.com/linux-blktests/blktests/pull/264
+> 
+> Jesse Taube (2):
+>    nvme: Add _setup_nvmet_port_marginal
+>    nvme/070: Test multipath and marginal ports
+> 
+>   common/nvme        |  31 +++
+>   tests/nvme/070     | 613 +++++++++++++++++++++++++++++++++++++++++++++
+>   tests/nvme/070.out |  43 ++++
+>   3 files changed, 687 insertions(+)
+>   create mode 100755 tests/nvme/070
+>   create mode 100644 tests/nvme/070.out
+> 
 
-Do we really need that function? css_rstat_flush() is already exposed and
-css can already be obtained, right? blkcg_fill_root_iostat() is just
-accessing system-wide bdev stats, which you probably don't need to begin
-with or if necessary just access through bdevs.
-
-Thanks.
-
--- 
-tejun
