@@ -1,56 +1,55 @@
-Received: from www421.your-server.de (www421.your-server.de [78.46.152.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE1B1A9F97;
-	Wed, 19 Aug 2026 19:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.46.152.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A463009F2
+	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 20:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787167475; cv=none; b=hK/mzaW2alJMYbkB/L9b6WsdClZ3Q8O9Xrq78TfOAaX7Mnw/aP7zCubJRQ6+rR3dpDZ6L83o9dIkrXhrcoX7s7Lj2Jkug2HkGWYxtO+9Q/oQ+PKXrs/U2LKWLxp8iHXNeyTccmhQgwKC3JZTJ9hKf3sRcfk/2SyXiOdzLDMuRvM=
+	t=1787169878; cv=none; b=mqZWhnTnwgmGutVGljPhuF/JZcZagyHPytDaVbjoEfu+jo+FyCgArDdFb2E8oF9mmS3uczY3SX1YycPzUdQuf2HRkIoHPFW9SEkouG14ENNccZ5nOuTsnKe0xpoBiz8ZFT1VUJjT+CyO9pnlZWiMwstlDFByp2RNi4Fs2DgILbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787167475; c=relaxed/simple;
-	bh=LImpQICgxonlEMe+Jz1/4UvyllI4Wy77xpEWxm61FNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Suwpu9+A3nxTN3BBE4VjHM22WxXRxsj3G5KsP+DH60C59h/EBVqPzER/BmN43Kpo/ponLYoUHL4+qXmYEI0h/9uAOfwf3ZyaTmK49Y/V//mdAfzO3bS+c8/5aiqaP2E/bZV1hGpitZ2FZRSAGS7ghMmUSQVTQVc3t8rkKDssPNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jregg.de; spf=pass smtp.mailfrom=jregg.de; dkim=pass (2048-bit key) header.d=jregg.de header.i=@jregg.de header.b=lfrt951Z; arc=none smtp.client-ip=78.46.152.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jregg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jregg.de
+	s=arc-20240116; t=1787169878; c=relaxed/simple;
+	bh=qGkqLlDl/zgz0nfl4xdkoO75AW1/TrLia/Swjqef9j4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D+se5ZWCjFhnz3/9qZ5DcOVPe2YhXOsqqkB2AEMOjHOyBTjWGJhXU/Ro77IaF9xGvhQgaPYetC0fUfwOYos+tCrAm+YR9L5kr6/feW9zuxoVt6y9L31tSwl+dGRw0WuHLIbk98gwswtl3wWKLG8YCYtvrj/T66SdzD6SVPppeEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6BUmS0f; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jregg.de header.i=@jregg.de header.b="lfrt951Z"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=jregg.de;
-	s=default2602; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=V4VuIeEVI99B2s1Ynd2OgNz8ccOo/1HBJ01jSLDzVq8=; b=lfrt951ZMDiZW1ElkVambb2BIu
-	J6slJ7kilDU81RQYTnP1b4pk+1M7uwsF3zP7nY1J/Eb7E4q4i04T13mrhVb63fqXlafSxy5ebXEJg
-	Ht+shTrk7Ve4nbIbp/bEEp5YYim0N1XaexoutRY8DAwecR/f0PPWZ64N9ZGV9d4Ac6ck/2RpnFd+y
-	ucMaFaRj8mKEbNT6xALdntJp3hno9gSWF0k3KMGeNuKWbgEN7o9Re+xjjWroL07BnrvCukhtQJ95d
-	BbxpKtUZCdRVixCv1WRhbFU/yy9HEQX7RfeOMJEJUZjA+Udmy3asOGI36MV9n6fTJX78/dRHKZbT/
-	NDrhZk1w==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www421.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <mail@jregg.de>)
-	id 1wwltn-0008eJ-2I;
-	Wed, 19 Aug 2026 21:24:31 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mail@jregg.de>)
-	id 1wwltm-000PqB-25;
-	Wed, 19 Aug 2026 21:24:31 +0200
-From: Jenson Johnathon Reggentin <mail@jregg.de>
-To: corbet@lwn.net
-Cc: axboe@kernel.dk,
-	linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Jenson Johnathon Reggentin <mail@jregg.de>
-Subject: [PATCH v2] docs: block: fix dead http link in blk-mq.rst
-Date: Wed, 19 Aug 2026 21:23:59 +0200
-Message-ID: <20260819192422.42189-1-mail@jregg.de>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260819174635.37505-1-mail@jregg.de>
-References: <20260819174635.37505-1-mail@jregg.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6BUmS0f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787169876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DVprECuFqi5/25eTasTEjoxbRyEm7VP4LBrO4h9TFwY=;
+	b=d6BUmS0fATHYLbZdt606sIlj42ca6zYFAtnDJkdFGIW/ymeGJYXrenO5X8vf4Zf/DX4oZH
+	YHeM7ET53/UL4uQeDpVnUgFCG+xUWhVEliPKhCXHTh2EVNNct687adDNmxmtanx3QBjTq7
+	2gBxWLS5rRybqNDYwDG4T6KznnoTSac=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-132-K4lxCDZvMwiK5YpEUdT2bw-1; Wed,
+ 19 Aug 2026 16:04:32 -0400
+X-MC-Unique: K4lxCDZvMwiK5YpEUdT2bw-1
+X-Mimecast-MFC-AGG-ID: K4lxCDZvMwiK5YpEUdT2bw_1787169870
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5992B180035C;
+	Wed, 19 Aug 2026 20:04:29 +0000 (UTC)
+Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.17.17.11])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D8AF2180049F;
+	Wed, 19 Aug 2026 20:04:27 +0000 (UTC)
+From: Jesse Taube <jtaubepe@redhat.com>
+To: linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+	shinichiro.kawasaki@wdc.com,
+	John Meneghini <jmeneghi@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	Jesse Taube <jtaubepe@redhat.com>
+Subject: [PATCH v2 0/2] Test multipath and marginal ports
+Date: Wed, 19 Aug 2026 16:04:23 -0400
+Message-ID: <20260819200425.194743-1-jtaubepe@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,31 +57,27 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28097/Wed Aug 19 08:24:38 2026)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-The current link http://kernel.dk/blk-mq.pdf leads to a 404 error page.
-https://www.kernel.dk/blk-mq.pdf leads to the correct document.
+Tests for the upcoming nvme-fc: FPIN link integrity handling set.
+It tests for various multipath and marginal port
+scenarios, while confirming the port usage and state. The test is
+intended to emulate receiving an FPIN event in a multipath environment.
 
-v2 to add the missing www. prefix in the actual file change.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220329
+Link: https://github.com/linux-blktests/blktests/pull/264
 
-Signed-off-by: Jenson Johnathon Reggentin <mail@jregg.de>
----
- Documentation/block/blk-mq.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jesse Taube (2):
+  nvme: Add _setup_nvmet_port_marginal
+  nvme/070: Test multipath and marginal ports
 
-diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
-index fc06761b6ea9..2798761efe0d 100644
---- a/Documentation/block/blk-mq.rst
-+++ b/Documentation/block/blk-mq.rst
-@@ -139,7 +139,7 @@ completed.
- Further reading
- ---------------
- 
--- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
-+- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <https://www.kernel.dk/blk-mq.pdf>`_
- 
- - `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
- 
+ common/nvme        |  31 +++
+ tests/nvme/070     | 613 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/070.out |  43 ++++
+ 3 files changed, 687 insertions(+)
+ create mode 100755 tests/nvme/070
+ create mode 100644 tests/nvme/070.out
+
 -- 
 2.54.0
 
