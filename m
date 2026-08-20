@@ -1,63 +1,63 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5E048550F
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346BA48662F
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787260694; cv=none; b=VLNjhsySt/YB1R0JA0UVeHwxfj7o0wgBR0J7p0B7zk3NEzWU2tcG8OEoVx6lKDGZEmaEpTOQcTiRJ7hYTHCe8Re5WVp/42KpfFxH8VDGws1r0WDKoFRQphg46eZbQHn1DFn607gM5PV6ldhcMh7iOp8gRQ1SfsE7gy4zjBaaqTc=
+	t=1787260697; cv=none; b=f28MDTaiMLD3a3KX3ITqj4IpB1XXx/Y/OmtvmfvJLct1ez4Gwgd/6l3Oos3MjGtprs0NBmtcibzDzJWCqSmGHcoMb20TVIJXBK8nNw2FLy6F40FmeDMy+TSVpwallcnT9dDdrDZoXVuHwq3ezecgj3/OrxtyT/2kziG7kyp4fWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787260694; c=relaxed/simple;
-	bh=OJSpf69yMcsfGIyak4mMels4G2wsnfckBxcquoS3tvs=;
+	s=arc-20240116; t=1787260697; c=relaxed/simple;
+	bh=KGpOGxE5aDGI+YJk6SVQmRM6Iyv3svPXmm0zCZ8M3JM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bGEyNYbdw1LQr5sxHuX+YHjrhEgbaDhH3EheFhwjnjvMXZuGCUyG85hefVzqbXyo414ySxttWO8Lj4bVsQ9NKwyBv/z8b7RLvipxLDUDfU3xtT3+LuCbo8fh4elaxyL3SVGxLlwP3jl3PrXEygxZn1MYtQ3jSEGjYkcMFcwgbZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTiCEloJ; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=RQTFbNnhiv1QTjm0+DV+mhEbgnjYOr73zZ+Znq5cxVYTOGT8cfz50eRVNIFf02WRJkZymMA0mP/Ux3ZPzeIYr5BUcf6v55AuTfVaH5UfG3PFTmBcETN4QSd9t6hqVKlvtUSazXI8gYAAdFOEGNRj7yb5L50P5zih36/GfQtNbNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvGTBne3; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTiCEloJ"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2d032846c95so4143685ad.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:18:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvGTBne3"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3811f512167so304703a91.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787260685; x=1787865485; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787260688; x=1787865488; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=si8wyumoq2U2f4OwgM7HXzPkBFFrINH56EYQucTf6UU=;
-        b=aTiCEloJfUL19anIQoysndVlNACXvFQ7bLbZDTIqCENAihLneesxO5x0U2dhVqIWmO
-         iw/Jb93aJEHauKy+oLgQneSyONL4svUbByBxlEaJnOViSiIdVUEk5gInBdmY7wWjl0vT
-         HyQkL+aVsFU6MaF8h6F/anXaU+mY09leGh6DCwNyYVrgIXjfWVDvQbiZmZSizy7Xo+UB
-         g5h3w45PWhhIemE+rMOaWdBhChR9dmY0DEWkw/A9K2eK2dpsG6yEAWIZZxgCTxSvsFmf
-         Mx/Ri+Q4eRR91BUdymWaV7snIRjI4fYuP/5GIArJyaa+dZ5u0U+YA9Jf14Q2rQUHKy84
-         7DvQ==
+        bh=pTVI5fQqcRejLtqxc3simDI2MaSc8wcnSCEjipsJOUc=;
+        b=CvGTBne3x3dy5StvYbKotfPM5CN0GGYIGCQPgCOQZ1TcPV6eoK2rUX9qFwEDyPrF9w
+         NB9eC9mny7lv7Sis4mQmIIg81RhW5W5mpHt1/dom96+hdQWxR4uijPnIJitTtVSeSK3F
+         Pp3Hk6DysR+0IPIY4mrMrC4hoFowXtY0PJMPQ6zBNpoXtCA/Hd613mQ7UObIlnz4urds
+         GEky3vPDsd9ZNLzEuK2u11C4MkixiQA6f1afkOodNilaPQ3ePYtYm/u64G2PXKPYNeyi
+         uuFLvwpw5n3EK5y9XVs+G9T+8ujXlXG4Aheqh42ClzAt8rz1v9sRtuCUbymYk/ZmuoDO
+         gHVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787260685; x=1787865485;
+        d=1e100.net; s=20251104; t=1787260688; x=1787865488;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=si8wyumoq2U2f4OwgM7HXzPkBFFrINH56EYQucTf6UU=;
-        b=nWWlnrlj7wcWCDTz3citSOq7AZ1suNL3LuIVFTR7BpzVpDwe7Wmr8+X0ct1/5nMYdN
-         a2wtC7rz7guoK6z+PEa+PVTZ5BMMijMt72lny2n0eZ9M/Fk0RXW0cCLXO01QMVP4JxD4
-         B99iL6Q33vEKn+uqx6CFjccrKyWSMp3iUXhaWWaEbaRWsRN4cYqsaWXzqzepnPb1GzIs
-         7P0+ynJgRBJgzfIehSMQVF8KgPFKZmMTyn5lOKHt5XDkZUGYSzz//1DgZYmRNl2HMAO1
-         q/1Bqz8X7v7zH/Fvyq+oA15noPpH7LmUP/zM+s7PIcXENkczh/K/22GhZL3/OY4PcvAQ
-         YSrQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp9YdAXqPrHwB1ey09NRQcNheqL/tfgf+fJhEQVHrt+OfjiZTtf8PheNLyEtdjn/CivfLR23RkfcaGp9A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzglO1e+MW0+a8aHdLbxphMIsNdljhXidZ804FGq0GPC6IbnOir
-	vYkJqu5rrV6B5thnmOpeJXNlsFDPpvoMgsbcXIScgDca9FxUn1SFU3uE
-X-Gm-Gg: AR+sD13gRZnCZyeGEoxmLlVfJmHI4CjAH665LoTsb2t9bZbPASYhldtPAbUFlZdh0r5
-	hEMhMVuNh+ny0Z1HqypkH1AWKonM01cnXr2zanSDcghFz/UkGA+OzSMRI6P+VtZROS+c8gZU/5l
-	0u+HGJGwW2DmYdGe789o14SHVbwwHrioEgEhXEi9BLi8+F36jUG2up5T8NWoh/s7ixenPoCY0Gz
-	mTCsj6XYaXhtHDscxYh9Bu2HHiFS2QQCV8/Kp0BXH7KREu+tG55IvExatF2fnQy28XmDKEV6d3z
-	15Cpfb2B5m18Ar/dTQvPED8igsJbP7rn5T+roL0Sakn96DXSeQ2NFNm+gHbWqu8agL1dgjMBNnm
-	PkkVosv2liMl5jn4DwMloEp5IXfmGdjerMM//00eJg+NMpSl6gbfVwsgtPJbLsOhooO3bRrw9tT
-	FcEfBFGvDVV/UIVU4G52Cxpx8NxnWVqyjl2KzBmQINVUDNIMRJtZDC9YZzD9NS7FQ43g==
-X-Received: by 2002:a05:6a21:790:b0:3c3:7ac4:dac0 with SMTP id adf61e73a8af0-3cd300d467dmr2643686637.13.1787260684565;
-        Thu, 20 Aug 2026 14:18:04 -0700 (PDT)
+        bh=pTVI5fQqcRejLtqxc3simDI2MaSc8wcnSCEjipsJOUc=;
+        b=FM9E9MF5UgjvXq5xob9rUCZHFQ+CLfPd8Pd41NUz6xNYg1blFf/htc66QZtGGmDXSt
+         nppoiEvRYR53b6MRjnBaxh7S5MyCHEzFaa+Wpg//QmsSSNL83nMXho+V32cqJK8aJ94B
+         A2/xNRrtlQ+ZJ1DOxRvjjfExLiZuYTskrTDdJhDqL9YZuwfOnhLwsp/mmL3gJrAvtvFL
+         j5NBBLvIWp5Z/DI4UXboe87RWyB2aIl2ZiDCR+EKAEJeZbm/SK42dNGHilBVaFhDQ2N2
+         TJ5OA6i/fkFrITDdTm5JSGDGYOEc7IXnr9mLWERrh8Mb85dJpL60GKxCtomJ0o+pakTc
+         XD6w==
+X-Forwarded-Encrypted: i=1; AHgh+RpMMU8Z/Icex1v1yYKckli+7wovwUQN2Hj+s/yXKuWgiHnJGM0OLzv3oKOfIarPIaOtYFH9U3T/IcY57g==@vger.kernel.org
+X-Gm-Message-State: AFuF++nweyuzoj2zFgfrmuGSHHzepFNV2J7kOzpDxf/IdGqgCqLS4xUH
+	hVaumnwQAEfPATkG8FnJOnfMVhbKQSuLofbMoCtwCNV2+hw3l2khLHJS
+X-Gm-Gg: AR+sD11WNdXLaTb8yCpRsR6h0uT9SNHwk8giflXpeO+EyuK1hkNh/ihdSY0GH4jFtLr
+	YULBh9x+r1mczJbNbbhuVep4owlf1AcshO2E/hASZJW/0I+xTg+rJEXeMso0EchL4GNgtoGa+IP
+	ytvni4Xcm7wESQLFSTM9cZD4Urt770oHhM08oQ1JSvIk5qkItL6iP18nppD0kxA9WkTQSG9dF9O
+	YeCy3aTIn9ZGmjVBws9lmnPRFH5Dvdh32eso2D0az6tKHJVUzZf6G7QQnPnXhjfJL+xrvR5pFpT
+	ljpVXxN6mpG0L0Bt9N6V/HeABwayCzQEU69R8GaLnfQYVI5Brf3MGhSLi66f1BcYvWkpZ9lFzfH
+	oFIJ2pzFev/6eyMsyoswgjOmJvblIghnLpG0WP0aAZLjg7HEGOeV9lGnDhL7MhYCA3ZQzjAn1pR
+	QlbQx4sgG12yPtcZ5LdOW7TUNGihOcssU/VUa5JMv/HyQYZFSEtBNWesc=
+X-Received: by 2002:a17:90b:1c90:b0:393:19a3:4f1 with SMTP id 98e67ed59e1d1-395c351d788mr2396492a91.6.1787260687664;
+        Thu, 20 Aug 2026 14:18:07 -0700 (PDT)
 Received: from localhost ([2a03:2880:9ff:40::])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1416ae1416dsm26285932c88.11.2026.08.20.14.18.03
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1416ad53874sm30447128c88.4.2026.08.20.14.18.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 14:18:04 -0700 (PDT)
+        Thu, 20 Aug 2026 14:18:07 -0700 (PDT)
 From: Ziyang Men <ziyang.meme@gmail.com>
 To: kernel-team@meta.com,
 	Jens Axboe <axboe@kernel.dk>,
@@ -91,9 +91,9 @@ Cc: Ingo Molnar <mingo@redhat.com>,
 	cgroups@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/4] selftests/bpf: add cgroup_iter_cpu test for cpu cgroup kfuncs
-Date: Thu, 20 Aug 2026 14:17:56 -0700
-Message-ID: <20260820211758.3393984-3-ziyang.meme@gmail.com>
+Subject: [PATCH v3 4/4] selftests/bpf: add test for blkcg io.stat BPF kfuncs
+Date: Thu, 20 Aug 2026 14:17:58 -0700
+Message-ID: <20260820211758.3393984-5-ziyang.meme@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260820211758.3393984-1-ziyang.meme@gmail.com>
 References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
@@ -105,93 +105,81 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add cgroup_iter_cpu, a selftest for the CPU controller BPF kfuncs.
+Add cgroup_iter_io to test the blkcg io.stat BPF kfuncs. The BPF
+program acquires the I/O css, flushes its statistics, converts it to a
+typed blkcg under RCU, walks the blkgs, and releases the css reference.
 
-The userspace side runs a CPU hog in a test cgroup with cpu.max settled
-then:
+The test performs O_DIRECT I/O on a private loop device. It checks the
+device ID and counters against io.stat.
 
-  - checks the CPU-time and throttling counters are nonzero,
-  - compares whether all values the program read are same as those
-    reading from cgroup file.
-
-Enable CONFIG_CGROUP_SCHED, CONFIG_FAIR_GROUP_SCHED and
-CONFIG_CFS_BANDWIDTH in the selftest config.
-
-Tested on VM with v7.2-rc5.
-
-Suggested-by: Shakeel Butt <shakeel.butt@linux.dev>
 Assisted-by: Claude:claude-opus-5
 Signed-off-by: Ziyang Men <ziyang.meme@gmail.com>
 ---
- tools/testing/selftests/bpf/cgroup_iter_cpu.h |  22 ++
- tools/testing/selftests/bpf/config            |   3 +
- .../bpf/prog_tests/cgroup_iter_cpu.c          | 259 ++++++++++++++++++
- .../selftests/bpf/progs/cgroup_iter_cpu.c     | 113 ++++++++
- 4 files changed, 397 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/cgroup_iter_cpu.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c
- create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c
+ tools/testing/selftests/bpf/cgroup_iter_io.h  |  17 ++
+ tools/testing/selftests/bpf/config            |   1 +
+ .../selftests/bpf/prog_tests/cgroup_iter_io.c | 254 ++++++++++++++++++
+ .../selftests/bpf/progs/cgroup_iter_io.c      |  74 +++++
+ 4 files changed, 346 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/cgroup_iter_io.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
+ create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_io.c
 
-diff --git a/tools/testing/selftests/bpf/cgroup_iter_cpu.h b/tools/testing/selftests/bpf/cgroup_iter_cpu.h
+diff --git a/tools/testing/selftests/bpf/cgroup_iter_io.h b/tools/testing/selftests/bpf/cgroup_iter_io.h
 new file mode 100644
-index 000000000000..74599a5c0e4d
+index 000000000000..f4bbaaccdf71
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/cgroup_iter_cpu.h
-@@ -0,0 +1,22 @@
++++ b/tools/testing/selftests/bpf/cgroup_iter_io.h
+@@ -0,0 +1,17 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-+#ifndef __CGROUP_ITER_CPU_H
-+#define __CGROUP_ITER_CPU_H
++#ifndef __CGROUP_ITER_IO_H
++#define __CGROUP_ITER_IO_H
 +
-+struct cpu_query {
-+	/* base cpu time, from cpu.stat */
-+	__u64 usage_usec;
-+	__u64 user_usec;
-+	__u64 system_usec;
-+	__u64 nice_usec;
-+	__u64 forceidle_usec;
-+	/* CFS bandwidth throttling, from cpu.stat and cpu.stat.local */
-+	__u64 nr_periods;
-+	__u64 nr_throttled;
-+	__u64 throttled_usec;
-+	__u64 nr_bursts;
-+	__u64 burst_usec;
-+	__u64 throttled_self_usec;
++struct io_query {
++	/* one device's io.stat counters */
++	__u64 rbytes;
++	__u64 wbytes;
++	__u64 rios;
++	__u64 wios;
++	__u64 dbytes;
++	__u64 dios;
++	__u64 dev;	/* dev_t of the device the counters belong to */
 +};
 +
-+#endif /* __CGROUP_ITER_CPU_H */
++#endif /* __CGROUP_ITER_IO_H */
 diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index ea7044f30adc..482b40dde2f9 100644
+index 482b40dde2f9..0e10d625de6e 100644
 --- a/tools/testing/selftests/bpf/config
 +++ b/tools/testing/selftests/bpf/config
-@@ -11,6 +11,9 @@ CONFIG_BPF_STREAM_PARSER=y
- CONFIG_BPF_SYSCALL=y
- # CONFIG_BPF_UNPRIV_DEFAULT_OFF is not set
- CONFIG_CGROUP_BPF=y
-+CONFIG_CGROUP_SCHED=y
-+CONFIG_FAIR_GROUP_SCHED=y
-+CONFIG_CFS_BANDWIDTH=y
- CONFIG_CRYPTO_HMAC=y
- CONFIG_CRYPTO_SHA256=y
- CONFIG_CRYPTO_USER_API=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c
+@@ -1,3 +1,4 @@
++CONFIG_BLK_CGROUP=y
+ CONFIG_BLK_DEV_LOOP=y
+ CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
+ CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=1
+diff --git a/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
 new file mode 100644
-index 000000000000..cd7e92ababfb
+index 000000000000..2267780912d8
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c
-@@ -0,0 +1,259 @@
++++ b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
+@@ -0,0 +1,254 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
++#define _GNU_SOURCE
 +#include <test_progs.h>
 +#include <bpf/libbpf.h>
 +#include <fcntl.h>
-+#include <signal.h>
-+#include <sys/prctl.h>
-+#include <sys/wait.h>
++#include <linux/loop.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++#include <sys/stat.h>
++#include <sys/sysmacros.h>
 +#include <unistd.h>
 +#include "cgroup_helpers.h"
-+#include "cgroup_iter_cpu.h"
-+#include "cgroup_iter_cpu.skel.h"
++#include "cgroup_iter_io.h"
++#include "cgroup_iter_io.skel.h"
++
++#define IO_SIZE (4 * 1024 * 1024)
 +
 +static int read_stats(struct bpf_link *link)
 +{
@@ -202,6 +190,7 @@ index 000000000000..cd7e92ababfb
 +	if (!ASSERT_OK_FD(fd, "bpf_iter_create"))
 +		return 1;
 +
++	/* Results land in skel->data_query; the read itself returns no data. */
 +	bytes = read(fd, NULL, 0);
 +	if (!ASSERT_EQ(bytes, 0, "read fd"))
 +		ret = 1;
@@ -210,129 +199,165 @@ index 000000000000..cd7e92ababfb
 +	return ret;
 +}
 +
-+/* Read cgroup file @name into @buf. */
-+static int read_cgroup_file(int cgroup_fd, const char *name, char *buf,
-+			    size_t size)
++/* Set up a loop device for cgroup-charged I/O. */
++static int loop_setup(char *loop_path, size_t sz, int *ctl_fd, int *loop_fd,
++		      int *back_fd)
 +{
-+	ssize_t n;
-+	int fd;
++	char back_path[] = "/tmp/cgroup_iter_io.XXXXXX";
++	int nr;
 +
-+	fd = openat(cgroup_fd, name, O_RDONLY);
++	*ctl_fd = *loop_fd = *back_fd = -1;
++
++	*ctl_fd = open("/dev/loop-control", O_RDWR | O_CLOEXEC);
++	if (*ctl_fd < 0)
++		return -1;
++
++	nr = ioctl(*ctl_fd, LOOP_CTL_GET_FREE);
++	if (nr < 0)
++		goto err;
++	snprintf(loop_path, sz, "/dev/loop%d", nr);
++
++	*back_fd = mkstemp(back_path);
++	if (*back_fd < 0)
++		goto err;
++	unlink(back_path);
++	if (ftruncate(*back_fd, (off_t)IO_SIZE * 4))
++		goto err;
++
++	*loop_fd = open(loop_path, O_RDWR | O_CLOEXEC);
++	if (*loop_fd < 0)
++		goto err;
++	if (ioctl(*loop_fd, LOOP_SET_FD, *back_fd))
++		goto err;
++
++	return 0;
++err:
++	if (*loop_fd >= 0)
++		close(*loop_fd);
++	if (*back_fd >= 0)
++		close(*back_fd);
++	close(*ctl_fd);
++	*ctl_fd = *loop_fd = *back_fd = -1;
++	return -1;
++}
++
++static void loop_teardown(const char *loop_path, int ctl_fd, int loop_fd,
++			  int back_fd)
++{
++	int nr = -1;
++
++	if (loop_fd >= 0) {
++		ioctl(loop_fd, LOOP_CLR_FD, 0);
++		close(loop_fd);
++	}
++	if (back_fd >= 0)
++		close(back_fd);
++	if (ctl_fd >= 0) {
++		if (sscanf(loop_path, "/dev/loop%d", &nr) == 1 && nr >= 0)
++			ioctl(ctl_fd, LOOP_CTL_REMOVE, nr);
++		close(ctl_fd);
++	}
++}
++
++/* O_DIRECT keeps I/O charged to the current cgroup. */
++static int do_direct_io(const char *loop_path)
++{
++	void *buf;
++	int fd, ret = -1;
++
++	fd = open(loop_path, O_RDWR | O_DIRECT | O_CLOEXEC);
 +	if (fd < 0)
 +		return -1;
-+	n = read(fd, buf, size - 1);
++	if (posix_memalign(&buf, 4096, IO_SIZE))
++		goto out_fd;
++	memset(buf, 0xab, IO_SIZE);
++
++	if (pwrite(fd, buf, IO_SIZE, 0) != IO_SIZE)
++		goto out_buf;
++	fsync(fd);
++	if (pread(fd, buf, IO_SIZE, 0) != IO_SIZE)
++		goto out_buf;
++	ret = 0;
++out_buf:
++	free(buf);
++out_fd:
++	close(fd);
++	return ret;
++}
++
++/* Read @dev's io.stat counters. @dev uses kernel dev_t encoding. */
++static int parse_io_stat(int cgroup_fd, __u64 dev, struct io_query *out)
++{
++	unsigned int want_maj = dev >> 20, want_min = dev & ((1U << 20) - 1);
++	char buf[4096], *line, *saveptr;
++	int fd, n, ret = -1;
++
++	fd = openat(cgroup_fd, "io.stat", O_RDONLY);
++	if (fd < 0)
++		return -1;
++	n = read(fd, buf, sizeof(buf) - 1);
 +	close(fd);
 +	if (n <= 0)
 +		return -1;
 +	buf[n] = '\0';
-+	return 0;
-+}
 +
-+/* Parse the "cpu.stat" file into @out. */
-+static int parse_cpu_stat(int cgroup_fd, struct cpu_query *out)
-+{
-+	char buf[4096], *line, *sp;
-+	unsigned long long v;
++	for (line = strtok_r(buf, "\n", &saveptr); line;
++	     line = strtok_r(NULL, "\n", &saveptr)) {
++		unsigned long long rb = 0, wb = 0, ri = 0, wi = 0, db = 0, di = 0;
++		unsigned int maj, min;
 +
-+	if (read_cgroup_file(cgroup_fd, "cpu.stat", buf, sizeof(buf)))
-+		return -1;
++		/* Only the device id is required; missing counters stay zero. */
++		if (sscanf(line,
++			   "%u:%u rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
++			   &maj, &min, &rb, &wb, &ri, &wi, &db, &di) < 2)
++			continue;
++		if (maj != want_maj || min != want_min)
++			continue;
 +
-+	for (line = strtok_r(buf, "\n", &sp); line;
-+	     line = strtok_r(NULL, "\n", &sp)) {
-+		if (sscanf(line, "usage_usec %llu", &v) == 1)
-+			out->usage_usec = v;
-+		else if (sscanf(line, "user_usec %llu", &v) == 1)
-+			out->user_usec = v;
-+		else if (sscanf(line, "system_usec %llu", &v) == 1)
-+			out->system_usec = v;
-+		else if (sscanf(line, "nice_usec %llu", &v) == 1)
-+			out->nice_usec = v;
-+		else if (sscanf(line, "core_sched.force_idle_usec %llu", &v) == 1)
-+			out->forceidle_usec = v;
-+		else if (sscanf(line, "nr_periods %llu", &v) == 1)
-+			out->nr_periods = v;
-+		else if (sscanf(line, "nr_throttled %llu", &v) == 1)
-+			out->nr_throttled = v;
-+		else if (sscanf(line, "throttled_usec %llu", &v) == 1)
-+			out->throttled_usec = v;
-+		else if (sscanf(line, "nr_bursts %llu", &v) == 1)
-+			out->nr_bursts = v;
-+		else if (sscanf(line, "burst_usec %llu", &v) == 1)
-+			out->burst_usec = v;
++		out->rbytes = rb;
++		out->wbytes = wb;
++		out->rios = ri;
++		out->wios = wi;
++		out->dbytes = db;
++		out->dios = di;
++		ret = 0;
++		break;
 +	}
-+	return 0;
++	return ret;
 +}
 +
-+/*
-+ * Parse the "cpu.stat.local" file into @out.
-+ */
-+static int parse_cpu_stat_local(int cgroup_fd, struct cpu_query *out)
++void test_cgroup_iter_io(void)
 +{
-+	unsigned long long v;
-+	char buf[256];
-+
-+	if (read_cgroup_file(cgroup_fd, "cpu.stat.local", buf, sizeof(buf)))
-+		return -1;
-+	if (sscanf(buf, "throttled_usec %llu", &v) != 1)
-+		return -1;
-+	out->throttled_self_usec = v;
-+	return 0;
-+}
-+
-+/* Read file value the bpf program reads. */
-+static int parse_stats(int cgroup_fd, struct cpu_query *out, bool have_bw)
-+{
-+	if (parse_cpu_stat(cgroup_fd, out))
-+		return -1;
-+	if (have_bw && parse_cpu_stat_local(cgroup_fd, out))
-+		return -1;
-+	return 0;
-+}
-+
-+/*
-+ * Check whether this kernel accounts CFS bandwidth.
-+ */
-+static bool cgroup_has_bw_stat(int cgroup_fd)
-+{
-+	char buf[4096];
-+
-+	if (read_cgroup_file(cgroup_fd, "cpu.stat", buf, sizeof(buf)))
-+		return false;
-+	return strstr(buf, "nr_periods ");
-+}
-+
-+/* Fork a child that spins in the current cgroup, kill it if the test exits. */
-+static pid_t spawn_cpu_hog(void)
-+{
-+	pid_t pid = fork();
-+
-+	if (pid == 0) {
-+		prctl(PR_SET_PDEATHSIG, SIGKILL);
-+		while (1)
-+			;
-+	}
-+	return pid;
-+}
-+
-+void test_cgroup_iter_cpu(void)
-+{
-+	char *cgroup_rel_path = "/cgroup_iter_cpu_test";
-+	struct cgroup_iter_cpu *skel;
-+	struct cpu_query *q;
-+	struct bpf_link *link;
-+	bool wrote_max, have_bw;
++	char *cgroup_rel_path = "/cgroup_iter_io_test";
++	int ctl_fd = -1, loop_fd = -1, back_fd = -1;
++	struct cgroup_iter_io *skel = NULL;
++	struct bpf_link *link = NULL;
++	char loop_path[64];
++	struct io_query *q;
 +	int cgroup_fd;
-+	pid_t hog;
 +
 +	cgroup_fd = cgroup_setup_and_join(cgroup_rel_path);
 +	if (!ASSERT_OK_FD(cgroup_fd, "cgroup_setup_and_join"))
 +		return;
 +
-+	wrote_max = !write_cgroup_file(cgroup_rel_path, "cpu.max", "10000 100000");
-+
-+	skel = cgroup_iter_cpu__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "cgroup_iter_cpu__open_and_load"))
++	if (loop_setup(loop_path, sizeof(loop_path), &ctl_fd, &loop_fd, &back_fd)) {
++		test__skip();	/* needs root + CONFIG_BLK_DEV_LOOP */
 +		goto cleanup_cgroup_fd;
++	}
++
++	skel = cgroup_iter_io__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "cgroup_iter_io__open_and_load"))
++		goto cleanup_loop;
++
++	/* Convert glibc st_rdev to kernel dev_t format. */
++	{
++		struct stat lst;
++
++		if (!ASSERT_OK(fstat(loop_fd, &lst), "fstat loop"))
++			goto cleanup_skel;
++		skel->data_query->target_dev =
++			((__u64)major(lst.st_rdev) << 20) | minor(lst.st_rdev);
++	}
 +
 +	DECLARE_LIBBPF_OPTS(bpf_iter_attach_opts, opts);
 +	union bpf_iter_link_info linfo = {
@@ -342,220 +367,133 @@ index 000000000000..cd7e92ababfb
 +	opts.link_info = &linfo;
 +	opts.link_info_len = sizeof(linfo);
 +
-+	link = bpf_program__attach_iter(skel->progs.cgroup_cpu_query, &opts);
++	link = bpf_program__attach_iter(skel->progs.cgroup_io_query, &opts);
 +	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
 +		goto cleanup_skel;
 +
-+	q = &skel->data_query->cpu_query;
-+
-+	hog = spawn_cpu_hog();
-+	if (!ASSERT_GT(hog, 0, "spawn_cpu_hog"))
++	/* This process is in the test cgroup, so the loop I/O is charged here. */
++	if (!ASSERT_OK(do_direct_io(loop_path), "do_direct_io"))
 +		goto cleanup_link;
 +
-+	sleep(1);
-+
-+	/* Run the bpf program before anything here reads cpu.stat. */
 +	if (!ASSERT_OK(read_stats(link), "read stats"))
-+		goto cleanup_hog;
++		goto cleanup_link;
 +
-+	have_bw = wrote_max && cgroup_has_bw_stat(cgroup_fd);
-+
-+	if (test__start_subtest("cgroup_iter_cpu__cputime")) {
-+		ASSERT_GT(q->usage_usec, 0, "usage_usec");
-+		ASSERT_GT(q->user_usec + q->system_usec, 0, "user+system_usec");
++	q = &skel->data_query->io_query;
++	if (test__start_subtest("cgroup_iter_io__write")) {
++		ASSERT_GT(q->wbytes, 0, "wbytes");
++		ASSERT_GT(q->wios, 0, "wios");
 +	}
-+	if (test__start_subtest("cgroup_iter_cpu__throttling")) {
-+		if (!have_bw) {
-+			test__skip();
-+		} else {
-+			ASSERT_GT(q->nr_periods, 0, "nr_periods");
-+			ASSERT_GT(q->nr_throttled, 0, "nr_throttled");
-+			ASSERT_GT(q->throttled_usec, 0, "throttled_usec");
-+			ASSERT_GT(q->throttled_self_usec, 0, "throttled_self_usec");
++	if (test__start_subtest("cgroup_iter_io__read")) {
++		ASSERT_GT(q->rbytes, 0, "rbytes");
++		ASSERT_GT(q->rios, 0, "rios");
++	}
++	if (test__start_subtest("cgroup_iter_io__dev"))
++		ASSERT_GT(q->dev, 0, "dev");
++
++	/* Compare with io.stat without I/O between the reads. */
++	if (test__start_subtest("cgroup_iter_io__match")) {
++		struct io_query filev = {};
++
++		if (ASSERT_OK(read_stats(link), "read stats") &&
++		    ASSERT_OK(parse_io_stat(cgroup_fd, q->dev, &filev),
++			      "parse io.stat")) {
++			ASSERT_EQ(q->rbytes, filev.rbytes, "rbytes");
++			ASSERT_EQ(q->wbytes, filev.wbytes, "wbytes");
++			ASSERT_EQ(q->rios, filev.rios, "rios");
++			ASSERT_EQ(q->wios, filev.wios, "wios");
++			ASSERT_EQ(q->dbytes, filev.dbytes, "dbytes");
++			ASSERT_EQ(q->dios, filev.dios, "dios");
 +		}
 +	}
 +
-+	/*
-+	 * cpu.stat cputime grows on every tick a task in the cgroup runs, so
-+	 * stop them all before comparing
-+	 */
-+	if (test__start_subtest("cgroup_iter_cpu__match")) {
-+		struct cpu_query filev = {};
-+		int i, stable = 0;
-+
-+		kill(hog, SIGSTOP);
-+		waitpid(hog, NULL, WUNTRACED);
-+		if (!ASSERT_OK(join_root_cgroup(), "join_root_cgroup"))
-+			goto cleanup_hog;
-+
-+		/*
-+		 * The period timer keeps adding to nr_periods for a while
-+		 * after the hog stops
-+		 */
-+		for (i = 0; i < 20; i++) {
-+			struct cpu_query before = {}, after = {};
-+
-+			if (!ASSERT_OK(parse_stats(cgroup_fd, &before, have_bw), "cpu.stat") ||
-+			    !ASSERT_OK(read_stats(link), "read stats") ||
-+			    !ASSERT_OK(parse_stats(cgroup_fd, &after, have_bw), "cpu.stat"))
-+				goto cleanup_hog;
-+
-+			if (!memcmp(&before, &after, sizeof(before))) {
-+				filev = before;
-+				stable = 1;
-+				break;
-+			}
-+			usleep(100000);
-+		}
-+
-+		if (!ASSERT_TRUE(stable, "cpu.stat stable"))
-+			goto cleanup_hog;
-+
-+		ASSERT_EQ(q->usage_usec, filev.usage_usec, "usage_usec");
-+		ASSERT_EQ(q->user_usec, filev.user_usec, "user_usec");
-+		ASSERT_EQ(q->system_usec, filev.system_usec, "system_usec");
-+		ASSERT_EQ(q->nice_usec, filev.nice_usec, "nice_usec");
-+		ASSERT_EQ(q->forceidle_usec, filev.forceidle_usec, "forceidle_usec");
-+
-+		if (have_bw) {
-+			ASSERT_EQ(q->nr_periods, filev.nr_periods, "nr_periods");
-+			ASSERT_EQ(q->nr_throttled, filev.nr_throttled, "nr_throttled");
-+			ASSERT_EQ(q->throttled_usec, filev.throttled_usec, "throttled_usec");
-+			ASSERT_EQ(q->nr_bursts, filev.nr_bursts, "nr_bursts");
-+			ASSERT_EQ(q->burst_usec, filev.burst_usec, "burst_usec");
-+			ASSERT_EQ(q->throttled_self_usec, filev.throttled_self_usec,
-+				  "throttled_self_usec");
-+		}
-+	}
-+
-+cleanup_hog:
-+	kill(hog, SIGKILL);
-+	waitpid(hog, NULL, 0);
 +cleanup_link:
 +	bpf_link__destroy(link);
 +cleanup_skel:
-+	cgroup_iter_cpu__destroy(skel);
++	cgroup_iter_io__destroy(skel);
++cleanup_loop:
++	loop_teardown(loop_path, ctl_fd, loop_fd, back_fd);
 +cleanup_cgroup_fd:
 +	close(cgroup_fd);
 +	cleanup_cgroup_environment();
 +}
-diff --git a/tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c b/tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c
+diff --git a/tools/testing/selftests/bpf/progs/cgroup_iter_io.c b/tools/testing/selftests/bpf/progs/cgroup_iter_io.c
 new file mode 100644
-index 000000000000..0e916234e7eb
+index 000000000000..0e9c9cd6e33a
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c
-@@ -0,0 +1,113 @@
++++ b/tools/testing/selftests/bpf/progs/cgroup_iter_io.c
+@@ -0,0 +1,74 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
 +#include <vmlinux.h>
 +#include <bpf/bpf_helpers.h>
 +#include <bpf/bpf_core_read.h>
-+#include "cgroup_iter_cpu.h"
++#include "bpf_experimental.h"
++#include "cgroup_iter_io.h"
 +
 +char _license[] SEC("license") = "GPL";
 +
-+struct cpu_query cpu_query SEC(".data.query");
++struct io_query io_query SEC(".data.query");
 +
-+extern const void __cpu_possible_mask __ksym;
++/* Device selected by userspace in kernel dev_t format. */
++__u64 target_dev SEC(".data.query");
 +
-+struct cgroup_base_stat___local {
-+	struct task_cputime cputime;
-+	__u64 forceidle_sum;
-+	__u64 ntime;
-+} __attribute__((preserve_access_index));
-+
-+static __always_inline __u64 read_throttled_self(struct task_group *tg, __u32 cpu)
++/* Keep inline: RCU and open-coded iterators cannot cross a BPF call. */
++static __always_inline int read_target_dev(struct cgroup *cgrp,
++					   struct io_query *out)
 +{
-+	struct cfs_rq *cfs_rq;
++	struct cgroup_subsys_state *css;
++	struct blkcg *blkcg;
++	struct blkcg_gq *pos;
++	__u64 dev;
++	int ssid;
 +
-+	cfs_rq = bpf_per_cpu_ptr(tg->cfs_rq, cpu);
-+	if (!cfs_rq)
++	ssid = bpf_core_enum_value(enum cgroup_subsys_id, io_cgrp_id);
++	css = bpf_cgroup_css(cgrp, ssid);
++	if (!css)
 +		return 0;
 +
-+	return BPF_CORE_READ(cfs_rq, throttled_clock_self_time);
++	css_rstat_flush(css);
++
++	bpf_rcu_read_lock();
++
++	blkcg = bpf_css_to_blkcg(css);
++	if (!blkcg) {
++		bpf_rcu_read_unlock();
++		bpf_css_release(css);
++		return 0;
++	}
++
++	bpf_for_each(blkg, pos, blkcg) {
++		dev = BPF_CORE_READ(pos, q, disk, part0, bd_dev);
++		if (dev != target_dev)
++			continue;
++
++		out->dev = dev;
++		out->rbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_READ]);
++		out->wbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_WRITE]);
++		out->rios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_READ]);
++		out->wios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_WRITE]);
++		out->dbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_DISCARD]);
++		out->dios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_DISCARD]);
++		break;
++	}
++	bpf_rcu_read_unlock();
++	bpf_css_release(css);
++	return 1;
 +}
 +
 +SEC("iter.s/cgroup")
-+int cgroup_cpu_query(struct bpf_iter__cgroup *ctx)
++int cgroup_io_query(struct bpf_iter__cgroup *ctx)
 +{
-+	struct cgroup_base_stat___local bstat = {};
 +	struct cgroup *cgrp = ctx->cgroup;
-+	struct cgroup_subsys_state *css;
-+	struct task_group *tg;
-+	__u64 throttled_self = 0;
-+	int ssid;
 +
 +	if (!cgrp)
 +		return 1;
 +
-+	css_rstat_flush(&cgrp->self);
-+	bpf_cgroup_base_stat(cgrp, (struct cgroup_base_stat *)&bstat);
++	/* Start fresh so a device that is not found stays all-zero. */
++	__builtin_memset(&io_query, 0, sizeof(io_query));
 +
-+	cpu_query.usage_usec = bstat.cputime.sum_exec_runtime / 1000;
-+	cpu_query.user_usec = bstat.cputime.utime / 1000;
-+	cpu_query.system_usec = bstat.cputime.stime / 1000;
-+	cpu_query.nice_usec = bstat.ntime / 1000;
-+	cpu_query.forceidle_usec = 0;
-+	if (bpf_core_field_exists(bstat.forceidle_sum))
-+		cpu_query.forceidle_usec = bstat.forceidle_sum / 1000;
-+
-+	bpf_rcu_read_lock();
-+	if (!bpf_core_enum_value_exists(enum cgroup_subsys_id, cpu_cgrp_id) ||
-+	    !bpf_ksym_exists(bpf_css_to_task_group))
-+		goto unlock;
-+
-+	ssid = bpf_core_enum_value(enum cgroup_subsys_id, cpu_cgrp_id);
-+	css = cgrp->subsys[ssid];
-+	if (!css)
-+		goto unlock;
-+
-+	tg = bpf_css_to_task_group(css);
-+	if (tg && bpf_core_field_exists(tg->cfs_bandwidth.nr_periods)) {
-+		cpu_query.nr_periods =
-+			(__u32)BPF_CORE_READ(tg, cfs_bandwidth.nr_periods);
-+		cpu_query.nr_throttled =
-+			(__u32)BPF_CORE_READ(tg, cfs_bandwidth.nr_throttled);
-+		cpu_query.throttled_usec =
-+			BPF_CORE_READ(tg, cfs_bandwidth.throttled_time) / 1000;
-+		cpu_query.nr_bursts =
-+			(__u32)BPF_CORE_READ(tg, cfs_bandwidth.nr_burst);
-+		cpu_query.burst_usec =
-+			BPF_CORE_READ(tg, cfs_bandwidth.burst_time) / 1000;
-+	}
-+
-+	if (tg && bpf_core_field_exists(tg->cfs_rq) &&
-+	    bpf_core_field_exists(struct cfs_rq, throttled_clock_self_time)) {
-+		__u32 mask_bytes = bpf_core_type_size(struct cpumask);
-+		__u32 full_words = mask_bytes / sizeof(__u64);
-+		int *cpu;
-+
-+		if (full_words)
-+			bpf_for_each(bits, cpu,
-+				     (const __u64 *)&__cpu_possible_mask,
-+				     full_words)
-+				throttled_self += read_throttled_self(tg, *cpu);
-+
-+		if (mask_bytes & (sizeof(__u64) - 1)) {
-+			__u32 tail = 0;
-+			const void *src = (const char *)&__cpu_possible_mask +
-+					  full_words * sizeof(__u64);
-+			int bit;
-+
-+			if (!bpf_probe_read_kernel(&tail, sizeof(tail), src))
-+				bpf_for(bit, 0, 32)
-+					if (tail & (1U << bit)) {
-+						__u32 tail_cpu = full_words * 64 + bit;
-+
-+						throttled_self +=
-+							read_throttled_self(tg, tail_cpu);
-+					}
-+		}
-+	}
-+
-+unlock:
-+	bpf_rcu_read_unlock();
-+	cpu_query.throttled_self_usec = throttled_self / 1000;
-+
++	read_target_dev(cgrp, &io_query);
 +	return 0;
 +}
 -- 
