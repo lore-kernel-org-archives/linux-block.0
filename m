@@ -1,58 +1,52 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835403C1984
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 19:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1271A275
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 20:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787255890; cv=none; b=ueCcIF1u10OueH7jaZU5zK9tTHq6O2LTdXjhcowOUih6UZBvhNTCqedW1CPiWrupFGAlt85miwjqzkKGc+5cRLZbX/X9l0bJHiNHdowzI0x2wCc4AZxmoWy6t2ShVcEChC6LrRheBzeutEIO1LQwIMe0dRjoMpZJK/QuBi5qk8I=
+	t=1787256050; cv=none; b=hxl+O+W/POC/YLKqSq0FXk6ONCtR03kgOu17L+TPaVY2rIsRnV9dMJy/zP5Jl+qlF+oV0tHNveJjwN225Q9C3Pff3jzIapLu6D44jIBUETtWFIStz2E72xHyCA9QOmuJWnP6D8kxLvIQIX26bfFwDIFP41FsLVIhMUtMR62o6ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787255890; c=relaxed/simple;
-	bh=yDeihUVE2mKEkrwNKbxWUGLwGJcud/J8Xefr5Eiev2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pKndDyOpwIuEfUvcwWjSWkaTyUcb/cdaHVeoKpzeOSAcwXRuID6y+9W7bmv0Q3D5WuIt+CN0mDt13ji2zpftJ//3qr8dc3iVbYEEtbCU/aJXPXMESlPzyF/4ORzMgzRn6ZH+AO7oZEff/j5rBpmMUkgRd6cxbOD9I4DzSCIdlfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RAbGiu1o; arc=none smtp.client-ip=199.89.1.16
+	s=arc-20240116; t=1787256050; c=relaxed/simple;
+	bh=7t+xciM56+QyMUk+OJl9RE1r6uyOeKLtj/bCYAR3pGE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e4NVMrIa9hsLfWVDj7tvUr4jKDYgQIkG/ktxBVCSbv+q/fghtacNtf009UrC6nMLLe87M5WvDRpfYuxRr5GQlOWCw7PJ8KiK9YqylhLf71L6Nso2jRxCxzAa3i62k0q+eCfKA9z2XQN/oZODo6+2ezS7GGjNoOdBu3BHwh1VtMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qfLLkR5N; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RAbGiu1o"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qfLLkR5N"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hQvPY15rGzlfsVF;
-	Thu, 20 Aug 2026 19:58:09 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hQvSc3JSHz1XM5kY;
+	Thu, 20 Aug 2026 20:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1787255885; x=1789847886; bh=tUrY9
-	/zW1hmjp0y28aomK3XNOE8Dtge/T+b3BupEmnE=; b=RAbGiu1oFI3ntoRC7JyME
-	2TX8N/uSQUQZEeA0j6sVMT7X2f7SMtGyxpWwaSke8wAdbMEbFvtbjKHhofQY4FVZ
-	djOknXqQN5HlPsjilvM8ziIcMXVzuQlTO5HR1ziNrtPKziGgPCbnJXbCW0/7JnqS
-	/lWQrjPsCH7moXFnFky5Xagv9p6NUMxFfQReA6Of/fJnHWDIHlhDLGv5tWDTQZ7g
-	TGUWIILqeJPLkrRGalE9qV/dR0hI7AgdYfrDnvLLGMeGIb5bQFQJoerzvnzki63y
-	oNRwNf99AxlUMdOelM0YP2tS+FLBwqVzaVCOqwLSGgQEYMAoo/bgxYUAhrJ+dHzX
-	g==
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1787256044; x=1789848045; bh=KlJM8o7MTMOsPeHKj9v9bh32CL/rv40NHJe
+	GRtq2PpI=; b=qfLLkR5NigMOuDaJTEmEffQhdw7gsBGpDNsl//ddRkGF9o9Ig41
+	skbAV7RfGXbKL971dEntHhfv1P9KZR1/oPYatfFNuTBua61QZtMHldauPLLl2x6y
+	J9NuPvZR5ayhuiVkObfmUNLgnXC3dbScf4a6rntsW0Zd7jz0NnuB4D2rX1LODa6V
+	bwH5VLo9ulH3lABKwPyv+nVeqX1girkUdVKg+1WLbv7aQkiu2ceO2kXe6paXwdsL
+	LkzuG1FXRWyjXGH9lXBcIsE/mGK++FfjkWgJUATQes2kEivya+Snn+7dOdu49GNA
+	EKWnvNiykgapF8fzGZRFd0xtyVUfFWB2G5w==
 X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 2nufVFmeISOm; Thu, 20 Aug 2026 19:58:05 +0000 (UTC)
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id X3i7A_E427hZ; Thu, 20 Aug 2026 20:00:44 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (148.60.168.34.bc.googleusercontent.com [34.168.60.148])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hQvPS28ttzlfvpW;
-	Thu, 20 Aug 2026 19:58:03 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hQvSX09qTz1XM4Sx;
+	Thu, 20 Aug 2026 20:00:43 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Nilay Shroff <nilay@linux.ibm.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 13/13] loop: Add __guarded_by() annotations
-Date: Thu, 20 Aug 2026 12:57:21 -0700
-Message-ID: <f81e920eed63d33d232948ecbc1b29c099e72016.1787255652.git.bvanassche@acm.org>
+Subject: [PATCH blktests] loop/014: Add test for backing file on loop device partition
+Date: Thu, 20 Aug 2026 13:00:34 -0700
+Message-ID: <20260820200034.3849080-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.766.g2966f0265a-goog
-In-Reply-To: <cover.1787255652.git.bvanassche@acm.org>
-References: <cover.1787255652.git.bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,76 +55,211 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Document which synchronization object protects which variable. Suppress
-complaints about accesses without locking in initialization and cleanup
-functions with context_unsafe() and __assume_ctx_lock().
+Add a new loop driver test that verifies that attempting to set the
+backing file of a loop device to a file located on a filesystem on one of
+the same loop device's partitions fails as expected by triggering the
+kernel function loop_validate_file().
+
+Modify src/loop_change_fd.c to accept a -r option to open the loop device
+and backing file in read-only mode (O_RDONLY).
+
+The test performs the following steps:
+- Create a 1 GB image file ($TMPDIR/img).
+- Instantiate a loop device for the image file with partition scanning
+  enabled.
+- Create two partitions of equal size on that loop device.
+- Format the second partition with the ext4 filesystem and mount it.
+- Create a 1 GB file on the mounted filesystem.
+- Unmount the filesystem, detach the loop device, and re-instantiate it i=
+n
+  read-only mode.
+- Mount the partition read-only.
+- Use src/loop_change_fd -r to attempt to change the backing file
+  descriptor of the loop device to the file on its own partition via
+  LOOP_CHANGE_FD, and verify that loop_validate_file() rejects it.
+- Clean up by unmounting the filesystem and detaching the loop device.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/loop.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ src/loop_change_fd.c |  20 ++++++--
+ tests/loop/014       | 107 +++++++++++++++++++++++++++++++++++++++++++
+ tests/loop/014.out   |   2 +
+ 3 files changed, 125 insertions(+), 4 deletions(-)
+ create mode 100755 tests/loop/014
+ create mode 100644 tests/loop/014.out
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 637212af70d2..8a6082d887eb 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -60,13 +60,13 @@ struct loop_device {
+diff --git a/src/loop_change_fd.c b/src/loop_change_fd.c
+index b124d829f380..722f14d3d91f 100644
+--- a/src/loop_change_fd.c
++++ b/src/loop_change_fd.c
+@@ -11,25 +11,37 @@
 =20
- 	gfp_t		old_gfp_mask;
+ void usage(const char *progname)
+ {
+-	fprintf(stderr, "usage: %s LOOPDEV PATH\n", progname);
++	fprintf(stderr, "usage: %s [-r] LOOPDEV PATH\n", progname);
+ 	exit(EXIT_FAILURE);
+ }
 =20
--	int			lo_state;
-+	int			lo_state __guarded_by(&lo_mutex);
- 	spinlock_t              lo_work_lock;
- 	struct workqueue_struct *workqueue;
- 	struct work_struct      rootcg_work;
--	struct list_head        rootcg_cmd_list;
--	struct list_head        idle_worker_list;
--	struct rb_root          worker_tree;
-+	struct list_head        rootcg_cmd_list __guarded_by(&lo_work_lock);
-+	struct list_head        idle_worker_list __guarded_by(&lo_work_lock);
-+	struct rb_root          worker_tree __guarded_by(&lo_work_lock);
- 	struct timer_list       timer;
- 	bool			sysfs_inited;
+ int main(int argc, char **argv)
+ {
++	int flags =3D O_RDWR;
+ 	int ret;
+ 	int fd, filefd;
++	int c;
 =20
-@@ -92,8 +92,8 @@ struct loop_cmd {
- #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
- #define LOOP_DEFAULT_HW_Q_DEPTH 128
+-	if (argc !=3D 3)
++	while ((c =3D getopt(argc, argv, "r")) !=3D -1) {
++		switch (c) {
++		case 'r':
++			flags =3D O_RDONLY;
++			break;
++		default:
++			usage(argv[0]);
++		}
++	}
++
++	if (optind + 2 !=3D argc)
+ 		usage(argv[0]);
 =20
--static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
-+static __guarded_by(&loop_ctl_mutex) DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_validate_mutex);
+-	fd =3D open(argv[1], O_RDWR);
++	fd =3D open(argv[optind], flags);
+ 	if (fd =3D=3D -1) {
+ 		perror("open");
+ 		return EXIT_FAILURE;
+ 	}
 =20
- /**
-@@ -2107,10 +2107,10 @@ static int loop_add(int i)
- 	lo =3D kzalloc_obj(*lo);
- 	if (!lo)
- 		goto out;
--	lo->worker_tree =3D RB_ROOT;
--	INIT_LIST_HEAD(&lo->idle_worker_list);
-+	context_unsafe(lo->worker_tree =3D RB_ROOT);
-+	context_unsafe(INIT_LIST_HEAD(&lo->idle_worker_list));
- 	timer_setup(&lo->timer, loop_free_idle_workers_timer, TIMER_DEFERRABLE)=
-;
--	WRITE_ONCE(lo->lo_state, Lo_unbound);
-+	context_unsafe(WRITE_ONCE(lo->lo_state, Lo_unbound));
-=20
- 	err =3D mutex_lock_killable(&loop_ctl_mutex);
- 	if (err)
-@@ -2173,7 +2173,7 @@ static int loop_add(int i)
- 	lo->lo_number		=3D i;
- 	spin_lock_init(&lo->lo_work_lock);
- 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
--	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
-+	context_unsafe(INIT_LIST_HEAD(&lo->rootcg_cmd_list));
- 	disk->major		=3D LOOP_MAJOR;
- 	disk->first_minor	=3D i << part_shift;
- 	disk->minors		=3D 1 << part_shift;
-@@ -2405,6 +2405,7 @@ static void __exit loop_exit(void)
- 	 * module unloading is requested). If this is not a clean unloading,
- 	 * we have no means to avoid kernel crash.
- 	 */
-+	__assume_ctx_lock(&loop_ctl_mutex);
- 	idr_for_each_entry(&loop_index_idr, lo, id)
- 		loop_remove(lo);
-=20
+-	filefd =3D open(argv[2], O_RDWR);
++	filefd =3D open(argv[optind + 1], flags);
+ 	if (filefd =3D=3D -1) {
+ 		perror("open");
+ 		return EXIT_FAILURE;
+diff --git a/tests/loop/014 b/tests/loop/014
+new file mode 100755
+index 000000000000..5814b8148a26
+--- /dev/null
++++ b/tests/loop/014
+@@ -0,0 +1,107 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Google LLC
++#
++# Verify that attempting to change a loop device's backing file (via
++# LOOP_CHANGE_FD) to a file on a filesystem residing on one of its own
++# partitions triggers the kernel function loop_validate_file() and fails=
+.
++
++. tests/loop/rc
++
++DESCRIPTION=3D"trigger loop_validate_file() when changing backing file t=
+o own partition"
++QUICK=3D1
++
++loop_device=3D
++mount_dir=3D
++
++requires() {
++	_have_program mkfs.ext4
++	_have_program parted
++	_have_src_program loop_change_fd
++}
++
++cleanup() {
++	if [[ -n "$mount_dir" ]]; then
++		umount "$mount_dir" &>/dev/null
++	fi
++	if [[ -n "$loop_device" ]]; then
++		losetup --detach "$loop_device" &>/dev/null
++	fi
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++	_register_test_cleanup cleanup
++
++	mount_dir=3D"$TMPDIR/mnt"
++
++	truncate -s 1G "$TMPDIR/img"
++
++	if ! loop_device=3D"$(losetup --find --partscan --show "$TMPDIR/img")";=
+ then
++		echo "Failed to instantiate loop device"
++		return 1
++	fi
++
++	if ! parted --script "$loop_device" \
++		mklabel gpt \
++		mkpart primary 0% 50% \
++		mkpart primary 50% 100% >>"$FULL" 2>&1; then
++		echo "Failed to create partitions on loop device"
++		return 1
++	fi
++
++	udevadm settle
++
++	local part=3D"${loop_device}p2"
++	if [[ ! -b "$part" ]]; then
++		echo "Partition $part does not exist"
++		return 1
++	fi
++
++	if ! mkfs.ext4 -F "$part" >>"$FULL" 2>&1; then
++		echo "Failed to format $part with ext4"
++		return 1
++	fi
++
++	mkdir -p "$mount_dir"
++	if ! mount -t ext4 "$part" "$mount_dir" >>"$FULL" 2>&1; then
++		echo "Failed to mount $part on $mount_dir"
++		return 1
++	fi
++
++	truncate -s 1G "$mount_dir/file"
++
++	umount "$mount_dir"
++	losetup --detach "$loop_device"
++	udevadm settle
++
++	# Reopen the loop device in read-only mode so that LOOP_CHANGE_FD can b=
+e used.
++	if ! loop_device=3D"$(losetup --read-only --partscan --find --show "$TM=
+PDIR/img")"; then
++		echo "Failed to re-instantiate loop device in read-only mode"
++		return 1
++	fi
++
++	udevadm settle
++
++	part=3D"${loop_device}p2"
++	if ! mount -o ro -t ext4 "$part" "$mount_dir" >>"$FULL" 2>&1; then
++		echo "Failed to mount $part read-only on $mount_dir"
++		return 1
++	fi
++
++	# LOOP_CHANGE_FD triggers loop_validate_file() in the kernel, which mus=
+t
++	# detect that the backing file resides on a partition of this loop devi=
+ce
++	# and reject the change.
++	if src/loop_change_fd -r "$loop_device" "$mount_dir/file" >>"$FULL" 2>&=
+1; then
++		echo "Changing backing file succeeded unexpectedly"
++	fi
++
++	umount "$mount_dir"
++	mount_dir=3D
++
++	losetup --detach "$loop_device"
++	loop_device=3D
++	udevadm settle
++
++	echo "Test complete"
++}
+diff --git a/tests/loop/014.out b/tests/loop/014.out
+new file mode 100644
+index 000000000000..78a7928c5249
+--- /dev/null
++++ b/tests/loop/014.out
+@@ -0,0 +1,2 @@
++Running loop/014
++Test complete
