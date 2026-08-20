@@ -1,133 +1,82 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F1E3EC838
-	for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 23:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9AE23815B
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 00:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787184000; cv=none; b=GDMYmwKJaEnkj9SwdAvOKKrXqNwhdHkcMKB0vWVH6km3rSV7N0yuVpAQobwkxI+sao19PxYYdj7dtUqRqVvMVfi+wSwT8/C8ugK2ZBy/kNZGJnpAiqrw5iyiA4hTDTtcP2nPNfgvwiIxwoP3bc3f1843LzBx71dOOKndNgEJ7/U=
+	t=1787187372; cv=none; b=csekoBh1QmRE+qIJkjFXzYHt/byglYzwungByYPLzvyvcGpRkXoImflGPl/+4a0HQ5ivx+Js9yGuyA53LUItk40tnE2DrIdIGMqMU5Y1Z1GxY9bpjdm5/cMPmjSrZymNKV0sxkVUcK9rOxke3Lv4QPmPJvLt62RW0w2Lh/O/UBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787184000; c=relaxed/simple;
-	bh=NGp/aL9J6o0WYmHnohWsvAE5IdAJbRwI8aWJlovJsXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H0SxLMP+lf4MaQpeNnGuraLSSLuDtC2PrTjqBs8OFIETSnBy0Vf6ueanPISnCmPlUzRl148lwINaYbenNJN/SAkAiS9QGKJIMVCbybfni19Hyk6W9tm1930FfBC0JAYIh7hdMtvRXnk5FxcEIinP7JykZ+whwqs8mqUcqTSku9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOo4Affm; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOo4Affm"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-84862b0d5aeso1485795b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 16:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787183999; x=1787788799; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sLv4USOHSGhU+T0T1FSL7i8gQWx1GCa8Cf4zSXBJYXM=;
-        b=UOo4AffmBRNzbrzeIGhyS9M+DR3r68ADGTp0Ohq7tgP9DAdDWXa62tsUBF8f3vanYM
-         G1kni+ApT+WrhlibrZr5aJHzcww9D+Djuy6yXjK0/ZQHlN8Bvy9hmeRspLcS/mky+9aQ
-         Kq8qNuLX+LeRoA3wNntmNHgPaQn0S7AU4/osJv13dN8egm3wIFb5QdA2oB8o01+07EZ3
-         ujCa0smf3o0KdVsDDuuWcKKX0V5t8BVJPr18KfLQrwrVIEbzwpANKc4MXQFQbss/FOiv
-         i+mquYQeSYBMCDZHSSfqUDEryfW15Rxj0Mw4w0/huCdoK7khE/pZAjKB+q7iaUrp6jNR
-         8L4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787183999; x=1787788799;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sLv4USOHSGhU+T0T1FSL7i8gQWx1GCa8Cf4zSXBJYXM=;
-        b=SKuDlYaYp2EodH2eFaw/nnXe19lKh/1JOWkHu/XQc4EYpqAcYfuIeU7a13HQFCsYZS
-         XlpjMD9vV6243mC+pf6nLsuzk7Z+HY/b+WGaX6fIe+4Y1aona85oocmCPAKJOhAIHqZA
-         8o7WqMSjuJANjhAYIN/qz7/AM4w90jEzK5H9VOFU+8BXciRcUWmJ2B1TT95TwdD3PI7x
-         6+WbBZ7zZv0QxcRkmJ1GLbAACe0+7kSUyq62QnQqaOl9AC9HW1uInEYxOmXjMJx6Pf/V
-         oGZ3ev9WO6k0zy7PZAVjIZjOO7HOAiCb58xgLQ/Xw5nXemBpeKDJGXqM4KC5tGbTDtsi
-         pEwA==
-X-Forwarded-Encrypted: i=1; AHgh+RoW2LL69A8absqiMa+TgfOAPl8QaLCHJ3E8ZXNaZW54Q11FgSvjOlMvRQteIM9qSw2jFzpClkdOKAKMyA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy88wZ0+Un9WqaPmlsbvSVoX/qaHU2xXJvgs8CJ2Smun9WtFcJk
-	Pqwui0caNIAQUuvzapJkIuBjryVw4mQDTOeENEgYCs651FILSCn6c7zr
-X-Gm-Gg: AR+sD10o4/3oUgyZnN9FCBHCkDi8MCR4B6eoD4Oy33VWoSnvrnD0Ej/Ll3hb0RFO8Di
-	FkMvHS+GvzWcvQ8hARerf7QHNQCrd8XTZXfd1rUYH759fyi4mS6SHNFeEXxT8458muEc0TDmk2F
-	XLw2mRikqXHne38OwHzRuVMqVGSg9Af1O5938QiVfdJwDDvUO8Jd3AtDYESEUnC2Xg6LgJY0pGB
-	wBUiWMtoq+m3FpEJMraw07K6+v+2nvDsRFI+GlyCYc9TL/UQcpqNHfDO3l3XQKx1TzxW4Eny1EM
-	+1WBEaeiMtz1mRVP17Rtd8PAVsfif36Jx2z1y0JryAu2c5a89wvABA099B83ycBfMPCNpvXeLbV
-	URWDRNIEt3NfGkkS/6jYw6sIQfELvnEIuilcpUYUsLjUrEFQGEPb4aQ7a+b8bx22aj8aFY2fEz7
-	ZE+nLAhmzJFv0ncpKQk8SflfbkZ/ktbI7Q5ekABkMdnihveyrVS1ai7j8EO3Ma+HuH/LeCbDT5q
-	SycvA38
-X-Received: by 2002:a05:6a20:734e:b0:3c3:954d:278d with SMTP id adf61e73a8af0-3cd010ff4b9mr13863807637.9.1787183998514;
-        Wed, 19 Aug 2026 16:59:58 -0700 (PDT)
-Received: from devvm16600.scu0.facebook.com ([2a03:2880:9ff:66::])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327bef3ce17sm15822174eec.1.2026.08.19.16.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 16:59:58 -0700 (PDT)
-Date: Wed, 19 Aug 2026 16:59:55 -0700
-From: Ziyang Men <ziyang.meme@gmail.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Shuah Khan <shuah@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] block: add BPF kfuncs to read blkcg io.stat
-Message-ID: <aoZDe0yvb49flaOs@devvm16600.scu0.facebook.com>
-References: <20260817214205.723267-1-ziyang.meme@gmail.com>
- <20260817214205.723267-2-ziyang.meme@gmail.com>
- <aoSUob1s8WBQ3buO@slm.duckdns.org>
- <aoTdQeLZZuRirNHE@devvm16600.scu0.facebook.com>
- <aoTf7u20mo9s6ADj@slm.duckdns.org>
- <aoTkZhQDoaQKpPe3@devvm16600.scu0.facebook.com>
- <aoYVh1ihBH-TWvi3@slm.duckdns.org>
- <aoYsIYnoFDvjkzKp@devvm16600.scu0.facebook.com>
- <aoYzjaXQNmm9bDcE@slm.duckdns.org>
+	s=arc-20240116; t=1787187372; c=relaxed/simple;
+	bh=1nMSuv1BdRBJ6ggoL8KNoTEoEsA8LvL0J7ybengfuTo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=WKYidOCiLDJiURCGWYe/qepEd/Qa59JICHxnLAVb0r9kiAqeegicVQGdcyZFFf/o6IJOBMPhwMZl9MH1KlaVonvyP0PouDN1EyZ9wCzRhlPuAvX3hDuc/O4JoefJ6UXuFHhZ72IupYwKLcjT6zLre5hbkD4gMGfrGVs0jdjYZoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: e8626e769c3111f19a56ed5b684f684d-20260820
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_QP, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:066b6852-abf6-4c80-8ddb-455eba091a83,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:10
+X-CID-INFO: VERSION:1.3.19,REQID:066b6852-abf6-4c80-8ddb-455eba091a83,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:10
+X-CID-META: VersionHash:7db8b62,CLOUDID:55e9f2d24782c58d6ca998e0b11ac445,BulkI
+	D:260819162138MN74OV5N,BulkQuantity:1,SF:10|66|78|81|82|83|102|127|850|865
+	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:
+	nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,AR
+	C:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: e8626e769c3111f19a56ed5b684f684d-20260820
+X-User: sangyao@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <sangyao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 538528718; Thu, 20 Aug 2026 08:55:59 +0800
+From: Yao Sang <sangyao@kylinos.cn>
+To: shinichiro.kawasaki@wdc.com
+Cc: dwagner@suse.de,
+	linux-block@vger.kernel.org,
+	sangyao@kylinos.cn
+Subject: Re: [PATCH blktests] nvme/070: add multipath command effects log lifetime test
+Date: Thu, 20 Aug 2026 08:55:32 +0800
+Message-Id: <20260820005532.1564542-1-sangyao@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <aoVkX-G5f4WNiU8e@shinhome>
+References: <aoVkX-G5f4WNiU8e@shinhome>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aoYzjaXQNmm9bDcE@slm.duckdns.org>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Tejun,
-
-On Wed, Aug 19, 2026 at 12:51:57PM -1000, Tejun Heo wrote:
->Hello,
->
->On Wed, Aug 19, 2026 at 03:20:17PM -0700, Ziyang Men wrote:
->> Yes the css_rstat_flush() is exposed but currently it is marked as SLEEPABLE, so
->> it doesn't accept a RCU_PROTECTED css we proposed. This is not a problem for cpu
->> ones since &cgrp->self is a trusted pointer.
->
->Yeah, bummer, so we get ref on cgroups but the subsys pointers are RCU, so
->that means those refs are only RCU protected. I guess we can't avoid a kfunc
->to get acquire a subsys css from cgroup. I wish css_rstat_flush() didn't
->schedule but it does need that cond_resched().
-
-Yeah that would be a pity. I will add kfuncs bpf_cgroup_css() and
-bpf_css_release() to handle the reference for the css.
-
-The bpf_blkcg_flush_stats() will be removed as well.
-
-Thanks,
-Ziyang
-
->
->Thanks.
->
->-- 
->tejun
+Hi Shin'ichiro,=0D
+=0D
+Thanks for the review. I agree with the other suggestions, but I have one=0D
+concern about dropping the KASAN requirement.=0D
+=0D
+The issue is reliably reproducible with KASAN enabled. Without KASAN,=0D
+however, the test may pass even on an affected kernel and fail to catch=0D
+the bug. Given this limitation, do you think it is still appropriate to=0D
+remove the _have_kernel_options KASAN check?=0D
+=0D
+I will also update the commit message and test comments with the actual=0D
+kernel fix commit once it is merged.=0D
+=0D
+Thanks,=0D
+Yao=0D
