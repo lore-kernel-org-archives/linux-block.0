@@ -1,135 +1,115 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7F82941A
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 04:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787200251; cv=none; b=PEmK7ob6IkKJQO3lGqiSWW8xud4Tt6fGqH7xGaGNRLM7RR7W7mAek9a+iy6dPpljS41DQC8n5VjtvBk5bPLIjRhN3+QUQE/nuyr6jYyqurafBmIRIbqWpy3nW6F/0FbQAicBOGhql7SL8npkuFU9I9xB/1vDmyofBg9VW0tvxUM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787200251; c=relaxed/simple;
-	bh=Gsc3MPeb/UzqY/BGYUT5a0UEvbWSGnyUPXMlynGthYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xc7/Rh+F9QtTGLuXf6q6ZcKzDa8XkN9taJ7yBHMj2NnPfI4LAvRkO3nbATNbne7If+a0m/NlKSGBGI0ZlBBq+Evn+Zbqb8rc8C+AuzUDmTv33PI1mAkXelg5fVrwPBATICfdpKBpG600SoCVFmrn1Ms022Y/uGfCS6sNZqIMCHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sx8Oq6h/; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E2F2D9792
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 05:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787202939; cv=pass; b=HfCxL7s3P3nut/f1jjKrZnFunKCRa3hyuoKbhG7xYZJ2yqL107HrJc1RF6O79S138wwZRveiRMd60enNsOei/2RCJSNtCt7nfFtSh/+CwhvLzviPBZ5u0wMHTGfGuLqFnk5tqZ5/iccvzvXqIQXXLHwdAoi/VXUEHWwpRMc06dQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787202939; c=relaxed/simple;
+	bh=zTnTEoXTuFEFA/C1D4ThX4Y+an6VucxyKo4Nr/GlcI4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=grUkD6Nhb12taYyKHA02aZ0dwOsQX8pLPUZH6kDqvwZY/4AHi9skXQnUnXFg74lbyS+aUVh0gsJg1chC7/9xxyVdUF6mSd/tjwzD3VcC6Xa2Ay5ugfZlA/wkDwnqsFcCpiDfDrThqwPCXWF+QIOkq9VgAHnusbFNtEsOWCOr3hk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=pR7HueMf; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sx8Oq6h/"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2cedda2ce6fso10076325ad.1
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 21:30:48 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="pR7HueMf"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51c4436d02cso10342231cf.1
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2026 22:15:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787202936; cv=none;
+        d=google.com; s=arc-20260327;
+        b=NRsnIi2JSDVdWHv7Zp7Uru7aHD20xyp2NcLxEHQxpwOAB+rW26oXgS9FfacHU5sxZ3
+         H8o/U3keMqIqvgFwHxFnbSrPu+E+eDZ4n8bxGi5c9o4TL5RtLJ3Bw9srsA5bTYEkeS9D
+         BJFjQbUiUQJGVHHwLhCr9pI4L3fo/XO8f+JgtPytrfXoJUsZ+fWuT/FJdOcblVQakL0J
+         YxGFkeNqcDlxGyH10TtaIB2kwa2J2BWKOWdgmFZe0uZm6VjGw1HYHVkk9InsRrbv6WKQ
+         WN8Esl/R0aCGUhFdhAufF2ikZwGNbj6BZKzkd9+xwZxoJdt/Z1z0fVqFxDKPDEXB/BdQ
+         pReA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=i1qzFHY4MADO+pKP/rYIVSKWuTq1hiwkVURcjqrdi5U=;
+        fh=gP3NxASj+wAoEQu9w1YAxcMHKTjD+s2qTH3kR/MzDNQ=;
+        b=rlzJ64aZRpwSZHor6WWndsGV6mXMr4trXOJoOBnwpPqUU37BfU7kvw3ohUVCcct+f9
+         IDT2ZGPu0oU9z5amBqk7Fw6iTwWEfHxsz8Wf4h429ls51Wud9D7Iv/gMNVPhnx5aTpV5
+         7HDfTYQ7Dr18VO7LnQf6T57ZuhvRP/ohZ7zfJ+GaqV7rL9HL45ExSWe8Yz9Ip/+fVIKW
+         wss/Kko0sTyhV/T10SSA3mulOBcIQ2Qln35TmDEjo0rT0c68VBvxV/KSy3ccdbMAl6gL
+         4Lpdm1SNcFhdPHPJe+Xx6xyEHau4kVVvwohQDgB5tEyxJle5Iw0dq/o5rFeID0iWr1/k
+         oOoA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787200248; x=1787805048; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=I+IVgraoRn/WB9CLu47Q7vfnBpS7x8p+feFll9RC2u4=;
-        b=sx8Oq6h/vW7FhaWz3Gd7314Aegjdk5TMBbqc5hhK2/DztQhvMS63QsMg6nDxz90BrD
-         ZgyPH0S7tph7bXuJGbT4bWA8J3FhwAHlpmos4uqg4yTos/sbSxttIFxN/XE5TX+d1bA9
-         KQcfiwidYmKuNBAEDntylgC5Z/A7P3Yvz489TR0zDUeJoToeHeAJ5o+3mZsM1Bxu+gK/
-         eYvfZVgRIN+izhzgesaDlQybH98cY5RXxWCpzISoR90vzNTKmObXRfng9EGu1MIi0oXN
-         SOkmLuNVnw+7U7URellw80A+gXz/aLuSRSm2KxlIqRyxo/iibj6k2pn7uWQA+XvM4xx5
-         u5yw==
+        d=szeredi.hu; s=google; t=1787202936; x=1787807736; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=i1qzFHY4MADO+pKP/rYIVSKWuTq1hiwkVURcjqrdi5U=;
+        b=pR7HueMfPp5SsP/6XDPqV3w6AakvsUCG6mW9WHE221/ExmC0JJyUt0eAXIvrBlIQce
+         OaKeZJhSE6nLUxf6+5vvg44lt0DdRb4U0zCmhK/+AkGn5ccbepOfonR+P6DPnXkjCnYO
+         sQ5S7Nerxn7s8+7Dlj91Qv9cdLg7CjgI//4G8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787200248; x=1787805048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=I+IVgraoRn/WB9CLu47Q7vfnBpS7x8p+feFll9RC2u4=;
-        b=AlBItynFI6lF95XXC+Jor5nBcUXOCi5AZsQffQzbquUEle+SOa2Fb3i/wwDqOHrmwb
-         nW9z7UfhLsEz04OmjFiD9hmYli02nngxW7UXVII1tpU5ZkN/FFVWH6W5Yn6mMx0GKvOS
-         cqz4Yb+1oAbfRj6eR5BnRqiEIdRHUO2MuLJdJ/jWXxVhYXBLAfXpQSayp3i1gEex2HbO
-         MM8c0Aq3qC538KaszbyIPKQms10dIpvQmMWPeLB+JdzgfyXpos2MChz66f3lcdTlPmh3
-         GOwecM9OlBT3hWK46MeBp7+yC0bAQ710n0VqxvvRqJAzz95WBjCIRWyCTj7p2jmKUZn5
-         aqPw==
-X-Forwarded-Encrypted: i=1; AHgh+RoaJQdzhjDM9BNl7ouIP+4DXGD6+GruHek4qT9oyhtFY7iTefIaxYIM/7dV2yfHJYMPLaRvgzAEp6PgSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ0QDkzB18uE8wy94fXlhrNyk+LPyFCLjnzPGsruu9ZnGocLUM
-	X1l7UQIafpUTmAyLQQ+a9WgZeyCm2I4apWIFAyDvt9Yq4H9Ufwbulw0=
-X-Gm-Gg: AR+sD11x37jmYPh4ameYEfPA1j3Nyi+GFB5hWasY4J6QvWeTW6/WuDoWXTfyGbW2Kq5
-	0kYDMwlwY2NAMxSTRdLwErAmydL6uzoLq5sjMEuKOS9pXMzhqLr1DadauKOvqoKJzyy5NnOJsFf
-	MnJnfK37fbRVL+Yk8FSUbrkooPjfCtfHzCh8qfVco8eIY4YP/jWUzvlkUNJbIDR/K5ACJlUMZ7b
-	mtPJXt/LX974eyRQUOhJLzTDVGVgZ+cBgCCU7OELDOdMtIOZ4sI0hJ2eUV7gw6wjPeWDUMEA5SZ
-	pml4pydEF4lzeOaSbkkK/1Uc1JygDMdyTSlI4g8Ld8pacgrrLMGelggLeG37zQftqEStTNeIlAJ
-	/6HppsJULU9bPyztbxu5XOGILeRD4Z6jfshg+MBCwEdjmkjtgIHJBWY+MCF+G2UAdufXI5HEPP+
-	+HSUgVvvuS9oqrOIZr9iD4CaBMyS3+HfaDbd0ZH+gfuYoSH/yU4o3tP/a5XlFktBLFobvTyln9a
-	A==
-X-Received: by 2002:a17:903:2bcb:b0:2cc:9179:32e with SMTP id d9443c01a7336-2d601e80fd8mr190373025ad.10.1787200247727;
-        Wed, 19 Aug 2026 21:30:47 -0700 (PDT)
-Received: from DL2XHKPB4.dl.net ([103.63.104.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d62e4ca49esm1760065ad.80.2026.08.19.21.30.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 21:30:47 -0700 (PDT)
-From: Triet Hoang <triet.hoang.dev@gmail.com>
-To: axboe@kernel.dk
-Cc: dbgh9129@gmail.com,
-	triet.hoang.dev@gmail.com,
-	mateusz.nowicki@posteo.net,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] mtip32xx: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
-Date: Thu, 20 Aug 2026 11:30:33 +0700
-Message-ID: <20260820043033.1945613-1-triet.hoang.dev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1787202936; x=1787807736;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=i1qzFHY4MADO+pKP/rYIVSKWuTq1hiwkVURcjqrdi5U=;
+        b=iph26pQisuTt1m+orriy9+CEm7yE3+vr/Z3dGIWgksmo7eUzWf3RfveKjtcFcddkJO
+         OeSh3CH7Hwf6jhUyldKrq52Q9q/BJVXaq1v9A3M/Bb4ur382sZ0qJXUMNfuuguTCf0iF
+         jtSaWcp/Sd77MlVmeLVX9EJami4wYNzkv5h/WRBx8MbhIJEn/K67cM+tuq4lhbAVEuAm
+         yqueaBjud4ODhF93tLJlyVtV037m8ksvx7vmCxHK6QpdBMNkEZhLOOWvWBvw75r39wd1
+         YIRKY9m6mWxsKRMxcgNKTllwf9hYB4F54jpoc05o9kPoY8By9zfC7BfOoWamXITkrCmI
+         LyJg==
+X-Forwarded-Encrypted: i=1; AHgh+RqQrOEslEjJvqiX50IThMz9TWjNDxTmHdP7gQEwScQCGtO44yJpb7JclinUqCGyWIR2eE3N26hDp6zdCg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ76qgXdAX20YbC0It1Ll+D6abdbCYJvsI8nxnXrDdBVObtHrn
+	/CogvVbQNv/Gne4hooOWO78pGRqpAatR5gw30SQQhKqWVCuhNbxzzLCahBeDgyyRiwoGsqK2FIN
+	3bxQxCww2lrcggwdVW69vW00fgRhpqhp0OuPFIvpC1Q==
+X-Gm-Gg: AR+sD13n6ssGqcX8MdmYfXbsBDhvLojdBj4gP/rBFQZzGZaq2uWbpw4n8MAs53ZRAfP
+	zOuboGYEXaa+dCH2DudhnhRpciMAkys6x6ZYt8LZGJh1+J4oenUvNEtyOSoksTFfsiXMCFFV5oa
+	z2srSqEU+8euzfRMmbKw3nzx5Dh6oFbydWLcLzA5HlDwcgY+I30M30jAfHu574nq4LjxdM+zKIO
+	3dwp19Rc8/bKfS13GxAxgu5wzapA4C1Xk0DDEUchHzJRn0hlqXe1Ws6xCMOzf2XVfdLOb8TgKbj
+	goNGPYkB3TQyFrhD1NjYLso+ivisi2bP0gHwNTCigSOC4pexO04ffcCG3pcwfntdH+Ff8HYASzX
+	oaf+KSvecJto=
+X-Received: by 2002:a05:622a:608f:b0:51c:1e2f:1281 with SMTP id
+ d75a77b69052e-52dd5e1114cmr96727921cf.42.1787202936231; Wed, 19 Aug 2026
+ 22:15:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260717125538.508925-1-joshi.k@samsung.com> <CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
+ <20260717125538.508925-2-joshi.k@samsung.com> <20260721030338.GU7380@frogsfrogsfrogs>
+ <71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com> <20260730172211.GF3556460@frogsfrogsfrogs>
+ <20260819070459.GA1541@lst.de>
+In-Reply-To: <20260819070459.GA1541@lst.de>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Thu, 20 Aug 2026 07:15:25 +0200
+X-Gm-Features: AcwNN1XXT5xefF0BXUU_TM3qwY6KZTggS9AZTFDK2j8DH58mqjaIjJ16-hbRpyc
+Message-ID: <CAJfpeguAkB01swoTKmqcEOQrej3g8yjr2RZSPQQPeo-4UE908g@mail.gmail.com>
+Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Kanchan Joshi <joshi.k@samsung.com>, brauner@kernel.org, 
+	dgc@kernel.org, jack@suse.cz, cem@kernel.org, axboe@kernel.dk, 
+	kbusch@kernel.org, ritesh.list@gmail.com, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Convert the deprecated SIMPLE_DEV_PM_OPS
-to DEFINE_SIMPLE_DEV_PM_OPS and pm_sleep_ptr().
+On Wed, 19 Aug 2026 at 09:06, Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Thu, Jul 30, 2026 at 10:22:11AM -0700, Darrick J. Wong wrote:
 
-This lets us drop the __maybe_unused annotations from its suspend and
-resume callbacks, and reduces kernel size in case CONFIG_PM or
-CONFIG_PM_SLEEP is disabled.
+> > passing through to another layer (e.g. fuse) assume that the third
+> > argument is a pointer and that it can copy sizeof(data_type) bytes at
+> > that address in and out of the kernel as part of marshalling.
+>
+> That is not a good assumption and things will break.
 
-Fixes: cd97b7e0d780 ("mtip32xx: convert to generic power management")
+Right.  Fuse server should send a whitelist of ioctl numbers it can handle.
 
-Signed-off-by: Triet Hoang <triet.hoang.dev@gmail.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+But ioctl's are a bad interface anyway.  Why not add proper syscalls instead?
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f214a616386c..cf44e281d7b3 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3937,7 +3937,7 @@ static void mtip_pci_remove(struct pci_dev *pdev)
-  *	0  Success
-  *	<0 Error
-  */
--static int __maybe_unused mtip_pci_suspend(struct device *dev)
-+static int mtip_pci_suspend(struct device *dev)
- {
- 	int rv = 0;
- 	struct driver_data *dd = dev_get_drvdata(dev);
-@@ -3959,7 +3959,7 @@ static int __maybe_unused mtip_pci_suspend(struct device *dev)
-  *      0  Success
-  *      <0 Error
-  */
--static int __maybe_unused mtip_pci_resume(struct device *dev)
-+static int mtip_pci_resume(struct device *dev)
- {
- 	int rv = 0;
- 	struct driver_data *dd = dev_get_drvdata(dev);
-@@ -4002,7 +4002,7 @@ static const struct pci_device_id mtip_pci_tbl[] = {
- 	{ 0 }
- };
- 
--static SIMPLE_DEV_PM_OPS(mtip_pci_pm_ops, mtip_pci_suspend, mtip_pci_resume);
-+static DEFINE_SIMPLE_DEV_PM_OPS(mtip_pci_pm_ops, mtip_pci_suspend, mtip_pci_resume);
- 
- /* Structure that describes the PCI driver functions. */
- static struct pci_driver mtip_pci_driver = {
-@@ -4010,7 +4010,7 @@ static struct pci_driver mtip_pci_driver = {
- 	.id_table		= mtip_pci_tbl,
- 	.probe			= mtip_pci_probe,
- 	.remove			= mtip_pci_remove,
--	.driver.pm		= &mtip_pci_pm_ops,
-+	.driver.pm		= pm_sleep_ptr(&mtip_pci_pm_ops),
- 	.shutdown		= mtip_pci_shutdown,
- };
- 
--- 
-2.53.0
-
+Thanks,
+Miklos
