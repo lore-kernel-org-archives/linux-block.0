@@ -1,63 +1,63 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346BA48662F
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD10548422B
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787260697; cv=none; b=f28MDTaiMLD3a3KX3ITqj4IpB1XXx/Y/OmtvmfvJLct1ez4Gwgd/6l3Oos3MjGtprs0NBmtcibzDzJWCqSmGHcoMb20TVIJXBK8nNw2FLy6F40FmeDMy+TSVpwallcnT9dDdrDZoXVuHwq3ezecgj3/OrxtyT/2kziG7kyp4fWs=
+	t=1787260697; cv=none; b=gsMBEeY4bJwe+icwOdcdeUbwrrkZgoBDihnBgkVZhYvT0IDtFnn7B0vurLsX+9gD8liaj9e3cEbZxa3V1e2vS7OhvfkAi4KT6gbGKpQMs3OqwsbVMqPY1ltOicg6f0UfCUSGTFPX/rKt0/ehDxnEodXCIsbaYH4/0bBbgCgB1l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787260697; c=relaxed/simple;
-	bh=KGpOGxE5aDGI+YJk6SVQmRM6Iyv3svPXmm0zCZ8M3JM=;
+	bh=TDKffd9Fkjz0NiAHzS4kTGbp08DKmog+dRzwJOqZg8Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RQTFbNnhiv1QTjm0+DV+mhEbgnjYOr73zZ+Znq5cxVYTOGT8cfz50eRVNIFf02WRJkZymMA0mP/Ux3ZPzeIYr5BUcf6v55AuTfVaH5UfG3PFTmBcETN4QSd9t6hqVKlvtUSazXI8gYAAdFOEGNRj7yb5L50P5zih36/GfQtNbNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvGTBne3; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=Sxd65ryQBauSzhx7L7MayArfs7UzcGWFkJHrUG3t8S/c6Q7E2d+zG9Pcj9WtURVyGtRNg4BKZyFOj+KvHC+5hOF/fXxiMQ3+t2dGQ0wmcjLxGU593kbLzwVWz8jPGx7stcdOYxwCfLsWvpKG6MP+IbINcQpZMDPpD4Suav3fkuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDxkV+Yi; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvGTBne3"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3811f512167so304703a91.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:18:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDxkV+Yi"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2cf50c6f235so4461875ad.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787260688; x=1787865488; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787260686; x=1787865486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pTVI5fQqcRejLtqxc3simDI2MaSc8wcnSCEjipsJOUc=;
-        b=CvGTBne3x3dy5StvYbKotfPM5CN0GGYIGCQPgCOQZ1TcPV6eoK2rUX9qFwEDyPrF9w
-         NB9eC9mny7lv7Sis4mQmIIg81RhW5W5mpHt1/dom96+hdQWxR4uijPnIJitTtVSeSK3F
-         Pp3Hk6DysR+0IPIY4mrMrC4hoFowXtY0PJMPQ6zBNpoXtCA/Hd613mQ7UObIlnz4urds
-         GEky3vPDsd9ZNLzEuK2u11C4MkixiQA6f1afkOodNilaPQ3ePYtYm/u64G2PXKPYNeyi
-         uuFLvwpw5n3EK5y9XVs+G9T+8ujXlXG4Aheqh42ClzAt8rz1v9sRtuCUbymYk/ZmuoDO
-         gHVg==
+        bh=usT9UbJbbjXSkfskstVIX1ccjxiE/NzHiKaVTFkNt1M=;
+        b=EDxkV+YiM+3P8ZsBGZDQBhg34IhQD3pdLX01CwkZRuHWiqwV6uUhmTaR5c074TqfF/
+         wh2eypQ4eZHNMUbJWR6QIESpaU0ftq+n7JwoVVPjMWLFNjFE9jQj05qmLMm21K48PjmC
+         LRD8R1LFRLSQ6ddKD0fbuh9Otx4U4mgF89PX92i6A8HtHZgBqnYxRV2k5GynMDJ8OrVL
+         u4astMIfbANf0oNNWuod6lk/iBwsGKirSxQCEHBNEf9jOBWk57ncuGk9iSHdQIJRbauD
+         iut0DDwSuayt6koBJQFZkeiGSW96wXBQ9BTdo65+MKPMo4IJ26MBfyIKC1eedNS7EMxU
+         sfiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787260688; x=1787865488;
+        d=1e100.net; s=20251104; t=1787260686; x=1787865486;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=pTVI5fQqcRejLtqxc3simDI2MaSc8wcnSCEjipsJOUc=;
-        b=FM9E9MF5UgjvXq5xob9rUCZHFQ+CLfPd8Pd41NUz6xNYg1blFf/htc66QZtGGmDXSt
-         nppoiEvRYR53b6MRjnBaxh7S5MyCHEzFaa+Wpg//QmsSSNL83nMXho+V32cqJK8aJ94B
-         A2/xNRrtlQ+ZJ1DOxRvjjfExLiZuYTskrTDdJhDqL9YZuwfOnhLwsp/mmL3gJrAvtvFL
-         j5NBBLvIWp5Z/DI4UXboe87RWyB2aIl2ZiDCR+EKAEJeZbm/SK42dNGHilBVaFhDQ2N2
-         TJ5OA6i/fkFrITDdTm5JSGDGYOEc7IXnr9mLWERrh8Mb85dJpL60GKxCtomJ0o+pakTc
-         XD6w==
-X-Forwarded-Encrypted: i=1; AHgh+RpMMU8Z/Icex1v1yYKckli+7wovwUQN2Hj+s/yXKuWgiHnJGM0OLzv3oKOfIarPIaOtYFH9U3T/IcY57g==@vger.kernel.org
-X-Gm-Message-State: AFuF++nweyuzoj2zFgfrmuGSHHzepFNV2J7kOzpDxf/IdGqgCqLS4xUH
-	hVaumnwQAEfPATkG8FnJOnfMVhbKQSuLofbMoCtwCNV2+hw3l2khLHJS
-X-Gm-Gg: AR+sD11WNdXLaTb8yCpRsR6h0uT9SNHwk8giflXpeO+EyuK1hkNh/ihdSY0GH4jFtLr
-	YULBh9x+r1mczJbNbbhuVep4owlf1AcshO2E/hASZJW/0I+xTg+rJEXeMso0EchL4GNgtoGa+IP
-	ytvni4Xcm7wESQLFSTM9cZD4Urt770oHhM08oQ1JSvIk5qkItL6iP18nppD0kxA9WkTQSG9dF9O
-	YeCy3aTIn9ZGmjVBws9lmnPRFH5Dvdh32eso2D0az6tKHJVUzZf6G7QQnPnXhjfJL+xrvR5pFpT
-	ljpVXxN6mpG0L0Bt9N6V/HeABwayCzQEU69R8GaLnfQYVI5Brf3MGhSLi66f1BcYvWkpZ9lFzfH
-	oFIJ2pzFev/6eyMsyoswgjOmJvblIghnLpG0WP0aAZLjg7HEGOeV9lGnDhL7MhYCA3ZQzjAn1pR
-	QlbQx4sgG12yPtcZ5LdOW7TUNGihOcssU/VUa5JMv/HyQYZFSEtBNWesc=
-X-Received: by 2002:a17:90b:1c90:b0:393:19a3:4f1 with SMTP id 98e67ed59e1d1-395c351d788mr2396492a91.6.1787260687664;
-        Thu, 20 Aug 2026 14:18:07 -0700 (PDT)
-Received: from localhost ([2a03:2880:9ff:40::])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1416ad53874sm30447128c88.4.2026.08.20.14.18.06
+        bh=usT9UbJbbjXSkfskstVIX1ccjxiE/NzHiKaVTFkNt1M=;
+        b=M2dcwf4811QOYnC8J5HjZZZC3iTY/9clziGAPisMzSPdwTCoIkdv1lcFSFr8eQNw66
+         9UckkpxUIbyl43ucHQ/QtiS7dnvrxB/nr0DL2ZIsGQUOXRK/0JbJ4kq0fU2Gu+blr4D1
+         z9QkkLvn+SrX/tFzfRl4keQlDHYfDiRj78j6ka9NlzCr+qTnq2zxyBKyASYJgoNtpOkC
+         XYAK5LmUpj8GClLkP389gZXrG/BvyA7BGHuBPsuBW4KfQNKtfckcLdjxkDbHfRjd6qNy
+         CrdemFFMliO4sP9z1WGFSDSimuwbRz5EotIoTFjj4M2yVSgEEhTp7OWEbY8SE12e1Oaq
+         63cQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rok8THlN4E3iNLeXvT8p2wiW6h/Q/NPntKxUFKT6wC61IxCsjmicUI3MMLgabWu2sS/Lk4fwBGtdBj4WA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoqWqQ2hfSAB2gxB7gl1YFtj4j/gK41a2qQMeJ0GSg3s4Z+0Ep
+	p9D5qv/SStSWkLfpQ2hpWPL7eDN7/iHtiqj3Q4WwdVKwo5PvjLJaQY46
+X-Gm-Gg: AR+sD13XwPzPzr/XptZJ88k4/P9o73iCS93fOSyswXV9hM8Qv0pZJfgEQXBejKnG5DN
+	j0WX+UqCa+dUUgxTMg0Oqvg9O8t3dPtB/nLoroc9ESLPN/lZWWB/MtlnzQBTNjQYtXpGnzfzuWU
+	faeeIoqNYmgavLTNihQl/OLxn2jlGiOfcd19SoA9fOqSI8fZroGSO8VOmDXr/IjVJGc6u31JP7u
+	bRB+3lBSzFJajwErGdoI4F2JyyerR0R4/kgEKiCbHDAxGxV/EGGNYxjggTEXBVNCXNkzfhYE2XN
+	bg6RJWT80XPllXshkL3K0/Ryn3g2XGTvS9/ILyzKlB/Kky7/WeWfKEcA8m9jvL+OiDwz65qaEJc
+	lq7B+SdXKOFatJwKzRE124lWLcgojXrmOSLZU1MK4VTyYE2qHJVbfhhxC1HnI9/xJeaHpn/IHam
+	8v1e2uVGBnezDJL5Fvemsnpk+9xSfHsPGcfQKHaDNUgr/S19EZ4okNo34=
+X-Received: by 2002:a17:903:b07:b0:2d0:cc92:f7a3 with SMTP id d9443c01a7336-2d64ada8eb8mr29906555ad.2.1787260686112;
+        Thu, 20 Aug 2026 14:18:06 -0700 (PDT)
+Received: from localhost ([2a03:2880:9ff:66::])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327d01ff056sm11599824eec.19.2026.08.20.14.18.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 14:18:07 -0700 (PDT)
+        Thu, 20 Aug 2026 14:18:05 -0700 (PDT)
 From: Ziyang Men <ziyang.meme@gmail.com>
 To: kernel-team@meta.com,
 	Jens Axboe <axboe@kernel.dk>,
@@ -91,9 +91,9 @@ Cc: Ingo Molnar <mingo@redhat.com>,
 	cgroups@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] selftests/bpf: add test for blkcg io.stat BPF kfuncs
-Date: Thu, 20 Aug 2026 14:17:58 -0700
-Message-ID: <20260820211758.3393984-5-ziyang.meme@gmail.com>
+Subject: [PATCH v3 3/4] block: add BPF kfuncs to read blkcg io.stat
+Date: Thu, 20 Aug 2026 14:17:57 -0700
+Message-ID: <20260820211758.3393984-4-ziyang.meme@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260820211758.3393984-1-ziyang.meme@gmail.com>
 References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
@@ -105,397 +105,298 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add cgroup_iter_io to test the blkcg io.stat BPF kfuncs. The BPF
-program acquires the I/O css, flushes its statistics, converts it to a
-typed blkcg under RCU, walks the blkgs, and releases the css reference.
+Collecting cgroup statistics is expensive because the existing method
+opens and parses a cgroup file for every cgroup. memcg already provides
+an efficient BPF interface; extend that model to the block controller.
 
-The test performs O_DIRECT I/O on a private loop device. It checks the
-device ID and counters against io.stat.
+Add bpf_cgroup_css() and bpf_css_release() to acquire a controller's
+css from a cgroup. The reference keeps the css alive across the
+sleepable css_rstat_flush().
 
+Add bpf_css_to_blkcg() as a checked RCU-protected css-to-blkcg
+conversion and an open-coded iterator for the per-device blkgs.
+
+Suggested-by: Shakeel Butt <shakeel.butt@linux.dev>
+Suggested-by: Tejun Heo <tj@kernel.org>
 Assisted-by: Claude:claude-opus-5
 Signed-off-by: Ziyang Men <ziyang.meme@gmail.com>
 ---
- tools/testing/selftests/bpf/cgroup_iter_io.h  |  17 ++
- tools/testing/selftests/bpf/config            |   1 +
- .../selftests/bpf/prog_tests/cgroup_iter_io.c | 254 ++++++++++++++++++
- .../selftests/bpf/progs/cgroup_iter_io.c      |  74 +++++
- 4 files changed, 346 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/cgroup_iter_io.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
- create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_io.c
+ MAINTAINERS                |   1 +
+ block/Makefile             |   3 +
+ block/bpf_blkcg.c          | 138 +++++++++++++++++++++++++++++++++++++
+ kernel/cgroup/bpf_cgroup.c |  62 ++++++++++++++---
+ 4 files changed, 194 insertions(+), 10 deletions(-)
+ create mode 100644 block/bpf_blkcg.c
 
-diff --git a/tools/testing/selftests/bpf/cgroup_iter_io.h b/tools/testing/selftests/bpf/cgroup_iter_io.h
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2f9472c1a090..87c56e955577 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6617,6 +6617,7 @@ F:	block/blk-cgroup.c
+ F:	block/blk-iocost.c
+ F:	block/blk-iolatency.c
+ F:	block/blk-throttle.c
++F:	block/bpf_blkcg.c
+ F:	include/linux/blk-cgroup.h
+ 
+ CONTROL GROUP - CPUSET
+diff --git a/block/Makefile b/block/Makefile
+index e7bd320e3d69..572e49988c8e 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -17,6 +17,9 @@ obj-$(CONFIG_BLK_ERROR_INJECTION) += error-injection.o
+ obj-$(CONFIG_BLK_DEV_BSG_COMMON) += bsg.o
+ obj-$(CONFIG_BLK_DEV_BSGLIB)	+= bsg-lib.o
+ obj-$(CONFIG_BLK_CGROUP)	+= blk-cgroup.o
++ifdef CONFIG_BPF_SYSCALL
++obj-$(CONFIG_BLK_CGROUP)	+= bpf_blkcg.o
++endif
+ obj-$(CONFIG_BLK_CGROUP_RWSTAT)	+= blk-cgroup-rwstat.o
+ obj-$(CONFIG_BLK_CGROUP_FC_APPID) += blk-cgroup-fc-appid.o
+ obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
+diff --git a/block/bpf_blkcg.c b/block/bpf_blkcg.c
 new file mode 100644
-index 000000000000..f4bbaaccdf71
+index 000000000000..d8ab8006bc57
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/cgroup_iter_io.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-+#ifndef __CGROUP_ITER_IO_H
-+#define __CGROUP_ITER_IO_H
++++ b/block/bpf_blkcg.c
+@@ -0,0 +1,138 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Block I/O Controller-related BPF kfuncs and auxiliary code
++ */
 +
-+struct io_query {
-+	/* one device's io.stat counters */
-+	__u64 rbytes;
-+	__u64 wbytes;
-+	__u64 rios;
-+	__u64 wios;
-+	__u64 dbytes;
-+	__u64 dios;
-+	__u64 dev;	/* dev_t of the device the counters belong to */
-+};
++#include "blk-cgroup.h"
 +
-+#endif /* __CGROUP_ITER_IO_H */
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 482b40dde2f9..0e10d625de6e 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -1,3 +1,4 @@
-+CONFIG_BLK_CGROUP=y
- CONFIG_BLK_DEV_LOOP=y
- CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
- CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=1
-diff --git a/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
-new file mode 100644
-index 000000000000..2267780912d8
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
-@@ -0,0 +1,254 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-+#define _GNU_SOURCE
-+#include <test_progs.h>
-+#include <bpf/libbpf.h>
-+#include <fcntl.h>
-+#include <linux/loop.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/stat.h>
-+#include <sys/sysmacros.h>
-+#include <unistd.h>
-+#include "cgroup_helpers.h"
-+#include "cgroup_iter_io.h"
-+#include "cgroup_iter_io.skel.h"
++#include <linux/bpf.h>
++#include <linux/btf_ids.h>
++#include <linux/rculist.h>
 +
-+#define IO_SIZE (4 * 1024 * 1024)
++__bpf_kfunc_start_defs();
 +
-+static int read_stats(struct bpf_link *link)
++/**
++ * bpf_css_to_blkcg - Cast an io controller css to its block cgroup
++ * @css: io controller css
++ *
++ * Must be called under RCU.
++ *
++ * Return: The block cgroup, or NULL if @css belongs to another controller.
++ */
++__bpf_kfunc struct blkcg *
++bpf_css_to_blkcg(struct cgroup_subsys_state *css)
 +{
-+	int fd, ret = 0;
-+	ssize_t bytes;
++	if (unlikely(css->ss != &io_cgrp_subsys))
++		return NULL;
 +
-+	fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(fd, "bpf_iter_create"))
-+		return 1;
-+
-+	/* Results land in skel->data_query; the read itself returns no data. */
-+	bytes = read(fd, NULL, 0);
-+	if (!ASSERT_EQ(bytes, 0, "read fd"))
-+		ret = 1;
-+
-+	close(fd);
-+	return ret;
++	return css_to_blkcg(css);
 +}
 +
-+/* Set up a loop device for cgroup-charged I/O. */
-+static int loop_setup(char *loop_path, size_t sz, int *ctl_fd, int *loop_fd,
-+		      int *back_fd)
-+{
-+	char back_path[] = "/tmp/cgroup_iter_io.XXXXXX";
-+	int nr;
++struct bpf_iter_blkg {
++	__u64 __opaque[2];
++} __aligned(8);
 +
-+	*ctl_fd = *loop_fd = *back_fd = -1;
-+
-+	*ctl_fd = open("/dev/loop-control", O_RDWR | O_CLOEXEC);
-+	if (*ctl_fd < 0)
-+		return -1;
-+
-+	nr = ioctl(*ctl_fd, LOOP_CTL_GET_FREE);
-+	if (nr < 0)
-+		goto err;
-+	snprintf(loop_path, sz, "/dev/loop%d", nr);
-+
-+	*back_fd = mkstemp(back_path);
-+	if (*back_fd < 0)
-+		goto err;
-+	unlink(back_path);
-+	if (ftruncate(*back_fd, (off_t)IO_SIZE * 4))
-+		goto err;
-+
-+	*loop_fd = open(loop_path, O_RDWR | O_CLOEXEC);
-+	if (*loop_fd < 0)
-+		goto err;
-+	if (ioctl(*loop_fd, LOOP_SET_FD, *back_fd))
-+		goto err;
-+
-+	return 0;
-+err:
-+	if (*loop_fd >= 0)
-+		close(*loop_fd);
-+	if (*back_fd >= 0)
-+		close(*back_fd);
-+	close(*ctl_fd);
-+	*ctl_fd = *loop_fd = *back_fd = -1;
-+	return -1;
-+}
-+
-+static void loop_teardown(const char *loop_path, int ctl_fd, int loop_fd,
-+			  int back_fd)
-+{
-+	int nr = -1;
-+
-+	if (loop_fd >= 0) {
-+		ioctl(loop_fd, LOOP_CLR_FD, 0);
-+		close(loop_fd);
-+	}
-+	if (back_fd >= 0)
-+		close(back_fd);
-+	if (ctl_fd >= 0) {
-+		if (sscanf(loop_path, "/dev/loop%d", &nr) == 1 && nr >= 0)
-+			ioctl(ctl_fd, LOOP_CTL_REMOVE, nr);
-+		close(ctl_fd);
-+	}
-+}
-+
-+/* O_DIRECT keeps I/O charged to the current cgroup. */
-+static int do_direct_io(const char *loop_path)
-+{
-+	void *buf;
-+	int fd, ret = -1;
-+
-+	fd = open(loop_path, O_RDWR | O_DIRECT | O_CLOEXEC);
-+	if (fd < 0)
-+		return -1;
-+	if (posix_memalign(&buf, 4096, IO_SIZE))
-+		goto out_fd;
-+	memset(buf, 0xab, IO_SIZE);
-+
-+	if (pwrite(fd, buf, IO_SIZE, 0) != IO_SIZE)
-+		goto out_buf;
-+	fsync(fd);
-+	if (pread(fd, buf, IO_SIZE, 0) != IO_SIZE)
-+		goto out_buf;
-+	ret = 0;
-+out_buf:
-+	free(buf);
-+out_fd:
-+	close(fd);
-+	return ret;
-+}
-+
-+/* Read @dev's io.stat counters. @dev uses kernel dev_t encoding. */
-+static int parse_io_stat(int cgroup_fd, __u64 dev, struct io_query *out)
-+{
-+	unsigned int want_maj = dev >> 20, want_min = dev & ((1U << 20) - 1);
-+	char buf[4096], *line, *saveptr;
-+	int fd, n, ret = -1;
-+
-+	fd = openat(cgroup_fd, "io.stat", O_RDONLY);
-+	if (fd < 0)
-+		return -1;
-+	n = read(fd, buf, sizeof(buf) - 1);
-+	close(fd);
-+	if (n <= 0)
-+		return -1;
-+	buf[n] = '\0';
-+
-+	for (line = strtok_r(buf, "\n", &saveptr); line;
-+	     line = strtok_r(NULL, "\n", &saveptr)) {
-+		unsigned long long rb = 0, wb = 0, ri = 0, wi = 0, db = 0, di = 0;
-+		unsigned int maj, min;
-+
-+		/* Only the device id is required; missing counters stay zero. */
-+		if (sscanf(line,
-+			   "%u:%u rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
-+			   &maj, &min, &rb, &wb, &ri, &wi, &db, &di) < 2)
-+			continue;
-+		if (maj != want_maj || min != want_min)
-+			continue;
-+
-+		out->rbytes = rb;
-+		out->wbytes = wb;
-+		out->rios = ri;
-+		out->wios = wi;
-+		out->dbytes = db;
-+		out->dios = di;
-+		ret = 0;
-+		break;
-+	}
-+	return ret;
-+}
-+
-+void test_cgroup_iter_io(void)
-+{
-+	char *cgroup_rel_path = "/cgroup_iter_io_test";
-+	int ctl_fd = -1, loop_fd = -1, back_fd = -1;
-+	struct cgroup_iter_io *skel = NULL;
-+	struct bpf_link *link = NULL;
-+	char loop_path[64];
-+	struct io_query *q;
-+	int cgroup_fd;
-+
-+	cgroup_fd = cgroup_setup_and_join(cgroup_rel_path);
-+	if (!ASSERT_OK_FD(cgroup_fd, "cgroup_setup_and_join"))
-+		return;
-+
-+	if (loop_setup(loop_path, sizeof(loop_path), &ctl_fd, &loop_fd, &back_fd)) {
-+		test__skip();	/* needs root + CONFIG_BLK_DEV_LOOP */
-+		goto cleanup_cgroup_fd;
-+	}
-+
-+	skel = cgroup_iter_io__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "cgroup_iter_io__open_and_load"))
-+		goto cleanup_loop;
-+
-+	/* Convert glibc st_rdev to kernel dev_t format. */
-+	{
-+		struct stat lst;
-+
-+		if (!ASSERT_OK(fstat(loop_fd, &lst), "fstat loop"))
-+			goto cleanup_skel;
-+		skel->data_query->target_dev =
-+			((__u64)major(lst.st_rdev) << 20) | minor(lst.st_rdev);
-+	}
-+
-+	DECLARE_LIBBPF_OPTS(bpf_iter_attach_opts, opts);
-+	union bpf_iter_link_info linfo = {
-+		.cgroup.cgroup_fd = cgroup_fd,
-+		.cgroup.order = BPF_CGROUP_ITER_SELF_ONLY,
-+	};
-+	opts.link_info = &linfo;
-+	opts.link_info_len = sizeof(linfo);
-+
-+	link = bpf_program__attach_iter(skel->progs.cgroup_io_query, &opts);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		goto cleanup_skel;
-+
-+	/* This process is in the test cgroup, so the loop I/O is charged here. */
-+	if (!ASSERT_OK(do_direct_io(loop_path), "do_direct_io"))
-+		goto cleanup_link;
-+
-+	if (!ASSERT_OK(read_stats(link), "read stats"))
-+		goto cleanup_link;
-+
-+	q = &skel->data_query->io_query;
-+	if (test__start_subtest("cgroup_iter_io__write")) {
-+		ASSERT_GT(q->wbytes, 0, "wbytes");
-+		ASSERT_GT(q->wios, 0, "wios");
-+	}
-+	if (test__start_subtest("cgroup_iter_io__read")) {
-+		ASSERT_GT(q->rbytes, 0, "rbytes");
-+		ASSERT_GT(q->rios, 0, "rios");
-+	}
-+	if (test__start_subtest("cgroup_iter_io__dev"))
-+		ASSERT_GT(q->dev, 0, "dev");
-+
-+	/* Compare with io.stat without I/O between the reads. */
-+	if (test__start_subtest("cgroup_iter_io__match")) {
-+		struct io_query filev = {};
-+
-+		if (ASSERT_OK(read_stats(link), "read stats") &&
-+		    ASSERT_OK(parse_io_stat(cgroup_fd, q->dev, &filev),
-+			      "parse io.stat")) {
-+			ASSERT_EQ(q->rbytes, filev.rbytes, "rbytes");
-+			ASSERT_EQ(q->wbytes, filev.wbytes, "wbytes");
-+			ASSERT_EQ(q->rios, filev.rios, "rios");
-+			ASSERT_EQ(q->wios, filev.wios, "wios");
-+			ASSERT_EQ(q->dbytes, filev.dbytes, "dbytes");
-+			ASSERT_EQ(q->dios, filev.dios, "dios");
-+		}
-+	}
-+
-+cleanup_link:
-+	bpf_link__destroy(link);
-+cleanup_skel:
-+	cgroup_iter_io__destroy(skel);
-+cleanup_loop:
-+	loop_teardown(loop_path, ctl_fd, loop_fd, back_fd);
-+cleanup_cgroup_fd:
-+	close(cgroup_fd);
-+	cleanup_cgroup_environment();
-+}
-diff --git a/tools/testing/selftests/bpf/progs/cgroup_iter_io.c b/tools/testing/selftests/bpf/progs/cgroup_iter_io.c
-new file mode 100644
-index 000000000000..0e9c9cd6e33a
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/cgroup_iter_io.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-+#include <vmlinux.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_core_read.h>
-+#include "bpf_experimental.h"
-+#include "cgroup_iter_io.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+struct io_query io_query SEC(".data.query");
-+
-+/* Device selected by userspace in kernel dev_t format. */
-+__u64 target_dev SEC(".data.query");
-+
-+/* Keep inline: RCU and open-coded iterators cannot cross a BPF call. */
-+static __always_inline int read_target_dev(struct cgroup *cgrp,
-+					   struct io_query *out)
-+{
-+	struct cgroup_subsys_state *css;
++struct bpf_iter_blkg_kern {
 +	struct blkcg *blkcg;
 +	struct blkcg_gq *pos;
-+	__u64 dev;
-+	int ssid;
++} __aligned(8);
 +
-+	ssid = bpf_core_enum_value(enum cgroup_subsys_id, io_cgrp_id);
-+	css = bpf_cgroup_css(cgrp, ssid);
-+	if (!css)
-+		return 0;
-+
-+	css_rstat_flush(css);
-+
-+	bpf_rcu_read_lock();
-+
-+	blkcg = bpf_css_to_blkcg(css);
-+	if (!blkcg) {
-+		bpf_rcu_read_unlock();
-+		bpf_css_release(css);
-+		return 0;
-+	}
-+
-+	bpf_for_each(blkg, pos, blkcg) {
-+		dev = BPF_CORE_READ(pos, q, disk, part0, bd_dev);
-+		if (dev != target_dev)
-+			continue;
-+
-+		out->dev = dev;
-+		out->rbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_READ]);
-+		out->wbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_WRITE]);
-+		out->rios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_READ]);
-+		out->wios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_WRITE]);
-+		out->dbytes = BPF_CORE_READ(pos, iostat.cur.bytes[BLKG_IOSTAT_DISCARD]);
-+		out->dios = BPF_CORE_READ(pos, iostat.cur.ios[BLKG_IOSTAT_DISCARD]);
-+		break;
-+	}
-+	bpf_rcu_read_unlock();
-+	bpf_css_release(css);
-+	return 1;
-+}
-+
-+SEC("iter.s/cgroup")
-+int cgroup_io_query(struct bpf_iter__cgroup *ctx)
++/**
++ * bpf_iter_blkg_new - Start iterating a block cgroup's per-device blkgs
++ * @it: iterator to initialize
++ * @blkcg: block cgroup to iterate
++ *
++ * Each blkg holds one device's io.stat counters. Offline blkgs are skipped.
++ * A blkg without a disk can be returned. Root blkgs do not contain the
++ * system-wide statistics shown by root io.stat. Must run under RCU.
++ *
++ * Return: 0 on success.
++ */
++__bpf_kfunc int bpf_iter_blkg_new(struct bpf_iter_blkg *it,
++				  struct blkcg *blkcg)
 +{
-+	struct cgroup *cgrp = ctx->cgroup;
++	struct bpf_iter_blkg_kern *kit = (void *)it;
 +
-+	if (!cgrp)
-+		return 1;
++	BUILD_BUG_ON(sizeof(struct bpf_iter_blkg_kern) > sizeof(struct bpf_iter_blkg));
++	BUILD_BUG_ON(__alignof__(struct bpf_iter_blkg_kern) !=
++		     __alignof__(struct bpf_iter_blkg));
 +
-+	/* Start fresh so a device that is not found stays all-zero. */
-+	__builtin_memset(&io_query, 0, sizeof(io_query));
-+
-+	read_target_dev(cgrp, &io_query);
++	kit->pos = NULL;
++	kit->blkcg = blkcg;
 +	return 0;
 +}
++
++/**
++ * bpf_iter_blkg_next - Return the next online blkg of the iterated block cgroup
++ * @it: iterator
++ *
++ * Return: the next online blkg, or NULL when the walk is done.
++ */
++__bpf_kfunc struct blkcg_gq *bpf_iter_blkg_next(struct bpf_iter_blkg *it)
++{
++	struct bpf_iter_blkg_kern *kit = (void *)it;
++	struct blkcg_gq *blkg = kit->pos;
++	struct hlist_node *node;
++
++	if (!kit->blkcg)
++		return NULL;
++
++	if (!blkg)
++		node = rcu_dereference(hlist_first_rcu(&kit->blkcg->blkg_list));
++	else
++		node = rcu_dereference(hlist_next_rcu(&blkg->blkcg_node));
++
++	/* Skip offline blkgs, matching io.stat. */
++	while (node) {
++		blkg = hlist_entry(node, struct blkcg_gq, blkcg_node);
++		/* A race only changes whether this blkg is returned. */
++		if (data_race(blkg->online)) {
++			kit->pos = blkg;
++			return blkg;
++		}
++		node = rcu_dereference(hlist_next_rcu(&blkg->blkcg_node));
++	}
++
++	/* The iterator must keep returning NULL after completion. */
++	kit->pos = NULL;
++	kit->blkcg = NULL;
++	return NULL;
++}
++
++/**
++ * bpf_iter_blkg_destroy - Tear down a blkg iterator
++ * @it: iterator
++ */
++__bpf_kfunc void bpf_iter_blkg_destroy(struct bpf_iter_blkg *it)
++{
++}
++
++__bpf_kfunc_end_defs();
++
++BTF_KFUNCS_START(bpf_blkcg_kfuncs)
++BTF_ID_FLAGS(func, bpf_css_to_blkcg,
++	     KF_RCU | KF_RCU_PROTECTED | KF_RET_NULL)
++
++BTF_ID_FLAGS(func, bpf_iter_blkg_new,
++	     KF_ITER_NEW | KF_RCU | KF_RCU_PROTECTED)
++BTF_ID_FLAGS(func, bpf_iter_blkg_next, KF_ITER_NEXT | KF_RET_NULL)
++BTF_ID_FLAGS(func, bpf_iter_blkg_destroy, KF_ITER_DESTROY)
++BTF_KFUNCS_END(bpf_blkcg_kfuncs)
++
++static const struct btf_kfunc_id_set bpf_blkcg_kfunc_set = {
++	.owner		= THIS_MODULE,
++	.set		= &bpf_blkcg_kfuncs,
++};
++
++static int __init bpf_blkcg_init(void)
++{
++	int err;
++
++	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
++					&bpf_blkcg_kfunc_set);
++	if (err)
++		pr_warn("error while registering bpf blkcg kfuncs: %d\n", err);
++
++	return err;
++}
++late_initcall(bpf_blkcg_init);
+diff --git a/kernel/cgroup/bpf_cgroup.c b/kernel/cgroup/bpf_cgroup.c
+index cd28c838dc7b..e253633e8278 100644
+--- a/kernel/cgroup/bpf_cgroup.c
++++ b/kernel/cgroup/bpf_cgroup.c
+@@ -8,12 +8,50 @@
+ #include <linux/bpf.h>
+ #include <linux/btf_ids.h>
+ #include <linux/cgroup.h>
++#include <linux/rcupdate.h>
+ 
++#ifdef CONFIG_CGROUP_SCHED
+ #include "../sched/sched.h"
++#endif
+ 
+-#ifdef CONFIG_CGROUP_SCHED
+ __bpf_kfunc_start_defs();
+ 
++/**
++ * bpf_cgroup_css - Get a reference to one controller's css
++ * @cgrp: cgroup to look in
++ * @ssid: controller ID
++ *
++ * The returned css must be released with bpf_css_release().
++ *
++ * Return: The referenced css, or NULL.
++ */
++__bpf_kfunc struct cgroup_subsys_state *
++bpf_cgroup_css(struct cgroup *cgrp, int ssid)
++{
++	struct cgroup_subsys_state *css;
++
++	if (unlikely(ssid < 0 || ssid >= CGROUP_SUBSYS_COUNT))
++		return NULL;
++
++	rcu_read_lock();
++	css = rcu_dereference(cgrp->subsys[ssid]);
++	if (css && !css_tryget(css))
++		css = NULL;
++	rcu_read_unlock();
++
++	return css;
++}
++
++/**
++ * bpf_css_release - Release a css reference
++ * @css: css to release
++ */
++__bpf_kfunc void bpf_css_release(struct cgroup_subsys_state *css)
++{
++	css_put(css);
++}
++
++#ifdef CONFIG_CGROUP_SCHED
+ /**
+  * bpf_css_to_task_group - Cast a CPU controller css to its task group
+  * @css: CPU controller css
+@@ -30,29 +68,33 @@ bpf_css_to_task_group(struct cgroup_subsys_state *css)
+ 
+ 	return container_of(css, struct task_group, css);
+ }
++#endif /* CONFIG_CGROUP_SCHED */
+ 
+ __bpf_kfunc_end_defs();
+ 
+-BTF_KFUNCS_START(bpf_cpu_cgroup_kfunc_ids)
++BTF_KFUNCS_START(bpf_cgroup_kfunc_ids)
++BTF_ID_FLAGS(func, bpf_cgroup_css, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
++BTF_ID_FLAGS(func, bpf_css_release, KF_RELEASE)
++#ifdef CONFIG_CGROUP_SCHED
+ BTF_ID_FLAGS(func, bpf_css_to_task_group,
+ 	     KF_RCU | KF_RCU_PROTECTED | KF_RET_NULL)
+-BTF_KFUNCS_END(bpf_cpu_cgroup_kfunc_ids)
++#endif
++BTF_KFUNCS_END(bpf_cgroup_kfunc_ids)
+ 
+-static const struct btf_kfunc_id_set bpf_cpu_cgroup_kfunc_set = {
++static const struct btf_kfunc_id_set bpf_cgroup_kfunc_set = {
+ 	.owner		= THIS_MODULE,
+-	.set		= &bpf_cpu_cgroup_kfunc_ids,
++	.set		= &bpf_cgroup_kfunc_ids,
+ };
+ 
+-static int __init bpf_cpu_cgroup_kfunc_init(void)
++static int __init bpf_cgroup_kfunc_init(void)
+ {
+ 	int err;
+ 
+ 	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
+-					&bpf_cpu_cgroup_kfunc_set);
++					&bpf_cgroup_kfunc_set);
+ 	if (err)
+-		pr_warn("error while registering cpu cgroup kfuncs: %d\n", err);
++		pr_warn("error while registering cgroup kfuncs: %d\n", err);
+ 
+ 	return err;
+ }
+-late_initcall(bpf_cpu_cgroup_kfunc_init);
+-#endif /* CONFIG_CGROUP_SCHED */
++late_initcall(bpf_cgroup_kfunc_init);
 -- 
 2.53.0-Meta
 
