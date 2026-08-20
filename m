@@ -1,280 +1,287 @@
-Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA53C3D9535
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146A14734C9
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787259749; cv=none; b=F7CmPQInAGQC1KR44jqPkoPoeHRU23CA2BKix2+kZ7VtbeNZO/WSKtporcyrz79KOwryTsnjZ2xWESKd0PxGGSlpCwkwOX9gKjfeeDC8dPpJq3JBbF7cq3W1C5hfVUMFJDiZfEGUYBYuPrJYqWl7Q3thh/iHp8mrMGS22UPMqgk=
+	t=1787260690; cv=none; b=F+XY/oq01xZ2HjG6Ufip7fE5Bf7uUJ/q44UZ8JD6MKt9BnXf1G/bAbbA1Y9DJpbtrAY1MhZspEtDj78kb6qwykj+l2exDei/iyqW4SpPnkaTQ/Rx4Rf1bFRfxlgQO57H1EHoaqVdEG2+CVdK5lk5SYoenB8L1qDy2z684EDL/i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787259749; c=relaxed/simple;
-	bh=svUM0Mp+YSR8yTwMicGs3ZmGDvzIZktVo9Q2lXQgO2c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=umZgWulcd4JFzrGrggXmZxuTKODtpiJV3TDSsIJwDMqfEHELd3V4W6Q5ZWbpA8fSBWWWfmaQcXwj1ra82NNwCxweWcKBiNIR92Otpe1nKOVqnZ3hOcXooS5gcOfc/bwvhXNktzPR7HtcfoczzrYfHbN19mphAtR9ZZDrU2FxHdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-4ab4af22d09so490178b6e.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:02:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787259746; x=1787864546;
-        h=content-transfer-encoding:content-type:to:from:subject:message-id
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1787260690; c=relaxed/simple;
+	bh=YjqdsGJuMeIq7n8PzjUvmgIYfZOosAHqNR3Q2LYldfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Cou/gClFZZdZA1o1p3H+q3oXMlwRPXO2uG6NyRAcJ4TnpBbvlVUvynP7kRCTrzdX+9wgoM/jMUDd+7rTlYUowZCDJe1Z7rYHQVtnhlBQfP5TK9cVppsVrauyW6lUGXb7xNgYRkkRn2I2mCMel+GW6xVzl2FdPhLOPpW4E/1Zw04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JbQuxgBK; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbQuxgBK"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-cc11a905ba5so274251a12.2
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787260683; x=1787865483; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GB4j5ZzEbHNjh+qE2dE1EgxaCeO9pNVK6hZY0hWhFP8=;
-        b=RQsV26qt86LxOWjOgjI3Y9UmGEXbptBGtFwCxz6dAwuIB+7BsdQt2MTyt/gP85ZFp3
-         2+iEnIPEYrn4DrchysU9E7rhL6ImoPSdQfXfK6V/BP+Ju22SXyhNnUxYbxcjBYio95Up
-         Ll+usnQQi3Xvd1MgUaYJa0mKIgU3LHs1n+k7EFFOOZJK33zbKTRhmB7R40CDJql7SREh
-         z3eCj8Rq/moLEgC4GjHkjFEjQk648H8IXUEMxusGBDrqsRSfwUZkz4oCWAjixY3NSeWy
-         MCOME8bLkaaQCP9xzkFFZ9KeaXhRtlHduGpgYl+hbgVIQaNlkghSuMbuY0+hKT8/C3ay
-         Eb1w==
-X-Forwarded-Encrypted: i=1; AHgh+Rr8SjJ8XSvBNuBVE/PuutDTB709+9HeDxknHwuTUmO4Bap/q5Q84JUpf1yCPFZnApqoB0cTRADMfgl+4Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcQcUolFbAf4mM2eze9HDpighbZrpQ4CGX0Zs9v7/VxYNcSuQh
-	FN8IlkTABtmUyD/6GePZjxLenSaKDFeLmi8XX6+fFfLTzlPwGqRhM278l9KfX4io+xSa5Bjcjok
-	TUH77iBpsSVjtDmsYMHzXlKM8lcDmcat1CFaem+kMmUSKeV/MmbrBxpmcM78=
+        bh=fNnF6T8sz4WljkkHVGCRYU0uuUkbDNh6HBGKfIf2U2g=;
+        b=JbQuxgBKFQmH25J3svttJ5EyFkABkSSDF8T4fxc5zuOmxOhIDPuxZj/iBDwmsKwWwF
+         yg/wUGCvnPmDZ4ghB6GSFJauxMGIm4Crw3oPttlhcmg1+5h9TGwYZl9P8fACiaG88Nr4
+         niV2XR8Zh7SYcMcJl/9oXnzTfivZ+T8KSCq2Ni1vQSI7MQ7yJAyrdE2tjAXL/Ny8rYjN
+         yPkIK24exLqzRYleEpa20U3T14LHE6XUykgKlz7kEuEoXza+C5ibFYH0dWo8zzue2Z++
+         HojkILr0m348OeH1PAbv6ma6mGXFNpWOc79+DDRkepKbcPKOWjRVQzzpDmdl1dvtMW4e
+         pnQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787260683; x=1787865483;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=fNnF6T8sz4WljkkHVGCRYU0uuUkbDNh6HBGKfIf2U2g=;
+        b=bR9Q7glHzV8Ucy5vh7GqXKM7sUOrO66JWlNnWTxFouDXdKBzvBElFzGBiR8dY248ji
+         ssSaHpVEGfkaZkd4WIQCWjA/ub/nVxhT75ndegGrCSdObI4OIWkPiI6H4RpURG3IiA3Z
+         ohVn0CHedkZMsAjAJNfRCE4+c9S+47iHNtM4NNXlIFdUS9uxzf2Wvfg04fnRqxhvgIqo
+         FzTkscw/tG9gxqUX/5weIUvWJ/wG8qggWR0wPjvqQuxIX5yV3dYmTK4wWkzA3lfdPtYF
+         AAHwka4lrN3/uV8yr0uSy1xt57SvY14SiR9rNxU/NBncWWKeAnaewkk7rg/r8FSTNvaQ
+         4CAQ==
+X-Forwarded-Encrypted: i=1; AHgh+RplsbVsPCCuYLLpJKJEBRbUwF/gYbmV8iNOJuQlvSa8k1hM2hqP76k7sCCbcIE9pSKvFS91qLwAmgwvFw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq6Dr6sGr5EBJLzOxxAvvSiqcAknwKc5jaELX/t0U0qpJjz4fD
+	HjzfVXQdYVmKGYwLk7d1mYpudkvw4bjS5LflpOAFOBwA9aftWA1pDBdk
+X-Gm-Gg: AR+sD11o084Nl31r4syZ1zgLzCIPuu3UTNnhheS/5o080J2EqQVcNYMBo5xTCZzAwpb
+	PNDkxPxnL92fHB0uWrkogbOdZl07y74KsZXCO50Br95CGBIvWcIctHbnHtzFSCVNG+1XiHl19Ru
+	f1FhZIpVAFDljJn3tkL8t7pI8qrMrT4eGth7PCWvz0V2YI5hyOc4Fh3xR6H0bbK9NZEgvzcF4aR
+	+Im8gk/dfYyWeMPAIdXURlN73nGIy8nIylLgF3oTvm2KXRmDsE43YtUi5jZrdM/QNGw0aWOEr6Y
+	vppsvqwb3ddonrpeuE7gDn+BBVWO0Cd3GkiY3mm9WwUO4X3WcNHAyF6dkHC27Q2OhMqLwELPr7C
+	Dj2Jt14vo17j2yGrl9h3Gk2WywSd3//YfV3YlR2g30+QQ6IZ7eNqcfk1xkOuV7DZYeCyRR4Hwsj
+	Oy61RvKAJgVtzYnGI8xrl37CUE+jLTl6676gYXpDLcZVtFF295F4XiMSk=
+X-Received: by 2002:a05:6a20:450c:b0:3bf:6d96:ac40 with SMTP id adf61e73a8af0-3cd3007ce9bmr2646024637.12.1787260682945;
+        Thu, 20 Aug 2026 14:18:02 -0700 (PDT)
+Received: from localhost ([2a03:2880:9ff:72::])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327bef3993dsm17917418eec.5.2026.08.20.14.18.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Aug 2026 14:18:02 -0700 (PDT)
+From: Ziyang Men <ziyang.meme@gmail.com>
+To: kernel-team@meta.com,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Ben Segall <bsegall@google.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Mykola Lysenko <mykolal@meta.com>,
+	Ziyang Men <ziyang.meme@gmail.com>,
+	linux-block@vger.kernel.org,
+	bpf@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 1/4] cgroup: add BPF kfuncs to read a cpu cgroup's stats
+Date: Thu, 20 Aug 2026 14:17:55 -0700
+Message-ID: <20260820211758.3393984-2-ziyang.meme@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260820211758.3393984-1-ziyang.meme@gmail.com>
+References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1188:b0:4b2:3e72:bab1 with SMTP id
- 5614622812f47-4b2ef24f8e1mr1021177b6e.6.1787259746343; Thu, 20 Aug 2026
- 14:02:26 -0700 (PDT)
-Date: Thu, 20 Aug 2026 14:02:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a876b62.4d75e56a.c9a88.004b.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in ocfs2_read_blocks (2)
-From: syzbot <syzbot+b03f9cd50db23adeeb71@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Collecting cgroup statistics is expensive because the existing method
+opens and parses a cgroup file. memcg already provides an efficient BPF
+interface; extend that model to the CPU controller.
 
-syzbot found the following issue on:
+Register css_rstat_flush() as a common kfunc and add
+bpf_cgroup_base_stat(). The latter returns cgroup_base_stat after the
+same cputime adjustment used by cpu.stat.
 
-HEAD commit:    4477a78374a5 Add linux-next specific files for 20260814
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D129b9949580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D9b32a36dd637b06=
-f
-dashboard link: https://syzkaller.appspot.com/bug?extid=3Db03f9cd50db23adee=
-b71
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-=
-1~exp1~20260613092250.77), Debian LLD 22.1.8
+The BPF program reads the plain CFS bandwidth counters directly. Add
+bpf_css_to_task_group() to check the controller and give the verifier a
+typed task_group pointer for bpf_per_cpu_ptr().
 
-Unfortunately, I don't have any reproducer for this issue yet.
+css_rstat_flush() may reschedule and requires a sleepable program.
+bpf_cgroup_base_stat() only takes locks and is not marked sleepable, but
+those locks are not NMI-safe.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/994c1c8c560e/disk-=
-4477a783.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cd54543d69ae/vmlinux-=
-4477a783.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/407cdf8f3fc2/bzI=
-mage-4477a783.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+b03f9cd50db23adeeb71@syzkaller.appspotmail.com
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L    =20
-------------------------------------------------------
-syz.3.993/9951 is trying to acquire lock:
-ffff8880724887d0 (&oi->ip_io_mutex){+.+.}-{4:4}, at: ocfs2_read_blocks+0x1e=
-f/0x14d0 fs/ocfs2/buffer_head_io.c:229
-
-but task is already holding lock:
-ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_upda=
-te include/linux/blkdev.h:1101 [inline]
-ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: loop_configure+0x787/0x=
-dc0 drivers/block/loop.c:1083
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&q->limits_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
-       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
-       loop_set_dio drivers/block/loop.c:1460 [inline]
-       lo_simple_ioctl drivers/block/loop.c:1528 [inline]
-       lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
-       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&q->q_usage_counter(io)#24){++++}-{0:0}:
-       bio_queue_enter block/blk.h:95 [inline]
-       blk_mq_submit_bio+0x7f8/0x2a70 block/blk-mq.c:3127
-       __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-       submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-       ocfs2_read_blocks+0x85e/0x14d0 fs/ocfs2/buffer_head_io.c:324
-       ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
-       ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
-       ocfs2_get_clusters+0x341/0xc00 fs/ocfs2/extent_map.c:625
-       ocfs2_extent_map_get_blocks+0x202/0x6a0 fs/ocfs2/extent_map.c:678
-       ocfs2_read_virt_blocks+0x283/0x9c0 fs/ocfs2/extent_map.c:1001
-       ocfs2_read_dir_block fs/ocfs2/dir.c:522 [inline]
-       ocfs2_find_entry_el fs/ocfs2/dir.c:790 [inline]
-       ocfs2_find_entry+0x3c3/0x2050 fs/ocfs2/dir.c:1165
-       ocfs2_find_files_on_disk+0xe0/0x340 fs/ocfs2/dir.c:2082
-       ocfs2_lookup_ino_from_name+0x52/0x100 fs/ocfs2/dir.c:2104
-       _ocfs2_get_system_file_inode fs/ocfs2/sysfile.c:133 [inline]
-       ocfs2_get_system_file_inode+0x32f/0x810 fs/ocfs2/sysfile.c:110
-       ocfs2_init_global_system_inodes+0x318/0x6e0 fs/ocfs2/super.c:461
-       ocfs2_initialize_super fs/ocfs2/super.c:2192 [inline]
-       ocfs2_fill_super+0x456e/0x6840 fs/ocfs2/super.c:993
-       get_tree_bdev_flags+0x430/0x4f0 fs/super.c:1887
-       vfs_get_tree+0x92/0x2a0 fs/super.c:1947
-       fc_mount fs/namespace.c:1198 [inline]
-       do_new_mount_fc fs/namespace.c:3772 [inline]
-       do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-       do_mount fs/namespace.c:4181 [inline]
-       __do_sys_mount fs/namespace.c:4397 [inline]
-       __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&oi->ip_io_mutex){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3181 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
-       validate_chain kernel/locking/lockdep.c:3924 [inline]
-       __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
-       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
-       ocfs2_read_blocks+0x1ef/0x14d0 fs/ocfs2/buffer_head_io.c:229
-       ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
-       ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
-       ocfs2_assign_bh fs/ocfs2/dlmglue.c:2415 [inline]
-       ocfs2_inode_lock_full_nested+0x2bb/0x1b30 fs/ocfs2/dlmglue.c:2510
-       ocfs2_statfs+0x1ba/0xa70 fs/ocfs2/super.c:1577
-       statfs_by_dentry fs/statfs.c:66 [inline]
-       vfs_statfs+0x147/0x2d0 fs/statfs.c:90
-       loop_get_discard_config drivers/block/loop.c:774 [inline]
-       loop_update_limits+0x375/0x920 drivers/block/loop.c:984
-       loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
-       lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
-       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &oi->ip_io_mutex --> &q->q_usage_counter(io)#24 --> &q->limits_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->limits_lock);
-                               lock(&q->q_usage_counter(io)#24);
-                               lock(&q->limits_lock);
-  lock(&oi->ip_io_mutex);
-
- *** DEADLOCK ***
-
-locks held by syz.3.993/9951: 2, last CPU#1:
- #0: ffff888026af3430 (&lo->lo_mutex){+.+.}-{4:4}, at: loop_global_lock_kil=
-lable drivers/block/loop.c:119 [inline]
- #0: ffff888026af3430 (&lo->lo_mutex){+.+.}-{4:4}, at: loop_configure+0x35d=
-/0xdc0 drivers/block/loop.c:1038
- #1: ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start=
-_update include/linux/blkdev.h:1101 [inline]
- #1: ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: loop_configure+0x7=
-87/0xdc0 drivers/block/loop.c:1083
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 9951 Comm: syz.3.993 Tainted: G             L      syzka=
-ller #0 PREEMPT(full)=20
-Tainted: [L]=3DSOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 07/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2059
- check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2191
- check_prev_add kernel/locking/lockdep.c:3181 [inline]
- check_prevs_add kernel/locking/lockdep.c:3300 [inline]
- validate_chain kernel/locking/lockdep.c:3924 [inline]
- __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
- lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
- __mutex_lock_common kernel/locking/mutex.c:646 [inline]
- __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
- ocfs2_read_blocks+0x1ef/0x14d0 fs/ocfs2/buffer_head_io.c:229
- ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
- ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
- ocfs2_assign_bh fs/ocfs2/dlmglue.c:2415 [inline]
- ocfs2_inode_lock_full_nested+0x2bb/0x1b30 fs/ocfs2/dlmglue.c:2510
- ocfs2_statfs+0x1ba/0xa70 fs/ocfs2/super.c:1577
- statfs_by_dentry fs/statfs.c:66 [inline]
- vfs_statfs+0x147/0x2d0 fs/statfs.c:90
- loop_get_discard_config drivers/block/loop.c:774 [inline]
- loop_update_limits+0x375/0x920 drivers/block/loop.c:984
- loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
- lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
- blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f61a979e0d9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 =
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
-f 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f61aa701028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f61a9a26180 RCX: 00007f61a979e0d9
-RDX: 0000200000001800 RSI: 0000000000004c0a RDI: 0000000000000005
-RBP: 00007f61a9835024 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f61a9a26218 R14: 00007f61a9a26180 R15: 00007ffd47e4a038
- </TASK>
-loop8: detected capacity change from 0 to 7
-Dev loop8: unable to read RDB block 7
- loop8: unable to read partition table
-loop8: partition table beyond EOD, truncated
-loop_reread_partitions: partition scan of loop8 (=EF=BF=BD=E8=A2=ABx=EF=BF=
-=BD^>=EF=BF=BD) failed (rc=3D-5)
-
-
+Suggested-by: Shakeel Butt <shakeel.butt@linux.dev>
+Suggested-by: Tejun Heo <tj@kernel.org>
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Ziyang Men <ziyang.meme@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ kernel/cgroup/Makefile     |  2 ++
+ kernel/cgroup/bpf_cgroup.c | 58 ++++++++++++++++++++++++++++++++++++++
+ kernel/cgroup/rstat.c      | 54 ++++++++++++++++++++++++++++++++---
+ 3 files changed, 110 insertions(+), 4 deletions(-)
+ create mode 100644 kernel/cgroup/bpf_cgroup.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/kernel/cgroup/Makefile b/kernel/cgroup/Makefile
+index ede31601a363..29f29228865b 100644
+--- a/kernel/cgroup/Makefile
++++ b/kernel/cgroup/Makefile
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-y := cgroup.o rstat.o namespace.o cgroup-v1.o freezer.o
+ 
++obj-$(CONFIG_BPF_SYSCALL) += bpf_cgroup.o
++
+ obj-$(CONFIG_CGROUP_FREEZER) += legacy_freezer.o
+ obj-$(CONFIG_CGROUP_PIDS) += pids.o
+ obj-$(CONFIG_CGROUP_RDMA) += rdma.o
+diff --git a/kernel/cgroup/bpf_cgroup.c b/kernel/cgroup/bpf_cgroup.c
+new file mode 100644
+index 000000000000..cd28c838dc7b
+--- /dev/null
++++ b/kernel/cgroup/bpf_cgroup.c
+@@ -0,0 +1,58 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Cgroup BPF kfuncs
++ *
++ * Author: Ziyang Men <ziyang.meme@gmail.com>
++ */
++
++#include <linux/bpf.h>
++#include <linux/btf_ids.h>
++#include <linux/cgroup.h>
++
++#include "../sched/sched.h"
++
++#ifdef CONFIG_CGROUP_SCHED
++__bpf_kfunc_start_defs();
++
++/**
++ * bpf_css_to_task_group - Cast a CPU controller css to its task group
++ * @css: CPU controller css
++ *
++ * Must be called under RCU. The kfunc gives BPF a typed task_group pointer.
++ *
++ * Return: The task group, or NULL if @css belongs to another controller.
++ */
++__bpf_kfunc struct task_group *
++bpf_css_to_task_group(struct cgroup_subsys_state *css)
++{
++	if (unlikely(css->ss != &cpu_cgrp_subsys))
++		return NULL;
++
++	return container_of(css, struct task_group, css);
++}
++
++__bpf_kfunc_end_defs();
++
++BTF_KFUNCS_START(bpf_cpu_cgroup_kfunc_ids)
++BTF_ID_FLAGS(func, bpf_css_to_task_group,
++	     KF_RCU | KF_RCU_PROTECTED | KF_RET_NULL)
++BTF_KFUNCS_END(bpf_cpu_cgroup_kfunc_ids)
++
++static const struct btf_kfunc_id_set bpf_cpu_cgroup_kfunc_set = {
++	.owner		= THIS_MODULE,
++	.set		= &bpf_cpu_cgroup_kfunc_ids,
++};
++
++static int __init bpf_cpu_cgroup_kfunc_init(void)
++{
++	int err;
++
++	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
++					&bpf_cpu_cgroup_kfunc_set);
++	if (err)
++		pr_warn("error while registering cpu cgroup kfuncs: %d\n", err);
++
++	return err;
++}
++late_initcall(bpf_cpu_cgroup_kfunc_init);
++#endif /* CONFIG_CGROUP_SCHED */
+diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+index de816a43db9f..5db72504a8a5 100644
+--- a/kernel/cgroup/rstat.c
++++ b/kernel/cgroup/rstat.c
+@@ -752,10 +752,49 @@ void cgroup_base_stat_cputime_show(struct seq_file *seq)
+ 	cgroup_force_idle_show(seq, &bstat);
+ }
+ 
+-/* Add bpf kfuncs for css_rstat_updated() and css_rstat_flush() */
++#ifdef CONFIG_BPF_SYSCALL
++
++__bpf_kfunc_start_defs();
++
++/**
++ * bpf_cgroup_base_stat - Read a cgroup's base statistics
++ * @cgrp: cgroup to read from
++ * @out: zero-initialized output in nanoseconds
++ *
++ * CPU time is adjusted as for cpu.stat.
++ */
++__bpf_kfunc void bpf_cgroup_base_stat(struct cgroup *cgrp,
++				      struct cgroup_base_stat *out)
++{
++	if (cgroup_parent(cgrp)) {
++		__css_rstat_lock(&cgrp->self, -1);
++		*out = cgrp->bstat;
++		cputime_adjust(&cgrp->bstat.cputime, &cgrp->prev_cputime,
++			       &out->cputime.utime, &out->cputime.stime);
++		__css_rstat_unlock(&cgrp->self, -1);
++	} else {
++		root_cgroup_cputime(out);
++	}
++}
++
++__bpf_kfunc_end_defs();
++
++BTF_KFUNCS_START(bpf_rstat_common_kfunc_ids)
++BTF_ID_FLAGS(func, css_rstat_flush, KF_SLEEPABLE)
++/* The reader does not sleep, but its locks are not NMI-safe. */
++BTF_ID_FLAGS(func, bpf_cgroup_base_stat)
++BTF_KFUNCS_END(bpf_rstat_common_kfunc_ids)
++
++static const struct btf_kfunc_id_set bpf_rstat_common_kfunc_set = {
++	.owner		= THIS_MODULE,
++	.set		= &bpf_rstat_common_kfunc_ids,
++};
++
++#endif /* CONFIG_BPF_SYSCALL */
++
++/* Add a bpf kfunc for css_rstat_updated(). */
+ BTF_KFUNCS_START(bpf_rstat_kfunc_ids)
+ BTF_ID_FLAGS(func, css_rstat_updated)
+-BTF_ID_FLAGS(func, css_rstat_flush, KF_SLEEPABLE)
+ BTF_KFUNCS_END(bpf_rstat_kfunc_ids)
+ 
+ static const struct btf_kfunc_id_set bpf_rstat_kfunc_set = {
+@@ -765,7 +804,14 @@ static const struct btf_kfunc_id_set bpf_rstat_kfunc_set = {
+ 
+ static int __init bpf_rstat_kfunc_init(void)
+ {
+-	return register_btf_kfunc_id_set(BPF_PROG_TYPE_TRACING,
+-					 &bpf_rstat_kfunc_set);
++	int ret;
++
++	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_TRACING,
++					&bpf_rstat_kfunc_set);
++#ifdef CONFIG_BPF_SYSCALL
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
++					       &bpf_rstat_common_kfunc_set);
++#endif
++	return ret;
+ }
+ late_initcall(bpf_rstat_kfunc_init);
+-- 
+2.53.0-Meta
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
