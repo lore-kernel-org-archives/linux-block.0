@@ -1,355 +1,280 @@
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4313E3905EB;
-	Thu, 20 Aug 2026 20:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA53C3D9535
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 21:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787258268; cv=none; b=EpFo148rjsXpUKNRwTENmTPp72629sPgHxwvnIF8pbdlwxPrE7+vfbIMu/6pN2Ror91P/DK1mIXH0h21fTa1S9+GPEI2ZKP50reoUOnVWU5qs6zk0v43A8dDxV4FFNGWz/vfT3Sded6s+hvDijPHjDw+u/ycva2Vg0jP1ux+Vtw=
+	t=1787259749; cv=none; b=F7CmPQInAGQC1KR44jqPkoPoeHRU23CA2BKix2+kZ7VtbeNZO/WSKtporcyrz79KOwryTsnjZ2xWESKd0PxGGSlpCwkwOX9gKjfeeDC8dPpJq3JBbF7cq3W1C5hfVUMFJDiZfEGUYBYuPrJYqWl7Q3thh/iHp8mrMGS22UPMqgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787258268; c=relaxed/simple;
-	bh=WdhUDV6hRQ1uGWJhV+dTJQtMWlxnY9p/U3HBYCxI6JQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f8wK6G/vnIfeqMlAkXGCeUy8STR+UmmFn+wE/EAHGOrMe9i+EN9zfKZ0VG6aA2yr4l41fHZAUh9uQfBWQIP9Lm4ARHVp+3cmMtheKvJVMkzETU+fd8x9mJJ6bcDRi14/1I2NluFpuuL+ayfntD4cXAihlk2bCjZZ8WbgzhHFnfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bsbernd.com; spf=pass smtp.mailfrom=bsbernd.com; dkim=pass (2048-bit key) header.d=bsbernd.com header.i=@bsbernd.com header.b=NjudmpvQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AhDnyHQP; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bsbernd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsbernd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bsbernd.com header.i=@bsbernd.com header.b="NjudmpvQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AhDnyHQP"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5AA1B14001A6;
-	Thu, 20 Aug 2026 16:37:45 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Thu, 20 Aug 2026 16:37:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bsbernd.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1787258265;
-	 x=1787344665; bh=6ucE+PuyD7hhDcJC9cnrveUi9RM10V2fUaIkxFbOn2s=; b=
-	NjudmpvQylhyKYeYYmq6rJ7HABJFpvMbHedU2kh7K6DH+E5Wxuivg0H4yaT4P4NO
-	kbo60xoea6v/A4BWjEhTErGw5QsWjX1sKqzAi9rSXprO4egiFQXL0IhIiHVR2STN
-	mHGabMSWPp5IiEBJBWlnTmsQb6D3b+osKOvv2EBO7fhduGhazJX3FMEjniF/Kwt1
-	UhIzTwqIRs9XBa9MazgWTpTxLiHtSfbtetmcwZ3RblbB9URInladeNBQ19SLxuPw
-	Pz5hY0GfbyR+Lg40YHZMyT68BRJAbFfZQbrcPqgv+Cn/8tZ0kA6IBGGREBFhNSp7
-	pg8e0sbNKWm6XWXf6X5Qgg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1787258265; x=
-	1787344665; bh=6ucE+PuyD7hhDcJC9cnrveUi9RM10V2fUaIkxFbOn2s=; b=A
-	hDnyHQP7VHFPMA6XkyQPPV+kxTuR63ACHUjsmyhgvH51uG+s2wH6nlUWZqrs6jvJ
-	n5e6KMtadbw1BDevf9v8RjsyZXkuWlY2sigO5V0u//GGzEVmhFNddXq8JT3UNYfK
-	t4u3l6ZzczbkXNW9udFW8J6IL3V3bd0VStzbU34XfA08OR+rclYBzttiRtM65mFK
-	yw0cDD6skyjMmiRPv11aRWLl8CrZaVEaFdcCwvi/JAmR/Z9VRmH/kEwRHzKPrrn6
-	rPGQyEBOaHps2JPgWOeLtHh93/x9Mn05WhIvMhaL02rf+seT1bMc3FwP2BqrNetI
-	LOV2uEwEDCIaSGNArX0eg==
-X-ME-Sender: <xms:l2WHanjw8UUSF-Hu9_ZW1tGRppoDHopFOAh_P3kMKAq6OEAQkImCeg>
-    <xme:l2WHaiYdIjhPobaFh-W1_Q8ySjBmVZwmmzfQWAglglqmJFkkpGHcDPYAmET31Sdog
-    KGJixJgR1kjCgGexWWnYjPexL3yM4ggJ8hmiL0UtSxsUN99LMdA>
-X-ME-Received: <xmr:l2WHajFGKtsUDMPSEl1LMLMSwi8PnqkbWBl1eZitWS95vUmaxgTeAJ3MOSog9mgS0LWzVrENxO5ew4dzZIhFBYZOHq_VQGM-fpY2e-e30wdHPLE_RkU5sza33Q>
-X-ME-Proxy-Cause: dmFkZTGHCMB3CGTM2Dwh8T0va7wncxs4WoVtY1MpbEKlWjdfXg+yWiMMKczX5wTbdMQFpW
-    0ivrAkLMc1Gy9qLL4MiAG4RZaZ+TP0xTORRCYVOZMrrRQYSWD9kxoqy/BlIfNeKxR7Znzr
-    h7HVMgFAz1lK+rTviqK6/+k2AfwXfxtFTIO2UHB7eZh0lzGsja0vb51ozmpUclzE3uezRD
-    O4Fgyv2mXC0WaCT4M5kEGmc3gzCWB2Csic43ezC8XPNnQ2nUzHlPDv2aO8abJa33IjSuOU
-    2uLUtu1tZMKYB/bL1YysHMEnw7Afccy+cP57ip8RoYSJi+nFnKs8qIE4cbhufgG9thy4fT
-    w7f9qKyaZoBrVvtMVTO140ABivXiqNzzoRlqL726mRbzNUqJt1Vv20qzGDX3Spgr15oj95
-    Ru+v8YQPrjiDiEevr9SLrWEWjtZluRp99GauM4sCfZdFTzO/d6pisCzRwKNmRt+7qJEG0U
-    E+ubpwhYqBbZUgHmj9UKGiDCJrmqMxxX+pFuBOYCCKew4bJWNfJE07gutvf23p0pirIMPW
-    nzFWD8FJkJwlU6Zmd7faQrApJeQr8ae8BpHVPYZV7WeowV3y+ivZ7Os1fS3jAr3a8aSwtE
-    uGx43wID7Vf5alpRgI7PK+PCPgPZVmX6/6bIkz6kyCsqVNFCRiBAhsL1sWpg
-X-ME-Proxy: <xmx:l2WHanZ_lz--3EQm87NGpIZZFX1EvBA2OF2WO1qCpTbmtlLKpbruOg>
-    <xmx:l2WHas1qlw55cOfr13Mt_g2CaOxD3kxfBOJAz8_deh4qIYaZHtgUlw>
-    <xmx:l2WHandbd0UltRmcNb7mGjIpyxyeNALZ1dWI2cMVdCJ_4ED8wjwicQ>
-    <xmx:l2WHamDpbNIjLSoN-dQKAW7kmf-bbpEX263X3kd9-aAR-C3A8kAl1w>
-    <xmx:mWWHaqAuBK6e5QVhbVrcAaIIi0Qvbclqy9FMbC9JrQnjloXk5iRuyviI>
-Feedback-ID: i5c2e48a5:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 20 Aug 2026 16:37:38 -0400 (EDT)
-Message-ID: <075218ce-0c30-4f3a-b01d-6eb99094b7e8@bsbernd.com>
-Date: Thu, 20 Aug 2026 22:37:35 +0200
+	s=arc-20240116; t=1787259749; c=relaxed/simple;
+	bh=svUM0Mp+YSR8yTwMicGs3ZmGDvzIZktVo9Q2lXQgO2c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=umZgWulcd4JFzrGrggXmZxuTKODtpiJV3TDSsIJwDMqfEHELd3V4W6Q5ZWbpA8fSBWWWfmaQcXwj1ra82NNwCxweWcKBiNIR92Otpe1nKOVqnZ3hOcXooS5gcOfc/bwvhXNktzPR7HtcfoczzrYfHbN19mphAtR9ZZDrU2FxHdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-4ab4af22d09so490178b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 14:02:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787259746; x=1787864546;
+        h=content-transfer-encoding:content-type:to:from:subject:message-id
+         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GB4j5ZzEbHNjh+qE2dE1EgxaCeO9pNVK6hZY0hWhFP8=;
+        b=RQsV26qt86LxOWjOgjI3Y9UmGEXbptBGtFwCxz6dAwuIB+7BsdQt2MTyt/gP85ZFp3
+         2+iEnIPEYrn4DrchysU9E7rhL6ImoPSdQfXfK6V/BP+Ju22SXyhNnUxYbxcjBYio95Up
+         Ll+usnQQi3Xvd1MgUaYJa0mKIgU3LHs1n+k7EFFOOZJK33zbKTRhmB7R40CDJql7SREh
+         z3eCj8Rq/moLEgC4GjHkjFEjQk648H8IXUEMxusGBDrqsRSfwUZkz4oCWAjixY3NSeWy
+         MCOME8bLkaaQCP9xzkFFZ9KeaXhRtlHduGpgYl+hbgVIQaNlkghSuMbuY0+hKT8/C3ay
+         Eb1w==
+X-Forwarded-Encrypted: i=1; AHgh+Rr8SjJ8XSvBNuBVE/PuutDTB709+9HeDxknHwuTUmO4Bap/q5Q84JUpf1yCPFZnApqoB0cTRADMfgl+4Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcQcUolFbAf4mM2eze9HDpighbZrpQ4CGX0Zs9v7/VxYNcSuQh
+	FN8IlkTABtmUyD/6GePZjxLenSaKDFeLmi8XX6+fFfLTzlPwGqRhM278l9KfX4io+xSa5Bjcjok
+	TUH77iBpsSVjtDmsYMHzXlKM8lcDmcat1CFaem+kMmUSKeV/MmbrBxpmcM78=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
- David Sterba <dsterba@suse.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
- <martin@omnibond.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org,
- devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
-References: <20260820193343.3852967-1-willy@infradead.org>
- <20260820193343.3852967-3-willy@infradead.org>
-From: Bernd Schubert <bernd@bsbernd.com>
-Content-Language: fr, en-US, de-DE, ru-RU
-In-Reply-To: <20260820193343.3852967-3-willy@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6808:1188:b0:4b2:3e72:bab1 with SMTP id
+ 5614622812f47-4b2ef24f8e1mr1021177b6e.6.1787259746343; Thu, 20 Aug 2026
+ 14:02:26 -0700 (PDT)
+Date: Thu, 20 Aug 2026 14:02:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a876b62.4d75e56a.c9a88.004b.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in ocfs2_read_blocks (2)
+From: syzbot <syzbot+b03f9cd50db23adeeb71@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    4477a78374a5 Add linux-next specific files for 20260814
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=3D129b9949580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3D9b32a36dd637b06=
+f
+dashboard link: https://syzkaller.appspot.com/bug?extid=3Db03f9cd50db23adee=
+b71
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-=
+1~exp1~20260613092250.77), Debian LLD 22.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/994c1c8c560e/disk-=
+4477a783.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cd54543d69ae/vmlinux-=
+4477a783.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/407cdf8f3fc2/bzI=
+mage-4477a783.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit=
+:
+Reported-by: syzbot+b03f9cd50db23adeeb71@syzkaller.appspotmail.com
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L    =20
+------------------------------------------------------
+syz.3.993/9951 is trying to acquire lock:
+ffff8880724887d0 (&oi->ip_io_mutex){+.+.}-{4:4}, at: ocfs2_read_blocks+0x1e=
+f/0x14d0 fs/ocfs2/buffer_head_io.c:229
+
+but task is already holding lock:
+ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_upda=
+te include/linux/blkdev.h:1101 [inline]
+ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: loop_configure+0x787/0x=
+dc0 drivers/block/loop.c:1083
+
+which lock already depends on the new lock.
 
 
+the existing dependency chain (in reverse order) is:
 
-On 8/20/26 21:33, Matthew Wilcox (Oracle) wrote:
-> FUSE relies on invalidate_inode_pages2() / invalidate_inode_pages2_range()
-> doing writeback by calling fuse_launder_folio().  While this works, it
-> is inefficient as each page is written back and waited for individually.
-> Far better to call filemap_invalidate_pages() which will do a bulk write
-> first, then remove the page cache.
-> 
-> With this done, fuse_launder_folio() no longer needs to exist so
-> delete it.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  fs/fuse/dax.c   | 15 +++------------
->  fs/fuse/dir.c   | 12 +++++++-----
->  fs/fuse/file.c  | 46 ++++++----------------------------------------
->  fs/fuse/inode.c | 17 +++++------------
->  4 files changed, 21 insertions(+), 69 deletions(-)
-> 
-> diff --git a/fs/fuse/dax.c b/fs/fuse/dax.c
-> index 8b53625ac7ab..45843975e28b 100644
-> --- a/fs/fuse/dax.c
-> +++ b/fs/fuse/dax.c
-> @@ -835,19 +835,10 @@ static int dmap_writeback_invalidate(struct inode *inode,
->  	loff_t start_pos = dmap->itn.start << FUSE_DAX_SHIFT;
->  	loff_t end_pos = (start_pos + FUSE_DAX_SZ - 1);
->  
-> -	ret = filemap_fdatawrite_range(inode->i_mapping, start_pos, end_pos);
-> -	if (ret) {
-> -		pr_debug("fuse: filemap_fdatawrite_range() failed. err=%d start_pos=0x%llx, end_pos=0x%llx\n",
-> -			 ret, start_pos, end_pos);
-> -		return ret;
-> -	}
-> -
-> -	ret = invalidate_inode_pages2_range(inode->i_mapping,
-> -					    start_pos >> PAGE_SHIFT,
-> -					    end_pos >> PAGE_SHIFT);
-> +	ret = filemap_invalidate_pages(inode->i_mapping, start_pos, end_pos);
->  	if (ret)
-> -		pr_debug("fuse: invalidate_inode_pages2_range() failed err=%d\n",
-> -			 ret);
-> +		pr_debug("fuse: filemap_invalidate_pages() failed. err=%d start_pos=0x%llx, end_pos=0x%llx\n",
-> +			 ret, start_pos, end_pos);
->  
->  	return ret;
->  }
-> diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
-> index 0e2a1039fa43..c6c72c0ee669 100644
-> --- a/fs/fuse/dir.c
-> +++ b/fs/fuse/dir.c
-> @@ -913,7 +913,8 @@ static int fuse_create_open(struct mnt_idmap *idmap, struct inode *dir,
->  		if (fm->fc->atomic_o_trunc && trunc)
->  			truncate_pagecache(inode, 0);
->  		else if (!(ff->open_flags & FOPEN_KEEP_CACHE))
-> -			invalidate_inode_pages2(inode->i_mapping);
-> +			filemap_invalidate_pages(inode->i_mapping, 0,
-> +					OFFSET_MAX);
->  	}
->  	return err;
->  
-> @@ -1904,7 +1905,8 @@ static int fuse_dir_open(struct inode *inode, struct file *file)
->  		if (ff->open_flags & (FOPEN_STREAM | FOPEN_NONSEEKABLE))
->  			nonseekable_open(inode, file);
->  		if (!(ff->open_flags & FOPEN_KEEP_CACHE))
-> -			invalidate_inode_pages2(inode->i_mapping);
-> +			filemap_invalidate_pages(inode->i_mapping, 0,
-> +					OFFSET_MAX);
->  	}
->  
->  	return err;
-> @@ -2277,13 +2279,13 @@ int fuse_do_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
->  	spin_unlock(&fi->lock);
->  
->  	/*
-> -	 * Only call invalidate_inode_pages2() after removing
-> -	 * FUSE_NOWRITE, otherwise fuse_launder_folio() would deadlock.
-> +	 * Only call filemap_invalidate_pages() after removing
-> +	 * FUSE_NOWRITE, otherwise it would deadlock.
->  	 */
->  	if ((is_truncate || !is_wb) &&
->  	    S_ISREG(inode->i_mode) && oldsize != outarg.attr.size) {
->  		truncate_pagecache(inode, outarg.attr.size);
-> -		invalidate_inode_pages2(mapping);
-> +		filemap_invalidate_pages(mapping, 0, OFFSET_MAX);
->  	}
->  
->  	clear_bit(FUSE_I_SIZE_UNSTABLE, &fi->state);
-> diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-> index ceada75310b8..2496161f9298 100644
-> --- a/fs/fuse/file.c
-> +++ b/fs/fuse/file.c
-> @@ -294,7 +294,8 @@ static int fuse_open(struct inode *inode, struct file *file)
->  		if (is_truncate)
->  			truncate_pagecache(inode, 0);
->  		else if (!(ff->open_flags & FOPEN_KEEP_CACHE))
-> -			invalidate_inode_pages2(inode->i_mapping);
-> +			filemap_invalidate_pages(inode->i_mapping, 0,
-> +					OFFSET_MAX);
->  	}
->  	if (dax_truncate)
->  		filemap_invalidate_unlock(inode->i_mapping);
-> @@ -644,10 +645,8 @@ static void fuse_aio_invalidate_worker(struct work_struct *work)
->  	struct fuse_io_priv *io = container_of(work, struct fuse_io_priv, work);
->  	struct address_space *mapping = io->iocb->ki_filp->f_mapping;
->  	ssize_t res = fuse_get_res_by_io(io);
-> -	pgoff_t start = io->offset >> PAGE_SHIFT;
-> -	pgoff_t end = (io->offset + res - 1) >> PAGE_SHIFT;
->  
-> -	invalidate_inode_pages2_range(mapping, start, end);
-> +	filemap_invalidate_pages(mapping, io->offset, io->offset + res - 1);
->  	io->iocb->ki_complete(io->iocb, res);
->  	kref_put(&io->refcnt, fuse_io_release);
->  }
-> @@ -1675,8 +1674,6 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
->  	size_t nmax = write ? fc->max_write : fc->max_read;
->  	loff_t pos = *ppos;
->  	size_t count = iov_iter_count(iter);
-> -	pgoff_t idx_from = pos >> PAGE_SHIFT;
-> -	pgoff_t idx_to = (pos + count - 1) >> PAGE_SHIFT;
->  	ssize_t res = 0;
->  	int err = 0;
->  	struct fuse_io_args *ia;
-> @@ -1689,7 +1686,7 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
->  		return -ENOMEM;
->  
->  	if (fopen_direct_io) {
-> -		res = filemap_write_and_wait_range(mapping, pos, pos + count - 1);
-> +		res = filemap_invalidate_pages(mapping, pos, pos + count - 1);
->  		if (res) {
->  			fuse_io_free(ia);
->  			return res;
-> @@ -1703,14 +1700,6 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
->  			inode_unlock(inode);
->  	}
->  
-> -	if (fopen_direct_io && write) {
-> -		res = invalidate_inode_pages2_range(mapping, idx_from, idx_to);
-> -		if (res) {
-> -			fuse_io_free(ia);
-> -			return res;
-> -		}
-> -	}
-> -
->  	io->should_dirty = !write && user_backed_iter(iter);
->  	while (count) {
->  		ssize_t nres;
-> @@ -1824,9 +1813,7 @@ static ssize_t fuse_direct_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  			 * write, to invalidate read-ahead cache that may have
->  			 * with the write.
->  			 */
-> -			invalidate_inode_pages2_range(mapping,
-> -				pos >> PAGE_SHIFT,
-> -				(pos + res - 1) >> PAGE_SHIFT);
-> +			filemap_invalidate_pages(mapping, pos, pos + res - 1);
->  		}
->  	}
->  	fuse_dio_unlock(iocb, exclusive);
-> @@ -2324,26 +2311,6 @@ static int fuse_writepages(struct address_space *mapping,
->  	return iomap_writepages(&wpc);
->  }
->  
-> -static int fuse_launder_folio(struct folio *folio)
-> -{
-> -	int err = 0;
-> -	struct fuse_fill_wb_data data = {};
-> -	struct iomap_writepage_ctx wpc = {
-> -		.inode = folio->mapping->host,
-> -		.iomap.type = IOMAP_MAPPED,
-> -		.ops = &fuse_writeback_ops,
-> -		.wb_ctx	= &data,
-> -	};
-> -
-> -	if (folio_clear_dirty_for_io(folio)) {
-> -		err = iomap_writeback_folio(&wpc, folio);
-> -		err = fuse_iomap_writeback_submit(&wpc, err);
-> -		if (!err)
-> -			folio_wait_writeback(folio);
-> -	}
-> -	return err;
-> -}
-> -
->  /*
->   * Write back dirty data/metadata now (there may not be any suitable
->   * open files later for data)
-> @@ -2427,7 +2394,7 @@ static int fuse_file_mmap(struct file *file, struct vm_area_struct *vma)
->  		if ((vma->vm_flags & VM_MAYSHARE) && !fc->direct_io_allow_mmap)
->  			return -ENODEV;
->  
-> -		invalidate_inode_pages2(file->f_mapping);
-> +		filemap_invalidate_pages(file->f_mapping, 0, OFFSET_MAX);
->  
->  		if (!(vma->vm_flags & VM_MAYSHARE)) {
->  			/* MAP_PRIVATE */
-> @@ -3102,7 +3069,6 @@ static const struct address_space_operations fuse_file_aops  = {
->  	.read_folio	= fuse_read_folio,
->  	.readahead	= fuse_readahead,
->  	.writepages	= fuse_writepages,
-> -	.launder_folio	= fuse_launder_folio,
->  	.dirty_folio	= iomap_dirty_folio,
->  	.release_folio	= iomap_release_folio,
->  	.invalidate_folio = iomap_invalidate_folio,
-> diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-> index d975073c6029..2c9a93a2173a 100644
-> --- a/fs/fuse/inode.c
-> +++ b/fs/fuse/inode.c
-> @@ -382,7 +382,8 @@ static void fuse_change_attributes_i(struct inode *inode, struct fuse_attr *attr
->  		}
->  
->  		if (inval)
-> -			invalidate_inode_pages2(inode->i_mapping);
-> +			filemap_invalidate_pages(inode->i_mapping, 0,
-> +					OFFSET_MAX);
->  	}
->  
->  	if (IS_ENABLED(CONFIG_FUSE_DAX))
-> @@ -547,8 +548,6 @@ int fuse_reverse_inval_inode(struct fuse_conn *fc, u64 nodeid,
->  {
->  	struct fuse_inode *fi;
->  	struct inode *inode;
-> -	pgoff_t pg_start;
-> -	pgoff_t pg_end;
->  
->  	inode = fuse_ilookup(fc, nodeid, NULL);
->  	if (!inode)
-> @@ -561,15 +560,9 @@ int fuse_reverse_inval_inode(struct fuse_conn *fc, u64 nodeid,
->  
->  	fuse_invalidate_attr(inode);
->  	forget_all_cached_acls(inode);
-> -	if (offset >= 0) {
-> -		pg_start = offset >> PAGE_SHIFT;
-> -		if (len <= 0)
-> -			pg_end = -1;
-> -		else
-> -			pg_end = (offset + len - 1) >> PAGE_SHIFT;
-> -		invalidate_inode_pages2_range(inode->i_mapping,
-> -					      pg_start, pg_end);
-> -	}
-> +	if (offset >= 0)
-> +		filemap_invalidate_pages(inode->i_mapping, offset,
-> +				offset + len - 1);
->  	iput(inode);
->  	return 0;
->  }
+-> #2 (&q->limits_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+       loop_set_dio drivers/block/loop.c:1460 [inline]
+       lo_simple_ioctl drivers/block/loop.c:1528 [inline]
+       lo_ioctl+0x16ca/0x2150 drivers/block/loop.c:1594
+       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Please correct me if I'm wrong, but doesn't that changes behavior for
-len <= 0? The logic to invalidate till the file end is lost, at least if
-offset is != -1?  And incostent behavior for len < 1?
-Note that the existing behavior is used by libfuse and heavily by some
-fuse daemons.
+-> #1 (&q->q_usage_counter(io)#24){++++}-{0:0}:
+       bio_queue_enter block/blk.h:95 [inline]
+       blk_mq_submit_bio+0x7f8/0x2a70 block/blk-mq.c:3127
+       __submit_bio_noacct_mq block/blk-core.c:756 [inline]
+       submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
+       ocfs2_read_blocks+0x85e/0x14d0 fs/ocfs2/buffer_head_io.c:324
+       ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
+       ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
+       ocfs2_get_clusters+0x341/0xc00 fs/ocfs2/extent_map.c:625
+       ocfs2_extent_map_get_blocks+0x202/0x6a0 fs/ocfs2/extent_map.c:678
+       ocfs2_read_virt_blocks+0x283/0x9c0 fs/ocfs2/extent_map.c:1001
+       ocfs2_read_dir_block fs/ocfs2/dir.c:522 [inline]
+       ocfs2_find_entry_el fs/ocfs2/dir.c:790 [inline]
+       ocfs2_find_entry+0x3c3/0x2050 fs/ocfs2/dir.c:1165
+       ocfs2_find_files_on_disk+0xe0/0x340 fs/ocfs2/dir.c:2082
+       ocfs2_lookup_ino_from_name+0x52/0x100 fs/ocfs2/dir.c:2104
+       _ocfs2_get_system_file_inode fs/ocfs2/sysfile.c:133 [inline]
+       ocfs2_get_system_file_inode+0x32f/0x810 fs/ocfs2/sysfile.c:110
+       ocfs2_init_global_system_inodes+0x318/0x6e0 fs/ocfs2/super.c:461
+       ocfs2_initialize_super fs/ocfs2/super.c:2192 [inline]
+       ocfs2_fill_super+0x456e/0x6840 fs/ocfs2/super.c:993
+       get_tree_bdev_flags+0x430/0x4f0 fs/super.c:1887
+       vfs_get_tree+0x92/0x2a0 fs/super.c:1947
+       fc_mount fs/namespace.c:1198 [inline]
+       do_new_mount_fc fs/namespace.c:3772 [inline]
+       do_new_mount+0x319/0xdc0 fs/namespace.c:3848
+       do_mount fs/namespace.c:4181 [inline]
+       __do_sys_mount fs/namespace.c:4397 [inline]
+       __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Thanks,
-Bernd
+-> #0 (&oi->ip_io_mutex){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3181 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+       validate_chain kernel/locking/lockdep.c:3924 [inline]
+       __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       ocfs2_read_blocks+0x1ef/0x14d0 fs/ocfs2/buffer_head_io.c:229
+       ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
+       ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
+       ocfs2_assign_bh fs/ocfs2/dlmglue.c:2415 [inline]
+       ocfs2_inode_lock_full_nested+0x2bb/0x1b30 fs/ocfs2/dlmglue.c:2510
+       ocfs2_statfs+0x1ba/0xa70 fs/ocfs2/super.c:1577
+       statfs_by_dentry fs/statfs.c:66 [inline]
+       vfs_statfs+0x147/0x2d0 fs/statfs.c:90
+       loop_get_discard_config drivers/block/loop.c:774 [inline]
+       loop_update_limits+0x375/0x920 drivers/block/loop.c:984
+       loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
+       lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
+       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &oi->ip_io_mutex --> &q->q_usage_counter(io)#24 --> &q->limits_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->limits_lock);
+                               lock(&q->q_usage_counter(io)#24);
+                               lock(&q->limits_lock);
+  lock(&oi->ip_io_mutex);
+
+ *** DEADLOCK ***
+
+locks held by syz.3.993/9951: 2, last CPU#1:
+ #0: ffff888026af3430 (&lo->lo_mutex){+.+.}-{4:4}, at: loop_global_lock_kil=
+lable drivers/block/loop.c:119 [inline]
+ #0: ffff888026af3430 (&lo->lo_mutex){+.+.}-{4:4}, at: loop_configure+0x35d=
+/0xdc0 drivers/block/loop.c:1038
+ #1: ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start=
+_update include/linux/blkdev.h:1101 [inline]
+ #1: ffff888026afda68 (&q->limits_lock){+.+.}-{4:4}, at: loop_configure+0x7=
+87/0xdc0 drivers/block/loop.c:1083
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 9951 Comm: syz.3.993 Tainted: G             L      syzka=
+ller #0 PREEMPT(full)=20
+Tainted: [L]=3DSOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
+gle 07/24/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2059
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2191
+ check_prev_add kernel/locking/lockdep.c:3181 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+ validate_chain kernel/locking/lockdep.c:3924 [inline]
+ __lock_acquire+0x15ff/0x2e50 kernel/locking/lockdep.c:5254
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5908
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+ ocfs2_read_blocks+0x1ef/0x14d0 fs/ocfs2/buffer_head_io.c:229
+ ocfs2_read_inode_block_full fs/ocfs2/inode.c:1968 [inline]
+ ocfs2_read_inode_block+0xe0/0x190 fs/ocfs2/inode.c:1980
+ ocfs2_assign_bh fs/ocfs2/dlmglue.c:2415 [inline]
+ ocfs2_inode_lock_full_nested+0x2bb/0x1b30 fs/ocfs2/dlmglue.c:2510
+ ocfs2_statfs+0x1ba/0xa70 fs/ocfs2/super.c:1577
+ statfs_by_dentry fs/statfs.c:66 [inline]
+ vfs_statfs+0x147/0x2d0 fs/statfs.c:90
+ loop_get_discard_config drivers/block/loop.c:774 [inline]
+ loop_update_limits+0x375/0x920 drivers/block/loop.c:984
+ loop_configure+0x7d2/0xdc0 drivers/block/loop.c:1084
+ lo_ioctl+0xad5/0x2150 drivers/block/loop.c:1564
+ blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f61a979e0d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 =
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
+f 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f61aa701028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f61a9a26180 RCX: 00007f61a979e0d9
+RDX: 0000200000001800 RSI: 0000000000004c0a RDI: 0000000000000005
+RBP: 00007f61a9835024 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f61a9a26218 R14: 00007f61a9a26180 R15: 00007ffd47e4a038
+ </TASK>
+loop8: detected capacity change from 0 to 7
+Dev loop8: unable to read RDB block 7
+ loop8: unable to read partition table
+loop8: partition table beyond EOD, truncated
+loop_reread_partitions: partition scan of loop8 (=EF=BF=BD=E8=A2=ABx=EF=BF=
+=BD^>=EF=BF=BD) failed (rc=3D-5)
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
