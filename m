@@ -1,82 +1,130 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9AE23815B
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 00:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5511DCA6B
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 01:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787187372; cv=none; b=csekoBh1QmRE+qIJkjFXzYHt/byglYzwungByYPLzvyvcGpRkXoImflGPl/+4a0HQ5ivx+Js9yGuyA53LUItk40tnE2DrIdIGMqMU5Y1Z1GxY9bpjdm5/cMPmjSrZymNKV0sxkVUcK9rOxke3Lv4QPmPJvLt62RW0w2Lh/O/UBI=
+	t=1787188154; cv=none; b=VAARYxtK5b2AVPsscFDOtYQVnAbBWdG0RQKVXrguEtnbaeOWYKjKroTGuWHPr0oap9UedewFwtmRmNKeza9p0aUISL4Eex2zR9CKcawNgTH4Kpf2xkp70rV3BpgLmWetkZZFsgAh7KgeRh+ODtocIzM6xOL1WLnoZ1FTDCu/Sh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787187372; c=relaxed/simple;
-	bh=1nMSuv1BdRBJ6ggoL8KNoTEoEsA8LvL0J7ybengfuTo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WKYidOCiLDJiURCGWYe/qepEd/Qa59JICHxnLAVb0r9kiAqeegicVQGdcyZFFf/o6IJOBMPhwMZl9MH1KlaVonvyP0PouDN1EyZ9wCzRhlPuAvX3hDuc/O4JoefJ6UXuFHhZ72IupYwKLcjT6zLre5hbkD4gMGfrGVs0jdjYZoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e8626e769c3111f19a56ed5b684f684d-20260820
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_QP, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:066b6852-abf6-4c80-8ddb-455eba091a83,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:10
-X-CID-INFO: VERSION:1.3.19,REQID:066b6852-abf6-4c80-8ddb-455eba091a83,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:10
-X-CID-META: VersionHash:7db8b62,CLOUDID:55e9f2d24782c58d6ca998e0b11ac445,BulkI
-	D:260819162138MN74OV5N,BulkQuantity:1,SF:10|66|78|81|82|83|102|127|850|865
-	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:
-	nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,AR
-	C:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: e8626e769c3111f19a56ed5b684f684d-20260820
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 538528718; Thu, 20 Aug 2026 08:55:59 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: shinichiro.kawasaki@wdc.com
-Cc: dwagner@suse.de,
-	linux-block@vger.kernel.org,
-	sangyao@kylinos.cn
-Subject: Re: [PATCH blktests] nvme/070: add multipath command effects log lifetime test
-Date: Thu, 20 Aug 2026 08:55:32 +0800
-Message-Id: <20260820005532.1564542-1-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <aoVkX-G5f4WNiU8e@shinhome>
-References: <aoVkX-G5f4WNiU8e@shinhome>
+	s=arc-20240116; t=1787188154; c=relaxed/simple;
+	bh=H9Dw27MoJUOXtKhToUDXu4yxZ8/SwzD/kZPyQC6UXq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qpd+cdhctVWdjfBCQAmktv2dFbP9mnxS7IQe8dyPtSLpngOPyC1VMPbaVyhF3R2876NHaGq4R2Wf6S6f9ox+resR0rEjofiz7pEdEim3g5nDm4c86t7yb9ifkFbb7By9SJWQqrWS4mtVUTMDCYXZ4cIEsPDDkVMNdxcu9ZMaE14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wbc2j+0e; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wbc2j+0e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A3C1F000E9;
+	Thu, 20 Aug 2026 01:09:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787188153;
+	bh=MrNDTOGNGZZIPMFkB7HdjVIz/nvAF3TkAeN5zA8lkfg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Wbc2j+0eXbXatWLVo6gqXOVtEFSkhnUKupYmXlCaHj2oy6sBo/kwtQV2eGobBc9Oe
+	 3LYFzTevP595pDYb5+lNRkDdoeY/LdXtjNtuxf0MKLQNnDCOkOQJX/Jg9Lf8uPJCEz
+	 +Q/CNSu1WgG7qjDEE8EyYg0fcqkZCFktup1/F8xyarZCR8LDSVZG3IFwspCwLW3vEg
+	 Pv3gTyDX2YzNBoHf/YgSKhvjs9WXES03JQpYKttJ+tnNh1vRDmdPdZjOjsja5ydsjI
+	 ZS7K2c3Q6xShISoGMZFuBbG/+7N0ScsLa+S4JirFT2lInyJFLu4MqFhjBW7m8g9GdZ
+	 M1ec2eTQpqwbQ==
+Date: Wed, 19 Aug 2026 21:09:12 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Block updates for 7.3
+Message-ID: <aoZTuDIVkY-qCE5p@kernel.org>
+References: <8787a176-6f4b-47fc-a309-867acf9fbdff@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8787a176-6f4b-47fc-a309-867acf9fbdff@kernel.dk>
 
-Hi Shin'ichiro,=0D
-=0D
-Thanks for the review. I agree with the other suggestions, but I have one=0D
-concern about dropping the KASAN requirement.=0D
-=0D
-The issue is reliably reproducible with KASAN enabled. Without KASAN,=0D
-however, the test may pass even on an affected kernel and fail to catch=0D
-the bug. Given this limitation, do you think it is still appropriate to=0D
-remove the _have_kernel_options KASAN check?=0D
-=0D
-I will also update the commit message and test comments with the actual=0D
-kernel fix commit once it is merged.=0D
-=0D
-Thanks,=0D
-Yao=0D
+On Wed, Aug 19, 2026 at 02:30:37PM -0600, Jens Axboe wrote:
+> Hi Linus,
+> 
+> The bulk of this is NVMe and MD, both via merges, but the core block
+> changes are the more interesting part. In detail:
+> 
+> - NVMe updates via Keith:
+>        - Enable Clang context analysis for the nvme host driver, adding
+>          context annotations across core, fabrics, rdma, tcp and pci
+>        - nvmet reservation state exposed through a new namespace-level
+>          debugfs directory, plus ABI documentation for the host sysfs
+>          and target configfs interfaces
+>        - nvme-tcp host memory disclosure fixes on the read path: reject a
+>          read that transferred too few bytes, don't accept C2HData based
+>          on blk_rq_payload_bytes() alone, and fix the R2T case for a read
+>          command
+>        - Parallelize nvme-rdma I/O queue allocation and startup (Surabhi)
+>        - Apple nvme fixes and quirks: page aligned admin queue buffers,
+>          destroy the admin queue on removal, and various DMA/NVMMU
+>          correctness fixes
+>        - A large pile of nvmet and host fixes for out-of-bounds reads,
+>          refcount/resource leaks, and NULL derefs across auth, zns,
+>          passthru, pci-epf, rdma and configfs
+>        - Various other fixes and cleanups
+> 
+> - MD updates via Yu Kuai:
+>        - llbitmap reshape support, the large series wiring exact bitmap
+>          mapping and reshape lifecycle through raid5 and raid10, growing
+>          the page cache in place, and remapping checkpointed bits as
+>          reshape progresses
+>        - raid5 fixes for lockless max_nr_stripes and recovery_offset
+>          accesses, a reshape deadlock with more failed devices than max
+>          degraded, and bitmap batch counter consistency
+>        - Atomic write handling for raid1/raid10, and removal of the
+>          REQ_NOWAIT support from raid1/10/456
+>        - raid5-ppl use-after-free fix in ppl_do_flush()
+>        - A batch of smaller fixes across md core and the bitmap code
+> 
+> - s390/dasd ESE full-track write support and the surrounding
+>   infrastructure, plus enabling CONTEXT_ANALYSIS for s390/block
+> 
+> - RWF_DONTCACHE support for block devices, built on new task-context
+>   bio completion infrastructure, and wiring it up for the iomap and
+>   buffer dropbehind writeback paths
+> 
+> - Async io_uring zone reset all, plus zone management command cleanups
+>   allowing REQ_NOWAIT and tightening conventional zone rejection
+> 
+> - Block integrity refactoring: lift BIP_CHECK_FLAGS to the shared
+>   header, handle nogenerate/noverify properly in fs-integrity, and
+>   drop the blk-integrity.h include from bdev.c
+> 
+> - Split out a new blk_plug.h header
+> 
+> - ublk improvements: add UBLK_F_IO_DESC_SIZE, split request validation
+>   from io_desc init, reject non-power-of-2 zone sizes in SET_PARAMS,
+>   and a series of hardening fixes around map/unmap and auto buf reg
+> 
+> - null_blk cleanups and configfs serialization fixes
+> 
+> - nbd queue freeze removal on the setup paths, and a new
+>   pre_defined_connections module parameter for pre-created devices
+> 
+> - blk-cgroup fixes for the race between policy activation and blkg
+>   destruction, and accounting per-cpu stats over possible CPUs across
+>   blk-stat, iolatency, iocost and kyber
+> 
+> - Various dio fixes: leak on metadata mapping error, validate user
+>   space vectors during extraction, and set dma_alignment from the
+>   backing file for loop and zloop direct I/O
+
+Hey Jens,
+
+I just encountered this today, so figured I'd share: I think there is
+a post-merge fixup needed once Linus were to merge your block changes,
+due to vfs iomap changes from vfs-7.3-rc1.iomap (which Linus already
+merged).
+
+Specifically commit 36f199c8d0ee4 ("iomap: add simple dio path for
+small direct I/O") added a new caller for bio_iov_iter_get_pages and
+Keith's commit 14b007e178811 ("block: validate user space vectors
+during extraction") added a new argument to bio_iov_iter_get_pages.
+
+Mike
