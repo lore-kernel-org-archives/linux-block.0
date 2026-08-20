@@ -1,55 +1,55 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FC0408630
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 19:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD04740B107
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 19:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787255885; cv=none; b=CEL7mvuPx/lW0TumHy1VZEEZxe7zA0onqKmL+0xvr4gQwXnjShXfjwfdNJ7efjslD/fh9fsWQeW/aWhTWmDrqaPhC2mD2nchrwPHsbf+jtkySJXokrl04u83NUMEHVG/IM7FEq4MWxE0aZaCZI4M3Om29pksBig1HQF1rAX5EOI=
+	t=1787255888; cv=none; b=cB0IfaeHNexgY9CcQxNpEqQPfWjEkjrdC61dyrQgm9sDY2/M7cvZV3/J4ShG57uGkBxc86M57IMMXY9LtXHbBfP/m38qMVj6Z7q+libi+cuV+JmUbbHtIyDiVd6z0fKHimgFWR6AjLiAOe4ZRi9sW+XE0z/TYvCIxFi95j1naDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787255885; c=relaxed/simple;
-	bh=FdemlE/D63fvfwoZuVQ4//FXMQi2bHQBeHx9NA+LIfg=;
+	s=arc-20240116; t=1787255888; c=relaxed/simple;
+	bh=nrrjtQwh0O36pPeeC6+8mQAbG5SBL9/4D387nQyR664=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r9BVFobO3wsYZOknQlXE+am6s4jf6aMRZXJUTE+xobWdf5ToXZDQCqVFgohT6d34Di5DWDnwdvxagElmuV+qpFMkiP/+GgFy2er2qybILyRqm3Egxbi/TN9OS/BlWGn1asvDlC4mqH9ISMe5kQ8znmuCyp3euViXZRu/cpbh9Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=JsuWB1pY; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=G8Xu3rEd4HohdozHGAyPaE8MnB1+5pVC+uYJcyd8eUby1zMFYytKSI9duzo3/5oikFKEWJJrXfp3XdQ3+vx8ilAbRlEMsaPynC8LiYv+sOgnVAVvt2qw3DKUl4Qvz/FYeTza1SBGuLZBp1kL9pTMz9fEEr8eCRnY45KcAOjiXJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=YRPFaD/U; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="JsuWB1pY"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="YRPFaD/U"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hQvPR4Zj9zlfq9R;
-	Thu, 20 Aug 2026 19:58:03 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hQvPV1hXjzlfsTm;
+	Thu, 20 Aug 2026 19:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1787255879; x=1789847880; bh=lSnF2
-	8tCm4QwwldrbFHNsXPBJVyD980ZWV6kfqJyWnU=; b=JsuWB1pY2K98BdxZXvOt2
-	UV0AKTEuamnMVmH8baFRCYjrHXVcsyx3VSTPH3yEkhhyXvKNAMNApuDWDHRzt7S7
-	87FYGKjors7w+p0mfBvs31ac4F68619P4SKN451yfRM1WJzFeYNCzsj0CjYs+54C
-	rkKlPy0P5VScyyf0ve92kp+Pb3Y0Q/4ILspBRXwkHR7kVWCxj9nUUpo0q9zPVAmk
-	SkZejIDoqzvgTiAhTlo8N4+UlUIbTTDiL02nbL6dcnqv8nJ38BRrcjoruvNO0Fnl
-	fbeirfdCnp1yJwiJRrGBScbv8iF1kBFF18SEPoSiJ7N1AGtmYRutzHJOmf5IUdOP
-	g==
+	:received:received; s=mr01; t=1787255883; x=1789847884; bh=x/GTT
+	XMas7aLrp++KdRAvI1nlG0fSiY2N6z69XdNIrk=; b=YRPFaD/U3bL+Mz5mLBzCy
+	deenvaoXL4o1onoE2ToaUVtbSbeiHGCYv+EUYhtq3M6WFykhFo9lP499hIinHkfM
+	rC0PqIOxckjtC8KOTwRIjUtcgNvh3vqd2tFiSRujShb7ys1KXhAjqydbo4jiJMIq
+	Gdb8KYF5GTg8S/zyzUIbihZkQ9h9FtairlXcdro/izKCNhWh297l3i/Ywsx30Pf/
+	yf4wUhL5Gh1JToLD0KlsVH7eIV890GnCNhWNzq+82shg3v29gO0dILg+k+kXs+X0
+	hEh72V8yTwBqEN0rreYiKtTln8z80ptKiABJ7jl1gV7tYdjrRBwN4MTgfyuXvKgl
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id EhKUYnR3jcDh; Thu, 20 Aug 2026 19:57:59 +0000 (UTC)
+ id T3kU7Y1tJ9-t; Thu, 20 Aug 2026 19:58:03 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (148.60.168.34.bc.googleusercontent.com [34.168.60.148])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hQvPL0HBVzlfvpW;
-	Thu, 20 Aug 2026 19:57:57 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hQvPQ1pCFzlfsVF;
+	Thu, 20 Aug 2026 19:58:01 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Nilay Shroff <nilay@linux.ibm.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 10/13] loop: Split loop_configure()
-Date: Thu, 20 Aug 2026 12:57:18 -0700
-Message-ID: <53467b1efacc57ea68c8d5e4f6f56fb2c2ccf516.1787255652.git.bvanassche@acm.org>
+Subject: [PATCH 12/13] loop: Modify the loop_process_work() calling convention
+Date: Thu, 20 Aug 2026 12:57:20 -0700
+Message-ID: <637d7618f1111e2447b8b1f219eef2ad40d88a29.1787255652.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.55.0.766.g2966f0265a-goog
 In-Reply-To: <cover.1787255652.git.bvanassche@acm.org>
 References: <cover.1787255652.git.bvanassche@acm.org>
@@ -61,182 +61,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prepare for adding a second __loop_configure() call.
+Prepare for annotating the rootcg_cmd_list member with __guarded_by().
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/loop.c | 110 +++++++++++++++++++++++--------------------
- 1 file changed, 58 insertions(+), 52 deletions(-)
+ drivers/block/loop.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 5ba4cf435103..cf65d88d73c2 100644
+index 8fde5f2d3473..637212af70d2 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1052,61 +1052,29 @@ static void loop_update_limits(struct loop_device=
- *lo, struct queue_limits *lim,
- 		lim->discard_granularity =3D 0;
+@@ -2037,13 +2037,15 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
  }
 =20
--static int loop_configure(struct loop_device *lo, blk_mode_t mode,
--			  struct block_device *bdev,
--			  const struct loop_config *config)
-+static int __loop_configure(struct loop_device *lo, blk_mode_t mode,
-+			    struct block_device *bdev,
-+			    const struct loop_config *config, struct file *file,
-+			    bool *partscan)
-+	__must_hold(&lo->lo_mutex)
+ static void loop_process_work(struct loop_worker *worker,
+-			struct list_head *cmd_list, struct loop_device *lo)
++			      struct loop_device *lo, bool rootcg)
  {
--	struct file *file =3D fget(config->fd);
- 	struct queue_limits lim;
--	int error;
- 	loff_t size;
--	bool partscan;
--	bool is_loop;
--
--	if (!file)
--		return -EBADF;
--
--	error =3D loop_check_backing_file(file);
--	if (error) {
--		fput(file);
--		return error;
--	}
--
--	is_loop =3D is_loop_device(file);
--
--	/* This is safe, since we have a reference from open(). */
--	__module_get(THIS_MODULE);
--
--	/*
--	 * If we don't hold exclusive handle for the device, upgrade to it
--	 * here to avoid changing device under exclusive owner.
--	 */
--	if (!(mode & BLK_OPEN_EXCL)) {
--		error =3D bd_prepare_to_claim(bdev, loop_configure, NULL);
--		if (error)
--			goto out_putf;
--	}
--
--	error =3D loop_global_lock_killable(lo, is_loop);
--	if (error)
--		goto out_bdev;
-+	int error;
+ 	int orig_flags =3D current->flags;
++	struct list_head *cmd_list;
+ 	struct loop_cmd *cmd;
 =20
--	error =3D -EBUSY;
- 	if (lo->lo_state !=3D Lo_unbound)
--		goto out_unlock;
-+		return -EBUSY;
+ 	current->flags |=3D PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
+ 	spin_lock_irq(&lo->lo_work_lock);
++	cmd_list =3D rootcg ? &lo->rootcg_cmd_list : &worker->cmd_list;
+ 	while (!list_empty(cmd_list)) {
+ 		cmd =3D container_of(
+ 			cmd_list->next, struct loop_cmd, list_entry);
+@@ -2074,14 +2076,14 @@ static void loop_workfn(struct work_struct *work)
+ {
+ 	struct loop_worker *worker =3D
+ 		container_of(work, struct loop_worker, work);
+-	loop_process_work(worker, &worker->cmd_list, worker->lo);
++	loop_process_work(worker, worker->lo, false);
+ }
 =20
- 	error =3D loop_validate_file(lo, file, bdev);
- 	if (error)
--		goto out_unlock;
-+		return error;
+ static void loop_rootcg_workfn(struct work_struct *work)
+ {
+ 	struct loop_device *lo =3D
+ 		container_of(work, struct loop_device, rootcg_work);
+-	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
++	loop_process_work(NULL, lo, true);
+ }
 =20
--	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) !=3D 0) {
--		error =3D -EINVAL;
--		goto out_unlock;
--	}
-+	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) !=3D 0)
-+		return -EINVAL;
-=20
- 	error =3D loop_set_status_from_info(lo, &config->info);
- 	if (error)
--		goto out_unlock;
-+		return error;
- 	lo->lo_flags =3D config->info.lo_flags;
-=20
- 	if (!(file->f_mode & FMODE_WRITE) || !(mode & BLK_OPEN_WRITE) ||
-@@ -1117,10 +1085,8 @@ static int loop_configure(struct loop_device *lo, =
-blk_mode_t mode,
- 		lo->workqueue =3D alloc_workqueue("loop%d",
- 						WQ_UNBOUND | WQ_FREEZABLE,
- 						0, lo->lo_number);
--		if (!lo->workqueue) {
--			error =3D -ENOMEM;
--			goto out_unlock;
--		}
-+		if (!lo->workqueue)
-+			return -ENOMEM;
- 	}
-=20
- 	/* suppress uevents while reconfiguring the device */
-@@ -1137,7 +1103,7 @@ static int loop_configure(struct loop_device *lo, b=
-lk_mode_t mode,
- 	/* No need to freeze the queue as the device isn't bound yet. */
- 	error =3D queue_limits_commit_update(lo->lo_queue, &lim);
- 	if (error)
--		goto out_unlock;
-+		return error;
-=20
- 	/*
- 	 * We might switch to direct I/O mode for the loop device, write back
-@@ -1155,14 +1121,56 @@ static int loop_configure(struct loop_device *lo,=
- blk_mode_t mode,
- 	WRITE_ONCE(lo->lo_state, Lo_bound);
- 	if (part_shift)
- 		lo->lo_flags |=3D LO_FLAGS_PARTSCAN;
--	partscan =3D lo->lo_flags & LO_FLAGS_PARTSCAN;
--	if (partscan)
-+	*partscan =3D lo->lo_flags & LO_FLAGS_PARTSCAN;
-+	if (*partscan)
- 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
-=20
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
- 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
-=20
-+	return 0;
-+}
-+
-+static int loop_configure(struct loop_device *lo, blk_mode_t mode,
-+			  struct block_device *bdev,
-+			  const struct loop_config *config)
-+{
-+	struct file *file =3D fget(config->fd);
-+	int error;
-+	bool partscan;
-+	bool is_loop;
-+
-+	if (!file)
-+		return -EBADF;
-+
-+	error =3D loop_check_backing_file(file);
-+	if (error) {
-+		fput(file);
-+		return error;
-+	}
-+
-+	is_loop =3D is_loop_device(file);
-+
-+	/* This is safe, since we have a reference from open(). */
-+	__module_get(THIS_MODULE);
-+
-+	/*
-+	 * If we don't hold exclusive handle for the device, upgrade to it
-+	 * here to avoid changing device under exclusive owner.
-+	 */
-+	if (!(mode & BLK_OPEN_EXCL)) {
-+		error =3D bd_prepare_to_claim(bdev, loop_configure, NULL);
-+		if (error)
-+			goto out_putf;
-+	}
-+
-+	error =3D loop_global_lock_killable(lo, is_loop);
-+	if (error)
-+		goto out_bdev;
-+	error =3D __loop_configure(lo, mode, bdev, config, file, &partscan);
- 	loop_global_unlock(lo, is_loop);
-+	if (error)
-+		goto out_bdev;
- 	if (partscan)
- 		loop_reread_partitions(lo);
-=20
-@@ -1171,8 +1179,6 @@ static int loop_configure(struct loop_device *lo, b=
-lk_mode_t mode,
-=20
- 	return 0;
-=20
--out_unlock:
--	loop_global_unlock(lo, is_loop);
- out_bdev:
- 	if (!(mode & BLK_OPEN_EXCL))
- 		bd_abort_claiming(bdev, loop_configure);
+ static const struct blk_mq_ops loop_mq_ops =3D {
