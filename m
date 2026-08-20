@@ -1,73 +1,71 @@
 Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70E3379C28
-	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 16:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252F347CA64
+	for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 16:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787241956; cv=none; b=UHgwUMWM3nWD7KI9NHuwnR1k1tQdPWmgQqMS55i4hj/py1uP0OoKB5T/OWSaG7xky60RgqcfoLbYUD5/VgHjMEE2ZAYy1HYbUwV6706yJHGLu805EYbip90DdXelDV2s3QC7O0spPGs9h60ndV2EmwXnBf5qOvXV5cBPNVS+BDY=
+	t=1787242524; cv=none; b=OgtjODAlq3MaAeOpqE6VCiFpJANv/8fbCrI6qDDDc7sKEApgpGyspB3798eMvFHXFQ/MRXGS8q7zpRWZlNlopxq9rLhgBjPBCnOcsW2QlOlCP//orEOqxXz16YHQyrHztGmEH3PawQY2sNmfSZBmAbLdc3M8AIUgnIXJ3q1UPi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787241956; c=relaxed/simple;
-	bh=ocY4xAl8KTcSa9Lp6Zr9McDe1eZy3H0hSEQWeqOtlQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AKXH0djKXXzl3MJJKr0M0Toow8a6Gw0lhPnShdE7e5/HIZcswm4DIIbWb3g0QVQLIpldY0URsXjYGFk3+DG1lSvCHCgI1ZMv3tezKE3ldDt03meI3yhxvJL8zPxVPxY2u6c6nqguCYjd7uYcCAAw/+zpIlLAjIBRmtqBMmq3uhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=Mr2rLnyT; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1787242524; c=relaxed/simple;
+	bh=1eGaePfxo5ymP3hIkDVgAxG++Nd7qH5qFafgF59tyLo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n9H8vmXPcsrPjh6j1VS1jGRrfbe8Wk5jsAZgdUeLd+49WLvQaULKgb+jIM/t2TzS2BmJf4SAw5u/vwZ8Q1rzKooVGf7z9N4L6RA3c+cgFjcRRLFDA3Ui+MRS4IO0r8S5ouv1QFiSBnU8kF537foeSfXiEwuWYL5R+1D30k8m9Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=lgT0Rdeb; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="Mr2rLnyT"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2d58efc7356so498465ad.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 09:05:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="lgT0Rdeb"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2cf50c6f235so899825ad.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2026 09:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1787241954; x=1787846754; darn=vger.kernel.org;
+        d=shopee.com; s=shopee.com; t=1787242521; x=1787847321; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mlfgi87PnjLpHGyk5E+2mv3sr7KAbB8WjHuaKC5SzIE=;
-        b=Mr2rLnyTkPncNFUAGGrQQA2jHOmzOvTNl54ujgwaHD4N/3fokBxzP2y/2R2HCg9jyo
-         aIpqKT4HChvjYEZTqmbsDmfDqpm79W3gFkQ3SgRilnRwfM5HLwQWxLckAbmE7wkOIHOL
-         gPErGOnI1xqFHuNJVGXTdUWLv9Kyzfm7B5ek7/1NFn2MD8VEUheOBIDB7sjarroM/duE
-         b1tZ2pfmnITaZxRHgl9yMYJN5asdLOHhp6RyC4xVtlTtFHHU3i4N0gfB4KWRxJ4SHnl9
-         SSLynOHndiVLE3IQtASGnHoCTKHyU/8bDSHOE+3s0Ba4B0teivPbEesPIPePUDzqIH0a
-         VKzQ==
+        bh=x9+KSVl0O6/fwQuGvA5+3KkAZNnKqB7JpSYBZ7/97m8=;
+        b=lgT0RdebfDecZyQvD+eBoNlTiAzGpaTBC2PcGUD/7918pQeympPRsqBokOOk5OpbhL
+         nzlFnE/358On1F7Io8kc9fvy+XNCJm0zcbokJ4ZfvO4REcqpqpIU2C+Kek8GvmIRJvwL
+         od3qlNr5MZmkisCud/F8nC11q90YAvrgQlyn5SYiJacfCgJbS9m30WII6IqJ2HTpZfmO
+         uWiMHKBt+vMNh72bANIZCU3ZqnGSiJ2PaTuj7EpeVrjDxxAjo/r3wOz8cHIxNWpcQX5I
+         6YMar4w1EML3LIsJ/W+zQsYmi9alKQgxxLVKmGNrIJde4iwXeLhQIWko40Y41KCVj8jf
+         yTNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787241954; x=1787846754;
+        d=1e100.net; s=20251104; t=1787242521; x=1787847321;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mlfgi87PnjLpHGyk5E+2mv3sr7KAbB8WjHuaKC5SzIE=;
-        b=icUAIQzK7kBVwTML9Tey/RWA5UWRgHSxwwx2FZjOXpx9OX0odqq4aThWgR0mO34roF
-         DhOoks/wuLbF2V6hACH3eRyZnI8I0fbFv77XybAbunDkuW+pjdx/iVgxoisAJ7tfJACW
-         mf0d+ZdLhYUJr2aua8w3n3l5Ub3PjI7SloDk8pC5LN3IvbslRKIJXOq48as+qZ3rqwEu
-         DzeSphBjGIvmLDqKjN8kZ3hT9CTKSxOWdzcOWn4o1IETS1IZDjseMiQ9zEwlBp01//jJ
-         aWB1ixgwKFN7x039o+QUUj0jn9p0X2TFkte1x1oqUcs0Uup5P32a5U3BDWfSinCNxkwV
-         J5tA==
-X-Gm-Message-State: AFuF++mx87Gi9q2vjrNnoYdPb08AmkkJu1qapOMt2iZwscts/h95jjny
-	5QrilU0hOMX8eFRFI37/llFQefleIDj2+NRTYmimSk/3ql2zZf5cHMBWeHPO/rJOVtkAF7ccIt4
-	4cPfw
-X-Gm-Gg: AR+sD11JMzsTzXNAelECYsoamJcs71Jbw0tEHYIW30EQD2oHzk/CfFKxDTozF357gar
-	dkOPXLWeLVVKLbr8TgEhY1a1JrgRj+g33rQfF1toGxE1Vr9C/vZBdDne2y3KseVdXYaad+8enXd
-	rAX+K+FfndeQdcXNecsOxj2PsJ+3FPj1Dc9OSfDwpS5rtXs40CqrGCpHzM993AWWjX//kqXmvNC
-	TtiQzVvMqwQdFyOFqkdhnvDu2nEqS9vFoCobrrm3JCeChZh8ZZw2WJ260Ku7gVOWGBL8MMm4Sc2
-	DRTSsxQscKve3Q9R7cAjTS17i7tyekIsr+vS+rJv2rePWWChgvkPTa2aBFs8CT9Itsy7ioUK67l
-	1kPIvCwNFAf3KW7b6UkzSt8Ol72sp5SFWBc6jtvlX2syzzAR24ID0+I7cm1F9yNxJnMZxiMNNZH
-	QeWC72CYzKjO3ldmV5ydhmI1CIUOvum7IN+T0Mp4GqACt2HA==
-X-Received: by 2002:a17:902:f682:b0:2d5:c099:16e2 with SMTP id d9443c01a7336-2d5fd6fbc91mr229316135ad.13.1787241954030;
-        Thu, 20 Aug 2026 09:05:54 -0700 (PDT)
-Received: from localhost.localdomain ([147.136.157.3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d62e36e20fsm9343015ad.48.2026.08.20.09.05.51
+        bh=x9+KSVl0O6/fwQuGvA5+3KkAZNnKqB7JpSYBZ7/97m8=;
+        b=mH8IOKhQFC+JWz+oL7cn18FixflGY6BgvzvbReSwU/U3WfjSGszrmsiN+MJFbC+ogz
+         X2yXFQUv9TIwhK86m8azdR0fCOficXvxr02M/R83w9EclnE3JjxZV6VTaHDcBrk80ijP
+         wZIbB5H9QOAMnE8rz+//9J7VDRPgBHL0Ubj4w4Kbluzy/oBNJUalXDxc2fYDwxsRxmg3
+         ygDSvieqNN/OA9VXXqKQpw8tByMBNd8pF0npaM4wbjdXJ0a4OQ5Kl5BfU3RvYbgwO3qO
+         WOTvlxexyw862LqjFtZiGlZ41+1gV/rpMX8Kd3lt6TwTc2PVwIsI9H7HUzBHXhuH3Lzd
+         ia2Q==
+X-Gm-Message-State: AFuF++my0uZfQoK5iKbqEL3hId1wZszHdbXgJLEV3tAoRXm+6ncUXMTY
+	CmH2+MxmpRquzSGna6OV+7fQfhyF8SWw+dWKp7t/C2ShynkH9jvcc1boWvdU1nmFxio=
+X-Gm-Gg: AR+sD10sNpZWz1OJeeH+ec+IbaX1vaVBveeHwAGgqoCrOV4J1F1aqnawRFNL3TKE9gc
+	f46j4E/GJJqP++XXPVjfoOKQFQIaaN40fLIGV6RbHRS896EghAf9QtgyUalR6yVr8UKFPmIvMf+
+	WImynls2T0LXgo6rUl1elzS3O/RCOsp4Eo2738id56/f7MFBqpCIMVC0SxqMsnZBZjthhz6mY85
+	+1FSBiuvOXVnAL34Axc8wiqkSSuTli6gwAkv+1qQBTeS3vOLiF1gKARxy1RLe7kW5p6Y8ivyZIG
+	LkNaUqxwON1gpA+DVgCHAijivLV0WqyPXtGm4XsVQcQq8DwvMj3xpMIU2a8dbNIf2lxGFcZIW5z
+	e/YnomyIQzlM1SkLXy+dj1Eqzk8odGuXANclJzeVlX8zyxPOWV1dV/cN73Y7Xjx3Meh6i/4kqVL
+	3gXPfe5sHCrzPPY0IKUO5PIKqJtaqj7xUG8c8kDnJqCzCM0g==
+X-Received: by 2002:a17:902:ef01:b0:2cf:8131:75f4 with SMTP id d9443c01a7336-2d5fd6fe255mr299825305ad.11.1787242521354;
+        Thu, 20 Aug 2026 09:15:21 -0700 (PDT)
+Received: from localhost.localdomain ([147.136.157.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d62e3c1924sm9221345ad.67.2026.08.20.09.15.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 09:05:53 -0700 (PDT)
+        Thu, 20 Aug 2026 09:15:20 -0700 (PDT)
 From: Tang Yizhou <yizhou.tang@shopee.com>
 X-Google-Original-From: Tang Yizhou
-To: yukuai@fygo.io,
-	tj@kernel.org,
-	axboe@kernel.dk
+To: axboe@kernel.dk,
+	guzebing1612@gmail.com
 Cc: linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	yukuai@fygo.io,
 	Tang Yizhou <yizhou.tang@shopee.com>
-Subject: [PATCH] blk-throttle: Remove dead check in tg_conf_updated()
-Date: Fri, 21 Aug 2026 00:05:47 +0800
-Message-ID: <20260820160547.357682-1-yizhou.tang@shopee.com>
+Subject: [PATCH v2] blk-wbt: Always change enable_state to MANUAL when setting latency
+Date: Fri, 21 Aug 2026 00:15:14 +0800
+Message-ID: <20260820161514.371181-1-yizhou.tang@shopee.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -79,68 +77,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Tang Yizhou <yizhou.tang@shopee.com>
 
-The check in tg_conf_updated() was introduced for io.low, so remove it.
+Commit 1e56f30a73f3 ("block: Make WBT latency writes honor enable
+state") compares only the boolean enabled state in the no-op check.
+Writing the current latency value while WBT is in WBT_STATE_ON_DEFAULT
+is therefore still skipped, and enable_state is not changed to
+WBT_STATE_ON_MANUAL. A subsequent elevator switch to BFQ then disables
+WBT through wbt_disable_default(), silently discarding the explicit
+sysfs setting:
 
-global ? tg->td->queue->root_blkg : tg_to_blkg(tg) was introduced in
-commit 9bb67aeb9678 ("blk-throttle: respect 0 bps/iops settings for
-io.low"). Remove it, too.
+  # enable_state = WBT_STATE_ON_DEFAULT, min_lat_nsec = 2000000
+  echo 2000 > /sys/block/nullb0/queue/wbt_lat_usec  # skipped as a no-op
+  echo bfq > /sys/block/nullb0/queue/scheduler
+  cat /sys/block/nullb0/queue/wbt_lat_usec          # 0, WBT disabled
 
-Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW")
+Skip the update only if the stored latency matches and enable_state
+already equals the exact target state: WBT_STATE_ON_MANUAL for a
+non-zero value, WBT_STATE_OFF_MANUAL for zero.
+
+A write that passes the check then reaches wbt_set_min_lat(), which
+performs the actual transition to the MANUAL state.
+
+Rename the helper to wbt_lat_changed() to improve readability.
+
+Fixes: 1e56f30a73f3 ("block: Make WBT latency writes honor enable state")
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+Reviewed-by: Guzebing <guzebing1612@gmail.com>
 Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
 ---
- block/blk-throttle.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+v2: Pick Yuai and Guzebing's Reviewed-by tag.
+ block/blk-wbt.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index ffc3b70065d4..fa742e63807d 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1267,7 +1267,7 @@ static int tg_print_conf_uint(struct seq_file *sf, void *v)
- 	return 0;
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 953d400fd013..4f12a064286e 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -813,7 +813,14 @@ static void wbt_queue_depth_changed(struct rq_qos *rqos)
+ 	wbt_update_limits(RQWB(rqos));
  }
  
--static void tg_conf_updated(struct throtl_grp *tg, bool global)
-+static void tg_conf_updated(struct throtl_grp *tg)
+-static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
++/*
++ * Return true if writing @val would change the WBT state:
++ * 1) @val differs from the stored min_lat_nsec, or
++ * 2) @val matches, but enable_state is not the corresponding manual state
++ *    (WBT_STATE_ON_MANUAL for non-zero @val, WBT_STATE_OFF_MANUAL for 0),
++ *    so the write still has to update enable_state.
++ */
++static bool wbt_lat_changed(struct request_queue *q, u64 val)
  {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 	struct cgroup_subsys_state *pos_css;
-@@ -1286,16 +1286,8 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	 * restrictions in the whole hierarchy and allows them to bypass
- 	 * blk-throttle.
- 	 */
--	blkg_for_each_descendant_pre(blkg, pos_css,
--			global ? tg->td->queue->root_blkg : tg_to_blkg(tg)) {
--		struct throtl_grp *this_tg = blkg_to_tg(blkg);
--
--		tg_update_has_rules(this_tg);
--		/* ignore root/second level */
--		if (!cgroup_subsys_on_dfl(io_cgrp_subsys) || !blkg->parent ||
--		    !blkg->parent->parent)
--			continue;
--	}
-+	blkg_for_each_descendant_pre(blkg, pos_css, tg_to_blkg(tg))
-+		tg_update_has_rules(blkg_to_tg(blkg));
- 	rcu_read_unlock();
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+ 	struct rq_wb *rwb;
+@@ -825,7 +832,8 @@ static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
+ 	if (rwb->min_lat_nsec != val)
+ 		return true;
  
- 	/*
-@@ -1388,7 +1380,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	else
- 		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
+-	return rwb_enabled(rwb) != !!val;
++	return rwb->enable_state !=
++	       (val ? WBT_STATE_ON_MANUAL : WBT_STATE_OFF_MANUAL);
+ }
  
--	tg_conf_updated(tg, false);
-+	tg_conf_updated(tg);
- 	ret = 0;
+ static void wbt_exit(struct rq_qos *rqos)
+@@ -1021,7 +1029,7 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
+ 		val *= 1000ULL;
  
- unprep:
-@@ -1610,7 +1602,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	tg->iops[READ] = v[2];
- 	tg->iops[WRITE] = v[3];
- 
--	tg_conf_updated(tg, false);
-+	tg_conf_updated(tg);
- 	ret = 0;
- unprep:
- 	blkg_conf_unprep(&ctx);
+ 	mutex_lock(&disk->rqos_state_mutex);
+-	if (!wbt_set_lat_changed(q, val)) {
++	if (!wbt_lat_changed(q, val)) {
+ 		mutex_unlock(&disk->rqos_state_mutex);
+ 		goto out;
+ 	}
 -- 
 2.43.0
 
