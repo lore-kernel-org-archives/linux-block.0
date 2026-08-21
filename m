@@ -1,328 +1,223 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f11.google.com (mail-oi2-f11.google.com [74.125.231.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1B737C911
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 08:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787302152; cv=fail; b=Zv4ToKsqntx6etQsNRakk8nYzN24ZYpM1mt9dHe2u7KIkusfKcD4JHpS0A7rUN579dnpWffbetZbUQDipXzh2YloiOob8pe8lM86sawWzC7YERg6TXzt0i1mTeRvmi/fOJ0nieUwRwk/1DzfmKMZh7yGa9Xxs5MTrlhItbyurhc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787302152; c=relaxed/simple;
-	bh=Nkvxa5RegopOhCeG7Vr7FyfGs4k59dxFQoccasuPpRw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N4kOVhG8hr+rbASpB3t91T7JaPO7VMGUuRO1dx3iyk51qcbq58csUDQLUuif4Pb+qKAcCuLGUCkYI6iqOlsOujwfnwIsFL06tHV+76EQ5eHjhwkeE/u3T8/PgJs9oxSyF3ZgXCQMwpEAqnLbL58/HCYtGOtIdMVWPteAUjmMTU4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=MHVT2zVI; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=PolJQaee; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MHVT2zVI";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="PolJQaee"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67L1R0Lh317148;
-	Fri, 21 Aug 2026 08:48:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=0dAQPhhD4p2bHJxewmZPYn3XWFWV6Z7mtECWwaufPIA=; b=
-	MHVT2zVIzwhfnAw6e3hW8eSeYeR8TFgHPIASlCVS5ifcxRmeE83sohL4zA+OC0kB
-	NZTr4hohK45Y9WW2d5xtRpxJhwoas9+FynoDwxkVwq+KgTJiT/BnIe6cHufozZHb
-	Bciae2cgALYdGcVd8fribky2tG45PiqKlQj9yO0JrynQaXxV06fdalUQ7WGY4Uuu
-	2flYs8T9oGq0BUcSADMJXOWZZEBZtRrdvfpP1xj0jMkaBieB/9IUfQXu+brLJxes
-	/R2rPkpSox69o6lbUstLfZBwBSampmna8EGtQy1LqsbtUfTaOwb4St/xo1MEuT4y
-	PeEbdJpXf8HFiZDCLPQHsQ==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4g4ydgmp03-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 21 Aug 2026 08:48:52 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 67L8eYPF012478;
-	Fri, 21 Aug 2026 08:48:51 GMT
-Received: from co1pr03cu002.outbound.protection.outlook.com (mail-westus2azon11010032.outbound.protection.outlook.com [52.101.46.32])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4g2eju6vpb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 21 Aug 2026 08:48:51 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OlXNmvFVaOvL+SoKLw2Yxue+58hXrMckqANnLa4aX93oKmhXkCik+AarTsarfLw3tHlLlLUxpPmqQJFI+Hl/PQhCLr1Hrf3QRlGDwGl72pX0EERhQ0NPd+PpJcS/KNwwbQgzmYh869gBzmdvzI1rMt6XejZpLu154PIq/QjTWKy6F3tJ7LzCmXG1vHLAWIlrCoMmjH1SaAfGXxNo4DkFklu0zLBkM61zmziOv4L3dOETVw88QQFI+y4ejmhw9RQCOQraiPKLzHeh7WV05RowmuE5ykafuh8Q4Y/6JYmfV6KpXnPW1c14s7A4mMZYclBOYnIvjqk13owQr8rkhI/beQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0dAQPhhD4p2bHJxewmZPYn3XWFWV6Z7mtECWwaufPIA=;
- b=LBkH3SdjbY/KNk35DgWVIb2j2HQl16mdiPzMUNITriOk+sNkRHm9d9WTyOmFhmAxRtvqTuNUXqpdF9PmkrhH0zGCBRD9M9NVlfrVfZ2lHRM3EkylvtpLOjorJwlDJMe6tt+kYFCgy+B0O/ibcdsDpaFyltMwaR3fqd/ldE+3neS/R9OsHfR4IqyK8xnQnyu8nl+zUzsuG9dbxBQ/Fb5/8Pu7CpWgbRGMij3yOQrQKhHzajJ6VA7kcEw24vtT43k0yyrhRWSUnqF63eh9e/vjXsbZqyfsdKhzyiWBwoMDagk/ncNGnQAbRQ1uOt8p6hYDELBPZ67cIlxt9PjoTUFL5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0dAQPhhD4p2bHJxewmZPYn3XWFWV6Z7mtECWwaufPIA=;
- b=PolJQaeeJ4sbr40QKknnBzsCL/390nn94IMwCSCSO7FS0tJl+dBYquvrs6ak7kF7cNa2rL83Wg8ReW4Efl0KTHVm6k4zRS3j/Zmmxq3W6KuR/+ekTVuXz0qth6dqnFOBEkF9CD7pDP+KWCw8RfNh5qQeFA4vRZBhJEz/TUFbsic=
-Received: from DM4PR10MB6229.namprd10.prod.outlook.com (2603:10b6:8:8c::12) by
- DSWPR10MB997801.namprd10.prod.outlook.com (2603:10b6:8:36c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.11; Fri, 21 Aug
- 2026 08:48:48 +0000
-Received: from DM4PR10MB6229.namprd10.prod.outlook.com
- ([fe80::867:63e7:13fa:fa7d]) by DM4PR10MB6229.namprd10.prod.outlook.com
- ([fe80::867:63e7:13fa:fa7d%6]) with mapi id 15.21.0339.010; Fri, 21 Aug 2026
- 08:48:48 +0000
-From: John Garry <john.g.garry@oracle.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        John Garry <john.garry@linux.dev>,
-        John Garry <john.g.garry@oracle.com>
-Subject: [PATCH RFC v3 3/3] nvme-multipath: fix diskstats for partitions
-Date: Fri, 21 Aug 2026 08:48:31 +0000
-Message-ID: <20260821084831.4155943-4-john.g.garry@oracle.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260821084831.4155943-1-john.g.garry@oracle.com>
-References: <20260821084831.4155943-1-john.g.garry@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: PH8PR07CA0009.namprd07.prod.outlook.com
- (2603:10b6:510:2cd::27) To DM4PR10MB6229.namprd10.prod.outlook.com
- (2603:10b6:8:8c::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48B944B681
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 09:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.203
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787304050; cv=none; b=jydN32Gx5NXtMStLUE7g7zyjDtjvv/ULK16kGJmV5kAKXIiyxaK7t9uqa9ulDTJcl5hvDKbg0k96V0peJx6x8W0oYGcnayBRXsD+aG4wArBFPiV6a8u9BuOaQBmlCe5fcmaoxAV8spFFQSNx3ezTG8cPcvQqOR+0CEQyhU0mRZE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787304050; c=relaxed/simple;
+	bh=rApTZfzqud6xiunif4O6/4Ni8veRPlY2aqD+J/VDMbk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=WNX5kqMm5g0khryZQDnqVYzsPvAsiPholY+QzjGkyxulARG79wrcWHPvdjBKYcCL03h5dDx0hbXZoBYp3jaXWPikqYXafjHpFNNXB8td3sJH7D5hK1xiiYaVI25+4Nxu0MdQfAAp2v9nLgp4YmzeAFWmK3+D7/Oxg+hbWEoi0Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi2-f11.google.com with SMTP id 5614622812f47-4af7193adb7so309846b6e.0
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 02:20:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787304039; x=1787908839;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ZKvC+5m73uO7ROWkWkuPjlS52ddEAzIvEuOVTswbBGQ=;
+        b=U9hNLWVf4OmZ+oBlWOLox0YGEixWHsInYTcx1KTDgxC04E/dPI6nju9zDAwsh364Gk
+         IhZ3hvFCE29XkLtBQO3bWLOp5ku1ftynD1VDRa4fAgzzoRP3oAOvx4oTzt8pMGBXKJV8
+         KkQ5050wB0nbh1Zl/XuBSAeIvuJwZyaHW5ye2HOzyPPtQJsQ2oQ7VHfB4G88AwDJqkQq
+         8s0AI6EZfPwPCEzDqXD9wlS9QY3499Yqyfyh7B/o+UfhB9bCaZayQnupbCT6hkvmLQw+
+         C20ncgPUPxTTZWC7MDGAwqDqxKLhr87ERI8wmpBTzEjzFNNa+qII+9J2ZXe5kLB0fQXj
+         KwoQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp3BDW4HNzEY9EteM6YziSLZs78AuHST5l9EpfoQjdzIf4LXBo16Grm5o33OKemX6bUSOora66XNTLh7w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaxQvTarcGiHiXJkgRTb9yO+IrcZxntsgH8r8wyUqsGRcAoOkI
+	d64/sB83BtaGNnyeCR3CLv1MR0F1++wKhoRq1JJQ2r4HplwhvHSf0kiZsnKXe1CvJ9+X1IrfqM8
+	+ZJOS/Yl1VMBKeg7KTNqm5/ffDLmviV4nEdTtvFRIHFxgnJ0WZSngkjJ1fyY=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR10MB6229:EE_|DSWPR10MB997801:EE_
-X-MS-Office365-Filtering-Correlation-Id: b587b745-e462-478b-9d9e-08deff610451
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|56012099006|5023799004|6133799003|22082099003|18002099003|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	FzneBYCHgCcKxwmKF0R3CXz9LMZO7oqM+0cj47nB6NsyIWzoBCN9lbYBS7sRkkbrQnxbxZKHn/4svGAFxmblBdcwBMdRr27vUvzKk7wdK0DxJhsLMwxfim/pEfUK1d9AiCBkldyw8DpiZyTvexhksQSoE0zg+Bjh+d42mUjq04jmbRvpzTvhii+bSh98WTmx/BLPjpPni1FkSDfg5vX3MukXpYOWu0lV0zV0quwbWqYN54x7JQ6emQV3nT5HEi6Uzzt+Auv021TrKlxQ6t44tiNblJcITJkg3qaPOJapF0F/mfxmg1+97u8Nc63eP+wOcICFQ/D8ppifFd8UeDCibEBhXJonJnjz3uV/aaKykY+HUDuQ7qyM5SDF4Cpe4sQwzLyc3EqZ4Aa00R+lKKqg7Qj00yeISRi80vTypKkFSCkPFzwC04T6C3eW0yFddRIHp2pbc2rwK0aCx7WEw37l3XLST3kfjdiV0wvxG3y22hw8mjyApkHSSJgmFG96sOVkkUgKK0fKIu7N8Bqe+R0p1OWV3kBzAuU6LE3dwQzLYez7E5cWlZmUsdT+9QlGzmnDNUnGbBkmhPCRjvLxgpC6A+4rPTCp8E07BbRr2/fPWiTqYIkSwFrBUiU2sPOmHdkBwcBB8HTvRUnkF9h3q8b2dIYryv9QMayhZXa4m2gWlBI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB6229.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(56012099006)(5023799004)(6133799003)(22082099003)(18002099003)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JhOEMo5Crs3G3bXt/PeetxEKVzxXSu9/DFbTNiIz6zFy2hXyMBTFU6vyYPlq?=
- =?us-ascii?Q?ZapMNNTns4SSqz1i/th+c64CAvPKivin60orMFJzWGqAhC10E2gbxwKJe08C?=
- =?us-ascii?Q?+yji6UcYC532Bl5JWAfjCU95adQOGqJeUcoLT+aTO/Ju/lf3bw+hMEn1axaa?=
- =?us-ascii?Q?7pGLFJJdlUy43XP6ndbrctvkaiaYDo07mn19oNsMlZ89droghhWfj/tNwxBN?=
- =?us-ascii?Q?04rYQ2fFznq+CIzubrWzpi9iVEE9X2T07vja+V4HOkT8nzOUZYYzm5gdzNJS?=
- =?us-ascii?Q?RcyN9f7OTRJv4bS7/hdPe6/UoLRw8jJx6S5os7u4eXZ8aCXhk7mr8N4Fjhxu?=
- =?us-ascii?Q?Sd0j/3wJFueYDOluRTHqBDNsPkNRzwKACvGR0ggJM+RbHM50L+NgWJxzE7a0?=
- =?us-ascii?Q?6cbzve0TjvCSrkg2AOX4byDrUI/qra3wDHDo6+Cw3XKq0LzuYaD5xHzEqf7Z?=
- =?us-ascii?Q?BIi9DibAzBPFttSSClKtmEkYZFARiBQ2tTJ4WAOZLbZoZpViBal6G5vkALVf?=
- =?us-ascii?Q?Ns+sT1OeWyfPp5Ge7hcxdJpZcL9ROHY9u6gKiViukHCkZluVR9CqxpfyLAlP?=
- =?us-ascii?Q?hTbaPBc5oDgOYYjAT83FzDWybnfbBlBL6ncXvvKfDYJPATWWBjCEWWBYnvyt?=
- =?us-ascii?Q?OOfNe28NxIDrjcyVz73tISd6SEO3q1cwmHYtrzhlNQnZjK0bdGGDD77Fq7Tt?=
- =?us-ascii?Q?VLsErTwjo/uD+voh2Kk6gessB+7IEh0lXPIYafHTwfk+bkc+izIPyqYHw+v0?=
- =?us-ascii?Q?Tbz0zwAKKh+JbQ6ITmU0VY8u27UgxFagb5VsvITn5uswNwKXpAbXnVxmsYqI?=
- =?us-ascii?Q?QxYlvrLHQ7LX8zyf34NxbbZYRCJbEG4HZQyM1EBEsBPk7QqAzhKxTyOhRJnr?=
- =?us-ascii?Q?2idbZIg9JlFFMOOBndPGSk2BujB3TfZIPw8iE2otx4b84cdDFoGToU/xjWZ6?=
- =?us-ascii?Q?elOOAQ4n70LgFLg200eOXKeR2O4ZHAC/x8qYItVfknKYRV1m/PfEPPgvLGq9?=
- =?us-ascii?Q?BWaVkgKtZXqBSkhlrFkOjcTMaxjEwWTdHViyZyBxFtpqpohDUFJWxfhHLhyt?=
- =?us-ascii?Q?qY3iqJIh9Xz83e+msg9Dv0W9XJgwjHik556gfGupGeQDU5S34GfOHsYHo1Pb?=
- =?us-ascii?Q?3MdJB9TjmYLOEtkLEhlHIFoWd46mhWB53iLLsS/xJeTSocmzUZc5iKJFcRON?=
- =?us-ascii?Q?6wvuHsQFsmpQG4ZSA6n8d5KcD+M+o1ayBfpK0Xyudb6zWWwokxU0lQb3/h+w?=
- =?us-ascii?Q?gltdj6plLX8/wCbLVNylzGWo8W3AKbR0HvtsnbnHfK551K7HULoBpjbhsE/w?=
- =?us-ascii?Q?/ivL6b82DFTfJ5FSIToBkSnImUEzAeH06pFPaIrNINPTOZ/trQBoMpQoowT8?=
- =?us-ascii?Q?6CkSBHleaWhAoGUvk0palIdz87suh8+u+DxrglAQa1Tw8dGVIOF27K2ARzQ0?=
- =?us-ascii?Q?4MN5ORCPt8OyqkPPkIolHDHIaQOJQ88ypG2vpWTlRnETj+GOuHtOCLGpf4ps?=
- =?us-ascii?Q?52cTneRP0hAbkShqls1fN9fpoBCFw1lGW2Lg1VeQbNEqVzg0C3JmVMMHSlXm?=
- =?us-ascii?Q?AiNNIt7i3XQH9JbWXOCQ8TXkzdr//pRQpPNQSo6J21VBJW7RvMVg0A88iHrG?=
- =?us-ascii?Q?5jn+kpAHxFHmlDb71UsQQrh5xLOCSktbXsKaeWADgWwK/QIBRtw6sI328F5S?=
- =?us-ascii?Q?5eJoDHorKsB66KUso2tMHcnhy8AftAPVizr4d2jG0DEyzCqZuwDpY+vQkx8o?=
- =?us-ascii?Q?sz6/R7VOkxPcyk2bqjacddjUvTgV2C8=3D?=
-X-Exchange-RoutingPolicyChecked:
-	JH/xKa1zospDAChR+u9k+Db+jpy+5MV6BacaNul2GuKK6H/2/c76aLIvOp5JWCrkCB1TOfa06GRuBg3r2aSFd9Rkadwcqymj+0jHDjEp9Z6V7+q+Kv009L00kPiKaAYCL677Z3faVKKm8yVd2qnu4cLZZMLjUdQoDlCqb84UpPJmusKO/nmHrhdib6dC+UnXClEfHAEuw5eN1LpjUdzVP4/EU/eAWPwGAzs/sSs0KGocet5eBDo3j9Ha8Cfyvozo0D/9eyzP5fWov+FRWcRANPPVX8oTunYmOAqRsqfIOlMS1b/SYK048V0XWSOF2NJeiBXaiPlJ5B1ZV7eZcUloNA==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	NINeA9hwwDjwvmot4eXxgraDBe7fcx00W2688fjDlsI0k6j3yT+ogRjB2Fvc+UpiaPV5vN7inXZ/Kv+KfTCpaU+mwF+IVsqpyjigjfVYxcfPRTjHVrm9grPG2RqGf30B+bn7PC4BTXL3Hsy3AY78Lhc9V4EMuq4dHoHCuebQQ2JUG+gg+quB58Xvy4X0rpyTl8+dwq4YzHD2geWPlIkyMer1HEwVNtAs5sXYfOc5iAAdXsOcAZYFyZoJqIvsDhGS46X5QTADQ0dkn5xbsRhdkURgtXhz5K17aXCI70GtLXYy3+MUDdsrmQFSFsb4meZ7xmCnAXZJDEB9g5omEyRB6VG0yX4WN3qGnWyuwBAYiCz2LrJ8lDzZuw+SIrg40+7st9mxnDwdl4eutLOaAvRhH9o7xhGhwu/Eg/GLWNfT6Y2mb0BhvzWEcuHDMNWVrEblZtqNA6nA/4CcfvV4C0cwVn+YVStn4wgKgJNoLOkJWeDZIX5AYfIJGRG1zh0LDBhkQjgo6x7p15CHa+ZmrTgHWekKKK3bWX0YrHJU2N/QBo7lqoBNhic9Eti0ZXLbT0yFHEDqZZY7sMQH/5XZhm6RI3CkblCviTX48zzDmP8J84c=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b587b745-e462-478b-9d9e-08deff610451
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB6229.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2026 08:48:48.4235
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8Auyd29lVOes1nsOVmZR8y3kEc4KDPaAlEao3jH4oGrmce1Cng7t27hbasKSnpnBIu1Wo3RK0iX7Dx/RjRi1pw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSWPR10MB997801
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-21_02,2026-08-21_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0 adultscore=0
- phishscore=0 mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2606160000 definitions=main-2608210063
-X-Proofpoint-ORIG-GUID: EC4FDjRokRXGSeQXK-8yf2-EpEQYIBYJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODIxMDA2NCBTYWx0ZWRfX2gRlRdmqJHvf
- x0z96s5fuYwMfg3AnaZROVZFha4lNZrN2iE4JoNa5lR6gfUg+3hGgYEuL9fh9meOhApGmMn5Aql
- aOh4IK992XV/7j+woUwraQgu6wduYzp8PqkWIfW0aDTkNTbRLS7OQHEPHvSDhriRudtH1cuH7pL
- /wF+C0IvqPU+kmYBUZT/9H1O9o/Xk98gXXyx0WYmvyd4Hy9Cx+KGwGQT5HqAuHe2ZDE8+zM96LR
- vwX2V7c3WvShaqlyZy+bdC/IGmGrnFXX7XMnYl1Lx8SDrtk62YoUHWAfck/iHbWCL/BwK6hj1wO
- cqitGwwd81CMv3DBAcua8qdVN77s1ytxadqXIclpfsYANjRMlw4P6bwJwl5zcWtzO7m87ag7ZaD
- I0jJ8OrPFHjFWJJeJEjNFbNvXe+RRCMg7FLAFMHNNoBgUakaqZKWFL5Q2dxpPDB8nbTf2J8LvBY
- O0pWcESBR9U1gmELdkpzeMKSEzIOcp7euUViG+zQ=
-X-Proofpoint-GUID: EC4FDjRokRXGSeQXK-8yf2-EpEQYIBYJ
-X-Authority-Analysis: v=2.4 cv=ZIDnX37b c=1 sm=1 tr=0 ts=6a8810f4 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=Sv0fKeRqtYgA:10
- a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=EIcjfB9IiI4px24ztqRk:22 a=yPCof4ZbAAAA:8 a=JZfiM8t-Gqk9RkH-230A:9
- a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:13521
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODIxMDA2NCBTYWx0ZWRfXwdN8bCEnUSZj
- Bj/wdRCAFSZgRn56oSMSAdH58hQZl6J51vGKBAieEXpT6WJEyNRglj65RojVO8GBwDrfgXdPpdS
- ZUusfeCrHXSBJ6tvoMa8jxKSyxGnTmfLzTAidfa8gr5sBVXfUaM6
+X-Received: by 2002:a05:6808:1526:b0:4a0:97bc:53a4 with SMTP id
+ 5614622812f47-4b2ef21e5c8mr4662256b6e.5.1787304039177; Fri, 21 Aug 2026
+ 02:20:39 -0700 (PDT)
+Date: Fri, 21 Aug 2026 02:20:39 -0700
+In-Reply-To: <6a807bfd.f7a79266.2f965f.0008.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a881867.dbb3a75c.13dd47.000f.GAE@google.com>
+Subject: Re: [syzbot] [block?] [cgroups?] possible deadlock in blkg_conf_prep
+From: syzbot <syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: John Garry <john.garry@linux.dev>
+syzbot has found a reproducer for the following issue on:
 
-Currently diskstats for partitions are never updated:
-$ ./fio_read nvme1n1p1 # run traffic on /dev/nvme1n1p1
-...
-$ more /proc/diskstats | grep nvme1
-259       2 nvme1c1n1 49857 0 400344 768565 0 0 0 0 0 2334 768565 0 0 0 0 0 0
-259       3 nvme1n1 99710 0 800680 1599285 0 0 0 0 0 2346 1599285 0 0 0 0 0 0
-259       5 nvme1n1p1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-259       4 nvme1c2n1 49853 0 400336 831472 0 0 0 0 0 2315 831472 0 0 0 0 0 0
+HEAD commit:    818bebeb63dd drm/xe: Don't hand out the flat CCS storage a..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=112c9e79580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ccca94d2c01b9e78
+dashboard link: https://syzkaller.appspot.com/bug?extid=144a1c0e22e53a08ef5a
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152c9e79580000
 
-This is because we only ever update the diskstats for the multipath disk in
-nvme_mpath_end_request(), and we never take into account that the original
-bi_bdev may been a partition of this disk.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-818bebeb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6e4100526b12/vmlinux-818bebeb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/723c4783ee96/bzImage-818bebeb.xz
 
-Functions bdev_start_io_acct() and bdev_start_io_acct() do handle
-updating diskstats for a partition, in that they also update the whole
-disk also (if a partition), so use the partition (if applicable) when
-calling those functions.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com
 
-Change any functionality which used to lookup the gendisk part0 to now
-lookup the specific gendisk partition.
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.3.20/6039 is trying to acquire lock:
+ffffffff8efc6c00 (fs_reclaim
+){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:314 [inline]
+){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4539 [inline]
+){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4899 [inline]
+){+.+.}-{0:0}, at: kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
 
-Signed-off-by: John Garry <john.g.garry@oracle.com>
+but task is already holding lock:
+ffff888028bae100 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_conf_prep+0xbc/0xf10 block/blk-cgroup.c:849
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&q->blkcg_mutex){+.+.}-{4:4}
+:
+       lock_acquire kernel/locking/lockdep.c:5886 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
+       blkcg_activate_policy+0x34f/0xbf0 block/blk-cgroup.c:1608
+       blk_throtl_init+0x39a/0x5b0 block/blk-throttle.c:1339
+       tg_set_conf.isra.0+0x252/0x500 block/blk-throttle.c:1368
+       cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
+       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
+       new_sync_write fs/read_write.c:595 [inline]
+       vfs_write+0x6af/0x1050 fs/read_write.c:687
+       ksys_write+0x12a/0x250 fs/read_write.c:739
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&q->q_usage_counter(io)#2){++++}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5886 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
+       blk_alloc_queue+0x610/0x790 block/blk-core.c:504
+       __blk_alloc_disk+0xa0/0x170 block/genhd.c:1520
+       brd_alloc.isra.0+0x41a/0x820 drivers/block/brd.c:327
+       brd_init+0x167/0x190 drivers/block/brd.c:420
+       do_one_initcall+0x11c/0x6f0 init/main.c:1353
+       do_initcall_level init/main.c:1415 [inline]
+       do_initcalls init/main.c:1431 [inline]
+       do_basic_setup init/main.c:1451 [inline]
+       kernel_init_freeable+0x6ea/0x7b0 init/main.c:1666
+       kernel_init+0x21/0x1e0 init/main.c:1556
+       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (fs_reclaim){+.+.}-{0:0}:
+       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
+       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+       validate_chain kernel/locking/lockdep.c:3924 [inline]
+       __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5253
+       lock_acquire kernel/locking/lockdep.c:5886 [inline]
+       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
+       __fs_reclaim_acquire mm/page_alloc.c:4375 [inline]
+       fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4389
+       might_alloc include/linux/sched/mm.h:314 [inline]
+       slab_pre_alloc_hook mm/slub.c:4539 [inline]
+       slab_alloc_node mm/slub.c:4899 [inline]
+       kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
+       __radix_tree_preload+0x333/0x820 lib/radix-tree.c:338
+       blkg_conf_prep+0x489/0xf10 block/blk-cgroup.c:885
+       tg_set_conf.isra.0+0x1ed/0x500 block/blk-throttle.c:1373
+       cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
+       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
+       new_sync_write fs/read_write.c:595 [inline]
+       vfs_write+0x6af/0x1050 fs/read_write.c:687
+       ksys_write+0x12a/0x250 fs/read_write.c:739
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  fs_reclaim --> &q->q_usage_counter(io)#2 --> &q->blkcg_mutex
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->blkcg_mutex);
+                               lock(&q->q_usage_counter(io)#2);
+                               lock(&q->blkcg_mutex);
+  lock(fs_reclaim);
+
+ *** DEADLOCK ***
+
+locks held by syz.3.20/6039: 6, last CPU#3:
+ #0: ffff88802339cd30 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x2aa/0x380 fs/file.c:1259
+ #1: ffff888037ab0460 (sb_writers#11){.+.+}-{0:0}, at: ksys_write+0x12a/0x250 fs/read_write.c:739
+ #2: ffff88802f2bbc80 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x2c2/0x5f0 fs/kernfs/file.c:336
+ #3: ffff88802a08a5a8 (kn->active#66){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:73 [inline]
+ #3: ffff88802a08a5a8 (kn->active#66){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x332/0x5f0 fs/kernfs/file.c:337
+ #4: ffff888028badf80 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev+0x253/0x410 block/blk-cgroup.c:806
+ #5: ffff888028bae100 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_conf_prep+0xbc/0xf10 block/blk-cgroup.c:849
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 6039 Comm: syz.3.20 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+ print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2059
+ check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2191
+ check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
+ check_prevs_add kernel/locking/lockdep.c:3300 [inline]
+ validate_chain kernel/locking/lockdep.c:3924 [inline]
+ __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5253
+ lock_acquire kernel/locking/lockdep.c:5886 [inline]
+ lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
+ __fs_reclaim_acquire mm/page_alloc.c:4375 [inline]
+ fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4389
+ might_alloc include/linux/sched/mm.h:314 [inline]
+ slab_pre_alloc_hook mm/slub.c:4539 [inline]
+ slab_alloc_node mm/slub.c:4899 [inline]
+ kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
+ __radix_tree_preload+0x333/0x820 lib/radix-tree.c:338
+ blkg_conf_prep+0x489/0xf10 block/blk-cgroup.c:885
+ tg_set_conf.isra.0+0x1ed/0x500 block/blk-throttle.c:1373
+ cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
+ kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
+ new_sync_write fs/read_write.c:595 [inline]
+ vfs_write+0x6af/0x1050 fs/read_write.c:687
+ ksys_write+0x12a/0x250 fs/read_write.c:739
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f87a939e0d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f87aa1ff028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f87a9625fa0 RCX: 00007f87a939e0d9
+RDX: 000000000000006a RSI: 00002000000000c0 RDI: 0000000000000005
+RBP: 00007f87a9435024 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f87a9626038 R14: 00007f87a9625fa0 R15: 00007ffd6065d3e8
+ </TASK>
+
+
 ---
- drivers/nvme/host/core.c      |  1 +
- drivers/nvme/host/multipath.c | 51 ++++++++++++++++++++++++++++-------
- 2 files changed, 42 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1322c678f4eb8..b94b9a3bceb28 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4273,6 +4273,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
- 		sprintf(disk->disk_name, "nvme%dc%dn%d", ctrl->subsys->instance,
- 			ctrl->instance, ns->head->instance);
- 		disk->flags |= GENHD_FL_HIDDEN;
-+		disk_add_mirror(ns->head->disk, ns->disk);
- 	} else if (multipath) {
- 		sprintf(disk->disk_name, "nvme%dn%d", ctrl->subsys->instance,
- 			ns->head->instance);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 75dbb58286a32..bd4056f1a9f28 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -144,6 +144,23 @@ void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
- 			blk_freeze_queue_start(h->disk->queue);
- }
- 
-+static struct block_device *nvme_disk_to_part(struct gendisk *disk,
-+						u8 partno)
-+{
-+	/* Quick lookup for whole disk */
-+	if (!partno)
-+		return disk->part0;
-+	return xa_load(&disk->part_tbl, partno);
-+}
-+
-+static struct block_device *nvme_to_disk_part(struct gendisk *disk,
-+					struct block_device *bdev)
-+{
-+	if (!bdev)
-+		return disk->part0;
-+	return nvme_disk_to_part(disk, bdev_partno(bdev));
-+}
-+
- void nvme_failover_req(struct request *req)
- {
- 	struct nvme_ns *ns = req->q->queuedata;
-@@ -165,8 +182,10 @@ void nvme_failover_req(struct request *req)
- 	}
- 
- 	spin_lock_irqsave(&ns->head->requeue_lock, flags);
--	for (bio = req->bio; bio; bio = bio->bi_next)
--		bio_set_dev(bio, ns->head->disk->part0);
-+	for (bio = req->bio; bio; bio = bio->bi_next) {
-+		bio_set_dev(bio, nvme_to_disk_part(ns->head->disk,
-+				bio->bi_bdev));
-+	}
- 	blk_steal_bios(&ns->head->requeue_list, req);
- 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
- 
-@@ -194,8 +213,9 @@ void nvme_mpath_start_request(struct request *rq)
- 		return;
- 
- 	nvme_req(rq)->flags |= NVME_MPATH_IO_STATS;
--	nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0, req_op(rq),
--						      jiffies);
-+	nvme_req(rq)->start_time = bdev_start_io_acct(
-+			nvme_to_disk_part(disk, rq->part),
-+			req_op(rq), jiffies);
- }
- EXPORT_SYMBOL_GPL(nvme_mpath_start_request);
- 
-@@ -208,7 +228,8 @@ void nvme_mpath_end_request(struct request *rq)
- 
- 	if (!(nvme_req(rq)->flags & NVME_MPATH_IO_STATS))
- 		return;
--	bdev_end_io_acct(ns->head->disk->part0, req_op(rq),
-+	bdev_end_io_acct(nvme_to_disk_part(ns->head->disk,
-+			 rq->part), req_op(rq),
- 			 blk_rq_bytes(rq) >> SECTOR_SHIFT,
- 			 nvme_req(rq)->start_time);
- }
-@@ -530,11 +551,21 @@ static bool nvme_available_path(struct nvme_ns_head *head)
- 	return nvme_mpath_queue_if_no_path(head);
- }
- 
-+static struct block_device *nvme_find_path_bdev(struct nvme_ns_head *head,
-+						u8 partno)
-+{
-+	struct nvme_ns *ns = nvme_find_path(head);
-+
-+	if (!ns)
-+		return NULL;
-+	return nvme_disk_to_part(ns->disk, partno);
-+}
-+
- static void nvme_ns_head_submit_bio(struct bio *bio)
- {
- 	struct nvme_ns_head *head = bio->bi_bdev->bd_disk->private_data;
- 	struct device *dev = disk_to_dev(head->disk);
--	struct nvme_ns *ns;
-+	struct block_device *bdev;
- 	int srcu_idx;
- 
- 	/*
-@@ -547,9 +578,9 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
- 		return;
- 
- 	srcu_idx = srcu_read_lock(&head->srcu);
--	ns = nvme_find_path(head);
--	if (likely(ns)) {
--		bio_set_dev(bio, ns->disk->part0);
-+	bdev = nvme_find_path_bdev(head, bdev_partno(bio->bi_bdev));
-+	if (likely(bdev)) {
-+		bio_set_dev(bio, bdev);
- 		/*
- 		 * Use BIO_REMAPPED to skip bio_check_eod() when this bio
- 		 * enters submit_bio_noacct() for the per-path device. The EOD
-@@ -557,7 +588,7 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
- 		 */
- 		bio_set_flag(bio, BIO_REMAPPED);
- 		bio->bi_opf |= REQ_NVME_MPATH;
--		trace_block_bio_remap(bio, disk_devt(ns->head->disk),
-+		trace_block_bio_remap(bio, disk_devt(head->disk),
- 				      bio->bi_iter.bi_sector);
- 		submit_bio_noacct(bio);
- 	} else if (nvme_available_path(head)) {
--- 
-2.43.7
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
