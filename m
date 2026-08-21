@@ -1,233 +1,168 @@
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3239B371CF4;
-	Fri, 21 Aug 2026 04:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787287899; cv=none; b=Hm5j6irGtEDy1ZMnqTcUppvS5jmcMXzO5LffHZFgN2Jt3me6Na/r10LzEpBagBej7wA0jK8+n59gmMbNOfB4t03/Ca8SI3v/48VN+lkJ9HpHt4WgMA0+1phKug4nKVPMM/V59Bu/AKewLneeGMy/sH1rJuhMK21ZMEgcyyc4I0s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787287899; c=relaxed/simple;
-	bh=MCk5UadZzYwpRzEiH271nGsphiwFj3ArZsaZHv4RckE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XEZ44j3OCrROkE2Ju3niC2aRpM7HbfcOSQshjMkXesvDWVU9T11Ikow/r657un3x5yiy80v5gRA9jyek4ZI2M2EvHxppcsh1tChNn5R05wl0Wz8rsmCknEXorUyHFcgW6Ya/+LZILljClJVUz8q8Byq2/E95xa9Pj15eGw/d5F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-f5-6a87d9549283
-Date: Fri, 21 Aug 2026 13:51:32 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>,
-	linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com,
-	kernel_team@skhynix.com, torvalds@linux-foundation.org,
-	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
-	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
-	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
-	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-	david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org,
-	kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-	mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-	vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-	dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-	linux-block@vger.kernel.org, josef@toxicpanda.com,
-	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
-	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-	melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-	harry.yoo@oracle.com, chris.p.wilson@intel.com,
-	gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, longman@redhat.com,
-	yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
-	netdev@vger.kernel.org, matthew.brost@intel.com,
-	her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com,
-	bp@alien8.de, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
-	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
-	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
-	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
-	tmgross@umich.edu, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v19 00/40] DEPT(DEPendency Tracker)
-Message-ID: <20260821045132.GB40890@system.software.com>
-References: <20260706061928.66713-1-byungchul@sk.com>
- <359ea967-9b97-4584-88e6-bddb4044de2e@kernel.org>
- <aoc-jJ10op62jXFK@casper.infradead.org>
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E9835C6AF
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 06:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787292130; cv=fail; b=IHlczbszcH8/iD90GTS5DA9Nfnge9uReqqJHKdATrC8Eyl9cejkCwmE6IblqE/fgm+asQZ7F+5EyY7pNWyWJDUau+Dn9F8UH6U4kcL/EnfgvjcVrg087gL0KIPCt8kCTQQ+rjd3R0p4G5H6+q5S7q0jz4P7EJRAhiKQ4kTyh0JE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787292130; c=relaxed/simple;
+	bh=rZIpq/xQq9CIQyzoVo54UJjtv6OHkHxqMQlJR6NZhMw=;
+	h=Date:From:To:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=VEmJr8+6Kav7b/CrFaRhnIXnMrtR6dcc4tcq/hNFxhn37ciPG8MBCnckxSFE/fUFKqDUD1yO9u04UC6xDRizZ3gMJldYKCki2h4htRSpi6qlUhR/9YahNrBpleFaw8zocfSuiGhxHXCBOd22IPk+6qXEJ+V6qgcAF8erUeY6pFc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=qT8qjy01; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=C9P0kvj/; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qT8qjy01";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="C9P0kvj/"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1787292127; x=1818828127;
+  h=date:from:to:subject:message-id:references:in-reply-to:
+   mime-version;
+  bh=rZIpq/xQq9CIQyzoVo54UJjtv6OHkHxqMQlJR6NZhMw=;
+  b=qT8qjy01Df3QPMAG9FWgJX0t5SA9wQzc5ixIzURE7KlxbecGOkCEMCGT
+   3Mz81nRzTLZOv4pXGnOC3nNWP+jVpgJu3vF90vMiyO+eKyYfzThNLYxCG
+   JrzS8G3pxVpTiNwGTEjWtQW5Jd5iqs0icvdnkYR/uZdGeoZ4mOpm9S49G
+   0xo2hlV9QihUmjan5r6L0YZraHfnNOhfx5MuhxIhzfxOG4NOokfR+vDTr
+   RfORMimB9azV5mJsTNAzUrhDRim6WMK0zf0bB2WMfYpGJHJyx2SbtgSZM
+   Eg96n/Xc/LRCNqS0I46NjCL/CSZMxJ4OnmJ7HE7E0MNzUlZuUHdwF3pRZ
+   g==;
+X-CSE-ConnectionGUID: YrgVp2juQPmLKv7OB2iK7g==
+X-CSE-MsgGUID: WmfEMuxrTl2070EUozeRXA==
+X-IronPort-AV: E=Sophos;i="6.25,234,1779120000"; 
+   d="scan'208";a="153017242"
+Received: from mail-westcentralusazon11013013.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.201.13])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Aug 2026 14:01:59 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x7SZXaXUUV6Ufuip3bPYrH2BxCqo3ySFIWmL8ZHlDU0FAmxgzGywLGFyM+oa/NQRAzhfmZH44PXOguEqmK3eES+FvR0axGdXEKvJoNJXfBk1Orzad6Ujsry06IxjJEuHmQgBjXA88xZCi3Ku587U1LBdwLDCwf1CJcNDPM+3iZOazbkNEGx40OeKUrhbqMM2EcFpd1RKO+AA86s7jbcF8p1YSZ30V43xnlvXhlsUIEDvxqicZa3ESgaRn28e/mvWuNAzU7SGhrVJS0c70O9wmjLedx0b204HNflaYpwvNjqzaxzDJgbvkspueD9HCCXbQljcQIbSlFfWLGpx6MtVwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4kWj1JDKya8bHiw/SbLQ4244f7FA5RzEOs8U4tDvoFw=;
+ b=yykBcmL/6BhxuoHDMEgq9YxP7+lxTE8By0lB1dak8hzatDu6Hbb+UXVExih8tMNA9S5YezuR3c8E61FpbJcOuCxiJ5kWjlmY33/p3pPB0144u2M4AoKfJyK1F5Y+EI6ujRqi6+4/0EoJeAh3hdsnMtuTRg7bH92qceL5AW0wuBAABt6ThwKaHYOgPAApABl48rt/xlskU3TOFW2qGB0cB6zE3l1C+0oVrcHvBv9KHYdq8mc+F+BM7JBAuCT+ht2OnQFNP+licdbAtyXxd6HdsNx8UIu3GrNOvBYtehFMd8TFTqalpxQwGMlukfVhgyb3glg6YDuECEi2ntnjhXmorg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4kWj1JDKya8bHiw/SbLQ4244f7FA5RzEOs8U4tDvoFw=;
+ b=C9P0kvj/+MonHQglligptGfLuu+7c0HJy+vt5zohEN5YZ8ie1cjzG+rbMSOfU7u0/0mxow6Tb4stGQKYWx3TCB8hkvyTkZVHkqTPDEa68a0nV6Vp3vZ6U7IgIHRQwtth3B/7EhJefqQQqrUgogTmRK/07ho+ibJUyItLjk86ruM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14) by SJ0PR04MB767244.namprd04.prod.outlook.com
+ (2603:10b6:a03:31c::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.10; Fri, 21 Aug
+ 2026 06:01:58 +0000
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85%4]) with mapi id 15.21.0339.008; Fri, 21 Aug 2026
+ 06:01:58 +0000
+Date: Fri, 21 Aug 2026 15:01:53 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org, 0wnerD1ed <l7z@0b1t.tech>
+Subject: Re: [PATCH blktests] block/045: respect dma_alignment
+Message-ID: <aofpEiLpsmRVtGJR@shinhome>
+References: <20260806094218.2077413-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260806094218.2077413-1-shinichiro.kawasaki@wdc.com>
+X-ClientProxiedBy: TYWP286CA0005.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:178::23) To SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aoc-jJ10op62jXFK@casper.infradead.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xbdRjG8z/3VjqP3QxHMDOpIyMY2Fy2+GocGUvM/l8wGvULJGIzzmwZ
-	N8tWwcSsLKAFXYOy2tCq64ItyGDUUi7Kuo3CNsao0m260pSxS4XN9gzHZSgiymEx7tsvz/Pk
-	eZ8PL0eqjzEpnL70gGgo1RZrGCWllJKOZ741/nHR1tiRJDDXHoLoZIyG4WuHKQiPnSGh3VdN
-	wJxnhYH44CyCGfenCOxTDhakyX4a4l/8zoDNOoZgunsJwZXYOpBCXxLgPOynITQaR/CV43ME
-	ofgyASe8uTDpnqLAYbtDgLWjn4DR5igFblMaOIJXaPjHWQYnpZ9ouHj9Fxp6TTdYmL96kwDz
-	DwsU+CPPgcmxSEPndJiAS+eHKXBdCxHQFRwl4YElFcINvyIYtyVYcC/MsNB630aDp8bOwrfH
-	WhAEHT/SELX8RsHV8X4Ep803CBjq7CWgc2qQBFerRMPIxBwLjZedDHR5rSQsTfTREOwZYeGW
-	RWLBumxmoPvcIgvVc5MIaqI74A/PbRruNczTu3LwYq2Fwm1dPQSuvfw3g9u/bkd4MDFDYtel
-	BIO/qVsi8GfBTPy9fYLFNacjLHZ6D+KaIYnGzafuEvj47AKNI/Gd2NtWx7y2MU/5cqFYrDeK
-	hi3Z7yh1Hfe7ifKOTZVHquO0CSVS6pGCE/jtQtNRH1GPuDW2DOfJMsWnCZ2NDiQzw28WwuE/
-	STmygU8XEr5t9UjJkfzQRmF8qZuUM+v5FwRf9BNGZhUPwqk7QUYOqflGJPwc6KEeGk8IF5ti
-	a0zyGUJ45e7aXZJPFVpWOBkVqxNuTWM58ST/rHC25wIh1wj8lEIYMfURDyc/JQy0hqkGxNsf
-	abU/0mr/v9WJyDak1pcaS7T64u1ZuqpSfWXW3rISL1p9W/eHy/l9aHbsjQDiOaRJUm29/lGR
-	mtYaK6pKAkjgSM0G1UnzqqQq1FZ9IBrKCgwHi8WKAErlKE2yatuD9wvV/LvaA+J+USwXDf+5
-	BKdIMaH9Rvx2vn/fd39lB4pe2ZdZ/9Kh3OaCs1ukZF9vWihjV+2rTzeOPk7q/I9lrVfvtt42
-	5Kj8ooKpWxc9mh+Iuk7sXtmTrBti7u1hIk0Di7klz7we2pTuX2jbYWyJxQcKlFkuXJ7X6nmx
-	8r29nnnJVr7ZeLMqe2e7S51XGXkzPSXHpqEqdNrnM0hDhfZfyWpIs7IDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTdxTGc/739vZS7XJBNu5w8UPVuJGAumzZMTNzZln8Q7LNZIsmLm42
-	eiOV8pJWUVjIaLFawBmoa5ktVWSzEgRxUNiYNsOqCGojzDlxFpGlA0mrMHkxtBTWblnml5Pn
-	nPN7Tp4Ph2eS5mSpvCZvr6TLU2tVnIJVfPh2Wfon9w7vWTPTsBzNpi/RPxSQ4W+GLhanp8ws
-	1rY0cRh1/CBHc+txGfbcNbLYd+4s4NC0GfBZxMGgqXOBxailW45Ts/flaDUALni6AW39FgYH
-	+n5msMltIDh5fp7D4OWngNbhAIc1YwYWx11HAO0jDjmOXd2Ej4cuyHBhcJTg3ZkQoCswTzDQ
-	dRgwasvBk/VtMbttgsOI7xaDNdY+wFPDgww+HXsI6O5+ADjaHgb0NBg5/LOqncHbgRfw1+lx
-	DnutlRw+7q8l+OQ8h3VGjwz7bwYBnQ4L4MjvHoJl37ZwaHO2stj58Cc59gfnCPptFoJnWz/A
-	IdcIizeq6kksc4z6PgUdNWUkVh4RtDZfIO+6gD4zHWVpY1sHoaZfohxtOtEENBK2AJ06XcZQ
-	U1WsvRwaZ+jBtv309I0QR8PTdzjqmalj6fV6kX5XHia02pdOO+2D8s0btynW75K0mkJJt/qd
-	HYrs5r/aSUHzigNfGYKyUgilVgDPi8Ib4tGebRWQwLPCSrHlmAPimhNWiQMDs0wcSRZeFUPu
-	1ytAwTPClWXivXA7E2eWCG+Jbn8lF9dKAcWLj3xcHEoSjoF4x9vB/rtIFHuPB/7RjJAmDsyP
-	kfhRRlgqnpnn4zIhFuGPURonXhSWi10d10gVKO3Pme3Pme3/m+uAaYRkTV5hrlqjfTNDn5Nd
-	lKc5kLEzP7cVYj/pKpmr/hGmbm/ygsCDarFyzYNDe5Jk6kJ9Ua4XRJ5RJSvPmWMj5S51UbGk
-	y/9ct08r6b2wlGdVKcqsrdKOJGG3eq+UI0kFku6/LeETUkuh5OuL2/21uzOvW28tUNmE1m9e
-	tCIz7bOG/HWNHYc2Fm//RqQfvRKBcPmyufzXEjcYs5whr/79at/93oPp8FJJpaKn1J/S9ukW
-	Z8FEYqQ8evLJZuMX2mLt5LUa63pP0PZeZu/sluqX3TczhuXBrYsuZZ1wRvZ93Lj6iNk3mZWq
-	0UoqVp+tXpvG6PTqvwHBiFqHjwMAAA==
-X-CFilter-Loop: Reflected
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|SJ0PR04MB767244:EE_
+X-MS-Office365-Filtering-Correlation-Id: 411cf717-6dbd-4521-38f5-08deff49b5ec
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|19092799006|376014|366016|56012099006|10067099003|22082099003|11063799006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	pfVqia23IoJSp7nXi6VLpjT+XnK/5TdDZk51zLkTKHJkPTzpFfnr7U0nLzDzc9X40Q9fDhnyZv4qmWZ/a9Y1UZhlTUKAlJBoJfgxmFGqE7vBmlcEHGSS3VhaetHs2d+r+GaNPCpy9uAbjtMfWevbP375DrtRPwOvhPPnQVBrpGqq9UdTg4WauZxCy1i+pG33+MzxqyzygMbEKDgPmGJfu3WgFDZB8WhGw7WrDwNNY21PsrqSFon01LltuojSZ2ODF8LRkudCV+ENtku2mRDC4a1F0Bg6b1jUWR1sCDlKCK2Xx/kEFaIy6FYKOcjSqgCX9Z2OdnG389xSCqJDNiZQyedXm8UGfXKr2C+wuyC7I+TcYsXy3CfOKnHITSL7TW4ArTh+kKmMMJADDjBgJb9WSy58Y5wix8eE+8CdHZd7eylTjQHS2hW7K1vLXB7Ii5QGH1espDYlWUQPHCVmHUrtXyfW/VKgiKD/YdDxg4OQwiFxaYodisAuRnV9MGfD0mAW4Sy1TdHtdDL219kjlEV9K02cKq3cxpXkty0OWrUwgsu1felidU6seGkDsM6PaUTb203Pj2cQ+VFSQnpXA3aokHc8efIBPaUloqzBA92uY7CUKVlrNbC/lXaVVYdhSc3g71La8PoTbsbr4/hrIX7xxc5cpYks2G9H65qRHR4seCk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(19092799006)(376014)(366016)(56012099006)(10067099003)(22082099003)(11063799006)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?s64xOn6eIUktNjyuxmr1qkwjw8Q+/cLGCF2veULAyyrYAzBaYMIt1XtyGbw+?=
+ =?us-ascii?Q?GLLtBiCRzJTjjxiEW3JGz/Eg0ECHRoTZeIuys4KReaF5MPNgerbzD8CCAUjG?=
+ =?us-ascii?Q?GF66pfZBUMjFbAmGiomQvOEYqqudPTLOlWOVEUeBxn4/LF4Sh4wctErglxzr?=
+ =?us-ascii?Q?kYt0E4dBrGA+2fq5Dv0EwE3tZzF5q1JgBw7cqCO0p3t8BBANnEaKcTE05pPa?=
+ =?us-ascii?Q?yMHZlAv5V6lEruNUCxBErAW8TEqQ3XoalRrMfaBU4vCzucPyP6R9C7Si2Arn?=
+ =?us-ascii?Q?XvbgsB43cdNag1ZSvMaXOcBXdPZqiZ1Mkv1c2IGiEw5gd75qInpef/d+CTCo?=
+ =?us-ascii?Q?nRZV1sgAY08LE8n8lsKA417OVbqcCgYM9HbU0a9EAe77TfQDJP7MTIFrrSyR?=
+ =?us-ascii?Q?mQ3ZQBytDIjgyTqq/TRvhRMbzOviVbmDmvZwZaET5ifBXT3AmX7N2BQnfizg?=
+ =?us-ascii?Q?Y8PtfEgKhEuYjAdkUWDlqHcbCBZhvk05QPOZ1X8lcjaigFbnkIoqVDxKCYQp?=
+ =?us-ascii?Q?h1iFpkBQ45nC6q7ire90ouxRGkqezyRNidxsbm+SdaAKkfcURmpfy8sF4u6a?=
+ =?us-ascii?Q?JounivNNJjZldawKqrTHEv21AECuN1v+MVo7DewLJnNgDY8jPv5BB30fOafC?=
+ =?us-ascii?Q?ak7g61Ir6CbeF28xpxBtt04iWcj7WYCm+rSSTZUXT9MCQImMbVkPUqRaiOuL?=
+ =?us-ascii?Q?h8D3wa4zadSjb5krasVMCzXwUPrcKh/YUJQuiB87064IHg9JXxUQqpZnr/Pc?=
+ =?us-ascii?Q?eZ3n+8tlHOJoQI2QdPMVD+Euq95gQ7WNkt5vAlkf7L+DZ5m7Uz8mKbW56YQV?=
+ =?us-ascii?Q?SW0ZRMGHYs++LDta/lbL8iIpZkDZl4FuZ4v0/btP8I1X4Tqh3Yl3ErzezUlv?=
+ =?us-ascii?Q?ZGHyykN1GPv1p2k1HK8TVSD7zQshXGZJj2LtmziBDzrhuhXuRBnkqWRCUV1i?=
+ =?us-ascii?Q?f3CMaB569YkPoteBocMkCE8QzUibM/F6+4UOTG7oJvZbQqLA2OqpcqfItWJ4?=
+ =?us-ascii?Q?P+mjhnwy4gHos7/CoPjx7WtX/i64R3IkKrvm65d3QSDzMvxZ/pWVMBk9ejZP?=
+ =?us-ascii?Q?iN52z8tAHMvxWqUfNv5uEh5Xf5OEJLT6GNhwNES0LRfpwsd2fmO2ZVXCvOKZ?=
+ =?us-ascii?Q?lgQYrSrS3IqQvP0k4zwrKh3MftdOs6q41ikh2+DmrHYH9QHXBrccHbq3uHGa?=
+ =?us-ascii?Q?4lr6/cGk/9Q5owDmyHdmQWtzsyEQuXGRJcdBuxTWsiw1KlwtNo+gXt55Rla8?=
+ =?us-ascii?Q?N3TwOworVbXR4yru04XIN4M1p6NKTW8g7Em6frhtiFdYkKCjSs/hu4rRQq+u?=
+ =?us-ascii?Q?FO/80p99Ytui3acEt0BiY8fquM5ipv8wyV5FnuJwcbS78j73J9P0klBOjeK5?=
+ =?us-ascii?Q?sLVHlrvFe4zFEjoniG9eOsg6FxrlPz3AAmQA0bziQ8LVX1bLk9pMZBtvt/F+?=
+ =?us-ascii?Q?4ikDm50o1695QX9AiJzvuwq4kOoPustvVDuohUFRL9uWnGUjWNTrODym1WWs?=
+ =?us-ascii?Q?gQKFtFsiqHbIOljKzTaGlobhsfgcJWewADrHkitVltKn74936D0U5/ydTo/8?=
+ =?us-ascii?Q?HTzezDWO86qSAZmP60iUGpSJSorlf810AHr0byypIbXuhbxzKPGAaYJely+W?=
+ =?us-ascii?Q?K7LcBFhpvtZ+3AnoijxvIVmDAnohEfDYc6zf239hcdSBDkozvkweWa/lvsT+?=
+ =?us-ascii?Q?qz90TFjcaYWJPhjb3EDw94o7XgQ2Xqg9zMDz26OVT9salURp1vh/63AyNd9n?=
+ =?us-ascii?Q?zAcRqhs+icyMmuxWh+fdO3eA+aQbrPs=3D?=
+X-Exchange-RoutingPolicyChecked:
+	bYejwceKsqz58RWUhoA7RLWZVkEBwywkArn6YNDbBSaUmwb0R+RhFFHoyNtgaRozRkqCNQRGgmWTneALf3TcByWRTw7Pln2EGjG7nUsvoei3Bd/Ed5ULXWMe5OpjMBc3Cc5tflp+JGj+nY2YQtkRsBEgheP4yyvrW5QrzqX8CBb4faxDH0CnU33l/Dvj4U3IYEB2bxtntIEL/PZU4NRephJnv1KV1DWNfcIIl9YuKSLaJWxKv6C0JmohtmWBrl2etY/hlPLuhSvR9tcG34Epi+etNwUl2UjZfSHtr6f/ZCv3EsnpkaQ6h2Xgt28L6D5G7qaiXvxbBPRRt4RggXYiiA==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	riWaeXt/6LZ+qL4716vevFAkVlq2Tm92p7G2dCfPWMauaGUKbcFPxp75Ewg+CLrIXd1hjCrdGesLN4ZWqb2jVjosPFKRSWiHxt0+e+Onx34Y93FnHrG0NawkH+dxfGcwCLIPVoXY4/o1ddIZjYT7fech2607SYLoxQNPCrHMmRJmF0fPgQdM9IaLnz5pN7EngF8kI37+evV8WU9YLDYLJt9B5IGkyuGB/2byARG5p4tX2vHrl7Ijv5m/TksOfjmGCciApI840j6KFJUgrrRpFl4dGA5m5OxouSsXrJpbJxXiwXGNmNzGSW0pRzqJB4YdWwGNaM266vhhfQlGgL9wxWOFyNIvs+AoSqhFsFR9jDxe8Ys3w9LNMLSr+WTJDrJQgVJSCd6vk+CyGq/qrIapo1k8cLP3AKkPCKgUcRAH22RM6jkQ/9mTtI3nAdIgYsStdkvMHrowvUHNDvYIxCe9LroRhhP9kHDeNB9MX3jT/R9b/9FYvKByBNchH/h0nZtqZkeTxdgsg01K584bmSweMlvEobmehh1msaWC8XAqaMSLoomSvzYn73BvQ8PVz9N9l8wtKuJgXkqPZhZIIQQqPEjzJ95khp9GJ7oVt+8dhBOjZrqHlkHXQxcqyrYSGw5l
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 411cf717-6dbd-4521-38f5-08deff49b5ec
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2026 06:01:58.4229
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7EXfCq7D7mwGHIDNGO/SYv7sCB9fAgA9BYE4Qe9AWQOyFCGZaZ+7N6rVX5MeFYaz9bHYEC+dcyYuL5JCAAefEMOudSYfDB7KaG2+t6lXBp0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB767244
 
-On Thu, Aug 20, 2026 at 06:51:08PM +0100, Matthew Wilcox wrote:
-> On Thu, Aug 20, 2026 at 07:16:05PM +0200, David Hildenbrand (Arm) wrote:
-> > > Consider this real deadlock pattern that lockdep cannot detect:
-> > >
-> > >    context X              context Y              context Z
-> > >
-> > >                           mutex_lock A
-> > >    folio_lock B
-> > >                           folio_lock B <- DEADLOCK
-> > >                                                  mutex_lock A <- DEADLOCK
-> > >                                                  folio_unlock B
-> > >                           folio_unlock B
-> > >                           mutex_unlock A
-> > >                                                  mutex_unlock A
-> >
-> > But that really just boils down to folio lock being implemented as a PG_lock +
-> > some advanced wait mechanism. And we must do that because of lack of bits in
-> > struct page.
-> >
-> > Willy mentioned in a previous version [1]: "I don't think it makes sense to
-> > track lock state in the page (nor folio).  Partly because there's just so many
-> > of them, but also because the locking rules don't really apply to individual
-> > folios so much as they do to the mappings (or anon_vmas) that contain folios."
-> >
-> > Given that lockdep is a debug feature, and we will at some point allocate struct
-> > folio separately, I assume we could just squeeze a "struct lockdep_map" in there
-> > in such debug configs and the world would not collapse.
-> >
-> > Doing that today (one "struct lockdep_map" in each "struct page") wouldn't work
-> > as mm_zero_struct_page() would not expect such large "struct page". But
-> > conceptually, for a debug kernel with a special CONFIG_LOCKDEP_PAGE_LOCK, maybe
-> > that would already be ok and we could just do that (and optimize it as we
-> > allocate folios separately).
-> >
-> > Not that it's ideal, but for a debug feature to at least check PG_lock, probably
-> > an easier way to achieve it than some completely new infrastructure.
-> >
-> > Now, Willy said "locking rules don't really apply to individual folios", I
-> > wonder if that could just help to also let lockdep check PG_lock with less
-> > metadata? (didn't fully wrap my head around the implications)
-> >
-> > [1]
-> > https://lore.kernel.org/all/aR3WHf9QZ_dizNun@casper.infradead.org/?utm_source=chatgpt.com
+On Aug 06, 2026 / 18:42, Shin'ichiro Kawasaki wrote:
+> Since the kernel commit 14b007e17881 ("block: validate user space
+> vectors during extraction"), the test case block/045 fails with the
+> error message below:
 > 
-> There are a few things going on that make PG_lock special.  Let me try
-> to explain again, only better this time.
+>  block/045 (test direct I/O full-trim bvec alignment)         [failed]
+>      runtime  0.550s  ...  0.630s
+>      --- tests/block/045.out     2026-08-03 19:26:40.407053612 +0900
+>      +++ /home/shin/Blktests/blktests/results/nodev/block/045.out.bad    2026-08-05 20:48:33.366932845 +0900
+>      @@ -1,2 +1,4 @@
+>       Running block/045
+>      +bio-full-trim: pread returned -1 (errno 22)
+>      +bio-full-trim helper failed
+>       Test complete
 > 
-> 1. The current lifetime of a struct page is the lifetime of the system.
-> But the semantics of its PG_lock bit change each time it is freed and
-> allocated.
+> The errno 22 means EINVAL. The commit introduced the dma_alignment check
+> and returns EINVAL when the check is not fulfilled. The test case calls
+> pread() with one byte offset. This offset is not aligned to the
+> dma_alignment, then EINVAL is returned.
+> 
+> To avoid the failure, respect the dma_alignment check. Get the
+> dma_alignment value and pass it to bio-full-trim command. Use the
+> alignment to decide the offset value.
 
-Yes, it's a classification issue that is very important.
-
-> 2. The position of PG_lock in the locking hierarchy only depend on
-> what the folio is currently being used for.  That is, all folios in
-> a given xfs inode behave exactly the same from a locking perspective.
-
-You are exactly explaining what the classification means.  Perfect.
-
-> There's no need to build up state about how each PG_lock is used;
-> they can all share.  Arguably all xfs file inodes are the same as
-
-Right.  That's why DEPT doesn't use a full map in each page but just
-uses a timestamp in each.  For the classification, DEPT uses a few
-classes for folio, using global maps:
-
-   1. folios in mm paths
-   2. folios in block device buffer (meta data)
-   3. folios in regular file cache
-
-However, yes.  I bet you could be a big help when classifying folios
-more presicely according to its usage.  But the current classification
-is still a good start I think.
-
-> each other (directory inodes might be different from file inodes),
-> so we might want to go further than telling DEPT that "this folio
-> belongs to this inode" and go to "this folio belongs to this xfs file
-> inode".
-
-Totally agree.
-
-> 3. PG_lock can be taken in task context then released in interrupt
-> context.  For full points, we need to mark the exact point at which
-> we submit the folio for read.  Otherwise we can get into the situation
-> alluded to by f2c817bed58d and better discussed at
-> https://lore.kernel.org/linux-mm/20200127150024.GN1183@dhcp22.suse.cz/
-> where we have the folio locked but haven't yet submitted it for I/O
-> so it doesn't matter how long we wait, it will never come unlocked.
-
-Interesting.  
-
-The following abstraction might make DEPT work with it.  For example:
-
-   Annotate the point submitting IO as an event for the folio_lock() to
-   be released.  That way, the issue above can be detected by DEPT.
-
-Again, DEPT can do every thing we need w.r.t. deadlock.
-
-	Byungchul
+FYI, I applied the patch.
