@@ -1,106 +1,67 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from mail.planestimations.com (mail.planestimations.com [45.92.8.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F417B1A9F96
-	for <linux-block@vger.kernel.org>; Sat, 22 Aug 2026 01:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BA330FF30
+	for <linux-block@vger.kernel.org>; Sat, 22 Aug 2026 03:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.92.8.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787360566; cv=none; b=XxlkpaxJClFO4geQBDB1Ohieb4uNYx7+41gmh1RtzPaQuPNi6zSkswuP36uBfeJQ5wbqo3VeizysbJ+HRZF1sraMI4txl5sBcPwBpOk8Yhw4J6tVQujZrMGz8dowfmolNwNUB6liyHWlCuHRJDc2ssQgR7f34oETHbC54MsGhS0=
+	t=1787370138; cv=none; b=JvZBOOHNzsn9+TWSBKA7w2HeP3R3ocR52+NiuYkQ2s2Ak9r0EOuRwoLqAs0t6DE9+M/sd5vNc7EEGGHAZVuXbYzmpju+im/KSzwEg8k1Q7dVQSpf5pV4eD+sEFeSNRmHqGeUl9xjWmYN8jpXuXhZrK6tLmvG6hvdlbSUMMv/73w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787360566; c=relaxed/simple;
-	bh=2GgCh0t0MFrL8n4SPYTLxUD310GG27/lTfTMfPU7nq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ek8u66vLTpAkRpd+2sk8p78eLd43IOAJtgk5+o6PO93I2OXoZHmjyWAJOJQsv6KjvzAQMwcfXN56Foxsim9TCst3JL5pnXSobW0yUhev4OEST7aClG7U5ffqHx+YwNpC4i3VdlmgqQt1FXkgfbcDUJFMQb+zzdmPoTHAxYWBywY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67M12ZKE035784;
-	Sat, 22 Aug 2026 10:02:35 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67M12ZFA035780
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 22 Aug 2026 10:02:35 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <34c3f72d-1d4f-4e0f-bc06-bc562e39a6f6@I-love.SAKURA.ne.jp>
-Date: Sat, 22 Aug 2026 10:02:35 +0900
+	s=arc-20240116; t=1787370138; c=relaxed/simple;
+	bh=2rVjJAdlXz1zySCfMjg3csmTNMfbPeBEUvD7nlqJj5s=;
+	h=References:In-Reply-To:Message-ID:From:To:Subject:Date:
+	 MIME-Version:Content-Type; b=HPgj1rWSAcjGOA9IjqeawqsfmfeNs7ByutRRMt59fkjNfmkqBMHNCXn+dUggUjXq9HQX0zoatOJgZoV4glBpavpEFgsNDpZWWXe0Eq2b508S+VpCkh/0cmBrGTJIvuDhLYpGAiNlU6MuMflDR6xGW5qTOEQMY4oJmseH+4A/FZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=planestimations.com; spf=pass smtp.mailfrom=planestimations.com; dkim=pass (2048-bit key) header.d=planestimations.com header.i=@planestimations.com header.b=QzsHJwDI; arc=none smtp.client-ip=45.92.8.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=planestimations.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=planestimations.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=planestimations.com header.i=@planestimations.com header.b="QzsHJwDI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=planestimations.com;
+	s=202505; t=1787311514;
+	bh=2rVjJAdlXz1zySCfMjg3csmTNMfbPeBEUvD7nlqJj5s=;
+	h=References:In-Reply-To:From:To:Subject:Date:From;
+	b=QzsHJwDIiIIEL+zUgWE2R81e5MYEShRW4olqvrotQyrd6CODb3uLYKp640MFGQ427
+	 IzGYFncGaiNSs6E6ZAIZv88NKxFXJE3yyZCe8Ob6VfpEzZ4ppd3XrKAoj1Z8f4dRCp
+	 YmTDqbEF+GnJ0k3gbsivXD4SfRI1H7tgWSo6w/0IMnYtDtMxwnJi3kTMVO8E6p/975
+	 DfE5xgUSPGW+Czt2r3YxLX/e22D+Ulst5jAiEZGJCsKtNlT3zHfpEpvwW2BWhXwNWq
+	 hayL2TIsugoX4v5gFouclKyYlS1ply+5JjEfDxvt0KOiTAuo8ZJhAzxrRh0KCTUvlI
+	 XmqCWG3xCQGvA==
+Received: from [127.0.0.1] (ec2-54-221-10-142.compute-1.amazonaws.com [54.221.10.142])
+	by mail.planestimations.com (Postfix) with ESMTPSA id 5C05E50321A
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 13:25:13 +0200 (CEST)
+References: <82d21d31-45fc-4211-9f8c-03eadc1534f8@planestimations.com>
+ <ab3df2c1-6bd3-4732-8567-7e3868728b1e@planestimations.com>
+In-Reply-To: <82d21d31-45fc-4211-9f8c-03eadc1534f8@planestimations.com>
+Message-ID: <7cdc495c-9e8c-4768-9cc2-9918ba96fcc6@planestimations.com>
+From: Jane Wells <jw@planestimations.com>
+To: linux-block@vger.kernel.org
+Subject: Complete CSI Takeoff Services for Your Next Build
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Aug 2026 11:25:10 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [block] general protection fault in lo_rw_aio
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Gary Guo <gary@garyguo.net>, Mark Brown <broonie@kernel.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Boqun Feng
- <boqun@kernel.org>, Theodore Tso <tytso@mit.edu>,
-        kernel test robot <oliver.sang@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <cdf41ad3-783f-4a14-8343-c893d6c50524@I-love.SAKURA.ne.jp>
- <f5cb9935-1497-474a-8e96-661914f18a71@I-love.SAKURA.ne.jp>
- <4e62dfee-53f4-4cb0-b92d-f2ce9a5b0852@acm.org>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <4e62dfee-53f4-4cb0-b92d-f2ce9a5b0852@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=utf-8
 
-On 2026/08/22 2:32, Bart Van Assche wrote:
-> On 8/21/26 5:46 AM, Tetsuo Handa wrote:
->> On 2026/08/03 22:34, Tetsuo Handa wrote:
->>> I am waiting for your response on
->>> "[PATCH v5] loop: Fix NULL pointer dereference in lo_rw_aio()" at
->>> https://lkml.kernel.org/r/30ccdd3c-6353-4a0f-bdc7-230ec3bf4765@I-love.SAKURA.ne.jp .
->>
->> You have never responded for 4 months since I first contacted you at
->> https://lkml.kernel.org/r/e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp .
->> Nobody being interested in this problem has caused multiple issues for linux-next tree.
->> Will you become responsive on this problem?
-> 
-> Since I didn't like the proposed solution I took a look at this issue
-> myself. If nobody objects I will integrate the patch below in my loop
-> driver patch series.
+Hello ,
 
-Here is a review comment from AI Mode in Google Search.
-I and Google consider that your patch is not sufficient.
-At least your patch should be reviewed by sashiko, by posting your patch to ML.
+I wanted to send a quick example of our project breakdown.
 
-----------
-Thanks for working on this patch. 
+We recently completed a full CSI takeoff covering roofing, MEP, structural,=
+ and finishes with clear cost breakdowns.
 
-However, I am concerned that using blk_mq_freeze_queue() alone is insufficient 
-to resolve the underlying synchronization issues in the loop driver. While 
-freezing the queue successfully prevents new I/O requests from entering, it 
-does not guarantee that all asynchronous work currently pending or executing 
-in the driver's internal workqueue has completely finished.
+If helpful, I can share a =
+similar sample tailored to your needs.
 
-If we rely solely on freezing the queue, we still leave the door open for several 
-critical race conditions:
+Would you like that?
 
-1. NULL Pointer Dereference: Asynchronous work items might still trigger and 
-   attempt to access structures or resources that are freed during cleanup.
-2. Deadlocks: Unsynchronized worker threads and queue management tasks can 
-   easily end up waiting on each other, causing a complete lockup.
-3. Incomplete Work: Internal worker threads might be cut off mid-execution, 
-   leaving the block device state corrupted or uncleaned.
+Regards,
 
-To safely prevent these issues, we need to ensure that the driver's internal 
-workqueue is completely synchronized and emptied. Instead of just a queue freeze, 
-we should incorporate a proper drain_workqueue() mechanism (or drain the specific 
-workqueue handling the async tasks) to guarantee that no lingering asynchronous 
-workers are active during the critical path.
+Jane Wells | Sales Representative
+Plan Estimating
 
-Could you please update the patch to include a thorough flushing/draining of 
-the loop driver's internal workqueue?
-
-Thanks,
-----------
-
+Click Here to =
+Unsubscribe
