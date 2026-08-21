@@ -1,248 +1,260 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF91410D06
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 07:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F173ADBA7;
+	Fri, 21 Aug 2026 07:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787297048; cv=none; b=XBn8oHmkHQpPNwQ+2T2CatJeo8C01CfcTgG30v9on8JCacXadGjlmhxThyaofRqp45zZzqRZRNeaTiYbTTYr8WEc6XulrN3DlCc8tbcpV7eAVJPzhpsb7V7CQ0ugOnaK4vo9CGy1WzUv3coAlQvmU7iJDwMY8atTYzim//2pFww=
+	t=1787297898; cv=none; b=PcgTZImPPcN20aVDR+zubiKEzgbe/HPyTN136m/oxdENgaa96qyXQ74gHlAob2DYLbQqy/3e9Pyjct9JwLgjN+1+jhuBMcZRkI0TOi1JupjD0AQOlKxh+WKUwocRAyx2BWilUWJkaYI3wj1GGnubZB0hxLxRJPJYSRyivsVqtzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787297048; c=relaxed/simple;
-	bh=HJ+KOl/z62h9nc+ENRR4I1onjWaqSyUg5sCbCNs8DWk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F5gZsIlkPM1SicMXzRosvbyrQaIeHefih76YXoKeYjS9YxNz9uuSgTUN+1kQtdvjgX3ikkxUTFQXBz8CwRzYTkjU71WqcqyMFGNPts7RMonL2IcjkYXPyrt/jDNwWutWCbb3mrOTsDHIzqN9HivA5fqFl8MK0MpOElJsoZDrVrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fbxfOV3j; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787297898; c=relaxed/simple;
+	bh=rKCnKYEcumWl3JyfMbSEhreXXJgGzptLv9nA+mGVflE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ElRpY1GYtJlaHlx7wipfMsdXrL+3EKShO4BoCY3UhUK881X6Y1I2rY83eh04EVEyYes7nawch5mZJywg43SxfRE/F5iwMLQsMU4q1eX4nenxleeVcwDA2TlMryY2hh7Dk3+G0jzhzS9sBvu4Ur75z+/2F8+ZN9/L246cvppvryU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQYZoZy5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fbxfOV3j"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-cbedbaba5fdso443731a12.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 00:24:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787297046; x=1787901846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=eQFxRmlnw8HmCpfmtAekPjcWF4+b8s8z2XwbA4bbArA=;
-        b=fbxfOV3jXXQa6rlejlwAMfr+hs027maIzLWaxJ37fLNUUKWtIoTjQF1GHo005UKQr7
-         45wed3nWXJkv0BgO5c8FapmyY9zy+vf54a+7gv4KL/KCxJ1jSsJFfJVye+6yQC5eEqgs
-         XJ574MrHgOH0/jtd67DKRB2zyzxEDfZ2jquqy6F31nrRZeaoq7sYNA/ZYR2+SYNiW9wK
-         UhB/VkVWULWpz+NJnt3nRHTrt5YeqXSoCnD5eLdF3eYURUX81pBxSUHTyJZlqGN5xSoP
-         tQ6UdLCpgH3Bxixufdm9+Ugw7DapyCccKCUseS4y8Q/rb4n8k88LsradJvM4VfXDJAlW
-         8vBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787297046; x=1787901846;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=eQFxRmlnw8HmCpfmtAekPjcWF4+b8s8z2XwbA4bbArA=;
-        b=SS2LS+i3prt+rcoT6dQV2vV6ZERd7FvlmZ8/I607nqnCk1JU7d582mllGs6WPZQhAm
-         pzeLU2Xi0I92U/ARHLSzpSLjRsNnYiGsp+8nZI/gLiSqE8gbuwgPtZ9EqvvBSg/2SCqg
-         JYza7Oe7B3C6aaR4NkWbfAKv5UwiC+sOwNaKD+N0fAa7uncDMwGBMRZMLqH1NeJIZAqu
-         4vH2W0bq74uU9Unbwzlx6Wdu+q6Nab+c8NOH/5IpDoOrjL1xGmRxqTUpYKqYznYZi2BR
-         ZIflooB0Ur0BhAajr26M/uY6NB8ZgOAK4MQTLAutZYZHdjgJWZURVfmWaPZShIE7F7sg
-         k3HQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqZV7oD9vtzwak4OQN8RpMe8rZOzFovGHsyOEuRlbCVn5m6MrG62s/K/awFSxcBFxl5s1NIOllX+PervA==@vger.kernel.org
-X-Gm-Message-State: AFuF++ni0vtsNDTNoSjbdv/t8awAtNdsDDBoUCo6gWNatFZNhkU2zR7K
-	W8eN2P+gDs0HZyiw7INlskPcbL9QqVMFdGUuePlniuV9qA5zzbNAZUfd
-X-Gm-Gg: AR+sD12Zq/aarajOTPPbF/Z3FeXMJAz7XVEcJN0I5J3HxluW0uIUV6RfhJHwvWUQfk7
-	bYKV+5V/yUdSeG6NtlRzbVqF9b5IyWiuKQBfLic4CFl0EcyYAy5k8CHW0cR6VnpKLVXd7mBJQbl
-	9RvmQr2ZSCqSGA7xiak8egvUWRzuIjORIwUt6ceeqA09/yiuAedtA+9+B0UEeG7b9h6/Ym5w16h
-	yG3DB9mKEi4OtOFXs9APx0XhZTVQ/l3xQpetS+I8WrZQjCBDCU+T6GWhPh/w0m80qsgk9kIEAhb
-	+7s6Ue3JrIEtsBcUqka7eP/AI3h9ukNNx+223c/OOVrxHE4PiYHjHxj6Xij9BvP7+li5KL6nsNC
-	93W5NPIltehlT8i+W5dKFxGdGrNLuFwuolBI7IFiuNCmMtmvrnJuEXCLEcvchVXzI4XnKV/M6Df
-	tZs1Sf0zR5VClXoQ6vYJuvpyTVB/9bqONA4t5iensVC0TIoJJXI/Ao/kSUaM9tC6/hRx9yzyuz
-X-Received: by 2002:a17:90b:1e0d:b0:395:4e0d:bc60 with SMTP id 98e67ed59e1d1-395c354d7ebmr7329239a91.9.1787297046224;
-        Fri, 21 Aug 2026 00:24:06 -0700 (PDT)
-Received: from osman.mioffice.cn ([43.224.245.178])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-395c467d907sm2025485a91.7.2026.08.21.00.24.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2026 00:24:05 -0700 (PDT)
-From: Zhan Xusheng <zhanxusheng1024@gmail.com>
-X-Google-Original-From: Zhan Xusheng <zhanxusheng@xiaomi.com>
-To: Davidlohr Bueso <dave@stgolabs.net>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-efi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhanxusheng@xiaomi.com,
-	Zhan Xusheng <zhanxusheng1024@gmail.com>
-Subject: [PATCH 2/2] block: partitions: efi: print GPT LBAs as unsigned
-Date: Fri, 21 Aug 2026 15:23:55 +0800
-Message-ID: <20260821072355.2006771-2-zhanxusheng@xiaomi.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260821072355.2006771-1-zhanxusheng@xiaomi.com>
-References: <20260821072355.2006771-1-zhanxusheng@xiaomi.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQYZoZy5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22BAA1F000E9;
+	Fri, 21 Aug 2026 07:37:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787297876;
+	bh=e3HgVd1cxxmEjUBaLU/HIwYldnlIEKneQD/S3mbdmAw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=QQYZoZy5XMUKRQ3cf2goz46XPoxmh58JVe2AGU+uh+MsIS4aHUXgKrB28hB092zbx
+	 I1Ca30A5zDO/BM6vXHOwQr9Ww+LL2RajKvWcmCnVxBdi5Gue+9kqdTMQfxbiSjaghv
+	 FlXE3DPbsU4C4c4alIYfBNXD5GCpd5K3spxKD8BU/W7WlILO5UQIX/mzPRGw7GHy1i
+	 HVEm3LZABnXfB2zRPj1WhiKoiTgjggZtcyGdvsaw9cJOtpDlfQFKCMMO8gqzkTIZWE
+	 w1z4aX4nM829Ub+PIjqaHJkXXyX6P6qyBaXSExMMdUL1TIHWJHe7y1cy7p1NSvUYFi
+	 ARYZ2gTtTrMPw==
+Message-ID: <f1657724-e7a9-45f6-9aef-af69d3c64a7d@kernel.org>
+Date: Fri, 21 Aug 2026 09:37:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 00/40] DEPT(DEPendency Tracker)
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org,
+ max.byungchul.park@gmail.com, kernel_team@skhynix.com,
+ torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+ linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+ linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+ will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+ joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+ duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+ david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org,
+ kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+ mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+ vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+ dennis@kernel.org, cl@linux.com, penberg@kernel.org, rientjes@google.com,
+ vbabka@suse.cz, ngupta@vflare.org, linux-block@vger.kernel.org,
+ josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+ jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+ djwong@kernel.org, dri-devel@lists.freedesktop.org,
+ rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+ hamohammed.sa@gmail.com, harry.yoo@oracle.com, chris.p.wilson@intel.com,
+ gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, longman@redhat.com,
+ yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+ netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
+ corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+ hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+ gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
+ arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
+ da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
+ frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+ josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
+ jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
+ neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ trondmy@kernel.org, anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+ clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+ kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, broonie@kernel.org,
+ kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
+ ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
+ baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
+ joel.granados@kernel.org, richard.weiyang@gmail.com,
+ geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
+ alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+ chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
+ link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
+ brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
+ mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-modules@vger.kernel.org, rcu@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ 2407018371@qq.com, dakr@kernel.org, miguel.ojeda.sandonis@gmail.com,
+ neilb@ownmail.net, bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+ dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+ tmgross@umich.edu, rust-for-linux@vger.kernel.org
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <359ea967-9b97-4584-88e6-bddb4044de2e@kernel.org>
+ <aoc-jJ10op62jXFK@casper.infradead.org>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aoc-jJ10op62jXFK@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Zhan Xusheng <zhanxusheng1024@gmail.com>
+On 8/20/26 19:51, Matthew Wilcox wrote:
+> On Thu, Aug 20, 2026 at 07:16:05PM +0200, David Hildenbrand (Arm) wrote:
+>>> Consider this real deadlock pattern that lockdep cannot detect:
+>>>
+>>>    context X              context Y              context Z
+>>>
+>>>                           mutex_lock A
+>>>    folio_lock B
+>>>                           folio_lock B <- DEADLOCK
+>>>                                                  mutex_lock A <- DEADLOCK
+>>>                                                  folio_unlock B
+>>>                           folio_unlock B
+>>>                           mutex_unlock A
+>>>                                                  mutex_unlock A
+>>
+>> But that really just boils down to folio lock being implemented as a PG_lock +
+>> some advanced wait mechanism. And we must do that because of lack of bits in
+>> struct page.
+>>
+>> Willy mentioned in a previous version [1]: "I don't think it makes sense to
+>> track lock state in the page (nor folio).  Partly because there's just so many
+>> of them, but also because the locking rules don't really apply to individual
+>> folios so much as they do to the mappings (or anon_vmas) that contain folios."
+>>
+>> Given that lockdep is a debug feature, and we will at some point allocate struct
+>> folio separately, I assume we could just squeeze a "struct lockdep_map" in there
+>> in such debug configs and the world would not collapse.
+>>
+>> Doing that today (one "struct lockdep_map" in each "struct page") wouldn't work
+>> as mm_zero_struct_page() would not expect such large "struct page". But
+>> conceptually, for a debug kernel with a special CONFIG_LOCKDEP_PAGE_LOCK, maybe
+>> that would already be ok and we could just do that (and optimize it as we
+>> allocate folios separately).
+>>
+>> Not that it's ideal, but for a debug feature to at least check PG_lock, probably
+>> an easier way to achieve it than some completely new infrastructure.
+>>
+>> Now, Willy said "locking rules don't really apply to individual folios", I
+>> wonder if that could just help to also let lockdep check PG_lock with less
+>> metadata? (didn't fully wrap my head around the implications)
+>>
+>> [1]
+>> https://lore.kernel.org/all/aR3WHf9QZ_dizNun@casper.infradead.org/?utm_source=chatgpt.com
+> 
+> There are a few things going on that make PG_lock special.  Let me try
+> to explain again, only better this time.
+> 
 
-From: Zhan Xusheng <zhanxusheng@xiaomi.com>
+Thanks for that information :)
 
-These values are read from the on-disk header, and the messages exist to
-report the ones that are out of range, so a value with the top bit set is
-exactly what they are asked to print.  %lld renders it as a negative
-number: a my_lba of 0xffffffffffffffff is reported as -1.
+> 1. The current lifetime of a struct page is the lifetime of the system.
+> But the semantics of its PG_lock bit change each time it is freed and
+> allocated.
 
-The compiler does not catch it, since a signed/unsigned mismatch between
-two types of the same width needs -Wformat-signedness, which the kernel
-does not enable.
+Well, yeah, but that will effectively change once we dynamically allocate struct
+folio.
 
-Drop the (unsigned long long) casts along with it.  alpha, mips and
-powerpc select int-l64.h for userspace only, so in-kernel u64 is
-unsigned long long everywhere and le64_to_cpu() already yields it.
+Until then, don't we have the following two events:
 
-Signed-off-by: Zhan Xusheng <zhanxusheng@xiaomi.com>
----
- block/partitions/efi.c | 69 +++++++++++++++++++++---------------------
- 1 file changed, 34 insertions(+), 35 deletions(-)
+(a) Allocator handing out a page
+(b) Page getting returned to page allocator
 
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 76994d3edd1a..54c595db12e8 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -344,10 +344,9 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 
- 	/* Check the GUID Partition Table signature */
- 	if (le64_to_cpu((*gpt)->signature) != GPT_HEADER_SIGNATURE) {
--		pr_debug("GUID Partition Table Header signature is wrong:"
--			 "%lld != %lld\n",
--			 (unsigned long long)le64_to_cpu((*gpt)->signature),
--			 (unsigned long long)GPT_HEADER_SIGNATURE);
-+		pr_debug("GUID Partition Table Header signature is wrong: %llu != %llu\n",
-+			 le64_to_cpu((*gpt)->signature),
-+			 GPT_HEADER_SIGNATURE);
- 		goto fail;
- 	}
- 
-@@ -383,9 +382,9 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 	/* Check that the my_lba entry points to the LBA that contains
- 	 * the GUID Partition Table */
- 	if (le64_to_cpu((*gpt)->my_lba) != lba) {
--		pr_debug("GPT my_lba incorrect: %lld != %lld\n",
--			 (unsigned long long)le64_to_cpu((*gpt)->my_lba),
--			 (unsigned long long)lba);
-+		pr_debug("GPT my_lba incorrect: %llu != %llu\n",
-+			 le64_to_cpu((*gpt)->my_lba),
-+			 lba);
- 		goto fail;
- 	}
- 
-@@ -394,21 +393,21 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 	 */
- 	lastlba = last_lba(state->disk);
- 	if (le64_to_cpu((*gpt)->first_usable_lba) > lastlba) {
--		pr_debug("GPT: first_usable_lba incorrect: %lld > %lld\n",
--			 (unsigned long long)le64_to_cpu((*gpt)->first_usable_lba),
--			 (unsigned long long)lastlba);
-+		pr_debug("GPT: first_usable_lba incorrect: %llu > %llu\n",
-+			 le64_to_cpu((*gpt)->first_usable_lba),
-+			 lastlba);
- 		goto fail;
- 	}
- 	if (le64_to_cpu((*gpt)->last_usable_lba) > lastlba) {
--		pr_debug("GPT: last_usable_lba incorrect: %lld > %lld\n",
--			 (unsigned long long)le64_to_cpu((*gpt)->last_usable_lba),
--			 (unsigned long long)lastlba);
-+		pr_debug("GPT: last_usable_lba incorrect: %llu > %llu\n",
-+			 le64_to_cpu((*gpt)->last_usable_lba),
-+			 lastlba);
- 		goto fail;
- 	}
- 	if (le64_to_cpu((*gpt)->last_usable_lba) < le64_to_cpu((*gpt)->first_usable_lba)) {
--		pr_debug("GPT: last_usable_lba incorrect: %lld < %lld\n",
--			 (unsigned long long)le64_to_cpu((*gpt)->last_usable_lba),
--			 (unsigned long long)le64_to_cpu((*gpt)->first_usable_lba));
-+		pr_debug("GPT: last_usable_lba incorrect: %llu < %llu\n",
-+			 le64_to_cpu((*gpt)->last_usable_lba),
-+			 le64_to_cpu((*gpt)->first_usable_lba));
- 		goto fail;
- 	}
- 	/* Check that sizeof_partition_entry has the correct value */
-@@ -422,7 +421,7 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 		le32_to_cpu((*gpt)->sizeof_partition_entry);
- 	if (pt_size > KMALLOC_MAX_SIZE) {
- 		pr_debug("GUID Partition Table is too large: %llu > %lu bytes\n",
--			 (unsigned long long)pt_size, KMALLOC_MAX_SIZE);
-+			 pt_size, KMALLOC_MAX_SIZE);
- 		goto fail;
- 	}
- 
-@@ -484,32 +483,32 @@ compare_gpts(gpt_header *pgpt, gpt_header *agpt, u64 lastlba)
- 		return;
- 	if (le64_to_cpu(pgpt->my_lba) != le64_to_cpu(agpt->alternate_lba)) {
- 		pr_warn("GPT:Primary header LBA != Alt. header alternate_lba\n");
--		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->my_lba),
--                       (unsigned long long)le64_to_cpu(agpt->alternate_lba));
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(pgpt->my_lba),
-+			le64_to_cpu(agpt->alternate_lba));
- 		error_found++;
- 	}
- 	if (le64_to_cpu(pgpt->alternate_lba) != le64_to_cpu(agpt->my_lba)) {
- 		pr_warn("GPT:Primary header alternate_lba != Alt. header my_lba\n");
--		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->alternate_lba),
--                       (unsigned long long)le64_to_cpu(agpt->my_lba));
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(pgpt->alternate_lba),
-+			le64_to_cpu(agpt->my_lba));
- 		error_found++;
- 	}
- 	if (le64_to_cpu(pgpt->first_usable_lba) !=
-             le64_to_cpu(agpt->first_usable_lba)) {
- 		pr_warn("GPT:first_usable_lbas don't match.\n");
--		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->first_usable_lba),
--                       (unsigned long long)le64_to_cpu(agpt->first_usable_lba));
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(pgpt->first_usable_lba),
-+			le64_to_cpu(agpt->first_usable_lba));
- 		error_found++;
- 	}
- 	if (le64_to_cpu(pgpt->last_usable_lba) !=
-             le64_to_cpu(agpt->last_usable_lba)) {
- 		pr_warn("GPT:last_usable_lbas don't match.\n");
--		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->last_usable_lba),
--                       (unsigned long long)le64_to_cpu(agpt->last_usable_lba));
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(pgpt->last_usable_lba),
-+			le64_to_cpu(agpt->last_usable_lba));
- 		error_found++;
- 	}
- 	if (efi_guidcmp(pgpt->disk_guid, agpt->disk_guid)) {
-@@ -542,17 +541,17 @@ compare_gpts(gpt_header *pgpt, gpt_header *agpt, u64 lastlba)
- 	}
- 	if (le64_to_cpu(pgpt->alternate_lba) != lastlba) {
- 		pr_warn("GPT:Primary header thinks Alt. header is not at the end of the disk.\n");
--		pr_warn("GPT:%lld != %lld\n",
--			(unsigned long long)le64_to_cpu(pgpt->alternate_lba),
--			(unsigned long long)lastlba);
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(pgpt->alternate_lba),
-+			lastlba);
- 		error_found++;
- 	}
- 
- 	if (le64_to_cpu(agpt->my_lba) != lastlba) {
- 		pr_warn("GPT:Alternate GPT header not at the end of the disk.\n");
--		pr_warn("GPT:%lld != %lld\n",
--			(unsigned long long)le64_to_cpu(agpt->my_lba),
--			(unsigned long long)lastlba);
-+		pr_warn("GPT:%llu != %llu\n",
-+			le64_to_cpu(agpt->my_lba),
-+			lastlba);
- 		error_found++;
- 	}
- 
+And while in the allocator, the PG_locked is essentially unused/unusable (and so
+would be lockdep data)?
+
+I'd argue there is a well defined lifetime for PG_locked and any additional
+lockdep metadata. At least theoretically ;)
+
+> 
+> 2. The position of PG_lock in the locking hierarchy only depend on
+> what the folio is currently being used for.  That is, all folios in
+> a given xfs inode behave exactly the same from a locking perspective.
+> There's no need to build up state about how each PG_lock is used;
+> they can all share.  Arguably all xfs file inodes are the same as
+> each other (directory inodes might be different from file inodes),
+> so we might want to go further than telling DEPT that "this folio
+> belongs to this inode" and go to "this folio belongs to this xfs file
+> inode".
+
+"There is no need", I am not entirely sure when it comes to anonymous folios.
+
+Even if there is actually no need, given that we are talking about debugging
+mechanisms, I am not sure if optimizing for less memory consumption is our
+highest priority. Debug kernels already consume plenty of memory on other things
+(page_ext, for example), so consuming some more to support the folio lock with
+lockdep does not sound too crazy for me.
+
+(maybe lockdep data could even life in page_ext)
+
+I understand that Dept applies to more things than just PG_locked, though.
+
+> 
+> 3. PG_lock can be taken in task context then released in interrupt
+> context.  For full points, we need to mark the exact point at which
+> we submit the folio for read.  Otherwise we can get into the situation
+> alluded to by f2c817bed58d and better discussed at
+> https://lore.kernel.org/linux-mm/20200127150024.GN1183@dhcp22.suse.cz/
+> where we have the folio locked but haven't yet submitted it for I/O
+> so it doesn't matter how long we wait, it will never come unlocked.
+
+Yeah, it seems hard to squeeze different locking contexts into existing lockdep.
+I cannot tell whether lockdep could be adjusted to allow for that, or how much
+work it would involve.
+
+So yeah, Dept might be a more natural fit for this scenario.
+
 -- 
-2.43.0
+Cheers,
 
+David
