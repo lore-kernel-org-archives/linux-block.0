@@ -1,37 +1,37 @@
-Received: from mta0.migadu.com (out-245.mta0.migadu.com [91.218.175.245])
+Received: from mta0.migadu.com (out-21.mta0.migadu.com [91.218.175.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF80764A8C
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 02:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686703148A7
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 02:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787280370; cv=none; b=OYi7UvCww/SWOWInaXUzVSKd0aaS5uonidpdW9Y88NR76vTt2c8j3ocZFScrXxF60nG9wFewT8qzBIwGTz+6YNJXnzQI2wFNpYen6GOjwIfkcpHjLGhl3vDFfolbgVy4Yq5XX/I1v9vvkv4vyvh+kiE8g3RGDk3YO0K/sMjToig=
+	t=1787280595; cv=none; b=TnyrKhx3Uq17ubFuYvxN0pVmJqhvdJb724uQ5rFF669vWBUzjuNT+X8I6yBiOJFDoRvzH3tbowvwzW5SuXYmzi8VV77m7of3lomR5lbuVQLnaSuPzR2nzhAS9Im7Ug9wFX58T72tsZsHJhQZMNvt4QXmfVkgEoWLG1seOHM1PEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787280370; c=relaxed/simple;
-	bh=9rDVrRfzZBCC9jJ3URnpdQEQQOnaj//MJ7Ba1g2oMqc=;
+	s=arc-20240116; t=1787280595; c=relaxed/simple;
+	bh=e2HPCQmk44iRbc7RKAXYq285pp53Adr8C6IxggLNowA=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mUO33JTSoFCZ0mQVmHeVfq+ugI5aPunpaGmg5xpIhk3w22qwKTlkrfTpuYGGsB2PLkzNvBnr+3jZgU0RfIA0MQHE5g0QhjG+2t94uTr4WDYRyTbF1SxJBh55bCL52yGQs1ie40qKELQ2b7q27ztm0PWkfm/2Gq2gMmVgqT1kOmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G0UWbhnr; arc=none smtp.client-ip=91.218.175.245
+	 In-Reply-To:Content-Type; b=MYCIts9m7o0zKlT79r2II5b+Mtnn3tVURYo7bMZwgeJcz+Taae7eIVi1k+bb5OpDSDM10upPbI0HBUb72aoEJfwyORqg1rNSQyFXzvt116+0bJch6ce01fMXyeyM+oQRYF7K2sU3VPRX+v1wJk2O3QVQSJsEy/KNa6n1Y0pBUhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WU2TLWnj; arc=none smtp.client-ip=91.218.175.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G0UWbhnr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WU2TLWnj"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=9rDVrRfzZBCC9jJ3URnpdQEQQOnaj//MJ7Ba1g2oMqc=;
+DKIM-Signature: a=rsa-sha256; bh=e2HPCQmk44iRbc7RKAXYq285pp53Adr8C6IxggLNowA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787280366; v=1; x=1787885166;
- b=G0UWbhnrTkPt/YSv5A0+9VoG3tQUDbENvWAWTITwE7AczNn47I73U7BDFlTjdl6rup+zR8n4
- aS5u902niJDMot7L31f/L4rRvGFIcJek6d0v28hORcGsNW9wlE5Be0uw3uzPZuma35+45xP49E9
- gO6Mb+6aE7P3ZCxROlxFBqMk=
+ t=1787280591; v=1; x=1787885391;
+ b=WU2TLWnje19mW37y4oIZvvC470igux/PfcCZDGIkyi5ZCKykAg25l+wTYSpUp6v8NQ/o8q7V
+ ADtwc9fksWG7aERZd3ce4R4GcQ5w/KCS4GArrWl3WlVYrx4dIhFvSkabvm8m5josgysp5FOdSWv
+ EN0JLieybaInSIw7SFbSEBtM=
 X-Envelope-To: linux-block@vger.kernel.org
 Received: from [192.168.110.173] (223.70.159.239)
-	by smtp.migadu.com with ESMTPS id ab17684995f18d63;
-	Fri, 21 Aug 2026 02:45:56 +0000
-X-Mizu-Trace-ID: ab17684995f18d63
+	by smtp.migadu.com with ESMTPS id 8c07abb10e4e858f;
+	Fri, 21 Aug 2026 02:49:51 +0000
+X-Mizu-Trace-ID: 8c07abb10e4e858f
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <b382ca10-090e-411a-afd9-37d84b6c7281@linux.dev>
-Date: Fri, 21 Aug 2026 10:45:48 +0800
+Message-ID: <f17cab7f-ee67-4d9c-95f0-01c28b4a520b@linux.dev>
+Date: Fri, 21 Aug 2026 10:49:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,84 +39,93 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, linux-block@vger.kernel.org, cgroups@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-throttle: Remove dead check in tg_conf_updated()
-To: Tang Yizhou <yizhou.tang@shopee.com>, yukuai@fygo.io, tj@kernel.org,
- axboe@kernel.dk
-References: <20260820160547.357682-1-yizhou.tang@shopee.com>
+Cc: cui.tao@linux.dev, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai@fygo.io
+Subject: Re: [PATCH v2] blk-wbt: Always change enable_state to MANUAL when
+ setting latency
+To: Tang Yizhou <yizhou.tang@shopee.com>, axboe@kernel.dk,
+ guzebing1612@gmail.com
+References: <20260820161514.371181-1-yizhou.tang@shopee.com>
 From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260820160547.357682-1-yizhou.tang@shopee.com>
+In-Reply-To: <20260820161514.371181-1-yizhou.tang@shopee.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
 
-在 2026/8/21 00:05, Tang Yizhou 写道:
+在 2026/8/21 00:15, Tang Yizhou 写道:
 > From: Tang Yizhou <yizhou.tang@shopee.com>
 > 
-> The check in tg_conf_updated() was introduced for io.low, so remove it.
+> Commit 1e56f30a73f3 ("block: Make WBT latency writes honor enable
+> state") compares only the boolean enabled state in the no-op check.
+> Writing the current latency value while WBT is in WBT_STATE_ON_DEFAULT
+> is therefore still skipped, and enable_state is not changed to
+> WBT_STATE_ON_MANUAL. A subsequent elevator switch to BFQ then disables
+> WBT through wbt_disable_default(), silently discarding the explicit
+> sysfs setting:
 > 
-> global ? tg->td->queue->root_blkg : tg_to_blkg(tg) was introduced in
-> commit 9bb67aeb9678 ("blk-throttle: respect 0 bps/iops settings for
-> io.low"). Remove it, too.
+>   # enable_state = WBT_STATE_ON_DEFAULT, min_lat_nsec = 2000000
+>   echo 2000 > /sys/block/nullb0/queue/wbt_lat_usec  # skipped as a no-op
+>   echo bfq > /sys/block/nullb0/queue/scheduler
+>   cat /sys/block/nullb0/queue/wbt_lat_usec          # 0, WBT disabled
 > 
-> Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW")
+> Skip the update only if the stored latency matches and enable_state
+> already equals the exact target state: WBT_STATE_ON_MANUAL for a
+> non-zero value, WBT_STATE_OFF_MANUAL for zero.
+> 
+> A write that passes the check then reaches wbt_set_min_lat(), which
+> performs the actual transition to the MANUAL state.
+> 
+> Rename the helper to wbt_lat_changed() to improve readability.
+> 
+> Fixes: 1e56f30a73f3 ("block: Make WBT latency writes honor enable state")
+> Reviewed-by: Yu Kuai <yukuai@fygo.io>
+> Reviewed-by: Guzebing <guzebing1612@gmail.com>
 > Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
 > ---
->  block/blk-throttle.c | 18 +++++-------------
->  1 file changed, 5 insertions(+), 13 deletions(-)
+> v2: Pick Yuai and Guzebing's Reviewed-by tag.
+>  block/blk-wbt.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index ffc3b70065d4..fa742e63807d 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -1267,7 +1267,7 @@ static int tg_print_conf_uint(struct seq_file *sf, void *v)
->  	return 0;
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index 953d400fd013..4f12a064286e 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -813,7 +813,14 @@ static void wbt_queue_depth_changed(struct rq_qos *rqos)
+>  	wbt_update_limits(RQWB(rqos));
 >  }
 >  
-> -static void tg_conf_updated(struct throtl_grp *tg, bool global)
-> +static void tg_conf_updated(struct throtl_grp *tg)
+> -static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
+> +/*
+> + * Return true if writing @val would change the WBT state:
+> + * 1) @val differs from the stored min_lat_nsec, or
+> + * 2) @val matches, but enable_state is not the corresponding manual state
+> + *    (WBT_STATE_ON_MANUAL for non-zero @val, WBT_STATE_OFF_MANUAL for 0),
+> + *    so the write still has to update enable_state.
+> + */
+> +static bool wbt_lat_changed(struct request_queue *q, u64 val)
 >  {
->  	struct throtl_service_queue *sq = &tg->service_queue;
->  	struct cgroup_subsys_state *pos_css;
-> @@ -1286,16 +1286,8 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
->  	 * restrictions in the whole hierarchy and allows them to bypass
->  	 * blk-throttle.
->  	 */
-> -	blkg_for_each_descendant_pre(blkg, pos_css,
-> -			global ? tg->td->queue->root_blkg : tg_to_blkg(tg)) {
-> -		struct throtl_grp *this_tg = blkg_to_tg(blkg);
-> -
-> -		tg_update_has_rules(this_tg);
-> -		/* ignore root/second level */
-> -		if (!cgroup_subsys_on_dfl(io_cgrp_subsys) || !blkg->parent ||
-> -		    !blkg->parent->parent)
-> -			continue;
-> -	}
-> +	blkg_for_each_descendant_pre(blkg, pos_css, tg_to_blkg(tg))
-> +		tg_update_has_rules(blkg_to_tg(blkg));
->  	rcu_read_unlock();
+>  	struct rq_qos *rqos = wbt_rq_qos(q);
+>  	struct rq_wb *rwb;
+> @@ -825,7 +832,8 @@ static bool wbt_set_lat_changed(struct request_queue *q, u64 val)
+>  	if (rwb->min_lat_nsec != val)
+>  		return true;
 >  
->  	/*
-> @@ -1388,7 +1380,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
->  	else
->  		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
+> -	return rwb_enabled(rwb) != !!val;
+> +	return rwb->enable_state !=
+> +	       (val ? WBT_STATE_ON_MANUAL : WBT_STATE_OFF_MANUAL);
+>  }
 >  
-> -	tg_conf_updated(tg, false);
-> +	tg_conf_updated(tg);
->  	ret = 0;
+>  static void wbt_exit(struct rq_qos *rqos)
+> @@ -1021,7 +1029,7 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
+>  		val *= 1000ULL;
 >  
->  unprep:
-> @@ -1610,7 +1602,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
->  	tg->iops[READ] = v[2];
->  	tg->iops[WRITE] = v[3];
->  
-> -	tg_conf_updated(tg, false);
-> +	tg_conf_updated(tg);
->  	ret = 0;
->  unprep:
->  	blkg_conf_unprep(&ctx);
+>  	mutex_lock(&disk->rqos_state_mutex);
+> -	if (!wbt_set_lat_changed(q, val)) {
+> +	if (!wbt_lat_changed(q, val)) {
+>  		mutex_unlock(&disk->rqos_state_mutex);
+>  		goto out;
+>  	}
 
 Reviewed-by: Tao Cui <cuitao@kylinos.cn>
 
