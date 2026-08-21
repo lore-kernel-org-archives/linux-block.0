@@ -1,49 +1,31 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D892748A8CC
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BC2391E7A
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787315622; cv=none; b=LpSWkDIQGPlG2M1kleyIpIDjLkvEuRN82YzQQ/1C3HB5WhFTwRb2eDKImnN4uXxwB/1asD6kIB9bpGgFbxPfEXXTIzdXHFYMtlHtd37myxULAODGzMW4RYeJ+xOFKoatRBm3IDwOlvaWhWLKzNdxvDHr+BdVwT9HN6kt8fI68R4=
+	t=1787316367; cv=none; b=u2J2dsHFQk1H5At/jNPc6ZR4VsFIdILO93uRg2CsHodv+btTOS8dfjmpVx9+9u2yu7mIYfaSubusN7VKtd8lSVhKCPpoIsL8v5GLuHU1YfnCCRrnwys96uza4GJbKWZyzRVmh6zuXe6jGZwXixYVB3I+waIKnksp724Bx/NyBKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787315622; c=relaxed/simple;
-	bh=ExMBDFobXnMpp6RdVhm0dYjGLANPAQ4yQMEKSXVnyY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=QZkYUdrtlE+crw97SE0FR8lbRY4F5yU2Q30M54n9Q2KwxLXUzPggv+acsZzKRiF1yDuEipJYGeUIEZPpruNXUNbq2Yvaop0mubuaLWcvSrdT3XWOHRM34yoztlGXrd/A/z5jntleGu4fsbggrocnlvFnMH0JejN6ONB2pmyf8sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=o9kbQum0; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="o9kbQum0"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260821123334epoutp036f8f671bbf34348ce7add7f796d44ad4~N0hT4hVI81819418194epoutp03E
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:33:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260821123334epoutp036f8f671bbf34348ce7add7f796d44ad4~N0hT4hVI81819418194epoutp03E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1787315614;
-	bh=ODaDgCCYCUHp5n0OTjvR5sPE2vW6JgnD3H3aVJw7xl0=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=o9kbQum0UOIciTe1w+FMjdMqRXvY8anflXXhHzMGg27Ab2YuKiFWtBWaLGnuWBBU8
-	 wCQYIhkf8/QT9F0Pg3KB4vl6jTMd+YRGySws7ri5ruxI1S1RXXe8LA4VzGgFKthsOV
-	 w32bX2trw5kmp7UorekJiSDQXPEek084L4a3dPW0=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260821123334epcas5p2010e9c4ae5f4bac56498d380910a878b~N0hTTU-Da0398603986epcas5p27;
-	Fri, 21 Aug 2026 12:33:34 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.88]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4hRKV508qSz6B9m5; Fri, 21 Aug
-	2026 12:33:33 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260821123332epcas5p2b0a3d8c25ea3f8f148f16031818b9bdc~N0hRs26Kr1514515145epcas5p2P;
-	Fri, 21 Aug 2026 12:33:32 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260821123330epsmtip22fa01d534d6b61e2ad320efe56cf7b2e~N0hQBUPp32063620636epsmtip27;
-	Fri, 21 Aug 2026 12:33:30 +0000 (GMT)
-Message-ID: <aac9db64-691c-4632-879e-bbf88784249d@samsung.com>
-Date: Fri, 21 Aug 2026 18:03:29 +0530
+	s=arc-20240116; t=1787316367; c=relaxed/simple;
+	bh=JLV4e1f2mU/2LvyMpFXDbCVR81DoMSlbTdP+wKxDhJc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
+	 In-Reply-To:Content-Type; b=K7VHCPc4uDLOnGv2qx71tZyW3MGYhllgz/kaD7suS4a6RsSbzGJwJduRai+B7HP1QolyGMG+ns9cndGTr2t4A7PBFI2rhZXl3MQVVX5Nmrjhe4yaM4nWdgtcCAHf17eMvACy9ujb3166W1actMg6M0kklZygUsvnqEgJyXavRqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67LCk3U5002036;
+	Fri, 21 Aug 2026 21:46:03 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67LCk2rl002033
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 21 Aug 2026 21:46:03 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <f5cb9935-1497-474a-8e96-661914f18a71@I-love.SAKURA.ne.jp>
+Date: Fri, 21 Aug 2026 21:46:00 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,49 +33,34 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/6] xfs: write stream based AG placement
-To: Christoph Hellwig <hch@lst.de>
-Cc: brauner@kernel.org, djwong@kernel.org, dgc@kernel.org, jack@suse.cz,
-	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [block] general protection fault in lo_rw_aio
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jens Axboe <axboe@kernel.dk>
+References: <cdf41ad3-783f-4a14-8343-c893d6c50524@I-love.SAKURA.ne.jp>
 Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260819072902.GA2332@lst.de>
+Cc: Gary Guo <gary@garyguo.net>, Mark Brown <broonie@kernel.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Boqun Feng
+ <boqun@kernel.org>, Theodore Tso <tytso@mit.edu>,
+        kernel test robot <oliver.sang@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+In-Reply-To: <cdf41ad3-783f-4a14-8343-c893d6c50524@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260821123332epcas5p2b0a3d8c25ea3f8f148f16031818b9bdc
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260717125638epcas5p2fb7128170d2443be3cfe1a7687d0c5fd
-References: <20260717125538.508925-1-joshi.k@samsung.com>
-	<CGME20260717125638epcas5p2fb7128170d2443be3cfe1a7687d0c5fd@epcas5p2.samsung.com>
-	<20260717125538.508925-6-joshi.k@samsung.com> <20260819072902.GA2332@lst.de>
+X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On 8/19/2026 12:59 PM, Christoph Hellwig wrote:
-> On Fri, Jul 17, 2026 at 06:25:37PM +0530, Kanchan Joshi wrote:
->> If AGs are fewer than write streams, write streams are distributed into
->> available AGs in round robin fashion.
+Hello, Jens.
+
+On 2026/08/03 22:34, Tetsuo Handa wrote:
+> Hello.
 > 
-> I think we should just limit the number of available write streams
-> to the number of AG, as otherwise we'll get into a bit of a mess.
+> I am waiting for your response on
+> "[PATCH v5] loop: Fix NULL pointer dereference in lo_rw_aio()" at
+> https://lkml.kernel.org/r/30ccdd3c-6353-4a0f-bdc7-230ec3bf4765@I-love.SAKURA.ne.jp .
 
-To confirm: given above quoting, for the other two cases (i.e., Streams 
-<= AGs), are you open to stream-based AG-sets modulo inode hashing (that 
-you suggested to skip in previous patch)?
-And is this point only for the case when Streams > AGs?
-
-This case can happen for hw streams, but for pure software streams, we 
-will not hit this case because the filesystem determines the stream 
-count based on the AG count.
-
-> And for the case of the hardware write streams query them in mkfs
-> to align the AG geometry to that.
-
-If this is only for the streams > AGs case, the filesystem can just 
-clamp down to match, turning it into a 'streams = AGs' case.
-And that means no changes in mkfs. Is that fine?
-Related benefit is to skip tricky mkfs AG calculations right for future 
-device sizes and varying stream counts.
+You have never responded for 4 months since I first contacted you at
+https://lkml.kernel.org/r/e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp .
+Nobody being interested in this problem has caused multiple issues for linux-next tree.
+Will you become responsive on this problem?
