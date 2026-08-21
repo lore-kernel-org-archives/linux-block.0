@@ -1,49 +1,49 @@
 Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80C338F258
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D892748A8CC
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787314136; cv=none; b=tsQMB3YJBG3q7gzLF4jGkL0K/eVQdGKO5ZjGidbLEtvyYbtbLY7zC9NI+RSsClXWkj8LyLLdsXmv1IdbLlNK4rJBrGzKDd5BGkPfDPDvo7fMyK12OgY6YlwRfcvldV/DUdxf7Z6eObRKZripBhNIpEEjTcUTEcJLAk2TXfAaks0=
+	t=1787315622; cv=none; b=LpSWkDIQGPlG2M1kleyIpIDjLkvEuRN82YzQQ/1C3HB5WhFTwRb2eDKImnN4uXxwB/1asD6kIB9bpGgFbxPfEXXTIzdXHFYMtlHtd37myxULAODGzMW4RYeJ+xOFKoatRBm3IDwOlvaWhWLKzNdxvDHr+BdVwT9HN6kt8fI68R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787314136; c=relaxed/simple;
-	bh=l5oAWZu7rkPPk5oMwWiAfitjSBwWUsqAQIjilfN5Gjc=;
+	s=arc-20240116; t=1787315622; c=relaxed/simple;
+	bh=ExMBDFobXnMpp6RdVhm0dYjGLANPAQ4yQMEKSXVnyY0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=aKW+Zo1113/Nh2+voWYcetpXmRz6wO8Cox7YhbwKVQNmqwg0XF8qMtX5EvIt/eqXlWytFr3wpqfEBDImyT1Piz5WXYKo2QaRu8fh3ZBEIsnB41O51EG/RGFTwq6IEedbUlPmPyFSCfSSK2md9t4lMvopYTcBs3j2v7l2FeRA2WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=HO5kpqfa; arc=none smtp.client-ip=203.254.224.33
+	 Content-Type:References; b=QZkYUdrtlE+crw97SE0FR8lbRY4F5yU2Q30M54n9Q2KwxLXUzPggv+acsZzKRiF1yDuEipJYGeUIEZPpruNXUNbq2Yvaop0mubuaLWcvSrdT3XWOHRM34yoztlGXrd/A/z5jntleGu4fsbggrocnlvFnMH0JejN6ONB2pmyf8sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=o9kbQum0; arc=none smtp.client-ip=203.254.224.33
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="HO5kpqfa"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="o9kbQum0"
 Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260821120848epoutp0365064e0b79e0da5aca71fe6dd93b6b66~N0Lr5OdSy2894828948epoutp03P
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:08:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260821120848epoutp0365064e0b79e0da5aca71fe6dd93b6b66~N0Lr5OdSy2894828948epoutp03P
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260821123334epoutp036f8f671bbf34348ce7add7f796d44ad4~N0hT4hVI81819418194epoutp03E
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 12:33:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260821123334epoutp036f8f671bbf34348ce7add7f796d44ad4~N0hT4hVI81819418194epoutp03E
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1787314128;
-	bh=I53J9+mBwCgZZgPE7jNJEo1ZucOq6BAk5MDbIZ2A9pQ=;
+	s=mail20170921; t=1787315614;
+	bh=ODaDgCCYCUHp5n0OTjvR5sPE2vW6JgnD3H3aVJw7xl0=;
 	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=HO5kpqfaYHMcO+v0mZtnrwxtnzMZ6fnXuASJoEdUrYzdqj/WSymtQDc1k8M0iZzJe
-	 9EIFcMw4WyoesCNuDlhBJccf83bd+gAQtaHLYkWyepVwpnJukI7lUrjnM4LJc5Qrk6
-	 1jJHqElGRv0D/UJyBS+mZQmBH1fq+mJahEYnY6Fs=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20260821120847epcas5p36e56b8a34657aa0014c5258bb26b0074~N0LrVCgmY0633206332epcas5p3w;
-	Fri, 21 Aug 2026 12:08:47 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4hRJxV5X0Wz2SSKZ; Fri, 21 Aug
-	2026 12:08:46 +0000 (GMT)
+	b=o9kbQum0UOIciTe1w+FMjdMqRXvY8anflXXhHzMGg27Ab2YuKiFWtBWaLGnuWBBU8
+	 wCQYIhkf8/QT9F0Pg3KB4vl6jTMd+YRGySws7ri5ruxI1S1RXXe8LA4VzGgFKthsOV
+	 w32bX2trw5kmp7UorekJiSDQXPEek084L4a3dPW0=
+Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260821123334epcas5p2010e9c4ae5f4bac56498d380910a878b~N0hTTU-Da0398603986epcas5p27;
+	Fri, 21 Aug 2026 12:33:34 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.88]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4hRKV508qSz6B9m5; Fri, 21 Aug
+	2026 12:33:33 +0000 (GMT)
 Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260821120846epcas5p1a48ba61937cb24bd471b1c9513285c0d~N0LpqDZY82301723017epcas5p1C;
-	Fri, 21 Aug 2026 12:08:46 +0000 (GMT)
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260821123332epcas5p2b0a3d8c25ea3f8f148f16031818b9bdc~N0hRs26Kr1514515145epcas5p2P;
+	Fri, 21 Aug 2026 12:33:32 +0000 (GMT)
 Received: from [107.122.11.51] (unknown [107.122.11.51]) by
 	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260821120844epsmtip22a6ff317b708d781e5759db80a3bb5af~N0Ln4LpgO0471904719epsmtip25;
-	Fri, 21 Aug 2026 12:08:44 +0000 (GMT)
-Message-ID: <5f212467-8920-4273-aa01-29d80d6e8f6a@samsung.com>
-Date: Fri, 21 Aug 2026 17:38:43 +0530
+	20260821123330epsmtip22fa01d534d6b61e2ad320efe56cf7b2e~N0hQBUPp32063620636epsmtip27;
+	Fri, 21 Aug 2026 12:33:30 +0000 (GMT)
+Message-ID: <aac9db64-691c-4632-879e-bbf88784249d@samsung.com>
+Date: Fri, 21 Aug 2026 18:03:29 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,51 +51,49 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/6] xfs: generic AG set based steering
+Subject: Re: [PATCH v4 5/6] xfs: write stream based AG placement
 To: Christoph Hellwig <hch@lst.de>
 Cc: brauner@kernel.org, djwong@kernel.org, dgc@kernel.org, jack@suse.cz,
 	cem@kernel.org, axboe@kernel.dk, kbusch@kernel.org, ritesh.list@gmail.com,
 	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
+	linux-block@vger.kernel.org, gost.dev@samsung.com
 Content-Language: en-US
 From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260819072137.GG1541@lst.de>
+In-Reply-To: <20260819072902.GA2332@lst.de>
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260821120846epcas5p1a48ba61937cb24bd471b1c9513285c0d
+X-CMS-MailID: 20260821123332epcas5p2b0a3d8c25ea3f8f148f16031818b9bdc
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 cpgsPolicy: CPGSC10-542,Y
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df
+X-CMS-RootMailID: 20260717125638epcas5p2fb7128170d2443be3cfe1a7687d0c5fd
 References: <20260717125538.508925-1-joshi.k@samsung.com>
-	<CGME20260717125636epcas5p2b68dd498717813e0b395b9d57d9d97df@epcas5p2.samsung.com>
-	<20260717125538.508925-5-joshi.k@samsung.com> <20260819072137.GG1541@lst.de>
+	<CGME20260717125638epcas5p2fb7128170d2443be3cfe1a7687d0c5fd@epcas5p2.samsung.com>
+	<20260717125538.508925-6-joshi.k@samsung.com> <20260819072902.GA2332@lst.de>
 
-On 8/19/2026 12:51 PM, Christoph Hellwig wrote:
-> On Fri, Jul 17, 2026 at 06:25:36PM +0530, Kanchan Joshi wrote:
->> Improve allocator concurrency and reduce interleaving by introducing
->> fixed sized AG set.
->> Use low bits of the inode as a hash to select AG within the AG set.
->> Overall, a file will try to use the same AG (and contiguity is maintained),
->> but multiple files will be spread across all AGs in the target AG set.
-> I'm a bit worried this kind of magic - the inodes close to each other
-> might not all have data or very different amounts of data.
+On 8/19/2026 12:59 PM, Christoph Hellwig wrote:
+> On Fri, Jul 17, 2026 at 06:25:37PM +0530, Kanchan Joshi wrote:
+>> If AGs are fewer than write streams, write streams are distributed into
+>> available AGs in round robin fashion.
 > 
-> I suspect the root cause this helps with is that the XFS initial data
-> placement algorithm that tries to place file data next to the inode is
-> actively harmful these days.  So doing an initial AG selection similar
-> to how the RT device does the initial RTG selection might be more
-> useful here (and thinking about moving to an inode32-like scheme
-> where small metadata with a lot of churn is constrained to a few
-> AGs).
+> I think we should just limit the number of available write streams
+> to the number of AG, as otherwise we'll get into a bit of a mess.
 
-Thinking to drop this for now, as this may need a distinct series.
+To confirm: given above quoting, for the other two cases (i.e., Streams 
+<= AGs), are you open to stream-based AG-sets modulo inode hashing (that 
+you suggested to skip in previous patch)?
+And is this point only for the case when Streams > AGs?
 
-This patch was here because stream based AG-set extended what this patch 
-was doing (i.e., the minimal fixed-size AG-set). That relationship goes 
-with the change you mentioned.
+This case can happen for hw streams, but for pure software streams, we 
+will not hit this case because the filesystem determines the stream 
+count based on the AG count.
 
-Replacing default AG allocator with an automatic RG-style rotor (no 
-user-supplied write-stream) might be a radical change in terms of impact.
+> And for the case of the hardware write streams query them in mkfs
+> to align the AG geometry to that.
+
+If this is only for the streams > AGs case, the filesystem can just 
+clamp down to match, turning it into a 'streams = AGs' case.
+And that means no changes in mkfs. Is that fine?
+Related benefit is to skip tricky mkfs AG calculations right for future 
+device sizes and varying stream counts.
