@@ -1,20 +1,20 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8355D476CD3
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 10:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811DB4746CF
+	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 10:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787307192; cv=none; b=nF9myMJw/wJc/mfGx3IgALpzR5+lQtbKl49afYT9UV9rkBb6igVAWfDLUPTPPJ29QU4FF2XenfegIC1CDRYNGtzEkZLJoTO6CcEDXdoyJmK5Hmlnf73+BP1CDLBBdFMf6qIp8BlW8Cqgffyqjtwr3f2hLenBRDIEgXqOnTejT4Y=
+	t=1787307198; cv=none; b=J3Jp2IZLKmO6PQJNJST/4zzR6EnCjLSRWS4u2lfYKCLNGoiQpExJhEHoa7tjnzkiqhkBQPXXsH7rzfMBI1lg4lUTtW2+vy3DL0DCqlaIeWmE8KcS4DkEKTkzx3eFP+27kBEE065uouXP+Qww0CdFqa3v2SegNQcxtAK0ZCCyGVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787307192; c=relaxed/simple;
-	bh=t2L7W8tOl4NoBqg2nMgutpWkUKj1RwGdhNTfpZAPX2s=;
+	s=arc-20240116; t=1787307198; c=relaxed/simple;
+	bh=3Ok6O6WdAjmXABK6wxOWEGjJETGZoD2Zv4OUHswj1t8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m7UqS9j/tJ9wS4XqI3qlvRk+R/u/vwJzS9G4d7D9Rm6XIYlzFMiI1h1ImoQRp4/9WSeeRI+hgBZJwiEnz2Zb+Kzs37xRJ/yRJ3jzbdLrofz8Vay+1M0sxhDw2G4nGfkrPtNO+bLynHoH8vJXC2dpRsr9+MI6ZX+WFV+/TADcvOY=
+	 MIME-Version; b=WPXz0TtAjwLOpquR2+iQ+jT1F5/nD1l/IkPRgcqq4d+p2qFCRSGp7sB+Eyh6+LT7z7FmOzYnf7afTCbyRLQqAFjYfOSPXbdyLtHJtyULz8WbJqiUg90VXwPi5vjdrP7PMyGLh3rkcmM9yKx8RIdjgxvKmQC+AhLJJ04rNlr6vYo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: ded58aba9d4811f19a56ed5b684f684d-20260821
+X-UUID: dc356f289d4811f19a56ed5b684f684d-20260821
 X-CTIC-Tags:
 	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
 	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
@@ -25,14 +25,14 @@ X-CTIC-Tags:
 	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
 	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:32119a8a-272c-4da0-ab41-31aefa5e52e4,IP:10,
+X-CID-O-INFO: VERSION:1.3.19,REQID:4f6659f8-d4d9-401c-9355-0e7532027461,IP:10,
 	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
 	:release,TS:10
-X-CID-INFO: VERSION:1.3.19,REQID:32119a8a-272c-4da0-ab41-31aefa5e52e4,IP:10,UR
+X-CID-INFO: VERSION:1.3.19,REQID:4f6659f8-d4d9-401c-9355-0e7532027461,IP:10,UR
 	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
 	elease,TS:10
-X-CID-META: VersionHash:7db8b62,CLOUDID:1cf5d50f4d202c183102c635821d49ec,BulkI
-	D:2608211812559TCYB9ES,BulkQuantity:0,SF:10|38|66|78|81|82|102|127|850|865
+X-CID-META: VersionHash:7db8b62,CLOUDID:6f31db393d643e16dc98306b3e1f8e82,BulkI
+	D:260821181255UZQH3ITJ,BulkQuantity:0,SF:10|38|66|78|81|82|102|127|850|865
 	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS
 	:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,A
 	RC:0
@@ -40,12 +40,12 @@ X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: ded58aba9d4811f19a56ed5b684f684d-20260821
+X-UUID: dc356f289d4811f19a56ed5b684f684d-20260821
 X-User: sangyao@kylinos.cn
 Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
 	(envelope-from <sangyao@kylinos.cn>)
 	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1910751995; Fri, 21 Aug 2026 18:12:52 +0800
+	with ESMTP id 1660134943; Fri, 21 Aug 2026 18:12:48 +0800
 From: Yao Sang <sangyao@kylinos.cn>
 To: axboe@kernel.dk,
 	kbusch@kernel.org,
@@ -55,9 +55,9 @@ Cc: john.g.garry@oracle.com,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Yao Sang <sangyao@kylinos.cn>
-Subject: [PATCH v3 4/5] block: factor atomic write hardware limit stacking
-Date: Fri, 21 Aug 2026 18:10:49 +0800
-Message-Id: <20260821101050.1464087-5-sangyao@kylinos.cn>
+Subject: [PATCH v3 3/5] block: factor path limits out of blk_stack_limits
+Date: Fri, 21 Aug 2026 18:10:48 +0800
+Message-Id: <20260821101050.1464087-4-sangyao@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260821101050.1464087-1-sangyao@kylinos.cn>
 References: <20260821101050.1464087-1-sangyao@kylinos.cn>
@@ -69,85 +69,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-blk_stack_atomic_writes_limits() stacks atomic write hardware limits and
-checks whether @start meets the bottom-device alignment. Only the start
-check depends on the top-to-bottom mapping.
+Same-LBA multipath needs to stack path limits without applying
+mapped-range topology calculations.
 
-Factor hardware limit stacking into blk_stack_atomic_writes_hw_limits()
-so same-LBA multipath can stack atomic write limits without checking a
-mapped start sector.
+Factor this path limit stacking into blk_stack_path_limits(). It covers
+execution features, sector and segment limits, write zeroes, discard
+segments, zone append and DMA alignment.
 
 There is no behavior change for existing callers.
 
 Signed-off-by: Yao Sang <sangyao@kylinos.cn>
 ---
- block/blk-settings.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ block/blk-settings.c | 77 +++++++++++++++++++++-----------------------
+ 1 file changed, 37 insertions(+), 40 deletions(-)
 
 diff --git a/block/blk-settings.c b/block/blk-settings.c
-index f1a2e4fe4e77..eaba38370657 100644
+index 9e7cdaaefbca..f1a2e4fe4e77 100644
 --- a/block/blk-settings.c
 +++ b/block/blk-settings.c
-@@ -653,6 +653,14 @@ static unsigned int blk_round_down_sectors(unsigned int sectors, unsigned int lb
- 	return sectors;
+@@ -756,6 +756,39 @@ static void blk_stack_atomic_writes_limits(struct queue_limits *t,
+ 	t->atomic_write_hw_boundary = 0;
  }
  
-+static void blk_clear_atomic_write_limits(struct queue_limits *lim)
++#define STACK_MIN_NOT_ZERO(t, b, field) \
++	((t)->field = min_not_zero((t)->field, (b)->field))
++#define STACK_MIN(t, b, field) \
++	((t)->field = min((t)->field, (b)->field))
++
++static void blk_stack_path_limits(struct queue_limits *t,
++		const struct queue_limits *b)
 +{
-+	lim->atomic_write_hw_max = 0;
-+	lim->atomic_write_hw_unit_max = 0;
-+	lim->atomic_write_hw_unit_min = 0;
-+	lim->atomic_write_hw_boundary = 0;
++	/*
++	 * These features must be supported by the top queue and every path that
++	 * can execute I/O. Clear them when a path does not support them.
++	 */
++	if (!(b->features & BLK_FEAT_NOWAIT))
++		t->features &= ~BLK_FEAT_NOWAIT;
++	if (!(b->features & BLK_FEAT_POLL))
++		t->features &= ~BLK_FEAT_POLL;
++	if (!(b->features & BLK_FEAT_PCI_P2PDMA))
++		t->features &= ~BLK_FEAT_PCI_P2PDMA;
++
++	STACK_MIN_NOT_ZERO(t, b, max_hw_sectors);
++	STACK_MIN_NOT_ZERO(t, b, max_dev_sectors);
++	STACK_MIN_NOT_ZERO(t, b, seg_boundary_mask);
++	STACK_MIN_NOT_ZERO(t, b, virt_boundary_mask);
++	STACK_MIN_NOT_ZERO(t, b, max_segments);
++	STACK_MIN_NOT_ZERO(t, b, max_integrity_segments);
++	STACK_MIN_NOT_ZERO(t, b, max_segment_size);
++	STACK_MIN(t, b, max_write_zeroes_sectors);
++	STACK_MIN(t, b, max_hw_wzeroes_unmap_sectors);
++	STACK_MIN_NOT_ZERO(t, b, max_discard_segments);
++	STACK_MIN(t, b, max_hw_zone_append_sectors);
++	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
 +}
 +
- /* Check if second and later bottom devices are compliant */
- static bool blk_stack_atomic_writes_tail(struct queue_limits *t,
- 				struct queue_limits *b)
-@@ -726,8 +734,8 @@ static bool blk_stack_atomic_writes_head(struct queue_limits *t,
- 	return true;
- }
+ /*
+  * Stack block sizes, I/O granularities, chunk boundaries and alignment for a
+  * bottom-device range mapped at @start. Round maximum sector limits after the
+@@ -873,51 +906,14 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 	int ret;
  
--static void blk_stack_atomic_writes_limits(struct queue_limits *t,
--				struct queue_limits *b, sector_t start)
-+static bool blk_stack_atomic_writes_hw_limits(struct queue_limits *t,
-+				struct queue_limits *b)
- {
- 	if (!(b->features & BLK_FEAT_ATOMIC_WRITES))
- 		goto unsupported;
-@@ -735,9 +743,6 @@ static void blk_stack_atomic_writes_limits(struct queue_limits *t,
- 	if (!b->atomic_write_hw_unit_min)
- 		goto unsupported;
- 
--	if (!blk_atomic_write_start_sect_aligned(start, b))
--		goto unsupported;
+ 	t->features |= (b->features & BLK_FEAT_INHERIT_MASK);
 -
- 	/* UINT_MAX indicates no stacking of bottom devices yet */
- 	if (t->atomic_write_hw_max == UINT_MAX) {
- 		if (!blk_stack_atomic_writes_head(t, b))
-@@ -747,13 +752,19 @@ static void blk_stack_atomic_writes_limits(struct queue_limits *t,
- 			goto unsupported;
- 	}
- 	blk_stack_atomic_writes_chunk_sectors(t);
--	return;
-+	return true;
+-	/*
+-	 * Some feaures need to be supported both by the stacking driver and all
+-	 * underlying devices.  The stacking driver sets these flags before
+-	 * stacking the limits, and this will clear the flags if any of the
+-	 * underlying devices does not support it.
+-	 */
+-	if (!(b->features & BLK_FEAT_NOWAIT))
+-		t->features &= ~BLK_FEAT_NOWAIT;
+-	if (!(b->features & BLK_FEAT_POLL))
+-		t->features &= ~BLK_FEAT_POLL;
+-	if (!(b->features & BLK_FEAT_PCI_P2PDMA))
+-		t->features &= ~BLK_FEAT_PCI_P2PDMA;
++	blk_stack_path_limits(t, b);
  
- unsupported:
--	t->atomic_write_hw_max = 0;
--	t->atomic_write_hw_unit_max = 0;
--	t->atomic_write_hw_unit_min = 0;
--	t->atomic_write_hw_boundary = 0;
-+	blk_clear_atomic_write_limits(t);
-+	return false;
-+}
-+
-+static void blk_stack_atomic_writes_limits(struct queue_limits *t,
-+				struct queue_limits *b, sector_t start)
-+{
-+	if (blk_stack_atomic_writes_hw_limits(t, b) &&
-+	    !blk_atomic_write_start_sect_aligned(start, b))
-+		blk_clear_atomic_write_limits(t);
- }
+ 	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+ 	t->max_user_sectors = min_not_zero(t->max_user_sectors,
+ 			b->max_user_sectors);
+-	t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
+-	t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
+-	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+-					b->max_write_zeroes_sectors);
+ 	t->max_user_wzeroes_unmap_sectors =
+ 			min(t->max_user_wzeroes_unmap_sectors,
+ 			    b->max_user_wzeroes_unmap_sectors);
+-	t->max_hw_wzeroes_unmap_sectors =
+-			min(t->max_hw_wzeroes_unmap_sectors,
+-			    b->max_hw_wzeroes_unmap_sectors);
+-
+-	t->max_hw_zone_append_sectors = min(t->max_hw_zone_append_sectors,
+-					b->max_hw_zone_append_sectors);
+-
+-	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
+-					    b->seg_boundary_mask);
+-	t->virt_boundary_mask = min_not_zero(t->virt_boundary_mask,
+-					    b->virt_boundary_mask);
+-
+-	t->max_segments = min_not_zero(t->max_segments, b->max_segments);
+-	t->max_discard_segments = min_not_zero(t->max_discard_segments,
+-					       b->max_discard_segments);
+-	t->max_integrity_segments = min_not_zero(t->max_integrity_segments,
+-						 b->max_integrity_segments);
+-
+-	t->max_segment_size = min_not_zero(t->max_segment_size,
+-					   b->max_segment_size);
+-	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
  
- #define STACK_MIN_NOT_ZERO(t, b, field) \
+ 	ret = blk_stack_topology_limits(t, b, start);
+ 
+@@ -927,8 +923,9 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 
+ 		t->max_discard_sectors = min_not_zero(t->max_discard_sectors,
+ 						      b->max_discard_sectors);
+-		t->max_hw_discard_sectors = min_not_zero(t->max_hw_discard_sectors,
+-							 b->max_hw_discard_sectors);
++		t->max_hw_discard_sectors =
++			min_not_zero(t->max_hw_discard_sectors,
++				     b->max_hw_discard_sectors);
+ 		t->discard_granularity = max(t->discard_granularity,
+ 					     b->discard_granularity);
+ 		t->discard_alignment = lcm_not_zero(t->discard_alignment, alignment) %
 -- 
 2.25.1
