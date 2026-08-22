@@ -1,67 +1,122 @@
-Received: from mail.planestimations.com (mail.planestimations.com [45.92.8.66])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BA330FF30
-	for <linux-block@vger.kernel.org>; Sat, 22 Aug 2026 03:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.92.8.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A83249363B
+	for <linux-block@vger.kernel.org>; Sat, 22 Aug 2026 06:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787370138; cv=none; b=JvZBOOHNzsn9+TWSBKA7w2HeP3R3ocR52+NiuYkQ2s2Ak9r0EOuRwoLqAs0t6DE9+M/sd5vNc7EEGGHAZVuXbYzmpju+im/KSzwEg8k1Q7dVQSpf5pV4eD+sEFeSNRmHqGeUl9xjWmYN8jpXuXhZrK6tLmvG6hvdlbSUMMv/73w=
+	t=1787380147; cv=none; b=rC7bWtSfegj+VPp1UXpxht+WQ8jEEP2nIv/yZnAGiyUSd3ljXndFTfMT+QY8O8JC91zClsnPg654dOsDzpYAbD04pnbrwfYJGkWPnrNRZh117jDiAgSQ/ymGgNpWBt5K1KHwls4kmJxqLVUvomNmmphkdCv+DhSbldvi6YVzjgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787370138; c=relaxed/simple;
-	bh=2rVjJAdlXz1zySCfMjg3csmTNMfbPeBEUvD7nlqJj5s=;
-	h=References:In-Reply-To:Message-ID:From:To:Subject:Date:
-	 MIME-Version:Content-Type; b=HPgj1rWSAcjGOA9IjqeawqsfmfeNs7ByutRRMt59fkjNfmkqBMHNCXn+dUggUjXq9HQX0zoatOJgZoV4glBpavpEFgsNDpZWWXe0Eq2b508S+VpCkh/0cmBrGTJIvuDhLYpGAiNlU6MuMflDR6xGW5qTOEQMY4oJmseH+4A/FZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=planestimations.com; spf=pass smtp.mailfrom=planestimations.com; dkim=pass (2048-bit key) header.d=planestimations.com header.i=@planestimations.com header.b=QzsHJwDI; arc=none smtp.client-ip=45.92.8.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=planestimations.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=planestimations.com
+	s=arc-20240116; t=1787380147; c=relaxed/simple;
+	bh=X8CjxXC6AJ3FTlOsgI0cVsGSbwI3M9/HDTMbtMoAcc0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XPQyBYQ9VaJH4NqHCdmb9NR8xn7YvA5H1lttXfLgqmFMxcjx7to+erw8JZDivl+PM/ayKyiREulpg/jutpkgMrcwX5UMQsaJmXDEusnSVIT3s1AH2MggM8aCGHi6ivs4KIC49AZgZtS6A+qYpHnSjG8kGtOpQi/WwYUyjilSmw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6dTAXhR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=planestimations.com header.i=@planestimations.com header.b="QzsHJwDI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=planestimations.com;
-	s=202505; t=1787311514;
-	bh=2rVjJAdlXz1zySCfMjg3csmTNMfbPeBEUvD7nlqJj5s=;
-	h=References:In-Reply-To:From:To:Subject:Date:From;
-	b=QzsHJwDIiIIEL+zUgWE2R81e5MYEShRW4olqvrotQyrd6CODb3uLYKp640MFGQ427
-	 IzGYFncGaiNSs6E6ZAIZv88NKxFXJE3yyZCe8Ob6VfpEzZ4ppd3XrKAoj1Z8f4dRCp
-	 YmTDqbEF+GnJ0k3gbsivXD4SfRI1H7tgWSo6w/0IMnYtDtMxwnJi3kTMVO8E6p/975
-	 DfE5xgUSPGW+Czt2r3YxLX/e22D+Ulst5jAiEZGJCsKtNlT3zHfpEpvwW2BWhXwNWq
-	 hayL2TIsugoX4v5gFouclKyYlS1ply+5JjEfDxvt0KOiTAuo8ZJhAzxrRh0KCTUvlI
-	 XmqCWG3xCQGvA==
-Received: from [127.0.0.1] (ec2-54-221-10-142.compute-1.amazonaws.com [54.221.10.142])
-	by mail.planestimations.com (Postfix) with ESMTPSA id 5C05E50321A
-	for <linux-block@vger.kernel.org>; Fri, 21 Aug 2026 13:25:13 +0200 (CEST)
-References: <82d21d31-45fc-4211-9f8c-03eadc1534f8@planestimations.com>
- <ab3df2c1-6bd3-4732-8567-7e3868728b1e@planestimations.com>
-In-Reply-To: <82d21d31-45fc-4211-9f8c-03eadc1534f8@planestimations.com>
-Message-ID: <7cdc495c-9e8c-4768-9cc2-9918ba96fcc6@planestimations.com>
-From: Jane Wells <jw@planestimations.com>
-To: linux-block@vger.kernel.org
-Subject: Complete CSI Takeoff Services for Your Next Build
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Aug 2026 11:25:10 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6dTAXhR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B51841F000E9;
+	Sat, 22 Aug 2026 06:29:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787380146;
+	bh=+FF3rcg31FrsH+/fMI37hhHHNK8xS0FaThm+246Zer8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=V6dTAXhR5fUk6nmYe0T9eEAW2SmMnGPzMZAnie/rcOs8Xf7Ol2OaDghwRfr/GRkrb
+	 1ZHOYAEutNH5h/kv8AKQ9p8GXkf5J+Z9G0lqi4a7ilIPqL0J6rX54V8NsQPKHLY2CG
+	 4pC17elqgpA3vKSmP3Z+rY9XJeMhxUVYgaoNGhGGspU4df6x3W6iXjLGE4her64eA3
+	 lklxDIZm2ME8ilALN03OjJONkllCY2hE9C17FvWJMHYDcmjtM6cA4orI92BOMxop19
+	 vsUH/+4iFskX0c1tJxjm3CSGB3BfdgfG2TpyL/8taKNj7sCFaSJyfyvTNPBao0MSGt
+	 BYwS+bG2uWqIQ==
+Message-ID: <47d4430d-ccc0-44e0-bfa1-98fd1129af6a@kernel.org>
+Date: Sat, 22 Aug 2026 15:29:03 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: Seagate Flex SMR
+To: Noah Bergbauer <noah@ehvag.de>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <d5ff28e5-53a3-481c-870f-f6115e82f4ed@ehvag.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <d5ff28e5-53a3-481c-870f-f6115e82f4ed@ehvag.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello ,
+On 8/21/26 23:38, Noah Bergbauer wrote:
+> Hello,
+> 
+> Seagate Flex SMR drives are an early generation of hybrid SMR (HSMR) 
+> drives with a configurable zone layout. There are three main challenges 
+> towards supporting this in the kernel:
 
-I wanted to send a quick example of our project breakdown.
+"Flex SMR" is not referring to any standard feature. So it is hard to see what
+you are talking about. In Linux, we support only drives that follow a standard,
+so for HDDs, that is SPC/SBC/ZBC for SAS drives and ACS/ZAC for SATA.
 
-We recently completed a full CSI takeoff covering roofing, MEP, structural,=
- and finishes with clear cost breakdowns.
+> 1. Instead of CONV they use SEQ_OR_BEFORE (type 4) zones. These permit 
+> random writes below the write pointer, so once full they behave exactly 
+> like CONV.
 
-If helpful, I can share a =
-similar sample tailored to your needs.
+Abbreviations do not make for an easy reading... I am assuming here that
+SEQ_OR_BEFORE refers to the SOBR == "Sequential or before" zone type that is
+defined as part of the ZBC/ZAC Zone Domains (ZD)/Zone Realms (ZR) feature set.
+Right ?
 
-Would you like that?
+> 2. In an (in my opinion rather questionable) attempt at backwards 
+> compatibility the drives camouflage themselves as non-ZBC. Their ZAC 
+> support can be detected from a special ATA log page but ZBC commands 
+> must be emulated via ATA PASS-THROUGH as a SAT may refuse zone commands 
+> on a non-ZBC drive.
 
-Regards,
+This is not questionable. ZD/ZR drives advertise themselves as regular disks
+with device type 0x0000 so that when they have all SOBR zones in Domain 0 (the
+SOBR zones domain) active and written, they behave 100% like regular disks and
+are backward compatible with regular disks.
 
-Jane Wells | Sales Representative
-Plan Estimating
+For a ZD/ZR disk in such state, you can use any file system (BTRFS/XFS/ext4 or
+whatever) as is without any patches. In the case of BTRFS and XFS, you can even
+use them with the the zoned format enabled and setting the software zone size to
+the actual device SOBR zone size to get things to align nively to zones (that is
+not necessary really, but that will work without any patching).
 
-Click Here to =
-Unsubscribe
+> 3. The zone configuration works by reporting both SEQ_OR_BEFORE and 
+> SEQWRITE_REQ zones each for the entire disk, and then for each pair of 
+> overlapping zones only one of them can be active while the other one 
+> will be in the offline condition. Right now some parts of the kernel 
+> (e.g. btrfs) don't play well with offline zones.
+
+No. That is not how it works, at least not without patches to the SCSI & ATA
+layers. The reason is that ZD/ZR drives are backward compatible with regular
+disks. So the READ CAPACITY command reports the size of domain 0 only (the SOBR
+zones). The sequential zones are in domain 1, which is unreachable without
+ignoring the capacity returned by the READ CAPACITY command, because domain 1 is
+in the LBA space beyond the capacity of domain 0.
+
+> I implemented all of this last year and in the end everything was 
+> working fine under btrfs. Now I would like to attempt to get this into 
+> the kernel. This would involve rewriting most of my patches from 
+> scratch. So before I invest a lot of time and effort into doing so, my 
+> question is: would you as the maintainer even be willing to accept these 
+> changes into the kernel?
+
+Unless you have a strong production/use case for this, it is a hard no for me.
+
+The reason is that properly supporting the zone domains/zone realms feature is
+*extremely hard*. This is full of gotcha and plenty of things will not be
+backward compatible with pure SMR support that we have. E.g. SOBR and
+conventional zones are very different before the SOBR zone is fully written.
+
+If you want to run a file system in domain 0 only, simply activate all the SOBR
+zones in domain 0, make sure the SOBR zones are all initialized (written) and
+you are done: the drive in that state is equivalent to a regular disk and
+everything will just work fine.
+
+Best regards.
+
+-- 
+Damien Le Moal
+Western Digital Research
