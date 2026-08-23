@@ -1,53 +1,31 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5531352C4E
-	for <linux-block@vger.kernel.org>; Sun, 23 Aug 2026 09:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2D441A8F;
+	Sun, 23 Aug 2026 11:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787477130; cv=none; b=i+yNd4qfPsRYRUK7bxhaKvSNxW3S7lZqAszZx2A+8MnJSq2RLNPF0p5bGw/VPTaALLdpIBOYvx4frr2hSi1J7KBKAsscNu+Uo9CppIBcjF2YUPJ8JOl59enbqX2ioeh2v8wnvvpj456ZM9okrto7yuRw9ZchPB5RNgidXjl/se8=
+	t=1787483976; cv=none; b=i49L5YacgLEODBsbBeUJU7uHfyEGo4pjAZf8t/YKJaYGTAMKY1ehVfbjl3zeggNzDuOICjxrSC0vOuEAJStjkbXviBGUGZYJWl7lCqO1j2Rd3IMd5HU0GGsNiKri8w5z29kNFClzzlzvfgqdAcH/pQEPICLZmmGZ7pO3/F6Eirg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787477130; c=relaxed/simple;
-	bh=fg3fhJ4gZUU9/IjEluLltYMIDqvR369u1Yw4y2i27tA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JM9gUte5NFQQdBwMC7JxZEz/648TYw3Nln3uzUy7IialX1/GfiRJ+TbyahgSPlLVktungNPPraUmk6ksGAYjga3ci60NzweD5a9bW3ip4HPqp9u7lk21hgpxJCDoVLNX6YmoVnTeSoxD48n1ZknLTsA4O+7yYEajc1HJqDNY7gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c15d111ca99so286869266b.0
-        for <linux-block@vger.kernel.org>; Sun, 23 Aug 2026 02:25:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787477127; x=1788081927;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Tvr23X+CegyVjqQJgHYb0m01ZH3nYD0og+5XwoMdqrw=;
-        b=gUHXB7u2v20ZxPufliSzmz3DN8psFW1Jtp+GD0iHbvZTm3xkneLpuHDl16veNG8/+y
-         Fn5ALd3vvPuoMsy2Hi1wmJyGYX9BeSEWPVTSasr0ND9tcK1yHkZrud6M7IIE8Je1o5dl
-         nxJBGGpA+zADxhEutsd/u1x7PLlxA3cBnnY0106SyIJqsaz+zwTSY/PmO1/Iqrv+vPVy
-         0TiB78iUsZNwVRU3nM3a1G6d36veiOPWwSFbAeZTDpnUO2WmLFum3ArX086Eh9gjGawi
-         Yo1tRtrmhsfv6J6tyTjU2YHI3eOBjWiqwyVlH0+CO62HgtYGRUvaCWsoJhOdHc7Xzgus
-         hbEA==
-X-Forwarded-Encrypted: i=1; AHgh+Rour5ks/hO9qpiDm6OdDLPwTlh616U8EKGWo6z+mD+XjK3HP66jBTRqkTpn0DRpdSTcLOwNRWQXCfr+uA==@vger.kernel.org
-X-Gm-Message-State: AFuF++k4imQ1GVfM00opce3Srx4q3IIPHJVRrgP2yuo0Gvz+HiAD6RYY
-	iOGazjCN7ECAfRZ9aPSGLpaz6yhn/f+wapL2bLLD9OZdDv4fsfAcFq3J
-X-Gm-Gg: AR+sD10T1mnKzQeL6r/iwSu9uGEnYLc/1vSvv7sTICL9oRRDY6GWNBxtrRBGxFiVbds
-	MYgXE2Nb43ef3hWED4hxPDSKmGVeu39yFh0Qf8651+lEGgpYgrbaqe8r0uqOgH7n1GqvJeCd0if
-	OXqOAQCTTxdHfy1hKIeCUnxo4hblmRwJWDcD+pXsX3e2zx8T+fWKYMfyxb+ujj3kWtE4ouPb+Bh
-	GuGHJCQAkDKPbSTrkujazMThg0AcZ+x+hx4fzo/2vNfvMrJAah5jcxpsrn0/TPTEgH143HRBq+1
-	Cc0Sl7OKSmq1e23G157r1EOoOECb6Q20CtzA1CuZLgCHIK+jw+234IqVjra0V6KM2NEhWGV0yiN
-	0byVbV3bzW0Vz48bdP8Us+BJrZjb9bdrH1cgZYrofphNAWeNMFyoWl7bYoA+p/DHwURp9m49dBo
-	wk+eBs/LfaKs6Cwtj38+60wUTA3jussatouzww3/R3aPJXBD8nA3kuEk2qlss2+ldCc2jZSnGYi
-	ZbfTFkd6CEMsq7r7hrBVlhFHzTEn9s=
-X-Received: by 2002:a17:907:cb81:b0:c16:831c:427d with SMTP id a640c23a62f3a-c249274b411mr1257104866b.21.1787477126909;
-        Sun, 23 Aug 2026 02:25:26 -0700 (PDT)
-Received: from [10.50.4.207] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c249606b696sm789418266b.7.2026.08.23.02.25.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Aug 2026 02:25:26 -0700 (PDT)
-Message-ID: <fa36cd8e-ecf3-471b-b1fb-0cfb8a684718@grimberg.me>
-Date: Sun, 23 Aug 2026 12:25:24 +0300
+	s=arc-20240116; t=1787483976; c=relaxed/simple;
+	bh=gcMW9xyOp4Ce6JzhCzJs131ZlCyLwnFgbMFJuQa7uB0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=bXhcN541EQawBA7tEI8iXxztVAVnHk+MIra/B31k8zqks76qUMA8bru8IxlpMKOdZ5JN9UY4DQvPe6T6C9PYZt2KTQUB7SF9rzy1i7rys8H4DIKyfznzpYLr9hKvD9HwT3rRNi1fFbPds0ZPdDoP823LWE1RrNeqdJyX0aJKej4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67NBHvbd037693;
+	Sun, 23 Aug 2026 20:17:57 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67NBHv9a037688
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 23 Aug 2026 20:17:57 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
+Date: Sun, 23 Aug 2026 20:17:57 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,33 +33,123 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 4/5] block: move bio validation into
- __bio_split_to_limits
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, axboe@kernel.dk, tom.leiming@gmail.com,
- coshi036@gmail.com, Igor.Achkinazi@dell.com, dlemoal@kernel.org
-References: <20260519172326.3462354-1-kbusch@meta.com>
- <20260519172326.3462354-5-kbusch@meta.com> <20260520072548.GC14937@lst.de>
- <ag3Q5wdOBFNclfMe@kbusch-mbp>
+Subject: [PATCH v6] loop: Fix NULL pointer dereference in lo_rw_aio()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block
+ <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christian Brauner <brauner@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, Mark Brown <broonie@kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        oe-lkp@lists.linux.dev, kernel test robot <oliver.sang@intel.com>,
+        kbuild test robot <lkp@intel.com>, Hillf Danton <hdanton@sina.com>
+References: <20260714043834.554-1-hdanton@sina.com>
+ <30ccdd3c-6353-4a0f-bdc7-230ec3bf4765@I-love.SAKURA.ne.jp>
 Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <ag3Q5wdOBFNclfMe@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <30ccdd3c-6353-4a0f-bdc7-230ec3bf4765@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav405.rs.sakura.ne.jp
+X-Virus-Status: clean
 
+syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
+An analysis by the Gemini AI collaborator [3] considers that this problem
+is caused by a timing shift primarily exposed by commit 65565ca5f99b
+("block: unify the synchronous bi_end_io callbacks"), along with helper
+refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
+helper").
 
+But due to difficulty of reproducing this race, discussion about what is
+happening and how to fix this problem is stalling. Also, we haven't
+identified how many filesystems are subjected to this problem.
 
-On 20/05/2026 18:19, Keith Busch wrote:
-> On Wed, May 20, 2026 at 09:25:48AM +0200, Christoph Hellwig wrote:
->> Moving the checking from submit_bio_noacct into __bio_split_to_limits
->> means that we lose it for bio-based drivers except for the few that
->> manuall call bio_split_to_limits.  So we'll still need a helper for
->> them, which could be called just before calling into ->submit_bio.
-> Oh good point. It looks like many of them don't even want their bio's to
-> split, so probably would need to factor out a limits check from the
-> split so that both can call from an entered queue context. Thanks for
-> the feedback.
+Therefore, this patch introduces a grace period for flushing pending I/O
+requests (which should be a good thing from the perspective of defensive
+programming) so that we won't hit NULL pointer dereference problem.
 
-Commented in the previous patch, would it make sense to move these
-to __bio_queue_enter itself as bio_post_enter_checks() ?
+Link: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
+Link: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 [2]
+Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp [3]
+Fixes: 65565ca5f99b ("block: unify the synchronous bi_end_io callbacks")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Changes in v6:
+  Drop debug code for emitting BUG: message, which is intended for helping
+  filesystem developers identify the caller of an I/O request that failed to
+  wait for completion.
+
+ drivers/block/loop.c | 53 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 6f12976035b0..feebc9999926 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1769,8 +1769,59 @@ static void lo_release(struct gendisk *disk)
+ 	need_clear = (lo->lo_state == Lo_rundown);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	if (need_clear)
++	if (need_clear) {
++		/*
++		 * Temporarily release disk->open_mutex in order to flush pending I/O
++		 * requests before clearing the backing device.
++		 *
++		 * This is a layering violation. But since bdev->bd_disk->fops->release()
++		 * (which is mapped to lo_release()) is the final function which
++		 * blkdev_put_whole() from bdev_release() calls immediately before
++		 * releasing disk->open_mutex, this changes nothing except opens a new
++		 * race window for allowing disk->fops->open() (which is mapped to
++		 * lo_open()) to be called.
++		 *
++		 * Even if lo_open() is called from blkdev_get_whole() due to this race,
++		 * the Lo_rundown state guarantees that lo_open() will fail with -ENXIO.
++		 * Thus, there will be effectively no change caused by this violation.
++		 */
++		mutex_unlock(&lo->lo_disk->open_mutex);
++		/*
++		 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
++		 * wait for already started loop_queue_rq() to complete.
++		 */
++		synchronize_rcu();
++		/*
++		 * Now that no more works are scheduled by loop_queue_rq(),
++		 * wait for already scheduled works to complete.
++		 */
++		drain_workqueue(lo->workqueue);
++		/*
++		 * Now that no more AIO requests are scheduled by lo_rw_aio(),
++		 * wait for already started AIO to complete.
++		 *
++		 * Due to synchronize_rcu() + drain_workqueue() sequence above,
++		 * calling blk_mq_unfreeze_queue() immediately after blk_mq_freeze_queue()
++		 * returns has to be safe, for loop_queue_rq() no longer schedules new
++		 * lo_rw_aio() works and lo_rw_aio() no longer submits new AIO requests.
++		 *
++		 * Deferring blk_mq_unfreeze_queue() does not help because we are about
++		 * to clear the backing device and drop the refcount for the backing device.
++		 * There is nothing we can do if blk_mq_freeze_queue() fails to flush.
++		 */
++		blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
++		/*
++		 * Perform remaining cleanup, with disk->open_mutex held.
++		 *
++		 * The lo->lo_state should remain Lo_rundown despite we temporarily
++		 * released disk->open_mutex, for I am the only and the last user of
++		 * this loop device because lo_open() cannot succeed.
++		 */
++		mutex_lock(&lo->lo_disk->open_mutex);
++		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
++			return;
+ 		__loop_clr_fd(lo);
++	}
+ }
+ 
+ static void lo_free_disk(struct gendisk *disk)
+-- 
+2.52.0
+
