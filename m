@@ -1,48 +1,53 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9BA397E75
-	for <linux-block@vger.kernel.org>; Sat, 22 Aug 2026 13:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF78318DB01
+	for <linux-block@vger.kernel.org>; Sun, 23 Aug 2026 09:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787406655; cv=none; b=Fe37AYEyE4OodTzekewdHusNsa/9EWz+jrhO+RLZvyx2i4qjxBSOtCFpkAeO8tLhPYF/qJ5icYqMC2hiCVG6QZj40n3XrJ97VHs1vWF9IxXO6dsCzda0yLDefVbkx0OODey6MoYfJGPbFJZSUQoFcPdYGPj14GZs/Lo0WvVZWEQ=
+	t=1787476199; cv=none; b=IiV9WBWU4txGuim2EZYoBXjlXdva/W4OMTeo3CkCunWscqjYtQdO230+VC05Oh6RyNDUsECMWguS/cWp8DAPaqV3+AXlpR3TPgFok2hK4Y/AEfg5P5/ZpkFawaU9GYXj1OWUWpm+bqOVIwOrZNz2etohY/5yomgbrxYEajPwn9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787406655; c=relaxed/simple;
-	bh=y8p+eSVlmosxkhFx1paEn+Iu4E9f78he/HJlT1fG3zY=;
+	s=arc-20240116; t=1787476199; c=relaxed/simple;
+	bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hvNo9g/pvq4aHwaueTGN944wimq/N6AnpZXULYdikbPSa8virzZkX2Bw8RRy4wrlBcjMEiiS81Zz8GAy6ZWD0n5gu4wtvcY5Qq3ZQl4w9YBH0M61UX5VyFrKgYFglCGCI8gzdFuimac50YNiibuDQN2TS0j3LpgYBeyH+UJJkjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QOBQJUMW; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QOBQJUMW"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hRz8q0GKVz1XM30w;
-	Sat, 22 Aug 2026 13:50:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1787406649; x=1789998650; bh=y8p+eSVlmosxkhFx1paEn+Iu
-	4E9f78he/HJlT1fG3zY=; b=QOBQJUMWObySp+dySRXFAvlm+I7XiX51IVIp2iQH
-	fefBTYQ/1HhUujWoR+JOPWYz9fHo+i8DSqmoHeFJB6tKa7QpcIwv06Wk+dii6377
-	uO0+7qaJqnTzvRz6lyftgHr1rMypbR5voEJJt52mJtfODIm9XEp/btcHzv7Iinxw
-	ZzzZunJKYwWatCplxFbqPNH+VgLb7SV8MR91A57ubDILLCzZurAMYo2HiSnhxe+8
-	iQ3en4R9JpuDsGKJYokct5DkLxqEXyEjIblvuGo1foNG27AkA0WHlbsx6tNGaCXG
-	Qlu46AC8I6aJH5S0tsq4gS00o4kxtPlbW8rQxvOoiKS0+w==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id qPg905vGL9XT; Sat, 22 Aug 2026 13:50:49 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hRz8m0Vl1z1XM5kt;
-	Sat, 22 Aug 2026 13:50:47 +0000 (UTC)
-Message-ID: <5b810fd2-e9b8-40e6-abd8-7858184eafc6@acm.org>
-Date: Sat, 22 Aug 2026 06:50:46 -0700
+	 In-Reply-To:Content-Type; b=MCEs02jQU11Xm+a1g6zw6gmtyUg8Pc9LtROQhOzuNmzUuaNH5Y8dVWNUUfP1Ki5pRGzoPb0efU4vrZ0AoUlv4cS3F6bFdY0xfLwM18nHkV2HVLzYu41lyvGBn9maWI9SHuMZ8MVqwmpDkYNd0QD/CF8ISEa7IwPdrcSB1KLoMaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6a3efa2b38aso4565409a12.2
+        for <linux-block@vger.kernel.org>; Sun, 23 Aug 2026 02:09:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787476194; x=1788080994;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=AHk7JyC/LaTnv7Y7DeH+D7yi6FCrKKPuJREGz5jtZ+tYBXLZ60q4BChDJ8+4Avouzs
+         9yf+TUWi50LP4kepozYBew9ZeF3+/JNQhb1E7HIENA7FNmeP56/V+ERmCuoGyOG8kdeY
+         KaOVAElN/CiTZsDyAnDbN33rpmlmhWKD1vhbIDxBq6as6qm1ayRWAjbsgh05P+RDtZCW
+         546+JSrqAkXFqEjcbbhbmWZtwA/YDoi+1tL9SR2IVJOOVG0dW0sBXJGN2+dVd+dHWXF1
+         p9eIgMKM+BwFStT8l9zh9v2TORUyIRyHqC2IoDjgaqpuiGXGReR03rcv3uP0YIU6n/qh
+         Fsgw==
+X-Forwarded-Encrypted: i=1; AHgh+Rq+jH7z7rZQHPSFRSlup9z5hsY5OW0q8uPHhlE5xDn9IbYlHhWzMYevY5i2ifec6LboukLP1crjln7NyQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++lqwpQGXBdvxb0Iffmdotiv6knRhTbGbJ80BKbDH1ycQm80QjTw
+	Y/Lq4E4feHDWm46D7uroB8RYw2A3pZTYCxSOfXdRuwoNlKGEXFjvCUS+
+X-Gm-Gg: AR+sD13MO8hKoZfwHeSfJeruJPTjQQEWZpBdEtAY2DNEd1NieV0zzhYRJoIhiuK/pZh
+	G2Lv4V12qh95vCf+qqSDrPRWQ1fTb8UO8CsxXnJoLTb+pCvQuleoYSFqgCJ1/NTW3PGALQXoDWk
+	Y48Ri9kPCIHQYxpDjRlAsd7VXRs+jfZONCpq0DeKdJjKgxrk2+TeJKKH614wDCfhBaox1TNsglK
+	V9ItAhDiBTuGtSaPONkoK1ID307NeDolIAKFviSSDgGZ7hs+TKqXYPok9IZKQTefhjampxTUZMN
+	1zzFztTNkYj6TuDh7qYsE1F5ruRm4jf0TvSC6G9a6aaq7S1Kk1cBTFJSfqV48JWyof7PMCOY5o+
+	xnqnPrP/8sg7Bphfq68OtfDWMud84fWhvz2IG3YoJHS0GgAh4QbWFPJvSIGxaoVhb8YPIw6aFZs
+	/1e+UJYuLZanAwk8PE9ygIdm9lqkZDlA8x4ClxE7vrUynMTFQWotRGU3vXGzyyq4396cDgd4mLX
+	Fdl3kdBb3vdIwAZbiA0fyvItZMBjQ==
+X-Received: by 2002:a05:6402:444a:b0:698:351c:979c with SMTP id 4fb4d7f45d1cf-6a42f16f016mr22623575a12.2.1787476194451;
+        Sun, 23 Aug 2026 02:09:54 -0700 (PDT)
+Received: from [10.50.4.207] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a59e2d8ae9sm2326174a12.28.2026.08.23.02.09.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Aug 2026 02:09:53 -0700 (PDT)
+Message-ID: <4daf6da6-e01a-4120-a9b8-d666fc67e21d@grimberg.me>
+Date: Sun, 23 Aug 2026 12:09:52 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,19 +55,17 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] block/042,043, src/dio-offsets.c: relicense from
- GPL-2.0 to GPL-3.0+
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Cc: John Pittman <jpittman@redhat.com>
-References: <20260821105539.794679-1-shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH RFC 1/5] blk-mq: fix status for unaligned bio
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+Cc: axboe@kernel.dk, hch@lst.de, tom.leiming@gmail.com, coshi036@gmail.com,
+ Igor.Achkinazi@dell.com, dlemoal@kernel.org, Keith Busch <kbusch@kernel.org>
+References: <20260519172326.3462354-1-kbusch@meta.com>
+ <20260519172326.3462354-2-kbusch@meta.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260821105539.794679-1-shinichiro.kawasaki@wdc.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20260519172326.3462354-2-kbusch@meta.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/21/26 3:55 AM, Shin'ichiro Kawasaki wrote:
-> Relicense all three files under GPL-3.0 or later to resolve this
-> incompatibility.
-Acked-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
