@@ -1,40 +1,35 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from mail.ehvag.de (arnold.ehvag.de [157.180.54.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22FD382F15;
-	Sun, 23 Aug 2026 15:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870801A681C
+	for <linux-block@vger.kernel.org>; Sun, 23 Aug 2026 16:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.180.54.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787500678; cv=none; b=QmdZwfsJl7vAYlGgbx8X7lNAG+gYvHy+OepbWIU6SctbeNsV6J0xHCcKubBaCD7hGVMfUzM62MO7+jW18Y/ShXJxskLpjum3z2bFe3cCLoLOEgES8VgK6vPRf7+ahIWlmtiwtpA/CJUE7GdlY1eFAebhG9AoYrHxnkFJJTFSACk=
+	t=1787503565; cv=none; b=ZQbtxYIQj3KHm6orA72vtCRDcTdwwRFo8We6ZptQIi4QxWplmmPhPz7DE6hujjBWWCSJbbw8DtJ7ovyCtdyfNrC+3ytHmHk2Q+H9AWNFDz5yG4gZZqnoOTwTHy/Ez3lnc3pjy56qQ0VE61LNk5/trImZ1gq1THATrmsfHAuZU9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787500678; c=relaxed/simple;
-	bh=jiFwZFp0evlJn4u9xurLfqyhGtWOp+pe2r3tMsa2MGg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=Ln/T9YU8d6YrGWs1ILKGRcVkTTXJuV2Q3SA+fps2lPCFWvkNkJZzdeP2ao7psbLgqYKPvP6n1hJuFYV8zyzCH2FspTRc+CRo4TtvRtPK8nqIJQUEAb9yp20NnKun0zAF2eZ4T1efDDqs3qudwheHobPCwEkxvjJqlzbJo7qxonM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=rQNjsoBY; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1787503565; c=relaxed/simple;
+	bh=1DX6sL0xUSoV0rkWiPs2ibPMcdHWtKuY9IWC8GXFexI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Osfu7DUHygWHNQkfp8g0JBOOmRlxybNm2mDuM7qhAixNF9Dk0g0XnNgo7uJ3Af0MabFcY9ACUHe2Z9aPmN5nAOIxPNAMdVXBBPEld5EuLGQgwP1IYkdjOvFyDWA3Cf1uqQM/NcEvJ+iGWvQtTdRa3yTf2JoDXCTLOQxl3kN9APQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ehvag.de; spf=pass smtp.mailfrom=ehvag.de; dkim=permerror (0-bit key) header.d=ehvag.de header.i=@ehvag.de header.b=6buF+EwH; dkim=pass (2048-bit key) header.d=ehvag.de header.i=@ehvag.de header.b=A87IZTYJ; arc=none smtp.client-ip=157.180.54.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ehvag.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ehvag.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="rQNjsoBY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1787500638; x=1788105438; i=markus.elfring@web.de;
-	bh=jiFwZFp0evlJn4u9xurLfqyhGtWOp+pe2r3tMsa2MGg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=rQNjsoBYOJ3MuLibf+MSM7+xBUfroun04ceHTS11nMODZsyw7R++APMFNTUK0XNQ
-	 q4Tg3Yv5xWlPVS6YEITFlCW6C5plegmsBCJtSPKiNbKMVdtAIhPFHKa80v4Ej1mNl
-	 9/TWXjhMrR2O3DAY53rCGz5Iqr8A+hvxMpXTPvLZTj1iklvo6Xg9gFyNHA7zYbEnf
-	 c2DpZs3D+TIiTaIBYH+QWYHuLothCKxAnOc2iDJrmS8Dn6Y3hkN1p5VAOWSbnH6zB
-	 NCqkmjEAbNCJkLVSYTwNlmvhaUwTpUAlUmq6xv6gx9gAjoVGQjbIYYlQLkt9Keg9y
-	 eNkYvkGjOT2Z5LUA8Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from client.hidden.invalid by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N3oyy-1wpbwr3Cqm-00tQtB; Sun, 23
- Aug 2026 17:57:17 +0200
-Message-ID: <550ff0b4-df39-46d2-9781-c8688df10c93@web.de>
-Date: Sun, 23 Aug 2026 17:57:11 +0200
+	dkim=permerror (0-bit key) header.d=ehvag.de header.i=@ehvag.de header.b="6buF+EwH";
+	dkim=pass (2048-bit key) header.d=ehvag.de header.i=@ehvag.de header.b="A87IZTYJ"
+DKIM-Signature: v=1; a=ed25519-sha256; s=202603e; d=ehvag.de; c=relaxed/relaxed; r=y;
+	h=From:To:Subject:Date:Message-ID; t=1787503550; bh=JEyd249+EOHs1uy06zRQrW5
+	wJQY66q401ZcT5Pwchj0=; b=6buF+EwHpfPcIYBCMZd7L+mdMwZXp4/pGxTExqgplLUtNfd8wq
+	p8jrvym7E/NZ8xa7SNhYbzSjdfPCCNAhszAg==;
+DKIM-Signature: v=1; a=rsa-sha256; s=202603r; d=ehvag.de; c=relaxed/relaxed; r=y;
+	h=From:To:Subject:Date:Message-ID; t=1787503550; bh=JEyd249+EOHs1uy06zRQrW5
+	wJQY66q401ZcT5Pwchj0=; b=A87IZTYJZrZxBf2g0y6AbayTgZBqXdpkLWpGPf/22voGRXCzLa
+	mmyQp4IuXNKiBRA6EENkvCPSjqNGq8a3baXzMKY1V9lrMq5qRxq6dHiDlpVsIhaplzbCZP3IpoI
+	DXbRRZ+cB99aTrFmIIo/qBSNlbadGRJB3j5XRUWW1R3pJWwey4iOnIdboex5wQzaZ0NQEvptbxS
+	dlkwh2JcXZhScUwHJrl6Tq+6xNt1XeA0kKaWhoIHSTIl22GXoTsKg2ZlN0axnr7czfHrhMr6Ng9
+	rU8G3KSrrcEL8cxI22ooX5vL3O5dRu0WlbC/febg8diC1JLLz5oE7A57zGLdY3hcHlw==;
+Message-ID: <88cfe0e2-4930-44c5-a1a3-45f95c8577e5@ehvag.de>
+Date: Sun, 23 Aug 2026 18:45:49 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,130 +37,90 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>,
- Bart Van Assche <bvanassche@acm.org>, Damien Le Moal <dlemoal@kernel.org>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, lkp@intel.com,
- oe-lkp@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
- Hillf Danton <hdanton@sina.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Mark Brown <broonie@kernel.org>, Oliver Sang <oliver.sang@intel.com>
-References: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
-Subject: Re: [PATCH v6] loop: Fix NULL pointer dereference in lo_rw_aio()
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:QnMg56S+5Tqqo8eAfWX216+eTqfSXkK364Kqj6Wla68OHJ9vWef
- hMDfSrwlSvuHhfznQOUUB18LnI+yR7uGCHeTwBbWWOOeBinz42ro0JGgMJIZL5Js6DmOozz
- yq94Y/NwWLFY13eVvZiGh79Z8FezWYeQTEDjFJya3MGzybnnMhcQrJrZr84vA181oNEV7Lt
- CmMcwSTbGK/qeQZVfBWpA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:KQEXKRtTgg0=;0CdyXlsceYWAmCK+ZH8RqnxfaAR
- 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
- 9QT8eWLHaw0O+6GTMMJE=
+Subject: Re: Seagate Flex SMR
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <d5ff28e5-53a3-481c-870f-f6115e82f4ed@ehvag.de>
+ <47d4430d-ccc0-44e0-bfa1-98fd1129af6a@kernel.org>
+Content-Language: en-US, de-DE
+From: Noah Bergbauer <noah@ehvag.de>
+In-Reply-To: <47d4430d-ccc0-44e0-bfa1-98fd1129af6a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-=E2=80=A6
-> Therefore, this patch introduces a grace period for =E2=80=A6
+> "Flex SMR" is not referring to any standard feature. So it is hard to see what
+> you are talking about. In Linux, we support only drives that follow a standard,
+> so for HDDs, that is SPC/SBC/ZBC for SAS drives and ACS/ZAC for SATA.
 
-See also once more:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv7.2#n94
+The specification can be found in T10/18-007r0. It's not exactly ZD/ZR 
+as it seems to predate those standards, but it's close.
 
-Regards,
-Markus
+> Abbreviations do not make for an easy reading... I am assuming here that
+> SEQ_OR_BEFORE refers to the SOBR == "Sequential or before" zone type that is
+> defined as part of the ZBC/ZAC Zone Domains (ZD)/Zone Realms (ZR) feature set.
+> Right ?
+
+Right.
+
+>> 3. The zone configuration works by reporting both SEQ_OR_BEFORE and
+>> SEQWRITE_REQ zones each for the entire disk, and then for each pair of
+>> overlapping zones only one of them can be active while the other one
+>> will be in the offline condition. Right now some parts of the kernel
+>> (e.g. btrfs) don't play well with offline zones.
+> 
+> No. That is not how it works, at least not without patches to the SCSI & ATA
+> layers. The reason is that ZD/ZR drives are backward compatible with regular
+> disks. So the READ CAPACITY command reports the size of domain 0 only (the SOBR
+> zones). The sequential zones are in domain 1, which is unreachable without
+> ignoring the capacity returned by the READ CAPACITY command, because domain 1 is
+> in the LBA space beyond the capacity of domain 0.
+
+You are correct of course. What I mean is that after activating some 
+zones in domain 1 the resulting holes in domain 0 need to be handled, 
+and one can not simply assume that the full capacity range is always 
+usable. Naturally, the capacity also needs to be increased to cover both 
+domains.
+
+>> I implemented all of this last year and in the end everything was
+>> working fine under btrfs. Now I would like to attempt to get this into
+>> the kernel. This would involve rewriting most of my patches from
+>> scratch. So before I invest a lot of time and effort into doing so, my
+>> question is: would you as the maintainer even be willing to accept these
+>> changes into the kernel?
+> 
+> Unless you have a strong production/use case for this, it is a hard no for me.
+> 
+> The reason is that properly supporting the zone domains/zone realms feature is
+> *extremely hard*. This is full of gotcha and plenty of things will not be
+> backward compatible with pure SMR support that we have. E.g. SOBR and
+> conventional zones are very different before the SOBR zone is fully written.
+> 
+> If you want to run a file system in domain 0 only, simply activate all the SOBR
+> zones in domain 0, make sure the SOBR zones are all initialized (written) and
+> you are done: the drive in that state is equivalent to a regular disk and
+> everything will just work fine.
+To be clear, what I have implemented is all about running a filesystem 
+in domain 1. And I want to push back a little on your claim that this is 
+extremely hard, because in a handful of small patches totaling around 
+500 lines of code I have found solutions for all of these challenges. I 
+am running btrfs on the sequential zones and it passes every test I have 
+thrown at it. I can show you the code if you like.
+
+For example, SOBR zone support specifically turned out to be quite easy 
+to implement in a backward compatible manner. I simply return true from 
+bdev_zone_is_seq() because treating a SOBR zone as sequential is always 
+safe. A SOBR-enabled filesystem can then query bdev_zone_is_sobr() to 
+take advantage of random writes.
+
+The use case is that these drives exist, they're out there, and with a 
+little bit of kernel work we could squeeze a few extra terabytes out of 
+each and every one of them by leveraging their SMR capabilities. That's 
+a clear win to me. Yes, they don't entirely follow the latest standards, 
+but to me this is no different than the many device-specific quirks 
+already supported by the kernel. And apart from the Flex-specific 
+discovery procedure, all of this work should be usable for supporting 
+other ZR/ZD drives in the future.
+
+Best,
+Noah Bergbauer
+
