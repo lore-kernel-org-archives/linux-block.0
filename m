@@ -1,220 +1,379 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68525412276;
-	Mon, 24 Aug 2026 14:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8217243846C
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787580798; cv=none; b=GHBhVo3o5nDKcHiEEET+HJ4k8Da3Rrpf7SXeIAJQn0DykPfPzZo8tDQtsfyPgkoEHSsh8C6neUUBwZR7JhDcSL/pCWPAu1F0D0VKNG89TcY8p/oMZBVG5fyaKLiwVBbyh/eVqAPm42D8Gp35Qn1HO7NbbeWlKyA8dflPrPdPZRE=
+	t=1787580854; cv=none; b=MfF9hZZhLCjCEh5lgED3NErlFyewVHC2UXsda9cj2vlR83ouwgDeoS6hUIL+ucjcwYtRvnRmIjRjVha7tRVSRw/k41w/W7Drs1eoWM/w5pnZQAKcnzY/f8S2cNMDj3pTiZjVT9bJGlyvjTY2FLqywHrO7uNFarzE0LbYCLVZ5CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787580798; c=relaxed/simple;
-	bh=5H0nEc59Q986HZLlpGguY+/gdQ4VjP7DPXfE8/3QAyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IAYmEdBjYaEHeOX5D1ANvN/9yzRV6J502Tc7FuhLvNAm0hGfP1f5FoOWkTQVIP4paZcJSemOG7oy+f2LQSF+VN3EUOpWN1hoveAukDuW/P6KtZOotn8ns1eo8dUNf04zWQ3H9YxgL64tul/1cqk0cl0si+xQCaMiSm462OipKhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtElHEPw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787580854; c=relaxed/simple;
+	bh=E+/Y8A6JoYUD95BeI1jel2LRvtmdEOwPn6AtXIpcyyU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=tKz0vGNyBnPpFcISKh5h1KiUE9iNClSWfevYW+Th0gGgkaPkpggz281rJAEwO6fn7D0X+35CRcTGdrp64chZ2DmAIXIi14Nh+B26APRUVau/OMKFAREEZJTB/XKqPfpWQq7uKiXe04B160VNUFC77RZMnPvJkmR/tWI8dCtvGfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jF6WGMsE; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtElHEPw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A325F1F000E9;
-	Mon, 24 Aug 2026 14:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787580797;
-	bh=UwPdrh+01Xqj47dnasafGAdC09bKCXp4sZUyzRQNWvc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=dtElHEPwNBnUAjSebU6MFkk5JZ7wdxDH0pEu5d85rPPv2hTujo2yfk9UH2/+wIjqv
-	 MjTyMq9G4xqDacg2PwrjhRfrpgSvPAVrvTLPSoTjD4e3MFiZ6KKWsUoDlwnlRvbvzf
-	 dQ8AECA2WmANRDlw6APiZmu5Lo8JRraWXZz55CqnDE6bKhO5zrB+OU68b7V1rfaOLr
-	 2CyCTmXc4Dz7bwNos8WCzsX6/iElz8tZUBUWB9J+widR5o/CBGoZLI9IOm8CpTT7OR
-	 ZUk5UYSBeF2a9pXwVwIimwiupWnRbUcKZmhqo1P5zkLpkRrtaATyfoxZScTMsgfy+X
-	 rqC2jWaDhsoIA==
-Message-ID: <3d58eb3c-7a9d-4183-907b-46172664631c@kernel.org>
-Date: Mon, 24 Aug 2026 16:12:29 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jF6WGMsE"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-836ccf53ef9so26954587b3.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787580851; x=1788185651; darn=vger.kernel.org;
+        h=content-type:mime-version:references:message-id:in-reply-to:subject
+         :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Aw7ugmpQOmjY2/CNCHaKDY6XRRUcvMaJ3u0iOskkTBo=;
+        b=jF6WGMsE1yarx5eL7ZoBBJZqhOmbWjKW0yB9y4xpuJrG+VawwYsuCdByYBiDkV1wYj
+         cSbsU1XJK60aytCEVs24D+ph919SyEjVZp6YMkm6hyK6U2nk6aozsG1FOMTT9iyYFcC/
+         7lrTJYZCZHT4JVeUMEWTvdb7c8TXmUnCQkU/04354Il1xDzQNrxoHqxy5h1VYisROLaJ
+         l8/ckLm6UfeDfVrmEZAHEyCjbpPwk9KdfmS27LDaux6ayGS9vLQE4eghXwx3eZGiRgFY
+         /4aLL1YMerGmsp/B6O8hH/OS0QrrVrLHfbJGLBBfugp1pBqQzKl3tonA0h28LpFFgHvM
+         2FYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787580851; x=1788185651;
+        h=content-type:mime-version:references:message-id:in-reply-to:subject
+         :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Aw7ugmpQOmjY2/CNCHaKDY6XRRUcvMaJ3u0iOskkTBo=;
+        b=XUbxvxU68oqJIRaF3j/ZrYEX0qZfqdRL3pJ3POCyNzd1/WgvjR5TNmr3pLZZlgrOHM
+         EDHxBAZTJkT8H4Qp5NziB8lfi18a1pn1CUF37unaMlMlFd+Ps29QKGE0124Y6s26gUuz
+         FYSPrJSeWaY8EE+N82dJ+QIFbyM6S4Qn8A15kiCd5NxDcJCdagy3JZpsJurr9IUUmRkj
+         q3Kn5ppqvw2iR6RnlY9VN1pecU8mX9JQXbpn1ZsJXRYfyo03siwxd294U1C7GXQBJIMW
+         FadB6K0qynhvwpbkBAw54KmlZRQ1gSHYH6sSgu5RBXF+p01WbLvKHp1fRLaCQyEC1c13
+         /a1A==
+X-Forwarded-Encrypted: i=1; AHgh+Rq268rJGvbJEz5QWE32poYwmmLhRL4Vbru7jaTSxLPuz83TQeqUzJM255uG4sfzyuv+oL1tkay3oDOqbQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++l0ejRf6SSEpH0JMc3MHNuC+pfZ05YzitdjQ2bS+wCKH0TMmlCx
+	SfKVY6ihCSbifYS7cNm612qeNZv0kuzTNRmJhqkWWyBk2WFGk5szbwmxP67WLbJlxw==
+X-Gm-Gg: AR+sD13UIVCGVFn4iKXDTV6mI5gDKl68bnAQ4/66d0AgE/auQWSw9qOaUt5anXvjCOO
+	lcdfG3Zo2dsdY0+b2lOP/0LyXZBfwRzS1H1j7XBRBzE6xOPlEvfhtS6Egs4EYpohUgER476BvJo
+	6IvECaJuzJyA+I1D9MJH/odB/B0XpBIfCG0yXnYYQIsTK2yMGXUFaJ/YsYmEflbQdCHWpQrccFt
+	PtfgAFhksIF9GezQf0ombKJN1goIrxbiQRFWnhlXBHGFk2HZZS51kBrLuJGNHiW8+fiU/FIxgS/
+	3cgkiloByNN3SvcXTMFXeeVn/s9EO4uK3uxPbQ1+95vL0YjvpqPBamnPh1/7oQGaGEHpXI85nrM
+	wyOJO5mhZ8GWAGwS42qg23x2TxFaRLS96VZp1Mc108C2J95xoLI8U6T4XPtl4h71bu8tOc7MVjF
+	cEosJw/he6mkgsqxoV0irFj4JUDxMZRPT7SFIQrK/5GGYznRY+Wqrj43OJxMvIP2UqCLqShGvw7
+	FcI7fWpvNC15dVO780ydOh47740wmWV1qcdDIq/Ch64UXKe
+X-Received: by 2002:a05:690c:e001:20b0:81d:bc5:4624 with SMTP id 00721157ae682-849f5df6e6amr76092477b3.25.1787580850776;
+        Mon, 24 Aug 2026 07:14:10 -0700 (PDT)
+Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-84cac4ef4edsm34110127b3.45.2026.08.24.07.14.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 07:14:10 -0700 (PDT)
+Date: Mon, 24 Aug 2026 07:14:06 -0700 (PDT)
+From: Hugh Dickins <hughd@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+cc: Ackerley Tng <ackerleytng@google.com>, 
+    Alexander Viro <viro@zeniv.linux.org.uk>, 
+    Baolin Wang <baolin.wang@linux.alibaba.com>, 
+    Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>, 
+    Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+    Christoph Lameter <cl@gentwo.org>, 
+    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+    David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
+    Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
+    Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
+    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
+    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
+    Marcelo Tosatti <mtosatti@redhat.com>, 
+    Matthew Wilcox <willy@infradead.org>, 
+    Mel Gorman <mgorman@techsingularity.net>, 
+    Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
+    Minchan Kim <minchan@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+    Oscar Salvador <osalvador@suse.de>, Peter Zijlstra <peterz@infradead.org>, 
+    Qi Zheng <qi.zheng@linux.dev>, Rik van Riel <riel@surriel.com>, 
+    Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+    Shakeel Butt <shakeel.butt@linux.dev>, 
+    Suren Baghdasaryan <surenb@google.com>, 
+    Vlastimil Babka <vbabka@kernel.org>, 
+    Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>, 
+    Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
+    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: [PATCH 09/25] mm/fbatch: restore mlock+munlock batching, without
+ extra ref
+In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+Message-ID: <32d663fb-f192-e0e5-114e-8a92240fb0ac@google.com>
+References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 00/40] DEPT(DEPendency Tracker)
-To: NeilBrown <neil@brown.name>
-Cc: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org,
- max.byungchul.park@gmail.com, kernel_team@skhynix.com,
- torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
- linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
- linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
- will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
- joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
- duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
- willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
- gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
- akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
- hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
- jglisse@redhat.com, dennis@kernel.org, cl@linux.com, penberg@kernel.org,
- rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
- linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com, boqun.feng@gmail.com,
- longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
- yeoreum.yun@arm.com, netdev@vger.kernel.org, matthew.brost@intel.com,
- her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de,
- x86@kernel.org, hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
- gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
- arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
- da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
- frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
- josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
- jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
- anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
- clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
- kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, broonie@kernel.org,
- kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
- ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
- baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
- joel.granados@kernel.org, richard.weiyang@gmail.com,
- geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
- alexander.shishkin@linux.intel.com, lillian@star-ark.net,
- chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
- link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
- brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
- mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, rcu@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev,
- 2407018371@qq.com, dakr@kernel.org, miguel.ojeda.sandonis@gmail.com,
- bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
- dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- tmgross@umich.edu, rust-for-linux@vger.kernel.org
-References: <20260706061928.66713-1-byungchul@sk.com>
- <359ea967-9b97-4584-88e6-bddb4044de2e@kernel.org>
- <20260821042143.GA40890@system.software.com>
- <825134a8-ceae-430c-b2fc-d1d0c7240f39@kernel.org>
- <178730572084.2852630.7732425311008244683@noble.neil.brown.name>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <178730572084.2852630.7732425311008244683@noble.neil.brown.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 
-Hi!
+Update mlock_folio(), munlock_folio() and their fbatch callouts and
+helpers, to do folio_try_get()s at batch processing time, instead of
+holding a folio reference all the while in mlock_fbatch: as in folio.c.
 
->>>
->>> That's a good news for lockdep.  (And even for DEPT :)
->>
->> He :) Where do you currently store the additional per-page information?
-> 
-> lockdep doesn't need to store per-page information.  Possibly DEPT
-> doesn't either.
+But more interesting is the use of mod_mlock_count(), using try_cmpxchg()
+to update folio->mlock_count safely when possible (now when on lru_add
+fbatch as well as when unevictable). While __mlock_folio() is as hard to
+think about as before, __munlock_folio() simpler because munlock_folio()
+can adjust mlock_count itself without clear_lru() or lruvec lock, and so
+do the folio_test_clear_mlocked() immediately for itself (without which
+unevictable_pgs_cleared was likely to appear high, when it should be 0
+or low to indicate good mlock health).
 
-That would be even better.
+__munlock_folio() is safe for use even when the unreferenced folio has
+been freed and reused. It appears that __mlock_folio() could affect a
+folio which has been freed and reused, but only if it is reused as an
+mlocked folio, in which case its mlock_count is spuriously incremented
+(but usually a spurious munlock decrement will follow).  How grave is
+this? If unevictable_pgs_cleared remains low, not so bad.
 
-[...]
+I've gone back and forth on whether to move mlock_fbatch and these
+functions into mm/folio.c: for now they stay here in mm/mlock.c.
 
-> 
-> maybe you put the folio which is locked on a queue or an lru or
-> whatever.
+Signed-off-by: Hugh Dickins <hughd@google.com>
+---
+ mm/mlock.c | 147 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 86 insertions(+), 61 deletions(-)
 
-For readahead, I think that queues / lru are not involved. We submit the I/O,
-and once the I/O is done, we unlock the folio from interrupt context.
-
-end_buffer_async_read() / iomap_finish_folio_read() end up calling
-folio_end_read(), where we do the magic
-
-	folio_wake_bit(folio, PG_locked);
-
-It's interesting, that for writeback we never unlock the folio on the I/O path,
-but instead have the dedicated page flag to tell us when writeback is complete.
-
-> 
-> There is no way to say "that queue owns this lock".  Maybe that could
-> usefully be added - assuming coherent semantics can be designed.
-> 
-> Somewhere else some other task takes responsibility for that folio and
-> the lock.  maybe it dequeues a page, or maybe an lru callback gives the
-> locked page to some code.
-> That code then calls
->    lock_map_acquire_try(&the_lock_map)
-
-I'd assume that's what the unlock path would do from interrupt context.
-
-> 
-> This says "this task is now holding this lock" (or more accurately "now
-> holding a lock of this class").
-> Note the "_try" - that says that the task didn't have to wait for the
-> lock, it just got it for free, which in fact it did.
-> 
-> Now if that task takes some other lock, lockdep will see a dependency
-> between the page lock and the new lock, and will accept or reject it as
-> you would expect.
-
-I guess on the interrupt path, we primarily unlock the folio lock only. But we
-might take some other spinlocks temporarily indeed, like
-iomap_finish_folio_read() does.
-
-
->  But I'd like to see a coherent
-> explanation of how the functionality offered by DEPT is clearly better.
-
-Yes, that's also what I am missing.
-
-Stating that lockdep is stable and should not be destabilized is not really a
-good argument.
-
+diff --git a/mm/mlock.c b/mm/mlock.c
+index 53d754e82ba2..1050010bbe0b 100644
+--- a/mm/mlock.c
++++ b/mm/mlock.c
+@@ -58,6 +58,20 @@ EXPORT_SYMBOL(can_do_mlock);
+  * indicate the unevictable state.
+  */
+ 
++static long mod_mlock_count(struct folio *folio, long incdec)
++{
++	long mlock_count = READ_ONCE(folio->mlock_count);
++
++	while (mlock_count & MLOCK_COUNT_0) {
++		if (mlock_count + incdec < MLOCK_COUNT_0)
++			return MLOCK_COUNT_0;
++		if (try_cmpxchg(&folio->mlock_count, &mlock_count,
++				mlock_count + incdec))
++			return mlock_count + incdec;
++	}
++	return 0;
++}
++
+ static struct lruvec *__mlock_folio(struct folio *folio, struct lruvec *lruvec)
+ {
+ 	/* There is nothing more we can do while it's off LRU */
+@@ -65,6 +79,7 @@ static struct lruvec *__mlock_folio(struct folio *folio, struct lruvec *lruvec)
+ 		return lruvec;
+ 
+ 	lruvec = folio_lruvec_relock_irq(folio, lruvec);
++	lruvec_del_folio(lruvec, folio);
+ 
+ 	if (unlikely(folio_evictable(folio))) {
+ 		/*
+@@ -73,92 +88,82 @@ static struct lruvec *__mlock_folio(struct folio *folio, struct lruvec *lruvec)
+ 		 * folio be unevictable?  I'm not sure, but move it now if so.
+ 		 */
+ 		if (folio_test_unevictable(folio)) {
+-			lruvec_del_folio(lruvec, folio);
+ 			folio_clear_unevictable(folio);
+-			lruvec_add_folio(lruvec, folio);
+-
+ 			__count_vm_events(UNEVICTABLE_PGRESCUED,
+ 					  folio_nr_pages(folio));
+ 		}
+ 		goto out;
+ 	}
+ 
++	/*
++	 * Something to keep in mind when studying the arithmetic here:
++	 * we only come to __mlock_folio() when mlock_folio() could not
++	 * mod_mlock_count() itself; but by the time this is processed,
++	 * the folio may have already been munlocked, or another mlock
++	 * already marked it as unevictable and so mod_mlock_countable.
++	 * And don't forget that a folio may be unevictable for reasons
++	 * other than mlocked (hence the folio_evictable() check above).
++	 */
++
+ 	if (folio_test_unevictable(folio)) {
+ 		if (folio_test_mlocked(folio))
+-			folio->mlock_count += MLOCK_COUNT_1;
++			mod_mlock_count(folio, MLOCK_COUNT_1);
+ 		goto out;
+ 	}
+ 
+-	lruvec_del_folio(lruvec, folio);
+ 	folio_clear_active(folio);
+ 	folio_set_unevictable(folio);
+-	folio->mlock_count = MLOCK_COUNT_0;
+-	if (folio_test_mlocked(folio))
+-		folio->mlock_count += MLOCK_COUNT_1;
+-	lruvec_add_folio(lruvec, folio);
+ 	__count_vm_events(UNEVICTABLE_PGCULLED, folio_nr_pages(folio));
++
++	if (!folio_test_mlocked(folio))
++		folio->mlock_count = MLOCK_COUNT_0;
++	else if (!mod_mlock_count(folio, MLOCK_COUNT_1))
++		folio->mlock_count = MLOCK_COUNT_0 + MLOCK_COUNT_1;
+ out:
++	lruvec_add_folio(lruvec, folio);
+ 	folio_set_lru(folio);
+ 	return lruvec;
+ }
+ 
+ static struct lruvec *__munlock_folio(struct folio *folio, struct lruvec *lruvec)
+ {
+-	int nr_pages = folio_nr_pages(folio);
+-	bool isolated = false;
++	long nr_pages = folio_nr_pages(folio);
+ 
+-	if (!folio_test_clear_lru(folio))
+-		goto munlock;
+-
+-	isolated = true;
+-	lruvec = folio_lruvec_relock_irq(folio, lruvec);
+-
+-	if (folio_test_unevictable(folio)) {
+-		/* Then mlock_count is maintained, but might undercount */
+-		if (folio->mlock_count > MLOCK_COUNT_0)
+-			folio->mlock_count -= MLOCK_COUNT_1;
+-		if (folio->mlock_count > MLOCK_COUNT_0)
+-			goto out;
+-	}
+-	/* else assume that was the last mlock: reclaim will fix it if not */
+-
+-munlock:
+-	if (folio_test_clear_mlocked(folio)) {
+-		__zone_stat_mod_folio(folio, NR_MLOCK, -nr_pages);
+-		if (isolated || !folio_test_unevictable(folio))
+-			__count_vm_events(UNEVICTABLE_PGMUNLOCKED, nr_pages);
+-		else
++	/* There is nothing more we can do while it's off LRU */
++	if (!folio_test_clear_lru(folio)) {
++		if (folio_test_unevictable(folio) && folio_evictable(folio))
+ 			__count_vm_events(UNEVICTABLE_PGSTRANDED, nr_pages);
++		/* But whoever puts it back on LRU should rescue it */
++		return lruvec;
+ 	}
+ 
+-	/* folio_evictable() has to be checked *after* clearing Mlocked */
+-	if (isolated && folio_test_unevictable(folio) && folio_evictable(folio)) {
+-		lruvec_del_folio(lruvec, folio);
++	lruvec = folio_lruvec_relock_irq(folio, lruvec);
++	lruvec_del_folio(lruvec, folio);
++
++	if (folio_test_unevictable(folio) && folio_evictable(folio)) {
+ 		folio_clear_unevictable(folio);
+-		lruvec_add_folio(lruvec, folio);
+ 		__count_vm_events(UNEVICTABLE_PGRESCUED, nr_pages);
+ 	}
+-out:
+-	if (isolated)
+-		folio_set_lru(folio);
++
++	lruvec_add_folio(lruvec, folio);
++	folio_set_lru(folio);
+ 	return lruvec;
+ }
+ 
+ /*
+- * Flags held in the low bits of a struct folio pointer on the mlock_fbatch.
++ * Flag held in the low bits of a struct folio pointer on the mlock_fbatch.
+  */
+-#define LRU_FOLIO 0x1
+-static inline struct folio *mlock_lru(struct folio *folio)
++#define MLOCK_FLAG 0x1
++static inline struct folio *mlock_flagged(struct folio *folio)
+ {
+-	return (struct folio *)((unsigned long)folio + LRU_FOLIO);
++	return (struct folio *)((unsigned long)folio + MLOCK_FLAG);
+ }
+ 
+ /*
+  * mlock_folio_batch() is derived from folio_batch_move_lru(): perhaps that can
+  * make use of such folio pointer flags in future, but for now just keep it for
+- * mlock.  We could use three separate folio batches instead, but one feels
+- * better (munlocking a full folio batch does not need to drain mlocking folio
+- * batches first).
++ * mlock.  We could use separate folio batches instead, but one feels better
++ * (munlocking a full folio batch does not need to drain mlocking batch first).
+  */
+ static void mlock_folio_batch(struct folio_batch *fbatch)
+ {
+@@ -169,10 +174,15 @@ static void mlock_folio_batch(struct folio_batch *fbatch)
+ 
+ 	for (i = 0; i < folio_batch_count(fbatch); i++) {
+ 		folio = fbatch->folios[i];
+-		mlock = (unsigned long)folio & LRU_FOLIO;
++		mlock = (unsigned long)folio & MLOCK_FLAG;
+ 		folio = (struct folio *)((unsigned long)folio - mlock);
+ 		fbatch->folios[i] = folio;
+ 
++		if (!folio_try_get(folio)) {
++			fbatch->folios[i] = NULL;
++			continue;
++		}
++
+ 		if (mlock)
+ 			lruvec = __mlock_folio(folio, lruvec);
+ 		else
+@@ -218,19 +228,25 @@ void mlock_folio(struct folio *folio)
+ {
+ 	struct folio_batch *fbatch;
+ 
+-	local_lock(&mlock_fbatch.lock);
+-	fbatch = this_cpu_ptr(&mlock_fbatch.fbatch);
+-
+ 	if (!folio_test_set_mlocked(folio)) {
+-		int nr_pages = folio_nr_pages(folio);
++		long nr_pages = folio_nr_pages(folio);
+ 
+ 		zone_stat_mod_folio(folio, NR_MLOCK, nr_pages);
+-		__count_vm_events(UNEVICTABLE_PGMLOCKED, nr_pages);
++		count_vm_events(UNEVICTABLE_PGMLOCKED, nr_pages);
+ 	}
+ 
+-	folio_get(folio);
+-	if (!folio_batch_add(fbatch, mlock_lru(folio)) ||
+-	    true || /* XXX Temporarily disable mlock batching */
++	/*
++	 * No more to do if mlock_count is maintained: either the folio
++	 * is on an lru_add fbatch, and will be moved to unevictable in
++	 * due course, or it's already counted as unevictable: no need
++	 * for an mlock_fbatch entry below.
++	 */
++	if (mod_mlock_count(folio, MLOCK_COUNT_1))
++		return;
++
++	local_lock(&mlock_fbatch.lock);
++	fbatch = this_cpu_ptr(&mlock_fbatch.fbatch);
++	if (!folio_batch_add(fbatch, mlock_flagged(folio)) ||
+ 	    !folio_may_be_lru_cached(folio) || lru_cache_disabled())
+ 		mlock_folio_batch(fbatch);
+ 	local_unlock(&mlock_fbatch.lock);
+@@ -244,15 +260,24 @@ void munlock_folio(struct folio *folio)
+ {
+ 	struct folio_batch *fbatch;
+ 
++	/*
++	 * No more to do if mlock_count is maintained and still raised.
++	 * But if mlock_count is unmaintained, we might need to queue an
++	 * munlock fbatch entry, just to cancel an undequeued mlock entry?
++	 */
++	if (mod_mlock_count(folio, -MLOCK_COUNT_1) > MLOCK_COUNT_0)
++		return;
++
++	if (folio_test_clear_mlocked(folio)) {
++		long nr_pages = folio_nr_pages(folio);
++
++		zone_stat_mod_folio(folio, NR_MLOCK, -nr_pages);
++		count_vm_events(UNEVICTABLE_PGMUNLOCKED, nr_pages);
++	}
++
+ 	local_lock(&mlock_fbatch.lock);
+ 	fbatch = this_cpu_ptr(&mlock_fbatch.fbatch);
+-	/*
+-	 * folio_test_clear_mlocked(folio) must be left to __munlock_folio(),
+-	 * which will check whether the folio is multiply mlocked.
+-	 */
+-	folio_get(folio);
+ 	if (!folio_batch_add(fbatch, folio) ||
+-	    true || /* XXX Temporarily disable munlock batching */
+ 	    !folio_may_be_lru_cached(folio) || lru_cache_disabled())
+ 		mlock_folio_batch(fbatch);
+ 	local_unlock(&mlock_fbatch.lock);
 -- 
-Cheers,
+2.51.0
 
-David
