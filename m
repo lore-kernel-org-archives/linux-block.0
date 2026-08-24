@@ -1,118 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A453233E8;
-	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787578376; cv=none; b=EhFqKK/Pw+/FGoPBB9RkenjuX3ZakO+GAi8r/8dYu2NE/sbuiksGqKXeWf/H1vPbDYto1GmFDhDoWcTBGfGAHoSQE5M3V6x80VTdZXQviAxxAMCS0sEjyv1Shb02dnGLs24C1Se7/Ic3rT7Fe3N6dE/aYIRsdZ9CmIp20r5TEs8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787578376; c=relaxed/simple;
-	bh=bqxr7tJMlMv9QBqyGWY6/PLr9AYldw0DmoB+D9A7GFc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZFj6nsQdYgX86BBFMLhLO60oIauvyFh6LaCzeeEsttca+LZZsDBx1sC9PBDLazr0fjPksVmVk6SLV+r+yC2/knvzb3EihNW8a1gMj2kVfaknFn6Enpth3KNKL2EJm00NhIsvTeYITojN1R3r6aYMSAC+Ggn3VS7jgbQ76psEl9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G8kAsPfC; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6570A42E414
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787579395; cv=pass; b=G/0vzn0/PP1KxUtKJ8NL4Hu8nDpeC9BMeUH16LuIMbX2RUsgP6wvm6J65dp2kuIvFpRS5WezhqzOX+/OUMOdRZ5v5QCa7JlEVpuhM1wyHCBWtWkX+m2qnsSvxyHEAYnyvXSfUaNeJHUtKw4jCRBaH1XHtyYq4vHn/jiUiqbo0sc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787579395; c=relaxed/simple;
+	bh=Gdi0w031Cj+0ZM8jnslnu596yibLYY4OhKTpyU6L/3w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gBAudtPsquBjmlmrT2iyKWIXcC3FUaLzZRh5AtiGAHayt8/B6Arm+ufmgKlCfmKiXHmjprzy5OxQvENg27+5QtYf21uaIBfVinLfdBiDCk5xlAfDxcBe3LvUkZL7bBEJkW8FM93Y+8dWwZIMe9ZXrVG8GUpzEp5ORuSmPaFqKc8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=NDMoFzvQ; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G8kAsPfC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A9339C2BCFB;
-	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1787578375;
-	bh=bqxr7tJMlMv9QBqyGWY6/PLr9AYldw0DmoB+D9A7GFc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=G8kAsPfCd3v0QZK65ZQP4KbhzUnGfCQ/YNdkoQ3WwCT14wzGj9hReIH273n2r91cC
-	 hf9cQNH9FaJ/SegJFP5aGHT+oSKJgm80aw235CTOzila7GC58WdE3xJQgbnh3pLrQ4
-	 WM+MOFoLPeHYdlmGlNN7hiznkG/ykacFsN7uBre0tLzM2dmmPP4vFHSrKCsef9+AAu
-	 oITHQNzQTS01lFe580bdiAAWEN0TmE/7m+Sn/alE9JlaAHLvUaDxgpysh07csx+4Gw
-	 0hxsbC4hK2ZL98jZpXhYDhFXcqtp0LsIjBdPRveODY9Bxf5txAk1Zdg9c8XbhyJlqe
-	 ic6rZ/mqXn1rA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887D9C5DF94;
-	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
-From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Date: Mon, 24 Aug 2026 15:32:48 +0200
-Subject: [PATCH v2 2/2] nbd: drop stale partitions on NBD_CLEAR_SOCK
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="NDMoFzvQ"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-517dc520840so25202641cf.3
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:49:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787579392; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Z7Bi6nctTiE8NGKhFhlCznDAL3p63rY0mXEPt71MkATlyXch7kcFku17Oc3/e48+Qe
+         9TvduB+X1pTk0Y0Ci95HO+WhrvVcg3xzFCxjyMZ0lnh2SA76eWcL+T3FfmVulZGsbv2i
+         prjvfR9dKiSMZE5PO+SeR066NyAlDvlgAZDXui4lH6Ok2kRbnz+TkgnSiQp3eZTR6y/W
+         +pnFrrI0qsOTi6dCIw5LrWWzFNXaRLk0BzHRntb1/VTPhFxA+8I+mQ9gUd1GQfxKAC4J
+         64iTzrG09CD4j9Z3lqsmaH5A5ELzydao/gANyVtcqIXhqylNMZY1knXpKi8RTzpgMYlQ
+         0Idw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=UWqjXIcqtIZGoXJHhXghNNIDKwEBlEpB/YPKWMii0qs=;
+        fh=nhaWZ7LDv3kLkksGRuBoIa5owzfdcgENBNnw9CzNXIg=;
+        b=DBL4yS4H/Md2Q4/pZy14eU7eoOsxgM6bSXVcY2Pi8Ae3SoB4lxtnoCDUUWg+rS48CJ
+         rmI863QBT4b5HlKyn7VZOwfEXlc6pEwczCg795AWrwcS1slgXktOBfROh36qF+GboHtp
+         fQqwEzyH8rXI1+7zfKxSqQnibN1lYjU923/mlfJ1RQXVG7yIsBC20XXnkTexbVXSNbt3
+         /OMCedz/qiNBUSi7oenmEnSSkmhgmIMtFKQLfPDU0IbBG0Mpd2kAK3AWR/+jVb2SLjzn
+         M52G1ASz1T/155Qvqxg0/M+bzQV7wCRHy8jrKpMIJ4Nd3S2qcbyZT0x9f954GYNS+s+Q
+         Au3g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1787579392; x=1788184192; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UWqjXIcqtIZGoXJHhXghNNIDKwEBlEpB/YPKWMii0qs=;
+        b=NDMoFzvQZiYLhYfgLRj1Ktm3K7LltETOkninXMRKeKJsVGrX/f5yYwoKebcqW5zE+J
+         Nuh6crj5oNcOPXEhNSWgsZDXUjnF55flY4e2grH5zeQSUf+xTlynxncJqIWBpEWpcJh3
+         2iRMqM1j+sNOmGDXD8voA/XnGZe83Hp5BGNw4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787579392; x=1788184192;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=UWqjXIcqtIZGoXJHhXghNNIDKwEBlEpB/YPKWMii0qs=;
+        b=MGev92fcZOt/RYmtApJjr6o/VMY/AHpkOGElUucLSXTNxuyalTDs9nXRbw/mXQOY0l
+         scZWgPysj/8i8vQbwV2MJPSKyfg+aB+q79jjni2P9JnAlKWq7PYpXYVlBE1Vk4WJn8F0
+         uYR+zEXf5jSsOcPfU28N/uvBkkeiZZ7SMM5phRpri+W+3RSYz60iqHu29nJvZO3zSILG
+         mhXKain6bGdL+ClgBDvGgfBQkynmU1ZSagxM7MGhRKvm2MKRFgKOHoRXc4E5lyNf1PMm
+         zqdeONRy3SIkHShXDRMij3p+7N4Uj90CMc0ontH0Ck4yqbGL3DUeDObSUosv1v/yvELT
+         aBYQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoFDhBM6NF0B5dYkKYf+4nGdBjBCrY49ukrl2Pv6Gc59NpIT/hLnUuZFaWUzHg+2Dk0YLNWfPWALPaTNw==@vger.kernel.org
+X-Gm-Message-State: AFuF++natxl4WKERexL8e9seK1GI1V8GvJEcUtJTt4MorbPt80uNyWsp
+	VzyDhLne4amHrKsTHerEOr1Kqsb+7aJPX8b+NbngMFVmxkzY5UFaWDLduPlNZiEtVBSN0q7bGNe
+	RAqbfGU52wYAfpomjxVMm2mITGoa5gkQYBNjkolvVqA==
+X-Gm-Gg: AR+sD12L7lBrq/p68ZCPrJu/kunkieLcHMNmfFe2b3svRmJFCYxGn7PT0g3RPYxQtg3
+	eH8l4ixTLSDwQ9vUMI9fWpHPkaJl30Fi8DY69tn7aowi0e4WP8m/taHbr9EM5fpW9PMbkyfL8K+
+	cEkSGrPuypkpDEQRrh2MLQel9eW/K9JcYkqKGseU7YLyn6EfPWL851ghgAgvs2F8BUOD0OzYbsq
+	b48cNlcLKYQrFDLLH9Enm8OMctFR5lyG4jNkReSKScBsoPv1wmAUFMlhCdIEc9F5w2IH7/svW3S
+	CGOt2ah5o4c+eA3BfI8HwgCF65/JwQDXi19CkN/AB7kIig8n5uz9sZ0k1yLVjI/sscHZyk+cToJ
+	JGZk=
+X-Received: by 2002:a05:622a:8416:10b0:52e:1109:8f6d with SMTP id
+ d75a77b69052e-52e1109944cmr94356391cf.42.1787579392384; Mon, 24 Aug 2026
+ 06:49:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260824-b4-loop-nbd-stale-partitions-v2-2-9815a577cebd@amutable.com>
-References: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
-In-Reply-To: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
-To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- nbd@other.debian.org, Christoph Hellwig <hch@infradead.org>, 
- Bart Van Assche <bvanassche@acm.org>, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Daan De Meyer <daan@amutable.com>, stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787578374; l=2227;
- i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=IJsYukTCp+gKDcCUl73TRLZtzYPIPmGwnx1/NOZHD4E=;
- b=+3LKI5LgUmNDygotKLNLsRXKAEF5uxws+wjt9ChSEsGXFVqJWzbH+YSsSCGOVnRyU54fmfXoR
- ve0kGD09ernCUHrWvT8l+uWR/XeooSDOTbqrxfcNt+Ur0EoXvdUX9wz
-X-Developer-Key: i=daan@amutable.com; a=ed25519;
- pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
-X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
- auth_id=868
-X-Original-From: Daan De Meyer <daan@amutable.com>
-Reply-To: daan@amutable.com
+References: <20260820193343.3852967-1-willy@infradead.org> <20260820193343.3852967-3-willy@infradead.org>
+ <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com> <aoxHOSC9kTPbKeNq@casper.infradead.org>
+In-Reply-To: <aoxHOSC9kTPbKeNq@casper.infradead.org>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Mon, 24 Aug 2026 15:49:37 +0200
+X-Gm-Features: AcwNN1WXkLYVG2Rn2OXRtnBdlHWAinn8Fn4WcEVqUKiB1DB-194nq79209afcM4
+Message-ID: <CAJfpegv3Ak+qNLb=fTSCSz7-taQ3Ui-Hkmqgn4PaGPe=CR4cbQ@mail.gmail.com>
+Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>, 
+	David Sterba <dsterba@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Daan De Meyer <daan@amutable.com>
+On Mon, 24 Aug 2026 at 15:29, Matthew Wilcox <willy@infradead.org> wrote:
+>
+> On Mon, Aug 24, 2026 at 11:05:46AM +0200, Miklos Szeredi wrote:
 
-Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from
-setting GD_NEED_PART_SCAN. Besides requesting a rescan, that bit was what
-removed stale partitions on the next open, as bdev_disk_changed() drops
-all partitions before it consults disk_has_partscan().
+> > Maybe add a variant that takes that lock?
+>
+> I don't understand what use that would be.  As soon as that function
+> drops the lock, the pages could be reinstated.  If the caller needs the
+> pages to not come back, it must need to hold the invalidate_lock across
+> the whole operation.
 
-nbd_clear_sock_ioctl() relied on that. It zeroes the capacity through
-nbd_bdev_reset(), but nothing removes the partitions of the disconnected
-device anymore. With the default max_part=16 they linger until the next
-connect sets GD_NEED_PART_SCAN again. With max_part=0 nothing ever sets
-it, so they are never removed at all, even though nbd does not set
-GENHD_FL_NO_PART and partitions can therefore still be added with BLKPG.
+invalidate_inode_pages2_range() together with launder_page guaranteed
+that no dirty data remained in the cache after that call.   Yes, the
+pages can be reinstated after that but those need faults and the
+server can then serialize those against the invalidation.
 
-Set GD_NEED_PART_SCAN in nbd_clear_sock_ioctl() so the partitions are
-dropped on the next open. Calling bdev_disk_changed() directly is not an
-option as it needs open_mutex, which nbd_open() acquires under
-config_lock.
+I don't see that guarantee with the filemap_write_and_wait_range()
+(with or without invalidate_lock actually) since the mapping can be
+dirtied again without the filesystem's knowledge.
 
-Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
-Cc: stable@vger.kernel.org
-Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Daan De Meyer <daan@amutable.com>
----
- drivers/block/nbd.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Am I missing something?
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ffce519bf008..09b4ad70a5d7 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1616,6 +1616,13 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
- 	nbd_clear_sock(nbd);
- 	disk_force_media_change(nbd->disk);
- 	nbd_bdev_reset(nbd);
-+	/*
-+	 * Drop the partitions of the disconnected device on the next open.
-+	 * They can exist even with max_part zero as they may have been added
-+	 * manually with BLKPG. Dropping them here is not possible as that
-+	 * needs open_mutex, which nbd_open() acquires under config_lock.
-+	 */
-+	set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
-
--- 
-2.54.0
+Thanks,
+Miklos
 
 
+>
+> Before any filesystem people get funny ideas about closing the O_DIRECT
+> race, you can't do that because you'll deadlock on doing I/O to the same
+> file that you've mmaped.
