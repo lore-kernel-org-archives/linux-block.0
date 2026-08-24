@@ -1,232 +1,379 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D74282F12
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 10:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787568922; cv=fail; b=fgY2YxJAjQuyjjS/H/VD0zoEh2tXn/t/znvjQGLVNxm5uo18xBol2WXbEjyxsoiQP///9m3kFdYsmdrLokRqkcLW3dgDGsuLWuLhVL/DtRzfgTcFttQfYqp/Ci4Y0STaZfSVRW5gy2au3V7H6XYmL+wFF5YSwyvf8J2rLyUqFh8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787568922; c=relaxed/simple;
-	bh=PeK2ldf1gtpK09Jp0x8iOmjGBynV6x/KxQMFjFG0gWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QVct0ZTwDOL7NmcRpmcOa68W6USA85TezYoMPUnBvJTjw8WQnMDg9j201qMzd9PUrsfWGs+yibqWDCA9K25KTUZ0+2Sijcnqb17iv0pSvgoFxNDCM/9ZOT2P7FVb7/aW+c8y8Y1sVgRzUWM6tE1BiWaOsCmdQ/BTYFuH63AXg+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=AvNZWPkv; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=x9McJS9A; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDF93EF0A6;
+	Mon, 24 Aug 2026 11:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787570335; cv=none; b=WjiVRYblt3LGFnElolwjVooYxeVkWOGCoIf2M16bAMeqLKTkAvuCX+st4Jq+vygU5DadEJdJRhHQEzcfiW7kA+AJLce5otHHqIyaVbt2wnHXzpqJWk7wbyav/FogC0s3EDXYaP6SDaJajAKZxcwczrQuYJR0kv9iqAZZjF4dEMQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787570335; c=relaxed/simple;
+	bh=FqNgKrXDIDlNBJAVOF/eN4RowgtxLQyzOYJqyvOoOPA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Iw0p4QIrWc7seJ6lG0Zg/a5jjix3Pr4YaXY1WA7vAd9HwLiHTEUTL+MzNVLS3eUc8N5ndTJ9ATYdZtvhchhChTohMWbSVxoVFrNVtteA3+fdWLiM8TI65n9atn0MasldpOvSLGImJwi7PQfmkrvqII3WUB/fwIYB+BWQEgA0dI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vw0PQSv+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AvNZWPkv";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="x9McJS9A"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1787568920; x=1819104920;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=PeK2ldf1gtpK09Jp0x8iOmjGBynV6x/KxQMFjFG0gWs=;
-  b=AvNZWPkvKaVCK4I5N8FBZiCq30JdQx1gEA08wwWy7svqEUHv5ePP5wit
-   rPXAJElj9DT2MeeS3OYd9njVu1HleKQovaR3B5wHHtDr1W/rExZgU6mb6
-   OfBXv3hIhnK2Epzx2DGLfHrxq0Onoe864c8BLFIurh3706won8kou+I0m
-   wz0Pj84IqSeVlAc+PXIoldQJ2RWv+tCuunzYn5SjQR8h8FA+R9VSST9AO
-   H0QvqeyOhmiESnSy964rsJHBcSLsXAa4PSW7MlnDnWeNSJDjDB9I8ZqJg
-   u9oF3LK2jDks1VjlY8lrJbqYyElzQkrOJH3hOn1M85uphInHGHVwEb6hq
-   g==;
-X-CSE-ConnectionGUID: lSUVzQsbSNOOjh78GOS9SA==
-X-CSE-MsgGUID: UOoR5wjdSkmRryV6n7JuxQ==
-X-IronPort-AV: E=Sophos;i="6.25,240,1779120000"; 
-   d="scan'208";a="153188706"
-Received: from mail-westus3azon11010008.outbound.protection.outlook.com (HELO PH7PR06CU001.outbound.protection.outlook.com) ([52.101.201.8])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Aug 2026 18:55:14 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gV13uJ7XG4PKtwaJJjNtCbt+Dcbls3MR0r7xWdPYEAgUmZb5t1uOTecxLNQQ2MuVkSw/JaZaY5AWZiZB8SG2S73sSuZqc3448lcOqBoKxWylc+lUwu23nxDdElxzT95D1oLA2YMCCucU1Y2Ku+NCAJCQqUy6NpQMcrgGzGnDjqt4K6eFAScc5VQhu5EJhfzs7jYGvowMxIyTwFKla1KGjsg7boBCa4k3D1DaG6qEuZYyv8Kz6vv1AoNMPgzrhksINVAZza1lJXX8s1zukOE/9VpRPs1WvLI61QpQenGXzRKgetX8hxvXv21TMIQRDr9DKjVssNZG0vKoammGGwTJuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qd4mO9dUjbqdF0GrO/FMwDUUJdNNSgiChAN7t5xEm5I=;
- b=cEf55jS1khsPsn95qTgpFK2ppHKfqhstZ5Mzxzqo7z6D8mC7jIP1j2guB0cVp6kBxl6iRcJeUr3kI5bkT1Aep6EDCMStZZtnPE1MdysHiPma917wPEzlvXCkAh+S96zg9bh5Nmlhhf2jaaDrxR2wC8U9mu8u+hV3fOmr5L5JaF3sQKAibwsR8eQ7ttTf293RzJh+iNfNznQuJHlHCaa/pk4n08zXfCNjcCl3MA9oCTbgIbPefAXGJ8hI0goYMeKZR0xOVnoIx7GAbIxEy7zRVZikjYkTe4dG9sPI18AXV9qfFOnodVMAWDG80g5TtzlTrmFJKqxuek20Y+sdcQLwnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qd4mO9dUjbqdF0GrO/FMwDUUJdNNSgiChAN7t5xEm5I=;
- b=x9McJS9AL4cR8Mal8yUDmE7o15+kDMsl5NcpGzFKCZRnm4spvztR3k0qwm6Ereb3k3lI1arH2EcM5mL6fkvPKqmE9kbAHSUr4sSCspiH+1BfL/40oJdsEFfWPQ/hqetGXgcFTxLYwimdwgb5+NDU6D0g2A9ZuLTHOOfmzQ3p+jQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by PH8PR04MB8658.namprd04.prod.outlook.com
- (2603:10b6:510:239::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.12; Mon, 24 Aug
- 2026 10:55:11 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%4]) with mapi id 15.21.0339.012; Mon, 24 Aug 2026
- 10:55:11 +0000
-Date: Mon, 24 Aug 2026 19:55:06 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] loop/014: Add test for backing file on loop
- device partition
-Message-ID: <aowhot0Y6jXYjeMY@shinhome>
-References: <20260820200034.3849080-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260820200034.3849080-1-bvanassche@acm.org>
-X-ClientProxiedBy: TY4P301CA0010.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:26f::8) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vw0PQSv+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED21E1F000E9;
+	Mon, 24 Aug 2026 11:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787570332;
+	bh=ZPgpXhjxhEp6fWTX8R/4rZ+5C7Ou3ihy4+RxC5piU2s=;
+	h=From:Subject:Date:To:Cc;
+	b=Vw0PQSv+m2sSzvQdhc4TDb0WDpr+01fCnuvdB15EljTpcaVG/CEZNCfXWJ18k5cbf
+	 rOM4RvQstU8ej522JYaq1Etl32edd5rr+086wK9VM4+aqaF6vTU8E0DOnalaNhx3jp
+	 CcAavN0ecOpT3H/9Kwb2ewJ4YT6rlPnWPja4eN2SjTMIWcZqBRxjkUXBb1FPlQvowP
+	 YqaOw6mAMGYokPf2fOJvcjbWayBJBot2697U53Tdxhj5oDq2rtGx9+FTuZw4c74g9o
+	 SpopHBJEYYTLBcS2C3NJvK9ARiG/g2czjvAYSwrTb5vuirgjpPYogCE+s7598wpTb0
+	 n+cNxWlsPznsg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Subject: [PATCH v20 0/8] rust: add `Ownable` trait and `Owned` type
+Date: Mon, 24 Aug 2026 13:17:52 +0200
+Message-Id: <20260824-unique-ref-v20-0-490735672187@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|PH8PR04MB8658:EE_
-X-MS-Office365-Filtering-Correlation-Id: 688c41f5-d234-474a-7821-08df01ce2b87
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|19092799006|366016|1800799024|376014|10067099003|56012099006|6133799003|22082099003|18002099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	EpbXSt7OuCntaVvdlhZRdOIvoWsU0j35mJ4w0C0Ywi0/sXpnCMpwa/30EwH5R0InCdVnq9dwKFRmMacLvjH+hYxit+k7WgwkSWt28l3z/xPROpXBQY11do1+K8zQgwX+1VuYFVJMhpPF3ZDGrxud1KIPIG9wYmvNik2VooVw37eiOLYgNMyPdYbpbUlKspy23m7pD6Ap7G3PXpmYo7mv6kQKzsOeYW2DPvrFnfa5Ny9eAXYaSFLUu1jGykI4lqAvXvQsyVjaGyJZoQa45Jj6XWDHGdszxLxtNK9tGjH7/vSeBhqLRPXzFqQT3aR1nFOnHY3JabVgfYxOsCm/WPn2vdK8RCifnYZru7IGIiw5vHo5S5WsEwv1n/Aw7+hOrWq/iZuoWh3p8EOb+1WsDp9ffzJlJ+H51DLDu3sMBq/83yAuu2eIsXNtyoGZUurSnnOoM2mtloiaD8UWXeTuX2WHX8ECsw4GIyKn+2xVJMVlb/BJYr8DaNIpcy/RUfXz39HZyV+LojFVHTGJMVpRMx0+kkFQBq4HLkBGDEeLi7/pDCdCnQZKowfXABvnDkzD+/oIomGlPtvdmlDjut3GRTW8gO+TnZ98XNbETvCvBhMK3N3c+fDCgadEpZPE3dfpksA+DGyRQD8LaEMEu9sbQhb902hEB5yjkdf9s0ufx5+v/Uw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(19092799006)(366016)(1800799024)(376014)(10067099003)(56012099006)(6133799003)(22082099003)(18002099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nSe5MDAuWIijaway4EEugQydZ8TvzujshVPciKMWhNSdeTAVIPAXH+Gr2/iG?=
- =?us-ascii?Q?xfVWudXNHOyDGnjBRC5TxV452iwYYAM9t6sgsJFqQgwraRJXxhXgLcbhjn82?=
- =?us-ascii?Q?Jw7qjYG7YuuaU2uqbaCm8HDtn7rCiACTwux58aorw11kLHQ8XL10pKqklROK?=
- =?us-ascii?Q?my2wp0b5x0/jCnv2VmTeOq4bXW3p4Z2olIPbDzuQ+Av+Kl4mrp6BZ1quwJSh?=
- =?us-ascii?Q?P5nZNVeZTQM6P4h/z7P36+j0+QGICnlitkqPSyTENDl9OMXSEXC3dH1OK67q?=
- =?us-ascii?Q?cHGibDBxA5g8fpD2K62MhoYzhumpnHacedizXYeX9vIlBz83LsyolniPrGoh?=
- =?us-ascii?Q?IfhkIksKNMBw8/oHCUVjjjMYOd9yvB0GM1Vlp745mlZ3MzwUMAOcShtJ4YSR?=
- =?us-ascii?Q?QV8yZdfVA67wyO//6Q9rrA271it3UY/+HTQ0/vDp/ETtqxCybq/vrww66gOF?=
- =?us-ascii?Q?DgrmUebeGZHEUD2A+72VJaeINmX1qNgHjs5R8/YmoU/4hOFh4N9QPhVsGjqF?=
- =?us-ascii?Q?Z0wfIugkX2n6+3sOz8Kd4DCfzpNKC0vTonUrNR8h9QhrWwGSTzn9dQfU6EOP?=
- =?us-ascii?Q?UYFQHCga+aQ9ueNpVKHOm6Ihu1OPLgpm/k+HnLdsJoBSbMwbGOr9K005PVbG?=
- =?us-ascii?Q?tISPA0y57RLHA+10qG35X/seZYN4u3VEzb3nhSQ4IU+WoabbF25ovGxi5HPn?=
- =?us-ascii?Q?ri+4tPff3tV+r+RlRwTdLNhhxgpeUp52jSuHSVpJZZvZ1sBQpBMo681If949?=
- =?us-ascii?Q?jq7xyrYkISkFRQwJwGi1F1iiQy+O9GHkgJLyK7kACjaXBUYeYsK4Z0Zl7Gdf?=
- =?us-ascii?Q?ewh3Usn9rRHTEOsIi9Q5BqWlpZVqa9lAptzKb9KsDQj7FQ5pfEMX5sY0HMX3?=
- =?us-ascii?Q?jMClsNIKvsCjM8E5Bk+7GMDGEBYsd93CpxLJndExfLhPKQsujvpi4oVfPJJe?=
- =?us-ascii?Q?Smx9RUzYMjqNHIw/YGOdEkq9ijsCrHu//UboxVW9/H3r/L5CtwK8ANOhHfCq?=
- =?us-ascii?Q?vjqIXZr6l2md5mnS3gw1hnpudEIOnIGZrtI1iYFAaMC7R3troPRYT2EGI9tM?=
- =?us-ascii?Q?dcK8cyZOdzuX9dV9yIKQsJ7NX5lOeRIiULAGtAj6q6inA4kmdLVoCToze2aX?=
- =?us-ascii?Q?v5JupbT91rgCD0aENiDBtgxTsyp2xOFKBf7zgQvMY+O1BFfY6d/WpoAt1k2A?=
- =?us-ascii?Q?AZUZzcBdA3hwhx+cEviz7yj5VrY1jAl5akuKF8a+WxsaM+dgwv32X4HusRCR?=
- =?us-ascii?Q?NSA5srAmdD2OFq0EPNp0tpyMZiOpWtNWYnImjSY1iq9Ck6DsLZ6WPYplknHS?=
- =?us-ascii?Q?QHe07/U/MrfmCDfgQ8GMCvhzm4qPJpXojLD5ua01TETQ6k1NHSLs8G+Mj783?=
- =?us-ascii?Q?DUmPBmnh3jmvyCT3fBtgwpmpNjOWvYLrU5BByEvs2+ovvSDiMm4kaHJ14KWB?=
- =?us-ascii?Q?KP3QYNZp/HHzhv6q5TlgtSw7lkpslqF5z3CkJJ4A7CFfJEUnU4LkO4TOgZUi?=
- =?us-ascii?Q?2axfa2sSAKP4rYtERedAMIjBDchCWUa97HNGzQBb1gG1TTKTrrM7yAms+QgX?=
- =?us-ascii?Q?KQLW/Tz0WaAFaUdU77WVB7B6YgfSECiF8rW2qxGtJURbtvN3Ga8k/LmZDP6x?=
- =?us-ascii?Q?/K2xsmmPgHI4u1f+vtinDrfaOVX9nbLUNYgtvd9j4rnGRmMPx5lUqTj4CPEW?=
- =?us-ascii?Q?nrHP2qLrYkBe8943YtopJXupx94IlH1Zn/icnSGkbLdIiUCjteRd+1lu3CTv?=
- =?us-ascii?Q?xRWn1tEGUrNOGxj1etvpNa0PTE71NEc=3D?=
-X-Exchange-RoutingPolicyChecked:
-	htwl7daicy+CY7R3GfIbDnz3XOBTNWiQqNzFuLWJwvxkEd8rI4XqY08kSjI3B+9w0p4mqJ0WT4mxvU/mJ0JeFt+J/n2t3aOuxSiKlIyZgLrJWLDAe4Hh7X9UFSnYPYMAeTbnF1GuuBzumwchms/wIvermOadsWygrItDEuGE8SFK2VhdhVd/j/CXxqwJyM9c/V3F6082GEuQz7jUlketWK6CWElwmXeA9xNnCyROqZ4XjKfWz+C+CqTQ16fBU7OMWn7dhNmp+j44zVioKZRTiP7n+bQizNiktd4tbPNzmRnc3DKF8awi1vLk3ZgEMnx1z5iEoNOFOlVAV31r1TFD+A==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	ebgqh/ijquOXaM3GE3PXTIjc26x6xdCw3/KKbo/x59h26EFC/63e9KgjybKk3nFNN/mNk9PTe7fm7GgPqyGeIAvPCgTO72BR5dALHbK7soUrmK6Mm9iEyxaWu6WEkiVMKQ2qW8EAoa17oKiFjUBUvaEvTvjYUQhQIp/Ix196T3UqetJNbmQ2Dw7WNpdAvTGah9bbkuhyRUD07DgQhXZYpmguYAfz85Z9NvPuWw+pHfVT03eA02ROIeQDS1vJAeW0pDg4VbxlQjk98sIKAFpxFuG8qtpFA68pFwKtmdIm9pFPHatxD8ncsj1k8KGe8OV5nl5srokvE43oO3fwZ6YBMjbkcWgxoFtJgXAogj1tvIxlxzxznRX3M7ckS4oM9pcGyo63r5DJQlM36Y17OAGABQt1hqJS92NZR9PN1FfrqCRtcR35k5St8WgC3vGRsQI4btttEw9jF4j7X1u2MQoQphVRlFsxI2KpzYdsPSz0OFamuiNMz+dBerMDo1/pGVxghWyofF/hBESAy4rWKMYzwb+NdS7d8Iq7Q/jgkk/15yTZFigBERAdDiTqPTM8OhMJGXb3uS1EMgSTGrXQrCZx0QhZh6fpNhg/fXw+DdQa56kIlfYQ8fvBdZ+Ndt8Q0J+Z
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 688c41f5-d234-474a-7821-08df01ce2b87
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2026 10:55:11.5992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FCjjK3vaM+JL2UZ0J9ZClZL1xj6iF3O4c+KtSylMHlqoo3l/8NGFoSkCz6m/bo4ABIdZj2J9Y8N6fw2MVDMTWhMNxJC0QgAhpCkgdXbJ5Q4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR04MB8658
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAGAojGoC/2XOPW7DMAwF4KsEmquC+pc69R5BBkuiEqGFncqN0
+ SLw3UtnqR2PfMT3yDsbsVUc2dvhzhpOdaxDT4OElwNLl64/I6+ZAiZBGlBg+K2vXzfkDQuXoaR
+ snSkBAyNwpbD+PNqOJ5ovdfwe2u+jfBJ6iZceCxL0uod2HLhwKcqAsUsxvn9g6/HzdWhntjRNw
+ qy0hK02pH1QmL2NYFPaa7vWT7ct6SRFV1IUwme11+5f2+fPHWkXdVJZBgUx7LVfaWm22pPWCDY
+ aH2zWbq/DWtutDqQpd6nzPpdcNnqe5z8COcD13gEAAA==
+X-Change-ID: 20250305-unique-ref-29fcd675f9e9
+To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+ Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, 
+ Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+ Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Lyude Paul <lyude@redhat.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, 
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+ Carlos Llamas <cmllamas@google.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+ Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, 
+ Nishanth Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, 
+ Michal Wilczynski <m.wilczynski@samsung.com>, Ira Weiny <iweiny@kernel.org>, 
+ Ira Weiny <iweiny@kernel.org>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, 
+ Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+ driver-core@lists.linux.dev, linux-block@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
+ linux-usb@vger.kernel.org, Asahi Lina <lina+kernel@asahilina.net>, 
+ Oliver Mangold <oliver.mangold@pm.me>, 
+ Viresh Kumar <viresh.kumar@linaro.org>, Boqun Feng <boqun@kernel.org>, 
+ Asahi Lina <lina+kernel@asahilina.net>, 
+ Igor Korotin <igor.korotin@linux.dev>, 
+ Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12294;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=FqNgKrXDIDlNBJAVOF/eN4RowgtxLQyzOYJqyvOoOPA=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqjChsf8CMKbtoVQ11KhWy3uKfRya4/CJC7zafO
+ zeTkhrgEwiJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaowobAAKCRD6UCkIqsW9
+ 0BIXD/4/h22+gOTb1sZHiEYU947FTv3rFPNwyrNF4963NKrXxxhP6qYXQjZs1ypmmhbM/oTCtFD
+ BAP71XODOpghHN2mb17Z/0OX4r1AN0uOKpDbmZSK3HfZYEYGWURO7Sc5Rj2KUSJ8uAzDFWAynVK
+ eKcMb/AfqyvnatdFGv3vxWvx7108a5vSISch1AxfACDfx8Kd0tT7Rc0wPZtN/jvOSHUVEXORNAP
+ IvMutAiF5X6KUuQw0XkxNh1y7uP3ezQ7zc2pvPxmJSrXBLL0h46O9WUiK72DnfHhlX6mk+T5rQs
+ P235JkLHBM/zu7iSnyAFSyXOOytkjWlJIB4bn6M5t3dSfqN9nndZCV4md1AytCMy9BnUwpnJ6h8
+ 5OHmWRYxqtv0AJCBKG8+nlPoIAQfCgqSkDXN8C8omy0AChQVOReNsgF1+4uoknuA3/yzqfGN9Ki
+ reEcMZuZq8q6dVCFaw3gsrBPdlWKKR2uMHTCFhB4yD0c4q680X4D2uGszzk1AUltO/yy6CrthMX
+ sqy+/Mw4U/5vx07ZLK4fxN2W0RMNoOhUjCosJI4xE3qFCJelKVHmEm5ktciDlZ2gXgP8yuTjeEh
+ nikWM5q1evHTccgrTLzlouSMTQHNwnVVvHWHqvUWTpkkU2Rd8HUd2BrUP7qhbqziwkOrcjgeM8q
+ XogP2ZfLfiTfAqA==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-On Aug 20, 2026 / 13:00, Bart Van Assche wrote:
-> Add a new loop driver test that verifies that attempting to set the
-> backing file of a loop device to a file located on a filesystem on one of
-> the same loop device's partitions fails as expected by triggering the
-> kernel function loop_validate_file().
-> 
-> Modify src/loop_change_fd.c to accept a -r option to open the loop device
-> and backing file in read-only mode (O_RDONLY).
-> 
-> The test performs the following steps:
-> - Create a 1 GB image file ($TMPDIR/img).
-> - Instantiate a loop device for the image file with partition scanning
->   enabled.
-> - Create two partitions of equal size on that loop device.
-> - Format the second partition with the ext4 filesystem and mount it.
-> - Create a 1 GB file on the mounted filesystem.
-> - Unmount the filesystem, detach the loop device, and re-instantiate it in
->   read-only mode.
-> - Mount the partition read-only.
-> - Use src/loop_change_fd -r to attempt to change the backing file
->   descriptor of the loop device to the file on its own partition via
->   LOOP_CHANGE_FD, and verify that loop_validate_file() rejects it.
-> - Clean up by unmounting the filesystem and detaching the loop device.
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Add a new trait `Ownable` and type `Owned` for types that specify their
+own way of performing allocation and destruction. This is useful for
+types from the C side.
 
-Thanks for the patch. Overall, it looks good to me. I ran the test using the
-kernel at the current Linus master branch tip, and confirmed the test case
-recreates the failrue, and the kernel side fix patch avoids the failure [1].
-Good.
+Implement `ForeignOwnable` for `Owned`.
 
-[1] https://lore.kernel.org/linux-block/0c8a65b8870b2ef09119093b485e37896b80e2a4.1787255652.git.bvanassche@acm.org/
+Convert `Page` to be `Ownable` and add a `from_raw` method.
 
-Please find two nit comments in line below. They are not a big deal. If you
-want, I can fold-in the changes when I apply this patch after the kernel side
-fix get upstreamed.
+Add the trait `OwnableRefCounted` that allows conversion between
+`ARef` and `Owned`. This is analogous to conversion between `Arc` and
+`UniqueArc`.
 
-> diff --git a/tests/loop/014 b/tests/loop/014
-> new file mode 100755
-> index 000000000000..5814b8148a26
-> --- /dev/null
-> +++ b/tests/loop/014
-> @@ -0,0 +1,107 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2026 Google LLC
-> +#
-> +# Verify that attempting to change a loop device's backing file (via
-> +# LOOP_CHANGE_FD) to a file on a filesystem residing on one of its own
-> +# partitions triggers the kernel function loop_validate_file() and fails.
+Patches 1-4 implement `Ownable` and applies it to `Page`. These patches
+can be merged on their own.
 
-I think the kernel side fix commit should be mentioned here.
+Patches 5-7 add `Ownable` -> `ARef` interop and can be merged later if
+consensus on their shape cannot be reached.
 
-> +
-> +. tests/loop/rc
-> +
-> +DESCRIPTION="trigger loop_validate_file() when changing backing file to own partition"
-> +QUICK=1
-> +
-> +loop_device=
-> +mount_dir=
-> +
-> +requires() {
-> +	_have_program mkfs.ext4
-> +	_have_program parted
-> +	_have_src_program loop_change_fd
-> +}
-> +
-> +cleanup() {
-> +	if [[ -n "$mount_dir" ]]; then
-> +		umount "$mount_dir" &>/dev/null
-> +	fi
-> +	if [[ -n "$loop_device" ]]; then
-> +		losetup --detach "$loop_device" &>/dev/null
-> +	fi
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +	_register_test_cleanup cleanup
-> +
-> +	mount_dir="$TMPDIR/mnt"
-> +
-> +	truncate -s 1G "$TMPDIR/img"
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+Changes in v20:
+- Fix a few copy/paste errors in safety comments (Sashiko).
+- Use `self.page.get()` rather than `Opaque::cast_into` (Alice).
+- Add a space between generics in a comment (Sashiko).
+- Change a safety comment to reference Box rather than KBox (Sashiko).
+- Link to v19: https://msgid.link/20260626-unique-ref-v19-0-2607ca88dfdf@kernel.org
 
-Nit: I suggest the long option "--size=1G" instead of the short option "-s 1G".
-     Same for mkdir -p option and mount -t option.
+Changes in v19:
+- Update `workqueue.rs` and the `aref` module docs to use `RefCounted` instead of `AlwaysRefCounted` (Sashiko).
+- Remove the default `OwnableRefCounted::into_shared` implementation to keep the trait safe (Sashiko).
+- Fix the `ARef<Self>` rustdoc link (Sashiko).
+- Reuse `Owned::into_raw`/`from_raw` in the `ForeignOwnable` implementation (Gary).
+- Link to v18: https://msgid.link/20260625-unique-ref-v18-0-4e06b5896d47@kernel.org
+
+Changes in v18:
+- Rebase on `rust-next` (2026-06-24).
+- Drop the `'static` bound on `ForeignOwnable for Owned` (Gary).
+- Make `Ownable::release` take a raw pointer instead of `&mut self` (Alice, Sashiko).
+- Drop `types::ARef` re-export (Alice).
+- Drop unneeded `#[repr(transparent)]` on `Owned` (Gary).
+- Fix `FOREIGN_ALIGN` for `Owned` to report the pointee alignment (Sashiko).
+- Remove `BorrowedPage`; use `&Page` directly (Alice).
+- Update Rust Binder for the `Owned<Page>` conversion (Alice).
+- Update `pwm.rs` for the `RefCounted`/`AlwaysRefCounted` split (Sashiko).
+- Fix documentation nits: missing `// INVARIANT:` comments, stale `Page` docs, and a stray `mut` (Sashiko).
+- Expand the `use` statements touched by the rename patch to the multi-line style (Onur).
+- Link to v17: https://msgid.link/20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org
+
+Changes in v17:
+- Rebase on v7.1-rc2.
+- Reorder patches so that `Ownable` can merge without `OwnableRefCounted` (Alice).
+- Add `#[inline]` directives to short functions added by the series (Gary).
+- Link to v16: https://msgid.link/20260224-unique-ref-v16-0-c21afcb118d3@kernel.org
+
+Changes in v16:
+- Simplify pointer to reference cast in `Page::from_raw`.
+- Use `NonNull<Page>` rather than `Owned<Page>` for `BorrowedPage` internals.
+- Use "convertible to reference" wording when converting pointers to references.
+- Fix formatting for `Page::from_raw` docs.
+- Leave imports alone when adding safety comment to aref example.
+- Use `KBox::into_nonnull` for examples.
+- Add patch for `KBox::into_nonnull`.
+- Change invariants and safety comments of `Ownable` and make the trait safe.
+- Make `Ownable::release` take a mutable reference.
+- Fix error handling in example for `Ownable`
+- Link to v15: https://msgid.link/20260220-unique-ref-v15-0-893ed86b06cc@kernel.org
+
+Changes in v15:
+- Update series with original SoB's.
+- Rename `AlwaysRefCounted` in `kernel::usb`.
+- Rename `Owned::get_pin_mut` to `Owned::as_pin_mut`.
+- Link to v14: https://msgid.link/20260204-unique-ref-v14-0-17cb29ebacbb@kernel.org
+
+Changes in v14:
+- Rebase on v6.19-rc7.
+- Rewrite cover letter.
+- Update documentation and safety comments based on v13 feedback.
+- Update commit messages.
+- Reorder implementation blocks in owned.rs.
+- Update example in owned.rs to use try operator rather than `expect`.
+- Reformat use statements.
+- Add patch: rust: page: convert to `Ownable`.
+- Add patch: rust: implement `ForeignOwnable` for `Owned`.
+- Add patch: rust: page: add `from_raw()`.
+- Link to v13: https://lore.kernel.org/r/20251117-unique-ref-v13-0-b5b243df1250@pm.me
+
+Changes in v13:
+- Rebase onto v6.18-rc1 (Andreas's work).
+- Documentation and style fixes contributed by Andreas
+- Link to v12: https://lore.kernel.org/r/20251001-unique-ref-v12-0-fa5c31f0c0c4@pm.me
+
+Changes in v12:
+-
+- Rebase onto v6.17-rc1 (Andreas's work).
+- moved kernel/types/ownable.rs to kernel/owned.rs
+- Drop OwnableMut, make DerefMut depend on Unpin instead. I understood
+  ML discussion as that being okay, but probably needs further scrunity.
+- Lots of more documentation changes suggested by reviewers.
+- Usage example for Ownable/Owned.
+- Link to v11: https://lore.kernel.org/r/20250618-unique-ref-v11-0-49eadcdc0aa6@pm.me
+
+Changes in v11:
+- Rework of documentation. I tried to honor all requests for changes "in
+  spirit" plus some clearifications and corrections of my own.
+- Dropping `SimpleOwnedRefCounted` by request from Alice, as it creates a
+  potentially problematic blanket implementation (which a derive macro that
+  could be created later would not have).
+- Dropping Miguel's "kbuild: provide `RUSTC_HAS_DO_NOT_RECOMMEND` symbol"
+  patch, as it is not needed anymore after dropping `SimpleOwnedRefCounted`.
+  (I can add it again, if it is considered useful anyway).
+- Link to v10: https://lore.kernel.org/r/20250502-unique-ref-v10-0-25de64c0307f@pm.me
+
+Changes in v10:
+- Moved kernel/ownable.rs to kernel/types/ownable.rs
+- Fixes in documentation / comments as suggested by Andreas Hindborg
+- Added Reviewed-by comment for Andreas Hindborg
+- Fix rustfmt of pid_namespace.rs
+- Link to v9: https://lore.kernel.org/r/20250325-unique-ref-v9-0-e91618c1de26@pm.me
+
+Changes in v9:
+- Rebase onto v6.14-rc7
+- Move Ownable/OwnedRefCounted/Ownable, etc., into separate module
+- Documentation fixes to Ownable/OwnableMut/OwnableRefCounted
+- Add missing SAFETY documentation to ARef example
+- Link to v8: https://lore.kernel.org/r/20250313-unique-ref-v8-0-3082ffc67a31@pm.me
+
+Changes in v8:
+- Fix Co-developed-by and Suggested-by tags as suggested by Miguel and Boqun
+- Some small documentation fixes in Owned/Ownable patch
+- removing redundant trait constraint on DerefMut for Owned as suggested by Boqun Feng
+- make SimpleOwnedRefCounted no longer implement RefCounted as suggested by Boqun Feng
+- documentation for RefCounted as suggested by Boqun Feng
+- Link to v7: https://lore.kernel.org/r/20250310-unique-ref-v7-0-4caddb78aa05@pm.me
+
+Changes in v7:
+- Squash patch to make Owned::from_raw/into_raw public into parent
+- Added Signed-off-by to other people's commits
+- Link to v6: https://lore.kernel.org/r/20250310-unique-ref-v6-0-1ff53558617e@pm.me
+
+Changes in v6:
+- Changed comments/formatting as suggested by Miguel Ojeda
+- Included and used new config flag RUSTC_HAS_DO_NOT_RECOMMEND,
+  thus no changes to types.rs will be needed when the attribute
+  becomes available.
+- Fixed commit message for Owned patch.
+- Link to v5: https://lore.kernel.org/r/20250307-unique-ref-v5-0-bffeb633277e@pm.me
+
+Changes in v5:
+- Rebase the whole thing on top of the Ownable/Owned traits by Asahi Lina.
+- Rename AlwaysRefCounted to RefCounted and make AlwaysRefCounted a
+  marker trait instead to allow to obtain an ARef<T> from an &T,
+  which (as Alice pointed out) is unsound when combined with UniqueRef/Owned.
+- Change the Trait design and naming to implement this feature,
+  UniqueRef/UniqueRefCounted is dropped in favor of Ownable/Owned and
+  OwnableRefCounted is used to provide the functions to convert
+  between Owned and ARef.
+- Link to v4: https://lore.kernel.org/r/20250305-unique-ref-v4-1-a8fdef7b1c2c@pm.me
+
+Changes in v4:
+- Just a minor change in naming by request from Andreas Hindborg,
+  try_shared_to_unique() -> try_from_shared(),
+  unique_to_shared() -> into_shared(),
+  which is more in line with standard Rust naming conventions.
+- Link to v3: https://lore.kernel.org/r/Z8Wuud2UQX6Yukyr@mango
+
+To: Danilo Krummrich <dakr@kernel.org>
+To: Lorenzo Stoakes <ljs@kernel.org>
+To: Vlastimil Babka <vbabka@kernel.org>
+To: "Liam R. Howlett" <liam@infradead.org>
+To: Uladzislau Rezki <urezki@gmail.com>
+To: Miguel Ojeda <ojeda@kernel.org>
+To: Boqun Feng <boqun@kernel.org>
+To: Gary Guo <gary@garyguo.net>
+To: Björn Roy Baron <bjorn3_gh@protonmail.com>
+To: Benno Lossin <lossin@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+To: Trevor Gross <tmgross@umich.edu>
+To: Daniel Almeida <daniel.almeida@collabora.com>
+To: Tamir Duberstein <tamird@kernel.org>
+To: Alexandre Courbot <acourbot@nvidia.com>
+To: Onur Özkan <work@onurozkan.dev>
+To: Lyude Paul <lyude@redhat.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Arve Hjønnevåg <arve@android.com>
+To: Todd Kjos <tkjos@android.com>
+To: Christian Brauner <brauner@kernel.org>
+To: Carlos Llamas <cmllamas@google.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+To: Dave Ertman <david.m.ertman@intel.com>
+To: Ira Weiny <ira.weiny@intel.com>
+To: Leon Romanovsky <leon@kernel.org>
+To: Paul Moore <paul@paul-moore.com>
+To: Serge Hallyn <sergeh@kernel.org>
+To: David Airlie <airlied@gmail.com>
+To: Simona Vetter <simona@ffwll.ch>
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+To: Jan Kara <jack@suse.cz>
+To: Igor Korotin <igor.korotin@linux.dev>
+To: Viresh Kumar <vireshk@kernel.org>
+To: Nishanth Menon <nm@ti.com>
+To: Stephen Boyd <sboyd@kernel.org>
+To: Bjorn Helgaas <bhelgaas@google.com>
+To: Krzysztof Wilczyński <kwilczynski@kernel.org>
+To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+To: Michal Wilczynski <m.wilczynski@samsung.com>
+To: Ira Weiny <iweiny@kernel.org>
+Cc: Philipp Stanner <phasta@kernel.org>
+Cc: rust-for-linux@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: driver-core@lists.linux.dev
+Cc: linux-block@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-pm@vger.kernel.org
+Cc: linux-pci@vger.kernel.org
+Cc: linux-pwm@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+
+---
+Andreas Hindborg (3):
+      rust: alloc: add `KBox::into_non_null`
+      rust: implement `ForeignOwnable` for `Owned`
+      rust: page: add `from_raw()`
+
+Asahi Lina (2):
+      rust: types: Add Ownable/Owned types
+      rust: page: convert to `Ownable`
+
+Oliver Mangold (3):
+      rust: rename `AlwaysRefCounted` to `RefCounted`.
+      rust: Add missing SAFETY documentation for `ARef` example
+      rust: Add `OwnableRefCounted`
+
+ drivers/android/binder/page_range.rs |  10 +-
+ rust/kernel/alloc/allocator.rs       |  19 +-
+ rust/kernel/alloc/allocator/iter.rs  |   6 +-
+ rust/kernel/alloc/kbox.rs            |   9 +
+ rust/kernel/auxiliary.rs             |  10 +-
+ rust/kernel/block/mq/request.rs      |  19 +-
+ rust/kernel/cred.rs                  |  16 +-
+ rust/kernel/device.rs                |  12 +-
+ rust/kernel/device/property.rs       |  11 +-
+ rust/kernel/drm/device.rs            |   9 +-
+ rust/kernel/drm/gem/mod.rs           |  16 +-
+ rust/kernel/fs/file.rs               |  23 ++-
+ rust/kernel/i2c.rs                   |  13 +-
+ rust/kernel/lib.rs                   |   1 +
+ rust/kernel/mm.rs                    |  22 ++-
+ rust/kernel/mm/mmput_async.rs        |  12 +-
+ rust/kernel/opp.rs                   |  16 +-
+ rust/kernel/owned.rs                 | 373 +++++++++++++++++++++++++++++++++++
+ rust/kernel/page.rs                  | 136 +++++--------
+ rust/kernel/pci.rs                   |  10 +-
+ rust/kernel/pid_namespace.rs         |  15 +-
+ rust/kernel/platform.rs              |  10 +-
+ rust/kernel/pwm.rs                   |  12 +-
+ rust/kernel/sync/aref.rs             |  84 +++++---
+ rust/kernel/task.rs                  |  13 +-
+ rust/kernel/types.rs                 |  12 ++
+ rust/kernel/usb.rs                   |  17 +-
+ rust/kernel/workqueue.rs             |   8 +-
+ 28 files changed, 728 insertions(+), 186 deletions(-)
+---
+base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+change-id: 20250305-unique-ref-29fcd675f9e9
+
+Best regards,
+--  
+Andreas Hindborg <a.hindborg@kernel.org>
+
+
