@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5986E25C804;
-	Mon, 24 Aug 2026 11:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E796A3F58E5;
+	Mon, 24 Aug 2026 11:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787570379; cv=none; b=PpUWCL3BJyRp5ufGGeIPhK6qYsYHhY/UKWybf4gDpjjOsDLKcQqBB8fvcgUGriUKVUj12DvbBiBiXVBQMThMIvVssuPE56B+8k868IC7E5dDj7CG9ZXTpmrnVwc6J4/oyLaGjOTLIvBdx5HCLUCcMq6IMg5phD4MMAemqLor8Ew=
+	t=1787570391; cv=none; b=DsaMFlfin5rB2o1yWgwjOVA5FkWSsfn17nLjoRnWK5K9z6/6fAchZDf/gasIotYKvVKT082RxsBXmO8zi7dqpfdOY3C4EpzIi6V/ihqSHa579zq/us6DGB4Jp0oU5Vg5IfVhlhOb8HM2IDFVDKnlrg53Ka2VgiEUnt5USMzQWdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787570379; c=relaxed/simple;
-	bh=2rKgaZ9YnwK1gJkiYXVWR75zXX3xU5rSz64pVhI43qg=;
+	s=arc-20240116; t=1787570391; c=relaxed/simple;
+	bh=IbxkR2S/sT5Qax06n21WRzHYxlna6pgSwprDnFizzhw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L9WHWOI8PNkVQby9DNhOleJ+ZK3O9j347yOATm3YYOIlDJJvHjbGP5jZ611GYvBoOEF2lL5pGJ9HMtqtmpQ2SkzCf6/rUHAXAiWX2eHhQNvxb9WgFY4+2bX5Wuoe0MVWVogb3WWoT9rBJ7lpULzhFxW8F9NR/qIrdjJnO5mrCQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4gAMO5B; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=hma10a0iNfQe52Mkz2L6xaYM5FURVRJxeLsVxn+0C/yaSzC1bYjxD9Ezc4nrn2L+4ZjhTGIS/6it0dqg2s6HOOeVP2MxcdA8C1B6MKz0vy+hdRHK3hZk7OLw2YQd+perBIASYhQUmlIyqGpSu22d6SztiExnfEX5MBRlwD79xDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cvBIFLRA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4gAMO5B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CACAD1F000E9;
-	Mon, 24 Aug 2026 11:19:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvBIFLRA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D12E71F00A3D;
+	Mon, 24 Aug 2026 11:19:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787570378;
-	bh=FUl4cpxwoEAMk39ePpTbKQbCsCUQnhH3/2ILTsycWVk=;
+	s=k20260515; t=1787570389;
+	bh=vL9knM2sUgbCQ85ffU5z6/s6VECuwJ6C1a0TUUfpb00=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=k4gAMO5BvwRCt6he2XnMfQcxhipMLBwDNolB13eUen1E2wn7fAu3MBJqkfNdJr30p
-	 KtBtxAdupxFiZDW1l3khlIZo5i166WHgK9Pn+A7sa/vSe0+LeDbm8p0/efMQ/maOqb
-	 hFezxfgre2Rzvka0kHj7n6QCtLOkxvS1Bhg8inibr4T+JjjYrvDkZMTqYAfmi3k8j6
-	 4oZ3KfuTIluGjYRLDL3kpp5vQXxd0TrKsfEdrDg/46DEbmuJqIMh5WqnKUbNs6hYOp
-	 zCXrqyY2xBjvOlklJqNgAt31S5TnrB+Usy8srISghFadNqdqLbUUZaoejrbb6VneEk
-	 HBGz5hSJfgoxA==
+	b=cvBIFLRAcda2SZw/JlrD6tOLwNfKcnVd5E0WZoutY+y8hwmHZ/O/6Ev8gSNNOk796
+	 R9vzEKuzdU0JQlwzbt/QCuq/vSRRoGFOgPbM7S8qMbmJ31pomA9Bx0DwWWtdXzPlcJ
+	 bjqOkSYxUEiNaBuOeH/wCMIyUw00fVSUWBMUKNuSXr6xs7IYK90q3cYemRq+iSN3Lp
+	 5axDKiwZnhzf+2oCzUZiWtQn6Kack0hljwkugFf8B+PubZOZIRefgqHcsw1k1iK5TA
+	 pDNaW/raJJsv5Pm3utpa3a0gclsIoz8iz81EkexgcN3hfv/tI6cRuS9m/tkdjkhWCO
+	 XETF1EOKtNWPw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 24 Aug 2026 13:17:55 +0200
-Subject: [PATCH v20 3/8] rust: implement `ForeignOwnable` for `Owned`
+Date: Mon, 24 Aug 2026 13:17:58 +0200
+Subject: [PATCH v20 6/8] rust: Add missing SAFETY documentation for `ARef`
+ example
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260824-unique-ref-v20-3-490735672187@kernel.org>
+Message-Id: <20260824-unique-ref-v20-6-490735672187@kernel.org>
 References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
 In-Reply-To: <20260824-unique-ref-v20-0-490735672187@kernel.org>
 To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
@@ -75,103 +76,61 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>,
  linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
  linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
  linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
- linux-usb@vger.kernel.org
+ linux-usb@vger.kernel.org, Oliver Mangold <oliver.mangold@pm.me>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2774; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=2rKgaZ9YnwK1gJkiYXVWR75zXX3xU5rSz64pVhI43qg=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqjCiCraxhcJ+w4vvZV1SY4iZnHh7vyhYoBDHKn
- QKMW9sWhP+JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaowoggAKCRD6UCkIqsW9
- 0B6WD/96ff4wxEK2+JhzJICtEMa7fDp5dNRnYJUPIXjrv2eWMvj/7PONFiDRsfxAKSkZRZMmnB9
- O8A0AaNhAuNv8rwfY1LPeVRWoOiCTsp1FtojPmOmZ8dURwpe5dEv+/YqdstPb2rvHEig/phd/z5
- NCWuo+l2Xrvz1UlV0ptcV1qvzkuHDDb9C4gdkt8O/or/0CzdFXUOvC7/ur8ccqxXbWjF2IbURHF
- oMHferZlysAgx2DAbuQvX83sEfBBqNF5bRU5mfV6ggL3IrKaybaJfh68KWrqtqIZilPrQvRgBap
- OWErwdXMZDQeb577fnBxvQw4QdwJmJ5yw/Wpv1USJjvFeaUoYn8NTL4nDhOIyv2k2J1f5a23npA
- PFFqRK9rTt1ZeDkkXVMwlw31/NUmu10MiiyLigWpyvfNrLfhNrDQ3QPxLtst2VmNQPIwlQgJTDi
- 4lgouA4IUoJ1/4cU8GMhSBGKiZYBLOZpa7FRvBOSz7fsmYljgCaD7lv30wlzIsMNnyBs7iXj5qU
- HUf5FqukUr9Mb/8kinmk7pIsCIaUEtRk9+rP7VO7tiZAbTp5Sn7fHOELtHTTWMLaNvbvqC0tYjT
- RMDYuRxK7Mjj/sV7REuFDiPZVGd5wZseUkzphLtK8XVVo0kHdyhHjWzqqaR0WCiSV7grNLz1RdX
- m9njpTvrY5w7MyA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1545; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Ze2x5FAumXdrYYXBmcLdm4zoQ8i0F4uXb1KFrUnACjQ=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqjCiF6dh93QL76FsS3p7E0fXhPzyq7P6N7DBZg
+ tiDSEuYy0eJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaowohQAKCRD6UCkIqsW9
+ 0EkxD/0XM2c5th1h+pGWV6+q9sYgp81vNSAgToV6NWXab5X9Q41O3etvl4v1UKRuRknTeiCNln7
+ bdnWb7sf1ddcFR8ctDx7tKS1lyYDHeUT/VJzXWcKqQXtyaCjA+VBSZB++jWxz4eN3rfSR7GGLa/
+ PYUcrMQb3iNL7Fevrhvf4Tyj3IpFO95jaD1CNRpzQhqi5LFH+Dytg5TPMQLqIumEu4c8+b4t4UN
+ eaR+Mvh/nBqPnjt/+0gfZGf9l1GN2VaOKj0BS0ubxibuJizarHIvv+PrZp3iwViSVF+h/SDC7rD
+ 1ENtCS0a3zosJOc6hENkAzE5dI5c0eOBNs/pTaL+DicoOuNfO+FfTdMUCcuU/hKQ4XUEYrtPAcQ
+ 2favBhHsZtH/gFr3Yjp19Vim0e/AiN3wVfmUHOHyinDd6vKgAoQEoZSvoDS20gDM58r1hMtN7Nc
+ nbYGLRNRRz35IroNM4ReUJZ1u9Jg0MbwAhOQufvDKBPYsqUOoEwdLJyCZnnIZ29b2UQnr/Vzh8Z
+ 7YPxMftrFJ5plKtEN0l9k4/KUzmhXfm+Le1zc1Lu74+OJHSl69zrN8kJFSPgCIqgPm5T5BL3/8n
+ hsRCDyVeRiNXPfeq/4NxDWzlzJzTQbtE7XvlK3N9hl98xNr/tfa9Qfk8IyEcKJwFzzffLjXpFIR
+ X6nSbfz4HsnxrIA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
-places such as the `XArray`.
+From: Oliver Mangold <oliver.mangold@pm.me>
 
-Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
-implement `ForeignOwnable`.
+SAFETY comment in rustdoc example was just 'TODO'. Fixed.
 
+Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-Reviewed-by: Gary Guo <gary@garyguo.net>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 ---
- rust/kernel/owned.rs | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ rust/kernel/sync/aref.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
-index 7fe9ec3e55126..93a5dfcc1e6f5 100644
---- a/rust/kernel/owned.rs
-+++ b/rust/kernel/owned.rs
-@@ -15,6 +15,8 @@
-     ptr::NonNull, //
- };
- 
-+use kernel::types::ForeignOwnable;
-+
- /// Types that specify their own way of performing allocation and destruction. Typically, this trait
- /// is implemented on types from the C side.
- ///
-@@ -186,3 +188,51 @@ fn drop(&mut self) {
-         unsafe { T::release(self.ptr) };
-     }
- }
-+
-+// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
-+// pointer satisfy alignment requirements of `T`.
-+unsafe impl<T: Ownable> ForeignOwnable for Owned<T> {
-+    const FOREIGN_ALIGN: usize = core::mem::align_of::<T>();
-+
-+    type Borrowed<'a>
-+        = &'a T
-+    where
-+        Self: 'a;
-+    type BorrowedMut<'a>
-+        = Pin<&'a mut T>
-+    where
-+        Self: 'a;
-+
-+    #[inline]
-+    fn into_foreign(self) -> *mut kernel::ffi::c_void {
-+        Owned::into_raw(self).as_ptr().cast()
-+    }
-+
-+    #[inline]
-+    unsafe fn from_foreign(ptr: *mut kernel::ffi::c_void) -> Self {
-+        // SAFETY: By function safety contract, `ptr` came from `into_foreign` and cannot be null.
-+        let ptr = unsafe { NonNull::new_unchecked(ptr.cast()) };
-+
-+        // SAFETY: By the function safety contract, `ptr` was returned by `into_foreign`, which gave
-+        // up exclusive ownership of a valid, pinned `T`; we retake that ownership here.
-+        unsafe { Owned::from_raw(ptr) }
-+    }
-+
-+    #[inline]
-+    unsafe fn borrow<'a>(ptr: *mut kernel::ffi::c_void) -> Self::Borrowed<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // reference for `'a`.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    #[inline]
-+    unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // unique reference for `'a`.
-+        let inner = unsafe { &mut *ptr.cast() };
-+
-+        // SAFETY: We never move out of inner, and we do not hand out mutable
-+        // references when `T: !Unpin`.
-+        unsafe { Pin::new_unchecked(inner) }
-+    }
-+}
+diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
+index ea5a16b8163a6..f26ca39b84d0d 100644
+--- a/rust/kernel/sync/aref.rs
++++ b/rust/kernel/sync/aref.rs
+@@ -142,7 +142,9 @@ pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
+     ///
+     /// struct Empty {}
+     ///
+-    /// # // SAFETY: TODO.
++    /// // SAFETY: The `RefCounted` implementation for `Empty` does not count references and never
++    /// // frees the underlying object. Thus we can act as owning an increment on the refcount for
++    /// // the object that we pass to the newly created `ARef`.
+     /// unsafe impl RefCounted for Empty {
+     ///     fn inc_ref(&self) {}
+     ///     unsafe fn dec_ref(_obj: NonNull<Self>) {}
+@@ -150,7 +152,7 @@ pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
+     ///
+     /// let mut data = Empty {};
+     /// let ptr = NonNull::<Empty>::new(&mut data).unwrap();
+-    /// # // SAFETY: TODO.
++    /// // SAFETY: We keep `data` around longer than the `ARef`.
+     /// let data_ref: ARef<Empty> = unsafe { ARef::from_raw(ptr) };
+     /// let raw_ptr: NonNull<Empty> = ARef::into_raw(data_ref);
+     ///
 
 -- 
 2.51.2
