@@ -1,142 +1,83 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBBA38839D
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 19:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787599998; cv=pass; b=q8kEqjIrdw/egVgbSmnS3Um16Salk7j53rYT2q37io7guDvzcVKG2LnpLtwDLfj3P/N6grFllX5BtyRE+sQSOa+PnUhQiCbUkT2XHRmATk13/1uD2PPprQY0Mj0VQK6dE9zw++hnVGGA4LYbijt9dYcLbRQ5UUKjF+An1bURYRI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787599998; c=relaxed/simple;
-	bh=6nzgFXxKsg+JnpSIQP0/wxVzDkLsa2CzNa+jLf/mGAU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EgkWmaYUnLs2EOjdDogpXXgXYXehYBI1w7wX2BOX9J7qe1MmQbawJKb2ZVxusD1O+7oyVC6p4Ls0/pdbLHYzqmfY/WbYQWRJFmFrk3c7+u5TyTl5HvW3P+ScNuTrbwp65Y/NnIjx4s0oMQWI0V60m1ZE0z/YI9LKUq1yC62z+8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=rWbvmCWm; arc=pass smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD22DBF75
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 20:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787603000; cv=none; b=ddEbA1disiGAgLE3mhO4+fs0L/AsvvqW/C1P2iskjpcJSZkI6M9eTmJL99vz4akgWI29q79bcuJS7L2gXq7Ht1TffGa0cOR2xxYe7DyfVJLo9aMCZsVSKVWnv8Kqv7A5aFGHS7sNg30q+8jmaFUrI+9y3BKnbDnwSdsmmP/xmqY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787603000; c=relaxed/simple;
+	bh=uqnlMNYmvVD5jKt/b0HPvHdkFFbsTC1QZsSbr2wkccY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uCK+vXPv/AWzNRDw4Ew+RrkoKCiuVjOTP3LnPVO0819TH54lep7A4c0pA8Aw9Nvq38MYm9CNs+aYwkhU5Z9k3hVdA0OFFckq2H2VacQ9d4J4S05vZDnwA31UjXCNaOWuD/9muwT3OLfnN0B/akKBr8gGlpWtqHHzc19NXZbsOLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=b5c1syLO; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="rWbvmCWm"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-52cd38ddcdfso22513751cf.3
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 12:33:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787599996; cv=none;
-        d=google.com; s=arc-20260327;
-        b=dd6TS/Pmr0i8Qha0PkqsLkhhIomeTwr3sFgpl/d822aN2x/ACpgGHyVD5YHidwBP/4
-         7J/WDkf9h5Ldn2VDIrfEqFNlaUBE7LlI4ILGWcnYOYZSc+QJG32Q9Pc5QVpYDXOynAUQ
-         6l5Qqz0csa4EIyfAW1w07QsaYGLMYi4UqxaFOb7fNwbEdT/axRhzj4UhHxU7LiteoZ8D
-         4WDdc3hKdxlB9Js13GCbEqwNVXG/K4tEvdeWflY/hBCx5bTnFhq59FBIfI+8lHNDgRvH
-         YlgtMAnqMF8K7othT/uem5SEN0SyzQ5EqVoCtehIR66f5Z2LBG1C5VTpWLQ+3jvUa2KU
-         3ARQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=DK1kq+UORspwzlcL44O0F5OA7o6ZQNGRnMf+1R0tFOc=;
-        fh=2iKZssqLhP6mh4k4QHAU9+AdHXupeUDFcW+atNxN2d8=;
-        b=BtjTZNtAdsHFoMc7UV7aFz8mmP14hOdM1jPaVPmGaUxRpjMbEC6GH0euOMUPVY9p24
-         ruAx6wtEwGqAzELVVctSXvQhCuQWHLDCocsB+gz0C9Cueyrx4+3BnuoujgkWebQEXT9u
-         dRnto5lBV90JO+/cQWCcN2zvqNCL+wtXL3EMZmrBQR+m5D0/4ZCRFadsFCjzXzbd3nr5
-         Pt8O2Z67CJqpycZzTfw0JzbUwD3vcLSLuFCkyX/RCY0vSTBIPsyD5P0bzE7tiZbcf3ZG
-         K/oSl7CObz/QBRqRdPC0mRCc6mExI4CySb1wDrc2owlmnwWXVoCLjtEg0chvJftw2Nm7
-         hQzw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1787599996; x=1788204796; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=DK1kq+UORspwzlcL44O0F5OA7o6ZQNGRnMf+1R0tFOc=;
-        b=rWbvmCWmjcCMV6cmRGcdr3+XqqhuMWDGjRX1T5jRxsvlEvHcuEqtIU8Ara72ZK/KBC
-         Fo3btCJeMyC+8K71XbO+ycgkyzflH+/WAU7RjJ+jWdNq4ZIUVDtoY46nzEbAYFajZokv
-         WbFxgJPYPnzHMK5AKBCgIKfsa0iEZf2co5VII=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787599996; x=1788204796;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=DK1kq+UORspwzlcL44O0F5OA7o6ZQNGRnMf+1R0tFOc=;
-        b=pXqGY/hSiIG0MyOq8rleMVPSW3tmTLGKC5ZJMGnPyZMj+2Wk7BnLlk3zvorvObNz4C
-         C1Emfx5snkbfOxwofOsYrXGNYptBxBY5/5X4DM2hzLYMOpI8nbD/MJI9pLOwKVa83Ueq
-         wiRg38myxLNLbSr9l4r52OCwYPVpIAFEJ3wTBTpVkjacULl+jerXne/uHUgRrUYY6RHR
-         xR4R5wATPH6A6JqkjHLvvTTofIcnksGPQ51nG//BT8uhwReAf+kOfmDe3BCwtkPnDBbS
-         d8WA7DtKU+MoR0uKmB6/GgdlRdRoVx3SrfhK/jz3R3R3PLaBQjywaHAlYUycU2TzRoAR
-         6eTQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqPRH1A+tP7TPCOoIfDUrKJghVM+tPPEfZz2fZOq4X6h2mArnKaZ5cQ0HIzq5IwWYjdmeQQuyUx4jT6AQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++mu+qlO/C74yj6lm0i+ywp3Y9fVKVXOZIy/P0oVzDoETZ8hIhgM
-	W4TosRZWeiv/HBSCCxH0yjAsFpUscwm1UkHDlDLGsUl1yqCLxRtlZkB0bEeGVFTbw2jVtaHbJew
-	LytNCCqWenY+RDyhiO6ZlBwh28NuXfQzOYhTugM2lcg==
-X-Gm-Gg: AR+sD10JFFWMN2/RdEHWVkJgWz2QAiMiQli1SyNrwVc5Q4Id0RGkWBZyM8U3gBljKqE
-	siF/epcRqRHxfeDe1w4lqsE75ig4g4hUEk6twZEsPF+0owmCx+Aiy7EJqjs/dog8rEdmBZWxyuC
-	F50gpGRSZq052rmDOo3Mn/GoxlAqiuIml1v3CX8giiR42kRq+3jSno9Qjm7LSqavqzCAeU/5q27
-	4+D5lpBwCvY3Ui0W0qCIvXpflCjCeZCtqNPMgW14Ch0iq6udh2pj5wmAEaPzXT46zhBf+PJgu/Z
-	nONuaCzBcSSf7DuMypSLZQA96O3KO/XtPt11YGHRKRwmKrgt+poP0boJ7sVaglm7SYpY+DO89YT
-	yt0k=
-X-Received: by 2002:a05:622a:411b:b0:517:78c7:d93a with SMTP id
- d75a77b69052e-52df57324bamr286714031cf.16.1787599995881; Mon, 24 Aug 2026
- 12:33:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="b5c1syLO"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hTMml00Xpz1XLyNL;
+	Mon, 24 Aug 2026 20:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1787602996; x=1790194997; bh=WDXzcOkCeF/E/L6o5eIJE0YB
+	b+lczGYcfjBgBfQ8M/M=; b=b5c1syLO3RnyvRRaq+l67NInxyzUzPlbItPROAk4
+	iZXJnLY/1oPzh+RKueCwFi12CktrTW9uufTYpoBb2Z5UP72F2c3/jrBCe+Qtfy54
+	8hTzKCa3Rp90jS22iRnsAALekgXlCUyQESBWOFhJOxjJ8QhtFLfXqjb3jPqPm9uM
+	deI3/hrcxTTtd8hHwgg5dBXv/fPlgawF1/K+VHjcvl8nkLJTpu9BOYb1yJnWMqx/
+	fOuYP2z2OKokyGVc+3CWXZ907EwRZFYCec1WpcK4TJH8tHr7ovV+QT91QptmvxF1
+	3pcZYCHvDh3OR9V1WYgqf6npxLhehS0rCpP2Ty1g4Z6qgw==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id rDUYE0vGWUbX; Mon, 24 Aug 2026 20:23:16 +0000 (UTC)
+Received: from [IPV6:2a00:79e0:2ed2:d:b39e:b901:b514:a851] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hTMmg4tPtz1XLyN0;
+	Mon, 24 Aug 2026 20:23:15 +0000 (UTC)
+Message-ID: <3161a470-6362-43dd-8cab-c3ca1859d479@acm.org>
+Date: Mon, 24 Aug 2026 13:23:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820193343.3852967-1-willy@infradead.org> <20260820193343.3852967-3-willy@infradead.org>
- <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
- <aoxHOSC9kTPbKeNq@casper.infradead.org> <CAJfpegv3Ak+qNLb=fTSCSz7-taQ3Ui-Hkmqgn4PaGPe=CR4cbQ@mail.gmail.com>
- <aoyKxvdQdeJQfPHj@casper.infradead.org>
-In-Reply-To: <aoyKxvdQdeJQfPHj@casper.infradead.org>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Mon, 24 Aug 2026 21:33:03 +0200
-X-Gm-Features: AcwNN1WHKWPg-gulrL_ybc1YuKIIGquGv3tDzpc2zs94XwMFk4U-dS3q1iLbtfs
-Message-ID: <CAJfpegtgenUaudDcvecJuV2_WkkVw=gdcB0Eqg=UFKPMZP1uKQ@mail.gmail.com>
-Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/13] loop: Fix race conditions in loop_validate_file()
+To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <cover.1787255652.git.bvanassche@acm.org>
+ <2b6da8a843526abf58d0d591ce487533bbce805e.1787255652.git.bvanassche@acm.org>
+ <b7f88eff-7886-4a85-9c97-7c88ba856780@linux.ibm.com>
+ <d998a691-4c43-4feb-ac5c-d174208c01db@acm.org>
+ <2e6d7e6d-d6e2-4675-abc3-51f21e407ff4@linux.ibm.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <2e6d7e6d-d6e2-4675-abc3-51f21e407ff4@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Aug 2026 at 20:17, Matthew Wilcox <willy@infradead.org> wrote:
-
-> Before:
->
-> fuse_open()
->         invalidate_inode_pages2()
->                 folio_lock()
->                 folio_unmap_invalidate()
->                         folio_launder()
->                 folio_unlock()
->
-> After:
->
-> fuse_open()
->         filemap_invalidate_pages()
->                 filemap_write_and_wait_range()
->                 invalidate_inode_pages2_range()
->                         folio_lock()
->                         folio_unmap_invalidate()
->                                 folio_test_dirty()
->                         folio_unlock()
->
-> so what's the serialisation that the filesystem can perform in the first
-> case that it can't perform in the second case?
-
-In the second case filemap_write_and_wait_range() won't write protect
-or unmap the page, so it may become dirty after the writeback.
-
-That can't happen in the first case, since the page is written and
-unmapped while under page lock.
-
-> or alternatively, what's the serialisation that would be useful by
-> adding a lock/unlock of the invalidate_lock inside
-> filemap_invalidate_pages()?
-
-Nothing.
-
-What would prevent this if we'd have writeback + unmap + writeback.
+On 8/24/26 11:06 AM, Nilay Shroff wrote:
+> Okay, that makes sense. So it looks like we can't easily get rid
+> of loop_validate_mutex. In that case, would it make sense to always
+> acquire loop_validate_mutex rather than acquiring it conditionally
+> only when the new backing file is a loop device?
+> 
+> I think loop_configure() and loop_change_fd() are control-plane
+> operations and are relatively infrequent, so taking
+> loop_validate_mutex should not add any noticeable overhead.
+> In return, we would have a single locking hierarchy and
+> the locking-context annotations would be much simpler and easier
+> to reason about.
+That's an interesting question. I will look into this.
 
 Thanks,
-Miklos
+
+Bart.
