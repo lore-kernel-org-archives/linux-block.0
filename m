@@ -1,53 +1,73 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8E4426429;
-	Mon, 24 Aug 2026 13:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43426279DC2
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787578180; cv=none; b=jS54w/L8T1A2Yeyss8uYyL4B85tZnDoeXKtDObZesObNsiLLzcstAa0pgbrZsj/V/pHLT4vv9/aBoPCZy3cjujADMn90vS41BW6dDTWxaZH9QKK4H1+lwqMmBayOdSidOUwcA0Se8KNg+0Ki58rPrj+2N/PXFAlvU2V5m+sVKsI=
+	t=1787578277; cv=none; b=eaZkE2qE1HK2MS6+Oyz3fT6pD1gnSaIAVXevh7Tmsnfx17ZkITeefTAxPm0PIL/XDCrn9w/sFGsfkMZBowP/d8SLC6VpLxWVPieNOvMkrDXPwcxD+v+SBuLx2j0z4dm8gTwqOxt7cDqQ9Lge5RFJMTl3PQ+oBe3HickZ0oJ79cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787578180; c=relaxed/simple;
-	bh=39FjQlUMP5udyZxk+WGpe9HcVJf/vBCTJVYsMuZuSuY=;
+	s=arc-20240116; t=1787578277; c=relaxed/simple;
+	bh=uGg/m1YBOeJTowj4uybIy6jrf/stiCcAnS70kdk5Udc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jO4IWvN/6FJoUw73i0quGuFjAM/ZQW+oNyz3DcLyxSlWRnVxZtwhKWNI5g+rEcJPo3cg7VjSrPdleZBZYQVqtVT9YkMmLhh23hOewSprPW7asq+nOD+d5r4u+sCk9JyHe5nQR0UFBgJblWyoq2LoGtdg3+iBext2YnHi7R7ZTeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DVpXuCgB; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=ddqwLOWDR5ED1W/tkz0WDn+07Ce7aety1SRij9sjAdawtJR7DL5+SlenMOm6gHtGRhbnC05vJWZNgWHivhNZSxiNdvpTerDTuQYiRa6KkygIo0OR1OJIqFvZ8AdFSw0R2d7Ais9iDQ5eYEPs2CyIKbceJR5+5vZ/HBe/5jmV1RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBeD2Ghu; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DVpXuCgB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=UP1TeJcQT74aqE7HfHCPzdq0084a2GndPFA/TBwUbHY=; b=DVpXuCgBWzg4bh1HoyTUjrvA7a
-	g10c2SRZCIct6G9ZFfmQ2xDtSRhzhvqg2iqKHeN34oUDs2mF8AkL4J1MbE3654XNJFqg/ZdbF4oxj
-	pf2I0N7VJIOWBRcdbFZgSYn9avDzAW+Xx+qe+fjTKty5JOw0KvHc2fk4qUalN5QpwUDn9VN4e6wDh
-	W29tgfU11wmdEgc6SYoRRgsdTfw38IlXNfwZYxT15ovSXkeoFOtT4JVo27hfDLiGm72vzie5Vf2fH
-	ENPz5NXe8NNZi5OSbLqQgl6OKMlEWF3mvgt5/cF6qcPLFK6DFenQCIt/gE91p/L6xfUTQUq4PmRu9
-	pCTg9upQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wyUjx-00000007HHf-3ewO;
-	Mon, 24 Aug 2026 13:29:29 +0000
-Date: Mon, 24 Aug 2026 14:29:29 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Miklos Szeredi <miklos@szeredi.hu>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org,
-	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
-Message-ID: <aoxHOSC9kTPbKeNq@casper.infradead.org>
-References: <20260820193343.3852967-1-willy@infradead.org>
- <20260820193343.3852967-3-willy@infradead.org>
- <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBeD2Ghu"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7eb5bdb50fcso3229357a34.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787578272; x=1788183072; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=y60jwkQhoD4s3eswGlcI736vrGSva62DV1OEGb13gfY=;
+        b=IBeD2GhuMv+wZ4tp5hrIbamZda45IfxUCzStv5gTB+BxmKE+5dMkfIzmb5/qxTkyr0
+         djPAt7CQ1PcM0D/jdtwWpjtvYsgokGjb993nsYnBq8hUBZV2pLHz58GxyGWq7Dl3VaKO
+         XM9xFN0no+U/vcBceyEvunzz1Vrt8uZfid7xU3BLOp2rRQWeK72thoOtx3xQMwaYeWxC
+         08pY0brQSNH4qu7o6QZgJ72wY/WWQqx5bWgGIxfQC/dnuWYEVDsJXDc7BIW5wwPh7BzH
+         1uggRCVLgiis+2ed9gmjeHRLsrifJjkQTy4Wme7nt8aYo+DXGJbMfVe8laPXt+edroad
+         bJ9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787578272; x=1788183072;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=y60jwkQhoD4s3eswGlcI736vrGSva62DV1OEGb13gfY=;
+        b=G1zvJYA5E+Bg7oTG17csv5n9HnHg8vJO5iaNWXK19YBefZFNzZXJ4Zg2eXzziyS6KQ
+         S/aCG9oC815g6gjvPqsbd42eZfqcGpNAiMiyn6IMqDRpCgQvftDFc+9j2jI8fGj6fIqv
+         nqpWSyW57s/tPlBAZXQchJdndYdBE7ErWhhh5ZE6kvBgjuoFzNoVHdwmrwuEMrAq4Jmt
+         eqJQ7439m9cF7keEf4Ciu0GmHxXJm+30RvLi9IuhrzNoWdV3HFTK1fJ86K8x5S6ov4XK
+         fhd+NuvzrZ6vgUfKYp33cSPq58VD57ssWMN6jUHYRN3XS266z3G+4cgf/+p+qFk2Q6ZM
+         0NaQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rr/ExkhpmhIil26hFeWpvzWHW2GZxjl/ojBOJ+mNZrPhVXam3tH9L0Pl2PkHvXRLuTktYseLrmdi+hy8Q==@vger.kernel.org
+X-Gm-Message-State: AFuF++kDV4o8nRamVVHvD3Yq+l2+18yVuNrkioFP5DJ/zaFOVGNmcSLi
+	MSpkCBMUr3Cs3sk4Sc+NpBDMkTbXXmEhA99IshVU+JRYka0vKuOVuAas
+X-Gm-Gg: AR+sD11iFJScLCBt6P0OJnRyfb8iv5HJpqgU2VWIcfLw1CH7VTH4IIGsm6x0uI73/R1
+	3M0Wg6gugumbTTjiCAcCsktBczRyJBPI3tAi1DL1+0gZsPsgp6kFdrle3Zl6QzpBb4nK9rmVV0P
+	YvReFu2EQaPyu64W4ztAAGf09Vmc8vvlyPGtU1wi2BDHw5T3wmXZOh16Wx9sBefVE5K5LC2xMgv
+	1zBQrUH5s+j2FscaJoWu+o0LtdQVPlLkst1oLyihk4ogQvh1ZKK2c2pPJZrCJiFQa4gj0uM1XgE
+	KPbSfA8pdoWGPN8X3kIA81gV++rIA1OdYyIZnLzF64cwWv1gln+fCzNFRZfWkaf0xF5wk/BXbY9
+	/aQZhUq5j+wex/yzkeKjQ5f4GW8MYgPbXhuJx537UnvC+Qc8HEYZAYRjfVQlr7uSPmu5RYSER8P
+	G0Mo+MPbkNXmBRAq4XlTVNRkweKeUa29wu20GxVEaVfY4B6EZtv65HbTsTP6HNkNLdXDbkXzO1q
+	PW3E7eMgIT2zalSCs31UrPNd8OE1+XyK+vSLbVvRVHn7+c9Ig/kmxeprsdHs8yX8nGN6MvjUQ==
+X-Received: by 2002:a05:6830:600d:b0:7df:5fc:3fd5 with SMTP id 46e09a7af769-7f461421249mr32340464a34.1.1787578272534;
+        Mon, 24 Aug 2026 06:31:12 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f48fcb4fa2sm4207470a34.25.2026.08.24.06.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 06:31:11 -0700 (PDT)
+Date: Mon, 24 Aug 2026 08:31:01 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 0/2] ublk: fix force_abort leftover after quiesce recover
+Message-ID: <aoxHlXhGrrFDN8SE@fedora-laptop>
+References: <20260821103047.369522-1-yangxiuwei@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,29 +76,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
+In-Reply-To: <20260821103047.369522-1-yangxiuwei@kylinos.cn>
 
-On Mon, Aug 24, 2026 at 11:05:46AM +0200, Miklos Szeredi wrote:
-> On Thu, 20 Aug 2026 at 21:34, Matthew Wilcox (Oracle)
-> <willy@infradead.org> wrote:
-> >
-> > FUSE relies on invalidate_inode_pages2() / invalidate_inode_pages2_range()
-> > doing writeback by calling fuse_launder_folio().  While this works, it
-> > is inefficient as each page is written back and waited for individually.
-> > Far better to call filemap_invalidate_pages() which will do a bulk write
-> > first, then remove the page cache.
+On Fri, Aug 21, 2026 at 06:30:45PM +0800, Yang Xiuwei wrote:
+> Hi,
 > 
-> filemap_invalidate_page() suggests to use invalidate_lock to prevent
-> races with pages coming back.  I'm not sure that without it the
-> behavior is identical.
+> Quiesce on a batch device leaves ubq->force_abort set. Recovery does
+> not clear it, so batch fetch fails with -ENODEV and the device stays
+> QUIESCED.
 > 
-> Maybe add a variant that takes that lock?
+> Patch 1 clears force_abort in ublk_queue_reset_io_flags().
+> Patch 2 adds -b coverage to recover_03.
+> 
+> Tested: recover_01, recover_03 (with and without -b).
+> 
+> Yang Xiuwei (2):
+>   ublk: clear force_abort in ublk_queue_reset_io_flags()
+>   selftests: ublk: add batch IO cases to recover_03
 
-I don't understand what use that would be.  As soon as that function
-drops the lock, the pages could be reinstated.  If the caller needs the
-pages to not come back, it must need to hold the invalidate_lock across
-the whole operation.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-Before any filesystem people get funny ideas about closing the O_DIRECT
-race, you can't do that because you'll deadlock on doing I/O to the same
-file that you've mmaped.
+
+Thanks,
+Ming
