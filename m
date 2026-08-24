@@ -1,63 +1,65 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4F842E43C
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EC64307B0
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787579398; cv=none; b=q9kpoeKoKWXKccqUWV3ZO/WqPCcc/hEXvuPJBgs3x7qBrAwnTId8Rup8LjihAB3c/XMfpXJ9j9ALVCkvYdgmZCAibktNMHsyVfVGGzKzLDw2tyBC3p9SzvJ0xGP/wvatyjNe44V/XaBLcLQr2dLcfo8rUrRbwOX2aBB5VI7NMSc=
+	t=1787579572; cv=none; b=JD+Uy0k+jsAP1Jy1YjKq5/rueh91wAgtbA0rb3xbStD78jxrHQ4eWNti3KrC/WM8hPzXC+VjFUM0tdiaRoLRQI3vXgpKBQ7jb8DlaMnSBhc4G/tvOguGonMc/sjfXcsi0wsCi64GVwl8uZw1VPgYWuM/E0pDMWyymrTiv4Srjw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787579398; c=relaxed/simple;
-	bh=3bHlh+yjzIVaS0rKbfcNVgRQ/8VtW7Bb04pv3uobmpk=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=LvKDo7hnb7qebPj/SPoqPhBFsDwSBqEyOdJmgGQuiCH3Ye+iHAhoutH/WnnKVRXFOP4A59xvxRFcJ2Bgkqoa0NEGjG3wiWmG+LdaPN19koYDEQ+/j7lEosw3VEMpYrmyn0ui9goILDkLeHsYdLJ5qYEl7ev64A0knwN4PSm/KvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FNosARSw; arc=none smtp.client-ip=209.85.128.169
+	s=arc-20240116; t=1787579572; c=relaxed/simple;
+	bh=INQpY4vkmtPsJDoCs8IyTHaF6Ew7wSWtqA9unZfAs40=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=bJgTfjnQBRON9Bb0S1aeZVcH2Di4gMR66R7y4IaLPW9AeyJpu7bil1/yrULhrd262Zb/FjVUcBccPlXF1yjqwcrpPHkivVl2w7Nw0drGDMzfCcTU/7T2CTV9owkg2zEgy6IS1WSWG3lWCW3ypXC/SeEjxLl+IqumnDcRafCBTt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I8E5GvDn; arc=none smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FNosARSw"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-836c718715fso32798617b3.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:49:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I8E5GvDn"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-66c744a00edso2118784d50.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:52:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787579393; x=1788184193; darn=vger.kernel.org;
-        h=content-type:mime-version:message-id:subject:cc:to:from:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wa1iTT9vjhUKkra9WxI7hECThksYL7WKs9jkspFydz8=;
-        b=FNosARSwfOfZRX46CtbAlx46mQDvTfxUpbpSlFFGSHWfR7zqncE/ZWK0kvNL8WoCOK
-         1WZWRMzCVVKBtwkyR/71t9bcrm4m5vFEQxhljAenWCoXoaE/4qd3xCxg1VrK7l6rQmVx
-         SLb/4ITsm2D2HQL0/UmWxm48wxuAKxG3VfR5u4aJt2vi1Fn1v+ImlXAQjhgEp7JU2bO2
-         i2fTGXFNAlcgAkOabFUaahTGXAT90iKiAMrnlZV4XVcyp0KODeBAj59LeP04mMpfNIZa
-         /wfhoBh1MhX6VkjtGIS6nh5LXvtQ1plxP3X5aV/29lq526uzTFLkQfXxln5NvEeoOooF
-         jaUQ==
+        d=google.com; s=20251104; t=1787579570; x=1788184370; darn=vger.kernel.org;
+        h=content-type:mime-version:references:message-id:in-reply-to:subject
+         :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=n94V7wbjjjBLybhmkw6p8j8STOH0bCJCKxuuQhNVBOI=;
+        b=I8E5GvDnAjikFhlI7R0RJ/jJBZcFW2jG9OJ4h1HGJb0aPinmiz21qlY0x2kEaGJJjR
+         gj6Nb+nQ+TfyOUJdaWEsZoW+yew66t8vea09M2BbGs/Ee6EPPatIVYvL4UtSera+WJ5f
+         v37OYzhw/ml2U/C7Big+Mh8SvT7YU3a2LdoSH/zTpNAg7mI9uJVu6issIcln2lTzhwyc
+         sCpgqRVu2s5P3dzzH1WXWLBJFxewQEX7gkyb2fa213s8QaR6jtxlh9Z2kUVpSlvxKThM
+         GYTs+uejwhbNlcYvj9I2RxnhSdLLjpIGGUgX7uVJUCgleeTb0RfUTlqkb2odQYobzJis
+         bdBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787579393; x=1788184193;
-        h=content-type:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=wa1iTT9vjhUKkra9WxI7hECThksYL7WKs9jkspFydz8=;
-        b=sxLa9sGlV96crgfbcMyDt+wHgkHMkTAsE9vPEJgWNP7JwACXp2g+Rd4SXQeqBQgMiY
-         WM12QUL7JkblfKZRkqCzwfuDy0PtPldg7Ll4lFAc7dGLB1hwd2f9+8K2OVHk98Fk+Rf4
-         q/mkAYWtD7lhum35ggeuMnGEA7unWOMPCGgi1NmYQnDoEgp4qkQcTQgOmHQceKX6XJLW
-         tqr9f2R9TdpxsYzF8/kKPXUxYD4ybqXHfDC2BYPn/+Sez+waL0PKwixT0A7lbYXRWqIR
-         21CjDZhf3ozXT8T7p+HXnH2IlnirabFeknYiCmnYg38XL//q5OBcLhYn5kA5lWuR5mDA
-         PooA==
-X-Forwarded-Encrypted: i=1; AHgh+Rpx1Ew9zya9oQ+ypo0yw98IhYoQ43ynNsUqV8YnBTQJkeNOGDrODK5hR4gd9/23Pti/jptfQTSQ8TiJSw==@vger.kernel.org
-X-Gm-Message-State: AFuF++noEza5H59iQhJ4yC6VECBfwwrGV7BO8H99bUsmc2npCBWh7NAK
-	lLV8LF5GRIM5TWjHCSKr8Q0IxJhT1h4jesh3kNQYs1z4X3c2Z2pI1tbKEXT7gawNSg==
-X-Gm-Gg: AR+sD10tJ9RY8joVfkGkk6vcpe5p90upYeAoh4vGQIRurvyJaAWDvtzZvVohqFNEeML
-	mzQVym9oUAP33O9g1VEKt8UHFEqIMCnC27Z9/zfsLKyT9B9CGktVn9nBsLJdFRpOsMGez/XRGe7
-	LTfWwNRdu5SX2h9a0zdEy2L4J95v3ErH7IVMTrrirXQfUntS8J8dhQ6W+yIIRjol8p2l4olCIG/
-	dRcgQntL1sgFsg2ABe9L/c+9Hdz2geMC2ozYt9oYjvx5TQeMj7XINf+9IWJK4pAYIN3B1cwPIeS
-	4t9A4YKZsoJ2pbGzhBdPqsjcIMufy2Egqy2lMINxtWEJ7/c+Hn7oZ15UymN9DpgTNoCMTL/v3l6
-	fQHO0hie89FDs2iAa//d8zf5WdHHCCLfEj21nXrR32e9HDqY0mto8Zf2c+NnRXw+R0Ng1HqbwK/
-	HpP/azZmYqn1GMVZOc4d3eoNGXKEwj0R/LO8ZBcn+PVXtVwphRrWCO6d6LczLpp5K5CBXQrE+3+
-	esGaXtdZSMTuoj6tLTtqVpw5C9b/dglc+NPH/tX0cViCLPM
-X-Received: by 2002:a05:690c:c602:b0:81e:ae6d:caed with SMTP id 00721157ae682-849f7262b93mr78114917b3.34.1787579392083;
-        Mon, 24 Aug 2026 06:49:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787579570; x=1788184370;
+        h=content-type:mime-version:references:message-id:in-reply-to:subject
+         :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=n94V7wbjjjBLybhmkw6p8j8STOH0bCJCKxuuQhNVBOI=;
+        b=Ll2djiNUJyJ/ywBYe5XblAFxDMF+rpkcfkQ6v+SfSR7uQ2W3dk7+U5ivNv44CvHuHB
+         dcq3QLEOmmiVwpuGJ36Ky3nYKAre8SsBbLd+nkM5os/KIF5CB8CkBe+Y19ZQJqPSPfoi
+         x8zfuShaQ92qv0bpZOF+DTuOqgFVBUE4oKH01ErcUyN3yDjcyhZ4CFhjsELrCrnPMuzS
+         83zOar+H7CktX6vPsUK5QuiVjPelZ7G5MCcQSVH16Z1SNcIFghdwnL1fkopwSMuChQ8u
+         /54+eYeUF/ZFmxrdbzD5Ng32MG8xft19oMULgo+LWerkhgoBQB51wadFn+R5bOMUL4PP
+         hwrQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrYqWqbNy2GCkNiNjah9qD6MWhL62wN7/rFhTcSoFdXyCgK6fpMWwp0UdX721mBnDudPiG+dNDcG6U3Fg==@vger.kernel.org
+X-Gm-Message-State: AFuF++nZKievLT6nqU+gKhrUSvvyKd+kH1bK4Ab2bTHZSxtOOoeLJttu
+	KjzYReqtjWib4xfK2gTt6NUFtAh+nLB4yyXJdh+Q51aQYSyzq1CFmxgwpf0kRti/SA==
+X-Gm-Gg: AR+sD13HdPB5d66O/ah+lKUhr9K6Wnl6ONcJSskuhMPE2VaOansFE6tJEwrTGukNXja
+	6C/VnC+o7EKaoEGiQHjd/PpWBuaoMckANKnpWEL83HBdFl2ha6SrPgUtyAd4BN32ni5waFlhZmu
+	qF7Hbszbs6wvpFh7GatQTrPkV8YAcL7XZQtLo3VzB7HlclqwysbOwFk/9BfGz8EjRxHL0UzQvJ/
+	4byl///2J3/RjHGbZ74xcrbPDTaHFXlanU5ZiCIszA27C8xlKRznerMtVFXOT5ld8u29b6hHRa2
+	4719RzksxQzSMtbhZNwpSV+oUBRo0W+unjBJQHN5OYvlyBj9TPhKLtzq5sNU5+pyzDD9q1Xhbzq
+	PJ1kwVJ2Zy4vowfkZZsmUCWpd6w1Z+A+lHtO7X4pnTE7Uaru7i+B8mhHHh0M1/GG8UBqwa6lGEd
+	XxxAwMXNF0ilCBTyRinZUbF9EjvZBZIl3Aqs/8I1ZgF4lKCShtO9iQ2BZMJYKCf4rGW5GZ4w1tJ
+	LFWC6fzirew2L1qiwIqJ1JZytagcxzeSfj18a9KlXJRTl+Oo8UiN2QoDj1RYFHg35ImV7A=
+X-Received: by 2002:a53:cdcf:0:b0:667:b314:aea4 with SMTP id 956f58d0204a3-66ce4a56db4mr7162361d50.16.1787579567501;
+        Mon, 24 Aug 2026 06:52:47 -0700 (PDT)
 Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-84ca62f6ad5sm33495767b3.18.2026.08.24.06.49.46
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66cf4624f47sm3724257d50.4.2026.08.24.06.52.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 06:49:49 -0700 (PDT)
-Date: Mon, 24 Aug 2026 06:49:31 -0700 (PDT)
+        Mon, 24 Aug 2026 06:52:46 -0700 (PDT)
+Date: Mon, 24 Aug 2026 06:52:41 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 cc: Ackerley Tng <ackerleytng@google.com>, 
@@ -67,12 +69,12 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>, 
     Christoph Lameter <cl@gentwo.org>, 
     Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-    David Hildenbrand <david@kernel.org>, Hugh Dickins <hughd@google.com>, 
-    JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>, 
-    Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, 
-    Kairui Song <ryncsn@gmail.com>, Kiryl Shutsemau <kas@kernel.org>, 
-    Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>, 
-    Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
+    David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
+    Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
+    Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
+    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
+    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
+    Marcelo Tosatti <mtosatti@redhat.com>, 
     Matthew Wilcox <willy@infradead.org>, 
     Mel Gorman <mgorman@techsingularity.net>, 
     Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
@@ -87,8 +89,11 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 00/25] mm/fbatch: drain lru_add_drain() and _all()
-Message-ID: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+Subject: [PATCH 01/25] mm/fbatch: remove !CONFIG_SMP special case of
+ folio_activate()
+In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+Message-ID: <3f18ab7d-c12a-d2a3-4d3e-f9908f94f27d@google.com>
+References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -97,112 +102,124 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-This series was prompted by lru_add_drain_all() appearing in watchdog
-backtraces: not to blame, but blocked on an unresponsive CPU to run
-its workqueue. lru_add_drain_all() is a heavyweight operation, which
-we often hope to avoid by a much lighter lru_add_drain(); but even
-those local drains can aggravate the lruvec lock contention which
-per-cpu fbatches are intended to ease.
+3.0 commit eb709b0d062e ("mm: batch activate_page() to reduce lock
+contention") brought in an ifdef CONFIG_SMP around activate batching:
+https://lore.kernel.org/linux-mm/20100805140755.501af8a7.akpm@linux-foundation.org/
+shows a sensitivity to bloat that day, not any incompatibility with UP.
 
-Now let the folios on the lru_add and other per-cpu fbatches remain
-there, isolatable, with PG_lru set and refcount unraised, just like
-when on an actual LRU. Then many calls to lru_add_drain() and _all()
-can be removed.
+No other batching here has a UP alternative, and it's a bit confusing:
+simplify mm/folio.c a little by removing it now.
 
-It's something I've wanted to do for years, tried several times, but
-only hit on a good way to do it a few weeks ago: now it's uncomfortable
-to watch others wrestling with the drainage, while I'm sitting on this.
+Certainly we can reduce UP bloat (and/or 32-bit bloat) by, say, lowering
+FOLIO_BATCH_SIZE from 31: traditionally 16, 14, 15, then raised to 31 by
+6.9 commit 9cecde80aae0 ("mm: increase folio batch size"); or by giving
+just the static per-cpu folio batches a type of their own with a smaller
+array size on UP (1? or a little batching worthwhile even on UP?). But
+not right now, it's orthogonal to this series.
 
-The key idea came from the "if (!folio_test_clear_lru(folio)) continue;".
-If we don't mind missing to take an action on rare occasions, then maybe
-we won't mind taking an action on the wrong folio on rare occasions, so
-long as it is a folio consenting to PG_lru rules.
+And I suspect that the old ifdef led to lru_activate being placed last,
+whereas it's usually the second most popular fbatch: move it there, to
+match cpu_needs_drain() comment "Check these in order of likelihood that
+they're not zero".
 
-No new locking, but relies on folio_try_get() and  folio_test_clear_lru()
-even on the lru_add fbatch; with use of bits not set in aligned pointers,
-and some try_cmpxchg()ing.  Speculative references to folios are already
-accepted: this adds another source of them.
+Signed-off-by: Hugh Dickins <hughd@google.com>
+---
+ mm/folio.c | 40 ++++++----------------------------------
+ 1 file changed, 6 insertions(+), 34 deletions(-)
 
-Performance? You (and the bots) tell me. I'm considering this as a
-cleanup, to make life easier for developers. I expect that some loads
-will show improvement, but also expect some disappointments (perhaps
-I go too far against lru_cache_disable()? or not far enough).
+diff --git a/mm/folio.c b/mm/folio.c
+index d2937600cf72..62b96c9ce19e 100644
+--- a/mm/folio.c
++++ b/mm/folio.c
+@@ -47,12 +47,10 @@ struct cpu_fbatches {
+ 	 */
+ 	local_lock_t lock;
+ 	struct folio_batch lru_add;
++	struct folio_batch lru_activate;
+ 	struct folio_batch lru_deactivate_file;
+ 	struct folio_batch lru_deactivate;
+ 	struct folio_batch lru_lazyfree;
+-#ifdef CONFIG_SMP
+-	struct folio_batch lru_activate;
+-#endif
+ 	/* Protecting the following batches which require disabling interrupts */
+ 	local_lock_t lock_irq;
+ 	struct folio_batch lru_move_tail;
+@@ -349,15 +347,6 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
+ 	count_memcg_events(lruvec_memcg(lruvec), PGACTIVATE, nr_pages);
+ }
+ 
+-#ifdef CONFIG_SMP
+-static void folio_activate_drain(int cpu)
+-{
+-	struct folio_batch *fbatch = &per_cpu(cpu_fbatches.lru_activate, cpu);
+-
+-	if (folio_batch_count(fbatch))
+-		folio_batch_move_lru(fbatch, lru_activate);
+-}
+-
+ void folio_activate(struct folio *folio)
+ {
+ 	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
+@@ -367,25 +356,6 @@ void folio_activate(struct folio *folio)
+ 	folio_batch_add_and_move(folio, lru_activate);
+ }
+ 
+-#else
+-static inline void folio_activate_drain(int cpu)
+-{
+-}
+-
+-void folio_activate(struct folio *folio)
+-{
+-	struct lruvec *lruvec;
+-
+-	if (!folio_test_clear_lru(folio))
+-		return;
+-
+-	lruvec = folio_lruvec_lock_irq(folio);
+-	lru_activate(lruvec, folio);
+-	lruvec_unlock_irq(lruvec);
+-	folio_set_lru(folio);
+-}
+-#endif
+-
+ static void __lru_cache_activate_folio(struct folio *folio)
+ {
+ 	struct folio_batch *fbatch;
+@@ -694,6 +664,10 @@ void lru_add_drain_cpu(int cpu)
+ 		trace_mm_lru_add_drain_tp(cpu, nr_folios);
+ 	}
+ 
++	fbatch = &fbatches->lru_activate;
++	if (folio_batch_count(fbatch))
++		folio_batch_move_lru(fbatch, lru_activate);
++
+ 	fbatch = &fbatches->lru_move_tail;
+ 	/* Disabling interrupts below acts as a compiler barrier. */
+ 	if (data_race(folio_batch_count(fbatch))) {
+@@ -716,8 +690,6 @@ void lru_add_drain_cpu(int cpu)
+ 	fbatch = &fbatches->lru_lazyfree;
+ 	if (folio_batch_count(fbatch))
+ 		folio_batch_move_lru(fbatch, lru_lazyfree);
+-
+-	folio_activate_drain(cpu);
+ }
+ 
+ /**
+@@ -825,11 +797,11 @@ static bool cpu_needs_drain(unsigned int cpu)
+ 
+ 	/* Check these in order of likelihood that they're not zero */
+ 	return data_race(folio_batch_count(&fbatches->lru_add) ||
++			 folio_batch_count(&fbatches->lru_activate) ||
+ 			 folio_batch_count(&fbatches->lru_move_tail) ||
+ 			 folio_batch_count(&fbatches->lru_deactivate_file) ||
+ 			 folio_batch_count(&fbatches->lru_deactivate) ||
+ 			 folio_batch_count(&fbatches->lru_lazyfree) ||
+-			 folio_batch_count(&fbatches->lru_activate) ||
+ 			 need_mlock_drain(cpu)) ||
+ 		has_bh_in_lru(cpu, NULL);
+ }
+-- 
+2.51.0
 
-The timing is not so good: middle of a merge window is not a great
-time to present new work; but I hope to be taking three weeks off in
-two weeks time, so best to get this out in the open early, while I can
-respond. If it's welcome in principle for 7.4, but too many changes
-are demanded, maybe someone else can step up to shepherd it through.
-
-Rebased and retested on Linus's tree of Sunday afternoon,
-base-commit: 4352b8aee98005853aa63f57d6377282de17a33f
-which includes the mm/swap.c to mm/folio.c renaming,
-but not yet David's mods to mm/gup.c which conflict with my 13/25:
-I'll reply to that one with an alternate patch to use once David's
-two have gone in (reverting both of them and what was there before).
-
-01/25 mm/fbatch: remove !CONFIG_SMP special case of folio_activate()
-02/25 mm/fbatch: allow folios_put_refs() to skip xa_is_value() entries
-03/25 mm/fbatch: temporarily disable lazyfree and mlock+munlock batching
-04/25 mm/fbatch: lru bit set, no extra ref, while folio on per-cpu fbatch
-05/25 mm/fbatch: lru_add_del_folio()+folio_add_lru() after clear_lru()
-06/25 mm/fbatch: fbatch_drain_lazyfree(onstack fbatch) before ptl unlock
-07/25 mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize folio_activate()
-08/25 mm/fbatch: replace mlock_new_folio() by __folio_add_lru(,mlockit)
-09/25 mm/fbatch: restore mlock+munlock batching, without extra ref
-10/25 mm/fbatch: remove several uses of mlock_drain_local()
-11/25 mm/fbatch: remove migration's PAGE_WAS_MLOCKED lru_add_drain()
-12/25 mm/fbatch: remove percpu_pvec_drained and folios_put()
-13/25 mm/fbatch: no lru_add drain to collect_longterm_unpinnable_folios()
-14/25 mm/fbatch: no lru_add_drain() nor _all() for memfd_wait_for_pins()
-15/25 mm/fbatch: remove shake_folio() shake_page() from memory-failure
-16/25 mm/fbatch: remove lru_cache_disable() from NUMA folio migration
-17/25 mm/fbatch: no lru_cache_disable() in __alloc_contig_migrate_range()
-18/25 mm/fbatch: remove lru_add_drain() and _all() calls from various
-19/25 mm/fbatch: vm/stat_refresh include lru_add_drain() on each cpu
-20/25 s390/fbatch: no lru_add_drain_all() in s390_wiggle_split_folio()
-21/25 block/fbatch: no lru_add_drain_all() in invalidate_bdev()
-22/25 fs/fbatch: drop_caches invalidate_bh_lrus() not lru_add_drain_all()
-23/25 fs,mm/fbatch: use invalidate_bh_lrus() not invalidate_bh_lrus_cpu()
-24/25 fs,mm/fbatch: lru_cache_disable() keep off buffer_head lrus only
-25/25 mm/fbatch: move lru_add_drain_all() declaration to mm/internal.h
-
- Documentation/mm/unevictable-lru.rst |   2 +-
- arch/s390/kernel/uv.c                |   1 -
- block/bdev.c                         |   1 -
- fs/buffer.c                          |  40 +--
- fs/drop_caches.c                     |   4 +-
- include/linux/buffer_head.h          |   8 +-
- include/linux/folio_batch.h          |   7 +-
- include/linux/huge_mm.h              |   6 +-
- include/linux/mm.h                   |  18 --
- include/linux/mm_inline.h            |  22 ++
- include/linux/mm_types.h             |  12 +-
- include/linux/swap.h                 |  14 +-
- mm/compaction.c                      |  25 +-
- mm/fadvise.c                         |  17 +-
- mm/folio.c                           | 375 +++++++++------------------
- mm/gup.c                             |  14 -
- mm/huge_memory.c                     |  16 +-
- mm/hwpoison-inject.c                 |   1 -
- mm/internal.h                        |  15 +-
- mm/khugepaged.c                      |  11 -
- mm/ksm.c                             |  12 -
- mm/madvise.c                         |   9 +-
- mm/memfd.c                           |   6 +-
- mm/memory-failure.c                  |  38 +--
- mm/memory.c                          |  14 +-
- mm/memory_hotplug.c                  |   4 +
- mm/mempolicy.c                       |   7 -
- mm/migrate.c                         |  13 +-
- mm/migrate_device.c                  |   9 -
- mm/mlock.c                           | 192 ++++++--------
- mm/page_alloc.c                      |   3 -
- mm/rmap.c                            |   4 -
- mm/shmem.c                           |   2 -
- mm/truncate.c                        |  17 +-
- mm/vmscan.c                          |  16 +-
- mm/vmstat.c                          |   1 +
- 36 files changed, 344 insertions(+), 612 deletions(-)
-
-Hugh
