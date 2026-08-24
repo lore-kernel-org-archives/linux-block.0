@@ -1,127 +1,127 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0161143B4B3
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1CB43F4BA
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787582516; cv=none; b=m/0I69yl59Y87XYySuadWPxcdeSBS4t8Kbrzvu+cn4kklXQOM921F3RHgJHiv+cE+vcLvdO1NkgeElArHdgNWEUloNPIQFvMZDL1ZMpStKEkZ1/iMmwP/ptDxx9FPRKB/aaXU/TFnr7KfQffKH7g6jCxFTYO8fXw18jGdeAPZt8=
+	t=1787582589; cv=none; b=hEB89kN1vh8ZX4XK1+z0d+qRCMtkZ0O0MVl2zGHr2nLZzrE7iSGE6VTOHMCzRpk7rf+483me+jkD5S6YeKvP4ePveJ6u3vBn6SR5fWNxid+YWAT8Rqo2MpKTzL2B/B531Niimn2ARED/F8lqtU710VCY540WXpeUm+xyAY7ADm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787582516; c=relaxed/simple;
-	bh=PA7/Pbx5AEThbU1dExwqFT9w9coLuAoGrR7Ue2+wOTE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=neaX4My/JIRhhhZEPzMw8Tmh4wiXraBaqidOg5WBSYkzh9g/yNreXfMKImk9RCcEPuBEUkgNAUqlaFXQcHmNjEi1rDERBuDky9qhMXDmYQ1tUXOz4SMgWPTToTUS87nBytLeKLrv58ND2qpCT9YHx7rDa8vdrlK7iWoTr8e++zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rcFBr73Y; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1787582589; c=relaxed/simple;
+	bh=W2r34cI+XaaQUdqCi3aOgKHvzlTyAT8XuHNk4YjX+HU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D1CSvg04DwD+c11X5Skc2fFc4PXB0WLeBHCFmF/OI25G5AG6BbOSIDbFHhp4JmVe6uikIm/NcmGrJuHAPa9ry0F7wzDHIxK4yLedyLlVNWqFNjSaah2e+vk4NTZoKP1AWnMtJ3/x51UM/MlecG8tKrY5ZxJ+ht4CwEMDBWtdAho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBNx1yRU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rcFBr73Y"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-66cf1f9965dso2248873d50.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787582514; x=1788187314; darn=vger.kernel.org;
-        h=content-type:mime-version:references:message-id:in-reply-to:subject
-         :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tbn1aAX73v4jfLOAScY/xk2YxlfOe4UtWahA1Ug2y2k=;
-        b=rcFBr73YIy47nKOwBwDuCgz1JK+wC6/lD6EuW9Isgoigtk5Wwk7ahW30oOmczMv4J8
-         Zs2r5rzqFq1Rdw3M+a9FtgKaYDrU0nNN8dxzGWoMtSuOKvsj+McppwvPEHfT6j+6f/kf
-         OVVby1pB3/oQ8e+TscMluo4qRb6D43Wnj49aw2VcgXFD1VLCJCsQoesu1IcEXSqM5bRT
-         kGxWhiScnSC0h9ug1UZEjOpthm8GS3LE30uHrPDfs4ddXPrxSnIVzyHeHsFc+O39zOW3
-         2x77IpHhRCR/Bb6g5YZmnvm9xrlh8drOBetRlA4xh0jh7vM4ClvivDELUUpHhYvzpdTS
-         tSDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787582514; x=1788187314;
-        h=content-type:mime-version:references:message-id:in-reply-to:subject
-         :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=tbn1aAX73v4jfLOAScY/xk2YxlfOe4UtWahA1Ug2y2k=;
-        b=FQ7BS/SaAmxbHqgwxaZqDIAVoSEzJUFyat5NlaibOK1FOoKkrqumeO50LqVVe6dQAZ
-         uqmlJSyKUmWbvV+QGvDe5enJ5D6+jObO8N4blSs4mdUTa4s9nMzLVte59Y99BHvdqmNT
-         ps9LU58vHTEzGH9F7NKZ87VhV4TEbm5Lexe3f/eHlYcugtMIvtv+N3F46DQoC9MslTi1
-         fhU2SqJnngdH21/aE+oS3rkM1c57vgEdWEr04kUeonuLns42fuP6XrOQQEoLEbKAIAb/
-         +JYOVL3FuTxMZshA2PaaAYoYKogg22O1yIv858o0242oLj4VVTKTXvVb4N/IxHCyDJCV
-         AjOA==
-X-Forwarded-Encrypted: i=1; AHgh+RoESDbBk002wtDUYTr6EW+A61PubRIiOswP5+J/cpOtJxty/o5+5CQkFYSh0wKMymny6smU/6cEdxhdcg==@vger.kernel.org
-X-Gm-Message-State: AFuF++k7obwOBqluL8RogpTqMbTiF1zFu1uRH9rOORc+YUM6U06C3imo
-	bvdN57i8xQ89OJkQ6YsWYbVuZKuBu/1l6tUMuPvaRSD6c6iXpqNdyQc6WDTB6ePRqA==
-X-Gm-Gg: AR+sD10M6umVHwgAKH3RxnTb01xxTdxJ8WjVtvPZ6Pm90H6THHwR2DEBMcuI1m5MRNk
-	msQT8lOo0oR9f2ZHFGzydGOZSJLPRcxloX9RsZVNpWBlvCIkiLsXn+l2JtXeb7v0eGo/6ZnLA2z
-	slxs5WTY5vInjzw6gSKkIRON2cKv/QrtlqEMk6kRFfuDgl/cLoIa2Y4saCGuj7yMy8oqsojN45g
-	O8yM+JB+cJFAu/LOTx01vvLnlssfAGGJP6acX+fyCeB8vdo+WE2FJE2kXwrZ8TbzTgEbhKsk5FT
-	Fa6br4E5VoxstcAS7ymQqhDBa7QrbfmXL1bXn5AnGrhK1qb7IjPMP5R29UVdDPXxxE0fwzQ1I3f
-	Z7T6AUHw1mSPKlFQO1PR0ExxxWWfMWwYDvOdHKXR7wBFL7H1pY9yGhD0LoT3FOXloMBGWsWXG3J
-	lgTL3iCJNwmxITUj1JMnqHGWbWPNRLvz8HAEbD2nuR5U7V5U1KRwyPsAfSxk1OYqXi2UeMuJYPZ
-	+omQETmIMyIml3c1sip5ThDYpczIWgUh/8ndg83WffMFXMSQroq6Ba6ZMs=
-X-Received: by 2002:a05:690e:7b1:b0:667:cf87:5838 with SMTP id 956f58d0204a3-66cf222e93amr4903896d50.25.1787582512262;
-        Mon, 24 Aug 2026 07:41:52 -0700 (PDT)
-Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-84caabb8b35sm34455727b3.27.2026.08.24.07.41.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 07:41:51 -0700 (PDT)
-Date: Mon, 24 Aug 2026 07:41:46 -0700 (PDT)
-From: Hugh Dickins <hughd@google.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-cc: Ackerley Tng <ackerleytng@google.com>, 
-    Alexander Viro <viro@zeniv.linux.org.uk>, 
-    Baolin Wang <baolin.wang@linux.alibaba.com>, 
-    Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>, 
-    Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-    Christoph Lameter <cl@gentwo.org>, 
-    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-    David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
-    Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
-    Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
-    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, 
-    Matthew Wilcox <willy@infradead.org>, 
-    Mel Gorman <mgorman@techsingularity.net>, 
-    Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
-    Minchan Kim <minchan@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-    Oscar Salvador <osalvador@suse.de>, Peter Zijlstra <peterz@infradead.org>, 
-    Qi Zheng <qi.zheng@linux.dev>, Rik van Riel <riel@surriel.com>, 
-    Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-    Shakeel Butt <shakeel.butt@linux.dev>, 
-    Suren Baghdasaryan <surenb@google.com>, 
-    Vlastimil Babka <vbabka@kernel.org>, 
-    Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>, 
-    Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
-    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 21/25] block/fbatch: no lru_add_drain_all() in
- invalidate_bdev()
-In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-Message-ID: <8facb079-aa8a-2973-4882-173e7d06ac07@google.com>
-References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBNx1yRU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787582583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=forfFVNHXdcKUrAO6tYWFvQxC3xkWQUr9XOJVlaCNVg=;
+	b=dBNx1yRUcb3ERCIHxojSqxcL4mV47tckYmbxUSGD3Cesdj7eqCIozkFxJrVyVwrEHsd1/0
+	PXo9uDPJ+bfRGb9fktyedS3jDxW5CTqxEB7VfpS2Kk3J5TgW6l5k7kBRWgAqkbtgWp62pc
+	SMSTNDS61iKuFR1BD6I0zdxG2VHvCLY=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-427-bXO84dgtNhKoDkREXaCNxg-1; Mon,
+ 24 Aug 2026 10:42:59 -0400
+X-MC-Unique: bXO84dgtNhKoDkREXaCNxg-1
+X-Mimecast-MFC-AGG-ID: bXO84dgtNhKoDkREXaCNxg_1787582574
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E653180AE92;
+	Mon, 24 Aug 2026 14:42:54 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.15])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C62F3195422E;
+	Mon, 24 Aug 2026 14:42:47 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v10 08/35] Add a function to kmap one page of a multipage bio_vec
+Date: Mon, 24 Aug 2026 15:41:01 +0100
+Message-ID: <20260824144130.759997-9-dhowells@redhat.com>
+In-Reply-To: <20260824144130.759997-1-dhowells@redhat.com>
+References: <20260824144130.759997-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-invalidate_bdev() has no good reason to lru_add_drain_all(), now that the
-per-cpu fbatch references are gone; but keep doing invalidate_bh_lrus().
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-Signed-off-by: Hugh Dickins <hughd@google.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- block/bdev.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index cd8323083740..853545b29b7f 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -97,7 +97,6 @@ void invalidate_bdev(struct block_device *bdev)
- 
- 	if (mapping->nrpages) {
- 		invalidate_bh_lrus();
--		lru_add_drain_all();	/* make sure all lru add caches are flushed */
- 		invalidate_mapping_pages(mapping, 0, -1);
- 	}
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 92837e2743f1..53cf36e73967 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
  }
--- 
-2.51.0
+ 
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
 
