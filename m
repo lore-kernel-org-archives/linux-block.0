@@ -1,83 +1,116 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD22DBF75
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 20:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6087729B77E;
+	Mon, 24 Aug 2026 20:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787603000; cv=none; b=ddEbA1disiGAgLE3mhO4+fs0L/AsvvqW/C1P2iskjpcJSZkI6M9eTmJL99vz4akgWI29q79bcuJS7L2gXq7Ht1TffGa0cOR2xxYe7DyfVJLo9aMCZsVSKVWnv8Kqv7A5aFGHS7sNg30q+8jmaFUrI+9y3BKnbDnwSdsmmP/xmqY=
+	t=1787604464; cv=none; b=nvHliXv+jZxVYJuzK1gE9YUU4ORgbEBBX0m68gQpei4Oa+RRuJJeuidYVfqt/YVMlC5Sd5On6EQznGfEcOXNS5je+tCSgBlGs/95IJSqpqyYTejMHB5kTQcYBO0bKm8hA7ahP2/2jg/XuS4vuB3aOgpb5j4bqRUa83RSgV+KjRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787603000; c=relaxed/simple;
-	bh=uqnlMNYmvVD5jKt/b0HPvHdkFFbsTC1QZsSbr2wkccY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uCK+vXPv/AWzNRDw4Ew+RrkoKCiuVjOTP3LnPVO0819TH54lep7A4c0pA8Aw9Nvq38MYm9CNs+aYwkhU5Z9k3hVdA0OFFckq2H2VacQ9d4J4S05vZDnwA31UjXCNaOWuD/9muwT3OLfnN0B/akKBr8gGlpWtqHHzc19NXZbsOLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=b5c1syLO; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1787604464; c=relaxed/simple;
+	bh=yOXThapvNvCgLifu01NItCV+B87skvWglNWX1ExEEZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cjnOVhVy3B0IawA7DeZs+AJQitzQWM5cqTSro6A1kxCGe0xyN+mpDpLmGMgyRd7h89sOGVm7gUxIq+ltqP2Pk8y0eUcYXaMmheawgf+WMq7GMr3/JKjMTXmi3lZgSYWpmMWg3dDKDv72hInFc2cmy2gi62xFLgZ41xze5s1IIMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=r9LfvOkj; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="b5c1syLO"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hTMml00Xpz1XLyNL;
-	Mon, 24 Aug 2026 20:23:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1787602996; x=1790194997; bh=WDXzcOkCeF/E/L6o5eIJE0YB
-	b+lczGYcfjBgBfQ8M/M=; b=b5c1syLO3RnyvRRaq+l67NInxyzUzPlbItPROAk4
-	iZXJnLY/1oPzh+RKueCwFi12CktrTW9uufTYpoBb2Z5UP72F2c3/jrBCe+Qtfy54
-	8hTzKCa3Rp90jS22iRnsAALekgXlCUyQESBWOFhJOxjJ8QhtFLfXqjb3jPqPm9uM
-	deI3/hrcxTTtd8hHwgg5dBXv/fPlgawF1/K+VHjcvl8nkLJTpu9BOYb1yJnWMqx/
-	fOuYP2z2OKokyGVc+3CWXZ907EwRZFYCec1WpcK4TJH8tHr7ovV+QT91QptmvxF1
-	3pcZYCHvDh3OR9V1WYgqf6npxLhehS0rCpP2Ty1g4Z6qgw==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id rDUYE0vGWUbX; Mon, 24 Aug 2026 20:23:16 +0000 (UTC)
-Received: from [IPV6:2a00:79e0:2ed2:d:b39e:b901:b514:a851] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hTMmg4tPtz1XLyN0;
-	Mon, 24 Aug 2026 20:23:15 +0000 (UTC)
-Message-ID: <3161a470-6362-43dd-8cab-c3ca1859d479@acm.org>
-Date: Mon, 24 Aug 2026 13:23:14 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="r9LfvOkj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=niEZYxfNIOD72gAedVquSAPl0GL96aOUAIsjWVWnyrs=; b=r9LfvOkjge2amjsBvyE5gj6qMI
+	uYvVlQ3b0KYGngAv8XESPmmtwmX5YL31/ZZL/aCv3YA8HiM47NGP857BeCRMrrjzps/Ne9d2cn52v
+	zqL2zGvjLLk1nv9syOdx3pvPSZ8lB4ZZOVBgqTtBiLjoK7MD80xjfIWR87mDrmvJgbQIzO6B2iuYH
+	wqfSCFzLZJjECzSnGHLMWVk/RyHGkAgVmz+igPSrxnkQPu9UxG3bW9HhbNxyefBXIscvW+/Ut9PSd
+	iZrPpiftS7pWBxDvgsL/MprJcvS05WbioAv/k/Wf8gVfSs67WWjwBEeQoBx+YaSMwlZC9Q0pIrjfj
+	dHmqFNDQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wybZv-00000007nCw-0Kvv;
+	Mon, 24 Aug 2026 20:47:35 +0000
+Date: Mon, 24 Aug 2026 21:47:34 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org,
+	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
+Message-ID: <aoyt5pL7mXYwSqsG@casper.infradead.org>
+References: <20260820193343.3852967-1-willy@infradead.org>
+ <20260820193343.3852967-3-willy@infradead.org>
+ <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
+ <aoxHOSC9kTPbKeNq@casper.infradead.org>
+ <CAJfpegv3Ak+qNLb=fTSCSz7-taQ3Ui-Hkmqgn4PaGPe=CR4cbQ@mail.gmail.com>
+ <aoyKxvdQdeJQfPHj@casper.infradead.org>
+ <CAJfpegtgenUaudDcvecJuV2_WkkVw=gdcB0Eqg=UFKPMZP1uKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/13] loop: Fix race conditions in loop_validate_file()
-To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <cover.1787255652.git.bvanassche@acm.org>
- <2b6da8a843526abf58d0d591ce487533bbce805e.1787255652.git.bvanassche@acm.org>
- <b7f88eff-7886-4a85-9c97-7c88ba856780@linux.ibm.com>
- <d998a691-4c43-4feb-ac5c-d174208c01db@acm.org>
- <2e6d7e6d-d6e2-4675-abc3-51f21e407ff4@linux.ibm.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <2e6d7e6d-d6e2-4675-abc3-51f21e407ff4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJfpegtgenUaudDcvecJuV2_WkkVw=gdcB0Eqg=UFKPMZP1uKQ@mail.gmail.com>
 
-On 8/24/26 11:06 AM, Nilay Shroff wrote:
-> Okay, that makes sense. So it looks like we can't easily get rid
-> of loop_validate_mutex. In that case, would it make sense to always
-> acquire loop_validate_mutex rather than acquiring it conditionally
-> only when the new backing file is a loop device?
+On Mon, Aug 24, 2026 at 09:33:03PM +0200, Miklos Szeredi wrote:
+> On Mon, 24 Aug 2026 at 20:17, Matthew Wilcox <willy@infradead.org> wrote:
 > 
-> I think loop_configure() and loop_change_fd() are control-plane
-> operations and are relatively infrequent, so taking
-> loop_validate_mutex should not add any noticeable overhead.
-> In return, we would have a single locking hierarchy and
-> the locking-context annotations would be much simpler and easier
-> to reason about.
-That's an interesting question. I will look into this.
+> > Before:
+> >
+> > fuse_open()
+> >         invalidate_inode_pages2()
+> >                 folio_lock()
+> >                 folio_unmap_invalidate()
+> >                         folio_launder()
+> >                 folio_unlock()
+> >
+> > After:
+> >
+> > fuse_open()
+> >         filemap_invalidate_pages()
+> >                 filemap_write_and_wait_range()
+> >                 invalidate_inode_pages2_range()
+> >                         folio_lock()
+> >                         folio_unmap_invalidate()
+> >                                 folio_test_dirty()
+> >                         folio_unlock()
+> >
+> > so what's the serialisation that the filesystem can perform in the first
+> > case that it can't perform in the second case?
+> 
+> In the second case filemap_write_and_wait_range() won't write protect
+> or unmap the page, so it may become dirty after the writeback.
 
-Thanks,
+But that can also happen in the first case.  page_mkwrite() can be called
+immediately after the folio is unlocked, for example.  Or the folio can
+be evicted and replaced with a different folio which is then dirtied.
 
-Bart.
+I've widened the race window, no doubt.  But it was always there.
+If you want to prevent something like that from happening, you need
+to be holding the invalidate_lock across the call to
+filemap_invalidate_folio() and whatever other thing you're doing that
+needs those pages clean.
+
+> That can't happen in the first case, since the page is written and
+> unmapped while under page lock.
+> 
+> > or alternatively, what's the serialisation that would be useful by
+> > adding a lock/unlock of the invalidate_lock inside
+> > filemap_invalidate_pages()?
+> 
+> Nothing.
+> 
+> What would prevent this if we'd have writeback + unmap + writeback.
+
+We could do that -- but it won't solve the problem because the pages
+could still be redirtied after the second writeback.
