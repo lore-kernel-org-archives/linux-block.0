@@ -1,115 +1,104 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ehvag.de (arnold.ehvag.de [157.180.54.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C77A3F0744
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 09:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787562360; cv=pass; b=LjApZgR80PxegrKjWJtBVeR6c6FnZrdq2s07piJVxqGyuBrXymDwVXjrTXXQKmhxjgNe7ADbNa544nibKGkKMjGgay+ScNB3yjwSc1ojr6Kc9ev8m49otPU6N+SGQZrrnmKOUkM+XLsFMnXsH5UmeuWkk8LUYBlRzfEQxXIwHP8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787562360; c=relaxed/simple;
-	bh=k1VcahloVqTMd2bS2EdontwtzK2WJK0zze95i6TSOFk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JDi8qLm8WzK/Iziw9JQMZxXQs43JuxV9lvt9vxen3hYnyD5w/MxT5juW30Ur2hGvsSYbRcOwooRDq/DHdY9Qmy56C4RhBUlc8XZzSBYZZ00X/dHXu4B6VrAVWvZsqvY2GK1GGRIsnrq0jxsXfQNxhEspWizHo05DtJOxiND7xPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=Md3V02RB; arc=pass smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C9A3E3165
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 10:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.180.54.146
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787567166; cv=none; b=b7SoudhrATOpj/eWtM+hyOu9d1VThJ1FkCuKDB0/xEtBMQ5EKEChXF36t2IVie8EjgHBxgZyv3uqLMmJmEcmZysZ4LhIUVtrHR2n/VT34LhJNDXknHeZQoyggoaIc3Kr1WNvzv/TpLovOZqICoDYs1o49q8gPXOiKw1H6l10osY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787567166; c=relaxed/simple;
+	bh=ZPO+kyxo2fugQmtEktw/8O7zRu3nvn37XOBML4AGGFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=eXzySDH7BPVjV5KxvBP++UEAi5clVIeOZ1S25+2ErDoZdLbhi/aGJYGabZu52FvFB4tR0GSbe7VsqtKQXMyNDrULW9EGvWLGQmVjVhIuhz3t+5mc8cCkaYUORfjh2doZnWqf7CXNyuV4Kp/LB5DZYOvgFSk/PhjOMaS2zBD+8i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ehvag.de; spf=pass smtp.mailfrom=ehvag.de; dkim=permerror (0-bit key) header.d=ehvag.de header.i=@ehvag.de header.b=NKTmWCjm; dkim=pass (2048-bit key) header.d=ehvag.de header.i=@ehvag.de header.b=KNyfwgjU; arc=none smtp.client-ip=157.180.54.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ehvag.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ehvag.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="Md3V02RB"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-93695893ac1so185709285a.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 02:05:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787562358; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RBTbKbxgyLJBjDkNZRJGTd53IurGqHnbf9yq5qfmuNeQIVxxTc8AiVYV9/mKhZeaPN
-         KMFpjCwvm3tWIeezhw9bZb45RwuiLzA2qu/sv0AQsMVtleVC/2xjU4OX+Ly5wE+nM6E6
-         fLwD573FMLbtPFUwG/8f2YlYpTECF+2mP5pCrUFXELAjGG89rz7779/vnXEXG31Dk9Hq
-         Ln5omNNFHaNa9RedDgGvz36/LrqYzSHoFFaa8IZYxr9R8s03TdYcGXkRjEk71oHxatoE
-         CJinvaSAGD1jOFkXT7UC2pcx/5fxji+1wsAJoWZ/oV8Y0nmbpXt6NCshCqPS2tL3CUAe
-         V/Uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=xjSchm007/sw+2JfMjG96f8T6RE12rgCCudebYixRu4=;
-        fh=5KsOmBQBFC8XHgZCFZkHSmUai/13mtTPPh17I3CqZ00=;
-        b=AMphCQf/d0M4qH1Ess+ybDx79x3E+YrR2OWUXerj/7Mrk9S1Zqa9+RP7wwHaAF4NhD
-         I6IM8iEpXXcjhsQHShC8i/N4JRFYgIcdPbVMJ+Lzxs95nnanz+eWRdUpZ0gaCLoy+93R
-         qAx/OtvtBTHgAt+TqSZ7/B7bZDxdpAi6cAtQKFf5U09JVLJcbkwFebxoC/jXYuhmaOXE
-         reSlQVuzvsqMfxC6+TsTzGTshLtnQjxkC5anqQmFVc+C2TQGLrVGycwg5NcwcrFC1Sk/
-         Tnzuz+bB46Bg6AMw6c3lW96xhAnnGZaZQbQkUK/9Qs0i5p4cZFA7yFDSju+7eis3eoE3
-         zZ2w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1787562358; x=1788167158; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=xjSchm007/sw+2JfMjG96f8T6RE12rgCCudebYixRu4=;
-        b=Md3V02RBMrXT7++lZjkapZopD8qkdAFSHpNsSv6QmBIPKOdzQWCNN6AR4kmpFvkadv
-         0WjoUBO4KWY/LQLlyBAjyM8JJ34zje3REjajNVZ3Gow34PJ4FI1D/qOFI4wkzef/51KP
-         WjSj07LC1JS0zXh2vxVUSAXHu2k8KyBR3WWNA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787562358; x=1788167158;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=xjSchm007/sw+2JfMjG96f8T6RE12rgCCudebYixRu4=;
-        b=a3aY0EJvqkV89g9YUtyF68oxT3qAOLwOM9+YVsVeVd/Cw4HM5uI5rSbbLEzCK30jsC
-         iSJqrt+ldl8Js57N+rn7RwA9a/xbsGACp1wiPOGwuedFo5DbcqOitZsZ+B2TnNLbgGAd
-         4cA/Av0qTOH6fHszdR+6Gjv7DgoQtSQhQ5RZPKQjNgxBm//n6ZatDv+TiE2TfBIJ77tX
-         DQS8z01VUqAdL8zw8dlob0tj1fmEcurf4NGIrailb4o7kpipkDWhGpwd+VSEzb0pDjG/
-         ptZnYWQuIS8Su8Oq5NzofCTDWJ4tceC0zHKac7J8O/NfRVHRF9Y5dhPtfY0zIBxwgXby
-         nsrg==
-X-Forwarded-Encrypted: i=1; AHgh+RpwOx5MSIBtVwU8qedouXvg+U1Bm2oj1GnnDHYBg8Fqt6TfgA/OS13HoH+Fi7i3mAX9+Ax4Zqh4WKXm1A==@vger.kernel.org
-X-Gm-Message-State: AFuF++mM0rGcHdkb2r+x8SZnD/bHT5cjL5Tb39qBWeC6dYhKFnDbBU+S
-	J0MCemX3RrIR7cWhD0RmPpD8h1IMXt09IUlOBJwovWgbOUe/NjC03YizvxywXhyM18yLUP0yMCl
-	g16PFo5wMol0JHJKBsdS65bbnbdH/f0MI+8hjWlZCNA==
-X-Gm-Gg: AR+sD12an1kxhj96varWq8FZ+KRuxKHu/qX/jHM4rCNGLNlPOyYdkw+7YEbuKYwitlE
-	kuJRnlUxFD5faubE/RhIUB9uN9/TD0l94fEzP6DGDYqA12kCMmEO+JNc0ICofqEr4ZZsWOMGTsE
-	v3N9Mh6QqH2NqwYS5lsxFWmivDAy/fNSmg0gGpuV8Nm/3GXrhBouj5XO3R4t/fIqjsvlFsHT5sT
-	MNqmbOJLX5AmWt13ytmWEbvGKfyEoKQtReM1YDAsMNdSlz6ulbw830R6x5POKSGWsqta7DEL08b
-	ScVY/O0MuQf6iZwbKKMoMPbI/THetlushlyV3wk275OHDqgf1b9WOnlfrQLSMRDp3RW83GsDyF4
-	vOSg=
-X-Received: by 2002:a05:620a:a2c6:10b0:92e:bbd0:260c with SMTP id
- af79cd13be357-9373957655amr1668397485a.36.1787562358062; Mon, 24 Aug 2026
- 02:05:58 -0700 (PDT)
+	dkim=permerror (0-bit key) header.d=ehvag.de header.i=@ehvag.de header.b="NKTmWCjm";
+	dkim=pass (2048-bit key) header.d=ehvag.de header.i=@ehvag.de header.b="KNyfwgjU"
+DKIM-Signature: v=1; a=ed25519-sha256; s=202603e; d=ehvag.de; c=relaxed/relaxed; r=y;
+	h=From:To:Subject:Date:Message-ID; t=1787567161; bh=t2dkM9cZVLMYhtmdgf463Pq
+	bJWpLkARydUQj0wf92d4=; b=NKTmWCjmRI6Ryq2feWZOWwcCOwVnlcKP/aQmn9Ro5KrVLLcwou
+	bG3e5Z8d2vneOIqCDAoj+U20wj4OSfBql2Aw==;
+DKIM-Signature: v=1; a=rsa-sha256; s=202603r; d=ehvag.de; c=relaxed/relaxed; r=y;
+	h=From:To:Subject:Date:Message-ID; t=1787567161; bh=t2dkM9cZVLMYhtmdgf463Pq
+	bJWpLkARydUQj0wf92d4=; b=KNyfwgjU4KgvBFJ1RuJw/6Tv7Y1S2cCy1hXSNB/GGWnfe/0Qij
+	lRHYbd9IivEOzKFqQCQvV84GvbDe2fnOri/H+zfq0prhJBbMz2LcKfnb/zQOPyHcwhqEAG0fid8
+	ySeR9U2fWBYSdvvZcU30vSXurKaaULDhUKcWJ44L5pGtYO6Ot9jmE47At0kUeBAR+1Sohc7awIk
+	3xo8KtvyUxuDz50u3zlHAo6B8QAWLHeQatBWGrQsVy1nrHhUgq2ULuDJHOYsaSwwkiPt3kYdzae
+	457/JOaOlythu6a7BOMvMuueoho/k16W8dcHzDPuQqCj9OJC4kiXEM5YmT2Wd2/LdHA==;
+Message-ID: <51d780f2-1037-45f5-a348-361f3399d74f@ehvag.de>
+Date: Mon, 24 Aug 2026 12:26:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820193343.3852967-1-willy@infradead.org> <20260820193343.3852967-3-willy@infradead.org>
-In-Reply-To: <20260820193343.3852967-3-willy@infradead.org>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Mon, 24 Aug 2026 11:05:46 +0200
-X-Gm-Features: AcwNN1VnwXUZIDZ1PfaZZEyLrhKwB3yAlvrDYfoxcRnFp4RHIk-2JE_xMlB98T0
-Message-ID: <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
-Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Seagate Flex SMR
+To: Damien Le Moal <dlemoal@kernel.org>
+References: <d5ff28e5-53a3-481c-870f-f6115e82f4ed@ehvag.de>
+ <47d4430d-ccc0-44e0-bfa1-98fd1129af6a@kernel.org>
+ <88cfe0e2-4930-44c5-a1a3-45f95c8577e5@ehvag.de>
+ <3cfe7ce2-ed79-41fe-b73f-d4d416169a8d@kernel.org>
+Content-Language: en-US, de-DE
+From: Noah Bergbauer <noah@ehvag.de>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <3cfe7ce2-ed79-41fe-b73f-d4d416169a8d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 20 Aug 2026 at 21:34, Matthew Wilcox (Oracle)
-<willy@infradead.org> wrote:
->
-> FUSE relies on invalidate_inode_pages2() / invalidate_inode_pages2_range()
-> doing writeback by calling fuse_launder_folio().  While this works, it
-> is inefficient as each page is written back and waited for individually.
-> Far better to call filemap_invalidate_pages() which will do a bulk write
-> first, then remove the page cache.
+>> The specification can be found in T10/18-007r0. It's not exactly ZD/ZR as it
+>> seems to predate those standards, but it's close.
+> 
+> This document is a proposal, not a standard. Some aspects of it are likely
+> integrated in ZAC-2, but if the drives you are talking about do not follow this
+> standard, we cannot support them.
 
-filemap_invalidate_page() suggests to use invalidate_lock to prevent
-races with pages coming back.  I'm not sure that without it the
-behavior is identical.
+The drives I am talking about (ST12000NM0558 to name a specific example) 
+appear to follow this exact proposal. Obviously I am aware of the 
+difference between a proposal and a standard.
 
-Maybe add a variant that takes that lock?
+For the purposes of the kernel block layer they implement ZAC-2. As I 
+said before, the majority of this work is applicable to any 
+standard-compliant ZD/ZR drive.
 
-Thanks,
-Miklos
+The only exception would be the Zone Activation Capabilities field, 
+which is all zero here (because it didn't exist yet). Instead, the 
+domains are discovered through a vendor specific log page. Is this not 
+an acceptable quirk?
+
+>> To be clear, what I have implemented is all about running a filesystem in
+>> domain 1. And I want to push back a little on your claim that this is extremely
+>> hard, because in a handful of small patches totaling around 500 lines of code I
+>> have found solutions for all of these challenges. I am running btrfs on the
+>> sequential zones and it passes every test I have thrown at it. I can show you
+>> the code if you like.
+> 
+> You are looking at this very narrowly. The simple fact that you now have a
+> drive that reports a capacity that is nearly twice what the drive can actually
+> store will likely cause lots of problems. Also, you may have patched BTRFS, but
+> what about XFS, zonefs, and device mapper (dm-zoned, dm-crypt, dm-linear,
+> dm-flakey, dm-error) ? All of these work with pure host-managed zoned drives,
+> and without patching will likely break with ZD/ZR disks. Hence my point that
+> supporting these drives correctly is absolutely not trivial.
+$ df -B GB /dev/sda
+Filesystem     1GB-blocks    Used Available Use% Mounted on
+/dev/sda          13694GB 13688GB       3GB 100% /mnt/a
+
+This was btrfs running on the above-mentioned 12TB drive. It works and 
+the capacity is correct. What am I missing?
+
+I'm hacking on this in my spare time, so please, cut me some slack here. 
+The current situation is that domain 1 is completely unusable for the 
+kernel. I would like to make some small and incremental improvements, 
+starting with zonefs and then btrfs (XFS didn't support zones at all 
+when I originally wrote this!). Does it really make sense to block those 
+just because it doesn't yet have all the bells and whistles that one 
+might eventually wish for?
+
+Best,
+Noah Bergbauer
+
