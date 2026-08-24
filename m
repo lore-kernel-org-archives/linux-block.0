@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD14B2EA732;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AD7324716;
 	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787578375; cv=none; b=nyi/H3gb26S7T1WRDB/0iEFy/pKWoKZG3NrQUUTMobOz6RkigXivhhfylqLvFp72hJoPXUwIaqvYJtlbrcF2eJyp7m/AnK1RgsJ9eyrSOdfrDI2JYSTFTT55bHeh4SkQiXbK50s/yiFWN8X8/Ninr8HD6PxsFRGZUroEawgXBPA=
+	t=1787578376; cv=none; b=Z1rFXGzAQ3iDrZUPnr4eUw2061yAxGKi6V6VHGpj8+L+rDpGxkshe+ftVCn1D9yrcqqil++i3geL4yzA3yijAcmtdngEzRqhadwggxMgxSt4sKEM+sKF++KxXEcg//KG9TLfsqLQZxF31LldOLdO94ebs/GhUuURLjshaQnsOq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787578375; c=relaxed/simple;
-	bh=/Es2fSdTwUmy/6IdP4XUR1DrGU7DaaE6PINJhMBwvuc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WvfajSoo87veubPuUvVLEMrY/Wvy6bIDf4hQYAV1V25H3DSOHwDvTNxDsOlrS+CpH3eEf0thcM8MZBEietJqi1icXTyaJcZj1NpWqoT94+xuaZBaHQrtP+7Po30MIjpjGnDyxka2Rx7Mx6YnFUPWT0GY02JuCamEbewma+7LQxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPfjmKuL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1787578376; c=relaxed/simple;
+	bh=m8oDTs2Omttsm2iVNRsyL1KTq7wF+IDuFw+OPYgP+Kg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=oWR3iiqOCUAFqO4MuDo5uAe5QUzJO+rZ9kTAVMz9C4yFZ7kaXbVdi2oU9rSQw+bGgsFlfWC3bNufX0dbpzs0YWnblow8pa6B9V/4+c9JVL1Z8qkC1/Q+3JU+0CtT9rqdNcSH5IrCyldXeYH0uz9OeQ+wdEdCsFm32giKG6haFv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LY9vVvfj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPfjmKuL"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 95AEBC2BCF6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LY9vVvfj"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 867A8C19425;
 	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1787578375;
-	bh=/Es2fSdTwUmy/6IdP4XUR1DrGU7DaaE6PINJhMBwvuc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=TPfjmKuLrCLVWYQvU9NjRhVbiivSNvxrwAYB+x6PQCrUbD0LoThQxvu7kB555Pb/a
-	 yicE8xwGn+3P2R0g3X3bh2NUY9Y3oGwP1zsB6e7JsJGPWzwr5OhfXHJNZeiPPUCXll
-	 WatuEKWfLJfwCQm2WaEnZwtqFVMVXaXrOfc/w1C3PzJeVcPqdKyfsHnQtZrsB5suwG
-	 X36S9SDJsIhNgN7zuRwxgVEf1ggoUPtrBpPMs31BMVxhK2I1kiE+c0ihyTO9NTp5ka
-	 dylUf+niRMG2xeC3Ou/MZjY+fy2E9Dr7UJs1lem9zdtzg1qWp2kOZiXb/8UidT69FU
-	 NrJic/1tY+QKw==
+	bh=m8oDTs2Omttsm2iVNRsyL1KTq7wF+IDuFw+OPYgP+Kg=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=LY9vVvfjVj0dTcYmQccXCfK9HWdq3+Ay3pEkWnRrKmIARH5jxrUIgRcABeKxPRAl3
+	 IfQBfGOzMvAD/nQjIpMGXEdkjxVYYHXW9MdBu1YJzceL4Y06xqm9uVV8Q256v868r0
+	 VKiatKE58emBZ3v6uuz6KR34AYpulQATZAUPiM4rZBICJ6tmxjHpLO/vE+3vgFvzMl
+	 hQqa9h5BwZauz+NXtn8UhOzhE6YpC630brsgQUtYJcMn5jGoXc/s8PIVHaIUu73dr4
+	 Inkj64EDkERbR8uHQwCFCiBs3HTyfKEclajAfdftozq0R11+gBy6ny42DUo4wTzKZO
+	 0+syj18dc55jA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E25C5DF9B;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629D8C5DF81;
 	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
 From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Date: Mon, 24 Aug 2026 15:32:47 +0200
-Subject: [PATCH v2 1/2] loop: drop stale partitions on LOOP_CHANGE_FD
+Subject: [PATCH v2 0/2] loop, nbd: drop partitions left behind by the
+ GD_NEED_PART_SCAN removal
+Date: Mon, 24 Aug 2026 15:32:46 +0200
+Message-Id: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,9 +41,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260824-b4-loop-nbd-stale-partitions-v2-1-9815a577cebd@amutable.com>
-References: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
-In-Reply-To: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42OQQ6CMBBFr2K6dkxpFIgr72FYzNBRaoCSTiEaw
+ t1t8QIu3/8zL39VwsGxqOthVYEXJ86PCczxoNoOxyeDs4mV0abUtS6BztB7P8FIFiRizzBhiC6
+ mPwFjC82WqwINqqSYAj/ce9ffmx/LTC9uY3bmC0JhoIBj2+VoQIkcctE5iT589mFLkQV/blgK0
+ FBWRNUFa1sR33CYI1LPp9YPqtm27QvDn62h9gAAAA==
+X-Change-ID: 20260806-b4-loop-nbd-stale-partitions-2d10ede71a2a
 To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
  Josef Bacik <josef@toxicpanda.com>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -51,11 +54,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
  Daan De Meyer <daan@amutable.com>, stable@vger.kernel.org
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787578374; l=2855;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787578374; l=2324;
  i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=WMb3SvdJ8nIuT3XTRHYjCJBoiazU8RPkqLA8H581hVc=;
- b=roJ22zyFQX/Aj5bjWwbYQ1OZriM1r+M8xNrCHVZC76NrO3DAmpoc//cdf8eoGpGjge//Kizny
- AUInBq9U2srA60ZGkwqHnztnuOc22sPBbB2dGpoO8tyqqSiM3OhIShM
+ bh=m8oDTs2Omttsm2iVNRsyL1KTq7wF+IDuFw+OPYgP+Kg=;
+ b=fNrfiKkFno9FI1OkHU1IpiZwGO7JDAKB2aiPhaNwy4SDOLKjkI6phc4O81sz4kHnlF/d34lTv
+ jqFqFl5ACeaCBaP+Szikiya/mlTUw0I82MIJ3feixk0zQoizlshzTB7
 X-Developer-Key: i=daan@amutable.com; a=ed25519;
  pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
 X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
@@ -63,78 +66,60 @@ X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
 X-Original-From: Daan De Meyer <daan@amutable.com>
 Reply-To: daan@amutable.com
 
-From: Daan De Meyer <daan@amutable.com>
-
 Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from
-setting GD_NEED_PART_SCAN. That bit did more than request a rescan:
-bdev_disk_changed() drops every partition before it consults
-disk_has_partscan(), so the lazy scan on the next open was also what
-removed partitions from a loop device without LO_FLAGS_PARTSCAN.
+loop_reread_partitions()") stopped disk_force_media_change() from setting
+GD_NEED_PART_SCAN. The caller audit in that commit only considered the bit
+as a request to rescan partitions, but it did more than that:
+bdev_disk_changed() drops every entry in disk->part_tbl before it consults
+disk_has_partscan(), and only the re-adding half is gated on partition
+scanning being enabled. The lazy scan on the next open was therefore also
+the only thing removing partitions from a device that has partitions but
+no partition scanning.
 
-Such devices are not unusual. bdev_add_partition() only rejects
-GENHD_FL_NO_PART disks, so BLKPG_ADD_PARTITION works while
-GD_SUPPRESS_PART_SCAN is set, and parted, libfdisk and systemd all fall
-back to BLKPG when BLKRRPART fails with -EINVAL, which is what a loop
-device without LO_FLAGS_PARTSCAN returns.
+Loop devices without LO_FLAGS_PARTSCAN are exactly such devices, and they
+are not unusual. bdev_add_partition() only rejects GENHD_FL_NO_PART disks,
+so BLKPG_ADD_PARTITION works while GD_SUPPRESS_PART_SCAN is set, and
+parted, libfdisk and systemd all fall back to BLKPG when BLKRRPART fails
+with -EINVAL, which is what a loop device without LO_FLAGS_PARTSCAN
+returns.
 
-loop_change_fd() only rescans when LO_FLAGS_PARTSCAN is set, so those
-partitions now survive the backing file swap and keep describing the old
-file. The new backing file must have the same size, but its partition
-table can be completely different, leaving the partition devices mapping
-the wrong ranges.
+Commit c4f4c0fc551c ("loop: remove manually added partitions on detach")
+fixed the detach path after this was reported as loop devices picking up
+partition devices from a previously built image:
 
-Call loop_reread_partitions() unconditionally. Without LO_FLAGS_PARTSCAN,
-blk_add_partitions() returns early, so this drops the stale partitions
-without scanning the new backing file.
+  https://bugs.debian.org/1141434
 
-Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
-Cc: stable@vger.kernel.org
-Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+These two patches fix the two remaining places that relied on the same
+lazy cleanup, LOOP_CHANGE_FD and NBD_CLEAR_SOCK.
+
+Regression tests for both paths have been submitted to blktests:
+
+  https://github.com/linux-blktests/blktests/pull/259
+  https://github.com/linux-blktests/blktests/pull/260
+
 Signed-off-by: Daan De Meyer <daan@amutable.com>
 ---
+Changes in v2:
+- Rewrap the comments added by both patches so they fit in 80 columns
+  (Christoph Hellwig).
+- No functional change, so the review and test tags from v1 were carried
+  over.
+- Link to v1: https://patch.msgid.link/20260806-b4-loop-nbd-stale-partitions-v1-0-67bb75a8d7be@amutable.com
+
+---
+Daan De Meyer (2):
+      loop: drop stale partitions on LOOP_CHANGE_FD
+      nbd: drop stale partitions on NBD_CLEAR_SOCK
+
  drivers/block/loop.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/block/nbd.c  |  7 +++++++
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+---
+base-commit: 0a0d1d55dad570724bf8c7ea83409639cfb4be9b
+change-id: 20260806-b4-loop-nbd-stale-partitions-2d10ede71a2a
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 6f12976035b0..89935cfc591f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -550,7 +550,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	struct file *old_file;
- 	unsigned int memflags;
- 	int error;
--	bool partscan;
- 	bool is_loop;
- 
- 	if (!file)
-@@ -604,7 +603,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	loop_assign_backing_file(lo, file);
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
--	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	loop_global_unlock(lo, is_loop);
- 
- 	/*
-@@ -622,8 +620,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	 */
- 	fput(old_file);
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
--	if (partscan)
--		loop_reread_partitions(lo);
-+	/*
-+	 * Rescan or, without LO_FLAGS_PARTSCAN, just drop the partitions of
-+	 * the old backing file. They can exist without LO_FLAGS_PARTSCAN as
-+	 * they may have been added manually with BLKPG.
-+	 */
-+	loop_reread_partitions(lo);
- 
- 	error = 0;
- done:
-
--- 
-2.54.0
+Best regards,
+--  
+Daan De Meyer <daan@amutable.com>
 
 
