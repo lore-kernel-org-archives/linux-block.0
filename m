@@ -1,65 +1,65 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62120408615
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9716343B3F7
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787581673; cv=none; b=nVKQq0GPJWZ6LC8hmBtT77a8n/h1ek2qx3+PZYO9ioXrNO+EwKksHMqhwfofVTz5We883gnYiB+vI0Xk8o0v2ZziJKhwX9PW/mML59OXw1KPtSQIBfXrMEWiVB0OX0LtmehfrBSVrrq8NouiGE4K3CsPHB1Lk3EIizyzDngobrc=
+	t=1787581813; cv=none; b=rqRCWuK8WpVat5W3Zwx5u7DNGOhuzLmgJO+6fb+MQSt65RVl+w9CndZOXecjw5HAHP5OGXSy0et4KN0US3out10VqdZPJ6zLcHDMwqq0rT7x11ccAZOf5RSmjwhTkBvtmaWLoXFyDtKQ7Sa5CZ8Tj0jTi01RKylaor577G5SV9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787581673; c=relaxed/simple;
-	bh=K5tiLB2R8cTQP87kSzydxOBlV+RGaP+4Wl5t2pez52c=;
+	s=arc-20240116; t=1787581813; c=relaxed/simple;
+	bh=9DZojNp3mZvt3EkXO4hFRxVx3MJf/eYMKHBe+MyaBCs=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZAbLZpRVMj3Quu5kU1aXekQjh3FQac+WGNgGO6S6DHwSNyuplE5rUXYEcctwX7L9YkhmYO7jJgKnmGf0GLLuO4kNsUS1AkjYKgasVyR9rDaX21tIvgCL90JZDsLHc2HHb3H6qpsM8O77N6aSd+RbKbW7V25BL25hqy5l48Vq5Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jABRjcEF; arc=none smtp.client-ip=209.85.128.178
+	 MIME-Version:Content-Type; b=QXPtfCSnOEsKDb3/fiMMH0Zx2mrWu7pqQ4XEHX9sE2nir7aThnO8wCgp63Xso+ICuVz51l9PIDDLyS+N1vXHAgf0N07zI9oydeH/SngIyVBauCo8FL7tXhyVnbBHJBc8cBpF4vRYZMgYL/vFjBMlr7gk9GGo4j+l4P6ncO/9TJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c/BVKwms; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jABRjcEF"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-836c4474028so41010037b3.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:27:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c/BVKwms"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-84c4d4f68c7so38291327b3.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:30:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787581671; x=1788186471; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1787581810; x=1788186610; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=M66vr5Wj9LfuIyfBX17/YRcr9cErJu0CoiHB0PAp+Bg=;
-        b=jABRjcEF/5TjwJko1iCIOR8dVyjMem4iahZMg4fJIuUiUIgSGqpWMDL3AeDBrOcA1e
-         JUbYqoDsQUUK+OLz5uZmjuKDGbmLy51AYdJ0FsgiME3QQw7FnshKxODGY6pV39e5Mr61
-         o2AsY5bXVAJrivZfZZvxaW/bYNOE6mbpezsEgSanQquVE9LYUqvT5hWlS2ueqgES2w+r
-         7cPp0pWQ855xC1rK94DmRjToW6jEvyQ/lZLLLYQYhUHjcc9OIsqIATwmWdW01Vz8KiQ0
-         T8xydmUk7A0a1wtxF021HYsVou6pNjG0e9UNI66a6YQKXIYjvrWEK19/zaIZUFqYVmLa
-         PN4g==
+        bh=jkA2C/lQgXcypv6Ly6gx3bJF+pwu7LTevogMVJJ14Qg=;
+        b=c/BVKwmskUlMdRTYj31BuO49DkQnZEsVS88LeGTloCLEWl67MFMWY9U6KoXZpWhL40
+         eRqUhLiCwNUHpoEAUbBakuEAE2RKa+OlK1PdTbgFZGSU6shJu4ef5s3HBzjKEue10BCh
+         UaP72LhLPnPAwjIP/0lrcR7VmeJLeBadr6kBuOisMv3a0sLliDOg1cP7hOGxwMRZjqd4
+         IOGkyaDIwLoLH9X+/dH6BzXl5D5dmur3c+IMW6zopQSrIza0DobJfZO/OAnCv5ZqcNn5
+         oyszmgqtJojMd1wJIu+uEorStzGdD/KvpdkMbeUZCx0S0fyCX+422ZIVPjWNd6EqqMj2
+         Yj6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787581671; x=1788186471;
+        d=1e100.net; s=20251104; t=1787581810; x=1788186610;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=M66vr5Wj9LfuIyfBX17/YRcr9cErJu0CoiHB0PAp+Bg=;
-        b=nmLTvqyJb92PqjKCNNpEfFmTCrNq24B4PzN6QXshDLHUD5u2po9PjgMKHjInsPbo4x
-         GklEbGb9UeorvVTSygYjE48yzMul+CbDIyJLB9AHz66TzgKgAo7oTgj+yNt3EkxzG/Xc
-         E4rB2ONEMAL+deJykubXnhz3/EWRR4FdZeXTHCc0u4pG/2UVuV+OGcQA2dnOYslyRJS1
-         d48CAtCK/enwBFEqMhEvv9XPAuuJRT/Uwnun71PBOI/5ON/0EIMdGnIQS3eop/kJS5wF
-         B8pW46e1We8G+k/qU/X5XUy/gmNgmZnf+HnGwoUx6veQgUmKjjjyFNjjqd1OgiS3tmYY
-         6b9w==
-X-Forwarded-Encrypted: i=1; AHgh+RoD4dzBrEq5ys+CG4pzHCdY6QqZ6EGjKBQzpydoTYnsXcwAo0wNkPIeYjU4KhocLRIfXswBn2dj5YbPRQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++lJSBCz+n9ku0RM9Y+SUSIc5cpr5iJf+ZPY8fXHbywF/T+CpSHR
-	0z3FVTUZlORAUkclTuHL/UTbWuimhxfsIhBGIRTLF3EEDyDCFEGQTBPITge+RTdhfA==
-X-Gm-Gg: AR+sD11gB8INUWMNQX3nCC+omGJBIfAGr8y3oiHBIoKI5h7w/r0+XRbHZfWVF3cbFT8
-	sWnoFTU7Gp05iN4UdArwZ6RBAG/77DHOxy0usDCy/Zl6s8dc77+XhFUHdMYgLFwIyv0v140CSD2
-	W83REWFB3dSF98MJ/YE9y9rCFMIOWUEjM9V2O9GCs6VOEuWp2lYSs1YGzJQDL1nfC2vM8BFtd3i
-	cSog83Nuf7/kqXY8vNcMw66FcJG+Q50iY4wyfHeYT2DzC4F2Zk1TA9WMUIH6idFjtTnKqM8wMRV
-	E4KSvPCg4tq0GuNDFvzXs2cz1gnLvekz6+LBg8OCV3tXvlvQpLnC8fcdmEybIVekbO7QudfQjEM
-	Lc254ffIQS5Rdu/MKCUL5s+cqr12CmWhWGshhyPYQFj+8+bwjz1NqGF1WELQCNNQZHhsjy38YZ4
-	8QWbwLgcN2RVw6Rpz4am7B2sR9yk18rM/BXtxj9vJoiJi26xeh4EZPZ7QpP+VHB5wkQT0vMcQl+
-	d9wiF+5fMQdbCUVDjkfN4ZYY3Nc9feuprst9x+5LJfA2k4l
-X-Received: by 2002:a05:690c:6d81:b0:851:5445:ad5b with SMTP id 00721157ae682-8515445b0cfmr26010647b3.1.1787581670595;
-        Mon, 24 Aug 2026 07:27:50 -0700 (PDT)
+        bh=jkA2C/lQgXcypv6Ly6gx3bJF+pwu7LTevogMVJJ14Qg=;
+        b=oopV4+VEVNjybSM2WA0F0R3BmK7dt3wsEZXOy6l4xft+uFjaAYEiWNgQ3YcElzdsHB
+         DjBUZnu0ldRwLvboAZaEUKJgf48+gInvR4nOqwuBpClY9GJZWQtgh8pUD+5Z6wd2ZXV+
+         mfU01RPJyymYdCiwILTSkjnby0Yi2/q7OPTgPjkedrbCiGdc1SOz27S29VvQWpeaR/k7
+         C1+INnPrXjuGfOY9U2f6inTHFXhvsOsrVgSIXby9fi4k8qsC/K8ubj/TTD1CLAPYxgjQ
+         v+fGpp4V9IuHKkMEe38/vk3EYxfXQv8ziPLR7GZzgHBewZB30IqBvp8nztmFH6FWvADN
+         7jqg==
+X-Forwarded-Encrypted: i=1; AHgh+RrwtlxPMabwj9MOQC3vgzIqeJ1tFJcvMOc2WFSRXzgRHgcve+wctpVM06UvIMF0+gKRUGCfnExx8ZcLgA==@vger.kernel.org
+X-Gm-Message-State: AFuF++nXrfbyTmS35n9otIfZYr6vrY9APYmrLvVCjYAl80QmGev+oyee
+	WbcHz8yH58mOZOQqh7EF0KjC846nI06rW4ZRWh/mNJQB4AFmZ8NoXjOgRqnxpJRtRQ==
+X-Gm-Gg: AR+sD110NuxyhGbFaZoCBqs97LtpZMwEKk31e1TZZz8bUOC6iIj0qQZaK6KssonG4Q8
+	+rVZTspLM57TbrQ0H9cG3uTq53Li8cgM64uZqIWabW5nWHGAo+dEwP7PJ3v/y6APvH4TZCi8fgR
+	2UF7P3D89XRAFEo2DBn+TkuNQANhk05/NGjPbPiRhxX8+HSDDKSTlKiGzkTFsMHVJYuIGQbpKjd
+	/0lHndigNmUds5sSi/cjWB1Wqq6IVqaYuIPUdJVIlhC8vePw4l1GcAs0ECQcjXqtZO+oK8Uyobf
+	MzffNq1sk87IHhd15/pR4WGqmwCVv+2px7liTjeW/xFIUX40VUiU+O0H3D14Q4pwuMdAJBS+Dgu
+	sww3iWOmRCeR8mIQ5/0+yzxyOhYxkv2sl5yG+pmFOaJL1CzXPiUi9ZngS3IlUhCYTYOcTRV1E+K
+	/0FPk6LFDMsrjPAoiF9D7s0YMXUWX59LRLEfEKp6ERMCZuei//F3PX6Bqffly9z5xgFpG1Ylh86
+	S5RcyV7LeR7si/2SVxJlWg8U8vP5lo7GGAU5pcEyYx9qUgnY6hvDPqNFj0=
+X-Received: by 2002:a05:690c:e29a:20b0:81e:eaaa:535b with SMTP id 00721157ae682-849f6c946f8mr72860737b3.35.1787581809761;
+        Mon, 24 Aug 2026 07:30:09 -0700 (PDT)
 Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-84cacacb78fsm33749697b3.49.2026.08.24.07.27.45
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-84caabb9e88sm34055617b3.29.2026.08.24.07.30.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 07:27:48 -0700 (PDT)
-Date: Mon, 24 Aug 2026 07:27:44 -0700 (PDT)
+        Mon, 24 Aug 2026 07:30:08 -0700 (PDT)
+Date: Mon, 24 Aug 2026 07:30:04 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 cc: Ackerley Tng <ackerleytng@google.com>, 
@@ -89,10 +89,10 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 15/25] mm/fbatch: remove shake_folio() shake_page() from
- memory-failure
+Subject: [PATCH 16/25] mm/fbatch: remove lru_cache_disable(() from NUMA folio
+ migration
 In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-Message-ID: <213f92b1-7ac2-189c-4656-ba7d00cc7666@google.com>
+Message-ID: <a5147dfb-cefb-fb9b-7162-b537e54d9bb1@google.com>
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,125 +102,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-shake_folio()'s lru_add_drain_all() no longer serves a purpose, now that
-the per-cpu fbatch references are gone. Are the retries in get_any_page()
-then still useful? Not obvious, so keep them.
+Remove lru_cache_disable() from mbind(MOVE), migrate_pages and move_pages
+syscall handling. They do not now benefit from lru_add_drain_all() first;
+they gain little benefit from invalidating buffer head LRUs first, since
+5.0 commit 80409c65e2c6 ("mm: migrate: make buffer_migrate_page_norefs()
+actually succeed"); and it's a shame that (even without CAP_SYS_NICE)
+they can prevent concurrent tasks from enjoying the use of those caches.
 
 Signed-off-by: Hugh Dickins <hughd@google.com>
 ---
- mm/hwpoison-inject.c |  1 -
- mm/internal.h        |  1 -
- mm/memory-failure.c  | 38 +-------------------------------------
- 3 files changed, 1 insertion(+), 39 deletions(-)
+ mm/mempolicy.c | 7 -------
+ mm/migrate.c   | 3 ---
+ 2 files changed, 10 deletions(-)
 
-diff --git a/mm/hwpoison-inject.c b/mm/hwpoison-inject.c
-index a11222572f97..9eab4b7d25b2 100644
---- a/mm/hwpoison-inject.c
-+++ b/mm/hwpoison-inject.c
-@@ -118,7 +118,6 @@ static int hwpoison_inject(void *data, u64 val)
- 	if (!hwpoison_filter_enable)
- 		goto inject;
+diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+index 501e0b80d7da..44912d707d57 100644
+--- a/mm/mempolicy.c
++++ b/mm/mempolicy.c
+@@ -1343,8 +1343,6 @@ int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
+ 	long err = 0;
+ 	nodemask_t tmp;
  
--	shake_folio(folio);
+-	lru_cache_disable();
+-
  	/*
- 	 * This implies unable to support non-LRU pages except free page.
- 	 */
-diff --git a/mm/internal.h b/mm/internal.h
-index ff4bd3a14539..9a25552cbd83 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -1140,7 +1140,6 @@ static inline bool node_reclaim_enabled(void)
-  */
- #ifdef CONFIG_MEMORY_FAILURE
- int unmap_poisoned_folio(struct folio *folio, unsigned long pfn, bool must_kill);
--void shake_folio(struct folio *folio);
- typedef int hwpoison_filter_func_t(struct page *p);
- void hwpoison_filter_register(hwpoison_filter_func_t *filter);
- void hwpoison_filter_unregister(void);
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index aaf14608b30e..2a6a01e260ed 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -310,30 +310,6 @@ static int kill_proc(struct to_kill *tk, unsigned long pfn, int flags)
- 	return ret;
+ 	 * Find a 'source' bit set in 'tmp' whose corresponding 'dest'
+ 	 * bit in 'to' is not also set in 'tmp'.  Clear the found 'source'
+@@ -1425,7 +1423,6 @@ int do_migrate_pages(struct mm_struct *mm, const nodemask_t *from,
+ 			break;
+ 	}
+ 
+-	lru_cache_enable();
+ 	if (err < 0)
+ 		return err;
+ 	return (nr_failed < INT_MAX) ? nr_failed : INT_MAX;
+@@ -1530,8 +1527,6 @@ static long do_mbind(unsigned long start, unsigned long len,
+ 	if (!new)
+ 		flags |= MPOL_MF_DISCONTIG_OK;
+ 
+-	if (flags & (MPOL_MF_MOVE | MPOL_MF_MOVE_ALL))
+-		lru_cache_disable();
+ 	{
+ 		NODEMASK_SCRATCH(scratch);
+ 		if (scratch) {
+@@ -1626,8 +1621,6 @@ static long do_mbind(unsigned long start, unsigned long len,
+ 		putback_movable_pages(&pagelist);
+ mpol_out:
+ 	mpol_put(new);
+-	if (flags & (MPOL_MF_MOVE | MPOL_MF_MOVE_ALL))
+-		lru_cache_enable();
+ 	return err;
  }
  
--/*
-- * Unknown page type encountered. Try to check whether it can turn PageLRU by
-- * lru_add_drain_all.
-- */
--void shake_folio(struct folio *folio)
--{
--	if (folio_test_hugetlb(folio))
--		return;
--	/*
--	 * TODO: Could shrink slab caches here if a lightweight range-based
--	 * shrinker will be available.
--	 */
--	if (folio_test_slab(folio))
--		return;
--
--	lru_add_drain_all();
--}
--EXPORT_SYMBOL_GPL(shake_folio);
--
--static void shake_page(struct page *page)
--{
--	shake_folio(page_folio(page));
--}
--
- static unsigned long dev_pagemap_mapping_shift(struct vm_area_struct *vma,
- 		unsigned long address)
- {
-@@ -1459,10 +1435,8 @@ static int get_any_page(struct page *p, unsigned long flags)
- 			 * We raced with (possibly temporary) unhandlable
- 			 * page, retry.
- 			 */
--			if (pass++ < GET_PAGE_MAX_RETRY_NUM) {
--				shake_page(p);
-+			if (pass++ < GET_PAGE_MAX_RETRY_NUM)
- 				goto try_again;
--			}
- 			ret = -EIO;
- 			goto out;
- 		}
-@@ -1477,7 +1451,6 @@ static int get_any_page(struct page *p, unsigned long flags)
- 		 */
- 		if (pass++ < GET_PAGE_MAX_RETRY_NUM) {
- 			put_page(p);
--			shake_page(p);
- 			count_increased = false;
- 			goto try_again;
- 		}
-@@ -1627,7 +1600,6 @@ static bool hwpoison_user_mappings(struct folio *folio, struct page *p,
- 	LIST_HEAD(tokill);
- 	bool unmap_success;
- 	bool forcekill;
--	bool mlocked = folio_test_mlocked(folio);
+diff --git a/mm/migrate.c b/mm/migrate.c
+index 534908a0839a..bf9fe533a5fb 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -2360,8 +2360,6 @@ static int do_pages_move(struct mm_struct *mm, nodemask_t task_nodes,
+ 	int start, i;
+ 	int err = 0, err1;
  
- 	/*
- 	 * Here we are interested only in user-mapped pages, so skip any
-@@ -1658,13 +1630,6 @@ static bool hwpoison_user_mappings(struct folio *folio, struct page *p,
- 		pr_err("%#lx: failed to unmap page (folio mapcount=%d)\n",
- 		       pfn, folio_mapcount(folio));
- 
--	/*
--	 * try_to_unmap() might put mlocked page in lru cache, so call
--	 * shake_page() again to ensure that it's flushed.
--	 */
--	if (mlocked)
--		shake_folio(folio);
+-	lru_cache_disable();
 -
- 	/*
- 	 * Now that the dirty bit has been propagated to the
- 	 * struct page and all unmaps done we can decide if
-@@ -2554,7 +2519,6 @@ int memory_failure(unsigned long pfn, int flags)
- 	 * The check (unnecessarily) ignores LRU pages being isolated and
- 	 * walked by the page reclaim code, however that's not a big loss.
- 	 */
--	shake_folio(folio);
- 
- 	folio_lock(folio);
+ 	for (i = start = 0; i < nr_pages; i++) {
+ 		const void __user *p;
+ 		int node;
+@@ -2440,7 +2438,6 @@ static int do_pages_move(struct mm_struct *mm, nodemask_t task_nodes,
+ 	if (err >= 0)
+ 		err = err1;
+ out:
+-	lru_cache_enable();
+ 	return err;
+ }
  
 -- 
 2.51.0
