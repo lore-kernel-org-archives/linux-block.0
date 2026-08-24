@@ -1,65 +1,65 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEA1439008
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B9A43BDD6
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 14:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787581412; cv=none; b=rxU+m8DX83/zhMRosYMPX8o4isXSu0MKJ8kZlu7u0KDK5YVbN5tajo7JT57YDQ3+k6uQiI6c2EioGgNlE2HzNgpXa/avHbrP9hJ1AgUk0rncMkeTZ0gUq+Mdbw4CXjfYQiNlM3xWnPyXrfw12nCUHlHFf8lpnHycn+haDX+FOPg=
+	t=1787581565; cv=none; b=QERyCYdx9j/RozDtRPcUFXDQkDrGZ6mMiF4d3EFQYY5HHi7EwdnS83k8C7MWTPH6Vdd0bTPYkrlswlhynvq05GB0j1y/0XTQaahZMdM7AXheDFwLI3pHXmSqZIKeWyUFZ9LLbR9+I2VM1VWWmu0lkq++HSWiYP37uikDgX4rmrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787581412; c=relaxed/simple;
-	bh=6kB5h1HEECPTicOG3LYyogzNQExsOtWLu7kTMzR5cg0=;
+	s=arc-20240116; t=1787581565; c=relaxed/simple;
+	bh=1gndqcwixIf69ERl83wZ/ahlq6SVahr40TbASWBQcgI=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=JoKT1PdiQ7FRO0z90jCXgGrsLGfTXwXbw3KzthwaV+ce/UEBxVsUpBe7+lAWwpkmJ7AqLn85K+KC1J+CqwbNglOESGvS336P44d0xlLgTuc0FihTMiIy4AgYzQk/Dp4IFsl9CEA1rKiz0OSUH3aa4v93fN1r8/NNFBi1l8QW8T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qTL5iIIU; arc=none smtp.client-ip=209.85.128.176
+	 MIME-Version:Content-Type; b=s0oT3oHD07gZzAGfJN1gT036X4r1Y4S8fQ5tSRZI/IUGf8Xaha4xxJCBbbqtktXiFIxqOndTcuqc9Jl0C+U6AVOgvkeo3dWID0GLgVDcf4jb7Wwuue8IS4XG7pjVSZzILNvOMRmLiZjRqYRxBH+hidXg25jZznPAPNOvaXC+nXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qtyj8YcU; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qTL5iIIU"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-836cb2fa1bcso53083727b3.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:23:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qtyj8YcU"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-836c91bd782so42798637b3.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 07:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787581409; x=1788186209; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1787581562; x=1788186362; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=DAA3AJBckMfL7iDkU5H4UAChzqupIeoXexgfVyLiXUk=;
-        b=qTL5iIIUHVBB9JoHNIpqnDPZ8Tgfan4sEu+QR0jdnehPcdRuSmmSwrTk5iczR8q5DD
-         600sh1DTir0FNM08emH2W9KFR+c5JnQvIJhyb3T26Cw4B38BIWghn22vvykMM45M388U
-         bJnjrkF6MAh4c/yHo3+o/t/uMp88ct+95h8a6fHmgzcnDUYnTD7ZsU5oDvccIbAxwtl2
-         WXjIvy7nmjcYv7IeJhvfOCQdnexTlqMx+eN9GT5NvTXc1Pu3tbLAzS6FYPxnkxx6+ZSN
-         Op/Oam74dLn3ZBLZnFPzkvHBG35ayFwnOvUGHFjjlvN6wqCLJ/YOlwnFTazDqJ9O/4LZ
-         BUig==
+        bh=lsHaeoqxnMhy2GB3rUAu2bzr8hj8izpjrzp8bJJzBnk=;
+        b=qtyj8YcUWb3nhbWfFR1yFkoOzDGF3NubYDQbAGYRXxSFU9sFzPTnQXiVe1+L8Ya6Ub
+         Y3ABAv8Skeh07ilRLu2LRwBRetxeZ3YjvOwJoSVd+ieEDuHymyt4KK7PyHaLFCez6/yA
+         CmYhhc3hG7OddFHnmw1Zds95SnjpsFeq6aR4Wpgl5qB23W0fCz4t9iCoDsh/RU+pcBqi
+         epj4aR0lPB6ForXt8ft/Mn+wYMS94Ze0kESzmtAXcUmhlDfYh9lsTD46vBBuJsMneRcq
+         DsveRAU02svpn38yxs09ge518OuI/pVdkv3Knis9TnbAIvU4lDhnuCGaGoZiptRruc5f
+         /2dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787581409; x=1788186209;
+        d=1e100.net; s=20251104; t=1787581562; x=1788186362;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DAA3AJBckMfL7iDkU5H4UAChzqupIeoXexgfVyLiXUk=;
-        b=SpXzw6VSJp/i2L8yjelEjd07LCno1+LbLm/+uqtX2Z4nDnHXw8mlq4DMTFV6IBEv9A
-         NzD3nhP7/37wjOjDdJtsDqVWgc8CwZPRRUAQMqfko4Y/Sa0heNo4f1VrKhp9o/EC2a7g
-         MbOLzGrKov1L/SAxVhtCcK0aaDFOdVEGn6JNkE3DVKnM9HpJj4Jt2zDmdKCHhfLp9sFE
-         LREV8A3cDwrY9Iac6qsnoGtRy6BnxLcVX/2ZakyLp3k9Jbb2wtil+fUZ95sQluXwg/6v
-         r/1ksapgY1wXg7Ox5VzX/DOXGUhYwD5rAhNzY/JkDCiypX6+mOvRNoMGNqO4Rornil+R
-         d6MQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqmS4zKWtqoltSMh1QG+V+/T0zOm/W7/m1Nfh9WgW7QQruPQMtisF+2EJ6dRF6yufl6UCHwo/j74eCOJw==@vger.kernel.org
-X-Gm-Message-State: AFuF++laPMFSJO/qI3GcFjWqO1EC85vpnvtAkxDYHBxWB9DmQi+uSK7t
-	jnjcmSJi6QQiBuqQA4LWZQGWxX+1q7Si0t80gx+vh+DH0kIy32uhADfjqkA90UKWjA==
-X-Gm-Gg: AR+sD13qCSl27ivWQ0IMdWBgoc1gAANdKKTlMBHLaWjYEhTbfMJMy88dWdHv2tpe8mJ
-	uAKIcxrerzT/sRESbELzErvH0FB2gNEeXexMwa12D0bnq8x8Ht5oCe60EfD2HhAWnD28Tn+nbac
-	NeT1V9wKTH/OCGE7RszPiHUjzw477PRy/N7gV2pc8yIV4Niw3jwlsijWr7y1u+fGt6DItX0Suiu
-	vqlbWwq3pKNw9g5j1DbzM1N5PlsUSanEgV487SfWgXx53nxM18Jaj+7vEeYjcMCVpbFqpQ9xgZ2
-	6W97jFnjNHtRsdsB6f+y9juyIdoTbnEIjSrPd+veuU/aqaveEDU/jBV1Mb9Irn7ef0kMypil0R0
-	kioHwXKU2vJHCIwfCeQ+EHGbl/aDd1ivatucHnBJEy5IhTG5hLSrht7dPw4BACWiRY6kDzQwH+S
-	eXjfdbvwC/hD/mWeK001OdPtFxyubp5zQpzqu9AtNdBNAFm4PrPNY9EGY4oRO+rkvFyxt/8sYxQ
-	5c8squV1uf7+aSgJHsuu6bfERyR6UcymrAimcJwX6e0uxJL
-X-Received: by 2002:a05:690c:a4db:b0:80d:a249:4854 with SMTP id 00721157ae682-84c99f902c3mr43542587b3.17.1787581408945;
-        Mon, 24 Aug 2026 07:23:28 -0700 (PDT)
+        bh=lsHaeoqxnMhy2GB3rUAu2bzr8hj8izpjrzp8bJJzBnk=;
+        b=RyiOA8bO5yGXGnqmcRJ25dpotwL2jL0zpqbAzZ7GDO/3gIXoEVQNV3VPsjeJdWIJiG
+         6utIF5KGt9jLGiLozyWi54HSpRr66iwwcQVjiRdWUW++uPlK213Bi7Z9aVSaOt8Cz4d5
+         lG2pkp18eg6G/1hVWHUUoFgDxqGOyUzPpkbVe6FqWvUfL785k3hZq6zEYBD6I4gGw68/
+         amonZtpX6KfiJ+tOuMzKH+xzDJPPDNy9H10PW4AbhCwULwEfsc0vAyFcygvKVg+4SEBD
+         xGPHUZ0ztWO2aI61d6gTk5hjJBgGLX2QtUwhypBDnsg32lm7xqYwWrpy9XEcowa7bhiH
+         Is9w==
+X-Forwarded-Encrypted: i=1; AHgh+RrpSSDbKmd5ENocWnhYdRuXjwMPgbnelKXsuKTkzuoT53z4410TQpfRnX6Ja2FMJEY7cVS0BEaFtxdjag==@vger.kernel.org
+X-Gm-Message-State: AFuF++nIWYkssOQNW2FQ5QEi7UHZf+opxE+wFk6alzNdrdfiIJXdGQkQ
+	PhWZsTUnXLWwFkM42Mg5A7aDrTfIDRQjEVYFuIxIs39+Gagqu42o1w5FH4I+eeBVDQ==
+X-Gm-Gg: AR+sD10RGvCLwu6ieqZZwvX4Mcp1CHRDuIooaWDOkTnxh+B81AUwRyH2U/fdOVYMxVM
+	hjUSc2W15i3YUIGNgC2A7IR18OrDcJL9LkswJIPADRwIAkRlLoDSnEo1B3fCRMSO0b43hko0Vt9
+	RYqAO+vo13ldGlM27zUluC1HSY28mK+YgGzVPv+dLBi3Nlf+tT2/0I+6rnAFJ+ZMTySoGnG2Ear
+	qgpPTIGYlRwf9gzqbAyewI0EzJvQSrx75aqfLoZPf6TVnnFjRf3ZA2qUnduiLvytAg8F28W5J7z
+	XT2c8L8IIaARH6J//VpCbDvPs8tN0pVzJZcj1BPvlj5ej3dryKenqSHUy46Yvk0DfSBW4G0jGPu
+	dDldhBVxoJP7elkjYynzsquytMgupZk1D/o0+y+/TiD1Xf/nVXLUCqiW/giroO1t4M9ei/IZgiK
+	OtgKvBLEbxcPw58o6U835kC03ZSmRWFRsm8pDx9AawI6zXqxYWa3/FFLuFQ6Fep7aWlcR9ckoqV
+	HdEjE5USpy0dxhoCmFOPzZWSECLGlD3W4rJxk7BxKqdaFnK
+X-Received: by 2002:a05:690c:c604:b0:821:1288:f820 with SMTP id 00721157ae682-84c95591347mr57984377b3.4.1787581561128;
+        Mon, 24 Aug 2026 07:26:01 -0700 (PDT)
 Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-84cab854483sm33838647b3.33.2026.08.24.07.23.24
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-84ca68c1b14sm34720667b3.21.2026.08.24.07.25.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 07:23:27 -0700 (PDT)
-Date: Mon, 24 Aug 2026 07:23:23 -0700 (PDT)
+        Mon, 24 Aug 2026 07:26:00 -0700 (PDT)
+Date: Mon, 24 Aug 2026 07:25:56 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 cc: Ackerley Tng <ackerleytng@google.com>, 
@@ -89,10 +89,10 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 13/25] mm/fbatch: no lru_add_drain() to
- collect_longterm_unpinnable_folios()
+Subject: [PATCH 14/25] mm/fbatch: no lru_add_drain() nor _all() for
+ memfd_wait_for_pins()
 In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-Message-ID: <fbf3fa74-c646-8855-17e4-e8b35dfd9c14@google.com>
+Message-ID: <4bad9833-60f5-30fd-098f-3a306722833d@google.com>
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,46 +102,39 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-collect_longterm_unpinnable_folios() has no use for lru_add_drain() nor
-lru_add_drain_all(), now that the per-cpu fbatch references are gone.
+memfd_tag_pins() used lru_add_drain(), memfd_wait_for_pins() then used
+lru_add_drain_all(): remove those calls, no longer useful now that the
+per-cpu fbatch references are gone.
 
 Signed-off-by: Hugh Dickins <hughd@google.com>
 ---
- mm/gup.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ mm/memfd.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index 99902c15703b..9616379ab069 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -2268,7 +2268,6 @@ static unsigned long collect_longterm_unpinnable_folios(
- {
- 	unsigned long collected = 0;
+diff --git a/mm/memfd.c b/mm/memfd.c
+index c708d92533f4..064f24dcddaa 100644
+--- a/mm/memfd.c
++++ b/mm/memfd.c
+@@ -40,8 +40,6 @@ static void memfd_tag_pins(struct xa_state *xas)
  	struct folio *folio;
--	int drained = 0;
- 	long i = 0;
+ 	int latency = 0;
  
- 	for (folio = pofs_get_folio(pofs, i); folio;
-@@ -2287,19 +2286,6 @@ static unsigned long collect_longterm_unpinnable_folios(
- 			continue;
- 		}
- 
--		if (drained == 0 && folio_may_be_lru_cached(folio) &&
--				folio_ref_count(folio) !=
--				folio_expected_ref_count(folio) + 1) {
--			lru_add_drain();
--			drained = 1;
--		}
--		if (drained == 1 && folio_may_be_lru_cached(folio) &&
--				folio_ref_count(folio) !=
--				folio_expected_ref_count(folio) + 1) {
--			lru_add_drain_all();
--			drained = 2;
--		}
+-	lru_add_drain();
 -
- 		if (!folio_isolate_lru(folio))
- 			continue;
+ 	xas_lock_irq(xas);
+ 	xas_for_each(xas, folio, ULONG_MAX) {
+ 		if (!xa_is_value(folio) && memfd_folio_has_extra_refs(folio))
+@@ -168,9 +166,7 @@ static int memfd_wait_for_pins(struct address_space *mapping)
+ 		if (!xas_marked(&xas, MEMFD_TAG_PINNED))
+ 			break;
  
+-		if (!scan)
+-			lru_add_drain_all();
+-		else if (schedule_timeout_killable((HZ << scan) / 200))
++		if (scan && schedule_timeout_killable((HZ << scan) / 200))
+ 			scan = LAST_SCAN;
+ 
+ 		xas_set(&xas, 0);
 -- 
 2.51.0
 
