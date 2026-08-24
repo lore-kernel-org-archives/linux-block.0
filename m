@@ -1,101 +1,140 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43426279DC2
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD14B2EA732;
+	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787578277; cv=none; b=eaZkE2qE1HK2MS6+Oyz3fT6pD1gnSaIAVXevh7Tmsnfx17ZkITeefTAxPm0PIL/XDCrn9w/sFGsfkMZBowP/d8SLC6VpLxWVPieNOvMkrDXPwcxD+v+SBuLx2j0z4dm8gTwqOxt7cDqQ9Lge5RFJMTl3PQ+oBe3HickZ0oJ79cc=
+	t=1787578375; cv=none; b=nyi/H3gb26S7T1WRDB/0iEFy/pKWoKZG3NrQUUTMobOz6RkigXivhhfylqLvFp72hJoPXUwIaqvYJtlbrcF2eJyp7m/AnK1RgsJ9eyrSOdfrDI2JYSTFTT55bHeh4SkQiXbK50s/yiFWN8X8/Ninr8HD6PxsFRGZUroEawgXBPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787578277; c=relaxed/simple;
-	bh=uGg/m1YBOeJTowj4uybIy6jrf/stiCcAnS70kdk5Udc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ddqwLOWDR5ED1W/tkz0WDn+07Ce7aety1SRij9sjAdawtJR7DL5+SlenMOm6gHtGRhbnC05vJWZNgWHivhNZSxiNdvpTerDTuQYiRa6KkygIo0OR1OJIqFvZ8AdFSw0R2d7Ais9iDQ5eYEPs2CyIKbceJR5+5vZ/HBe/5jmV1RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBeD2Ghu; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787578375; c=relaxed/simple;
+	bh=/Es2fSdTwUmy/6IdP4XUR1DrGU7DaaE6PINJhMBwvuc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=WvfajSoo87veubPuUvVLEMrY/Wvy6bIDf4hQYAV1V25H3DSOHwDvTNxDsOlrS+CpH3eEf0thcM8MZBEietJqi1icXTyaJcZj1NpWqoT94+xuaZBaHQrtP+7Po30MIjpjGnDyxka2Rx7Mx6YnFUPWT0GY02JuCamEbewma+7LQxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPfjmKuL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBeD2Ghu"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7eb5bdb50fcso3229357a34.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:31:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787578272; x=1788183072; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=y60jwkQhoD4s3eswGlcI736vrGSva62DV1OEGb13gfY=;
-        b=IBeD2GhuMv+wZ4tp5hrIbamZda45IfxUCzStv5gTB+BxmKE+5dMkfIzmb5/qxTkyr0
-         djPAt7CQ1PcM0D/jdtwWpjtvYsgokGjb993nsYnBq8hUBZV2pLHz58GxyGWq7Dl3VaKO
-         XM9xFN0no+U/vcBceyEvunzz1Vrt8uZfid7xU3BLOp2rRQWeK72thoOtx3xQMwaYeWxC
-         08pY0brQSNH4qu7o6QZgJ72wY/WWQqx5bWgGIxfQC/dnuWYEVDsJXDc7BIW5wwPh7BzH
-         1uggRCVLgiis+2ed9gmjeHRLsrifJjkQTy4Wme7nt8aYo+DXGJbMfVe8laPXt+edroad
-         bJ9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787578272; x=1788183072;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=y60jwkQhoD4s3eswGlcI736vrGSva62DV1OEGb13gfY=;
-        b=G1zvJYA5E+Bg7oTG17csv5n9HnHg8vJO5iaNWXK19YBefZFNzZXJ4Zg2eXzziyS6KQ
-         S/aCG9oC815g6gjvPqsbd42eZfqcGpNAiMiyn6IMqDRpCgQvftDFc+9j2jI8fGj6fIqv
-         nqpWSyW57s/tPlBAZXQchJdndYdBE7ErWhhh5ZE6kvBgjuoFzNoVHdwmrwuEMrAq4Jmt
-         eqJQ7439m9cF7keEf4Ciu0GmHxXJm+30RvLi9IuhrzNoWdV3HFTK1fJ86K8x5S6ov4XK
-         fhd+NuvzrZ6vgUfKYp33cSPq58VD57ssWMN6jUHYRN3XS266z3G+4cgf/+p+qFk2Q6ZM
-         0NaQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rr/ExkhpmhIil26hFeWpvzWHW2GZxjl/ojBOJ+mNZrPhVXam3tH9L0Pl2PkHvXRLuTktYseLrmdi+hy8Q==@vger.kernel.org
-X-Gm-Message-State: AFuF++kDV4o8nRamVVHvD3Yq+l2+18yVuNrkioFP5DJ/zaFOVGNmcSLi
-	MSpkCBMUr3Cs3sk4Sc+NpBDMkTbXXmEhA99IshVU+JRYka0vKuOVuAas
-X-Gm-Gg: AR+sD11iFJScLCBt6P0OJnRyfb8iv5HJpqgU2VWIcfLw1CH7VTH4IIGsm6x0uI73/R1
-	3M0Wg6gugumbTTjiCAcCsktBczRyJBPI3tAi1DL1+0gZsPsgp6kFdrle3Zl6QzpBb4nK9rmVV0P
-	YvReFu2EQaPyu64W4ztAAGf09Vmc8vvlyPGtU1wi2BDHw5T3wmXZOh16Wx9sBefVE5K5LC2xMgv
-	1zBQrUH5s+j2FscaJoWu+o0LtdQVPlLkst1oLyihk4ogQvh1ZKK2c2pPJZrCJiFQa4gj0uM1XgE
-	KPbSfA8pdoWGPN8X3kIA81gV++rIA1OdYyIZnLzF64cwWv1gln+fCzNFRZfWkaf0xF5wk/BXbY9
-	/aQZhUq5j+wex/yzkeKjQ5f4GW8MYgPbXhuJx537UnvC+Qc8HEYZAYRjfVQlr7uSPmu5RYSER8P
-	G0Mo+MPbkNXmBRAq4XlTVNRkweKeUa29wu20GxVEaVfY4B6EZtv65HbTsTP6HNkNLdXDbkXzO1q
-	PW3E7eMgIT2zalSCs31UrPNd8OE1+XyK+vSLbVvRVHn7+c9Ig/kmxeprsdHs8yX8nGN6MvjUQ==
-X-Received: by 2002:a05:6830:600d:b0:7df:5fc:3fd5 with SMTP id 46e09a7af769-7f461421249mr32340464a34.1.1787578272534;
-        Mon, 24 Aug 2026 06:31:12 -0700 (PDT)
-Received: from fedora-laptop ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f48fcb4fa2sm4207470a34.25.2026.08.24.06.31.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 06:31:11 -0700 (PDT)
-Date: Mon, 24 Aug 2026 08:31:01 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Yang Xiuwei <yangxiuwei@kylinos.cn>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 0/2] ublk: fix force_abort leftover after quiesce recover
-Message-ID: <aoxHlXhGrrFDN8SE@fedora-laptop>
-References: <20260821103047.369522-1-yangxiuwei@kylinos.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPfjmKuL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95AEBC2BCF6;
+	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1787578375;
+	bh=/Es2fSdTwUmy/6IdP4XUR1DrGU7DaaE6PINJhMBwvuc=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=TPfjmKuLrCLVWYQvU9NjRhVbiivSNvxrwAYB+x6PQCrUbD0LoThQxvu7kB555Pb/a
+	 yicE8xwGn+3P2R0g3X3bh2NUY9Y3oGwP1zsB6e7JsJGPWzwr5OhfXHJNZeiPPUCXll
+	 WatuEKWfLJfwCQm2WaEnZwtqFVMVXaXrOfc/w1C3PzJeVcPqdKyfsHnQtZrsB5suwG
+	 X36S9SDJsIhNgN7zuRwxgVEf1ggoUPtrBpPMs31BMVxhK2I1kiE+c0ihyTO9NTp5ka
+	 dylUf+niRMG2xeC3Ou/MZjY+fy2E9Dr7UJs1lem9zdtzg1qWp2kOZiXb/8UidT69FU
+	 NrJic/1tY+QKw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E25C5DF9B;
+	Mon, 24 Aug 2026 13:32:55 +0000 (UTC)
+From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
+Date: Mon, 24 Aug 2026 15:32:47 +0200
+Subject: [PATCH v2 1/2] loop: drop stale partitions on LOOP_CHANGE_FD
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260821103047.369522-1-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260824-b4-loop-nbd-stale-partitions-v2-1-9815a577cebd@amutable.com>
+References: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
+In-Reply-To: <20260824-b4-loop-nbd-stale-partitions-v2-0-9815a577cebd@amutable.com>
+To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
+ Josef Bacik <josef@toxicpanda.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ nbd@other.debian.org, Christoph Hellwig <hch@infradead.org>, 
+ Bart Van Assche <bvanassche@acm.org>, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+ Daan De Meyer <daan@amutable.com>, stable@vger.kernel.org
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787578374; l=2855;
+ i=daan@amutable.com; s=20260712; h=from:subject:message-id;
+ bh=WMb3SvdJ8nIuT3XTRHYjCJBoiazU8RPkqLA8H581hVc=;
+ b=roJ22zyFQX/Aj5bjWwbYQ1OZriM1r+M8xNrCHVZC76NrO3DAmpoc//cdf8eoGpGjge//Kizny
+ AUInBq9U2srA60ZGkwqHnztnuOc22sPBbB2dGpoO8tyqqSiM3OhIShM
+X-Developer-Key: i=daan@amutable.com; a=ed25519;
+ pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
+X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
+ auth_id=868
+X-Original-From: Daan De Meyer <daan@amutable.com>
+Reply-To: daan@amutable.com
 
-On Fri, Aug 21, 2026 at 06:30:45PM +0800, Yang Xiuwei wrote:
-> Hi,
-> 
-> Quiesce on a batch device leaves ubq->force_abort set. Recovery does
-> not clear it, so batch fetch fails with -ENODEV and the device stays
-> QUIESCED.
-> 
-> Patch 1 clears force_abort in ublk_queue_reset_io_flags().
-> Patch 2 adds -b coverage to recover_03.
-> 
-> Tested: recover_01, recover_03 (with and without -b).
-> 
-> Yang Xiuwei (2):
->   ublk: clear force_abort in ublk_queue_reset_io_flags()
->   selftests: ublk: add batch IO cases to recover_03
+From: Daan De Meyer <daan@amutable.com>
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Commit 267ec4d7223a ("loop: fix partition scan race between udev and
+loop_reread_partitions()") stopped disk_force_media_change() from
+setting GD_NEED_PART_SCAN. That bit did more than request a rescan:
+bdev_disk_changed() drops every partition before it consults
+disk_has_partscan(), so the lazy scan on the next open was also what
+removed partitions from a loop device without LO_FLAGS_PARTSCAN.
+
+Such devices are not unusual. bdev_add_partition() only rejects
+GENHD_FL_NO_PART disks, so BLKPG_ADD_PARTITION works while
+GD_SUPPRESS_PART_SCAN is set, and parted, libfdisk and systemd all fall
+back to BLKPG when BLKRRPART fails with -EINVAL, which is what a loop
+device without LO_FLAGS_PARTSCAN returns.
+
+loop_change_fd() only rescans when LO_FLAGS_PARTSCAN is set, so those
+partitions now survive the backing file swap and keep describing the old
+file. The new backing file must have the same size, but its partition
+table can be completely different, leaving the partition devices mapping
+the wrong ranges.
+
+Call loop_reread_partitions() unconditionally. Without LO_FLAGS_PARTSCAN,
+blk_add_partitions() returns early, so this drops the stale partitions
+without scanning the new backing file.
+
+Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
+Cc: stable@vger.kernel.org
+Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Daan De Meyer <daan@amutable.com>
+---
+ drivers/block/loop.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 6f12976035b0..89935cfc591f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -550,7 +550,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	struct file *old_file;
+ 	unsigned int memflags;
+ 	int error;
+-	bool partscan;
+ 	bool is_loop;
+ 
+ 	if (!file)
+@@ -604,7 +603,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	loop_assign_backing_file(lo, file);
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+-	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	loop_global_unlock(lo, is_loop);
+ 
+ 	/*
+@@ -622,8 +620,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	 */
+ 	fput(old_file);
+ 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+-	if (partscan)
+-		loop_reread_partitions(lo);
++	/*
++	 * Rescan or, without LO_FLAGS_PARTSCAN, just drop the partitions of
++	 * the old backing file. They can exist without LO_FLAGS_PARTSCAN as
++	 * they may have been added manually with BLKPG.
++	 */
++	loop_reread_partitions(lo);
+ 
+ 	error = 0;
+ done:
+
+-- 
+2.54.0
 
 
-Thanks,
-Ming
