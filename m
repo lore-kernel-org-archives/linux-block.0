@@ -1,60 +1,49 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3EA19D07A
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA8D3E49DF
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787551980; cv=none; b=U6JXpCHh2QW0JDbQ27sy7bnoLgNVIgiqEhxFblg2OL4YkFpRlZvSn6Sxh/zpFKBllVOWpP9Cz3tVzVI1+U/TMRYlpbmVopR6mBXePnMfAgdzrimI+dY1817z7rE5TX6iNXlgnHAIQKj1QC96gQ3DDOHGDSo+asMf23AQTxE+oW4=
+	t=1787553064; cv=none; b=Sq73Zch2y/AjXTSnlcd1EdGyP3zrmszebtA33BQnDkWxbQxAHYQCzfvkuxdEj9MZW7EHhhjz+KJLmGujKNpNJR9g9vrK4RgErMqnhQzPMtsCHUEG05M8N+tejV1PuVp1w4DQWM2kXQqm+ToLcUu2rv8VjJ7dZzNt07HPDc+oKpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787551980; c=relaxed/simple;
-	bh=ZxDlBPowj/JnSPs/s9FamAmMjzwziRXbLE6AMyt3g9c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TsznFEfXUtu/dF+BnOBMX+otblL2jIQChquFNqycEQiFzUig08OyFf4IwoWbWnL4QFw6sdceVcTdXg13t4jdk6Vs9Wr4dzzZDNhhLurY5OdW5CUHIk+3vcwmA0xBekCK6NAxPSiVO0CJ8DH/14IMnMt1FPcqkwkni69ZYIfkWmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Mb4l6BJT; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787553064; c=relaxed/simple;
+	bh=K+IYTtofw2pmaKZFzqJXikVzycHfs/qx5Aut57MsMzs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=tsvSJ31f4zXPgTHC6mVnNy+CoOLO4T6FvIJE2aCay5KETBCYNhMPe0EHKSepAZrCgS0hZxCs6+JttnJVyP+nVzLZM/vfMOhcei5KdRxsPUkMNzwI+V2xYqUkrkopaAwcEuRu2VujJgPaRFxj/+EEGeUdQy+iTr8Ts9kU+iWuKj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Yt/qX8Du; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Mb4l6BJT"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67O5Vax71014028;
-	Mon, 24 Aug 2026 06:12:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=y45Yj4
-	wCv/1hyRIoTb5htK/ISsoDVgidzufce/DdsZY=; b=Mb4l6BJTCwlIcR3PgBEleJ
-	D+/DO1Iv4Tl6ou2kdhbvq95llpEhMWVOuTS9c+mKMZr6RdGXKhtjC1WNK+PtVycC
-	utjxxjrEhBHnGmeWU8cIwgOwA7wBUI7ElPK3x0gWu69dffwYLcQTXX1+M1goHykJ
-	H7xyLyZqoCviQOVRX25s8y8T+D0Nhi4kFe9d4xWw+Ed5N2Vph+xRQzzKAOw/sW2f
-	dhyhpf6qNDYJtDGZJ6LerV3BCSNWGcuRP407foKP443p5VPhxK+ZKyHSpvByAVqn
-	UTk8fbVgd5n0k1Soy0EK2V4clA2hZ9jBeD7uWKigb9xAXZYJoiTBPqnj5loleVlw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73dwyba9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Aug 2026 06:12:50 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67O6BFcN026580;
-	Mon, 24 Aug 2026 06:12:50 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g7rag44gf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Aug 2026 06:12:50 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67O6Cn9O32965270
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Aug 2026 06:12:49 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 329E358056;
-	Mon, 24 Aug 2026 06:12:49 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB0CD58052;
-	Mon, 24 Aug 2026 06:12:47 +0000 (GMT)
-Received: from [9.123.7.57] (unknown [9.123.7.57])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 24 Aug 2026 06:12:47 +0000 (GMT)
-Message-ID: <b7f88eff-7886-4a85-9c97-7c88ba856780@linux.ibm.com>
-Date: Mon, 24 Aug 2026 11:42:46 +0530
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Yt/qX8Du"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260824063054epoutp03e8535a57a4719f99c522df833fe51a1f~OqggrM6DR0102801028epoutp03M
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:30:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260824063054epoutp03e8535a57a4719f99c522df833fe51a1f~OqggrM6DR0102801028epoutp03M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1787553054;
+	bh=l9ewL7Vj/+p0l9PBJ+KUTT26wzlxtPIKe9UQzgg8mPM=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=Yt/qX8Dur57r4cpC53xiQSYhSqbKlPdBEZTQ0vQU9wS8J9sm505jtf5KJO/000peo
+	 L1reEYE8xKZ6lpd5JFJpDpEQAr0g85/TS8jph1ASW1c68QBZHKiDTyaMDG0cx2/3D9
+	 SKFC4CTEd97PVzfBM8K3dnNxpsbJsOwn/SvqPOWg=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260824063051epcas5p4dae4dc9bf4b75eff3a7c11b7344c085c~Oqgd0tAvO3238232382epcas5p4G;
+	Mon, 24 Aug 2026 06:30:51 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.38.93]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4hT1JB0MrNz6B9m4; Mon, 24 Aug
+	2026 06:30:50 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260824063049epcas5p1058d0ae3078a8468e455052136c16d91~OqgcZoIVy0699106991epcas5p1o;
+	Mon, 24 Aug 2026 06:30:49 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260824063047epsmtip2bf0e54344178bbad0c86a273542d5388~OqganKjN_2928529285epsmtip28;
+	Mon, 24 Aug 2026 06:30:47 +0000 (GMT)
+Message-ID: <076db8e7-6c6e-4d91-b442-1471ad7a5c27@samsung.com>
+Date: Mon, 24 Aug 2026 12:00:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,117 +51,122 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/13] loop: Fix race conditions in loop_validate_file()
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <cover.1787255652.git.bvanassche@acm.org>
- <2b6da8a843526abf58d0d591ce487533bbce805e.1787255652.git.bvanassche@acm.org>
+Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org,
+	dgc@kernel.org, jack@suse.cz, cem@kernel.org, axboe@kernel.dk,
+	kbusch@kernel.org, ritesh.list@gmail.com, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <2b6da8a843526abf58d0d591ce487533bbce805e.1787255652.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260819070814.GB1541@lst.de>
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI0MDA1MSBTYWx0ZWRfX1noYg4n1oIUi
- DNOZBImf/okV8LFasbjokAxfYsnwPKn+kSP/1JAniKsvaDCTSfpZwczezDjn/G7J6js6GtMC3ts
- 4pfSriJdf4JW33a0kD/K+D/U0/eMECQ=
-X-Authority-Analysis: v=2.4 cv=AYuB2XXG c=1 sm=1 tr=0 ts=6a8be0e2 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=N54-gffFAAAA:8
- a=jrC3V2uMrGWpuTbyrfsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: XcNgvhXkP-JfMdYIaGCG9fhMU6DDBma2
-X-Proofpoint-GUID: XcNgvhXkP-JfMdYIaGCG9fhMU6DDBma2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI0MDA1MSBTYWx0ZWRfX4U53tEMmxKAq
- 3JOMWUcN7vrOFGfn3oVHm5lZQISlyo4lOtUHnxpUVsm0/eT7NGJYf6shzD53viobF61wdJ0EPwf
- YAvl6HLRzXbjLwDGtLUOJuRjS0rlFPsZB+PCQyo4GceqskSRW+XPsuiAhbIivJIHiYGL0naOzva
- SPxhuRFVtt7i8AiuoI4yOAoahAr6kD/AT9le/g+fIQ8fTK5is7M7F2XMEk/pblbP7DZpt/nTaP0
- GaeiZemyhvRByFMZD1ghpkOAabuwevgAuGiBj0entSmP6DKjxNOWprA9MJ8+/HIlOfI3u/BkX8o
- 1kl8u2eHzMQQU8bQbZD/VvmeBNnYM6kIxCYEWwqD1aAYBolgU5+i437HpLPb2ExbsDDDY6J0x1r
- K6B9hmEByOW4CbHCz3tQAA52Wktj0EgmfGWBm/dd9EW16vTKWfEHhVXo+RSEoscnrRmx4ENKw2k
- CbBqWBAFFNzWSiIw7uQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-24_02,2026-08-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 bulkscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608240051
+X-CMS-MailID: 20260824063049epcas5p1058d0ae3078a8468e455052136c16d91
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319
+References: <20260717125538.508925-1-joshi.k@samsung.com>
+	<CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
+	<20260717125538.508925-2-joshi.k@samsung.com>
+	<20260721030338.GU7380@frogsfrogsfrogs>
+	<71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com>
+	<20260819070814.GB1541@lst.de>
 
-On 8/21/26 1:27 AM, Bart Van Assche wrote:
-> Fix race conditions in loop_validate_file() by adding reference counting
-> to the file chain traversal.
+On 8/19/2026 12:38 PM, Christoph Hellwig wrote:
+> On Thu, Jul 30, 2026 at 08:22:51PM +0530, Kanchan Joshi wrote:
+>> Christoph's idea was to use FD for a write-stream so that it remains
+>> exclusive to the application and unrelated applications don't collide.
+>>
+>> So, in this version, write-stream ids are implemented as independent
+>> resource:
+>> - To set a file's write-stream ID to X, the app must first obtain the fd
+>> for stream X.
+>> - That stream/fd will be unavailable if some other application has
+>> already opened it.
+>> - If applications gets the stream fd, it can use that to set stream id
+>> for multiple files.
+>> - It can close the stream-fd and that does not change anything for the
+>> file resource (i.e, its inode continue to carry the stream-id value that
+>> was set).
+>>
+>> Christoph - does this match?
 > 
-> Ensure the file reference is kept alive during all dereferences by
-> calling get_file() before the loop and deferring fput() until after we
-> have locked the target device's lo_mutex and confirmed it is in the
-> Lo_bound state.
+> Almost.  I didn't really think of your last point there.  If the
+> inodes keeps using it when it is dropped that breaks the model a
+> bit, but revoking it might make things a bit ugly and slow.  Urgg.
+
+I think it is consistent to the model that says stream fd is a distinct 
+resource and it is a necessary lease/license to set the particular 
+stream(-id) across files.
+If the stream-fd is held, that stream-id remains exclusive to the 
+application.
+Closing means, applications is fine to release the license and 
+underlying stream-id becomes available to other users.
+Application may use stream-fd license and set corresponding write-stream 
+id into N files. We don't need to track those N files and negate the 
+effect (clear stream-id in those N inodes) when the license was released.
+
+>> Here are the revised names (suggestions?):
+>>
+>> 1. FS_IOC_QUERY_MAX_WRITE_STREAM_IDS		_IOR('f', 135, __u32)
+>>
+>> Returns (in __u32) number of supported stream-ids.
+>>
+>> 2. FS_IOC_OPEN_WRITE_STREAM_ID			_IOWR('f', 136, struct
+>> fs_write_stream_open)
+>>
+>> Open the specific write-stream id (or any available one via a flag) and
+>> return its FD. This gives right to use that stream-id.
 > 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/block/loop.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
+> maybe s/OPEN/ALLOC(ATA)/ ?
+
+Yes.
+If we are doing away with stream-id, ALLOC is better.
+If we retain (as this version does), OPEN may still be better.
+
+>> And the following manage setting/clearing/querying write-stream on the file:
+>>
+>> 3. FS_IOC_SET_FILE_WRITE_STREAM_BY_FD		_IOW('f', 137, __s32)
+>>
+>> Sets a file's write-stream value (in inode) to whatever the stream fd
+>> (passed as __s32) carries. So one never sets scalar values into a file
+>> directly.
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index c5f026520836..8b633ea6e72f 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -520,7 +520,7 @@ static struct file *loop_get_backing_file(struct loop_device *lo)
->   	 * loop_configure().
->   	 */
->   	rmb();
-> -	return lo->lo_backing_file;
-> +	return get_file(lo->lo_backing_file);
->   }
->   
->   /* Returns 0 if and only if @file is not backed by loop device @bdev. */
-> @@ -534,21 +534,27 @@ static int loop_validate_file(struct loop_device *lo, struct file *file,
->   	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
->   		return -EINVAL;
->   
-> +	get_file(f);
->   	/* Avoid recursion */
->   	while (is_loop_device(f)) {
->   		struct loop_device *l;
-> +		struct file *prev_f = f;
->   		struct block_device *f_bdev = loop_get_bdev(f);
->   
->   		lockdep_assert_held(&loop_validate_mutex);
-> -		if (f_bdev->bd_disk == bdev->bd_disk)
-> +		if (f_bdev->bd_disk == bdev->bd_disk) {
-> +			fput(f);
->   			return -EBADF;
-> +		}
->   
->   		l = f_bdev->bd_disk->private_data;
->   		scoped_guard(mutex, &l->lo_mutex)
->   			f = loop_get_backing_file(l);
-> +		fput(prev_f);
->   		if (!f)
->   			return -EINVAL;
->   	}
-> +	fput(f);
->   	return 0;
->   }
->   
-I see that with the refactoring and the changes in this patch, where we now
-take an explicit reference to each backing file while traversing the loop-device
-chain and hold the corresponding lo_mutex while checking lo_state and acquiring
-that reference, loop_validate_mutex may no longer be necessary.
+> I'd drop the _BY_FD.
 
-In particular, loop_get_backing_file() now atomically checks that the loop device
-is in Lo_bound state and takes a reference to lo_backing_file while holding
-lo_mutex. Therefore, if loop_clr_fd() or loop_change_fd() concurrently replaces
-or clears the backing file, the validator still holds its own reference. It also
-appears that loop_change_fd() and loop_clr_fd() for the same loop device are
-already serialized by lo_mutex.
+Sure, I will drop.
 
-So I am wondering whether loop_validate_mutex now be redundant? If so, it may
-be worth consider removing it as part of this series. That would simplify the
-locking and make the context annotations considerably cleaner as well.
+That said, we may need a way to clear the stream-id of a file.
+We don't need stream-fd for that. An explicit flag here can convey that 
+intent.
 
-Thanks,
---Nilay
+>>
+>> 4. FS_IOC_QUERY_FILE_WRITE_STREAM_ID		_IOR('f', 138, __u32)
+>>
+>> Queries the write-stream value (__u32) currently assigned to the file
+>> (its inode).
+> 
+> I'm not sure exposing the actual ID to the user space application is a
+> that good idea, 
 
+But don't we need a way to know if stream id/value is set on a file or 
+not? This ioctl is more about observability; GET equivalent of SET.
+Also write stream value is not going to be there if/when in-core inode 
+gets evicted.
+
+> same for passing in the wanted ID when allocating.
+
+Can drop OPEN_EXACT flag if you prefer that.
+But this was for the case if application restarted and wanted its new 
+data to go into the bucket where it was previously writing.
+> That leaks a lot of internal details.
+
+I viewed stream-id similar to how we view file-name. Application can 
+list file names, but need the fd to do operations on that file.
+So, I could not understand internal details part. Could you explain? We 
+have FIEMAP and unprivileged XFS_IOC_FSGEOMETRY already expose the 
+placement of the file.
