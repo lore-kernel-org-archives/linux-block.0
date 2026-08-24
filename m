@@ -1,65 +1,65 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EC64307B0
-	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC5541B8F1
+	for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 13:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787579572; cv=none; b=JD+Uy0k+jsAP1Jy1YjKq5/rueh91wAgtbA0rb3xbStD78jxrHQ4eWNti3KrC/WM8hPzXC+VjFUM0tdiaRoLRQI3vXgpKBQ7jb8DlaMnSBhc4G/tvOguGonMc/sjfXcsi0wsCi64GVwl8uZw1VPgYWuM/E0pDMWyymrTiv4Srjw0=
+	t=1787579730; cv=none; b=nN7UcxxS69JYGZPoBBbf3A0bC+wESXSpC/P8JbjXcU+E2xwElJ5xIfeIuoljmtMyCWdR41q2Nd9b186EOZmwfEI1UZGVKiRCQWb1qs71naC3JCZhmC8DOA2HFRa4dgs36KnMfwjG67lmLJZ8hxR9kahmjtkrtB9Y19HwTlGqy+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787579572; c=relaxed/simple;
-	bh=INQpY4vkmtPsJDoCs8IyTHaF6Ew7wSWtqA9unZfAs40=;
+	s=arc-20240116; t=1787579730; c=relaxed/simple;
+	bh=1pawnKHS5KFrhVDfUohuGCOCrDfc8Tr2JRyh3/rR6Ds=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=bJgTfjnQBRON9Bb0S1aeZVcH2Di4gMR66R7y4IaLPW9AeyJpu7bil1/yrULhrd262Zb/FjVUcBccPlXF1yjqwcrpPHkivVl2w7Nw0drGDMzfCcTU/7T2CTV9owkg2zEgy6IS1WSWG3lWCW3ypXC/SeEjxLl+IqumnDcRafCBTt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I8E5GvDn; arc=none smtp.client-ip=74.125.224.44
+	 MIME-Version:Content-Type; b=KFSzqEYxd+dcqXxHNbyXObaUViakQ6svSAuw6sQTcgvsA4pcl9AeezKTfDkodzJBU5grYeQAHtRh+Fum1aitODbtyFBa7TzxIBz5KMn1T+O7KUDLqK2wrrGqG5BRuz4vC3neozudaICrHkL3eelDZbHXGcu+hcvLns0CfYdPYck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PlMN4MUf; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I8E5GvDn"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-66c744a00edso2118784d50.2
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:52:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PlMN4MUf"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-836cde02992so42077897b3.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2026 06:55:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787579570; x=1788184370; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1787579726; x=1788184526; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=n94V7wbjjjBLybhmkw6p8j8STOH0bCJCKxuuQhNVBOI=;
-        b=I8E5GvDnAjikFhlI7R0RJ/jJBZcFW2jG9OJ4h1HGJb0aPinmiz21qlY0x2kEaGJJjR
-         gj6Nb+nQ+TfyOUJdaWEsZoW+yew66t8vea09M2BbGs/Ee6EPPatIVYvL4UtSera+WJ5f
-         v37OYzhw/ml2U/C7Big+Mh8SvT7YU3a2LdoSH/zTpNAg7mI9uJVu6issIcln2lTzhwyc
-         sCpgqRVu2s5P3dzzH1WXWLBJFxewQEX7gkyb2fa213s8QaR6jtxlh9Z2kUVpSlvxKThM
-         GYTs+uejwhbNlcYvj9I2RxnhSdLLjpIGGUgX7uVJUCgleeTb0RfUTlqkb2odQYobzJis
-         bdBQ==
+        bh=kV9CvWZgKJ3OzoIjmFQaCybgDiXpPYv7ZoBPddJ/7AM=;
+        b=PlMN4MUfQ5D2mw3zw54NNsyU6D1AE/pj/NAap5TEvjl/8Il4WZgDO/o6tmzc3Cf0Ex
+         GM3rmEJX8vEjCe7tJhBk6yw+1bcSO7NZwe4YEaknjFYwvkVlC1LGFGTtQ26xJYkc9VY6
+         wmrPI7f7ng1vy3ryztuamFEyFdcVJM/ltTzEgqVvhxJLJCV5OEMXeaZRpxo7lL5O3Xc4
+         iV1qRGn0ublc4Ls1wZ+iU5aryP/gtsSMkitbvn/qiUV9eGFCOPDCTTRD2ZQhFsvwPRGn
+         Ei8NTeZb2pya9AODihemEt1u3ieDeQ6zuDO3TD6haLdtE5xxVVa0mOWNliJGgdy4xnr6
+         mjRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787579570; x=1788184370;
+        d=1e100.net; s=20251104; t=1787579726; x=1788184526;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=n94V7wbjjjBLybhmkw6p8j8STOH0bCJCKxuuQhNVBOI=;
-        b=Ll2djiNUJyJ/ywBYe5XblAFxDMF+rpkcfkQ6v+SfSR7uQ2W3dk7+U5ivNv44CvHuHB
-         dcq3QLEOmmiVwpuGJ36Ky3nYKAre8SsBbLd+nkM5os/KIF5CB8CkBe+Y19ZQJqPSPfoi
-         x8zfuShaQ92qv0bpZOF+DTuOqgFVBUE4oKH01ErcUyN3yDjcyhZ4CFhjsELrCrnPMuzS
-         83zOar+H7CktX6vPsUK5QuiVjPelZ7G5MCcQSVH16Z1SNcIFghdwnL1fkopwSMuChQ8u
-         /54+eYeUF/ZFmxrdbzD5Ng32MG8xft19oMULgo+LWerkhgoBQB51wadFn+R5bOMUL4PP
-         hwrQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrYqWqbNy2GCkNiNjah9qD6MWhL62wN7/rFhTcSoFdXyCgK6fpMWwp0UdX721mBnDudPiG+dNDcG6U3Fg==@vger.kernel.org
-X-Gm-Message-State: AFuF++nZKievLT6nqU+gKhrUSvvyKd+kH1bK4Ab2bTHZSxtOOoeLJttu
-	KjzYReqtjWib4xfK2gTt6NUFtAh+nLB4yyXJdh+Q51aQYSyzq1CFmxgwpf0kRti/SA==
-X-Gm-Gg: AR+sD13HdPB5d66O/ah+lKUhr9K6Wnl6ONcJSskuhMPE2VaOansFE6tJEwrTGukNXja
-	6C/VnC+o7EKaoEGiQHjd/PpWBuaoMckANKnpWEL83HBdFl2ha6SrPgUtyAd4BN32ni5waFlhZmu
-	qF7Hbszbs6wvpFh7GatQTrPkV8YAcL7XZQtLo3VzB7HlclqwysbOwFk/9BfGz8EjRxHL0UzQvJ/
-	4byl///2J3/RjHGbZ74xcrbPDTaHFXlanU5ZiCIszA27C8xlKRznerMtVFXOT5ld8u29b6hHRa2
-	4719RzksxQzSMtbhZNwpSV+oUBRo0W+unjBJQHN5OYvlyBj9TPhKLtzq5sNU5+pyzDD9q1Xhbzq
-	PJ1kwVJ2Zy4vowfkZZsmUCWpd6w1Z+A+lHtO7X4pnTE7Uaru7i+B8mhHHh0M1/GG8UBqwa6lGEd
-	XxxAwMXNF0ilCBTyRinZUbF9EjvZBZIl3Aqs/8I1ZgF4lKCShtO9iQ2BZMJYKCf4rGW5GZ4w1tJ
-	LFWC6fzirew2L1qiwIqJ1JZytagcxzeSfj18a9KlXJRTl+Oo8UiN2QoDj1RYFHg35ImV7A=
-X-Received: by 2002:a53:cdcf:0:b0:667:b314:aea4 with SMTP id 956f58d0204a3-66ce4a56db4mr7162361d50.16.1787579567501;
-        Mon, 24 Aug 2026 06:52:47 -0700 (PDT)
+        bh=kV9CvWZgKJ3OzoIjmFQaCybgDiXpPYv7ZoBPddJ/7AM=;
+        b=KxJ/rFfNK1WWm/m8HHNUotbgy0U9uYCmc4+w8w8p81zDqsuqVndr3waTZauMwh5umq
+         CYGWudEFeuOTjIISDvPHL4PcmxlG7GwB9pdwRwd1TovKlqmJhrqx0oIrOvIZmJcdd/bT
+         G1Qmec+X2ceFJXoB2To2/TPhxXwe+FyJ2UMJz4H04HfoX1Ue1j0hnwkjiJQMDRmnJ+hs
+         rL/cRkR5FayQPWH9z3aNDJ/8BR2wDDk+KEDOPfYmR0sBrhGFtVzcdcOzvcSNW8W0kvte
+         YtbhsyjgnCxFVo2wJBpgez13xpBMYt8NRkFz2C6Mf80CkRSRbp/qLUW/vxgBfljFRGn+
+         DzwA==
+X-Forwarded-Encrypted: i=1; AHgh+RpRZaraXyKJJMIdbfOW81pi9J+LFrFmbM8dcAuT7l8gQMNc3ieBl0x++2w6rsEQlnWj13BsLI0/gVmnIQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++l0r79a/3Q3kHDAGvcICt7k/m40+qwMA0xOfgwtc3qWc/7pvLrE
+	crv8hwy7HlHSek/kDAMbw1MN14bRiUTxy0506CkJ+Hw9i748YVi2+hYJWXp3AbtZ5w==
+X-Gm-Gg: AR+sD12dHjVHCBo4ieAKm65E8s+c5NkJ2dbmDzayxCZElrRz2gLw6SJmQtIlPRfceEu
+	zI8nXzRmOkXh1UNdaLF8qzO3ox/Ngj6XkZW6a+7+sOluSxpGOq3V/x3PYOYDW8yVmCIiAeWpENg
+	NqWGjY4jaIKpbA1hj61V6OJ24R1urlCXaSgvCrq08KhVzOdfAAHkUS2gH1HUnMatorqNes9uUZ6
+	v69wrCufoMgBIptKXTi+lLhoApnkVJ00LFMcqRQiR7LqH6ypPRPl0PiqV/lpYskJ00WTwOY0di4
+	SWqGxbh/5juXa87YTRyxt4lSmzQu/vms3J8lD/++bgpnsCLAWhRhLyfZwxs2KQLhhHi8djZXPIK
+	qGKX3ltiUWhW5cIS75ryV9jdHNoHY8U2+ulEBQ5YWzsuTPtzX5MPYUoDFTglB/pz+GmtdM1wt+Z
+	H2YoaRZVJ3VfaXFvRpPcyy4+chJEgz1hWYREmGhQ48CFu9i7nF7SU5N4UKfIjM6vt67KGNdNDpg
+	q6OWqKHlDc11g3ob/wFMdINoHRi2etSUIAeF3+B6mlcm5xaj2+iLfx6OU8C
+X-Received: by 2002:a05:690c:e3e5:b0:844:7e98:fe01 with SMTP id 00721157ae682-849f18a8409mr92007567b3.5.1787579725434;
+        Mon, 24 Aug 2026 06:55:25 -0700 (PDT)
 Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66cf4624f47sm3724257d50.4.2026.08.24.06.52.43
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-853ff053a0esm3017297b3.0.2026.08.24.06.55.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 06:52:46 -0700 (PDT)
-Date: Mon, 24 Aug 2026 06:52:41 -0700 (PDT)
+        Mon, 24 Aug 2026 06:55:23 -0700 (PDT)
+Date: Mon, 24 Aug 2026 06:55:18 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 cc: Ackerley Tng <ackerleytng@google.com>, 
@@ -70,7 +70,7 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Christoph Lameter <cl@gentwo.org>, 
     Claudio Imbrenda <imbrenda@linux.ibm.com>, 
     David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
-    Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
+    Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, 
     Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
     Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
     Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
@@ -89,10 +89,10 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 01/25] mm/fbatch: remove !CONFIG_SMP special case of
- folio_activate()
+Subject: [PATCH 02/25] mm/fbatch: allow folios_put_refs() to skip xa_is_value()
+ entries
 In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-Message-ID: <3f18ab7d-c12a-d2a3-4d3e-f9908f94f27d@google.com>
+Message-ID: <44c7773e-5806-d24a-83c9-f39b3a134138@google.com>
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,124 +102,168 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-3.0 commit eb709b0d062e ("mm: batch activate_page() to reduce lock
-contention") brought in an ifdef CONFIG_SMP around activate batching:
-https://lore.kernel.org/linux-mm/20100805140755.501af8a7.akpm@linux-foundation.org/
-shows a sensitivity to bloat that day, not any incompatibility with UP.
+Let folios_put_refs() (hence folio_batch_release()) skip xa_is_value()
+entries, and therefore remove unneeded folio_batch_remove_exceptionals().
 
-No other batching here has a UP alternative, and it's a bit confusing:
-simplify mm/folio.c a little by removing it now.
+It made some sense when introduced in 3.1 for shmem swap entries only,
+but workingset shadows popularized exceptional entries in 3.15, and it's
+silly for so many sites to be squashing exceptionals out of the fbatch,
+merely to suit an inadequacy in folios_put_refs().
 
-Certainly we can reduce UP bloat (and/or 32-bit bloat) by, say, lowering
-FOLIO_BATCH_SIZE from 31: traditionally 16, 14, 15, then raised to 31 by
-6.9 commit 9cecde80aae0 ("mm: increase folio batch size"); or by giving
-just the static per-cpu folio batches a type of their own with a smaller
-array size on UP (1? or a little batching worthwhile even on UP?). But
-not right now, it's orthogonal to this series.
+But remove exceptionals on leaving truncate_folio_batch_exceptionals(),
+one of whose callers then passes the fbatch on to others less tolerant.
 
-And I suspect that the old ifdef led to lru_activate being placed last,
-whereas it's usually the second most popular fbatch: move it there, to
-match cpu_needs_drain() comment "Check these in order of likelihood that
-they're not zero".
+No longer essential to this series, since 7.2 commit 9669b87065a6
+("mm/lruvec: preemptively free dead folios during lru_add drain")
+allowed folios_put_refs() to skip NULLs; but still an improvement.
 
 Signed-off-by: Hugh Dickins <hughd@google.com>
 ---
- mm/folio.c | 40 ++++++----------------------------------
- 1 file changed, 6 insertions(+), 34 deletions(-)
+ include/linux/folio_batch.h |  5 +----
+ mm/folio.c                  | 25 ++++---------------------
+ mm/shmem.c                  |  2 --
+ mm/truncate.c               | 16 ++++++++++------
+ 4 files changed, 15 insertions(+), 33 deletions(-)
 
+diff --git a/include/linux/folio_batch.h b/include/linux/folio_batch.h
+index b45946adc50b..e1cc8ae023f1 100644
+--- a/include/linux/folio_batch.h
++++ b/include/linux/folio_batch.h
+@@ -22,8 +22,7 @@ struct folio;
+  * The folio_batch is used to amortise the cost of retrieving and
+  * operating on a set of folios.  The order of folios in the batch may be
+  * significant (eg delete_from_page_cache_batch()).  Some users of the
+- * folio_batch store "exceptional" entries in it which can be removed
+- * by calling folio_batch_remove_exceptionals().
++ * folio_batch store "exceptional" (xa_is_value) entries in it too.
+  */
+ struct folio_batch {
+ 	unsigned char nr;
+@@ -100,6 +99,4 @@ static inline void folio_batch_release(struct folio_batch *fbatch)
+ 	if (folio_batch_count(fbatch))
+ 		__folio_batch_release(fbatch);
+ }
+-
+-void folio_batch_remove_exceptionals(struct folio_batch *fbatch);
+ #endif /* _LINUX_FOLIO_BATCH_H */
 diff --git a/mm/folio.c b/mm/folio.c
-index d2937600cf72..62b96c9ce19e 100644
+index 62b96c9ce19e..b2bce6b77498 100644
 --- a/mm/folio.c
 +++ b/mm/folio.c
-@@ -47,12 +47,10 @@ struct cpu_fbatches {
- 	 */
- 	local_lock_t lock;
- 	struct folio_batch lru_add;
-+	struct folio_batch lru_activate;
- 	struct folio_batch lru_deactivate_file;
- 	struct folio_batch lru_deactivate;
- 	struct folio_batch lru_lazyfree;
--#ifdef CONFIG_SMP
--	struct folio_batch lru_activate;
--#endif
- 	/* Protecting the following batches which require disabling interrupts */
- 	local_lock_t lock_irq;
- 	struct folio_batch lru_move_tail;
-@@ -349,15 +347,6 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
- 	count_memcg_events(lruvec_memcg(lruvec), PGACTIVATE, nr_pages);
- }
+@@ -983,6 +983,10 @@ void folios_put_refs(struct folio_batch *folios, unsigned int *refs)
+ 		if (!folio)
+ 			continue;
  
--#ifdef CONFIG_SMP
--static void folio_activate_drain(int cpu)
--{
--	struct folio_batch *fbatch = &per_cpu(cpu_fbatches.lru_activate, cpu);
--
--	if (folio_batch_count(fbatch))
--		folio_batch_move_lru(fbatch, lru_activate);
--}
--
- void folio_activate(struct folio *folio)
- {
- 	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
-@@ -367,25 +356,6 @@ void folio_activate(struct folio *folio)
- 	folio_batch_add_and_move(folio, lru_activate);
- }
++		/* Skip any "exceptional" (workingset or shmem swap) entry. */
++		if (xa_is_value(folio))
++			continue;
++
+ 		if (is_huge_zero_folio(folio))
+ 			continue;
  
--#else
--static inline void folio_activate_drain(int cpu)
+@@ -1088,27 +1092,6 @@ void __folio_batch_release(struct folio_batch *fbatch)
+ }
+ EXPORT_SYMBOL(__folio_batch_release);
+ 
+-/**
+- * folio_batch_remove_exceptionals() - Prune non-folios from a batch.
+- * @fbatch: The batch to prune
+- *
+- * find_get_entries() fills a batch with both folios and shadow/swap/DAX
+- * entries.  This function prunes all the non-folio entries from @fbatch
+- * without leaving holes, so that it can be passed on to folio-only batch
+- * operations.
+- */
+-void folio_batch_remove_exceptionals(struct folio_batch *fbatch)
 -{
+-	unsigned int i, j;
+-
+-	for (i = 0, j = 0; i < folio_batch_count(fbatch); i++) {
+-		struct folio *folio = fbatch->folios[i];
+-		if (!xa_is_value(folio))
+-			fbatch->folios[j++] = folio;
+-	}
+-	fbatch->nr = j;
 -}
 -
--void folio_activate(struct folio *folio)
--{
--	struct lruvec *lruvec;
--
--	if (!folio_test_clear_lru(folio))
--		return;
--
--	lruvec = folio_lruvec_lock_irq(folio);
--	lru_activate(lruvec, folio);
--	lruvec_unlock_irq(lruvec);
--	folio_set_lru(folio);
--}
--#endif
--
- static void __lru_cache_activate_folio(struct folio *folio)
- {
- 	struct folio_batch *fbatch;
-@@ -694,6 +664,10 @@ void lru_add_drain_cpu(int cpu)
- 		trace_mm_lru_add_drain_tp(cpu, nr_folios);
+ #ifdef CONFIG_MEMCG
+ static void lruvec_reparent_lru(struct lruvec *child_lruvec,
+ 				struct lruvec *parent_lruvec,
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 89a1495e55f7..3911721e1e55 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -1156,7 +1156,6 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, uoff_t lend,
+ 				truncate_inode_folio(mapping, folio);
+ 			folio_unlock(folio);
+ 		}
+-		folio_batch_remove_exceptionals(&fbatch);
+ 		folio_batch_release(&fbatch);
+ 		cond_resched();
+ 	}
+@@ -1276,7 +1275,6 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, uoff_t lend,
+ 			}
+ 			folio_unlock(folio);
+ 		}
+-		folio_batch_remove_exceptionals(&fbatch);
+ 		folio_batch_release(&fbatch);
  	}
  
-+	fbatch = &fbatches->lru_activate;
-+	if (folio_batch_count(fbatch))
-+		folio_batch_move_lru(fbatch, lru_activate);
+diff --git a/mm/truncate.c b/mm/truncate.c
+index b58ba940be47..4151f7a167e3 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -53,7 +53,7 @@ static void clear_shadow_entries(struct address_space *mapping,
+ /*
+  * Unconditionally remove exceptional entries. Usually called from truncate
+  * path. Note that the folio_batch may be altered by this function by removing
+- * exceptional entries similar to what folio_batch_remove_exceptionals() does.
++ * exceptional entries.
+  * Please note that indices[] has entries in ascending order as guaranteed by
+  * either find_get_entries() or find_lock_entries().
+  */
+@@ -95,7 +95,7 @@ static void truncate_folio_batch_exceptionals(struct address_space *mapping,
+ 				dax_delete_mapping_entry(mapping, indices[i]);
+ 			}
+ 		}
+-		goto out;
++		goto squash;
+ 	}
+ 
+ 	xas_set(&xas, indices[j]);
+@@ -113,8 +113,14 @@ static void truncate_folio_batch_exceptionals(struct address_space *mapping,
+ 	if (mapping_shrinkable(mapping))
+ 		inode_lru_list_add(mapping->host);
+ 	spin_unlock(&mapping->host->i_lock);
+-out:
+-	folio_batch_remove_exceptionals(fbatch);
 +
- 	fbatch = &fbatches->lru_move_tail;
- 	/* Disabling interrupts below acts as a compiler barrier. */
- 	if (data_race(folio_batch_count(fbatch))) {
-@@ -716,8 +690,6 @@ void lru_add_drain_cpu(int cpu)
- 	fbatch = &fbatches->lru_lazyfree;
- 	if (folio_batch_count(fbatch))
- 		folio_batch_move_lru(fbatch, lru_lazyfree);
--
--	folio_activate_drain(cpu);
++squash:
++	for (i = j + 1; i < nr; i++) {
++		folio = fbatch->folios[i];
++		if (!xa_is_value(folio))
++			fbatch->folios[j++] = folio;
++	}
++	fbatch->nr = j;
  }
  
  /**
-@@ -825,11 +797,11 @@ static bool cpu_needs_drain(unsigned int cpu)
+@@ -575,7 +581,6 @@ unsigned long mapping_try_invalidate(struct address_space *mapping,
+ 		if (xa_has_values)
+ 			clear_shadow_entries(mapping, indices[0], indices[nr-1]);
  
- 	/* Check these in order of likelihood that they're not zero */
- 	return data_race(folio_batch_count(&fbatches->lru_add) ||
-+			 folio_batch_count(&fbatches->lru_activate) ||
- 			 folio_batch_count(&fbatches->lru_move_tail) ||
- 			 folio_batch_count(&fbatches->lru_deactivate_file) ||
- 			 folio_batch_count(&fbatches->lru_deactivate) ||
- 			 folio_batch_count(&fbatches->lru_lazyfree) ||
--			 folio_batch_count(&fbatches->lru_activate) ||
- 			 need_mlock_drain(cpu)) ||
- 		has_bh_in_lru(cpu, NULL);
- }
+-		folio_batch_remove_exceptionals(&fbatch);
+ 		folio_batch_release(&fbatch);
+ 		cond_resched();
+ 	}
+@@ -732,7 +737,6 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 		if (xa_has_values)
+ 			clear_shadow_entries(mapping, indices[0], indices[nr-1]);
+ 
+-		folio_batch_remove_exceptionals(&fbatch);
+ 		folio_batch_release(&fbatch);
+ 		cond_resched();
+ 	}
 -- 
 2.51.0
 
