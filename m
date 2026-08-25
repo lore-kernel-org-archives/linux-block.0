@@ -1,183 +1,151 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66300385D7A
-	for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 07:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787641708; cv=pass; b=po/2ZkPwKRkhYcgx/31qD4Bo1PyAf/937ZClU/KS793vEzGHhRTejKvyMjs8DirB3y4v2LEQHHDM3kxvJUszNMg+vs8FAu9Nvzoxi7QAEuEGlG2K6m8qokTIc3CTO2ghQ2k0kfd4pfXpsScauX6Pxi+KxiDBk45S0ZKn1EB8Hxk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787641708; c=relaxed/simple;
-	bh=YLC6H3tBQW6nRRMf6LiPtQJuL1Ra+q2lA0+1KSYOB+Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tM3/sVhzQcMw5jcM02N6eaggpZfncgxIqQBgmwXTgjpTMIQ0H68StKV4IoulzLH49dxr38SSm1YRVBwXm5nKD8MC8ESaZZFJGc9tnILZdKWBiWCd6IFtRwqj8vgg8GNtDewudjc0E17FmeJlj1Js8LlgLuhpLHdNvLjPZvj1ReI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=QDR9SP0L; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0783EBF07
+	for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 09:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787649808; cv=none; b=fVN1znhFMa0a5C+KIdp9DhpmjXutkm2ccBDpkFSXRk3nvG3/BFWVw/EYuzBA6bXVJi4p3Ox7UkOLxxfvK6zv7hcjCd0BwTMDry3blqWa51PjF+g71LZDIGEG0aDXUmhx01dKP4MwZnqeN88UVrHqj0O2L2GaAKKRU7cVtuE+3Bg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787649808; c=relaxed/simple;
+	bh=HiKrd3eV2rwkL3o/DZk2JSzup1z/32LkdO/qyn2di6E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DRvvfiFnDcBTsOHI1uA7hxptpuPDlq4M1C3v2cjPqfBKsOikHZbgkUcgSl+OSQgLmW5CHN+pefYRynQHp6zdYKy3+wPQ//3IsW3miWBbUmPkNH88B0fMeUKTeKtmOKWwnfl8QNdK/zYig4deyRCxv3KEhjNhoctFSrvocaYf1j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtq2Ukwr; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="QDR9SP0L"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-51c2a449c57so25153261cf.1
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 00:08:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787641705; cv=none;
-        d=google.com; s=arc-20260327;
-        b=so6G7uGp9yK6NUMiHRGEE0qjl9tEYnzL37ABzV7sBN9tbYZS7vg2XXOUoR7XkuwN7j
-         NjGQ/RcIFvv3SAnWUVi7hZ/Ox51T+nYpz2R+/YYfRHnUlfXM6cKnAITje1p3gvWDG3+J
-         EwdSKYRvmiVu1mu07Vz/htj6AphussILL/A4VvYbZeUjXtaKchAmSPZhUv6bIwX9tqnf
-         ZGcLORlVNDdh1X/RpYNxQb0xvypcH+OGiA5Pbn6A3x21IXxBZj6ZTdwNNeeG7pmjsOE3
-         Whzy7q/UIolsjeh5wE2SdimhcVCQUMSbyweqsctP/U2rtr+fldDLOx4b+M5LiYRGb9s9
-         7HUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=FUPUaRwtppzW7Cz0zNlhCOY1JMoitTGaOwtquxqzhgM=;
-        fh=qsGpku+8Vw5jpU/iZ7i+bu19+4TQHqLfiL4+mhRF8qA=;
-        b=hkX4H0dVsrYTTy0FMqpsCTWiDkoOEryfhOekzi27b5h9uK8H/qEzFv8nbSrjjJ0qro
-         24HjONVHPEuGWZT6z0uaKsc7n0RyJDNw/HqD5Yn3eyU7mLkg591fJ4sNkzlLF5pp9O03
-         Z7qEC+WnVquLqT8PvkeS6QIDB1NJWt7s45vJPlo1/ly6DFdKNNMlumrDlWB/60EmNk3k
-         nPDT3aguU+l7QTUJHK57CPyCw4cda07ErkA5uYnU9IrliUv3+IHBSZie5vm7daIqDVut
-         RsXR5MexJd098+qX1vik/HnxEV4yl53MUy8apNYgHG0/l7a0kSGYA5xM94M2RhagnrT7
-         BZZw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtq2Ukwr"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-39652a6e963so398966a91.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 02:23:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1787641705; x=1788246505; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FUPUaRwtppzW7Cz0zNlhCOY1JMoitTGaOwtquxqzhgM=;
-        b=QDR9SP0LBmea2rHSDTV0eo8peqwJDbaSjDSIZdSl90nnAHn/gJupLYGgdHr2FxtVq+
-         SFDyJ7cJsc2jPxpn8+S470xOxvgH5AU7+nX9O3JJbgHdOwXUhvfjaj5Rr55JBmEDEWwU
-         OsBctqdU+N528P/96TDw3jhV6lMu/TzDWDAr8=
+        d=gmail.com; s=20251104; t=1787649806; x=1788254606; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bp7aIFrM5Ow6CazQpbG7KkEXOIatOW1QaOjDzgI64Kg=;
+        b=dtq2Ukwr9za2V5PoIQ8FjRxoW2duQYps8omNrXS+5qK8wDiq/LbvLnSR2cI23eAgCB
+         BqBSwED1hK7wIBXNK+rTETLPVi+Vqndmi85b0wDpze+EvEFF9DKMxpR3tFEcfsO3SSH8
+         wjromQxHIJ00Ot1b9219wM+tld7X9+nwiHZ/mP/CfW8y6IWsfRw8ztVeLaLD0EmB5yJa
+         MfMfKPgGj5t4o/Txu4OXeX5KIG28nHwMdzul6NEj8AI4mVkYvVieOuvnljdYOq/gRo52
+         nK984v9I6/o/5O2IP+qluwzhvWye3orU4y7QLqsxzfk+CepBDkBVwKFoGYQLqTy2K5BS
+         onKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787641705; x=1788246505;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=FUPUaRwtppzW7Cz0zNlhCOY1JMoitTGaOwtquxqzhgM=;
-        b=TNM+GF7uJudCiIFcXXrteqdTiArvZ32lsXJZpCAOGgxhYSesjett/QJycRlWR0IMzD
-         MfnOP0jmhM2QVTW6ELysbWTlTk2+OxYRhGzpj1v8IGIqhGMmKN2NB6FY7ZdKoSsjiGdk
-         89EQ/vrGGIBwzri9+x6uwMMHsaPoN7JN2DH60/7wYXsAqnpY1QvgobLLo1MymdxRvQ8t
-         bQ0p8vwFp7xmBuAS6L+j7/auWmr8fuy19cyX0X5VoFX/IwOie9Ezu2Qpsdplx/DWII1M
-         36Za/tQVqz+Lk6tdIopdeyCLHwZ4qWSf64LlYLwcZpTtBBAJG0C5FqjMPHx353EiFe0U
-         mHbg==
-X-Forwarded-Encrypted: i=1; AHgh+Rpo03NacYGXnOOBqar1fWlzofvj4J5OPFkzvgK7IMA7X0kA7f3Bu9nbVQitsTeMvHDP0F92TSu585KhHA==@vger.kernel.org
-X-Gm-Message-State: AFuF++kNeI03DB0J3KI73oE+jyltJBg3yES2KuIEC87P5NAZ0O3SMSq0
-	P2B1sVAVcdHe/YBwaHZ3t0HIR6Y7zjI5uwQFxHCKL0aXNbEmeh/6BtSwzUtygM8Im+rfhVuvwAG
-	n+IpimRS5tYiJfyuJ8eqLnC6sk3ZqsZ3nplpAeKaVrQ==
-X-Gm-Gg: AR+sD101jrPMN6zc/jaMAb4uH7z1vpRY9+acTDNePSaxDvQB92IBNijwJJSooh1/jVM
-	eYAlnxdxVqlTihhdkiqzK8Y6z2dQc61rJMFYkkw4D3EQw7JsCar+5HXrmVQG08HDrynXxGdeZPS
-	U4dMS3exvPKI946UysaMeHfdrdya1xNYYWoIvm2bdzAAiu+HSfsGNjyE2MbdMknGdOgAC1EmtLt
-	sXVxbcrrqJHVLmhkRLIlfE8QVu4lrgNhcfK6uGm+TForHoA4gPt+ub0UFeCdQEDLQzp+tUhWpd0
-	mD4Ns+y91g6+mr4PFLvLUSVuwlVt9dYGoRfnjvU1iXoqWhV2B1hKbmfrGymtasPcA1aXBCWxotd
-	kOLM=
-X-Received: by 2002:ac8:5f53:0:b0:52d:6afd:7db5 with SMTP id
- d75a77b69052e-52df59ec0d3mr342600351cf.25.1787641705339; Tue, 25 Aug 2026
- 00:08:25 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787649806; x=1788254606;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bp7aIFrM5Ow6CazQpbG7KkEXOIatOW1QaOjDzgI64Kg=;
+        b=MmGaWrj7Ll4UUPOqEJz3l15SnbhYATV+qcJGG1fyUyvqhwhLRitLNPG0fEm09sM9QA
+         JhBDjQAu0V6NB1SEhidBkGV6EXKgVnYey/Ti24pUIRrZ/dJf4va2wMcU6DFYjoQYsOgi
+         jE8b+N8sHa6iD/iMFK/ndu/e9Jit4dELGxaz+6E5pDaIE7v+IxLNYROx/EAKxMPrk/Z3
+         QLBsE1+la1XQXXxy0KaIWdQhIWYLO59Ez1E+OLUjoxJ2NnLkYt/jhX+I0tJ5W2GGNESm
+         G6cpGT6JzfCvLLctG216TLIIDXL6cH4ZVIP90J/cT7o/Qcmd+Hcd2mhb6M0TpE+fVrmt
+         1QXQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpkMe9l6R2Pup3jlcGIm/WYzElvv1+BmzkogB0AKNEQNVqxozl1IdEPi32YfHlcqAaol5C6fGs2M/PDMQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++mEe+BGbfP1eJLHnOdpIEdKClOGY0aoYNrgy9znXcEsuNG+8zcj
+	OU+sm7TspVg0tpHT7uzWdD6pOAZpN7fvZYGR2ogTfVybep/sqqFGZHiz
+X-Gm-Gg: AR+sD119W0P3MnXzxbzFzsdt7HHHO8rZAkmbVX401+STsZVtJN0zL3Ju9SIbhj1lOO+
+	6OAhMHPeiNBWLp5IAEnotoDmJ1SF2c+kYs8t94PwlAuG4bsxKxqoVYdPYa+v3l+Jcpcy3LahxT/
+	0miDJNfBPq+/neau12OvR4FgFZWPKhwtwQrAUi1BgghhxzDKovlgDt68YjFLqPhv3n86Nc15Iz1
+	xIzahDtcwtznFEmjKIr+amK5u0pM0wXf0vCzhh80M10c6U8u5O+b0vvhgtiyvL4+HCR8AP3l/l2
+	M8l+1ISh4pJPyl9MobHXExBCX61KW8NzPeXkgr4+g0BBRZOGu/gg+5lTDMWXlOWwXPM47iVp1Y1
+	AOL+zYqC9z/xclCkEt770HQ72LiSaxj1dKfQltL2w5eIex2CVgID5BQ7yQ35ClytHt25HVfDRN7
+	gGpX6jh5wmyc1dAvu1NG7BtG7ZCUWtaeQOW3PkE8VK7tR1WS8/CaRuY+scDKT3EAoV+88VcuIRR
+	9bePTNC1iyZ6kU=
+X-Received: by 2002:a17:90b:4b42:b0:390:84db:888e with SMTP id 98e67ed59e1d1-39645b1c818mr5264179a91.7.1787649806023;
+        Tue, 25 Aug 2026 02:23:26 -0700 (PDT)
+Received: from localhost.localdomain ([122.11.210.25])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39645c06e02sm3048627a91.17.2026.08.25.02.23.22
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 25 Aug 2026 02:23:25 -0700 (PDT)
+From: Hao Jia <jiahao.kernel@gmail.com>
+To: minchan@kernel.org,
+	senozhatsky@chromium.org,
+	axboe@kernel.dk,
+	akpm@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Hao Jia <jiahao1@lixiang.com>
+Subject: [PATCH] zram: fix idle age_sec underflow in idle_store()
+Date: Tue, 25 Aug 2026 17:23:16 +0800
+Message-Id: <20260825092316.69658-1-jiahao.kernel@gmail.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820193343.3852967-1-willy@infradead.org> <20260820193343.3852967-3-willy@infradead.org>
- <CAJfpegvP3i8ZJc2T=+f4rAhZ4E1QcT5+jC6mQPLxtB-yoK9Brw@mail.gmail.com>
- <aoxHOSC9kTPbKeNq@casper.infradead.org> <CAJfpegv3Ak+qNLb=fTSCSz7-taQ3Ui-Hkmqgn4PaGPe=CR4cbQ@mail.gmail.com>
- <aoyKxvdQdeJQfPHj@casper.infradead.org> <CAJfpegtgenUaudDcvecJuV2_WkkVw=gdcB0Eqg=UFKPMZP1uKQ@mail.gmail.com>
- <aoyt5pL7mXYwSqsG@casper.infradead.org>
-In-Reply-To: <aoyt5pL7mXYwSqsG@casper.infradead.org>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Tue, 25 Aug 2026 09:08:13 +0200
-X-Gm-Features: AcwNN1VLOxg4TFDsQzXPHVySuwqrEIZSjxOFz1CuAgo80c2cUSWOrt0F79eOWzI
-Message-ID: <CAJfpegv_SKhArUNBFUtsmkXSn+JzYgOjhFOqVf-Yd9MnsjBY_w@mail.gmail.com>
-Subject: Re: [PATCH 2/7] fuse: Use filemap_invalidate_pages()
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	devel@lists.orangefs.org, Pavel Begunkov <asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 24 Aug 2026 at 22:47, Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Mon, Aug 24, 2026 at 09:33:03PM +0200, Miklos Szeredi wrote:
+From: Hao Jia <jiahao1@lixiang.com>
 
-> > In the second case filemap_write_and_wait_range() won't write protect
-> > or unmap the page, so it may become dirty after the writeback.
->
-> But that can also happen in the first case.  page_mkwrite() can be called
-> immediately after the folio is unlocked, for example.  Or the folio can
-> be evicted and replaced with a different folio which is then dirtied.
+After commit 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking"),
+idle_store() computes the idle cutoff as follows:
 
-Let me try to make up a very concrete example.  It's not realistic and
-very unlikely to exist, yet something more subtle might be relying on
-this behavior.  I don't know.   At this point I'm just trying to show
-you that the two are really not equivalent, not that this has any
-practical significance.
+	cutoff = ktime_sub((u32)ktime_get_boottime_seconds(), age_sec);
 
-Let's imagine a distributed filesystem based on fuse.  It wants to
-serialize accesses to a file to avoid sub page writes reverting to
-stale data on cached writeback.  Cached writeback is unavoidable in
-case of writable mmap, so it tries to handle this case correctly by
-totally excluding cached aliases existing on different nodes.   If one
-node reads a range of pages, that range is invalidated on all other
-nodes.
+Because the left operand is cast to a 32-bit unsigned integer, when
+age_sec exceeds the current uptime, the subtraction wraps modulo 2^32
+and the huge result is zero-extended into the s64 cutoff.  mark_idle()
+subsequently marks every entry as idle instead of matching nothing,
+breaking the intended semantics of /sys/block/zramX/idle.  For instance,
+running echo 86400 > idle on a machine up for only two minutes causes
+all newly written pages to be marked as idle and handed over to idle
+writeback and recompression.
 
-The below example show store to a single page on node A and B with and
-without launder_page, starting with both having the page mmapped but
-not yet in cache.
+Drop the explicit cast to perform the subtraction in signed arithmetic
+again, restoring the previous behavior: an age_sec greater than uptime
+yields a negative cutoff, and one equal to uptime yields 0. Since a
+cutoff of 0 is now a valid computed value, it can no longer double as
+the "all" sentinel. Switch to KTIME_MIN instead, which no ac_time can
+be after.
 
-1) with launder_page
+Fixes: 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking")
+Signed-off-by: Hao Jia <jiahao1@lixiang.com>
+---
+ drivers/block/zram/zram_drv.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-store on A
-  - send READ
-  - server checks that no aliases exists
-  - returns page
-  - page is mapped in address space and dirtied
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index a9b3bb1d3bef..da51f70b7121 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -438,7 +438,7 @@ static void mark_idle(struct zram *zram, ktime_t cutoff)
+ 		}
+ 
+ #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+-		is_idle = !cutoff ||
++		is_idle = cutoff == KTIME_MIN ||
+ 			ktime_after(cutoff, zram->table[index].attr.ac_time);
+ #endif
+ 		if (is_idle)
+@@ -453,7 +453,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+ 			  const char *buf, size_t len)
+ {
+ 	struct zram *zram = dev_to_zram(dev);
+-	ktime_t cutoff = 0;
++	ktime_t cutoff = KTIME_MIN;
+ 
+ 	if (!sysfs_streq(buf, "all")) {
+ 		/*
+@@ -464,7 +464,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+ 
+ 		if (IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) &&
+ 		    !kstrtouint(buf, 0, &age_sec))
+-			cutoff = ktime_sub((u32)ktime_get_boottime_seconds(),
++			cutoff = ktime_sub(ktime_get_boottime_seconds(),
+ 					   age_sec);
+ 		else
+ 			return -EINVAL;
+@@ -475,7 +475,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+ 		return -EINVAL;
+ 
+ 	/*
+-	 * A cutoff of 0 marks everything as idle, this is the
++	 * A cutoff of KTIME_MIN marks everything as idle, this is the
+ 	 * "all" behavior.
+ 	 */
+ 	mark_idle(zram, cutoff);
+-- 
+2.34.1
 
-store on B
-  - send READ
-  - server sees alias on A, sends INVALIDATE
-  - INVALIDATE is processed on A:
-     + page is locked,
-     + unmapped
-     + data written to server via launder_page
-     + unlocked
-  - returns updated page
-  - page is mapped in address space and dirtied
-
- store on A concurrently with previous store on B
-   a) happens before page is unmapped:
-      - change is written by launder_page together with previous store
-   b) happens after page is unmapped:
-      -  page lock waits for writeback to finish
-      -  sends READ
-      - server sees in progress READ on B
-      - wait until READ on B is finished
-      - sends INVALIDATE to B
-      - ...
-
-2) without launder_page
-
-store on A: same as above
-
-store on B
-  - send READ
-  - server sees alias on A, sends INVALIDATE
-  - INVALIDATE is processed on A:
-     + page is written back
-     + unmapped
-  - returns updated page
-  - page is mapped in address space and dirtied
-
- store on A concurrently with previous store on B
-   a) happens before page writeback:
-      - change is written together with previous store
-   b) happens after page writeback but before unmap:
-      - since page is still mapped, store succeeds, page becomes dirty
-      - at this point we have differing cache contents on A and B
-
-Thanks,
-Miklos
