@@ -1,87 +1,85 @@
-Received: from mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541723FB7DE
-	for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 12:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B48C455176;
+	Tue, 25 Aug 2026 13:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787662683; cv=none; b=iDXjGBNTaTvy2b1xFZ7KCvF1WQ1Vv68reAfWcr2NQ7yShRM3baNK8e55plhktnW9nCW/83FhT9EgNA+dx+yqyn7e0aABWAdf7jmNHfoTlD1gqJmjjFK2ZKurtJXaHhdkzeoKS1IK8FnUTLXN0lrMwjT6sTDrUkIiAjtI8lHQnms=
+	t=1787662931; cv=none; b=q9+eaHdeaUm+LPj5lkAt05kseaJD1PqV5fait9BTqVjvoCT3vPOeo1QvfOvdtbn/9lATSGLAj2WaVj44TTWDkdEUED79JOK/08ViMjx1FOqvKoabOWzYcgDZRPt8OF5MpyWR3CWSiZgK24+N2LlRJvtUmBi7ea45pmqKCedKarQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787662683; c=relaxed/simple;
-	bh=1YPYm6TwcZfy5y0h7vMpIpqxKy7QKXtsLrVb2wLMlJU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i0yxfYKmdQgiafeYygQyTU5m7LgkG6AJiCMFTHKQpezd23yjbYDON8K7IYN79HMbyAD3Q+c3tDYoEg4AN1Osgp1m0Ikvaobxt5v97BQ//SvSVddLmqsmCxYyjqO/HQvXiBT32JxpFeI2xOZO972dxUgoP3Fi8N7MFK7nAy3XT90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wMjbQkAM; arc=none smtp.client-ip=95.215.58.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787662931; c=relaxed/simple;
+	bh=VNcoz4Pw6SFuZfea+o/jo++KMcxe/kAZME+DPG+fZOo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=NTq2a4KDUx6kRIZVKlBjB89g1j5ad+cxMDUlXL9DkK2ezR2RdVqKQ8vUQfxTgkj7WVmurCxOIv2lWdURVisWbs98Bne2gt94Mk1j5hDr21kj0KS0LVpkm3Xlh7+phTFM5xh3HhqIVFUllyKs23/MK2/fq2BMzJ8kYcwciMY7NM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dkp00pUl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wMjbQkAM"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=1YPYm6TwcZfy5y0h7vMpIpqxKy7QKXtsLrVb2wLMlJU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787662680; v=1; x=1788267480;
- b=wMjbQkAMc/18lGb2cSoaJmxH11xv9oJN4kKEgJCGZFJ9cgfPyQ0hxr/9hYTEzaErmc/Zafoj
- gCaXAt7HH8jGtT4V6xlqXTDMLzcdnm6kVsCb3Fdk8aIi/soP/V2/aO19z9ivn53Kq8SXI4lJUJZ
- XKziGct8Em8oJJkRgpBD5jQ8=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: from ctao-book.. (223.70.159.239)
-	by smtp.migadu.com with ESMTPS id ac232629fd2da2f1;
-	Tue, 25 Aug 2026 12:58:00 +0000
-X-Mizu-Trace-ID: ac232629fd2da2f1
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: axboe@kernel.dk
-Cc: hch@lst.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH 3/3] loop: drop the unused argument of lo_req_flush()
-Date: Tue, 25 Aug 2026 20:57:20 +0800
-Message-ID: <20260825125720.181793-4-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260825125720.181793-1-cui.tao@linux.dev>
-References: <20260825125720.181793-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dkp00pUl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1972A1F00A3F;
+	Tue, 25 Aug 2026 13:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787662929;
+	bh=VNcoz4Pw6SFuZfea+o/jo++KMcxe/kAZME+DPG+fZOo=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To;
+	b=Dkp00pUl9EQ7kOKFQgqA2AIpvWU64bXsCrPAHo2qX5sNnLEOXJ5aBfAY6fhEeaYrk
+	 plBRhMhwwqmDXjQzXoAF4Y9UnaE6++ghDotlTwDLqWYKco+ySPZ81338ywjIpV8Yuh
+	 kG5jEQvKZwhGsnHdrk1/trpBPttTYxDHgVrm53gWUteDdiXjBJVIq/kI3zv6QlPkIM
+	 2f7Z1LsZE/FhsO0XeZBWqSuG8SmpE0fgIDqpLmj6Z7m3FMEITvXj/nUH5oYfWO/l67
+	 T3X7eYN53W8nSAZXwL/AS8OsYKZ0bU6cnO/xBj/O/fGL++eW5F8VDSMJZSXdfvsV0M
+	 Vf4P8RYBCMHAw==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 25 Aug 2026 15:01:57 +0200
+Message-Id: <DKY1M6ZZENAL.152ELCOMXURCU@kernel.org>
+Subject: Re: [PATCH v20 1/8] rust: alloc: add `KBox::into_non_null`
+Cc: "Lorenzo Stoakes" <ljs@kernel.org>, "Vlastimil Babka"
+ <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, "Uladzislau
+ Rezki" <urezki@gmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng"
+ <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross"
+ <tmgross@umich.edu>, "Daniel Almeida" <daniel.almeida@collabora.com>,
+ "Tamir Duberstein" <tamird@kernel.org>, "Alexandre Courbot"
+ <acourbot@nvidia.com>, =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ "Lyude Paul" <lyude@redhat.com>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?=
+ <arve@android.com>, "Todd Kjos" <tkjos@android.com>, "Christian Brauner"
+ <brauner@kernel.org>, "Carlos Llamas" <cmllamas@google.com>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, "Dave Ertman" <david.m.ertman@intel.com>,
+ "Leon Romanovsky" <leon@kernel.org>, "Paul Moore" <paul@paul-moore.com>,
+ "Serge Hallyn" <sergeh@kernel.org>, "David Airlie" <airlied@gmail.com>,
+ "Simona Vetter" <simona@ffwll.ch>, "Alexander Viro"
+ <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>, "Igor Korotin"
+ <igor.korotin@linux.dev>, "Viresh Kumar" <vireshk@kernel.org>, "Nishanth
+ Menon" <nm@ti.com>, "Stephen Boyd" <sboyd@kernel.org>, "Bjorn Helgaas"
+ <bhelgaas@google.com>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>, "Pavel Tikhomirov" <ptikhomirov@virtuozzo.com>,
+ "Michal Wilczynski" <m.wilczynski@samsung.com>, "Ira Weiny"
+ <iweiny@kernel.org>, "Philipp Stanner" <phasta@kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <driver-core@lists.linux.dev>,
+ <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+ <linux-pwm@vger.kernel.org>, <linux-usb@vger.kernel.org>
+To: "Andreas Hindborg" <a.hindborg@kernel.org>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
+ <20260824-unique-ref-v20-1-490735672187@kernel.org>
+In-Reply-To: <20260824-unique-ref-v20-1-490735672187@kernel.org>
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Mon Aug 24, 2026 at 1:17 PM CEST, Andreas Hindborg wrote:
+> Add a method to consume a `Box<T, A>` and return a `NonNull<T>`. This
+> is a convenience wrapper around `Self::into_raw` for callers that need
+> a `NonNull` pointer rather than a raw pointer.
+>
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Reviewed-by: Gary Guo <gary@garyguo.net>
 
-lo_req_flush() never uses its request argument.  Drop it.
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 8ba146e76a59..e7d16e5961c0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -270,7 +270,7 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	return ret;
- }
- 
--static int lo_req_flush(struct loop_device *lo, struct request *rq)
-+static int lo_req_flush(struct loop_device *lo)
- {
- 	int ret = vfs_fsync(lo->lo_backing_file, 0);
- 	if (unlikely(ret && ret != -EINVAL))
-@@ -411,7 +411,7 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
- 
- 	switch (req_op(rq)) {
- 	case REQ_OP_FLUSH:
--		return lo_req_flush(lo, rq);
-+		return lo_req_flush(lo);
- 	case REQ_OP_WRITE_ZEROES:
- 		/*
- 		 * If the caller doesn't want deallocation, call zeroout to
--- 
-2.43.0
-
+Acked-by: Danilo Krummrich <dakr@kernel.org>
