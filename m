@@ -1,297 +1,176 @@
-Received: from va-2-54.ptr.blmpb.com (va-2-54.ptr.blmpb.com [209.127.231.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8677430B509
-	for <linux-block@vger.kernel.org>; Tue, 25 Aug 2026 02:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F0925A640;
+	Tue, 25 Aug 2026 02:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787625361; cv=none; b=J/wv3oYDvE5AUSnHeUBmIzavyY7LkqVpVi9fmaPpVnnPdTw84cf61NYDLkH2uq/uWEF3R6bsIQg41J0hKPWd2gB0zONTiNQFFhZoA8wYQMH8RI1WGUdCvhK7X/qO9QTDgmN+f1W7rv+O/VigMTRtSEaodGt04v9/xKzAMNvJuf4=
+	t=1787625641; cv=none; b=Xm6mkBjRJ6tuuHOTva0Lqw+k1HWKjkRaZSkos067FCuNl1ZofVFhQbQAdIKREzhqvPZv65Rn7rU1cZRIF2+vYzb309xXXfFiw9cZ2bU17NZo6mAXnCEnu5O0NzzXUfYLk77WDuEddqB6r8IxR+brS3lNhPGIiicXxXXvKWcbWFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787625361; c=relaxed/simple;
-	bh=Cw5BitVxKiZ/XuqFC9PfZMXgD2EiVbmLVlUZl4A/kNE=;
-	h=From:Subject:Date:Message-Id:In-Reply-To:To:References:
-	 Content-Type:Cc:Mime-Version; b=L/v0JrA8GK9CupzTpqO54smij2/eJJ5TkyhFo4A9MQEAL3I5qDfHpTvkJGfbKG/a8IzEXpmaYrqwEbFDev0PeavYNdFZ+S29pcaG8Me/JR1BT8tJo6P6m5rAcPEFC0oFXbyFUtudBkR1h8ofmRcqFBC9OnuoQlw4SBZ+WmkqIC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=N1damRuD; arc=none smtp.client-ip=209.127.231.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1787625641; c=relaxed/simple;
+	bh=grmr8ShzbmokeeZM8GJP7va3jRxjvHZ4u/qI8TrYDQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r0GvZ4K+sWj+29sHFYdaDzrHKzkBQB/Hwvl+qDGQA2gA5zfwWU+Vq2VmlLsVB/g1b+JKSQITlE80D1sdjAyOmHi+SeG5lUIbzMw7LcRskG6WvPSvYlBdOzTBYdA+/lpE3zLpahIkiwtviCBx1ZwyQefUSuZ+VyWj+UmtE9+fO5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hzGqzCFd; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="N1damRuD"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hzGqzCFd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1787625231;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=lDI5s84hBd6G6H4Z44CVTBiUldbRbWGcWgxU60+VRcc=;
- b=N1damRuDdXq/S1qvgsPvIgiOMRae2tOkZnrPnX1YDwqs4BpardpXORILjIwLcfT8gYvwpj
- y61YbIXqFqSjzjrn0p6+CIe6SIBHKc9qAw6XSARZEfZtjieI80bZQTVw9B+QETeoNZA+pu
- TWAjzZ46WhnyanSUxlDLh1p/WnyjNm3fgccPfl/M/4xsLb/VBYb1pWqQR0LMYoC1hGE8nK
- KadtWGzDFvZXC6xb/23tUyEcACNIzwGM96ySDeyVio6TOd1xo8LUoK8Oh78L/wbHfzWxv3
- 04zQ7pe5Zo3U0Nd2rvrcDJvdztzZvF7cvxjniVoqNblCd8b3RFfMfgLhHpxn6g==
-From: "yu kuai" <yukuai@fygo.io>
-Subject: Re: [RFC PATCH v3 4/6] blk-cgroup: allocate blkgs in blkg_create
-Date: Tue, 25 Aug 2026 10:33:45 +0800
-Message-Id: <6a9cc2ee-c46f-4cd4-9d32-a96bcbfed213@fygo.io>
-User-Agent: Mozilla Thunderbird
-In-Reply-To: <ca5c6c43-b6e6-48f3-9e3b-6d5f8b1538c8@linux.dev>
-Received: from [192.168.1.104] ([39.182.0.185]) by smtp.larksuite.com with ESMTPS; Tue, 25 Aug 2026 02:33:49 +0000
-To: "Tao Cui" <cui.tao@linux.dev>, "Yu Kuai" <yukuai@kernel.org>, 
-	"Jens Axboe" <axboe@kernel.dk>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, 
-	"Sebastian Andrzej Siewior" <bigeasy@linutronix.de>, 
-	"Clark Williams" <clrkwllms@kernel.org>, 
-	"Steven Rostedt" <rostedt@goodmis.org>, "yu kuai" <yukuai@fygo.io>
-Reply-To: yukuai@fygo.io
-References: <20260823152926.1043863-1-yukuai@kernel.org> <20260823152926.1043863-5-yukuai@kernel.org> <ca5c6c43-b6e6-48f3-9e3b-6d5f8b1538c8@linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Cc: "Christoph Hellwig" <hch@lst.de>, "Nilay Shroff" <nilay@linux.ibm.com>, 
-	"Hannes Reinecke" <hare@suse.de>, <linux-block@vger.kernel.org>, 
-	<cgroups@vger.kernel.org>, <linux-rt-devel@lists.linux.dev>, 
-	<linux-kernel@vger.kernel.org>
-X-Lms-Return-Path: <lba+26a8cff0e+3bf86d+vger.kernel.org+yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cMhE1zLIBEfW8ce0tgca2Z8WQ504QioXQyvOVgDlw9s=; b=hzGqzCFd/Zil7siDD7txgS0PkI
+	0btYf2KcGF4Jt5LTpvtm3rcvqgdEJSmZrUdBF9aqMpMYUh9Wx2DIzUj8xdR3ux2f0ydIJjgu6/GP/
+	GCGCI2Cu8TlWQosSPGxvlQtgSVvTwAmUUZIpR/2u1oLk4ZJts6jT8AMgHc7WKf4EmDelDxaZNwldB
+	bwuBAzBiHPtS2yBO9dgBLMH1854Fm9Yq579Rygv7X8gtmLlRanmAfRNHAJH+8I1bkHkoV2E7aBA/w
+	Rmforme87QTE7Bp3x5xKUtL/ppwt4PjCQFG+iz4NzVNJh7Q9S88tpLt+noBixClVZE+hH5oiywcdZ
+	NRPAIH+Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wyh57-00000008BRG-20Ss;
+	Tue, 25 Aug 2026 02:40:09 +0000
+Date: Tue, 25 Aug 2026 03:40:09 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: NeilBrown <neil@brown.name>
+Cc: "David Hildenbrand (Arm)" <david@kernel.org>,
+	Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org,
+	max.byungchul.park@gmail.com, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org,
+	kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+	mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+	vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+	dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+	linux-block@vger.kernel.org, josef@toxicpanda.com,
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+	hch@infradead.org, djwong@kernel.org,
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+	harry.yoo@oracle.com, chris.p.wilson@intel.com,
+	gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, longman@redhat.com,
+	yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+	netdev@vger.kernel.org, matthew.brost@intel.com,
+	her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com,
+	bp@alien8.de, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
+	kees@kernel.org, bigeasy@linutronix.de, clrkwllms@kernel.org,
+	mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, bagasdotme@gmail.com,
+	wsa+renesas@sang-engineering.com, dave.hansen@intel.com,
+	geert@linux-m68k.org, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org,
+	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v19 00/40] DEPT(DEPendency Tracker)
+Message-ID: <ao0AieB7zg5FKD39@casper.infradead.org>
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <359ea967-9b97-4584-88e6-bddb4044de2e@kernel.org>
+ <20260821042143.GA40890@system.software.com>
+ <825134a8-ceae-430c-b2fc-d1d0c7240f39@kernel.org>
+ <178730572084.2852630.7732425311008244683@noble.neil.brown.name>
+ <3d58eb3c-7a9d-4183-907b-46172664631c@kernel.org>
+ <178761465493.3510150.12380729360578969391@noble.neil.brown.name>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178761465493.3510150.12380729360578969391@noble.neil.brown.name>
 
-Hi,
+On Tue, Aug 25, 2026 at 09:37:34AM +1000, NeilBrown wrote:
+> > For readahead, I think that queues / lru are not involved. We submit the I/O,
+> > and once the I/O is done, we unlock the folio from interrupt context.
+> 
+> "submit the I/O" means "attach the page to a "struct bio" (or similar)
+> and attach the struct bio to a transmit queue for the device (or
+> similar).  So there really is a queue.
+> 
+> > 
+> > end_buffer_async_read() / iomap_finish_folio_read() end up calling
+> > folio_end_read(), where we do the magic
+> > 
+> > 	folio_wake_bit(folio, PG_locked);
+> 
+> Exactly where the lock ownership should be reclaimed is not immediately
+> clear to me.  bio_endio() might be early enough but there are probably
+> better points.
+> 
+> A small difficulty here is that a bio has multiple folios and they are
+> all locked.  I cannot see that lockdep has a concept of holding an
+> arbitrarily large set of related locks.
+> We could just tell lockdep 
+>   "I have some folios locked" 
+> or maybe enhance lockdep to allow
+>   "I have N folios locked"
+> or even
+>   "I have N folios in address-space A with the highest offset being O".
+> 
+> This would allow lockdep to check the validity of locking another folio
+> - only allowed if the address space is the same and the offset is larger
+> than the previous largest.
 
-=E5=9C=A8 2026/8/25 9:35, Tao Cui =E5=86=99=E9=81=93:
-> Hi Kuai,
->
-> =E5=9C=A8 2026/8/23 23:29, Yu Kuai =E5=86=99=E9=81=93:
->> From: Yu Kuai <yukuai@fygo.io>
->>
->> Move blkg allocation into blkg_create() and have it take a gfp_t mask, s=
-o
->> that the caller controls whether creation may sleep. blkg_create() now
->> always allocates the blkg itself instead of sometimes receiving a
->> preallocated one, which lets the lookup and config paths drop their open=
--
->> coded preallocation and retry loops.
->>
->> blkg_lookup_create() and the root-blkg setup use GFP_NOIO (or GFP_KERNEL
->> for the root) so they do not recurse into IO reclaim; the nowait policy
->> path added later will use GFP_ATOMIC.
->>
->> Signed-off-by: Yu Kuai <yukuai@fygo.io>
->> ---
->>   block/blk-cgroup.c | 48 +++++++++++++---------------------------------
->>   1 file changed, 13 insertions(+), 35 deletions(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 0f34a80a726d..33fba781017b 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -383,37 +383,29 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *b=
-lkcg, struct gendisk *disk,
->>   out_free_blkg:
->>   	kfree(blkg);
->>   	return NULL;
->>   }
->>  =20
->> -/*
->> - * If @new_blkg is %NULL, this function tries to allocate a new one as
->> - * necessary using %GFP_NOWAIT.  @new_blkg is always consumed on return=
-.
->> - */
->>   static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendis=
-k *disk,
->> -				    struct blkcg_gq *new_blkg)
->> +				    gfp_t gfp_mask)
->>   {
->> -	struct blkcg_gq *blkg;
->> +	struct blkcg_gq *blkg =3D NULL;
->>   	int i, ret;
->>  =20
->>   	lockdep_assert_held(&disk->queue->blkcg_mutex);
->>  =20
->>   	/* request_queue is dying, do not create/recreate a blkg */
->>   	if (blk_queue_dying(disk->queue)) {
->>   		ret =3D -ENODEV;
->>   		goto err_free_blkg;
->>   	}
->>  =20
-> Reading patch 4/6, one thing looked off to me. Before the series,
-> blkg_create() allocated with GFP_NOWAIT under queue_lock, or took a
-> caller-preallocated object. After patches 3+4, it allocates with the
-> passed gfp_mask while holding blkcg_mutex:
->
->> -	/* allocate */
->> -	if (!new_blkg) {
->> -		new_blkg =3D blkg_alloc(blkcg, disk, GFP_NOWAIT);
->> -		if (unlikely(!new_blkg)) {
->> -			ret =3D -ENOMEM;
->> -			goto err_free_blkg;
->> -		}
->> +	blkg =3D blkg_alloc(blkcg, disk, gfp_mask);
->> +	if (unlikely(!blkg)) {
->> +		ret =3D -ENOMEM;
->> +		goto err_free_blkg;
->>   	}
->> -	blkg =3D new_blkg;
->>  =20
-> (patch 4 also makes blkg_lookup_create() pass GFP_NOIO for the
-> config path, where blkg_conf_prep() used to drop queue_lock before
-> allocating.)
->
-> blk_throtl_init() reaches blkcg_activate_policy() with the queue
-> frozen, so we can end up allocating (and entering reclaim) while
-> holding q_usage_counter -> blkcg_mutex. Reclaim can then add the
-> q_usage_counter edge from the disk probe side.
->
-> I booted the series in a VM with PROVE_LOCKDEP to check, and lockdep
-> does report a circular dependency on the first io.max write, every
-> boot:
->
->      bash/2330 is trying to acquire lock:
->      ffff88810e518548 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkcg_activate_p=
-olicy+0x1ee/0xa00
->      but task is already holding lock:
->      ffff88810e518060 (&q->q_usage_counter(io)){++++}-{0:0}, at: blk_mq_f=
-reeze_queue_nomemsave+0xd/0x20
->
->      Chain exists of:
->      &q->blkcg_mutex --> fs_reclaim --> &q->q_usage_counter
->
-> GFP_NOIO keeps direct writeback out of reclaim, so an actual hang
-> looks hard to hit -- but the splat fires on a very common operation.
+It's more complex than that; see my other emails on the subject.
 
-This is a known problem, and there is also a known problem to call pd_alloc=
-_fn() while
-queue is frozen, because percpu allocation there can trigger lockdep deadlo=
-ck as well.
+I think we need the ability for lockdep to call a function which says "I
+hold this lock, is that lock OK to acquire".  But the devil is in the
+details.
 
->
-> Could the two-phase allocation already used for pd_prealloc in
-> blkcg_activate_policy() also apply to blkg_create()? I.e. try
-> GFP_NOWAIT under blkcg_mutex, and if that fails drop the mutex,
-> preallocate with GFP_KERNEL and retry. I think that drops the
-> blkcg_mutex -> fs_reclaim edge, but I may be missing something.
+> > 
+> > It's interesting, that for writeback we never unlock the folio on the I/O path,
+> > but instead have the dedicated page flag to tell us when writeback is complete.
+> 
+> PG_locked and PG_writeback are two different lock-bits with two
+> different meanings.
+> When a folio is PG_locked the content is invalid and shouldn't be accessed.
+> When a folio is in PG_writeback its data is not safe even though
+> PG_dirty has been cleared (if I remember correctly).
+> 
+> So these are two separate, though related, lock bits that would both
+> need to be tracked.  lockdep would detect how they are related.
 
-I'm afraid not, this is not the plan to fix the deadlock, the plan for the =
-order is:
+Some history ... before we had PG_writeback, we held PG_locked
+throughout the writeback process.  People argued convincingly that it
+was fine to map a page into a process's address space (which requires
+PG_locked) while it was being written back.  And so PG_locked was
+split.  Now we take PG_locked at the beginning of the writeback process
+and downgrade to PG_writeback at some point.
 
-1) hold blkcg_mutex first;
-2) allocate memory, including blkg and pd_alloc_fn;
-3) queue freeze;
-4) pd_init_fn and make blkg online;
-
->
-> Thanks,
-> Tao
->
->>   	/* link parent */
->>   	if (blkcg_parent(blkcg)) {
->>   		rcu_read_lock();
->>   		blkg->parent =3D blkg_lookup(blkcg_parent(blkcg), disk->queue);
->> @@ -461,12 +453,12 @@ static struct blkcg_gq *blkg_create(struct blkcg *=
-blkcg, struct gendisk *disk,
->>   	/* @blkg failed fully initialized, use the usual release path */
->>   	percpu_ref_kill(&blkg->refcnt);
->>   	return ERR_PTR(ret);
->>  =20
->>   err_free_blkg:
->> -	if (new_blkg)
->> -		blkg_free(new_blkg);
->> +	if (blkg)
->> +		blkg_free(blkg);
->>   	return ERR_PTR(ret);
->>   }
->>  =20
->>   /*
->>    * The root blkg holds a live reference while the disk is active, so w=
-alking
->> @@ -531,11 +523,11 @@ static struct blkcg_gq *blkg_lookup_create(struct =
-blkcg *blkcg,
->>   			pos =3D parent;
->>   			parent =3D blkcg_parent(parent);
->>   		}
->>   		rcu_read_unlock();
->>  =20
->> -		blkg =3D blkg_create(pos, disk, NULL);
->> +		blkg =3D blkg_create(pos, disk, GFP_NOIO);
->>   		if (IS_ERR(blkg)) {
->>   			blkg =3D ret_blkg;
->>   			break;
->>   		}
->>   		if (pos =3D=3D blkcg)
->> @@ -865,39 +857,29 @@ int blkg_conf_prep(struct blkcg *blkcg, const stru=
-ct blkcg_policy *pol,
->>   	 * non-root blkgs have access to their parents.
->>   	 */
->>   	while (true) {
->>   		struct blkcg *pos =3D blkcg;
->>   		struct blkcg *parent;
->> -		struct blkcg_gq *new_blkg;
->>  =20
->>   		parent =3D blkcg_parent(blkcg);
->>   		rcu_read_lock();
->>   		while (parent && !blkg_lookup(parent, q)) {
->>   			pos =3D parent;
->>   			parent =3D blkcg_parent(parent);
->>   		}
->>   		rcu_read_unlock();
->>  =20
->> -		new_blkg =3D blkg_alloc(pos, disk, GFP_NOIO);
->> -		if (unlikely(!new_blkg)) {
->> -			ret =3D -ENOMEM;
->> -			goto fail_unlock;
->> -		}
->> -
->>   		if (!blkcg_policy_enabled(q, pol)) {
->> -			blkg_free(new_blkg);
->>   			ret =3D -EOPNOTSUPP;
->>   			goto fail_unlock;
->>   		}
->>  =20
->>   		rcu_read_lock();
->>   		blkg =3D blkg_lookup(pos, q);
->>   		rcu_read_unlock();
->> -		if (blkg) {
->> -			blkg_free(new_blkg);
->> -		} else {
->> -			blkg =3D blkg_create(pos, disk, new_blkg);
->> +		if (!blkg) {
->> +			blkg =3D blkg_create(pos, disk, GFP_NOIO);
->>   			if (IS_ERR(blkg)) {
->>   				ret =3D PTR_ERR(blkg);
->>   				goto fail_unlock;
->>   			}
->>   		}
->> @@ -1466,27 +1448,23 @@ void blkg_exit_queue(struct request_queue *q)
->>   }
->>  =20
->>   int blkcg_init_disk(struct gendisk *disk)
->>   {
->>   	struct request_queue *q =3D disk->queue;
->> -	struct blkcg_gq *new_blkg, *blkg;
->> +	struct blkcg_gq *blkg;
->>  =20
->>   	/*
->>   	 * If the queue is shared across disk rebind (e.g., SCSI), the
->>   	 * previous disk's blkcg state is cleaned up asynchronously via
->>   	 * disk_release() -> blkcg_exit_disk(). Wait for all old blkgs to be
->>   	 * removed from the queue list before setting up new blkcg state.
->>   	 */
->>   	wait_var_event(&q->blkg_list, list_empty_careful(&q->blkg_list));
->>  =20
->> -	new_blkg =3D blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
->> -	if (!new_blkg)
->> -		return -ENOMEM;
->> -
->>   	/* Make sure the root blkg exists. */
->>   	mutex_lock(&q->blkcg_mutex);
->> -	blkg =3D blkg_create(&blkcg_root, disk, new_blkg);
->> +	blkg =3D blkg_create(&blkcg_root, disk, GFP_KERNEL);
->>   	if (IS_ERR(blkg))
->>   		goto err_unlock;
->>   	q->root_blkg =3D blkg;
->>   	mutex_unlock(&q->blkcg_mutex);
->>  =20
-
---=20
-Thanks,
-Kuai
