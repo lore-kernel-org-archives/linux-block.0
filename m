@@ -1,155 +1,117 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f5.google.com (mail-oi2-f5.google.com [74.125.231.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8113D7D9F
-	for <linux-block@vger.kernel.org>; Wed, 26 Aug 2026 10:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AD7416878
+	for <linux-block@vger.kernel.org>; Wed, 26 Aug 2026 12:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787740987; cv=none; b=ilBjW4eYtPxxY95SHHwksyUOlgj4DsdeGl2cF1OgHx/+OXmnydwKS+c8F0Ra0R1GYftN85lwzgAjHfGWc9TCDogwAyDBJ/gObmPLTgts7oyETvVD/oZrUTAAAjILfvmzlNLrA3i4rIh/uxilId95oh8xZvjVfn0uX7EyhxyW5ms=
+	t=1787746955; cv=none; b=dMwfRbFl+WmQS5gAXE98Z9OSTiN4/lvwIP1Ri725uOnsGgn9hCY75iHpIsIUUXy4ijajb8EgQNErpFl6lwppCN5aPVLXUO++ccJQ+m5plKRXhJHWrbtkTbN8D7PcW/srFi95d0WNk33cA0h3ZAmyM0KolKiKWdtIqM+X92KXuAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787740987; c=relaxed/simple;
-	bh=V9tSR8GlKo14ujIhXUB9kjhVK5L9ZbZ8aUd27vDHVes=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=g0ITxf7Tz5R2Y25/hNpGM1/bAkL6D201o2Xx4LsdFvywwOT7fy52e5jL2mlhYzcsAsiRDRBsJ7k81tki0cErkC3yt+FN5TkEG6CAvbyMAh6k/E76uvZhmSSfP7rtXtEj051GrODoszlVQ/6gFZjzTUTkJ4qrWJs6LnKaw3Qbj5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=HExBa7vU; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="HExBa7vU"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260826104256epoutp029d69434e6867f6097de38ff8869547e6~PVPJZpC671036610366epoutp024
-	for <linux-block@vger.kernel.org>; Wed, 26 Aug 2026 10:42:56 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260826104256epoutp029d69434e6867f6097de38ff8869547e6~PVPJZpC671036610366epoutp024
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1787740976;
-	bh=b7S5hM7p1oZO94IHXtrATGeyfj9R7PKi9SWBT1dOY5E=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=HExBa7vUp9qghRwHmU3qqFIBw81gMpe8GwX0oI0iXqm6rDtU940lSZlii0vzzxTBG
-	 7/OXvV+v+XlR3xBL9p6XshQVqX5/PW/D4PwaDRoGJxMPihVLts4sg9XTmxd+enMBO+
-	 iv6Ah95hJAoK9JQVfWRoeA9Q+e/IqLnjRL9GHw+E=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260826104256epcas5p2bdd7d258c9e9c5551fe9a2db656a933f~PVPI6kYuE0322103221epcas5p24;
-	Wed, 26 Aug 2026 10:42:56 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.92]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4hVLp75Gppz2SSKX; Wed, 26 Aug
-	2026 10:42:55 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260826104255epcas5p373ce91fb30a5a8b6fa5d780d9c1640b1~PVPH1Pyjc0982309823epcas5p3D;
-	Wed, 26 Aug 2026 10:42:55 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260826104253epsmtip14cb04dd143758ac8f5f4a88621b3f755~PVPF-MBfK1269512695epsmtip1R;
-	Wed, 26 Aug 2026 10:42:53 +0000 (GMT)
-Message-ID: <c6064b06-9e34-4790-80ef-c76333c2a11a@samsung.com>
-Date: Wed, 26 Aug 2026 16:12:52 +0530
+	s=arc-20240116; t=1787746955; c=relaxed/simple;
+	bh=vJu/tgezIAyPq/jvVxwLDZ/MvZnGeML+p2SKRSGhOeg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=F700/bdbVWOLCqJrDBwwE5Vq6fHxUUXB4wi+NvChIQCew/UScO+i3DMT3ypJwdJKX/SGumJnV2s+ftD7ngIeH7DeJuEeRbSGLO0BsS4bUqWLPuxhvjrG6Z1QroWX3w1EyN2NaRkvkmIlNMcmXIF/WXp3lgbpJ5bDsF+FxyHMWy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi2-f5.google.com with SMTP id 5614622812f47-4b3759b7ff0so56016b6e.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Aug 2026 05:22:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787746952; x=1788351752;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=P5eo3SCH5j3Fs+ZHwEuof0JMA7kWfr4/TVZy9FrVKM4=;
+        b=aXJv5O/Lc8NCvcUOsSaxIvjB56mk/Aqjb6mlmvUbLbIeWZqUD/90E/0D6Rk8KC81ZH
+         DwTfHK7eAA7pUlMK7A1+I95eT0vqnFjo7jQDAt3taZmopuovfZ+FQtQsgiDAeHPmc4Kr
+         jVl9hyM2brdyD1TDJWteXRK5kYqdEfcO18YEphHC+XZNsVSmz8Yy9BbcXy9ZHnAadI3p
+         7/W0fGorxQhaKpw8yp/B+1H0Cqe1GSjdleaMWVnkLQmrOISBftcZhQ8f6fg6yDeS3ICp
+         Q0QKY8GPhZmFa3OS3u6DVJR1/ZeDdRfvsEsqjGwVFrtF4D53BsdQn916MvcX5vvxlbAf
+         FEVg==
+X-Forwarded-Encrypted: i=1; AHgh+Roh0gpBpL/XGhB3NvbJiMRvBOXict5NDRQWmNJ5JIehRgIQI8L4Y+24na2MaTIEirtvSQF7/JWhywqdrw==@vger.kernel.org
+X-Gm-Message-State: AFuF++mMgkx1K7X6XmSIONK3skrb+5wgpK4gB20Gxkjre4HZ8mDP/nv6
+	Q+w5Wdlv7EEQ0IGAM/EPI1DZN+fM88oE8BxvpozJJceCNv+6gdQO0xTr78d2e4NjipUEhuwgCPQ
+	5EeN5IsKSkCve0WW9fA/NECLqNIg9VJM2umJO8XW78evFPPY00cAhxC0sQK0=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/6] fs: add write-stream management ioctls
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org,
-	dgc@kernel.org, jack@suse.cz, cem@kernel.org, axboe@kernel.dk,
-	kbusch@kernel.org, ritesh.list@gmail.com, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260825065533.GA24808@lst.de>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260826104255epcas5p373ce91fb30a5a8b6fa5d780d9c1640b1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319
-References: <20260717125538.508925-1-joshi.k@samsung.com>
-	<CGME20260717125627epcas5p3f5ad1cf917d563cc061e571b2f932319@epcas5p3.samsung.com>
-	<20260717125538.508925-2-joshi.k@samsung.com>
-	<20260721030338.GU7380@frogsfrogsfrogs>
-	<71ae458a-a6e3-4c6f-8fb9-7e8bc088bb87@samsung.com>
-	<20260819070814.GB1541@lst.de>
-	<076db8e7-6c6e-4d91-b442-1471ad7a5c27@samsung.com>
-	<20260825065533.GA24808@lst.de>
+X-Received: by 2002:a05:6808:4fd1:b0:4aa:d5f:123e with SMTP id
+ 5614622812f47-4b366b0ea25mr6875968b6e.9.1787746952438; Wed, 26 Aug 2026
+ 05:22:32 -0700 (PDT)
+Date: Wed, 26 Aug 2026 05:22:32 -0700
+In-Reply-To: <6a778cfb.9c11d2ce.289b96.00b7.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a8eda88.1d9ded08.62e62.00ad.GAE@google.com>
+Subject: Re: [syzbot] [block?] WARNING in blk_mq_free_tag_set
+From: syzbot <syzbot+02b37e31e64ea5cb6d29@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/25/2026 12:25 PM, Christoph Hellwig wrote:
-> On Mon, Aug 24, 2026 at 12:00:46PM +0530, Kanchan Joshi wrote:
->>>> - That stream/fd will be unavailable if some other application has
->>>> already opened it.
->>>> - If applications gets the stream fd, it can use that to set stream id
->>>> for multiple files.
->>>> - It can close the stream-fd and that does not change anything for the
->>>> file resource (i.e, its inode continue to carry the stream-id value that
->>>> was set).
->>>>
->>>> Christoph - does this match?
->>>
->>> Almost.  I didn't really think of your last point there.  If the
->>> inodes keeps using it when it is dropped that breaks the model a
->>> bit, but revoking it might make things a bit ugly and slow.  Urgg.
->>
->> I think it is consistent to the model that says stream fd is a distinct
->> resource and it is a necessary lease/license to set the particular
->> stream(-id) across files.
->> If the stream-fd is held, that stream-id remains exclusive to the
->> application.
->> Closing means, applications is fine to release the license and
->> underlying stream-id becomes available to other users.
-> 
-> But that also means it can be reallocated to other users, which
-> now mix data.  I guess the answer might be "don't do this", but
-> I'd love to have interfaces that aren't easy to abuse.  OTOH
-> implementing this might be quite an overhead.
-> 
->>>> 4. FS_IOC_QUERY_FILE_WRITE_STREAM_ID		_IOR('f', 138, __u32)
->>>>
->>>> Queries the write-stream value (__u32) currently assigned to the file
->>>> (its inode).
->>>
->>> I'm not sure exposing the actual ID to the user space application is a
->>> that good idea,
->>
->> But don't we need a way to know if stream id/value is set on a file or
->> not? This ioctl is more about observability; GET equivalent of SET.
->> Also write stream value is not going to be there if/when in-core inode
->> gets evicted.
-> 
-> Yes, but the application needs to basically set it after open
-> anyway.  Keeping any kind of state over a file descriptor that
-> has been closed doesn't make much sense.
-> 
->>> same for passing in the wanted ID when allocating.
->>
->> Can drop OPEN_EXACT flag if you prefer that.
->> But this was for the case if application restarted and wanted its new
->> data to go into the bucket where it was previously writing.
-> 
-> But that assumes that the bucket hasn't otherwise been reused, which
-> might not be the case.
-> 
->>> That leaks a lot of internal details.
->>
->> I viewed stream-id similar to how we view file-name. Application can
->> list file names, but need the fd to do operations on that file.
->> So, I could not understand internal details part. Could you explain? We
->> have FIEMAP and unprivileged XFS_IOC_FSGEOMETRY already expose the
->> placement of the file.
-> 
-> There are a lot of operations on filenames.. XFS_IOC_FSGEOMETRY and
-> are in a different register than normal file operations.  If we
-> want to expose the mapped stream IDs I'd also rather have them in
-> a different register than the usual APIs.
-> 
+syzbot has found a reproducer for the following issue on:
 
-So based on the above discussion, do you see this as the right interface?
+HEAD commit:    a8406e6c0b79 Add linux-next specific files for 20260825
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=114f1625580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=da8932b2925a9804
+dashboard link: https://syzkaller.appspot.com/bug?extid=02b37e31e64ea5cb6d29
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13dad979580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10136979580000
 
-1. FS_IOC_WRITE_STREAM_GET_MAX : query max write streams
-2. FS_IOC_WRITE_STREAM_ALLOC: allocate any write stream (if available) 
-and return stream fd. No flag whatsoever.
-3. FS_IOC_WRITE_STREAM_SET: set write stream into a file using stream-fd
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bd019bacac75/disk-a8406e6c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e47580ccc38d/vmlinux-a8406e6c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b7909a5638c6/bzImage-a8406e6c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+02b37e31e64ea5cb6d29@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+timer_delete_sync(&sdp->delay_work) && rcu_segcblist_n_cbs(&sdp->srcu_cblist)
+WARNING: kernel/rcu/srcutree.c:707 at cleanup_srcu_struct+0x3d6/0x8b0 kernel/rcu/srcutree.c:706, CPU#0: syz.0.1231/9288
+Modules linked in:
+CPU: 0 UID: 0 PID: 9288 Comm: syz.0.1231 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+RIP: 0010:cleanup_srcu_struct+0x3d6/0x8b0 kernel/rcu/srcutree.c:706
+Code: f3 8b 00 48 83 7d 00 00 4c 8b 74 24 10 0f 85 dd 03 00 00 41 ff c5 41 83 e5 0f 41 83 fd 07 0f 86 e2 fe ff ff e9 ab 00 00 00 90 <0f> 0b 90 4c 8d b5 00 02 00 00 4c 89 f3 48 c1 eb 03 48 b8 00 00 00
+RSP: 0018:ffffc900033c7cf0 EFLAGS: 00010206
+RAX: 1ffffd1ffff81745 RBX: 0000607edaf36940 RCX: dffffc0000000000
+RDX: 0000000000000001 RSI: ffffffff8e478a87 RDI: 00000000ffffffff
+RBP: ffffe8ffffc0b940 R08: ffffffff907a4f7f R09: 1ffffffff20f49ef
+R10: dffffc0000000000 R11: fffffbfff20f49f0 R12: ffff888054a1e800
+R13: 0000000000000000 R14: ffffe8ffffc0ba28 R15: 1ffffffff1ce95de
+FS:  00007f73abf2d6c0(0000) GS:ffff888124cd5000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000000100 CR3: 0000000076d8a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ blk_mq_free_tag_set+0x617/0x790 block/blk-mq.c:4976
+ loop_remove+0x4e/0xc0 drivers/block/loop.c:2143
+ loop_control_remove drivers/block/loop.c:2201 [inline]
+ loop_control_ioctl+0x4a6/0x5a0 drivers/block/loop.c:2243
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f73aaf9e0d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f73abf2d028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f73ab225fa0 RCX: 00007f73aaf9e0d9
+RDX: 0000000000000001 RSI: 0000000000004c81 RDI: 0000000000000003
+RBP: 00007f73ab035024 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f73ab226038 R14: 00007f73ab225fa0 R15: 00007ffe4f51e5e8
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
