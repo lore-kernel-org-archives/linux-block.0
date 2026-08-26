@@ -1,103 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073E53BE14D;
-	Wed, 26 Aug 2026 09:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2693CAA49;
+	Wed, 26 Aug 2026 10:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787736574; cv=none; b=OoF7QMGtk4VpdApYl8e0S4QfZexxcOgxycKVL1qoIv/ECKz2Aqyi4kAe+7Mig9K9eBUPYuIMU8zE8tjGHgrzIXOlqshPACqcFWKRr5pbT3GRgGcncT7/cs2txanmCy8NvMM0p+6sHijpn/VAR9wSUtpTv6t04DQpBvRHko2fCNo=
+	t=1787740741; cv=none; b=Iw3x3e76XGQzAIC56sZZfqcltIILdJFMcX4A3kN4KOnm7DPszUDJwWLA+yX2q1mLRc2WRtjzlAdWaRL7DznuRWXxgWbNaIPspZf3AOTF5apyVQVXkh9Ex0Pk3wrheZqHLm27lYoqjGGuJCagol++LmLnkF0SaYDHh1gyuAZkdsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787736574; c=relaxed/simple;
-	bh=vE0DFncUbEa7WUezDlJbcmjpQbbiEpMqeMkCvD7YDbU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XdYzgQmyKcGKmTl9mfPSgAq4opPLv6a+T/ALUBX8538mFeyhckPLL+E+och0kv9TUnkPQ9sW4h8897Ex6tdN9+pu4//DvxwSo3tN4FQgL6SJU3ov0oce54QxRsdCyTiyGSFD4OGXJBXJIxY58oHQYObo+WzDN+w+TblrRNolAKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMLbpbtV; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMLbpbtV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B9931F01561;
-	Wed, 26 Aug 2026 09:29:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787736572;
-	bh=vE0DFncUbEa7WUezDlJbcmjpQbbiEpMqeMkCvD7YDbU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=GMLbpbtV6XRD4w6KN91RH1oCiVx72uKzWQqLkbfx2kIDN9D9Eag0gzkEbhDAl0gWt
-	 P1YCkvBlGTSdwRH3cp7KuiATo/uaSTYejkU3Vxpztm9iu3uFxILV1ojmRaKWYlikRY
-	 Ggw4d12WTNh1bcjG7gDKhj2+I6mDhrKTue5CuHtVBbtjdSc5JxIGzd18mhpGbu9Yql
-	 CcB/55rMLKstOxN38hkC+/m6VAXbVIPr7Ta8HzW2B+7BxGx5BXD678vW+tpQrbQfJh
-	 g9tTDJTf0faFwf4/6U0eVGbrjKFJOeooMnCeoyi93Y+sF616btPc7GrV1O9Sww9y70
-	 JGj0Mli2sglfQ==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
- Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett"
- <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda
- <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
- <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno
- Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor
- Gross <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>,
- Lyude Paul
- <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve
- =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, Todd Kjos
- <tkjos@android.com>, Christian
- Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, "Rafael
- J. Wysocki" <rafael@kernel.org>, Dave Ertman <david.m.ertman@intel.com>,
- Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
- Hallyn <sergeh@kernel.org>, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan
- Kara <jack@suse.cz>, Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar
- <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen Boyd
- <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Krzysztof
- =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Pavel Tikhomirov
- <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>,
- Ira Weiny <iweiny@kernel.org>, Philipp Stanner <phasta@kernel.org>,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, driver-core@lists.linux.dev,
- linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org, Oliver Mangold
- <oliver.mangold@pm.me>
-Subject: Re: [PATCH v20 6/8] rust: Add missing SAFETY documentation for
- `ARef` example
-In-Reply-To: <CANiq72mPLrKQMzb37ow2969m5r3Z2Kh_4LHERUun6ALw3ea6tg@mail.gmail.com>
-References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
- <20260824-unique-ref-v20-6-490735672187@kernel.org>
- <CANiq72mPLrKQMzb37ow2969m5r3Z2Kh_4LHERUun6ALw3ea6tg@mail.gmail.com>
-Date: Wed, 26 Aug 2026 11:29:08 +0200
-Message-ID: <87y0dt1b8b.fsf@t14s.mail-host-address-is-not-set>
+	s=arc-20240116; t=1787740741; c=relaxed/simple;
+	bh=aNqnHUAaUhTGvvVwE9ECDTRoDx01i/L5nzyGJk3/rHs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tPuY4aQjGQtNffDrRzGCwd3nGA0YgC0B/w1PGOEC4ngY/VuTHV7vS/iyLZ6EKTwF1CmrWmaQVszIr5CdJOB8wNK08qtr9aiNzMoimItYocDJ0a+QmUqV0sdPe3yXoTDzj08dpIsUbUspa1lCJjq3bdr7VKFukjwkh2CwaduKhxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67QAbvDZ079437;
+	Wed, 26 Aug 2026 19:37:57 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67QAbusX079434
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 26 Aug 2026 19:37:57 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <3bb080d0-4421-4012-8a62-6a2bf165cbd9@I-love.SAKURA.ne.jp>
+Date: Wed, 26 Aug 2026 19:37:54 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Bart Van Assche <bvanassche@acm.org>,
+        Markus Elfring <Markus.Elfring@web.de>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, lkp@intel.com,
+        oe-lkp@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>, Oliver Sang <oliver.sang@intel.com>,
+        linux-btrfs@vger.kernel.org
+References: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
+ <550ff0b4-df39-46d2-9781-c8688df10c93@web.de>
+ <38ad64c1-edc7-431d-8f52-fba572ebf3eb@I-love.SAKURA.ne.jp>
+ <372ca5f6-81a0-4f6c-8f55-ebeeada9f955@acm.org>
+ <27bcb147-bead-4432-8cd0-981489f36228@acm.org>
+ <c41e9198-86a8-4bcd-a608-6f457b24f345@I-love.SAKURA.ne.jp>
+ <7e51bca8-218a-40b8-8ff8-fc59671f5add@acm.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <7e51bca8-218a-40b8-8ff8-fc59671f5add@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav211.rs.sakura.ne.jp
 
-Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
-
-> On Mon, Aug 24, 2026 at 1:19=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
+On 2026/08/26 8:16, Bart Van Assche wrote:
+> On 8/25/26 8:13 AM, Tetsuo Handa wrote:
+>> On 2026/08/25 7:53, Bart Van Assche wrote:
+>>> A correction: it is not safe to call drain_workqueue() nor to freeze the
+>>> request queue in __loop_clr_fd(). I'm considering to modify the comment
+>>> in that function as follows:
 >>
->> From: Oliver Mangold <oliver.mangold@pm.me>
+>> you also recognized that we can't call drain_workqueue() or flush_workqueue().
 >>
->> SAFETY comment in rustdoc example was just 'TODO'. Fixed.
->>
->> Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
->> Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
->> Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->
-> Please see/link https://github.com/Rust-for-Linux/linux/issues/351.
+>> Therefore, I chose to temporarily drop lo->lo_disk->open_mutex in order to
+>> make it possible to safely perform drain_workqueue().
+> 
+> My sentence was incomplete: I should have written that it is not safe to
+> call drain_workqueue() nor flush_workqueue() from __loop_clr_fd() while
+> the request queue is frozen. It is not clear to me how draining or
+> flushing the workqueue from inside __loop_clr_fd() could cause trouble
+> if this happens with the queue unfrozen since disk->open_mutex is not
+> acquired by the memory reclaim code?
 
-Do you want a link to this issue with a regular `Link:` tag?
+I don't know how "since disk->open_mutex is not acquired by the memory reclaim
+code" is relevant...
 
+Current situation is a result of what we had considered 4 years ago; we don't need
+to destroy workqueue (note that destroy_workqueue() implies drain_workqueue()) from
+__loop_clr_fd() ( https://lkml.kernel.org/r/20220330052917.2566582-16-hch@lst.de ).
 
-Best regards,
-Andreas Hindborg
+Since there is a
 
+  Chain exists of:
+    (wq_completion)loop0 --> system_transition_mutex/1 --> &disk->open_mutex
+  
+   Possible unsafe locking scenario:
+  
+         CPU0                    CPU1
+         ----                    ----
+    lock(&disk->open_mutex);
+                                 lock(system_transition_mutex/1);
+                                 lock(&disk->open_mutex);
+    lock((wq_completion)loop0);
 
+dependency, but my proposal to forbid binding loop device to pseudo files
+( https://lkml.kernel.org/r/148efba2-a0b6-47d7-ac76-b19d2f4b696c@I-love.SAKURA.ne.jp )
+was rejected by Christoph, we are stuck in a
 
+  Draining workqueue with open_mutex held causes creating a complex lock dependency
+  chain involving the global system_transition_mutex. (Maybe there are other paths
+  that create similar dependency chain if we drain workqueue with open_mutex held.)
+
+versus
+
+  Not draining workqueue causes NULL pointer dereference in lo_rw_aio().
+
+collision. Therefore,
+
+  Draining workqueue *without open_mutex held* can avoid creating a complex lock
+  dependency chain involving the global system_transition_mutex and can also avoid
+  NULL pointer dereference in lo_rw_aio().
+
+is my solution.
+
+Can you agree with my solution?
