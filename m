@@ -1,84 +1,84 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FDE48B361
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D7148C403
 	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 16:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787846927; cv=none; b=uN4uw933ZxXLDwIjk9dKjX2Jft9IHEetu7jLYKu1Aj354A//OhQg436e3BNRr49hird+qcdlmm1Kg1gIzgiN9SYxHRbfvTrgawM3rijXT8aHw6qTS2gaWOwrD5SQJXmpMDvfYU+vtnH67Y9lLCkmXM5U9PJvpjMWSd6h8tVHA7Q=
+	t=1787846928; cv=none; b=SRup2O8Q/OcS507r8g220zs/c24ZMUXC9/z+dMMHYkNRtoWprNVt0Dzwt4xcROGTkMbxUI5Z5pxKRXXkMDq26379r9cS2EnHhJVD9xYi8soW2t3gj0dasR9ZVSm7ZbfnLEX5p5Tg4f69Q5Sm8MVcrLzQo3oiZ14K12OFoGO4BWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787846927; c=relaxed/simple;
-	bh=I8krKhJahgIEJ7HiEH76lvoj/BYjFhFqiLB5U5WP74A=;
+	s=arc-20240116; t=1787846928; c=relaxed/simple;
+	bh=Dfrg6lE9de3zpyDCOAah5y60csvIaySoJn8fAvjltME=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oxK2vJj8fQV3hpbnC9TLr/hbXKrOJyMHPedVw+Q//UGuapAGeVSNSYnC0M2Hsz1WMVLpq1G345lN1RlBJw7I74wSUkP536mclpPeun4NPNxhLYHQ8tM+UxxAUp66yY8+1mKy3r8w9Hn4Ft+7qDox2X5bor8WKBhe9ZaJvffLMR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JVwY129Y; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=bFTLkUq1; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version:Content-Type; b=RHbnf+pKo/+UNa6OGbvRTFNUZJQF660+4A1IZik0Z3mkW75TgaO4U5A8DG0qd1klQvr434ivi7MO/nXFoSWxA2ynBBpdmPl36c96QtfeYH9M3dQMObTDPmwIaFUnFQp1xcG7cSdUubmor4jm9eoqgzzZcmmyhas8BIPfq9e66IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pA5RVx75; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Glox0Mke; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JVwY129Y";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="bFTLkUq1"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67RFbdxp3829326
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pA5RVx75";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Glox0Mke"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67RFcvxT359714
 	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 16:08:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	IPlM6Y0iVHV+fOjO00taADkuu2MuBiXuc3s9hjMOFU0=; b=JVwY129YOPuk83p1
-	OS9RZY4wq1W/fBzbVhYuzQ46IQYLJu9nhcJJE3s/iD58RZC46hZDN3V9kJ3WjGOs
-	hWPlvWLjLUQ0T22iu+0H4ntZykCjCuf2OaAcjGenuInkJrWOeCUlLVEKSNUDx9nP
-	B4YyI+t7M/DENNv+8QgnCzMs4sg6DtTTSwdgGZ1PDwXzvXcUJMvvja9rHLz5hsH6
-	33R0G2Ko8JB+pczAODx9Z9UsnljogPXcdL+eVMH3u50OiGsgNXOr8e7MICq9OOjw
-	gfjl46ekKYQ47F+KzWahu7RUDq5W7u5DRom1anSB+zQ58GtxwMEVTHOOQdTwI/n4
-	UIvvxA==
+	fg04UKiEaH0S7rfjN0Lg/gctUU1gmD3apjDNgN4QmkY=; b=pA5RVx75UuOZY5r6
+	RMJfr6RJYwvQUBLetHCZEdZLlCa0kif9EJN0c/i5eGgkFAmGMln2IkpqaRYvEoWM
+	3xTr+7d0OX7RsRV6pa6AH9M/kz2FFc5e+cLr46Mds9FRJPqwZZmwqa445tZ4PR5A
+	iTeYcwdUBE0lG1Y7BUMQmD7SIQagJPoyr+19KRYtEUMhmzS1jFCqZnerWAo13bXW
+	5QkVJFDIUoz8k1/o7AtUS+XNobHDxwrUIAzcd5wTNN2PUbuFYM0m5lfwmZaAspRi
+	FzZnoB7uA1DXcYHq8jz4HPRf49wN2pLTlOhlWomEFJmRz/Gte1FTTHVoS3RdzpnW
+	FiAypg==
 Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4game7s5a6-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ganr68r36-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
 	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 16:08:43 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-396b9ef3070so118357a91.3
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-38dde0df80bso159010a91.3
         for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 09:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1787846923; x=1788451723; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1787846922; x=1788451722; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=IPlM6Y0iVHV+fOjO00taADkuu2MuBiXuc3s9hjMOFU0=;
-        b=bFTLkUq1vSjAB8cx8cOgE/Tgp7m312UZYmE8DLrNOUxZ8u0dJEeGq2STwIi6xnJQPj
-         lu+kd88hCOdV/gEw4nHE4/JuCZ4SeM0nC9BsKi5c/E3GG07rGnoVzzU3Vfg5hLvmtvJQ
-         QD7awuoQNz1hcpV3r7RqBESsA5Ln42aUDqjvUITX5UF/ZJYh6w9a2Z9F2JG3F/j/tEkx
-         bLEIygQ64BXheBpVwvdzaEYnEl/Uk+MOOzodrakQr8quCZ7BtZkmWhDi+UnuZ2gUMYwR
-         vPBh6/1BdLpAs4R8y/y2awCOp7y7wb1PsQAweCUT6/TENmU09OmfSypoXc2Ds7IQstuE
-         PlVg==
+        bh=fg04UKiEaH0S7rfjN0Lg/gctUU1gmD3apjDNgN4QmkY=;
+        b=Glox0MkeeIkODAWZXyJwmZNtFpcY/fjEJya1EynOOooVQB9miuCTlTDR1I9sJ3W6xk
+         LTH5a5sqxcR0cEitZpc3AdKX+h9Ml7vx+RduM7cXEbIe7WKN83xF9c102EzVRbHoWy0N
+         aX+5shpO4/su2jAfdFcyrsSjnOREttxDQkTOKXFzCmqrcxBjl5zumkfEt6xsHtUw0PkV
+         tY1UNFTCdX9O/IupuhjjIq8J26EP1i6N9ASuxr/ix5UtLM35WuU0yQR1AjqpSrYRcwqy
+         VTUER4idCT/QPT9V6/V0deeYxlu4KcHqWbWgz1mu6IUrKQGBl6wAmqa8kbOeDQj5qQzz
+         +q1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787846923; x=1788451723;
+        d=1e100.net; s=20251104; t=1787846922; x=1788451722;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=IPlM6Y0iVHV+fOjO00taADkuu2MuBiXuc3s9hjMOFU0=;
-        b=fusBafF3VtNKnbJ65eYgABn9LHIUvhGPQuGr+NuJWhJtCx+hyu60ce4AAg5BEl2dMI
-         k5E3iulPUWBeI8//IUxpm9DCPDzxzYnvk3fElCiPDBsJUMALORCmJqQzXMFsxpPw66eO
-         T8o1Ale8gSpeH9u1pkL0+CnKNvaob3xjGj9D9U9VxgxnF19pO8LRNxChDXeCIccHgPji
-         KIGF+JXCaG8FbSf7Gp/NeS2BLKFiUN+o7X+W6lgU9DvYg2oFf72YGhtI/zVpceWpqJMg
-         pBnyu+jCgIA/8gi6fyBtFbanFK1+q2kYccu6VHvBTx/KwtkvLrwj42BWqZu4ko+CrfoW
-         edGw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrq656XDVhA+18N1X4zVp1tE32jwpgXioWFgvutazNzcKybp8hsR7H24SVVZEhoKl/y1ZxwnI+DINuCcw==@vger.kernel.org
-X-Gm-Message-State: AFuF++nHfoBqRz+7SBcWS7myXzg6xtN5xxnxMjthtzaNHnqnVfzhI90O
-	mtlRjFmP6X4hoogh1ef6UuNnfSXFTmDIesXdF7bNWd0bDTrEOckH8cym7www9ObFO9yyJoQr4Zx
-	8y2OsJbcKOZvMbnGpyc0c2U+UtEVb+6LtM5Qgi13htNhR3pEI+5a6nsmLwJX1K+clSA==
-X-Gm-Gg: AR+sD107YLLt3Y/QhnXH7SuMXUD5XIYY4Ch8uBMBtHHDGv8+OiUo9WVJ4kfLY7yLa4m
-	UolIKlh+y9vWVgBlAktAhksyXnCeAVjmYeHv/BVvd07x2VCeQKz5NR/ZY7LYmlC7Yy3RkBod+OF
-	0+uLWwV7zINPYj6+BlbhjCQjELZ8o/iTcv7pVDMVIKfpIK7Yb12ZQejuL/AJL0fS31xM9FY9H+C
-	ha2KzKyG3QYw8K2H3LurgTVJv0/zNdrwDqP4A9E5uYXv8pP9DAcPKRAqkB/kA3+HHqNKk45trrj
-	QsKydOKqhOa8EaprUCR2dzL9/o4EE/G1j1C/rK07Xz49Pz65rJQAN37KQcIZguIc440lSFqyBvO
-	J2JpFB/i+oMg/96LnvHaFoNWkjRoityFeCogZpSTsYDaD0Qml+iSLCJlZUec=
-X-Received: by 2002:a17:90b:4d0c:b0:37f:c97a:939f with SMTP id 98e67ed59e1d1-396d0dd5069mr450692a91.7.1787846922318;
-        Thu, 27 Aug 2026 09:08:42 -0700 (PDT)
-X-Received: by 2002:a17:90b:4d0c:b0:37f:c97a:939f with SMTP id 98e67ed59e1d1-396d0dd5069mr450573a91.7.1787846921737;
-        Thu, 27 Aug 2026 09:08:41 -0700 (PDT)
+        bh=fg04UKiEaH0S7rfjN0Lg/gctUU1gmD3apjDNgN4QmkY=;
+        b=q34o3QVIf8K5yDOR6WcrJj8a5inO0ng+t9IMim2taCha9ClUseiwpX4fy7TcF2RLGY
+         QSekiOiPfsYBIb5ZSIQxR+8VCpnq0H4esjfxle5UJxvzBXyUUIRlPcvw55LlobtJVoyF
+         Glf/XKWx7Uy0SxT+SjK5ZAXnUlo5KDrFibiLoZPN7QwFcHFByq5oRz/82MoubapJAtgY
+         6wYfIFUKEQKieh5ITp0+nFAUh+pzH8Zt0ia2jIUz3XyXSe/y9/bwkGQPtGToSDSEZViN
+         O2UZoEVDCp5DWgsmmIHj6+5GhV+lRefQjf3nWr7f8TpNMLbdUUB7Tn430X5Kv+6whM/1
+         jEQg==
+X-Forwarded-Encrypted: i=1; AHgh+RrcHZ0HF9XPvkwLcD8ZDArtaA3hhcMHdw0lRJn3lubvwcXjsyQH6+HunSKQhTu247KgZJh/MhsbGZ2rQA==@vger.kernel.org
+X-Gm-Message-State: AFuF++l7XqWEbD7t/oIIy6TJAx4OVH5ski9IE9mn6hmee2NB0ObbpYtO
+	c/tD2x1yeePcJiJs77MJ8W+occ/S0aeaKrgSsyQ88WuQ0i9TxUMAllvC6gWsuekaPqIeYOZa7Jc
+	h5LtpIDf7RUlJNUNbDQViBPdpYuTThkF9jWwFrnDT7WttuvPpzMkRUsAbRSr/W2LUrQ==
+X-Gm-Gg: AR+sD13cHNuNtbeBhWb1Gj2NWOQQCbuTkR7SYu/INVi6VGZFWUdhkPpcjSztcNOIUst
+	Zcqa6z0P1rPs2hZ43DEsBGcJ6iEf84zRuoy3WiBlksp3JOBQ1Le0ddUGaYk6VIm58F4SLys/p84
+	3OGgOFkUFfOOltftD9RjqX6i7cHxNzy20XjqX0sRlSzjPr+1QeWMk3G12QYl2RPTYgA3wN9IyIA
+	0VQxJPRt7GWwrv1hUVlKVyTxCtGr2DrwVgcqDUA4NPeMDUZAMdehaizt7JqSG0/vcsNzsC9y1Uk
+	D9cYDPHA1ull6sSuClSZzGAGe0C1smOmB5MeyXWK93fGpIv/FYJXOF/cdsdTLOWwMonLbUoImnr
+	4+sqNlZHK8ro5t1GpvVJetKCDtHMa7RDT8UFAsoWnUSSnbOTlptJghgK3FtQ=
+X-Received: by 2002:a17:90b:520f:b0:37c:6130:7a5b with SMTP id 98e67ed59e1d1-396d0ec0d70mr617871a91.8.1787846920228;
+        Thu, 27 Aug 2026 09:08:40 -0700 (PDT)
+X-Received: by 2002:a17:90b:520f:b0:37c:6130:7a5b with SMTP id 98e67ed59e1d1-396d0ec0d70mr617665a91.8.1787846919411;
+        Thu, 27 Aug 2026 09:08:39 -0700 (PDT)
 Received: from u24-san1p10108.qualcomm.com (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396b0fd9085sm3245892a91.12.2026.08.27.09.08.40
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396b0fd9085sm3245892a91.12.2026.08.27.09.08.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Aug 2026 09:08:41 -0700 (PDT)
+        Thu, 27 Aug 2026 09:08:39 -0700 (PDT)
 From: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
 To: ebiggers@kernel.org, axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
         James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
@@ -91,9 +91,9 @@ Cc: neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
         bvanassche@acm.org, alim.akhtar@samsung.com, avri.altman@sandisk.com,
         stefanha@redhat.com, pbonzini@redhat.com, eperezma@redhat.com,
         xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: [PATCH v1 09/11] soc: qcom: add ICE keyslot partitioning driver for guest VMs
-Date: Thu, 27 Aug 2026 09:07:18 -0700
-Message-ID: <20260827160806.1295313-10-linlin.zhang@oss.qualcomm.com>
+Subject: [PATCH v1 08/11] block: add /dev/blk-crypto-proxy for host-side virtio-blk inline encryption
+Date: Thu, 27 Aug 2026 09:07:17 -0700
+Message-ID: <20260827160806.1295313-9-linlin.zhang@oss.qualcomm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
 References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
@@ -105,359 +105,1038 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDEzNiBTYWx0ZWRfX9MH3PSdddeL/
- pUtDWptwh/fK4c9gJs9ITS55TR2RlUVyKsLuNwg/tKHwpDY9kMbH8NE2HG+Jp5mUzgas5eJxzk+
- zX1CmXdG9SRs1TQS8wAvRBDK1XCTG8RVSXYX6DiDZ6ICjjoIzBO6buhbGmQlEdYXHT6c7oIn1yh
- eS/ZU6Jsled3UtqqCBe/TFQ8JWsODfVdKPoPAK6CUI9AuoNF5fe8WDDXQzWGNLQQYxNIry5nxsV
- MO7skgmP4mMQUUK8EECxWc1dJft/kAuxb9LeXLchEoEkLEGrEuaGgxLoHxKKt5IDoIIYJNBwctF
- qR5AfSGl5RL/5rHDYmPJxEy6TwSLNSlUdq5ZDCaf0GpUcDaEKM3Zh0hDGGygJeGjo7Mocl9rWZz
- iKsK16V7d+83S6J5/64f2DhTCnI5IOCh2baajZv4PKFd6JBVjt+VLO8EE56HaXQDYf/BlVAmhL6
- UW0faTi1iz2vRXfDW7Q==
-X-Proofpoint-GUID: _6kbmRrjlAU-TJG-wvj1257WcOxu-2zt
-X-Authority-Analysis: v=2.4 cv=Yrc/gYYX c=1 sm=1 tr=0 ts=6a90610b cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDEzNiBTYWx0ZWRfXyOleOtSdBbYK
+ TLnj0QpJey5zCsxDYShE3HljvUYVs26Ac+IENkSGikaTQs3WrPzNTN5EvidMuBxf09PJPH137/D
+ aLomMsEDJVcZ/QJV+ZAh+M89p7hI6QR2yaMgT9IDG2NG8/Ho4J0t/v+WlzPAdysRXSpC3cLd/65
+ bibubh5t6sfiDxtqvJyobHksPsA3wuGFxQDTZsLg/7O0YX3JAg0umUrmSy5rwQEynRVV+zHEz62
+ OEcj6pZTnBvfCvZNqw4Nrtszk21cj/NH6tjoILDOCCYXAmOzQz56f6rCCO8eOhlYApAKP13N1M4
+ yRvi12fRlxJESjF0JRrAq2owkz1YMnlxwYA6gGqDzOzvA/wUZG3cSOLHLUe3LFtpyGy6ZmT4Vc6
+ ZMB64VXQwkre0MrI1rxVOUuCx/AMGpf9yrmPAjN8XLuNP2R4S1eRFdcvnCV8bin1LxM80cRxO0k
+ uHopLqYqoVjK3LEcipQ==
+X-Authority-Analysis: v=2.4 cv=d5DFDxjE c=1 sm=1 tr=0 ts=6a90610b cx=c_pps
  a=0uOsjrqzRL749jD1oC5vDA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
- a=EUspDBNiAAAA:8 a=w3opuUzClo5xMoDqJE4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=WH_6LjaRQCbUvFa_ckcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
  a=mQ_c8vxmzFEMiUWkPHU9:22
-X-Proofpoint-ORIG-GUID: _6kbmRrjlAU-TJG-wvj1257WcOxu-2zt
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDEzNiBTYWx0ZWRfX66cCUlX1dN7T
- UMvyTT/D/FO79/YrftxJnbOw8wv5dcTJT3fNc/iUzvi3bvDOF84HLS87rlUwrmLnWfrix4KK155
- 0g3JUdpWL7cQiKQfAqfuEKwG1GlgNO4=
+X-Proofpoint-GUID: ACqBjdT0kwSkOlVVFCQx7Pn9V6RDNzuR
+X-Proofpoint-ORIG-GUID: ACqBjdT0kwSkOlVVFCQx7Pn9V6RDNzuR
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDEzNiBTYWx0ZWRfX+lrLYI87BApZ
+ 5dw3NE9PrnP6h1bnP5R4BUJtHrhxzhz2AY20kGSyBw2EaLryu/PLtIEo6kwOBssPeEC702gHSDe
+ 4BMmmWRZRHfvv2fi/K7/08mxOV5Ybsw=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-27_07,2026-08-27_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015 spamscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 adultscore=0 suspectscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608270136
 
 From: linlzhan <linlin.zhang@oss.qualcomm.com>
 
-On Qualcomm platforms the ICE hardware has a fixed number of physical
-keyslots shared across the host and all guest VMs.  A userspace
-virtio-blk backend handling VIRTIO_BLK_T_CRYPTO_IN/OUT requests needs
-to translate a guest's virtual keyslot index to the corresponding
-physical ICE keyslot without letting one VM access another VM's slots.
+A userspace virtio-blk backend receives VIRTIO_BLK_T_CRYPTO_IN/OUT
+requests from guests that carry a virtual ICE keyslot index and a data
+unit number.  The backend must submit the bio to the host storage
+controller with the correct inline encryption context, but it has
+no in-kernel interface to do so.
 
-Add QCOM_ICE_SLOTS, a platform driver that implements bcp_slot_virt_ops
-for the /dev/blk-crypto-proxy device.  It parses a
-qcom,ice-keyslot-map device-tree node describing the per-VM keyslot
-allocation table, where each child entry maps a guest_id to a
-contiguous physical slot range [slot_offset .. slot_offset +
-max_ice_slots).  Entry 0 is reserved for the host; guest entries start
-at index 1 and are excluded from the guest-facing translation so that
-blk-crypto-proxy cannot accidentally route a guest request into the
-host's physical keyslots.
+Add /dev/blk-crypto-proxy, a misc character device that bridges a
+userspace virtio-blk backend to the kernel blk-crypto layer.  The
+interface is three ioctls:
 
-The driver exposes two callbacks:
+  BCP_BIND_CONTEXT      — bind a host block device fd and a hypervisor
+                          VM fd to this file descriptor; the kernel
+                          resolves the VM fd to a guest id and holds
+                          the bdev reference for the fd lifetime.
+  BCP_GET_CRYPTO_CAPS   — query the bound device's blk_crypto_profile
+                          capabilities (supported modes, key types, max
+                          DUN bytes) and the number of ICE keyslots
+                          allocated to the bound VM, so the backend can
+                          populate the virtio config space crypto fields.
+  BCP_SUBMIT_IO_BY_VSLOT — submit an inline-encrypted bio using the
+                          virtual slot index supplied by the guest.  The
+                          kernel resolves virt_slot to a physical ICE
+                          keyslot via bcp_slot_virt_ops, calls
+                          bio_crypt_set_ctx_by_slot(), and submits the
+                          bio synchronously.  Large requests are split
+                          at data-unit boundaries (BIO_MAX_VECS per bio)
+                          to preserve DUN/IV correctness. The
+                          implementation follows the block layer's
+                          direct-I/O path, with two differences: each
+                          bio carries an inline encryption context, and
+                          multiple bios are submitted sequentially
+                          rather than concurrently now.
 
-  get_guest_slots()  — return the number of ICE keyslots allocated to
-                       a given guest_id; used by BCP_GET_CRYPTO_CAPS to
-                       populate the max_slots field in the virtio config
-                       space.
-  vslot_to_pslot()   — translate a (guest_id, virtual-slot) pair to the
-                       corresponding physical ICE keyslot index; used by
-                       BCP_SUBMIT_IO_BY_VSLOT before calling
-                       bio_crypt_set_ctx_by_slot().
+The driver is hypervisor-agnostic and storage-vendor-agnostic.  Two
+pluggable op-sets registered by platform drivers fill the gaps:
 
-The singleton pointer to the parsed table is RCU-protected; the hot
-path reads it lock-free.  Probe validates that no two VM entries share
-a guest_id or overlapping physical slot ranges.
+  bcp_hypervisor_ops  — translate a hypervisor VM fd to an opaque
+                        guest_id; implemented by the hypervisor driver.
+  bcp_slot_virt_ops   — map (profile, guest_id, virt_slot) to a
+                        physical ICE keyslot; implemented by the
+                        platform storage virtualization layer.
 
-Note: This patch is submitted for visibility. The keyslot partitioning
-is based on the current DT-based keyslot allocation with vm_id known.
-We are aware this may be revised to use a TZ SCM query interface in a
-future version of this series, submit it RFC for design discussion.
+Both op-sets are RCU-protected singletons; the hot path reads them
+lock-free.
 
 Signed-off-by: linlzhan <linlin.zhang@oss.qualcomm.com>
 ---
- drivers/soc/qcom/Kconfig          |  18 +++
- drivers/soc/qcom/Makefile         |   1 +
- drivers/soc/qcom/qcom_ice_slots.c | 232 ++++++++++++++++++++++++++++++
- 3 files changed, 251 insertions(+)
- create mode 100644 drivers/soc/qcom/qcom_ice_slots.c
+ drivers/block/Kconfig                 |  15 +
+ drivers/block/Makefile                |   1 +
+ drivers/block/blk-crypto-proxy.c      | 667 ++++++++++++++++++++++++++
+ include/linux/blk-crypto-proxy.h      | 100 ++++
+ include/uapi/linux/blk-crypto-proxy.h | 122 +++++
+ 5 files changed, 905 insertions(+)
+ create mode 100644 drivers/block/blk-crypto-proxy.c
+ create mode 100644 include/linux/blk-crypto-proxy.h
+ create mode 100644 include/uapi/linux/blk-crypto-proxy.h
 
-diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
-index 6c632d114d45..e1f383b4dc63 100644
---- a/drivers/soc/qcom/Kconfig
-+++ b/drivers/soc/qcom/Kconfig
-@@ -294,6 +294,24 @@ endif
- # Options selected by other drivers from different subsystems must be outside
- # of the menuconfig if-block:
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 7790ee2c700c..48ad79734c09 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -176,6 +176,21 @@ config BLK_DEV_LOOP
  
-+config QCOM_ICE_SLOTS
-+	tristate "Qualcomm ICE keyslot partitioning for VM guests"
-+	depends on ARCH_QCOM || COMPILE_TEST
-+	depends on BLK_CRYPTO_PROXY
+ 	  Most users will answer N here.
+ 
++config BLK_CRYPTO_PROXY
++	tristate "Inline encryption proxy for virtio-blk guests"
 +	depends on BLK_INLINE_ENCRYPTION
 +	help
-+	  Parses the qcom,ice-keyslot-map device-tree node and provides
-+	  per-VM ICE keyslot accounting and virtual-to-physical slot
-+	  translation for guest VMs sharing ICE hardware on Qualcomm
-+	  platforms.
++	  Provides /dev/blk-crypto-proxy, a misc character device that allows a
++	  userspace virtio-blk backend to submit inline-encrypted block I/O
++	  on behalf of guest virtual machines.
 +
-+	  When enabled, guest virtual keyslot indices are mapped to the
-+	  physical ICE keyslot range allocated to each VM, preventing one
-+	  VM from accessing another VM's keyslots.
++	  Guests supply a virtual keyslot index and data unit number with
++	  each encrypted request.  The host kernel translates the virtual
++	  slot to a physical hardware keyslot and issues the bio to the
++	  storage controller with the correct inline encryption context.
 +
-+	  Say M here when multiple VMs share ICE keyslots on a Qualcomm
-+	  platform.  If unsure, say N.
++	  If unsure, say N.
 +
- config QCOM_INLINE_CRYPTO_ENGINE
- 	tristate
- 	select QCOM_SCM
-diff --git a/drivers/soc/qcom/Makefile b/drivers/soc/qcom/Makefile
-index 6d4b7546d1fb..952a57554f9d 100644
---- a/drivers/soc/qcom/Makefile
-+++ b/drivers/soc/qcom/Makefile
-@@ -38,6 +38,7 @@ obj-$(CONFIG_QCOM_LLCC) += llcc-qcom.o
- obj-$(CONFIG_QCOM_KRYO_L2_ACCESSORS) +=	kryo-l2-accessors.o
- obj-$(CONFIG_QCOM_ICC_BWMON)	+= icc-bwmon.o
- qcom_ice-objs			+= ice.o
-+obj-$(CONFIG_QCOM_ICE_SLOTS)	+= qcom_ice_slots.o
- obj-$(CONFIG_QCOM_INLINE_CRYPTO_ENGINE)	+= qcom_ice.o
- obj-$(CONFIG_QCOM_CRYPTO_VIRT)	+= crypto_virt.o
- obj-$(CONFIG_QCOM_PBS) +=	qcom-pbs.o
-diff --git a/drivers/soc/qcom/qcom_ice_slots.c b/drivers/soc/qcom/qcom_ice_slots.c
+ config BLK_DEV_LOOP_MIN_COUNT
+ 	int "Number of loop devices to pre-create at init time"
+ 	depends on BLK_DEV_LOOP
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 079c910d5fc9..636137248d0d 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -23,6 +23,7 @@ obj-$(CONFIG_BLK_DEV_LOOP)	+= loop.o
+ obj-$(CONFIG_SUNVDC)		+= sunvdc.o
+ 
+ obj-$(CONFIG_BLK_DEV_NBD)	+= nbd.o
++obj-$(CONFIG_BLK_CRYPTO_PROXY)	+= blk-crypto-proxy.o
+ obj-$(CONFIG_VIRTIO_BLK)	+= virtio_blk.o
+ 
+ obj-$(CONFIG_VIRTBLK_CRYPTO_VIRTUALIZATION) += virtio_blk_crypto_ext.o
+diff --git a/drivers/block/blk-crypto-proxy.c b/drivers/block/blk-crypto-proxy.c
 new file mode 100644
-index 000000000000..364ac93077c1
+index 000000000000..60722884dbcd
 --- /dev/null
-+++ b/drivers/soc/qcom/qcom_ice_slots.c
-@@ -0,0 +1,232 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * qcom_ice_slots.c - Qualcomm ICE keyslot partitioning for guest VMs
-+ *
-+ * Implements bcp_slot_virt_ops: translates a (guest_id, virtual-slot) pair to
-+ * a physical ICE keyslot index using a per-VM allocation table parsed from
-+ * the device-tree node with compatible = "qcom,ice-keyslot-map".
-+ *
-+ * Device-tree layout:
-+ *
-+ *   ice_keyslot_map: ice-keyslot-map {
-+ *       compatible = "qcom,ice-keyslot-map";
-+ *       #address-cells = <1>;
-+ *       #size-cells = <0>;
-+ *
-+ *       vm@3  { reg = <3>;  qcom,max-ice-slots = <16>; qcom,ice-slot-offset = <0>;  };
-+ *       vm@52 { reg = <52>; qcom,max-ice-slots = <32>; qcom,ice-slot-offset = <16>; };
-+ *   };
-+ *
-+ * Each child entry maps a guest (reg = guest_id) to a contiguous physical keyslot
-+ * range [slot_offset .. slot_offset + max_ice_slots).
-+ *
-+ * Entry 0 is always the host's own reservation.  Entries 1+ are guest
-+ * reservations.  The host's entry is used by ufs-qcom to size its
-+ * blk_crypto_profile; it is excluded from the guest-facing translation table
-+ * so that blk-crypto-proxy can never accidentally route a guest request into
-+ * the host's physical keyslots.
-+ *
-+ * The ufs-qcom driver reads the host slot info and validates all entries
-+ * against the hardware slot count directly via the OF API, with no symbol
-+ * dependency on this module.
-+ */
++++ b/drivers/block/blk-crypto-proxy.c
+@@ -0,0 +1,667 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#define pr_fmt(fmt) "blk-crypto-proxy: " fmt
 +
 +#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/rcupdate.h>
++#include <linux/miscdevice.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
 +#include <linux/slab.h>
++#include <linux/blkdev.h>
++#include <linux/bio.h>
++#include <linux/mutex.h>
++#include <linux/overflow.h>
++#include <linux/file.h>
++#include <linux/mm.h>
++#include <linux/pagemap.h>
++#include <linux/rcupdate.h>
++#include <linux/uio.h>
++#include <linux/blk-crypto.h>
 +#include <linux/blk-crypto-profile.h>
 +#include <linux/blk-crypto-proxy.h>
++#include <linux/virtio_blk.h>
 +
-+#define QCOM_ICE_SLOTS_MAX_ENTRIES	8
++static const struct bcp_hypervisor_ops __rcu *g_hypervisor_ops;
++static DEFINE_MUTEX(g_hypervisor_ops_lock);
 +
-+struct qcom_ice_slot_entry {
++static const struct bcp_slot_virt_ops __rcu *g_slot_virt_ops;
++static DEFINE_MUTEX(g_slot_virt_ops_lock);
++
++int bcp_register_hypervisor_ops(const struct bcp_hypervisor_ops *ops)
++{
++	int ret = 0;
++
++	mutex_lock(&g_hypervisor_ops_lock);
++	if (rcu_access_pointer(g_hypervisor_ops))
++		ret = -EBUSY;
++	else
++		rcu_assign_pointer(g_hypervisor_ops, ops);
++	mutex_unlock(&g_hypervisor_ops_lock);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(bcp_register_hypervisor_ops);
++
++void bcp_unregister_hypervisor_ops(const struct bcp_hypervisor_ops *ops)
++{
++	mutex_lock(&g_hypervisor_ops_lock);
++	if (rcu_access_pointer(g_hypervisor_ops) == ops)
++		rcu_assign_pointer(g_hypervisor_ops, NULL);
++	mutex_unlock(&g_hypervisor_ops_lock);
++	synchronize_rcu();
++}
++EXPORT_SYMBOL_GPL(bcp_unregister_hypervisor_ops);
++
++int bcp_register_slot_virt_ops(const struct bcp_slot_virt_ops *ops)
++{
++	int ret = 0;
++
++	mutex_lock(&g_slot_virt_ops_lock);
++	if (rcu_access_pointer(g_slot_virt_ops))
++		ret = -EBUSY;
++	else
++		rcu_assign_pointer(g_slot_virt_ops, ops);
++	mutex_unlock(&g_slot_virt_ops_lock);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(bcp_register_slot_virt_ops);
++
++void bcp_unregister_slot_virt_ops(const struct bcp_slot_virt_ops *ops)
++{
++	mutex_lock(&g_slot_virt_ops_lock);
++	if (rcu_access_pointer(g_slot_virt_ops) == ops)
++		rcu_assign_pointer(g_slot_virt_ops, NULL);
++	mutex_unlock(&g_slot_virt_ops_lock);
++	synchronize_rcu();
++}
++EXPORT_SYMBOL_GPL(bcp_unregister_slot_virt_ops);
++
++/**
++ * struct bcp_ctx - per-fd state for /dev/blk-crypto-proxy
++ * @bdev_file: file handle for the bound block device; NULL until BCP_BIND_CONTEXT.
++ *             Published with smp_store_release() so hot-path ioctls can read it
++ *             lock-free via smp_load_acquire() in bcp_ctx_bound().
++ * @guest_id: guest identifier resolved from vm_fd at bind time.
++ * @bdev_writable: block_dev_fd was opened with write access.
++ * @bind_lock: serializes concurrent BCP_BIND_CONTEXT calls on this fd.
++ */
++struct bcp_ctx {
++	struct file *bdev_file;
 +	u32 guest_id;
-+	u32 max_slots;
-+	u32 slot_offset;
-+};
-+
-+struct qcom_ice_slots {
-+	struct qcom_ice_slot_entry entries[QCOM_ICE_SLOTS_MAX_ENTRIES];
-+	unsigned int num_entries;
++	bool bdev_writable;
++	struct mutex bind_lock;
 +};
 +
 +/*
-+ * There is at most one qcom,ice-keyslot-map platform node per SoC.  A single
-+ * global pointer is set at probe time and cleared at remove time.  The
-+ * hot-path read (from bcp_slot_virt_ops callbacks) is protected by RCU;
-+ * probe/remove serialise via the platform driver guarantee.
++ * True once BCP_BIND_CONTEXT has published ctx->bdev_file.  The acquire pairs
++ * with smp_store_release() in bcp_ioctl_bind_context(), ensuring ctx->guest_id
++ * and ctx->bdev_writable are visible to any caller that observes true.
 + */
-+static struct qcom_ice_slots __rcu *g_ice_slots;
-+
-+static struct qcom_ice_slots *virt_lookup(struct blk_crypto_profile *profile)
++static bool bcp_ctx_bound(struct bcp_ctx *ctx)
 +{
-+	/* Single UFS controller: profile argument is not needed. */
-+	return rcu_dereference(g_ice_slots);
++	return smp_load_acquire(&ctx->bdev_file) != NULL;
 +}
 +
-+static int qcom_ice_slots_get_guest_slots(struct blk_crypto_profile *profile,
-+					  u32 guest_id)
++static int bcp_open(struct inode *inode, struct file *file)
 +{
-+	struct qcom_ice_slots *virt = virt_lookup(profile);
-+	unsigned int i;
++	struct bcp_ctx *ctx;
 +
-+	if (!virt)
-+		return -ENOKEY;
-+
-+	/* entries[0] is the host; guest entries start at index 1. */
-+	for (i = 1; i < virt->num_entries; i++) {
-+		if (virt->entries[i].guest_id == guest_id)
-+			return virt->entries[i].max_slots;
-+	}
-+	return -ENOKEY;
-+}
-+
-+static int qcom_ice_slots_vslot_to_pslot(struct blk_crypto_profile *profile,
-+					 u32 guest_id, u32 virt_slot,
-+					 unsigned int *phy_slot_out)
-+{
-+	struct qcom_ice_slots *virt = virt_lookup(profile);
-+	unsigned int i;
-+
-+	if (!virt)
-+		return -ENOKEY;
-+
-+	for (i = 1; i < virt->num_entries; i++) {
-+		if (virt->entries[i].guest_id != guest_id)
-+			continue;
-+		if (virt_slot >= virt->entries[i].max_slots)
-+			return -EINVAL;
-+		*phy_slot_out = virt->entries[i].slot_offset + virt_slot;
-+		return 0;
-+	}
-+	return -ENOKEY;
-+}
-+
-+static const struct bcp_slot_virt_ops qcom_slot_virt_ops = {
-+	.get_guest_slots = qcom_ice_slots_get_guest_slots,
-+	.vslot_to_pslot = qcom_ice_slots_vslot_to_pslot,
-+};
-+
-+static int qcom_ice_slots_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct device_node *child;
-+	struct qcom_ice_slots *virt;
-+	unsigned int idx = 0, total_slots = 0;
-+	int ret = 0;
-+
-+	virt = devm_kzalloc(dev, sizeof(*virt), GFP_KERNEL);
-+	if (!virt)
++	ctx = kzalloc_obj(*ctx, GFP_KERNEL);
++	if (!ctx)
 +		return -ENOMEM;
++	mutex_init(&ctx->bind_lock);
++	file->private_data = ctx;
++	return 0;
++}
 +
-+	for_each_child_of_node(dev->of_node, child) {
-+		u32 guest_id, max_slots, slot_offset;
-+		unsigned int j;
++static int bcp_release(struct inode *inode, struct file *file)
++{
++	struct bcp_ctx *ctx = file->private_data;
 +
-+		if (idx >= QCOM_ICE_SLOTS_MAX_ENTRIES) {
-+			dev_err(dev, "too many vm entries (> %u)\n",
-+				QCOM_ICE_SLOTS_MAX_ENTRIES);
-+			ret = -EINVAL;
-+			of_node_put(child);
-+			goto err_free;
-+		}
-+
-+		if (of_property_read_u32(child, "reg", &guest_id))
-+			continue;
-+		if (of_property_read_u32(child, "qcom,max-ice-slots", &max_slots))
-+			continue;
-+		if (of_property_read_u32(child, "qcom,ice-slot-offset", &slot_offset)) {
-+			dev_err(dev, "missing qcom,ice-slot-offset for guest_id=%u\n",
-+				guest_id);
-+			ret = -EINVAL;
-+			of_node_put(child);
-+			goto err_free;
-+		}
-+
-+		if (idx > 0 &&
-+		    slot_offset <
-+		    virt->entries[idx - 1].slot_offset +
-+		    virt->entries[idx - 1].max_slots) {
-+			dev_err(dev, "slot overlap: guest_id=%u overlaps guest_id=%u\n",
-+				guest_id, virt->entries[idx - 1].guest_id);
-+			ret = -EINVAL;
-+			of_node_put(child);
-+			goto err_free;
-+		}
-+
-+		for (j = 0; j < idx; j++) {
-+			if (virt->entries[j].guest_id == guest_id) {
-+				dev_err(dev, "duplicate guest_id=%u\n", guest_id);
-+				ret = -EINVAL;
-+				of_node_put(child);
-+				goto err_free;
-+			}
-+		}
-+
-+		virt->entries[idx].guest_id = guest_id;
-+		virt->entries[idx].max_slots = max_slots;
-+		virt->entries[idx].slot_offset = slot_offset;
-+		total_slots += max_slots;
-+		idx++;
++	if (ctx) {
++		if (ctx->bdev_file)
++			bdev_fput(ctx->bdev_file);
++		mutex_destroy(&ctx->bind_lock);
++		kfree(ctx);
++		file->private_data = NULL;
 +	}
++	return 0;
++}
 +
-+	if (idx == 0) {
-+		dev_err(dev, "no VM entries found in qcom,ice-keyslot-map\n");
-+		ret = -EINVAL;
-+		goto err_free;
++/*
++ * Resolve a userspace block device fd to a struct file holding a reference
++ * to the block device, opened with the same access mode as @fd so that a
++ * read-only fd cannot gain write access via BCP_SUBMIT_IO_BY_VSLOT.
++ */
++static struct file *bcp_bdev_from_fd(int fd, bool *writable)
++{
++	struct file *f;
++	struct inode *inode;
++	dev_t dev;
++	blk_mode_t mode = 0;
++
++	f = fget(fd);
++	if (!f)
++		return ERR_PTR(-EBADF);
++	inode = file_inode(f);
++	if (!S_ISBLK(inode->i_mode)) {
++		fput(f);
++		return ERR_PTR(-ENOTBLK);
 +	}
++	if (f->f_mode & FMODE_READ)
++		mode |= BLK_OPEN_READ;
++	if (f->f_mode & FMODE_WRITE)
++		mode |= BLK_OPEN_WRITE;
++	if (!mode) {
++		fput(f);
++		return ERR_PTR(-EACCES);
++	}
++	*writable = !!(mode & BLK_OPEN_WRITE);
++	dev = inode->i_rdev;
++	fput(f);
++	return bdev_file_open_by_dev(dev, mode, NULL, NULL);
++}
 +
-+	virt->num_entries = idx;
++static long bcp_ioctl_bind_context(struct file *file,
++				   struct bcp_bind_context_arg __user *argp)
++{
++	struct bcp_ctx *ctx = file->private_data;
++	struct bcp_bind_context_arg arg;
++	const struct bcp_hypervisor_ops *hv_ops;
++	struct file *bdev_file;
++	u32 guest_id;
++	bool writable = false;
++	int ret;
++
++	if (!ctx)
++		return -EINVAL;
++	if (copy_from_user(&arg, argp, sizeof(arg)))
++		return -EFAULT;
++	if (arg.reserved)
++		return -EINVAL;
 +
 +	/*
-+	 * Publish the singleton.  From this point on, bcp_slot_virt_ops
-+	 * callbacks can resolve virt via rcu_dereference(g_ice_slots).
++	 * get_guest_id() may sleep; call it before taking bind_lock.
 +	 */
-+	rcu_assign_pointer(g_ice_slots, virt);
++	rcu_read_lock();
++	hv_ops = rcu_dereference(g_hypervisor_ops);
++	if (!hv_ops) {
++		rcu_read_unlock();
++		return -EOPNOTSUPP;
++	}
++	ret = hv_ops->get_guest_id(arg.vm_fd, &guest_id);
++	rcu_read_unlock();
++	if (ret)
++		return ret;
 +
-+	ret = bcp_register_slot_virt_ops(&qcom_slot_virt_ops);
-+	if (ret) {
-+		dev_err(dev, "failed to register slot_virt_ops: %d\n", ret);
-+		goto err_free;
++	/*
++	 * Serialize against concurrent BCP_BIND_CONTEXT calls: two callers
++	 * could both pass the ctx->bdev_file == NULL check before either stores.
++	 */
++	guard(mutex)(&ctx->bind_lock);
++
++	if (ctx->bdev_file)
++		return -EBUSY;
++
++	bdev_file = bcp_bdev_from_fd(arg.block_dev_fd, &writable);
++	if (IS_ERR(bdev_file))
++		return PTR_ERR(bdev_file);
++
++	ctx->guest_id = guest_id;
++	ctx->bdev_writable = writable;
++	/*
++	 * Publish ctx->bdev_file last with a release barrier; bcp_ctx_bound()
++	 * reads it with smp_load_acquire() without taking @bind_lock.
++	 */
++	smp_store_release(&ctx->bdev_file, bdev_file);
++	return 0;
++}
++
++/*
++ * Maps VIRTIO_BLK_CRYPTO_MODE_* to enum blk_crypto_mode_num.  The two index
++ * spaces do not coincide, so modes_supported[] must not be copied positionally.
++ * Keep in sync with virtio_blk_crypto_mode_map[] in drivers/block/virtio_blk.c.
++ */
++static const enum blk_crypto_mode_num
++	bcp_virtio_crypto_mode_map[VIRTIO_BLK_CRYPTO_MODE_MAX + 1] = {
++	[VIRTIO_BLK_CRYPTO_MODE_INVALID]	= BLK_ENCRYPTION_MODE_INVALID,
++	[VIRTIO_BLK_CRYPTO_MODE_AES_256_XTS]	= BLK_ENCRYPTION_MODE_AES_256_XTS,
++};
++
++static long bcp_ioctl_get_crypto_caps(struct file *file,
++				      struct bcp_get_crypto_caps_arg __user *argp)
++{
++	struct bcp_ctx *ctx = file->private_data;
++	struct bcp_get_crypto_caps_arg arg;
++	struct block_device *bdev;
++	u32 modes[VIRTIO_BLK_CRYPTO_MODE_MAX + 1] = {0};
++	struct blk_crypto_profile *profile;
++	unsigned int i, n;
++	u32 cap, written;
++
++	if (!ctx || !bcp_ctx_bound(ctx))
++		return -ENXIO;
++
++	if (copy_from_user(&arg, argp, sizeof(arg)))
++		return -EFAULT;
++	if (arg.num_modes && !arg.modes_ptr)
++		return -EINVAL;
++
++	bdev = file_bdev(ctx->bdev_file);
++	profile = bdev_get_queue(bdev)->crypto_profile;
++	if (!profile)
++		return -EOPNOTSUPP;
++
++	arg.key_types_supported = profile->key_types_supported;
++	/*
++	 * Clamp to 8: the @dun wire field is a single __aligned_u64 so nothing
++	 * upstream can deliver a wider DUN regardless of what the profile claims.
++	 */
++	arg.max_dun_bytes = min_t(u32, profile->max_dun_bytes_supported, 8);
++
++	/*
++	 * arg.modes_supported[] is indexed by VIRTIO_BLK_CRYPTO_MODE_* (index 0
++	 * is always 0 per the virtio spec).  Translate via the map above; do not
++	 * copy profile->modes_supported[] positionally.
++	 */
++	n = VIRTIO_BLK_CRYPTO_MODE_MAX + 1;
++	cap = arg.num_modes;
++	written = min_t(u32, cap, n);
++
++	for (i = 1; i < n; i++) {
++		enum blk_crypto_mode_num kmode = bcp_virtio_crypto_mode_map[i];
++
++		if (!kmode)
++			continue;
++		modes[i] = profile->modes_supported[kmode];
 +	}
 +
-+	dev_info(dev, "registered: %u VMs, %u total ICE slots\n",
-+		 idx, total_slots);
-+	return 0;
++	if (written &&
++	    copy_to_user(u64_to_user_ptr(arg.modes_ptr), modes,
++			 written * sizeof(modes[0])))
++		return -EFAULT;
++	arg.num_modes = written;
 +
-+err_free:
++	arg.max_slots = 0;
++	rcu_read_lock();
++	{
++		const struct bcp_slot_virt_ops *sv_ops =
++				rcu_dereference(g_slot_virt_ops);
++		if (sv_ops) {
++			int nslots = sv_ops->get_guest_slots(profile, ctx->guest_id);
++
++			if (nslots > 0)
++				arg.max_slots = nslots;
++		}
++	}
++	rcu_read_unlock();
++
++	if (copy_to_user(argp, &arg, sizeof(arg)))
++		return -EFAULT;
++	return 0;
++}
++
++/*
++ * Compute the number of pages needed for up to @want_bytes of iovec data
++ * starting at cursor (@start_idx, @start_off).  The page count is capped at
++ * @cap to bound the arithmetic; *bytes_out receives the actual byte count.
++ */
++static unsigned int bcp_iov_pages_for_bytes(const struct iovec *iov, u32 iov_cnt,
++					    u32 start_idx, u64 start_off,
++					      u64 want_bytes, unsigned int cap,
++					      u64 *bytes_out)
++{
++	u64 pages = 0, taken = 0;
++	u32 i;
++
++	for (i = start_idx; i < iov_cnt && taken < want_bytes; i++) {
++		u64 base, len;
++
++		if (i == start_idx) {
++			base = (u64)(uintptr_t)iov[i].iov_base + start_off;
++			len  = iov[i].iov_len - start_off;
++		} else {
++			base = (u64)(uintptr_t)iov[i].iov_base;
++			len  = iov[i].iov_len;
++		}
++		if (len == 0)
++			continue;
++		if (len > want_bytes - taken)
++			len = want_bytes - taken;
++		pages += DIV_ROUND_UP(len + offset_in_page(base), PAGE_SIZE);
++		taken += len;
++		if (pages >= cap) {
++			*bytes_out = taken;
++			return cap;
++		}
++	}
++	*bytes_out = taken;
++	return (unsigned int)pages;
++}
++
++/*
++ * Advance cursor (*idx, *off) forward by @bytes within @iov[0..iov_cnt).
++ */
++static void bcp_iov_advance_cursor(const struct iovec *iov, u32 iov_cnt,
++				   u32 *idx, u64 *off, u64 bytes)
++{
++	while (bytes > 0 && *idx < iov_cnt) {
++		u64 seg_remaining = iov[*idx].iov_len - *off;
++		u64 take = min_t(u64, seg_remaining, bytes);
++
++		*off += take;
++		bytes -= take;
++		if (*off == iov[*idx].iov_len) {
++			(*idx)++;
++			*off = 0;
++		}
++	}
++}
++
++static long bcp_ioctl_submit_io_by_vslot(struct file *file,
++					 struct bcp_submit_io_by_vslot_arg __user *argp)
++{
++	struct bcp_ctx *ctx = file->private_data;
++	struct bcp_submit_io_by_vslot_arg arg;
++	struct block_device *bdev;
++	struct blk_crypto_profile *profile;
++	struct iovec *iov = NULL;
++	struct iov_iter iter;
++	struct blk_crypto_slot slot;
++	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
++	u64 bytes_done = 0;
++	u64 align, stride;
++	u64 total_bytes;
++	u32 seg_idx = 0;
++	u64 seg_off = 0;
++	unsigned int phy_slot;
++	int ret = -EFAULT;
++
++	if (!ctx || !bcp_ctx_bound(ctx))
++		return -ENXIO;
++
++	if (copy_from_user(&arg, argp, sizeof(arg)))
++		return -EFAULT;
++	if (arg.reserved2)
++		return -EINVAL;
++
++	bdev = file_bdev(ctx->bdev_file);
++
++	if (arg.direction != BCP_DIR_READ && arg.direction != BCP_DIR_WRITE)
++		return -EINVAL;
++	/*
++	 * blk_mode_t does not stop submit_bio() from writing; enforce the
++	 * caller's original fd permission explicitly.
++	 */
++	if (arg.direction == BCP_DIR_WRITE && !ctx->bdev_writable)
++		return -EACCES;
++	/*
++	 * bdev_read_only() can change after bind time; submit_bio_noacct()'s
++	 * bio_check_ro() only warns rather than errors in this kernel.
++	 */
++	if (arg.direction == BCP_DIR_WRITE && bdev_read_only(bdev))
++		return -EROFS;
++	if (arg.flags != BCP_SUBMIT_IO_F_IOV)
++		return -EINVAL;
++	if (arg.iov_cnt == 0 || arg.iov_cnt > BCP_MAX_IOV)
++		return -EINVAL;
++	/* A shift amount >= 64 would be undefined behavior. */
++	if (arg.data_unit_size_bits >= 64)
++		return -EINVAL;
++
++	profile = bdev_get_queue(bdev)->crypto_profile;
++	if (!profile)
++		return -EOPNOTSUPP;
++
++	/* Resolve virt_slot → phy_slot. */
++	rcu_read_lock();
++	{
++		const struct bcp_slot_virt_ops *sv_ops =
++				rcu_dereference(g_slot_virt_ops);
++		if (!sv_ops) {
++			rcu_read_unlock();
++			return -EOPNOTSUPP;
++		}
++		ret = sv_ops->vslot_to_pslot(profile, ctx->guest_id,
++					     arg.virt_slot, &phy_slot);
++	}
++	rcu_read_unlock();
++	if (ret)
++		return ret;
++
++	memset(dun, 0, sizeof(dun));
++	dun[0] = arg.dun;
++
++	slot.phy_slot            = phy_slot;
++	slot.data_unit_size_bits = arg.data_unit_size_bits;
++
++	align = 1ULL << arg.data_unit_size_bits;
++	/*
++	 * Split bios at stride (smallest multiple of the data unit size >=
++	 * PAGE_SIZE) boundaries so each bio ends on a whole data unit.
++	 * bio_crypt_check_alignment() is skipped for slot-based bios (bc_key
++	 * == NULL), so a mid-unit split would silently mis-encrypt/mis-decrypt.
++	 */
++	stride = DIV_ROUND_UP(PAGE_SIZE, align) * align;
++
++	/*
++	 * Import the caller's iovec once.  import_iovec() validates every
++	 * segment with access_ok(), returns the total byte count, and takes a
++	 * private kernel copy that eliminates TOCTOU from a guest mutating its
++	 * own iovec array mid-ioctl.
++	 */
++	ret = import_iovec(arg.direction == BCP_DIR_READ ? ITER_DEST : ITER_SOURCE,
++			   (const struct iovec __user *)u64_to_user_ptr(arg.iov_ptr),
++			   arg.iov_cnt, 0, &iov, &iter);
++	if (ret < 0)
++		return ret;
++	total_bytes = ret;
++
++	/*
++	 * Reject a misaligned total length up front: bio_crypt_check_alignment()
++	 * is skipped for slot-based bios so nothing downstream will catch it.
++	 */
++	if (total_bytes == 0 || (total_bytes & (align - 1)) ||
++	    (total_bytes & (SECTOR_SIZE - 1))) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	/*
++	 * Fail fast if the request exceeds the device.  bio_check_eod() would
++	 * also catch this, but only on the last bio after earlier bios have
++	 * already done real I/O.
++	 */
++	{
++		sector_t nr_sectors = total_bytes >> SECTOR_SHIFT;
++		sector_t maxsector = bdev_nr_sectors(bdev);
++
++		if (nr_sectors > maxsector || arg.sector > maxsector - nr_sectors) {
++			ret = -EIO;
++			goto out;
++		}
++	}
++
++	/*
++	 * Reject an out-of-range DUN: slot-based bios skip
++	 * bio_crypt_check_alignment(), so an overflow would silently truncate
++	 * in the hardware DUN field rather than error out.
++	 */
++	{
++		u64 total_units = total_bytes >> arg.data_unit_size_bits;
++		u64 max_dun_used, dun_limit;
++
++		if (check_add_overflow(arg.dun, total_units - 1, &max_dun_used)) {
++			ret = -EINVAL;
++			goto out;
++		}
++		dun_limit = profile->max_dun_bytes_supported >= 8 ? U64_MAX :
++			(1ULL << (8 * profile->max_dun_bytes_supported)) - 1;
++		if (max_dun_used > dun_limit) {
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
++	/*
++	 * Submit the request as a sequence of bios (submit_bio_wait() per
++	 * bio), each holding at most BIO_MAX_VECS pages.  Sequential
++	 * submission avoids DUN/IV correctness concerns across concurrent
++	 * in-flight bios.
++	 */
++	while (seg_idx < arg.iov_cnt) {
++		unsigned int pages_used = 0;
++		u64 bio_bytes = 0;
++		u32 la_idx = seg_idx;
++		u64 la_off = seg_off;
++		u64 remaining_before;
++		struct bio *bio;
++
++		/*
++		 * Lookahead: count how many whole stride units fit within a
++		 * fresh bio's BIO_MAX_VECS page budget.
++		 */
++		for (;;) {
++			u64 unit_bytes;
++			unsigned int unit_pages;
++
++			unit_pages = bcp_iov_pages_for_bytes(iov, arg.iov_cnt,
++							     la_idx, la_off, stride,
++							BIO_MAX_VECS + 1,
++							&unit_bytes);
++			if (unit_bytes == 0)
++				break; /* only empty segments remain */
++
++			if (pages_used + unit_pages > BIO_MAX_VECS) {
++				if (pages_used == 0) {
++					/* data_unit_size_bits too large to fit one unit. */
++					ret = -EINVAL;
++					goto out;
++				}
++				break; /* finalize this bio; unit deferred to next */
++			}
++
++			pages_used += unit_pages;
++			bio_bytes  += unit_bytes;
++			bcp_iov_advance_cursor(iov, arg.iov_cnt, &la_idx, &la_off,
++					       unit_bytes);
++		}
++
++		if (bio_bytes == 0)
++			break;
++
++		bio = bio_alloc(bdev, pages_used,
++				arg.direction == BCP_DIR_WRITE ?
++					REQ_OP_WRITE : REQ_OP_READ,
++				GFP_KERNEL);
++		if (!bio) {
++			ret = -ENOMEM;
++			goto out;
++		}
++		bio->bi_iter.bi_sector = arg.sector + (bytes_done >> SECTOR_SHIFT);
++
++		/*
++		 * Use bio_iov_iter_get_pages() to pin pages into the bio,
++		 * the same as the O_DIRECT path.  Truncate the iter to this
++		 * bio's byte budget, then reexpand for the next iteration.
++		 */
++		remaining_before = iov_iter_count(&iter);
++		iov_iter_truncate(&iter, bio_bytes);
++		ret = bio_iov_iter_get_pages(bio, &iter, 0, 0);
++		if (ret < 0) {
++			bio_put(bio);
++			goto out;
++		}
++		if (iov_iter_count(&iter) != 0) {
++			/*
++			 * The lookahead verified bio_bytes fits in BIO_MAX_VECS;
++			 * if bio_iov_iter_get_pages() stopped early, its page
++			 * accounting disagreed with bcp_iov_pages_for_bytes().
++			 */
++			bio_put(bio);
++			ret = -EIO;
++			goto out;
++		}
++		iov_iter_reexpand(&iter, remaining_before - bio_bytes);
++
++		/*
++		 * Match __blkdev_direct_IO(): mark pages dirty on reads into
++		 * user-backed memory.
++		 */
++		if (arg.direction == BCP_DIR_READ && user_backed_iter(&iter))
++			bio_set_pages_dirty(bio);
++
++		bcp_iov_advance_cursor(iov, arg.iov_cnt, &seg_idx, &seg_off,
++				       bio_bytes);
++
++		bio_crypt_set_ctx_by_slot(bio, &slot, dun, GFP_KERNEL);
++
++		ret = submit_bio_wait(bio);
++		bio_put(bio);
++		if (ret)
++			goto out;
++
++		/*
++		 * Advance dun by this bio's contribution only, not by
++		 * recomputing from arg.dun + bytes_done, to avoid silent
++		 * truncation when bytes_done grows past UINT_MAX data units.
++		 */
++		bio_crypt_dun_increment(dun, (unsigned int)(bio_bytes >> arg.data_unit_size_bits));
++		bytes_done += bio_bytes;
++	}
++	ret = 0;
++
++out:
++	kfree(iov);
 +	return ret;
 +}
 +
-+static void qcom_ice_slots_remove(struct platform_device *pdev)
++static long bcp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 +{
-+	bcp_unregister_slot_virt_ops(&qcom_slot_virt_ops);
-+	/*
-+	 * Clear the singleton under RCU so that any concurrent ioctl that
-+	 * already took the read lock and is mid-lookup sees either the old
-+	 * valid pointer or NULL, never a freed pointer.
-+	 */
-+	rcu_assign_pointer(g_ice_slots, NULL);
-+	synchronize_rcu();
++	void __user *argp = (void __user *)arg;
++
++	switch (cmd) {
++	case BCP_BIND_CONTEXT:
++		return bcp_ioctl_bind_context(file, argp);
++	case BCP_GET_CRYPTO_CAPS:
++		return bcp_ioctl_get_crypto_caps(file, argp);
++	case BCP_SUBMIT_IO_BY_VSLOT:
++		return bcp_ioctl_submit_io_by_vslot(file, argp);
++	default:
++		return -ENOTTY;
++	}
 +}
 +
-+static const struct of_device_id qcom_ice_slots_of_match[] = {
-+	{ .compatible = "qcom,ice-keyslot-map" },
-+	{}
++static const struct file_operations bcp_fops = {
++	.owner		= THIS_MODULE,
++	.open		= bcp_open,
++	.release	= bcp_release,
++	.unlocked_ioctl	= bcp_ioctl,
++	.compat_ioctl	= compat_ptr_ioctl,
 +};
-+MODULE_DEVICE_TABLE(of, qcom_ice_slots_of_match);
 +
-+static struct platform_driver qcom_ice_slots_driver = {
-+	.probe  = qcom_ice_slots_probe,
-+	.remove = qcom_ice_slots_remove,
-+	.driver = {
-+		.name           = "qcom-ice-slots",
-+		.of_match_table = qcom_ice_slots_of_match,
-+	},
++static struct miscdevice bcp_misc = {
++	.minor	= MISC_DYNAMIC_MINOR,
++	.name	= "blk-crypto-proxy",
++	.fops	= &bcp_fops,
 +};
-+module_platform_driver(qcom_ice_slots_driver);
 +
-+MODULE_DESCRIPTION("Qualcomm ICE keyslot partitioning for guest VMs");
++static int __init blk_crypto_proxy_init(void)
++{
++	int ret;
++
++	ret = misc_register(&bcp_misc);
++	if (ret)
++		return ret;
++	return 0;
++}
++
++static void __exit blk_crypto_proxy_exit(void)
++{
++	misc_deregister(&bcp_misc);
++}
++
++module_init(blk_crypto_proxy_init);
++module_exit(blk_crypto_proxy_exit);
++
 +MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Host-side inline crypto proxy for virtio-blk guests");
+diff --git a/include/linux/blk-crypto-proxy.h b/include/linux/blk-crypto-proxy.h
+new file mode 100644
+index 000000000000..6cf1ff0703e9
+--- /dev/null
++++ b/include/linux/blk-crypto-proxy.h
+@@ -0,0 +1,100 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef __LINUX_BLK_CRYPTO_PROXY_H
++#define __LINUX_BLK_CRYPTO_PROXY_H
++
++#include <uapi/linux/blk-crypto-proxy.h>
++#include <linux/types.h>
++
++struct blk_crypto_profile;
++
++/**
++ * struct bcp_hypervisor_ops - hypervisor VM identity operations
++ *
++ * Translates a hypervisor-specific VM fd to the opaque u32 vm_id used
++ * throughout blk-crypto-proxy.  Register once at module init time.
++ */
++struct bcp_hypervisor_ops {
++	/**
++	 * @get_guest_id: Resolve @vm_fd to an opaque guest identifier.
++	 *
++	 * Verify the caller is permitted to act on behalf of the VM and write
++	 * its u32 id to @guest_id_out.  The value is passed verbatim to
++	 * bcp_slot_virt_ops callbacks.
++	 *
++	 * Returns 0 on success, -errno on failure.
++	 */
++	int (*get_guest_id)(int vm_fd, u32 *guest_id_out);
++};
++
++/**
++ * bcp_register_hypervisor_ops() - register the hypervisor op-set
++ * @ops: op-set to register; must remain valid until unregistered.
++ *
++ * Returns 0 on success, -EBUSY if an op-set is already registered.
++ */
++int bcp_register_hypervisor_ops(const struct bcp_hypervisor_ops *ops);
++
++/**
++ * bcp_unregister_hypervisor_ops() - unregister the hypervisor op-set
++ * @ops: must be the pointer that was passed to bcp_register_hypervisor_ops().
++ *
++ * Blocks until all in-flight callers have finished, then clears the
++ * registration.  Safe to call from module exit.
++ */
++void bcp_unregister_hypervisor_ops(const struct bcp_hypervisor_ops *ops);
++
++/**
++ * struct bcp_slot_virt_ops - ICE keyslot virtualization operations
++ *
++ * Per-VM ICE keyslot accounting and virtual-to-physical slot translation.
++ * The implementation owns the slot allocation table and is registered once
++ * at platform driver probe time.
++ *
++ * @profile is passed to every callback so an implementation supporting
++ * multiple storage controllers can distinguish between them.
++ *
++ * All callbacks may be called concurrently and must not sleep (called
++ * under RCU read lock).
++ */
++struct bcp_slot_virt_ops {
++	/**
++	 * @get_guest_slots: Return the number of ICE keyslots allocated to @guest_id.
++	 *
++	 * Returns the slot count (≥ 1) on success, -ENOKEY if @guest_id is
++	 * not in the allocation table.
++	 */
++	int (*get_guest_slots)(struct blk_crypto_profile *profile, u32 guest_id);
++
++	/**
++	 * @vslot_to_pslot: Translate a VM-local virtual slot to a physical slot.
++	 * @guest_id:       hypervisor-assigned VM identifier.
++	 * @virt_slot:   0-based slot index within @guest_id's allocation.
++	 * @phy_slot_out: receives the physical ICE keyslot index on success.
++	 *
++	 * Returns 0 on success, -ENOKEY if @guest_id is unknown, -EINVAL if
++	 * @virt_slot >= the VM's allocation.
++	 */
++	int (*vslot_to_pslot)(struct blk_crypto_profile *profile,
++			      u32 guest_id, u32 virt_slot,
++			      unsigned int *phy_slot_out);
++};
++
++/**
++ * bcp_register_slot_virt_ops() - register the slot-virt op-set
++ * @ops: op-set to register; must remain valid until unregistered.
++ *
++ * Returns 0 on success, -EBUSY if an op-set is already registered.
++ */
++int bcp_register_slot_virt_ops(const struct bcp_slot_virt_ops *ops);
++
++/**
++ * bcp_unregister_slot_virt_ops() - unregister the slot-virt op-set
++ * @ops: must be the pointer passed to bcp_register_slot_virt_ops().
++ *
++ * Blocks until all in-flight callers have finished, then clears the
++ * registration.  Safe to call from module exit.
++ */
++void bcp_unregister_slot_virt_ops(const struct bcp_slot_virt_ops *ops);
++
++#endif /* __LINUX_BLK_CRYPTO_PROXY_H */
+diff --git a/include/uapi/linux/blk-crypto-proxy.h b/include/uapi/linux/blk-crypto-proxy.h
+new file mode 100644
+index 000000000000..dc8adc8ef5ed
+--- /dev/null
++++ b/include/uapi/linux/blk-crypto-proxy.h
+@@ -0,0 +1,122 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++
++#ifndef __UAPI_LINUX_BLK_CRYPTO_PROXY_H
++#define __UAPI_LINUX_BLK_CRYPTO_PROXY_H
++
++#include <linux/types.h>
++#include <linux/ioctl.h>
++
++#define BCP_DIR_READ     0
++#define BCP_DIR_WRITE    1
++
++/*
++ * BCP_BIND_CONTEXT - bind a host block device and hypervisor VM fd.
++ *
++ * Must be called once after open(), before any other ioctl.
++ * Returns -EBUSY if already bound, -EOPNOTSUPP if no hypervisor op-set
++ * is registered.
++ *
++ * @block_dev_fd: fd of the host block device to bind.
++ * @vm_fd:        hypervisor VM fd identifying the guest.
++ * @reserved:     must be zero.
++ */
++struct bcp_bind_context_arg {
++	__s32 block_dev_fd;
++	__s32 vm_fd;
++	__u32 reserved;
++};
++
++/*
++ * BCP_GET_CRYPTO_CAPS - query crypto capabilities of the bound block device.
++ *
++ * Requires BCP_BIND_CONTEXT; returns -ENXIO otherwise.
++ *
++ * @key_types_supported:  [out] BLK_CRYPTO_KEY_TYPE_* bitmask.
++ * @max_dun_bytes:        [out] maximum DUN bytes supported.
++ * @max_slots:            [out] maximum ICE keyslots available for the bound VM;
++ *                              0 if the VM is not found in the table.
++ * @num_modes:            [in] capacity of the buffer pointed to by @modes_ptr,
++ *                              in entries. [out] number of entries actually
++ *                              written to @modes_ptr (may be less than the
++ *                              given capacity; the caller must use this
++ *                              value, not its own capacity, to know how many
++ *                              entries are valid).
++ * @modes_ptr:             [in] pointer to a caller-allocated __u32 array of
++ *                              at least @num_modes (as given) entries. Must
++ *                              be non-NULL if @num_modes (as given) is > 0.
++ *                              On return, holds a per-mode data_unit_size
++ *                              bitmask array indexed by VIRTIO_BLK_CRYPTO_MODE_*
++ *                              (virtio wire numbering, uapi/linux/virtio_blk.h)
++ *                              -- NOT by enum blk_crypto_mode_num. Index 0 is
++ *                              reserved and always 0, matching struct
++ *                              virtio_blk_crypto_modes.modes[].
++ *
++ * @modes_ptr is a pointer + count rather than a fixed-size array embedded in
++ * this struct so that sizeof(struct bcp_get_crypto_caps_arg) -- and hence the
++ * _IOWR-encoded ioctl number -- does not depend on VIRTIO_BLK_CRYPTO_MODE_MAX.
++ * The caller and this kernel may be built against different virtio_blk.h
++ * versions (and thus different values of that constant); embedding a
++ * VIRTIO_BLK_CRYPTO_MODE_MAX-sized array directly in this struct would make
++ * the ioctl fail to even dispatch (-ENOTTY) whenever the two disagree.
++ */
++
++struct bcp_get_crypto_caps_arg {
++	__u32 key_types_supported;
++	__u32 max_dun_bytes;
++	__u32 max_slots;
++	__u32 num_modes;
++	__aligned_u64 modes_ptr;
++};
++
++/*
++ * BCP_SUBMIT_IO_BY_VSLOT - submit an encrypted bio using a virtual slot.
++ *
++ * The kernel resolves virt_slot to a physical ICE keyslot and submits the
++ * I/O synchronously.  Large requests are split at data-unit boundaries
++ * (BIO_MAX_VECS pages per bio).  Requires BCP_BIND_CONTEXT; returns -ENXIO
++ * otherwise.
++ *
++ * @virt_slot:           guest-visible slot index (0-based within the VM's range).
++ * @direction:           BCP_DIR_READ or BCP_DIR_WRITE.
++ * @flags:               must be BCP_SUBMIT_IO_F_IOV.
++ * @data_unit_size_bits: log2 of the encryption data unit size in bytes.
++ * @sector:              start sector (512-byte units).
++ * @dun:                 data unit number (single 64-bit limb, little-endian).
++ * @iov_ptr:             pointer to scatter-gather array of struct bcp_iovec.
++ * @iov_cnt:             number of entries in @iov_ptr[].
++ * @reserved2:           must be zero.
++ *
++ * @sector, @dun and @iov_ptr use __aligned_u64 to guarantee identical struct
++ * layout between 32-bit and 64-bit callers, as required by
++ * .compat_ioctl = compat_ptr_ioctl.
++ */
++
++/* Maximum iovec segments per BCP_SUBMIT_IO_BY_VSLOT call (matches UIO_MAXIOV). */
++#define BCP_MAX_IOV            1024
++
++#define BCP_SUBMIT_IO_F_IOV    (1U << 0)	/* scatter-gather mode; must always be set */
++
++struct bcp_iovec {
++	__u64 iov_base;
++	__u64 iov_len;
++};
++
++struct bcp_submit_io_by_vslot_arg {
++	__u32 virt_slot;
++	__u32 direction;
++	__u32 flags;
++	__u32 data_unit_size_bits;
++	__aligned_u64 sector;
++	__aligned_u64 dun;
++	__aligned_u64 iov_ptr;
++	__u32 iov_cnt;
++	__u32 reserved2;
++};
++
++#define BCP_IOC_MAGIC    0xC7
++
++#define BCP_BIND_CONTEXT       _IOW(BCP_IOC_MAGIC, 1, struct bcp_bind_context_arg)
++#define BCP_GET_CRYPTO_CAPS    _IOWR(BCP_IOC_MAGIC, 2, struct bcp_get_crypto_caps_arg)
++#define BCP_SUBMIT_IO_BY_VSLOT  _IOW(BCP_IOC_MAGIC, 3, struct bcp_submit_io_by_vslot_arg)
++
++#endif /* __UAPI_LINUX_BLK_CRYPTO_PROXY_H */
 -- 
 2.34.1
 
