@@ -1,256 +1,377 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-83.mta0.migadu.com [91.218.175.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8804503FC;
-	Thu, 27 Aug 2026 12:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C74045FFD9
+	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 13:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787835386; cv=none; b=Y7vU/9TbkKwBrSDOabHtxLZhhdfabmImAiX6fRxPU2wmZDm17s78Yu2O8/ZXPjCvZOiDM0Pfh7MO3tM+SfarwhXeg66LBmTKjQC2gTmA+MBfpfMGWSShJhvE31CTw4AxwbtHtGimo9WMK4h1BPJRe6AgpoW6R7kL7EHr2LiCt5s=
+	t=1787835792; cv=none; b=YLW4hCclvb+Yx6SvBKGHxvmyd2sdtg4jYqPr/yfEkPN9I62Y/Ut8nYYtOMwN0dW4H3Aq8muqF8xq2ZzW5sX8tf2/1B/riaWc80KgNmdK371g3oL0jrAlnSTiZkrX7EIe/DAPeTusCFMx6gtO+oNWw9tKnjOSpM092feMCoI78dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787835386; c=relaxed/simple;
-	bh=yjfAd5HzqoftbhQaKFAEymWiks9xoHxKsZAGMnolXHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e4shf0TiE7wC2yxwBiwwrlXx6SUbDI4rIhBHJz6iU6+RojokbdEl27/nDZjObwpkHZi9ZG1V4/dcI/hk8Cw8ZgZGxVjcEknLiXcWSaltAQkIk2I6gMm9SQ2rxmGJxrXjHseKvbMHtqTaUsNLMLKnMqwOsZVyfSXtAgf9/IQdmEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=f6tlP77p; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787835792; c=relaxed/simple;
+	bh=zaXorwSx0qkUCwLt2lQ+z30Q7xd+Z/E9AKrAi5Mcmxg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dnq3fg3Ro/5aUXUNcUJal1BRUt4wmQWAKxmqf3nVnvSFlVJ3kjyGQ0IeBXHSQlDulxx9lh4q+LlJBkF1pb+h8Hn4Z6ZQpInhCWl+kctTt/WPGKhuWj5ayS02zq1NrHwDsMEuspnZSjrJfztEA8MEhWMwPUC4m00e2qvcYA3g28I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M/i7zlw6; arc=none smtp.client-ip=91.218.175.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="f6tlP77p"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67RCVgnU3056614;
-	Thu, 27 Aug 2026 12:55:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=3Xd30D
-	SJ7NtPUCB5YLdv6K4XXDXekQyh4v5AohRuQOg=; b=f6tlP77p8rsDqNanHBg/mR
-	SFGPnMureofD0asnngvcFKDo1/sP6tQt0475avRXaPbc2QxyqbUp1AlJG20SeTMc
-	sLVkKA3qCxC4LnbQsNlsKc+QI6bcGSVR77XLc7QwJguy/jkUaOtk/2lrcFU6jRYP
-	NZM7RtRSjdwW2OWYm6xzCk/6bEqW4+qOnJiAohRg1XLESISnXo0XCNoanbxbTIW8
-	o/lDL0ILnkYWF5nCB1MXrSHCtJxvoTmcY8UWvDma01tZ1DqxfsgisB/DDzzrTVFP
-	265jNcHiVrtIYEIWlUX8isemob51/tcmfeFlDFnCJb5D6FdSMTJIkwPEnXF7AcZw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73dxn25s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Aug 2026 12:55:13 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67RCfLlo031321;
-	Thu, 27 Aug 2026 12:55:12 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4g7q3k82uw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Aug 2026 12:55:12 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67RCt9m049938804
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Aug 2026 12:55:09 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA13C2004F;
-	Thu, 27 Aug 2026 12:55:08 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E0B2120043;
-	Thu, 27 Aug 2026 12:55:05 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.111.92.98])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 27 Aug 2026 12:55:05 +0000 (GMT)
-Date: Thu, 27 Aug 2026 14:55:02 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        Ackerley Tng
- <ackerleytng@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Baolin
- Wang <baolin.wang@linux.alibaba.com>,
-        Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>,
-        Christian Brauner
- <brauner@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Christoph Lameter
- <cl@gentwo.org>,
-        David Hildenbrand <david@kernel.org>, JP Kobryn
- <jp.kobryn@linux.dev>,
-        Jan Kara <jack@suse.cz>, Jens Axboe
- <axboe@kernel.dk>,
-        Johannes Weiner <hannes@cmpxchg.org>, Kairui Song
- <ryncsn@gmail.com>,
-        Kiryl Shutsemau <kas@kernel.org>, Lance Yang
- <lance.yang@linux.dev>,
-        Leonardo Bras <leobras.c@gmail.com>, Lorenzo
- Stoakes <ljs@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Matthew
- Wilcox <willy@infradead.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>,
-        Minchan
- Kim <minchan@kernel.org>, Muchun Song <muchun.song@linux.dev>,
-        Oscar
- Salvador <osalvador@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>, Qi
- Zheng <qi.zheng@linux.dev>,
-        Rik van Riel <riel@surriel.com>,
-        Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>,
-        Shakeel Butt
- <shakeel.butt@linux.dev>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Vlastimil
- Babka <vbabka@kernel.org>,
-        Yang Shi <yang@os.amperecomputing.com>, Yu Zhao
- <yuzhao@google.com>,
-        "Zach O'Keefe" <zokeefe@google.com>, Zi Yan
- <ziy@nvidia.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 20/25] s390/fbatch: no lru_add_drain_all() in
- s390_wiggle_split_folio()
-Message-ID: <20260827145502.2fb4505b@p-imbrenda>
-In-Reply-To: <2319f670-fe0b-f032-c0dc-486cbec0f3e1@google.com>
-References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-	<7bf68e7b-f88c-6ca9-39ab-e9fedab0c8be@google.com>
-	<20260826155722.0198d3ce@p-imbrenda>
-	<2319f670-fe0b-f032-c0dc-486cbec0f3e1@google.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M/i7zlw6"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=zaXorwSx0qkUCwLt2lQ+z30Q7xd+Z/E9AKrAi5Mcmxg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787835769; v=1; x=1788440569;
+ b=M/i7zlw6OynSVxZRrBxrhebrrGKmBhkBL4YyBceo9N+j3oSqFGQZ4LxFNYYuaq66imBY72zB
+ 3PaInkm+xCvUFUMKxn/aJVMACtm69tFae8NFF6ApWZEM/z46oy2R+NgcwXy7XJ3azd3Kg5hmRxN
+ ftK2Vj4lLwwHnLDwP4kiTOSI=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 39be45320f9a0c02;
+	Thu, 27 Aug 2026 13:02:48 +0000
+X-Mizu-Trace-ID: 39be45320f9a0c02
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <da2d8bda-5d88-4644-bc9a-3cc91851e5e1@linux.dev>
+Date: Thu, 27 Aug 2026 15:02:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC for-next 2/3] block: allow error injection rules to delay
+ bios
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>, Christoph Hellwig <hch@lst.de>
+References: <20260827000115.128093-1-haris.iqbal@linux.dev>
+ <20260827000115.128093-3-haris.iqbal@linux.dev>
+Content-Language: en-US
+From: Haris Iqbal <haris.iqbal@linux.dev>
+In-Reply-To: <20260827000115.128093-3-haris.iqbal@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDEwNCBTYWx0ZWRfX0TZApJLkdtZ1
- PtE0rU7ktQWVARMaJcd4vZ13/G8yHyRHM4u3EkB+SbNKBO7mZMEKkD16iaWBwlYzwAuGe9vvOym
- vJ2I67XiTk6YxR75ZgRBPBeAYkBQUSQ=
-X-Authority-Analysis: v=2.4 cv=AYuB2XXG c=1 sm=1 tr=0 ts=6a9033b1 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=1XWaLZrsAAAA:8
- a=QKwNBufzpuw2Nls-StEA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: Wrj_BCzufVTI3xnHE8uI4nTHpOZ09pgb
-X-Proofpoint-GUID: kiq6mmh02NZYDyKGi_UG9okOaLOjTkKb
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDEwNCBTYWx0ZWRfX/GC60VEqff6H
- AD+jIFLFniVC/xqIljwSPxusJt+WASSapWED2IMDwJBC5s8SXEzQ7Lw24xM/z5E8irvqBHKEEA8
- TsW67q+rmn+Lv2a7dNWCRh2BztVeZUoe2yVSmLtzBxu4rSqHQQAV3yZwxg5jvqh6JgjK8wxQTwN
- 3f2mo07mhERoXsbSGoy9prIWB/8kUt2YRvv+WDuqqOPTiMOVQvYC3s2bpCow5iwFaWuISYM30QX
- IA2ZK7TtbtOUmEorzZpatwwaRI0Ydek+gChszZuyQyDyn5QQQneZm2xxTgg8aOPFGoO1Y5kjqnF
- He3CpPU3+3/7Wld3khcvM4hXDOZAoZ60mnpZh92cwtJeFc+WqcM4HxUKlExo1CuVoR42aresGwi
- PPIFJufe7OMchwSCXeYh1nHaPgz62e4WIlmmffUFctzQbF0Lfap2jfKSgXzReFafxjYYHG69fSV
- zPDUH3nxbniYRLw4loQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-27_05,2026-08-26_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 bulkscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608270104
 
-On Thu, 27 Aug 2026 01:49:12 -0700 (PDT)
-Hugh Dickins <hughd@google.com> wrote:
 
-> On Wed, 26 Aug 2026, Claudio Imbrenda wrote:
-> > On Mon, 24 Aug 2026 07:39:12 -0700 (PDT)
-> > Hugh Dickins <hughd@google.com> wrote:
-> >   
-> > > s390_wiggle_split_folio() has no good reason to lru_add_drain_all(),
-> > > now that the per-cpu fbatch references are gone.
-> > > 
-> > > Signed-off-by: Hugh Dickins <hughd@google.com>
-> > > ---
-> > >  arch/s390/kernel/uv.c | 1 -
-> > >  1 file changed, 1 deletion(-)
-> > > 
-> > > diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> > > index dc14ebc0105b..120a467026a5 100644
-> > > --- a/arch/s390/kernel/uv.c
-> > > +++ b/arch/s390/kernel/uv.c
-> > > @@ -364,7 +364,6 @@ int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
-> > >  
-> > >  	lockdep_assert_not_held(&mm->mmap_lock);
-> > >  	folio_wait_writeback(folio);
-> > > -	lru_add_drain_all();
-> > >  
-> > >  	if (!folio_test_large(folio))
-> > >  		return 0;  
-> > 
-> > This is black magic for me, I am not sure I fully understand all the
-> > details, but what's the new purpose of lru_add_drain_all() ?
-> > 
-> > will we have a guarantee that no stray references to mapped folios will
-> > ever remain?
-> > 
-> > Any unexpected reference (i.e. not due to mappings, see
-> > expected_folio_refs()) will cause a protected guest to hang.  
+
+On 8/27/26 02:01, Md Haris Iqbal wrote:
+> Error injection can only fail a bio today.  Add a delay_us option so that
+> a rule can hold a bio back first, to model a slow device.
 > 
-> I most certanly don't know s390 or that code well enough to guarantee
-> you that no stray references to mapped folios can remain there. What I
-> can guarantee is that no references, of the kind which lru_add_drain_all()
-> used to be needed to remove, can exist there: so there will no longer
-> be any point in s390 (or others) calling it for that reason, to help
-> split_folio() to succeed.
-
-we are not using it to help split_folio() succeed (although that's a
-pleasant side effect). We need it even for small pages, to guarantee
-that no extra reference from LRU is present on the page.
-
-you just mentioned that, with this patch series, no such references
-will be there, so that would be enough for me
-
+> If a matching rule has delay_us set, the bio is held for that long.  It is
+> then failed if the rule also has a status, or resubmitted below the
+> injection hook so that the rules are not applied to it again.
 > 
-> You wonder then, what lru_add_drain_all()'s new purpose is, why it
-> still exists at all? I did hope to remove it completely, but found
-> two usages that I could not argue against: one is in user-forced page
-> reclaim (two memcg interfaces and a sysfs interface), where it's
-> still desirable to push folios on to the immediately reclaimable LRUs,
-> rather than leave any on the per-cpu fbatches preceding those LRUs;
-> the other is in memory hotremove, where it will be necessary to erase
-> stray addresses, through which a subsequent folio_try_get() might have
-> accessed a struct folio which (I imagine) might have been freed.
+> The bio is submitted from a workqueue rather than from the timer, because
+> submitting a bio can sleep.  Bios with REQ_NOWAIT are never delayed, and
+> values above 600 seconds are rejected.
 > 
-> Yes, your split_folio() may still occasionally fail, because of
-> transient references and folio_try_get()s on that folio; but that's
-> so before and after the changes. And there is (in my mind anyway) an
-> open question of whether "folio_try_get() blips" will be visible a
-> little more than before.
-
-yes, it's fine if there are transient fails, as long as this won't
-block indefinitely (or for extended amounts of time)
-
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+> ---
+>   block/blk-core.c        |  13 ++--
+>   block/blk.h             |   1 +
+>   block/error-injection.c | 147 ++++++++++++++++++++++++++++++++++++----
+>   3 files changed, 142 insertions(+), 19 deletions(-)
 > 
-> Hmm, looking again at s390_wiggle_split_folio(), it seems rather
-> odd that it was doing an lru_add_drain_all() at all: because any
-> large (hence splittable) folios have themselves been immediately
-> flushed from the per-cpu fbatches, not left queued up there. Maybe
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 196bccf27f58..f28ccc4633d4 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -759,11 +759,8 @@ static void __submit_bio_noacct_mq(struct bio *bio)
+>   	current->bio_list = NULL;
+>   }
+>   
+> -void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+> +void __submit_bio_noacct_nocheck(struct bio *bio, bool split)
+>   {
+> -	if (unlikely(blk_error_inject(bio)))
+> -		return;
+> -
+>   	blk_cgroup_bio_start(bio);
+>   
+>   	if (!bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+> @@ -793,6 +790,14 @@ void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+>   	}
+>   }
+>   
+> +void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+> +{
+> +	if (unlikely(blk_error_inject(bio)))
+> +		return;
+> +
+> +	__submit_bio_noacct_nocheck(bio, split);
+> +}
+> +
+>   static blk_status_t blk_validate_atomic_write_op_size(struct request_queue *q,
+>   						 struct bio *bio)
+>   {
+> diff --git a/block/blk.h b/block/blk.h
+> index 50abfd932886..cdf6d8964da6 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -61,6 +61,7 @@ bool __blk_freeze_queue_start(struct request_queue *q,
+>   			      struct task_struct *owner);
+>   int __bio_queue_enter(struct request_queue *q, struct bio *bio);
+>   void submit_bio_noacct_nocheck(struct bio *bio, bool split);
+> +void __submit_bio_noacct_nocheck(struct bio *bio, bool split);
+>   int bio_submit_or_kill(struct bio *bio, unsigned int flags);
+>   
+>   static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
+> diff --git a/block/error-injection.c b/block/error-injection.c
+> index 47cdd8973adc..9b823edf3f8a 100644
+> --- a/block/error-injection.c
+> +++ b/block/error-injection.c
+> @@ -6,9 +6,17 @@
+>   #include <linux/blkdev.h>
+>   #include <linux/parser.h>
+>   #include <linux/seq_file.h>
+> +#include <linux/workqueue.h>
+>   #include "blk.h"
+>   #include "error-injection.h"
+>   
+> +/*
+> + * Cap the delay so that a typo can't wedge a device for good.  This is still
+> + * well beyond the default hung task timeout, which is one of the things a
+> + * delay is useful for triggering.
+> + */
+> +#define BLK_ERROR_INJECT_MAX_DELAY_US	(600 * USEC_PER_SEC)
+> +
+>   struct blk_error_inject {
+>   	struct list_head		entry;
+>   	sector_t			start;
+> @@ -18,14 +26,91 @@ struct blk_error_inject {
+>   
+>   	/* only inject every 1 / chance times */
+>   	unsigned int			chance;
+> +
+> +	/* hold the bio for this long before submitting or failing it */
+> +	unsigned int			delay_us;
+>   };
+>   
+> +/*
+> + * A bio held by a delay rule.  This is self-contained on purpose: it does not
+> + * point back at the rule, so rules can be removed while delayed bios are
+> + * outstanding, and it does not point at the gendisk, so nothing has to be
+> + * cleaned up when the disk goes away.  A delayed bio holds no queue usage
+> + * counter reference either, so one that outlives its disk is failed by the
+> + * GD_DEAD check in __bio_queue_enter() once it is finally submitted.
+> + */
+> +struct blk_error_inject_delay {
+> +	struct delayed_work		dwork;
+> +	struct bio			*bio;
+> +	blk_status_t			status;
+> +};
+> +
+> +static struct workqueue_struct *blk_error_inject_wq;
+> +
+>   DEFINE_STATIC_KEY_FALSE(blk_error_injection_enabled);
+>   
+> +static void blk_error_inject_delay_work(struct work_struct *work)
+> +{
+> +	struct blk_error_inject_delay *d = container_of(to_delayed_work(work),
+> +			struct blk_error_inject_delay, dwork);
+> +	struct bio *bio = d->bio;
+> +	blk_status_t status = d->status;
+> +
+> +	kfree(d);
+> +
+> +	if (status != BLK_STS_OK) {
+> +		bio->bi_status = status;
+> +		bio_endio(bio);
+> +	} else {
+> +		/*
+> +		 * Submit below the injection hook.  Re-entering it would match
+> +		 * the same rule again and the bio would never be issued, so a
+> +		 * bio that was delayed once skips error injection entirely
+> +		 * from here on, including any other rule that covers it.
+> +		 */
+> +		__submit_bio_noacct_nocheck(bio, false);
 
-yes, because as I mentioned above, we are not using it for
-split_folio(), but to guarantee that no extra references are present.
+According to Sashiko, this will cause split bios to go through multiple 
+delays.
 
-We count how many references are present, how many we are expecting,
-and if any extra are present, we do the lru drain. If after the drain
-we still have extra references, then we try again, in the hope that the
-extra references go away quickly (i.e. we expect the extra references
-to be due to I/O)
+Initial look says that what Sashiko is saying is true. I will take a 
+deeper look and get back.
 
-when a page transitions from "normal" to "secure-guest owned", we must
-make sure that no extra references are present.
-
-> there was an earlier time when mm did not enforce that; and Barry
-> is currently looking to relax that, so the limitation intended for
-> pmd-sized folios is no longer forced on the smallest large folios.
-> 
-> If Barry's relaxation goes in before my drainage changes, then
-> there is value in that s390 lru_add_drain_all() in the interim.
-
-hmmm so, should it stay for now, then?
-
-also: I'm working on completely reworking how the transition from
-non-secure to secure is handled, with the explicit goal of getting rid
-of that kludge we are currently using. That will also get rid of the
-lru drain. But it will take some time (I hope to have something by the
-end of the year)
+> +	}
+> +}
+> +
+> +/*
+> + * Hand the bio to a workqueue that submits or fails it once the delay has
+> + * expired.  Both blk_mq_submit_bio() and ->submit_bio can sleep, so this can't
+> + * be completed from the timer itself.
+> + *
+> + * Returns false if the bio can't be delayed, in which case the caller handles
+> + * it immediately instead.
+> + */
+> +static bool blk_error_inject_delay(struct gendisk *disk, struct bio *bio,
+> +		blk_status_t status, unsigned int delay_us)
+> +{
+> +	struct blk_error_inject_delay *d;
+> +
+> +	/* never block a bio that asked not to be blocked */
+> +	if (bio->bi_opf & REQ_NOWAIT)
+> +		return false;
+> +
+> +	d = kmalloc_obj(*d, GFP_NOIO);
+> +	if (!d)
+> +		return false;
+> +
+> +	pr_info_ratelimited("%pg: delaying %s at sector %llu:%u by %uus\n",
+> +			disk->part0, blk_op_str(bio_op(bio)),
+> +			bio->bi_iter.bi_sector, bio_sectors(bio), delay_us);
+> +
+> +	d->bio = bio;
+> +	d->status = status;
+> +	INIT_DELAYED_WORK(&d->dwork, blk_error_inject_delay_work);
+> +	queue_delayed_work(blk_error_inject_wq, &d->dwork,
+> +			usecs_to_jiffies(delay_us));
+> +	return true;
+> +}
+> +
+>   bool __blk_error_inject(struct bio *bio)
+>   {
+>   	struct gendisk *disk = bio->bi_bdev->bd_disk;
+>   	struct blk_error_inject *inj;
+> +	blk_status_t status = BLK_STS_OK;
+> +	unsigned int delay_us = 0;
+>   
+>   	rcu_read_lock();
+>   	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
+> @@ -45,29 +130,38 @@ bool __blk_error_inject(struct bio *bio)
+>   		if (inj->chance > 1 && (get_random_u32() % inj->chance) != 0)
+>   			continue;
+>   
+> -		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+> -				disk->part0, blk_status_to_str(inj->status),
+> -				blk_op_str(inj->op), bio->bi_iter.bi_sector,
+> -				bio_sectors(bio));
+> -		bio->bi_status = inj->status;
+> -		rcu_read_unlock();
+> -		bio_endio(bio);
+> -		return true;
+> +		status = inj->status;
+> +		delay_us = inj->delay_us;
+> +		break;
+>   	}
+>   	rcu_read_unlock();
+> -	return false;
+> +
+> +	if (delay_us && blk_error_inject_delay(disk, bio, status, delay_us))
+> +		return true;
+> +	if (status == BLK_STS_OK)
+> +		return false;
+> +
+> +	pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+> +			disk->part0, blk_status_to_str(status),
+> +			blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
+> +			bio_sectors(bio));
+> +	bio->bi_status = status;
+> +	bio_endio(bio);
+> +	return true;
+>   }
+>   
+>   static int error_inject_add(struct gendisk *disk, enum req_op op,
+>   		sector_t start, u64 nr_sectors, blk_status_t status,
+> -		unsigned int chance)
+> +		unsigned int chance, unsigned int delay_us)
+>   {
+>   	struct blk_error_inject *inj;
+>   	int error = -EINVAL;
+>   
+>   	if (op == REQ_OP_LAST)
+>   		return -EINVAL;
+> -	if (status == BLK_STS_OK)
+> +	if (status == BLK_STS_OK && !delay_us)
+> +		return -EINVAL;
+> +	if (delay_us > BLK_ERROR_INJECT_MAX_DELAY_US)
+>   		return -EINVAL;
+>   
+>   	inj = kzalloc_obj(*inj);
+> @@ -86,6 +180,7 @@ static int error_inject_add(struct gendisk *disk, enum req_op op,
+>   	inj->start = start;
+>   	inj->status = status;
+>   	inj->chance = chance;
+> +	inj->delay_us = delay_us;
+>   
+>   	pr_debug_ratelimited("%pg: adding %s injection for %s at sector %llu:%llu\n",
+>   			disk->part0, blk_status_to_str(status),
+> @@ -139,6 +234,7 @@ enum options {
+>   	Opt_nr_sectors		= (1u << 18),
+>   	Opt_status		= (1u << 19),
+>   	Opt_chance		= (1u << 20),
+> +	Opt_delay_us		= (1u << 21),
+>   
+>   	Opt_invalid,
+>   };
+> @@ -151,6 +247,7 @@ static const match_table_t opt_tokens = {
+>   	{ Opt_nr_sectors,		"nr_sectors=%u"		},
+>   	{ Opt_status,			"status=%s"		},
+>   	{ Opt_chance,			"chance=%u"		},
+> +	{ Opt_delay_us,			"delay_us=%u"		},
+>   	{ Opt_invalid,			NULL,			},
+>   };
+>   
+> @@ -189,7 +286,7 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+>   		char *options)
+>   {
+>   	enum { Unset, Add, Removeall } action = Unset;
+> -	unsigned int option_mask = 0, chance = 1;
+> +	unsigned int option_mask = 0, chance = 1, delay_us = 0;
+>   	enum req_op op = REQ_OP_LAST;
+>   	u64 start = 0, nr_sectors = 0;
+>   	blk_status_t status = BLK_STS_OK;
+> @@ -232,6 +329,9 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+>   			if (!error && chance == 0)
+>   				error = -EINVAL;
+>   			break;
+> +		case Opt_delay_us:
+> +			error = match_uint(args, &delay_us);
+> +			break;
+>   		default:
+>   			pr_warn("unknown parameter or missing value '%s'\n", p);
+>   			error = -EINVAL;
+> @@ -243,7 +343,7 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+>   	switch (action) {
+>   	case Add:
+>   		return error_inject_add(disk, op, start, nr_sectors, status,
+> -				chance);
+> +				chance, delay_us);
+>   	case Removeall:
+>   		if (option_mask & ~Opt_removeall)
+>   			return -EINVAL;
+> @@ -279,10 +379,11 @@ static int blk_error_injection_show(struct seq_file *s, void *private)
+>   
+>   	rcu_read_lock();
+>   	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
+> -		seq_printf(s, "%llu:%llu op=%s,status=%s,chance=%u",
+> +		seq_printf(s, "%llu:%llu op=%s,status=%s,chance=%u,delay_us=%u",
+>   			   inj->start, inj->end,
+>   			   blk_op_str(inj->op),
+> -			   blk_status_to_tag(inj->status), inj->chance);
+> +			   blk_status_to_tag(inj->status), inj->chance,
+> +			   inj->delay_us);
+>   		seq_putc(s, '\n');
+>   	}
+>   	rcu_read_unlock();
+> @@ -317,3 +418,19 @@ void blk_error_injection_exit(struct gendisk *disk)
+>   {
+>   	error_inject_removeall(disk);
+>   }
+> +
+> +static int __init blk_error_injection_init_wq(void)
+> +{
+> +	/*
+> +	 * WQ_MEM_RECLAIM so that a delayed bio on the reclaim path can still
+> +	 * find a worker under memory pressure.  Note that this only guarantees
+> +	 * a worker exists, not that it is free: submitting a bio can block on
+> +	 * a queue freeze or on tag allocation, so a delayed bio can still be
+> +	 * held up behind another one.
+> +	 */
+> +	blk_error_inject_wq = alloc_workqueue("blk_error_inject", WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
+> +	if (!blk_error_inject_wq)
+> +		panic("Failed to create blk_error_inject wq\n");
+> +	return 0;
+> +}
+> +subsys_initcall(blk_error_injection_init_wq);
 
