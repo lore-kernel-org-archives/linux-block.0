@@ -1,59 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F412F1FDF
-	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 11:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50436440A2B;
+	Thu, 27 Aug 2026 12:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787831182; cv=none; b=u1SsbEpYBL9Ulh683dfTYlSyRlbDqw7O7JizaHZQYZ2owQz0mQkj7pMGrikSYmfngj9Ycj0fBTRPvUNPMY83ggLx/eT8X/fv7jxc/llcnwQJiTvfdk4Hzox/N8IIIFTPxoHGbdzaN+OcQ4DuddjTUFwQ5VUbcMX91urpG+kQZkQ=
+	t=1787832152; cv=none; b=feOcC3/TRH5PSKUfIzUVhPExA2aFGo08VstlA03Ffzb35UZqo8iQAUjernwwPg93/lddmFhjogllnQnQgrtd1RqpB2fDI9XGJT7dG/MbZCrDl5I+1FByKjzzaun7aXZ7c2Ngr4OGaaUlvFDkjSzkSZCLgNHO3gku5NO6z0Rcm0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787831182; c=relaxed/simple;
-	bh=I93NvcT5kkpWYtiRck26P3d7syS0PgNWXwsEmndyHm4=;
+	s=arc-20240116; t=1787832152; c=relaxed/simple;
+	bh=xy7XKD/bymlK+Ksss8En9NkgtwUVdpivc5xveG7VynQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DMsYbGwKw387L4ysw7Bfh6YkUsRg4UslQZ6ZN3HHFXBYGYA028xVpxx0Q9ElDoPTG5YiDRN8sD5OZqKaZyPhUMDXi++nw+fWLbEBGvF/TDoBxFRHC9s1OWX3buXxje8exwaXLK5QvDtHir/aJjmUGz+9rP1l84gf81EIK+/tkvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rt4sOSCR; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=P0T8WNNA4m2yTcoTNnLFIdJMW1K066byYPdEk+XIP2aR0Mw0ApGHCDRVqmpwn5qUqkY15ubDcIwJIyqlfV5p5ApRsLj8TN9vXQUpThAtgFMXkD4xQo3+abeBftyyLp+IuO+4SYB9cIIyzOrJCRx0WvhGa3mDtGR6PPVAayDUjCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oU5Fu3nr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rt4sOSCR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376771F00A3E;
-	Thu, 27 Aug 2026 11:46:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oU5Fu3nr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 315A71F00A3D;
+	Thu, 27 Aug 2026 12:02:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787831180;
-	bh=1/7HEinzHyrUIuuAvpR8eRudqoAYvO5vyA5jKxjS7tE=;
+	s=k20260515; t=1787832151;
+	bh=2XsxeEPR3/Rk7rjBdJvlKvo98WGdtvIZTN2N8+2tZQM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Rt4sOSCRNDXuFPLuoJaGzxCPmi1+DLpY927TMXzpzdfWtFouhdayMbPf6X405oVpy
-	 0q0qtAzraVDJrstHEPH87k4Y070O0WLN5ftXpWOU/6IjRPIGu6jz+h06Evik4Lrjna
-	 RSRIU2oX2OIn5WFxhRyl3H9CUTVKwIPbarZbV9fJbipOxDQfA41ZjCJtLCOKIfD7wT
-	 3mIuDwlMo/2tISjSaaSwB2e84o3sBNdDX7D+kHnRjkK8bpcdTjoZwEp1JMUhz9HYK4
-	 MkHCPE4LILNBkbhMIdabjnMOrbBQaLPLkiZOWvt+Z0YQM+E6t9x9L38dq4qfNCGve+
-	 ZknbhUhYMOkxQ==
+	b=oU5Fu3nrwgSonksrVWuyCM/FVaiZU5Gi+zkbUcCV+6xESzPhMe5dL8xTf3tQk3VY+
+	 KHxvgVpnPTpHQGazRIpUt456oMO2kIvsKleE8vsOPV2T4YgKvwEd06gg0t20onsmg4
+	 H2YePWYvzJZOsp0Lyl0CCfkgtJzhD9vwHCiUw8wWzH4t6BMrkqQtFE1n+e2Ddr0VlZ
+	 rrzVJQGRaQV2vgIZFBDEYR4vydHidItacPkK11kWlV6/mhaFZr9CcRezKp8IFUbdGW
+	 TqvuZqOUe7EWRULhJeLATyRbHiG1SNjvWO9h8mzvwzauSERiBs1ht+u5i/UUIc2Ws9
+	 1LlK1PhBcmoCA==
 Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 0D84C1980047;
-	Thu, 27 Aug 2026 07:46:10 -0400 (EDT)
+	by mailfauth.ams.internal (Postfix) with ESMTP id 04F11198006A;
+	Thu, 27 Aug 2026 08:02:19 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Thu, 27 Aug 2026 07:46:17 -0400
-X-ME-Sender: <xms:giOQajxrB74n8M4jds9AgIgRcXpZU72wEnOkHc67ccNPTLLr8QeOrQ>
-    <xme:giOQavD3npuGe4nFyz4WZJ-qUfIAY-EgCq22IPkgUII8ZyzGBtOwUV9G0iQGDgzOG
-    RehAd8N5LIKhvMjiVwxkNL-m2X-UTvHQKMnBSxB4NzfddAx7cqQmY0K>
-X-ME-Received: <xmr:giOQatEdIKGZu4wUeRJvPxwf9xdQrGV7tpsNpfxfdTl_3NKnq4cP7GW7iEs>
-X-ME-Proxy-Cause: dmFkZTFEkFs1SlQDQdGfvtSAc9WTtr25v16L9+AoTBfiYB5jwPukem/FqOc9aBgzJGVE8s
-    XWYu6XtTF1TiqpkLYgBAEZedvE5yRMka2V0KyqpQK759rDery0ZQGWPcpvUce4YOjJdxaU
-    mkTf/h8DzsCePJPfrcIYp7xj1rVZw3sfyseBqC2/BQ8R8iSKLxuJs+tBOg/r6anSmnpAGj
-    suewUpL2Xs5LkLCTflIiNIekfKUet6doHLg1kVgwEnuEEpGtXoDy4Uu5Xw+aUuWpdhdYH1
-    6O/Lvfm5/orsfos/smODRowOFflASWqZjIPkmpZbyHf+P2lnRwkJw4sifLopkuetjJjFkr
-    X2dMrF2eJyqCwxQIzQ5IGiUwcFQge78u2cyfBqZkCWT5CcNVB2b34WWwQ0URExW4hkV1aQ
-    VMa18lLChoRZqk8ZtIAQiEsxhoTbabQnXk5nEsISNP8YF0fHGnI+tuvYx2zGzPDTq2YWfF
-    QBTdbxsbws8PYjblh48P7bR4oI+zvDgBhC8d6yjVSSg3TjuYD8biX1DTIPSj2w6fItuZ4/
-    iyaktA3Yvce6MXL9T9alUvd3Vj+A5RoIHjbfYs/vMt1U0WVNM6EK1igwNxqOvJ1t2DoL3n
-    87zY9T+sIyKV1SZpj/n2fUbPx49BE0ULFZXet8EkBdfquu52KsyYYAZPxiXA
-X-ME-Proxy: <xmx:giOQas2OLdJ4vCHLOR8jMhfVr2tyw-CQpxDt2Q7fGMGmRKCgA0zTYA>
-    <xmx:giOQasabqX5COZwurOKIaF9PlBhW-FRP14X3Lw1NmJ_AQ9xRNM6qew>
-    <xmx:giOQakxILQStI4fYkHh5khjicZk8rS5SP1n_fgq3iqBHDEhyTFtZJg>
-    <xmx:giOQal1cjolE8KhzFiTwWpP7I85s2j-ZZ-zVksXlMlSqFxI_yZZhKg>
-    <xmx:giOQav3y6duKlH4MJy6mMMXvnUw52ihIcPMaYjTGDnlxNYNKGufQVsIk>
+  by phl-compute-02.internal (MEProxy); Thu, 27 Aug 2026 08:02:27 -0400
+X-ME-Sender: <xms:SyeQaoKo4tb8bnlH35Szx0wbWy1NZzrTNp7vZHlBAy7-Fq4uFp-eiA>
+    <xme:SyeQarFtcvavQQbVlnXTqwtmjArg-w4o6Ar6lS5E8jAZUR7yVzO1kMBJNzgQYLg2F
+    dVhC-lD7rF7m35p74_UP39j9dC5zeKcCs-ESRSXIPDxDgRCgZMm4KQ>
+X-ME-Received: <xmr:SyeQasEhQH8TtHVEGB_dbkCL2SlmpH8VDjVoQNmre6hRRmzmxEEpLkqdwsU>
+X-ME-Proxy-Cause: dmFkZTEirA8p/Fg2Vt0IQ3sbf8tygsd6g4HGOD50ZYQXuEOzvK3DDnN+iPIFENoOnOzS8y
+    jl4cteOEz9eDzItp1psFvzkCM8nSgtIDdtXPBJUOsZUni9pif7kyC1W52Cbg5Y5o4uXe65
+    VqjwEt9ummVrtTdk+rpysdpOiyf5vZ9yetWZQoeBBoc+hPU4GIoq6romIJ6qEM6rH+0v7t
+    OBnCBYkMaKf1tYtVOe0M2Ct7auJ71LhpDbgT1P/lz9P3MFwvlMkwlj2+xrVs8UmZMr74kE
+    RP/8923JcU3qWpmArRahVMHSYtCWOWanNLthEMna1K6MswnvpxEy649NmN9nHdrRrGzBbW
+    W/k1jezLaTAJc73o/EXawFGSUYoJR4c+TXIzR7h20OG7HDRGWp0bK9L+wkAlAJYhtry1YW
+    sJ6WIBHNqylTjDtXfscT6bsb+fxgd+t/Ew3ALSICZinX2t+XlOJp4HolZ4C7IdMTv4hHWH
+    +t8SZPqTgfyzBoelXA+4SfIjRWtn9U2ZpWT4mGQvrNivXc7daUyWHp3sDOkyxYDXoQcmbq
+    yV4DrKa+59naxi6Pj7cBVsnTFEGxK7FsGKZcsuXdDqAdLJIuVE6szwyIGDdiPnskEaEVih
+    QWuXHPSyTDwaLSAQhXmFzfXcK8Uhx2Pk992kJhYYzXVdDq7ovWBWIfhGRHxg
+X-ME-Proxy: <xmx:SyeQas6x_CJAKC10gEebMtWvee83j2n4rr6KZqH9u-QrgV25nhpENA>
+    <xmx:SyeQaobfSR2oXdZfYfuMbYFgWhmZIlwMBfH9GtmIZCEj6lSEoQBxbQ>
+    <xmx:SyeQaoswysIcl7AWGL07Q0fQFEhknHXPx5s0slrJlXtovuG8C79AOg>
+    <xmx:SyeQai2eUUcBLktxZoPLt_q8cP0i2UUXT3PadRIqdG8xhqrvOK51Fw>
+    <xmx:SyeQaioTmw4oBvOWObMpNP3HJglgHG0vOGhDDJbax1PZhaE0uqr0wCVD>
 Feedback-ID: i10464835:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 27 Aug 2026 07:46:09 -0400 (EDT)
-Date: Thu, 27 Aug 2026 12:46:08 +0100
+ 27 Aug 2026 08:02:17 -0400 (EDT)
+Date: Thu, 27 Aug 2026 13:02:16 +0100
 From: Kiryl Shutsemau <kas@kernel.org>
 To: Hugh Dickins <hughd@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -84,11 +84,11 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
  Zach O'Keefe <zokeefe@google.com>, 	Zi Yan <ziy@nvidia.com>,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
  	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 04/25] mm/fbatch: lru bit set, no extra ref, while folio
- on per-cpu fbatch
-Message-ID: <apAaWsWPV9QEeVwn@thinkstation>
+Subject: Re: [PATCH 07/25] mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize
+ folio_activate()
+Message-ID: <apAllneItXmyjRPo@thinkstation>
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
- <e0887417-85a7-453e-e733-561dc11db08f@google.com>
+ <16b39f43-d91e-7b23-900e-90cec13837ff@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -97,23 +97,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0887417-85a7-453e-e733-561dc11db08f@google.com>
+In-Reply-To: <16b39f43-d91e-7b23-900e-90cec13837ff@google.com>
 
-On Mon, Aug 24, 2026 at 07:01:20AM -0700, Hugh Dickins wrote:
-> Treat folios on a per-cpu fbatch as if they were already on the lruvec:
-> with PG_lru set, without holding an extra reference. This will enable
-> the removal of most lru_add_drain() and lru_add_drain_all() calls soon.
-> 
-> Recognize such a folio by 0x02 set in the folio->lru.next pointer by
-> folio_add_lru().
+On Mon, Aug 24, 2026 at 07:09:34AM -0700, Hugh Dickins wrote:
+> @@ -355,6 +356,8 @@ bool lru_add_del_folio(struct folio *folio)
+>  	/* BUG_ON(folio_test_lru(folio)); */
+>  	if (!(folio->lru_next & BIT(LRU_NEXT_BATCHED)))
+>  		return false;
+> +	if (folio->lru_next & BIT(LRU_NEXT_ACTIVATE))
+> +		folio_set_active(folio);
+>  	folio->lru.next = LIST_POISON1;
+>  	/* BUG_ON(folio->lru_next & BIT(LRU_NEXT_BATCHED)); */
+>  	return true;
 
-Hm. pfmemalloc (__GFP_MEMALLOC) thingy already claims the bit. Is it
-safe because such memory is never on LRU?
+folio_activate()'s try_cmpxchg() can land in between two lru_next reads.
+Logically, it is safe but I suspect KCSAN would not be happy about it.
 
-Are pfmemalloc and PG_lru mutually exclusive?
+Maybe READ_ONCE() here?
 
-Do we want to be explicit about this? Like, folio/page_is_pfmemalloc()
-shouldn't return true for PG_lru folios/pages or something.
+Other note, page_pool (pp_magic) seems to be using bit 2, but I don't
+think there's a real conflict.
 
 -- 
   Kiryl Shutsemau / Kirill A. Shutemov
