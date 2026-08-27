@@ -1,150 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f11.google.com (mail-oi2-f11.google.com [74.125.231.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBF912F585;
-	Thu, 27 Aug 2026 09:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A9A41DED8
+	for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 10:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787822442; cv=none; b=mY2tR4HBh9bCEeCd/90dGOiHaB8tvMbuyxSBBN+vDJ6tqLqWIdpMm3mTdVrSjQzQ5AIBjsqNsTwfN4StC61WmSza4HCoe2vaZ2UWKcVB9+7/pfk6dDzz/MWN28uIRU4KCWWVyQu0bPwKS7hIYh2y8NdoI4o8akor8GHXfDnDYUI=
+	t=1787825271; cv=none; b=rmbkXT8j5p274Tpl7YjHw527Rgj+EY47A1ZbUP3E5HOAqmS0/L5ziF8brOJtuqqCU1xz9tDeMRGvy3M40DYb2L1eugzE2p//LrZYTj8be81J+u9x53YzIaUclG1OEfw9OvJqU/DasUK5v/RRu7qJLolwB+iiJYQzm3nYzGo3zb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787822442; c=relaxed/simple;
-	bh=F1snZgwjWPb8+c/6wzwH4Q06qio/CD1Sw2VhCuKX5DQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qgMuxyd1bGHp6S/lqwQny0JEt+D1cbqpBwlOpaIPTpkKvs78CnQnrkY7WEGclT5u39CpHu996PLfDuKENYpT0Ivf2DjRPpCsdV2BLcC+AqbHhaxW7oxIR6B7mDCQb4bk7eNos0TD8TWHBmzLVA5NSZiCI3wPjZsmpPoqT+KahA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AewH8qVo; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AewH8qVo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2ED11F000E9;
-	Thu, 27 Aug 2026 09:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787822441;
-	bh=MQ5yrSer67OLzLd9lz4RUmRIM3BfwQlVemrGrqjo/J0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=AewH8qVoW428CLvXuvn03nnnNNP+TgdWg5uRUNFsxqCL+qVKeAjZDW+Tmxv3tAVdc
-	 7UIVsQWQbyBgUKhK2nFQti2iPxw0BTpPo1vq8iLuV88Lgd4H/PB1EF6MYmiaihBni6
-	 G5F6gOD/c/IuPNuv7PXCBiTHbx44v1IRNf32u/Vb0ErvNQVonwYUp8zYU+tDAzZUdx
-	 wy/6HEE8/4+JjE3saEFPne1x2ZAx9PbQZVIk5BRuTTtwzFXfGeJJJXlXU5XunauPqm
-	 Sxc89Jf7AuhJN9ZCDiVpmwkcHiZr7L6Sjj+HRwJWxkrQ4nRUqxV3uAdsRHdH+ppbBk
-	 YaSl01yghZ8oQ==
-Message-ID: <1dc8f7d5-c923-410a-a262-dc21c9e65420@kernel.org>
-Date: Thu, 27 Aug 2026 11:20:28 +0200
+	s=arc-20240116; t=1787825271; c=relaxed/simple;
+	bh=RVzOCFn/4sEqFpOvd1a0857XGxya77/cuhUokJwqr6g=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AcaWOAprchU2o3odtQ8T3z+oVpEJVSJnWF0xGtWrGqMoEMwph2LVRDgu9qRfPEAg0OCOsQYiiYiTj8vDHZGAuTTB1YHVoIZ7Agm52PKJK4BoEffUuC82/Z/FPrFZ9xLoelUVVBdkwUzlQAeEB8E9regKwnLF9EIWsHcACPrtvLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi2-f11.google.com with SMTP id 5614622812f47-4af7193adb7so174958b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 03:07:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787825264; x=1788430064;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=p11dZYhzWvRbix8e2dTeUc0wy381a09q511ebbLUCIA=;
+        b=n3Qc6traG3tEhLZMU9K6l3vO2eBxulcXSSiotBTKJoztzMTDOeEzhZ80wm8WjeZlhI
+         Yc5whwyH/Nbk267HYAeyaDsu9bJzpqjgmVw2qwn+vzIDw2aNGt8JI3nqlZngvEUeYRvJ
+         bsPWGPzeFAx13N1EY6itpaOLCqV9N7Msm/gVZGgtPzvRb0qQB1Qss2qvd1fGWBPLRFZQ
+         2ucVDk1KYmiblennRA4H4dV8wcvBHadP2qHSoyF3gi2R+VLn0n3XTBgQr+vj/vz/fayx
+         DcgspBkB9UYa2/BlaBWi3tL5rGdq7DrQeDTs5B8I8bum+Y+gXyoh7h/FU3yPTn1vF+Ja
+         fSjw==
+X-Forwarded-Encrypted: i=1; AHgh+RqTVgqH6ebwWspT3NtIZIcjtZZBL2BHZPYsVC2Zbr7xQD5futRPFH9nzX/rVdL/bXjjTQn/7huFMXD7MA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mAQz9X2PqG/idHcWCKk80sFvkXQoAjSN8hTOTAqGUi5K9H1V08
+	BiQD42JV+AmBz9ZYiDPM+xhFzA0VDGmNpK0QmTAXo/ad8Z5lp0jk+ZaZaI/tukW+GUk2U/4erQu
+	M5SVhsIGg7Zr4WpIwFZsKNMuxOGNxdfAR0fOQ9JN3anJAAdVkCQUe9FUUOkk=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH alt 13/25] mm/fbatch: no lru_add_drain() to
- collect_longterm_unpinnable_folios()
-To: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Ackerley Tng <ackerleytng@google.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Barry Song <baohua@kernel.org>,
- Binbin Wu <binbin.wu@linux.intel.com>, Christian Brauner
- <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Christoph Lameter <cl@gentwo.org>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, JP Kobryn <jp.kobryn@linux.dev>,
- Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>,
- Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>,
- Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, Matthew Wilcox <willy@infradead.org>,
- Mel Gorman <mgorman@techsingularity.net>, Miaohe Lin <linmiaohe@huawei.com>,
- Michal Hocko <mhocko@suse.com>, Minchan Kim <minchan@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Peter Zijlstra <peterz@infradead.org>, Qi Zheng <qi.zheng@linux.dev>,
- Rik van Riel <riel@surriel.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan
- <surenb@google.com>, Vlastimil Babka <vbabka@kernel.org>,
- Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>,
- Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
- <fbf3fa74-c646-8855-17e4-e8b35dfd9c14@google.com>
- <333bb765-a36d-e07e-d3c4-5ea2f1cadfcb@google.com>
- <5d42fbfa-1cc3-4161-8ba0-7318267576a1@kernel.org>
- <e10bc806-f995-e48d-a24e-8872f0a71689@google.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <e10bc806-f995-e48d-a24e-8872f0a71689@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6808:c297:b0:4a1:296:adec with SMTP id
+ 5614622812f47-4b366a0113cmr17051837b6e.15.1787825264331; Thu, 27 Aug 2026
+ 03:07:44 -0700 (PDT)
+Date: Thu, 27 Aug 2026 03:07:44 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a900c70.50659fcc.60cd.0013.GAE@google.com>
+Subject: [syzbot] [block?] BUG: unable to handle kernel paging request in blk_mq_complete_request_remote
+From: syzbot <syzbot+2e3bf0bd49acd9b21d4b@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/27/26 11:16, Hugh Dickins wrote:
-> On Mon, 24 Aug 2026, David Hildenbrand (Arm) wrote:
->> On 8/24/26 16:55, Hugh Dickins wrote:
->>> collect_longterm_unpinnable_folios() has no use for lru_add_drain() nor
->>> lru_add_drain_all(), now that the per-cpu fbatch references are gone.
->>> So remove the recently added lru_cache_drain_for_folio().
->>>
->>> Signed-off-by: Hugh Dickins <hughd@google.com>
->>> ---
->>> Alternate version for use once David Hildenbrand's two commits
->>> here have been pulled from mm.git into linux.git for 7.3-rc1.
->>
->> For 7.4 we expect another user of the helper in KVM guest_memfd code (the
->> primary reason why we introduce the helper), so depending on when this series is
->> ready it will just remove that user as well, or we'll need some coordination
->> between trees.
-> 
-> Yes, I could supply an alternate alternate version, providing an empty
-> stub for lru_cache_drain_for_folio(), so Ackerley's and my series can
-> proceed (or not) independently. Later. But at present your patch or
-> patches seem to be in both mm.git and Ackerley's series (17/46),
-> but not yet in Linus's tree.
+Hello,
 
-They are in mm-stable, so they should go upstream this week. Anyhow, that's all
-stuff that's easily resolved later.
+syzbot found the following issue on:
 
--- 
-Cheers,
+HEAD commit:    68f892e99df9 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=135bb415580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d1128bc53f2ef7f3
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e3bf0bd49acd9b21d4b
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+userspace arch: arm64
 
-David
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f98dd20a7b98/disk-68f892e9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/441f1ad32549/vmlinux-68f892e9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8da5227b7dc8/Image-68f892e9.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2e3bf0bd49acd9b21d4b@syzkaller.appspotmail.com
+
+Unable to handle kernel paging request at virtual address dfff800000000031
+KASAN: null-ptr-deref in range [0x0000000000000188-0x000000000000018f]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0
+[dfff800000000031] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1]  SMP
+Modules linked in:
+CPU: 1 UID: 0 PID: 8684 Comm: kworker/u8:27 Tainted: G             L      syzkaller #0 PREEMPT 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/07/2026
+Workqueue: nvme-reset-wq nvme_reset_work
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : blk_mq_complete_request_remote+0xc4/0x858 block/blk-mq.c:1297
+lr : blk_mq_complete_request_remote+0x88/0x858 block/blk-mq.c:1289
+sp : ffff800095647900
+x29: ffff800095647980 x28: ffff800095647900 x27: dfff800000000000
+x26: 0000000000000000 x25: ffff0000c648326a x24: dfff800000000000
+x23: ffff700012ac8f20 x22: 1fffe000192284a4 x21: 1fffe00018c90648
+x20: 000000000000018e x19: ffff0000c9142400 x18: 1fffe00034bbbe28
+x17: 0000000000000003 x16: ffff800088b37000 x15: 0000000000000000
+x14: 0000000000000000 x13: 0000000000000001 x12: 0000000000000004
+x11: ffff700012ac8f3c x10: ffff8000884bb5d7 x9 : 1fffe00019228482
+x8 : 0000000000000031 x7 : ffff80008281b4e0 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008281f228
+x2 : 0000000000000000 x1 : ffff0000d604ba80 x0 : 0000000000000000
+Call trace:
+ blk_mq_complete_request_remote+0xc4/0x858 block/blk-mq.c:1297 (P)
+ nvme_try_complete_req drivers/nvme/host/nvme.h:823 [inline]
+ nvme_handle_cqe drivers/nvme/host/pci.c:1590 [inline]
+ nvme_poll_cq+0x4ec/0x106c drivers/nvme/host/pci.c:1621
+ nvme_reap_pending_cqes drivers/nvme/host/pci.c:2078 [inline]
+ nvme_dev_disable+0x384/0x540 drivers/nvme/host/pci.c:3328
+ nvme_reset_work+0x510/0x69c drivers/nvme/host/pci.c:3490
+ process_one_work kernel/workqueue.c:3322 [inline]
+ process_scheduled_works+0x788/0x10b8 kernel/workqueue.c:3405
+ worker_thread+0x798/0xbd0 kernel/workqueue.c:3486
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:838
+Code: 97d02797 f9400288 91063914 d343fe88 (38f86908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	97d02797 	bl	0xffffffffff409e5c
+   4:	f9400288 	ldr	x8, [x20]
+   8:	91063914 	add	x20, x8, #0x18e
+   c:	d343fe88 	lsr	x8, x20, #3
+* 10:	38f86908 	ldrsb	w8, [x8, x24] <-- trapping instruction
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
