@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3769837F32F;
-	Thu, 27 Aug 2026 17:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D072641F5D5;
+	Thu, 27 Aug 2026 17:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787851021; cv=none; b=AWqpYfQ95KsPtfjAp264dSbxhKbiwVOumO1lbdLYEF7zGScYtAel+SN2S3Q4By00hercwK4goRNIy7tIXVS+vJTKMK9dxJt1lgpzPhqv7m5d/ZK260cHRnh7GHg9g4SB/d38YPR3GUFssfKYPZ3fCHD4VMI7dlfiwsEnYy78fwc=
+	t=1787851444; cv=none; b=GLNmndFHvT7hMA4LFoLAPYq1yOKQRaQGFBcpIqk3m/+B4Tko8yLd+57QUleBCSdykKu8R0BVZOBNEWaPqcFNXRc3Nz35jLNlqDZvE9TyujW1031OH11smtS/ITumAgIaAmgf19wN0rh0orhvB5wuGMkoBdrM7v19QhryHA+TG6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787851021; c=relaxed/simple;
-	bh=Nc83ONEDUXZJgXQtDlkuMA7k0Sbew6WY/be9VPAWEAQ=;
+	s=arc-20240116; t=1787851444; c=relaxed/simple;
+	bh=H5ZRMIE38fbrqt3mKWehWW9NwT08Qp2Sc2+mr9vS/as=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BgFZuHXVf3EOtn36T9An0DUn2/BpMYWCv9rqRxqGyFPTpUdLSLr3Kut4L7LxshUYqUm/mHHPGjGRrcfkyrbUxlvICgppNhWELKJtdkKZ8iBJQtedaE6/uK6YP6OR/cvvTMIQrESyAF2bwbfONtxZyFivr/4dQGIUiarwgxWIaVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HIAzlg3E; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=uMdx21Ywj2lkbjkW4VZxumdUJZ9xex+j5iyMQGHwf92a0M1VGCxYoNOxrxeT3etBUNP64zp8Xh1ws9L1vOsYQUxGgP4rfb7uiMCMtamBNixRnCPKeGj2To/dTAa6t2bc2Mk/skiJ+iGQTHYTejRPKHwmXCoJTk6fMufpIPuJoHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EzLpiBjN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HIAzlg3E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63DD21F00A3D;
-	Thu, 27 Aug 2026 17:16:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EzLpiBjN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B14011F000E9;
+	Thu, 27 Aug 2026 17:23:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787851020;
-	bh=9FMyam65/eD/ZbqglAxkrA726lGv09BnDgz9N86rBL4=;
+	s=k20260515; t=1787851443;
+	bh=BjfGfa7gS4D2wDK9mCCSlkjUdk96fAt8iFKlJ66xdXk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=HIAzlg3ECKZVs6xzOsrw5gyORuG5PWOTZHEB/bfgLKhzYVMoKRXCKO/pDpo8BAjZ3
-	 Jp/0FlG3B69eOYDMVYrFZhj0Xvnagdl4uAFY0sSQRP/HoPgTa6q7anNJ3838q5pfvr
-	 jTopbnKKC5OJAtegtZwE+IB3ZvpKWgFP3y/q8fRl2IJXMPRhIGjmwwfZ4Fo4rxdbS+
-	 vLhKFCtF5jTT7DEZLlviC3hnT42AxRe8vaExvYi8G94FZKTdUI2VLBNrN615wfUw76
-	 o9hNxiWzIBfNXXWFSCIgEzxAWh74QdhyAivKRm6HrVgQg0rSlLTbjuQmBqajzzVrel
-	 B41emjGw5sOzg==
-Message-ID: <f1e51e11-3a0a-41e8-ad5f-817a4a26bc73@kernel.org>
-Date: Thu, 27 Aug 2026 19:16:48 +0200
+	b=EzLpiBjNYRL+cecuiQoLhAzu7P8qyHCBg5rZkgBcp23SnYHYI83dN1J3k3hnXWUun
+	 sf5NLBe4/3OssrfnO52PXIBY48h6Xl9YhU1d7FCXkCP2aLD0U1fdzcIBv3WdqSgFIz
+	 hjadHXoPzSbMVpUQiJ+eVBHaNsUAcC6l+ka6F9DHPXTRCtvOgwIhoh0mup9ELuSwDL
+	 MfL8FqK5PMcINwus6FEHP6gldl8wXFCgjAYaKrMo2JcyUVvoFRvoOWZfcgT/LyrVJu
+	 9tcvciVYTK+I3cB2kbcTTqpwx3p1mK4QvoFlxEMKppupZfkHiMpFIOMhFXMGViy5Lu
+	 9L8/+h48xIwDA==
+Message-ID: <7fb30b85-ea60-45bd-aef2-494943b524a0@kernel.org>
+Date: Thu, 27 Aug 2026 19:23:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,7 +35,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/25] mm/fbatch: drain lru_add_drain() and _all()
+Subject: Re: [PATCH 01/25] mm/fbatch: remove !CONFIG_SMP special case of
+ folio_activate()
 To: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>
 Cc: Ackerley Tng <ackerleytng@google.com>,
  Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -62,6 +63,7 @@ Cc: Ackerley Tng <ackerleytng@google.com>,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+ <3f18ab7d-c12a-d2a3-4d3e-f9908f94f27d@google.com>
 From: "David Hildenbrand (Arm)" <david@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=david@kernel.org; keydata=
@@ -108,56 +110,38 @@ Autocrypt: addr=david@kernel.org; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+In-Reply-To: <3f18ab7d-c12a-d2a3-4d3e-f9908f94f27d@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 8/24/26 15:49, Hugh Dickins wrote:
-> This series was prompted by lru_add_drain_all() appearing in watchdog
-> backtraces: not to blame, but blocked on an unresponsive CPU to run
-> its workqueue. lru_add_drain_all() is a heavyweight operation, which
-> we often hope to avoid by a much lighter lru_add_drain(); but even
-> those local drains can aggravate the lruvec lock contention which
-> per-cpu fbatches are intended to ease.
+On 8/24/26 15:52, Hugh Dickins wrote:
+> 3.0 commit eb709b0d062e ("mm: batch activate_page() to reduce lock
+> contention") brought in an ifdef CONFIG_SMP around activate batching:
+> https://lore.kernel.org/linux-mm/20100805140755.501af8a7.akpm@linux-foundation.org/
+> shows a sensitivity to bloat that day, not any incompatibility with UP.
 > 
-> Now let the folios on the lru_add and other per-cpu fbatches remain
-> there, isolatable, with PG_lru set and refcount unraised, just like
-> when on an actual LRU. Then many calls to lru_add_drain() and _all()
-> can be removed.
+> No other batching here has a UP alternative, and it's a bit confusing:
+> simplify mm/folio.c a little by removing it now.
 > 
-> It's something I've wanted to do for years, tried several times, but
-> only hit on a good way to do it a few weeks ago: now it's uncomfortable
-> to watch others wrestling with the drainage, while I'm sitting on this.
+> Certainly we can reduce UP bloat (and/or 32-bit bloat) by, say, lowering
+> FOLIO_BATCH_SIZE from 31: traditionally 16, 14, 15, then raised to 31 by
+> 6.9 commit 9cecde80aae0 ("mm: increase folio batch size"); or by giving
+> just the static per-cpu folio batches a type of their own with a smaller
+> array size on UP (1? or a little batching worthwhile even on UP?). But
+> not right now, it's orthogonal to this series.
 > 
-> The key idea came from the "if (!folio_test_clear_lru(folio)) continue;".
-> If we don't mind missing to take an action on rare occasions, then maybe
-> we won't mind taking an action on the wrong folio on rare occasions, so
-> long as it is a folio consenting to PG_lru rules.
+> And I suspect that the old ifdef led to lru_activate being placed last,
+> whereas it's usually the second most popular fbatch: move it there, to
+> match cpu_needs_drain() comment "Check these in order of likelihood that
+> they're not zero".
 > 
-> No new locking, but relies on folio_try_get() and  folio_test_clear_lru()
-> even on the lru_add fbatch; with use of bits not set in aligned pointers,
-> and some try_cmpxchg()ing.  Speculative references to folios are already
-> accepted: this adds another source of them.
 
-Sounds very interesting. Thanks for looking into that, LRU caches are a big pain.
+This fits the theme of removing CONFIG_SMP conditionals where they are not
+really warranted and cause maintenance overhead.
 
-> 
-> Performance? You (and the bots) tell me. I'm considering this as a
-> cleanup, to make life easier for developers. I expect that some loads
-> will show improvement, but also expect some disappointments (perhaps
-> I go too far against lru_cache_disable()? or not far enough).
-> 
-> The timing is not so good: middle of a merge window is not a great
-> time to present new work; but I hope to be taking three weeks off in
-> two weeks time, so best to get this out in the open early, while I can
-> respond.
+Let's see if this actually creates real problems we have to worry about.
 
-I'll be out myself next week. And I'm sure my inbox will be even more of a mess
-than it is right now when I return.
-
-> If it's welcome in principle for 7.4, but too many changes
-> are demanded, maybe someone else can step up to shepherd it through.
-I'm certainly interested, my workload is the limiting factor ;)
+Acked-by: David Hildenbrand (Arm) <david@kernel.org>
 
 -- 
 Cheers,
