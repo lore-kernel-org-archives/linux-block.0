@@ -1,152 +1,178 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501F623A564
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 03:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787888041; cv=pass; b=t/OCyeBULwDT0OPyHLMMpqfxmIb0KD9A5TIBnf0+kUDAhPQgjzfA/5m57seyK36mRZ7jFCwjIb6Z8J6ybSgqCu4QDDeJWX7inkzRaCxTfa3ywRoEOwszleBo4qzOMUva96Of6vNmGra4Pet6/Je5OQNbW7Bioh1hF8PGSfNIrD8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787888041; c=relaxed/simple;
-	bh=eVCUgnuZPY9rp4G0hxfWBoh/8wdCFKKRU8Eq9Q7yXbg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PBGf3o9+i0YMtxIBw9Axi073+IgZpGtKBYGgIChwL+TYETV9J59S3F4eVs5L3L4HfkYnM0MnMM2nRg1hEJuh++lBPbd7AwsuYuKqueAVqVciK0ihPjEKxmwRM9AzjMysO9j42Xul7q8izUOpVAk7lcaPO7Up9VUNB59//uJF5Qw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qoJ0brIm; arc=pass smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474911C69D
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 04:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787891036; cv=none; b=ERMFLczrzKRVlYEhvznUskPWc6PRn47KQM3T3hpeMfj2DriWUnEjc4CrsISmegOQCETmn1hcU9N6RUVq3plAE1p44zRG43HKu0i0IjpmAAVQzkwDombGkBNGu1S+iO2rsk1TYBmlz1jnsbbHhVBtgQO2IqIfDrnPOA81hkbEMDs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787891036; c=relaxed/simple;
+	bh=DnZkF4y22JAJTSK2MwWTqrc1Kr8ta5ni+z0wpRWAhpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rrOn4LeyOequZwHq3rRfm7o77I+WZRsRU69VF4PubmPWalM+30RPhbSNr+LPHtU0R55TeIrcypy4vT8Y8gjb6N+rNMXqHP9C0vwB1OZkJ/N3nPuWbIVNHkSXmF5vtontg1gxXOrSg7o6KXnDyrlnpKor5+FbeorbT4lprR3YAzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CuSEpZN0; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qoJ0brIm"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7f3b01b8996so38026a34.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 20:33:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787888039; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ipaf6LnB5ih0nD3LgRgh8Y12rbLJb3MnAPwqebhAqTkObUgwLNzL93+sN6w13uokMX
-         wVb60b4bQANJ+WvyT7WCpGFQYpzYI7Fm5ZXpcN4JQZU5R/Zbui07+7hw0YBQTILYZxYx
-         fU/HpFr6myxNCIjV0Yrh6+MGPk42nWn3bLGekNbot0BtRWhxDNo2frNNMAh0FtR75tpt
-         BhPOvWUN1PnArwtWCUhAzB5VIhKYf7ItnOosnoo8X9r5rmL3WMYr7fy/tShfuSswmke0
-         tmqNg7BPpCN/vOEkVYqe7HfTQETkzuTYkMy0fsSy9CkJrceiVDIrJmvxKWlrDJ5y8UCf
-         kVRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tJ6GRA/2LwQW6/jDEIjrj/TZS2ZKHOJ3XYsZbyYACDw=;
-        fh=SOjbjKFzxXZtXkjy/NqBwfs/FUHQT1+/Oh1OreiEL3k=;
-        b=SPzoJWgh3LBmRP3kJ9EJluVHzBgU5Vikh9i2zmFdrOFxBRMqrbZi0/0B59Yx1lux/R
-         ZInwiBh4F9TEWxqz0HGtARR7Mgjs3uqJKFoJiUre8ZvTYYA5Py8PRwAbEKsS9buKDto2
-         cYY4OB9SDUCU0rh/QpKu6HSuMIzT3H0NobU5mzWDQAV9Cg1X2woQRi62j9GBkd1To6a4
-         aMKCdSS//J3LmM7Jqz+xylKNCD7TDrfruF20+Kva80LqHMoOlWveXD35m8z99tIHPqr4
-         yfczGJVYZExZ6nGHLWcQvpnUAvKaB9T8ouXbZR/39wjlYe/3midtS1COjeATQSk/UmSV
-         vRrA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CuSEpZN0"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-cc1c8d4a959so499975a12.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 21:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787888039; x=1788492839; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+        d=chromium.org; s=google; t=1787891034; x=1788495834; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=tJ6GRA/2LwQW6/jDEIjrj/TZS2ZKHOJ3XYsZbyYACDw=;
-        b=qoJ0brImXYW2jxuJ/+X9STf16jjXZ92rLmZ4786e6MVSpMWvhHnkJ14DzuZd++/cjq
-         iXnv5vvRllyON65+nnXaCJ/b6+YH56o0zedDj/zHvJNlAGDchuDSruVJyLQBrV8WAXWs
-         SravIim8345TcwwvXjYeU75tQ4kL7jLhRajFS1OSDokJJV/2VK2hrLyNHeytc09YbPBE
-         jM2IhEqSV04jlyvKp+lPOuB2WYY9aatRDk+LOTBeBnMlDt3YlDDVrTb0oSdatP/JD6YQ
-         IL0Ud2rj4HI2GkkPVHkPeM+vv4EnsEOhUTSW45cOfdJ43h4sIYmtFzLdciJnJMx53rpl
-         0bRw==
+        bh=VWPkFKtjckaHQlGnKFt7IY0lwvB1Zo3ZClT5DILJKpE=;
+        b=CuSEpZN0pUsz+nThtjJ7CWtrdh4ucaAkZQAQL7inUMZwOPCiOOxe+YKQ2+FyGu8XZx
+         QLB6YXU89U0Dwf0Q5U9Du3Mz6/oaP1lR20ug/ZxVXPlDkvQebAoJG0zSjT/XUW8R5SCc
+         9HLtWsJGmBlRSFAX0MvaYLHTLew+CHEy7rSas=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787888039; x=1788492839;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1787891034; x=1788495834;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=tJ6GRA/2LwQW6/jDEIjrj/TZS2ZKHOJ3XYsZbyYACDw=;
-        b=Hjk3kXcXZEgikMVDLuP+fa40Z19YWE8IooLMR8CzzYkx6Z0BGiipj2YwOYHt4QIjpG
-         bibELfJtgV++K6yEQ+E1EtcET/6i0y2Y2GaCQ4GncKtHYMTEuySLkVmkAeNLqhUkWb5G
-         nkQnke+8XWMP7u/Dl/ZSdwgCGjCaFoQCZ5wRcYoIHTPaxojs5XkmxpNBiMeS8TlIhrW3
-         zAndBX+If4p0yQ6SvKHoeoXMtJVuqJrMBgdGILIiWbG42N3PFqeVwRT9R4oIT4ez6z9L
-         g+QnM9u4AeGllosMx8RtjZvh05Lg6l2tgLCLM3rjGJZKNIdYKV4F9o47kMgzLOdCyfy8
-         K0EA==
-X-Forwarded-Encrypted: i=1; AHgh+RrNaPRODGEW95Vyh89nC7g/mLKOqQ9NIFphAS/LcPQCFbjt+xtDYcxIKY9HCepoZu9ELnmgysOhJmtoFg==@vger.kernel.org
-X-Gm-Message-State: AFuF++ngwCd1d9rQRcaeM4Schd0cwB1mzyiIKLoHi1/ILLnxit5vDJN5
-	Ha/88wn19X4CiVnoQu2KHUEsPxv0GJaCfy67fVhp835JxH6gfJdYD6uGzjoJu2GLV1ol65mFuUz
-	4zgQlI1FwXX6oNUO80fRwDTcYrtw1GUA=
-X-Gm-Gg: AR+sD100K6h4sHY+j5gMSS9Mmm253/oxICt5WGkrVwyvg1VE97qviyRut1uCN4+HlXX
-	tpXXKYYp3IWeg2QgYOfWncNQiV/vNS8v71i9+u3LDgoHFlcP/xM1Xn2xzSi3w006v5Xeq61gHq3
-	vUGkVF3iGU0fs20ydQoSMDXPJXbKvYw0caLiaHsaVJPrlxU3wG0GgNOV59xC9VjDIgeQNx9jbJc
-	+MqAautDeCJs3s4DN4r2Hk9+dYG9+PyWPik2B592/YdlyGzSRng+CCXwpcSTb05ZOddbfnUiYQi
-	O0K7e8mP8EDwfUXf49j0IKpTBUqA695yKxpVFhm33M7L2rIJ3k98i28W2j4ORd21iKIqAFCv9vQ
-	G7azKmucQYTMb+mp6cZxzdxvfWpo7UFP+BQe2sf1OqUvy
-X-Received: by 2002:a05:6820:340e:10b0:6b1:67e1:fc8e with SMTP id
- 006d021491bc7-6b1c66e6ce5mr2559540eaf.25.1787888038951; Thu, 27 Aug 2026
- 20:33:58 -0700 (PDT)
+        bh=VWPkFKtjckaHQlGnKFt7IY0lwvB1Zo3ZClT5DILJKpE=;
+        b=IeQ+64QW0jQUP9rICAbprxvWOEzDBlZwj2qdz5VKdITyw+nk+24W+xEFE9OtJZyhK9
+         OaocUG6s454M/ovTZcS6cw07NYEE/lp6CVFp/wTEeLJBKaMpbN1o22w8BElOI429HC1g
+         0qTLe6bfDmSSA92AbZjRmNa8cLEWbtzoCKkEyBI7ovWZdQv0L9qtWW1QagE+YA35hLJm
+         axrcA9cexbO3dR8ADE58io4AqrBA2P4vUTi3ePTeJFIo0XBrSKeWoT1XDlZnCBjf93i2
+         +Rf9i4qmIovOcrIqOF01S7nUTbLxyG0Aynqd6rN0xWQET3764Q3YsO6BBsZoIhp7sCZ5
+         UXtQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rryk4gYK5FazXbTtyh2p5C1mR4vqu5m1Uq6cHz/CRLOsvok2uWKsF6YhhTADp/aMy391zh/NxDHB14RrQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++nZOZXvG3qagFe9b4mZa2zUUgFRCHlCYGOKi4EukCxqeDcJcV81
+	n9T2WCYy4WxJ7oprZb35BQXksy0BVbBzdNA7bt2KItz0B4Ut3Q8QE24XUxiiB/jDZw==
+X-Gm-Gg: AR+sD138OZah8GIhjgIL/6k+BPCFBDxnjWfW8+EWcQZebTrR+YbYU+DKpLDhqdK/hRv
+	0KDl4aqk2vzy2HSY7k+rjCOZ7zEZ8awDwiqeh1k/GJnZRQ6rKppL1AWkX1fM9XrTsdrThcghyjA
+	VEQB5cRHnNXxoGqIS2LDzEiq/uz0gfUfbcVUqUnTxSOAebzbvyYV1eVZvTMkSYHwnGScouXaVSO
+	RcFH3cDsCBo5da2qzfx7R5QIrl/7144XKsXsAV2e0KzFKDhbNAS8OibtN8wbFwR5HKHWqUmx5kq
+	aDJCgzLCtXFn5t1D8wjkVcTRSZzTfFjh1ekzHuar7PwvN8vFLYaorfEp+WWp/lWRG7puRtBoQXE
+	0JaLYXb8nnbYV72SMZjY1O8jQFujqd7fki+sUHKw6/UO1QEqwstGhXtdkOuZNj/Dcnh5/3b8gAl
+	RSKUbRK7B1X5knO5xn+31m/w4AFrB87IsiKnXYMkdUqvBUcTTiXexuiuwiQIz8RzTGfTgJzVENa
+	48x1uSWHEfTF4Ru0KGLKuQoaSgl4Xb8klaAYA==
+X-Received: by 2002:a17:90b:1d46:b0:380:21b7:e727 with SMTP id 98e67ed59e1d1-396d0f8d841mr8257407a91.14.1787891034541;
+        Thu, 27 Aug 2026 21:23:54 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:ff0:ad84:24b0:9e52])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396ddc08266sm823074a91.11.2026.08.27.21.23.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2026 21:23:53 -0700 (PDT)
+Date: Fri, 28 Aug 2026 13:23:49 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Hao Jia <jiahao.kernel@gmail.com>
+Cc: Brian Geffon <bgeffon@google.com>, minchan@kernel.org, 
+	senozhatsky@chromium.org, axboe@kernel.dk, akpm@linux-foundation.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Hao Jia <jiahao1@lixiang.com>
+Subject: Re: [PATCH] zram: fix idle age_sec underflow in idle_store()
+Message-ID: <apEK-yRTQR8VdT3e@google.com>
+References: <20260825092316.69658-1-jiahao.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260827185722.3234622-1-csander@purestorage.com>
- <20260827185722.3234622-2-csander@purestorage.com> <CAJnrk1YfTg-Lz+TmM+c=Asc8N4QGuY9_g8zUXtaNr4O7hG1Djw@mail.gmail.com>
- <CADUfDZoEosgMMQ47BDWBskTOZrYZpg6VUT5c4kwczDLRLXYk=Q@mail.gmail.com>
-In-Reply-To: <CADUfDZoEosgMMQ47BDWBskTOZrYZpg6VUT5c4kwczDLRLXYk=Q@mail.gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 27 Aug 2026 22:33:46 -0500
-X-Gm-Features: AcwNN1V96G10EnqkMmlBEbQoJ8ihVOlJhML3SIuW3TsrH3jrmu0CBU7aGovmtII
-Message-ID: <CACVXFVOLBVVGwfo+mbn+4jnGKZS66dL_2ghsKiaT6buscWJg6w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] io_uring/cmd: split io_uring_cmd_set_res() from io_uring_cmd_done()
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Joanne Koong <joannelkoong@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	Bernd Schubert <bernd@bsbernd.com>, Miklos Szeredi <miklos@szeredi.hu>, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, fuse-devel@lists.linux.dev, 
-	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260825092316.69658-1-jiahao.kernel@gmail.com>
 
-On Thu, Aug 27, 2026 at 4:44=E2=80=AFPM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> On Thu, Aug 27, 2026 at 1:05=E2=80=AFPM Joanne Koong <joannelkoong@gmail.=
-com> wrote:
-> >
-> > Hi Caleb,
-> >
-> > On Thu, Aug 27, 2026 at 11:57=E2=80=AFAM Caleb Sander Mateos
-> > <csander@purestorage.com> wrote:
-> > >
-> > > In preparation for setting the io_uring NVMe passthru CQE results fro=
-m
-> > > the blk-mq request completion rather than the task work callback, spl=
-it
-> > > out functions io_uring_cmd_set_res{,32}() from io_uring_cmd_done{,32}=
-().
-> > > This allows io_uring_cmd_done{,32}() and __io_uring_cmd_done() to be
-> > > consolidated into a single CQE-size-agnostic function with 3 fewer
-> > > arguments than __io_uring_cmd_done().
-> > >
-> >
-> > The conversion looks logically correct to me but the interface feels a
-> > bit annoying / fragile on the caller side.
-> >
-> > Is there a way nvme can get what it needs without changing the other
-> > callers? Would it work to just keep the existing
-> > io_uring_cmd_done{,32}() as is and add a separate API for special
-> > callers like nvme, eg:
-> >
-> >   void io_uring_cmd_set_res32(struct io_uring_cmd *cmd, s32 ret, u64 re=
-s2);
-> >   void __io_uring_cmd_done(struct io_uring_cmd *cmd, unsigned issue_fla=
-gs);
-> >
-> > where io_uring_cmd_done{,32} would then just be inline wrappers over
-> > those? afaict, then only the nvme callsite would have to change and
-> > fuse, btrfs, block, ublk, and scsi_bsg could just stay as is. Do you
-> > think something like that makes sense to do?
+Adding Brian.
 
-Yeah, this way is definitely much better from a driver viewpoint.
+On (26/08/25 17:23), Hao Jia wrote:
+> After commit 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking"),
+> idle_store() computes the idle cutoff as follows:
+> 
+> 	cutoff = ktime_sub((u32)ktime_get_boottime_seconds(), age_sec);
+> 
+> Because the left operand is cast to a 32-bit unsigned integer, when
+> age_sec exceeds the current uptime, the subtraction wraps modulo 2^32
+> and the huge result is zero-extended into the s64 cutoff.  mark_idle()
+> subsequently marks every entry as idle instead of matching nothing,
+> breaking the intended semantics of /sys/block/zramX/idle.  For instance,
+> running echo 86400 > idle on a machine up for only two minutes causes
+> all newly written pages to be marked as idle and handed over to idle
+> writeback and recompression.
+> 
+> Drop the explicit cast to perform the subtraction in signed arithmetic
+> again, restoring the previous behavior: an age_sec greater than uptime
+> yields a negative cutoff, and one equal to uptime yields 0. Since a
+> cutoff of 0 is now a valid computed value, it can no longer double as
+> the "all" sentinel. Switch to KTIME_MIN instead, which no ac_time can
+> be after.
 
+Can we instead just reject such cases?   It should be an error to
+request writeback of pages that are 2y old on a system that has
+uptime of 2d.
 
+Maybe something like this:
 
-Thanks,
-Ming Lei
++             time64_t uptime;
+
+-             if (IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) &&
+-                 !kstrtouint(buf, 0, &age_sec))
+-                     cutoff = ktime_sub((u32)ktime_get_boottime_seconds(),
+-                                        age_sec);
+-             else
++             if (!IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) ||
++                 kstrtouint(buf, 0, &age_sec))
+                      return -EINVAL;
++
++             /* No slot can be older than the system uptime */
++             uptime = ktime_get_boottime_seconds();
++             if (age_sec >= uptime)
++                     return -ERANGE;
++
++             cutoff = uptime - age_sec;
+      }
+
+We are probably fine doing just basic arithmetics operations on those two.
+One is u32 the other one is s64: we should be fine just doing >= and sub.
+I guess we also can use plain comparison
+	cutoff > zram->table[index].attr.ac_time
+in mark_idle().  Or am I hallucinating?
+
+[keeping the rest of the original patch]
+
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index a9b3bb1d3bef..da51f70b7121 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -438,7 +438,7 @@ static void mark_idle(struct zram *zram, ktime_t cutoff)
+>  		}
+>  
+>  #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+> -		is_idle = !cutoff ||
+> +		is_idle = cutoff == KTIME_MIN ||
+>  			ktime_after(cutoff, zram->table[index].attr.ac_time);
+>  #endif
+>  		if (is_idle)
+> @@ -453,7 +453,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+>  			  const char *buf, size_t len)
+>  {
+>  	struct zram *zram = dev_to_zram(dev);
+> -	ktime_t cutoff = 0;
+> +	ktime_t cutoff = KTIME_MIN;
+>  
+>  	if (!sysfs_streq(buf, "all")) {
+>  		/*
+> @@ -464,7 +464,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+>  
+>  		if (IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) &&
+>  		    !kstrtouint(buf, 0, &age_sec))
+> -			cutoff = ktime_sub((u32)ktime_get_boottime_seconds(),
+> +			cutoff = ktime_sub(ktime_get_boottime_seconds(),
+>  					   age_sec);
+>  		else
+>  			return -EINVAL;
+> @@ -475,7 +475,7 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+>  		return -EINVAL;
+>  
+>  	/*
+> -	 * A cutoff of 0 marks everything as idle, this is the
+> +	 * A cutoff of KTIME_MIN marks everything as idle, this is the
+>  	 * "all" behavior.
+>  	 */
+>  	mark_idle(zram, cutoff);
+> -- 
+> 2.34.1
+> 
