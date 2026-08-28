@@ -1,217 +1,139 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FA046A603;
-	Fri, 28 Aug 2026 15:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EBD353A72
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 15:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787929729; cv=none; b=NaSGZCyxI0dQJggxIVE6k1er/RmIylXN/RfrIOfegN4ing8Qu0pHSocf7rmgrUXadhD02H7UNrKj6NbN4RF8ILvt6mndLRvgPVHPTFUQJmgNPD7u0Lrxt27qQgsAWcn9OiMgnBJsbJyuxi83lyEySzxKKDqpQklzCSBRBbDGrpU=
+	t=1787930699; cv=none; b=f8m1rYRUXu7SxU0Upsz0W16jMnWdgAuMLkF2RSvz91Qtq6W6VivN0Zuw40E0iBXIQS8LPas6WBH2QVdEzG18fCYWXDz5H+g0J3EWNW28QRY53ZUFh3D4hBFhE0WV/QxrupP30DTKgmTMFaYHO7q/e0WNksbiQAMLolNNG3E3ucE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787929729; c=relaxed/simple;
-	bh=VdL5Ez1TP9OEdhEYgAp4psPvS1MFoZ44aSZbnIms9RU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hq2HPOiTdX/85GAOBHlnM58NUiXxykgJGuFzRNuCsLv6O5OEJXNukCDw6wJbY9HP1/9sXUJFxgliWx0NPvOhSezK24IeJVKqe78schVXCt76MmSn4lz/mfHiv+q0zG3Kuf17aHAzz+OQJDIZ8iyCRsiTSc/eApQiNpSl+hcux08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cVQ6kEee; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787930699; c=relaxed/simple;
+	bh=tpyZvgdIuReJeSrdOPCyYr8fsLpfLCii8h1S1BKcev0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XvwY2xT7yRr6H24aRqVz0UfwjCJs4NvGdEqShArSnfwmLYXWp12Qtzs93aBwGC0DZliIe7nVxoTWPVKs5D/fnrXmxsdJw8vEz+kN7bzzelYhNOPQ5uVXYr1OxjWQADHKx+deZQe6NoOEQB1W9Ms7/rx2MnJS1DQGkwIyyFjP/rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWTVVlBb; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cVQ6kEee"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SDVgsu2186259;
-	Fri, 28 Aug 2026 15:02:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=R2ReIf
-	cU6q09mU3umuATDMJX0HzmPeiVXkiDg/a3WZ0=; b=cVQ6kEeeIOBZIof5NJlQup
-	ylyV/I1zq0HtB5g6HlEIjL3uqD0k1SbkZ2e4sqztn2MOZqxPYrDZRqlsqF+aHzIt
-	k/FfJkqgrkyYNvpM6+23MBXi7QfwidYK0jynJxvuMQCv9vMMeFnJH+hYoq0b2CS/
-	3HZO63xQNFrF9UiE+le8kygr//DrJGZN5QszhHZ9lu0eOwz4+MIKwgDR/cImP2g6
-	FFcLF+UKgAz/DfwcqxC9jKw+pme/G3Kx03KAbHCmgS8EKBEmd9yvnGttbR45TjrF
-	umlVhg6AdVlHo96/zr40P3V65wc7z65Q8113Zx5GaX8HZiAl6wPOqnQAXEJM+pOw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73dxvpvv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Aug 2026 15:02:22 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67SEuQUI021766;
-	Fri, 28 Aug 2026 15:02:21 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g7p3qq5xb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Aug 2026 15:02:21 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67SF2J3G32899538
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Aug 2026 15:02:19 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A081620043;
-	Fri, 28 Aug 2026 15:02:19 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15F3520040;
-	Fri, 28 Aug 2026 15:02:19 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.224.75.30])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 28 Aug 2026 15:02:19 +0000 (GMT)
-Date: Fri, 28 Aug 2026 17:02:17 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        Ackerley Tng
- <ackerleytng@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Baolin
- Wang <baolin.wang@linux.alibaba.com>,
-        Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>,
-        Christian Brauner
- <brauner@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Christoph Lameter
- <cl@gentwo.org>,
-        David Hildenbrand <david@kernel.org>, JP Kobryn
- <jp.kobryn@linux.dev>,
-        Jan Kara <jack@suse.cz>, Jens Axboe
- <axboe@kernel.dk>,
-        Johannes Weiner <hannes@cmpxchg.org>, Kairui Song
- <ryncsn@gmail.com>,
-        Kiryl Shutsemau <kas@kernel.org>, Lance Yang
- <lance.yang@linux.dev>,
-        Leonardo Bras <leobras.c@gmail.com>, Lorenzo
- Stoakes <ljs@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Matthew
- Wilcox <willy@infradead.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>,
-        Minchan
- Kim <minchan@kernel.org>, Muchun Song <muchun.song@linux.dev>,
-        Oscar
- Salvador <osalvador@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>, Qi
- Zheng <qi.zheng@linux.dev>,
-        Rik van Riel <riel@surriel.com>,
-        Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>,
-        Shakeel Butt
- <shakeel.butt@linux.dev>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Vlastimil
- Babka <vbabka@kernel.org>,
-        Yang Shi <yang@os.amperecomputing.com>, Yu Zhao
- <yuzhao@google.com>,
-        "Zach O'Keefe" <zokeefe@google.com>, Zi Yan
- <ziy@nvidia.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 20/25] s390/fbatch: no lru_add_drain_all() in
- s390_wiggle_split_folio()
-Message-ID: <20260828170217.324c3445@p-imbrenda>
-In-Reply-To: <cdbaa4ff-d2b3-34bf-dd41-01fdc65edebe@google.com>
-References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
-	<7bf68e7b-f88c-6ca9-39ab-e9fedab0c8be@google.com>
-	<20260826155722.0198d3ce@p-imbrenda>
-	<2319f670-fe0b-f032-c0dc-486cbec0f3e1@google.com>
-	<20260827145502.2fb4505b@p-imbrenda>
-	<cdbaa4ff-d2b3-34bf-dd41-01fdc65edebe@google.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWTVVlBb"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-39652a6e963so2163357a91.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 08:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787930697; x=1788535497; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Y9a+pZojUOO4HpL0ROFDlkkfxxX7L9GiDlhrWObpWAw=;
+        b=OWTVVlBbRUCkbMVkRasQwwDxPWox/hkiL5iu7d9S25HY2zJqkrIxjPXkQ8V6EKsGkA
+         iJYENLOmUiE7+LwNJ+TNrlxyeViCzC4yb5e8I+wfHtrMDrE2EKU69+DUrseyp4rd24Er
+         GFMavUJY+7oX28ge4JG1rZjcFy69hoTZQFUWKdSsHdw/3pmQZDqdaqb1fXRFQa7tz5s0
+         q91km5mJ/ag9TgRTJsYqZpK1aNRhvBqsEbRTtMmj5nnyjvoUNskLRiPY4VHTKS09w6pU
+         Jt34/k4A3EyUpMj8c9rWdiA+KYQdcp2Yt+4rEYgA091/eVQJAXufEp72Wg0vhyaNmJcc
+         8qhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787930697; x=1788535497;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Y9a+pZojUOO4HpL0ROFDlkkfxxX7L9GiDlhrWObpWAw=;
+        b=OSASFC6W506eSilifY89H8cTL3t7XxuND3TM1GGy2qhLclO5Iu3rrtshszQ0eG9mKp
+         W6fxzYn+4ArChecRX0dSR3SjPJS+kNK6bOZoymURrif7Peu8jVXZ39qQPKw7z74Ajpv7
+         JciQN/Ek/OR1Qz9TcSCk8VaPDdbGX3mX5iNb9fEr2IodwbepAyz2V8rBbcKUm8Tinxg7
+         UfEjwX2Dyuqtkf6nHA0054FgMXNKxtjjZcg763CCUtHYv8DZ7U8yZC0LxLGBtcuyN4XI
+         ve9SKBYR02fwJM1coyW60rYEM//XLMw/WrfzvWw+Vv6s1AsZdWLWHo3ZOKc9Rd6uIeww
+         n8rA==
+X-Forwarded-Encrypted: i=1; AHgh+RqcAHuKf1JLIA7Yy5+GcE4lX2B53CfOcYL1b/5RF0IYh8GcXFWn50e8LRPAKe6c30SKKyywFOaqx63Law==@vger.kernel.org
+X-Gm-Message-State: AFuF++k/Wno7jyVUZ1lu285luj34L3N6ZXZotc0NKhF3TIFxFA/8Z/cB
+	uTOwV3EXZd/9jHEC9dmMG1bydyZVHIzcWKzzcJ8PaSqq2xHGUZ0zO6wI
+X-Gm-Gg: AR+sD11F+5f6iMSG34W7pCj/iOyPzRybLGaui05ACFC4Zsh3FksRS0pHrBppDqIsZAz
+	N4RcsUtAJGCxPzoTS5qZsKdvznqXwrn7hB4d62a/5DLdD1uB0AOrm5M5xwjd4ImhiLXGYPhkn/d
+	OxAwGhNKBaRsxR1yFwDb3Ai4WvnB0tqDQQ3qFZO+GgQDOxcu9LwpgtmpOkc6Y3gem1oC3HGodk0
+	yo3suH93zX6/2kJ9UjYhUSASJmj98pAWKEYQW1tuj2B3WbHlnphesf277uOpKGh8BAXHDImiz1B
+	yxTncctt/ME7PWNNfupt2jPKu+UfR3RnEtvX1VQtW7BrMgCIszRWO0/O3d2eq5CDeK+rkdJnLLz
+	9GRDgR6danJQJvaw2NlUd0lMptABVNW7ujRBd/b+jjNJMzGD0fTYEhKSEwBG9z4IkJwkVG9zdb0
+	S9xcjb3QQmE/T1Q0iLnoCENqnZDotz6dnMNhI/QS+RZeuBBKvdZrQjPvzZk2axCvoAP5Ulhkb69
+	SU2N1AW/CzeI6rz8l5y1Hq2vUy75YFuHxrBt0kCfV3b9sEaabm5QG/O6KPL+LLvW2Ka
+X-Received: by 2002:a17:90a:f088:b0:398:9beb:a2bd with SMTP id 98e67ed59e1d1-3989beba8bdmr429233a91.31.1787930696923;
+        Fri, 28 Aug 2026 08:24:56 -0700 (PDT)
+Received: from [127.0.1.1] (ppp-124-121-113-94.revip2.asianet.co.th. [124.121.113.94])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-328713b0451sm7412788eec.16.2026.08.28.08.24.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Aug 2026 08:24:56 -0700 (PDT)
+From: Mikael Etienne <mikael1022bzh@gmail.com>
+To: Mario.Limonciello@amd.com, vasant.hegde@amd.com, iommu@lists.linux.dev,
+ linux-ide@vger.kernel.org, linux-block@vger.kernel.org
+Cc:
+ regressions@lists.linux.dev, joro@8bytes.org, suravee.suthikulpanit@amd.com
+Subject: Re: [REGRESSION] Silent SATA read corruption with dma-iommu on AMD
+ 600-series AHCI (6.19 good, 7.0+ bad)
+Date: Fri, 28 Aug 2026 22:24:51 +0700
+Message-ID: <178793069172.1699234.13635367891277204598@gmail.com>
+In-Reply-To: <fb875f14-3b47-4d43-ae3a-0d0b17e1c64a@amd.com>
+References:
+ <CAHEgv3TiJUvS=Hustyem0ts8jkbFVAdzBazmPhCbv2sNnTsZkg@mail.gmail.com>
+ <c5c2b503-e273-4aa5-ad9f-f7afee02ab9e@amd.com>
+ <178791494900.1152725.12728124457005560389@gmail.com>
+ <fb875f14-3b47-4d43-ae3a-0d0b17e1c64a@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDEzMCBTYWx0ZWRfXxHuti5Dj527N
- FiuJvw5RRjbYYN3JC15bUZTx+KDTxKTF+YzVq/ezrl4g++dGepSXXGaZVPkOm4cymppJdcuSX9P
- xHXurASEMTrGs5t4EgR5ewb+tDvOJx0=
-X-Authority-Analysis: v=2.4 cv=AYuB2XXG c=1 sm=1 tr=0 ts=6a91a2ff cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=1XWaLZrsAAAA:8
- a=fg8ePjUzgZY9LUZ9XEsA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: FQUAcCuNRcSdPaHF-8xMvR4ns_OVsTxc
-X-Proofpoint-GUID: tqGOyE4oqLz6WkdSLX2ygEk1_1IVTp04
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDEzMCBTYWx0ZWRfXxRCLSM+4Biti
- Tjs1pSPmVVcJoKO+z3p0Dt1SG8YQgEPKpDMcG/eaCrZOoFaJ9AFvVCkax+818IAsE8Uegm/xMgc
- 0/cwTHHY1YoT+gHc2fQNCwnZjlqu8AMiNWqlapdmKpzZAI7HmUo9CZmuCr4hKdlqp73EVEnoMQy
- pNu+pSs1Oh5o5El/K5kbtrI3W1AkYZed0rHnRnt0tO0sNPiWOCoAByfFwGIAsvi7TeogT7IPnrz
- rEK5ADmyOmerpw33FysddOMskKC+kTa4RWJPGyi68ppeQBBFXXcl18hqGrkc6lRFa6ihlHhCE4q
- 7IxqQuA/dq4h5+4ff08OmadKB3LkyhDSwC/7Tn9F+zXd6tMPaZiCnf6QPDmTqZeiYwun+8DLvlg
- fVFgNWQR+c2vPwMIpleETyofoCHhb4yzDx9NL7ik/gqTM/j2gQVlp7eELE7d2jk5a3NuP1eA1X7
- H+giiQLr8LQcrtD41UA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-28_04,2026-08-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 bulkscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608280130
 
-On Fri, 28 Aug 2026 01:57:25 -0700 (PDT)
-Hugh Dickins <hughd@google.com> wrote:
+On 8/28/2026 6:22 PM, Limonciello, Mario wrote:
+> BUT the issue internally does show the issue is specificially once the
+> 32-bit IOVA space is exhausted.
+>
+> Unfortunately; the solution is currently a BIOS change in how the type
+> bytes of the IOVA is handled.
 
-> On Thu, 27 Aug 2026, Claudio Imbrenda wrote:
-> > On Thu, 27 Aug 2026 01:49:12 -0700 (PDT)
-> > Hugh Dickins <hughd@google.com> wrote:  
-> ...
-> > > 
-> > > I most certanly don't know s390 or that code well enough to guarantee
-> > > you that no stray references to mapped folios can remain there. What I
-> > > can guarantee is that no references, of the kind which lru_add_drain_all()
-> > > used to be needed to remove, can exist there: so there will no longer
-> > > be any point in s390 (or others) calling it for that reason, to help
-> > > split_folio() to succeed.  
-> > 
-> > we are not using it to help split_folio() succeed (although that's a
-> > pleasant side effect). We need it even for small pages, to guarantee
-> > that no extra reference from LRU is present on the page.  
-> 
-> Ah, thanks for explaining, that all makes more sense to me now.
-> I remember from when working on memfd write sealing years ago, it too
+Hi Mario,
 
-yep, we use it to make sure no I/O is happening on the page while it's
-transitioning
+Thanks -- the 32-bit IOVA exhaustion detail is the first thing that explains
+the timing I see. My failure takes 3h25m of sustained reads to appear, and a
+reboot clears it completely with the same kernel and the same on-disk data.
+"Low IOVA space works, high IOVA space does not, and a reboot starts from an
+empty low space again" fits that exactly.
 
-> had to be able to account for every page reference before proceeding,
-> and resorted to lru_add_drain() and lru_add_drain_all() to help -
-> those now removed in 14/25 of this series.
+The ASM1166 write-up you linked is also a very close match: a controller that
+advertises CAP.S64A but cannot actually reach above 4 GB. My SATA controller is
+the AMD 600-series chipset one (1022:43f6), which is Promontory/ASMedia silicon,
+and it likewise advertises 64bit in its AHCI flags.
 
-I see, then I guess we're good (see below)
+Firmware, since you mention a BIOS fix: I am already on the latest available for
+this board.
 
-> 
-> ...
-> > > If Barry's relaxation goes in before my drainage changes, then
-> > > there is value in that s390 lru_add_drain_all() in the interim.  
-> > 
-> > hmmm so, should it stay for now, then?  
-> 
-> The s390 lru_add_drain_all() should go whenever the rest of this
-> series goes in. It's not essential for the callers to be removed
-> immediately, no correctness requirement; but nicer if we can get
-> rid of most of them. I'm hoping this patch can just go in along
-> with the rest via the mm tree - and I'm sure you can trust David
-> Hildenbrand to understand and protect s390's interests.
+  Gigabyte X870I AORUS PRO ICE
+  BIOS FB1c, 2026-07-21, AMI, platform firmware revision 5.41
+  AGESA!V9 ComboAm5PI 1.3.0.1c
+  CPU microcode 0x0a70520a
 
-so if I understand correctly, with this series the LRU caches
-will never hold extra references (as in refcount) on pages anymore,
-therefore calling lru_add_drain_all() will never decrease the refcount
-on any of the pages that are in any of the LRU caches
+So whatever BIOS-side change you have internally is either not in AGESA
+1.3.0.1c, or not sufficient on this board.
 
-in that case the lru drain can indeed go
+On the bisection: before committing to two weeks, I would like to try making the
+reproducer fast. If the trigger really is 32-bit IOVA exhaustion, then booting
+with iommu.forcedac=1 alone should hand out high IOVAs immediately and fail in
+minutes rather than after 3h25m. If that works, a v6.19..v7.0 bisection becomes
+an evening rather than a fortnight, and you would also have a reproducer that is
+practical to run in a lab.
 
-> 
-> > 
-> > also: I'm working on completely reworking how the transition from
-> > non-secure to secure is handled, with the explicit goal of getting rid
-> > of that kludge we are currently using. That will also get rid of the
-> > lru drain. But it will take some time (I hope to have something by the
-> > end of the year)  
-> 
-> Good luck!
-> Hugh
+I will try that tonight, with all services stopped, then the
+amd_iommu=pgtbl_v2 iommu.forcedac=1 combination Vasant asked for. I will report
+bytes re-read, wall time and workload rather than a verdict.
 
+If you already know that forcedac alone will not behave that way, please tell me
+and I will not waste the evening on it.
+
+And to be straight about the rest: this is a production home server, so a
+two-week bisection is a real cost for me. The reproducer is three lines of fio.
+If you can run it on comparable hardware in your lab, that would very likely be
+faster than me doing it here -- and I am happy to run any specific kernel or
+debug patch you want in the meantime.
+
+Thanks,
+Mikael Etienne
