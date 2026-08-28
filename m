@@ -1,221 +1,218 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907F8459AF9
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 14:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568AA463B85;
+	Fri, 28 Aug 2026 14:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787927797; cv=none; b=bm7561IEfsO+4Mta/dOQjJhF4840LgkRagvEQCuVvqQ3oSf3OCg0du82oCqbBdQHqm7GlzHi+cU7kLCkDJORnE+H4+SvKmG15vAYINkGYNbWuJPxOQb0xm9H/BX7L6jUAOfFds7jdEUnP90myZzjBtWenTECh6Ra0VxyLPPAfE4=
+	t=1787928078; cv=none; b=lZGqhOnjGX0WP1v/eYzdmbHPRaNXTIhEvQ0tpQnWZT/PbVKrNvaRvROwhT+J/WfPFLY+vEj6XSHJ3AJY7dmUWYT8uvLL6VAPOlRKhm1nUZqJnyKIB4CjP2m6AX7ToWjTDiwyxrR29yG/NG6f3jTwt7gMA9bl+qlTpvRTXSiUoU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787927797; c=relaxed/simple;
-	bh=4JiDX/yubXfTIhjMav9YvfmI0tVcsBWXL9wlEHdvhAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gIJPvysBtMRh3cgRQtgQjc/OEHKJ5EWlqhilWaU6hTXXxazZ3Oin1DzNsGLT2x5AOMuhl0iSnHoDB+OP05EzmPSt4v72ILt0E2xPLV3wLdhX2F42YZYXvhw1fDshbQYa95prElTt7IJw9fxUZXocuxwrzSpbXuTKq1IJ0F/5WH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=F12H2c2U; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=p1Tp0I0F; arc=none smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1787928078; c=relaxed/simple;
+	bh=Zk2lLawAVtiA5kIDVK7dR8UmSrPGPvhMa8loRHiylXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jxnXHIGCWj4rQQg8mcqVVa6EGmKGJaY0wrQuXEHtQChuluWlpxt5B4XtlbfO8SC5tSnEaHedIwMdkqpgqGJhINJAVe+m3sWlyDlAlPWerPZ58kpIoC9wBXAJySrqB0ZoEx1f9yUL8CEG6BPLiNRh5SuHzekSyWgMGw8MFYLdAuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=panAWlyH; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="F12H2c2U";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="p1Tp0I0F"
-Received: from pps.filterd (m0167076.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SEYJmN2332340
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 10:36:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=598u
-	fPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=; b=F12H2c2UtXrwM4aiV8RY
-	T6eQfL7tPt9zJqQ0qDMpHJTRIQx7uGaXr8PNXlYmtIP4tw1xsinsanB65kvwh6yr
-	cJWEGlHk7hbi0+jCkEw+P/O34iplGmfv49C3D1qBwP+Wwyl+lcaVjXbwVYyCayZk
-	qyIlyk6Gia5BIiB1ESl6zKVrwigefZhXwWUTyxis/IL0bPrfDUvT9IC9t+p3zqnm
-	9dsIKRbVfZ5zPwf//UZ/woAuXC1Z9hwJS8+RkgdjQ5NeqiZH1tvUQUWT8nAWoryf
-	aYCSICh+wUlIkDYoWFVtNBPlhDVehUoa1Fy8e76aK0yqkmYKCfhPTrWp60RRKqJZ
-	Qw==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gbbvgg6bg-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 10:36:34 -0400 (EDT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-52f9f6b85cbso10697991cf.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 07:36:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1787927794; x=1788532594; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=598ufPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=;
-        b=p1Tp0I0Fiuti0m4hHE8wwKweya+3mgI8DhCdWRfwLKLyq/SqLxB9S5IHwWySNFkRf9
-         9bkIl1tcT8KkK0sS8JV1FZD5Qt1bFL7EMmxnKDk5T8NYLvqkf9ZD9GOxpGVLvK0618fF
-         CgzAzFKe24979y/RomedOoKXqpYmlzj7S148r7p7mlevJ4Ri13p8AyMZnQ3eg93b9WAe
-         qHP165Up+VT+gL4BQwBhNq2tpOMjFiJ6sYWZgmG+DduBTZkEVutzL4W1SWlB2qLTUy14
-         paM9ARp6la2zLACFb2HKfl+FJmgtm6dctWnZbkgMXU6QnecPxU3/oMcc8E9RIPOzfChS
-         +wiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787927794; x=1788532594;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=598ufPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=;
-        b=Felt9QpmP/gAYI1aFrXv2KWUZdVgIj0mH8nB/hUGwUtS1kfz0zkFdKNUI9ggciXGUp
-         byrIKMN/eMkbBiKAqRocBC+iqF32JcWwsJ4Vd0sF+tWeKANOV0w1hBYEQINk3TlYd3St
-         Isv0HcWIXPWb/2Fpa2yrsqu2+YUWlhX+iU8oMFuLx+kcBExcTbXmkNp4mmhTt3lUTdYe
-         q0y30VbxsTzzI7O4ZXdtLRX/gi1Q53tTs1e0+TLHPD5bRjbhHNb8QU1HUkMbggiiU8KQ
-         VuEde2kVZwGzo9Bj3cpMyD9rUuo+L/EiU24C/Ldz4PzT2nkX5r+yKRprKUgYaxK9s4Nc
-         RY1Q==
-X-Gm-Message-State: AFuF++nvqGeIXUfxHy0erxhDfQguJgN+N7Vh8eAiueDJbHy/3C6OR/YL
-	rA2kQdxLNTF5ixUTHkHPIz/HBT80SkJnuGNY8fGK8ZanBhxgMeKlWpQImHL5Gi4psE+1mUu9pKj
-	6KhgY9LkoxYfcPtqsERazSSPSD86w1NReHlhOpJXLZwxtctWCKS6rTIhkS7U/
-X-Gm-Gg: AR+sD10cizOTWvbbgSuS/B2ratbjLp3AGTzQiuhAMEuLUQyYzLhjD8PzJIpjnPkyWn4
-	LiBaEq75n9lVebjz2uoCFB/ybHz3933vP3qGkhUNBWRUTpJenAzfFknYxFYd+uJjpsf5UkEFtnE
-	sgbmHyaJAtM8qy+7a4SnHdtRclnQ2zaOQpcSv9SLNAIoS0+3DnmngZi9bo3wi6C78UzbJLn9xqZ
-	Dwu2RTg6nKcf6pu3ZD+W0KZQyF067EZOjdRqwEC8HKTlP4XPGDcsrR8BYFAHDxlEyIn7W5hfHcg
-	wZ6S4fi5Zys2C/o7vNcaQgP6snyLkXqVMtpQ0UJsB64/ZSfNnTVaqnvYdtnc3q1++tut9wgo2rK
-	enqJwuAAzhjYxNau5a6bYC55t4lB7XWy5eE4OCxnTPgH9K9KY4paI/J/N1k/LydQ=
-X-Received: by 2002:ac8:598f:0:b0:51c:805:1be3 with SMTP id d75a77b69052e-52fb96ffa65mr81226361cf.31.1787927788725;
-        Fri, 28 Aug 2026 07:36:28 -0700 (PDT)
-X-Received: by 2002:ac8:598f:0:b0:51c:805:1be3 with SMTP id d75a77b69052e-52fb96ffa65mr81225571cf.31.1787927788195;
-        Fri, 28 Aug 2026 07:36:28 -0700 (PDT)
-Received: from ?IPV6:2a00:a040:199:85d9:7dc6:c240:3de1:e554? ([2a00:a040:199:85d9:7dc6:c240:3de1:e554])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482fbb20793sm4116286f8f.17.2026.08.28.07.36.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Aug 2026 07:36:27 -0700 (PDT)
-Message-ID: <8da4a2dd-a4ef-4a61-888f-60c611d3f911@columbia.edu>
-Date: Fri, 28 Aug 2026 17:36:24 +0300
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="panAWlyH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=dMVNde2wkTvg21HA6gMMmOc6O33QVmC43CxfG7wt05E=; b=panAWlyHZ294r8CVUs1Mm0l75I
+	Fqt6DYaJvW4Q2ZEsuTzJV+rrIZ/kMojDsSLozPad5UdoK1OegnDlPFX6SavtvreoybTU4bYeYvAzH
+	DYJJ5pzY3rY3zoX9Q6zxpJI8tj6rB+OlMdAKOTts4anffWRGrqrjTCaUF+R6Kg52sZBl9qSKoALPR
+	8t6sTZhlF8WOnLwzCXUmtqKz3ZtvfwgtYOQJx9aKgPMZ/50LvwONfzYIvWzmxC2ohjzZSCDfPkw8w
+	ipxGVHtu3VTsMJV0czrZ188J1wwRIMXKLGIDYQQIxhkZ927L1IaULYL+JNI1M2QOnK6aU7/E3I2zL
+	NwjsEWmw==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wzxl4-0000000Eq6F-0ksv;
+	Fri, 28 Aug 2026 14:40:42 +0000
+Date: Fri, 28 Aug 2026 15:40:41 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Hugh Dickins <hughd@google.com>
+Cc: Kiryl Shutsemau <kas@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Barry Song <baohua@kernel.org>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Christoph Lameter <cl@gentwo.org>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Kairui Song <ryncsn@gmail.com>, Lance Yang <lance.yang@linux.dev>,
+	Leonardo Bras <leobras.c@gmail.com>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Mel Gorman <mgorman@techsingularity.net>,
+	Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Qi Zheng <qi.zheng@linux.dev>, Rik van Riel <riel@surriel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>,
+	Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 04/25] mm/fbatch: lru bit set, no extra ref, while folio
+ on per-cpu fbatch
+Message-ID: <apGd6T84Zs1RgTVg@casper.infradead.org>
+References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
+ <e0887417-85a7-453e-e733-561dc11db08f@google.com>
+ <apAaWsWPV9QEeVwn@thinkstation>
+ <3b8d9cc4-d6f9-6bd6-f774-34cfca9c48c9@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] block: unpin all pages of a bvec in
- bio_iov_iter_align_down()
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@suse.de>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        John Garry <john.g.garry@oracle.com>,
-        Christian Brauner
- <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
- <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: oPgxdI-uKvX9pkg7WCcGRFuC9tO0ECyl
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDEyNiBTYWx0ZWRfX2BFtJkKRkofC
- DYKz4IWc68H2AVP0wulyh6mzi1REjfg2I5bCdOaq0tQ3qmjMLtIZPtZ67OC7Gf/Q44+v54i6W+T
- nzQm9IMK5e6Jh7mqeVkZyTCk8e7SNkeKscoIsQg+2823h2KruYOh
-X-Authority-Analysis: v=2.4 cv=M8597Sws c=1 sm=1 tr=0 ts=6a919cf2 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=Qm0qsxP7aFY2tkT6R2MF:22
- a=8X_uEV4oKehs6EEG2ucA:9 a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22
-X-Proofpoint-GUID: oPgxdI-uKvX9pkg7WCcGRFuC9tO0ECyl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDEyNiBTYWx0ZWRfX3PphMJUGXetp
- yiqhVFez12LR7y7iiWalEz9ddgRP1ydJnmNBqsG1y27pnKmjGER+QXW19N56EK0jD3Aaabg0ozA
- vWgqKQYju72sfjI9+eUVC0IywQ5nwVfAXwha+vZC3CoEtamGKmZDpx/437HyDZ+k7BApkIZSqeP
- NsVPe5mr+HiQFG2HiZRIr0WvzIKcNsiHUpyXiH2C3rpf3QsiPtGhClML/77erBgHt+bmM6FTZ1e
- f48AzsA7Exbof+YyuFGMaD5UVKvDwBKDNFlk4IlXGOH8eEH2Ny42LN0AghVKN2iN/atfxd3smJ8
- /785ccnh3FEala+VHAY2/QR3cHkhF9M0yOTZmr+Bx8lnASVkTCvKgRODpW5y1TFsSVkzBgaHsEd
- Z3w5SCTL6pA4kPPzqfvdHGuEtw5Z/LCOcgVG2T3RnZwtdEMwIvqqZdL5NZthsUsj0HxRwpMQzyV
- nb/PImMimPjqYuimfUg==
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11889
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 bulkscore=10 impostorscore=10 phishscore=0
- malwarescore=0 lowpriorityscore=10 adultscore=0 spamscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608280126
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b8d9cc4-d6f9-6bd6-f774-34cfca9c48c9@google.com>
 
-On 8/28/26 4:49 PM, Tal Zussman wrote:
-> bio_iov_iter_align_down() drops trailing bvecs with unpin_user_page(),
-> but a bvec built by iov_iter_extract_bvecs() can span several pages of
-> one folio, each with its own pin. All but the first pin leak.
+On Fri, Aug 28, 2026 at 01:04:34AM -0700, Hugh Dickins wrote:
+> On Thu, 27 Aug 2026, Kiryl Shutsemau wrote:
+> > On Mon, Aug 24, 2026 at 07:01:20AM -0700, Hugh Dickins wrote:
+> > > Treat folios on a per-cpu fbatch as if they were already on the lruvec:
+> > > with PG_lru set, without holding an extra reference. This will enable
+> > > the removal of most lru_add_drain() and lru_add_drain_all() calls soon.
+> > > 
+> > > Recognize such a folio by 0x02 set in the folio->lru.next pointer by
+> > > folio_add_lru().
+> > 
+> > Hm. pfmemalloc (__GFP_MEMALLOC) thingy already claims the bit. Is it
+> > safe because such memory is never on LRU?
+> > 
+> > Are pfmemalloc and PG_lru mutually exclusive?
+> > 
+> > Do we want to be explicit about this? Like, folio/page_is_pfmemalloc()
+> > shouldn't return true for PG_lru folios/pages or something.
 > 
-> The partially trimmed bvec has the same problem. Shrinking bv_len does
-> not release the pins for the pages cut off by the trim, and
-> __bio_release_pages() only unpins the pages bv_len still covers at
-> completion.
-> 
-> Both issues occur only with a logical block size above PAGE_SIZE and a
-> large folio backing the user buffer. On a device with a 64K logical
-> block size, an O_DIRECT pwritev() from a hugetlb mapping that ends 16K
-> past a block boundary leaks one huge page per call, whether the
-> remainder is its own bvec or the tail of a larger one.
-> 
-> Unpin all pages of a dropped bvec with unpin_user_folio(), as
-> __bio_release_pages() does, and unpin the pages trimmed off the last
-> bvec as well.
-> 
-> Fixes: 20a0e6276edb ("block: align the bio after building it")
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
->  block/bio.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 898b2f5ef8c8..48fa6b9a6dba 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1196,6 +1196,11 @@ bool bio_iov_iter_set(struct bio *bio, const struct iov_iter *iter)
->  	return true;
->  }
->  
-> +static unsigned int bvec_nr_pages(const struct bio_vec *bv)
-> +{
-> +	return DIV_ROUND_UP(bv->bv_offset + bv->bv_len, PAGE_SIZE);
-> +}
-> +
->  /*
->   * Aligns the bio size to the len_align_mask, releasing excessive bio vecs that
->   * __bio_iov_iter_get_pages may have inserted, and reverts the trimmed length
-> @@ -1205,6 +1210,7 @@ static int bio_iov_iter_align_down(struct bio *bio, struct iov_iter *iter,
->  				   struct bio_vec *bv, unsigned len_align_mask)
->  {
->  	size_t nbytes = bio->bi_iter.bi_size & len_align_mask;
-> +	unsigned int npages;
->  
->  	if (!nbytes)
->  		return 0;
-> @@ -1213,14 +1219,24 @@ static int bio_iov_iter_align_down(struct bio *bio, struct iov_iter *iter,
->  	bio->bi_iter.bi_size -= nbytes;
->  	while (nbytes >= bv->bv_len) {
->  		if (bio_flagged(bio, BIO_PAGE_PINNED))
-> -			unpin_user_page(bv->bv_page);
-> +			unpin_user_folio(bvec_folio(bv),
-> +					 bvec_nr_pages(bv));
+> Gosh, thanks so much for pointing that out: I was completely ignorant
+> of the the pfmemalloc use, and a bit (bit 1!) shocked to learn of it
+> (why wouldn't they just reuse a pageflag, I wonder? but doesn't matter).
 
-And right after sending this, I noticed bvec_unpin()...
+The idea is that it is used temporarily to communicate from the
+page allocator to the caller "This only succeeded because of
+PF_MEMALLOC".  Making it a page flag would require all callers be
+aware of it -- most simply do not care.  PF_MEMALLOC was set on
+their behalf and there is nothing they can usefully do with this
+information.
 
-I think a cleaner solution is to move bvec_unpin() up, make bvec_nr_pages()
-handle bv_offset > PAGE_SIZE, use bvec_nr_pages() in bvec_unpin(), and then
-use bvec_unpin() here.
+So we want to communicate it in a way that allows the unaware caller to
+discard the information, and I chose bit 1 of page->lru.next.  We
+used to use page->index == -1UL (which was also naturally overwritten by
+the unaware caller), but we needed to have it be part of PP_SIGNATURE
+and that needed to be not part of page->index ...
 
->  		if (!--bio->bi_vcnt)
->  			return -EFAULT;
->  		nbytes -= bv->bv_len;
->  		bv--;
->  	}
-> +
-> +	/*
-> +	 * __bio_release_pages() only unpins the pages still covered by
-> +	 * bv_len, so drop the pins for the pages trimmed off here.
-> +	 */
-> +	npages = bvec_nr_pages(bv);
->  	bv->bv_len -= nbytes;
-> +	npages -= bvec_nr_pages(bv);
-> +	if (npages && bio_flagged(bio, BIO_PAGE_PINNED))
-> +		unpin_user_folio(bvec_folio(bv), npages);
->  	return 0;
->  }
->  
+Commit dc8cf7550a70 if you want to read more about it.
+
+We do use a page flag in slab; we check the pfmalloc bit and move it
+into a page flag (SL_pfmemalloc).  But we don't use it for folios.
+
+While there is a folio_is_pfmemalloc(), I think that was a mistake
+and it should now be deleted.  It hasn't been used since slab was
+converted away from folios last November.
+
+> Anyway, as you've rightly guessed, it's not a problem at all: these
+> mm/folio.c and mm/mlock.c per-cpu fbatches are entirely for folios;
+> and if any pfmemalloced page ever get used for a folio (dunno) and
+> put on an fbatch for LRU, then of course its use of lru.next is
+> immediately overwritten (first by what this patch writes in lru_next,
+> then later by the lru.next pointer for whatever LRU it goes on to -
+> just as before this patch).
 > 
+> If you were to tell me that some subsystem uses PG_lru for some
+> other purpose, then I would have to get more worried; but we can
+> be fairly sure that's not so, since mm/compaction.c for one relies
+> on konwing it's free to  play with PG_lru folios.
+> 
+> Whether a folio is ever allocated with __GFP_MEMALLOC, I'm not
+> certain (haven't looked), but there is no need to exclude that:
+> it simply would not retain that page_is_pfmemalloc() info across
+> folio_add_lru().
+
+That's the correct thinking.
+
+How about this patch?
+
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index dd09c438fa23..fcefffb52d3e 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -3122,36 +3122,25 @@ static inline void *folio_address(const struct folio *folio)
+ 	return page_address(&folio->page);
+ }
+ 
+-/*
+- * Return true only if the page has been allocated with
+- * ALLOC_NO_WATERMARKS and the low watermark was not
+- * met implying that the system is under some pressure.
++/**
++ * page_is_pfmemalloc - Page allocation should have failed
++ * @page: The just-allocated page
++ *
++ * Usually the page allocator keeps some memory in reserve.  If
++ * __GFP_MEMALLOC is used, the page allocator can dip into those
++ * reserves.  The caller can find out if the allocation came from
++ * the reservers by calling this function.
++ *
++ * If the caller does not care, it can simply use the page as
++ * normal.  The field that the information is stored in is usually
++ * overwritten by most uses of a page.  Nobody should call this for
++ * a page they did not allocate as it can easily have false positives.
+  */
+ static inline bool page_is_pfmemalloc(const struct page *page)
+ {
+-	/*
+-	 * lru.next has bit 1 set if the page is allocated from the
+-	 * pfmemalloc reserves.  Callers may simply overwrite it if
+-	 * they do not need to preserve that information.
+-	 */
+ 	return (uintptr_t)page->lru.next & BIT(1);
+ }
+ 
+-/*
+- * Return true only if the folio has been allocated with
+- * ALLOC_NO_WATERMARKS and the low watermark was not
+- * met implying that the system is under some pressure.
+- */
+-static inline bool folio_is_pfmemalloc(const struct folio *folio)
+-{
+-	/*
+-	 * lru.next has bit 1 set if the page is allocated from the
+-	 * pfmemalloc reserves.  Callers may simply overwrite it if
+-	 * they do not need to preserve that information.
+-	 */
+-	return (uintptr_t)folio->lru.next & BIT(1);
+-}
+-
+ /*
+  * Only to be called by the page allocator on a freshly allocated
+  * page.
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index 09cb1e18bc16..9bcfc4213b91 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -85,6 +85,7 @@ struct page {
+ 	 * WARNING: bit 0 of the first word is used for PageTail(). That
+ 	 * means the other users of this union MUST NOT use the bit to
+ 	 * avoid collision and false-positive PageTail().
++	 * Bit 1 of the first word is used by page_is_pfmemalloc()
+ 	 */
+ 	union {
+ 		struct {	/* Page cache and anonymous pages */
+
 
