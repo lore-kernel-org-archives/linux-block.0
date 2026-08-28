@@ -1,130 +1,144 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mta1.migadu.com (out-232.mta1.migadu.com [95.215.58.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23163C2785
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 06:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B8554781
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 07:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787896984; cv=none; b=fAAkgKrYoWSvZEh6IvGz8EetcMA53nI6aAMmEGMPujCtXxNAuaAy6Ogi4ReE9qt8VMU/D3qxiC+Am9sLZF7WxhfNaF62MKhlGUjp+F9Oo1Y//1Jd2odBuUg2M90N9jcXxO8CyZOj/5JzpjB1TavkqupsJZmRiT9LYn87FS4D7po=
+	t=1787901629; cv=none; b=GCU3Fn1NQcf4OsVl+M6zHjdZgL0Nmsb1RhW+tudMbbYzk+1Ci2HIiqtOyRZ//8NL6FoFE1RkklRUAKMCeGWuxctAlrrnxSHWntmBwpJ+xAhnQWQsG9r1a76yEAMCu+Kad8ygJBslbR770wr4jcWdupEsVkOKvK8WbE8koRr4Jlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787896984; c=relaxed/simple;
-	bh=r8Yyj/B0psBPnsbPoRoLJhZOA+rZ1pswme91QS9W8H8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCb42QQZWpQKu21BCy0KchG2F4F1zqUdQoi38TpzR0jkzIq0cM7DZdkmvk6viarvh6wa6cYRYTAlnk/b2Htf9cGLYWxiZDQZhqvzta5o25T8XuKJw7hJJxIZO69wLS91Wq45mud3hJ7S+KSPk/tBpxfRvlCdFHWw/OLmDTC5HYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=oO0KD19N; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1787901629; c=relaxed/simple;
+	bh=lyJSjacjcFvHRNzPVGXfZPUd0xoPdr41+3jUabfwPgg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BIWs346492f1NiB84FuVNwhV5dkstEFsrfWqpFgXPKUc62JzcotdaMWUz3u8GLwguPhREiTq3AJI9ekU8v0HLeCX0UW7x6+q2Mp4C+oeiw1sm4LBsxVrrgtYkc2EwmqXf6noqpfw0hAiFLRXZ7lyIE0Z5tObHq9pAzDCBaMogoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BwGACSes; arc=none smtp.client-ip=95.215.58.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oO0KD19N"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-cbedbaba5fdso531011a12.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Aug 2026 23:03:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1787896982; x=1788501782; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ayElgOjba/J4lXi4vpvSYn1UEyGu20arfi9trmZff0w=;
-        b=oO0KD19Ngly+8+x7jdiCC4TQ33pr7Bj3ZP+xHUQFKFPaRTwh2bSLfq13aV2rv9ND5V
-         6WrJ4LAr60Ce1Qn1P9yjTfN63iTHi5xjAe1iz6UbiKPNDQqjBIVrNeWiW6rZhAXoa3+x
-         YlVicmmKT5/biQtuhtc9o5aDuge6RWmBWEdzs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787896982; x=1788501782;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ayElgOjba/J4lXi4vpvSYn1UEyGu20arfi9trmZff0w=;
-        b=XKss59FhIpW43dEyNnEj6/X4QliXzX+AqXtP9iQEPJCD1JyLto+YGTCnGgESSazjLV
-         HJIYnPSLUymn0CedWT4GrcdVYlXXTgZF2msYMXODZKU6RSalTnD2nTQw0uEk7mZvFuho
-         xX+MD7eEeVFCe5h0iCGXnV7Yj/YQOOi6x9LByog2pkw8fA/7PYMqy/V3/zHth3Oi/MBi
-         lvT4YX/VcSXTAwd1yGWh77Ix8EytDmCgHKQXtst/dJEiEI0plE5Tgz3jgasVcLl9XGkD
-         fKYUvWIBTGSDuwqrVLZFk0v7dLniUAhshmv11nZqqTmtOIyAqfffePsizfdn0Lt1uLpr
-         fZmw==
-X-Forwarded-Encrypted: i=1; AHgh+Rpopu5g/Chi52lSjqHLQ/IfZ8m7b2iKLqu3ms6c33B960UZhBnrsA6R7KiqCUR93hfQpfopoo26meNYoQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++mfKE5xdFZHa6/gXjXk2ijHItr8wVxkyAWle6jdEx/6uQoUrPDN
-	vP0EZ+ztC61q9uyu17e3y7QmRkBgnNRF9JN6IHr3jb+IQYpBmHZoLeSkVvzuZHiHgg==
-X-Gm-Gg: AR+sD12CPnvy1oOtIdeHVbfbr0f+7GWH2agX4B0gOhiabZMqe82f1wnnMVOEVZGH9F5
-	5BAMUE3/T6V0WRwT7ipxfGS7QiBaM9xS2M04xWUb6L6lazBe6rovskUoQYZQhkZ1CrzsuPTDe48
-	Ag7ao9c/P7cT4R/feuixfl0YmN5N6OqbLmfjwEk+uoPaV7FYQCkwXQjqtkSrWz/RCgtH+mhjq1U
-	05b81LVj4t27K5YqPjjjFFqKTfqBMglLXgofDQpLC3p3UemPB2YCZJ716NKTB9tGzP+VS7xFhxL
-	xbn8sKgCkRre8MSvvpi/ToPv04fY9r3HQbDzjd9shKNd5Jm7GKlRMWb/cjf9yracd2ydwL5r2zb
-	1rCW15ZFYWBN3p/Rk9No/x7lhwvYXEF2WZU3ar00nY1rCs2gdFN41GywFQqbSdC/EhmMLkJod3A
-	c1gRO+aAkmiTZ3W4YOWAj9Mu5wCvKyAMV7ivZ2SJi39wp/VEVvSMPEwkpjupbAUnCgQ9FJIO41/
-	p4btjLjVMnJT7bm9o9CdHpCgARjlw==
-X-Received: by 2002:a17:90b:3e48:b0:37d:f206:a2ac with SMTP id 98e67ed59e1d1-396d0ebd7fbmr9970210a91.7.1787896981859;
-        Thu, 27 Aug 2026 23:03:01 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:a804:e404:4b31:580b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396b0fd5c34sm5744072a91.8.2026.08.27.23.02.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Aug 2026 23:03:00 -0700 (PDT)
-Date: Fri, 28 Aug 2026 15:02:56 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Hao Jia <jiahao.kernel@gmail.com>, Brian Geffon <bgeffon@google.com>, 
-	minchan@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Hao Jia <jiahao1@lixiang.com>
-Subject: Re: [PATCH] zram: fix idle age_sec underflow in idle_store()
-Message-ID: <apEkQSC5PLQAsrqj@google.com>
-References: <20260825092316.69658-1-jiahao.kernel@gmail.com>
- <apEK-yRTQR8VdT3e@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BwGACSes"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=lyJSjacjcFvHRNzPVGXfZPUd0xoPdr41+3jUabfwPgg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787901626; v=1; x=1788506426;
+ b=BwGACSes3hG+mis1StWLcxbNKOvdlMpjiIPwSGqMWfU3p0OgjAs0J6Hmy3OjAlMoj2ePd3ly
+ 0HymuBB+LgmucpytCl3AI/gzvLkKSyguPFJVr2+EJL8o1DMQj6m17sXMWPC8x9eLdoVwVjXJHyi
+ yRlQnV7+FP+tyOc0Wt9jqdVg=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 60ab96d263ab17e5;
+	Fri, 28 Aug 2026 07:20:16 +0000
+X-Mizu-Trace-ID: 60ab96d263ab17e5
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: axboe@kernel.dk,
+	hch@lst.de
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cui.tao@linux.dev,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH] loop: defer the queue limits clear to a workqueue
+Date: Fri, 28 Aug 2026 15:20:04 +0800
+Message-ID: <20260828072004.273519-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <apEK-yRTQR8VdT3e@google.com>
+Content-Transfer-Encoding: 8bit
 
-On (26/08/28 13:23), Sergey Senozhatsky wrote:
-> On (26/08/25 17:23), Hao Jia wrote:
-> > After commit 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking"),
-> > idle_store() computes the idle cutoff as follows:
-> > 
-> > 	cutoff = ktime_sub((u32)ktime_get_boottime_seconds(), age_sec);
-> > 
-> > Because the left operand is cast to a 32-bit unsigned integer, when
-> > age_sec exceeds the current uptime, the subtraction wraps modulo 2^32
-> > and the huge result is zero-extended into the s64 cutoff.  mark_idle()
-> > subsequently marks every entry as idle instead of matching nothing,
-> > breaking the intended semantics of /sys/block/zramX/idle.  For instance,
-> > running echo 86400 > idle on a machine up for only two minutes causes
-> > all newly written pages to be marked as idle and handed over to idle
-> > writeback and recompression.
-> > 
-> > Drop the explicit cast to perform the subtraction in signed arithmetic
-> > again, restoring the previous behavior: an age_sec greater than uptime
-> > yields a negative cutoff, and one equal to uptime yields 0. Since a
-> > cutoff of 0 is now a valid computed value, it can no longer double as
-> > the "all" sentinel. Switch to KTIME_MIN instead, which no ac_time can
-> > be after.
-> 
-> Can we instead just reject such cases?   It should be an error to
-> request writeback of pages that are 2y old on a system that has
-> uptime of 2d.
-> 
-> Maybe something like this:
-> 
-> +             time64_t uptime;
-> 
-> -             if (IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) &&
-> -                 !kstrtouint(buf, 0, &age_sec))
-> -                     cutoff = ktime_sub((u32)ktime_get_boottime_seconds(),
-> -                                        age_sec);
-> -             else
-> +             if (!IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) ||
-> +                 kstrtouint(buf, 0, &age_sec))
->                       return -EINVAL;
-> +
-> +             /* No slot can be older than the system uptime */
-> +             uptime = ktime_get_boottime_seconds();
-> +             if (age_sec >= uptime)
-> +                     return -ERANGE;
+From: Tao Cui <cuitao@kylinos.cn>
 
-Or perhaps, instead "return len" and make it a fast path out, w/o the
-need to iterate any slots, take locks, etc.
+loop_clear_limits() calls queue_limits_commit_update() directly from
+the loop workqueue that processes the request.  That does a
+non-atomic struct assignment to q->limits without freezing the queue,
+which races with lockless readers of q->limits on other CPUs - bio
+splitting reads max_hw_sectors, the discard path reads
+max_hw_discard_sectors - and can let them observe torn values.  The
+trigger is a discard or write-zeroes request on a loop device whose
+backing file does not support the corresponding fallocate operation.
 
-> +
-> +             cutoff = uptime - age_sec;
->       }
+The code already has an XXX comment saying this should move to a
+workqueue.  Do that: schedule a work item on the system workqueue,
+where it is safe to freeze the queue and update the limits using
+queue_limits_commit_update_frozen().  Accumulate pending modes in
+lo->clear_limits_mode so that failures between scheduling and
+execution of the work item are not lost, and cancel the work item
+before the device is freed.  If the device is reconfigured to a
+backing file that does support the operation in that window, the
+stale clear takes effect and discard is disabled until the next
+reconfiguration.
+
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+---
+ drivers/block/loop.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 6f12976035b0..5a1e8b6794ed 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -67,6 +67,8 @@ struct loop_device {
+ 	struct list_head        rootcg_cmd_list;
+ 	struct list_head        idle_worker_list;
+ 	struct rb_root          worker_tree;
++	struct work_struct      clear_limits_work;
++	int			clear_limits_mode;
+ 	struct timer_list       timer;
+ 	bool			sysfs_inited;
+ 
+@@ -222,9 +224,12 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
+ 		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+ }
+ 
+-static void loop_clear_limits(struct loop_device *lo, int mode)
++static void loop_clear_limits_workfn(struct work_struct *work)
+ {
++	struct loop_device *lo =
++		container_of(work, struct loop_device, clear_limits_work);
+ 	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
++	int mode = lo->clear_limits_mode;
+ 
+ 	if (mode & FALLOC_FL_ZERO_RANGE)
+ 		lim.max_write_zeroes_sectors = 0;
+@@ -234,14 +239,13 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
+ 		lim.discard_granularity = 0;
+ 	}
+ 
+-	/*
+-	 * XXX: this updates the queue limits without freezing the queue, which
+-	 * is against the locking protocol and dangerous.  But we can't just
+-	 * freeze the queue as we're inside the ->queue_rq method here.  So this
+-	 * should move out into a workqueue unless we get the file operations to
+-	 * advertise if they support specific fallocate operations.
+-	 */
+-	queue_limits_commit_update(lo->lo_queue, &lim);
++	queue_limits_commit_update_frozen(lo->lo_queue, &lim);
++}
++
++static void loop_clear_limits(struct loop_device *lo, int mode)
++{
++	lo->clear_limits_mode |= mode;
++	schedule_work(&lo->clear_limits_work);
+ }
+ 
+ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+@@ -1781,6 +1785,7 @@ static void lo_free_disk(struct gendisk *disk)
+ 		destroy_workqueue(lo->workqueue);
+ 	loop_free_idle_workers(lo, true);
+ 	timer_shutdown_sync(&lo->timer);
++	cancel_work_sync(&lo->clear_limits_work);
+ 	mutex_destroy(&lo->lo_mutex);
+ 	kfree(lo);
+ }
+@@ -2100,6 +2105,7 @@ static int loop_add(int i)
+ 	spin_lock_init(&lo->lo_lock);
+ 	spin_lock_init(&lo->lo_work_lock);
+ 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
++	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
+ 	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
+ 	disk->major		= LOOP_MAJOR;
+ 	disk->first_minor	= i << part_shift;
+-- 
+2.43.0
+
