@@ -1,72 +1,74 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45463286D60
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 09:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16D43932C6
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 09:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787908809; cv=none; b=WXFrwpOsCM0+efaB8h5u8gBhU7WLoQNiUY95uIeMFVWren3gTk/RmVIrssZZAM5N6b6nZsefMJUnD17EaZ09scBY3dhybbVNApdhnh2Fm43D148/d/SGXZsfhydGREpGGeZ4ez8HDio4wwk0lOEzwia4nAXtkj++5jq4rU8qXP8=
+	t=1787908936; cv=none; b=M01G0VIVauhrv6w19HlPAeR930aMHNerFRwl+kEyuugtdVHJ9dpbzFy8evZICyg0fgRkTQLvGJTmVdjuj2FWAtlOB551fhqJxGY6nMkT8xyRdKM3JcoJUanS8sJbm51GsMe68Afc/02OwN2d2jgwbwq3771Iu4PEt62hn9s7wfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787908809; c=relaxed/simple;
-	bh=EGGw3miVGv3g5cGs3Y5Uv6JSfXmW9UFpDJgLxjdqzMg=;
+	s=arc-20240116; t=1787908936; c=relaxed/simple;
+	bh=CJLgODrfV2Cp1dGKQQzoBAn4r52V04Ohp6JVxo0/bF0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UKlDlSC1HPvkCvM6gSt9Qd65HOoax62uB/y3ebv07oLPTiWWn8LGVJgNtfoG6pU9HsrOawQG+PRr+XklNXkaJLP0KrFDDRItODtxNClvIUjt53mQ9KvupY6RCQmJ2NhE0OKC1349oDExGV/tvNvE64Vbd9BiRQytIQNHc5CfQg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Pux+ojDq; arc=none smtp.client-ip=209.85.210.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=n/4s/9IWjluHih8enEFR1sseAvuzHIBaw72aqJZLAjvHsKs2gdnGwhc0sib4g3mJC5Y4wD5wgGpsVK/NjC7HqabM1VkjXOUoEppqCD2u0lN2EdVgRw64SY9tH2hM5OK3cCoghpc9jEFZb98eIN73z6PHp254rPwz6csh50KBb70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=L12MpWWM; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Pux+ojDq"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84830c774a0so1047449b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 02:20:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L12MpWWM"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-38e041ea211so890947a91.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 02:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1787908807; x=1788513607; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1787908934; x=1788513734; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Dn4vRPgsu9ZH/AxJw/yAM2v9xHesMIpX1FxiYpcxLmU=;
-        b=Pux+ojDqr4IkTYpL/QaDQYtR8zxovJJRNG43i0Cv03tV+hOm8SMKWWvNJoAdTDYaF4
-         MpnrXyWNSuTkL6KL14753V55TdQm0aQsXuiIZE76CUNbGKXrXyKIKch6Q1hpl8Eb8CLq
-         TtcURFnt8fDtIRmCIWFPLWSFf1iQaSjWVvTYY=
+        bh=3lLlM8Ydp+ABqyPX6Fa3ap8cVbB1qq0q8Y2hRhjdpUI=;
+        b=L12MpWWMOZUt09UoFHsRWKPAJTpqXfi6VfEyIe25WREFacR0HNk5S9rXfiTBspm97u
+         WfCZVE1kOE2ATN+3YK+Ub0ReFnxlH7rq2h2FKn5ekq6D8MphHZrxWXRfJeQppyutAKSM
+         B6bmvkIr5VYLOIcZZCRcDulbUAb/816d4xl50=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787908807; x=1788513607;
+        d=1e100.net; s=20251104; t=1787908934; x=1788513734;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Dn4vRPgsu9ZH/AxJw/yAM2v9xHesMIpX1FxiYpcxLmU=;
-        b=gw3xdxGdPtp+PTTaiuA9nNXWUPgaS9M4PIQVseukSkozczwP9DW94zN+O07nq3HXXe
-         MOEHLLoaKwQx4rfqHvZgqE27tm3FD+TdTJoUZBinRDHXkX9tU58U3wP6LwP5i7p7A9Pn
-         lWd/gZW1/6j5QWT3f+5HWSFS0XVFP+VPgZhMeDOOZapX/Ftvq0ngf5xMIXEQUTZyya9Q
-         TUxuIqIcHOmhow5WWi1JCjuP5sMtL2TFJKV/5+zLUfNvWYF7cohN08rfbGOnOavnddIJ
-         c5xwGHHAmUxdr1dmV5hkmWay+DjBiX2eFh3HrA878d7D677dlxnD7HcoKtfXnNlQmL8C
-         dAtg==
-X-Forwarded-Encrypted: i=1; AHgh+Rrua3qX+esPg5NfIPy78lxgfbt2VKpuBXNkU0a4vYQCyz9xOsqqbcpjj3qevO52wAApTIPajamPp2JbuA==@vger.kernel.org
-X-Gm-Message-State: AFuF++l3sJJzAZXh50DbFB0IfF9Ov8wDd2OY1ZkYlVsOuqdN9jAc7Y3u
-	TYIFHOdYSZzTNL7wMjUeWRYuox6I/xyvEbyX9gunyL9Cc3bKum+ZFTng4Ohn7XT47KqT5U3UXGg
-	Wc0k=
-X-Gm-Gg: AR+sD11S18YaAdJKAqK4cIooy6VC4PuK3fiSXuzG3gNDR/aA8FQpBUDrWYZ+WCT8h3N
-	MNcVyuzPr5GPYmfe4MNYc15NzTMJul/qYu917XEatsPcJBhZpViyknhsdNW65JnVNVSs3PCvGdt
-	WFfL1AA+p5+irpUaJ66fm7rlS36wDlsJlPYMNaf+KeSoe2SGBcIWYeZNMtM8sgmvW+78XjHwwZB
-	ZG2gUPANoezsfwagdagynHROGIBue0y/xaVNcSuBkAnYIcmrHMLe5GUmK5kKGiUtg0E0zXReEbe
-	UMvrSInlmPeFflsm37BMmDpbZYQtQatmWXWCR9NoQYvr54YB6q6TcNc5OmKnItcKbRYvEu53iYS
-	xJqMgiDxUxEFXTunA8Jpc6BpN07QBX1scpVYeCytp8NlpPnPXG/1ELJUi3t9JuHFRIOjf5Owyq4
-	RmPtEnuZWCWWbpG+GWwI8j7XYiVaQ5AmcjWKthz/264tYKHdWeKNYmYyCylhECGGqBxOwVBIuxm
-	34lJzqP9qQd3TZZxpXakSMEH0cy
-X-Received: by 2002:a05:6a20:4499:b0:3cd:9dea:2be1 with SMTP id adf61e73a8af0-3d263ad82a1mr12426617637.0.1787908807449;
-        Fri, 28 Aug 2026 02:20:07 -0700 (PDT)
+        bh=3lLlM8Ydp+ABqyPX6Fa3ap8cVbB1qq0q8Y2hRhjdpUI=;
+        b=hEvmRr+ugfKSuU28+xG2lzeRIbsVAB1fMTa9qZGDxrh7+UbciN34aEl6hBZSw1h3lS
+         c5V6Zb4uzIPP4ojW3Ng0nlE4PIP8gzRulmljIKSv0KEoiaInxmYgGBWdCG6fGiwy5ylL
+         NNTmDGlisJDe8EQnaZGrTOTcyHu76/8kGr4RVAwmdm0XI7H+A0WDreuzjqQ2CH23OvoO
+         0X1V3KzXfS6wGgkR+pzjy3HM14mE0F07A8uohGGhRQvRQeUt/n5+STkv6MlfkErlM7VF
+         +jm0tSIreJuryAMWjKzdcnChZQNhVGM22XJhaD47VLCB28nE0hIcbFG/yIP1nbiqIfFr
+         Gbjg==
+X-Forwarded-Encrypted: i=1; AHgh+Ro2RfGvFkD/EHmB8AOsiHj4UCctl9Fyfz2Q9W5p1+dPCDPT6DrG4py+QgnTXGufPhx3TfMyRYQLrRjYPg==@vger.kernel.org
+X-Gm-Message-State: AFuF++l+VJWxTzlBmHprjw2cWSul4awQXxfeWpHK0xQiZ2LBTifEbZET
+	byUBp1bFOAT3pD7fGYgfajlKzCmqxBx+IEMsGkumPF1dVy9NTOSMf8Fo4ubdovEqsw==
+X-Gm-Gg: AR+sD10CYmHNwsMPoX+3GqCexNoNbvK7Gxz4VyZszuSkdugZqEDpv6RFU7l8Wu+WhUI
+	TqkTjIK7cvQwBBIZem29fcj3XIT4k6z8CgQU2VPo7kq/Q7DmtX+vMZIzm1t1uBGNnO1seP3qTiI
+	Annvknj+QbRt3Lqzo1c/r4xcOMMltRl+bi4YLWi/D0YSCOABIXzYJAn66EVwSYBaRW+uh7u91Jo
+	WZ+RZ132KJFp6AYKopN5OBDe7Tydl8/zXFU27SpIhAm4Y0shDc5Ef1il/GIHjeeF7s8ATCaA740
+	2Me8hpZ15K2QJ55vTgtBMP8fsS79iYrLA9w10prQzDNrGPk10k0j/LD5oiQuWpUto5qJnJHfNXC
+	iI2JnEaRn3vF6HWqdfTl1aSxKCqpijxOZgzZkWFTUTzATtcO/IPFmL8tZUzWGv27dsZKZrB+pNj
+	wN2Xj7fHpdsev7x8yKGVk0W5ETuxffKz0z4PRkSFIjbthaqTZcdm7/al54uG9YHwoLhGeCkovvK
+	3YMly0ejrRtQm2tMGW9SVXwheRoZw==
+X-Received: by 2002:a17:90a:da83:b0:396:5cdc:4bea with SMTP id 98e67ed59e1d1-396d0e7cd03mr10652759a91.5.1787908933848;
+        Fri, 28 Aug 2026 02:22:13 -0700 (PDT)
 Received: from google.com ([2a00:79e0:2031:6:a804:e404:4b31:580b])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc1f32f68bdsm372314a12.3.2026.08.28.02.20.03
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396b0ea808csm6454217a91.2.2026.08.28.02.22.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Aug 2026 02:20:06 -0700 (PDT)
-Date: Fri, 28 Aug 2026 18:20:01 +0900
+        Fri, 28 Aug 2026 02:22:13 -0700 (PDT)
+Date: Fri, 28 Aug 2026 18:22:09 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Hao Jia <jiahao.kernel@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	akpm@linux-foundation.org, bgeffon@google.com, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Hao Jia <jiahao1@lixiang.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] zram: fix idle age_sec underflow in idle_store()
-Message-ID: <apFSk6cEmfHNGstC@google.com>
-References: <20260828083149.45760-1-jiahao.kernel@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Brian Geffon <bgeffon@google.com>, minchan@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: fix idle age_sec underflow in idle_store()
+Message-ID: <apFS2a3lkskcZaag@google.com>
+References: <20260825092316.69658-1-jiahao.kernel@gmail.com>
+ <apEK-yRTQR8VdT3e@google.com>
+ <apEkQSC5PLQAsrqj@google.com>
+ <55c09f16-4b0d-58a8-9413-f88279ed69fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,36 +77,61 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260828083149.45760-1-jiahao.kernel@gmail.com>
+In-Reply-To: <55c09f16-4b0d-58a8-9413-f88279ed69fe@gmail.com>
 
-On (26/08/28 16:31), Hao Jia wrote:
-> After commit 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking"),
-> idle_store() computes the idle cutoff as:
+On (26/08/28 16:38), Hao Jia wrote:
+> On 2026/8/28 14:02, Sergey Senozhatsky wrote:
+> > On (26/08/28 13:23), Sergey Senozhatsky wrote:
+> > > On (26/08/25 17:23), Hao Jia wrote:
+> > > > After commit 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking"),
+> > > > idle_store() computes the idle cutoff as follows:
+> > > > 
+> > > > 	cutoff = ktime_sub((u32)ktime_get_boottime_seconds(), age_sec);
+> > > > 
+> > > > Because the left operand is cast to a 32-bit unsigned integer, when
+> > > > age_sec exceeds the current uptime, the subtraction wraps modulo 2^32
+> > > > and the huge result is zero-extended into the s64 cutoff.  mark_idle()
+> > > > subsequently marks every entry as idle instead of matching nothing,
+> > > > breaking the intended semantics of /sys/block/zramX/idle.  For instance,
+> > > > running echo 86400 > idle on a machine up for only two minutes causes
+> > > > all newly written pages to be marked as idle and handed over to idle
+> > > > writeback and recompression.
+> > > > 
+> > > > Drop the explicit cast to perform the subtraction in signed arithmetic
+> > > > again, restoring the previous behavior: an age_sec greater than uptime
+> > > > yields a negative cutoff, and one equal to uptime yields 0. Since a
+> > > > cutoff of 0 is now a valid computed value, it can no longer double as
+> > > > the "all" sentinel. Switch to KTIME_MIN instead, which no ac_time can
+> > > > be after.
+> > > 
+> > > Can we instead just reject such cases?   It should be an error to
+> > > request writeback of pages that are 2y old on a system that has
+> > > uptime of 2d.
+> > > 
+> > > Maybe something like this:
+> > > 
+> > > +             time64_t uptime;
+> > > 
+> > > -             if (IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) &&
+> > > -                 !kstrtouint(buf, 0, &age_sec))
+> > > -                     cutoff = ktime_sub((u32)ktime_get_boottime_seconds(),
+> > > -                                        age_sec);
+> > > -             else
+> > > +             if (!IS_ENABLED(CONFIG_ZRAM_TRACK_ENTRY_ACTIME) ||
+> > > +                 kstrtouint(buf, 0, &age_sec))
+> > >                        return -EINVAL;
+> > > +
+> > > +             /* No slot can be older than the system uptime */
+> > > +             uptime = ktime_get_boottime_seconds();
+> > > +             if (age_sec >= uptime)
+> > > +                     return -ERANGE;
+> > 
+> > Or perhaps, instead "return len" and make it a fast path out, w/o the
+> > need to iterate any slots, take locks, etc.
 > 
-> 	cutoff = ktime_sub((u32)ktime_get_boottime_seconds(), age_sec);
+> Thanks for the feedback! I've sent out v2 of the patch. Please take a look
+> when you get a chance.
 > 
-> Because the left operand is cast to u32, when age_sec exceeds the current
-> uptime the subtraction wraps modulo 2^32 and the huge result is
-> zero-extended into the s64 cutoff. mark_idle() then marks every entry as
-> idle instead of matching nothing. For instance, running
-> 
-> 	echo 86400 > /sys/block/zramX/idle
-> 
-> on a machine up for only two minutes marks all newly written pages idle
-> and hands them to idle writeback and recompression.
-> 
-> No slot can have been accessed before the system booted, so an age_sec
-> that reaches back past uptime cannot match any slot. Return early in that
-> case, without walking the table or taking any slot locks.
-> 
-> Track the cutoff as time64_t rather than ktime_t. Both cutoff and
-> ac_time are boot-time values in seconds, so a plain arithmetic
-> comparison against ac_time in mark_idle() is correct and no ktime
-> helpers are needed.
-> 
-> Fixes: 2e8ff2f51dde ("zram: use u32 for entry ac_time tracking")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Signed-off-by: Hao Jia <jiahao1@lixiang.com>
+> https://lore.kernel.org/all/20260828083149.45760-1-jiahao.kernel@gmail.com
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Thanks, looks good.
