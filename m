@@ -1,185 +1,221 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0387D46EC79
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 13:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907F8459AF9
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 14:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787925042; cv=none; b=ohJZsFe+DoS0/AtCf6sSf81rBuBewP93spRPrTO32VbGfMA0Pbqm+EAfH3jSI5xndxQAvk2TyfzBcdPqgWDV6v33KDszX2cowulonJGr2bnn4CB5tCzCO6gHRYW6QIiEiw03skKrDqxb7UA9/j1Cg+Ha3Xei/47huyhcOaH4Tzc=
+	t=1787927797; cv=none; b=bm7561IEfsO+4Mta/dOQjJhF4840LgkRagvEQCuVvqQ3oSf3OCg0du82oCqbBdQHqm7GlzHi+cU7kLCkDJORnE+H4+SvKmG15vAYINkGYNbWuJPxOQb0xm9H/BX7L6jUAOfFds7jdEUnP90myZzjBtWenTECh6Ra0VxyLPPAfE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787925042; c=relaxed/simple;
-	bh=CLBEYcKpWyuhrcgiMUWFD60aO3Fph2vHxszmT1moq34=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sEN2u31wP71RLlvKsuKd/vRTjz/Yu1tURKRyQCgx02OCxUCGkIhiWeJUXd4oSZyQwUNYE0c0cO7/0sdM4ZIME1cBQN0XZKHuFS9FP2xrx23iuEfau0XDr7T8Bzgpdd9DkDAbbFDxZUxWsxs7ibIp++BGzgY6QD7hzjMKLjHYywM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=lXpIiGs1; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=2ZJ6UdCc; arc=none smtp.client-ip=148.163.135.74
+	s=arc-20240116; t=1787927797; c=relaxed/simple;
+	bh=4JiDX/yubXfTIhjMav9YvfmI0tVcsBWXL9wlEHdvhAk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gIJPvysBtMRh3cgRQtgQjc/OEHKJ5EWlqhilWaU6hTXXxazZ3Oin1DzNsGLT2x5AOMuhl0iSnHoDB+OP05EzmPSt4v72ILt0E2xPLV3wLdhX2F42YZYXvhw1fDshbQYa95prElTt7IJw9fxUZXocuxwrzSpbXuTKq1IJ0F/5WH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=F12H2c2U; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=p1Tp0I0F; arc=none smtp.client-ip=148.163.139.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="lXpIiGs1";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="2ZJ6UdCc"
-Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SCY8BL1743154
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 09:50:40 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="F12H2c2U";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="p1Tp0I0F"
+Received: from pps.filterd (m0167076.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SEYJmN2332340
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 10:36:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Bgm9
-	Lli18Fm8IY/j8xR8FpbXhUGGdPwb42mwnsGVJrE=; b=lXpIiGs1yvcVkoXZ+BRp
-	aah3VZmrUyPV6mFS+VhqketrNQ2RqfVXqEBYRnBkUUe0o1wV1AYa0MGOKHwFgFWr
-	vyu9F5LMzBI43aWEGi9OqL6qIbtzM1HYbbMBdh5tceTRAk5+1jvHcNYqnGUFA23b
-	jSGjI+NBOaTwoTlsW16joScTiICVC0oDIRd9BpfITfAPkKVItUWKreTrVu/0ra7D
-	I6ywj55ZQa8Fy8Pd9cpSS5TmaFHUBJH2kt3Nhys/EKQERzQjFv7sXmNJUUhXAcnl
-	ymXEWf6xv76Ppn8D1ed/iS5bUJwevRDN9KYSm53uiU78uxa3QNNkj1SZfj9Atb4w
-	vg==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gaufacg2s-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=598u
+	fPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=; b=F12H2c2UtXrwM4aiV8RY
+	T6eQfL7tPt9zJqQ0qDMpHJTRIQx7uGaXr8PNXlYmtIP4tw1xsinsanB65kvwh6yr
+	cJWEGlHk7hbi0+jCkEw+P/O34iplGmfv49C3D1qBwP+Wwyl+lcaVjXbwVYyCayZk
+	qyIlyk6Gia5BIiB1ESl6zKVrwigefZhXwWUTyxis/IL0bPrfDUvT9IC9t+p3zqnm
+	9dsIKRbVfZ5zPwf//UZ/woAuXC1Z9hwJS8+RkgdjQ5NeqiZH1tvUQUWT8nAWoryf
+	aYCSICh+wUlIkDYoWFVtNBPlhDVehUoa1Fy8e76aK0yqkmYKCfhPTrWp60RRKqJZ
+	Qw==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gbbvgg6bg-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 09:50:40 -0400 (EDT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-90c8da50f4fso9721176d6.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 06:50:39 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 10:36:34 -0400 (EDT)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-52f9f6b85cbso10697991cf.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 07:36:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1787925039; x=1788529839; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Bgm9Lli18Fm8IY/j8xR8FpbXhUGGdPwb42mwnsGVJrE=;
-        b=2ZJ6UdCcyrJinjZQ/lBFbR+QmLb48TYCes6ouy9jqUHD6V5wnZ5XI7QluGc5R/6/Jx
-         udiJp8rnvMJjANjcFUeG05V95CKvxeONXBCb99+gIwIHKQyE1+QkVpZD7O5WdVfBcq5G
-         Z3NxsqMoFmUypGX/aLAZy9kBSX3NsW61kPQbCZU4N3wt3Nl1K3hcBl8tjVAaBWnNZKCk
-         RLPwsYxbqocI4TZVCF2SXvB8tNoJJGnkripSQu5bpHmniaI87jxNvmlI1w/HGfQ9BwLj
-         RCi1sCBrCNDxYJ6kMgaAPlAT1K1CDLW4d3SxHtEzMim829c+2ds1i4zGGLPfRK3YUML5
-         mb4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787925039; x=1788529839;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=columbia.edu; s=lionmail; t=1787927794; x=1788532594; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Bgm9Lli18Fm8IY/j8xR8FpbXhUGGdPwb42mwnsGVJrE=;
-        b=RcxawgWC8zG6NpR1Iz/5UqPEB7SbiTkYVmjdQczAFqH5nWBUUkrpA+PecN2sMuZcRN
-         Gv+wbBB/uk9rTvozJJ7zYVDaU1bTA8GU+p24rMVpHGkn8zdIfDpY2kENGXkdz0AWNW17
-         Xz1TbMqe9UnnVMwxhCHuD2S7EJZtS7CvyNEkShW3yZPdV+TIHkA/nlFNgDY4zpw89mm4
-         aonEOsmUaA7hnuXi6N1+CTgOOzU+jp74bVK56+sobItAYbBpFF49ge1DFwBnARB7Cr2P
-         zZrgYgCtFakglUfc1UIkeEwqkbKnHSbP82uvlyAi7LYk6SSEHOs3EFOXcLGa0QeA9ttv
-         jMYA==
-X-Gm-Message-State: AFuF++niy+qjy5N8+qhkIqbJCgjx4T1/XvGF6K3peeCDkNgImjt29xP6
-	Pia7FbY4/2IkQE1ZZkMnoZREdvXnzS7G9y93bC/faxqCsWP0r0lKc8i4eYbi3vfEj8dKcvW6ZD5
-	v8NyD9NhLzjBYm1PwE1dFC4nkGiBEAcLkhaDhFTbOiG/btiik+6oEL4uV2fV9
-X-Gm-Gg: AR+sD13P2iLayrPG1hjj6FbUElCiXgEXLaz7WQ2xS2mmfbSAUhLY+wYVjq66306RC0y
-	yZRvEyBaHfb067FAYsEP7U/kqrE8aNVGvbjKpNFNX35nyBxRNn9KRzSoaCAwzVDXso0YJNola5y
-	dQE52ZILPQStRgksQ+mYEWbDQc2m7UtFUeMp/XKAlU/ptpBz5q7jaTVGBlAvh01AUKqpgxSD8uC
-	JdB9dk+zcjpP4mKyQntLwaRLVk+IunO4LSSH6NXlLfhibp4j1RRYcKlxUgPY9NGOHRZGNzjNTnE
-	37vLdiYINqrkfishNu7xBWNxAlsRckOUY/y2AWSpwT9oc1Q95ObOOT43JL8UfTVll/DEaF7uSxV
-	WdLq5K7ga
-X-Received: by 2002:a05:6214:234e:b0:8cc:ea2c:f2b3 with SMTP id 6a1803df08f44-90ce0f0a733mr76345886d6.21.1787925038956;
-        Fri, 28 Aug 2026 06:50:38 -0700 (PDT)
-X-Received: by 2002:a05:6214:234e:b0:8cc:ea2c:f2b3 with SMTP id 6a1803df08f44-90ce0f0a733mr76345216d6.21.1787925038479;
-        Fri, 28 Aug 2026 06:50:38 -0700 (PDT)
-Received: from [127.0.1.1] ([45.130.83.151])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90ce4534ebesm15645116d6.48.2026.08.28.06.50.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Aug 2026 06:50:37 -0700 (PDT)
-From: Tal Zussman <tz2294@columbia.edu>
-Date: Fri, 28 Aug 2026 09:49:56 -0400
-Subject: [PATCH v2 7/7] block: remove dead metadata handling from the async
- direct I/O path
+        bh=598ufPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=;
+        b=p1Tp0I0Fiuti0m4hHE8wwKweya+3mgI8DhCdWRfwLKLyq/SqLxB9S5IHwWySNFkRf9
+         9bkIl1tcT8KkK0sS8JV1FZD5Qt1bFL7EMmxnKDk5T8NYLvqkf9ZD9GOxpGVLvK0618fF
+         CgzAzFKe24979y/RomedOoKXqpYmlzj7S148r7p7mlevJ4Ri13p8AyMZnQ3eg93b9WAe
+         qHP165Up+VT+gL4BQwBhNq2tpOMjFiJ6sYWZgmG+DduBTZkEVutzL4W1SWlB2qLTUy14
+         paM9ARp6la2zLACFb2HKfl+FJmgtm6dctWnZbkgMXU6QnecPxU3/oMcc8E9RIPOzfChS
+         +wiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787927794; x=1788532594;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=598ufPSbILHNfdSaKUhv0/mnqSbYE6cS+Ejd1n/aDFM=;
+        b=Felt9QpmP/gAYI1aFrXv2KWUZdVgIj0mH8nB/hUGwUtS1kfz0zkFdKNUI9ggciXGUp
+         byrIKMN/eMkbBiKAqRocBC+iqF32JcWwsJ4Vd0sF+tWeKANOV0w1hBYEQINk3TlYd3St
+         Isv0HcWIXPWb/2Fpa2yrsqu2+YUWlhX+iU8oMFuLx+kcBExcTbXmkNp4mmhTt3lUTdYe
+         q0y30VbxsTzzI7O4ZXdtLRX/gi1Q53tTs1e0+TLHPD5bRjbhHNb8QU1HUkMbggiiU8KQ
+         VuEde2kVZwGzo9Bj3cpMyD9rUuo+L/EiU24C/Ldz4PzT2nkX5r+yKRprKUgYaxK9s4Nc
+         RY1Q==
+X-Gm-Message-State: AFuF++nvqGeIXUfxHy0erxhDfQguJgN+N7Vh8eAiueDJbHy/3C6OR/YL
+	rA2kQdxLNTF5ixUTHkHPIz/HBT80SkJnuGNY8fGK8ZanBhxgMeKlWpQImHL5Gi4psE+1mUu9pKj
+	6KhgY9LkoxYfcPtqsERazSSPSD86w1NReHlhOpJXLZwxtctWCKS6rTIhkS7U/
+X-Gm-Gg: AR+sD10cizOTWvbbgSuS/B2ratbjLp3AGTzQiuhAMEuLUQyYzLhjD8PzJIpjnPkyWn4
+	LiBaEq75n9lVebjz2uoCFB/ybHz3933vP3qGkhUNBWRUTpJenAzfFknYxFYd+uJjpsf5UkEFtnE
+	sgbmHyaJAtM8qy+7a4SnHdtRclnQ2zaOQpcSv9SLNAIoS0+3DnmngZi9bo3wi6C78UzbJLn9xqZ
+	Dwu2RTg6nKcf6pu3ZD+W0KZQyF067EZOjdRqwEC8HKTlP4XPGDcsrR8BYFAHDxlEyIn7W5hfHcg
+	wZ6S4fi5Zys2C/o7vNcaQgP6snyLkXqVMtpQ0UJsB64/ZSfNnTVaqnvYdtnc3q1++tut9wgo2rK
+	enqJwuAAzhjYxNau5a6bYC55t4lB7XWy5eE4OCxnTPgH9K9KY4paI/J/N1k/LydQ=
+X-Received: by 2002:ac8:598f:0:b0:51c:805:1be3 with SMTP id d75a77b69052e-52fb96ffa65mr81226361cf.31.1787927788725;
+        Fri, 28 Aug 2026 07:36:28 -0700 (PDT)
+X-Received: by 2002:ac8:598f:0:b0:51c:805:1be3 with SMTP id d75a77b69052e-52fb96ffa65mr81225571cf.31.1787927788195;
+        Fri, 28 Aug 2026 07:36:28 -0700 (PDT)
+Received: from ?IPV6:2a00:a040:199:85d9:7dc6:c240:3de1:e554? ([2a00:a040:199:85d9:7dc6:c240:3de1:e554])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482fbb20793sm4116286f8f.17.2026.08.28.07.36.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Aug 2026 07:36:27 -0700 (PDT)
+Message-ID: <8da4a2dd-a4ef-4a61-888f-60c611d3f911@columbia.edu>
+Date: Fri, 28 Aug 2026 17:36:24 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260828-blkdev-fixes-v2-7-32f3f40cebed@columbia.edu>
-References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
-In-Reply-To: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/7] block: unpin all pages of a bvec in
+ bio_iov_iter_align_down()
 To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@suse.de>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         John Garry <john.g.garry@oracle.com>,
-        Christian Brauner <brauner@kernel.org>,
+        Christian Brauner
+ <brauner@kernel.org>,
         "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tal Zussman <tz2294@columbia.edu>
-X-Mailer: b4 0.14.3-dev-d7477
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787925005; l=1284;
- i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=CLBEYcKpWyuhrcgiMUWFD60aO3Fph2vHxszmT1moq34=;
- b=5WvKxt3K2LYokFDzH4WeJTFTA7gEIVIWCTmbVlba+tySOCaeA5kMtbAcp9DpKL341If1ztIEY
- xh3MbLbTCOAAGoQ8NrQGpjPrFv+GQRpn8+uJLIHNzo8rEQPhfBCqT+R
-X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
- pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDExOSBTYWx0ZWRfX6dzIDrHiZvvW
- 9x+24bXQBmnrjYiQmt29pcHkmPIiNoqws50Ea1Phb6GVon78FTf6dHF+NUOE472yDdErqYpduAm
- 9HqW+19hUuY+K7IGJoO+NK4wKQqIuNAmZJhLofEIlxjOM5N2IaRNKMmzz8WqiXWmQAkdCLM1fJ0
- nQxUwCY8uhlBOUJxpKVcVcX5GKQg3dsKgBZrzFTPXm0V1fuoz35QqIQLIOOJbMlJIukA8kpxvCD
- YS/f90NYkeB/BD9LgPl8ox4oYA1ixWLHgTUmxX901OtC5xTBqt6yq/mrhNUyAYmkQ6uNe06wPOH
- lqiSoEsAZYpZ8jnhaKMPz+CJ8BSdaolV1gx5EueWgv2Uon4H+d9p2naXvvqWv5coiMqSi/yE84Q
- KU/WIopSL7zYj43G1rsuccqFTlZwr2+QjJP+6EA9i30DUL9ANdDYc+XTFwVDdt6KAo3sFWNQFvt
- EZx5RyOfiMYCNMxvMWQ==
-X-Authority-Analysis: v=2.4 cv=PIc/P/qC c=1 sm=1 tr=0 ts=6a919230 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=xDWFIMX55ayQNp92vt0S/Q==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
- a=YZNyPf5b8iN1AD22L6QA:9 a=QEXdDO2ut3YA:10 a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-GUID: yADhLvt68QMmaVoRxAdd6_1SA2Qe6_W_
-X-Proofpoint-ORIG-GUID: yADhLvt68QMmaVoRxAdd6_1SA2Qe6_W_
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDExOSBTYWx0ZWRfX4s0T0dW8q6j0
- xZ8csAm7WsB+Ws+BUHipAvnEnutuNlHm2Q5B3atJnKLofGPszqZd8c60zy016AizkTC6ysJ6hnS
- acyxAXqt6/GMQD4HIXPOaKocRAaPKzInLxBD2i6pLI1yIanDhs3n
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11888
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
+ <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: oPgxdI-uKvX9pkg7WCcGRFuC9tO0ECyl
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDEyNiBTYWx0ZWRfX2BFtJkKRkofC
+ DYKz4IWc68H2AVP0wulyh6mzi1REjfg2I5bCdOaq0tQ3qmjMLtIZPtZ67OC7Gf/Q44+v54i6W+T
+ nzQm9IMK5e6Jh7mqeVkZyTCk8e7SNkeKscoIsQg+2823h2KruYOh
+X-Authority-Analysis: v=2.4 cv=M8597Sws c=1 sm=1 tr=0 ts=6a919cf2 cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=Qm0qsxP7aFY2tkT6R2MF:22
+ a=8X_uEV4oKehs6EEG2ucA:9 a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22
+X-Proofpoint-GUID: oPgxdI-uKvX9pkg7WCcGRFuC9tO0ECyl
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDEyNiBTYWx0ZWRfX3PphMJUGXetp
+ yiqhVFez12LR7y7iiWalEz9ddgRP1ydJnmNBqsG1y27pnKmjGER+QXW19N56EK0jD3Aaabg0ozA
+ vWgqKQYju72sfjI9+eUVC0IywQ5nwVfAXwha+vZC3CoEtamGKmZDpx/437HyDZ+k7BApkIZSqeP
+ NsVPe5mr+HiQFG2HiZRIr0WvzIKcNsiHUpyXiH2C3rpf3QsiPtGhClML/77erBgHt+bmM6FTZ1e
+ f48AzsA7Exbof+YyuFGMaD5UVKvDwBKDNFlk4IlXGOH8eEH2Ny42LN0AghVKN2iN/atfxd3smJ8
+ /785ccnh3FEala+VHAY2/QR3cHkhF9M0yOTZmr+Bx8lnASVkTCvKgRODpW5y1TFsSVkzBgaHsEd
+ Z3w5SCTL6pA4kPPzqfvdHGuEtw5Z/LCOcgVG2T3RnZwtdEMwIvqqZdL5NZthsUsj0HxRwpMQzyV
+ nb/PImMimPjqYuimfUg==
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11889
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=10 impostorscore=10 malwarescore=0 spamscore=0 bulkscore=10
- adultscore=0 priorityscore=1501 clxscore=1015 suspectscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608280119
+ clxscore=1015 suspectscore=0 bulkscore=10 impostorscore=10 phishscore=0
+ malwarescore=0 lowpriorityscore=10 adultscore=0 spamscore=0
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608280126
 
-Since commit 2729a60bbfb9 ("block: don't silently ignore metadata for
-sync read/write"), blkdev_direct_IO() sends every IOCB_HAS_METADATA
-request to __blkdev_direct_IO(). Remove the now unreachable metadata
-mapping in __blkdev_direct_IO_async() and the unmap in its completion
-handler.
+On 8/28/26 4:49 PM, Tal Zussman wrote:
+> bio_iov_iter_align_down() drops trailing bvecs with unpin_user_page(),
+> but a bvec built by iov_iter_extract_bvecs() can span several pages of
+> one folio, each with its own pin. All but the first pin leak.
+> 
+> The partially trimmed bvec has the same problem. Shrinking bv_len does
+> not release the pins for the pages cut off by the trim, and
+> __bio_release_pages() only unpins the pages bv_len still covers at
+> completion.
+> 
+> Both issues occur only with a logical block size above PAGE_SIZE and a
+> large folio backing the user buffer. On a device with a 64K logical
+> block size, an O_DIRECT pwritev() from a hugetlb mapping that ends 16K
+> past a block boundary leaks one huge page per call, whether the
+> remainder is its own bvec or the tail of a larger one.
+> 
+> Unpin all pages of a dropped bvec with unpin_user_folio(), as
+> __bio_release_pages() does, and unpin the pages trimmed off the last
+> bvec as well.
+> 
+> Fixes: 20a0e6276edb ("block: align the bio after building it")
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> ---
+>  block/bio.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 898b2f5ef8c8..48fa6b9a6dba 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1196,6 +1196,11 @@ bool bio_iov_iter_set(struct bio *bio, const struct iov_iter *iter)
+>  	return true;
+>  }
+>  
+> +static unsigned int bvec_nr_pages(const struct bio_vec *bv)
+> +{
+> +	return DIV_ROUND_UP(bv->bv_offset + bv->bv_len, PAGE_SIZE);
+> +}
+> +
+>  /*
+>   * Aligns the bio size to the len_align_mask, releasing excessive bio vecs that
+>   * __bio_iov_iter_get_pages may have inserted, and reverts the trimmed length
+> @@ -1205,6 +1210,7 @@ static int bio_iov_iter_align_down(struct bio *bio, struct iov_iter *iter,
+>  				   struct bio_vec *bv, unsigned len_align_mask)
+>  {
+>  	size_t nbytes = bio->bi_iter.bi_size & len_align_mask;
+> +	unsigned int npages;
+>  
+>  	if (!nbytes)
+>  		return 0;
+> @@ -1213,14 +1219,24 @@ static int bio_iov_iter_align_down(struct bio *bio, struct iov_iter *iter,
+>  	bio->bi_iter.bi_size -= nbytes;
+>  	while (nbytes >= bv->bv_len) {
+>  		if (bio_flagged(bio, BIO_PAGE_PINNED))
+> -			unpin_user_page(bv->bv_page);
+> +			unpin_user_folio(bvec_folio(bv),
+> +					 bvec_nr_pages(bv));
 
-No functional change.
+And right after sending this, I noticed bvec_unpin()...
 
-Assisted-by: Claude:claude-fable-5
-Signed-off-by: Tal Zussman <tz2294@columbia.edu>
----
- block/fops.c | 10 ----------
- 1 file changed, 10 deletions(-)
+I think a cleaner solution is to move bvec_unpin() up, make bvec_nr_pages()
+handle bv_offset > PAGE_SIZE, use bvec_nr_pages() in bvec_unpin(), and then
+use bvec_unpin() here.
 
-diff --git a/block/fops.c b/block/fops.c
-index 8769bb13df1c..1964cb113842 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -312,9 +312,6 @@ static void blkdev_bio_end_io_async(struct bio *bio)
- 		ret = blk_status_to_errno(bio->bi_status);
- 	}
- 
--	if (bio_integrity(bio))
--		bio_integrity_unmap_user(bio);
--
- 	iocb->ki_complete(iocb, ret);
- 
- 	if (dio->flags & DIO_SHOULD_DIRTY) {
-@@ -376,13 +373,6 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		task_io_account_write(bio->bi_iter.bi_size);
- 	}
- 
--	if (iocb->ki_flags & IOCB_HAS_METADATA) {
--		ret = bio_integrity_map_iter(bio, iocb->private);
--		WRITE_ONCE(iocb->private, NULL);
--		if (unlikely(ret))
--			goto out_bio_put;
--	}
--
- 	if (iocb->ki_flags & IOCB_ATOMIC)
- 		bio->bi_opf |= REQ_ATOMIC;
- 
-
--- 
-2.39.5
+>  		if (!--bio->bi_vcnt)
+>  			return -EFAULT;
+>  		nbytes -= bv->bv_len;
+>  		bv--;
+>  	}
+> +
+> +	/*
+> +	 * __bio_release_pages() only unpins the pages still covered by
+> +	 * bv_len, so drop the pins for the pages trimmed off here.
+> +	 */
+> +	npages = bvec_nr_pages(bv);
+>  	bv->bv_len -= nbytes;
+> +	npages -= bvec_nr_pages(bv);
+> +	if (npages && bio_flagged(bio, BIO_PAGE_PINNED))
+> +		unpin_user_folio(bvec_folio(bv), npages);
+>  	return 0;
+>  }
+>  
+> 
 
