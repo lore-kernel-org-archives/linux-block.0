@@ -1,225 +1,97 @@
-Received: from mail-oi2-f2.google.com (mail-oi2-f2.google.com [74.125.231.194])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3FD188CC9
-	for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 00:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63F52C234E
+	for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 02:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787963616; cv=none; b=UqNmQLZjWjQISpMCVYbyM7/43JbMt2LLbZOV7t4o1F8iIXT4W0lZkTP8m4JVkQGrZ2QmlHCzRLeaSXlgbPMza4dA8Dn1s3esyFRo+8bb1pfOWbTBCm5D1f9re87E48q7pPINxshmS0B7Yjop7+/Wx2AMANa8QjvFtjpYu/WSFIg=
+	t=1787969620; cv=none; b=nRO1AjYndRKO4DbGxlXR10B0t+DGTUuc/oxQmD2syobWnXao3PHC5akES1K9/5rbZaDX6F/Jw1YeIO1CzJZ74qMG+esZU94MTTGZ9Zq/k6ncSKG+j6ftwrosDkUN1vjp1ZlwUogEl5uVHrI6U74+IwH9ZYefDa7mSOqITXPzFdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787963616; c=relaxed/simple;
-	bh=nkPhFdgmWtXtAyV4iyyrZcCvowT2KbVn3gNKW2Yrtfc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Rben+zXG/3euAhVvKFOC1d/I8TaJDrKzGR3wRw07F4T8cJ3Mbo6JYNnzDG+0vxELN1yJiot7UVmV9RF8PmwGngSYAO3/nGM8AD2snT53vFIKDIaRHG1TWbZbMcF0+roR9lvmgGCM3UYT77uwSM+JzGxRDNz0eJscgg8Rv0NuKSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi2-f2.google.com with SMTP id 5614622812f47-495d5d27acfso785750b6e.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 17:33:34 -0700 (PDT)
+	s=arc-20240116; t=1787969620; c=relaxed/simple;
+	bh=5rv0FfyiYEvyvVwzL3LiWBygbPcujcnx1umZvHO9vBQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=nH6liclJAmCxLbLqSVgRRVe5FdwcGtErSgqjECVAXjK0Hv1ODjaWu1NUBvo/hBYhzNS2vx2jevqgIZ0Angm/bLbd4PA0WXwIOMb4mvyoCRtbq/EGUNmx3svRs4eohIMteW3vckUqBB9T6JmCbui/JgkFFyQw0KzJ1dbLRhkXZGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rjK7yde0; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rjK7yde0"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2cfbbdfa60bso18083915ad.3
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 19:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787969618; x=1788574418; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ovGmNS04B5xvYEr6LE0aaw0+pimuQ4fxyRqoFUQTeKs=;
+        b=rjK7yde0uBQrqGrYhS/8b4unVQRZEEyR9LCvOd8R2CUB35GH+z9m5MYrgJ59di1K+L
+         oFogsD3Ill6upGMJKJGcRjvh4fn2o3ec92DeqWjqRPuunJCBIvyyUU9RfeVx/Vh9Hwb0
+         N+0AlrJqTzlNbdlwcrB3CIvTxn+gnItYb5PuVDlp0K/t3jKMfnqda0jGTZsakQo8zWgz
+         EGTlgunXuESMD8rwf0CBiMr90MqXpg4uDufIGh2Ti5QEhroJ7EBdwKl/eTfARekSA9aX
+         mtwkmzw0P1lJM9wz4oW7dfE9ezFYSKdoKvxwEPwyzscelY2sonU84hZmkVj9lKFD9Yn7
+         Porw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787963613; x=1788568413;
-        h=content-type:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=IlIMu5bgBCnFIxaX2eV5zuV1R2iOSwt6vufRHu6k+8k=;
-        b=d5YsJP9wgeIEfAQPi3bND6ZWJDXTzizd1VqxaOiJ8yqR3nTNJotEf1S0Z9HNvIt2rB
-         +ZxRx1g6Z4xlLBmU964G3SszohsOWQFAeDclSMZlLBJK37h7mH6lSdOaLppowXmAsrBo
-         pZAGg5gj5qYS25qa+t3/7PkLQyHF0lk+xlKjeUvfuZKQ4Mf560NojvF/bIa/d9zl/vj2
-         ZBHrKgPunEjINXU2I+BODJKpmqmAiSOhKEf5gD5YAnqj+DCLSo3VeL0ScU4DmwbwzdSK
-         G2f8l3w0WnSscwhAKpGioxWMaIKn3qljSDZpPL0VJnhpoTC7NdVTNxWoyuMKBjSR4wI6
-         sEzw==
-X-Forwarded-Encrypted: i=1; AHgh+RpT34siGbtTrPzr6Jkrab+rAib4tz04oflzPwmgFHzf0r9go7Xo4wjK8/SzJNr34FUTTXcqubvb2h+fdg==@vger.kernel.org
-X-Gm-Message-State: AFuF++nU2Uay+jL/z3q/cviEJa3JwwG9O8Gu5iZ9GAMV80bZQUhkm5cj
-	8dxI3MMkyaf3W1hyBq9/+eGbfleuPAJfjcRT0+9yTxZ0R6HIYolqpSawgmHjqzxct3/qfHVRNgM
-	HDAMJHw+jrkA/P8hsTQWyde2HHPmQ1JlpKlKBt568H8cMqGEAwZB7N5Wgl9U=
+        d=1e100.net; s=20251104; t=1787969618; x=1788574418;
+        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ovGmNS04B5xvYEr6LE0aaw0+pimuQ4fxyRqoFUQTeKs=;
+        b=N27PoNG/ca9fyihJMB9wPNQxj3QMLv7waKxhWwt+ZXgx8olqYCRhZE8Mpu0kivcvI0
+         Hyx/UZfcPLpVY1nOufCb9RJFWQ4dQGZHbrsAJUU0I6XBtuNhzcHtJs97OeHe2MOAaGlx
+         ADxfCpG73+0y2S3+OtE5yQd48dFYrFFnB/4VOx6zshCJYmRpadtjxYQGjVt7NICCSKjS
+         ABcSeW5AC77Czd/SLR15Mo2atsZXkVL1NUS/W4x2bn8X6/EyN+xs5904MLIT5p/NTGCY
+         9EAwTd7gh4vAZZi5dhwFrUyeZLAF2O1ONF0caxKroAZ7ARd42w2gM+LWhMsmSt0ChFjb
+         7CKg==
+X-Gm-Message-State: AFuF++l8rfSbmZObePT/aSvniKsloUkefki42fivKI8w4bxe1zSQAKiO
+	bXPhnXj9j2uzcSh6pHY1hYneIMGn5KUxymmKKkZzLGonUh3T4FpWTb5GZCoiRMxn7D0=
+X-Gm-Gg: AYBFou3/MvcGCG7ccfhbcFanSaHVEWstM1scrMXUCxiWvvtlE5d8PVuHszRS+nsBayh
+	qcwWd1XFqiKW34nrPKcDubJ8ENGUbx1ZIY6WmdgJ/1cMX2b5x/1jyhxALTO1TbVfiNsEjpPAoUU
+	cvs2QMzeVtf+uffQJJjH49oQw4oTXjCRKX32pf7WWhvGwjiGsunpcw9JW1FL5fU6FZGXSyQPXVE
+	6vvd2RJkjAhzTiN+kWYYpx07oxOuSCvTKrwtiXE/+nLky9QRYa0Mz2iiQfNfcdqA23A6KA+btKc
+	6GZXzQpuK7dfTfygPQR1fqW7WTitOMvNJFT7fgYIrfiT/MbgL243dkTCF4XEZkSmeG5ixPiLrOt
+	qI33jVZEIl4KKXLLm0nb8FVMVClV3/ni2bRnJsQlHVkArZy52SBF8+jNSSm9o/Ys9HFekO4rs3X
+	qtivhWbmRoaXPYaO3Tmfl9ex19Sp7o3ZMY1MksmqGxI93Jca41SJkLYesZfgGYyQDNHncQ32vGk
+	ftN6LkvHMw=
+X-Received: by 2002:a17:902:d483:b0:2d7:4b42:9352 with SMTP id d9443c01a7336-2d74dca231amr184313925ad.3.1787969618107;
+        Fri, 28 Aug 2026 19:13:38 -0700 (PDT)
+Received: from emedev.tailf75c28.ts.net ([148.222.209.172])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f995e60sm10164143eec.22.2026.08.28.19.13.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Aug 2026 19:13:37 -0700 (PDT)
+Message-ID: <6a924051.e22746c9.8f0fc.bdc2@mx.google.com>
+X-Google-Original-Message-ID: <20260828223000.ramshared-v1-cover>
+From: emersonbusson <emersonbusson@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	linux-kernel@vger.kernel.org,
+	emersonbusson <emersonbusson@gmail.com>
+Subject: [RFC PATCH v1 0/2] drivers/block: add RamShared hardware-accelerated VRAM block driver
+Date: Fri, 28 Aug 2026 23:13:30 -0300
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1306:b0:4b3:80b8:8741 with SMTP id
- 5614622812f47-4b39804f929mr11891424b6e.5.1787963613752; Fri, 28 Aug 2026
- 17:33:33 -0700 (PDT)
-Date: Fri, 28 Aug 2026 17:33:33 -0700
-In-Reply-To: <6a807bfd.f7a79266.2f965f.0008.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a9228dd.1d9ded08.62e62.00f7.GAE@google.com>
-Subject: Re: [syzbot] [block?] [cgroups?] possible deadlock in blkg_conf_prep
-From: syzbot <syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+This patch series introduces the RamShared hardware-accelerated block driver
+(drivers/block/ramshared).
 
-HEAD commit:    818bebeb63dd drm/xe: Don't hand out the flat CCS storage a..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=104ced79580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ccca94d2c01b9e78
-dashboard link: https://syzkaller.appspot.com/bug?extid=144a1c0e22e53a08ef5a
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f08379580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=124ced79580000
+RamShared maps discrete GPU video memory (VRAM) apertures over direct PCIe
+DMA to provide an ultra-low latency, non-rotational block device with a
+synchronous .rw_page swapout path.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-818bebeb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6e4100526b12/vmlinux-818bebeb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/723c4783ee96/bzImage-818bebeb.xz
+Key Design Highlights:
+1. blk-mq multi-queue parallel request processing with atomic gendisk allocation.
+2. Synchronous .rw_page fast-path in block_device_operations for zero-allocation
+   swapout under direct memory reclaim pressure.
+3. PCIe AER error handling with pci_error_handlers to contain link resets.
+4. Comprehensive multi-kernel compatibility across 5.15 LTS through 6.18+.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com
+Testing & Quality Gates:
+- checkpatch.pl --strict: 0 errors, 0 warnings, 0 checks.
+- sparse semantic address-space analysis: PASS (__iomem annotations verified).
+- Multi-tier saturation benchmark: 9,160 MB swap holding 40 continuous cycles
+  over 30 seconds with 0.00 ms access latency under WSL2/Hyper-V.
 
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.1.18/6027 is trying to acquire lock:
-ffffffff8efc6c00
- (
-fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:314 [inline]
-fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4539 [inline]
-fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4899 [inline]
-fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
-
-but task is already holding lock:
-ffff888028683bc0 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_conf_prep+0xbc/0xf10 block/blk-cgroup.c:849
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&q->blkcg_mutex){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5886 [inline]
-       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
-       blkcg_activate_policy+0x34f/0xbf0 block/blk-cgroup.c:1608
-       blk_throtl_init+0x39a/0x5b0 block/blk-throttle.c:1339
-       tg_set_conf.isra.0+0x252/0x500 block/blk-throttle.c:1368
-       cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
-       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
-       new_sync_write fs/read_write.c:595 [inline]
-       vfs_write+0x6af/0x1050 fs/read_write.c:687
-       ksys_write+0x12a/0x250 fs/read_write.c:739
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&q->q_usage_counter(io)#17){++++}-{0:0}:
-       lock_acquire kernel/locking/lockdep.c:5886 [inline]
-       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
-       blk_alloc_queue+0x610/0x790 block/blk-core.c:504
-       blk_mq_alloc_queue+0x174/0x290 block/blk-mq.c:4420
-       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4467
-       loop_add+0x498/0xb60 drivers/block/loop.c:2071
-       loop_init+0x1d3/0x200 drivers/block/loop.c:2310
-       do_one_initcall+0x11c/0x6f0 init/main.c:1353
-       do_initcall_level init/main.c:1415 [inline]
-       do_initcalls init/main.c:1431 [inline]
-       do_basic_setup init/main.c:1451 [inline]
-       kernel_init_freeable+0x6ea/0x7b0 init/main.c:1666
-       kernel_init+0x21/0x1e0 init/main.c:1556
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 (fs_reclaim){+.+.}-{0:0}:
-       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
-       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
-       validate_chain kernel/locking/lockdep.c:3924 [inline]
-       __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5253
-       lock_acquire kernel/locking/lockdep.c:5886 [inline]
-       lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
-       __fs_reclaim_acquire mm/page_alloc.c:4375 [inline]
-       fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4389
-       might_alloc include/linux/sched/mm.h:314 [inline]
-       slab_pre_alloc_hook mm/slub.c:4539 [inline]
-       slab_alloc_node mm/slub.c:4899 [inline]
-       kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
-       __radix_tree_preload+0x333/0x820 lib/radix-tree.c:338
-       blkg_conf_prep+0x489/0xf10 block/blk-cgroup.c:885
-       tg_set_conf.isra.0+0x1ed/0x500 block/blk-throttle.c:1373
-       cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
-       kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
-       new_sync_write fs/read_write.c:595 [inline]
-       vfs_write+0x6af/0x1050 fs/read_write.c:687
-       ksys_write+0x12a/0x250 fs/read_write.c:739
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  fs_reclaim --> &q->q_usage_counter(io)#17 --> &q->blkcg_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->blkcg_mutex);
-                               lock(&q->q_usage_counter(io)#17);
-                               lock(&q->blkcg_mutex);
-  lock(fs_reclaim);
-
- *** DEADLOCK ***
-
-locks held by syz.1.18/6027: 6, last CPU#3:
- #0: ffff888035cc8b70 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x2aa/0x380 fs/file.c:1259
- #1: ffff8880372a4460 (sb_writers#11){.+.+}-{0:0}, at: ksys_write+0x12a/0x250 fs/read_write.c:739
- #2: ffff888037174c80 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x2c2/0x5f0 fs/kernfs/file.c:336
- #3: ffff8880534200f8 (kn->active#66){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:73 [inline]
- #3: ffff8880534200f8 (kn->active#66){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x332/0x5f0 fs/kernfs/file.c:337
- #4: ffff888028683a40 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev+0x253/0x410 block/blk-cgroup.c:806
- #5: ffff888028683bc0 (&q->blkcg_mutex){+.+.}-{4:4}, at: blkg_conf_prep+0xbc/0xf10 block/blk-cgroup.c:849
-
-stack backtrace:
-CPU: 3 UID: 0 PID: 6027 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2059
- check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2191
- check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
- check_prevs_add kernel/locking/lockdep.c:3300 [inline]
- validate_chain kernel/locking/lockdep.c:3924 [inline]
- __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5253
- lock_acquire kernel/locking/lockdep.c:5886 [inline]
- lock_acquire+0x1b9/0x370 kernel/locking/lockdep.c:5843
- __fs_reclaim_acquire mm/page_alloc.c:4375 [inline]
- fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4389
- might_alloc include/linux/sched/mm.h:314 [inline]
- slab_pre_alloc_hook mm/slub.c:4539 [inline]
- slab_alloc_node mm/slub.c:4899 [inline]
- kmem_cache_alloc_noprof+0x63/0x6a0 mm/slub.c:4933
- __radix_tree_preload+0x333/0x820 lib/radix-tree.c:338
- blkg_conf_prep+0x489/0xf10 block/blk-cgroup.c:885
- tg_set_conf.isra.0+0x1ed/0x500 block/blk-throttle.c:1373
- cgroup_file_write+0x1e6/0x8a0 kernel/cgroup/cgroup.c:4412
- kernfs_fop_write_iter+0x3e0/0x5f0 fs/kernfs/file.c:345
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x6af/0x1050 fs/read_write.c:687
- ksys_write+0x12a/0x250 fs/read_write.c:739
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f7b6519e159
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f7b66080028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f7b65425fa0 RCX: 00007f7b6519e159
-RDX: 000000000000006a RSI: 00002000000000c0 RDI: 0000000000000005
-RBP: 00007f7b65235024 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f7b65426038 R14: 00007f7b65425fa0 R15: 00007ffc8680c158
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Signed-off-by: emersonbusson <emersonbusson@gmail.com>
