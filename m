@@ -1,196 +1,134 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f5.google.com (mail-oi2-f5.google.com [74.125.231.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF22CCB9;
-	Sat, 29 Aug 2026 05:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF8A322DB7
+	for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 05:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787980701; cv=none; b=Jgb+edLcZvz5neiGoyln2qmDjpt+vLE/IOSswIerZ0T3WAH/HHOyXoE/9Fwjz5RBiaZ69Lu3ia6S5MVJ+CVPEYyQwpyE/j3o9ToZx2xWewnaSBaHhuHRZdmyCTQaYc9gnxu5rQLF0DWf6iS1fU0FEcJAlH8s+Rmm0/15Telygh4=
+	t=1787981489; cv=none; b=a6tR1kcnPFXCqeMjnSz5On1MI0dRPAqNGFz7nRz8u++rqrn/szUrfF++WU2u0thqZjpRZnGXAst4rFQqUfDsfP8TcHzetSOQurI19SDsV4TTVn618rXhfUWEx7tB1Jm8iJc7LaeH07sJnhKuMf0arHj3HCW+HJBXsdnAs2bLtUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787980701; c=relaxed/simple;
-	bh=qRwZ5NpNVPKe2b6/4sk8juFJHvLZLl114q8bZtIi3iw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j0FAdIfomSR3cJRlJimvyVzpWhgB7+3XmR8d9YLQvWl01UBo3rfSYbwZm9SqzB2duVqwgASWvRVwKr4gGVZgsmBK3oXmBpt6f4LPnPyQeVtFoF9rpGxHGlXS0wXqYEMvwtncZX+HGSkY8J+qKnSsW4BON4/PYDzyx5Dh6xLyBxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67T5H1Rj003598;
-	Sat, 29 Aug 2026 14:17:01 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67T5H01E003595
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 29 Aug 2026 14:17:00 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <903a22a2-432c-4e72-bc09-7898becf2f3e@I-love.SAKURA.ne.jp>
-Date: Sat, 29 Aug 2026 14:17:00 +0900
+	s=arc-20240116; t=1787981489; c=relaxed/simple;
+	bh=J63cCjU7NQMqNc4BYfZxkPvygTtwZPK/s48tuhKYo9w=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Tf37BbdFrAxK4bgyxfsZTRt5JcNIIFS4/nqf1oRyCJwOGR3ntu8tr2T2Ddkfmpaa2/exJQxvBC1FhBjzS7svjZraa5qtd/7qVTdpVGK1XrXzrFh7RPocqk6oEnn9JY3Lrp4E2Etafc1ryKb4nUcSKj2zz0/YnBSZYGYXl3mljSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi2-f5.google.com with SMTP id 5614622812f47-4b3759b7ff0so697411b6e.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2026 22:31:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787981487; x=1788586287;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IUjmvQ8X6s/JHGzOzsHlequ1pScp7s06KOL9eRF58EU=;
+        b=C0zwdio9nIjoxXSTJcTQtZQ+tl6lYvDFH6rDt9X1FwDtTVlztXO3+W8p7lHtVAX8jP
+         zxSoUt8apmO0gP8DlQHW9FKmzvBOVla8nHxt5KrH7hwp1uNV+Gj1S4rDDETsrxHuIufr
+         DCRAwQ5X4JMHfBDCV6cW3xcWi/Lj7HmlUsg2a4wZOBhUbYeadw+bN/gV4cBq9IykjY0E
+         WGx5UR9iFcpmqKFxE9klWPDCuUTTwZIsxk8s9qlPmYOWvuW6JqIE1Wt+RubZk4j14qeE
+         VZz56DxXAdzFz/WnwvBID8W0SP3MrL7OKNj4EGXAC2Noh0h1cb/AxJobcTyRqQxlDsYw
+         fFZA==
+X-Forwarded-Encrypted: i=1; AHgh+RpijrsxSO+vJOjijdhJI7jnkfTZ5vnEnLXqpg/qlSZJ9mTpz0GUH2A2Ez3tUfMbFJJZFkVsmTBg2u8F8w==@vger.kernel.org
+X-Gm-Message-State: AFuF++mXr81dgAEn7u3wzgD9uVRIJ84oKcd1k9m8tgdliaFij5hO6lb1
+	Oe5Z15A818D+l/0YHyqq37acUkMOMnSdXSCc4NpA74ve8bhBPp1EIJPfn5zhe6KvJ+HCsUjwbct
+	PFjRnWfTq96FF3m/8nZepm5+gqFmnJGiQdIT3mXSoVavEr2AmHzPiyGKckJQ=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7] loop: Fix NULL pointer dereference in lo_rw_aio()
-To: Bart Van Assche <bvanassche@acm.org>,
-        Markus Elfring <Markus.Elfring@web.de>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, lkp@intel.com,
-        oe-lkp@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>, Oliver Sang <oliver.sang@intel.com>,
-        linux-btrfs@vger.kernel.org
-References: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
- <550ff0b4-df39-46d2-9781-c8688df10c93@web.de>
- <38ad64c1-edc7-431d-8f52-fba572ebf3eb@I-love.SAKURA.ne.jp>
- <372ca5f6-81a0-4f6c-8f55-ebeeada9f955@acm.org>
- <27bcb147-bead-4432-8cd0-981489f36228@acm.org>
- <c41e9198-86a8-4bcd-a608-6f457b24f345@I-love.SAKURA.ne.jp>
- <7e51bca8-218a-40b8-8ff8-fc59671f5add@acm.org>
- <3bb080d0-4421-4012-8a62-6a2bf165cbd9@I-love.SAKURA.ne.jp>
- <d2f387b9-031a-4306-9323-56f98a8241b7@acm.org>
- <e5518546-701e-4d3c-a077-18e34aa8c188@I-love.SAKURA.ne.jp>
- <c0df5f39-d103-4e36-9807-df0ae0247772@acm.org>
- <c2ab2547-63b3-48cf-87c1-fc53219e360a@I-love.SAKURA.ne.jp>
- <d0471919-9b71-4d24-9fb8-5f1d7f3792ca@acm.org>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <d0471919-9b71-4d24-9fb8-5f1d7f3792ca@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav411.rs.sakura.ne.jp
-X-Virus-Status: clean
+X-Received: by 2002:a05:6808:c1ad:b0:495:f8a6:81f8 with SMTP id
+ 5614622812f47-4b3981e5467mr14147676b6e.13.1787981487283; Fri, 28 Aug 2026
+ 22:31:27 -0700 (PDT)
+Date: Fri, 28 Aug 2026 22:31:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a926eaf.1d9ded08.62e62.0102.GAE@google.com>
+Subject: [syzbot] [block?] BUG: corrupted list in blk_mq_request_bypass_insert
+From: syzbot <syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026/08/29 1:29, Bart Van Assche wrote:
-> On 8/28/26 8:53 AM, Tetsuo Handa wrote:
->> +     * wait for already started loop_queue_rq() to complete.
->> +     */
->> +    synchronize_rcu();
-> 
-> Calling synchronize_rcu() to wait for ongoing loop_queue_rq() calls to
-> complete won't work if anyone would set BLK_MQ_F_BLOCKING for the
-> request queues created by the loop driver.
+Hello,
 
-Excuse me, but this ordering is correct (reviewed by Gemini and sashiko).
+syzbot found the following issue on:
 
->                                            Please use the block-layer
-> APIs instead of open-coding these. I'm referring to
-> blk_mq_quiesce_queue() and blk_mq_wait_quiesce_done().
-> 
-> Freezing the request queue must happen before waiting for ongoing
-> loop_queue_rq() calls to finish.
+HEAD commit:    f1b8fa82cab7 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=14f18379580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d1128bc53f2ef7f3
+dashboard link: https://syzkaller.appspot.com/bug?extid=f4353e96f7004ae5a09e
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+userspace arch: arm64
 
-I and Gemini cannot catch what you want to say here.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> Calling synchronize_rcu() does not prevent new I/O to be submitted. What
-> prevents io_uring to submit more I/O asynchronously, e.g. if a file
-> descriptor that refers to a loop device instance has been registered in
-> the fixed-file table?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/932d85a2bda2/disk-f1b8fa82.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5b6b8fb76e8d/vmlinux-f1b8fa82.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c246b61ee396/Image-f1b8fa82.gz.xz
 
-Calling synchronize_rcu() makes sure that no more queue_work() calls are
-made from loop_queue_work() from loop_queue_rq(). Since loop_queue_rq() is
-called with RCU read lock, subsequent loop_queue_rq() calls which are made
-after synchronize_rcu() returned shall see lo->lo_state != Lo_bound and
-return with BLK_STS_IOERR.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com
 
-> 
->> +    /*
->> +     * Now that no more works are scheduled by loop_queue_rq(),
->> +     * wait for already scheduled works to complete.
->> +     */
->> +    drain_workqueue(lo->workqueue);
->> +    /*
->> +     * Now that no more AIO requests are scheduled by lo_rw_aio(),
->> +     * wait for already started AIO to complete.
->> +     */
->> +    blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
-> 
-> Freezing the request queue must happen before lo->workqueue is drained.
+ non-slab/vmalloc memory
+list_add corruption. prev->next should be next (ffff0000c8a39040), but was ffff0000c8ab0e48. (prev=ffff0000c8ab0e48).
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:34!
+Internal error: Oops - BUG: 00000000f2000800 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 4390 Comm: kworker/0:1H Tainted: G             L      syzkaller #0 PREEMPT 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/07/2026
+Workqueue: kblockd blk_mq_requeue_work
+pstate: 63400005 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32
+lr : __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32
+sp : ffff8000947079f0
+x29: ffff8000947079f0 x28: ffff800094707aa8 x27: ffff800094707aa0
+x26: 1fffe00019147209 x25: ffff0000c8a39040 x24: ffff0000c8a39048
+x23: 1fffe000191561c9 x22: dfff800000000000 x21: ffff0000c8ab0e48
+x20: ffff0000c8ab0e48 x19: ffff0000c8a39040 x18: 1fffe00034bb7428
+x17: 3034303933613863 x16: 3030303066666666 x15: 28207478656e2065
+x14: 6220646c756f6873 x13: 0000000000000001 x12: 0000000000000000
+x11: 0000000000000000 x10: 0000000000000002 x9 : d55a73c626cee600
+x8 : d55a73c626cee600 x7 : ffff80008048c60c x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff80008049731c
+x2 : 0000000100000001 x1 : ffff0000c56f3a80 x0 : 0000000000000075
+Call trace:
+ __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32 (P)
+ __list_add_valid include/linux/list.h:96 [inline]
+ __list_add include/linux/list.h:158 [inline]
+ list_add_tail include/linux/list.h:191 [inline]
+ blk_mq_request_bypass_insert+0x130/0x1cc block/blk-mq.c:2551
+ blk_mq_requeue_work+0x3a4/0x52c block/blk-mq.c:1560
+ process_one_work kernel/workqueue.c:3322 [inline]
+ process_scheduled_works+0x788/0x10b8 kernel/workqueue.c:3405
+ worker_thread+0x798/0xbd0 kernel/workqueue.c:3486
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:838
+Code: 91270000 aa1303e1 aa1403e3 979c2c73 (d4210000) 
+---[ end trace 0000000000000000 ]---
 
-Again, I and Gemini cannot catch what you want to say here.
 
-Calling drain_workqueue() after synchronize_rcu() makes sure that no more
-loop_handle_cmd() calls are made from loop_process_work() from loop_workfn()
-and loop_rootcg_workfn().
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Calling blk_mq_freeze_queue() after drain_workqueue() after synchronize_rcu()
-does wait for completion of all pending I/O requests which has been scheduled
-via loop_queue_rq(), by waiting for q_usage_counter to reach 0. Also, this
-synchronize_rcu() => drain_workqueue() => blk_mq_freeze_queue() ordering
-guarantees that q_usage_counter won't be incremented again after it once
-reached 0, due to the lo->lo_state != Lo_bound check in loop_queue_rq().
-This makes it possible to call blk_mq_unfreeze_queue() immediately after
-blk_mq_freeze_queue().
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> 
->> +    /* Step 2: Perform remaining cleanup, with open_mutex held. */
->> +    mutex_lock(&disk->open_mutex);
-> 
-> After having obtained disk->open_mutex, lease add something like the
-> following: WARN_ON_ONCE(lo->lo_state == Lo_bound). Even if this
-> condition can't be triggered today, this may help with detecting bugs in
-> future loop driver changes.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Did you mean WARN_ON_ONCE(lo->lo_state != Lo_rundown) ?
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-> 
->> @@ -1168,8 +1186,6 @@ static void __loop_clr_fd(struct loop_device *lo)
->>       /* let user-space know about this change */
->>       kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
->>       mapping_set_gfp_mask(filp->f_mapping, gfp);
->> -    /* This is safe: open() is still holding a reference. */
->> -    module_put(THIS_MODULE);
->>         disk_force_media_change(lo->lo_disk); 
-> 
-> I don't think that it's acceptable to invoke __loop_clr_fd()
-> asynchronously in its entirety. I think at least the following code
-> should be executed synchronously from lo_release():
-> 
->     loop_sysfs_exit(lo);
-> 
->     mutex_lock(&lo->lo_mutex);
->     WRITE_ONCE(lo->lo_state, Lo_unbound);
->     mutex_unlock(&lo->lo_mutex);
-> 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Doing so breaks the whole protection provided by the Lo_rundown state. As soon
-as lo->lo_state becomes Lo_unbound, lo_open() will succeed and loop_configure()
-will start changing an lo object before WQ context cleans up that lo object.
-
->> @@ -1769,8 +1797,20 @@ static void lo_release(struct gendisk *disk)
->>       need_clear = (lo->lo_state == Lo_rundown);
->>       mutex_unlock(&lo->lo_mutex);
->>   -    if (need_clear)
->> -        __loop_clr_fd(lo);
->> +    /*
->> +     * In order to flush pending I/O requests before clearing the backing
->> +     * device, defer __loop_clr_fd() to WQ context. The Lo_rundown state
->> +     * guarantees that lo_open() will fail with -ENXIO.
->> +     */
->> +    if (need_clear) {
->> +        /*
->> +         * Grab all references that will be dropped as soon as
->> +         * returning from lo_release() and releasing disk->open_mutex.
->> +         */
->> +        get_device(disk_to_dev(disk));
->> +        __module_get(disk->fops->owner);
->> +        queue_work(system_long_wq, &lo->lo_clr_work);
->> +    }
->>   }
-> 
-> Please convert the above code to the "early return" style that is used
-> elsewhere in the kernel.
-
-That is OK. But after you agreed that my patch works as expected.
-
-> 
-> Why system_long_wq instead of lo->workqueue?
-
-That is a deadlock. We can't flush a work in lo->workqueue from inside
-WQ callback function where that work is associated with.
+If you want to undo deduplication, reply with:
+#syz undup
