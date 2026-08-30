@@ -1,158 +1,123 @@
-Received: from mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
+Received: from mail-oi2-f4.google.com (mail-oi2-f4.google.com [74.125.231.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942FE148850
-	for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 01:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918282BF002
+	for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 05:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788052829; cv=none; b=Hh6gTMc2VOerJo0PycJGZ4FAB1poPJe6C4buNRoOqVS7/+uFgEJqvUU5WYBBMXqLNbS3biJOzfxmO1z+HBXlE9qgWTm1JVtPX1eod+c6dfD/vu8a1Sh35g2uiEcW8HVZs16w0MKvjmYeNT4LmQEDH7BgEawe34gim+S4HQWy8tk=
+	t=1788066510; cv=none; b=r26JMwTkXZNryCBA0GxxMETFhuJeDNeTH7uvLUqiDHYdyqTtMYr+wqt0mTsi+z/P/ypNrDgSHgbtyt+zHEIqwBClF6zi+fTE8zkrOGuck5zGWgGQRsZFXC8gDM3+uCqKSzmHkjhC7CfnPrgH4UnqVKIf1z8LFHn6IM6dPqA8noo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788052829; c=relaxed/simple;
-	bh=cXHnugjrYFIs1UwN0nVV8md0Hm/sTFj0FoTfSt8CKkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kw3qdD4RQBVFD60T4Q6BIV14g19qtuwz82/dPe/FrQFXVF7uHhZbDQc1ldU2FCTYAsZgOrO0z9ZSAjJJDkHRiOtYALxo7aOtVJp7P8Owy1uW9tx/P5kWgRhivgJpSIKmBBPkzcDgieXgnwY8vCpiX5jD5lB2Xkeuyybb7ldMDUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uj+g9NvU; arc=none smtp.client-ip=91.218.175.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uj+g9NvU"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=cXHnugjrYFIs1UwN0nVV8md0Hm/sTFj0FoTfSt8CKkQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788052825; v=1; x=1788657625;
- b=uj+g9NvUax7kkrmIpYg5SAngii4rI5NgZzTsmimdl7DRGWtZKrBbA4vzOltKw3RmjP45oemd
- c4Hn8XvTb+1yIkyINTqftazhZ8oPSr+ZUCLw2B2zLD+nJPvNohSU6CBT06lVB0SRDhdzxYx//6L
- nQJ2sM9NxgDidSbFkEHYpY58=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 0ca15c6cd765ee62;
-	Sun, 30 Aug 2026 01:20:25 +0000
-X-Mizu-Trace-ID: 0ca15c6cd765ee62
-X-Migadu-Flow: FLOW_OUT
-From: Md Haris Iqbal <haris.iqbal@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Md Haris Iqbal <haris.iqbal@linux.dev>
-Subject: [v2 for-next 3/3] Documentation: block: document error injection delays
-Date: Sun, 30 Aug 2026 03:20:02 +0200
-Message-ID: <20260830012002.80275-4-haris.iqbal@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260830012002.80275-1-haris.iqbal@linux.dev>
-References: <20260830012002.80275-1-haris.iqbal@linux.dev>
+	s=arc-20240116; t=1788066510; c=relaxed/simple;
+	bh=QrUw5wx6Zi6OdHnBtaCTdCevZ09hIv8FNK8RsANa4Yo=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=DRDDNEVgAdBUAh12FkJQjsAsIaGjEgq8XMSesn77wRL1QG24oTQrwdL3g9bK7oQf1yI7FlBrVOLx8zzOBwAXyso41CF7qAgPUceWbcoek5853lyL7o6qOlESPP3bxXS+eS9BnVVyMiHxNEMDP/N1UgaPZWkKLYtxo8EG39zX+9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi2-f4.google.com with SMTP id 5614622812f47-4b388697b03so306254b6e.0
+        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 22:08:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788066507; x=1788671307;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=M9Xja3isy4PvneAFilyVvbQLwR9EOrBnUoImyCuQUe4=;
+        b=F/qryVWklA2728Z/MO6RI3BFRuW5I6z7ei2+yA7EoYglxTgipv9P6Stev3tRTtFWSE
+         wPIRslS9bnbyvjHgRGv/lvlPR1ljbqCvHsK05L9Pppxxq/gnMh6VTHDcMqZiRNqSxs3O
+         X61uhdXhWCA1T/JKoFlCmL4PY8VD7GMPUHWz2wPdXHMIs7FR48Ck8Q5P2DPMVQpasl00
+         blgEnNSYbe9bc4LpkBw6KeNHDxR9xB23XAeMxb/MvOmkjaCXtf47PbkcU72OxUhezMm/
+         fNCEBbkkindkKk3x7hllxgkz4kIf7YVycxdSRnw4lfyNo4WUSJEJH+6YofUFAURTv84W
+         UTWQ==
+X-Forwarded-Encrypted: i=1; AHgh+RokOIogqESfkdwBFprF+1ZfJn0Vz6u2EVPthJT75ioAJlSmBgDkB4rXttW43+TGrywAq7VH/V3keSn67w==@vger.kernel.org
+X-Gm-Message-State: AFuF++mki8Kt7qNe4/xQ+TR0beNIIQEtqstWCGk7E0jJN9rxGxS1Itue
+	++4rBp+A2HJDTS7iBnxd00pi0i8b9h93D3sjBsNPulxRUKjiIN8Ip5p+1pplwOkjp8XjVPWqyRK
+	08IMWa+a/lNgObkkekzZQbCp9E3fOlgEPDRVRJMWIbbXlwlQ/3ssO/mk3MV0=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:4fea:b0:4b3:7b31:8df0 with SMTP id
+ 5614622812f47-4b3981ae41amr18296040b6e.10.1788066507419; Sat, 29 Aug 2026
+ 22:08:27 -0700 (PDT)
+Date: Sat, 29 Aug 2026 22:08:27 -0700
+In-Reply-To: <6a778d36.01d0871a.3a0d52.006f.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a93bacb.08e933ee.dbf97.00f9.GAE@google.com>
+Subject: Re: [syzbot] [block?] WARNING in blk_validate_limits
+From: syzbot <syzbot+ac00e7bf7ac8c91af921@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, hch@infradead.org, kbusch@kernel.org, kbusch@meta.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Document the delay_us option: the delay happens above the driver, a
-delayed bio is not run through the rules again, and holding a bio back
-reorders it against bios submitted later.
+syzbot has found a reproducer for the following issue on:
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+HEAD commit:    e30626823a40 Add linux-next specific files for 20260828
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=157e7d79580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=da8932b2925a9804
+dashboard link: https://syzkaller.appspot.com/bug?extid=ac00e7bf7ac8c91af921
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16936e25580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179fc379580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f3d0d809c004/disk-e3062682.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/14efbbb42757/vmlinux-e3062682.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0919b1002ace/bzImage-e3062682.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/4f0c60a63a72/mount_0.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=12936e25580000)
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ac00e7bf7ac8c91af921@syzkaller.appspotmail.com
+
+F2FS-fs (loop0): f2fs_disable_checkpoint finishes, err:0
+F2FS-fs (loop0): Mounted with checkpoint version = 48b305e6
+fscrypt: AES-256-XTS using blk-crypto-fallback
+------------[ cut here ]------------
+lim->dma_alignment > PAGE_SIZE
+WARNING: block/blk-settings.c:497 at blk_validate_limits+0x1676/0x2270 block/blk-settings.c:497, CPU#1: syz-executor215/5627
+Modules linked in:
+CPU: 1 UID: 0 PID: 5627 Comm: syz-executor215 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+RIP: 0010:blk_validate_limits+0x1676/0x2270 block/blk-settings.c:497
+Code: e8 cf da 0b fd 90 0f 0b 90 eb 8f e8 c4 da 0b fd 90 0f 0b 90 eb 84 e8 b9 da 0b fd 90 0f 0b 90 e9 76 ff ff ff e8 ab da 0b fd 90 <0f> 0b 90 e9 68 ff ff ff e8 9d da 0b fd 90 0f 0b 90 e9 81 00 00 00
+RSP: 0018:ffffc900038dee60 EFLAGS: 00010293
+RAX: ffffffff84bbe625 RBX: ffffc900038df0f0 RCX: ffff888076f99f40
+RDX: 0000000000000000 RSI: 00000000ffffffff RDI: 0000000000001000
+RBP: 00000000ffffffff R08: ffff88806ec9427f R09: 1ffff1100dd9284f
+R10: dffffc0000000000 R11: ffffed100dd92850 R12: ffffc900038df040
+R13: dffffc0000000000 R14: 1ffff9200071be1e R15: dffffc0000000000
+FS:  000055557ce9e400(0000) GS:ffff888124dd6000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000072708000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ queue_limits_commit_update+0x87/0x390 block/blk-settings.c:552
+ loop_configure+0x7f1/0xdc0 drivers/block/loop.c:1086
+ lo_ioctl+0xae0/0x2010 drivers/block/loop.c:1564
+ blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f1351d03669
+Code: c0 79 93 eb d5 48 8d 7c 1d 00 eb 99 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 d8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd20598c38 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1351d03669
+RDX: 00002000000005c0 RSI: 0000000000004c0a RDI: 0000000000000004
+RBP: 0000000000000001 R08: 000055557ce9f580 R09: 000055557ce9f580
+R10: 0000200000000600 R11: 0000000000000246 R12: 00007ffd20598c60
+R13: 0000000000000002 R14: 431bde82d7b634db R15: 00007f1351d6204b
+ </TASK>
+
+
 ---
- Documentation/block/error-injection.rst | 58 ++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/block/error-injection.rst b/Documentation/block/error-injection.rst
-index 81f31af82e65..a1f50d41211d 100644
---- a/Documentation/block/error-injection.rst
-+++ b/Documentation/block/error-injection.rst
-@@ -9,7 +9,8 @@ Overview
- 
- Configurable error injection allows injecting specific block layer status codes
- for sector ranges of a block device.  Errors can be injected unconditionally, or
--with a given probability.
-+with a given probability.  Instead of, or before, failing a bio it can also be
-+held back for a while to model a slow device.
- 
- To use configurable error injection, CONFIG_BLK_ERROR_INJECTION must be enabled.
- 
-@@ -34,15 +35,60 @@ op=<string>		block layer operation this rule applies to.  This uses
- 			the XYZ for each REQ_OP_XYZ operation, e.g. READ, WRITE
- 			or DISCARD. Mandatory.
- status=<string>		Status to return.  This uses XYZ for each BLK_STS_XYZ
--			code, e.g. IOERR or MEDIUM. Mandatory.
-+			code, e.g. IOERR or MEDIUM. Mandatory unless delay_us
-+			is given.
- start=<number>		First block layer sector the rule applies to.
- 			Optional, defaults to 0.
- nr_sectors=<number>	Number of sectors this rule applies.
- 			Optional, defaults to the remainder of the device.
- chance=<number>		Only return a failure with a likelihood of 1/chance.
- 			Optional, defaults to 1 (always).
-+delay_us=<number>	Hold the bio back for this many microseconds.  Without
-+			status the bio is then submitted to the device as
-+			usual, with status it is failed once the delay has
-+			expired.  Optional, defaults to 0 (no delay).
-+			Values above 600 seconds are rejected.
- ===================	=======================================================
- 
-+Delays
-+------
-+
-+A delayed bio is held before it is submitted, so the device itself never sees a
-+slow I/O: the delay is not visible to the driver, to the I/O statistics, or to
-+anything else below submission such as writeback throttling.  Throttling by
-+blk-throttle happens before a bio can be delayed, so it is not affected either.
-+What it does exercise is everything waiting above the block layer, for instance
-+io_uring cancellation, hung task detection, and filesystem or userspace
-+timeouts.  Because the low level driver is not involved, a delay does not reach
-+the blk-mq timeout handler or SCSI error handling.
-+
-+Once a bio has been delayed no rule is evaluated for it a second time, not when
-+its delay expires and it is submitted below the injection hook, and not when
-+the block layer splits it and resubmits the remainder above the hook.  A bio
-+that matched a delay rule therefore never gets an error from another rule, even
-+one covering the same sectors, and is held for the delay once rather than once
-+per split.  Put the delay and the status in a single rule to fail a bio after
-+holding it back.
-+
-+A delayed bio is issued after bios submitted while it was held, which reorders
-+the I/O stream.  On zoned devices this breaks sequential write ordering: zone
-+write plugging happens below the injection hook, so the writes issued while a
-+write is held reach the zone out of order and are failed as misaligned.  Only
-+delay reads there.
-+
-+Bios that must not block are never delayed.  A bio with REQ_NOWAIT set is
-+submitted, or failed with the rule's status, immediately.
-+
-+The delay is a lower bound for anything longer than a timer tick, and the timer
-+wheel adds further slack as the delay grows.  Values shorter than a tick are of
-+little use: they expire on the next tick, which is anywhere between now and one
-+tick away.
-+
-+Removing rules does not release bios that are already being delayed by them;
-+those run out on their own.  A delayed bio whose disk is removed in the meantime
-+is not submitted until its delay expires, by which point the queue no longer
-+accepts I/O, so it fails with EIO.
-+
- Example
- -------
- 
-@@ -54,6 +100,14 @@ Return BLK_STS_MEDIUM for every write to /dev/nvme0n1:
- 
- 	$ echo 'add,op=WRITE,start=0,status=MEDIUM' > /sys/kernel/debug/block/nvme0n1/error_injection
- 
-+Delay every read of /dev/nvme0n1 by 10 milliseconds, then issue it normally:
-+
-+	$ echo 'add,op=READ,delay_us=10000' > /sys/kernel/debug/block/nvme0n1/error_injection
-+
-+Fail one in 100 writes with BLK_STS_TIMEOUT, but only after 30 seconds:
-+
-+	$ echo 'add,op=WRITE,status=TIMEOUT,chance=100,delay_us=30000000' > /sys/kernel/debug/block/nvme0n1/error_injection
-+
- Remove all rules for /dev/nvme0n1:
- 
- 	$ echo 'removeall' > /sys/kernel/debug/block/nvme0n1/error_injection
--- 
-2.53.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
