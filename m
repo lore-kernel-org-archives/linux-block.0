@@ -1,150 +1,117 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8627A33344A
-	for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 17:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6063F1045;
+	Sun, 30 Aug 2026 00:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788023966; cv=none; b=MKI2eA1YIC28ENqA6cfBNqHlZhanhAS7fgbmjrewCsTwjgnF3P8/X52OBsV/euOjdCOxGbmWp3EVtH48MOjTeVSEO/h/NM5Zmhr141k7gb6Gu4dxaUusT7XkgERq19e9yJCApG1SgXNl6z8G9QhQ5CVcJm6ALruxJEowxjpeQdo=
+	t=1788048976; cv=none; b=Gc13A2qPgx6X68XHiCCbFF4pq4TXqDrXIAokqOzlGJ7q1EqxqkqfU0gIkXzv9Uo/SEVIDq+PtadK/lkpW2L3mB0550uUs9vldxhKWjzmH+lHnzvTIo5yGzbDfpnr0XtVj15loRn25H2CFxxF2l7gXtIkyPsfjS47x291enJssL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788023966; c=relaxed/simple;
-	bh=O+wxVmw71itIPx8p6M3uCMg4PxYrKBzmlO3zU/mCCLg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LseB3OGdfL9TMBVssu8P1dMrq+Ll0g0T96ygj4uH7LRQlnAgctt50IZ4LrzBjsCCsK26JLF2h2BzHNSG/QjCITyRhkq8s+XsjQ2RVYhOSAAmCkNvQbyqCJTYwYwWkLzu2Ad15RVHlhkFFOpiTB1y/a7CNGYSi+uTPoGrqHaAc8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BaWMha+L; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788048976; c=relaxed/simple;
+	bh=hWPeW2bnlSHWE26VZa4Dkp1Om2W4eiJgpNIkNqvy3DM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=FUW/Kzs37oLfO+xHDx2fh9h8O6x/iOtYctLM8tWMGasekKyEDNzs5eDTarfqgCZtNy3dJFoKrknBrX7JWYyH1WKKCWl9XCIHuswAUy88X47rrPQvtzyRxW8PS/2x9HzlgEmFNvrqB4l4V6+iTNiqWMRcrLA7kXpzpH/nqLUQZJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=k6bNDLmd; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BaWMha+L"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-46f88060e8dso274790f8f.2
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 10:19:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788023962; x=1788628762; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sONVEZiNDD/vWuq0jYfSacz0G46fBZ+XyTkV+lYzYaM=;
-        b=BaWMha+LMe6KJjqeN9+LRhT+kFFpw8zM/yXZUNoIN/ln4L5p2VhpV2+VwJVASKyd7D
-         EiOWwPFKxCtKPcTTqn0i81BGD8dao8D6PVtwg7zrtgxVBu6+gQ3YJkBZwIUk7Uz58nsA
-         uc4gmxZWNMl42Bsqa4yQ2Nu8a9l4T6nPxLs4rhZomvwR3MpZwbT/dUPGcyhAAGbMcOYR
-         p01BE2wLuXzr+HWZyS8Ezx1dVZvM+cT/vpdlZZSmfYgxYiHAw2HSYeRfKzhR3zphGcRL
-         6TlXH3HF0WwawK7WaG3qVADXQih0QXOrgBYhPJ71xK3kcFGI/rKJKupS/Bz8mGFLpMGM
-         WZJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788023962; x=1788628762;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sONVEZiNDD/vWuq0jYfSacz0G46fBZ+XyTkV+lYzYaM=;
-        b=MA6F9dX71G+sPDZZqhTu0bl3Ovp7HVC8oGeXJv8WfavL9rVeq0tovxc3na9Lcb42Wk
-         YFdNWY9tyu3/L0m7S5ciMp+sPzE3/tg0D5I8u1hl9FWyHEm6lRQrbzrBAJRnqx0FSVlm
-         HlIFWIwJ+ZcD5ra3hKZoY5yyz1CSSqBrVPAyWVoTZfdrKaCJAAopZXtk1uBDIAfRrjpw
-         VYlCcrgE/BDAHwTaDKbAY9ISFazN1nkB6O5YiJPAI8Od8qUwIJwHmBCbM77KkZVprVZS
-         2kGZdenfPvwVWz5B4dZTQ5UkSTsYaj1pLCibaBoDefT9D+YeQS/32CaeVqRb0tP7tlKH
-         d46w==
-X-Forwarded-Encrypted: i=1; AKwUvBy5k+8ta4vGtNyqJQgTxCkWBKA0Xs/x5z4FJX3AnlrJKqKFKMp3qpH6YKDejJU47AEy2s0wkpN2qKL+YQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++mP2CcsN8UnHjBZ3tbxJ4tsRy1ussTJEtXNZ9GQkZt7r9P2Pul6
-	y5+ZsJT6mvbGdrT02GVpJp5EfSBYnPgn/CiI8BqY3h4qjkmQbApfCrFX
-X-Gm-Gg: AYBFou1uA9m56cbnWZIvs6+LvnqIxAILtrU6yBpcGeMFG2VFRnKBXMjfHkDT4mvNvo6
-	u9pFreE6nMG3fIcxGp2l9P2Hhz1hrM0qche6FVwOXl1YZIr5/0lQ6G2vpOZRzUUcJM38WfUspJ4
-	c8us66AcTIDGbl1Vy7Ts8N73vQ7qcf6lrsBsVPoVjVtZYJuBOS3kLEbgpGAj+mKApSFXI4KboGp
-	4AWHdEWytjbuiacSuQxAFOdTY9ClyG5KFz9wTCOu1UhA5LWIYuSkjGkPEVHvBl9LBoOcTFCvxJD
-	/ZVkVf8Lvq1jsZLa0FwWLAomQrg7wESuENAEv/+WJVLNE9//Q6ybzNCSKCQeZKo76kNj7GxGXK6
-	Y3x7ueH036lKCUwfxnxHq9dyM1rJ5VBLTafH+opoKrr4BkSnpJ8Vv3skIcF47ooyBWAMblM2gGy
-	QeTfRLxRY6JP0IUIKu6WPCaHYYA/vwtomiAJSF1TAQZMq6G8iCgIkJMEzQlH5trx5RYhvbdNEFa
-	POjdtC41R3Uj+oIFz9gRCHBv85EbwC71UZiKN1oub/AeoKG7DaU+/ZHLVs0TKSS02URblcwtbUI
-	mwDtb7s+R+87YA==
-X-Received: by 2002:a05:6000:2f8a:b0:482:e0f3:462c with SMTP id ffacd0b85a97d-482f7826e4cmr11932558f8f.0.1788023961957;
-        Sat, 29 Aug 2026 10:19:21 -0700 (PDT)
-Received: from pop-os.. (98.102.222.87.dynamic.jazztel.es. [87.222.102.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482fbb20793sm10999986f8f.17.2026.08.29.10.19.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 10:19:20 -0700 (PDT)
-From: =?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	axboe@kernel.dk,
-	hch@lst.de,
-	linux-block@vger.kernel.org,
-	syzbot+b8d61a58b7c7ebd2c8e0@syzkaller.appspotmail.com,
-	syzbot+2aca91e1d3ae43aef10c@syzkaller.appspotmail.com,
-	=?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
-Subject: [PATCH 6.1.y v2] block: make bio_check_eod work for zero sized devices
-Date: Sat, 29 Aug 2026 19:19:18 +0200
-Message-ID: <20260829171918.134829-1-miguelgarciaroman8@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <2025041215-grudge-rearrange-7123@gregkh>
-References: <2025041215-grudge-rearrange-7123@gregkh>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="k6bNDLmd"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hXXj42bxzz1XM6JB;
+	Sun, 30 Aug 2026 00:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1788048963; x=1790640964; bh=Wtaf/cIuCZ36ss7taFgx1buy
+	K4QIVLCAsKiQ+IlDW54=; b=k6bNDLmdF8PiLDd0KSYU6RGXLC8sm7WKpn2f7exL
+	sDSjBCbnRKi//MZZFX8sT6oG4VziYeWfptYUDgdtFAFW+caXcE0ABHezn7Ww8lsi
+	PiKgnhCajWcMthWzEj/cc4KNkus/ovFRliLsJdZml5NHGMWLUPu99wDNzCBEobmX
+	x70ohLdCgA6EI4i9Efr1/2xRuGgaQqy/fRWFI+B/SlzVa33JNRFRGDWwfJ0X5v+E
+	2jszn1Ykhbs/tm4O2IeeRmvg3aQP0KjgXxjwnTHNIHMithzX/AlqNm8DoV7CQPg5
+	+TiVmdeTHq6kuFm0SU1WweSOGYwG0TiIxb9RD7DKM2c4gg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id LpLhf2E7jO38; Sun, 30 Aug 2026 00:16:03 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hXXhx4XnSz1XM6J6;
+	Sun, 30 Aug 2026 00:16:01 +0000 (UTC)
+Message-ID: <2cf45e85-176a-4209-86ad-8f389a9a4282@acm.org>
+Date: Sat, 29 Aug 2026 17:16:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [block?] BUG: corrupted list in
+ blk_mq_request_bypass_insert
+To: syzbot <syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <6a926eaf.1d9ded08.62e62.0102.GAE@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6a926eaf.1d9ded08.62e62.0102.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Christoph Hellwig <hch@lst.de>
+On 8/28/26 10:31 PM, syzbot wrote:
+> kernel BUG at lib/list_debug.c:34!
+> Call trace:
+>   __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32 (P)
+>   __list_add_valid include/linux/list.h:96 [inline]
+>   __list_add include/linux/list.h:158 [inline]
+>   list_add_tail include/linux/list.h:191 [inline]
+>   blk_mq_request_bypass_insert+0x130/0x1cc block/blk-mq.c:2551
+>   blk_mq_requeue_work+0x3a4/0x52c block/blk-mq.c:1560
+>   process_one_work kernel/workqueue.c:3322 [inline]
+>   process_scheduled_works+0x788/0x10b8 kernel/workqueue.c:3405
+>   worker_thread+0x798/0xbd0 kernel/workqueue.c:3486
+>   kthread+0x304/0x3d4 kernel/kthread.c:436
+>   ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:838
 
-commit 3eb96946f0be6bf447cbdf219aba22bc42672f92 upstream.
+If my AI assistant got it right the root cause of this issue is as
+follows (I haven't tried to verify this):
+* Concurrent calls of nvme_reset_work() and blk_mq_requeue_work().
+* nvme_decide_disposition() does not check NVME_REQ_CANCELLED for
+   non-multipath requests and returns RETRY instead of COMPLETE.
 
-Since the dawn of time bio_check_eod has a check for a non-zero size of
-the device.  This doesn't really make any sense as we never want to send
-I/O to a device that's been set to zero size, or never moved out of that.
+The same AI assistant proposes the following patch (again, I have not
+verified whether this makes sense):
 
-I am a bit surprised we haven't caught this for a long time, but the
-removal of the extra validation inside of zram caused syzbot to trip
-over this issue recently.  I've added a Fixes tag for that commit, but
-the issue really goes back way before git history.
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 8e45a2789123..a1b2c3d4e5f6 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -425,7 +425,8 @@ static inline enum nvme_disposition 
+nvme_decide_disposition(struct request *req)
+  		if (nvme_is_path_error(nvme_req(req)->status) ||
+  		    blk_queue_dying(req->q))
+  			return FAILOVER;
+  	} else {
+-		if (blk_queue_dying(req->q))
++		if (blk_queue_dying(req->q) ||
++		    (nvme_req(req)->flags & NVME_REQ_CANCELLED))
+  			return COMPLETE;
+  	}
 
-Fixes: 9fe95babc742 ("zram: remove valid_io_request")
-Reported-by: syzbot+b8d61a58b7c7ebd2c8e0@syzkaller.appspotmail.com
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20230524060538.1593686-1-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+@@ -551,7 +552,7 @@ bool nvme_cancel_request(struct request *req, void 
+*data)
+  	if (blk_mq_rq_state(req) != MQ_RQ_IN_FLIGHT)
+  		return true;
 
-Backport note for 6.1.y:
+-	nvme_req(req)->status = NVME_SC_HOST_ABORTED_CMD;
++	nvme_req(req)->status = NVME_SC_HOST_ABORTED_CMD | NVME_STATUS_DNR;
+  	nvme_req(req)->flags |= NVME_REQ_CANCELLED;
+  	blk_mq_complete_request(req);
+  	return true;
 
-The same underlying bug affects 6.1.y even though 9fe95babc742 is not in
-that tree.  The syzbot reproducer attaches a socket to /dev/nbd0 without
-setting its capacity, then mounts it as BEFS.  BEFS calls sb_bread() while
-bdev_nr_sectors() is zero.  The maxsector guard makes bio_check_eod() accept
-that read, which reaches NBD and waits for a response instead of failing
-with -EIO.  syzbot reproduced the resulting __bread_gfp() hang on 6.1.y and
-identified this upstream commit by fix bisection.
-
-Reported-by: syzbot+2aca91e1d3ae43aef10c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2aca91e1d3ae43aef10c
-Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
----
-Changes in v2:
-- Explain the 6.1.y NBD and BEFS failure path, as requested by Greg:
-  https://lore.kernel.org/r/2025041215-grudge-rearrange-7123@gregkh
-- Preserve both syzbot reports and the upstream commit metadata.
-- Refresh against v6.1.186.
-
-Older stable trees are not included here because this backport and its local
-validation are scoped to the syzbot report for 6.1.y.
-
-v1: https://lore.kernel.org/r/20250412102424.56383-1-miguelgarciaroman8@gmail.com
-
- block/blk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 25b4733..1fcd80a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -515,7 +515,7 @@ static inline int bio_check_eod(struct bio *bio)
- 	sector_t maxsector = bdev_nr_sectors(bio->bi_bdev);
- 	unsigned int nr_sectors = bio_sectors(bio);
- 
--	if (nr_sectors && maxsector &&
-+	if (nr_sectors &&
- 	    (nr_sectors > maxsector ||
- 	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
- 		pr_info_ratelimited("%s: attempt to access beyond end of device\n"
--- 
-2.43.0
+Bart.
