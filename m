@@ -1,152 +1,135 @@
-Received: from mail-oi2-f5.google.com (mail-oi2-f5.google.com [74.125.231.197])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571FC283FE5
-	for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 05:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68D535F170
+	for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 07:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788069457; cv=none; b=DKewHAVbR2+1Zchhm4TspCUK8BcIu9Rh4C1kt2ZX/YFEsvhWtIsmL5mn4uXJxdjLE98SrFEavuTHUXhG0UTOcibSCWE/X0MG7+N49JjNC14QWWfozTF3AR3wW+5UTediex9Uog+PmubN0wsOuV8NFpqPcKIlbKNKQ7u2OBjSMHA=
+	t=1788075223; cv=none; b=m2QmOszEtQTXomdfPoU3LmecH5OtWARqfayBd4XeRZZ601uPwkmV+nbhnhj9IS1IvyfqWDkyz8gn3+qFdo1MMI8tKqpqPmbmiQm3l/Hb6WFcEnYobtXzDmGE3pUSn3xOGL5TCrUYaPODkmt6oYBnP4Aex1x90AzpOcQ9klaFyx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788069457; c=relaxed/simple;
-	bh=RKvjahK235bsSkBPco7W8TPdvlWbJaAhDtFa/GzPnLo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PaGfqrT/VZZHFzJRLb5mIZX8oDRrswF/Ue9H8NzmeFfzG8s/Qe8WWqBonfWqVFKIDGM4r2x/Cc0cDS556Iw3ekOQs5w6xNqbyI45Llq0e7JHMsLlceAK7/uPRfSJDxuYD9bSTxsWEenNte/CK0rVTa1ZqLW2wBWuDL0f6oaEH2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi2-f5.google.com with SMTP id 5614622812f47-4b3759b7ff0so1204762b6e.1
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2026 22:57:29 -0700 (PDT)
+	s=arc-20240116; t=1788075223; c=relaxed/simple;
+	bh=U41QKWCb5wZVT5AgkRyZK+w6MKjpL9Tu8ac+zzjqQUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EZDod7EzFo5MTrcI7w2iTMIJxrBxkN1/3RA5TmwM0x5b/7AwLDAepLtN7x+KHuNTyV21Rw0PxqZX2awx5wq8tdLUA23cAJSiKxMdPxFj6lst/muF2rYAZWurqEj6YH7L1ZVNDLfj29H7ywloOXgWnLaQNMWm7GR/GYcCQDEPc4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bT0hYlFS; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bT0hYlFS"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-ca12086c06eso1907635a12.0
+        for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 00:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788075221; x=1788680021; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=5hgvVg90KPg9PlOfVqdnTJqeAsOm9vQLV6x0bJ/G+8U=;
+        b=bT0hYlFSkrmlQQSf7CERb2qkBx7IMOV25+c7Q5DEStmuuc/tT+BwOR4n91aMdVza+B
+         s10wPY/67LVo59mo7y56DXSfN0h1ZpgwVdaT2OILKNW+swoVuGQ7nrwRFfimoH/Kj4yU
+         pCPBM6vK+EQ18oG22YlDKj3OVgVGqGnWP+P9v7kegmnhxLF8xN/tS3VrHbr/IVu+mQrN
+         yn+hxFxCJ/8mXRAsQLhCq8lNXXdal27sSkXG4ShUAEDbJox97//da3knloAd4cc4Xx5r
+         shDJ2D2C2nlYK6UaO7DNkK3d77V1DD+Bd4z8JkLqp1rHk9NV58hY16ZDzG4lp5+WcH9K
+         4IAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788069448; x=1788674248;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WPzYaVT96ZZz0Nmz5XnIq2YVKAVdKMvBMnRhoLzoJmQ=;
-        b=sU0XWshvxHCpbSEV4NkuKXI9Z+SD8ORL5aYF0MpP4MO1tKSP94GFDBDGg1Qw6IG9wm
-         FRusk6aE34U2s+tMoq4VgDyVfWJdCNwY4ZKIuA7civaqrk4UA+acj+HzZdg7RjOtqijY
-         GC1lbOOS5CIMFLgARwX3r4veF4fTVdRn/ziVZ0hoggPFetkZxXNPiAox3EwYyEoWbjo8
-         WaNKBfarPims/4buoIzWeiEZZi8USaSS8PvNLXob8mB1TnpzvXuw91MWpZHwexgFtvFx
-         BsuXSbVGOdx3O474wfTS+unr4wt+d+su063M8awd+UKkwg4XcqDXL/aOBqz6YkqxW17k
-         XR/Q==
-X-Forwarded-Encrypted: i=1; AHgh+Roo4bGGRteL3y1KlwfMOD1ZLha6IxrPXlbdu/b5Bj3+LiE81JjMOS6ObAFpGY+mTrpFlPxcrut9xO0mtw==@vger.kernel.org
-X-Gm-Message-State: AFuF++naN89GbJbIkGwdaD01E1fCF2PGkAzkaF8XUY4BWNAa5Nici7ef
-	wvwGGz0N4Mjf5VIxkrBw+EyBdN40NWPdSCsJFWt35HfqAbswdWh7R6+gqxRbKgu7+vuK68j0ueR
-	/s8RwS0CA0mKAam7O+RKIZ6I86abwyA5xY58qDHW2GIBv7RmLiLJB9iM9ojU=
+        d=1e100.net; s=20251104; t=1788075221; x=1788680021;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5hgvVg90KPg9PlOfVqdnTJqeAsOm9vQLV6x0bJ/G+8U=;
+        b=lkMb2x+VifdFgBgAdqwaghbZwJhnRQVsYgBHKUrx7tkoDoHDHS7IsTZKgz3fV5Wo2m
+         ptyECXWJxe1me0oNqYBdMsLTzJpLUNVOiiv83zPzKBPEsI7T1YHHfNH+tMMDDqc0KiaH
+         Nf2nm0BtfX7GlumqEmsjsi1FhxvNSVHVF2jqLmyRHoF9tGf0gzgu4bOVcMg/Xf5E6Cg3
+         WzWE8z4UoeoVmMNzOrTRE1xWcc8mn8r3L6piQec8QgB2OnDjcMzPYNfj590qKyUEX9bY
+         h2VOiQn8sFiKtWHaCIlfLJDyYGe+JtFKOxS96yIm51V3aWkeI35JxvKhYN8RnT8rBYg6
+         AyHA==
+X-Gm-Message-State: AFuF++lKGkvk+nsqR2HXjHXW5Y0FqDO6a/WEio1cpC6wpKG8kMs85UZl
+	R5bp0cZqaIyWgnCpuZIbTNEow/1kc2wHIavS1bdsrqwX3jo/PuRLFNMJ
+X-Gm-Gg: AR+sD116r06DhSqyFFG3609C9p9ln3ItR6e6YOcrcC3AmKueW8TR1vPfz+Ooxpe3VsZ
+	dv4LKUY/xqB78SfAnHO1c8viDdOG1b8B+Wq2itEqEkjJVH8WSwFzAZ0l1+c/U8biuxIlmnbc5Yu
+	3AQ/Nla2FHKH3QxU5fNJKO4FK6fhYvLQ5amCThM2yH7LA/o/Q+XWvXOeR7zCylVgEAjn9C87ncG
+	eOJfUlqhueZhfBq65Dx54kvN7l+lShB9Djs7HLNmefvoR5LSj+hdXRiESMv6ARn9jZQQYuxBPz8
+	8/3WOqEutrkrlZlmcxxfwcAWQodz0Ipng3IH2bMsnx3DbMvbRUpkUsIrJM4of9gS67YlIyeJkGt
+	ulZ+/xAk0srbz5pchp2LAXXaPorRR2KK12QmmtbmfqrpsYKhIXXwNH98oPetZkp/llFahCKt2Jz
+	H+VqlWPR8IWXUFetMMtVgkWodISxih+eF+ItLQLMEv7SucePchys/dd39XS7mMUzSoDnbTp7FsH
+	EHDirClw4q54Gqt17aL7DSnf42kNRe99xs0NX1opvtLQVYAGNdUZE3K2g+ryistlk213TdAEsE6
+	7uOUr8fv9g7YsxALFb12oM/xbJu8Jq7DDx4zQd6i+cNtJrfSSEoeC8ZVpZ/mKlqvgEabJtUQd1b
+	VmE3NLrfViU47jFxyn7wST0WeVYSDumVZNk1VUeLQ8IrV6iWW9S8wRwexzN3f6MZpeKmlm+vGeY
+	JEVc9aU5M=
+X-Received: by 2002:a05:6a20:43a2:b0:3cc:f008:8125 with SMTP id adf61e73a8af0-3d265a3d2a2mr28366450637.1.1788075220885;
+        Sun, 30 Aug 2026 00:33:40 -0700 (PDT)
+Received: from HEXER.localdomain ([175.157.17.45])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-142e41837c6sm17293131c88.11.2026.08.30.00.33.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Aug 2026 00:33:40 -0700 (PDT)
+From: Kanishka De Silva <kpskanna1915@gmail.com>
+To: greg@kroah.com,
+	tom.leiming@gmail.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	security@kernel.org,
+	stable@vger.kernel.org,
+	Kanishka De Silva <kpskanna1915@gmail.com>
+Subject: [PATCH v2] ublk: clear VM_MAYWRITE on read-only ublk char device mmap
+Date: Sun, 30 Aug 2026 13:03:31 +0530
+Message-ID: <20260830073331.634-1-kpskanna1915@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026083055-isotope-broiler-88e5@gregkh>
+References: <2026083055-isotope-broiler-88e5@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1525:b0:4b2:8e51:aac2 with SMTP id
- 5614622812f47-4b398018734mr21779232b6e.8.1788069448281; Sat, 29 Aug 2026
- 22:57:28 -0700 (PDT)
-Date: Sat, 29 Aug 2026 22:57:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a93c648.08e933ee.dbf97.00fc.GAE@google.com>
-Subject: [syzbot] [block?] BUG: unable to handle kernel paging request in __blk_mq_alloc_driver_tag
-From: syzbot <syzbot+b380cbb218c1ef0fe808@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+ublk_ch_mmap() rejects mmap requests with VM_WRITE set, but never
+clears VM_MAYWRITE on the resulting read-only mapping. This allows
+a userspace daemon to mmap the per-queue command buffer PROT_READ,
+then upgrade it to PROT_WRITE via mprotect(), since VM_MAYWRITE was
+never cleared.
 
-syzbot found the following issue on:
+The command buffer holds struct ublksrv_io_desc entries that are
+kernel-written ABI; a writable mapping lets an unprivileged daemon
+process corrupt fields such as addr, op_flags, nr_sectors, and
+start_sector.
 
-HEAD commit:    f1b8fa82cab7 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=10697d79580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d1128bc53f2ef7f3
-dashboard link: https://syzkaller.appspot.com/bug?extid=b380cbb218c1ef0fe808
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-userspace arch: arm64
+Same bug class as the drm/panthor and drm/vc4 VM_MAYWRITE fixes, and
+the 2026-08-13 ptp/vmclock fix (a5edadbae57e).
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Verified via mprotect() PoC: before the fix, a PROT_READ mapping can
+be upgraded to PROT_READ|PROT_WRITE and a write into the command
+buffer corrupts io_desc fields (confirmed under KASAN). After the
+fix, mprotect() returns -EACCES.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/932d85a2bda2/disk-f1b8fa82.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5b6b8fb76e8d/vmlinux-f1b8fa82.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c246b61ee396/Image-f1b8fa82.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b380cbb218c1ef0fe808@syzkaller.appspotmail.com
-
-nvme nvme0: Does your device have a faulty power saving mode enabled?
-nvme nvme0: Try "nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off" and report a bug
-Unable to handle kernel paging request at virtual address dfff800000000000
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0
-[dfff800000000000] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1]  SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 4404 Comm: kworker/0:1H Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/07/2026
-pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : blk_mq_tag_is_reserved block/blk-mq.h:224 [inline]
-pc : __blk_mq_alloc_driver_tag+0x118/0x554 block/blk-mq.c:1844
-lr : blk_mq_tag_busy block/blk-mq.h:211 [inline]
-lr : __blk_mq_alloc_driver_tag+0xbc/0x554 block/blk-mq.c:1842
-sp : ffff800099507780
-x26: 0000000000000000 x25: 1fffe000190d6c82 x24: dfff800000000000
-x23: ffff0000c8044400 x22: 0000000000000004 x21: 00000000ffffffff
-x20: ffff0000c86b6400 x19: ffff0000c86b6410 x18: 00000000ffffffff
-x17: ffff80008a7d6000 x16: 0000000000000004 x15: ffff80008a35fda0
-x14: ffff80008a5d5e28 x13: 0000000000000002 x12: 0000000000000000
-x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
-x5 : ffff80008aa7bd88 x4 : 0000000000000000 x3 : ffff8000817944e8
-x2 : 0000000000000000 x1 : ffff0000c81a3a80 x0 : 0000000000000000
-Call trace:
- blk_mq_get_driver_tag block/blk-mq.h:374 [inline]
- blk_mq_prep_dispatch_rq block/blk-mq.c:2029 [inline]
- blk_mq_dispatch_rq_list+0x298/0x13a8 block/blk-mq.c:2108
- __blk_mq_sched_dispatch_requests+0x250/0x10e8 block/blk-mq-sched.c:299
- blk_mq_sched_dispatch_requests+0xa8/0x158 block/blk-mq-sched.c:329
- blk_mq_run_work_fn+0x214/0x2e4 block/blk-mq.c:2532
- worker_thread+0x798/0xbd0 kernel/workqueue.c:3486
- kthread+0x304/0x3d4 kernel/kthread.c:436
-Code: 35001b08 910012d6 b94002b5 d343fec8 (38f86908) 
----[ end trace 0000000000000000 ]---
-SMP: stopping secondary CPUs
-Kernel Offset: disabled
-CPU features: 0x14000000,003c0008,27020a02,a84ff6a7
-Memory Limit: none
-Rebooting in 86400 seconds..
-----------------
-Code disassembly (best guess):
-   0:	35001b08 	cbnz	w8, 0x360
-   4:	910012d6 	add	x22, x22, #0x4
-   8:	b94002b5 	ldr	w21, [x21]
-   c:	d343fec8 	lsr	x8, x22, #3
-* 10:	38f86908 	ldrsb	w8, [x8, x24] <-- trapping instruction
-
-
+Fixes: 3fee8d7599e1 ("ublk_drv: add io_uring based userspace block driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kanishka De Silva <kpskanna1915@gmail.com>
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2: Cc linux-block@vger.kernel.org and Jens Axboe per get_maintainer.pl
+    (Greg KH). Added Reviewed-by from Ming Lei. No code change.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/block/ublk_drv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 6c5bec7..e5ba07d 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2653,6 +2653,12 @@ static int ublk_ch_mmap(struct file *filp, struct vm_area_struct *vma)
+ 	if (vma->vm_flags & VM_WRITE)
+ 		return -EPERM;
+ 
++	/*
++	 * The per-queue command buffer is kernel-written ABI; prevent
++	 * the daemon from upgrading to writable via mprotect().
++	 */
++	vm_flags_clear(vma, VM_MAYWRITE);
++
+ 	end = UBLKSRV_CMD_BUF_OFFSET + ub->dev_info.nr_hw_queues * max_sz;
+ 	if (phys_off < UBLKSRV_CMD_BUF_OFFSET || phys_off >= end)
+ 		return -EINVAL;
+-- 
+2.53.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
