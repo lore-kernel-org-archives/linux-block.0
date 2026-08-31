@@ -1,122 +1,134 @@
-Received: from va-2-47.ptr.blmpb.com (va-2-47.ptr.blmpb.com [209.127.231.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE10A3D3309
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 11:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C503C1F57
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 11:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788174055; cv=none; b=Sjf0RRARJdGitWh6Lp8iOMHAt+ZXWEUH2XNAD/ohPQ56Mkk57f5/IGd052RfETI9kO3Jqh4McTYtV/bFPgXgFDktBQPTc91EfB0RakfTK7t7LnEqVNTDtUekV1x5JdesTP4iGmGI57IU5cAsWJiQwnCS5ffmPyrC2rz2X1jeRIU=
+	t=1788174492; cv=none; b=rNRv+Ayb+AlUODqTVumo/sEWAlVJT1iD6fgJ5652pJcrBh8g8a36Soyp7dAhfxFQochHtUfrY3qVpwmA18VMoR8fO8/QXrrczaTfN8f9xhR5uWxdTUuc44iW4k3E0rEpUsHnn3kjqYLK+s/kaoHu9vTXejMQWFmdMSjO++uCchc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788174055; c=relaxed/simple;
-	bh=dGQbrBmhQS0x71Wh94RlSbsiKuZn5xVs6SzWfWQuRnE=;
-	h=References:Content-Type:From:To:Cc:In-Reply-To:Message-Id:
-	 Mime-Version:Subject:Date; b=iy+tZ13qLmdr/dp9p1TT54zqZYeA/t4zEnhxbG2937U+ABohlWEp0dsolfQOmKjW+lOjAd8EjejaGYksRL/zMLLP+d0LvQtreJdOHjEUfHOPXUySlMlk0OB8vGlLqpFqEWsNrADvp7gKXRO5xbxxy4CBUOOa/2NCUmlEwP7hDdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=bTPIQpTN; arc=none smtp.client-ip=209.127.231.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="bTPIQpTN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1788174037;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=oj9pT49fkgayCGX3SEUyRMQPTGIlIhlnZO6FdcY++Ts=;
- b=bTPIQpTNDtnkToWPcIBQfN2zhLMbnW7CzuwXSsZPP+7nJzalRaE+9MbMhXNfsF4F0SJg6O
- RTJsHt/kyT6cygfCpXvQL7+Wx8u/eK0G64B8Qi2h8EX6eyRE+BsR5ecncWEPglg/3a990q
- gsdztIG1T2aL0eJsJemdytKXlWh8Gg/lu0TWLaBXNBsaLykPWt45Qan3pKw6Ld+ooaSXcA
- ynkqc9pUvW+i+939QKzXkxRPTOBUYnNCpWD3jTXtFP44N5z6/ek2o8tayK/4QwJ7RmW1yI
- 36IU7ARPImQN0TFVOJ5RAFzIkqpWHcS7N6+KG838JqrfftMEjKzgG1v9Hi7hQg==
-X-Lms-Return-Path: <lba+26a955ed5+a79bb9+vger.kernel.org+yukuai@fygo.io>
-References: <20260831055716.773354-1-tao1.yu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-From: "yu kuai" <yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
-To: "Tao Yu" <tao1.yu@intel.com>, <tj@kernel.org>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>, "yu kuai" <yukuai@fygo.io>
-Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>, 
-	<syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com>, 
-	<stable@vger.kernel.org>
-In-Reply-To: <20260831055716.773354-1-tao1.yu@intel.com>
-Reply-To: yukuai@fygo.io
-Message-Id: <371c8526-c50f-4ca9-a9d0-7bbbd9991d63@fygo.io>
+	s=arc-20240116; t=1788174492; c=relaxed/simple;
+	bh=4krpdLYFAbC346LuGw9aJD8BVybv/Ef/3kCwbzK1CH8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hTU4Bdw6hHaObipv7eiYWJBCsQK5WAIOaCu+G9kb+QqL6LqPmaARwIgpx7+dUGVSlQv96n7s4h9jupqTQfVJN12vw89lwUGoVrDU/I5uBQC5IJKlmKzQV2jf/c8Q56vfUvSPsp8H+Q5moRaBNc0gbIFXuhtIAZZl6CsGdy+R3DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hYR5r168tzKHMlh
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:07:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id C659F41963
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:08:00 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.132])
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHMAuPYJVqZo_vAA--.44034S5;
+	Mon, 31 Aug 2026 19:08:00 +0800 (CST)
+From: Ye Bin <yebin@huaweicloud.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: ming.lei@redhat.com
+Subject: [PATCH v2 1/4] block/mq-deadline: reject zero prio_aging_expire
+Date: Mon, 31 Aug 2026 19:01:41 +0800
+Message-Id: <20260831110144.2648156-2-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260831110144.2648156-1-yebin@huaweicloud.com>
+References: <20260831110144.2648156-1-yebin@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Received: from [192.168.1.104] ([39.182.0.178]) by smtp.larksuite.com with ESMTPS; Mon, 31 Aug 2026 11:00:36 +0000
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] blk-cgroup: use GFP_NOIO for radix tree preload in blkg_conf_prep
-Date: Mon, 31 Aug 2026 19:00:32 +0800
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBHMAuPYJVqZo_vAA--.44034S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxJFy3Cw48tw4UAw45Wr4rZrb_yoW5ZF4xpF
+	W7X3Z8tr10g3W7XryfKr13tr1Sg397J347KrykAws7CFn5urWqvFyFkF90vF93Jr9rCw4a
+	qr4vgFykGr98JFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvmb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
+	A2048vs2IY020Ec7CjxVAFwI0_Jrv_JF4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx
+	0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWU
+	JVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
+	W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
+	1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
+	IIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvE
+	x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IU14CJJUUUUU==
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
-Hi,
+From: Ye Bin <yebin10@huawei.com>
 
-=E5=9C=A8 2026/8/31 13:57, Tao Yu =E5=86=99=E9=81=93:
-> blkg_conf_prep() allocates a new blkg with GFP_NOIO after dropping
-> queue_lock, but still preloads the radix tree node with GFP_KERNEL while
-> q->blkcg_mutex is held.
->
-> GFP_KERNEL may enter direct reclaim and acquire fs_reclaim, which adds
-> the dependency
->
->    q->blkcg_mutex -> fs_reclaim
->
-> This completes a circular locking dependency with the existing path
->
->    fs_reclaim -> q->q_usage_counter -> q->blkcg_mutex
->
-> and triggers a lockdep warning when configuring blkcg policies.
->
-> Use GFP_NOIO for radix_tree_preload() so that the preload context matches
-> the rest of this allocation path and does not recurse into reclaim while
-> q->blkcg_mutex is held.
->
-> Reported-by: syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D144a1c0e22e53a08ef5a
-> Fixes: f255c19b3ab46 ("blk-cgroup: Pre-allocate tree node on blkg_conf_pr=
-ep")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tao Yu <tao1.yu@intel.com>
-> ---
+A prio_aging_expire of zero does not disable I/O priority in
+mq-deadline.  Instead the priority aging path in
+dd_dispatch_prio_aged_requests() is invoked with "now - 0 == now",
+which causes best-effort and idle requests to be dispatched ahead of
+pending real-time requests -- a classic priority inversion, not the
+"priority disabled" behavior users may expect when writing zero.
 
-This problem is already fixed by following patch, the radix_tree_preload=20
-is removed.
+Reject zero (and negative) values in the sysfs store with -EINVAL so
+that a misconfiguration is reported rather than silently accepted.
 
-[PATCH 1/3] blk-cgroup: use a request_queue rhashtable for blkg lookup -=20
-Yu Kuai=20
-<https://lore.kernel.org/all/20260823133045.970199-2-yukuai@kernel.org/>
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ block/mq-deadline.c | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
 
->   block/blk-cgroup.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 2b5c29434e426..27e00180e4cc1 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -873,7 +873,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
->   			parent =3D blkcg_parent(parent);
->   		}
->  =20
-> -		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
-> +		/* Drop queue_lock to do new blkg allocation with GFP_NOIO. */
->   		spin_unlock_irq(&q->queue_lock);
->  =20
->   		new_blkg =3D blkg_alloc(pos, disk, GFP_NOIO);
-> @@ -882,7 +882,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
->   			goto fail_exit;
->   		}
->  =20
-> -		if (radix_tree_preload(GFP_KERNEL)) {
-> +		if (radix_tree_preload(GFP_NOIO)) {
->   			blkg_free(new_blkg);
->   			ret =3D -ENOMEM;
->   			goto fail_exit;
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 5f643c0ce2a8..a4358625cfc8 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -31,7 +31,10 @@ static const int read_expire = HZ / 2;  /* max time before a read is submitted.
+ static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SOFT! */
+ /*
+  * Time after which to dispatch lower priority requests even if higher
+- * priority requests are pending.
++ * priority requests are pending.  Must be > 0: a value of zero would make
++ * the priority aging path dispatch best-effort and idle requests ahead of
++ * pending real-time requests through "now - 0 == now", a classic priority
++ * inversion.
+  */
+ static const int prio_aging_expire = 10 * HZ;
+ static const int writes_starved = 2;    /* max times reads can starve a write */
+@@ -770,7 +773,6 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
+ 	STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, msecs_to_jiffies)
+ STORE_JIFFIES(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0, INT_MAX);
+ STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0, INT_MAX);
+-STORE_JIFFIES(deadline_prio_aging_expire_store, &dd->prio_aging_expire, 0, INT_MAX);
+ STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX);
+ STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);
+ STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
+@@ -778,6 +780,28 @@ STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
+ #undef STORE_INT
+ #undef STORE_JIFFIES
+ 
++/*
++ * prio_aging_expire must be positive: a value of zero would make the
++ * priority aging path dispatch best-effort and idle requests ahead of
++ * pending real-time requests through "now - 0 == now", a classic priority
++ * inversion.  Reject zero and negative values instead of clamping, so that
++ * a misconfiguration is reported rather than silently accepted.
++ */
++static ssize_t deadline_prio_aging_expire_store(struct elevator_queue *e,
++						 const char *page, size_t count)
++{
++	struct deadline_data *dd = e->elevator_data;
++	int val, ret;
++
++	ret = kstrtoint(page, 0, &val);
++	if (ret < 0)
++		return ret;
++	if (val <= 0)
++		return -EINVAL;
++	dd->prio_aging_expire = msecs_to_jiffies(val);
++	return count;
++}
++
+ #define DD_ATTR(name) \
+ 	__ATTR(name, 0644, deadline_##name##_show, deadline_##name##_store)
+ 
+-- 
+2.34.1
 
---=20
-Thanks,
-Kuai
