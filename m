@@ -1,129 +1,122 @@
-Received: from mta0.migadu.com (out-217.mta0.migadu.com [91.218.175.217])
+Received: from va-2-47.ptr.blmpb.com (va-2-47.ptr.blmpb.com [209.127.231.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7FD3E7173
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 10:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE10A3D3309
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 11:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788170846; cv=none; b=iFd/TplaD0dBopSgcuXnrQdVaka3ItLTPLyWAq5cqzkWFYmBogjZtEl79vnpiCjJjB/BXBpcNfYe7IsTTxQn6JTvkhM25GZeA5p8HPNj2u/7/PJpGNyUl4rMFuw5lk4lmrr2EN3sInL4qaKskx7emUXbYWLW7CFWiSxpGczWQAE=
+	t=1788174055; cv=none; b=Sjf0RRARJdGitWh6Lp8iOMHAt+ZXWEUH2XNAD/ohPQ56Mkk57f5/IGd052RfETI9kO3Jqh4McTYtV/bFPgXgFDktBQPTc91EfB0RakfTK7t7LnEqVNTDtUekV1x5JdesTP4iGmGI57IU5cAsWJiQwnCS5ffmPyrC2rz2X1jeRIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788170846; c=relaxed/simple;
-	bh=L8sCA1hR0yKQaKvtbOB+F+dFt6CAS+8pOknhGBWJJP0=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nIvs+0LlCxpNo5xvKlpDdC0DM2Xf9XELgYmnxjwn1BBJprKpXYjZrStOOrrc4r762vihhRHdElvXs/yKtjUyv6Ubw9s/OZE40TxzuzWwg5HzjUusVbuQTnk2/e5RZ53VMYoX14v4ueAYb3G4YlG9M1pdCmEmcXAM/P/+h9BibXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JpqhbaVW; arc=none smtp.client-ip=91.218.175.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788174055; c=relaxed/simple;
+	bh=dGQbrBmhQS0x71Wh94RlSbsiKuZn5xVs6SzWfWQuRnE=;
+	h=References:Content-Type:From:To:Cc:In-Reply-To:Message-Id:
+	 Mime-Version:Subject:Date; b=iy+tZ13qLmdr/dp9p1TT54zqZYeA/t4zEnhxbG2937U+ABohlWEp0dsolfQOmKjW+lOjAd8EjejaGYksRL/zMLLP+d0LvQtreJdOHjEUfHOPXUySlMlk0OB8vGlLqpFqEWsNrADvp7gKXRO5xbxxy4CBUOOa/2NCUmlEwP7hDdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=bTPIQpTN; arc=none smtp.client-ip=209.127.231.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JpqhbaVW"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=L8sCA1hR0yKQaKvtbOB+F+dFt6CAS+8pOknhGBWJJP0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788170842; v=1; x=1788775642;
- b=JpqhbaVWQx16Tqxk1v+JNW04XHFGh1rf7K5LAiGL6GP5C0qfSQZY2fT2u2uRsd6z59wXIZP5
- J6RecwpRCzPFfFVo5O9w1RY/0dwzqaB761Gnm7LPSAI/ymG76uJ/3pN+Ogz5BQvxrXWunde0SsA
- hzEm8JxKEjwd2wxVCP2ha+Rk=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 5c7f071e8e369887;
-	Mon, 31 Aug 2026 10:07:12 +0000
-X-Mizu-Trace-ID: 5c7f071e8e369887
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <276b50cc-6b92-425f-8f70-25b2fade14c0@linux.dev>
-Date: Mon, 31 Aug 2026 18:07:06 +0800
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="bTPIQpTN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1788174037;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=oj9pT49fkgayCGX3SEUyRMQPTGIlIhlnZO6FdcY++Ts=;
+ b=bTPIQpTNDtnkToWPcIBQfN2zhLMbnW7CzuwXSsZPP+7nJzalRaE+9MbMhXNfsF4F0SJg6O
+ RTJsHt/kyT6cygfCpXvQL7+Wx8u/eK0G64B8Qi2h8EX6eyRE+BsR5ecncWEPglg/3a990q
+ gsdztIG1T2aL0eJsJemdytKXlWh8Gg/lu0TWLaBXNBsaLykPWt45Qan3pKw6Ld+ooaSXcA
+ ynkqc9pUvW+i+939QKzXkxRPTOBUYnNCpWD3jTXtFP44N5z6/ek2o8tayK/4QwJ7RmW1yI
+ 36IU7ARPImQN0TFVOJ5RAFzIkqpWHcS7N6+KG838JqrfftMEjKzgG1v9Hi7hQg==
+X-Lms-Return-Path: <lba+26a955ed5+a79bb9+vger.kernel.org+yukuai@fygo.io>
+References: <20260831055716.773354-1-tao1.yu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+From: "yu kuai" <yukuai@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+To: "Tao Yu" <tao1.yu@intel.com>, <tj@kernel.org>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>, "yu kuai" <yukuai@fygo.io>
+Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, 
+	<syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com>, 
+	<stable@vger.kernel.org>
+In-Reply-To: <20260831055716.773354-1-tao1.yu@intel.com>
+Reply-To: yukuai@fygo.io
+Message-Id: <371c8526-c50f-4ca9-a9d0-7bbbd9991d63@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, hch@lst.de, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH v2 2/3] loop: replace simple_strtol() with kstrtoint()
-To: bvanassche@acm.org, axboe@kernel.dk
-References: <20260831100305.695116-1-cui.tao@linux.dev>
- <20260831100305.695116-3-cui.tao@linux.dev>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260831100305.695116-3-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from [192.168.1.104] ([39.182.0.178]) by smtp.larksuite.com with ESMTPS; Mon, 31 Aug 2026 11:00:36 +0000
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] blk-cgroup: use GFP_NOIO for radix tree preload in blkg_conf_prep
+Date: Mon, 31 Aug 2026 19:00:32 +0800
 
+Hi,
 
-Hi Bart,
+=E5=9C=A8 2026/8/31 13:57, Tao Yu =E5=86=99=E9=81=93:
+> blkg_conf_prep() allocates a new blkg with GFP_NOIO after dropping
+> queue_lock, but still preloads the radix tree node with GFP_KERNEL while
+> q->blkcg_mutex is held.
+>
+> GFP_KERNEL may enter direct reclaim and acquire fs_reclaim, which adds
+> the dependency
+>
+>    q->blkcg_mutex -> fs_reclaim
+>
+> This completes a circular locking dependency with the existing path
+>
+>    fs_reclaim -> q->q_usage_counter -> q->blkcg_mutex
+>
+> and triggers a lockdep warning when configuring blkcg policies.
+>
+> Use GFP_NOIO for radix_tree_preload() so that the preload context matches
+> the rest of this allocation path and does not recurse into reclaim while
+> q->blkcg_mutex is held.
+>
+> Reported-by: syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D144a1c0e22e53a08ef5a
+> Fixes: f255c19b3ab46 ("blk-cgroup: Pre-allocate tree node on blkg_conf_pr=
+ep")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Tao Yu <tao1.yu@intel.com>
+> ---
 
-在 2026/8/31 18:03, Tao Cui 写道:
-> From: Tao Cui <cuitao@kylinos.cn>
-> 
-> simple_strtol() is deprecated and swallows errors.  Use kstrtoint()
-> in the max_loop setup code; an invalid option keeps the default and
-> now says so.
-> 
-> Only mark max_loop_specified when the option was parsed successfully.
-> With simple_strtol() a garbage string yields max_loop = 0, and
-> loop_probe()'s "max_loop_specified && max_loop" check short-circuits
-> on 0, so legacy autoloading is not capped.  Keeping max_loop at its
-> default while still setting max_loop_specified would instead turn the
-> default into a hard upper bound for dynamic device creation.  This
-> mirrors what max_loop_param_set_int() already does for the module
-> parameter.
-> 
+This problem is already fixed by following patch, the radix_tree_preload=20
+is removed.
 
-Thanks for the review!
+[PATCH 1/3] blk-cgroup: use a request_queue rhashtable for blkg lookup -=20
+Yu Kuai=20
+<https://lore.kernel.org/all/20260823133045.970199-2-yukuai@kernel.org/>
 
-After sending v1 I noticed a regression in this patch, so I'll follow
-up with a v2 of just this one (1/3 and 3/3 are unchanged and keep your
-Reviewed-by).
+>   block/blk-cgroup.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 2b5c29434e426..27e00180e4cc1 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -873,7 +873,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
+blkcg_policy *pol,
+>   			parent =3D blkcg_parent(parent);
+>   		}
+>  =20
+> -		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
+> +		/* Drop queue_lock to do new blkg allocation with GFP_NOIO. */
+>   		spin_unlock_irq(&q->queue_lock);
+>  =20
+>   		new_blkg =3D blkg_alloc(pos, disk, GFP_NOIO);
+> @@ -882,7 +882,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
+blkcg_policy *pol,
+>   			goto fail_exit;
+>   		}
+>  =20
+> -		if (radix_tree_preload(GFP_KERNEL)) {
+> +		if (radix_tree_preload(GFP_NOIO)) {
+>   			blkg_free(new_blkg);
+>   			ret =3D -ENOMEM;
+>   			goto fail_exit;
 
-With simple_strtol() a garbage max_loop= string yields max_loop = 0,
-and loop_probe()'s "max_loop_specified && max_loop" check
-short-circuits on 0, so legacy autoloading was not capped.  In v1 an
-invalid string keeps max_loop at its default value while
-max_loop_specified is still set to true, which turns the default into
-a hard upper bound for dynamic device creation.  The v2 only marks
-max_loop_specified when kstrtoint() succeeds, mirroring
-max_loop_param_set_int():
-
- 	if (kstrtoint(str, 0, &max_loop))
-+	{
- 		pr_warn("loop: invalid max_loop, keeping default\n");
-+		return 1;
-+	}
- #ifdef CONFIG_BLOCK_LEGACY_AUTOLOAD
- 		max_loop_specified = true;
- #endif
-
-This was pointed out by an AI-assisted review of v1, so I've left your
-Reviewed-by off this one for now.  Could you take another look when
-you have a chance?
-
+--=20
 Thanks,
-Tao
-
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> 
-> ---
-> Changes in v2:
-> - move max_loop_specified = true under the success path, pointed out
->   by an AI-assisted review of v1.
-> ---
->  drivers/block/loop.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 68a9cc7aeb13..126f42580632 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2341,7 +2341,10 @@ module_exit(loop_exit);
->  #ifndef MODULE
->  static int __init max_loop_setup(char *str)
->  {
-> -	max_loop = simple_strtol(str, NULL, 0);
-> +	if (kstrtoint(str, 0, &max_loop)) {
-> +		pr_warn("loop: invalid max_loop, keeping default\n");
-> +		return 1;
-> +	}
->  #ifdef CONFIG_BLOCK_LEGACY_AUTOLOAD
->  	max_loop_specified = true;
->  #endif
-
+Kuai
