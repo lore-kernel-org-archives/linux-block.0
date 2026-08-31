@@ -1,111 +1,176 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117655398A9
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 15:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68B2473C8D;
+	Mon, 31 Aug 2026 15:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788189707; cv=none; b=KVOCRZa+K23aGA+KoyhgcqBDUK9K++w40aZQDQ8QfeM7y6M9au2CpjnJysMIVAgSkMm/pOHbTJjjmUjrQ2cpg9v3KyIvwUSLtQkwD4M4dNpMEkhvZ8Y3ChfAatkU7vfhhAggFh7vv9Axjyg/rWwwKAGqRZvJ+Zi/Hkov+k/4Hbk=
+	t=1788191509; cv=none; b=BE2e6IVqUy/psO0tqjeaR7AUmHE2+LbaQm7Ecf1WAr5Owws9fnfdd8EVlnYPOhQTddXEjp7sjsBYasZJqJbaCg8COXbQviCs7E4/ew8DZT3TYzSo1se2UUYyxpNG13cwnzvCMUYR2VWUFNwXgq+JLB75eNQBPEtck6K5frTHcAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788189707; c=relaxed/simple;
-	bh=Wl7hWPoxTOBlqq7vnQDQZQd/z2keZXJ4zCnVMCil4kM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JCkLOu+dVgZyWTnFDzYgqtFvINpLg+tV4Qedyot8MiF5HtifMhbApml0I1chako0LVtLhO2rBgZr91Xq6rUhFlRrnLrhCj2m5z4n8kHOVwjhJRndCMDpPoGiwGdLd+uxXdLZMpIBuUgea2U+V5G4EHQU3pUCYrmOyCn6PUQuBEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pskg3RuR; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pskg3RuR"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4980fe6b3beso29050705e9.0
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 08:21:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788189704; x=1788794504; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rYStpApz59/NN9gdwKEzWwAQTvauo+N1Z+YjlKkOxKU=;
-        b=pskg3RuRnkP6XyW0j/mGUjVSpFepIgco3Gpjx2rB618KCCUKSzwbJPkCqKH5nHJmrJ
-         8Qew3s4fK2wWmMdfbpBn1l9lCOldFLnTiGBXYkc9lxkuQp7LYbKLjiKny5vUcQmfc7k3
-         rIjw4bbBuSAWYIMSJdf/u2RC4a0Xb7tlmycWi5PtYsQ8A7397lgJ9RazHbK7RrL0eBHQ
-         zGFrVOAUsi/PMwg1SHjxvaD9TY9bMzDYlz8qoQHNHSC8XyyySnhk3Do/4JAovbt1Jtf3
-         O7klmtxsT527pevyWpiNT8UMAIPJpxUlbcGy19t0aEnhxuU/drXqigSXDozxG+DIrcwi
-         DDTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788189704; x=1788794504;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rYStpApz59/NN9gdwKEzWwAQTvauo+N1Z+YjlKkOxKU=;
-        b=RI2sWfkwpkdhw6xOBHqqR6OqophC7P6VNXEubzJcvJmMbiDIaNqtETwv0e/e530Gdb
-         z2GfTHlIAHz/w3QH2soKT+I7iEkrxJXXz5lR2TGUouhA4CHKa/55C0z9SXYfe0C1d2aj
-         cGDJjods4Zkh/Ca2HaNQfpNko6Thf6Ofn5+83wITwKkkvnE6STUHNR1urDVVmDcxp2Uq
-         AjnPzWGkVONyW+dbuELYXfMpCESo890SOc5IjqWWsd58OnZbsxHcQVIhepfh9Ku/iW8H
-         LxWludAF9ESuR6BDKpqUrHsfn/WiURIYR4RbhqwTjyyvFA2OHFsPK1kWb3D/Xa5beZIc
-         H7Iw==
-X-Gm-Message-State: AFuF++nWIlnlai8HT8M6dOKi8rUqgBkWknXQ2zmPRM8F2rfw6qiUHF37
-	aMroQB0qdJZ1xFV1S+uTR2dCWkftCyC5hiDRJWLgTq28OGBjS9sFRkpX
-X-Gm-Gg: AR+sD13iylhJh+FJy6cE2waaUMokmy7oMuxIqjbaLxAPrOXPj5uhRCdPZ/U8L30/HxX
-	ZfWwK1B/ZWFQmJam+cLqxR8HM9m16k73Q1MkKZuHXHkp1PafQeMWtajqVTtKxiP8WXyg2W9tKNI
-	iWphtfLZBJ0F10mfyNaQ4dLe5RCFwT3Zc9eA6xJ9Qk3lH8x5kr35nJgMKjGF2AnEFchvcEfmfQw
-	lcdncz8RdP80YGYSFBN2dpiQxrJ+JPH8eVJicYa0FzZBsdAdVBjMM7XPbepPl0n2Rj6fFLwQ8Ms
-	fHPAbxF6Fe4iCFyqHflpC3UxbHOjGKLXpcvEYV4P8q4l13rpyTHZ5rRWfRVBQGzMbBG5qsRPpew
-	YTIpTZH35jvYgH2uzerAP+pfkxJXIwZl6m6ZbjKB1fMS/1g5zi+JVnhh5Saqf/akP6EJYEwsSK5
-	C2kFjJ0v4gzbknvv1+/m7CpKUoiFgZ7uzt1Au08KHgOwxES0n6EfLQdmZtdJclfBOFEhDwGVrsc
-	Er4qOdOXK06ATK8Myvx13Ic
-X-Received: by 2002:a05:600d:8497:10b0:49c:dc11:2b62 with SMTP id 5b1f17b1804b1-49cdc112ba2mr26489365e9.7.1788189703907;
-        Mon, 31 Aug 2026 08:21:43 -0700 (PDT)
-Received: from unix.. (244.red-81-44-253.staticip.rima-tde.net. [81.44.253.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b963c3c0asm528166815e9.10.2026.08.31.08.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2026 08:21:41 -0700 (PDT)
-From: =?UTF-8?q?Iv=C3=A1n=20Ezequiel=20Rodriguez?= <ivanrwcm25@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Iv=C3=A1n=20Ezequiel=20Rodriguez?= <ivanrwcm25@gmail.com>
-Subject: [PATCH v1 2/2] block: loop: restore state on loop_configure() error
-Date: Mon, 31 Aug 2026 12:20:44 -0300
-Message-ID: <20260831152044.166353-3-ivanrwcm25@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260831152044.166353-1-ivanrwcm25@gmail.com>
-References: <20260831152044.166353-1-ivanrwcm25@gmail.com>
+	s=arc-20240116; t=1788191509; c=relaxed/simple;
+	bh=bBVowiB5dS8JjB/FFWssLYEWYbCErytHxenCEPiDcoQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PkV5hnBLX7/JzF6Vdf2fzwbrsOsODNoIaEYXFGHYPuDds1IFdIuB3KYyv9yKe0MW6yizvL0S8TC0a6KpbVFjoQ5gU+RuDykh56A8lPqRjNBgwH/vnFqkJHu2qY7VpA/h8R0ZIA8b21YReCoSPKadlXcHikJRoccaTWYplCivrSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 67VFnte6047028;
+	Tue, 1 Sep 2026 00:49:55 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 67VFntWh047025
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 1 Sep 2026 00:49:55 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <30528b67-6ff9-4512-892b-f48d819e100f@I-love.SAKURA.ne.jp>
+Date: Tue, 1 Sep 2026 00:49:51 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Tao Cui <cui.tao@linux.dev>, brauner@kernel.org
+Cc: Markus.Elfring@web.de, axboe@kernel.dk, broonie@kernel.org,
+        bvanassche@acm.org, dlemoal@kernel.org, hch@infradead.org, hch@lst.de,
+        hdanton@sina.com, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        lkp@intel.com, oe-lkp@lists.linux.dev, oliver.sang@intel.com,
+        torvalds@linux-foundation.org, viro@zeniv.linux.org.uk,
+        Tao Cui <cuitao@kylinos.cn>
+References: <6a770a9c-2642-4392-9b9c-609836693f36@I-love.SAKURA.ne.jp>
+ <20260831141143.704821-1-cui.tao@linux.dev>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260831141143.704821-1-cui.tao@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav211.rs.sakura.ne.jp
 
-On failure after loop_assign_backing_file(), restore the backing
-file GFP mask, clear lo_backing_file/lo_device, and re-enable uevents
-before unlocking and dropping the file reference.
+Thank you for joining to this thread, Tao.
 
-Signed-off-by: Iván Ezequiel Rodriguez <ivanrwcm25@gmail.com>
----
- drivers/block/loop.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On 2026/08/31 23:11, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> Hi Tetsuo, Bart,
+> 
+>> +	/* Step 1: Flush all outstanding I/O, without open_mutex held. */
+>> +	/*
+>> +	 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
+>> +	 * wait for already started loop_queue_rq() to complete.
+>> +	 */
+>> +	synchronize_rcu();
+> 
+> Your reply to Bart says loop_queue_rq() is called with RCU read
+> lock, but I don't see one.  The two call sites of ->queue_rq() are
+> blk_mq_dispatch_rq_list() and __blk_mq_issue_directly(), and
+> neither is wrapped in rcu_read_lock().  Direct issue from
+> blk_mq_submit_bio() runs in process context with no RCU read-side
+> critical section, so synchronize_rcu() does not wait for a
+> loop_queue_rq() that is already running there.  Only the softirq
+> dispatch path is an implicit RCU reader.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 6f12976035b0..838554bd980e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1123,6 +1123,13 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	return 0;
- 
- out_unlock:
-+	if (lo->lo_backing_file) {
-+		mapping_set_gfp_mask(lo->lo_backing_file->f_mapping,
-+				     lo->old_gfp_mask);
-+		lo->lo_backing_file = NULL;
-+		lo->lo_device = NULL;
-+	}
-+	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
- 	loop_global_unlock(lo, is_loop);
- out_bdev:
- 	if (!(mode & BLK_OPEN_EXCL))
--- 
-2.43.0
+You can read sashiko's raw logs at https://sashiko.dev/#/log/49552 .
 
+  Okay, let's break this down. My initial thought is to examine how the `blk_mq_run_dispatch_ops`
+  macro is implemented. Specifically, how does it handle RCU read locks? It wraps the provided
+  `dispatch_ops` in either `rcu_read_lock()` or `srcu_read_lock()`, depending on the `BLK_MQ_F_BLOCKING`
+  flag. The loop device, however, is set up *without* this `BLK_MQ_F_BLOCKING` flag. Therefore,
+  `loop_queue_rq` executes under the protection of `rcu_read_lock()`.
+
+  Now, the critical question: Does the `synchronize_rcu()` call in `__loop_clr_fd` effectively address
+  the potential race conditions? Since `loop_queue_rq()` is indeed RCU-protected, `synchronize_rcu()` will
+  correctly wait for all currently executing instances of `loop_queue_rq()` to complete. Furthermore,
+  the `lo_state` transition to `Lo_rundown` before calling `__loop_clr_fd` ensures that any *new* calls to
+  `loop_queue_rq()` will see this state and return an error. This perfectly fences the execution of
+  `loop_queue_rq()`. Moreover, `drain_workqueue()` then makes sure all queued works are completed, and
+  these are scheduled by `loop_queue_rq()`. This is great; all scheduled works are completed before
+  clearing `lo->lo_backing_file`.
+
+> 
+> The window is still closed by the steps below, so this is not a
+> correctness bug, but the synchronize_rcu() is not doing what the
+> comment claims.  blk_mq_quiesce_queue() +
+> blk_mq_wait_quiesce_done(), as Bart suggested, would express the
+> intent directly.
+
+synchronize_rcu() + drain_workqueue() can be implied by blk_mq_freeze_queue() + blk_mq_unfreeze_queue().
+But why are you talking about blk_mq_quiesce_queue() + blk_mq_wait_quiesce_done() ?
+
+> 
+>> +	/*
+>> +	 * Now that no more AIO requests are scheduled by lo_rw_aio(),
+>> +	 * wait for already started AIO to complete.
+>> +	 */
+>> +	blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
+> 
+> About this step, in your follow-up you wrote:
+> 
+>>   (1) since we are in lo_release() with disk_openers(disk) == 0, the activity of
+>>       incrementing/decrementing q_usage_counter (incremented before loop_queue_rq()
+>>       is called, and decremented after loop_queue_rq() returned BLK_STS_IOERR)) will
+>>       cease shortly
+> 
+> The decrement timing here is only true for the error path.  For
+> BLK_STS_OK the reference is held until the request is freed, which
+> is what makes blk_mq_freeze_queue() wait for requests that already
+> passed the state check, including the loop workqueue worker that
+> completes them.  That is the property step 1 relies on, and it is
+> worth stating in the comment.
+> 
+> What is still open is Bart's question about io_uring fixed files:
+> if submissions can continue after the last close, "cease shortly"
+> does not hold, and it is the freeze wait that actually drains them.
+
+If submissions can continue _forever_ despite disk_openers(disk) == 0, what
+mechanism was preventing this problem from occurring until Linux 7.0 ?
+
+> 
+>> +	if (need_clear) {
+>> +		/*
+>> +		 * Grab all references that will be dropped as soon as
+>> +		 * returning from lo_release() and releasing disk->open_mutex.
+>> +		 */
+>> +		get_device(disk_to_dev(disk));
+>> +		__module_get(disk->fops->owner);
+>> +		queue_work(system_long_wq, &lo->lo_clr_work);
+>> +	}
+> 
+> With teardown now asynchronous, between the last close()
+> returning and the work item finishing, lo_open() and
+> LOOP_CONFIGURE return -ENXIO.  That is the same behavior change
+> that led to the revert of the earlier attempt (bf23747ee053,
+> xfs/259).  Moving the xfstests side to the tests is one thing, but
+> userspace that closes a loop device and immediately reconfigures
+> it now needs to handle a transient -ENXIO.  Is that acceptable, or
+> should the retry happen in the kernel?
+
+Does whether the teardown being synchronous or asynchronous matter so much?
+
+I don't think we can control when e.g. udev-worker becomes the thread
+who actually calls __loop_clr_fd()
+( https://lkml.kernel.org/r/9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp ).
+Even if an existing user app calls close() immediately followed by open(),
+we can't prove that __loop_clr_fd() is synchronously called by that user app
+because udev-worker can jump in and udev-worker becomes the thread who actually
+calls __loop_clr_fd().
+
+   An user app     udev-worker
+   -----------     -----------
+                    open()
+    close()
+    open() // => succeeds due to Lo_bound state
+    ioctl(LOOP_CONFIGURE) // => fails with -EBUSY due to Lo_bound state
+    close() // <= gives up due to ioctl() failure
+                    close() // => becomes  Lo_rundown and __loop_clr_fd() is called
+
+A claim that mentions that the kernel is unable to release forever due to a refcount
+leak bug is valid. But a claim that mentions that the kernel cannot prove that
+this -ENXIO or -EBUSY problem never happens is invalid. Programs that use the loop
+device have to be prepared for transient errors.
