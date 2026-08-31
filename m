@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026743B14B0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199733BED59
 	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 03:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788147712; cv=none; b=GB8hFkIs1r6sggC9vfha3MBA3ZzieiufINv8Sc8pfuPw6tdF2g8ZeLPloxKyCv7vG5RPUEELTFLzTd0l1rTM09lZgJKQ0IoJpuhQ2qNYZOjA9ZCYLyVqSYE66ulUMEZA8NUcCjTqBX8exrDsBB3xjyYZWwQTd1E0zpRlp6z1hUA=
+	t=1788147712; cv=none; b=QMfWP5QreKUIm3lrqQcOtlJVKj817M9BVUILr5c6Nf97SA/sn6LkYVhzA4MdPf5eL/HPrSqe2jnsURALJg7twzcqpmsEmQlp2NNzd0m/1LjHa3aPhol9+PB9wpTX+3rAzHThkIHLWohW9f7rNrtVpHXhfZg0gykLW9jXCljbNII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788147712; c=relaxed/simple;
-	bh=aNfsKosS9YzH7/uFRfBkjGmeDPrh/tXsYVYFch99F3E=;
+	bh=vGjLotNSzDfw+Ebe3gaKIutWSUqhJsC05T83Aamx0JE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l4O3wUO28wn53ZmBFCk70PaUSVLIt2JJtDHh89hKe1iJy/hJKpZsepweOsk8XLurKT16L1IoBe+B8ye0W/VGbKb9pAg+T6r16pFiE9lxQmKnPtfS4wkYd5nEZA+kN+LQQZfp1cQ4S2JYHnK/GcmZKa9f/1aCaIs9am9bItcsLIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVOossuW; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=jw5dOkUipTsLbS4fXSRcn8S7k+SIAxcbdKTL8krkE3heBzgefJIq8VfhE3JhlGx2zdjt4kJiF3WXfw6a5Flys3PkH9+JsdITQn+osXfXNzQXkjeT1RYcu0LNzKx3S0RUGLn5UWSmCMNdbLXgOabNkVMuS04YNn7vFpuReTh50Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbtOk/jU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVOossuW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ED881F00ADF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbtOk/jU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0540F1F01558;
 	Mon, 31 Aug 2026 03:41:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788147688;
-	bh=VawDjYocbOnhI45mzokaYhUaC+l9hoJ1jXMWzAoDcFI=;
+	s=k20260515; t=1788147689;
+	bh=o/xhMDa3/o/X78i4+yAbRnObL7iUlZ3SkkIZtgqpFpA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lVOossuWn8kTa6WDrQ2gDrzfQwgoE3p5fa6lvdk51O3OJdf6OrOqdM+mGdymD/Qv9
-	 hCQVfKCSfp950ElaTJtcABQ/Mp4t2RoLAVcISZmacJemZG8kjq9axfUQFLaXgSQyuY
-	 KErrgNJ4JSDxGBRgGPNKYbTCTTkezblmIB8Gll2NtXtPa93HbfP4nS+pe5zegFGCzv
-	 VAKIAgtuwQnee70auMjBkgf3DuYkRu1X+zpIgA6S2emMWlExKeDtln4rkyJsNCjnb5
-	 td44XBgNVwWzdlx8cbOeyEOOLNL582MAK74sF/VRMxCtclTYPxg+4FrZadDVOPfiYy
-	 BWgtjixsmjszQ==
+	b=cbtOk/jUJv5iRWmDrpmXlhMfXGGUrZq19yoQMu17yZT3r1yicNLC/mdT/E6z5VZAo
+	 ypWKouEjT421I4iKN+7dunvopgVHnj5Y/J+76wAwVdweNfXKW7SxuKzTaXA3SEDEtO
+	 igXpKp4HdRqg38ThiTKs2XzuZNhVxUvoy5QgByix6ARCeBflx1HTUmsvJ7g52bBo8i
+	 IEUf7i8pn2Rt6puIyBvdU6PEOwx6A7m3sT0/UdZqXONT4Q9JVUfVvHpbfwYjklQyx7
+	 Dc4bzsb6r5cdLZs4mf+pFsCmblEFlXEET48uu6g6B5bukmICCXgxEivHhLvWMU/zZG
+	 pmvhKihV7zz3w==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 08/12] block: propagate readonly and offline conditions to zone write plugs
-Date: Mon, 31 Aug 2026 12:41:05 +0900
-Message-ID: <20260831034109.744039-9-dlemoal@kernel.org>
+Subject: [PATCH v6 09/12] block: always treat offline and read-only zones as dead
+Date: Mon, 31 Aug 2026 12:41:06 +0900
+Message-ID: <20260831034109.744039-10-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260831034109.744039-1-dlemoal@kernel.org>
 References: <20260831034109.744039-1-dlemoal@kernel.org>
@@ -44,161 +44,181 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When revalidating the zones of a zoned block device, or when handling a
-zone which has a zone write plug flagged with
-BLK_ZONE_WPLUG_NEED_WP_UPDATE, the function
-disk_zone_wplug_sync_wp_offset() is used to update the write pointer
-offset of a zone write plug. However, this does not take into account the
-condition of the zone, which may have changed to readonly or offline,
-which in itself will always cause errors.
+Since any write BIO targeting an offline or a read-only zone will fail,
+there is no point in keeping zone write plugs for these zones.
+So for any offline or read-only zone, the zone write plug should always
+be treated as dead.
 
-In order to catch such errors, rename disk_zone_wplug_sync_wp_offset() to
-disk_zone_wplug_sync_state() and in addition to the zone write pointer,
-also update the zone write plug condition if the zone is readonly or
-offline.
+Do this by modifying disk_check_zone_wplug_dead() to always mark read-only
+and offline zones as dead to force a removal of the zone write plug from
+the disk hash table on BIO submission. blk_zone_wplug_prepare_bio() is
+also modified to have the same checks to immediately fail a write BIO
+targeting a read-only or offline zone. With these two changes, any newly
+issued or unplugged write BIO targeting a read-only or offline zone is
+immediately failed.
 
-This change also requires changes to how a reset all zones operation
-(REQ_OP_ZONE_RESET_ALL) is handled so that the offline or read-only
-condition of zone write plugs is not overwritten with an erroneous empty
-condition. To do so, introduce the helper function
-disk_zone_is_offline_or_readonly() to skip updating the condition of zones
-that are read-only or offline and that do not have a zone write plug.
-For zones that have a zone write plug, the helper function
-disk_zone_wplug_is_offline_or_readonly() is used in
-disk_zone_wplug_set_wp_offset() to not update a zone write plug write
-pointer and condition for read-only and offline zones.
+Finally, disk_zone_wplug_sync_state() is modified to add a call to
+disk_mark_zone_wplug_dead() for the zone write plug of any read-only or
+offline zone found during zone revalidation or a report zones.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c | 55 +++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 46 insertions(+), 9 deletions(-)
+ block/blk-zoned.c | 110 +++++++++++++++++++++++++---------------------
+ 1 file changed, 59 insertions(+), 51 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 4b0eda94bbf3..e19e0506b32f 100644
+index e19e0506b32f..576f82b605a0 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -277,6 +277,29 @@ static inline u8 disk_zone_get_state(struct gendisk *disk, sector_t sector)
- 	return zs;
+@@ -744,6 +744,53 @@ static inline void disk_put_zone_wplug(struct blk_zone_wplug *zwplug)
+ 		disk_free_zone_wplug(zwplug);
  }
  
-+static enum blk_zone_cond disk_zone_get_cond(struct gendisk *disk,
-+					     sector_t sector)
++static inline void blk_zone_wplug_bio_io_error(struct blk_zone_wplug *zwplug,
++					       struct bio *bio)
 +{
-+	u8 zs = disk_zone_get_state(disk, sector);
++	struct request_queue *q = zwplug->disk->queue;
 +
-+	return blk_zstate_to_zone_cond(zs);
++	bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
++	bio_io_error(bio);
++	disk_put_zone_wplug(zwplug);
++	/* Drop the reference taken by disk_zone_wplug_add_bio(). */
++	blk_queue_exit(q);
 +}
 +
-+static inline bool
-+disk_zone_cond_is_offline_or_readonly(enum blk_zone_cond cond)
++/*
++ * Abort (fail) all plugged BIOs of a zone write plug.
++ */
++static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
 +{
-+	return cond == BLK_ZONE_COND_READONLY ||
-+		cond == BLK_ZONE_COND_OFFLINE;
-+}
++	struct gendisk *disk = zwplug->disk;
++	struct bio *bio;
 +
-+static inline bool disk_zone_is_offline_or_readonly(struct gendisk *disk,
-+						    sector_t sector)
-+{
-+	enum blk_zone_cond cond = disk_zone_get_cond(disk, sector);
++	lockdep_assert_held(&zwplug->lock);
 +
-+	return disk_zone_cond_is_offline_or_readonly(cond);
-+}
++	if (bio_list_empty(&zwplug->bio_list))
++		return;
 +
- static bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
- {
- 	u8 zs = disk_zone_get_state(disk, sector);
-@@ -587,6 +610,11 @@ static bool disk_zone_wplug_is_full(struct gendisk *disk,
- 	return zwplug->wp_offset >= disk->last_zone_capacity;
- }
- 
-+static bool disk_zone_wplug_is_offline_or_readonly(struct blk_zone_wplug *zwplug)
-+{
-+	return disk_zone_cond_is_offline_or_readonly(zwplug->cond);
-+}
++	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
++			    zwplug->disk->disk_name, zwplug->zone_no);
++	while ((bio = bio_list_pop(&zwplug->bio_list)))
++		blk_zone_wplug_bio_io_error(zwplug, bio);
 +
- static bool disk_insert_zone_wplug(struct gendisk *disk,
- 				   struct blk_zone_wplug *zwplug)
- {
-@@ -893,8 +921,10 @@ static void disk_zone_wplug_set_wp_offset(struct gendisk *disk,
- 
- 	/* Update the zone write pointer and abort all plugged BIOs. */
- 	zwplug->flags &= ~BLK_ZONE_WPLUG_NEED_WP_UPDATE;
--	zwplug->wp_offset = wp_offset;
--	disk_zone_wplug_update_cond(disk, zwplug);
-+	if (!disk_zone_wplug_is_offline_or_readonly(zwplug)) {
-+		zwplug->wp_offset = wp_offset;
-+		disk_zone_wplug_update_cond(disk, zwplug);
-+	}
- 
- 	disk_zone_wplug_abort(zwplug);
- 	if (!zwplug->wp_offset || disk_zone_wplug_is_full(disk, zwplug))
-@@ -924,8 +954,8 @@ static unsigned int blk_zone_wp_offset(struct blk_zone *zone)
- 	}
- }
- 
--static unsigned int disk_zone_wplug_sync_wp_offset(struct gendisk *disk,
--						   struct blk_zone *zone)
-+static unsigned int disk_zone_wplug_sync_state(struct gendisk *disk,
-+					       struct blk_zone *zone)
- {
- 	struct blk_zone_wplug *zwplug;
- 	unsigned int wp_offset = blk_zone_wp_offset(zone);
-@@ -935,6 +965,11 @@ static unsigned int disk_zone_wplug_sync_wp_offset(struct gendisk *disk,
- 		unsigned long flags;
- 
- 		spin_lock_irqsave(&zwplug->lock, flags);
-+		if (disk_zone_cond_is_offline_or_readonly(zone->cond)) {
-+			zwplug->flags &= ~BLK_ZONE_WPLUG_NEED_WP_UPDATE;
-+			zwplug->cond = zone->cond;
-+			zwplug->wp_offset = UINT_MAX;
++	zwplug->flags &= ~BLK_ZONE_WPLUG_PLUGGED;
++
++	/*
++	 * If we are using the per disk zone write plugs worker thread, remove
++	 * the zone write plug from the work list and drop the reference we
++	 * took when the zone write plug was added to that list.
++	 */
++	if (blk_queue_zoned_qd1_writes(disk->queue)) {
++		spin_lock(&disk->zone_wplugs_list_lock);
++		if (!list_empty(&zwplug->entry)) {
++			list_del_init(&zwplug->entry);
++			disk_put_zone_wplug(zwplug);
 +		}
++		spin_unlock(&disk->zone_wplugs_list_lock);
++	}
++}
++
+ /*
+  * Flag the zone write plug as dead and drop the initial reference we got when
+  * the zone write plug was added to the hash table. The zone write plug will be
+@@ -761,6 +808,12 @@ static void disk_mark_zone_wplug_dead(struct blk_zone_wplug *zwplug)
+ 
+ static inline bool disk_check_zone_wplug_dead(struct blk_zone_wplug *zwplug)
+ {
++	if (disk_zone_wplug_is_offline_or_readonly(zwplug)) {
++		disk_zone_wplug_abort(zwplug);
++		disk_mark_zone_wplug_dead(zwplug);
++		return true;
++	}
++
+ 	if (!(zwplug->flags & BLK_ZONE_WPLUG_DEAD))
+ 		return false;
+ 
+@@ -844,53 +897,6 @@ static struct blk_zone_wplug *disk_get_or_alloc_zone_wplug(struct gendisk *disk,
+ 	return zwplug;
+ }
+ 
+-static inline void blk_zone_wplug_bio_io_error(struct blk_zone_wplug *zwplug,
+-					       struct bio *bio)
+-{
+-	struct request_queue *q = zwplug->disk->queue;
+-
+-	bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
+-	bio_io_error(bio);
+-	disk_put_zone_wplug(zwplug);
+-	/* Drop the reference taken by disk_zone_wplug_add_bio(). */
+-	blk_queue_exit(q);
+-}
+-
+-/*
+- * Abort (fail) all plugged BIOs of a zone write plug.
+- */
+-static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
+-{
+-	struct gendisk *disk = zwplug->disk;
+-	struct bio *bio;
+-
+-	lockdep_assert_held(&zwplug->lock);
+-
+-	if (bio_list_empty(&zwplug->bio_list))
+-		return;
+-
+-	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
+-			    zwplug->disk->disk_name, zwplug->zone_no);
+-	while ((bio = bio_list_pop(&zwplug->bio_list)))
+-		blk_zone_wplug_bio_io_error(zwplug, bio);
+-
+-	zwplug->flags &= ~BLK_ZONE_WPLUG_PLUGGED;
+-
+-	/*
+-	 * If we are using the per disk zone write plugs worker thread, remove
+-	 * the zone write plug from the work list and drop the reference we
+-	 * took when the zone write plug was added to that list.
+-	 */
+-	if (blk_queue_zoned_qd1_writes(disk->queue)) {
+-		spin_lock(&disk->zone_wplugs_list_lock);
+-		if (!list_empty(&zwplug->entry)) {
+-			list_del_init(&zwplug->entry);
+-			disk_put_zone_wplug(zwplug);
+-		}
+-		spin_unlock(&disk->zone_wplugs_list_lock);
+-	}
+-}
+-
+ /*
+  * Update a zone write plug condition based on the write pointer offset.
+  */
+@@ -969,6 +975,7 @@ static unsigned int disk_zone_wplug_sync_state(struct gendisk *disk,
+ 			zwplug->flags &= ~BLK_ZONE_WPLUG_NEED_WP_UPDATE;
+ 			zwplug->cond = zone->cond;
+ 			zwplug->wp_offset = UINT_MAX;
++			disk_mark_zone_wplug_dead(zwplug);
+ 		}
  		if (zwplug->flags & BLK_ZONE_WPLUG_NEED_WP_UPDATE)
  			disk_zone_wplug_set_wp_offset(disk, zwplug, wp_offset);
- 		spin_unlock_irqrestore(&zwplug->lock, flags);
-@@ -979,7 +1014,7 @@ int disk_report_zone(struct gendisk *disk, struct blk_zone *zone,
- 	}
+@@ -1524,11 +1531,12 @@ static bool blk_zone_wplug_prepare_bio(struct blk_zone_wplug *zwplug,
+ 		return false;
  
- 	if (disk->zone_wplugs_hash)
--		disk_zone_wplug_sync_wp_offset(disk, zone);
-+		disk_zone_wplug_sync_state(disk, zone);
+ 	/*
+-	 * Check that the user is not attempting to write to a full zone.
+-	 * We know such BIO will fail, and that would potentially overflow our
+-	 * write pointer offset beyond the end of the zone.
++	 * Check that the user is not attempting to write to a full, read-only
++	 * or offline zone. We know such BIOs will fail, so there is no point
++	 * in issuing them.
+ 	 */
+-	if (disk_zone_wplug_is_full(disk, zwplug))
++	if (disk_zone_wplug_is_full(disk, zwplug) ||
++	    disk_zone_wplug_is_offline_or_readonly(zwplug))
+ 		return false;
  
- 	if (args && args->cb)
- 		return args->cb(zone, idx, args->data);
-@@ -1100,8 +1135,7 @@ int blkdev_get_zone_info(struct block_device *bdev, sector_t sector,
- 	else
- 		zone->capacity = disk->zone_capacity;
- 
--	if (zone->cond == BLK_ZONE_COND_READONLY ||
--	    zone->cond == BLK_ZONE_COND_OFFLINE) {
-+	if (disk_zone_cond_is_offline_or_readonly(zone->cond)) {
- 		zone->wp = ULLONG_MAX;
- 		return 0;
- 	}
-@@ -1240,8 +1274,11 @@ static void blk_zone_reset_all_bio_endio(struct bio *bio)
- 
- 	/* Update the cached zone conditions. */
- 	for (sector = 0; sector < get_capacity(disk);
--	     sector += bdev_zone_sectors(bio->bi_bdev))
-+	     sector += bdev_zone_sectors(bio->bi_bdev)) {
-+		if (disk_zone_is_offline_or_readonly(disk, sector))
-+			continue;
- 		disk_zone_set_cond(disk, sector, BLK_ZONE_COND_EMPTY);
-+	}
- 	clear_bit(GD_ZONE_APPEND_USED, &disk->state);
- }
- 
-@@ -2362,7 +2399,7 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
- 	if (!disk->zone_wplugs_hash)
- 		return 0;
- 
--	wp_offset = disk_zone_wplug_sync_wp_offset(disk, zone);
-+	wp_offset = disk_zone_wplug_sync_state(disk, zone);
- 	if (!wp_offset || wp_offset >= zone->capacity)
- 		return 0;
- 
+ 	if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
 -- 
 2.55.0
 
