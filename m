@@ -1,77 +1,140 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF26E3C416B
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 08:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D059E3D6CB4
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 08:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788163456; cv=none; b=ax3QljvaU73Q6mCNw91j+n4ZZzORkJ9I0Qq2tRgE8d5WK7JID4IuJhH55125+S6kuCiv7m88lF+meobLVQC4Y9gU/bPC1sujPa2wNrXnfoKVa0A4kM/hlWBr3d89fW2Eb5Ei6dc103mmmp4qefROJjhBc47OdQfmM5wsN5z9XYs=
+	t=1788165491; cv=none; b=pP3F8V1ueUO/hfKnYWFUEJROofMj2kHr7Gw8najUwU/RTcTI/pckYnm18q6sKfISnHIXLLYQ3EUS37bTXaUVlbKX+fC7XFi48ZTO+BZipexqFzBOrP9A8yQNHNHGdZ6Jtx6mfUJmAtmrmezpsAp2FKZlinVR7J2pp8EfUvalbGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788163456; c=relaxed/simple;
-	bh=s65l/6VWi7KqowfVgR0mX1NO8Ka0YZZlOITiFdH2u5c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oWPwKwJa3Z+L322fiheP2o9zugcmIqQ/iFcoHjv1kP5JlquU0P+wpl47xqi+HaJxexer3YTr9gt/9BM6M+MZPW+e5kEfoSpbUxMoZC8xaQSUzAX4A4JjI5AOmKcGe+o5iEPtASUjRBq4z4z7ZVdwaqGTl7ralwaV+XQNdAu40C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 890e1120a51211f19a56ed5b684f684d-20260831
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_AS_FROM, HR_TO_COUNT
-	HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED
-	SA_TRUSTED, SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS
-	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF
-	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:354229cb-06fd-4baa-a8e7-3ead8edeb0d2,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:10
-X-CID-INFO: VERSION:1.3.19,REQID:354229cb-06fd-4baa-a8e7-3ead8edeb0d2,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:10
-X-CID-META: VersionHash:7db8b62,CLOUDID:50ff9990caa7e96f5054b6e27b624a9c,BulkI
-	D:26083116041099FKK443,BulkQuantity:0,SF:10|66|78|81|82|83|102|127|136|850
-	|865|898,TC:nil,Content:0|15|50,EDM:-3|-100,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 890e1120a51211f19a56ed5b684f684d-20260831
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1386349333; Mon, 31 Aug 2026 16:04:05 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: sangyao@kylinos.cn
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	john.g.garry@oracle.com,
-	kbusch@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@grimberg.me
-Subject: Re: [PATCH v3 0/5] block, nvme: support same-LBA multipath limit stacking
-Date: Mon, 31 Aug 2026 16:03:40 +0800
-Message-Id: <20260831080340.44146-1-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260821101050.1464087-1-sangyao@kylinos.cn>
-References: <20260821101050.1464087-1-sangyao@kylinos.cn>
+	s=arc-20240116; t=1788165491; c=relaxed/simple;
+	bh=WLtm+GBjS4mENbZdWq6ft2W9jH1OWPirkpQ5szhajHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OGYxGZEMOZ8NytCqDrM8sj+Qzu5/Ap/r1agRm9TA6n3XMmt80PiJbvIc4L/zFVymcwB78Op68AJ1ysRUqNpYtEpIcPxqf9oJMfcgRPY2HBnDh+40eaPFCI2c/adJpFS4PqCfKSYr3SVARCg6zBdkbuauqtF9xOTIGe/LEp6HbXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AtcOLTG/; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AtcOLTG/"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-398b1e63c49so1195649a91.0
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 01:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788165485; x=1788770285; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=wvmBjNWujEmlSCyP5EP6vmyuBGO/nrT24KCWQT1TNSQ=;
+        b=AtcOLTG/e8e8yduYS9tgCC1O5Dqgq0qNkM9FL6xjE+z6VAdoOOHzBkQvXfy536lN4H
+         KlOpYy8g+kAF5aMzcCYu3ATuVbOOi95u3G9MccHKVVsLEMjXdLYt3C8LpebdjTYCT0sB
+         lIgaw5TAPQ0JMhrtLE7VDI5UYHqT/VMC7U2Tt813tnxF2itGXWMQ0WU8V+r12UaAG88S
+         Y3NvcOXzlssbXOmpeKQydrDGPpd1oghGf+ZbkLuF5HBS0v/n9RB4dPNnybWQdYjD7Nkh
+         JrMc0VzVShlD5oZw5zi5YbJj6VPCstqab7kGYXLhCSkP+RGbmURurLP7EDKNBEkFVJhF
+         WTvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788165485; x=1788770285;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=wvmBjNWujEmlSCyP5EP6vmyuBGO/nrT24KCWQT1TNSQ=;
+        b=ojZ+p5/ed6eFCnyBDJLmeUkz58TSvqy5d6jV+kvvuKXI12cCTpgw5p0gMLys+Dr51G
+         3aGetbtXzdedO6KOz/rCS1+zjGiuCYLlCPEXDF5Q/SngP8Sit9u+sfcEXOZCK55Wz8y+
+         Pd3P6IWAf8e5p28mHkxdJFfg+Zin/YEMHshN3TvVPH5J2k3T0Q9xPA3rqZUocGcB3hcH
+         wnGR8AQ3xgLjwoOQf/6dBBw4fjrA+gsVOnfeDm7nJqRfQBPE7SR8O0BZqzWa2iXIzTPs
+         6p4uKLgfu0OoY9vj5sZq0J6FlUWhq+RN7QTbyrJjbk8HSAC9BmZneBrlMStNLCa/9nFs
+         BoGg==
+X-Forwarded-Encrypted: i=1; AKwUvBwF178NGBhbQI0BhpnJSME1JZlpzrcslBYhOftDp+S0eRll2eZcrICppesy/rkS97iAHWoFFud5Zh9APg==@vger.kernel.org
+X-Gm-Message-State: AFuF++kO+GkcVaMPOBhAfD8Vxi9Ff9vk1tN8BnBGlQRwavCLkvw13Zpy
+	PjyAkwNepaPmT/H+hoevv8s6yDWUj1fclRRo74b2cn7Ol9l09KHDJQ837WnCBA==
+X-Gm-Gg: AYBFou06UVWDTy7Ac4x4QPsgn0xXtgZsmlL1sJYysoyAo2/tPOhA80n/bW7TrPOAbI2
+	jSH7B0iU29FoZXO4oefqwC/NYTm4UzaBKn3b6ayjLw0hwv57vMMV7F2Q7kylF91WGB4ZZnV0Hs9
+	r3/6tna1w1asdYR6vdVdBJwz75BbWapvoGCgpXMgGLQ6rMZ0+43YM0XSEBX0xNTMx8tbtTmyTE8
+	qOonjVFnwStpK0GNfmkmaHGWbEiOeoYOaS3gNBpZNLC+Nao5ruBPpkFedHcQdutdO8uwAZGHwQx
+	PahZrOIoFpuomoBJd/6WpXJxHBe97Q9pRu2mM9OMH4EV4jAvYJj319V+VwjSSSVuclM4bXIqlCs
+	jlEG9JCWJ2YsmA/g95lSQ2iFWC2vGRJSCqvLE6Ayzlag+bZIsjcniWoeJyZA3Vedt0s7reQclfv
+	XbinPZ131gHaGpv46t8nB1+WfOQ77ZlnBrQm0dmy75CYyF/8VA2qE3sJo8wHDWhqmS5XYzbP2Jh
+	pic3Mw0vvb6uOHJQhU=
+X-Received: by 2002:a17:90b:388a:b0:398:ceef:edde with SMTP id 98e67ed59e1d1-398da8cf414mr5021997a91.15.1788165484692;
+        Mon, 31 Aug 2026 01:38:04 -0700 (PDT)
+Received: from [10.125.192.112] ([122.11.210.25])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-396d7853da8sm5066022a91.4.2026.08.31.01.37.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Aug 2026 01:38:04 -0700 (PDT)
+Message-ID: <c961850c-09d0-3366-73e0-1932c1dc00e5@gmail.com>
+Date: Mon, 31 Aug 2026 16:37:55 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH v2] zram: fix idle age_sec underflow in idle_store()
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Hao Jia <jiahao.kernel@gmail.com>, minchan@kernel.org, axboe@kernel.dk,
+ bgeffon@google.com, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, stable@vger.kernel.org
+References: <20260828083149.45760-1-jiahao.kernel@gmail.com>
+ <20260828102446.3eb7f3dc779753b831e33fe6@linux-foundation.org>
+ <apT-ocFYDmU6iC-j@google.com>
+From: Hao Jia <jiahao.kernel@gmail.com>
+In-Reply-To: <apT-ocFYDmU6iC-j@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
 
-A gentle ping for this series. Any further comments would be appreciated.
+
+On 2026/8/31 12:15, Sergey Senozhatsky wrote:
+> On (26/08/28 10:24), Andrew Morton wrote:
+>> On Fri, 28 Aug 2026 16:31:49 +0800 Hao Jia <jiahao.kernel@gmail.com> wrote:
+> [..]
+>>
+>> Thanks.  Sashiko asked a couple of questions about this change:
+>> 	https://sashiko.dev/#/patchset/20260828083149.45760-1-jiahao.kernel@gmail.com
+> 
+> 
+>> Does this early return prevent marking valid boot-time pages as idle?
+>> When a page is accessed during the first second of system boot, its ac_time
+>> would be 0.
+> 
+> There is no possibility for zram to hold pages during first second of
+> system boot, regardless of whether zram was configured as a swap device
+> or as a block device (mount-ed with real filesystem).
+> 
+> 
+>> Can the early return above bypass this zram device initialization check?
+> 
+> We already do that, e.g. when kstrtouint(buf, 0, &age_sec) fails.  Apart
+> from that, that's not how one checks if device was initialized.  We may
+> want to consolidate those checks, just for symmetry.
+
+Agreed on both points -- the early return is not a new "bypass", and
+the write() return value was never a way to probe init state.
+
+How about moving the init_done() check to the top, so all the early
+returns sit behind the same device-state check?
+
+static ssize_t idle_store(...)
+{
+    struct zram *zram = dev_to_zram(dev);
+    time64_t cutoff = 0;
+
+    guard(rwsem_read)(&zram->dev_lock);
+    if (!init_done(zram))
+            return -EINVAL;
+
+    if (!sysfs_streq(buf, "all")) {
+            ...
+    }
+
+    mark_idle(zram, cutoff);
+    return len;
+}
+
+The read lock then also covers the parsing, but that is non-sleeping
+and its cost is negligible.
 
 Thanks,
-Yao
+Hao
