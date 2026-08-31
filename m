@@ -1,71 +1,75 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055D646C82A
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 15:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4C5538D8F
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 15:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788189671; cv=none; b=CRqQ6NvDddd9JITldxyl91qKZ2yF+Iv+yfh+yCzu2jn2B2KKm1F+ItYfhc+5OEDjwwC65qAVZdTjKiwUI2bq0L2R0lbFic0GWcxdWn1wX6BdXT3I3Y8IpUr94NtWy+YZfOW0G0/H+hfn0x0GIPD9bOspsleP6+I/fmAlgPO2CGE=
+	t=1788189692; cv=none; b=AAaWKXYX2SQdbqj1b2ETpiapT/2BSdt7qU16LJTZIN3y7Yzlx58gFs8SOusJT+zJuF+VfEi7+sPlyc/Hkkpi0dOlGZZcHCifYp7Hm+bRdWMqjgI5ML8Cwdgbw9UoKJe3lWrNaLKhEfb/MmdVkmwvw+PNFwcbSk5OBtYtWwWSx3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788189671; c=relaxed/simple;
-	bh=I3IR3GBHdAkVdNiESsyYvrip0q0uu2T6kLFw5nY8Hio=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u70JSF8v+o4uDJCo7IOiEGIo5iKNMa/z91qJnBkprn1837ZhBXewrV9WNzgIbQxnbs9V42JGsNuc/l8XGC4p2M+Jdhw0PJVz7YlM1QRX38M+ixUIo6quGC7wHzYjLAOa5TyrLnulg/qaS/CJr/S6XTXFfbRjAnyq3tS4RVQwWso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NkCL/YRx; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1788189692; c=relaxed/simple;
+	bh=d4C+oISs8ASeTjE405C18tiA451W0TvVEaZooCCeh1k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dbAB+K1rIQ7ibRHlxmD2QG/9Azw8+CkM2cLSUXLWeVvV/SZ1HYf3ojGfRyBhUTXXznTBIdqslas29jDSmmKfu76RYQdSrZkSOuiPmFL780rK8GBmB+0EO/8/Q2rTgOZ2RoGpTd8CF1BGQZqmpJR20BTSAjYYn0RxBuesHT234aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rV5ZoH9M; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkCL/YRx"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-49b96837ca3so20422365e9.3
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 08:21:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rV5ZoH9M"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-482e5733a5aso2152241f8f.0
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 08:21:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788189668; x=1788794468; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/Upu5Sph9WjD5dUvZLJCJ1CVmGjImMqIfnouv4erWVM=;
-        b=NkCL/YRxe0THu+EQa4D3X21RcS6Lr+FXqoG/ozqCCntah4y08W37h9nOUt1bRkmT9r
-         IERuY2Bh355v3WbGOYH7zUsMzWNSNWvsD4Bv1FxGs1pyTa8+igGnuZakoAv3XhQHx6kr
-         EzHqFaVbfOboJNY9wX564biV3mOnCZGc0lxcNN3JGYSlk30plp8sQiiOwxTKwsrJLRj+
-         F7MwQGUUeqZL5GZ7mqe6lCFUO/wc4d+V7AU9EKt2G0CHhT9EZQK33j2wU2J9OMmYzViG
-         a4+WX7FW8zFTv+juPIEe+9G2eQJXa+2rZRjubzYhmzoYS9ljUQlxYeVWp1k7jhLhjcj5
-         NzTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788189668; x=1788794468;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1788189689; x=1788794489; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=/Upu5Sph9WjD5dUvZLJCJ1CVmGjImMqIfnouv4erWVM=;
-        b=kwcStxmYLUnglKXe18Swluo8w8tScbxh4cetNFvTQQdpAqLqRBJpR0tHFZE+QMNRzp
-         SLcZ3shM93oMr68XEGVEKaVx78DSi+ZCpYL8oql7RtUmSMrP3XD10WuthZUYfrf7YbVC
-         d09DD5x/pTPU6QyJXkxRLYp9gh9LfRiamSL5mcF64RmKEDiTp6BufMmVWLt8t2EWM7k7
-         oOjl9sFcdEAkA2IK1UqaEAV/Q7IHVIn1xM1OP4RElpl3T4xED6kT997IbgpL5yK6o5Sr
-         hL90hBDQi+kx5vab+UgRMiUmEMHCdHPu39qMnlO5chU4J/7T7E3KjqzJXuh2E58YtWQx
-         stPQ==
-X-Gm-Message-State: AFuF++k9y1YPt6Re9wEijguJVHnJybhWgQ1dskgkwCNfZyjRcxT8JX00
-	Z8Z0N8afn2SOqml9UJ2fiFidm5RXE1s8rczPvLmEk0bKKCgePn5/89XY
-X-Gm-Gg: AR+sD12L3ukBBURK+Mg+N0WuyMV9QPcgyx/qEFEgkX3bKH0fpyNgxm8Im+zCWnFtqp+
-	HDKnh5YpBK8JvOYwDlF+f7+qqF5In+D3yvJfsDy2x6MXbfA+hwutgRK2Uoxc8nC9H+s8uthpCGW
-	pKkrmQx1geJEYeU6kdp6R/u1Gpc3MZanKK1MWchehCVIuS1+iyeltZdK24mbgf+RXOO2K8DTRcn
-	axzWCTxD+prwxAd1RocF3BhRixz0SipJuZOiltSvrSx082zQoHPEyOQx+x3gmTDQm35gBcBSgAi
-	2753RVuF9Kra7iBgKXQOyBF+McA8tzizdZ55FUhasNYy78EdQsaFjQW7f4lLngPdW38QH8BRNu9
-	KT3b+zd6Ap4szDUIWcnAOnRGYVH+K5VY7nTscxxhQCHVvgy88qRjXKGHqp0mfyZ9q3+4gz/YkGM
-	V9a3t/pco9pTBG+RShsRboNeg/X54tU8634PtiIW3fnKHq7NgLL6L47wcUkopYyEz7jD9hnsRN0
-	7UAckotR/6BKNfNoHRvJEd6
-X-Received: by 2002:a05:600c:1d1d:b0:499:ad2e:f7bc with SMTP id 5b1f17b1804b1-49b91c3ddbcmr332472335e9.10.1788189668022;
-        Mon, 31 Aug 2026 08:21:08 -0700 (PDT)
+        bh=EeDOa3UQ6qSuniQ8iVMBKVscy2UT6ZrGGYbSUHa/WVQ=;
+        b=rV5ZoH9MLOAUQet/ZDRqvdwkiguJwC09jiMjTt21FF8HNPBEKovBiXpPgfNwnm51KA
+         tMWr7r1/Pv5waSeceP8jMrKAn7IrPJZ+TPaB1KzSNrbQsK+fHhP8oi8pQSlpml3I1cgz
+         /ghVmWI+WUXtRk505yAaivcW+5pvUBx1DywZvHdjFS1KDImRzFcmU2lpt/m2erP6fsML
+         udD7YJJTJUGGsC1It7yHCm+FQZENCUC6GEgqeuJI+rPJED8BizWEUCxOQ042S6/V749I
+         Q18ZoBac9Gcl7RJ483ORIipypQCWvf/KtSNffKNQpQ44hWuZ/fbJH5QrL429okyXDrGd
+         iFNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788189689; x=1788794489;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=EeDOa3UQ6qSuniQ8iVMBKVscy2UT6ZrGGYbSUHa/WVQ=;
+        b=XgKmCdJPreB/9zwV8HOTy6RcX7i8KRGf95Abize1xmDr03huV3voLvd/xpUyuROChN
+         ERszo8JHoGRiEjNkicdxak3pHSUrc2thTKVqs74avK6/tLk3Rq1sFAdzS3dPcFGxjZZJ
+         YD9isXyk2chqMWhEcp/NvTzSiuvcCLJAkKFjVU/GUzi9yG1D4FsyjWGgE26F+7f2FaTv
+         hiKAYrR+nkd2V80XTJGiEdgKOOvrh+IGaSRyNtW0bgymYYt9e9L+g9/0cmifnl7d0R+l
+         pFDIIs18X/4Jo+51vC1XQ/vQi2nzMbgVqvmTDPizY8Z2UGwbWIkhNxVAMC0qLFptUSIg
+         UIkQ==
+X-Gm-Message-State: AFuF++mAB4SQwmafWBzlnOyC9YmIEdLQESJ6xTRJFzvVaaUn8mZs2j9h
+	RcOksNg4rQ1V95/x5VxLeB298/gGeWo3UfvJSq8rbCwGA41Q3MLYxhZu
+X-Gm-Gg: AR+sD13lqBLNrCfPuPuMFodJrJSh+VaiDe3RBARYpImW94VkDf40gTt4LZ/2fxCxDxn
+	GtHx6DubzixGuoYMbB6dokAID6l6MlmmAxcykIEAJ59jMgIRvLws+Kms4GVnduz1ne/ps2fVdss
+	jL7uIkpOXdf5RSaQ9VKIAgDEoLxzwSbEE2scFKqGm7TBqYczO3evzorz7Sm2wYVQIrmMWi8LsVT
+	xcd4zWDC0/GWVCAr1xfY8AYzWYcw+F0CHjeAjbM1Hj/ZurYQbBgdv6XWKxth4phqzM8ZVdVngij
+	G5WqZXHWti6+Y81bOH8QoWdziqZOCmIrqMSkLaP0Kc2hjVE8Hp0NERkB5+z867ARvJS9S3+RQr6
+	WUs+or5T1bgbTjyIuEbgGICDkjVi5FHadKmO9uKJa48ltXZ/f9LbJfuALXxZH2cCAXjrRU9CsaT
+	fBNRtYFh+KhRR/aN5zN/8adyo9wCHZ8W3V+tygWwtol0nrROHnE5/WQUZI3EaV4wMSSIZCg+tXS
+	VeUFnL6HrsNgmqKtgG7m21n
+X-Received: by 2002:a05:600c:8b5b:b0:49a:5b88:f551 with SMTP id 5b1f17b1804b1-49cdc429f0dmr27121445e9.6.1788189689334;
+        Mon, 31 Aug 2026 08:21:29 -0700 (PDT)
 Received: from unix.. (244.red-81-44-253.staticip.rima-tde.net. [81.44.253.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b963c3c0asm528166815e9.10.2026.08.31.08.20.55
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b963c3c0asm528166815e9.10.2026.08.31.08.21.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2026 08:21:04 -0700 (PDT)
+        Mon, 31 Aug 2026 08:21:20 -0700 (PDT)
 From: =?UTF-8?q?Iv=C3=A1n=20Ezequiel=20Rodriguez?= <ivanrwcm25@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Iv=C3=A1n=20Ezequiel=20Rodriguez?= <ivanrwcm25@gmail.com>
-Subject: [PATCH v1 0/2] block: brd/loop error-path cleanup
-Date: Mon, 31 Aug 2026 12:20:42 -0300
-Message-ID: <20260831152044.166353-1-ivanrwcm25@gmail.com>
+Subject: [PATCH v1 1/2] block: brd: destroy xa on allocation failure
+Date: Mon, 31 Aug 2026 12:20:43 -0300
+Message-ID: <20260831152044.166353-2-ivanrwcm25@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260831152044.166353-1-ivanrwcm25@gmail.com>
+References: <20260831152044.166353-1-ivanrwcm25@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,30 +79,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+xa_init() runs before blk_alloc_disk(); on error the path called
+brd_free_device() without xa_destroy(), leaking the xarray state.
 
-Two small error-path cleanups in brd and loop.
+Signed-off-by: Iván Ezequiel Rodriguez <ivanrwcm25@gmail.com>
+---
+ drivers/block/brd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Patch 1 destroys the brd xarray on allocation failure after xa_init().
-Patch 2 restores backing-file GFP mask, clears lo_backing_file /
-lo_device, and re-enables uevents when loop_configure() fails after
-loop_assign_backing_file().
-
-Base: v7.3-rc1
-
-Tested: built bzImage with CONFIG_BLK_DEV_RAM=y and CONFIG_BLK_DEV_LOOP=y;
-booted QEMU initramfs smoke (ram0 present + LOOP_CONFIGURE happy path).
-
-Thanks,
-Iván
-
-Iván Ezequiel Rodriguez (2):
-  block: brd: destroy xa on allocation failure
-  block: loop: restore state on loop_configure() error
-
- drivers/block/brd.c  | 1 +
- drivers/block/loop.c | 7 +++++++
- 2 files changed, 8 insertions(+)
-
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 00cc8122068f..c18262295c39 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -346,6 +346,7 @@ static int brd_alloc(int i)
+ out_cleanup_disk:
+ 	put_disk(disk);
+ out_free_dev:
++	xa_destroy(&brd->brd_pages);
+ 	brd_free_device(brd);
+ 	return err;
+ }
 -- 
 2.43.0
+
