@@ -1,38 +1,35 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F933E638E
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 11:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764703E1CE5
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 11:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788175309; cv=none; b=ozwwnjEqT3FJvvpz7E6xAMZiKCFPqzxpmhyhiZt7xxGqHCheHaT7/umT4lGqTtWj6sT3PXhwSb2zQ13iRX4nTeJqvZoQt94+/ZmWNpaHoZgSGjhWmigNSXrem1AjHOFGtqCViS1l7mqJBj/ycfAMtm8deqo0ul3q5TnzkXpD+6I=
+	t=1788175316; cv=none; b=Nz3N4xmyyp5BVDM4XQbi7aHe5X9ANLeuBxTc0gTp5THjR2OveoQruTz+KhqWdL3nBpRqoooeNsl12UJvm36KqDLDLdaASIpIobD6ks4SZLnwgvbL9fmER5Bqcm3Azgnj1V3Gvn77IJqWdMPJ8i7Go5Gd5e3m2D75wC/7WRJeDqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788175309; c=relaxed/simple;
-	bh=MyLBcPM7j/sNcO0Ph90aaQQ0HIIj8JMUQx6NIzfatmo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D1pJZ/qaKosz2LjeSale4y4YSAZApglcGcWIbcKrUIjkWJobrgtCiN1McIZ/CXZauuLpNliYUQV5o+3/IFyc45EvHn1uYNEYDT15W50rZOV5reyYZilQiAf49NbwSLH9MWA2sUG8Ei6hyqvpqigRH/M8i1zQwj4XUjfjXmDM4qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	s=arc-20240116; t=1788175316; c=relaxed/simple;
+	bh=dnJ6yhAA65QUkp/vrh0buvFAyDZYKHJ0lqGkUYotTSU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=S1LtY5UHRysFyZIFEKtbXIUCebdnUs1+APVFgreKeyTVUJYDAJKNsyPx//ZtZqHxCVZHFdnKKlCsLLpq2oDHgZKmjidV1IDsXqMHF9oKPt+IGD1OB3NV3saQ0LcJsOob7LiO/bjA22ri5FD/2mhBRWJ+SRerfd+JNopal9UfADg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hYRPs3Ff5zYQv99
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:21:05 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hYRPk0b78zKHMhX
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:20:58 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id EB453407C4
+	by mail.maildlp.com (Postfix) with ESMTP id AAD73407B5
 	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:08:00 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.87.132])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHMAuPYJVqZo_vAA--.44034S8;
+	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHMAuPYJVqZo_vAA--.44034S4;
 	Mon, 31 Aug 2026 19:08:00 +0800 (CST)
 From: Ye Bin <yebin@huaweicloud.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org
 Cc: ming.lei@redhat.com
-Subject: [PATCH v2 4/4] docs: block: document prio_enable and prio_aging_expire in deadline-iosched
-Date: Mon, 31 Aug 2026 19:01:44 +0800
-Message-Id: <20260831110144.2648156-5-yebin@huaweicloud.com>
+Subject: [PATCH v2 0/4] block/mq-deadline: add prio_enable switch and harden prio_aging_expire
+Date: Mon, 31 Aug 2026 19:01:40 +0800
+Message-Id: <20260831110144.2648156-1-yebin@huaweicloud.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260831110144.2648156-1-yebin@huaweicloud.com>
-References: <20260831110144.2648156-1-yebin@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,92 +37,83 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHMAuPYJVqZo_vAA--.44034S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF47uF4fGFWxZFy8Aw13Jwb_yoW5trW5p3
-	93XFWSvF1kXa4xt34xJw47Xr1Fy397ZFW7Jr97t348t3Z8Zwn2vFnakr4F9F9rC3y8Aa4a
-	qr48t34kGr15Zr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvKb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2
-	WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkE
-	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x07j5nYwUUUUU=
+X-CM-TRANSID:cCh0CgBHMAuPYJVqZo_vAA--.44034S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxXryfAF1xCFy3Gr15uryUJrb_yoW5Ww4xpr
+	Z5WFWYyFWkX3WIg3yxAF43Zw1rJw4xJrW7Jr1kKryUC3Z8Crs7ZFyrtFn0gFy7AFn3K3Za
+	grn2qa4kGryYqFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUglb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+	z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r1Y6r17MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVF
+	xhVjvjDU0xZFpf9x07UE-erUUUUU=
 X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
 From: Ye Bin <yebin10@huawei.com>
 
-The mq-deadline scheduler exposes two sysfs tunables, prio_enable and
-prio_aging_expire, that control its I/O priority (RT/BE/IDLE) support,
-but neither was described in the deadline-iosched documentation.
+v2 diff vs v1:
+1. Rejects zero and negative prio_aging_expire values with -EINVAL.
+2. Introduce a per-queue prio_enable boolean sysfs attribute to disable
+io priority.
+3. Adds a module parameter prio_enable to disable io priority.
+4. Documents both prio_enable and prio_aging_expire in
+Documentation/block/deadline-iosched.rst.
 
-Add sections covering:
+This series adds a way to disable I/O priority (RT/BE/IDLE) distinction
+in the mq-deadline scheduler and hardens the prio_aging_expire tunable
+to prevent priority inversion.
 
-  - prio_enable: enables/disables RT/BE/IDLE distinction; when disabled
-    all requests fall into the best-effort bucket and the priority aging
-    path is bypassed.  Switching the value drains in-flight I/O (queue
-    freeze and quiesce) to avoid priority inversion during the transition.
-    Also available as a module parameter.
+Since mq-deadline introduced support for I/O priorities, processes
+without an explicit I/O priority are bound to their scheduling priority.
+Many applications do not care about I/O priorities and have no way to
+disable the distinction, which adds overhead and can cause unexpected
+latency behaviour.  This series gives operators a per-queue sysfs
+switch (and a module parameter default) to opt out of the RT/BE/IDLE
+classification entirely.
 
-  - prio_aging_expire: the time after which a waiting best-effort or idle
-    request may be dispatched despite pending real-time requests, to
-    prevent indefinite starvation.  Defaults to 10000 ms; only effective
-    when prio_enable is on and at least two priority buckets are
-    populated.  Zero and negative values are rejected with -EINVAL to
-    avoid the "now - 0 == now" priority inversion.
+Patch 1 rejects zero and negative prio_aging_expire values with
+-EINVAL.  A value of zero does not disable I/O priority; instead the
+priority aging path in dd_dispatch_prio_aged_requests() is invoked with
+"now - 0 == now", which dispatches best-effort and idle requests ahead
+of pending real-time requests -- a classic priority inversion.
 
-Signed-off-by: Ye Bin <yebin10@huawei.com>
----
- Documentation/block/deadline-iosched.rst | 32 ++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+Patch 2 adds a per-queue prio_enable boolean sysfs attribute.  When
+disabled, every request is filed in the best-effort bucket and the
+priority aging path is bypassed.  The sysfs store drains in-flight I/O
+through queue freeze and quiesce (the same sequence used by
+elevator_switch()) to avoid priority inversion while toggling at
+runtime.  As requests may now be filed in a bucket that does not match
+their ioprio, dd_start_request(), dd_request_merged() and
+dd_merged_requests() are updated to look up the per-priority bucket
+from rq->elv.priv[0] instead of recomputing it from the request ioprio;
+the now-unused dd_rq_ioclass() helper is removed.
 
-diff --git a/Documentation/block/deadline-iosched.rst b/Documentation/block/deadline-iosched.rst
-index 9f5c5a4c370e..ffa88cbf2951 100644
---- a/Documentation/block/deadline-iosched.rst
-+++ b/Documentation/block/deadline-iosched.rst
-@@ -69,4 +69,36 @@ that comes at basically 0 cost we leave that on. We simply disable the
- rbtree front sector lookup when the io scheduler merge function is called.
- 
- 
-+prio_enable	(bool)
-+----------------------
-+
-+Whether to enable I/O priority support that distinguishes real-time (RT),
-+best-effort (BE) and idle requests.  When enabled (the default), requests are
-+filed into separate per-priority buckets and dispatched in priority order: lower
-+priority requests are deferred while any higher priority requests are pending,
-+subject to the prio_aging_expire aging mechanism described below.  When disabled,
-+every request is filed in the best-effort bucket, the priority aging path is
-+bypassed, and the scheduler dispatches from that single bucket.  This lets
-+systems that do not want RT/BE/IDLE distinction opt out of the extra overhead.
-+Switching the value drains all in-flight I/O (queue freeze and quiesce) to avoid
-+priority inversion during the transition.  This parameter can also be set at
-+module load time via the prio_enable module parameter.
-+
-+
-+prio_aging_expire	(in ms)
-+------------------------------
-+
-+To prevent lower priority requests from being starved indefinitely by a steady
-+stream of higher priority requests, the deadline scheduler ages pending
-+requests.  prio_aging_expire is the time after which a best-effort or idle
-+request that has been waiting longer than this threshold may be dispatched even
-+though real-time requests are still pending.  The default is 10000 ms (10 s).
-+
-+This parameter only takes effect when prio_enable is enabled and there are
-+requests queued in at least two distinct priority buckets.  The value must be
-+positive: zero or negative values are rejected with -EINVAL, since a value of
-+zero would dispatch best-effort and idle requests ahead of pending real-time
-+requests through "now - 0 == now", a classic priority inversion.
-+
-+
- Nov 11 2002, Jens Axboe <jens.axboe@oracle.com>
+Patch 3 adds a module parameter prio_enable so the default can be
+overridden at load time (mq_deadline.prio_enable=0 on the kernel
+command line or modprobe mq_deadline prio_enable=0), letting systems
+opt out of I/O priority from boot without writing to sysfs after every
+queue creation.
+
+Patch 4 documents both prio_enable and prio_aging_expire in
+Documentation/block/deadline-iosched.rst.
+
+Ye Bin (4):
+  block/mq-deadline: reject zero prio_aging_expire
+  block/mq-deadline: add prio_enable switch for I/O priority control
+  block/mq-deadline: add module parameter for prio_enable
+  docs: block: document prio_enable and prio_aging_expire in
+    deadline-iosched
+
+ Documentation/block/deadline-iosched.rst |  32 +++++
+ block/mq-deadline.c                      | 148 ++++++++++++++++++-----
+ 2 files changed, 151 insertions(+), 29 deletions(-)
+
 -- 
 2.34.1
 
