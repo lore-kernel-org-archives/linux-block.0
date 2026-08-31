@@ -1,102 +1,119 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229E13C1F31
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 04:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7564538DC71;
+	Mon, 31 Aug 2026 05:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788149714; cv=none; b=DM/Da4g4q4pFfGuA3XVqfdxZOyYaaHjty5XOm0t/F+lAB+LCLR8P66qj8HfLMFZHgN5J/wDGwWqpznt0/kjYzDJQsahVAu8gIbfNQWe5wZPt8JZICoYghYYKpQMpfDO0stBSIdC/eDIuyhXTmDBV8qXJOTylTDZZ3Q6WD04KnxE=
+	t=1788155842; cv=none; b=fqfGcheXVBGvgaobRGGBEjCCYrBiJPxXlGV0w7tX1jbrwI2IVL/6WWGKlWxI27xF8ArBEG4NYlcut/WRnoOu6EfvUvhZxp1coCxtuBHBWiLo8iGAbsZyYFj6wywKaZrWIsRGcUybt7EbiJhNZWneqk/VgNm8GKQ32FbBqygzUkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788149714; c=relaxed/simple;
-	bh=JWo7qptpEQzm5VHboo67cAi1vsGRFcq3ubh3+dfJsWg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjwAJ+7TT9eT773OAeQ6+KrMckV9Lh0n7mwUUE/vhRNGF1DGZbqitxjp+KngKAb4Cq1jfqlVLh/MTS/7Eu1O0s/a/jjFI2VKGq+wbET6t6I+9vHzUp5xtJvBjUgReR6i+tNpGH6CKWJ5JkemN2R965MamNQ1PVZgUJL57UbHlII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JsSdJZpG; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1788155842; c=relaxed/simple;
+	bh=cKK22JY6o1/GYcTB1hR0UNrqPfLsqQak1zI8LrKAR0U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n1QCMo0/etnKGPNpxiItcEAU16AaPY9UCzYoLJH6Dlffx/dfN9A7xoWy8itc2MZmMGazYWynR7oqe/2vUMNJV2m0urkyLilqvQhwdSx3oypbm6oHZz2AyMlSIZIelmlu68ik7lu5hkJrU4LNzNkOcDipkaHFj7j7lHKTGeyazJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HCXihJmR; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JsSdJZpG"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2d712281f8bso33334465ad.1
-        for <linux-block@vger.kernel.org>; Sun, 30 Aug 2026 21:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1788149711; x=1788754511; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sf/yHYtrO3MQh0Uz1YqiTDYHxqYrBGeKFLdYV/NPx7E=;
-        b=JsSdJZpGdCeI2ltUaUM/Rk32oLibhNj1jwKI23MgiLnDLnVQA0FjFNnwIW1vb4+Qjj
-         p8dga2++saDpM81nzNBIEHsiyAkdH+grOTDWaOr+6eGawBQNxTlAujEAwfqwn+bZCfYt
-         +x53SdIj1TRS0OKrRvxqaRlRisCmQfaFlz7k0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788149711; x=1788754511;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sf/yHYtrO3MQh0Uz1YqiTDYHxqYrBGeKFLdYV/NPx7E=;
-        b=QSC64qJ7C78/WXdcxOKefMCfz4s80Eth1yTOgB8PkQ1X7N2IJf/EpFgLAVF8MQIe6J
-         ZGgjZIrMd73PIGr9Pfj2K0vPsIHUnfV6ShOeecDNviDUP12r/hvSdC88MNlkS8cbBQSp
-         Ak+Qm9oRcxdkI3+qQLuscm99N3SXiFPX88ubYw7FQV5PmNEra0Ihw9ct4jU5VuEc5tfX
-         XHOrcX5AC31keIldQbIKugSvfrZMCGi5w2KPI1Vie8BOa6Es/lExU9V950LACugWeMBj
-         d04BXO+5DOy+AXM6kowS7oSNY8Gzbk92UVqUKaTIvFjs6ztOmNL8muo5Vvy1gZhn6FBz
-         y6fQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxugnOfNpt5h5BPRZWW2i6qly4EKLJlDXwITzCgHQUB15FazZI2tHeuTSIxMAcnTj2LdV39cnUmUwRVOg==@vger.kernel.org
-X-Gm-Message-State: AFuF++kvMsH3hqo8BcEUh4jP0FJmoPwApaCuZbm42sy0jtAt4EIx3ZXA
-	7Qym8FG2jIPYVg+aFFAjOATejS/NtTVO9n0+wA/Nx1qQEribBsaGNYOBE9S/dZm0gw==
-X-Gm-Gg: AYBFou0Qysc9pgnqebomrwbKOTFDOo3Cca7VcI1wP8gABJ+0JOukapSXs8mps13Yluw
-	5jkCD8Vcs1wWKOHzTXhJJI4KDU974TVIwP1Xt/z6BSZ0y/pob9ggkeqC8AciuwYug0K8GHDHgDc
-	nKjw3qYTo2rH7eRChFLZKQsnpZTV2oICtOVaHzWSzocjn8vTaD8NBsmaFupoyedkrWRGBpf6p+X
-	h/eHeLG5WEuWSIcwh1z9FEKbiCxjXXBjZyw5EbFAzVul053sIgB+qqcEXbIM4m34k6/iHDuNtST
-	DAyYKMoZJghZTzacPLZHn7Ijcr4sy1fm+tmt/DFFoMj6V0jbDhJehBuetEp5Diydpvg8qKbwhCm
-	lPBPp7I6LVU2YRhJ5EmBPkUm9ixA0HiEFvPtwtXkQQgp1JaAULPmaZFuNEkdNk5umHuIJlsUJiu
-	pbOUIpjYFy0N8XJi4DgrbJBFACoGKGsElA6qX/lyMjc2Y9wixcKHkoVsv0t3340yaUYvhQ65XPf
-	DMBA+SNx8rdbX3hO+U97KFjdFNs
-X-Received: by 2002:a17:903:3d07:b0:2d8:d4d7:f055 with SMTP id d9443c01a7336-2d93fa78359mr10662945ad.22.1788149711457;
-        Sun, 30 Aug 2026 21:15:11 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:6c22:caaa:530b:455d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d75988b6fcsm28017105ad.56.2026.08.30.21.15.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Aug 2026 21:15:10 -0700 (PDT)
-Date: Mon, 31 Aug 2026 13:15:06 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Hao Jia <jiahao.kernel@gmail.com>, minchan@kernel.org, 
-	senozhatsky@chromium.org, axboe@kernel.dk, bgeffon@google.com, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Hao Jia <jiahao1@lixiang.com>, 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HCXihJmR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1788155841; x=1819691841;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cKK22JY6o1/GYcTB1hR0UNrqPfLsqQak1zI8LrKAR0U=;
+  b=HCXihJmRAiP1G++VffMiBLgyA1Fp9yjkQsOyaOWUjU3UmHIeDPnw6nOB
+   RbUBU1sj+yaIY5x95nuWgGZ+gFsw7taPT2awtcvb0VKvAUAZcHVwsCxgK
+   Cj3AhI+Dhnx9BOph1EujU126+r5SdkGbQ8DVPrxPF4wjWS6R/cczFz1ZB
+   5lg2FmqYT6X6uoI+Izk+UyZkcorgBmpr/iSURJMZOq+RAM9hS/2qtAtSY
+   mqneqZppoE4r5bQXFZS/DnUrIDKpgSRGmFY9cUtbQPjKmQ9y+qI5ZCRUN
+   2z7evwRW7qJFtfrFSfQGG0qKIxmlwAXFXTOl3JnFLSoeBtCvKBn+ebDVo
+   w==;
+X-CSE-ConnectionGUID: PaIF3/EMTZKgw07/2RuzDw==
+X-CSE-MsgGUID: nAyX0XeAR2i6ZbCdLzyjDA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11891"; a="87685507"
+X-IronPort-AV: E=Sophos;i="6.25,252,1779174000"; 
+   d="scan'208";a="87685507"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2026 22:57:20 -0700
+X-CSE-ConnectionGUID: LfU/4KPFS1y5kPly/KzuDg==
+X-CSE-MsgGUID: G8hsJwG+QAG/YwLNFozcZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,252,1779174000"; 
+   d="scan'208";a="266127689"
+Received: from tester.sh.intel.com ([10.112.106.126])
+  by fmviesa008.fm.intel.com with ESMTP; 30 Aug 2026 22:57:17 -0700
+From: Tao Yu <tao1.yu@intel.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tao Yu <tao1.yu@intel.com>,
+	syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com,
 	stable@vger.kernel.org
-Subject: Re: [PATCH v2] zram: fix idle age_sec underflow in idle_store()
-Message-ID: <apT-ocFYDmU6iC-j@google.com>
-References: <20260828083149.45760-1-jiahao.kernel@gmail.com>
- <20260828102446.3eb7f3dc779753b831e33fe6@linux-foundation.org>
+Subject: [PATCH] blk-cgroup: use GFP_NOIO for radix tree preload in blkg_conf_prep
+Date: Mon, 31 Aug 2026 13:57:16 +0800
+Message-Id: <20260831055716.773354-1-tao1.yu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260828102446.3eb7f3dc779753b831e33fe6@linux-foundation.org>
+Content-Transfer-Encoding: 8bit
 
-On (26/08/28 10:24), Andrew Morton wrote:
-> On Fri, 28 Aug 2026 16:31:49 +0800 Hao Jia <jiahao.kernel@gmail.com> wrote:
-[..]
-> 
-> Thanks.  Sashiko asked a couple of questions about this change:
-> 	https://sashiko.dev/#/patchset/20260828083149.45760-1-jiahao.kernel@gmail.com
+blkg_conf_prep() allocates a new blkg with GFP_NOIO after dropping
+queue_lock, but still preloads the radix tree node with GFP_KERNEL while
+q->blkcg_mutex is held.
 
+GFP_KERNEL may enter direct reclaim and acquire fs_reclaim, which adds
+the dependency
 
-> Does this early return prevent marking valid boot-time pages as idle?
-> When a page is accessed during the first second of system boot, its ac_time
-> would be 0.
+  q->blkcg_mutex -> fs_reclaim
 
-There is no possibility for zram to hold pages during first second of
-system boot, regardless of whether zram was configured as a swap device
-or as a block device (mount-ed with real filesystem).
+This completes a circular locking dependency with the existing path
 
+  fs_reclaim -> q->q_usage_counter -> q->blkcg_mutex
 
-> Can the early return above bypass this zram device initialization check?
+and triggers a lockdep warning when configuring blkcg policies.
 
-We already do that, e.g. when kstrtouint(buf, 0, &age_sec) fails.  Apart
-from that, that's not how one checks if device was initialized.  We may
-want to consolidate those checks, just for symmetry.
+Use GFP_NOIO for radix_tree_preload() so that the preload context matches
+the rest of this allocation path and does not recurse into reclaim while
+q->blkcg_mutex is held.
+
+Reported-by: syzbot+144a1c0e22e53a08ef5a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=144a1c0e22e53a08ef5a
+Fixes: f255c19b3ab46 ("blk-cgroup: Pre-allocate tree node on blkg_conf_prep")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tao Yu <tao1.yu@intel.com>
+---
+ block/blk-cgroup.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 2b5c29434e426..27e00180e4cc1 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -873,7 +873,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			parent = blkcg_parent(parent);
+ 		}
+ 
+-		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
++		/* Drop queue_lock to do new blkg allocation with GFP_NOIO. */
+ 		spin_unlock_irq(&q->queue_lock);
+ 
+ 		new_blkg = blkg_alloc(pos, disk, GFP_NOIO);
+@@ -882,7 +882,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			goto fail_exit;
+ 		}
+ 
+-		if (radix_tree_preload(GFP_KERNEL)) {
++		if (radix_tree_preload(GFP_NOIO)) {
+ 			blkg_free(new_blkg);
+ 			ret = -ENOMEM;
+ 			goto fail_exit;
+-- 
+2.34.1
+
