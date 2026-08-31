@@ -1,144 +1,74 @@
-Received: from mta0.migadu.com (out-1.mta0.migadu.com [91.218.175.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4C94D2EDF
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 14:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5694A4A4844;
+	Mon, 31 Aug 2026 14:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788185528; cv=none; b=mQp3h3IM4BWmScGO+A5r2QFeahLELKjWwfkuNuDNlw6nbykhg/9Vn04TCZdgTbNaArQOZW35j3tntg0i9ajb7LxJvAVsgChYmTpl2BnP7JX9mS9ixrY9wg6LjCjTeJo3v2nyvWV+VN2Qd8TsyMuCa9FoJ1+MXYfNiC2aLO1DitE=
+	t=1788188340; cv=none; b=RNEs+k9uqjTH/gtNjsDeAtszBQJNyQytooWzmvX9T5BBcJgnydBf8fnTLadsIU+z/GtUY4YnWEz4jYIbELtML3Fgm+/7hHSGNFIyaNNw19O8lajyHexAdVI2lPYOX+9uxQQvp0tymaPbqO4FNBpnC6OO/p7IunmfZFZprwDEUo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788185528; c=relaxed/simple;
-	bh=qeMdGEKedWl1FPeoapg8nysRoTiyOSWg/nAFOX53SYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=upW9dmai1CZqd96xmevvhvY8Y+NpTOMM4JEePw/bFnI7jORGlYWIquIvV3nkY87aGNsfly91zJyY8d6Qmthk4vi84y4sR/7zY8o5nGjOj9DYyBsyWC5uKJIz4UYT2nqCRVL6oG6Wn9AvXiqj+WjnNrmBHlwV1pvCFGPuQQK7RVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UpySgTxB; arc=none smtp.client-ip=91.218.175.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788188340; c=relaxed/simple;
+	bh=APbP3/wimRJr2gE1cSIRP3gDJwEHcvRTK6fLaUrVbFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T8GQNtzC2CjhIJIPR5RIans1uj3BwQ+JLrzvx6RIzoUR4SXXogVsCu+VlImfGo70c8Q3TVxi5Y0RN93DCygYcnIAwt5keX0G9iQl6E926ob+qi+3jIYhSk29JItiKuAZDrCqC+9fLD23oSRqx5Mw7c+DBEM3/wQIPWiRfVk+Nfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwIigDYm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UpySgTxB"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=qeMdGEKedWl1FPeoapg8nysRoTiyOSWg/nAFOX53SYI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788185524; v=1; x=1788790324;
- b=UpySgTxB7rkxUGIyTpQnQIDRnAUoPGeDYZFzZECpxJvXHmpZxm3bwcfx5EYnMnsVdYEBOYwa
- iu01b13XW9kL8gEQd9HmWD5Y8i8so2ASmXRCDFz73mNWh9S7xSpbLxxHF4uc9GXR/ezP/Q+SGPU
- 7WbKYyaxgv7iBNoEUydmSMWs=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 0c74ffbab702f936;
-	Mon, 31 Aug 2026 14:11:54 +0000
-X-Mizu-Trace-ID: 0c74ffbab702f936
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: penguin-kernel@i-love.sakura.ne.jp,
-	brauner@kernel.org
-Cc: Markus.Elfring@web.de,
-	axboe@kernel.dk,
-	broonie@kernel.org,
-	bvanassche@acm.org,
-	dlemoal@kernel.org,
-	hch@infradead.org,
-	hch@lst.de,
-	hdanton@sina.com,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-next@vger.kernel.org,
-	lkp@intel.com,
-	oe-lkp@lists.linux.dev,
-	oliver.sang@intel.com,
-	torvalds@linux-foundation.org,
-	viro@zeniv.linux.org.uk,
-	cui.tao@linux.dev,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH v7] loop: Fix NULL pointer dereference in lo_rw_aio()
-Date: Mon, 31 Aug 2026 22:11:43 +0800
-Message-ID: <20260831141143.704821-1-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <6a770a9c-2642-4392-9b9c-609836693f36@I-love.SAKURA.ne.jp>
-References: <6a770a9c-2642-4392-9b9c-609836693f36@I-love.SAKURA.ne.jp>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwIigDYm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE6B1F000E9;
+	Mon, 31 Aug 2026 14:58:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788188339;
+	bh=14bNFPNL5UxWNXFU6JP1TsTgUvqSn2B1NpHtXK6Gc8s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IwIigDYmUFKcMyWnc48szI2N9Wf1Wh4eaJ2qeAnCArP5eyhm2WCJ1oHo6dgjvWvpF
+	 ayof/nBOv9fNGf3nv2yv01Z9SGx9EN2VB0EpgMiwFHPHe6oRCsqpBBeYHEnvOtramz
+	 D6+zHiFBVVUhrR7tUcHwrtKLP8C8USlKJCW6eslv2z1Mp+Wg7rBqmKekbpgG723oIr
+	 eRfL3UY11/lHkRl3UqYojjcvXTKKJsOk5pmrINmccWd5G17LJf09iDEIvbY4To1J5H
+	 l8kIhYmmNOV6nBxWslm/20cnKSzObV3L2Lej3GvhDx0B8a4TR9fnJi2baBUJyU+vCn
+	 fhq3hd98Ch23g==
+Date: Mon, 31 Aug 2026 08:58:57 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: syzbot <syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [syzbot] [block?] BUG: corrupted list in
+ blk_mq_request_bypass_insert
+Message-ID: <apWWsVUm5ri7b4oR@kbusch-mbp>
+References: <6a926eaf.1d9ded08.62e62.0102.GAE@google.com>
+ <2cf45e85-176a-4209-86ad-8f389a9a4282@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2cf45e85-176a-4209-86ad-8f389a9a4282@acm.org>
 
-From: Tao Cui <cuitao@kylinos.cn>=0D
+On Sat, Aug 29, 2026 at 05:16:00PM -0700, Bart Van Assche wrote:
+> On 8/28/26 10:31 PM, syzbot wrote:
+> > kernel BUG at lib/list_debug.c:34!
+> > Call trace:
+> >   __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32 (P)
+> >   __list_add_valid include/linux/list.h:96 [inline]
+> >   __list_add include/linux/list.h:158 [inline]
+> >   list_add_tail include/linux/list.h:191 [inline]
+> >   blk_mq_request_bypass_insert+0x130/0x1cc block/blk-mq.c:2551
+> >   blk_mq_requeue_work+0x3a4/0x52c block/blk-mq.c:1560
+> >   process_one_work kernel/workqueue.c:3322 [inline]
+> >   process_scheduled_works+0x788/0x10b8 kernel/workqueue.c:3405
+> >   worker_thread+0x798/0xbd0 kernel/workqueue.c:3486
+> >   kthread+0x304/0x3d4 kernel/kthread.c:436
+> >   ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:838
+> 
+> If my AI assistant got it right the root cause of this issue is as
+> follows (I haven't tried to verify this):
+> * Concurrent calls of nvme_reset_work() and blk_mq_requeue_work().
+> * nvme_decide_disposition() does not check NVME_REQ_CANCELLED for
+>   non-multipath requests and returns RETRY instead of COMPLETE.
 
-Hi Tetsuo, Bart,=0D
-=0D
-> +	/* Step 1: Flush all outstanding I/O, without open_mutex held. */=0D
-> +	/*=0D
-> +	 * Now that loop_queue_rq() sees lo->lo_state !=3D Lo_bound,=0D
-> +	 * wait for already started loop_queue_rq() to complete.=0D
-> +	 */=0D
-> +	synchronize_rcu();=0D
-=0D
-Your reply to Bart says loop_queue_rq() is called with RCU read=0D
-lock, but I don't see one.  The two call sites of ->queue_rq() are=0D
-blk_mq_dispatch_rq_list() and __blk_mq_issue_directly(), and=0D
-neither is wrapped in rcu_read_lock().  Direct issue from=0D
-blk_mq_submit_bio() runs in process context with no RCU read-side=0D
-critical section, so synchronize_rcu() does not wait for a=0D
-loop_queue_rq() that is already running there.  Only the softirq=0D
-dispatch path is an implicit RCU reader.=0D
-=0D
-The window is still closed by the steps below, so this is not a=0D
-correctness bug, but the synchronize_rcu() is not doing what the=0D
-comment claims.  blk_mq_quiesce_queue() +=0D
-blk_mq_wait_quiesce_done(), as Bart suggested, would express the=0D
-intent directly.=0D
-=0D
-> +	/*=0D
-> +	 * Now that no more AIO requests are scheduled by lo_rw_aio(),=0D
-> +	 * wait for already started AIO to complete.=0D
-> +	 */=0D
-> +	blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));=
-=0D
-=0D
-About this step, in your follow-up you wrote:=0D
-=0D
->   (1) since we are in lo_release() with disk_openers(disk) =3D=3D 0, the =
-activity of=0D
->       incrementing/decrementing q_usage_counter (incremented before loop_=
-queue_rq()=0D
->       is called, and decremented after loop_queue_rq() returned BLK_STS_I=
-OERR)) will=0D
->       cease shortly=0D
-=0D
-The decrement timing here is only true for the error path.  For=0D
-BLK_STS_OK the reference is held until the request is freed, which=0D
-is what makes blk_mq_freeze_queue() wait for requests that already=0D
-passed the state check, including the loop workqueue worker that=0D
-completes them.  That is the property step 1 relies on, and it is=0D
-worth stating in the comment.=0D
-=0D
-What is still open is Bart's question about io_uring fixed files:=0D
-if submissions can continue after the last close, "cease shortly"=0D
-does not hold, and it is the freeze wait that actually drains them.=0D
-=0D
-> +	if (need_clear) {=0D
-> +		/*=0D
-> +		 * Grab all references that will be dropped as soon as=0D
-> +		 * returning from lo_release() and releasing disk->open_mutex.=0D
-> +		 */=0D
-> +		get_device(disk_to_dev(disk));=0D
-> +		__module_get(disk->fops->owner);=0D
-> +		queue_work(system_long_wq, &lo->lo_clr_work);=0D
-> +	}=0D
-=0D
-With teardown now asynchronous, between the last close()=0D
-returning and the work item finishing, lo_open() and=0D
-LOOP_CONFIGURE return -ENXIO.  That is the same behavior change=0D
-that led to the revert of the earlier attempt (bf23747ee053,=0D
-xfs/259).  Moving the xfstests side to the tests is one thing, but=0D
-userspace that closes a loop device and immediately reconfigures=0D
-it now needs to handle a transient -ENXIO.  Is that acceptable, or=0D
-should the retry happen in the kernel?=0D
-=0D
-Thanks,=0D
-Tao=0D
+We want to be able to retry eligible commands that were caught in the
+crossfire of a controller reset.
