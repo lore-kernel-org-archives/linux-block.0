@@ -1,172 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0787738888C;
-	Mon, 31 Aug 2026 21:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6643AAF54
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 22:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788210483; cv=none; b=dGRuy+X8iF6E7dGsV7Ni7+vqBhXAB2nD/BV4pNKMPKOaSnVC1ieYv3tLdGRoWs21qqWGP+ncvMeuG9xnx2bOXxvzdjEhBYLW8qQIZ+BohbUEPr6IBKAsSd6DX5x+hlrScYa1DJD47hdQVf15sP3SWWW3BRJkElKJlug8pK29JX4=
+	t=1788214576; cv=none; b=egYn1zObEgNSZ7gZ8NiwCqMD10mj18HuUgg5shE5/Emv5dd3QBdEPo6Vag7KjSWUhYqBv+BfEpICDEyoeRsGZHmq0SvKEJwGzeAi4Yso8rkNkih+tVhGiq0/i9OIPhx5l6oIqfiY1RV+Yx94Z8aL6nTTZnyZ3lU3Je7IEBsgzcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788210483; c=relaxed/simple;
-	bh=zcm8ggJed5PjXC+9lg/xPUfVJkdcYjA3JSXdynW72Sc=;
+	s=arc-20240116; t=1788214576; c=relaxed/simple;
+	bh=n0uh/N7eWZUb0RjMv828tkY0P84MX7NtYM9Lx3Rv6Ps=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RCk8FuMGGRbP6gFH1w89+JwV3xu72qJ0LDttYk8dvjKUyRNX85QHhNasL2FnrP9rdNPT9e+S2KUugMuBhyoH4Is+7SXjuWehyH1lq9DbvAa7Bpvi5RrLRF00TjoMthXY/gSzB0sc9vGtnR5LOlv1OuMGtaUm1VIlF+jtFE+rU6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKZUz43L; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=L6QHU+cM1txU9ihE4E+BC27yViw7rqkZz/+pN7WfwKHp7WA5Ii4PSxdCZKUTj8KVHecsQK7fVflGXQFOeqJ+nXim6W7iCKDS9CDgQ1ro7BEN6JLtRoEiFEaA+jImxaVNHpCRYYcQHmuC7Y4WEcLNtPgnVetiEMkDLOs8zofkTQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=da5qnH1W; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKZUz43L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7711F000E9;
-	Mon, 31 Aug 2026 21:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788210481;
-	bh=QYx9KC4MIYUH9ekoEcwCMnVwX3dAfHBqBgdU/xOfYwg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=dKZUz43LXHW4oXXwv67Upy9MfEsw9rlqnr503Dd1gXznuApyHbDBk35ZmgfAT56xJ
-	 SYTsg33QtvTaI1vJ0Izvyb+AtN39XfKYQisxJavxVwPCl1gLxBqnLqiO8CcOX00jMg
-	 SOh2f8zhfEcR4p1MHl52Z6hgOQsWZRti0dC9ua9cZOtAbsK1S2nkjd9JLgI742p4ex
-	 OcrFfMoBBZIdZ7zNRPD8CkEiAqVL5aUfP+PdBDbuUTXpes5cbCNp5Hif4c+/O26eWY
-	 ZK0QMiNhcCf9piH79cnMgt6mERIBc1Ep/m9kyTKThrwq+94DpMVgmdW1T4kxsVZRXb
-	 rAe1OX3iPbaTQ==
-Date: Mon, 31 Aug 2026 14:07:59 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
-	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
-	mani@kernel.org, andersson@kernel.org, konradybcio@kernel.org,
-	bvanassche@acm.org, alim.akhtar@samsung.com,
-	avri.altman@sandisk.com, stefanha@redhat.com, pbonzini@redhat.com,
-	eperezma@redhat.com, xuanzhuo@linux.alibaba.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
- virtio-blk guests
-Message-ID: <20260831210759.GE86114@quark>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827184219.GB2137493@google.com>
- <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="da5qnH1W"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2d6f9e2f681so38914895ad.3
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 15:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788214574; x=1788819374; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=itoTfTA7PQdk1phHOoJqHytihyiYJY8mf5sirqQA+ig=;
+        b=da5qnH1WO56PfoGb2YbHDEb0pb4p2F0mwlMUXEouj9MY1ri/8D0/oxECfIvORCgy3v
+         45WN2K23zpku7GSLctlp/Q6FncpT3etJy8QeuUXtImhVFj3QTE89qbvhZE+TTe1yVcWl
+         XP39Ow5SRV56Khrql82EO4TH0OCvshoCb8aHSmhchz/Jf7anD8mb/HPkrWJMubH3zppg
+         vUpz38TudVh5DPP46ZR94Rlr0G9qB7oAh2nz4DbqDRVEAfnkumubUSfxljy2DXEty2MW
+         8OZWPlFk3CWizA4mSZm+GxOCzUnvaKwZfm7rUdyz/OqsN3vwRu3NtiNZcuNWJGiHAB0l
+         bYfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788214574; x=1788819374;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=itoTfTA7PQdk1phHOoJqHytihyiYJY8mf5sirqQA+ig=;
+        b=LfE4Kb7mlZ2sormV4RGi2DiKUZ0/fKAp5zuR4qB6iSsPLwvgm7yl+L2xLRj1HoxjIl
+         dvXX5HHFsqawc1LxiI8+yEdidpCqE7oojTtcdBanTVq70hzXcYN6fIFY1vCsH2UPr4Mi
+         QZQYeZkEWc5AdABqPSsdx7RkFgZo9TyziBTwlt8U/jUTkc8exAs2NHYZj00IYOaZKpsQ
+         Pq7Hw/KiaWNI2wZPPuOt6hp3iYoOdhXGFYMWUJtrGbGIbQNTSynvEIcqjDaZKeTsMEIX
+         HaYMZronzNHp3jNt/Vk3vuiE47VDl8S17hwU9PzT2sZNdYe5W/Y9fN2bZu8k/4J6/kxD
+         uI8w==
+X-Forwarded-Encrypted: i=1; AKwUvBzmi9Jxr22Bn4epmH1aTZbUHLHo7C3W0b2IuZN4bhWtM9gQ6MLGYVfJQfIhzuwmshUaY+TbQMucgtLcdw==@vger.kernel.org
+X-Gm-Message-State: AFuF++lK7diRalu2otxOQS+mdfvaW/4bLO/+b1Z3lxNC0BYPTRN2L39D
+	piMdyta1EU7QfZ5p193nK91cAw1Tf8wobWhWLCMUQe3PFB9rqwzLT+4I
+X-Gm-Gg: AYBFou3vc5J/EtItsJU+S3S5R5bpTkdeMBwKK1ycEWZe/kMcv37h9XCwKw3Px+apCd3
+	r7zCmdAKhnhmHEP59nt9tssyl2SkxEaduEQipurCeLvJKSuZVaVXczMkBy+7yGfmqb17eqVUkO/
+	s+9TMT367PVv2vNbwqPfAWK49IH6ESHex8yWXxNtOWuVLno7b1xg19mtvnr5xhSboYcuV2Z8JqS
+	g9/NNW68zF/kXffy302OHQcGbhfjPgHj+cMCvavXBB9DQA7Li45E5Qw6AZrP/OE74fyksEPlNVj
+	+AD6nZFGhGk/v3vcNbnHImnwguWwoLKXCnH1evyAAblmX+LdIzb2mTVvBJ+GmoaLY+Bu5IlAxEl
+	99qQ/8VQO3NayBOW+M0WYQgEeWfAaLnMTgbmZY9ULZUrL3M0aqLLM3FUzX2JD1+zZlHkqQAs+q9
+	dvsxn/eU8MQlFWrXPa3vrr6v/B0ICpBEYR9dN8RGjz2PCE7PedAIHzGC4Sgj9uu4O2UYVnmsysl
+	QojSe4SFg==
+X-Received: by 2002:a17:903:1850:b0:2d5:e3ce:3988 with SMTP id d9443c01a7336-2d74dddceebmr476446215ad.11.1788214573604;
+        Mon, 31 Aug 2026 15:16:13 -0700 (PDT)
+Received: from devvm16600.scu0.facebook.com ([2a03:2880:9ff:6f::])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f995e60sm33397369eec.22.2026.08.31.15.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Aug 2026 15:16:12 -0700 (PDT)
+Date: Mon, 31 Aug 2026 15:16:10 -0700
+From: Ziyang Men <ziyang.meme@gmail.com>
+To: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Ben Segall <bsegall@google.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
+	bpf@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] cgroup: expose cpu.stat and io.stat to BPF
+Message-ID: <apX9KtGrmfA7u0zV@devvm16600.scu0.facebook.com>
+References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
+In-Reply-To: <20260820211758.3393984-1-ziyang.meme@gmail.com>
 
-On Fri, Aug 28, 2026 at 11:37:57PM +0800, Linlin Zhang wrote:
-> Thanks for your comments!
-> 
-> Not making virtio-blk itself support key programming and eviction is
-> something done deliberately. Based on that HW-wrapped key management
-> operations are also handled in the out-of-band path.
-> 
-> There are bellow 2 approaches I investigated to let virtio-blk programming
-> the key.
-> 
->   1. virtio_blk implements blk_crypto_ll_ops interfaces, including program
->      key and evict key interfaces.(Same to 'the virtio-blk interface standardized
->      blk_crypto_ll_ops requests' mentioned by Stefan in the virtio SPEC thread)
-> 
->      The guest's block crypto profile manages the keyslot in virtual slot
->      format in this scenario.
-> 
->       - block crypto key and virt_slot index it passed to the hypervisor's
->        (EL2) device emulation (QEMU, using QEMU in the following) which
->        runs in userspace of the host. Besides of transferring the virtual
->        slot to the physical slot, a programming block crypto key UAPI need
->        be added. Follow current blk-crypto design, it may be like
->        BLKCRYPTOGENERATEKEY. I thought this results in a security risk that
->        allows userspace process a key into a key slot.
-> 
->      - For key eviction, it's similar to above key programming handling, also
->        need a key eviction in blk IOCTLs, but leads to the security risk
->        that allow userspace client to evict a key in a key slot.
-> 
->     virt_slot, DUN and DUSize is appended to virtblk request during crypto
->     I/O.
-> 
->   2. virtio_blk implements blk_crypto_ll_ops interfaces, excluding program
->      key and evict key interfaces.
-> 
->      The guest's block crypto profile doesn't manage keyslot for the guest,
->      the host's block crypto profile manages keyslot for both the guest and
->      the host. The trigger of key programming operation is moved from the
->      guest to the host.
-> 
->        - The whole block crypto key (key size, key bytes, blk_crypto_config)
->          and DUN are appended to the virtblk request during IO, a little
->          high payload.
-> 
->          The backend parses the crypto message in the virtio queue and
->          construct a block crypto key and DUN for the bio_crypto_ctx
->          set to the BIO. So that the IO flow in the host can program
->          the key. 
-> 
->          The question is that the blk-crypto-profile distinguishs the
->          block crypto key via the key's address. But the host has
->          different key addresses for the programming and eviction key
->          operations of the same block crypto key from GVM, because the
->          key is re-constructed in the host for the key program and
->          eviction operations. 
-> 
->          To fix it, the approach I thought is maintaining a new key
->          hash table in the backend, and comparing the block crypto key
->          content and DUN parsed from virtio queue with that in the key
->          hash table. 
->          My major concern is that this need keep the keys synchronization
->          b/w this new hash table and the blk-crypto-profile's hash table
->          carefully, avoiding that key is still present in the
->          blk-crypto-profile's hash table, but removed in backend hash
->          table. Another point is that the whole block crypto key and
->          DUN are appended into virtio block request per crypto I/O.
-> 
->        - For key eviction, adding a key eviction in blk IOCTLs allows
->          userspace client to evict a key in a key slot. I thought this
->          is a security concern.
-> 
-> 
->      This option doesn't need map virt_slot to physical one.
-> 
-> 
-> Taking all the above into account, I made a compromise to implement
-> blk_crypto_ll_ops interfaces in a out-of-band path, which lets the virtio
-> blk only need focus on the data path. I agree that it is complex than
-> the second option mentioned in the above, but small payload (only
-> virt_slot, DUN, DUSize) in the virtio block request and no security
-> risk of key eviction from userspace.
-> 
-> 
-> I would like to hear your thoughts about the above and am appreciated
-> if you could share your insights about the design of inline
-> encryption in virtio block.
+Hi Reviewers, 
 
-Well, the way it should work is that each virtio-blk device should have
-its own set of *virtual* keyslots on the host side.  From the guest's
-perspective it would act very similarly to UFS / eMMC inline encryption,
-and it would be easy to integrate into the existing stack.
+Just want to follow-up on this patch series. Please let me know the possible
+issues and I will fix them. 
 
-Then to process encrypted I/O, the host would use the keyslot number in
-the I/O to look up the blk_crypto_key it previously saved, and issue I/O
-using that key (using bio_crypt_set_ctx()).  The existing keyslot
-management logic in the block layer would allocate or wait for a
-physical keyslot as needed, so it should just work.
+Thanks very much!
 
-Eviction would similarly be passed through to blk_crypto_evict_key().
+Best,
+Ziyang
 
-Note that with this design, there would be no static partitioning of the
-physical keyslots.  The host would just allocate and release them as
-needed, similar to memory allocation.  The total number of virtual
-keyslots could be greater than the number of physical keyslots.
-
-This design would also work with hardware-wrapped keys.
-
-The hardest part is still the UAPIs for the VMM to do what it needs to
-do (assuming that it even needs to support physical inline encryption
-hardware at all, and not simply use the AES acceleration on the CPU),
-but that is the case with any of the proposals.
-
-- Eric
+On Thu, Aug 20, 2026 at 02:17:54PM -0700, Ziyang Men wrote:
+>Collecting cgroup statistics is expensive: the existing method is to
+>open and parse a cgroup file for every cgroup of interest. The memory
+>controller already has an efficient alternative through BPF; this series
+>extends that model to the CPU and block I/O controllers.
+>
+>Patch 1 adds the CPU kfuncs, and patch 2 adds their selftest. Patch 3
+>adds the blkcg kfuncs, and patch 4 adds their selftest.
+>
+>This v3 combines the two previously posted v2 series:
+>CPU v2: https://lore.kernel.org/all/20260818002450.3071325-1-ziyang.meme@gmail.com/
+>blkcg v2: https://lore.kernel.org/all/20260817214205.723267-1-ziyang.meme@gmail.com/
+>
+>===
+>Changes since CPU v2:
+>- Rename bpf_cpu.c to bpf_cgroup.c and use unlikely() and container_of()
+>  for the task_group conversion.
+>- Remove bpf_css_flush_rstat() and register the existing
+>  css_rstat_flush() in the common kfunc set.
+>- Remove the SLEEPABLE mark bpf_cgroup_base_stat().
+>
+>Changes since blkcg v2:
+>- Add bpf_cgroup_css() and bpf_css_release() to keep a controller css
+>  alive across the sleepable rstat flush.
+>- Add an RCU-protected checked css-to-blkcg conversion and make the blkg
+>  iterator take the typed blkcg pointer.
+>- Use the existing css_rstat_flush() and remove bpf_blkcg_flush_stats().
+>- Do not expose root io.stat values.
+>
+>===
+>Changes since CPU v1:
+>- Make the rstat flush generic, move it to rstat.c, and make it take a css.
+>- Expose cgroup_base_stat directly instead of repacking its CPU times.
+>- Replace the throttled-time aggregation kfunc with a checked RCU cast in
+>  the CPU cgroup BPF code. The cast preserves the verifier type needed for
+>  the BPF program to perform the per-CPU sum itself.
+>- Remove the scheduler changes.
+>
+>Built with LLVM. Pass test on v7.2-rc5.
+>
+>Ziyang Men (4):
+>  cgroup: add BPF kfuncs to read a cpu cgroup's stats
+>  selftests/bpf: add cgroup_iter_cpu test for cpu cgroup kfuncs
+>  block: add BPF kfuncs to read blkcg io.stat
+>  selftests/bpf: add test for blkcg io.stat BPF kfuncs
+>
+> MAINTAINERS                                   |   1 +
+> block/Makefile                                |   3 +
+> block/bpf_blkcg.c                             | 138 ++++++++++
+> kernel/cgroup/Makefile                        |   2 +
+> kernel/cgroup/bpf_cgroup.c                    | 100 +++++++
+> kernel/cgroup/rstat.c                         |  54 +++-
+> tools/testing/selftests/bpf/cgroup_iter_cpu.h |  22 ++
+> tools/testing/selftests/bpf/cgroup_iter_io.h  |  17 ++
+> tools/testing/selftests/bpf/config            |   4 +
+> .../bpf/prog_tests/cgroup_iter_cpu.c          | 259 ++++++++++++++++++
+> .../selftests/bpf/prog_tests/cgroup_iter_io.c | 254 +++++++++++++++++
+> .../selftests/bpf/progs/cgroup_iter_cpu.c     | 113 ++++++++
+> .../selftests/bpf/progs/cgroup_iter_io.c      |  74 +++++
+> 13 files changed, 1037 insertions(+), 4 deletions(-)
+> create mode 100644 block/bpf_blkcg.c
+> create mode 100644 kernel/cgroup/bpf_cgroup.c
+> create mode 100644 tools/testing/selftests/bpf/cgroup_iter_cpu.h
+> create mode 100644 tools/testing/selftests/bpf/cgroup_iter_io.h
+> create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c
+> create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
+> create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c
+> create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_io.c
+>
+>
+>base-commit: 3b5f4b83c4abc0c9b0a7b9e2b44e816611b7f2ec
+>-- 
+>2.53.0-Meta
