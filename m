@@ -1,190 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B832941A;
-	Mon, 31 Aug 2026 07:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779743C5855
+	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 07:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788159842; cv=none; b=nkQHbk+sF7at0Xz5HeZ++R9BJccW5cml7iB0ppD7BLyghA4k87T7S+TGtokwK/EH/bDbMYuTtGK0RhW+FcXKLp8KloHB4G+if9D4YM+MFQlLmrqc4yCiLicLoR2Y/ReSxhrHkfgTNYJWnaFZSa8r2hFi/16wDmvr852xv+kIXvE=
+	t=1788161929; cv=none; b=skh/EzOUIpYMoan1iqXY94fBdBBn5e/PSNAPMb9dZWKrpUWCaClmoA18FlyuFcKosxKJ8/1JCaHwiStPqdJjg0pDEmigkHrWYDfrND/NTdZCha0sJ5W2uiiezugMDdv14Drk/s/UkuPZYrRlSt6T/koGVjzd+NOD9NZKajMYn1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788159842; c=relaxed/simple;
-	bh=gmNMkW8BJZK0ghbj5E3UG1lGb6HMaLQ+7eEIVm4U4TU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aueIJjjPO6MFW3gkEjUct6uxt9BcVD99g0zB8CGS1fIrYLZy44vgFZqALhQqC/hG7bZLcee/u5aL8TJ18r3Sjdl0p+FnXbuXpawN3vnh55rUdcUYDUhK+EPGCz3SoyL9nW9LaEHNSDpLqFIjzeNHUqVXCzU6uji/hpLjs7X2MEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AFKrmk+5; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFKrmk+5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 696831F000E9;
-	Mon, 31 Aug 2026 07:03:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788159841;
-	bh=dn2CLObij1YYUhH1wWw0aDiMly3mPdNFWYv1tBBXevA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=AFKrmk+5vDmyG9G8H1JEEwJbmAk+fBzl7A0jPF47kKkG+EJygmQXSJwqVFQbAzhk/
-	 PQWVVpn+fKH7QbCTKRdmHwFbsuYrC/B8t8Gz0lS/xu7n/SOD6dRijaAxUSDkoyUoBR
-	 gBEi1NI5wl7DxC/qfV/hOWx4BA3YQJYDQfGeltl2TY784nvgMeCm7JtPYj72kkecdA
-	 tbubdBPTQfwKEazPBtnDGmq5dwRnog+8wTykLf3KSUrjIcF419bX1TSvaUkxIKVTxl
-	 8eiNF0B12+vwHQhjYN33moZ5mka0UJHlAnck/1tYihFEFYWZMlx7lc3ostmD3wvR2I
-	 KM0aMaRSvf+pw==
-Message-ID: <046e4b62-6d25-40fc-baa3-2978eb96eb70@kernel.org>
-Date: Mon, 31 Aug 2026 09:03:48 +0200
+	s=arc-20240116; t=1788161929; c=relaxed/simple;
+	bh=n+bm+oD3kn40fyS7L0liJo1kS7q5/LI+20B3up/88HQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iaw44AzUlgR1g1ztJZ8rQraBP96tY/pxcKAPGEjwGmOIKdB0diQisibMfuIaJJQNMUq1dtmxF5++pHyIcyRwsJ82/IRM1VInAQxmq+oTF/seh4OSEXgzWesy0BhCiQJEOysqKeo/JjwmY05U9E+MfguS6j0XugdAjDxfOF1mw9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-7466771f1caso690874137.0
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 00:38:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788161926; x=1788766726;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=1+Wb6c4hy/mllkEGw9UkJDy4J8V6hEIxHDRjaIVv61Q=;
+        b=p2t2r303wiLHrDf2NaNi8tDMmE4V6mOuxhWu4epPw+mLBg12y6Psk/xO1AVyJ7gzh4
+         k455gIvAJZnZJnMuC+1Al9wou2fI6i89hykysZUiA0vWGpm9kJ8oW1UDQDUB+TkpW9C8
+         Xz7hzr/FqV7E1Jtkl+gU3Hsjg9W1NsZ90wf8MeJR//LW2zwmEJ1KTJ3DuW+GdgfpaoTh
+         5yueakFBp10p77b7WMj/j9yze/oAs4UlJDodYCDDZwsVfpFy1LUQaoRXJr1waWQJxoRr
+         IuzGlftDTY0/Gg4OIPSZjtiSkLdFRRkb8l7SJjZWwVkezYHLJz3siarv0re6235Spmvv
+         qFOQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrDol/fo57OFJBHQ8pm3ur/JX3vQKgT31YYSsE2P7HNXOKME+/4vNbh5plx0ZrSQqdF5IbNG4x6E4gaaA==@vger.kernel.org
+X-Gm-Message-State: AFuF++nISDevevulFfRw3NDynNhFqesW8fXFxFGWBVtd7iX5x8GUQ36e
+	7A/uP8q2WCYtSXza1Gf44DQigzArP2KbFbFKgdu/d6pI4uwWGAE7wXq9HRGLWrLg
+X-Gm-Gg: AR+sD101m0ON4yC31jqGLt+wmanJgQ2dkLWEX4N6YFFjIO3chNA9LsPto2mV1ljn83W
+	0vlm/Xd+ExCcIA1Kain4FYMxYJLxCe7oYT96f/RBVGQY625SUvHpU7cpY5ygQb+t1QSFYp52r7t
+	sYijaV1q7Lrs1UtkGjH1JF99rLyM6sKFM32z+G2AJI7jq48RUqqp9aBCryCK8YzWIuTOp00PL2n
+	hEAOztnlnOOaR4rGqY3XYfozDeNLWFci/cZ0UbfpwAAZi8kmcmkkOSYNC0/In1h2Bdc1AIeW29N
+	3zWavjCKeCxQiXUKvYi6FU/b5fPMoQ6QlBAE87L1rRjPLLKZ0JPDNvEjekfQD3XxjLLF5JX/iXQ
+	a/ib9uYsUoexo2e9yXdh/FsCsIdg1PXzUOc+wtFTRMbesLwoM7aqGwOqSd+7rnFsJBgnxbo5qX7
+	9eOjitwJKIGOYwo3S6hPmnxVyIdt0y3iWfGPNNV1cW/+zwcFbCPD6oDT5n6P6P3J5JR7k1WyH3e
+	LQzYSnIUd3KSfuvBdTS3flgKon/SC1B/fkf
+X-Received: by 2002:a05:6102:4bc2:b0:77f:fb50:8822 with SMTP id ada2fe7eead31-78597f13346mr6418746137.7.1788161924412;
+        Mon, 31 Aug 2026 00:38:44 -0700 (PDT)
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com. [209.85.217.44])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-785f247e397sm6181198137.0.2026.08.31.00.38.43
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Aug 2026 00:38:44 -0700 (PDT)
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-74ab6c88052so809234137.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 00:38:43 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rp8fX3Y4eKuoqBMHHPL6iRM/zMEsB0E2K0gWwxhw0LLJ3qmVRXDLbGpRdNjVWjI51KBSqYVBsrK7JLn4Q==@vger.kernel.org
+X-Received: by 2002:a05:6102:418b:b0:778:721:53db with SMTP id
+ ada2fe7eead31-7859426191emr7077458137.0.1788161923583; Mon, 31 Aug 2026
+ 00:38:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 11/11] scsi: ufs: ufs-qcom: support ICE keyslot
- partitioning for guest VMs
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>, ebiggers@kernel.org,
- axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
- devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Cc: neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
- mani@kernel.org, andersson@kernel.org, konradybcio@kernel.org,
- bvanassche@acm.org, alim.akhtar@samsung.com, avri.altman@sandisk.com,
- stefanha@redhat.com, pbonzini@redhat.com, eperezma@redhat.com,
- xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827160806.1295313-12-linlin.zhang@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <20260827160806.1295313-12-linlin.zhang@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1786929430.git.fthain@linux-m68k.org> <1e349506a7cc6aa574aacbd4c69c240b5a1e3eb8.1786929430.git.fthain@linux-m68k.org>
+In-Reply-To: <1e349506a7cc6aa574aacbd4c69c240b5a1e3eb8.1786929430.git.fthain@linux-m68k.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 31 Aug 2026 09:38:32 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXgtstGtcbRkrtKtQ+d1c=mCe5zgYZCx4dyUQ_YnVhbbw@mail.gmail.com>
+X-Gm-Features: AcwNN1XVC3wu-2rZS0i2vSr8DmQmHBettg6W2uihbfihhqw2AlLs5EB1RzHcC7M
+Message-ID: <CAMuHMdXgtstGtcbRkrtKtQ+d1c=mCe5zgYZCx4dyUQ_YnVhbbw@mail.gmail.com>
+Subject: Re: [PATCH v2 07/32] swim: Enable clock divider only where appropriate
+To: Finn Thain <fthain@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Laurent Vivier <laurent@vivier.eu>, 
+	Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org, 
+	linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 27/08/2026 18:07, Linlin Zhang wrote:
-> From: linlzhan <linlin.zhang@oss.qualcomm.com>
-> 
-> On Qualcomm platforms where UFS inline encryption is shared between
-> the host and guest VMs, the ICE hardware keyslots must be partitioned
-> so that each VM operates only within its own physical slot range.
-> Without this, the host's blk_crypto_profile would manage all hardware
-> slots, conflicting with slots already allocated to guests.
-> 
-> Add ufs_qcom_ice_parse_slot_table() to read the qcom,ice-keyslot-map
-> device-tree node.  The function parses all child entries and validates
-> that no entry's slot range or the combined total exceeds the hardware
-> slot count from REG_UFS_CCAP.  The first child entry is taken as the
-> host's own reservation; its slot count and offset are returned to the
-> caller.
-> 
-> In ufs_qcom_ice_init(), use the parsed host reservation to initialize
-> the blk_crypto_profile with only the host's slot count rather than the
-> full hardware range.  Set profile->slot_offset so that
-> blk_crypto_keyslot_index() returns the correct physical ICE slot
-> number when programming hardware.  If no qcom,ice-keyslot-map node is
-> present, the existing behaviour (profile manages all slots) is
-> preserved.
-> 
-> Note: This patch is submitted for visibility. The ufs-qcom driver
-> gets its max_slots and slot_offset based on the the current
-> DT-based keyslot mechanis. we are aware this may need to be replaced
-> by a TZ SCM interface, submit it RFC for design discussion.
-> 
-> Signed-off-by: linlzhan <linlin.zhang@oss.qualcomm.com>
+Hi Finn,
+
+Thanks for your patch!
+
+On Mon, 17 Aug 2026 at 03:55, Finn Thain <fthain@linux-m68k.org> wrote:
+> Some models have a 16 MHz FCLK oscillator and others 32 MHz. Put this
+> information into the swim device platform_data so that the driver can
+> correctly enable the clock divider. When this is enabled incorrectly,
+> nothing can be read and failures from the Error Correction Machine are
+> flagged in the error register.
+>
+> This is chip initialization, so do this in swim_floppy_init() rather
+> than floppy_open(). Drop the udelay() which was apparently copied and
+> pasted from swim3.c, where it relates to interrupts (of which this chip
+> has none).
+
+This move should be a separate patch.
+
+> Cc: Joshua Thompson <funaho@jurai.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+> Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 > ---
->  drivers/ufs/host/ufs-qcom.c | 91 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 90 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
-> index 62396212a0a7..0611ab50f4cc 100644
-> --- a/drivers/ufs/host/ufs-qcom.c
-> +++ b/drivers/ufs/host/ufs-qcom.c
-> @@ -163,6 +163,74 @@ static inline void ufs_qcom_ice_enable(struct ufs_qcom_host *host)
->  		qcom_ice_enable(host->ice);
+>  arch/m68k/mac/config.c | 31 ++++++++++++++++++++++++++++++-
+
+For the m68k part:
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+> --- a/arch/m68k/mac/config.c
+> +++ b/arch/m68k/mac/config.c
+> @@ -984,8 +984,37 @@ static int __init mac_platform_init(void)
+>                         .start = swim_base,
+>                         .end   = swim_base + 0x1FFF,
+>                 };
+> +               unsigned int data = 0;
+
+Nit: in the absence of a real platform_data structure, please use a
+more explanatory name.
+
+Perhaps s/data/s_fclk/, and store S_FCLK_DIV2 or zero?
+Or s/data/setup/, and store the full register value?
+
+> --- a/drivers/block/swim.c
+> +++ b/drivers/block/swim.c
+
+> @@ -807,8 +806,10 @@ static void swim_set_parameters(struct swim __iomem *base)
+>                 swim_write(base, parameter, mem[i]);
 >  }
->  
-> +/**
-> + * ufs_qcom_ice_parse_slot_table() - parse qcom,ice-keyslot-map DT node
-> + * @dev:          UFS controller device
-> + * @hw_max_slots: total physical ICE keyslots reported by REG_UFS_CCAP
-> + * @num_slots:    receives host max_ice_slots (0 = no partitioning)
-> + * @slot_offset:  receives host ice-slot-offset
-> + *
-> + * Parses the qcom,ice-keyslot-map device-tree node.  The first child entry
-> + * is the host's own reservation; subsequent children are guest reservations.
-> + * Validates that no entry's range exceeds @hw_max_slots and that the sum of
-> + * all entries does not exceed @hw_max_slots.
-> + *
-> + * If no qcom,ice-keyslot-map phandle is present, sets @num_slots to 0 and
-> + * returns 0.  Returns -EINVAL if any entry or the total exceeds @hw_max_slots.
-> + */
-> +static int ufs_qcom_ice_parse_slot_table(struct device *dev,
-> +					 unsigned int hw_max_slots,
-> +					 unsigned int *num_slots,
-> +					 unsigned int *slot_offset)
-> +{
-> +	struct device_node *slots_np, *child;
-> +	unsigned int total_slots = 0;
-> +	bool first = true;
-> +	int ret = 0;
+>
+> -static int swim_floppy_init(struct swim_priv *swd)
+> +static int swim_floppy_init(struct platform_device *pdev)
+>  {
+> +       struct swim_priv *swd = platform_get_drvdata(pdev);
+> +       unsigned int *data = pdev->dev.platform_data;
+
+Likewise.
+
+>         struct queue_limits lim = {
+>                 .features               = BLK_FEAT_ROTATIONAL,
+>         };
+> @@ -816,6 +817,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+>         int drive;
+>         struct swim __iomem *base = swd->base;
+>
+> +       swim_write(base, setup, S_IBM_DRIVE | (*data ? S_FCLK_DIV2 : 0));
 > +
-> +	*num_slots   = 0;
-> +	*slot_offset = 0;
-> +
-> +	slots_np = of_parse_phandle(dev->of_node, "qcom,ice-keyslot-map", 0);
+>         swim_set_parameters(base);
+>
+>         /* scan floppy drives */
 
-No
+Gr{oetje,eeting}s,
 
-> +	if (!slots_np)
-> +		return 0;
-> +
-> +	for_each_child_of_node(slots_np, child) {
-> +		u32 off, max;
-> +
-> +		if (of_property_read_u32(child, "qcom,ice-slot-offset", &off) ||
-> +		    of_property_read_u32(child, "qcom,max-ice-slots", &max))
+                        Geert
 
-No, there is no such ABI.
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
-Best regards,
-Krzysztof
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
