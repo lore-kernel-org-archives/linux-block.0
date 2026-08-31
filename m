@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199733BED59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7DE3BED01
 	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 03:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788147712; cv=none; b=QMfWP5QreKUIm3lrqQcOtlJVKj817M9BVUILr5c6Nf97SA/sn6LkYVhzA4MdPf5eL/HPrSqe2jnsURALJg7twzcqpmsEmQlp2NNzd0m/1LjHa3aPhol9+PB9wpTX+3rAzHThkIHLWohW9f7rNrtVpHXhfZg0gykLW9jXCljbNII=
+	t=1788147709; cv=none; b=DLLhlnvnlFKt9qPDhkATjdPg+L8PKqaHz2Y5duN1KIVHHJcXZQFTVDzG1ycEXmK4cdxcfFWUAu/q5QeLHtC9tgPqW79fke2ugn9qEmrp6duPr2z91deQdh7cC6JK34VVMS4lMbQ1WoW+ZOs+khhDH9bugaGqX5AGas2j81QSCMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788147712; c=relaxed/simple;
-	bh=vGjLotNSzDfw+Ebe3gaKIutWSUqhJsC05T83Aamx0JE=;
+	s=arc-20240116; t=1788147709; c=relaxed/simple;
+	bh=k6D7/M2TCTPyy6m62kouocEP2hTKuX/rxJNK3urTMB8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jw5dOkUipTsLbS4fXSRcn8S7k+SIAxcbdKTL8krkE3heBzgefJIq8VfhE3JhlGx2zdjt4kJiF3WXfw6a5Flys3PkH9+JsdITQn+osXfXNzQXkjeT1RYcu0LNzKx3S0RUGLn5UWSmCMNdbLXgOabNkVMuS04YNn7vFpuReTh50Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbtOk/jU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=HFocEuEzp5RG9KMaguch1aGhP6l2IpBWxfhJdv7j/rXhycjNjp7pn8ugoqtgI6uXpSTUlaZzmySDN1Df4OYQ1hJAgaV9EBL3sOiEry9Xz3COxy3YXxAHwDHz17BWAZ1tus3hA2gFw3JyI3QCphduMYoNfCw6FSFj6tC91nsDcgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6zTaWeY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbtOk/jU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0540F1F01558;
-	Mon, 31 Aug 2026 03:41:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6zTaWeY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5649B1F00ADE;
+	Mon, 31 Aug 2026 03:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788147689;
-	bh=o/xhMDa3/o/X78i4+yAbRnObL7iUlZ3SkkIZtgqpFpA=;
+	s=k20260515; t=1788147687;
+	bh=asNIaf5uT5FMBqDWaVplZYt5ziW4Ek+HbJ9uw6LT3fo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cbtOk/jUJv5iRWmDrpmXlhMfXGGUrZq19yoQMu17yZT3r1yicNLC/mdT/E6z5VZAo
-	 ypWKouEjT421I4iKN+7dunvopgVHnj5Y/J+76wAwVdweNfXKW7SxuKzTaXA3SEDEtO
-	 igXpKp4HdRqg38ThiTKs2XzuZNhVxUvoy5QgByix6ARCeBflx1HTUmsvJ7g52bBo8i
-	 IEUf7i8pn2Rt6puIyBvdU6PEOwx6A7m3sT0/UdZqXONT4Q9JVUfVvHpbfwYjklQyx7
-	 Dc4bzsb6r5cdLZs4mf+pFsCmblEFlXEET48uu6g6B5bukmICCXgxEivHhLvWMU/zZG
-	 pmvhKihV7zz3w==
+	b=h6zTaWeYnrt+rhCRGtmstjXLmUJU4S8C+qEJhxTinOI8LS9js2JqyjWgvBQEhjbFb
+	 J0ZRxIbY5rBo92JNLAlHaxMlCYOcOpB9bO7rQN8kJ/31sC2tuT24RscbPWG31hBiOg
+	 ww0+P6/VbrdNnk30aSZ7yttXAiQ6tb/zTQExKYPgmNrS/CcKopiX/ePSOX/BSkmb09
+	 RbmStffo1BixtAiJ42PprwTyZ3PTEUri9LWbbxnMCRHa4OfrknRSzGFdAK/0dU/Tc9
+	 YCgiRszzbmFkDD4F/Vi7dBFvjeBxSztBJ7q3M2HT/amNLPaGAnWngCDlDP2Se0GCkk
+	 kZnV24EdLBObA==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 09/12] block: always treat offline and read-only zones as dead
-Date: Mon, 31 Aug 2026 12:41:06 +0900
-Message-ID: <20260831034109.744039-10-dlemoal@kernel.org>
+Subject: [PATCH v6 07/12] block: drop all zone write plugs on capacity changes
+Date: Mon, 31 Aug 2026 12:41:04 +0900
+Message-ID: <20260831034109.744039-8-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260831034109.744039-1-dlemoal@kernel.org>
 References: <20260831034109.744039-1-dlemoal@kernel.org>
@@ -44,181 +44,130 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since any write BIO targeting an offline or a read-only zone will fail,
-there is no point in keeping zone write plugs for these zones.
-So for any offline or read-only zone, the zone write plug should always
-be treated as dead.
+If during revalidation, we detect a capacity change for a zoned block
+device, e.g. due to a storage element removal on an HDD, we can assume
+that the device was reformatted, which implies that all sequential zones
+are empty. For such case, we can remove and free all zone write plugs in
+the gendisk hash table by marking them as dead, thus avoiding also to
+leave zone write plugs for zones that are beyond the new device capacity
+in the disk hash table.
 
-Do this by modifying disk_check_zone_wplug_dead() to always mark read-only
-and offline zones as dead to force a removal of the zone write plug from
-the disk hash table on BIO submission. blk_zone_wplug_prepare_bio() is
-also modified to have the same checks to immediately fail a write BIO
-targeting a read-only or offline zone. With these two changes, any newly
-issued or unplugged write BIO targeting a read-only or offline zone is
-immediately failed.
+Introduce the function disk_revalidate_capacity() to do this and call this
+new function at the beginning of blk_revalidate_disk_zones(), so that the
+zone revalidation process can re-create, if needed, any zone write plug
+for sequential zones that are not empty.
 
-Finally, disk_zone_wplug_sync_state() is modified to add a call to
-disk_mark_zone_wplug_dead() for the zone write plug of any read-only or
-offline zone found during zone revalidation or a report zones.
+The checks on the capacity and zone size that were in
+blk_revalidate_disk_zones() are moved to disk_revalidate_capacity() and
+if true, also trigger dropping all zone write plugs.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c | 110 +++++++++++++++++++++++++---------------------
- 1 file changed, 59 insertions(+), 51 deletions(-)
+ block/blk-zoned.c | 71 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 55 insertions(+), 16 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index e19e0506b32f..576f82b605a0 100644
+index 83737c9a92d8..4b0eda94bbf3 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -744,6 +744,53 @@ static inline void disk_put_zone_wplug(struct blk_zone_wplug *zwplug)
- 		disk_free_zone_wplug(zwplug);
+@@ -2222,6 +2222,56 @@ static int disk_revalidate_zone_resources(struct gendisk *disk,
+ 	return ret;
  }
  
-+static inline void blk_zone_wplug_bio_io_error(struct blk_zone_wplug *zwplug,
-+					       struct bio *bio)
++static void disk_drop_zone_wplug(struct blk_zone_wplug *zwplug, void *data)
 +{
-+	struct request_queue *q = zwplug->disk->queue;
++	unsigned long flags;
 +
-+	bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
-+	bio_io_error(bio);
-+	disk_put_zone_wplug(zwplug);
-+	/* Drop the reference taken by disk_zone_wplug_add_bio(). */
-+	blk_queue_exit(q);
++	spin_lock_irqsave(&zwplug->lock, flags);
++	disk_zone_wplug_abort(zwplug);
++	disk_mark_zone_wplug_dead(zwplug);
++	spin_unlock_irqrestore(&zwplug->lock, flags);
 +}
 +
-+/*
-+ * Abort (fail) all plugged BIOs of a zone write plug.
-+ */
-+static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
++static int disk_revalidate_capacity(struct gendisk *disk)
 +{
-+	struct gendisk *disk = zwplug->disk;
-+	struct bio *bio;
++	struct queue_limits *lim = &disk->queue->limits;
++	sector_t zone_sectors = lim->chunk_sectors;
++	unsigned int nr_zones = disk_get_nr_zones(disk);
++	int ret = -ENODEV;
 +
-+	lockdep_assert_held(&zwplug->lock);
-+
-+	if (bio_list_empty(&zwplug->bio_list))
-+		return;
-+
-+	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
-+			    zwplug->disk->disk_name, zwplug->zone_no);
-+	while ((bio = bio_list_pop(&zwplug->bio_list)))
-+		blk_zone_wplug_bio_io_error(zwplug, bio);
-+
-+	zwplug->flags &= ~BLK_ZONE_WPLUG_PLUGGED;
++	if (!get_capacity(disk) || !nr_zones)
++		goto drop_all_zwplugs;
 +
 +	/*
-+	 * If we are using the per disk zone write plugs worker thread, remove
-+	 * the zone write plug from the work list and drop the reference we
-+	 * took when the zone write plug was added to that list.
++	 * Checks that the device driver indicated a valid zone size and that
++	 * the max zone append limit is set.
 +	 */
-+	if (blk_queue_zoned_qd1_writes(disk->queue)) {
-+		spin_lock(&disk->zone_wplugs_list_lock);
-+		if (!list_empty(&zwplug->entry)) {
-+			list_del_init(&zwplug->entry);
-+			disk_put_zone_wplug(zwplug);
-+		}
-+		spin_unlock(&disk->zone_wplugs_list_lock);
++	if (!zone_sectors || !is_power_of_2(zone_sectors)) {
++		pr_warn("%s: Invalid non power of two zone size (%llu)\n",
++			disk->disk_name, zone_sectors);
++		goto drop_all_zwplugs;
 +	}
++
++	/*
++	 * Check if the capacity has changed. If it did, assume that the device
++	 * was reformatted and that all sequential zones are now empty. So drop
++	 * all zone write plug.
++	 */
++	if (disk->nr_zones && disk->nr_zones != nr_zones) {
++		pr_warn("%s: Number of zones changed (%u -> %u)\n",
++			disk->disk_name, disk->nr_zones, nr_zones);
++		ret = 0;
++		goto drop_all_zwplugs;
++	}
++
++	return 0;
++
++drop_all_zwplugs:
++	disk_for_all_zone_wplugs(disk, disk_drop_zone_wplug, NULL);
++
++	return ret;
 +}
 +
- /*
-  * Flag the zone write plug as dead and drop the initial reference we got when
-  * the zone write plug was added to the hash table. The zone write plug will be
-@@ -761,6 +808,12 @@ static void disk_mark_zone_wplug_dead(struct blk_zone_wplug *zwplug)
- 
- static inline bool disk_check_zone_wplug_dead(struct blk_zone_wplug *zwplug)
+ static int blk_revalidate_zone_cond(struct blk_zone *zone, unsigned int idx,
+ 				    struct blk_revalidate_zone_args *args)
  {
-+	if (disk_zone_wplug_is_offline_or_readonly(zwplug)) {
-+		disk_zone_wplug_abort(zwplug);
-+		disk_mark_zone_wplug_dead(zwplug);
-+		return true;
-+	}
-+
- 	if (!(zwplug->flags & BLK_ZONE_WPLUG_DEAD))
- 		return false;
+@@ -2411,31 +2461,20 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+  */
+ int blk_revalidate_disk_zones(struct gendisk *disk)
+ {
+-	struct request_queue *q = disk->queue;
+-	sector_t zone_sectors = q->limits.chunk_sectors;
+ 	struct blk_revalidate_zone_args args = { };
+ 	struct blk_report_zones_args rep_args = {
+ 		.cb = blk_revalidate_zone_cb,
+ 		.data = &args,
+ 	};
+ 	unsigned int noio_flag;
+-	int ret = -ENOMEM;
++	int ret;
  
-@@ -844,53 +897,6 @@ static struct blk_zone_wplug *disk_get_or_alloc_zone_wplug(struct gendisk *disk,
- 	return zwplug;
- }
+-	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
++	if (WARN_ON_ONCE(!blk_queue_is_zoned(disk->queue)))
+ 		return -EIO;
  
--static inline void blk_zone_wplug_bio_io_error(struct blk_zone_wplug *zwplug,
--					       struct bio *bio)
--{
--	struct request_queue *q = zwplug->disk->queue;
--
--	bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
--	bio_io_error(bio);
--	disk_put_zone_wplug(zwplug);
--	/* Drop the reference taken by disk_zone_wplug_add_bio(). */
--	blk_queue_exit(q);
--}
--
--/*
-- * Abort (fail) all plugged BIOs of a zone write plug.
-- */
--static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
--{
--	struct gendisk *disk = zwplug->disk;
--	struct bio *bio;
--
--	lockdep_assert_held(&zwplug->lock);
--
--	if (bio_list_empty(&zwplug->bio_list))
--		return;
--
--	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
--			    zwplug->disk->disk_name, zwplug->zone_no);
--	while ((bio = bio_list_pop(&zwplug->bio_list)))
--		blk_zone_wplug_bio_io_error(zwplug, bio);
--
--	zwplug->flags &= ~BLK_ZONE_WPLUG_PLUGGED;
+-	if (!get_capacity(disk))
+-		return -ENODEV;
 -
 -	/*
--	 * If we are using the per disk zone write plugs worker thread, remove
--	 * the zone write plug from the work list and drop the reference we
--	 * took when the zone write plug was added to that list.
+-	 * Checks that the device driver indicated a valid zone size and that
+-	 * the max zone append limit is set.
 -	 */
--	if (blk_queue_zoned_qd1_writes(disk->queue)) {
--		spin_lock(&disk->zone_wplugs_list_lock);
--		if (!list_empty(&zwplug->entry)) {
--			list_del_init(&zwplug->entry);
--			disk_put_zone_wplug(zwplug);
--		}
--		spin_unlock(&disk->zone_wplugs_list_lock);
+-	if (!zone_sectors || !is_power_of_2(zone_sectors)) {
+-		pr_warn("%s: Invalid non power of two zone size (%llu)\n",
+-			disk->disk_name, zone_sectors);
+-		return -ENODEV;
 -	}
--}
--
- /*
-  * Update a zone write plug condition based on the write pointer offset.
-  */
-@@ -969,6 +975,7 @@ static unsigned int disk_zone_wplug_sync_state(struct gendisk *disk,
- 			zwplug->flags &= ~BLK_ZONE_WPLUG_NEED_WP_UPDATE;
- 			zwplug->cond = zone->cond;
- 			zwplug->wp_offset = UINT_MAX;
-+			disk_mark_zone_wplug_dead(zwplug);
- 		}
- 		if (zwplug->flags & BLK_ZONE_WPLUG_NEED_WP_UPDATE)
- 			disk_zone_wplug_set_wp_offset(disk, zwplug, wp_offset);
-@@ -1524,11 +1531,12 @@ static bool blk_zone_wplug_prepare_bio(struct blk_zone_wplug *zwplug,
- 		return false;
++	ret = disk_revalidate_capacity(disk);
++	if (ret)
++		return ret;
  
  	/*
--	 * Check that the user is not attempting to write to a full zone.
--	 * We know such BIO will fail, and that would potentially overflow our
--	 * write pointer offset beyond the end of the zone.
-+	 * Check that the user is not attempting to write to a full, read-only
-+	 * or offline zone. We know such BIOs will fail, so there is no point
-+	 * in issuing them.
- 	 */
--	if (disk_zone_wplug_is_full(disk, zwplug))
-+	if (disk_zone_wplug_is_full(disk, zwplug) ||
-+	    disk_zone_wplug_is_offline_or_readonly(zwplug))
- 		return false;
- 
- 	if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+ 	 * Allocate zone resources if they are needed and we have not done
 -- 
 2.55.0
 
