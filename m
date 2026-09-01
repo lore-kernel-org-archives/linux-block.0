@@ -1,158 +1,127 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D329346777
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 06:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788243629; cv=none; b=WsnnBBxy7pFrnaYnK4rkTFdPPPdcSjOwy28KMdwcuRVlCf2Ngm9uq4pGHQ3NwWbdZdJCFLX/wK5yzDOrzUX0PEgN8Ht1I1R+2+lCbOWKS/kE8hdUGMRjHYWA/Y4w4QnZHWEcvVjxqDvftSH5T9LYtbgSMrH4R0Opcq/Eg0VX1Ng=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788243629; c=relaxed/simple;
-	bh=7kAXqpDhc+U5NotagFYGtFI5lJerTgwre3i3eLWhEOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R1rSLq+Lllt7OQKe4DaeLfDcKIiILfI5lLmWpGQwbbM6rHwAuBeEH9rxPymX4oXcQpNjbRsur33c9ekb9SyS8C+6eW8pdr3/yAqeXaRmwyI88q+ffJKZDEofO7uwcKodbJCfJOm81ydHMM3A7nlpQY29Z3SRQJhdGSdlwDHT12A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hYwgN1HhjzKHMYX
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 14:19:28 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 22BA6405B7
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 14:20:18 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with UTF8SMTPSA id cCh0CgBHMAudbpZqJM9SAQ--.59400S3;
-	Tue, 01 Sep 2026 14:20:15 +0800 (CST)
-Message-ID: <b53ad130-3360-41b7-9180-cc66a16a356e@huaweicloud.com>
-Date: Tue, 1 Sep 2026 14:20:13 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D0B36F419
+	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 06:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788245368; cv=pass; b=JCQCwx3IyOE+kMFbaUULEcvYbk8SMIPgS8pfo4fm21rrjVFcC56U9vrptjcD0lLscSOGnSX824Wg8pjRPXst3JmLWIvDOMc2dg8kGjmmu/piJcqjQVxXLCsAuf9tJhyUjS6Ui3qBdiEP348uKeBu7ZxvRVYMB7vGxKfc12js85U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788245368; c=relaxed/simple;
+	bh=oNGTPV0Nte2s7Q4Q4v2+7pT7OOG+CNawxlnpt/7u8Oo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d27C7Yv+4k4BvZaEvsUxe6rGgwUV+W6rqhmD2/IumS/yFVXqA0OMkmmEvfAITfb+0ZW6ypHqo+L7cJjVNtZJOX+gmRGbTsDVnMNGCC9WCCz+c+bGIFZGtY5itV52qMTFsQ81/Wv4AeiaNcTucZOJpdnqHxwyNHbsmsCqmPzldbw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=BpsrGk+A; arc=pass smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="BpsrGk+A"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-482e4998d28so390675f8f.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 23:49:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788245365; cv=none;
+        d=google.com; s=arc-20260327;
+        b=E8nREKi5DeeS65C/UmbyAJTODQVYOqQUpp867UxhLhx/AMCUUyqNPFlbyGyKwgMgnT
+         /hcT6S0RxX3pT9lx4D1THTN/WjwFOAAyyIcB6vvipHfQaxAwVJ8KGQui3+tPyDVqRet4
+         0S6f7yIgOI6smlxqGR3rDsapEcSKXV3G3iaNSDaY3t3bJsc0uAhie4FohYlfvvGEIdU/
+         ABOFpY+Z17mOG7AvWdVrR1kYBJcL6d36qsrU+JbFDlpwzA/GVfnY35XkUeDxY435Aj5I
+         xiy+yUaHcrBtoqLFYg49Vh/OJrBWvIno2qkl6DCxagGjn66UBvv9CG2gKoSOzxdQQnNo
+         dJ6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=QZ0kwvuRo9QIP5y4Kks1XO3hGegOKMFKjzEnWHMijtc=;
+        fh=p0XfzqQwH8SyheitKxN/p/pKnOhYo6hX90AsN9HY1gM=;
+        b=I78l4BsrSXs11ELsMNWC0h0n3xXAo2EwUqvVV1czyRe5UxfMj1+rlZRhU/QdIgFKfT
+         InlWWzhIwXQCHkG/dA6eQCMmes6yQutnKNj7BsLx0MegOx8km7E21crYdEQXhyr122cS
+         68Fkhg1A53hFvoBSvvachPXEA28glykJ+hdqhSa3pHujvWMCt41yLQnbnaSSVW5hJXvT
+         AgdEyQlDjk6KzszcqrgICESiizXtNxT8tk3E4J7X1J+ATivJYpHyXmuxpSjhn7IEyMJK
+         NAu2b7DR79RmHielp5/83DnH8CGroPLSa4dUrPfp+yoUpeLxB0r+5pY+9BTEM+Br1vld
+         IwtQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1788245365; x=1788850165; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=QZ0kwvuRo9QIP5y4Kks1XO3hGegOKMFKjzEnWHMijtc=;
+        b=BpsrGk+AP0QMLVKK63eMt9ayptIxw6Zo84n0T/bxYqygIWWDqt4o/f7vLmokBi18SI
+         VctIFLw9q0fX64w0+LFO2ybgHFe4GeTREVbQbJN0/5vRwiCdVcN+Mmb5pOZjMpSA1Z7S
+         kpvvZ5kIjaP5SjelpsK9pH5Zn0bOLdt6MiOYZXQZA07Wqo+yFVMLzh7sj8oUUKWeHR8j
+         yCLsdXRoqhTeTP0CsH1qkUcupJQWoaBjECmFeOaY/xC1Nnh5J0vl2fivHai2xI4JSNRf
+         HiMqGBnS5C9GOh66r6Gkvn4i4kkGwvYPy+b+XqfEnZFAwmtqLBp9uwiJagmWlwZlh02t
+         NsVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788245365; x=1788850165;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=QZ0kwvuRo9QIP5y4Kks1XO3hGegOKMFKjzEnWHMijtc=;
+        b=RR730PH0N66CTgR3xCcCeJ1uGqRcaGBAbJDgfJ/VtJt0CByG9JZLdPJ0iweroDQwHy
+         ffswxJpdjEehecNBU93QO3JETDbrAjANwOICneAfQ1qscpOfN4Q2UOToP9TkDraGs5WP
+         PWb+1jgRHSTrkfMdlCPmG/MvKkVt6uaaN5+5Vzs8/FViYeZVDqe3zrORzZFTbMQ6A8cr
+         0jlbyx2gg3sra2tBp6lo4fHYPfWM90XNSdu7TCtjTH877TZrGiuUxg1KPHQZK7byZ13V
+         yPn0Cwzk3N2mVDcjNN74uZbCkrD82g3T5orfxgDFrNAl2JPFnV7Q5wI2j5NewWDmXdIH
+         KIyA==
+X-Forwarded-Encrypted: i=1; AKwUvByBXF3fI8RnNrxOP5CdSsmG6qG78Pov/NZtyiNN+FtSbbqxgM6DT9eR2Msc9rvRreLHplX8j/lOV1IxoQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++kmn0JeCWf++sOogUqlKjsem5tSjJfhMTSIJsJVUAGMW6MzJ1h2
+	460ipO9enYJ5HzQ9p3cvTqWwQkthZpB+nmVngI8D3Rem0RF2LSCJEkq5g6IW4CFzaL8594DsZWu
+	bVOT4p+yZndd3Zt5l55p/Oc3VHF8U70bj6wkM+pDG9g==
+X-Gm-Gg: AYBFou3nzL28WAun58utFnIO5T1HRIptaInLwxF4YC2OvyvS/wNRSt+hnxmBgcBXG6v
+	ylx1oi8Gs4Kf7J+lpyD/7rg+uG2iOvw8lDGNC59rgBtxsCWTqzqM2jgGaTl+MaQZrXtQP0di/wl
+	xEdBntkaSMrTPi2b/3r2N2o3HlYyrzUIfiU9iYBMN+Swb9xklQUsRb+4ejLS5JGtdnS5y4jNF/l
+	ntJ+Xlc6TqDIdQ9/pxT1T+ppl6XZSQmOgxEsANM0KMUY5fUyVfwOylbDqNodDgWS8+ZNDzJ69H2
+	VtEfxjzuCkJL6uWoiZosihCaLi8hBCAE5SDiDAYFZ2K3sQtnLWN3sg5BEe51J49wJ+KgKd+oLw1
+	bfdbftzoeWzoyfHv0Nh9DLWgtxFrow6zIf8PeDoZrhA==
+X-Received: by 2002:a05:6000:4605:b0:482:daf8:a3d7 with SMTP id
+ ffacd0b85a97d-482f7987c26mr52155535f8f.3.1788245364933; Mon, 31 Aug 2026
+ 23:49:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] block: fix BLKSECDISCARD zero-length range causing
- page cache invalidation
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
- hch@lst.de, yukuai@fygo.io, linux-block@vger.kernel.org
-Cc: yangerkun@huawei.com, chengzhihao1@huawei.com
-References: <20260725002355.347485-1-wozizhi@huaweicloud.com>
- <27b84502-9239-4a21-b38c-a44697764d57@huaweicloud.com>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <27b84502-9239-4a21-b38c-a44697764d57@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHMAudbpZqJM9SAQ--.59400S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAF4rZF1xuF4fZF4kGF18Grg_yoW5KrWkpr
-	ykGFy5GryUWr97ur18tF17ZryUtw1Uta1UAr15XF1DZrWDArnFgFyUWrySgrykJrWkJr4U
-	JF4jvr97ZFy7uFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkv14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
-	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUUUU=
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-5-neelx@suse.com>
+ <20260601230406.GC25574@quark> <CAPjX3FdMBAbz9T5yW=0ytRJD8s6zYHpo+TcYY-9-+egBHL=TFw@mail.gmail.com>
+ <20260819155907.GB133077@google.com>
+In-Reply-To: <20260819155907.GB133077@google.com>
+From: Daniel Vacek <neelx@suse.com>
+Date: Tue, 1 Sep 2026 08:49:14 +0200
+X-Gm-Features: AcwNN1WkYRRvmrS9cx6H6wX9ppPbN-o7Vdk1JkhuHWMyozjsn6o2JUHcNtEnIsk
+Message-ID: <CAPjX3FftK4tz7d-MmwMbHTXbz4Y9L7=TmxkDNnMfghrPtvbqxw@mail.gmail.com>
+Subject: Re: [PATCH v7 04/43] fscrypt: conditionally don't wipe mk secret
+ until the last active user is done
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>, 
+	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jens,
+On Wed, 19 Aug 2026 at 17:59, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, Aug 19, 2026 at 04:22:23PM +0200, Daniel Vacek wrote:
+> > > > +     /* We can't wipe the master key secret until the last activeref is
+> > > > +      * dropped on the master key with per-extent encryption since the key
+> > > > +      * derivation continues to happen as long as there are active refs.
+> > > > +      * Wipe it here now that we're done using it.
+> > > > +      */
+> > > > +     if (sb->s_cop->has_per_extent_encryption)
+> > > > +             wipe_master_key_secret(&mk->mk_secret);
+> > >
+> > > wipe_master_key_secret() is idempotent, so we might as well just do it
+> > > unconditionally here.
+> >
+> > While this is true, it also (kind of) documents that the secret should
+> > already be wiped out by now in case of !extent encryption.
+> >
+> > But I can wipe the secret unconditionally here if you insist.
+>
+> So leave a comment that mentions that it's not always needed.  Just like
+> how fscrypt_free_master_key() does kfree_sensitive(), because why not.
 
-Gentle ping on this patch. It has collected several Reviewed-by
-tags and I haven't seen any outstanding comments, so I believe it'
-ready to go?
+Right. Thanks.
 
-I just checked it still applies cleanly on the latest for-next,
-so it should be ready to pick up as-is.
+--nX
 
-Thanks,
-Zizhi Wo
-
-在 2026/8/6 14:39, Zizhi Wo 写道:
-> friendly ping...
-> 
-> 在 2026/7/25 8:23, Zizhi Wo 写道:
->> From: Zizhi Wo <wozizhi@huawei.com>
->>
->> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") 
->> fixed
->> the start+len overflow via check_add_overflow() but did not handle the
->> start=0, len=0 case. There, start + len = 0, so end = 0 passes all 
->> checks,
->> and truncate_bdev_range()->truncate_inode_pages_range() is then called 
->> with
->> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
->> the entire page cache is invalidated.
->>
->> Fix this by replacing the validation with blk_validate_byte_range(), 
->> which
->> already rejects a zero-length range and is what BLKDISCARD uses. This 
->> also
->> switches the alignment check from a hardcoded 512 to
->> bdev_logical_block_size().
->>
->> Fixes: 0bd1ed4860d0 ("block: pass inclusive 'lend' parameter to 
->> truncate_inode_pages_range")
->> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
->> Reviewed-by: Yu Kuai <yukuai@fygo.io>
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
->> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->> ---
->> v2:
->> Add the fixtag.
->>
->> v1: https://lore.kernel.org/all/20260704073942.3760597-1- 
->> wozizhi@huaweicloud.com/
->> ---
->>   block/ioctl.c | 13 +++++--------
->>   1 file changed, 5 insertions(+), 8 deletions(-)
->>
->> diff --git a/block/ioctl.c b/block/ioctl.c
->> index 3d4ea1537457..3b7d33a737e8 100644
->> --- a/block/ioctl.c
->> +++ b/block/ioctl.c
->> @@ -174,12 +174,11 @@ static int blk_ioctl_discard(struct block_device 
->> *bdev, blk_mode_t mode,
->>   }
->>   static int blk_ioctl_secure_erase(struct block_device *bdev, 
->> blk_mode_t mode,
->>           void __user *argp)
->>   {
->> -    uint64_t start, len, end;
->> -    uint64_t range[2];
->> +    uint64_t range[2], start, len;
->>       int err;
->>       if (!(mode & BLK_OPEN_WRITE))
->>           return -EBADF;
->>       if (!bdev_max_secure_erase_sectors(bdev))
->> @@ -187,19 +186,17 @@ static int blk_ioctl_secure_erase(struct 
->> block_device *bdev, blk_mode_t mode,
->>       if (copy_from_user(range, argp, sizeof(range)))
->>           return -EFAULT;
->>       start = range[0];
->>       len = range[1];
->> -    if ((start & 511) || (len & 511))
->> -        return -EINVAL;
->> -    if (check_add_overflow(start, len, &end) ||
->> -        end > bdev_nr_bytes(bdev))
->> -        return -EINVAL;
->> +    err = blk_validate_byte_range(bdev, start, len);
->> +    if (err)
->> +        return err;
->>       inode_lock(bdev->bd_mapping->host);
->>       filemap_invalidate_lock(bdev->bd_mapping);
->> -    err = truncate_bdev_range(bdev, mode, start, end - 1);
->> +    err = truncate_bdev_range(bdev, mode, start, start + len - 1);
->>       if (!err)
->>           err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
->>                           GFP_KERNEL);
->>       filemap_invalidate_unlock(bdev->bd_mapping);
->>       inode_unlock(bdev->bd_mapping->host);
-> 
-> 
-
+> - Eric
