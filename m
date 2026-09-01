@@ -1,186 +1,127 @@
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF78459AE1
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 09:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788253834; cv=none; b=rGBUGh55UD+KpQQxnUbvmQFkGz/AxveEuCYHIE6Ou/nDZKfQ88KOSobfaPQk717HkxjBUKpTZ0Eq9MDicOX7/U0sINdE91zP5R+7AW8aNRdSqF4MfURtU1yWYTeFnU5e7ufX6UEtv0flcB9hVvlxpJnoFl5om6w5UI1PHEwIQQU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788253834; c=relaxed/simple;
-	bh=MbIyWVV1fDEvUhmmiJrRl8bgUScodrVy2todr24b9xg=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5514559B56
+	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 09:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788254011; cv=pass; b=CF3RiuA6j+xLbEhJvWaV8ldUXD7VJOPDQ1lWflz6oj7x1fpDGN0qMLsgOdADkxZy2ka23EpzSe/ICrjMfKzrLC3n84A8scczeayKrf9FMfpcNuwgKl1BmPgnSFqHd35vl6j0AAQFMY0o73x8IMoWEvapOY2XSnf+YMH2b9deV08=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788254011; c=relaxed/simple;
+	bh=vpZBEto8PoVWCX501jJbndFd75E0wS7eccM0P5s5MNw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MWQTj1huhx59ecr894NebEVbRLx7QPVqCbqqbgiVmeRYPgpO11q9HhpX6AHY1apiSr3MNdINHlB9j5WHyoeIwamZ05WcAIf7kxMX2yUEzg6NhkpTy+ipnQ7FN3laxhD1eCt4jx92gZUUoF4BFD4z/yyWsZKiJFcqu41hE4eL0aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	 To:Cc:Content-Type; b=vFP5kjn9PmeYE5Sm2Wk5Z6O7fgiWTcN2FSaca5o47uVJUWYLF8A0mrwF9e2R0S1n+5Dfuot9Yu1stYV8tfYW5MOavOQ6KYl5z8uRzTfclAkeRIVSvmsVJDosLuzs51e7sx9JAOcRc5Pw5fFW2nVs7GskcWS6E+5Cz5v3iIh/GtE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZ+mdyBN; arc=pass smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-97ea365dd68so877343241.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2026 02:10:28 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZ+mdyBN"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-cc1c7962bdcso525972a12.2
+        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2026 02:13:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788254008; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Eobkk03G6SQ3QnR3X/gtA5XBG9qkGKa3ngExg+ze1HI4FTA9zaLrULthp1fA/T+LzI
+         9f75rUMrGC3l3tBvp0v5+DxlgiOYdWIfj8dpuZZcR9Put4jz2IhQWYmTVHDnwUc3SuHj
+         0BO9oihXDWGup61rAqyQhzoRg7XVQR4sxZ9eY0I2TsySYefS5fmU7L8xYl3Vy92rrQO6
+         ROle3cam8Y6xOIgUwjthse0EJJYhQzZAH/lMSfq7D49yJYHJ3VwkeFhQi+VlIGoH9Lmd
+         xFcb1RANbJ7KvkJNNpjZmXYg68uebUezVlZG8/Jc+PMk/sTjEB1adjrTLMGV+cksPwpK
+         pUGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vpZBEto8PoVWCX501jJbndFd75E0wS7eccM0P5s5MNw=;
+        fh=+/3AkmUdVyoLg1ANcKaV3atFMuMtH/eG1BveTS2WqsQ=;
+        b=iO033ykHj6PcmVJRcjXHET/Js0JmnIzkGSKL/Z6LDi3JVoHtNsjtuzI+NqvH8ycxy2
+         Q+h2ZK4NchV8jxmVExbMfolHdBxN9JL154dEpQ6HP+jp0WQ8A4ktdluAI9LpSDqQYwls
+         awC1NHpE5/CCxjLiigXQ3fi86JrASM04Kixyu95iQGB6ykGuCeszAfFBDRHy5JCBu9n4
+         NEfmS9TKtVOIfxNqnxXFDw57UOH+yYeSJ1NR3GyQNu2Jb/kRXE6EsDDxKWv1fQQlfUpB
+         CgnDqEKTseRQDCYyLnX9W/upLV90RvcjTu7LQeDyfeKmSYjuQIwMF/Dm68SICwXHLMG3
+         Yr3Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788254008; x=1788858808; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vpZBEto8PoVWCX501jJbndFd75E0wS7eccM0P5s5MNw=;
+        b=kZ+mdyBNwGXPB71ZOD5ubeRlNeoMjjm1324iN6VVXQkvPXpBZOKXGwe9aGz315/qq7
+         DhFxQcy2jAL0m7AR6gbdouQyb+NdCmCFlaCQCtUec7n5mwftziRlyOtGCLtRWjHc7P7Q
+         E4K0m4plTvyvZZ3YfnZDYbx1hTAaSP8TtJkOBxL1yG/WXZRN7LMS8RCgfLMHKeNU4EpE
+         ufK18YM1bMOtoyS2wVU/J1IYbcNahUHBv/MFeymV227UYQuzT/V6xGcLvluPmBXfVfbb
+         g2ZZlMS7h08VS6Pph3L85s/aXi/xtodluv1DN32yg0Xr+nJKxQORiav+nY17CWAIG5YZ
+         CT8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788253826; x=1788858626;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=FAHBVIqCMd7JP6CfhiZjkc1474N3IhXqUrk37KgzKlc=;
-        b=Hm67WGzSnnvmpcRdTEQxE9+Jjf0soZcNG1nCtHrOE9hlPJWSJM9VGubENOyUJ8oVlv
-         lF230yON24ij5ZL69HOcVWZALuRYLafScS/hRxa2N5UrYWRxyYJ2Jq5kbBf8kx6vb23W
-         kKg78iXgXdzSipK8iyk5WSZaYLWYAAn3GVm7rcNzazlATCheYwVfCRxCd2lhQi4Fn12R
-         rFiQW7jNfcVEcy6kMHTSEiP1/gC4BTHQufAliV+Rix3qaVMIhxl1t/9Ydta0oMThXqf1
-         bIm0kv4HARCfANZv5//ublDCR/P5q0OnZs1RNKeUaLuLCqH554KGBQ64CZCAY58HRF7P
-         OkZA==
-X-Forwarded-Encrypted: i=1; AHgh+Rp+HXgZjuUf9K2BPr6Gg721ubWZseyT4N2rQvFXFycxOVZbQ60ofZuEdUDpwfZYdJ6F+/vq85lxvFtJ/Q==@vger.kernel.org
-X-Gm-Message-State: AFuF++lDOmgFY28Z8kvMSbJkIg9EraGPjqSFmoR3dXcxwcVNKflYDMNs
-	INpHpBu2LsQK0VYOuwj0A3SxYY3WQO+7hXPDHuU4XTGnN4HlLa4hsKQT5MEMnDXZ
-X-Gm-Gg: AR+sD12jvXAyUSnOLNG5RGYVQdUZQul/dV2v/T4259m4XPO7vM4/4kXG++1H7LAIK+a
-	cRQRK7+eqyutRlR6G+xk1jSmUie2bOnofogzIxku4+RESOjS2tfbUi8eDF2HTY8wvB4huORPofD
-	NHKcVdvXSQe3eciwFO4SC+C3WMrM4RbW/T857psZR0yfKVeoJH2W0vc6TPcCcEFI7YiUxAcYtfy
-	0rDQhOrRmnm+zM+X0C3FA8nSmyB8DDdSMmgFoMU3tBmaeDosEO/lxKuF2hsNRfOiMrfh2v2s6Y2
-	igednYHf9GNEGX0gxKEsbfvMmHABcgl/AmOGg+4MFPKibuUhaVoJ1ohmLOB/KHONXZYJBu/M9BS
-	/PiLWfOgPNvLZgI8msUiXWJUxm43FUEqgMfzoeLeke36X8D34bmJXcQ0Ct+kyqJpi65ytwRbgcK
-	7QCrGzqV4YJB00w0POyvOQO3a+QBfsgdRjsoZgy3yi7Bkw7oEvZoEC9eZwKGUyxnUyoWX+P/Vpc
-	/Hl8KmpiC1Gg95ytlSD4m1vqIJtkg==
-X-Received: by 2002:a05:6102:4188:b0:738:1ef6:51b9 with SMTP id ada2fe7eead31-78597d071b0mr13077029137.5.1788253825844;
-        Tue, 01 Sep 2026 02:10:25 -0700 (PDT)
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com. [209.85.221.179])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7893f43666esm5374270137.9.2026.09.01.02.10.25
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2026 02:10:25 -0700 (PDT)
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5c65093556aso3267765e0c.2
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2026 02:10:25 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrsBJrGTYz7aPBqCfvrFiGjw5pxAALDzculKqPaMbCG8Egpi8poWPZOwF6i8q2uqpBV8HRbWgw2QpJ5IA==@vger.kernel.org
-X-Received: by 2002:a05:6102:3e83:b0:779:c38e:de53 with SMTP id
- ada2fe7eead31-7859956a1cdmr13463869137.10.1788253824841; Tue, 01 Sep 2026
- 02:10:24 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788254008; x=1788858808;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vpZBEto8PoVWCX501jJbndFd75E0wS7eccM0P5s5MNw=;
+        b=bSqR16Ma6X9Km+cWE2UxUiQCMMzHwfbzu8flWHu88UByFu6oWA0+lrsVM0OiSzOU7F
+         vOvV2LaRo2cMeA8BZ1HDl43S7p7V8uqcOX6OdyrBH0bUYlzpgaWSIAmS+IixdDwmIBsh
+         vlsW/T4cWjD6wn+PVdPoBmEGizzZQ/Cy7Xw18up+Y+PyOTPkt9MXwSES3fks3dMZtz0y
+         4wFtlU0gFP4kBIq6809sEwXHdrHCFRTxY0NWSD1MHBgrH75IlWT5b/3rQfyjgyDIpEiD
+         yIg8AAirBXCUCns0YIeokP9iZqscnBJid9hyWYKkgsv9JrUmiF0cwYgfRGYEj57cMGE6
+         c3Pw==
+X-Forwarded-Encrypted: i=1; AHgh+RpGfVt7r+pi4rMxytSoKSmwgRPX2W1J+Pqz4ANLPY9GEfkL5egt0OlTS38sRiKqm0uFrwzGbnybGDDiTA==@vger.kernel.org
+X-Gm-Message-State: AFuF++nuO7AEc0G8tBM1j5GAMRJoCCPBcQlkhaLkghq8HxNR0eDxieNL
+	lE7HxuqjHU1Jry0HyXyXgu2X2DRqty3tk/3dv3axneggLerTQ/d9zt4kbA3zLLlPbSQIkdPkWuV
+	ZOtFClI8NeL/O6VkpWZiBbgZM9R7sYp0=
+X-Gm-Gg: AYBFou34NZ7u5sdKyRKSvPOVIriwNZWK1FoeF1qNlod1VHsu6m0ZNwU2Pdf4kt9neWZ
+	FgYsFH9qEe0iCixIKw1ZBhqb+yXcv73m5hGuY7PpwerDjoha9VTWssaQMyrejfKvjsaUqUHWi6D
+	HMb/4LFNWazni8p2IIXx1dRbNmgzi35KtGBQyyO56nCoIxILrLhElYeDeGQGy6oGv1itIqATtt1
+	9t0X+sgwc0GgvpmhBe2FKbhVTZjoVVxgqW3okDCyZrlrkHXxxIHME5VZx+f+cJpsWUoYx5DB4Cs
+	Qjbqa5hWINTWuomuHBwTNwrYtO6UTf/Fi7Q1dRel7OLiusbKvcKqMoF6s0587CwFYjJluqfVZeT
+	/rpCFLiM1AGJPYwcN/7kLIdreJVfSu6VaJgIkkvQAX2s4nlRq/am04y3cW3i1bJRoeUi/ltc=
+X-Received: by 2002:a17:902:c94e:b0:2ca:de3:15eb with SMTP id
+ d9443c01a7336-2d74ce5e476mr262988545ad.0.1788254008481; Tue, 01 Sep 2026
+ 02:13:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1786929430.git.fthain@linux-m68k.org> <1e349506a7cc6aa574aacbd4c69c240b5a1e3eb8.1786929430.git.fthain@linux-m68k.org>
- <CAMuHMdXgtstGtcbRkrtKtQ+d1c=mCe5zgYZCx4dyUQ_YnVhbbw@mail.gmail.com> <b0f20a10-78d4-e8e6-4001-99f076b99a8a@linux-m68k.org>
-In-Reply-To: <b0f20a10-78d4-e8e6-4001-99f076b99a8a@linux-m68k.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 1 Sep 2026 11:10:12 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXGBT+Xbm+zftBzQEaCgAY2CNUxqE9Swz03se4tVisENg@mail.gmail.com>
-X-Gm-Features: AcwNN1Vv8ix3n1nJubUXaePLSvTFNecD0g75FaaL-e1OfJQWQPFwaJuEm50wUr4
-Message-ID: <CAMuHMdXGBT+Xbm+zftBzQEaCgAY2CNUxqE9Swz03se4tVisENg@mail.gmail.com>
-Subject: Re: [PATCH v2 07/32] swim: Enable clock divider only where appropriate
-To: Finn Thain <fthain@linux-m68k.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Laurent Vivier <laurent@vivier.eu>, 
-	Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+References: <eqzS1cYG2bYJ10oFrfX_D7UVNqb_NuK3wsMUUEXpdBj7yCtzD24WOzI8zIKg2FlD04VFp_R9xt65fGmEqpt6QA==@protonmail.internalid>
+ <20260831-fix-gendisk-block-size-docs-v1-1-900546005799@hotmail.com>
+ <87ld9mxxec.fsf@t14s.mail-host-address-is-not-set> <SN7PR07MB9708ED760C7DDF833BEE80E1CFA82@SN7PR07MB9708.namprd07.prod.outlook.com>
+In-Reply-To: <SN7PR07MB9708ED760C7DDF833BEE80E1CFA82@SN7PR07MB9708.namprd07.prod.outlook.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 1 Sep 2026 11:13:15 +0200
+X-Gm-Features: AcwNN1WeTomQFbbl4m_DFvxroJZ1wjKX2oKzXiA5vqp9Wpi2S2v6pF4_O2NjrD0
+Message-ID: <CANiq72mC6uUrjHQ7Cz41o_=+YPBobf5TX4X43WfDhObaCRBM9A@mail.gmail.com>
+Subject: Re: [PATCH] rust: block: Fix GenDiskBuilder block size documentation
+To: ai qubits <aiqubits@hotmail.com>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, 
+	Sophon Z via B4 Relay <devnull+aiqubits.hotmail.com@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Finn,
-
-On Tue, 1 Sept 2026 at 09:56, Finn Thain <fthain@linux-m68k.org> wrote:
-> On Mon, 31 Aug 2026, Geert Uytterhoeven wrote:
-> > On Mon, 17 Aug 2026 at 03:55, Finn Thain <fthain@linux-m68k.org> wrote:
-> > > Some models have a 16 MHz FCLK oscillator and others 32 MHz. Put this
-> > > information into the swim device platform_data so that the driver can
-> > > correctly enable the clock divider. When this is enabled incorrectly,
-> > > nothing can be read and failures from the Error Correction Machine are
-> > > flagged in the error register.
-> > >
-> > > This is chip initialization, so do this in swim_floppy_init() rather
-> > > than floppy_open(). Drop the udelay() which was apparently copied and
-> > > pasted from swim3.c, where it relates to interrupts (of which this chip
-> > > has none).
-> >
-> > > Cc: Joshua Thompson <funaho@jurai.org>
-> > > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> > > Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
-> > > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
-
-> > > --- a/arch/m68k/mac/config.c
-> > > +++ b/arch/m68k/mac/config.c
-> > > @@ -984,8 +984,37 @@ static int __init mac_platform_init(void)
-> > >                         .start = swim_base,
-> > >                         .end   = swim_base + 0x1FFF,
-> > >                 };
-> > > +               unsigned int data = 0;
-> >
-> > Nit: in the absence of a real platform_data structure, please use a
-> > more explanatory name.
-> >
-> > Perhaps s/data/s_fclk/, and store S_FCLK_DIV2 or zero?
-> > Or s/data/setup/, and store the full register value?
+On Tue, Sep 1, 2026 at 4:00=E2=80=AFAM ai qubits <aiqubits@hotmail.com> wro=
+te:
 >
-> I looked again at this but I still can't see any uses for the other bits.
-> So perhaps I should change it to:
+> Thanks for the review and the Ack.
 >
-> +               bool fast_fclk = false;
-
-That's another option.
-
-> > > --- a/drivers/block/swim.c
-> > > +++ b/drivers/block/swim.c
-> >
-> > > @@ -807,8 +806,10 @@ static void swim_set_parameters(struct swim __iomem *base)
-> > >                 swim_write(base, parameter, mem[i]);
-> > >  }
-> > >
-> > > -static int swim_floppy_init(struct swim_priv *swd)
-> > > +static int swim_floppy_init(struct platform_device *pdev)
-> > >  {
-> > > +       struct swim_priv *swd = platform_get_drvdata(pdev);
-> > > +       unsigned int *data = pdev->dev.platform_data;
-> >
-> > Likewise.
-> >
+> Understood. I will leave this documentation fix as-is for Jens to pick up
+> and prepare a separate follow-up patch after it lands.
 >
-> ... and change that to:
->
->         bool *data = pdev->dev.platform_data;
->         bool fast_fclk = data && *data;
->
-> I am unsure whether a NULL check is desirable here (?)
+> The follow-up will add a helper in rust/helpers/blk.c for
+> blk_validate_block_size(), use it from
+> GenDiskBuilder::validate_block_size(), and update the documentation to
+> avoid specifying a configuration-dependent upper bound.
 
-In theory it cannot happen on a sane system. But recently people started
-hardening drivers against misuse through sysfs' driver_override and
-bind attributes, in which case the pointer would be NULL.
+Note: I don't think your messages will be accepted by the mailing
+list, since they use HTML. Please switch to plain text -- thanks!
 
-> Interestingly, that NULL check itself is sufficient and so we don't really
-> need the flag at all. Allocating memory for this bool is a completely
-> pointless kmalloc.
-
-Sure, but readability and maintainability also matter.  In the absence
-of a proper driver-specific platform data structure, having a boolean
-variable with an explanatory name is better than an obscure NULL
-pointer check.
-And what if you need to add more data later? At least the bool can be
-safely replaced by a larger structure with a bool as its first member,
-without the need for a single atomic patch.
-
-> > >         struct queue_limits lim = {
-> > >                 .features               = BLK_FEAT_ROTATIONAL,
-> > >         };
-> > > @@ -816,6 +817,8 @@ static int swim_floppy_init(struct swim_priv *swd)
-> > >         int drive;
-> > >         struct swim __iomem *base = swd->base;
-> > >
-> > > +       swim_write(base, setup, S_IBM_DRIVE | (*data ? S_FCLK_DIV2 : 0));
-> > > +
->
->         swim_write(base, setup, S_IBM_DRIVE | (fast_fclk ? S_FCLK_DIV2 : 0));
->
-> Would the bool be more acceptable? TBH, I'm not sure it's an improvement.
->
-> Thanks for your review.
->
-> > >         swim_set_parameters(base);
-> > >
-> > >         /* scan floppy drives */
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Cheers,
+Miguel
