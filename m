@@ -1,184 +1,133 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6643AAF54
-	for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 22:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079503043DE
+	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 02:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788214576; cv=none; b=egYn1zObEgNSZ7gZ8NiwCqMD10mj18HuUgg5shE5/Emv5dd3QBdEPo6Vag7KjSWUhYqBv+BfEpICDEyoeRsGZHmq0SvKEJwGzeAi4Yso8rkNkih+tVhGiq0/i9OIPhx5l6oIqfiY1RV+Yx94Z8aL6nTTZnyZ3lU3Je7IEBsgzcs=
+	t=1788228164; cv=none; b=irQIsmzbJSk5dFCW9Kc6lxt3Owz7xNwKCQqhR6TFTSbhcsmCi5g7/yNPu0ej2Ilu6NBl7r6Nkt+y3f1to9sdP/seZd4XD7Tq3cs3BbXXmIB52Oi80DcGdRYMZncQ1HYIYgjQXtrq2OhuNtIsx9xp2p4N1dgbLj++uMNMWt5/a5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788214576; c=relaxed/simple;
-	bh=n0uh/N7eWZUb0RjMv828tkY0P84MX7NtYM9Lx3Rv6Ps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6QHU+cM1txU9ihE4E+BC27yViw7rqkZz/+pN7WfwKHp7WA5Ii4PSxdCZKUTj8KVHecsQK7fVflGXQFOeqJ+nXim6W7iCKDS9CDgQ1ro7BEN6JLtRoEiFEaA+jImxaVNHpCRYYcQHmuC7Y4WEcLNtPgnVetiEMkDLOs8zofkTQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=da5qnH1W; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1788228164; c=relaxed/simple;
+	bh=DKAZQ4HB8RVRyPINtHAlvihaYgNW2N0m1l6ppV9ct0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dG1Wuf5XusbAQV7DVKPqrxL/oMoYzF6YX4me2fLp3TVgz0Hvli1U5x+SxPbbYT7aPtSB+Jmn6V4EJYIiMHq7oV9X/rRNMOwTer3yDHiJuv7R8yFHzHnYcEWFKbUtJadukQricipqVpzHWZ65156h7Z+F6ieLz6mk+CM0SfTWb7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m3ypPjrY; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="da5qnH1W"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2d6f9e2f681so38914895ad.3
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 15:16:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3ypPjrY"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-cbe827e3cb4so4550836a12.3
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 19:02:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788214574; x=1788819374; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=itoTfTA7PQdk1phHOoJqHytihyiYJY8mf5sirqQA+ig=;
-        b=da5qnH1WO56PfoGb2YbHDEb0pb4p2F0mwlMUXEouj9MY1ri/8D0/oxECfIvORCgy3v
-         45WN2K23zpku7GSLctlp/Q6FncpT3etJy8QeuUXtImhVFj3QTE89qbvhZE+TTe1yVcWl
-         XP39Ow5SRV56Khrql82EO4TH0OCvshoCb8aHSmhchz/Jf7anD8mb/HPkrWJMubH3zppg
-         vUpz38TudVh5DPP46ZR94Rlr0G9qB7oAh2nz4DbqDRVEAfnkumubUSfxljy2DXEty2MW
-         8OZWPlFk3CWizA4mSZm+GxOCzUnvaKwZfm7rUdyz/OqsN3vwRu3NtiNZcuNWJGiHAB0l
-         bYfw==
+        d=gmail.com; s=20251104; t=1788228148; x=1788832948; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=xndijz6hV8q9in3RSA1ablFs8VlKyT94mnXwH4oGlXE=;
+        b=m3ypPjrYii6n/6JqvApbVSBQwf8fPWfJqr5KrTxkCaHfpDrNumXOJkTKe87EZmT5u9
+         IFVhRFkYDnKN58EWJ8zfCc+GHPPiNXfFWEinFk3sIYoCK/C1eoKS0FNX8qGIw0Z5bDd5
+         ivUOg7CqLSC03SLe53kynnVI8AilnfyBraZBwMkxVCFFUpHLFHyefp9qfRqAG6A/jb2g
+         k5Sv0eg5pZsZivr+0WDiBHbZnC304OTSOwa5WHh38xNyRSAFrrPWSzqysoqJ8EEedmRM
+         6gEJigwdlumWYiEmU2qGy244xRLLir7TrHpd+BjZ7coUA+BbvZeB4N+GGRDQcbhq6wOK
+         1mZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788214574; x=1788819374;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1788228148; x=1788832948;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=itoTfTA7PQdk1phHOoJqHytihyiYJY8mf5sirqQA+ig=;
-        b=LfE4Kb7mlZ2sormV4RGi2DiKUZ0/fKAp5zuR4qB6iSsPLwvgm7yl+L2xLRj1HoxjIl
-         dvXX5HHFsqawc1LxiI8+yEdidpCqE7oojTtcdBanTVq70hzXcYN6fIFY1vCsH2UPr4Mi
-         QZQYeZkEWc5AdABqPSsdx7RkFgZo9TyziBTwlt8U/jUTkc8exAs2NHYZj00IYOaZKpsQ
-         Pq7Hw/KiaWNI2wZPPuOt6hp3iYoOdhXGFYMWUJtrGbGIbQNTSynvEIcqjDaZKeTsMEIX
-         HaYMZronzNHp3jNt/Vk3vuiE47VDl8S17hwU9PzT2sZNdYe5W/Y9fN2bZu8k/4J6/kxD
-         uI8w==
-X-Forwarded-Encrypted: i=1; AKwUvBzmi9Jxr22Bn4epmH1aTZbUHLHo7C3W0b2IuZN4bhWtM9gQ6MLGYVfJQfIhzuwmshUaY+TbQMucgtLcdw==@vger.kernel.org
-X-Gm-Message-State: AFuF++lK7diRalu2otxOQS+mdfvaW/4bLO/+b1Z3lxNC0BYPTRN2L39D
-	piMdyta1EU7QfZ5p193nK91cAw1Tf8wobWhWLCMUQe3PFB9rqwzLT+4I
-X-Gm-Gg: AYBFou3vc5J/EtItsJU+S3S5R5bpTkdeMBwKK1ycEWZe/kMcv37h9XCwKw3Px+apCd3
-	r7zCmdAKhnhmHEP59nt9tssyl2SkxEaduEQipurCeLvJKSuZVaVXczMkBy+7yGfmqb17eqVUkO/
-	s+9TMT367PVv2vNbwqPfAWK49IH6ESHex8yWXxNtOWuVLno7b1xg19mtvnr5xhSboYcuV2Z8JqS
-	g9/NNW68zF/kXffy302OHQcGbhfjPgHj+cMCvavXBB9DQA7Li45E5Qw6AZrP/OE74fyksEPlNVj
-	+AD6nZFGhGk/v3vcNbnHImnwguWwoLKXCnH1evyAAblmX+LdIzb2mTVvBJ+GmoaLY+Bu5IlAxEl
-	99qQ/8VQO3NayBOW+M0WYQgEeWfAaLnMTgbmZY9ULZUrL3M0aqLLM3FUzX2JD1+zZlHkqQAs+q9
-	dvsxn/eU8MQlFWrXPa3vrr6v/B0ICpBEYR9dN8RGjz2PCE7PedAIHzGC4Sgj9uu4O2UYVnmsysl
-	QojSe4SFg==
-X-Received: by 2002:a17:903:1850:b0:2d5:e3ce:3988 with SMTP id d9443c01a7336-2d74dddceebmr476446215ad.11.1788214573604;
-        Mon, 31 Aug 2026 15:16:13 -0700 (PDT)
-Received: from devvm16600.scu0.facebook.com ([2a03:2880:9ff:6f::])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f995e60sm33397369eec.22.2026.08.31.15.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2026 15:16:12 -0700 (PDT)
-Date: Mon, 31 Aug 2026 15:16:10 -0700
-From: Ziyang Men <ziyang.meme@gmail.com>
-To: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Ben Segall <bsegall@google.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] cgroup: expose cpu.stat and io.stat to BPF
-Message-ID: <apX9KtGrmfA7u0zV@devvm16600.scu0.facebook.com>
-References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
+        bh=xndijz6hV8q9in3RSA1ablFs8VlKyT94mnXwH4oGlXE=;
+        b=ZXK01TrkBB2aabTb9I/wXH+Nau+8+WYPCz4V1Asu535YT+XVLUxdY0fFOwD2vTZitq
+         ZPD9GdJ8/f2kPHGBeYMAeGhV5Sy/6DDzkOUHOntV6lkL9yi9q2BhJw8K/nZlSyxg6WFF
+         OwyR+nXsyg7iFEABgezSfMC3Q67YLDuulXyFjMYB1M5Xjpk0jfd5y27efr+ULqD4/Uq5
+         JQPlyxwuNSPEybVpz0HIv840lxWL4YOFWk3t5Eqq9o0jwNOkwwrzHEhl/2dl+M3DRTAt
+         ap17Mcykvrj3v6JC/zybjiOkvtZUdAS9EgpUMoRMPGwknuBAMiJCow4R94AP8fuv5Gx6
+         Zk5Q==
+X-Forwarded-Encrypted: i=1; AHgh+RoJXidKiz8AyiRFossyC36uAt4kkaB9i9jzl7rWI3LpOr8xZc4BPVYD+Q/Wjt4I70XMT92ADZUAH/biYw==@vger.kernel.org
+X-Gm-Message-State: AFuF++mlT+gn0xIXPvdjWtnCnD3LSTrIW4cQZwj2DikVdYWBNS5xMIK2
+	xhZO4Ont8TJ7G+M/YIJdSw4TbiRG9IffJ6yoDHFyT6lRN1yAm/v8RFFj
+X-Gm-Gg: AR+sD12D19TTeWFlRYEgysaIwfziDG42LU17mV0nJNJfu7PRHsoplCZYMv9h+/D9UtB
+	EPgA1p9DBK6h/hpGOgd1zbeWTSXFFhH3xP0q66Cj8xGljyK0KU+mzErIV+W8mpdor7EyETLSG2t
+	skkzYKdtOw4mHN4aCeOYLpD0tFpaQyIL2LyxyWm12YQd64eivm7dMik6NYST+0nxlTiQImHdriu
+	mhe7bY21xpJ0JFPypANl6yS8uQw/xz1eVK3/Ojz8CANFLuNmmeag4jkeEJEOVFccAQqaQ23opqD
+	fNlkcXDFrP7TFCyLkSLNU4MDCaBgnaIcrIb3tWufmNimc1mY1hiF0IuExMTkqqsGYg2a/2qj6+G
+	X6XtLJ3kO1q8+hdPpthZbxTBA23eHhBdIMXxaK02nIq9hlMdBPQV+vmp5QPTwBbK/LM0D5PPumP
+	RjfDtu5n25GShcNgZK2KwtTwqppWPDeb0uSKq16LcghhrQ0tZXI4KFz+f6bO0OjT+hqMtCHplrY
+	aqPfUdq
+X-Received: by 2002:a05:6a20:d502:b0:3d3:aec2:4dc8 with SMTP id adf61e73a8af0-3d7b0548a7cmr8045683637.20.1788228148286;
+        Mon, 31 Aug 2026 19:02:28 -0700 (PDT)
+Received: from [10.240.116.157] ([122.11.210.25])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc1f36e8ee6sm5115496a12.26.2026.08.31.19.02.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Aug 2026 19:02:27 -0700 (PDT)
+Message-ID: <7b007eef-2f6d-c86a-065b-85eb85b5ee0f@gmail.com>
+Date: Tue, 1 Sep 2026 10:02:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260820211758.3393984-1-ziyang.meme@gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH v2] zram: fix idle age_sec underflow in idle_store()
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, minchan@kernel.org,
+ axboe@kernel.dk, bgeffon@google.com, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, stable@vger.kernel.org
+References: <20260828083149.45760-1-jiahao.kernel@gmail.com>
+ <20260828102446.3eb7f3dc779753b831e33fe6@linux-foundation.org>
+ <apT-ocFYDmU6iC-j@google.com>
+ <c961850c-09d0-3366-73e0-1932c1dc00e5@gmail.com>
+ <apVK4g2ikVJe_Hcg@google.com>
+From: Hao Jia <jiahao.kernel@gmail.com>
+In-Reply-To: <apVK4g2ikVJe_Hcg@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Reviewers, 
 
-Just want to follow-up on this patch series. Please let me know the possible
-issues and I will fix them. 
 
-Thanks very much!
+On 2026/8/31 17:38, Sergey Senozhatsky wrote:
+> On (26/08/31 16:37), Hao Jia wrote:
+>> On 2026/8/31 12:15, Sergey Senozhatsky wrote:
+>>> On (26/08/28 10:24), Andrew Morton wrote:
+>>>> On Fri, 28 Aug 2026 16:31:49 +0800 Hao Jia <jiahao.kernel@gmail.com> wrote:
+>>> [..]
+>>>>
+>>>> Thanks.  Sashiko asked a couple of questions about this change:
+>>>> 	https://sashiko.dev/#/patchset/20260828083149.45760-1-jiahao.kernel@gmail.com
+>>>
+>>>
+>>>> Does this early return prevent marking valid boot-time pages as idle?
+>>>> When a page is accessed during the first second of system boot, its ac_time
+>>>> would be 0.
+>>>
+>>> There is no possibility for zram to hold pages during first second of
+>>> system boot, regardless of whether zram was configured as a swap device
+>>> or as a block device (mount-ed with real filesystem).
+>>>
+>>>
+>>>> Can the early return above bypass this zram device initialization check?
+>>>
+>>> We already do that, e.g. when kstrtouint(buf, 0, &age_sec) fails.  Apart
+>>> from that, that's not how one checks if device was initialized.  We may
+>>> want to consolidate those checks, just for symmetry.
+>>
+>> Agreed on both points -- the early return is not a new "bypass", and
+>> the write() return value was never a way to probe init state.
+>>
+>> How about moving the init_done() check to the top, so all the early
+>> returns sit behind the same device-state check?
+> 
+> Yeah, I don't know...  Moving it under device lock doesn't buy us
+> anything.  We don't need device lock to validate integer rangers,
+> etc.  There are validations that we need to do under device lock
+> because those require a consistent device state.  But things like
+> "is system uptime less than supplied sysfs data" don't logically
+> require a device lock.
 
-Best,
-Ziyang
+Thanks for the clarification. The current patch is enough, so no change 
+is needed.
 
-On Thu, Aug 20, 2026 at 02:17:54PM -0700, Ziyang Men wrote:
->Collecting cgroup statistics is expensive: the existing method is to
->open and parse a cgroup file for every cgroup of interest. The memory
->controller already has an efficient alternative through BPF; this series
->extends that model to the CPU and block I/O controllers.
->
->Patch 1 adds the CPU kfuncs, and patch 2 adds their selftest. Patch 3
->adds the blkcg kfuncs, and patch 4 adds their selftest.
->
->This v3 combines the two previously posted v2 series:
->CPU v2: https://lore.kernel.org/all/20260818002450.3071325-1-ziyang.meme@gmail.com/
->blkcg v2: https://lore.kernel.org/all/20260817214205.723267-1-ziyang.meme@gmail.com/
->
->===
->Changes since CPU v2:
->- Rename bpf_cpu.c to bpf_cgroup.c and use unlikely() and container_of()
->  for the task_group conversion.
->- Remove bpf_css_flush_rstat() and register the existing
->  css_rstat_flush() in the common kfunc set.
->- Remove the SLEEPABLE mark bpf_cgroup_base_stat().
->
->Changes since blkcg v2:
->- Add bpf_cgroup_css() and bpf_css_release() to keep a controller css
->  alive across the sleepable rstat flush.
->- Add an RCU-protected checked css-to-blkcg conversion and make the blkg
->  iterator take the typed blkcg pointer.
->- Use the existing css_rstat_flush() and remove bpf_blkcg_flush_stats().
->- Do not expose root io.stat values.
->
->===
->Changes since CPU v1:
->- Make the rstat flush generic, move it to rstat.c, and make it take a css.
->- Expose cgroup_base_stat directly instead of repacking its CPU times.
->- Replace the throttled-time aggregation kfunc with a checked RCU cast in
->  the CPU cgroup BPF code. The cast preserves the verifier type needed for
->  the BPF program to perform the per-CPU sum itself.
->- Remove the scheduler changes.
->
->Built with LLVM. Pass test on v7.2-rc5.
->
->Ziyang Men (4):
->  cgroup: add BPF kfuncs to read a cpu cgroup's stats
->  selftests/bpf: add cgroup_iter_cpu test for cpu cgroup kfuncs
->  block: add BPF kfuncs to read blkcg io.stat
->  selftests/bpf: add test for blkcg io.stat BPF kfuncs
->
-> MAINTAINERS                                   |   1 +
-> block/Makefile                                |   3 +
-> block/bpf_blkcg.c                             | 138 ++++++++++
-> kernel/cgroup/Makefile                        |   2 +
-> kernel/cgroup/bpf_cgroup.c                    | 100 +++++++
-> kernel/cgroup/rstat.c                         |  54 +++-
-> tools/testing/selftests/bpf/cgroup_iter_cpu.h |  22 ++
-> tools/testing/selftests/bpf/cgroup_iter_io.h  |  17 ++
-> tools/testing/selftests/bpf/config            |   4 +
-> .../bpf/prog_tests/cgroup_iter_cpu.c          | 259 ++++++++++++++++++
-> .../selftests/bpf/prog_tests/cgroup_iter_io.c | 254 +++++++++++++++++
-> .../selftests/bpf/progs/cgroup_iter_cpu.c     | 113 ++++++++
-> .../selftests/bpf/progs/cgroup_iter_io.c      |  74 +++++
-> 13 files changed, 1037 insertions(+), 4 deletions(-)
-> create mode 100644 block/bpf_blkcg.c
-> create mode 100644 kernel/cgroup/bpf_cgroup.c
-> create mode 100644 tools/testing/selftests/bpf/cgroup_iter_cpu.h
-> create mode 100644 tools/testing/selftests/bpf/cgroup_iter_io.h
-> create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_cpu.c
-> create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_iter_io.c
-> create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_cpu.c
-> create mode 100644 tools/testing/selftests/bpf/progs/cgroup_iter_io.c
->
->
->base-commit: 3b5f4b83c4abc0c9b0a7b9e2b44e816611b7f2ec
->-- 
->2.53.0-Meta
+Thanks,
+Hao
