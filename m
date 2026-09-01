@@ -1,129 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C40E3A6B8D
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 14:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788274428; cv=none; b=ppImJS7C+iDw5+Wve177GeOBwpzy4tVh9hkIxKdTiLlsDN/x636BF868Vb+j38589ZBe3ahyn/2FFcgDTXvCVDr9RHHeKSLywT9/6L91rm4/RxlisdkwMwkx6Fbyx9BSRVQsrY7xm6OIGidZz2XHJe9C3+Ll1BLd+swguycnFHY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788274428; c=relaxed/simple;
-	bh=hmmmQfae2hxyCJQidJGci5Y2uZPW3r9YqvFfdm4bTmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gcd7l23U9CBFr631Bhr+xE9GMXgpBfsj9s0ZgJfjJdeaT7PInA+gu+O4qCUSrjF4qKItVLS/fj+U0sa0qtH05m30HhCxGGcXZFDGYzbDWUnTmw57bIC8EWzvcJU5dWFCXbKuUz3ZgTWTfbQoIatGfJaDG2D3qPelUlTXU9m8KiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PYUXpeIt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cMYng27y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E971A6838
+	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 15:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788277562; cv=pass; b=i0hwcIQykK7ZsDCssxC+jUXIqZ4a5pt/i05uxsfHeLlkWRjHcQk9gMbjU3PJOv2zQpMCaAfCHpw5gMMk/1j0ENGUjcPdZ91lwWjpXFGAINkKUZCbSk91elNffpSnBvjeXApaGXgwyuLx4pbTCTGWyEON//yIIYqRc7IgCNTHsCM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788277562; c=relaxed/simple;
+	bh=eDOwdQXSRtgOf4mTyaflzKqNbnrUr4pbbePUikXSLlE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UC7przJoo/U4V7+YbdpjQ+1O1fwU5H0ywrj46W87LKpevNAdeXirdI9aWhmbHSaqCkvO7USLDg3mSvMcTOCrI7nWX7HR7HQ7AZNmxM29Klt1pfnHGVsY3dZ7NGUkLhpWUA0u/4aEXBN0B0SLj4G6qwxkiVliuPSolOlUHYut9+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeLD69Jb; arc=pass smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYUXpeIt";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cMYng27y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788274426;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fbyTpneZ+04gfzP6rRWP45g5+NNCS/n/AJeJwyZrfWY=;
-	b=PYUXpeItEk3U7+3wEVV1EHaGFlgo7sLyJ0NUXb6uBtfcFTQjHFzynjfUPDpm3N2SSOrerv
-	cAX1PKjeUyJmw9yrrgkmolF8JFq8Am7XdrIGD/vSMt47/olqzpEKNsBMvooARuw3pCT3QN
-	4eFvOpHd8j/L6/nMYf7+CJUisqThnQE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-z2P8S9o2MoytsipqfJmIaw-1; Tue, 01 Sept 2026 10:53:44 -0400
-X-MC-Unique: z2P8S9o2MoytsipqfJmIaw-1
-X-Mimecast-MFC-AGG-ID: z2P8S9o2MoytsipqfJmIaw_1788274424
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4997b060af8so8244665e9.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2026 07:53:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeLD69Jb"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7f4f53975e6so807235a34.3
+        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2026 08:46:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788277560; cv=none;
+        d=google.com; s=arc-20260327;
+        b=K1RHBpAuO38ujGWr8zFiqOTm0pq2Zbe2U7SCXQ0zk9QGANXiR4mBDY8egnzWaWLsFV
+         RHte29olC57cc6cD/RnA6Z1bRJu/BwisQTpoAQ0z0AasYFl2QXL6gJ8o3P2/KTWoz2bB
+         LYVOAX1Wd17YxynN/t29Rc9AL7a684QheVUQ1RsyKm4IOrnVMwZE1mh8jfwGbq17aqY/
+         BSpXhgQooN33T6myst3kzoxjsuZkU+HyKL0mllVEN6r2Ot/IH7QIgpR60I+TMcTyOnyf
+         23nSuAe1snmUACeOiISAibk4hxuLYgBvM/VIWCeqUzvDjjwYXH7ItuWjvIScXbXG9Qcg
+         C1Wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=gsQFi1OZbsAa51qs2HRH0J2IDHT8L9xs8AMXHKs0Nzs=;
+        fh=5pifgl4p3JNpH2WvIzWvEY6PQEfWtVTMuqKSWkWHHak=;
+        b=NTkQR+kAKrQpQAEMhDf/PmX1NObxz/HerDqbiSdFwJqWUzT0Y9TAucgLEbzKXvVUw2
+         xw0+WTNGHH/5K+7Jr9861wmsTuxkVrAnJKhYM/KkmgJM5X6qFMGqo//09JATmc/MCmDV
+         mI2IPPDUUaCyqQRN0iTwmW0rjjGd9PXxOzhs3qATPt6HZqGHXeFSvhnB0gmv6i+WD2IT
+         PWy6PZA+5OMUn5Qv37OcpqRmPvDFdsK0WmDLEYx/oG3hdhmIInsWpBvx+Qt8OWAMlaFB
+         QkrgcOhPOuYhiKVlQoD8z3N97X80T1JCtryglMkX0h7rVclG0nNaNLeeUQCGt8SDkSJe
+         bmLA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1788274424; x=1788879224; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=fbyTpneZ+04gfzP6rRWP45g5+NNCS/n/AJeJwyZrfWY=;
-        b=cMYng27yoTdtueWNdq4/x2bGozJAuOPnqqzUMH/avf/o1VTFGnutt0sUk2/NqOes2v
-         iyLtpFzJwGZpe9oeWRjSexuxXdRpAx4Q1i1RozroA+n/GTIipibCLWmTcst4jPg3yAm2
-         lSjD50OzuzWVLEeZ/9xAthL+UofwzL7WUQAFho3dlqJDqEBuZWlU7TYQRNrdauq1iG22
-         g0GF50++XJ0JLVO4D8ptYLhvuDqrSPXeGt1kB2uxpMB2R7mqkSGeQ7mYvt4M8H2wXn8X
-         uM07m1DqTkMEolLxC8t7S+8iW3ENVueVShrY4mECN1JFlBYrdVO8245FHjuJ9NcU89Md
-         bC8Q==
+        d=gmail.com; s=20251104; t=1788277560; x=1788882360; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=gsQFi1OZbsAa51qs2HRH0J2IDHT8L9xs8AMXHKs0Nzs=;
+        b=FeLD69JbsHIAxDWi6r76ivUtRMUHszrYWwV3ny0LM95P5+sEsVjubd4zy6KvUOf+PZ
+         utlWLWqBeg5aj+pXKGr4lcYqG4NH7lmulUwXt9MqdXa9YdvG7/CDadSGzytx6DvU7a+B
+         2mRz9wJZUpIGLnRgxdmXGsUBYnQIxmrgd9ce9D+64RHKXB4G8Cmu1mvBZYgfXgXTjNax
+         wVG8HCSM1ipYHazASi83xWTZranH8duNAlos/cggpwzPtexoVwSOgs+YY7CZscyMcrXN
+         /6MVobTkVGnYVCxdPEZQzMUWZKfFbfAAHzXKnxQWUQGuCqwMhE0eLvJ+WMnUAolpVHYm
+         hBtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788274424; x=1788879224;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=fbyTpneZ+04gfzP6rRWP45g5+NNCS/n/AJeJwyZrfWY=;
-        b=cxFw5rsU3G9SCfIFuyKdcJcqsXuxdvq0uemeJLfyYRVq9AmgF5218rwq1xTaShImRm
-         uRuUu0sw/Bo460hYc67qHIIIAboVfp80cOc1jcd7hX6bJKuflRymFr1VU5gjWD+TtpBA
-         bc9UTZAbl2CrFJIdFwoEkX73izcCfgvinriwxMqhzrhrTO6wVJ1kX5hTGdEb1lqw8eCo
-         c+pFpAlL8tHNs4yeH2JTROg48d+gfNl6cD3EVWuy6cnzXVEmS8YfLr4H5kDQ9SinMWzC
-         WHRpEbfito8pqSAT57C11Ojvza4/3cRMnoDoE+ofjAbO8Mr4txWMmt99Hxm+Sal0oEWG
-         RbsQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqiyLpxJp71AA1lCM5XpQwAOzONhBxQ+IeZPGyu9FkBBsNOO1Rj0V9l8lLiqQboIzqNoQoTeU1fPSRhHQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++lvKtMpuowdt2z3G5a1x+BM3w7cmhbq+D+tqIiMWYfYWfBfJ1U6
-	9j/6NpkSkqyq4TmZOXRqkbcc+VS29k/MlDrooc30AISzYcFldcWI0Ykgrtafk9o4ojm+HPRxjpl
-	qzBqaY49cNGAmiEWvxstpTAEeUdAYVWemnP/0sYQB5PzC7NnlKjQqdTKYXJ0ailv9
-X-Gm-Gg: AR+sD134Y3rXmIEYuS3+bineUyWCLyu17aNHxz2B1nt82LTb12UQAyfgC+gveJigp+G
-	zKuvUyenqn2LDbkJJtgZ55nJSsh2cYr7cukd1Sqip0bmYTAUALf8SaWnYuBx9bD6/O8WqhSlpld
-	8VZIlnEh/oqbem0qztkLZ+jNVQSmBnkLgARhXgRjU2mDRk0O4Yek0tMwrdnRn7g/b9qxyyhq2KG
-	YvF4oKTtBjSHebVWHL6QxL5Bc8xJKWK1dxq8Mo1rwC/cEktSIP/VsRCLrtCjffGlKwOpkayNSlY
-	h6bPkKg4/0gC3DPWt59tgNJwxYN05GI6HHm7dVay2Vpk77csfKevtdSh5zw3+UFqO85sDkWtwL1
-	jfL83kPZJLVNHPk3UDvUl7Q/dtEA2LMwIaXCGv6KAJSE=
-X-Received: by 2002:a05:600c:4fd2:b0:496:c9cd:e7ab with SMTP id 5b1f17b1804b1-49b91c22421mr551346985e9.5.1788274423688;
-        Tue, 01 Sep 2026 07:53:43 -0700 (PDT)
-X-Received: by 2002:a05:600c:4fd2:b0:496:c9cd:e7ab with SMTP id 5b1f17b1804b1-49b91c22421mr551346135e9.5.1788274423285;
-        Tue, 01 Sep 2026 07:53:43 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cdce08b8esm65734725e9.3.2026.09.01.07.53.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2026 07:53:42 -0700 (PDT)
-Message-ID: <4bd634b0-c8a7-467c-9c08-40e7ab37eedf@redhat.com>
-Date: Tue, 1 Sep 2026 16:53:41 +0200
+        d=1e100.net; s=20251104; t=1788277560; x=1788882360;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=gsQFi1OZbsAa51qs2HRH0J2IDHT8L9xs8AMXHKs0Nzs=;
+        b=ruPSI6jzpOb+8RFep5n8h7KHTO+gmjqmxDL+4kUWBzqXhZm7f5huUChJjf+5PcrzSU
+         nHJEQ3gUA2+Va5lD9AS5Pyivifks+7b2/c2GM5M+0/rBy6gOH9tyP7dgQ5A2IuK4tZ+s
+         BkJxGudXnivvBE7NzttbfprUXYwI/yLksPrL3GWyWhmwaCPPCFxP0DNOafJOLquAGKdo
+         KnQ30s6aYKXC0ePqboxRCyDTJypWSdKVNWNrnDPDoKt58OS606/KQLAcGxSBZBz1Y7Lz
+         riJT+8EnOhIulzCOrNn38ZvOJf5by4PikpRlNlEHAys3WusHefIAnloaWxTORZOrTHvr
+         k/cw==
+X-Forwarded-Encrypted: i=1; AHgh+RrMtIWG9LX87AQpU15ExyDoMMaJ4tXSar9xqfStUsRyaKJj78g1dMoQn4CFHHgyK2eYTz2xBHwK1eOGyw==@vger.kernel.org
+X-Gm-Message-State: AFuF++kv3mH4maRrT9KddGFtPIwR8ZK36qiKSLj2dpHrhC5reaNYMX/s
+	uWB4YBUNjbogPn5/46lJVBpjkiHYPs3ms935+WM/NE1mXSPYYIeXk4nk9vbJfRG43yLlareitCS
+	Y86j0dIyz3/7/e0k81B6r3TUK9qwm/CA=
+X-Gm-Gg: AR+sD12UQcRe0rJ5WKr+NlDBnKFY/HX27e+DURPn9Ryx1ZcrO184ipVpcbjiwTyexH2
+	VysGGnDbN8Z3xmIaOXaM7vS5a14sJ+I8X1b/ur9Y1r64LjxQSisCZEOL1Ogrp65Zja56leteHor
+	4asAAIfJqXJkD+RbTzd1FggL4pon7+IhXJNiB/6gz7YRICImLJaHPk6nPElYCZFDeuMg1DFbpSk
+	BULcyTMMmwyPTFr6JgzAUOnzEkDud0Vl+e/FoIB3W4mdrIpuqxDADF2meK6tZymEjzRM1EJk4rg
+	/8olrDlDFA2LPYzq2j+NL/rn0PwTZ4rURfnBqYC51ALo+AF/VwBL0987xg+HwAP8FLNu7eg3L3b
+	HQRISouUZtyNxN6Y2K8o6k/Kuzth7g0tWTyj1WYTnh7P3
+X-Received: by 2002:a05:6820:4dee:b0:6b1:d18b:4057 with SMTP id
+ 006d021491bc7-6b1d18b4cf3mr27183383eaf.14.1788277559579; Tue, 01 Sep 2026
+ 08:45:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2] block: save page offset gaps in cloned bio
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>,
- Eric Auger <eric.auger@redhat.com>
-References: <20260819154937.3903312-1-kbusch@meta.com>
- <178827386087.2511601.16223997201252856898.b4-ty@b4>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <178827386087.2511601.16223997201252856898.b4-ty@b4>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260901142438.237586-1-yi1tang.yang@gmail.com>
+In-Reply-To: <20260901142438.237586-1-yi1tang.yang@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 1 Sep 2026 10:45:47 -0500
+X-Gm-Features: AcwNN1WAKibAn_iMgh1g7gL5eDq1EGX5D1bvCdF1UgBxd1UvQDqs20gt_SkRPh8
+Message-ID: <CACVXFVNs=yx1M5_S3QDawanrpjC1Kaiou++9BX-XcQVgAcFyrA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: add missing DEL_DEV_ASYNC to unprivileged
+ permission check
+To: Yitang Yang <yi1tang.yang@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Sep 1, 2026 at 9:25=E2=80=AFAM Yitang Yang <yi1tang.yang@gmail.com>=
+ wrote:
+>
+> ublk_ctrl_uring_cmd_permission() is missing the UBLK_CMD_DEL_DEV_ASYNC
+> case, causing the command to always return -EINVAL for unprivileged
+> ublk devices. Fix it by adding the missing case.
+>
+> Fixes: 13fe8e6825e4 ("ublk: add UBLK_CMD_DEL_DEV_ASYNC")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Yitang Yang <yi1tang.yang@gmail.com>
+> ---
+>  drivers/block/ublk_drv.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 6c5bec7da97c..ade5d7fddd9d 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -5716,6 +5716,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ub=
+lk_device *ub,
+>         case UBLK_CMD_STOP_DEV:
+>         case UBLK_CMD_ADD_DEV:
+>         case UBLK_CMD_DEL_DEV:
+> +       case UBLK_CMD_DEL_DEV_ASYNC:
+>         case UBLK_CMD_SET_PARAMS:
+>         case UBLK_CMD_START_USER_RECOVERY:
+>         case UBLK_CMD_END_USER_RECOVERY:
 
-On 9/1/26 4:44 PM, Jens Axboe wrote:
-> 
-> On Wed, 19 Aug 2026 08:49:37 -0700, Keith Busch wrote:
->> The cloned bio needs to inherit the accumulated gaps between vectors so
->> that we can know if this bio can subscribe to the iova coalescing
->> optimization.
->>
->> When cloning for a split, the gap only applies to the front bio since
->> that's as far as has been processed. The remaining bio can reset its
->> gaps to 0 since it advanced past the checked vectors, and will start its
->> accounting from there on the next split check.
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [1/1] block: save page offset gaps in cloned bio
->       commit: 96c8ea3c5add7920b3c43840d1ea76b3354c8d2d
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-Thanks!
-
-Eric
-> 
-> Best regards,
-
+Thanks,
+Ming Lei
