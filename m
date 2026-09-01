@@ -1,245 +1,173 @@
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452D53321DE
-	for <linux-block@vger.kernel.org>; Tue,  1 Sep 2026 06:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5593E46E01F;
+	Tue,  1 Sep 2026 07:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788245977; cv=none; b=suOVgzJfQ29vOPGhPHPRGmajVhIqcSZkcQJDXJBIW0sQVczipKCICKvSwBiORonO+GE2E8g6w813ua2p3xDigm4B6f1vf1VQrIj4FgnkCicxk0p52k+Xq2Dx3uLqBJ0k70BdV3vj6a1Xqpx/36lTo99Tecw1e09i2XkEHdapSiQ=
+	t=1788249396; cv=none; b=PrJDUjFwDqJDKw2yAidVPwyBSUWD+e9IK7/cvPFg+Hre5hCGa41RdAUR7FxMylvOMm+HvcDAaA0aXZ0gumFla/BvSh9likhlLg1Nxq2F0zsTO1ZPlBrwFnZnj4tb4QWHlZEyQ2kHSdYd5jcrGvOhsXthFrQIyrOUgzi1pYc8We0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788245977; c=relaxed/simple;
-	bh=bybDq+Dgk+bd3pbHkkH+vj+kmBGHB1tiLHdPmcf3tRo=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=UcfGHcMCXNAqdLpT4FSkCg0pCU5nON3uTcs2BlLBvbu8+gEiH3DqV4porUGHyfqDmRSwdQUVqQyMd0WHKC0SbesJ21mL9dNFWCZXq9w2VNQSIy6bFgJ94T5jiG+XIeM58T/3pIVQevKQYOChAHLyFKNXwa8HBaMCF3kH8CE08t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7f653940ba4so647516a34.1
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2026 23:59:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788245974; x=1788850774;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=63L/bxFUv722Vl7mOzFbgh0sRzdogZ3j1mEhDHkXGRo=;
-        b=Jz5I2MFM5UCJBsV0ur6bqEkjZAZycjk21Ae/pkff+Qzz5BB0ibraAEi0OJJlZ/7E6y
-         qVWefA8lu0bqcsSeDD2zD/kGT5gDEWEnrjRr+qXPDQ0PXsTzrOAL/rBUDmkYWnBCmWzB
-         iIlP23k8bx5BJXP+zx/6duw/3vRXfoteb++Z4RbCQVbRh9fvTs4cMH3Rrdwkq0GcP8l4
-         K9osqyQQP1qRz15Be+JZvJa8RroRUZUtXuGqHa43W7z/QAXE9cnaryOCtqZCAvFjfn0/
-         pOMjtoCKnBvn5DJSDL+LHIPgFoZDBdGLE+WygwNZ8veP8V6MgwIhKm9NgUXMnjgON+gB
-         vpXQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqVegHiWOw3EEXrwrHO6Ws3weytrrqZtB2GXNzWCDk1/sMXJC2XJ4cEAy/KsrX9mxIZbmMWy/7z5S0HqA==@vger.kernel.org
-X-Gm-Message-State: AFuF++kQMuKwTgB/oTWcEyxVIv6+qwUGM+jkte78P1w2XOdNat77DUI+
-	zhcOhWpsx1bmMdY/EIeT3aXHxehYMZtETnmfXCdY/f6qdr18sslD2wfnlCsQLcKyS2h53Ape7QE
-	Gc/VorB7uER6bzuMYK4iB3HhjRNd+n2lQ7MszWX6NRaL2x4+ABdMBTQbJEWM=
+	s=arc-20240116; t=1788249396; c=relaxed/simple;
+	bh=nnqLushIJ9FXM4IqlhQfEoJBRo1HzMg1fpdsB2/rllk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=EyujxxsLahtjZ6TsAGnIXM4oSBHogTDN/hI7+nkcWZXsh419VcYG24QqxIfmBeO3+zbSMhAj0BCkXGyqaYR2k7j02p+qHR6pkV07SlHPFXErBi2yeLEVD1q3Ai9i/Y+XgmaAA64OypcF1GJQUocrRTCu5VC7SHdYZyIw1U+yNMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ov+QlCwT; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ov+QlCwT"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 6362014000F5;
+	Tue,  1 Sep 2026 03:56:33 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Tue, 01 Sep 2026 03:56:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1788249393; x=1788335793; bh=5DLQz4D4XG1gMTW77CwaiVr/i7cTEkZOBTB
+	A8kcXN0E=; b=Ov+QlCwTbSdEqNzkn5ya9/tyEVlQKvIzWd7Qcpx1ia5DK9oa5Io
+	MPJLLukvvFoDJiG1d3v3q5hKt/16QjnOq9ORTPjj3Q7wtKlJNVOWfyyv3x3HV5pq
+	dZ522h51HPxaCrT1mO2RDfLwy/cCUp2CV6is46VSsqUB70tO2r0emoc+RkE1VqxX
+	BRG+VKQ4IGLL5XSTEOCll8cNeynXxLCo2tjqq+5xWvQKX3oTKxn+UGbNV1Hf7wXR
+	1wpL8F76aBExo4QVwAsUhaunkspM7SVcmwWoPkQlTUxRVHk9ptalNX+780L8IURp
+	bGPEi7MPgh7O0YnH0GtTSsxcu/U85Q35TbA==
+X-ME-Sender: <xms:MIWWak8epuKgSxM6YjeSJO4Vd-FIytSon8rmOvjxYiH0IRXhmGiWdw>
+    <xme:MIWWamxBF4U8i12hFyY5ARd8ParGNmNkO8Qhxr1VseGBG03z67peXDgwfhtTtTaMl
+    JeYE95O2WLve1iIoTRKxha_wttvKfNa2YIRt7jeRFEGaXqz8QRwA9Oi>
+X-ME-Received: <xmr:MIWWap4-GPszMmU-Z6T91mrWQ73OODbHky4A0_ImQCCOtC8qY60KG-M3R6Z8ZR_zVmvPQqe64oZyXYsMrs100RSOicLPn-5CJGU>
+X-ME-Proxy-Cause: dmFkZTFnHdl46V9iY7mt7ZU14BLrD9dGCxF5Iuya6z2uOhMxwB3MoPfi3YTm050+ngLUP6
+    BCml/R3fYt1/eoRGwE5ZHXZ/79FnBk3P5UbU7qx1MhZhsvxctXFz3WF+Vzfomppa4Mjd+q
+    VaIa/sNNOj0yDqWSo4BaM74QVhq4HEeNIF9j6sLhNc8W/28PnOFUHetkopaeOX/UNLpWEM
+    58+DSSQDGH5qQYW5diunS6aSNjTv1ma5aoJPfbAx9k1L7GmcEzI1g5xp+ohwgD60mzweGW
+    8Y+nDI8DWviG7Nuq0uuW+YrWztnnBszqcMLs8hDfe3SICXV8/bj0TzWZ+IaYwQWsHeXxh4
+    baMcWyD98PDx7MQxBz3nS/meMRKQjJU79AhF92jPg0X7xColoqxpVKF+gfTya1DyUFxo0b
+    5xh9WmaH3P1flpXEpTjOPMMHV30YF5LDUEOYl1zIQsNSOC+ra8evJNhrcrQgJxuxhZEBad
+    Cddf+8u3hZq0hEvqg37ArAe1Wwe5TGOa0zf6hNIyo8NLa1OUK+UdNj53NgxevMggBt0U47
+    cJcrUEDpRQQvo1Lz5nPgkYkP4XgppG7zP1TTPaiIUMRAq4O2Yp/oy0b7xKtvqYc7WWG4dc
+    oHvxLpSzLc0gf3jRKFbDnpn/HgktJnu4FoLStWGZAL2uKwPG+8UyYpLvlCTg
+X-ME-Proxy: <xmx:MIWWal-Ypf1GNruhgG4x7vln1933lPr4vzFjeQWxxhE6qJ0kMyUvtQ>
+    <xmx:MIWWamr4hzOgwhfuh7xBtzpVZD200i7JF7Wmp6RKmln6Y__VfCUvHw>
+    <xmx:MIWWauoetXxIq_c70ANdceJRHvDuBsw0MKuIjU9d6RHO2QGxHjPIlA>
+    <xmx:MIWWah302mbwG5G4OSWcigSuct-wM_Cy8RNZNq0DGGkdvO_JHmnytw>
+    <xmx:MYWWajup1qBfVR8Uv2pbFUIfSO9oMOzTyhouYSXxBgV1_PA9Knm_Nci9>
+Feedback-ID: i58a146ae:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 1 Sep 2026 03:56:29 -0400 (EDT)
+Date: Tue, 1 Sep 2026 17:56:52 +1000 (AEST)
+From: Finn Thain <fthain@linux-m68k.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+cc: Jens Axboe <axboe@kernel.dk>, Laurent Vivier <laurent@vivier.eu>, 
+    Joshua Thompson <funaho@jurai.org>, linux-block@vger.kernel.org, 
+    linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 07/32] swim: Enable clock divider only where
+ appropriate
+In-Reply-To: <CAMuHMdXgtstGtcbRkrtKtQ+d1c=mCe5zgYZCx4dyUQ_YnVhbbw@mail.gmail.com>
+Message-ID: <b0f20a10-78d4-e8e6-4001-99f076b99a8a@linux-m68k.org>
+References: <cover.1786929430.git.fthain@linux-m68k.org> <1e349506a7cc6aa574aacbd4c69c240b5a1e3eb8.1786929430.git.fthain@linux-m68k.org> <CAMuHMdXgtstGtcbRkrtKtQ+d1c=mCe5zgYZCx4dyUQ_YnVhbbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:824:b0:6b3:6d00:263b with SMTP id
- 006d021491bc7-6b36d00398emr7086198eaf.19.1788245974251; Mon, 31 Aug 2026
- 23:59:34 -0700 (PDT)
-Date: Mon, 31 Aug 2026 23:59:34 -0700
-In-Reply-To: <20260831152044.166353-1-ivanrwcm25@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a9677d6.04428c52.29b18.0002.GAE@google.com>
-Subject: [syzbot ci] Re: block: brd/loop error-path cleanup
-From: syzbot ci <syzbot+ci7c1a0fc0cefeacdb@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, ivanrwcm25@gmail.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot ci has tested the following series
-
-[v1] block: brd/loop error-path cleanup
-https://lore.kernel.org/all/20260831152044.166353-1-ivanrwcm25@gmail.com
-* [PATCH v1 1/2] block: brd: destroy xa on allocation failure
-* [PATCH v1 2/2] block: loop: restore state on loop_configure() error
-
-and found the following issues:
-* general protection fault in lo_release
-* general protection fault in lo_rw_aio
-
-Full report is available here:
-https://ci.syzbot.org/series/9ab490fc-567e-414a-9754-890ca131012d
-
-***
-
-general protection fault in lo_release
-
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      44e96e364b04163ddddc8a24289cef4982b7e36e
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/f5d23472-69ec-45bc-b33a-b59f7c0e7493/config
-syz repro: https://ci.syzbot.org/findings/a48673c0-89de-4ffc-b71c-3aa9e5313ec8/syz_repro
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000000a: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000050-0x0000000000000057]
-CPU: 0 UID: 0 PID: 5946 Comm: syz.0.87 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:__loop_clr_fd drivers/block/loop.c:1177 [inline]
-RIP: 0010:lo_release+0x47c/0x7e0 drivers/block/loop.c:1780
-Code: 89 e7 e8 77 60 fc fb bf e0 01 00 00 49 03 3c 24 be 02 00 00 00 e8 84 c6 9c 05 48 8b 44 24 30 4c 8d 70 50 4c 89 f0 48 c1 e8 03 <42> 80 3c 28 00 74 08 4c 89 f7 e8 45 60 fc fb 41 bc e8 00 00 00 4d
-RSP: 0018:ffffc90003787b60 EFLAGS: 00010206
-RAX: 000000000000000a RBX: ffff8881063f93c8 RCX: 0000000000000046
-RDX: 0000000000000006 RSI: ffffffff8e46de57 RDI: ffffffff8c6d5780
-RBP: ffffc90003787d08 R08: ffffffff9079c73f R09: 1ffffffff20f38e7
-R10: dffffc0000000000 R11: fffffbfff20f38e8 R12: ffff8881063f8080
-R13: dffffc0000000000 R14: 0000000000000050 R15: 1ffff920006f0f74
-FS:  00007fae103d46c0(0000) GS:ffff88818d6f1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fae0f5eb840 CR3: 000000010c31a000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- bdev_release+0x571/0x690 block/bdev.c:-1
- blkdev_release+0x15/0x20 block/fops.c:682
- __fput+0x418/0xa50 fs/file_table.c:512
- fput_close_sync+0x11f/0x240 fs/file_table.c:617
- __do_sys_close fs/open.c:1560 [inline]
- __se_sys_close fs/open.c:1545 [inline]
- __x64_sys_close+0x7e/0x110 fs/open.c:1545
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fae0f55e98e
-Code: 08 0f 85 a5 a8 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 80 00 00 00 00 48 83 ec 08
-RSP: 002b:00007fae103d3da8 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 00007fae103d46c0 RCX: 00007fae0f55e98e
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-RBP: 0000000000000010 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007fae103d3ee0 R14: 00007fae103d46a8 R15: 00007fae06600000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__loop_clr_fd drivers/block/loop.c:1177 [inline]
-RIP: 0010:lo_release+0x47c/0x7e0 drivers/block/loop.c:1780
-Code: 89 e7 e8 77 60 fc fb bf e0 01 00 00 49 03 3c 24 be 02 00 00 00 e8 84 c6 9c 05 48 8b 44 24 30 4c 8d 70 50 4c 89 f0 48 c1 e8 03 <42> 80 3c 28 00 74 08 4c 89 f7 e8 45 60 fc fb 41 bc e8 00 00 00 4d
-RSP: 0018:ffffc90003787b60 EFLAGS: 00010206
-RAX: 000000000000000a RBX: ffff8881063f93c8 RCX: 0000000000000046
-RDX: 0000000000000006 RSI: ffffffff8e46de57 RDI: ffffffff8c6d5780
-RBP: ffffc90003787d08 R08: ffffffff9079c73f R09: 1ffffffff20f38e7
-R10: dffffc0000000000 R11: fffffbfff20f38e8 R12: ffff8881063f8080
-R13: dffffc0000000000 R14: 0000000000000050 R15: 1ffff920006f0f74
-FS:  00007fae103d46c0(0000) GS:ffff8882a8cf1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd52a75ff8 CR3: 000000010c31a000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	89 e7                	mov    %esp,%edi
-   2:	e8 77 60 fc fb       	call   0xfbfc607e
-   7:	bf e0 01 00 00       	mov    $0x1e0,%edi
-   c:	49 03 3c 24          	add    (%r12),%rdi
-  10:	be 02 00 00 00       	mov    $0x2,%esi
-  15:	e8 84 c6 9c 05       	call   0x59cc69e
-  1a:	48 8b 44 24 30       	mov    0x30(%rsp),%rax
-  1f:	4c 8d 70 50          	lea    0x50(%rax),%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 45 60 fc fb       	call   0xfbfc607e
-  39:	41 bc e8 00 00 00    	mov    $0xe8,%r12d
-  3f:	4d                   	rex.WRB
+Content-Type: text/plain; charset=us-ascii
 
 
-***
+On Mon, 31 Aug 2026, Geert Uytterhoeven wrote:
 
-general protection fault in lo_rw_aio
+> On Mon, 17 Aug 2026 at 03:55, Finn Thain <fthain@linux-m68k.org> wrote:
+> > Some models have a 16 MHz FCLK oscillator and others 32 MHz. Put this
+> > information into the swim device platform_data so that the driver can
+> > correctly enable the clock divider. When this is enabled incorrectly,
+> > nothing can be read and failures from the Error Correction Machine are
+> > flagged in the error register.
+> >
+> > This is chip initialization, so do this in swim_floppy_init() rather
+> > than floppy_open(). Drop the udelay() which was apparently copied and
+> > pasted from swim3.c, where it relates to interrupts (of which this chip
+> > has none).
+> 
+> This move should be a separate patch.
+> 
 
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      44e96e364b04163ddddc8a24289cef4982b7e36e
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/f5d23472-69ec-45bc-b33a-b59f7c0e7493/config
-syz repro: https://ci.syzbot.org/findings/556532c0-64a7-4471-9558-ea3a7a213af7/syz_repro
+OK.
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000009: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
-CPU: 0 UID: 0 PID: 83 Comm: kworker/u9:3 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: loop0 loop_rootcg_workfn
-RIP: 0010:lo_rw_aio+0xc36/0xf20 include/linux/percpu-rwsem.h:-1
-Code: fb 48 8d 35 00 00 00 00 bf 60 04 00 00 48 03 3b e8 9f 51 68 fb bb 30 00 00 00 4c 8b 74 24 58 49 83 c6 48 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 8b 6c fc fb 49 03 1e 48 89 d8 48
-RSP: 0018:ffffc9000277f620 EFLAGS: 00010206
-RAX: 0000000000000009 RBX: 0000000000000028 RCX: ffff888102725a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc9000277f790 R08: ffff88810aa529a7 R09: 1ffff1102154a534
-R10: dffffc0000000000 R11: ffffed102154a535 R12: dffffc0000000000
-R13: 0000000000000000 R14: 0000000000000048 R15: ffff88810aa529b0
-FS:  0000000000000000(0000) GS:ffff88818d6f1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000558fd5b46210 CR3: 00000001bb152000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- do_req_filebacked drivers/block/loop.c:432 [inline]
- loop_handle_cmd drivers/block/loop.c:1954 [inline]
- loop_process_work+0x960/0x11c0 drivers/block/loop.c:1989
- process_one_work kernel/workqueue.c:3387 [inline]
- process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3470
- worker_thread+0xa47/0xfb0 kernel/workqueue.c:3551
- kthread+0x38b/0x480 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:lo_rw_aio+0xc36/0xf20 include/linux/percpu-rwsem.h:-1
-Code: fb 48 8d 35 00 00 00 00 bf 60 04 00 00 48 03 3b e8 9f 51 68 fb bb 30 00 00 00 4c 8b 74 24 58 49 83 c6 48 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 8b 6c fc fb 49 03 1e 48 89 d8 48
-RSP: 0018:ffffc9000277f620 EFLAGS: 00010206
-RAX: 0000000000000009 RBX: 0000000000000028 RCX: ffff888102725a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc9000277f790 R08: ffff88810aa529a7 R09: 1ffff1102154a534
-R10: dffffc0000000000 R11: ffffed102154a535 R12: dffffc0000000000
-R13: 0000000000000000 R14: 0000000000000048 R15: ffff88810aa529b0
-FS:  0000000000000000(0000) GS:ffff88818d6f1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000558fd5b46210 CR3: 0000000169ee2000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	fb                   	sti
-   1:	48 8d 35 00 00 00 00 	lea    0x0(%rip),%rsi        # 0x8
-   8:	bf 60 04 00 00       	mov    $0x460,%edi
-   d:	48 03 3b             	add    (%rbx),%rdi
-  10:	e8 9f 51 68 fb       	call   0xfb6851b4
-  15:	bb 30 00 00 00       	mov    $0x30,%ebx
-  1a:	4c 8b 74 24 58       	mov    0x58(%rsp),%r14
-  1f:	49 83 c6 48          	add    $0x48,%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 8b 6c fc fb       	call   0xfbfc6cc4
-  39:	49 03 1e             	add    (%r14),%rbx
-  3c:	48 89 d8             	mov    %rbx,%rax
-  3f:	48                   	rex.W
+> > Cc: Joshua Thompson <funaho@jurai.org>
+> > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> > Fixes: 8852ecd97488 ("m68k: mac - Add SWIM floppy support")
+> > Signed-off-by: Finn Thain <fthain@linux-m68k.org>
+> > ---
+> >  arch/m68k/mac/config.c | 31 ++++++++++++++++++++++++++++++-
+> 
+> For the m68k part:
+> Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> 
+> > --- a/arch/m68k/mac/config.c
+> > +++ b/arch/m68k/mac/config.c
+> > @@ -984,8 +984,37 @@ static int __init mac_platform_init(void)
+> >                         .start = swim_base,
+> >                         .end   = swim_base + 0x1FFF,
+> >                 };
+> > +               unsigned int data = 0;
+> 
+> Nit: in the absence of a real platform_data structure, please use a
+> more explanatory name.
+> 
+> Perhaps s/data/s_fclk/, and store S_FCLK_DIV2 or zero?
+> Or s/data/setup/, and store the full register value?
+> 
 
+I looked again at this but I still can't see any uses for the other bits. 
+So perhaps I should change it to:
 
-***
++		bool fast_fclk = false;
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+> > --- a/drivers/block/swim.c
+> > +++ b/drivers/block/swim.c
+> 
+> > @@ -807,8 +806,10 @@ static void swim_set_parameters(struct swim __iomem *base)
+> >                 swim_write(base, parameter, mem[i]);
+> >  }
+> >
+> > -static int swim_floppy_init(struct swim_priv *swd)
+> > +static int swim_floppy_init(struct platform_device *pdev)
+> >  {
+> > +       struct swim_priv *swd = platform_get_drvdata(pdev);
+> > +       unsigned int *data = pdev->dev.platform_data;
+> 
+> Likewise.
+> 
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+... and change that to:
 
-To test a fix for this bug, please reply with `#syz test`
-(on a separate line) and attach the patch to the email.
+	bool *data = pdev->dev.platform_data;
+	bool fast_fclk = data && *data;
 
-Notes:
-- The patch will be applied on top of the tested series (as an
-  incremental fix).
-- To test a new version of the whole series, please send it directly
-  to syzbot@lists.linux.dev.
-- Arguments like custom git repos and branches are not supported.
+I am unsure whether a NULL check is desirable here (?)
+
+Interestingly, that NULL check itself is sufficient and so we don't really 
+need the flag at all. Allocating memory for this bool is a completely 
+pointless kmalloc.
+
+> >         struct queue_limits lim = {
+> >                 .features               = BLK_FEAT_ROTATIONAL,
+> >         };
+> > @@ -816,6 +817,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+> >         int drive;
+> >         struct swim __iomem *base = swd->base;
+> >
+> > +       swim_write(base, setup, S_IBM_DRIVE | (*data ? S_FCLK_DIV2 : 0));
+> > +
+
+	swim_write(base, setup, S_IBM_DRIVE | (fast_fclk ? S_FCLK_DIV2 : 0));
+
+Would the bool be more acceptable? TBH, I'm not sure it's an improvement.
+
+Thanks for your review.
+
+> >         swim_set_parameters(base);
+> >
+> >         /* scan floppy drives */
+> 
