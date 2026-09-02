@@ -1,80 +1,87 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CBA4A0154;
-	Wed,  2 Sep 2026 14:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C044A2E19
+	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 14:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788358418; cv=none; b=H7SJ8XcjqvLBR136UttXf3slR2Qk7eAewD6BmRFGrluNUZlk4MMYhbvCdZyvKKwEwNlKe84XdreI9XPJ2qkOwQgBTaIcCGeYGNB0l65SSA8CwuurjXtH+jF/NWHw+F/bblMkPTO5MhmrrEQuyr5bmXRNWCZc1e9O74piXLQzPhw=
+	t=1788359646; cv=none; b=dkcLcG8ulkEDb/9eCgrZ/uZPBLnTxxY2crs3602MfnpEYozdE2CF6t/A8nsI8eqdyKxszBQSgebzHUzroBiJSyHZIt4z4vDSU8I3monb7TcJi3SM9mbq/aD6mHOR2B9d72AolP8m30ZNYBO8uwlCOvlC3XlqpfAv5xuAQUpyckc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788358418; c=relaxed/simple;
-	bh=NHtdNaDKh+5XxrxX7v9drlmVMwNdXRr6HEeMmqq48Qg=;
+	s=arc-20240116; t=1788359646; c=relaxed/simple;
+	bh=Q0t/tq/G1G6iYahafSY7REe4nCmiASWINvH8wSZejrI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lbq4HMCDiUySQvnm6WYXuIYv3En5WlzE2pLJIygoqduiYwc5gO0KsrNyZuLHI9XSm/A/GnInQ3PaUhvSdG0tcL6uV3ypNWOsxE5b/PvS4I2saGOxQ5UTZ5L2ffo0hiWV1375EnMKJs9OLwEylEQhzeiqZYATjO2PWYKxl/cGBQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HMc4hAKm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6G1A98Wh; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HwOHQTTa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hIGXKIq8; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=lDm04m0GwCBPmbjC+1IMHRZYE4Mph6JI8vCL3syW6TH0gEOK5EmzdnNxIklv0LZVUPm5rm+Ef4no2vY6l2hS8WPPtXuuA0uT3kZ4Op5C5dQjh0PNaZlhYr9/7/YLNHRJOBFs0DljLldbRPIMoIbBYO8W/5jaGbAgv2L0B+5Nzo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=hmHgb0re; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BVr3REQQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HMc4hAKm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6G1A98Wh";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HwOHQTTa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hIGXKIq8"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 895FE1F7D2;
-	Wed,  2 Sep 2026 14:13:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1788358410; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tec4cGpeOp8thNu/8lIkhabAPNNp/8C0542EKjQVIW4=;
-	b=HMc4hAKmZy45gOxl+HvTr2DIoaqHN3PPpXfxAqo9UefyiL+qgwTY4aANEtBI6QLNGOxzXw
-	kIhzivKjlIs1pYt9GSfuEdEtPh3WyP0C8e39mfqHIZjWE0MCJPI11Lh6K4F1Yxv56ft7Wn
-	sZAej0Ybg7WGMvBJK78Q5PofehYCsxA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1788358410;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tec4cGpeOp8thNu/8lIkhabAPNNp/8C0542EKjQVIW4=;
-	b=6G1A98WhKNq/f3Z0s9r9OV1OfZENIVGUllpwdYAk67B3F4pFB8bb/WM0xgwGCNAxnzKpeI
-	/cmP1vesXQI7XeBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1788358406; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tec4cGpeOp8thNu/8lIkhabAPNNp/8C0542EKjQVIW4=;
-	b=HwOHQTTaaShtyIGhggTJe+HvgyBSXEm1oEzY2hnUPYbNkPdvix1lXNdcx6jIrHrOjOARQ4
-	8Ie5Pf81wpNTQ8v0dIk7nMH/JQ26QkbNBXrq8l3fBomKMWslVbFERiPW2Gd2iOIe1wwSGk
-	bd4Q1dx/qO8kiPq9EDjzHdBrD0Eeoeo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1788358406;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tec4cGpeOp8thNu/8lIkhabAPNNp/8C0542EKjQVIW4=;
-	b=hIGXKIq8FaXnin2eUQV9zc13gSs9aWDEe6VnjdLoYCVRek2rQ84pAzUQkFushQJbaEocMa
-	aF6gutBtyZkH+fCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3B9C713736;
-	Wed,  2 Sep 2026 14:13:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 34fVDQYvmGpXBgAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 02 Sep 2026 14:13:26 +0000
-Message-ID: <aaa82acf-2d8d-4e93-b248-a8fdec2be1c8@suse.de>
-Date: Wed, 2 Sep 2026 16:13:25 +0200
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="hmHgb0re";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BVr3REQQ"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 682CR9Rd1647747
+	for <linux-block@vger.kernel.org>; Wed, 2 Sep 2026 14:34:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	d+TRtaIih3SdU3RFxUDMrL/VfpbAnPIZ43woQUPKeWQ=; b=hmHgb0reI4KPyazS
+	m1EBlfFCVaCwOx5ItvaL/B/YReYwWgdiMXG/cqxtpdFqGdFZF9Ja2A/8ItVVBAgn
+	ImHh1v7wQFy7/y/DUQHsdqS7oz6qW5Lrp2V1KFrjCvsqqsAG/rBV9iJwNO8e479K
+	ygku/DBzFm5PIvJtu12ovbncCrgxAzqzHuNXc6Q7nNPj6UzpGR12FBSWgkV1tc/P
+	3cbqhNR0yAyWK2roUmEYpaAAEI8Bwn71o827B1WYcYaYKOehrt5xbebCvF4+q+qA
+	276AChT+PJKJfVoQVPGmhq5zFs2Uhl6LNg24UHGblMReLKlUXl3vDesCqQ5aLPx3
+	hnEdZA==
+Received: from mail-yx1-f72.google.com (mail-yx1-f72.google.com [74.125.224.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gejv88qfu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 02 Sep 2026 14:34:02 +0000 (GMT)
+Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-66e44d96aa0so973191d50.2
+        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2026 07:34:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1788359642; x=1788964442; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=d+TRtaIih3SdU3RFxUDMrL/VfpbAnPIZ43woQUPKeWQ=;
+        b=BVr3REQQ+YWp4cBtUpiqzdsk9dB4ZHiMD1NytynDhDVbCXrUUgtir904cI8IQB8ryP
+         O+WJrxcEByXhRDEG6WZcCVCyUKpyWgpysZ3mKSDgeMe2g8tTSdYkGJW373daoI+E61xw
+         3EI1rS2sWGiLL3zIGSWAS4WFW7nxbgu27igmvTQsshLL7DlRuqvCkUIS5ub2HIF+yKI5
+         OqIo9Jc4IRUDPttKroIS5WAqi8rjvrOmMTD2LnOQOoAhJgwV2H+wGY1UfYKk8KPbGn7t
+         OSCLT7rrkKdenenhhY+TECfRzdcAgLuCS5JSrIB40RGfceILub58GJB1OFDGrVRh1i0B
+         biyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788359642; x=1788964442;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=d+TRtaIih3SdU3RFxUDMrL/VfpbAnPIZ43woQUPKeWQ=;
+        b=PPKk6stACpvrQsTt1GFOAhkiO6nxtlFxnOcokyZGJVM0Nkqtw7fSXe2y89AJrG15Sf
+         7lJpB4+xK5i39od1OTGBfrD5F99lfakK954NnsZ2opc4/NvwDilRL6Aa7LZUI4jcWs9A
+         aSBLwdNtuB5LLslnV5dUnxkfNPfimtNdSqgB0H/Nx52o+KYQM6SRSpyZh9ZqZtAgxJp+
+         xlAgKPpR5+ejZ71hr+JCgAhU9pFTVC62O54WbxjRFsfV4ifM0L706an5lMz1o+vD8jmE
+         XSX4Krsu90buY466yG0jR/+AXDhn8Nz4I+2alhH6ASfBe0zn/XtrWzLBeyqvZ9+ku0Wa
+         7GvA==
+X-Forwarded-Encrypted: i=1; AKwUvBx1CV9D3stuHRKJW/rEh9gRWirRRwlGZTXbTIuhnO07XGwp/QmPLDlG9HqeBBrXL5q8R+na/q/+Tfmr/w==@vger.kernel.org
+X-Gm-Message-State: AFuF++mxHWHS7TC3Mov8bqT13puLYBo6Pq9xRBIPiZDpNkqjv7M/Mari
+	e1hP82h21nDTlJzuU9P2VCP6DUD4VIm+yGP8xYbC6mUxwGDKzg19GwTuTVh7eKRla+dGyaWVYru
+	rD8VJl1Bdetm76gaJw5gEolh9FvV5uCM9xIoEM6iM3Qmy8F0ePt/NUt64dwcBW9Dmvw==
+X-Gm-Gg: AYBFou3etpWuZRW+1JHS+xjnaxUiwykNB6kvAFWOmqBPRrVIDIFqcyXYAxtT1S1PvCr
+	tNDdaRwyM3zoK5wYeNeRqhWuF4VLCrWwpblI+WDcDX2hXoAeMmAIiS13fuyyNgj2fcldhOv2wIB
+	efROAZ0jcvC02HsVQlb5C3WrFF+gcV2vP78EX4RKJJEPoP9eeJ0555zw+1nAkt3GzTuJ+hIyKBr
+	LNBqnu02EflIJzzQsjpg3oqr2AW0+Qs0pkYp6pZfbcGZawpJkUXViMDGMnZbTCQ9XpfDpm3jcRc
+	jLP6ChInK1tS3PTEyil1VzjhZRnx0/BvU+pgoNby0rTirfLiKNoZboXTaOrIq61hFDOdIbp5jWi
+	nVFxGTXnROZmT6YhP7fWYcV2ALbrBjuZ+v0HzHy+lCLfFqLowN7ozQFOlXw==
+X-Received: by 2002:a53:c051:0:20b0:66d:2c09:fb70 with SMTP id 956f58d0204a3-66f9b6c6c7emr1566006d50.0.1788359641763;
+        Wed, 02 Sep 2026 07:34:01 -0700 (PDT)
+X-Received: by 2002:a53:c051:0:20b0:66d:2c09:fb70 with SMTP id 956f58d0204a3-66f9b6c6c7emr1565974d50.0.1788359641287;
+        Wed, 02 Sep 2026 07:34:01 -0700 (PDT)
+Received: from [10.110.114.54] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-86c184e4b52sm18439867b3.34.2026.09.02.07.33.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Sep 2026 07:34:01 -0700 (PDT)
+Message-ID: <2af521b1-3b74-417d-8b0b-e30bc6d8df03@oss.qualcomm.com>
+Date: Wed, 2 Sep 2026 22:33:50 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,81 +89,152 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] block: unpin all pages of a bvec in
- bio_iov_iter_align_down()
-To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Luis Chamberlain <mcgrof@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- John Garry <john.g.garry@oracle.com>, Christian Brauner
- <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
- Keith Busch <kbusch@kernel.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
- <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
+Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
+ virtio-blk guests
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
+        James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
+        mani@kernel.org, andersson@kernel.org, konradybcio@kernel.org,
+        bvanassche@acm.org, alim.akhtar@samsung.com, avri.altman@sandisk.com,
+        stefanha@redhat.com, pbonzini@redhat.com, eperezma@redhat.com,
+        xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
+References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
+ <20260827184219.GB2137493@google.com>
+ <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
+ <20260831210759.GE86114@quark>
+ <ca838905-f0f8-4f0a-96aa-2bc05ab6c0a7@oss.qualcomm.com>
+ <20260901212834.GA3585187@google.com>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.996];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid,columbia.edu:email]
+From: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+In-Reply-To: <20260901212834.GA3585187@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: 04IO4_2Bc8wqRY4RaKrojKxrtMKQdjHo
+X-Authority-Analysis: v=2.4 cv=L+wtheT8 c=1 sm=1 tr=0 ts=6a9833da cx=c_pps
+ a=VEzVgl358Dq0xwHDEbsOzA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
+ a=v6EDwWi3nRXZDjx7Lu4A:9 a=QEXdDO2ut3YA:10 a=uujmmnXaIg8lM0-o0HFK:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAyMDEyOCBTYWx0ZWRfX2d07IFd+9qp2
+ nMPzIw/BdyiD1RRsv0NRh68ZzbDy1Fzi9Bb+6dhzigc3m53VXfIjW1yDXzRuQGwoAGtfa/5O0r7
+ +N6ypPuOhgdtSouD+pxOnaUFDDuEREz/jDDnZiKgj4qLuAiYPesDmPoTrJON7MvYhjAspFCxCbo
+ BCuKulicPXuoetqhPe3dQXMHfLj/p5vlTI5m1agmruKVwtdcjj2nyZkrt2LikFijN7etU4tF3kZ
+ 1y+EgBjp6DBAThKEhDf8GMxIzvfQwmZTKMAGm+xnPdOgZGjMDoa2/tMjXUtawYp9U8HP8GczZem
+ d3iEZ3qIRqD4uvFfta2WTfNKHXA9Ta1hxRr/VbTsciBy+QdwJs4g1ebgi37IrxCFOz1DbXOaxcH
+ S1uYnvhAlHgbLGfo6dYunQw9Ej2qcjdBBLDBFBEN0ZQF2ry266TCQC1zarFyzRE6gqEjOrHJQOJ
+ BOCSGg4215XR/7E8Fww==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAyMDEyOCBTYWx0ZWRfX4NNYUphpLvfD
+ 7H9GqODtoHG9d5Bv9sFS5GeFXc1mkG+6mbF6YhNfzlKGV0CENPogsq0ZK0AOQgpXtzmCVgitRXS
+ +gS4g1fsxYwWZpQrIVkE1LPd5s+8xuc=
+X-Proofpoint-ORIG-GUID: 04IO4_2Bc8wqRY4RaKrojKxrtMKQdjHo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-02_03,2026-09-01_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 clxscore=1015 bulkscore=0 impostorscore=0 phishscore=0
+ spamscore=0 suspectscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609020128
 
-On 8/28/26 3:49 PM, Tal Zussman wrote:
-> bio_iov_iter_align_down() drops trailing bvecs with unpin_user_page(),
-> but a bvec built by iov_iter_extract_bvecs() can span several pages of
-> one folio, each with its own pin. All but the first pin leak.
-> 
-> The partially trimmed bvec has the same problem. Shrinking bv_len does
-> not release the pins for the pages cut off by the trim, and
-> __bio_release_pages() only unpins the pages bv_len still covers at
-> completion.
-> 
-> Both issues occur only with a logical block size above PAGE_SIZE and a
-> large folio backing the user buffer. On a device with a 64K logical
-> block size, an O_DIRECT pwritev() from a hugetlb mapping that ends 16K
-> past a block boundary leaks one huge page per call, whether the
-> remainder is its own bvec or the tail of a larger one.
-> 
-> Unpin all pages of a dropped bvec with unpin_user_folio(), as
-> __bio_release_pages() does, and unpin the pages trimmed off the last
-> bvec as well.
-> 
-> Fixes: 20a0e6276edb ("block: align the bio after building it")
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
->   block/bio.c | 18 +++++++++++++++++-
->   1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+On 9/2/2026 5:28 AM, Eric Biggers wrote:
+> On Tue, Sep 01, 2026 at 04:22:33PM +0800, Linlin Zhang wrote:
+>> With this design, I believe there would be two VM exits associated with
+>> encrypted I/O:
+>>   1. Key programming
+>>      Before encrypted I/O can be submitted, the guest needs to program a key
+>>      into a virtual keyslot:
+>>      
+>>      Guest virtio-blk driver
+>>          -> VM exit
+>>          -> virtio-blk backend (e.g. QEMU)
+>>          -> ioctl
+>>          -> host virtio-blk proxy driver
+>>             (stores the blk_crypto_key in a virtual keyslot)
+>>
+>>   2. Encrypted I/O submission
+>>      The I/O request carries the virtual keyslot number and DUN:
+>>
+>>      Guest virtio-blk driver
+>>         -> VM exit
+>>         -> virtio-blk backend (e.g. QEMU)
+>>         -> ioctl
+>>         -> host virtio-blk proxy driver
+>>            (looks up the blk_crypto_key associated with the virtual keyslot
+>>             and submits I/O using bio_crypt_set_ctx())
+> 
+> Most I/O requests only need step (2), since they reuse step (1) from a
+> previous I/O request.  The kernel evicts a keyslot only when it is the
+> least recently used among all the keyslots and another one is needed.
+> (Or when eviction is explicitly requested.)
+> 
+> This is especially relevant when only a small number of keys is used,
+> like is the case when the per-file key support in fscrypt is disabled.
+> Programming keys on Qualcomm ICE has always been very slow even on
+> physical hardware, and the kernel was already designed to mitigate that.
+> 
+
+ACK
+
+>> I have been wondering whether a model similar to the passthrough
+>> blk-crypto-profile used by certain dm targets could be applicable here.
+>>
+>> In such a design, ownership of keyslot management would effectively and totally
+>> move to the host. The guest would no longer manage virtual keyslots, and the
+>> host block layer would continue using its existing keyslot manager to allocate,
+>> reuse, and evict physical keyslots as needed.
+> 
+> I think the virtual keyslots are still useful so that the key bytes, key
+> size, key type, algorithm, and data unit size don't have to be
+> transmitted in every I/O request, then all revalidated and processed
+> again.  There is a reason that inline encryption hardware uses keyslots,
+> and I think the same largely applies to virtio-blk.
+> 
+
+Thanks for your clarification!
+
+I agree that virtual keyslots still provide an important benefit by
+avoiding revalidation of the crypto context on every I/O request and
+reducing payload for most encrypted I/O request.
+
+One concern I had is around ownership and lifetime management. If 
+key programming and I/O submission are exposed through separate interfaces,
+the implementation needs to ensure that a programmed virtual keyslot
+cannot be modified or replaced unexpectedly before the associated I/O
+is submitted. Otherwise, I/O could end up being issued with a different
+key than the one originally intended.
+
+As Stefan pointed out, this sounds more like an object lifetime and
+permission model problem than a keyslot model problem. My current
+thinking is that blk-crypto-proxy could own both virtual keyslot management
+and the corresponding access control. For example, key programming and
+key eviction could be exposed through blk-crypto-proxy ioctls, while
+the block device and its virtual keyslot namespace are instantiated when
+the blk-crypto-proxy device is opened. That would allow ownership and
+lifetime of programmed keys to be tied to a specific file descriptor context.
+
+Separately, regarding the I/O submission path itself (patch 08 in this
+series), I'd also appreciate your thoughts and block maintainers'
+opinions on the direction that would be preferable from a block-layer
+perspective.
+
+My initial prototype introduced a dedicated ioctl for submitting I/O
+carrying blk-crypto metadata because of the additional validation
+requirements around DUN handling and data-unit alignment. However, I
+understand the concern about introducing a separate I/O submission
+interface that bypasses existing optimized paths such as io_uring.
+
+Do you think these blk-crypto-specific requirements should instead be
+integrated into an existing interface, such as io_uring, or is there any
+precedent for introducing a dedicated interface when additional crypto
+metadata needs to accompany I/O requests?
+
+
+> - Eric
+
