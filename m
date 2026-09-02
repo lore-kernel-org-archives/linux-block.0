@@ -1,80 +1,80 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1943B05B9;
-	Wed,  2 Sep 2026 12:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006D44756AE;
+	Wed,  2 Sep 2026 13:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788353574; cv=none; b=q43UUDGVQhUKf35o8i0Y9zbYsWxzuOr3lOAaCRuZQtsfdFj/t5b6YJxpUSZDvuCcL9wU1vs+TpG+QZLdVOOvGXlOcRsbcs1AcfTlwYaBMw36lu7ofuK3Z5u3hVaiWTITqDbyWodSr/6zgwsiyVGbRizlvqD5LQsUl5FodBc0HAA=
+	t=1788354259; cv=none; b=cy9tjdGXbufRB13/i4HYvnGIwJeZtXvDwqbYRIzk7CrVoyh8cqA/+lYmxkaWrjMzqUHhcqiP7luKy6EV6jGSaxHXpskZ6tXxBr0aTn44QwbMuKEbEvMv0AXfF2Xkme1bayYpJjs1hPVQQ56GL/wpr0m2MfJgfd3n8AeMh3davfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788353574; c=relaxed/simple;
-	bh=iNY2PsrjJ41qPmKkJcbwjcamy3MPcWd9C3cQZ8uQQgA=;
+	s=arc-20240116; t=1788354259; c=relaxed/simple;
+	bh=GpXZI/OqqMDezYCipNWrDDXWztHm06XfE3y96Z95PKI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GAJZj0xGDAHaadYwaJ8zKc8vHRbYuhPeM9T9A7Cd+igtHzm0m+NW8hdA0JNnaud/I+kagA2SYLczIcCGAHDPMIwpX/RARh5XV8EQT+3IGta0JRuZmp/MZz+XHjYgTRo+E14okFpv/qpiS7wsf/Zdc/C8OmU/rXnnEKkPY3QMOL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZnrE2wjp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Wms9o4Iy; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qGTP0gxP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=p82kxfQc; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=bZG+JdA5cD6+RPvldEFmDmyHBGuHyDD7SRmF+4NFubjFPy/3Y6LwXb4nNd3y/n8QXmhQxelXj60Zk1iAiVtpKm+dB/kSg/HDudpf0XDwHQ7gQQ1zYqvvvK/vuw+DCweLvCh5gOeFtQZ3n80UBZmxFYJCYRyf0qpM4zFawIctZnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=y452SvEV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eSoUn4lY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mxL9TFtw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UGcH6j5f; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZnrE2wjp";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Wms9o4Iy";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qGTP0gxP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="p82kxfQc"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="y452SvEV";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eSoUn4lY";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mxL9TFtw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UGcH6j5f"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B230321CCC;
-	Wed,  2 Sep 2026 12:52:42 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9BA8321D36;
+	Wed,  2 Sep 2026 13:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1788353566; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1788354251; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P967ebjBPN7pzqwkyb0E3k3uYf3DEa4qKX5H/x03Qfc=;
-	b=ZnrE2wjpDIlYDUDUWfQ1oFuv/7v/HEY95TYUB4b7IhZn7TaQ19IawybCpwhmRGXXqqDRS1
-	qm83kOlLeMqyETKNLyStpiCtNDPlGwwHT20YnaOn8ta/H/m89InPpNHf5A9VPk4Sr1YVI6
-	Xej2/PtgND6bSVM53ttOSHpAqDF5GIE=
+	bh=TrHZoBJ19a7O8e8QOjl851dqqNWBajXpEJqZgdh9rSk=;
+	b=y452SvEVdTKX0bsLSE+CA/QCA92czQY/1HypyIHTu3/MOtasFqgNKxyR6ICbS3xITB61ad
+	9tviZEL7hauN7HPowZ3+/WgkgQZgpBWA+azv3Yz++76QXSrzOK/Ij08jPU6Iq61Bf/vKKL
+	UrRtztVapmx/2Z5TbpPmc1OsLZDX8CQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1788353566;
+	s=susede2_ed25519; t=1788354251;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P967ebjBPN7pzqwkyb0E3k3uYf3DEa4qKX5H/x03Qfc=;
-	b=Wms9o4Iy1ZQQuiU4FQUOnmkP6qbD+M6upjFQ3vwH9DuFZLFEgOdIWZga0bi0Kl9IJNEduo
-	QvOE38G7XQ5vKEBw==
+	bh=TrHZoBJ19a7O8e8QOjl851dqqNWBajXpEJqZgdh9rSk=;
+	b=eSoUn4lYfb3viW1x0YH/5i4g4+2UeGAbGpI8HphDUu55mfJYtvGOtJZ5x6zhdhmoCVbFzZ
+	NdBw+q7WCqCOXXBA==
 Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1788353562; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1788354247; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P967ebjBPN7pzqwkyb0E3k3uYf3DEa4qKX5H/x03Qfc=;
-	b=qGTP0gxPD9C+aeR5UFgqlEiyH2S4KIFOAu334db750ZQeke1+c2KrYdHxTynk7VQU5b/dV
-	JsTC5z/EfV9BcUIifxw929BXI5t00vpJp3wP1tOY+sY0rGhn32y0IfiweCr27bktsOE+MY
-	5UwS/h0NLhaJKS+WG3+XvV48RWee0Sk=
+	bh=TrHZoBJ19a7O8e8QOjl851dqqNWBajXpEJqZgdh9rSk=;
+	b=mxL9TFtwnRIwfDXrqsRsLHVn6UQyjKQOLbeDGPHKX0o024QeZHnD1vivXiHtZ9Bg8Tk3CZ
+	zUs3NT/ofWet8WGur3TY4GxVUrm9oYFIl6+lLxLHsJxvMOEVKsJXSjMMy5ggKuJiVBTqY+
+	l7d+4zMirVaWv+2LgYN5WYYe2Ksnyzc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1788353562;
+	s=susede2_ed25519; t=1788354247;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P967ebjBPN7pzqwkyb0E3k3uYf3DEa4qKX5H/x03Qfc=;
-	b=p82kxfQcA7b4WvyxKPl+lGUt9MhzhP/LyQ2yq8UVoP2QGNncXXoXnJ5xxyUl0wiGvXQHTu
-	ULEqeRMRPzjQOwDg==
+	bh=TrHZoBJ19a7O8e8QOjl851dqqNWBajXpEJqZgdh9rSk=;
+	b=UGcH6j5fYmMfWO6fb/aYaL/Or9NhdXq1+ybuliM7iDVsUh2zCcxAu9hreg+KFQG1YmAWTt
+	JKzpu28JcAvPUVAg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 74F66136E6;
-	Wed,  2 Sep 2026 12:52:42 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 627CB136E6;
+	Wed,  2 Sep 2026 13:04:07 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wcYhHBocmGoYNAAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 02 Sep 2026 12:52:42 +0000
-Message-ID: <fbae8643-ae15-4406-8afa-d9701b1f3e39@suse.de>
-Date: Wed, 2 Sep 2026 14:52:42 +0200
+	id DTSdF8cemGprPwAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 02 Sep 2026 13:04:07 +0000
+Message-ID: <f9308891-f421-440e-b4b0-f600362aaafc@suse.de>
+Date: Wed, 2 Sep 2026 15:04:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,7 +82,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] block: take i_rwsem for the splice read path
+Subject: Re: [PATCH v2 4/7] block: honor IOCB_NOWAIT in the block device
+ buffered read path
 To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
  Christoph Hellwig <hch@lst.de>,
  Johannes Thumshirn <johannes.thumshirn@wdc.com>,
@@ -92,12 +93,13 @@ To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
  <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
  Keith Busch <kbusch@kernel.org>,
  "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>
 References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
- <20260828-blkdev-fixes-v2-3-32f3f40cebed@columbia.edu>
+ <20260828-blkdev-fixes-v2-4-32f3f40cebed@columbia.edu>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260828-blkdev-fixes-v2-3-32f3f40cebed@columbia.edu>
+In-Reply-To: <20260828-blkdev-fixes-v2-4-32f3f40cebed@columbia.edu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Score: -4.30
@@ -105,12 +107,12 @@ X-Spam-Level:
 X-Spamd-Result: default: False [-4.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	NEURAL_HAM_SHORT(-0.20)[-0.993];
 	MIME_GOOD(-0.10)[text/plain];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
@@ -119,46 +121,32 @@ X-Spamd-Result: default: False [-4.30 / 50.00];
 	FROM_EQ_ENVFROM(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email,columbia.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,columbia.edu:email,imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
 X-Spam-Flag: NO
 
 On 8/28/26 3:49 PM, Tal Zussman wrote:
-> def_blk_fops wires ->splice_read directly to filemap_splice_read(),
-> which allocates folios based on mapping_min_folio_order() without any
-> lock against set_blocksize(). A splice from a block device can race
-> set_blocksize() raising the minimum folio order and insert a folio that
-> is too small for the mapping. blkdev_read_iter() wraps filemap_read()
-> in inode_lock_shared() for this reason, but the splice path was missed.
+> blkdev_read_iter() takes inode_lock_shared() unconditionally around
+> filemap_read(). Unlike blkdev_write_iter(), it does not reject
+> IOCB_NOWAIT for buffered I/O, so a non-blocking read, or the buffered
+> tail of a short IOCB_NOWAIT direct read, blocks behind set_blocksize()
+> holding i_rwsem across sync_blockdev().
 > 
-> Splicing from a block device while toggling the block size between 512
-> bytes and 64K with BLKBSZSET hits this within seconds on a
-> CONFIG_DEBUG_VM kernel:
+> A preadv2(RWF_NOWAIT) issued while another thread changes the block
+> size with a dirty page cache blocks for as long as sync_blockdev()
+> takes, 4 to 6 seconds on a scsi_debug device with delay=5.
 > 
->    page dumped because: VM_BUG_ON_FOLIO(folio_order(folio) < mapping_min_folio_order(mapping))
->    kernel BUG at mm/filemap.c:858!
->    Oops: invalid opcode: 0000 [#1] SMP NOPTI
->    RIP: 0010:__filemap_add_folio+0x51c/0x570
->    Call Trace:
->     filemap_add_folio+0x64/0x140
->     page_cache_ra_order+0x1dd/0x3d0
->     filemap_get_pages+0x153/0x760
->     filemap_splice_read+0x13f/0x300
->     splice_file_to_pipe+0xc0/0xd0
->     do_splice+0x6a8/0x890
->     __do_splice+0xb0/0x210
->     __x64_sys_splice+0x80/0x100
->     do_syscall_64+0x10e/0x520
->     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> Use inode_trylock_shared() for IOCB_NOWAIT and return the bytes the
+> direct path already read, or -EAGAIN if none, when the lock is
+> contended, preserving NOWAIT semantics.
 > 
-> Take inode_lock_shared() around filemap_splice_read(), like the read
-> path does.
-> 
-> Fixes: 3c20917120ce ("block/bdev: enable large folio support for large logical block sizes")
+> Fixes: c0e473a0d226 ("block: fix race between set_blocksize and read paths")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Link: https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
 > Assisted-by: Claude:claude-fable-5
 > Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 > ---
->   block/fops.c | 18 +++++++++++++++++-
->   1 file changed, 17 insertions(+), 1 deletion(-)
+>   block/fops.c | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
