@@ -1,193 +1,117 @@
-Received: from mta0.migadu.com (out-22.mta0.migadu.com [91.218.175.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4799638CFE7
-	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 06:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856B038DC4F;
+	Wed,  2 Sep 2026 06:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788330979; cv=none; b=THO6xb/4R//D5SYDKZMT8p7JpC4tWkFdTTY7YSoPd5GmWUgHmVW535pNSUHswGjgcX6Db0HndY4i+VvkhlsYZAiHwwK6Ubh3lcLniOwDfc3SYRbaMlf67gDHbGR+unDtv9tGyCCQIes1nhqZwnwiFK6qPEYpwNH19XnJehTz7Zk=
+	t=1788331517; cv=none; b=dXnXt21HzL67qQspDYGXDTWEjVeiI6F1zfWMboGpjr0KMpRZk7vKN9p6kao59M40JI8EFAmcupm90nGrVwexL8NJkIt26r10cnVj4MK0+6Pa6QV5I6cRBwf0Tr9GH2jAyxj/jwt97OA9Om5+T3WZBD37HYmIQLGwJ840a0pWJWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788330979; c=relaxed/simple;
-	bh=O5KS5q5kowuwRNhVBilCCDdZNkUSPi5it2ZSZRGWyl8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dxt/JsOpNTJz/2Squ5Fx+ppPByUoFmmNbSy133nDRUFKfIXaNtDs82n5eSk8AyQM+Vn9DCKu8sYjmlUPEItPAL+2I6YBlDqgGGF9UfJHf+EC31DWD57g3TJd2YQHjXrkN/29HGUMF02c5N0SbBNgNtARo2NpIGgv5VTj04OSUHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gBoRVk1T; arc=none smtp.client-ip=91.218.175.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gBoRVk1T"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=O5KS5q5kowuwRNhVBilCCDdZNkUSPi5it2ZSZRGWyl8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788330974; v=1; x=1788935774;
- b=gBoRVk1T19a7vBkifysRN2wXZ4/WH+RiqftqNhW0j7tV2AbGDrRwwYV6bGBJ/xHhfVVCdH4t
- xUx9IOGu042abdokDF4kdtqIrJ1KwKFj18DYbHrOR4DGesAIkh7icmsHOL77uo7blLkKSceFRyY
- 0A+RnwJaZ9KmVUo23nWeb8P4=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id db4f6236f35008cd;
-	Wed, 02 Sep 2026 06:36:14 +0000
-X-Mizu-Trace-ID: db4f6236f35008cd
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <73b3b4d6-888a-4621-8a7c-7914fa2c5fc6@linux.dev>
-Date: Wed, 2 Sep 2026 14:36:08 +0800
+	s=arc-20240116; t=1788331517; c=relaxed/simple;
+	bh=TNlvMcn2opUIZTn4FXeb0xIoY6Mzbcw6rngdJp2JHmM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ULF/8unowjxlKbDRUlQFRWFN8Dyb3VguAvXZaGymi23WvnahljdXG9pHhKO+t3930bTFtnl9750cDOnhLZ6jfh3BuR1kC17Drtx5r6ljy8QFYdzwX4F5D6HH6d7osw164LQPiw7ZTMVANu/S8gAgvlYMvHU4p3slgkTZSeK2F44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: d3fb30aea69911f19a56ed5b684f684d-20260902
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:b4c36449-f8cf-410c-9271-750cd821b6bc,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:20
+X-CID-META: VersionHash:7db8b62,CLOUDID:d6542c26a7db73212b26c141168b5048,BulkI
+	D:nil,BulkQuantity:0,SF:102|850|865|898,TC:nil,Content:0|15|50,EDM:5,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: d3fb30aea69911f19a56ed5b684f684d-20260902
+X-User: yanlonglong@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <yanlonglong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1984752943; Wed, 02 Sep 2026 14:45:04 +0800
+From: longlong yan <yanlonglong@kylinos.cn>
+To: tom.leiming@gmail.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	longlong yan <yanlonglong@kylinos.cn>
+Subject: [PATCH] selftests/ublk: add NULL check after calloc()
+Date: Wed,  2 Sep 2026 14:44:36 +0800
+Message-ID: <20260902064437.1376-1-yanlonglong@kylinos.cn>
+X-Mailer: git-send-email 2.47.1.windows.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH v2] loop: defer the queue limits clear to a workqueue
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20260902063420.882203-1-cui.tao@linux.dev>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260902063420.882203-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi. Bart, 
+Three calloc() calls in the ublk selftests lack NULL return checks,
+leading to potential NULL pointer dereferences on allocation failure:
 
-在 2026/9/2 14:34, Tao Cui 写道:
-> From: Tao Cui <cuitao@kylinos.cn>
-> 
-> loop_clear_limits() calls queue_limits_commit_update() directly from
-> the loop workqueue that processes the request.  That does a
-> non-atomic struct assignment to q->limits without freezing the queue,
-> which races with lockless readers of q->limits on other CPUs - bio
-> splitting reads max_hw_sectors, the discard path reads
-> max_hw_discard_sectors - and can let them observe torn values.  The
-> trigger is a discard or write-zeroes request on a loop device whose
-> backing file does not support the corresponding fallocate operation.
-> 
-> The code already has an XXX comment saying this should move to a
-> workqueue.  Do that: schedule a work item on the system workqueue,
-> where it is safe to freeze the queue and update the limits using
-> queue_limits_commit_update_frozen().  Accumulate pending modes in
-> lo->clear_limits_mode so that failures between scheduling and
-> execution of the work item are not lost, reset the accumulated
-> modes when a new backing file is assigned, and cancel the work
-> item before the device is freed.
-> 
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> 
-> ---
-> Changes since v1:
-> 
-> - Make clear_limits_mode atomic_t: loop workers can hit the |=
->   concurrently.
-> 
-> - Reset clear_limits_mode when assigning a new backing file, so
->   stale modes do not clear limits of the new file.
-> 
-> - Cancel the work item from loop_remove() before del_gendisk():
->   the queue can already be in RCU-delayed freeing when
->   lo_free_disk() cancels it.
-> 
-> Tested on x86-64 (qemu, vfat-backed loop device): 30s discard and
-> reconfigure loop exercises the clear 577 times, no torn sysfs reads,
-> no difference against the unpatched kernel.
-> 
+1. kublk.c ublk_ctrl_init(): the allocated `dev` is dereferenced
+   immediately via `info = &dev->dev_info` without checking for NULL.
 
-thanks for the Reviewed-by on v1.
+2. batch.c alloc_batch_commit_buf(): the allocated `t->commit` is
+   dereferenced in the following for-loop without checking for NULL.
 
-v2 makes clear_limits_mode atomic, resets it on rebind, and
-cancels the work item from loop_remove().  The code changed, so
-could you take another look when you have time?
+3. batch.c alloc_batch_fetch_buf(): the allocated `t->fetch` is
+   dereferenced in the following for-loop without checking for NULL.
 
-Thanks,
-Tao
+Add NULL checks after each calloc(), returning NULL or -ENOMEM consistent
+with existing error handling in the same functions.
 
-> Link: https://lore.kernel.org/r/20260828072004.273519-1-cui.tao@linux.dev/
-> ---
->  drivers/block/loop.c | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 6f12976035b0..368ea857895c 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -67,6 +67,8 @@ struct loop_device {
->  	struct list_head        rootcg_cmd_list;
->  	struct list_head        idle_worker_list;
->  	struct rb_root          worker_tree;
-> +	struct work_struct      clear_limits_work;
-> +	atomic_t		clear_limits_mode;
->  	struct timer_list       timer;
->  	bool			sysfs_inited;
->  
-> @@ -222,9 +224,12 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
->  		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
->  }
->  
-> -static void loop_clear_limits(struct loop_device *lo, int mode)
-> +static void loop_clear_limits_workfn(struct work_struct *work)
->  {
-> +	struct loop_device *lo =
-> +		container_of(work, struct loop_device, clear_limits_work);
->  	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
-> +	int mode = atomic_xchg(&lo->clear_limits_mode, 0);
->  
->  	if (mode & FALLOC_FL_ZERO_RANGE)
->  		lim.max_write_zeroes_sectors = 0;
-> @@ -234,14 +239,13 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
->  		lim.discard_granularity = 0;
->  	}
->  
-> -	/*
-> -	 * XXX: this updates the queue limits without freezing the queue, which
-> -	 * is against the locking protocol and dangerous.  But we can't just
-> -	 * freeze the queue as we're inside the ->queue_rq method here.  So this
-> -	 * should move out into a workqueue unless we get the file operations to
-> -	 * advertise if they support specific fallocate operations.
-> -	 */
-> -	queue_limits_commit_update(lo->lo_queue, &lim);
-> +	queue_limits_commit_update_frozen(lo->lo_queue, &lim);
-> +}
-> +
-> +static void loop_clear_limits(struct loop_device *lo, int mode)
-> +{
-> +	atomic_or(mode, &lo->clear_limits_mode);
-> +	schedule_work(&lo->clear_limits_work);
->  }
->  
->  static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-> @@ -516,6 +520,7 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
->  static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
->  {
->  	lo->lo_backing_file = file;
-> +	atomic_set(&lo->clear_limits_mode, 0);
->  	lo->old_gfp_mask = mapping_gfp_mask(file->f_mapping);
->  	mapping_set_gfp_mask(file->f_mapping,
->  			lo->old_gfp_mask & ~(__GFP_IO | __GFP_FS));
-> @@ -1781,6 +1786,7 @@ static void lo_free_disk(struct gendisk *disk)
->  		destroy_workqueue(lo->workqueue);
->  	loop_free_idle_workers(lo, true);
->  	timer_shutdown_sync(&lo->timer);
-> +	cancel_work_sync(&lo->clear_limits_work);
->  	mutex_destroy(&lo->lo_mutex);
->  	kfree(lo);
->  }
-> @@ -2100,6 +2106,7 @@ static int loop_add(int i)
->  	spin_lock_init(&lo->lo_lock);
->  	spin_lock_init(&lo->lo_work_lock);
->  	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-> +	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
->  	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
->  	disk->major		= LOOP_MAJOR;
->  	disk->first_minor	= i << part_shift;
-> @@ -2138,6 +2145,10 @@ static int loop_add(int i)
->  
->  static void loop_remove(struct loop_device *lo)
->  {
-> +	/* Cancel early: the queue may be in RCU-delayed freeing
-> +	 * by the time lo_free_disk() runs. */
-> +	cancel_work_sync(&lo->clear_limits_work);
-> +
->  	/* Make this loop device unreachable from pathname. */
->  	del_gendisk(lo->lo_disk);
->  	blk_mq_free_tag_set(&lo->tag_set);
+Signed-off-by: longlong yan <yanlonglong@kylinos.cn>
+---
+ tools/testing/selftests/ublk/batch.c  | 4 ++++
+ tools/testing/selftests/ublk/kublk.c | 9 +++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/ublk/batch.c b/tools/testing/selftests/ublk/batch.c
+index d8d9ebed5979..5dd6bdfaf9c1 100644
+--- a/tools/testing/selftests/ublk/batch.c
++++ b/tools/testing/selftests/ublk/batch.c
+@@ -88,6 +88,8 @@ static int alloc_batch_commit_buf(struct ublk_thread *t)
+ 	int i, ret, j = 0;
+ 
+ 	t->commit = calloc(t->nr_queues, sizeof(*t->commit));
++	if (!t->commit)
++		return -ENOMEM;
+ 	for (i = 0; i < t->dev->dev_info.nr_hw_queues; i++) {
+ 		if (t->q_map[i])
+ 			t->commit[j++].q_id = i;
+@@ -184,6 +186,8 @@ static int alloc_batch_fetch_buf(struct ublk_thread *t)
+ 	/* double fetch buffer for each queue */
+ 	t->nr_fetch_bufs = t->nr_queues * 2;
+ 	t->fetch = calloc(t->nr_fetch_bufs, sizeof(*t->fetch));
++	if (!t->fetch)
++		return -ENOMEM;
+ 
+ 	/* allocate one buffer for each queue */
+ 	for (i = 0; i < t->nr_fetch_bufs; i++) {
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index 2400b4615766..f7ddbb4c5582 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -435,9 +435,14 @@ static void ublk_ctrl_deinit(struct ublk_dev *dev)
+ static struct ublk_dev *ublk_ctrl_init(void)
+ {
+ 	struct ublk_dev *dev = (struct ublk_dev *)calloc(1, sizeof(*dev));
+-	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
++	struct ublksrv_ctrl_dev_info *info;
+ 	int ret;
+ 
++	if (!dev)
++		return NULL;
++
++	info = &dev->dev_info;
++
+ 	dev->ctrl_fd = open(CTRL_DEV, O_RDWR);
+ 	if (dev->ctrl_fd < 0) {
+ 		free(dev);
+-- 
+2.43.0
 
