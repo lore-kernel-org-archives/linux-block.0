@@ -1,229 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-209.mta0.migadu.com [91.218.175.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B4A4A9D6A
-	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 20:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E003B47DF
+	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 23:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788379590; cv=none; b=QqN/p4KPY5Haf9+XL8iCU7bq3k7J2Lq1C+Ta9sL4uY7zcEpb4Uz1QdRvOqxBfoSuwSLvnCQzncTM1uG00BXMRwe2wzY//Bhs+EOlAYadyFCdHnEMvfw4qvzVqkExjNf1fx2GupeOsolBejPEuNgFYfy8qR4fE34SWvtOGRf96gw=
+	t=1788390631; cv=none; b=V4AAJnOF4ay2D2tuQ5l7NV96Fg8gbFamHfjI8XN4sjeTYdli/QHC533G6m4KpTJf9kQA0Wnt37SY8UqWjIuA9ZK7ieoR6Y/hEO0LMCMYQjt3SmlCqo5+TlUF54aOzmydcXEsNeg6hrQXqwrpiXDy6CV+bTQ+QUlk/GLOJXcO/cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788379590; c=relaxed/simple;
-	bh=PUdwSTyoKchnGNvcKZneP8Bj182M6z3uu7Ne1W7EWu4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lpSTDejNMI+VCIA6D1C5rFLMpZLPg+m+9cVNrcDHm2y4cUNfbFjYcJSnjSx/K4qJbxDGCd17j6HPobVEEAgjSYhNSu2fgtxj4ApXO5Kn9/w6RH9zMG3B65qqpxbUOJtF3Pi4dlwvk05FAt85ztn+vSUaPfrLQN+Kofzb8Az6lsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WCOKFc+O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788390631; c=relaxed/simple;
+	bh=gh0fIpKiPd0DP6/RuTzi5CpiJJOPRkFRWWSg57qcjP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hBLXd4b8IQao4UmUtk2mDtjaiLZRmWv14JuVqb90xwzzCr6hLuQ7+J1+g5hKNtfW4TkLPFndxnKOl5iGxlsh+PGYBjPJXz2hILGCgMt3oOKADP+HbaUQcAXViQBN2SDehr9f95R77F3oNKvwewLWJB8+q8LyoSBVCUZCPlDV5II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g5GAOmHr; arc=none smtp.client-ip=91.218.175.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCOKFc+O"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788379587;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qj6Ej6aw6ESKMozrrmkT6gNikVjoJG57NJAgL2FNY6M=;
-	b=WCOKFc+OOFBg8ZCGTQRn2hdODzY5e9d+JzC2swX2QKkeAddA8mVuPK8LykDkixbWyRF3lp
-	RNC88hmrTjNLqCUy9l5fISQqJR+8dvHnEWNWJv+CdYBuRqg7XfXb8J1RkfIODax9KAKdWQ
-	QmaLeODbOdfV9GYBhPs45PuJfw/mpvw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-66-lfSnGyAPO7iHpTz7KpplyA-1; Wed,
- 02 Sep 2026 16:06:22 -0400
-X-MC-Unique: lfSnGyAPO7iHpTz7KpplyA-1
-X-Mimecast-MFC-AGG-ID: lfSnGyAPO7iHpTz7KpplyA_1788379579
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 69AD1195421A;
-	Wed,  2 Sep 2026 20:06:19 +0000 (UTC)
-Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.17.16.153])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 08C161955F02;
-	Wed,  2 Sep 2026 20:06:15 +0000 (UTC)
-From: Jesse Taube <jtaubepe@redhat.com>
-To: linux-nvme@lists.infradead.org
-Cc: linux-scsi@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Justin Tee <justin.tee@broadcom.com>,
-	Naresh Gottumukkala <nareshgottumukkala83@gmail.com>,
-	Paul Ely <paul.ely@broadcom.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Hannes Reinecke <hare@suse.de>,
-	Jesse Taube <jtaubepe@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	John Meneghini <jmeneghi@redhat.com>,
-	Bryan Gurney <bgurney@redhat.com>,
-	Chris Leech <cleech@redhat.com>,
-	"Ewan D . Milne" <emilne@redhat.com>,
-	shinichiro.kawasaki@wdc.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v2 7/7] nvme: fcloop: Add set_marginal_rport to sysfs
-Date: Wed,  2 Sep 2026 16:05:47 -0400
-Message-ID: <20260902200547.184734-8-jtaubepe@redhat.com>
-In-Reply-To: <20260902200547.184734-1-jtaubepe@redhat.com>
-References: <20260902200547.184734-1-jtaubepe@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g5GAOmHr"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=gh0fIpKiPd0DP6/RuTzi5CpiJJOPRkFRWWSg57qcjP0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788390624; v=1; x=1788995424;
+ b=g5GAOmHrH9h9fSPe8sVCYbE/pbjm3LHnXzLzdTBsSeQQH0nFnBbRCr0G/2BSNOZE6gCKRtaH
+ qZKs9txtSEdfl4pZKSy0geWGtB5cmQTtt1E/BHgfjJRlQV6pelaYhSfoQl57Pkm5XEt+d2+Xl3l
+ k57GVP+fx/ryzBj5hTqVX2vg=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 1b76ea144a7bccf6;
+	Wed, 02 Sep 2026 23:10:02 +0000
+X-Mizu-Trace-ID: 1b76ea144a7bccf6
+X-Migadu-Flow: FLOW_OUT
+Date: Wed, 2 Sep 2026 16:10:01 -0700
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Ziyang Men <ziyang.meme@gmail.com>
+Cc: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>, 
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Ben Segall <bsegall@google.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	Emil Tsalapatis <emil@etsalapatis.com>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	JP Kobryn <inwardvessel@gmail.com>, Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org, 
+	bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] cgroup: expose cpu.stat and io.stat to BPF
+Message-ID: <apisezhyZe_3vp0x@linux.dev>
+References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
+ <apX9KtGrmfA7u0zV@devvm16600.scu0.facebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <apX9KtGrmfA7u0zV@devvm16600.scu0.facebook.com>
 
-To allow testing of multipath failover, add a sysfs attribute to set a
-remote port as marginal. This will allow the fcloop LLDD to set the
-marginal flag on a remote port, simulating a marginal link.
+On Mon, Aug 31, 2026 at 03:16:10PM -0700, Ziyang Men wrote:
+> Hi Reviewers,
+> 
+> Just want to follow-up on this patch series. Please let me know the possible
+> issues and I will fix them.
+> 
 
-Example:
-Turn on marginal for a remote port matching wwnn and wwpn:
-`echo 'wwnn=0x200000109b5f2956,wwpn=0x100000109b5f2956,marginal=1' >
-/sys/class/fcloop/ctl/set_marginal_rport`
-
-Turn off marginal for a remote port matching wwnn and wwpn:
-`echo 'wwnn=0x200000109b5f2956,wwpn=0x100000109b5f2956,marginal=0' >
-/sys/class/fcloop/ctl/set_marginal_rport`
-
-Suggested-by: John Meneghini <jmeneghi@redhat.com>
-Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
-V10 -> V1:
- - New patch
-V1 -> V2:
- - Fix reference count leak in error path
----
- drivers/nvme/target/fcloop.c | 50 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
-
-diff --git a/drivers/nvme/target/fcloop.c b/drivers/nvme/target/fcloop.c
-index b63af3b643a6..9977c2a71bd5 100644
---- a/drivers/nvme/target/fcloop.c
-+++ b/drivers/nvme/target/fcloop.c
-@@ -6,6 +6,7 @@
- #include <linux/module.h>
- #include <linux/parser.h>
- #include <uapi/scsi/fc/fc_fs.h>
-+#include <uapi/scsi/fc/fc_els.h>
- 
- #include "../host/nvme.h"
- #include "../target/nvmet.h"
-@@ -21,6 +22,7 @@ enum {
- 	NVMF_OPT_FCADDR		= 1 << 3,
- 	NVMF_OPT_LPWWNN		= 1 << 4,
- 	NVMF_OPT_LPWWPN		= 1 << 5,
-+	NVMF_OPT_MARGINAL	= 1 << 6,
- };
- 
- struct fcloop_ctrl_options {
-@@ -31,6 +33,7 @@ struct fcloop_ctrl_options {
- 	u32			fcaddr;
- 	u64			lpwwnn;
- 	u64			lpwwpn;
-+	u32			marginal;
- };
- 
- static const match_table_t opt_tokens = {
-@@ -40,6 +43,7 @@ static const match_table_t opt_tokens = {
- 	{ NVMF_OPT_FCADDR,	"fcaddr=%x"	},
- 	{ NVMF_OPT_LPWWNN,	"lpwwnn=%s"	},
- 	{ NVMF_OPT_LPWWPN,	"lpwwpn=%s"	},
-+	{ NVMF_OPT_MARGINAL,	"marginal=%d"	},
- 	{ NVMF_OPT_ERR,		NULL		}
- };
- 
-@@ -120,6 +124,13 @@ fcloop_parse_options(struct fcloop_ctrl_options *opts,
- 			}
- 			opts->lpwwpn = token64;
- 			break;
-+		case NVMF_OPT_MARGINAL:
-+			if (match_int(args, &token)) {
-+				ret = -EINVAL;
-+				goto out_free_options;
-+			}
-+			opts->marginal = token;
-+			break;
- 		default:
- 			pr_warn("unknown parameter or missing value '%s'\n", p);
- 			ret = -EINVAL;
-@@ -199,6 +210,9 @@ fcloop_parse_nm_options(struct device *dev, u64 *nname, u64 *pname,
- 
- #define TGTPORT_OPTS	(NVMF_OPT_WWNN | NVMF_OPT_WWPN)
- 
-+#define MARGINAL_OPTS	(NVMF_OPT_WWNN | NVMF_OPT_WWPN | \
-+			 NVMF_OPT_MARGINAL)
-+
- 
- static DEFINE_SPINLOCK(fcloop_lock);
- static LIST_HEAD(fcloop_lports);
-@@ -1663,6 +1677,40 @@ fcloop_set_cmd_drop(struct device *dev, struct device_attribute *attr,
- 	return count;
- }
- 
-+static ssize_t
-+fcloop_set_marginal_rport(struct device *dev, struct device_attribute *attr,
-+		const char *buf, size_t count)
-+{
-+	struct fcloop_nport *nport;
-+	struct fcloop_ctrl_options opts = {};
-+	unsigned long flags;
-+	int ret;
-+
-+	ret = fcloop_parse_options(&opts, buf);
-+	if (ret)
-+		return ret;
-+
-+	/* everything there ? */
-+	if ((opts.mask & MARGINAL_OPTS) != MARGINAL_OPTS)
-+		return -EINVAL;
-+
-+	nport = fcloop_nport_lookup(opts.wwnn, opts.wwpn);
-+	if (!nport)
-+		return -ENOENT;
-+
-+	spin_lock_irqsave(&fcloop_lock, flags);
-+	if (!nport->rport || !nport->rport->remoteport) {
-+		spin_unlock_irqrestore(&fcloop_lock, flags);
-+		fcloop_nport_put(nport);
-+		return -ENOENT;
-+	}
-+
-+	nvme_fc_set_remoteport_fpin(nport->rport->remoteport, opts.marginal);
-+	spin_unlock_irqrestore(&fcloop_lock, flags);
-+	fcloop_nport_put(nport);
-+
-+	return count;
-+}
- 
- static DEVICE_ATTR(add_local_port, 0200, NULL, fcloop_create_local_port);
- static DEVICE_ATTR(del_local_port, 0200, NULL, fcloop_delete_local_port);
-@@ -1671,6 +1719,7 @@ static DEVICE_ATTR(del_remote_port, 0200, NULL, fcloop_delete_remote_port);
- static DEVICE_ATTR(add_target_port, 0200, NULL, fcloop_create_target_port);
- static DEVICE_ATTR(del_target_port, 0200, NULL, fcloop_delete_target_port);
- static DEVICE_ATTR(set_cmd_drop, 0200, NULL, fcloop_set_cmd_drop);
-+static DEVICE_ATTR(set_marginal_rport, 0200, NULL, fcloop_set_marginal_rport);
- 
- static struct attribute *fcloop_dev_attrs[] = {
- 	&dev_attr_add_local_port.attr,
-@@ -1680,6 +1729,7 @@ static struct attribute *fcloop_dev_attrs[] = {
- 	&dev_attr_add_target_port.attr,
- 	&dev_attr_del_target_port.attr,
- 	&dev_attr_set_cmd_drop.attr,
-+	&dev_attr_set_marginal_rport.attr,
- 	NULL
- };
- 
--- 
-2.55.0
+AI bots have raised real concerns. Please address those and then resubmit.
 
