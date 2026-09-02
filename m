@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86924A8A28
-	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 20:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B4A4A9D6A
+	for <linux-block@vger.kernel.org>; Wed,  2 Sep 2026 20:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788379586; cv=none; b=PvNLRZ+QPM1RyVa8xvGyjejT9G6pHNXsp7r2q08UrfQLU+Z6Ruq5HniD4YbhUmHVG7EoZaT5nBZwtxafnXlqxzJQIcfnAgCnoUzTLinx/I94/c8HHf8SqI6UVKLQrXKQke1E6gkkK4+l1CxekaBPfJh7tcyjrfwWk6feNFCDEp8=
+	t=1788379590; cv=none; b=QqN/p4KPY5Haf9+XL8iCU7bq3k7J2Lq1C+Ta9sL4uY7zcEpb4Uz1QdRvOqxBfoSuwSLvnCQzncTM1uG00BXMRwe2wzY//Bhs+EOlAYadyFCdHnEMvfw4qvzVqkExjNf1fx2GupeOsolBejPEuNgFYfy8qR4fE34SWvtOGRf96gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788379586; c=relaxed/simple;
-	bh=TX/A9T7k2l7O+z/2UKblsu8QuGJl1aMR7tTvqKEq/WE=;
+	s=arc-20240116; t=1788379590; c=relaxed/simple;
+	bh=PUdwSTyoKchnGNvcKZneP8Bj182M6z3uu7Ne1W7EWu4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=izai+PP0Y7gH3heCp7ahhimZCmy+11PHCr4rpgOc77Ulqm7wQNfqYNoFKzDgRTB0oERjgN+gTRseit5xdl/TOAo5VMGyIfo0eCRstODnN99kQkMfUWM4P0y7+DZSiYhg75D3rheH1JkD+NTKXKKmFeAGz56EUjO1wViTJsEQWi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ldn/m6bx; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=lpSTDejNMI+VCIA6D1C5rFLMpZLPg+m+9cVNrcDHm2y4cUNfbFjYcJSnjSx/K4qJbxDGCd17j6HPobVEEAgjSYhNSu2fgtxj4ApXO5Kn9/w6RH9zMG3B65qqpxbUOJtF3Pi4dlwvk05FAt85ztn+vSUaPfrLQN+Kofzb8Az6lsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WCOKFc+O; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ldn/m6bx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCOKFc+O"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788379583;
+	s=mimecast20190719; t=1788379587;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XMYZkkfvLk4oMTmC0tcijBigxpVsXAU2YnaVB3q+VDM=;
-	b=Ldn/m6bxo1R/5lep3Y/uTh+V6UZ5XqLq5Q/WVMNyR5rbvqZcWHtzPD1XzSUvSSlNNCPepc
-	kogYM9tRRnIQlM/aMTgsqVYEqQNXdWEWOO1ciUupPuTZch+oeoMdM7yxD/h1djh47+KhJ6
-	dvWr1NfBUag+Q3sI7chpTb5T10C2K3U=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Qj6Ej6aw6ESKMozrrmkT6gNikVjoJG57NJAgL2FNY6M=;
+	b=WCOKFc+OOFBg8ZCGTQRn2hdODzY5e9d+JzC2swX2QKkeAddA8mVuPK8LykDkixbWyRF3lp
+	RNC88hmrTjNLqCUy9l5fISQqJR+8dvHnEWNWJv+CdYBuRqg7XfXb8J1RkfIODax9KAKdWQ
+	QmaLeODbOdfV9GYBhPs45PuJfw/mpvw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-Oa_6jVWVNQewd7r_--03mw-1; Wed,
- 02 Sep 2026 16:06:19 -0400
-X-MC-Unique: Oa_6jVWVNQewd7r_--03mw-1
-X-Mimecast-MFC-AGG-ID: Oa_6jVWVNQewd7r_--03mw_1788379575
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-66-lfSnGyAPO7iHpTz7KpplyA-1; Wed,
+ 02 Sep 2026 16:06:22 -0400
+X-MC-Unique: lfSnGyAPO7iHpTz7KpplyA-1
+X-Mimecast-MFC-AGG-ID: lfSnGyAPO7iHpTz7KpplyA_1788379579
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 691F9192DD55;
-	Wed,  2 Sep 2026 20:06:15 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 69AD1195421A;
+	Wed,  2 Sep 2026 20:06:19 +0000 (UTC)
 Received: from jtaubepe-thinkpadx1carbongen12.ibmlowe.csb (unknown [10.17.16.153])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B12581955F02;
-	Wed,  2 Sep 2026 20:06:11 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 08C161955F02;
+	Wed,  2 Sep 2026 20:06:15 +0000 (UTC)
 From: Jesse Taube <jtaubepe@redhat.com>
 To: linux-nvme@lists.infradead.org
 Cc: linux-scsi@vger.kernel.org,
@@ -69,11 +69,10 @@ Cc: linux-scsi@vger.kernel.org,
 	shinichiro.kawasaki@wdc.com,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH v2 6/7] nvme-fc: add nvme_fc_set_remoteport_fpin()
-Date: Wed,  2 Sep 2026 16:05:46 -0400
-Message-ID: <20260902200547.184734-7-jtaubepe@redhat.com>
+	linux-block@vger.kernel.org
+Subject: [PATCH v2 7/7] nvme: fcloop: Add set_marginal_rport to sysfs
+Date: Wed,  2 Sep 2026 16:05:47 -0400
+Message-ID: <20260902200547.184734-8-jtaubepe@redhat.com>
 In-Reply-To: <20260902200547.184734-1-jtaubepe@redhat.com>
 References: <20260902200547.184734-1-jtaubepe@redhat.com>
 Precedence: bulk
@@ -85,62 +84,146 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add nvme_fc_set_remoteport_fpin() and supporting functions. This
-function is called by the SCSI FC transport and driver layer to set or
-clear the 'marginal' path status for a specific rport.
+To allow testing of multipath failover, add a sysfs attribute to set a
+remote port as marginal. This will allow the fcloop LLDD to set the
+marginal flag on a remote port, simulating a marginal link.
 
-Co-developed-by: Hannes Reinecke <hare@kernel.org>
-Signed-off-by: Hannes Reinecke <hare@kernel.org>
-Signed-off-by: John Meneghini <jmeneghi@redhat.com>
+Example:
+Turn on marginal for a remote port matching wwnn and wwpn:
+`echo 'wwnn=0x200000109b5f2956,wwpn=0x100000109b5f2956,marginal=1' >
+/sys/class/fcloop/ctl/set_marginal_rport`
+
+Turn off marginal for a remote port matching wwnn and wwpn:
+`echo 'wwnn=0x200000109b5f2956,wwpn=0x100000109b5f2956,marginal=0' >
+/sys/class/fcloop/ctl/set_marginal_rport`
+
+Suggested-by: John Meneghini <jmeneghi@redhat.com>
 Signed-off-by: Jesse Taube <jtaubepe@redhat.com>
----
 V10 -> V1:
- - Remove nvme_fc_modify_rport_fpin_state
- - Use struct nvme_fc_remote_port instead of wwpn and wwnn
+ - New patch
 V1 -> V2:
- - Use nvme_ctrl_assign_marginal over set/clear_bit
+ - Fix reference count leak in error path
 ---
- drivers/nvme/host/fc.c         | 13 +++++++++++++
- include/linux/nvme-fc-driver.h |  2 ++
- 2 files changed, 15 insertions(+)
+ drivers/nvme/target/fcloop.c | 50 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 7886c0dcc626..c4810d048b87 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -895,6 +895,19 @@ nvme_fc_set_remoteport_devloss(struct nvme_fc_remote_port *portptr,
+diff --git a/drivers/nvme/target/fcloop.c b/drivers/nvme/target/fcloop.c
+index b63af3b643a6..9977c2a71bd5 100644
+--- a/drivers/nvme/target/fcloop.c
++++ b/drivers/nvme/target/fcloop.c
+@@ -6,6 +6,7 @@
+ #include <linux/module.h>
+ #include <linux/parser.h>
+ #include <uapi/scsi/fc/fc_fs.h>
++#include <uapi/scsi/fc/fc_els.h>
+ 
+ #include "../host/nvme.h"
+ #include "../target/nvmet.h"
+@@ -21,6 +22,7 @@ enum {
+ 	NVMF_OPT_FCADDR		= 1 << 3,
+ 	NVMF_OPT_LPWWNN		= 1 << 4,
+ 	NVMF_OPT_LPWWPN		= 1 << 5,
++	NVMF_OPT_MARGINAL	= 1 << 6,
+ };
+ 
+ struct fcloop_ctrl_options {
+@@ -31,6 +33,7 @@ struct fcloop_ctrl_options {
+ 	u32			fcaddr;
+ 	u64			lpwwnn;
+ 	u64			lpwwpn;
++	u32			marginal;
+ };
+ 
+ static const match_table_t opt_tokens = {
+@@ -40,6 +43,7 @@ static const match_table_t opt_tokens = {
+ 	{ NVMF_OPT_FCADDR,	"fcaddr=%x"	},
+ 	{ NVMF_OPT_LPWWNN,	"lpwwnn=%s"	},
+ 	{ NVMF_OPT_LPWWPN,	"lpwwpn=%s"	},
++	{ NVMF_OPT_MARGINAL,	"marginal=%d"	},
+ 	{ NVMF_OPT_ERR,		NULL		}
+ };
+ 
+@@ -120,6 +124,13 @@ fcloop_parse_options(struct fcloop_ctrl_options *opts,
+ 			}
+ 			opts->lpwwpn = token64;
+ 			break;
++		case NVMF_OPT_MARGINAL:
++			if (match_int(args, &token)) {
++				ret = -EINVAL;
++				goto out_free_options;
++			}
++			opts->marginal = token;
++			break;
+ 		default:
+ 			pr_warn("unknown parameter or missing value '%s'\n", p);
+ 			ret = -EINVAL;
+@@ -199,6 +210,9 @@ fcloop_parse_nm_options(struct device *dev, u64 *nname, u64 *pname,
+ 
+ #define TGTPORT_OPTS	(NVMF_OPT_WWNN | NVMF_OPT_WWPN)
+ 
++#define MARGINAL_OPTS	(NVMF_OPT_WWNN | NVMF_OPT_WWPN | \
++			 NVMF_OPT_MARGINAL)
++
+ 
+ static DEFINE_SPINLOCK(fcloop_lock);
+ static LIST_HEAD(fcloop_lports);
+@@ -1663,6 +1677,40 @@ fcloop_set_cmd_drop(struct device *dev, struct device_attribute *attr,
+ 	return count;
  }
- EXPORT_SYMBOL_GPL(nvme_fc_set_remoteport_devloss);
  
-+void
-+nvme_fc_set_remoteport_fpin(struct nvme_fc_remote_port *portptr, bool marginal)
++static ssize_t
++fcloop_set_marginal_rport(struct device *dev, struct device_attribute *attr,
++		const char *buf, size_t count)
 +{
-+	struct nvme_fc_rport *rport = remoteport_to_rport(portptr);
-+	struct nvme_fc_ctrl *ctrl;
++	struct fcloop_nport *nport;
++	struct fcloop_ctrl_options opts = {};
 +	unsigned long flags;
++	int ret;
 +
-+	spin_lock_irqsave(&rport->lock, flags);
-+	list_for_each_entry(ctrl, &rport->ctrl_list, ctrl_list)
-+		nvme_ctrl_assign_marginal(&ctrl->ctrl, marginal);
-+	spin_unlock_irqrestore(&rport->lock, flags);
++	ret = fcloop_parse_options(&opts, buf);
++	if (ret)
++		return ret;
++
++	/* everything there ? */
++	if ((opts.mask & MARGINAL_OPTS) != MARGINAL_OPTS)
++		return -EINVAL;
++
++	nport = fcloop_nport_lookup(opts.wwnn, opts.wwpn);
++	if (!nport)
++		return -ENOENT;
++
++	spin_lock_irqsave(&fcloop_lock, flags);
++	if (!nport->rport || !nport->rport->remoteport) {
++		spin_unlock_irqrestore(&fcloop_lock, flags);
++		fcloop_nport_put(nport);
++		return -ENOENT;
++	}
++
++	nvme_fc_set_remoteport_fpin(nport->rport->remoteport, opts.marginal);
++	spin_unlock_irqrestore(&fcloop_lock, flags);
++	fcloop_nport_put(nport);
++
++	return count;
 +}
-+EXPORT_SYMBOL_GPL(nvme_fc_set_remoteport_fpin);
  
- /* *********************** FC-NVME DMA Handling **************************** */
+ static DEVICE_ATTR(add_local_port, 0200, NULL, fcloop_create_local_port);
+ static DEVICE_ATTR(del_local_port, 0200, NULL, fcloop_delete_local_port);
+@@ -1671,6 +1719,7 @@ static DEVICE_ATTR(del_remote_port, 0200, NULL, fcloop_delete_remote_port);
+ static DEVICE_ATTR(add_target_port, 0200, NULL, fcloop_create_target_port);
+ static DEVICE_ATTR(del_target_port, 0200, NULL, fcloop_delete_target_port);
+ static DEVICE_ATTR(set_cmd_drop, 0200, NULL, fcloop_set_cmd_drop);
++static DEVICE_ATTR(set_marginal_rport, 0200, NULL, fcloop_set_marginal_rport);
  
-diff --git a/include/linux/nvme-fc-driver.h b/include/linux/nvme-fc-driver.h
-index 9f6acadfe0c8..95d79386d126 100644
---- a/include/linux/nvme-fc-driver.h
-+++ b/include/linux/nvme-fc-driver.h
-@@ -536,6 +536,8 @@ void nvme_fc_rescan_remoteport(struct nvme_fc_remote_port *remoteport);
- int nvme_fc_set_remoteport_devloss(struct nvme_fc_remote_port *remoteport,
- 			u32 dev_loss_tmo);
+ static struct attribute *fcloop_dev_attrs[] = {
+ 	&dev_attr_add_local_port.attr,
+@@ -1680,6 +1729,7 @@ static struct attribute *fcloop_dev_attrs[] = {
+ 	&dev_attr_add_target_port.attr,
+ 	&dev_attr_del_target_port.attr,
+ 	&dev_attr_set_cmd_drop.attr,
++	&dev_attr_set_marginal_rport.attr,
+ 	NULL
+ };
  
-+void nvme_fc_set_remoteport_fpin(struct nvme_fc_remote_port *portptr, bool marginal);
-+
- /*
-  * Routine called to pass a NVME-FC LS request, received by the lldd,
-  * to the nvme-fc transport.
 -- 
 2.55.0
 
