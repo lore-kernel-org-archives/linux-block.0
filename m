@@ -1,134 +1,108 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476384B1270
-	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 13:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788442155; cv=pass; b=fxi5xEux3L4P+nBqXji7pJzqSdgPErzBUF2s3ZLTA5NJlxOBwaYQ8IlbDAX2mQYyz1cTJ4hyYtw5PFfOOedz3tOvKIg1SJdAY22NRhfpKh2/imrkqZh/I/8PsDdr82m8yH8oxLlWB72hgCd9X3fRMgTIied/up0cqD+6Q2SRw6I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788442155; c=relaxed/simple;
-	bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sbvnuBRgZTxQw/9VeY0oIRI798RZoIHipBmiemc378UBlll+wWFpXyXtTAAw4v8KGFGsHa6/zMGQMeTz6c9l44cSLmnp7/Gu4UMtpqZFQppexFLA/uOkAoQgxlYsu6arXupjwOFgJDdrxZrivlpZWHZlB37ZiUMRHlzUnxrH0AM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QibOJQnk; arc=pass smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1418B378838
+	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 17:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788457301; cv=none; b=tGbE48jf1Mybp2qiFWXoB1vxNLPJHkB1uzM3sUFadjzr+VK8rU+0LcT0NozTEjefTCahP+v/2j3hu0vbjyPhNV3w/vYeKQGhdqjeJO05NdGemyU+DGxzTsnUCJELFM4bDvSKwcFgt5SlaQHn0FLXy6YKobw0FPNUo3KHR4xaXCc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788457301; c=relaxed/simple;
+	bh=pWSElYc8vth469p/p45Q3vrajNYvKALRapQG0DOJD5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LDc6YQm5FVLlCAfgo9NKYIe1iFoexVJhVo8riARmKaJzrfkcwrGCP757uqHuzEdXVGI8lWOIXMYIY3OYm9csu097nU3Pt7NvIMNKg9ZvMoi/CadmRROqCBotl4M5QLJFFqJZkBt+7DKubyq9fWOrW/88AdEQdIbQKtV2kk3Z7Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VW0pjsgA; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QibOJQnk"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cc442c988b2so41653a12.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 06:29:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788442137; cv=none;
-        d=google.com; s=arc-20260327;
-        b=MbJsQevOoIpfVoF7jOP34obtJbo+CP/6V8Oa65Du9GjRWKIErdbao5mjg5uDFoo0T3
-         DFxat9An+HnVRW128tGSv+dgVodq8S3MKsua/oHZUIdooJ/ZmEIUtmdPWZgD2P9nDs4j
-         pnizER6UIkuWVyBglHLHILEPP4utQ0UISkgM1blpk5uR+2B38aUwQ1S8iuE3i7Y1ywxs
-         SdL6n37ddl6ag+tz29shFgOEnIMZsHyEhn5q2J9pJcJK8K73WO3+mYepBPiE9KaaVHLO
-         p0PJQ0gIRsz+P3Qo3kEIWceHtsi3teddM5c/ovXWJzJ6WGWC7YPBdlJV9BGxtQs5MIm0
-         879w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
-        fh=Ua1KGO4gA/COLpTW/0s7lEOtayydJlT2gqkR3Znd9kw=;
-        b=dfnk4ZKaFMQCf9yHIJMOGvFnkKVpKYhe97XpB2toj1dVg8gYxfQ1+QDeNW9668VVir
-         ko35fir59sb3l1upF0IzWXpX6RVpskkBQIt+7WFEjKey9H6aqskxmyYcY1fWMgGAeyEi
-         somv/B/xXf1pz1+6OvtcQMPMCTeyeo2he8Z1YOrXZnByk9J8pjzv0nSS8to5mjI3jKpf
-         848vOxK3xRfJh6j0sL7wU1YIdkQwYjVrSjMRhX8C56ELAsR9JHKC63OORUEKG3AlZmw0
-         LJ065K6/f4/iwPpuFB1uE2vSsGTb4qc44cBdDt9+4Lm5DyP0eZ9D0c9dalw0JMKHXbj2
-         ZljA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VW0pjsgA"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6b1c75f0049so60764eaf.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 10:41:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788442137; x=1789046937; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
-        b=QibOJQnk1IcJqAPts7niHKXB4MYd7rKKk/wudeEGKQp0iGQwDGwevv3JskZ75xdch6
-         jfqm4L1dCpknWVRfoup0pgPVeoVkxrEgPBofP5UlvVojRvaPkpNXhQFo3YOpI5eUKzJ3
-         oVIpCzNOrezqt2zVbyS0+jWle3e6IbhPsEo3ji4QqZhQGS8vqm75osJq5KNHbniSe7Cs
-         7IMjXLKRAKNvoWjZP6f0QpU7q5nxhdS5rzzAAq7Cy/eRo92sBJSuU2C/89sY38/jJfVI
-         jvANMBPDBxnLupAoA5f1OGYcmYjS1lAQ1aXvNLhVjMv0fKwt2U1nwuAN5oFlZ7SxOXAL
-         4HoQ==
+        d=gmail.com; s=20251104; t=1788457299; x=1789062099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ykwTaa6ygXsfYqfQ8E8HUJuFa56MBU+sp0H1tR5irQM=;
+        b=VW0pjsgAhOnEXoABdJX0LSb+sMnJDPixNllCbrjJD3bhhkzVdNRHRjyM1jfBc3LC1i
+         DHfmAzoJiJ0nrxX/W6glocopx6Of4VNS+MQlUSJUkDSYF0yfuXyscS95/FJ20eITF9/e
+         XjUU3dm4Srj6zHaxx0hKVhLQ3liXe4lpKyD5GSVles3RR6NUc+H+jRFZH65s+xw86r3p
+         RkIlFqGZSaqjS4crqChPYj3NJ819/1yScIsOEhRLIIev8pXLeF7w0hDCfL8LdPYDpPNo
+         Bau6wQhsM6ZHCuPaKKLuiITvUc7hXh1490Hlacq1rmcZIzSgid2ShitqkhaynLQp0rFE
+         0wJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788442137; x=1789046937;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
-        b=XkJl3CH0pcUT0tITl4R3RsjM337gfKlo1OczVQUSXmDMCYlK4CEuvLd62kHVjNtFRN
-         fla2cRcDGAZusJFaOCgjr7h5/KOJ4SKo4nhn4gwdKkfyUlafuKKI33Z9ud0t1O1Adw62
-         3HPpUNypdMJPBQ7ZRnpIrYRXBhqaeu2XRDBTmHQdsavBX2JbqS/59WYZMQ+GhXfgbal9
-         tCWBRUZvc/ZWw9JuHyUddSOAGrzAiffVBkOuoBTyOV1DCe2Ihauna/80q27PLfVefZXk
-         uFHG2dvha2kffl56LFtr4SOz1Q4HlcDOPl0D7eJt2LYMLka9pvCUkdt9uscAsl5xyPig
-         wiQg==
-X-Forwarded-Encrypted: i=1; AKwUvBy9TvHPjsaGO8RXmXyifh3W0zXsveUBn5+QLcZ48HN7NFCc0Can5+tCOlEQM4lLajNx+S3OjG6We1HvJw==@vger.kernel.org
-X-Gm-Message-State: AFuF++k5XoJ3WgmQY64dfboetQmMQMIcfxyepF+tMtOZGVNt85mfTFeh
-	pPChWFqQd6bPTd6yb/riL3sTK1HJ18aDUkkrsfr9e8T4k2HEyG8Dmj28V6PvQ/OoeZ8bHpIa89P
-	vT8RTDSWN9LwvhvKiBXtatNIJUQ1PaxE=
-X-Gm-Gg: AYBFou2+e1pnoM7TDzXiBKsd4CL9whqwzxdimQpJ/TL+Njzl3vGjkEM2iTzrTLDgOHx
-	kInFnH6Pc2yIVDq/HxRpKqh0RhAqK3KorLlQA9nTSKDsggNq3iPtL3Ys57z6lyErmuNnnRDpAzi
-	TEvuSvJz1INh4HkNPFUNhTHKwrhXUws4rlD275EeJUWVFlun6AmGvxzOyC9KuLW72F0zeth56Xt
-	TKloDqGt6hAYs5VzX2t7Z55vLqdj+VgfU+SCX1fN5Kzzu0iiYLDksMqo1nQvM/E435GXQGKRZxs
-	zG95kndCXden59DFyKDyFITFBfIMjFh3B/aplt+S6RJO0tSF1mJjuldsMVaOU5tlu5AB06zVFsG
-	fK4zeN4NKVzM9W/sz1wTPlTZOg9/vLVAOBwdV3vxtplzZVAN2Upa+ZfLF+fKX
-X-Received: by 2002:a17:90b:1d0d:b0:38e:c140:2a0b with SMTP id
- 98e67ed59e1d1-39aee0e6ed8mr12609481a91.3.1788442136905; Thu, 03 Sep 2026
- 06:28:56 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788457299; x=1789062099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ykwTaa6ygXsfYqfQ8E8HUJuFa56MBU+sp0H1tR5irQM=;
+        b=eYEKFbcSWR/GSbov6Gdpi8Dc71I5Vaq6xzrHl6c07VLZQlU4o1uTw0rKLl3bznAwxv
+         29PkqencOOwDDVaNkEDO4FJl9YZwrRKPoZqFdYk8T+wQMl8pfUhNcKB6vv9ieacW9Ba/
+         AalRiORh1PudtkrlqgcQuSQ4ywbbBfCQGTDBVOS3h0agOHxoacypSMClZec9oY8rAGL/
+         CQGgWsatBW3pVk9wKpIlCTXoG5GtAt2gZXDkmI7oGzYthBixlj5V4gukjEN5rRrEsrFe
+         s7INm+s6RDF99Z/P0AxaNPQTfIqcabQHzT78Krnn6G1ezfbFKihC/GTMHpFUd50fjO9P
+         ncRQ==
+X-Gm-Message-State: AFuF++lRd1QS+AV0Ry8mZ8jpa8Q2BkjhqVI8sQv6iQEO66mPPdqltwNJ
+	cCkUFkgjhcIp49H1nb/PejtuiErNZl4iJN52Fkzet0iC+Wheqfg5IpQQk8CPya/VfflZaw==
+X-Gm-Gg: AYBFou2I7nfzjBpDeFf+zpxhWvwsO/YY/850bYDIQO7lU1p+8Dy5iDEq3gmQOZCyRcf
+	EyaSyGlbd2/0no60yPw2Oec+tl7HwGf/ZKJVjHhBMMGbgLqztFEFZrlcgL0T1DusfOpJeONUH+g
+	serRA7na+lVOqlIS1yl3rimg3bIfu+P6kg3JhWOR/3Kpn5koVfUoTH3FmUv0CSRjM8k88Jjg+CS
+	UGWlVNPSh2snqzlfZJa2HTOXDwqgJhCmO+TRKIABKEl+CuEnFbkfyzRNTqXeMsspokhX+G9UXfS
+	pPOmWKODqoBx93zerULph0EVDcjJy7SEDxb8npAstaR0h64nncJEFt3bla82XkxSCHrSU8mHoKu
+	Uqaz4QCGGt6LktzvV8mVZCge1rrspDkwPtB4kNNWWwjyxopN2PkQ5qCsqPnEnCGjG1vjYW12y0T
+	HWYnTvsYCY6L7xv3+lKSTgEvcnJU77pWXlYzTdvE9f2jh/EDAucDrhCXbivw==
+X-Received: by 2002:a05:6820:1524:b0:6ae:a950:9fb4 with SMTP id 006d021491bc7-6b6fe0b8574mr263503eaf.33.1788457298656;
+        Thu, 03 Sep 2026 10:41:38 -0700 (PDT)
+Received: from debian.lan ([172.245.89.240])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b6de522bb0sm568133eaf.13.2026.09.03.10.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2026 10:41:38 -0700 (PDT)
+From: Maks <mi9992828@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: block: zero logical block size leads to infinite loop in set_init_blocksize()
+Date: Thu,  3 Sep 2026 20:41:24 +0300
+Message-ID: <20260903174124.51009-1-mi9992828@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
- <20260824-unique-ref-v20-6-490735672187@kernel.org> <CANiq72mPLrKQMzb37ow2969m5r3Z2Kh_4LHERUun6ALw3ea6tg@mail.gmail.com>
- <87y0dt1b8b.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <87y0dt1b8b.fsf@t14s.mail-host-address-is-not-set>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 3 Sep 2026 15:28:43 +0200
-X-Gm-Features: AcwNN1XsmuEPyO39jqyvRGfAMw_DGGPMkiDRHtfg1ZEoNlBhpVDCHnmjvBP_pa8
-Message-ID: <CANiq72muo8SotJHJQhEe=2kiprbrQTvrEMqd1Uw_7yNSfA3Gpw@mail.gmail.com>
-Subject: Re: [PATCH v20 6/8] rust: Add missing SAFETY documentation for `ARef` example
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
-	Ira Weiny <iweiny@kernel.org>, Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, driver-core@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Oliver Mangold <oliver.mangold@pm.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 26, 2026 at 11:29=E2=80=AFAM Andreas Hindborg <a.hindborg@kerne=
-l.org> wrote:
->
-> Do you want a link to this issue with a regular `Link:` tag?
+Hi,
 
-Yeah, thanks!
+I hit a soft lockup in set_init_blocksize() with a block device whose
+logical_block_size was zero.
 
-Cheers,
-Miguel
+I understand that logical_block_size == 0 violates the block layer
+contract and that the driver which allowed this value needs to be fixed.
+
+However, the generic block code currently turns this invariant violation
+into a non-terminating loop:
+
+while (bsize < PAGE_SIZE) {
+    if (size & bsize)
+        break;
+    bsize <<= 1;
+}
+
+With bsize == 0, the value never changes.
+
+In my case this resulted in:
+
+watchdog: BUG: soft lockup - CPU#0 stuck for 26s! [(udev-worker):...]
+RIP: set_init_blocksize+0x28/0x60
+
+Call Trace:
+  blkdev_get_whole+...
+  bdev_open+...
+
+Is this considered acceptable behavior for a broken driver, or should
+the generic block layer defensively detect this case and fail the open
+instead of spinning indefinitely?
+
+If adding such a check is considered worthwhile, I can prepare a patch.
+
+Thanks,
+Maks
