@@ -1,130 +1,294 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED134367F58
-	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 22:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B48E31E855;
+	Thu,  3 Sep 2026 23:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788474798; cv=none; b=Rkh5ZHA+dA5kknxcD5QFkqnr546otk2HQYki2eHonzB7Zr3TQgQekZqWi7QWjUAsR2KH474EJS3rnMIBkAmb/609p7TTKjfci+kInY5vQVDLfSep1mFNVaBc+ge5eQN5QHq1ZqiaqcjVLRwQQI9zXjNl8GPzj8B8Bsw/TyOey2Y=
+	t=1788477435; cv=none; b=YvXvIga/6b4zdJ3amXyEBuDjQ+KyfElF6NizkmnnvolJcCEyGACbApUb/kfeodALMpET4ujFJSS7W+uITPgD/zDIe8OffscIxm4Z4y6mxZbMG+me/TZSz4d/5sbWKsFqvlSrI75RzXahVxB4ydJFN89OyIf8dNL6R0oiyoDnMAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788474798; c=relaxed/simple;
-	bh=4c3nfHzx6sq9eUFKnQag6UKfPOIkWmaO1ykpU7H4aTg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EkeXXh9iIjPfI3HUEl+GUr9a327R3FqxtHZc2liSj212zKZeOS52m78lam3SyBiz9XQQH5wHIEoxBbxeXSSj8Xlo/PKHy16TB6nc/nKjC5/YSGom8FEC4q2FTvDss3//h8FLUwtLSLBV1FI0CiXBFxCy4X6qqrwamogrAtMm5Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FsHvcRhC; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsHvcRhC"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2d6f9e2f681so4102985ad.3
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 15:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788474796; x=1789079596; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=fsb6fC2BuVNqBfvyOr4NyKSsD45FGtfpTAVkgi/kym4=;
-        b=FsHvcRhCU6TMl+UeBx+bnI8iEyrnBLJwSmw9MOiZMDL29XawM5rsCzPt5uvYnfeCRd
-         VxMzbh+f/Q2YjF3tjclhwcCrez5bxpwNi+ODuX9ExQ9kfWQAjhj0CKHLgW76roI2rDKl
-         +Bnot7RxzAuGXtuPcLje3DjlYwFhqyU21vWhmqRI3S/U/IXncIUAKQ0oO0cUeBL+qiYq
-         WEOHWLinVimGVZhqVOZb8E/SC1kbn7fXkpq3USuc+lG57dj32GGkVg24WpiAfAeBI069
-         PnGalnKHaQyjpmO3Y/tlrVGVWV3mWWZI36WWV2wZnjlunR2MeRT0LiWqu1ky/vfizaYL
-         ek7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788474796; x=1789079596;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fsb6fC2BuVNqBfvyOr4NyKSsD45FGtfpTAVkgi/kym4=;
-        b=CZlhkeB584Wwb//ReG36TSN+OVL1gY/CEwhAfSpGMqf4rrT1jywbQ0iI/eZ2PVPQ8U
-         Rb46KBUUpmXbsZudTqbWNYFgQLYchpfWPrkYuSGD2JG2BBFvlOlVNmkFO6qbliErJRHx
-         bVgy1kA/RV7KEi8bu+5s19WK2//TRGRF+1YZo8rPtzhguMoQc+yx94Sv8o3dDb2/niiw
-         bYhdZazQ1HNwBFOKcfUyl+CNWbI9JASy0nFVqsVrN9jRn+GXWtydc5jG7Vc/ir6aGKZW
-         odH/Vui8o4eM4fz4Y1p78aGFiV0Sjbl6jg/67H72bBbEKcESYD8UpId+ilmyuWe5OU3H
-         SW0A==
-X-Forwarded-Encrypted: i=1; AKwUvBwbCi4YFpT3B1tQqZJ1YkYujg4VvkUG2kogWo8VbqPkivTj+PEyKPKq4brmgmShUDJmBNXwgU2/wEF74g==@vger.kernel.org
-X-Gm-Message-State: AFuF++lfQo8lPydq8hD8Y4LIgc0q2BfBpubQYzueo/8/UrnCmzyAXCMq
-	wAlJNlNcVPIUg2eclHXFAgdmJHbI4KxAAOVD4fHoZQv6IY4G1ct6GQLn
-X-Gm-Gg: AYBFou2MtkRIEObsX8E8lmqLT/ej6nk+M5/aPgBOumAeDvNn0DQ4DGdvuNHAU03Tdb6
-	L3pEszrxm43Ae62F3n2dfKMhmn8nAqml8LHxX5SaX4aS3Yfc7iLeuFzb472x/ZgwHrkoWxztfgN
-	179VOD2K+uGSUAQQRYnvXhHFsTdwZvkJcfQ2aRyDMUNg6dty9eUhTe5KT+6j//IqmSQG2jicYAL
-	81pAgDEcrAEM+W8n32PILI+qDpOCGzIJKW68+zyeaEy8ddKMXvq+2S9fqUJgot5zGWM1c+Rg0Gx
-	gVFH4tdWmqcWia5akwCyoHkJjIbq+4yjxRKKjLGT3qDa/TPVELlnAmYLNllCSfRBU0y59gBiBbt
-	Ece71BH3t2DmRNsuZoQn9L+rRYmTsWRnjmxbvgZzaxOAKC6GRg5QIydXEM8Hz74GfFIebb1aBdw
-	fS+O4qZ5ZQeOX3h44WFFPvnAaQHSoW1yAaNAqsdQ1929LxZSoNNeZI49Ai1gcCEw1YRvxKUFSyj
-	QM7HvSV
-X-Received: by 2002:a17:90b:268f:b0:398:c3a3:dbd0 with SMTP id 98e67ed59e1d1-39b2612eb96mr2849147a91.8.1788474796180;
-        Thu, 03 Sep 2026 15:33:16 -0700 (PDT)
-Received: from devvm16600.scu0.facebook.com ([2a03:2880:9ff:73::])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339a534d25sm1797152eec.5.2026.09.03.15.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 15:33:15 -0700 (PDT)
-Date: Thu, 3 Sep 2026 15:33:12 -0700
-From: Ziyang Men <ziyang.meme@gmail.com>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: kernel-team@meta.com, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Ben Segall <bsegall@google.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Mykola Lysenko <mykolal@meta.com>, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] cgroup: expose cpu.stat and io.stat to BPF
-Message-ID: <apn1qN+ic4A7elHD@devvm16600.scu0.facebook.com>
-References: <20260820211758.3393984-1-ziyang.meme@gmail.com>
- <apX9KtGrmfA7u0zV@devvm16600.scu0.facebook.com>
- <apisezhyZe_3vp0x@linux.dev>
+	s=arc-20240116; t=1788477435; c=relaxed/simple;
+	bh=OcraPRWToqpWgIaAhNICXIMXXlLZJ8IO7GQah7aYTWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rx2VTHtb5xYRHOEgXSWR/KPy9wFwdzZHY8qtzkHGadbsOhCxoR/W0yra1n+Pp40NWu/3MmhQ+NwsYJ2oU6Vs5kWajkOnnV7dfQ7XgdUvzranKApUBFY3KJtrRbor1pSUZtHx9A2HUIR5H3Eo88JBMAyevrYbf0U+XdQTUnUcwfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 683NFuGC006373;
+	Fri, 4 Sep 2026 08:15:56 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 683NFugi006370
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 4 Sep 2026 08:15:56 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <9ac07477-b2be-482b-9e97-87acf9635307@I-love.SAKURA.ne.jp>
+Date: Fri, 4 Sep 2026 08:15:55 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <apisezhyZe_3vp0x@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v7.1] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Bart Van Assche <bvanassche@acm.org>,
+        Markus Elfring <Markus.Elfring@web.de>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, lkp@intel.com,
+        oe-lkp@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>, Oliver Sang <oliver.sang@intel.com>,
+        linux-btrfs@vger.kernel.org
+References: <8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp>
+ <550ff0b4-df39-46d2-9781-c8688df10c93@web.de>
+ <38ad64c1-edc7-431d-8f52-fba572ebf3eb@I-love.SAKURA.ne.jp>
+ <372ca5f6-81a0-4f6c-8f55-ebeeada9f955@acm.org>
+ <27bcb147-bead-4432-8cd0-981489f36228@acm.org>
+ <c41e9198-86a8-4bcd-a608-6f457b24f345@I-love.SAKURA.ne.jp>
+ <7e51bca8-218a-40b8-8ff8-fc59671f5add@acm.org>
+ <3bb080d0-4421-4012-8a62-6a2bf165cbd9@I-love.SAKURA.ne.jp>
+ <d2f387b9-031a-4306-9323-56f98a8241b7@acm.org>
+ <e5518546-701e-4d3c-a077-18e34aa8c188@I-love.SAKURA.ne.jp>
+ <c0df5f39-d103-4e36-9807-df0ae0247772@acm.org>
+ <c2ab2547-63b3-48cf-87c1-fc53219e360a@I-love.SAKURA.ne.jp>
+ <d0471919-9b71-4d24-9fb8-5f1d7f3792ca@acm.org>
+ <903a22a2-432c-4e72-bc09-7898becf2f3e@I-love.SAKURA.ne.jp>
+ <d7e26d4b-d9b9-47c0-9658-c241499209b5@acm.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <d7e26d4b-d9b9-47c0-9658-c241499209b5@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav311.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Wed, Sep 02, 2026 at 04:10:01PM -0700, Shakeel Butt wrote:
->On Mon, Aug 31, 2026 at 03:16:10PM -0700, Ziyang Men wrote:
->> Hi Reviewers,
->>
->> Just want to follow-up on this patch series. Please let me know the possible
->> issues and I will fix them.
->>
->
->AI bots have raised real concerns. Please address those and then resubmit.
->
+syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
+An analysis by the Gemini AI collaborator [3] considers that this problem
+is caused by a timing shift primarily exposed by commit 65565ca5f99b
+("block: unify the synchronous bi_end_io callbacks"), along with helper
+refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
+helper").
 
-Hi Shakeel, 
+But due to difficulty of reproducing this race, discussion about what is
+happening and how to fix this problem is stalling. Also, we haven't
+identified how many filesystems are subjected to this problem.
 
-I have reviewed the AI bots suggestions, and it seems the main issue is to
-decide whether we want some kfuncs to be NMI safe, e.g., 
+Therefore, introduce a grace period for flushing outstanding I/O
+(which should be a good thing from the perspective of defensive
+programming) so that we won't hit NULL pointer dereference problem.
 
-	- The `bpf_cgroup_base_stat()`, which calls the `cputime_adjust()` and in turn
-	  acquires `raw_spin_lock_irqsave()`.
-	- The `bpf_cgroup_css()` and `bpf_css_release()` to get/put the css.
+However, calling drain_workqueue() from __loop_clr_fd() with
+disk->open_mutex held causes lockdep warnings. We need to flush
+outstanding I/O without disk->open_mutex held. Therefore, defer
+__loop_clr_fd() to WQ context, like commit 322c4293ecc5 ("loop: make
+autoclear operation asynchronous") did.
 
-The simply solution is to mark them SLEEPABLE.
+The past attempt was reverted by commit bf23747ee053 ("loop: revert "make
+autoclear operation asynchronous"") for two reasons:
 
-Hi Eduard, what's your idea about this? Do we want to mark them SLEEPABLE or there
-are better ways stand in the mid?
+  (1) Userspace might be expecting that fput() on the backing file is
+      processed before lo_release() from close() returns to user mode.
+      But a debug patch [4] suggested me that this teardown operation is
+      racy regardless of whether disk->open_mutex is temporarily released
+      or not, and therefore the xfs/259 breakage should be addressed on
+      the xfstests side.
 
-Thanks,
-Ziyang 
+  (2) Lockdep reported circular locking dependency caused by flushing
+      system-wide WQs. But we no longer need to worry that dependency
+      because all in-tree users no longer flush system-wide WQs.
+
+Therefore, let's retry deferring __loop_clr_fd() to WQ context.
+
+Link: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
+Link: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 [2]
+Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp [3]
+Link: https://lkml.kernel.org/r/9f8b5ab0-efbc-4cf3-a1f8-b43377416946@I-love.SAKURA.ne.jp [4]
+Fixes: 65565ca5f99b ("block: unify the synchronous bi_end_io callbacks")
+Assisted-by: Gemini-Pro
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+What an AI coding assistant based on Gemini told Bart about the v7.1 patch:
+
+  1. Userspace ABI / Teardown Regression (Asynchronous Autoclear)
+
+  The Regression: When a loop device configured with LO_FLAGS_AUTOCLEAR is
+  closed (such as during unmounting with umount -d or mount -o loop),
+  userspace expects that close() synchronously tears down the device and
+  releases the backing file (fput()) before returning to user mode.
+
+  Prior History: This exact asynchronous deferral was merged in commit
+  322c4293ecc5 ("loop: make autoclear operation asynchronous") and had to
+  be reverted in commit bf23747ee053 ("loop: revert 'make autoclear
+  operation asynchronous'") because standard filesystem unmount sequences
+  (such as umount ext4_on_xfs; umount /xfs) broke with -EBUSY in xfstests
+  (e.g., xfs/259).
+
+  Kernel Policy: Handwaving this in the commit log ("the xfs/259 breakage
+  should be addressed on the xfstests side") is not acceptable. Breaking
+  synchronous teardown semantics violates the core Linux kernel rule: never
+  break userspace. Real-world container engines, test suites, and system
+  utilities rely on fput() having completed when lo_release() / close()
+  returns.
+
+What Bart says about the v6 patch which does synchronous teardown:
+
+  Releasing and reacquiring disk->open_mutex from __loop_clr_fd() seems
+  risky to me. There is plenty of code in block/bdev.c that assumes that
+  disk->open_mutex is not released by lo_release().
+
+Then, what direction can we go?
+
+ drivers/block/loop.c | 74 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 60 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 6f12976035b0..516118b3a16c 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -75,6 +75,7 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
++	struct work_struct	lo_clr_work;
+ };
+ 
+ struct loop_cmd {
+@@ -1134,13 +1135,42 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 	return error;
+ }
+ 
+-static void __loop_clr_fd(struct loop_device *lo)
++static void __loop_clr_fd(struct work_struct *work)
+ {
++	struct loop_device *lo = container_of(work, struct loop_device, lo_clr_work);
++	struct gendisk *disk = lo->lo_disk;
+ 	struct queue_limits lim;
+ 	struct file *filp;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	int err;
+ 
++	/* Step 1: Flush all outstanding I/O, without open_mutex held. */
++	/*
++	 * Since loop_queue_rq() is called with RCU read lock, this synchronize_rcu()
++	 * makes sure that no more queue_work() calls are made from loop_queue_work()
++	 * from loop_queue_rq(). Subsequent loop_queue_rq() calls which are made after
++	 * this synchronize_rcu() returned shall see lo->lo_state != Lo_bound and
++	 * return with BLK_STS_IOERR.
++	 */
++	synchronize_rcu();
++	/*
++	 * This drain_workqueue() makes sure that no more loop_handle_cmd() calls are
++	 * made from loop_process_work() from loop_workfn()/loop_rootcg_workfn().
++	 */
++	drain_workqueue(lo->workqueue);
++	/*
++	 * This blk_mq_freeze_queue() waits for completion of all outstanding I/O
++	 * which has been scheduled via loop_queue_rq(), by waiting for q_usage_counter
++	 * to reach 0. Since the lo->lo_state != Lo_bound check in loop_queue_rq()
++	 * guarantees that no more new I/O requests are made, we can call
++	 * blk_mq_unfreeze_queue() immediately after blk_mq_freeze_queue() returns.
++	 */
++	blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
++
++	/* Step 2: Perform remaining cleanup, with open_mutex held. */
++	mutex_lock(&disk->open_mutex);
++	WARN_ON_ONCE(lo->lo_state != Lo_rundown);
++
+ 	spin_lock_irq(&lo->lo_lock);
+ 	filp = lo->lo_backing_file;
+ 	lo->lo_backing_file = NULL;
+@@ -1151,12 +1181,7 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	lo->lo_sizelimit = 0;
+ 	memset(lo->lo_file_name, 0, LO_NAME_SIZE);
+ 
+-	/*
+-	 * Reset the block size to the default.
+-	 *
+-	 * No queue freezing needed because this is called from the final
+-	 * ->release call only, so there can't be any outstanding I/O.
+-	 */
++	/* Reset the block size to the default. */
+ 	lim = queue_limits_start_update(lo->lo_queue);
+ 	lim.logical_block_size = SECTOR_SIZE;
+ 	lim.physical_block_size = SECTOR_SIZE;
+@@ -1168,8 +1193,6 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	/* let user-space know about this change */
+ 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+ 	mapping_set_gfp_mask(filp->f_mapping, gfp);
+-	/* This is safe: open() is still holding a reference. */
+-	module_put(THIS_MODULE);
+ 
+ 	disk_force_media_change(lo->lo_disk);
+ 
+@@ -1199,11 +1222,18 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	WRITE_ONCE(lo->lo_state, Lo_unbound);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
++	/* Step 3: Drop refcounts, without open_mutex held. */
++	mutex_unlock(&disk->open_mutex);
++
++	put_device(disk_to_dev(disk));
++
+ 	/*
+-	 * Need not hold lo_mutex to fput backing file. Calling fput holding
+-	 * lo_mutex triggers a circular lock dependency possibility warning as
+-	 * fput can take open_mutex which is usually taken before lo_mutex.
++	 * This is safe: flush_work() from loop_remove() from loop_exit() waits
++	 * until this function returns; effectively dropping the final module
++	 * references synchronously.
+ 	 */
++	module_put(THIS_MODULE);
++
+ 	fput(filp);
+ }
+ 
+@@ -1769,8 +1799,20 @@ static void lo_release(struct gendisk *disk)
+ 	need_clear = (lo->lo_state == Lo_rundown);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	if (need_clear)
+-		__loop_clr_fd(lo);
++	if (!need_clear)
++		return;
++	/*
++	 * In order to flush outstanding I/O before clearing the backing
++	 * device, defer __loop_clr_fd() to WQ context. The Lo_rundown state
++	 * guarantees that lo_open() will fail with -ENXIO.
++	 *
++	 * Grab disk reference which will be dropped as soon as
++	 * returning from lo_release() and releasing disk->open_mutex.
++	 * We don't need to grab disk->fops->owner reference because
++	 * we are holding one obtained by loop_configure().
++	 */
++	get_device(disk_to_dev(disk));
++	queue_work(system_long_wq, &lo->lo_clr_work);
+ }
+ 
+ static void lo_free_disk(struct gendisk *disk)
+@@ -2034,6 +2076,7 @@ static int loop_add(int i)
+ 	lo = kzalloc_obj(*lo);
+ 	if (!lo)
+ 		goto out;
++	INIT_WORK(&lo->lo_clr_work, __loop_clr_fd);
+ 	lo->worker_tree = RB_ROOT;
+ 	INIT_LIST_HEAD(&lo->idle_worker_list);
+ 	timer_setup(&lo->timer, loop_free_idle_workers_timer, TIMER_DEFERRABLE);
+@@ -2138,6 +2181,9 @@ static int loop_add(int i)
+ 
+ static void loop_remove(struct loop_device *lo)
+ {
++	/* Wait for __loop_clr_fd() to complete. */
++	flush_work(&lo->lo_clr_work);
++
+ 	/* Make this loop device unreachable from pathname. */
+ 	del_gendisk(lo->lo_disk);
+ 	blk_mq_free_tag_set(&lo->tag_set);
+-- 
+2.55.0
