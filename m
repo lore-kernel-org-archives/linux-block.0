@@ -1,150 +1,134 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0934D4A99CB
-	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 13:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788440425; cv=none; b=FNMPI90eHH0Vv9Q2CTjL4TXR09Weiq0Z2o3qYVljJz4oX79H2yGmhZWGVc03HNysIK4Sncae+r2o0Bk19NSDPAfMgQUKQ/NEwO4nRnxp7t/GapdbtzfEmhoGuFqJV8JcYAn1Gk+V3Mol4ZJ8+g7ArkVbwrnGJarhvWDRECa92Kw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788440425; c=relaxed/simple;
-	bh=jIu+OlxanokFLSfiquBpo8YXaj6PW7O81zppVlD1xwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ONcOh0JvFoNFzyH4tCuMmE1gkNIlCnQ0yN/OdrO2ZG/hY8X5r1/5mEp9UfI6A/cy/QYky9f+9ik6zPg+qI5azUf6yKAONMh6lwb3U+z0XaGkgZg86KnlfNExBo0L6Sd6yjI0txdirmrHeezS91liVSnWVyVSdQAN/h0srFPn5Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mma0Uzwk; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476384B1270
+	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 13:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788442155; cv=pass; b=fxi5xEux3L4P+nBqXji7pJzqSdgPErzBUF2s3ZLTA5NJlxOBwaYQ8IlbDAX2mQYyz1cTJ4hyYtw5PFfOOedz3tOvKIg1SJdAY22NRhfpKh2/imrkqZh/I/8PsDdr82m8yH8oxLlWB72hgCd9X3fRMgTIied/up0cqD+6Q2SRw6I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788442155; c=relaxed/simple;
+	bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sbvnuBRgZTxQw/9VeY0oIRI798RZoIHipBmiemc378UBlll+wWFpXyXtTAAw4v8KGFGsHa6/zMGQMeTz6c9l44cSLmnp7/Gu4UMtpqZFQppexFLA/uOkAoQgxlYsu6arXupjwOFgJDdrxZrivlpZWHZlB37ZiUMRHlzUnxrH0AM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QibOJQnk; arc=pass smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mma0Uzwk"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-85339ed040aso1924525b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 06:00:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QibOJQnk"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cc442c988b2so41653a12.0
+        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 06:29:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788442137; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MbJsQevOoIpfVoF7jOP34obtJbo+CP/6V8Oa65Du9GjRWKIErdbao5mjg5uDFoo0T3
+         DFxat9An+HnVRW128tGSv+dgVodq8S3MKsua/oHZUIdooJ/ZmEIUtmdPWZgD2P9nDs4j
+         pnizER6UIkuWVyBglHLHILEPP4utQ0UISkgM1blpk5uR+2B38aUwQ1S8iuE3i7Y1ywxs
+         SdL6n37ddl6ag+tz29shFgOEnIMZsHyEhn5q2J9pJcJK8K73WO3+mYepBPiE9KaaVHLO
+         p0PJQ0gIRsz+P3Qo3kEIWceHtsi3teddM5c/ovXWJzJ6WGWC7YPBdlJV9BGxtQs5MIm0
+         879w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
+        fh=Ua1KGO4gA/COLpTW/0s7lEOtayydJlT2gqkR3Znd9kw=;
+        b=dfnk4ZKaFMQCf9yHIJMOGvFnkKVpKYhe97XpB2toj1dVg8gYxfQ1+QDeNW9668VVir
+         ko35fir59sb3l1upF0IzWXpX6RVpskkBQIt+7WFEjKey9H6aqskxmyYcY1fWMgGAeyEi
+         somv/B/xXf1pz1+6OvtcQMPMCTeyeo2he8Z1YOrXZnByk9J8pjzv0nSS8to5mjI3jKpf
+         848vOxK3xRfJh6j0sL7wU1YIdkQwYjVrSjMRhX8C56ELAsR9JHKC63OORUEKG3AlZmw0
+         LJ065K6/f4/iwPpuFB1uE2vSsGTb4qc44cBdDt9+4Lm5DyP0eZ9D0c9dalw0JMKHXbj2
+         ZljA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788440419; x=1789045219; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=A7QKH2r7d66SxSFJm8bjz6ZBcyuRFjzyujOBEDXlc4U=;
-        b=Mma0UzwkG8xdTwfb5jJvwaqAGSgzGlon5iJSbIfZHE7aOiBS5BkrAAGIdtXw+ZZnJI
-         bsMOnhT/8Dt4ESWQCNeabTfU6DJH6nDwYZfiAbp7doDCbdly05zXPw6Mt1DbWq2x168p
-         9t1vu0CxqB8uhPQxRQIhW3U1HACEsgRD3FD5aJE8X2l+8uWcY2uCpTDO3BwkB4//R3Wk
-         V8shx2IszUFho3C+p1s/mM5TpAxsN25aw6jXfKPxE1McPCSR+1BQmgFI0HvqEmQYf8Qg
-         b0dkYmFG4cSwWOAJdxd6OKyj9gUYQlCEnCykWDfcgGTpYasySjS1TVHHgLGYtloWzShM
-         EZEw==
+        d=gmail.com; s=20251104; t=1788442137; x=1789046937; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
+        b=QibOJQnk1IcJqAPts7niHKXB4MYd7rKKk/wudeEGKQp0iGQwDGwevv3JskZ75xdch6
+         jfqm4L1dCpknWVRfoup0pgPVeoVkxrEgPBofP5UlvVojRvaPkpNXhQFo3YOpI5eUKzJ3
+         oVIpCzNOrezqt2zVbyS0+jWle3e6IbhPsEo3ji4QqZhQGS8vqm75osJq5KNHbniSe7Cs
+         7IMjXLKRAKNvoWjZP6f0QpU7q5nxhdS5rzzAAq7Cy/eRo92sBJSuU2C/89sY38/jJfVI
+         jvANMBPDBxnLupAoA5f1OGYcmYjS1lAQ1aXvNLhVjMv0fKwt2U1nwuAN5oFlZ7SxOXAL
+         4HoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788440419; x=1789045219;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=A7QKH2r7d66SxSFJm8bjz6ZBcyuRFjzyujOBEDXlc4U=;
-        b=nRtRQXC/YY1hWOyx3Uka0fh754yCc8iFuQ/3iyRkclnEHcMKFwalUIkHzAWIrmRkQu
-         MIlon5fpFZid9fa5FajnYAHdXwLU4zA3WFr+dcGgCE6SBrRHmdWLA7cF2Yms46N90LDW
-         8YcchH38181qezDHxzWbh1dt+0KyZNo6YEnh7MByScA6J6km/WfqqCDuVuuNMeaTFOTu
-         TK6mjiYN9whe//Ttpkzcg+OB0OrCpX6alTpyRLN4+qXINQo+rYMbntCJ2XCnKDAAmgZy
-         PYNLbrhOYhkYv7f3vQuTD6wFiiO83bkHixxFEnnqFKX8GJ4nxYFNY4VHl8OQBjyDt92Z
-         jMeg==
-X-Forwarded-Encrypted: i=1; AKwUvBxC+M41RBp5T6/o0szI3z2zcW2I4akRZ9jkjxG4Kt+bfj130MVcmawuBZpUpM2Vul9jRBIUnJsFRmhWEQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++nAqJeZGuC8zPPINW2FiFa/yLCoqTs/B3EINsV8zcUPUoMVXU2O
-	nYXYgizgr5Js66X+ArF0SO+3TRPupImGvgpOBF+qADYy1BvbNKqkhwQs
-X-Gm-Gg: AYBFou3cuANChjG0Qv7bsZZNEF8nFbPg2LQ/ViRW29DQuD4LpKhbZHlk5QFbEGg/6xs
-	q+4TNGSIWCfht2EUhtKTc0XMHEofZd874zp04oo17LcppH26J0g63vRPMAkMLgk/aV+FqxQq65i
-	shIWYa5AFafSM6EvkWD8SgLF8my8/lWfMGacu5scNKzwHl6j4nFgbd3izfzlXsfI7Z3OROk8MPp
-	+H7efKZvR3+coTanoChepr4ahRiu7/evwMw+R+ZIF+zLfFL0GwkeTqXQalQGH8B+KiBudMvA0pH
-	qyu3ljKePkhtpOJToTPOFGUUVnat5wNT5/IqOf8BAd6183y/cmCdjibRiqsIesIWABlUS7hOarV
-	bRV2RST3J65lYJDb4Ck+x/c5dbzvbbExTAAykT7BgVkpO8wxG4XIcr/MEOEqGr2/6Nft+8K/THc
-	n1/7H5UVv/Mi4TQ6uyaRYnUVv94nGrqqFZ2fya1/WIfzZnqgc2TtRxgsDN5Cwq66h+NU5Jsidlx
-	OewxZGenytIicesh0O/L3tv
-X-Received: by 2002:a05:6a00:1a0d:b0:85f:4255:59a8 with SMTP id d2e1a72fcca58-85f42557303mr14081961b3a.10.1788440419002;
-        Thu, 03 Sep 2026 06:00:19 -0700 (PDT)
-Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-85db23f7bccsm2980946b3a.10.2026.09.03.06.00.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 06:00:16 -0700 (PDT)
-From: Wenjie Qi <qwjhust@gmail.com>
-X-Google-Original-From: Wenjie Qi <qiwenjie@xiaomi.com>
-To: jaegeuk@kernel.org,
-	chao@kernel.org
-Cc: linux-f2fs-devel@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	jack@suse.cz,
-	axboe@kernel.dk,
-	tz2294@columbia.edu,
-	baohua@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	qiwenjie@xiaomi.com,
-	qwjhust@gmail.com
-Subject: [PATCH v4 2/2] f2fs: enable buffered RWF_DONTCACHE
-Date: Thu,  3 Sep 2026 20:59:53 +0800
-Message-ID: <cd5bc4fbb9000e5936dfc96e97ed1e8ab94d0a94.1788438786.git.qiwenjie@xiaomi.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1788438786.git.qiwenjie@xiaomi.com>
-References: <cover.1788438786.git.qiwenjie@xiaomi.com>
+        d=1e100.net; s=20251104; t=1788442137; x=1789046937;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=0lzGBDpPSFyRzORpVpv5BVqn0OH17bvA2nEL9BC2eGk=;
+        b=XkJl3CH0pcUT0tITl4R3RsjM337gfKlo1OczVQUSXmDMCYlK4CEuvLd62kHVjNtFRN
+         fla2cRcDGAZusJFaOCgjr7h5/KOJ4SKo4nhn4gwdKkfyUlafuKKI33Z9ud0t1O1Adw62
+         3HPpUNypdMJPBQ7ZRnpIrYRXBhqaeu2XRDBTmHQdsavBX2JbqS/59WYZMQ+GhXfgbal9
+         tCWBRUZvc/ZWw9JuHyUddSOAGrzAiffVBkOuoBTyOV1DCe2Ihauna/80q27PLfVefZXk
+         uFHG2dvha2kffl56LFtr4SOz1Q4HlcDOPl0D7eJt2LYMLka9pvCUkdt9uscAsl5xyPig
+         wiQg==
+X-Forwarded-Encrypted: i=1; AKwUvBy9TvHPjsaGO8RXmXyifh3W0zXsveUBn5+QLcZ48HN7NFCc0Can5+tCOlEQM4lLajNx+S3OjG6We1HvJw==@vger.kernel.org
+X-Gm-Message-State: AFuF++k5XoJ3WgmQY64dfboetQmMQMIcfxyepF+tMtOZGVNt85mfTFeh
+	pPChWFqQd6bPTd6yb/riL3sTK1HJ18aDUkkrsfr9e8T4k2HEyG8Dmj28V6PvQ/OoeZ8bHpIa89P
+	vT8RTDSWN9LwvhvKiBXtatNIJUQ1PaxE=
+X-Gm-Gg: AYBFou2+e1pnoM7TDzXiBKsd4CL9whqwzxdimQpJ/TL+Njzl3vGjkEM2iTzrTLDgOHx
+	kInFnH6Pc2yIVDq/HxRpKqh0RhAqK3KorLlQA9nTSKDsggNq3iPtL3Ys57z6lyErmuNnnRDpAzi
+	TEvuSvJz1INh4HkNPFUNhTHKwrhXUws4rlD275EeJUWVFlun6AmGvxzOyC9KuLW72F0zeth56Xt
+	TKloDqGt6hAYs5VzX2t7Z55vLqdj+VgfU+SCX1fN5Kzzu0iiYLDksMqo1nQvM/E435GXQGKRZxs
+	zG95kndCXden59DFyKDyFITFBfIMjFh3B/aplt+S6RJO0tSF1mJjuldsMVaOU5tlu5AB06zVFsG
+	fK4zeN4NKVzM9W/sz1wTPlTZOg9/vLVAOBwdV3vxtplzZVAN2Upa+ZfLF+fKX
+X-Received: by 2002:a17:90b:1d0d:b0:38e:c140:2a0b with SMTP id
+ 98e67ed59e1d1-39aee0e6ed8mr12609481a91.3.1788442136905; Thu, 03 Sep 2026
+ 06:28:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
+ <20260824-unique-ref-v20-6-490735672187@kernel.org> <CANiq72mPLrKQMzb37ow2969m5r3Z2Kh_4LHERUun6ALw3ea6tg@mail.gmail.com>
+ <87y0dt1b8b.fsf@t14s.mail-host-address-is-not-set>
+In-Reply-To: <87y0dt1b8b.fsf@t14s.mail-host-address-is-not-set>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 3 Sep 2026 15:28:43 +0200
+X-Gm-Features: AcwNN1XsmuEPyO39jqyvRGfAMw_DGGPMkiDRHtfg1ZEoNlBhpVDCHnmjvBP_pa8
+Message-ID: <CANiq72muo8SotJHJQhEe=2kiprbrQTvrEMqd1Uw_7yNSfA3Gpw@mail.gmail.com>
+Subject: Re: [PATCH v20 6/8] rust: Add missing SAFETY documentation for `ARef` example
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
+	Ira Weiny <iweiny@kernel.org>, Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, driver-core@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org, 
+	Oliver Mangold <oliver.mangold@pm.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Pass FGP_DONTCACHE to f2fs_filemap_get_folio() for IOCB_DONTCACHE writes
-and advertise FOP_DONTCACHE.
+On Wed, Aug 26, 2026 at 11:29=E2=80=AFAM Andreas Hindborg <a.hindborg@kerne=
+l.org> wrote:
+>
+> Do you want a link to this issue with a regular `Link:` tag?
 
-Keep the F2FS-specific lookup because write_begin_get_folio() adds
-FGP_STABLE, which can deadlock here.
+Yeah, thanks!
 
-Signed-off-by: Wenjie Qi <qiwenjie@xiaomi.com>
----
- fs/f2fs/data.c | 9 ++++++---
- fs/f2fs/file.c | 2 +-
- 2 files changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index b0fedacfd12..6e816c9349a 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -3884,11 +3884,15 @@ static int f2fs_write_begin(const struct kiocb *iocb,
- 	struct inode *inode = mapping->host;
- 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
- 	struct folio *folio;
-+	fgf_t fgp_flags = FGP_LOCK | FGP_WRITE | FGP_CREAT;
- 	pgoff_t index = pos >> PAGE_SHIFT;
- 	bool need_balance = false;
- 	block_t blkaddr = NULL_ADDR;
- 	int err = 0;
- 
-+	if (iocb->ki_flags & IOCB_DONTCACHE)
-+		fgp_flags |= FGP_DONTCACHE;
-+
- 	trace_f2fs_write_begin(inode, pos, len);
- 
- 	if (!f2fs_is_checkpoint_ready(sbi)) {
-@@ -3934,9 +3938,8 @@ static int f2fs_write_begin(const struct kiocb *iocb,
- 	 * Do not use FGP_STABLE to avoid deadlock.
- 	 * Will wait that below with our IO control.
- 	 */
--	folio = f2fs_filemap_get_folio(mapping, index,
--				FGP_LOCK | FGP_WRITE | FGP_CREAT,
--				mapping_gfp_mask(mapping));
-+	folio = f2fs_filemap_get_folio(mapping, index, fgp_flags,
-+				       mapping_gfp_mask(mapping));
- 	if (IS_ERR(folio)) {
- 		err = PTR_ERR(folio);
- 		goto fail;
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index edc352569e8..570244ae4fc 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -5909,6 +5909,6 @@ const struct file_operations f2fs_file_operations = {
- 	.splice_read	= f2fs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fadvise	= f2fs_file_fadvise,
--	.fop_flags	= FOP_BUFFER_RASYNC,
-+	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
- 	.setlease	= generic_setlease,
- };
--- 
-2.43.0
-
+Cheers,
+Miguel
