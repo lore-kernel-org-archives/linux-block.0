@@ -1,64 +1,64 @@
 Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22E64AA018
-	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 13:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0934D4A99CB
+	for <linux-block@vger.kernel.org>; Thu,  3 Sep 2026 13:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788440418; cv=none; b=f7QL152Zha42EwTNlgy8HTzsJyv8PwtloFiwp6XIcj+ZcteH7JMePuo4U0y6eN3GOlaJNG1dy6NUpWGih4iTfHBEJLSoxuMX13qp0hSEnhF5j+wb70wMrSLLBqC0HRX60IzgCkjwQeVt/nUm7p9nIRPnDPsuwn0JLdnuBSaDFLQ=
+	t=1788440425; cv=none; b=FNMPI90eHH0Vv9Q2CTjL4TXR09Weiq0Z2o3qYVljJz4oX79H2yGmhZWGVc03HNysIK4Sncae+r2o0Bk19NSDPAfMgQUKQ/NEwO4nRnxp7t/GapdbtzfEmhoGuFqJV8JcYAn1Gk+V3Mol4ZJ8+g7ArkVbwrnGJarhvWDRECa92Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788440418; c=relaxed/simple;
-	bh=06+qffQcwEwALMxBLy9dFemvnbiaogYHvKparT5EmWo=;
+	s=arc-20240116; t=1788440425; c=relaxed/simple;
+	bh=jIu+OlxanokFLSfiquBpo8YXaj6PW7O81zppVlD1xwQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cw1BnvrK3DiV8WdTOvJjUJF3wi/3HDQNW7kd0dWnlEF012wdY8joCnQB8SqIe8wfqcHPP1akinvQX7ADXxI7wIKBESIoKJD4oSm+bxuxX1Nm5sh2TStQn4NRXiORn54VHQriU42sv6Wil/+CRWskMCTLZqsfve1rZoMNMy+NL5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VbSt71qi; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=ONcOh0JvFoNFzyH4tCuMmE1gkNIlCnQ0yN/OdrO2ZG/hY8X5r1/5mEp9UfI6A/cy/QYky9f+9ik6zPg+qI5azUf6yKAONMh6lwb3U+z0XaGkgZg86KnlfNExBo0L6Sd6yjI0txdirmrHeezS91liVSnWVyVSdQAN/h0srFPn5Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mma0Uzwk; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VbSt71qi"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8568e3ed034so1947092b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 06:00:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mma0Uzwk"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-85339ed040aso1924525b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2026 06:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788440411; x=1789045211; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788440419; x=1789045219; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=aNUKKLqZvrANPeHHYmjPL7ok/64poHS/mGT0EIbK468=;
-        b=VbSt71qib43/2Tbef1LbeD/M8nDsImuyJRUhYtQTC6SWYMDYP0LR0xOxPnmuhhWgZv
-         XU7P+gBE93KxjOsk0RT9majmDglzcbbPIDvaGkyvKCrIcOATUivGlMJVI3k85JRIB9ek
-         yj9oNQgxUQxCw+zefldFKJSlD01AyBmlLsxa2czGCBipDZoqThrwPYZc+odDQdPScw89
-         YyjaBDgpSiDybbByDYhNCL5a0OEEC7cYKSL5xPiaCxK+/R8STC/qpXpl4Zisi7+/V2zW
-         caJOBEM6KIpsZr/8WvvI3rpnQt1GLfoE+JCKpUr7s6oAuZdDpidH4eMuTh0TJY59KpYb
-         CTIw==
+        bh=A7QKH2r7d66SxSFJm8bjz6ZBcyuRFjzyujOBEDXlc4U=;
+        b=Mma0UzwkG8xdTwfb5jJvwaqAGSgzGlon5iJSbIfZHE7aOiBS5BkrAAGIdtXw+ZZnJI
+         bsMOnhT/8Dt4ESWQCNeabTfU6DJH6nDwYZfiAbp7doDCbdly05zXPw6Mt1DbWq2x168p
+         9t1vu0CxqB8uhPQxRQIhW3U1HACEsgRD3FD5aJE8X2l+8uWcY2uCpTDO3BwkB4//R3Wk
+         V8shx2IszUFho3C+p1s/mM5TpAxsN25aw6jXfKPxE1McPCSR+1BQmgFI0HvqEmQYf8Qg
+         b0dkYmFG4cSwWOAJdxd6OKyj9gUYQlCEnCykWDfcgGTpYasySjS1TVHHgLGYtloWzShM
+         EZEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788440411; x=1789045211;
+        d=1e100.net; s=20251104; t=1788440419; x=1789045219;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aNUKKLqZvrANPeHHYmjPL7ok/64poHS/mGT0EIbK468=;
-        b=TgZIlplTdq+ady0hC64UrthA6dVmTgX5/5RmM2aCi/Kqq+f5Le6q+BCu43F5WHxXST
-         y4o3YTUd931RdDPUjy9illMq79gwoQ40e4FOj+ZlRN4Vmy2hXgmIn+u+2bKdBpeHdtAy
-         PicVabIFjBbMRQYdukjjxPwnkCgSkm8UMZM+n2pI4Wr1QakdUwzvdvfdGH6MbqT1x/z8
-         kCvU46XCIo+1nH/h8NX8pJDb0rtOTGDTzPzlWuYE+a5kld+ZqWWGEoX4vL0p23+NDip7
-         j5OlpW5e8QkK2ElfMA+JZrfqSr1YG05xnSGlWr3rvzdkW55XZ0YHtS0V6MXNbD1fIHsl
-         uzFA==
-X-Forwarded-Encrypted: i=1; AKwUvBwk/ntMWyZLAXKWAu/zyaraw2M4C1+l8cnBePlNkyNxKp2Wc3mNlT8Lnnxs5jTneAWCYpvDwWP1iB3+TQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++kG87HN7rnRhd6BrpVvdd8vlzOOxZMjTgYbf9aiguGi+/ICK0Xe
-	m7LatS8f0FPVe5b9TI/6Z3/v0GRrQOR+pWA/RpqKqF0+fyyNw476O6+u
-X-Gm-Gg: AYBFou3an3tBs4wU5yke+6y+5/HqBE97WuzvKIJ3l6wFcH/ws6o8cv0ijXpIOpbc2lD
-	6sujpRF1ia195Be5hJsyJnE71Hl1urK2v47J0JkbV5QkRrBmec7agDasg+bCil0fiAicr67cylZ
-	HPDB+JJMTlILwt5tNl/rcBzJSj0hYowq+Ina3ALBkHi31C7+FzZ4Hj/4iv59nQv/64bBdhCjJOX
-	DKqyDY+0+Ju7s2oLzm/c10M7fQ+PlKAAD7qrzGvrY6bB0XxHFxqvO+p0OzGDv2Tpm2+z6IYyrx/
-	kIWCoHWSHwIHXMYFRimfF2jSyhwjJPG9jvnrB7WhJU5GWPpFBSdSs6rsNASldhO/+AzCyyuqJwp
-	Ywzm5ywOG+7mrmy7a64ZINREFRjO2ygH/bwuzWctux6YlZHP4aUpXR4hsWEoB8e5nen7fuYPUbT
-	ctfvdi5eIZ1QTFWA/8i8wZHn6/K4H2gLX5OXHXfvGWx2kod6EfUSKBt16c1ZYhCpnmwMrDseySK
-	4iTDdC0kmDIAi05qnReU0/v
-X-Received: by 2002:a05:6a00:1408:b0:852:3726:dfde with SMTP id d2e1a72fcca58-85ed25e2492mr15794500b3a.9.1788440410410;
-        Thu, 03 Sep 2026 06:00:10 -0700 (PDT)
+        bh=A7QKH2r7d66SxSFJm8bjz6ZBcyuRFjzyujOBEDXlc4U=;
+        b=nRtRQXC/YY1hWOyx3Uka0fh754yCc8iFuQ/3iyRkclnEHcMKFwalUIkHzAWIrmRkQu
+         MIlon5fpFZid9fa5FajnYAHdXwLU4zA3WFr+dcGgCE6SBrRHmdWLA7cF2Yms46N90LDW
+         8YcchH38181qezDHxzWbh1dt+0KyZNo6YEnh7MByScA6J6km/WfqqCDuVuuNMeaTFOTu
+         TK6mjiYN9whe//Ttpkzcg+OB0OrCpX6alTpyRLN4+qXINQo+rYMbntCJ2XCnKDAAmgZy
+         PYNLbrhOYhkYv7f3vQuTD6wFiiO83bkHixxFEnnqFKX8GJ4nxYFNY4VHl8OQBjyDt92Z
+         jMeg==
+X-Forwarded-Encrypted: i=1; AKwUvBxC+M41RBp5T6/o0szI3z2zcW2I4akRZ9jkjxG4Kt+bfj130MVcmawuBZpUpM2Vul9jRBIUnJsFRmhWEQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++nAqJeZGuC8zPPINW2FiFa/yLCoqTs/B3EINsV8zcUPUoMVXU2O
+	nYXYgizgr5Js66X+ArF0SO+3TRPupImGvgpOBF+qADYy1BvbNKqkhwQs
+X-Gm-Gg: AYBFou3cuANChjG0Qv7bsZZNEF8nFbPg2LQ/ViRW29DQuD4LpKhbZHlk5QFbEGg/6xs
+	q+4TNGSIWCfht2EUhtKTc0XMHEofZd874zp04oo17LcppH26J0g63vRPMAkMLgk/aV+FqxQq65i
+	shIWYa5AFafSM6EvkWD8SgLF8my8/lWfMGacu5scNKzwHl6j4nFgbd3izfzlXsfI7Z3OROk8MPp
+	+H7efKZvR3+coTanoChepr4ahRiu7/evwMw+R+ZIF+zLfFL0GwkeTqXQalQGH8B+KiBudMvA0pH
+	qyu3ljKePkhtpOJToTPOFGUUVnat5wNT5/IqOf8BAd6183y/cmCdjibRiqsIesIWABlUS7hOarV
+	bRV2RST3J65lYJDb4Ck+x/c5dbzvbbExTAAykT7BgVkpO8wxG4XIcr/MEOEqGr2/6Nft+8K/THc
+	n1/7H5UVv/Mi4TQ6uyaRYnUVv94nGrqqFZ2fya1/WIfzZnqgc2TtRxgsDN5Cwq66h+NU5Jsidlx
+	OewxZGenytIicesh0O/L3tv
+X-Received: by 2002:a05:6a00:1a0d:b0:85f:4255:59a8 with SMTP id d2e1a72fcca58-85f42557303mr14081961b3a.10.1788440419002;
+        Thu, 03 Sep 2026 06:00:19 -0700 (PDT)
 Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-85db23f7bccsm2980946b3a.10.2026.09.03.06.00.05
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-85db23f7bccsm2980946b3a.10.2026.09.03.06.00.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 06:00:09 -0700 (PDT)
+        Thu, 03 Sep 2026 06:00:16 -0700 (PDT)
 From: Wenjie Qi <qwjhust@gmail.com>
 X-Google-Original-From: Wenjie Qi <qiwenjie@xiaomi.com>
 To: jaegeuk@kernel.org,
@@ -75,9 +75,9 @@ Cc: linux-f2fs-devel@lists.sourceforge.net,
 	linux-mm@kvack.org,
 	qiwenjie@xiaomi.com,
 	qwjhust@gmail.com
-Subject: [PATCH v4 1/2] f2fs: complete dropbehind write bios in task context
-Date: Thu,  3 Sep 2026 20:59:52 +0800
-Message-ID: <c4e69fb1ffd6c6fd968683c690ba29f2b98c9fa8.1788438786.git.qiwenjie@xiaomi.com>
+Subject: [PATCH v4 2/2] f2fs: enable buffered RWF_DONTCACHE
+Date: Thu,  3 Sep 2026 20:59:53 +0800
+Message-ID: <cd5bc4fbb9000e5936dfc96e97ed1e8ab94d0a94.1788438786.git.qiwenjie@xiaomi.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1788438786.git.qiwenjie@xiaomi.com>
 References: <cover.1788438786.git.qiwenjie@xiaomi.com>
@@ -89,71 +89,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Buffered RWF_DONTCACHE writes invalidate dropbehind folios at writeback
-completion. Mark these bios BIO_COMPLETE_IN_TASK so the block layer runs
-F2FS completion in task context when needed.
+Pass FGP_DONTCACHE to f2fs_filemap_get_folio() for IOCB_DONTCACHE writes
+and advertise FOP_DONTCACHE.
 
-Use the same flag to keep normal and dropbehind folios from merging in the
-IPU and OPU paths. Classify the original page-cache folio rather than an
-encrypted or compressed replacement folio.
-
-Keep the existing large-ATC completion path unchanged.
+Keep the F2FS-specific lookup because write_begin_get_folio() adds
+FGP_STABLE, which can deadlock here.
 
 Signed-off-by: Wenjie Qi <qiwenjie@xiaomi.com>
 ---
- fs/f2fs/data.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ fs/f2fs/data.c | 9 ++++++---
+ fs/f2fs/file.c | 2 +-
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 21f396ebe22..b0fedacfd12 100644
+index b0fedacfd12..6e816c9349a 100644
 --- a/fs/f2fs/data.c
 +++ b/fs/f2fs/data.c
-@@ -503,6 +503,8 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
- 	bio = bio_alloc_bioset(bdev, npages,
- 				fio->op | fio->op_flags | f2fs_io_flags(fio),
- 				GFP_NOIO, &f2fs_bioset);
-+	if (!is_read_io(fio->op) && folio_test_dropbehind(fio->folio))
-+		bio_set_flag(bio, BIO_COMPLETE_IN_TASK);
- 	bio->bi_iter.bi_sector = sector;
- 	if (is_read_io(fio->op)) {
- 		bio->bi_end_io = f2fs_read_end_io;
-@@ -793,6 +795,13 @@ static bool page_is_mergeable(struct f2fs_sb_info *sbi, struct bio *bio,
- 	return bio->bi_bdev == f2fs_target_device(sbi, cur_blkaddr, NULL);
- }
+@@ -3884,11 +3884,15 @@ static int f2fs_write_begin(const struct kiocb *iocb,
+ 	struct inode *inode = mapping->host;
+ 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+ 	struct folio *folio;
++	fgf_t fgp_flags = FGP_LOCK | FGP_WRITE | FGP_CREAT;
+ 	pgoff_t index = pos >> PAGE_SHIFT;
+ 	bool need_balance = false;
+ 	block_t blkaddr = NULL_ADDR;
+ 	int err = 0;
  
-+static bool f2fs_bio_dropbehind_mergeable(struct bio *bio,
-+					  struct f2fs_io_info *fio)
-+{
-+	return bio_flagged(bio, BIO_COMPLETE_IN_TASK) ==
-+		folio_test_dropbehind(fio->folio);
-+}
++	if (iocb->ki_flags & IOCB_DONTCACHE)
++		fgp_flags |= FGP_DONTCACHE;
 +
- static bool io_type_is_mergeable(struct f2fs_bio_info *io,
- 						struct f2fs_io_info *fio)
- {
-@@ -985,8 +994,10 @@ int f2fs_merge_page_bio(struct f2fs_io_info *fio)
+ 	trace_f2fs_write_begin(inode, pos, len);
  
- 	trace_f2fs_submit_folio_bio(data_folio, fio);
- 
--	if (bio && !page_is_mergeable(fio->sbi, bio, *fio->last_block,
--						fio->new_blkaddr))
-+	if (bio &&
-+	    (!page_is_mergeable(fio->sbi, bio, *fio->last_block,
-+				fio->new_blkaddr) ||
-+	     !f2fs_bio_dropbehind_mergeable(bio, fio)))
- 		f2fs_submit_merged_ipu_write(fio->sbi, &bio, NULL);
- alloc_new:
- 	if (!bio) {
-@@ -1086,7 +1097,8 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 	    (!io_is_mergeable(sbi, io->bio, io, fio, io->last_block_in_bio,
- 			      fio->new_blkaddr) ||
- 	     !f2fs_crypt_mergeable_bio(io->bio, fio_inode(fio),
--				bio_folio->index, fio)))
-+				bio_folio->index, fio) ||
-+	     !f2fs_bio_dropbehind_mergeable(io->bio, fio)))
- 		__submit_merged_bio(io);
- alloc_new:
- 	if (io->bio == NULL) {
+ 	if (!f2fs_is_checkpoint_ready(sbi)) {
+@@ -3934,9 +3938,8 @@ static int f2fs_write_begin(const struct kiocb *iocb,
+ 	 * Do not use FGP_STABLE to avoid deadlock.
+ 	 * Will wait that below with our IO control.
+ 	 */
+-	folio = f2fs_filemap_get_folio(mapping, index,
+-				FGP_LOCK | FGP_WRITE | FGP_CREAT,
+-				mapping_gfp_mask(mapping));
++	folio = f2fs_filemap_get_folio(mapping, index, fgp_flags,
++				       mapping_gfp_mask(mapping));
+ 	if (IS_ERR(folio)) {
+ 		err = PTR_ERR(folio);
+ 		goto fail;
+diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
+index edc352569e8..570244ae4fc 100644
+--- a/fs/f2fs/file.c
++++ b/fs/f2fs/file.c
+@@ -5909,6 +5909,6 @@ const struct file_operations f2fs_file_operations = {
+ 	.splice_read	= f2fs_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fadvise	= f2fs_file_fadvise,
+-	.fop_flags	= FOP_BUFFER_RASYNC,
++	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
+ 	.setlease	= generic_setlease,
+ };
 -- 
 2.43.0
 
