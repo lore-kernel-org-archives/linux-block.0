@@ -1,59 +1,59 @@
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B057B4477F5;
-	Fri,  4 Sep 2026 09:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DDC447817;
+	Fri,  4 Sep 2026 09:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788514586; cv=none; b=UcnKSvpeDrUIASuDlzc+RbUoB362PATB3+LERda2xSUP9ScQ+ldPpC/pmn2+lwXPdHpoz9vDSFuC1dL+s8NX2SJ+JsPHDjUSeXuPTfESlLDiXKg7SjMHOC+RBOSRW5DHAgwCjLMcpVWHuSOV2OHxkgEfh3EdhOXi1WXD06NeiIs=
+	t=1788514594; cv=none; b=KZAU3lqYnJ/mF0RUxnP124x3dg8MEPRWLKi+//ksJ/lXHBk8rWNPq5WdNMe45wl9F/ZFAXf9dmWoHjENZ/Dgjin7hAVOzM6GQxCmwfiy6yBOrq+p2ZNMcZvXE2x7Jrw7xidxc/hlm7+Y5NY+GJfQ2A3SpsRw/4EX2A9iccn3YS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788514586; c=relaxed/simple;
-	bh=KBXKxt6P0G5kYd3DMM5it9aUm8Y6FcNbZ50G8muC2AM=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=fsXBwzcGWgSEth0hq2VgW8Fd0ktIYTDntE0EgcQMWWN3YGqUsWtBeycbjQ/5XAUGCsIBUjo914MffDe7gGPN5a05NTRLbrMdK2vfO1FULi3yVLVajPdhcyEoICBBys0KK7k/cZ/CMh+nvShiMYcw6z0Io/w990PX1qlGqHUgASU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HGhUXsGR; arc=none smtp.client-ip=103.168.172.154
+	s=arc-20240116; t=1788514594; c=relaxed/simple;
+	bh=W/2peY7QXmgSVaUSqR3xSWS3rJJZzZGsQ2US1ly9C70=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Gou0fL0PsZI9xvHzL+FnjNt4xk2KhNqXWdVOaB+IsLXSckhm3+EOQ8SNM90Gk6eoXiOl8vWoR9BrsBlr2sDrSW1uS+bUzpSvOG29imn0RqdyezFkB0YWjCfZ5W93UNfDvLmHB60MrIEYmdvVyK141ERnzsxkgUktPjDyjTCHG1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OtNPeOJ0; arc=none smtp.client-ip=103.168.172.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HGhUXsGR"
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 92FB814000B7;
-	Fri,  4 Sep 2026 05:36:23 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OtNPeOJ0"
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 50862EC0212;
+	Fri,  4 Sep 2026 05:36:32 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Fri, 04 Sep 2026 05:36:23 -0400
+  by phl-compute-09.internal (MEProxy); Fri, 04 Sep 2026 05:36:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514583; x=
-	1788600983; bh=hrRgqAeah4TNWLlkx6lLt/cNMnqAA85FE9HMuJS0LZs=; b=H
-	GhUXsGRFMNXfU7eih37baWP2deB0oUrWCdp0MqiWl04VUp6ZfA2xPnLALxv9bSvW
-	m5wsc4egok5ruIQeZsQzTxicEvTw5gPI9FQvphERGVc89wQ+d+vk+252Ubh/rFyL
-	MqIyhXgSssJRNisMj3Iu1Egg5KUCHY0Gae76oN5MXpkBzxxYho0VrqEBC0BmYmHg
-	vUPPwhFbei4Xn4/rbxJrtcm9d1Nz6oXtCLpSa4fz/iE1BJIbMdgmn8m8eMOSeCUq
-	gI+kovZdNmZyFSCT7dyKsnck4+lD8a12n1dhTNllmcBcnuBRGMXvPZsk4wDygySw
-	BTKvq1km/FnzEq36RH7+w==
-X-ME-Sender: <xms:F5GaajhKjaXEAGYecxk_-b8CGXYigrjp8QAQgjYq0PPQVdcoeuvzxA>
-    <xme:F5GaaqFJxLufnq4pOJdrmjaxsUqpAM186R7X-mbWQxesImg99leWx1fFvarRQz0LF
-    fRns1JfbtUQ1YSxMJokH2WCd__Wq6yMQ87hEQ7p3u0TKRd0U23RzJOz>
-X-ME-Received: <xmr:F5Gaai9bAD81slidb7sba55QCljCfLxqmxJaDy5-za3O65pU_INb4BXAykLpjaGtsyCdh15mQN73KeM6CpqNQdXpU6U8RTL0Nm4>
-X-ME-Proxy-Cause: dmFkZTEe+0K1AexRW5VKg6Igspc49h8df5hxyd+FQ2UxEzuyTDi2ZhdiSThGiBIwkdDgU9
-    3rC08hmhwBNxNoNuM+ycNNv31fkYVLn6pBr27tqKRLQMq1NV3DFc39Iqyivnkegn2UfxIv
-    roQdqcH3VVXGJWlrRZqsrGKoS9rmBFYj7GFxW36+XXMnxcw5HiNtvMvRco3OYXN6UY/K0t
-    SqGzE69/GT65xt5VU7CUtrbe1RJV9Of5WXGGzQneXN7Ylc6viWLtf2PMOfqRj9Ut2W6+Hz
-    DfFSoa/BAnz3IHwFnQcu4acvCfz7MIdPrcCNMUsADy4T129cFo7Yojs7dtan6e38DtGhSs
-    7UQpvgPBN2FcrZsm83Tk911BeeLF3EYIYBEOlh+EFXYf4BMXjhOzTAaogfXDPFwYlWlb1I
-    S6SQ+PmI7GOtMeJd6jifMigYUPYOOlbvs/f/BXADu4KLeezuNVEXh4zReeOLDxbvvtmMCz
-    MANm38k9ZemtQodT62zEdBAEAOYr+Uxwrm+DZq3X7Sx5B5au0x++D8CzrnzDhS0jENCfnh
-    hL/AAvzIqbGOgU+2reQs507wBQQzRQUFbujSNoKag1LYj90Pp69qq643gmg77BwadZavoB
-    +p6Qhwi5MtidPbnrfQYdu45VJhA5ZMqMtHwUyBaxLVDB5oHnkU2gKq4pSfpg
-X-ME-Proxy: <xmx:F5GaahwI0IR_iKWx44HNm6LFRCbOuWdgdF_jhAgnnbNMIH8qdZEptg>
-    <xmx:F5GaauNZOcl9YFz4UL-F86jzPniaCzwJRzGyQXVTksfqqbfsxBOHEQ>
-    <xmx:F5Gaam9VWmDQSeUpiNeGAtYx9kYhdExJABugpZnukqIYppmI8-U2gg>
-    <xmx:F5Gaar6oyltzdezP8RQXcQiqyTwnzsUKyIlBO_WfHOe7HxeRyrDJBA>
-    <xmx:F5GaasTymZBaknUiNF0EfS-tkWqQ5NX2US5yM-pvIMbs8FownWrSkkcG>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514592; x=
+	1788600992; bh=Z20/xYIt8naMl8dD/6e4TSmsRBPPZUUgtJg076bDEt0=; b=O
+	tNPeOJ0Idr9G4JnBFhzF97dwGCxywtSgnhTCRa5P7XGY8U5QO/WI6z4sa5wCHj6p
+	QaoITr3Mi/1gxE9cvaS0Vf7ldeFWH2CPkX5y9cjWDJK3Yr0DhuPPVoiJbt3aNFED
+	unGZGXB4sD1c+hK3KRvUw+RTfyFx3GzEpkuD8/Y6jsT+sSRqP54KA2RpFM0qOjMJ
+	Q0vrEeDwv+MAaAbnnXMkof1I7NnFk88+WbgoeM6BhhV6o+0AA+nVnPDYNEulg9g1
+	GAuYiZS5lsi6XXMHQsrOrfZCp11vu7b639IhYPNkKNVMc7zFD5PsiZj8G+s3qKwi
+	MGJEdn8L+tq1Pplqy6zbg==
+X-ME-Sender: <xms:IJGaao_dn6ZqxyP810750exuangq3U_AK2-9VRb4BaoTk9CyblQLEQ>
+    <xme:IJGaaqwvQSfXMM4_uJ6pnVhXqsheNDEH731iIUtRg3bXd8Fof-xs9EKjL_KO-Pezq
+    GkokqulLYjuBqqkGh7Q-zNBi1uUoctl7d3ZCb5S1WVMD6tCHE3KdKOO>
+X-ME-Received: <xmr:IJGaat4vANZ99El5jygEzfatuDjc5MKj3NnmNNCxXsiMtXmWY5igLkaKBukLx_vhF0Qjn4trSJBJ6G2hauMIklqnsS-GFOUgnzQ>
+X-ME-Proxy-Cause: dmFkZTFZ/TtYWX7QRSPqbWdhFvGKPdYLqSrS0kW5tw/ccCSeQwGXLU8z8+n4MTGG5Fz3xO
+    fBhPKm+HgWFmiq+gJDvSVIfRvZvgV672b0RABACnDdhJF/iW3opz+U3/SP3bVUvVx8Q287
+    Ap1gWmRx+bP8FRnMF0HKeE0yfsMRD8AYBXtaUsZs5aI7BW+fV7e9Q0YJu0hP5K8l60oxGK
+    XrcuXNo1hSmleRjGCb9wMFpOFKoRGwYOR+2UyWTZOvcSmWg9D5Za0czKtKfTDaJ7RbQZgm
+    lIJH+OOpA0D60VJW1h483ZeutJ4e8G1K0sL6VJD12jwsAudayvIunnWKGaY8cBa7nccFWv
+    heq/msEziktLWpOMZ9NXNM9QFw03T5eqezgpHov9MF9RWQ8uc4Edv/R7IuHCoFmgwVmc6D
+    p7oXTf6J1Iql+X8lykrN8/QRdMhFHNDmE539dwFEenDiQq9kPEHccaXLM+oDr17kDN6mHs
+    tY4FsfRtkugeqMnClXJdpN5RT+38uccuO/ShH9KSJIXKfp3o+zWYI4isIbG8Ak/FWRA+3/
+    VCX8BiV0NkybeCnb6xJ8PAKnB5JToOGsrKNo4ddnIAMCZ7PT1MP3ahu0/c7CRcDLApmwyg
+    dL/0CqO4NAB2J5PsehnNM9ub1z/5pzFJ6/Xt3rISIBMLWtUiO83Hq8+tHjQQ
+X-ME-Proxy: <xmx:IJGaap_QJnwqSSDalQ0FhSf4MRuVtuEJ32eo5zMs-eGOkbyDWsISXA>
+    <xmx:IJGaaqprFoSQZ7o63GXds8Zka5yhMVGdLhySlXkpBY5eyEHNuli2cg>
+    <xmx:IJGaaiqx54PEc4GCEmHyF9OW_u1niJ3zWl9DPwsaC1BZNdne1kcNTw>
+    <xmx:IJGaal25yDmTPjG-77QyyAkl9KM_fS3S3sjnrDsfKS-iVOr9dTZtfQ>
+    <xmx:IJGaanvwDpVNTIuwWcQJ7QXctHh_xmUcwm978OwMofUkRw4snn73YBMp>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Sep 2026 05:36:21 -0400 (EDT)
+ 4 Sep 2026 05:36:31 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <d33238b1b2c4a444ed3ae59d4444fafebb550921.1788513997.git.fthain@linux-m68k.org>
+Message-ID: <64ee742adc48218962a989017b9dc5622e2932c7.1788513997.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1788513996.git.fthain@linux-m68k.org>
 References: <cover.1788513996.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v3 30/33] swim: Clean up whitespace
+Subject: [PATCH v3 31/33] swim: Define macros for constants
 Date: Fri, 04 Sep 2026 19:26:36 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,255 +73,55 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-No functional changes.
+Define a SEL_MASK macro to name the anonymous constant. Define STEPPING
+rather than re-use STEP because the latter is a command bit macro (see also
+GCR_MODE vs. SETGCR). No functional change, just better readability.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c     | 46 +++++++++++++++++++++-------------------
- drivers/block/swim_asm.S | 14 +++---------
- 2 files changed, 27 insertions(+), 33 deletions(-)
+ drivers/block/swim.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 1501444fe070..a5be31b732b5 100644
+index a5be31b732b5..6f37a01219c2 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -2,7 +2,7 @@
- /*
-  * Driver for SWIM (Sander Woz Integrated Machine) floppy controller
-  *
-- * Copyright (C) 2004,2008 Laurent Vivier <Laurent@lvivier.info>
-+ * Copyright (C) 2004, 2008 Laurent Vivier <Laurent@lvivier.info>
-  *
-  * based on Alastair Bridgewater SWIM analysis, 2001
-  * based on SWIM3 driver (c) Paul Mackerras, 1996
-@@ -69,7 +69,7 @@ struct swim {
- 	REG(read_handshake)
- } __attribute__((packed));
+@@ -105,6 +105,8 @@ struct iwm {
  
--#define swim_write(base, reg, v) 	out_8(&(base)->write_##reg, (v))
-+#define swim_write(base, reg, v)	out_8(&(base)->write_##reg, (v))
- #define swim_read(base, reg)		in_8(&(base)->read_##reg)
+ /* Select values for swim_select and swim_readbit */
  
- /* IWM registers */
-@@ -93,7 +93,7 @@ struct iwm {
- 	REG(q7H)
- } __attribute__((packed));
- 
--#define iwm_write(base, reg, v) 	out_8(&(base)->reg, (v))
-+#define iwm_write(base, reg, v)		out_8(&(base)->reg, (v))
- #define iwm_read(base, reg)		in_8(&(base)->reg)
- 
- /* Bits in phase register */
-@@ -165,23 +165,23 @@ struct floppy_state {
- 	/* physical properties */
- 
- 	enum drive_location location;	/* internal or external drive */
--	int		 head_number;	/* single- or double-sided drive */
-+	int head_number;		/* single- or double-sided drive */
- 
- 	/* media */
- 
--	int		 disk_in;
--	int		 ejected;
--	enum media_type	 type;
--	int		 write_protected;
-+	int disk_in;
-+	int ejected;
-+	enum media_type type;
-+	int write_protected;
- 
--	unsigned int	 total_secs;
--	unsigned int	 secpercyl;
--	unsigned int	 secpertrack;
-+	unsigned int total_secs;
-+	unsigned int secpercyl;
-+	unsigned int secpertrack;
- 
- 	/* in-use information */
- 
--	int		track;
--	int		ref_count;
-+	int track;
-+	int ref_count;
- 	bool registered;
- 
- 	struct gendisk *disk;
-@@ -216,6 +216,7 @@ extern int swim_read_sector_data(struct swim __iomem *base,
- 				 unsigned char *data);
- 
- static DEFINE_MUTEX(swim_mutex);
++#define SEL_MASK	0x100
 +
- static void set_swim_mode(struct swim __iomem *base, int enable)
- {
- 	struct iwm __iomem *iwm_base = (struct iwm __iomem *)base;
-@@ -402,7 +403,7 @@ static int swim_seek(struct swim __iomem *base, int step)
- 	if (step == 0)
- 		return 0;
+ #define SEEK_POSITIVE	0x000
+ #define SEEK_NEGATIVE	0x004
+ #define STEP		0x001
+@@ -115,6 +117,7 @@ struct iwm {
+ #define SETMFM		0x101
+ #define SETGCR		0x105
  
--	for ( ; step > 0; step--) {
-+	for (; step > 0; step--) {
- 		if (swim_step(base))
- 			return -1;
- 	}
-@@ -413,7 +414,7 @@ static int swim_seek(struct swim __iomem *base, int step)
- 	return 0;
++#define STEPPING	0x001
+ #define READ_DATA_0	0x004
+ #define ONEMEG_DRIVE	0x005
+ #define SINGLE_SIDED	0x006
+@@ -271,7 +274,7 @@ static inline void swim_select(struct swim __iomem *base, int sel)
+ {
+ 	swim_write(base, phase, RELAX | PHASE_PIN_DIR);
+ 
+-	via1_set_head(sel & 0x100);
++	via1_set_head(sel & SEL_MASK);
+ 
+ 	swim_write(base, phase, (sel & CA_MASK) | PHASE_PIN_DIR);
+ }
+@@ -366,7 +369,7 @@ static int swim_step(struct swim __iomem *base)
+ {
+ 	swim_action(base, STEP);
+ 	udelay(150);
+-	return swim_readbit_timeout(base, STEP, false, 20 * 1000);
++	return swim_readbit_timeout(base, STEPPING, false, 20 * 1000);
  }
  
--static int swim_track(struct floppy_state *fs,  int track)
-+static int swim_track(struct floppy_state *fs, int track)
- {
- 	struct swim __iomem *base = fs->swd->base;
- 	int ret;
-@@ -555,10 +556,10 @@ static blk_status_t swim_queue_rq(struct blk_mq_hw_ctx *hctx,
- }
- 
- static struct floppy_struct floppy_type[4] = {
--	{    0,  0, 0,  0, 0, 0x00, 0x00, 0x00, 0x00, NULL }, /* no testing   */
-+	{    0,  0, 0,  0, 0, 0x00, 0x00, 0x00, 0x00, NULL }, /* no testing */
- 	{  720,  9, 1, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 360KB SS 3.5"*/
--	{ 1440,  9, 2, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 720KB 3.5"   */
--	{ 2880, 18, 2, 80, 0, 0x1B, 0x00, 0xCF, 0x6C, NULL }, /* 1.44MB 3.5"  */
-+	{ 1440,  9, 2, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 720KB 3.5" */
-+	{ 2880, 18, 2, 80, 0, 0x1B, 0x00, 0xCF, 0x6C, NULL }, /* 1.44MB 3.5" */
- };
- 
- static int get_floppy_geometry(struct floppy_state *fs, int type,
-@@ -585,10 +586,11 @@ static void setup_medium(struct floppy_state *fs)
- 
- 	if (swim_readbit(base, DISK_IN)) {
- 		struct floppy_struct *g;
-+
- 		fs->disk_in = 1;
- 		fs->write_protected = swim_readbit(base, WRITE_PROT);
- 		fs->type = swim_readbit(base, TWOMEG_MEDIA) ?
--			HD_MEDIA : DD_MEDIA;
-+			   HD_MEDIA : DD_MEDIA;
- 		fs->head_number = swim_readbit(base, SINGLE_SIDED) ? 1 : 2;
- 		get_floppy_geometry(fs, 0, &g);
- 		fs->total_secs = g->size;
-@@ -690,7 +692,7 @@ static int floppy_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	int err;
- 
- 	if ((cmd & 0x80) && !capable(CAP_SYS_ADMIN))
--			return -EPERM;
-+		return -EPERM;
- 
- 	switch (cmd) {
- 	case FDEJECT:
-@@ -809,7 +811,7 @@ static int swim_floppy_init(struct platform_device *pdev)
- 	bool *data = pdev->dev.platform_data;
- 	bool fast_fclk = data && *data;
- 	struct queue_limits lim = {
--		.features		= BLK_FEAT_ROTATIONAL,
-+		.features = BLK_FEAT_ROTATIONAL,
- 	};
- 	int err;
- 	int drive;
-@@ -961,7 +963,7 @@ static void swim_remove(struct platform_device *dev)
- static struct platform_driver swim_driver = {
- 	.probe  = swim_probe,
- 	.remove = swim_remove,
--	.driver   = {
-+	.driver = {
- 		.name	= CARDNAME,
- 	},
- };
-diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
-index 241088b12829..c373fb3fc750 100644
---- a/drivers/block/swim_asm.S
-+++ b/drivers/block/swim_asm.S
-@@ -5,7 +5,7 @@
-  * needs assembly language because is very timing dependent
-  * this controller exists only on macintosh 680x0 based
-  *
-- * Copyright (C) 2004,2008 Laurent Vivier <Laurent@lvivier.info>
-+ * Copyright (C) 2004, 2008 Laurent Vivier <Laurent@lvivier.info>
-  *
-  * based on Alastair Bridgewater SWIM analysis, 2001
-  * based on netBSD IWM driver (c) 1997, 1998 Hauke Fath.
-@@ -110,7 +110,6 @@ sector_data_mark:
- 	/* read header */
- 
- 	moveq	#max_retry, %d2
--
- amark0:	tstb	%a2@
- 	dbmi	%d2, amark0
- 	bpl	signal_nonyb
-@@ -118,7 +117,6 @@ amark0:	tstb	%a2@
- 	moveb	%a5@, %a4@(o_track)
- 
- 	moveq	#max_retry, %d2
--
- amark1:	tstb	%a2@
- 	dbmi	%d2, amark1
- 	bpl	signal_nonyb
-@@ -126,7 +124,6 @@ amark1:	tstb	%a2@
- 	moveb	%a5@, %a4@(o_side)
- 
- 	moveq	#max_retry, %d2
--
- amark2:	tstb	%a2@
- 	dbmi	%d2, amark2
- 	bpl	signal_nonyb
-@@ -134,7 +131,6 @@ amark2:	tstb	%a2@
- 	moveb	%a5@, %a4@(o_sector)
- 
- 	moveq	#max_retry, %d2
--
- amark3:	tstb	%a2@
- 	dbmi	%d2, amark3
- 	bpl	signal_nonyb
-@@ -142,7 +138,6 @@ amark3:	tstb	%a2@
- 	moveb	%a5@, %a4@(o_size)
- 
- 	moveq	#max_retry, %d2
--
- crc0:	tstb	%a2@
- 	dbmi	%d2, crc0
- 	bpl	signal_nonyb
-@@ -150,7 +145,6 @@ crc0:	tstb	%a2@
- 	moveb	%a5@, %a4@(o_crc0)
- 
- 	moveq	#max_retry, %d2
--
- crc1:	tstb	%a2@
- 	dbmi	%d2, crc1
- 	bpl	signal_nonyb
-@@ -197,13 +191,14 @@ mfm_read_data:
- 
- 	/* read data */
- 
--	movel	#sector_size-1, %d4		/* sector size */
-+	movel	#sector_size - 1, %d4		/* sector size */
- 	movew	#max_retry, %d2
- read_data_loop:
- 	moveb	%a2@, %d5
- 	andb	#(.Lhr_fifo_1byte + .Lhr_fifo_2bytes), %d5
- 	dbne	%d2, read_data_loop
- 	beq	data_exit
-+
- 	moveq	#max_retry, %d2
- 	moveb	%a5@, %d3
- 	bsr	.Lmaybe_store
-@@ -219,7 +214,6 @@ read_data_loop:
- 
- 	movew	#max_retry, %d2
- data_crc0:
--
- 	tstb	%a2@
- 	dbmi	%d2, data_crc0
- 	bpl	data_exit
-@@ -227,9 +221,7 @@ data_crc0:
- 	moveb	%a5@, %d5
- 
- 	moveq	#max_retry, %d2
--
- data_crc1:
--
- 	tstb	%a2@
- 	dbmi	%d2, data_crc1
- 	bpl	data_exit
+ static int swim_track00(struct swim __iomem *base)
 -- 
 2.52.0
 
