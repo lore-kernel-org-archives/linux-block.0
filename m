@@ -1,59 +1,59 @@
 Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA49442FDF;
-	Fri,  4 Sep 2026 09:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5BB44AB7C;
+	Fri,  4 Sep 2026 09:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788514558; cv=none; b=FPGO6/zSrqVaBchHt61sUIt89zwdJBgUe2EbMC+gn7ZGnzEpf/BzdrhTS59FIcZBhssv7Bx2mpLa51HC3LAqeALDFvUe+a8nEjhU3kD5jXJNn+vQ26G3464oBysCtLgjQbNeeZNH1v+JNgHID463mHdw8BM+CjwOA8aaLPq8ock=
+	t=1788514568; cv=none; b=WuvGiBZBxYX6fhxFkrFO5+PeIVmpwqokWcDPU7JDAZzlJkmAl1rRB395jvSKfNWYi7x/2jfmTaiWdpf3UC4exqMsodpZlpwCLZIpVwlAI853QPptAfJTdV4EK15W4911H4Lm4YV+ygpEDo65fj9pF5XOdGjgr7wjSnxLLNrCPMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788514558; c=relaxed/simple;
-	bh=54s669xz9R4knQSDFIxGY95Jbs1iNwq26b5KurojJus=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=asRU9jTLjg01ETdn/OA1esPq0iXVIeHa2+ANBTrxTY+Jm9YZocLb7RZBBc7XoAC+y03XukFA/xtAto497Mfkq1N9qz9Zhh1VZ+F9eUN5t7XDQwlOqutJ63gSFMy4bQ8JYQy3dzY7zlwqay/zkpSq2wsrWr6Gf/kuhCbEhGQrHJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ojDBP+D0; arc=none smtp.client-ip=103.168.172.147
+	s=arc-20240116; t=1788514568; c=relaxed/simple;
+	bh=2fO1Nem8psV2BkjGVjYicEG3JCcCuYnNeeWE91GQ7rU=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=M+jC3mACRkIlWaG13SX7kfcmNDtXa1aUOBTc9j23z2jiu5CLl9S20A9JlLHgchWaMQqqpGiA5ktEvdSrEiBNgzLUxTi9alzR7FnuOmX5G98ZikRmT9W7DWA2BLEn40oYkC6gBsiw1dfxXopHaElP0OhlFaLul1xDCjJn1OeUq2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iVSu3bD2; arc=none smtp.client-ip=103.168.172.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ojDBP+D0"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iVSu3bD2"
 Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id CBA6FEC01CD;
-	Fri,  4 Sep 2026 05:35:55 -0400 (EDT)
+	by mailfout.phl.internal (Postfix) with ESMTP id 87174EC01F3;
+	Fri,  4 Sep 2026 05:36:05 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Fri, 04 Sep 2026 05:35:55 -0400
+  by phl-compute-05.internal (MEProxy); Fri, 04 Sep 2026 05:36:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514555; x=
-	1788600955; bh=kMa4KjbYmjabaIB7zCkIhmIco0mIOh9GB0j7GmK0U+4=; b=o
-	jDBP+D0HzaKWgBbiITJ0ncR1ADpbu/gXumY2HzwzpGbgR+vVbyeADF2RYaveGh6M
-	EiKLtDzaEX21My9ileXh8OyR+rPMdq3wk41u2OIEVTeZzjIo1vX944n9IOE8qo0v
-	e+muCCFLQGMK+7LeKj6FEzGpQKIeNSQyy9OQM7z18Vi7TBr9nXvdj6wRc9iRKX31
-	ZqSg9wuSe/i6IxgxLU4Z0or6HdCxw0QoHTjMm6vNYJ+rxq07j+l6BPW4ClF6lCng
-	rTgUclA9c9P3oVH7/wZLA5p+KlRHBmYDd8iwlS/fjj7J/fOqiDwaFmJNYSsx0Xr1
-	lwGrdXDEMaDeYFFOd2uOg==
-X-ME-Sender: <xms:-5Caap3UiLxh4OHMfQhZpYt9AhjkTRh-7A3r1RqjSR5a1vHSV33PNw>
-    <xme:-5CaaqL0UK61msETh9wkK4WVMKQJ8zdYk4Mu4XLsWt3B4HqsbwHLkYZ5pHn0Gh5yo
-    Snfe2i5UYEcbfuZrxYtj0z_eHiQkXJvC1S2KrdKnE-z2JI6N0cRiT_Y>
-X-ME-Received: <xmr:-5CaapwQdGmZqcc-BWgAitZat-C36-NfD4Oq-w9tCvy2-vgiP8seV2VlfWO3h6W7dWXfR5CId3Nn0r5CKhlnp466zdB3Oot3ezc>
-X-ME-Proxy-Cause: dmFkZTEgSwz66V+qSU0onCxC1F8ShoiVzEkD4nv3k8arPvEJrRCttwK35Oooa03yDS3V7Z
-    X24bDVU3zk97dZjGWhXiX/ncGofJJNeEuYKgl31r/eDK9q5L7nwuD3/hEQU4j57irJs8tO
-    84Cp9nRkKueV+P/Zh+1MA5C3iN5rv0++YXPj7VEh4HRI8ixbdKjZUIuiKKcqpAq6/i16Ze
-    PQjCFsqYVbtDn7r5YuWGcGxoEjqVvREju6nRSm6O4BMaQ0J9b6++FaFcvgP73aZ6WigYRi
-    RlMdiJjw76SzlSBX2alJJ3NXs6ywRX0EZbPP0m8cGOgA5DoC4o+kLwJIiLSJDXjG4wSOWd
-    BGUbTFruA+0pFCU8Tb0J7j06EvzYhq5c0S+S7D/wSSH/sXYelGRtHPbcEV3kMV00hQ2qxX
-    7PV4m7V6HqRDzRnfMqKOsoDh7+rgAA3hmn+dN0lSTD4SlfvraKTmUiiwuhQNIMEtQ5YJOi
-    xM9h2ymqVtOGbnDZPCpdW9oyGpUt5vJmb+X+WSZmELU09W7nFKS9TaVsYR8ZbzBhiNB0B4
-    qrAVxnhVc61LBH+lOpP7em5J3O3PkMkHr7qo4ND2+IqvVp0julfc9CXxfscYc8+kVX94jh
-    YJEhEFSmISBG9rxLMceGXq8MHbZ3TLZZF+Jh27HSRzLQAZUu2rl/uM1r1bCA
-X-ME-Proxy: <xmx:-5CaaoU1kFOcjlJDtKr4Pk5YMoxehEZzlcig4zd3asrdlfvuOZdFiA>
-    <xmx:-5CaapgFpWQ-gp8JslX5ITg3LfKbk-IW5Dal7rotU57u7vm76-nQQw>
-    <xmx:-5CaaoAPU4qEmSUoCatcEakXFgepUiMpT5gX2x-tqrEq20D9o0P5sQ>
-    <xmx:-5Caavsnifc4WLmzS2FNE23Syq7F-PklMHTt26QybRfBoaTHsnlJ-g>
-    <xmx:-5Caakl4S04W7MHRVn56IutPz3buTOwqulCr94iUk7JVvEEYGhHBCr9A>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514565; x=
+	1788600965; bh=Tho79OsiO2FJWFdgFU+2neNMuP7dJTkpAAbGMDaxns4=; b=i
+	VSu3bD2lLSQAPfqtO/7+wNjjzQNNyFTKz2tQwQNrLfTu3yLkVz0h+rWHn3XvCkEG
+	1f8qAAnW5nlzHOoKsklOLeSvpsNS47tVvGfbW87iYZfvKKo9EppjuUNCTwLRtQum
+	f34411Sxk3mv9kkkvQo1v9wb3NzmzKCt0vsMgTnk9OLk/3BCLCnCDNdtbimMdHZs
+	ZtfKBymkrGXaw1Kwr7g31np6ILWlK0eAadO9ECk7fUGONRJ2nfQrJYhZ0f3ewXPh
+	bKcmWK+lAJqOFmYty+OpmYYD8aVEAAg6cLChz5p26wCmWKXgChbQctw7Hwlew0EK
+	YO1CuCzvMAi/hCK998SoA==
+X-ME-Sender: <xms:BZGaaiDhvfAj8HQbN5UZic979xOv6X5fGgxiUNvVvkBC-aUMLK2EWA>
+    <xme:BZGaamn66LRiJzmoZk5RU7tAgv_zYw9KNLqRioyXwWxxfwEL-8hCME69SdTxpIjh2
+    QRC_Ltb2uzFYYjrA5i9xcsd_LdfhpmdvI_3BnIXkSCI-og7-EFzCOSf>
+X-ME-Received: <xmr:BZGaaldQ07IDx26WMwRh5VPAYViC6JX-uggLugwq_TQGjCZik_pIiqfsLrybtG0RjItDWoVdtQdjNOddAK2ccizQOW1i5nw-9sk>
+X-ME-Proxy-Cause: dmFkZTG2k577uDIDfm5jzfBdETCuanfOTnt5vT+Axih7bVvGSgJDBPpJ+GL/LXsHcgEpZ4
+    RC5KHYugI5UaHe6JFYpb4bXBM0FxyLRXOp/X9d5ZOg2Ly58fUO0/OmbwN5cHbLu9sehiqM
+    h9MCdGCEJIsgdXf7qX9gR0srfmKNBjWG3Pz0rJGyFDbc7ny0QDgWCsea9K/QVXVwC+WQn1
+    /WeYxYu0ujQ+4f7Q6s/BX5WsAHenyiVIakVPqBf8IDrqgnLyqGQRmDhTpKk+gBytK587fb
+    RwBpCQY2ZiVruSNCs9KFw8IIZZm1rG9teq5nrbmN6dPQfYZgmVhHgDAJ7hJABVwoGYNPlm
+    +3r5vSHxFe5gJ8HuHqY7TnykzX9qYUTISmY30td35xU5S1ME1R7UKyrL0ivYxnss+/r0MF
+    3PkDzy5ZllCqCJUKrfshDV/o9he0cauH9FO1LE7Jh6P+ABWEpKLxO30O2TmQmlglJJ2pUW
+    EUTTL1x5TCjuO4GCAzBBweH394Zv7cCsQrVfDppKNWwQCC07lhq1c0AO/yyzALe0kfAe8x
+    atQfAMA4GVzAmHvDaefxvfMN+72N7SURd0OQVouO1ALhR/RrCYbJ54DDi6MmmgFo/6d0pg
+    /UZVVbTkcCBAnrnesIQHbxIhXVP4HGweU/Bs45SyWBYEhbE2FCXlLTLGvFFw
+X-ME-Proxy: <xmx:BZGaaiRaxA6NTg0zb9s8sT5l6Ev9-A0oVysI-xghe3LTA5lwgovSvw>
+    <xmx:BZGaakt3U5c2d-MGpa3kXmYIPsViI6Qt4NVhWT-UHpBy4wsIvBqzbg>
+    <xmx:BZGaardKxOOMvcDSZHfVEmHV1Qya7ELit7V6uAvAG72g2JFtdCy0IQ>
+    <xmx:BZGaambIphCkeLh0cEpPvf4ygiDspRGtrpXmvrKa2rBkPIEZAqcaBA>
+    <xmx:BZGaaqy6Yd0Ry9tLE0281HJsLSntsRslD5JNEc_IyZPJHgs8KVjSk-DH>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Sep 2026 05:35:54 -0400 (EDT)
+ 4 Sep 2026 05:36:03 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <613fa64bc857fecd141b5049eb9188ed72c9ec52.1788513997.git.fthain@linux-m68k.org>
+Message-ID: <082b79a3f2fa2ff5df9b51c582e01a8e47444613.1788513997.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1788513996.git.fthain@linux-m68k.org>
 References: <cover.1788513996.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v3 27/33] swim: Move swd initialization
+Subject: [PATCH v3 28/33] swim: Add some helpful references
 Date: Fri, 04 Sep 2026 19:26:36 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,36 +73,34 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-For better readability, initialize the swd backpointer along with the
-other floppy_state struct members. No functional change.
+These documents relate to the IWM, ISM, SWIM 1, 2, 3 and associated
+disk drives. No functional change.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/swim.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 3ce73176da2e..f249b96339d8 100644
+index f249b96339d8..3b8acaa21787 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
-@@ -764,6 +764,7 @@ static void swim_add_floppy(struct swim_priv *swd, enum drive_location location)
- 	if (swim_track00(base))
- 		goto out;
- 
-+	fs->swd = swd;
- 	fs->location = location;
- 
- 	fs->type = HD_MEDIA;
-@@ -853,8 +854,6 @@ static int swim_floppy_init(struct platform_device *pdev)
- 			err = PTR_ERR(swd->unit[drive].disk);
- 			goto exit_put_disks;
- 		}
--
--		swd->unit[drive].swd = swd;
- 	}
- 
- 	for (drive = 0; drive < swd->floppy_count; drive++) {
+@@ -8,6 +8,14 @@
+  * based on SWIM3 driver (c) Paul Mackerras, 1996
+  * based on netBSD IWM driver (c) 1997, 1998 Hauke Fath.
+  *
++ * See also:
++ * Inside Macintosh, vol. III, ch. 2
++ * https://archive.org/details/SWIMDesignDocs
++ * NEC uPD72070 FDC datasheet
++ * mkLinux source file swimiiicommonhal.c
++ * http://www.mac.linux-m68k.org/devel/iwm.php.html
++ * MAME source file sonydriv.cpp
++ *
+  * 2004-08-21 (lv) - Initial implementation
+  * 2008-10-30 (lv) - Port to 2.6
+  */
 -- 
 2.52.0
 
