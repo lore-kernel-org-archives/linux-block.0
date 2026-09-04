@@ -1,154 +1,210 @@
-Received: from mail-oo2-f8.google.com (mail-oo2-f8.google.com [74.125.231.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16484501F59
-	for <linux-block@vger.kernel.org>; Fri,  4 Sep 2026 22:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FC24FC8D2
+	for <linux-block@vger.kernel.org>; Fri,  4 Sep 2026 22:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788560613; cv=none; b=NuKWaMTwCQfx6HlIm2zZhJ6WBD0olTBooi1PFWaBd45rjQM3sHg1qCnTLNh9GyGgGbudvCrDOaaFyO12k4RIiYV8FmuofwkFks42YpUVUmrSv5zkbZ7h34xJUCfOZPgdZo6v3C4eCwSLm1p5DCY1VprHubxh2ft5bWdxgF5wrEo=
+	t=1788561315; cv=none; b=uLLbHxwjhbQvkmqH36zI3iUmazlMK929/UfdYNp8q88iiPapCriwa7h71e17Qj+5Gfn2m1GvGPoCFLIL0Lq62suI6qzVWUVq2cFhNiG8nOjy5d9fZOcvYSm48dJxVbXwzbPGiVCk686rImoa3DwvyUfArpiKsiuKzn7rr+S6/mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788560613; c=relaxed/simple;
-	bh=blQx9O2GljPiDvE4oHqZaB4Q9lTVaxFla5bbqWs8PaQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d693149TnaLmUn0bWECmBSJch50RWV9F1GWhFRs+sWSNNib0WDCgMc/H9Xb/nFslk8XIBo9P3kgzzI1ieFuqTrgc4CqgqJotposDJ5KCD82urCIzgAWktLRmKAnE+kInhkC04ivD4tRpM1LZJyIC5xRRhLaPEIi8H/Smx2ZVfUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo2-f8.google.com with SMTP id 006d021491bc7-6b128c3af4bso149685eaf.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2026 15:23:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788560608; x=1789165408;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+	s=arc-20240116; t=1788561315; c=relaxed/simple;
+	bh=DA84oxU3rQPrvSsuP6rsi2zMphGkpHQDobH17fbWDNc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YMxPaiPfb50SlIDCikAAaJyjoLiNY2SUuSUQnRFuvKs8RxGOLWBq0cmUW+zGkIkYrvxdi51qvWwgN9PkSJrElM6lKl1Q/9ccENBWJvoYENhcgQqOH7krjH1a1A6LzUaLScQg3QUuTt2CZ+5Tx28mX3vNEo0btHxF/GtsgAYvd54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=OM83EIbe; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=p4AhNWtA; arc=none smtp.client-ip=148.163.135.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="OM83EIbe";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="p4AhNWtA"
+Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 684MWkrZ2906573
+	for <linux-block@vger.kernel.org>; Fri, 4 Sep 2026 18:35:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=NS3I
+	WLMNep/DrvoibIPUp7dIa6zL29X7BYhj1p+bdp0=; b=OM83EIbeyrJBmKFxiBn7
+	95BjxB368qVNGNObkjZ85O1d248QOiUYlzhhJJep+Gt6Hi2B8Fzo7oVG64eJc/tj
+	zbc2s9qp5g61Kxn9jIQmS3ffGdAlGQCLFIZHun44tpLrXKQNNfvb8FNBH5XRYio2
+	Z0cVo9Dhz5NYwVILy/CkqWJ4AHXPq0IB3wvtxsLVRMEl30S7UHiN5mLrnAZYCkPg
+	El3m/66187L/MxMuSPzMn+/WT6GRdkqqrMx3xhVwRJ1iy26arqEVzNfdiHL4NoDp
+	xnLYfSKwSetCrD1jSwhPGIAgpUmWjZfBSh9+fhBno0Kz/ApUcGuNj1MCJ7bpAC3u
+	VQ==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gg4b613vs-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 04 Sep 2026 18:35:11 -0400 (EDT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-93909014c85so254053285a.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2026 15:35:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=columbia.edu; s=lionmail; t=1788561311; x=1789166111; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=sxZDoFRvVAvGWSm+Ntioz7anQi0nXepD82NI5Zzbt8s=;
-        b=rVx057GfEhAGEEY1eAHibQs+rT0+LpMH0UgBr3N9/Oe5vaHtKgP2nKQm/dmeq9gWF6
-         7DpogFNIJJABRxuZD0I0CofvA+A3iNVzGbaRBQWeRoTfUByzDm2fHwx1/tXcrQrOOsbn
-         CA0JweIGuaBNU34/ktSjLY5JUrco6xe1tkodPDUQQhpspkbx7+9Ge3epqFlmb+HhGMfV
-         2LTXoLf2ob6LhrnqLeSSCbCn2EcfAAuVxcG/gfRV1G9mzepT5T/yfTrVHyc3DbKt4utd
-         PCnKYlyU3BNdyxblHMAjI1TZHVMLm01KeP/NEEZBsr0rejV5+lMLf8ZFEoJnJVVcGk9x
-         OpRw==
-X-Gm-Message-State: AFuF++m4yzsVikeOUB8uK07VIYdI/Ee70ViOozQLZAIfMGjwImiFp4LA
-	3Yx4ae3dUCGVQ5L0s/qyycs2lAtQWwWsp7dMOo3AO43lSxEeRkMWeRTkR5i8+dPaHXvTRYex2WZ
-	kuAIUMCjGCSh5McRvYN9wCgULaTlwxNwDw5hGrp1OTPPRqOrxaUjo2YN/PAfPEA==
+        bh=NS3IWLMNep/DrvoibIPUp7dIa6zL29X7BYhj1p+bdp0=;
+        b=p4AhNWtAX8wTG5vcPeNMdAcvakpQAgw5k6QYrC1/brPsb0ngW6tTBFeahesat9odxP
+         3/CeRuSUVwltWS+YmhVbW32ySRK+wgeoOP1mAg5qJNFADd22/RTTdMNo4WY+nsgFcy3r
+         tIM/Lc66jspSRsVFs4xxPN+Iyz68ZXTVepvBh/ovG2zevFudQ6nymIw3vOLr+xw+dd+A
+         EMIVdCQHwdZQI0YqVYI0xQPp60no3jNtSJVJQMeZMMAwOv+upZeY/nwE2mtrIFqpUx++
+         99tApD++TY7WQocdN+Vb/ljMdRb2f+sL2dbkP2mxUEqvWoG27jkwA13Ty0hfNuxG3/9t
+         MyHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788561311; x=1789166111;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NS3IWLMNep/DrvoibIPUp7dIa6zL29X7BYhj1p+bdp0=;
+        b=hW/uUxM2ZcvdnoTpF0M47aYuHbD1UVN9XVtj1iNxuPFadhj6U6CeeNvLn6lRuI68CP
+         JZQWKba1FHzn3TsGBTtPIgic7xYtxPzdV49Mp+VSlCvwmY0H20aDrgaWIsE6a/y07GJ6
+         DI/L5wimGDXPqN7ZSc9I3vxwIuXfrMfSgidQac+eDSavxAL0aN/2MzgV6ks3VkPLCx6a
+         lm+PbnnLBPhrD93svIMvNzLAGLJUKy6+a+U3/Nfg4fOzlpNJyaH4be9fj4SjdCqXlokI
+         k4VlRnG2F0WRHboy9PFGDE0ooVxsanE1Shqu4vAwj5Iw3K0KtuLBRHVRtWHOM5gNFsHm
+         6n2w==
+X-Forwarded-Encrypted: i=1; AKwUvBwpL93yngZe97twuOgXMuCyarvSyEzzLBNvCuGaUnLFxiiiqBFSPp88zqitUXyaYStDZJbX/AS8m9r0AQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++m8E30kRVT86pYqK7f2pgACZFmh90eS/1NDMUaeXte7muk+SEM9
+	UvA1n1zLH6FmL47aoN06mABykC2vIXnmQA6lrgSIxMPTvYmw0dA0Wn3cMZSpIhm3XTVCkpSjrVw
+	1BnPnMrIkAvVzdKuK8BFpvvtet2poEbnua4VzfmNakRRa+6f3rjZwKIx/U2qX
+X-Gm-Gg: AYBFou20fnV0ZtJauJQ5QxXvq5fTug012kMN/Ytlj8OQzOJY5edq9sPigA6oMv5sHSu
+	PR5iZfO/c5aiRovDgvUbpexagETDs1ajD7LYJJiE0VfRYMizVx/Cj7DVGWLELXZg37cCCBxusfA
+	QBG4wVwvQV0WbZ89s6v3JhPjuydyC2R5nlub0nYcGQ1WEb8Er1jJobox3Nmp7ncYVl+YQbCgD9G
+	cfa4EhWphWNi6sFFd7z2qpcJUdwtutFne/f8v2tR1DBjn2O8Wv61rIQaFtSE3kbS8gMVoLjhMiq
+	FfZNn6DDRoHFxiY5/H2of5dSROKwHXaHH2BlusdmoJRnNYDJAE6MedrfocpLKO9bca/7GgNh+oc
+	KcIJ+BiFQkrNToG1bDhwupds4Uvs6COm6vMJLNh5tgNNuifslfSNO
+X-Received: by 2002:a05:620a:44c3:b0:939:8905:ce9b with SMTP id af79cd13be357-9398905d927mr531683585a.17.1788561310774;
+        Fri, 04 Sep 2026 15:35:10 -0700 (PDT)
+X-Received: by 2002:a05:620a:44c3:b0:939:8905:ce9b with SMTP id af79cd13be357-9398905d927mr531679985a.17.1788561310278;
+        Fri, 04 Sep 2026 15:35:10 -0700 (PDT)
+Received: from [10.207.49.22] (nat-128-59-177-158.net.columbia.edu. [128.59.177.158])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91040664be1sm31193686d6.18.2026.09.04.15.35.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Sep 2026 15:35:09 -0700 (PDT)
+Message-ID: <789e5449-fc8b-4ef4-9571-26abd514681b@columbia.edu>
+Date: Fri, 4 Sep 2026 18:35:09 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:820:b0:6b7:8396:f3c1 with SMTP id
- 006d021491bc7-6b78396f863mr3577644eaf.35.1788560608197; Fri, 04 Sep 2026
- 15:23:28 -0700 (PDT)
-Date: Fri, 04 Sep 2026 15:23:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a9b44e0.a5e650b3.363816.0002.GAE@google.com>
-Subject: [syzbot] [block?] BUG: sleeping function called from invalid context
- in null_insert_page
-From: syzbot <syzbot+95fdab36405e5ffdb680@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] f2fs: complete dropbehind write bios in task
+ context
+To: Wenjie Qi <qwjhust@gmail.com>, jaegeuk@kernel.org, chao@kernel.org
+Cc: linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        hch@lst.de, jack@suse.cz, axboe@kernel.dk, baohua@kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, qiwenjie@xiaomi.com
+References: <cover.1788438786.git.qiwenjie@xiaomi.com>
+ <c4e69fb1ffd6c6fd968683c690ba29f2b98c9fa8.1788438786.git.qiwenjie@xiaomi.com>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <c4e69fb1ffd6c6fd968683c690ba29f2b98c9fa8.1788438786.git.qiwenjie@xiaomi.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: 4Z6tL9B1Z1BUmOlY58ZVNNxTrw9-9A-k
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA0MDIwOSBTYWx0ZWRfX/I+WEBI7Iad4
+ 5iMcTnQYnyOIldx4wgqC2wf47wfSdx9bCYe8X7B6VMxjEl6Ma1/+lrKd8cVTbKml+7N91NGlXNW
+ ShH1UbS4iCvQJvixfMOZR6U/ZU/L+Ktt0yOiD0j7Anc+xGi7FaOtb/+ndO6TCYNyraIvUw4kKD5
+ vCZNejNRYaX9WPLx0NOQR5n+6+pbX6NU/yi6V8EOjcCyEpp3x8IMsGhF69W+HcExXtv1tziyY6x
+ 5iIbvslc3tfRodSboI+LKWLwMItXI4NF8P56/DlLRo0BH/qAGSgZJkwsh98X3PTcBxVilIFNBrS
+ /AnS4PB93ERSl7uj6APTfazWKHeUCSJ+fk97b3NBnDeBV8BqxuaBffkPoN4oGmzcXMJVAhoMm+i
+ jFYlTW50KwTD4fPo7ZKRUZuXeEsYOJZGkXEgXAtxKSx/RVUKdhwBTkLajHJK3dncnsJIQktnL01
+ VKPDs5l5fs6VouAkX5w==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA0MDIwOSBTYWx0ZWRfXx1gNF3zdHAlj
+ +gogRei/FhDplCb2OuTO9tsXbmRszT6m8gj6B9gFPqafPf5WLzRtZm5xwoSfLGe1O4YsZC5v0ZR
+ OLNRuxbl6Y7s/McyPFoe5pMWEFb2+Cm9QvnKZX1QrWsTYiHiNuCD
+X-Authority-Analysis: v=2.4 cv=WfI8rUhX c=1 sm=1 tr=0 ts=6a9b479f cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=tLges04aSNaZGVAfhBIy2A==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
+ a=IeNN-m2dAAAA:8 a=r4jUT_wghbJ-rGNBW1sA:9 a=QEXdDO2ut3YA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-GUID: 4Z6tL9B1Z1BUmOlY58ZVNNxTrw9-9A-k
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11896
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=10 clxscore=1015 phishscore=0 lowpriorityscore=10
+ priorityscore=1501 suspectscore=0 malwarescore=0 bulkscore=10 adultscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2609040209
 
-Hello,
+On 9/3/26 3:59 PM, Wenjie Qi wrote:
+> Buffered RWF_DONTCACHE writes invalidate dropbehind folios at writeback
+> completion. Mark these bios BIO_COMPLETE_IN_TASK so the block layer runs
+> F2FS completion in task context when needed.
+> 
+> Use the same flag to keep normal and dropbehind folios from merging in the
+> IPU and OPU paths. Classify the original page-cache folio rather than an
+> encrypted or compressed replacement folio.
+> 
+> Keep the existing large-ATC completion path unchanged.
+> 
+> Signed-off-by: Wenjie Qi <qiwenjie@xiaomi.com>
+> ---
+>   fs/f2fs/data.c | 18 +++++++++++++++---
+>   1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+> index 21f396ebe22..b0fedacfd12 100644
+> --- a/fs/f2fs/data.c
+> +++ b/fs/f2fs/data.c
+> @@ -503,6 +503,8 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
+>   	bio = bio_alloc_bioset(bdev, npages,
+>   				fio->op | fio->op_flags | f2fs_io_flags(fio),
+>   				GFP_NOIO, &f2fs_bioset);
+> +	if (!is_read_io(fio->op) && folio_test_dropbehind(fio->folio))
+> +		bio_set_flag(bio, BIO_COMPLETE_IN_TASK);
+>   	bio->bi_iter.bi_sector = sector;
+>   	if (is_read_io(fio->op)) {
+>   		bio->bi_end_io = f2fs_read_end_io;
+> @@ -793,6 +795,13 @@ static bool page_is_mergeable(struct f2fs_sb_info *sbi, struct bio *bio,
+>   	return bio->bi_bdev == f2fs_target_device(sbi, cur_blkaddr, NULL);
+>   }
+>   
+> +static bool f2fs_bio_dropbehind_mergeable(struct bio *bio,
+> +					  struct f2fs_io_info *fio)
+> +{
+> +	return bio_flagged(bio, BIO_COMPLETE_IN_TASK) ==
+> +		folio_test_dropbehind(fio->folio);
+> +}
+> +
 
-syzbot found the following issue on:
+So I'm admittedly not very familiar with f2fs, but why is it necessary
+to prevent merging here? For iomap, we concluded that merging was fine,
+as it just results in some extra folios getting resolved in task context
+(see commit efbde6f9f449 ("iomap: use BIO_COMPLETE_IN_TASK for dropbehind
+writeback")).
 
-HEAD commit:    f1b8fa82cab7 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=17b7e779580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d1128bc53f2ef7f3
-dashboard link: https://syzkaller.appspot.com/bug?extid=95fdab36405e5ffdb680
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-userspace arch: arm64
+>   static bool io_type_is_mergeable(struct f2fs_bio_info *io,
+>   						struct f2fs_io_info *fio)
+>   {
+> @@ -985,8 +994,10 @@ int f2fs_merge_page_bio(struct f2fs_io_info *fio)
+>   
+>   	trace_f2fs_submit_folio_bio(data_folio, fio);
+>   
+> -	if (bio && !page_is_mergeable(fio->sbi, bio, *fio->last_block,
+> -						fio->new_blkaddr))
+> +	if (bio &&
+> +	    (!page_is_mergeable(fio->sbi, bio, *fio->last_block,
+> +				fio->new_blkaddr) ||
+> +	     !f2fs_bio_dropbehind_mergeable(bio, fio)))
+>   		f2fs_submit_merged_ipu_write(fio->sbi, &bio, NULL);
+>   alloc_new:
+>   	if (!bio) {
+> @@ -1086,7 +1097,8 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
+>   	    (!io_is_mergeable(sbi, io->bio, io, fio, io->last_block_in_bio,
+>   			      fio->new_blkaddr) ||
+>   	     !f2fs_crypt_mergeable_bio(io->bio, fio_inode(fio),
+> -				bio_folio->index, fio)))
+> +				bio_folio->index, fio) ||
+> +	     !f2fs_bio_dropbehind_mergeable(io->bio, fio)))
+>   		__submit_merged_bio(io);
+>   alloc_new:
+>   	if (io->bio == NULL) {
+> -- 
+> 2.43.0
+> 
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/932d85a2bda2/disk-f1b8fa82.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5b6b8fb76e8d/vmlinux-f1b8fa82.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c246b61ee396/Image-f1b8fa82.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+95fdab36405e5ffdb680@syzkaller.appspotmail.com
-
-BUG: sleeping function called from invalid context at ./include/linux/sched/mm.h:323
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 8414, name: syz.7.670
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-1 lock held by syz.7.670/8414:
- #0: ffff800088d271a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #0: ffff800088d271a0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:840 [inline]
- #0: ffff800088d271a0 (rcu_read_lock){....}-{1:3}, at: blk_mq_dispatch_queue_requests+0x110/0x6d4 block/blk-mq.c:2872
-CPU: 0 UID: 0 PID: 8414 Comm: syz.7.670 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/07/2026
-Call trace:
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)
- __dump_stack+0x30/0x40 lib/dump_stack.c:94
- dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
- dump_stack+0x1c/0x28 lib/dump_stack.c:129
- __might_resched+0x354/0x4c0 kernel/sched/core.c:9197
- __might_sleep+0x84/0xdc kernel/sched/core.c:9126
- might_alloc include/linux/sched/mm.h:323 [inline]
- slab_pre_alloc_hook mm/slub.c:4537 [inline]
- slab_alloc_node mm/slub.c:4897 [inline]
- __kmalloc_cache_noprof+0x88/0x5ec mm/slub.c:5485
- _kmalloc_noprof include/linux/slab.h:988 [inline]
- null_alloc_page drivers/block/null_blk/main.c:870 [inline]
- null_insert_page+0x94/0x4e8 drivers/block/null_blk/main.c:1019
- copy_to_nullb drivers/block/null_blk/main.c:1157 [inline]
- null_transfer drivers/block/null_blk/main.c:1271 [inline]
- null_handle_data_transfer drivers/block/null_blk/main.c:1300 [inline]
- null_handle_memory_backed+0x474/0x9d8 drivers/block/null_blk/main.c:1380
- null_process_cmd+0x118/0x1b0 drivers/block/null_blk/main.c:1434
- null_handle_cmd drivers/block/null_blk/main.c:1457 [inline]
- null_queue_rq+0x788/0xa88 drivers/block/null_blk/main.c:1703
- null_queue_rqs+0x108/0x204 drivers/block/null_blk/main.c:1717
- __blk_mq_flush_list block/blk-mq.c:2827 [inline]
- blk_mq_dispatch_queue_requests+0x33c/0x6d4 block/blk-mq.c:2872
- blk_mq_flush_plug_list+0x37c/0x494 block/blk-mq.c:2960
- __blk_flush_plug+0x364/0x440 block/blk-core.c:1266
- blk_finish_plug+0x68/0x90 block/blk-core.c:1293
- blkdev_writepages+0x128/0x184 block/fops.c:486
- do_writepages+0x284/0x47c mm/page-writeback.c:2571
- filemap_writeback+0x230/0x2bc mm/filemap.c:387
- filemap_fdatawrite_range mm/filemap.c:412 [inline]
- filemap_write_and_wait_range+0x90/0x114 mm/filemap.c:684
- filemap_write_and_wait include/linux/pagemap.h:65 [inline]
- sync_blockdev block/bdev.c:276 [inline]
- bdev_release+0x114/0x328 block/bdev.c:1129
- blkdev_release+0x20/0x34 block/fops.c:680
- __fput+0x338/0x74c fs/file_table.c:512
- fput_close_sync+0x10c/0x278 fs/file_table.c:617
- __do_sys_close fs/open.c:1511 [inline]
- __se_sys_close fs/open.c:1496 [inline]
- __arm64_sys_close+0x80/0x110 fs/open.c:1496
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x64/0x260 arch/arm64/kernel/entry-common.c:758
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:777
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:590
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
