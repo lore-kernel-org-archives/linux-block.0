@@ -1,143 +1,202 @@
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020090.outbound.protection.outlook.com [52.101.196.90])
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486064A2041;
-	Fri,  4 Sep 2026 13:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.90
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788530220; cv=fail; b=jYz1269rnZ2DOxgKVqR77t/1jNONAWomA6CykgHDQ8vst7FTwGNGkx2bVxowdxtKCS3ZncOEAB4Bar66TiClZo01e/7996g9tich2YlrZ9yr5vxsvtmEzH8EwxquW8gag7C6XfcZIGNDoto+1HWcjOLwSB20LhCM2FOlyaa+NmE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788530220; c=relaxed/simple;
-	bh=HQXrPnlYFee2noIks7uw0OZXGjPEkBv3+Je7ohwr3uM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cUenr9clMH4ja2oWEp7dL6Kn4UQ2xmyIOzsdWznYFwn2vCagC99rhUX2kGgFYMbvYzbQNh54zz1cTQlGO/e4lPYoJ0d6nCDknzQZb5zsGEAmypFhxzdnt1ZFc0HFfpqpf3Nay+J0NVZto8PiWPn2aMDGDIjrv8XMn+M/NqmxDNQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.196.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J6KWCDKJ0cTfbvBbfc5SOJMjcGsKQcfkAsrE1VJKEbdV1H0avExk1uf2dpeNGygHCGBH+E33IC7x6gSRk9YY7eGE8rsmgMP7UGuydCT7HhvZZD200iL4Ov3I0M1OQPegjIMIYaRrynbd3EqnaH0uyqjm0vE7Gs4RjzEU4Mzvc3sb27cpmXk22qysVm/zvhr3CcIFeaeCaCXPGGuJYz8v/Rpq7xrrS78oiptw+JVOdMOO0QPY0oP9MrcjCuYLT43Qlv5T/GFCOtrcz9ccUBrv2u1DIv7iiaBoMbOeYGKNRGYyrAg8PevGK8tt6qufMZ9cunz/v2F85HCmkwgVE1oB3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=tFcNC3UXw6ERszbKua2USNZSD9x0EDd4WVdk1PcKf8g=;
- b=djj7iOfFxbbtKWRFKlrcTL4qy21a6qC2ZmhtR3IMqmksaC+p65BSruEwkS5U2BydE/W8d9xmFSQu2LR+wJJM8MDM2npsPJEweD+jE5ru5gMPw5E1Crp3ZKZrKTn7aQX6VOmNGiXTqBWXwd4L7ZiXvWa1tkKavXvibELhF5rjFV1x5WFVjD3RkG3uaLbkWQ6nUSXkRHPqtj7wB2Xj9zUEd5tPF0o/lLNIr0CNDx0qN4LduO/cNXhJxViCfs70gQdMv73QKoBLutggVez1HoTHwSmfyPKF8YdshRGnA/coUQIBctPqOS4Qpy7sxwvbtZM2gbktiTUn+poQXx7WPUdWeg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by CWXP123MB4134.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:b9::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.13; Fri, 4 Sep
- 2026 13:56:53 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0360.008; Fri, 4 Sep 2026
- 13:56:53 +0000
-Date: Fri, 4 Sep 2026 09:56:50 -0400
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
-	bigeasy@linutronix.de, wagi@kernel.org, marco.crivellari@suse.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 0/8] blk: honor isolcpus configuration
-Message-ID: <xo2u42apweqnfj3mq5b7jmjcvdgqrr6f4sh5sy5ys2eose3xfs@ux4utwwiiscz>
-References: <k2lz7cbhtzlx23qk2nhii46znecytdfrcyoctvpqgu2ibttdbz@v2y6jttq2h6l>
- <20260904114249.217677-1-ionut.nechita@windriver.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260904114249.217677-1-ionut.nechita@windriver.com>
-X-ClientProxiedBy: MN2PR03CA0011.namprd03.prod.outlook.com
- (2603:10b6:208:23a::16) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61DD4F55AC
+	for <linux-block@vger.kernel.org>; Fri,  4 Sep 2026 16:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788538795; cv=none; b=rQ+8dlf1CYUwBW6RMb0QPmKMV6Za9hK6d4Pz1w+3DUBnBdMIG4ZuGqHCNlqykndjV89nDYgDwIejysD4lNdLiz0VoYWIu9peKMk8rmVL6Kp6tTaQ3HBlCdJBUuB83QoxYSu+8EHU26VwVXWyPAUh019gLLtaoBIWyxN0fW2hnNY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788538795; c=relaxed/simple;
+	bh=ObmG9tfgjwMlydiJMgZz0Uw/hklY3TtDzEUESXlWCvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MyDdcoPRbeUc7qP0Cw9hWD885pb/ri/P0Kq2Qd1ue4l5xDQrbuFUkji2z9xJv/83ZR745UNSZHzKHJOAib9L3BirRIjFl/5tLOTzMpXqvmO2MQog2dJEKb/B7+V2XTDzRVBwZI+U/4Kw5x6pt1WkaB0u1ahNnVTTTlZBPp1tjeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=MUZ8znf0; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=cBR3imX3; arc=none smtp.client-ip=148.163.135.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="MUZ8znf0";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="cBR3imX3"
+Received: from pps.filterd (m0167071.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 684G9xjR3547769
+	for <linux-block@vger.kernel.org>; Fri, 4 Sep 2026 12:19:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=CZJ1
+	b+xo/XcDeEB8HUsZoAtzYxQXYY6E5mqisQMBwto=; b=MUZ8znf0F71L1M2hlNCv
+	xCdJmIm7XMf/ZQwLW2vfFk52O2B0oQciKpMGkORYC8CQSVjyJAGqs98bXKdH4p0J
+	NoW3cU8XjBMqTUzZF13/gB0To13e/miRP2elTJFgjIVSH63x4dQ3QAjAbgtl5zs4
+	jfuTUul/5qdl5iKb6ylat+bQj1LBd7qFDlMoUwp1+szGa0w2v5oF/S+kX7BEfaFs
+	jTdfUM49H1C6cKBG1dC+2e1qrVLQRQOK2rg7gJHQ+eYpLInbOb2LPWneyYHnPNg4
+	Xm5cfjhewvn10YVHNHDuqDIqm8SlaOVpvFZllGQG6RXWt5FebeRX6aYiG4ZQovJQ
+	SQ==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gg0ac8rmp-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 04 Sep 2026 12:19:48 -0400 (EDT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-90e7db8d191so25369066d6.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2026 09:19:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=columbia.edu; s=lionmail; t=1788538788; x=1789143588; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CZJ1b+xo/XcDeEB8HUsZoAtzYxQXYY6E5mqisQMBwto=;
+        b=cBR3imX3JNlUtiewTNBPQGXRDUZJ1yA6kjgt6spkMyH9o+YA8rcrJHbYXyw78U3EZS
+         Ez21EkHpLMAGSkYhDo58dlqXHEGghwba+gBbq6esViGN/tj57b1E+Tg0iwAphAbE9nmP
+         Ub7TAZzXTA/PfPt1Hp2aLTOVoSdMKklrj/bzJjgbvVEbxiRilC/5CUTy0zwmjmWTqUVU
+         0NV2P+lTjWosLtvJJz9aYJzYQcuJ1Xj2tbCEwwVucitruck4FtsNQ8zAf0rrKWKxoRUs
+         LB2nS6dK2Cune4mrYg9hdEPBBGNZ1P3gyP1FNUcDfOwvPtcDp4iWk56jxG7407xkg65y
+         qcPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788538788; x=1789143588;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=CZJ1b+xo/XcDeEB8HUsZoAtzYxQXYY6E5mqisQMBwto=;
+        b=XXV09VgeBQn1i6aOJ+qiAMwYYwsD/9YESeOLhiJCPDosV8uu1mh8kTaIDW3qgtwKWb
+         tgjVZPtvQsFQOIVWNYT7Vyy0fqbXXn3xJoCRAcZ+3Ah0VmMrVa27un0Z2G2vujDMDrpz
+         0D+SNzIyPowDSmVnTDj2mDA4dvqv2IOLY9G+m7/NFhj+tO+EbAKGtWVzu2aQcyVtrF+a
+         a+27/eaD8iuBEat3kbZN9Ruej5SOyN07V3QaAao9TopdvZx6wfdDJfj+78JLEkCcJNpE
+         Rq4KVGFO+88D1ja/G785jjdVvF3dlBWkTmGb5v5ZQcDpLBi2mfvTY6yg9dbmKdfCcGnK
+         BXvw==
+X-Gm-Message-State: AFuF++lCmx/aFB8YJLfM2mBBssQZbYLbYGhdVRW30MDAVeDCm9gjC2Jo
+	45u1JWDSNR2JIDUYYh8jgSgI3aP7I/kMxBnl3nB0IHU1PCo9nAHggeaIBZPHU74oujhEKgXZj4O
+	s4W/2adSL04rVnKd3ndbQ4/XQzTb+mXin4vJ62qJqc78kKtf/4CWbSiXcDdZ5bkPl6q2dYyg=
+X-Gm-Gg: AYBFou1pTg2xjjvoph3BVxK0l88fOC63cojrIIwdTZImIrDw8/SM2+iUzYY0qt5Vp8m
+	dM+PoFZxaiq5DAIdQDjmJV4I7jsA2uTuPcn+oikESiNqwfcMXSUE7VF9qVS8V2llIlf4LyHX7MX
+	bPz4uHZfuAC0O6RLE3s61IcwyNJf7jBt15t6uBtrx64mDQYmMnLnsJfeUOcm095Lq9HBWGNKmEG
+	qUI4Fi1mOnsTzIgz/aknqZN+kI0E8fbRzUj5eog9hH0aRwyA0gD6gcOduXgP47lV8UopjSwf0ID
+	//XGH79N7urSk93+w7NEEM8jrRQ3q4X5Vd8nbv9Y5MyzoLYlvhu7PN4S6IXZ5NbhUEfaR/c6wgi
+	IzEv2QkJK3mB0EJOdLRkOnFLl0cdFX63LxrXe/LpXId1csa3b0pkX
+X-Received: by 2002:a05:6214:c6a:b0:910:3c08:fc6c with SMTP id 6a1803df08f44-9103ef89180mr79714506d6.22.1788538787693;
+        Fri, 04 Sep 2026 09:19:47 -0700 (PDT)
+X-Received: by 2002:a05:6214:c6a:b0:910:3c08:fc6c with SMTP id 6a1803df08f44-9103ef89180mr79713766d6.22.1788538787001;
+        Fri, 04 Sep 2026 09:19:47 -0700 (PDT)
+Received: from [10.207.49.22] (nat-128-59-177-158.net.columbia.edu. [128.59.177.158])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9104067b099sm24071926d6.28.2026.09.04.09.19.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Sep 2026 09:19:46 -0700 (PDT)
+Message-ID: <95a68e6f-0e45-4763-8345-00f85c53b5ac@columbia.edu>
+Date: Fri, 4 Sep 2026 12:19:45 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|CWXP123MB4134:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb501cd8-7c29-40cb-4f17-08df0a8c6029
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|23010399003|366016|10067099003|56012099006|4143699003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	7GssUaaTBz/9rCLK0o8xZhoPDZnymjZFmEF1/HYFgvCSFyk8zz/kfI6xJUPNIBWIRG9yjag6CFZhcwOlmIsc1gjEGpRxW+YnWFX/o1Au3cf7eKFK8TfwZ2BbkkJJyC2kpuNkBKbb/JKSY6o/dhr9Usea7YzkmmOPAt9PvLFUpzPC4Qhq8KZX08gKVJr6EMz/ivNgIFDREgkA0Aus1k2HbzZY1Lc0DHG7WApemXAxx4JiOQ53Kufo0s/2uOG/mFpzz7O58YDPzuvEhUMTGxZiFDObc4OMtX+TieJdt7XysX1je0l6H0rbfpCXoW5FLwWmKMxDLGkPGn2Dk9auljT+nHEdeBHUfXOXDXyco8JjaiuVtcUXZLgWwVIxy6/oW8IjVGOqyEQaTEaXHBG32f45ouEE7rWK4Y6f/tJ8P1ZPrvmKMhZ+njRGk/2IIK6v+QUPIRMFSo3GkfKLQnsfpy/mrFX+C9R4Tf5uqcMojR0fGpKHu/5GwAlNxQNBBrRBs2kdbDmBEA6foA3+tX8C3kd7wxsRZfmNRpGqnZMuJbmVD6Jw1dNN79o9UJth7ECoPopabqMq5czrrLUIlIX8roLS1WjnRi33IpyZMREMDG64FuCf7DTpfhJqRRXp34QtflTXf7mTjWKllrPsMKznvgDUEfGCfTG5jpQmY0SLPpmfFT0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(23010399003)(366016)(10067099003)(56012099006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T1YydmpuZ1VaaGo0enJPVkJieVYyYnBFVUxUMkhzYmFKbDEvSjd0RVFTclQx?=
- =?utf-8?B?Skp5Qjh4WERCK1JBQnFlTDlsZ1FBWm5UTFZLclFqMHhEanY1eUIwSlZJdXE3?=
- =?utf-8?B?SDkwSUdiMEkvQTBJeGpBU0dmZTFNSHlHQTB0SWUrNE9TUEFXcEtiV200VVdR?=
- =?utf-8?B?dXo1MEFlMHJwQWFvZWc2cHdzbGxOY256ZjIzYWExZ2RTdC9HMzVFQ1Y5NFRK?=
- =?utf-8?B?VGd4VER0WDRHbDVkcUdEdW5nMDFaQkhmdld1Z3lNd1NtbXFIdjRBVFZ1OW1o?=
- =?utf-8?B?T0p2WGIvbTJQeXE5eWYzZklWbkJpOEEwWm9JSHZNdEI4a0tvRXhKK3FwRXZo?=
- =?utf-8?B?c2tjUUt3VnNqRGcwdHMxYXBOdktjZjFKTDBFTmpUTTVlaUJSZnQwRFg5cjhJ?=
- =?utf-8?B?a0YzSUpkV0JYRlpIWTl5TDJHcjQvekJhUGFjYm5jN1grRnRiNlU2T1Qxd2V2?=
- =?utf-8?B?SkJkNXVrMFB4NWdLcUdlZ0FNOWdyV2dTazllbGFVY3JoblB6WURxR084aE9r?=
- =?utf-8?B?aG05UW14SDZQNW13TVdua1h5WlRUV002MDFZbEVnRnY1bkxUL3VDNVFnOWJZ?=
- =?utf-8?B?T3dNOGx3YlViKzRBbWRhZmFxQ1d1dHhYdnZlbHdMYXVJUGxJMmRhcDlBZy9z?=
- =?utf-8?B?Y2ZMdTRjUUZkblhic0xyaWt1dXM0RGhjVnBOMVVERFVGNEZBUjQ0SU5TTlRO?=
- =?utf-8?B?S1NaV2hIMmNDcHVUVFBLYWVMcHY2dkwvT2pITmplbjM2TElXeHhCbGVNTjRT?=
- =?utf-8?B?cHcwelRXTG5ib3djUVQxSXhaTGlQRTdheEFvSU0wUG0rNm84SWNBaFFTemxD?=
- =?utf-8?B?OHFyNy81MWsxeHN1TjdRcjR0TUdCVzV4T1ZmVUlna09jdTVMU0llK3g4aHpP?=
- =?utf-8?B?UHkyT2VkamQza0xhaHRQUDdFblViemRrMXp3dVEvV1ZkMTcxNERCK3h0aWtv?=
- =?utf-8?B?dXhBbllZQzFmNUlDczB1Q3NoeTZHR3paQTJsWURjMHo3NU1oR3VpL2M2empY?=
- =?utf-8?B?OE55dC9xdThNL2hjWmdxNERQS2tLa0JZSytQODhQTWZ3bGVtZEk5OUQ5QlhO?=
- =?utf-8?B?ZUhaNDVPWnhtU1RmNllpSFpOM1VKUnlURGJqMTgwUEhwSXFwNWhZQ0JXbHIx?=
- =?utf-8?B?cElWZVZJZ3FONGsrdUNwZHBrOEptajlnMUF0aWFyNmhxc2krR2h2NjNxb2hn?=
- =?utf-8?B?aVI4ME5YS0NxckRFcEJUaDVUdlg4V2xMbnI5RjVwS0ptV2o2RlpVYmJIMXcr?=
- =?utf-8?B?WFk2VGZOdEd2MzVNcVVwMC9XZkpRRXVxNjZzTVdpU1JUMlo2M05mdE1pNVdr?=
- =?utf-8?B?TzdkVHpXT3hSZUFvSk0yYzlkaC9rZEZxZkRKSzByS2lqd0dtbk1pUkdEd2oy?=
- =?utf-8?B?S05qMGsrMHA5ZnNaS0VPSU5xa21vKzdHS3A3WlBOc2FEK0xaNG1WcUwxZTNR?=
- =?utf-8?B?Vm0rK0lnbjJrZFcwUlc5azFvT0d1aHB2VlZGTmhKdXVJK1JIWGVsQk00V3JN?=
- =?utf-8?B?aHgrdDdlMEFKOUtTYjRJWFdkRGVPeTlheGtoTmpQTHdnWElaWXBmMVVVcFlD?=
- =?utf-8?B?b2pMaXVsVkhVYjJKclJhdzdmVmxIdHRQTlRCUWtUeE9hWnhWYnI4anViRFZK?=
- =?utf-8?B?RVIxTXFIL25jUjRESkNKUUVpbnNkVFlwT0oyQUNaZzg1WVcxZ21rQ05QK0t3?=
- =?utf-8?B?Y0g2eDV2VlR4OXltdHh0OGpHczNQMWdwUEhReU52VWF1c044UGgyUVMvZmIx?=
- =?utf-8?B?WHYyV2ZQcWZFMktuRWFlYUFpMEdXd0xjZFFGTUw0L3RaUGlNY3ZGWWU1NmZL?=
- =?utf-8?B?UnhySEgveWNHWXVIWkVCYktWQVAra1AxWnlESjkwZzV5WFczZ09IN05KbHUz?=
- =?utf-8?B?NVRyTUdqbjZkdkdyVlQremFyMER3eVJPbDlROXZsS2NUMHlvR05SRkR1TjBh?=
- =?utf-8?B?K3NmNkl6WTZrL2NybDVpVE5FejAyL2Q4WHp2VGdzVGFGSVAydkpHcmRtRWxQ?=
- =?utf-8?B?UlBlcFQ1TVJxZHp0RVhqOER2MzQ5YnRTMzJKalpqUTA1OS9OaUNYcFBHUE9L?=
- =?utf-8?B?dXQ5Mm5BUjZQN1ArYzM3MkJRcXdqeUtIZnd2ZnVpVUNnQmdRNUpLWFg3R29h?=
- =?utf-8?B?K3ZJTE03ZC9qQWE2cmxrWllBbGJ2bUdSWlBHTWczWllCa3dKRm5ZSzVzNDRk?=
- =?utf-8?B?RzVCZm4wNHozUjB4N0ZkK0kwZDhlZEdxcUxnbFJtbS9xY24yKzNtQVh4S2lo?=
- =?utf-8?B?clRIczJFS0Zxb1RxNmpyL1o3dld3a2x6a3o1TmU2blhjZUVTYlltSmZhOWdC?=
- =?utf-8?B?Rm14MHhEVXFUUW02N1hyMDdRaHNSRkJJNysrcnNWWWRTOE9tRXlFdz09?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb501cd8-7c29-40cb-4f17-08df0a8c6029
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2026 13:56:53.5966
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lLkgndeZnULgHfCg9Y3BAL8ndeR2iheIv2dXt4T9OZxsYRNPdcfboOzp9UwIY1HU2bWCWB3FR6zrJDVJZpjoRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB4134
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/7] block device fixes for large block sizes,
+ IOCB_NOWAIT, and direct I/O
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@suse.de>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        John Garry <john.g.garry@oracle.com>,
+        Christian Brauner
+ <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sashiko <sashiko-bot@kernel.org>
+References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: a_vEz6ERh1vv44se8BIuncQjF4qhM5C_
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA0MDE0OCBTYWx0ZWRfXwIfqnRMlt65J
+ woVqKOFAsCMHpVkIvibTjO/HQhhO42Lx+N5jo0AC1o+2pJB29qFQfK2rYjF9TU/4vkRLuGMYvHF
+ zHTi1dfCwyVExrdpzwvu/3jJ9IUuwnBm6ttf2eV4V4X8P4jOmsih
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA0MDE0OCBTYWx0ZWRfXwef4ZIOHC1Qe
+ G1GF+pAJOcbzKwayb1qpzvheI2doZuFSWfet1J7YFqiz9TgpE7j7zxXP+cyAw7lkK11yYxyOCDX
+ i57ZJkBYWGdSKPSljXKElB0DP2uvZKsNDiTjtN1mWD8qr4ri58Ennd+HT9lpp8HbXC1T1xRztjp
+ C9BwnpNGn3zHDIPVluLeUVPhq0FrIn2qJU0M4YEdm7+ix2HmbAq0WOmi7nY4VVt9o2n5b8bZDVZ
+ ED7vloINqy/AcVvgs38Kkm5VSuZ8wqiRGRowKYP8gJhLDYFZ7rcXUaVVtLgqym8Ro9DJC+b2Rmh
+ KULnNAbzS5dcLhyys0aijv80VxRSqEwlvOoKD61Q0M/hLvISC/gDB1qUSiQH2XjBW8lf1E0VLQr
+ Rkj7Hs4M5OcxIewlAZWuVwJr2CA3TjYjdFgve5CgaMA727tGXvCv5dRJFU6SdOat+JE05aVPn4T
+ X5SklN0uz84w+3B7nRw==
+X-Proofpoint-ORIG-GUID: a_vEz6ERh1vv44se8BIuncQjF4qhM5C_
+X-Authority-Analysis: v=2.4 cv=a4EAM0SF c=1 sm=1 tr=0 ts=6a9aefa4 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=tLges04aSNaZGVAfhBIy2A==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=79PYxaXUQd1wl-QFWJnA:22
+ a=VwQbUJbxAAAA:8 a=NEAV23lmAAAA:8 a=dXbZDeGBosa9AtOZLTMA:9 a=QEXdDO2ut3YA:10
+ a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11895
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=10 adultscore=0 spamscore=0 phishscore=0 priorityscore=1501
+ bulkscore=10 lowpriorityscore=10 malwarescore=0 clxscore=1015 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609040148
 
-On Fri, Sep 04, 2026 at 02:42:42PM +0300, Ionut Nechita (Wind River) wrote:
-> Hi Aaron,
+On 8/28/26 4:49 PM, Tal Zussman wrote:
+> A set of independent fixes for the block device file operations. The
+> first two were found by Sashiko while reviewing the RWF_DONTCACHE series
+> [1]. The fourth and fifth were found by Sashiko's review of v1 of this
+> series, and the rest came from asking an LLM to find any similar or
+> related issues. Each issue has been reproduced, with the fixes resolving
+> the issues.
 > 
-> Just a quick follow-up -- is there a newer revision of this series in
-> the works, or posted somewhere I might have missed? I'm mainly trying
-> to gauge where things stand so I can line up the GNR-D testing against
-> the right base.
+> Patch 1 fixes silently lost mmap writes with CONFIG_BUFFER_HEAD=n.
 > 
-> No rush at all -- happy to wait for whatever the next spin looks like.
+> Patches 2 and 3 take i_rwsem around the direct I/O write fallback and
+> the splice read path, which race set_blocksize() changing the mapping's
+> minimum folio order.
 > 
-> Thanks,
-> Ionut
+> Patch 4 makes the buffered read path honor IOCB_NOWAIT instead of
+> blocking on i_rwsem.
+> 
+> Patch 5 makes IOCB_ATOMIC writes fail instead of tearing and falling
+> back to buffered I/O. Block devices can reject both paths into the
+> fallback before submitting any I/O, so we fail rather than issue a
+> WARN() like ext4 does.
+> 
+> Patch 6 fixes leaked page pins in bio_iov_iter_align_down(), and patch
+> 7 removes dead metadata handling in the async direct I/O path.
+> 
+> These issues are currently unlikely to be hit in practice due to the
+> specific configurations required to trigger them.
+> 
+> The reproducer for patch 1 has been submitted to blktests [2].
+> 
 
-Hi Ionut,
+FYI the reproducer has been merged to blktests as block/048.
 
-Yes. I am working on the next iteration. I hope to have it ready by next
-week.
+> [1] https://lore.kernel.org/all/20260730-blk-dontcache-v7-0-3e8e6850068d@columbia.edu/
+> [2] https://github.com/linux-blktests/blktests/pull/258
+> 
+> ---
+> Changes in v2:
+> - Rebase on current master.
+> - 1/7: Add Christoph's Reviewed-by and submit the reproducer to
+>   blktests.
+> - 2/7: Skip the buffered fallback for IOCB_NOWAIT direct writes, per
+>   Sashiko.
+> - 2/7: Change the Fixes: commit from c0e473a0d226 to 3c20917120ce
+> - 3/7 to 7/7: New patches.
+> - Link to v1: https://lore.kernel.org/r/20260802-blkdev-fixes-v1-0-a82fc549fd74@columbia.edu
+> 
+> ---
+> Tal Zussman (7):
+>       block: use iomap_dirty_folio for block devices
+>       block: take i_rwsem for the direct I/O write fallback
+>       block: take i_rwsem for the splice read path
+>       block: honor IOCB_NOWAIT in the block device buffered read path
+>       block: fail atomic writes instead of falling back to buffered I/O
+>       block: unpin all pages of a bvec in bio_iov_iter_align_down()
+>       block: remove dead metadata handling from the async direct I/O path
+> 
+>  block/bio.c  | 18 ++++++++++++-
+>  block/fops.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++------------
+>  2 files changed, 84 insertions(+), 18 deletions(-)
+> ---
+> base-commit: 1b78070aaef63512688aebfbc82365ef9d6660f1
+> change-id: 20260801-blkdev-fixes-771b1c314ebb
+> 
+> Best regards,
 
-Kind regards,
--- 
-Aaron Tomlin
