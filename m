@@ -1,48 +1,29 @@
-Received: from mta1.migadu.com (out-20.mta1.migadu.com [95.215.58.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9262941687B
-	for <linux-block@vger.kernel.org>; Fri,  4 Sep 2026 05:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.20
+Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [118.143.206.90])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB37233949;
+	Fri,  4 Sep 2026 06:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.143.206.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788500289; cv=none; b=IxS7Vg0DjU9bX10B1USZ8U4HMNV9eriI6VE1AGwgBt0eJ46xRRcwXTU0QI34rH+ApMPllsA83QXIgiuWR/0zWaU+7EaW/LGrFUPOnkrFT2DS77BI2fLyMAXgPS+V5mgn/9Iz/TLILkh+Ouj2GyxxklstPIckKY695/mfHFw+NDE=
+	t=1788504320; cv=none; b=q239Hsxdd2VrBbixo3t9wbihORQD4Ox0eWQp5l1Y24ywYKHO4O0ppwNUfQgZpRsG55Pup60ANtsYaWwNpdyJKWscJ4TzkAac+Q96RRJmTjlF/MVtxZ9Sn28K2MwNkP9pCl/tLqpEy6fbB4In0Iom+3mKmudCcoy03kOBuIU/oSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788500289; c=relaxed/simple;
-	bh=MU1sHvpqoBfFc0gexyP/TzWUZ7RJEDh2n3zyKs/ESGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HbRA2s8aY433FOVl+xjThHQUIPKvzV3FF0nYiOatP8d1o7A+HkmqoEmeCSoetL9ZEaC9oBr/lt2l0xqxtfgKOjAz1+PWzn06SWoqcydGKfAEX+1K2vaQFIOPpwCt5yR7ad0W1p2xI1bjWWleIlF70SW4n+fn/EMlyArUcwdmbCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J3NZ1Z//; arc=none smtp.client-ip=95.215.58.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J3NZ1Z//"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=MU1sHvpqoBfFc0gexyP/TzWUZ7RJEDh2n3zyKs/ESGc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788500285; v=1; x=1789105085;
- b=J3NZ1Z//NzvRkSNn/yNyVZ/wHClKfLgYJc/OAdZ2fU/Mj4eGGreBEbNA1Pjo/9G+/LhBgV0r
- rLni6kxUzFmq16weOPXgyqyu/zqk36OdfNoOwZCg5Xnhuy6Aq2DMEv/dnYLtwEtDk0qKQYsw228
- 1P5SOVmLL/x4Uwy5mrMo56sg=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 3004a30640d02020;
-	Fri, 04 Sep 2026 05:38:05 +0000
-X-Mizu-Trace-ID: 3004a30640d02020
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: axboe@kernel.dk,
-	yu kuai <yukuai@fygo.io>,
-	Tang Yizhou <tangyeechou@gmail.com>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	tj@kernel.org,
-	yangxiuwei@kylinos.cn,
-	cuitao@kylinos.cn,
-	cui.tao@linux.dev,
-	Tang Yizhou <yizhou.tang@shopee.com>
-Subject: [PATCH v2] blk-cgroup: remove unused blk_queue_for_each_rl stub
-Date: Fri,  4 Sep 2026 13:37:55 +0800
-Message-ID: <20260904053755.1222938-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1788504320; c=relaxed/simple;
+	bh=Be3NKpeYyku2QkrBjKFmErRhp0bgBDENK4U0S0pHM6k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b8WmPKQAsgatuUUtN7/SnJ52iCoqETilRq1fqxDK8MVZwq8X1kKbmcogIkxeiNnXPQKgkwOViW/NdFOC/O6NpaWoqL/f8sCkz7gygREBxRMtmC2AAK9N5iRHmLx2kwJ7JUmCcXoIYuJjL4qODC0roJ41kiKxYRLqicmoNW2vmjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=118.143.206.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
+X-CSE-ConnectionGUID: 7Z/tdsLnSyGvG78wVVpMhw==
+X-CSE-MsgGUID: Ff33qnlCQ/SkQYzfNFynVA==
+X-IronPort-AV: E=Sophos;i="6.25,260,1779120000"; 
+   d="scan'208";a="161531732"
+From: Wang Shuaiwei <wangshuaiwei1@xiaomi.com>
+To: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner
+	<tglx@kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, <wanghui33@xiaomi.com>,
+	Wang Shuaiwei <wangshuaiwei1@xiaomi.com>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>
+Subject: [PATCH] tick/block: Add BLOCK_SOFTIRQ to the hotplug safe mask
+Date: Fri, 4 Sep 2026 14:45:06 +0800
+Message-ID: <20260904064506.671203-1-wangshuaiwei1@xiaomi.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -51,50 +32,49 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BJ-MBX03.mioffice.cn (10.237.8.123) To bj-mbx11.mioffice.cn
+ (10.237.8.131)
 
-From: Tao Cui <cuitao@kylinos.cn>
+During CPU-hotplug stress testing combined with an I/O
+workload, the following message is observed:
 
-blk_queue_for_each_rl() was added by commit a051661ca6d1 ("blkcg:
-implement per-blkg request allocation") to iterate over the root request
-list and per-blkg request lists for the legacy (non-blk-mq) request
-allocation path.  The request_list code, including q->root_rl from
-struct request_queue, was later removed in 2018 by commit db6d99523560
-("block: remove request_list code").
+  "NOHZ tick-stop error: local softirq work is pending, handler #10!!!"
 
-The macro definition left behind in the !CONFIG_BLK_CGROUP fallback
-branch of the private block/blk-cgroup.h header now references the
-removed q->root_rl field, and has no callers in-tree (it would fail to
-compile if expanded, so it cannot have any out-of-tree users either).
+On CPU offline, ksoftirqd is parked at CPUHP_AP_SMPBOOT_THREADS while
+the CPU still takes interrupts. A block completion raised after that
+point stays pending, and if the dying CPU goes idle before teardown,
+report_idle_softirq() sees it, keeps the tick alive and prints the
+error above.
 
-Remove the dead stub.
+Such pending block completions on the outgoing CPU are drained later by
+blk_softirq_cpu_dead() (CPUHP_BLOCK_SOFTIRQ_DEAD), so a pending
+BLOCK_SOFTIRQ is harmless here. Add it to SOFTIRQ_HOTPLUG_SAFE_MASK
+like the other teardown-covered vectors.
 
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-Reviewed-by: Yu Kuai <yukuai@fygo.io>
-Reviewed-by: Tang Yizhou <yizhou.tang@shopee.com>
-
+Signed-off-by: Wang Shuaiwei <wangshuaiwei1@xiaomi.com>
 ---
-Changes in v2:
-- Rebase onto current linux-next head (no code change).
-- Add the Reviewed-by tags collected on v1 (Yu Kuai, Tang Yizhou).
-- Link to v1: https://lore.kernel.org/r/20260717102049.2080768-1-cui.tao@linux.dev
----
- block/blk-cgroup.h | 3 ---
- 1 file changed, 3 deletions(-)
+ include/linux/interrupt.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index e67c69839129..ceca6647a5e5 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -517,9 +517,6 @@ static inline void blkg_put(struct blkcg_gq *blkg) { }
- static inline void blk_cgroup_bio_start(struct bio *bio) { }
- static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio) { return true; }
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 3bf969ad8fe0..52bb684090c0 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -573,9 +573,11 @@ enum
+  * _ IRQ_POLL: irq_poll_cpu_dead() migrates the queue
+  *
+  * _ (HR)TIMER_SOFTIRQ: (hr)timers_dead_cpu() migrates the queue
++ *
++ * _ BLOCK_SOFTIRQ: blk_softirq_cpu_dead() completes the remaining requests
+  */
+-#define SOFTIRQ_HOTPLUG_SAFE_MASK (BIT(TIMER_SOFTIRQ) | BIT(IRQ_POLL_SOFTIRQ) |\
+-				   BIT(HRTIMER_SOFTIRQ) | BIT(RCU_SOFTIRQ))
++#define SOFTIRQ_HOTPLUG_SAFE_MASK (BIT(TIMER_SOFTIRQ) | BIT(BLOCK_SOFTIRQ) |\
++				   BIT(IRQ_POLL_SOFTIRQ) | BIT(HRTIMER_SOFTIRQ) | BIT(RCU_SOFTIRQ))
  
--#define blk_queue_for_each_rl(rl, q)	\
--	for ((rl) = &(q)->root_rl; (rl); (rl) = NULL)
--
- #endif	/* CONFIG_BLK_CGROUP */
  
- #endif /* _BLK_CGROUP_PRIVATE_H */
+ /* map softirq index to softirq name. update 'softirq_to_name' in
 -- 
 2.43.0
 
