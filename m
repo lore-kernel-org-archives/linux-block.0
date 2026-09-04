@@ -1,59 +1,59 @@
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DDC447817;
-	Fri,  4 Sep 2026 09:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9B844E64C;
+	Fri,  4 Sep 2026 09:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788514594; cv=none; b=KZAU3lqYnJ/mF0RUxnP124x3dg8MEPRWLKi+//ksJ/lXHBk8rWNPq5WdNMe45wl9F/ZFAXf9dmWoHjENZ/Dgjin7hAVOzM6GQxCmwfiy6yBOrq+p2ZNMcZvXE2x7Jrw7xidxc/hlm7+Y5NY+GJfQ2A3SpsRw/4EX2A9iccn3YS8=
+	t=1788514603; cv=none; b=VUmh3uGkk9o+dV/MDmGYZaQ99EXcAYsLnUeVGBlTzEYjfXEdp1CVmo3ktBuM0Wn53fy/J6pCTOla0dvcJ6F000S+v1ONI87edVAuAi0o9RNkQw66dzh++zOWvLLOwayznbzdL9mv7EGVOZ0piHNsoof8DeNP5wQT9IZFLjPj+Mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788514594; c=relaxed/simple;
-	bh=W/2peY7QXmgSVaUSqR3xSWS3rJJZzZGsQ2US1ly9C70=;
-	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Gou0fL0PsZI9xvHzL+FnjNt4xk2KhNqXWdVOaB+IsLXSckhm3+EOQ8SNM90Gk6eoXiOl8vWoR9BrsBlr2sDrSW1uS+bUzpSvOG29imn0RqdyezFkB0YWjCfZ5W93UNfDvLmHB60MrIEYmdvVyK141ERnzsxkgUktPjDyjTCHG1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OtNPeOJ0; arc=none smtp.client-ip=103.168.172.147
+	s=arc-20240116; t=1788514603; c=relaxed/simple;
+	bh=mzkDrXBH4RomLX+jHLh/d6zM58mnDl0YDinRD4ebPt0=;
+	h=To:Cc:Message-ID:In-Reply-To:References:From:Subject:Date; b=Xc4l4/GUWPopxJLxZgZrLuis2gPWz6a6UCzpWKIAUNjMjxKstB5Rz9s70h/6P9bLxhw/ZZ/JRD8LhgKbjpVIP/ghx/eKeyDGqybsrOfaTA9w0Yp51in0OhApFwLNIXdYKpYMIc+VlAfl8casQaTlx6B5l81YnmFqjY+6ThFNiHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TAcnlCFl; arc=none smtp.client-ip=103.168.172.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OtNPeOJ0"
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id 50862EC0212;
-	Fri,  4 Sep 2026 05:36:32 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TAcnlCFl"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id EDEED1400067;
+	Fri,  4 Sep 2026 05:36:40 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Fri, 04 Sep 2026 05:36:32 -0400
+  by phl-compute-06.internal (MEProxy); Fri, 04 Sep 2026 05:36:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
 	:feedback-id:from:from:in-reply-to:in-reply-to:message-id
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514592; x=
-	1788600992; bh=Z20/xYIt8naMl8dD/6e4TSmsRBPPZUUgtJg076bDEt0=; b=O
-	tNPeOJ0Idr9G4JnBFhzF97dwGCxywtSgnhTCRa5P7XGY8U5QO/WI6z4sa5wCHj6p
-	QaoITr3Mi/1gxE9cvaS0Vf7ldeFWH2CPkX5y9cjWDJK3Yr0DhuPPVoiJbt3aNFED
-	unGZGXB4sD1c+hK3KRvUw+RTfyFx3GzEpkuD8/Y6jsT+sSRqP54KA2RpFM0qOjMJ
-	Q0vrEeDwv+MAaAbnnXMkof1I7NnFk88+WbgoeM6BhhV6o+0AA+nVnPDYNEulg9g1
-	GAuYiZS5lsi6XXMHQsrOrfZCp11vu7b639IhYPNkKNVMc7zFD5PsiZj8G+s3qKwi
-	MGJEdn8L+tq1Pplqy6zbg==
-X-ME-Sender: <xms:IJGaao_dn6ZqxyP810750exuangq3U_AK2-9VRb4BaoTk9CyblQLEQ>
-    <xme:IJGaaqwvQSfXMM4_uJ6pnVhXqsheNDEH731iIUtRg3bXd8Fof-xs9EKjL_KO-Pezq
-    GkokqulLYjuBqqkGh7Q-zNBi1uUoctl7d3ZCb5S1WVMD6tCHE3KdKOO>
-X-ME-Received: <xmr:IJGaat4vANZ99El5jygEzfatuDjc5MKj3NnmNNCxXsiMtXmWY5igLkaKBukLx_vhF0Qjn4trSJBJ6G2hauMIklqnsS-GFOUgnzQ>
-X-ME-Proxy-Cause: dmFkZTFZ/TtYWX7QRSPqbWdhFvGKPdYLqSrS0kW5tw/ccCSeQwGXLU8z8+n4MTGG5Fz3xO
-    fBhPKm+HgWFmiq+gJDvSVIfRvZvgV672b0RABACnDdhJF/iW3opz+U3/SP3bVUvVx8Q287
-    Ap1gWmRx+bP8FRnMF0HKeE0yfsMRD8AYBXtaUsZs5aI7BW+fV7e9Q0YJu0hP5K8l60oxGK
-    XrcuXNo1hSmleRjGCb9wMFpOFKoRGwYOR+2UyWTZOvcSmWg9D5Za0czKtKfTDaJ7RbQZgm
-    lIJH+OOpA0D60VJW1h483ZeutJ4e8G1K0sL6VJD12jwsAudayvIunnWKGaY8cBa7nccFWv
-    heq/msEziktLWpOMZ9NXNM9QFw03T5eqezgpHov9MF9RWQ8uc4Edv/R7IuHCoFmgwVmc6D
-    p7oXTf6J1Iql+X8lykrN8/QRdMhFHNDmE539dwFEenDiQq9kPEHccaXLM+oDr17kDN6mHs
-    tY4FsfRtkugeqMnClXJdpN5RT+38uccuO/ShH9KSJIXKfp3o+zWYI4isIbG8Ak/FWRA+3/
-    VCX8BiV0NkybeCnb6xJ8PAKnB5JToOGsrKNo4ddnIAMCZ7PT1MP3ahu0/c7CRcDLApmwyg
-    dL/0CqO4NAB2J5PsehnNM9ub1z/5pzFJ6/Xt3rISIBMLWtUiO83Hq8+tHjQQ
-X-ME-Proxy: <xmx:IJGaap_QJnwqSSDalQ0FhSf4MRuVtuEJ32eo5zMs-eGOkbyDWsISXA>
-    <xmx:IJGaaqprFoSQZ7o63GXds8Zka5yhMVGdLhySlXkpBY5eyEHNuli2cg>
-    <xmx:IJGaaiqx54PEc4GCEmHyF9OW_u1niJ3zWl9DPwsaC1BZNdne1kcNTw>
-    <xmx:IJGaal25yDmTPjG-77QyyAkl9KM_fS3S3sjnrDsfKS-iVOr9dTZtfQ>
-    <xmx:IJGaanvwDpVNTIuwWcQJ7QXctHh_xmUcwm978OwMofUkRw4snn73YBMp>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1788514600; x=
+	1788601000; bh=51+l+4t/eDclkKVdvo5tHtz9ZQ1eAbR09EDfIyzxuiQ=; b=T
+	AcnlCFlPRk58OZiX1k6sNHjsfy94RydcwXlGMJOAUU00MP/hDI72wDqwzTfD4j1K
+	wXGm+f6B7JGAYMI9DQsOc4kcVrEzqoSYERByPqfdtXTtO5KxtMeQ6m+5E4BHr5Dt
+	l6IsIyR6re6d9YdWL7zhHJlkUD3dN6iUdLHGA1/eqfzAWYKgqrG4pB5D5hvkp3t/
+	FXvoluxr+0KVEwUkUIpLoejuvkSXYA55melQ/0uMLy1qk+EFJhLyzsqY9EsQKWlx
+	FajEL7NWSygO4pHpZeWcUEwFL3uXsVULpoPA0PYaacVb8GgY9grKWSo7HWmm2Za6
+	tMEJduedY6eiErWj1jAYg==
+X-ME-Sender: <xms:KJGaapzYEF6QppkyzV8aIrDC_Ak7eVKdYvVWgzU38Zcs851IX9UIiA>
+    <xme:KJGaajXC5Xlwle5MnPvkcJSNqYHYdaWbAxeMCSv7pFlc1OAUOJYD-KSFRgdnyzk8t
+    JSxOIWTHgHEClNFONqTGz0A-XAiZ3rNjnNr7UUq0ao_8IwRrcfG_LY_>
+X-ME-Received: <xmr:KJGaajOqBcZ6Du6BLWQGPGTvmxwlJ0NRxBPr_tLIz8KmRja3JuPv0UnWQ6aZ3723ZJknFCKxo62vq9NxPzZV6sMbEKBmWqUta6g>
+X-ME-Proxy-Cause: dmFkZTES4bQ21oAzpNnp51xfFHSMQBPKtrMCV5iYYMBFJYMMGuku2wDZqHLDhf7MMkpQep
+    sMe4CyNnIEY4dUJg6qGIApiDz7xq7NkSCScmKgrMc4345BLDBaaFf6c8TLqowSoQSjBNao
+    tQAjHxJbuqzVv3VzZRZEacp4FA41Q9OcL5NDtbJMFMDUCcPGJR7zU6OainbhxZYK3NU11B
+    Fa2x5PyGrJHtwPQxOc1oyHJXrbM2nyqpGGOSM3yceNTB7ODw+A07JKEQZT40T9t1sfxdOY
+    Z+GEWRwgrC3pQuxmclLHPwxPnQJ8sX9Nh9G6tEyIm0Ldv+rMccWy5ZFRy0U8vBhf8uuzsH
+    AVt6esPCMxKRONG3sfwnrkafd7I09OT5/lkgiGpE6UIVBwy4uskQObAJS0Dn4X7ghYHzaD
+    KNHMbZeSVOZYXy20uQHrP2P4k7xgLJNl9xvR1k5641Me3/bkXkFGwe4bcna5Qvmp2QMe9P
+    FQBZmj9ivzHkS/vRMftiMZLb+/Br7uDQ7eyh0T8Curi1/jvtmnTw51oFtBkxMaUUODomuF
+    l5sBe7lWn/mCG3mMgBov1xbK3veV1wHVeR7npulmD6uEmVnm+S/35Mkilr1578PQSsvcAB
+    KRAK8iVcsAPXpOlpEFKd2GXWKd2FABDiW8/EWlwrs1LH0n05OvKr/fUidSXw
+X-ME-Proxy: <xmx:KJGaatBEwBarum6KR6xM-qjqWDPpgCYZ6R9GAYFMVn_FGBfi9AZuLw>
+    <xmx:KJGaaofq_NDcONAMARtYeIQK7jEH8Lnzvf6-grerJUx-MsKNThHprw>
+    <xmx:KJGaakNDwvGvCrkZfl5ALcVjWbcdppCvXcPNsf08qTF31sVJxY8gzg>
+    <xmx:KJGaagJkJ7w19jTdeXL8t4kUhAJ02-mcaZ7s2IQIDFJqsAx56Mf0vQ>
+    <xmx:KJGaaqgvmmDNUVImWrd1qmW2AF2yFw56-qJs90YXdaNAKCP5c-A-m4SF>
 Feedback-ID: i58a146ae:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Sep 2026 05:36:31 -0400 (EDT)
+ 4 Sep 2026 05:36:38 -0400 (EDT)
 To: Jens Axboe <axboe@kernel.dk>,
     Laurent Vivier <laurent@vivier.eu>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -61,11 +61,11 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
     linux-block@vger.kernel.org,
     linux-m68k@lists.linux-m68k.org,
     linux-kernel@vger.kernel.org
-Message-ID: <64ee742adc48218962a989017b9dc5622e2932c7.1788513997.git.fthain@linux-m68k.org>
+Message-ID: <7eee06428905fd7ad60909d9b5726c15cde1b844.1788513997.git.fthain@linux-m68k.org>
 In-Reply-To: <cover.1788513996.git.fthain@linux-m68k.org>
 References: <cover.1788513996.git.fthain@linux-m68k.org>
 From: Finn Thain <fthain@linux-m68k.org>
-Subject: [PATCH v3 31/33] swim: Define macros for constants
+Subject: [PATCH v3 32/33] swim: Define symbols for constants
 Date: Fri, 04 Sep 2026 19:26:36 +1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -73,55 +73,80 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Define a SEL_MASK macro to name the anonymous constant. Define STEPPING
-rather than re-use STEP because the latter is a command bit macro (see also
-GCR_MODE vs. SETGCR). No functional change, just better readability.
+Define local symbols to give some meaning to anonymous constants.
+No functional change.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Finn Thain <fthain@linux-m68k.org>
 ---
- drivers/block/swim.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/block/swim_asm.S | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index a5be31b732b5..6f37a01219c2 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -105,6 +105,8 @@ struct iwm {
+diff --git a/drivers/block/swim_asm.S b/drivers/block/swim_asm.S
+index c373fb3fc750..a1879cfaa6f4 100644
+--- a/drivers/block/swim_asm.S
++++ b/drivers/block/swim_asm.S
+@@ -43,6 +43,10 @@
+ 	.equ	sector_size, 512
+ 	.equ	.Lmark_sequence_len,	4
  
- /* Select values for swim_select and swim_readbit */
- 
-+#define SEL_MASK	0x100
++	.equ	.Lmr_clear_fifo,	0x01
++	.equ	.Lmr_action,		0x08
++	.equ	.Lmr_write_action,	0x18
 +
- #define SEEK_POSITIVE	0x000
- #define SEEK_NEGATIVE	0x004
- #define STEP		0x001
-@@ -115,6 +117,7 @@ struct iwm {
- #define SETMFM		0x101
- #define SETGCR		0x105
+ 	.equ	.Lhr_crc_error,		0x02
+ 	.equ	.Lhr_fifo_2bytes,	0x40
+ 	.equ	.Lhr_fifo_1byte,	0x80
+@@ -95,11 +99,11 @@ sector_data_mark:
+ 	lea	%a3@(read_data), %a5
+ 	lea	%a3@(read_mark), %a3
  
-+#define STEPPING	0x001
- #define READ_DATA_0	0x004
- #define ONEMEG_DRIVE	0x005
- #define SINGLE_SIDED	0x006
-@@ -271,7 +274,7 @@ static inline void swim_select(struct swim __iomem *base, int sel)
- {
- 	swim_write(base, phase, RELAX | PHASE_PIN_DIR);
+-	moveb	#0x18, %a3@(write_mode0 - read_mark)
+-	moveb	#0x01, %a3@(write_mode1 - read_mark)
+-	moveb	#0x01, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
++	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+ 	tstb	%a3@(read_error - read_mark)
+-	moveb	#0x08, %a3@(write_mode1 - read_mark)
++	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
  
--	via1_set_head(sel & 0x100);
-+	via1_set_head(sel & SEL_MASK);
+ 	lea	sector_address_mark, %a1
+ 	moveq	#.Lmark_sequence_len, %d4
+@@ -157,7 +161,7 @@ crc1:	tstb	%a2@
  
- 	swim_write(base, phase, (sel & CA_MASK) | PHASE_PIN_DIR);
- }
-@@ -366,7 +369,7 @@ static int swim_step(struct swim __iomem *base)
- {
- 	swim_action(base, STEP);
- 	udelay(150);
--	return swim_readbit_timeout(base, STEP, false, 20 * 1000);
-+	return swim_readbit_timeout(base, STEPPING, false, 20 * 1000);
- }
+ 	moveq	#0, %d0
+ signal_nonyb:
+-	moveb	#0x18, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+ 	rts
  
- static int swim_track00(struct swim __iomem *base)
+ 	.global swim_read_sector_data
+@@ -177,11 +181,11 @@ mfm_read_data:
+ 	lea	%a3@(read_data), %a5
+ 	lea	%a3@(read_mark), %a3
+ 
+-	moveb	#0x18, %a3@(write_mode0 - read_mark)
+-	moveb	#0x01, %a3@(write_mode1 - read_mark)
+-	moveb	#0x01, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_clear_fifo, %a3@(write_mode1 - read_mark)
++	moveb	#.Lmr_clear_fifo, %a3@(write_mode0 - read_mark)
+ 	tstb	%a3@(read_error - read_mark)
+-	moveb	#0x08, %a3@(write_mode1 - read_mark)
++	moveb	#.Lmr_action, %a3@(write_mode1 - read_mark)
+ 
+ 	lea	sector_data_mark, %a1
+ 	moveq	#.Lmark_sequence_len, %d4
+@@ -239,7 +243,7 @@ data_crc1:
+ 	subl	%d4, %d0
+ 
+ data_exit:
+-	moveb	#0x18, %a3@(write_mode0 - read_mark)
++	moveb	#.Lmr_write_action, %a3@(write_mode0 - read_mark)
+ 	rts
+ 
+ .Lmaybe_store:
 -- 
 2.52.0
 
