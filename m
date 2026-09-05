@@ -1,172 +1,107 @@
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0901B3F3296
-	for <linux-block@vger.kernel.org>; Sat,  5 Sep 2026 07:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122F8233929
+	for <linux-block@vger.kernel.org>; Sat,  5 Sep 2026 10:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788592024; cv=none; b=Zfq+OQ8csht9GCUOb2FXU1VqIggT+jENKJ121qJY0wT+j4fvQhTuo4g2pd8SONBfcVCGjVqL6xrujuiaUQcGGcZuehOgoUzBJgNyQTsR9EXsuMF2vtYK5WjkLcNN4R/P3C9Qf3Q9mBH+kaRY8HRzfGhwXo9Zp3OxmDmxZJJQ3v0=
+	t=1788603424; cv=none; b=LCXZCwo0zw8KohRZszXud6qOl12DKGvEFftZnc+jwTTzardvXU0bbHEu5n35WURKbJ4OTgxCTCh4pWN9Ch1orYEL6IDfHTBVbX4BeMU2rNCASmRNVsbaeHIVlFfIjGDuI6Dzz/QGviOH4E0ckqVz4f2pcS+kuRYXObMG1IzxVb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788592024; c=relaxed/simple;
-	bh=6oaGc/WO4cwTtsEqJt5kWPU00aUPc/WnmINShN+4QPM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=h0xSMUpA5Vryyx5yjNkcJYCw4v7/imrOHXhBNpW1+Lfh/Bg4ex9ScqhB0R7bthnxjCzIJuvqD7VwaAaKvxLpf/Hh5oBj1xhdbGwJ6tge2MnL0jCHz2Jnwb7COVbO15ZnDYND4NsBJPPYUWimv/fw936lexs3Xg0Uk4GUxnUcVJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-6b13ff9c9aaso2038056eaf.1
-        for <linux-block@vger.kernel.org>; Sat, 05 Sep 2026 00:07:01 -0700 (PDT)
+	s=arc-20240116; t=1788603424; c=relaxed/simple;
+	bh=LOej/AYRFpanqeFtrB12UCaSzUurAtWEeV/Opq5mv6c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qCV/DBfFqNI1np5MRzs10Uy0rm4bO7V7M7rH6txDIXlLNFyf2AQ2AhA34CrrGDm/4K88yD4IbDkZ2fFou/mdDfzwuq2rI98dbt1nrMb9p4HBK9iZ3w2udsjaGCVrb422lS7P3MhrOYyXBLvreDUEKLeNvrfACKLNKjh3bOiHgL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PRN8rc0j; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRN8rc0j"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-485850cbac3so1190298f8f.3
+        for <linux-block@vger.kernel.org>; Sat, 05 Sep 2026 03:17:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788603421; x=1789208221; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Hd94cO2LUptZCyLaPZ/4faK40v4+2cKldNglmmH7Ufo=;
+        b=PRN8rc0jMfXrOj4bd0RDDIdSbeM29UESirqBoEF6Lv4mw+aBQCZcVALHeHpZzGpvD9
+         /jdG9maUKhMsmVdePzI0PirkqrF4mjLzNORH1vBZYdNf8YAj4Y1sm5K+r+gFu6KSFIGe
+         ID715ZQdi5dcSuJfl1GeR9hvWQi7TzAtVz3rxNT0wEjTopxZmO+tmkA40/0GoyWiuYGu
+         DNFwGZ5CYsMrssigp42NWKz/sxLrCTlsrci172hyQidcTY2ZFRf14U3E0nM1FZuiDlwB
+         m96K+F2w3cZXJqhi3yQtg1LVnmvwwX5KRtV8bRsjS9YcAvZ6ZQjHNKmZ5nDzCrkMhP+K
+         udUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788592020; x=1789196820;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=nnvwnS1OPKAjnbL2Ffg9wjdt+AOLqiiejT+aXhRtPlk=;
-        b=ZCNMzQuAiexDb7UyK7VlDnqTFAEqUURBNQvDizTUEnuLIV3kT17b9A5in7DoN3cifh
-         sQjZbgwCoA+0pT1hLrJ+6vKFu5U2gJrlPK1mnNfFkSM2YLx1x5lBn0TeEqHffdR1Ieg1
-         c4Kd0LOIlK6IZd82sR0XjyVKNM8BmJsiGaC2bka81nzqtd65Q3LLIhF91fcMEdDyvjBG
-         G2A1oCuDde1hJpWJcn7YNecrI74sV7bz9GKbe+Gepi7ilyeaqaAd+tCXGU6LdZCUsT30
-         u+RA/Lg/eWn0uzX6+5sfVLxNPtTvs0vDQYn2ATv5f4U9tKq8GA0B7sX45Is+VNTVkWLz
-         AWOQ==
-X-Forwarded-Encrypted: i=1; AKwUvByvrmmSkxvzNPRuNSuFaHubJ2puVrk9sbuQBwp90zWBt7sdhL+zpm8+D7ydr7gUYJRFaDaJd5L2CfHq8A==@vger.kernel.org
-X-Gm-Message-State: AFuF++mT0rHE8mEC/AXCwwVawuw4lh7ICJVCmf20NDEoqcKukk1IsbP8
-	8ZuOwK0HqD8h6O5wERWXxbVS2EF/ZctfjfLrQOEyUVmmmC1XPoumWiaJy6y2wo7aT1pnnwkMO+n
-	jtLGerZLaGXSaXmC5PvLH7GELaYETHT/SxGLel9P5CZ82f7ap6bh02NP6BLY=
+        d=1e100.net; s=20251104; t=1788603421; x=1789208221;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Hd94cO2LUptZCyLaPZ/4faK40v4+2cKldNglmmH7Ufo=;
+        b=PcuOkbFfMPvBOzDCoKnkBLORcX0e1mnejMfGDnZ0foY/N+Swv3rlY8r9FQmjZrjIwP
+         Rfhj4ANFNgeKwlMsdDSbkeUnwahWuJjgkuGm3418gEV3ohmLII4Xx9MbWPagv3yQ7Dqy
+         KQpgZF2CydfsAm4o23qnaVLLuW6ZU111OrdEVHsu3IT5I52n2mN4aNItiRaZDxmSlVnF
+         6twXtsrCuKcsBIMBZ8f4s/SjAQfEYxkAJ0dzphEH0Daeo2+Qq9bGkwUuH9KhEcRMSp+8
+         /Gt91X6q6HfzQo4/0z9/fm4B1qV/xkM7LFtcAHhT/oiCyuzGwybz5exGOGHPF0hwyBL6
+         X8Hw==
+X-Forwarded-Encrypted: i=1; AKwUvBx9lAActYpAeqoaxWo1j1GgQGsplmTx5ZSC4butlQCJxf06FDY6kP5mYDZGjC9heJEdDj24o8xZROYfOQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++muB2yRxBP95yao403g5t48Or+lzGKAz0OaE6jSQxHC4Bs15dJl
+	ri/0iCYextPTuOlE7EgiXgpfOPZ3WZhBW3QVNgiyPSKSof/lNANNvfLF
+X-Gm-Gg: AYBFou2ZL97hbTcLq4qzjERGeZ4rxVt4sX+3/oa/yOC2UGkH1CXcg8aI7yMtrFpcZXR
+	a1z+6EK68C+a21+fn+ZniKbD2qxs/2Vu4ihWF9sY3aQRlE5EW+Bg/NQt9qzjK465yljtuLFtx6A
+	FSri9MK5ySG+EsmX6OMvFSm6K52ezgZisXxMB7AHe6cDzSqJi8/p6WPXuCRRyw2et/jvwcJWpRp
+	cBqCqJv1FpXCmy+LwVxmxal14WtBNG6S8VDizxub5VPaLiapM9QL2Gl7CSkm82mE7xBtQdbYTi4
+	oA+7GzY1bpFOdymKS/vQHchJGoDSlqdzYOGL31a4GPdiMelwXopq7v8s7qzGsNEepATfU5ZIST4
+	llH2f0VSiarcRluLbOYycrYiuSP7qJWaj9c+ipGQqxztx/bHT/POxOROi39KMI3clzHOQOz31Tf
+	FVIL1skoJp1mlsk4mURThwx5FNd9BofOlNjFBaSgFvj30VKN5EMYrLshKVyonGA2rdwNFLr/tt2
+	g/cIiavqizs7WJ7TT49pnUjgVVQyBBVkBzrfV8pZB3lY6dnH2OFnYAl1kdP6i2Vlp8D0NM8NVoK
+	OHl2t73iP7wYYPpNgNFVhrbejEaGrE83xXSmqIyAGZaW1WRiCl+lYePi5/LwKhZtryznyqFIr79
+	Dzw==
+X-Received: by 2002:a05:6000:288f:b0:485:8c16:a357 with SMTP id ffacd0b85a97d-4858c16a736mr9388870f8f.47.1788603421059;
+        Sat, 05 Sep 2026 03:17:01 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-2a02-3100-a4eb-3001-c06d-af27-9fa2-ea53.310.pool.telefonica.de. [2a02:3100:a4eb:3001:c06d:af27:9fa2:ea53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4858bcefd59sm9405888f8f.19.2026.09.05.03.17.00
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 05 Sep 2026 03:17:00 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	linux-block@vger.kernel.org,
+	Fengnan Chang <changfengnan@bytedance.com>
+Subject: [PATCH] block: Drop the stale @op line from the bio_copy_kern() kernel-doc
+Date: Sat,  5 Sep 2026 12:16:58 +0200
+Message-Id: <20260905101658.42774-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4cca:b0:6b7:8415:d790 with SMTP id
- 006d021491bc7-6b78415d8d8mr4693626eaf.59.1788592020180; Sat, 05 Sep 2026
- 00:07:00 -0700 (PDT)
-Date: Sat, 05 Sep 2026 00:07:00 -0700
-In-Reply-To: <cover.1788438786.git.qiwenjie@xiaomi.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a9bbf94.a5e650b3.26d8a.0006.GAE@google.com>
-Subject: [syzbot ci] Re: f2fs: enable buffered RWF_DONTCACHE
-From: syzbot ci <syzbot+cid5582b8164122eda@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, baohua@kernel.org, chao@kernel.org, hch@lst.de, 
-	jack@suse.cz, jaegeuk@kernel.org, linux-block@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, qiwenjie@xiaomi.com, 
-	qwjhust@gmail.com, tz2294@columbia.edu
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+bio_copy_kern() lost its op argument in commit 05ce4c584cc6 ("block:
+use bio_alloc_bioset for passthru IO by default"), but the kernel-doc
+still describes it and kernel-doc warns about the excess parameter on
+every docs build.
 
-[v4] f2fs: enable buffered RWF_DONTCACHE
-https://lore.kernel.org/all/cover.1788438786.git.qiwenjie@xiaomi.com
-* [PATCH v4 1/2] f2fs: complete dropbehind write bios in task context
-* [PATCH v4 2/2] f2fs: enable buffered RWF_DONTCACHE
+Drop the line.
 
-and found the following issue:
-general protection fault in f2fs_write_begin
-
-Full report is available here:
-https://ci.syzbot.org/series/cbb9ded8-1388-4a7b-bfa7-44082b04025b
-
-***
-
-general protection fault in f2fs_write_begin
-
-tree:      mm-new
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/akpm/mm.git
-base:      e3fc12b08aadde9cec7b3799ac0e0c9a1aa245c4
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/e5903709-6ea2-4b1e-9dfc-f073e36367f7/config
-syz repro: https://ci.syzbot.org/findings/d05a5d64-e9a3-4714-9b41-43042eaaa82c/syz_repro
-
-loop0: detected capacity change from 0 to 40427
-F2FS-fs (loop0): invalid crc value
-F2FS-fs (loop0): f2fs_recover_fsync_data: recovery fsync data, check_only: 0
-F2FS-fs (loop0): Mounted with checkpoint version = 48b305e5
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000004: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-CPU: 1 UID: 0 PID: 5791 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:f2fs_write_begin+0x181/0x28e0 fs/f2fs/data.c:3893
-Code: e7 e8 23 21 d4 fd 49 8b 04 24 48 89 44 24 40 41 c6 45 2c 04 c7 84 24 a0 02 00 00 00 00 00 00 48 83 c3 20 48 89 d8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 e9 23 00 00 41 be 80 00 00 00 44 23 33
-RSP: 0018:ffffc900037af7a0 EFLAGS: 00010202
-RAX: 0000000000000004 RBX: 0000000000000020 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: ffff8881b465c918 RDI: 0000000000000000
-RBP: ffffc900037afad0 R08: ffffc900037afb80 R09: ffffc900037afba0
-R10: dffffc0000000000 R11: ffffffff8463a450 R12: ffff88816b91e678
-R13: fffff520006f5f1c R14: dffffc0000000000 R15: ffff8881b465c918
-FS:  00007f65b5e096c0(0000) GS:ffff8882a8cd9000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f65b4e70050 CR3: 000000016a860000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- page_symlink+0x27a/0x440 fs/namei.c:6556
- f2fs_symlink+0x5fc/0x970 fs/f2fs/namei.c:714
- vfs_symlink+0x18b/0x330 fs/namei.c:5794
- filename_symlinkat+0x1cd/0x410 fs/namei.c:5819
- __do_sys_symlinkat fs/namei.c:5839 [inline]
- __se_sys_symlinkat+0x4e/0x2b0 fs/namei.c:5834
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f65b4f9e159
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f65b5e09028 EFLAGS: 00000246 ORIG_RAX: 000000000000010a
-RAX: ffffffffffffffda RBX: 00007f65b5225fa0 RCX: 00007f65b4f9e159
-RDX: 00002000000005c0 RSI: ffffffffffffff9c RDI: 0000200000000700
-RBP: 00007f65b5035024 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f65b5226038 R14: 00007f65b5225fa0 R15: 00007fffb6ecc0c8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:f2fs_write_begin+0x181/0x28e0 fs/f2fs/data.c:3893
-Code: e7 e8 23 21 d4 fd 49 8b 04 24 48 89 44 24 40 41 c6 45 2c 04 c7 84 24 a0 02 00 00 00 00 00 00 48 83 c3 20 48 89 d8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 e9 23 00 00 41 be 80 00 00 00 44 23 33
-RSP: 0018:ffffc900037af7a0 EFLAGS: 00010202
-RAX: 0000000000000004 RBX: 0000000000000020 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: ffff8881b465c918 RDI: 0000000000000000
-RBP: ffffc900037afad0 R08: ffffc900037afb80 R09: ffffc900037afba0
-R10: dffffc0000000000 R11: ffffffff8463a450 R12: ffff88816b91e678
-R13: fffff520006f5f1c R14: dffffc0000000000 R15: ffff8881b465c918
-FS:  00007f65b5e096c0(0000) GS:ffff8882a8cd9000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f65b4feb840 CR3: 000000016a860000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	e8 23 21 d4 fd       	call   0xfdd42128
-   5:	49 8b 04 24          	mov    (%r12),%rax
-   9:	48 89 44 24 40       	mov    %rax,0x40(%rsp)
-   e:	41 c6 45 2c 04       	movb   $0x4,0x2c(%r13)
-  13:	c7 84 24 a0 02 00 00 	movl   $0x0,0x2a0(%rsp)
-  1a:	00 00 00 00
-  1e:	48 83 c3 20          	add    $0x20,%rbx
-  22:	48 89 d8             	mov    %rbx,%rax
-  25:	48 c1 e8 03          	shr    $0x3,%rax
-* 29:	42 0f b6 04 30       	movzbl (%rax,%r14,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	0f 85 e9 23 00 00    	jne    0x241f
-  36:	41 be 80 00 00 00    	mov    $0x80,%r14d
-  3c:	44 23 33             	and    (%rbx),%r14d
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Fixes: 05ce4c584cc6 ("block: use bio_alloc_bioset for passthru IO by default")
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-map.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-To test a fix for this bug, please reply with `#syz test`
-(on a separate line) and attach the patch to the email.
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 9cb9605d1f62..35212355b8cd 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -356,7 +356,6 @@ static void bio_copy_kern_endio_read(struct bio *bio)
+  *	@rq: request to fill
+  *	@data: pointer to buffer to copy
+  *	@len: length in bytes
+- *	@op: bio/request operation
+  *	@gfp_mask: allocation flags for bio and page allocation
+  *
+  *	copy the kernel address into a bio suitable for io to a block
+-- 
+2.53.0
 
-Notes:
-- The patch will be applied on top of the tested series (as an
-  incremental fix).
-- To test a new version of the whole series, please send it directly
-  to syzbot@lists.linux.dev.
-- Arguments like custom git repos and branches are not supported.
