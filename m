@@ -1,105 +1,97 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBC24E8E1C
-	for <linux-block@vger.kernel.org>; Sat,  5 Sep 2026 18:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FD73264DD
+	for <linux-block@vger.kernel.org>; Sat,  5 Sep 2026 20:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788632754; cv=none; b=PkfyYab7VpSs31gx9q9G+nIgomT4al5g6oFRTAIACTwy6ZssljK03Iu//SQ07vbtZaQcrgdFByZsBWOHr1eRMoLPjUV4Qc+YTkFBWX5LAz0n48ke8SG6yRyQONOUvzX1CFYSXX0nwYwNZarrpmyxLZ40KUwtCaL2Ad8ZpGjNE7o=
+	t=1788640416; cv=none; b=spQ//dcH2imVB4WNvxa1eval5QfgRK6JHMOwqMMqjUhOuRwppqj1ZTSNtOB/IWrcEkQGq/wU7N/E3t18X1P0wlcb1buwxHxbtJCRoSRcyabQj21UYqWBKtWh++kKMePRXYMQSk9yMEFaFEIu70/ilD/OAMbRIsxr3xR72N4PPRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788632754; c=relaxed/simple;
-	bh=rakUssaS3Z60N+MJ5OmiZGkRVrp4Fe3erHejZIlcqBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D2iJ7AJrC+IntQqv2tyOWQ/uidzlx4fphRR8g1NXI7xppUuIiMGGWQXmU9Aj3rDHGrDpDymRANLbibnCosY+N1DT4qygeerdkULKeRIBQPpGHtUYMg96Ttv5/aj9MDtSyWZvQvCvQ90es5BLNXP/1rUy9TGaPddjvgsP2I7lW4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=x7nOgQT5; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="x7nOgQT5"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49b965570d7so25220365e9.0
-        for <linux-block@vger.kernel.org>; Sat, 05 Sep 2026 11:25:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1788632750; x=1789237550; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vh1tho+DMPBe6dOnmyRhQgSZf9FdJaDw5EyeCtsHdOA=;
-        b=x7nOgQT57/9v5uuS/L3bp3Rp1I79CMDt3RPB6x5WzokX0qKuYgq/1Ks2QOTuMFpLBy
-         wpXguFNBeyZ2i8pnQLtkncuOpnb0ezbdiDlynKW8mBU3m1mfW2vov8+x1uSqnS7DssjY
-         x88hVLAZakH5j81wCIsdwPkxr+ca1SquUf2RR2/VTfv7pdR/IuQ4NGalxOBGClOZ2M2L
-         xK2eUL/Q7OJQpT/4f0A7MURgRi/M8BEKc4YewZnOfnBOQu7lNu+XZClxqP9ZssV3d7n0
-         NBL4RpAF08898ve1SqptTIhWZtKMAAjGxU9c75Bqbr6qSBlY6xyvvDc94WJvY/KcJjIF
-         jPNg==
+	s=arc-20240116; t=1788640416; c=relaxed/simple;
+	bh=VEyTOk2wnJuWL/0aDXAN5YhjuaqFPCGeVVSL0O/+rwk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Guj8PGP25XoJz0WjLYx3RT60LMeESXFurwrSqckrhE/ECJresO3xQyngQpKYTIEulhrl14rN3svA/NHBKjn94rf1Rw+ExLfPBQSDvMatQFOyIX6B7X+9FRvjg+V0J8n8nO58Lq23ckO1QDVS9mtuLBOYR0HPXXtpou/wN+qm1l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7e6b59d85dcso4371197a34.3
+        for <linux-block@vger.kernel.org>; Sat, 05 Sep 2026 13:33:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788632750; x=1789237550;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Vh1tho+DMPBe6dOnmyRhQgSZf9FdJaDw5EyeCtsHdOA=;
-        b=EpR9iE5xX6Zib2FN0omfAbzLCiXuG7ydvN4UfVjRsDhEtW8y+C4LfG7XwL7udr2S3I
-         b1PX4usUBcHqAnDdlnKR/yr8Dmfbd4wEOr4jWQPH4mCIUCJzfVGl5sjd/u2l5DGmEUbA
-         nN8kUWtY5Fi78qHXye3KeHcHAQf9kT7EXf8R7J5WywhCHKNm5oQBGYOSiJk+DUXcQaun
-         vDxo7T9bdLmKsuRB3xxPOCG+OupzLA0uo2RU5qyjbHKJVQ1Kd2c7EI2fowwWB5JMQcop
-         zd/eqJdR9T442sDUXXzZ/4PN1DUUvSj6v58GvqYE9NNEgHbCOeS6HVsXPNq0GSdPp0/g
-         m+0A==
-X-Forwarded-Encrypted: i=1; AKwUvByFDd1Wc2qCsmIiUHCKIPh4jH2zHH05tRSDFCZnbT6Av43hRcrz88XUHwvD0+RMGBElO/3C2SHxca0zJA==@vger.kernel.org
-X-Gm-Message-State: AFuF++nWTkh5L/eIrrSMuBLUkawF3PyyBrBrUogSk40CshIJkv6UH8pp
-	gCHGt//1QXYhMSLifVd1fiJNmg1DA7HAMGNHXnbV3gZIQmjmYe3r99ERqXz4x3+l5qc=
-X-Gm-Gg: AYBFou2wR4JvbZG3hOydx8+PWuFwGtBH1g5rJxqpE3009rl50QROmKK8EjQdb3+ljSx
-	joRqu8I5N/Hjn5/bgMCgQdm1XhG6DMLhX2VZK+74ynmBA5m8bKkBV60eUg2dN4PFbzWvcIj4Vv5
-	6+dkLUBMgWT4w1oziJnx8cB8J3EtrPQ3OveZWBGf6F6P7soyKAYj8KBgZMoDMKUeVifCzVwcuYc
-	4y96ES5aqu/phvS4gmZPBUWul2Q8kaDplp/RW+rvBwaPCS++W+Ek80CZcU4D4zIauJfn031FxMN
-	ErsYBQh61mDq15J3fSY2pMAgG7YCnZ9WEalP6xIbHzJ3lSn3lVE/ZXIIXTFFqm+mtirfHPLA7+Q
-	0H/QxqmwKFouxICnmm4zzMtH9fCkYfr97HC1MFkD2uk5CejDLpKgeB9cKFaMfcSTCkfAodwCh/3
-	lK1CFavguIFqxeErU2sXM7+9HkL6vMXaW4Plb++zYt6070a+ngoWDy+HItRQi9TQGkcZKjv1iJV
-	Iq5wZCQ/NH8Ad/iesfA7Az6jA9nc+nC
-X-Received: by 2002:a05:600c:3b02:b0:49b:9202:6f80 with SMTP id 5b1f17b1804b1-49cf8220edemr149030685e9.6.1788632750385;
-        Sat, 05 Sep 2026 11:25:50 -0700 (PDT)
-Received: from localhost (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cee60bae6sm298811535e9.9.2026.09.05.11.25.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Sep 2026 11:25:49 -0700 (PDT)
-Date: Sat, 5 Sep 2026 20:25:48 +0200
-From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Hemanth Selam <hemanth.selam@gmail.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
-	Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	drbd-dev@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: drbd: fix typos in comments
-Message-ID: <apxeZOBtnBZtgjfw@linbit.com>
-Mail-Followup-To: Hemanth Selam <hemanth.selam@gmail.com>, 
-	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, 
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, drbd-dev@lists.linux.dev, 
-	linux-block@vger.kernel.org
-References: <20260904113103.10805-1-hemanth.selam@gmail.com>
- <20260904113103.10805-2-hemanth.selam@gmail.com>
+        d=1e100.net; s=20251104; t=1788640414; x=1789245214;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DaK/UszpBwoJ72t5z8E9yTVEpqhHUeXVcZVl5D5Td0o=;
+        b=bwH0qAjPLazGv7pyVoz+eDGS9ZmxEm4mkTFjt9gzF60tVXT8ftKZAC9IYsD+TfB+Yi
+         A95M3m/UVGTYoNuqLtp+JWqnswLbU9wdjappm3wwJOli5dRRD7LZwmEWPaYlfCIR2DBz
+         VXra0jYlwaUGmB7ORajN/TjJct+jHIcbG4um1kOeZukOPhzcSNNVU0P06g/jWgJSIa1F
+         VjFO75UWq0JVjBwnOZ8FQHmBW+s0pZjGoaCCtl6PcqPeGuPjDRlA77pPlRHyNxFkJieq
+         VKQLi6drb15bzz+4xxfE7SMuTeBmL1145yBDozHa7I0eMABggG5HF3xQTxTzc6L113be
+         sHYg==
+X-Gm-Message-State: AFuF++nx6G8SwR3z8JQoOYeK6Ort86UIPCZYO2s8uFeBSJAMhBiyElJp
+	FAQnuoVhbzr03rzSlL7LVlszoadAh1CnAIv93yqZvQMr2b0Zvb84uKX/KaYQATtc8c+0Z2/3LYT
+	KZJuvkSLMfqQSy7DZPb5u2PVfxIlxXevtR9ZCYJnTNx9WJpjBBde4/mRtk78=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260904113103.10805-2-hemanth.selam@gmail.com>
+X-Received: by 2002:a05:6820:82a:b0:6b3:4a99:bd87 with SMTP id
+ 006d021491bc7-6b6fd7ca02bmr8376303eaf.30.1788640414366; Sat, 05 Sep 2026
+ 13:33:34 -0700 (PDT)
+Date: Sat, 05 Sep 2026 13:33:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a9c7c9e.87c06881.102b7.0001.GAE@google.com>
+Subject: [syzbot] Monthly block report (Sep 2026)
+From: syzbot <syzbot+list6a51048a59f44a26a220@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Sep 04, 2026 at 05:00:59PM +0530, Hemanth Selam wrote:
->Fix typos in comments, reported by scripts/checkpatch.pl using the
->misspelling list in scripts/spelling.txt.  Only touches comments, no code
->changes.
->
->Assisted-by: Cursor:claude-opus-5
->Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
->---
-> drivers/block/drbd/drbd_nl.c    | 2 +-
-> drivers/block/drbd/drbd_req.c   | 4 ++--
-> drivers/block/drbd/drbd_state.c | 2 +-
-> 3 files changed, 4 insertions(+), 4 deletions(-)
+Hello block maintainers/developers,
 
-Typo fixes like this are usually only worth it if they come with "real"
-fixes in the same general area. Otherwise, they just cause unneccessary
-churn for the involved maintainers.
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
-Regards,
-Christoph
+During the period, 10 new issues were detected and 4 were fixed.
+In total, 32 issues are still open and 118 have already been fixed.
+There are also 30 low-priority issues.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  1741    Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<2>  87      No    INFO: task hung in read_cache_folio (6)
+                   https://syzkaller.appspot.com/bug?extid=9db0864859224b833108
+<3>  57      Yes   INFO: task hung in __rq_qos_throttle (2)
+                   https://syzkaller.appspot.com/bug?extid=53706c567afab5131044
+<4>  29      No    possible deadlock in blkcg_deactivate_policy (2)
+                   https://syzkaller.appspot.com/bug?extid=14254d81dd19ba7d7e41
+<5>  16      Yes   INFO: task hung in blkdev_read_iter
+                   https://syzkaller.appspot.com/bug?extid=afa7aef0c237038586e7
+<6>  11      No    BUG: unable to handle kernel paging request in blk_mq_complete_request_remote
+                   https://syzkaller.appspot.com/bug?extid=2e3bf0bd49acd9b21d4b
+<7>  1249    Yes   WARNING in blk_mq_free_tag_set
+                   https://syzkaller.appspot.com/bug?extid=02b37e31e64ea5cb6d29
+<8>  94      Yes   INFO: rcu detected stall in kjournald2 (2)
+                   https://syzkaller.appspot.com/bug?extid=14c6ac6811273526cfa5
+<9>  30      Yes   KASAN: slab-out-of-bounds Read in blk_mq_free_rqs
+                   https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
+<10> 13      No    KASAN: slab-out-of-bounds Read in seq_buf_putmem
+                   https://syzkaller.appspot.com/bug?extid=f179b16e13624138b0f1
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
