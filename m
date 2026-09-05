@@ -1,112 +1,76 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2687B324B24;
-	Sat,  5 Sep 2026 14:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8709A33936D
+	for <linux-block@vger.kernel.org>; Sat,  5 Sep 2026 14:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788618351; cv=none; b=IkNtCben9y7XSAi/WDjsdoBRh/769I0Bj+4PNI6i5wwA2rQ4kanfAOp7UfkyUfSWNMtmrtDFupRewlP3PnIchP0z9O0po8JypfGwYTuyhVf9YmJ7k4Lyn1V84zGCqicGVKqlPwhlUImzFVdNri4gYL6NB2Z/Fgnph/5heu6wHCw=
+	t=1788618386; cv=none; b=PHzlbiHr/LkdSlnQzszdChtXokS/g0jYD9vWTgph6aNtErFIgz9wsOlpRja4DTS9PpxF7IybuII5dEapGPOVcxGtwaexIyJkVPqugCYsfPVux4R8SUF5x8oOa068FTalsps/Drc9H6+pQ8nNRrK8Mno0QzW8gdAhayigNH6Z40k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788618351; c=relaxed/simple;
-	bh=jndXAAKHidpqftMQBa26cKlXG5nvYlOXafytPCALO5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hDklFlvx/tg1A+J+Sa9ePF4UHoO4XaApLQtcDSUSB/+Ra3fJlqR0cJz4g+QVnZN+jsi77SH41qncOZNFWP0+WLU1sl3COW0ZZMKUk5deeTxgIKjk8PiBndmanP8SUBXCi2ObXfdexXpP6cRvWNW3TEI6POkV1cmTgQMMH0KOdvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dUGZCBem; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dUGZCBem"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1788618348; x=1820154348;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jndXAAKHidpqftMQBa26cKlXG5nvYlOXafytPCALO5Q=;
-  b=dUGZCBemVzGI3Yv0mWk75ahfd3A1Z1XFKypefigZ9uzvtfTw7lm14ADA
-   tKxNXruVYTPPHNQj93pV4Knloab5ThDFwJTtUbLjKWb9LbQMjcsKbtp0D
-   YbmC1JXiYpeg2SyzZ89+Cbh5lQFmNLBoJ5m9He3IHuO6l/A6TrePx6dzR
-   cdtIRem0BHzDwWceKcK8sEIL2h4LHb5HT559bOFCsTdE2+vmA6p8NMxIX
-   bIAJZrianiAE03HPERatIyp137ui+njaHNK8fwhvmPzaoR7HMahBP8XAZ
-   3wqghnF2uh/yq8Bc1ID/waBkxnClk8cbsrP5WDxTFQ4d19C7wQZ5rnBR7
-   A==;
-X-CSE-ConnectionGUID: XH7xWYRCQ02VGJu+2MvdLQ==
-X-CSE-MsgGUID: RAvUzEy+Tiyo2asooDXV/w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11896"; a="99755054"
-X-IronPort-AV: E=Sophos;i="6.25,263,1779174000"; 
-   d="scan'208";a="99755054"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2026 07:25:46 -0700
-X-CSE-ConnectionGUID: 8U27AxlCS3SUnHoCDZJdLA==
-X-CSE-MsgGUID: iracYlDuRPuLQIaGChvIkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,263,1779174000"; 
-   d="scan'208";a="272247298"
-Received: from lkp-server01.sh.intel.com (HELO 73f3364bc37e) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 05 Sep 2026 07:25:42 -0700
-Received: from kbuild by 73f3364bc37e with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1x2rKs-000000000Z9-3kZH;
-	Sat, 05 Sep 2026 14:25:38 +0000
-Date: Sat, 5 Sep 2026 22:25:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Markus Elfring <Markus.Elfring@web.de>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-	lkp@intel.com, oe-lkp@lists.linux.dev,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Hillf Danton <hdanton@sina.com>, Mark Brown <broonie@kernel.org>,
-	Oliver Sang <oliver.sang@intel.com>, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v8] loop: Fix NULL pointer dereference in lo_rw_aio()
-Message-ID: <202609052240.ovdWUOyj-lkp@intel.com>
-References: <dc2f1e00-5e10-4e02-9415-c6ecb2cbc6b3@I-love.SAKURA.ne.jp>
+	s=arc-20240116; t=1788618386; c=relaxed/simple;
+	bh=bLGZqFjwKWwJ6Tuf7d+9jt+f34PRzR2MJVMi8+7Glb0=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=YwL3uXm5+X4etN61MZIkYEXuyORBlLUD6FGDMwV9DCJoxd0ccgYGeoCfslJur58f8Kzkf39ppX2573gTNYz/KZbrx0zAqEgfnjLMHxFFIhmhLNAT9D5Xzr+4m//vc5mdgVOQf9KRPCapy4QJWdwV3AYekh4bVe7ggNwFAHKO/Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7ead32f5c6aso1883799a34.1
+        for <linux-block@vger.kernel.org>; Sat, 05 Sep 2026 07:26:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788618383; x=1789223183;
+        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=1ETkXqycGRjohhEM+siMcRzRNo0ykM9QCfZj8kTd0Fk=;
+        b=VMJfthdcTs+O606F67rEXTQ4ROWvm9DJGrsfS7cPcwkUs7A4tl3uuiLOrn6FbYTHh2
+         I3ykfrH/k8cbYHNWO7dpkWfElqDkmsp7z0ifaOj+DRfkkVcpZciXPqCyUJBkWXmU8S62
+         AXT6Ft736M7O58PsvSbv2Fk3UsrZIm7dgBWndetgeDjJQ9JPGy5ysK9YdBnWvE95Yq8T
+         lSocTpGdFWGSXISqAJ4cZsg4vIEBdGcxVv1JKr8aQ/WHmKp+D9YaA3sxCM7uKGIk6fDB
+         hUvv6umFERFE/P0uuedQ9dbrdkfKw2iOYLUU3L8ajDh1r+fkYYqU5sIGZ56u2hYIDNe6
+         Y1og==
+X-Forwarded-Encrypted: i=1; AKwUvBxDOYcZXup80NaWa+/BAsjmxyYQDIpC3qHzrcYw2+iFgTcAA8KKUw2tQ0Cbc5PAcVYJse4mkJ0JMhUHgw==@vger.kernel.org
+X-Gm-Message-State: AFuF++la8dYLGl0SWlgwbHjIcC1DnB5LdZwOtcn4Fsk7DkwIP5Yuj+3g
+	27O3GR3n6ZCIYquKUIIu0YBLKxL1RQzp/NbR/eAgoSJBK6wtPLtVs3mx6Xt8HOp7CyEdH4VWu/B
+	yCjIPxtoPO2NtmxyWR9FZ+f7H6uIV7GFX5BVjY/HMvOLO8JLWudkAnrSKzCs=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc2f1e00-5e10-4e02-9415-c6ecb2cbc6b3@I-love.SAKURA.ne.jp>
+X-Received: by 2002:a05:6820:617:b0:6b3:506e:b484 with SMTP id
+ 006d021491bc7-6b6fc9d0782mr8242414eaf.16.1788618383574; Sat, 05 Sep 2026
+ 07:26:23 -0700 (PDT)
+Date: Sat, 05 Sep 2026 07:26:23 -0700
+In-Reply-To: <5fdd4d960a6b47ab7cfa6ef0f44fb575fc45d1ca.1788611415.git.qiwenjie@xiaomi.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a9c268f.a6639fcc.23b8b0.0003.GAE@google.com>
+Subject: [syzbot ci] Re: f2fs: enable buffered RWF_DONTCACHE
+From: syzbot ci <syzbot+ci2f6618cc34ef3809@syzkaller.appspotmail.com>
+To: qwjhust@gmail.com, axboe@kernel.dk, baohua@kernel.org, chao@kernel.org, 
+	hch@lst.de, jack@suse.cz, jaegeuk@kernel.org, linux-block@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, qiwenjie@xiaomi.com, 
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com, tz2294@columbia.edu
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Tetsuo,
+syzbot ci has tested the suggested fix patch on top of the following series:
 
-kernel test robot noticed the following build errors:
+[v4] f2fs: enable buffered RWF_DONTCACHE
+https://lore.kernel.org/all/cover.1788438786.git.qiwenjie@xiaomi.com
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on linus/master v7.3-rc1 next-20260904]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Patch: https://ci.syzbot.org/jobs/279baf88-89a3-4cb8-93c2-4bd86aa5092e/patch
+Testing results:
+* [build 0] Build Patched: passed
+* [build 0] Boot test: Patched: passed
+* [build 0] Previous reproducers: passed
+  - general protection fault in f2fs_write_begin (patched) - passed
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tetsuo-Handa/loop-Fix-NULL-pointer-dereference-in-lo_rw_aio/20260904-085046
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/dc2f1e00-5e10-4e02-9415-c6ecb2cbc6b3%40I-love.SAKURA.ne.jp
-patch subject: [PATCH v8] loop: Fix NULL pointer dereference in lo_rw_aio()
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20260905/202609052240.ovdWUOyj-lkp@intel.com/config)
-compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 0edd1b088cc36b4faee80358c925a91e16006258)
-rustc: rustc 1.96.0 (ac68faa20 2026-05-25)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260905/202609052240.ovdWUOyj-lkp@intel.com/reproduce)
+Full report is available here:
+https://ci.syzbot.org/session/7e05d54c-8b9e-4e22-a746-48153ea42a60
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202609052240.ovdWUOyj-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> error[E0063]: missing field `post_release` in initializer of `block_device_operations`
-   --> rust/kernel/block/mq/gen_disk.rs:128:58
-   |
-   128 |         const TABLE: bindings::block_device_operations = bindings::block_device_operations {
-   |                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `post_release`
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
