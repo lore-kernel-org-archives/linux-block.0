@@ -1,199 +1,302 @@
-Received: from out28-173.mail.aliyun.com (out28-173.mail.aliyun.com [115.124.28.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1F8DDA9;
-	Sun,  6 Sep 2026 07:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF38539EF20
+	for <linux-block@vger.kernel.org>; Sun,  6 Sep 2026 10:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788679935; cv=none; b=PuQf1W5CtnOFazQaIpZU+EGqrou5pfYUg6SWAbfHRtAEw5ltVgV5aDtLUZLPTzMcnMQIXxXFs3BxuYZ92KpkMyDpQp5t54xjILrZd8tle66u5fSWt+QfcR3DTdhINEajAL7S+PTBU3XRieK+5A+N0ewxUeRax6dSLe6ApFfFlKc=
+	t=1788689637; cv=none; b=bYYPWPwCK1SR2OGKks+Vn5Y2PSx9LzNKECP4+Q0gM6xXJlkGrW7onij8C1j/dF+rfiKw6+vmGo4Zk+VIMyptMscStHl8YiXV9zuxaRrmXA3VDPhK5OPs4b6PUaL4tveNfNMmVxEVyEH3dFDFxhTSaBWepHBfeEeSgHgF6oFepAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788679935; c=relaxed/simple;
-	bh=FJm9ug6DcPpsf2j0pB9cJtm0cOiu4ANli+jKLEGZ/Uc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hQRE1ZFLHOR1W54DGgqCqlZwA/Bz1JT1fePXdQVzzWypQxniW3W//Jws9F5UF2ZXofM4sWbo3NfTcBEFGtx/FuWO75+2rHqbxBTZqmgraXV6coBAI5PxzwClNwskOQ0KlnjOVAjXD/26MYu8lHrmPcB7ervbF0zpI0Aivdnkors=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xiaopeng.com; spf=pass smtp.mailfrom=xiaopeng.com; dkim=pass (1024-bit key) header.d=xiaopeng.com header.i=@xiaopeng.com header.b=ngmncIvD; arc=none smtp.client-ip=115.124.28.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xiaopeng.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaopeng.com
+	s=arc-20240116; t=1788689637; c=relaxed/simple;
+	bh=2PwtB6kLiVvDcKFdb2HwQL/sdwD5dtYQaZpqxsE1A4w=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=R7y7iY3L1ioeuyVDX52gFT/WqVNxkxNJGQOirsw/ZauXtTnRpsRcXV7rN576SCPS7Z+IqCh6lJWJgbK8Tffrv9B7JxQOl3qu1/+/6rzZgVbFIO8PFNIcX63TXFUH+I1rOAk7jQUJD1OQH38NlR3L55aabu4ceLwI6A+s3bmHytg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QslXpm9a; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xiaopeng.com header.i=@xiaopeng.com header.b="ngmncIvD"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xiaopeng.com; s=default;
-	t=1788679929; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=fJgXmYmYFY1zWOGbn8dl+uPiJS+iQ9OGlxFKsVIxnGQ=;
-	b=ngmncIvD95h6GjMAuHRr6mtEskHtTWNQYxVt1xyEv3vxTexKVA8BSxPqlz1MmQ71LWJvMCkggFhNFQXHGncdaxDd64Gze6zG2c/7wyGBF85+tgy04reEBWYlYs3qXMEvWrCJbRAplvSA8dmLJ2kWvrYyl/szp48xeNJTLUtDftg=
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07436259|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.00480246-5.28004e-05-0.995145;FP=13762072585042488439|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033068016216;MF=liuc63@xiaopeng.com;NM=1;PH=DS;RN=5;RT=5;SR=0;TI=SMTPD_---.j6qG566_1788679927;
-Received: from localhost(mailfrom:liuc63@xiaopeng.com fp:SMTPD_---.j6qG566_1788679927 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Sun, 06 Sep 2026 15:32:08 +0800
-From: Liu Chao <liuc63@xiaopeng.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Liu Chao <liuc63@xiaopeng.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] partitions: ldm: add input-side bounds to ldm_get_vstr
-Date: Sun,  6 Sep 2026 15:31:14 +0800
-Message-ID: <20260906073114.3296121-1-liuc63@xiaopeng.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QslXpm9a"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-484392e3d33so1630389f8f.2
+        for <linux-block@vger.kernel.org>; Sun, 06 Sep 2026 03:13:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788689634; x=1789294434; darn=vger.kernel.org;
+        h=content-type:mime-version:message-id:date:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4MV+DtHFnknelIeSr2Ogt1AHuCaTwwIg9+ZSOQmRrC4=;
+        b=QslXpm9a2yHmUnEJgzcrONiDiOcCot8P4TNIOM1a1AJjmOUTVdMlLX1dO6hL9sLfHs
+         kQ9w8SaQpMYcP7RWeWv7NqUAdjILkkNk+gt8v/MwJ4d/2MLPf5etvJb1lNyx78k9106+
+         zSPq0qztXcgZwW9bzzvlKpYm+muE47tyW7W7TqIvkiedHzjg1oAyfDWoj95hZy0GfU7I
+         GV99VX+wBJgwuVghVqhS+vV95rwasjsI8nbQlgtsiCA62RTomsLGdlosdMB39IOITkT4
+         yZkqceezewyVHNHnuOtn0NLMuv6cyAD5eZ3mKSPP0vlXvzJckywt6Qedyq5bWBLtXjMV
+         DTiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788689634; x=1789294434;
+        h=content-type:mime-version:message-id:date:references:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=4MV+DtHFnknelIeSr2Ogt1AHuCaTwwIg9+ZSOQmRrC4=;
+        b=PyjINE+23wVQHKk/4V6vnX45D8tue3rha+n71OtPDDWeYxtZnqYghfK/s36H1GMdDK
+         fQVfJ+xJOd70EYAkEtDIYRzun042wiwbvYEc6t1Ntk07rlBFrALQYjVrUW3iZ3SzBSPu
+         Z1ttrUi4OXjnP/ThB/TQSGF8qhLITE6JZ5Ji0+jf7b9/Um/Wo7Nx5NB1CUtPpXqIK6pX
+         SsCjJlz+lIhsd51Dlfy0pp0IRGFuHY/jwvBXh627J9IpTv7U+g2zAYmLlFYsk/dKYSr1
+         dp1GeNoDbwazuXDtigT4ha9KuuAX8vJ2Llh9IhTpqvcFUP8kakj8wUYfSOspDD4VbGxQ
+         dmkg==
+X-Forwarded-Encrypted: i=1; AKwUvBwQ3lrA1PGjgQBKeLEKqxr/u2pH1uFN6GaLdPRlR7dUAXLZyf/zQcEzZU5jT2s8/Rh/mvHYP5Z5C/uC2A==@vger.kernel.org
+X-Gm-Message-State: AFuF++klUpmxkOcO+PC2+ybj5zcJR7GLde5I532N5fkUH+592BvYbC0k
+	MLk9f7fN1nCYucjG7RKg3i/6xyx+8rozIWfy1C57RbwvFUzNXq+ctp6O
+X-Gm-Gg: AYBFou3i7mFeXmhYxW/9F/Tjd2iz8twoCfR4fHXTTqsytTXVQ0fxS3nf4ujkk+vlu1Y
+	F6A3XnyaouJ61Z5n08C09bHSgE4ghH3vhw7RDFHyi/58Ik+mkWJEQwZWI7V0ntMKGnrPQS0RsCy
+	XtyTekQmuPtszy2SntYbDMN/1i9AzqFMzK7n1g83VQCVGfWu4HGZL7hZRymi+91Rt5p4TAi4RbT
+	AaM6j5orNDmtu6W48ESPcDdb2H1PN92y/zrvVTm++SFes+Q38s0HizkLucKo4sXBP0fEyGheM73
+	GQ5D77czV3IGs0AHBjF6943gCoDLuXDjlatz+xqwAuClfFdIL90xGSfN5Wi0y9evEql9pv+1qUV
+	BgRPSAHoQWJTzSM/5WZUwfb9eH67Dk7sasSzy0fkC2o1Fkxu9uZreSjaVaIzSn4GQ2jr7nAbEKt
+	XOjMLbj6GZhJlbWSIsJnfli/+2VT3nssVOsgXFQ17olhrqoSgvYw4FvNINqiTx4Xgy9Uf4yuFvJ
+	2WVI2DFf5hnfK+VVFmgL0DIs3hV5SQVeN9Brk8hKq0qdVdiZQS1uJwRDsvPW6MTV6O9
+X-Received: by 2002:a05:600c:a087:b0:49c:d26a:cf70 with SMTP id 5b1f17b1804b1-49cf825a75dmr163710045e9.15.1788689633488;
+        Sun, 06 Sep 2026 03:13:53 -0700 (PDT)
+Received: from Abds-MacBook-Air.local (cb-8021x-nat-134-110.net.uni-frankfurt.de. [141.2.134.110])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d04fe7f9dsm119275575e9.0.2026.09.06.03.13.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Sep 2026 03:13:52 -0700 (PDT)
+From: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+To: Jinpu Wang <jinpu.wang@cloud.ionos.com>, linux-raid
+ <linux-raid@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>
+Cc: Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>, Jens Axboe
+ <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Ming Lei
+ <ming.lei@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, Nilay Shroff
+ <nilay@linux.ibm.com>
+Subject: Re: [BUG] md/raid1: deadlock between a queue limits sysfs store and
+ a spare re-add
+In-Reply-To: <CAMGffEn0RcbyEcgCCVdxEf8Zwd6hnrjnYPdqrMsf8TL8qEBKRA@mail.gmail.com>
+References: <CAMGffEn0RcbyEcgCCVdxEf8Zwd6hnrjnYPdqrMsf8TL8qEBKRA@mail.gmail.com>
+Date: Sun, 06 Sep 2026 12:13:48 +0200
+Message-ID: <m2h5k2661v.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-ldm_get_vstr() copies a length-prefixed string out of a VBLK record:
 
-	length = block[0];
-	if (length >= buflen) {
-		length = buflen - 1;
-	}
-	memcpy(buffer, block + 1, length);
+Hi Jack,
 
-length is clamped to the output buffer, but not to the remaining
-input.  block points into the VBLK at an offset returned by
-ldm_relative(), which can place it at the last byte of the buffer.
-The memcpy then reads up to 127 bytes past the allocation
-(disk->alt_name is 128 bytes).
+On Sun, Sep 06, 2026 at 06:58 +0200, Jinpu Wang wrote:
+> Hi,
+>
+> writing to a queue limit attribute of an md array while a spare is being
+> re-added deadlocks the array, with three tasks left unkillable in D state.
+> The host has to be rebooted to recover.
+>
+> We hit this in production on 6.12.100 with RAID1 arrays, triggered by a
+> udev rule writing queue/max_sectors_kb.  Reading the code, v7.2 looks
+> affected too; see "Which versions" below for exactly what was tested and
+> what was not.
+>
+> The cycle
+> =========
+>
+> Three tasks, one array:
+>
+>   udev-worker     queue_attr_store() holds q->limits_lock and waits in
+>                   blk_mq_freeze_queue() for q_usage_counter to drain
+>
+>   fio             holds a q_usage_counter reference, waits in
+>                   md_handle_request()'s is_suspended() loop
+>
+>   md_start_sync   holds mddev->suspended, waits for q->limits_lock
+>
+> Nobody can proceed: the freeze needs the in-flight I/O to finish, that
+> I/O needs mddev->suspended cleared, and clearing it needs the spare add
+> to finish, which is blocked on the lock the first task holds.
+>
+> The three legs in v7.2 (8d3ae59288f1):
+>
+> block/blk-sysfs.c, queue_attr_store():
+>
+> struct queue_limits lim = queue_limits_start_update(q);
+>
+> res = entry->store_limit(disk, page, length, &lim);
+> if (res < 0) {
+> queue_limits_cancel_update(q);
+> return res;
+> }
+>
+> res = queue_limits_commit_update_frozen(q, &lim);
+>
+> queue_limits_start_update() takes q->limits_lock, and
+> queue_limits_commit_update_frozen() calls blk_mq_freeze_queue() with it
+> still held.  max_sectors_kb is a QUEUE_LIM_RW_ENTRY, so a plain
+>
+> echo 1024 > /sys/block/mdN/queue/max_sectors_kb
+>
+> reaches this path.
+>
+> drivers/md/md.c, md_start_sync():
+>
+> if (mddev->reshape_position == MaxSector &&
+>    md_spares_need_change(mddev)) {
+> suspend = true;
+> mddev_suspend(mddev, false);
+> }
+>
+> mddev_lock_nointr(mddev);
+>
+> and from there md_choose_sync_action() -> remove_and_add_spares() ->
+> ->hot_add_disk() -> raid1_add_disk() -> mddev_stack_new_rdev(), which
+> does a blocking
+>
+> lim = queue_limits_start_update(mddev->gendisk->queue);
+>
+> while mddev->suspended is set.
+>
+> drivers/md/md.c, md_handle_request(), where the in-flight I/O waits:
+>
+> if (is_suspended(mddev, bio)) {
+> ...
+> wait_event(mddev->sb_wait, !is_suspended(mddev, bio));
+>
+> So md acquires q->limits_lock while holding a quiescing primitive that
+> blocks exactly the I/O a concurrent freeze is waiting to drain.
+>
+> Backtraces
+> ==========
+>
+> From a 6.12.100 based kernel:
+>
+>   INFO: task kworker/2:2 blocked for more than 184 seconds.
+>   Workqueue: md_misc md_start_sync [md_mod]
+>   Call Trace:
+>    __mutex_lock.constprop.0+0x31c/0x6d0
+>    mddev_stack_new_rdev+0x59/0x150 [md_mod]
+>    raid1_add_disk+0x97/0x180 [raid1]
+>    remove_and_add_spares+0xe8/0x230 [md_mod]
+>    md_start_sync+0x14c/0x3e0 [md_mod]
+>    process_one_work+0x162/0x370
+>
+>   INFO: task (udev-worker) blocked for more than 184 seconds.
+>   Call Trace:
+>    blk_mq_freeze_queue_wait+0x9e/0xd0
+>    queue_limits_commit_update_frozen+0x12/0x40
+>    queue_attr_store+0xc9/0x1c0
+>    kernfs_fop_write_iter+0x133/0x220
+>    vfs_write+0x29c/0x450
+>
+>   INFO: task fio blocked for more than 184 seconds.
+>   Call Trace:
+>    md_handle_request+0x10d/0x2b0 [md_mod]
+>    __submit_bio+0x23e/0x2f0
+>    submit_bio_noacct_nocheck+0x1a3/0x3c0
+>    blkdev_direct_IO+0x265/0x5d0
+>
+> /proc/mdstat at that point, with the spare add never completing:
+>
+>   md0 : active raid1 rnbd0[0] rnbd1[1](S)
+>         5238784 blocks super 1.2 [2/1] [U_]
+>
+> Reproducer
+> ==========
+>
+> On a scratch machine, with two ram devices:
+>
+>   mdadm -C /dev/md111 --force -e 1.2 --assume-clean -l 1 \
+>         --bitmap=internal -n 2 /dev/ram0 /dev/ram1
+>
+>   # keep I/O in flight
+>   fio --direct=1 --rw=randrw --ioengine=libaio --iodepth=32 --numjobs=4 \
+>       --time_based=1 --runtime=180 --filename=/dev/md111 --name=repro &
+>
+>   # stand in for the udev worker
+>   while :; do
+>       echo 128 > /sys/block/md111/queue/max_sectors_kb 2>/dev/null
+>   done &
+>
+>   # drive spare re-adds
+>   for i in $(seq 20); do
+>       mdadm /dev/md111 --fail /dev/ram0
+>       mdadm /dev/md111 --remove /dev/ram0
+>       mdadm /dev/md111 --add /dev/ram0
+>       mdadm --wait /dev/md111
+>   done
+>
+> It reproduced on the first iteration for us, though it is a race, so it
+> may need a few attempts on other machines.
+>
+> Which versions
+> ==============
+>
+> Reproduced: 6.12.100 (distro kernel carrying the stable backport of
+> c99f66e4084a), RAID1, repeatedly, on several hosts.
+>
+> Not reproduced, code inspection only: v7.2 (8d3ae59288f1).  All three
+> legs quoted above are from the v7.2 tree and are unchanged there, so it
+> looks affected, but we have not run the reproducer on a mainline build.
+> Happy to do that if it helps.
+>
+> raid10 calls mddev_stack_new_rdev() from raid10_add_disk() in the same
+> way, so it looks exposed too; we have only tested raid1.
+>
+> When it started
+> ===============
+>
+> Before commit c99f66e4084a ("block: fix queue freeze vs limits lock
+> order in sysfs store methods"), queue_attr_store() froze the queue first
+> and took limits_lock afterwards, so limits_lock was never held across the
+> freeze wait and this cycle could not form.  That commit moved the freeze
+> inside queue_limits_commit_update_frozen(), i.e. under limits_lock:
+>
+>   Fixes: c99f66e4084a ("block: fix queue freeze vs limits lock order
+> in sysfs store methods")
+>
+> That is not an argument for reverting it: it exists so sd_revalidate_disk()
+> can issue SCSI commands while holding the limits lock, which cannot work
+> on a frozen queue.  The md side is on the wrong side of the ordering the
+> block layer expects, as spelled out in commit 06a2ff603f1f ("loop: Fix
+> recently introduced lock inversion"): all block driver code takes
+> queue_limits_start_update() before freezing.  md instead takes a
+> quiescing primitive of its own first.
+>
+> What we are running
+> ===================
+>
+> We fixed it on the md side, by taking the limits update in
+> md_start_sync() before mddev_suspend(), threading the queue_limits
+> through ->hot_add_disk() so the personality stacks into it without
+> taking the lock itself, and committing before resuming, so the update
+> still lands while the array is quiesced.  That removes the inversion
+> without touching the shared block layer code.
+>
 
-On the fragmented-VBLK path the buffer comes from
-kmalloc(sizeof(struct frag) + size * num) and the overread walks
-straight into the slab redzone.  The reproducer below exercises
-the 64-byte vb->name path in ldm_parse_vblk():
+I am working on a bug in slot_store(). It calls remove_and_add_spares()
+without suspending the array. If I just suspend the array without taking
+care of q->limits_lock, it would  trigger the same issue you mentioned.
+2- state_store() also calls remove_and_add_spares(), while the array is
+suspended by rdev_attr_store(), so it would probably trigger the same
+issue as well.
 
-  BUG: KASAN: slab-out-of-bounds in ldm_get_vstr.isra.0+0x43/0x90
-  Read of size 63 at addr ffff8881003e3f17 by task swapper/0/1
+> Two approaches we tried first and discarded, in case they save someone
+> the detour:
+>
+> - mutex_trylock() in mddev_stack_new_rdev() with a retry on contention.
+>   A writer that keeps retaking limits_lock wins nearly every time, so
+>   the retry does not converge: we measured 1132 backoffs against 1
+>   success, the array staying degraded with an idle spare throughout, and
+>   md_check_recovery() suspending and resuming the array on every pass.
+>
+> - Dropping limits_lock around the freeze wait inside
+>   queue_limits_commit_update_frozen().  This works, but it inverts the
+>   ordering the block layer has standardised on, and a concurrent update
+>   committing in the window is then silently overwritten.
+>
+> We can post the md-side patch if that direction looks right, or defer to
+> whatever you prefer.  Reproducer script and the full logs are available.
+>
+> Thanks,
+> Jack
+>
 
-The partition scan runs automatically when a block device with an
-MBR type-0x42 partition appears.
-
-Add a blocklen parameter and clamp the string length to the
-remaining input at each call site.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Liu Chao <liuc63@xiaopeng.com>
----
- block/partitions/ldm.c | 40 +++++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 15 deletions(-)
-
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index c0bdcae58..5468e038a 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -673,6 +673,7 @@ static u64 ldm_get_vnum (const u8 *block)
- /**
-  * ldm_get_vstr - Read a length-prefixed string into a buffer
-  * @block:   Pointer to the length marker
-+ * @blocklen: Number of bytes available at @block
-  * @buffer:  Location to copy string to
-  * @buflen:  Size of the output buffer
-  *
-@@ -680,20 +681,27 @@ static u64 ldm_get_vnum (const u8 *block)
-  * they are prefixed by a one byte length marker.  This function copies one of
-  * these strings into a buffer.
-  *
-- * N.B.  This function DOES NOT perform any range checking on the input.
-- *       If the buffer is too small, the output will be truncated.
-+ * N.B.  The string is clamped to both @blocklen and @buflen; if either
-+ *       is too small the output will be truncated.
-  *
-  * Return:  0, Error and @buffer contents are undefined
-  *          n, String length in characters (excluding NULL)
-  *          buflen-1, String was truncated.
-  */
--static int ldm_get_vstr (const u8 *block, u8 *buffer, int buflen)
-+static int ldm_get_vstr(const u8 *block, int blocklen, u8 *buffer, int buflen)
- {
- 	int length;
- 
- 	BUG_ON (!block || !buffer);
- 
-+	if (blocklen < 1) {
-+		buffer[0] = '\0';
-+		return 0;
-+	}
-+
- 	length = block[0];
-+	if (length > blocklen - 1)
-+		length = blocklen - 1;
- 	if (length >= buflen) {
- 		ldm_error ("Truncating string %d -> %d.", length, buflen);
- 		length = buflen - 1;
-@@ -744,8 +752,8 @@ static bool ldm_parse_cmp3 (const u8 *buffer, int buflen, struct vblk *vb)
- 		return false;
- 
- 	comp = &vb->vblk.comp;
--	ldm_get_vstr (buffer + 0x18 + r_name, comp->state,
--		sizeof (comp->state));
-+	ldm_get_vstr(buffer + 0x18 + r_name, buflen - (0x18 + r_name),
-+		comp->state, sizeof(comp->state));
- 	comp->type      = buffer[0x18 + r_vstate];
- 	comp->children  = ldm_get_vnum (buffer + 0x1D + r_vstate);
- 	comp->parent_id = ldm_get_vnum (buffer + 0x2D + r_child);
-@@ -790,8 +798,8 @@ static int ldm_parse_dgr3 (const u8 *buffer, int buflen, struct vblk *vb)
- 		return false;
- 
- 	dgrp = &vb->vblk.dgrp;
--	ldm_get_vstr (buffer + 0x18 + r_name, dgrp->disk_id,
--		sizeof (dgrp->disk_id));
-+	ldm_get_vstr(buffer + 0x18 + r_name, buflen - (0x18 + r_name),
-+		dgrp->disk_id, sizeof(dgrp->disk_id));
- 	return true;
- }
- 
-@@ -829,7 +837,8 @@ static bool ldm_parse_dgr4 (const u8 *buffer, int buflen, struct vblk *vb)
- 	if (len != get_unaligned_be32(buffer + 0x14))
- 		return false;
- 
--	ldm_get_vstr (buffer + 0x18 + r_objid, buf, sizeof (buf));
-+	ldm_get_vstr(buffer + 0x18 + r_objid, buflen - (0x18 + r_objid),
-+		buf, sizeof(buf));
- 	return true;
- }
- 
-@@ -864,8 +873,8 @@ static bool ldm_parse_dsk3 (const u8 *buffer, int buflen, struct vblk *vb)
- 		return false;
- 
- 	disk = &vb->vblk.disk;
--	ldm_get_vstr (buffer + 0x18 + r_diskid, disk->alt_name,
--		sizeof (disk->alt_name));
-+	ldm_get_vstr(buffer + 0x18 + r_diskid, buflen - (0x18 + r_diskid),
-+		disk->alt_name, sizeof(disk->alt_name));
- 	if (uuid_parse(buffer + 0x19 + r_name, &disk->disk_id))
- 		return false;
- 
-@@ -1072,16 +1081,16 @@ static bool ldm_parse_vol5(const u8 *buffer, int buflen, struct vblk *vb)
- 		return false;
- 	}
- 	volu = &vb->vblk.volu;
--	ldm_get_vstr(buffer + 0x18 + r_name, volu->volume_type,
--			sizeof(volu->volume_type));
-+	ldm_get_vstr(buffer + 0x18 + r_name, buflen - (0x18 + r_name),
-+			volu->volume_type, sizeof(volu->volume_type));
- 	memcpy(volu->volume_state, buffer + 0x18 + r_disable_drive_letter,
- 			sizeof(volu->volume_state));
- 	volu->size = ldm_get_vnum(buffer + 0x3D + r_child);
- 	volu->partition_type = buffer[0x41 + r_size];
- 	memcpy(volu->guid, buffer + 0x42 + r_size, sizeof(volu->guid));
- 	if (buffer[0x12] & VBLK_FLAG_VOLU_DRIVE) {
--		ldm_get_vstr(buffer + 0x52 + r_size, volu->drive_hint,
--				sizeof(volu->drive_hint));
-+		ldm_get_vstr(buffer + 0x52 + r_size, buflen - (0x52 + r_size),
-+				volu->drive_hint, sizeof(volu->drive_hint));
- 	}
- 	return true;
- }
-@@ -1115,7 +1124,8 @@ static bool ldm_parse_vblk (const u8 *buf, int len, struct vblk *vb)
- 	vb->flags  = buf[0x12];
- 	vb->type   = buf[0x13];
- 	vb->obj_id = ldm_get_vnum (buf + 0x18);
--	ldm_get_vstr (buf+0x18+r_objid, vb->name, sizeof (vb->name));
-+	ldm_get_vstr(buf + 0x18 + r_objid, len - (0x18 + r_objid),
-+		vb->name, sizeof(vb->name));
- 
- 	switch (vb->type) {
- 		case VBLK_CMP3:  result = ldm_parse_cmp3 (buf, len, vb); break;
 -- 
-2.50.1
-
+Best Regards,
+Abd-Alrhman
