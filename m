@@ -1,64 +1,64 @@
 Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4862D4AA008
-	for <linux-block@vger.kernel.org>; Mon,  7 Sep 2026 13:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE56E4E3778
+	for <linux-block@vger.kernel.org>; Mon,  7 Sep 2026 13:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788788379; cv=none; b=rVM132licNg/rPBEMBsxHB6kNGqv/ekEId0q3h0NuS7Y3/fR1G3Hw8reZMRB7h6Zq4NcDL1e0n/N34Wb4WhQu59vN6lGbobdZTedQWavgkqQTL1Dbpd2otJIXDrf5iIawGvM/n+jmIyWRjg4TPaI8ZoklHGEe6tT4E4KSglAu9Q=
+	t=1788788380; cv=none; b=fu6TTVJHn3jwr61gpS2R5ez+0q8QYM1Cdg88uLGNsfAOj9QIlQ4y/sOAUXdJnsFcVfwOS82YtBd1GRSaMp8LfxXYuQiK5Q4xcz3Z7aF8t5cf2PeiEaxxufR570rr5kedpo8mVUAksbIibYmfMTuXlmq3Oe6CWQT1x323KHnlT9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788788379; c=relaxed/simple;
-	bh=hD/Ag5mHGnb/+Q6knSZLrEWDJiU4f9Bj33/1WM3/LXU=;
+	s=arc-20240116; t=1788788380; c=relaxed/simple;
+	bh=j1qQhW/DMga9//Ebbmvtda5D1XA/aQWh2EDKH/0LM2Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EiBUO+aVX4UBjwvc3n9uKfkzISm8hO+P0VhQDMOGuI5sH03NC3H5YJDv1gD/5arFNbHjXezbv6UDOQ6/QznoRafgcTdDTHbug1o4g+XMPLWI9JC48AU9KDvANzzi7o/q9+VpDfV4+ENwvoNi+w/k+/LSjwIsuqp6ydS/8p5Vi7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=GHWh4IM2; arc=none smtp.client-ip=74.125.228.140
+	 MIME-Version; b=BIFnRhubCzSfIN4J9B8lLOhJubWoW5cJUeGGK8VPgokLR9Gvsznr5p/4/wiY/c9zbpHKp/cS0sX9HyI5Jm0cIqjOPiXonDa/t32lSud6HcKGwrQ6jHIPY3wZB97Ehp4l/RSiDnK1w/8pOh9O4JMXJcoilgaH8nWVJ3nshFinVHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=gkqhCZIZ; arc=none smtp.client-ip=74.125.228.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="GHWh4IM2"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c255a6e63c0so41612166b.3
-        for <linux-block@vger.kernel.org>; Mon, 07 Sep 2026 06:39:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="gkqhCZIZ"
+Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c25bf832368so25444166b.0
+        for <linux-block@vger.kernel.org>; Mon, 07 Sep 2026 06:39:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1788788374; x=1789393174; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1788788377; x=1789393177; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=E3LHKOhRHO633fHElMtM+oKayOtlnDDwdzgZYZQwQYo=;
-        b=GHWh4IM2pqHGd1IIba3F1sPYrYi20Z+9MOwBdyjahoezgBUZ6ooqGNPSQdog6EiwHP
-         6KDUCcaeKlY76QG1AuQ9Wal3Zshf83AfETubekoMuv8Mt+cLdT+G6OWbaMcdxxFzm/zS
-         t28uMJIlmIAwv++F0hlKjzKzUcjhIeIBftFokSQDL2y6Iqmb07r/GlpJthH9sJN9W+ua
-         bAo0S4i3s3wLRGmsmlDItLS4Oirao79eO0Bwnp3xcSGbxu+YpRndWwg8xTA+i95bN21B
-         vkAuuQwNkg5AwqCO16QiOMDnNq0dW8RpFuqdp4WvhEmD08kWacLWwHDtHThAQfjzNc0M
-         OHHw==
+        bh=G+X7Aa1PtynLQRsIRhDWSLMhkCeEiNsDSsNbut1hjAs=;
+        b=gkqhCZIZRlnPMXRltd6zez8wMjALrsemQCpiQl0OWgMtke6I9Kxu2FVXwpzoYljRlJ
+         ODMhOqJXgyzbO29kCM4Q4cNhrUWEsCvprHlyPyYkMMbF+6QiUoj3VRRSb7m4pnSnBwAh
+         pDFHgKkgsxjxUnhCAwQHP5g4MDCnfaNAATEcSRqdnea6Xif5bn+83D4BzQA0U/o1oig3
+         OMcqhtRewqs6OPmNr3NSpFpt/XG3GPh6A1rG5RzFD7m8I9QVQLjjFg/yUzGb1ZTSyriK
+         818QpeORuOwSA3alBsNd5MFPL2qcscoptIT+XDLhLx0L1uOxGiY+x66K1bAgs1Wsjiht
+         ox2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788788374; x=1789393174;
+        d=1e100.net; s=20251104; t=1788788377; x=1789393177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=E3LHKOhRHO633fHElMtM+oKayOtlnDDwdzgZYZQwQYo=;
-        b=nzLxjpqPWiljGrgJfjttYk9XXvKJeIqo3C+8r4aYquI8RLwA6qr/bpCd40R06352YM
-         v93Y4hvYxWiWyBH/HUfTyzlGUH2kGjaxX0KJCxzGV0QPwSkz4VyzKNuiytAzQDFr4mFY
-         +E6gMK4N6qLDseFnPoKg4SqljUlGQivxd5UWoe8394DCtncIA99YVyzZYDcPN7pQHQ6j
-         Mtzbrqi6KxgziPNh+v1/DYPy1pKpsv9+tcV4RSugKFy43S1pK01XperbqstKZ9Mvva5D
-         Ik+ucD12dWnAwG8v+V/rU5N4Up79fBDVVxECjd1xa4SKBAIJ+wTGAt67H5ez0pIULfEr
-         V5vw==
-X-Forwarded-Encrypted: i=1; AKwUvByhZq9ShYZtgAGp5rpnXjJNtHN7qJKh1hkWzGsVvV6S5J/iQhjYLCu0B5UGq2fYrgdVBNWB2W9cziofJA==@vger.kernel.org
-X-Gm-Message-State: AFuF++mlu6OHFZMg/qQuCntyw7Iv9htNs6GMYFGE6umOaknPdwxKZcbM
-	dWOI+SZn9iNpbJVB+xe17+4cFTsEwdmMYXDPSuYtqmZaFQpI3KnJ3XEzhqn8NxQZ3Aw=
-X-Gm-Gg: AYBFou2WgU9/0VVvciEWMYwsMT81BSAD3+PN9jLBYlLLOgNg+2TkRkCjlm07VspIqOw
-	iZO7n3C0RzeLP4RMFcl8AEVazBHv4aMxzIqZRadqusY3yPePt3sEXqQNsCpeM/fbFTNlrO6kpeW
-	2tKEENglM9djQnD7htYGdy2MOJmrLGJDKCib5j5p1FxJeWGno3qvpc458FZ0Ci+i0i8bwmT2whv
-	1BKBc+ol9DGPWZaVaR/y1f8YgkKnltQeOLmwsFDqo+6XGNOKMmv6f28QJ75fPrEM91r3QVk4bvA
-	ztCSDGPoNVJ9tf4GPmnx4gsdZrAxNB+iOHWyq6P7gZQJCeYTNk2dq1UUWPJlt5H25XNy2Eb2FiA
-	y1E1sCJbxU81wJBLjzp5moer0DW9LNM9NDaDgvdFcdg7iFmgfmtlKrQx7hxmectGE/WUxU7cZmr
-	RCDvdPvFpnoW3eOW8lAeBl2NK3iAb/M/j6FhfS14FB8o4L6dr8HL8LKv69wfzn6imFLbqSeNdCX
-	x88MkCCkPSVZKya/TbV7GkgIajuhokCYA==
-X-Received: by 2002:a17:907:c1b:b0:c15:ccda:26d5 with SMTP id a640c23a62f3a-c2612b8e83fmr883905666b.4.1788788374271;
-        Mon, 07 Sep 2026 06:39:34 -0700 (PDT)
+        bh=G+X7Aa1PtynLQRsIRhDWSLMhkCeEiNsDSsNbut1hjAs=;
+        b=IS38KO38XGCfJepp58TZVS6hqad0iYLdgFhIFRNA3K5wFfoi1MpJk8FlsamP/EwqtR
+         tJsqZWM8FlTORzyoizxETEDuCafU8S5L/S4TuojG7LqFGPpj03X9mrrGYfVbv+WpZkXB
+         OX6VjtQDbzJGJk5Y9IWpNynyLrLv9N09HkhrDmhOmuyA6FJzZqs0hJM/3gVAYaLLYOqh
+         yYmQMKW7WmofQcLNBquukgKbETJNoSttZg2Fu2fgUTPFvEp++wJd2t4reb01HSvDpJfW
+         f9j0Ew4QIWtUxyfFxIuYxgymOV0kgZJwerLSJZgRZXz60VN95xKptCIC9viGteoXa5gK
+         65gA==
+X-Forwarded-Encrypted: i=1; AKwUvBzFulc9sGE9R8unY1F3JkP0/+RpHeZXTbhTEfzHT0PMix1EpGk6U9MO4UQ2xinIBnVGRS1BmeRMNLfQXA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mfSLJCpDtTlyDXC62KtiUUUIqvoC+HvVffiZIDmWI47U5BvIgQ
+	3DjuNf35i3seJLWSfY2CjbVFCm/kZVYNZeAbjArMlgam/Sc3co+5Tr++U5OVBsC8ngo=
+X-Gm-Gg: AYBFou35EWrYtfZzvwm8yQm0KYRuXkvpQBCqbMfpWg5GYrlAntJdWT6IEeeAQd7fdSc
+	XI61VtM308AKfF0NZI0MxsmkOiIaY1LK1u4c4+q2TPM5BBKD5zwkLdGCqKV8jFrybXUaq9cWsXn
+	CocstbIMatIAOp0L7cOkMgs8UIJ7WQXDp0/UIyq2QSIbyiymNeFKt64mC4A9gbx5UqIF7UKX2HU
+	GNljERvGd2RISvInx3HTzbsBiYbqCS6dizrRxNdnSAHTwq4W0gCFJXfmhAZzvLpMABII8wrvKNn
+	Int2M0dAbE4pAASLITEL4dQRTpktTA4OQ/4rHe0WSJ7FggQnf1DoXRAXp0bEzHlH3AabwRhIos0
+	aV/k6dC4wjMyXswMucofDdA3DrWIAupGin+newkIbbd6NbQMlXe/1pDmtiY7c7AUHBCVHE3VExD
+	n98xYePXighBGi4PDiV5zh7b6Z/H6NFtC0u7cIn8zGyzafTotrUHDbGHDaDKg+JKzGdpNyJsNNG
+	/qU5136fPqU7ADyLM3YgmMwFfbJsrEQaqYKB7LrkmSm
+X-Received: by 2002:a17:907:3fa7:b0:c1f:4754:d87b with SMTP id a640c23a62f3a-c2624f0a4f6mr557429666b.1.1788788377056;
+        Mon, 07 Sep 2026 06:39:37 -0700 (PDT)
 Received: from jwang-ThinkPad-T14-Gen-6.fkb.profitbricks.net ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c262c770678sm314301866b.53.2026.09.07.06.39.32
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c262c770678sm314301866b.53.2026.09.07.06.39.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 06:39:33 -0700 (PDT)
+        Mon, 07 Sep 2026 06:39:36 -0700 (PDT)
 From: Jack Wang <jinpu.wang@ionos.com>
 To: Nilay Shroff <nilay@linux.ibm.com>,
 	abd.masalkhi@gmail.com
@@ -71,9 +71,9 @@ Cc: linux-raid <linux-raid@vger.kernel.org>,
 	Yu Kuai <yukuai@fygo.io>,
 	tom.leiming@gmail.com,
 	Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH 2/6] md: pass a queue_limits down to ->hot_add_disk()
-Date: Mon,  7 Sep 2026 15:39:25 +0200
-Message-ID: <20260907133929.1081540-3-jinpu.wang@ionos.com>
+Subject: [PATCH 4/6] md: pass a queue_limits through the rdev sysfs stores
+Date: Mon,  7 Sep 2026 15:39:27 +0200
+Message-ID: <20260907133929.1081540-5-jinpu.wang@ionos.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260907133929.1081540-1-jinpu.wang@ionos.com>
 References: <20260907133929.1081540-1-jinpu.wang@ionos.com>
@@ -87,338 +87,160 @@ Content-Transfer-Encoding: 8bit
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-Adding a leg stacks its queue limits, which mddev_stack_new_rdev() does
-by taking q->limits_lock itself.  Callers that hold reconfig_mutex, or
-have the array suspended, must not do that: the lock's holder waits for
-I/O they are blocking.  They need to own the update instead.
+state_store() and slot_store() can add a leg, which stacks its queue
+limits, and the caller has to own that update because q->limits_lock
+must be taken before the array is locked and suspended.
 
-Give ->hot_add_disk(), remove_and_add_spares() and
-md_choose_sync_action() a queue_limits argument, and add
-mddev_stack_rdev_into() to stack into a caller-owned update.  Every
-caller passes NULL, so no functional change; the users follow.
+Give the rdev sysfs store callback a queue_limits argument.
+rdev_attr_store() passes NULL, so no functional change; the user
+follows.
 
 Assisted-by: Claude:claude-opus-5
 Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/md/dm-raid.c   |  2 +-
- drivers/md/md-linear.c |  3 +-
- drivers/md/md.c        | 66 ++++++++++++++++++++++++++++++++----------
- drivers/md/md.h        |  5 +++-
- drivers/md/raid1.c     |  8 +++--
- drivers/md/raid10.c    | 15 +++++++---
- drivers/md/raid5.c     |  5 ++--
- 7 files changed, 78 insertions(+), 26 deletions(-)
+ drivers/md/md.c | 45 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/md/dm-raid.c b/drivers/md/dm-raid.c
-index 8f5a5e1342a9..21a1922bee4f 100644
---- a/drivers/md/dm-raid.c
-+++ b/drivers/md/dm-raid.c
-@@ -3923,7 +3923,7 @@ static void attempt_restore_of_faulty_devices(struct raid_set *rs)
- 			clear_bit(Faulty, &r->flags);
- 			clear_bit(WriteErrorSeen, &r->flags);
- 
--			if (mddev->pers->hot_add_disk(mddev, r)) {
-+			if (mddev->pers->hot_add_disk(mddev, r, NULL)) {
- 				/* Failed to revive this device, try next */
- 				r->raid_disk = r->saved_raid_disk = -1;
- 				r->flags = flags;
-diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
-index 73b367b61b87..1f44c2d7db93 100644
---- a/drivers/md/md-linear.c
-+++ b/drivers/md/md-linear.c
-@@ -186,7 +186,8 @@ static int linear_run(struct mddev *mddev)
- 	return ret;
- }
- 
--static int linear_add(struct mddev *mddev, struct md_rdev *rdev)
-+static int linear_add(struct mddev *mddev, struct md_rdev *rdev,
-+		      struct queue_limits *lim)
- {
- 	/* Adding a drive to a linear array allows the array to grow.
- 	 * It is permitted if the new drive has a matching superblock
 diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 680b34a63cb3..28fc903ffeea 100644
+index c7d1f9813f5d..8ad6fe178e96 100644
 --- a/drivers/md/md.c
 +++ b/drivers/md/md.c
-@@ -94,8 +94,8 @@ static DECLARE_WAIT_QUEUE_HEAD(resync_wait);
-  */
- static struct workqueue_struct *md_misc_wq;
+@@ -3033,7 +3033,13 @@ static int cmd_match(const char *cmd, const char *str)
+ struct rdev_sysfs_entry {
+ 	struct attribute attr;
+ 	ssize_t (*show)(struct md_rdev *, char *);
+-	ssize_t (*store)(struct md_rdev *, const char *, size_t);
++	/*
++	 * @lim: a queue limits update the caller owns, or NULL.  Stores that
++	 * can add a leg to the array must stack into it rather than take
++	 * q->limits_lock themselves, see md_start_sync().
++	 */
++	ssize_t (*store)(struct md_rdev *rdev, const char *page, size_t len,
++			 struct queue_limits *lim);
+ };
  
--static int remove_and_add_spares(struct mddev *mddev,
--				 struct md_rdev *this);
-+static int remove_and_add_spares(struct mddev *mddev, struct md_rdev *this,
-+				 struct queue_limits *lim);
- static void mddev_detach(struct mddev *mddev);
- static void export_rdev(struct md_rdev *rdev);
- static void md_wakeup_thread_directly(struct md_thread __rcu **thread);
-@@ -2994,7 +2994,7 @@ static int add_bound_rdev(struct md_rdev *rdev)
- 		 */
- 		super_types[mddev->major_version].
- 			validate_super(mddev, NULL/*freshest*/, rdev);
--		err = mddev->pers->hot_add_disk(mddev, rdev);
-+		err = mddev->pers->hot_add_disk(mddev, rdev, NULL);
- 		if (err) {
- 			md_kick_rdev_from_array(rdev);
- 			return err;
-@@ -3110,7 +3110,7 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
- 	} else if (cmd_match(buf, "remove")) {
- 		if (rdev->mddev->pers) {
- 			clear_bit(Blocked, &rdev->flags);
--			remove_and_add_spares(rdev->mddev, rdev);
-+			remove_and_add_spares(rdev->mddev, rdev, NULL);
- 		}
- 		if (rdev->raid_disk >= 0)
- 			err = -EBUSY;
-@@ -3314,7 +3314,7 @@ slot_store(struct md_rdev *rdev, const char *buf, size_t len)
- 		if (rdev->mddev->pers->hot_remove_disk == NULL)
- 			return -EINVAL;
- 		clear_bit(Blocked, &rdev->flags);
--		remove_and_add_spares(rdev->mddev, rdev);
-+		remove_and_add_spares(rdev->mddev, rdev, NULL);
- 		if (rdev->raid_disk >= 0)
- 			return -EBUSY;
- 		set_bit(MD_RECOVERY_NEEDED, &rdev->mddev->recovery);
-@@ -3344,7 +3344,8 @@ slot_store(struct md_rdev *rdev, const char *buf, size_t len)
- 			rdev->saved_raid_disk = -1;
- 		clear_bit(In_sync, &rdev->flags);
- 		clear_bit(Bitmap_sync, &rdev->flags);
--		err = rdev->mddev->pers->hot_add_disk(rdev->mddev, rdev);
-+		err = rdev->mddev->pers->hot_add_disk(rdev->mddev, rdev,
-+						     NULL);
- 		if (err) {
- 			rdev->raid_disk = -1;
- 			return err;
-@@ -6275,6 +6276,40 @@ int mddev_stack_new_rdev(struct mddev *mddev, struct md_rdev *rdev)
- }
- EXPORT_SYMBOL_GPL(mddev_stack_new_rdev);
- 
-+/*
-+ * Stack a new rdev into limits the caller already holds limits_lock for and
-+ * will commit itself.  Used from paths that must take limits_lock before
-+ * quiescing the array, see md_start_sync().
-+ */
-+int mddev_stack_rdev_into(struct mddev *mddev, struct md_rdev *rdev,
-+			  struct queue_limits *lim)
-+{
-+	struct queue_limits tmp = *lim;
-+
-+	if (mddev_is_dm(mddev))
-+		return 0;
-+
-+	if (queue_logical_block_size(rdev->bdev->bd_disk->queue) >
-+	    queue_logical_block_size(mddev->gendisk->queue)) {
-+		pr_err("%s: incompatible logical_block_size, can not add\n",
-+		       mdname(mddev));
-+		return -EINVAL;
-+	}
-+
-+	queue_limits_stack_bdev(&tmp, rdev->bdev, rdev->data_offset,
-+				mddev->gendisk->disk_name);
-+
-+	if (!queue_limits_stack_integrity_bdev(&tmp, rdev->bdev)) {
-+		pr_err("%s: incompatible integrity profile for %pg\n",
-+		       mdname(mddev), rdev->bdev);
-+		return -ENXIO;
-+	}
-+
-+	*lim = tmp;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(mddev_stack_rdev_into);
-+
- /* update the optimal I/O size after a reshape */
- void mddev_update_io_opt(struct mddev *mddev, unsigned int nr_stripes)
- {
-@@ -7706,7 +7741,7 @@ static int hot_remove_disk(struct mddev *mddev, dev_t dev)
- 		goto kick_rdev;
- 
- 	clear_bit(Blocked, &rdev->flags);
--	remove_and_add_spares(mddev, rdev);
-+	remove_and_add_spares(mddev, rdev, NULL);
- 
- 	if (rdev->raid_disk >= 0)
- 		goto busy;
-@@ -10167,8 +10202,8 @@ static int remove_spares(struct mddev *mddev, struct md_rdev *this)
- 	return removed;
+ static ssize_t
+@@ -3079,7 +3085,8 @@ state_show(struct md_rdev *rdev, char *page)
  }
  
--static int remove_and_add_spares(struct mddev *mddev,
--				 struct md_rdev *this)
-+static int remove_and_add_spares(struct mddev *mddev, struct md_rdev *this,
-+				 struct queue_limits *lim)
+ static ssize_t
+-state_store(struct md_rdev *rdev, const char *buf, size_t len)
++state_store(struct md_rdev *rdev, const char *buf, size_t len,
++	    struct queue_limits *lim)
  {
- 	struct md_rdev *rdev;
- 	int spares = 0;
-@@ -10191,7 +10226,7 @@ static int remove_and_add_spares(struct mddev *mddev,
- 			continue;
- 		if (!test_bit(Journal, &rdev->flags))
- 			rdev->recovery_offset = 0;
--		if (mddev->pers->hot_add_disk(mddev, rdev) == 0) {
-+		if (mddev->pers->hot_add_disk(mddev, rdev, lim) == 0) {
- 			/* failure here is OK */
- 			sysfs_link_rdev(mddev, rdev);
- 			if (!test_bit(Journal, &rdev->flags))
-@@ -10206,7 +10241,8 @@ static int remove_and_add_spares(struct mddev *mddev,
- 	return spares;
+ 	/* can write
+ 	 *  faulty  - simulates an error
+@@ -3257,7 +3264,8 @@ errors_show(struct md_rdev *rdev, char *page)
  }
  
--static bool md_choose_sync_action(struct mddev *mddev, int *spares)
-+static bool md_choose_sync_action(struct mddev *mddev, int *spares,
-+				  struct queue_limits *lim)
+ static ssize_t
+-errors_store(struct md_rdev *rdev, const char *buf, size_t len)
++errors_store(struct md_rdev *rdev, const char *buf, size_t len,
++	     struct queue_limits *lim)
  {
- 	/* Check if reshape is in progress first. */
- 	if (mddev->reshape_position != MaxSector) {
-@@ -10234,7 +10270,7 @@ static bool md_choose_sync_action(struct mddev *mddev, int *spares)
- 	 * also removed and re-added, to allow the personality to fail the
- 	 * re-add.
- 	 */
--	*spares = remove_and_add_spares(mddev, NULL);
-+	*spares = remove_and_add_spares(mddev, NULL, lim);
- 	if (*spares || test_bit(MD_RECOVERY_LAZY_RECOVER, &mddev->recovery)) {
- 		clear_bit(MD_RECOVERY_SYNC, &mddev->recovery);
- 		clear_bit(MD_RECOVERY_CHECK, &mddev->recovery);
-@@ -10294,11 +10330,11 @@ static void md_start_sync(struct work_struct *ws)
- 		 * As we only add devices that are already in-sync, we can
- 		 * activate the spares immediately.
- 		 */
--		remove_and_add_spares(mddev, NULL);
-+		remove_and_add_spares(mddev, NULL, NULL);
- 		goto not_running;
+ 	unsigned int n;
+ 	int rv;
+@@ -3283,7 +3291,8 @@ slot_show(struct md_rdev *rdev, char *page)
+ }
+ 
+ static ssize_t
+-slot_store(struct md_rdev *rdev, const char *buf, size_t len)
++slot_store(struct md_rdev *rdev, const char *buf, size_t len,
++	   struct queue_limits *lim)
+ {
+ 	int slot;
+ 	int err;
+@@ -3378,7 +3387,8 @@ offset_show(struct md_rdev *rdev, char *page)
+ }
+ 
+ static ssize_t
+-offset_store(struct md_rdev *rdev, const char *buf, size_t len)
++offset_store(struct md_rdev *rdev, const char *buf, size_t len,
++	     struct queue_limits *lim)
+ {
+ 	unsigned long long offset;
+ 	if (kstrtoull(buf, 10, &offset) < 0)
+@@ -3404,7 +3414,8 @@ static ssize_t new_offset_show(struct md_rdev *rdev, char *page)
+ }
+ 
+ static ssize_t new_offset_store(struct md_rdev *rdev,
+-				const char *buf, size_t len)
++				const char *buf, size_t len,
++				struct queue_limits *lim)
+ {
+ 	unsigned long long new_offset;
+ 	struct mddev *mddev = rdev->mddev;
+@@ -3511,7 +3522,8 @@ static int strict_blocks_to_sectors(const char *buf, sector_t *sectors)
+ }
+ 
+ static ssize_t
+-rdev_size_store(struct md_rdev *rdev, const char *buf, size_t len)
++rdev_size_store(struct md_rdev *rdev, const char *buf, size_t len,
++		struct queue_limits *lim)
+ {
+ 	struct mddev *my_mddev = rdev->mddev;
+ 	sector_t oldsectors = rdev->sectors;
+@@ -3573,7 +3585,8 @@ static ssize_t recovery_start_show(struct md_rdev *rdev, char *page)
+ 	return sprintf(page, "%llu\n", recovery_start);
+ }
+ 
+-static ssize_t recovery_start_store(struct md_rdev *rdev, const char *buf, size_t len)
++static ssize_t recovery_start_store(struct md_rdev *rdev, const char *buf, size_t len,
++				    struct queue_limits *lim)
+ {
+ 	unsigned long long recovery_start;
+ 
+@@ -3612,7 +3625,9 @@ static ssize_t bb_show(struct md_rdev *rdev, char *page)
+ {
+ 	return badblocks_show(&rdev->badblocks, page, 0);
+ }
+-static ssize_t bb_store(struct md_rdev *rdev, const char *page, size_t len)
++
++static ssize_t bb_store(struct md_rdev *rdev, const char *page, size_t len,
++			struct queue_limits *lim)
+ {
+ 	int rv = badblocks_store(&rdev->badblocks, page, len, 0);
+ 	/* Maybe that ack was all we needed */
+@@ -3627,7 +3642,9 @@ static ssize_t ubb_show(struct md_rdev *rdev, char *page)
+ {
+ 	return badblocks_show(&rdev->badblocks, page, 1);
+ }
+-static ssize_t ubb_store(struct md_rdev *rdev, const char *page, size_t len)
++
++static ssize_t ubb_store(struct md_rdev *rdev, const char *page, size_t len,
++			 struct queue_limits *lim)
+ {
+ 	return badblocks_store(&rdev->badblocks, page, len, 1);
+ }
+@@ -3641,7 +3658,8 @@ ppl_sector_show(struct md_rdev *rdev, char *page)
+ }
+ 
+ static ssize_t
+-ppl_sector_store(struct md_rdev *rdev, const char *buf, size_t len)
++ppl_sector_store(struct md_rdev *rdev, const char *buf, size_t len,
++		 struct queue_limits *lim)
+ {
+ 	unsigned long long sector;
+ 
+@@ -3680,7 +3698,8 @@ ppl_size_show(struct md_rdev *rdev, char *page)
+ }
+ 
+ static ssize_t
+-ppl_size_store(struct md_rdev *rdev, const char *buf, size_t len)
++ppl_size_store(struct md_rdev *rdev, const char *buf, size_t len,
++	       struct queue_limits *lim)
+ {
+ 	unsigned int size;
+ 
+@@ -3766,7 +3785,7 @@ rdev_attr_store(struct kobject *kobj, struct attribute *attr,
+ 		if (rdev->mddev == NULL)
+ 			rv = -ENODEV;
+ 		else
+-			rv = entry->store(rdev, page, length);
++			rv = entry->store(rdev, page, length, NULL);
+ 		suspend ? mddev_unlock_and_resume(mddev) : mddev_unlock(mddev);
  	}
  
--	if (!md_choose_sync_action(mddev, &spares))
-+	if (!md_choose_sync_action(mddev, &spares, NULL))
- 		goto not_running;
- 
- 	if (!mddev->pers->sync_request)
-@@ -10849,7 +10885,7 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
- 					rdev2->saved_raid_disk = -1;
- 				else
- 					rdev2->saved_raid_disk = role;
--				ret = remove_and_add_spares(mddev, rdev2);
-+				ret = remove_and_add_spares(mddev, rdev2, NULL);
- 				pr_info("Activated spare: %pg\n",
- 					rdev2->bdev);
- 				/* wakeup mddev->thread here, so array could
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index b6d2e8929a0f..39b95951cc17 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -765,7 +765,8 @@ struct md_personality
- 	 * if appropriate, and should abort recovery if needed
- 	 */
- 	void (*error_handler)(struct mddev *mddev, struct md_rdev *rdev);
--	int (*hot_add_disk) (struct mddev *mddev, struct md_rdev *rdev);
-+	int (*hot_add_disk)(struct mddev *mddev, struct md_rdev *rdev,
-+			    struct queue_limits *lim);
- 	int (*hot_remove_disk) (struct mddev *mddev, struct md_rdev *rdev);
- 	int (*spare_active) (struct mddev *mddev);
- 	sector_t (*sync_request)(struct mddev *mddev, sector_t sector_nr,
-@@ -1047,6 +1048,8 @@ int do_md_run(struct mddev *mddev);
- int mddev_stack_rdev_limits(struct mddev *mddev, struct queue_limits *lim,
- 		unsigned int flags);
- int mddev_stack_new_rdev(struct mddev *mddev, struct md_rdev *rdev);
-+int mddev_stack_rdev_into(struct mddev *mddev, struct md_rdev *rdev,
-+			  struct queue_limits *lim);
- void mddev_update_io_opt(struct mddev *mddev, unsigned int nr_stripes);
- 
- extern const struct block_device_operations md_fops;
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index f0646fb24371..dd348b5695d0 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1898,7 +1898,8 @@ static bool raid1_remove_conf(struct r1conf *conf, int disk)
- 	return true;
- }
- 
--static int raid1_add_disk(struct mddev *mddev, struct md_rdev *rdev)
-+static int raid1_add_disk(struct mddev *mddev, struct md_rdev *rdev,
-+			  struct queue_limits *lim)
- {
- 	struct r1conf *conf = mddev->private;
- 	int err = -EEXIST;
-@@ -1923,7 +1924,10 @@ static int raid1_add_disk(struct mddev *mddev, struct md_rdev *rdev)
- 	for (mirror = first; mirror <= last; mirror++) {
- 		p = conf->mirrors + mirror;
- 		if (!p->rdev) {
--			err = mddev_stack_new_rdev(mddev, rdev);
-+			if (lim)
-+				err = mddev_stack_rdev_into(mddev, rdev, lim);
-+			else
-+				err = mddev_stack_new_rdev(mddev, rdev);
- 			if (err)
- 				return err;
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 1093c798d9dd..a5b65f377d04 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -2095,7 +2095,8 @@ static int raid10_spare_active(struct mddev *mddev)
- 	return count;
- }
- 
--static int raid10_add_disk(struct mddev *mddev, struct md_rdev *rdev)
-+static int raid10_add_disk(struct mddev *mddev, struct md_rdev *rdev,
-+			   struct queue_limits *lim)
- {
- 	struct r10conf *conf = mddev->private;
- 	int err = -EEXIST;
-@@ -2130,7 +2131,10 @@ static int raid10_add_disk(struct mddev *mddev, struct md_rdev *rdev)
- 			continue;
- 		}
- 
--		err = mddev_stack_new_rdev(mddev, rdev);
-+		if (lim)
-+			err = mddev_stack_rdev_into(mddev, rdev, lim);
-+		else
-+			err = mddev_stack_new_rdev(mddev, rdev);
- 		if (err)
- 			return err;
- 		p->head_position = 0;
-@@ -2147,7 +2151,10 @@ static int raid10_add_disk(struct mddev *mddev, struct md_rdev *rdev)
- 		clear_bit(In_sync, &rdev->flags);
- 		set_bit(Replacement, &rdev->flags);
- 		rdev->raid_disk = repl_slot;
--		err = mddev_stack_new_rdev(mddev, rdev);
-+		if (lim)
-+			err = mddev_stack_rdev_into(mddev, rdev, lim);
-+		else
-+			err = mddev_stack_new_rdev(mddev, rdev);
- 		if (err)
- 			return err;
- 		conf->fullsync = 1;
-@@ -4484,7 +4491,7 @@ static int raid10_start_reshape(struct mddev *mddev)
- 		rdev_for_each(rdev, mddev)
- 			if (rdev->raid_disk < 0 &&
- 			    !test_bit(Faulty, &rdev->flags)) {
--				if (raid10_add_disk(mddev, rdev) == 0) {
-+				if (raid10_add_disk(mddev, rdev, NULL) == 0) {
- 					if (rdev->raid_disk >=
- 					    conf->prev.raid_disks)
- 						set_bit(In_sync, &rdev->flags);
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index b91545ce090d..0ec555ada64a 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -8441,7 +8441,8 @@ static int raid5_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
- 	return err;
- }
- 
--static int raid5_add_disk(struct mddev *mddev, struct md_rdev *rdev)
-+static int raid5_add_disk(struct mddev *mddev, struct md_rdev *rdev,
-+			  struct queue_limits *lim)
- {
- 	struct r5conf *conf = mddev->private;
- 	int ret, err = -EEXIST;
-@@ -8728,7 +8729,7 @@ static int raid5_start_reshape(struct mddev *mddev)
- 		rdev_for_each(rdev, mddev)
- 			if (rdev->raid_disk < 0 &&
- 			    !test_bit(Faulty, &rdev->flags)) {
--				if (raid5_add_disk(mddev, rdev) == 0) {
-+				if (raid5_add_disk(mddev, rdev, NULL) == 0) {
- 					if (rdev->raid_disk
- 					    >= conf->previous_raid_disks)
- 						set_bit(In_sync, &rdev->flags);
 -- 
 2.43.0
 
