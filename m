@@ -1,545 +1,184 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F984EBAEF
-	for <linux-block@vger.kernel.org>; Mon,  7 Sep 2026 13:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F077F448391;
+	Mon,  7 Sep 2026 13:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788788384; cv=none; b=BZH737oreNU7IQurBJzO31127KCRUjfxQ9ponA7hKd5s7Obfjp4c4u+psrR7bF8SZXLTAQbl/dXo2CTUOvfzbZyfAVxSkbwjioG+Bad4vME9dU8h3lFfM0JAzuzv7dGkt6y546BDN+LS0P5wl15p9oYzOkNxgXUY19tMjcLNzGI=
+	t=1788789536; cv=none; b=c4W41MGjtHK6xfVDxcbm9b7HHuLqGHnrAkd9I24WMRl9mUow7spdxZJYkDu4SM2HyulG7GiUOD0iSY79zlVo5Bp7iEpZARYSbkfaSXyGrkXKJ1ZcNHNZM8hDCDe4bWqp7IzBcQuD7b/pHD9dABscV9JMXp3Z4UjsaqyWNHeed/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788788384; c=relaxed/simple;
-	bh=bA0dugMMcgla+thapureiuTjx5lv/VXzMsLQPVT9V/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dD7xJ257MwhAg0md09/ftpjru9LqOnZy31bdpDTsJ8JN4jn7IZxf/Jed+WGnADdu5fD+ZJoPv8AYiOVARcziJEJAOx//lfDfne29i5b8mwrSpCWynfraaLEXJKWGxv0a7o+QTnFpm78jexu1wdMnTP0FNd4j48swajGyTAAWhvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=QLZj34XH; arc=none smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1788789536; c=relaxed/simple;
+	bh=FoCP7lPoDfHG2GfC2Z1IJE/VE1BgpSCafAaICpL0ILw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rEdgY+w4GQlKSQuobykD1EvA0Ym+FB2JKitBZRjCrJZ9ZJC7+vsMam8jnHW52CcgyZPOMzZKR4gA8I0NoxrU6/dgiEF8zKGflWQ5GRiXflb8HDNXGLMfjwWyJTF2gYX41UEyeAUWVQTIJkT31XtUsVTswTWAvr92iFFONXRR2PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wu3IZRZr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="QLZj34XH"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c252fb14159so49419266b.1
-        for <linux-block@vger.kernel.org>; Mon, 07 Sep 2026 06:39:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1788788380; x=1789393180; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ef7tRt74/32hJPZX/Kbw3PIctGdA0rrNTIV4VwBkDXo=;
-        b=QLZj34XHkfVhvcxdqPna/hCUKStqAia+ba7gLPqkNweiSBiHmgSVwvmWoV/3DTyFM8
-         XWjonxe8bjteqa0MNvVcedNJ5t6g1XqvJ+j8T8JQ9xDNrH4cw79/tMo88Ta4sMUdqqPj
-         s9pUgpBPvsRj7fW1ae/V7g6/Ohvmesg8Lm8A/smxPL69PXA/IMHY6bqDYHAYQnE7NE2t
-         m8YPcJjMPZKAtniEhgbspGMmJFEpHquafQIJqd+S9ogF3NTHZx3R+Y604q9EA3zgJ2CU
-         6ZOzD1LEq1q518K5XGKfNqg4r3ukRXw68jZWGdc+1SGEgiTuIvJussOkmemik87aLWNM
-         IEjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788788380; x=1789393180;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ef7tRt74/32hJPZX/Kbw3PIctGdA0rrNTIV4VwBkDXo=;
-        b=jtgoouUZ0O7kLY4GI0mJPFs8DmB/qo1GzUn4VQ55hfO/xPZkj7vefOh6OVrZG0a1WR
-         2Z0Jg65ag5gyD/WcShrnwjG9qpiIZj6LOpTaSF/+mqqay9LxAiWcTuGuxJmxIiEPD0Qg
-         YG/3iHWNkQo7lvSJfh5J29Y1fx7V2/gcAhcv505UsFuW3Z0gdUYIZB1ln15wsRDM9Eiq
-         h59v0f3fdOGZNAg9hh6ZETNrgUe99DmVMfjC7X7T5uMw/N5Fc6SJoQZjJ2R5VJmc3Ohn
-         NnVwqUbLhpDwFwnNtA+wm0J/47l5afMNw5Ox72gqKyVBA1XaItzOVd7vlJJYbVmiMNmc
-         mvYg==
-X-Forwarded-Encrypted: i=1; AKwUvBz9jOJYauNyEtbKFcXHcer0ewWpwZyz46PCOLJ6cnJu5oN1gspuxFvvo8ThuLj72c1sOtIJyZbAyJe21A==@vger.kernel.org
-X-Gm-Message-State: AFuF++mLPxAmYfBuQ8lbzfGmt3xXLhHG0o0D6OX1BlzlzCeZnw/X8L0T
-	4ct+UhfdJPGxrM1FPwZTGlpG67BJI/jCItymBBUYA/sMf8E9fYKQhXwaELCm1OWA06s=
-X-Gm-Gg: AYBFou2Phnyg6oHTqpbLeurPl8/k/OfQINzvL2CIeNGjDlBoFybJ1pEB/uwP4Q2vhzP
-	Nn97CXuzvYXcUHdjPGHhsjrfAkcwfXYc1z82Dp3WiXjMO/NyjgLP/bUMpfXoaxmi7LwZXBEjEiW
-	i/LK+PehGxq9fSw4GLy+oSzphLNhhoJlzXzRMrk0tsuiuYxQRQ7osaZSurLpBKWC2CjVNEEEPRy
-	koTPd43AyXAPC246e4S5igkpE2Mseu+BTH4HuYJRfFLiWuqIcbdHP1ZKFv4aZnnx3uK9A1Z8a3D
-	lK5CvM1LJXyV5iDhmKmG3Izh5g9QhwdWMo4UFKtb+GVQFLeE7fr5UTiQ7fDI+rHnw6b3rqzhb+x
-	3IvUQ0SQ2y3GiJIspY8XjxgnoHUba+lJzkqqzixIX/yam9rVUHj2dwBn4csaNuuQ0JNLO70ZwOR
-	40KBCd8yE0Tu+E2btgPeEGdTchXGRTIOPRzXeckYyIu8+0B+h1B1tph8uDRLVdXUcFuA0EKKD7e
-	MnyOddy1Qh9LYxKfUBQCCiNRk+cib+djw==
-X-Received: by 2002:a17:906:c115:b0:c25:3ec4:9e43 with SMTP id a640c23a62f3a-c2624d2422emr530526266b.0.1788788379684;
-        Mon, 07 Sep 2026 06:39:39 -0700 (PDT)
-Received: from jwang-ThinkPad-T14-Gen-6.fkb.profitbricks.net ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c262c770678sm314301866b.53.2026.09.07.06.39.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 06:39:39 -0700 (PDT)
-From: Jack Wang <jinpu.wang@ionos.com>
-To: Nilay Shroff <nilay@linux.ibm.com>,
-	abd.masalkhi@gmail.com
-Cc: linux-raid <linux-raid@vger.kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	Song Liu <song@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>,
-	tom.leiming@gmail.com,
-	Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH 6/6] md: take q->limits_lock before locking and suspending the array
-Date: Mon,  7 Sep 2026 15:39:29 +0200
-Message-ID: <20260907133929.1081540-7-jinpu.wang@ionos.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260907133929.1081540-1-jinpu.wang@ionos.com>
-References: <20260907133929.1081540-1-jinpu.wang@ionos.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wu3IZRZr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD7821F00A3A;
+	Mon,  7 Sep 2026 13:58:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788789534;
+	bh=I6HvKokTBWQ5qgUPDm6WwxT5+vJL6f+t/uawYA58zoY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=Wu3IZRZrPimxJw8Xrfy4xfMIQYTFuR01X8avL7jkL6VDDrRR/R5ZOFA2yk6u1qm/w
+	 AKoK2kijj6fYGv5w8z+yajL7wx8MHIt41AhSubYNt4+Zd6KlEXkqZX/mbd8drzk9W4
+	 BhAcsbTdhvbMQ0uxnwA4wAf3wYS7iFq4rFc1zYtkKv1sUwUKX2MnKP8p3a2Kd5g6iU
+	 gI55Yv2wG8TFVCTbExYoWOrB4WMke5xHKiy6gRZJDHOIqxHvyE18ycr3ZJ8xPejC3Y
+	 IggNAEHiJaevSjwpzqvJKs3X3UeTqGP8ry5v4xe4lCj+SE0wSrAqt5ojIe9ehxWWS7
+	 fBME7tR0VAR4g==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Gary Guo <gary@garyguo.net>, Danilo Krummrich <dakr@kernel.org>, Lorenzo
+ Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, "Liam R.
+ Howlett" <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel
+ Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
+ Gross <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>,
+ Lyude Paul
+ <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve
+ =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, Todd Kjos
+ <tkjos@android.com>, Christian
+ Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, "Rafael
+ J.
+ Wysocki" <rafael@kernel.org>, Dave Ertman <david.m.ertman@intel.com>, Leon
+ Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan
+ Kara <jack@suse.cz>, Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar
+ <vireshk@kernel.org>, Nishanth
+ Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>,
+ Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Michal Wilczynski
+ <m.wilczynski@samsung.com>, Ira Weiny <iweiny@kernel.org>, Philipp Stanner
+ <phasta@kernel.org>, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ driver-core@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
+ linux-usb@vger.kernel.org, Asahi Lina <lina+kernel@asahilina.net>
+Subject: Re: [PATCH v20 4/8] rust: page: convert to `Ownable`'
+In-Reply-To: <CAH5fLgjEfZO9DwcUxaKCWd_hFUrXU+cxiwmRg1UnM2pKD6gPvg@mail.gmail.com>
+References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
+ <20260824-unique-ref-v20-4-490735672187@kernel.org>
+ <ao2WubjLtDuHvRzx@google.com> <DL894TFXM5AT.2QOXN683UKXIF@garyguo.net>
+ <CAH5fLggAMfBcxprKJxs4JbieKadC_mKg4B0xNETOH1QUi72UGQ@mail.gmail.com>
+ <8733vlxmm8.fsf@t14s.mail-host-address-is-not-set>
+ <2dpwVpJS3VbfQ7CmE3HeY4IJSSMXTP_O9sSP3HHHUD7Z29RNEG4Hc0m8f94jKWjFlekcTXvIBA-QdGYrf8w1sw==@protonmail.internalid>
+ <CAH5fLgjEfZO9DwcUxaKCWd_hFUrXU+cxiwmRg1UnM2pKD6gPvg@mail.gmail.com>
+Date: Mon, 07 Sep 2026 15:58:35 +0200
+Message-ID: <87zextw4c4.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Jack Wang <jinpu.wang@cloud.ionos.com>
+"Alice Ryhl" <aliceryhl@google.com> writes:
 
-Writing a queue limits attribute while a spare is re-added deadlocks
-the array:
+> On Mon, Sep 7, 2026 at 2:38=E2=80=AFPM Andreas Hindborg <a.hindborg@kerne=
+l.org> wrote:
+>>
+>> Alice Ryhl <aliceryhl@google.com> writes:
+>>
+>> > On Sun, Sep 6, 2026 at 3:02=E2=80=AFPM Gary Guo <gary@garyguo.net> wro=
+te:
+>> >>
+>> >> On Tue Aug 25, 2026 at 2:20 PM BST, Alice Ryhl wrote:
+>> >> > On Mon, Aug 24, 2026 at 01:17:56PM +0200, Andreas Hindborg wrote:
+>> >> >> +        // SAFETY: We just successfully allocated a page, so we n=
+ow have ownership of the newly
+>> >> >> +        // allocated page. We transfer that ownership to the new =
+`Owned<Page>` object.
+>> >> >> +        // Since `Page` is transparent, we can cast the pointer d=
+irectly.
+>> >> >> +        Ok(unsafe { Owned::from_raw(page.cast()) })
+>> >> >
+>> >> > This doesn't satisfy the safety requirements of Owned::from_raw()
+>> >> > because the page may be used with vm_insert_page(), which increment=
+s its
+>> >> > refcount and causes it to be shared the vma system, and this occurs
+>> >> > before Page::release() is called.
+>> >>
+>> >> I suppose the existing vm_insert_page() abstraction we have is already
+>> >> problematic, because it uses `&Page`?
+>> >>
+>> >> Maybe we want to change the API to use `ARef<Page>` so it already has=
+ to be
+>> >> shared? Conceptually it takes a reference count from a `&Page`, which=
+ isn't
+>> >> possible because `Page` is not `AlwaysRefCounted`, so it needs a `&AR=
+ef<Page>`
+>> >> to be able to do that op.
+>> >
+>> > Honestly, the problem is the safety requirements of Owned::from_raw().
+>> > Pages have a "special" main reference, and free_page() does more than
+>> > put_page(). It even does something when the refcount does not hit
+>> > zero.
+>> >
+>> > The correct behavior for Page is to allow the user to hold one
+>> > Owned<Page> whose drop calls free_page(), *plus* any number of
+>> > ARef<Page> references that invoke put_page() on drop. This way, the
+>> > owned page controls the special drop codepath.
+>>
+>> This does not mesh well with the model of `Owned` behaving like
+>> `UniqueArc` to `ARef` behaving like an `Arc`.
+>
+> It's a different case, I agree.
+>
+>> Please help me understand; with page having a main ref and an auxiliary
+>> refcount, if we model that with a single `Owned<Page>` and a number of
+>> `ARef<Page>`, what would happen in the case where the main ref (`Owned`)
+>> is dropped first? Is this legal?
+>
+> Yes, it's legal.
+>
+>> My intuition here would be to follow Garry's suggestion and have
+>> `vm_insert_page` take an `ARef<Page>`. Can you elaborate why this is not
+>> an option?
+>
+> That would be the wrong ownership semantics. The C side increments the
+> refcount rather than take ownership of a passed-in refcount, so the
+> correct argument type is &Page.
 
-  udev-worker    queue_attr_store() holds q->limits_lock, waits in
-                 blk_mq_freeze_queue() for q_usage_counter to drain
-  fio            holds a q_usage_counter reference, parked in
-                 md_handle_request()'s is_suspended() loop
-  mdadm          suspended the array, waits for reconfig_mutex
-  md_start_sync  holds reconfig_mutex, waits for q->limits_lock
+Or `&ARef<Page>`? Because with `Page` being `Ownable` it would not be
+OK to increment the refcount from just a `&Page`.
 
-Blocking on q->limits_lock while holding reconfig_mutex, or with the
-array suspended, is waiting for normal I/O, which mddev_suspend()
-already warns about:
+> Now, for the use-case in Binder I believe we could switch to
+> put_page(), as we don't need the extra stuff from free_page(), in
+> which case we only want ARef<Page> and do not require Owned support.
+> But as long as we are calling free_page(), it needs to not be
+> clonable.
 
-	 * hold reconfig_mutex to wait for normal io will deadlock, because
-	 * other context can't update super_block, and normal io can rely on
-	 * updating super_block.
-	lockdep_assert_not_held(&mddev->reconfig_mutex);
+You are calling `__free_page` directly in binder? I could not find this
+with grep except in the C binder. Is this code you are calling into from
+Rust binder?
 
-The lock's holder waits for the queue to drain, and that I/O can be
-parked on mddev->suspended, which another task holds while waiting for
-reconfig_mutex.  So q->limits_lock has to nest outside both.
+From `__free_pages()` kernel-doc (`mm/page_alloc.c`):
 
-Take the update before the array is locked and suspended, and pass it
-down so the personality stacks into it:
+> If the last reference to this page is speculative, it will be
+> released by put_page() which only frees the first page of a
+> non-compound allocation. [...] **If you want to use the page's
+> reference count to decide when to free the allocation, you should
+> allocate a compound page, and use put_page() instead of
+> __free_pages().**
 
-  - md_start_sync(), at both suspend points
-  - md_ioctl() for ADD_NEW_DISK and HOT_REMOVE_DISK
-  - rdev_attr_store(), for slot and for state "remove"/"re-add"
-  - raid5 skip_copy_store(), which took the lock while suspended
+I guess this is what you are referring to? We could change `Page` to
+this style as well and all would be fine I think?
 
-They are converted together because a mix of the two orders is an ABBA.
-All of them commit while the array is still quiesced.
+At any rate, today I learned about Pfn walkers, compaction,
+memory-failure, etc. that take transient refcounts
+pages. With that in mind we need to reformulate the invariant of
+`Ownable` to exclude optimistic transient references.
 
-Two callers still take the lock inside reconfig_mutex, both with the
-array suspended: ->start_reshape() from action_store(), which suspends
-before flushing sync_work so the update cannot be held across it, and
-raid*_run() -> queue_limits_set() from level_store(), which already
-hangs on its own because it freezes the queue while suspended.
+Best regards,
+Andreas Hindborg
 
-Verified with a raid1 of two ram devices, fio in flight and a loop
-writing queue/max_sectors_kb: 20 fail/remove/add cycles complete, where
-the same test wedges the array before the change.  A reshape and a level
-change are not covered by it.
-
-Fixes: c99f66e4084a ("block: fix queue freeze vs limits lock order in sysfs store methods")
-Assisted-by: Claude:claude-opus-5
-Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
----
- drivers/md/md-autodetect.c |   2 +-
- drivers/md/md.c            | 116 +++++++++++++++++++++++++++++++------
- drivers/md/md.h            |   3 +-
- drivers/md/raid5.c         |  31 +++++++---
- 4 files changed, 124 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/md/md-autodetect.c b/drivers/md/md-autodetect.c
-index 4b80165afd23..929513109657 100644
---- a/drivers/md/md-autodetect.c
-+++ b/drivers/md/md-autodetect.c
-@@ -213,7 +213,7 @@ static void __init md_setup_drive(struct md_setup_args *args)
- 				(1 << MD_DISK_ACTIVE) | (1 << MD_DISK_SYNC);
- 		}
- 
--		md_add_new_disk(mddev, &dinfo);
-+		md_add_new_disk(mddev, &dinfo, NULL);
- 	}
- 
- 	if (!err)
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 6af11a74db57..c4054d06d107 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2981,7 +2981,7 @@ void md_update_sb(struct mddev *mddev, int force_change)
- }
- EXPORT_SYMBOL(md_update_sb);
- 
--static int add_bound_rdev(struct md_rdev *rdev)
-+static int add_bound_rdev(struct md_rdev *rdev, struct queue_limits *lim)
- {
- 	struct mddev *mddev = rdev->mddev;
- 	int err = 0;
-@@ -2994,7 +2994,7 @@ static int add_bound_rdev(struct md_rdev *rdev)
- 		 */
- 		super_types[mddev->major_version].
- 			validate_super(mddev, NULL/*freshest*/, rdev);
--		err = mddev->pers->hot_add_disk(mddev, rdev, NULL);
-+		err = mddev->pers->hot_add_disk(mddev, rdev, lim);
- 		if (err) {
- 			md_kick_rdev_from_array(rdev);
- 			return err;
-@@ -3117,7 +3117,7 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len,
- 	} else if (cmd_match(buf, "remove")) {
- 		if (rdev->mddev->pers) {
- 			clear_bit(Blocked, &rdev->flags);
--			remove_and_add_spares(rdev->mddev, rdev, NULL);
-+			remove_and_add_spares(rdev->mddev, rdev, lim);
- 		}
- 		if (rdev->raid_disk >= 0)
- 			err = -EBUSY;
-@@ -3236,7 +3236,7 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len,
- 			if (!mddev_is_clustered(rdev->mddev) ||
- 			    (err = mddev->cluster_ops->gather_bitmaps(rdev)) == 0) {
- 				clear_bit(Faulty, &rdev->flags);
--				err = add_bound_rdev(rdev);
-+				err = add_bound_rdev(rdev, lim);
- 			}
- 		} else
- 			err = -EBUSY;
-@@ -3323,7 +3323,7 @@ slot_store(struct md_rdev *rdev, const char *buf, size_t len,
- 		if (rdev->mddev->pers->hot_remove_disk == NULL)
- 			return -EINVAL;
- 		clear_bit(Blocked, &rdev->flags);
--		remove_and_add_spares(rdev->mddev, rdev, NULL);
-+		remove_and_add_spares(rdev->mddev, rdev, lim);
- 		if (rdev->raid_disk >= 0)
- 			return -EBUSY;
- 		set_bit(MD_RECOVERY_NEEDED, &rdev->mddev->recovery);
-@@ -3354,7 +3354,7 @@ slot_store(struct md_rdev *rdev, const char *buf, size_t len,
- 		clear_bit(In_sync, &rdev->flags);
- 		clear_bit(Bitmap_sync, &rdev->flags);
- 		err = rdev->mddev->pers->hot_add_disk(rdev->mddev, rdev,
--						     NULL);
-+						     lim);
- 		if (err) {
- 			rdev->raid_disk = -1;
- 			return err;
-@@ -3760,6 +3760,9 @@ rdev_attr_store(struct kobject *kobj, struct attribute *attr,
- 	struct rdev_sysfs_entry *entry = container_of(attr, struct rdev_sysfs_entry, attr);
- 	struct md_rdev *rdev = container_of(kobj, struct md_rdev, kobj);
- 	struct kernfs_node *kn = NULL;
-+	struct request_queue *q = NULL;
-+	struct queue_limits lim;
-+	struct queue_limits *limp = NULL;
- 	bool suspend = false;
- 	ssize_t rv;
- 	struct mddev *mddev = READ_ONCE(rdev->mddev);
-@@ -3780,15 +3783,37 @@ rdev_attr_store(struct kobject *kobj, struct attribute *attr,
- 			suspend = true;
- 	}
- 
-+	/*
-+	 * These can add a leg back, which stacks its limits; the other
-+	 * state_store() values never reach ->hot_add_disk().  q->limits_lock
-+	 * nests outside the lock and the suspend, see md_start_sync().
-+	 */
-+	if ((entry->store == slot_store ||
-+	     (entry->store == state_store &&
-+	      (cmd_match(page, "remove") || cmd_match(page, "re-add")))) &&
-+	    !mddev_is_dm(mddev)) {
-+		q = mddev->gendisk->queue;
-+		lim = queue_limits_start_update(q);
-+		limp = &lim;
-+	}
-+
- 	rv = suspend ? mddev_suspend_and_lock(mddev) : mddev_lock(mddev);
- 	if (!rv) {
- 		if (rdev->mddev == NULL)
- 			rv = -ENODEV;
- 		else
--			rv = entry->store(rdev, page, length, NULL);
-+			rv = entry->store(rdev, page, length, limp);
-+		/* apply the limits before the array takes I/O again */
-+		if (limp) {
-+			queue_limits_commit_update(q, limp);
-+			limp = NULL;
-+		}
- 		suspend ? mddev_unlock_and_resume(mddev) : mddev_unlock(mddev);
- 	}
- 
-+	if (limp)
-+		queue_limits_commit_update(q, limp);
-+
- 	if (kn)
- 		sysfs_unbreak_active_protection(kn);
- 
-@@ -7575,7 +7600,8 @@ static int get_disk_info(struct mddev *mddev, void __user * arg)
- 	return 0;
- }
- 
--int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info)
-+int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
-+		    struct queue_limits *lim)
- {
- 	struct md_rdev *rdev;
- 	dev_t dev = MKDEV(info->major,info->minor);
-@@ -7723,11 +7749,11 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info)
- 				if (err)
- 					mddev->cluster_ops->add_new_disk_cancel(mddev);
- 				else
--					err = add_bound_rdev(rdev);
-+					err = add_bound_rdev(rdev, lim);
- 			}
- 
- 		} else if (!err)
--			err = add_bound_rdev(rdev);
-+			err = add_bound_rdev(rdev, lim);
- 
- 		return err;
- 	}
-@@ -7780,7 +7806,8 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info)
- 	return 0;
- }
- 
--static int hot_remove_disk(struct mddev *mddev, dev_t dev)
-+static int hot_remove_disk(struct mddev *mddev, dev_t dev,
-+			   struct queue_limits *lim)
- {
- 	struct md_rdev *rdev;
- 
-@@ -7795,7 +7822,7 @@ static int hot_remove_disk(struct mddev *mddev, dev_t dev)
- 		goto kick_rdev;
- 
- 	clear_bit(Blocked, &rdev->flags);
--	remove_and_add_spares(mddev, rdev, NULL);
-+	remove_and_add_spares(mddev, rdev, lim);
- 
- 	if (rdev->raid_disk >= 0)
- 		goto busy;
-@@ -8380,6 +8407,22 @@ static inline int md_ioctl_valid(unsigned int cmd)
- 	}
- }
- 
-+/*
-+ * Commands that can reach ->hot_add_disk().  ADD_NEW_DISK only does so for a
-+ * journal device or a personality without ->hot_remove_disk, but that depends
-+ * on disk info still in user memory here, so it is included as a whole.
-+ */
-+static bool md_ioctl_may_add_disk(unsigned int cmd)
-+{
-+	switch (cmd) {
-+	case ADD_NEW_DISK:
-+	case HOT_REMOVE_DISK:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- static bool md_ioctl_need_suspend(unsigned int cmd)
- {
- 	switch (cmd) {
-@@ -8435,6 +8478,9 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	unsigned int noio_flags = 0;
- 	void __user *argp = (void __user *)arg;
- 	struct mddev *mddev = NULL;
-+	struct request_queue *q = NULL;
-+	struct queue_limits lim;
-+	struct queue_limits *limp = NULL;
- 	bool suspend;
- 
- 	err = md_ioctl_valid(cmd);
-@@ -8485,11 +8531,20 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	if (!md_is_rdwr(mddev))
- 		flush_work(&mddev->sync_work);
- 
-+	/* q->limits_lock nests outside both, see md_start_sync() */
-+	if (md_ioctl_may_add_disk(cmd) && !mddev_is_dm(mddev)) {
-+		q = mddev->gendisk->queue;
-+		lim = queue_limits_start_update(q);
-+		limp = &lim;
-+	}
-+
- 	suspend = md_ioctl_need_suspend(cmd);
- 	err = suspend ? mddev_suspend_and_lock(mddev) : mddev_lock(mddev);
- 	if (err) {
- 		pr_debug("md: ioctl lock interrupted, reason %d, cmd %d\n",
- 			 err, cmd);
-+		if (limp)
-+			queue_limits_cancel_update(q);
- 		goto out;
- 	}
- 	if (suspend)
-@@ -8531,7 +8586,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		goto unlock;
- 
- 	case HOT_REMOVE_DISK:
--		err = hot_remove_disk(mddev, new_decode_dev(arg));
-+		err = hot_remove_disk(mddev, new_decode_dev(arg), limp);
- 		goto unlock;
- 
- 	case ADD_NEW_DISK:
-@@ -8547,7 +8602,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 				/* Need to clear read-only for this */
- 				break;
- 			else
--				err = md_add_new_disk(mddev, &info);
-+				err = md_add_new_disk(mddev, &info, limp);
- 			goto unlock;
- 		}
- 		break;
-@@ -8585,7 +8640,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		if (copy_from_user(&info, argp, sizeof(info)))
- 			err = -EFAULT;
- 		else
--			err = md_add_new_disk(mddev, &info);
-+			err = md_add_new_disk(mddev, &info, limp);
- 		goto unlock;
- 	}
- 
-@@ -8618,6 +8673,9 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	    err != -EINVAL)
- 		mddev->hold_active = 0;
- 
-+	if (limp)
-+		queue_limits_commit_update(q, limp);
-+
- 	if (suspend) {
- 		memalloc_noio_restore(noio_flags);
- 		mddev_unlock_and_resume(mddev);
-@@ -10346,6 +10404,9 @@ static bool md_choose_sync_action(struct mddev *mddev, int *spares,
- static void md_start_sync(struct work_struct *ws)
- {
- 	struct mddev *mddev = container_of(ws, struct mddev, sync_work);
-+	struct request_queue *q = NULL;
-+	struct queue_limits lim;
-+	struct queue_limits *limp = NULL;
- 	int spares = 0;
- 	bool suspend = false;
- 	unsigned int noio_flags = 0;
-@@ -10357,6 +10418,17 @@ static void md_start_sync(struct work_struct *ws)
- 	 */
- 	if ((mddev->reshape_position == MaxSector || !md_is_rdwr(mddev)) &&
- 	    md_spares_need_change(mddev)) {
-+		/*
-+		 * Adding a spare below stacks its limits, which needs
-+		 * q->limits_lock.  Take it before suspending: its holder
-+		 * waits in blk_mq_freeze_queue() for I/O that
-+		 * mddev->suspended holds back, so the other order deadlocks.
-+		 */
-+		if (!mddev_is_dm(mddev)) {
-+			q = mddev->gendisk->queue;
-+			lim = queue_limits_start_update(q);
-+			limp = &lim;
-+		}
- 		suspend = true;
- 		mddev_suspend(mddev, false);
- 		noio_flags = memalloc_noio_save();
-@@ -10371,6 +10443,12 @@ static void md_start_sync(struct work_struct *ws)
- 	if (!suspend && (mddev->reshape_position == MaxSector || !md_is_rdwr(mddev)) &&
- 	    md_spares_need_change(mddev)) {
- 		mddev_unlock(mddev);
-+		/* see above: q->limits_lock nests outside both */
-+		if (!mddev_is_dm(mddev)) {
-+			q = mddev->gendisk->queue;
-+			lim = queue_limits_start_update(q);
-+			limp = &lim;
-+		}
- 		mddev_suspend_and_lock_nointr(mddev);
- 		suspend = true;
- 		noio_flags = memalloc_noio_save();
-@@ -10384,11 +10462,11 @@ static void md_start_sync(struct work_struct *ws)
- 		 * As we only add devices that are already in-sync, we can
- 		 * activate the spares immediately.
- 		 */
--		remove_and_add_spares(mddev, NULL, NULL);
-+		remove_and_add_spares(mddev, NULL, limp);
- 		goto not_running;
- 	}
- 
--	if (!md_choose_sync_action(mddev, &spares, NULL))
-+	if (!md_choose_sync_action(mddev, &spares, limp))
- 		goto not_running;
- 
- 	if (!mddev->pers->sync_request)
-@@ -10419,6 +10497,8 @@ static void md_start_sync(struct work_struct *ws)
- 	 *     https://bugzilla.kernel.org/show_bug.cgi?id=218200
- 	 * Therefore, use __mddev_resume(mddev, false).
- 	 */
-+	if (limp)
-+		queue_limits_commit_update(q, limp);
- 	if (suspend) {
- 		memalloc_noio_restore(noio_flags);
- 		__mddev_resume(mddev, false);
-@@ -10441,6 +10521,8 @@ static void md_start_sync(struct work_struct *ws)
- 	 *     https://bugzilla.kernel.org/show_bug.cgi?id=218200
- 	 * Therefore, use __mddev_resume(mddev, false).
- 	 */
-+	if (limp)
-+		queue_limits_commit_update(q, limp);
- 	if (suspend) {
- 		memalloc_noio_restore(noio_flags);
- 		__mddev_resume(mddev, false);
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 9e3bd5ab5519..ceca8cfcdcb9 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -1042,7 +1042,8 @@ struct mdu_disk_info_s;
- extern int mdp_major;
- void md_autostart_arrays(int part);
- int md_set_array_info(struct mddev *mddev, struct mdu_array_info_s *info);
--int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info);
-+int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
-+		    struct queue_limits *lim);
- int do_md_run(struct mddev *mddev);
- #define MDDEV_STACK_INTEGRITY	(1u << 0)
- int mddev_stack_rdev_limits(struct mddev *mddev, struct queue_limits *lim,
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 3faa2a94c03b..22759c631c4d 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7288,6 +7288,9 @@ static ssize_t
- raid5_store_skip_copy(struct mddev *mddev, const char *page, size_t len)
- {
- 	struct r5conf *conf;
-+	struct request_queue *q = NULL;
-+	struct queue_limits lim;
-+	struct queue_limits *limp = NULL;
- 	unsigned long new;
- 	int err;
- 
-@@ -7297,23 +7300,33 @@ raid5_store_skip_copy(struct mddev *mddev, const char *page, size_t len)
- 		return -EINVAL;
- 	new = !!new;
- 
-+	/* q->limits_lock nests outside both, see md_start_sync() */
-+	if (!mddev_is_dm(mddev)) {
-+		q = mddev->gendisk->queue;
-+		lim = queue_limits_start_update(q);
-+		limp = &lim;
-+	}
-+
- 	err = mddev_suspend_and_lock(mddev);
--	if (err)
-+	if (err) {
-+		if (limp)
-+			queue_limits_cancel_update(q);
- 		return err;
-+	}
- 	conf = mddev->private;
- 	if (!conf)
- 		err = -ENODEV;
- 	else if (new != conf->skip_copy) {
--		struct request_queue *q = mddev->gendisk->queue;
--		struct queue_limits lim = queue_limits_start_update(q);
--
- 		conf->skip_copy = new;
--		if (new)
--			lim.features |= BLK_FEAT_STABLE_WRITES;
--		else
--			lim.features &= ~BLK_FEAT_STABLE_WRITES;
--		err = queue_limits_commit_update(q, &lim);
-+		if (limp) {
-+			if (new)
-+				limp->features |= BLK_FEAT_STABLE_WRITES;
-+			else
-+				limp->features &= ~BLK_FEAT_STABLE_WRITES;
-+		}
- 	}
-+	if (limp)
-+		err = queue_limits_commit_update(q, limp) ?: err;
- 	mddev_unlock_and_resume(mddev);
- 	return err ?: len;
- }
--- 
-2.43.0
 
