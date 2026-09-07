@@ -1,141 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCCD48C8CD
-	for <linux-block@vger.kernel.org>; Mon,  7 Sep 2026 12:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F87A4A6CEF;
+	Mon,  7 Sep 2026 12:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788783705; cv=none; b=mbMtThmXivqcc/IUS9Aoh5+s2/Zz92XjoR07osi/74yK0mxgM8jzcigymkmPlkQsrUldR6k7IF6xj1w68+EZC1cbvg7igDkds4Gyg5wqpQXRojCK520p8qWWDcgco7ln9SdIHjXXvY0EUe1SyQOtuWsf3wk1TAKuqAiTV2D9iBM=
+	t=1788784723; cv=none; b=oh2VzjaZxRBFdy1l2ZOWmh5tuDNLhseHWWj2i6s5fkuWEPLxvzDv1cIZUHOdM+r3kMhevYPKZnhZ5Ilnf+LYACd6gEgoZopw4jkwTFeOfhO/QiZzP6V2XDENEyLHgulreNgwMfWlOODWpv1HUMXotdg6Ekh8skA8CYvRIGkNlr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788783705; c=relaxed/simple;
-	bh=ys2RtTT2/y0lbuNZYqACtv7UnbI3tPaFnvr/VFM4wIU=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=uxYm8PCl5XFuf+wv9iT8U5uI2w525EWGHuB6GPXyOEe768sc33FvAFr4Z3M2puEXYvLE7xPgHahzu9T7zkLz7s0IaHjPp7QwVsO9ckM2O7DVpLz4qUFsfCWweyjcEw1jwu0YjsAms7JKYq9B2jwcOVN7CMvrIxszUKhpXHZvKMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IWQOWOBv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788784723; c=relaxed/simple;
+	bh=2KKsXLABCVBrGrYgB3/AEs1QcF1OetznXpcnRKacGxY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=n9jcIcwgJb/ykqLdo9q1TSuWJArzDKdySvdsh5GeE7qJNm0bbZrcn8di8r1Zhy/9YxmVzfss/vh/K4fiATZjEDlOzXU9F4VYuJUSjJmPfIMV75g56jnfY/NnfOVlG6PZIsfJ7OU/JXlyyy8qttgyJBn2tFE3nchQDEmRdlmAfBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRYVCxLY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IWQOWOBv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788783703;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=v7/OknVUZyUNnRD+W4UfJIkatN/gArs6AZm+/kFGYCc=;
-	b=IWQOWOBvZhajz2OYUZWNP+RQ0P1zb1Wmn5LitourV83Cc4VOGyxbD8ajihqAnwnh2VTPa1
-	UpJQm9VCcQCw4JEKPVVDl6zoqK+kFLQ/5sYoXhI/FlzE2AFP9Bjje9SL+OgDtxjdJwmogv
-	ofSdItMEoGgxE47/3n9LZJs/a3SVRFA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-480-hSxBCpqxN1K3cjr3LmQsPA-1; Mon,
- 07 Sep 2026 08:21:41 -0400
-X-MC-Unique: hSxBCpqxN1K3cjr3LmQsPA-1
-X-Mimecast-MFC-AGG-ID: hSxBCpqxN1K3cjr3LmQsPA_1788783700
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 97FFE180AE2D;
-	Mon,  7 Sep 2026 12:21:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.158])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E664830002F0;
-	Mon,  7 Sep 2026 12:21:35 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: dhowells@redhat.com, Keith Busch <kbusch@kernel.org>,
-    Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
-    Alexander Viro <viro@zeniv.linux.org.uk>,
-    Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev,
-    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH v3] block: Fix start and length check added to iov_iter_extract_bvecs()
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kRYVCxLY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 804011F00A3A;
+	Mon,  7 Sep 2026 12:38:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788784722;
+	bh=KD+2zcpvmkcDZ3cJuCNDIPkcI/BtMjbq/CkWlis/PbU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=kRYVCxLY0/vTJ+fbmiuidiZQ+nIGH/QQuK/Qi8lQ02VhxlPUZ0WJUQjPMPR57SbcW
+	 q9ArkX+lA0h0qlH46NRcal31nv+ecnkEemNBrVHbmQ1h71tj5VST7+zO0x6YXSzB3i
+	 cPQW6OnsBJ7tUaclciTTf0zGW4oR1lCVNyUm6YsyUC9aGtgib7AnMYkJNGu41k6wdO
+	 /F3gYxxJ0BBinS+JZ2un9pBUwwbDdmNSaUG9m9bFQvkpJN3EFGFST8Mmq0yV6ViYwW
+	 7xvSkClBpumHKJBZnZ2b9YGNbICmSo0MxgutXJ3cXXgZrZrwS7637pq/UkkfPReY2B
+	 x5Ldt7pD8EE7Q==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>, Gary Guo <gary@garyguo.net>
+Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
+ Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett"
+ <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda
+ <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor Gross
+ <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>, Tamir
+ Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>,
+ Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>, Lyude Paul
+ <lyude@redhat.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXY=?=
+ =?utf-8?B?w6Vn?=
+ <arve@android.com>, Todd Kjos <tkjos@android.com>, Christian Brauner
+ <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Dave Ertman <david.m.ertman@intel.com>, Leon
+ Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan
+ Kara <jack@suse.cz>, Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar
+ <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen Boyd
+ <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Krzysztof
+ =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Pavel Tikhomirov
+ <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>,
+ Ira Weiny <iweiny@kernel.org>, Philipp Stanner <phasta@kernel.org>,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, driver-core@lists.linux.dev,
+ linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org, Asahi Lina
+ <lina+kernel@asahilina.net>
+Subject: Re: [PATCH v20 4/8] rust: page: convert to `Ownable`'
+In-Reply-To: <CAH5fLggAMfBcxprKJxs4JbieKadC_mKg4B0xNETOH1QUi72UGQ@mail.gmail.com>
+References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
+ <20260824-unique-ref-v20-4-490735672187@kernel.org>
+ <ao2WubjLtDuHvRzx@google.com> <DL894TFXM5AT.2QOXN683UKXIF@garyguo.net>
+ <CAH5fLggAMfBcxprKJxs4JbieKadC_mKg4B0xNETOH1QUi72UGQ@mail.gmail.com>
+Date: Mon, 07 Sep 2026 14:38:23 +0200
+Message-ID: <8733vlxmm8.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1456601.1788783694.1@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Sep 2026 13:21:34 +0100
-Message-ID: <1456602.1788783694@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-    =
+Alice Ryhl <aliceryhl@google.com> writes:
 
-Commit 14b007e17881 added an address check using iter_iov_addr() and a
-length check using iter_iov_len() to iov_iter_extract_bvecs(), but these
-cannot be used so and are unsafe in this circumstance as the functions hav=
-e
-hardwired assumptions about the iterator type.  They should only be used
-with ITER_UBUF or ITER_IOVEC-type iterators; they shouldn't be used with
-ITER_BVEC, ITER_KVEC, ITER_FOLIOQ, ITER_XARRAY or ITER_DISCARD iterators.
+> On Sun, Sep 6, 2026 at 3:02=E2=80=AFPM Gary Guo <gary@garyguo.net> wrote:
+>>
+>> On Tue Aug 25, 2026 at 2:20 PM BST, Alice Ryhl wrote:
+>> > On Mon, Aug 24, 2026 at 01:17:56PM +0200, Andreas Hindborg wrote:
+>> >> +        // SAFETY: We just successfully allocated a page, so we now =
+have ownership of the newly
+>> >> +        // allocated page. We transfer that ownership to the new `Ow=
+ned<Page>` object.
+>> >> +        // Since `Page` is transparent, we can cast the pointer dire=
+ctly.
+>> >> +        Ok(unsafe { Owned::from_raw(page.cast()) })
+>> >
+>> > This doesn't satisfy the safety requirements of Owned::from_raw()
+>> > because the page may be used with vm_insert_page(), which increments i=
+ts
+>> > refcount and causes it to be shared the vma system, and this occurs
+>> > before Page::release() is called.
+>>
+>> I suppose the existing vm_insert_page() abstraction we have is already
+>> problematic, because it uses `&Page`?
+>>
+>> Maybe we want to change the API to use `ARef<Page>` so it already has to=
+ be
+>> shared? Conceptually it takes a reference count from a `&Page`, which is=
+n't
+>> possible because `Page` is not `AlwaysRefCounted`, so it needs a `&ARef<=
+Page>`
+>> to be able to do that op.
+>
+> Honestly, the problem is the safety requirements of Owned::from_raw().
+> Pages have a "special" main reference, and free_page() does more than
+> put_page(). It even does something when the refcount does not hit
+> zero.
+>
+> The correct behavior for Page is to allow the user to hold one
+> Owned<Page> whose drop calls free_page(), *plus* any number of
+> ARef<Page> references that invoke put_page() on drop. This way, the
+> owned page controls the special drop codepath.
 
-This proves to be a problem for cachefiles as an iterator of type
-ITER_FOLIOQ is passed and iter_iov_addr() and iter_iov_len() both
-malfunction because iter->__iov in iter_iov() is not pointing to an iovec
-array.
+This does not mesh well with the model of `Owned` behaving like
+`UniqueArc` to `ARef` behaving like an `Arc`.
 
-Fix this by using iov_iter_alignment() instead.
+Please help me understand; with page having a main ref and an auxiliary
+refcount, if we model that with a single `Owned<Page>` and a number of
+`ARef<Page>`, what would happen in the case where the main ref (`Owned`)
+is dropped first? Is this legal?
 
-Fixes: 14b007e17881 ("block: validate user space vectors during extraction=
-")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-cc: Hannes Reinecke <hare@kernel.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Alexander Viro <viro@zeniv.linux.org.uk>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: netfs@lists.linux.dev
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- lib/iov_iter.c |   18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+My intuition here would be to follow Garry's suggestion and have
+`vm_insert_page` take an `ARef<Page>`. Can you elaborate why this is not
+an option?
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 6665372ecf71..5e9f9e2c30b1 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1921,15 +1921,29 @@ ssize_t iov_iter_extract_bvecs(struct iov_iter *it=
-er, struct bio_vec *bv,
- 		unsigned short max_vecs, unsigned mem_align_mask,
- 		iov_iter_extraction_t extraction_flags)
- {
--	unsigned long start =3D (unsigned long)iter_iov_addr(iter);
- 	unsigned short entries_left =3D max_vecs - *nr_vecs;
- 	unsigned short nr_pages, i =3D 0;
- 	size_t left, offset, len;
- 	struct page **pages;
- 	ssize_t size;
- =
 
--	if ((start | iter_iov_len(iter)) & mem_align_mask)
-+	/*
-+	 * DMA engines typically have both memory address and length alignment
-+	 * requirements, so check these against the alignment mask.  For UBUF,
-+	 * IOVEC and KVEC, only the current segment will be drawn from; for
-+	 * everything else we might draw from multiple segments, so we need to
-+	 * check those too.
-+	 */
-+	if (likely(iter_is_ubuf(iter) ||
-+		   iter_is_iovec(iter) ||
-+		   iov_iter_is_kvec(iter))) {
-+		unsigned long start =3D (unsigned long)iter_iov_addr(iter);
-+
-+		if ((start | iter_iov_len(iter)) & mem_align_mask)
-+			return -EINVAL;
-+	} else if (iov_iter_alignment(iter) & mem_align_mask) {
- 		return -EINVAL;
-+	}
- =
-
- 	/*
- 	 * Move page array up in the allocated memory for the bio vecs as far as
+Best regards,
+Andreas Hindborg
 
