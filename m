@@ -1,294 +1,246 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mta1.migadu.com (out-238.mta1.migadu.com [95.215.58.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB744FC8EE
-	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 09:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788859140; cv=pass; b=PGjGJLjheZgury8HUmwy8U4lcDtm6hwBz9Sfqhbq16MklT0Xs9AW02gmj2iHDq1hSFa1vLr5zWDqpT4bchLzRz0HXWvtpL8q/msolpCu+J2Vrsy/qMnk+zZweM2yO9F4kvYZ9r3AO51Pop4jYcSawuO7aRNznWvB+XxI9l1Xy+k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788859140; c=relaxed/simple;
-	bh=eXO7Dx+pbjhDr44qla+xgyZaF085tCxcRrffYGenIAk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=glZB2Cm1JRPC+7hJWYamI+wxdloaO9+Dc6pxXXUvfXPskceyLwS8VZovBZxrduEro/ZIl1PvDfdWWmnS2qJp3M398svkHcF/wxYBxjEdpTNLnevoSmv+Z26kl90k6CFAt4Jp9iEGj642Cc0iks3Qw7YUn5zho6Wgd3QdMlB67gM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aF2kvHoX; arc=pass smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BBD4CB8BC
+	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 10:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.238
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788861739; cv=none; b=RUKI/pPpIOtcWYx5lmE0X3M9UEPLhwEuvFzS+11NKfXDO5cQWdSnywoAJObHz5XvkeFFeFzZNA/zl+Gd9LzP8uHVAIs++12LmNdJOwxd527rYQhORMkPpjd7pH0JlDaBTZfFcrLek+Ab1hRjQGpU6QOa+OcJU0Z2rdjiv1nfBVU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788861739; c=relaxed/simple;
+	bh=NaZjtoXPlnUMK40knB5HRLM8L7qIzudaPFX6dseAb8A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=thmGMs8SJGGlbuNr98AIMpY7zCdggPdbiYvHJEfJvf+PkE6tPhwH2dURdfeIGbSw1Jt/Z8+6BFQSWhRwvuX48JlVdfG9/qc6w8UH/EX64NNuhGeLggIeAoEvO4bDrkyq1EMlFa9rF50uFBg31M0EsCSYa13YXsM/ezBmDhoNcX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gk9bEeBn; arc=none smtp.client-ip=95.215.58.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aF2kvHoX"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47de0093c42so4215733f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2026 02:18:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788859134; cv=none;
-        d=google.com; s=arc-20260327;
-        b=fzTznDA+G0m+Vq9K6ckfpGJlIJv2GP2ARep3EYKIPgTd+d/o5cK1El6XVXb3hbpdcE
-         i24CxA/JV8LgzOmpqLIuV9tSuQlHa4AjgvqRNBIYqQ7n+wb/N0obmgp1S6W4Q9Ml32bp
-         6O4Sh64IkC0nnKjHmQz+hDNQ+pMcqfqfR0LYDz8Mw0O9wkKbQO49zUS1HX8xhii75bG1
-         G42ZhfQFQvfx6zswCRk4wp3mGTHjVMLuSS9qDlbEwO6Ob7C493rSL7FjjfhrbPyhQydV
-         UyBG4RVxwAQzx1vZM3trB1LzvJLQ957MduV6zIdeLCmYBlTd36FA6E8PhzHG/34hgkMf
-         ckFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=VIgSHXB8I26MCbzgx5LIxLwOOEsEsffKtC5qMFw/5wM=;
-        fh=ln9tkKZZCmFNAZNso9bj6zDLFhFCAcETjURxGeQOjmI=;
-        b=o2SI5UqLegZFoOyfJsamA2WXzGx4fUhrA6Z10cMvmR2CbFgJY+KTYU9VeoS6L9ButU
-         LSdojj8ZPBbQk1njbREgO3N/3bqzZXx7iYUN6vUbaYkpYoQqwCPQv4ENmFpXcZdKrHUX
-         Q5LHqYO3hQz4KnNnz2qDLsUdCxUEI3A29s64N9kuaX++6Brt6L8WHdWd+crg/FXCNpRW
-         18KXV+uQ6KM35mOhLOTxayaTphtY15a8b7DSLH0L431BHkbH1/Ei0y+PUnzhEYxu3N9Z
-         Mykr5mKY0Q9Qo/UQT/OwsTElwcs96DLLoPN0qM4MZ6cnHyl1+IwZSg9+H4gkSn+eo2Ga
-         ZL6g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788859134; x=1789463934; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=VIgSHXB8I26MCbzgx5LIxLwOOEsEsffKtC5qMFw/5wM=;
-        b=aF2kvHoXQnc3y94j3MpvsaBZICi9rb7EgUVMffOdRTqJRP1zI0ZUrzpkHxbK7TKccP
-         URA7NthNEhjbDpvO5E5SfFkXe8lRprntfGsj6nc9Uj0+yhenHtGbPammp2p5QTTPzonM
-         NNXnjqAp3WJwS07aLIioGpVpAn58cCI7zU4VyygV6BZ/hZx4mJ9gQmVOOut0nIWBt2Wb
-         xPcr2pjuNWPhs94sKnzi7SboLd4mcQyEJwLgimh4PhCdgs+NIu36N1d6RQWevSO1lHXY
-         3YOUzr+4enTI/l8GgUzMWZ467P2mHTPQIQA+3WkuXjBaAoWvG8ewZrnjIWRpQ1ssUF0h
-         B94A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788859134; x=1789463934;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VIgSHXB8I26MCbzgx5LIxLwOOEsEsffKtC5qMFw/5wM=;
-        b=mJowxWA3bPE50j6mf4qq4egsH0+gHx5MpylW2JtCgf7RNjM9mczkm1I/9CB3Ec9IPq
-         E1R5LCUbCZ4b/tS2FQc6dx1BMHqfUi/MKrnUWUv3P/30vbezGTVv46fs5rI1pHLY+J7M
-         ktdCpDOp9Hg9/+6xkdDs2Ife0UbBjWo4gZ9oj411/HUiZmamQUOsmWrxJ0qEQtfcLH5m
-         93lAIfO3ArKjycK9b2fltH8cHheMswf7DTuRmwB7AmG5hwtFSamKSE4MiKek+3PSuKWm
-         aXwqfjwAH7wS6BBQa/I1c57Rxfj+XWgQdDtEmyn9ihmy1efAMkGgY9akRUomZZWqcy1O
-         N9Uw==
-X-Forwarded-Encrypted: i=1; AKwUvBzCGrA9xcUJ2KO0Rn+EvIYiXgXBwLuoycN8dB4WCIYv1P04ffytji5EZIVKui0JojmUp39ihCIBnJgCow==@vger.kernel.org
-X-Gm-Message-State: AFuF++muN0uGm5g9JCNb3Xk1FxmGhnStUtDMt8atrruBOQor93PMRtyn
-	sCWxbF2ab1bnf0sAtdd8Vv18skDgK73kEzDngBLh7t+iIbROVV7Erz9r55U9gLBwGMf+a47J5qo
-	MaLn5fatqznKnxR+wR/GkYULZ/nNkpMz09ASgb71K
-X-Gm-Gg: AYBFou0Df7I+p9oOIvSc2MgzJohLRyvzMT/dmwcT0E7Cz1203o3OPpDwFzrqlUNQg5p
-	R8T8a/RjM8VKGUAJbD6nXUza/TLUEte4pFGHfa8uBOarHODm4aC/5G6MDajZZYqs0eim9vngU2q
-	qtYPwzA7GAz9i45Smqr22yr3eIJ91ms+OilR7/vaUR01fFtkRL6rVv2cqF8jLdLyADQJJpogqCZ
-	de+smMhGsvA8xRoXGFAz33alqPotg4bCrp2F9LTjPudQcKEzds/BWqPAmO0DQaDGL7690+BnKPv
-	5H0T/70luRb1gN82REz6yFyomhAIFhPZpdKlrTCEqZzYC126YgKQYtmHm5krNflYuQf7DE/ngJr
-	0RCNGI3bzbne7zW3350ot8B9ijSMcMQ==
-X-Received: by 2002:a05:6000:2584:b0:485:8c16:5efa with SMTP id
- ffacd0b85a97d-4858c16617emr27731999f8f.52.1788859132844; Tue, 08 Sep 2026
- 02:18:52 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gk9bEeBn"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=NaZjtoXPlnUMK40knB5HRLM8L7qIzudaPFX6dseAb8A=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788861733; v=1; x=1789466533;
+ b=Gk9bEeBnGk5s3686roTD611EnN3xpL4p45DUBfbktLzoLxXf8Dtrn3LUsgmhb8hiGw++Dmx4
+ IrfwQ6Te7OwFMlyaVf6PdGHMjttqLfhgUv6aT6zeD470x5aKLUUmLLC5K1ynLGmtvOuBl+gIj1X
+ 8MMHkF8QHZ/bC6uFHh2Zbzrg=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id aba7fee861943fea;
+	Tue, 08 Sep 2026 10:02:03 +0000
+X-Mizu-Trace-ID: aba7fee861943fea
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: tj@kernel.org,
+	josef@toxicopanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	andrii@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	linux-kselftest@vger.kernel.org,
+	cui.tao@linux.dev,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [RFC PATCH 0/8] blk-iocost: BPF struct_ops cost model
+Date: Tue,  8 Sep 2026 18:01:35 +0800
+Message-ID: <20260908100143.47598-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260824-unique-ref-v20-0-490735672187@kernel.org>
- <20260824-unique-ref-v20-4-490735672187@kernel.org> <ao2WubjLtDuHvRzx@google.com>
- <DL894TFXM5AT.2QOXN683UKXIF@garyguo.net> <CAH5fLggAMfBcxprKJxs4JbieKadC_mKg4B0xNETOH1QUi72UGQ@mail.gmail.com>
- <8733vlxmm8.fsf@t14s.mail-host-address-is-not-set> <2dpwVpJS3VbfQ7CmE3HeY4IJSSMXTP_O9sSP3HHHUD7Z29RNEG4Hc0m8f94jKWjFlekcTXvIBA-QdGYrf8w1sw==@protonmail.internalid>
- <CAH5fLgjEfZO9DwcUxaKCWd_hFUrXU+cxiwmRg1UnM2pKD6gPvg@mail.gmail.com>
- <87zextw4c4.fsf@t14s.mail-host-address-is-not-set> <CAH5fLgjYmvp1Ph3dYXnTKkAvWgNpgCAPeq_7PZhRai6pCNmVmw@mail.gmail.com>
- <87qzj4w2nw.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <87qzj4w2nw.fsf@t14s.mail-host-address-is-not-set>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Tue, 8 Sep 2026 11:18:40 +0200
-X-Gm-Features: AcwNN1VPjOtQdlrm_QvCyA8uta8erft96HkhfUzl1dJDcrSqVwPtKidMELQvEqo
-Message-ID: <CAH5fLgjrQDWSPX-81TNdnc=AU3Jge57vUJ_SHCn8=uUyGfRq=g@mail.gmail.com>
-Subject: Re: [PATCH v20 4/8] rust: page: convert to `Ownable`'
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Gary Guo <gary@garyguo.net>, Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, 
-	Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
-	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
-	Ira Weiny <iweiny@kernel.org>, Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, driver-core@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Asahi Lina <lina+kernel@asahilina.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 8, 2026 at 11:00=E2=80=AFAM Andreas Hindborg <a.hindborg@kernel=
-.org> wrote:
->
-> Alice Ryhl <aliceryhl@google.com> writes:
->
-> > On Mon, Sep 7, 2026 at 3:58=E2=80=AFPM Andreas Hindborg <a.hindborg@ker=
-nel.org> wrote:
-> >>
-> >> "Alice Ryhl" <aliceryhl@google.com> writes:
-> >>
-> >> > On Mon, Sep 7, 2026 at 2:38=E2=80=AFPM Andreas Hindborg <a.hindborg@=
-kernel.org> wrote:
-> >> >>
-> >> >> Alice Ryhl <aliceryhl@google.com> writes:
-> >> >>
-> >> >> > On Sun, Sep 6, 2026 at 3:02=E2=80=AFPM Gary Guo <gary@garyguo.net=
-> wrote:
-> >> >> >>
-> >> >> >> On Tue Aug 25, 2026 at 2:20 PM BST, Alice Ryhl wrote:
-> >> >> >> > On Mon, Aug 24, 2026 at 01:17:56PM +0200, Andreas Hindborg wro=
-te:
-> >> >> >> >> +        // SAFETY: We just successfully allocated a page, so=
- we now have ownership of the newly
-> >> >> >> >> +        // allocated page. We transfer that ownership to the=
- new `Owned<Page>` object.
-> >> >> >> >> +        // Since `Page` is transparent, we can cast the poin=
-ter directly.
-> >> >> >> >> +        Ok(unsafe { Owned::from_raw(page.cast()) })
-> >> >> >> >
-> >> >> >> > This doesn't satisfy the safety requirements of Owned::from_ra=
-w()
-> >> >> >> > because the page may be used with vm_insert_page(), which incr=
-ements its
-> >> >> >> > refcount and causes it to be shared the vma system, and this o=
-ccurs
-> >> >> >> > before Page::release() is called.
-> >> >> >>
-> >> >> >> I suppose the existing vm_insert_page() abstraction we have is a=
-lready
-> >> >> >> problematic, because it uses `&Page`?
-> >> >> >>
-> >> >> >> Maybe we want to change the API to use `ARef<Page>` so it alread=
-y has to be
-> >> >> >> shared? Conceptually it takes a reference count from a `&Page`, =
-which isn't
-> >> >> >> possible because `Page` is not `AlwaysRefCounted`, so it needs a=
- `&ARef<Page>`
-> >> >> >> to be able to do that op.
-> >> >> >
-> >> >> > Honestly, the problem is the safety requirements of Owned::from_r=
-aw().
-> >> >> > Pages have a "special" main reference, and free_page() does more =
-than
-> >> >> > put_page(). It even does something when the refcount does not hit
-> >> >> > zero.
-> >> >> >
-> >> >> > The correct behavior for Page is to allow the user to hold one
-> >> >> > Owned<Page> whose drop calls free_page(), *plus* any number of
-> >> >> > ARef<Page> references that invoke put_page() on drop. This way, t=
-he
-> >> >> > owned page controls the special drop codepath.
-> >> >>
-> >> >> This does not mesh well with the model of `Owned` behaving like
-> >> >> `UniqueArc` to `ARef` behaving like an `Arc`.
-> >> >
-> >> > It's a different case, I agree.
-> >> >
-> >> >> Please help me understand; with page having a main ref and an auxil=
-iary
-> >> >> refcount, if we model that with a single `Owned<Page>` and a number=
- of
-> >> >> `ARef<Page>`, what would happen in the case where the main ref (`Ow=
-ned`)
-> >> >> is dropped first? Is this legal?
-> >> >
-> >> > Yes, it's legal.
-> >> >
-> >> >> My intuition here would be to follow Garry's suggestion and have
-> >> >> `vm_insert_page` take an `ARef<Page>`. Can you elaborate why this i=
-s not
-> >> >> an option?
-> >> >
-> >> > That would be the wrong ownership semantics. The C side increments t=
-he
-> >> > refcount rather than take ownership of a passed-in refcount, so the
-> >> > correct argument type is &Page.
-> >>
-> >> Or `&ARef<Page>`? Because with `Page` being `Ownable` it would not be
-> >> OK to increment the refcount from just a `&Page`.
-> >
-> > That's just a limitation in your traits. There is no problem with
-> > creating a refcount from just a &Page.
->
-> Yes, I agree. The limitation is by design. My point is, `vm_insert_page`
-> can work fine with the `&ARef<Page>` type. So if that would be OK with
-> you, I would patch that as part of this patch.
+From: Tao Cui <cuitao@kylinos.cn>
 
-IMO, Page should implement AlwaysRefcounted and this method should
-take &Page. Anything else just adds limitations that are not needed.
-But I'm ok not implementing Ownable for it.
+Why a pluggable model at all
+----------------------------
 
-> >> > Now, for the use-case in Binder I believe we could switch to
-> >> > put_page(), as we don't need the extra stuff from free_page(), in
-> >> > which case we only want ARef<Page> and do not require Owned support.
-> >> > But as long as we are calling free_page(), it needs to not be
-> >> > clonable.
-> >>
-> >> You are calling `__free_page` directly in binder? I could not find thi=
-s
-> >> with grep except in the C binder. Is this code you are calling into fr=
-om
-> >> Rust binder?
-> >
-> > Via the Drop of Page, not directly of course.
-> >
-> >> From `__free_pages()` kernel-doc (`mm/page_alloc.c`):
-> >>
-> >> > If the last reference to this page is speculative, it will be
-> >> > released by put_page() which only frees the first page of a
-> >> > non-compound allocation. [...] **If you want to use the page's
-> >> > reference count to decide when to free the allocation, you should
-> >> > allocate a compound page, and use put_page() instead of
-> >> > __free_pages().**
-> >>
-> >> I guess this is what you are referring to? We could change `Page` to
-> >> this style as well and all would be fine I think?
-> >>
-> >> At any rate, today I learned about Pfn walkers, compaction,
-> >> memory-failure, etc. that take transient refcounts
-> >> pages. With that in mind we need to reformulate the invariant of
-> >> `Ownable` to exclude optimistic transient references.
-> >
-> > Yes we can switch Rust Binder to use put_page() and have Page not
-> > implement Ownable at all. That would be okay, because Binder's pages
-> > are not higher order.
->
-> As far as I can tell, we can also switch `Owned<Page>` to allocate the
-> page with `__GFP_COMP` and use `put_page` in drop.
+When iocost landed in 2019, its commit message already promised that
+"a later patch will also allow using bpf progs for cost models", and
+the code has carried the split for it ever since: calc_vtime_cost()
+is a dispatcher whose only implementation is calc_vtime_cost_builtin().
+Seven years later the builtin linear model is still the only one.
+This RFC fills that slot, following the bpf_tcp_ca and sched_ext
+precedent: builtin algorithms stay as the default, new algorithms are
+prototyped in BPF behind a struct_ops.
 
-I'm not entirely sure if __GFP_COMP is needed, since the page is order
-zero to begin with, so I don't think it makes a difference.
+The measured problems
+---------------------
 
-> > But this case still does highlight that
-> > Ownable<_> currently does not address the use-case where the
-> > Ownable<T> is a special reference there can only be one of, rather
-> > than a completely unique reference.
->
-> This is not the use case `Ownable` aims to solve.
+The builtin model prices each IO with a binary sequential/random base
+picked by a single per-cgroup cursor and a 16MB seek threshold, plus
+a per-page cost.  On a virtio-blk device with the HDD autop profile,
+a 4k IO costs ~24us when judged sequential and ~2.7ms when judged
+random, a 112x spread, so a wrong judgement becomes a wrong price.
+Three classes of mispricing, all measured:
 
-Maybe not, but then it doesn't apply to Page.
+ 1. Heuristic rigidity.  Two legitimate sequential readers in one
+    cgroup (a database with multiple tablespaces, a threaded backup)
+    ping-pong the single cursor and are all priced random: measured
+    89x overcharge, 12.9x throughput collapse under the same weight.
+    Random IO within a hot window smaller than the 16MB threshold is
+    priced sequential: measured 107x undercharge, an accounting
+    escape for hotspot workloads.  No setting of the six builtin
+    parameters seems able to fix this: telling the streams apart
+    requires per-IO state tracking, which looks like logic rather
+    than coefficients.
 
-> > For instance, the GPUVM abstraction would be another case where
-> > Ownable<_> could be used if we have this other model where Ownable<_>
-> > and ARef<_> are legal at the same time. Currently GPUVM uses a special
-> > UniqueRefGpuVm type to solve this problem.
->
-> I am wondering if we can make case I intend to solve (Ownable is a
-> unique reference) coexist with the "at most one of this ref can exist".
-> The "at most one of this kind" sounds similar to the `ListArc` use case
-> to me, which is a different problem.
+ 2. Device nonlinearity.  SLC-cache phases, SMR band placement and
+    shared controllers (multiple NVMe namespaces multiplexing one
+    device) make the real cost of an identical IO vary by an order of
+    magnitude over time or across namespaces.  A static
+    6-parameter linear model has no way to express that.
 
-I think they can co-exist. If AlwaysRefcounted is implemented, it is
-the ListArc use-case. If Refcounted but not AlwaysRefcounted is
-implemented, it is UniqueArc use-case.
+ 3. Unpriced operations.  Flush and zone append fall through to a
+    cost of zero and bypass throttling entirely (fixed in a separate
+    series already posted), but the same pattern extends to device
+    quirks the builtin model was never taught.
 
-Alice
+Mispricing feeds directly into the control loop: vtime budgets,
+surplus donation and the vrate feedback all consume the model's
+output, so a wrong model can skew the whole controller.
+
+How
+---
+
+A new "iocost_model_ops" struct_ops with a single callback:
+
+    u64 calc_cost(op, nbytes, sector, cursor, iocg_id, flags)
+
+scalar arguments only, no kernel pointers exposed; the return value
+is vtime (2^37 per second of device time), clamped to 1s per IO; a
+return value of 0 delegates the IO back to the builtin formula, so a
+model which only handles some IO types cannot make the rest free.
+iocg_id identifies the issuing cgroup so a model can keep
+per-cgroup state; struct_ops signatures are frozen once merged, so
+it is part of the initial interface.  Devices opt in per queue with
+"echo $dev ctrl=bpf > io.cost.model"; everything else keeps the
+builtin model unchanged.  Patch overview:
+
+ 1/8: add an iocost_ioc_tick tracepoint emitting the per-period
+      controller state, so model quality can be evaluated without
+      drgn (existing events are state-change driven and silent in
+      steady state)
+ 2/8: define the iocost_model_ops interface (above); the model is
+      called from the IO submission path under RCU and must not
+      sleep
+ 3/8: register the struct_ops; at most one model system-wide (EBUSY),
+      registration serialized with a mutex, base helper set allowed
+      so models can use maps for per-cgroup state
+ 4/8: dispatch cost calculation to the registered model in
+      calc_vtime_cost(), falling back to the builtin formula; the
+      request-level sizing path keeps the builtin formula
+ 5/8: per-device opt-in via ctrl=bpf
+ 6/8: selftest with an example model (the builtin linear HDD formula
+      at double cost, mirroring bpf_dctcp as the in-tree reference
+      implementation) plus a runner verifying registration and
+      ctrl=bpf readback, including the rejected-without-model case
+ 7/8: a second example model which replaces the single-cursor
+      sequentiality heuristic with per-cgroup multi-stream detection
+      keyed by iocg_id, the first consumer of that argument
+ 8/8: document ctrl=bpf in cgroup-v2.rst
+
+Does it work
+------------
+
+Mechanism, verified functionally (QEMU, virtio-blk with the HDD
+profile, same 8s sequential-read workload from a 1%-weight cgroup,
+builtin vs the 2x example model):
+
+ - per-IO charge: 2854us -> 5728us, a factor of 2.001-2.007x; the
+   completed IO count halves (2634 -> 1332) and total cost.usage is
+   conserved (7.51s vs 7.63s of device time), i.e. the model output
+   drives both charging and budgeting
+ - the same ratio holds across four hosts (local disk, enterprise
+   NVMe, NVMe-backed root on an idle k8s master, and a real 7.3T HDD
+   behind a loaded host) and across 4k/64k/1M block sizes: 2.00-2.03x
+   on the flash-backed hosts, and within 2% of 2x on the real HDD,
+   where the host load adds variance
+ - edge cases: ctrl=bpf without a registered model is rejected; a
+   second registration fails with EBUSY; unregistering the model or
+   returning 0 (delegation) both fall back to the builtin price; a
+   model using a map keyed by iocg_id records distinct ids per
+   cgroup
+ - iocost_ioc_tick fires every period in steady state and emits one
+   final tick with running=0 before the controller goes idle
+
+Payoff, demonstrated with the multi-stream example model (7/8) on
+the same setup, 4k IOs at weight 1000, builtin vs the model:
+
+ - two sequential readers in one cgroup: priced 2064us/op by builtin
+   (both judged random by the single cursor) and 23us/op by the model
+   (each stream keeps its own slot), a throughput recovery from 7.2
+   to 511 MiB/s
+ - random IO inside an 8M window: priced 22.9us/op by builtin
+   (undercharge, an accounting escape) and 2643us/op by the model
+ - single-stream sequential and whole-disk random pricing are
+   unchanged, so the model fixes both directions of mispricing
+   without introducing a new one
+
+Non-interference, measured on enterprise NVMe (MEMBLAZE P6541,
+passthrough to KVM guest, 8 proc x 128k sequential read, 7.5M
+aggregate IOPS):
+
+ - no measurable overhead when not in use: builtin vs BPF-patched kernel
+   (no model registered) within noise (30180 vs 30314 ops/proc);
+   the one indirect call per bio is not measurable at this rate
+ - 12-hour stress (870 iterations, 3 cgroups at 1000/100/10 weights,
+   read + write + flush concurrent, 87 iocost disable/enable cycles,
+   870 model switches): zero errors, zero memory drift (0.03% over
+   32GB)
+
+Open questions for discussion:
+
+ 1. Interface: scalar args (as here) vs passing struct bio * for
+    CO-RE access?  Is a cold-path model_refresh() callback needed so
+    models can track vrate?
+ 2. Per-cgroup state lifetime: iocg_id is the css id and is recycled
+    once the cgroup is removed, so models must treat it as a
+    transient key.  Does the interface need a release(iocg_id)
+    callback so models can clean up per-cgroup state instead of
+    detecting reuse, or is per-cgroup bpf local storage, which
+    carries its own lifetime, the better home for model state?
+ 3. Request-level asymmetry: the request-based sizing path
+    (calc_size_vtime_cost, which feeds the latency QoS met/missed
+    decision) still uses the builtin formula when a model is
+    registered, while bio charging goes through the model.  Should
+    the request path dispatch too, or is builtin sizing with a BPF
+    charge model acceptable?
+ 4. One model system-wide vs named models selectable per device (as
+    tcp-cc names are per-socket)?
+
+Tao Cui (8):
+  blk-iocost: add iocost_ioc_tick tracepoint for per-period device
+    summary
+  blk-iocost: define iocost_model_ops cost model interface
+  blk-iocost: implement BPF struct_ops registration
+  blk-iocost: dispatch cost calculation to registered BPF model
+  blk-iocost: add ctrl=bpf per-device opt-in
+  selftests/bpf: add iocost cost model test
+  selftests/bpf: add multi-stream sequentiality example model
+  docs: cgroup-v2: document io.cost ctrl=bpf option
+
+ Documentation/admin-guide/cgroup-v2.rst       |  16 +-
+ block/Kconfig                                 |   9 +
+ block/Makefile                                |   1 +
+ block/blk-iocost-bpf.c                        | 152 +++++++++++++++++
+ block/blk-iocost.c                            |  46 +++++-
+ include/linux/blk-iocost.h                    |  56 +++++++
+ include/trace/events/iocost.h                 |  40 +++++
+ .../selftests/bpf/prog_tests/iocost_model.c   | 155 ++++++++++++++++++
+ .../selftests/bpf/progs/iocost_model.c        |  91 ++++++++++
+ tools/testing/selftests/bpf/progs/iocost_ms.c | 122 ++++++++++++++
+ 10 files changed, 682 insertions(+), 6 deletions(-)
+ create mode 100644 block/blk-iocost-bpf.c
+ create mode 100644 include/linux/blk-iocost.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/iocost_model.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iocost_model.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iocost_ms.c
+
+-- 
+2.43.0
+
