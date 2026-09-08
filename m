@@ -1,100 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f34.google.com (mail-oo2-f34.google.com [74.125.231.162])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CE635C180;
-	Tue,  8 Sep 2026 18:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD5659E338
+	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 20:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788893931; cv=none; b=i5WEeE/wK+a5MrmyAui2Hsida4ssYDzOcaZTAhgo04oZhv1LBVqpAzpyL42HAIh32k7dxJZVtMVQLYOHinX8+6t4jsqWMt2kJcqsjgno4z2Zk4I40740XE/2uA4Cwue/ENfu7PuhV7y6zhL+mTeV6eOFipuq2yDi2s+60L0ljkI=
+	t=1788898139; cv=none; b=YHDXHRyuHbp6zLdGOSgYPA5CAvxiWgImw9FQzdy409ujVihvFNUrLBP5dNsmGjqmzEXzs/mGhxlMun5FWWExbbXueAUui/e75nJjZV9uy4u9Ld0cGeNHm2IV0J/ka8RXLhUe6RV57IAn9k5j+cyyqYy88z91Umgp6xPdlnTaA20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788893931; c=relaxed/simple;
-	bh=YBNUPhK+dSG8Rj+GgFl/0zrJ57AbV8JvJot3uj9k1OU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GiN5c4X9x/7K46mUofNwp7bd1Vxh+tpGciVdELPXWlF6+h0fhawvp7TPY3VmWq96e3+tMOqzNZlfw/2zR9xl7mXM9pcXi/5xn+9TTj7AZz4WuY4218s/++OGMkjh6KT1NMK0Bw9qlbozLDEvvPIl1Kd8Rm5kHJF0GCXIrA3mDYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JhnzMcGd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788898139; c=relaxed/simple;
+	bh=/kMit8CUDaP2BflI6bC+09wX3fqJwv8fLnZxYfqIkgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QIP66SdkEys58xAc95PWG+QDrKbLix6uQ8qohsKNaQ6lSct60k+9Vt+4Rt/Ogibr0IBuTu4NIySEQEbqO9Is9L6jzM52lbMwxln2VNc89k5eb5NXTSR40lS4YWPV6AQRatXZgN6HEKS6yHo2Nmsp4jn014qOoiSpT9WqJ+TAi4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tamu.edu; spf=pass smtp.mailfrom=tamu.edu; dkim=pass (2048-bit key) header.d=tamu.edu header.i=@tamu.edu header.b=GzgtppxI; arc=none smtp.client-ip=74.125.231.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tamu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tamu.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JhnzMcGd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9229F1F00A3A;
-	Tue,  8 Sep 2026 18:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788893930;
-	bh=7cgAipI1fCRs+j94B3V9v2XQIDOdhYQSv7FLrs5JCAY=;
-	h=From:Date:Subject:To:Cc;
-	b=JhnzMcGdo5B88I00ke3UkNQOidATxO+8bKtleRggm9yHIQlT7LKi0GwEqqTQgIuIL
-	 R27ZPKyuSXLv9IavHDkQT3t/KtWSTqsNIP1EF8PZFnrXiGDWfDAtEcpy0EYI0ThjNK
-	 UFZ76y18WiCVlz747GuC4UVuGmwChjWNO7ILlxCcsWbZJEfXx15lBDhAsu/9tpYOx9
-	 bvVTQB08qrvqi/sCSBCaJLqitV8mkjzUGXUbHu/HeK7YufipaFCLrJuBLoVDMVxc0k
-	 LeCPRXZzofFKCS7epSG3/U2bnkn9dGHzf5y7TPvSwsFvrc9l29O7PISYsVTXUU7ETZ
-	 EKXpaNVkOFQsQ==
-From: Vincent Mailhol <mailhol@kernel.org>
-Date: Tue, 08 Sep 2026 20:58:26 +0200
-Subject: [PATCH RESEND] block: store GPT attributes as a raw value
+	dkim=pass (2048-bit key) header.d=tamu.edu header.i=@tamu.edu header.b="GzgtppxI"
+Received: by mail-oo2-f34.google.com with SMTP id 46e09a7af769-80032c08611so285333a34.3
+        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2026 13:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tamu.edu; s=google; t=1788898134; x=1789502934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cpZBZiNkX1boADxTuU2IVraCPujz/4cVmGXwbGYdtrg=;
+        b=GzgtppxIDL/LhxXRbBfnTCRUpuvgQ9f9hlAu2dLKdN3vqY2Tk9jNIlNX11ACGrSXwQ
+         FUNtmXfyRVRbo/qRL1Lxyd8sUb2mpmQzlAP3wHQbClgGDeuIZZTEPnxaogPLzaKJP44v
+         kWGsvTNzbeNmPEjtf9J8Lv7Jqpt0kenHQV3zKWnylPYfDwZVajObpvUFJqGAzGTxe/2L
+         M9978pleCh7C+Iw58Eh173jQPq9oIbq3KlaBbLeFP+qUVxZoKKQYwDgkyqjUEGNYlaNw
+         11tXwDBn6t4e5pyM5pnPgx7DPN7AunkojkjaixANUlA1CnmqO84C0DJG8fCnq419otOn
+         tvMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788898134; x=1789502934;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=cpZBZiNkX1boADxTuU2IVraCPujz/4cVmGXwbGYdtrg=;
+        b=XTBjPT21Pgp/gQqi1vBj2DVIvcBuDuO1MgLlBVxE7Duzar5nB7x4+LnebNpdLKLtZp
+         8DYzptZc7RI7IuvejYy6FpYl6aR08sN8XCjBqfiMyYMuDOEmIbv87t20RGYU4a2pcS4U
+         PVu7vCXtj5do7c0rxCjU6CTKte45kwJog7A3f97a4YM3jL/jBCiuFMuJgbBXfvuW0eb3
+         Q0+xFP0ORRFvFtGKFUL/Vvg5D7xNzhPNLtwDRX4w2NFRWPvFYUYas29Krk7XnFcA+ZYA
+         0vv9whEPQPcC5BkNTzNXis1S2nErYytBEuOD7/2q5QEwZ0Vrtvginr+Tfxp2j4Xo24kC
+         b57Q==
+X-Forwarded-Encrypted: i=1; AKwUvByxuQ3Ri9+I/eCxhvbwp41CZov+rbl7eNQxWUc+3umc8HP4LxXwSqkLAbhbdKQpNll7dbOSHX+zuNzZQg==@vger.kernel.org
+X-Gm-Message-State: AFuF++nPNuILpbL5WELvjQwSHrxc/jcSoni+HHZVShQmx3BlTtFXGUoN
+	cLPpnrzJ2QQIVekdayI8CcOMYlN47Pldtzw0+Nf0xFDLjhYulpG83y7JAL3/iS75JL4=
+X-Gm-Gg: AYBFou0eCPPEMrGPa1cd1mBGd7LJesZnHMgX8fh9/qO2vxM0HpeWNjIl6EO+LGczjcg
+	l3VO6MT49eP2suq8MEMMYFQ/fjwm8kXhr/oOLDWLSAYSBfCpHnHbDFkidwN62aa93FapNmT7QV3
+	0D+4Dlg2Qk5/lgpRlRQy/bb+2cbxpe+qh6oluAyhwwUuXNYRbqxwJWD7Bsxlxq5V5lugVnE2puc
+	HsCjf85ZWBT0YV92VAv1rqf2CinBlXdQprqCDOT6El2w1M9d6evpRgIT9CSN/zBcUSg8ShJbGnA
+	kZF4/lTN2ZERhx8GJZVgizTbKikekszdrVJz2FSvv6FYZrxfc1yFkjk7KiVNgpOd0k2xfbj7xgV
+	xCjycTEmeHPOOSGnD4zX3/9ndOIuX6hIKn9XJJkCmDJ+6svOQ8Y6+h57Pcf13nNU7zo+e/kxRtw
+	eBIXpiv7i5CEElcErF/90F1widyuFfQdJFTSFXfnAlee1IpRLEFYFvXCVB2wKvIvg/YNoByqPN/
+	QURvOxOYohBP7QkoKIvSKdM0kgQsz4QsEqLyHSizaic/Tq8tpSUuWf9477NpbC0b2z76xQ=
+X-Received: by 2002:a05:6830:3499:b0:7f6:705b:ffe7 with SMTP id 46e09a7af769-800f1a35138mr1966540a34.14.1788898132377;
+        Tue, 08 Sep 2026 13:08:52 -0700 (PDT)
+Received: from fb.keuhufpvur4u1eezzhu5ttlizh.gx.internal.cloudapp.net ([20.106.51.18])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f9f6793f5fsm17086281a34.8.2026.09.08.13.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2026 13:08:51 -0700 (PDT)
+From: Qingxiao Xu <qingxiao@tamu.edu>
+To: 
+Cc: Qingxiao Xu <qingxiao@tamu.edu>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] rnull: fix geometry store check-then-act across lock scopes
+Date: Tue,  8 Sep 2026 20:08:43 +0000
+Message-ID: <20260908200845.405112-1-qingxiao@tamu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260908-fix_gpt_entry_attributes-v1-1-a4dcb417e8fc@kernel.org>
-To: Davidlohr Bueso <dave@stgolabs.net>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-efi@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Vincent Mailhol <mailhol@kernel.org>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1540; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=YBNUPhK+dSG8Rj+GgFl/0zrJ57AbV8JvJot3uj9k1OU=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDFkLop7anP2VP+O0YM6ZpawlzAWGbifMgjRbXs839GsV5
- k1x/Di1YyILgxgXg6WYIsuyck5uhY5C77BDfy1h5rAygQyRFmlgAAIWBr7cxLxSIx0jPVNtQz1D
- IEPHiIGLUwCm+qUCw3+n3pnblvPPnFoU9vWRwgrdTXUZW7feWveC87GH6nP+l+sbGP7XbFHrnv+
- uyDbrXoXmlf+PIncs5F3MNC9up9T7D6dCs/9wAwA=
-X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
- fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
+Content-Transfer-Encoding: 8bit
 
-struct _gpt_entry_attributes currently models the GPT partition entry
-attributes field with bitfields. This is broken on machines using the
-__BIG_ENDIAN_BITFIELD ABI because GPT always stores the attributes on
-disk as a 64-bit little-endian.
+The blocksize/rotational/capacity/irqmode stores check powered under one
+Mutex acquisition, drop the guard, then update under a second acquisition.
+A concurrent power-on can create the live disk from stale geometry in
+between, leaving powered==true with config != live disk.
 
-No current code consumes individual fields from that structure. So just
-remove struct _gpt_entry_attributes entirely and replace it by an __le64
-value in struct _gpt_entry instead. This lets users apply endian-aware
-masks explicitly when inspecting attribute bits.
+Hold one guard for the powered check and the field update.
 
-Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+Signed-off-by: Qingxiao Xu <qingxiao@tamu.edu>
 ---
- block/partitions/efi.h | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ drivers/block/rnull/configfs.rs | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/block/partitions/efi.h b/block/partitions/efi.h
-index 84b9f36b9e47..1f56f93b2804 100644
---- a/block/partitions/efi.h
-+++ b/block/partitions/efi.h
-@@ -75,18 +75,12 @@ typedef struct _gpt_header {
- 	 */
- } __packed gpt_header;
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 32c10c3f4..66ef91b3f 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -174,7 +174,8 @@ impl configfs::AttributeOperations<1> for DeviceConfig {
+     }
  
--typedef struct _gpt_entry_attributes {
--	u64 required_to_function:1;
--	u64 reserved:47;
--        u64 type_guid_specific:16;
--} __packed gpt_entry_attributes;
--
- typedef struct _gpt_entry {
- 	efi_guid_t partition_type_guid;
- 	efi_guid_t unique_partition_guid;
- 	__le64 starting_lba;
- 	__le64 ending_lba;
--	gpt_entry_attributes attributes;
-+	__le64 attributes;
- 	__le16 partition_name[72/sizeof(__le16)];
- } __packed gpt_entry;
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
++        let mut guard = this.data.lock();
++        if guard.powered {
+             return Err(EBUSY);
+         }
  
-
----
-base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
-change-id: 20260724-fix_gpt_entry_attributes-e5af9e080ce1
-
-Best regards,
+@@ -182,7 +183,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+         let value = text.parse::<u32>().map_err(|_| EINVAL)?;
+ 
+         GenDiskBuilder::validate_block_size(value)?;
+-        this.data.lock().block_size = value;
++        guard.block_size = value;
+         Ok(())
+     }
+ }
+@@ -204,11 +205,12 @@ impl configfs::AttributeOperations<2> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
++        let mut guard = this.data.lock();
++        if guard.powered {
+             return Err(EBUSY);
+         }
+ 
+-        this.data.lock().rotational = kstrtobool_bytes(page)?;
++        guard.rotational = kstrtobool_bytes(page)?;
+ 
+         Ok(())
+     }
+@@ -225,14 +227,15 @@ impl configfs::AttributeOperations<3> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
++        let mut guard = this.data.lock();
++        if guard.powered {
+             return Err(EBUSY);
+         }
+ 
+         let text = core::str::from_utf8(page)?.trim();
+         let value = text.parse::<u64>().map_err(|_| EINVAL)?;
+ 
+-        this.data.lock().capacity_mib = value;
++        guard.capacity_mib = value;
+         Ok(())
+     }
+ }
+@@ -248,14 +251,15 @@ impl configfs::AttributeOperations<4> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
++        let mut guard = this.data.lock();
++        if guard.powered {
+             return Err(EBUSY);
+         }
+ 
+         let text = core::str::from_utf8(page)?.trim();
+         let value = text.parse::<u8>().map_err(|_| EINVAL)?;
+ 
+-        this.data.lock().irq_mode = IRQMode::try_from(value)?;
++        guard.irq_mode = IRQMode::try_from(value)?;
+         Ok(())
+     }
+ }
 -- 
-Vincent Mailhol <mailhol@kernel.org>
+2.43.0
 
