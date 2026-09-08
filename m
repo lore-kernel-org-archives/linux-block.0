@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1415854EEBC;
-	Tue,  8 Sep 2026 16:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D701A6835;
+	Tue,  8 Sep 2026 16:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788884514; cv=none; b=stYCkcKZUPzSWyVOx7WBOKxw2+OuKwZd/rM8rbNbiQGEPtSlOSzW9DSMPTF1NqWtnvz4fQrhKU1ZFqCSXO6npqxCG6qyBdwp6RBR5wl714h0rgRNREjLYsTj7I1WQk3AbBGGQOr9WuAPtLfPRP6Bi0Rixgocl8Fpq0F2DeLjIYM=
+	t=1788885061; cv=none; b=X/T7hGK6xyP8zbDfX0lkeDHg5G1lPXEexjr42sQGySRg82Ux0+fO3+5FNNkmm+bRUO174BqqmirnZeqtte/r/5amLCe0Fr6WemIVtPu8ISMlfuQwJ/n1k+jBQgM6ZWsAXpx71CvWiB0jv5kwgNYVvnbPCl4qB+cR1j831glh1lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788884514; c=relaxed/simple;
-	bh=FlVZhIe8XWeo2xdg+2N8/HN5+zcTxL3Nv/ReOPyjFRs=;
+	s=arc-20240116; t=1788885061; c=relaxed/simple;
+	bh=5Ec4aSY7o3k0sKM9wWHt9rsFs5lO16AT9ABnU8TGsao=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KhuCketD8PbxzEZXHt/+dENX7YQTlYJ6cW7ClnDQFsoTa59FXyzKl91QpA+o5xL3reJPakL6kZdFIvLaBHSsDyoO/IoTCC7muw+QFxBAROCT0TtQ3QQ1E3TjPrdi1YM1IeQyKPwg1T2u8ETbGu8bpqET+lDjLTrs+mp6lOZr+RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiZa1FAG; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=nYEF/kspaEt5XuQQHZ/1lNL67sHz2BbEiueTUX8dGhLnNTsIlCqVBNuqz/38ghV9yduUuBQbknmLHQlXTFWyd2oYMokqqqwM25ivL31xTKEYjHaUTK5ohJGj+F9cJsW006NKE7WNfJKVtqWaHjKuXZgszK4xG3wHn9gHvZs03t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJhwsDAz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiZa1FAG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 123031F00A3A;
-	Tue,  8 Sep 2026 16:21:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJhwsDAz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 687791F00A3A;
+	Tue,  8 Sep 2026 16:30:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788884512;
-	bh=7TqmDJUy5o6mpDI4ISF8yh2oVfrhqIccw/xxHz+n0OU=;
+	s=k20260515; t=1788885060;
+	bh=PbREINwiHzdfOIDyvzXmpqXBcn2ufYLyhPRpYbuszSY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=JiZa1FAGRjiBxr4eCE7etd8xF5Ox2fvunf4Jh+pFg1WAlP4CubwSmpW8U6vTnZbqI
-	 YPq9gfVGk9OeA9lPeUUItoILDjtrvzuNLB1QRZzdMNroVNsqitDi63hRXYHDWz8faX
-	 ryQ4NCpeoWxNaIWCwerL0PlpSURsC79JZceJ11MmTMhmAQPP9fUSqHbOMpekl2pkdx
-	 jgPUXw+/QOFPPU4n9pXbY5TmblnOwnS2K0Y1UVizacnB1rHu1w//n5XlgfEoru/2O7
-	 pCEWvLm7W9BGee4uNRUQoDTIiJNIonPu9E1BUPZULWOxY3pMWs2zt/FjbDlFGfVudH
-	 /BwFmrRFqP37A==
-Message-ID: <25144cf6-a5ae-4e1f-b77b-768e2636825f@kernel.org>
-Date: Tue, 8 Sep 2026 18:21:43 +0200
+	b=JJhwsDAzdDYYBuw+OjApzid/DL+uKEvAJ2ThGvEQEp2/vT/ZgMLMANci4KhIZVs+q
+	 KJIDDQQEyY89H+5OdaSGpu84eRh3LwQimAoVYTdEGIr2HH6/9L/SixMgZ/eRkkp52m
+	 HbFatySDrHgffwcdSMmR1TKgUfv7D8u8QNU9vBBvQDD5ag/tdudXWiBGWJIgqhyP20
+	 DUX/YejlKToKQSDWX24HIZrv5PvbQhTnV/ykAxojd5wB18HHVIGHuG5DUbmadoVHmP
+	 tLQYD8brxV8cRvpS+E2sUT9aaSJuO4XG6dBrT5eWlTQggVrvOdfVg8KQSmvc6cdwZ6
+	 xhu0OCpOAfQuQ==
+Message-ID: <da0f5ac1-c9a6-40d4-b67d-3c35fab0f428@kernel.org>
+Date: Tue, 8 Sep 2026 18:30:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/25] mm/fbatch: allow folios_put_refs() to skip
- xa_is_value() entries
+Subject: Re: [PATCH 03/25] mm/fbatch: temporarily disable lazyfree and
+ mlock+munlock batching
 Content-Language: en-US
 To: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>
 Cc: Ackerley Tng <ackerleytng@google.com>,
@@ -47,10 +47,11 @@ Cc: Ackerley Tng <ackerleytng@google.com>,
  Christoph Lameter <cl@gentwo.org>, Claudio Imbrenda
  <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>,
  JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>,
- Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>,
- Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>,
- Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Kairui Song <ryncsn@gmail.com>, Kiryl Shutsemau <kas@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>,
+ Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>,
  Mel Gorman <mgorman@techsingularity.net>, Miaohe Lin <linmiaohe@huawei.com>,
  Michal Hocko <mhocko@suse.com>, Minchan Kim <minchan@kernel.org>,
  Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
@@ -64,7 +65,7 @@ Cc: Ackerley Tng <ackerleytng@google.com>,
  linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-mm@kvack.org
 References: <14a16945-529b-8bc0-ab38-3ea97e54e223@google.com>
- <44c7773e-5806-d24a-83c9-f39b3a134138@google.com>
+ <9593975e-8732-999a-73d1-37fd332eb840@google.com>
 From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
 Autocrypt: addr=vbabka@kernel.org; keydata=
  xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
@@ -105,31 +106,21 @@ Autocrypt: addr=vbabka@kernel.org; keydata=
  NcaZ+c6J4H+nEJGi2SkHAUJz5oBzuThvPudLvPA/SK8sKoM01IRxSihev/S/5WLazXB1PGem
  OCbvzC1IjWJJraxiDJ5IygokapUa2RP7+WBR22skQ3SSl6G107QgWKSyTOGWEaRmV53vxQLV
  jXuCmzSSasTL60zq5yGrT4/DYQVSNEUiUbG4pYekxJujNeEDkUlky0Y=
-In-Reply-To: <44c7773e-5806-d24a-83c9-f39b3a134138@google.com>
+In-Reply-To: <9593975e-8732-999a-73d1-37fd332eb840@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 8/24/26 15:55, Hugh Dickins wrote:
-> Let folios_put_refs() (hence folio_batch_release()) skip xa_is_value()
-> entries, and therefore remove unneeded folio_batch_remove_exceptionals().
+On 8/24/26 15:58, Hugh Dickins wrote:
+> It will not matter if we occasionally get activation or deactivation
+> wrong; but a mistaken lazyfree (MADV_FREE) would likely cause dataloss.
+> So disable its batching while reworking the per-cpu fbatch handling,
+> then re-enable it with more thought afterwards.
 > 
-> It made some sense when introduced in 3.1 for shmem swap entries only,
-> but workingset shadows popularized exceptional entries in 3.15, and it's
-> silly for so many sites to be squashing exceptionals out of the fbatch,
-> merely to suit an inadequacy in folios_put_refs().
-> 
-> But remove exceptionals on leaving truncate_folio_batch_exceptionals(),
-> one of whose callers then passes the fbatch on to others less tolerant.
-> 
-> No longer essential to this series, since 7.2 commit 9669b87065a6
-> ("mm/lruvec: preemptively free dead folios during lru_add drain")
-> allowed folios_put_refs() to skip NULLs; but still an improvement.
+> Similarly disable mlock+munlock batching temporarily: they will need
+> some redesign before re-enabling. Just insert one disabling line for
+> now, leaving the rest of the code as it was, for consideration later.
 > 
 > Signed-off-by: Hugh Dickins <hughd@google.com>
-
-Like David, I don't understand what exactly
-truncate_folio_batch_exceptionals() does. But this patch seems correct to
-me, so:
 
 Reviewed-by: Vlastimil Babka (SUSE) <vbabka@kernel.org>
 
