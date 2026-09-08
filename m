@@ -1,87 +1,41 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F75333A71B
-	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 03:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157F64A3F35
+	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 08:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788839777; cv=none; b=kXPv1bG22pNUCAMTgPKaiGq4Ux9J+EQ0vighfCvpnmJ6viK6fNrZ/79icid2ozZl5Wi9dveOQ3ZdmN/jC99FzWeh8dE8DkgYr41W+6EoR40T9wDsnBAxahOanfZq8EyQ5AfBZzI81VxECuBnfuvYOgA3F5jPO92eHwqZgCWcHT8=
+	t=1788857882; cv=none; b=VhMyzMtcxEcjCPTw3C6/1u+RrvlB8Kt/ep6LOqOVvJ4x/k4h6kcjJY+tXnV29a/rZ3msOdRgfcb+FPFvLxtazgiWB6q+F6O7uN789nHFAWEl5D9nQj3toS56EvGj/33uFoyWSFQLEXzyQGKT/I/s1J3o5Kli8NiVvwQhKynG81s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788839777; c=relaxed/simple;
-	bh=xF23A56s+3D6NRTLDK2xRJOhzghX3Tn1Neio0fVKNxA=;
+	s=arc-20240116; t=1788857882; c=relaxed/simple;
+	bh=hQ7qgQ5o4ItfwOH7guIbLb0Ux0pDnWGFQm1r3ScPFcw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ahxlX4DsP6bFuOUIyo02ogHASiQXN8Ay/WFtf56y/dx/hYmsZ6ikjAgbBbWlVmL1rZ7Pwsbf2Hkrzqs8niybvgJaK1PzCBAaKWnG2uF/Bt/r0xSHUN9yvtbuE77WAumXG8fVhYrOc/L1yQ4tuautxemGjkWradhi3A6ZBG+lXCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H7TPsm+H; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 MIME-Version; b=YDsImTd7uVLNXlpJsLbrPBtj8Ga8EwZt7OcKOLycqWtFZoJSkswWUH035xR0TpM0HszYKGpWKQkzBcTcrGz31yMqYmJ8M/YZFCJAxbogWBqeqDH6BN8ynRefXYv9IL4J10HKl0hdnkjV8ogUp0SUb7QV29JrLKbeY84ezcTGKLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HHOZmHnM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7TPsm+H"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2db3305f94fso28966205ad.0
-        for <linux-block@vger.kernel.org>; Mon, 07 Sep 2026 20:56:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788839765; x=1789444565; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wHuXN+TozonanTrHY2nOVJpLzPnOvGV5cbx8xr3LhCY=;
-        b=H7TPsm+HG7j4HxWtWxy9NQVwAeL0Y6QQWRSEMQcdidjYaks/6yy6wbb273/7xH+OUo
-         L36Rg8DcCQVkew4nkFDibK9OzZg+2FvkI/4yGpf6N5R/6sy+fok0LOuRNCZLTDLff2Q6
-         bkuf9KtZHDAeoRu9Xjz8FUUQcaxalkIL7OUQ5OKTkbMh1qKWNty7tYvv6b3vyzsiAng1
-         bZDiwqOf+ceQDXtWT0OaciW9NoXnf/DW86tnTOzVrk2o4T3V3GCCjNFjs54+Svkss6Ec
-         8q1zcZk9QXsKifcSqZ7/iVG3gD1sMkdD8cJWS3LhltKzTUpOlB/TNo3OvNqZLn8U9rpV
-         ofrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788839765; x=1789444565;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wHuXN+TozonanTrHY2nOVJpLzPnOvGV5cbx8xr3LhCY=;
-        b=jUbwE9X8tnG8JNO/reBl9nIEyc1r4p4nv9w8NQiGrYj5XK1l0N5yXZ3+zyEPFUcgrG
-         nb18sfW2uilTXlH5+dKkunSlA70PZ+P4fyP11H5bfCPjV6GyTCQytqeD5dXX9jpKbRNl
-         /a9Lzr9DraLduwsNds5P2TPNzTVysOZgNvCLfyNzmxtqcFXOLz7KTDHODVcJWlgzg2dB
-         jpl2qeEESyzFDb6DWNkgdy2aJ69Bm2rcMYn3FWMaWkoBCVm86ErFn7uGb3Dw0HRREDOl
-         mZylcFCDtJ+gPDmZw1rvYbjv/IpZFJHG4zM4Pg62YCVgr4/ZiyI5GkguuFT0WYVlNISI
-         L1+g==
-X-Forwarded-Encrypted: i=1; AKwUvBwy5emgPjYrcW1JQ0+BtFucBbtaCN4vPiDI/ogLrsJmNfquSSE/HW+PItw/ec0x8wXxF0EcPFb+8yN1xg==@vger.kernel.org
-X-Gm-Message-State: AFuF++kirNOV9pskRCZHA28WbpgNAzkKkR215O+QCXuJmTEh09n8fy1P
-	L7aUFoKbDDvXlqkzs/duq4V7n+cn5/W8hyPae+UCeD/TT5JJDT/alkk1
-X-Gm-Gg: AYBFou3Lzi9aoQ8Mr5ghRteJKmx5G+0/C8It9P815hdIIZ0Q9f9JLo0VJwxxT8Hb6uH
-	aTzus1zLs16MIMJPknY3t+8ZcjhnlTFwJyUb9ZKxAr7RiUGTG+K+S/3fbqWCdNVF80Ibwcjh55c
-	1qQeu3Zt4SeYXalMu5rCd33JTzysgiVEAFwVw8HoM5uWGw4pBiA0AMY36Ij6NNjrQebsr5rHCKH
-	RbZT98QUiFEcYkBNsaYgo4K3F1JPLeb/lDCSPtle6RYc+NdxXt10Ai6M62NvJe4YDjiU1VQpLHW
-	ffMAUQddFNUKCNsW3SpvscsegCG56xThdWhVPgmOngpK4ZivMOgoSbtK3Auy8cl1WuT/VtgXxVF
-	h42ur0V8RklWHTTTbxgV9PWFjnH+6bqPPaCijdYsJfgVNT5ywBPLI3fIGmgJwNfPe+cYm1CWROe
-	fER7zhg/vXQRzEWaHVEQVUKNNF7xR8foXOMiBQ9E7Dyle3sAh4ea43PnL/nNjFPp+K1xqL++o+M
-	exMDXHarQf74PhGtuvxYv/D
-X-Received: by 2002:a17:902:f70f:b0:2bf:dd0:c8b1 with SMTP id d9443c01a7336-2db1225b297mr394667095ad.0.1788839765501;
-        Mon, 07 Sep 2026 20:56:05 -0700 (PDT)
-Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2db14aeaf74sm51899295ad.81.2026.09.07.20.56.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 20:56:05 -0700 (PDT)
-From: Wenjie Qi <qwjhust@gmail.com>
-X-Google-Original-From: Wenjie Qi <qiwenjie@xiaomi.com>
-To: jaegeuk@kernel.org,
-	chao@kernel.org
-Cc: linux-f2fs-devel@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	jack@suse.cz,
-	axboe@kernel.dk,
-	tz2294@columbia.edu,
-	baohua@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	qiwenjie@xiaomi.com,
-	qwjhust@gmail.com,
-	syzbot+cid5582b8164122eda@syzkaller.appspotmail.com
-Subject: [PATCH v5 2/2] f2fs: enable buffered RWF_DONTCACHE
-Date: Tue,  8 Sep 2026 11:55:43 +0800
-Message-ID: <1cd46ad6e0e566c283dd70be7864248f504b1997.1788795700.git.qiwenjie@xiaomi.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1788795700.git.qiwenjie@xiaomi.com>
-References: <cover.1788438786.git.qiwenjie@xiaomi.com> <cover.1788795700.git.qiwenjie@xiaomi.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHOZmHnM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7301F00A3D;
+	Tue,  8 Sep 2026 08:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788857877;
+	bh=0bPKENIjFemv/gbkbxnBxs87VyTsvYmHOjphWU55eww=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=HHOZmHnMBDJK2LUGuDFhgXaYQksQ0fyohtNn4rDPjmEOFGnUE1aSQCS+emsUCA5r8
+	 l7Ad0LLWp/z40fvl3ksiAk51yuofKKAgQPppxpo7/L3vY9kLZwuLxi+FqlFSbjgY7h
+	 AZay4VZMpukcQZuEHpnL/zE9vEWDoWX46q1qv/R3Daa4iL4zEWMObJAyCoo6uvkW+c
+	 m7BQZQFj1Unr3DPuT1wIKB4KyNbWtJJ0tSkYsD7W//ArdKMirdVtQ0bOuMfsXPYb/f
+	 fUamJ6gLta+PvjEeiPKiEqp22rLBfXtmJRTv+qJBKPUrMb9Ud/1S9z0CFtZd72cexo
+	 geaJTGuKRP9yw==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v7 01/16] block: remove disk_free_zone_resources()
+Date: Tue,  8 Sep 2026 17:57:30 +0900
+Message-ID: <20260908085745.1082697-2-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260908085745.1082697-1-dlemoal@kernel.org>
+References: <20260908085745.1082697-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -90,72 +44,165 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Pass FGP_DONTCACHE to f2fs_filemap_get_folio() for
-IOCB_DONTCACHE writes and advertise FOP_DONTCACHE.
+In the rare event when revalidating the zones of a zoned block device
+fails, the device capacity will be dropped to 0. In such case, the zoned
+block device will either be rescanned and restored or will be dropped
+entirely and its gendisk will be destroyed. So calling
+disk_free_zone_resources() from blk_revalidate_disk_zones() in case of
+an error does not make much sense. We can keep the zone resources in case
+the device is rescanned and restored and simply free all resources in
+disk_release_zone_resources() when the gendisk is destroyed.
 
-The address-space write_begin callback is also used by internal
-callers that pass a NULL kiocb, including page_symlink(). Check iocb before
-inspecting its flags.
+Remove the call to disk_free_zone_resources() from
+blk_revalidate_disk_zones() and squash disk_free_zone_resources() inside
+disk_release_zone_resources(). With this change, the conditional creation
+of the zone write plugs work queue is not necessary anymore as the
+workqueue will keep existing together with all other resources until the
+disk is released. This simplifies disk_alloc_zone_resources().
 
-Keep the F2FS-specific lookup because write_begin_get_folio() adds
-FGP_STABLE, which can deadlock here.
-
-Reported-by: syzbot+cid5582b8164122eda@syzkaller.appspotmail.com
-Closes: https://ci.syzbot.org/series/cbb9ded8-1388-4a7b-bfa7-44082b04025b
-Signed-off-by: Wenjie Qi <qiwenjie@xiaomi.com>
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
-Changes since v4:
+ block/blk-zoned.c | 58 +++++++++++++++++------------------------------
+ 1 file changed, 21 insertions(+), 37 deletions(-)
 
-- handle internal write_begin callers that pass a NULL kiocb;
-- add syzbot report attribution.
-
- fs/f2fs/data.c | 9 ++++++---
- fs/f2fs/file.c | 2 +-
- 2 files changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index fc48a752fe9..c9b29882f07 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -3883,11 +3883,15 @@ static int f2fs_write_begin(const struct kiocb *iocb,
- 	struct inode *inode = mapping->host;
- 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
- 	struct folio *folio;
-+	fgf_t fgp_flags = FGP_LOCK | FGP_WRITE | FGP_CREAT;
- 	pgoff_t index = pos >> PAGE_SHIFT;
- 	bool need_balance = false;
- 	block_t blkaddr = NULL_ADDR;
- 	int err = 0;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index a5afb842bf35..c7d8c767bb31 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1893,21 +1893,6 @@ static int disk_alloc_zone_resources(struct gendisk *disk,
+ 	if (!disk->zone_wplugs_pool)
+ 		goto free_hash;
  
-+	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
-+		fgp_flags |= FGP_DONTCACHE;
+-	/*
+-	 * We may already have a zone write plug workqueue as this function may
+-	 * be called after disk_free_zone_resources(), which does not destroy
+-	 * the workqueue (the zone write plugs workqueue is destroyed at
+-	 * disk_release() time).
+-	 */
+-	if (!disk->zone_wplugs_wq) {
+-		disk->zone_wplugs_wq =
+-			alloc_workqueue("%s_zwplugs",
+-					WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_PERCPU,
+-					pool_size, disk->disk_name);
+-		if (!disk->zone_wplugs_wq)
+-			goto destroy_pool;
+-	}
+-
+ 	disk->zone_wplugs_worker =
+ 		kthread_create(disk_zone_wplugs_worker, disk,
+ 			       "%s_zwplugs_worker", disk->disk_name);
+@@ -1918,8 +1903,18 @@ static int disk_alloc_zone_resources(struct gendisk *disk,
+ 	}
+ 	wake_up_process(disk->zone_wplugs_worker);
+ 
++	disk->zone_wplugs_wq =
++		alloc_workqueue("%s_zwplugs",
++				WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_PERCPU,
++				pool_size, disk->disk_name);
++	if (!disk->zone_wplugs_wq)
++		goto stop_worker;
 +
- 	trace_f2fs_write_begin(inode, pos, len);
+ 	return 0;
  
- 	if (!f2fs_is_checkpoint_ready(sbi)) {
-@@ -3933,9 +3937,8 @@ static int f2fs_write_begin(const struct kiocb *iocb,
- 	 * Do not use FGP_STABLE to avoid deadlock.
- 	 * Will wait that below with our IO control.
- 	 */
--	folio = f2fs_filemap_get_folio(mapping, index,
--				FGP_LOCK | FGP_WRITE | FGP_CREAT,
--				mapping_gfp_mask(mapping));
-+	folio = f2fs_filemap_get_folio(mapping, index, fgp_flags,
-+				       mapping_gfp_mask(mapping));
- 	if (IS_ERR(folio)) {
- 		err = PTR_ERR(folio);
- 		goto fail;
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index c763fb972e8..92f916ca8b9 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -5920,6 +5920,6 @@ const struct file_operations f2fs_file_operations = {
- 	.splice_read	= f2fs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fadvise	= f2fs_file_fadvise,
--	.fop_flags	= FOP_BUFFER_RASYNC,
-+	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
- 	.setlease	= generic_setlease,
- };
++stop_worker:
++	kthread_stop(disk->zone_wplugs_worker);
++	disk->zone_wplugs_worker = NULL;
+ destroy_pool:
+ 	mempool_destroy(disk->zone_wplugs_pool);
+ 	disk->zone_wplugs_pool = NULL;
+@@ -1975,7 +1970,7 @@ static void disk_set_zones_cond_array(struct gendisk *disk, u8 *zones_cond)
+ 	kfree_rcu_mightsleep(zones_cond);
+ }
+ 
+-static void disk_free_zone_resources(struct gendisk *disk)
++void disk_release_zone_resources(struct gendisk *disk)
+ {
+ 	if (disk->zone_wplugs_worker) {
+ 		kthread_stop(disk->zone_wplugs_worker);
+@@ -1983,8 +1978,10 @@ static void disk_free_zone_resources(struct gendisk *disk)
+ 	}
+ 	WARN_ON_ONCE(!list_empty(&disk->zone_wplugs_list));
+ 
+-	if (disk->zone_wplugs_wq)
+-		drain_workqueue(disk->zone_wplugs_wq);
++	if (disk->zone_wplugs_wq) {
++		destroy_workqueue(disk->zone_wplugs_wq);
++		disk->zone_wplugs_wq = NULL;
++	}
+ 
+ 	disk_destroy_zone_wplugs_hash_table(disk);
+ 
+@@ -1994,16 +1991,6 @@ static void disk_free_zone_resources(struct gendisk *disk)
+ 	disk->nr_zones = 0;
+ }
+ 
+-void disk_release_zone_resources(struct gendisk *disk)
+-{
+-	if (disk->zone_wplugs_wq) {
+-		destroy_workqueue(disk->zone_wplugs_wq);
+-		disk->zone_wplugs_wq = NULL;
+-	}
+-
+-	disk_free_zone_resources(disk);
+-}
+-
+ struct blk_revalidate_zone_args {
+ 	struct gendisk	*disk;
+ 	u8		*zones_cond;
+@@ -2317,11 +2304,11 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	sector_t zone_sectors = q->limits.chunk_sectors;
+ 	sector_t capacity = get_capacity(disk);
+ 	struct blk_revalidate_zone_args args = { };
+-	unsigned int memflags, noio_flag;
+ 	struct blk_report_zones_args rep_args = {
+ 		.cb = blk_revalidate_zone_cb,
+ 		.data = &args,
+ 	};
++	unsigned int noio_flag;
+ 	int ret = -ENOMEM;
+ 
+ 	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
+@@ -2358,8 +2345,8 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	}
+ 	memalloc_noio_restore(noio_flag);
+ 
+-	if (ret <= 0)
+-		goto free_resources;
++	if (ret < 0)
++		goto free_args;
+ 
+ 	/*
+ 	 * If zones where reported, make sure that the entire disk capacity
+@@ -2369,22 +2356,19 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 		pr_warn("%s: Missing zones from sector %llu\n",
+ 			disk->disk_name, args.sector);
+ 		ret = -ENODEV;
+-		goto free_resources;
++		goto free_args;
+ 	}
+ 
+ 	ret = disk_update_zone_resources(disk, &args);
+ 	if (ret)
+-		goto free_resources;
++		goto free_args;
+ 
+ 	return 0;
+ 
+-free_resources:
++free_args:
+ 	pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+ 
+ 	kfree(args.zones_cond);
+-	memflags = blk_mq_freeze_queue(q);
+-	disk_free_zone_resources(disk);
+-	blk_mq_unfreeze_queue(q, memflags);
+ 
+ 	return ret;
+ }
 -- 
-2.43.0
+2.55.0
+
