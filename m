@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-129.mta0.migadu.com [91.218.175.129])
+Received: from mta1.migadu.com (out-252.mta1.migadu.com [95.215.58.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94BC4CC28D
-	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 10:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAB04D990C
+	for <linux-block@vger.kernel.org>; Tue,  8 Sep 2026 10:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788861740; cv=none; b=YVG+1oBwRc90VEU5NfTkq5LXQX6/7kxgqYWMgFenrlKWX3Rn2r5VOctgZc99GN/NJvbAH7j7gH1XM9KV5x963kVnncOnaCxbmytVd+z6t8DHh6khUupzkp9V4lTmn5hPoFoLWHuBd+9NjxEBIungmfGdWPbD9rjVsn6edDyOqDY=
+	t=1788861748; cv=none; b=WgyjL2feDsNeVNKq/A6d08FWa17saBEFZ3Lj9YRDfIaKG6x7pSCxiG6sqcgLOSs5tG+7OuvnVcomkt7lLfDeRhmXGsp7KutbZCml35GVw6AkfZgN7a4+MyqROzDR30VZBSQgrGvMV/JeimqNOVPcxvEVmvACf3a4Qh5cZJL7TnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788861740; c=relaxed/simple;
-	bh=6Er5qYt+ZL2rO4NlQ1VevHRE6P5HGnDAn+0Yr/dg/0g=;
+	s=arc-20240116; t=1788861748; c=relaxed/simple;
+	bh=3EOpRkGpyjybDuKlEe8Dm2WpL894O+e4syc8+3J+rKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hnrsfqEkdJ9SdeZuxCgECpVg7I4oeciyIo8CobDnlTtzQvWY/18GyfQhjSdAWconh7b/0Y5PSl1TWk84RxzwCrNGvcbXRb+FwTpR/8ERx3kze8zmtCQ+cBg2otxFjQlRcybc/wi9Umvw5UHWiZB2i35eQYdYsRzA+OdYUpM9f48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JWvNfjWg; arc=none smtp.client-ip=91.218.175.129
+	 MIME-Version; b=ZFiWSksyxkJdbaVkSrV4YbUuQhbsJYjs0JtloOoYTDZUPmmDdjRRC0iCut/qWbg2lkWZlW5u0ecAtfdmmG+fbtmrssGkPcqhhU1PnV5akUxj7qWlc72jeClnCKk0LRwUqdyUT9L4Dwovva7GJlpudAfmsPuQ/mQTNK1mCCcK1OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YY864aDQ; arc=none smtp.client-ip=95.215.58.252
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JWvNfjWg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YY864aDQ"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=6Er5qYt+ZL2rO4NlQ1VevHRE6P5HGnDAn+0Yr/dg/0g=;
+DKIM-Signature: a=rsa-sha256; bh=3EOpRkGpyjybDuKlEe8Dm2WpL894O+e4syc8+3J+rKs=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788861733; v=1; x=1789466533;
- b=JWvNfjWgf7ukrdt4gC6LENfTtGxf6hReZebMLhAlTcqQa2PvtyEQBUDY8MWYY3173C2Fp8OP
- t+8h7beDta2ewHRVOAXWvVkfB0dA6u2HpmCuaUfMi853g5EVYC4RpLJ02quSXHekNm8cZ7ZAEwD
- i5XvSTaJDLFWdpL8RJiblY58=
+ t=1788861743; v=1; x=1789466543;
+ b=YY864aDQ8ApF0zFToG0dYNGdF4qoOSE+bCJa81VN2QE4H4LehI1OWr48s2PAHSKlJmKz0NnU
+ P8mWLZMCaZIVvTG1iDB6zZuT2o0VQXTRlstCw+hRo/C0+OE4Vnn7e1r9YgnYfsiRxXPeacE7PDF
+ aXWwiahadRC0HFXxHQeVLeCc=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id f280b3f1737e38a0;
-	Tue, 08 Sep 2026 10:02:13 +0000
-X-Mizu-Trace-ID: f280b3f1737e38a0
+Received: by smtp.migadu.com with ESMTPS id e678ba84bb062b64;
+	Tue, 08 Sep 2026 10:02:23 +0000
+X-Mizu-Trace-ID: e678ba84bb062b64
 X-Migadu-Flow: FLOW_OUT
 From: Tao Cui <cui.tao@linux.dev>
 To: tj@kernel.org,
@@ -43,9 +43,9 @@ Cc: cgroups@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	cui.tao@linux.dev,
 	Tao Cui <cuitao@kylinos.cn>
-Subject: [RFC PATCH 1/8] blk-iocost: add iocost_ioc_tick tracepoint for per-period device summary
-Date: Tue,  8 Sep 2026 18:01:36 +0800
-Message-ID: <20260908100143.47598-2-cui.tao@linux.dev>
+Subject: [RFC PATCH 2/8] blk-iocost: define iocost_model_ops cost model interface
+Date: Tue,  8 Sep 2026 18:01:37 +0800
+Message-ID: <20260908100143.47598-3-cui.tao@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260908100143.47598-1-cui.tao@linux.dev>
 References: <20260908100143.47598-1-cui.tao@linux.dev>
@@ -59,112 +59,114 @@ Content-Transfer-Encoding: 8bit
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-The existing iocost tracepoints are state-change driven: vrate_adj
-fires only when the adjustment logic runs, inuse_* only on surplus
-state transitions, activate/idle only on cgroup state changes.  In a
-steady state none of them fire.  The only other way to observe the
-controller (period length, vrate, busy level, active cgroup count,
-device utilization) is iocost_monitor.py, which reads kernel memory
-through drgn and is not usable in most production environments.
+Define the interface for pluggable cost models: a struct_ops with a
+single calc_cost(op, nbytes, sector, cursor, iocg_id, flags) callback
+taking scalar arguments only.  The return value is vtime (2^37 per
+second of device time), clamped to 1s per IO by the kernel.  A return
+value of 0 delegates the IO back to the builtin formula, so a model
+which only handles some IO types cannot make the rest free.
 
-Add iocost_ioc_tick, emitted once per period from the tail of
-ioc_timer_fn() with the overall controller state: period_us, vrate,
-busy_level, active iocg count, usage percentage and running state.
-It fires every period the controller runs, including steady states,
-plus one final tick before the controller goes idle, which makes
-dormancy (e.g. a device saturated entirely by uncharged IO) directly
-visible.
+iocg_id is the id of the issuing cgroup, so a model can keep
+per-cgroup state, e.g. for multi-stream sequentiality detection.
+The id is only valid while the cgroup exists and is recycled after
+removal, so models must treat it as a transient key; struct_ops
+callback signatures are frozen once merged, so the identifier is
+part of the initial interface.
 
-At the default period this is a couple of events per second per
-device; the cost is zero while the static key is off.
+The model is called from the IO submission path under RCU and must
+not sleep.  Only the bio-level charging path consults the model; the
+request-level sizing path keeps using the builtin formula.
+
+This is a definition-only patch; the registration infrastructure and
+dispatch hook follow in subsequent patches.
 
 Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- block/blk-iocost.c            |  5 +++++
- include/trace/events/iocost.h | 40 +++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
+ block/Kconfig              |  9 ++++++
+ include/linux/blk-iocost.h | 56 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
+ create mode 100644 include/linux/blk-iocost.h
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 2745bffcd5eef..c24daa9d72ee9 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2238,6 +2238,7 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	struct ioc_now now;
- 	LIST_HEAD(surpluses);
- 	int nr_debtors, nr_shortages = 0, nr_lagging = 0;
-+	int nr_active = 0;
- 	u64 usage_us_sum = 0;
- 	u32 ppm_rthr;
- 	u32 ppm_wthr;
-@@ -2274,6 +2275,8 @@ static void ioc_timer_fn(struct timer_list *timer)
- 		u64 vdone, vtime, usage_us;
- 		u32 hw_active, hw_inuse;
+diff --git a/block/Kconfig b/block/Kconfig
+index 70e4a66d941ff..bf43be21e00bb 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -231,4 +231,13 @@ config BLK_ERROR_INJECTION
  
-+		nr_active++;
+ source "block/Kconfig.iosched"
+ 
++config BLK_CGROUP_IOCOST_BPF
++	bool "Enable BPF pluggable cost model support for the cost IO controller"
++	depends on BLK_CGROUP_IOCOST && BPF_SYSCALL && BPF_JIT
++	help
++	 Enabling this option registers the "iocost_model_ops" BPF
++	 struct_ops type, which allows a BPF program to replace the
++	 builtin linear cost model on devices configured with
++	 "ctrl=bpf" through io.cost.model.
 +
- 		/*
- 		 * Collect unused and wind vtime closer to vnow to prevent
- 		 * iocgs from accumulating a large amount of budget.
-@@ -2460,6 +2463,8 @@ static void ioc_timer_fn(struct timer_list *timer)
- 		ioc_refresh_vrate(ioc, &now);
- 	}
- 
-+	trace_iocost_ioc_tick(ioc, nr_active, usage_us_sum);
+ endif # BLOCK
+diff --git a/include/linux/blk-iocost.h b/include/linux/blk-iocost.h
+new file mode 100644
+index 0000000000000..7111b5c03dc36
+--- /dev/null
++++ b/include/linux/blk-iocost.h
+@@ -0,0 +1,56 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_BLK_IOCOST_H
++#define _LINUX_BLK_IOCOST_H
 +
- 	spin_unlock_irq(&ioc->lock);
- }
- 
-diff --git a/include/trace/events/iocost.h b/include/trace/events/iocost.h
-index e772b1bc60d60..2b9ff348a4f51 100644
---- a/include/trace/events/iocost.h
-+++ b/include/trace/events/iocost.h
-@@ -178,6 +178,46 @@ TRACE_EVENT(iocost_ioc_vrate_adj,
- 	)
- );
- 
++#include <linux/types.h>
++
++#ifdef CONFIG_BLK_CGROUP_IOCOST_BPF
++
 +/*
-+ * Periodic per-device summary, emitted once per period from the tail of
-+ * ioc_timer_fn().  Unlike the state-change events above, this fires every
-+ * period the controller is running, including steady states, and carries
-+ * the overall controller state so basic monitoring doesn't require drgn.
++ * Pluggable cost model interface for blk-iocost.
++ *
++ * A BPF struct_ops implementation registered against "iocost_model_ops"
++ * replaces the builtin linear cost model on devices configured with
++ * "ctrl=bpf" through io.cost.model.  The model is a pure function of the
++ * arguments below and returns the cost of the IO in device time units,
++ * where 1 second of device time equals 2^37 (VTIME_PER_SEC).  The
++ * returned value is clamped by the kernel.  A cost of 0 delegates the
++ * IO back to the builtin formula, so a model which does not handle a
++ * given IO type cannot make it free.
++ *
++ * The iocg_id argument identifies the issuing cgroup (css id) so the
++ * model can keep per-cgroup state, e.g. for multi-stream sequentiality
++ * detection.  The id is only valid while the cgroup exists: css ids are
++ * recycled once the cgroup is removed, so models must treat it as a
++ * transient key and reset state when they observe it reused.  Whether
++ * the interface needs a release(iocg_id) callback for state cleanup is
++ * an open question.
++ *
++ * The model is called from the IO submission path under RCU and must
++ * not sleep.  Only the bio-level charging path consults the model;
++ * the request-level sizing path (calc_size_vtime_cost()) keeps using
++ * the builtin formula.
 + */
-+TRACE_EVENT(iocost_ioc_tick,
 +
-+	TP_PROTO(struct ioc *ioc, int nr_active, u64 usage_us_sum),
++/* flags for calc_cost() */
++#define IOCOST_COST_F_MERGE	(1ULL << 0)	/* called from merge path */
 +
-+	TP_ARGS(ioc, nr_active, usage_us_sum),
++struct iocost_model_ops {
++	/*
++	 * @op:		REQ_OP_* value (uapi blk_opf.h)
++	 * @nbytes:	IO size in bytes
++	 * @sector:	starting sector
++	 * @cursor:	iocg cursor sector, 0 if none (sequentiality hint)
++	 * @iocg_id:	css id of the issuing cgroup
++	 * @flags:	IOCOST_COST_F_*
++	 */
++	u64 (*calc_cost)(u64 op, u64 nbytes, u64 sector, u64 cursor,
++			 u64 iocg_id, u64 flags);
++};
 +
-+	TP_STRUCT__entry (
-+		__string(devname, ioc_name(ioc))
-+		__field(u32, period_us)
-+		__field(u64, vrate)
-+		__field(int, busy_level)
-+		__field(int, nr_active)
-+		__field(u32, usage_pct)
-+		__field(int, running)
-+	),
++bool iocost_bpf_calc_cost(u64 op, u64 nbytes, u64 sector, u64 cursor,
++			  u64 iocg_id, u64 flags, u64 *costp);
++bool iocost_bpf_model_registered(void);
 +
-+	TP_fast_assign(
-+		__assign_str(devname);
-+		__entry->period_us = ioc->period_us;
-+		__entry->vrate = ioc->vtime_base_rate;
-+		__entry->busy_level = ioc->busy_level;
-+		__entry->nr_active = nr_active;
-+		__entry->usage_pct = ioc->period_us ?
-+			div_u64(usage_us_sum * 100, ioc->period_us) : 0;
-+		__entry->running = ioc->running;
-+	),
-+
-+	TP_printk("[%s] period=%uus vrate=%llu busy=%d active=%d usage=%u%% running=%d",
-+		__get_str(devname), __entry->period_us, __entry->vrate,
-+		__entry->busy_level, __entry->nr_active, __entry->usage_pct,
-+		__entry->running
-+	)
-+);
-+
- TRACE_EVENT(iocost_iocg_forgive_debt,
- 
- 	TP_PROTO(struct ioc_gq *iocg, const char *path, struct ioc_now *now,
++#endif	/* CONFIG_BLK_CGROUP_IOCOST_BPF */
++#endif	/* _LINUX_BLK_IOCOST_H */
 -- 
 2.43.0
 
