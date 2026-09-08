@@ -1,170 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B5659C990;
-	Tue,  8 Sep 2026 18:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EEE52B1F2;
+	Tue,  8 Sep 2026 18:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788891958; cv=none; b=CHTftp2BVhqUNbmik6anF+tz90+TOvsPBWeFw02XgGiHOGbSPZq4dNhcMEN2OFdjAbVSkliVjnua6FHJoLaDjHDBJgBBDGmGNWATYgVTWkV7T575ZB8Otihjw3tk1WJef7KSoZPcpWO32dA0Q9QfhxSJbr1R0Uwke2nsJOSb5/c=
+	t=1788891972; cv=none; b=Q95beOSBNwQsvZR/GUrkMXAuQmovQrRnQKdZ4bEdRYadUDctGEBfkLj8xD6MKfjobvWL9cUwLxl8DQskGOQBFdsmITpFq6283JsFhNj9NEkh2+EH3cljE/0I4QgHpzFDdwHeqnxvlGfpT91TsnrsgT1hFJ0/Q7re0WDNJ9Yfep8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788891958; c=relaxed/simple;
-	bh=dFvKo2wgimjoi6v8qrBvNdwiJV+aaDYxtnGgRwN9Mzo=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=rbJQS8iyuhyTVc2zQtXDm8frRrccpkH4cIJkY7ipOKh4uz7wMKAcl7cguP4OsXNYkVNS3+07TsiO/yKZMASNyCh9qoawMZi7X4iI49D35Z2dgXmfF0l/wQ1yYhhWgK4yHPl2uOxDMQI7PMB2jFLYoYRRBTW+9KH2ym5tnb5f4aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtUJWXMk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788891972; c=relaxed/simple;
+	bh=JotacaC8Yi6RB3Wh1xuZinZf/eembXM8GBApBE0Q6J8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=npmRjVcrAoc35fhZTCbih0i8L1aeme7ZO5KgG1OYKH/kk7sL0Srbfp4JJekoh+SR50pxZZwjhYCFow1BZESlxoURnXmqe34qKnQuT3j7Y2gT2/jVEi98ClUtIoZ2/VzKcU/V/IE8DSk3A0Ifh8t6xDqLGIQPvuOahpqrFNAxlCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SM4eteF3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtUJWXMk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD2091F00A3A;
-	Tue,  8 Sep 2026 18:25:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788891955;
-	bh=ggXtq3bunUbLmKM1huLP9AkpZpdVTn5E2T4t//Tpijs=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=FtUJWXMkcN/8Yt3EIZSbJoEWJoNUlzZUpdcMoDGa0s0EPSmrU/ylUey8BPdu4fHEo
-	 FOEkLxr1amnwYKi8v5hwe+ghRqSo9Ja60ZbztVEGLu4l1zMpa+op2i2ZiB9mJ4D69L
-	 c7sT4sK12bC6vgJ0Ene+f3K/WSKugbdKjTzEOhgchm8QZWBFoxt+bTbte7Vrq8PbQH
-	 BzPAfOZ2jImmE6/p6HNa24Oez+KBP6u5IHhqOOEJnXZTxOCQ0oizEFQULzYMPZy09U
-	 KAZPQmA99BunlgD9V8dMLWpVDbtVM7xGERMB/I2U8jMExJW4jenViShb4kxElJ0ngM
-	 /ij8qmjOGlg0Q==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id E801CF40066;
-	Tue,  8 Sep 2026 14:25:53 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Tue, 08 Sep 2026 14:25:53 -0400
-X-ME-Sender: <xms:MVOgarF9JbAShygp14cmukJWB6jYu45ZSVwYGy7JwyqfoeL1QvlDtg>
-    <xme:MVOgajJenudN_tOWA8F9mqK24RpAWIBYtPMsN_ZsraEgapma8arrDIevHiMNK8DX_
-    3JHgQUn4mCwsLgwLZhnFbfwuAv8z4ktOyAUEJiejlfsjyiVviZb1sT1>
-X-ME-Proxy-Cause: dmFkZTFD74QV18d/sk8xPd+vfyUwpFmtrlQTCQuFGStRknzlodZhUrafwOgYulpo79eDuD
-    YwmB0ZhBeYhgCbLZCc+YMIYhevY+yJzhnzzesJmbUa0tAGi26e698vnskJhznhE4WvBgXo
-    acxz7uvcNifYzXJelBCKRn+DVzwgGuProSmFO+pgS44QzRB49U45GNOyRL3hBfseuxXgJT
-    /TfKW3Or6Vq+kYLn6o9HzP7ZnUTH31TpveCdLJ2hXlTTu5p/bAuIbmcrnJ4PoTCd81JVKK
-    31TtTjnx9WTL0aTSiLpPVSDJpnHAprgjoBDHyQepDqXfF6RDtlTHYzjPX4SIhhM4nkVZGO
-    69Spj3N8wJKssRnZeXBICQ/Fl67KWDrFEhpErPkPrH/yKpdzLtUhafF8Vgt4wQvacU0rr3
-    F2ZjWox2dBF4be/TMtlDrZFU8YFaqPKVzN3osjq5PW6jAUDrWVpqiVls+/M+0dMfEU9UCz
-    YFANAma/ut1mB0cf5yR6L1i1KwdyikYa57FAvkSVNOTlzzhxxIveyssz3xr4gdAyJH3nMH
-    kGEC9VmdD+hNlVl9QIRD4psKh3SXNhg67E+JJqKTkDj81835UPw5tCOBOBw38//5B+5gMQ
-    /J5HXC19UrJcsjD7tmMPiqchVLMyfFXHP43J82mmQz99bs5f6nB8kPty5m4A
-X-ME-Proxy: <xmx:MVOganplPVK3rq69OMb44nQhIGah1YC-Et2WS2UU428JL7HBxNXBmQ>
-    <xmx:MVOgagvMMBQmtkgTTladCnxqfFNPywTepoGBBOrwQgniTS1Eay83sg>
-    <xmx:MVOgaqaAyaf0kaiygW1wxJUsdiceOhr3sWDfvE2NfIz_tpQcJs8_1w>
-    <xmx:MVOganYIUnxCwzBzWcs4MvyjTRmZmhC00sHGPWg0By5plDwU6ZRb2g>
-    <xmx:MVOgarksjuuEMCGc1HhUw8HIGvjN0GM-gLJdVU_IX_4Z7QS0x9l6Fwnc>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C649A7811F5; Tue,  8 Sep 2026 14:25:53 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SM4eteF3"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 688F1gkO080739;
+	Tue, 8 Sep 2026 18:25:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=RvgaXF
+	H6uOhXgX48Gwaka3u/f8LEurm0LC9LjU6CT+U=; b=SM4eteF3Ab47gTuP78zAsC
+	JeoHEnWCt6GgWYFNDplzlQD8594SytEigB81ok+qt5p2TwClMzyUETbs5BCYj/dS
+	kUNL7SeQOb7WLJFz6DRe903m5N2VI0Ai6aTY5B06YGN6jhc3mxmHnNSJi9Kj1Ewk
+	mgOiXbXLcLObzsM6ZaCwprrDJa8eeAuB8j8ZMEZh4I6kBCbn+EdvBXwk3e7moEvu
+	mz31PMToCCfcj/q0iFGAkngou+Rm9xTXvlTtG1Da601fo6MX9BGXI7YfpIhhHbK0
+	JH/zSXJFQaJbJbUXsNVkngQw1uxfWJZAFmHE0wtsR1+ef7Cp1H5k6swe8ZgcpJZQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ggbjrrt3u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Sep 2026 18:25:55 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 688IBGrm015513;
+	Tue, 8 Sep 2026 18:25:54 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ggwsw5sey-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Sep 2026 18:25:54 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 688IPrpR24707834
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 8 Sep 2026 18:25:53 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8001A58062;
+	Tue,  8 Sep 2026 18:25:53 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51DE058054;
+	Tue,  8 Sep 2026 18:25:50 +0000 (GMT)
+Received: from [9.61.40.182] (unknown [9.61.40.182])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  8 Sep 2026 18:25:50 +0000 (GMT)
+Message-ID: <70108fa1-d290-44d9-966f-b50a220562cf@linux.ibm.com>
+Date: Tue, 8 Sep 2026 23:55:48 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AvkNhIlgtVI3
-Date: Tue, 08 Sep 2026 14:25:32 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Mike Snitzer" <snitzer@kernel.org>
-Cc: linux-nfs@vger.kernel.org, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, axboe@kernel.dk, jlayton@kernel.org,
- david.flynn@hammerspace.com
-Message-Id: <995a853c-2c54-4bd0-9708-f6e0c1be7fd5@slotpi15m67>
-In-Reply-To: <20260908163448.30841-5-snitzer@kernel.org>
-References: <20260908163232.30774-1-snitzer@kernel.org>
- <20260908163448.30841-1-snitzer@kernel.org>
- <20260908163448.30841-5-snitzer@kernel.org>
-Subject: Re: [PATCH 4/4] nfsd: fall back to buffered I/O when a direct write gets
- -EINVAL
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] md: don't wait for q->limits_lock while md holds back
+ I/O
+To: Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc: abd.masalkhi@gmail.com, linux-raid <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, Song Liu <song@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>, Yu Kuai <yukuai@fygo.io>,
+        tom.leiming@gmail.com
+References: <20260907133929.1081540-1-jinpu.wang@ionos.com>
+ <e6ad5b61-0ba2-49fa-96c7-e821defe45a7@linux.ibm.com>
+ <CAMGffEmKrqcxYAtdTxg6GnwwFjJJg50wxpTfBobps-_QwQAoGg@mail.gmail.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAMGffEmKrqcxYAtdTxg6GnwwFjJJg50wxpTfBobps-_QwQAoGg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=E7T9Y6dl c=1 sm=1 tr=0 ts=6aa05333 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8
+ a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=UgJECxHJAAAA:8 a=ymsFPWhVC54ODViv0ewA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=-El7cUbtino8hM1DCn8D:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA4MDE5NiBTYWx0ZWRfX2/xszqn6q+cm
+ HuynDT+87VNeE114lHHA6Okmj58Cj8j4ivXajmXunSjdJ47b1uBBdL9eE0UhI+lbmzr6dD/dBT3
+ ioswykhE3TpQZjHmq3ozn1xUi9uPPRQ=
+X-Proofpoint-ORIG-GUID: X3KH50dQw882Km4FrvIbuPD4rN2jbXzf
+X-Proofpoint-GUID: D5c61sM_gB0ibo8SEeViA1o2HxIfVVjD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA4MDE5NiBTYWx0ZWRfX47zNikqvAGJT
+ 0dDWkWLxGwInMSU/y4PCTD7ujD8O/nMgSSp3rMknYQQT0+DnV5NkATMo7D24f5cqgSqhKvRIUym
+ MkEJgy4PaEqPFfU3/8+iYpU+zjqTBcGn9CFDDGnQL+jYYgenE1vJqOSn+vpoUYz53kysfPqsE9p
+ Ki6Vf7/fKJg8r4mr3lHn3YNlJI7taKtNsgmyrfu6dKqPvAOKmDvKILMtupk+3jNje/LXBTkLK/r
+ U7mEPaTeHbxtR8GplgG8hfwttyQPrLYJ3WGjN4AWx6iCNz1gmy3L069VGMgsxImJXEG41P6Mf5J
+ ExPyhnx4jxsmGo6h1jcsZNazZ7WagtQUG9wnaM6bsqnLjP+Wg0/fwGPpRhxbHfb1rBft9IwhD7A
+ aFeyyCw7B/AsFURf9naPPQC1P2F2+glWexGKSYtRrO0p2/Ey7WBN5EUZQCXmrZ320dtRI6Atnj5
+ cdzwr2/IQgu3xkqfWFw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-08_03,2026-09-08_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0 spamscore=0 suspectscore=0 priorityscore=1501
+ bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609080196
 
-On 9/8/26 12:34 PM, Mike Snitzer wrote:
-> nfsd_dio_iter_is_aligned() approves a write iterator against the
-> file's STATX_DIOALIGN attributes (a whole-iterator iov_iter_alignment()
-> test against dio_mem_align), but the block stack applies stricter
-> geometry tests at bio split time: bio_split_io_at() checks each bvec's
-> offset and length against the queue's dma_alignment and may find no
-> valid block-size-aligned split at all. An ITER_BVEC WRITE payload can
-> pass the former and fail the latter: bio_iov_bvec_set() hands nfsd's
-> bvec array to the queue as-is, and the payload's first fragment starts
-> mid-page (the RPC header precedes it in the receive buffer), so the
-> iterator's interior page boundaries need not be logical-block aligned
-> and a bio the queue must split may have no valid split point. When
-> that happens, nfsd_direct_write() returned the -EINVAL to the client
-> as a failed WRITE (NFS4ERR_INVAL) -- for a perfectly valid request.
->
-> Observed against a brd-backed nvme-loop XFS export (dio_mem_align=4)
-> with 1 MiB WRITEs, e.g. arriving as 65 bvecs with bv0=(408,15976):
-> the gate admits the iterator, the block layer rejects it, and every
-> large write on the affected connection errors out (dd: Invalid
-> argument).
+On 9/8/26 5:39 PM, Jinpu Wang wrote:
+> On Tue, Sep 8, 2026 at 1:16 PM Nilay Shroff <nilay@linux.ibm.com> wrote:
+>>
+>> On 9/7/26 7:09 PM, Jack Wang wrote:
+>>> From: Jack Wang<jinpu.wang@cloud.ionos.com>
+>>>
+>>> Writing to a queue limits attribute of an md array while a spare is
+>>> being re-added deadlocks the array.  I reported this earlier here:
+>>>
+>>>     https://lore.kernel.org/linux-raid/CAMGffE=heGA3y8FjQ0Sm1jj-kd-=H9Y54WozKASSEZhc9UNKjA@mail.gmail.com/
+>>>
+>>> Four tasks, one array:
+>>>
+>>>     udev-worker    queue_attr_store() holds q->limits_lock, waits in
+>>>                    blk_mq_freeze_queue() for q_usage_counter to drain
+>>>     fio            holds a q_usage_counter reference, parked in
+>>>                    md_handle_request()'s is_suspended() loop
+>>>     mdadm          suspended the array, waits for reconfig_mutex
+>>>     md_start_sync  holds reconfig_mutex, waits for q->limits_lock
+>>>
+>>> The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Since
+>>> commit c99f66e4084a ("block: fix queue freeze vs limits lock order in
+>>> sysfs store methods") the sysfs store holds q->limits_lock across the
+>>> freeze, so md must not block on that lock while it is holding back the
+>>> I/O the freeze waits for.  That is the same hazard mddev_suspend()
+>>> already documents for reconfig_mutex.
+>>>
+>>> The rule this series applies is that q->limits_lock nests outside both
+>>> reconfig_mutex and the suspend.  Where md cannot arrange that, because
+>>> it is called with reconfig_mutex already held or from the sync thread,
+>>> it takes the update with a trylock and does without one on a contended
+>>> pass.
+>>>
+>>> Patches 1, 2 and 4 are plumbing with no functional change.  Patches 3
+>>> and 5 convert the two callers that cannot own an update.  Patch 6 does
+>>> the hoists, all in one patch because a mix of the two lock orders is an
+>>> ABBA.
+>>>
+>>> Two callers still take q->limits_lock inside reconfig_mutex, both with
+>>> the array suspended, and patch 6 says why: ->start_reshape() from
+>>> action_store(), which suspends before flushing sync_work, and
+>>> raid*_run() -> queue_limits_set() from level_store(), which already
+>>> hangs on its own because it freezes the queue while suspended.  Both
+>>> need more restructuring than belongs here.
+>>>
+>>> The patches are based on v7.3-rc2.
+>>>
+>>> Tested there with a raid1 of two ram devices, fio in flight and a loop
+>>> writing queue/max_sectors_kb: 20 fail/remove/add cycles complete,
+>>> where the same test wedges the array before the series.  Every patch
+>>> builds on its own.  A reshape and a level change are not covered by that
+>>> test.
+>>
+>> Overall, I think the direction looks good. With this series, we now have the
+>> locking order where q->limits_lock is acquired before the suspend and
+>> reconfig_mutex.
+>>
+>> However, when I ran these changes through blktests, I hit the lockdep splat[1],
+>> which exposes an ABBA dependency between disk->open_mutex and q->limits_lock.
+>>
+>> Looking at the existing dependency chain, disk->open_mutex is expected to
+>> be acquired before q->limits_lock. However, with this change, md_ioctl()
+>> acquires q->limits_lock first and subsequently reaches md_import_device(),
+>> which acquires disk->open_mutex. This reverses the existing lock ordering
+>> and introduces the ABBA dependency, so I think this needs to be addressed.
+>>
+> 
+> Thanks for running this through blktests.
+> 
+> You are right, and it is worse than the one path you hit.  The import is
+> not the only offender: everything in the mddev->pers branch of
+> md_add_new_disk() that opens or closes a component device runs with
+> q->limits_lock held.  Besides md_import_device() there are four
+> export_rdev() calls and one md_kick_rdev_from_array(), and export_rdev()
+> ends in fput(rdev->bdev_file), so it takes disk->open_mutex too.
+> rdev_attr_store() looks like a second instance: it starts the update for
+> every state_store() write, and "remove" reaches
+> md_kick_rdev_from_array().
+> 
 
-Thanks for chasing this down. The bv0 numbers make the gate defect
-clear: 15976 is not a multiple of the logical block size, so the
-direct segment's first interior bvec boundary lands mid-sector. The
-boundaries after that are page boundaries, which are fine.
+I think fput() doesn't immediately release the blkdev, as the final __fput()
+is deferred through task work or delayed fput work. So that shouldn't be an
+issue here. Also, md_kick_rdev_from_array() defers the cleanup until
+mddev_unlock(). mddev_unlock() should be called after we release
+q->limits_lock, so this should not be an issue here.
 
-A small correction for the commit message: nfsd_dio_iter_is_aligned()
-doesn't exist. The gate is the first-bvec offset test in
-nfsd_write_dio_iters_init(), and it checks only that one offset
-against nf_dio_mem_align. Likewise bio_iov_bvec_set() is now
-bio_iov_iter_set().
+> So the rule needs to be stronger than what I wrote: q->limits_lock nests
+> outside reconfig_mutex and the suspend, and must not be held across any
+> component device open or close.
+> 
+> Two ways to get there, and I would rather hear which you prefer before
+> respinning:
+> 
+> 1) Keep the lock outermost, move the open and close out from under it.
+>     md_ioctl() imports before taking q->limits_lock and releases after
+>     committing and unlocking; md_add_new_disk() hands the rdev back
+>     instead of exporting it.  The import then runs without
+>     reconfig_mutex, so the superblock format fields need a snapshot and a
+>     recheck under the lock.  Only the mddev->pers branch needs this, the
+>     other two never reach add_bound_rdev().
+> 
+> 2) Drop the hoist for ADD_NEW_DISK and stack the leg after resume, with
+>     q->limits_lock on its own.  Much smaller, but the leg is live before
+>     its limits are stacked and the integrity rejection lands after the
+>     add rather than before it.
+> 
+> Is there a better option?  If ->hot_add_disk() is meant to be callable
+> with an update already in flight, that limits how far the open and close
+> can move.
 
-> Treat -EINVAL from the direct attempt as "not direct-able": restore the
-> segment's iterator and retry it as (uncached when FOP_DONTCACHE)
-> buffered I/O, the same fallback nfsd_write_dio_iters_init() picks for
-> geometries it rejects itself.
+I think moving q->limits_lock after md_import_device() in the mddev->pers
+branch looks reasonable to me. This reduces code churn, and we can acquire
+q->limits_lock after md_import_device() returns, before proceeding with
+the queue-limit update.
 
-[ ... ]
+We should also move the device suspend until after q->limits_lock is acquired
+for ADD_NEW_DISK, so that we maintain the intended ordering of q->limits_lock
+and suspend.
 
-> @@ -1467,6 +1469,33 @@ nfsd_direct_write(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  		expected = iov_iter_count(&segments[i].iter);
->
->  		host_err = vfs_iocb_iter_write(file, kiocb, &segments[i].iter);
-> +		if (unlikely(host_err == -EINVAL &&
-> +			     (kiocb->ki_flags & IOCB_DIRECT))) {
+This also ensures that q->limits_lock is not held across component-device
+open/import, avoiding the disk->open_mutex -> q->limits_lock dependency
+reversal reported by lockdep.
 
-[ ... ]
+Thanks,
+--Nilay
 
-> +			segments[i].iter = saved_iter;
-> +			kiocb->ki_flags &= ~IOCB_DIRECT;
-> +			if (file->f_op->fop_flags & FOP_DONTCACHE)
-> +				kiocb->ki_flags |= IOCB_DONTCACHE;
-> +			trace_nfsd_write_vector(rqstp, fhp, kiocb->ki_pos,
-> +						segments[i].iter.count);
-> +			host_err = vfs_iocb_iter_write(file, kiocb,
-> +						       &segments[i].iter);
-> +		}
-
-Per our discussion last October:
-
-  https://lore.kernel.org/linux-nfs/aPXihwGTiA7bqTsN@infradead.org/
-
-The conclusion then was that -EINVAL from ->write_iter can come from
-a number of conditions in the filesystem, so NFSD can't treat it as
-meaning only that the I/O was misaligned. That still holds, so I'd
-rather not use -EINVAL to signal a retry. An -EINVAL that really is
-the filesystem rejecting the request would now cost a second full
-write attempt before surfacing anyway.
-
-nfsd_write_dio_iters_init() already has the segment start and
-nf_dio_offset_align, and after the first bvec every boundary is
-page-aligned. If it also requires the first bvec's remaining length
-(from the segment start) to be a multiple of offset_align and takes
-the no_dio path otherwise, that rejects bv0=(408,15976) up front
-using only data NFSD already has.
-
-What would help me understand the failure even better:
-
-- Which -EINVAL in bio_split_io_at() fired: the per-bvec dma_alignment
-  test, or the zero-length result after ALIGN_DOWN()?
-
-- On the reproducer, how does stx_dio_offset_align compare with the
-  queue's logical_block_size?
-
-If there turn out to be cases the gate can't predict from the statx
-data, that seems like a question for the block and fs folks about
-what error the filesystem should surface, rather than something to
-work around in NFSD.
-
-
--- 
-Chuck Lever (Come to NFS bake-a-thon! https://nfsv4bat.org)
