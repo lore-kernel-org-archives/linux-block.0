@@ -1,240 +1,98 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7672B583AA2;
-	Wed,  9 Sep 2026 16:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1393A1693
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 19:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788972196; cv=none; b=bw5PyxIio7v5k4I1DAlsCwN4T7tSgNeiMYltMP0DfVKWDEXDDH+nTTsPiZjOZ6KRxlf9S8rVBc6MbO8PfUPNC8J1ijxfgnCHPr09vY+TcmifpSspUiAISWLjg2tGStoGlR8lQHCN1qsocFQBIxZ6dsIcPgkm36oxdAsWepNCZNo=
+	t=1788981087; cv=none; b=qKIAfiZVQYqwkIe3HcbuP/JmkU1YZo+nk0EVHZTPIhM7JzJJMTo481uhRLKVimZwC/SEMPdtoQfeH4NQYjjZHKYlC1jOWxEOTAUoA5btyE8yuMC4H1l+f2+w4/oAGSoaztwQSWASTTPWqvDKcIw6yvHjS3ECGKMoXeVhdk39VAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788972196; c=relaxed/simple;
-	bh=Rmv+XFG0Smc2ev5OLs9Elfy1TSAjyDdHLInw0IJrl4M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lzMx1EITGBgSSG3SyArjjevTTQ79RQ2mHgYJ2FXwuO+Tpg27q9K5epEndfghDWxyVlXIM/QozfcSklA7iAocfykYRV63p4bjEZmG2EFjHGvKWgMQQVasq+/Zco7F0BE2S7fxD8ULO7DN1oA8UcgTmBS7YwAehBFX2FFlIKiiz5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=n4iCgFEM; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1788981087; c=relaxed/simple;
+	bh=uWTE4KFoN9z7NQm6uONrFNah204dGFqp0h597QOiKpM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WrEDBRkl294SMw0QEdN0xK/se8rPxPyHqQHkzreVQWW/uErKHO7KtrAvxNe5GKKIK57HnQftbsNqV+gCBZfQ/y2oKqVC9hRlLSqtQtoRLS5p28Tbe565P73SJ+e6ll9IpQHm0E+ttyaZjLPLvoMIPi53wIl/vRVj/MFYJ4ocPjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f+TE+L9o; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="n4iCgFEM"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hg67P6Kgxzlfvpb;
-	Wed,  9 Sep 2026 16:43:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1788972178; x=1791564179; bh=qD52kSI1bMiOql8tKOqAnnYb
-	ynQfw9FhKyunGxJ4H2w=; b=n4iCgFEMQEmPX1Ij3Om1LK0nnt0tTbDtZwIZaOTn
-	EjzudmIgqoqTb4QbC1dhTT1Ftbf/aItaxHEi+Rd0xWNQYl0kTvTP16N/icIcH4EI
-	Zz2eIQERlJoHHbmCNZZPTYG5punBSLgYBvTClToBIMhDHs/S0D8Xi4CLqxl2o9+Y
-	oIOidxOBUTHH3KeighWCbqqw9j5hBIK5WAhBnL7OGUy38v3NIildnCAHEZZGYJFW
-	S0sjeoY6ZvCrnKj+jGgMARXK8B2qRZXKEUNAAcr1fd0BHCcqlRfbi6nI3RM5kmwx
-	kbbsCtXMqx5SbisPCdGpU9E75nIxfYNUrN9AKtsQwNbxtw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id N08FdswJcFRd; Wed,  9 Sep 2026 16:42:58 +0000 (UTC)
-Received: from [100.86.178.220] (unknown [104.133.214.192])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hg6724zrCzlfvpG;
-	Wed,  9 Sep 2026 16:42:54 +0000 (UTC)
-Message-ID: <2da174ef-1d5a-425d-b885-be9482b0be90@acm.org>
-Date: Wed, 9 Sep 2026 09:42:53 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+TE+L9o"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-836c4474028so62862167b3.0
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 12:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788981085; x=1789585885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NP8VYiUC10Sz2tQCfzJkm+STUtPDVYzlvloEvsflTSQ=;
+        b=f+TE+L9oCnwbN9jNQcniw8QWsX7Gqwe7xOLGhV2t+WP8OQiznGt1u78o01qL0/uImX
+         5Pn0OBRmEcn4EKExNnCrUH1romw32QohX5X7KM6QLxZIA/F2T5egGQvWspsCO6qf6Vln
+         ZUdT7kV2/YFKyK0x6g9sRT9SgufHlPztK9aZxEmpCkv0YClVJQCXF6DSuuENyK1jqifG
+         gIUji8nb05NPb3YvatBTb7SFYv3fBlhoQ105WSEizVVhAnUSV+uYXP/k9TVzB2PpIBSS
+         XZcH2iE+m/OmlHskM9FB85OAzA71g+/SPt/y6ST0ooqrkHpaWzEhgfVcglIS7yhXPUix
+         etjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788981085; x=1789585885;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NP8VYiUC10Sz2tQCfzJkm+STUtPDVYzlvloEvsflTSQ=;
+        b=aWRg/cBECGtHgDZ7PPM7CtzS9kbCMFhNpVXJXbviEsPeQAg6R95jpFhDzBqFw+/PkQ
+         0regA+PUL4j0k9EEuMO/A1RoOJoL5CHX/dXUK2NK8+QMrev1bin2qkHeIzV84Fzpys47
+         pHWSWZt1cgK6l19Ho34cywUFqvRNhB0NEX5sCFIvvl4ekqy3cKM5DXwRn1i/dswjZ+hV
+         T7x0DoXR3xV6qJdLnE/bs3bb64aoAzqaqgTmb1acRi9dtlYlvKBA+LgThY/R498h0FcL
+         Y1mCAwMfbLFGc8OvnN7rg+/t8vVqi0iLAx0XhpoGQhYnq7Nm0vHFEvqd3mSAYM83xKBG
+         rT/Q==
+X-Gm-Message-State: AFuF++nQe/nFCIYjvel3nVCciXUp0Skp3gPP2eMAxmmTMjxfFx6K481N
+	SXdv0qT786PPUlNUs1e7zh2yqgkVY/XcuiqmGF9jMUR4drGDQPLBJZ7hC6/G26MPHYpl1A==
+X-Gm-Gg: AYBFou0q63Z8jm81nvfD7lNpBr+pYiWn0LiniDkUVBimKvLo0DW8l7NTaHq7XPQYsoi
+	FNlzpbEyYRB3Ya86zInt+g7cypsjFpkxH4cvyEWeYOam5C2Oby901PooDuQeXdAQgM4+WZmXdl9
+	xlk6x/Y17ng1TZprSlKV5/4PdHxssRAKZvb/zUEwDIPgtU4cgIzgIW2Zp+2HbAtOIE4tpY+SJ+G
+	i3dOc1HzvSCWya0WqTpmVQcWloP/i/tH64ro9PdvTKSP3IEUvRDJr4xFOTghDyDoGHUqypwBzQU
+	2cacFb8QAcKqTHNxIjXkfaojtb616xxxJqg9NkJFxykmmRMQgdyPzLg3h9+nRx+81Kfc8jK/GJH
+	Mp+JtVbcWMrsFX+cYakdYhsQFFRpCykc9Dhmn0bwcpwiipyU7fBX0C3Drqn4HqrPTnpGZ/efwfC
+	/2RynejagBf4WxgD/n72SKl453XB2X94+qTXgWFfkqLz3hX9QTAfZ5Slc8oZeMlTFEGJFHlg==
+X-Received: by 2002:a05:690c:e3ea:b0:873:5bb2:6bfa with SMTP id 00721157ae682-8735bb26d93mr104665667b3.36.1788981085104;
+        Wed, 09 Sep 2026 12:11:25 -0700 (PDT)
+Received: from debian.lan ([172.245.89.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397f9f0734sm1500624385a.4.2026.09.09.12.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2026 12:11:23 -0700 (PDT)
+From: Maks <mi9992828@gmail.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: block: zero logical block size leads to infinite loop in set_init_blocksize()
+Date: Wed,  9 Sep 2026 22:11:07 +0300
+Message-ID: <20260909191107.53134-1-mi9992828@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <apm0q8sNDooT53jU@kbusch-mbp>
+References: <apm0q8sNDooT53jU@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/13] ARM: remove riscpc
-To: Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Linus Walleij <linusw@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- imx@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
- linux-omap@vger.kernel.org, linux-block@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
-References: <20260908152808.3928630-1-arnd@kernel.org>
- <20260908152808.3928630-4-arnd@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260908152808.3928630-4-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 9/8/26 8:27 AM, Arnd Bergmann wrote:
-> The Acorn Risc PC is the oldest still support Arm machine in the kernel=
-,
-> originally shipped with an ARMv3 ARM610 support in 1994, it later allow=
-ed
-> faster StrongARM CPUs.
->=20
-> The main limitation here is the CPU bus that does not allow 16-bit
-> wide data transfers and hence requires the kernel to be built with the
-> -march=3Darmv3 compiler option that was discontinued in gcc-9.
->=20
-> As gcc-8 is barely supported for compiling the kernel, this one
-> will not see another LTS kernel release, so remove it now.
+Hi,
 
-If this patch has to be reposted, here is the feedback of my AI coding
-assistant (based on an LLM and hence may be wrong):
-----------------------------------------------------------------------
-Overview
---------
-This patch removes the Acorn RiscPC platform (ARCH_RPC), the oldest=20
-32-bit ARM machine supported in mainline Linux (originally ARMv3 ARM610,=20
-later StrongARM SA-110). Because RiscPC hardware requires -march=3Darmv3=20
-(discontinued in GCC 9) due to bus limitations, deprecating and removing=20
-it paves the way to clean out legacy ARMv3 support from the kernel.
+> How did you manage to get a block_device created, but bypassed the check
+> and override for a zero logical block size in blk_validate_limits()? Is
+> your driver writing over the limits outside the API's update path?
 
-Removing RiscPC also represents a major architectural milestone for=20
-arch/arm: with SA-1100 (patch 1), Footbridge (patch 2), and RiscPC=20
-(patch 3) removed, COMMON_CLK, SPARSE_IRQ, and USE_OF (Device Tree)=20
-become unconditionally selected for all 32-bit ARM targets, and legacy=20
-headers mach/io.h and mach/memory.h are eliminated.
+Yes, it does update the queue limits directly:
 
-Overall, this is a very welcome cleanup, but there are a few missed=20
-references, orphaned symbols, and stale comments that should be addressed=
-.
+    volume->queue->limits = limits;
 
-Issues & Observations
----------------------
-1. Missed arch/arm/Makefile cleanup
-Patch 03 deletes the entire directory arch/arm/mach-rpc/, but does not=20
-touch arch/arm/Makefile. As a result, two orphaned entries remain:
+There is no blk_validate_limits() call on this path, so this bypasses the
+normal queue limits validation.
 
-makefile
+Given that the driver is clearly bypassing the normal queue limits
+validation, would a defensive check in set_init_blocksize() still be
+considered worthwhile to avoid the infinite loop in this case?
 
+If so, I can prepare and send a patch.
 
-machine-$(CONFIG_ARCH_RPC)		+=3D rpc
-machdirs-$(CONFIG_ARCH_RPC)		+=3D arch/arm/mach-rpc
-Furthermore, machdirs-$(CONFIG_ARCH_RPC) was the very last user of=20
-machdirs- in arch/arm/Makefile (after Footbridge and SA-1100 are removed=20
-in patches 1 & 2):
-
-makefile
-
-
-# legacy platforms provide their own mach/*.h headers globally,
-# these three are mutually exclusive
-machdirs-$(CONFIG_ARCH_FOOTBRIDGE)	+=3D arch/arm/mach-footbridge
-machdirs-$(CONFIG_ARCH_RPC)		+=3D arch/arm/mach-rpc
-machdirs-$(CONFIG_ARCH_SA1100)		+=3D arch/arm/mach-sa1100
-KBUILD_CPPFLAGS +=3D $(patsubst %,-I$(srctree)/%/include,$(machdirs-y))
-Once RiscPC is gone, the entire machdirs- inclusion block can and should=20
-be removed from arch/arm/Makefile.
-
-2. Missed ARCH_ACORN reference in lib/fonts/Kconfig
-The patch deletes config ARCH_ACORN from arch/arm/Kconfig and removes=20
-#ifdef CONFIG_ARCH_ACORN from
-lib/fonts/font_acorn_8x8.c
-, but missed
-lib/fonts/Kconfig:74
-:
-
-kconfig
-
-
-config FONT_ACORN_8x8
-	bool "Acorn console 8x8 font" if FONTS
-	depends on FRAMEBUFFER_CONSOLE || DRM_PANIC
-	default y if !SPARC && !FONTS && ARM && ARCH_ACORN
-Because ARCH_ACORN is removed, this default can never trigger and the=20
-reference should be cleaned up.
-
-3. Orphaned ARCH_RPC reference in arch/arm/mm/Kconfig
-In
-arch/arm/mm/Kconfig:281-282
-:
-
-kconfig
-
-
-config CPU_SA110
-	bool
-	select CPU_32v3 if ARCH_RPC
-	select CPU_32v4 if !ARCH_RPC
-Since ARCH_RPC is removed, select CPU_32v3 if ARCH_RPC references a=20
-non-existent symbol. If CPU_SA110 remains temporarily (before the=20
-architectural cleanup in 7.5), this should be simplified to select CPU_32=
-v4.
-
-4. Dead code in arch/arm/kernel/atags_compat.c
-With CONFIG_ARCH_ACORN removed from arch/arm/Kconfig, two blocks in
-arch/arm/kernel/atags_compat.c
-  are now dead code:
-
-Lines 150=E2=80=93157: #ifdef CONFIG_ARCH_ACORN / if (machine_is_riscpc()=
-)=20
-memory bank tagging.
-Lines 186=E2=80=93194: #ifdef CONFIG_ARCH_ACORN ATAG_ACORN translation.
-These blocks should be removed as part of this patch.
-
-5. Stale comments
-arch/arm/include/asm/io.h:207-209
-:
-c
-
-
-/*
-  * Now, pick up the machine-defined IO definitions
-  */
-#if IS_ENABLED(CONFIG_PCMCIA) || defined(CONFIG_PCI)
-CONFIG_NEED_MACH_IO_H and #include <mach/io.h> were removed, leaving=20
-this comment describing generic PCI/PCMCIA I/O limits.
-arch/arm/boot/bootp/Makefile:21
-: # guess an initrd location if possible is left dangling right before=20
-ifdef INITRD_OFFSET after all initrd_offset-$(CONFIG_...) logic has been=20
-stripped out.
-6. Floppy driver & arch/arm/include/asm/floppy.h status
-The patch removes the ARM MFM AND FLOPPY DRIVERS entry from MAINTAINERS:
-
-diff
-
-
--ARM MFM AND FLOPPY DRIVERS
--M:	Ian Molton <spyro@f2s.com>
--S:	Maintained
--F:	arch/arm/include/asm/floppy.h
--F:	arch/arm/mach-rpc/floppydma.S
-While
-floppydma.S
-  was deleted,
-arch/arm/include/asm/floppy.h
-  was left in the tree.
-
-On ARM, floppy support requires ARCH_MAY_HAVE_PC_FDC, which was selected=20
-only by Footbridge and RiscPC.
-With both gone, no ARM board selects ARCH_MAY_HAVE_PC_FDC.
-Furthermore, asm/floppy.h references IRQ_FLOPPYDISK and DMA_FLOPPY,=20
-which no longer exist on ARM.
-Either
-arch/arm/include/asm/floppy.h
-  and config ARCH_MAY_HAVE_PC_FDC in arch/arm/Kconfig should be deleted=20
-in this patch, or noted if intentionally deferred to the 7.5 driver clean=
-up.
-7. Good changes & verification
-block/partitions/Kconfig: Dropping default y if ARCH_ACORN while keeping=20
-ACORN_PARTITION available under PARTITION_ADVANCED is correct; users can=20
-still inspect/mount Acorn media on modern architectures.
-drivers/tty/vt/keyboard.c: Clean removal of !defined(CONFIG_ARCH_RPC)=20
-from the raw keyboard scan handler.
-Elimination of NEED_MACH_IO_H and NEED_MACH_MEMORY_H: Very clean removal=20
-across arch/arm/Kconfig, arch/arm/include/asm/io.h,=20
-arch/arm/include/asm/memory.h, and arch/arm/mm/mmu.c.
-Minor Typo in Commit Message
-text
-
-
-The Acorn Risc PC is the oldest still support Arm machine in the kernel,
-originally shipped with an ARMv3 ARM610 support in 1994, it later allowed
-faster StrongARM CPUs.
-"oldest still support Arm machine" -> "oldest still supported Arm machine=
-"
-"with an ARMv3 ARM610 support" -> "with ARMv3 ARM610 support" or "with=20
-an ARMv3 ARM610 CPU"
+Thanks,
+Maks
