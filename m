@@ -1,179 +1,385 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f100.google.com (mail-vs1-f100.google.com [209.85.217.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F52489FC4
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 22:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACEC48EC83
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 22:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788991527; cv=none; b=fLRjJzwZgMRNRD6jynA1T4kqH8ZUqQLMzHPneXm0QO4BCm38i6FIvGXXozx9I28m098caX+s90ulfE0mEIZQAYEFdZ5rvwQGoVzCeP7vL5T3khoI+KYxfM4UpALto+EzdRZkjK8VZKGh8pugUA95fiiqxYPlZsm70AWEUz8dlzk=
+	t=1788992954; cv=none; b=q7JGOE/hdhunjgYvRqHoaJA6XaT5NZsxnanbknNYXZfXDPFKw3BLG3PYDxveoCln1WVybRN1i65era9CqIDwZ9iu5DL+iotnnNiY9tLUe5KIh25nC8MmBRqtlnZ30upl+hkOeqtB/2gWkNTK0MQVBZIg/6KtHMiiF9uF8h7s/oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788991527; c=relaxed/simple;
-	bh=gUvUBfvXAIVgjCzdiwV3/TF71eqAveqNX7ByY2W7Bng=;
-	h=Message-ID:In-Reply-To:References:From:Subject:To:Cc:Date:
-	 MIME-Version:Content-Type; b=MyhNQqRKH04sUyTTStq183kSl40dbRyIvWSpvG1+8n2uhm1Jx9+I/8si6nZCGKMEuGfoFB7WMN5xSNrwsoHFC/ZlA45b5zmIf3R/X5T2m1ByEGsTgkTM4hMkPQzwJWhpRFh0nnCeUljSlSezTbMpp0rIPvhUdfVsPvW+BZ1oArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=U440jBa4; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=tgGO+if4; arc=none smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1788992954; c=relaxed/simple;
+	bh=sLx20K+qsQCJyEhfpGSQLav0qN/DYI0usp+NjaEikj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dlbVopJ6bXqZrmttVwGzYg4fuOu50Hfwk2VDJCROQkc7sgUNgepcyZ+Uou4He1tDWGoA6YKA4eH26ujz4WGqyahfVc4L9Wbipa2/uFmaUJFIox3RPs46wdXdUrsCw81mXJSLaPFV+meEkRqz2wxjXBdmlLm4WljdSUDmN5Gd4co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=KsbjO2R7; arc=none smtp.client-ip=209.85.217.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="U440jBa4";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="tgGO+if4"
-Received: from pps.filterd (m0499198.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689KYgwT1655849
-	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 18:05:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=l0kN
-	/rDFN/f55aXR9L0fwoeC0Cq8ZY3zyzxNrCxyk5Q=; b=U440jBa4zt5XZQqSXjr3
-	h6a8uj+m9eq8F/EPCTVNZhUwxBp7mVm8Js5AJ99ZaGjCfCQ3a+5hjjc4ZFOGf1+l
-	LSPY76FSfg90vUn85AWJLfncpdaFJtDTXdgpdX+e3KzhmPsdcxNelLrqKNDXfG7z
-	nkBryH0eX8CbCYWlbbisAN3gGmRmymvUYYSmdsxRjG1BdmeXViIPSmpJ6bO2arzm
-	gSJfpLEC1ohfcupjxAwkI7V1zAvUxu3Tw21smdXH39M8CRlRcxg3GHYbBPK62HtF
-	bGoIZyqxVYmXobYdtgkFHLzPrtPSjh4BvLbpGYLDNKJYjf3owKXHDDDGuYLOP41L
-	ow==
-Received: from mail-yx1-f72.google.com (mail-yx1-f72.google.com [74.125.224.72])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcxxsynd-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 18:05:24 -0400 (EDT)
-Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-66cbfb7ec42so11259311d50.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:05:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="KsbjO2R7"
+Received: by mail-vs1-f100.google.com with SMTP id ada2fe7eead31-7904f893dd2so2482137.2
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:29:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1788991524; x=1789596324; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:cc:to
-         :subject:from:references:in-reply-to:message-id:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=l0kN/rDFN/f55aXR9L0fwoeC0Cq8ZY3zyzxNrCxyk5Q=;
-        b=tgGO+if46eWNe/HJIYYTuffi4ReZnwtixyoVGGFlwiMniBADIFuYF9KmAqgIZYr39S
-         jwypkyBFYFllrVF913ECxr3EzA1JrUs5gKq1gvLD2NNiQRQg2Gn9RpYKqmAP42CFi6xP
-         g20N8/oK6h+oO1wPp3Vo8xwIVBjzN49925Cz38O1MOntQL42muP61v6SK4sdrVgqEmFq
-         0GB9OPcK3F3bmlDQC1NriF+eki76fiu0YTvHcx74Npfei02EFNtRZMK5bWMjcoXbVX2o
-         ZwSVXCwe+kzggmf4NcykTX89nAH1r7DAWu13/cwufAQsY0o2baIcDb52gE6bpCY8fDZV
-         HVnw==
+        d=purestorage.com; s=google2022; t=1788992944; x=1789597744; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bsGabQTCyGBOnewN0WNVIraAhvd9VdUc8vuvn8dczvo=;
+        b=KsbjO2R7+0OPuTjY3C0ERl15E9eo9zWNKvSfvZRhnCNfUd90OlEj7rfh4C7rB4rkP0
+         2cCEevAEmeEkCHuG9+rH8yckFQWVsVRgXN9OnrAhOgtYBNNGdATsAg/IkLstcw/SGAr1
+         rqq3GIM50w1PHJo9I9Rtt2WP6nCdfGXhmodTLpi5Crkb7eVcMZOPWeak6oGP4RfzVq5L
+         ax0VGJ/en1AF94r5bTaJ53CMkMrvPonSGJwfF5k+i0VsPl1Kh+YWdRMj/REhPXNWtEmv
+         yUlUNDeMHRDe+IPYSGtsyJy04SXbHxk2d66uwJmLcXRCJhF0QNzkTyZj/sLvHq8A0SfV
+         M8eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788991524; x=1789596324;
-        h=content-transfer-encoding:content-type:mime-version:date:cc:to
-         :subject:from:references:in-reply-to:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=l0kN/rDFN/f55aXR9L0fwoeC0Cq8ZY3zyzxNrCxyk5Q=;
-        b=YZU5dkBLjl5RJnLDa7aFwv4V7qBVjAwb60ryr/FMJt6AOcLFljoPGPOpyUbY+v6ek8
-         qmHvMOKtZyEuCmfOGhtDgWyRrAJmotpVXoFGktFa+UeeLTJpwS60uofFWX7PLVkaeWj3
-         RZtz2WSHfOEZK+XFsiHviShCA+pnLs9iPRlQrEDSO7Vk+Ygb+4x2ReFjuUQbhIonMxBJ
-         LJkmqrLnKtRfPkQobSIK9uE8l5p/wgBxG3WKNldyx7XOAmJIYcZn9gkPBKHDoErgzs9q
-         V6CqzqK1Zvb8sYZhCPt58t7Jeq10ILyIJsEwUgeh7LjEKuDVcJPjWznlDRwMZNB99YEZ
-         +N4A==
-X-Gm-Message-State: AFuF++n1KfvYcKRzMJSL3+w55T4Nm2YRlJnvxqslnuCmCY4idrYfZ9gl
-	sXqVab2y/Rielx8YWq+fnZb1kqCBvdIOFL9+jXnaWxLuom8MM7d16H7Oiv6StQkfKQsouoc27IB
-	QieMFf8+zURZ+2FnHgH51BZMw5gW4K6eJCZGKL4qxyfis1aOiZHzoBOW9ZaZP
-X-Gm-Gg: AYBFou3HeatvvBVneUWjunjvU2GOMyZeYmSyChY80Wnk7rzxMhCdgzl2iPydsnNCGON
-	oNvo3jqrDGec3MuoV9GGAndwSNKTgvqFxTR33yTnenw/lFSTMA74dS69lQY09HxLprBGb2Q8Exp
-	FvAhfo3YKaaBmc+ENCSijMU21s4wGLWTJ+gAfQs0ADBkQ+2ULLrvDE1wjTrVeUOO3psfFP6OkHE
-	dKGOfF05eU2qdsKrndr98xYUEAEcoTaH+xIN2ZfwfkMLEH80xHucObKhWuJkixgnpz9OdfpC5ZW
-	6e9AVfNygTlmZ5lRyR9v3Hv+17D+UQZ7MFkAo4Gx5c0uVNFccCsG9g+rSOZCri3Rk9ZefxcVeaW
-	MOqTgSpI0MaIRceWEvdokgLH19fGHbBPegbp9xFU5hy2ej3a+
-X-Received: by 2002:a53:c847:0:b0:66d:1c78:5dd2 with SMTP id 956f58d0204a3-66fb5a6d546mr10813811d50.37.1788991524052;
-        Wed, 09 Sep 2026 15:05:24 -0700 (PDT)
-X-Received: by 2002:a53:c847:0:b0:66d:1c78:5dd2 with SMTP id 956f58d0204a3-66fb5a6d546mr10813779d50.37.1788991523534;
-        Wed, 09 Sep 2026 15:05:23 -0700 (PDT)
-Received: from [127.0.1.1] (nat-128-59-176-193.net.columbia.edu. [128.59.176.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91040693f75sm154018806d6.35.2026.09.09.15.05.19
+        d=1e100.net; s=20251104; t=1788992944; x=1789597744;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bsGabQTCyGBOnewN0WNVIraAhvd9VdUc8vuvn8dczvo=;
+        b=Cf29eRzPcCuMpVlfMGUScuXI8DgT3gEwtF82S9sxFYxgmjbZ73wdaQo4mqpAJ09gWA
+         btygi5efzJyaJ3n+BwbXuzFWzFi+dNwg1wKKx9sXt6iyaBbrKG4aHwy6kLa6DOkd2atd
+         Ypv7YzTjdKvknsgwmD6Lfyn8DKItyM3i8e5XotBo9D2vWWHggINXeBzEZcp3sgVYsjR1
+         zzVDsuLkglVaMcVGRa9zGhVN6uRsTOJJOV8BEzJE1RWLV+IdBw/3Cvtihj4faxAsjy29
+         wGOkkAHrj8qv4fhvgYMREHoHLDGcTOFSpB/6nLUvakEZQLg/RJpt0fiPwMpr5AARDlKZ
+         3H9g==
+X-Forwarded-Encrypted: i=1; AKwUvBynU0xTcwGa/lEDJfXrbZgViNDxrkoA5HDJ836ln9P2zY1YFBFaF/W+jyB66BkrHDB59f4/QfhVexEk3g==@vger.kernel.org
+X-Gm-Message-State: AFuF++nvAS3vGnavHUBStprbGLSipxWkr1kR8Z1uozSdgRHlKAWP1az/
+	Y5D4FjD2lXEdITsu8lCEL01vcvGfuARh7xJU3uWKTSAKEvVfTHComvVreaKWrS34aMoHdyYLsTS
+	AM63rxUKsdTXmtFBcJUul9gR5JuDUlKrajtsg
+X-Gm-Gg: AYBFou36xlq5L/XT7ymD1ulb9UzOq58SnaXtOKJYi3gF3PQ2yYyveLQz9TT2iZhnxnw
+	X+c5qqq6OkTWKoXOCq7+k1l2QGh20aQcjt4zpdOVxfwwHbHroN+MnbPbtaqU+qU/j4/5zBSaCJw
+	UhWsaizfHIaMZi6KuSDotgG5pG1yJ6esmA/+7Wkf3zcAzbRNIuFHEZprtjWA5zpnlOBmEz0NqcS
+	IqpI7cJTVt5zhYIIvxbkZUnnO2zUsKWt8MPf0zRxyc+KRXIz7SkhC1WN1jiX7qnXnKfkuoH+pBY
+	k16f172us/e1HDw/zSN13VjnMsL00p1UvZXVXgYGNsuXk4oZQVg6qi3P4LbZjX2PIF1dhcWQS+R
+	VsmMGsbIJtmAh9IQljrcz0vAaco8jP8xN
+X-Received: by 2002:a67:ebd5:0:b0:790:563:8d1b with SMTP id ada2fe7eead31-79005639f22mr1285898137.0.1788992944076;
+        Wed, 09 Sep 2026 15:29:04 -0700 (PDT)
+Received: from c7-smtp-2026.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id a1e0cc1a2514c-9808e9758adsm5500843241.0.2026.09.09.15.29.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 15:05:20 -0700 (PDT)
-Message-ID: <20260909-blkdev-fixes-v3-7-1a5222c6e8ad@columbia.edu>
-In-Reply-To: <20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu>
-References: <20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu>
-From: Tal Zussman <tz2294@columbia.edu>
-Subject: [PATCH v3 7/7] block: remove dead metadata handling from the async
- direct I/O path
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Hannes Reinecke <hare@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        John Garry <john.g.garry@oracle.com>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sashiko <sashiko-bot@kernel.org>, Tal Zussman <tz2294@columbia.edu>
-Date: Wed, 09 Sep 2026 18:05:14 -0400
+        Wed, 09 Sep 2026 15:29:04 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (bond0.slc5-n17m28-k8s.dev.purestorage.com [IPv6:2620:125:9025:20::a31:41f])
+	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 4F0D6402BA;
+	Wed,  9 Sep 2026 16:29:03 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 4C79CE40322; Wed,  9 Sep 2026 16:29:03 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH 3/6] blk-integrity: pass iov_iter to blk_rq_integrity_map_user()
+Date: Wed,  9 Sep 2026 16:28:33 -0600
+Message-ID: <20260909222836.2475352-4-csander@purestorage.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260909222836.2475352-1-csander@purestorage.com>
+References: <20260909222836.2475352-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=b6EncdGx c=1 sm=1 tr=0 ts=6aa1d824 cx=c_pps
- a=VEzVgl358Dq0xwHDEbsOzA==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=BpGzv1V74M3SfeTrGa8v:22
- a=IE87Obj3e0A1gCLlgTsA:9 a=QEXdDO2ut3YA:10 a=uujmmnXaIg8lM0-o0HFK:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDI0OCBTYWx0ZWRfXw/vLi7JjE+Ah
- dVwSY8HxMYJKiTPA95SiqNaL4d3TqIx5QUrtuy5JgyHva7ZQFAXmEIa2gwFinnVRiNZF1uDAeDK
- WCuQZh7KAo9ES6w6CNN7J3A1npjsvfHF8QmnGuN3cE6o2mtIUM4s
-X-Proofpoint-GUID: oEk_ANcTsKp_tt9--JHyYTxPrQz5UY7s
-X-Proofpoint-ORIG-GUID: oEk_ANcTsKp_tt9--JHyYTxPrQz5UY7s
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDI0OCBTYWx0ZWRfX03ebyD8mI+lk
- kHdx5Grhujw1k/y0ZpjlnhNy8LuJGnYcBvenEs2kIkIRFgkRcGe7tFpOl0LQi0IzYCqejVFGxMw
- zsyPVuaiE6WXoQDkEnyNXbiJfx/LwfP8EzFFvqyHJU/0k2KgyENrTnzWQuY69kzAvjiEtjdEN9E
- udxaLc81wWuFXxaPAIKgHKK5t1f94DABc+ExQpuElHh+T+Yoa4f4hiWNxzVaG02WmIqptG9IhNg
- nonC/meKobFoxb0e7G/RRxcMWQCC7XpxZn4MQkqoSl7swJ8fG8FKH4ScDrvSDdGvSOf6tE8wpXY
- bbtlP7UnfMFnAZ2O556btNpWgghrPM/mOl/u+DgxQQDIy+wpezcmCgjTaC72FlmqifjbZdqVXxA
- 9kHPaTl76sB/SIvmlL0FKwp/yCacgo+/NuMlE33g4XTCGdE+SXXsc/qlnvaQsW4S2HGmA3gp8dB
- p/i4aSS6cytgrOhOv5g==
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11900
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=10 bulkscore=10 adultscore=0 suspectscore=0 lowpriorityscore=10
- spamscore=0 priorityscore=1501 clxscore=1015 phishscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609090248
+Content-Transfer-Encoding: 8bit
 
-Since commit 2729a60bbfb9 ("block: don't silently ignore metadata for
-sync read/write"), blkdev_direct_IO() sends every IOCB_HAS_METADATA
-request to __blkdev_direct_IO(). Remove the now unreachable metadata
-mapping in __blkdev_direct_IO_async() and the unmap in its completion
-handler.
+To allow blk_rq_integrity_map_user() to accept an io_uring registered
+buffer (represented as a ITER_BVEC iov_iter), take the buffer as an
+iov_iter argument. Move the conversion from a user address-length pair
+into an iov_iter to the caller.
 
-No functional change.
+Since a non-ITER_UBUF iov_iter could be passed in the future,
+iov_iter_extract_pages() in bio_integrity_map_user() won't necessarily
+pin the pages. Condition the page unpins on iov_iter_extract_will_pin().
+Add a BIP_PAGE_PINNED bit to bip_flags to track if the pages are pinned.
 
-Assisted-by: Claude:claude-fable-5
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- block/fops.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ block/bio-integrity.c         | 43 +++++++++++++++++++++++------------
+ block/blk-integrity.c         |  7 ++----
+ drivers/nvme/host/ioctl.c     |  6 ++++-
+ include/linux/bio-integrity.h |  1 +
+ include/linux/blk-integrity.h |  6 ++---
+ 5 files changed, 38 insertions(+), 25 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index 0b614d76d128..6a86bffafa7a 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -306,9 +306,6 @@ static void blkdev_bio_end_io_async(struct bio *bio)
- 		ret = blk_status_to_errno(bio->bi_status);
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 8ba8bfa41f8a..3a5554d3ea2f 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -187,11 +187,12 @@ static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip)
+ 
+ 	iov_iter_bvec(&orig_iter, ITER_DEST, orig_bvecs, orig_nr_vecs, bytes);
+ 	ret = copy_to_iter(bvec_virt(bounce_bvec), bytes, &orig_iter);
+ 	WARN_ON_ONCE(ret != bytes);
+ 
+-	bio_integrity_unpin_bvec(orig_bvecs, orig_nr_vecs);
++	if (bip->bip_flags & BIP_PAGE_PINNED)
++		bio_integrity_unpin_bvec(orig_bvecs, orig_nr_vecs);
+ }
+ 
+ /**
+  * bio_integrity_unmap_user - Unmap user integrity payload
+  * @bio:	bio containing bip to be unmapped
+@@ -207,11 +208,12 @@ void bio_integrity_unmap_user(struct bio *bio)
+ 			bio_integrity_uncopy_user(bip);
+ 		kfree(bvec_virt(bip->bip_vec));
+ 		return;
  	}
  
--	if (bio_integrity(bio))
--		bio_integrity_unmap_user(bio);
--
- 	iocb->ki_complete(iocb, ret);
+-	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt);
++	if (bip->bip_flags & BIP_PAGE_PINNED)
++		bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt);
+ }
  
- 	if (dio->flags & DIO_SHOULD_DIRTY) {
-@@ -366,13 +363,6 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		task_io_account_write(bio->bi_iter.bi_size);
+ /**
+  * bio_integrity_add_page - Attach integrity metadata
+  * @bio:	bio to update
+@@ -257,11 +259,11 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
+ 	return len;
+ }
+ EXPORT_SYMBOL(bio_integrity_add_page);
+ 
+ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
+-				   int nr_vecs, unsigned int len)
++				   int nr_vecs, unsigned int len, bool pinned)
+ {
+ 	bool write = op_is_write(bio_op(bio));
+ 	struct bio_integrity_payload *bip;
+ 	struct iov_iter iter;
+ 	void *buf;
+@@ -292,14 +294,18 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
+ 	if (IS_ERR(bip)) {
+ 		ret = PTR_ERR(bip);
+ 		goto free_buf;
  	}
  
--	if (iocb->ki_flags & IOCB_HAS_METADATA) {
--		ret = bio_integrity_map_iter(bio, iocb->private);
--		WRITE_ONCE(iocb->private, NULL);
--		if (unlikely(ret))
--			goto out_bio_put;
--	}
--
- 	if (iocb->ki_flags & IOCB_NOWAIT)
- 		bio->bi_opf |= REQ_NOWAIT;
+-	if (write)
+-		bio_integrity_unpin_bvec(bvec, nr_vecs);
+-	else
++	if (write) {
++		if (pinned)
++			bio_integrity_unpin_bvec(bvec, nr_vecs);
++	} else {
+ 		memcpy(&bip->bip_vec[1], bvec, nr_vecs * sizeof(*bvec));
++		if (pinned)
++			bip->bip_flags |= BIP_PAGE_PINNED;
++	}
  
+ 	ret = bio_integrity_add_page(bio, virt_to_page(buf), len,
+ 				     offset_in_page(buf));
+ 	WARN_ON_ONCE(ret != len);
+ 	bip->bip_flags |= BIP_COPY_USER;
+@@ -308,27 +314,29 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
+ 	kfree(buf);
+ 	return ret;
+ }
+ 
+ static int bio_integrity_init_user(struct bio *bio, struct bio_vec *bvec,
+-				   int nr_vecs, unsigned int len)
++				   int nr_vecs, unsigned int len, bool pinned)
+ {
+ 	struct bio_integrity_payload *bip;
+ 
+ 	bip = bio_integrity_alloc(bio, GFP_KERNEL, nr_vecs);
+ 	if (IS_ERR(bip))
+ 		return PTR_ERR(bip);
+ 
+ 	memcpy(bip->bip_vec, bvec, nr_vecs * sizeof(*bvec));
+ 	bip->bip_iter.bi_size = len;
+ 	bip->bip_vcnt = nr_vecs;
++	if (pinned)
++		bip->bip_flags |= BIP_PAGE_PINNED;
+ 	return 0;
+ }
+ 
+ static unsigned int bvec_from_pages(struct bio_vec *bvec, struct page **pages,
+ 				    int nr_vecs, ssize_t bytes, ssize_t offset,
+-				    bool *is_p2p)
++				    bool *is_p2p, bool pinned)
+ {
+ 	unsigned int nr_bvecs = 0;
+ 	int i, j;
+ 
+ 	for (i = 0; i < nr_vecs; i = j) {
+@@ -340,11 +348,12 @@ static unsigned int bvec_from_pages(struct bio_vec *bvec, struct page **pages,
+ 			size_t next = min_t(size_t, PAGE_SIZE, bytes);
+ 
+ 			if (page_folio(pages[j]) != folio ||
+ 			    pages[j] != pages[j - 1] + 1)
+ 				break;
+-			unpin_user_page(pages[j]);
++			if (pinned)
++				unpin_user_page(pages[j]);
+ 			size += next;
+ 			bytes -= next;
+ 		}
+ 
+ 		if (is_pci_p2pdma_page(pages[i]))
+@@ -361,10 +370,11 @@ static unsigned int bvec_from_pages(struct bio_vec *bvec, struct page **pages,
+ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ {
+ 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	struct page *stack_pages[UIO_FASTIOV], **pages = stack_pages;
+ 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec = stack_vec;
++	bool pinned = iov_iter_extract_will_pin(iter);
+ 	iov_iter_extraction_t extraction_flags = 0;
+ 	size_t offset, bytes = iter->count;
+ 	bool copy, is_p2p = false;
+ 	unsigned int nr_bvecs;
+ 	int ret, nr_vecs;
+@@ -397,12 +407,12 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 
+ 	/*
+ 	 * Handle partial pinning. This can happen when pin_user_pages_fast()
+ 	 * returns fewer pages than requested.
+ 	 */
+-	if (user_backed_iter(iter) && unlikely(ret != bytes)) {
+-		if (ret > 0) {
++	if (unlikely(ret != bytes)) {
++		if (pinned && ret > 0) {
+ 			int npinned = DIV_ROUND_UP(offset + ret, PAGE_SIZE);
+ 			int i;
+ 
+ 			for (i = 0; i < npinned; i++)
+ 				unpin_user_page(pages[i]);
+@@ -412,31 +422,34 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 		ret = -EFAULT;
+ 		goto free_bvec;
+ 	}
+ 
+ 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
+-				   &is_p2p);
++				   &is_p2p, pinned);
+ 	if (pages != stack_pages)
+ 		kvfree(pages);
+ 	if (nr_bvecs > queue_max_integrity_segments(q))
+ 		copy = true;
+ 	if (is_p2p)
+ 		bio->bi_opf |= REQ_NOMERGE;
+ 
+ 	if (copy)
+-		ret = bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes);
++		ret = bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes,
++					      pinned);
+ 	else
+-		ret = bio_integrity_init_user(bio, bvec, nr_bvecs, bytes);
++		ret = bio_integrity_init_user(bio, bvec, nr_bvecs, bytes,
++					      pinned);
+ 	if (ret)
+ 		goto release_pages;
+ 	if (bvec != stack_vec)
+ 		kfree(bvec);
+ 
+ 	return 0;
+ 
+ release_pages:
+-	bio_integrity_unpin_bvec(bvec, nr_bvecs);
++	if (pinned)
++		bio_integrity_unpin_bvec(bvec, nr_bvecs);
+ free_bvec:
+ 	if (bvec != stack_vec)
+ 		kfree(bvec);
+ 	return ret;
+ }
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 964eebbee14d..6977bfd96927 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -118,18 +118,15 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
+ out:
+ 	return copy_struct_to_user(argp, usize, &meta_cap, sizeof(meta_cap),
+ 				   NULL);
+ }
+ 
+-int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+-			      ssize_t bytes)
++int blk_rq_integrity_map_user(struct request *rq, struct iov_iter *iter)
+ {
+ 	int ret;
+-	struct iov_iter iter;
+ 
+-	iov_iter_ubuf(&iter, rq_data_dir(rq), ubuf, bytes);
+-	ret = bio_integrity_map_user(rq->bio, &iter);
++	ret = bio_integrity_map_user(rq->bio, iter);
+ 	if (ret)
+ 		return ret;
+ 
+ 	rq->nr_integrity_segments = blk_rq_count_integrity_sg(rq->q, rq->bio);
+ 	rq->cmd_flags |= REQ_INTEGRITY;
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 748a4cbf7e90..e69c49c334a0 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -175,11 +175,15 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
+ 				0, rq_data_dir(req));
+ 	if (ret)
+ 		return ret;
+ 
+ 	if (has_metadata) {
+-		ret = blk_rq_integrity_map_user(req, meta_buffer, meta_len);
++		struct iov_iter meta_iter;
++
++		iov_iter_ubuf(&meta_iter, rq_data_dir(req), meta_buffer,
++			      meta_len);
++		ret = blk_rq_integrity_map_user(req, &meta_iter);
+ 		if (ret)
+ 			goto out_unmap;
+ 	}
+ 
+ 	return ret;
+diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
+index 0ea2a8bf7efb..740acb8c1077 100644
+--- a/include/linux/bio-integrity.h
++++ b/include/linux/bio-integrity.h
+@@ -12,10 +12,11 @@ enum bip_flags {
+ 	BIP_COPY_USER		= 1 << 4, /* Kernel bounce buffer in use */
+ 	BIP_CHECK_GUARD		= 1 << 5, /* guard check */
+ 	BIP_CHECK_REFTAG	= 1 << 6, /* reftag check */
+ 	BIP_CHECK_APPTAG	= 1 << 7, /* apptag check */
+ 
++	BIP_PAGE_PINNED		= 1 << 14, /* pages need to be unpinned */
+ 	BIP_MEMPOOL		= 1 << 15, /* buffer backed by mempool */
+ };
+ 
+ /* flags that require generate/verify action. */
+ #define BIP_CHECK_FLAGS (BIP_CHECK_GUARD | BIP_CHECK_REFTAG | BIP_CHECK_APPTAG)
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
+index b1b530613c34..8b655ac165e8 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -28,12 +28,11 @@ static inline bool queue_limits_stack_integrity_bdev(struct queue_limits *t,
+ 
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ int blk_rq_map_integrity_sg(struct request *, struct scatterlist *);
+ 
+ int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
+-int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+-			      ssize_t bytes);
++int blk_rq_integrity_map_user(struct request *rq, struct iov_iter *iter);
+ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
+ 		     struct logical_block_metadata_cap __user *argp);
+ bool blk_rq_integrity_dma_map_iter_start(struct request *req,
+ 		struct device *dma_dev,  struct dma_iova_state *state,
+ 		struct blk_dma_iter *iter);
+@@ -116,12 +115,11 @@ static inline int blk_rq_map_integrity_sg(struct request *q,
+ 					  struct scatterlist *s)
+ {
+ 	return 0;
+ }
+ static inline int blk_rq_integrity_map_user(struct request *rq,
+-					    void __user *ubuf,
+-					    ssize_t bytes)
++					    struct iov_iter *iter)
+ {
+ 	return -EINVAL;
+ }
+ static inline bool blk_rq_integrity_dma_map_iter_start(struct request *req,
+ 		struct device *dma_dev,  struct dma_iova_state *state,
 -- 
-2.39.5
-
+2.55.0
 
