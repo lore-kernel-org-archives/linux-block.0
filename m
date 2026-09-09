@@ -1,274 +1,285 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B279021D5B0
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 04:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788928142; cv=pass; b=iByE2ja98ZMwa1x+7z7YMhhDsPwGWZZmE9S6g6uVCX3Z4IstrwvMBftt3H7a2rk3uGyWfVosVV/2BeUz2C0QRRhWR9OEEjuiHDcllCjXv+YvQmms3hDNz+qtLWVEPnRDBfwjYL6qQfJQD5YKOfWFNXkGeFMxqqJqTXnELNSlWLM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788928142; c=relaxed/simple;
-	bh=QQhJ3qYIjUasljmP8havcCtl5vRenKquD/kkYVenMyg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J++MXKAMYN6JeM1PyL6aLHnauUFmecYjE4ABmiOK4I4OYsKMdNzUEUadCrsqTDLySvfhaHr9C4X65s5USg73ZYM9OeFaLDCpNgmqbVcGnFfQJSRInn/M9w020h7MMugRt0n+mZyurGEy8pJ0RNTEv9ayVvgbR5+Fa5U15dSCXCk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b=bimaWllq; arc=pass smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F4D3546CD
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 06:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788933841; cv=none; b=Clddf3k+Yav/eYr+rjwF4Jv6KB/LQVzQVJjrpPt/cr9E9VhGidqBu1vj2jIp7xRPe6yl4/55zqBf6jNCg4A/OznNT3YI9jAHlJMdq5nrQZ1YhozBcVZQbQLXyM4JfXhvs7Af0aEzjbBjzfCMtPUq+npF1mQ8fFlztMBr47e+UI0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788933841; c=relaxed/simple;
+	bh=xcuyhl9eQ2tGDEV2FKl7YFK2dioFXp6VQjtibFde8k0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m3Qw2riupmqg9+9Hff8yhtnU21hJSKbFCVYUV9lUhBK3NHtNmfELOuD6u8CWUPRcFeeGQwWqFNyJqdNAhEmhnkgRgeKGjFK91UUKlbTgIIbedjW8jGt3JKgxBeQitYIs7OavSCXEKxbPZ6AxX1SCE17AlEAVlHfFEVpxMv9SpzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=on+rPIbK; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=ZwyNrMsy; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="bimaWllq"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c255a6e63c0so75493866b.3
-        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2026 21:29:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788928139; cv=none;
-        d=google.com; s=arc-20260327;
-        b=S0RoG7/KR3Tc8Qjo2r0qN6VgwJdJwsStxIEtzo0InorvCnjRAskf9bzDrqqvOZuufZ
-         5f66gJr/S9fH5636Xh8rRfHzSZax9aDwMO64xLriVfPMp0fsuI0YCEWFlBs2mcECM/ko
-         +6Z+jxvQLGVWOa9FemWJ916akk8aC9wYA3RnODxuujDpP6mniu5kDQhZ0FN40FvF6BBc
-         CRf+HjSYrWa0JqUnEQoG4qmaBNOA/VtkzCOxtLK0Zv8101q+ILqP9JRRM3DG2FLIkgDK
-         /ze15lkmljvFVOwVfu4TvCS3wl+DqBVWye8WJ6G0vn665fJm1bfTQQk23RCQQb5o8+Od
-         oQSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1JLg12pdT8x1DC+kmJ5GTBCz8csi15xeh0bsfDtpGJk=;
-        fh=OZzaF7z6FXq9wfbiPovfIG74Y0L5y9++zY9bMCiiulc=;
-        b=EO9/pbv/L489s/M5/LEG31x7dsvTB1cMdzS+l/aqC0VT8t/kQi9M4fGYaVuITGPKKZ
-         8BY1+RaJsuElSR6xWmhSBOJh7DC9Kp33RkQyWO0UO0JpxZkEJAOs5LvWtVvnCsCUwFhk
-         6170Y3CzvasmcowtbVreOqyD9kBskut28+KonAsRWtyQWf3q2gESlbpbN5XPEtpaRJoW
-         /4KdIscuZ45+zrBCKWtJ4BfYweMmo9PvfvV4b2++6wxdSEW9oiMZky/sVcc9uEwjJuJl
-         ZbJVwVnh58avpQdrDDHGxqLaCbDIdCmBLt9MjFlnLHRbE1vJSFDLAYMN/RmgFYN7Kp+j
-         mojg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="on+rPIbK";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="ZwyNrMsy"
+Received: from pps.filterd (m0167074.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6894Ziie3246725
+	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 02:03:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=JD9s
+	mCHI+SSIjWaqFBwOjwARRnBsMSzMXSmp0jGnZ1Q=; b=on+rPIbKxGOv9EwPYP0B
+	MvKrPsJlmnzIacRHspNzH/Rt92c/EQZhD2MrXA/wlEJR9GWw4SOLnh7jL1HE2V0O
+	H8BAjECNb0Z2DzswFqVu/NsjMjCyRHVcByH7MUY/GwslSM1csqmA5SzyTfXhLcjm
+	0N+UlynG2tU0YUyq44+50Y6Btuq4NXlMSYmlOyWR71O9G0jmzFn/id7BlB/NdQdq
+	TWuUFujeeGRdSXvquLpWQWiq7xqnQZ1cquQBvmS08FhPGcMNwcGnKapfu1I6I1k1
+	/uhkK7G2EypuaO3w+PlK1I2G9/X8mpSXDgLYBACu2H1R1OgeIGjZSB5IoKYi7nk4
+	6A==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gjnn9ncr1-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 02:03:57 -0400 (EDT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93903622880so1052106385a.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2026 23:03:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google; t=1788928139; x=1789532939; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1JLg12pdT8x1DC+kmJ5GTBCz8csi15xeh0bsfDtpGJk=;
-        b=bimaWllqTtuuzjD4+40FfdVhALPOqyH2CKPYXbxCOZDuuGqRSInF6H6pavHefc9fB5
-         l7ePySzV7jgCRM70sVJBcZRE1vRU2/bbwPXWhCXmv/6n2nlZp/UGN6f6b3PZ5vugfxkp
-         ZHN36uI1JPwzMqaHlOAK5AoRGbPEcE33aKEv9ga9i2lJy3TFBeyG6p6/BZmJtpcVs4bw
-         EVRUB0BSxuO6ZAu/a/CiVSaVQorWst1noOVsX8dM2jUpGr6jTSB2w/5CwzO6oCX2FZ2V
-         Ng9iv7H5qrtEFEPF1JxqrrCow1dOWy2SKmRuh/PBkwUEmX9CAP6dBn1FV22qib4GLUMw
-         NCYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788928139; x=1789532939;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=columbia.edu; s=lionmail; t=1788933837; x=1789538637; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1JLg12pdT8x1DC+kmJ5GTBCz8csi15xeh0bsfDtpGJk=;
-        b=ZVoGdMZiqOt4DipmUkw1jVixrJO39X7xrhO/vqUAdhxnNWS/JXr77oNgcTZ1rN4KOw
-         +elbI+VQUBldyB1AOqpm9rWhTy98uooyGFWkUJT/6F/bgWs0G9WvVSzL5i2z46lQZtGd
-         +zayzJ9mPsp72MthMctP45jZruvB6zFTzfPFlmbcoey4N1ULlVjYbPDzm3mpJ0OgdrFb
-         +Gc3jCG9rmMs5uErTq0p+CPqyODJHIAPzuwpwWC+TYbLETGqfsKgz/7z3Y2UX38Aa2BI
-         U4Ge0R2mRdZedkseEgYfK5HT8FNwtMvmoBvROiSt/5IdgPk1B7pZiHA7DzWizq8WCYFx
-         zgvQ==
-X-Forwarded-Encrypted: i=1; AKwUvByzys++XcziraS/Dlw4fjIlJi50FgC5DQG7EcNMIVcDzDnGVFLiPu2YZZgBUj5MychqtqLIfHQkGSQl1w==@vger.kernel.org
-X-Gm-Message-State: AFuF++lkuqYQPusIdWb4z96gcXb0p2wkcq12SpD2qOy/KcTenVOjR+vJ
-	HhtSBvOFWj2M4bQJTr8juwh2j+nAAvf2o9EfZENxZaS7DCCj3gwG8CiUlLNVT7dBXZCLqNp5/8m
-	vESc/AfAgm0rwJIH/WdqKe5N4T+q1Et+Jd7veqpUatA==
-X-Gm-Gg: AYBFou1hxTF8fXVBLMFGTBs2X3TCLzPXj6742in0kX1Rdb4NgQLvTQO2cx654Z2wEQ1
-	DNUTkiwwjJ/x4f1MLIWEWzP3uKs/KntY7hyXx2gKXgOCMDVT1A8/BDOfxOa7dqvOkG77h4000Ku
-	Tfxr3mmX1W7SyZi6JHUXoqXYPWty6kV5Vn9EjxAMQZJIEKYTp8lrGo+c+yQL0iOt2yxpvMNza5I
-	MGNFCEJUTSEEVKCKXWz8xrk03LfQtD92GItwWICH4m6H3TqDGfG9tRLMss8yVkQBArZfI90bBJt
-	HlMJ+swvWq379mTT2Uv87uN6L6CJQm6XlW0pbO7VsfMzPPOKQrNw9BXMuzC+CszYOnnPNlApMJS
-	CaHQdkVA+pAE=
-X-Received: by 2002:a17:907:7296:b0:c25:2ded:ad36 with SMTP id
- a640c23a62f3a-c2610e582d2mr1230577466b.0.1788928138997; Tue, 08 Sep 2026
- 21:28:58 -0700 (PDT)
+        bh=JD9smCHI+SSIjWaqFBwOjwARRnBsMSzMXSmp0jGnZ1Q=;
+        b=ZwyNrMsyArHxK+tjwZ7VgLLKLrCfW3Cw/G1tzGCSE+8E+fbBRR1MWp3ciRegPYe0VT
+         rYlDvQwDJoSimFEunCb5QwYwejvka9bP/uHo7PxX48N0RHBFL1sFI+WAEcoDArAMy8SV
+         +1GOtFAPQzOKQvIWeO/PN9KJbjG0bdD7nF9+wtFqT7MAUrsLwe6enNTE4ktd/S1dQU2P
+         VTxxHhI4FcbzTkzJuJCxy9Y4lpa7HKsmndUZcEjMZxt15Q/Dk/vw37kABonqrAgmiXcg
+         kxCQGA0/butKnsz7Z44reA31vxZCwmD/4q4q5dsbR/kolPwgLqfh2uS1WPgld60UZYGW
+         Amhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788933837; x=1789538637;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=JD9smCHI+SSIjWaqFBwOjwARRnBsMSzMXSmp0jGnZ1Q=;
+        b=oBLEZ/r8RIsGqVYuoNadGRBUENkX4VM6M+TQHEItDOhs9+ek+HEe5AKJlYS8w6z0vk
+         EGNVr3d35612DXfDfqae81NpkT1cKu0T6OTbDPTLe1ly7fxlWCKBUYF6w8rGKH1GfC9X
+         +LSoMGpXafxIKLBMzgA0/v00zrBDUQWpJtFs4g52Yt0FY2REUjRt8xWvjhrdImtLxqMS
+         PdQPZULZTMqqpT2rbeScyPFQPrzxoZrzogyDfanWJ/l9b2dsiGH2Pp9E4JoGKrqDTbTS
+         cwiE/KGHp8AQSGctq2aleKvdQZAg8pCXWtBidVq3UuTh0PvE/+BCDGz7Ba3P0fQhNv9B
+         rBZQ==
+X-Gm-Message-State: AFuF++lGlpkjHM6itpAckNW+Lae5LxSdrCNUTd4c0Cewx5TMntb/x02S
+	C3SysqnzFSVX83sltkOUqjKnKYDD/tjoWM1TWunYcwGz0odywIXYBd9KWFbmVgcFY5FBFnwoyxN
+	pn34nAf/qa24x0NsEn959gPhbaII6Y6pw6LxI/9cyPC5NDWN7s4Y0usETs9JS
+X-Gm-Gg: AYBFou3c9b+Ew1tGZMvodh3R83jTyFDaCjHAuGpKHgDddpdTmr8TLyA8EuDHQj3g9KH
+	LPtWUlWXlXE79jxmbN4FGdtnRf4iYTIoLZujE4Jr43sxrCSDZBJ4g4ER025KqYqbGZLY/T8Z4Rf
+	ArmxQWV6Z5+lH/pXEAI3cqD4c1Ub1bOjMRIIV+zrkIK3T6sSYOa90oTbhgfqrbpvM9Zlv4F40Vk
+	wrBUmE08K2Qt1qCSglzNKe1iY4IYzERBPdHn9BW0KcIcpslLeUsiQDJSrkHWYQoiT3dl68S4Ldw
+	KH9QsJeXD67iIq52zcUZcc/0a9yreAtW93bx4KqMbb2F0H+y6nG8MKrAPpYIJyysEHU+LhOeSG6
+	HyDAYA+yEnfHYZEpEB5vPv+rOJxrpmfkgzXsPz/elytwvEXLfn/weRdA=
+X-Received: by 2002:a05:620a:4857:b0:939:5d22:d1f0 with SMTP id af79cd13be357-9396dead4a3mr2642639685a.2.1788933837497;
+        Tue, 08 Sep 2026 23:03:57 -0700 (PDT)
+X-Received: by 2002:a05:620a:4857:b0:939:5d22:d1f0 with SMTP id af79cd13be357-9396dead4a3mr2642637385a.2.1788933836992;
+        Tue, 08 Sep 2026 23:03:56 -0700 (PDT)
+Received: from [192.168.1.62] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fb6e95csm1314254685a.31.2026.09.08.23.03.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Sep 2026 23:03:56 -0700 (PDT)
+Message-ID: <a8e91285-c1f1-4c3e-a3b3-b5f21d07a879@columbia.edu>
+Date: Wed, 9 Sep 2026 02:03:55 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260907133929.1081540-1-jinpu.wang@ionos.com>
- <e6ad5b61-0ba2-49fa-96c7-e821defe45a7@linux.ibm.com> <CAMGffEmKrqcxYAtdTxg6GnwwFjJJg50wxpTfBobps-_QwQAoGg@mail.gmail.com>
- <m2bja7612z.fsf@gmail.com> <m28q5b5s4n.fsf@gmail.com>
-In-Reply-To: <m28q5b5s4n.fsf@gmail.com>
-From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date: Wed, 9 Sep 2026 06:28:47 +0200
-X-Gm-Features: AcwNN1V7hHSxU3jM0XuZmAWH9OsgQnh1FWej0MoI6-EHbmpkMwG-3O42FSIo6RE
-Message-ID: <CAMGffEmg+UEfoMp-TTw9+T2kTtuv6fCiBfufO9Evads8dtGLwA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] md: don't wait for q->limits_lock while md holds back I/O
-To: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, linux-raid <linux-raid@vger.kernel.org>, 
-	linux-block <linux-block@vger.kernel.org>, Song Liu <song@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>, 
-	Yu Kuai <yukuai@fygo.io>, tom.leiming@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/7] block: fail atomic writes instead of falling back
+ to buffered I/O
+To: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@suse.de>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong"
+ <djwong@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        john.garry@linux.dev
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sashiko <sashiko-bot@kernel.org>
+References: <20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu>
+ <20260828-blkdev-fixes-v2-5-32f3f40cebed@columbia.edu>
+ <a7752d1e-8ec1-44d1-a266-c287c315e8ab@oracle.com>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <a7752d1e-8ec1-44d1-a266-c287c315e8ab@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=b5+CJNGx c=1 sm=1 tr=0 ts=6aa0f6ce cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=azVShVRs0zEubeQ0wG0L:22
+ a=c92rfblmAAAA:8 a=VwQbUJbxAAAA:8 a=eLqeY6lZVrwov0sEPbwA:9 a=QEXdDO2ut3YA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22 a=GvGzcOZaWPEFPQC_NcjD:22
+X-Proofpoint-GUID: 1_OaBOrSAMhZmZt-aodun4Fmqa6omS3r
+X-Proofpoint-ORIG-GUID: 1_OaBOrSAMhZmZt-aodun4Fmqa6omS3r
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDA2NiBTYWx0ZWRfXym602LQju/y8
+ Vg/gi7nBOqnnxksQGszcHSAd1detDZG0+x7TGVRRfzUf/Mgt/fuVGeZNp8+rgfCWmFxrxOGlWNB
+ 5Mmp6NFLsGE5oueMURerSMs0LFfaXiki7sRRtgemx9h8W9wAdWeQi9jEFt/5NM5mQ8v5f42Rq8f
+ VxEAUB3j/lTgUCrMEkNTXQd0zGmkMHIxMinEXzsvB6IPWrS+e8hHUaxe4WTxlmhiaRa/uxMqlLI
+ Z8VoSxiX9DrYWdTAp6/r5B/U/C8P6Xh1TYkzqDKTb7PSygyR7PD9K80DfMPzWf3Q0/HbekBGLJ2
+ MVghpvrZQR8RQlUPv3Yp0ktFrckq4BLEo2c9t/rzGAp8b8Gwj103jMpx2QK0sjbZge9yRAqKg9P
+ hzZjDX66A/Pt0mSIpIMepHy2D5zDT1qvTPYocsbf1dypgO23TVqmHPzxR+YxLVu2TCYAPysu6ei
+ 0jsPDxGRIpip4aD4gYw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDA2NiBTYWx0ZWRfX4M/JqwPN+vhr
+ VpzwVvnYUQ69Ixp3xUw4t4CW3soBB0NJZ6uGy1kvhyn5lQKGpjS+s+b6jKlw8HPmPsahh/U4iqG
+ xc9gAxtpzoAMD8x42szfwKxrseylEj5uJMBe33ViGVx131hRRDHD
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11900
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 adultscore=0 suspectscore=0 impostorscore=10 malwarescore=0
+ lowpriorityscore=10 spamscore=0 phishscore=0 priorityscore=1501 bulkscore=10
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609090066
 
-On Tue, Sep 8, 2026 at 11:51=E2=80=AFPM Abd-Alrhman Masalkhi
-<abd.masalkhi@gmail.com> wrote:
->
-> On Tue, Sep 08, 2026 at 20:37 +0200, Abd-Alrhman Masalkhi wrote:
-> > Hi Jack and Nilay,
-> >
-> > On Tue, Sep 08, 2026 at 14:09 +0200, Jinpu Wang wrote:
-> >> On Tue, Sep 8, 2026 at 1:16=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.c=
-om> wrote:
-> >>>
-> >>> On 9/7/26 7:09 PM, Jack Wang wrote:
-> >>> > From: Jack Wang<jinpu.wang@cloud.ionos.com>
-> >>> >
-> >>> > Writing to a queue limits attribute of an md array while a spare is
-> >>> > being re-added deadlocks the array.  I reported this earlier here:
-> >>> >
-> >>> >    https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-kd=
--=3DH9Y54WozKASSEZhc9UNKjA@mail.gmail.com/
-> >>> >
-> >>> > Four tasks, one array:
-> >>> >
-> >>> >    udev-worker    queue_attr_store() holds q->limits_lock, waits in
-> >>> >                   blk_mq_freeze_queue() for q_usage_counter to drai=
-n
-> >>> >    fio            holds a q_usage_counter reference, parked in
-> >>> >                   md_handle_request()'s is_suspended() loop
-> >>> >    mdadm          suspended the array, waits for reconfig_mutex
-> >>> >    md_start_sync  holds reconfig_mutex, waits for q->limits_lock
-> >>> >
-> >>> > The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Sinc=
-e
-> >>> > commit c99f66e4084a ("block: fix queue freeze vs limits lock order =
-in
-> >>> > sysfs store methods") the sysfs store holds q->limits_lock across t=
-he
-> >>> > freeze, so md must not block on that lock while it is holding back =
-the
-> >>> > I/O the freeze waits for.  That is the same hazard mddev_suspend()
-> >>> > already documents for reconfig_mutex.
-> >>> >
-> >>> > The rule this series applies is that q->limits_lock nests outside b=
-oth
-> >>> > reconfig_mutex and the suspend.  Where md cannot arrange that, beca=
-use
-> >>> > it is called with reconfig_mutex already held or from the sync thre=
-ad,
-> >>> > it takes the update with a trylock and does without one on a conten=
-ded
-> >>> > pass.
-> >>> >
-> >>> > Patches 1, 2 and 4 are plumbing with no functional change.  Patches=
- 3
-> >>> > and 5 convert the two callers that cannot own an update.  Patch 6 d=
-oes
-> >>> > the hoists, all in one patch because a mix of the two lock orders i=
-s an
-> >>> > ABBA.
-> >>> >
-> >>> > Two callers still take q->limits_lock inside reconfig_mutex, both w=
-ith
-> >>> > the array suspended, and patch 6 says why: ->start_reshape() from
-> >>> > action_store(), which suspends before flushing sync_work, and
-> >>> > raid*_run() -> queue_limits_set() from level_store(), which already
-> >>> > hangs on its own because it freezes the queue while suspended.  Bot=
-h
-> >>> > need more restructuring than belongs here.
-> >>> >
-> >>> > The patches are based on v7.3-rc2.
-> >>> >
-> >>> > Tested there with a raid1 of two ram devices, fio in flight and a l=
-oop
-> >>> > writing queue/max_sectors_kb: 20 fail/remove/add cycles complete,
-> >>> > where the same test wedges the array before the series.  Every patc=
-h
-> >>> > builds on its own.  A reshape and a level change are not covered by=
- that
-> >>> > test.
-> >>>
-> >>> Overall, I think the direction looks good. With this series, we now h=
-ave the
-> >>> locking order where q->limits_lock is acquired before the suspend and
-> >>> reconfig_mutex.
-> >>>
-> >>> However, when I ran these changes through blktests, I hit the lockdep=
- splat[1],
-> >>> which exposes an ABBA dependency between disk->open_mutex and q->limi=
-ts_lock.
-> >>>
-> >>> Looking at the existing dependency chain, disk->open_mutex is expecte=
-d to
-> >>> be acquired before q->limits_lock. However, with this change, md_ioct=
-l()
-> >>> acquires q->limits_lock first and subsequently reaches md_import_devi=
-ce(),
-> >>> which acquires disk->open_mutex. This reverses the existing lock orde=
-ring
-> >>> and introduces the ABBA dependency, so I think this needs to be addre=
-ssed.
-> >>>
-> >>
-> >> Thanks for running this through blktests.
-> >>
-> >> You are right, and it is worse than the one path you hit.  The import =
-is
-> >> not the only offender: everything in the mddev->pers branch of
-> >> md_add_new_disk() that opens or closes a component device runs with
-> >> q->limits_lock held.  Besides md_import_device() there are four
-> >> export_rdev() calls and one md_kick_rdev_from_array(), and export_rdev=
-()
-> >> ends in fput(rdev->bdev_file), so it takes disk->open_mutex too.
-> >> rdev_attr_store() looks like a second instance: it starts the update f=
-or
-> >> every state_store() write, and "remove" reaches
-> >> md_kick_rdev_from_array().
-> >>
-> >> So the rule needs to be stronger than what I wrote: q->limits_lock nes=
-ts
-> >> outside reconfig_mutex and the suspend, and must not be held across an=
-y
-> >> component device open or close.
-> >>
-> >> Two ways to get there, and I would rather hear which you prefer before
-> >> respinning:
-> >>
-> >> 1) Keep the lock outermost, move the open and close out from under it.
-> >>    md_ioctl() imports before taking q->limits_lock and releases after
-> >>    committing and unlocking; md_add_new_disk() hands the rdev back
-> >>    instead of exporting it.  The import then runs without
-> >>    reconfig_mutex, so the superblock format fields need a snapshot and=
- a
-> >>    recheck under the lock.  Only the mddev->pers branch needs this, th=
-e
-> >>    other two never reach add_bound_rdev().
-> >>
-> >> 2) Drop the hoist for ADD_NEW_DISK and stack the leg after resume, wit=
-h
-> >>    q->limits_lock on its own.  Much smaller, but the leg is live befor=
-e
-> >>    its limits are stacked and the integrity rejection lands after the
-> >>    add rather than before it.
-> >>
-> > I am thinking about changeing the order of reconfig_mutex and the
-> > suspention. we would suspend the array inside raid1_add_disk()
-> > and raid1_remove_disk() when we add/remove the rdev from raid1 conf.
-> >
->
-> Sorry, changing the order would complicate it and result in a deadlock.
-> In those cases, normal I/O can be waiting for a superblock update which
-> needs to acquire the reconfig_mutex. At the same time, the task adding
-> the new rdev would be holding the reconfig_mutex while waiting for that
-> exact I/O to drain.
-Hi Abd-Alrhman,
+On 9/7/26 10:49 AM, John Garry wrote:
+> On 28/08/2026 14:49, Tal Zussman wrote:
+>> An IOCB_ATOMIC direct write to a block device can silently lose its
+>> torn-write guarantee in two ways:
+>> 
+>>     1. blkdev_direct_write() turns an -EBUSY from page cache invalidation
+>>        into a 0 return, so the whole write is retried through
+>>        blkdev_buffered_write(), with no atomicity guarantee.
+>> 
+>>     2. On a partial page pin, __blkdev_direct_IO_simple() and
+>>        __blkdev_direct_IO_async() submit what was pinned with REQ_ATOMIC
+>>        set and leave the rest to the buffered fallback.
+>> 
+>> The second case can be triggered deterministically. A 16K
+>> pwritev2(RWF_ATOMIC) whose last page is PROT_NONE, on a scsi_debug
+> 
+> If there is some scenario which does not allow the iovec to be written
+> atomically for RWF_ATOMIC, then we should document it in the man pages
+> description of RWF_ATOMIC.
+> 
+>> device with atomic_wr=1, completes short with only three of the four
+>> pages written, violating RWF_ATOMIC semantics.
+>> 
+>> Fail the I/O instead. Return -EAGAIN when page cache invalidation fails
+>> for IOCB_ATOMIC rather than retrying through the page cache, matching
+>> __iomap_dio_rw(), which treats the failure as transient and lets the
+>> caller retry. Release a short atomic pin and return -EFAULT before
+>> submission, which is what a direct write already returns when none of
+>> the buffer can be pinned. A sync atomic write can then never return
+>> short with a remainder, so the buffered fallback is never reached.
+>> 
+>> ext4 has the same fallback and only warns in it. 
+> 
+> It should reject it, as IOCB_ATOMIC would be ignored in that path.
+> 
 
-Yes, there are different deadlock scenarios.
+I'll send an email to the ext4 maintainers as Christoph suggested.
 
-Thank you for your input.
->
-> >> Is there a better option?  If ->hot_add_disk() is meant to be callable
-> >> with an update already in flight, that limits how far the open and clo=
-se
-> >> can move.
-> >>
-> >> Thanks,
-> >> Jack
-> >
-> > --
-> > Best Regards,
-> > Abd-Alrhman
->
-> --
-> Best Regards,
-> Abd-Alrhman
+>> For block devices both
+>> ways in can be detected before any I/O is submitted, so fail early instead.
+>> 
+>> Fixes: caf336f81b3a ("block: Add fops atomic write support")
+>> Reported-by: Sashiko<sashiko-bot@kernel.org>
+>> Link: https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
+>> Assisted-by: Claude:claude-fable-5
+>> Signed-off-by: Tal Zussman<tz2294@columbia.edu>
+>> ---
+>>    block/fops.c | 21 ++++++++++++++++++++-
+>>    1 file changed, 20 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/block/fops.c b/block/fops.c
+>> index a3a709697b40..8769bb13df1c 100644
+>> --- a/block/fops.c
+>> +++ b/block/fops.c
+>> @@ -87,6 +87,12 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+>>    	ret = blkdev_iov_iter_get_pages(&bio, iter, bdev);
+>>    	if (unlikely(ret))
+>>    		goto out;
+>> +	if ((iocb->ki_flags & IOCB_ATOMIC) && iov_iter_count(iter)) {
+> 
+> Could we even move this check into bio_iov_iter_get_pages()?
+> bio_iov_iter_get_pages() is used in fs/iomap/direct-io.c in the same
+> fashion, i.e. it's expected to be iter'ed only once for IOCB_ATOMIC.
+> 
+> If bio_iov_iter_get_pages() does not give all the pages for REQ_ATOMIC,
+> then something is wrong and we should error. For this to work, we must
+> ensure that bio_iov_iter_get_pages() is only called once for a
+> REQ_ATOMIC bio - that would be the semantic.
+> 
+
+Yes, I'll move the check right after bio_iov_iter_align_down() in
+bio_iov_iter_get_pages(). That ends up looking cleaner.
+
+>> +		/* a short atomic write would be torn by definition */
+>> +		bio_release_pages(&bio, false);
+>> +		ret = -EFAULT;
+> 
+> Eh, generally we return -EINVAL for something which can't be written
+> atomically - like in iomap_dio_bio_iter_one(). -EFAULT is not documented
+> for RWF_ATOMIC (afair).
+> 
+
+Sure I'll change this to -EINVAL.
+
+>> +		goto out;
+>> +	}
+>>    	ret = bio.bi_iter.bi_size;
+>>    
+>>    	if (iov_iter_rw(iter) == WRITE)
+>> @@ -352,6 +358,12 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+>>    		ret = blkdev_iov_iter_get_pages(bio, iter, bdev);
+>>    		if (unlikely(ret))
+>>    			goto out_bio_put;
+>> +		if ((iocb->ki_flags & IOCB_ATOMIC) && iov_iter_count(iter)) {
+> 
+> At least this check could be factored out of
+> __blkdev_direct_IO_simple(), right?
+> 
+
+It's gone with the change to bio_iov_iter_get_pages().
+
+>> +			/* a short atomic write would be torn by definition */
+>> +			bio_release_pages(bio, false);
+>> +			ret = -EFAULT;
+>> +			goto out_bio_put;
+>> +		}
+>>    	}
+>>    	dio->size = bio->bi_iter.bi_size;
+>>    
+>> @@ -691,8 +703,15 @@ blkdev_direct_write(struct kiocb *iocb, struct iov_iter *from)
+>>
+>>    	written = kiocb_invalidate_pages(iocb, count);
+>>    	if (written) {
+>> -		if (written == -EBUSY)
+>> +		/*
+>> +		 * The buffered write fallback cannot provide torn-write
+>> +		 * protection, so atomic writes must fail instead.
+>> +		 */
+> 
+> Would it be better to have this check in direct_write_fallback(), i.e.
+> always -EAGAIN in direct_write_fallback() for IOCB_ATOMIC?
+> 
+
+This wouldn't work since direct_write_fallback() takes the result of the
+buffered write as an argument, so the write will have already happened.
+Instead, we can skip the fallback in blkdev_write_iter(), like we do for
+IOCB_NOWAIT in patch 2. The new check in bio_iov_iter_get_pages() ensures
+we get there with nothing written to disk for bad IOCB_ATOMIC so it should
+be safe to skip.
+
+Thanks for the review!
+
+>> +		if (written == -EBUSY) {
+>> +			if (iocb->ki_flags & IOCB_ATOMIC)
+>> +				return -EAGAIN;
+>>    			return 0;
+>> +		}
+>>    		return written;
+>>    	}
+>>    
+>> 
+>> -- 
+>> 2.39.5
+> 
+
