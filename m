@@ -1,64 +1,64 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9134915B7
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 09:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6942F49158F
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 09:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788944505; cv=none; b=mW4v+vYbDr5h/Bgg0Kx0oncq4j/8gaBXtoIZdaGSNJb6KAoECwWnPeSTWH+oXc89kAK+gf8/aBMVp3K3/PMu2IGNiEeNbAJ2rpdvibnxzMxmMTAAU4oJyAF7blJhQFNLCw+q1owWeuDAaiXaM/nJ1dzAk5tdpk6Us3OXBcR5p64=
+	t=1788944507; cv=none; b=OOLpoq49OknDLzKFRIx6Jw74Q5Jd4GJSpsM7+Rh3ii+igaIq4yXUxfc8jJWaEPZ1gaUir3OlOU6CAaGxvSsXbIybmcVC4PnGq+Kl2cFW/OfBwr+f9Ui8XmXp08o4lMCe+XE4e7ja0zqQ+S9wkUWG8bPOpSVGSpvTkdbiKuEE3Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788944505; c=relaxed/simple;
-	bh=RC1BNmkCuQU1DakRzhjF5JezadS0qgQe8SFPOXejDL4=;
+	s=arc-20240116; t=1788944507; c=relaxed/simple;
+	bh=HwU/ru9C3cqaYxeWB4WaVZIJTnLTox6zR3se4so5PpA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=astD/io/KQsltgG3Cd96NIXsIAyzjkW5eghH/4Rc5oq23YXyM69Y7RDjh5Wdo5BorOXGMu0mCZFWqB+33pBChhwkoosuk2Z+xpVDCMjPbwU128s68jEXYtBT40oub6gll3NvvWZmAlG9++yyRMYKktKnOvQu8UsZxuzp5QP8FF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=gOJ6F8ar; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=WWRNLXOuyyXsAG4wmpaTzIc0LHGWUzyYksFszK9a+YyK3aHoLlX+lt30po0U0xl2u5yl1TI3rqcoFlNnjRsRNkkjehMiX4BqbWToc8lushPIAEtUt96fOe+LeQVjCWZuHiTh0GleOMqBk3UXn08IjStu7tPnxgMQG78fWKgI270=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QUioUctI; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="gOJ6F8ar"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-38e58034d05so4591322a91.2
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 02:01:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QUioUctI"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-38e041ea211so4609534a91.0
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 02:01:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1788944493; x=1789549293; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1788944497; x=1789549297; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=E/izFqZ/muM6zoo5C7zoGnLseqg/LKzmuBhX1YVp8oU=;
-        b=gOJ6F8arppcKqtODSq6pTQPHYC11kjfOFk6a3G5oG1Jhz4v0yWI2qz3gH1PmVjlgL8
-         xmb0/PzsRtXpOHzhPi7GcSlBsYGTx/CH+mGCvIsHrY+IIsdv+J7y5cocKuUCSxqG+cYi
-         xl6GqSOMSxQ26e1slcvdZNyJNWrMyZHyAmXr/1WWj0jZFX7bSTXXvsyeDjwLcbpicaTY
-         jwfkNS2AuhowPJ/8KAt7lmc3H6PAStaRBdOwvBnpKgRe1iUt8kLTWe7hzLXNsHjP4Mwy
-         drlaXlke/jcUG2GBhbjRL0wK3H8dDGFl5tFN0Z+c6LlfpCQJ4xg5SOI9tjpv+Bpbqw3D
-         RuvQ==
+        bh=fnw+bbx2n8GI1P1qJxz04Evujcp+PRs2H97tReO8VaY=;
+        b=QUioUctI+Amc+Qo8bxZ3Rkm5hQ2qoQWS+Sd3eMUC9YW8ujSx2qmtA0UuqW5IiZIIk6
+         paEtPzUxpnykPMckhjnT2nSLmwyIheOY7Bz+nUFCkeJi9rGd9zOvpNNpOIuqsGPFzQVb
+         RdBLlttJXlTIVn1eG7Ac2vtDNo5OR3t5f8eMic2VRXVeDpDFYYMIKV0U2A7OL5lzINw/
+         KAlAy9voHDqRDESHB3LSOEgfQihmwH5Z+16LDRs/prbyntctGSvsfrOrGuW8uWf4uzlO
+         gCn5hmNzAiVCIyeWzkzx0OuZFTRYiUxdm7sparBn/MDFM7s4vQiuWgU0XGM2muz7gsb9
+         q8Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788944493; x=1789549293;
+        d=1e100.net; s=20251104; t=1788944497; x=1789549297;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=E/izFqZ/muM6zoo5C7zoGnLseqg/LKzmuBhX1YVp8oU=;
-        b=b69tHP1n6xyoaXO/UR9ixzskZ00myo2lW0aspA4UIuqPTo1895he3FCGvsolKdw2/V
-         j81KFv9QHUdHFfoFVfqOdyXJ0ey4SnJPpUP838ZSavyQxAeuxaEXdktJxltwKmuJFihH
-         clCcILxB8VPY/leWikiQae/tTS6vQGDniCtstKwurtO5osmEkg2U2J0cnA/o4HVcxFQf
-         fKmoMmTQlHcaLSoZUh13PjlhFzoxD3AYR/nm/MOZ+Jz6SAp48woTqvlA25NwFoah7XfL
-         sz0XZVbI3zIEOmEznY4f2wnZL+Ui5shMVz1+NZEibMjO7V1xzyO9DqkcPyd4jnqWSNQm
-         3UOg==
-X-Gm-Message-State: AFuF++nPW2QLmieTNrByQLpKJqLXHsiH2nt/OfLfLeEL/RCdRX7lN0T7
-	rEQKQOPvHAN43jQNvr73U2LE2u9P4f0OlTlv298nJP2CyYKZDUos8d6j/HQVnwmm3LDq/QS8j1W
-	BLC1P8ec=
-X-Gm-Gg: AYBFou2oDSGtzoGmPFK7ojF3DZZf5CsC8Srtov0a3/kDhLBg+TjytLyO9F9ilcN0epL
-	QEY8s/9hbz4rRljEGUf0qnXv0QOEEUTDcQgwbE7KaZIVSRpedJzkej7O7lzI737/1lVjAH8sQB6
-	2BRM3OycrGhjCXzjKOhDGlhTpvtfc3EBj/Z2W2h52Va6vbrhXkyCIlUDdTXJ7d2IzzDLTCdZ82D
-	qmXv3lgH2+SCYML7J6hVTZkcQ6+IsyVlDZjMYkt7yTJf/VFa/31UA0L3L0CUkHWPI5avzgRvLC/
-	l5kaHHikTnwcf3MLDaHpr9l2c9qE6AFr0Fdw66CW0QPnLKChkrIrMuMW2Ucku2x2yr16kLL7Fsl
-	oar4LtaR52mAWNIUIkrovm9NeXjkxIRcjAKiBryMRYhgWy8lAbR7OKFyPX2I79znECr67HrE6/7
-	xo42YI8n0OQxK2Eq98JA1EUwdbJP9owMOkeHis3XkiyBmSA9njHT8eIsKWGZqBxaYg3XeleS7He
-	g==
-X-Received: by 2002:a17:90b:2784:b0:395:4de5:1054 with SMTP id 98e67ed59e1d1-39b26272bdcmr57133385a91.16.1788944492663;
-        Wed, 09 Sep 2026 02:01:32 -0700 (PDT)
-Received: from localhost ([106.38.226.45])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39b08bcc090sm36856959a91.4.2026.09.09.02.01.31
+        bh=fnw+bbx2n8GI1P1qJxz04Evujcp+PRs2H97tReO8VaY=;
+        b=rokf2ODaOYqDG36GjLfjlzF3zKxCS5OtYU5EjU/FyFp0/XjePmVJFSPcq9Xl4CdnYo
+         njTeAzWjT4UFZEIPCk8udiMXPhU0b7SGZxXwsEOQXQzXplmLBa+8Mjk5unnAJrqthguU
+         J2jEFxUr0LB+aJgd0QOJbGgnuLUyzL2/p/7h1Mh4eJYMTOnERNz+3wnHrsjiBC5gsSqg
+         be1jUKJ5q2M0KaiaPTBPVCDT189GcfYUeqcyuyT74XA2dJ6rMFEreCHYE7hMi23/DHlp
+         V+mraIv4VSdgo9m9sFMW3cXV6HMNV42/EQex27uQVZsNq5ZbdJ99hRMs5wkz1pTOTxEp
+         17Xg==
+X-Gm-Message-State: AFuF++m6SUb4rXozLJzJ9dpTJIu2h6wz+VT3cW80y7IKoh1rrIQn0lMA
+	YdpmBSAAk2dJlfAMFfjiM6fj/2aGKMqA8//kGt9dC+eMdbQdu0vM03Oo5dlEhCpe73zIA0bTDvv
+	d6s7xp7Y=
+X-Gm-Gg: AYBFou2PXQ4cm3kwyvox59ZQjQcRU19fF2Pe+qg3U0av+8tQnxdcA1lfOC9Pv4dUN99
+	QWnDLg0qVzmwp2WrNgbygvEahunyuQPTfpPgNoRW95shM3nqX4A4NZ+33hJMKX4rqfyoxYt3Jog
+	rQiCEdHvfRdQiMOyHJv3LmnhFHCjeHxyGX7QNtsIyag9ZWYFTMJ3OzYfRIz7/+DW/pFklxcxCBT
+	4Ib2vp1kSkZjt2XK9CGwkP6P4hDsMUWHDkVcqsp/R6KHPc1bC3wGIhJ4GDJkRqX3E9CnnAXCITH
+	r45+QfkRuPIb0NBeeNdEel2XNknC9GwjhYif1x71mILW3545iFj4o6sbxtVmYNKsP4S4dEGUTLs
+	AU98Y7Brh8o44rNtNpdmchQZtstMXORtvjnzpRQbaXcw3ScGjPXt6505cT53/kWpuO62I8v/zh/
+	F5AhD2YvMdBgN1qMtUxN9ysWLF34bMY4m1WT1umTGcN8ICjfxflfJbotCICotsvKZIyMQqQetBw
+	fAi
+X-Received: by 2002:a17:90b:1343:b0:398:d93a:b343 with SMTP id 98e67ed59e1d1-39b26123302mr60180972a91.3.1788944496615;
+        Wed, 09 Sep 2026 02:01:36 -0700 (PDT)
+Received: from localhost ([106.38.226.186])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39bac3a2809sm4683088a91.10.2026.09.09.02.01.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 02:01:32 -0700 (PDT)
+        Wed, 09 Sep 2026 02:01:36 -0700 (PDT)
 From: Julian Sun <sunjunchao@bytedance.com>
 To: linux-block@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
@@ -76,9 +76,9 @@ Cc: jack@suse.cz,
 	djwong@kernel.org,
 	ebiggers@kernel.org,
 	sandeen@redhat.com
-Subject: [PATCH 4/7] fs: use sb_for_each_inodes() API.
-Date: Wed,  9 Sep 2026 17:01:09 +0800
-Message-Id: <20260909090112.790006-5-sunjunchao@bytedance.com>
+Subject: [PATCH 5/7] gfs2: use sb_for_each_inodes() for cooperative eviction
+Date: Wed,  9 Sep 2026 17:01:10 +0800
+Message-Id: <20260909090112.790006-6-sunjunchao@bytedance.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260909090112.790006-1-sunjunchao@bytedance.com>
 References: <20260909090112.790006-1-sunjunchao@bytedance.com>
@@ -90,148 +90,82 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use sb_for_each_inodes() in evict_inodes() to avoid rescanning referenced
-inodes after each reschedule. Collect eligible inodes during the walk and
-dispose of them after it completes.
-
-Convert drop_pagecache_sb() as well, replacing its deferred toput_inode
-reference with the iterator's position tracking.
+Convert gfs2_evict_inodes() to sb_for_each_inodes(). Take and drop the
+inode reference within the callback, with iput() outside the list lock,
+to retain cooperative eviction. The iterator preserves the walk position
+and removes the need for toput_inode.
 
 Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
 ---
- fs/drop_caches.c | 44 +++++++++++++++++++------------------------
- fs/inode.c       | 49 +++++++++++++-----------------------------------
- 2 files changed, 32 insertions(+), 61 deletions(-)
+ fs/gfs2/ops_fstype.c | 38 +++++++++++++++-----------------------
+ 1 file changed, 15 insertions(+), 23 deletions(-)
 
-diff --git a/fs/drop_caches.c b/fs/drop_caches.c
-index 49f56a598ecb..0d475a5ff8cf 100644
---- a/fs/drop_caches.c
-+++ b/fs/drop_caches.c
-@@ -16,36 +16,30 @@
- /* A global variable is a bit ugly, but it keeps the code simple */
- static int sysctl_drop_caches;
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index 718e0da7dfce..acdbf9ca44a3 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -996,7 +996,7 @@ static int gfs2_lm_mount(struct gfs2_sbd *sdp, int silent)
+ 		switch (token) {
+ 		case Opt_jid:
+ 			ret = match_int(&tmp[0], &option);
+-			if (ret || option < 0) 
++			if (ret || option < 0)
+ 				goto hostdata_error;
+ 			if (test_and_clear_bit(SDF_NOJOURNALID, &sdp->sd_flags))
+ 				ls->ls_jid = option;
+@@ -1719,6 +1719,19 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
+ 	return 0;
+ }
  
--static void drop_pagecache_sb(struct super_block *sb, void *unused)
-+static int drop_pagecache_inode_iter_cb(struct inode *inode, void *unused)
++static int gfs2_evict_inode_iter_cb(struct inode *inode, void *unused)
++{
++	struct super_block *sb = inode->i_sb;
++
++	__iget(inode);
++	spin_unlock(&inode->i_lock);
++	spin_unlock(&sb->s_inode_list_lock);
++
++	iput(inode);
++	spin_lock(&sb->s_inode_list_lock);
++	return 0;
++}
++
+ /**
+  * gfs2_evict_inodes - evict inodes cooperatively
+  * @sb: the superblock
+@@ -1741,31 +1754,10 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
+  */
+ static void gfs2_evict_inodes(struct super_block *sb)
  {
 -	struct inode *inode, *toput_inode = NULL;
-+	struct super_block *sb = inode->i_sb;
+ 	struct gfs2_sbd *sdp = sb->s_fs_info;
  
+ 	set_bit(SDF_EVICTING, &sdp->sd_flags);
+-
 -	spin_lock(&sb->s_inode_list_lock);
 -	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
 -		spin_lock(&inode->i_lock);
--		/*
--		 * We must skip inodes in unusual state. We may also skip
--		 * inodes without pages but we deliberately won't in case
--		 * we need to reschedule to avoid softlockups.
--		 */
--		if ((inode_state_read(inode) & (I_FREEING | I_WILL_FREE | I_NEW)) ||
--		    (mapping_empty(inode->i_mapping) && !need_resched())) {
+-		if ((inode_state_read(inode) & (I_FREEING | I_WILL_FREE | I_NEW)) &&
+-		    !need_resched()) {
 -			spin_unlock(&inode->i_lock);
 -			continue;
 -		}
 -		__iget(inode);
-+	if (mapping_empty(inode->i_mapping)) {
- 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&inode->i_lock);
 -		spin_unlock(&sb->s_inode_list_lock);
 -
--		invalidate_mapping_pages(inode->i_mapping, 0, -1);
 -		iput(toput_inode);
 -		toput_inode = inode;
 -
 -		cond_resched();
 -		spin_lock(&sb->s_inode_list_lock);
-+		return 0;
- 	}
-+
-+	__iget(inode);
-+	spin_unlock(&inode->i_lock);
- 	spin_unlock(&sb->s_inode_list_lock);
--	iput(toput_inode);
-+
-+	invalidate_mapping_pages(inode->i_mapping, 0, -1);
-+	iput(inode);
-+
-+	spin_lock(&sb->s_inode_list_lock);
-+
-+	return 0;
-+}
-+
-+static void drop_pagecache_sb(struct super_block *sb, void *unused)
-+{
-+	sb_for_each_inodes(sb, INODE_ITER_NORMAL, drop_pagecache_inode_iter_cb, NULL);
- }
- 
- static int drop_caches_sysctl_handler(const struct ctl_table *table, int write,
-diff --git a/fs/inode.c b/fs/inode.c
-index b4279063a5dd..07a5f48641af 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -959,6 +959,17 @@ static void dispose_list(struct list_head *head)
- 	}
- }
- 
-+static int evict_inodes_inode_iter_cb(struct inode *inode, void *data)
-+{
-+	struct list_head *dispose = (struct list_head *)data;
-+
-+	inode_state_set(inode, I_FREEING);
-+	inode_lru_list_del(inode);
-+	spin_unlock(&inode->i_lock);
-+	list_add(&inode->i_lru, dispose);
-+	return 0;
-+}
-+
- /**
-  * evict_inodes	- evict all evictable inodes for a superblock
-  * @sb:		superblock to operate on
-@@ -970,44 +981,10 @@ static void dispose_list(struct list_head *head)
-  */
- void evict_inodes(struct super_block *sb)
- {
--	struct inode *inode;
- 	LIST_HEAD(dispose);
-+	unsigned int flags = INODE_ITER_NORMAL | INODE_ITER_UNUSED;
- 
--again:
--	spin_lock(&sb->s_inode_list_lock);
--	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
--		if (icount_read_once(inode))
--			continue;
--
--		spin_lock(&inode->i_lock);
--		if (icount_read(inode)) {
--			spin_unlock(&inode->i_lock);
--			continue;
--		}
--		if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE)) {
--			spin_unlock(&inode->i_lock);
--			continue;
--		}
--
--		inode_state_set(inode, I_FREEING);
--		inode_lru_list_del(inode);
--		spin_unlock(&inode->i_lock);
--		list_add(&inode->i_lru, &dispose);
--
--		/*
--		 * We can have a ton of inodes to evict at unmount time given
--		 * enough memory, check to see if we need to go to sleep for a
--		 * bit so we don't livelock.
--		 */
--		if (need_resched()) {
--			spin_unlock(&sb->s_inode_list_lock);
--			cond_resched();
--			dispose_list(&dispose);
--			goto again;
--		}
 -	}
 -	spin_unlock(&sb->s_inode_list_lock);
--
-+	sb_for_each_inodes(sb, flags, evict_inodes_inode_iter_cb, &dispose);
- 	dispose_list(&dispose);
+-	iput(toput_inode);
++	sb_for_each_inodes(sb, INODE_ITER_NORMAL, gfs2_evict_inode_iter_cb, NULL);
  }
- EXPORT_SYMBOL_GPL(evict_inodes);
+ 
+ static void gfs2_kill_sb(struct super_block *sb)
 -- 
 2.39.5
 
