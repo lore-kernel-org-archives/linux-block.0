@@ -1,212 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA543B71C4;
-	Wed,  9 Sep 2026 20:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12BE4399ED
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 20:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788984668; cv=none; b=WzrUxBKmk7TbKIYly9K/dSU/qhB1YA/o4OoqN27BXxESsJbQU3PQE1h8eQZZsNkeA9e+FMTvsBiX0OpBtZHwKyddGMRmb9Dr9MY2x/zZj9Fbq/OKYEqqelVDM98mgnzgd7dyXOTKOehSoEy2G6rfaZbFqRh+GBsvxMh89jpVxYE=
+	t=1788987394; cv=none; b=OVKNTdrI7nwMedfee7Zmh5Kl/zRSnEsx+5UPuP+A961NrUmQPfORYvz1wJQMocXiBl4Q6ooZXZo5xX4AjBV5AnCt45ej8MiGdNrMpxh1vAtEKkpgy23b6BdDabb5OTYJO6hrObIZCoGNtg+pXjDXLAsgUPphjYUl/NU+qR65CZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788984668; c=relaxed/simple;
-	bh=5HoG3honV/sojWC8vPCS1yQeOGAMvOh2ZbyOcHFktnc=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=X1pDXokmrpGEEtnOz2VqRfmxI/G0F9OcP4z7z+OWl2utvwtl3ImNTaI3wP/1qdNtwRbsYIh+Yw8mM3rPXFXKYzbGR/UE1308Mdw/eBjIjzmyGJlN0mAMILk4tPy37XVpPCiZUSQ2cDCt3/wtocSY5L1lDG6MJsiPs/i1Jw87LVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOzG7z/W; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788987394; c=relaxed/simple;
+	bh=Eu+0Om4nXxfhek9V2AOG88l8xsxFV6d4kLyWXbtDvRU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CTQQ/GpAnP4QLUV5B/fq0MMKI8BWvhea3+P7hOW8bXAm1bDZ2rlZA532GtfFxyVvY3kwIKhYvpzrSWlU21O2CvqYndNVKJPEmtkJM50bKsJEGrFsp0X8r+qqVWr+2EEyqvAu+/RqngnDfhb2Fl+jw7rizrhdRxOmlTiBMz16aus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=Pfwu2z97; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=cn7pOP8n; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOzG7z/W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E75471F000FF;
-	Wed,  9 Sep 2026 20:10:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788984656;
-	bh=dMpeLqTNXDRpS+r+jORTF862uDqb/CqEpFeuPMT9TQY=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=MOzG7z/WitVOZzXnEIONfv6+fQIabeSSDolWC+rNYrS7Vlwwk1vfEtfYArR3h+6AW
-	 BkZjdwcm4wildy8SICewrTrtCKgy1b/k3oor33cNi+NQUhi9t08L42AuUSej2fEUqe
-	 qfny4KDHxbZ/xJqwFiumW+2xXGFO5NTmGmjFJsK/R3ZPuIR60+kApLxdoET5/gH2iE
-	 rWbH4vbeQZu2OBM+F5Ue964Xfcvu1u56EKpW7dmEAVwazFnXO1VEyiFIhPc6gnzFQs
-	 PkgWE1RX2sqolRE0Bgev0hvDTVbQb+YwwFjRG96UwvW36lXSDQI2HmKP52zMD7Vv7T
-	 Lhkf7318C1Mlw==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 48EF31980052;
-	Wed,  9 Sep 2026 16:10:53 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Wed, 09 Sep 2026 16:10:53 -0400
-X-ME-Sender: <xms:Sr2hajWlva4lVEbm2EzQ1s3udRWO4ikQFFFPxDegsKQ3CTjZB3r-uA>
-    <xme:Sr2hambJl-c3e1UrZYMfqYiLxCHTOQsPkJ8JLd0z0j-CmEmZZXevEai-Q5MqU57rC
-    ZZC53tEJfuu9jLPODK6QXBLSGBNaUsNCeOiE3yoJfwKabbHa6Xe7xPZ>
-X-ME-Proxy-Cause: dmFkZTGP2bhb/XYhsNLB9S53X9rzoPN54qfE/KjrIQ+39ezusymjgkFG9cet+423ozVpDR
-    QFvnmTNBMcgGscLcMMj7nBUY31hzJeOaGY2jSrT3p2YxejgdAUzrKdVOR8lCRBS16Gn88X
-    /+XGMDl8CSXVYCQsr0wErwVPc+V6zmpd4d51AzTQO8MWr89uCO460fbix+l7zmvoJuzkvE
-    RaO6/PdGwEVTqYIezlus3lDCEAnry2C8vj8V499E/dlZoQ4ScXku67uqDjBlKaXI4HB2gC
-    KacujXVdDoEwzQ2dyYPEUzaZ7+e2mOEhOGj1Fetuz0MEj4OcAAwjVvsFr0sHvhPpz277Gf
-    eKzGoSn6iqanxzNgqqMPsXCY76vQD+ea58iHSG5APtokUDPToSvfELosscq5Qt4yP2Q9+t
-    y1tk8mh/YV6JND1qNbS+O2favpqJYSFmbwPFawNlshEMNgXzINZxwKWiewG0SxhFiQFIL9
-    4DpI0upYjn0k3v2eBM7Iml4anYd8gF3WPX86kKH7R0o4H64FA7zDDSXAF3jY5QkB0ZSiW6
-    sIKc9JmLSD+i8R4Jef0OcLMUt1jMXi6faA5jYE6vH5UfgYoDR3/ZIP9Q6vSw4pAYMA/Nxa
-    V2SShKsn+8CcVH/XBZJ+tLKfo4Kqs/CxHjYl1vrrgz/DIr30WA6FviGoSjxg
-X-ME-Proxy: <xmx:Tb2hapOSEggtAzw0YPolcJShgHipiCEz32yrnlma3o-FVpqo5DDtLw>
-    <xmx:Tb2hampTwttRtE3MK5w7nObKR1veqSPqSuzHl5qP3-u6Rq2T0fLYYA>
-    <xmx:Tb2hau5yJgf9foM2D7YQh1VswYDLBi8VWRuYGaVJdHhtOWFLOMS4ZQ>
-    <xmx:Tb2hagpfMYsdVStUsBhPHlcE5fczSNlUCNGOAGT9WGdLMRXUiDZ7qw>
-    <xmx:Tb2hasKSPzPUsbdSIk5XCLjXxVPXAZU5O6viFS2qHLW3A3TqPNR5T1ZS>
-Feedback-ID: i36794607:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 78FB232A007B; Wed,  9 Sep 2026 16:10:50 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="Pfwu2z97";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="cn7pOP8n"
+Received: from pps.filterd (m0167076.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689KYZko1214575
+	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 16:56:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps01; bh=wAZfefiEaDRvanKkEQj6zpo9v6
+	6Gi+kDLh61ika2uy4=; b=Pfwu2z978uNChRb5pJYyTCzabmBFMKDDJ+onuIG2tU
+	DrLEYqmJIggO75sD0sJRGLrMe+Z+tJTd2vGS3P21WSAX5l3GZHDz2Y5tt9j16HQY
+	F2Lm+jNOaN6ZOyUqEWVIbt2R1HBoedjVZCjM5Yg4aUrEfu+B56TTsujcHaYeWCiU
+	MJudNCyeA8hCjp6PiTTPO/2VbS/95jyvLSBTG2G5SORfVCVUlpa68/Aw6aMROjgV
+	uopwRSlGdG+AkXpJvE7H8RChdbcigwffrkBrL0VYKIVZWBL102ZF81JQcnDyumrv
+	kUT/gn3jiuEbQBAsh5jXD008jAwjIbchi4zodoFwRquQ==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcxyh6ph-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 16:56:26 -0400 (EDT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-93903982af1so1292275585a.3
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 13:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=columbia.edu; s=lionmail; t=1788987386; x=1789592186; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wAZfefiEaDRvanKkEQj6zpo9v66Gi+kDLh61ika2uy4=;
+        b=cn7pOP8nV4qe3FQgsLXRjNX8yNCPxwaS/f6AvV1B1bj/KILRoiAuyH0sSXrge9KaUl
+         +LropMeraAYXxvRewPcNybtuSVGQ1EWysfzC+hy6aJfUef1TN1z9HALaN6AOr4MQP1/9
+         mnZgf6W8oedDlM9vsVaQMHQhpdtNfZgcXOxMkE9PgPEcwcB5CcIAtK8lg6+xg9Ax1cm8
+         NEc7N4MofP1mRVe2bnfybZRFjQfZYnzot5LZmc0KjVRpa3Yh2n2nr0vjmdbvO78wf1sa
+         UpJOl1P06SoDX5yGeFxGSmL6AjaY1PddGXOS3nONtb+V0LX8GoWyCwG3AFhP+5VZk+ap
+         Pdxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788987386; x=1789592186;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=wAZfefiEaDRvanKkEQj6zpo9v66Gi+kDLh61ika2uy4=;
+        b=knqwqupOmrUVQUufa0e2JRmHithc5NyMGj/B/J++HmVcM/Cs/gb9Tzks4xqEGO1fi4
+         3/jew8pezydrlr25dLZalSybGvIKWiVQ0gpWeAIhFt8lbni6L9e7S6sN0vwIA6W0X0n5
+         0P7Ek+/0+IFfwjyAmWznbLqaGJ5aZBUm2YpLukG4mnKgO8+8K8k/lSkzQjU8wlE8aYHs
+         UOSUnR459BDvEE0dwQdHzdujanxkW0JKJWbZ20z7B7/D67y9+Wteb24XnAEls6KR2NGY
+         tdy/qaNm4ZkLE8ckyY22166m8jSpriQa2f9nA0V6bKm6ic9v4uGpiABxcDUOEWwu9HL6
+         Vjog==
+X-Gm-Message-State: AFuF++nS+LxwnGUPfLWUOP5OqLuZeZur3AT9+0ip2jwVsvzKaaAfA+UL
+	YfY08nekwqvWoXEaDpqqsN6oaqX48/JmeL5cQpiOOAdijYS72MuSaSyf2p+GwunQHToDIFpXllk
+	gk6VO4jAMoBGg1Or1FicyUuJfG3h6eRWgivVb8aEnYhRpp5BC5q3zENvm1SO981cMuklTIao=
+X-Gm-Gg: AYBFou1YD/TbpWNcjZSDAoBkDSIrWVKLFRvHKqu8GTsct8Up3MisJhARH3hRH67WIQW
+	ro2b/lbqXSbehfJRq64Eaw68GNDnX98VkiMn2mdQiGQCN5IqOthztG789taXdX94+YkqscxlNIN
+	/2eAga+nrOKVb4qLD8p1tsQeOSPZW7AhCqdPrnKX4metDPKgbrc4+13KOzE0ZPn/Ep9837pz2cy
+	mLXiVoRKksNKCFqiYSauinwG498qEywLS4NPB1HOdO8/dCcCDE4+mtOWRJ26j6/CO6ls4cNL1Xt
+	OjKt5DisKhGy4cIwDbpL7bkocB+g5HbTScNIjksJn1fX5BWqL5pkSHzq4btKfeiEmwl17uK4VaF
+	4O9Q+cZith1SFPgnTg1VrMv5RYHVSDLxDSb4EYTgp0XpluZxH
+X-Received: by 2002:a05:620a:400f:b0:939:7e48:f937 with SMTP id af79cd13be357-939806da346mr3905964685a.34.1788987386143;
+        Wed, 09 Sep 2026 13:56:26 -0700 (PDT)
+X-Received: by 2002:a05:620a:400f:b0:939:7e48:f937 with SMTP id af79cd13be357-939806da346mr3905960785a.34.1788987385680;
+        Wed, 09 Sep 2026 13:56:25 -0700 (PDT)
+Received: from [127.0.1.1] (nat-128-59-176-193.net.columbia.edu. [128.59.176.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fba2c3esm1504798685a.36.2026.09.09.13.56.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2026 13:56:25 -0700 (PDT)
+From: Tal Zussman <tz2294@columbia.edu>
+Date: Wed, 09 Sep 2026 16:56:17 -0400
+Subject: [PATCH RFC] ext4: never fall back to buffered I/O for atomic
+ direct writes
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AGTXWeH1PU47
-Date: Wed, 09 Sep 2026 22:09:43 +0200
-From: "Arnd Bergmann" <arnd@kernel.org>
-To: "Bart Van Assche" <bvanassche@acm.org>,
- "Krzysztof Kozlowski" <krzk@kernel.org>,
- "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
- "Linus Walleij" <linusw@kernel.org>, "Russell King" <linux@armlinux.org.uk>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- imx@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
- Linux-OMAP <linux-omap@vger.kernel.org>, linux-block@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
-Message-Id: <b0705a8d-1b85-44e0-917d-19ba760e8c12@app.fastmail.com>
-In-Reply-To: <2da174ef-1d5a-425d-b885-be9482b0be90@acm.org>
-References: <20260908152808.3928630-1-arnd@kernel.org>
- <20260908152808.3928630-4-arnd@kernel.org>
- <2da174ef-1d5a-425d-b885-be9482b0be90@acm.org>
-Subject: Re: [PATCH 03/13] ARM: remove riscpc
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002@columbia.edu>
+X-B4-Tracking: v=1; b=H4sIAPDHoWoC/yWMQQrCMBAAv1L27ELaWqVeBR/gtXjYrBtdrYkkU
+ QqlfzfqcQZmZkgSVRLsqhmivDVp8AXqVQV8JX8R1HNhaEyzMb3pUaa8RsrhoYw+oKNxtMR3tHX
+ XGdpS69hBqZ9RnE6/8wDHwx5Of5le9iacv09Ylg8o+r4egAAAAA==
+X-Change-ID: 20260909-ext4-atomic-no-fallback-b1550a7a3fcf
+To: Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>,
+        Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
+        Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+        "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+        Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>
+X-Mailer: b4 0.17-dev-db0b7
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1788987384; l=2513;
+ i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
+ bh=Eu+0Om4nXxfhek9V2AOG88l8xsxFV6d4kLyWXbtDvRU=;
+ b=hP4uTw3T93DqPxhf6WfvMmeepkGXSHcHNK0KjYju1xI/5qcBbLiisM5f2b99lfMB4oqigXcKr
+ HiFHq/XknnbCc7mLX9Dl1pQGFYFWp/WTU+kgC/z3CMkQkfA6ZfOxIa/
+X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
+ pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
+X-Proofpoint-GUID: 8CJKIZKlUancNjkQ_pESdc1_aJwtvQnU
+X-Authority-Analysis: v=2.4 cv=Gr7XaU1C c=1 sm=1 tr=0 ts=6aa1c7fa cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=Qm0qsxP7aFY2tkT6R2MF:22
+ a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=ExgVtMUaGOEd3M8Mp4cA:9 a=QEXdDO2ut3YA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDIzNSBTYWx0ZWRfX3h8cSSVZGDGO
+ OcP6Nw5Oav/eBDo8fXJJdd2nkm0anzJrUMNawEPC+RGo7dg26qO+Hsm1q78JU2A4MEwtJZETJVH
+ l5nEwWR9209lK1mVX1EE2MmheyqvUFiUlHq3wFLBvqpIvl2WBcdlqQt0lHPVbNoPZ+821AuUJGG
+ Tzwi1iaxyBTUq/sGpRotLpiOMw67VzV7dJlnn5mZ50W5Pl9WO6ioBVkUZIu3CIJa2hvwA6ruY01
+ DiT02cjk7F0ldjJfns3leL7jWj6DtEI9TbGvNDkd2i0/mfsDdeYifiD+usLUR50sL9TYf0uMule
+ 54Hl3/183V2tXnTnQqD/RMeN5rUBRc8DFI5g/P6quOCW3vNCE6UMi/T1+NJKb8E/rA7jF6zUKE8
+ w0e24q36z81Dy7F1pGp48B6P6rctBadEFJ++WsllhRZSgLiIU7AMfcE449gSYRQGosIKcSPuPYa
+ vfngPS+I6GtgRHIhFbw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDIzNSBTYWx0ZWRfX6EggbMOw+Y+N
+ Rk9lCzEx71arCaldxhPx1JTrQPAaYoRsOMxHudxYgqdmb3qja70cGEiViu2Y3W67rcdn4i2ejaL
+ 79APVoOs220b4pb8wZFW/HHSMkh1kOEpRxce+sCimvFSPROonllF
+X-Proofpoint-ORIG-GUID: 8CJKIZKlUancNjkQ_pESdc1_aJwtvQnU
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11900
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 lowpriorityscore=10 priorityscore=1501 clxscore=1015
+ adultscore=0 malwarescore=0 suspectscore=0 bulkscore=10 impostorscore=10
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609090235
 
-On Wed, Sep 9, 2026, at 18:42, Bart Van Assche wrote:
-> On 9/8/26 8:27 AM, Arnd Bergmann wrote:
->> The Acorn Risc PC is the oldest still support Arm machine in the kern=
-el,
->> originally shipped with an ARMv3 ARM610 support in 1994, it later all=
-owed
->> faster StrongARM CPUs.
->>=20
->> The main limitation here is the CPU bus that does not allow 16-bit
->> wide data transfers and hence requires the kernel to be built with the
->> -march=3Darmv3 compiler option that was discontinued in gcc-9.
->>=20
->> As gcc-8 is barely supported for compiling the kernel, this one
->> will not see another LTS kernel release, so remove it now.
->
-> If this patch has to be reposted, here is the feedback of my AI coding
-> assistant (based on an LLM and hence may be wrong):
+ext4_dio_write_iter() finishes a short direct write through the page
+cache. For an atomic write that path only warns and then continues,
+which would tear the write.
 
-Most of this was already discussed, but there are two additional
-changes that I made based on it.
+This came out of a block device fix [1], where an IOCB_ATOMIC direct
+write could complete short when only part of the buffer could be
+pinned, with the rest going through the buffered fallback. Christoph
+Hellwig noted that ext4 has the same fallback and only warns in it [2],
+and John Garry agreed it should reject the write instead [3].
 
-> Issues & Observations
-> ---------------------
-> 1. Missed arch/arm/Makefile cleanup
-> Patch 03 deletes the entire directory arch/arm/mach-rpc/, but does not=20
-> touch arch/arm/Makefile. As a result, two orphaned entries remain:
->
-> machine-$(CONFIG_ARCH_RPC)		+=3D rpc
-> machdirs-$(CONFIG_ARCH_RPC)		+=3D arch/arm/mach-rpc
-> Furthermore, machdirs-$(CONFIG_ARCH_RPC) was the very last user of=20
-> machdirs- in arch/arm/Makefile (after Footbridge and SA-1100 are remov=
-ed=20
-> in patches 1 & 2):
+In contrast to the block device, nothing reaches the branch on ext4
+today: iomap requires the mapping to cover the whole atomic write, a
+buffer that can't be pinned in full fails in iomap before the bio is
+submitted, and a failed page cache invalidation returns -EAGAIN rather
+than reaching the buffered fallback. Exclude atomic writes from the
+fallback outright instead of WARN()-ing inside it, so any future bug
+yields an error rather than a torn write with a WARN().
 
-Fixed already after sashiko-bot found the same thing.
+Link: https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu/ [1]
+Link: https://lore.kernel.org/linux-block/20260907071217.GD934@lst.de/ [2]
+Link: https://lore.kernel.org/linux-block/a7752d1e-8ec1-44d1-a266-c287c315e8ab@oracle.com/ [3]
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+---
+ fs/ext4/file.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-> kconfig
->
->
-> config FONT_ACORN_8x8
-> 	bool "Acorn console 8x8 font" if FONTS
-> 	depends on FRAMEBUFFER_CONSOLE || DRM_PANIC
-> 	default y if !SPARC && !FONTS && ARM && ARCH_ACORN
-> Because ARCH_ACORN is removed, this default can never trigger and the=20
-> reference should be cleaned up.
-
-I have this in the patch that removes acornfb. It could go into
-either one, but I felt it fits better there
-
-> kconfig
->
->
-> config CPU_SA110
-> 	bool
-> 	select CPU_32v3 if ARCH_RPC
-> 	select CPU_32v4 if !ARCH_RPC
-> Since ARCH_RPC is removed, select CPU_32v3 if ARCH_RPC references a=20
-> non-existent symbol. If CPU_SA110 remains temporarily (before the=20
-> architectural cleanup in 7.5), this should be simplified to select CPU=
-_32v4.
-
-Also explained already that I preferred removing CPU_32v3 along
-with CPU_SA110 in a later patch, not together with ARCH_RPC.
-
-> 4. Dead code in arch/arm/kernel/atags_compat.c
-> With CONFIG_ARCH_ACORN removed from arch/arm/Kconfig, two blocks in
-> arch/arm/kernel/atags_compat.c
->   are now dead code:
->
-> Lines 150=E2=80=93157: #ifdef CONFIG_ARCH_ACORN / if (machine_is_riscp=
-c())=20
-> memory bank tagging.
-> Lines 186=E2=80=93194: #ifdef CONFIG_ARCH_ACORN ATAG_ACORN translation.
-> These blocks should be removed as part of this patch.
-
-I have a patch to remove that file.
-
->
-> /*
->   * Now, pick up the machine-defined IO definitions
->   */
-> #if IS_ENABLED(CONFIG_PCMCIA) || defined(CONFIG_PCI)
-> CONFIG_NEED_MACH_IO_H and #include <mach/io.h> were removed, leaving=20
-> this comment describing generic PCI/PCMCIA I/O limits.
-
-Fixed now.
-
-> arch/arm/boot/bootp/Makefile:21
-> : # guess an initrd location if possible is left dangling right before=20
-> ifdef INITRD_OFFSET after all initrd_offset-$(CONFIG_...) logic has be=
-en=20
-> stripped out.
-
-Removed that entire block now:
-
---- a/arch/arm/boot/bootp/Makefile
-+++ b/arch/arm/boot/bootp/Makefile
-@@ -17,12 +17,6 @@ add_hex =3D $(shell printf 0x%x $$(( $(1) + $(2) )) )
- #   INITRD_PHYS must be in RAM
-=20
- PARAMS_PHYS :=3D $(call add_hex, $(PHYS_OFFSET), 0x100)
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 374b4bc25bd5..fb561c701d29 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -666,17 +666,16 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	else
+ 		inode_unlock(inode);
+ 
+-	if (ret >= 0 && iov_iter_count(from)) {
++	/*
++	 * Buffered I/O provides no torn-write protection, so never finish an
++	 * atomic write through the page cache. iomap should not return a short
++	 * atomic write anyway.
++	 */
++	if (ret >= 0 && iov_iter_count(from) &&
++	    !(iocb->ki_flags & IOCB_ATOMIC)) {
+ 		ssize_t err;
+ 		loff_t endbyte;
+ 
+-		/*
+-		 * There is no support for atomic writes on buffered-io yet,
+-		 * we should never fallback to buffered-io for DIO atomic
+-		 * writes.
+-		 */
+-		WARN_ON_ONCE(iocb->ki_flags & IOCB_ATOMIC);
 -
--# guess an initrd location if possible
--ifdef INITRD_OFFSET
--INITRD_PHYS :=3D $(call add_hex, $(PHYS_OFFSET), $(INITRD_OFFSET))
--endif
--
- endif
-=20
- PHONY +=3D initrd
-@@ -30,7 +24,7 @@ initrd:
-        @test "$(PARAMS_PHYS)" !=3D "" || \
-        (echo bootpImage: You must specify PHYS_OFFSET of PARAMS_PHYS ; =
-exit -1)
-        @test "$(INITRD_PHYS)" !=3D "" || \
--       (echo bootpImage: You must specify INITRD_OFFSET or INITRD_PHYS =
-; exit -1)
-+       (echo bootpImage: You must specify INITRD_PHYS ; exit -1)
-        @test "$(INITRD)" !=3D "" || \
-        (echo bootpImage: You must specify INITRD; exit -1)
-=20
+ 		offset = iocb->ki_pos;
+ 		err = ext4_buffered_write_iter(iocb, from);
+ 		if (err < 0)
 
-> 6. Floppy driver & arch/arm/include/asm/floppy.h status
-> The patch removes the ARM MFM AND FLOPPY DRIVERS entry from MAINTAINER=
-S:
+---
+base-commit: df2908090cda368b01ff43709f51890076c56157
+change-id: 20260909-ext4-atomic-no-fallback-b1550a7a3fcf
 
-commented already that this is removed along with CONFIG_ISA in a later
-patch.
+Best regards,
+--  
+Tal Zussman <tz2294@columbia.edu>
 
-      Arnd
