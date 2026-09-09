@@ -1,65 +1,65 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF2B41D4EF
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 10:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D5B48E0CD
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 10:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788949390; cv=none; b=bAlkVS9dM+K2OiLnth6vVZ1BD3GPNn5b2WgK+JldIJZiYvIgYiTjVLs4+ZdhZePLPq2Qa8pEyd1v4zbbFYws2I2qmUorlfcNMFnBxU2Ixy4B5TWREm9EseQeHLNsUTbEDc3ZqjZazj+08ifDVgOEnZAocAZ+vLrNRENlQgADJ6U=
+	t=1788949514; cv=none; b=Vc7HOXKpnMAopfgnBneB+eeUplaOBU25fxjwF0nfk8/1Ko2U4hfqnenq2j8xb8wjxLh2+t5+ShRaIN7dtPJ/pfapgRKbH2wIWSjrdBBMmBAQ9WOpScnZb3i9OrdSUQ6Umd8t5lHt0uSCAlXDqUWzkNqYjmUBVUJdOVIHSL3ErxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788949390; c=relaxed/simple;
-	bh=RrFIEm8SrJEjhBjzApoefNfd8aQaR4Oxfr/yDuZhFPU=;
+	s=arc-20240116; t=1788949514; c=relaxed/simple;
+	bh=PA7/Pbx5AEThbU1dExwqFT9w9coLuAoGrR7Ue2+wOTE=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=qoGtN6NksbHD8YOY+ziq5sjSnBDQ1bPRHMymUVECpeXVIek9J8bKZLtqCAXAL4Vjbuu2luvi01nSK0U80yai7j9PXDnVrwSXXDc3UfdKWwGNjHxL1eJNcNZUQPm7nnTfLmjXW7pan4McaTNcT70RQKIZfWh28ttW5lg2WTEJJDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZoRzlaCR; arc=none smtp.client-ip=209.85.128.169
+	 MIME-Version:Content-Type; b=ZcC/ejYr9sRHE+bFeDPFdvLVxtvgrbSanzbiFlv2WUn5OHAfLvujXrOGzTNi1RFB4qCCWQKk/jIooarbhQ9PWAQyyOQXX+zYIX9uVvxAcGc0LNAjk/dosLssoG283qpnYoRDFZ6QF2ezn5uJtIRJR+C5qVJ6PaCf7lhGH71SwoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HW+EaZji; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZoRzlaCR"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-8588583a7c3so57687947b3.2
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 03:23:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HW+EaZji"
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-87ab6e5f91eso26412637b3.2
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 03:25:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788949388; x=1789554188; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1788949512; x=1789554312; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=2UY30k1UeQzYu1OvDSaJuzIQ8I7z52NjmS+xQ0qJeoY=;
-        b=ZoRzlaCRFXhH6gCaS3eEcmQTSTKHzTmJKAFmIlJChPlLxnQWPDvmcYyCo34ZtQ4JwK
-         9liXSr9XQyn6eDXCJA0PhPpYangmdjaKltp8Z2mbwnKEma2qNUWjNKz+LESYTRm312fu
-         Sc2okpFRLO+NTb1xQex6y7ciauOwGUOmKDcTtFcBSI2lASywJ8vrz8UZEMl0loeyEdqa
-         akAq9L9rAqzMHpqT0nf3pI09liWo+VnpxJ6a6l3ebqBnbZE3pYUqEUc1ioBb925HCRSY
-         dTbxog+PSoprsbaLQk5FE6QVEYobawHzFMMEdh36UGK8SY6HxDgd20i6s3LNBr9kC9E1
-         5F1w==
+        bh=tbn1aAX73v4jfLOAScY/xk2YxlfOe4UtWahA1Ug2y2k=;
+        b=HW+EaZjiYCl68C/eh9GtTeuUwf78zPfGbkzhXivweQVojv1dxlQv6iKtumQ25xbgD0
+         ytVgs7VsVheV0XktCqLX/GcVUmrWu9tquIiesM9bgC/EeimVdpv0yrd1DMlMlr7VH622
+         EVqOuxKrljgR/puRT5ILgOmsugaRxrjhp9EUxp96wB0u9Mh4NrG6oKBALnMdztkiL1y1
+         raKA/B0z8YcICgjAayDUFOe46xzC7ejMAhEcvp5G9PGZ1tivkFZ0z8ghLYhXH0JKCD+H
+         X/zsca4oz1yCyhRfzVEfS4Ha3sR4wu52YEP/pzWGpOA2TlnPCPCagE0Aoy0lV5GO77hI
+         sjJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788949388; x=1789554188;
+        d=1e100.net; s=20251104; t=1788949512; x=1789554312;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=2UY30k1UeQzYu1OvDSaJuzIQ8I7z52NjmS+xQ0qJeoY=;
-        b=tIRarSX4yoLJh/ScONSRCKvRA87zzw9TjpzxhaiAv3MgNm9m+tNEMCPV76arl4i+j6
-         mYsZJOZBg90FlOIK/hiT94h1lRf0sS+4EywXKV1JCs6wOsvI2/l3aWOrKwnEv4UcEHgD
-         mGX84jamZDW1iDt91/weO1xbSX3mEgd61brgMnWMQ668InyQp1HesQfZPgu2vZaYQOCi
-         CW4F0uyF4RErj08MJCiP9SPuDhWtuTMZtu1R8orrWecDwLPTDFX9eKufq9eeKTjC9XkX
-         4vPQG1F/FO3DKJDifpLOQ2OKZiQcuZ/Es5RGLn6jlTAhpC33g1ALARIdDMnLG3bkTlBG
-         BVNQ==
-X-Forwarded-Encrypted: i=1; AKwUvBymZXrDnDA2j4IJBKi3GkgQs2/IqA9fT4T+oNwU6i2RrlRL15/fgM8VsdWWTUpmWS/wN4L0oOrpRvL0PA==@vger.kernel.org
-X-Gm-Message-State: AFuF++ntNa8DRK70QUvzZHO9WcgNlYXlYj1NHjd8QeQOIDRzMnuXVGGl
-	fHCDuJpXZMRjnmyoBR5ungQVwWSdvT28VU/B7z5VHeT24uAX0zKRVdB0YyUTAiPG6w==
-X-Gm-Gg: AYBFou0xrBRdrhYfUeLeUZqgBP6Lf/u+lH6+kFK8bjjrJ+/Q/0WgFBxr0nCJI7nXs1w
-	N4E74F0/FMP4CqTmAEVajkDLa1PSsLRhMyJ+ug8xeWaGYvsaIJuFQLKcBd1cwlgXENztJrgdeFc
-	+O4vd3Sy4gR27JMoAFrSdsOP3hCDqwpXhcuVcUiWKI6sJoD5Fl+pgI1l/GTlOOJkPSU3sGKfTdv
-	mDXIwqcEUHwdczjUUWnZKF2weJvOV/Hmdnqn58nZd9g+nCecNK7NWYzcGindToOEyJfkI9Sl8gu
-	jIGmpeWfe7kfU1NUfiwfgMFHkhaYKAlK+6dQ882adTHwSrGoh1qrX4U/9aQdL9K9ezOfVaRDIp3
-	o//7mNY7e9ilRVfz1xMzH7oHA9jfBuI2SeiDCsFW6uuwdipFcRdQopOEs2kjDWmRJvTlMH1Cc3Q
-	tN/QOXOZ2b2FnGVAXbqTzzqMY27CSZJIzFnmA6iBYWJzRIelBvNDTINUMAlCKN03vNpxJLE7UbW
-	lbYFGcyr2vZQMj7MXZTEyQh3TVGz+eW31VeWsmDVt3S0gccATWnhbQbdLk=
-X-Received: by 2002:a05:690c:4b85:b0:870:c600:686c with SMTP id 00721157ae682-87126aa77d1mr116385687b3.18.1788949387337;
-        Wed, 09 Sep 2026 03:23:07 -0700 (PDT)
+        bh=tbn1aAX73v4jfLOAScY/xk2YxlfOe4UtWahA1Ug2y2k=;
+        b=ZARgdsnpxQl4XXgTrsbiT1DWFTN0SSvq3jQiF4jBt+wIMyIT+LL0H3gPPHeE9W31bG
+         k06EyzIgFQ2rB8RqCUMyAqjzvOml43kFPfUfcnQqgjdySkOZT/rQzWOiCV1EOlooty5s
+         9Oc8yF0OOSv1myHMEn7oObMEvi8Beo6ACCqkMRzcbFReEUxPhFE5sJRFhAMryMD++40Y
+         GvC5DApZJ+lWYWTY+QjW009DigN+ahrO88j5lGRhLOl/KD0QEfUt3j5+AXeBgdGBhAtm
+         C3fkbXWrx0ycrUb3gZqMEYYd7V0BDamjkaCbi24TDNf4XKXRWkUJG53h1H9M8wNTvfvj
+         4o7A==
+X-Forwarded-Encrypted: i=1; AKwUvBz+4fk3x3Bxmk7ZosvBJdFnD0E1VYq98/FaQA1qM5QwCyf5SHdWUf5SkSzqsqk9OP7RJuj1/o2KgsDlfA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mWFqP9EDum5JRIL6PifBMc3qIpt/MJo+4m1wH0BBF5QSsGxWb/
+	tFQ4iK8zj6HiU4HOkcIuhMd9QC+dNHxKkapRqS10g8CMXUgnuZwWxMyaC2fIaZGUgg==
+X-Gm-Gg: AYBFou2yI5iR9aKJSE6qkJZziPncpPeJsl93WA7bQ5/GSRZXrJ+XtTG0IibOPK4eupd
+	266SZ/jQxnWj3uLpF5dp7UTcvdw75PeA9aoIqlv+DISCnIfnN8KTeSuh/GQWT5zkE2Qh1MK3iLY
+	70fvFmfE7/8b8vflJpTRbukzbi9uLbk+prpEuk/3DMXTVWdwu/OhLkbRL+Ms5GKnjo9uwyLrl5v
+	NlkWPY1Qup1IjXtUlz3k7hG6KCZkLUxgJxpQvJx0B1RgbY9SScyXurMB3tarwdL41xm3AmFfNHW
+	P1hcfGw2TpydUwGEDKIW5ckveh9uyT9fDY4RFIzqpPBvNkvXJApSBfGh3SjKekXE4rUbeuVYNC+
+	c5ss658PaLKWV5+tFpAISfG/B5E8lO1mXdEAhOTqSviv8bwdaLMB7IJkMZb5QdBok2WeFyoSrhg
+	fN6Us+DByG3X5A30wf9nW/8MGTmncYCS/u/J/7VHd6XvfWWwb2TA5q6hsY7hbPbai7ibTPiJrR4
+	pKudkXwvu3TI7Hsfx6EsvyyW7sBgODPAVn4KPRnro5WbCA4ljR4w+126o0B6XmPf3r5nA==
+X-Received: by 2002:a05:690c:62c4:b0:870:96e4:6716 with SMTP id 00721157ae682-87127b36981mr130530337b3.28.1788949510969;
+        Wed, 09 Sep 2026 03:25:10 -0700 (PDT)
 Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8714b62503dsm108473437b3.38.2026.09.09.03.23.01
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-87149315162sm107287417b3.12.2026.09.09.03.25.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 03:23:05 -0700 (PDT)
-Date: Wed, 9 Sep 2026 03:23:00 -0700 (PDT)
+        Wed, 09 Sep 2026 03:25:09 -0700 (PDT)
+Date: Wed, 9 Sep 2026 03:25:05 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 cc: Ackerley Tng <ackerleytng@google.com>, 
@@ -89,10 +89,10 @@ cc: Ackerley Tng <ackerleytng@google.com>,
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH v2 20/26] s390/fbatch: no lru_add_drain_all() in
- s390_wiggle_split_folio()
+Subject: [PATCH v2 21/26] block/fbatch: no lru_add_drain_all() in
+ invalidate_bdev()
 In-Reply-To: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
-Message-ID: <d8a9dcab-4fc6-1f28-d6b2-e9231f3ba150@google.com>
+Message-ID: <0debd9f6-0ff8-31b0-4830-3a81ba56754a@google.com>
 References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,26 +102,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-s390_wiggle_split_folio() has no good reason to lru_add_drain_all(),
-now that the per-cpu fbatch references are gone.
+invalidate_bdev() has no good reason to lru_add_drain_all(), now that the
+per-cpu fbatch references are gone; but keep doing invalidate_bh_lrus().
 
 Signed-off-by: Hugh Dickins <hughd@google.com>
 ---
- arch/s390/kernel/uv.c | 1 -
+ block/bdev.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index dc14ebc0105b..120a467026a5 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -364,7 +364,6 @@ int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
+diff --git a/block/bdev.c b/block/bdev.c
+index cd8323083740..853545b29b7f 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -97,7 +97,6 @@ void invalidate_bdev(struct block_device *bdev)
  
- 	lockdep_assert_not_held(&mm->mmap_lock);
- 	folio_wait_writeback(folio);
--	lru_add_drain_all();
- 
- 	if (!folio_test_large(folio))
- 		return 0;
+ 	if (mapping->nrpages) {
+ 		invalidate_bh_lrus();
+-		lru_add_drain_all();	/* make sure all lru add caches are flushed */
+ 		invalidate_mapping_pages(mapping, 0, -1);
+ 	}
+ }
 -- 
 2.51.0
 
