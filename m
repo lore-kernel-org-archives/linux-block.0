@@ -1,88 +1,88 @@
 Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43F3339376
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 19:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08FE34B662
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 19:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788982793; cv=none; b=Ol62FVr2VqQNdsWsB4zagQUz/tFkUv5Jgj5+TckM9G3ZFuzgG5HBZRnIgyJu0Nu1bOaT3z4Iu4rMcQRaHwjW+y5SQ1bNh5z13+b5LxqLgN38vovgmD/v9dgQJJZo+rDe+D+PVrf7Dp2vLsvp7JU8Qnh+Ggcgjdm6Ee0N2HoSZGw=
+	t=1788982794; cv=none; b=V5lHWUS8CIyMlWkgyIskHAW8rIfW33GHkigOcktGU7fgp35FkHuIDcbm7m2MDzfvEeJsN8Kcdk3vIEbhyPm7wv4Nhjt6TGZiSyTwH7VwfxmhPKKL95zrnesDB+0z1xR6X8GpO8mZngu32xLiHETdQeSTNKljoC6DqiSvStWacIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788982793; c=relaxed/simple;
-	bh=5mYluXL3APFeNnvNX/sl51f51jpUVVFIocJDOuJGSOo=;
+	s=arc-20240116; t=1788982794; c=relaxed/simple;
+	bh=obaIzVk2GLEOOacy7EyU3XEneSjd7PF288qmX6xPgg4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DxwX8XR/+bXuPu8eTjMgKmSJE7dkoV5BaFiH4lx+fORrH3aKLOwT/0WxL61G6v1dWifuZTXokXEYpw6uuR8tNGNqvhMJB90cBowdj0DJY3ZwBRo2N6XLWSaNQkiwteaMppUp65cdcPyY730XJYGUVLfL2hAqUYhEGvPlyF3iZGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=hxrhvjyC; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=0tNxeAnb; arc=none smtp.client-ip=148.163.139.74
+	 In-Reply-To:To:Cc; b=n94CQFVvWzGZWy5IYcLtoXETdO2ECTjQlA9Bab42HFD402vGvSLa9Winwfk+zxI/dAhsQaaMCZ3r9/N9dla+kdDbkNZwd2UhDYOkyc8nFdDvmtGd2fsfdXGz2mcxVieoiCh7FmQYseAbuvcxjQTNO3k7E/O95fhM8GYOmw/zNZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=V2cGEHqI; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=UB8l0hdu; arc=none smtp.client-ip=148.163.139.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="hxrhvjyC";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="0tNxeAnb"
-Received: from pps.filterd (m0167077.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689If9iC849931
-	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 15:39:49 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="V2cGEHqI";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="UB8l0hdu"
+Received: from pps.filterd (m0167074.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689IfLTm901245
+	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 15:39:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=DIRO
-	lFF1/K73bb2LBF+3C9pSGmL+Mm0FCwxxToDtaLI=; b=hxrhvjyCMDfnYBDJ0Z34
-	Xtt28Egqcjd3TE8quAcU96pvLA2dMOFrfyZouCHErr8ymCQAKYg0RBp2w2E7ceLP
-	195GMP5u2MHfCg4+/i2z4el7N4kptv7lRpSravAwpOhcJFHNAiSKrzllFpWt2fUe
-	MVbi06a6pwps4nkoLBbbUiK2EEnaXw8hMoYKmkygkh47OrJSRPhWlmG69BUPgL23
-	MkCt/uwh0EI3OfYvxsyFA5l4LbxqCflpjjio0FBkhttlcrgfQIG7+OomnfaGUqx/
-	TU22ArYBw2KYo0yhciH7SSMGRkCLp+w3nRwVdh6AqeZlm4hEG8j6oa6OUdMHn6ds
-	VQ==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcy10h3w-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=et2P
+	GKftYmV6ASGOGFqxXp7WgymzRzFQcOeYvtolW0Y=; b=V2cGEHqIge6Dtp6oFLjI
+	y7LkJDemg8jOgrsCEI1Q5h5Qw+Ao88SRleudCqeMP/sjRVPfPULoCNulU2JtVvTL
+	PLjUOfPIlIQHUEV+ZaMlQKFlE707H5zsXtUmdRB1/8eQ6UT7VwabAaSzZZAu2Cvp
+	F+sn/uDLiBBDjXu+cuaqTKz/36/OZaB/h/MQx9MGTEvrOh0zC2oOWN5ZJ5JA0D8b
+	8SjqQgCVFMiTTzqdP+PTc9gcRJ0THN2YwnMhe7g/Q5O7v3OtDNCNP/QsphCv+YdL
+	WgX+fAuUw/nXi7C0UTDXevhp/2vSNaTFmgPpQ1PdCN0S3wdOHosjNGZJP0unvMrO
+	GQ==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcy08qt6-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:39:49 -0400 (EDT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-52d33c89a29so137699451cf.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 12:39:49 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:39:50 -0400 (EDT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-52fb6c7b680so81470811cf.1
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 12:39:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1788982789; x=1789587589; darn=vger.kernel.org;
+        d=columbia.edu; s=lionmail; t=1788982790; x=1789587590; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DIROlFF1/K73bb2LBF+3C9pSGmL+Mm0FCwxxToDtaLI=;
-        b=0tNxeAnbGLf4r1LviQVMx9OiRCdG/tsOBMCBgrU5136bpLHHqj7JQKJjceJgVbqbIY
-         6AdWylrEcK4Q52Oszot5Mr9Qnh42o2+a6vbVDEffCx9AYeFFcoO+yZrmdqCj+dlzMNOm
-         +8TE3rLQwGkqEx8INliaS+PRfGxw/ZCGOaJQevVa+KmHyLL3PO+u7FjMqjGBX8i8M1Ic
-         LckzoI6G6G12djzz5B9LGHDAPKGw+dpcsQVPzFgjj1in1UIYWtO8l+u7sFJhlRtqDqwF
-         Yt9Gku8tOjHAW3ly+yXDy2jkK+FEXdVfmyZpYXDS2Q+e4iOjlT7pYbT/YZM/cp8PZ+z7
-         esiQ==
+        bh=et2PGKftYmV6ASGOGFqxXp7WgymzRzFQcOeYvtolW0Y=;
+        b=UB8l0hdugJKRqoJuJ5YzmEr2J1LchN8voH8vQYAkN3PTccU514rABYgIoyy+NS5wiT
+         gYgbJje42MWy8Qdo5ACnAuEC0RqN8t1c2+LwSfu/48p1qKb/YD6yKOoNuJZ+WOm3ngX6
+         ugWbYp3toeBkOcSQtFVeUzz7vaklpU3S11+g7lJRP6S8baGnBWQw3fc/t/IUIdazcEKu
+         fUv43ZmURAVgXWOTVCIJMYsLfTIaK+nQEDnAweS7+07vM+Of9JetwLO7ke3vJOLhwfpZ
+         GbIb3/8u8iOf2Oa49F0Fm66mRXmvq4/yuLCX+PBv8yxGSsArxaY5tcMz+5BVvQyEL5sF
+         VGDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788982789; x=1789587589;
+        d=1e100.net; s=20251104; t=1788982790; x=1789587590;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=DIROlFF1/K73bb2LBF+3C9pSGmL+Mm0FCwxxToDtaLI=;
-        b=VII7kChDA9OI1zbcswKSJaMikWrKyExy1fDhCFnxibW8RjCbtoWQWCjAoHih3KMPTM
-         XeJTv+fETeoaWOc0hydKymW/LrmMgFEGkM4MnbbwVklxdXy/OIerUBZMEBYiwBWkmQhT
-         MwzSTmjru/ZxMXuZSFBH+3vC2tjey8OuwAkgecuLXfFtAqmJxTL6DIQZTay48LnF4pui
-         jFsIWFVMvtmolMP2Fu6ktjIVS70DXMAZs1COPGj5ZBqOo+r7XYjNIV5LtoiJFe/M48R3
-         JJ+qrPi/Me/cr6DWCZwUd/dyrwyBIwccoEYkiX24GFpDAhfECXn/MoiQ61HqprlyBr7v
-         5yAA==
-X-Forwarded-Encrypted: i=1; AKwUvBzqVOcCra7htwxY1kzWHWWj8XYF/1vp7qR0BPhqkuNZFSPvtrQ28T+/ldeVoJsj2jqMxbzrjYfQxxadvw==@vger.kernel.org
-X-Gm-Message-State: AFuF++nTvVsR7gmKbIYabIgMq7RMgcXIbImvSMSxtSndL7QH8cEwYefH
-	b+FEdIOBHBGFVeDt9LiGSYosk7ntaQKJycY666AD889ns9DdHW/9yG+SzDerGKEhIMFUbrmeXM1
-	l1b5bnziKBRGZAZZnPMQ+ONRNAtScZ6+ZLq2uuaKLllJ5TFFpBbBoaiesysxW7Df2vW5PJ+s=
-X-Gm-Gg: AYBFou1HgHxrzNzFhEl+q4R9A4I7A2NEhvpiQemXwWPbrBL3B1yHKxDwPmRaBeystxG
-	/yS6GVPs5wn5yhBVEg1Yj1GtSkDUXbUEMXv0F2UDcuACaZ6pzZBd+rsfZ3JQ/32iqxQFL0fdS7u
-	Tawe+dbpBo5Pcw0KmVrjZgal367Xi3DTD0htPR0XY/CvfR3PTRxGIe2Gu+hbjPe2Q2IVQ9lQz+M
-	cFo92khqkFWl6wvOXttvbIj2uTcUVJNZ/8opEKpAlOuMNzL0cMg/kThnFMejH5kkvlFcpxCKncZ
-	VG5sCpCbz9esDAY0gmbUXmrcIjxDOTsp36km+gTnELSR/ynpabz9Juvqw0Df5TXOMTrYxVFUWFw
-	aEHb9d9AQp7MfFM7PMS4wNvJV9trOhefFnmt4oTQSpnTf8wPs
-X-Received: by 2002:a05:622a:646:b0:52f:b627:6091 with SMTP id d75a77b69052e-530aeaf92d1mr50257341cf.5.1788982788583;
-        Wed, 09 Sep 2026 12:39:48 -0700 (PDT)
-X-Received: by 2002:a05:622a:646:b0:52f:b627:6091 with SMTP id d75a77b69052e-530aeaf92d1mr50256801cf.5.1788982788000;
-        Wed, 09 Sep 2026 12:39:48 -0700 (PDT)
+        bh=et2PGKftYmV6ASGOGFqxXp7WgymzRzFQcOeYvtolW0Y=;
+        b=nbhJ45ijnA11wNJsqKbFCbaTfIFv7zdyBz1iTa1/u121akkB2ut3ea8oq07uSbt0UX
+         yrOlpszr5tpqNeQVdKlN7+yIx6666lrzmm4RgB+pQJ4VXkz0GZyc7QsThhzWTBPl7Z0h
+         kCccGfG9AuTyhVD7GztyK++W3IE3XpjY+c4gxcpYQg0fBsmWRChWYCj0W/ToJ13tiAgO
+         i3LcnwRnIWAz+3iUSx/byYUEC8KPdCAp3D68FvKDnRfGqPgMcyCHsskG/DiBUWE299BR
+         xZBUGsx7Dt8rOXe68l6iZT+g7JWZj8OTr3M90RZtayGl+qFtsGtOUWy0VxqOPgnpQFoJ
+         kVyg==
+X-Forwarded-Encrypted: i=1; AKwUvByRoEy1ZCR+V9xvXRkLd/rXU1EfemTKU54z2VeXtzIUbWZLf+P4Vax1TndJC6uu3pGhlHTybwKiHIFSCA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mMGs8spiMHttKv0EE8/mCH/5eE8jAFwlp8HlKaSXaL/QRiZpJY
+	cT3i8LbGiHpoiC1FmDFgR4hx3SPRVAdX4Y3Cedr/Pd5JK/qyeybvg82Hp5BTgAqTCU7GKcnUt7n
+	Mz0vukm+GKgAbcS6mCU2x1oNHfzHz0qUxhFgp7qWuzMBDRurAHW5J2iTobloNz1W2Ybnr2KU=
+X-Gm-Gg: AYBFou1+6t8XV5opb2UhSr8oAcDG7zGelhErafS+2ezrmH15BDIXyVzK844quwtfuMW
+	XcCblrN4hGRNVxJjN/6JZWhgzbEJiLyB9TMbBm0XEJeixSF0xWTkVgAYPo563e/+HfgvB3KzmY9
+	1ILuDGLpvJMBSpFG9iqSgKnyAb7ABoTOTR1FeNoLwdmwe557PfZZLlpc6QhCT14ZQWtwZKMkfGF
+	57Ac1TKHxBGhF7TXUaawVpQWKI1UD+P82izhsXgH3qzlweBoKrPqxThOK/e7ijH8gcDPK2o4Pkc
+	Z+9wayclF4mxaZCffy0C2khYaI2ZTy7wPlY8kIdhlj2ZkZ2QMZ5GdVzrENGvWEAL+iK1IWy3O5I
+	lPWzG6dy+C3PR3XlEGpMpqGuCscgOb1YlpcHlV6O1Kz7nhpcG
+X-Received: by 2002:ac8:5fc8:0:b0:52f:b58d:7d5b with SMTP id d75a77b69052e-530aeb4047cmr38823751cf.21.1788982789674;
+        Wed, 09 Sep 2026 12:39:49 -0700 (PDT)
+X-Received: by 2002:ac8:5fc8:0:b0:52f:b58d:7d5b with SMTP id d75a77b69052e-530aeb4047cmr38823141cf.21.1788982789113;
+        Wed, 09 Sep 2026 12:39:49 -0700 (PDT)
 Received: from [127.0.1.1] (nat-128-59-176-193.net.columbia.edu. [128.59.176.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530868ceb68sm83026191cf.29.2026.09.09.12.39.46
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530868ceb68sm83026191cf.29.2026.09.09.12.39.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 12:39:46 -0700 (PDT)
+        Wed, 09 Sep 2026 12:39:48 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Wed, 09 Sep 2026 15:39:29 -0400
-Subject: [PATCH blktests 2/3] block/050: add a splice read race test for
- block devices
+Date: Wed, 09 Sep 2026 15:39:30 -0400
+Subject: [PATCH blktests 3/3] block/051: add a pinned page leak test for
+ trimmed direct writes
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,308 +91,334 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260909-blkdev-fixes-tests-v1-2-1f8af8665d16@columbia.edu>
+Message-Id: <20260909-blkdev-fixes-tests-v1-3-1f8af8665d16@columbia.edu>
 References: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
 In-Reply-To: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>, Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev-db0b7
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1788982781; l=7576;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1788982781; l=9801;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=5mYluXL3APFeNnvNX/sl51f51jpUVVFIocJDOuJGSOo=;
- b=M5QG65VumjYnaJN0i/2MBfE5KGP/NM3LKgF/Ae+xMRzpewODBMBbrT01GlrCoVmx01bm7Bn/t
- JwD6q7HaU0fCsrZuyv05iIJQcZxZnCfpxHsUQupfrQhyGDteriHlRaJ
+ bh=obaIzVk2GLEOOacy7EyU3XEneSjd7PF288qmX6xPgg4=;
+ b=QUuHBIYKvImq5+Ve97OlyejDbi2UAgPCPfZMIAxR68JDmkkoWvqxcgTmIeaOs4M3TV/4e/Bg4
+ UxpL6h1kUaKAkrpZY7rncfMzldu8gJ6fO5fTWrk3zy4YJY0TzA+tXYQ
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Authority-Analysis: v=2.4 cv=FrWQbGrq c=1 sm=1 tr=0 ts=6aa1b605 cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
+X-Proofpoint-ORIG-GUID: UuWHaWWOAN3ff3A-APdXE3PXK3otLf-t
+X-Authority-Analysis: v=2.4 cv=NrlE4MdJ c=1 sm=1 tr=0 ts=6aa1b606 cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
  a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=QOCMdifcju39GKoXhKua:22
- a=VwQbUJbxAAAA:8 a=BO-O2x_ebyKE4gWa1f0A:9 a=QEXdDO2ut3YA:10
- a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX9QQ/ecCHMbGq
- YWTvUsoHoucrAavmyiUMiGC7QZbmfIUGbtAg+SCy61BqJVCgAzrU9tibd9/rYjzAtWVGm5KStVu
- W7Mx0G9KsgrhGHtq0dvJ6WxLxu4+E1bo5Q8SBQ2mYfVPUawqbjL/
-X-Proofpoint-ORIG-GUID: cbEAC-Iq3QlMcRB-coFsmUI4l-5y_kLK
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfXxvQEu3cksFp9
- 0s6sS5zgYfNLqEqWt1AP/T0CXiOMfiagCTNw0Yv/27eMn0RJ2cnAn5vUnUZ4ksH3TquE1KWpOVT
- c8ZQxQmMjXFbfAGUxhAnAldZsxdAxyEHsk7X6rdmpzwAyAai3JQpCxDCYapw+9UttAykmC0rYkY
- /g2K3V/5/k1A+Wz2wZR3NTQybrfSlIqPbf6GoDHwRZM+qEmZxWuu6TGE802ROk7KM5ptJ/0gT9X
- ChyWSZgskABTHbLy/UvDgzPIpoxGg406TJx+o82U5TuN72PpftDRjw83ms3wVfCvNIMmyX91q/Q
- uE2qbTsQ5v10lQge4bXFi3juYTx1k/anSMw2GfYEw/poC9/IgX8DypCjPDh+MrbS+CnGTV0Ij0I
- hrK9mEmzEvVNp4xwkkQ8tKgnG2F3C9XrWb/lsREtLQNHLGzbEUembqRAYjP5BhK5iCyPIImpt3O
- /NBrGbqW42DTocW7Dtg==
-X-Proofpoint-GUID: cbEAC-Iq3QlMcRB-coFsmUI4l-5y_kLK
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=azVShVRs0zEubeQ0wG0L:22
+ a=VwQbUJbxAAAA:8 a=ReHvhgLgI_wA6UgXX78A:9 a=QEXdDO2ut3YA:10
+ a=dawVfQjAaf238kedN5IG:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX+34YK172vy/u
+ Hk1/WD8hlWbeUJXVRWsAjhBgLmNxwMQhqcqeGzOM6ZG9QC0a+bnJKyJbHyUybynsCEE3sTEglYt
+ RC7XhUYyN2+8Yjzb9W3Gve3XeVCMVCry2ExmxUvlVlod7e5ev4B+
+X-Proofpoint-GUID: UuWHaWWOAN3ff3A-APdXE3PXK3otLf-t
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX1hnOAFylqXlO
+ lYbyR7KEiHFzTPuQm1cj7/o+1+S7wyEdLuspBrTZk8PcSmzu1uowN1QJYQU+/w+Ldf54xt8Iyka
+ vBLXe9ufSxiF79RckRpRErjsmqTyrWQHnBLju38+/wUp5ZdFADCEEW1eYAaMZfQOdu2rsDeYxeA
+ dzSe+DAG/eJubEEDmyxxH6F8Wlim0ZAYQFKU7hYFkq5dokKNehjXC1gxbOSa+VFVvvrnaTJpvsE
+ 456cwhPtHAJxnHAymPufdXrqtmjXRl/sF3IhY2kmQnbsiQj2Rg7Y5qM2S3GCpCuXbSPp8spbHD4
+ A1LUTf2qWtglbfbDg3Tp29mjaHtNh1mM83y1VqW8A9MuQjgOQoCW8Jq4tS/outJhdOPQHWb44p/
+ tH+DovV6qHs8YofFkxdC/4KJShx76gN0zXqOj+BCk0wsx/R+/L6MiZDgBBf/In5KqMWOTyTGUIb
+ w3XYAdFTGGLWmRHvC8w==
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11900
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 spamscore=0 bulkscore=10 lowpriorityscore=10
- suspectscore=0 impostorscore=10 phishscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 lowpriorityscore=10 impostorscore=10 clxscore=1015 phishscore=0
+ priorityscore=1501 adultscore=0 malwarescore=0 suspectscore=0 bulkscore=10
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609090219
 
-The block device splice read path has to hold i_rwsem like the plain
-read path, so that it does not race set_blocksize() raising the
-mapping's minimum folio order and add a folio that is too small for the
-mapping.
+bio_iov_iter_align_down() trims a direct I/O bio down to the logical
+block size and unpins the pages it drops. A bvec can span several pages
+of one folio, each with its own pin, and dropping or shrinking such a
+bvec has to release all of them. When it does not, the folio is never
+freed.
 
 This is a regression test for that issue, fixed in the kernel patch
-"block: take i_rwsem for the splice read path" [1].
+"block: unpin all pages of a bvec in bio_iov_iter_align_down()" [1].
 
-splice() from a memory-backed null_blk device into a pipe while toggling
-the block size between 512 bytes and 64K with BLKBSZSET. A
-CONFIG_DEBUG_VM kernel reports the folio order mismatch as a BUG, which
-blktests picks up from dmesg.
+Issue O_DIRECT pwritev() from a hugetlb mapping to a memory-backed
+null_blk device with a 64K logical block size, with a first segment that
+ends half a block past a block boundary and an unreadable second
+segment, so that the bio is trimmed by several pages of one huge page.
+Place the first segment across two huge pages so the tail is its own
+bvec and gets dropped, and inside one huge page so the tail is the end
+of a larger bvec and gets shrunk, to cover both paths. Compare
+HugePages_Free before and after, and fail if huge pages leaked.
 
-The minimum folio order only moves with block sizes above the page size,
-i.e. with CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K.
+The leak needs a logical block size above the page size, i.e.
+CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K, and a
+large folio backing the buffer, which hugetlb provides. Reserve huge
+pages for the test and restore the previous count afterwards.
 
-[1]: https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-3-32f3f40cebed@columbia.edu/
+[1]: https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-6-32f3f40cebed@columbia.edu/
 
 Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
- src/.gitignore      |   1 +
- src/Makefile        |   3 +-
- src/splice-race.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/050     |  54 +++++++++++++++++
- tests/block/050.out |   2 +
- 5 files changed, 230 insertions(+), 1 deletion(-)
+ src/.gitignore          |   1 +
+ src/Makefile            |   1 +
+ src/bio-trim-pin-leak.c | 191 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/051         |  64 ++++++++++++++++
+ tests/block/051.out     |   2 +
+ 5 files changed, 259 insertions(+)
 
 diff --git a/src/.gitignore b/src/.gitignore
-index 754beef..dbebc22 100644
+index dbebc22..92c08d1 100644
 --- a/src/.gitignore
 +++ b/src/.gitignore
-@@ -11,6 +11,7 @@
- /mount_clear_sock
- /nbdsetsize
- /openclose
-+/splice-race
- /sg/dxfer-from-dev
- /sg/syzkaller1
- /zbdioctl
+@@ -1,5 +1,6 @@
+ /bio-bounce-read
+ /bio-full-trim
++/bio-trim-pin-leak
+ /dio-fallback-race
+ /dio-offsets
+ /discontiguous-io
 diff --git a/src/Makefile b/src/Makefile
-index f789ff6..328f2c5 100644
+index 328f2c5..aba50f7 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -32,7 +32,8 @@ C_TARGETS := \
- C_URING_TARGETS := metadata \
- 	nvme-passthru-admin-uring
- C_UBLK_TARGETS := miniublk
--C_THREAD_TARGETS := dio-fallback-race
-+C_THREAD_TARGETS := dio-fallback-race \
-+	splice-race
- 
- HAVE_LIBURING := $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
- HAVE_UBLK_HEADER := $(call HAVE_C_HEADER,linux/ublk_cmd.h,1)
-diff --git a/src/splice-race.c b/src/splice-race.c
+@@ -15,6 +15,7 @@ HAVE_C_DEF = $(shell if echo -e "$(H)include <$(1)>\n$(H)ifdef $(2)\nHAVE_$(2)\n
+ C_TARGETS := \
+ 	bio-bounce-read \
+ 	bio-full-trim \
++	bio-trim-pin-leak \
+ 	dio-offsets \
+ 	loblksize \
+ 	loop_change_fd \
+diff --git a/src/bio-trim-pin-leak.c b/src/bio-trim-pin-leak.c
 new file mode 100644
-index 0000000..e411752
+index 0000000..54af181
 --- /dev/null
-+++ b/src/splice-race.c
-@@ -0,0 +1,171 @@
++++ b/src/bio-trim-pin-leak.c
+@@ -0,0 +1,191 @@
 +// SPDX-License-Identifier: GPL-3.0+
 +/*
 + * Copyright (C) 2026 Tal Zussman
 + *
-+ * Race splice() from a block device against BLKBSZSET.
++ * Check that a direct write trimmed to the logical block size unpins all the
++ * pages it drops.
 + *
-+ * Splicer threads splice from the device into a pipe while another thread
-+ * toggles the block size between 512 bytes and 64K with BLKBSZSET.
++ * Issue O_DIRECT pwritev() from a hugetlb mapping with a two-segment iovec
++ * whose first segment ends half a block past a block boundary and whose
++ * second segment is an unreadable PROT_NONE mapping. The direct path pins the
++ * first segment, fails to pin the second and trims the bio down to a block
++ * boundary. The trimmed tail spans several pages of one huge page, each with
++ * its own pin. If the trim releases at most one of them, the huge page
++ * never returns to the pool, which shows up as a drop in HugePages_Free.
 + *
-+ * The splice read path has to run under i_rwsem like the plain read path.
-+ * If it does not, it races set_blocksize() raising the mapping's minimum
-+ * folio order and adds a folio that is too small for the mapping, which a
-+ * CONFIG_DEBUG_VM kernel reports as a BUG. The caller checks dmesg.
++ * The tail is either its own bvec, when the first segment straddles two huge
++ * pages, or the end of a larger one, when it sits inside a single huge page.
++ * Each iteration issues one write of each kind. The direct I/O fallback
++ * finishes the trimmed half block through the page cache, so each write
++ * returns one and a half blocks.
 + *
-+ * usage: splice-race <blockdev> <seconds>
++ * The tail only holds several pins when it spans several pages of a large
++ * folio, so the device needs a logical block size of at least four pages and
++ * the buffer comes from a hugetlb mapping.
 + *
-+ * exit:  0 = ran for <seconds>
++ * usage: bio-trim-pin-leak <blockdev> <iterations>
++ *
++ * exit:  0 = no huge pages leaked
 + *        1 = setup error
++ *        2 = huge pages leaked
 + */
 +#define _GNU_SOURCE
 +#include <fcntl.h>
-+#include <pthread.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
 +#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/uio.h>
 +#include <unistd.h>
 +
 +#include <linux/fs.h>
 +
-+#define CHUNK		(64 * 1024)
-+#define RANGE		(2 * 1024 * 1024)	/* keep the race on a few folios */
-+#define NR_SPLICERS	4
++#define EXIT_LEAKED	2
 +
-+#define SMALL_BS	512
-+#define LARGE_BS	(64 * 1024)
-+
-+static const char *dev;
-+static int bszfd;
-+static volatile int stop;
-+static int failed;
-+
-+/* filemap_splice_read() from the device */
-+static void *splicer(void *arg)
++static long meminfo(const char *key)
 +{
-+	int pipefd[2];
-+	loff_t off = 0;
-+	char *sink;
-+	int fd;
++	char line[256];
++	long val = -1;
++	FILE *f;
 +
-+	fd = open(dev, O_RDONLY);
-+	if (fd < 0) {
-+		perror("open");
-+		failed = 1;
-+		return NULL;
++	f = fopen("/proc/meminfo", "r");
++	if (!f) {
++		perror("fopen");
++		return -1;
 +	}
 +
-+	if (pipe(pipefd)) {
-+		perror("pipe");
-+		failed = 1;
-+		return NULL;
-+	}
-+
-+	sink = malloc(CHUNK);
-+	if (!sink) {
-+		perror("malloc");
-+		failed = 1;
-+		return NULL;
-+	}
-+
-+	while (!stop) {
-+		ssize_t n = splice(fd, &off, pipefd[1], NULL, CHUNK, 0);
-+
-+		if (n < 0) {
-+			perror("splice");
-+			failed = 1;
++	while (fgets(line, sizeof(line), f)) {
++		if (!strncmp(line, key, strlen(key))) {
++			val = strtol(line + strlen(key), NULL, 10);
 +			break;
 +		}
-+
-+		/* drain the pipe so the next splice does not block on it */
-+		while (n > 0) {
-+			ssize_t d = read(pipefd[0], sink, n);
-+
-+			if (d <= 0) {
-+				perror("read");
-+				failed = 1;
-+				return NULL;
-+			}
-+			n -= d;
-+		}
-+
-+		if (off >= RANGE)
-+			off = 0;
 +	}
 +
-+	return NULL;
-+}
-+
-+/* change i_blkbits and the mapping's minimum folio order underneath them */
-+static void *resizer(void *arg)
-+{
-+	int bs = SMALL_BS;
-+
-+	while (!stop) {
-+		if (ioctl(bszfd, BLKBSZSET, &bs)) {
-+			perror("BLKBSZSET");
-+			failed = 1;
-+			break;
-+		}
-+		bs = bs == SMALL_BS ? LARGE_BS : SMALL_BS;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int spawn(pthread_t *t, void *(*fn)(void *))
-+{
-+	int err = pthread_create(t, NULL, fn, NULL);
-+
-+	if (err)
-+		fprintf(stderr, "pthread_create: %s\n", strerror(err));
-+
-+	return err;
++	fclose(f);
++	return val;
 +}
 +
 +int main(int argc, char **argv)
 +{
-+	pthread_t splicers[NR_SPLICERS];
-+	pthread_t resizer_t;
-+	int bs = LARGE_BS;
-+	int i;
++	struct iovec iov[2];
++	long pgsz, hpsz;
++	long before, after;
++	char *badseg;
++	char *map;
++	int lbs, iters;
++	int fd, i;
 +
 +	if (argc != 3) {
-+		fprintf(stderr, "usage: %s <blockdev> <seconds>\n", argv[0]);
++		fprintf(stderr, "usage: %s <blockdev> <iterations>\n", argv[0]);
 +		return EXIT_FAILURE;
 +	}
 +
-+	dev = argv[1];
++	iters = atoi(argv[2]);
 +
-+	bszfd = open(dev, O_RDONLY);
-+	if (bszfd < 0) {
++	pgsz = sysconf(_SC_PAGESIZE);
++	if (pgsz < 0) {
++		perror("sysconf");
++		return EXIT_FAILURE;
++	}
++
++	hpsz = meminfo("Hugepagesize:") * 1024;
++	if (hpsz <= 0) {
++		fprintf(stderr, "no hugetlb page size in /proc/meminfo\n");
++		return EXIT_FAILURE;
++	}
++
++	fd = open(argv[1], O_RDWR | O_DIRECT);
++	if (fd < 0) {
 +		perror("open");
 +		return EXIT_FAILURE;
 +	}
 +
++	if (ioctl(fd, BLKSSZGET, &lbs)) {
++		perror("BLKSSZGET");
++		return EXIT_FAILURE;
++	}
++	printf("logical block size: %d, page size: %ld, huge page size: %ld\n",
++	       lbs, pgsz, hpsz);
++
 +	/*
-+	 * The minimum folio order only moves with block sizes above the page
-+	 * size, which needs BLK_MAX_BLOCK_SIZE above PAGE_SIZE, i.e.
-+	 * CONFIG_TRANSPARENT_HUGEPAGE.
++	 * The trimmed tail is half a block, and it has to span at least two
++	 * pages for a pin to leak.
 +	 */
-+	if (ioctl(bszfd, BLKBSZSET, &bs)) {
-+		perror("BLKBSZSET");
++	if (lbs < 4 * pgsz) {
++		fprintf(stderr, "logical block size %d is below four pages\n",
++			lbs);
++		return EXIT_FAILURE;
++	}
++	if (hpsz < 2 * lbs) {
++		fprintf(stderr, "huge page size %ld is below two blocks\n", hpsz);
 +		return EXIT_FAILURE;
 +	}
 +
-+	for (i = 0; i < NR_SPLICERS; i++) {
-+		if (spawn(&splicers[i], splicer))
++	badseg = mmap(NULL, lbs, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (badseg == MAP_FAILED) {
++		perror("mmap");
++		return EXIT_FAILURE;
++	}
++
++	before = meminfo("HugePages_Free:");
++	if (before < 2 * iters + 2) {
++		fprintf(stderr, "HugePages_Free is %ld, need at least %d\n",
++			before, 2 * iters + 2);
++		return EXIT_FAILURE;
++	}
++
++	for (i = 0; i < iters; i++) {
++		map = mmap(NULL, 2 * hpsz, PROT_READ | PROT_WRITE,
++			   MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
++		if (map == MAP_FAILED) {
++			perror("mmap");
 +			return EXIT_FAILURE;
++		}
++		memset(map, 'A', 2 * hpsz);
++
++		iov[0].iov_len = lbs + lbs / 2;
++		iov[1].iov_base = badseg;
++		iov[1].iov_len = lbs / 2;
++
++		/*
++		 * One block from the end of the first huge page and half a
++		 * block from the start of the second, then an unreadable
++		 * segment: the bio is trimmed by half a block, dropping the
++		 * bvec pinned from the second huge page.
++		 */
++		iov[0].iov_base = map + hpsz - lbs;
++		if (pwritev(fd, iov, 2, 0) != lbs + lbs / 2) {
++			perror("pwritev");
++			return EXIT_FAILURE;
++		}
++
++		/*
++		 * The same write from the start of the first huge page: the
++		 * pinned segment is a single bvec, and the trim shrinks it
++		 * by half a block instead of dropping one.
++		 */
++		iov[0].iov_base = map;
++		if (pwritev(fd, iov, 2, 0) != lbs + lbs / 2) {
++			perror("pwritev");
++			return EXIT_FAILURE;
++		}
++
++		if (munmap(map, 2 * hpsz)) {
++			perror("munmap");
++			return EXIT_FAILURE;
++		}
 +	}
-+	if (spawn(&resizer_t, resizer))
-+		return EXIT_FAILURE;
 +
-+	sleep(atoi(argv[2]));
-+	stop = 1;
++	after = meminfo("HugePages_Free:");
++	printf("HugePages_Free: %ld -> %ld over %d iterations\n",
++	       before, after, iters);
 +
-+	for (i = 0; i < NR_SPLICERS; i++)
-+		pthread_join(splicers[i], NULL);
-+	pthread_join(resizer_t, NULL);
++	if (after < before) {
++		printf("%ld huge pages leaked\n", before - after);
++		return EXIT_LEAKED;
++	}
 +
-+	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
++	printf("no huge pages leaked\n");
++	return EXIT_SUCCESS;
 +}
-diff --git a/tests/block/050 b/tests/block/050
+diff --git a/tests/block/051 b/tests/block/051
 new file mode 100755
-index 0000000..64c0406
+index 0000000..a4edec2
 --- /dev/null
-+++ b/tests/block/050
-@@ -0,0 +1,54 @@
++++ b/tests/block/051
+@@ -0,0 +1,64 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2026 Tal Zussman
 +#
-+# Race splice() from a block device against BLKBSZSET. The splice read path
-+# has to hold i_rwsem like the plain read path so that it does not race
-+# set_blocksize() raising the mapping's minimum folio order. Without it, the
-+# splice adds a folio that is too small for the mapping, which a
-+# CONFIG_DEBUG_VM kernel reports as a BUG.
++# Issue partial O_DIRECT writes from a hugetlb mapping to a block device with
++# a 64K logical block size and check that no huge pages leak. The bio of such
++# a write is trimmed down to a block boundary, and the pages it drops each
++# hold their own pin when a large folio backs the buffer. If the trim
++# releases at most one of them, whether it drops a whole bvec or shrinks one,
++# the huge page never returns to the pool.
 +#
-+# Regression test for patch "block: take i_rwsem for the splice read path".
++# Regression test for patch "block: unpin all pages of a bvec in
++# bio_iov_iter_align_down()".
 +
 +. tests/block/rc
 +. common/null_blk
 +
-+DESCRIPTION="race splice() from a block device against BLKBSZSET"
-+TIMED=1
++DESCRIPTION="check for pinned page leaks from trimmed direct writes"
++QUICK=1
 +
 +requires() {
 +	_have_null_blk
 +	_have_kernel_option TRANSPARENT_HUGEPAGE
-+	_have_kernel_option DEBUG_VM
-+	_have_src_program splice-race
-+	if (( $(_get_page_size) >= 65536 )); then
-+		SKIP_REASONS+=("a 64K block size is not above the page size")
++	_have_kernel_option HUGETLBFS
++	_have_src_program bio-trim-pin-leak
++	if (( $(_get_page_size) > 16384 )); then
++		SKIP_REASONS+=("a 64K block size is below four pages")
 +		return 1
 +	fi
 +}
@@ -400,35 +426,43 @@ index 0000000..64c0406
 +test() {
 +	echo "Running ${TEST_NAME}"
 +
-+	: "${TIMEOUT:=30}"
++	local nr_hugepages ret
 +
-+	if ! _configure_null_blk nullb1 blocksize=512 memory_backed=1 \
++	if ! _configure_null_blk nullb1 blocksize=65536 memory_backed=1 \
 +	     size=64 power=1; then
-+		echo "configuring null_blk failed"
-+		return 1
-+	fi
-+
-+	if ! blockdev --setbsz 65536 /dev/nullb1; then
-+		SKIP_REASONS+=("kernel does not support a 64K block size")
-+		_exit_null_blk
++		SKIP_REASONS+=("null_blk does not support a 64K block size")
 +		return
 +	fi
 +
-+	if ! src/splice-race /dev/nullb1 "${TIMEOUT}" >>"${FULL}" 2>&1; then
-+		echo "splice-race helper failed"
-+	fi
++	nr_hugepages=$(cat /proc/sys/vm/nr_hugepages)
++	echo $((nr_hugepages + 40)) > /proc/sys/vm/nr_hugepages
 +
++	src/bio-trim-pin-leak /dev/nullb1 16 >>"${FULL}" 2>&1
++	ret=$?
++
++	echo "${nr_hugepages}" > /proc/sys/vm/nr_hugepages
 +	_exit_null_blk
++
++	case $ret in
++	0)
++		;;
++	2)
++		echo "huge pages leaked by trimmed direct writes"
++		;;
++	*)
++		echo "bio-trim-pin-leak helper failed"
++		;;
++	esac
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/block/050.out b/tests/block/050.out
+diff --git a/tests/block/051.out b/tests/block/051.out
 new file mode 100644
-index 0000000..fc4e537
+index 0000000..e9a2745
 --- /dev/null
-+++ b/tests/block/050.out
++++ b/tests/block/051.out
 @@ -0,0 +1,2 @@
-+Running block/050
++Running block/051
 +Test complete
 
 -- 
