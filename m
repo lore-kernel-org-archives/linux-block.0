@@ -1,86 +1,88 @@
 Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC253BFACE
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 19:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC443BED79
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 19:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788982789; cv=none; b=kEPRDTWXUhnZNz94GCesLzqgveqIEvZfDjEPTM3hwLr9nLKPZnAQz573XWOBX7beQQ/I+6KuVIpgQycp/PI6GmGi21AIDF4HlNvz3GDAsrpj10jfl9+oqkg9IrZqDioThGsheDjcZmmznkYfpizFdYyStDf6P53uXYWp4IHkIBA=
+	t=1788982792; cv=none; b=dDIXzMmXsJvqUqDb4klFux0ZFy/JiqSSN3xkEpp026iR5WJjQ7Y51aga8snW7TvzpUYJNo7wJPY2ZGSaH84gXeWDQO2YUMkkbBVdYe1mTPiYDjS+F8GAoSo5+WHFENvumKKTH2dtIAU9dg7/MyEZ6Y5nN3ICWSY30SLEg2W5ax4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788982789; c=relaxed/simple;
-	bh=aQznoNEJaKGJ2Gsktn+SsBCWRFCw7tOypI4unUi5/nI=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=b819E7xJhxZnoWTwsOkIhlJNBK99TppozslBg0/cSdJkxC5Of5bW9Oh56NzlvaQeVcjyWK8zNcJ69HNAfv0Bs6wkwrZdWLJRAlJ3ajw0Xq/df/NlxSWjKKuTZaHiTxdxhT6/KacMNdHlBVa3krA/Gl1IGO/yUPaIs9Cwx5cyKCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=idTUXb0I; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=BJOptJDD; arc=none smtp.client-ip=148.163.139.74
+	s=arc-20240116; t=1788982792; c=relaxed/simple;
+	bh=aIz+rz2nycWz601SVIyRFFVHBcuQFBtZdmyQQX13hdQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=lLDlN16V4DyR/MrswObtGa7ZER4S5yEtC/1S7t7ZXJQ3Mslm2nVF2iLV9CNzhZeZjmE+CvoFMGsjpk+JGWYtIlZ61bfc8Wskhzb3FqAvz2M9lA6J0tXCYtB8XRhilA5W7E7O2vW32qdzpan/UUwZvE1ZsixxTdh1Qh6fgJH0s6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=Eob8Wzuc; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=rIbnrYfh; arc=none smtp.client-ip=148.163.139.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="idTUXb0I";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="BJOptJDD"
-Received: from pps.filterd (m0167077.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689IfG5c850134
-	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 15:39:45 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="Eob8Wzuc";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="rIbnrYfh"
+Received: from pps.filterd (m0167076.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 689If9up946325
+	for <linux-block@vger.kernel.org>; Wed, 9 Sep 2026 15:39:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pps01; bh=9y9UpH52v3OlDKKtahqsmv8F56
-	wS1E13w6NkrRS/xGg=; b=idTUXb0Ii/vvGCrvl2kZpIA1+klBdvFZauTnpzuLUt
-	Azf7tvbRqGbtUqa7mfnYc4MJfMw0iv92eg6gVkwsEKqBhprNOJ2C49tVWRGa1/Au
-	LB/CWY9HYmGhNgiTEbe0+ZGEcWz0cMEs19m4wizOWNOLxya0EXqIrSkLiXo9FQNw
-	7Uwg3bmWsVUMwwhL4hzYhPWySrdTo19K7zb4A1o1xmGXx+teXJE+qjlgC2WTsr6n
-	rPoFN10mb/DD9KDbdou0GLTHZTu6x4ArPA2y8FRrSpCjK9uxnTBkvz3Aaui1BGic
-	vu8qxJiZua8P6xMRNMje+QLWJI4K7Chf6repzt9bEfzw==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcy10h3f-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=kfSQ
+	TvixBfj8we7CzfSEcPTU/t5Qmi2/1Xd/ipsTwgA=; b=Eob8Wzuch/VEnTP27HLh
+	Ol0xyI9Rw9HbzLM4+m+o8nWdvK/1sClu1epnTvkaYjCKUw9KwZUBBPwZTpU42fVx
+	tq2Ujy7iAGT7wD2ZwRlI+vMG9QtEX3Hx2Cpt1IEA2Cu5Mww4TkpLFotK9+xBVOxx
+	DvNYDPRnmmFsXH2dsxRaFDe1KrQp5YOgF+rw7VCi3HWzYk/wlWSBJDQcm8zWpThU
+	CTigwGTAnohGOomaDqVMbDuc2k2WPXtNHX+WMnqi70EEUDPVKUMEKxIifH5B5u1A
+	wX5WOmLVb20JIY4VP8ZAq7Y4puR/rqXqjAISbJ+pwERcOkjEe/4o69ZMdWuF0NPK
+	6w==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gkcxyghcp-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:39:45 -0400 (EDT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51c26012cd0so106637031cf.0
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 12:39:45 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 15:39:47 -0400 (EDT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-92e62e3459fso970930185a.0
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 12:39:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1788982785; x=1789587585; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=9y9UpH52v3OlDKKtahqsmv8F56wS1E13w6NkrRS/xGg=;
-        b=BJOptJDDEie5/hxqtM1XNfXMVZv+1joLV1Sne63rVZRFo2oTTXbUbqNFlyCxLCmwUK
-         uvVwtBmlmPAz/n/33v5F1U+Q7FCVLee18sBTCj9vVD4mfmYyPqg9juEmP2EZXkkmBytk
-         SWqq04n8p8TXa479mqwS+YkPlCxEEBetSvEV+iucb+08T/6Pvrupz+nHMa7NBY9GH4Bg
-         aUJ93TSYj3EY9czYU4X2/jVRnYfFQqM0D/6TH+GTGDMr4Q/RYe/x3MCMXLFga6LQN0Kw
-         GhQxH3nOrRPBYFJG/Nj+PVc0AEsJ4rZZv9cBuN5ZdduJQF4GMZmVgnKJqDkTSDnqGa9o
-         4grQ==
+        d=columbia.edu; s=lionmail; t=1788982787; x=1789587587; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kfSQTvixBfj8we7CzfSEcPTU/t5Qmi2/1Xd/ipsTwgA=;
+        b=rIbnrYfhnD9TZCYDzIvnkXwz/n2btmUHt/CKsufTjCWA7hYN6XX+2+PJPKQ3Kg1iqS
+         KXb0mWiOIgvGT98KCINi1hQ+50JSCjIJwqYVlBPDxlIjMgHvbZ6ynD9i9ulEpE4yLmGU
+         IlCqjzI57Nc8408JsXAbnyRonq6Na19f6OYKKF0WfGIe5/DROb8aSajavbUhhbdvkOBh
+         m3AEPLISAXzZuRhaLGO0a3qsn5fEipDoHUggrXqhOpV/WSaQ8opjfLyG1FKaA4m8yPFO
+         +jLi6ciDcaXJLDSrVVPfcu/a0mAalT/xXQjUbgshZKN0DnnQjO1JsFdD2nyKAt+clYe8
+         iG7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788982785; x=1789587585;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=9y9UpH52v3OlDKKtahqsmv8F56wS1E13w6NkrRS/xGg=;
-        b=pSM52F+9wMNlP576kGLJe0S1I/Me84oFduJclq3RU4YbOOiqwiMzhCezwPy+xMzjBA
-         J6t6UbrWpbTAvXH6ZHf6b5FqaLYYxoYx3oW6m4eFilFEFS7G1W4lT2d8BbnVx5LUj1+X
-         n1jURdCSf6u/7g9ZytZoWfDsx0Qw8LPUM6OfoRDY0WlUFekzQHaOKIigXll/AfFXxgcE
-         a5WKQ7Xrc0rHTArUcvERTmgo4A4SiU7HMHPMqNJX21JAdFZXSPlpe8IQN9shUoUKBMP6
-         3UnyORuwNE18Rgpmm8P0AUxYSwQRJyhtPjCZ5xizVxHzzr+3K5MIOIUo5QCKmTf9GpSu
-         nsMg==
-X-Forwarded-Encrypted: i=1; AKwUvBy/PkW08KSxwoU7xcRQmhHOtn/Bvin5+qJOBDBOeL28Z4r1ZpJltpiHlYV8jz9jdZ9yT+KkwULCT86KJg==@vger.kernel.org
-X-Gm-Message-State: AFuF++mHmTmbf4EJ7ehBovHZIh0Bso/cMOl5dq61h9nlB5grbcx6QI7W
-	9cFI7gjvDK9UFF4U/bt6+XKA7yaYDeVx7/0AeiAetRZVK6wqSdhhV4spMqXi0XkUm/X4Jadc+s5
-	wfFhYd8ihp2RPAXN6Rya88wNOxljVMkqt/pb0upwZs2TcmManzGmiyTZPJ2bIiU320UCiFnU=
-X-Gm-Gg: AYBFou10zELulJd5zjGWssuvpJXyFsh+aLY9gZSOlcI+WOhixWRwBYDBKdVYqXhkb5a
-	pKccvmdWWPEufI4JFyhYpQBsFPxbO/9giLjjYDzMhuPXNH6Wd4UIcP9mPUFgwh4PcpFFkJJOOZ4
-	xknWdv8NUDcccgqfH/I3IeviSRmcoAdIBMy0ShH3k75VG9CgjmDPnQnTwPXTrwYgMqCxbdSEVPn
-	AZ+XVqLudDHWGW/7G8Wvvxb0Drb5K6IdVGBXvvLphgK+bxBQD89YL8sED73CGpOtQy9ttRD1HZo
-	SEo2W6vzcU3QMqd1+34zWsoDgWQsPo3+EVMh0uRxAz2JWrdrtmb9kG9Re5oww6sNkTT4oy5dXHK
-	L3tSiIxkIgo6NCp/tMwCByc54Q5zUgGgrmMOGUTJeVQIr3oSq
-X-Received: by 2002:a05:622a:258a:b0:530:430f:630a with SMTP id d75a77b69052e-53054a1f457mr443008311cf.48.1788982784653;
-        Wed, 09 Sep 2026 12:39:44 -0700 (PDT)
-X-Received: by 2002:a05:622a:258a:b0:530:430f:630a with SMTP id d75a77b69052e-53054a1f457mr443007101cf.48.1788982783531;
-        Wed, 09 Sep 2026 12:39:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788982787; x=1789587587;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kfSQTvixBfj8we7CzfSEcPTU/t5Qmi2/1Xd/ipsTwgA=;
+        b=pMUByiXfuqqAluboWPeK+8egI7SWjd6DkoTd+UowVkAehAEsvSyqJ/PcKOBZqoW3hR
+         GrtIGHrHcSSd2ziKnrI3KJPF39Ga59F1HRf8mtZ4e1YNSMsBOGELQSHCoAz2ZbiM2Opy
+         0Y4VMBBBlz9POTIG55ucTinbt7KifcX28dX703cRCDwU2pYDNeKsCN216W35jDGIs/02
+         cxzGeLSrQ0ex0WDSD7ISpbn2xhVA8/4WLHhJgfBJWK73V+STY/DJtU0UKwYj049S+Owm
+         fPDfZuPI21h14EHYYH138SGRUrjKn52ukf9mAyi4lI3Oa9ljDPO6oj6TLCUWhhqP2To9
+         4PNA==
+X-Forwarded-Encrypted: i=1; AKwUvByEMQQxXsaunkcAedNkPJ0kwySv2LCPNvMUoaCLzeohJajH5RPQAVgUUaIFFnIlL4mmKd5khkEodzLPpQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++k86jSl6GZOI/pDgm/soc63Tc8o7kUCasToFMkKzcpDswu9T6B0
+	xrC30xjhi0S7o0L+dRKawZQXkhvbg0m/NkT7UEGwJNTqc8bdLslykq5LusEVdi2Sj0VeJgnW/J2
+	IhRiGkgXAc1tbLsMMDSB+y7/ahRiREQkNCAZvNB1PUFFPvNTFwg07T22N8BXAqcJ9Wu0p06U=
+X-Gm-Gg: AYBFou0WPUKHbJN1gBT8omqghA3URDhUd8MfATh75i8rQq2dvTdizhL0b85IH5e5ce/
+	vETSpCcWsS+q92xaM9SKCkPpS5xuvVLKlv7NMyBKL9IIswyMWm4hJDGQS1PLQkoXwgLhDUfOkiU
+	FVqtZOSYWAHH0AfrzseblyHREmDJ046EzgnQkaH1mSZ9V07Ul2JgzB3fX/Zwha4lV3zHZWgKKKU
+	+nSdzsIoWlZOsUYp3hovGHuuaPib9+iChyOQwoSv0FQ9Uclifw3+sYSbgaqoGr4j+tayByfRfQX
+	lKTFHyKnnhcoKc/grO9ok50T7+zTMPtfZq3Dq0Y3FYRgzdmMvEhlVBGBLm/Yzz89RcNUlmIOcRi
+	tE5aQjoQSOCHXmGfT9klk0sN7ut/FF+pXlOPV3mzKL1WB30gC
+X-Received: by 2002:ac8:7f14:0:b0:530:15a4:612f with SMTP id d75a77b69052e-53054829d0fmr439947881cf.16.1788982786774;
+        Wed, 09 Sep 2026 12:39:46 -0700 (PDT)
+X-Received: by 2002:ac8:7f14:0:b0:530:15a4:612f with SMTP id d75a77b69052e-53054829d0fmr439946981cf.16.1788982786065;
+        Wed, 09 Sep 2026 12:39:46 -0700 (PDT)
 Received: from [127.0.1.1] (nat-128-59-176-193.net.columbia.edu. [128.59.176.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530868ceb68sm83026191cf.29.2026.09.09.12.39.42
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530868ceb68sm83026191cf.29.2026.09.09.12.39.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 12:39:42 -0700 (PDT)
+        Wed, 09 Sep 2026 12:39:43 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Subject: [PATCH blktests 0/3] blktests: tests for the direct I/O fallback,
- splice, and bio trimming fixes
-Date: Wed, 09 Sep 2026 15:39:27 -0400
-Message-Id: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
+Date: Wed, 09 Sep 2026 15:39:28 -0400
+Subject: [PATCH blktests 1/3] block/049: add a direct I/O write fallback
+ race test for block devices
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,86 +91,436 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAO+1oWoC/yWM0QqCQBBFf0XmuYFN2DX7legh9a6NhsXOJoH47
- 436eLjn3IUUSaB0LRZKmEXlPRmcTwW1z8fUg6UzptKVwdWu5uY1dpg5yg/KGZqVQ+WiDyH6ePF
- k4Sdhn627kfm7Rfdj0W8zoM3bJ63rH+9YJBuAAAAA
-X-Change-ID: 20260909-blkdev-fixes-tests-670f566f5f85
+Message-Id: <20260909-blkdev-fixes-tests-v1-1-1f8af8665d16@columbia.edu>
+References: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
+In-Reply-To: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>, Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev-db0b7
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1788982781; l=1693;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1788982781; l=10948;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=aQznoNEJaKGJ2Gsktn+SsBCWRFCw7tOypI4unUi5/nI=;
- b=bG6NV6SZFpzgjzMZiTukB3/wZs8wObdqQELldC2/PZbmHx45cYoHoljgJUKM3r8ZoaTF6t1QW
- aR7qc8YpxxcDnHHkJ33w80IDRovWm4PuohbyTIl1d6XvRyk3OkSFE63
+ bh=aIz+rz2nycWz601SVIyRFFVHBcuQFBtZdmyQQX13hdQ=;
+ b=ENXD/eiJfpjPFY5LkTwYK0u6yAXRNPC60lXd85644Mq7i+8+srS9Hv+dBgvAsPliViXM4Ja5h
+ hXfM5h9VfL+AeezvP3o0GIKXK2lRpc3Ul9Y34FYRG0N+w0qRTAh6lws
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Authority-Analysis: v=2.4 cv=FrWQbGrq c=1 sm=1 tr=0 ts=6aa1b601 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
+X-Proofpoint-GUID: 61_gy9UrlN_tGRoq19x9xe-namjzVWDN
+X-Authority-Analysis: v=2.4 cv=Gr7XaU1C c=1 sm=1 tr=0 ts=6aa1b603 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=fJxgZNdXt3opHMdyAp+FXA==:17
  a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=QOCMdifcju39GKoXhKua:22
- a=VwQbUJbxAAAA:8 a=Ncn71mQr2BTXJ4py16kA:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX4LwdEMkbWTAS
- G+9Tggd/Lva6kMoaLDLAPd45Legv51KLSNhHMsdxawigSFfvkTLwx/OCxbRACuCB4iXmmrazkFb
- s72lBUiRn3sWzCNNX2VRJSz68bMr49ap2N4LWZnlcJlQ6KPkJ0s6
-X-Proofpoint-ORIG-GUID: ynFoLdFcRlRMDZd57hPnxZW4FWOgyxWd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX2sGvpik2DkIk
- A9RlWvJ4fSLIXo6eO9J4j8KPQf2Ii5hJ8tONUc0/ia9m0A5RUOHSgXN4OrDZdPIGWksKHbJ5HE7
- xeqbRN6bV9u/s100L16y69xlpdOUmhxB2AS0RofFZXQvUtZd5QY7UAnPmWE/mydPQt06h+ov4Fj
- cYArUqU7GsHJBeP103Uq4Yw+y+7ljyAam7ihxW4fmrA3tMom49dmDj+BO41G041vYl4FL0oqZj9
- RN2K7n6Qql2xSNqk0rPCyxV9PN8kgnAwZoNE66adeJ6/zVuaUZMDMdOCiMFHlg6tggLLWBhZMUA
- 5+jj1Rojo604eF1gHhmuxU94ToaI2grP6x9R9xeQ06B9C5BKmPBVcUn6FgS37d8FakN0ClXOBAv
- 5lWEDYMEhWFhWurSRkBwCqlwvfdhBH8UDqhVZvMMlqTHOE6zaXCZdTSgk7uAfkMlRHWGaCAemL7
- cme3HKrFHwOpBT0iucQ==
-X-Proofpoint-GUID: ynFoLdFcRlRMDZd57hPnxZW4FWOgyxWd
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=Qm0qsxP7aFY2tkT6R2MF:22
+ a=VwQbUJbxAAAA:8 a=2Qm6IutkKbbWaStAUrAA:9 a=QEXdDO2ut3YA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX4Oxk8T72dtEO
+ zdQ663DYtFfnpxgAONN2BHUOyF1szSnaHCRZ3kNitEC+sCn+obup1gxQ0fqx6pAMwZAdFZYOGCH
+ H9H1WvSiH0JaTqY8GZfy3jLHa9/cz6ijKly3wK7WLBj9Wvh2AqOWtx2rNafFMaimLjKMDsQdKlR
+ 3vpjIeajTy2V0hyDsxtK0tSS7vrfKIPAVR+MvZ2Xns8C46I1840JGsp31Kx/P59XfO6D6/l9hSc
+ SmQCaSJgkrsIlCt6O03tibMIuG3f4RsulAQCw42rqdZbu1hhTUgh/kEfhYL4WuZySowje7/Bn4K
+ aSStbzC4LA8gG4dVd4sD5OQ6/TvcHQHki3hei/53zoe6snzHVtRd8xzy0pefYtSa/gL08rvMBCy
+ KrMK3hvBxxDx6gQH3KcB/1LFWrGlE26mZesb+TmvsSfGlORlCRPuYqyCn8yDspTpTaexA6VicMW
+ eIGEPK9+1oyWLq/SIrw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDIxOSBTYWx0ZWRfX/pjCo815SyLk
+ nyf/+ss3tAtjcA1CtlY2wGPxp8r5C4RxfWUrZvULAoPd1i8iJ6nZFDKs5A5Bt9cs96aQUtWzkHw
+ UtoWZqmp28E9Nwzr9JU7sXfMoIM/K4stYxaiH2qFLy0WlONA0MUU
+X-Proofpoint-ORIG-GUID: 61_gy9UrlN_tGRoq19x9xe-namjzVWDN
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11900
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 spamscore=0 bulkscore=10 lowpriorityscore=10
- suspectscore=0 impostorscore=10 phishscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 phishscore=0 lowpriorityscore=10 priorityscore=1501 clxscore=1015
+ adultscore=0 malwarescore=0 suspectscore=0 bulkscore=10 impostorscore=10
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609090219
 
-Three regression tests for block device fixes under review [1],
-following block/048 for the first patch of that series.
+A direct write to a block device that completes only partially finishes
+as a buffered write through the direct I/O fallback. That buffered write
+has to hold i_rwsem like the plain buffered write path, so that it does
+not race set_blocksize() raising the mapping's minimum folio order and
+add a folio that is too small for the mapping.
 
-block/049 races partial O_DIRECT writes, which finish through the
-direct I/O write fallback, against BLKBSZSET. block/050 does the same
-with splice(). Both need CONFIG_DEBUG_VM to report the folio order
-mismatch, and skip on kernels without a 64K block size or with 64K
-pages.
+This is a regression test for that issue, fixed in the kernel patch
+"block: take i_rwsem for the direct I/O write fallback" [1].
 
-block/051 issues trimmed O_DIRECT writes from a hugetlb mapping to a
-device with a 64K logical block size and checks that no huge pages
-leak, covering both the dropped and the shrunk bvec.
+Issue O_DIRECT pwritev() to a memory-backed null_blk device with a
+two-segment iovec whose second segment is an unreadable PROT_NONE
+mapping, so that the direct path returns short and enters the fallback.
+Meanwhile toggle the second segment's protection so that some fallbacks
+get past the fault-in and reach the page cache, populate the page cache
+with folios of the current block size, and toggle the block size between
+512 bytes and 64K with BLKBSZSET. A CONFIG_DEBUG_VM kernel reports the
+folio order mismatch as a BUG, which blktests picks up from dmesg.
 
-[1] https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu/
+The minimum folio order only moves with block sizes above the page size,
+i.e. with CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K.
 
+[1]: https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-2-32f3f40cebed@columbia.edu/
+
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
-Tal Zussman (3):
-      block/049: add a direct I/O write fallback race test for block devices
-      block/050: add a splice read race test for block devices
-      block/051: add a pinned page leak test for trimmed direct writes
-
- src/.gitignore          |   3 +
- src/Makefile            |   9 +-
- src/bio-trim-pin-leak.c | 191 ++++++++++++++++++++++++++++++++++++++++
+ src/.gitignore          |   1 +
+ src/Makefile            |   7 +-
  src/dio-fallback-race.c | 229 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/splice-race.c       | 171 ++++++++++++++++++++++++++++++++++++
  tests/block/049         |  57 ++++++++++++
  tests/block/049.out     |   2 +
- tests/block/050         |  54 ++++++++++++
- tests/block/050.out     |   2 +
- tests/block/051         |  64 ++++++++++++++
- tests/block/051.out     |   2 +
- 11 files changed, 783 insertions(+), 1 deletion(-)
----
-base-commit: 94aea0684058ffcc91e6de9c2fc85fedf1342a39
-change-id: 20260909-blkdev-fixes-tests-670f566f5f85
+ 5 files changed, 295 insertions(+), 1 deletion(-)
 
-Best regards,
---  
-Tal Zussman <tz2294@columbia.edu>
+diff --git a/src/.gitignore b/src/.gitignore
+index e9869e1..754beef 100644
+--- a/src/.gitignore
++++ b/src/.gitignore
+@@ -1,5 +1,6 @@
+ /bio-bounce-read
+ /bio-full-trim
++/dio-fallback-race
+ /dio-offsets
+ /discontiguous-io
+ /loblksize
+diff --git a/src/Makefile b/src/Makefile
+index ef9c887..f789ff6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -32,6 +32,7 @@ C_TARGETS := \
+ C_URING_TARGETS := metadata \
+ 	nvme-passthru-admin-uring
+ C_UBLK_TARGETS := miniublk
++C_THREAD_TARGETS := dio-fallback-race
+ 
+ HAVE_LIBURING := $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
+ HAVE_UBLK_HEADER := $(call HAVE_C_HEADER,linux/ublk_cmd.h,1)
+@@ -43,7 +44,7 @@ CXX_TARGETS := \
+ SYZKALLER_TARGETS := \
+ 	sg/syzkaller1
+ 
+-TARGETS := $(C_TARGETS) $(CXX_TARGETS) $(SYZKALLER_TARGETS)
++TARGETS := $(C_TARGETS) $(C_THREAD_TARGETS) $(CXX_TARGETS) $(SYZKALLER_TARGETS)
+ 
+ ifeq ($(HAVE_UBLK_HEADER), 1)
+ ifeq ($(HAVE_NEW_UBLK_INTF), 1)
+@@ -68,6 +69,7 @@ override CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wno-sign-compare \
+ 		     -Werror $(CXXFLAGS) $(CONFIG_DEFS)
+ URING_FLAGS :=  -D_GNU_SOURCE
+ URING_LIBS := -lpthread -luring
++THREAD_LIBS := -lpthread
+ LDFLAGS ?=
+ 
+ all: $(TARGETS)
+@@ -88,6 +90,9 @@ $(CXX_TARGETS): %: %.cpp
+ $(SYZKALLER_TARGETS): %: %.c
+ 	$(CC) $(CFLAGS) -Wno-unused-but-set-variable $(LDFLAGS) -o $@ $^
+ 
++$(C_THREAD_TARGETS): %: %.c
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(THREAD_LIBS)
++
+ $(C_URING_TARGETS): %: %.c
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(URING_FLAGS) -o $@ $^ $(URING_LIBS)
+ 
+diff --git a/src/dio-fallback-race.c b/src/dio-fallback-race.c
+new file mode 100644
+index 0000000..e5221c5
+--- /dev/null
++++ b/src/dio-fallback-race.c
+@@ -0,0 +1,229 @@
++// SPDX-License-Identifier: GPL-3.0+
++/*
++ * Copyright (C) 2026 Tal Zussman
++ *
++ * Race partial O_DIRECT writes to a block device against BLKBSZSET.
++ *
++ * Writer threads issue O_DIRECT pwritev() with a two-segment iovec whose
++ * second segment is an unreadable PROT_NONE mapping. The direct path writes
++ * the first segment, fails to pin the second and returns short, so the write
++ * finishes as a buffered write through the direct I/O fallback. A second
++ * thread toggles the second segment's protection so that some fallbacks get
++ * past fault_in_iov_iter_readable() and reach the page cache, a third
++ * populates the page cache with folios of the current block size, and a
++ * fourth toggles the block size between 512 bytes and 64K with BLKBSZSET.
++ *
++ * The fallback has to run under i_rwsem like the plain buffered write path.
++ * If it does not, it races set_blocksize() raising the mapping's minimum
++ * folio order and adds a folio that is too small for the mapping, which a
++ * CONFIG_DEBUG_VM kernel reports as a BUG. The caller checks dmesg.
++ *
++ * usage: dio-fallback-race <blockdev> <seconds>
++ *
++ * exit:  0 = ran for <seconds>
++ *        1 = setup error
++ */
++#define _GNU_SOURCE
++#include <fcntl.h>
++#include <pthread.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/uio.h>
++#include <unistd.h>
++
++#include <linux/fs.h>
++
++#define GOOD		(8 * 1024)		/* written by the direct path */
++#define BAD		(64 * 1024)		/* unreadable, forces a short write */
++#define RANGE		(2 * 1024 * 1024)	/* keep the race on a few folios */
++#define NR_WRITERS	2
++
++#define SMALL_BS	512
++#define LARGE_BS	(64 * 1024)
++
++static const char *dev;
++static long pgsz;
++static char *badseg;
++static int bszfd;
++static volatile int stop;
++static int failed;
++
++/* partial direct write, finished as a buffered write by the fallback */
++static void *writer(void *arg)
++{
++	struct iovec iov[2];
++	off_t off = 0;
++	char *good;
++	int fd;
++
++	fd = open(dev, O_RDWR | O_DIRECT);
++	if (fd < 0) {
++		perror("open");
++		failed = 1;
++		return NULL;
++	}
++
++	if (posix_memalign((void **)&good, pgsz, GOOD)) {
++		perror("posix_memalign");
++		failed = 1;
++		return NULL;
++	}
++	memset(good, 'A', GOOD);
++
++	iov[0].iov_base = good;
++	iov[0].iov_len = GOOD;
++	iov[1].iov_base = badseg;
++	iov[1].iov_len = BAD;
++
++	while (!stop) {
++		if (pwritev(fd, iov, 2, off) < 0) {
++			perror("pwritev");
++			failed = 1;
++			break;
++		}
++		off = (off + GOOD) % RANGE;
++	}
++
++	return NULL;
++}
++
++/* let some fallbacks get past the fault-in and into the page cache */
++static void *flipper(void *arg)
++{
++	while (!stop) {
++		if (mprotect(badseg, BAD, PROT_READ | PROT_WRITE) ||
++		    mprotect(badseg, BAD, PROT_NONE)) {
++			perror("mprotect");
++			failed = 1;
++			break;
++		}
++	}
++
++	return NULL;
++}
++
++/* populate the page cache with folios sized for the current block size */
++static void *reader(void *arg)
++{
++	off_t off = 0;
++	char *buf;
++	int fd;
++
++	fd = open(dev, O_RDONLY);
++	if (fd < 0) {
++		perror("open");
++		failed = 1;
++		return NULL;
++	}
++
++	buf = malloc(GOOD);
++	if (!buf) {
++		perror("malloc");
++		failed = 1;
++		return NULL;
++	}
++
++	while (!stop) {
++		if (pread(fd, buf, GOOD, off) < 0) {
++			perror("pread");
++			failed = 1;
++			break;
++		}
++		readahead(fd, off, RANGE / 4);
++		off = (off + GOOD) % RANGE;
++	}
++
++	return NULL;
++}
++
++/* change i_blkbits and the mapping's minimum folio order underneath them */
++static void *resizer(void *arg)
++{
++	int bs = SMALL_BS;
++
++	while (!stop) {
++		if (ioctl(bszfd, BLKBSZSET, &bs)) {
++			perror("BLKBSZSET");
++			failed = 1;
++			break;
++		}
++		bs = bs == SMALL_BS ? LARGE_BS : SMALL_BS;
++	}
++
++	return NULL;
++}
++
++static int spawn(pthread_t *t, void *(*fn)(void *))
++{
++	int err = pthread_create(t, NULL, fn, NULL);
++
++	if (err)
++		fprintf(stderr, "pthread_create: %s\n", strerror(err));
++
++	return err;
++}
++
++int main(int argc, char **argv)
++{
++	pthread_t writers[NR_WRITERS];
++	pthread_t flipper_t, reader_t, resizer_t;
++	int bs = LARGE_BS;
++	int i;
++
++	if (argc != 3) {
++		fprintf(stderr, "usage: %s <blockdev> <seconds>\n", argv[0]);
++		return EXIT_FAILURE;
++	}
++
++	dev = argv[1];
++
++	pgsz = sysconf(_SC_PAGESIZE);
++	if (pgsz < 0) {
++		perror("sysconf");
++		return EXIT_FAILURE;
++	}
++
++	bszfd = open(dev, O_RDONLY);
++	if (bszfd < 0) {
++		perror("open");
++		return EXIT_FAILURE;
++	}
++
++	/*
++	 * The minimum folio order only moves with block sizes above the page
++	 * size, which needs BLK_MAX_BLOCK_SIZE above PAGE_SIZE, i.e.
++	 * CONFIG_TRANSPARENT_HUGEPAGE.
++	 */
++	if (ioctl(bszfd, BLKBSZSET, &bs)) {
++		perror("BLKBSZSET");
++		return EXIT_FAILURE;
++	}
++
++	badseg = mmap(NULL, BAD, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (badseg == MAP_FAILED) {
++		perror("mmap");
++		return EXIT_FAILURE;
++	}
++
++	for (i = 0; i < NR_WRITERS; i++) {
++		if (spawn(&writers[i], writer))
++			return EXIT_FAILURE;
++	}
++	if (spawn(&flipper_t, flipper) || spawn(&reader_t, reader) ||
++	    spawn(&resizer_t, resizer))
++		return EXIT_FAILURE;
++
++	sleep(atoi(argv[2]));
++	stop = 1;
++
++	for (i = 0; i < NR_WRITERS; i++)
++		pthread_join(writers[i], NULL);
++	pthread_join(flipper_t, NULL);
++	pthread_join(reader_t, NULL);
++	pthread_join(resizer_t, NULL);
++
++	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
++}
+diff --git a/tests/block/049 b/tests/block/049
+new file mode 100755
+index 0000000..aa5622a
+--- /dev/null
++++ b/tests/block/049
+@@ -0,0 +1,57 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Tal Zussman
++#
++# Race partial O_DIRECT writes to a block device against BLKBSZSET. A direct
++# write that completes only partially finishes as a buffered write through the
++# direct I/O fallback, which has to hold i_rwsem like the plain buffered write
++# path so that it does not race set_blocksize() raising the mapping's minimum
++# folio order. Without it, the fallback adds a folio that is too small for the
++# mapping, which a CONFIG_DEBUG_VM kernel reports as a BUG.
++#
++# Regression test for patch "block: take i_rwsem for the direct I/O write
++# fallback".
++
++. tests/block/rc
++. common/null_blk
++
++DESCRIPTION="race the direct I/O write fallback against BLKBSZSET"
++TIMED=1
++
++requires() {
++	_have_null_blk
++	_have_kernel_option TRANSPARENT_HUGEPAGE
++	_have_kernel_option DEBUG_VM
++	_have_src_program dio-fallback-race
++	if (( $(_get_page_size) >= 65536 )); then
++		SKIP_REASONS+=("a 64K block size is not above the page size")
++		return 1
++	fi
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	# the race hits about once a minute on an unfixed kernel
++	: "${TIMEOUT:=60}"
++
++	if ! _configure_null_blk nullb1 blocksize=512 memory_backed=1 \
++	     size=64 power=1; then
++		echo "configuring null_blk failed"
++		return 1
++	fi
++
++	if ! blockdev --setbsz 65536 /dev/nullb1; then
++		SKIP_REASONS+=("kernel does not support a 64K block size")
++		_exit_null_blk
++		return
++	fi
++
++	if ! src/dio-fallback-race /dev/nullb1 "${TIMEOUT}" >>"${FULL}" 2>&1; then
++		echo "dio-fallback-race helper failed"
++	fi
++
++	_exit_null_blk
++
++	echo "Test complete"
++}
+diff --git a/tests/block/049.out b/tests/block/049.out
+new file mode 100644
+index 0000000..c88edfe
+--- /dev/null
++++ b/tests/block/049.out
+@@ -0,0 +1,2 @@
++Running block/049
++Test complete
+
+-- 
+2.39.5
 
