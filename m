@@ -1,141 +1,157 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-ed2-f12.google.com (mail-ed2-f12.google.com [74.125.228.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D351F51FCA2
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 10:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788950152; cv=none; b=vAZRHePgyKo7g1/2bbnb5qSn+XwCpB35K1GF+ww3b+OpdBhJFv8NugQolanpVBCVrQtwUmxv2kiitT4cIa4VVOouKAGdb3AXEnPM83cX//cgzLyo1+uuP1lDm1KYcxLkCzpG4IL3WQao+XXJzSNNI2F9y5bv/rNLWkTP0bb8mQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788950152; c=relaxed/simple;
-	bh=RILLo1OM8wUjyazDx0uYb0ZEOlSa7QCNuPJs8t0VB8g=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=hDD9pw8j0EIjSGWp4A+KuWHupNfksZKSOzqxc+XIYvVABRMSs2K5jp8IsuPEJ79NuIrBykkh1v8qGkvJyswImKnCSMXkarzpfX/OUreQhSwMoXnbPwKCaPPntCjvxaewc8xxsnOwG/1b0cx5vidKDcu1xJmgPra/CH9xPrOVkkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y7JxXRY9; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511E652379A
+	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 10:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788950167; cv=pass; b=noZ4T4hKKBnD0lGqZyyOX8i3E7F02sWQ2zSvaeq9IUYcvtSuXZeS1mz9hTSdk0jAFByIZwhmyzvWCtfxmHiwl4fMDQWuj6Ufz271XrmWsDeloC14f9ZT4uXXPGtI1hkFwSXQAf84fDIQI3CvtM+2Eq65K7bDedH3gmXJaaJwsi4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788950167; c=relaxed/simple;
+	bh=jiUSKPWQHUb8wgWpAcCdYB6GZGkWirt+xiv0f1KbsrE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JbECcLnz0UnrvuyFZay6pv+Ma9OZP+I5FcXcOsJStoSc78APZhQXLvw8JPB+8bNlYY+NwiBJuAUdphfvmHeM/TGFzw+7v6ztyr2eEghH2jPV9ene/8c7DoKCNlrIkBeuTa+x4u1vo0/jhTlAs5RNE8EFwY1FlbrBaZEPY3WV02I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b=K2aGm/dj; arc=pass smtp.client-ip=74.125.228.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y7JxXRY9"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-871c8a36fe3so62740847b3.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 03:35:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="K2aGm/dj"
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a99c3904a1so20712a12.0
+        for <linux-block@vger.kernel.org>; Wed, 09 Sep 2026 03:36:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788950160; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cCGbN6s583TQr0MwqI2W5jOmZRmz0eLQvMVbgDKCDfsHStadFUQe+omqmGoIpWGJcv
+         EDnbCwRLmgLraOiO/Oji633J8TcotDhC0gUySasoGk/xYv23U+K3pUsl5ohirikTLSfJ
+         scEr+u3ql+jndduert93vv0GbbGuy9dw8pu2LYjXJx97CVOJFJwx5T+djSKdmc4pAIKi
+         QZMiM/DkjeHZR77xR63wdJskVRhv2pFT60UUy7bVjZzz1830+EADbR8uaDFBFD92nPnA
+         NLMlBEHKfSQQG0ScgUYpA3KGzyebNRlQOJsaJqzJU1/UWxARQAQvYK0itkcYWM5JtOeB
+         ayTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PiYK9hlMysoO7QWt3It5QIF3PriSPcy84exsAliRPN0=;
+        fh=zIp8GLB0st8dawbn6bVXgl+j/AMx05TFxUhSfkhpt4A=;
+        b=CJBan3Cp9wwP3SC4R9vSrtxcRLvfJHw3VtN/UJfTy4pySMisLE05pJkjKgza3mnmeH
+         OjjLi9Aq+pvoKy4WBkUBDG9OW2N6hybgEKUImDjkB4ULfhYJ9efbR5BDyVbfpEaMqCFs
+         cc7/NLfeGuSNH6eyg9ds9uVd6AkOciDGw9ad9MuUhGwdk7zhXL+Tezg8526Z45l6jYEx
+         R0SIbgkhRFRdOsJKrmcHPHsstT/I9Ez6bVhHS/0T3OYyXHcTd/AHOU5OUpyVdgsPeWis
+         MxYj1ZODEYG6X552XeX49cEs8N+01EX9LSE9zvTn0EdIIDT83eGppDGTkOj7ETTlOX9g
+         jo8w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788950150; x=1789554950; darn=vger.kernel.org;
-        h=content-type:mime-version:references:message-id:in-reply-to:subject
-         :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=01Cz/m/rw5yJ2Ele+bEMQyVaRjGaQszVRRuNtZjuAys=;
-        b=Y7JxXRY9lDl6xdfun4kcEv86OTrEQM55JJNMOAS8dS9x5sWlAJSxDXreUGfqQPbcED
-         XLQ9/6f3pvZLbK708V2enROPzlPuXEvHEfQ/GnIh82qtIw7Lo1M7yFN7pJJRDk66KwNM
-         WImd6FUjuy/FxntUCo9elqCDafrWOPGP2ies8hazChJ7X79X9kFm3cTDSdPFAWQVWhHS
-         xidR9NaO0mxL8ydAVtn/4c7S2u2ZbV/c1lGaUjhNJby3ij170xuebuagtoMCx3hY6wJc
-         fqa64N/b1umfpyLtF2U6dMZCE393S8+Thee29sMSB5YV5tLMSvUGQA7Z/cjxlFHJ11Lb
-         cwTw==
+        d=cloud.ionos.com; s=google; t=1788950160; x=1789554960; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=PiYK9hlMysoO7QWt3It5QIF3PriSPcy84exsAliRPN0=;
+        b=K2aGm/djq+KyUsHQ4ltRqRnnwRxbM+WSPbrCCiChCKHH8CK9xQRr5L8zYzAx9MDth/
+         eLdOWdXEEFTSl4XzBbPGRdg7h4rPEntreCLR8gABJ+LOjQL6XH94d2sAs7lNYaJVFNeI
+         ar1yA8r69P80gdUrOcNhlpDxCirdhcPjrZF3ESbb0a30af1hw6C3/fWYm9RVcfZE2QYT
+         QZe1WqC+jATZE5bICQ6sfIspkNlFJ31p3cn95IPSL9Ne3kx3mdFIWUJ5kXaN/eYouaIo
+         hzqynPwTDpTcuJSaW9uSWpqvq6asfj/PuyNCsjfb3ghaALHcNa8C2JMbanUeJF2scucx
+         poIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788950150; x=1789554950;
-        h=content-type:mime-version:references:message-id:in-reply-to:subject
-         :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=01Cz/m/rw5yJ2Ele+bEMQyVaRjGaQszVRRuNtZjuAys=;
-        b=gu07LzqQmJqEJAv8oE8jO3AGkkQjbglQ9Pjyru1BYsM70jJQUyd3KnVLLZ0aIQroOE
-         1oCJhTaxuNkrWFbcIVrPNEeAXmZCylGnBoLW39e1pcfPbJp2+oEQvHuLAruttCrMHNpe
-         1+8S0dXGkBBSOQATrtQWe8XQ+FtUem/CAZa4BIDvVpeRJbSZ+EqIm095K++fxe29fuqO
-         jujte3GBHdfdTbmG+lsk82wtLyDGYjT6RezZiA3rrT3yoXZRAZncjkIXFtDoejZRQkKr
-         /Xdv1xhzWqou8xYQvL62uiEAUg6g83+6YV7wYsrYtvAqgudOGaIKG2OhQvAXsd239L+5
-         F5JQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxKOuPjhrFgl11u96OThjrXYjurt5tXyvF8FsiJX6HWIbZhItUVgxOl9kEP7JkpKju1urfTyM7Q0ou83g==@vger.kernel.org
-X-Gm-Message-State: AFuF++mnpd8nRto1iByDUFjrXXkc/l7fs9re7WZqJcNN42x8v90ZMEly
-	xOm9OrzS0OiHRjiaOnG8VTBq6F47y3AZJrvLLwzHnh4K9shgGAqTxJc7V2DKqhM8bg==
-X-Gm-Gg: AYBFou35iBQ97cHuUIDcqepEqMAHKmwakqH4q/oeUQ20H5QYYbmAvnuWolIkNh6+bwN
-	rIG2MvEK4nsPCGJlU5Q88LJdT38pyziWzfBM5dEaNSiiRtATM3jFavfI3H/ZvgM6CnXvaXzTZMl
-	XVutOCzZN6ZPu3Y80KmL+TNCXst36iB0mmVVH3uRWmLdKARdc01rE6xQK7tNf/ugMXM3uAB9K8R
-	km3heU5R0+0Sqc40JkJs/mOujgUK8ZFp7ZmVFLTy24qp7WNtb6NHFuLcFNfy6QvUxt8j7USDYom
-	GSngVcm6d88YTOsptt88b5cPZ6yOEP1ijO2zGfTM/9MCZwKggLe5gM2h+Zq3bzGQbQaPho7vOYU
-	Zm0qeUGFuaHYDcThPZAEH+9qqyfgHs7allyLkIYPgjMnyL0Z+msX4LuCATAwaoq1PYQdfebaKJ0
-	FAoev4dd8ZbCQgMwSmoR0P0KQLecH9W4QmYN/ff9IqsRhgZI7GnzvJuCdlqd/05HN0RLn4Q1pM+
-	uvcu9cBrCgph8JHzlB4hHhH04xkqizy/qTzdzG6665wLRK9BETfJm6Yev4vT3zu
-X-Received: by 2002:a05:690c:c50d:b0:873:ea3b:6c08 with SMTP id 00721157ae682-873ea3b77c9mr91382717b3.1.1788950148979;
-        Wed, 09 Sep 2026 03:35:48 -0700 (PDT)
-Received: from [192.168.1.242] (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-87143ca6ddesm107684497b3.2.2026.09.09.03.35.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 03:35:47 -0700 (PDT)
-Date: Wed, 9 Sep 2026 03:35:42 -0700 (PDT)
-From: Hugh Dickins <hughd@google.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-cc: Ackerley Tng <ackerleytng@google.com>, 
-    Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>, 
-    Baolin Wang <baolin.wang@linux.alibaba.com>, 
-    Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>, 
-    Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-    Christoph Lameter <cl@gentwo.org>, 
-    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-    David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
-    Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
-    Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
-    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, 
-    Matthew Wilcox <willy@infradead.org>, 
-    Mel Gorman <mgorman@techsingularity.net>, 
-    Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
-    Minchan Kim <minchan@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-    Oscar Salvador <osalvador@suse.de>, Peter Zijlstra <peterz@infradead.org>, 
-    Qi Zheng <qi.zheng@linux.dev>, Rik van Riel <riel@surriel.com>, 
-    Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-    Shakeel Butt <shakeel.butt@linux.dev>, 
-    Suren Baghdasaryan <surenb@google.com>, 
-    Vlastimil Babka <vbabka@kernel.org>, 
-    Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>, 
-    Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
-    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH v2 25/26] mm/fbatch: move lru_add_drain_all() declaration to
- mm/internal.h
-In-Reply-To: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
-Message-ID: <26b1d94a-497a-fd6d-e700-342ccb65c045@google.com>
-References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
+        d=1e100.net; s=20251104; t=1788950160; x=1789554960;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=PiYK9hlMysoO7QWt3It5QIF3PriSPcy84exsAliRPN0=;
+        b=RxNR2y5OTb2ytpyKgWfpGHfDt6agyhnyAPNQSB7Mg1QgBJ0OGbJ/o90pfAnrx8lIbj
+         KvdOp9yfeepFUBv07w6Q//aYiCvonaaM862ikeLOyj35oM3T077nkJnDc+htswzj5NOw
+         4EwouC8qXano57OC1D0Sjfz5sqGczfUIxXA6U4SH3RD6qGU0aUxsFC+3+xPfz2DkLT3v
+         sKZznTFJjmwF2XKbnN27QyedJLfi+MHobFtasGyUDUSy++Icy6eN3OGpKPI06LCdO07J
+         jv+DaCA8oyq/JKvhYDO3T+gGjtfvuKX5hR4POLknktVCuUUD3crvnD3shaVdsboPxn2Z
+         T1zA==
+X-Forwarded-Encrypted: i=1; AKwUvBx/vZ6RFhV0jGKh5LZCxU7Il3TIjj2jSpVVuOg1hb9O8Z8Dx1seJVtbLxfgxYeawKrKIUMkd8Ue+dLBBg==@vger.kernel.org
+X-Gm-Message-State: AFuF++na51On529Sy8vHoYZhgfXm5p/XVbCwG5zOGIUDjl8zffyUYRK5
+	lloGIHLx3rKnRpmtyoKB7q1GCHVO61nZUNeWUlM4XWBQuj2hyaGr1sOQ3kAh3Dos37tpwKmWAjf
+	VI9m82xmUI+y19SYuLTHaaAkCp6JMcwoFRDWE/o2Y6Q==
+X-Gm-Gg: AYBFou06Y+OWQV10PgGpoJ7NEG0KALV1U5PiavfFOgPHHmCWGJlp08lg3EOvxAaxVo7
+	K8Jc50SdN26kOnFYLjnH8Nyn0vGb/TzkAi6i+WRF4dvYQdH38u8PpJuu6tAzhGsgVIughGY/E+J
+	ADMMjnWthldc+37QeGpeUYwWvShng06azs7LbwaNnCmpSdcOTHecHjktvfu524JMyiq3yncMbzJ
+	yv8hxncxZh+nBT4Opv2L/tLhn4VyTgeqVvbJbErHP78HFYLeV8gF98+LwzgsA9CtCJ0EtIuUPmS
+	8YBAaaF8JWwCaQXXKYwnMiNuLq+aBOJC4yibok/Ui4CBwuSUM1Rsg/E=
+X-Received: by 2002:a17:907:940d:b0:c25:3ccf:bd87 with SMTP id
+ a640c23a62f3a-c2624d27f76mr997745066b.0.1788950160219; Wed, 09 Sep 2026
+ 03:36:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20260907133929.1081540-1-jinpu.wang@ionos.com>
+ <20260907133929.1081540-2-jinpu.wang@ionos.com> <20260909062923.GB29874@lst.de>
+In-Reply-To: <20260909062923.GB29874@lst.de>
+From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date: Wed, 9 Sep 2026 12:35:49 +0200
+X-Gm-Features: AcwNN1X-2oF0MYpARsjLKHXLdD4JaJtQpG0Ei6Y9Q2CxFNEsVa4yPYfrtiGyUCo
+Message-ID: <CAMGffEngy4GGR0ScFYRAUwsGrnO17gL2HRJE3wBX8tHBaq5SNg@mail.gmail.com>
+Subject: Re: [PATCH 1/6] block: add queue_limits_start_update_trylock()
+To: Christoph Hellwig <hch@lst.de>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, abd.masalkhi@gmail.com, 
+	linux-raid <linux-raid@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
+	Song Liu <song@kernel.org>, Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
+	Yu Kuai <yukuai@fygo.io>, tom.leiming@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Only mm now uses lru_add_drain_all(), in forced reclaim and in memory
-hotremoval: help to keep it that way by moving its declaration alongside
-that of lru_add_drain() in mm/internal.h.
+On Wed, Sep 9, 2026 at 8:29=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
+:
+>
+> On Mon, Sep 07, 2026 at 03:39:24PM +0200, Jack Wang wrote:
+> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> >
+> > Some callers must not wait for q->limits_lock, because they hold
+> > something the current holder waits for.  md is one: its
+> > check_sb_changes() runs with reconfig_mutex held, while a
+> > queue_attr_store() holding limits_lock waits in blk_mq_freeze_queue()
+> > for I/O that can be waiting for a superblock update needing that mutex.
+> >
+> > Add a trylock variant of queue_limits_start_update() for them.
+>
+> I don't think this is a good idea, please fix the lock ordering
+> instead.
+Fair enough, I will drop the trylock.
 
-Signed-off-by: Hugh Dickins <hughd@google.com>
----
- include/linux/swap.h | 1 -
- mm/internal.h        | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+The ordering fix is the rest of the series: the callers that add a new
+leg take q->limits_lock before reconfig_mutex and the suspend.
+>
+> > Assisted-by: Claude:claude-opus-5
+>
+> But if not please try to come up with helpers like this based on
+> your own.  We don't really need this amount of AI slop.
 
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 423d9b669149..dfa6314c0cee 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -300,7 +300,6 @@ static inline void folio_add_lru(struct folio *folio)
- 	__folio_add_lru(folio, false);
- }
- void folio_mark_accessed(struct folio *folio);
--void lru_add_drain_all(void);
- 
- enum lru_cache_drained {
- 	LRU_CACHE_NOT_DRAINED,
-diff --git a/mm/internal.h b/mm/internal.h
-index d9930b752153..f28fd310455c 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -54,6 +54,7 @@ static inline bool folio_may_be_lru_cached(const struct folio *folio)
- }
- 
- void lru_add_drain(void);
-+void lru_add_drain_all(void);
- void lru_add_drain_cpu(int cpu);
- void lru_add_drain_cpu_zone(struct zone *zone);
- void folio_deactivate(struct folio *folio);
--- 
-2.51.0
+Noted.
 
+Thanks!
+>
+> > + * Like queue_limits_start_update(), but fails instead of waiting when=
+ another
+> > + * update is in flight.  For callers that must not block on q->limits_=
+lock
+> > + * because they hold something its current owner is waiting for.
+> > + *
+> > + * Context: process context.
+> > + */
+> > +static inline bool
+> > +queue_limits_start_update_trylock(struct request_queue *q,
+> > +                               struct queue_limits *lim)
+> > +     __cond_acquires(true, &q->limits_lock)
+> > +{
+> > +     if (!mutex_trylock(&q->limits_lock))
+> > +             return false;
+> > +
+> > +     *lim =3D q->limits;
+> > +
+> > +     return true;
+> > +}
+> > +
+> >  int queue_limits_commit_update_frozen(struct request_queue *q,
+> >               struct queue_limits *lim) __releases(&q->limits_lock);
+> >  int queue_limits_commit_update(struct request_queue *q,
+> > --
+> > 2.43.0
+> ---end quoted text---
