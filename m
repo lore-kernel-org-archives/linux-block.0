@@ -1,110 +1,113 @@
-Received: from mta1.migadu.com (out-102.mta1.migadu.com [95.215.58.102])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710C25505DA
-	for <linux-block@vger.kernel.org>; Wed,  9 Sep 2026 13:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8615632BE;
+	Wed,  9 Sep 2026 13:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788959585; cv=none; b=GBW/a5sxCVtPGPUm5DUV6qjjMkEBF8lyxD7Uz4jajmTvSWvv4/WegJmvWQGoeH7Gi4itcrY1EZ5DWb5i3SD2w2THiEhbBCfDrGX04KRyV7dcgv/nmVzyoN28IH46YWT49jtYzhaFIaK8aAvKJjRxdDFHbKLKMFGIe5WWeQhcyhc=
+	t=1788960411; cv=none; b=gV6rlJDMW4JIjF/x23FXFz5UjbAwdCfN3935DDnEDCi8CYQ++QLvMBbnQnF3AwmSPn0QyDhANtSo3Eh6mP61nWgAlPNNkM9nFlb2NWzOnueyOKWhsuCwybsTfzeiYzvsFbX8EpEDUAUYnQNpFyIE7viZdn1nq1/xYgevKP2qO88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788959585; c=relaxed/simple;
-	bh=pTDfVRoX1U+RIjfQuPegFcGKswGHWQIt1UsGbzs5f/E=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WrpSqMU4BERMU6PqS3nkJAoEaki/EIL1tPuXW/wrSUqWmjqgEHBLn8Wh39P3JSg6IaXozJzwgXR407m7wqFMmO+x1Xtw25cQqO7Jz7exM5I8lIS5HIUnorw4sW+Df3oZVjucNTKsniHkZGP9kAakAnuGTDiswkDadvWvfQNEcGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OtdeloKO; arc=none smtp.client-ip=95.215.58.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788960411; c=relaxed/simple;
+	bh=m9d7ujv378uw+j2ZjyLPhKB21Fd8zoqENiKhmu/5oqg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XhFm4Y3UXjlZjmiBvkDGQaK2sl6PA/NdSn2TuEVFZjuy59J2KKWX8cG2wPr0AOA2Gu/GoPLs1VQWSRW7djNbPYffoeM7oOVoEFPfPEAH/0ejTkdXeqjPWquS0k/nYz1D3uM0pNm6LR7WFcHG6wxe7MltMStShYEfQzCOM8P56vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=IADbfR6V; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OtdeloKO"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=pTDfVRoX1U+RIjfQuPegFcGKswGHWQIt1UsGbzs5f/E=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788959580; v=1; x=1789564380;
- b=OtdeloKOIruM9qO0qJpX2b+U/7i6FL3ax2sVvxjwMZamfzLli6o5HmujIYltuTKW9+kB0Pcd
- UvVXIgft599AT40Lw210drnTEfY9StLpnk2hBqZudqP/TFjSOnOgBQ09jtX35FBs+icNyiLXqHD
- qnPP6Cty/9atR4fdA0g8K/tA=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id b52656f567ea3328;
-	Wed, 09 Sep 2026 13:13:00 +0000
-X-Mizu-Trace-ID: b52656f567ea3328
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <7ff19114-de0c-4118-a000-b236d8d30127@linux.dev>
-Date: Wed, 9 Sep 2026 21:12:54 +0800
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="IADbfR6V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1788960409; x=1820496409;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=stTt3pcn/55ggI22k7c3KD4aU4G5gE3hgIvnTyPwIrs=;
+  b=IADbfR6VUP/0XeI3sbHdYanC4dODAowD7WV9UjWeVgyteB8bADUEv8Hi
+   W8+TSgjnfnc2fBS41c3++HkQeEQl+pCjjFD1j3KWHm/ZzYFUaWLuIC330
+   HuN9KzCg2sq/hzya27hbHzNkmPJbwm6JcH9glaX1nbR068heBDe8ZzDEt
+   vetA3bZxv5cfdNgRHXpUYfz6dYuUnotguVkre1usz4pYdNM9j6wbP2jId
+   g/arLF0iaaSVnMMqu1rVzcUZnS958degofIWiYIZt8DlkYaqpNqT+SNFo
+   IdNUhouQ8dg9nBi1n/ePa63kjFRIPBk5FsaJyvE8dcasLMmuxJOId338L
+   w==;
+X-CSE-ConnectionGUID: XFeq43UxR+edIZcqz43naA==
+X-CSE-MsgGUID: d9xPtqCDSL2K4hIpBkglyA==
+X-IronPort-AV: E=Sophos;i="6.25,270,1779148800"; 
+   d="scan'208";a="28092934"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2026 13:26:43 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:26264]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.27:2525] with esmtp (Farcaster)
+ id 2b3fafe0-6241-42f4-94b6-181936edf88d; Wed, 9 Sep 2026 13:26:43 +0000 (UTC)
+X-Farcaster-Flow-ID: 2b3fafe0-6241-42f4-94b6-181936edf88d
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
+ Wed, 9 Sep 2026 13:26:43 +0000
+Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com
+ (10.253.107.175) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.46; Wed, 9 Sep 2026
+ 13:26:41 +0000
+From: Mahmoud Nagy Adam <mngyadam@amazon.de>
+To: <linux-kselftest@vger.kernel.org>
+CC: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, "Jens
+ Axboe" <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH] selftests: ublk: install test_common.sh and trace/ scripts
+Date: Wed, 9 Sep 2026 15:26:03 +0200
+Message-ID: <20260909132602.68852-2-mngyadam@amazon.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
- Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [RFC PATCH 0/8] blk-iocost: BPF struct_ops cost model
-To: Tejun Heo <tj@kernel.org>
-References: <20260908100143.47598-1-cui.tao@linux.dev>
- <178889947167.2.14514677804554939704@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <178889947167.2.14514677804554939704@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hello, Tejun
+Every ublk test script sources test_common.sh from its own directory:
 
-在 2026/9/9 04:31, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Tue, 08 Sep 2026 18:01:35 +0800, Tao Cui wrote:
-> 
->>  4. One model system-wide vs named models selectable per device (as
->>     tcp-cc names are per-socket)?
-> 
-> The struct_ops instance should be per-device. Loading a model for a device
-> should switch it to BPF automatically. Switching back to the builtin model
-> should detach the struct_ops.
-> 
->>  2. Per-cgroup state lifetime: iocg_id is the css id and is recycled
->>     once the cgroup is removed, so models must treat it as a
->>     transient key.  Does the interface need a release(iocg_id)
->>     callback so models can clean up per-cgroup state instead of
->>     detecting reuse, or is per-cgroup bpf local storage, which
->>     carries its own lifetime, the better home for model state?
-> 
-> I'd pass blkcg as a kptr and add online/offline callbacks so the model can
-> manage its per-cgroup state.
-> 
->> return value of 0 delegates the IO back to the builtin formula, so a
->> model which only handles some IO types cannot make the rest free.
-> 
-> I don't think mixing BPF and builtin pricing makes sense, either per IO or
-> between charging and request sizing. It seems convoluted and error-prone.
-> Implementing the linear model in BPF is straightforward.
-> 
-> Please combine the interface, registration, dispatch and configuration
-> changes into one patch. These patches are small and implement one feature.
-> 
+    . "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
 
-Thanks for the detailed review across the series.
+and test_generic_02/12 additionally run bpftrace against the scripts in
+trace/. Neither test_common.sh nor trace/ is listed in TEST_FILES, so
+"make install" does not copy them into the install directory and every
+ublk test fails when run from there:
 
-All the comments make sense. I'm reworking the interface for v2
-along those lines: the attachment model will be reworked, the
-mixed builtin/BPF pricing path will go away so a model fully owns
-pricing on a device it's attached to (including flushes), the
-per-cgroup state handling is being reworked, operation flags will
-be preserved, and sleepable models will be rejected during
-verification.
+  ./test_generic_02.sh: line 4: .../kselftest_install/ublk/test_common.sh: No such file or directory
+  ./test_generic_02.sh: line 8: _have_program: command not found
 
-The Kconfig dependency, the example model issues, the selftest
-problems, and the patch organization will all be addressed as well.
+The bpftrace tests are affected even when bpftrace is installed: the
+missing trace/*.bt makes bpftrace exit immediately, and the tests then
+report a skip rather than a failure, which hides the problem.
 
-I'll post v2 once it's ready.
+Add both to TEST_FILES, matching how other selftests ship their sourced
+helpers (see kexec/kexec_common_lib.sh and zram/zram_lib.sh).
 
-Thanks,
-Tao
+Fixes: 6aecda00b7d1e1 ("selftests: ublk: add kernel selftests for ublk")
+Fixes: 723977cab4c0fd ("selftests: ublk: add generic_01 for verifying sequential IO order")
+Cc: stable@vger.kernel.org # v6.15+
+Assisted-by: Kiro:claude-opus-5
+Signed-off-by: Mahmoud Nagy Adam <mngyadam@amazon.de>
+---
+ tools/testing/selftests/ublk/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> Thanks.
-> 
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 5daf36c6c36c4c..37883e9d50ec3e 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -73,6 +73,8 @@ TEST_PROGS += test_stress_08.sh
+ TEST_PROGS += test_stress_09.sh
+ 
+ TEST_FILES := settings
++TEST_FILES += test_common.sh
++TEST_FILES += trace
+ 
+ TEST_GEN_PROGS_EXTENDED = kublk metadata_size
+ STANDALONE_UTILS := metadata_size.c
+-- 
+2.47.3
 
