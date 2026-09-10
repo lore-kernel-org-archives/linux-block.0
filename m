@@ -1,235 +1,197 @@
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021137.outbound.protection.outlook.com [52.101.95.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF774471D02;
-	Thu, 10 Sep 2026 16:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.137
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789058613; cv=fail; b=f0A+vwpOBuPy/9SY87xfrxIwT3akwl/Z7rA8ri2dlITSWhLRue202YYBZ3Xv31v0uq2SucILDjDXgUgH+3tuDu/sOHOg4DR4HfFQBKERqIdHZQarRcJGrqTFwHRhUbWlDjtpHtPDda9Hflm1as6lAaB1stfj4Mf6kUTIfjXb0IM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789058613; c=relaxed/simple;
-	bh=LnkPUs8Vz8p22GDgf9p4OU1PLE1tJcz8BCu0Dteq+Eg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KVrJ4esB2cX0SjsRQt4c4btFWvxiUPiBYGHTBJAVrPBnShv9jsMxWwXv/Kdge9umzZN/eLKVurlJV9sXMnk3NeV3oBrdkstDDU7yvwJ2k9zi/QiV03SN3I5UD8c6I7Ggnx9xOur6DycZR5dzfENcrTaAYzfHWXDbIpgvPIcUl3E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.95.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a/dSqjY/9jCUnwX49wqzzqncq/ueSPx4ewZt6Qkb3KWYWei683nyvW+R9tzkSGsynT0poVbIR4R2YSshP/eOVqhy5fjDk8v6om65SaCLdm1OHkP/v6K+ps4p/zXwdk0yx8RIIr0lnWwRx+iNh0TvSYyacP9VJdxClP3jHnvM1qGSRNiLwgiRfy1dgTS3uwMdRPlM+o/ibtOx1FrjTqnJVHoig7NlC8AJqJIW7EygGwd2lRaorRs/KaEfemscTT56/bp0BrH8sEDb3VJ71a5gAJAaTC/wwczQVOT9Rp+9m//g1cKgckwJ0kkG4H9+eLzFMP8RoDDSZxP79Yf+SXBxJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=bJ+B5Mzhzc/vkAtQlWYHFZ7lwRLodwb5bHEtIZ2braA=;
- b=O90E8oCe3TCQTKtIEnGdgU8J7HfiVJnD1ytR62/AhKvnRdVV6tBuicGjxweQ6m0tO7iZRI+Hw+/ZpGmnxAzZvn68g6LH/4CwAGTuCnrbRMrAKiryVseop6qeCNquVCXsEeH5QV6sSjimMjPEDjuhUmPQvUPc9ZAZGo+BH8RSu9k0b/XfgL+Elvk96fyNlBZbS6KGgKkyCXfNZ/87w7pFpPsHtqFh/Hwak0vcJdU/t9iuMCos7WcbEcAb+OrY9JJ3CNjZETWK43UYiBbrYNux1nT0HmYobCpFJxAW9KrVE7byeNRUpfBb+eMgYUa4724IbnAZAzVEPEPrsow0J6uyEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by CWLP123MB4179.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:be::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.9; Thu, 10 Sep
- 2026 16:43:24 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0406.007; Thu, 10 Sep 2026
- 16:43:24 +0000
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: axboe@kernel.dk,
-	tglx@kernel.org,
-	aacraid@microsemi.com,
-	James.Bottomley@HansenPartnership.com,
-	mkp@kernel.org,
-	frederic@kernel.org,
-	bigeasy@linutronix.de
-Cc: atomlin@atomlin.com,
-	ionut.nechita@windriver.com,
-	corbet@lwn.net,
-	vincent.guittot@linaro.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	radu@rendec.net,
-	akpm@linux-foundation.org,
-	steve@abita.co,
-	sean@ashe.io,
-	chjohnst@gmail.com,
-	neelx@suse.com,
-	mproche@gmail.com,
-	nick.lange@gmail.com,
-	marco.crivellari@suse.com,
-	rishil1999@outlook.com,
-	linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v16 9/9] docs: add managed_irq_strict flag to isolcpus
-Date: Thu, 10 Sep 2026 12:42:37 -0400
-Message-ID: <20260910164237.500196-10-atomlin@atomlin.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260910164237.500196-1-atomlin@atomlin.com>
-References: <20260910164237.500196-1-atomlin@atomlin.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH2PR18CA0034.namprd18.prod.outlook.com
- (2603:10b6:610:55::14) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C89A4A8A3F;
+	Thu, 10 Sep 2026 16:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789059160; cv=none; b=YErJaJF/DuxsJWd6AkJMWRmT84rEKTDIyfwHljHtlYlDdBQHeVasusmM5kM1G3mP7iH38AKZh8nU0AG8VUnEkFj0KiRLkzm5ySxvOuMbzoA94/cXverX7AMBWOYUIu2abg49cnx5XbqUPdVXMCZ0YA88c+Jl3AyDpCvyyPj5VCc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789059160; c=relaxed/simple;
+	bh=fSYGuunbzZ4i4xCxug8U7PKL0xZovIOy4VVReg+zoQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QohKFEcFHJFz0sriYTbkhAoC+Hqk7WzLVmLnyksAJ7CC2ZvV4RCg46cQdekSYy2IlHZ2Cv0TiJ+q5dH5VpbH3NCs0NGmNFc7yzsykTmHVSPcb9vAKiFVnXLNsbImyyfMo/TmWgbIHGaRNTIp8uCjqBWgqqZ29ZGBv25+8tLd7Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=s/I2dT8q; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=iRmjXzS4; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B7YOWDK9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+K1KsJ44; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="s/I2dT8q";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="iRmjXzS4";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B7YOWDK9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+K1KsJ44"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7E69B21B4D;
+	Thu, 10 Sep 2026 16:52:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1789059148; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bPNwGzD19Yd8NTGm2yZRzQmdff/uYw4ynY7Z4lTx+uY=;
+	b=s/I2dT8qni8fUFZMuhcUU5FG2aoPeKP2L5jArvIiPbExHEggzFRQGZPgL1HNpa4I0ZlyNv
+	+akAyOIk4x+TR/4LVVgIQPwQR957DS6QqtIEpABqQ+/Z1HRxwAfgIiWN9MEUk0x4ghdAYA
+	aCCLc96ePQO1OVHDj8hn6ascwxyhe3w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1789059148;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bPNwGzD19Yd8NTGm2yZRzQmdff/uYw4ynY7Z4lTx+uY=;
+	b=iRmjXzS4BazWV17voQDGUP0M7U9377Bzr70iX+bWLRIBZJVgXUjEZ5qOBHqrFbtYPJSvW9
+	mJaSbn+p+tv+KBDg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1789059144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bPNwGzD19Yd8NTGm2yZRzQmdff/uYw4ynY7Z4lTx+uY=;
+	b=B7YOWDK90eR033QXrNnYSuCYRJN8DArVVOK/vBPr6mNsYzyNMk5DZRmwsy/DSRbuRWPC9I
+	GbNKzTzNAKWZAiM5gqg1xmXcug+T3Ifb86LquVlV+TTvqlpMXxAIvCB2ESGCPSQqIM27wu
+	3kbTvCON4sbbprPDTlPmfbbobGo9k4g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1789059144;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bPNwGzD19Yd8NTGm2yZRzQmdff/uYw4ynY7Z4lTx+uY=;
+	b=+K1KsJ44jKmWKd+mW6ClzeMLIxtEMc4QuBoin8T2PluVCvinkg++wW9rtl9pudHgJ1WPas
+	/2hqoHUctWd5wzCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 49D4913180;
+	Thu, 10 Sep 2026 16:52:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id dJEAEkjgomqZaAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 10 Sep 2026 16:52:24 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id BEB9AA12EA; Thu, 10 Sep 2026 18:52:23 +0200 (CEST)
+Date: Thu, 10 Sep 2026 18:52:23 +0200
+From: Jan Kara <jack@suse.cz>
+To: Julian Sun <sunjunchao@bytedance.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-security-module@vger.kernel.org, jack@suse.cz, 
+	agruenba@redhat.com, mic@digikod.net, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, aleksa@amutable.com, legion@kernel.org, 
+	djwong@kernel.org, ebiggers@kernel.org, sandeen@redhat.com
+Subject: Re: [PATCH 1/7] fs: remove trailing whitespace from
+ include/linux/fs.h
+Message-ID: <nsy6xdkwzcnl3qezgyug2mnv2ng5744rt2466ua5du3tonrxon@uj6fb4oqri25>
+References: <20260909090112.790006-1-sunjunchao@bytedance.com>
+ <20260909090112.790006-2-sunjunchao@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|CWLP123MB4179:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbccfb6f-2bc5-4f53-0d8b-08df0f5aa1bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|23010399003|366016|10067099003|56012099006|6133799003|3023799007|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	bEiayBMSZcRnZdrYpwyzx2GHAJAQqoHUImcvEnBALidvD8bNDv1p3/gukcX4VB/5EbKdYuDG4/Ku9ntogIzExHaK7loxuvTii5jRYkQ+8ujtdE5pynttehLoWnsz2HLDPAhHG5av9oUgnxq2m7IqqkkjsCKP54sqdljKDz7T2pSF+2vCRhOuLhkNVNKkIjMnOEqpRKxefif3B988rrKjQczsSt9Hu9nzFNT5L/xsOR3geXT4KQHUPVJXD0K3K+OKCNRVKrLmaw9dhYCr3EYQebxQLZMn3dSkUIb3R1AjmRMjI9loLhAkXJcp3amsqgeNxJuVypcDkx6a5mMK6rISmzMuIlVpmj4Sl2Gd3U6pxDqZCQREAy+RiE0h2895uKopwCvdwfjbpWUPvzVh1Ne1UX1t7p6O9N8RZN1F8XO3OfQOmmpRWflwkRa2gIj4LravffJFo8BrAVfYiNjgoiUgkNAjnLvzFghkjvfPSbu94jQoQLw1UvmgGgLPXdlRuvUEfsm4vchg8jPWRwR8KxiNpqu+xUlsUjXuY1Eb+LOR92Ia9k3PVZbUFv4KEzca+SKkMikXd2vbm14PkYSkYRdtseZlsZleD+9n+no1M/TetIdhofgFhRMmy3zGqSXoKGAfTRD7EcD8o0q7xy0rKe4+fwGWw9T3KQYF7uPnN69DJdU=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(23010399003)(366016)(10067099003)(56012099006)(6133799003)(3023799007)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GRlCz6+aM+1vSgP+rFsuahenb7DLqDKFHNKRA6h5SM1elnF5j9a1YTQt9Ayb?=
- =?us-ascii?Q?x5Iv0K66rr+iwy4yiZCeL4ODV+286Z3rwA5AVG6Mg3CPMAbEqU1aI7DWVCch?=
- =?us-ascii?Q?iHjQ999i4lTjIPnO+ecSq9dx9Jr2rWIHCPskyuTZrdCEYZj95GmlrzfIJYbd?=
- =?us-ascii?Q?Y4SViMv47V3n3OuXb2KMfpEFn9cvst51j1NHNth/ICK5QOri3rztaPR5GPy+?=
- =?us-ascii?Q?WGoOE/u7GwAsG7AMkEH45TQ/f8fPKVaehlr5AIuiMt0atZbBCxeYh0+Gc0sb?=
- =?us-ascii?Q?PHkAzWcy6Q3WFWd/PQnHJ8Y5A/gV+iPD2OZ5mey2/qy2juLASRdbpwFpBxo1?=
- =?us-ascii?Q?jFOA5UNBWkRl/dCEwIA0nMOJiAB3hsnTXkdjMGhIlLNB7cfQubm562jZfcob?=
- =?us-ascii?Q?NM7M/cfsJ/yzkduOLtlrtpvjro6Y0e0O6m1JP1GwQMqc0pXwkwL9lNJ1S0hV?=
- =?us-ascii?Q?gu2XEzliPKTlQfhz0KLO8Ni4dIkxHog27N7DFBVdKIdEeu6CYL/VPQy1pRHS?=
- =?us-ascii?Q?2fE4VoA73eq6s3VY7OXxX19hydxNUHiJ54EEGTYQn0bKKepXUh7vHCs3Us/I?=
- =?us-ascii?Q?RnBxJvEkTKNx+YMTEwcpxaDl0zIxj7HAkyMXsX2ygCAoiAwHGZMa5DA6fwt6?=
- =?us-ascii?Q?muX2tQ/3E0ovWQpH+qDfvEQfvTRYyh4RfegNlP3HG0uhQRUE4XXKGB5rsJ6i?=
- =?us-ascii?Q?lYXoiMl53QjeP9Ra0Yu2AdPlZa5TfQAX2Y49k4N3rEpMYi9By32gKlv7ms7+?=
- =?us-ascii?Q?W9Jx9bHHer8gOnwYZT2Bsv1shlw/0qEzxBOTw/8djh9MyRyu5wAXjYlM5cPl?=
- =?us-ascii?Q?dxRPQv1ScARm9yvytGNG8F+vPAAW0DlLeMCnq239agdYpaIfYAfQNu+6CRKg?=
- =?us-ascii?Q?LSC91Qe+OKSzbKoWIKYUB/zW+5YWsIC6bgp9PFUNdbVrCIEE6GVQ2NCNgWJA?=
- =?us-ascii?Q?SSkUcGcKsR8Yd1thpgwU4KQ+f9EabGbWgCFfUHYtgBLqwSzPjOCRCzhYgm5j?=
- =?us-ascii?Q?Iq9EpCvolAWM9x79VLde8ayWPDvoSmSen7tgFbUlUV4FyXAvGWjNns9vGFvT?=
- =?us-ascii?Q?G6vPZ8FXJgXwbK3PXKrjMOGtxSrPLT/m9gwY0zVVixNLUCy7TEW9mKQPzSRl?=
- =?us-ascii?Q?qlAbolIukX3M2KvqamGG2KXbJAN3oBfsIq5heOt3Y/3vuLTg+24+UaN/84Ai?=
- =?us-ascii?Q?usRnBGCcFDU39MjPbxPJTuwzpUUq0ef/3iAnxZ5sYLAf8jRN6IctePBntv4v?=
- =?us-ascii?Q?zEeM5puLeddrZ4E3l6bYXEId9pHuYzFIFoRyRwxukGCvNOGITYxSBtU+W1E9?=
- =?us-ascii?Q?j0YyxHTF4H1OdAkUSz54bqgWqXkTVgKILSs4L+wLZeF/NdK9qN2OK09gzEOH?=
- =?us-ascii?Q?y9kixhIsGJB9QqQdl9O0gEvP/E3nOrX5S1VHloP3CiozqBfqGCIEw1gqH4KP?=
- =?us-ascii?Q?fUOy3ciqn7kqxw7BatMcyI8W/iNYFCYotq4XIFx8qbwBCF/yWlNNTm9yQc1I?=
- =?us-ascii?Q?GzmOE3tjjdqPNyTZVbZz5wpSrc/avsaUFGFSTxTyhJsYWsIsCY/OJlJaz+rM?=
- =?us-ascii?Q?a1vuGL5yYHHaUBBOll617iEn2erggrLfSMIxMtZb3xa2GHAdqoHzbBnrsraa?=
- =?us-ascii?Q?dk8k6x+rCVMCBz1nsW2JZsX+qJkQsSqhPgk4xq/HiSFH6uTDDrr3A/jCVif8?=
- =?us-ascii?Q?ZAg3eioc06ZLgpf3WQ+ipW7yBx2n5Co7cyT5Dszh2Do+l0oRoNSIr+3EleQ9?=
- =?us-ascii?Q?a+jadWwDww=3D=3D?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbccfb6f-2bc5-4f53-0d8b-08df0f5aa1bb
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2026 16:43:24.6534
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xGssOx2eql90NgivJLi4uzLhcoElFZFsk0c2DIF4mM81v13EZ508K4Cf/lz/9Pt7lNeQWwuOwOXAnCXLVcDTBg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP123MB4179
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260909090112.790006-2-sunjunchao@bytedance.com>
+X-Spam-Score: -3.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email,bytedance.com:email]
+X-Spam-Flag: NO
 
-From: Daniel Wagner <wagi@kernel.org>
+On Wed 09-09-26 17:01:06, Julian Sun wrote:
+> Remove trailing whitespace before introducing the inode iterator API.
+> This avoids unrelated whitespace changes from automatic editor cleanup
+> in the following patches. This also fixes formatting issues in fs.h
+> reported by scripts/checkpatch.pl.
+> 
+> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
 
-The managed_irq_strict flag informs multiqueue device drivers where to
-place hardware queues and managed interrupt vectors. Document this new
-flag in the isolcpus command-line argument description, describe its
-relationship and precedence with respect to the legacy managed_irq flag,
-and document HK_TYPE_MANAGED_IRQ_STRICT in the core housekeeping guide.
+We generally try to avoid whitespace only or style only changes as they
+hurt backportability mostly unnecessarily. But this patch looks harmless
+enough so feel free to add:
 
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Co-developed-by: Aaron Tomlin <atomlin@atomlin.com>
-Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
----
- .../admin-guide/kernel-parameters.txt         | 37 ++++++++++++++++++-
- Documentation/core-api/housekeeping.rst       |  6 ++-
- 2 files changed, 41 insertions(+), 2 deletions(-)
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 68647ff4bdd2..eb608e5139a6 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2822,7 +2822,6 @@ Kernel parameters
- 			  "number of CPUs in system - 1".
- 
- 			managed_irq
--
- 			  Isolate from being targeted by managed interrupts
- 			  which have an interrupt mask containing isolated
- 			  CPUs. The affinity of managed interrupts is
-@@ -2845,6 +2844,42 @@ Kernel parameters
- 			  housekeeping CPUs has no influence on those
- 			  queues.
- 
-+			managed_irq_strict
-+			  Strictly restrict multiqueue hardware queue
-+			  allocation and managed interrupt affinity to
-+			  housekeeping CPUs. Unlike the best-effort
-+			  managed_irq flag, this option guarantees that
-+			  managed interrupts and multiqueue block device
-+			  queues are never created for or mapped to isolated
-+			  CPUs.
-+
-+			  In the block layer (blk-mq), device queue allocation
-+			  and CPU-to-queue mappings are restricted to
-+			  housekeeping CPUs. For devices using managed
-+			  interrupts, hardware completion interrupts are routed
-+			  exclusively to housekeeping cores, shielding isolated
-+			  CPUs from I/O interruptions even if they initiated the
-+			  request.
-+
-+			  If both managed_irq and managed_irq_strict are
-+			  specified, managed_irq_strict takes precedence.
-+
-+			  Note: Using managed_irq_strict restricts the number
-+			  of allocated hardware queues to match the number of
-+			  housekeeping CPUs for single-set drivers. This
-+			  prevents MSI-X vector exhaustion and forces isolated
-+			  CPUs to share submission queues.
-+
-+			  Note: Offlining housekeeping CPUs which serve
-+			  isolated CPUs will fail. The isolated CPUs must
-+			  be offlined before offlining the housekeeping
-+			  CPUs.
-+
-+			  Note: When I/O is submitted by an application on
-+			  an isolated CPU, the hardware completion
-+			  interrupt is handled entirely by a housekeeping
-+			  CPU.
-+
- 			The format of <cpu-list> is described above.
- 
- 	iucv=		[HW,NET]
-diff --git a/Documentation/core-api/housekeeping.rst b/Documentation/core-api/housekeeping.rst
-index ccb0a88b9cb3..6d08c71e6c0e 100644
---- a/Documentation/core-api/housekeeping.rst
-+++ b/Documentation/core-api/housekeeping.rst
-@@ -23,7 +23,7 @@ CPU. It is simply a CPU that can execute housekeeping work. There must
- always be at least one online housekeeping CPU at any time. The CPUs that
- are not	isolated are automatically assigned as housekeeping.
- 
--Housekeeping is currently divided in four features described
-+Housekeeping is currently divided in five features described
- by the ``enum hk_type type``:
- 
- 1.	HK_TYPE_DOMAIN matches the work moved away by scheduler domain
-@@ -44,6 +44,10 @@ by the ``enum hk_type type``:
- 	to HK_TYPE_DOMAIN except it ignores the isolation performed by
- 	cpusets.
- 
-+5.	HK_TYPE_MANAGED_IRQ_STRICT matches the multiqueue block devices and
-+	managed IRQs strictly restricted to housekeeping CPUs through
-+	``isolcpus=managed_irq_strict``.
-+
- 
- Housekeeping cpumasks
- =================================
+								Honza
+
+> ---
+>  include/linux/fs.h | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index f9d1e05e8ae6..09c4db5e9ae0 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -296,7 +296,7 @@ struct iattr {
+>   */
+>  #define FILESYSTEM_MAX_STACK_DEPTH 2
+>  
+> -/** 
+> +/**
+>   * enum positive_aop_returns - aop return codes with specific semantics
+>   *
+>   * @AOP_WRITEPAGE_ACTIVATE: Informs the caller that page writeback has
+> @@ -306,7 +306,7 @@ struct iattr {
+>   * 			    be a candidate for writeback again in the near
+>   * 			    future.  Other callers must be careful to unlock
+>   * 			    the page if they get this return.  Returned by
+> - * 			    writepage(); 
+> + *			    writepage();
+>   *
+>   * @AOP_TRUNCATED_PAGE: The AOP method that was handed a locked page has
+>   *  			unlocked it and the page might have been truncated.
+> @@ -1315,8 +1315,10 @@ struct file *get_file_active(struct file **f);
+>  
+>  #define	MAX_NON_LFS	((1UL<<31) - 1)
+>  
+> -/* Page cache limit. The filesystems should put that into their s_maxbytes 
+> -   limits, otherwise bad things can happen in VM. */ 
+> +/*
+> + * Page cache limit. The filesystems should put that into their s_maxbytes
+> + * limits, otherwise bad things can happen in VM.
+> + */
+>  #if BITS_PER_LONG==32
+>  #define MAX_LFS_FILESIZE	((loff_t)ULONG_MAX << PAGE_SHIFT)
+>  #elif BITS_PER_LONG==64
+> @@ -2285,7 +2287,7 @@ int sync_inode_metadata(struct inode *inode, int wait);
+>  struct file_system_type {
+>  	const char *name;
+>  	int fs_flags;
+> -#define FS_REQUIRES_DEV		1 
+> +#define FS_REQUIRES_DEV		1
+>  #define FS_BINARY_MOUNTDATA	2
+>  #define FS_HAS_SUBTYPE		4
+>  #define FS_USERNS_MOUNT		8	/* Can be mounted by userns root */
+> @@ -2907,7 +2909,7 @@ ssize_t __kernel_read(struct file *file, void *buf, size_t count, loff_t *pos);
+>  extern ssize_t kernel_write(struct file *, const void *, size_t, loff_t *);
+>  extern ssize_t __kernel_write(struct file *, const void *, size_t, loff_t *);
+>  extern struct file * open_exec(const char *);
+> - 
+> +
+>  /* fs/dcache.c -- generic fs support functions */
+>  extern bool is_subdir(struct dentry *, struct dentry *);
+>  extern bool path_is_under(const struct path *, const struct path *);
+> -- 
+> 2.39.5
+> 
 -- 
-2.55.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
