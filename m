@@ -1,239 +1,192 @@
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020142.outbound.protection.outlook.com [52.101.196.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4AE47D460;
-	Thu, 10 Sep 2026 11:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.142
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789041198; cv=fail; b=jM4TU+/cn8c9euL5sqrE53TN6uO4/WQcKbLl4UtXGaLnnnEwRk7x0GXr7DH+2VsVmGET5ljkwihlpnUlNW2riZk7DhiAZoJkd98Wb9w19hFItQTzyAOC7qoKBeRB3CQ1mnmhGHlo6tv0HjSJb4tulRMDphEQqv7iHGKVFvunrm8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789041198; c=relaxed/simple;
-	bh=mis+9m4PePU+MlURn0+BRA5EoyBVFRTh+oM9u97uSZk=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=f/bSRQt0AVxxT3EWWWEBfRQ1tHClPQgcfXBaSsVdFANbrM4vin9pElq1N2Ca1sXfXPeGdxod6ji+EH0iydTXMZhg0ciplebBHk4PntAfI+1vcSUhdtEzk/WLgHfjhciOcS6Rb/l58nqAPuoqj7ATR1J+Kjx/yZ+O6jQ2y2JIzX4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=KdRU7BpB; arc=fail smtp.client-ip=52.101.196.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE1E4825A8;
+	Thu, 10 Sep 2026 12:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789041674; cv=none; b=dXu0MTJ2WeXflpyHflQj6KzevOIZgYsWfTue1fxCBmlBeRCndFZq1xporWDHWrA0VWPrAMEJBx57m0v8aal1jdAmHnm31BgxFzoR1JEgdKoKzmYtsrJhZzc9FKm0gkz9QnBb1Ux5cgv+VO2bUDisEKiyOhgvji14r+1KCgv1P3k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789041674; c=relaxed/simple;
+	bh=EiLR1oNWBTUfzhayliGRuhK28Eyt3bB++mx+A/XcLOA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DcIYDLr/DRAS0Tkr2w2joZBTyY7xkfu7XFx37oQCeogx6SlElYC+Mp9expgPEhBavaBt5xGeJv6Q94zEBEGy2ERFbcVgtjQW/7uwcjDK64fztPindAM79CCaB4EhrAnwqBxdH3KLCVcnX/gJ/SsPq33kdBZk5dRFRjQbQ+g7waw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhEat1/v; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="KdRU7BpB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eopGiQ/H7JUlqKhYEeLmGaLFzqVWMUssNIL5gGSz+UFqaLF/icw4mBmor5kgdyn9c9fhwnZ7RM6715jbtKe9dZ408NCYfu5oAuyaTLHBNQb1lfGGAEvb6VnLv6hfYQFqtvSSjGpa1cSgFGO2iaKZifdqCspbdPODHkJkcfCPTfWiFUgboybRAZT1clbt6BJQxbSyTEbsaPvqBZnQhjCZ9NV1HhkReEdmHyNX4xHMYIeX/P+noF6K4YpkkQZdii7Td62/PTn0aX5ceaFEAzNkBcZP/u3QtFqiHSk3Uzxk8kcNtF+tl9VZhPEY5vAduGN5HDA06BSauCZa16CkXIcOag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HJi+P5rJVUgbxW7rvcOQda+09y57Bnf36RvvQnm92Zw=;
- b=jzjeO9nagkfoPf6RfcQgwW0VponxZYSJLTl/FZBSwHx0hBgZlxeRq9cSNI3E4hkJZGhjTCG4oJfvmVdBWSKv/1djhQNXLW4zn7jY7DnBn8TnyaviGTcbtdO+iCPdMChxhpJrI1Y/B0/8ar/LOyZGPzDEPfoMfEdbB7YQpqjgM5AowvoyHHQHIf+JD+wOJ8TD8ypFPN4zy0U0l1Elalcy5+ZmGy8n7/fhntv3vsAUIMBnuuAlPr1DERhHqUfndHPHguR3hWWrHAWZ6wWrnCGhEa6apBt3AB60P+E8fGr/xF5YifAStuhDI13zErY+uAyfB2sOLZdIc6LJicMw9C4NuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HJi+P5rJVUgbxW7rvcOQda+09y57Bnf36RvvQnm92Zw=;
- b=KdRU7BpBXyp0jqV+Jnr1zaWtw7US63BRALU44j+0/KpRovWKiZMfWC491CMpRfPZVNkuadilhVsfa4EM/iK+PmABStJdWXMTJBVYd3yzfamsWmf4U6jS1NXySaGx36SO2Fu12DsvrSOEt8VJdFaAnBVfjKZpLcZw2OCatKQhAXc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4ab::19)
- by LO7P265MB7437.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:41d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.9; Thu, 10 Sep
- 2026 11:53:03 +0000
-Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- ([fe80::f60b:1537:68d7:4fc1]) by LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- ([fe80::f60b:1537:68d7:4fc1%4]) with mapi id 15.21.0406.007; Thu, 10 Sep 2026
- 11:53:02 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 10 Sep 2026 12:53:02 +0100
-Message-Id: <DLBM64YIHJ5U.3NZZTGR2NP75Y@garyguo.net>
-Cc: "Al Viro" <viro@zeniv.linux.org.uk>, "Andrew Morton"
- <akpm@linux-foundation.org>, "Brian Foster" <bfoster@redhat.com>, "Damien
- Le Moal" <dlemoal@kernel.org>, "Hillf Danton" <hdanton@sina.com>, "Markus
- Elfring" <Markus.Elfring@web.de>, "Ming Lei" <tom.leiming@gmail.com>, "Qu
- Wenruo" <wqu@suse.com>, "Tao Cui" <cui.tao@linux.dev>, "kernel test robot"
- <lkp@intel.com>, "linux-block" <linux-block@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>
-Subject: Re: [PATCH 1/2] block: Add post_release() operation
-From: "Gary Guo" <gary@garyguo.net>
-To: "Tetsuo Handa" <penguin-kernel@I-love.SAKURA.ne.jp>, "Jens Axboe"
- <axboe@kernel.dk>, "Bart Van Assche" <bvanassche@acm.org>, "Christoph
- Hellwig" <hch@lst.de>
-X-Mailer: aerc 0.22.0
-References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
-In-Reply-To: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
-X-ClientProxiedBy: LO3P123CA0026.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:388::6) To LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:4ab::19)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhEat1/v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C017C1F000FF;
+	Thu, 10 Sep 2026 12:01:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789041672;
+	bh=gGRiP00UZ2QnxQeyHEnzHM+4PwMNnzfPUpjThhppjiI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=FhEat1/vifu+AabmjF8NmJPEP65qR4NBg4Ky/6jU3lo17Q0Zo2BhNylfwMKgXlIDI
+	 UMImBV5640D83WmIILt73l8RjBygDF6Mt7gu1/ntqS0oBR8lidQsw7r3Sj2i5WdR8V
+	 INjCSwvtzlHK8kPH7G5nIBuVR3YVGY4ybJh+g5gGSFGtxyX6EYVptvqJMZZwjeQfGi
+	 aeG04jNaLuKWedKy71l1HWQfVdwcFptEjzJJ89C6fdNfHpJadbzrMhFXlVUL2CJHgj
+	 w8mBMnWhfb9D+zFJggWb28AQFcd5s8vG8Yuhm57TZx5ehR5Gfv4Ij2Aijxv4bMLNbQ
+	 hZcM2Ic2G/G5A==
+Message-ID: <ddab52d0-48c7-4d2c-b403-45f11e041654@kernel.org>
+Date: Thu, 10 Sep 2026 14:01:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOAP265MB8560:EE_|LO7P265MB7437:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7742ebed-9c5d-4e66-a1fe-08df0f321175
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|7416014|376014|366016|10070799003|10067099003|5023799004|56012099006|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	C48v3JlltlBsh73fIJSjsiZKSjfuHD6KTqYgol3dhnx838bbaOc7ovhJy+xqOkgqi8uYuifuw5jw3Wf6lv5G5GgXYwGo9WjhK5hfXj9+Q2aIXP7nk507+Vqy7qUZNnrU21vkW6e1yHcJRF3TNOZfplgEaG84lqpWnBFq2HzuKVXXQfGbiNpNQ+FBXLFbFWNtwXm9ZKEosBhCO1qacyMkldQS0Zp5glUDWK10RCe5mAQ4Nh0xBANaCVVixPjO/v9SkVzUmR3ZOPJCxVIRgevJBrojTAhp4GlgDA15d1Wh4fhYuGBrM3H3pgxQ/hJ7C/QejqaB6CpY6vmMDhhmEgtLVeNsNJB2bkInM56qA8sn9nVpqfa86aXLxwum9W0VmsHjhuNBX5/3V0u1ub0dgpZnu6dFOePWKaVt6NZ4GPqz1tHxcqFTZe7c/KhDB2e5eLCInRODoR2Mw6jke6UC4lTWyQf8Y+zE45gGIfSYBXPncuAN7d+XsZCxw9c2cPMTrwmc3CLOa87R049XzVJj4SfUa4sbKPtC2NIg0n6W3KU9o6HyNVZqQ95H22cVgknEbpqV3IHazfG4iNMmO/M7legIpw5l+ugsTdutJwF/Ri59m0XqAq+s0ICdJQ81MuS4uVFSlMOTWvuCEOmy2ctvHzty9JdL0QYdz6UqTqqwXmD+HT8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(7416014)(376014)(366016)(10070799003)(10067099003)(5023799004)(56012099006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bWZjNXJUUTZkUWlwVkU1bktJVmJjY3crbTRNVy9iR25DVks4bWdVRVUzYkE3?=
- =?utf-8?B?ZCtlMG9hVktGcFp1Ly9qeGVnaXhla1ZDTFB1WW5FTHlxRXpOVDFhU3U2WjJF?=
- =?utf-8?B?TXlQS0ZOMEh4dVhiWFpKMjFEYnpaRXQva3JoYWs5cE83STJndnR2Ym1hUGk3?=
- =?utf-8?B?Zm50V0xVekhXRURtZjBBSXZaOWZISXE3YlluYk9FWjJxVDdJcGxQa0dQck83?=
- =?utf-8?B?RjI4b0dZOWtCdHBqc053L1hkc2NvNldNZm13bDFmSHVJK2NvNnZPVER5Z2hx?=
- =?utf-8?B?NUdRQXRLTmJCQ010aFdTT1ZubHdqT0djWko3SUxDODlwZlJtcG5OcnB3ckRj?=
- =?utf-8?B?REhkdGs3WW90UnF4bE5pVnlHdSs4T2VvTVJHdTlhcWtWR1hZUzBYcjFLZHBv?=
- =?utf-8?B?ZW9sV0lEeE5hNWRCcXVpWEx4Zmd3eHVCTm1CakxEV2FzVW1JM095ZFhGY1Fx?=
- =?utf-8?B?YVkzWmgwY0lVb2VHU1lEYXJpd044WkNVUmsrMWdmUFg5SE0xZTZwV1AxajNX?=
- =?utf-8?B?Ly96VGk0SGpPemFKRWQ4cnNLSEV4ZkE3azNqNUtWRC9KZTcydUVXbm9rSEFw?=
- =?utf-8?B?Z0twYnpnbGtPYXppQ3RKeTNZSEN0ZzhaR3VPUVYwT2x5T0k2aW1WQVJQQ0NT?=
- =?utf-8?B?SENBazhmNXkrNUs0WCs5S0l4bDh2Wkw5R3M0cWZVWFdXSzNoanFFRUtueW9Y?=
- =?utf-8?B?TXllRjh3OE12S1FwZHh5TkpPR0Z4dDZWQXB5Y1puZGZpcXplbmE0YVlVdFVn?=
- =?utf-8?B?WjFxNC9Pck1JTTVVanpTV2xrOElrZUtzeUZJa1lXMUsrb29hOTFKSVgyS2tC?=
- =?utf-8?B?TEFrSStUeHpuNWd5RG1rYTYzQmZyM0RVc2RoOFdWZkJuRDlNZHc3NXl1OVBU?=
- =?utf-8?B?WHg0NHl6R25vVEc4V2szMU93Q09iczk2T3JRdmVtVnptMWdjeEJGQmdxZUxw?=
- =?utf-8?B?dTZlUDVLS0hGOU1zZVJwbVJUTGptd2FLV3N0V1NnbDlCVm9qV0I5S3MrWkIy?=
- =?utf-8?B?WDhmbzFyMG8wSHZFdkpTRDlZS1lnc1J2N0FZSWxxd1JncjZ5VWNQRXpHMHY3?=
- =?utf-8?B?WDVUYkpXVWJGbFZlaEw3Q2FwZ2ovZnZFV2Y1aFptbCtneDYzY1JCcHZJKytV?=
- =?utf-8?B?M0tOajNwMjI0RDcrcllnelZBWUpJNEJpelhacG51MFNqT1FRTUwxS2RrR3BE?=
- =?utf-8?B?djZobndmMEpJazRnL3JwTTRVcEIvczZLM0pUaThhWTYwbUlSMStRdVFqSFpk?=
- =?utf-8?B?eDhIb1RkazZlMzVGZjhiWUdqaUJ5aFlVb1pUNVJoVEk0dEFmVnU4cXphNmI4?=
- =?utf-8?B?V3ZnSzNGTkpzNEpQVXdlQ3k5YytJV1lXOUxYWXNWby9YRjVNYVVhbC9sN3dW?=
- =?utf-8?B?TDAwaDhVUVN2K3ZiRUVkK0E4VDQvNFVtSjg0M09zeXV5NTNnajY5eVRIUXVu?=
- =?utf-8?B?WTFiU2hVeWNYdk51ZGtqSXUwZzY3dElnVUJDOUhFT0Z0OWdaM3pGWHdFR09X?=
- =?utf-8?B?bmEwMFRmY2V5N0FRSmh3TlpzbThSRjZnMXN1bXpVbWo2WkN5QUVJMCtXSDVs?=
- =?utf-8?B?K25TYjhRRHhFTk14R0MvUEVhQzV5ZllwbVZ2VFIwSE5jSTd6ZzF3UklUYytC?=
- =?utf-8?B?c2FxSWtxMWUvU2dYSGtVWXhNckdhcnhabjJYblRuV3NWMUl2OElmd2J5eGhP?=
- =?utf-8?B?dW9TOWR0c1BBK3hTUEZXQTJqSzU2Q01wTkpQZzF5U1Q5VVFSWWtLYWNPdW1y?=
- =?utf-8?B?VjN4OXdFcE1RY3pKekZTNHByMk82eXBBdXUwMTFiUThjcXpRWDYrMUw0UjFH?=
- =?utf-8?B?dFhjWW5iWmgrcFpBNkpwZHFRTWRZQkFRRzJPY21IclMvdVJVZlduZ3pDOGt6?=
- =?utf-8?B?ZmtYY3RvcmxDL2szMHFYREhRQkFUWVoxSlVwci9JUlFkYTZ6SUxLUHViN1JW?=
- =?utf-8?B?aWVkTDVzTEUzVFpRQXVHNmFYMVhCZklUMVFGQ3pKQVhTbDVhd1p2Wnh1QWI1?=
- =?utf-8?B?VWxFeElnbzMybFdXbXFXVExjZ2N3Wnp6eCtUTmRuME81K2JPa3pURUJLOVBl?=
- =?utf-8?B?N21vWHVCZCt2S3Zxd2cva0FnSml6VTRRTENqRHQyK3lYOHZqSWpYZ3VVMFFE?=
- =?utf-8?B?dmc5TVJEaWJ5SjNwOXBOMEdqK05mRzJxMDVBd0R6NUZTYTJXRGNJQlFHdHJr?=
- =?utf-8?B?VUt0dUtrdTNreDFiaVhlR1ZDYTNqWWpURXFuaklvTHdJRFk2bGJ3WTk1cFRv?=
- =?utf-8?B?YmZGWXR1ZjlQRWtiNEVmOFZoUXNFcFdCb0pjTkt3ZVgzREVIR2Y1dmcxZEI2?=
- =?utf-8?B?VVY3WERSTUx5akxzU2lycTF6Ulkrdk0vbi9mdVJ6NlFjaE1jSHhkUT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7742ebed-9c5d-4e66-a1fe-08df0f321175
-X-MS-Exchange-CrossTenant-AuthSource: LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2026 11:53:02.6825
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x975aILJj0Q6chZXRQGFYYhWChYx+UEPsCmG34yrzUDottTq4D3sP43q+UuB7KRXBmfjKKnjjgbpkdFvsclH5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO7P265MB7437
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/26] mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize
+ folio_activate()
+Content-Language: en-US
+To: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Ackerley Tng <ackerleytng@google.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Barry Song <baohua@kernel.org>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Christian Brauner
+ <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Christoph Lameter <cl@gentwo.org>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>,
+ JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Kairui Song <ryncsn@gmail.com>, Kiryl Shutsemau <kas@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>,
+ Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>,
+ Mel Gorman <mgorman@techsingularity.net>, Miaohe Lin <linmiaohe@huawei.com>,
+ Michal Hocko <mhocko@suse.com>, Minchan Kim <minchan@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ Peter Zijlstra <peterz@infradead.org>, Qi Zheng <qi.zheng@linux.dev>,
+ Rik van Riel <riel@surriel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan
+ <surenb@google.com>, Yang Shi <yang@os.amperecomputing.com>,
+ Yu Zhao <yuzhao@google.com>, Zach O'Keefe <zokeefe@google.com>,
+ Zi Yan <ziy@nvidia.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org
+References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
+ <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+Autocrypt: addr=vbabka@kernel.org; keydata=
+ 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
+In-Reply-To: <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed Sep 9, 2026 at 11:48 AM BST, Tetsuo Handa wrote:
-> Add post_release() block device operation which provides a hook for
-> performing synchronous cleanup without disk->open_mutex held, which is
-> needed by the loop devices.
->
-> Real-world container engines, test suites, and system utilities rely on
-> fput() from __loop_clr_fd() being completed when lo_release() returns.
-> But changes which went to the v7.1 merge window broke an assumption that
-
-What change? You should mention it with a Fixes tag.
-
-The message should also explain how the assumption is broken, not just stat=
-ing
-that it's broken.
-
-> there is no outstanding I/O when __loop_clr_fd() is called, causing NULL
-> pointer dereference problem in lo_rw_aio().
->
-> In order to fix this regression, we want to allow __loop_clr_fd() to flus=
-h
-> outstanding I/O. But calling drain_workqueue() from __loop_clr_fd() with
-> disk->open_mutex held causes lockdep warnings. We need a mechanism which
-> can flush outstanding I/O without disk->open_mutex held.
->
-> This post_release() operation is intended for performing only idempotent
-> actions such as flush_work(), for nothing prevents multiple threads from
-> concurrently calling this operation. That is, the loop device schedules
-> a work_struct for calling __loop_clr_fd() from lo_release() where
-> disk->open_mutex is held, and waits for completion of that work_struct
-> using post_release() operation where disk->open_mutex is not held.
->
-> Also, this post_release() operation is called from only bdev_release()
-> path. This is because loop_configure() is not yet called (there is nothin=
-g
-> to clear) if something went wrong between an initialization lo_open() and
-> an error-unwinding lo_release() within the bdev_open() path.
->
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+On 9/9/26 11:55, Hugh Dickins wrote:
+> Implement an equivalent to the old __lru_cache_activate_folio()
+> optimization, to activate a folio recently put in the lru_add fbatch,
+> without having to put it through the lru_activate fbatch too. Neither
+> lruvec lock nor lru bit can guard this safely and efficiently, so resort
+> to try_cmpxchg() on a further, LRU_NEXT_ACTIVATE bit in folio->lru_next.
+> 
+> Signed-off-by: Hugh Dickins <hughd@google.com>
 > ---
->  block/bdev.c                     | 2 ++
->  include/linux/blkdev.h           | 6 ++++++
->  rust/kernel/block/mq/gen_disk.rs | 1 +
->  3 files changed, 9 insertions(+)
->
-> diff --git a/block/bdev.c b/block/bdev.c
-> index cd8323083740..7ce5acaacf43 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -1188,6 +1188,8 @@ void bdev_release(struct file *bdev_file)
->  	else
->  		blkdev_put_whole(bdev);
->  	mutex_unlock(&disk->open_mutex);
-> +	if (bdev->bd_disk->fops->post_release)
-> +		bdev->bd_disk->fops->post_release(bdev->bd_disk);
-> =20
->  	module_put(disk->fops->owner);
->  put_no_open:
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 4f7905c3412b..f05dba1b5962 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1605,6 +1605,12 @@ struct block_device_operations {
->  	 * driver.
->  	 */
->  	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
-> +	/*
-> +	 * Called after disk->open_mutex is released in the bdev_release() path=
-.
-> +	 * Used by loop devices that need to perform synchronization without
-> +	 * holding disk->open_mutex. This operation has to be idempotent.
-> +	 */
-> +	void (*post_release)(struct gendisk *disk);
+>  include/linux/mm_inline.h |  4 ++++
+>  mm/folio.c                | 23 ++++++++++++++++++++---
+>  2 files changed, 24 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/mm_inline.h b/include/linux/mm_inline.h
+> index 8420b1276535..8f5efadf9c7c 100644
+> --- a/include/linux/mm_inline.h
+> +++ b/include/linux/mm_inline.h
+> @@ -346,6 +346,7 @@ static inline void folio_migrate_refs(struct folio *new, const struct folio *old
+>  enum {
+>  	LRU_NEXT_NEVER_TAIL = 0,	/* Used by a tail's compound_head */
+>  	LRU_NEXT_BATCHED = 1,		/* Not used by any aligned pointer */
+> +	LRU_NEXT_ACTIVATE,
+>  	NR_LRU_NEXT_FLAGS
 >  };
-> =20
->  #ifdef CONFIG_COMPAT
-> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_=
-disk.rs
-> index fc97dd873974..2ff77ef49781 100644
-> --- a/rust/kernel/block/mq/gen_disk.rs
-> +++ b/rust/kernel/block/mq/gen_disk.rs
-> @@ -129,6 +129,7 @@ pub fn build<T: Operations>(
->              submit_bio: None,
->              open: None,
->              release: None,
-> +            post_release: None,
->              ioctl: None,
->              compat_ioctl: None,
->              check_events: None,
 
-You can use
+This addition, and the comment "/* This mask will do nothing on 64-bit */"
+in folio_add_lru()... does it mean that now this is breaking 32-bit? Should
+we make this optimization, or perhaps all of the cpu fbatch, 64-bit only?
 
-    ..pin_init::zeroed()
-
-to have all other fields zeroed. It might be beneficial if we care about kn=
-owing
-all new callbacks, but it doesn't look this is the new case.
-
-We probably should remove all `None` assignments so it's all covered by the
-`..zeroed()`, but that'll need to be its own patch.
-
-Best,
-Gary
+> @@ -358,6 +359,9 @@ bool lru_add_del_folio(struct folio *folio)
+>  	if (!(lru_next & BIT(LRU_NEXT_BATCHED)))
+>  		return false;
+>  
+> +	if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> +		folio_set_active(folio);
+> +
+>  	WRITE_ONCE(folio->lru.next, LIST_POISON1);
+>  	/* BUG_ON(folio->lru_next & BIT(LRU_NEXT_BATCHED)); */
+>  
+> diff --git a/mm/folio.c b/mm/folio.c
+> index a18d8ef6afd5..0b75c3b69d5a 100644
+> --- a/mm/folio.c
+> +++ b/mm/folio.c
+> @@ -256,15 +256,32 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
+>  
+>  void folio_activate(struct folio *folio)
+>  {
+> +	unsigned long lru_next;
+> +
+>  	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
+>  	    !folio_test_lru(folio))
+>  		return;
+>  
+>  	/*
+> -	 * XXX: It is curiously difficult to recreate safely the old
+> -	 * __lru_cache_activate_folio() optimization (folio_set_active()
+> -	 * directly if it's on the local lru_add fbatch): revisit later.
+> +	 * This optimization is intended for the common case of folio
+> +	 * having been recently added to this CPU's lru_add fbatch.
+> +	 * But since other CPUs can now take it at any instant (after
+> +	 * a folio_test_clear_lru()), and we may be migrated to another
+> +	 * CPU, it is simplest just to extend the optimization to all CPUs.
+> +	 *
+> +	 * folio_set_active() would be unsafe without the lruvec lock, and
+> +	 * a folio_test_clear_lru() here might cause a racing drain of the
+> +	 * lru_add fbatch to skip its lru_add(): so use try_cmpxchg().
+>  	 */
+> +	lru_next = READ_ONCE(folio->lru_next);
+> +	while (lru_next & BIT(LRU_NEXT_BATCHED)) {
+> +		if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> +			return;
+> +		if (try_cmpxchg(&folio->lru_next, &lru_next,
+> +				lru_next | BIT(LRU_NEXT_ACTIVATE)))
+> +			return;
+> +	}
+> +
+>  	folio_batch_add_and_move(folio, lru_activate);
+>  }
+>  
 
