@@ -1,187 +1,191 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A994A4828;
-	Thu, 10 Sep 2026 15:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A90381B0F
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 16:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789053293; cv=none; b=H0602q5RjZxx5jo7GkZrgBuGjLebwdfJ4NOt5m8ulOdOy+QWwGjVX3iOQ1bFVqGh4/ehDQYcWzhzedrRCKG0dK6oSMIMXdjKKn3fjer/5qYZ94gXaQKE/k7kXadjylzZlQuWzS+m+IexJunVFG+nMntDNaZ6ovYYdeBBazdt5eM=
+	t=1789057872; cv=none; b=ZciULjqeiXBvLplA3GalCwPFC4mfcJBVzB9UIpHCDBM03oMXjsXSfQPw/NkJmz/eqKyA2RXPG0cVxP6pk4JjB2WsVkCyocBC806000Bi3LFtLH6j5BLbwdWlVbMEjodiaCoLQasFjshAu/ReZZZ5+AqAVaoSDiJtZDbxErSSEZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789053293; c=relaxed/simple;
-	bh=xPUnhtmCJL1zjENUgzc4+IJ2FCGKfLyvIqteJcfnq4M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FcugArNubDwKvVgh/KrMF0HUWXK4c1Onqgg1NvbDQEE6A9bj4J/fm6S647ABMa5YuHYFIZ0rbYT8wXRgstfq65g7SfwI9FSHov95AmPGwvNX4UDBw+oXtSLFez0y0AiXTGdcWmOrAE5seo3fawEA72I83hSdp70/cz9Srin85p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oyLoMfxZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1789057872; c=relaxed/simple;
+	bh=kcJgGBv43uV4lQuuDHe4VjFldBPqvQ8pUtSwWNQ1PIE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=t2IJeHrt5Ovi/+DIbrJoLiQ1GYRdWg1FnWYOraiA8CZtjUUxPHEipelsxGJTHfBglzHca3iwlNSQ9DqRjwLECTyRh8SxwVlpbVI02uz6q1KiRiIzxMMxhVogZqkgNlDLwy+cO5eDHr/AzwY55J8H/MTDvyhtc0ZlA8b8IQm4Uho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=k46jxYaJ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ks85O+sp; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oyLoMfxZ"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68AFDSiC3266754;
-	Thu, 10 Sep 2026 15:14:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pf6sAm
-	6ySUjeHhH+OX9WrlKoZTISlAaNwcFj+u48Bns=; b=oyLoMfxZKEkD3CLOOicCuF
-	mPrms9UkvbQiJUzr3AiJjXGabXREHdEIPIJhI6Q1BDOpqeFQFIBe7V1Ltgo7eZ2K
-	DoSFDnTpk82VNfdvUt7yTsKLeXzOMgDVvlQ78s/3VWnIeAAbpeenprVwJSMvHKty
-	6dM2LOVLxWbRmJBmpy2BVlfPDK8TsLCvg8Z6T9JElQVoAmKjzaMTo841u57cG1G4
-	S09HT5mYSF5073/vUbdP/q1cbcCUhKmNYbLFVBUSPf8EIVsrcmsuZ+zQZq6Rl2lo
-	8rHLDRCn7HULZ8AwwUdV1K/9ysyZwjiEdF0aZB++OIamNPDh/xsN36bwFb7um+aA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gkd8qneu5-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 10 Sep 2026 15:14:35 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68AF7u1d201998;
-	Thu, 10 Sep 2026 15:14:34 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gkvq2rrbp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Sep 2026 15:14:34 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68AFDpUh15598320
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Sep 2026 15:13:52 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C21CA5803F;
-	Thu, 10 Sep 2026 15:14:33 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5290A5805A;
-	Thu, 10 Sep 2026 15:14:30 +0000 (GMT)
-Received: from [9.61.102.225] (unknown [9.61.102.225])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 10 Sep 2026 15:14:29 +0000 (GMT)
-Message-ID: <c9ff6779-feb0-489e-a6ee-9477fd105e61@linux.ibm.com>
-Date: Thu, 10 Sep 2026 20:44:28 +0530
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="k46jxYaJ";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ks85O+sp"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68AF4XVH107113
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 16:31:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=m7yzWTdFaMYpCscxPwImij
+	Ly8JVKI4jHgQ7Y/ei13oU=; b=k46jxYaJTuZcphY9IGriGaTx8KR/eHKegwy7iF
+	mT3YB1cvTGLVdkkeJ5pk+eNt0AJhUzGvnklQlbKL8d9m3JJt4azqWnBN3SZd71j6
+	tyqfPd+Kvh4tz3X+3tB+vpMKnq3+5YqNhwMiDTOQt9m7Z+BCdJbEaB/z/6I0+9FX
+	fGCPs7h9qfaJWEZ9NO/daV7x9IqUSEGRLP9rkrFxfr9E+TbJwaXxG72c8+KhfI1P
+	b9CDepIUA0arxpn62PiV8OPdbzSJMfvKGuaz0WLa+T7Xjx2Rx6Ve57MZQJMwfd58
+	cN3g3qfJY5QKbv8L6co1n6IdAO8Q1U7QCppRIznbQa+7Rfqg==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gksh8t2k2-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 16:31:09 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-398e1f7d1a5so5286788a91.0
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 09:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1789057869; x=1789662669; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m7yzWTdFaMYpCscxPwImijLy8JVKI4jHgQ7Y/ei13oU=;
+        b=ks85O+sp3zLzzbqZWdG/F8MCP4hN9OmTojOOa2H2w5vhHEOrHBc0UijtfeMmdNSeDy
+         76Xj73gO3vjnibznEwwtOTU7iPaZy5BVzV9C/hywrLWW7QvslbayiD+jOQw06tc2Wweb
+         rC+tfaMtuNnj08Am4Zll5vCW36K/S6+n8p817gkgEsOFTQy1084Ecjwjmmwzst1yUDcT
+         JdIuKYySMic0N0GBRAwDhPs2bjp5TSqqgH+cLB2B2tmci2N4wvMcwFaOuFYDiD3g52D3
+         WKevWuz2zqzy8YeVNrYVd0BSH+7bHNt1jAzdNpk1WcEvsb4Zxeep6hjtgUfzwDYqU8AB
+         yElA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789057869; x=1789662669;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=m7yzWTdFaMYpCscxPwImijLy8JVKI4jHgQ7Y/ei13oU=;
+        b=U1KY40OTqqLW+/XvY9D+SEbeoAgQ8fS0SgduZwDItQYkz1RaGWOuzVB2YqNUqlU6AH
+         ScJ5BbbSvookmbZcJIgLQxs2c0ha5LUYUjNYKfjM2zj9y5NcmkiyvxoGiyHCI3nHhH7I
+         KccLaHVqrjAArGAv9/19qiMOm1JE6Y2jDGbDaEkSCBGUByAZtdDUgfswOpqOMD95WQM0
+         KDdbJtLfkqRZ4gW7Ac1Mg3NRmG3jp7n8Nl+SYQV/Y0qvNKE6BzRAGEfJSTSvxoFLaxV3
+         7Gqyn+K9a+7X9fWWkVGhEr23pgkIrYDaVhg2C39xn2ieOsZ0R/8pdX/0D5D0nd8ZoQgs
+         K4XA==
+X-Forwarded-Encrypted: i=1; AKwUvBw9XD/PLRvvKB/TJxcQKhvEZQaPnNf8yJP8tgUHbriUI0/jS04Pd4VqZOGBrS6boq1qg1Y88nli7fcnSA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mc3PuriFZFAIVJ3owFJQTnEKHfA8yWkwOBg0fHjt2FcjD5JQjq
+	WcpcUtRpfQ+e981XtqnkIXNjl+dSCaIS9+jQKcHgMaNb8srbLG18VTY9A8yagVhP/fuN1CK0/O1
+	W9KQz18roqHzbvbsgCjRIxaijERmEV8fF6akg4xvwe+7LpQYNn9nUQcm4y7vO0vBL7Q==
+X-Gm-Gg: AYBFou3QVtzIag8sbqqrKV4nPo+Q0ySTipoUzLxYGVRD7bn0OFm+wTLp4M9dYZFWaOQ
+	u87rzKQnNYYxcBK8SDuaZ1doDvMRb2NmxAmDkwYHDqSmgO5qHIL1MY5AAgFXW67gFhMkITkDLu+
+	drUfbQh9nr9eeIO/5fMuKfhGRMUtV1wWewyA2kRdxZ3Y2pt9WOQzYGTGcSDWyU0I4Vawk2fHueL
+	CckRRjJAt2up09GeQGzFOHCEFpjs1nfPf42ewCcNVsS4Y+QuxiTB0zW6YhNDr6279nGR5NURFDU
+	lbPH7k4LKSEt7mZzk+HSZzduaAX3MpDaoMo0selaTKGgjqDNN9YIzm2WYgr2SOiVceskZCQXVmG
+	hn46IGSiMMiGR6eKPoq8HdUb5LOGGNaqRKpBYjMhfKtzaGrToM6WBEG3i8XfFSHirXUKfZzg=
+X-Received: by 2002:a17:90b:2542:b0:398:9beb:5c17 with SMTP id 98e67ed59e1d1-39b2620a2bfmr59984542a91.18.1789057869012;
+        Thu, 10 Sep 2026 09:31:09 -0700 (PDT)
+X-Received: by 2002:a17:90b:2542:b0:398:9beb:5c17 with SMTP id 98e67ed59e1d1-39b2620a2bfmr59984483a91.18.1789057868409;
+        Thu, 10 Sep 2026 09:31:08 -0700 (PDT)
+Received: from congzhan02.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39d94bafb3bsm424320a91.1.2026.09.10.09.31.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2026 09:31:07 -0700 (PDT)
+From: Cong Zhang <cong.zhang@oss.qualcomm.com>
+Date: Fri, 11 Sep 2026 00:31:01 +0800
+Subject: [PATCH] virtio_blk: use synchronous quiesce in
+ virtblk_freeze_priv()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: fix out-of-bounds read in blk_mq_free_rqs
-To: syzbot <syzbot@kernel.org>, syzkaller-bugs@googlegroups.com,
-        Krystian Kaniewski <krystianmkaniewski@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
-References: <c92b0c7e-17fb-44c8-99d9-59d45004d05a@mail.kernel.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <c92b0c7e-17fb-44c8-99d9-59d45004d05a@mail.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=SpUFe/O0 c=1 sm=1 tr=0 ts=6aa2c95c cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=edf1wS77AAAA:8
- a=pGLkceISAAAA:8 a=hSkVLCK3AAAA:8 a=VnNF1IyMAAAA:8 a=7bTMroNJj3-o06XVi28A:9
- a=QEXdDO2ut3YA:10 a=DcSpbTIhAlouE1Uv7lRv:22 a=cQPPKAXgyycSBL8etih5:22
-X-Proofpoint-ORIG-GUID: kWznKHegshNxz_gk4fidlEc_sd7b3-tY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTEwMDE4MiBTYWx0ZWRfXzlU9PNBi2j7D
- n+ImY6bRx3XVJaZg+2CoGkmT68NeSui5ea1hhGXW4A26j4XFloY8iPZZaGORPZMRd+eWyKjlzGm
- r//3M+o8Lj51xDRFkmsHlZ++CPEWOm9C8Or3Qn5xUPSrEPLfIW1rIjh5EXcugV2ToNKXryLiq/p
- nm7Ke2Dk+ETyuyKrLpdXTVD+B+pJ2o8C1vP7zQsKDPlu2ST7yYGOJkNyYGxbOrzJq196k2cE5k0
- /JI9j5I7bccNptOFI3xXfdiSestg6txOOHhakx5YavKPouYIYzNKeES6GN85mwJEZ+q41NjciXF
- VH4e9RuViQf6aICGKgE6JWVD7CgklHV3UxVfOBMKF8muZZ61OGbJZiDJWqWY/ya/0MZ4d7jbwbF
- LKSD6X80AVL9Nt/xLU05gqf7SETDF4lDyONygUvEkKwGZkleNIgp3Wemzrq24Kthb9bHmSRcSF9
- mVS4wIV1pSqPd5EARTA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTEwMDE4MiBTYWx0ZWRfX0PQdgdff5wmJ
- 4pScsl3oi2cpDKdKylMgO7u6alWVWzm14UGMzIbn3GuAeZmzGOe/HbYlHpIOwIWfv9sPL/SfKSo
- HDSYVJmY9uqtgJScm6H0I3TCVYTx4MU=
-X-Proofpoint-GUID: Q6dgpUTMwSxTYiQT4BbgrgGt_2vTpoGw
+Message-Id: <20260911-virtblk_sync_quiesce-v1-1-a883f8f31258@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAETbomoC/yXMQQ6CMBBA0auQWdukbbABrkIMsdNRR0mVDhAN4
+ e4UXL7F/wsIJSaBplgg0czC75hhTgXg4xrvpDhkg9XW6dpoNXMaff/q5BexG6bcIqnaW6yqUJ5
+ L4yCnn0Q3/h7b9vK3TP5JOO4vWNcN0oUde3gAAAA=
+X-Change-ID: 20260910-virtblk_sync_quiesce-9b2c88d45416
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowangio@gmail.com>,
+        =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>
+Cc: linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Cong Zhang <cong.zhang@oss.qualcomm.com>
+X-Mailer: b4 0.15-dev-38bf1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1789057863; l=2010;
+ i=cong.zhang@oss.qualcomm.com; s=20250926; h=from:subject:message-id;
+ bh=kcJgGBv43uV4lQuuDHe4VjFldBPqvQ8pUtSwWNQ1PIE=;
+ b=n62tXsCZlwo3B+DeASbqVIAWgz6tguB52thgCTLihVpIEtl7yEH7lwlKoXMLJgcunsnLFSFho
+ hgTCaG1bfqqC9qqcQSpc+BLyUiPxSdgV0tmhJCYlBGxIekBRGveLDX0
+X-Developer-Key: i=cong.zhang@oss.qualcomm.com; a=ed25519;
+ pk=8SBh3ey5igz2nlW+UFC6khFvaNPgG7MmbWtAeO2s6n8=
+X-Proofpoint-GUID: lGG1VR5N1RVghMuqiKUNM2PL1KUF7jFX
+X-Proofpoint-ORIG-GUID: lGG1VR5N1RVghMuqiKUNM2PL1KUF7jFX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTEwMDIwMCBTYWx0ZWRfX/isC4wMOSghD
+ PRJzRNO4pxxyLZKMmoaQ4uC9Fnj463N7pSJpMsZo7ICBEMQ/ftUdMq5bQm/j29tRvCk4X7RWdqx
+ //bgi88TkZXnFvt4lplWsKUqgwc1VvGQGDhcRc4HA98cOvp1zjLiR3zmEExzaewip4TKVR5ae65
+ /2p9m5PYofVxitYHmF++mQ1+l6Ggsoa9Mox8IUgQ7K/zyioQdcRb08NpJXaxP7M7Fk/DanCbAlX
+ T07csa3Tr1InA3Con2Y20w0QVf1zNRDPX+qYms78cd+0mfgzgsd25dCcJLiAWg+VuymitnZxbtf
+ WQGEu9bOpGcpdNMmMdzri6POZNOmU3fEtx/x5syBqsyG/9t4WpFPb85ThwfP0Ee7qxIxasy5cz5
+ +fsmZz80g2+NThNYfUfjaf45RmdIPQzRxFUExYTS0qWn/zSsfnSMN0wboN8HTFQAl8X0NDt/TsT
+ 2dFcDoZou30cm9qKuvg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTEwMDIwMCBTYWx0ZWRfXz6kHw/8Zl1MH
+ Y4iJo6MimMGkZMV5PPmiNK/XIF8yIyO1UA+LnjZj+S+gpmsdv6qkP8UAx1SErqi3ndjGaY7unAw
+ i82nAqdf2mR3x/VJuc1IqKWiu3T6f84=
+X-Authority-Analysis: v=2.4 cv=a56lZkSF c=1 sm=1 tr=0 ts=6aa2db4d cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=EUspDBNiAAAA:8 a=cmBj7K86vS66_wzKDlEA:9 a=QEXdDO2ut3YA:10
+ a=mQ_c8vxmzFEMiUWkPHU9:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-10_05,2026-09-09_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
- clxscore=1011 phishscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609100182
+ lowpriorityscore=0 impostorscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 malwarescore=0 phishscore=0 bulkscore=0 clxscore=1011
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609100200
 
-On 9/10/26 3:49 PM, syzbot wrote:
-> From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
-> 
-> A KASAN slab-out-of-bounds read can occur in blk_mq_free_rqs() when there
-> is a mismatch between the number of hardware queues allocated for the IO
-> scheduler (et->nr_hw_queues) and the number of hardware queues in the block
-> tag set (set->nr_hw_queues).
-> 
-> This mismatch can happen if blk_mq_update_nr_hw_queues() fails halfway
-> through (e.g., due to memory pressure during
-> blk_mq_prealloc_tag_set_tags()). In this error path, the elevator is
-> restored with a larger number of hardware queues than the block tag set
-> actually has.
-> 
-> When the elevator is later freed, blk_mq_free_sched_tags() iterates up to
-> the new et->nr_hw_queues and calls blk_mq_free_rqs(). In blk_mq_free_rqs(),
-> it attempts to access set->tags[hctx_idx] to get the driver tags. Because
-> set->nr_hw_queues was not updated due to the earlier failure, set->tags
-> still has the old (smaller) size, leading to an out-of-bounds read.
-> 
-Yes makes sense, this scenario seems feasible.
+Replace blk_mq_quiesce_queue_nowait() with blk_mq_quiesce_queue() in
+virtblk_freeze_priv().
 
-> BUG: KASAN: slab-out-of-bounds in blk_mq_free_rqs+0xde/0x680
-> Read of size 8 at addr ffff88818d67fc28 by task syz-executor117/5839
-> Call Trace:
->   blk_mq_free_rqs+0xde/0x680
->   blk_mq_free_map_and_rqs+0x40/0xf0
->   blk_mq_free_sched_tags
->   blk_mq_free_sched_res+0xeb/0x280
->   elevator_change_done+0x1d2/0x5c0
->   elevator_change+0x34f/0x480
->   elv_iosched_store+0x504/0x630
->   queue_attr_store+0x207/0x2b0
-> 
-> To fix this, explicitly check if hctx_idx < set->nr_hw_queues before
-> accessing set->tags[hctx_idx]. If hctx_idx >= set->nr_hw_queues, the
-> hardware queue doesn't exist in the tag set, meaning there are no driver
-> tags to clear mappings from. In this case, safely set drv_tags to NULL. The
-> subsequent call to blk_mq_clear_rq_mapping() already handles a NULL
-> drv_tags pointer and will safely return.
-> 
-Fix looks reasonable.
+Keep the existing freeze and unfreeze order. The synchronous call waits
+for dispatch code that was already running. The queue remains quiesced
+until virtblk_restore_priv() calls blk_mq_unquiesce_queue().
 
-> This fix also prevents a similar out-of-bounds read in the failure path of
-> blk_mq_alloc_rqs(), where a failure during new driver tag allocation could
-> lead to blk_mq_free_rqs() being called with an hctx_idx greater than or
-> equal to set->nr_hw_queues.
-> 
-I'm not sure if this is possible. Looking at the callers of blk_mq_alloc_rqs(),
-the allocation loops appear to be bounded by set->nr_hw_queues, so an
-hctx_idx >= set->nr_hw_queues should not be passed to blk_mq_alloc_rqs() in
-that path. Nevertheless, the guard in blk_mq_free_rqs() looks reasonable as
-a defensive check and fixes the reported failure.
+Fixes: 7678abee0867 ("virtio-blk: don't keep queue frozen during system suspend")
 
-> Fixes: 04225d13aef1 ("block: fix potential deadlock while running nr_hw_queue update")
-> Assisted-by: Gemini:gemini-3.5-flash Gemini:gemini-3.1-pro-preview syzbot
-> Reported-by: syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
-> Link: https://syzkaller.appspot.com/ai_job?id=827b5760-86a0-4f44-9c69-430b572eac12
-> Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
-> 
-> ---
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 2c850330a..8e6726b37 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3473,8 +3473,10 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->   
->   	if (blk_mq_is_shared_tags(set->flags))
->   		drv_tags = set->shared_tags;
-> -	else
-> +	else if (hctx_idx < set->nr_hw_queues)
->   		drv_tags = set->tags[hctx_idx];
-> +	else
-> +		drv_tags = NULL;
->   
->   	if (tags->static_rqs && set->ops->exit_request) {
->   		int i;
-Thanks for the fix! Overall, this looks good to me.
+Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
+---
+blk_mq_run_work_fn() can call blk_mq_sched_dispatch_requests() through
+blk_mq_run_dispatch_ops(). The dispatcher checks QUEUE_FLAG_QUIESCED
+while the flag is clear. It can then be preempted before it gets a
+request. At that time, it has no queue usage reference, so
+blk_mq_freeze_queue() does not wait for it.
 
-Reviewed-by: Nilay Shorff <nilay@linux.ibm.com>
+virtblk_freeze_priv() then calls blk_mq_quiesce_queue_nowait() and
+blk_mq_unfreeze_queue(). A new request can enter the queue. The old
+dispatcher can run again, use its old flag check, get the new request,
+and call virtio_queue_rq(). At the same time, virtblk_freeze_priv() can
+reset the device, delete the virtqueues, and free vblk->vqs. The old
+dispatcher can then use a deleted virtqueue or a NULL vblk->vqs, and the
+kernel can crash.
+---
+ drivers/block/virtio_blk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 32bf3ba07a9d..7a570591e040 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1595,7 +1595,7 @@ static int virtblk_freeze_priv(struct virtio_device *vdev)
+ 
+ 	/* Ensure no requests in virtqueues before deleting vqs. */
+ 	memflags = blk_mq_freeze_queue(q);
+-	blk_mq_quiesce_queue_nowait(q);
++	blk_mq_quiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q, memflags);
+ 
+ 	/* Ensure we don't receive any more interrupts */
+
+---
+base-commit: 50d05c7c76c96b90462f24debacca971d2e86713
+change-id: 20260910-virtblk_sync_quiesce-9b2c88d45416
+
+Best regards,
+--  
+Cong Zhang <cong.zhang@oss.qualcomm.com>
 
