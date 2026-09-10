@@ -1,76 +1,76 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-oo2-f34.google.com (mail-oo2-f34.google.com [74.125.231.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A78239A81B
-	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1E3C3C08
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789073729; cv=none; b=hcyKpH06U/FzSfSba4T2y3viyHfCKLVKGAtsxV1aeXbHIiN8yscgAcjvRWt4wTjUjKzNVsCh+CQK7coKywTrklkXI5y3oz3rGdXHbCauP9BEa/AiroJDwUaFAcfjbHM4J/cZ+Bylm6a5n+aJ6+dIrYOafgIfjuaqHj5/qVXDraM=
+	t=1789073731; cv=none; b=UFnBzyUS9G5+0vx+fyQFjmRhs9LVJv+mMcyV6IUZDIsOn2CTDEm0olzs5M7BsnF4Bdsj8mvWDluFjvsqQ1Nb8qjZbbHpb0y/9DmnvCloKjKFeo1Ri/NS1qOHfonJaGKR1Ucjr5qRJLGJz8DW1oL9dVNnwS7OUegypoc6qpHNQO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789073729; c=relaxed/simple;
-	bh=/A2Fwd+9+3agfDel93uvmLAzyFdulq2jHx373bRNuP8=;
+	s=arc-20240116; t=1789073731; c=relaxed/simple;
+	bh=Fv3RXwZqn495cmiP5raleJQljDMbicO0SAG8ncGK+vE=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mo51Ii5ZJZmFkXQ6TwwaL9Bx5FSb/Em4yCEFdntVuzU0nj1hvV8HWhTTcxhyU4Mrbi3JfsVa3hKuoHynsGdFlclfcyzs5UzFIrIOHj7F4J/iEjIwLZZ+bd0uAoND8N4Zrpghd0OTRVqKSnx4GN4MD7ejf5y7O+d9shkNTmoN99M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=q3MR69iH; arc=none smtp.client-ip=209.85.210.50
+	 MIME-Version:Content-Type; b=juoBEEes9BWYpORiZfhKsvYC5f9VBW11ndW4KDEzvEgdpA7ZZeCJmm0ssT3wjPvd+chdCuwGs/qwwFb/ysh86+SlFn4zCJH8TD+OgeSbs84xCbowsCPaUHRy68P2Bvcg4h4QDjSyRPc1awj4yQKNPk/pOsRwTdIYhFcPrvOUheU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=A8NUqVSN; arc=none smtp.client-ip=74.125.231.162
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="q3MR69iH"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7f4f824de5dso109891a34.2
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:55:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="A8NUqVSN"
+Received: by mail-oo2-f34.google.com with SMTP id 46e09a7af769-80032c08611so173403a34.3
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:55:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073726; x=1789678526; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073727; x=1789678527; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=1WJxP3qg6bq1oKid3neP8OLauam4Io159DZHymfuNtU=;
-        b=q3MR69iHn0RY8dFStvfBYLlIS711TnZP6i2obkEa4Tv+UcqUhErfE32yGVLx7KsNPZ
-         byOPuN6dCUuUqe3/2ke0voaOgHQ15J3/TxvcWWR4CxSJOEpK2lr1SMfGnOaInGirOPoi
-         U9+d3LfXKFyhZDll6x3PHgbEjT+cwcQHuy5x0TX6NRwWCTVQU3beZRDRVuAh0HA2/aBm
-         hRUZMjdqg173YDLJS2lNLwhlVe6CdCPQXcqhDquiXxweFjiNGZq+83YorruH9lJIDIpy
-         Loj4/drY7cGjraj7X3wfak0K7BuP8+V9NIoQl+OU3sqOd/vflIr+mbJ3Moss3e3ZrWoR
-         5L6w==
+        bh=ByTA2lPgAWA1USbCn0cljtTYE5VkX9SiQfJb08kxXuo=;
+        b=A8NUqVSNyCFkg1me5LtwdgVXWPC4Vi+Bj5Q7ilEHrvaL+3qa/Q3m4l3DQ+pWbQgYq5
+         C++tCPxe2VgSxnRA+A7FfBH/fkOGZLqq0v0X7T+X+KB198mdoAdiQKZaMslOAEqIDGLy
+         DyfnGhvQ0ndVxJGXhSIunSMNrNjF1n7zUoi8bgRuDaMn+sBrCnMy8f9+c12ZcVxfYRJW
+         k29zF8x4TxpVqKFw3JOyNVaUO/N8UzaQKOrzcaK2TuT62WXU6j+geFd3K+G85GreBIt/
+         bVxhfudPgDXC5IE7QMUomMyJcYa8qhjl98LFp5wjbLVq6QzIap8cT0kcIJHRazZPRpSb
+         Qe5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789073726; x=1789678526;
+        d=1e100.net; s=20251104; t=1789073727; x=1789678527;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1WJxP3qg6bq1oKid3neP8OLauam4Io159DZHymfuNtU=;
-        b=H2xll32LQWFLUYNKU+KsDvDYY/Enrm3U4af8OtIiGsGUyk009C3H/gEk+zgUGzifLM
-         hQiKaNSgK0goQ9QL7xwJhMcobWxUp0WbdtZPrpaKJrc45sy5qD4zRc6DZiufEd/fWJtw
-         RArg5aCUh6vnov7IEbZE5hTGoncD+09QXQT16mteXSEHLOfrJ/90UoqgKJb7zkESCoYa
-         tSod7pGO3k/YD87uSPeAsd+Q1kxM0DlYqcO8JqVRZQOf+umuMBtmfftFBhytKzYq0O0B
-         2wbTWGWjcxN5uqXsTCcUaZMZFesVH3vG9qaV13xo8IU1cwGx3JabC90FqC+8oscfs1yM
-         +ccg==
-X-Forwarded-Encrypted: i=1; AKwUvBx8nio5gdU/YexS5GIa+G4RNEbKh/RyXCkrhnhlYrd3RUo8148ysN6kYYopcVa0JwfnUEcToSpXtptPMw==@vger.kernel.org
-X-Gm-Message-State: AFuF++nIbc7U5XYQYrWcvkxaGUSXA9I97H5BaLcytW7sGxXNyoNpvGqW
-	CjyfcLiZWayK99FQfqi6mWgZPxjJPjo8pqHKSu6tiH+DevWde7O3D9OUsUzKJ81BLogVlEdKuQl
-	nqwOETXs=
-X-Gm-Gg: AYBFou308A4Tk4DTDbWVZMiFE2hGcyqA5dFCHh117jrHxBT9fhz9Q4+kPyGkHmuZCL/
-	YoXDz28VHq7gQ0eXxZGStIvZ1yLisZ8DsAcjjlTriXQDnuaOQ73LbmpioOUlvFn0hdNn38vLl+n
-	mXtXcA+f4DLKJfnR6g/mFrQsgUMCUpf/e7x8nFyGQZdaXXBrE0wLaHz/9Q99DiGTgyiirCYndsN
-	3clHF9YXVdyOx7K2wkVlS+i+t4hgM/dETJjhj6tHtENtCp28Yh6WrDT1Fs150jFuhHHB8KYFw3R
-	p0Soecv4tKcRCPk+Gdgy8H5+9awRyi1YCvCd9TTy6gqtDauTa3PB1klb8Kzn5niMwr++L/0fiR6
-	353sXO+0E8hnBnWEiLgiP1YnaGXzdL8Ody8yDT2jzftw16PFUgvoBVPTlcAzCaYBT9O7zTxFSPd
-	2xupntJM92NhQunQS9KH60n51cLr8524c+8Ynb4RtaBi9C4I/X971hMU2cNRvGXyEDyC455XeIl
-	CKgj9Cp7G4j2aArJy91dTDmwFjos2Vxrvk21x6E8uIxoRlxp8o=
-X-Received: by 2002:a05:6830:6abc:b0:7fa:ab72:9dfa with SMTP id 46e09a7af769-803ff447bcdmr479781a34.18.1789073725724;
-        Thu, 10 Sep 2026 13:55:25 -0700 (PDT)
+        bh=ByTA2lPgAWA1USbCn0cljtTYE5VkX9SiQfJb08kxXuo=;
+        b=tM4Aw4OTJjlnIa9xTH3fbTcsioTuHNPJ+7CmLQHU+Bj/7jhQN/HErWYlKGguMNwrDi
+         N9wM8UDQ7NOSU+8BLLgVyHq2OqdcJI3+KWUp3Thhqxqdb4j50YV2ah/ZSBLaVCNfvI17
+         /OuWXayEAK/iheO6JJpitfeInDrCsVUZ/kV772zyLfHmxoxyTiWmxpDWeu962yW2Nht5
+         f6Ag+b/g+iiS4w6SiRSxZaUv5E3ESJGOvDKqCKktrRCZ1DtL5yTkxaK+XgZN4pv/WR+9
+         utlFts7/iycO8Fflsnew8R59eFdmUgOxJSmaI54VtPQNWl9gaOEVutgAAJojdOMCLkHk
+         vyWQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwPZDcU5ztyO6mqttzwKtWGMsDwBmHJxP8Sx/+UDUIv9qpI5BDAOcfuaKa9Kr/6vMcEV5/zQ5y9n8BLAQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++kmnRn/SQIbQ3LmpOkpgWuSe6PZ/2Eyqwt4eye9S7xxyHiPBjB+
+	azx6bNkhESsr8lI0YN6Npplo4OtbdQK9EsuPtewhKtNFnT6VmQQxrvoxbEFsATRpkKYkheZL7jr
+	1nR0U03s=
+X-Gm-Gg: AYBFou1k9MOTHJFGyF8iS52nHn8lebe3cBXPr4Gm88ZsWIrfvyqb3bZxjkA9PN5fgjf
+	0ur7+MHMJ3NPuadx8pynWsfCB5f30Lb/KJaikA/Ms/wzsq9OvfawJ8hxyGTTd8wVcPEgQSvJdWf
+	r5mfG/+woNC/Sn+CwkftOMb5KGhTkNMCGgdQvJhOuoo+kkBrySr72t7ruAjgV0wf6fAujvFkh+Z
+	55VpubVVJq9SoaIHHFI48s4WkvDn4Ej4h2HCcAI2LgujQet/uYYWtDsOw/9jMAI6it16M6YMiAO
+	ZjY09GRc/SPXoISzuJwgVuJLcO4OmysYUnVfQfWUHeHQawCoudxyBVZ5NrpuBQrPUkIlajQXPw1
+	+C6DXxOVyPdaysnVupG8FAGBiAd9VOKWEcGGxRzzH4z0QwwLuDc888D/umPzOOJJs4GUgGJSI40
+	S4uCk7auWN5IksqG0CZ8gXDF5FjfhAUThoN+o2eCTywxZgA3aq4MzWxq7pCaTE8lZ1riPwqxfU9
+	WyfIc4ja+Lkv2dGgBhm9sYYsdrGc78j37x5MT/WM9DEa6PD190=
+X-Received: by 2002:a05:6830:3746:b0:7f4:d16e:45f9 with SMTP id 46e09a7af769-803fd138783mr996256a34.7.1789073726792;
+        Thu, 10 Sep 2026 13:55:26 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-803f60fe54asm635779a34.15.2026.09.10.13.55.24
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-803f60fe54asm635779a34.15.2026.09.10.13.55.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 13:55:25 -0700 (PDT)
+        Thu, 10 Sep 2026 13:55:26 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Davidlohr Bueso <dave@stgolabs.net>, 
- Vincent Mailhol <mailhol@kernel.org>
-Cc: linux-efi@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260908-fix_gpt_entry_attributes-v1-1-a4dcb417e8fc@kernel.org>
-References: <20260908-fix_gpt_entry_attributes-v1-1-a4dcb417e8fc@kernel.org>
-Subject: Re: [PATCH RESEND] block: store GPT attributes as a raw value
-Message-Id: <178907372482.484803.13802362688033738030.b4-ty@b4>
-Date: Thu, 10 Sep 2026 14:55:24 -0600
+To: linux-kselftest@vger.kernel.org, Mahmoud Nagy Adam <mngyadam@amazon.de>
+Cc: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260909132602.68852-2-mngyadam@amazon.de>
+References: <20260909132602.68852-2-mngyadam@amazon.de>
+Subject: Re: [PATCH] selftests: ublk: install test_common.sh and trace/
+ scripts
+Message-Id: <178907372584.484803.15302806925021302928.b4-ty@b4>
+Date: Thu, 10 Sep 2026 14:55:25 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,23 +82,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Tue, 08 Sep 2026 20:58:26 +0200, Vincent Mailhol wrote:
-> struct _gpt_entry_attributes currently models the GPT partition entry
-> attributes field with bitfields. This is broken on machines using the
-> __BIG_ENDIAN_BITFIELD ABI because GPT always stores the attributes on
-> disk as a 64-bit little-endian.
+On Wed, 09 Sep 2026 15:26:03 +0200, Mahmoud Nagy Adam wrote:
+> Every ublk test script sources test_common.sh from its own directory:
 > 
-> No current code consumes individual fields from that structure. So just
-> remove struct _gpt_entry_attributes entirely and replace it by an __le64
-> value in struct _gpt_entry instead. This lets users apply endian-aware
-> masks explicitly when inspecting attribute bits.
+>     . "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
+> 
+> and test_generic_02/12 additionally run bpftrace against the scripts in
+> trace/. Neither test_common.sh nor trace/ is listed in TEST_FILES, so
+> "make install" does not copy them into the install directory and every
+> ublk test fails when run from there:
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: store GPT attributes as a raw value
-      commit: 74ea55a6ecb3fd69b47b2b8a6f6979a6c79c7ce7
+[1/1] selftests: ublk: install test_common.sh and trace/ scripts
+      commit: c4fa55f85c47cd5d54d717fb8170746edb10292e
 
 Best regards,
 -- 
