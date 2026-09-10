@@ -1,75 +1,80 @@
-Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED6E3ACA60;
-	Thu, 10 Sep 2026 07:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.133.4.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604663BBFD8;
+	Thu, 10 Sep 2026 07:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789024731; cv=none; b=cZjQGpIUi11llWHfEf/anddXPKBOvRXp7ZI47y7yTJ05MWfMzWlRhYQozmG9IUQKaCi5x/hJBorvNBrtzg8K1907KOrzvvgpQnZ+B7hosQygAEkAWRpOJUMgMwiJ/JPW3bpf9YrvdajEVfG2MOfky3bjR/FTRFt2OM6QaRj1jD4=
+	t=1789024849; cv=none; b=gIC3LQTPtiSRsWCga8GABg8jJr7kHtmy3gi0XiLR+RqQl7WO+jRdexKIRJWyvrhb8p+Z2nqi2aWEM5/IFsS//MIRm8zjU4RFe/HUrGA+IeL5A9AUaeW14piWgAjuGMSJ4ORgoDPnGSmtfbCUsyqJRQa5M28pvQ5HuiPAbcL9QGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789024731; c=relaxed/simple;
-	bh=shiWjj1lGQKHil7cvcMTNNkQ6u42VvO2m3EcTLYasgs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=r9jfC3EdYReoJ/i6j1ToJdy8K1Ptx3zV92wjQD64rmYVoIQZHru6FcZE9D5n4Ir1JjkuJ4TxZKta8Zi8Lr4VT3bj2RM0qTGuQHRM9htAbd9KCsylRZ6A/4zwtXf+7+dpPFxVLcbp7P85YLI30MU1GN945XxJx8/P1cgbPi//sJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de; spf=pass smtp.mailfrom=zedat.fu-berlin.de; dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b=acZlyY+G; arc=none smtp.client-ip=130.133.4.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zedat.fu-berlin.de
+	s=arc-20240116; t=1789024849; c=relaxed/simple;
+	bh=95lB2rqAT8/9fbrzrWPi9ojqqwpDHL3D7Fj0mykqOXo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=X9ONvKDtjaWf2nJlKY9pAtI/kqguLwajytQ+E10ywHNb4ZKtfJgpgcHCfhjtHvXV0Afe3lqM9Z3dnlgcLS2fDvdsLlGuHrBkoIdhlz7SyXN23ekI+I5OXgmvoOyIL+Jt8oGm1ITuLTa46ulTfFtYjMxthPl0Irid6rmbtqlfzIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQ6bYg3M; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b="acZlyY+G"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=fu-berlin.de; s=fub01; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:From:
-	Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=RiTpQGfQvEG2bEzKz9Q0QXGg61I4AiEa7vvH0A0GsWE=; t=1789024727;
-	x=1789629527; b=acZlyY+GFFyYKt+vIYUU8eR+frox4ZUqpLTZy71wVa/QGRFdQm+EsePS6ozp9
-	9G1IQ4XpS0odTFfRwPbaj8CVlLZe2Q1TBfdIWLf6R4+i6C9YseONQpnTmdx3kov8HQ8VL6EnocfO/
-	+OJCM62Roq+X5ZsE5EQ+XlAXGWia+xEku8mRun1bGDWENjEzT4wbsuRhTWZqtqMXabePte2c182RP
-	4mG5Q2bwsePxJwEkhSKTNSR2V+FjpRC5xxLZyNRUR+CbPrhadLQbg0qsHAB2iPcofHxD+o+B1b2K9
-	xH7Izh9ZIeYNceqXeXihWJaCu9tRPzSH656NjG34mMrhABcELA==;
-Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
-          by outpost.zedat.fu-berlin.de (Exim 4.99)
-          with esmtps (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@zedat.fu-berlin.de>)
-          id 1x4YzK-00000002uMe-3uzN; Thu, 10 Sep 2026 09:14:26 +0200
-Received: from p5dc55206.dip0.t-ipconnect.de ([93.197.82.6] helo=[192.168.178.61])
-          by inpost2.zedat.fu-berlin.de (Exim 4.99)
-          with esmtpsa (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@physik.fu-berlin.de>)
-          id 1x4YzK-00000000Gbj-2v0N; Thu, 10 Sep 2026 09:14:26 +0200
-Message-ID: <774b2451be908e2cc07f0cc4d98e4178ab1a0d7b.camel@physik.fu-berlin.de>
-Subject: Re: [PATCH 0/2] sunvdc: fix silent data loss under LDC congestion
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-To: Stian Halseth <stian@itx.no>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, andreas@gaisler.com, davem@davemloft.net, 
-	regressions@lists.linux.dev
-Date: Thu, 10 Sep 2026 09:14:25 +0200
-In-Reply-To: <20260901173947.3292110-1-stian@itx.no>
-References: <24f8b266-f17c-4909-b43d-8ab05721c5d8@kernel.dk>
-	 <20260901173947.3292110-1-stian@itx.no>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQ6bYg3M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE251F000FF;
+	Thu, 10 Sep 2026 07:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789024848;
+	bh=8TX6RG6eAzR9OAyzBYFZrl4ztTDV71rgf3sUqmarc+k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=IQ6bYg3MnkXyDuyDbI64Liip8nHYaBMzMu/UIorsLWaoZy6Le/8DvWXPDVkxl08Lx
+	 QbfWxcxpQ/FdEo1sSKVaH/ho6IVF2lDjmAHwfuiZ8jwnzWG7rvOqCxVHrrh+llmvl7
+	 BevH/YuqiCJO8bKfEjvPCtejPbFK6ZJ2PUp7pcIBZDg2r3lqtm/jcWZCIAtM0xIxOe
+	 MGjur0/6GvJIDZR8m+o7b/knQ0EBAHL5fNUiWh1uYJSfbijounF7pq8MnP16I2lzMm
+	 nxksftyLDB572CLWjHzNHVK4ZQqL+fKvaYOxeqyLquhkI76MsnD4GvUTYm/6u69f6L
+	 wqbht1m1Ge4Jg==
+From: Christian Brauner <brauner@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, David Howells <dhowells@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>, 
+ Christoph Hellwig <hch@lst.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev, 
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <1667275.1788941191@warthog.procyon.org.uk>
+References: <1667275.1788941191@warthog.procyon.org.uk>
+Subject: Re: [PATCH v4] block: Fix start and length check added to
+ iov_iter_extract_bvecs()
+Message-Id: <20260910-bison-unpolitisch-ritualisieren-46a638e9d310@brauner>
+Date: Thu, 10 Sep 2026 09:20:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Original-Sender: glaubitz@physik.fu-berlin.de
-X-ZEDAT-Hint: PO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-db0b7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=911; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=95lB2rqAT8/9fbrzrWPi9ojqqwpDHL3D7Fj0mykqOXo=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQtivI+Z9MY45fC9mN+qU/P3qJ9ZvJhcvKv6sVfPVx8b
+ nXj2mObO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbSu5Xhv/PVWVnvL5hVTXvv
+ XxK09M8Sz4y4/b0tW1i67nxu/z3V0o7hn43W7IZdzxnX25tfktn56HuIqa5n+62AVO6wJbkVxTm
+ ZbAA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Hi Jens,
+On Wed, 09 Sep 2026 09:06:31 +0100, David Howells wrote:
+> block: Fix start and length check added to iov_iter_extract_bvecs()
 
-any chance you could take a look at this series?
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-Adrian
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
---=20
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer
-`. `'   Physicist
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] block: Fix start and length check added to iov_iter_extract_bvecs()
+      https://git.kernel.org/vfs/vfs/c/57a78ad2305f
+
