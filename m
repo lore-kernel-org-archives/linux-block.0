@@ -1,399 +1,96 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+Received: from mta0.migadu.com (out-89.mta0.migadu.com [91.218.175.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8080F433BB0
-	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 08:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA403AB272
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 08:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789027894; cv=none; b=cl8joZnu5A1Kf1apLgYxGuTEc+4Hd//yEq5W8XMNqYzrUL6r++PDJFhURV+JfguIiqf+sqb0BdKjnsP3xpHEx/oZ/T6a8CKkFUkdcF9QwNkO5m03XXI4K1gU5g+HV64mqITUDSzXEBlvdggHdOVdJsf5IVaJUbpZKwbV8UbpXqk=
+	t=1789029976; cv=none; b=GOXAa85CiqEOswSmqkdirJVtLXFGwrG2xFA16dHz/dNlEM+AtUcMad8Dh2WyF30LjlJpa4/NbdYsLHg4HQYzur6eZLrmEhwPLoF//DE/dcRBDdlSDTslwW3u+unwnMCXxpnBWbR+rJOrfj3GbwbVJ+Budq7LOcGcM/l7g5Ag+lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789027894; c=relaxed/simple;
-	bh=VWJq79Pbtf4IbOZyn7AR5EcaHFmtf9h2nH5b25XhR2E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P8xkvlkSvJoIuHnjyD5WihyhNF/VaarKYOIh3xXD6f5vsYk8mMdUcZbXaJEbiGav/MiWNQYJHkN5Gq0IEKjqWJSwWW9idXtTL1/wbNYpurM70nI+ik701VlBJvJsnNw0JJWEgAD3weflPSqPikRCqBRQ/8dKXZ/1z0jxBNXUSKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=TE/57EFV; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1789029976; c=relaxed/simple;
+	bh=uNk98S24xdDQAd9sR/oPvfM7Xxt/HxIpY5XMKOE8m7w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EzHp3mt6fc/qojj49+S8Uo592/pB35EAwiUyqMKcruSRZTBVV9uEjoVghpZ72i9NNjraFWwSfGtQ1BvEz2iFYEIW+4EuXys/Et5nkAKXs1cquwcMG++C+lWfv+8KKUW7/R9UmnSZ1wHgjL5u7eycEHpOvCHaPL7mTSbmVElWAJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uyIK/dEv; arc=none smtp.client-ip=91.218.175.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="TE/57EFV"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cfbdac7a1so3234095e9.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 01:11:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1789027888; x=1789632688; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7WxxmD3yg0pg+i13gK8J2zlyLTSoxJMhIHGtHp0KYMk=;
-        b=TE/57EFVuI+OZ/IiWW5Il/G1G+sP8z2qb3niY8ltt02d7SvWDiEv4y2+JsgB1uZpuZ
-         NlkOcgVOmzdfLBo9dKE+TTnKthv2BzaS0uqpu8kS6oB1CO01zW5ZmrjEx7b7wncNv2az
-         BkIAzeBogew5N2LQwO14t/UYLzSmCN/yHsEwHOn2pKe9N5SNTVNyK2W0O+vyF733wB6P
-         wJzf7A4Vft/wXSE6lh4pKXtUDSPqqfK11SVkykpc4GiSfk6Cg1E56HPlrEzgIOCGiH96
-         ulWcvp0M9aF4WHHbDkxS/g1tI55KUguX0D/0aHgIrgkFHi5WnintFHxUT4o5R+F9qATX
-         lrIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789027888; x=1789632688;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7WxxmD3yg0pg+i13gK8J2zlyLTSoxJMhIHGtHp0KYMk=;
-        b=aKD0mYuqzsSBjpyzEioWGCewXSm0XdpXsNqAdjFq0u5jX7HHgH4f0eWzwHtCMXjKfb
-         Mjb5Ero4vJ5hRkgBeflq72f2hRsLPNq/J1ZMNzl9omU59WdJLTkqMLAhAc0iC11Cl4UD
-         oDi/liU1quIGzAuQLCxuKKTKIaile/eYGtM4xbYLp79PjdFtZCWyl4pouBcO2DdNHyOK
-         b8vJmWAjggNMizFrEsHL6i3yb11989Clu0hsGKxejfpBPLZ2+MvhhEoVvuMCF3NAZ2uP
-         4NC6dIFANiso0pCgyCI/mtOVGbm8XT643+LE8NgKzoSFKKkijzy4p8X1BvPKPyDFGoSM
-         8uvQ==
-X-Gm-Message-State: AFuF++l3BZDNxXMBPFLIBjbyTPWtQtE5nrMEe4W0piB7SVScy2hqSCgC
-	vqr/hhcuyfs7jCCJ//aZtQLoIh+Rn0BgrBuvQDQXedMkKRo88RxF60i9cwbOTU8C+Vg=
-X-Gm-Gg: AYBFou3pxnuOp2YJjjozXU4Q7mehvQl4smrRDl9Gy7xaNdjz8rHgOxuZYn9SfYNQkk6
-	yzxsHK1yfifOkuSKAETyaa1gLRd7AmGZJ1eH6v4vJkm9UewKlNvACNBDAn/ccG+Cf3UvxAakIdP
-	nk+Y+h7AJ/PmAEPwUP2r++Zj9nUQbtMQeSpdmDsXDliGhMBTx0DIJBT3TqKQxGpzm8jnSAuC/qP
-	+71YDCmjrC3K+jkh8LBA6ULB5qX0h5d1c+J4MdXcg+oW6NvDpMPXmajXScDEVdTRg5P7esirRRS
-	cqgwDRkBM9Hl4XP2WA1kkkZrBCcOK88ilQ9h0CS60gkL4jmxx3e6yAjRWIQXMLsJn/H0SOZd+HT
-	vbZ11Hm14IoLcrIgIbyqUHiRarnnlWE+0JIrcjBVnLAZgs2j+y3Sceh+eiC+J+pMDhrsZ7YXyqC
-	AV6IjlZnXSGrA5VVV5uJhcbSusV9CbBEVHUIPIz+ceWnMuB/jj8x7IUvbwh4opnpFChGIjN4qOO
-	mNufIxoS0fQ6yhyI2i6n8HqRMgtDWtBMs91LxToUJm5
-X-Received: by 2002:a05:600c:3b25:b0:49b:910c:76fb with SMTP id 5b1f17b1804b1-49d01dd415bmr272852515e9.2.1789027887561;
-        Thu, 10 Sep 2026 01:11:27 -0700 (PDT)
-Received: from jwang-ThinkPad-T14-Gen-6.fkb.profitbricks.net ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d20fc1be3sm55261135e9.4.2026.09.10.01.11.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 01:11:26 -0700 (PDT)
-From: Jack Wang <jinpu.wang@ionos.com>
-To: Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>,
-	linux-raid@vger.kernel.org,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	abd.masalkhi@gmail.com
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Xiao Ni <xiao@kernel.org>,
-	Li Nan <magiclinan@didiglobal.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	dm-devel@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH v2 8/8] md: link a new leg's holder before locking the array
-Date: Thu, 10 Sep 2026 10:11:13 +0200
-Message-ID: <20260910081114.1605746-9-jinpu.wang@ionos.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260910081114.1605746-1-jinpu.wang@ionos.com>
-References: <20260910081114.1605746-1-jinpu.wang@ionos.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uyIK/dEv"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=uNk98S24xdDQAd9sR/oPvfM7Xxt/HxIpY5XMKOE8m7w=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789029961; v=1; x=1789634761;
+ b=uyIK/dEv+gw9O3PPOah9gucNvdnybMNa+Vuco3a7MQqpbwrhxe3TBZSrjVqbp3CkyHC+Zcja
+ 7XTzvOBcdkZqMEavyKVZ/mj0V2vrdSxlV3La9f70mEpz/6HWo63IpH70yYsZpIHf0/Q0yZN/c3s
+ f+9FY5DQCKsUyyUjmJOfSjJ0=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by mta10.migadu.com with ESMTPS id cb036e4150614f0a;
+	Thu, 10 Sep 2026 08:46:01 +0000
+X-Mizu-Trace-ID: cb036e4150614f0a
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <b800ecf7-1e78-4605-9db0-7bf891d8ca51@linux.dev>
+Date: Thu, 10 Sep 2026 09:45:59 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] block: cap atomic write size by PI buffer size
+ constraints
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, John Garry <john.g.garry@oracle.com>,
+ "Martin K. Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org
+References: <20260907074111.721054-1-hch@lst.de>
+ <20260907074111.721054-3-hch@lst.de>
+ <a17ccccc-a91c-4e45-a97e-d899c739e159@linux.dev>
+ <20260910053636.GA27408@lst.de>
+Content-Language: en-US
+From: John Garry <john.garry@linux.dev>
+In-Reply-To: <20260910053636.GA27408@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jack Wang <jinpu.wang@cloud.ionos.com>
+On 9/10/26 06:36, Christoph Hellwig wrote:
+> On Wed, Sep 09, 2026 at 10:16:17AM +0100, John Garry wrote:
+>> Furthermore, I don't think that this is the change above is correct. We
+>> have 4x atomic limits and I think that 3x would need updating:
+>> - atomic_write_max_sectors
+>> - atomic_write_unit_min
+>> - atomic_write_unit_max
+>>
+>> The expectation is that the driver sets atomic_write_hw_max,
+>> atomic_write_hw_unit_min, and atomic_write_hw_unit_max individually. We
+>> don't assume that atomic_write_hw_unit_max ==
+>> rounddown_pow_of_two(atomic_write_hw_max). The is because of SCSI and it's
+>> granularity and alignment atomic limits 🙁
+>> Anyway, maybe this is a better change:
+>>
+>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>> index 8274631290db..b88744d42719 100644
+>> --- a/block/blk-settings.c
+>> +++ b/block/blk-settings.c
+>> @@ -233,11 +233,15 @@ static void blk_atomic_writes_update_limits(struct
+>> queue_limits *lim)
+>>   	unsigned int unit_limit = min(lim->max_hw_sectors << SECTOR_SHIFT,
+>> blk_queue_max_guaranteed_bio(lim));
+>>
+>> +	unit_limit = min_not_zero(unit_limit, max_integrity_io_size(lim));
+>>   	unit_limit = rounddown_pow_of_two(unit_limit);
+>>
+>>   	lim->atomic_write_max_sectors =
+>>   		min(lim->atomic_write_hw_max >> SECTOR_SHIFT,
+>>   			lim->max_hw_sectors);
+>> +	lim->atomic_write_max_sectors =
+>> +		min_not_zero(lim->atomic_write_max_sectors,
+>> +			max_integrity_io_size(lim));
+> This needs to be conditional on a non-zero lim->integrity.metadata_size.
+> 
+> Otherwise this looks sane.
 
-bd_link_disk_holder() takes the leg's disk->open_mutex, and
-bind_rdev_to_array() calls it with reconfig_mutex held, so the
-dependency the previous patch removed from md_import_device() is still
-there by another route:
+ok, I can add that.
 
-  -> #2 (&q->limits_lock):        sd_revalidate_disk / sd_open
-  -> #1 (&disk->open_mutex):      bd_link_disk_holder
-                                  bind_rdev_to_array
-                                  md_add_new_disk
-                                  md_ioctl        <- ADD_NEW_DISK
-  -> #0 (&mddev->reconfig_mutex): md_ioctl        <- RUN_ARRAY
-
-bd_unlink_disk_holder() only takes blk_holder_mutex, which is why the
-release side needs no change and made the link side easy to miss.
-
-Link the holder where the leg is opened, before the array is locked, and
-record it in a new HolderLinked flag so the release side knows whether
-there is a link to drop.  A failed link is not fatal, as before.  A leg
-that is linked but not yet bound is released through md_export_rdev(),
-which drops the link first.
-
-A leg is now linked before it is known to be acceptable, so a leg the
-array goes on to reject shows up in its slaves directory until the
-error path releases it.
-
-md then no longer takes disk->open_mutex under reconfig_mutex: of the
-functions that take it, md reaches bdev_open() and bd_link_disk_holder()
-from the paths above, bdev_release() and bdev_fput() only through fput(),
-which defers to task work, del_gendisk() only from mddev teardown, and
-never sync_bdevs().
-
-Assisted-by: LLM
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
----
- drivers/md/md-autodetect.c |  2 +-
- drivers/md/md.c            | 70 ++++++++++++++++++++++++++++----------
- drivers/md/md.h            |  7 +++-
- 3 files changed, 59 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/md/md-autodetect.c b/drivers/md/md-autodetect.c
-index e592577356ad..b6f9fb36f1bb 100644
---- a/drivers/md/md-autodetect.c
-+++ b/drivers/md/md-autodetect.c
-@@ -231,7 +231,7 @@ static void __init md_setup_drive(struct md_setup_args *args)
- 		mddev_lock_nointr(mddev);
- 
- 		md_add_new_disk(mddev, &dinfo, &nd, NULL);
--		md_put_new_disk(&nd);
-+		md_put_new_disk(mddev, &nd);
- 	}
- 
- 	/*
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index fa033d7d3831..235f0d645cea 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2632,7 +2632,7 @@ static int bind_rdev_to_array(struct md_rdev *rdev, struct mddev *mddev)
- 		sysfs_get_dirent_safe(rdev->kobj.sd, "bad_blocks");
- 
- 	list_add_rcu(&rdev->same_set, &mddev->disks);
--	bd_link_disk_holder(rdev->bdev, mddev->gendisk);
-+	/* the holder is linked with the open, see md_link_rdev_holder() */
- 
- 	return 0;
- 
-@@ -2648,6 +2648,23 @@ void md_autodetect_dev(dev_t dev);
- /* just for claiming the bdev */
- static struct md_rdev claim_rdev;
- 
-+/*
-+ * bd_link_disk_holder() takes the leg's disk->open_mutex, so the link is
-+ * made with the open, before the array is locked.  bd_unlink_disk_holder()
-+ * only takes blk_holder_mutex, so dropping it is safe under any lock.
-+ */
-+static void md_link_rdev_holder(struct md_rdev *rdev, struct mddev *mddev)
-+{
-+	if (!bd_link_disk_holder(rdev->bdev, mddev->gendisk))
-+		set_bit(HolderLinked, &rdev->flags);
-+}
-+
-+static void md_unlink_rdev_holder(struct md_rdev *rdev, struct mddev *mddev)
-+{
-+	if (test_and_clear_bit(HolderLinked, &rdev->flags))
-+		bd_unlink_disk_holder(rdev->bdev, mddev->gendisk);
-+}
-+
- static void export_rdev(struct md_rdev *rdev)
- {
- 	pr_debug("md: export_rdev(%pg)\n", rdev->bdev);
-@@ -2661,11 +2678,18 @@ static void export_rdev(struct md_rdev *rdev)
- 	kobject_put(&rdev->kobj);
- }
- 
-+/* release a leg that was linked before the array was locked */
-+static void md_export_rdev(struct mddev *mddev, struct md_rdev *rdev)
-+{
-+	md_unlink_rdev_holder(rdev, mddev);
-+	export_rdev(rdev);
-+}
-+
- static void md_kick_rdev_from_array(struct md_rdev *rdev)
- {
- 	struct mddev *mddev = rdev->mddev;
- 
--	bd_unlink_disk_holder(rdev->bdev, rdev->mddev->gendisk);
-+	md_unlink_rdev_holder(rdev, rdev->mddev);
- 	list_del_rcu(&rdev->same_set);
- 	pr_debug("md: unbind<%pg>\n", rdev->bdev);
- 	mddev_destroy_serial_pool(rdev->mddev, rdev);
-@@ -4974,9 +4998,11 @@ new_dev_store(struct mddev *mddev, const char *buf, size_t len)
- 	if (IS_ERR(rdev))
- 		return PTR_ERR(rdev);
- 
-+	md_link_rdev_holder(rdev, mddev);
-+
- 	err = mddev_suspend_and_lock(mddev);
- 	if (err) {
--		export_rdev(rdev);
-+		md_export_rdev(mddev, rdev);
- 		return err;
- 	}
- 	noio_flags = memalloc_noio_save();
-@@ -5003,7 +5029,7 @@ new_dev_store(struct mddev *mddev, const char *buf, size_t len)
- 	err = bind_rdev_to_array(rdev, mddev);
-  out:
- 	if (err)
--		export_rdev(rdev);
-+		md_export_rdev(mddev, rdev);
- 	memalloc_noio_restore(noio_flags);
- 	mddev_unlock_and_resume(mddev);
- 	if (!err)
-@@ -7519,6 +7545,10 @@ static void autorun_devices(int part)
- 			limp = &lim;
- 		}
- 
-+		/* link before locking, see md_link_rdev_holder() */
-+		rdev_for_each_list(rdev, tmp, &candidates)
-+			md_link_rdev_holder(rdev, mddev);
-+
- 		if (mddev_suspend_and_lock(mddev)) {
- 			pr_warn("md: %s locked, cannot run\n", mdname(mddev));
- 			if (limp) {
-@@ -7538,7 +7568,7 @@ static void autorun_devices(int part)
- 			rdev_for_each_list(rdev, tmp, &candidates) {
- 				list_del_init(&rdev->same_set);
- 				if (bind_rdev_to_array(rdev, mddev))
--					export_rdev(rdev);
-+					md_export_rdev(mddev, rdev);
- 			}
- 			autorun_array(mddev, limp);
- 			if (limp && queue_limits_commit_update(q, limp))
-@@ -7552,7 +7582,7 @@ static void autorun_devices(int part)
- 		 */
- 		rdev_for_each_list(rdev, tmp, &candidates) {
- 			list_del_init(&rdev->same_set);
--			export_rdev(rdev);
-+			md_export_rdev(mddev, rdev);
- 		}
- 		mddev_put(mddev);
- 	}
-@@ -7730,7 +7760,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 	     nd->minor_version != mddev->minor_version)) {
- 		pr_warn("%s: array reconfigured while opening %pg\n",
- 			mdname(mddev), nd->rdev->bdev);
--		export_rdev(nd->rdev);
-+		md_export_rdev(mddev, nd->rdev);
- 		nd->rdev = NULL;
- 		return -EBUSY;
- 	}
-@@ -7763,13 +7793,13 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 				pr_warn("md: %pg has different UUID to %pg\n",
- 					rdev->bdev,
- 					rdev0->bdev);
--				export_rdev(rdev);
-+				md_export_rdev(mddev, rdev);
- 				return -EINVAL;
- 			}
- 		}
- 		err = bind_rdev_to_array(rdev, mddev);
- 		if (err)
--			export_rdev(rdev);
-+			md_export_rdev(mddev, rdev);
- 		return err;
- 	}
- 
-@@ -7806,7 +7836,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 			/* This was a hot-add request, but events doesn't
- 			 * match, so reject it.
- 			 */
--			export_rdev(rdev);
-+			md_export_rdev(mddev, rdev);
- 			return -EINVAL;
- 		}
- 
-@@ -7832,7 +7862,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 				}
- 			}
- 			if (has_journal || mddev->bitmap) {
--				export_rdev(rdev);
-+				md_export_rdev(mddev, rdev);
- 				return -EBUSY;
- 			}
- 			set_bit(Journal, &rdev->flags);
-@@ -7847,7 +7877,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 				/* --add initiated by this node */
- 				err = mddev->cluster_ops->add_new_disk(mddev, rdev);
- 				if (err) {
--					export_rdev(rdev);
-+					md_export_rdev(mddev, rdev);
- 					return err;
- 				}
- 			}
-@@ -7857,7 +7887,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 		err = bind_rdev_to_array(rdev, mddev);
- 
- 		if (err)
--			export_rdev(rdev);
-+			md_export_rdev(mddev, rdev);
- 
- 		if (mddev_is_clustered(mddev)) {
- 			if (info->state & (1 << MD_DISK_CANDIDATE)) {
-@@ -7919,7 +7949,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 
- 		err = bind_rdev_to_array(rdev, mddev);
- 		if (err) {
--			export_rdev(rdev);
-+			md_export_rdev(mddev, rdev);
- 			return err;
- 		}
- 	}
-@@ -8031,7 +8061,7 @@ static int hot_add_disk(struct mddev *mddev, struct md_new_disk *nd)
- 	return 0;
- 
- abort_export:
--	export_rdev(rdev);
-+	md_export_rdev(mddev, rdev);
- 	return err;
- }
- 
-@@ -8577,15 +8607,18 @@ int md_import_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 		return err;
- 	}
- 
-+	/* link the holder here too, for the same reason */
-+	md_link_rdev_holder(rdev, mddev);
-+
- 	nd->rdev = rdev;
- 	return 0;
- }
- 
- /* release a leg md_add_new_disk() did not take ownership of */
--void md_put_new_disk(struct md_new_disk *nd)
-+void md_put_new_disk(struct mddev *mddev, struct md_new_disk *nd)
- {
- 	if (nd->rdev) {
--		export_rdev(nd->rdev);
-+		md_export_rdev(mddev, nd->rdev);
- 		nd->rdev = NULL;
- 	}
- }
-@@ -8717,6 +8750,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 			err = -EINVAL;
- 			goto out;
- 		}
-+		md_link_rdev_holder(nd.rdev, mddev);
- 	}
- 
- 	/* q->limits_lock nests outside both, see md_start_sync() */
-@@ -8864,7 +8898,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
- 
- out:
- 	/* a leg we opened but nothing took ownership of */
--	md_put_new_disk(&nd);
-+	md_put_new_disk(mddev, &nd);
- 
- 	if (cmd == STOP_ARRAY_RO || (err && cmd == STOP_ARRAY))
- 		clear_bit(MD_CLOSING, &mddev->flags);
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 73a27d83d65a..1a0d57d58ad1 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -294,6 +294,11 @@ enum flag_bits {
- 				 * serial bios.
- 				 */
- 	Nonrot,			/* non-rotational device (SSD) */
-+	HolderLinked,		/* bd_link_disk_holder() succeeded for this
-+				 * leg.  The link is made before the array is
-+				 * locked, as it takes disk->open_mutex,
-+				 * see md_import_new_disk().
-+				 */
- };
- 
- static inline int is_badblock(struct md_rdev *rdev, sector_t s, sector_t sectors,
-@@ -1069,7 +1074,7 @@ struct md_new_disk {
- 
- int md_import_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 		       struct md_new_disk *nd);
--void md_put_new_disk(struct md_new_disk *nd);
-+void md_put_new_disk(struct mddev *mddev, struct md_new_disk *nd);
- int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info,
- 		    struct md_new_disk *nd, struct queue_limits *lim);
- int do_md_run(struct mddev *mddev, struct queue_limits *lim);
--- 
-2.43.0
-
+I'd like to test this, I suppose scsi_debug is all I have to sanity test 
+this...
