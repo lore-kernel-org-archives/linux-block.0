@@ -1,82 +1,117 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996243EEAE7
-	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 10:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0673C0635;
+	Thu, 10 Sep 2026 10:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789034970; cv=none; b=n9kI8p551E1sCQUroNnXN7T1pInQbUmr+bbkYEahwoBX4Jld+BSuTty3CyTk4iO3wX8gU/WYzvhZo5JMdftCujqUDQr37PadVXXkq/4CZG+YDeEjreZWeN10yOMkq7o8rhOZVF7n1tOVbxdhjoGRWfwFhXAKw9lSTBQaRJmtgWY=
+	t=1789035599; cv=none; b=g94ic0GTBgYtWTD3D7tgp78lEH6TSAFXTPVuNDF4gcrd7meMVUmPcY9tKkPj28sF4Mo49cy8QbzNbmkAmdaNTG/BWi/+ZXiSD+13Dvumgif/YP4ahCT905fpcWjfowLKAh8NxfzVDWhscDZITDreCVIcemwUn1A7E8DFi0eveiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789034970; c=relaxed/simple;
-	bh=FDh0DW4FreAXgSlDFmbyju9lTtz4hVwzfOzm+e6qy+M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VycnDduDxocPr0/Rs9K+anfkCp3A/tTWGkUDkbth2i7m/KPrrQ9gmWZUjAA0cMD8YX4LOS4LRRQXtVNvDwxVXLZYclm0WJzSJS3osg+9lh6Z2rddCxT2rI8cvlN7CmYePeKotxPO9zhrrLMeRrENFrZXOWuEHRDB9t5e7gMugAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: aafcedfcacff11f19a56ed5b684f684d-20260910
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:a6cd0f10-e723-4c87-8165-18430586c298,IP:10,
-	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:30
-X-CID-INFO: VERSION:1.3.19,REQID:a6cd0f10-e723-4c87-8165-18430586c298,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:30
-X-CID-META: VersionHash:7db8b62,CLOUDID:6a195ccaa05e1996a283e674f5ff424d,BulkI
-	D:26083116041099FKK443,BulkQuantity:2,SF:10|66|78|81|82|83|102|127|136|850
-	|865|898,TC:nil,Content:0|15|50|99,EDM:5|-100,IP:-2,URL:0,File:nil,RT:nil,
-	Bulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR
-	:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: aafcedfcacff11f19a56ed5b684f684d-20260910
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1445208291; Thu, 10 Sep 2026 18:09:11 +0800
-From: Yao Sang <sangyao@kylinos.cn>
-To: john.g.garry@oracle.com
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	john.garry@linux.dev,
-	kbusch@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@grimberg.me,
-	sangyao@kylinos.cn
-Subject: Re: [PATCH v3 0/5] block, nvme: support same-LBA multipath limit stacking
-Date: Thu, 10 Sep 2026 18:08:48 +0800
-Message-Id: <20260910100848.1248846-1-sangyao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <b6372900-7be4-4e6e-94ae-f816341e4c07@oracle.com>
-References: <b6372900-7be4-4e6e-94ae-f816341e4c07@oracle.com>
+	s=arc-20240116; t=1789035599; c=relaxed/simple;
+	bh=AGMXOz9WooLtmxCka5jf4X5QiuyLIh02VQs1iSo0TnA=;
+	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=KKUieZI2zMQ2GVJFL2KWJAE06rDFPUDCx8Dw6qmLqPMBHkc1+sedbIeBSYAC4hHeAg8y9uQ0CZv2lNVFr5Bhh1EBHOGZVHCtbTzsxJRJdwkwY4g4tNURIs2klxSBOtBc4uuStrZRS8V+EPzW40Nxs3ktTxGyvJbnTaeWrHnavPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mwp/OYZ+; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mwp/OYZ+"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id E85261F000FF;
+	Thu, 10 Sep 2026 10:19:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789035597;
+	bh=1td4zs8wZKlsu/Ec/TS1O57yTzxpXdAFyxHvF+VC3sE=;
+	h=From:To:Cc:Subject:Date;
+	b=Mwp/OYZ+jSKHM/OkdunoCw336mPjlitqLIODgIYIR/EV/Oud6w1dYZjb2f+txl6zA
+	 njkUaSgRFgnFjlSYlVxha3EUTr8kTJsSnxldUJa6stxfmwWuX+eyeBS+1V09cAa8ug
+	 vsJsjpKdl8BW4HPlfBYRd5ygOd8ipFnLeaP39jM5U8dwSTj0fb+S1is56rWFBCG93E
+	 hhhHOHcIxZjG99GMlnF4RafvjI4OWpRXHP1i32c8JcX/1aycpzgMKCcVY6lTKivgqu
+	 MNq02pH3990xDjcTbci5SLxINHvkjz34FclzT6uqcjV5l3uJWh3wWvRCOACFKVfkSV
+	 1iVkVsZib509g==
+From: "syzbot" <syzbot@kernel.org>
+To: syzkaller-bugs@googlegroups.com, Krystian Kaniewski <krystianmkaniewski@gmail.com>, "Jens Axboe" <axboe@kernel.dk>, <linux-block@vger.kernel.org>, "Nilay Shroff" <nilay@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
+Subject: [PATCH] blk-mq: fix out-of-bounds read in blk_mq_free_rqs
+Message-ID: <c92b0c7e-17fb-44c8-99d9-59d45004d05a@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Date: Thu, 10 Sep 2026 10:19:56 +0000 (UTC)
 
-Hi John,
+From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
 
-Sorry for the late reply, and thanks for the review.
+A KASAN slab-out-of-bounds read can occur in blk_mq_free_rqs() when there
+is a mismatch between the number of hardware queues allocated for the IO
+scheduler (et->nr_hw_queues) and the number of hardware queues in the block
+tag set (set->nr_hw_queues).
 
-Initializing the head limits only once needs some care, as we still
-need to refresh them after Format NVM and namespace changes.
-I'm working on this and will send v4 once it's ready.
+This mismatch can happen if blk_mq_update_nr_hw_queues() fails halfway
+through (e.g., due to memory pressure during
+blk_mq_prealloc_tag_set_tags()). In this error path, the elevator is
+restored with a larger number of hardware queues than the block tag set
+actually has.
 
-Thanks,
-Yao
+When the elevator is later freed, blk_mq_free_sched_tags() iterates up to
+the new et->nr_hw_queues and calls blk_mq_free_rqs(). In blk_mq_free_rqs(),
+it attempts to access set->tags[hctx_idx] to get the driver tags. Because
+set->nr_hw_queues was not updated due to the earlier failure, set->tags
+still has the old (smaller) size, leading to an out-of-bounds read.
+
+BUG: KASAN: slab-out-of-bounds in blk_mq_free_rqs+0xde/0x680
+Read of size 8 at addr ffff88818d67fc28 by task syz-executor117/5839
+Call Trace:
+ blk_mq_free_rqs+0xde/0x680
+ blk_mq_free_map_and_rqs+0x40/0xf0
+ blk_mq_free_sched_tags
+ blk_mq_free_sched_res+0xeb/0x280
+ elevator_change_done+0x1d2/0x5c0
+ elevator_change+0x34f/0x480
+ elv_iosched_store+0x504/0x630
+ queue_attr_store+0x207/0x2b0
+
+To fix this, explicitly check if hctx_idx < set->nr_hw_queues before
+accessing set->tags[hctx_idx]. If hctx_idx >= set->nr_hw_queues, the
+hardware queue doesn't exist in the tag set, meaning there are no driver
+tags to clear mappings from. In this case, safely set drv_tags to NULL. The
+subsequent call to blk_mq_clear_rq_mapping() already handles a NULL
+drv_tags pointer and will safely return.
+
+This fix also prevents a similar out-of-bounds read in the failure path of
+blk_mq_alloc_rqs(), where a failure during new driver tag allocation could
+lead to blk_mq_free_rqs() being called with an hctx_idx greater than or
+equal to set->nr_hw_queues.
+
+Fixes: 04225d13aef1 ("block: fix potential deadlock while running nr_hw_queue update")
+Assisted-by: Gemini:gemini-3.5-flash Gemini:gemini-3.1-pro-preview syzbot
+Reported-by: syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
+Link: https://syzkaller.appspot.com/ai_job?id=827b5760-86a0-4f44-9c69-430b572eac12
+Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+
+---
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 2c850330a..8e6726b37 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3473,8 +3473,10 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 
+ 	if (blk_mq_is_shared_tags(set->flags))
+ 		drv_tags = set->shared_tags;
+-	else
++	else if (hctx_idx < set->nr_hw_queues)
+ 		drv_tags = set->tags[hctx_idx];
++	else
++		drv_tags = NULL;
+ 
+ 	if (tags->static_rqs && set->ops->exit_request) {
+ 		int i;
+
+
+base-commit: 075b74841bd0065a3bda3440873c747938e69b68
+-- 
+See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
+The person who has signed off on the patch is responsible for
+addressing comments.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
