@@ -1,107 +1,128 @@
-Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FC13CB54E
-	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B083C10A3
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789073734; cv=none; b=HHAIskigGmgpxazy2N6SRaZrIbn/aFR2wd5rSFIMyTfpwG4tyE3m5ZAGmSY/xv1CP0T84Jj3WNR9WqnpFqo/cWuztWuJd2mTVjeYMi9QKVSid9blNjVMlCRynMZowkDsCGqL1PHYXjWiPjtkW/0MBPYAPAiU/l/5uuVdSGwMvaU=
+	t=1789073925; cv=none; b=jrf+PZewNcLmTKVXrk152/cB7KjjCSO42L0TKHRyRd7iMKNM8ICNR4AxpJ7fD1TNU4Q2kuYtnf4f2iooaz/KzsEg8Q7ew3O9U38uXBwWkc9noKX+XwssJ9utoluspEGUKNF8ZXHIlVmxk/5nxd9jYxgev+f+syGc8hg6Wx0DlO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789073734; c=relaxed/simple;
-	bh=t6ppwnoW/+SGU7+SZTpQCy0ZyrHu7AGE6vmt1IJD2Xk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=e39PFKc13vKVtH0CWMx+cZnKyeKZNvWq+tBYAI8jUm73b4QwiKDHkoHrevU7FDIDG2tZ1s4OdCL7ClplgVrTt8ZMVZnrfIAIVdT5U8TeptPl5HPUkrjg8Molsh5eIjk+BtQ+V5Yv7W/vRlmujEiWHu3hcQTYpSjXwXBNxV4OFRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Vp+7ZKLl; arc=none smtp.client-ip=74.125.231.171
+	s=arc-20240116; t=1789073925; c=relaxed/simple;
+	bh=ylWdr8yhyOUHr5p7rV7V/FTvMFhwSjE7Fa4ndWREMxM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MYhisBktPPoVh+ZQCIOEJ1Z9Dr/U1TJjiP1rr2FyH2x1ZW9ccScagt294ACOyMcFg2+K/fpc8nuz1zVBhVcIK1DXwnFhLIFH10w3z804tB7d5VJ8Krn75Z916SJ3xhPa8mlwOT6X/xpmh9Yb2cEuqLf4Z0R1xqcXmqtBRTyx6ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=JCWIFFcL; arc=none smtp.client-ip=209.85.160.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Vp+7ZKLl"
-Received: by mail-oo2-f43.google.com with SMTP id 46e09a7af769-7f4f0cfb29cso140892a34.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:55:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="JCWIFFcL"
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-46aef784ddcso95965fac.2
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:58:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073730; x=1789678530; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=B/R1OOuoA7A615cqKW89RYxj2atLZSBY/Ou5CD1Turw=;
-        b=Vp+7ZKLls41ZsActN33B+Ko9uzXa5TmRUtTWkEuC65XqHFmTroSDd4Q32h22Eu3lYN
-         gEyR64HkUMPmN2/MDwWfLwSS1+TskHgIHH++hUeGn3rbPLcHGku1OECfjpSY6woYvlf5
-         kiYSXuh69eG+Q8R9PjFXyg6FW9ETbPrtwR+/WOt5+vbHKu1b8UPWV4Ruq/FUfpI25AZy
-         58camd0NXcgJmJdpcaHNPkv4PrQEdW5UrAO6LsND17A90OIIVG9l+aNj1Fh9zGxui5Uq
-         ZXS5bG0Ef5W8AqQh7zsBA4chfq8Isp7P79IYyG4QxyQwR2bXmwSVmvawk7t+vd6Q5m2W
-         k/MQ==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073919; x=1789678719; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=227EuAsNywH5Ru6uyjfcvigTr1soLZnaZRqqI+5pgxA=;
+        b=JCWIFFcLxLQxXdXDZEqLRBuXsJhUNNgngvc5gWsDUDvJybqybK9yVb7iLek50ShSMZ
+         /weV9JaumU1fbMQSuJRjtmii5oKcvXI7hapFyIj9WN1anPieaNLAHzzxFVkj8Ivrd/Jl
+         pbN/PxTQogxvZNrlHqRZtGoAM8uAriRL0ZuTT5QF0L3VfSsLvn7cHYJWEnnsRDuATUDR
+         ol3EcgyDzCYe1VdcsqdVzSFGG63cpGPsck4oVgcEVsNpWQ6wl7Imye9o2679pizPWvOH
+         XPgaL+71rKMZA1s640W3tlBhJbBFo9l3PYafygM90yKbz34uCamWM5ssODooIH9n/OZG
+         4SRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789073730; x=1789678530;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=B/R1OOuoA7A615cqKW89RYxj2atLZSBY/Ou5CD1Turw=;
-        b=H48D20DKuPr2lbjHxjqgYZTjDyYQCrAaJk7bG/LHqmRhDWZt0x7jlLHj8M8gAh0Bkf
-         6dEgnHXW9nQoO/9E9Ell3cDaNw3xjcuFhuWIbAe8NdNYvt1iNjqdYUH2QTLC4gArysN3
-         ET/irTvP5FGiXY65LZpK6WqIWp/qLHkdCBtG39uzOq5oFB1/WHsJ8J1RleDeQB+bDBFz
-         PgxjW+NC7ae6PDmHIP3JDyuyPrRwVaoe59Xy9WJkkAwBcf5SsEXR21MrsXpO5/3bb0Z6
-         0xgcJxP/LhIrxkPFsOtMke92Ay0u+db7lNKQd7cQIVWHHjTxFEMLO4httneToR+UNxLn
-         5srg==
-X-Gm-Message-State: AFuF++nY4q2C+EC3ODQEgjAyXqteoCDTPXjpVLTySJD0g/OXuBmgKbxB
-	Qjp/SjjuyP2cpXCPbi0egXdMgkOWn0zHdKmxw8ACfPW+kpcJX5QUTHlMTRvIhyKS0u4=
-X-Gm-Gg: AYBFou1gZrOWSuwq66HxxGK9ljpfzgl3ZxZwXRZHR2uNSXELswHrrxrOhxVrEN17rQj
-	HhRbXS1u/eHTJhP8jpQDG7/8wJ3AQE/XkCGaLInGut++BTDES7AVtU31lf7rRqAoO4DyASIhfyE
-	NNoX34GvqEmrSdE7u1uGduuACdI9G/JMUk9bsUa3FqjSDcu54gRhU29XbJqZXN0L6t/fF4Xh5wf
-	Rv2KfGx/e4R5VzhvjSa6i+qSzIlNEv6Yy6KBunQblMMOC2DabEliz0d7Xsun3a7tiU0dPrejJHK
-	PybF/wYI4Sh0xpdp+2p2o/XMv9DgJ1fh5URMQZzHcMGxMDA3h6uwe49r5am6dqJMrMzqFgd5uPD
-	ZEse8eGUzkIVxEVvDrCiKKZAx9Du989YjJ5dWI+yDvYNKR2Vd7LPmXgbq+mZWn0KhbI8PWmDSJb
-	YY2A2cq5J7ES3SvgF2k9wQijAjDGIXNUDjcRMMCvCkTvLKjI2X3lrvJH1UnLI4UczBDfU1B5YOr
-	7A1TJpxSFrcOLi0Ysdt0PheBEOqqHJXpydaDuSDsMUltMVWKCw=
-X-Received: by 2002:a05:6830:2690:b0:7e6:d384:459e with SMTP id 46e09a7af769-803fdfc94ffmr847414a34.3.1789073730048;
-        Thu, 10 Sep 2026 13:55:30 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-803f60fe54asm635779a34.15.2026.09.10.13.55.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 13:55:29 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Stian Halseth <stian@itx.no>
-Cc: linux-block@vger.kernel.org, sparclinux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, andreas@gaisler.com, davem@davemloft.net, 
- glaubitz@physik.fu-berlin.de, regressions@lists.linux.dev
-In-Reply-To: <20260901173947.3292110-1-stian@itx.no>
-References: <20260901173947.3292110-1-stian@itx.no>
-Subject: Re: [PATCH 0/2] sunvdc: fix silent data loss under LDC congestion
-Message-Id: <178907372879.484803.7974471214841698578.b4-ty@b4>
-Date: Thu, 10 Sep 2026 14:55:28 -0600
+        d=1e100.net; s=20251104; t=1789073919; x=1789678719;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=227EuAsNywH5Ru6uyjfcvigTr1soLZnaZRqqI+5pgxA=;
+        b=c/IrWBMsm90cE7Ae9HbScYlf6Llb1QohP38/WqNVfcYPFwZQLXbu9eJo53IWYXUi81
+         J2xNE6skAk+lRCJhn3yyqwxvvMN2aJKaoZktsVTsRMnHU7cNHA/UAqucjJlge70rv/So
+         jxIDDqvugZABaeRj1cIgLCAaVsi5eYOgdartDkbC9iNWI+hVuLFL4Uib/T8TUaBvQcOw
+         56nJJw1slY0nxsPLvoKJHplJOIFtwIhMLFLqaP7jsIGQcaThGF0jkVQA7fi0n0d4nZv/
+         YKab+39DSrBs0/Y6prYX1f8tnWHHQ1F8FbkDoOdk3SKM0/SfSBVZLXP3TMHa+b6R/N0U
+         tRrA==
+X-Forwarded-Encrypted: i=1; AKwUvBw6o5HenoZsg1eKVXBV48KtSKnJtQG7DPEr0UzRJodv8SQwf/elBvL1/1lbJgjGpRp/DLqfDjo/BhD1zg==@vger.kernel.org
+X-Gm-Message-State: AFuF++lnjAsY9mH+W2YZ7s0B/AlHlFr5+L9iVu4SefA6PxxHpwcv7zbe
+	QXLp0enyGPkcs4cgYtiwRMCONmd1d0LwT3504x2qXrWDGgEOzhc7/j+QniGQvohY2sQ=
+X-Gm-Gg: AYBFou014Xgqh1mKOkVmn+k5igBadb3IUGvA8gKYZVH3UJEdbnmHKnJRKBZqxSLuxwt
+	qAfK+u8fikdV0imVozq1qa46O6wubGeHJ9ApScsTgb0IK1oQZBPsscIKd5gKh1NAbH0PCUCDiCm
+	EwP4Q9ZjKUSRLXeBdHUssX4HnbB2+J1Ml0lYOUVBnShEhAGbtXsPBZntyStGcSP7BVpyPd/Ci16
+	mtd/KqYUFZM+OxZ++l006MytQWa+YeUsp0q7rJ2yjMyBmI/l/xK0buGqIqMyAyxUvNNoCsoT/Lv
+	HfDjNrD1nHqguANeRTicnhb99yRQolcI7ssFbH4x2qDLVnvaKO72pqRTYycxbI91Dr8UMLMZUyn
+	O4uQ96czNoBymKSqDC+HjdLLwU7/8DiYv4B3EOmAo9mbKuAKTVfa0PQhkPaAAxp6pVSscXrnrdQ
+	ywRWl9fhiZUids7XG1tDlvdyKdImlnSlyFb0npF+z77kjaCCVE0vE5BnVksXJTCguYcj1SUkn85
+	/15S81lv5MFB950apLIgqoyhKcWcKvHtMtJt84MZcH2P+KNwZBZiOXw
+X-Received: by 2002:a05:6820:3411:20b0:6c0:5630:bdef with SMTP id 006d021491bc7-6c0bd97850emr353461eaf.67.1789073919642;
+        Thu, 10 Sep 2026 13:58:39 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6c09a122443sm1108879eaf.9.2026.09.10.13.58.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Sep 2026 13:58:38 -0700 (PDT)
+Message-ID: <eb469580-509a-4895-a819-e7f3e4fa0b0a@kernel.dk>
+Date: Thu, 10 Sep 2026 14:58:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 00/16] Add dmabuf read/write via io_uring
+From: Jens Axboe <axboe@kernel.dk>
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, David Sterba <dsterba@suse.com>,
+ Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev,
+ nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+References: <cover.1785596451.git.asml.silence@gmail.com>
+ <178907372259.484803.15807864431748251506.b4-ty@b4>
+Content-Language: en-US
+In-Reply-To: <178907372259.484803.15807864431748251506.b4-ty@b4>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
-
-On Tue, 01 Sep 2026 19:39:44 +0200, Stian Halseth wrote:
-> Since commit a11f6ca9aef9 ("sunvdc: Do not spin in an infinite loop
-> when vio_ldc_send() returns EAGAIN"), Linux guests in LDOMs see
-> occasional spurious write failures that manifest as filesystem
-> corruption. The failure signature is:
+On 9/10/26 2:55 PM, Jens Axboe wrote:
 > 
->     sunvdc: vdc_tx_trigger() failure, err=-11
->     I/O error, dev vdiskc, sector ... op 0x1:(WRITE) ...
->     vdiskc: writeback error on inode ...
+> On Sat, 01 Aug 2026 16:46:12 +0100, Pavel Begunkov wrote:
+>> The patch set allows to register a dmabuf to an io_uring instance for
+>> a specified file and use it with io_uring read / write requests. The
+>> infrastructure is not tied to io_uring and there could be more users
+>> in the future. A similar idea was attempted some years ago by Keith [1]
+>> (from where I borrowed a good number of changes). Later it was brough
+>> back up to life by Tushar and Vishal.
+>>
+>> [...]
 > 
-> [...]
+> Applied, thanks!
 
-Applied, thanks!
+Eh no it is not applied, was just looking at the series locally and I
+guess it got added to the b4 ty pile.
 
-[1/2] sunvdc: unmap LDC cookies when the descriptor send fails
-      commit: 0c6da21fa35e03fc74f09895433ccd6d4a9c3530
-[2/2] sunvdc: fix -EIO issue due to lack of retries
-      commit: 5067d4ba713961d8ccea1e06cd4c453793f3121e
+I am, however, wondering if we'll see a v6 of this soon? I had some
+comments on the nvme dma mapping, that can be improved, but I'd rather
+defer that to post getting this included.
 
-Best regards,
+If the series is dormant, just let us know, and we can pick up the bits
+and pieces.
+
 -- 
 Jens Axboe
-
-
-
