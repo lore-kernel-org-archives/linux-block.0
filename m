@@ -1,117 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0673C0635;
-	Thu, 10 Sep 2026 10:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA654570C2;
+	Thu, 10 Sep 2026 10:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789035599; cv=none; b=g94ic0GTBgYtWTD3D7tgp78lEH6TSAFXTPVuNDF4gcrd7meMVUmPcY9tKkPj28sF4Mo49cy8QbzNbmkAmdaNTG/BWi/+ZXiSD+13Dvumgif/YP4ahCT905fpcWjfowLKAh8NxfzVDWhscDZITDreCVIcemwUn1A7E8DFi0eveiA=
+	t=1789036841; cv=none; b=kJs+RBVXUOZTXNNUlGfLbMrkIqtazW4ZQLr8+xoNJW/uH6yl+ecK71wjvIjLzja20UsHtbqJnMf3+QH0jGECJGLXv+ktJ9t5mARuCKMp68y06AUCy45FlYGRTH3agSGjrUzBctJhKVNGe8EaJ0/ojln8ILd8jld03I60SNQrHLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789035599; c=relaxed/simple;
-	bh=AGMXOz9WooLtmxCka5jf4X5QiuyLIh02VQs1iSo0TnA=;
-	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=KKUieZI2zMQ2GVJFL2KWJAE06rDFPUDCx8Dw6qmLqPMBHkc1+sedbIeBSYAC4hHeAg8y9uQ0CZv2lNVFr5Bhh1EBHOGZVHCtbTzsxJRJdwkwY4g4tNURIs2klxSBOtBc4uuStrZRS8V+EPzW40Nxs3ktTxGyvJbnTaeWrHnavPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mwp/OYZ+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789036841; c=relaxed/simple;
+	bh=MIcY1C8MN6ruQso0PInqXSYbJW/J3xRQLXFt6LaXZhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zz5rFL+/d1yKOhVDQAQiI3pElDX+PEnfoXLQndm8kEilOk0T49fA403LdnuR7gXIOYzOPhf3I9IN868Pkd1sLbsxdBAiCfcDspjq8oA5zOpko0g8DZIjLQkpo48H4XC/UfdaMnpVtma8eUgB0OcbE+YbBrNOW17nX2zLH+n9W64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oKnzk6qp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CGE5WYVp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vGMkJVot; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4nuin77n; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mwp/OYZ+"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id E85261F000FF;
-	Thu, 10 Sep 2026 10:19:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789035597;
-	bh=1td4zs8wZKlsu/Ec/TS1O57yTzxpXdAFyxHvF+VC3sE=;
-	h=From:To:Cc:Subject:Date;
-	b=Mwp/OYZ+jSKHM/OkdunoCw336mPjlitqLIODgIYIR/EV/Oud6w1dYZjb2f+txl6zA
-	 njkUaSgRFgnFjlSYlVxha3EUTr8kTJsSnxldUJa6stxfmwWuX+eyeBS+1V09cAa8ug
-	 vsJsjpKdl8BW4HPlfBYRd5ygOd8ipFnLeaP39jM5U8dwSTj0fb+S1is56rWFBCG93E
-	 hhhHOHcIxZjG99GMlnF4RafvjI4OWpRXHP1i32c8JcX/1aycpzgMKCcVY6lTKivgqu
-	 MNq02pH3990xDjcTbci5SLxINHvkjz34FclzT6uqcjV5l3uJWh3wWvRCOACFKVfkSV
-	 1iVkVsZib509g==
-From: "syzbot" <syzbot@kernel.org>
-To: syzkaller-bugs@googlegroups.com, Krystian Kaniewski <krystianmkaniewski@gmail.com>, "Jens Axboe" <axboe@kernel.dk>, <linux-block@vger.kernel.org>, "Nilay Shroff" <nilay@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
-Subject: [PATCH] blk-mq: fix out-of-bounds read in blk_mq_free_rqs
-Message-ID: <c92b0c7e-17fb-44c8-99d9-59d45004d05a@mail.kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oKnzk6qp";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CGE5WYVp";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vGMkJVot";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4nuin77n"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D500F1FD91;
+	Thu, 10 Sep 2026 10:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1789036834; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=69B/w051ajDwGu+8Za/JAqWssX4AmJ+eR0Ae71+TIaM=;
+	b=oKnzk6qp221MxeaLysF5WGuuQWZ9htHvF2sU8L01JLhKsTqv6XdPsPFLfnf949mKjd+2KW
+	4ZJMFbu3/nZcxPcfjC9Qa/rwd05UwPr1wfujjmI4JL0nXq5wN7jDD1EtrgAthbLb/qHsLD
+	mT5w/ZYwimzK1tTd0UaHS0fMm0qPqU0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1789036834;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=69B/w051ajDwGu+8Za/JAqWssX4AmJ+eR0Ae71+TIaM=;
+	b=CGE5WYVpzolyPAM98sjSKHy0XSRmdEHHW0KfPwYGkrFbnP75cvJXauBY1kMfA9l9/Lbz0V
+	16k30U22AG9zpHBw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vGMkJVot;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=4nuin77n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1789036829; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=69B/w051ajDwGu+8Za/JAqWssX4AmJ+eR0Ae71+TIaM=;
+	b=vGMkJVotbONpPT4Ck84jmBWLJaIQmxCU9JSwGhovkDmbd4n3UPM17xoSzJMYo7cxU3j2yh
+	+LQDg84w9llomTKsX5EMhxdl1TgK0HSEKNOQzFNuV3JUsXu9KszhLIpEm0esl8ipERDebc
+	6fP7x9/RlLLSDZFr7VQ8KbMV5UVgKMg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1789036829;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=69B/w051ajDwGu+8Za/JAqWssX4AmJ+eR0Ae71+TIaM=;
+	b=4nuin77n+MGJib/6bFwOFK/RpEmkfQ0Xq5ybvk0qUQyS44zBbYRqRdUYqiSHtT54NHkyao
+	METyYWSESbfxGABA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 49A9713180;
+	Thu, 10 Sep 2026 10:40:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id L3gJDx2JomqWWwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 10 Sep 2026 10:40:29 +0000
+Message-ID: <b6eb9cd8-9597-4023-a2d1-7bc0f07f68b2@suse.de>
+Date: Thu, 10 Sep 2026 12:40:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/7] block: remove dead metadata handling from the
+ async direct I/O path
+To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ John Garry <john.g.garry@oracle.com>, Christian Brauner
+ <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>
+References: <20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu>
+ <20260909-blkdev-fixes-v3-7-1a5222c6e8ad@columbia.edu>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260909-blkdev-fixes-v3-7-1a5222c6e8ad@columbia.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Date: Thu, 10 Sep 2026 10:19:56 +0000 (UTC)
+X-Spam-Score: -4.51
+X-Rspamd-Queue-Id: D500F1FD91
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,lst.de:email,suse.de:dkim,suse.de:email,suse.de:mid];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Flag: NO
 
-From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+On 9/10/26 12:05 AM, Tal Zussman wrote:
+> Since commit 2729a60bbfb9 ("block: don't silently ignore metadata for
+> sync read/write"), blkdev_direct_IO() sends every IOCB_HAS_METADATA
+> request to __blkdev_direct_IO(). Remove the now unreachable metadata
+> mapping in __blkdev_direct_IO_async() and the unmap in its completion
+> handler.
+> 
+> No functional change.
+> 
+> Assisted-by: Claude:claude-fable-5
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> ---
+>   block/fops.c | 10 ----------
+>   1 file changed, 10 deletions(-)
+> 
+Maybe a 'Fixes' tag, since you already referenced the commit?
 
-A KASAN slab-out-of-bounds read can occur in blk_mq_free_rqs() when there
-is a mismatch between the number of hardware queues allocated for the IO
-scheduler (et->nr_hw_queues) and the number of hardware queues in the block
-tag set (set->nr_hw_queues).
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-This mismatch can happen if blk_mq_update_nr_hw_queues() fails halfway
-through (e.g., due to memory pressure during
-blk_mq_prealloc_tag_set_tags()). In this error path, the elevator is
-restored with a larger number of hardware queues than the block tag set
-actually has.
+Cheers,
 
-When the elevator is later freed, blk_mq_free_sched_tags() iterates up to
-the new et->nr_hw_queues and calls blk_mq_free_rqs(). In blk_mq_free_rqs(),
-it attempts to access set->tags[hctx_idx] to get the driver tags. Because
-set->nr_hw_queues was not updated due to the earlier failure, set->tags
-still has the old (smaller) size, leading to an out-of-bounds read.
-
-BUG: KASAN: slab-out-of-bounds in blk_mq_free_rqs+0xde/0x680
-Read of size 8 at addr ffff88818d67fc28 by task syz-executor117/5839
-Call Trace:
- blk_mq_free_rqs+0xde/0x680
- blk_mq_free_map_and_rqs+0x40/0xf0
- blk_mq_free_sched_tags
- blk_mq_free_sched_res+0xeb/0x280
- elevator_change_done+0x1d2/0x5c0
- elevator_change+0x34f/0x480
- elv_iosched_store+0x504/0x630
- queue_attr_store+0x207/0x2b0
-
-To fix this, explicitly check if hctx_idx < set->nr_hw_queues before
-accessing set->tags[hctx_idx]. If hctx_idx >= set->nr_hw_queues, the
-hardware queue doesn't exist in the tag set, meaning there are no driver
-tags to clear mappings from. In this case, safely set drv_tags to NULL. The
-subsequent call to blk_mq_clear_rq_mapping() already handles a NULL
-drv_tags pointer and will safely return.
-
-This fix also prevents a similar out-of-bounds read in the failure path of
-blk_mq_alloc_rqs(), where a failure during new driver tag allocation could
-lead to blk_mq_free_rqs() being called with an hctx_idx greater than or
-equal to set->nr_hw_queues.
-
-Fixes: 04225d13aef1 ("block: fix potential deadlock while running nr_hw_queue update")
-Assisted-by: Gemini:gemini-3.5-flash Gemini:gemini-3.1-pro-preview syzbot
-Reported-by: syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
-Link: https://syzkaller.appspot.com/ai_job?id=827b5760-86a0-4f44-9c69-430b572eac12
-Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
-
----
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c850330a..8e6726b37 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3473,8 +3473,10 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 
- 	if (blk_mq_is_shared_tags(set->flags))
- 		drv_tags = set->shared_tags;
--	else
-+	else if (hctx_idx < set->nr_hw_queues)
- 		drv_tags = set->tags[hctx_idx];
-+	else
-+		drv_tags = NULL;
- 
- 	if (tags->static_rqs && set->ops->exit_request) {
- 		int i;
-
-
-base-commit: 075b74841bd0065a3bda3440873c747938e69b68
+Hannes
 -- 
-See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
-The person who has signed off on the patch is responsible for
-addressing comments.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
