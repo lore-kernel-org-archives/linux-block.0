@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446863DCD83;
-	Thu, 10 Sep 2026 09:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F350B379EC6;
+	Thu, 10 Sep 2026 09:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789030876; cv=none; b=Ta26opAnPqwjjG4TRDrP7zY1Jx362nFIglhTL3QDR6N74DE1OfzWD3ACJDbNUBpfgt3qNjq+G9GihnMbwcbEzDG0FMQb/ueXgAKEwjFF7GnN0PjLQhfF3giV2tvJ36yRGpXNgKWvyo1FWDuYFRI7QAfAnuUrv2CYO6lkN3X4KiM=
+	t=1789030882; cv=none; b=cKb8B1MsZW1bXXBkoRejRiBR3HvV4DcFUA1hQucz3p+mFwVQ3jOupK8InnG/NPS4wfhY1BBWvhzTAqb/Gbo1kojY/lXath5R+0aNc59uLIvKKPsfBWWVdW+EZppqFf1tovym7hPH+dps/9GEj3PszVNep3Rvm4LLehre5GGVvjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789030876; c=relaxed/simple;
-	bh=mGjHroTCuk5mK+JJ+qPXVN3JjYkyaG93c58j6hdhhAw=;
+	s=arc-20240116; t=1789030882; c=relaxed/simple;
+	bh=SXD5uNcrjbDkLGWlPX/KbflXX1vgmQ5tBA1rgWw6Oxo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lq0XcNe1CI/PDtNOsZWchhof12IFZVeExGp/sSZGmrFl8kpWMz4MM45KKQ8ZztXY+2j1Hm+YtCNMv33n22/02LhNXKoTMvFCgpAtvFBfRyIAZkMRHwKFccm0B77htenn68u2gSHciCXfHiNVfadYkM/YOJYLqkHSRzZKoEq6eKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3BerBbv; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=U+egxhW+zjea3siP0mvtjZsoJvveloY54fMQdwWI9500OW3PicCqX8qBljw3B9Ipd86Zo8HH32vAN6MvRtJ76YXkFrnxsJ26sg0ehS5MYixIbjBNWkC6RkoNpLed/12QCyjTGTgN2dSzcDuGQFXwB8iknZ498GbZp8kGioaOFbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJ+XqesX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3BerBbv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4B481F00893;
-	Thu, 10 Sep 2026 09:00:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJ+XqesX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AEF11F00898;
+	Thu, 10 Sep 2026 09:01:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789030860;
-	bh=Wg/k9xgyZfA9ou1Djuuw6WTAhRSTMUQxS2X1MvSzmrw=;
+	s=k20260515; t=1789030872;
+	bh=s7S7XXrE3nWzY3ONCdrsA6SEjg/y++hz7JJ/gIuPEcM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=M3BerBbvMzXCbqj1EM09oZC1x/XqtdFtYXby2y7p5INcP1rT/onE38lD3s9fbAPt1
-	 dTM3owMdOb51VKsqIS7ZY4Jwd+kmExADj4SdFBpqtRitNVsuPob0zCPz/YCbvq/NWg
-	 bKEUVq61CO36E7mG2RaRdMSHyjZ7cCks9P0bE1iIUh50r0w6bwX3IzKb2uL/bCD0J0
-	 XCJ+26ItEf7z37CManyUaT30zxZl0HKA6kD+wNWZ99EgI8FR8q7xtGE26//BdQyFY5
-	 r/Vf5yfq3gWNKI5fBzX4eKcDmkrgIXN0SXzDQwGZVe6/iwbjS5wVgAkLQVgjI7Wj+N
-	 34OcU8MdNduOw==
+	b=IJ+XqesXeR3rwnE8YiSGAMy74CDSFRf2vn9CkYC94FFki3qkJju9gP347J8asQYy1
+	 Ba4hgpuYSs1N56xySaWeWTdoWQLbFuJf3QU0GE2gD//1hacXnchFL+XZyvbRWckVud
+	 43sG/uMibp+/HuD70PSFtTf+xbxQVPfiBghz7yXppW+a0mFJck0q0ErSG4AKF4+lvF
+	 0vsVu83SO6vFPFQOsm+r2wtgEisrUEHNUgPza4UklC7aewEaRRYDHU/lX2LBcIS0EH
+	 tg9wd9zfGWKo6QLeDt2BSO+Vm3gjyr81Onnwto6R/eTQNwDvJtKQklRZ987kcoS4It
+	 w4akeFg8drFyw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Thu, 10 Sep 2026 11:00:13 +0200
-Subject: [PATCH v21 9/9] rust: page: add `ExclusivePage` for race-free page
- access
+Date: Thu, 10 Sep 2026 11:00:12 +0200
+Subject: [PATCH v21 8/9] rust: page: add `from_raw()`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,8 +36,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260910-unique-ref-v21-9-e83257373062@kernel.org>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260910-unique-ref-v21-8-e83257373062@kernel.org>
 References: <20260910-unique-ref-v21-0-e83257373062@kernel.org>
 In-Reply-To: <20260910-unique-ref-v21-0-e83257373062@kernel.org>
 To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
@@ -78,119 +77,62 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>,
  linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
  linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
  linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
- linux-usb@vger.kernel.org
+ linux-usb@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4137; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=mGjHroTCuk5mK+JJ+qPXVN3JjYkyaG93c58j6hdhhAw=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqonGpjFpIGLMETXkqUNOBWFFizecM/26XuOncT
- XS44dh5H5CJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaqJxqQAKCRD6UCkIqsW9
- 0LrMEACOm8qftJlk0GIO4ABiC6zoPZAx2wOPesrHLpI3yWQgcGB9ibsYkXK02yOfxuQMd5U1XEy
- kbzCsSAVhUUTuRLhFIUTEOpjgX/MXvSnmXJxnZogRyVBym3A6Je6rXWsgU4Je3qDsRWaz7kFXUk
- R1drGj+gxmakDZaVaxEoWBkzuRr7ZvwKHWUIJxhzkDb5psCDVvZOY6A1xcTwC5rate+r3NPo516
- +iVFq6MqVlAcHnwGGMGsCkBBUt9aWLt/Hiunh84LwSYOTzrIDtFEQoSr450gCDwK9FTjmcpoHXj
- 94+1SOEu5P9+U2V3aRAQYVVOJAL5tAaLDeLcLNvP9OY9Z9iZmx9BOHShqepoaOf/E+sG3s5hDgB
- dwqZVd5fHyf0EuSdKGM/fNhQiRwPJ4aAL7pONHTSNWJTYRIT4dmS5Zspd9WlBHs0KP64c5Jbee5
- wmnyR4QPIDeyzzTkw9d7GDN+Dg4409ufq3emr5PX6XMRdxHiScv1MJ5x6fLF62b+xZZtP04ahI/
- UJPJHdQKHsuZoK1JYSiGqLBv01CXdiSuV3oDAlLBqcSBCdj3jmNlD3RyWwimRU3WsP3JyBSMSla
- 2VTyzkCqWTXDpUa5HncvNKHmXLW4Hb/YlycVtlU1KkGP0vZIYslkDWvSezPQAc2SODRqlPkf8uz
- cvfoyXcSbtziopA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1342; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=qsvOsH5eJ/6SOy/kG5D1q9n3SKwDVeax/chnlBoc3Xo=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqonGoab6vY8s20eqgiCSmL4uGzV7sGy2smNjbZ
+ wuNFu6zRxGJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaqJxqAAKCRD6UCkIqsW9
+ 0P2ED/4y0eQDwdjf1HYThRZR1AGuMa3kPD5Z55q5tNW5zGzFQWEjGOPwoKokVlha/nFjzxaddX+
+ REzqMGWyTOcbuX/SXoeDCy0OhknY/kwnhAsS+xJxaARcFVrwakURX9JQs91mLwqDYGSNHC20cFy
+ U+YgPREcQJVQzzJAGyOK/2PCUqC0bDxTjUWVdtTIV6RMUE7U89ulN79TUItTzt4bjrw4IpFCY6U
+ sTBgSAf3wfNHkKD5JazKA3TyWPREJUNfqTAdSIz+f/hTa1qbLHcRQlL93CFB+9FmUxVCcCiaD4s
+ q1z82eE61CdMs6UWpHhYDll19pW6abxVa5iNqq+WNxz2QYfYhOCzc4es7H+PiT+CbxrSaFTImWk
+ x+XNqAwXFQ10L2uHjklUOUIcJ6KAmrBeXazqL/6UgXMRe8ISncWYSC9nAnITCrtOOr/puGiEF1E
+ m5zLFhTnvBu7N0872U1cJqrESNiReM4HckNcw5GEOH9xOHRcoM2tI7B+gnogw7atqjMmWVEneMv
+ 6v/v0CDDBmwj1/jjMupa8FRmoz9xr3zMIOZMZVYMz7AtueK6DiKX5Rbg8srWyL7FalAf4ifRHJG
+ i1JpqOo/KpwQCCRSzIlJYJw/LSWKs6dcfoLoD09ol2jQkAsfpqkEERGE/JQO8mlhgHR6VNnOdL6
+ gKJ8ZCKmAm5v1mg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-`ExclusivePage` wraps a regular page but adds an invariant that the
-page data area does not incur data races. This means `ExclusivePage`
-cannot be mapped to user space or shared with devices, and it
-becomes simpler to directly reference the contents of the page.
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Since `Page` implements `AlwaysRefCounted`, handing out a `&Page`
-from an `ExclusivePage` would allow safe code to obtain an
-`ARef<Page>` to the page and break the aliasing invariant of
-`ExclusivePage`. Thus, do not implement `Deref<Target = Page>` for
-`ExclusivePage`.
+Add a method to `Page` that allows construction of an instance from `struct
+page` pointer.
 
 Assisted-by: LLM
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Reviewed-by: Onur Özkan <work@onurozkan.dev>
 ---
-
-This patch was previously submitted as part of a different series, see link
-below. It is included in this series to provide an example user of `Owned`.
-
-Link: https://lore.kernel.org/r/20260605-page-additions-v2-1-03f04c8fdbbf@kernel.org
----
- rust/kernel/page.rs | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
+ rust/kernel/page.rs | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
-index cd394b0656c0..4e5b1c2f4346 100644
+index a2610774c749..cd394b0656c0 100644
 --- a/rust/kernel/page.rs
 +++ b/rust/kernel/page.rs
-@@ -17,7 +17,11 @@
-         AlwaysRefCounted,
-         RefCounted, //
-     },
--    types::Opaque,
-+    types::{
-+        Opaque,
-+        Ownable,
-+        Owned, //
-+    },
-     uaccess::UserSliceReader, //
- };
- use core::ptr::{
-@@ -349,3 +353,52 @@ unsafe fn dec_ref(obj: NonNull<Self>) {
- // SAFETY: We do not implement `Ownable`, thus it is okay to obtain an `ARef<Page>` from a
- // `&Page`.
- unsafe impl AlwaysRefCounted for Page {}
-+
-+/// A page whose data area follows standard Rust aliasing rules.
-+///
-+/// [`ExclusivePage`] has the same usage constraints as other Rust types. Thus, it cannot be mapped
-+/// to user space or shared with devices. This makes it safe to reference the contents of the page
-+/// while the page is mapped in kernel space.
-+///
-+/// Note: [`ExclusivePage`] does not provide access to the underlying [`Page`]. Handing out a
-+/// `&Page` would allow safe code to obtain an [`ARef<Page>`] to the page, which would violate the
-+/// invariants of `ExclusivePage`.
-+///
-+/// # Invariants
-+///
-+/// The data of this page is accessed only through references to [`ExclusivePage`]. While a shared
-+/// reference to a [`ExclusivePage`] exists, there are no writes to its data. While an exclusive
-+/// reference exists, there are no other reads or writes of its data.
-+#[repr(transparent)]
-+pub struct ExclusivePage(Page);
-+
-+impl ExclusivePage {
-+    /// Allocates a new `ExclusivePage`.
-+    pub fn alloc_page(flags: Flags) -> Result<Owned<Self>, AllocError> {
-+        // SAFETY: Depending on the value of `gfp_flags`, this call may sleep. Other than that, it
-+        // is always safe to call this method.
-+        let page = unsafe { bindings::alloc_pages(flags.as_raw(), 0) };
-+        let page = NonNull::new(page).ok_or(AllocError)?;
-+
-+        // INVARIANT: The page was just allocated, so its data is only accessible through the
-+        // returned `Owned<ExclusivePage>`.
-+        // SAFETY:
-+        //  - We just successfully allocated a page, so we hold the only reference to it, and we can
-+        //    transfer that exclusive ownership to the new `Owned<ExclusivePage>`. Since
-+        //    `ExclusivePage`
-+        //    is transparent over `Page`, we can cast the pointer directly.
-+        //  - The page is never moved out of its allocation, so we can treat it as pinned.
-+        Ok(unsafe { Owned::from_raw(page.cast()) })
-+    }
-+}
-+
-+impl Ownable for ExclusivePage {
+@@ -146,6 +146,20 @@ pub fn nid(&self) -> i32 {
+         unsafe { bindings::page_to_nid(self.as_ptr()) }
+     }
+ 
++    /// Create a `&Page` from a raw `struct page` pointer.
++    ///
++    /// # Safety
++    ///
++    /// `ptr` must be convertible to a shared reference with a lifetime of `'a`.
 +    #[inline]
-+    unsafe fn release(this: NonNull<Self>) {
-+        // SAFETY: By the function safety requirements, we have exclusive ownership of the page, and
-+        // by the type invariant no other references to it exist, so we relinquish the last
-+        // reference count and the page is freed. Since `ExclusivePage` is transparent over `Page`,
-+        // we can cast the pointer directly.
-+        unsafe { bindings::put_page(this.cast().as_ptr()) };
++    pub unsafe fn from_raw<'a>(ptr: *const bindings::page) -> &'a Self {
++        // INVARIANT: By the function safety requirements, `ptr` refers to a valid `struct page`, so
++        // the returned reference upholds the type invariant of `Page`.
++        // SAFETY: By function safety requirements, `ptr` is not null and is convertible to a shared
++        // reference.
++        unsafe { &*ptr.cast() }
 +    }
-+}
++
+     /// Runs a piece of code with this page mapped to an address.
+     ///
+     /// The page is unmapped when this call returns.
 
 -- 
 2.51.2
