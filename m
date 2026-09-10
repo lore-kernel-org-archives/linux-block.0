@@ -1,200 +1,202 @@
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020093.outbound.protection.outlook.com [52.101.196.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF214E56F9;
-	Thu, 10 Sep 2026 16:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789058579; cv=fail; b=qLJh4B5vh+aFMjNBUtT85EdFJdJbBQX6MyO7nJWgYFRDfVIIfyLNnD5EOmFkF6le1/sorE9rWM0zO0uXua/HzZqTik3l3LR/TN1gtgN2u/N8Rq2A55vLoVQhpgnvXIoJ4BmveS1ztQrYcFOgv/hf8jFRCnD6Jz8nPcJSl1m6/vY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789058579; c=relaxed/simple;
-	bh=xjG2tRYYuK4uJZa+4H0bkRa05Z9bU0kwKYSIakGM6x0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N831EZnXGZPuhFchyqRMAp7qy4nPsLXBB1ecAMHHPTPgkhly7eIYVrflvLjvYaFU5aAx7sWFk3CEThpmNSibuVZp8Lw4w5j/ZUi7HGPYgQ6wydEuBUouOp1o8rOceA1fpmNlhgh4wTJwJmCYO9LfRrTfXO3E3b4Ttu4ObuomOtM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.196.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oNUeA1+N9BHMWrbwVk0hm1GL2/+OGqB7JHyxcQFL3sxrrEL3AqXl9aq5Be54jAucEbS3uwM1i9zY90wugvuBFevE/pK1ZqLLpH5IUn6N5KkCKCwSfMF88cPHkepPXknnfBeF0bK4XNXWz3gOjWVkTSfHPc6wtQZdpLawdsr9veBfBBMLoAWsb+0JfLS63kK48YSSujLRt9+QyfMDoIZ2yi/XKDGarMMH7og5sMQOvAx2FnLfzAn0g3/2cfKHWuTQbQmcRRF5VAdtQng0tFMSWoLdFh231Wa45/2WCLu5oLzSr1Ssiaqxiv7BANwKHuOgY4j7MgdATJVABjssydhSPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=4WO0GAEqxTGLmUFitmgR1ZTPbYpelVRt5xRMxd/yFqs=;
- b=tF96mFSt8STaBRBHQh//frQg6gosj1bai7icRfdBgkv6ad97wjaqh3jSkyXcjVRghF9FqInq5vRdmCuqroCXNU+SUgYaHR9jjfRgVmc8OFV15GeWqXTjvUueSlx4UKvRU+TWOd2amF2nzU0Ki9AwAdY4GyA3w1S4bKoqdi5FAQx3OmIwT3tHsDUV17VGwr/dOFr2jzFgLdFkERxycluw0YtCrJa4XsA68TLxKPPBB1AHNSIo9Qfq1V+WadDA54LAj8qvd9z8ucnuD9yl1pIS2o6Ti7P1iU7hBWqhmt3DaG7fVRauYiJ4qJ9hODDqGBMcyvaiP0BSz8loZqYp9uaRJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by CW1P123MB096022.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:2a3::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.9; Thu, 10 Sep
- 2026 16:42:55 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0406.007; Thu, 10 Sep 2026
- 16:42:55 +0000
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: axboe@kernel.dk,
-	tglx@kernel.org,
-	aacraid@microsemi.com,
-	James.Bottomley@HansenPartnership.com,
-	mkp@kernel.org,
-	frederic@kernel.org,
-	bigeasy@linutronix.de
-Cc: atomlin@atomlin.com,
-	ionut.nechita@windriver.com,
-	corbet@lwn.net,
-	vincent.guittot@linaro.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	radu@rendec.net,
-	akpm@linux-foundation.org,
-	steve@abita.co,
-	sean@ashe.io,
-	chjohnst@gmail.com,
-	neelx@suse.com,
-	mproche@gmail.com,
-	nick.lange@gmail.com,
-	marco.crivellari@suse.com,
-	rishil1999@outlook.com,
-	linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v16 2/9] lib/group_cpus: remove dead !SMP code
-Date: Thu, 10 Sep 2026 12:42:30 -0400
-Message-ID: <20260910164237.500196-3-atomlin@atomlin.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260910164237.500196-1-atomlin@atomlin.com>
-References: <20260910164237.500196-1-atomlin@atomlin.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: DS7PR03CA0004.namprd03.prod.outlook.com
- (2603:10b6:5:3b8::9) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430724746D4;
+	Thu, 10 Sep 2026 16:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789058581; cv=none; b=SdrHRTUafQkTV4r4sd39jXrKLxXbHEDriwfLH0MB2XqZfzPm8gH1wBT3X6t9ELyUbYiPhPlC9wooZ0k6ztdnpFQ1L8jMbKH9x8wswvtbULKT6QFFcx9iWX2qetwPOEOmraFgBDsfjyhEn9cAml0nqvIF5l988fIfRtXEGgILfDA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789058581; c=relaxed/simple;
+	bh=8Ri/Spiu7X3VxJRCZ/3Kkau/nCdLiYyhq30upHZz5ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=na8GSRraqjkhn+F5Wh+UcHLoOdFn10D1c4Q+XrsFjN9+DLMM9wCkB4rDfpMGdusBA/6ArNEtK8sL7FqL4Y57hC1DiAG2UcjqYDR2izGZm4sgarTdwmUpdCXLe+AxUPZ9N8SEl7SkAaTccCnb+Rb7z6yPMjBW6TBSBqLWesiJwls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mx6t+Yj0; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mx6t+Yj0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40211F000FF;
+	Thu, 10 Sep 2026 16:42:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789058578;
+	bh=u+08F42gZ1mjtG948ilU+qH+waoqzEUJrlsSmxp12pg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Mx6t+Yj0PeebzMuIJqPgec3En+yEc3jysRhyQVcO/3xYfd6qRuj4KeQqGVNCzS2eL
+	 tCtcfzvlsBuCl4wxQp6RjOgXiieppplEvlrHF+GHBK62/oFrGU48yOaMvfA3o8/DKl
+	 lp6zHFol4XfSS/1l/cU6JxsVOB1VRQHK9uwzb3UaviBuy4O13O//74V+0i7C/ekLSM
+	 xY/O3Idda5zMFFYFFSaqcOcGCxMfdZ0Giof01bXvDxALY83lMxS2B1Z6K0pJsE++qd
+	 8ttfLDK+ZFgQeeUlUGkjRs+XrSEr2l8SmGBsKMUNs/VdxT4ev53Rb0h/F/7fMsBQj5
+	 lpuAfGS8Cb3Sg==
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 5C10C198003A;
+	Thu, 10 Sep 2026 12:42:46 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Thu, 10 Sep 2026 12:42:53 -0400
+X-ME-Sender: <xms:Bd6iagPViEKcMUR9L2vFUVYNdprlzxw9XOLW44LJ6W1KhqtQxQnhvA>
+    <xme:Bd6iattXOdK7DFkC0F0nDe7b7nzqRN_1slYG7pnn2eTjabVH1i1lJVoXBOTnkDcYD
+    yQHBBQge5ZmMFR65IoCw_QeLeGdvdGeOn7HeFsJIZo_eBj7htu3DsCO>
+X-ME-Received: <xmr:Bd6ialInbQnB2AqOShml-Iu32fBNfjpfNiHw8KMCpB9T_FsL6DAUsXfgPRE>
+X-ME-Proxy-Cause: dmFkZTE6jQ7+ezdJvg0JCOHdeYm98uh8QoD3ppKlDCRkHPBf90NB4jh+ryx62TK4xbeazW
+    OjmkN5eot9viRbZ00CYgDBHT2oH+RH5aQCFDDcusEjlg36Fb5ctpKOdLx985wH/FQip39p
+    T7ct56TymSBRJpKxvgkeX9MwBtQkzBLcy1It/iWo2GFSKP14EPKpuBcDC6NZBPjPGuOYSt
+    gDaf9qR90/vzX/n4LPNTXJAoXyXdh9FPu33aE25/XhViK2AK9AjkA9McfHxKUYwZZ4cNQy
+    L9J1ZGy+68s9a/50qhSiH99Xat/XVOrftxEw7V9RkHk0x0GqdIBAFNnw6YCfe96nIenPCV
+    unI4se8nbIGD4Kq9IYLNhYyv87qSPRhN+Krgj6j273FqV5FEWJwwMlgm5Sz+45zLTVppmx
+    gHvNV0/P+4vzXnfFkqMihWIDJuG3ZV6EBEqsa8ZNbqO6blwIo2VGujQcKnZ0KB8O1A4cZh
+    9aVyRAJDPIwz5b4tC125/MeGSy186XR8QU31P4geQmSY4nJzZjY/iH6DhjfNoFwbPWMawa
+    e5jKQkqOdLGPlpHmn82M4fAZGG4IXR1RdfGZek9O9ES1ZEMAINtyHU1UsXLyrbltnxGrWV
+    KMFv8bBZJLT//oUQTE/4JmHaZi+S9YjPBcCpBWE6Rkuxj00ZtgLEzvfdjpDQ
+X-ME-Proxy: <xmx:Bd6iajt_a78yf2WByZxPGLwSXjlyfvmDfqklZ3D-bRcriVOd6tjAiw>
+    <xmx:Bd6iak311tPhcHMu11wJQRGm-Fk6zSP8hp2lUqWvrnseo5WM6kic7Q>
+    <xmx:Bd6iaupl1jqCNcNt6L9n9QuK98czBLyQ7VsDoSscYztatIFYfsUShA>
+    <xmx:Bd6iav6AfsE1iY-2vTfH3cPqIiNOLEowj4RO_MWGwntIFX9Y4OIZvA>
+    <xmx:Bd6iap0WK4EpvFtPf4iclLgLtn-EIP7kOOwcSnxor8OGyZNXXiZYHcGf>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 10 Sep 2026 12:42:44 -0400 (EDT)
+Date: Thu, 10 Sep 2026 17:42:43 +0100
+From: Kiryl Shutsemau <kas@kernel.org>
+To: Hugh Dickins <hughd@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ 	Ackerley Tng <ackerleytng@google.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ 	Alexandre Ghiti <alex@ghiti.fr>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ 	Barry Song <baohua@kernel.org>, Binbin Wu <binbin.wu@linux.intel.com>,
+ 	Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ 	Christoph Lameter <cl@gentwo.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ 	David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>,
+ Jan Kara <jack@suse.cz>, 	Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, 	Kairui Song <ryncsn@gmail.com>,
+ Lance Yang <lance.yang@linux.dev>, 	Leonardo Bras <leobras.c@gmail.com>,
+ Lorenzo Stoakes <ljs@kernel.org>, 	Marcelo Tosatti <mtosatti@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>,
+ 	Mel Gorman <mgorman@techsingularity.net>,
+ Miaohe Lin <linmiaohe@huawei.com>, 	Michal Hocko <mhocko@suse.com>,
+ Minchan Kim <minchan@kernel.org>, 	Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>,
+ 	Peter Zijlstra <peterz@infradead.org>, Qi Zheng <qi.zheng@linux.dev>,
+ Rik van Riel <riel@surriel.com>,
+ 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shakeel Butt <shakeel.butt@linux.dev>,
+ 	Suren Baghdasaryan <surenb@google.com>,
+ Vlastimil Babka <vbabka@kernel.org>,
+ 	Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>,
+ Zach O'Keefe <zokeefe@google.com>, 	Zi Yan <ziy@nvidia.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v2 07/26] mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize
+ folio_activate()
+Message-ID: <aqLaa4QvXMbQaIWG@thinkstation>
+References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
+ <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|CW1P123MB096022:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30ef03d7-1460-46d8-0aea-08df0f5a9035
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|366016|376014|7416014|6133799003|18002099003|22082099003|56012099006|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	DUnbbSYmwBkRmk06ZP6hZZt77itE0RbTU43ziUztlKR7Rezcim5GdtOu9vqLMe+xO6ilJEjbg6X2ZBytBXAOang1YC72ZjEUEbFBtQgJHc9Mu73RXZFc3aoVGpSi9ENbq4LARzmYCyPexn+1boAcmcNFU7ySbkepQqCjLkx6uHQ23eWKSyfVm2wWM0srU7cKDy3yw6dR0j9NefD8oMWOvjE846+8+w70E+ZoIE5hnJUNh2Q6og7rOdKYuWR/Ck/G6IiCvkk/OSpNCrQtmFilnMEQQWwCpMeYSuMbC6E67JNMeZki/1ZPSbQ/UH/8lWX4/ZqkAUS7ZngjJxT0KXgi8/LXKVk/1Ve0gKnBPpDJwCEO3CspJ6S4HT8buog12Pl5mMmQ9paXCytW2LFssDT/YTRut5EvY+XYK3/zIRXOty+MB0FbiHRBbEpjfXAtH1EUhNsIbDS+ngwwkGouVA/yrEhPEbxXf8ZaU/Oy7umwnEIF3jx4rbyCx7KZIOtb3k0haFHRnRon/4FhVAHeOyWUKkrDOF4VKYWc8IjEkhcWaFO/RsLNFjhPLPaiNC3/eXhuN5LyaBMHY6Z9Ag6J2oKOYiZzF6kchcHWSk0Joky9oh1rVLceAxaxQnqGXi2PVFeFFa4dvtXJF0Y1TwvUL1Q6Ff3v0YN8ajBhToDZYkgiIZ4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(376014)(7416014)(6133799003)(18002099003)(22082099003)(56012099006)(10067099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ff29oOyxn62t71PH3deYJgDGEKi5HQ1pADSvmyMuExYnz1jm9oZgLDXvWdCb?=
- =?us-ascii?Q?Vffp7TMEdThQT3N+vUAEyCM8+ObBhrjxH/bxyHXBpuRd3ZnyHM7ApBwQ0T9v?=
- =?us-ascii?Q?9inC9nvM6TWscdvwJ6riKPU+go8++gFTI45evnEnac9olixsstQ7TF/MEliH?=
- =?us-ascii?Q?CR/ldeV2E0IxBQjURQ8BvM7ppWW+iY6nl4QRX0DN5mxdEWAnQ/HNMa+liwfA?=
- =?us-ascii?Q?A26pYgGTPrB/I6iFCqcyGeIgm68dgH4SfiVIuWCx6n3sT3KS+LuN3xJLSfv6?=
- =?us-ascii?Q?fwZPW41s+E79H7BkyhH989sugCFZKuBFXikInzhPPVnFtNS3YiJhLeDS2DiS?=
- =?us-ascii?Q?MMvNlpMnSX7tkyCgMfZFpVLqsiI7otCtztEXIeaalqOyV9T5FnjLP1aFu6eV?=
- =?us-ascii?Q?Bz0M5HsYRIIHUgnu4jHBwUsKFhdeaA4vlBSmE/FXm1JAcJDV16l8XQEcai3u?=
- =?us-ascii?Q?2vFNKukKx9bUSQlji5MBaFVvMhL1LpzJwR0WH+4+Tb/xaY7IQfJcNo/7QdME?=
- =?us-ascii?Q?F/q3D8EJNkDFHwPPcVoNWuRm9iqajxThFTUmeUgbZI/EICiZxc4KdhsgB9Ta?=
- =?us-ascii?Q?jVa1BJBuTZUllJjA5FtTLicRa3e/4SfO71gP4NLvxW0g/6zclJXOcjM6rF5Z?=
- =?us-ascii?Q?InCA56kEDF0yUDsKilWXlTW0E37+772cIuZzKFWkgboNNbjRSPsUFj+PrYOu?=
- =?us-ascii?Q?pXqhTuZJ13RvuEvZSCZqL5Yv+qjkZRULRv1uGZc71Icd22i54eHsbfqbIjhT?=
- =?us-ascii?Q?530MR0i5TqokJtONR4oSM5ubZgceVE9f5WjpxyT0Jc+/0uB1ophTYIMJ+axr?=
- =?us-ascii?Q?s4i+WVZiSeApQYEJh9hJEuAAkA0ff20zTq4JiNnrERcC+oPPgbWtZHvp4nrW?=
- =?us-ascii?Q?OO2KWd5DIdDcBQg1TkytGMiEXKnhhbI8A3l9jdUgYIzOi7hd0Vr+i/18D1tw?=
- =?us-ascii?Q?hUVqJbRMNI1NXHyZqizSYj7BXwi5q1qYqQeUq1rW7VAdtXSu4J/NrWAU3g4X?=
- =?us-ascii?Q?xlRZhoQ39XLMabMUNmXgcVEJV9k2Bj96GOYwc+4sTUMFZT/jQmk3NIAicrkq?=
- =?us-ascii?Q?tLbWzzdZVf6EmeS7Qgd+UUUFfRdLGFlDzY1c/irDqIMG5U1DWVkCGwPCLaUI?=
- =?us-ascii?Q?5z3A0HvolrgSmzpqhgpqSGxNHVY7jM4Olou4iNXxsp9XcgCeKcNceOGcMfjf?=
- =?us-ascii?Q?O4HwSD0eUDDAnZ3Zux+b2CG52vedpsJdfVBP8r0b2naHgBMNY1XQpDqyXFSM?=
- =?us-ascii?Q?sZrUSrZNVUOeRHSpImQhPqQyOkmLIXTC3B0XkRKSU2Hucnq+Nfi5U8mBkseh?=
- =?us-ascii?Q?YzDIRovoSHgk3RIgszfBtkxc7Xf3VjaSZMoagdpMUnzhkf9xLVf81zUe2ugN?=
- =?us-ascii?Q?OeipojMJQlz2u+I7Kku5giWxhMiN3ZjxXC3M9V1ImxxSYbV3LpP1xOHF4GKx?=
- =?us-ascii?Q?PVSLZtizW5c4U42+15A2i+loB4azrv54KUDCf5HjNi12oUPS4Dqf4yNrLade?=
- =?us-ascii?Q?tqluz4XVijrwOZndkg5rjlD3GEsoozmRN1hyULiW6uKDEUIhpYUE1BKsxYMP?=
- =?us-ascii?Q?c6z0xexUT54bJ5SMIJVf+EECD5XlZVi6itUKFDCxICMy0Jn81ktuHiZ60YXB?=
- =?us-ascii?Q?2qDyiE3qZzS4k1pVW12RjLtjKT1/S0Vhb3Rr2YZZcTR8acoszwKaPYYaVe+i?=
- =?us-ascii?Q?/cOrDafQtrEC7Ck2OtWtK0E0F74hewcaZWWzTq7Zw/JE1rQyC20tJu4rr+Kt?=
- =?us-ascii?Q?5A66hxqrmw=3D=3D?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30ef03d7-1460-46d8-0aea-08df0f5a9035
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2026 16:42:55.3062
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q+NngaWDOVta5BUERIzpDCs1DJ0Dh0eEVHM7JFCIgRHviXgfDZfIfUqyEEoPd3d+cSAT6ujeHOO+OGHG89fkzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P123MB096022
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com>
 
-From: Daniel Wagner <wagi@kernel.org>
+On Wed, Sep 09, 2026 at 02:55:41AM -0700, Hugh Dickins wrote:
+> Implement an equivalent to the old __lru_cache_activate_folio()
+> optimization, to activate a folio recently put in the lru_add fbatch,
+> without having to put it through the lru_activate fbatch too. Neither
+> lruvec lock nor lru bit can guard this safely and efficiently, so resort
+> to try_cmpxchg() on a further, LRU_NEXT_ACTIVATE bit in folio->lru_next.
+> 
+> Signed-off-by: Hugh Dickins <hughd@google.com>
+> ---
+>  include/linux/mm_inline.h |  4 ++++
+>  mm/folio.c                | 23 ++++++++++++++++++++---
+>  2 files changed, 24 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/mm_inline.h b/include/linux/mm_inline.h
+> index 8420b1276535..8f5efadf9c7c 100644
+> --- a/include/linux/mm_inline.h
+> +++ b/include/linux/mm_inline.h
+> @@ -346,6 +346,7 @@ static inline void folio_migrate_refs(struct folio *new, const struct folio *old
+>  enum {
+>  	LRU_NEXT_NEVER_TAIL = 0,	/* Used by a tail's compound_head */
+>  	LRU_NEXT_BATCHED = 1,		/* Not used by any aligned pointer */
+> +	LRU_NEXT_ACTIVATE,
+>  	NR_LRU_NEXT_FLAGS
+>  };
+>  
+> @@ -358,6 +359,9 @@ bool lru_add_del_folio(struct folio *folio)
+>  	if (!(lru_next & BIT(LRU_NEXT_BATCHED)))
+>  		return false;
+>  
+> +	if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> +		folio_set_active(folio);
+> +
+>  	WRITE_ONCE(folio->lru.next, LIST_POISON1);
+>  	/* BUG_ON(folio->lru_next & BIT(LRU_NEXT_BATCHED)); */
+>  
+> diff --git a/mm/folio.c b/mm/folio.c
+> index a18d8ef6afd5..0b75c3b69d5a 100644
+> --- a/mm/folio.c
+> +++ b/mm/folio.c
+> @@ -256,15 +256,32 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
+>  
+>  void folio_activate(struct folio *folio)
+>  {
+> +	unsigned long lru_next;
+> +
+>  	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
+>  	    !folio_test_lru(folio))
+>  		return;
+>  
+>  	/*
+> -	 * XXX: It is curiously difficult to recreate safely the old
+> -	 * __lru_cache_activate_folio() optimization (folio_set_active()
+> -	 * directly if it's on the local lru_add fbatch): revisit later.
+> +	 * This optimization is intended for the common case of folio
+> +	 * having been recently added to this CPU's lru_add fbatch.
+> +	 * But since other CPUs can now take it at any instant (after
+> +	 * a folio_test_clear_lru()), and we may be migrated to another
+> +	 * CPU, it is simplest just to extend the optimization to all CPUs.
+> +	 *
+> +	 * folio_set_active() would be unsafe without the lruvec lock, and
+> +	 * a folio_test_clear_lru() here might cause a racing drain of the
+> +	 * lru_add fbatch to skip its lru_add(): so use try_cmpxchg().
+>  	 */
+> +	lru_next = READ_ONCE(folio->lru_next);
+> +	while (lru_next & BIT(LRU_NEXT_BATCHED)) {
+> +		if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> +			return;
+> +		if (try_cmpxchg(&folio->lru_next, &lru_next,
+> +				lru_next | BIT(LRU_NEXT_ACTIVATE)))
+> +			return;
 
-The core scheduler recently transitioned to compiling SMP data
-structures unconditionally to reduce code complexity - see commit
-cac5cefbade9 ("sched/smp: Make SMP unconditional").
+Hm. What prevents the folio from becoming unevictable under us here?
+I don't see anything.
 
-In alignment with this philosophy of reducing dual-path maintenance,
-this patch removes the #ifdef CONFIG_SMP guards and the dedicated !SMP
-fallback logic here.
+__folio_add_lru() wouldn't like it:
 
-While the !SMP path provided a slightly simpler execution flow for
-uniprocessor kernels (avoiding SMP-specific overhead), maintaining these
-separate code paths adds unnecessary complexity and testing burden.
-Removing these guards simplifies the codebase by standardizing entirely
-on the SMP logic, which safely resolves to single-CPU operations on UP
-configurations.
+	VM_BUG_ON_FOLIO(folio_test_active(folio) &&
+			folio_test_unevictable(folio), folio);
 
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
----
- lib/group_cpus.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+folio_lru_list() has the VM_BUG() too.
 
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index e6e18d7a49bb..b8d54398f88a 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -9,8 +9,6 @@
- #include <linux/sort.h>
- #include <linux/group_cpus.h>
- 
--#ifdef CONFIG_SMP
--
- static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 				unsigned int cpus_per_grp)
- {
-@@ -564,22 +562,4 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
- 	*nummasks = min(nr_present + nr_others, numgrps);
- 	return masks;
- }
--#else /* CONFIG_SMP */
--struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
--{
--	struct cpumask *masks;
--
--	if (numgrps == 0)
--		return NULL;
--
--	masks = kzalloc_objs(*masks, numgrps);
--	if (!masks)
--		return NULL;
--
--	/* assign all CPUs(cpu 0) to the 1st group only */
--	cpumask_copy(&masks[0], cpu_possible_mask);
--	*nummasks = 1;
--	return masks;
--}
--#endif /* CONFIG_SMP */
- EXPORT_SYMBOL_GPL(group_cpus_evenly);
+I am not sure what the right fix is.
+
+Maybe lru_add_del_folio() should only call folio_set_active() on
+!folio_test_unevictable() folios?
+
+Or should we allow occasional active+unevictable so if they are
+munlocked, they will go directly to active list?
+
+> +	}
+> +
+>  	folio_batch_add_and_move(folio, lru_activate);
+>  }
+>  
+> -- 
+> 2.51.0
+> 
+
 -- 
-2.55.0
-
+  Kiryl Shutsemau / Kirill A. Shutemov
