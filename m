@@ -1,106 +1,152 @@
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA854390987
-	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10A13C10A3
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 20:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789073499; cv=none; b=iPcmk9L6lXVfqPkplIxSMq8KprNz+kIeqyFs0YTrLaCuOMOHYOvvq/GxJMyOMuxi2BL0RjRtmydkHR/zPQvc7D2fLlSBo214ZBqT4HLLoUM3DvJLGWyqdftFhGbgpi+1aA01XHUSv/Shdhii4WcgE7zHv1CAF4w50PI3HfvZ39A=
+	t=1789073727; cv=none; b=tm3M+9gvLkBK6LBW7lsBLVnUvQqAWycKxEWZ6cslDlMyu+1kYo9qy1hMSK7y6G6GYH9xvPMlRVPWgsaqlp7iV/QsJoMlanKYL5MhkZphFMG4EumgKWCZuxkIOVxyEEPkTlXK3HbkVs7Ls5vLGsdJ3evNlif/2U2tHM/Pdo5KKNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789073499; c=relaxed/simple;
-	bh=lQ1tC8QyyXsDWotGX0Dze7Qq9KJn6duOUqMRQ51l/t0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kFzk02VPNNb8lgURTh2rMSqy702h+McXczJr0kKCqbS4xwCXYgcxFqTqERAlDAxLyaL4+stilCkfemQajFB+m38PtsV/xvprNUE+rT7WHN2stHYYsjqMaW5E/j1Vra+TdED8zJTsYUIhl8oO3vt5PFYUJkkBw1RVwXaQR3zQad0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=qyAe0Gp+; arc=none smtp.client-ip=209.85.167.169
+	s=arc-20240116; t=1789073727; c=relaxed/simple;
+	bh=hFrf47wiCRa+Xp/RSbKkY05XcZwBmlybD2veRYYsg0I=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=KlhOmF92RU/dVhHdWgDnoFkKfYKQ+yQl5jHkfbTA6+OJksAeWgZJbo+HGdpiP/U9h6szh4pZkLK0EOzDoUKqPski0NRiJUdNhKwjKafsJTS39XtfH3zHRAQylxmS4sVjWkI4Hkz/eeig39HlbDkZXGjtwOJKwpaAT7bAZxeqoJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=cHd6WKoA; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="qyAe0Gp+"
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-4b3a61bdf22so199717b6e.3
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:51:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="cHd6WKoA"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7ffa69b7462so205460a34.3
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 13:55:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073494; x=1789678294; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GXMKHM4ByjQtPNS9X+R9gCOHk8uolkvlV5huzt/Ejg0=;
-        b=qyAe0Gp+5MJD41P0biXsS+Tm0HKWVFusfBdr9lw1bFjum0QXINGToLWe3CtCYKJLzP
-         mBCuIRz/76OmagJleXEv3Bv34AwPLVWb8g2XWC8qslvJ3tiUei3HkNC/2ZLl4qBipMdH
-         qSjuY5eFLiqF1axrzdsuju/LUT05moIPnXAayc4h0Y+oGbqayjp10hSlr/iRIwyLWAWN
-         Nl9nxWeW8LX7syvxrhW0/jOCeRrnsZA/x4bTf/mR8NJlgFsTKlF+5vKeEdBt1o46RLZI
-         jk0llL/4HRqbWf0SK1oeMwc5YFrwyRUFB07A8lRQDQvmvP4V5CpDHShEiq0t27SDF4em
-         MWQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789073494; x=1789678294;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789073725; x=1789678525; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GXMKHM4ByjQtPNS9X+R9gCOHk8uolkvlV5huzt/Ejg0=;
-        b=HZ3RcQ83zhrFY1pDG14TGBrQ41t2k/TWJh69a2wgxNb/dWahOjKfWOIo1L+Wzdc0S0
-         xZiCBC1jugzyMqydrKUIbj6EZYfEkT15tMapArOBfq9xYUWBY7fzOLldBD5xlUA3y4Tg
-         BZcIzKx+cmjVsyero3XLr1w70cszM2JVyueBQmG0u7CmReXz0DQw/dbC/mX3W7s5vjAG
-         3D3crase5t7NjSH0L0B6ut1cse7nIasDcw0tY6KTxZFuclj0Otg3xlDze7MYd0ziCYXX
-         K3Cjyk7QoAXaleBeeTP2MVqhhvtzs5TqJTdp3eJeWfc9OhI811xfU+CmcdO/R0oDYkpy
-         81/A==
-X-Forwarded-Encrypted: i=1; AKwUvBwK6+m3YAZyf1E5qfvSd0kJTPNH1jz0DGca9eGLnk26uoO4zSzT8uvCcMB0cKF+bsNH5/uX8ysWMi+5lw==@vger.kernel.org
-X-Gm-Message-State: AFuF++l1kwrMe08TWsQBRiW6w9HCsqW9EJLncWBL6I/wCxKEdPbqHBp8
-	bIV5LZUwKoyXrDVIrkSGP52MrP4WLPJJSorCTQxVIHhVN+TV4637eToM9OR4SGAWT58=
-X-Gm-Gg: AYBFou0jkmh9mWb3/fG+fzedEd8gdHw19mpPjUvMKnCpR5GRAf4gVIkGcOgxgpL41Uu
-	jw+8OQ0w+gdEF9WLpuoOtYIWXNY385QJyzauPGxMGde0Gw/Cpf9GzHoJH4n60ffSJ+yn8Mbfd6X
-	KJ1B22bXSZ7xpT66IzJZCjNBYYFvXtWsixCuJFZQdv9mBmoyPI5VBaEYAEaeYlQQbhhfmsP8vw8
-	7ZcLNZpL/ENAe7RI25GrU5Zo4oC4zwO62s073FNAkUGjgOgFPcCuPEdEtyBXTLrgoSLu6TrQ5XF
-	jGHwx5GWsUVK6t9zDKWmU26/0y1GdzTNg147wdgY2SB2ua8YW74gne/g7eS1WSRVTZXYevi35mT
-	vNy8gkCzdWl3RxaEVZPxQcAB/Vx6Q9qpRYbPvM6PhEIffw8iyyvTKVKJJ/ePEwWHELfrIX6O3LZ
-	UVAG5W6GIAAxvDrkgvvLJiXwHr74ScZBPQcLrqGxg4lg9RKSRXEeneSRzgc5D9NHRz6Xe4+p2oY
-	OobSth1D5nuEDWqZAuEVPYymfx4GJSpDAZVgcr0V76CTdFGzxhVmcFl
-X-Received: by 2002:a05:6808:1a09:b0:4b9:a88b:8895 with SMTP id 5614622812f47-4c31cf44127mr554822b6e.43.1789073494540;
-        Thu, 10 Sep 2026 13:51:34 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4c330daa69asm282875b6e.5.2026.09.10.13.51.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2026 13:51:33 -0700 (PDT)
-Message-ID: <cff350b3-836f-4953-97f3-d664164746b4@kernel.dk>
-Date: Thu, 10 Sep 2026 14:51:33 -0600
+        bh=pkbEmlLYOqHu2rT/pG1b8F4ZrumOvKHVAf/LIvXXM5Y=;
+        b=cHd6WKoAkZVsRuu8KoPan46EIfg6VdtlPtEjUgBLJ19o6s1C/So7zaFjSumnMYu52q
+         g+3GprZpgU0qqMUqp+UrgaslT8B+rasqcvgdgxaJjLlxpgNB5bLc+pW2uIgtZuO50nIN
+         8FddKuSLz9D6zKO2i4DK7tPcw7Jr8FfiZj8U+yXum0nx5TON+d78WYjsZEgmdVpqMuBo
+         lpf6R+zGcruYC6JtOBQi9qbGI3djIIKqnjdtTScIeqK0RHFiOH6Xj1GRaKoBYgs/tjxW
+         UpcjGmb23ts0wrHJG7xwegI2ArRgUltSREuDSdffE77y5yNlQSNvMQ+ExKi8opZqMeiZ
+         C09Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789073725; x=1789678525;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=pkbEmlLYOqHu2rT/pG1b8F4ZrumOvKHVAf/LIvXXM5Y=;
+        b=OI4hhC8JUF1toEejYYGgTBwgAEu+cNNjTp4xjP+yfD9UREIB3/pjsGWdecpeJx5aT7
+         A5MWC/Y5pPtIUAox3VCbTpgG0XilZspfcfBKrBHNm7yyh5nGJdjobOvC9dbw1Y1wKwgk
+         pOyjKt2ggoE4Aty90GmK88Wqx0r8pVdUOd37hZv3Ti/jWgjSw+Ue41kephKAO15vU11S
+         G6WPUeBpU6d9gjHV0cBljy+NiI1LkOzi7dMrATuuX0zAuy7YguXgXtqA/hJOQ78dZsLS
+         Ut6dOeWWTwuKihCU3ALkTRtA/tUI0RQQsE6fM2fmMks3cXjav5RCmXfxcpQ5iy881aso
+         L/Tg==
+X-Forwarded-Encrypted: i=1; AKwUvBxLoEmkFIgxZFxzXdWtHXneMr4mk+5uzq5TuhX7OqQuCSKi8bGlR2oMigQCnPRy9nS4e1zNi1goJqfOBA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mrpEq92aEwZ0fNs7zQEc6sR9Jfu/rf6R1QmAoh5kUBKMX5WKAz
+	n3F/1EcTvY5I5G9Xc8wAVljPVg5TowYbZN/qYbpg8hBXmUF/rBA5YTiPZC1JtWOYQwo=
+X-Gm-Gg: AYBFou3yOOmN3hHCGPm4ng27rxiWFUZazFJWH6LG0k18GXpMqjic0W1KHYk1DIASmCj
+	E+se82AQYVpKZ09Rb4cMN9Wd37U2pk/myhHyJwSKkhTLvP6Eq6n86xEQF4UmoXMu7lJdfdjVpGK
+	8LFNRR0TAkF0XDXuR0R7RVHiQNyOPJTtsWm/+8mY+5dwUOCxnt8lyBp1XnKJVRJLxiJE0XaqRv8
+	U4SIEf9pGqXgZ8DASf9NV1ZOVDSI4yMtQ/+8a9XEypoMOToVZ9rvWcKkzoGVyS1lk7Fi0qXEWQr
+	PJg6+X3pNwALzYuGj5/35yNT8PDHu2f1pYNCcLQtrkcDqiQzDjjSGjKIBPPbthkeRWjs0fGq0/u
+	bghxpUucvxkrxX1VT/DjPsYmNutp84j5KyPqaNX9IXlpmtGvdzvy2+t/Nx0dzKxvdwL2XKp+oQu
+	82Ud0IC1sbcYSbBvkoekpwr8m+uJHBLYkh7sNuxMuVY+FEs16izCa0XfMFzGy/meUGBKo8m7f8+
+	UGMmUirOy2O/Uq4tSkSOvniF5Na+4ePU20l7DbP2vsiTX5SOkU=
+X-Received: by 2002:a05:6830:2702:b0:800:d883:997f with SMTP id 46e09a7af769-803fec02e59mr471619a34.2.1789073724704;
+        Thu, 10 Sep 2026 13:55:24 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-803f60fe54asm635779a34.15.2026.09.10.13.55.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2026 13:55:23 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org, 
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linaro-mm-sig@lists.linaro.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>, 
+ William Power <william.power@intel.com>, 
+ Phil Cayton <phil.cayton@intel.com>, Damien Le Moal <dlemoal@kernel.org>, 
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>, 
+ Benjamin Marzinski <bmarzins@redhat.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, David Sterba <dsterba@suse.com>, 
+ Ilya Dryomov <idryomov@gmail.com>, dm-devel@lists.linux.dev, 
+ nvdimm@lists.linux.dev, linux-btrfs@vger.kernel.org, 
+ ceph-devel@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+In-Reply-To: <cover.1785596451.git.asml.silence@gmail.com>
+References: <cover.1785596451.git.asml.silence@gmail.com>
+Subject: Re: [PATCH v5 00/16] Add dmabuf read/write via io_uring
+Message-Id: <178907372259.484803.15807864431748251506.b4-ty@b4>
+Date: Thu, 10 Sep 2026 14:55:22 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: lazy bounce buffering for checksummed reads v3
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>
-Cc: Tal Zussman <tz2294@columbia.edu>, Anuj Gupta <anuj20.g@samsung.com>,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
-References: <20260909060924.1102037-1-hch@lst.de>
- <fe537c5f-114d-4d9a-817d-93f359e12924@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <fe537c5f-114d-4d9a-817d-93f359e12924@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On 9/10/26 2:50 PM, Jens Axboe wrote:
-> On 9/9/26 12:08 AM, Christoph Hellwig wrote:
->> NOTE/QUESTION TO SUBSYSTEM MAINTAINERS: The patches in this series are
->> split over 3 subsystems, and I'd love to hear from the maintainers
->> about their preferences for merging this.
+
+On Sat, 01 Aug 2026 16:46:12 +0100, Pavel Begunkov wrote:
+> The patch set allows to register a dmabuf to an io_uring instance for
+> a specified file and use it with io_uring read / write requests. The
+> infrastructure is not tied to io_uring and there could be more users
+> in the future. A similar idea was attempted some years ago by Keith [1]
+> (from where I borrowed a good number of changes). Later it was brough
+> back up to life by Tushar and Vishal.
 > 
-> It's a little hard to split as you have eg block patches both at the
-> start and beginning... In the spirit of getting this some runtime, I'm
-> going to queue it up in a separate branch,
-> for-7.4/lazy-bounce-buffering for now.
+> [...]
 
-On 2nd thought since this already relies on stuff in the XFS tree
-apparently, you can just add my
+Applied, thanks!
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+[01/16] dma-buf: introduce initial file I/O infrastructure
+        (no commit info)
+[02/16] iov_iter: add iterator type for dmabuf maps
+        (no commit info)
+[03/16] block: rename bi_bvec_done
+        (no commit info)
+[04/16] block: always adjust bi_offset on bio_advance_iter
+        (no commit info)
+[05/16] block: move bvec init into __bio_clone
+        (no commit info)
+[06/16] block: introduce bio_iov_iter_set()
+        (no commit info)
+[07/16] block: introduce dma map backed bio type
+        (no commit info)
+[08/16] block: add dma-buf support for raw bdev
+        (no commit info)
+[09/16] nvme-pci: implement dma-buf backed requests
+        (no commit info)
+[10/16] nvme-pci: rename nvme_pci_sgl_set_data to nvme_pci_dma_iter_set_sgl
+        (no commit info)
+[11/16] nvme-pci: add SGL support for the dmabuf path
+        (no commit info)
+[12/16] io_uring/rsrc: introduce buf registration structure
+        (no commit info)
+[13/16] io_uring/rsrc: extend buffer update
+        (no commit info)
+[14/16] io_uring/rsrc: add uncloneable regbuf flag
+        (no commit info)
+[15/16] io_uring/rsrc: add regbuf import flags
+        (no commit info)
+[16/16] io_uring/rsrc: add dmabuf backed registered buffers
+        (no commit info)
 
-to the block patches. Would probably make everybody's life easier.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
