@@ -1,80 +1,228 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604663BBFD8;
-	Thu, 10 Sep 2026 07:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDAA419FD4
+	for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 08:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789024849; cv=none; b=gIC3LQTPtiSRsWCga8GABg8jJr7kHtmy3gi0XiLR+RqQl7WO+jRdexKIRJWyvrhb8p+Z2nqi2aWEM5/IFsS//MIRm8zjU4RFe/HUrGA+IeL5A9AUaeW14piWgAjuGMSJ4ORgoDPnGSmtfbCUsyqJRQa5M28pvQ5HuiPAbcL9QGU=
+	t=1789027880; cv=none; b=Si/2kLoutI7b0LYtN/yynSquKnbvN6aXPRp0fn5pcDxJrShtmVsjavqgHhisxroQl9wE7u2s3de/acAsTs+M9TZYjWcDWu/KP1YupI8quFoKZ16Om6FP8CqpuE4BJbZcqCaOJ4seM4cEdEVzn25WzGP4yPZuNPYmAcrA+L0P2TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789024849; c=relaxed/simple;
-	bh=95lB2rqAT8/9fbrzrWPi9ojqqwpDHL3D7Fj0mykqOXo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=X9ONvKDtjaWf2nJlKY9pAtI/kqguLwajytQ+E10ywHNb4ZKtfJgpgcHCfhjtHvXV0Afe3lqM9Z3dnlgcLS2fDvdsLlGuHrBkoIdhlz7SyXN23ekI+I5OXgmvoOyIL+Jt8oGm1ITuLTa46ulTfFtYjMxthPl0Irid6rmbtqlfzIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQ6bYg3M; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789027880; c=relaxed/simple;
+	bh=3gwQDg5/pRQMl/ZeRC2dW7FljbzBvJ81WHltDVFJAPY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wh3i9O/l2X67rMU3SSo34XZ90eHiMCtv9u3ovB9yxyzU8OIYJtdxTRkfdZGhVry67MCn1rUrIN+zFTTFvvAdXGeIGKzlT5Q7EW/XER8+lHC/0GV0W4LXrp2Mut9dsB4Mk+pHuj36I6mebY3vo1yM/roBJifyvcIZc939TVLGcr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=cmZyACvv; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQ6bYg3M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE251F000FF;
-	Thu, 10 Sep 2026 07:20:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789024848;
-	bh=8TX6RG6eAzR9OAyzBYFZrl4ztTDV71rgf3sUqmarc+k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=IQ6bYg3MnkXyDuyDbI64Liip8nHYaBMzMu/UIorsLWaoZy6Le/8DvWXPDVkxl08Lx
-	 QbfWxcxpQ/FdEo1sSKVaH/ho6IVF2lDjmAHwfuiZ8jwnzWG7rvOqCxVHrrh+llmvl7
-	 BevH/YuqiCJO8bKfEjvPCtejPbFK6ZJ2PUp7pcIBZDg2r3lqtm/jcWZCIAtM0xIxOe
-	 MGjur0/6GvJIDZR8m+o7b/knQ0EBAHL5fNUiWh1uYJSfbijounF7pq8MnP16I2lzMm
-	 nxksftyLDB572CLWjHzNHVK4ZQqL+fKvaYOxeqyLquhkI76MsnD4GvUTYm/6u69f6L
-	 wqbht1m1Ge4Jg==
-From: Christian Brauner <brauner@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, David Howells <dhowells@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>, 
- Christoph Hellwig <hch@lst.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
- Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev, 
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <1667275.1788941191@warthog.procyon.org.uk>
-References: <1667275.1788941191@warthog.procyon.org.uk>
-Subject: Re: [PATCH v4] block: Fix start and length check added to
- iov_iter_extract_bvecs()
-Message-Id: <20260910-bison-unpolitisch-ritualisieren-46a638e9d310@brauner>
-Date: Thu, 10 Sep 2026 09:20:40 +0200
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="cmZyACvv"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd82be878so3905755e9.1
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2026 01:11:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1789027876; x=1789632676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=2hP0ERLQ89AaL2POqDRKNFPqokF0N5w680U/ZWvBmc8=;
+        b=cmZyACvvPAxoj//w3DDkacKFZvo+Bw31IGu+wTN/+r1KJibjv4oZd5fzU9IwZoLmxG
+         5V7Wpr/K2b2QOkRgA8a6mdaZSmQLAS+EB73SKrPvX7qpxHkO4X5uTkChZnQSdsxjck8E
+         iVIRvMRiv39wZIEZ7jwkW6hyeKFKb2xy/ne9PSd7FO1xHcTcUKB9nMaQNZ266SLmtrAx
+         RlcSVp5FU8X6/sF7+HtG3JctFxCnHm9NjklBhn98Y9y7zFdvUO2d8HZ2rcTVf0Ko2jiW
+         s9EDZFKTuhCQmUduyUT14Has/yuIhrc81xunUH2tOecsmUQCDhPngO+taKOnzu4J4SBX
+         FLfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789027876; x=1789632676;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2hP0ERLQ89AaL2POqDRKNFPqokF0N5w680U/ZWvBmc8=;
+        b=g9u4mC7ce1zkRwXay5vPatXnxIFeBsszBlgiKcHOyuFiMdsB615ruVIoJGe3jN8pZO
+         0Xg0ZVIXsO0oFb4VncTpS+Ub9j3JmAJmfPQhFkWRYBg0lc2MUW+rkLjGu4ITXwpSyKeD
+         V7ErKzPMOXMKMx3we2O5y//QZLNZ2DmaMf9N1vxl8bVWDQUCUlzmkGOo5cVsN9efDKLs
+         OPKpS0VI8x3zkCLRKYzrm6eCL76TvDGf6Pr2abmtxO+KTQORKE/Hti2020JOJf8mocI+
+         lxpLH+l5MiqxnAiCP/JTY/Xyx+R+qcVh/uZzwiJ/3XczHPP9yGHuw88xbv3PsXQrOEOO
+         SgZw==
+X-Gm-Message-State: AFuF++mcMlIdZ6WKUmCHS0hEyWkViC8kcpjrS9Ghe4Fe56SyaKep4QNk
+	B/Inf8/LYIdjFlFoUCP7puWIrRL1EKiyCp0PZUMUZ3VxV4n7n+Ky6iXrf8ujbnH9we0=
+X-Gm-Gg: AYBFou1n59pXcciV9Am8IybjYi0aGrXx6jE7RtQhUvXERPQ0vPBsHNH7SOaV+LfA20Z
+	PE7oKdjE+gAUtdPZYI9+pCGIwlD4FlVcTl5163HgYkkRh5NMBL6D5/J8olFtS/F8Q8Uv3vO0JiU
+	pigLigiucpJk8FZeCxh1g5vq+O4wNMJM1HoLjqk4cuSOAaOrC3Uc3+W6WJ/arW/A4pNh6eDhknb
+	P21s7dNgXzkVkv1v1zUnpbtGlsmicoDILrmuex3pkPh6faaQ6pc29Zqvudod2rmkpfY5muQ/jZC
+	CybUzro/s24V0iIT1L1XqjQWbUVly5VORWMsMAARceLRnMvLmE4dWvwgcIbRySllR5YF94CS3vd
+	SRtD9K2S6VKJUaZdc4Qh64uzDkEhmE6nqROkyCHSIO78EwpkN/B5HZUeUKji0WfbmH/jsaK088l
+	GjpuB5l9ZLTXOqzRKmS1zf2pMOxKLyBzhh3rcQREQyYeHKNdd2ORWzF8Bg0cG322h6r6ZoLVoNi
+	foSNYI+BFQ1sAhi12YN2XTXdBL6+HwAAY4HJXYKc5V8
+X-Received: by 2002:a05:600c:860b:b0:49c:f9b8:bae0 with SMTP id 5b1f17b1804b1-49d01dd6b62mr265590605e9.2.1789027875742;
+        Thu, 10 Sep 2026 01:11:15 -0700 (PDT)
+Received: from jwang-ThinkPad-T14-Gen-6.fkb.profitbricks.net ([212.227.34.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d20fc1be3sm55261135e9.4.2026.09.10.01.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2026 01:11:15 -0700 (PDT)
+From: Jack Wang <jinpu.wang@ionos.com>
+To: Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@fygo.io>,
+	linux-raid@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	abd.masalkhi@gmail.com
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Xiao Ni <xiao@kernel.org>,
+	Li Nan <magiclinan@didiglobal.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	dm-devel@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Jack Wang <jinpu.wang@cloud.ionos.com>
+Subject: [PATCH v2 0/8] md: don't wait for q->limits_lock while md holds back I/O
+Date: Thu, 10 Sep 2026 10:11:05 +0200
+Message-ID: <20260910081114.1605746-1-jinpu.wang@ionos.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-db0b7
-X-Developer-Signature: v=1; a=openpgp-sha256; l=911; i=brauner@kernel.org;
- h=from:subject:message-id; bh=95lB2rqAT8/9fbrzrWPi9ojqqwpDHL3D7Fj0mykqOXo=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQtivI+Z9MY45fC9mN+qU/P3qJ9ZvJhcvKv6sVfPVx8b
- nXj2mObO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbSu5Xhv/PVWVnvL5hVTXvv
- XxK09M8Sz4y4/b0tW1i67nxu/z3V0o7hn43W7IZdzxnX25tfktn56HuIqa5n+62AVO6wJbkVxTm
- ZbAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Wed, 09 Sep 2026 09:06:31 +0100, David Howells wrote:
-> block: Fix start and length check added to iov_iter_extract_bvecs()
+From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Writing to a queue limits attribute of an md array while a spare is
+being re-added deadlocks the array.  I reported this earlier here:
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+  https://lore.kernel.org/linux-raid/CAMGffE=heGA3y8FjQ0Sm1jj-kd-=H9Y54WozKASSEZhc9UNKjA@mail.gmail.com/
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Four tasks, one array:
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+  udev-worker    queue_attr_store() holds q->limits_lock, waits in
+                 blk_mq_freeze_queue() for q_usage_counter to drain
+  fio            holds a q_usage_counter reference, parked in
+                 md_handle_request()'s is_suspended() loop
+  mdadm          suspended the array, waits for reconfig_mutex
+  md_start_sync  holds reconfig_mutex, waits for q->limits_lock
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Since
+commit c99f66e4084a ("block: fix queue freeze vs limits lock order in
+sysfs store methods") the sysfs store holds q->limits_lock across the
+freeze, so md must not block on that lock while it is holding back the
+I/O the freeze waits for.  That is the same hazard mddev_suspend()
+already documents for reconfig_mutex.
 
-[1/1] block: Fix start and length check added to iov_iter_extract_bvecs()
-      https://git.kernel.org/vfs/vfs/c/57a78ad2305f
+v1 kept q->limits_lock outermost where it could and used a trylock
+everywhere else.  Christoph asked for the lock ordering to be fixed
+instead, so v2 drops the trylock and the block patch that added it.
+
+The rule v2 applies is that q->limits_lock nests outside reconfig_mutex
+and the suspend everywhere, with no exceptions to paper over.  The two
+callers that cannot own an update do not need one: check_sb_changes()
+and md_check_recovery() only ever re-add a device that is already a
+member, so its limits are stacked and the update is a refresh, and they
+now take the no-stack path unconditionally.  mddev_update_io_opt() is
+not an add and does need the update, so patch 4 defers it to a work
+item that takes the lock with nothing held.
+
+Making the hoists unconditional exposed a second cycle that the trylock
+had been hiding, which Nilay hit with lockdep on v1:
+
+  q->limits_lock -> reconfig_mutex        added by this series
+  reconfig_mutex -> disk->open_mutex      pre-existing, md opens legs
+                                          under reconfig_mutex
+  disk->open_mutex -> q->limits_lock      pre-existing, sd_open() ->
+                                          sd_revalidate_disk()
+
+Only the middle edge can go, so legs are now opened before any md lock
+is taken.  Patch 7 does the opens and patch 8 the holder links, which
+take disk->open_mutex too and were easy to miss because the release
+side only takes blk_holder_mutex.  Opening without reconfig_mutex means
+the superblock format fields have to be snapshotted and rechecked once
+the array is locked.
+
+Patches 1, 3 and 6 are plumbing with no functional change.
+
+Two callers still take q->limits_lock inside reconfig_mutex, both with
+the array suspended, and patch 5 says why: ->start_reshape() from
+action_store(), which suspends before flushing sync_work, and
+raid*_run() -> queue_limits_set() from level_store(), which already
+hangs on its own because it freezes the queue while suspended.  Both
+need more restructuring than belongs here.
+
+The patches are based on v7.3-rc2.
+
+v1: https://lore.kernel.org/linux-raid/20260909063029.GC29874@lst.de/T/#t
+
+Changes since v1:
+ - Drop the trylock and the block patch adding
+   queue_limits_start_update_trylock(), per Christoph.
+ - check_sb_changes() and md_check_recovery() take the no-stack path
+   unconditionally instead of trying the lock first.
+ - Defer the io_opt update to a work item rather than skipping it on a
+   contended pass (patch 4, was "md: don't wait for q->limits_lock in
+   mddev_update_io_opt()").
+ - New patches 6-8 to close the reconfig_mutex -> disk->open_mutex
+   edge that lockdep reported on v1: pass a queue_limits through
+   ->run(), open new legs before locking the array, and link their
+   holders there too.
+ - Rebased on v7.3-rc2.
+
+Testing, on v7.3-rc2 with lockdep (PROVE_LOCKING, DEBUG_LOCK_ALLOC):
+
+ - the reproducer below, 20 fail/remove/add cycles with fio in flight
+   and a loop writing queue/max_sectors_kb, where the same test wedges
+   the array before the series
+ - array start at raid0, raid1, raid5, raid10 and linear, spare add,
+   fail and remove, the rdev sysfs stores, ADD_NEW_DISK, array_state
+   transitions, a level change and a raid5 3 -> 4 reshape to
+   completion, which is what exercises patch 4's work item: io_opt
+   goes from 1048576 to 1572864 once end_reshape() runs
+ - HOT_ADD_DISK of an undersized leg, so bind_rdev_to_array() fails
+   and patch 8's release path runs
+
+No lockdep reports, and debug_locks stayed 1 throughout.  Every patch
+builds on its own.
+
+A blktests case covering this deadlock will be sent separately.
+
+The reproducer, for anyone who wants it:
+
+  mdadm -C /dev/md111 --force -e 1.2 --assume-clean -l 1 \
+        --bitmap=internal -n 2 /dev/ram0 /dev/ram1
+
+  fio --direct=1 --rw=randrw --ioengine=libaio --iodepth=32 --numjobs=4 \
+      --time_based=1 --runtime=180 --filename=/dev/md111 --name=repro &
+
+  while :; do
+      echo 128 > /sys/block/md111/queue/max_sectors_kb 2>/dev/null
+  done &
+
+  for i in $(seq 20); do
+      mdadm /dev/md111 --fail /dev/ram0
+      mdadm /dev/md111 --remove /dev/ram0
+      mdadm /dev/md111 --add /dev/ram0
+      mdadm --wait /dev/md111
+  done
+
+Jack Wang (8):
+  md: pass a queue_limits down to ->hot_add_disk()
+  md: don't wait for q->limits_lock in check_sb_changes()
+  md: pass a queue_limits through the rdev sysfs stores
+  md: defer the io_opt update out of the sync thread
+  md: take q->limits_lock before locking and suspending the array
+  md: pass a queue_limits through ->run()
+  md: open new legs before locking the array
+  md: link a new leg's holder before locking the array
+
+ drivers/md/dm-raid.c       |   4 +-
+ drivers/md/md-autodetect.c |  38 ++-
+ drivers/md/md-linear.c     |  30 +-
+ drivers/md/md.c            | 661 +++++++++++++++++++++++++++++--------
+ drivers/md/md.h            |  56 +++-
+ drivers/md/raid0.c         |  16 +-
+ drivers/md/raid1.c         |  26 +-
+ drivers/md/raid10.c        |  37 ++-
+ drivers/md/raid5.c         |  54 ++-
+ 9 files changed, 741 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
 
