@@ -1,60 +1,66 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318E83793A5;
-	Fri, 11 Sep 2026 10:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC632D0C8F
+	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 11:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789124128; cv=none; b=gxzOPYRjWBY+OHNe4EEqYRmsH6kf4m/XANcdwgGBlsqdzwRuvvRONUCZkia/BoPr9H1ANFj871JlCZvB8c0rw1TxmUeUyxNEedrryFWYrTq55U5oXRmbV09OF6C5oEzGWYWHgQtV9kvlzIcGnIUftaKWiVlj3Ln+X/rMLjje/n4=
+	t=1789126495; cv=none; b=Ahy3iAQX7B1PQilAaC0RKSC1U4yjGtrGQ2xnuANlVtFh5dO9SosmnvBcpVtjNmdUoy2c4qE7QHnKq5rJPa0ptF6Kwv9bmKIkt4Zp3SWmvs/xtdxTxZjc+Mj7Cmf/A8UPNnCPumZZRaDoURAf+tSo0FjmqbTC8GpsTHIi/+jjtEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789124128; c=relaxed/simple;
-	bh=ve2s5k2AkcEmEu6uGupBJMjWdCPQzeGp6SYoEHL7tQY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tLL0c4h//eGpCSup5W02RFafvKAyFACT427RBRmO+phh2AUHIeajHRaZIwVt8Sp/rtgcsew+gCa36qi3QfP2Y9p326gRZbeXCHF3Bwf9kiInuYcGtD7Kwo/kUcJdMgrlUokT50/hxrezGEZDq7woWw4dlrsIAXtUEKeO4A4a2Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HTvpUoue; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1789126495; c=relaxed/simple;
+	bh=uSENhsjHLMag1yw4ubPaOkKXgaHQgR7pN3TBtgw88SY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=u3zp7GMKO4WQONB7JCwNAktHmWD/vIRI9ZnwUQlCRayXTfD8ru/FPEgAxkfUVMJ1mdj6HrwSsS8dct27eIcStG1EjtBFEBvPlddaqEaNimFwdDG0qpNxaxtNv2ihYH3RWTWe9+MrZKQEgD64oCdb+Zqx+HRhVs8oiJtG6At50ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=aWrUsDNr; arc=none smtp.client-ip=209.85.167.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HTvpUoue"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68B81io71082809;
-	Fri, 11 Sep 2026 10:54:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Dl1WGo
-	ynbtS7pJelxoHt7PUoSpyjimiBnE9ma6L8RAQ=; b=HTvpUoueqN2vo+EYb26yB4
-	+eJX+nI4VCUxVcVdS94GCvUEloSUX4D/+vgMNVHRlU9k1ldSlfXxca8OMLdHsBAz
-	RKWW/Jr9hzGqeR/RJlVFY+sQ7XqiYNR0i6ROghU16OXb72IAj46M4mMTdwo40bfj
-	nnws/xhcba0fg7nqbY6rjT3myMecCYryO8I7qUJAjos5f1gHk2HYk0agfdapt1Tb
-	DR8yO1KeNLEBH5xRQBPFgDjze6xf7G/12d6PC3tmp6vwC/usaSDRe2VArO9bt7V7
-	Gl+pmitp+LgkPqq3U3v87Dv49zSQPU7QiLutLNRogG8/2wJaHCk4YwOSp2238egQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gkd8sauyb-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 11 Sep 2026 10:54:54 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68BAo31a1499341;
-	Fri, 11 Sep 2026 10:54:54 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gkvwk5u9w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Sep 2026 10:54:54 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68BAsrCg49086866
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 11 Sep 2026 10:54:53 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B7C758056;
-	Fri, 11 Sep 2026 10:54:53 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 522315803F;
-	Fri, 11 Sep 2026 10:54:45 +0000 (GMT)
-Received: from [9.61.102.225] (unknown [9.61.102.225])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 11 Sep 2026 10:54:45 +0000 (GMT)
-Message-ID: <ec866125-6e45-4977-bb01-b13697fd3a8c@linux.ibm.com>
-Date: Fri, 11 Sep 2026 16:24:44 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="aWrUsDNr"
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-4a4cb36ae00so690553b6e.0
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 04:34:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789126486; x=1789731286; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=E1MKScrqDW/JeFHQxtKlAMq5jZO/K5+SFYOUQ9DUJP4=;
+        b=aWrUsDNrd+fgkSbGngU1N8Exu3ftojjddYfytk0D7lSlgntgSW/2xIuFbwnwuFEoB6
+         yKk2Wnh8693RdVbEbTqBWEfN6Lq84rKzk6jBBwJcqxFUmNYkRxXErWTT8VS6pyLf+egP
+         qN9+3WkUnsxHBYwdnXLBtY3yQeimNv+LhU+zExReE4pJPQCE8/YNK4dgTBFyrbddy2H1
+         OZFZodAw60BFcfjVCJPAG7pclYNsGDe2Ub8+1DZHubHSfKe79ea5mEo4LUkE9sNNZCdH
+         XKOonpjRM6DBRBiZCcl93N34Q5DreO6HiEbNKQM0bZzP0bS4wx9cR3mrB+Sn1cWwfNDl
+         zdtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789126486; x=1789731286;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=E1MKScrqDW/JeFHQxtKlAMq5jZO/K5+SFYOUQ9DUJP4=;
+        b=DsFmmzDqgwAxhj+z7ZK2ilfAtNr2zpxex2cjknarNBulYUzcpyS/0TJ+noJQH4hwn1
+         /FIGMfxscma9BxZig6nYRCHnySMrHMQuKCVMjZwdO98zjxzC474rBlxp1Vkfkz8VVLaQ
+         jF87YZnWtja9Ay7ZkZf7SO7bxBKVSRAuctQD8GVSVRi/0qhTtjW44nVnE1a4ea7BHFez
+         T+zfn/XK/xBcOISbXYaBepFinJx7nrc9XLASrk23LnL6fBk2nHfvjTRqcKDDX8lSm3XB
+         2V9iJr/eO78DivFbtHgSReY/24BWtn4B1kvElxizzh/vTKrjgmFNSKCeqDjfowWNF3tV
+         eMow==
+X-Gm-Message-State: AFuF++n837nRjqpSSRG/gOkYOXcA8LEgQJlc0F9tXbhyn0f90HzzfHBE
+	cCZ1QunFa1YQqX4AM5kDRFKUK1s5jXREoNUIsIA94gyMm5SiR+CzAeSTLZgqCKbnYhoDANQYHac
+	73X4n7P0=
+X-Gm-Gg: AYBFou1ZDw3+AWHuHEM+7NiqqdoAU9h7PehFUHdrkD2oo0nJys/PNmghA20UocnB/j+
+	pbE7Julae1qVJA8TKRq4SanIp7HNJSsojzd2oo03fyXdfPw5XKSnTIjTNSCyaZwlTheiI9dPNq1
+	4fBQDB2TdBJ8/CJtZgt2nzIEEy0JNylo7bM5EAMap57iLR8kB3RhonFxCmty3I32anlP5JZooRw
+	PFzcnzNFgNFAP9nzL+pWibRQ+pNvJAAYoygk5Gawgi5LzbXoTqFbb72PytUvY0wdNy3JSPwSbSa
+	EjzJw1M9KyVpo7wBfSv7SvQ3/7jw9MXqxcvE2AtsaFT4BxHSTbdcAwJ/+ZAW2gvjo+IJKNhbsv4
+	lm35GD6D871bINZmhbi4e+1+csFKS2LXSaQ4GerhIASaDWeGZd4EQotr/pwEBA2JX3PJ7tKhWyR
+	VdCeKsykHQKz9ctHIhDplQS7ym0ROhIe9pYCnKdcasiOGl5V2o7r8qn2qv62RQH6GEe/4v1ak9i
+	0Ep9u3leS9wTEqTW/r/k4nwwj9fI+yERg9jqXVsJc/wu8pRGpDaGs4a7Q==
+X-Received: by 2002:a05:6809:2d7:10b0:4c3:82cd:601a with SMTP id 5614622812f47-4c382cd6184mr1208452b6e.32.1789126485770;
+        Fri, 11 Sep 2026 04:34:45 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4c3314b17d0sm1802737b6e.8.2026.09.11.04.34.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Sep 2026 04:34:44 -0700 (PDT)
+Message-ID: <1b9b8e2c-463e-43e1-95d7-308c07b500f0@kernel.dk>
+Date: Fri, 11 Sep 2026 05:34:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,176 +68,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/8] md: pass a queue_limits through ->run()
-To: Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
-        Yu Kuai <yukuai@fygo.io>, linux-raid@vger.kernel.org,
-        abd.masalkhi@gmail.com
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <tom.leiming@gmail.com>, Xiao Ni <xiao@kernel.org>,
-        Li Nan <magiclinan@didiglobal.com>, Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Jack Wang <jinpu.wang@cloud.ionos.com>
-References: <20260910081114.1605746-1-jinpu.wang@ionos.com>
- <20260910081114.1605746-7-jinpu.wang@ionos.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260910081114.1605746-7-jinpu.wang@ionos.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 7.3-rc3
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: mJoiRqb9F6DXhRIgws3wyshHKa-XeLSu
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTExMDE0NyBTYWx0ZWRfX4r2UUkKaDR7s
- /SjSUmnFJfz2+np+3mXaQu0tJ4M6RZ0m79KvqtNq+5MtCyj8POwnz0nh1sfzaydMnxI+0RZ/bs7
- NLjsxZht9sTLxPw/TVZ8PXoXayNjAGmVBgJncvy1hl4tMDNLH5Q3LxpPxUeRH7i7ywIVg7muDAy
- oa2+l9NUqQJU2/jOmWh6psLvbrdvasj32F49uAraPv9zHk/GhN61s+T9ih91/+LaXLNzlV9xl87
- 3U/6t2Wp5O5D9S6P685TSq2ncXF/jLDNSxZppV5jS9bSyDGst40TxK9BsA4TQ7pJ9agIwu6GlVh
- yLn5K/nnCsKiAant6dGxMHjPIczNoYSkIqovE42y+mJxZEXOoo6gXTP9A7Vt7HJYMImCpmEGNZH
- KGDJ4fQtwWKVNZcbgXDWgAbDXwyDJV/uqLyYnjNGElbc29JPEaesHuFBNLwKUxScX8W2KmGv2Zs
- Owf995Ef6HeghJIQg8g==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTExMDE0NyBTYWx0ZWRfX+BIy3pNXosbk
- HVBpn4uP59O/2q2bpnsnQ1bz6mkrraLxf3K7SPAbvDzjoes9/sXSPIycnbetoUwoxgw4T4da4gr
- iU13hGG0yxB6qyRiaPDs3MDYSRsNFtg=
-X-Authority-Analysis: v=2.4 cv=MpXHeGae c=1 sm=1 tr=0 ts=6aa3ddff cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=pFKa84mh1ibiSWCD5WAA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: GH09hlCRcLiK-W5DuwAjUlEKGBVt2biZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-11_03,2026-09-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- adultscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609110147
 
-> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-> index 35e103f0c2c3..59141e4299a8 100644
-> --- a/drivers/md/raid0.c
-> +++ b/drivers/md/raid0.c
-> @@ -379,7 +379,8 @@ static void raid0_free(struct mddev *mddev, void *priv)
->   	kfree(conf);
->   }
->   
-> -static int raid0_set_limits(struct mddev *mddev)
-> +static int raid0_set_limits(struct mddev *mddev,
-> +			    struct queue_limits *caller_lim)
->   {
->   	struct queue_limits lim;
->   	int err;
-> @@ -398,10 +399,19 @@ static int raid0_set_limits(struct mddev *mddev)
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->   	if (err)
->   		return err;
-> +	/*
-> +	 * The caller owns an update and commits it itself; taking
-> +	 * q->limits_lock here would take it a second time.
-> +	 */
-> +	if (caller_lim) {
-> +		*caller_lim = lim;
-> +		return 0;
-> +	}
-> +
->   	return queue_limits_set(mddev->gendisk->queue, &lim);
->   }
->   
-[...]
+Hi Linus,
 
-> -static int raid1_set_limits(struct mddev *mddev)
-> +static int raid1_set_limits(struct mddev *mddev,
-> +			    struct queue_limits *caller_lim)
->   {
->   	struct queue_limits lim;
->   	int err;
-> @@ -3185,10 +3186,19 @@ static int raid1_set_limits(struct mddev *mddev)
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->   	if (err)
->   		return err;
-> +	/*
-> +	 * The caller owns an update and commits it itself; taking
-> +	 * q->limits_lock here would take it a second time.
-> +	 */
-> +	if (caller_lim) {
-> +		*caller_lim = lim;
-> +		return 0;
-> +	}
-> +
->   	return queue_limits_set(mddev->gendisk->queue, &lim);
->   }
->   
+A few block fixes for this week. This pull request contains:
 
-[...]
+- Fix the start and length check added to iov_iter_extract_bvecs(),
+  which used iter_iov_addr()/iter_iov_len() helpers that aren't safe
+  for the ITER_BVEC/FOLIOQ/etc iterator types passed.
 
->   
-> -static int raid10_set_queue_limits(struct mddev *mddev)
-> +static int raid10_set_queue_limits(struct mddev *mddev,
-> +				   struct queue_limits *caller_lim)
->   {
->   	struct r10conf *conf = mddev->private;
->   	struct queue_limits lim;
-> @@ -3948,10 +3949,19 @@ static int raid10_set_queue_limits(struct mddev *mddev)
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->   	if (err)
->   		return err;
-> +	/*
-> +	 * The caller owns an update and commits it itself; taking
-> +	 * q->limits_lock here would take it a second time.
-> +	 */
-> +	if (caller_lim) {
-> +		*caller_lim = lim;
-> +		return 0;
-> +	}
-> +
->   	return queue_limits_set(mddev->gendisk->queue, &lim);
->   }
->   
+- sunvdc fixes for an -EIO issue from lack of retries, and unmapping
+  LDC cookies when the descriptor send fails
 
-[...]
+- Clear force_abort in ublk_queue_reset_io_flags()
 
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index 22759c631c4d..28bd81de86c1 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -7944,7 +7944,8 @@ static int raid5_create_ctx_pool(struct r5conf *conf)
->   	return conf->ctx_pool ? 0 : -ENOMEM;
->   }
->   
-> -static int raid5_set_limits(struct mddev *mddev)
-> +static int raid5_set_limits(struct mddev *mddev,
-> +			    struct queue_limits *caller_lim)
->   {
->   	struct r5conf *conf = mddev->private;
->   	struct queue_limits lim;
-> @@ -7996,10 +7997,19 @@ static int raid5_set_limits(struct mddev *mddev)
->   	/* No restrictions on the number of segments in the request */
->   	lim.max_segments = USHRT_MAX;
->   
-> +	/*
-> +	 * The caller owns an update and commits it itself; taking
-> +	 * q->limits_lock here would take it a second time.
-> +	 */
-> +	if (caller_lim) {
-> +		*caller_lim = lim;
-> +		return 0;
-> +	}
-> +
->   	return queue_limits_set(mddev->gendisk->queue, &lim);
->   }
->   
-[...]
-I'd propose the same changes as I suggested in patch 1/8, for
-raid5_set_limits(), raid10_set_queue_limits(), raid1_set_limits()
-and raid0_set_limits().
+- ublk selftest install fix
 
-In particular, I think these functions should always operate on
-a caller-provided struct queue_limits and only prepare/update the
-limits, without deciding whether to commit them. The caller should
-own the limits update and commit it as appropriate for its locking
-context.
+Please pull!
 
-Thanks,
---Nilay
+
+The following changes since commit 00ef2248c5dae08548f7ceb6951b022f89905330:
+
+  Merge tag 'nvme-7.3-2026-09-03' of git://git.infradead.org/nvme into block-7.3 (2026-09-03 19:48:07 -0600)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20260911
+
+for you to fetch changes up to 94b1a3ca9b8db3151f1416263704c159a9470da5:
+
+  selftests: ublk: add batch IO cases to recover_03 (2026-09-10 20:19:21 -0600)
+
+----------------------------------------------------------------
+block-7.3-20260911
+
+----------------------------------------------------------------
+David Howells (1):
+      block: Fix start and length check added to iov_iter_extract_bvecs()
+
+Jens Axboe (1):
+      sunvdc: fix -EIO issue due to lack of retries
+
+Mahmoud Nagy Adam (1):
+      selftests: ublk: install test_common.sh and trace/ scripts
+
+Stian Halseth (1):
+      sunvdc: unmap LDC cookies when the descriptor send fails
+
+Yang Xiuwei (2):
+      ublk: clear force_abort in ublk_queue_reset_io_flags()
+      selftests: ublk: add batch IO cases to recover_03
+
+ drivers/block/sunvdc.c                          | 26 ++++++++++++++++++++++++-
+ drivers/block/ublk_drv.c                        |  1 +
+ lib/iov_iter.c                                  | 18 +++++++++++++++--
+ tools/testing/selftests/ublk/Makefile           |  2 ++
+ tools/testing/selftests/ublk/test_recover_03.sh |  5 +++++
+ 5 files changed, 49 insertions(+), 3 deletions(-)
+
+-- 
+Jens Axboe
 
