@@ -1,131 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834CB485923
-	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 13:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A5325F7A9
+	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 13:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789133841; cv=none; b=bhFlPhdGg0eViz/ytkI0t2Em65iF38A+K5msx6tlfWHn6MV1Q7RYf2Y5wIs1hX/+tMgY6mvnzUNE2WspUOHo5edlYz/vFAfRu8eb2UIbvqzQFlgigiVJnhjZw3XuUU3WciJPvUtfsyEVWap8okPUwIi0HgVhS2xmUPq8vLGTCNc=
+	t=1789133929; cv=none; b=ryzrSFBXlDms9XJNj6zcaCKN4R4g5nUOB2/0uy7OCokQRsxxnvB+seRpJUnI2ulybo2Fb4SUUbJOyYVSkg10ZxKepa+ol65Ngzxy/vNkPS5IHTiBR/kR5IiQRJSK+symB+OCShGLolH8U8nOfSnBxNIIpfP3DlqF6uKoYPcqHwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789133841; c=relaxed/simple;
-	bh=Pt4h3NpVdFxgIyPdCiaqsfwIllKAbrQoe/JCPvMw2WI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FyXcrcHMuyr+JHU6nTwR/hHyJgGq+12JdjecqhO4gtwfZn7Vke6O0M/Qb1f3B4ZE5nhqv50R0u0YF3IOuV02D7IvYteMdqQcoznwsxkHLaWqWRsYaRyC0p+v4Jwev/Eiak27rUiGNWvoqitWkVIkfx3i0r78cfloNXZ9xBl/noc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RK6YIPuv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789133929; c=relaxed/simple;
+	bh=5SC3HT3+5ycGwWh5KBASibBcRAJzdLO3KnH4sjbmFDM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SHCOzDlezdBzwFBhBY+cCA1acTH1pFMFM3NrB2WvL3aOfTGMVVP7l+Hp9xtn4zOwv7Mz/KF4QUuqnL3qn9rYzlpOpvZsAKoM/p36LhRmqZIhDOF6RhptTvbOMy1ppShLcAXNyF3coxM2epp+nJveipdfhs2jncWGc2ses71N6Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=sD9i0EPj; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RK6YIPuv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB981F00899
-	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 13:37:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789133838;
-	bh=EmV7xvDd8p7wDhHv2qGiIJwLxypfzLhq7lXIjcWfW4A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=RK6YIPuvLOg4R2v2jLAGmphnDEq+EKPbqBKfDsdJrv+Znqc5OXM4FAN6IGJFrLVUe
-	 pqk2i0d60glJzWgU6NnEpEUwu86Wk6vaGWQ2YHEZiKad6VD3MsU8QFl8vz8aGQMz8O
-	 qQUcPzrlU/rqVLVwhq1u81e9W09ZL/B7OBXqptJ8hfTlKoLPI+6JjXxu2rEikRxSIT
-	 wox0kPFtfdi0hEucQmmDK7fC2ql0XLwMEvS9W++/bBWpwJSPrsogWXtAq/LQ9pN2B5
-	 xmCn0gqIP4F9BMXnGvIzL4ukEVZgZjJWnCni/NPPDEB9km3KoJH8HOSI9gKQN7kJlc
-	 de/FtBjyQWBrQ==
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f18010so889251e87.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 06:37:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxmjqKFOqzEz8DZAoqzeMWHIoJibMXQp2fcQDeH6+H0GcjhH8OO8V9jrIDhEO4eLkKChK4jYEjpTTAkuw==@vger.kernel.org
-X-Gm-Message-State: AFuF++lJxmaoJML00VQ9lwNyRALtYC8zJZaElZhnytmvMYL9v86J0uKE
-	sYYRpZROUFTs6J8U2iR3eK2WxdrLDa89RhW+db2pH7DPIjiy+SEzW3ssZERD3z3hVEdv8Amd1Nk
-	jKWn3IOdDr6F/8BRNHsztWgcspaB8PYQ=
-X-Received: by 2002:a05:6512:1293:b0:5b6:183b:d20c with SMTP id
- 2adb3069b0e04-5b8a032660amr1119488e87.51.1789133836636; Fri, 11 Sep 2026
- 06:37:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="sD9i0EPj"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7f57db8b5a4so841419a34.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 06:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1789133926; x=1789738726; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sCKlIYEc3WBtqZTRSmkKr4C+yXpeMrWNJb+k5yI49J0=;
+        b=sD9i0EPjj0Ig68IeGg90WglA7IXGd9HwDQFuhbJxnkZjB9Si4yn+4RIQak7mynH8zH
+         +1igcCeXsxwsXgponQPQcytQjaWGZlR66ar561qN73PpPOlr9uGsjcgjobCPKB/avnlv
+         a6LoshCKEOCyssaM+uYy0Rz5r8mafFkENxpBEAhYYNyTBGSrJ2MW1OIYtHElh1gFbyeS
+         25eZHFxVSNu4fZY/OuFp1yh2tYbwRN9s8O9Uj3iLNMsZMMstNEZ+LW7X1oDFuiHn3V1Z
+         zR3n/XKfT4kjiRHGzC/hy2wBLC4+VjYpRg05efGSlP9DZfjmhocxWk6aScfTYbWrKgFU
+         RHKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789133926; x=1789738726;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sCKlIYEc3WBtqZTRSmkKr4C+yXpeMrWNJb+k5yI49J0=;
+        b=QLV44QD+O5WnGh/1VgJCISQzLFdW9pZlGQy9YkfaIEtHE6/9sA9fqGDLvF5HAh0b6l
+         hZG5MdpWz5vw5XVNG7Qed1T4NtZH9KHOOmp7zNpcbjdPGLZj1ia4IBbEdi6R2NonV7an
+         Z3LGy0iUmrsX5v/0pw8g3oyk0xB0Gsr8ZFkNGeE4je9p4FgdrzjDX5BnHQaxP14z4WhF
+         tlgNS6/7OX9UZp2ruF4vSHGWkNfDYTBNNtW03elLwOff0EPmAdZUXBqI+if7Gsnyk8za
+         p1RYLz4DfrV1n/ifabKim9xQIXVv6Y0VnXgKX0IXkltiEbfP4LFKSxQv7lwTlHmxHvf2
+         HDhg==
+X-Forwarded-Encrypted: i=1; AKwUvBwRXu+cX/AYA22217aPrL84QQNQLzBkZeQNG9b+hJIV1Fa9n5oIzRUc/+Ev3t3+kEIBmgbcSbb7ZtHrnA==@vger.kernel.org
+X-Gm-Message-State: AFuF++l+RQU4s72lOGMsms0m1lovrXTjkSeVx9y84N3M6K46pEQfTSwB
+	fzU8JLl+6BgNkB/nGY/V+G2HursW3vyEIXpOSI4/tzLzp0wpjfWokpR60oJ0q2KgAMA=
+X-Gm-Gg: AYBFou3Yc3JpLE/1f82Dy49kBwOXLd0rm5MiAI0z8EhuzZ6MClIiokl7J3YXn07sLhL
+	r3gAwsj1ruW2AkALR9O4dsU30f2hDiWvStl4G8g9imGcURmcNrMZ+hn9EMKViih2E/i2eXKznHU
+	p2byMhbLe+4PcZkewzYOnSPRF9wzgAfHLxnxtci3bLKnMBG8D72ulY4CqHZRcfvVicjLZtXSG8e
+	+vXyzWAeW5Sy4CrwuJsf+uL65SqeTLfxRnihRhGoD0naOF7eh7lRZTnjtS+CODSGEOBqgxpgb64
+	6VXJhNKEVUUJ0siEsdmfSLHryadNMSCOz2tPz6dqwCmA1BkwHj+LqXgyDRqm6Xocxos9RCk3avQ
+	JXRlMdBX4BAvOujmVYtELHcUkNHVFY81nVlPRlg8PXtWcDUlqOexbgotC/lBo0URK6NqMDA0wti
+	9HOfG9IvuQYTkWGp3BAjTwuKsp3xyAmtIsbSLzfEj7Sz+zpj6a99X/ec0qCISSyTiNPxaJF/sw+
+	NXwNvoymdOYr6TbCNaBIMNyDSQhnCBlQfyYOMqKB7UtvlhtgZlFHyYz
+X-Received: by 2002:a05:6830:7314:b0:7ee:19dc:b00 with SMTP id 46e09a7af769-803fd2514b3mr3323405a34.3.1789133925938;
+        Fri, 11 Sep 2026 06:38:45 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8051005d845sm206965a34.24.2026.09.11.06.38.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Sep 2026 06:38:45 -0700 (PDT)
+Message-ID: <2325107b-8c45-4304-aaa5-f8c768d619bf@kernel.dk>
+Date: Fri, 11 Sep 2026 07:38:44 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260908152808.3928630-1-arnd@kernel.org> <20260908152808.3928630-4-arnd@kernel.org>
- <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com>
- <CAD++jL=ysmPgs8yKH5KBobuv-eeCHHgZwvo1kvHOFuTwhkaOew@mail.gmail.com> <2144051c-268c-40b1-8c22-4be49f0edd17@acm.org>
-In-Reply-To: <2144051c-268c-40b1-8c22-4be49f0edd17@acm.org>
-From: Linus Walleij <linusw@kernel.org>
-Date: Fri, 11 Sep 2026 15:37:02 +0200
-X-Gmail-Original-Message-ID: <CAD++jLmRZek7MjW5LuLUb=u5RmgOyHy4V1OcTv7asAZJpWogtA@mail.gmail.com>
-X-Gm-Features: AcwNN1W6r513ollKEmEehDsh6aLwchGLVwxmCgwImDsptMKBPomLX6IK__6z0wQ
-Message-ID: <CAD++jLmRZek7MjW5LuLUb=u5RmgOyHy4V1OcTv7asAZJpWogtA@mail.gmail.com>
-Subject: Re: [PATCH 03/13] ARM: remove riscpc
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Drew Fustini <fustini@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>, Stefan Agner <stefan@agner.ch>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade <andreas@kemnade.info>, 
-	Kevin Hilman <khilman@baylibre.com>, Roger Quadros <rogerq@kernel.org>, 
-	Tony Lindgren <tony@atomide.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew@lunn.ch>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	Gregory Clement <gregory.clement@bootlin.com>, Robert Jarzmik <robert.jarzmik@free.fr>, 
-	Kristoffer Ericson <kristoffer.ericson@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>, Shawn Guo <shawnguo@kernel.org>, 
-	Karl Mehltretter <kmehltretter@gmail.com>, "David Hildenbrand (Arm)" <david@kernel.org>, 
-	Nicolas Pitre <npitre@baylibre.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	devicetree@vger.kernel.org, imx@lists.linux.dev, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org, 
-	Ian Molton <spyro@f2s.com>, Jens Axboe <axboe@kernel.dk>, Helge Deller <deller@gmx.de>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, "Paul E. McKenney" <paulmck@kernel.org>, linux-block@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: lazy bounce buffering for checksummed reads v3
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>,
+ "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+ Tal Zussman <tz2294@columbia.edu>, Anuj Gupta <anuj20.g@samsung.com>,
+ linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org
+References: <20260909060924.1102037-1-hch@lst.de>
+ <fe537c5f-114d-4d9a-817d-93f359e12924@kernel.dk>
+ <cff350b3-836f-4953-97f3-d664164746b4@kernel.dk>
+ <20260911114438.GA21957@lst.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260911114438.GA21957@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 11, 2026 at 3:26=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
-> wrote:
-> On 9/11/26 2:07 AM, Linus Walleij wrote:
+On 9/11/26 5:44 AM, Christoph Hellwig wrote:
+> On Thu, Sep 10, 2026 at 02:51:33PM -0600, Jens Axboe wrote:
+>>> It's a little hard to split as you have eg block patches both at the
+>>> start and beginning... In the spirit of getting this some runtime, I'm
+>>> going to queue it up in a separate branch,
+>>> for-7.4/lazy-bounce-buffering for now.
+>>
+>> On 2nd thought since this already relies on stuff in the XFS tree
+>> apparently, you can just add my
+>>
+>> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> to the block patches. Would probably make everybody's life easier.
+> 
+> No, the current series is just on top of mainline with the block
+> fixes for Sashiko existing issues comments split out.  Which probably
+> was a mistake, as that now lead to a side-discussion and Sashiko can't
+> apply it any more because it is too stupid to parse the cover letter.
+> 
+> I guess I'll do another resend with the two of those that stick
+> included, and I'll leave the third on to John, who already has a
+> handle on it.
 
-> > The community has a built in tension around this:
-> >
-> > - One camp that are enthusiast like yourself. That kind of people
-> >    are running the show inside arch/m68k on Amigas and Ataris.
-> >
-> > - One camp who get their paycheck from present day companies
-> >    and constantly on top of the latest technology. As can be
-> >    seen Qualcomm just taped out a brand new ARMv7 SoC
-> >    named Kuno, for example.
-> >
-> > As you can see this leads to a bit of tension.
->
-> That summary looks incomplete to me. Every time a kernel API is modified
-> that is used by the RiscPC code, the RiscPC code has to be modified too.
-> Removing the RiscPC code makes modifying kernel APIs easier. A recent
-> example is available here: "[PATCH v5] scsi: core: Drop
-> Scsi_Host.default_lock"
-> (https://lore.kernel.org/linux-scsi/20260831095821.3486994-1-john.g.garry=
-@oracle.com/).
+OK, I've got it in for-7.4/lazy-bounce-buffering now.
 
-Yes that is development churn, but this is the same whether the hardware
-supported is old or brand new and doesn't really answer the question
-whether it is to be supported or not.
-
-That line of reasoning will always require a supportive hypothesis such as:
-
-- We don't want to support stuff that is old (deprecation and deletionist
-  stance, I don't want to hear yesterdays news)
-
-- We don't want to support stuff that has very few users (utilitarism,
-basically,
-  the biggest common good for the biggest number of people take
-  precedence)
-
-This is implicit in many statements people make about this. What entusiasts
-ask is a completely different question:
-
-- Is this fun (for me/us), makes me feel good to work on etc.
-
-NB: personally I don't take a clear stance here, I mostly want to break apa=
-rt
-the argument and clarify what it is all about.
-
-Yours,
-Linus Walleij
+-- 
+Jens Axboe
