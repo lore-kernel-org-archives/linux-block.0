@@ -1,89 +1,63 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A9E582BBC;
-	Fri, 11 Sep 2026 20:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8735A5135
+	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 20:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789157060; cv=none; b=gDj4KUiuJeUqInHOxMO8DEWlbJTiiYI8M5ezn2loWzqJij0r1ZiuJPDCTA/ui4HaW1uTT+i8Tgs/EfXRLyYh4Ee0Lofb5hZN3nmuXey/9FRyz2XgGGM6umtSvbzZJAHPSx3Qdn2w5L+zuzNNfsDx5Nu9q+vI/a6w6Sxm/Bo6Ihk=
+	t=1789158364; cv=none; b=XJi1ICmquQW83nG1Ith5nNt0aLOg+OkdBul/agS7+Hm1Oy/BDfYudCJKj8FTmCd5Ah/ueRhdjboH8ejSMcSwZ6C0vVlzxnlztmVv/DsRv1QvqCYqipuolnlkbzLOKunmPTo6BDMX4INypxfpGpIB+bKc5vDTwVCx3aoCxzE8vtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789157060; c=relaxed/simple;
-	bh=HIDPV2uNIewrth5OQ3+QaUHHaMD41l/JEGJnxqFl78o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W+ImskXlTSY5skYpJ4eEfRX2PPclQk040LA1lcjY91uwHFwlwo6JfkXnRcsJXvqpEj2WlaULrrzvi1/3ZMiILTS7rYlhkCBhJ1n5ZPmtmq6gZxLhfWeCcvH0UutpTBVSqMWDEs8Nzlrg9d7uNr5KKv00dYpWw2Xwdz0bZ8zR/tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=q62fyD0k; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1789158364; c=relaxed/simple;
+	bh=0wA591x+Pr35seOMlP6N2WHBaPNsOI1ZOe7IV8LVTkA=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=VaA+pZbRrE4Es4ol6biTc98HtbUThKffoYRVE3D/fiTkgrkxGcJgmUndgmsc45qG/G7fCcvMNzR0HqmuZqmS53gIiu4mz30s+WmWGWZGQO7bcJjMk3KAjY8HSG9e7m82cED43wWybs8a1scN0xtIJtD7gOqzKddmHS7ij7EjcnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oR4WW8Z9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="q62fyD0k"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hhQVL5v3nzlfwHS;
-	Fri, 11 Sep 2026 20:04:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1789157044; x=1791749045; bh=9V6y/LA3PpCkJiAhn6rEdd4W
-	zhdjTn5sjQoVNJe2/7A=; b=q62fyD0k/RJXnCNNOoFiWEoCbk0Rws5wUDMBYfML
-	ckwzq81OtjcsvJmV4plmcFGelGfLUR4QwmQQHxn5mMl8gMPDVT9/xLuvgIzMW3mZ
-	GcZkt4oDs/s3Yd/DpzXzrnVx0tGq9g3NKWayER+0ZHqLPBHteqzG3husPe9S/aQ+
-	XuSMqgyT+JNJlLPVPpOrrXYRZWvbSbMcAK7W/ZHc3i20BQW1GM8aJ2qwmuOICJoF
-	AaMFd2AHfkmszuVqqWxMsmYU8lESN2xOPz7paJP7m68TS7X/fIo45d6RbgCe3Pdm
-	byIqrrmBpNGXQS/BQB16j1iK9+dxq2fh2CB6PVW/KW/RqQ==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id RwW8F8ojH23T; Fri, 11 Sep 2026 20:04:04 +0000 (UTC)
-Received: from [100.80.231.125] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hhQV81dQkzlfvqM;
-	Fri, 11 Sep 2026 20:03:59 +0000 (UTC)
-Message-ID: <d89aa722-2d13-4733-b5c1-f0194bf4b342@acm.org>
-Date: Fri, 11 Sep 2026 13:03:59 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oR4WW8Z9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6DA51F00893;
+	Fri, 11 Sep 2026 20:25:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789158357;
+	bh=FMYoMtRHMFYSr3QqYKBqdK4rTA2gv2mMBqmCR2eWgds=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=oR4WW8Z9bYYnEXuAQVDC/MAUcbd/lB6Jhdj8ldTEccJbvbIOWpOoLslf6rnDvnJ53
+	 g4fT3QhZsrw6/ArSt1tsLZb/DhFSfeyLg9ut+X3YcQ4uu3FLWJe6dgo2ohNpWWPDR7
+	 yxM7iRZ+hgCRR1UNUbPoWxIFoIR5YMpXM4PNUzb9P+bsSmEal2+xjJqOY65tGsOduE
+	 eX9DgAyKuosBdFxwZ63DkVkIy5EvMa+GxmMexdhw7fPq5sbm7ObJ4bNSDFtSJTTeTS
+	 O4LPRBST64slX2mkrwYL4p9vP1mmYEtuB1RKgN95ReyzIF9NrBgndtmzNjCIKEi+n8
+	 qQLGAdZAw/TTA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0C5A3924451;
+	Fri, 11 Sep 2026 20:24:55 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 7.3-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <1b9b8e2c-463e-43e1-95d7-308c07b500f0@kernel.dk>
+References: <1b9b8e2c-463e-43e1-95d7-308c07b500f0@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <1b9b8e2c-463e-43e1-95d7-308c07b500f0@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20260911
+X-PR-Tracked-Commit-Id: 94b1a3ca9b8db3151f1416263704c159a9470da5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 35ef102063fd6f39e045e6d4e92ac04d3d29c0bf
+Message-Id: <178915829445.3095760.13019100650811204609.pr-tracker-bot@kernel.org>
+Date: Fri, 11 Sep 2026 20:24:54 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] loop: Perform __loop_clr_fd() after disk->open_mutex
- is dropped.
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
- Andrew Morton <akpm@linux-foundation.org>, Brian Foster
- <bfoster@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
- Hillf Danton <hdanton@sina.com>, Markus Elfring <Markus.Elfring@web.de>,
- Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
- Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
- linux-block <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org
-References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
- <9f1273a7-6dfe-46bb-966f-fe08876f4375@I-love.SAKURA.ne.jp>
- <3883b05e-0a34-43f7-b2a9-a46d2b0c5ffc@acm.org>
- <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 9/10/26 2:44 AM, Tetsuo Handa wrote:
-> On 2026/09/10 4:33, Bart Van Assche wrote:
->> __loop_clr_fd() is queued from the lo_post_release() callback and hence
->> may be called concurrently with or after another thread has called
->> bdev_open(). Hence, lo->lo->state should be checked instead of assuming
->> that it equals Lo_rundown.
-> 
-> No, __loop_clr_fd() is queued from the lo_release() callback.
+The pull request you sent on Fri, 11 Sep 2026 05:34:43 -0600:
 
-Yes, it is *queued* from the lo_release() callback function but there is
-no guarantee that __loop_clr_fd() has started before bdev_open() is
-called again.
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20260911
 
-Thanks,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/35ef102063fd6f39e045e6d4e92ac04d3d29c0bf
 
-Bart.
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
