@@ -1,145 +1,131 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A743425F7A9
-	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 13:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524CF2F6931
+	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 14:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789134215; cv=pass; b=Cp4qDGdssXz+3R4DZ+2o8Z1AaLCBgZbdqZoaQpmyItFcKrxFkawIepzeqTCHjj6bkTZHJ4/lG2Nh91SDuKIkMOgAUcqCILqDQEZ975WeXPNsSFfKDYnll6ZmOgFUFljQeDB0j/UNdpgEMO3X+KpXcg5O3rFBxEp2cT5Sadjqoi8=
+	t=1789137513; cv=pass; b=Fdgdi01DIPxxZuljSCtyfBmf3KjFBfCpKmz6iYu08QKBP/+9spOT6EdcxNllFnnqSjVAIisItTN4LO8i5KhNdk5bWCYgN76U3idNms9MbATjIQq0CxYbPzHEAMU63YLEGdpGIUn7AkttJbbRLo8ZXsMjPTxdbxrGxpGh6fmMv70=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789134215; c=relaxed/simple;
-	bh=qqONGiVmU3Y+JSEn4qygivSbxUuzyWx0IT02Btj63eI=;
+	s=arc-20240116; t=1789137513; c=relaxed/simple;
+	bh=XLpKjuu4srfrU1du6/lAaUzD7jl948KYiIqSg/FlWVg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eT2Qatt1D7xeOD1slILPIfxS6787A7vxjgDo9TdPQ9gS1fz5UzpDKPtw2G5J6SOXpyLshLAhajU78I1Kfl5i2BjwtwyDdoHT9189qRmiHfWDowaFRigjngLe7ropc6xmTAQED/AqgQLab+66hFV1Ct4+7CJk2S+bGqYuyvqP2is=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ehf9dS9K; arc=pass smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=fEwRmpJYB8iH8S7jQ79ZX3eaviE1GW0MCDqUBhQqXwyphBwRsM/yzRcRLwOUY9ZNIxt4X96C9UPpS5osRoyTZvOH6F+UaKBg/ySjErexU56rRZkSalkapk14SjZHJKZCKfiNk9ZQMStqr9oJrrZnCukRRBuGU0cQTV/1p90lsGg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=HB8Y+RT4; arc=pass smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ehf9dS9K"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-49b965570d7so11607535e9.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 06:43:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789134210; cv=none;
+	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="HB8Y+RT4"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-8588583a7c3so9079337b3.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 07:38:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789137507; cv=none;
         d=google.com; s=arc-20260327;
-        b=htTx/DuL28Lpt8hBfy5RzhekIdpKC4lSPXFMncKsWBpUCm/2coyZqGc/ytepY+wUGZ
-         0VJYI7oj+uBBdztXWXIYXI2Qo8V0EyEG6JO2w6gIIh32f7BsMyuDySOOqjrYTaJXuaag
-         jBoU7wsxiNgRQ/3VwfwEXGRyLWFLeRbWlXW4fjPwVhVcaPldFZB4Mut6Os1XoeHZDjfx
-         V9ze7fHIUoW4d3hNTjVopZtvN24mpUzOF3RS3S0ENLreVUTchkuL22TXD70gIizoGVU/
-         NM1CLyxdpR3K/mOdKZb3zF3hDAu694qktXklgAgnos9HOFgaDPvcKVVic7fA21EUgBSk
-         b6JQ==
+        b=GMz9R1tgO7wprE9wE4ORJRkaXig0wBgnkIRTG2s8EN8QNO5BLCpdQLnvTk/AGm19On
+         3topssr3rHjb2+YBtHsGeVfLhNu7+bZi5R8uroUZfmYLGCytGLFTriq6Tk2vVn4Sab06
+         DripZ0EDcmnonVeBGhIAcNKFub5rDp1kdzf0oYgSfW4hp9wdSnpzKotj+aJAXYRFuokJ
+         vuu4AJSTYmk96F/9e1qPT8Zt7asl1Dm2tHxIKXn/VldUacmL/hlx65D8Eq4DLDu98aBH
+         8PnfGpA1X8VmINPxdXfM7nwVl7X/dYskvnb00W29QpCnZAZE6dK8V2Iop8ak9TI++pwQ
+         YTvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qqONGiVmU3Y+JSEn4qygivSbxUuzyWx0IT02Btj63eI=;
-        fh=WYIFxoQMwBeTji9hrm+oNlc9zUe2ZH2+B3YpLONilos=;
-        b=jq8kCW8IN17q+5Gtwo9app0zEzGwdEkl7uXHJ3LzzGp3kitLPgHz/EkX71143uW46z
-         mN5eUoytnsriAaZV/O8bfKD6PTLyYbcgFe1inKzz5Bme/vfcLZmPUmVpyJyjFYIMnaCH
-         CMA4R88jzHb4XXkZEKWuklA697Mbsh7NC1xcoZgzoT/LHdvt7lt/DQt3tXJLqX+DEd/o
-         FU9g0gGrLQApH6bp9MJ+HdzpArqy/9xmRrA8OaaCGjCQz52xs2wdV0P8H8mxRPqRrH67
-         IxZhqgtMJW0qqjbJpHyPItlGFB/hu9J5UE4TTQLh1RNcQ7j/rnykUZ2PzzCkGz0zX+Fj
-         18UA==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=jpJbb5DSDD0uOBnoN5sYAo9U83labpJz6g7jqXOS7q0=;
+        fh=Q3vMwBXUVfZT6d6P+dHsyxbyHTepgO33i+Y+uXYAXzg=;
+        b=WXYGxsbg7NvYiu813Enf46YSGKP2RSQG6Pmfzwuow17S6JNIH1OCewDJK1gxGxYAjB
+         X2M4A1t0/OpmZtKu3yu6haKciHcbA3OQTpS/W/s9Vn2KLukwa4wYvIu0lpf/87iDdmiC
+         bQpp8VHcnEVIsHQhVtBlY7R/hUfp+tMGouQPiRKgdZ0LY6dqQi8X1+a9oz8UmHCz8o21
+         4NSeXte+RF8IneDi1znKqyumSPxqHP5x34BTkD0oQZmEGxiROwJ2TRwCqRHIBoQGrsmW
+         K9oA5KRwgedbZkIJYa9kGX5TpXI+a3a0LFIpfX4kCFAKoRMPWH9WMSG1MfcCJaNV4hOE
+         zxDw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789134210; x=1789739010; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=qqONGiVmU3Y+JSEn4qygivSbxUuzyWx0IT02Btj63eI=;
-        b=ehf9dS9KBtz8dLPV1eOtxc8kmJv+fOyIVW2ZdO06596kBMMRx/tyUK2lDgVQgI5M/c
-         SSpBMb7uUs4G1u34797nfCD7P+9zLvxXZxAHnuR56Buv7tbMHFhU+KXC31bwb8LxfuHW
-         8rSFo0UCiOxET6/EGYFoQmdn13E7BSnpGDUmtBh5eTd4sQzXsa+4KMiX2L2pwFInQmBd
-         XbtYZ8PflSCvO08pB5VAXZaYQ3wTj5HZ2Hp+yRGmtaYxRkpKM8QUHwvM09P+tJQDQK9v
-         QG0xK00MrU/0875Gy+xMQiBhNe3qdsPJOLSKMbDDhT7ODGKOfLVFvcBzJ0WilrEwQq0E
-         IdaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789134210; x=1789739010;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=0x0f.com; s=google; t=1789137507; x=1789742307; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=qqONGiVmU3Y+JSEn4qygivSbxUuzyWx0IT02Btj63eI=;
-        b=F2GmlrbPwtrsjBgDtt4iex6igfh3dhy6eenBs0b7k5ogLpErkZ9o6hK/kNw6bbeG5v
-         RBacK58N0oWUMVHPONlksPrwkJWDU7/DuqMpR5ELAvZXr4inIYg3kHhy/GBkHCph/y0z
-         MnfKe6/L/bCYiq8dzs5YjdarSRu1jhPLxNMLEb+SjdzusM0Uy1mfMaHGngpss9nFn25V
-         Fkv4P8w9I3fjKSy91SCCHIqoDItvoFnxQjTTCtRNXMN+3PavieyqMIMInZnTNLx93X61
-         H2zWRLNwSuN00KpYR/5nYkisvMX3BZngwGTbeF7F0rsSnF+FYXre6kLj2vViHHyZ3+Od
-         OXVA==
-X-Forwarded-Encrypted: i=1; AKwUvBwpkRJb5mUjlVrEbORYfm4H6C8bS4d8nNY2jKBr2flHTTzXSSq1bqC+u7gIytS+lqOUvlbI0MxiFqFnzA==@vger.kernel.org
-X-Gm-Message-State: AFuF++lTtXbn2QC4paoo44Kklu6ZQu2PLk4KQ515rMCb39ZyySRukalz
-	Zh91x5o0Kfj4IeulpdsvCFyEQ1DC+Hh+ONaVANZXgbKJPAra7Idu4INibMtD5yBnw2ZPS1oHMzy
-	PaZ2JTPUIFGkbzPGvsBwII8kctF36DClCQwUjYGOi
-X-Gm-Gg: AYBFou2PzonUZlSFxn4/izdq3rfSf0pUyzhj553EbvOhdcYAae2QAgDJFaoqXTWCDEF
-	aE1g5N8uUktpf0+bV1weQC8HiqoyUwh0PeisSSLCrySfAPDRjiYWDaZ+Y/bnJNZn8B46EckQlYw
-	8MMxixsQNxGR6/7WGRCSLsXMAaaFxS6bKClj1tiOCC0Jz7oQfqYEM+wuf4HPoav41gisvP5SEI/
-	UzjhbDo86WHl6+Y1ovau6NtzWL6F9+VNnvHbI8lgBsOJMezTcyYX11xMMAyC37WQ9OK0tbVlQZL
-	SnXzeOEIxvsgpkthz475cj9OygY+fpSICVUmL6h7bv7DH4bVw0b8r0sq09umSKaX9sgdNFfneZG
-	t8MDaHx6x7WlXV9Gd4iQ0uqfPKfl+u1my9AQh8XNHgUsQBy4/9DUS
-X-Received: by 2002:a05:600d:8445:10b0:49c:cf18:494e with SMTP id
- 5b1f17b1804b1-49e6198a3b2mr36939915e9.12.1789134209249; Fri, 11 Sep 2026
- 06:43:29 -0700 (PDT)
+        bh=jpJbb5DSDD0uOBnoN5sYAo9U83labpJz6g7jqXOS7q0=;
+        b=HB8Y+RT4TRPooM8mqpi8DeLFRTPVsBx9aCjZB/tdFSV51HaKr7YUqtjHQkphkOVbT6
+         uuwIWKH3SAN0TzGoi7GXFe0YJRT5iKtXrRz5k8GxzTLnZPeidsaT8lGynlHxy7GjzZ9r
+         wzrI72QggorLaBikBSbsEG1noEYrmgMFuOan4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789137507; x=1789742307;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=jpJbb5DSDD0uOBnoN5sYAo9U83labpJz6g7jqXOS7q0=;
+        b=kG3kU9NwAVxOl1CUUVAVm8AIHJtyH4iGWnpz0u5kL/IMvUCD7MQRGobJiSoGPsSLTl
+         5TmAt0wANwEIYkDXQaDeRBQo97E1W7XsY/tRMK9we43maFRLq4DMoGwPVjiKR3KwU7gH
+         y3iThAiCJIUqf+FhxkILL5c1+PC+OxNQNSndCNTbUxW8WtH/rJHTJUgEVfFc0/Xu3pXp
+         r1xwAI1ihSPWhLx5qp7/e0R7tS01BTjFVENZsQnkWbu1+QvUg3oUMlkTJckEH4AEmw/y
+         uLV399Tfy2Uyo++2+2G1hw+0j1bVJGq99gtzSn37gPRNg4u1yci6LpAdMurP27rnywtY
+         xeEw==
+X-Forwarded-Encrypted: i=1; AKwUvBzyYE+KSZLZAl7FfKKLpW9wgg/DbQCvC5o5iHruK4kCrNklrAo44zj4m8bERInDQt8nVcdGblFnbWI1pA==@vger.kernel.org
+X-Gm-Message-State: AFuF++kJSm6NVgDUDZRAraI03cRD8QUMQ+0mtNA/kZyL7xycI5NMa8WY
+	j9okwogLGX7/3m+8kXCblUrfCRH6UUVsVgZO/GDCvDB6l+0uzVa/U+BBea79sjcwtoOiceGnO5k
+	eQG5TzvxU8WeYens6Jc36Z8cRkQ9dV729HmV9U8Mo5Q==
+X-Gm-Gg: AYBFou3FgM7sRIbmsA+0NLk6DhHJfye0fSMlllMwTfAc0DD3ylKwCxtkueBw2Ab9Ew1
+	n3KLsa4K1O+GkV3s3yz3YiFoRMHzfNOLhEacCWvNWCLPW0Uq5QkxKMJH8UhcOqL5SAhEsbix2th
+	/1eA1Rd74JhPCUmakUbqbG3Q7wa/1scU6+kkyLP7jxX0IyiHTnLV8l0KjO65FxQ48D6jAtzs5Zb
+	EdNfsxvSmCImIeY3yBvnwgESVQiXH/ADOhF1hYZUC+HliXD1VuN+/N3YcUQIUNcyfbSpVyj/lWA
+	tsDnJ/kg1h43GUY+VgReh4S+0FIJU5na+uit104wMGoxSSMSD14MZQQ0+74/crs0
+X-Received: by 2002:a05:690c:399:b0:873:5bb2:6c10 with SMTP id
+ 00721157ae682-884b7316b4dmr14810657b3.58.1789137507274; Fri, 11 Sep 2026
+ 07:38:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260910-unique-ref-v21-0-e83257373062@kernel.org> <20260910-unique-ref-v21-7-e83257373062@kernel.org>
-In-Reply-To: <20260910-unique-ref-v21-7-e83257373062@kernel.org>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Fri, 11 Sep 2026 15:43:16 +0200
-X-Gm-Features: AcwNN1UlYe5vy_4Ph8n7W5xph6nzuuUOW4o-tvYKznIiNAx0UgbfO_rFNfVUhuY
-Message-ID: <CAH5fLghC2qRh8qNmMHMWQXiWW9FAPdd-O4z-O-17FFDB3hy=+A@mail.gmail.com>
-Subject: Re: [PATCH v21 7/9] rust: page: convert to `AlwaysRefCounted`
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
-	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
-	Ira Weiny <iweiny@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, driver-core@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20260908152808.3928630-1-arnd@kernel.org> <20260908152808.3928630-4-arnd@kernel.org>
+ <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com> <CAD++jL=ysmPgs8yKH5KBobuv-eeCHHgZwvo1kvHOFuTwhkaOew@mail.gmail.com>
+In-Reply-To: <CAD++jL=ysmPgs8yKH5KBobuv-eeCHHgZwvo1kvHOFuTwhkaOew@mail.gmail.com>
+From: Daniel Palmer <daniel@0x0f.com>
+Date: Fri, 11 Sep 2026 23:38:14 +0900
+X-Gm-Features: AcwNN1V8w1uOymS_yob5PvYfeWzm1NprI6fjxQoUm4Mlo3gyAoZUnypuVT5lDl8
+Message-ID: <CAFr9PX=_FmMdR4TeP+tqURZdZCTjw8UYxAxeszs_vcpTbX+_aw@mail.gmail.com>
+Subject: Re: [PATCH 03/13] ARM: remove riscpc
+To: Linus Walleij <linusw@kernel.org>
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Drew Fustini <fustini@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>, Stefan Agner <stefan@agner.ch>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade <andreas@kemnade.info>, 
+	Kevin Hilman <khilman@baylibre.com>, Roger Quadros <rogerq@kernel.org>, 
+	Tony Lindgren <tony@atomide.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew@lunn.ch>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
+	Gregory Clement <gregory.clement@bootlin.com>, Robert Jarzmik <robert.jarzmik@free.fr>, 
+	Kristoffer Ericson <kristoffer.ericson@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Karl Mehltretter <kmehltretter@gmail.com>, "David Hildenbrand (Arm)" <david@kernel.org>, 
+	Nicolas Pitre <npitre@baylibre.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	devicetree@vger.kernel.org, imx@lists.linux.dev, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org, 
+	Ian Molton <spyro@f2s.com>, Jens Axboe <axboe@kernel.dk>, Helge Deller <deller@gmx.de>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, "Paul E. McKenney" <paulmck@kernel.org>, linux-block@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 10, 2026 at 11:01=E2=80=AFAM Andreas Hindborg <a.hindborg@kerne=
-l.org> wrote:
->
-> `struct page` is managed by a native reference count, and kernel C
-> code routinely takes its own references to pages, for example when a
-> page is inserted into a VMA with `vm_insert_page()`.
->
-> Thus, implement `RefCounted` for `Page`, backed by `get_page()` and
-> `put_page()`, mark it `AlwaysRefCounted`, and return `ARef<Page>` from
-> `Page::alloc_page()`. The page is freed when the last reference to it is
-> dropped; for the order-0 pages allocated here, this is equivalent to
-> `__free_pages()`.
->
-> This also allows `Page` references to be returned as borrowed
-> references without owning the `struct page`. Remove `BorrowedPage`
-> and update users to use `&Page` and `ARef<Page>`.
->
-> Assisted-by: LLM
-> Suggested-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+Hi Linus,
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+On Fri, 11 Sept 2026 at 18:11, Linus Walleij <linusw@kernel.org> wrote:
+> - One camp that are enthusiast like yourself. That kind of people
+>   are running the show inside arch/m68k on Amigas and Ataris.
+
+I have SMP working on m68k (dual 68040, real hardware) among other
+oddities. I think some people would get a kick out of seeing it but
+also I think some people would also ask why we can't just delete
+everything that isn't arm64/amd64/riscv. I'm putting off sending
+patches like that to avoid everything getting deleted. :)
+
+Cheers,
+
+Daniel
