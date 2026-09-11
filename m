@@ -1,126 +1,130 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D737A49DBB5
-	for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 18:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC85C3DDAFB;
+	Fri, 11 Sep 2026 19:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789152208; cv=none; b=XrksFwnoDQy/1M+QuXgn/7C4Vtm54hXz9nMJe9p8lvs2n+E0qQvNT7Se7nCYYp7Dp6eTPr5jgNKLktDie7HjmdHR1qJyWDnhy41kZ95fTKRiWLAatakS7ZQGpzK01x8a0XY5UmAq632OPKlqlnXLP3QB1pK9YAjuq1sJ75bSqUg=
+	t=1789153412; cv=none; b=InGkIDPEW7JaRf+riPrNn/INJ3t4WPYJ3i/TB/DcDFsOw+S2dJmrjexmRKTNt320OxliYn5SvVzzntSxNBOcbUBkymBTssWNSzUqQVP/zpJ8Kr6EMU/MfR361b/aWF8WEVD+5baPR9n0gwuh0pvVi7osLTEcHh/MpXugADf39Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789152208; c=relaxed/simple;
-	bh=Vo/Zbo4FmIJeIV5z2fixRdEtyG30qlGNFYOjHoNYkqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pfEWeoyhHf9n+idlcn1ZMxgDrks9tAKLdn+3JFraYvLpM2puSouuXDoypNdzDRMs47VTHePpKNj/5R1xOoapgaVIqf6AanfHViwnnwLzKci8r8kMPv6hkgmOX8cPspvDburR0XlWL4la5ceoTLtP4Dg0ohInoXEBY9M6K1nHcg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkmGIJbB; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789153412; c=relaxed/simple;
+	bh=AAJxS1ZeWVorNTNsOrxKWTuYDxU3bdBsDIZpKFEvAmw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CLCq1/Lk9XICTyWDyG+EoqjExhNzXTeIGY89uIvnae+A9v4GXxspxJdvHQIVoISY+lvcBGcs56797amlhKCeRyfv1XA+RhABmWmEWSljNbZjhBam/tkpxDtQRMDO9f58plQKPVojxMvDo8OT0Z96jcPpz2kuo9XBWfDoBmxOPBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=cvtq3BMS; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkmGIJbB"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-4843cedd129so95786f8f.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 11:43:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789152201; x=1789757001; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WEMRrWkwvFIDZfKdDi5vmlHb7sgj26/s86919xqFCGg=;
-        b=hkmGIJbBp4EQG8Uj6bpqrQLLIx6687IoycAymJGV+AQbiulxMddwk/XjuxgBdaOgRh
-         vjlGnpEswovnh80F9t8tbcEwpHnU7ilhSJSoW0LTmXGNZMYdKZcQBLvAHXrDgJBDeok7
-         ZqmJfVVT1Y2C7Yk7vcFHuRPXWxQ6+IWNvElRuinPE86yblBvn8Wnq2azuUCCa5QWd3bf
-         qK4b/vMq22GGwsDShePmi7WSgExb5FsepmNmXsf5rbELNjDZ37OVZnFrpjXxcBMNVauO
-         btSHH3MjcKO15Zq7kM/kfsFWwG6wlO9FmPwkucU75k99FIABnvOlg7eQK01Vvw9l03n6
-         F2lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789152201; x=1789757001;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WEMRrWkwvFIDZfKdDi5vmlHb7sgj26/s86919xqFCGg=;
-        b=Xm+C59W5LBGK5vcFcLmVzPIo+I8FjJY1XK/0f6CeHNjjiOrmipVfT8gPITcgfc+KHU
-         ZEOvB7MRp7TLw+9gtS4ORkhj68n6rK5Rs/bjs4Xwnd9aLAeinhXrFthC0oqsF8u5ApPW
-         gCJfQ9foe/yp6ZHEw/Quwwn/exgx7WDATfcIGz0PyYl+OsCqYIH/J9ayRXSq/sRf0TCH
-         XE+phkdHrxHSG+/9gJGWTV0+MtctzBsgxdRt620QmszuKrgnLJiMbex6IMTIzlkKjB6c
-         Q6UvkGr77jlZgevQYkKM4CfptYi2dH5P81sgIDDbcdGhXBHYXVl8DhRKQ16ocAZmf9Dy
-         0AWA==
-X-Forwarded-Encrypted: i=1; AKwUvBwBtAFecWXgFiO9DYNYwJ2PtThZaqpfBXTLb+CTLt3VGu9jKhKAcXNy5wLbGWu22Q7W7lTHfgx6GoUYMg==@vger.kernel.org
-X-Gm-Message-State: AFuF++m+G2XFjPPtNlR2dK4eFf01z+3G/c56zffRExoUrXRqihOBz/03
-	OiofxOEf4suYbTTyzVsviUUfkRtqqE9nBJo2cH7foSMi7VhT/2rfhQQ5
-X-Gm-Gg: AYBFou3DWZO/r9WcG/Z0yOVmWkEZXBpKKFhDLERARe75XkLSjcQ4pJsbYQ6RMtaQjY0
-	XvWQjZT7SwEBzMy+7Le87pp0K6g1rVsShCEhuEhnoshQgWDvu+/PIyuwD9nmWHwGsL08X/IaMNg
-	9UiYdzjzkVZkVB3/CbWm+dh3+BzLKMW/QcvIoPOScrTdbhI2lvvwXz3v1XWJCZ+LYDclfHJc6Qj
-	Cqeed+EpulvRqiO0yLa8Qv7Rtfkotfoz1KYcnLndBKSbcGtMlxBwao3YZDkh6WRQEdb8OZuzcpz
-	grSt5M7+wAFbXhuDKIMgfgg1DKNICHBQS5+lm8Tfw16h62Oo0VJgq5TeYw5cibN3oAlkRkpnuAu
-	4aaM2ndu4I5mM5EARGKGaesa30jNI1fh/KDMFB9AgY8caRqlFjDjR8LPWzoxSZszzrfqDwhQeb3
-	sDq1wtBHi8TxMJxnIypFw67G1fOlOr3X6dFbLW9aSrFDcyxcI7fgDSOXB+AOKO+lblM6WB4kXnL
-	AaGrOYUkyJDbXWdxyBx7mbtWlSSHPOTZx15e8Lhk0AkgLIlK1aXJ/Pb4YSr/4cPmh4i77LvR4oE
-	RZjMuESLnnGscHZLF/c/L8ji5jFlRNqQ0FsTnansdKrdfzGK5Q==
-X-Received: by 2002:a05:6000:4605:b0:485:ac39:36ef with SMTP id ffacd0b85a97d-486eb1d3781mr14290458f8f.5.1789152200719;
-        Fri, 11 Sep 2026 11:43:20 -0700 (PDT)
-Received: from unknown748F3CBA5068 (dynamic-095-114-033-154.95.114.pool.telefonica.de. [95.114.33.154])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486f0403125sm5446009f8f.8.2026.09.11.11.43.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2026 11:43:20 -0700 (PDT)
-Date: Fri, 11 Sep 2026 20:42:46 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Linus Walleij <linusw@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Drew Fustini <fustini@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>, 
-	Stefan Agner <stefan@agner.ch>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Aaro Koskinen <aaro.koskinen@iki.fi>, 
-	Andreas Kemnade <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>, 
-	Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Andrew Lunn <andrew@lunn.ch>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	Gregory Clement <gregory.clement@bootlin.com>, Robert Jarzmik <robert.jarzmik@free.fr>, 
-	Kristoffer Ericson <kristoffer.ericson@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>, Shawn Guo <shawnguo@kernel.org>, 
-	"David Hildenbrand (Arm)" <david@kernel.org>, Nicolas Pitre <npitre@baylibre.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
-	imx@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-omap@vger.kernel.org, Ian Molton <spyro@f2s.com>, Jens Axboe <axboe@kernel.dk>, 
-	Helge Deller <deller@gmx.de>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-block@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org
-Subject: Re: [PATCH 03/13] ARM: remove riscpc
-Message-ID: <aqRI3N5FPX1dpIlk@gmail.com>
-References: <20260908152808.3928630-1-arnd@kernel.org>
- <20260908152808.3928630-4-arnd@kernel.org>
- <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="cvtq3BMS"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hhP8K6yzjz1XM6JN;
+	Fri, 11 Sep 2026 19:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1789153394; x=1791745395; bh=HKB85OlUopoTlP2cYiFJXnK6
+	cXsUfRhylsdCN0AeosE=; b=cvtq3BMSIvQZr2O49qdJ6rlypEbTYIyBHGdXHuqv
+	zIQoCJdk6hmmw5EQ8jzvupgBakf1+/wLZ89T7v3w0Df7xOz5KW7YPY0X3o9ydnSj
+	CPRUrlf7SLM8jqy5fWIrjAHa7BxSWD3RK6/ju+f2klBF8xBun202aSqXZxvtzg6o
+	zLmS+GHWyIXINcaqUmyBwOkN/JgqhPnUR9B5GRFwVnuGQOZyfIHu0Ik1d/UdKHSZ
+	FNOpXXNQLRcYFEBsfyf+gZ3dZxQQScj7pAmki8+tGVzPSC6abnP7OG9en+86g7Dc
+	rpEaaypiB1JNtoZDKWHSA8uhSTBfyT5838f2QYxB1GsQTg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id qvovV8J3T_kX; Fri, 11 Sep 2026 19:03:14 +0000 (UTC)
+Received: from [100.80.231.125] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hhP7t6bfRz1XM4Sx;
+	Fri, 11 Sep 2026 19:03:06 +0000 (UTC)
+Message-ID: <94ee6bd1-8126-4a99-9b9c-d58e16fd9d9e@acm.org>
+Date: Fri, 11 Sep 2026 12:03:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] drivers/rufs: add Rust UFS host controller driver
+To: jaemyung.lee@samsung.com, Andreas Hindborg <a.hindborg@kernel.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20260912-rufs-private-v1-1-716db733e655@samsung.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260912-rufs-private-v1-1-716db733e655@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 10, 2026 at 08:44:34PM +0100, Ethan Nelson-Moore wrote:
+On 9/11/26 8:52 AM, Jaemyung Lee via B4 Relay wrote:
+> Add a Rust UFS host controller driver that exposes UFS logical units as
+> native blk-mq block devices without depending on the SCSI midlayer.
+
+One of the goals in the Linux kernel is *not* to duplicate code.
+Decoupling the UFS driver from the SCSI mid-layer implies duplicating
+the functionality of the SCSI mid-layer. I do not agree with this.
+
+> The driver is written in Rust.
+
+Most UFS driver contributors are not familiar with Rust so I think the
+choice of Rust will make this driver unpopular.
+
+> The existing UFS driver is built on the SCSI subsystem. That made sense
+> historically: UFS adopted the SCSI Architecture Model as its application
+> layer, so reusing the SCSI midlayer's command queuing, error handling,
+> power management, and logical-unit addressing let UFS reach Linux quickly
+> and reliably. ufshcd bridges the SCSI midlayer to UFS Protocol Information
+> Units.
 > 
-> Because I think it's cool that the kernel still supports actual Acorn
-> hardware, I patched gcc 16.2 to restore ARMv3m support:
-> https://github.com/EthanNelson-Moore/gcc-arm-retro
+> That foundation has become a source of friction. The evolution of UFS is
+> governed by JEDEC and increasingly includes UFS-specific features outside
+> the SCSI command set standardized by T10.
+
+Huh? As long as I was attending JEDEC meetings I insisted on using
+commands already standardized by T10 and *not* introducing new commands.
+
+I do not want to give UFS vendors the freedom to introduce new commands
+without coordinating with a standards body that has more experience with
+the introduction of new commands, e.g. T10.
+
+Linux filesystems support the NVMe and SCSI command sets via the
+abstractions offered by the block layer. Introducing new types of
+storage commands would require that the block layer and all filesystems
+are modified. I have not yet seen an good example of a new command that
+warrants such changes.
+
+> On Intel UFS 2.1 hardware, 4 KiB direct io_uring at QD32/job gave
+> these optimized-mode ranges over 1/2/4 jobs (three samples):
 > 
+>    Workload  Op     RUFS kIOPS   C kIOPS      Difference
+>    --------  -----  -----------  -----------  ---------------
+>    randread  read   48.91-61.26  41.56-41.60  +17.6% to +47.4%
+>    randwrite write  8.19-8.30    8.21-8.22    -0.4% to +1.1%
+>    randrw    read   5.26-5.34    5.28-5.38    -0.9% to -0.4%
+>    randrw    write  5.27-5.34    5.29-5.37    -0.8% to -0.5%
 
-Nice.
+"Intel UFS 2.1" sounds weird to me since Intel never produced any UFS
+devices as far as I know. Did you perhaps want to write "Intel UFSHCI
+2.1"? If so, these measurements are not representative since UFSHCI
+2.1 does not support MCQ. Measurement results for legacy (SDB) mode
+are highly sensitive to whether or not the I/O submitter runs on the
+same CPU core as the completion interrupt.
 
-I've made a RiscPC emulator in the browser using QEMU and WASM. It boots
-Linux kernels and currently emulates a StrongARM RiscPC:
-
-https://github.com/kmehltretter82/risc_pc_linux_emu
-
-I used LLMs a lot while building it.
-
-Your GCC work looks useful for this. I will look at building the RiscPC
-Linux kernel with it, and at emulating the original ARMv3 CPU too.
-
-Thanks,
-Karl
+Bart.
