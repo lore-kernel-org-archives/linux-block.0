@@ -1,119 +1,129 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC82247A0C7
-	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 11:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BE1299920;
+	Sat, 12 Sep 2026 12:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789213857; cv=none; b=Sa0xMED9Bd6pYT4EPmt78ulpc4yYoxWyucGTHyc7x1xItIPJVNeIy9ULc7Lc5wDK0IeJEe/nyT8V2NKhd/JHUWfJCTnp5dm7DUgMYBf5zhRW5hrCjQvvGqsRstPf6kOvb77WLuz60LoG6kMs5SoPBY/bzroaLtMOozEm3nUqRg0=
+	t=1789215010; cv=none; b=R2AfaN88hX6rdzYvIY2i7ZyF8H13pbUI6WkIsGxdzBD+D82nifR/j3j+xPvRvkAPcsx9oPGd5gJWur6H5Ac7PKhj4cxYpqKvFbAfihKtJGa+5AUmAmncJE1jOR5BK1lTisqxEu50zPWNBUCUFyCx7Jflwaw39VTU+3AGtowgI7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789213857; c=relaxed/simple;
-	bh=kxErrs4roEhSSClOtlghiIpbOslE858jVpMTxuu3av8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cTUo+R310WelyBEuUIU8B3V28GRrA7JpJ/Di2rtyfTRpUH3EKOt4EUFr80jxvEVE76mZCCKj3m3/QypGOy0AgmWqVQGiJg85Wx3V47FOEPPkXX1pUSdFGL8BWYY7iR1hXKhYPdTy7Y2RbdXitYkAJG1tXzCwppy2rQ/eTZRKRjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLzukZBG; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789215010; c=relaxed/simple;
+	bh=/k4GRfwmwZKzSvKRwfRpdBLr6CRpzHPGhwfQMUhuJh8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UuTOX7mvtnYQwN/tkvm9EeeHIAO1rsUtOlCAkAtadlWzM+/2U+goM6x+V6dh8K5pX+ySo7dpPP1wPjyN2GD8oZ9OJoxFhwP1zj0wnwTrrPLDlX2IFcHe95tI9adQBxbVik49K5CjK6MdpoPxenfdTrRJiSCjzahBq22lMwws/K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=oZM71hHx; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLzukZBG"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e6598dd44so1473895e9.1
-        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 04:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789213853; x=1789818653; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mrSSAaN9bpeL0MXOAeJWNyQt5RT1xqA1WET8iXWLSAU=;
-        b=XLzukZBG2Ki52eUxDGMvoZenD5X246Jv6M5HwyG/gnY6xoJVLUXyVXzIzp00QBRxZh
-         mgOFfcQajei5OZySYwhVHiT4ogvtEZ1gmkjZzn/s6VBIypULuuZfPcfV1fltcrE2yqOe
-         0iirDiQFJNAcotSTKujGJFiHKHuCqb86q8ofpNh6pMKdH9jjFRf7zm0iMHsNm6WClk+o
-         HXBPErhYfmQPD3W3EXE83ILy3y24SWC/Qvsg26sJOyD1pW3+ht2iogu3Jb0adKtEhQl/
-         TFZLudPFSiFbCU+kBh/O5L8G0Tt7RDqHDaT8efuzkXmeCh4rtlHvIgBeJPdz2VQUFjgJ
-         H/kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789213853; x=1789818653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mrSSAaN9bpeL0MXOAeJWNyQt5RT1xqA1WET8iXWLSAU=;
-        b=EAP4PDFn58KR/upzLVMapVwrI5+sB59lUnToCg1WlSkZ432chRP3xSbSv8R3Qn8osE
-         sj/ywigNUshAlFZsQD0w4Lc3DFaHhUVhuCPEJGFUJ+d+TSOhDS3SrGlGSpOX9ofLnHGF
-         iInNI5aGTEaP+meGydO91Fjt+Sz05D9vAvbwEzc+PtJBW7JhVNymBVjLRdgj0ifNtgk2
-         vfDrKZaF81Trm8YGGVJepscgSzYF5rwxdWw11eLjsX0eOwbCSfHPilREc84Dr0b9Tb4S
-         Rv0DNsDVqaM1t7YCVIxfmceIqROmZSmIHqRpAGRVKW34uDVnywFMC5WF0pFRoPXnuYNe
-         5YgQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwqIHM8q3VvIWlewcQDCyF6rWnjmphhsgtsDuOnIydFKFSdKMKTcoFqlEin3IZHw5Lgd65sAuHp8wIRIA==@vger.kernel.org
-X-Gm-Message-State: AFuF++lQu5tpQ9nVjsTfvWkvoUraaXJrmeDEBQyvZPBWk5XnYw283gRb
-	Bqcni+8VCeG7pgefAzEIXcHbagfiitOe3mAOPsX4LTicXqe6WA2xwHZoQH/EqrB4
-X-Gm-Gg: AYBFou1tGWl57VemH+ausMGPAPUcUD9XgFclwk9NrG9vur+QFe0wK2U1hbA28U2bgy4
-	SolAy6Rkc4KH1/hokCL7IT8hz7t60BFcOz8qzTpRclhUW8wk644SHd818eR4/DWVGTEjkZWboZW
-	vvIh3oVf0YeAiOYmyyY1j3i7G2WRo0p73j5midT6wbmjbwK2tH8Oqslhx6u/UUyjiHsIP7dqK9t
-	/iHA7bPp8gnxq3kxdkqymaqujdkm/6GCV2n+a4I1jPZOeOju5Az7Ho5mUOCCM5SQ9cwp/eiF85C
-	lnxx5cXs/w5l4ErExl2m10rPMZN4/k7tur6HT4AVho0djZA8QiN2Fa6pQJ7/Op+CxOY6U/FQblG
-	FNLycSLfbCJ67K/cmV0L3+ip9rLyGM0UYIDu/2yUWfYwyADpoQIXCW1oqlTOwiOHDrXL7WmjHz3
-	ThyXH8lJsNiXiGuyQLqvB98+mTyQpQnSRy+6vx5LX4LqsSat/Jm86h6eFqmQM3Dhepg9bdkWoUo
-	nRuJMXwmh8KdeMvdm26pZ3JdpLOgcwAUPppQxBshztLOsi6s13AzETzVs12x+wAi7Tw4B7VNdeI
-	ER2HjRNpqm85FSDNdawtbspe9ix7Qu638rcBUTsXdufGai6vF1W0gQXr/AJoQM8HN6iODpFRX9g
-	TEcAafcM=
-X-Received: by 2002:a05:600c:6219:b0:49d:39:90ba with SMTP id 5b1f17b1804b1-49e6caacf0dmr19258345e9.3.1789213852624;
-        Sat, 12 Sep 2026 04:50:52 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-2a02-3100-b260-f201-9983-e8c4-aff5-7a36.310.pool.telefonica.de. [2a02:3100:b260:f201:9983:e8c4:aff5:7a36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d26c2985dsm400640565e9.6.2026.09.12.04.50.51
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 12 Sep 2026 04:50:52 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
-	linux-block@vger.kernel.org,
-	Satya Tangirala <satyat@google.com>
-Subject: [PATCH v2] blk-crypto: Fix the num_prealloc_fallback_crypt_ctxs parameter description
-Date: Sat, 12 Sep 2026 13:50:50 +0200
-Message-Id: <20260912115050.89055-1-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="oZM71hHx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1789215006;
+	bh=/k4GRfwmwZKzSvKRwfRpdBLr6CRpzHPGhwfQMUhuJh8=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=oZM71hHxMpR9t+SuGo5js5DAyZlRbQAFVHKU4+7Zb+EqftYdEo0QJgdiRvK/I3YLX
+	 iGTUu+ySHx3yK/Y6KXn1EgbBfyjfuy3DgUKYgonreQK3g7FtI/rWtk7VLNPQJr2H/U
+	 HM16lMnR9WUccxFiyQ7zieUDuecpvOybOD11HMnM=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::8309])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519MLKEM768 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 1990A1C00A3;
+	Sat, 12 Sep 2026 08:10:06 -0400 (EDT)
+Message-ID: <bdcff6a168e6d4b8e9c9524bd598281817a7df2c.camel@HansenPartnership.com>
+Subject: Re: [PATCH RFC] drivers/rufs: add Rust UFS host controller driver
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>, Greg KH
+	 <gregkh@linuxfoundation.org>, jaemyung.lee@samsung.com
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
+	 <gary@garyguo.net>, =?ISO-8859-1?Q?Bj=F6rn?= Roy Baron	
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl	
+ <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich	
+ <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, Tamir
+ Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>,
+ Onur =?ISO-8859-1?Q?=D6zkan?=	 <work@onurozkan.dev>,
+ linux-kernel@vger.kernel.org, 	rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, 	linux-scsi@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+Date: Sat, 12 Sep 2026 08:10:05 -0400
+In-Reply-To: <87mrtmvioe.fsf@kernel.org>
+References: <20260912-rufs-private-v1-1-716db733e655@samsung.com>
+	 <YKq4TcQM0v2dXF4wTHEvZKwASII6PDd_R7_UiHWe3NRnR4JsrC_ZS-x6jA_Kl7P6ONehU0REHYk7WaLz8Xv5gA==@protonmail.internalid>
+	 <2026091124-treason-trickily-bc52@gregkh> <87mrtmvioe.fsf@kernel.org>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNE
+ lecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn
+ 1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHU
+ RfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8
+ X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvd
+ HRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGw
+ MGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAml2ZBI
+ FCS3GUMIACgkQgUrkfCFIVNZKjQf/deRzlXZClKxTC/Ee2yEPqqS7mm/INUA49KdQQ5oIhSxkUBy0
+ 9J4qjMIo5F8ZFkFTqikBqeL35LKu7O7rn8WETfX8Bxvos3HUsl3jHo34DES4MUFIpoQPgtiLRGwLb
+ K0cVCAArR2u2qj4ABmTRrs1I1kvdjEw6gatOuXtEe/j5O2fvfzTq9GBr0Q3n2IAsFXi4hLlx6VPE8
+ tyWUZ8BWJKtih3JAeUiXFvASL3McV0rV9RnU0VbjEQEhSE7PMYhWpnDC9AyBb0lXJllQRvC3NSkUB
+ 8KVQgNNxRPss0WE/nBoZ4dFA42jTyzTz8lNylxZoAWV7WJb3QxVg4oCodRVrxxrQhSmFtZXMgQm90
+ dG9tbGV5IDxqZWpiQGtlcm5lbC5vcmc+iQFVBBMBCAA/AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeA
+ QIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mYBQkbNYS9AAoJEIFK5HwhSFTWBpwIAL5Bk3
+ 5FB34U6iHmDzzgdCbxLTs43T/YQyJpcGIvopBvnI/fDY8oSG6Df64/O6B+1R+A8TDp6ZG5ysUWnCC
+ 6GuIaEHemBYkitMPglR6+sGCMQY7O0mlsPvdssvKK1KI9Bno4VU6ogaF2qVzefSqg1Djmf/DcsxWP
+ rI/jdJ8FB5AYR2rjIdDFc+zRdAJuavo1/anyY2wgpFh/3R8IOYAEfWV9nGgYkf9+tA4EIn1sxE0I3
+ L5oW2N3mbyRrkzuBwO8ztMCwqEPk7moWzhokcZqMXiAIahaZdkashJC+s2X2RZSGCy+g+pvY5NN4B
+ BVG5XwLgVBqbHMTcxE0fbmPqz+q6O0LEphbWVzIEJvdHRvbWxleSA8amVqYkBoYW5zZW5wYXJ0bmV
+ yc2hpcC5jb20+iQFXBBMBCABBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmODZ5ACGwMFCRs1hL0F
+ CwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQgUrkfCFIVNZu0Af/TzvL2/NdgAcw9uN3x60H8
+ jc4QUq14VpxcFEFEMpcj1morkX/G93V+56HBBaXZj+yK8PhxIA/SIz+sU7C/0YvKuvzakP8ZX/7WJ
+ e32SOUtjfr/VTaqjIBzNj6OxLvZpmNbBw7s6DwhhNpHOWqJ/1ml+PtDRDV71IB58yVqQjp1xlNKVl
+ ZppcJ5908EJzsFnRIVjiQiDSKoppqB2BCibBbrWcln7CiWMyOC/cco6SIn6twH+f7+aivJ3xGcOE2
+ a9gBKF5rNi9TBoX9oyPmshv/TDmnohsVrH7AYXlGYfZTk15SWEiROh1QX8/uD9wl/gcIv5EDUpT/F
+ L2jzOsA5663bw==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The parameter is num_prealloc_fallback_crypt_ctxs, but its
-MODULE_PARM_DESC() uses num_prealloc_crypt_fallback_ctxs.
+On Sat, 2026-09-12 at 13:00 +0200, Andreas Hindborg wrote:
+> "Greg KH" <gregkh@linuxfoundation.org> writes:
+>=20
+> > On Sat, Sep 12, 2026 at 12:52:55AM +0900, Jaemyung Lee via B4 Relay
+> > wrote:
+> > > Comments on the decision to bypass the SCSI midlayer, the blk-mq
+> > > model used
+> > > in its place, and the proposed prerequisite API boundaries would
+> > > be
+> > > especially welcome.
+> >=20
+> > Many many years ago, the USB subsystem tried to bypass the SCSI
+> > midlayer for its storage driver, and while it was a "quick
+> > solution" at the time, in the end, it didn't work out and we
+> > dropped the driver as it just made no sense to keep duplicating all
+> > of the logic all the time.
+> >=20
+> > So I wouldn't recommend it, as long as UFS builds on top of the
+> > SCSI commands and the like, you should not attempt to duplicate it
+> > in a separate driver, no matter how much "simpler" it initially
+> > seems to be.
+>=20
+> The scsi related code in this driver is less than 300 lines and is
+> mostly struct packing/unpacking. I guess we could lift the struct
+> definitions from the scsi layer via bindgen. But at 280 lines I am
+> not sure it is worth it, and it hardly counts as duplication.
 
-BLK_INLINE_ENCRYPTION_FALLBACK is a bool, so this code is built in when
-enabled. Its parameter metadata is recorded in modules.builtin.modinfo,
-where the parm and parmtype entries currently refer to different names.
+You didn't actually read the above did you?  The problem isn't
+necessarily the duplication of code per-se it's the duplication of
+function without understanding the subtlety.   Every fool thinks they
+can duplicate the core features of SCSI in a few hundred lines (and
+they can: the core SCSI model looks beguilingly simple).  They then
+usually spend years adding back the necessary corner cases and quirks
+before finally concluding that actually they shouldn't have tried in
+the first place.  Just because it's in rust doesn't change that
+calculus ... and you're by no means the first people to try this, so
+listen to the voices of experience and don't.
 
-Use the actual parameter name in MODULE_PARM_DESC() so the description
-matches the type entry.
+Regards,
 
-Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-Assisted-by: LLM
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
----
-Changes in v2:
-- Correct the changelog to describe built-in metadata in
-  modules.builtin.modinfo. The patch itself is unchanged.
-
-v1: https://lore.kernel.org/r/20260906165952.2344-1-kmehltretter@gmail.com/
-
- block/blk-crypto-fallback.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 2a8f40a65158..877934db18ef 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -34,7 +34,7 @@ MODULE_PARM_DESC(num_keyslots,
- 
- static unsigned int num_prealloc_fallback_crypt_ctxs = 128;
- module_param(num_prealloc_fallback_crypt_ctxs, uint, 0);
--MODULE_PARM_DESC(num_prealloc_crypt_fallback_ctxs,
-+MODULE_PARM_DESC(num_prealloc_fallback_crypt_ctxs,
- 		 "Number of preallocated bio fallback crypto contexts for blk-crypto to use during crypto API fallback");
- 
- struct bio_fallback_crypt_ctx {
-
-base-commit: 986c24e0fe44f844b44d365b71ce831947f50298
--- 
-2.39.5 (Apple Git-154)
-
+James
