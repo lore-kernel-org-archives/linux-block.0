@@ -1,67 +1,67 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69F2145B27
-	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 23:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10042853F3
+	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 23:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789256027; cv=none; b=mLD0+j+xW049X1bzpgRvJa1Q1uln19/uwSoIgsMnhuQ3vkRFkXyWaAd+2qTPbcqqKbiKoSRnO/Blfq8eijl/M3yQ1meUH7/4bnRvDBqtf+v2A4OPJgaOdIBtNnjNb5ew2SIqnpvwp+IIrzdttZYRH2/8sy7nsYVAwP1KTvpVmCE=
+	t=1789256804; cv=none; b=LXs7D6fUcFRCIf+qBmO99OwS/s5Quh66GC8DSVwTz8wPlqni0ybnGhFv864jl4eS8FllZzvC8AsrwQ3PJu9h/fA3NC4NaczxgFFLxk3/5PBNIDR1j5PKIsL2wffRk4whP4gYRzfgF8kZkaesYW2CD8p1XTznQhggVzW0m6+b6tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789256027; c=relaxed/simple;
-	bh=1gDPSptQeLj0OPrmt+0JnBYsBhx744ZDgc9Dq15UM34=;
+	s=arc-20240116; t=1789256804; c=relaxed/simple;
+	bh=Y+Y7jFaIBY1fqvsHyMrlaVgN8ji3JyM0UKEwR2MldH0=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=V/PmmTDNAQAGaIRV/JrJI0uroIF/EFLzWlPYQO483rooMtnOA9L9ZmlcxL8+oR9lYZJ1FzPFKoxJ1xk/7QxIZ22x+1fGk1hfsJn8bTU2r8UxERaLqUG4sG8cL2f54PiMBK9enbvWg7CDWJTa+ds7b29XWCE1TSmBruf8fp/R4M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyh9oMnz; arc=none smtp.client-ip=209.85.128.43
+	 MIME-Version:Content-Type; b=WGRuP/tUvzJvpdYX55kRwMt+1FdJVqyOkGbc/cl4ZJPHo4k1hZkl3ehQnLSInHwRXC7WhTF0EcatcYk7ZIPeQvUNdQQq8fvrqLC7QkXDszBNuTm6mdKHCCmEWXgk59ChLIEu8cwKq4N8orv4msxnYd3rIQctUtLpPCr8zqHzvsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tdDKYYxh; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyh9oMnz"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-49ccfae359fso15725915e9.3
-        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 16:33:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tdDKYYxh"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-49e6bad7b79so7862775e9.1
+        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 16:46:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789256024; x=1789860824; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1789256798; x=1789861598; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=GfWZA5VorxPvBHCBstYGbBsoifsqUoZdc3SoHINZf28=;
-        b=nyh9oMnzKN5gJFcuwcEpkaedunk0sBKBgBUlUwJc5PrqGF1qkDZrLUJjIzy8NdJj9Q
-         NtWgzVCpjMMJvGVJ4zh6rH+5gOkhOFb/ZLelzAmdieXV4cbnIYM/hv47hbrYTJ+qgr33
-         lNJB7PfQJA9wKZSJB6NLZnY9oCBQE64yiP0vubK0slD8lGLZNq3vcSyyPWQvTbCwaL6o
-         U/kNU+Nmi5KcJFg438aAuvSvsQ/yt88jQN2sYBZ3BVz57/jKyERLRGSY6H9hw/g/8r9b
-         0dJPu3B+4uhfrdasItNEZbztisXPCyRElJVK6jC2UAgkNJlMnvMWhChd4q6goPg8Cbzz
-         flmg==
+        bh=pVsvS8oPhpD7RsA/j/bC9uAynbPr4/hmIZdqzmX+oJs=;
+        b=tdDKYYxhhG3Q90T+T2I74scQd0QZpaj6bXd9gYJnQlvUn1k0SfH6l7Use+mSwwH2cS
+         1MitrMX39+bM1n75/I5lvVvhFKbf3Fxs+EAquS4dUxmDfK1l3zwO37W7HQ4zykCU5+ze
+         S6wOCYQmKGbXiBPx5opCsm+TSd8mY1n0q57udrEmuVrwtwljIlpTXj7rvh79FpCH7+XD
+         O0D3Iq4kjdPHoM5On1qOggbJtGYdZcno605QkeJZr25AKVats0RAmol+ZdrD1Ha21Z7R
+         ZszssoDSUVMRoSxrjWdNAiL7m5WA1BhhMp85M0KxHyPup9PCDgvP7MwASYoUTCMWgTrn
+         Lt+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789256024; x=1789860824;
+        d=1e100.net; s=20251104; t=1789256798; x=1789861598;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GfWZA5VorxPvBHCBstYGbBsoifsqUoZdc3SoHINZf28=;
-        b=k2yvdesTilJi8f/FcJcq0lHmwfgzY+etyPltucS1Ko7V7jGGPsu7D6ud6f/xsuqduU
-         6V/z1CVLe+SGJeZjeTf2vrelig4fPkiY9RlUJpr13OEugNXDi7ZbTPplcWFXVXLmB75E
-         JR/rBWyXd6SWtoiZPd0ei2NkxArr89Q+MbsypfxAsVy9D5qSOLwHuh/ab+uH0EzBNf/+
-         AYC2JGAgt7cLnZCHFFk9md4IFEhFhjPjW7xU/52+/QdZpxl7EdS6ut47USD3pS+/CQ0i
-         JO83Cl0ZF6D7w1ij+zsLCvUAiD8gzJQW3bl0lp4HUONgvdONpWwwpdbXul9IkjLwteiY
-         ILbw==
-X-Forwarded-Encrypted: i=1; AKwUvBwzSrs3OE5YSH+WDpjpIQF2bS+lOoe32htExaVFdS3IEJP9mCb6DfOq/0YO2OjFRjokgsvZUJXMOSgdog==@vger.kernel.org
-X-Gm-Message-State: AFuF++mtNhT1CvCIAfv5V1f6pYyfNZnrhL23bwRpzTeKRZ3Sd2VAmfPT
-	2oyd95crvwfDVFhg4296UL4a1c/Fr5t2s+2zsLh0FfcVtNifDJjT6T2oGuundEXqXw==
-X-Gm-Gg: AYBFou1PxTU1xdF8yb0PdyJO6dUjTzRSWpxGHI3jzVhTifqLID7dz/AiJEDGWGcjM3u
-	8oMMGmbqtVNtNNEecQoWUXN9hnrSKcOOt656g1SlgXtKzKLuqoDBN5jAcpzIEubIIo9JZBcD2+2
-	1UFpRchs8Q0siJypBu4XNNoaruHhvudDJpmsDc07bdy7wZnCfITUkRvDjZtySOpeWNlt6U1Klhf
-	AvWJZEsTauMvUlbDYdk60DWeWjSmfsqe13LpBhBw49J8Y7juwlnSN4ivplo8wkx+70L6L+rkqst
-	NbTr+P79dlv9bh9I1lIpmvWt0E6ksZd1QyNp8L7gGRXLoZJ1SCNjx/Syv2JngQJyfgKin4acOqp
-	MWAWd5ikh2u/bwL2N/Vnqok7PT2nJ08nU/9cVIZkATXA8SXlb6Hypv6znzynvcLipdb/5lR8YwP
-	192tU8i9iLw+DcBNgGkSwCJyLlcSnYh6wr/JqW1zRQy3P/JTjb6hO2UaA58fAAz500G/Jn0S1TU
-	R1SLFHJ3LGv7rlr/RLZ
-X-Received: by 2002:a05:600c:8b41:b0:49b:d45:703e with SMTP id 5b1f17b1804b1-49e6198865dmr137086655e9.8.1789256023669;
-        Sat, 12 Sep 2026 16:33:43 -0700 (PDT)
+        bh=pVsvS8oPhpD7RsA/j/bC9uAynbPr4/hmIZdqzmX+oJs=;
+        b=OMOye8AtbYygX9MXZuiJ4AMDn6lUOLfoGh18CGV1B7m6r87QE40PeJ/+R5UPiF/xBy
+         D/lgu8Gypoiq0yRmt2jM5YejDouueijFpLtMNfTQQirNAzI+TTkW3BmoVQLKfIcnbdEI
+         N+k+R6Y2N2CAorU1vzBSa8/SXVPc81WgVtExz10Sla6njl4uhJXFxRXh/HL5Prc+TLlj
+         9Og6Ls4EPywbAcq9uhwKrtxjv8eSnoW/MwWH8Ekm9HasjUbgmzH+V+VWfES8p+vtaygA
+         NuB6Ge17X1bBtWSfCkEkg2URmMVCRbNWbrWheaPLVGtWMX2HPl2hPr6QU82C48SYVyVk
+         M77g==
+X-Forwarded-Encrypted: i=1; AKwUvByEymmUwHILlFVmol0R09YRPYZbKrbfvFQOfAfWQkZsJuExSU4/KJses8d9CIkMDBhXnECNXQ80Y3nYsg==@vger.kernel.org
+X-Gm-Message-State: AFuF++nrOEJXX21LoZOeWUApszappdZTcSHa3rljDY07QaUaLDcCjACq
+	qIHBd4A0ZMi40Nf7brAu5mk5FpuzYp3oLQD6u9k3vBU6gr+we5b4YFs1s/AIJjG8/Q==
+X-Gm-Gg: AYBFou1aJSqOWuQ/nvhrB5NCgu/i8YIxT2claArPKjGh2BswegcNicx1xuWrEQx2ITT
+	cdUK7wNM5fQqKeJL/A4NssXowqhJ42NNQxf1p7ddCTakv2NEnEo/OGLKk85jZIvcIkNvy98HhOC
+	y0wLw/MoZjX+K3N69kHnfWEMBgV99yiqNq1NSXnaPjMBGNFAUf87WhHhH4v5tro7WZUrwG0a/S9
+	4IXgS1N/tSpTCJ37UGYhOVwF3x8rBYvLzGX2o9xNuXr5ndMWYQeajXrXChZmwF8RBRiUqt/A2zY
+	WaLKUtvzNVRVTgvR4rVTyMuUNE/ELQQrQApYvfuf5fgdLAiuxJ0VAXOVYwz3h6c7dL6rrIs9TcK
+	lU7azFcv7Ai4u75ztOf+beHRUhzkhXV7mazRoux+7Pro7eO4SHpjfBIK+4cnfrH0JSfZKZWPTzN
+	zertIqHYEyducKOTNGCADsIUwdtw5AugI3f7bzMYXDmXpz5wMMtz6uGpJ0iihhJWYGjvVGEjaGV
+	tbMxbIOihJOgxl+vCyl
+X-Received: by 2002:a05:600c:3b1f:b0:49c:fc89:59cb with SMTP id 5b1f17b1804b1-49e61983468mr118820705e9.5.1789256798142;
+        Sat, 12 Sep 2026 16:46:38 -0700 (PDT)
 Received: from darker.lan (104.157.125.91.dyn.plus.net. [91.125.157.104])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d26be3e35sm266378545e9.2.2026.09.12.16.33.40
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e6221ffb0sm139496775e9.3.2026.09.12.16.46.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Sep 2026 16:33:41 -0700 (PDT)
-Date: Sat, 12 Sep 2026 16:33:39 -0700 (PDT)
+        Sat, 12 Sep 2026 16:46:36 -0700 (PDT)
+Date: Sat, 12 Sep 2026 16:46:34 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
-To: Kiryl Shutsemau <kas@kernel.org>
+To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
 cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
     Ackerley Tng <ackerleytng@google.com>, 
     Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>, 
@@ -73,8 +73,9 @@ cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>,
     David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
     Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
-    Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>, 
-    Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
+    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
+    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
+    Marcelo Tosatti <mtosatti@redhat.com>, 
     Matthew Wilcox <willy@infradead.org>, 
     Mel Gorman <mgorman@techsingularity.net>, 
     Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
@@ -84,16 +85,15 @@ cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>,
     Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
     Shakeel Butt <shakeel.butt@linux.dev>, 
     Suren Baghdasaryan <surenb@google.com>, 
-    Vlastimil Babka <vbabka@kernel.org>, 
     Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>, 
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2 07/26] mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize
- folio_activate()
-In-Reply-To: <aqLaa4QvXMbQaIWG@thinkstation>
-Message-ID: <84fecd13-f1e4-7d40-94c9-963f5c2f7aee@google.com>
-References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com> <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com> <aqLaa4QvXMbQaIWG@thinkstation>
+Subject: Re: [PATCH v2 09/26] mm/fbatch: restore mlock+munlock batching,
+ without extra ref
+In-Reply-To: <ce1e07aa-5600-46c1-b35a-d7df09a84521@kernel.org>
+Message-ID: <96fa2371-8a9e-8fcb-08f0-2977320bbbe8@google.com>
+References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com> <69ba633c-8fd5-1f4b-2e1e-b9b15b8946be@google.com> <ce1e07aa-5600-46c1-b35a-d7df09a84521@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -102,120 +102,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-On Thu, 10 Sep 2026, Kiryl Shutsemau wrote:
-> On Wed, Sep 09, 2026 at 02:55:41AM -0700, Hugh Dickins wrote:
-> > Implement an equivalent to the old __lru_cache_activate_folio()
-> > optimization, to activate a folio recently put in the lru_add fbatch,
-> > without having to put it through the lru_activate fbatch too. Neither
-> > lruvec lock nor lru bit can guard this safely and efficiently, so resort
-> > to try_cmpxchg() on a further, LRU_NEXT_ACTIVATE bit in folio->lru_next.
+On Thu, 10 Sep 2026, Vlastimil Babka (SUSE) wrote:
+> On 9/9/26 11:59, Hugh Dickins wrote:
+> > Update mlock_folio(), munlock_folio() and their fbatch callouts and
+> > helpers, to do folio_try_get()s at batch processing time, instead of
+> > holding a folio reference all the while in mlock_fbatch: as in folio.c.
+> > 
+> > But more interesting is the use of mod_mlock_count(), using try_cmpxchg()
+> > to update folio->mlock_count safely when possible (now when on lru_add
+> > fbatch as well as when unevictable). While __mlock_folio() is as hard to
+> > think about as before, __munlock_folio() simpler because munlock_folio()
+> > can adjust mlock_count itself without clear_lru() or lruvec lock, and so
+> > do the folio_test_clear_mlocked() immediately for itself (without which
+> > unevictable_pgs_cleared was likely to appear high, when it should be 0
+> > or low to indicate good mlock health).
+> > 
+> > __munlock_folio() is safe for use even when the unreferenced folio has
+> > been freed and reused. It appears that __mlock_folio() could affect a
+> > folio which has been freed and reused, but only if it is reused as an
+> > mlocked folio, in which case its mlock_count is spuriously incremented
+> > (but usually a spurious munlock decrement will follow).  How grave is
+> > this? If unevictable_pgs_cleared remains low, not so bad.
+> > 
+> > I've gone back and forth on whether to move mlock_fbatch and these
+> > functions into mm/folio.c: for now they stay here in mm/mlock.c.
 > > 
 > > Signed-off-by: Hugh Dickins <hughd@google.com>
 > > ---
-> >  include/linux/mm_inline.h |  4 ++++
-> >  mm/folio.c                | 23 ++++++++++++++++++++---
-> >  2 files changed, 24 insertions(+), 3 deletions(-)
+> >  mm/mlock.c | 147 +++++++++++++++++++++++++++++++----------------------
+> >  1 file changed, 86 insertions(+), 61 deletions(-)
 > > 
-> > diff --git a/include/linux/mm_inline.h b/include/linux/mm_inline.h
-> > index 8420b1276535..8f5efadf9c7c 100644
-> > --- a/include/linux/mm_inline.h
-> > +++ b/include/linux/mm_inline.h
-> > @@ -346,6 +346,7 @@ static inline void folio_migrate_refs(struct folio *new, const struct folio *old
-> >  enum {
-> >  	LRU_NEXT_NEVER_TAIL = 0,	/* Used by a tail's compound_head */
-> >  	LRU_NEXT_BATCHED = 1,		/* Not used by any aligned pointer */
-> > +	LRU_NEXT_ACTIVATE,
-> >  	NR_LRU_NEXT_FLAGS
-> >  };
+> > diff --git a/mm/mlock.c b/mm/mlock.c
+> > index 2c690f18031e..1050010bbe0b 100644
+> > --- a/mm/mlock.c
+> > +++ b/mm/mlock.c
+> > @@ -58,6 +58,20 @@ EXPORT_SYMBOL(can_do_mlock);
+> >   * indicate the unevictable state.
+> >   */
 > >  
-> > @@ -358,6 +359,9 @@ bool lru_add_del_folio(struct folio *folio)
-> >  	if (!(lru_next & BIT(LRU_NEXT_BATCHED)))
-> >  		return false;
-> >  
-> > +	if (lru_next & BIT(LRU_NEXT_ACTIVATE))
-> > +		folio_set_active(folio);
+> > +static long mod_mlock_count(struct folio *folio, long incdec)
+> > +{
+> > +	long mlock_count = READ_ONCE(folio->mlock_count);
 > > +
-> >  	WRITE_ONCE(folio->lru.next, LIST_POISON1);
-> >  	/* BUG_ON(folio->lru_next & BIT(LRU_NEXT_BATCHED)); */
-> >  
-> > diff --git a/mm/folio.c b/mm/folio.c
-> > index a18d8ef6afd5..0b75c3b69d5a 100644
-> > --- a/mm/folio.c
-> > +++ b/mm/folio.c
-> > @@ -256,15 +256,32 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
-> >  
-> >  void folio_activate(struct folio *folio)
-> >  {
-> > +	unsigned long lru_next;
-> > +
-> >  	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
-> >  	    !folio_test_lru(folio))
-> >  		return;
-> >  
-> >  	/*
-> > -	 * XXX: It is curiously difficult to recreate safely the old
-> > -	 * __lru_cache_activate_folio() optimization (folio_set_active()
-> > -	 * directly if it's on the local lru_add fbatch): revisit later.
-> > +	 * This optimization is intended for the common case of folio
-> > +	 * having been recently added to this CPU's lru_add fbatch.
-> > +	 * But since other CPUs can now take it at any instant (after
-> > +	 * a folio_test_clear_lru()), and we may be migrated to another
-> > +	 * CPU, it is simplest just to extend the optimization to all CPUs.
-> > +	 *
-> > +	 * folio_set_active() would be unsafe without the lruvec lock, and
-> > +	 * a folio_test_clear_lru() here might cause a racing drain of the
-> > +	 * lru_add fbatch to skip its lru_add(): so use try_cmpxchg().
-> >  	 */
-> > +	lru_next = READ_ONCE(folio->lru_next);
-> > +	while (lru_next & BIT(LRU_NEXT_BATCHED)) {
-> > +		if (lru_next & BIT(LRU_NEXT_ACTIVATE))
-> > +			return;
-> > +		if (try_cmpxchg(&folio->lru_next, &lru_next,
-> > +				lru_next | BIT(LRU_NEXT_ACTIVATE)))
-> > +			return;
+> > +	while (mlock_count & MLOCK_COUNT_0) {
+> > +		if (mlock_count + incdec < MLOCK_COUNT_0)
+> > +			return MLOCK_COUNT_0;
+> > +		if (try_cmpxchg(&folio->mlock_count, &mlock_count,
+> > +				mlock_count + incdec))
+> > +			return mlock_count + incdec;
+> > +	}
 > 
-> Hm. What prevents the folio from becoming unevictable under us here?
-> I don't see anything.
-> 
-> __folio_add_lru() wouldn't like it:
-> 
-> 	VM_BUG_ON_FOLIO(folio_test_active(folio) &&
-> 			folio_test_unevictable(folio), folio);
-> 
-> folio_lru_list() has the VM_BUG() too.
+> This never rereads folio->mlock_count to mlock_count inside the loop, so it
+> can spin forever?
 
-You're right, thank you. I thought I had deleted all such VM_BUG_ONs:
-and indeed I had, but only in a patch I later decided was too much for
-this series (removing PG_unevictable, using !folio_evictable() in some
-places, or folio_test_unevictable() testing another POISON in lru_next).
-
-That excuse is not enough for this series! Yes, I must send a fixup,
-but not today.
+You give me a nasty moment, have I misunderstood? Isn't it part of the
+try_cmpxchg() contract, that it reads folio->mlock_count into mlock_count
+when it fails? Hence the "&mlock_count" rather than just "mlock_count"?
 
 > 
-> I am not sure what the right fix is.
-> 
-> Maybe lru_add_del_folio() should only call folio_set_active() on
-> !folio_test_unevictable() folios?
-> 
-> Or should we allow occasional active+unevictable
+> (too late here for me to understand the rest today)
 
-Yes, that's what I did, just removed the VM_BUG_ONs: but I'll need
-to check again whether that other patch also had to fix any ordering
-of checks. Offhand, probably not: once the "Unevictable LRU" became
-an oopsing fiction, it was important to check unevictable first:
-unevictable must take precedence, and then it really doesn't matter
-whether active is set or not.
-
-> so if they are
-> munlocked, they will go directly to active list?
-
-I didn't think of that, but I don't think that "active", set racily
-back when the folio was assigned "unevictable", bears much relation
-to whether it ought to be put on active or inactive list when later
-made evictable again. We should probably be consistent, and
-consistent with existing behaviour, that they go to inactive when
-made evictable. (I'm not looking at that other patch at present,
-I don't recall where active got cleared in it.)
+But that I understand very weil: thanks for all that you have managed.
 
 Hugh
