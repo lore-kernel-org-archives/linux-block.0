@@ -1,97 +1,95 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04347364038
-	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 09:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1BB4718D7;
+	Sat, 12 Sep 2026 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789205587; cv=none; b=gzr7p2R7q9DHYkQD9ELBMPz3Avdwk9t9kY6QxsLm4jWmoidEnYQuOr9bZ9bcaUzZh2cdXAFTvbeCqEZA5miTP9Op96V+XcypLQiP8xuv9pzIpgPrTgOz+sW+EWxJ0QEKGb+AX7/tXmUaJ4l9O8fczc9gVw/axLa85/+23rte+/s=
+	t=1789210812; cv=none; b=Hu5sBZALHfxJBkzk+bGw7hASeeLerCkFf704aASx3vwI2jPdSxYHdvGb0vmldfxFcuXTnMpmEYE2Vjo6E4Dg0exjPOfLpLWdPaLZmC2GNG29Mc3CuQoFJq+BR9OgJ4qghx7ZRTpA9DW42b1DPc1B6PyJZnEll1+YwGcbMLpk6ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789205587; c=relaxed/simple;
-	bh=tAqpRW5ptikvGBLcXEfBJ381reEYmJjIKCPS65RMqec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRD5mp37EwpZjsk0kUDNeIS8j+gHAevO6Z96tlGME9LdC4pRJqok8Amo0WjTt1Tlm3S/sibzbtMToySOU+t/8BCUaIYfYa9+J6e7NmAM64NlMGo5QAwMe+b9hhbbigKfoq5T+qFSc5o/sdWkWAq8+IMxifKuDrsfNUGkwFQupEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXSNKW+k; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789210812; c=relaxed/simple;
+	bh=yMOmuHQZeZO2DYB4FecN+9SKHrlnAi9MIs6rM4dzN8Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lPktYCZpcNDJIZFsZ1wwl+4UkwuK61iesiedcLu7R9mr41vYNgDYvgnjAez5do0JdxBLL0dQop4JEhF4tfWvLYFzJ8AGj7Mziwwv7E8A8uzU+9bDppOYSkITYwXysExsMlMmQZXPnqWe/v6eGEDnx91JtyWudj9/6x7DpJaflPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8Yt7vt2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXSNKW+k"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-48441a2ba1bso1157381f8f.1
-        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 02:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789205584; x=1789810384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=2QTMJitCjsStUznpilHnMjzfzNZTGItPoTsN7Y7b7W8=;
-        b=WXSNKW+kqFBOOK2mukoSgfBIFTs2tXGPghl0SF4J1FUfkr2zB8LNWft9EY8Nzo1Bkw
-         pIkZJborAfBJoDpRiuKXdAgzMoAojQSBj4rfr2pE5S/ibYGkeN98WyiC71ug3NLQZWGN
-         b7/wk7KFJkUn757reyJKeycPIG7XthkrcGxPRowVC9+15QzlZctnCmHlFm6UMVLXA4qm
-         bkt9PgfIfpGSq0lCqpoOwB+a3N/tuQAgpeb1zsY3s0Szbr4xY5eZWgV7sDpLc9ZAXDFJ
-         7P2gx89cmaWI197+E8YsoDFrVqxSuNqwdX9qhRft7PZx3mATB284Dows+Ofkd2XdDlTB
-         VRXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789205584; x=1789810384;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2QTMJitCjsStUznpilHnMjzfzNZTGItPoTsN7Y7b7W8=;
-        b=aqdUQLfevxmM8MIO/MPAYOuNnic4e9BCoEFBfagtVbd8zXaqrtpQH0z3ezCC9o9L6c
-         Fc9eTgBhfhrvQNtAr9VMc1t/ma95lUXLWJqwg3hi5MbX1rwqDp2+cyVd7N56DqGu2Z/J
-         bu9ptHcHP2L0PLlk4sKOvknF1uSt2sBJVf7Nmf1lmVD7Pfm987jZnYVBbTq34BpdTE11
-         rHn8S5y+EaMFk1E54aMFB/gu2IjzQn2i/sqNPmoV97LBwEySCNhiV8m08LpY+frulx5s
-         4YzV4wthXVTK2JQ3rhMa3bLeN3dr47tbaj2XqPm4FZu9WTRREopdlZ0icitaI2Diewtj
-         zlxA==
-X-Forwarded-Encrypted: i=1; AKwUvBzeVrY2TE0OLQhEOy1NX3ItlmtFUiEcl8X7f2id+ZqwakLLXNYsKIAmfePnqdHjWJ2CaM6aHWq38uBvQA==@vger.kernel.org
-X-Gm-Message-State: AFuF++m2StLIXkgfunkrNnrDotUVXMv2j9eZUNfUVQVRuGiC7f2z3cXF
-	MVhepW6RGT/YgMBBkzZTVPvpG3Z7sanLW0rFwHMZv7oS4+BgWQJK1mw4yn576GGN
-X-Gm-Gg: AYBFou2dvfQZVFinQ/vDlKrpSi0F2HDb4pGbxyxgnbHFSIJc53F9v+IdOGB28mRSi3j
-	hTfms097cMFZFKw2SSSUK4hdpvlWgxvMFQ1ovpweWiDKE74CfJscrh+cJTvA46CkVxA5xUR0HPu
-	Mlm5J3e+2khf5b/o2x1QgVE4rskClN5KXxcxfgbfUSWTCZF/dERcBYvDHQ2P63pwDFtCL3sd9rp
-	Q83raLNygqeg/3uegwSc13GUnTgahHVibIvuwYHeeqMeljFeySpJj3YZZl7D4P8A3XQ0qox/ly1
-	iwTWX17YwwSAZkAAQTETL6e1TCL1Q4ijrlJxAg+wBGSdCUCB7PfUhfADY+Z3vI7k78lKdO9gyMp
-	zeay2E3ccutIQNM4OBMxtnZpBwTTyNXkPvXdxcMtxjbWrl52782JjxrsKoR7n3FHNrGI4Muqv40
-	H/do5CD8tuGL+gVrajWN3Zb8lUjgKpH/teEuDTHiPmmDGnn70dRn3wI+Cg5umnebWLZKY/fbQ0C
-	Hmk3v6gpDavmEU18erfOAFn0yEs/GYhlCSM8Mpwju/K3dDEet2sFlOq7+PPOPc35un8YMIm+Mo6
-	TOjwS2m9nIvP1gQGqdProQWSywgf3lSma9LPa+MmylK2dIjnfrhQLJYDHlKqUUDniSt+y+493Yw
-	=
-X-Received: by 2002:a05:6000:2410:b0:484:3fce:6ad2 with SMTP id ffacd0b85a97d-486eb2fa66dmr10406865f8f.15.1789205583738;
-        Sat, 12 Sep 2026 02:33:03 -0700 (PDT)
-Received: from unknown748F3CBA5068 (dynamic-2a02-3100-b260-f201-9983-e8c4-aff5-7a36.310.pool.telefonica.de. [2a02:3100:b260:f201:9983:e8c4:aff5:7a36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486eb34e74esm11895369f8f.25.2026.09.12.02.33.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Sep 2026 02:33:03 -0700 (PDT)
-Date: Sat, 12 Sep 2026 11:33:02 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Jiri Kosina <jikos@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] floppy: flush pending work before releasing resources on
- init failure
-Message-ID: <aqUcNyP9DooWW9kf@gmail.com>
-References: <20260722034435.13432-1-kmehltretter@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8Yt7vt2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C991F00893;
+	Sat, 12 Sep 2026 11:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789210811;
+	bh=xLww4sKnxO9neFXT3j4RVAXakrCt95cYTPTrtUYkk4U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=Q8Yt7vt2zA9T7oJXUqwgXtJl++1dWs9Wyc/txnDnArGbsa5Ltq9V8/4AHXcXUNzjb
+	 w0WfcKLqW3EuIAUHexWf8cP3DSCVH9I/+6WaKSNm0yA3NeqnazfVFmzVM/MNOYc1VE
+	 PJ3j3Kz79v8PNPBP+kgMI7s+bAFWb6CxTwmwwYWoz67/NAPRUZWmt3MbuT6pze1GPp
+	 LQi4dzfo3oyapfZpSzobdabTEo5s/KHikxd7i7UY+RZvXS0y5COysldbnsNK4mExzY
+	 BYymrz3Owr/as2YOhmAh5diPMEbr3zt2EZbvsRRBxtmZjMVLSebch5lrNzPRZwMVHf
+	 NPmPVz4Bytz9g==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Greg KH <gregkh@linuxfoundation.org>, jaemyung.lee@samsung.com
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
+ <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno
+ Lossin <lossin@kernel.org>, Alice
+ Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo
+ Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH RFC] drivers/rufs: add Rust UFS host controller driver
+In-Reply-To: <2026091124-treason-trickily-bc52@gregkh>
+References: <20260912-rufs-private-v1-1-716db733e655@samsung.com>
+ <YKq4TcQM0v2dXF4wTHEvZKwASII6PDd_R7_UiHWe3NRnR4JsrC_ZS-x6jA_Kl7P6ONehU0REHYk7WaLz8Xv5gA==@protonmail.internalid>
+ <2026091124-treason-trickily-bc52@gregkh>
+Date: Sat, 12 Sep 2026 13:00:01 +0200
+Message-ID: <87mrtmvioe.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260722034435.13432-1-kmehltretter@gmail.com>
+Content-Type: text/plain
 
-On Wed, Jul 22, 2026 at 05:44:35AM +0100, Karl Mehltretter wrote:
-> The flush used to be here. Commit 070ad7e793dc ("floppy: convert to
-> delayed work and single-thread wq") renamed the label out_flush_work to
-> out_release_dma and dropped it. Restore it so the work drains before the
-> IRQ and DMA are released, as floppy_module_exit() already does.
-> 
-> Fixes: 070ad7e793dc ("floppy: convert to delayed work and single-thread wq")
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+"Greg KH" <gregkh@linuxfoundation.org> writes:
 
-Friendly ping on this patch. It already has a Reviewed-by.
+> On Sat, Sep 12, 2026 at 12:52:55AM +0900, Jaemyung Lee via B4 Relay wrote:
+>> Comments on the decision to bypass the SCSI midlayer, the blk-mq model used
+>> in its place, and the proposed prerequisite API boundaries would be
+>> especially welcome.
+>
+> Many many years ago, the USB subsystem tried to bypass the SCSI midlayer
+> for its storage driver, and while it was a "quick solution" at the time,
+> in the end, it didn't work out and we dropped the driver as it just made
+> no sense to keep duplicating all of the logic all the time.
+>
+> So I wouldn't recommend it, as long as UFS builds on top of the SCSI
+> commands and the like, you should not attempt to duplicate it in a
+> separate driver, no matter how much "simpler" it initially seems to be.
 
-Thanks,
-Karl
+The scsi related code in this driver is less than 300 lines and is
+mostly struct packing/unpacking. I guess we could lift the struct
+definitions from the scsi layer via bindgen. But at 280 lines I am not
+sure it is worth it, and it hardly counts as duplication.
+
+The ufshci driver is duplicated by this driver. Our suggestion is
+replacing it.
+
+> But really:
+>
+>>  30 files changed, 10005 insertions(+)
+>
+> 30 files and 10000 lines doesn't seem that simple :)
+
+You can take a look and decide for yourself :) To each his own I guess.
+To me, reading this ufshci driver is much easier than reading the C
+ufshci driver along with the scsi subsystem.
+
+
+Best regards,
+Andreas Hindborg
+
+
