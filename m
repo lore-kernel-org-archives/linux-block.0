@@ -1,67 +1,67 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B0636EAB1
-	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 22:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69F2145B27
+	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 23:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789252517; cv=none; b=CgBHd2pRtN/TOHFXz8WEsVVBfANw/mCgNxzAUQHq+QaiKHcQNKC7tV8W3UO1lQ8ofTqN/5r986jnnJJzjqJHkWyeOJgWoGM6C2vvsgauhrTc7nxEC3Bir2o+OM2PkwBuhqlbei3sAwDDCUHzJi1hMJvRpZg7NW+o38IjNTTQycY=
+	t=1789256027; cv=none; b=mLD0+j+xW049X1bzpgRvJa1Q1uln19/uwSoIgsMnhuQ3vkRFkXyWaAd+2qTPbcqqKbiKoSRnO/Blfq8eijl/M3yQ1meUH7/4bnRvDBqtf+v2A4OPJgaOdIBtNnjNb5ew2SIqnpvwp+IIrzdttZYRH2/8sy7nsYVAwP1KTvpVmCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789252517; c=relaxed/simple;
-	bh=dNxIy8a69k/1fYH+eiiinSZ2mf/9dsJ9XtaFpi81jpY=;
+	s=arc-20240116; t=1789256027; c=relaxed/simple;
+	bh=1gDPSptQeLj0OPrmt+0JnBYsBhx744ZDgc9Dq15UM34=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Fw5zPWGWe18WWOAaHNVBtBVmC6vD7Zn3bM1J+lAv/ukPFI5NZo8N+6C7tg0v9WTVYa9xlvM90ZbZt83MFEl3ClzlrRdX88XkijQdFccuR+Uxfnn53DD6wkgNhxLLSWpXmiH0CFTyNfrSJcGCARe3oQtGQ0rc7zzXk41dkFNuWx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=whl4qRtE; arc=none smtp.client-ip=74.125.225.140
+	 MIME-Version:Content-Type; b=V/PmmTDNAQAGaIRV/JrJI0uroIF/EFLzWlPYQO483rooMtnOA9L9ZmlcxL8+oR9lYZJ1FzPFKoxJ1xk/7QxIZ22x+1fGk1hfsJn8bTU2r8UxERaLqUG4sG8cL2f54PiMBK9enbvWg7CDWJTa+ds7b29XWCE1TSmBruf8fp/R4M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyh9oMnz; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="whl4qRtE"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912e64ccso6829455e9.0
-        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 15:35:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyh9oMnz"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-49ccfae359fso15725915e9.3
+        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 16:33:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789252514; x=1789857314; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1789256024; x=1789860824; darn=vger.kernel.org;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=XyqTSD7+XEJxR7K9Lr2Cp4DYcxTxFY5cqwi53+WEaFU=;
-        b=whl4qRtEs6oE/VTOzPGEwfrXBx/N9YwyZxLS9AQmxXOmuijw9NgHp/X7WMEJH32em8
-         KG8Xdh+IsuuvgkiUC7nwRtSLcUy4n5c3Naawg5xZHVqOg0KOMFj4D3zpataJKDQwKmRG
-         sqRufb9tvTG2hwqLkGt+CJe2fjAWSbWQ7Kp4UtrVpOTQPZCxnj3G5fm9jrVUB7s/9Fpa
-         RXMQSlV+IJpjJ6En9n6t/ntBVfctR1uzVAstGA+dt+sOzCveKP9mKu0oz1OIpSC66mE8
-         X3Ge9we2oFRLgtzApXnxCZP2POX1ufQV+HHE/dPKZ+t6wo/sKCia3bPANSsod2hg2oT0
-         1D6w==
+        bh=GfWZA5VorxPvBHCBstYGbBsoifsqUoZdc3SoHINZf28=;
+        b=nyh9oMnzKN5gJFcuwcEpkaedunk0sBKBgBUlUwJc5PrqGF1qkDZrLUJjIzy8NdJj9Q
+         NtWgzVCpjMMJvGVJ4zh6rH+5gOkhOFb/ZLelzAmdieXV4cbnIYM/hv47hbrYTJ+qgr33
+         lNJB7PfQJA9wKZSJB6NLZnY9oCBQE64yiP0vubK0slD8lGLZNq3vcSyyPWQvTbCwaL6o
+         U/kNU+Nmi5KcJFg438aAuvSvsQ/yt88jQN2sYBZ3BVz57/jKyERLRGSY6H9hw/g/8r9b
+         0dJPu3B+4uhfrdasItNEZbztisXPCyRElJVK6jC2UAgkNJlMnvMWhChd4q6goPg8Cbzz
+         flmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789252514; x=1789857314;
+        d=1e100.net; s=20251104; t=1789256024; x=1789860824;
         h=content-type:mime-version:references:message-id:in-reply-to:subject
          :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=XyqTSD7+XEJxR7K9Lr2Cp4DYcxTxFY5cqwi53+WEaFU=;
-        b=WuKm5b2IwsLfVHiVXj5bggVFitHZ2NBQUbUxX5LmrgapXM4TIP+3bFeacrWpx3PODv
-         IkSdeKQ5q3ATWZplkbSmEaFoFGICfIDVIg9NhB0rEkV/NdlUhHC/yFm0/6mcLgojRuNE
-         dOOLypGUDR3G281qcV7dFcHpDqEclxg5U1luNwn78H1A9NbISNdcS0/ddoT+bSVpIwSd
-         WJy6OkTkhxesh2VcuOw9Iwmi7xYeOPuARBxIOYm/UtXCZjSaLxKs8NGoyTWwxTtevJ14
-         Z7tZ/deaqRMmyiGHDFLZ2k3hk4iEaJvWHWzgLKlCpr+sAkkAchWbVN0uKPTkpH1ezPhc
-         neNQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwK6a2ieNbHSa0IZiQm/APFiCZYAdINYV2enptmd4gUh909Cn1yZa/CnBu+DMGyCdiKgKii8cgY91HdcQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++np4vPWVKVKfYXFh+Oj75wlY6OJCmy+chdcSV0oFF8yltlqH6Cq
-	S4dsf0mrJYx0J+WV9JGkezmkqCM3KCkhx8ObJyOLl0wnW+oq+JRd7FTNiJwgibmUGA==
-X-Gm-Gg: AYBFou1ICTljreLBgumYq9nIDrPmXGRiZmYWXOU6dsAYRr29TlSQMWTU41tOeU/csiz
-	/WfI6/KT1ChDYBrHfDZ1aZTMkdSeQYgmIbmxEWnAL0bXbx/UaIK/CVwJHmiRq6B0xYJ3QjSN1dC
-	8+O9pJ6ovfk/eheeOmv0+zJ5wgfW+NFMhoAJBvIe66eIKne8WXXnBvYCV6A8kuWzxaNd5Aq3Non
-	Y+RkYOgqVMZuolmz+zn3rlpgb935byR2WXCBohdxoqWKY0NlaVvfnGmp1qz0WbNer+EypP87/yx
-	FR7K6K0raEisrwZiuLUj4G8aqQT3h39/6+YFujGw23hMywKruq4eNIl1DtfnVh6u1CpmYMX/NA6
-	fMyKEsKvEVYaR0RuAIXxQIkQy7aW8Fg4UrLwYd/uJX4Von7E2zxbSQm4XQGsV2TIYpU1BKEAR7e
-	oetD9BCEHnvqSFbR04x9O+8k6l4iD9KvcRg5djLPAO8Fbnb5nYavhIaC0dgQ0k5Awxgp2WdphYB
-	INXuj76eKNYVSt2s0CD
-X-Received: by 2002:a05:600c:3513:b0:493:f140:c3fb with SMTP id 5b1f17b1804b1-49e619c0357mr193958835e9.7.1789252513196;
-        Sat, 12 Sep 2026 15:35:13 -0700 (PDT)
+        bh=GfWZA5VorxPvBHCBstYGbBsoifsqUoZdc3SoHINZf28=;
+        b=k2yvdesTilJi8f/FcJcq0lHmwfgzY+etyPltucS1Ko7V7jGGPsu7D6ud6f/xsuqduU
+         6V/z1CVLe+SGJeZjeTf2vrelig4fPkiY9RlUJpr13OEugNXDi7ZbTPplcWFXVXLmB75E
+         JR/rBWyXd6SWtoiZPd0ei2NkxArr89Q+MbsypfxAsVy9D5qSOLwHuh/ab+uH0EzBNf/+
+         AYC2JGAgt7cLnZCHFFk9md4IFEhFhjPjW7xU/52+/QdZpxl7EdS6ut47USD3pS+/CQ0i
+         JO83Cl0ZF6D7w1ij+zsLCvUAiD8gzJQW3bl0lp4HUONgvdONpWwwpdbXul9IkjLwteiY
+         ILbw==
+X-Forwarded-Encrypted: i=1; AKwUvBwzSrs3OE5YSH+WDpjpIQF2bS+lOoe32htExaVFdS3IEJP9mCb6DfOq/0YO2OjFRjokgsvZUJXMOSgdog==@vger.kernel.org
+X-Gm-Message-State: AFuF++mtNhT1CvCIAfv5V1f6pYyfNZnrhL23bwRpzTeKRZ3Sd2VAmfPT
+	2oyd95crvwfDVFhg4296UL4a1c/Fr5t2s+2zsLh0FfcVtNifDJjT6T2oGuundEXqXw==
+X-Gm-Gg: AYBFou1PxTU1xdF8yb0PdyJO6dUjTzRSWpxGHI3jzVhTifqLID7dz/AiJEDGWGcjM3u
+	8oMMGmbqtVNtNNEecQoWUXN9hnrSKcOOt656g1SlgXtKzKLuqoDBN5jAcpzIEubIIo9JZBcD2+2
+	1UFpRchs8Q0siJypBu4XNNoaruHhvudDJpmsDc07bdy7wZnCfITUkRvDjZtySOpeWNlt6U1Klhf
+	AvWJZEsTauMvUlbDYdk60DWeWjSmfsqe13LpBhBw49J8Y7juwlnSN4ivplo8wkx+70L6L+rkqst
+	NbTr+P79dlv9bh9I1lIpmvWt0E6ksZd1QyNp8L7gGRXLoZJ1SCNjx/Syv2JngQJyfgKin4acOqp
+	MWAWd5ikh2u/bwL2N/Vnqok7PT2nJ08nU/9cVIZkATXA8SXlb6Hypv6znzynvcLipdb/5lR8YwP
+	192tU8i9iLw+DcBNgGkSwCJyLlcSnYh6wr/JqW1zRQy3P/JTjb6hO2UaA58fAAz500G/Jn0S1TU
+	R1SLFHJ3LGv7rlr/RLZ
+X-Received: by 2002:a05:600c:8b41:b0:49b:d45:703e with SMTP id 5b1f17b1804b1-49e6198865dmr137086655e9.8.1789256023669;
+        Sat, 12 Sep 2026 16:33:43 -0700 (PDT)
 Received: from darker.lan (104.157.125.91.dyn.plus.net. [91.125.157.104])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e60acff8bsm191751465e9.9.2026.09.12.15.35.10
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d26be3e35sm266378545e9.2.2026.09.12.16.33.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Sep 2026 15:35:11 -0700 (PDT)
-Date: Sat, 12 Sep 2026 15:35:09 -0700 (PDT)
+        Sat, 12 Sep 2026 16:33:41 -0700 (PDT)
+Date: Sat, 12 Sep 2026 16:33:39 -0700 (PDT)
 From: Hugh Dickins <hughd@google.com>
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+To: Kiryl Shutsemau <kas@kernel.org>
 cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
     Ackerley Tng <ackerleytng@google.com>, 
     Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>, 
@@ -73,9 +73,8 @@ cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>,
     David Hildenbrand <david@kernel.org>, JP Kobryn <jp.kobryn@linux.dev>, 
     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
     Johannes Weiner <hannes@cmpxchg.org>, Kairui Song <ryncsn@gmail.com>, 
-    Kiryl Shutsemau <kas@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-    Leonardo Bras <leobras.c@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, 
+    Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>, 
+    Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
     Matthew Wilcox <willy@infradead.org>, 
     Mel Gorman <mgorman@techsingularity.net>, 
     Miaohe Lin <linmiaohe@huawei.com>, Michal Hocko <mhocko@suse.com>, 
@@ -85,15 +84,16 @@ cc: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>,
     Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
     Shakeel Butt <shakeel.butt@linux.dev>, 
     Suren Baghdasaryan <surenb@google.com>, 
+    Vlastimil Babka <vbabka@kernel.org>, 
     Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>, 
     Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
     linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH v2 07/26] mm/fbatch: LRU_NEXT_ACTIVATE bit to optimize
  folio_activate()
-In-Reply-To: <ddab52d0-48c7-4d2c-b403-45f11e041654@kernel.org>
-Message-ID: <bbf33dc0-6812-f204-188f-f2176a4faf4c@google.com>
-References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com> <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com> <ddab52d0-48c7-4d2c-b403-45f11e041654@kernel.org>
+In-Reply-To: <aqLaa4QvXMbQaIWG@thinkstation>
+Message-ID: <84fecd13-f1e4-7d40-94c9-963f5c2f7aee@google.com>
+References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com> <c44a34f8-ea3c-48cd-27d5-02df129be685@google.com> <aqLaa4QvXMbQaIWG@thinkstation>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -102,8 +102,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 
-On Thu, 10 Sep 2026, Vlastimil Babka (SUSE) wrote:
-> On 9/9/26 11:55, Hugh Dickins wrote:
+On Thu, 10 Sep 2026, Kiryl Shutsemau wrote:
+> On Wed, Sep 09, 2026 at 02:55:41AM -0700, Hugh Dickins wrote:
 > > Implement an equivalent to the old __lru_cache_activate_folio()
 > > optimization, to activate a folio recently put in the lru_add fbatch,
 > > without having to put it through the lru_activate fbatch too. Neither
@@ -127,34 +127,95 @@ On Thu, 10 Sep 2026, Vlastimil Babka (SUSE) wrote:
 > > +	LRU_NEXT_ACTIVATE,
 > >  	NR_LRU_NEXT_FLAGS
 > >  };
+> >  
+> > @@ -358,6 +359,9 @@ bool lru_add_del_folio(struct folio *folio)
+> >  	if (!(lru_next & BIT(LRU_NEXT_BATCHED)))
+> >  		return false;
+> >  
+> > +	if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> > +		folio_set_active(folio);
+> > +
+> >  	WRITE_ONCE(folio->lru.next, LIST_POISON1);
+> >  	/* BUG_ON(folio->lru_next & BIT(LRU_NEXT_BATCHED)); */
+> >  
+> > diff --git a/mm/folio.c b/mm/folio.c
+> > index a18d8ef6afd5..0b75c3b69d5a 100644
+> > --- a/mm/folio.c
+> > +++ b/mm/folio.c
+> > @@ -256,15 +256,32 @@ static void lru_activate(struct lruvec *lruvec, struct folio *folio)
+> >  
+> >  void folio_activate(struct folio *folio)
+> >  {
+> > +	unsigned long lru_next;
+> > +
+> >  	if (folio_test_active(folio) || folio_test_unevictable(folio) ||
+> >  	    !folio_test_lru(folio))
+> >  		return;
+> >  
+> >  	/*
+> > -	 * XXX: It is curiously difficult to recreate safely the old
+> > -	 * __lru_cache_activate_folio() optimization (folio_set_active()
+> > -	 * directly if it's on the local lru_add fbatch): revisit later.
+> > +	 * This optimization is intended for the common case of folio
+> > +	 * having been recently added to this CPU's lru_add fbatch.
+> > +	 * But since other CPUs can now take it at any instant (after
+> > +	 * a folio_test_clear_lru()), and we may be migrated to another
+> > +	 * CPU, it is simplest just to extend the optimization to all CPUs.
+> > +	 *
+> > +	 * folio_set_active() would be unsafe without the lruvec lock, and
+> > +	 * a folio_test_clear_lru() here might cause a racing drain of the
+> > +	 * lru_add fbatch to skip its lru_add(): so use try_cmpxchg().
+> >  	 */
+> > +	lru_next = READ_ONCE(folio->lru_next);
+> > +	while (lru_next & BIT(LRU_NEXT_BATCHED)) {
+> > +		if (lru_next & BIT(LRU_NEXT_ACTIVATE))
+> > +			return;
+> > +		if (try_cmpxchg(&folio->lru_next, &lru_next,
+> > +				lru_next | BIT(LRU_NEXT_ACTIVATE)))
+> > +			return;
 > 
-> This addition, and the comment "/* This mask will do nothing on 64-bit */"
-> in folio_add_lru()... does it mean that now this is breaking 32-bit? Should
-> we make this optimization, or perhaps all of the cpu fbatch, 64-bit only?
+> Hm. What prevents the folio from becoming unevictable under us here?
+> I don't see anything.
+> 
+> __folio_add_lru() wouldn't like it:
+> 
+> 	VM_BUG_ON_FOLIO(folio_test_active(folio) &&
+> 			folio_test_unevictable(folio), folio);
+> 
+> folio_lru_list() has the VM_BUG() too.
 
-Answering second question first: those could have been options, to
-disable the activation optimization or all per-cpu fbatching, on 32-bit;
-but I much preferred them not to diverge, and tried hard to keep 32-bit.
+You're right, thank you. I thought I had deleted all such VM_BUG_ONs:
+and indeed I had, but only in a patch I later decided was too much for
+this series (removing PG_unevictable, using !folio_evictable() in some
+places, or folio_test_unevictable() testing another POISON in lru_next).
 
-First Q: This does not, in the end, break 32-bit at all. But while I
-was developing, I thought it did, and reluctantly switched the encoding
-away from holding lru_add entry pointer in lru_next, to holding
-lru_add cpu and lru_add index in lru_next: from those the lru_add
-entry pointer can easily be calculated, and there's lots of space
-left over for more flag bits (which I thought might come to be needed).
+That excuse is not enough for this series! Yes, I must send a fixup,
+but not today.
 
-But then I had that marvellous realization in folio_batch_move_lru(),
-that it needed to service "wrong" entries in exactly the same way as
-"right" entries, therefore didn't need to distinguish them, therefore
-didn't need any address there at all.
+> 
+> I am not sure what the right fix is.
+> 
+> Maybe lru_add_del_folio() should only call folio_set_active() on
+> !folio_test_unevictable() folios?
+> 
+> Or should we allow occasional active+unevictable
 
-I have kept the address for debugging, and do put it to some use in
-the paranoid vmstats patch 27/26. On 32-bit, with 4-byte pointers,
-this LRU_NEXT_ACTIVATE bit does then leave one pointer covering two
-adjacent entries, when it's deciding whether the folio points back
-to this lru_add entry. Is it possible for two adjacent entries to
-hold the same folio (and so perhaps miscount the stat)? Yes, it is
-possible (if that folio is freed and reused and readded immediately);
-but so unlikely that it's of no importance when gathering stats.
+Yes, that's what I did, just removed the VM_BUG_ONs: but I'll need
+to check again whether that other patch also had to fix any ordering
+of checks. Offhand, probably not: once the "Unevictable LRU" became
+an oopsing fiction, it was important to check unevictable first:
+unevictable must take precedence, and then it really doesn't matter
+whether active is set or not.
+
+> so if they are
+> munlocked, they will go directly to active list?
+
+I didn't think of that, but I don't think that "active", set racily
+back when the folio was assigned "unevictable", bears much relation
+to whether it ought to be put on active or inactive list when later
+made evictable again. We should probably be consistent, and
+consistent with existing behaviour, that they go to inactive when
+made evictable. (I'm not looking at that other patch at present,
+I don't recall where active got cleared in it.)
 
 Hugh
