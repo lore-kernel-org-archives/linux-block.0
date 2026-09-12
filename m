@@ -1,82 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52973C3F7D;
-	Fri, 11 Sep 2026 23:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFD2CA6F;
+	Sat, 12 Sep 2026 00:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789170894; cv=none; b=mghi2b3+tW1GcxaNd6YJ1r/qx86/UNErukKV/94tMkW0qDcn2GFxEra6GM2ledoIDySln1gkqucfpW7yIZJDuUKXwxVksjVe7WCMWUW0yhfzwLGRuf2bsOFYYMYyZd3Y/5Xi4mrvBYkc4df0uj9cVxqMz55WUNTZ46t7H+1tCt8=
+	t=1789173113; cv=none; b=YusTEpXg5Ed9WujvyfGQGvrdwsVujtjKAw5mtWzXQoI6EVIfYK3Qzge5SU9gXxODy/9I8au17KI4ZyrqTBCF3T7n2tcGcHn1rzGgi39I0YS0T0Mu7hLoRshz5WvuobNb/haAkoS/xtk8vmZam+krR8BrV69QfEfoGZHWCB5ivnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789170894; c=relaxed/simple;
-	bh=w7Il/r3fxJX3eElLw9gE1szRQycPaBFiM3D3/emL5S8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QBQpXkBwtXnm8kU1QiEYbVlJxIZqGTjqVkzCaJsBYWkgYXqnt4e6ui9Pl5094H0knrs473yNeUDygib7OQJ7sZgA02/v1KfLuufh7MBJJF19QnZo4jijledVN22pmerWd4AhqzwxqEoZoMQl1ZUDS9UXNFZ2lXcaHoQgVCuB99E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpt87xQZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789173113; c=relaxed/simple;
+	bh=HXNI6UAMrjh9+VLP1v7jAT28x3W4ScCqb3gnwwzFXMc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b410PUIdShg8aCdCz5GkMmTLfHAQRbwCvTBOk9z7eNWx0DYogNwIWCwAZUPtwBIurbyGfdLFBto7RtauvTAAGhk/R45/VGRN0HIsq3Bwhai1IYFbzW0upT6Pg0Kus9cC84uaFG1tcFF9mUCnjXJfjawmG5Qg4HrWS7D7TL/G9IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TCYa9xs5; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpt87xQZ"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2AC8E1F000FF;
-	Fri, 11 Sep 2026 23:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789170892;
-	bh=0Ah6nDX+H6aEft6Xraj4xE0JoGU9OyYYiZe/wFZlXHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=fpt87xQZ29bC2rNErR5EbgeXCO/6S7zKxmitINtIcbflxJP3zGd2ahlvz99YQhfnb
-	 /Vxr0ZRejkx46apSQeAehipJ7F8fg4rbZ1D/NDpLyjXL2jqy8OXkKFt/WFXyDL+hei
-	 4JzyZc700TtBr7FmE7OItJsM+dZW7/rWjGTmYmmWTqMFKxH6HGwma9IVEd7ZeKegja
-	 sartZFsP8RWco7tVMCeslVvVl8b3NL97aAL7bc0qUyZcw7eJLqKV5m+w+2wZQA8djF
-	 dgTroE6ohd9Wxb/KpIcK+PE942HfikOWH33mA/zqEIatZFS8eZDOBhFEg4LN/3fS7A
-	 QJ5tQYWFXKNIQ==
-Date: Fri, 11 Sep 2026 16:54:51 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: Fix the thaw_bdev reference in bdev_freeze()
- kernel-doc
-Message-ID: <20260911235451.GD6283@frogsfrogsfrogs>
-References: <20260911233415.31271-1-kmehltretter@gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TCYa9xs5"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hhXRB6kgDzlfvq0;
+	Sat, 12 Sep 2026 00:31:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1789173103; x=1791765104; bh=33U5vQimcyFyEVA37rvZUyWR
+	rhM9rGpLuC0TPddNhvY=; b=TCYa9xs5Xih6lVMUwwNrSlHM6JIS18cuPnO4VaXh
+	0tyi0bVEjRt6RBJKFkkYKoJX/gCWy3f55XhBeO+ybQHbTtE4N2vpMCbNbFm8WnTD
+	ScdISD33wsa5L/ukJgkpRjQcO0ijxejP4hIu3gwo0PDyYYwgFe03Xz5Wtjm8gDtQ
+	kUoBwVfnX2A1e0rMumoJz65KCE3eUg/WjulAXRPI9Ydxpq3jBECRRwMTu9YXh3L4
+	HW2TQKNO8T1ZXdiEN1sppoxFNkAWAUtVJ49AlYXJr7XNZVU5Pc0gsG3v5f7yRNEZ
+	9pyxp9tFIv4ZOCOcDKZhKHoqUbE/Gx1pbPO49FHxbqc16g==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id KN3l8zysGsJR; Sat, 12 Sep 2026 00:31:43 +0000 (UTC)
+Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hhXQx6WtHzlfvpM;
+	Sat, 12 Sep 2026 00:31:37 +0000 (UTC)
+Message-ID: <a863d8ea-d72e-48b4-862f-1a7439cb255c@acm.org>
+Date: Fri, 11 Sep 2026 17:31:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260911233415.31271-1-kmehltretter@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Add post_release() operation
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+ Andrew Morton <akpm@linux-foundation.org>, Brian Foster
+ <bfoster@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Hillf Danton <hdanton@sina.com>, Markus Elfring <Markus.Elfring@web.de>,
+ Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+ Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+ linux-block <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org
+References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
+ <3fceb17e-35f5-4275-bfa5-f1a018c732c9@acm.org>
+ <f00a7749-c59a-4c96-bc41-b34c80a40aef@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <f00a7749-c59a-4c96-bc41-b34c80a40aef@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Sep 12, 2026 at 01:34:14AM +0200, Karl Mehltretter wrote:
-> The kernel-doc comment of bdev_freeze() refers to thaw_bdev, which was
-> renamed to bdev_thaw by commit 982c3b305843 ("bdev: rename freeze and
-> thaw helpers"). Say bdev_thaw.
+On 9/11/26 3:34 PM, Tetsuo Handa wrote:
+> On 2026/09/12 4:54, Bart Van Assche wrote:
+>> On 9/9/26 3:48 AM, Tetsuo Handa wrote:
+>>>        int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
+>>> +    /*
+>>> +     * Called after disk->open_mutex is released in the bdev_release() path.
+>>> +     * Used by loop devices that need to perform synchronization without
+>>> +     * holding disk->open_mutex. This operation has to be idempotent.
+>>> +     */
+>>> +    void (*post_release)(struct gendisk *disk);
+>>
+>> Instead of referring to bdev_release(), which is not in the public API,
+>> the above comment should mention that .post_release() is called after .release().
 > 
-> Fixes: 982c3b305843 ("bdev: rename freeze and thaw helpers")
-> Assisted-by: LLM
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> Such change is not accurate. The .release() is also called if something went wrong after
+> the .open() succeeded. The reason I emphasis bdev_release() is that the .post_release()
+> is not called if something went wrong after the .open() succeeded.
 
-Not sure why I'm on this, but this is correct so
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+Please integrate the above text in the comment above .post_release().
 
---D
-
-> ---
->  block/bdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>> The above comment should also mention that .post_release()
+>> implementations may sleep.
 > 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index cd8323083740604da145563aa8e7b55c4f627467..fac74319e9fbacc9cf2bec4a4b043b837a9678ab 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -292,7 +292,7 @@ EXPORT_SYMBOL(sync_blockdev_range);
->   * The reference counter (bd_fsfreeze_count) guarantees that only the last
->   * unfreeze process can unfreeze the frozen filesystem actually when multiple
->   * freeze requests arrive simultaneously. It counts up in bdev_freeze() and
-> - * count down in bdev_thaw(). When it becomes 0, thaw_bdev() will unfreeze
-> + * count down in bdev_thaw(). When it becomes 0, bdev_thaw() will unfreeze
->   * actually.
->   *
->   * Return: On success zero is returned, negative error code on failure.
-> -- 
-> 2.39.5 (Apple Git-154)
+> Such change is fine.
 > 
+>>
+>> Additionally, why is .post_release() added at the end instead of just
+>> under .release()?
+> 
+> Because I consider the .post_release() is categorized to
+> 
+> 	/*
+> 	 * Special callback for probing GPT entry at a given sector.
+> 	 * Needed by Android devices, used by GPT scanner and MMC blk
+> 	 * driver.
+> 	 */
+> 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
+> 
+> hook.
+
+Are you claiming that .post_release() is Android-specific? I don't think
+that's correct.
+
+Bart.
