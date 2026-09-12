@@ -1,104 +1,161 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAD19463;
-	Sat, 12 Sep 2026 01:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789176209; cv=none; b=OrI5qwj6l0uUgUV31RIa7f74orx5/tyWFGg51O5U6gnQljyP2Ds2stjzm90qRjdJGA+FVh25L3NdRt3h0KMGLDm99r40dyZsPTE2Yasa0LR5QJwQ8oA3B0VozOtCLPSZ3RIBRwaqEFgkVpPv7HAf4yt7h/+H0MEKXupFEa6m9OY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789176209; c=relaxed/simple;
-	bh=hxhQ/JUXS2JEWqy13Qw8zYJmr+bQK2uGvE6g15bRImA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BH+V8W4AZCY3CyY7gaU0n+0/Qp7d3Y9+nZz0W+J2mtbwr+khCJs91tpYlIuMvsTI+r1+6sMvCpJcxlacQnK8PPK8aFDnspiM0cmR8z9oWEJY5NlLFubWIgI/kJT6mQwWGrM+SBIC8NGa5F2oHBcjROXLo90uR2Y22HKtAvtzUP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68C1MWZW093538;
-	Sat, 12 Sep 2026 10:22:32 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68C1MWnP093535
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 12 Sep 2026 10:22:32 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <6fdefda9-c7e4-4368-8d9a-280043b4051e@I-love.SAKURA.ne.jp>
-Date: Sat, 12 Sep 2026 10:22:31 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44AE2E718B
+	for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 01:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789176586; cv=pass; b=G+mqyxocC9RFye5ISoNBB1XUGY7V6YzAx0yeTnUqMVQfaoz+Ppp3vYJjfHqW7DOeHXkLkWKwXYzIxZbPH4b0EzBQYFqOaXxoSrAItChoTrCxb7P4WHqwxTtxOtVJsPNnUvZFuDda/VY6J7QR2R52neWuCD8oOKMlbVgqWib1Wbk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789176586; c=relaxed/simple;
+	bh=MqFZZ1MZCCOk3B2AWbqhU4vVtD/Z+SwXDy5HKI6vso0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=obWk63JuHcJczXJv5yqv1IHbsm7EMlPChMQ7ry+l9fs0kNl4x7bCrzZ/RI5ImuYdjQTnFSr5kcK1icPabz8XhqC0vw9PXqfie+7iWCPltfzJp0iahxxYj78BASX8ZCk4+16kt4AKXWcBPAlVA8k1a0R2Qojb59Ou5Y32rbcAQZI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=QAqLa2iA; arc=pass smtp.client-ip=74.125.227.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="QAqLa2iA"
+Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d747ee1f9bso4937825ad.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2026 18:29:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789176583; cv=none;
+        d=google.com; s=arc-20260327;
+        b=UF3y1sn77hdVaKZOGT/ZRzV2ua4mIr2PGoca2PdbKddns+rEkkFlc4mc9mkvwjMGHM
+         5+PyvqJUfBte47v0ZyZazjpEqN0EmQDzkRI4Kwcl8BaB+/T5Tp6kh0CU1+RbXbU1Yt5I
+         72Ga+RlLsrNkCW9Ey2xcFaeJhFi1jyiK+vBCqWjhKKmKENVNIv4pTOzNkgeqEANR7Olv
+         ZPpENbfYWCRnq2kFnFkZSQRhrgL8LL2FNVdpMthASzk85O1jfZd5/C3CxVV8Ew1wepgz
+         mXLwR9Bi2qeY4DdmHCg/sY1wA7Ps3/B8BoSl9HFzxw5J3ogfN5oz86PIl4X8dUOc8toW
+         zGOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=MqFZZ1MZCCOk3B2AWbqhU4vVtD/Z+SwXDy5HKI6vso0=;
+        fh=3PqUYbVDLqiWBfm1oi+Tr+DAsSI7VEFcrK5S6xm+yZg=;
+        b=PUd4Q13TR9JntE1oGmFYJYq1BHIMqOF4+SERLEwUKKbGmp4SG/ZRSVmTGtJq3VUC74
+         CTCjdqq7eU8QdqbzQ4sWTmkJM1vTotTwTkmjpDP4rxi0L53HkXq20f8GIn0VRkzb1wgc
+         eUZ5tQN6PHmHBAXZAQoFFSt222oFw8RgXPDg7l1BT/nQ//iOCe0QTVAAJP4d3xUeBpQS
+         dup+dLyH8D0qU23KPpha20sl8jyPuPT5cwThFt8qgDCc+3JPzJ7pO3v1i/Z3c1qsPIxS
+         r/6+QkPRBbJBy5ANn3nc1NDm8v8jVDAfwqZdt81TU1FUbM60nU4fOVZ/wnqV6aKFN5hm
+         iHjA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0x0f.com; s=google; t=1789176583; x=1789781383; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MqFZZ1MZCCOk3B2AWbqhU4vVtD/Z+SwXDy5HKI6vso0=;
+        b=QAqLa2iAbwvbRxmC6B/DPpQl65ZVNzEquWN6wGgAhav0o7h1rYsToOePhjX5FWfOwV
+         2QVaUBzUttmd9Bo86TSJ6STiOqDzCq4lJcczZXWAE7fbGVZ3m8PWgwWu+anMzWklqRTP
+         /wcfwddYmq2X1nPNtWMdy+IL2+QUWEynTsNoA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789176583; x=1789781383;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=MqFZZ1MZCCOk3B2AWbqhU4vVtD/Z+SwXDy5HKI6vso0=;
+        b=qjK9M5xg4FzQZA7NJx2njR3sb+JpwexuTvDe9NFSI2JNOEwHCWDyM1ryhQn5BbqeKz
+         /q9EwAFX5aEPVMoBiG5WczzdlClzayk+Ijxp2X4D2HjP+UOl8wumqqXY+RjPW8Pt+bFr
+         aKPAuBSvJh79ZSKfhf0DMfbCh3BIftPT19HNAXBMxUC0z2gaIAgGBKvLztuXtLWPfidu
+         kWDahnm8PqeO2vx6ZovZoBKX22bSHb64tcpiEf3StwCoZufdgjSHLx2yhOFCQ6nZrBtb
+         U+dxYEj+zGomkwRH7LlA0YCoeWKiWHXj7NHln0u8rHRlrt2abOPP13SulvtOZmMYgR1V
+         by2g==
+X-Forwarded-Encrypted: i=1; AKwUvByxUqSffTNwpPdoOl8p1SlH+VyrfW3IaeL3AXuBgdh3MYdYHIXijm6othL7a0LYAU2kYowTDEZxKLZcSA==@vger.kernel.org
+X-Gm-Message-State: AFuF++kbeS/JX2FIRBbim36rEYcKyocB9VFE4p3oWj9L1wrgWZeTIH8R
+	tMdUIcczpf7YVf36K+LWF0Ng+wrNjb9ey4LW9rOTMjCrAODK7BGdlNLb1EaldY+vd3qhhW9dVGt
+	EkmT+LRDeQrSw0Y8khMZ90eWZCW7qWQT18dMrpmKCcA==
+X-Gm-Gg: AYBFou0YFmv17bm4Ivi9oojNwlWofUdyAglfmbxdcVJQRxhe0tg3aeiuGwWM/s311/2
+	d+iO2WR7kB6G9SbKe9Ok32Uhd96xrKHGEvmBBsyj3JAL1i8QqbhFCYK9GMP7hX2nl9AtELntr14
+	x+XQaboZnKPh/pzP9AGErq1ZvEjLiDmhA7LWiuWhof5ZmKETDK2/K8PJKAjuYx8Ve5g0Phimenx
+	yU0pCL1rOiN7XHjjunu0c7HMjVo3GKNuLi5TO1BT3krRvFBOhTcBHugkc5dfvD7qRbu/wNxWhh0
+	cwkoEyzlLZ952DLHAx2+arZO+vMiOv0KFAK0XxBsHPhal1WMbKPzog==
+X-Received: by 2002:a17:90b:4fc2:b0:381:6c5:3f63 with SMTP id
+ 98e67ed59e1d1-39d9bc42d1bmr12376403a91.6.1789176583130; Fri, 11 Sep 2026
+ 18:29:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] loop: Perform __loop_clr_fd() after disk->open_mutex
- is dropped.
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Brian Foster
- <bfoster@redhat.com>,
-        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
-        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        rust-for-linux@vger.kernel.org
-References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
- <9f1273a7-6dfe-46bb-966f-fe08876f4375@I-love.SAKURA.ne.jp>
- <3883b05e-0a34-43f7-b2a9-a46d2b0c5ffc@acm.org>
- <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
- <d89aa722-2d13-4733-b5c1-f0194bf4b342@acm.org>
- <15037162-0e54-4722-ac7e-c9a863a8a2f7@I-love.SAKURA.ne.jp>
- <b700652d-ed63-444a-b879-ec2725affaa7@acm.org>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <b700652d-ed63-444a-b879-ec2725affaa7@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav213.rs.sakura.ne.jp
-X-Virus-Status: clean
+References: <20260908152808.3928630-1-arnd@kernel.org> <20260908152808.3928630-4-arnd@kernel.org>
+ <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com>
+ <CAD++jL=ysmPgs8yKH5KBobuv-eeCHHgZwvo1kvHOFuTwhkaOew@mail.gmail.com>
+ <CAFr9PX=_FmMdR4TeP+tqURZdZCTjw8UYxAxeszs_vcpTbX+_aw@mail.gmail.com> <CAD++jL=zaF1zcTv6Mta5Xw69WeLC30NRcH0_pkSkLJJ0UtnZHQ@mail.gmail.com>
+In-Reply-To: <CAD++jL=zaF1zcTv6Mta5Xw69WeLC30NRcH0_pkSkLJJ0UtnZHQ@mail.gmail.com>
+From: Daniel Palmer <daniel@0x0f.com>
+Date: Sat, 12 Sep 2026 10:29:30 +0900
+X-Gm-Features: AcwNN1UYIuhyU3FVES8GlXYNI9phDxlCK3dBrZsiSwUakZtphqfaiRPyo96Awf4
+Message-ID: <CAFr9PX=tVOzqGU4k0zSzXheuU5z5LZi4LSGdUvjChrSTrbyjJg@mail.gmail.com>
+Subject: Re: [PATCH 03/13] ARM: remove riscpc
+To: Linus Walleij <linusw@kernel.org>
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Drew Fustini <fustini@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>, Stefan Agner <stefan@agner.ch>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade <andreas@kemnade.info>, 
+	Kevin Hilman <khilman@baylibre.com>, Roger Quadros <rogerq@kernel.org>, 
+	Tony Lindgren <tony@atomide.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew@lunn.ch>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
+	Gregory Clement <gregory.clement@bootlin.com>, Robert Jarzmik <robert.jarzmik@free.fr>, 
+	Kristoffer Ericson <kristoffer.ericson@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Karl Mehltretter <kmehltretter@gmail.com>, "David Hildenbrand (Arm)" <david@kernel.org>, 
+	Nicolas Pitre <npitre@baylibre.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	devicetree@vger.kernel.org, imx@lists.linux.dev, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org, 
+	Ian Molton <spyro@f2s.com>, Jens Axboe <axboe@kernel.dk>, Helge Deller <deller@gmx.de>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, "Paul E. McKenney" <paulmck@kernel.org>, linux-block@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026/09/12 10:02, Bart Van Assche wrote:
-> On 9/11/26 3:18 PM, Tetsuo Handa wrote:
->> On 2026/09/12 5:03, Bart Van Assche wrote:
->>> On 9/10/26 2:44 AM, Tetsuo Handa wrote:
->>>> On 2026/09/10 4:33, Bart Van Assche wrote:
->>>>> __loop_clr_fd() is queued from the lo_post_release() callback and hence
->>>>> may be called concurrently with or after another thread has called
->>>>> bdev_open(). Hence, lo->lo->state should be checked instead of assuming
->>>>> that it equals Lo_rundown.
->>>>
->>>> No, __loop_clr_fd() is queued from the lo_release() callback.
->>>
->>> Yes, it is *queued* from the lo_release() callback function but there is
->>> no guarantee that __loop_clr_fd() has started before bdev_open() is
->>> called again.
->>
->> Since lo->lo_state was set to Lo_rundown by lo_release(), lo_open() will return -ENXIO.
->> What can go wrong if bdev_open() is called again before __loop_clr_fd() starts?
-> 
-> This breaks LO_FLAGS_AUTOCLEAR, isn't it?
+Hi Linus,
 
-Why do you think so?
+On Sat, 12 Sept 2026 at 03:15, Linus Walleij <linusw@kernel.org> wrote:
+> I would say using generic entry would be a prerequisite for
+> doing m68k SMP so we don't introduce *more* entry
+> oddities, but after that I'm game.
 
-  App1                   App2                   system_long_wq
-  Calls lo_release().
-    Schedules __loop_clr_fd().
-                         Calls lo_open() but fails with -ENXIO.
-                                                Starts __loop_clr_fd().
-  Calls lo_post_release().
-    Starts waiting for completion of __loop_clr_fd().
-                                                Finishes __loop_clr_fd().
-    Finishes waiting for completion of __loop_clr_fd().
+I have started this for one part of the m68k tree (68000), but it's
+one of those things that is hard/frustrating to test on real hardware.
+For the last few weeks I've had claude create a QEMU that can boot all
+of the m68k supported machines to Linux, Netbsd and their original OS.
+It already found this:
+https://lore.kernel.org/linux-m68k/20260828094940.3882602-1-daniel@0x0f.com/
 
-  Calls lo_open() again and succeeds.
-                         Calls lo_open() again and succeeds.
+> As SoC maintainer I see that m68k has a lot of technical debt
+> like drivers under arch/m68k and no proper hardware description
+> (such as device tree)
 
-App1's open() after close() is succeeding.
-App2's open() being temporarily failing with -ENXIO should be acceptable.
-If App2 wants to avoid repeatedly failing with -ENXIO, App2 should use
-ioctl(LOOP_CTL_GET_FREE) before open().
+I have m68k machines using devicetree... :)
+
+> There are things like
+> amiints.c, cia.c, ataints.c, q40ints.c etc that should be in
+> drivers/irqchip. So many time.c that should be in
+> drivers/clocksource/* and many other unmodern things.
+
+Would be easier with devicetree. But is anyone crazy enough to go
+through the pain of merging the devicetree support and then arguing
+about devicetree bindings for each of those drivers only to be told
+m68k should just be removed?
+
+> Albeit I think actually going and fixing that can't be super-hard
+> in the age of LLMs. So listing things like this likely will just make
+> someone go and do it. :D
+
+Once you have an emulator that the LLM can operate it can do the
+change/build/test/debug cycle all on its own.
+With a test harness it can even test the changes work on the real hardware.
+But I don't think that's enough to convince people the changes are
+worth reviewing/merging.
+
+Cheers,
+
+Daniel
