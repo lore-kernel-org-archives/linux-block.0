@@ -1,111 +1,227 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779F3C2EA;
-	Sun, 13 Sep 2026 00:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FB32765D7
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 02:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789259452; cv=none; b=kJmaOBU8NGod+jAmnbTyYHcvByuSunNZCWEKhn6iZsylpHkN7JzrsWnikBP2cTnyVzACRn3Cxh6AGM9Hgv95Q4Sb0oVzdOnuNj4rISSbUHHH0pki1LJutoUhlFJlMgmLeoZiU/4jSxx1XF1iWjJmyvNXE9txaVBfSg/V2x6AXpI=
+	t=1789268318; cv=none; b=nxei17Z4+cMvFSS/jX+VPOIYbGzXWk1VIBHxHK+rGma7vfLiHxYWYzWvEYSBccIppQMWkO7c/ar3bNBfhpBP343Ad5iZZdfFE4Sbukm/2H+B5LqvSG3xKxCuUuJEWXg61H74bAhZcNoFm6YuvbwJGB1VWoGfpquhh1rLok7AEek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789259452; c=relaxed/simple;
-	bh=HlbGcHncXgxeJnyIgMYYOBgqjwLfT1+DovrzLoZeEKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P0IG1vqQPQR8++786EG1szpK9qOQHP2zkQlwFxjSegh1t3qUg3GbkJIPH0NUAPnLDfd1B96skk/BWnpey03rcP9RYMm9NBVwXOp/JX6pee+X+Za1l6snXPwYUYhQfKgww1TRcGaUxY2xgtmxXYvTDmH3cHyhX7aEI7QnzJwkVVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=myJRdf8Y; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1789268318; c=relaxed/simple;
+	bh=AggbHlNlS2wRgnp/52kFEhrWoD5wMPtJZEBYqJ5/O0w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JSZcwrGWfyMol22l19yJss6tdm8t1miWh9Sdlo8AjwGT/lNBtNRmALs0QKSNUtp7VScpKhP0UV5TVKtlWFxDAsty69IoXcqnnFQKlEdwLSaH80mpe05L4w1464fOwbUmdQcOHknPzVCeehg5WdCAEGYA3hVvoBSfAGaLRpC9qCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IhfKd1Uk; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="myJRdf8Y"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hj8MT064Fz1XM4TB;
-	Sun, 13 Sep 2026 00:30:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1789259432; x=1791851433; bh=HlbGcHncXgxeJnyIgMYYOBgq
-	jwLfT1+DovrzLoZeEKw=; b=myJRdf8Y48khX3oHnCfykX7JiM8D2p5lIv3j4Z+T
-	aqMmyojak/oUaZg9HU3ffg2DzINFpfGQMNqF2vvMiZ5MyfRzobSLAlwNIamtpg9p
-	8qMjmuBtGcmsu3uO4eDC49Ywoeamp2WYkmaU6ICKrK2eb8Kx1KBls2bkUeYIFCAK
-	QfN5KHlGv7nlvmGRW2Q8fPuoV4dy2z+5NGrotqoFnbNf7HsC4+W2Da6BIevicBjf
-	46OCNPmf5G9aO44la11cSoea2SgjXP2/7Iy+74bYZBom6/ZYUpJN0B9MLc7sgR9u
-	RurcDhNuN8EQZ5aJl2sedu8CW4n7IeY4vhm0wSm5FOshjw==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id TTRlBX5WCrYz; Sun, 13 Sep 2026 00:30:32 +0000 (UTC)
-Received: from [192.168.0.215] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hj8M40tmMz1XM4Sx;
-	Sun, 13 Sep 2026 00:30:23 +0000 (UTC)
-Message-ID: <ba386a0a-8022-4c3f-a1c1-bb22205b51d4@acm.org>
-Date: Sat, 12 Sep 2026 17:30:22 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhfKd1Uk"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-85469d249c5so1055532b3a.3
+        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 19:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789268316; x=1789873116; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YkNvKOxozlLmolowDJQsMyoByil3F96EgYKhJ/Nv9Lo=;
+        b=IhfKd1UkSbJeBggspUq7h1856Y4vRkph2fxUMX5fY1RctctK3b2iMz7V7r4P0+WH7g
+         Fjh1upuaov+mIAS/dbIZAps0UzYW7O+/DB3kHFjFlQ2B2NSO7J11QmJ16uc3Vh5vMuBI
+         Pgx9VwvzRlDePWBnP96/wyt+G/V9GTytCKCB1pMDcZRv1juSl7Q3pfNzsFT4dEva6QZb
+         YrnE8QS7U6IrI0cxlRvkImLfEYtTY5h2SLiuyjF7JlujgXzVaYEExr+2456JNrkhhEqF
+         W9iMWRVuydYQ8nRm4rIHqffmFL6qf41aUZmBm9gFkbhf15E75N5djv+ISX88K0/QuqmY
+         VlyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789268316; x=1789873116;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=YkNvKOxozlLmolowDJQsMyoByil3F96EgYKhJ/Nv9Lo=;
+        b=HXb+H2WBYB0QxY7Q5jF3k7Jq8QAULZ3YGn/zh+qU9XOOc0i+vQum7TUPqk51MTH2h5
+         Uy/YMvtFRjsI+5kmMNZUsa7l6T/jnYCqgNwtbTq1tFZIn9WK64p5oKgLB2amSvo/lDbN
+         FyrzyKvx82J30+PaI9E1BBG/cWsHdqIk0BZdkaGyfvM4JjEgD2ZQC7vZbV9AnOL1mIcP
+         COpLx5O22wm9wK85XMUJLkzHLY9Bcxy+BmMRWajE50z3CKgmL80yQ8ndsv1ITMp9aep7
+         U+ljsHRhoGcUCoJG6Z8ecXsQxVm6//juJJpQH1BweipdNakFXLihhttqA4WRyMK1khzy
+         SM5g==
+X-Forwarded-Encrypted: i=1; AKwUvBx5tFH33ew51/xAO10tshppgmt6LMjsHGQp/+7cC+/p0Pp1H/F6BTZSGXlwlpaGXriCq6bGX5tmQ6H10Q==@vger.kernel.org
+X-Gm-Message-State: AFuF++no7nns1oZ+j+h3K+PA2aymZoSVbPDpASVux3YgNDycBLpCyR5c
+	CsnX2ZOU8vCJc/pawdeNHihifohdSSbJ8BsJ61xkyWtT8PXerjU96PU=
+X-Gm-Gg: AYBFou2kQmG6AQfffW5Bv8xeKunFtp95hm0gTpeC1d4Av2f5gysrkz5tdJQatoXcEqW
+	kgUFSXO+M8JIlfbxkNUfUzbjyePLZsXQSvzRHhyJw+9pwSK4pB50kpHAYLfMt0uB5EZ0uPTf4sb
+	S4DzV9Yj9dbWhurY0rhtqHoSYfCkGayhx/5/bd11nPlhYoTCA2IylGfEZqk/UXWG9ZvHb/2QrUv
+	La5W+T0+auAoAd/xQwykeZv2mSznX5WTu88I0y83q16mKO4i5KderN5I7lweTm0Q2zOe0/lq3SV
+	8GeGag7ezVvQSFD41D+yvnGU9gNCmd+kV5lZjx5V2eBi5k6T3jdZ764dgbwO5Hb9s55X1jWLEjG
+	332/yCH+gcI19nssagwv3z5eTni9Yr4WyB4N8UUZwiAjCSpIMgHiZ7oKBjNN8vFKCVTvwKgtxkC
+	Ya/xGqXO8eyg4chATZRy6ofYdI9hqX75pr+qI7YIr+7w9JFdH+j22MNf5xlfs6BmvGRz9Y6hvze
+	IcIknRQFFhKae5dPc5wQctEUg==
+X-Received: by 2002:a05:6a21:6f88:b0:398:8870:b58f with SMTP id adf61e73a8af0-3daed319787mr20832624637.14.1789268316064;
+        Sat, 12 Sep 2026 19:58:36 -0700 (PDT)
+Received: from ydg-Zenbook-14-UM3406GA ([2001:2d8:7f00:8c85:b91:ff81:c860:362e])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc4c657156bsm3022673a12.21.2026.09.12.19.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Sep 2026 19:58:35 -0700 (PDT)
+From: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"Martin K . Petersen" <mkp@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Adriano Cordova <adrianox@gmail.com>,
+	syzbot+f179b16e13624138b0f1@syzkaller.appspotmail.com,
+	linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+Subject: [PATCH] blktrace: build the synthesized v1 record from the entry's own layout
+Date: Sun, 13 Sep 2026 11:58:27 +0900
+Message-ID: <20260913025827.457116-1-donggeunyoo.kernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] drivers/rufs: add Rust UFS host controller driver
-To: Andreas Hindborg <a.hindborg@kernel.org>,
- James Bottomley <James.Bottomley@HansenPartnership.com>,
- Greg KH <gregkh@linuxfoundation.org>, jaemyung.lee@samsung.com
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Bean Huo <beanhuo@iokpp.de>
-References: <20260912-rufs-private-v1-1-716db733e655@samsung.com>
- <YKq4TcQM0v2dXF4wTHEvZKwASII6PDd_R7_UiHWe3NRnR4JsrC_ZS-x6jA_Kl7P6ONehU0REHYk7WaLz8Xv5gA==@protonmail.internalid>
- <2026091124-treason-trickily-bc52@gregkh> <87mrtmvioe.fsf@kernel.org>
- <6JMwZ4EuSfQ8V4TGaPwatQ31m30TceLJblORsuILQmy4VV8Fx2lHbihL8ARsRUuJmaSUqek8L54y4Nk6DuZMXQ==@protonmail.internalid>
- <bdcff6a168e6d4b8e9c9524bd598281817a7df2c.camel@HansenPartnership.com>
- <87eceyvdnv.fsf@kernel.org>
- <RJ3H-1s-vh5YR7DRuPZ6p050ld3umNGcKNeBigg7n3KUQt1WJ2C-sR9kEqrF6f4ubj5AHoHNvB0MRGJyw6tf_Q==@protonmail.internalid>
- <77e00073a9254d5ea1ade771590da81a859b75a6.camel@HansenPartnership.com>
- <87bja2v5g6.fsf@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <87bja2v5g6.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/12/26 8:45 AM, Andreas Hindborg wrote:
-> If we expected this new driver to be a strict subset of ufshcd, we would
-> not build it. The reason to do it is the features that do not fit the
-> scsi midlayer.
+blk_trace_synthesize_old_trace() emits a classic blk_io_trace for the
+binary trace_pipe output by copying 32 bytes from the ring buffer entry's
+sector onward into a struct blk_io_trace. It reads them at blk_io_trace2
+offsets, and the two layouts diverge after bytes: v2 has a 32-bit pid at
+28 and a 64-bit action at 32, where v1 has a 32-bit action at 28 and pid
+at 32. On a v2 entry every field from action on lands one slot off, so a
+consumer reads the pid as the action, the device as the cpu, and the cpu
+as error and pdu_len.
 
-That's a super vague statement. What features do you want to implement
-that do not fit the SCSI mid-layer? If this is about implementing non-
-standard SCSI commands, REQ_OP_DRV_IN and REQ_OP_DRV_OUT should be
-sufficient, isn't it? Please note that this is not an endorsement for
-implementing non-standard commands in UFS devices. Non-standard storage
-commands complicate filesystem development and maintenance, especially
-if which commands are supported depends on both the manufacturer of the
-storage device and the device model.
+The PDU comes from the wrong offset as well. The copy ends at v2 offset
+48 + pdu_len while the PDU starts at 64, and the emitted pdu_len is taken
+from the v2 cpu, so it reads 0 while extra bytes were appended and the
+consumer resynchronizes on the wrong boundary.
 
-> Here is what I count the midlayer doing for UFS today: sense to
-> retry/errno disposition (scsi_decide_disposition, scsi_check_sense,
-> sd_done), the abort to LU reset to host reset escalation in scsi_eh with
-> ufshcd supplying the handlers, the sd device model (capacity, write
-> cache, UNMAP, runtime PM), and the SG_IO ioctl plus the scsi_device
-> sysfs tree.
-Logical unit scanning, DMA support, /dev/sg* support, /dev/bsg support,
-timeout handling, pausing I/O while error handling is ongoing and zoned
-storage support is missing from the above list.
+The entry is not always a v2 record. __blk_add_trace() reserves
+sizeof(struct blk_io_trace) when the trace was set up by BLKTRACESETUP,
+and on such an entry the 32-byte copy is correct. pdu_len is still read
+at v2 offset 50 though, past the end of a 48-byte entry, and drives an
+unbounded copy that desynchronizes the stream. That is what syzbot hit.
 
-Thanks,
+Take the layout from iter->ent_size, which is the only discriminator the
+entry carries -- magic and sequence are the ftrace header, not a version
+stamp. Assign the v1 fields from their counterparts in that layout and
+append the PDU from the end of it, bounded by the entry size.
 
-Bart.
+  BUG: KASAN: slab-out-of-bounds in seq_buf_putmem+0x124/0x180
+  Read of size 1352 at addr ffff8880295bdb98 by task syz.2.2551/19243
+   seq_buf_putmem+0x124/0x180 lib/seq_buf.c:241
+   blk_trace_synthesize_old_trace kernel/trace/blktrace.c:1780 [inline]
+   blk_trace_event_print_binary+0x130/0x1b0 kernel/trace/blktrace.c:1788
+   tracing_read_pipe+0x568/0xb50 kernel/trace/trace.c:5444
+   vfs_read+0x213/0xa80 fs/read_write.c:572
+
+Fixes: 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2")
+Reported-by: syzbot+f179b16e13624138b0f1@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=f179b16e13624138b0f1
+Cc: stable@vger.kernel.org
+Signed-off-by: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+Assisted-by: Claude:claude-fable-5
+---
+QEMU x86_64, KASAN, virtio disk, base 5225b8eec4c9. Binary stream read from
+trace_pipe with options/bin set, decoded at v1 offsets.
+
+v2 entry, via /sys/block/vda/trace/enable. Unpatched, offset 28 holds the pid
+and 32 the action; device, cpu, error and pdu_len are each one slot off.
+Patched, every field is in place: action 0x08110001 at 28, pid at 32, device
+0x0fd00000 at 36, cpu at 40, error and pdu_len 0.
+
+v1 entry, via a BLKTRACESETUP helper -- the only path that sets
+bt->version = 1. Unpatched, the 48-byte record is right and eight bytes are
+then appended behind it, so the next record's magic no longer lands on a
+record boundary and the stream never recovers. Patched, the record is
+byte-identical and the 64-byte cadence holds across the capture.
+
+PDU-carrying entry, via BLK_TA_REMAP from reading a partition. Unpatched, the
+record says pdu_len 0 and then appends 16 bytes taken from v2 offset 48, the
+error/pdu_len/pad trailer, so the reader resynchronizes 16 bytes late.
+Patched, pdu_len is 16 and the bytes are the blk_io_trace_remap:
+device_from 0x0fd00001, device_to 0x0fd00000, sector_from 0.
+
+Not exercised: the splat itself. iter->ent points into a ring buffer
+sub-buffer page, so KASAN sees the over-read only when it crosses the page
+end -- the entry has to sit about a kilobyte short of the tail and be
+followed by an event with a large time delta. 120 rounds over varying buffer
+sizes did not land it. The over-read is visible without KASAN in the v1 arm
+above: those eight appended bytes are out-of-bounds data.
+
+__blk_add_trace() reserving a v1-sized entry at all is a separate defect,
+fixed by Adriano Cordova's "blktrace: always record ftrace events as
+blk_io_trace2", <20260903202932.156278-1-adrianox@gmail.com>. It cites a
+different syzbot report, but removing the short entry closes this one as
+well. Once it lands every entry takes the first arm, so the branch can come
+out; the field assignment is the fix and stays either way. Until then the
+second arm is what keeps this function from reading past a 48-byte entry.
+ kernel/trace/blktrace.c | 48 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 39 insertions(+), 9 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 8cd2520b4c99..455d761ff84e 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1768,17 +1768,47 @@ static enum print_line_t blk_trace_event_print(struct trace_iterator *iter,
+ 
+ static void blk_trace_synthesize_old_trace(struct trace_iterator *iter)
+ {
++	const struct blk_io_trace2 *t2 = te_blk_io_trace(iter->ent);
++	const struct blk_io_trace *t1 = (const struct blk_io_trace *)iter->ent;
+ 	struct trace_seq *s = &iter->seq;
+-	struct blk_io_trace2 *t = (struct blk_io_trace2 *)iter->ent;
+-	const int offset = offsetof(struct blk_io_trace2, sector);
+-	struct blk_io_trace old = {
+-		.magic	  = BLK_IO_TRACE_MAGIC | BLK_IO_TRACE_VERSION,
+-		.time     = iter->ts,
+-	};
++	struct blk_io_trace old;
++	const void *pdu;
++
++	if (iter->ent_size >= sizeof(*t2)) {
++		old = (struct blk_io_trace) {
++			.sector   = t2->sector,
++			.bytes    = t2->bytes,
++			.action   = lower_32_bits(t2->action),
++			.pid      = t2->pid,
++			.device   = t2->device,
++			.cpu      = t2->cpu,
++			.error    = t2->error,
++			.pdu_len  = min_t(size_t, t2->pdu_len,
++					  iter->ent_size - sizeof(*t2)),
++		};
++		pdu = t2 + 1;
++	} else if (iter->ent_size >= sizeof(*t1)) {
++		old = (struct blk_io_trace) {
++			.sector   = t1->sector,
++			.bytes    = t1->bytes,
++			.action   = t1->action,
++			.pid      = t1->pid,
++			.device   = t1->device,
++			.cpu      = t1->cpu,
++			.error    = t1->error,
++			.pdu_len  = min_t(size_t, t1->pdu_len,
++					  iter->ent_size - sizeof(*t1)),
++		};
++		pdu = t1 + 1;
++	} else {
++		return;
++	}
++
++	old.magic = BLK_IO_TRACE_MAGIC | BLK_IO_TRACE_VERSION;
++	old.time = iter->ts;
+ 
+-	trace_seq_putmem(s, &old, offset);
+-	trace_seq_putmem(s, &t->sector,
+-			 sizeof(old) - offset + t->pdu_len);
++	trace_seq_putmem(s, &old, sizeof(old));
++	trace_seq_putmem(s, pdu, old.pdu_len);
+ }
+ 
+ static enum print_line_t
+-- 
+2.53.0
+
