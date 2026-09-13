@@ -1,156 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19283F410E
-	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 18:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B872BE7A7
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 20:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789323261; cv=none; b=eVdF5u3XHE3vg+kAFsHIP/L2qdEN5EOZyiCi42QJ3qEyu975YMYH3cP/kZaiTU8BM5hOYTbB9iWV+TNKLvSTvXDC1g//ccs89khGsqIhb+x61DBa/tBuWp251hcmJt/byQJBlYrEj8oZOVi0ySOjXoOHIdAz4+4llVrhklDmtK4=
+	t=1789330377; cv=none; b=QPKXi5COI76MMW0dPvmoQN9Uk3FkcOv8Ud8WoRIS6XicfvU5r6C4Xn/cPBpKICKrhhv8h+K0dadyAQ79SxzaBtpKxl6PWIbFFYGO1R871urizscXseVl21taL9KucFOiH1Br1SxyHmx48wjs7ahTADxE0KFF4iCyzvcLB9Z6wuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789323261; c=relaxed/simple;
-	bh=+i/WMQo12F+E81xj/jdX7lcu6060BfxnYwbQM4ckRZ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jAyVrXz++L8fDBEhHNwBMgjr9UPEh8pXDUUXv44wNm56dCzKkNlKDuMUfK0Zj3cs3CexS2gk9zzYo3Hmk00q2+agAuwKkCa7RcLv1dx1wAWFobPBFDn+KDTbh70HGMMLxEWP5KrwLn9F2/W+yQIA7p6QeIrkTDrBhNeXtRrQyWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SO2SmIdY; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789330377; c=relaxed/simple;
+	bh=k0GTGV5zZqW8e9OqkW6QVLzZ/2iogaea3tj5Guot4+c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QD42cxnSr7y1BoES9+jbG88nwGNx/cc94/cBm9A1z+6vMaybUt3XiINfVXK6Qkpe1nLjJLJdtaGMFtNcz+Eu3dlkuYh5P5DNdYVKrYAQmRmdgNavlwTmGzSYPsfmPO60mf/UjQIjFvEfkxWVUAAOxh/6CWUeYXG3gmgWQUHFeos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=gQoy7Xrn; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=VuwJdDoe; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SO2SmIdY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E69A01F0089B
-	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 18:13:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789323239;
-	bh=+i/WMQo12F+E81xj/jdX7lcu6060BfxnYwbQM4ckRZ4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=SO2SmIdYjJe5zzSusPLufb1N/4sITaFnh3OuAjM0+HDJ/0jzTDRo1LJJD3yuz0LAe
-	 m9utPZHktAferMrZ1uMTDiSdbFT8PuZIT68sd6yul+TOjyulMH1leZv3n2097fW0kI
-	 HZSTnOlV/XWa3doV6AwdmTxJGx3acDrumYZ3xAXLg9oBP7AZeX4c+jdG+GE3leTYME
-	 o+gGhWxF0SyzDJ1JCk+kUMy4kYISkcvV3AkuDb36TVraJLgPIZU84S7P5MYAV3syTK
-	 sGiu4PkjnJsUoo795urpsWbR9ka05zNomPSqGObRwYr6ZGH3GsxtKSjfhGjyfqiex9
-	 6SceEGtrOAcWw==
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b76462aae9so943294e87.2
-        for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 11:13:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzYHmF04/PhLCypP+g6cll5NhS63nfwsLbTjZUf+dSGx+Zh+6xRCVaJshRIqNw2aaN97aDQkQmim7EzBA==@vger.kernel.org
-X-Gm-Message-State: AFuF++kXPxizb8JGfJF21j6QCqiq7cXXEmmi/polFArl/IcTISNAV/Jj
-	VAzunbrbvlm5Za+lnzZsqGH54w5QPRIKMe6g5mOziCgw1e0etqYonD+Gtgkz2BTfJbaiW0zg5Kb
-	ArJamQmPEAECdr3gunLVExJLwGdSfj1s=
-X-Received: by 2002:a05:6512:158b:b0:5b8:9ec5:c936 with SMTP id
- 2adb3069b0e04-5b8a8ec2c76mr1378800e87.44.1789323238029; Sun, 13 Sep 2026
- 11:13:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="gQoy7Xrn";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="VuwJdDoe"
+Received: from pps.filterd (m0167074.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68DJ1UW9445928
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 16:12:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=bDqM
+	F7VA0MJ0fYRBYzcGOJXnsLMvTFFlZbyP/iQRyvU=; b=gQoy7XrnrRKCEEGq9c7Z
+	jd8jSDobtRDd/bEy8dimQWvHSaJMnvEiKRO1u+riGDJoaW0H+yBjyHfqcBzmT41u
+	Yjhd+kLsKL04Ip9Ny6gN3zdz1+7yd+JDyRBGXvWJ7yQZACzLJ8xPPOrBnCvbjACZ
+	hen0JjAtM6PbslsAHNBxnlPBjBlNVt6GAi6rqPBWf8MjPLMx24eDcRl4NYqPblH2
+	yeGl0rpo/e/cY2XR4Cv9NFuhB0DmpvYPkPw+4XzvF/E5lD01jLd8as0viLJiIJ2G
+	Vnlm8vCrl6cMqjqq/jSTo/ycUA0Oi82kL+4eagyF+ofbdAxHkdR5q4sQHTk2z32R
+	Iw==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4gnwac9ebt-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 16:12:53 -0400 (EDT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93a0c7126e7so182852985a.2
+        for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 13:12:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=columbia.edu; s=lionmail; t=1789330372; x=1789935172; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=bDqMF7VA0MJ0fYRBYzcGOJXnsLMvTFFlZbyP/iQRyvU=;
+        b=VuwJdDoeM8b/k1uDMRzOOpcg4oaCzLaCZSbn/3aDPtSIAFniFee+NnnsaWUgDmBWcX
+         biNEWvRASr05JanoC0xWGcOXDZpkJEQgleEHSpVffx5tzWW8OD2QxGLJwRLd2s5tvszs
+         F29xfcyF2o7+bRkXmgZOXoCvOLmcN8ScC/uTp9NLe+HiBYfs9WTxNxR/ai0gzBNLXkPt
+         Lxos1cNBCvLpAHFpCkz2Qx/Syk8z4ZD0whwZZktIVr3A0myDPOtpGhi02VVDPT5Rz8Bk
+         l5AVmobuZZTTUoBYWEBmjV+sOtaho43Qq1b0gZoj37/OzquRQga8PkBJxqIsduAWeil3
+         OygA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789330372; x=1789935172;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bDqMF7VA0MJ0fYRBYzcGOJXnsLMvTFFlZbyP/iQRyvU=;
+        b=qWhbdGNWcOYqi2PMD7jDI1UUTSzzepqaoGb12g/m4zhAi6ZFLNvb+Mv46rlLDUvz8q
+         /Jdot3FZhI3iLIPEZC5XO5I5t0y4HJGSt6MDAm1RkRZ5KWNckniavy2px9kZcaiCSmZS
+         Fzto1Gkx7jj1b54vDmUiFnAb8gnSNSwzjF56T1VCPeb1AAae5Aqrdl8qhHtJ50ZhVFTq
+         qKL3ymwT5uqWUH3CJpsK6rWIqyFBkfRTCsuaLWB3Hgzp0Ufgz/lVNOwiOQAp7XtCcUJO
+         LsFSLn2YgdQoZPbvicX/KfyIhMZVXtwSxNkbMylPf8ICYoM/1PwEksWdSw9Ahxgt+9dI
+         sT7w==
+X-Gm-Message-State: AFuF++m/NZU9OnENqudcd+PIFjEJ4ZpbQEBxJ/MOEhQrJ0qRaW8o2USh
+	LCKTWHbChCX60mZjaM2o+5OfnfVwRO25wjEi3WOLPibT/7Vo46DNDffx1qYYqSBApJhY0nCLpH1
+	qKjhfw7nB/R3eCOiFejxCH5OzYZj08oXk3S3StpU5lcXDWArzp5CiUmZLRC45
+X-Gm-Gg: AYBFou0cHhVCeKukatqJGH+ogxDaskUKuZTOHPzy2WN3djy4NY6Q2Kt6pxPJw3UqvKz
+	yrWkSKxpYVH+dgX3ROXZojdkw84R/nikiHK+pfPZ8h2meNcW8ZLACY4PgoSPcPUj1RHAt8CinLz
+	npW0sRy2d99mP+YBKKmLtXEbkc7a+l+qqOStK+KyLaf8Zy67nFCUANG7daEaeOflDm2LB+F+S4G
+	But6ItlTwv6bjAUa/GFOVMnATwLd0E3P64c6K9A/lzN2Zi1wprfAnAPiogcKZXIPWT/oiThyI/d
+	+0K8NZPPfnV9pzm6kpCY+i9vXVr8cGBbkJhd6bF5m4Z1bIvtRvayIL8ZV04g4O61VIyH6ZmxZVy
+	bQ1TWG+gLbQyIKvnSfm/ffybWAwcnk6KESML6hvrDQBqbl5e7o8qs
+X-Received: by 2002:a05:620a:40c2:b0:937:6832:1f04 with SMTP id af79cd13be357-939ea22aa00mr2003301385a.34.1789330367740;
+        Sun, 13 Sep 2026 13:12:47 -0700 (PDT)
+X-Received: by 2002:a05:620a:40c2:b0:937:6832:1f04 with SMTP id af79cd13be357-939ea22aa00mr2003296885a.34.1789330367325;
+        Sun, 13 Sep 2026 13:12:47 -0700 (PDT)
+Received: from [10.207.49.22] (nat-128-59-179-215.net.columbia.edu. [128.59.179.215])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f4d89f9sm79149266d6.47.2026.09.13.13.12.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Sep 2026 13:12:46 -0700 (PDT)
+Message-ID: <64febc67-75ae-43e7-8b12-6f9de894e66a@columbia.edu>
+Date: Sun, 13 Sep 2026 16:12:46 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260908152808.3928630-1-arnd@kernel.org> <20260908152808.3928630-4-arnd@kernel.org>
- <CADkSEUjYhRk-ezaXZkHzFTFQnySFSisKtZfEP-_NtLnQF+6-1Q@mail.gmail.com>
- <CAD++jL=ysmPgs8yKH5KBobuv-eeCHHgZwvo1kvHOFuTwhkaOew@mail.gmail.com>
- <CAFr9PX=_FmMdR4TeP+tqURZdZCTjw8UYxAxeszs_vcpTbX+_aw@mail.gmail.com>
- <CAD++jL=zaF1zcTv6Mta5Xw69WeLC30NRcH0_pkSkLJJ0UtnZHQ@mail.gmail.com> <CAFr9PX=tVOzqGU4k0zSzXheuU5z5LZi4LSGdUvjChrSTrbyjJg@mail.gmail.com>
-In-Reply-To: <CAFr9PX=tVOzqGU4k0zSzXheuU5z5LZi4LSGdUvjChrSTrbyjJg@mail.gmail.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Sun, 13 Sep 2026 20:13:44 +0200
-X-Gmail-Original-Message-ID: <CAD++jL=nr_Rgf6e+vo2bbTRNvEXysEEMjMhGp3-2J2_JPSVkiA@mail.gmail.com>
-X-Gm-Features: AcwNN1UBjE2eanAt46mrgMtCvXLgZ5DQ_bTFYwRvKhaMIzHs2zMGgr1ICh4wWo0
-Message-ID: <CAD++jL=nr_Rgf6e+vo2bbTRNvEXysEEMjMhGp3-2J2_JPSVkiA@mail.gmail.com>
-Subject: Re: [PATCH 03/13] ARM: remove riscpc
-To: Daniel Palmer <daniel@0x0f.com>
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Arnd Bergmann <arnd@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Drew Fustini <fustini@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>, Stefan Agner <stefan@agner.ch>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade <andreas@kemnade.info>, 
-	Kevin Hilman <khilman@baylibre.com>, Roger Quadros <rogerq@kernel.org>, 
-	Tony Lindgren <tony@atomide.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew@lunn.ch>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	Gregory Clement <gregory.clement@bootlin.com>, Robert Jarzmik <robert.jarzmik@free.fr>, 
-	Kristoffer Ericson <kristoffer.ericson@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>, Shawn Guo <shawnguo@kernel.org>, 
-	Karl Mehltretter <kmehltretter@gmail.com>, "David Hildenbrand (Arm)" <david@kernel.org>, 
-	Nicolas Pitre <npitre@baylibre.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	devicetree@vger.kernel.org, imx@lists.linux.dev, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org, 
-	Ian Molton <spyro@f2s.com>, Jens Axboe <axboe@kernel.dk>, Helge Deller <deller@gmx.de>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, "Paul E. McKenney" <paulmck@kernel.org>, linux-block@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-fbdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/7] block: remove dead metadata handling from the
+ async direct I/O path
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Hannes Reinecke <hare@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        John Garry <john.g.garry@oracle.com>,
+        Christian Brauner
+ <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sashiko <sashiko-bot@kernel.org>
+References: <20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu>
+ <20260909-blkdev-fixes-v3-7-1a5222c6e8ad@columbia.edu>
+ <b6eb9cd8-9597-4023-a2d1-7bc0f07f68b2@suse.de>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <b6eb9cd8-9597-4023-a2d1-7bc0f07f68b2@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=BqQIUoX5 c=1 sm=1 tr=0 ts=6aa703c5 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=2jelXx5xVcRIF5zNctN5Qg==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=azVShVRs0zEubeQ0wG0L:22
+ a=VwQbUJbxAAAA:8 a=wwJz1-KtMk0lVk0rRkEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-ORIG-GUID: f8_2GWxKTSYWKxWAI9DjygyFHIv0B88o
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTEzMDI4OCBTYWx0ZWRfX7+Uj0sXqDHZl
+ IjNhX50CzA1d2FOhxFyzi3x+HXUEeD6Be0239g0DApcT2NFWH+fVkgBGEIe0+eJr5+0WAeH4Z1t
+ pMxfRfNoB5HwitLgokdI/4DGw8QF0ir0eS+fC822PGgU+81DYRTx
+X-Proofpoint-GUID: f8_2GWxKTSYWKxWAI9DjygyFHIv0B88o
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTEzMDI4OCBTYWx0ZWRfX6295KBYgx0c9
+ 5ZTKBtl34P+EPyG2bbomIoq3bFhoem8RTlL/A9ltn3iw0tjaKp8lkMIh2LHacJ9Rzop1ZNvntKj
+ 2WWriCmUONo1JWxvXASNqjttq/GESYgypmkmGO9YaNPIZTkfhkkdKTD2WBOv3xgkfPTYs95LAK2
+ k0zbLGrb60rCKu4zdF7DHT/M25l/gi7juUURT8b6Ezd9R88FxZKXKO13DQmx3/PbjdDEkhqszkz
+ pEAgp2IVh2j9BGl21hGV4oRmOQht9qcuUR3N9TnFyNGkA6NkSkMABY47SvykiBiOSEKRhw4Rl8z
+ /5/KG49UBwXbQ3vd17ltRZmoIY3ELlBDjHDUkhyUyyQoPnGUWsfk7EQ9cqtqHCDia1DMJxPT9Ve
+ WEyrf96HMFC1HIfHaiydXquutz1hYq3Mh1q9AiG4pTPLMc0txm0S0HCHdvjTYpP7oymKwalXf8i
+ eQYcux65e3FsjgMNtOQ==
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11904
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=10 impostorscore=10 clxscore=1015 priorityscore=1501
+ adultscore=0 suspectscore=0 phishscore=0 spamscore=0 lowpriorityscore=10
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609130288
 
-Hi Daniel,
+On 9/10/26 6:40 AM, Hannes Reinecke wrote:
+> On 9/10/26 12:05 AM, Tal Zussman wrote:
+>> Since commit 2729a60bbfb9 ("block: don't silently ignore metadata for
+>> sync read/write"), blkdev_direct_IO() sends every IOCB_HAS_METADATA
+>> request to __blkdev_direct_IO(). Remove the now unreachable metadata
+>> mapping in __blkdev_direct_IO_async() and the unmap in its completion
+>> handler.
+>> 
+>> No functional change.
+>> 
+>> Assisted-by: Claude:claude-fable-5
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+>> ---
+>>   block/fops.c | 10 ----------
+>>   1 file changed, 10 deletions(-)
+>> 
+> Maybe a 'Fixes' tag, since you already referenced the commit?
+> 
 
-On Sat, Sep 12, 2026 at 3:29=E2=80=AFAM Daniel Palmer <daniel@0x0f.com> wro=
-te:
-> On Sat, 12 Sept 2026 at 03:15, Linus Walleij <linusw@kernel.org> wrote:
+No need, I think, since it doesn't actually fix a bug.
 
-> > I would say using generic entry would be a prerequisite for
-> > doing m68k SMP so we don't introduce *more* entry
-> > oddities, but after that I'm game.
->
-> I have started this for one part of the m68k tree (68000), but it's
-> one of those things that is hard/frustrating to test on real hardware.
+> Reviewed-by: Hannes Reinecke <hare@kernel.org>
+> 
 
-Pretty cool!
+Thanks!
 
-> For the last few weeks I've had claude create a QEMU that can boot all
-> of the m68k supported machines to Linux, Netbsd and their original OS.
-> It already found this:
-> https://lore.kernel.org/linux-m68k/20260828094940.3882602-1-daniel@0x0f.c=
-om/
+> Cheers,
+> 
+> Hannes
+> -- 
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+> HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> 
 
-Now we're talking.
-
-> > As SoC maintainer I see that m68k has a lot of technical debt
-> > like drivers under arch/m68k and no proper hardware description
-> > (such as device tree)
->
-> I have m68k machines using devicetree... :)
->
-> > There are things like
-> > amiints.c, cia.c, ataints.c, q40ints.c etc that should be in
-> > drivers/irqchip. So many time.c that should be in
-> > drivers/clocksource/* and many other unmodern things.
->
-> Would be easier with devicetree. But is anyone crazy enough to go
-> through the pain of merging the devicetree support and then arguing
-> about devicetree bindings for each of those drivers only to be told
-> m68k should just be removed?
-
-That's conflating two completely different things that think
-about themselves as different communities.
-
-Devicetree is in its ambition OS-independent and the fact that
-the bindings are all in the Linux git is just a convenience because
-that community works well and is dominant.
-
-No device tree maintainer should *ever* complain abot
-*any* binding with reference to what Linux supports or
-where Linux want to go. Only people not actually working
-with device tree would say such things.
-
-Device tree bindings have been deleted but then by the
-person who is maintainer of the binding itself, and for
-the argument that "no operating system" supports the
-platform anymore.
-
-Reviewing and merging m68k bindings should not be
-any more problem than any other binding, and it should
-not have an impact on Linux support of m68k.
-
-> Once you have an emulator that the LLM can operate it can do the
-> change/build/test/debug cycle all on its own.
-> With a test harness it can even test the changes work on the real hardwar=
-e.
-> But I don't think that's enough to convince people the changes are
-> worth reviewing/merging.
-
-I will review them. And I do not think the DT maintainers
-have anything against m68k.
-
-Yours,
-Linus Walleij
