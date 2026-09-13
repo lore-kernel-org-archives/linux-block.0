@@ -1,85 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00B43C1D4F;
-	Sun, 13 Sep 2026 06:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D1735E1D5
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 09:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789282534; cv=none; b=HxD6r7EDuavjw8JQZFTKT4eAMrx6a5DduTs+iCUNQBDjyJlgXCyDyfFpsbSrbWuTql8Q+XPdGf+ZFrTy8NR3e0QNLSNt+GgTIGWwJfZsT/QM4rltcHY81BKtUt5fpDkI3n+Ew5TaCOhzEN6sXzYHELCv7Fu61i8/AEj+LET8C8s=
+	t=1789290163; cv=none; b=b+tpsTSMa6r5jo3k4t8HxiuZGiVBSdofblrjZRAiGmYNPln+YoFvQzp5/1fyYRqIKm1uBHEO+CRl0MmBV/FvEq8ZOZpMOXXyQu1dwmGug9IdptGJJm+3spXcQ9aEmGlDv6lbSGl0MsPmHh/NZjaXsIxzvsfBve7M63A7o8uLMes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789282534; c=relaxed/simple;
-	bh=SWJ50Samts+m7KaPf4XIxu1KYbP4c8FQ95Ihg3WUIDE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hUbrKC+XH/Fln9ARdPqBg1nMktFI47sm2J5Ciw2FmX5vwgxh6BdetY1X7JabCrkwfQkZ/A2RTyS6CXHmYYeI4+7IYa5kNPg9cH4TEWkE8j6FFPtyz6LPzQZbVFNwM6GZkM8m16UwlEoVhTByrngxZnY6Sd2kMHjCGCeMBuiKf98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1GYpsNA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789290163; c=relaxed/simple;
+	bh=JkrUHzTm2jW7khHbM99EuDPTNWDcljhw3EFcnkkw0fM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pfXexFlcVyyUQzOhrlTIw2h2hNEzLpBlS53twmmfVFWaLQfU5CPETyVFxQKpxR1bk1E+OLvXiq4cR/BLQPqG1iuhg54LXIBbK9KMwX6xUcnT9p3c66Ij1ZGZEhAQwvYYqANRrCn/V1RJtdUdl+FTZzzc5CKOHglN9IEkMiwHBjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fvccRwFO; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1GYpsNA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 313601F00893;
-	Sun, 13 Sep 2026 06:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789282532;
-	bh=wT6gN/IxgPOdTmMhpo1rniCpWE+wufTMXpH4Yd2onlI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=S1GYpsNAcUx0FM53lU9XD7zterbc/p52NIZV+fMTVTYJ6erepuX41g85L5n7PvkJJ
-	 8DyqyQIpmcHLylqfO6XWSo0DEA74+IpDKPoFtNYUtRB2pWX32grlDMgBXojD3u4IRA
-	 gRyjRQo1pb8uRFp4YpNOf1t41jIGgXTqlRrEqjT/OXqf1ggIqCgLWhKi941OwoGx35
-	 DFO0DSBsqJJL6qE9ZmvHNqdpd4Jp5KJ0wFJRbWNE0xbxnJ861QQSROnV/Z28ij51aB
-	 FNQN15OXDwCd1LRcPVcXgP3w52Grw6b/cwXBW5KAkci5pkWdZe4ltunpTvsVf82b6P
-	 11r3CWL8qVYeQ==
-From: Yu Kuai <yukuai@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvccRwFO"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cc4aa02a269so1805275a12.2
+        for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 02:02:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789290161; x=1789894961; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NJPTyTqu2TRVdmgNC7HgINfF2pPJkmCQHX4itENndTE=;
+        b=fvccRwFOMmxYK6LwwE96O4Kr8RC/339fJCXgAXwTeKwuF+Q1x0H8USWGTy10wGzqmW
+         FNvj2mubzPz7xeFrbrm+5hQ5WOKTErlgYNv+efGfg7d6aRFW6HC6scwSD4wZ73L5zxhu
+         cCGFeSSpJVnit2Xiu841phhstteNUALslLpEhEXZZRJfABwvA9m4iDhlvJJuzK9TV9qr
+         S5dYheTDwjBophLUBKGFHVAqDkt7fYWhkqJ6mUs9yVo/iHUOMsIXCPGprstwOdJD3VHj
+         JOXSxllrbUc9agxOStNHA15tv8PBMMtLMRRagiaZAGytwJfVFRnkGw2HJwYbUXXcbC70
+         ABzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789290161; x=1789894961;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NJPTyTqu2TRVdmgNC7HgINfF2pPJkmCQHX4itENndTE=;
+        b=av688R+l/Q1Q1jtmt0UM6jTh3FkwBfx3W7+EsB5vW4KylZF8lbXQVk0PrT13XacTML
+         9MtH86JxNNR5Vn/pDwb9rXa5+BT179Dx3TgbiUrBp4Jv63WATQ7bfguP014Oh27LwZnu
+         VxEozddFNwXmCIAxF6Z8K4FLZaCPb9zsUlVzxV2fbWEnZm3fQiKGgtILA15exkpuihVb
+         d6dabVflBunVg/mKjaUjXTMnAirnFnB/DOU0djgYVDtEufgUj+4zmIuZ6qBMqYdVe1Op
+         Er/RRvI0hSb1Ux4gc2fvD5+sJ8mz5cMP/TyWeBRvQiMoR5u1fr3b6c630lF6W5Xob1Vk
+         sxlA==
+X-Forwarded-Encrypted: i=1; AKwUvByZTxDGZkJ3tv98pJmta9bxXGqMlxQi+UiatX0wO+q29DVQgBusYbys4DZhGnm6rwSeJpxfwbyXmeDGCw==@vger.kernel.org
+X-Gm-Message-State: AFuF++ko/WORYZvQkqS/+Y68h0J3lGwKd8y4hb++Hty5hchGc/nX29Et
+	GBhRhr35GMhmFj2kun+jPf+x0Rs9II12o74U0T7n+GQd0o2cio0gifU=
+X-Gm-Gg: AYBFou30lr1i2R1W96L2AVXZsEREANv44sOzRkuWGVMPCGkYMvtCisK3B5lSESov/5P
+	jNUawJVP9TSXb800Sh1INl4ZCquI5arLNFM5p8BG7n+jApl5NT7XaN6ShMhiXxYYjvgGLydBwf8
+	Cb8m0vDMxuRvzZiaq8EK8249l30Fo4uafdKB12AuOoUw6cMdnrdqpZzTkru1cmL5gJZXPnYFAsI
+	+HZnDH9KIG5p1ioKyU1xQ6f6UNTVjl0XlIybvqkCCbU3GVS108T/sDhFxYrN+BvAFdCA29Hf7+D
+	QKyFXr1jU+oBnX+s3YPseW69dooA8HAxZ/1dwjH5SWIV+bMLJu1jDPJXDaG4+kk3a8cgK8tKdMi
+	ghnN9zxlzv526nDbEqZbgAyEn5Hwwd+FJ4IO8TKynxj4D82UaNrtLpE5+AY8MOq9r1g/Jvq84gr
+	SMGVQW4PsxHD5oc1DczdzwdK0PYBjR/RDNgLrk+Q31hTl4gLJNqQSi5p9n92Af93lYQyLowXUkE
+	mhAP6YH90DmSiu+vOhVvBlceg==
+X-Received: by 2002:a17:90b:4b83:b0:396:b98b:a3c2 with SMTP id 98e67ed59e1d1-39d9bd67a22mr20972507a91.8.1789290160872;
+        Sun, 13 Sep 2026 02:02:40 -0700 (PDT)
+Received: from ydg-Zenbook-14-UM3406GA ([2001:2d8:7f00:8c85:b91:ff81:c860:362e])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39d95092c06sm14711702a91.4.2026.09.13.02.02.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Sep 2026 02:02:40 -0700 (PDT)
+From: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Coly Li <colyli@fygo.io>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Song Liu <song@kernel.org>,
-	Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Barry Song <baohua@kernel.org>,
-	Youngjun Park <youngjun.park@lge.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Cc: Yu Kuai <yukuai@fygo.io>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"Martin K . Petersen" <mkp@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Tao Cui <cuitao@kylinos.cn>,
+	Adriano Cordova <adrianox@gmail.com>,
 	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v2 3/3] blk-cgroup: move async bio punt state to blkcg
-Date: Sun, 13 Sep 2026 14:54:40 +0800
-Message-ID: <326e4904402440323532168095f2eb0c6f697836.1789237877.git.yukuai@fygo.io>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1789237876.git.yukuai@fygo.io>
-References: <cover.1789237876.git.yukuai@fygo.io>
+	donggeunyoo.kernel@gmail.com
+Subject: [PATCH v3] blktrace: fix the field offsets of the synthesized v1 record
+Date: Sun, 13 Sep 2026 18:02:32 +0900
+Message-ID: <20260913090232.715798-1-donggeunyoo.kernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -88,199 +83,116 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yu Kuai <yukuai@fygo.io>
+blk_trace_synthesize_old_trace() emits a classic blk_io_trace for the
+binary trace_pipe output by copying 32 bytes from the ring buffer
+entry's sector onward into a struct blk_io_trace. The entry is a
+blk_io_trace2, and the two layouts diverge after bytes: v2 has a 32-bit
+pid at 28 and a 64-bit action at 32, where v1 has a 32-bit action at 28
+and pid at 32. Every field from action on lands one slot off, so a
+consumer reads the pid as the action, the device as the cpu, and the cpu
+as error and pdu_len.
 
-blkcg_punt_bio_submit() currently queues punted bios on blkg->async_bios,
-so it has to call bio_blkg() to find or create a queue-local blkg.  Bios
-now carry and pin the blkcg css, so punted bio lifetime no longer needs to
-be anchored by a blkg.
+The PDU comes from the wrong offset as well. The copy ends at v2 offset
+48 + pdu_len while the PDU starts at 64, so for any event carrying one
+-- BLK_TA_REMAP, SPLIT, UNPLUG_*, DRV_DATA, BLK_TN_MESSAGE -- the bytes
+appended are the error, pdu_len and pad trailer rather than the PDU.
 
-Keeping the punt state in blkg can instantiate a blkg even when no blkcg
-policy is enabled, just to bounce submission from a shared kthread.  Move
-async_bio_lock, async_bios and async_bio_work to struct blkcg, and queue
-punted bios on bio_blkcg() for non-root cgroups.  Root or unassociated bios
-are submitted directly.
+Assign each v1 field from its v2 counterpart and append the PDU from the
+end of the v2 record.
 
-This preserves the priority-inversion avoidance while preventing
-blkcg_punt_bio_submit() from creating blkgs that are not needed by any
-policy.
+This applies on top of Adriano Cordova's "blktrace: always record ftrace
+events as blk_io_trace2", <20260903202932.156278-1-adrianox@gmail.com>,
+and needs it. Without that patch __blk_add_trace() still reserves a
+48-byte v1 entry when the trace was set up by BLKTRACESETUP, and nothing
+in the entry says which layout it has: magic and sequence are the ftrace
+trace_entry header and neither writer fills them, and the two sizes
+overlap, because a v1 record carrying a 16-byte BLK_TA_REMAP PDU is also
+64 bytes. Removing the short entry is what makes reading the v2 layout
+unconditionally correct.
 
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
+Fixes: 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2")
+Link: https://lore.kernel.org/all/20260903202932.156278-1-adrianox@gmail.com/
+Cc: stable@vger.kernel.org
+Signed-off-by: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+Assisted-by: Claude:claude-fable-5
 ---
- block/blk-cgroup.c | 52 ++++++++++++++++++++++++++--------------------
- block/blk-cgroup.h | 14 ++++++-------
- 2 files changed, 35 insertions(+), 31 deletions(-)
+Note: this applies on top of Adriano Cordova's "blktrace: always record
+ftrace events as blk_io_trace2" and is not correct without it -- please
+apply it after his.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 59ccfefe16a8..aa3cee107ebe 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -180,14 +180,10 @@ static void blkg_free(struct blkcg_gq *blkg)
+  https://lore.kernel.org/all/20260903202932.156278-1-adrianox@gmail.com/
+
+v3:
+ - Drop the min_t() bound on pdu_len. Both TRACE_BLK producers reserve
+   sizeof(struct blk_io_trace2) + pdu_len + cgid_len, so the entry is
+   always at least sizeof(*t) + t->pdu_len and the bound never clamps.
+   sashiko-bot read it as an integer underflow,
+   <20260913064414.01DF31F00893@smtp.kernel.org>; that needs an entry
+   smaller than 64 bytes, which the patch above removes.
+v2:
+ - Drop the iter->ent_size test v1 used to tell a v1 entry from a v2 one.
+   It cannot: a 48-byte v1 record carrying a 16-byte BLK_TA_REMAP PDU is
+   also 64 bytes. Caught by sashiko-bot,
+   <20260913031030.E85191F000FF@smtp.kernel.org>.
+ - Drop the syzbot Reported-by/Closes. That report is the unbounded copy
+   on a 48-byte entry, which the patch above closes, not this one.
+v2: https://lore.kernel.org/all/20260913063155.708520-1-donggeunyoo.kernel@gmail.com/
+v1: https://lore.kernel.org/all/20260913025827.457116-1-donggeunyoo.kernel@gmail.com/
+
+QEMU x86_64, origin/master 2f0c1cf72f46 plus the patch above, one config
+and one initramfs across all arms. BLKTRACESETUP on a partitioned virtio
+disk, blk tracer with options/bin, and a partition read for a
+BLK_TA_REMAP with a 16-byte PDU. Decoded at v1 offsets:
+
+  patched     action 0x0811000f, pid 0x75, device 0x0fe00010, pdu_len 16,
+              PDU device_from 0x0fe00011 device_to 0x0fe00010
+              sector_from 0, next record on the boundary. Byte-identical
+              between v2 and v3, stable over four boots.
+  unpatched   the same fields, correct, then extra bytes appended: that
+              length is read at v2 offset 50, which on a v1 entry is
+              inside the PDU, so it is garbage. 8 bytes in one boot; the
+              first record in the stream varies between boots, so the
+              overrun is not a fixed size.
+
+Not exercised: the syzbot splat. iter->ent points into a ring buffer
+sub-buffer page, so KASAN sees an over-read only when it crosses the page
+end; 120 rounds over varying buffer sizes did not land it.
+ kernel/trace/blktrace.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index ae010969c144..89d7b707daff 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1728,17 +1728,23 @@ static enum print_line_t blk_trace_event_print(struct trace_iterator *iter,
  
- static void __blkg_release(struct rcu_head *rcu)
+ static void blk_trace_synthesize_old_trace(struct trace_iterator *iter)
  {
- 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
++	const struct blk_io_trace2 *t = te_blk_io_trace(iter->ent);
+ 	struct trace_seq *s = &iter->seq;
+-	struct blk_io_trace2 *t = (struct blk_io_trace2 *)iter->ent;
+-	const int offset = offsetof(struct blk_io_trace2, sector);
+ 	struct blk_io_trace old = {
+ 		.magic	  = BLK_IO_TRACE_MAGIC | BLK_IO_TRACE_VERSION,
+ 		.time     = iter->ts,
++		.sector   = t->sector,
++		.bytes    = t->bytes,
++		.action   = lower_32_bits(t->action),
++		.pid      = t->pid,
++		.device   = t->device,
++		.cpu      = t->cpu,
++		.error    = t->error,
++		.pdu_len  = t->pdu_len,
+ 	};
  
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	WARN_ON(!bio_list_empty(&blkg->async_bios));
--#endif
--
- 	blkg_free(blkg);
+-	trace_seq_putmem(s, &old, offset);
+-	trace_seq_putmem(s, &t->sector,
+-			 sizeof(old) - offset + t->pdu_len);
++	trace_seq_putmem(s, &old, sizeof(old));
++	trace_seq_putmem(s, t + 1, old.pdu_len);
  }
  
- /*
-  * A group is RCU protected, but having an rcu lock does not mean that one
-@@ -226,23 +222,23 @@ static void blkg_release(struct percpu_ref *ref)
- }
- 
- #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
- static struct workqueue_struct *blkcg_punt_bio_wq;
- 
--static void blkg_async_bio_workfn(struct work_struct *work)
-+static void blkcg_async_bio_workfn(struct work_struct *work)
- {
--	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
--					     async_bio_work);
-+	struct blkcg *blkcg = container_of(work, struct blkcg, async_bio_work);
- 	struct bio_list bios = BIO_EMPTY_LIST;
- 	struct bio *bio;
- 	struct blk_plug plug;
- 	bool need_plug = false;
- 
--	/* as long as there are pending bios, @blkg can't go away */
--	spin_lock(&blkg->async_bio_lock);
--	bio_list_merge_init(&bios, &blkg->async_bios);
--	spin_unlock(&blkg->async_bio_lock);
-+	/* as long as there are pending bios, @blkcg can't go away */
-+	{
-+		guard(spinlock)(&blkcg->async_bio_lock);
-+		bio_list_merge_init(&bios, &blkcg->async_bios);
-+	}
- 
- 	/* start plug only when bio_list contains at least 2 bios */
- 	if (bios.head && bios.head->bi_next) {
- 		need_plug = true;
- 		blk_start_plug(&plug);
-@@ -259,19 +255,20 @@ static void blkg_async_bio_workfn(struct work_struct *work)
-  * cgroup.  Use this helper instead of submit_bio to punt the actual issuing to
-  * a dedicated per-blkcg work item to avoid such priority inversions.
-  */
- void blkcg_punt_bio_submit(struct bio *bio)
- {
--	struct blkcg_gq *blkg = bio_blkg(bio);
-+	struct blkcg *blkcg = bio_blkcg(bio);
- 
--	if (blkg && blkg->parent) {
--		spin_lock(&blkg->async_bio_lock);
--		bio_list_add(&blkg->async_bios, bio);
--		spin_unlock(&blkg->async_bio_lock);
--		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-+	if (blkcg && cgroup_parent(blkcg->css.cgroup)) {
-+		{
-+			guard(spinlock)(&blkcg->async_bio_lock);
-+			bio_list_add(&blkcg->async_bios, bio);
-+		}
-+		queue_work(blkcg_punt_bio_wq, &blkcg->async_bio_work);
- 	} else {
--		/* Never bounce if there is no non-root blkg to queue on. */
-+		/* Never bounce if there is no non-root blkcg to queue on. */
- 		submit_bio(bio);
- 	}
- }
- EXPORT_SYMBOL_GPL(blkcg_punt_bio_submit);
- 
-@@ -350,15 +347,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	blkg->q = disk->queue;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
- 	blkg->blkcg_id = blkcg->css.id;
- 	blkg->iostat.blkg = blkg;
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spin_lock_init(&blkg->async_bio_lock);
--	bio_list_init(&blkg->async_bios);
--	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
--#endif
- 
- 	u64_stats_init(&blkg->iostat.sync);
- 	for_each_possible_cpu(cpu) {
- 		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
- 		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
-@@ -1399,10 +1391,16 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 		if (blkcg->cpd[i])
- 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
- 
- 	mutex_unlock(&blkcg_pol_mutex);
- 
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	{
-+		guard(spinlock)(&blkcg->async_bio_lock);
-+		WARN_ON(!bio_list_empty(&blkcg->async_bios));
-+	}
-+#endif
- 	free_percpu(blkcg->lhead);
- 	kfree(blkcg);
- }
- 
- static struct cgroup_subsys_state *
-@@ -1447,10 +1445,18 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
- 	}
- 
- 	spin_lock_init(&blkcg->lock);
- 	refcount_set(&blkcg->online_pin, 1);
- 	INIT_HLIST_HEAD(&blkcg->blkg_list);
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spin_lock_init(&blkcg->async_bio_lock);
-+	{
-+		guard(spinlock)(&blkcg->async_bio_lock);
-+		bio_list_init(&blkcg->async_bios);
-+	}
-+	INIT_WORK(&blkcg->async_bio_work, blkcg_async_bio_workfn);
-+#endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	INIT_LIST_HEAD(&blkcg->cgwb_list);
- #endif
- 	list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
- 
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index f68ea21958f5..7d73085503d5 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -75,18 +75,11 @@ struct blkcg_gq {
- 
- 	struct blkg_iostat_set __percpu	*iostat_cpu;
- 	struct blkg_iostat_set		iostat;
- 
- 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spinlock_t			async_bio_lock;
--	struct bio_list			async_bios;
--#endif
--	union {
--		struct work_struct	async_bio_work;
--		struct work_struct	free_work;
--	};
-+	struct work_struct		free_work;
- 
- 	atomic_t			use_delay;
- 	atomic64_t			delay_nsec;
- 	atomic64_t			delay_start;
- 	u64				last_delay;
-@@ -111,10 +104,15 @@ struct blkcg {
- 	/*
- 	 * List of updated percpu blkg_iostat_set's since the last flush.
- 	 */
- 	struct llist_head __percpu	*lhead;
- 
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spinlock_t			async_bio_lock; /* protects async_bios */
-+	struct bio_list			async_bios __guarded_by(&async_bio_lock);
-+	struct work_struct		async_bio_work;
-+#endif
- #ifdef CONFIG_BLK_CGROUP_FC_APPID
- 	char                            fc_app_id[FC_APPID_LEN];
- #endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head		cgwb_list;
+ static enum print_line_t
 -- 
-2.51.0
+2.53.0
 
