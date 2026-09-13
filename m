@@ -1,100 +1,135 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32ED232395
-	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 09:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315933B6E8;
+	Sun, 13 Sep 2026 09:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789291893; cv=none; b=SOPyNPZ7RoLCQ3CQtJvZHOdkANSK4+MzcbxDO5oDnu+cJftdPNixcLC40QL+MM/g97EiVLyeqmi1+RHYfQqpuQVRp2ZsZ12qHncf1XcZeY5p5tcwAk7T2m34wDsuZRWwLqJazYQojw0Q11zp+qchMnHKivoPcmhcBZXFzXHxtlg=
+	t=1789292231; cv=none; b=X80xjUhVk40TdFcvYZxtKjcPHpTRGB0aKI7c5zYWDN9xcnrfa5MMFi4NBh1BkPQgdHpLFTvk0qw4xfUc0JMXGBD7FSkFbS9LH3IPs5q8Vm4TewhC6cr+pIO03O5jX8egL7lvK/dHwlyRSU/Fersfpxh4SZFnumBqhNgfKMuiPzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789291893; c=relaxed/simple;
-	bh=xB5jj8VPvBnGrXDhKdmlbyncIiPk1DJUxDep5ugNJCo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FnzddWOoZD+jbIEb1WD6jKLqzWn4xSe/CYruNiClSfiAPz3fxANnw48KFPkY2nqHKWhDE9tjqLBYYdG2MmgWkuKXB+ikYv3rWIjX9hCSxC6Gfw2r5WU/CM25wt+fpARyy+gXH3ozcZXIFTWxHKtolxzBDu2LJfyNHoiYe4NQfIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcLcZ5a8; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789292231; c=relaxed/simple;
+	bh=vdwZyUESC/usVPAkdnOVBw1iWK78gw2er94VuCtRjQg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dWEOmPaPcNQNruS08ABBIa1Ho1l9ud5DA4uU+g4+6BtwJn5mFzYSC6qYOuBhIk6IvHxAYnVTJlaf0bzyQA+ZR8WbvL9U5Ue2ZNfNjSnFpaaH+Ch6tfVBwqdymNx0/gvIG0TviRn+0yhKoIwPHiApLs8LN6v8UjDM31qaQ6EFKlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXq3ebKy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcLcZ5a8"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2d6e954afbdso17592225ad.2
-        for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 02:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789291891; x=1789896691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xB5jj8VPvBnGrXDhKdmlbyncIiPk1DJUxDep5ugNJCo=;
-        b=bcLcZ5a8DOxb8NmSw2onwbJexq9ZvcVI1bEcyaVGrc98NhBLXyjJfK/12ATbGRxGYl
-         40X1SgI7Q8PIKcU8JFNgOi02srf/NeZixaLYhlWE8sPwH+5xSAuJj417Q7+rijxUq3Hk
-         HL/fUDu47XlOB5Eb4ZYIF4bpPkuFVkxAn9KvMhTJq1/mj/oIdOLys4sK85B8/j9rrcqA
-         jaG2/rI+jXTwsi1ZLU6SPmbP+HtosxEtlvCeUk7iysuRx95yNLvJ2KJIuRgI0Z606whA
-         vciGxcE/H9rWjjnXKjXcIDIYix9lfGlFk40NyY+8Q0BmaSxvVOhPm1ZqSk3VPF+UuPts
-         kBUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789291891; x=1789896691;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xB5jj8VPvBnGrXDhKdmlbyncIiPk1DJUxDep5ugNJCo=;
-        b=k5E+EJTS4wj/9m6vydZeUuG0E4dbMrbMDKIAXtVFVviFQ/B5FgxdpIzSlpwza/HeV9
-         x3B0YwbhZ0/Lf5YFoTgg8T1hQn0TIcgi4DAeZ3Q2LNJoHDWvvkSg8mJ0AUuJtpayVaE1
-         iiZxMfcIloBpmzPG5luWfWjKdFnFcDaM/TRgI4kViVKxhszC6+Octl+36CX88PuOyv3R
-         2F1yfawg69+Tt5GnAm+dkcKjzvuEblak6XM7DQx/6QO/dhiAikrGBZW9+vdlp5U9Pwf6
-         3cC4oD3LgLlJXQD3YOtGDx9H269//ohPiUscSW3yTAtkTzxQ82CgegOLPyEUsAn+RyMr
-         VtiA==
-X-Forwarded-Encrypted: i=1; AKwUvBw0P82Yv/SVm2tK2MTMxPvvjp7ewnU6AomDYAuNafoF696DAn4z4inI9Hdmsb+4bSCGozZT13udU1Lcvg==@vger.kernel.org
-X-Gm-Message-State: AFuF++l8PDdsvqi+GVqzToSxyPnA91I1ngKgGTCTLgA2Z7GbcbrhZ7CB
-	m0aQ2J7MoRCyGB+h7GDWD9+xgyfEtS8I0BmcHgKK0co/rGmkmDcTXV6vl4bgQS4=
-X-Gm-Gg: AYBFou297pv2dya15FRvathvYqog+wOhFUPw481qwPlYM1DVt3lQv85d7jCsrPV96L4
-	oIfmLDciBssuoi1BpkzUTvg+KF8hRPH+0CoFQ51ADT5P2Gk3WRXJ6a0atMasAJH9xJVqNdb4QXS
-	Wdfl/fKGq2oe4gYo8r2yylq3W9hKwhrwFCNjL85sE3mr9g3RUN/a1Tm222SSMv0xObJawWi+Nex
-	13tuPdpxFrrDCEgF0Zog2oZr6SKipULsOiC4BZpvMEZJo84Red2VtPKfromy9BDRo8ZjiPUUhVy
-	1wNRHz6vuFLAD/pG48QgdeDgb3k9lRKTGB9miJqwQfgvGC+PcMmaMoYBpbvZmNcJ9USyywbq1Jx
-	fnIiw1ViRZcGp2Wk5NJwQKsRjL5/8UGnmQOqM8YzIWa4LIqu+si7/CAF+YVds9qypWdvPs1dsPe
-	pX7UEWbm/l7bcXU5V0ReQwGIc9qp8Ml3Y+32eH8jOzUFNg8cg9j+3j1trDTFfTE/1cvnKqeM6Fk
-	meoezZca37NEdeybwAlBfiEbQ==
-X-Received: by 2002:a17:902:db04:b0:2dd:3ddf:b87a with SMTP id d9443c01a7336-2dd3ddfbb26mr152670615ad.0.1789291890999;
-        Sun, 13 Sep 2026 02:31:30 -0700 (PDT)
-Received: from ydg-Zenbook-14-UM3406GA ([2001:2d8:7f00:8c85:b91:ff81:c860:362e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2dd2cff67aasm31954125ad.79.2026.09.13.02.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 02:31:30 -0700 (PDT)
-From: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: linux-trace-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Adriano Cordova <adrianox@gmail.com>,
-	donggeunyoo.kernel@gmail.com
-Subject: Re: [PATCH v3] blktrace: fix the field offsets of the synthesized v1 record
-Date: Sun, 13 Sep 2026 18:31:24 +0900
-Message-ID: <20260913093124.717495-1-donggeunyoo.kernel@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260913091321.B3C061F000FF@smtp.kernel.org>
-References: <20260913090232.715798-1-donggeunyoo.kernel@gmail.com> <20260913091321.B3C061F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXq3ebKy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B941F000FF;
+	Sun, 13 Sep 2026 09:36:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789292229;
+	bh=TeKLAo2lyBFX9D/j+t1NddJvYANiKwcO6O8pNn5tCYg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=ZXq3ebKyzE91YMdk8KbwizzTYuRfKiJOjlC7hKcGtHQQZJ5nCJUfiu07FF3uqPR7f
+	 o6PqZ16b+Hzz787iWq7uAC2vR9/5i/IcYkPHKcuLhWMNuP85R6uSJM7F8FyrlWBS1Q
+	 KGIHV9T/yk+v10sUF/WNyxF8c8Po1Eo24e9YNLKt1UalWmzbnS3U12EvMGLOio9tEM
+	 ODMte60um3jwtWBD0ubXBYEB7KUwVDXh6qnHC7TqbJBMW531TTW44iAHQTQrd9L9Ll
+	 YCzgkk7cH0cJu67QwfwU4dQxrTMaBkv9vzAy6OxG6D2amnqezq/M6SGoPo0FCl+y/h
+	 jcgRapmP3RlUQ==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
+ Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett"
+ <liam@infradead.org>, Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda
+ <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
+ <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno
+ Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor
+ Gross <tmgross@umich.edu>, Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>,
+ Lyude Paul
+ <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve
+ =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, Todd Kjos
+ <tkjos@android.com>, Christian
+ Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, "Rafael
+ J. Wysocki" <rafael@kernel.org>, Dave Ertman <david.m.ertman@intel.com>,
+ Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan
+ Kara <jack@suse.cz>, Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar
+ <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen Boyd
+ <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Krzysztof
+ =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Pavel Tikhomirov
+ <ptikhomirov@virtuozzo.com>, Michal Wilczynski <m.wilczynski@samsung.com>,
+ Ira Weiny <iweiny@kernel.org>, Matthew Brost <matthew.brost@intel.com>,
+ Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Philipp Stanner
+ <phasta@kernel.org>, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ driver-core@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
+ linux-usb@vger.kernel.org
+Subject: Re: [PATCH v21 9/9] rust: page: add `ExclusivePage` for race-free
+ page access
+In-Reply-To: <aqYUWzRSade_Ww67@casper.infradead.org>
+References: <20260910-unique-ref-v21-0-e83257373062@kernel.org>
+ <20260910-unique-ref-v21-9-e83257373062@kernel.org>
+ <aqYUWzRSade_Ww67@casper.infradead.org>
+Date: Sun, 13 Sep 2026 11:36:53 +0200
+Message-ID: <878q55v6fe.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Sun, 13 Sep 2026 09:13:21 +0000, sashiko-bot@kernel.org wrote:
-> - [High] blk_trace_synthesize_old_trace unconditionally parses ring buffer
-> entries as 64-byte blk_io_trace2 structures, resulting in an out-of-bounds
-> read and info leak when processing 48-byte v1 entries because the required
-> dependency patch is missing.
+Matthew Wilcox <willy@infradead.org> writes:
 
-Correct, and as the patch says, Adriano Cordova's patch has to be applied
-first.
+> On Thu, Sep 10, 2026 at 11:00:13AM +0200, Andreas Hindborg wrote:
+>> `ExclusivePage` wraps a regular page but adds an invariant that the
+>> page data area does not incur data races. This means `ExclusivePage`
+>> cannot be mapped to user space or shared with devices, and it
+>> becomes simpler to directly reference the contents of the page.
+>> 
+>> Since `Page` implements `AlwaysRefCounted`, handing out a `&Page`
+>> from an `ExclusivePage` would allow safe code to obtain an
+>> `ARef<Page>` to the page and break the aliasing invariant of
+>> `ExclusivePage`. Thus, do not implement `Deref<Target = Page>` for
+>> `ExclusivePage`.
+>
+> Given this description, I wonder if this shouldn't be implemented by
+> alloc_frozen_pages() / free_frozen_pages().  We'ree certainly trying
+> to move the C parts of the kernel away from thinking that pages have a
+> refcount (folios have a refcount; otheer memdescs may or may not have
+> a refcount).  Do your intended users of this actually have a need for a
+> refcount?
 
-The read side cannot know the layout: magic and sequence are the ftrace
-trace_entry header and neither writer fills them, and the sizes overlap,
-since a 48-byte v1 record carrying a 16-byte BLK_TA_REMAP PDU is also 64.
-His patch fixes it on the write side, by not recording a v1 entry at all.
-With that applied this patch is correct -- measured on a BLKTRACESETUP
-trace with the blk tracer, reading a partition for that remap.
+I'm not familiar with that API, but I will take a look. The
+`ExclusivePage` would not need a refcount. The reference is intended to
+be exclusive, giving mutable access to the page contents.
+
+I could imagine a situation where someone might want to transition a
+page reference from exclusive to shared, but I do not have a user for
+that at the moment.
+
+>
+>> +++ b/rust/kernel/page.rs
+>> @@ -17,7 +17,11 @@
+>>          AlwaysRefCounted,
+>>          RefCounted, //
+>>      },
+>> -    types::Opaque,
+>> +    types::{
+>> +        Opaque,
+>> +        Ownable,
+>> +        Owned, //
+>> +    },
+>
+> While I'm asking stupid questions, what's the significance of the //
+> after Owned?  I see it after RefCounted too.
+
+It is a hack to get rustfmt to format the import statements in a Linus
+compatible manner [1]. As far as I know, it will go away once rustfmt
+learns to do this by itself.
+
+Best regards,
+Andreas Hindborg
+
+
+[1] https://docs.kernel.org/rust/coding-guidelines.html#imports
+
