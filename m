@@ -1,125 +1,195 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59D023FC5A;
-	Sun, 13 Sep 2026 03:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F592D12F3
+	for <linux-block@vger.kernel.org>; Sun, 13 Sep 2026 06:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789269116; cv=none; b=CAbULuQvPezH/8Jow7BnzhsmP8oXEor9ju67+Gv2rOVhRZdlAYxjBauksivnVcwZPFTtaB/PQ4f5/watVdrEgjU+gcIYuW9gpzcRAnB/AVXiTVDouQlxubUaOLMtgFfcuAh9U3ReWKXnVEa4w1pWgnTNKYK/VBRS12hPXxvDURs=
+	t=1789281126; cv=none; b=BLl2aOdvWF4CGz9oATT4lChwjNjZdX7RNuUBO9b9ntXENhCmNuXSf+73FUhLnQOGhMtvtAtTX3w882KnmhcU8sR6/Vb/lR2C51Q6QWT1za/YnMRKFb4Usd/k9PqT7sqQFawbXLnxaLPRcxer0dKErxzE95cqxlhD6SK01pZA0Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789269116; c=relaxed/simple;
-	bh=lG6My4wnTEsn31dKI0mnQFtd2gAifBlGSMfIxgn83vo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NC4AWstuiyar9KXut7nHJfE7lDBW4Wbo6pgmw/ijqU+31Tak9sOhpv4EvsYQSwMcOY9S6u4FigKqxKJkdvsBnTscNyRqAxb9aFXi0RKUWjRUhhdvw16npBaN+Va/HjEvj/ri/jiNCAD6tP/Q6+K7ARXQ1DhlbIc8+GEzCMBNECw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CCR8M2oB; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1789281126; c=relaxed/simple;
+	bh=H4ETr6mwXUYrX8RAIMZz7ErNDPXTHuQ7d2Pd0f6oSws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XYyCpfrjdBFe1XdzXLtiXeh/1iAdZpHRBfnul4DAlJQ2PRS5HfQ+ZGQgOMcGUrLloyX4SiPItSpgg2HKsjKTXLkhwEavOozbYEUh7IlqgL6ygUwf2VSP1p4hF1ENxKUkQ+tdwY2hvKp8J3l1/MfhLk5ccPGKCjOWshlSSVbpUHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=opORQWCp; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CCR8M2oB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ssrb0XY/cPSH8ZAUVROdvAzpy0zzHhYV7tpvfy8CQwA=; b=CCR8M2oB4m+y0ftzq1hl5Cd7Sp
-	Eq4utnfvBFq8gG0OogYzPZnaQmzmOp5fGRpwLZZxXeWo5U93OC/Wz+xi6QYk98IdczgUTQT2qoCKU
-	KRd5XLKE1z55BO0DvoKqhe880rWuFdw1oBGkG7StPD4m+68dPIwtGr3HiGHt0EP5J31zAOnhXrkq6
-	H9YfQ8GzUvx+lR7ad3e/FRHlzs3qPoF6bfrnkWMKjURpXqLuM58MWTSM8LvGJrlpAd2Zzgd3Kprn7
-	9QWHr0RTjUAtUGxCv0xeRJ5uWFR4OjKHcnWu/4GD7GYpMcua8HluIaf9wWQfAzw2c47qK2YYb1024
-	17XaQfSw==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1x5acl-00000003JyY-1RDO;
-	Sun, 13 Sep 2026 03:11:23 +0000
-Date: Sun, 13 Sep 2026 04:11:23 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	"Liam R. Howlett" <liam@infradead.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Lyude Paul <lyude@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>,
-	Serge Hallyn <sergeh@kernel.org>, David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Igor Korotin <igor.korotin@linux.dev>,
-	Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,
-	Ira Weiny <iweiny@kernel.org>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	driver-core@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-pwm@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v21 9/9] rust: page: add `ExclusivePage` for race-free
- page access
-Message-ID: <aqYUWzRSade_Ww67@casper.infradead.org>
-References: <20260910-unique-ref-v21-0-e83257373062@kernel.org>
- <20260910-unique-ref-v21-9-e83257373062@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="opORQWCp"
+Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cebad4afso1120583a12.0
+        for <linux-block@vger.kernel.org>; Sat, 12 Sep 2026 23:32:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789281125; x=1789885925; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=EIS5RKlZgBWCHN8Ol/C+0jNYOT5tZB/4WMxwPWSV000=;
+        b=opORQWCp+GqyypjOmQQmAI4LmM4fcYXniQVTdF+gT2Xt8Gs0GFRHSUTOH1jFTU1/7Z
+         Y/3ZHwiWR1+7PplM9mEk8DnrrCTQ5IOKId43l08IHvYrm0eoZZvLVtgEKCDYoxDmvZb3
+         E+cvaFZUeMc8UoIxTZNJWWvxh5zC3q3TqctE8K5mmPYeyVQUsVceUWN2b+Jo5FKNM0go
+         k3OCCc1dqIcEr970GejCQ0Uc3NmxsdpCcrKcua7T1VYzXjMN+j3uGxhaCejCPdOAPYjU
+         HxRWibm1gqztYHZCSWoAaZmbzSxc10q38mvyE422zlRmdoRdWXt6yFAbC7/CgOFV9fvh
+         6ncQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789281125; x=1789885925;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=EIS5RKlZgBWCHN8Ol/C+0jNYOT5tZB/4WMxwPWSV000=;
+        b=mKjMyLNHH84bN5PBUC9rBOh8hrlDK9VtbxPhfyZVQ767XYvvPIVa1eunG5JerBsTLK
+         F9GB6dweoL/VxSOknxC/gCwDXXaJ5s2Fb4YgO7qQVMj7OnVzDOFx6M5qR+JoP/ebLpsa
+         F9e1NndCL3wpuGMondoBp4h2f+EfOOk0n+YhhJ+6vH+VeZTDI9pIiPWrZzwE+YpVXudK
+         U2WgbkPoJjyeLK/x7OW0mnJUE2qayR7EVa5aZSMiNj0BBMME8/Ld3UwIwMdKxChZgL5l
+         VcAcj2H+PFt/J1yJpPmbWbrp2xhIhn1KWUzRYrqpkMv726rKYOqo+BL7nVkmujeeyLNj
+         +M/g==
+X-Forwarded-Encrypted: i=1; AKwUvBxg7BEIP6kiAHuenQZ4mBcoNqVxOdDalBVG4V2hIjNBaj6NPTV6Y+xQkf6iYj6J51FZFNNQfzPBD5gVQw==@vger.kernel.org
+X-Gm-Message-State: AFuF++ljorv3Ma/PxTj8edX67BMYXUK2f+diQfSrzOOKAgsROK/wtMbE
+	47WPvBqClf/oYrj9hCXPNNqi4YJpUlwqeSw5xaSw086GX8Q60oOlJVQ=
+X-Gm-Gg: AYBFou0/z+4bYy7cVt+H/IFXlT9hkhaVD6DeOrU8xV/RZUHJ8et+IHCoTdDrPkZF+CV
+	NeSfvPhgsLMgORyHJU3TWo0e/rdR6ymDh6nuLvj1WwqoXvgIB1OB86j4F77sk1r9ZMVA6J0YbiU
+	+GvbkmBu82693WyYqqoKZru/90AOUyR3m+uWuhWKYhrKaO2QweM+19rOy1Q3GXrvOk2EQLEn3eu
+	xmX+LnNLwGJu0cBpWxXyo8khQtR4MAfhncopNXhp5RTagnrgCQf9zAfUgoPq818nwnZMvIlzSgx
+	OmalfWDMJrycKC2HQVwGtpdjiYuvPFxXtCP9n5ZGGn/tx38oQ/xiVWdEtFpH1bnCsbUuHbGnB6q
+	/GtXXKdhBHvxdaPxKddZUXQIBPw4T30AasEO2MrTs7UBtd0k0Am2o5woyf8+cVNUDuB2Q0J2XsS
+	6tlWS3U/udkxH+l5oynwA1Ir8SGGC1d5YFy0cnPkdWNRylLcXAvz2nHTHNZbO+99UnaNlQucZ9F
+	XAlzxrG++KbM6gQdwrpibRc8tMNuTEwYgfK
+X-Received: by 2002:a05:6a21:7314:b0:3da:ec28:2cc9 with SMTP id adf61e73a8af0-3daed3b990cmr22208557637.23.1789281124737;
+        Sat, 12 Sep 2026 23:32:04 -0700 (PDT)
+Received: from ydg-Zenbook-14-UM3406GA ([2001:2d8:7f00:8c85:b91:ff81:c860:362e])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc4c6585f94sm3247894a12.25.2026.09.12.23.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Sep 2026 23:32:04 -0700 (PDT)
+From: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"Martin K . Petersen" <mkp@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Adriano Cordova <adrianox@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	donggeunyoo.kernel@gmail.com
+Subject: [PATCH v2] blktrace: fix the field offsets of the synthesized v1 record
+Date: Sun, 13 Sep 2026 15:31:55 +0900
+Message-ID: <20260913063155.708520-1-donggeunyoo.kernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260910-unique-ref-v21-9-e83257373062@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 10, 2026 at 11:00:13AM +0200, Andreas Hindborg wrote:
-> `ExclusivePage` wraps a regular page but adds an invariant that the
-> page data area does not incur data races. This means `ExclusivePage`
-> cannot be mapped to user space or shared with devices, and it
-> becomes simpler to directly reference the contents of the page.
-> 
-> Since `Page` implements `AlwaysRefCounted`, handing out a `&Page`
-> from an `ExclusivePage` would allow safe code to obtain an
-> `ARef<Page>` to the page and break the aliasing invariant of
-> `ExclusivePage`. Thus, do not implement `Deref<Target = Page>` for
-> `ExclusivePage`.
+blk_trace_synthesize_old_trace() emits a classic blk_io_trace for the
+binary trace_pipe output by copying 32 bytes from the ring buffer
+entry's sector onward into a struct blk_io_trace. The entry is a
+blk_io_trace2, and the two layouts diverge after bytes: v2 has a 32-bit
+pid at 28 and a 64-bit action at 32, where v1 has a 32-bit action at 28
+and pid at 32. Every field from action on lands one slot off, so a
+consumer reads the pid as the action, the device as the cpu, and the cpu
+as error and pdu_len.
 
-Given this description, I wonder if this shouldn't be implemented by
-alloc_frozen_pages() / free_frozen_pages().  We'ree certainly trying
-to move the C parts of the kernel away from thinking that pages have a
-refcount (folios have a refcount; otheer memdescs may or may not have
-a refcount).  Do your intended users of this actually have a need for a
-refcount?
+The PDU comes from the wrong offset as well. The copy ends at v2 offset
+48 + pdu_len while the PDU starts at 64, so for any event carrying one
+-- BLK_TA_REMAP, SPLIT, UNPLUG_*, DRV_DATA, BLK_TN_MESSAGE -- the bytes
+appended are the error, pdu_len and pad trailer rather than the PDU.
 
-> +++ b/rust/kernel/page.rs
-> @@ -17,7 +17,11 @@
->          AlwaysRefCounted,
->          RefCounted, //
->      },
-> -    types::Opaque,
-> +    types::{
-> +        Opaque,
-> +        Ownable,
-> +        Owned, //
-> +    },
+Assign each v1 field from its v2 counterpart and append the PDU from the
+end of the v2 record, bounded by the entry size.
 
-While I'm asking stupid questions, what's the significance of the //
-after Owned?  I see it after RefCounted too.
+This applies on top of Adriano Cordova's "blktrace: always record ftrace
+events as blk_io_trace2", <20260903202932.156278-1-adrianox@gmail.com>,
+and needs it. Without that patch __blk_add_trace() still reserves a
+48-byte v1 entry when the trace was set up by BLKTRACESETUP, and nothing
+in the entry says which layout it has: magic and sequence are the ftrace
+trace_entry header and neither writer fills them, and the two sizes
+overlap, because a v1 record carrying a 16-byte BLK_TA_REMAP PDU is also
+64 bytes. Removing the short entry is what makes reading the v2 layout
+unconditionally correct.
+
+Fixes: 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2")
+Link: https://lore.kernel.org/all/20260903202932.156278-1-adrianox@gmail.com/
+Cc: stable@vger.kernel.org
+Signed-off-by: Donggeun Yoo <donggeunyoo.kernel@gmail.com>
+Assisted-by: Claude:claude-fable-5
+---
+Note: this applies on top of Adriano Cordova's "blktrace: always record
+ftrace events as blk_io_trace2" and is not correct without it -- please
+apply it after his.
+
+  https://lore.kernel.org/all/20260903202932.156278-1-adrianox@gmail.com/
+
+v2:
+ - Drop the iter->ent_size test v1 used to tell a v1 entry from a v2
+   one. It cannot: a 48-byte v1 record carrying a 16-byte BLK_TA_REMAP
+   PDU is also 64 bytes, so a v1 entry took the v2 arm and came out with
+   every field from action on shifted and the PDU dropped. Caught by
+   sashiko-bot, <20260913031030.E85191F000FF@smtp.kernel.org>.
+ - Depend on the patch above instead, so no v1 entry reaches this
+   function.
+ - Drop the syzbot Reported-by/Closes. That report is the unbounded copy
+   driven by pdu_len read past the end of a 48-byte entry, and his patch
+   is what closes it; this one fixes the field offsets, a separate
+   defect on the same line.
+v1: https://lore.kernel.org/all/20260913025827.457116-1-donggeunyoo.kernel@gmail.com/
+
+QEMU x86_64, origin/master 2f0c1cf72f46 plus his patch, one config and
+one initramfs across all three arms. BLKTRACESETUP on a partitioned
+virtio disk, blk tracer with options/bin, and a partition read for a
+BLK_TA_REMAP with a 16-byte PDU. Binary stream decoded at v1 offsets:
+
+  mainline    action 0x0811000f, pid 0x75, device 0x0fe00010, pdu_len 16
+              and the correct PDU, then 8 bytes too many, so the next
+              record's magic no longer lands on a boundary.
+  v1 of this  action 0x75 -- the pid -- pid 0x0811000f, device 0, cpu
+              0x00100000, error 0xd00f, pdu_len 0, PDU dropped. In sync,
+              wrong.
+  this patch  action 0x0811000f, pid 0x75, device 0x0fe00010, pdu_len
+              16, the correct PDU, next record on the boundary.
+
+Not exercised: the syzbot splat. iter->ent points into a ring buffer
+sub-buffer page, so KASAN sees an over-read only when it crosses the
+page end; 120 rounds over varying buffer sizes did not land it.
+ kernel/trace/blktrace.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index ae010969c144..875c04d86c93 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1728,17 +1728,24 @@ static enum print_line_t blk_trace_event_print(struct trace_iterator *iter,
+ 
+ static void blk_trace_synthesize_old_trace(struct trace_iterator *iter)
+ {
++	const struct blk_io_trace2 *t = te_blk_io_trace(iter->ent);
+ 	struct trace_seq *s = &iter->seq;
+-	struct blk_io_trace2 *t = (struct blk_io_trace2 *)iter->ent;
+-	const int offset = offsetof(struct blk_io_trace2, sector);
+ 	struct blk_io_trace old = {
+ 		.magic	  = BLK_IO_TRACE_MAGIC | BLK_IO_TRACE_VERSION,
+ 		.time     = iter->ts,
++		.sector   = t->sector,
++		.bytes    = t->bytes,
++		.action   = lower_32_bits(t->action),
++		.pid      = t->pid,
++		.device   = t->device,
++		.cpu      = t->cpu,
++		.error    = t->error,
++		.pdu_len  = min_t(size_t, t->pdu_len,
++				  iter->ent_size - sizeof(*t)),
+ 	};
+ 
+-	trace_seq_putmem(s, &old, offset);
+-	trace_seq_putmem(s, &t->sector,
+-			 sizeof(old) - offset + t->pdu_len);
++	trace_seq_putmem(s, &old, sizeof(old));
++	trace_seq_putmem(s, t + 1, old.pdu_len);
+ }
+ 
+ static enum print_line_t
+-- 
+2.53.0
 
