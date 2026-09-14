@@ -1,33 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F833B42C7;
-	Mon, 14 Sep 2026 08:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798F030C158;
+	Mon, 14 Sep 2026 09:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789373805; cv=none; b=gDB/MhERjagvDb7oSgM1ClbN/AjdXaVgCLeM7IT4isJyFDxiQuWCfZCH4o4iTbwU50I8N4/Ez7O3vVpg1ml3/2zYSwiaaLJNIiGR/PCt3Ix0aqj1xZUDLYMjxLM0u/KuU0wBg+Oy9IbkIK203HueP5/fgGMK6EJdB/PMvxeY/Z8=
+	t=1789376436; cv=none; b=dlZxeRgRvtrctjPQGfT4idFdCatl86yJobOPVb9Wk4xzx/OBJVj6SLRa/brVJfcwI9ZZ6bcmnMx9Xqh6fVps6ZKriVC/RJCMEUa68QVWCMKqnMpvHjWSyRh6iwsekRHj5SWIv6GQc1S7u2vpEVbxKKlPMStanbX/p3OO9Drnql8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789373805; c=relaxed/simple;
-	bh=7FGkG0NWc7WQ8UuV1zHV0N1eYzspl/0gM2ZZH+aIzBI=;
+	s=arc-20240116; t=1789376436; c=relaxed/simple;
+	bh=7bt/F0CfVemOLCYjcFdY4goT6DEiXj1lo5PD518miAs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HXz1iwP0yMyr0qOth9f+OKe8rglACoRumGpBEVB7d/2dqZ7jab34nIpBhkiQ0k2Uzr+tor7QLF04mWZz+hA5hfMP+3qBksw+BIBsew5y4A5XW81QFQsoxbuDU+I/RPFgIrrz7N4fnJ6uvh4xlZ/1AvjIHv5f71V7JaHEXZTSXmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g5VZa+oD; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=py756LHAsqviw9qcIaWWcj5jQNVhkPGaw+0zpYVSDOw2EDoYojCog5bbpooVfHTTgV48kOAavCqNCpl1dKmqT/ykU08qwurI9R/bOsW2hZHtLFTpqFMIkAtjYNCHzLBUrhodKTl0pve6b0oz8uCPnqJdhhotA5auyWgZkaTTsrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=B7GNDCSc; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5VZa+oD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D865F1F000FF;
-	Mon, 14 Sep 2026 08:16:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789373804;
-	bh=C2ZDgDBTBPtrsfvAlmUEPAUvKktvQtFVn2Ou8+zwXP8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=g5VZa+oD7n0qwA8dkNw1dGt1hYXlL3zXO88zEqM7vtRhR1kV5deBd4b9OCOtJUWQ5
-	 +N4pTKxXSl3IIDDDtWLcdaGHzf5YRCL5WIboBhYwWdxa9PoPaVWsgfnBXEDxHkH1eS
-	 xzx1SsHXbB59GXTRN3edLFEomnyLmfK6g4SSrm53cjWCgW8FYM8qzJ2gbI3L+AZzxV
-	 sjJLSgZNQmwcLieaLRLf5E+z1ii1Fdan/onsPk9Ph40+wV+r+20SjHboG/rT+ju6mz
-	 11hHk1V/FKSJB5okOVcsvDJ52P9SN3ow8/R+JIR55Z7MMROrj45/EqEufFgUSEyF1E
-	 /Gne3r9EIYRGw==
-Message-ID: <294580c0-ad46-4160-b954-360a8a4dacdb@kernel.org>
-Date: Mon, 14 Sep 2026 10:16:33 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B7GNDCSc"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68E61cQU1073456;
+	Mon, 14 Sep 2026 08:59:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pt3fSj
+	eeIvWvADHdEPjDUXMMoaPuoTnloTSzqubqWqg=; b=B7GNDCScsOGqYPNIY9orkN
+	HY8ojE0QQlZ6xyEU8m89/vC8C+tWvny456itzCZHkkHmW1laVd8dkWFsG9raouzO
+	IR1zaJ8DgeqsKKTYNCNWCrZkCwG99La442uSvx8AT1uf6qXM+hcNlklaFEuPDdk/
+	GqPRirHdQxoajVFyeiI8kJsATQ1ifvpvUmv9uBVVz15mH+kfNEqtpKe/hHHmbVt5
+	niKh1lSktd1kx+sQXXaWNcMghxKJJs4TZ5GNs+7wdzatSA0e2ROGynKhh3lRU5LK
+	cKWeWJQ8Y9Of2NjArx269SMfbEf6+LROL18rlv7HHKJNDBu3n8SQtcqzU4/t6b6A
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmv5hgc3b-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 14 Sep 2026 08:59:27 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68E5o6vw1787513;
+	Mon, 14 Sep 2026 08:59:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gnjjgmvfy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Sep 2026 08:59:26 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68E8xOrP47579618
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 14 Sep 2026 08:59:24 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 734662004B;
+	Mon, 14 Sep 2026 08:59:24 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3944520040;
+	Mon, 14 Sep 2026 08:59:24 +0000 (GMT)
+Received: from [9.224.77.173] (unknown [9.224.77.173])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 14 Sep 2026 08:59:24 +0000 (GMT)
+Message-ID: <61b5197f-3a6e-4cbd-8ad7-ca69582309f6@linux.ibm.com>
+Date: Mon, 14 Sep 2026 10:59:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,151 +62,272 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 09/26] mm/fbatch: restore mlock+munlock batching,
- without extra ref
+Subject: Re: [PATCH] nbd: reclassify u->iolock of AF_UNIX sockets
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+        Christian Borntraeger <borntraeger@kernel.org>
+References: <20260713181401.11088-1-borntraeger@linux.ibm.com>
 Content-Language: en-US
-To: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Ackerley Tng <ackerleytng@google.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Barry Song <baohua@kernel.org>,
- Binbin Wu <binbin.wu@linux.intel.com>, Christian Brauner
- <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Christoph Lameter <cl@gentwo.org>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>,
- JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Kairui Song <ryncsn@gmail.com>, Kiryl Shutsemau <kas@kernel.org>,
- Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>,
- Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>,
- Matthew Wilcox <willy@infradead.org>,
- Mel Gorman <mgorman@techsingularity.net>, Miaohe Lin <linmiaohe@huawei.com>,
- Michal Hocko <mhocko@suse.com>, Minchan Kim <minchan@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Peter Zijlstra <peterz@infradead.org>, Qi Zheng <qi.zheng@linux.dev>,
- Rik van Riel <riel@surriel.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan
- <surenb@google.com>, Yang Shi <yang@os.amperecomputing.com>,
- Yu Zhao <yuzhao@google.com>, Zach O'Keefe <zokeefe@google.com>,
- Zi Yan <ziy@nvidia.com>, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
- <69ba633c-8fd5-1f4b-2e1e-b9b15b8946be@google.com>
- <ce1e07aa-5600-46c1-b35a-d7df09a84521@kernel.org>
- <96fa2371-8a9e-8fcb-08f0-2977320bbbe8@google.com>
-From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Autocrypt: addr=vbabka@kernel.org; keydata=
- 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
-In-Reply-To: <96fa2371-8a9e-8fcb-08f0-2977320bbbe8@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20260713181401.11088-1-borntraeger@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE0MDEyMSBTYWx0ZWRfX+YlATiqctGpe
+ k1wngUHpBpEIeYRP3aTkIEwCUY4EhsTDKjVSD/bV4HeDw3NX9NXsGGWrevk5sEdMOVcAG4d1We4
+ jGLh3/TKsPQ7Ms5MnrT8viHwk6MlwpSOdYv123SQz5dUrhNGPbcMKxg+uM/UtB/AiDZX6MxWRHU
+ 3/a4ASoxIkqjldqHV+hzclqKN7tQiJFJo/FTtiscUwJpuNDCO+SXM6K4kxNtZVh4+eYz28WcXXm
+ jHTwe+qJRugknJoHhINdyWAcmfzhNOATR67lsOjGsl2Q2dalndvMt6L7h7sNVH8vnHBNyI1L28S
+ 3h4flERW7YbKUhlD4xYum4jAQfioqaXWZyvIBNoaNEzVvUAWjx++uO+dOUU9bmRX+8HILu19z2n
+ pA86o9cghQKRN9p9oe0jqDbMmghpjH7P671TMRJon/F1Nn1gc9d3qygM+2RZqZH2zIVrTfd5H8H
+ 2lJndpCFadLSlq2fF+w==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE0MDEyMSBTYWx0ZWRfX0xtS1jCc3bMq
+ 1RkLP/6qJgSPLVkGMilUc9nB1oejdatiOxPZVIbbwgawFMw/BukY8LXLuWQoID+UrFNT6MRWhD/
+ vkj/pPMMIEDyCPAAtdiR3gls7Yus2Cg=
+X-Authority-Analysis: v=2.4 cv=Zsx4uN7G c=1 sm=1 tr=0 ts=6aa7b76f cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=LzvJ8H6-aFGr2eQcibkA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: kpOJ9pIp-rtEa6xqL_mdf5hqQ2cMvDos
+X-Proofpoint-GUID: t3V_b0Wgz2UdNpGKkjelEm7xlBcSKqfu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-14_02,2026-09-13_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609140121
 
-On 9/13/26 01:46, Hugh Dickins wrote:
-> On Thu, 10 Sep 2026, Vlastimil Babka (SUSE) wrote:
->> On 9/9/26 11:59, Hugh Dickins wrote:
->> > Update mlock_folio(), munlock_folio() and their fbatch callouts and
->> > helpers, to do folio_try_get()s at batch processing time, instead of
->> > holding a folio reference all the while in mlock_fbatch: as in folio.c.
->> > 
->> > But more interesting is the use of mod_mlock_count(), using try_cmpxchg()
->> > to update folio->mlock_count safely when possible (now when on lru_add
->> > fbatch as well as when unevictable). While __mlock_folio() is as hard to
->> > think about as before, __munlock_folio() simpler because munlock_folio()
->> > can adjust mlock_count itself without clear_lru() or lruvec lock, and so
->> > do the folio_test_clear_mlocked() immediately for itself (without which
->> > unevictable_pgs_cleared was likely to appear high, when it should be 0
->> > or low to indicate good mlock health).
->> > 
->> > __munlock_folio() is safe for use even when the unreferenced folio has
->> > been freed and reused. It appears that __mlock_folio() could affect a
->> > folio which has been freed and reused, but only if it is reused as an
->> > mlocked folio, in which case its mlock_count is spuriously incremented
->> > (but usually a spurious munlock decrement will follow).  How grave is
->> > this? If unevictable_pgs_cleared remains low, not so bad.
->> > 
->> > I've gone back and forth on whether to move mlock_fbatch and these
->> > functions into mm/folio.c: for now they stay here in mm/mlock.c.
->> > 
->> > Signed-off-by: Hugh Dickins <hughd@google.com>
->> > ---
->> >  mm/mlock.c | 147 +++++++++++++++++++++++++++++++----------------------
->> >  1 file changed, 86 insertions(+), 61 deletions(-)
->> > 
->> > diff --git a/mm/mlock.c b/mm/mlock.c
->> > index 2c690f18031e..1050010bbe0b 100644
->> > --- a/mm/mlock.c
->> > +++ b/mm/mlock.c
->> > @@ -58,6 +58,20 @@ EXPORT_SYMBOL(can_do_mlock);
->> >   * indicate the unevictable state.
->> >   */
->> >  
->> > +static long mod_mlock_count(struct folio *folio, long incdec)
->> > +{
->> > +	long mlock_count = READ_ONCE(folio->mlock_count);
->> > +
->> > +	while (mlock_count & MLOCK_COUNT_0) {
->> > +		if (mlock_count + incdec < MLOCK_COUNT_0)
->> > +			return MLOCK_COUNT_0;
->> > +		if (try_cmpxchg(&folio->mlock_count, &mlock_count,
->> > +				mlock_count + incdec))
->> > +			return mlock_count + incdec;
->> > +	}
->> 
->> This never rereads folio->mlock_count to mlock_count inside the loop, so it
->> can spin forever?
+Am 13.07.26 um 20:14 schrieb Christian Borntraeger:
+> From: Christian Borntraeger <borntraeger@kernel.org>
 > 
-> You give me a nasty moment, have I misunderstood? Isn't it part of the
-> try_cmpxchg() contract, that it reads folio->mlock_count into mlock_count
-> when it fails? Hence the "&mlock_count" rather than just "mlock_count"?
+> in our CI we do get the following when unloading the nbd module.
+> 
+> [  120.008698] block nbd0: NBD_DISCONNECT
+> [  120.009078] block nbd0: Disconnected due to user request.
+> [  120.009413] block nbd0: shutting down sockets
+> 
+> [  120.269755] ======================================================
+> [  120.269757] WARNING: possible circular locking dependency detected
+> [  120.269759] 7.2.0-rc2-00005-g3e3aa6da87d3 #117 Not tainted
+> [  120.269761] ------------------------------------------------------
+> [  120.269762] modprobe/8168 is trying to acquire lock:
+> [  120.269764] 000001e67da57138 (set->srcu){.+.?}-{0:0}, at: __synchronize_srcu+0x36/0x210
+> [  120.269775]
+>                 but task is already holding lock:
+> [  120.269776] 000001bf63462d90 (&q->elevator_lock){+.+.}-{3:3}, at: elevator_change+0xac/0x1d0
+> [  120.269784] which lock already depends on the new lock.
+> 
+> [  120.269786] the existing dependency chain (in reverse order) is:
+> [  120.269788]
+>                 -> #5 (&q->elevator_lock){+.+.}-{3:3}:
+> [  120.269792]        lock_acquire+0x150/0x3f0
+> [  120.269795]        __mutex_lock+0xba/0xdc0
+> [  120.269799]        mutex_lock_nested+0x32/0x40
+> [  120.269802]        elevator_change+0xac/0x1d0
+> [  120.269804]        elv_iosched_store+0x194/0x1e0
+> [  120.269807]        kernfs_fop_write_iter+0x18c/0x270
+> [  120.269810]        vfs_write+0x23c/0x380
+> [  120.269813]        ksys_write+0x88/0x120
+> [  120.269816]        __do_syscall+0x170/0x750
+> [  120.269818]        system_call+0x72/0x90
+> [  120.269821]
+>                 -> #4 (&q->q_usage_counter(io)#18){++++}-{0:0}:
+> [  120.269871]        lock_acquire+0x150/0x3f0
+> [  120.269873]        blk_alloc_queue+0x2fe/0x340
+> [  120.269876]        blk_mq_alloc_queue+0x6c/0xe0
+> [  120.269879]        __blk_mq_alloc_disk+0x2a/0x80
+> [  120.269881]        dasd_gendisk_alloc+0xd4/0x200
+> [  120.269885]        dasd_state_known_to_basic+0x34/0x1f0
+> [  120.269890]        dasd_change_state+0x28a/0x570
+> [  120.269892]        dasd_set_target_state+0x76/0xf0
+> [  120.269895]        dasd_generic_set_online+0xc8/0x2c0
+> [  120.269897]        ccw_device_set_online+0xc6/0x550
+> [  120.269901]        online_store+0xd2/0x270
+> [  120.269904]        kernfs_fop_write_iter+0x18c/0x270
+> [  120.269906]        vfs_write+0x23c/0x380
+> [  120.269909]        ksys_write+0x88/0x120
+> [  120.269912]        __do_syscall+0x170/0x750
+> [  120.269914]        system_call+0x72/0x90
+> [  120.269916]
+>                 -> #3 (fs_reclaim){+.+.}-{0:0}:
+> [  120.269920]        lock_acquire+0x150/0x3f0
+> [  120.269922]        __fs_reclaim_acquire+0x44/0x50
+> [  120.269925]        fs_reclaim_acquire+0xbe/0x100
+> [  120.269927]        kmem_cache_alloc_noprof+0x6c/0x6d0
+> [  120.269931]        alloc_empty_file+0x58/0x150
+> [  120.269933]        dentry_open+0x3c/0xa0
+> [  120.269935]        pidfs_alloc_file+0xba/0x130
+> [  120.269940]        pidfd_prepare+0x8c/0xf0
+> [  120.269945]        scm_recv_unix+0xb0/0x130
+> [  120.269949]        __unix_dgram_recvmsg+0x2aa/0x430
+> [  120.269954]        sock_recvmsg+0x70/0xd0
+> [  120.269956]        ____sys_recvmsg+0x8a/0x190
+> [  120.269958]        ___sys_recvmsg+0x88/0xd0
+> [  120.269960]        __sys_recvmsg+0x76/0xd0
+> [  120.269962]        __do_sys_socketcall+0x40a/0x460
+> [  120.269964]        __do_syscall+0x170/0x750
+> [  120.269967]        system_call+0x72/0x90
+> [  120.269969]
+>                 -> #2 (&u->iolock){+.+.}-{3:3}:
+> [  120.269973]        lock_acquire+0x150/0x3f0
+> [  120.269975]        __mutex_lock+0xba/0xdc0
+> [  120.269978]        mutex_lock_nested+0x32/0x40
+> [  120.269981]        unix_stream_read_generic+0x11e/0xa60
+> [  120.269985]        unix_stream_recvmsg+0xae/0xc0
+> [  120.269988]        sock_recvmsg+0x70/0xd0
+> [  120.269990]        __sock_xmit+0xf0/0x1b0 [nbd]
+> [  120.269997]        nbd_handle_reply+0x284/0x770 [nbd]
+> [  120.270001]        recv_work+0x10c/0x290 [nbd]
+> [  120.270004]        process_one_work+0x2ba/0x800
+> [  120.270009]        worker_thread+0x21a/0x400
+> [  120.270012]        kthread+0x164/0x190
+> [  120.270016]        __ret_from_fork+0x4c/0x340
+> [  120.270020]        ret_from_fork+0xa/0x30
+> [  120.270022]
+>                 -> #1 (&cmd->lock){+.+.}-{3:3}:
+> [  120.270026]        lock_acquire+0x150/0x3f0
+> [  120.270028]        __mutex_lock+0xba/0xdc0
+> [  120.270031]        mutex_lock_nested+0x32/0x40
+> [  120.270034]        nbd_queue_rq+0x38/0x70 [nbd]
+> [  120.270037]        blk_mq_dispatch_rq_list+0x19c/0x540
+> [  120.270040]        __blk_mq_do_dispatch_sched+0x3ce/0x3e0
+> [  120.270043]        __blk_mq_sched_dispatch_requests+0x198/0x1e0
+> [  120.270046]        blk_mq_sched_dispatch_requests+0x3c/0x90
+> [  120.270049]        blk_mq_run_work_fn+0x9e/0x180
+> [  120.270052]        process_one_work+0x2ba/0x800
+> [  120.270055]        worker_thread+0x21a/0x400
+> [  120.270058]        kthread+0x164/0x190
+> [  120.270060]        __ret_from_fork+0x4c/0x340
+> [  120.270063]        ret_from_fork+0xa/0x30
+> [  120.270065]
+>                 -> #0 (set->srcu){.+.?}-{0:0}:
+> [  120.270069]        check_prev_add+0x160/0xf40
+> [  120.270073]        __lock_acquire+0x12aa/0x15a0
+> [  120.270075]        lock_sync+0xf4/0x190
+> [  120.270077]        __synchronize_srcu+0x5c/0x210
+> [  120.270080]        elevator_switch+0x190/0x340
+> [  120.270082]        elevator_change+0x152/0x1d0
+> [  120.270084]        elevator_set_none+0x44/0x90
+> [  120.270087]        blk_unregister_queue+0xd4/0x130
+> [  120.270090]        __del_gendisk+0x172/0x3c0
+> [  120.270093]        del_gendisk+0x86/0xb0
+> [  120.270096]        nbd_dev_remove+0x30/0x90 [nbd]
+> [  120.270100]        nbd_cleanup+0x11a/0x3a8 [nbd]
+> [  120.270104]        __do_sys_delete_module+0x18e/0x340
+> [  120.270107]        __do_syscall+0x170/0x750
+> [  120.270110]        system_call+0x72/0x90
+> [  120.270112]
+>                 other info that might help us debug this:
+> 
+> [  120.270114] Chain exists of:
+>                   set->srcu --> &q->q_usage_counter(io)#18 --> &q->elevator_lock
+> 
+> [  120.270120]  Possible unsafe locking scenario:
+> 
+> [  120.270121]        CPU0                    CPU1
+> [  120.270122]        ----                    ----
+> [  120.270124]   lock(&q->elevator_lock);
+> [  120.270126]                                lock(&q->q_usage_counter(io)#18);
+> [  120.270129]                                lock(&q->elevator_lock);
+> [  120.270132]   sync(set->srcu);
+> [  120.270134]
+>                  *** DEADLOCK ***
+> 
+> [  120.270136] 2 locks held by modprobe/8168:
+> [  120.270138]  #0: 000001bf44ce11e0 (&set->update_nr_hwq_lock){++++}-{3:3}, at: del_gendisk+0x76/0xb0
+> [  120.270145]  #1: 000001bf63462d90 (&q->elevator_lock){+.+.}-{3:3}, at: elevator_change+0xac/0x1d0
+> [  120.270152]
+>                 stack backtrace:
+> [  120.270155] CPU: 48 UID: 0 PID: 8168 Comm: modprobe Not tainted 7.2.0-rc2-00005-g3e3aa6da87d3 #117 PREEMPT
+> [  120.270157] Hardware name: IBM 9175 ME1 701 (LPAR)
+> [  120.270158] Call Trace:
+> [  120.270158]  [<000002c7d1164dde>] dump_stack_lvl+0xae/0x108
+> [  120.270160]  [<000002c7d126e5b4>] print_circular_bug+0x1a4/0x230
+> [  120.270163]  [<000002c7d126e7cc>] check_noncircular+0x18c/0x1b0
+> [  120.270165]  [<000002c7d126fb80>] check_prev_add+0x160/0xf40
+> [  120.270167]  [<000002c7d12736fa>] __lock_acquire+0x12aa/0x15a0
+> [  120.270168]  [<000002c7d1275ce4>] lock_sync+0xf4/0x190
+> [  120.270169]  [<000002c7d129c8fc>] __synchronize_srcu+0x5c/0x210
+> [  120.270171]  [<000002c7d1bb4790>] elevator_switch+0x190/0x340
+> [  120.270173]  [<000002c7d1bb4a92>] elevator_change+0x152/0x1d0
+> [  120.270174]  [<000002c7d1bb53c4>] elevator_set_none+0x44/0x90
+> [  120.270176]  [<000002c7d1bbee84>] blk_unregister_queue+0xd4/0x130
+> [  120.270177]  [<000002c7d1bdff42>] __del_gendisk+0x172/0x3c0
+> [  120.270179]  [<000002c7d1be0216>] del_gendisk+0x86/0xb0
+> [  120.270182]  [<000002c751b2adc0>] nbd_dev_remove+0x30/0x90 [nbd]
+> [  120.270185]  [<000002c751b30d72>] nbd_cleanup+0x11a/0x3a8 [nbd]
+> [  120.270189]  [<000002c7d12c72ce>] __do_sys_delete_module+0x18e/0x340
+> [  120.270191]  [<000002c7d22dc170>] __do_syscall+0x170/0x750
+> [  120.270192]  [<000002c7d22f0db2>] system_call+0x72/0x90
+> [  120.270194] INFO: lockdep is turned off.
+> 
+> this seems to be a false positive.
+> 
+> Commit d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep
+> circular dependency") already reclassifies sk_lock and slock of
+> sockets handed to nbd, including AF_UNIX ones, precisely to keep
+> lockdep from reporting.
+> That is not sufficient for AF_UNIX: the unix stream/dgram recvmsg and
+> sendmsg paths do not serialize on sk_lock but on unix_sk(sk)->iolock,
+> and that mutex keeps the generic "&u->iolock" class shared by every
+> AF_UNIX socket in the system.
+> 
+> Teach lockdep about the lock instances to avoid this report.
+> This gets rid of the lockdep warning.
+> 
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-Indeed, sorry! It would have helped if the contract was spelled out
-somewhere. But now I found it only for the atomic_try_cmpxchg() variant.
-Guess I'm too used to the slab_update_freelist() wrappers which don't follow
-this... but maybe should? Hmm.
 
->> 
->> (too late here for me to understand the rest today)
+Ping.
+
+> ---
+>   drivers/block/nbd.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 > 
-> But that I understand very weil: thanks for all that you have managed.
-> 
-> Hugh
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 8f10762e90ef..a811e431b47a 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -32,6 +32,7 @@
+>   #include <linux/err.h>
+>   #include <linux/kernel.h>
+>   #include <linux/slab.h>
+> +#include <net/af_unix.h>
+>   #include <net/sock.h>
+>   #include <linux/net.h>
+>   #include <linux/kthread.h>
+> @@ -1241,6 +1242,7 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+>   #ifdef CONFIG_DEBUG_LOCK_ALLOC
+>   static struct lock_class_key nbd_key[3];
+>   static struct lock_class_key nbd_slock_key[3];
+> +static struct lock_class_key nbd_unix_iolock_key;
+>   
+>   static void nbd_reclassify_socket(struct socket *sock)
+>   {
+> @@ -1267,6 +1269,17 @@ static void nbd_reclassify_socket(struct socket *sock)
+>   					      &nbd_slock_key[2],
+>   					      "sk_lock-AF_UNIX-NBD",
+>   					      &nbd_key[2]);
+> +		/*
+> +		 * The AF_UNIX stream recvmsg/sendmsg paths serialize on
+> +		 * u->iolock, not sk_lock, so it must be reclassified as
+> +		 * well.  A held mutex cannot be reclassified; skip it in
+> +		 * that case, as sock_allow_reclassification() does for
+> +		 * sk_lock.
+> +		 */
+> +		if (!mutex_is_locked(&unix_sk(sk)->iolock))
+> +			lockdep_set_class_and_name(&unix_sk(sk)->iolock,
+> +						   &nbd_unix_iolock_key,
+> +						   "&u->iolock-NBD");
+>   		break;
+>   	}
+>   }
 
