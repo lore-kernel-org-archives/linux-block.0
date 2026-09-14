@@ -1,153 +1,241 @@
-Received: from mail-oo2-f1.google.com (mail-oo2-f1.google.com [74.125.231.129])
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C831337F726
-	for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 21:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC18352030
+	for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 23:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789421189; cv=none; b=cDf1KP9oCEMYsm+Dfk5rR3gNaYPeAjtCFpdP3Ykq9FNdZ0zmOke0vQCV9uxeJK8LZ6DjrPmerzda0K2TBFP4MiQIDJyhvqmTwropSUwrUj9q7yNQDdH4DhDN/krP9CeTzcEA3Wv3WIEjrfl5cM8I/7+T4DPmb5Iq5jg59w8et6o=
+	t=1789426832; cv=none; b=rA1cQjEyOk4AhFpmuFB1zxRiKJQdxx8zm7KHa80cSHm0pFuNRr7Ct0pus/UqW1Xzd0GoE8GOmLB/Av8P08xyw+ZFJr1M5aqxUpJOJnRUPbytdbVsCI2du4bn7XDNFJz+3smWpxTMJq4rumTOehvrrnH/d04TsfJpmLEZNfCidaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789421189; c=relaxed/simple;
-	bh=dWWNsdjuysMJ/2085tK0NW4f9jW++Y+Re2ydq5/YTrs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pjjHYxaNgdAfGg5XX3CF+OC/8F1Rp2SlrlEi0ZIAUCXXXDIAReR2znjDDCdSfQ/+ABfdMWPunSC2onIJqJUjR3NEsOaprHAyaj4QtToi3ECoX+9zThowvEdE/TGbZvV2YAO8Fli5Qv7o/6h2VnBmzNPvekmV+oxj0bR8LlJ1v8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.129
+	s=arc-20240116; t=1789426832; c=relaxed/simple;
+	bh=Uvda3mpDZ+Q/k7LZ/3pQQ7KyTaZcRTOLWlF3hmPQjjE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=eNLX4Y0ubsSXZ9lPU2ywK0y/Bq58FFUBW6IGekJlpDU0lbXzNfOgoe8sNNqTMpnpy8HuL6gFhXBT11ESSCmug5yPFWNj7rlY4ypA7x9KxD39hkK8phlsOu3e//sygQuPJeHsHSD97nDlg/+G0Ubbs6oqZ88InbM89xO7VUANHdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo2-f1.google.com with SMTP id 006d021491bc7-6bc93a7858fso161810eaf.1
-        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 14:26:27 -0700 (PDT)
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-6c1a8f2c565so4508512eaf.2
+        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 16:00:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789421186; x=1790025986;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vvjwSBjsoRZGABnGVp2dTMSYiqE1jQGUEtvi1+gEewA=;
-        b=SvbgDL3ps6w9eZ5O14utJAdWervWZVanZnOh/hoeR9f2BEAz1ChnRS9FQngj0b939F
-         z4B3xJZmJUMtiRoaetSg/OeXDQedCYqQyJBahpeXzRx7ztZM7x2jiHy6/a24Ae9EQqDY
-         ugedOw4LtAiPGLFIZCFKKsHGViOaYVtXS9YKVe5nk/avPv23f4H3l0c8yZkYn9tlO3J7
-         jdo8uQRIYpJocPIM0eD5Vow7SZiahMX+eKMltdNFttoK1lzonWqCYHDKSu1OimK9Rr6X
-         YlaB/XcMGp5Usdx9QyQw6z4r7+rsmIh7NQbv+vKJUw2rA87I5imz/TVviuAS+j1NvKn2
-         grjw==
-X-Forwarded-Encrypted: i=1; AKwUvByRbag1yahz6wd5tBK3j2nUZfMG1IxbxLhNZszjAdGoZbQ+Rz1bqHJ0+DdyJmt8c9U3DJlLytw8PB9L+A==@vger.kernel.org
-X-Gm-Message-State: AFuF++nJa+Hx6bNd4ETKUntuJBxt4rfJDINORu8LUfJqsk/DYULsCsdV
-	Wjk+sp5Sf8GlhWMfBSl4ISN/dmbmMUovp9Yq4ndi0O1Smef1oFsg6RJaiTdeE8qwnEH+5EvBETh
-	Ce0FUxwwmdkIgvWJ8dYlCdRG5QSsQY3ibjeDoz4Jz7aokcWmrQI8PhLIeYdQ=
+        d=1e100.net; s=20260707; t=1789426829; x=1790031629;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=44Xx70pjFYQDKE7JTJq5Y/pRdejI1BJo8WjK0aWEuzw=;
+        b=Sdy5/c/ZrUN0hxibDbDDjmJVUNgm07xTubobbtIGP2+SBwyvPhlxtui1MIsLUWMe+P
+         ti6iYxRs4oPsl9TtHkFKUvpj6bgl+4AZsIJXKrHx5EtSh9hyJd+rK2CmZYSdBkPmLETL
+         dhSPPs2im7KCIV/Erabl0LT70h0ypTFGRMDiBLh6QbY1bqzFNWd6vJUoAwnCCDZ1tgmd
+         oArgtAEkYZs3Lay0NfVrD9FNdPr+x2Px9ZKTCyMez3PntD549/ScTkXGn8qFizT2I3e9
+         eEZHvbVb1tDbNvAVI6RkKGaS1kfTJARpbFimgYtCkutS6Z3mlfITcfZk1XEeh/yd96po
+         tefA==
+X-Forwarded-Encrypted: i=1; AKwUvBxixdR8qTuicad6J/ThgMkQbD8JoYTanyc/kSR8Kket5FoNSPAjqxlaWK9atFfv0EgosgkGXgohwtI3zQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++l92Q6rpPsj0707OmaIDv88YkByj8pr6Sq3K4uinishvuX/uIHH
+	dbBvAu/faMfyR3s1T9kqPe854LiXGq70A8qFYIheesEdTv2BNE+I48raYu+aRh001aMSFAElKAM
+	Pt81WoesHzXjrKp52lKye6c6DjJjnUUaiaAZlFTh9MoiNWzx3COMV0Qgib54=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:3084:b0:6b7:83d6:292d with SMTP id
- 006d021491bc7-6c542831440mr2450704eaf.48.1789421186537; Mon, 14 Sep 2026
- 14:26:26 -0700 (PDT)
-Date: Mon, 14 Sep 2026 14:26:26 -0700
+X-Received: by 2002:a05:6820:4c02:b0:6be:46f4:2908 with SMTP id
+ 006d021491bc7-6c544dad007mr2996077eaf.55.1789426829545; Mon, 14 Sep 2026
+ 16:00:29 -0700 (PDT)
+Date: Mon, 14 Sep 2026 16:00:29 -0700
+In-Reply-To: <6a6d3cbd.6ce73036.24301b.000d.GAE@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6aa86682.f81106d8.2ab401.0056.GAE@google.com>
-Subject: [syzbot] [block?] WARNING: suspicious RCU usage in mas_start (2)
-From: syzbot <syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com>
+Message-ID: <6aa87c8d.4c28b7d0.c1bba.0020.GAE@google.com>
+Subject: Re: [syzbot] [raid?] possible deadlock in blk_probe_dev
+From: syzbot <syzbot+68e1f51046d68329940f@syzkaller.appspotmail.com>
 To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tom.leiming@gmail.com
+	linux-raid@vger.kernel.org, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yukuai@fnnas.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
-
-syzbot found the following issue on:
+syzbot has found a reproducer for the following issue on:
 
 HEAD commit:    704340f1cd0d Merge tag 'x86_urgent_for_7.3-rc4' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16091925580000
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=12ff9905580000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5c3949d762a91f
-dashboard link: https://syzkaller.appspot.com/bug?extid=b48868c46e62c1c4cb2c
+dashboard link: https://syzkaller.appspot.com/bug?extid=68e1f51046d68329940f
 compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=120f305e580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117fb5f9580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-704340f1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e02afc1c5927/vmlinux-704340f1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/09cb4a8b3309/bzImage-704340f1.xz
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a0bc8e580000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com
+Reported-by: syzbot+68e1f51046d68329940f@syzkaller.appspotmail.com
 
-=============================
-WARNING: suspicious RCU usage
+======================================================
+WARNING: possible circular locking dependency detected
 syzkaller #0 Not tainted
------------------------------
-lib/maple_tree.c:720 suspicious rcu_dereference_check() usage!
+------------------------------------------------------
+syz-executor197/4337 is trying to acquire lock:
+ffff888023113d40 ((wq_completion)md_misc){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x9c/0x1c0 kernel/workqueue.c:4111
+
+but task is already holding lock:
+ffffffff8f9b98e0 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev+0x28/0x1e0 block/genhd.c:885
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #3 (major_names_lock){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       blk_probe_dev+0x28/0x1e0 block/genhd.c:885
+       blk_request_module+0x16/0xc0 block/genhd.c:901
+       blkdev_get_no_open+0x9b/0xf0 block/bdev.c:870
+       bdev_file_open_by_dev block/bdev.c:1091 [inline]
+       bdev_file_open_by_dev+0x70/0x210 block/bdev.c:1079
+       md_import_device+0x120/0x360 drivers/md/md.c:3847
+       md_add_new_disk+0xdbf/0x1820 drivers/md/md.c:7656
+       md_ioctl+0x2bec/0x36d0 drivers/md/md.c:8499
+       blkdev_ioctl+0x5ad/0x6f0 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #2 (&mddev->reconfig_mutex){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
+       mddev_lock_nointr drivers/md/md.h:734 [inline]
+       md_start_sync+0xc4/0xea0 drivers/md/md.c:10275
+       process_one_work+0xac7/0x1b10 kernel/workqueue.c:3396
+       process_scheduled_works kernel/workqueue.c:3479 [inline]
+       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3560
+       kthread+0x373/0x450 kernel/kthread.c:436
+       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 ((work_completion)(&mddev->sync_work)){+.+.}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       process_one_work+0xa32/0x1b10 kernel/workqueue.c:3372
+       process_scheduled_works kernel/workqueue.c:3479 [inline]
+       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3560
+       kthread+0x373/0x450 kernel/kthread.c:436
+       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 ((wq_completion)md_misc){+.+.}-{0:0}:
+       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       touch_wq_lockdep_map+0xad/0x1c0 kernel/workqueue.c:4111
+       __flush_workqueue+0x131/0x1200 kernel/workqueue.c:4153
+       md_alloc+0x30/0x10a0 drivers/md/md.c:6334
+       md_alloc_and_put drivers/md/md.c:6423 [inline]
+       md_probe drivers/md/md.c:6439 [inline]
+       md_probe+0x73/0xf0 drivers/md/md.c:6434
+       blk_probe_dev+0x149/0x1e0 block/genhd.c:888
+       blk_request_module+0x16/0xc0 block/genhd.c:901
+       blkdev_get_no_open+0x9b/0xf0 block/bdev.c:870
+       blkdev_open+0x141/0x4f0 block/fops.c:665
+       do_dentry_open+0x6ab/0x14d0 fs/open.c:996
+       vfs_open+0x82/0x3f0 fs/open.c:1101
+       do_open fs/namei.c:4837 [inline]
+       path_openat+0x19fa/0x2440 fs/namei.c:5000
+       do_file_open+0x20e/0x430 fs/namei.c:5029
+       do_sys_openat2+0x10f/0x1e0 fs/open.c:1417
+       do_sys_open fs/open.c:1423 [inline]
+       __do_sys_openat fs/open.c:1439 [inline]
+       __se_sys_openat fs/open.c:1434 [inline]
+       __x64_sys_openat+0x12d/0x210 fs/open.c:1434
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
 other info that might help us debug this:
 
+Chain exists of:
+  (wq_completion)md_misc --> &mddev->reconfig_mutex --> major_names_lock
 
-rcu_scheduler_active = 2, debug_locks = 1
-locks held by syz.0.17/5926: 1, last CPU#0:
- #0: ffff888034a420a0 (&ctx->uring_lock){+.+.}-{4:4}, at: tctx_task_work_run+0x1cd/0xbf0 io_uring/tw.c:92
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(major_names_lock);
+                               lock(&mddev->reconfig_mutex);
+                               lock(major_names_lock);
+  lock((wq_completion)md_misc);
+
+ *** DEADLOCK ***
+
+locks held by syz-executor197/4337: 1, last CPU#2:
+ #0: ffffffff8f9b98e0 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev+0x28/0x1e0 block/genhd.c:885
 
 stack backtrace:
-CPU: 0 UID: 0 PID: 5926 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+CPU: 2 UID: 0 PID: 4337 Comm: syz-executor197 Not tainted syzkaller #0 PREEMPT(full) 
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
 Call Trace:
  <TASK>
  __dump_stack lib/dump_stack.c:94 [inline]
  dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- lockdep_rcu_suspicious.cold+0x4f/0xb2 kernel/locking/lockdep.c:6972
- mas_root lib/maple_tree.c:720 [inline]
- mas_start+0x621/0x7c0 lib/maple_tree.c:1250
- mas_state_walk lib/maple_tree.c:3006 [inline]
- mas_walk+0x82/0x310 lib/maple_tree.c:4458
- ublk_try_buf_match+0x469/0x7e0 drivers/block/ublk_drv.c:5639
- ublk_init_iod+0x4a4/0x5b0 drivers/block/ublk_drv.c:521
- ublk_setup_iod+0x145/0x2f0 drivers/block/ublk_drv.c:1536
- ublk_dispatch_req+0x4e/0xb00 drivers/block/ublk_drv.c:1776
- ublk_cmd_tw_cb+0xbe/0x110 drivers/block/ublk_drv.c:2067
- tctx_task_work_run+0xabe/0xbf0 io_uring/tw.c:96
- tctx_task_work+0x7a/0xa0 io_uring/tw.c:133
- task_work_run+0x150/0x240 kernel/task_work.c:233
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0x951/0x2ae0 kernel/exit.c:1011
- do_group_exit+0xd5/0x2a0 kernel/exit.c:1154
- __do_sys_exit_group kernel/exit.c:1165 [inline]
- __se_sys_exit_group kernel/exit.c:1163 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1163
- x64_sys_call+0x1567/0x1570 arch/x86/include/generated/asm/syscalls_64.h:232
+ print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2087
+ check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2219
+ check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
+ lock_acquire kernel/locking/lockdep.c:5942 [inline]
+ lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+ touch_wq_lockdep_map+0xad/0x1c0 kernel/workqueue.c:4111
+ __flush_workqueue+0x131/0x1200 kernel/workqueue.c:4153
+ md_alloc+0x30/0x10a0 drivers/md/md.c:6334
+ md_alloc_and_put drivers/md/md.c:6423 [inline]
+ md_probe drivers/md/md.c:6439 [inline]
+ md_probe+0x73/0xf0 drivers/md/md.c:6434
+ blk_probe_dev+0x149/0x1e0 block/genhd.c:888
+ blk_request_module+0x16/0xc0 block/genhd.c:901
+ blkdev_get_no_open+0x9b/0xf0 block/bdev.c:870
+ blkdev_open+0x141/0x4f0 block/fops.c:665
+ do_dentry_open+0x6ab/0x14d0 fs/open.c:996
+ vfs_open+0x82/0x3f0 fs/open.c:1101
+ do_open fs/namei.c:4837 [inline]
+ path_openat+0x19fa/0x2440 fs/namei.c:5000
+ do_file_open+0x20e/0x430 fs/namei.c:5029
+ do_sys_openat2+0x10f/0x1e0 fs/open.c:1417
+ do_sys_open fs/open.c:1423 [inline]
+ __do_sys_openat fs/open.c:1439 [inline]
+ __se_sys_openat fs/open.c:1434 [inline]
+ __x64_sys_openat+0x12d/0x210 fs/open.c:1434
  do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
  do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f35df99e159
-Code: Unable to access opcode bytes at 0x7f35df99e12f.
-RSP: 002b:00007ffcaa2c82b8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f35df99e159
-RDX: 0000000000000064 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000003 R08: 0000000000000000 R09: 00007f35dfbec3e0
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f35dfbec3e0 R14: 0000000000000003 R15: 00007ffcaa2c8370
+RIP: 0033:0x7fc5b6fe4b37
+Code: 48 89 fa 4c 89 df e8 98 1d 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007ffd92e81700 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 000055557809b400 RCX: 00007fc5b6fe4b37
+RDX: 0000000000000002 RSI: 00007ffd92e81810 RDI: ffffffffffffff9c
+RBP: 00007ffd92e81810 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000004
+R13: 0000000000000005 R14: 00007fc5b7049ca0 R15: 0000000000000002
  </TASK>
-I/O error, dev ublkb0, sector 0 op 0x0:(READ) flags 0x800000 phys_seg 1 prio class 2
-Buffer I/O error on dev ublkb0, logical block 0, async page read
+md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+block device autoloading is deprecated and will be removed.
+md: could not open device unknown-block(0,0).
+md: md_import_device returned -6
+md/raid1:md127: not clean -- starting background reconstruction
+md/raid1:md127: active with 2 out of 2 mirrors
+md127: detected capacity change from 0 to 20480
+md127: detected capacity change from 20480 to 0
+md: md127 stopped.
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
 If you want syzbot to run the reproducer, reply with:
 #syz test: git://repo/address.git branch-or-commit-hash
 If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
