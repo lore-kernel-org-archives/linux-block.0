@@ -1,74 +1,105 @@
-Received: from mx10.gouders.net (mx10.gouders.net [202.61.206.94])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23BC3FC5D0;
-	Mon, 14 Sep 2026 11:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.61.206.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213B345D910;
+	Mon, 14 Sep 2026 12:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789383786; cv=none; b=ReJJceO+me/Pb5JkHHayNM4DhZR42NxKSZWJguqeQ7VGZkn28yAGn4sGDQhR35z0J8DWck+hQ+EDJYpi7xX5TDabbxJ7hjEA31YCtb9x48Sp91U9zhHMbfbrAAPOBEaVXMdR+5NvzBairVNZ6vPYm7ISjnsP3MBnY9u8ds3dp8c=
+	t=1789387448; cv=none; b=gc5jypOzeb16ZS3hT/eBXAdZOv1RMu60mgG5Rqoc0nVYFJgaqW04HAd1VroUiwSoobmPBMiSWz+ALQ0s0aaej01NFZ39zaoNsy3cOhU0pZKBR8fjZh+5MGs5VsrQpqeZVKCH0HVkvh7kG8PbfbGPv+qJGwYxGj7FRovhgER1BaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789383786; c=relaxed/simple;
-	bh=feTNeZ21BNrqRGVAvjOwvU/3q6aY66M8cI3IJByjReQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kV1uetR3ven9zZj0Ybraf7Bb68VqGWEN7CLtQTyXeaDvXMypC8gX/5TFq2UiibK76n6e28hS0e4q9SOfA0CEhi0xzUuP9wGI7hizjTYh9kt0h6jOzoHagLX3+i73GfIL7S3I6HV1QnyPhqnx6D35KOywLwrIZDbnTkUUXanQoKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gouders.net; spf=pass smtp.mailfrom=gouders.net; dkim=pass (1024-bit key) header.d=gouders.net header.i=@gouders.net header.b=J3QGa7p0; arc=none smtp.client-ip=202.61.206.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gouders.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gouders.net
+	s=arc-20240116; t=1789387448; c=relaxed/simple;
+	bh=RwEZhfMJP7L6Q0UDZRqChxPxeZtWRLjjgHga4wyLG+U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=L/JqhcdGBV8tNiHBr64eI8IHNeIRQ+VuvPx4VTD77EFcrhE4ivLBVOb8qQa1j3HRaFs2GRifI2FF0kAkmzgQ+dn/3dJihdtGeLir4WzyKsSkh+ri5xw93kbUsgL5aw3QxoUwYAEeJQRKqWcufYKKO4OYYmArZLHSUY4Z1GDoU7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gCsAFcR0; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gouders.net header.i=@gouders.net header.b="J3QGa7p0"
-Received: from localhost (ip-109-41-49-60.web.vodafone.de [109.41.49.60])
-	(authenticated bits=0)
-	by mx10.gouders.net (8.18.2/8.17.1.9) with ESMTPSA id 68EB2W07265105
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Mon, 14 Sep 2026 13:02:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gouders.net; s=gnet;
-	t=1789383753; bh=feTNeZ21BNrqRGVAvjOwvU/3q6aY66M8cI3IJByjReQ=;
-	h=From:To:Cc:Subject:Date;
-	b=J3QGa7p0M8osOcYdCQK66ehImQRx1vUWkKZFUHbhfS4iAr4Eso4Lbv1xRhLmao+9r
-	 UYYk2+3y6nvkj9KAMtghIFfsbbYNSNcwJAYEhRS4eJUgdNSHfidBmp90BeNdhILynO
-	 5jSJm+l4x+1czgiIYGxedy+zmbOOYRHHHHz6KRMs=
-From: Dirk Gouders <dirk@gouders.net>
-To: Shuah Khan <shuah@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
-        Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] selftests: ublk: fix unused_result error
-Date: Mon, 14 Sep 2026 13:01:09 +0200
-Message-ID: <20260914110145.41627-2-dirk@gouders.net>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gCsAFcR0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789387446; x=1820923446;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=RwEZhfMJP7L6Q0UDZRqChxPxeZtWRLjjgHga4wyLG+U=;
+  b=gCsAFcR0CPZkKCq2CZqPTWbYBOuU2HzZ2NpCCY2l6z80hS7W9jRJWLfm
+   D4GzmbyzTHb+rQsjq309oZKFcrtvRJGR9X9JUeBsjCwKM4RiJ0y/nc6Sb
+   S4mqHULrIuMh1pxQR6vo8Lld90wxMICNC0cEdbVkAdoIePDfGB8/TEPPp
+   H0CTqyqX98iiJE63i0Qq4BKHWdxUds9W6pxzM7e1C3CWiNAy8DiFYNQQo
+   CmTmadPqbI0ArJw6bXLFEn57vTe7Qjdx53No9gofHZ/kMk654Z+IfxBFe
+   +4ZDqa05Ot3ouU+JT6t/e0IJ0TCqTOqBNw25xKlWwpHCROPG0Yt0JtHNT
+   A==;
+X-CSE-ConnectionGUID: Ladvqn86Sbu6MGeuGui9rA==
+X-CSE-MsgGUID: W4Ngqh+2Q+GZ+wnIwN4BaA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11904"; a="89763224"
+X-IronPort-AV: E=Sophos;i="6.27,102,1787036400"; 
+   d="scan'208";a="89763224"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2026 05:04:05 -0700
+X-CSE-ConnectionGUID: h0RGzZDZSImuU1pjcvMo4g==
+X-CSE-MsgGUID: FzTGZXnSSpmvM9i3IXefpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,102,1787036400"; 
+   d="scan'208";a="274541772"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.96])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2026 05:03:58 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Petr Pavlu <petr.pavlu@suse.com>, Jens Axboe <axboe@kernel.dk>, Jakub
+ Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Joonas
+ Lahtinen <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, Matthew Brost <matthew.brost@intel.com>, Thomas
+ =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>
+Cc: Simon Horman <horms@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Francois Dugast
+ <francois.dugast@intel.com>, Luis Chamberlain <mcgrof@kernel.org>, Petr
+ Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami
+ Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ linux-block@vger.kernel.org, netdev@vger.kernel.org,
+ linux-api@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/6] drm/i915: Include error-injection.h for
+ ALLOW_ERROR_INJECTION()
+In-Reply-To: <20260911-module-include-error_injection-v1-4-5da895d8c84d@suse.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <20260911-module-include-error_injection-v1-0-5da895d8c84d@suse.com>
+ <20260911-module-include-error_injection-v1-4-5da895d8c84d@suse.com>
+Date: Mon, 14 Sep 2026 15:03:56 +0300
+Message-ID: <2860c528b7ce0d596a24b05f0ae2b4a9f21be301@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Commit 166b476b8dee (selftests/ublk: add shared memory zero-copy
-support in kublk, 2026-03-31) introduced a write(2), ignoring its
-return value and thus causing an error, when building.
+On Fri, 11 Sep 2026, Petr Pavlu <petr.pavlu@suse.com> wrote:
+> Several drivers/gpu/drm/i915/*.c files use ALLOW_ERROR_INJECTION(), which
+> is defined in asm-generic/error-injection.h. They currently rely on this
+> header being included indirectly through linux/module.h ->
+> linux/error-injection.h.
+>
+> Add the missing includes in preparation for removing the
+> linux/error-injection.h include from linux/module.h.
 
-Fix this by using the common workaround "(void)!" to trick the
-compiler the result is being used.
+I guess merging all of this through one tree would speed things up for
+you.
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- tools/testing/selftests/ublk/kublk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 2400b4615766..5b19bfcfa8d7 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -1589,7 +1589,7 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
+for merging via whichever tree you prefer. However, please let me know
+if you do want this merged through drm-intel.
+
+Thanks for doing this.
+
+
+BR,
+Jani.
  
- 	/* Signal listener thread to stop and wait for it */
- 	if (linfo.stop_efd >= 0) {
--		write(linfo.stop_efd, &stop_val, sizeof(stop_val));
-+		(void)!write(linfo.stop_efd, &stop_val, sizeof(stop_val));
- 		pthread_join(listener, NULL);
- 		close(linfo.stop_efd);
- 		ublk_shmem_sock_destroy(dinfo->dev_id, linfo.sock_fd);
--- 
-2.55.0
 
+-- 
+Jani Nikula, Intel
