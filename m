@@ -1,41 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2516544C50B;
-	Tue, 15 Sep 2026 20:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581AC4CE67E
+	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 20:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789502473; cv=none; b=HkCWBuTEs6mnkCcRkvZ4mrPuoP7NJmdr5I4n6+6wkLCEp0JZrSrTq7dVlt37EraiO+iYBZsDWPeeruFy5U1yGXfxGYfq0uwPXD2zzWl0j6Nqt5sT+3bAIY6Ux2cE7pSu/4pCjdiRA0bDdIP4coiLcdg2+nqjFF+Bl2n96oGqseY=
+	t=1789503956; cv=none; b=IbTqYcVTEe+kilqUDX0Y9Fwb3P2hxCDQ0Zm5W9LiUoabxcBrXk/SpL3iBezHYy3YoJhQx6CQIH3GmF+b/a5X8YqSWuFIzIHHpVMcuG2yOqrZfhbVIkUnNWXohXIEFer8HoiA6Y0LKplYMnnHErQD8qkcETQqVyCoNUFNyWEBJAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789502473; c=relaxed/simple;
-	bh=5BXj3GYAp+K0PEWPKETO0y+KRxP+PxfG6Uos6q6Hx2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kz8sPpsKFI0NPzq5jeBrSm2Wz/1HoNwstMJQ5x2x007ii4GRFuE29czosrhGc0lMsI/IPSWwj5igwGgkUjpYAHWcDKvL7Y4minpdSXBN025KpK64fXDKA0QPs6ZgCOk7Xu9XrqZvbs4A9aDCiz0iaLrWdGd7wAwbaXip9egmjos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IG5+8vNd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789503956; c=relaxed/simple;
+	bh=RvjCwhFGET9Uj66Osagy6a4qssD8e7inBSdkIa2r4RE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bjsHzxGKUStML18uNamV5vN4/bjtMCnvhfsm2ikwD89WX/D34o8pHa6D0mDU8AbmB6cjQE5NtWDKSvf5Mn0/Vg2ZuArF3n0i6UKc7BbxqdLJlZx3Gg07Y38c+99e1qBBHmReUUi0iy090nooPjgajW5YdwUW3rS58KRyEV0y7BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LQ4SIr0i; arc=none smtp.client-ip=74.125.227.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IG5+8vNd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E68BD1F000FF;
-	Tue, 15 Sep 2026 20:01:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789502471;
-	bh=92nr8IGaQH5EjHNWCGT9F67ybnm5tD52y6P8CzHrxf4=;
-	h=From:To:Cc:Subject:Date;
-	b=IG5+8vNdUIUVZTp/0K6hwT1phJUCkIKpdU+PJguUwgpD2C35hLKBmdqA6jKx2e7ji
-	 Jpbie10mWoQ5u4s7aAUZdA41yew/dLcbvKRkiqXBWrvptltkZ1yBeDUACsCap2VEz3
-	 wJyVmvDTtuw8kZyswcikFz1zwttOohsd7GAyLIwF/v0S1qm/FfuVJyg3TzwpBk6cbi
-	 gPFnIRwXHJlND3A4L0p7+0UxllaUVBL6V2+ij1Mj46hXgJQcO4AgWwxs2Deq4pGset
-	 3N34WpWvpRuev/qgMm0YStZoJDF5QXJdZNLO2GWXDFS6FutNhaYMWbJJ+FTvwiVpHh
-	 M7GVE4A9a0v3Q==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: reduce stack usage in __ublk_shmem_remove_ranges
-Date: Tue, 15 Sep 2026 22:00:56 +0200
-Message-ID: <20260915200107.3522560-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQ4SIr0i"
+Received: by mail-pj2-f43.google.com with SMTP id d9443c01a7336-2d9004a1ac0so1656975ad.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 13:25:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789503945; x=1790108745; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=vNdtcRPen4btN0ZzDjINeGYvdaPnuO0V2FcBebJBxrc=;
+        b=LQ4SIr0iJ2j0rSMPS75BkS/YsHHcvyEwx7hEYHSOzqlkoNVZPXUO5DFr+gzIGR7gil
+         c5cnsBqFQhFf5lCkCSGvKDDkW2jXS7AVhXK1+BBHJdYPJ9z52DiOtr4XrttK3lJwDTvu
+         Bojx3wUptCsFl2y0zPB+7YaWHgog3ZfFIx3odNqGxSMgsRLJKf6XX5YNe3ZxzYCd2zdk
+         yMiCybBXIgt4fYeWGHjK0WGdfbUvvkkrUJ94ehuW8ZFE0G5pgHOGxL4fBPW3Qq9CBuQD
+         imBmTTc1D5CUZOwB2Hc6BQEspI3KxNPRlUXlT+Jgk4YNU59p/ZLAd1+cSd0a99odW2wR
+         DVMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789503945; x=1790108745;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=vNdtcRPen4btN0ZzDjINeGYvdaPnuO0V2FcBebJBxrc=;
+        b=B9mhgTzN1ltJnSHilI8iRCUeY+t476OkLInOCQoa+kFBDnlNzNFZQHUTVMOZLvnoTY
+         4BE9tGlFZNOEdAuMEQB5ClxBw2OKFSJXoPTe4fiyo4Zed3q3qwsmsB9P9A+F3R6lGwif
+         eH0ZpLPeFk41Vi0TY3vm+D2GJXSBIz8y22zF6T0UC9f/vFIJCHPOjSIPRu3Er/HYJMUZ
+         yE0ABNYijEegkJpZb1CQ82k7n0skgSEGt4LeYf68kqYkJCWAbsj97Iruco3P0aJUHoRq
+         gQvYoeGv0IXvl+aIDlSVOgd/jg/GvNEx+p9kDzr4Y/cvyF9mIz21bRt1rYB4LoYrEFUW
+         GxaA==
+X-Gm-Message-State: AFuF++luvnndooR2KwRL7JynJ+OwTXP8Af0K1FFVnsZ742EXL7QavQBL
+	maGgryeVKq0vl/EDlsPuNwf32EAZmM/qPcNNtKDVNGziUkKTZkUoOZ9D
+X-Gm-Gg: AYBFou1bZnVM6LOUK1rtp3dBpNCVixIzFGIDGD5ce8TGhBvo8zbaEwJY8mEkIksqoe9
+	d8y5jOBPHqeVxiCqmAr9DSKCe8Qpxso7t+71mB4zxaUfPb3bnmG/ScYBoZW8yRZu6BAXIEiBTpG
+	C2Cw+ltX1fHleazDRMWPaPiV09QA+sQtUSLZ760PmR8PMQ+SWQRnXAdUyf//iRgLESci1k6Txd6
+	rECKgroluUOCwnVIHlkNlJHVcfVFCcIaG4FH31lajQE6GPUz9fERDpXRH4FupYwiz+P3F2CGjkL
+	18OlECzrV6hSNghgLkjGrkr/MnJnKjMDUt1cVfAS8qMtGxchuZGa/vodrXvUCzyRtu0faSvKnxE
+	N06GS8lrfGXDPuSpr2k5l5extH/yZGE5xy061t/Xq4xAyBnt+a1E5zKR32UXGlSgMaRCsUl9W2N
+	9Tks4rQOwvl2xUsOWXFfHH0qDRDC8i58V0daU1yBjUBMrbAYdGltb3OzWY0PhP5u8pg8FmaPsY4
+	RfRmAx9ZThFzV3/TM2OIXI=
+X-Received: by 2002:a17:902:ec89:b0:2dd:7593:8634 with SMTP id d9443c01a7336-2dd838536b6mr44291865ad.13.1789503945178;
+        Tue, 15 Sep 2026 13:25:45 -0700 (PDT)
+Received: from nixos.tail966018.ts.net ([2405:9800:b530:f677:2b6:42de:4884:aa25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bf5aa1194sm1560592eec.14.2026.09.15.13.25.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 13:25:44 -0700 (PDT)
+From: Tanawat Jukmongkol <tanawat.jukmon@gmail.com>
+To: axboe@kernel.dk,
+	tz2294@columbia.edu
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-next@vger.kernel.org,
+	regressions@lists.linux.dev,
+	Tanawat Jukmongkol <tanawat.jukmon@gmail.com>
+Subject: [PATCH] fs/buffer: fix NULL deref on folio-less bh in __bh_submit
+Date: Wed, 16 Sep 2026 03:25:34 +0700
+Message-ID: <20260915202534.468958-1-tanawat.jukmon@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,42 +76,39 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+jbd2 submits buffer_heads it allocates directly for journal descriptor
+and commit-record blocks, which have no folio backing at all - as the
+comment on buffer_set_crypto_ctx() just above already notes. Unlike
+that check, and unlike the bh->b_folio check further down in the same
+function, __bh_submit() calls folio_test_dropbehind(bh->b_folio)
+unconditionally, so committing a transaction on one of these bh's
+null-derefs while reading the folio's flags:
 
-The array in __ublk_shmem_remove_ranges() is one kilobyte long,
-which is really too much for an on-stack allocation, as can be
-seen with a frame warning limit of 1.25kb that otherwise produces
-a clean build on my test system:
+  BUG: kernel NULL pointer dereference, address: 0000000000000000
+  RIP: __bh_submit+0x90/0x140
+  Call Trace:
+   jbd2_journal_commit_transaction
+   kjournald2
+   kthread
 
-drivers/block/ublk_drv.c: In function '__ublk_shmem_remove_ranges':
-drivers/block/ublk_drv.c:5573:1: error: the frame size of 1392 bytes is larger than 1280 bytes [-Werror=frame-larger-than=]
+Guard the call the same way.
 
-Maybe half the size is good enough here, so try 32 entries.
-If 64 entries are really required, the array could be dynamically
-allocated, but that would risk an allocation failure.
-
-Fixes: 309e02dccf64 ("ublk: avoid unpinning pages under maple tree spinlock")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: a2c924c240e7 ("buffer: set BIO_COMPLETE_IN_TASK for dropbehind writeback")
+Signed-off-by: Tanawat Jukmongkol <tanawat.jukmon@gmail.com>
 ---
-I have really no idea if the 64 number was significant or just chosen
-to fit within usual stack frames.
----
- drivers/block/ublk_drv.c | 2 +-
+ fs/buffer.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 66eb55e7162e..6fe85aba32ce 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -5531,7 +5531,7 @@ static void ublk_unpin_range_pages(unsigned long base_pfn,
-  *
-  * Returns true if the tree walk completed, false if more ranges remain.
-  */
--#define UBLK_REMOVE_BATCH	64
-+#define UBLK_REMOVE_BATCH	32
- 
- struct ublk_unpin_range {
- 	unsigned long base_pfn;
--- 
-2.53.0
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 427d8a817..4aea0bb08 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1106,7 +1106,7 @@ static void __bh_submit(struct buffer_head *bh, blk_opf_t opf,
 
+ 	bio = bio_alloc(bh->b_bdev, 1, opf, GFP_NOIO);
+
+-	if (folio_test_dropbehind(bh->b_folio) && op_is_write(opf))
++	if (bh->b_folio && folio_test_dropbehind(bh->b_folio) && op_is_write(opf))
+ 		bio_set_flag(bio, BIO_COMPLETE_IN_TASK);
+
+ 	if (IS_ENABLED(CONFIG_FS_ENCRYPTION))
