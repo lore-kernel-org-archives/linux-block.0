@@ -1,123 +1,161 @@
-Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D4B4AF9FD
-	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 17:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789493297; cv=pass; b=IEGrcYMnh64T/DMkpgDKN0IGNSKqMk/VS7kY2cVMEoY8R4vVvqaTMeTepDvh2qRg+kJknrQWUirE7S+Q4VNml+Ji+JPkimV9GjWq7nU2va/lUPmfzZBNTmFRzjbCFSSOcB325Q15aHP9p56DY04+q8ktIhG9UJBUUTkzq+F73dg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789493297; c=relaxed/simple;
-	bh=cXz8ov4bwHxMA/tyqY3Crch8C4r5Qa4kwtPDiQjwdE0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hy4rB/KFnlFribqjM2HIhk1iyRIvxztT9F6Vf58uugO3qu8gjVAKm+0uxemd6Kqdb/fV24U1q1dBk8JwstOJ02bAWdhYNhBUBzplwYemUbNlm3WGoafOVJ8pA/Q30I8VNtafmUBVicEf8KoTZ5Q4Nd2L5BDbQg4+Rg4vTicwR5k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uci.edu; spf=pass smtp.mailfrom=uci.edu; dkim=pass (2048-bit key) header.d=uci.edu header.i=@uci.edu header.b=iAnhVCfC; arc=pass smtp.client-ip=74.125.230.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uci.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uci.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F94C4BCAD6;
+	Tue, 15 Sep 2026 17:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789493807; cv=none; b=W0aRsK9J1GX7P0W9JQnJXPIEBInb7Wy2/Ro3mrb6rWvLaQMxBBByO2zQDGI4wDz2Rl87gTShomx2/YQ6moM0uaCD/7gOGcrm8czEpvxHwP5Xb+LTfnCc2VJqKLqMwshwBEX/eVETl2h9km9buAenaol4ZHNT2wibYvTw4nz6fv0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789493807; c=relaxed/simple;
+	bh=haCJjpvxdy5Wk+oaFaPh7AyDc26SKJkmUlJxZtfxRw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s63CJsFEWyNPUKvW+uH10u5yn89IvEVjVSu/LQtx3jvX98T1l3oEvrsXYvmITHnqiHdKHhClxKc2jB9ghh9GywsaSBMMh1RYNk0r+58fnzLyfMidgRzd8w0AJRk9XduZNd1TYzMu0ftr63LQXL7lQ1qYbqVGDRRtvu6oiNAj3ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OUKMUYKB; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uci.edu header.i=@uci.edu header.b="iAnhVCfC"
-Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-90cdfc9b6ebso172966d6.2
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 10:28:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789493294; cv=none;
-        d=google.com; s=arc-20260327;
-        b=WkjrWFfgvFTCkm+FPKkJvzjwdyQxBYYenIptEpSPr2lIpBEjSoSpWijoOfZ3VgRldQ
-         vQndSqnvsTk4kUOKAKMwsIpUGADqxYWD0Il3CkvBLSM8P3ZBZXG7kiSBpOKPwtNKKhts
-         WNNqgR1hTB+a1qolFuEX0O1WLX9Qlbr80OSh3/8hUfqzj2S08wNDU0kM0gWUFn1skw4v
-         lhD7CiTgl6tXS7zQle924xNqWt2YMj8dkpsMC46VrG6r5NC6r3ilB+FLb9nrp3yYDhNI
-         bvdPGfuTb5zDr3F3IHJ0jF2BmSJ41AcC4cTQ3fNA8Mv+T2cvFQs8BrGwjd8p5663nyiN
-         52EA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cXz8ov4bwHxMA/tyqY3Crch8C4r5Qa4kwtPDiQjwdE0=;
-        fh=VKPVrwyyT14wG427tzszc+fE8CYO989fkh4b08uh75g=;
-        b=N8tiMouk39udsrnwI9Fq2jowal71aRLhBl4d+USzR3bsjieUJm6itrqj8rpxFSA37w
-         8/ZG93R2Tb+MIDeLQP9QUmpQ4RdvJhe8haddwec2+2G/USgkBWHE97mf1cX3X4a78ATG
-         h9b34Gkd4ebCIHDBfPTepqfKZ60be5CZ4zqvSQLIxPLVMHC5OYQHTAvJ5AQi5j25lheh
-         LlZhErdMWN6VYl55ZwVw1upDaR/P6TPng8JSb2kaF2rlxybAN4pCuPsz6IVLll14bozG
-         0nfMq+87kQoynl0xvurUlWpI/yfaRvMatkwnE+bi5HjP4FYTurXIg7qW+G2pITty7nhZ
-         /Sag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=uci.edu; s=google; t=1789493294; x=1790098094; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=cXz8ov4bwHxMA/tyqY3Crch8C4r5Qa4kwtPDiQjwdE0=;
-        b=iAnhVCfC/GstWFVuRgRJqT4FHWl13NHy/zwExXynjnm5UUwuK1tsidgxWQTwSqUx9R
-         iw+pGss6Ol7j5LSJf54+7JMruq5s6Z3ikQxyL8zjpo+Bka5bxohBTljsAVCpmcNt78YA
-         SIPltXHdi2JugNArVzfhsR8X4gEU+dzBj9DGBO4drkD7VsrbavxCH8Murp1LwLblpSQ6
-         aWRcFBUDQEfJ9h8r8ArrMo866/Bt3evWV5F6xJDsQxnX569NPYUqjPqaXBKFT/F6iXja
-         QEvgYl7qyWGnxOpcKwZTloXr+myvGFYdQTOWpzXzP6c/AKdplgya5i4X7g4YfrFhNo6v
-         HyQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789493294; x=1790098094;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cXz8ov4bwHxMA/tyqY3Crch8C4r5Qa4kwtPDiQjwdE0=;
-        b=rbiJxaPVeHcRKnTwWzvk44zZmk8mOtvVsdGt195ZwCO/yHH9q8j8XCrhg75iDMsr/K
-         fR6pZn7D4ZPZAelawYHwGy3oWdNgR9nCQih0N0q5vQzI6vMxX1UYjW6qYr9zZ9M0FeuV
-         SgjvJ18CI81kwg3BX/3geN3+tBilBQuWnA1QOSFgNA8Zcj6Zqx4EIYZFm4E1YvRUE6zn
-         u3LwPtibYJJZJN10NZPveMsS3twvLe0LM+BRdKz++KNRWAIOWHULNKIEJSmCqSztRZIa
-         338v2oyj3Im1kBeuUIC1EtPLa8Rp3V4/ZXOGjNTLEzN7ZmNsE7yVrD3LwYRmMBiTE7wS
-         QZcA==
-X-Forwarded-Encrypted: i=1; AKwUvBzd9CkWTAODClGloEuBDks0QVOScOuks6ilKW0qNmqMtshAbJw00flZkp9JWtN6QSOiI/kIOK9gKFFjkQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++lm0f+hwFQlG/6ho4KAB9hv2vcR8WkSlZ17Xnwzrend7VRntncx
-	5/g4xRhWWGoB+McguErHcKaw4bG916R6Q+5RBXFA1F56GB7SmRpCA0HSdZ6pX84K1N03MI4GdYx
-	vxmOGpIsjvLdqDTa0Wjo30+oTycUJy4sNwVC6Hls3Ow==
-X-Gm-Gg: AYBFou3K+QS4F+YBQhFPR+F+hu1Qsne8/kzFR/qRNXLmHGfETG7DIyGQqXJC8wzz5yb
-	9I4uqFTJqJO/6YXYltr2+nZeqR5pWYi49aZAfFJdPoGBxAiqaAtY6FkkCeoykJSsHP03mVX+PlY
-	f0x3NPSsRq1+ZJZ9bC77UD1q6/raDn3Mp83CtiCyOy1hbYNSkwuTPM/jCh/yxiJve+qa//lGY3H
-	oML5eYZZ3mkIqVUk/fIiwqHym7AHB8Xlsw65/pFg1pN8HVPSdWqtOt0JPycl+9XYx4uBKSwZBMX
-	UGS5wCLQer/yg7D0sZ5eWTmZ8PwJGTiDy9/Ro7C2Xue4dKhQhmnTApRGWCuEu+tBgT5m3TPWt98
-	B2S09PDlOIZg=
-X-Received: by 2002:a05:6214:4285:b0:90e:873f:112b with SMTP id
- 6a1803df08f44-9122e51912amr132309106d6.16.1789493292175; Tue, 15 Sep 2026
- 10:28:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OUKMUYKB"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4hkq2L3yX5zlfvq1;
+	Tue, 15 Sep 2026 17:36:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1789493791; x=1792085792; bh=LVL2tZV2y084omEP1NoRSeYy
+	3Kb1se75ERMKZV3zIek=; b=OUKMUYKB6lvNecxG/ZgpZj3UzwXkM6jAaXYchvLP
+	KR0ApiVEtIW9xipyPkLRyVCC3PnhhfCYVyGc27GTuOznY1szMcrZavU4LUHvRfYz
+	/jBTanELFdbIFLA5jZvqWsplGkUcKZ/y5nnsSua6YH8BnSQ4QyZvuMd52OnpjWFi
+	pDWqM5HnjNA4L3X4A69uOo59/i7t8ZJcedjD4dAgi4z5cmhQgeeshcbasnxTG4+P
+	nkut8ZWie7hIhzylmsOMV8JGcWDHELRfYN/vNKL5wymx3PyloFQkNxdZDvMADcCn
+	L3EnnxKzvmXqBqj2mZ3z4/J0PneATHiDZEKr9Q6YkhrpBA==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id P4eRAqqf1Lb3; Tue, 15 Sep 2026 17:36:31 +0000 (UTC)
+Received: from [IPV6:2a00:79e0:2ed2:d:c609:318c:4379:cce1] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4hkq225l7bzlfvpG;
+	Tue, 15 Sep 2026 17:36:26 +0000 (UTC)
+Message-ID: <e8fd7e8c-4a14-49d6-8bce-16fd44d864b9@acm.org>
+Date: Tue, 15 Sep 2026 10:36:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1789420324.git.pgovind2@uci.edu> <f515b62bb05e7b6bf0bb06c8fdb362486fea25a8.1789420324.git.pgovind2@uci.edu>
- <CANiq72=jRupLtnQSnAewyZZC7q4-oeAVmA=SfBGN+z_nefsnvQ@mail.gmail.com> <CANiq72nPhNRxesnUQ3HKBxtfxUD4r5rPYVQOxbiOAvpEtzUrbA@mail.gmail.com>
-In-Reply-To: <CANiq72nPhNRxesnUQ3HKBxtfxUD4r5rPYVQOxbiOAvpEtzUrbA@mail.gmail.com>
-From: Priya Bala Govindasamy <pgovind2@uci.edu>
-Date: Tue, 15 Sep 2026 10:28:02 -0700
-X-Gm-Features: AcwNN1WfaadzBgQ5koNE2WDSXdYwEBE4lZ6PVotun2aDdrF6D5VwA-Z1FB1DNk4
-Message-ID: <CAPPBnEYRjm80r2v=jBnRS8xGf4WS1g0vo1=xagu+xPxixxb9wA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] rust: block: Fix unsoundness in `Operations::queue_rq`
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: a.hindborg@kernel.org, boqun@kernel.org, ojeda@kernel.org, 
-	rust-for-linux@vger.kernel.org, ardalan@uci.edu, zhiyunq@cs.ucr.edu, 
-	dzueck@uci.edu, 
-	"linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] loop: Perform __loop_clr_fd() after disk->open_mutex
+ is dropped.
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+ Andrew Morton <akpm@linux-foundation.org>, Brian Foster
+ <bfoster@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Hillf Danton <hdanton@sina.com>, Markus Elfring <Markus.Elfring@web.de>,
+ Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+ Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+ linux-block <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org
+References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
+ <9f1273a7-6dfe-46bb-966f-fe08876f4375@I-love.SAKURA.ne.jp>
+ <3883b05e-0a34-43f7-b2a9-a46d2b0c5ffc@acm.org>
+ <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
+ <d89aa722-2d13-4733-b5c1-f0194bf4b342@acm.org>
+ <15037162-0e54-4722-ac7e-c9a863a8a2f7@I-love.SAKURA.ne.jp>
+ <b700652d-ed63-444a-b879-ec2725affaa7@acm.org>
+ <6fdefda9-c7e4-4368-8d9a-280043b4051e@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6fdefda9-c7e4-4368-8d9a-280043b4051e@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-Thanks for your response. I will send a v2 patch addressing the feedback.
+On 9/11/26 6:22 PM, Tetsuo Handa wrote:
+> On 2026/09/12 10:02, Bart Van Assche wrote:
+>> On 9/11/26 3:18 PM, Tetsuo Handa wrote:
+>>> On 2026/09/12 5:03, Bart Van Assche wrote:
+>>>> On 9/10/26 2:44 AM, Tetsuo Handa wrote:
+>>>>> On 2026/09/10 4:33, Bart Van Assche wrote:
+>>>>>> __loop_clr_fd() is queued from the lo_post_release() callback and =
+hence
+>>>>>> may be called concurrently with or after another thread has called
+>>>>>> bdev_open(). Hence, lo->lo->state should be checked instead of ass=
+uming
+>>>>>> that it equals Lo_rundown.
+>>>>>
+>>>>> No, __loop_clr_fd() is queued from the lo_release() callback.
+>>>>
+>>>> Yes, it is *queued* from the lo_release() callback function but ther=
+e is
+>>>> no guarantee that __loop_clr_fd() has started before bdev_open() is
+>>>> called again.
+>>>
+>>> Since lo->lo_state was set to Lo_rundown by lo_release(), lo_open() w=
+ill return -ENXIO.
+>>> What can go wrong if bdev_open() is called again before __loop_clr_fd=
+() starts?
+>>
+>> This breaks LO_FLAGS_AUTOCLEAR, isn't it?
+>=20
+> Why do you think so?
+>=20
+>    App1                   App2                   system_long_wq
+>    Calls lo_release().
+>      Schedules __loop_clr_fd().
+>                           Calls lo_open() but fails with -ENXIO.
+>                                                  Starts __loop_clr_fd()=
+.
+>    Calls lo_post_release().
+>      Starts waiting for completion of __loop_clr_fd().
+>                                                  Finishes __loop_clr_fd=
+().
+>      Finishes waiting for completion of __loop_clr_fd().
+>=20
+>    Calls lo_open() again and succeeds.
+>                           Calls lo_open() again and succeeds.
+>=20
+> App1's open() after close() is succeeding.
+> App2's open() being temporarily failing with -ENXIO should be acceptabl=
+e.
+> If App2 wants to avoid repeatedly failing with -ENXIO, App2 should use
+> ioctl(LOOP_CTL_GET_FREE) before open().
 
-Best regards,
-Priya
+Userspace applications and tests (such as mount/umount, losetup,=20
+systemd, and xfstests) expect that:
+1. Teardown of a loop device with LO_FLAGS_AUTOCLEAR completes
+    synchronously during the final close() (in lo_release()), releasing
+    the backing file references (fput()).
+2. Calling open() immediately after close() succeeds (allowing the loop
+    device to be immediately reallocated, reopened, or configured in
+    Lo_unbound state).
 
+There is evidence of this in the history of drivers/block/loop.c:
+* The Asynchronous Autoclear Regression & Revert (Commits 322c4293ecc5
+   and bf23747ee053) In December 2021, commit 322c4293ecc5
+   ("loop: make autoclear operation asynchronous") attempted to break a
+   circular lock dependency by offloading autoclear (__loop_clr_fd())
+   from lo_release() to a workqueue (system_long_wq).
+* In February 2022, commit bf23747ee053 ("loop: revert 'make autoclear
+   operation asynchronous'") had to revert that change after xfstests
+   broke. The commit message explicitly states:
 
-On Mon, Sep 14, 2026 at 11:55=E2=80=AFPM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Tue, Sep 15, 2026 at 6:39=E2=80=AFAM Miguel Ojeda
-> <miguel.ojeda.sandonis@gmail.com> wrote:
-> >
-> > Finally, it is usually nice to provide a simple example when possible
-> > of the safe code that triggers the issue.
->
-> Ah, in case it helps: the cover letter was on my spam folder -- I see
-> you provided a full example there, thanks (it may still be nice to
-> show the key bits in the commit message, e.g. the part of the impl
-> that goes wrong), since that is what will be kept in the Git log.
->
-> Cheers,
-> Miguel
+   "The kernel test robot is reporting that xfstest which does
+
+ =C2=A0=C2=A0=C2=A0=C2=A0umount ext2 on xfs
+ =C2=A0=C2=A0=C2=A0=C2=A0umount xfs
+
+   sequence started failing, for commit 322c4293ecc58110 ("loop: make
+   autoclear operation asynchronous") removed a guarantee that fput() of
+   backing file is processed before lo_release() from close() returns to
+   user mode."
+
+   When autoclear was asynchronous, close() returned before the device
+   was unbound and before the backing file was released, breaking
+   immediate reuse and subsequent filesystem unmounts.
+
+Bart.
