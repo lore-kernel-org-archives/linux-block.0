@@ -1,161 +1,184 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D4A248881;
-	Tue, 15 Sep 2026 07:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B628A48A2C3
+	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 08:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789457723; cv=none; b=okD9G9XHGDgJXau8PVbpObR2yE5HbWg5rZ0KFjuO0hF3XERFtswR50/h2jy1kwOHPD7DkMUyRhx4nZ9pCaSAeY2gE5W6B/M4rxYR6ttiGyhcQNPVdqSOuArdBI7wtikXf38/5h580z2jGfVlSByDYDB6cah56SuRaUjEAO/1AgU=
+	t=1789461255; cv=none; b=KnM+YPDi/r93owMfwyNEIaDUwxLQG81ZKtqXM/fd3SG+HCo/rbQJyKfHCXGXg0tubMVn/ooeda1TCMG5FTqKk4hDK6emUaeci9/3zK7kp4aQCkz5bkvXtwlUyU/LrpVp9cCrI+EFDivMMTqAOVeySB2L6uzT+P0r8eKj7LlRasU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789457723; c=relaxed/simple;
-	bh=HKRtLYYt8Toe4P03Ofg4HMYivWkaKC32Te+XVYJYQYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fNbq4R9448911LH4uaJSS6OOxheQu/oqtEoGpyrMa0sChNDmguLt3/W5/914TwCsmtVI4VBw5pVRWkpB0Fanmm6Xbrrd0qUSL18U4AlO4aiKaJ5yOtD/ZJHk6W7zIO/csOpZVYDZbmE3sxIY2HsDdtTgcz+QIEu3iJgDjSu+Jrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MSN6bD0T; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1789461255; c=relaxed/simple;
+	bh=mMnIRUx9uBCAogbRbbeRXnqqhUuA70DoXdIBREBFHxM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lsusStEvDfpjt4QIBTmiT5bo5klPy27KBMxnA8QKcA+XQKHgFHbHD3xIXGFWNHUCCiOdPU7PuyaDFvPpDXcj8Jw21WgjpjW0+QInnrgJpW3ICmQjpcTpDeaurJpkYEi/sz+hRohkwY7fpzmBcdA0hipU61haEjB4FmJVu6XGbVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Ip5cVX3N; arc=none smtp.client-ip=74.125.227.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MSN6bD0T"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68F71qss4192863;
-	Tue, 15 Sep 2026 07:34:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=PWgvjmXGp2Zm7s53A3DZQaedkDL7MS
-	jIBZBtGkdgJOg=; b=MSN6bD0TeHYr9Zb80Zs23fo7S3EgpRzjhgVS87iWaT5PLC
-	FrOGZ1NV+gldILCi2r6kaJxXG0m5iFZQQLnSHs2v0pz/+cQRJ2e7ps4wYSFwCgUa
-	6XyV10niZBy/7QnMxs7cp0HBH7AuUu41/3lt7v3m/Ug0syEUf9bMkcdgrurtH+2A
-	mYBIcYTsBwP0e1wtNMX0sNT/lh1gMWYfX6JlJw2V+vROa8Z0sWVT9DlukWOeWVjv
-	BlNiqZ0pgpA/0uI0pN0vL1WvBexE6Ags5mqZ+fJmtHjz0Be6i0P3jc43T2Vo8Vz8
-	WNbUVvle6lrrjGD78rMnlae6VEqYyX8n39x9tIsw==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmv5hnwtr-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 15 Sep 2026 07:34:57 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68F6ZIek3523888;
-	Tue, 15 Sep 2026 07:34:57 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gpyxs8c0c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Sep 2026 07:34:57 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68F7YtWq44761590
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Sep 2026 07:34:55 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F03EF2004B;
-	Tue, 15 Sep 2026 07:34:54 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C0FA20043;
-	Tue, 15 Sep 2026 07:34:50 +0000 (GMT)
-Received: from li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com (unknown [9.39.20.92])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 15 Sep 2026 07:34:50 +0000 (GMT)
-Date: Tue, 15 Sep 2026 13:04:47 +0530
-From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Jan Kara <jack@suse.cz>, "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Baokun Li <libaokun@linux.alibaba.com>,
-        "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-        Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>,
-        John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC] ext4: never fall back to buffered I/O for atomic
- direct writes
-Message-ID: <aqj1F2drbqLEVmSm@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
-References: <20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002@columbia.edu>
- <vgxva24firqq6eqt2wyovm6uqh356nvrsb35exzxtnxftspy3w@gb7uiv4gwets>
- <03907742-fc59-4d31-b12d-760a67e163a6@columbia.edu>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Ip5cVX3N"
+Received: by mail-pj2-f13.google.com with SMTP id d9443c01a7336-2d747ee1f9bso31328015ad.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 01:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1789461252; x=1790066052; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=vwYuAUVTEM1KZY8XIMf3dOzuS7TDv0+6YLYzPNZ/wUM=;
+        b=Ip5cVX3N28zPJTWC1Di5w4pkmN0nB5Gto/nBoZ2F5TmhCc3X+QjzbTSx1zVfj1LJa2
+         EPDo7sU4SEy0m+Im2nnuMMev124T0D9fBxDAr9btY33qT5929l7HyQS+vOQKRDWOPCos
+         PTzr+ziGt4U2maKgE12QLzqZNMDltAeRyOJKlzdB+rikOhfPd0LG89pX5pszsEI1o7WC
+         TeP5x79aCxbPMJnln+newI2IAblnQctppRquuroYzzEVnn1RtVvS5IEQw52AvlD6Nzje
+         pOXKrzIAWGkrO7OZmM+O+RUX3bNa+4qdVLy97SmJn1r4OmnUCDH/eXUkI4bbAXwIQVxQ
+         T2IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789461252; x=1790066052;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=vwYuAUVTEM1KZY8XIMf3dOzuS7TDv0+6YLYzPNZ/wUM=;
+        b=VrhCvKoTgEIbwXCX6oXK/w8+ACkm1wWK2LsstkCtN1uWnWIIC2EeARnVtGRsIvLiBn
+         BjrKZhIjw9Jv6GBmZYGSuTNxENSDNrDs1JcsoOijU3xSaXuAUJ1QSw568ihO2ZVHrYW4
+         Uw/4NpFi1CwUtSMTZFV2DMy8xwAE1Sota8e+Db9yr6x37uF4BEUI57knK99YPwjy96iU
+         7gZhaVOKGAgNcBpZPvHO2d2vUw2okqdxFLvsJuuehjmkiZkshHrdA136zNCFMaMHv95q
+         6ZyYdXdpzeE98TVBxxWlFS1xmDHOQ4mYhhP2Nry5lDmmqQmmpQ8OH357VfHefv4XicF5
+         PFpA==
+X-Gm-Message-State: AFuF++mPALsta+RRR4It1lr32TXg0dRq9A/rJ0UsmBSGyYUC28qdpl6q
+	alz+Yj9TjmByIr9aUjqlRb+0dqjDsRo8LWIX/8f63mNtky6pwwCNeWAL90bi5JxCHrS6Mzc+gCW
+	x2H1Gmzs=
+X-Gm-Gg: AYBFou3r8jt/JKmG3akrWE0/RIUH0JAMYt+0BN+WXCM8X1gwcvCXH2x3GTqW7Aw8W6n
+	y5tZrjWISw/ieYYnURzq/sk7IbsTIY92gEz0iO1bMEhYAC5bjkLThAfyDUi/MziFKZiUw4PZG/4
+	Jt6XUPnEDP8uWU1oDwqxPhtb5/Wit/k1x2cnb2E9i1882cBdaKLS6mwnGKojpTu5LTC9Ig+yeid
+	jTS2lPWK9xS15EW+SdQN230XUeiQKFD1PYh13ZIOTXbLXi1MnvdW3nxoRNXVK3N2Zd5bJXnrDIi
+	IWPAUnz05xiBz8RY+qv2BxuKDO2lZizYnXPe4jD7y3MoA2kB/MRn/7qA3algKTuFVOfmE6hQ3Mc
+	BCEcxCoypRsQAG0xY+QMZhInnQ1F6oqH16xLXx+Qc5ela1XikCQxv66A87PWebzIB5QaoSWG88x
+	qkniIM2T366TGdey8mHhUUZ0Y9y1w8M0J9gRUkmomR5v8NfZUq+4CfKJ3EwOcjLVIvqGbf8s55
+X-Received: by 2002:a17:902:fc4c:b0:2d9:123c:8c49 with SMTP id d9443c01a7336-2dd6c6db8b7mr146833195ad.14.1789461251905;
+        Tue, 15 Sep 2026 01:34:11 -0700 (PDT)
+Received: from localhost ([106.38.226.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2dd2cca268csm62498695ad.1.2026.09.15.01.34.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 01:34:11 -0700 (PDT)
+From: Julian Sun <sunjunchao@bytedance.com>
+To: linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org
+Cc: axboe@kernel.dk,
+	hannes@cmpxchg.org,
+	mhocko@kernel.org,
+	roman.gushchin@linux.dev,
+	shakeel.butt@linux.dev,
+	muchun.song@linux.dev,
+	willy@infradead.org,
+	jack@suse.cz,
+	tj@kernel.org,
+	akpm@linux-foundation.org
+Subject: [PATCH v5 0/3] memcg,writeback: flush foreign bdev mappings separately
+Date: Tue, 15 Sep 2026 16:34:03 +0800
+Message-Id: <20260915083406.3471036-1-sunjunchao@bytedance.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <03907742-fc59-4d31-b12d-760a67e163a6@columbia.edu>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE1MDEwNyBTYWx0ZWRfX0G1yeIMmher3
- jvPnybfjQOmrDpsyuEquUHn5fjGkozsuJfHbisP2wBF7mgFvm17R+cGsQ9fmA1GNjaBf1tMdct6
- J8WZLxZULR/aQAolvZ61B/8DSkoXxph4WeuAXJ4zjMowGvn9pm+u5sbma6r4sXB4RR6r3Pn21SX
- ce7CwPdqZhh9f8zTolEUFdpnJHZ53+IpzAU4TrW8h9H3yMo+B5KlgSOPKid6X52UbFle9PzavVF
- 7DHDvHwyZBsHwtIk4U/ESi/SE7ERrl+HeKQTqehietp8HX1ajGSBaFhtygiF7jQUFnJhhY27aCl
- fVKFbfxUy28A6DLH4f68NSoLbYKpv95ovmAiGPOg97vRYKM35YsKEDodpdVhe/qGtOnfJeI1U/2
- 1u/E3RhTdPltXj3kJiIPxCnn4HgTbIg7nOIGsMsskuz4+ZrGfSLB1ZElOry13VSpnXe8gHuuog3
- w+Y1F9mKVxI1okzv4vQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE1MDEwNyBTYWx0ZWRfX1HkQq7qg7Thi
- ErKfONHwuiTQ14oorDmqplJi4r0V+6f6T6ZzuyRC/5GQBAOZzsaQ2yjj6G61GCzOOkUiRlWAuuJ
- Hwmb7fhw4kvVCp2G/Yc17OBVyKaQVqY=
-X-Authority-Analysis: v=2.4 cv=Zsx4uN7G c=1 sm=1 tr=0 ts=6aa8f522 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=c92rfblmAAAA:8
- a=5l271pzm8Fzoa8UtYScA:9 a=CjuIK1q_8ugA:10 a=GvGzcOZaWPEFPQC_NcjD:22
-X-Proofpoint-ORIG-GUID: NB7Z35pS9rB9-1mJTKFnv-8zwlU-8umW
-X-Proofpoint-GUID: VPZJfKRNAEsVdKqDOfb8IRICzyjqB3j_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-15_02,2026-09-14_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 impostorscore=0 clxscore=1011 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609150107
+Content-Transfer-Encoding: 8bit
 
-On Sun, Sep 13, 2026 at 07:18:37PM -0400, Tal Zussman wrote:
-> On 9/10/26 6:58 AM, Jan Kara wrote:
-> > I agree your patch makes things better but I have a question: are short
-> > writes (even 0) allowed for atomic writes? I don't think so as far as my
-> > understanding of atomic writes goes (and based on what I could find in the
-> > code). But after your change we'd just return short write (including ret ==
-> > 0) now which doesn't look ideal and also doesn't match your "so any future
-> > bug yields an error rather than a torn write with a WARN()" description. So
-> > as a futureproofing I'd maybe suggest just:
-> > 
-> > 	if (WARN_ON_ONCE(iocb->ki_flags & IOCB_ATOMIC && ret >= 0 &&
-> > 			 iov_iter_count(from)))
-> > 		ret = -EIO; /* or maybe -ENOPROTOOPT??? */
-> > 
-> > before the fallback to buffered IO as a more robust solution.
-> > 
-> 
-> Short writes shouldn't be allowed, so this is definitely better in terms of
-> future-proofing. I'll do this with EIO but with the if (WARN_ON_ONCE())
-> inside the existing ret and iov_iter_count() check to avoid duplicating the
-> checks.
+Hi,
 
-Hi Tal, Jan,
+This series avoids owner-wide foreign writeback triggered by dirtying
+shared bdev inodes. Instead, it tracks bdev targets separately and
+schedules writeback of their mappings.
 
-AFAICR the WARN_ON was mostly precautionary as we ensure in the dio path
-that a during submission we ensure a write will not tear else we return
-an error. Sure we can go with Jan's suggestion but  I think either ways,
-if we hit that WARN_ON at that point we have already torn the write so
-it is actually a BUG in the sense that we have not honored the
-RWF_ATOMIC contract, but hopefully that will not happen.
+Problem
+=======
 
-> 
-> It looks like Sashiko also found a pre-existing issue where an atomic request
-> can be done non-atomically [1]. I'll see if I can reproduce it and add a fix
-> as a second patch in v2.
+Bdev inodes are commonly shared by many memcgs. Dirtying their pages
+can cause the owner wb to be tracked as foreign, triggering writeback
+of the entire wb rather than just the bdev mapping.
 
-Looking at Sashiko's comment, it does seem like a valid issue. A simple
-test would be to create an inode with inline data after mounting with -o
-inline_data which should force ext4_should_use_dio() to return false.
+In production, almost all the foreign dirtying we traced came from bdev
+inodes. Across our observations, a bdev mapping had as little as about
+10 MiB of dirty pages, yet foreign flushes targeted the entire owner
+wb. On one machine, we observed 599 such works queued on one wb, with
+an average request budget of about 43 GiB per work.
 
-Return,
-ojaswin
+Measured impact
+===============
 
-> 
-> Thanks,
-> Tal
+The synthetic test used a VM with 4 vCPUs, 8 GiB RAM, ext4 and cgroup
+v2, with device write bandwidth capped at 200 MiB/s. Background fio
+repeatedly overwrote a 256 MiB file using buffered I/O, while
+foreground fio performed sequential direct writes. Four memcgs
+generated metadata and buffered writes to trigger foreign flushes.
 
+We measured completed block writes to the background fio file,
+including final sync, and foreground fio bandwidth, latency and
+completion time.
 
-> 
-> [1] https://sashiko.dev/#/patchset/20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002%40columbia.edu?part=1
-> 
-> 
+Across three runs per kernel, mean background file write I/O decreased
+by 72.7%, foreground bandwidth increased by 23.0%, and completion time
+decreased by 18.8%.
+
+Metric                         Baseline    Patched     Change
+Background file write I/O (GiB)    6.154      1.680     -72.7%
+Foreground bandwidth (MiB/s)      150.29     184.81     +23.0%
+Foreground completion time (s)   109.203     88.652     -18.8%
+Foreground mean latency (ms)      212.84     172.74     -18.8%
+
+How it helps
+============
+
+Frequent writeback of the file overwritten by background fio reduces
+the opportunity to coalesce buffered writes in the page cache.
+Several overwrites of the same page can otherwise result in a single
+write of its latest contents. Flushing between updates instead writes
+the same page repeatedly, generating more device I/O for the same
+application writes.
+
+This additional I/O makes the device reach its performance limit
+more easily and competes with foreground I/O for device bandwidth.
+
+The benefit is expected to be most pronounced when these conditions
+occur together on the same device:
+
+1. Limited device bandwidth, as with an HDD, makes the additional
+   writeback I/O more likely to saturate the device.
+2. Multiple cgroups perform buffered overwrites. Frequent foreign
+   writeback reduces write coalescing and increases device I/O.
+3. Concurrent direct I/O bypasses the page cache and competes directly
+   with writeback I/O for device bandwidth.
+
+Approach
+========
+
+Following Jan's suggestion, this series records foreign bdev targets
+separately and flushes their mappings instead of their owner wbs. This
+preserves a way for dirty throttling to initiate bdev writeback while
+avoiding owner-wide writeback triggered by these records. The existing
+foreign-wb mechanism remains unchanged for other inodes.
+
+Tracking is best effort: each memcg keeps a bounded set of device
+numbers without persistent device or inode references. Closed devices
+and devices with a busy open_mutex are skipped. Device removal and
+device-number reuse may race with lookup.
+
+Flushes run asynchronously on a dedicated workqueue to isolate these
+frequently triggered tasks from existing workqueue users. If workqueue
+allocation fails, the existing foreign-wb mechanism remains in use.
+
+Thanks.
+
+Julian Sun (3):
+  block: introduce bdev_flush_by_dev()
+  memcg,writeback: flush foreign bdev mappings separately from owner wbs
+  writeback: record bdev targets in foreign writeback tracepoints
+
+ block/bdev.c                     |  24 +++++++
+ include/linux/blkdev.h           |   1 +
+ include/linux/memcontrol.h       |  15 ++++
+ include/trace/events/writeback.h |  22 +++---
+ mm/memcontrol.c                  | 113 ++++++++++++++++++++++++++++---
+ 5 files changed, 157 insertions(+), 18 deletions(-)
+
+-- 
+2.39.5
