@@ -1,118 +1,102 @@
-Received: from mail-oo2-f2.google.com (mail-oo2-f2.google.com [74.125.231.130])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E66382F0C
-	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 01:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30703CF1E0
+	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 01:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789436017; cv=none; b=aVJzJ7URSYIphfZEenuypkhzFkCltxYCWJR3tXmy/+KTFYdOcj8bR4M9eoRmFhOZA6Zj94220gILgDJT4JJSNSNQj6FFU+C8VNxCJqVQ09yQqq2wLT6rvG8V1+bHfwVU3oPKQRsvLdBed+4AnM7mRr8VibPk0sc+F6xMvI7bek0=
+	t=1789437475; cv=none; b=a689Y8Aq0sSubyyjSlxkxIZGD9/M/pRTLIZI5+JLsETj1Yhdd4EMHPmssOygsKO1vwJTXBGukgc0fR5GnS1Aws+qMrN/Hq0b8Gfsmh8NxggP/dhiDeGOP/ch0mrJEMh5zKIlJkj1EAUi/GfcPHwO547l9jXBL3kS7XjqJn9HGgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789436017; c=relaxed/simple;
-	bh=cfKk5FoxDTMqLNBEB4oPfs+wb8JELser8oC7VI8XvkQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=H3lugme7yLhpRcIWCDGIMCzneyj0j9BtfZrsLIsuT2/fxGmWC66HdgApIoZxMeErqC8HY8yn6PJo9x62lvT3wEVVNLXsTjMbg+mah6lfVczTbf40DGGKzrYcXfbjJSaTPfeh/nU0KK5tPt9W3V0lZQch/Wkiw4UKYfapn6NnjrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo2-f2.google.com with SMTP id 006d021491bc7-6bd3ee01a0dso1489899eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 18:33:34 -0700 (PDT)
+	s=arc-20240116; t=1789437475; c=relaxed/simple;
+	bh=RzPgH/3eGo+TdM3AJC5ylErp3efZkoBM2RxE6XOg6z8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cK/ePNrnSmC4fH+tKJ/lLpMtQlRmX22qXEu+g5CbkhFv4tCw1c7QxERFpj4aEPQqx5/CNRuI5VXDNPBrCGMbFzWw+8+GpkWyhZPvS/BKNUxD2Rpu8US3iWrIrKwU9yY8KlL5dGlRqHQKO275NpQvpmtjyFS+gKxs4yX3+C1oXew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oTquKce7; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oTquKce7"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-86ec25cf7ecso459586b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 18:57:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789437473; x=1790042273; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=8LtHfoqQuWljZWMj5fNvShJKWJ7Eo3q2bY3EGg9Y51M=;
+        b=oTquKce7kKml8UudqBdJjRYYXkK7xVBS0OZtZssEc4L6A8jL91zwz31t7CCC2AfJ9Z
+         M6F4E01S2fn/GKHTMMVFxIOZWofX6DrXzM3ILW+siPw8AOLa6PutVF8DwY7lkBmZ1KjL
+         3BUeL4nljRO+69XLDcCYzoTyhMaU9DShKdjHA4bl0Bc/GAaohyhYb1StPRgvGdc7Sudh
+         +6fz4fEmatET/8zD5q541u5TQcuHAcb3wtfPgA3B8oG64DfAWAXpbYq4s6MsO9L70aiv
+         oAKLAQBYwHQH8nlxVXejuT++l3BtE43uKUXqQAQOsHwH3/55s3wRd94FgbWVBWvWpAT9
+         c31A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789436013; x=1790040813;
-        h=content-type:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Y1RMj3nj6Oa60Do6JMC79RJ4/ktrXyj0vc2+aB9ZeLw=;
-        b=IYePbBLOzLpr25NeTgohRLVPF4fCZ+jzwb6y9rDoWRhmp79FwiQ7tm1h8oZ2EKETrC
-         fxCGWh83R1dafZqX2cubgUu/jG51gbjG6v5H2QvtrRsmBXocBGlnuxHvQP3qxhduNjxg
-         Zhh2In3XKZxXwTTKpBFfO380C5tUrWITCSzvkOyXj9EjGDm+d3yEZzUamHBhn84mRX0Z
-         UGS261oeB2DBrFrsuLiGDLUNofMx18ZiDkWIcdyOsB8d1Dm88j4JmJ0IBRl+FDypMCHQ
-         31aSMZqagZfeXq32x2bvo6unlX78+G04T+q3JwJTDAIQX76FPQto77y939ab0nwwsccb
-         gaVg==
-X-Forwarded-Encrypted: i=1; AKwUvBy5KgaKlL3B0fr07Ouy0UIKGLf/fBZtrPiArludhoqXI/ywifAU3l0SA8QnBKSz/uq6qgZPhF5zR0QDJw==@vger.kernel.org
-X-Gm-Message-State: AFuF++mHlPy8XQ80LWR0fJsUgbJZ6rhZNrwfxLc8ZCANFybXB9VPpsuF
-	truinNL80xP55AD5CTLECHzw0f8LwDxsTbLDCYDTibGb15NbClTE0a/VrKLj2UizKvJ/84QNEOT
-	JaT0pESHGlaSN9B652cpCsqwf0CTwjH+eXhDnqaRoGw1pb/BfotbrOMTB8VM=
+        d=1e100.net; s=20260707; t=1789437473; x=1790042273;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8LtHfoqQuWljZWMj5fNvShJKWJ7Eo3q2bY3EGg9Y51M=;
+        b=yCGbueXIrAIBJ/sTFc5E72J8OGfu3xawQ3jYxTGvzKQHbVI2gaWwMz6Ow23FuFat1t
+         aWypOXO4Ad09a25FNLaedWWkL5xE3r+bpV/wFBQKB3uQohybbf25kJx83vZhb71xKkIm
+         Yl4vvzxbS6ILenEtqAyb4BtxhQIdrlLCe3ZQaK6lLuLY9oWquMkOWP2QB2itz4KQEmaD
+         7vsjbcoNIP8ZB7jadd4u1vqH0WE/y+d67h6lOEhI0ndB84B11KEQWsb3FPGAhrr3XWsN
+         8bQZxG714EqVzqmCNP+3DddEUFRopnPPr5DcwthpfOQnXnYEbsFa69ZNMiMRnyBE+Cyc
+         Gvrw==
+X-Forwarded-Encrypted: i=1; AKwUvBypr/12dL2lCtr+vbYOjvqQnDRzVoFc0if55aIni7By/6Vm6vabjOweBePHrdjq5eb4PCyVQ1oOX9eoKA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mNrZ1Fd/yOJsglAsHQHb7P83G/HymtATnVbF0FWa/oUCujU6q/
+	aI1imYeWfbZ0ZLkQlBICqHOv6xA4X4LdrBdf/hL9OTkWVnW4VgdroYcK
+X-Gm-Gg: AYBFou0bNs6T/NxsS+gmo71COyGQphAAimS+z3gRRCSw09rGgsPpd2LDFsTzs5+dQcz
+	IUEw40HDMkZR3nEZdsHUxxg/qX8eIZ4xtXI5d0Ah9VKzLvagcdjMc2yuhd9r9nGpRNwN8N5GtcL
+	ovpEBL3HEV+qo4N1TOkvw483h40G1ZdHjsbFGF5CEJtw+ZL2YA/jZolPrA795FWo4KP2aWl0Ft6
+	Z7PrqWPbfPpgKLfu0xbflp/lGeC7ZF/CHAwbWxhpxmV5XZjjJn0PY1iyZULl4/sLOJnooV55Y+R
+	tsSo5pOKX4/0jsSzjBPAU1P0Ln5P42KJME6Eq08zPpEn5xebLM2K4HjE2pjoOR1eJT1TRVQ5Z+5
+	VtUC6/mr3eN1px2GAnOldpE2AYxDUcyAt81Vo9asDwKXAS7yxAUjQ2lZdLCJAggC1wHZqG3YYUr
+	LvqAiLyLHgHn8SEe6rVT9qPfmmU8kPrShtMXKYP7EUhTg6zbQiBSAKatNbvScz2fteirLvsaLJh
+	PHZn5j1KgSEAC6nTLZcbnzyfIepbuAd
+X-Received: by 2002:a05:6a00:3a01:b0:86d:117e:5db3 with SMTP id d2e1a72fcca58-8708c45f131mr2265230b3a.26.1789437472373;
+        Mon, 14 Sep 2026 18:57:52 -0700 (PDT)
+Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-86b6139e3bfsm5231011b3a.50.2026.09.14.18.57.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Sep 2026 18:57:51 -0700 (PDT)
+From: Wenjie Qi <qwjhust@gmail.com>
+To: jaegeuk@kernel.org,
+	chao@kernel.org
+Cc: linux-f2fs-devel@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	hch@lst.de,
+	jack@suse.cz,
+	axboe@kernel.dk,
+	tz2294@columbia.edu,
+	baohua@kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	qiwenjie@xiaomi.com,
+	qwjhust@gmail.com
+Subject: Re: [PATCH v5 0/2] f2fs: enable buffered RWF_DONTCACHE
+Date: Tue, 15 Sep 2026 09:57:45 +0800
+Message-ID: <20260915100000.1789437600-1-qwjhust@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1788795700.git.qiwenjie@xiaomi.com>
+References: <cover.1788438786.git.qiwenjie@xiaomi.com> <cover.1788795700.git.qiwenjie@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c99:b0:6b7:83c5:fde9 with SMTP id
- 006d021491bc7-6c5447a22b4mr2757507eaf.42.1789436013716; Mon, 14 Sep 2026
- 18:33:33 -0700 (PDT)
-Date: Mon, 14 Sep 2026 18:33:33 -0700
-In-Reply-To: <6a926eaf.1d9ded08.62e62.0102.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6aa8a06d.4c28b7d0.c1bba.0027.GAE@google.com>
-Subject: Re: [syzbot] [block?] BUG: corrupted list in blk_mq_request_bypass_insert
-From: syzbot <syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, kbusch@kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+Hi Jaegeuk and Chao,
 
-HEAD commit:    5445d6419962 arm64: Don't read GMID_EL1 when MTE is disabled
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=121f2115580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=56ed23170c168d4c
-dashboard link: https://syzkaller.appspot.com/bug?extid=f4353e96f7004ae5a09e
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161f2115580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110a75f9580000
+Friendly ping on this series.  v5 includes the mixed-bio completion update,
+the syzbot NULL-kiocb fix, and the additional memory-pressure data.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e8b70e3bd109/disk-5445d641.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e5227e56ac93/vmlinux-5445d641.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/54905f78be59/Image-5445d641.gz.xz
+Please let me know if this direction is acceptable or if another revision is
+needed.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f4353e96f7004ae5a09e@syzkaller.appspotmail.com
-
- non-slab/vmalloc memory
-list_add corruption. prev->next should be next (ffff0000c7fc2840), but was ffff0000c83b0048. (prev=ffff0000c83b0048).
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:34!
-Internal error: Oops - BUG: 00000000f2000800 [#1]  SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 4354 Comm: kworker/0:1H Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/14/2026
-Workqueue: kblockd blk_mq_requeue_work
-pstate: 63400005 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32
-lr : __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32
-sp : ffff800094547a10
-x29: ffff800094547a10 x28: ffff800094547ac8 x27: ffff800094547ac0
-x26: 1fffe00018ff8509 x25: ffff0000c7fc2840 x24: ffff0000c7fc2848
-x23: 1fffe00019076009 x22: dfff800000000000 x21: ffff0000c83b0048
-x20: ffff0000c83b0048 x19: ffff0000c7fc2840 x18: 1fffe00035b9ec28
-x17: 3034383263663763 x16: 3030303066666666 x15: 28207478656e2065
-x14: 6220646c756f6873 x13: 0000000000000001 x12: 0000000000000003
-x11: 0000000000000000 x10: 0000000000000002 x9 : 1fe110670cc49300
-x8 : 1fe110670cc49300 x7 : ffff80008048e314 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff800080498f8c
-x2 : 0000000100000001 x1 : ffff0000d6353b00 x0 : 0000000000000075
-Call trace:
- __list_add_valid_or_report+0x144/0x148 lib/list_debug.c:32 (P)
- __list_add_valid include/linux/list.h:104 [inline]
- __list_add include/linux/list.h:169 [inline]
- list_add_tail include/linux/list.h:206 [inline]
- blk_mq_request_bypass_insert+0x130/0x1cc block/blk-mq.c:2551
- blk_mq_requeue_work+0x3a4/0x52c block/blk-mq.c:1560
- process_one_work kernel/workqueue.c:3387 [inline]
- process_scheduled_works+0x91c/0x1250 kernel/workqueue.c:3470
- worker_thread+0x798/0xbd0 kernel/workqueue.c:3551
- kthread+0x304/0x3d4 kernel/kthread.c:436
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:838
-Code: 91170000 aa1303e1 aa1403e3 979ab1d1 (d4210000) 
----[ end trace 0000000000000000 ]---
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Thanks,
+Wenjie
