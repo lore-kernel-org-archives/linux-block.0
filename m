@@ -1,36 +1,31 @@
-Received: from mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665A43BFAC0
-	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 21:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB372FD7B1;
+	Tue, 15 Sep 2026 22:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789507790; cv=none; b=S0NXCGF+cVXRZRx/6mEupEu6DR4LcFDR8JqqKetx/S2xOEhJvNFBb64OqkMyUW3AdPwB6ztxL6whEvxN1PNBHEMx2ry9KcTJwCbi65mw+HqM6qDQkXAyU9wCH7M+4UbLQVU6Hk8UHyTkRCIMGE4WOB1FOM4gA7iiHufKsKMl9Ks=
+	t=1789511991; cv=none; b=ZWywRlvKHhllzxtHTxZcXIYKHJI0v2ilQ6jdnU4Ya5TrCs1mlGDQAdJMcv1pKb9S6NYtpBr2bmpMiGMVTMq0m6edZUG+liNDO4ciIOWWkhwpMn6JgJ2T5l+aeq6IF4eN+5+9ZVuMPSOqHg+/EKLBad9jfRy0ZcV1zg73d2ov54E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789507790; c=relaxed/simple;
-	bh=yx5Fr+divRbcs9QYGD9iNt36K1csv117Cvf/nf+9DGk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=P81KgPJs2fVVWzzd99fuGdlBzyr5a9igOU2014s2PxGqt8cJ8HOT/weKhht0DRA2zfSKCBzdPYgecs1L4di19sGbNpYGbSGb4J4QioqyRSCwpd2GDUVfRwyuTahUQ7/vNlAFwCnzyCobrirxwSKjftkCiv0/hbs9Q3PQqIylpdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NXScDh/5; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NXScDh/5"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=yx5Fr+divRbcs9QYGD9iNt36K1csv117Cvf/nf+9DGk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789507786; v=1; x=1790112586;
- b=NXScDh/5Kt6PuKHPxL8z2ZNGhXF8x8/+5McOWFwZYhBW3qHEv+AKZC6UXAAqOu4hwJEiYOMb
- /Gwl6Fop+kcDDxbep9x4DlSkciBHFXbLIalkRTYC3C4Ej3eiyq0v3Q3Vfrf0irBpmZa7L1nIZuU
- dUbrwAKuaFlUh1iSEAxI5DDQ=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id bf330ec59736de2f;
-	Tue, 15 Sep 2026 21:29:36 +0000
-X-Mizu-Trace-ID: bf330ec59736de2f
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <829d5857-6f28-44c2-ba9a-d9b7a3069b89@linux.dev>
-Date: Tue, 15 Sep 2026 23:29:31 +0200
+	s=arc-20240116; t=1789511991; c=relaxed/simple;
+	bh=BytfvsOQXDGpqrDU7apJCC+qNjb/4afOahQqHgZcpQE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lKxieleDj85iUUxwyxf7komV5MAwo/uUgXlVE5iHr6p2hBIwtZO5WOO6poN3ZJ3YpDXz7Xl6xK3RqgFbu3rQXoeIWYNGSCgFB2tpAxK6YsEVcQy/GEvEhYQje2zOjWKuo6wvZo0fBlbbnX2Zy2GbHUZCVmR8xrAC3zRR4VQ82Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68FMciqg048547;
+	Wed, 16 Sep 2026 07:38:44 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68FMci0x048544
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 16 Sep 2026 07:38:44 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <2dd38a68-4ceb-48d5-953d-7ea2c7122418@I-love.SAKURA.ne.jp>
+Date: Wed, 16 Sep 2026 07:38:43 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,44 +33,91 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [v2 for-next 2/3] block: allow error injection rules to delay
- bios
-From: Haris Iqbal <haris.iqbal@linux.dev>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-References: <20260830012002.80275-1-haris.iqbal@linux.dev>
- <20260830012002.80275-3-haris.iqbal@linux.dev>
- <20260915091146.GC15715@lst.de>
- <6bb6b89f-d71a-4c1b-b6a3-89e3f3c02e2b@linux.dev>
+Subject: Re: [PATCH 2/2] loop: Perform __loop_clr_fd() after disk->open_mutex
+ is dropped.
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brian Foster
+ <bfoster@redhat.com>,
+        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
+        Markus Elfring <Markus.Elfring@web.de>,
+        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        rust-for-linux@vger.kernel.org
+References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
+ <9f1273a7-6dfe-46bb-966f-fe08876f4375@I-love.SAKURA.ne.jp>
+ <3883b05e-0a34-43f7-b2a9-a46d2b0c5ffc@acm.org>
+ <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
+ <d89aa722-2d13-4733-b5c1-f0194bf4b342@acm.org>
+ <15037162-0e54-4722-ac7e-c9a863a8a2f7@I-love.SAKURA.ne.jp>
+ <b700652d-ed63-444a-b879-ec2725affaa7@acm.org>
+ <6fdefda9-c7e4-4368-8d9a-280043b4051e@I-love.SAKURA.ne.jp>
+ <e8fd7e8c-4a14-49d6-8bce-16fd44d864b9@acm.org>
 Content-Language: en-US
-In-Reply-To: <6bb6b89f-d71a-4c1b-b6a3-89e3f3c02e2b@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <e8fd7e8c-4a14-49d6-8bce-16fd44d864b9@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav414.rs.sakura.ne.jp
 
+On 2026/09/16 2:36, Bart Van Assche wrote:
+> On 9/11/26 6:22 PM, Tetsuo Handa wrote:
+>> On 2026/09/12 10:02, Bart Van Assche wrote:
+>>> On 9/11/26 3:18 PM, Tetsuo Handa wrote:
+>>>> On 2026/09/12 5:03, Bart Van Assche wrote:
+>>>>> On 9/10/26 2:44 AM, Tetsuo Handa wrote:
+>>>>>> On 2026/09/10 4:33, Bart Van Assche wrote:
+>>>>>>> __loop_clr_fd() is queued from the lo_post_release() callback and hence
+>>>>>>> may be called concurrently with or after another thread has called
+>>>>>>> bdev_open(). Hence, lo->lo->state should be checked instead of assuming
+>>>>>>> that it equals Lo_rundown.
+>>>>>>
+>>>>>> No, __loop_clr_fd() is queued from the lo_release() callback.
+>>>>>
+>>>>> Yes, it is *queued* from the lo_release() callback function but there is
+>>>>> no guarantee that __loop_clr_fd() has started before bdev_open() is
+>>>>> called again.
+>>>>
+>>>> Since lo->lo_state was set to Lo_rundown by lo_release(), lo_open() will return -ENXIO.
+>>>> What can go wrong if bdev_open() is called again before __loop_clr_fd() starts?
+>>>
+>>> This breaks LO_FLAGS_AUTOCLEAR, isn't it?
+>>
+>> Why do you think so?
+>>
+>>    App1                   App2                   system_long_wq
+>>    Calls lo_release().
+>>      Schedules __loop_clr_fd().
+>>                           Calls lo_open() but fails with -ENXIO.
+>>                                                  Starts __loop_clr_fd().
+>>    Calls lo_post_release().
+>>      Starts waiting for completion of __loop_clr_fd().
+>>                                                  Finishes __loop_clr_fd().
+>>      Finishes waiting for completion of __loop_clr_fd().
+>>
+>>    Calls lo_open() again and succeeds.
+>>                           Calls lo_open() again and succeeds.
+>>
+>> App1's open() after close() is succeeding.
+>> App2's open() being temporarily failing with -ENXIO should be acceptable.
+>> If App2 wants to avoid repeatedly failing with -ENXIO, App2 should use
+>> ioctl(LOOP_CTL_GET_FREE) before open().
+> 
+> Userspace applications and tests (such as mount/umount, losetup, systemd, and xfstests) expect that:
+> 1. Teardown of a loop device with LO_FLAGS_AUTOCLEAR completes
+>    synchronously during the final close() (in lo_release()), releasing
+>    the backing file references (fput()).
 
+App1 is achieving it via the combination of lo_release() and lo_post_release().
 
-On 9/15/26 23:24, Haris Iqbal wrote:
-> 
-> 
-> On 9/15/26 11:11, Christoph Hellwig wrote:
->> The delay does look fine, but I'd really like to not use up one of the
->> scare bio flags for it.  Can we insist on the delay only working for
->> an error, so that we never have to reinsert?
-> 
-> We can do that, but that's only half of the feature, and the weaker half 
-> IMHO. Only delay with a successful completion covers a more useful 
-> scenario for testing in the upper layers.
-> 
-> I am thinking about how else we can do this, but did not find a nice 
-> approach.
-> 
-> Maybe we can #ifdef the new flag on CONFIG_BLK_ERROR_INJECTION?
+> 2. Calling open() immediately after close() succeeds (allowing the loop
+>    device to be immediately reallocated, reopened, or configured in
+>    Lo_unbound state).
 
-I forgot one small point in favour of the flag.
+App1 is achieving it via the combination of lo_release() and lo_post_release().
 
-We can remove addition of __submit_bio_noacct_nocheck() function, since 
-with the flag the re-entry after the delay would fail on 
-blk_error_inject(). This would remove confine the change to 
-error_injection files.
+So, what is wrong?
