@@ -1,265 +1,94 @@
-Received: from mta0.migadu.com (out-230.mta0.migadu.com [91.218.175.230])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29B13F328A
-	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 02:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132E73A5E91;
+	Tue, 15 Sep 2026 03:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789440487; cv=none; b=B4wOCpganNdOXVbqcf4kp7GFsXx3GH7kKWhFWkaFN6GQl8hStNXSak1eY6rgwsBSLxyU43Ci2PVAP8OuRIiWOrY4HbZjqsPMmrlBaeeCBX/DpqFr4SJAGbgvfNxamkJ+XTwdzkvTi5QzPutv3+eFwujfuuJkiTnMn/wWSqadIfc=
+	t=1789444790; cv=none; b=glPOB1WeauuN2grQd+8PPMuTjlyhpECsYP6WfwT9P8TFz7NmSrhIwDMpkBBQfT7YooJf4/zkA9bmPQuM4y8uzL61Isa6MgSk8GYjbPxYRR4/gDdWbOJuOpluBtsgJ1gUV0X1DjoFCTsqrLyTRu6XSeVXiFOyQ6j7+0F3rDCAaHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789440487; c=relaxed/simple;
-	bh=dg2HRw5LMUit+a+Lv3CITObMCSjJD6X/Pd5b9KHsSyQ=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=S+c0I5V1jch2uPoLUz5yND+QC6UL/dl5k0XgNmj6dXOQQKfNvRd307WvYuTu9IT4kDiP8/qWmOZ9W6vCQKCI+qFOEYVxlSc1mUBRW5Wt9TYlhfPPFHJVFM/75tOfK2AuPg9z0tG9iJA4GIKgsEsPNIrRNpNIRlqlwtEUzvyLy/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FlpPN0w8; arc=none smtp.client-ip=91.218.175.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789444790; c=relaxed/simple;
+	bh=3i6DjEo+qc1q8RmPR77Wsg41nqFB+6O6hnb8uL4v7aI=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DPpWTqkkWUSBFKI6TfZW6kFjKirgRkRJ2zr92vwiD2v6iF5YN5+PQ7pzhtH217eoizYMoRcJ3DM1IV7MSwaiSNzsrDsJ7EA1zOiy3X8g1l7yvXA/oi4pJH2cSV/MgkW5rPK+Dg61kw37gA0Dw6fwrsUoEsXsxG2w4rjdigf9jmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=kjzgAp2k; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FlpPN0w8"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=dg2HRw5LMUit+a+Lv3CITObMCSjJD6X/Pd5b9KHsSyQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789440480; v=1; x=1790045280;
- b=FlpPN0w83eMNQoWDOVcPfvKNm5p7Fctfss/2Enl29uDmZuOL/hdV5KKhv936thie/DqQ+RHt
- lryjeDWvQC+F5V/iTBN5e04ynnT1564Ijl0PDXNLzs1fQgPJ05PEL9rAyvXehs+u4u5vW351paG
- yvrTsESySGmmYOWd+si9ercA=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id d5573e5db9cff029;
-	Tue, 15 Sep 2026 02:48:00 +0000
-X-Mizu-Trace-ID: d5573e5db9cff029
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <04c3ccfb-75e7-484a-b99c-ad68db19153d@linux.dev>
-Date: Tue, 15 Sep 2026 10:47:57 +0800
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="kjzgAp2k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E0511F000FF;
+	Tue, 15 Sep 2026 03:59:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1789444788;
+	bh=P+yQWpukN/knPtOJgQNkfX9OLcd33cnh6zLsLwhJhp4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=kjzgAp2kjFItnvcD/iiVOdi3vYle8h6OkfTm2Pl4YLHuoIn/xWMFV+Fq2zNNJTV8+
+	 tLIZ6zfMSMLpP3hqmitweLqKWdyK9udp1J1IawJrI7yrLGQ8hWdfBc8nqRn0RRRpxk
+	 PvqnQN8UTJe14p0snkAGQ8VOr+BP9oshe3j8j6W8=
+Date: Mon, 14 Sep 2026 20:59:47 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Julian Sun <sunjunchao@bytedance.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org,
+ roman.gushchin@linux.dev, shakeel.butt@linux.dev, muchun.song@linux.dev,
+ willy@infradead.org, jack@suse.cz, rostedt@goodmis.org, tj@kernel.org
+Subject: Re: [PATCH v4 0/3] memcg,writeback: flush foreign bdev mappings
+ separately
+Message-Id: <20260914205947.5aab9d7261ef0f26ec8f3213@linux-foundation.org>
+In-Reply-To: <20260914103119.1708452-1-sunjunchao@bytedance.com>
+References: <20260914103119.1708452-1-sunjunchao@bytedance.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
- cuitao@kylinos.cn
-Subject: Re: [RFC PATCH v3 1/5] blk-iocost: add BPF struct_ops cost model
- support
-To: Amery Hung <ameryhung@gmail.com>
-References: <20260914073356.791518-1-cui.tao@linux.dev>
- <20260914073356.791518-2-cui.tao@linux.dev>
- <CAMB2axNkTS-UuH-KctiY+5qh-JZZkKsiyQr_KOnGJt1bPoL3eA@mail.gmail.com>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <CAMB2axNkTS-UuH-KctiY+5qh-JZZkKsiyQr_KOnGJt1bPoL3eA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Amery,
+On Mon, 14 Sep 2026 18:31:16 +0800 Julian Sun <sunjunchao@bytedance.com> wrote:
 
-Thanks for the review.  These are all addressed in the upcoming v4,
-inline below.
-
-在 2026/9/15 07:02, Amery Hung 写道:
-> I mostly looked from a struct_ops perspective.
+> Bdev inodes are routinely shared by multiple memcgs. Recording their
+> owner wb as foreign can cause dirty throttling in one memcg to trigger
+> writeback of unrelated file data belonging to that wb.
 > 
->> +
->> +static const struct bpf_func_proto *
->> +bpf_iocost_get_func_proto(enum bpf_func_id func_id,
->> +                         const struct bpf_prog *prog)
->> +{
->> +       switch (func_id) {
->> +#ifdef CONFIG_CGROUPS
->> +       case BPF_FUNC_cgrp_storage_get:
->> +               return &bpf_cgrp_storage_get_proto;
+> On one production machine, bdev mapping snapshots showed as little
+> as about 10 MiB of dirty data. A queue snapshot of its owner wb showed
+> 599 foreign-flush works, with an average requested writeback budget of
+> 43 GiB per work.
 > 
-> This seems redundant. BPF_FUNC_cgrp_storage_get should already be part
-> of bpf_base_func_proto.
+> In other words, a small amount of foreign dirtying in the bdev mapping
+> can trigger owner-wide writeback requests, whose budgets averaged
+> 43 GiB in this queue snapshot.
 
-Agreed.  get_func_proto() now just delegates to bpf_base_func_proto().
-I kept the callback itself, since the verifier resolves helpers
-through ops->get_func_proto() and there is no NULL fallback.
+What is the overall runtime effect of this?  IOW, can we see some
+before-and-after numbers?
 
+> Following Jan's suggestion, this series records foreign bdev targets
+> separately and flushes their mappings instead of their owner wbs. This
+> preserves a way for dirty throttling to initiate bdev writeback while
+> avoiding owner-wide writeback triggered by these records. The existing
+> foreign-wb mechanism remains unchanged for other inodes.
 > 
->> +#endif
->> +       default:
->> +               return bpf_base_func_proto(func_id, prog);
->> +       }
->> +}
->> +
->> +static int bpf_iocost_check_member(const struct btf_type *t,
->> +                                  const struct btf_member *member,
->> +                                  const struct bpf_prog *prog)
->> +{
->> +       /* calc_cost() is called with RCU read lock held */
->> +       if (prog->sleepable)
->> +               return -EINVAL;
->> +       return 0;
->> +}
->> +
->> +static int bpf_iocost_init_member(const struct btf_type *t,
->> +                                 const struct btf_member *member,
->> +                                 void *kdata, const void *udata)
->> +{
->> +       struct iocost_model_ops *ops = kdata;
->> +       const struct iocost_model_ops *uops = udata;
->> +       u32 moff = __btf_member_bit_offset(t, member) / 8;
->> +
->> +       switch (moff) {
->> +       case offsetof(struct iocost_model_ops, name):
->> +               if (bpf_obj_name_cpy(ops->name, uops->name,
->> +                                    sizeof(ops->name)) <= 0)
->> +                       return -EINVAL;
->> +               return 1;
->> +       }
->> +
->> +       return 0;
->> +}
->> +
->> +static u64 bpf_iocost_calc_cost_stub(u64 opf, u64 nbytes, u64 sector,
->> +                                    struct blkcg *blkcg, u64 model_flags);
->> +
->> +/*
->> + * kdata is seeded from the CFI stubs, so calc_cost is never NULL; a
->> + * model which did not implement it inherits the stub, which prices
->> + * every IO at 0.  Compare against the stub to reject it.
->> + */
->> +static int bpf_iocost_validate(void *kdata)
->> +{
->> +       struct iocost_model_ops *ops = kdata;
->> +
->> +       if (ops->calc_cost == bpf_iocost_calc_cost_stub)
->> +               return -EINVAL;
+> Tracking is best effort: each memcg keeps a bounded set of device
+> numbers without persistent device or inode references. Closed devices
+> and devices with a busy open_mutex are skipped. Device removal and
+> device-number reuse may race with lookup.
 > 
-> This should check !ops->calc_cost. CFI stubs are used to construct
-> trampolines; they are not copied into kdata for callbacks omitted by
-> userspace. Also, should the reserved name "linear" be rejected here?
-
-I already reworked the validation to check for a NULL calc_cost(),
-matching your observation that omitted callbacks remain NULL rather
-than inheriting the CFI stub.
-
-A model named "linear" is now rejected as well.
-
+> Flushes run asynchronously on a dedicated workqueue to isolate these
+> frequently triggered tasks from existing workqueue users. If workqueue
+> allocation fails, the existing foreign-wb mechanism remains in use.
 > 
->> +       return 0;
->> +}
->> +
->> +static int bpf_iocost_reg(void *kdata, struct bpf_link *link)
->> +{
->> +       struct iocost_model_ops *ops = kdata;
->> +       struct iocost_bpf_model *m;
->> +       int ret = 0;
->> +
->> +       if (!bpf_struct_ops_get(ops))
->> +               return -ENOENT;
+> Julian Sun (3):
+>   block: introduce bdev_flush_by_dev()
+>   memcg,writeback: flush foreign bdev mappings separately from owner wbs
+>   writeback: record bdev targets in foreign writeback tracepoints
 > 
-> struct_ops core should hold a map reference when calling .reg().
-> Calling bpf_struct_ops_get() in reg() and bpf_struct_ops_put() in
-> unreg() doesn't seem necessary.
+>  block/bdev.c                     |  24 +++++++
+>  include/linux/blkdev.h           |   1 +
+>  include/linux/memcontrol.h       |  15 ++++
+>  include/trace/events/writeback.h |  22 +++---
+>  mm/memcontrol.c                  | 113 ++++++++++++++++++++++++++++---
 
-Right, the core already holds the map reference during registration,
-so I dropped the bpf_struct_ops_get()/put() calls from .reg()/.unreg().
-The per-device binding references remain, so an unregistered but still
-bound model keeps its kdata alive.
+I'd consider this a memcg patch, and not only due to the line counts.
 
-> 
->> +
->> +       m = kzalloc(sizeof(*m), GFP_KERNEL);
->> +       if (!m) {
->> +               bpf_struct_ops_put(ops);
->> +               return -ENOMEM;
->> +       }
->> +       refcount_set(&m->refs, 1);
->> +
->> +       mutex_lock(&iocost_bpf_reg_lock);
->> +       {
->> +               struct iocost_bpf_model *other;
->> +
->> +               list_for_each_entry(other, &iocost_bpf_models, list) {
->> +                       if (!strcmp(other->ops->name, ops->name)) {
->> +                               ret = -EEXIST;
->> +                               break;
->> +                       }
->> +               }
->> +       }
->> +       if (!ret) {
->> +               m->ops = ops;
->> +               list_add(&m->list, &iocost_bpf_models);
->> +               list_add(&m->lifecycle, &iocost_bpf_lifecycle);
-> 
-> This seems to contradict what the changelog says: "blkcg
-> online/offline notifications follow the model binding, not the name
-> registry"
-
-Right, the implementation didn't match the changelog.  The lifecycle
-list now follows model binding: a model joins it on the first bind
-and leaves on the last unbind.
-
-> 
->> +       }
->> +       mutex_unlock(&iocost_bpf_reg_lock);
->> +
->> +       if (ret) {
->> +               bpf_struct_ops_put(ops);
->> +               kfree(m);
->> +       }
->> +       return ret;
->> +}
->> +
->> +/*
->> + * Unregistering drops the registration reference.  When the last
->> + * reference is gone (no device bound), the node leaves the lifecycle
->> + * list and is freed; otherwise bound devices keep it alive and it
->> + * keeps receiving blkcg online/offline notifications.
->> + */
->> +static void bpf_iocost_unreg(void *kdata, struct bpf_link *link)
->> +{
->> +       struct iocost_model_ops *ops = kdata;
->> +       struct iocost_bpf_model *m;
->> +
->> +       mutex_lock(&iocost_bpf_reg_lock);
->> +       m = iocost_bpf_model_lookup(ops);
->> +       if (m) {
->> +               list_del(&m->list);
->> +               if (refcount_dec_and_test(&m->refs)) {
->> +                       list_del(&m->lifecycle);
->> +                       kfree(m);
->> +               }
->> +       }
->> +       mutex_unlock(&iocost_bpf_reg_lock);
->> +
->> +       bpf_struct_ops_put(ops);
-> 
-> Mentioned above. Doesn't seem to be necessary.
-> 
-> [...]
-> 
->> +static const struct iocost_model_ops *
->> +ioc_bpf_model_prepare(const char *name)
->> +{
->> +#ifdef CONFIG_BLK_CGROUP_IOCOST_BPF
->> +       const struct iocost_model_ops *new = NULL;
->> +       int ret;
->> +
->> +       if (!name[0])
->> +               return NULL;
->> +       ret = iocost_bpf_model_get(name, &new);
-> 
-> It looks more straightforward if iocost_bpf_model_get() just return
-> the ops ptr and ERR_PTR on error.
-
-iocost_bpf_model_get() now returns either the ops pointer or an
-ERR_PTR() directly.
-
-I'll post v4 shortly.
-
-Thanks,
-Tao
-
-> 
->> +       return ret ? ERR_PTR(ret) : new;
->> +#else
->> +       return name[0] ? ERR_PTR(-ENOENT) : NULL;
->> +#endif
->> +}
-
+Please cc linux-mm on memcg patchsets.
