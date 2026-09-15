@@ -1,102 +1,265 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mta0.migadu.com (out-230.mta0.migadu.com [91.218.175.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30703CF1E0
-	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 01:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29B13F328A
+	for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 02:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789437475; cv=none; b=a689Y8Aq0sSubyyjSlxkxIZGD9/M/pRTLIZI5+JLsETj1Yhdd4EMHPmssOygsKO1vwJTXBGukgc0fR5GnS1Aws+qMrN/Hq0b8Gfsmh8NxggP/dhiDeGOP/ch0mrJEMh5zKIlJkj1EAUi/GfcPHwO547l9jXBL3kS7XjqJn9HGgw=
+	t=1789440487; cv=none; b=B4wOCpganNdOXVbqcf4kp7GFsXx3GH7kKWhFWkaFN6GQl8hStNXSak1eY6rgwsBSLxyU43Ci2PVAP8OuRIiWOrY4HbZjqsPMmrlBaeeCBX/DpqFr4SJAGbgvfNxamkJ+XTwdzkvTi5QzPutv3+eFwujfuuJkiTnMn/wWSqadIfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789437475; c=relaxed/simple;
-	bh=RzPgH/3eGo+TdM3AJC5ylErp3efZkoBM2RxE6XOg6z8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cK/ePNrnSmC4fH+tKJ/lLpMtQlRmX22qXEu+g5CbkhFv4tCw1c7QxERFpj4aEPQqx5/CNRuI5VXDNPBrCGMbFzWw+8+GpkWyhZPvS/BKNUxD2Rpu8US3iWrIrKwU9yY8KlL5dGlRqHQKO275NpQvpmtjyFS+gKxs4yX3+C1oXew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oTquKce7; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789440487; c=relaxed/simple;
+	bh=dg2HRw5LMUit+a+Lv3CITObMCSjJD6X/Pd5b9KHsSyQ=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=S+c0I5V1jch2uPoLUz5yND+QC6UL/dl5k0XgNmj6dXOQQKfNvRd307WvYuTu9IT4kDiP8/qWmOZ9W6vCQKCI+qFOEYVxlSc1mUBRW5Wt9TYlhfPPFHJVFM/75tOfK2AuPg9z0tG9iJA4GIKgsEsPNIrRNpNIRlqlwtEUzvyLy/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FlpPN0w8; arc=none smtp.client-ip=91.218.175.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oTquKce7"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-86ec25cf7ecso459586b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2026 18:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789437473; x=1790042273; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=8LtHfoqQuWljZWMj5fNvShJKWJ7Eo3q2bY3EGg9Y51M=;
-        b=oTquKce7kKml8UudqBdJjRYYXkK7xVBS0OZtZssEc4L6A8jL91zwz31t7CCC2AfJ9Z
-         M6F4E01S2fn/GKHTMMVFxIOZWofX6DrXzM3ILW+siPw8AOLa6PutVF8DwY7lkBmZ1KjL
-         3BUeL4nljRO+69XLDcCYzoTyhMaU9DShKdjHA4bl0Bc/GAaohyhYb1StPRgvGdc7Sudh
-         +6fz4fEmatET/8zD5q541u5TQcuHAcb3wtfPgA3B8oG64DfAWAXpbYq4s6MsO9L70aiv
-         oAKLAQBYwHQH8nlxVXejuT++l3BtE43uKUXqQAQOsHwH3/55s3wRd94FgbWVBWvWpAT9
-         c31A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789437473; x=1790042273;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8LtHfoqQuWljZWMj5fNvShJKWJ7Eo3q2bY3EGg9Y51M=;
-        b=yCGbueXIrAIBJ/sTFc5E72J8OGfu3xawQ3jYxTGvzKQHbVI2gaWwMz6Ow23FuFat1t
-         aWypOXO4Ad09a25FNLaedWWkL5xE3r+bpV/wFBQKB3uQohybbf25kJx83vZhb71xKkIm
-         Yl4vvzxbS6ILenEtqAyb4BtxhQIdrlLCe3ZQaK6lLuLY9oWquMkOWP2QB2itz4KQEmaD
-         7vsjbcoNIP8ZB7jadd4u1vqH0WE/y+d67h6lOEhI0ndB84B11KEQWsb3FPGAhrr3XWsN
-         8bQZxG714EqVzqmCNP+3DddEUFRopnPPr5DcwthpfOQnXnYEbsFa69ZNMiMRnyBE+Cyc
-         Gvrw==
-X-Forwarded-Encrypted: i=1; AKwUvBypr/12dL2lCtr+vbYOjvqQnDRzVoFc0if55aIni7By/6Vm6vabjOweBePHrdjq5eb4PCyVQ1oOX9eoKA==@vger.kernel.org
-X-Gm-Message-State: AFuF++mNrZ1Fd/yOJsglAsHQHb7P83G/HymtATnVbF0FWa/oUCujU6q/
-	aI1imYeWfbZ0ZLkQlBICqHOv6xA4X4LdrBdf/hL9OTkWVnW4VgdroYcK
-X-Gm-Gg: AYBFou0bNs6T/NxsS+gmo71COyGQphAAimS+z3gRRCSw09rGgsPpd2LDFsTzs5+dQcz
-	IUEw40HDMkZR3nEZdsHUxxg/qX8eIZ4xtXI5d0Ah9VKzLvagcdjMc2yuhd9r9nGpRNwN8N5GtcL
-	ovpEBL3HEV+qo4N1TOkvw483h40G1ZdHjsbFGF5CEJtw+ZL2YA/jZolPrA795FWo4KP2aWl0Ft6
-	Z7PrqWPbfPpgKLfu0xbflp/lGeC7ZF/CHAwbWxhpxmV5XZjjJn0PY1iyZULl4/sLOJnooV55Y+R
-	tsSo5pOKX4/0jsSzjBPAU1P0Ln5P42KJME6Eq08zPpEn5xebLM2K4HjE2pjoOR1eJT1TRVQ5Z+5
-	VtUC6/mr3eN1px2GAnOldpE2AYxDUcyAt81Vo9asDwKXAS7yxAUjQ2lZdLCJAggC1wHZqG3YYUr
-	LvqAiLyLHgHn8SEe6rVT9qPfmmU8kPrShtMXKYP7EUhTg6zbQiBSAKatNbvScz2fteirLvsaLJh
-	PHZn5j1KgSEAC6nTLZcbnzyfIepbuAd
-X-Received: by 2002:a05:6a00:3a01:b0:86d:117e:5db3 with SMTP id d2e1a72fcca58-8708c45f131mr2265230b3a.26.1789437472373;
-        Mon, 14 Sep 2026 18:57:52 -0700 (PDT)
-Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-86b6139e3bfsm5231011b3a.50.2026.09.14.18.57.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2026 18:57:51 -0700 (PDT)
-From: Wenjie Qi <qwjhust@gmail.com>
-To: jaegeuk@kernel.org,
-	chao@kernel.org
-Cc: linux-f2fs-devel@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	jack@suse.cz,
-	axboe@kernel.dk,
-	tz2294@columbia.edu,
-	baohua@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	qiwenjie@xiaomi.com,
-	qwjhust@gmail.com
-Subject: Re: [PATCH v5 0/2] f2fs: enable buffered RWF_DONTCACHE
-Date: Tue, 15 Sep 2026 09:57:45 +0800
-Message-ID: <20260915100000.1789437600-1-qwjhust@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1788795700.git.qiwenjie@xiaomi.com>
-References: <cover.1788438786.git.qiwenjie@xiaomi.com> <cover.1788795700.git.qiwenjie@xiaomi.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FlpPN0w8"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=dg2HRw5LMUit+a+Lv3CITObMCSjJD6X/Pd5b9KHsSyQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789440480; v=1; x=1790045280;
+ b=FlpPN0w83eMNQoWDOVcPfvKNm5p7Fctfss/2Enl29uDmZuOL/hdV5KKhv936thie/DqQ+RHt
+ lryjeDWvQC+F5V/iTBN5e04ynnT1564Ijl0PDXNLzs1fQgPJ05PEL9rAyvXehs+u4u5vW351paG
+ yvrTsESySGmmYOWd+si9ercA=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id d5573e5db9cff029;
+	Tue, 15 Sep 2026 02:48:00 +0000
+X-Mizu-Trace-ID: d5573e5db9cff029
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <04c3ccfb-75e7-484a-b99c-ad68db19153d@linux.dev>
+Date: Tue, 15 Sep 2026 10:47:57 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
+ cuitao@kylinos.cn
+Subject: Re: [RFC PATCH v3 1/5] blk-iocost: add BPF struct_ops cost model
+ support
+To: Amery Hung <ameryhung@gmail.com>
+References: <20260914073356.791518-1-cui.tao@linux.dev>
+ <20260914073356.791518-2-cui.tao@linux.dev>
+ <CAMB2axNkTS-UuH-KctiY+5qh-JZZkKsiyQr_KOnGJt1bPoL3eA@mail.gmail.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <CAMB2axNkTS-UuH-KctiY+5qh-JZZkKsiyQr_KOnGJt1bPoL3eA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Jaegeuk and Chao,
+Hi Amery,
 
-Friendly ping on this series.  v5 includes the mixed-bio completion update,
-the syzbot NULL-kiocb fix, and the additional memory-pressure data.
+Thanks for the review.  These are all addressed in the upcoming v4,
+inline below.
 
-Please let me know if this direction is acceptable or if another revision is
-needed.
+在 2026/9/15 07:02, Amery Hung 写道:
+> I mostly looked from a struct_ops perspective.
+> 
+>> +
+>> +static const struct bpf_func_proto *
+>> +bpf_iocost_get_func_proto(enum bpf_func_id func_id,
+>> +                         const struct bpf_prog *prog)
+>> +{
+>> +       switch (func_id) {
+>> +#ifdef CONFIG_CGROUPS
+>> +       case BPF_FUNC_cgrp_storage_get:
+>> +               return &bpf_cgrp_storage_get_proto;
+> 
+> This seems redundant. BPF_FUNC_cgrp_storage_get should already be part
+> of bpf_base_func_proto.
+
+Agreed.  get_func_proto() now just delegates to bpf_base_func_proto().
+I kept the callback itself, since the verifier resolves helpers
+through ops->get_func_proto() and there is no NULL fallback.
+
+> 
+>> +#endif
+>> +       default:
+>> +               return bpf_base_func_proto(func_id, prog);
+>> +       }
+>> +}
+>> +
+>> +static int bpf_iocost_check_member(const struct btf_type *t,
+>> +                                  const struct btf_member *member,
+>> +                                  const struct bpf_prog *prog)
+>> +{
+>> +       /* calc_cost() is called with RCU read lock held */
+>> +       if (prog->sleepable)
+>> +               return -EINVAL;
+>> +       return 0;
+>> +}
+>> +
+>> +static int bpf_iocost_init_member(const struct btf_type *t,
+>> +                                 const struct btf_member *member,
+>> +                                 void *kdata, const void *udata)
+>> +{
+>> +       struct iocost_model_ops *ops = kdata;
+>> +       const struct iocost_model_ops *uops = udata;
+>> +       u32 moff = __btf_member_bit_offset(t, member) / 8;
+>> +
+>> +       switch (moff) {
+>> +       case offsetof(struct iocost_model_ops, name):
+>> +               if (bpf_obj_name_cpy(ops->name, uops->name,
+>> +                                    sizeof(ops->name)) <= 0)
+>> +                       return -EINVAL;
+>> +               return 1;
+>> +       }
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static u64 bpf_iocost_calc_cost_stub(u64 opf, u64 nbytes, u64 sector,
+>> +                                    struct blkcg *blkcg, u64 model_flags);
+>> +
+>> +/*
+>> + * kdata is seeded from the CFI stubs, so calc_cost is never NULL; a
+>> + * model which did not implement it inherits the stub, which prices
+>> + * every IO at 0.  Compare against the stub to reject it.
+>> + */
+>> +static int bpf_iocost_validate(void *kdata)
+>> +{
+>> +       struct iocost_model_ops *ops = kdata;
+>> +
+>> +       if (ops->calc_cost == bpf_iocost_calc_cost_stub)
+>> +               return -EINVAL;
+> 
+> This should check !ops->calc_cost. CFI stubs are used to construct
+> trampolines; they are not copied into kdata for callbacks omitted by
+> userspace. Also, should the reserved name "linear" be rejected here?
+
+I already reworked the validation to check for a NULL calc_cost(),
+matching your observation that omitted callbacks remain NULL rather
+than inheriting the CFI stub.
+
+A model named "linear" is now rejected as well.
+
+> 
+>> +       return 0;
+>> +}
+>> +
+>> +static int bpf_iocost_reg(void *kdata, struct bpf_link *link)
+>> +{
+>> +       struct iocost_model_ops *ops = kdata;
+>> +       struct iocost_bpf_model *m;
+>> +       int ret = 0;
+>> +
+>> +       if (!bpf_struct_ops_get(ops))
+>> +               return -ENOENT;
+> 
+> struct_ops core should hold a map reference when calling .reg().
+> Calling bpf_struct_ops_get() in reg() and bpf_struct_ops_put() in
+> unreg() doesn't seem necessary.
+
+Right, the core already holds the map reference during registration,
+so I dropped the bpf_struct_ops_get()/put() calls from .reg()/.unreg().
+The per-device binding references remain, so an unregistered but still
+bound model keeps its kdata alive.
+
+> 
+>> +
+>> +       m = kzalloc(sizeof(*m), GFP_KERNEL);
+>> +       if (!m) {
+>> +               bpf_struct_ops_put(ops);
+>> +               return -ENOMEM;
+>> +       }
+>> +       refcount_set(&m->refs, 1);
+>> +
+>> +       mutex_lock(&iocost_bpf_reg_lock);
+>> +       {
+>> +               struct iocost_bpf_model *other;
+>> +
+>> +               list_for_each_entry(other, &iocost_bpf_models, list) {
+>> +                       if (!strcmp(other->ops->name, ops->name)) {
+>> +                               ret = -EEXIST;
+>> +                               break;
+>> +                       }
+>> +               }
+>> +       }
+>> +       if (!ret) {
+>> +               m->ops = ops;
+>> +               list_add(&m->list, &iocost_bpf_models);
+>> +               list_add(&m->lifecycle, &iocost_bpf_lifecycle);
+> 
+> This seems to contradict what the changelog says: "blkcg
+> online/offline notifications follow the model binding, not the name
+> registry"
+
+Right, the implementation didn't match the changelog.  The lifecycle
+list now follows model binding: a model joins it on the first bind
+and leaves on the last unbind.
+
+> 
+>> +       }
+>> +       mutex_unlock(&iocost_bpf_reg_lock);
+>> +
+>> +       if (ret) {
+>> +               bpf_struct_ops_put(ops);
+>> +               kfree(m);
+>> +       }
+>> +       return ret;
+>> +}
+>> +
+>> +/*
+>> + * Unregistering drops the registration reference.  When the last
+>> + * reference is gone (no device bound), the node leaves the lifecycle
+>> + * list and is freed; otherwise bound devices keep it alive and it
+>> + * keeps receiving blkcg online/offline notifications.
+>> + */
+>> +static void bpf_iocost_unreg(void *kdata, struct bpf_link *link)
+>> +{
+>> +       struct iocost_model_ops *ops = kdata;
+>> +       struct iocost_bpf_model *m;
+>> +
+>> +       mutex_lock(&iocost_bpf_reg_lock);
+>> +       m = iocost_bpf_model_lookup(ops);
+>> +       if (m) {
+>> +               list_del(&m->list);
+>> +               if (refcount_dec_and_test(&m->refs)) {
+>> +                       list_del(&m->lifecycle);
+>> +                       kfree(m);
+>> +               }
+>> +       }
+>> +       mutex_unlock(&iocost_bpf_reg_lock);
+>> +
+>> +       bpf_struct_ops_put(ops);
+> 
+> Mentioned above. Doesn't seem to be necessary.
+> 
+> [...]
+> 
+>> +static const struct iocost_model_ops *
+>> +ioc_bpf_model_prepare(const char *name)
+>> +{
+>> +#ifdef CONFIG_BLK_CGROUP_IOCOST_BPF
+>> +       const struct iocost_model_ops *new = NULL;
+>> +       int ret;
+>> +
+>> +       if (!name[0])
+>> +               return NULL;
+>> +       ret = iocost_bpf_model_get(name, &new);
+> 
+> It looks more straightforward if iocost_bpf_model_get() just return
+> the ops ptr and ERR_PTR on error.
+
+iocost_bpf_model_get() now returns either the ops pointer or an
+ERR_PTR() directly.
+
+I'll post v4 shortly.
 
 Thanks,
-Wenjie
+Tao
+
+> 
+>> +       return ret ? ERR_PTR(ret) : new;
+>> +#else
+>> +       return name[0] ? ERR_PTR(-ENOENT) : NULL;
+>> +#endif
+>> +}
+
