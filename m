@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-41.mta0.migadu.com [91.218.175.41])
+Received: from mta0.migadu.com (out-68.mta0.migadu.com [91.218.175.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9BD442FAD
-	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 07:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFB14503E3
+	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 07:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789543436; cv=none; b=a0gNoAX1MOkd/mANVsisqRnD6WuuOeXK0JD8kRn6OsCbGcycfN9e5HUEba/HXrfErwkkkndsUXIaNWwcy87xPI9/55gFMDWqwDCYl04FzW/f0OX6/zd7wG7Dfq5iNHLTWbFjuetbE889uQefZCySahrofL3NodSNyjzD72Uj/T4=
+	t=1789543448; cv=none; b=L5SXCfUX5PI9C8xrkXdztzFH4QdnLgc91JZREow+4UEUHHR/UJAfzIsU0/+Zbc0APvl/JRhfk3XKIXvg1BKtINafcgC0zTW5jgFCclENZhDqsygllCSDKthXR2UPQLIlhqARdDvTzaOg+E5taEQ9rZn5SLVCpU6cHdV7jJ2NLU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789543436; c=relaxed/simple;
-	bh=uoC/DTNjLo+8BpUG1DxkXdxXYHJdmsRQjIs9AQ/rPTs=;
+	s=arc-20240116; t=1789543448; c=relaxed/simple;
+	bh=4OA2nej6IWtQ8Xx7g0EluNu1mPKmXu52f8UQGPQcLVY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qAZJqH5Elh3ntaC/Enm/epX+ehb/yoCGoHCj31O/34oSv5r8mjXshRyKyraqrrcQ638tEQ10YfhwsWvbmAjoNbjKYgfkMwgKJ776P4/cuVrtbsF4xRgX8avsUaD1MeDLwVX06N1Ydwq+Zx5N7sTXUHHxvSQwP6zqhaScpD3+HIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tx5hhvQ5; arc=none smtp.client-ip=91.218.175.41
+	 MIME-Version; b=TY+aS2ZS9NUgEP+95FPKyRRt0kVV7hRz8tOK1Zej8ma3/XPv11w9lVzUZCmUHLiMTPcoBgFzGCl/pyGWsgZb+I9g1r6A3mnUw+Gc33U9Yv2KpB6/GWWPDx7osvIqZOUxjCCKLVTEoAU+pvr3UhmVzR1WqYIduBWgBL8SSjZhhU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pd8Yrkan; arc=none smtp.client-ip=91.218.175.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tx5hhvQ5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pd8Yrkan"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=uoC/DTNjLo+8BpUG1DxkXdxXYHJdmsRQjIs9AQ/rPTs=;
+DKIM-Signature: a=rsa-sha256; bh=4OA2nej6IWtQ8Xx7g0EluNu1mPKmXu52f8UQGPQcLVY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789543410; v=1; x=1790148210;
- b=Tx5hhvQ5nSHaU4Ik7ApMy12CgCy+datVEpMzDGk4Q9uAuMCL8iJ7587hlxDAT96uuVS1JZYj
- 1rP/Xn1XMeTNDovjdzxaeTU+lHjToHWJmzc4whO3N+BHNNKWLW1N1jzWYbosb7G0n2/xUTCRcoX
- 7Pf6Bb2/HRzunImmGOAN6+Mc=
+ t=1789543425; v=1; x=1790148225;
+ b=Pd8Yrkan50I1iLvL/BTfjKmS8zqg92M8iK9xs0hKNhhsqjUja138bKEJbAZ+6W/vsQs7eZW5
+ 3YTr9pi6U0HhHhbN2EjcYQHoyOa/3a6Kb8+dvfuVlbGkne/qAF6zPvKVWJPzVLaWEtTG7lMp5sU
+ fr/pq0sRlx9Pc/e1YJnXR798=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 572a0c6a9d624fe7;
-	Wed, 16 Sep 2026 07:23:30 +0000
-X-Mizu-Trace-ID: 572a0c6a9d624fe7
+Received: by smtp.migadu.com with ESMTPS id 0120a9c06dd3c4d7;
+	Wed, 16 Sep 2026 07:23:45 +0000
+X-Mizu-Trace-ID: 0120a9c06dd3c4d7
 X-Migadu-Flow: FLOW_OUT
 From: Tao Cui <cui.tao@linux.dev>
 To: tj@kernel.org,
@@ -44,9 +44,9 @@ Cc: cgroups@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	cui.tao@linux.dev,
 	cuitao@kylinos.cn
-Subject: [RFC PATCH v4 2/5] selftests/bpf: add iocost cost model test
-Date: Wed, 16 Sep 2026 15:22:59 +0800
-Message-ID: <20260916072302.1068871-3-cui.tao@linux.dev>
+Subject: [RFC PATCH v4 4/5] selftests/bpf: add multi-stream sequentiality example model
+Date: Wed, 16 Sep 2026 15:23:01 +0800
+Message-ID: <20260916072302.1068871-5-cui.tao@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260916072302.1068871-1-cui.tao@linux.dev>
 References: <20260916072302.1068871-1-cui.tao@linux.dev>
@@ -60,190 +60,66 @@ Content-Transfer-Encoding: 8bit
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-Add an example cost model implementing the full builtin linear HDD
-formula at double cost, including flush pricing, and a runner which
-registers it as a struct_ops and binds it to a device through
-io.cost.model with "model=iocost_2x", verifying the readback and
-restoring "model=linear" afterwards, checking the write error and
-errno of every step including the restoration.  Binding an unknown
-model name is verified to fail with ENOENT.  Under the same workload
-the doubled model charges exactly twice the builtin model (verified
-2882us -> 5722us per IO, completed IO count halved).
+Add a second example cost model which replaces the builtin
+single-cursor sequentiality heuristic with a per-cgroup table of
+stream slots: an IO is sequential iff its sector matches the expected
+next sector of any tracked stream.  Interleaved sequential readers in
+one cgroup keep their own slots instead of ping-ponging a single
+cursor, and random IO inside a hot window rarely matches a moving
+expectation.  Merged bios skip the base cost but still advance the
+matched stream position, so a merge at the expected sector does not
+make the following new IO look random.
 
-Per-cgroup stream state uses a CGRP_STORAGE map keyed by the cgroup
-of the blkcg argument, so the model inherits the cgroup lifetime and
-never leaks or reuses stale state.  opf carries the full
-bio->bi_opf including REQ_* flag bits, so the operation must be
-extracted with a mask, not compared for equality.
+Stream state lives in a CGRP_STORAGE map keyed by the cgroup of the
+blkcg argument, following the cgroup lifetime; there is no
+fixed-size registry to exhaust.
 
-All writes go through write(2) rather than stdio, since the kernel's
-rejection happens in the write() syscall, not in the userspace buffer
-copy.  CONFIG_BLK_CGROUP_IOCOST and CONFIG_BLK_CGROUP_IOCOST_BPF are
-added to the selftest kernel config: without them vmlinux.h does not
-contain iocost_model_ops and the skeletons fail to build; the runtime
-skip cannot avoid a build dependency.
+Measured (QEMU, virtio-blk with the HDD profile, 4k IOs, w=1000):
+two sequential readers in one cgroup are priced 1961us/op by the
+builtin model (judged random) and 23us/op by this model (judged
+sequential), the completed IO count rises from 4495 to 207505;
+random IO inside an 8M window is priced 24us/op by builtin
+(undercharge) and 2607us/op by this model; single-stream sequential
+and whole-disk random pricing are unchanged.
 
-The runner is skipped unless $IOCOST_TEST_DEV gives a major:minor of
-a device with iocost enabled.
+Stream updates are lockless like the builtin cursor; a lost update
+misclassifies a single IO.  Slots are only advanced for bios the
+builtin prices.  The streams test lives here with the model it
+loads.  The page count truncates like the builtin.
 
 Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- tools/testing/selftests/bpf/config            |   2 +
- .../selftests/bpf/prog_tests/iocost_model.c   | 165 ++++++++++++++++++
- .../selftests/bpf/progs/iocost_model.c        | 135 ++++++++++++++
- 3 files changed, 302 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/iocost_model.c
- create mode 100644 tools/testing/selftests/bpf/progs/iocost_model.c
+ .../selftests/bpf/prog_tests/iocost_model.c   |  34 ++++
+ tools/testing/selftests/bpf/progs/iocost_ms.c | 156 ++++++++++++++++++
+ 2 files changed, 190 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/iocost_ms.c
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 2f79688dcf7ce..67a630cb56148 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -138,3 +138,5 @@ CONFIG_SMC_HS_CTRL_BPF=y
- CONFIG_DIBS=y
- CONFIG_DIBS_LO=y
- CONFIG_PM_WAKELOCKS=y
-+CONFIG_BLK_CGROUP_IOCOST=y
-+CONFIG_BLK_CGROUP_IOCOST_BPF=y
 diff --git a/tools/testing/selftests/bpf/prog_tests/iocost_model.c b/tools/testing/selftests/bpf/prog_tests/iocost_model.c
-new file mode 100644
-index 0000000000000..94c633b975277
---- /dev/null
+index 94c633b975277..ba1de8b2309ab 100644
+--- a/tools/testing/selftests/bpf/prog_tests/iocost_model.c
 +++ b/tools/testing/selftests/bpf/prog_tests/iocost_model.c
-@@ -0,0 +1,165 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+#include <ctype.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include "iocost_model.skel.h"
+@@ -4,6 +4,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include "iocost_model.skel.h"
++#include "iocost_ms.skel.h"
+ 
+ /*
+  * Write a line to io.cost.model with write(2) and return the errno of
+@@ -163,3 +164,36 @@ void serial_test_iocost_model(void)
+ 
+ 	iocost_model__destroy(skel);
+ }
 +
 +/*
-+ * Write a line to io.cost.model with write(2) and return the errno of
-+ * the failed write, or 0 on success.  stdio is not used here on
-+ * purpose: the kernel's rejection happens in the write() syscall,
-+ * not in the userspace buffer copy, and every write, including
-+ * the error paths of the callers below, is checked.
++ * Same check for the multi-stream example model.  Only one model can
++ * be bound to a device at a time; both tests bind and restore, so
++ * they are serial and independent.
 + */
-+static int write_cost_model(const char *buf)
++void serial_test_iocost_model_streams(void)
 +{
-+	int fd, err = 0;
-+	ssize_t n;
-+
-+	fd = open("/sys/fs/cgroup/io.cost.model", O_WRONLY);
-+	if (fd < 0)
-+		return -errno;	/* negative: the file is not there */
-+	n = write(fd, buf, strlen(buf));
-+	if (n < 0)
-+		err = errno;
-+	close(fd);
-+	return err;
-+}
-+
-+/*
-+ * Read back the io.cost.model line of dev and copy the model= value
-+ * into @model.  Returns 0 on success.
-+ */
-+static int readback_model(const char *dev, char *model, size_t model_sz)
-+{
-+	char line[256], word[256], *m, *end;
-+	FILE *fp;
-+	int found = 0;
-+
-+	fp = fopen("/sys/fs/cgroup/io.cost.model", "r");
-+	if (!fp)
-+		return -1;
-+	while (fgets(line, sizeof(line), fp)) {
-+		if (sscanf(line, "%255s", word) == 1 && !strcmp(word, dev)) {
-+			found = 1;
-+			break;
-+		}
-+	}
-+	fclose(fp);
-+	if (!found)
-+		return -1;
-+
-+	m = strstr(line, "model=");
-+	if (!m)
-+		return -1;
-+	m += strlen("model=");
-+	end = m;
-+	while (*end && !isspace(*end))
-+		end++;
-+	snprintf(model, model_sz, "%.*s", (int)(end - m), m);
-+	return 0;
-+}
-+
-+/*
-+ * Bind the named model to a device with "model=<name>", verify the
-+ * readback and restore the builtin model.  Returns 0 on success.
-+ */
-+static int bind_model(const char *dev, const char *name)
-+{
-+	char buf[300], got[64];
-+	int err;
-+
-+	snprintf(buf, sizeof(buf), "%s model=%s\n", dev, name);
-+	err = write_cost_model(buf);
-+	if (err)
-+		return err > 0 ? -err : -EIO;
-+	err = readback_model(dev, got, sizeof(got));
-+	if (!err && !strcmp(got, name)) {
-+		/*
-+		 * restore the builtin linear model on every path so
-+		 * the device is not left bound to a model the caller
-+		 * may unregister right after; the write is checked too
-+		 */
-+		snprintf(buf, sizeof(buf), "%s model=linear\n", dev);
-+		err = write_cost_model(buf);
-+		return err > 0 ? -err : (err ? -EIO : 0);
-+	}
-+
-+	/* bind failed or does not read back: still restore, but report
-+	 * the original failure rather than the restore result
-+	 */
-+	snprintf(buf, sizeof(buf), "%s model=linear\n", dev);
-+	write_cost_model(buf);
-+	return err ? -EIO : -EINVAL;
-+}
-+
-+/*
-+ * True when the device line exists in io.cost.qos and iocost is
-+ * enabled on it.
-+ */
-+static int dev_has_iocost(const char *dev)
-+{
-+	char line[256], word[256];
-+	FILE *fp;
-+	int found = 0;
-+
-+	fp = fopen("/sys/fs/cgroup/io.cost.qos", "r");
-+	if (!fp)
-+		return 0;
-+	while (fgets(line, sizeof(line), fp)) {
-+		if (sscanf(line, "%255s", word) == 1 && !strcmp(word, dev)) {
-+			found = strstr(line, "enable=1") != NULL;
-+			break;
-+		}
-+	}
-+	fclose(fp);
-+	return found;
-+}
-+
-+/*
-+ * Bind the 2x example model and verify the io.cost.model readback.
-+ * IO accounting itself is not checked here; it needs a device doing
-+ * real IO under iocost and is covered by the kernel-side validation
-+ * described in the cover letter.
-+ *
-+ * Requires root, cgroup v2 and a device with iocost support.  The
-+ * device must be given as major:minor in $IOCOST_TEST_DEV, otherwise
-+ * the test is skipped.
-+ */
-+void serial_test_iocost_model(void)
-+{
-+	struct iocost_model *skel;
-+	char buf[300], *dev;
++	struct iocost_ms *skel;
++	char *dev;
 +	int err;
 +
 +	dev = getenv("IOCOST_TEST_DEV");
@@ -257,55 +133,40 @@ index 0000000000000..94c633b975277
 +		return;
 +	}
 +
-+	/*
-+	 * negative: binding an unknown model name must be rejected,
-+	 * so a typo cannot silently disable cost model updates
-+	 */
-+	snprintf(buf, sizeof(buf), "%s model=no_such_model\n", dev);
-+	err = write_cost_model(buf);
-+	ASSERT_EQ(err > 0 ? err : 0, ENOENT, "unknown_model_rejected");
-+
-+	skel = iocost_model__open_and_load();
++	skel = iocost_ms__open_and_load();
 +	if (!ASSERT_OK_PTR(skel, "skel_open_load"))
 +		return;
 +
-+	/* attaching the struct_ops registers the model by name */
-+	err = iocost_model__attach(skel);
++	err = iocost_ms__attach(skel);
 +	if (ASSERT_OK(err, "attach"))
-+		ASSERT_OK(bind_model(dev, "iocost_2x"), "bind_and_readback");
++		ASSERT_OK(bind_model(dev, "iocost_ms"), "bind_and_readback");
 +
-+	iocost_model__destroy(skel);
++	iocost_ms__destroy(skel);
 +}
-diff --git a/tools/testing/selftests/bpf/progs/iocost_model.c b/tools/testing/selftests/bpf/progs/iocost_model.c
+diff --git a/tools/testing/selftests/bpf/progs/iocost_ms.c b/tools/testing/selftests/bpf/progs/iocost_ms.c
 new file mode 100644
-index 0000000000000..efef61410464d
+index 0000000000000..70019db0fd790
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/iocost_model.c
-@@ -0,0 +1,135 @@
++++ b/tools/testing/selftests/bpf/progs/iocost_ms.c
+@@ -0,0 +1,156 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Example iocost cost model: the builtin linear HDD formula with all
-+ * costs doubled.
++ * Example multi-stream sequentiality detection cost model.
 + *
-+ * The constants mirror what calc_lcoefs() derives from the AUTOP_HDD
-+ * defaults (rbps=174019176 rseqiops=41708 rrandiops=370, w-side
-+ * analog) in vtime units where 1s == 2^37.  On a rotational device
-+ * still on ctrl=auto, a device bound to this model through
-+ * io.cost.model charges exactly twice the builtin model under the
-+ * same workload, so the doubled cost is a direct check that
-+ * accounting goes through the BPF path.  On a non-rotational device,
-+ * or one with user-pinned coefficients, the ratio to the builtin
-+ * model is arbitrary.
++ * The builtin model keeps a single cursor per cgroup, so two
++ * interleaved sequential readers in one cgroup are all priced random
++ * (measured 89x overcharge, 12.9x throughput collapse), while random
++ * IO inside a hot window smaller than the 16MB seek threshold is
++ * priced sequential (measured 107x undercharge).  This model replaces
++ * the single cursor with a per-cgroup table of stream slots: an IO is
++ * sequential iff its sector matches the expected next sector of any
++ * tracked stream.  Interleaved streams keep their own slots, and
++ * windowed random IO rarely matches a moving expectation.
 + *
-+ * The cursor handling mirrors the builtin: a zero cursor means "no
-+ * previous IO", and the cursor is only advanced for READ and WRITE
-+ * bios the builtin prices, so flushes and discards leave it alone.
-+ *
-+ * The model implements the full linear formula itself, including
-+ * flushes: there is no fallback to the builtin model, a dataless
-+ * WRITE|REQ_PREFLUSH is priced as a one-page write.
++ * Stream state lives in a CGRP_STORAGE map, so it is created and
++ * freed with the cgroup.  The model implements the full builtin
++ * linear formula itself, including flush pricing.
 + */
-+
 +#include "vmlinux.h"
 +#include <bpf/bpf_helpers.h>
 +#include <bpf/bpf_tracing.h>
@@ -314,7 +175,6 @@ index 0000000000000..efef61410464d
 + * VTIME_PER_SEC, IOC_PAGE_SIZE/SHIFT, IOC_SECT_TO_PAGE_SHIFT and
 + * IOCOST_COST_F_MERGE come from vmlinux.h (BTF enum constants)
 + */
-+#define LCOEF_RANDIO_PAGES	4096	/* 16MB seek threshold */
 +#define IOCOST_REQ_OP_MASK	0xff		/* REQ_OP_MASK, not in BTF */
 +
 +/*
@@ -337,27 +197,30 @@ index 0000000000000..efef61410464d
 +#define WSEQIO	(RU(VTIME_PER_SEC, WSEQIOPS) - WPAGE)
 +#define WRANDIO	(RU(VTIME_PER_SEC, WRANDIOPS) - WPAGE)
 +
++#define NSLOTS	4
++
++struct streams {
++	__u64 expected[NSLOTS];	/* next expected sector, per stream */
++	__u64 stamp[NSLOTS];	/* LRU stamp, 0 = empty */
++};
++
 +/*
-+ * per-cgroup cursor storage: keyed by the cgroup, freed with it, so
-+ * the model never leaks or reuses stale per-cgroup state
++ * per-cgroup stream table: keyed by the cgroup, freed with it
 + */
 +struct {
 +	__uint(type, BPF_MAP_TYPE_CGRP_STORAGE);
 +	__uint(map_flags, BPF_F_NO_PREALLOC);
 +	__type(key, int);
-+	__type(value, __u64);
-+} cursor_store SEC(".maps");
++	__type(value, struct streams);
++} stream_tab SEC(".maps");
 +
 +SEC("struct_ops")
-+u64 BPF_PROG(iocost_2x_calc_cost, u64 opf, u64 nbytes, u64 sector,
++u64 BPF_PROG(iocost_ms_calc_cost, u64 opf, u64 nbytes, u64 sector,
 +	     struct blkcg *blkcg, u64 model_flags)
 +{
-+	u64 pages, seek_pages = 0, base, coef_page, randio, cost;
-+
-+	/* builtin truncates: max(sectors >> IOC_SECT_TO_PAGE_SHIFT, 1) */
-+	pages = nbytes >> IOC_PAGE_SHIFT;
-+	if (!pages)
-+		pages = 1;
++	struct streams *s;
++	u64 pages, base, coef_page, randio, advance, now;
++	u32 i, victim = 0, found = 0xFFFFFFFF;
 +
 +	if ((opf & IOCOST_REQ_OP_MASK) == REQ_OP_READ) {
 +		base = RSEQIO; coef_page = RPAGE; randio = RRANDIO;
@@ -366,54 +229,79 @@ index 0000000000000..efef61410464d
 +	} else {
 +		/*
 +		 * a fully owning model must price every op; unknown
-+		 * ops are priced as a single page write
++		 * ops are priced as per-page writes
 +		 */
 +		base = 0; coef_page = WPAGE; randio = 0;
 +	}
++	advance = RU(nbytes, 512);	/* sectors */
 +
-+	/*
-+	 * mirror the builtin cursor semantics: seek distance is only
-+	 * computed against a non-zero cursor, and the cursor is only
-+	 * advanced for bios the builtin prices (READ/WRITE with a
-+	 * non-zero size), so flushes and discards leave it alone
-+	 */
-+	{
-+		__u64 *cursor, cur;
-+		int priced = (opf & IOCOST_REQ_OP_MASK) == REQ_OP_READ ||
-+			     (opf & IOCOST_REQ_OP_MASK) == REQ_OP_WRITE;
-+
-+		cursor = bpf_cgrp_storage_get(&cursor_store,
-+					      blkcg->css.cgroup, NULL,
-+					      BPF_LOCAL_STORAGE_GET_F_CREATE);
-+		if (!cursor) {
-+			if (model_flags & IOCOST_COST_F_MERGE)
-+				base = 0;
-+			return 2 * (base + pages * coef_page);
-+		}
-+		cur = *cursor;
-+		if (cur && priced) {
-+			seek_pages = sector > cur ? sector - cur
-+						   : cur - sector;
-+			seek_pages >>= IOC_SECT_TO_PAGE_SHIFT;
-+			if (seek_pages > LCOEF_RANDIO_PAGES)
-+				base = randio;
-+		}
-+		if (priced && nbytes &&
-+		    !(model_flags & IOCOST_COST_F_MERGE))
-+			*cursor = sector + RU(nbytes, 512);
++	/* only bios the builtin prices participate in stream tracking */
++	if (!(((opf & IOCOST_REQ_OP_MASK) == REQ_OP_READ ||
++	       (opf & IOCOST_REQ_OP_MASK) == REQ_OP_WRITE) && nbytes)) {
++		pages = nbytes >> IOC_PAGE_SHIFT;
++		if (!pages)
++			pages = 1;
++		return base + pages * coef_page;
 +	}
 +
-+	if (model_flags & IOCOST_COST_F_MERGE)
-+		base = 0;
++	s = bpf_cgrp_storage_get(&stream_tab, blkcg->css.cgroup, NULL,
++				 BPF_LOCAL_STORAGE_GET_F_CREATE);
++	if (!s) {
++		/* no storage: price per page, truncating like the builtin */
++		pages = nbytes >> IOC_PAGE_SHIFT;
++		if (!pages)
++			pages = 1;
++		return base + pages * coef_page;
++	}
 +
-+	cost = 2 * (base + pages * coef_page);
-+	return cost;
++	/*
++	 * Slot access is lockless, mirroring the builtin single-cursor
++	 * update in ioc_rqos_throttle(): concurrent CPUs submitting for
++	 * the same cgroup can race on slot updates; mispricing is
++	 * bounded and acceptable for an example model.
++	 */
++	now = bpf_ktime_get_ns();
++	for (i = 0; i < NSLOTS; i++) {
++		if (s->expected[i] == sector && s->stamp[i]) {
++			found = i;
++			break;
++		}
++	}
++	if (found != 0xFFFFFFFF) {
++		/* sequential: keep the seq base from the op branch */
++		s->expected[found] = sector + advance;
++		s->stamp[found] = now;
++	} else {
++		base = randio;
++		for (i = 1; i < NSLOTS; i++) {
++			if (s->stamp[i] < s->stamp[victim])
++				victim = i;
++		}
++		s->expected[victim] = sector + advance;
++		s->stamp[victim] = now;
++	}
++
++	/* builtin truncates: max(sectors >> IOC_SECT_TO_PAGE_SHIFT, 1) */
++	pages = nbytes >> IOC_PAGE_SHIFT;
++	if (!pages)
++		pages = 1;
++	if (model_flags & IOCOST_COST_F_MERGE) {
++		/*
++		 * merged bios skip the base cost but still advance
++		 * the stream position above, so a merge at the
++		 * expected sector does not make the following new IO
++		 * look random
++		 */
++		base = 0;
++	}
++
++	return base + pages * coef_page;
 +}
 +
 +SEC(".struct_ops")
-+struct iocost_model_ops iocost_2x = {
-+	.calc_cost = (void *)iocost_2x_calc_cost,
-+	.name = "iocost_2x",
++struct iocost_model_ops iocost_ms = {
++	.calc_cost = (void *)iocost_ms_calc_cost,
++	.name = "iocost_ms",
 +};
 +
 +char LICENSE[] SEC("license") = "GPL";
