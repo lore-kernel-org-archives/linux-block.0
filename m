@@ -1,103 +1,96 @@
-Received: from mta0.migadu.com (out-253.mta0.migadu.com [91.218.175.253])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649164AC15D
-	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 09:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8663E4AEBEF;
+	Wed, 16 Sep 2026 09:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789551956; cv=none; b=TcBx80zSJUOv1IifWckac3M/VrzHPFo/myCn4dJVasYDyW6tt6Rctd6SRyaMkrcPxJUUsnD6jYXpt8iVlow40DHg1yx/nQPP1sw8P5iCW3CCFUzmx7NngowB+NVDwDiwhPwqcLrZ3SdQUSev380KULhn+QBBBn7z6EZtn0hLo6Y=
+	t=1789552149; cv=none; b=sdjGSxLfU6Unmzm5HFKeifs2+VyIsb1JsIEJ+XIiDj3SnPl1RF2XtBzJPajg0iP7CsmiaXqyREcemJoM0asTsYC6+y/7VoIYxr3yuwEEv66MmXTP/KubNz231mZxsbZFzodFqRoqjiEA6hANmCeq71ciSovAtalcIUDrg7v4iPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789551956; c=relaxed/simple;
-	bh=mO98Mkuc0nB/Kxdxx3wdKcIT3x3Ro8TrzEDgQ/nqMZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CsNSgMQeSE/vD+aZlUCHYVzwSX9XW8zcY4uoUBaaucVZj4pdxu0Xk5y2RyNqFJ9L4O9wEk+Ct2tTBpGn6YV2D0ARIPnMonSe3Zm4G2HBQF7Xdwg3eNPY2gvN4vGlrLeqi6MDJ6aqom8k4I9hYlzVoGMJl+rvcZPQlNe0poTa0P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pKMhxyXW; arc=none smtp.client-ip=91.218.175.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pKMhxyXW"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=mO98Mkuc0nB/Kxdxx3wdKcIT3x3Ro8TrzEDgQ/nqMZs=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789551933; v=1; x=1790156733;
- b=pKMhxyXWe8GL9GtZWsijKRsN3MO6RUaq1pp8i5zf0joaXNOVqCthb+HZRz6dyuDI8UIUBTvl
- 6c7q3Z6WR75YQTdDIVqshB47LWSuCD6BjlptvcCPe9D+QTl5ISo9bIoQqfRBDxNpd2Faq3LGutY
- HQIc1NwmP1A9M11VxOYW/1SY=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta11.migadu.com with ESMTPS id 4e1f0847cc37f286;
-	Wed, 16 Sep 2026 09:45:13 +0000
-X-Mizu-Trace-ID: 4e1f0847cc37f286
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <cf378b14-8e59-47c0-af44-c28415a640bf@linux.dev>
-Date: Wed, 16 Sep 2026 10:45:12 +0100
+	s=arc-20240116; t=1789552149; c=relaxed/simple;
+	bh=yNZKSeD9djGtz5o/sJAjhbLIc6ZrYenwtSjaIgHcp50=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U8lWLRMx0SvOjKHiBsDpF0hkOjgXLN+i1N87cYQoXPMw1TV0H4sadLaLXxK4Xm+tAzQya/59S5oC/6pWV5b9bJL1KtBFFN9WBgv4X+da6Gyx0kFFSeXS19zPy93kZWbjkra/p84XsNq+coD6MDeIXUjyd/77nk/lH0NwB7ePG0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-03 (Coremail) with SMTP id rQCowACXmjj9ZapqLKXgBw--.61487S2;
+	Wed, 16 Sep 2026 17:48:45 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: axboe@kernel.dk
+Cc: bvanassche@acm.org,
+	danil.kipnis@cloud.ionos.com,
+	haris.iqbal@ionos.com,
+	jgg@ziepe.ca,
+	jinpu.wang@ionos.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] rnbd-srv: Fix sess_dev use-after-free in process_msg_close()
+Date: Wed, 16 Sep 2026 09:48:17 +0000
+Message-Id: <20260916094817.2007756-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 0/3] fix NVMe multipath partition diskstats
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20260821084831.4155943-1-john.g.garry@oracle.com>
-Content-Language: en-US
-From: John Garry <john.garry@linux.dev>
-In-Reply-To: <20260821084831.4155943-1-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACXmjj9ZapqLKXgBw--.61487S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF1fAFW8Kr47JFy3uF17Wrg_yoW8GFyxpa
+	y0y3Wj9ryFkF4UG3yDZw4xuFWYyan2y3y8Cr1xur1UZ345ZFy2vFn3X34xJF1qqry8Can0
+	qFn5JayrCw1Yya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9a14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCV
+	W8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJr
+	UvcSsGvfC2KfnxnUUI43ZEXa7VUbtl1PUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRIMA2qqP4efBQAAs2
 
-On 8/21/26 09:48, John Garry wrote:
+process_msg_close() drops the device reference with rnbd_put_sess_dev()
+before using sess_dev again in rnbd_srv_destroy_dev_session_sysfs().
+If that put drops the last kref, e.g. when the device is concurrently
+being torn down through rnbd_srv_sess_dev_force_close(), the waiter in
+rnbd_destroy_sess_dev() is woken up and frees sess_dev, so the
+subsequent rnbd_srv_destroy_dev_session_sysfs() call operates on freed
+memory.
 
-Hi guys,
+Move the rnbd_put_sess_dev() call after the sysfs teardown so it is the
+last access to sess_dev.
 
-Any opinion on this one? Specifically how to improve the per-path disk 
-partition cloning here.
+Fixes: 2de6c8de192b ("block/rnbd: server: main functionality")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/block/rnbd/rnbd-srv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers
-
-> Currently the NVMe multipath partition diskstats are not maintained.
-> This is because the functionality to update the diskstats only updates
-> for the whole disk (and not per partition).
-> 
-> As an example:
-> $ ./fio_read nvme1n1p1 # run traffic on /dev/nvme1n1p1
-> ...
-> $ more /proc/diskstats | grep nvme1
->   259       2 nvme1c1n1 49857 0 400344 768565 0 0 0 0 0 2334 768565 0 0 0 0 0 0
->   259       3 nvme1n1 99710 0 800680 1599285 0 0 0 0 0 2346 1599285 0 0 0 0 0 0
->   259       5 nvme1n1p1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
->   259       4 nvme1c2n1 49853 0 400336 831472 0 0 0 0 0 2315 831472 0 0 0 0 0 0
-> 
-> Notice how all values are 0 for nvme1n1p1.
-> 
-> This series addresses that problem by first updating the gendisk code to
-> create the partition table for hidden disks, as suggested by Keith.
-> 
-> This is done by cloning the partition table from the multipath disk.
-> 
-> Secondly the NVMe multipath functionality to handle the diskstats is
-> modified to handle the gendisk partition, by looking up this partition
-> from the per-path disk partition.
-> 
-> Setting as RFC as I am not too happy with the block partition cloning
-> code.
-> 
-> Difference to v2:
-> - don't scan per-path disk, and clone from multipath disk instead
-> 
-> John Garry (3):
->    block: support linking disks to clone partitions
->    block: don't show partition diskstats for GENHD_FL_HIDDEN
->    nvme-multipath: fix diskstats for partitions
-> 
->   block/blk.h                   |  1 +
->   block/genhd.c                 | 35 +++++++++++++++++++++++-
->   block/partitions/core.c       | 45 +++++++++++++++++++++++++++++++
->   drivers/nvme/host/core.c      |  1 +
->   drivers/nvme/host/multipath.c | 51 ++++++++++++++++++++++++++++-------
->   include/linux/blkdev.h        |  8 ++++++
->   6 files changed, 130 insertions(+), 11 deletions(-)
-> 
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 10e8c438bb43..2ebc2eac384f 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -361,10 +361,10 @@ static void process_msg_close(struct rnbd_srv_session *srv_sess,
+ 	if (IS_ERR(sess_dev))
+ 		return;
+ 
+-	rnbd_put_sess_dev(sess_dev);
+ 	mutex_lock(&srv_sess->lock);
+ 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
+ 	mutex_unlock(&srv_sess->lock);
++	rnbd_put_sess_dev(sess_dev);
+ }
+ 
+ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+-- 
+2.34.1
 
