@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-193.mta0.migadu.com [91.218.175.193])
+Received: from mta0.migadu.com (out-203.mta0.migadu.com [91.218.175.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281E0483BD1
-	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 08:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D08D47FB10
+	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 08:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789548816; cv=none; b=e4ftPpOR1Kr6ZyG/VZA5igtvHvczwf6BiOUfe8aSJCI5VHxjHFJCs8ouDX6gA/YJBHqIdCLCMy4zM2yH66L1U7FpUd2ogkgdTy7yjBV3VIL/AmyPrLg57ip/WmdtxdIt9s2IK9h2+pow56Ka8Oo8FS3EbLGJ8TGbkDMDa8xtwl0=
+	t=1789548820; cv=none; b=tzX3BENY20d8sZe8Jn+61Yr0JlKjKeVzVipE/Om6J3so/6QVwp103Jg9jLl5Si3LzZntLi2TsenmYNnRKu1Ev2yjfZpy+YXfNxgZ9YgeX/HfUVcDov/Y/bIj9MyB+rLr7L/vnz2N0wD7kVVrrzfv1zu9nnHESuHYiGLfARNPR/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789548816; c=relaxed/simple;
-	bh=loa/g3I+Yv/9naA0zXCKsZcRV0ZjLJKQ5OTetC/5DVw=;
+	s=arc-20240116; t=1789548820; c=relaxed/simple;
+	bh=kCLIOKC5wMvDVR07yq/o4W7NDVvGkZvtFSaE4nzjdqU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S03aREQWcaKgQdhuSwv42arnoWwivz5CXWAWGfeFHLGy4PILDaVwifWckK9m2vrrgpnKFHEoOMS1TBR51rpXJm4rmFS8UFIJk3Hyiu5Z3we0RSOlvVLizw7Ao0Jbqj6lTvTtjdlRQiTSkzQJ2M/7O/Jw4mzG0N2YGcMWdHEPiZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BuiPTh5I; arc=none smtp.client-ip=91.218.175.193
+	 MIME-Version; b=H/HbtcU4neitcXbkymgvheVHb4kGc+qLSproXmkARykV431fPTF+QKgtZPLmjuWippceiERvzDhAc0aanYUrnjSGDDG6lGB68N5qLs2p/Bn/DMwttZ5wpU8GkZPXOCCJl+pXdk7a5L/KtJBfQFA+ZTL/YyscPbYkuPYgaso9eyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f/EAGotJ; arc=none smtp.client-ip=91.218.175.203
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BuiPTh5I"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f/EAGotJ"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=loa/g3I+Yv/9naA0zXCKsZcRV0ZjLJKQ5OTetC/5DVw=;
+DKIM-Signature: a=rsa-sha256; bh=kCLIOKC5wMvDVR07yq/o4W7NDVvGkZvtFSaE4nzjdqU=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789548806; v=1; x=1790153606;
- b=BuiPTh5I0jkUZb7q+SDPnksxAfJtDS9QplS6jrlObT9ZRyRG3SWNgjk7aaOIbQHTshtCwWlZ
- m1mxjceUwfDj0lj1PPGgpHoxKwJvofGaytDAwlgnVNojUAMlhGV98mQ5YZ9Ryat2BOMV5Gbqybj
- xpi0ZHb51mLDRn5N5NmGGVes=
+ t=1789548813; v=1; x=1790153613;
+ b=f/EAGotJivNnLMAsqHzWgdw5Ifv8zRv5DVXNFDwebnGbRRVADz3IopW1v1v8CT4rMM/YvUz4
+ H+kQ9iSvTHDO6U9OKPomSdK8g+8XIGCfrjAVyRqwqFYVk0EtM6iwFA3pKF8o03qtmLGDvqG6NdF
+ XncWDJkd2mh5nOvE0i0LGP38=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id adf49a5116c396e5;
-	Wed, 16 Sep 2026 08:53:26 +0000
-X-Mizu-Trace-ID: adf49a5116c396e5
+Received: by smtp.migadu.com with ESMTPS id 918a633a8f8616b2;
+	Wed, 16 Sep 2026 08:53:33 +0000
+X-Mizu-Trace-ID: 918a633a8f8616b2
 X-Migadu-Flow: FLOW_OUT
 From: Tao Cui <cui.tao@linux.dev>
 To: tj@kernel.org,
@@ -39,9 +39,9 @@ Cc: cgroups@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	cui.tao@linux.dev,
 	cuitao@kylinos.cn
-Subject: [PATCH v2 2/4] blk-iocost: charge zone appends as page-counted sequential writes
-Date: Wed, 16 Sep 2026 16:53:02 +0800
-Message-ID: <20260916085304.1080271-3-cui.tao@linux.dev>
+Subject: [PATCH v2 3/4] blk-iocost: account zone append completions in latency stats
+Date: Wed, 16 Sep 2026 16:53:03 +0800
+Message-ID: <20260916085304.1080271-4-cui.tao@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260916085304.1080271-1-cui.tao@linux.dev>
 References: <20260916085304.1080271-1-cui.tao@linux.dev>
@@ -55,63 +55,46 @@ Content-Transfer-Encoding: 8bit
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-Zone append is a primary write operation for zoned devices; zoned
-btrfs and f2fs use it for data writes.  It is priced at zero, so the
-zone append portion of zoned workloads runs outside the controller:
-a 1%-weight cgroup issued 16000 appends at zero cost on a zoned
-null_blk.
+ioc_rqos_done() only accounts READ and WRITE completions, so zone
+append completions are excluded from the latency window: the vrate
+feedback loop cannot see ZA-induced latency, leaving it unable to
+respond to device saturation caused by zone appends.  Similarly,
+calc_size_vtime_cost_builtin() does not classify zone append as a
+write operation.
 
-A zone append advances the zone write pointer and is therefore
-sequential from the device's perspective; the actual sector is only
-returned after completion, so the cursor-based seq/rand
-classification doesn't apply.  Price it as a page-counted sequential
-write.  After this patch, 16000 appends from the same cgroup are
-charged 533264 usec (33us per append).
+This is not covered by the patch that prices zone appends: charging
+goes through the cost model, while the latency window is the feedback
+path the vrate controller watches.
 
-Also skip the cursor update for ZA bios: bi_sector is the zone
-start, not the actual write position (which is only returned after
-completion).  Setting the cursor from ZA would misclassify subsequent
-READ/WRITE bios.
+Treat zone append as WRITE for both latency accounting and cost
+classification.
 
 Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
 Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- block/blk-iocost.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ block/blk-iocost.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 082f26d6e27b6..2e4e9ce2c9359 100644
+index 2e4e9ce2c9359..ef1b7e65455e2 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -2560,6 +2560,17 @@ static void calc_vtime_cost_builtin(struct bio *bio, struct ioc_gq *iocg,
- 		coef_randio	= ioc->params.lcoefs[LCOEF_WRANDIO];
- 		coef_page	= ioc->params.lcoefs[LCOEF_WPAGE];
+@@ -2609,6 +2609,7 @@ static void calc_size_vtime_cost_builtin(struct request *rq, struct ioc *ioc,
+ 	case REQ_OP_READ:
+ 		*costp = pages * ioc->params.lcoefs[LCOEF_RPAGE];
  		break;
 +	case REQ_OP_ZONE_APPEND:
-+		/*
-+		 * A zone append advances the zone write pointer and is
-+		 * therefore sequential from the device's perspective, so
-+		 * the cursor-based classification below doesn't apply.
-+		 * Compute the full cost here.
-+		 */
-+		if (!is_merge)
-+			cost += ioc->params.lcoefs[LCOEF_WSEQIO];
-+		cost += pages * ioc->params.lcoefs[LCOEF_WPAGE];
-+		goto out;
- 	default:
- 		goto out;
- 	}
-@@ -2720,8 +2731,8 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 	if (!iocg_activate(iocg, &now))
- 		return;
- 
--	/* dataless bios have no meaningful position for seq/rand detection */
--	if (bio->bi_iter.bi_size)
-+	/* ZA bi_sector is zone start, dataless bios have no write position */
-+	if (bio->bi_iter.bi_size && bio_op(bio) != REQ_OP_ZONE_APPEND)
- 		iocg->cursor = bio_end_sector(bio);
- 	vtime = atomic64_read(&iocg->vtime);
- 	cost = adjust_inuse_and_calc_cost(iocg, vtime, abs_cost, &now);
+ 	case REQ_OP_WRITE:
+ 		*costp = pages * ioc->params.lcoefs[LCOEF_WPAGE];
+ 		break;
+@@ -2879,6 +2880,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+ 		pidx = QOS_RLAT;
+ 		rw = READ;
+ 		break;
++	case REQ_OP_ZONE_APPEND:
+ 	case REQ_OP_WRITE:
+ 		pidx = QOS_WLAT;
+ 		rw = WRITE;
 -- 
 2.43.0
 
