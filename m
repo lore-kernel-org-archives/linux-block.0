@@ -1,123 +1,143 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f12.google.com (mail-oi2-f12.google.com [74.125.231.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB372FD7B1;
-	Tue, 15 Sep 2026 22:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789511991; cv=none; b=ZWywRlvKHhllzxtHTxZcXIYKHJI0v2ilQ6jdnU4Ya5TrCs1mlGDQAdJMcv1pKb9S6NYtpBr2bmpMiGMVTMq0m6edZUG+liNDO4ciIOWWkhwpMn6JgJ2T5l+aeq6IF4eN+5+9ZVuMPSOqHg+/EKLBad9jfRy0ZcV1zg73d2ov54E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789511991; c=relaxed/simple;
-	bh=BytfvsOQXDGpqrDU7apJCC+qNjb/4afOahQqHgZcpQE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lKxieleDj85iUUxwyxf7komV5MAwo/uUgXlVE5iHr6p2hBIwtZO5WOO6poN3ZJ3YpDXz7Xl6xK3RqgFbu3rQXoeIWYNGSCgFB2tpAxK6YsEVcQy/GEvEhYQje2zOjWKuo6wvZo0fBlbbnX2Zy2GbHUZCVmR8xrAC3zRR4VQ82Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68FMciqg048547;
-	Wed, 16 Sep 2026 07:38:44 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68FMci0x048544
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 16 Sep 2026 07:38:44 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <2dd38a68-4ceb-48d5-953d-7ea2c7122418@I-love.SAKURA.ne.jp>
-Date: Wed, 16 Sep 2026 07:38:43 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028AD2931CB
+	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 00:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.204
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789519066; cv=pass; b=OXL61LMV2HbX5NLsDZAVHdwQ/iPRBbXrkZJqxUno3oAmoFqpphaKg3UScJ1xD5lPxM9hNTtvLDezjfyKFQXXZXR4MVV781hAs3QoeDhTOSesnAuzDsC60PXiM8YqT3j3MfrQwkR2MEx/okaiTZYUWVvxtTFYo1zGUI1T4W8SKiI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789519066; c=relaxed/simple;
+	bh=lyc02VtQIZxhw/NaQxlFiomk5M1MRIsJ/0DiRUUBSzU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uuCsPao8+lEAXwNGHT4AzVBWcUBs1dxs4V7ZU5VVPoA8+aEnxGY7ysIb0JCK8z868xp5UToL/vV0Ta6JcxMCTa7G/O/RV+JElhTEKpTG5JAtcasLNNsfs1m86hZ8awuZ+CRQlx2Eb7AKaKe8ALLxxBMyw96JIPhqG3V8h1efzbY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lH9u2seC; arc=pass smtp.client-ip=74.125.231.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lH9u2seC"
+Received: by mail-oi2-f12.google.com with SMTP id 5614622812f47-4b37a368895so251139b6e.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2026 17:37:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789519063; cv=none;
+        d=google.com; s=arc-20260327;
+        b=fomsHtpTOzmhokHT0ZCsvsXnc4NFQF9det+olEwyrNCTw4DoFzPsMCkFLdEuzz2aJS
+         9dWZ1hb/gaWHDTut8M5pwc0LIwdO+D5kcfgR5fMu/JrKHzX/0XIabS3ar05o1Cz1KvCX
+         P8f1Hjcev0SCBgW2LyS2pRej8fI7Neo+NGKHiJzcRibh0NzxuPOiSWvfDNByu2HI6EKq
+         byYZkP/k193HYByAphFCcENQVH5ZA1WwcyXNapGy078VbfjObR6QNMNJbln/N6wnkdFv
+         /9YVvTnCgiKFYS55gben32Hva2h9ZvNit5DwATaGaeaHaKESAULmn6AmszMZio5DxuSr
+         z9pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DWeROdCeteC+h1bv3zClbfu9jEolgnytmK08OqnLrD4=;
+        fh=25mFMSRqiK0cyjj/AUiwSoA0xabx/5VvVRa2GvPQzFI=;
+        b=p/pYUt5uIW6RqU/ngtDlfM4fG+2Yk8f2Pcsbk8gwcXx9Bs0iLtFoOiykC2A9M/CGny
+         I1ztdceY2zqhO2zrkspsg4oDifM9mbTBFNIPUTi0LbHgRugwm/ddgdzIN3ZbgrDqX14S
+         zBNCHlv1udjsAADY5Y5Hq+30PQdg+s3ZDhYDLG1s0p5Xr2XT5EOj75mhfS8ha9AXQMNz
+         8BDMV/bHQVKUO1hxD25ba96ULrcfszxd93+Nu71nIQFArs6EORn67Isk4f5aoGboJFZZ
+         P7EB1r1SedsXSB7B6HftuaXS8sZvTBDrGZExxf681dOsbdf2awALzMLoD8af2ZB3WEoZ
+         QcxQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789519063; x=1790123863; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=DWeROdCeteC+h1bv3zClbfu9jEolgnytmK08OqnLrD4=;
+        b=lH9u2seCno1Pu6lfoz0hNUo9rocBd2SKeqrIpiV9yF8XKajrD7l5Qj2zHH61/c1H8E
+         tb7WqJJ87Iwwd07f+zMB0DYvPhsS2A9gT06KU/ZF57XnQRu8NIYEvmLKN6h9JJe/aN11
+         dhtN28MtoLyX9n/ojEgT+9CACwK/O71bZYRxtEhbsGddaHzKBgnUWwhkOJzK3lgnDDtO
+         zn+WNPGved0U32aaFGe7Ewm3AtUCc6ZQaEvJEERZ+6A13zGY4j572jqDDD6H8zXy9EA4
+         u2OTZhI8frBYy8nQyYWrLOAwhRfpEX1Zwwarkg11BHrNan6g4LO6jjb9kpjG3mluSwyQ
+         wZLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789519063; x=1790123863;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DWeROdCeteC+h1bv3zClbfu9jEolgnytmK08OqnLrD4=;
+        b=fzF1Lz3Tvh06KkQsfaIzpLItb8048kIsEhTqYEy/Wm4iE875nLjlFPcUnAJXQt+HCf
+         QX4EDxt0XT8o7HlD7jD+sSOwQ+V13XmBKSCWdbiQGl5E/Kscwmn6PBOy6dJ1qGsxs7EP
+         IiDBbry9xr0bL/2omQNPJ8yRiy18Kw03nBxO/fuhqpeorL++WqMKBUpOENEe6r0NYEMG
+         qmcNObI1vMIfkmi6HfWqVoKMG178lds+HgBWa8IMz4MePtmnI6CNoueHu06iW+l3jKuc
+         nmt/xNIUoYDJ6vDnbuaPzopBUbj+giKngXFV9c6TZkpayfnUyUowetvpiDgoC+1YeM6m
+         nb8g==
+X-Forwarded-Encrypted: i=1; AKwUvBz8oqXzj1hhubIpWVKtuaKDHpdOcX8pAj4W//Zwiu7uR+l9htXtN/j899EZbQDbmFG2Unn0zk9xa85Arg==@vger.kernel.org
+X-Gm-Message-State: AFuF++l/VbCfaD2VXDIrVWwbNWh4btjQ5p9dNLqrGTwfyxMGl6Q1RK4w
+	m0Q9ltxwVu1zxpUi3q+FldaOPH+dHNf/fvxwR+24QnzqIXe1vyG4bFVp4zr0ybIk6+WnUKNvhws
+	qvq5xx5sGgFYwsfxXR1DSzXrsLLLFvx4=
+X-Gm-Gg: AYBFou18YalsH7HVMPuDEccDS2Rlyxz7Y/1RZot7gVbaykpCDrsFeCFVhO+kJZVtuU3
+	ovTmudmsQAhW6lxBE20mcDB7/YLiMJk/tmDKWVtguVikcrsKbou2t0LtW2uPHQkXtBM+3regHjH
+	tdk8wjsMGBctODfweh9h7OLFGPryWRjN/WppXvC08+Ml2I4pwY28xM2lOsLC9zy9kGjWFi8XDgz
+	W5mbKgOkMzeEtO2dFHKDx1pHUhc3RTHJil3vUsSSLhcPkN9CA9Ef+EJSkceVSsbZsbuYh7Y0SOT
+	pDsQVr95TU8MQo39LcLPCWFukBgj1X35cAsQHcmh3W3BtEyLrp4+Ue4eYKZ63SBfPtihxY7D74r
+	V4gXaRkiyf2sdAI7nm+zxGWwS7ex1/vo4u8IGF7Mqycz/qFrmIhHLlpw=
+X-Received: by 2002:a05:6808:1782:b0:4b9:a8ac:47e with SMTP id
+ 5614622812f47-4ca4c283485mr938132b6e.28.1789519062807; Tue, 15 Sep 2026
+ 17:37:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] loop: Perform __loop_clr_fd() after disk->open_mutex
- is dropped.
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Brian Foster
- <bfoster@redhat.com>,
-        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
-        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        rust-for-linux@vger.kernel.org
-References: <60bf7af2-b84e-4056-9195-a26ad51ada46@I-love.SAKURA.ne.jp>
- <9f1273a7-6dfe-46bb-966f-fe08876f4375@I-love.SAKURA.ne.jp>
- <3883b05e-0a34-43f7-b2a9-a46d2b0c5ffc@acm.org>
- <08b0057a-280d-4e55-8e94-e510ec1a371f@I-love.SAKURA.ne.jp>
- <d89aa722-2d13-4733-b5c1-f0194bf4b342@acm.org>
- <15037162-0e54-4722-ac7e-c9a863a8a2f7@I-love.SAKURA.ne.jp>
- <b700652d-ed63-444a-b879-ec2725affaa7@acm.org>
- <6fdefda9-c7e4-4368-8d9a-280043b4051e@I-love.SAKURA.ne.jp>
- <e8fd7e8c-4a14-49d6-8bce-16fd44d864b9@acm.org>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <e8fd7e8c-4a14-49d6-8bce-16fd44d864b9@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav414.rs.sakura.ne.jp
+References: <20260915200107.3522560-1-arnd@kernel.org>
+In-Reply-To: <20260915200107.3522560-1-arnd@kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 15 Sep 2026 19:37:30 -0500
+X-Gm-Features: AcwNN1WN6n5VaFsDoH3kCwWcr9SYOgDUJLo2q6b2SsGwG9_bgzJWczNA720qB7k
+Message-ID: <CACVXFVMBZemmYjFYYo-E7mij6R6aqNbQ2iAQiZ+P6rqhKxUQsQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: reduce stack usage in __ublk_shmem_remove_ranges
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>, 
+	Caleb Sander Mateos <csander@purestorage.com>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026/09/16 2:36, Bart Van Assche wrote:
-> On 9/11/26 6:22 PM, Tetsuo Handa wrote:
->> On 2026/09/12 10:02, Bart Van Assche wrote:
->>> On 9/11/26 3:18 PM, Tetsuo Handa wrote:
->>>> On 2026/09/12 5:03, Bart Van Assche wrote:
->>>>> On 9/10/26 2:44 AM, Tetsuo Handa wrote:
->>>>>> On 2026/09/10 4:33, Bart Van Assche wrote:
->>>>>>> __loop_clr_fd() is queued from the lo_post_release() callback and hence
->>>>>>> may be called concurrently with or after another thread has called
->>>>>>> bdev_open(). Hence, lo->lo->state should be checked instead of assuming
->>>>>>> that it equals Lo_rundown.
->>>>>>
->>>>>> No, __loop_clr_fd() is queued from the lo_release() callback.
->>>>>
->>>>> Yes, it is *queued* from the lo_release() callback function but there is
->>>>> no guarantee that __loop_clr_fd() has started before bdev_open() is
->>>>> called again.
->>>>
->>>> Since lo->lo_state was set to Lo_rundown by lo_release(), lo_open() will return -ENXIO.
->>>> What can go wrong if bdev_open() is called again before __loop_clr_fd() starts?
->>>
->>> This breaks LO_FLAGS_AUTOCLEAR, isn't it?
->>
->> Why do you think so?
->>
->>    App1                   App2                   system_long_wq
->>    Calls lo_release().
->>      Schedules __loop_clr_fd().
->>                           Calls lo_open() but fails with -ENXIO.
->>                                                  Starts __loop_clr_fd().
->>    Calls lo_post_release().
->>      Starts waiting for completion of __loop_clr_fd().
->>                                                  Finishes __loop_clr_fd().
->>      Finishes waiting for completion of __loop_clr_fd().
->>
->>    Calls lo_open() again and succeeds.
->>                           Calls lo_open() again and succeeds.
->>
->> App1's open() after close() is succeeding.
->> App2's open() being temporarily failing with -ENXIO should be acceptable.
->> If App2 wants to avoid repeatedly failing with -ENXIO, App2 should use
->> ioctl(LOOP_CTL_GET_FREE) before open().
-> 
-> Userspace applications and tests (such as mount/umount, losetup, systemd, and xfstests) expect that:
-> 1. Teardown of a loop device with LO_FLAGS_AUTOCLEAR completes
->    synchronously during the final close() (in lo_release()), releasing
->    the backing file references (fput()).
+On Tue, Sep 15, 2026 at 3:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
+te:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> The array in __ublk_shmem_remove_ranges() is one kilobyte long,
+> which is really too much for an on-stack allocation, as can be
+> seen with a frame warning limit of 1.25kb that otherwise produces
+> a clean build on my test system:
+>
+> drivers/block/ublk_drv.c: In function '__ublk_shmem_remove_ranges':
+> drivers/block/ublk_drv.c:5573:1: error: the frame size of 1392 bytes is l=
+arger than 1280 bytes [-Werror=3Dframe-larger-than=3D]
+>
+> Maybe half the size is good enough here, so try 32 entries.
+> If 64 entries are really required, the array could be dynamically
+> allocated, but that would risk an allocation failure.
+>
+> Fixes: 309e02dccf64 ("ublk: avoid unpinning pages under maple tree spinlo=
+ck")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> I have really no idea if the 64 number was significant or just chosen
+> to fit within usual stack frames.
+> ---
+>  drivers/block/ublk_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 66eb55e7162e..6fe85aba32ce 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -5531,7 +5531,7 @@ static void ublk_unpin_range_pages(unsigned long ba=
+se_pfn,
+>   *
+>   * Returns true if the tree walk completed, false if more ranges remain.
+>   */
+> -#define UBLK_REMOVE_BATCH      64
+> +#define UBLK_REMOVE_BATCH      32
 
-App1 is achieving it via the combination of lo_release() and lo_post_release().
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-> 2. Calling open() immediately after close() succeeds (allowing the loop
->    device to be immediately reallocated, reopened, or configured in
->    Lo_unbound state).
-
-App1 is achieving it via the combination of lo_release() and lo_post_release().
-
-So, what is wrong?
+Thanks,
+Ming Lei
