@@ -1,67 +1,67 @@
-Received: from mail-pj2-f42.google.com (mail-pj2-f42.google.com [74.125.227.170])
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD6049B44F
-	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 16:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEE74C33FB
+	for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 16:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789576132; cv=none; b=cTwZqgUs4RTdMynvTgQuZgSmgHpbSSrPQ6FimepOb1YloeL9sUi7M9zWITYnY900PiiJYIIS9oC5RPV35Hd56/hMxCRbVWddf56zEe+fycHsb8sL4VMxwF0ho0lDLYNFI7zU5TY1RjLcjG+nt75M0I266xS4HKZ7CxWZ8IkqcRY=
+	t=1789577184; cv=none; b=mVrFUPUbRQk2ho+oPwQ9WhJt1iUXhVQ4CaAiPcAViaXCNq7sl6oINA3VwPA7cJYqiI+SpLM8cOw6WZFigrb2AWNqO0R0tGGkiE3l33p8vYxeQgFNZU9M50TdH9oIUgpM2oXdbm9/jV/IPyFLd3Nb2INXXf4cci3yUfa0Z4hXPx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789576132; c=relaxed/simple;
-	bh=sd8lC+4Cqbrm6JY6F2H3FLocfjos/39Rx7c2SQsUVHg=;
+	s=arc-20240116; t=1789577184; c=relaxed/simple;
+	bh=1fs5/9PJdlbuBhTs0ZxkDNW+v2WItpOPk3QzGFWOdbk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fjnv5ktz+6KkSPTMcgO/acU1Y2xodvrKEv79jy6vwYrgUb+u1d1GFPzIog8FhMykDYV2/KOUBpRYYMkuMmJC2RD9b78R29HNfdPBYXnW6iaZqfeCeB1mFEP6Zmh7wWxxzcUom53gRoxJ4Lkxzybixkz1XeN4EWS9+TaTfNL6v3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M+FaMes8; arc=none smtp.client-ip=74.125.227.170
+	 MIME-Version:Content-Type; b=Jpu/vNOSbzqqr2mdd2toRyFkio5yA2jnBO/yCquqOvB6Lo/KAfNs3prw5bIq2Ar69Qia1+hwg+39z3Lb6gvjHMWcARWij31upUpoynbjyCel53ors4UvyEvur/xDKfqFWXVu6mj1EhPESiuAu+3C+blLZdTNyiBSI2zEhEWDdq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMSLSCTc; arc=none smtp.client-ip=74.125.227.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M+FaMes8"
-Received: by mail-pj2-f42.google.com with SMTP id 98e67ed59e1d1-396ccb1a990so1018841a91.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 09:28:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMSLSCTc"
+Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-396ccd66bb4so1082998a91.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 09:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789576129; x=1790180929; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789577171; x=1790181971; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=sd8lC+4Cqbrm6JY6F2H3FLocfjos/39Rx7c2SQsUVHg=;
-        b=M+FaMes8POydks9qxsVMwuSEEz6WSq2JFHH/frLsPfPq6TgAtbdGzf1lqOEGg7luDo
-         QYQdKMS2m0pgVEa4DNqGCSZgdQQNjVVNrBnAfF3xWUV9bQty7Y8h7IG4YBlmkcHEA/e2
-         0JCTw5EzZwofmPAbwdOI6XeD/QFB4eoXHduHuRZiAag9zfm8hnSuNHdSw8QCn4EOZkmP
-         QbeCwZCQ1J8fqo8XZNBf0ZvDzcljnk62t3X7Bhu5dTwb2VUkIupAMyX6LlOeLEMsvdFN
-         m47fuHlbyUwPxNxT9GDRV9WHoAeS4YdgZcq/+9pGePkj4HJvEEhdVVbeLILIYmUZMd4A
-         cypQ==
+        bh=1fs5/9PJdlbuBhTs0ZxkDNW+v2WItpOPk3QzGFWOdbk=;
+        b=QMSLSCTcLtJ+AiMJ6XECO+C16YHQOAZXJqddh+1hwfr5SVCU4HFWiTSJa1dhNOAfge
+         pfYOyTxgh+G7+nYzG29DcTK0mbanmL4Ki5CnnFA1nBDvUO6vmqKWePAB+FZ5FpUy7ybf
+         NvpmQd8hmW1D58fLfNxQ2IO4hTT5eo54DBnXZzh2iajCO69bt2cf5NtANoLSgFqyO5/A
+         9LEmXnDntVcj3+khqajRkChzL+EBb5PV7pHymXnMoVk6pz3eKRz4jysRegqRDLaw73Fi
+         qXC75IwpNB6FudUN9Cqwzv40xMcW2rJfnS4fRbIUZsdSRYywhbx5SH4WUeYfZTSmmPUN
+         0lKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789576129; x=1790180929;
+        d=1e100.net; s=20260707; t=1789577171; x=1790181971;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=sd8lC+4Cqbrm6JY6F2H3FLocfjos/39Rx7c2SQsUVHg=;
-        b=ayO9AySwdIk0kqh8VEdRnu2YCkCU1r2j2zdqmI6cwD+6z6wpt5VTYk8DutZwAjeXJ2
-         6dSO3mYYCkE5ij19gpC+K8BQmQy+1Zg41gfV9e3lOr/bwXZpJAs6tfepoARTD+ib8sJf
-         QaGjuCkrZ8HX07wrhAUPDCWbU7dWcOMZg3VQN6rjBvE7mP6dAC6lzo0rexqDDTTOuM5h
-         yWvqMNu9kgUR4WzKTuIVmTtewMPkYTXRCW4emdjKUo7S1VFLheQstT/m0uPlo6jtMfgN
-         vy6Xd1pHFGEiKbgQB3i5hHpKiF+lPXFkSFDnnBe3b2b9D+MSPTxl6wvF5lk2ZGYBjBmF
-         ldIg==
-X-Forwarded-Encrypted: i=1; AKwUvBz/HmURGWo76Ritlcfi5FyQrODMAzzQ6zOgMYgLDOPSUHNXhKK2CoHoXU7ou/sHVA6QPnMoDeS+Zh5W6A==@vger.kernel.org
-X-Gm-Message-State: AFuF++lxt5yKJWhY9blUnsnr+RUx3fySfcLGO97xxUtaU5qKTVKGvEDx
-	HQnMHCjQxBqmZ4avshkXWeX/ZkeHoMRAaLsmOum00ptn1TZ+P2nzaQev
-X-Gm-Gg: AYBFou3I44iWziW87XDgjXrEaKf6WCBy3ipESQVLBVY+MGqv5okRYaFJKHurOjj23se
-	49ZPFWDQsQ2gs3qMe0Ovj+hTldGcvg48yiL759SWuOC0a8DfMCNit1W1v9g3fe+3jdTDbrQ8Ztr
-	jZEtmHTc9upkDHgwNZg4dwkcwHmGwOQ5+5jO8BmjdFpWli+Q3Ze4R4I+pcxRBGhooxaUAXm5uY0
-	h1eMI7c+fNcrppgGK27Yaoqon8QrzsyPaQJDCu9r/Zx5kA16HNSM3Lq75SaEEJcjGTpbXRV+lum
-	018JSQgKtK7HNDIFhfoqBM4XiL/gOFfb+Q65vg9Z5vCpGW8yc+ODaQ5XvS0Dzv+qXrS3tk/r4du
-	7d/dpi1xwprxJBCrGEy0bkBaBDdZFUSJn1fC2PcLImED5rz+sTb5NhBRR8SruD3uPfbKRZzwWkZ
-	kNLqc4zbOgimknY9pAG39HFPQH4pcGUGPiGniHNawt8vuBAmJbphzRgjVppwB5GV+gUQ==
-X-Received: by 2002:a17:90b:5105:b0:39d:f18c:5f05 with SMTP id 98e67ed59e1d1-39e1e25a054mr7305861a91.2.1789576129023;
-        Wed, 16 Sep 2026 09:28:49 -0700 (PDT)
+        bh=1fs5/9PJdlbuBhTs0ZxkDNW+v2WItpOPk3QzGFWOdbk=;
+        b=ERfeUtsvg7rtmZda1pt6LIFAf8qKQsWhk6eW6Ko4ighP2DpD64pwGZ8UdwpZ6jzHPQ
+         bmtEUJW2GglpvTwVpRwWKu5rrmRA9L35S6vB5DK5hM4ZLtqeGvrSgUTOttrVHlMCKj/r
+         G3xW8DAvMP4X8S6Fvt3CCXNyGC22efQha5qkWTvY1Mt0k+sfb4fDFaY3YhFjjuOJq4u6
+         Ndd+wUNxPYKr0QpJxFVYC32kVVrDbrcoQmHk/IH5uwIgr1t4j5Q2u6Wol7e7KXO1GwZm
+         kYb9KNeEJRSfd3ahNDX5h9Xf6kFzZKye3Yqm7fU0fnDTHoe0VnfRBaGrMAyyBQYVRI1L
+         W9qQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwifHJVy76WCJJ1sdvCDs8c0aexl7dUkl10lvJzn6/ruSGux55l6lDyvrvzIsUkeLImS9Rzm0l5Twg8xQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++lfZn5CUpU9rSGlFU+UJuhzmATYkLNUNle87E9PH9VOXnYd+6GE
+	U1HtFQDPKB6kS1/8BpAGv5L+vhLEyySyJ3AAoF6XHP9wDIwS2Pc9QM16
+X-Gm-Gg: AYBFou1LqcqnM5oBh9waO58d5yaCFq5n95InhhA+9uunIIM4zPSmda9A+05qrPFOT6c
+	yNLc6rW+lJaHCa7iUSK6YQ4vYpVCvMolguq85cKTJ9TiOeVrJIDy0DVdo6SS6xmxZP9yrnBjAbB
+	CLzN5PMA7+s902Bd4c+mCqJoqohR9VOJEJSbdY2eghZGLxVIDCMl6Xn6RGbFG6po9eWbLlFwdcx
+	DSC3xmpo4vB1Bkq0vksgk3jvPw1a4t0K5SCQ+MJogm3J17VjA9cxvgMpKqjDqXiBq6N3v2KU7hY
+	LvrxnXmb/oujwO5TOlJtgNfi3Qd+wv+JN3Cfvrt1omxobGPDk5xN4senGyA1+kbKlu0D8Qqu+UZ
+	/P/2Fwp+X7tNl2wqyBfMV+cdW2fMgdg1s/MtkwqZobpCjkiQ0tXJfoIrzegTGIkVXdgNlYboBrc
+	hUftRhsN7X8qOGJvj75AOTHnkh+Uun95dDRkrMW9iMXvjomtACbJE4s1LhYWBfJ51/9w==
+X-Received: by 2002:a17:90b:560d:b0:39b:3109:10ce with SMTP id 98e67ed59e1d1-39e1e45cbaemr7258907a91.16.1789577170531;
+        Wed, 16 Sep 2026 09:46:10 -0700 (PDT)
 Received: from jm-X870 ([2001:e60:20dd:7c28:de1c:fff7:d3a4:d8c7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e360a9210sm217191a91.15.2026.09.16.09.28.41
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e3617443asm292100a91.9.2026.09.16.09.46.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 09:28:48 -0700 (PDT)
+        Wed, 16 Sep 2026 09:46:09 -0700 (PDT)
 From: Jaemyung Lee <ldc.jml@gmail.com>
 X-Google-Original-From: Jaemyung Lee <jaemyung.lee@samsung.com>
-To: Greg KH <gregkh@linuxfoundation.org>
+To: Bean Huo <beanhuo@iokpp.de>
 Cc: Jaemyung Lee <jaemyung.lee@samsung.com>,
 	Andreas Hindborg <a.hindborg@kernel.org>,
 	Miguel Ojeda <ojeda@kernel.org>,
@@ -82,11 +82,11 @@ Cc: Jaemyung Lee <jaemyung.lee@samsung.com>,
 	linux-scsi@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org
 Subject: Re: [PATCH RFC] drivers/rufs: add Rust UFS host controller driver
-Date: Thu, 17 Sep 2026 01:28:38 +0900
-Message-ID: <20260916162838.2557370-1-jaemyung.lee@samsung.com>
+Date: Thu, 17 Sep 2026 01:46:01 +0900
+Message-ID: <20260916164601.2562349-1-jaemyung.lee@samsung.com>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <2026091124-treason-trickily-bc52@gregkh>
-References: <20260912-rufs-private-v1-1-716db733e655@samsung.com> <2026091124-treason-trickily-bc52@gregkh>
+In-Reply-To: <4c38f13af8f75020fefc35827463e9bc643b99f4.camel@iokpp.de>
+References: <20260912-rufs-private-v1-1-716db733e655@samsung.com> <4c38f13af8f75020fefc35827463e9bc643b99f4.camel@iokpp.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -96,38 +96,70 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Fri, 2026-09-11 at 22:27 +0200, Greg KH wrote:
-> Many many years ago, the USB subsystem tried to bypass the SCSI midlayer
-> for its storage driver, and while it was a "quick solution" at the time,
-> in the end, it didn't work out and we dropped the driver as it just made
-> no sense to keep duplicating all of the logic all the time.
+On Fri, 2026-09-11 at 23:44 +0200, Bean Huo wrote:
+> You still use scsi everywhere in your implementation protocol/scsi.rs
+> builds READ_10/16, WRITE_10/16, SYNCHRONIZE_CACHE and UNMAP CDB, so
+> "decouple UFS from SCSI" really means "copy a small part of sd and the
+> SCSI error handling into a UFS driver." while JEDEC defines the UFS
+> application layer as SCSI, the SCSI work doesn't go away, you just move
+> somewhere else, and it has to be written again.
+
+I agree. By "decouple" I meant independence from the Linux SCSI mid-layer,
+not removal of the SCSI command set from UFS.
+
+The current RFC has CDB construction and only a small part of completion
+disposition. It does not yet implement enough sense, retry, recovery, and
+disk behavior to show that the complete UFS-specific version is smaller or
+simpler. The cover letter stated that conclusion too early.
+
+> The "friction" claim is weak. SCSI has already been changed to fit UFS.
+> Two examples: UFS now uses SCSI simple copy, group number in scsi write
+> command.
 >
-> So I wouldn't recommend it, as long as UFS builds on top of the SCSI
-> commands and the like, you should not attempt to duplicate it in a
-> separate driver, no matter how much "simpler" it initially seems to be.
+> I doubt how far this can go. do we really need to pay effort for a new
+> RUST UFS driver, I am not very confident, unless SCSI is removed from the
+> UFS spec and JEDEC defines native UFS commands, or we talk to the device
+> directly with UPIU. please name the JEDEC feature that the SCSI midlayer
+> really blocked, or that was historial issue which has been fixed.
 
-Thank you for pointing us to the `ub` history. I had not considered that
-case when working on RUFS.
+Also fair. I cannot currently name a public JEDEC feature that was
+shown to be impossible to implement because of the SCSI mid-layer.
 
-After reviewing the current SCSI and UFS paths in more detail, I agree that
-the initial normal-I/O implementation is not evidence that a standalone
-driver remains simpler. The difficult parts are exactly the parts that are
-still missing: sense and retry policy, abort and reset escalation, late
-completion, power management, device discovery, and existing userspace
-interfaces.
+One of my main motivations was the amount of cross-layer reasoning needed
+for product EH and PM problems. In product work, I often had to follow UFS
+state, generic SCSI recovery state, block queue state, and device-PM state
+together. That experience is a reason to investigate another design, but
+private product experience is not proof that the upstream architecture is
+wrong.
 
-I think the next step is to identify concrete problems in the current UFS
-integration and compare a standalone design with focused improvements to
-`ufshcd`. If the complete design only reproduces SCSI functionality and its
-corner cases, a second path would not be justified.
+> I would also like to see the heavy and hard parts, because they are the
+> parts that decide if this design worrks:
+>
+> 1, error handling: abort, LU reset, retries with limits, sense decoding,
+> this is the very hard part of UFS driver.
+>
+> 2, user-space tools interface: SG_IO and bsg (sg3_utils, ufs-utils, FFU
+> with WRITE BUFFER), and the UFS sysfs tree..
 
-> 30 files and 10000 lines doesn't seem that simple :)
+I agree. These are architecture requirements, not small follow-up features.
+Before claiming that standalone is useful, the design needs to cover
+timeout, abort, LU and host recovery, bounded retries, sense and Unit
+Attention, late completion, DMA safety, PM-aware recovery, and request
+disposition.
 
-That is fair. Calling the design simple at this stage was not right. The
-driver is already substantial while several hard areas are not present.
+I think the next step should be to document these responsibilities and
+compare the standalone design with improving `ufshcd` before completing a
+second implementation. If RUFS only reproduces the same behavior and
+complexity, the standalone design would need to be reconsidered.
 
-I will treat the earlier failed approach as a design constraint, not as
-history that can be dismissed because UFS is a different device class.
+> Did any AI tool help write this code? If so, please add the Assisted-by:
+> tag.
+
+Yes. An LLM helped during reviewing, testing and preparation of the
+submission. I will add the tag required by the current kernel documentation
+in the next revision:
+
+Assisted-by: LLM
 
 Regards,
 Jaemyung
