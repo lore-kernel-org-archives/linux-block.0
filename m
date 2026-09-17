@@ -1,128 +1,194 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE44331237
-	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 05:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0498442372
+	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 06:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789624356; cv=none; b=azCJszSAQogY5NC0pqAuUsqDGh3AtC9xUrrGrKbd/EGgzJBJidSSrAC6lLwTaDOUm0Gpxo2fgIOStwWaoH2bNkeoaJn9+M9fmy5kJTYl+lHaB0nmVxv6kkXsZXxYlzQLyYH62P+RRZ7CbQht77kVVpFq7uT2ckR4g5GdgBZgD7w=
+	t=1789628286; cv=none; b=RhGo+mpDoj8wfZ20k37dB+AC/7SVDJimBItxC0ocM2vrghb4VEM8dgiSsRrHXOcHLRMEKWTiajXIyVZWxqhi96tyQ8FPWrw6wZe0yitNx9be5sVT8DOt8uS/ip83s2/x0vX295V7Y9n5mCZdbALnU1FBY8uIDyYDuVgAuQKxzIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789624356; c=relaxed/simple;
-	bh=MiVDMOCKgZPSEpRTsMWJWVtLgjVDsSw1xpl4VEVgHFg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=WR8F2DvnUPGzw+joYU/QxGn3Sf0czHSsJWhty9L7BWRc6jlk9n29GQCd507GrMvHjxhU+/rsKs2fHKwAsajc8l+GVbmAJ+DZ2x7sJcpyhjeI7EBHcB48z9cbNOY0oiuXYc6dW4PX5h0cEBzPBhtn0tN0r6sl1mVtp6tLe/EjDA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ltRPl9L/; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1789628286; c=relaxed/simple;
+	bh=EdkFAZRsmiYJE6DaAOCziXE4wBB/YD3JhZLeLQWTIRA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lNhmb/6Ia68bxAiqrZYn/r5AIDWaZb0nQ4/QrGzUuGS8CbXqhvXMv5h62IVXumUU2WwuNvWI0XSYXVTeRK4PwNmXygevLI2zKns7Vn9kq3k1tr+kgz1rGe4fx0MZsle3iWSMBYlz2Y3SJXUCU2kt1x1uURiMMNHb+GK4wXBwLWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Qm7PRaJr; arc=none smtp.client-ip=74.125.227.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ltRPl9L/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=MiVDMOCKgZPSEpRTsMWJWVtLgjVDsSw1xpl4VEVgHFg=; b=l
-	tRPl9L/v+b56z9ps388HduqA1Jy46gKbT9WSPw9TU20FxqAcr7Q/0HTAlEo6eo3Z
-	aV6uHlDsiw/5K6M1TpmLaCfilTML+pVffSdk0A3/8cZTkPNzEKsXVXmpUaSjvKy1
-	74HsD7JJZiOqRFiSiErgv0AdQcFtVT6AHFRaMi+yhs=
-Date: Thu, 17 Sep 2026 13:52:15 +0800 (CST)
-From: huhai  <15815827059@163.com>
-To: "John Garry" <john.garry@linux.dev>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	"Henry Hu" <huhai@kylinos.cn>
-Subject: Re:Re: [PATCH] blk-mq: check passthrough state before reusing
- cached requests
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <18a634dd-35fc-4f33-a7c2-4c72d210b0bb@linux.dev>
-References: <20260916151655.2588-1-15815827059@163.com>
- <18a634dd-35fc-4f33-a7c2-4c72d210b0bb@linux.dev>
-X-NTES-SC: AL_Qu2TC/qZu0so4yiQZekcmkgajuc/XMK3ufsv24FSc+EEvzzE2B4QfWBfOkLy3NiFIi+pnxOaXhZ3zfhRe7thIJTLa3sIFnPAgKgumRV4KA==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Qm7PRaJr"
+Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-398beb616f5so169088a91.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 23:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1789628284; x=1790233084; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DNKAWCInS3ncgYsrptjrEkqpgHAtyYq0bBCMZxfKpWo=;
+        b=Qm7PRaJr9i+DQv4HPSSr/O26ByUThApgh+lS5YR67UEPRwGDhFKUGdpoftF9boGMOs
+         7IQdBmrL0XMifDR4ZeXuYaoX0+0K4PmXWdjkZuwGROs8/LdPK+L6jTzry+l98SX1Ua2A
+         e6mu+GqealqQu8TNhzamGA54fUtR9mEgcWEIcSnycJFNCYBi2CIvIzoKPnTYlCAbjOoT
+         VdHt1AVR8oVLaZSbasqVzb7kCPQG2Ae5lvHzIUTPiMsjwzL6arpJUvQ746A7CZLGgjEP
+         Bq6x4TUUfVZrN7W75Nqh3oQbsIp+zT1Y/7H5DWDQN8QofJxC5s38I92TSyDmI6IAMiiq
+         mtlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789628284; x=1790233084;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DNKAWCInS3ncgYsrptjrEkqpgHAtyYq0bBCMZxfKpWo=;
+        b=GIgNhJeCTtNrik/5nAdVX7/UwwzW0dMYItLQGqyuO5mHoUmAZIKg1b2AO5JogOAZrl
+         CInY10yn3YW+hqJLs1QhTFc0f00LKypMTr/o4eRxPLBQKyEMuQcziDlBkOAPNNNW2kQL
+         Jm2951cbbMeFNQFfDgdzaIUF2GF0R7IylrmgmbgkD1Yy10RzLMl2ZBZhRnm/c+gSbFhW
+         SYG8zzKcjT4+8DSHXIMXwSCmQ2MckJrsChrHDiEkJvd9NgPXdtN4kTBlOdfTLw0PRsG6
+         p1dnwxSYruhaE7x/wCnf36LlXeIeJFPOh3tISONAezODYcoATaVQMpZfK9SukfIsvYgX
+         qH5g==
+X-Gm-Message-State: AFuF++miyPZZOL4nrXc2/quim02SXNya5dU32GOPlH4xTzKduqcO0avc
+	N8/SwnIZjk0awyjc6E3bC1kP2l4g7YZ3NeyUvbEBEkUTKwTnWcjrnQmQYLx2UkpZxKA9PmIFe/N
+	Zk0+r
+X-Gm-Gg: AYBFou28n0wk8HVdcy822GFZdSHSQSytWIoJzwe9TT6z/gmjxZ96v1v9gRqb+0cfBq4
+	z6SWpyJ1bqnoamSUedG37MyBoZRZZcy4meym9Jj4H4LVjcYVIqGw3y7BfuL9VmafckMcmtwJon+
+	7ownw8sWcHWRCUWcSXRtB2WfjjDwfcpiSgI1lF79kbW+iaclYm98Q3PbVfe+ZEjF3vn/v4h/sBE
+	7pwX16lI/Gp64N8TetAMoKQNBuywDAz5Ws1ldMMj14kjJcq8PQ9Pya7zRDG2PX+IEtsQcw9FsHI
+	syIuh2CYErbcJxGHnLYklZTQvhcwLtIvDH0HUBFGEydipvP1PHIBrfSG9Rv0jPRyPybBJ7MHoTR
+	qqpsH242Z/b0kWb+QRL2LHfUI0XL7xCSyeFoWiiboYEd5Y4jZFHC+SaQc6XSvO/vqpmylXoNxx9
+	YZM/UNSJNQYsD3qyuK7cyqEtPsi3boV2SgpqNAi4QJ3CIaCyi+6F2wq9JmHnoSMCDOId9UcpgC
+X-Received: by 2002:a17:90b:1b06:b0:39e:429b:1e2c with SMTP id 98e67ed59e1d1-39e429b2135mr542709a91.15.1789628283519;
+        Wed, 16 Sep 2026 23:58:03 -0700 (PDT)
+Received: from localhost ([106.38.226.6])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e35e4e0c6sm3888175a91.8.2026.09.16.23.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Sep 2026 23:58:02 -0700 (PDT)
+From: Julian Sun <sunjunchao@bytedance.com>
+To: linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org
+Cc: axboe@kernel.dk,
+	hannes@cmpxchg.org,
+	mhocko@kernel.org,
+	roman.gushchin@linux.dev,
+	shakeel.butt@linux.dev,
+	muchun.song@linux.dev,
+	willy@infradead.org,
+	jack@suse.cz,
+	tj@kernel.org,
+	akpm@linux-foundation.org
+Subject: [PATCH v6 0/3] memcg,writeback: flush foreign bdev mappings separately
+Date: Thu, 17 Sep 2026 14:57:56 +0800
+Message-Id: <20260917065759.2643940-1-sunjunchao@bytedance.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4deafc69.49ba.1a0adec3e0f.Coremail.15815827059@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:aigvCgD3_2APgKtqIrBIAA--.26847W
-X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbC7w+oLmqrgA8vgAAA3H
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
 
-QXQgMjAyNi0wOS0xNyAwMzoxOTo1OCwgIkpvaG4gR2FycnkiIDxqb2huLmdhcnJ5QGxpbnV4LmRl
-dj4gd3JvdGU6Cj5PbiA5LzE2LzI2IDE2OjE2LCBodWhhaSB3cm90ZToKPj4gRnJvbTogSGVucnkg
-SHUgPGh1aGFpQGt5bGlub3MuY24+Cj4+IAo+PiBibGtfbXFfYWxsb2NfcmVxdWVzdCgpIGFuZCBi
-bGtfbXFfc3VibWl0X2JpbygpIHNoYXJlIHBsdWctPmNhY2hlZF9ycXMsCj4+IGJ1dCBuZWl0aGVy
-IGxvb2t1cCBjaGVja3MgdGhlIHBhc3N0aHJvdWdoIHN0YXRlLiBUaGlzIGFsbG93cyBhbiBpb191
-cmluZwo+PiBiYXRjaCB0byByZXVzZSBhIGNhY2hlZCBOVk1lIHBhc3N0aHJvdWdoIHJlcXVlc3Qg
-Zm9yIGFuIG9yZGluYXJ5IGJpby4KPj4gCj4+IFdoZW4gYW4gSS9PIHNjaGVkdWxlciBpcyBlbmFi
-bGVkLCBwYXNzdGhyb3VnaCByZXF1ZXN0cyBoYXZlIFJRRl9TQ0hFRF9UQUdTCj4+IHNldCBidXQg
-UlFGX1VTRV9TQ0hFRCBjbGVhciwgYW5kIHNraXAgLT5wcmVwYXJlX3JlcXVlc3QoKS4gUmV1c2Ug
-dXBkYXRlcwo+PiBycS0+Y21kX2ZsYWdzIHdpdGhvdXQgcmVpbml0aWFsaXppbmcgdGhlIHNjaGVk
-dWxlciBzdGF0ZSwgc28gdGhlIHJlcXVlc3QKPj4gaXMgaW5zZXJ0ZWQgaW50byB0aGUgc2NoZWR1
-bGVyIG9uIHBsdWcgZmx1c2gsIHdoaWxlIGNvbXBsZXRpb24gc2tpcHMKPj4gLT5maW5pc2hfcmVx
-dWVzdCgpLiBXaXRoIGt5YmVyLCB0aGlzIGxlYWtzIHRoZSBkb21haW4gdG9rZW4gYWNxdWlyZWQg
-YXQKPj4gZGlzcGF0Y2ggYW5kIGNhbiBzdGFsbCBmdXJ0aGVyIEkvTyBpbiB0aGF0IGRvbWFpbi4K
-Pj4gCj4+IFRoaXMgd2FzIHJlcHJvZHVjZWQgd2l0aCBreWJlciBhbmQgcmVxdWVzdCBtZXJnaW5n
-IGRpc2FibGVkIG9uIGEgUUVNVQo+PiBOVk1lIGRldmljZSBieSBzdWJtaXR0aW5nIGEgcGFzc3Ro
-cm91Z2ggcmVhZCBmb2xsb3dlZCBieSBPX0RJUkVDVCB3cml0ZXMKPj4gaW4gb25lIGlvX3VyaW5n
-IGJhdGNoLiBUb2tlbnMgbGVhayB1bnRpbCB0aGUga3liZXIgd3JpdGUtZG9tYWluIHRva2VuIHBv
-b2wKPj4gaXMgZXhoYXVzdGVkLCBibG9ja2luZyBleHQ0IGpvdXJuYWwgSS9PIGFuZCBmc3luYygp
-Ogo+PiAKPj4gICAgSU5GTzogdGFzayBqYmQyL252bWUwbjEtODo5NyBibG9ja2VkIGluIEkvTyB3
-YWl0IGZvciBtb3JlIHRoYW4gMjQxIHNlY29uZHMuCj4+ICAgICAgQ2FsbCBUcmFjZToKPj4gICAg
-ICAgIHNjaGVkdWxlKzB4ZTkvMHgzMDAKPj4gICAgICAgIGlvX3NjaGVkdWxlKzB4Y2EvMHgxNTAK
-Pj4gICAgICAgIGJpdF93YWl0X2lvKzB4MWIvMHgxNDAKPj4gICAgICAgIF9fd2FpdF9vbl9iaXQr
-MHg2My8weDE3MAo+PiAgICAgICAgamJkMl93cml0ZV9zdXBlcmJsb2NrKzB4M2Q3LzB4NjAwCj4+
-ICAgICAgICBqYmQyX2pvdXJuYWxfdXBkYXRlX3NiX2xvZ190YWlsKzB4MWUzLzB4MmQwCj4+ICAg
-ICAgICBqYmQyX2pvdXJuYWxfY29tbWl0X3RyYW5zYWN0aW9uKzB4MTFkMS8weDViNTAKPj4gCj4+
-ICAgIElORk86IHRhc2sgZnN5bmN0ZXN0OjEwNyBibG9ja2VkIGluIEkvTyB3YWl0IGZvciBtb3Jl
-IHRoYW4gMjQxIHNlY29uZHMuCj4+ICAgICAgQ2FsbCBUcmFjZToKPj4gICAgICAgIHNjaGVkdWxl
-KzB4ZTkvMHgzMDAKPj4gICAgICAgIGlvX3NjaGVkdWxlKzB4Y2EvMHgxNTAKPj4gICAgICAgIGZv
-bGlvX3dhaXRfYml0X2NvbW1vbisweDJlZC8weDc4MAo+PiAgICAgICAgZm9saW9fd2FpdF9iaXQr
-MHgxOC8weDMwCj4+ICAgICAgICBmb2xpb193YWl0X3dyaXRlYmFjaysweDRiLzB4MWUwCj4+ICAg
-ICAgICBfX2ZpbGVtYXBfZmRhdGF3YWl0X3JhbmdlKzB4MTIwLzB4MWUwCj4+ICAgICAgICBmaWxl
-X3dyaXRlX2FuZF93YWl0X3JhbmdlKzB4ZWIvMHgxMzAKPj4gICAgICAgIGV4dDRfc3luY19maWxl
-KzB4MzY4LzB4YTgwCj4+ICAgICAgICBkb19mc3luYysweGEyLzB4MjAwCj4+IAo+PiBSZXF1aXJl
-IHRoZSBwYXNzdGhyb3VnaCBzdGF0ZSB0byBtYXRjaCBiZWZvcmUgcmV1c2luZyBhIGNhY2hlZCBy
-ZXF1ZXN0Lgo+PiBXaXRoIHRoZSBmaXgsIHRoZSB3b3JrbG9hZCBjb21wbGV0ZXMgbm9ybWFsbHku
-Cj4+IAo+PiBBc3Npc3RlZC1ieTogTExNCj4+IFNpZ25lZC1vZmYtYnk6IEhlbnJ5IEh1IDxodWhh
-aUBreWxpbm9zLmNuPgo+PiAtLS0KPj4gICBibG9jay9ibGstbXEuYyB8IDQgKysrKwo+PiAgIDEg
-ZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykKPj4gCj4+IGRpZmYgLS1naXQgYS9ibG9jay9i
-bGstbXEuYyBiL2Jsb2NrL2Jsay1tcS5jCj4+IGluZGV4IGEyNmExMWM3M2VlMy4uM2E5ZDU3ZjZh
-NTY5IDEwMDY0NAo+PiAtLS0gYS9ibG9jay9ibGstbXEuYwo+PiArKysgYi9ibG9jay9ibGstbXEu
-Ywo+PiBAQCAtNjQ4LDYgKzY0OCw4IEBAIHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqYmxrX21xX2Fs
-bG9jX2NhY2hlZF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLAo+PiAgIAkJCXJldHVy
-biBOVUxMOwo+PiAgIAkJaWYgKG9wX2lzX2ZsdXNoKHJxLT5jbWRfZmxhZ3MpICE9IG9wX2lzX2Zs
-dXNoKG9wZikpCj4+ICAgCQkJcmV0dXJuIE5VTEw7Cj4+ICsJCWlmIChibGtfcnFfaXNfcGFzc3Ro
-cm91Z2gocnEpICE9IGJsa19vcF9pc19wYXNzdGhyb3VnaChvcGYpKQo+PiArCQkJcmV0dXJuIE5V
-TEw7Cj4+ICAgCj4+ICAgCQlycV9saXN0X3BvcCgmcGx1Zy0+Y2FjaGVkX3Jxcyk7Cj4+ICAgCQli
-bGtfbXFfcnFfdGltZV9pbml0KHJxLCBibGtfdGltZV9nZXRfbnMoKSk7Cj4+IEBAIC0zMDYyLDYg
-KzMwNjQsOCBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19tcV9nZXRfY2FjaGVkX3JlcXVl
-c3Qoc3RydWN0IGJsa19wbHVnICpwbHVnLAo+PiAgIAkJcmV0dXJuIE5VTEw7Cj4+ICAgCWlmIChv
-cF9pc19mbHVzaChycS0+Y21kX2ZsYWdzKSAhPSBvcF9pc19mbHVzaChvcGYpKQo+PiAgIAkJcmV0
-dXJuIE5VTEw7Cj4+ICsJaWYgKGJsa19ycV9pc19wYXNzdGhyb3VnaChycSkgIT0gYmxrX29wX2lz
-X3Bhc3N0aHJvdWdoKG9wZikpCj4+ICsJCXJldHVybiBOVUxMOwo+Cj5JdCBzZWVtcyBsaWtlIHNv
-bWUgY29kZSB3aGljaCBjb2RlIGJlIGZhY3RvcmVkIG91dCAoYmV0d2VlbiAKPmJsa19tcV9hbGxv
-Y19jYWNoZWRfcmVxdWVzdCgpIGFuZCBibGtfbXFfZ2V0X2NhY2hlZF9yZXF1ZXN0KCkpLgo+Cj5B
-bmQgbWF5YmUgNzc0NjU2NDc5Mzk3OGZlMmY0M2IxOGEzMDJiMjJkY2EwYWQzYTBlOCBjb3VsZCB0
-byBiZSByZXBlYXRlZCAKPmZvciBibGtfbXFfYWxsb2NfY2FjaGVkX3JlcXVlc3QoKSwgd2hpY2gg
-Y291bGQgbWVhbiBldmVuIG1vcmUgZmFjdG9yaW5nIG91dC4KClRoYW5rcyBmb3IgdGhlIHJldmll
-dyBhbmQgc3VnZ2VzdGlvbnMuCgpJJ3ZlIGNvbmZpcm1lZCBkZDYyMTZiYjE2ZTggaXMgdGhlIHBh
-dGNoIHRoYXQgaW50cm9kdWNlZCB0aGUgaXNzdWUuIEknbGwgdGhlcmVmb3JlCmFkZCB0aGUgbWlz
-c2luZyB0YWcgaW4gdjI6CgpGaXhlczogZGQ2MjE2YmIxNmU4ICgiYmxrLW1xOiBtYWtlIHN1cmUg
-ZWxldmF0b3IgY2FsbGJhY2tzIGFyZW4ndCBjYWxsZWQgZm9yIHBhc3N0aHJvdWdoIHJlcXVlc3Qi
-KQoKQmVmb3JlIGRkNjIxNmJiMTZlOCB0aGUgcmVwcm9kdWNlciBpcyBjbGVhbi4gQXQgZGQ2MjE2
-YmIxNmU4IGl0IHRyaWdnZXJzIGEKS0FTQU4gc2xhYi1vdXQtb2YtYm91bmRzIHdyaXRlIGluIG52
-bWVfcXVldWVfcnFzKCkgZHVyaW5nIHRoZSBpb191cmluZyBwbHVnCmZsdXNoOgoKICBCVUc6IEtB
-U0FOOiBzbGFiLW91dC1vZi1ib3VuZHMgaW4gbnZtZV9xdWV1ZV9ycXMrMHg4ZjMvMHhhNTAKICBX
-cml0ZSBvZiBzaXplIDggYnkgdGFzayByZXByby85NAogIENhbGwgVHJhY2U6CiAgICBudm1lX3F1
-ZXVlX3JxcysweDhmMy8weGE1MAogICAgX19ibGtfbXFfZmx1c2hfcGx1Z19saXN0KzB4OTMvMHhj
-MAogICAgYmxrX21xX2ZsdXNoX3BsdWdfbGlzdCsweDE1MmQvMHgxZDIwCiAgICBibGtfZmluaXNo
-X3BsdWcrMHg1Yy8weGIwCiAgICBpb19zdWJtaXRfc3FlcysweDExNDIvMHgxZGIwCiAgICBfX2Rv
-X3N5c19pb191cmluZ19lbnRlcisweDdhYS8weDFkYzAKCldpdGggdGhpcyBmaXggYXBwbGllZCwg
-dGhlIHJlcHJvZHVjZXIgY29tcGxldGVzIHdpdGhvdXQgdGhlIEtBU0FOIHJlcG9ydC4KCkkgd2ls
-bCBjb250aW51ZSB0byBldmFsdWF0ZSB0aGUgc3VnZ2VzdGVkIHJlZmFjdG9yaW5nIGFuZCBhcHBs
-eWluZyA3NzQ2NTY0NzkzOTcKdG8gYmxrX21xX2FsbG9jX2NhY2hlZF9yZXF1ZXN0KCksIGFuZCBj
-b25maXJtIGluIHYyLi4KClRoYW5rcywKSGVucnkgSHUuCgo+Cj4+ICAgCXJxX2xpc3RfcG9wKCZw
-bHVnLT5jYWNoZWRfcnFzKTsKPj4gICAJcmV0dXJuIHJxOwo+PiAgIH0K
+Hi,
+
+This series avoids owner-wide foreign writeback triggered by dirtying
+shared bdev inodes. Instead, it tracks bdev targets separately and
+schedules writeback of their mappings.
+
+Problem
+=======
+
+Bdev inodes are commonly shared by many memcgs. Dirtying their pages
+can cause the owner wb to be tracked as foreign, triggering writeback
+of the entire wb rather than just the bdev mapping.
+
+In production, almost all the foreign dirtying we traced came from bdev
+inodes. Across our observations, a bdev mapping had as little as about
+10 MiB of dirty pages, yet foreign flushes targeted the entire owner
+wb. On one machine, we observed 599 such works queued on one wb, with
+an average request budget of about 43 GiB per work.
+
+Measured impact
+===============
+
+The synthetic test used a VM with 4 vCPUs, 8 GiB RAM, ext4 and cgroup
+v2, with device write bandwidth capped at 200 MiB/s. Background fio
+repeatedly overwrote a 256 MiB file using buffered I/O, while
+foreground fio performed sequential direct writes. Four memcgs
+generated metadata and buffered writes to trigger foreign flushes.
+
+We measured completed block writes to the background fio file,
+including final sync, and foreground fio bandwidth, latency and
+completion time.
+
+Across three runs per kernel, mean background file write I/O decreased
+by 72.7%, foreground bandwidth increased by 23.0%, and completion time
+decreased by 18.8%.
+
+Metric                         Baseline    Patched     Change
+Background file write I/O (GiB)    6.154      1.680     -72.7%
+Foreground bandwidth (MiB/s)      150.29     184.81     +23.0%
+Foreground completion time (s)   109.203     88.652     -18.8%
+Foreground mean latency (ms)      212.84     172.74     -18.8%
+
+How it helps
+============
+
+Frequent writeback of the file overwritten by background fio reduces
+the opportunity to coalesce buffered writes in the page cache.
+Several overwrites of the same page can otherwise result in a single
+write of its latest contents. Flushing between updates instead writes
+the same page repeatedly, generating more device I/O for the same
+application writes.
+
+This additional I/O makes the device reach its performance limit
+more easily and competes with foreground I/O for device bandwidth.
+
+The benefit is expected to be most pronounced when these conditions
+occur together on the same device:
+
+1. Limited device bandwidth, as with an HDD, makes the additional
+   writeback I/O more likely to saturate the device.
+2. Multiple cgroups perform buffered overwrites. Frequent foreign
+   writeback reduces write coalescing and increases device I/O.
+3. Concurrent direct I/O bypasses the page cache and competes directly
+   with writeback I/O for device bandwidth.
+
+Approach
+========
+
+Following Jan's suggestion, this series records foreign bdev targets
+separately and flushes their mappings instead of their owner wbs. This
+preserves a way for dirty throttling to initiate bdev writeback while
+avoiding owner-wide writeback triggered by these records. The existing
+foreign-wb mechanism remains unchanged for other inodes.
+
+Tracking is best effort: each memcg keeps a bounded set of device
+numbers without persistent device or inode references. Closed devices
+and devices with a busy open_mutex are skipped. Device removal and
+device-number reuse may race with lookup.
+
+Flushes run asynchronously on a dedicated workqueue to isolate these
+frequently triggered tasks from existing workqueue users. If workqueue
+allocation fails, the existing foreign-wb mechanism remains in use.
+
+Changes since v5:
+- Fix repeated overwriting of slot 0 in patch 2 and add comments.
+
+Changes since v4:
+- Add before-and-after performance comparisons to the cover letter.
+
+Changes since v3:
+- Flush foreign-dirtied bdev inode mappings separately, as suggested
+  by Jan.
+
+Thanks.
+
+Julian Sun (3):
+  block: introduce bdev_flush_by_dev()
+  memcg,writeback: flush foreign bdev mappings separately from owner wbs
+  writeback: record bdev targets in foreign writeback tracepoints
+
+ block/bdev.c                     |  24 ++++++
+ include/linux/blkdev.h           |   1 +
+ include/linux/memcontrol.h       |  15 ++++
+ include/trace/events/writeback.h |  22 ++++--
+ mm/memcontrol.c                  | 124 ++++++++++++++++++++++++++++---
+ 5 files changed, 168 insertions(+), 18 deletions(-)
+
+-- 
+2.39.5
