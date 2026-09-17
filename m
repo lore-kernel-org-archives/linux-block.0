@@ -1,228 +1,119 @@
-Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
+Received: from mail-ed2-f12.google.com (mail-ed2-f12.google.com [74.125.228.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178E93D9522
-	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 07:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7D4A43EE
+	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 09:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789628489; cv=none; b=QrqschrWrbrLJHHfpveME0jmbVcCROo4v0jnAUgs7W/sL1NMrYDiN0R9cbbmowxcm8QLdvyvNO+UFZPyRGOyPQPejJqYLeWF4QlxmumKAhXbdfPEBPUu3ZRB3ZFsAWNUeqB7rgIVQ8r/HwDQ78PXlS72S16xT1pPhUln3cyhaYM=
+	t=1789636041; cv=none; b=KixaZM8jSw4YuUwfd3TFo0JgFGbh/3AT7nmGV96NsP+bHcnp77VprypvfM2ymxeCdjDxj/cJUaeTuELL+vU6ONT3wDIdnT232ghvHMA4QT9f/CBMKhkDMy4RaAUx+FRKgyN2FOi+0Ry7KuDyxtrHTsOlFHYHw8LR8drNqzLzgeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789628489; c=relaxed/simple;
-	bh=4PMSPRmeJVSA0/LfRDquf5uYBdjnY0Aenl/yglzKIVI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Xj94TA6RP0W0Ns9FF92uzeypfiihzYsDhp4UkqYWrElBc8R+k+zrHFv/2XQi0MsNBHELWqcETrfV5vhYX26Os9c1T5SlDwKJ429Be5v+QOM0xPcN3n0KhjUFRbgs3bEmf1pEytuW1lb25oI9uskoZwka+Rvbg1YbDFqTojrQXz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=JWES4zIx; arc=none smtp.client-ip=74.125.227.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1789636041; c=relaxed/simple;
+	bh=4VYAgGnCoLccnThsi6FGyu7dWH9CoLPORdAqvgX6CSE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XyAyNEUKeOOBND6eTtjvjZqyz1kV1BadvDkCZF8VADAeDACRnl0r7PGq77htOY8ztCnNlNeYBkhwA6Fij3/H9YzbJAyk1uI8HSzNycqaITMBMcAXd5QOEQqgH90eiWm4fLQ8oAKUJARvOG4sDM+1V6/ycdaAWs4v+56tBb6B+7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0r4xj3Q; arc=none smtp.client-ip=74.125.228.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="JWES4zIx"
-Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-396ccafb751so411551a91.2
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 00:01:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0r4xj3Q"
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a6063d7daaso867028a12.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 02:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1789628487; x=1790233287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=CWcZ32DEcvckTxaHfwF/iY9dOheOeLm1G2879tq/8J0=;
-        b=JWES4zIx2ev7VXkoYCq6u/iDmSehD4/DU2Io/8RzB7moMX8URhZm06MtC3AJF+HI5f
-         xubqhDl+BfNXVcZIs2mpTLmNKWA7azeyLSEG88Yc+2Us2u54ZmbTVIs5YTDrqGeIlUL3
-         eqbhMX0nlWCCfxXw/H+FJ6wJT7IAqBV+XqoPGjk91XTWT+RFlQ6b8BhlNOD78kvad5wd
-         voJpkmsWsZk7pil77vHz9kMXemlK29NDJpE5hjoZmImHe/y0ieaJBkAk1XDw8p4r4bOo
-         sRvwMhGze8U7RZbzEePgfbzKesd/2a3+Av2K4PHPjj9kFBP+VfHsL/jrBWKjfWOI+Hf9
-         S7IQ==
+        d=gmail.com; s=20251104; t=1789636038; x=1790240838; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=11XG6GHVaKbsTYUnnB/fk0WT0cIpei9Z8XfJe+BSC78=;
+        b=A0r4xj3QNwAAw62cs9wWPGv7Oa1AR6vFxFL1JZ/AW4UM8QE1jqJrJrGujM4kbFtZVM
+         Hr/PRDs3Sgwh55dfNItyEGYJmsmAVEjV9ssdmpNJp1TTCMkM0VYtwP5b3L3ISwy5k7OF
+         0I969s2KAVqA8swHFBHVqykZyOPfhEXg71Sw+Ca0XQBdakhZfviAdFolwVnq5D28akod
+         GybY1gWkdmbN5+IAhHitrzNw35+SRZSv4/iUUJND7zZY9SKTHMG0rx0ROMsHrQXD91MZ
+         fGWF6GhJN9Gd5wgadMF/CP6BT/hJ59pPX4F02aGAjmbDOk3q0c+grJkpi1h6phzn3UPL
+         JNhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789628487; x=1790233287;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=CWcZ32DEcvckTxaHfwF/iY9dOheOeLm1G2879tq/8J0=;
-        b=XLnGBjmyYnAqERcUn4HrDDDY4Mb7rOLZSwWKTHUYnRXPBsV5lIHBT0RTV8KSpJY8L0
-         xX13zMzlW8Uk6v9gzw5R3LgPcMLBN1fr0kzeJhy46WI6w2pU3s1prvMdAc5l/9DzLFda
-         8jBn/H8KbPgxB0DIz1+92mhtNoGrb8+pYFvCrsosqXazaiQEuGTs5/uBMetO9s1xv6sF
-         9EMiKx8ZdvfnIJTFdH56fYiBOmoIefarMWfV3dH0OzxgmgnOs5xSBBuNqzhXSpbFW6XX
-         yzkw8qW40zPUa5mOmy/OKUFK3dSQ6jJnWTOABG68WooiouXqxNN+nnsAzIRM5NUvEkq9
-         hVzA==
-X-Gm-Message-State: AFuF++ly+Uy62LPuwCk08WOSqzSF4EjT0x5bbiOy/d8w5VDdCLZJTmcT
-	+V5fZtaiJamhZuIuoXKg9I1TjrJw9905glLCe89IS/+9G7+J48NUZgfKCkf/CxvPDcgN0QNXaOx
-	DxyHa
-X-Gm-Gg: AYBFou07rRo+o2qRbptyTHePcatMYu0LUQQKxy/MpdriytmJiovLco+UXc/PwFviTlS
-	qc9at0VDj8b95D3rh3Va9tS8LyU0cLJeNVYy+agdjHAa/5y+fHpaiBGVmYBwE8y+dLufS5mqp2g
-	WkQnIF8jXRVF485sdjlwlFXs34Whiwn3H3YJiwoR37GMap3RSkr+bXz2mmlbuD2199Orejbowov
-	bR/EiZqZCQL5SXNWrRITSO/g0Auu02UfeJFTJh+DdzN6NRCA2Zka7+vjdoPxBSEJe+ii1c1LVEf
-	7DCTS3mLXghOgrn6wPVJ7lYMh8eKU1YSszIbCbXcCbm4Q48pWo8VetsL64Q9EfNQKqg07EUgQ1n
-	jHCQj9Z6GBgkh2VGPOsudu6xfpcV/C9IFAQipMTW+fKrnjhmMskwVnInCeJ+SRuZQdTCepYRlLc
-	6rnqUFapFGXNcpQZoyPzE+EMZsaNXwhJE8vKbG+tvaQAq7bQApKbiIvV1MsyUZ6j33h+HLG/3j5
-	w==
-X-Received: by 2002:a17:90b:390e:b0:39e:8d5:fcee with SMTP id 98e67ed59e1d1-39e1e4d750emr15487090a91.17.1789628487085;
-        Thu, 17 Sep 2026 00:01:27 -0700 (PDT)
-Received: from localhost ([106.38.226.93])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e361b3a39sm3418041a91.11.2026.09.17.00.01.26
+        d=1e100.net; s=20260707; t=1789636038; x=1790240838;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=11XG6GHVaKbsTYUnnB/fk0WT0cIpei9Z8XfJe+BSC78=;
+        b=nRWswwMT0ZSuE8OKxzQtopEHTAWgwXJJW2IvkfxTaQEEfSzAREMyGDI9iBS2VEqNEb
+         hUbvUokxMCrPlSJcJS1VNn1vBfRlpRJ5jXHWB/lrfGoqPod34R0kWyRR/y0gf/MBdlr8
+         SJp667Grpp6X81ssKt7+4rE3lzdD754dHAkl04lyXvIgxcZ5RQWKRlfRZgpHmEkqoPX5
+         wFob4+ZWdRPbmGoYXLS/06GP68GxvHafOa6j7W60L99vc7gI7Li1IvqaZ2k+ZudzS+GX
+         wvFMl3g/bxY0d/nSah4NjTDKe5UDHViZ8UM4p0Vxwi9mW3pXTP2D8rXX3CQBdLeGu6ow
+         V5zA==
+X-Gm-Message-State: AFuF++lq2W8imivuxFC9v1VdERm8RCMuB0V01Oymd39bR2NGDakhfA5L
+	WLoe5eSO0U6+s6qNLHqjnn3TSs18TzD8ImorYTwY8LK1CB3mD/wdXOQEbiGE5Q2R
+X-Gm-Gg: AYBFou1NPJpB4kEiTUVaI8WaxdigxYrHHb4cZdFm+oE0TQAMc/2tDed3VK4tNWe/6GI
+	k6NbA15jGuxqsDwcwW+GK6Ao/j+4SNhBFHrUbhaxjNI2+3+1wQOY/Fkc4YNkMdruYTYSZFfM6xQ
+	K/wZ7fPj6Da68BEbdIZTQ9mpauSnR/lIi6yUj9BwuJ/bWZSBZ8eX3WcuNxwloEv/QiAJt1abA4I
+	7aNfF/G6RiCTgof6aL+KeMHRD8r9R5MWt8/yRKW3JmtYkJjfhoS4vU+vtwuCo6HcNy7aZtP9FmQ
+	tN6/TEJ6Pi85eGO1k5oOZEjv34ekQhyCTmjHZWS0nO3Fiz95JJNi7n1s/1pyzqeSL6uV8Xt0PZQ
+	OrqN+zJQKlOv6KsuA2nFY+D8kFjOzpm2hHl3V2i9nPRyYPBwgdx/P1RPRNJOjUqvNXexxMGzyL4
+	utify3nlDt2MCR62BVDuPxNFodt51bcUfAUCHp6+f2nw2Yg0QO2cSIx5IsGEC3c4Db+31EMNcUr
+	N5g8YaCPBiLxp/344X+Lmc2iMxSkeWHuf25gAP5RSySJMZe/LstqoZVos9msFdc9cS+nC5R
+X-Received: by 2002:a05:6402:52d6:b0:6a9:ae73:2b59 with SMTP id 4fb4d7f45d1cf-6aa224041a1mr7540556a12.13.1789636038039;
+        Thu, 17 Sep 2026 02:07:18 -0700 (PDT)
+Received: from [127.0.0.2] (0x3ec686fb.mobile.telia.dk. [62.198.134.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6aa1d2ab4ebsm3286953a12.30.2026.09.17.02.07.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2026 00:01:26 -0700 (PDT)
-From: Julian Sun <sunjunchao@bytedance.com>
-To: linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org
-Cc: axboe@kernel.dk,
-	hannes@cmpxchg.org,
-	mhocko@kernel.org,
-	roman.gushchin@linux.dev,
-	shakeel.butt@linux.dev,
-	muchun.song@linux.dev,
-	willy@infradead.org,
-	jack@suse.cz,
-	tj@kernel.org,
-	akpm@linux-foundation.org
-Subject: [PATCH v6 3/3] writeback: record bdev targets in foreign writeback tracepoints
-Date: Thu, 17 Sep 2026 15:01:19 +0800
-Message-Id: <20260917070119.2648123-2-sunjunchao@bytedance.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260917065759.2643940-1-sunjunchao@bytedance.com>
-References: <20260917065759.2643940-1-sunjunchao@bytedance.com>
+        Thu, 17 Sep 2026 02:07:16 -0700 (PDT)
+From: Malte Wechter <maltewechter@gmail.com>
+Date: Thu, 17 Sep 2026 11:07:13 +0200
+Subject: [PATCH] rnull: configfs: add power to configfs features
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260917-upstream-v7-3-rc3-v1-1-d0b620bf82c9@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAMCtq2oC/yXMTQqDQAxA4atI1gZGhyrTqxQX85NqBK0kKoJ4d
+ 6ft8lu8d4KSMCk8ixOEdlb+zBlVWUAc/NwTcsqG2tSNcVWL26KrkJ9wb9GiRIsmhUfjXPLBGsj
+ dIvTm4/d8dX/rFkaK63cE13UDOZh5a3UAAAA=
+X-Change-ID: 20260917-upstream-v7-3-rc3-0db5699dab30
+To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Malte Wechter <maltewechter@gmail.com>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1789636035; l=1119;
+ i=maltewechter@gmail.com; s=20260812; h=from:subject:message-id;
+ bh=4VYAgGnCoLccnThsi6FGyu7dWH9CoLPORdAqvgX6CSE=;
+ b=L3IqiNeupBg1A7BEFeHM7SaRg1I52yfOds1Jaj3LJfHoEFNA1x5jLDRU03mrjIZbe1BAvnwfl
+ v3I6WrIC9pFASH5OI3K+kUjNBgOK90ezsjrhRRa1iLXHJikIuJQ+9CY
+X-Developer-Key: i=maltewechter@gmail.com; a=ed25519;
+ pk=Ta/JQQMOW0Cbxp+yEwWqWFEyKFRyuQeSoYicwD7yvWI=
 
-Add dev to track_foreign_dirty and flush_foreign so traces can
-distinguish foreign-wb tracking from the bdev-only path. Append the
-field to each event and print it as major:minor; zero denotes the
-normal foreign-wb path.
+features displayed by configfs for rnull was inconsistent with the
+actual features available. This correctly exposes `power` as a feature,
+which is also consistent with the C null_blk driver.
 
-Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
+Signed-off-by: Malte Wechter <maltewechter@gmail.com>
 ---
- include/trace/events/writeback.h | 22 ++++++++++++++--------
- mm/memcontrol.c                  |  9 ++++++---
- 2 files changed, 20 insertions(+), 11 deletions(-)
+ drivers/block/rnull/configfs.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/trace/events/writeback.h b/include/trace/events/writeback.h
-index 13ee076ccd16..ffd1b8df4231 100644
---- a/include/trace/events/writeback.h
-+++ b/include/trace/events/writeback.h
-@@ -273,9 +273,9 @@ TRACE_EVENT(inode_switch_wbs,
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 32c10c3f4d0fd..5f1cdd54cf48a 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -35,7 +35,7 @@ impl AttributeOperations<0> for Config {
  
- TRACE_EVENT(track_foreign_dirty,
- 
--	TP_PROTO(struct folio *folio, struct bdi_writeback *wb),
-+	TP_PROTO(struct folio *folio, struct bdi_writeback *wb, dev_t dev),
- 
--	TP_ARGS(folio, wb),
-+	TP_ARGS(folio, wb, dev),
- 
- 	TP_STRUCT__entry(
- 		__array(char,		name, 32)
-@@ -284,6 +284,7 @@ TRACE_EVENT(track_foreign_dirty,
- 		__field(u64,		cgroup_ino)
- 		__field(u64,		page_cgroup_ino)
- 		__field(unsigned int,	memcg_id)
-+		__field(dev_t,		dev)
- 	),
- 
- 	TP_fast_assign(
-@@ -295,34 +296,37 @@ TRACE_EVENT(track_foreign_dirty,
- 		__entry->ino		= inode ? inode->i_ino : 0;
- 		__entry->memcg_id	= wb->memcg_css->id;
- 		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
-+		__entry->dev		= dev;
- 
- 		rcu_read_lock();
- 		__entry->page_cgroup_ino = cgroup_ino(folio_memcg(folio)->css.cgroup);
- 		rcu_read_unlock();
- 	),
- 
--	TP_printk("bdi %s[%llu]: ino=%llu memcg_id=%u cgroup_ino=%llu page_cgroup_ino=%llu",
-+	TP_printk("bdi %s[%llu]: ino=%llu memcg_id=%u cgroup_ino=%llu page_cgroup_ino=%llu dev=%u:%u",
- 		__entry->name,
- 		__entry->bdi_id,
- 		__entry->ino,
- 		__entry->memcg_id,
- 		__entry->cgroup_ino,
--		__entry->page_cgroup_ino
-+		__entry->page_cgroup_ino,
-+		MAJOR(__entry->dev), MINOR(__entry->dev)
- 	)
- );
- 
- TRACE_EVENT(flush_foreign,
- 
- 	TP_PROTO(struct bdi_writeback *wb, unsigned int frn_bdi_id,
--		 unsigned int frn_memcg_id),
-+		 unsigned int frn_memcg_id, dev_t dev),
- 
--	TP_ARGS(wb, frn_bdi_id, frn_memcg_id),
-+	TP_ARGS(wb, frn_bdi_id, frn_memcg_id, dev),
- 
- 	TP_STRUCT__entry(
- 		__array(char,		name, 32)
- 		__field(u64,		cgroup_ino)
- 		__field(unsigned int,	frn_bdi_id)
- 		__field(unsigned int,	frn_memcg_id)
-+		__field(dev_t,		dev)
- 	),
- 
- 	TP_fast_assign(
-@@ -330,13 +334,15 @@ TRACE_EVENT(flush_foreign,
- 		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
- 		__entry->frn_bdi_id	= frn_bdi_id;
- 		__entry->frn_memcg_id	= frn_memcg_id;
-+		__entry->dev		= dev;
- 	),
- 
--	TP_printk("bdi %s: cgroup_ino=%llu frn_bdi_id=%u frn_memcg_id=%u",
-+	TP_printk("bdi %s: cgroup_ino=%llu frn_bdi_id=%u frn_memcg_id=%u dev=%u:%u",
- 		__entry->name,
- 		__entry->cgroup_ino,
- 		__entry->frn_bdi_id,
--		__entry->frn_memcg_id
-+		__entry->frn_memcg_id,
-+		MAJOR(__entry->dev), MINOR(__entry->dev)
- 	)
- );
- #endif
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 55bd5d100caa..f634874bbcef 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -3949,14 +3949,15 @@ void mem_cgroup_track_foreign_dirty_slowpath(struct folio *folio,
- 	struct address_space *mapping = folio_mapping(folio);
- 	struct inode *bdev_inode = mapping ? mapping->host : NULL;
- 
--	trace_track_foreign_dirty(folio, wb);
--
- 	if (memcg_bdev_frn_wq && bdev_inode &&
- 	    sb_is_blkdev_sb(bdev_inode->i_sb)) {
-+		trace_track_foreign_dirty(folio, wb, bdev_inode->i_rdev);
- 		mem_cgroup_track_foreign_bdev(memcg, bdev_inode->i_rdev);
- 		return;
- 	}
- 
-+	trace_track_foreign_dirty(folio, wb, 0);
-+
- 	/*
- 	 * Pick the slot to use.  If there is already a slot for @wb, keep
- 	 * using it.  If not replace the oldest one which isn't being
-@@ -4031,6 +4032,7 @@ void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
- 		spin_lock_irqsave(&memcg->frn_lock, flags);
- 		if (!ctx->inflight && ctx->dev) {
- 			ctx->inflight = true;
-+			trace_flush_foreign(wb, 0, 0, ctx->dev);
- 			queue_work(memcg_bdev_frn_wq, &ctx->work);
- 		}
- 		spin_unlock_irqrestore(&memcg->frn_lock, flags);
-@@ -4048,7 +4050,8 @@ void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
- 		if (time_after64(frn->at, now - intv) &&
- 		    atomic_read(&frn->done.cnt) == 1) {
- 			frn->at = 0;
--			trace_flush_foreign(wb, frn->bdi_id, frn->memcg_id);
-+			trace_flush_foreign(wb, frn->bdi_id, frn->memcg_id,
-+					    0);
- 			cgroup_writeback_by_id(frn->bdi_id, frn->memcg_id,
- 					       WB_REASON_FOREIGN_FLUSH,
- 					       &frn->done);
--- 
-2.39.5
+     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+         let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_str("blocksize,size,rotational,irqmode\n")?;
++        writer.write_str("blocksize,size,rotational,irqmode,power\n")?;
+         Ok(writer.bytes_written())
+     }
+ }
+
+---
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+change-id: 20260917-upstream-v7-3-rc3-0db5699dab30
+
+Best regards,
+--  
+Malte Wechter <maltewechter@gmail.com>
 
