@@ -1,65 +1,65 @@
-Received: from mail-oi2-f12.google.com (mail-oi2-f12.google.com [74.125.231.204])
+Received: from mail-oi2-f41.google.com (mail-oi2-f41.google.com [74.125.231.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD892DE709
-	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 02:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB291448E0
+	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 02:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789610948; cv=none; b=FaIQdc7piLDWiuKerKs2EervFhbZChjE/NxyP1H1ehiBFrVllna4GMihY+ZJihcnWR47/p++CTPfro3zLtZkVAhkabB9Azit8azcpn/xoFHSdRlmKL66SndFiyGCzCGnmdWRH86bTQK296b+CaDuqVUHiI2vLQyidopwPuSg1jE=
+	t=1789610954; cv=none; b=jW6gxPzm2+ARn+KMeP69SxVlb1x3OEcZ/l2/HlaRNFalzFATcv8eM631FheOebM0skGV7QCRqR/LaffmnYZeMlWI9noIs6Ag0IEPq1ZR/EUC0ze08Xqvda9ocQgEK9tUOYFlhhJ/WNek52VLWovehP7YHvbWORdXqggcVpEb9ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789610948; c=relaxed/simple;
-	bh=r7KETro03mbh2peL23HRgFmmLN8WkJ36j9hxUY7twcc=;
+	s=arc-20240116; t=1789610954; c=relaxed/simple;
+	bh=ChhbQmfcR4p8J3/gFvJzvhucipNfIhOl3pNXWmuGJus=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NRUeJLnfal+mZxKRamJhIRr0pyfC8Zul1a+gmMaMbh2n2GJkW7R1FHl6pVRJSjgiflCkiytUbPVtpmoZTC7IdeHihFyGITeS4ylUj+7cdioOpKZGVdpRNZJ8fHcHaRApTWIIlpC3QgD6s4I+6jmdbLYDkMLy6f6pd2l1l/jqOhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=V2Pu+x7P; arc=none smtp.client-ip=74.125.231.204
+	 MIME-Version; b=OdVVIE+WVDsAfj7hB7jWQ0EmVe770vt4ej5pOzUBpNHQfdH5S2PiuOqbi0EqElugbFMaBIONsskgKo5Dev1s2WwQcu/8II0N1/aHiDVyyQahsHxUZF28rJVvbsyI8eBradIKmEyA7h3xFikK3lF6PmWafbkjHfvCmEQJZK5WYLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RV6tp/23; arc=none smtp.client-ip=74.125.231.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="V2Pu+x7P"
-Received: by mail-oi2-f12.google.com with SMTP id 46e09a7af769-804f7045f3eso117582a34.2
-        for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 19:09:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RV6tp/23"
+Received: by mail-oi2-f41.google.com with SMTP id 46e09a7af769-805cc8b4231so213524a34.2
+        for <linux-block@vger.kernel.org>; Wed, 16 Sep 2026 19:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1789610946; x=1790215746; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1789610952; x=1790215752; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=HjEqzoruK2cVKHsNbOug1YqWgRo+jMvoWK8u9zqqC1s=;
-        b=V2Pu+x7PKL/dEbo3W+iMapSwU4J4J4ayk0WOx8aDHkal7LkuSl7hwJNt646KuZzNtw
-         VLHejUvKS8znN0FFtfYUyezu348Vt16Rr1+g80qCR+PCXjCOfS6vyLrP7PzvEkyQgMfa
-         +q3uv6UiAOd2oURXdNgqOA21+sdLRA41lxv/8NU31g6bzqWd9WchchsNhdNVF/17Qtpn
-         RmjjXfe9fzYnjec9WgQO/RCpLK0a7f7wES8ROzs+B6YN2kAGdQll3+8Ko80/uZSJr89M
-         xvoC99fjqpe5XeihvPixge+2D6KfqgogHLSE/x1QrFfJqwdSZ0URuQaTJ4kfqjiSmkVb
-         J56Q==
+        bh=f0T1IvfBw3ebyjaZWVZBcsx1XWMSh/Mzfc7wKk0DGKM=;
+        b=RV6tp/23c68W1aY+/xF8tDc9i2mbpfVqHXSkvDrKakus5fUSKSMUgXCHKMvu03C830
+         KwBKGQtQF4nuvv3oIwcMoxagZYHAgLCw/D4oQYyJbiYSyeLKFTO7aum7o2rPr2i9x9+S
+         jh/OTyA90ZMeQuB4u+dBjJvEFSOkd6ZXiZHrIlZe2XWn1i3rK2PmAgXguzxebjBzqHib
+         thgDYYC+8zEIPZgxjzYAIls3bCsL2P9YpiGNDFBCO5335YCr8VGB2voSPV+YgQOzu25v
+         0CnzmEGH9wSRyTbUdL5tbTfNIKrYAalWszk4kz0W3d2pGBJcrqv9e7Vl5PiaJ7tvZ+ff
+         20tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789610946; x=1790215746;
+        d=1e100.net; s=20260707; t=1789610952; x=1790215752;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=HjEqzoruK2cVKHsNbOug1YqWgRo+jMvoWK8u9zqqC1s=;
-        b=YEYUxzJ0XvcgN6V3ZSXSzKw4ejTqy2hJWdRvNZRnEIDP+iAtcbT3/KfEyh3aqCSPaP
-         l8CYctEXgZkXbH2E1B+kdH2yVJCb41NL8S/g3hDoRPJdZh1Fu9ThzM+WagKDV8LNQ130
-         iJ0WioXDeKjW0s1nUuZbeOKNwnONzTJCmuehT2M2kmJnc38ey7TojKg7fjY+P1IFBqlG
-         k+w7vtsBtmvnrd+zowL+LewsW6QL4b56LWSfN8Kvd65tPjtp+gDDU+MnSzYowINFeX4+
-         7PZPjeK9jojlYhWGeykfsFetwbhbGqUmp/eDJqRUpvP62CKDT9UJhrU9WF6aQi3p7hqv
-         mByQ==
-X-Gm-Message-State: AFuF++k/h5KSDUJtG2cFTkvdNjoov46NTtSPJ64QH0gDpPY6HNsGrV/J
-	WfZfnbOlLTdDv1ztncI4a4Vneeo+6sZEJXemZ9Kfq0fVQoHOC59Dn5LlZ3q4No0EaDkhHbCCBCP
-	qHoyREP3uhC2n5k7dw57Knyj/sUNpAGlSBYAmphpI9wtS/03nMwCV02cWr/aqkJf7qWu0MaKkSj
-	78qqwf+c1fxD5DQOBm9BLeOVj5+LW5Qvk6wa0+P59K76tw94W3X8+9DbxhGA==
-X-Gm-Gg: AYBFou0/sPLuh+Ixw2lXJewZQao5TqKinoKFg0VqJW5aQS7iw/nsM8sysQGO/W/rVAW
-	+VEzcS3ksttVfV8nzllZa9SszQaDarRoA1oXpZIPJWpzd71k+GdWfvqF8eEfOXFrM+gMbFZshdl
-	xLhIrSVR1lEm6VPY4OWzHLzaT06vrt+anWbK21rl+T/xmfzK/amTS6JXha5zC97JKprHg2RcpqU
-	V/BWMd2/0ih9LZ2BAsIeEpW3IxfqNNjOM6f9o5yfQENBly61zocx4ixgWeEcB7Hzr7IMGQF8AF0
-	BZTNFUD89XWxBj5I/tbADG0+J29tIohSTXnV7pGTGdPBd7Tjzi7ZNUvgrYsmkj4AMu4+vjWuBrF
-	rGiD8Lh/xgI4DHy9oB4NgW+bpS0O3m5GDKLPrZEIr0LGcANb3kTFFf5pf0iSKugaO/r8m3KjZPJ
-	7hHh21PuR/nwKnTu3HLSfmQ/OTfi8F8DTR5HAyM99qVGOaAaLygTdqSZyQ+XbYNU6Q9/PdYBlvd
-	ZjEwg7WWYPhlhp0PhsvRbIYOmbPRg7fkInSRZQ=
-X-Received: by 2002:a05:6830:2695:b0:7fa:ab72:9e02 with SMTP id 46e09a7af769-80b2f5d9272mr5300245a34.26.1789610945235;
-        Wed, 16 Sep 2026 19:09:05 -0700 (PDT)
+        bh=f0T1IvfBw3ebyjaZWVZBcsx1XWMSh/Mzfc7wKk0DGKM=;
+        b=iGAUdGW681u0p6rQIayoL+BHQs9iBAFvZvBcVdyGVNYUOAEXdkkhDTPlNLOMdIx94e
+         j0WYNSlERFZRrvBQ7zW91Wcgf7f9626i3VyeULcmWZvyKzieM2bekSDs+7gcRqnnCC7G
+         K97oSBcC1Uxm8B7SJ/zqgROEtSsjM5evpZv91lkpIvKTPP8MnbrML592s3dK/y2SU/A3
+         229GDuu8y8sOZkGuR+6dU95TfO0ETjRW5N7NSPXRy1SIQj28hM2CfTudrVlY8TtYFZX/
+         MSy+wceeaJZqNclDOheiI+62J9wyLDK7sVcfqgT3xGl/voz4VxlGM24o6pU7pbTH4ffX
+         7Ziw==
+X-Gm-Message-State: AFuF++kM/QVWdQ2qQx/4yhIKz3545c/2OVNZm8AjB0X93NmOfb8HJRKp
+	Mic/zANnVcnd03rGwLDhiPoYW3uACkW4n3T3uK3rkuws0xmOXd7dap1hNqu3Prs3Wp1+u4Vr00P
+	YPBmhfY5gA3So/2OBsDac7n7s2vTEONSjNmDDyHu1P6qtRdwWmT6AhO0jzkWKIxzShK+64oRCzJ
+	tnj+C4EWPcpU9I26IxK2i0bKekL7WT1pDMSAAmb9mcfePEmcyuorOW2ucNXw==
+X-Gm-Gg: AYBFou0iaZfsJ+wCV2xwuNGfLBRxY0YgCIkeIP02wNQ8Q39wFjZx0mOr2DsLnSSEt3c
+	fs3HF3DU535FdZl6fVfYVwOcnU/wX6R8Hxj0J0sKik37YOF5qdjgY1GB00Bo1lqFAqr98qQjiNb
+	KABe5HByY/8ZaZ8aQNVLPPUiKtVUT7Js+61nsfrRhNA9/TtSlZWZi5ynUIy/k00CmyK+JcNZ91c
+	3MFby59gGoM3FZ+NF0CxjskpmxJK9gtq5CgMgj8M+QnCwr//yYBqDLqygL9WLvungXJBejzd9vg
+	xG5uiUWvs3sAdI5TIVFPVj4PAkcwx8Li7jNnywY5e8r6pDAi9fIFBWkhcx+cf9jE02/gnscAmHG
+	NrdDJ3T/zCyf16PjmVIi/Ou9nCX9ZtyMilt+W20nvVdMaPPzTSXDkBCrRLKpvIqBB68SoEKACLH
+	q2bhYwd/aihMywkbJVycxTjZzLd0Mrma76QWL1ma8bkFJ5CoUx0lRn2b2XO1Tt6ghQepfeMDRaF
+	THak5GiDts8WLvfxGaFlTLDiRrdaXytLDKk7CM=
+X-Received: by 2002:a05:6808:1912:b0:4b9:e5fa:8905 with SMTP id 5614622812f47-4ca4b73867bmr5112939b6e.24.1789610951636;
+        Wed, 16 Sep 2026 19:09:11 -0700 (PDT)
 Received: from dev-mkhalfella.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-80c46cb6675sm1862569a34.16.2026.09.16.19.09.04
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-80c46cb6675sm1862569a34.16.2026.09.16.19.09.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 19:09:04 -0700 (PDT)
+        Wed, 16 Sep 2026 19:09:11 -0700 (PDT)
 From: Mohamed Khalfella <mkhalfella@purestorage.com>
 To: linux-block@vger.kernel.org
 Cc: shinichiro.kawasaki@wdc.com,
@@ -73,9 +73,9 @@ Cc: shinichiro.kawasaki@wdc.com,
 	Randy Jennings <randyj@purestorage.com>,
 	Dhaval Giani <dgiani@purestorage.com>,
 	Mohamed Khalfella <mkhalfella@purestorage.com>
-Subject: [PATCH blktests 3/5] src/miniublk: add the inject command
-Date: Wed, 16 Sep 2026 20:06:23 -0600
-Message-ID: <20260917020752.1672578-4-mkhalfella@purestorage.com>
+Subject: [PATCH blktests 4/5] src/nvme-ghost-write-detector: add an ABA ghost write detector
+Date: Wed, 16 Sep 2026 20:06:24 -0600
+Message-ID: <20260917020752.1672578-5-mkhalfella@purestorage.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260917020752.1672578-1-mkhalfella@purestorage.com>
 References: <20260917020752.1672578-1-mkhalfella@purestorage.com>
@@ -87,166 +87,144 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a CLI command which arms a delay on a running device:
+Consider a write X that is issued to an LBA and times out without ever
+being acknowledged. The initiator retries it on another path, where it
+lands. A write Y to the same LBA follows and lands as well. The original
+X is still in flight somewhere in the fabric, and when it finally
+reaches the device it overwrites Y. A read now returns X, a write the
+initiator gave up on long ago.
 
-    miniublk inject -n dev_id -o {read|write} -d delay -c count
-
-It sends one INJECT_DELAY datagram to the device's control port and
-waits for the reply, so it returns only once the daemon has armed the
-request. A test can therefore arm a delay and start IO immediately
-without racing the daemon.
+Add a program to catch this. It opens the device O_DIRECT and, on each
+iteration, issues a series of writes of distinct byte patterns to the
+same LBA, the 4k block at offset 0, waits, then reads that block back
+and checks every byte holds the pattern written last. Because the
+patterns differ, the value that comes back identifies which write
+reappeared.
 
 Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
 ---
- src/miniublk.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
+ src/.gitignore                  |  1 +
+ src/Makefile                    |  1 +
+ src/nvme-ghost-write-detector.c | 86 +++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+)
+ create mode 100644 src/nvme-ghost-write-detector.c
 
-diff --git a/src/miniublk.c b/src/miniublk.c
-index 8dc2a56..2dbd4aa 100644
---- a/src/miniublk.c
-+++ b/src/miniublk.c
-@@ -48,6 +48,7 @@
- 
- #define UBLK_CTRL_PORT_BASE	61000
- #define UBLK_CTRL_MSG_MAGIC	0x6b6c6275
-+#define UBLK_CTRL_RCV_TIMEO	3
- 
- enum {
- 	UBLK_CTRL_CMD_PING		= 0,
-@@ -1561,6 +1562,114 @@ static int cmd_dev_list(int argc, char *argv[])
- 	return 0;
- }
- 
-+static int cmd_dev_inject(int argc, char *argv[])
+diff --git a/src/.gitignore b/src/.gitignore
+index e9869e1..9673be8 100644
+--- a/src/.gitignore
++++ b/src/.gitignore
+@@ -15,6 +15,7 @@
+ /zbdioctl
+ /miniublk
+ /nvme-passthrough-meta
++/nvme-ghost-write-detector
+ /ioctl-lbmd-query
+ /nvme-passthru-admin-uring
+ /nvme-delay-ioctl
+diff --git a/src/Makefile b/src/Makefile
+index dd64694..92b4d0c 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -24,6 +24,7 @@ C_TARGETS := \
+ 	mount_clear_sock \
+ 	nvme-delay-ioctl \
+ 	nvme-passthrough-meta \
++	nvme-ghost-write-detector \
+ 	ioctl-lbmd-query \
+ 	nbdsetsize \
+ 	openclose \
+diff --git a/src/nvme-ghost-write-detector.c b/src/nvme-ghost-write-detector.c
+new file mode 100644
+index 0000000..bd42dde
+--- /dev/null
++++ b/src/nvme-ghost-write-detector.c
+@@ -0,0 +1,86 @@
++// SPDX-License-Identifier: GPL-3.0+
++// Copyright (C) 2026 Mohamed Khalfella
++
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <string.h>
++#include <malloc.h>
++#include <errno.h>
++#include <libgen.h>
++
++#define BUF_SIZE	4096
++#define ITERATIONS	10
++#define DELAY		3		/* seconds delay between iterations */
++#define WRITE_COUNT	10
++
++#define WRITE_OFFSET	0
++#define READ_OFFSET	WRITE_OFFSET
++
++int main(int argc, char **argv)
 +{
-+	static const struct option longopts[] = {
-+		{ "number",		1,	NULL, 'n' },
-+		{ "op",			1,	NULL, 'o' },
-+		{ "delay",		1,	NULL, 'd' },
-+		{ "count",		1,	NULL, 'c' },
-+		{ "control_port",	1,	NULL, 0},
-+		{ NULL }
-+	};
-+	struct timeval tv = { .tv_sec = UBLK_CTRL_RCV_TIMEO, };
-+	struct ublk_ctrl_msg req = {};
-+	struct ublk_ctrl_msg rsp;
-+	struct sockaddr_in addr;
-+	int dev_id = -1, op = -1, delay = 0, count = 1;
-+	int ctrl_port = -1;
-+	int fd, ret, option_idx, opt;
++	int fd, i, w, off, ret;
++	char *buff;
 +
-+	while ((opt = getopt_long(argc, argv, "n:o:d:c:",
-+				  longopts, &option_idx)) != -1) {
-+		switch (opt) {
-+		case 'n':
-+			dev_id = strtol(optarg, NULL, 10);
-+			break;
-+		case 'o':
-+			if (!strcmp(optarg, "read"))
-+				op = UBLK_IO_OP_READ;
-+			else if (!strcmp(optarg, "write"))
-+				op = UBLK_IO_OP_WRITE;
-+			break;
-+		case 'd':
-+			delay = strtol(optarg, NULL, 10);
-+			break;
-+		case 'c':
-+			count = strtol(optarg, NULL, 10);
-+			break;
-+		case 0:
-+			if (!strcmp(longopts[option_idx].name, "control_port"))
-+				ctrl_port = strtol(optarg, NULL, 10);
-+			break;
-+		}
++	fprintf(stdout, "starting %s test program\n", basename(argv[0]));
++
++	if (argc < 2) {
++		fprintf(stderr, "usage: %s /dev/nvmeXnY", argv[0]);
++		return 1;
 +	}
 +
-+	if (dev_id < 0 || op < 0 || delay <= 0 || count <= 0) {
-+		ublk_err("%s: -n dev_id -o {read|write} -d delay -c count are required\n",
-+				__func__);
-+		return -EINVAL;
-+	}
-+
-+	if (ctrl_port < 0)
-+		ctrl_port = UBLK_CTRL_PORT_BASE + dev_id;
-+
-+	fd = socket(AF_INET, SOCK_DGRAM, 0);
++	fd = open(argv[1], O_RDWR | O_DIRECT);
 +	if (fd < 0) {
-+		ublk_err("%s: can't create socket: %s\n", __func__,
-+				strerror(errno));
-+		return -errno;
++		fprintf(stderr, "failed to open device, errno = %d\n", errno);
++		return 1;
 +	}
-+	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 +
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sin_family = AF_INET;
-+	addr.sin_port = htons(ctrl_port);
-+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-+
-+	/* connect so that a missing daemon shows up as ECONNREFUSED */
-+	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-+		ublk_err("%s: can't connect to port %d: %s\n", __func__,
-+				ctrl_port, strerror(errno));
-+		ret = -errno;
++	ret = posix_memalign((void **)&buff, BUF_SIZE, BUF_SIZE);
++	if (ret) {
++		fprintf(stderr, "failed to allocate buffer, ret = %d\n", ret);
 +		goto out;
 +	}
 +
-+	req.magic = UBLK_CTRL_MSG_MAGIC;
-+	req.cmd = UBLK_CTRL_CMD_INJECT_DELAY;
-+	req.data[0] = op;
-+	req.data[1] = delay;
-+	req.data[2] = count;
++	for (i = 0; i < ITERATIONS; i++) {
++		fprintf(stdout, "iteration number %d, writing data\n", i);
 +
-+	if (send(fd, &req, sizeof(req), 0) != sizeof(req)) {
-+		ublk_err("%s: can't send to port %d: %s\n", __func__,
-+				ctrl_port, strerror(errno));
-+		ret = -errno;
-+		goto out;
++		for (w = 0; w < WRITE_COUNT; w++) {
++			memset(buff, w, BUF_SIZE);
++			ret = pwrite(fd, buff, BUF_SIZE, WRITE_OFFSET);
++			if (ret != BUF_SIZE) {
++				fprintf(stderr, "failed to write buff, "
++						"ret = %d, errno = %d\n",
++						ret, errno);
++				goto out;
++			}
++		}
++
++		sleep(5);
++		fprintf(stdout, "validating written data\n");
++
++		ret = pread(fd, buff, BUF_SIZE, READ_OFFSET);
++		if (ret != BUF_SIZE) {
++			fprintf(stderr, "failed to read buff, "
++					"ret = %d, errno = %d\n",
++					ret, errno);
++			goto out;
++		}
++
++		for (off = 0; off < BUF_SIZE; off++) {
++			if (buff[off] != WRITE_COUNT - 1) {
++				fprintf(stdout, "validation failed\n");
++				goto out;
++			}
++		}
++
++		fprintf(stdout, "successfully validated\n");
++		sleep(DELAY);
 +	}
 +
-+	if (recv(fd, &rsp, sizeof(rsp), 0) != sizeof(rsp)) {
-+		ublk_err("%s: no reply from dev %d on port %d: %s\n", __func__,
-+				dev_id, ctrl_port, strerror(errno));
-+		ret = -errno;
-+		goto out;
-+	}
-+
-+	if (rsp.magic != UBLK_CTRL_MSG_MAGIC) {
-+		ublk_err("%s: bad reply from port %d\n", __func__, ctrl_port);
-+		ret = -EPROTO;
-+		goto out;
-+	}
-+
-+	ret = rsp.ret;
-+	if (ret)
-+		ublk_err("%s: dev %d rejected the request: %d\n", __func__,
-+				dev_id, ret);
 +out:
++	fprintf(stdout, "finished %s test program\n", basename(argv[0]));
 +	close(fd);
 +	return ret;
 +}
-+
- static int cmd_dev_help(int argc, char *argv[])
- {
- 	printf("%s add -t {null|loop} [-q nr_queues] [-d depth] [-n dev_id] [--control_port port] \n",
-@@ -1577,6 +1686,9 @@ static int cmd_dev_help(int argc, char *argv[])
- 	printf("%s recover -t {null|loop} [-n dev_id] [--control_port port] \n", argv[0]);
- 	printf("\t -t loop -f backing_file \n");
- 	printf("\t -t null\n");
-+	printf("%s inject -n dev_id -o {read|write} -d delay -c count [--control_port port] \n",
-+			argv[0]);
-+	printf("\t delay the next <count> <read|write> ios by <delay> seconds\n");
- 	return 0;
- }
- 
-@@ -1915,6 +2027,8 @@ int main(int argc, char *argv[])
- 		ret = cmd_dev_help(argc, argv);
- 	else if (!strcmp(cmd, "recover"))
- 		ret = cmd_dev_recover(argc, argv);
-+	else if (!strcmp(cmd, "inject"))
-+		ret = cmd_dev_inject(argc, argv);
- out:
- 	if (ret)
- 		cmd_dev_help(argc, argv);
 -- 
 2.55.0
 
