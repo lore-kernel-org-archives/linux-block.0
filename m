@@ -1,86 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED535208D9;
-	Thu, 17 Sep 2026 16:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08F14F3ECC;
+	Thu, 17 Sep 2026 17:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789662711; cv=none; b=hlXvjQku5qisPHmbU6lXTw1iwzpO6ouPHev4PPvvpuvKVtmKLEv5r5O603EIJPehU60YXaBmMP3kMzRoyDhIHSHTn23bqj7RbNJVyGpFZToiLKeyUYzfsMnab/fIMlqkdzeXy9oEyHCtI4ZNr4bGlbrw53wPehYfV1JWe9/PAFU=
+	t=1789665515; cv=none; b=H2W31xfSeJCldsJBSxh9a/wumFZtnwI+yhGKZsR/qeTuRoqL10n6JMF9fAiZVP2uQpm4LAR/mCb9ud2ugg9VBV+I68K4My/Fzs1P86OAfYRzGV0jvyIw2HZqtMcFXui8t+uaYIgjJug/uczVimMM+r/yvtOW8QD8dI8V2jUavZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789662711; c=relaxed/simple;
-	bh=0To77VH1BvxXlwP0fOQpNPmA0GzBaW2FlPdaU1r/PME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p6BOPAu0OpLto3n4uEA1BLqDupLU2pwd5Cr+YzfTTJE2jioe58hifs24xWROqhi+IsY4mQkHTIbHvKtMpV2kyVoDpNsSbLaSZRXaM0xgR4VD/0keuYAmLAsygABtBSSzirRXQoC99/BcCY0uQ6YQcmfMAh/qKkfFrx9bP10B6Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h7YRASXZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789665515; c=relaxed/simple;
+	bh=lk0SDPjUq8n+EkW8aP+t8iENWednLBKvqT3m1egQ16M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=P8xXxD2J1+xsKjizm31xdUMGkKgfQv/qnhxC670jy5C5hJ6D8BP9e44D82swa9JbxFevcFJ07ybqbirxIhEW3XPVN41VpDRbYIBXl9+c7o728v7EcJcmESTkbYB+R9OrTpwzGqruOZO4cCCecVAOmQhyTAxN4NtfwEZZtAt/dxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nzZ2yZkp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h7YRASXZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1DD61F00893;
-	Thu, 17 Sep 2026 16:31:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzZ2yZkp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53CC1F00893;
+	Thu, 17 Sep 2026 17:18:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789662710;
-	bh=MNrVdq8SN12rH480qe2VVLnJrb/VvlyGe2h6LGmcApU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=h7YRASXZKPWHByFdQ1iXCJGWVds9T3xZm/7V9v0s90TxkmTKJSWZIMT9GoXtDlmxX
-	 yNQxcyaBVrLRJQtvdh9tPfDllW+Y7XLcPajjU/lr6cK7p9KLWXI7VF2xJeW3BMgNhF
-	 tiMSwtBCHzq0Vi/7CLQUBxtFdYxkjbGGJwWzjKp/n6ibIAibyjNvFzwVXKz0BAuusl
-	 yx1Yb0IfMxUOvbTipfUDz5+S2aj7TO0FUIfwROOfn0l11btj2eRKALOyhOf8PjCjQ6
-	 JcSFGGpTYtlSu3BJbja9ngadPercgSux+EyCkxr5m6Jd/OjJ8kP5NFp+ABtX6qLVYF
-	 cihLtODG88ZDA==
-Date: Thu, 17 Sep 2026 06:31:49 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hannes@cmpxchg.org, mkoutny@suse.com, shakeel.butt@linux.dev,
-	riel@surriel.com
-Subject: Re: [PATCH] blk-cgroup: skip rstat flush for cgroups without blkgs
-Message-ID: <aqwV9cjg7Yj2OtBG@slm.duckdns.org>
-References: <20260917161020.4139163-1-usama.arif@linux.dev>
+	s=k20260515; t=1789665514;
+	bh=lk0SDPjUq8n+EkW8aP+t8iENWednLBKvqT3m1egQ16M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=nzZ2yZkpiNXdm/rdS7AgJ/W1oQ5/Yzxg+QCWfjdB3JKpI6X58n4MiWC/iheshFMnr
+	 x1P6DxS2l8gtw9dlpGoTEDYzfeo7S0NfFkhpnzErnd9OLg5yGkeN/1AGU1X/RTY67b
+	 sTrs6NtAy2pHLogyQynOq/Vyobwu6zoJEpUBqYSvM0+Qz334Ym2jSaQFJvWpxsbSdv
+	 jSNASBPJvBaj5rTIZVNxZFm/zqdweGjEmFWyrl581XkYapCBJOUNlmUJj4o8eAd0vX
+	 iQARzPnCFesAp8uGDuXsGW4pMek/pJalTBK1wFsppDi19ZUEzye6a7dP0Ljq/KaaqD
+	 f7JJ70S2Q29yw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Malte Wechter <maltewechter@gmail.com>, Boqun Feng <boqun@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Malte Wechter <maltewechter@gmail.com>
+Subject: Re: [PATCH] rnull: configfs: add power to configfs features
+In-Reply-To: <20260917-upstream-v7-3-rc3-v1-1-d0b620bf82c9@gmail.com>
+References: <vspA5VSGRK2smvApi6HxKjwbOdC5xDyBIiK3BBM15J9CmbDQqwlg3zTY65NQeOzOWqle3sY-izGdKuXtqIMAWg==@protonmail.internalid>
+ <20260917-upstream-v7-3-rc3-v1-1-d0b620bf82c9@gmail.com>
+Date: Thu, 17 Sep 2026 19:18:13 +0200
+Message-ID: <875x034x0q.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260917161020.4139163-1-usama.arif@linux.dev>
+Content-Type: text/plain
 
-On Thu, Sep 17, 2026 at 09:10:20AM -0700, Usama Arif wrote:
-> Non-root io.stat reads flush the blkcg rstat subtree before walking
-> ->blkg_list. This takes the subsystem rstat lock and checks for pending
-> updates on every possible CPU, even when there is no per-device state to
-> print.
-> 
-> Blkg creation is hierarchical. A descendant blkg implies an ancestor
-> blkg on the same device, so an empty ->blkg_list means the subtree cannot
-> contribute any output. Return early in that case.
-> 
-> A concurrent first blkg may be deferred to the next read. This is
-> consistent with the existing non-atomic flush and list walk.
-> 
-> This is not rare: 340 of 969 io.stat files were empty on a 316-CPU host.
-> In a 16-vCPU lockdep-enabled guest, the median
+"Malte Wechter" <maltewechter@gmail.com> writes:
 
-Can you please test on a kernel w/ lockdep disabled? It doesn't make much
-sense to compare performance numbers with lockdep enabled.
+> features displayed by configfs for rnull was inconsistent with the
+> actual features available. This correctly exposes `power` as a feature,
+> which is also consistent with the C null_blk driver.
+>
+> Signed-off-by: Malte Wechter <maltewechter@gmail.com>
 
-> open/read/close time over 35 batches of 20,000 reads changed as follows:
-> 
->                          before     after
->   empty io.stat          49.1 us   41.0 us
->   populated io.stat      49.9 us   50.2 us
-> 
-> This is a 16.6% reduction for empty reads. Populated reads were unchanged
-> within measurement noise.
-> 
-> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+Looks good, please add the Fixes: tag.
 
-That said, I don't see any downsides:
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Best regards,
+Andreas Hindborg
 
-Thanks.
 
--- 
-tejun
+
