@@ -1,64 +1,64 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A6351FCD5
-	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 13:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4AD4BF934
+	for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 13:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789651814; cv=none; b=sWyMzOm9xJU7X6uaeD3VsFWmycAvVMvCKBWawFe5tdo2HqKOMfEaDSxi9jJssAb3tmPqvHFtRpfsaTFJyK0JlSdB7xo0PjatxZ3Ey6xbH0PntYL9cVI5rhzCZpUJj7U/lrj6g5dl2gT5BdaSJD351AmyBDVj9CmGvSzMlqmvzPc=
+	t=1789651813; cv=none; b=fXyyZyTYWSjchf1n1+sxYlrlcIgHf9LDn9+uv3l3e2JH3SxNrTAMgv9H2WwBoFGueLqIKxir/5kCkFpe1zYwNhw1YOOvHkYlQWcWwiR7lbNMRwMOUVkiA6ATlz0zVmxCCeJH9A1B0XTfBahdRTGL2y8iqtbFlRvHSjgiQHbjww4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789651814; c=relaxed/simple;
-	bh=kgacaXhkkji4P8QOQ+aFj100L+etrdW7UzgN1ijHzHY=;
+	s=arc-20240116; t=1789651813; c=relaxed/simple;
+	bh=m2UU0/l7oXH4nDDm4aNiVdsK/0ORRSvCe00W37MZM54=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qwJ9iTeZr66va+DzGmsIS2PGNCGEm1otOnjOeFx88Nn71kDDs0TK9HFvcIdOJOT5Ko9Y1sV9PtYCHavZKrxbUKByaLlwPszsoCx/jzTupdFjEfbZlZPMpzUsf45FUq9Se0H1Urk9ukI9ptIVj1dPglfw8lz/gGBIThMXXJ3H9B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b=KMGzSQHn; arc=none smtp.client-ip=74.125.225.141
+	 MIME-Version; b=e4rHlwlN1MY9DlFIUWOqf5oZ6jCZ0WR0S1V5upIQdqG91zRH171Fosbv+l66Dmnx3qAL61t6Uzdx632PUvuQoePYbs93/rN1Ud//CiAx7qt95Mk8yV2hhl6OjN+ZDudYCIquckgiETQGMpUDnnj9aVE3eckluzRqwhU13adjINg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b=EkGNaUPH; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b="KMGzSQHn"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49cd5462b69so5112705e9.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 06:30:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b="EkGNaUPH"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e620fa473so5118485e9.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2026 06:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=starlabs-systems.20251104.gappssmtp.com; s=20251104; t=1789651799; x=1790256599; darn=vger.kernel.org;
+        d=starlabs-systems.20251104.gappssmtp.com; s=20251104; t=1789651798; x=1790256598; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GhZfe7j97gcGMqNS+7HeL0ehn+NCntLK64e5hLR53vg=;
-        b=KMGzSQHnXHagzGVPGxif3eDEd30RorkGW7q3GcXqowT/bgNasMll94uFTZKymf/XG8
-         tovBR3YGZZOlDcpBFR9wjKvC3RkVKSe1cY/FlrKNfW986zXRRsF2lT1VADCagcwL90a5
-         GfaxBWYIppR1k5e7Aa75NjbzWo8GQwToSUjIepXWrWLusfwJJrem7JVwToUUAk7dqJ9L
-         MLf/5obAblKj6wQng8tqO6e4icV9XxFxqjR/VdXS3S+bb59pb0SrNo8MUMfv3iyJLeDN
-         2url79nAawKo0yVbBYc4Azey4+g6qeyzXG+Ang3FbwdFSpkbSkQIdc5sH3M1tsPcL5Xx
-         EBxw==
+        bh=cYqy4JvgQiRzCuvqvHp97HhL8V2ft2LLYeHwmXteui8=;
+        b=EkGNaUPHk0gCOURnQPHeX9tSlGgDfIPzVjd/lnLCeRErwDbYKU4BQDoajk1jwvDy+j
+         NBa0QpS7P47So6cifHV8RRnY4WadJVeszl2Nsf/8i3nDeQaYjMKCeYOKSx/hxBSomZEw
+         rnXazoXlGfmpepFfToUV0s6lnvTCkFMMCgS0Sbq6F9WumcWYWyg2Ub8WXsFqfXytRoQi
+         L3cvrslXCgqzO0zKviYkehDLwSeO/HZoMBgY3yFjoykyymVLXNJDb9/E4EBlJximhl5g
+         sxZyax/5Kt5VChk4VBXhKrYXBnpzeSVI7OxWa+FFL8VhNit1cwxjtoO4pKQXtIZjNL5C
+         X1JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789651799; x=1790256599;
+        d=1e100.net; s=20260707; t=1789651798; x=1790256598;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GhZfe7j97gcGMqNS+7HeL0ehn+NCntLK64e5hLR53vg=;
-        b=yTeuFbWjDncZgrSJaeRH1iAv9NJvM6urZeNnjM1i5WiNuVv0wfefZEcvPxK7Xs2kVQ
-         jQ1WQZ9fWbeAX6YMWzNR+HSFXp4EI0c0KilHaX4fOsQsiacvG18f8FxC/WxnAKdAvk1/
-         3WLw8WwTGBSNUPSWOKoT/mJHrreyNe4tQW2ulCG09kjbNbg/AaEYvg/QbV0dv/Cj4EwV
-         pC0ek3OogzhLp7XV/TbLGarfhGn5mIA5p3K2kXomV4rUWw9eez+Of9AeZSFX5Ec+l3K2
-         RidJHPJAJzhw+HRAURyjRe82l8aEGnuXEr5H/8YuDg1yVHgHLgoZJkfc0Yv6eOFiy37i
-         HF5w==
-X-Forwarded-Encrypted: i=1; AKwUvBx+pF4BTSVGaHe8n0N2jKP8JZaRv5Q1SvHEA0Ltp69MFwLZqZixxtVlGHOMP1BjdgLubB8k7OpMyFImVA==@vger.kernel.org
-X-Gm-Message-State: AFuF++mQgRgF3JACpMJhJ5yyp1bcg1h/Ae/Thj5PXu6xMZvnncgPqCjB
-	DOIfADwjbCQXrLf15rjoMlnLX+BNET9KoAsobbwoe6v4NVsxIbummvleey96987cWg==
-X-Gm-Gg: AYBFou1xYRyqi8dzRWbSyteV9Z9Y9lIhQ5lVIhj87sdkIJ1SiMaVNtshmKUPPeV+S98
-	iIRKZY6NXhiMHUV8iTYLvVx1l3smmpPk3wYmbo7KG/lrqxPrzbO/neoc1/72pOcaewp2tsrpLkr
-	sIimNs7SC7N5IgSxmXF2bbRFjSjuQY4PTTI+gMGyblqHJfO4c9Qfhutd75551Lfb2uQHEwsJNOs
-	vQNgIwJdywk3hmfjPjhCJiG6mZ1zvfvKKi1DarJzL143jM6hWueeHWq5NVcv7V+Uo0Ay4cVF3Mq
-	rhLqJpvLvIjBOzm1sbrzOTtEWlNQ8fKjey8RQljJeXWfsGe7Q52ZjRAiMx7Yi/f6365by3fev5N
-	pRQyRBq2RKSpr/KRQZVrpCH6KFK3ubarJdLPY/rFSvUZkEwW/dPSmtYKiOT9laXkHtVyyrbpZwS
-	yhaDLKypScCixsIBsSX5/TqDW33XBGEPtNx41FQIeGCXVG250cT6/PVLePGBWzl6xdV9DDDyWly
-	e5DO3jnGb1KWxCIQhHO/B1eXTupbhzYzcd8rw==
-X-Received: by 2002:a05:600c:4e91:b0:49d:726:cc9f with SMTP id 5b1f17b1804b1-49eb72f39d7mr156045335e9.5.1789651799329;
-        Thu, 17 Sep 2026 06:29:59 -0700 (PDT)
-Received: from fighter ([216.128.28.240])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fbd2356d1sm97548275e9.6.2026.09.17.06.29.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=cYqy4JvgQiRzCuvqvHp97HhL8V2ft2LLYeHwmXteui8=;
+        b=hEtMk7Z24bATrej+SESPIhN2xCn40AKzG4KKHFBbWH1DtBGvRZTgGjksE0+ge2YOXw
+         mloCWOEqJfJxdn0fOz8FNrpFlnS9PvPMeFTRk0wUih1A5eejDstNvMoPLXJFQBr8zjhM
+         IStP/+PA7vGDEsTU+Pv2B6t+yzRQfqU6vJKjHng6FvQQqIOva6zbvkqx+JtFL0I0Zyxk
+         xvBZ4UONY7kLB1aU77uhNYjQT0T+5oy65o6BMDWCVOKNvKMKoQNYz2+3iw+BOZZuZjig
+         NHvhzPghT+s1S24wmYJIhbJSiKFCDx0IgfLDz3qFql8WqzhjU4d45pJeB8S5+Ke3H6sW
+         izEA==
+X-Forwarded-Encrypted: i=1; AKwUvByoqBMTSfOFoHvEAqVaTGrob7YrTC9CDmlaxR/KWJngiVnpTdh/Hgva91ZzieQwnjAkxYPZE1kjVZjRPA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mGlhcg8bT3il+IDBz6tFpY1syNbxnZgvT4kHWM5I9NuC9VMRfA
+	5xEuO6CT4uR97lIYXTQbMuSW3BTfd3TvHBcL2gbEMa5nXtW4AScui4ydHufOXWRPqw==
+X-Gm-Gg: AYBFou3EyQ0nx6/Eb7/G3KscW/p+W5woHP66zP2a+51ShALhELld7LskuyWY6cKj+7P
+	p4celIa7pjinrZzlkXO38IS3/bmzf2PAOSRnDpWRpvYYP3+CfeP5VS+EXXy08+3sYQDFyaDdh3k
+	wuNWXNa689U5oshWMojHS0DdZcwfNl78EtDdUlUgm1DsNuEvjL5l+4gaoh2K566UL4r807O0juJ
+	gew4hBOjvc3szkOu/GvwQAePvZw97F7cad6TUW0AQiPu5hsJ0qKANn8JMmHDl7TuurmVynu+sul
+	ckfSuKLgtX4mQVLQvw9tsq9tthXCcPcY7j/zjd5Bh4b3j1A1wafJgBnXGbNMvzOl5VyzzB9wic0
+	hKhBaxRcPl0E5QRypN/Pxa52bA+cpACOAbxwUzTjO+Hw22S17C59M6GB6CHNX+9IcqxgyHoOiFT
+	6H8pPtifS4zu1066MKV2nMgicvI3C83GA31VgyMKMX2l53+6gvw2Zg+JhKIyQmh95zksc98aUkb
+	tT9NRfstXdFd/5JkYv4o9erNn8=
+X-Received: by 2002:a05:600d:644f:20b0:49f:c199:e1e2 with SMTP id 5b1f17b1804b1-49fc199e215mr12253705e9.28.1789651798061;
         Thu, 17 Sep 2026 06:29:58 -0700 (PDT)
+Received: from fighter ([216.128.28.240])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fbd2356d1sm97548275e9.6.2026.09.17.06.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Sep 2026 06:29:57 -0700 (PDT)
 From: Sean Rhodes <sean@starlabs.systems>
 To: linux-pm@vger.kernel.org
 Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
@@ -80,9 +80,9 @@ Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
 	linux-mm@kvack.org,
 	Xueqin Luo <luoxueqin@kylinos.cn>,
 	Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>
-Subject: [PATCH v3 RESEND 4/4] PM: hibernate: document encrypted snapshot seed ABI
-Date: Thu, 17 Sep 2026 14:29:50 +0100
-Message-ID: <81c284e9246faa817050f34d46a9fbe558ddba5b.1789651778.git.sean@starlabs.systems>
+Subject: [PATCH v3 RESEND 3/4] PM: hibernate: permit encrypted snapshot device under lockdown
+Date: Thu, 17 Sep 2026 14:29:49 +0100
+Message-ID: <f237b56e8444ea7b477dbcf4aa6dafd2ff0c1dc7.1789651778.git.sean@starlabs.systems>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1789651778.git.sean@starlabs.systems>
 References: <cover.1789651778.git.sean@starlabs.systems>
@@ -94,90 +94,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Document the write-only snapshot_seed sysfs file and update the userspace
-snapshot interface text to describe the opaque wrapped-key flow used by
-encrypted hibernation.
+Lockdown disables hibernation because restoring attacker-controlled image
+data can modify kernel memory. Permit opening the userspace snapshot
+device under lockdown when encrypted hibernation support is built, but
+require encryption to be enabled before image data can be read or written
+and before restore or power-off ioctls can proceed.
+
+Tested on StarFighter MTL with lockdown enabled: encrypted uswsusp
+hibernate and restore used the snapshot device path.
 
 Signed-off-by: Sean Rhodes <sean@starlabs.systems>
 ---
- Documentation/ABI/testing/sysfs-power   | 18 +++++++++++++
- Documentation/power/userland-swsusp.rst | 35 ++++++++++++++++++-------
- 2 files changed, 44 insertions(+), 9 deletions(-)
+ kernel/power/hibernate.c | 8 ++++++++
+ kernel/power/power.h     | 1 +
+ kernel/power/user.c      | 2 +-
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-power b/Documentation/ABI/testing/sysfs-power
-index d38da077905a..c756712a9df5 100644
---- a/Documentation/ABI/testing/sysfs-power
-+++ b/Documentation/ABI/testing/sysfs-power
-@@ -470,3 +470,21 @@ Description:
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index a95cb447a13a..0b8626bdf81a 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -114,6 +114,14 @@ bool hibernation_available(void)
+ 		!secretmem_active() && !cxl_mem_active();
+ }
  
-                 Minimum value: 1
-                 Default value: 3
++bool hibernation_snapshot_dev_available(void)
++{
++	return nohibernate == 0 &&
++		(!security_locked_down(LOCKDOWN_HIBERNATION) ||
++		 IS_ENABLED(CONFIG_ENCRYPTED_HIBERNATION)) &&
++		!secretmem_active() && !cxl_mem_active();
++}
 +
-+What:		/sys/power/snapshot_seed
-+Date:		July 2026
-+Contact:	linux-pm@vger.kernel.org
-+Description:
-+		Write-only file present when CONFIG_ENCRYPTED_HIBERNATION=y.
-+
-+		Trusted early userspace writes a 32-byte seed, encoded as
-+		64 hexadecimal characters plus an optional newline, before
-+		enabling encrypted userspace hibernation snapshots.
-+
-+		The first successful write locks the seed until the next boot.
-+		Writing the same seed again succeeds. Writing a different seed
-+		fails with EPERM.
-+
-+		The kernel does not authenticate the first writer. Trusted early
-+		userspace must provision this file before untrusted privileged
-+		code can run.
-diff --git a/Documentation/power/userland-swsusp.rst b/Documentation/power/userland-swsusp.rst
-index 282e01d2fe61..957be396dcf5 100644
---- a/Documentation/power/userland-swsusp.rst
-+++ b/Documentation/power/userland-swsusp.rst
-@@ -116,20 +116,37 @@ SNAPSHOT_S2RAM
- 	its state on the basis of the saved suspend image otherwise)
+ /**
+  * hibernation_set_ops - Set the global hibernate operations.
+  * @ops: Hibernation operations to use in subsequent hibernation transitions.
+diff --git a/kernel/power/power.h b/kernel/power/power.h
+index 815c84c1e0dd..351b5f68bde3 100644
+--- a/kernel/power/power.h
++++ b/kernel/power/power.h
+@@ -168,6 +168,7 @@ extern int snapshot_image_loaded(struct snapshot_handle *handle);
  
- SNAPSHOT_ENABLE_ENCRYPTION
--	Enables encryption of the hibernate image within the kernel. Upon suspend
--	(ie when the snapshot device was opened for reading), returns a blob
--	representing the random encryption key the kernel created to encrypt the
--	hibernate image with. Upon resume (ie when the snapshot device was opened
--	for writing), receives a blob from usermode containing the key material
--	previously returned during hibernate.
-+	Enables encryption of the hibernate image within the kernel. Trusted
-+	early userspace must write the 32-byte snapshot encryption seed to
-+	/sys/power/snapshot_seed before calling this ioctl. Upon suspend
-+	(ie when the snapshot device was opened for reading), this ioctl returns
-+	an opaque wrapped key blob and the starting nonce. Upon resume (ie when
-+	the snapshot device was opened for writing), this ioctl receives the
-+	same blob and nonce from usermode after the same seed has been written
-+	to /sys/power/snapshot_seed. The plaintext image key is generated and
-+	unwrapped inside the kernel.
-+
-+	The first successful seed write establishes the wrapping key for that
-+	boot. The kernel does not authenticate the writer, the TPM policy used to
-+	unseal the seed, or image freshness. Early userspace must provision the
-+	seed before untrusted privileged code can run and must enforce any TPM
-+	policy and rollback protection.
-+
-+	Under lockdown, direct block-device write() calls to the active swap
-+	backend are restricted to the process which owns the snapshot device and
-+	the extents allocated with SNAPSHOT_ALLOC_SWAP_PAGE. These writes must
-+	use synchronous buffered I/O (O_DSYNC without O_DIRECT), and cannot
-+	exceed the number of pages returned by that ioctl. The swap header may
-+	only be written at the offset supplied with SNAPSHOT_SET_SWAP_AREA.
+ extern bool hibernate_acquire(void);
+ extern void hibernate_release(void);
++bool hibernation_snapshot_dev_available(void);
  
- SNAPSHOT_SET_USER_KEY
- 	Mixes additional user key material into the data portion of an encrypted
- 	hibernate image. The ioctl argument points to struct uswsusp_user_key.
- 	key_len must be between 8 and USWSUSP_USER_KEY_SIZE bytes, and reserved
--	must be zero. The kernel writes meta_size with the encrypted metadata
--	size that userspace may transfer before providing the user key during
--	resume.
-+	must be zero. During hibernation the kernel writes meta_size with the
-+	encrypted metadata size. During resume, userspace passes the saved
-+	meta_size back so the kernel can switch keys at the metadata boundary
-+	before the snapshot header has been decrypted.
+ extern sector_t alloc_swapdev_block(int swap);
+ bool swsusp_swap_range_allocated(int swap, loff_t pos, size_t count);
+diff --git a/kernel/power/user.c b/kernel/power/user.c
+index de41f590c98d..b8d3342f1548 100644
+--- a/kernel/power/user.c
++++ b/kernel/power/user.c
+@@ -184,7 +184,7 @@ static int snapshot_open(struct inode *inode, struct file *filp)
+ 	unsigned int sleep_flags;
+ 	int error;
  
- The device's read() operation can be used to transfer the snapshot image from
- the kernel.  It has the following limitations:
+-	if (!hibernation_available())
++	if (!hibernation_snapshot_dev_available())
+ 		return -EPERM;
+ 
+ 	sleep_flags = lock_system_sleep();
