@@ -1,135 +1,108 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704F34F7CB2;
-	Fri, 18 Sep 2026 15:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D2750AC0D
+	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 15:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789743706; cv=none; b=p+3QBUqCXnoA3VANBrBD33csoX5v17/04UhgBLSq3yV8V4R4ebpQYxwqjbzQnxnv8Fefb42ecJEtFjXF1MPqEx1+2tZiuAXt65/YB3uzVBP4W7ishDDqSlQ2lJCoOZmyoZvQUvLmIbm/RabFJvn5NWqpq52hXpEOGbL4geK2nxA=
+	t=1789746240; cv=none; b=CAFSU+64nUkY6AhKQmBwhnrIS7bdpk7Tlv3LVMo0qZfyvb5Mn7si+ULeNtks2LAU+o05GHa3NFYzD9VAcqoEDPh1CihzgNG8PuSWQiznTkj8XhpNQGUHUTh31mw/0tNtlKHTBexlflRtHtNjIv2addjnpmBhRiPckQJVWUUHluQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789743706; c=relaxed/simple;
-	bh=P6JAC0zbWbMCQcuPeT0DKubinZja6GhcL2AL/YCT7VE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=kEXZQbpl2CPpiY3CGAq4pAVyRJXRYT75/8wk3JJqV3HcQ/EivqYoP44Ly52mhSxoV36RTuxODmIQUTGtMEGUye5fdZR/esBGm0RupXvPWAKyxKQGv6uXYL0FraeCV6fOAYunpHBZ+uI1EIplC7MGy/OIKy51fkRcmyMIiVdY4V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68IF0C2Z073061;
-	Sat, 19 Sep 2026 00:00:12 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68IF0BGg073055
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 19 Sep 2026 00:00:11 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <f597b6e6-77a7-4c09-9d72-e5a9cbe6d7c2@I-love.SAKURA.ne.jp>
-Date: Sat, 19 Sep 2026 00:00:07 +0900
+	s=arc-20240116; t=1789746240; c=relaxed/simple;
+	bh=C5AWntZI5VfsdkhVNOlhJWjuARyHAh4CGfTREDIJj+8=;
+	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:In-Reply-To:
+	 References:MIME-Version; b=Dg6vb46Eb81WFJMvkWJFWI9KYTZvnkJGhMKo/v6+5DsLPiNGCTdDHOhhtyqb+fnCHw9ZfO8qELg3TKq9QODJq7tE3Ko20PApI8ul3AdpbLz2/wchpmPFooDVT61mGMRxDmhtvmPuORGxMzydDuab/sXLVOMiuX6yADPfL89QeTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aR9+soVg; arc=none smtp.client-ip=74.125.228.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aR9+soVg"
+Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c29d50b7cf9so141636766b.2
+        for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 08:43:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789746235; x=1790351035; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:references:in-reply-to:cc:to
+         :from:subject:message-id:date:content-type:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=C5AWntZI5VfsdkhVNOlhJWjuARyHAh4CGfTREDIJj+8=;
+        b=aR9+soVgGL4K0KTpu5HjNLJkXqcbTxvb57pKBs5lIyj7YfMZkK00Eb2bOLDkyqgy6q
+         W1BGp77qdE4WpZWCKpfmoja4QWPd2MV5G5jIBsMvXST1gfwrLivSA+QkPgjBaZpNzB+s
+         HpmuRVzdX2T4sgB96qkMRSo8Aw0CYEg8fA2WTTJC88IMnjRogv1MjPgeiFD5SEUu8zQm
+         DuiOpXt7kQ07aFZSvXKBZxh8KbGD5Ud6g72zEW9TmBILUu7VwmQlWAJI3LAt1pDR3xUC
+         6AQQX7ePR04BdAMldOJPlbxd/x+OSEc5Ii3zsZBAj77GAv0qrXrRE4kQ7GHmcLeGBzJJ
+         pZzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789746235; x=1790351035;
+        h=mime-version:content-transfer-encoding:references:in-reply-to:cc:to
+         :from:subject:message-id:date:content-type:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=C5AWntZI5VfsdkhVNOlhJWjuARyHAh4CGfTREDIJj+8=;
+        b=Q6Utyy8HAeNEfTxp4rUuv+bcibGKTi6dpjn5d0rCbRl1K8R38R8JH3Ew+m17UrVEfy
+         oY8RgSDoi/LmxpJvWmUZ3t/0fK9O6cNTpPhdliWBdjj4i0ck8Y75Nd2lYxNQIW6IL0zs
+         GFYT3aMAFqFUpSCh3iwHxj/oecFhpOmjtfN+1DhSBRKE+dayvJgjcsNzNRA5Uxz81NQd
+         UBOA94IR5kGPEQWEsDLoKIEb5fKJ2SCFkk8JVCy+74JmhLwc85iBZb6F+zKcZ66HqwaX
+         ZFZdsJ2WU7zxDr15jyJhgJBX6qYfzF93QJaU+ci3tJ4FnezPoMMcX4PZHSMxCguTa3Z9
+         cCnQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwJW5MhbjKFGhUdeSbEidGSDfUxwCxtFwX4e1+uXsiyTXww9FQS7Ru+l7NOJSwLnfY6AhCVd0QG5Mzzag==@vger.kernel.org
+X-Gm-Message-State: AFuF++nCQS2dnRL7a3DqufTM1Pf2dqVyBU3CQL8MmCvP91Bt8RDuMYnI
+	zMmb3W32SXRRUV9MQsXME3Rgv/1V6ax53aVvvIWufxUcsq3rr/3sYdYJ
+X-Gm-Gg: AYBFou2PqKBLJdwWurC+D2gcqDjPkBTUBU4vN2kMc1DhRB8b54e+Jd22JINP2r4KCHv
+	5ovQV5jhv3KASvdQRXBEdZca8BepoNGC6b3S06fNUy9vrnfJk9OlDcXPhvhlOUXr9jTcTLmEZ2q
+	mKU/zOdRQH7v9a6YT5p1cmQKczXwHpGFwNcb5tkVhkpgk+peifpS7bR+TPSYbHhsbJCJDyKp6aj
+	HWoNobYZH5d8ta9b8WN/wHuvw1z9Z1U0n+Smuhwupdmf5WKznI3oPPgIi1pOUkMn0tr1iEsYiFE
+	OoufIBUx1mICLHvrsO4+O6tduxMni00JTMNmue/E/IrmG9rBy7UZLiBzyCHRQFsaIrgzvURO0cx
+	JY84jUMQ6ibotXzkGuhTKgxV7qJWQZDnEzlqEnRyswGQcTtIZSmvv2f5MD9kd/NARdou3Mss570
+	9jNlGibk8GD1lfqYOjP80HreXXp6XlSoU3SnP/JiQswzp6qMDL1NZuti24ZFrNNQ24Zi6u62ufo
+	KVvrk7NRVKNmqLaWLwvsGScU3dDHUcRoKvinfzdAFwmadlLAh5ewsZiVV3EBN+SnrtSOIZ87lsf
+	RTAy1KbYDjgz5U8=
+X-Received: by 2002:a17:907:3f17:b0:c26:19de:9126 with SMTP id a640c23a62f3a-c2a15b3401dmr300021466b.25.1789746234745;
+        Fri, 18 Sep 2026 08:43:54 -0700 (PDT)
+Received: from localhost ([153.61.198.250])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2a1b7a442bsm78355366b.4.2026.09.18.08.43.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Sep 2026 08:43:54 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 18 Sep 2026 15:43:50 +0000
+Message-Id: <DLIK37JYD35X.3NZ4ZHTHDKAFX@gmail.com>
+Subject: Re: [RFC PATCH v5 1/5] blk-iocost: add BPF struct_ops cost model
+ support
+From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+To: "Tao Cui" <cui.tao@linux.dev>, <tj@kernel.org>, <josef@toxicopanda.com>,
+ <axboe@kernel.dk>, <ameryhung@gmail.com>
+Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, <andrii@kernel.org>,
+ <eddyz87@gmail.com>, <daniel@iogearbox.net>,
+ <linux-kselftest@vger.kernel.org>, <cuitao@kylinos.cn>
+In-Reply-To: <20260918031751.1255420-2-cui.tao@linux.dev>
+References: <20260918031751.1255420-1-cui.tao@linux.dev> <20260918031751.1255420-2-cui.tao@linux.dev>
+X-Mailer: mkdraft (claude review draft; edit before sending)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>, linux-block <linux-block@vger.kernel.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Brian Foster
- <bfoster@redhat.com>,
-        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
-        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
-        rust-for-linux@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Nilay Shroff <nilay@linux.ibm.com>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH v3 1/2] block: Add post_release() operation
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav111.rs.sakura.ne.jp
 
-Add post_release() block device operation which provides a hook for
-performing synchronous cleanup without disk->open_mutex held, which is
-needed by the loop devices.
+On Fri, Sep 18, 2026 at 11:17 AM Tao Cui <cui.tao@linux.dev> wrote:
+> The registration and binding model follows the TCP congestion
+> model registration pattern: registering a struct_ops makes the model
+> available by its name (char name[IOCOST_MODEL_NAME_LEN], validated at
+> init_member), while
+> io.cost.model binds one registered model to a device with
+> "model=<name>" and unbinds with "model=linear" or "ctrl=auto/user".
+> Unregistering a model removes it from the registry, but its name
 
-Real-world container engines, test suites, and system utilities rely on
-fput() from __loop_clr_fd() being completed when lo_release() returns.
-But changes which went to the v7.1 merge window broke an assumption that
-there is no outstanding I/O when __loop_clr_fd() is called, causing NULL
-pointer dereference problem in lo_rw_aio().
+I don't think it's what Tejun asked for in v1. He asked for a per-device
+struct_ops instance where attaching switches the device to bpf and
+detaching switches it back. Instead there is a global name registry,
+a lifecycle list, an "unregistered but still bound" state and a
+refcount_t on top of bpf_struct_ops_get(), and every version since v3
+had a lifetime bug in exactly that code.
+Do it like hid_bpf_ops does with hid_id: device in the struct_ops,
+bind in .reg, unbind in .unreg, and le
+t struct_ops own the lifetime.
 
-In order to fix this regression, we want to allow __loop_clr_fd() to flush
-outstanding I/O. But calling drain_workqueue() from __loop_clr_fd() with
-disk->open_mutex held causes lockdep warnings. We need a mechanism which
-can flush outstanding I/O without disk->open_mutex held.
+pls wait for Tejun's feedback before respinning.
 
-This post_release() operation is called from only bdev_release() path.
-This is because loop_configure() is not yet called (there is nothing to
-clear) if something went wrong between an initialization lo_open() and
-an error-unwinding lo_release() within the bdev_open() path.
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-Changes in v3:
-  Dropped description about idempotence, for it seems that Vart wants to
-  let current thread run __loop_clr_fd() instead of offloading to WQ context
-  and letting current thread call flush_work()
-  ( https://lkml.kernel.org/r/cdaebcf71c5de3e994f535dfdc9daa15a77bf59b.1789680010.git.bvanassche@acm.org ).
-
- block/bdev.c                     | 2 ++
- include/linux/blkdev.h           | 8 ++++++++
- rust/kernel/block/mq/gen_disk.rs | 1 +
- 3 files changed, 11 insertions(+)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index cd8323083740..7ce5acaacf43 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1188,6 +1188,8 @@ void bdev_release(struct file *bdev_file)
- 	else
- 		blkdev_put_whole(bdev);
- 	mutex_unlock(&disk->open_mutex);
-+	if (bdev->bd_disk->fops->post_release)
-+		bdev->bd_disk->fops->post_release(bdev->bd_disk);
- 
- 	module_put(disk->fops->owner);
- put_no_open:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4f7905c3412b..d13d703a7bea 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1577,6 +1577,14 @@ struct block_device_operations {
- 			unsigned int flags);
- 	int (*open)(struct gendisk *disk, blk_mode_t mode);
- 	void (*release)(struct gendisk *disk);
-+	/*
-+	 * This operation is called after returned from release() and
-+	 * disk->open_mutex was released. But be careful that this operation
-+	 * is not called after an initialization open() has succeeded but
-+	 * something went wrong and an error-unwinding release() was called.
-+	 * This operation might sleep.
-+	 */
-+	void (*post_release)(struct gendisk *disk);
- 	int (*ioctl)(struct block_device *bdev, blk_mode_t mode,
- 			unsigned cmd, unsigned long arg);
- 	int (*compat_ioctl)(struct block_device *bdev, blk_mode_t mode,
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index fc97dd873974..2ff77ef49781 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -129,6 +129,7 @@ pub fn build<T: Operations>(
-             submit_bio: None,
-             open: None,
-             release: None,
-+            post_release: None,
-             ioctl: None,
-             compat_ioctl: None,
-             check_events: None,
--- 
-2.55.0
-
+pw-bot: cr
