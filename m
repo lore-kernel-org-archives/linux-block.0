@@ -1,60 +1,135 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46402135B8;
-	Fri, 18 Sep 2026 08:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D923F1051
+	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 09:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789721006; cv=none; b=JiLuxSY6PNhr7td3lEkz3zYvZ2aYFkv2dKLcaCdXMNNPSH10x1fnh/feqgMeeB80scxCGbpkm+eBrUBSNPR4nwjLhECidJBKsGaaxj9Ljhc3uAMiTmZvwWBX50grJ/0qoBkZQMD+C4gjGJbUOlNp7dwYxNhOY4wbRR4FeAJiV8g=
+	t=1789723219; cv=none; b=fKEQHjvjlKzW+fXse6+1FIRis+PKahKzxzna8B8lGjva2QmnzPJ4FHtz07E2ByIiseYAJ0y23AxjdR6VET9zAHBys/e3bb+uWpQkkL0aZzAx4nCncuOFumJIAf/JBZlNyjh9rXt0ay0/C8POYdB9/WLBdDahTvu+aUe7OHKnmFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789721006; c=relaxed/simple;
-	bh=3M9a/35OVXvz350BzCHPFrdNKIx6w//3HhXy9OwBmT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i+cUOKeN3Et67R3K8mC25Nf6dGBzfdYQI+i3kdBOJGlunxCf+eHOjbjxMb+RhVfRsHrI3Myxgth7QNrfFdqjaiNGsw9UiaPRLxyhlF1NNHvMAoZuykph+XNP6ZmK3I0fsG671NrP8VPIutgEhdzlSg3AwqYLuBw88jd+5M8uGTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id D7C2168C4E; Fri, 18 Sep 2026 10:43:15 +0200 (CEST)
-Date: Fri, 18 Sep 2026 10:43:15 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Hannes Reinecke <hare@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	John Garry <john.g.garry@oracle.com>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Keith Busch <kbusch@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sashiko <sashiko-bot@kernel.org>
-Subject: Re: [PATCH v3 6/7] block: unpin all pages of a bvec in
- bio_iov_iter_align_down()
-Message-ID: <20260918084315.GA12283@lst.de>
-References: <20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu> <20260909-blkdev-fixes-v3-6-1a5222c6e8ad@columbia.edu>
+	s=arc-20240116; t=1789723219; c=relaxed/simple;
+	bh=lVI4wS9/F6uS9qnJB4qvn+MECJkuubYFiWZq6Sw6lrU=;
+	h=Cc:From:Date:Content-Type:To:In-Reply-To:Subject:Message-Id:
+	 Mime-Version:References; b=Zdn1wox9PSM8yn2uL0FxGt6AFePhepSunJhLuAne+dUncHtbVRq0SeoJVlSnmVpcqd04S4QCTQg1BYZd/dareITLnp9T1RtSjy96rQewQQHB/ryjLfviDmCpMgX0cIp/gI+iy2cBXWRTPMfDGKSOREKDk6YlWAjPmsEY21x3peI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=bwBSdZ1I; arc=none smtp.client-ip=209.127.231.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="bwBSdZ1I"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1789723203;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=c/HoGHos08YYVCDf+erQy3ROLdbEA8DrOr1npGBRCuw=;
+ b=bwBSdZ1IC2vZJtJQ/GMrgZtFKRuuaPwCdBnsVuBZK6OAE/8KLo1qyhHqMMucszqIQ+NkQ2
+ HU22scbIi4juP7uDQoN2yJO1G9pAH/o3M11JKl8GQa+S1r5Y8BMJwBwEJhOfbqphjVZxdn
+ 4yJH4AnELbXL5Ej/uTa6zIxHk/LQAYt4GP5OAuLG1IzbfNdiAQ/oxgQ4h14NALYiEW2F81
+ ZWkWZwb9JqbvgqODZjDQttxI64Lhn4YXAABcOdUvpIV5upKvcA6VJysv/TxG7WPbSXtXFa
+ VdB7sBO5K3nkoNbXDSVcHsd3NaAQP4MUtRi2ofcw3DZ/hzlSesbtohAXVw9SsA==
+Cc: "Jens Axboe" <axboe@kernel.dk>, "Josef Bacik" <josef@toxicpanda.com>, 
+	"Tejun Heo" <tj@kernel.org>, "Johannes Weiner" <hannes@cmpxchg.org>, 
+	=?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	"Jonathan Corbet" <corbet@lwn.net>, 
+	"Shuah Khan" <skhan@linuxfoundation.org>, 
+	"Randy Dunlap" <rdunlap@infradead.org>, "Coly Li" <colyli@fygo.io>, 
+	"Kent Overstreet" <kent.overstreet@linux.dev>, 
+	"Alasdair Kergon" <agk@redhat.com>, "Mike Snitzer" <snitzer@kernel.org>, 
+	"Mikulas Patocka" <mpatocka@redhat.com>, 
+	"Benjamin Marzinski" <bmarzins@redhat.com>, "Song Liu" <song@kernel.org>, 
+	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
+	"Andreas Gruenbacher" <agruenba@redhat.com>, 
+	"Matthew Wilcox" <willy@infradead.org>, "Jan Kara" <jack@suse.cz>, 
+	"Andrew Morton" <akpm@linux-foundation.org>, 
+	"Chris Li" <chrisl@kernel.org>, "Kairui Song" <kasong@tencent.com>, 
+	"Kemeng Shi" <shikemeng@huaweicloud.com>, 
+	"Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>, 
+	"Barry Song" <baohua@kernel.org>, 
+	"Youngjun Park" <youngjun.park@lge.com>, 
+	"Nathan Chancellor" <nathan@kernel.org>, 
+	"Nick Desaulniers" <ndesaulniers@google.com>, 
+	"Bill Wendling" <morbo@google.com>, 
+	"Justin Stitt" <justinstitt@google.com>, 
+	"Nilay Shroff" <nilay@linux.ibm.com>, "Tao Cui" <cuitao@kylinos.cn>, 
+	<linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>, 
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-bcache@vger.kernel.org>, <dm-devel@lists.linux.dev>, 
+	<linux-raid@vger.kernel.org>, <gfs2@lists.linux.dev>, 
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>, 
+	<llvm@lists.linux.dev>
+From: "yu kuai" <yukuai@fygo.io>
+Date: Fri, 18 Sep 2026 17:19:53 +0800
+X-Original-From: yu kuai <yukuai@fygo.io>
+X-Lms-Return-Path: <lba+26aad0242+12f7a7+vger.kernel.org+yukuai@fygo.io>
+User-Agent: Mozilla Thunderbird
+Reply-To: yukuai@fygo.io
+Received: from [192.168.1.104] ([39.182.0.142]) by smtp.larksuite.com with ESMTPS; Fri, 18 Sep 2026 09:20:01 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+To: "Christoph Hellwig" <hch@lst.de>, "yu kuai" <yukuai@fygo.io>
+In-Reply-To: <20260918071634.GA10884@lst.de>
+Subject: Re: dm review needed, was: Re: [PATCH v3 2/3] blk-cgroup: store blkcg in bio instead of blkg
+Message-Id: <daf4ba77-4c25-4993-900d-ee1fe713d9b6@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260909-blkdev-fixes-v3-6-1a5222c6e8ad@columbia.edu>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Mime-Version: 1.0
+References: <20260918041744.1526924-1-yukuai@kernel.org> <20260918041744.1526924-3-yukuai@kernel.org> <20260918071634.GA10884@lst.de>
 
-> +
-> +	/*
-> +	 * __bio_release_pages() only unpins the pages still covered by
-> +	 * bv_len, so drop the pins for the pages trimmed off here.
-> +	 */
-> +	npages = bvec_nr_pages(bv);
->  	bv->bv_len -= nbytes;
-> +	npages -= bvec_nr_pages(bv);
+Hi,
 
-Wouldn't it make more sense to calculate npages once after the
-decrement here, or am I missing something?
+=E5=9C=A8 2026/9/18 15:16, Christoph Hellwig =E5=86=99=E9=81=93:
+> On Fri, Sep 18, 2026 at 12:17:43PM +0800, Yu Kuai wrote:
+>>   static inline void dm_bio_record(struct dm_bio_details *bd, struct bio=
+ *bio)
+>>   {
+>>   	bd->bi_bdev =3D bio->bi_bdev;
+>> -	bd->bi_flags =3D bio->bi_flags;
+>> +	/*
+>> +	 * Restoring BIO_BLKG_REF would not recreate its associated reference.
+>> +	 */
+>> +	bd->bi_flags =3D bio->bi_flags & ~(1U << BIO_BLKG_REF);
+> But do we need to restore the reference?  I have to admit that
+> this surrounding code is very confusing and I would really like
+> to have the dm maintainers look over it.
 
+dm_bio_record() will store the bi_flags for current bio, later the flag is =
+restored
+by dm_bio_restore(). For example like dm-raid1 read error path:
+
+issue path, if blk-throttle is enabled, flag can be set before bio issuing =
+to dm-raid1
+
+mirror_map
+  dm_bio_record
+   bd->bi_flags =3D bio->bi_flags
+   // contain the new flag
+
+bio_endio
+  bio_clear_blkcg
+  // new flag is cleared
+  clone_endio
+   mirror_end_io
+   // if this IO failed and there is another mirror to read
+    dm_bio_restore
+     bio->bi_flags =3D bd->bi_flags
+     // new flag is set without get a blkg reference
+
+So I think we don't need to restore the reference, BTW, there is another ap=
+proach to
+avoid such problem in blk-throttle I don't take for now:
+
+For bio entering blk-throttle, we can clear the new flag and blkg reference=
+ directly
+after the bio is throttled and before this bio is issuing to disk, because =
+bio will
+not enter blk-throttle in the completion path. And since blk-throttle is th=
+e only rq_qos
+policy that can be enabled for bio-based disk, then dm_bio_record() will ne=
+ver see a
+bio with the new flag set.
+
+--=20
+Thanks,
+Kuai
