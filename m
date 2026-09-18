@@ -1,144 +1,279 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-112.mta0.migadu.com [91.218.175.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DD23876C1
-	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 05:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881B3331EB0
+	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 05:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789708648; cv=none; b=Tjrgnok94WAHodIqopzqZ5/vW3V4p7t/Bmv8ljKqVQFvLDmVhh70QM3sRojD/8WsU3SekaEkbrsJfnzW7ug9rDdfRSISR30lpSvBRAlUxvqZ75Btj7doEMZQCw8opjpxH62gyzXSZ7WWevqa6hyNN06+WfuCpeXuYFXbqkqZeqs=
+	t=1789710529; cv=none; b=kk6slYyyh0ki9m/saz3kL1+ZSsG19qCPYYA+3h4Jet3oNtbsPMXr3zwJXGdis6Au/kBSgHGdqYk7K8aQQertiJH3UODvcFo0XCCptmrqcK67iErIPprqjxXOMVu2wxz5RgxInqISes159eGzUZNASifd8vngNEHqLZ3BcIEtrUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789708648; c=relaxed/simple;
-	bh=g+a1m5tmRrU29Rdz7sXB/UPTJYVvuXJme3+7dutOY2M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=F2k28mNJ51jk6wMy+AorcGvSzysf6TcEp6aBaYX+xo+Ix5E8gDrNmnuohllOpEd/c70aIVba+Sou2Ena+EJbIE5RztRK9Dkak9M2YdkjLhxJ6hgPWjfiUHDwNw/FwWIci1D0xwhSdymiwBNgQdUEh7AErZWNf0gf6Cy6LWfahGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mlJROwrx; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1789710529; c=relaxed/simple;
+	bh=PshD76OGVb+/ieHp7MefuQ6CWTqmMkYsJi2+RDu7jWA=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Pqghr8p4b+i3m8Y+tjewC99Bx/AIBB3tr4KxgcvYNGKFylJd9UMKa2HVk+jAkJar9l79vUFfhnEN0k8VK2gYcjF8zzanNnewI8eN+qAItZvhRDNxdARWhX9h2WnKpOOEjwmsVQ42/dkI+16Nscp6IV0/vqiSmAL1WlL4vK/AeDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ce1sToe8; arc=none smtp.client-ip=91.218.175.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="mlJROwrx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=g+a1m5tmRrU29Rdz7sXB/UPTJYVvuXJme3+7dutOY2M=; b=m
-	lJROwrxy21komPHvNROPYFhaNIx4B1d7IaESDd3v8ZxXue0n7Emdj3BlSjieYGRG
-	0oR1R1DGKfMssbmB1qK/GEFD781OVfFlcrESdPxsNCKM5wu6IQRnM07Mk3lxyGiD
-	OsHzpRlCo9ukoHMjmGZoaDCq6TQ/EhJiVxrQOcR+TM=
-Date: Fri, 18 Sep 2026 13:16:58 +0800 (CST)
-From: huhai  <15815827059@163.com>
-To: "Keith Busch" <kbusch@kernel.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	"Henry Hu" <huhai@kylinos.cn>
-Subject: Re:Re: [PATCH] blk-mq: check passthrough state before reusing
- cached requests
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <aqv3hrg_fCZZCojW@kbusch-mbp>
-References: <20260916151655.2588-1-15815827059@163.com>
- <aqv3hrg_fCZZCojW@kbusch-mbp>
-X-NTES-SC: AL_Qu2TC/ubt04q7iaRZ+kcmkgajuc/XMK3ufsv24FSc88EnDLMxCsDfXVKFnvz6tOTDA2WlB6tUgpO49xDXrBTG1hBK2e3ehZuR9RIBatekw==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ce1sToe8"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=PshD76OGVb+/ieHp7MefuQ6CWTqmMkYsJi2+RDu7jWA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789710525; v=1; x=1790315325;
+ b=Ce1sToe8hdtT4U9Y0qMQs6fihH6tInjCW0ZH3iHqS9hDdaaYxJ4hQplmtCeOzaGE9xR7/zyz
+ oETbdhERKNY559trJpuot/ag7Mciaa7q2NWMvDzRs9rzovDMF1rGch+r6Oo9vAXLL6zuIPk1lfU
+ VBpvtR0Lm/vXi4tPCEo4ZnEg=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 7690daf423a0b019;
+	Fri, 18 Sep 2026 05:48:35 +0000
+X-Mizu-Trace-ID: 7690daf423a0b019
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <a314cf09-c9c8-4ac2-9721-04ba19f4b857@linux.dev>
+Date: Fri, 18 Sep 2026 13:48:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <24313658.46fe.1a0b2f24bcc.Coremail.15815827059@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:gCgvCgDHT0VKyaxqYXRJAA--.37478W
-X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbCzQpKz2qsyUrTNQAA3h
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, cuitao@kylinos.cn
+Subject: Re: [RFC PATCH v5 0/5] blk-iocost: BPF struct_ops cost model
+To: tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk, ameryhung@gmail.com
+References: <20260918031751.1255420-1-cui.tao@linux.dev>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20260918031751.1255420-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-QXQgMjAyNi0wOS0xNyAyMjoyMTo1OCwgIktlaXRoIEJ1c2NoIiA8a2J1c2NoQGtlcm5lbC5vcmc+
-IHdyb3RlOgo+T24gV2VkLCBTZXAgMTYsIDIwMjYgYXQgMTE6MTY6NTVQTSArMDgwMCwgaHVoYWkg
-d3JvdGU6Cj4+IEBAIC02NDgsNiArNjQ4LDggQEAgc3RhdGljIHN0cnVjdCByZXF1ZXN0ICpibGtf
-bXFfYWxsb2NfY2FjaGVkX3JlcXVlc3Qoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsCj4+ICAJCQly
-ZXR1cm4gTlVMTDsKPj4gIAkJaWYgKG9wX2lzX2ZsdXNoKHJxLT5jbWRfZmxhZ3MpICE9IG9wX2lz
-X2ZsdXNoKG9wZikpCj4+ICAJCQlyZXR1cm4gTlVMTDsKPj4gKwkJaWYgKGJsa19ycV9pc19wYXNz
-dGhyb3VnaChycSkgIT0gYmxrX29wX2lzX3Bhc3N0aHJvdWdoKG9wZikpCj4+ICsJCQlyZXR1cm4g
-TlVMTDsKPgo+SSBzZWUgaG93IHRoaXMgYWRkcmVzc2VzIHlvdXIgb2JzZXJ2YXRpb24sIGJ1dCBJ
-IGRvbid0IHRoaW5rIHRoaXMgaXMgdGhlCj5yaWdodCB3YXkgdG8gZml4IGl0LiBUaGUgYmF0Y2gg
-b2YgcmVxdWVzdHMgYWxsb2NhdGVkIHRvIHByaW1lIHRoZSBjYWNoZQo+c2hvdWxkbid0IGJlIGxv
-Y2tlZCBpbnRvIGEgc3BlY2lmaWMgdHlwZSBvZiBjb21tYW5kIHRoYXQgY2FuIHVzZSBpdCwKPklN
-Ty4gVGhpcyBpcyBhIGJpdCBtb3JlIGludm9sdmVkIG9mIGEgY2hhbmdlLCBidXQgaXQgc2hvdWxk
-IGFsbG93IG1vcmUKPmZsZXhpYmxlIHVzZSBvZiB0aGUgY2FjaGVkIHJlcXVlc3RzLiBIZXJlJ3Mg
-YSBxdWljayBpZGVhIHRvIGF0dGVtcHQKPnRoYXQ6Cj4KClRoYW5rcywgSSB0aGluayB0aGlzIGlz
-IHRoZSBiZXR0ZXIgZGlyZWN0aW9uLiBjYWNoZWQgcmVxdWVzdHMgc2hvdWxkbid0IGJlCmxvY2tl
-ZCBpbnRvIGEgc3BlY2lmaWMgdHlwZSBvZiBjb21tYW5kLiBJbml0aWFsaXppbmcgdGhlIHNjaGVk
-dWxlciBzdGF0ZQp3aGVuIGEgcmVxdWVzdCBpcyBhY3R1YWxseSBoYW5kZWQgb3V0IGlzIGNsZWFu
-ZXIgdGhhbiByZWplY3RpbmcgYSBtaXNtYXRjaApkdXJpbmcgY2FjaGUgbG9va3VwLgoKSSB0ZXN0
-ZWQgeW91ciBkaWZmIHdpdGggbXkgcmVwcm9kdWNlcjogdGhlIGt5YmVyIHRva2VuIGNvdW50IHJl
-dHVybnMgdG8gemVybwphZnRlciBJTyBjb21wbGV0ZXMsIGFuZCB0aGUgd29ya2xvYWQgbm8gbG9u
-Z2VyIHN0YWxscyBhbmQgdGhlIGh1bmcgdGFzayBpcwpubyBsb25nZXIgcmVwb3J0ZWQuCgpJJ2xs
-IGRyb3AgbXkgb3JpZ2luYWwgZml4LiBJZiBhIHN0YWJsZSBiYWNrcG9ydCBpcyBuZWVkZWQsIG15
-IG9yaWdpbmFsIG1pbmltYWwKZml4IGlzIHNtYWxsIGFuZCBzZWxmLWNvbnRhaW5lZDsgaGFwcHkg
-dG8gcmVzcGluIGl0IGZvciBzdGFibGUgaWYgdXNlZnVsLiAKCkZlZWwgZnJlZSB0byB0dXJuIHRo
-aXMgaW50byBhIGZvcm1hbCBwYXRjaDsgSSBjYW4gdGVzdCBpdCBmdXJ0aGVyIG9uY2UgaXQncyBw
-b3N0ZWQuIAoKVGhhbmtzLApIZW5yeSBIdQoKPi0tLQo+ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1t
-cS5jIGIvYmxvY2svYmxrLW1xLmMKPmluZGV4IGEyNmExMWM3M2VlM2UuLmMxZmQyMDgwN2RhMzAg
-MTAwNjQ0Cj4tLS0gYS9ibG9jay9ibGstbXEuYwo+KysrIGIvYmxvY2svYmxrLW1xLmMKPkBAIC00
-NDcsMTcgKzQ0NywyOCBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19tcV9ycV9jdHhfaW5p
-dChzdHJ1Y3QgYmxrX21xX2FsbG9jX2RhdGEgKmRhdGEsCj4gCVdSSVRFX09OQ0UocnEtPmRlYWRs
-aW5lLCAwKTsKPiAJcmVxX3JlZl9zZXQocnEsIDEpOwo+IAo+LQlpZiAocnEtPnJxX2ZsYWdzICYg
-UlFGX1VTRV9TQ0hFRCkgewo+LQkJc3RydWN0IGVsZXZhdG9yX3F1ZXVlICplID0gZGF0YS0+cS0+
-ZWxldmF0b3I7Cj4rCXJldHVybiBycTsKPit9Cj4rCj4rc3RhdGljIGJvb2wgYmxrX29wX2J5cGFz
-c19zY2hlZChibGtfb3BmX3Qgb3BmKQo+K3sKPisJcmV0dXJuIChvcGYgJiBSRVFfT1BfTUFTSykg
-PT0gUkVRX09QX0ZMVVNIIHx8Cj4rCSAgICAgICBibGtfb3BfaXNfcGFzc3Rocm91Z2gob3BmKTsK
-Pit9Cj4gCj4tCQlJTklUX0hMSVNUX05PREUoJnJxLT5oYXNoKTsKPi0JCVJCX0NMRUFSX05PREUo
-JnJxLT5yYl9ub2RlKTsKPitzdGF0aWMgdm9pZCBibGtfbXFfc2V0X3JxX3NjaGVkKHN0cnVjdCBy
-ZXF1ZXN0ICpycSwgYmxrX29wZl90IG9wZikKPit7Cj4rCXN0cnVjdCBlbGV2YXRvcl9xdWV1ZSAq
-ZSA9IHJxLT5xLT5lbGV2YXRvcjsKPiAKPi0JCWlmIChlLT50eXBlLT5vcHMucHJlcGFyZV9yZXF1
-ZXN0KQo+LQkJCWUtPnR5cGUtPm9wcy5wcmVwYXJlX3JlcXVlc3QocnEpOwo+LQl9Cj4rCWlmICgh
-ZSB8fCBibGtfb3BfYnlwYXNzX3NjaGVkKG9wZikpCj4rCQlyZXR1cm47Cj4gCj4tCXJldHVybiBy
-cTsKPisJcnEtPnJxX2ZsYWdzIHw9IFJRRl9VU0VfU0NIRUQ7Cj4rCUlOSVRfSExJU1RfTk9ERSgm
-cnEtPmhhc2gpOwo+KwlSQl9DTEVBUl9OT0RFKCZycS0+cmJfbm9kZSk7Cj4rCj4rCWlmIChlLT50
-eXBlLT5vcHMucHJlcGFyZV9yZXF1ZXN0KQo+KwkJZS0+dHlwZS0+b3BzLnByZXBhcmVfcmVxdWVz
-dChycSk7Cj4gfQo+IAo+IHN0YXRpYyBpbmxpbmUgc3RydWN0IHJlcXVlc3QgKgo+QEAgLTUxOCwx
-MiArNTI5LDEwIEBAIHN0YXRpYyB2b2lkIGJsa19tcV9saW1pdF9kZXB0aChzdHJ1Y3QgYmxrX21x
-X2FsbG9jX2RhdGEgKmRhdGEpCj4gCSAqIEZsdXNoL3Bhc3N0aHJvdWdoIHJlcXVlc3RzIGFyZSBz
-cGVjaWFsIGFuZCBnbyBkaXJlY3RseSB0byB0aGUKPiAJICogZGlzcGF0Y2ggbGlzdCwgdGhleSBh
-cmUgbm90IHN1YmplY3QgdG8gdGhlIGFzeW5jX2RlcHRoIGxpbWl0Lgo+IAkgKi8KPi0JaWYgKChk
-YXRhLT5jbWRfZmxhZ3MgJiBSRVFfT1BfTUFTSykgPT0gUkVRX09QX0ZMVVNIIHx8Cj4tCSAgICBi
-bGtfb3BfaXNfcGFzc3Rocm91Z2goZGF0YS0+Y21kX2ZsYWdzKSkKPisJaWYgKGJsa19vcF9ieXBh
-c3Nfc2NoZWQoZGF0YS0+Y21kX2ZsYWdzKSkKPiAJCXJldHVybjsKPiAKPiAJV0FSTl9PTl9PTkNF
-KGRhdGEtPmZsYWdzICYgQkxLX01RX1JFUV9SRVNFUlZFRCk7Cj4tCWRhdGEtPnJxX2ZsYWdzIHw9
-IFJRRl9VU0VfU0NIRUQ7Cj4gCj4gCS8qCj4gCSAqIEJ5IGRlZmF1bHQsIHN5bmMgcmVxdWVzdHMg
-aGF2ZSBubyBsaW1pdCwgYW5kIGFzeW5jIHJlcXVlc3RzIGFyZQo+QEAgLTU2Myw2ICs1NzIsNyBA
-QCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKl9fYmxrX21xX2FsbG9jX3JlcXVlc3RzKHN0cnVjdCBi
-bGtfbXFfYWxsb2NfZGF0YSAqZGF0YSkKPiAJCXJxID0gX19ibGtfbXFfYWxsb2NfcmVxdWVzdHNf
-YmF0Y2goZGF0YSk7Cj4gCQlpZiAocnEpIHsKPiAJCQlibGtfbXFfcnFfdGltZV9pbml0KHJxLCBh
-bGxvY190aW1lX25zKTsKPisJCQlibGtfbXFfc2V0X3JxX3NjaGVkKHJxLCBkYXRhLT5jbWRfZmxh
-Z3MpOwo+IAkJCXJldHVybiBycTsKPiAJCX0KPiAJCWRhdGEtPm5yX3RhZ3MgPSAxOwo+QEAgLTU5
-MSw2ICs2MDEsNyBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKl9fYmxrX21xX2FsbG9jX3JlcXVl
-c3RzKHN0cnVjdCBibGtfbXFfYWxsb2NfZGF0YSAqZGF0YSkKPiAJCWJsa19tcV9pbmNfYWN0aXZl
-X3JlcXVlc3RzKGRhdGEtPmhjdHgpOwo+IAlycSA9IGJsa19tcV9ycV9jdHhfaW5pdChkYXRhLCBi
-bGtfbXFfdGFnc19mcm9tX2RhdGEoZGF0YSksIHRhZyk7Cj4gCWJsa19tcV9ycV90aW1lX2luaXQo
-cnEsIGFsbG9jX3RpbWVfbnMpOwo+KwlibGtfbXFfc2V0X3JxX3NjaGVkKHJxLCBkYXRhLT5jbWRf
-ZmxhZ3MpOwo+IAlyZXR1cm4gcnE7Cj4gfQo+IAo+QEAgLTYzNyw4ICs2NDgsNiBAQCBzdGF0aWMg
-c3RydWN0IHJlcXVlc3QgKmJsa19tcV9hbGxvY19jYWNoZWRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVz
-dF9xdWV1ZSAqcSwKPiAJCWlmIChwbHVnLT5ucl9pb3MgPT0gMSkKPiAJCQlyZXR1cm4gTlVMTDsK
-PiAJCXJxID0gYmxrX21xX3JxX2NhY2hlX2ZpbGwocSwgcGx1Zywgb3BmLCBmbGFncyk7Cj4tCQlp
-ZiAoIXJxKQo+LQkJCXJldHVybiBOVUxMOwo+IAl9IGVsc2Ugewo+IAkJcnEgPSBycV9saXN0X3Bl
-ZWsoJnBsdWctPmNhY2hlZF9ycXMpOwo+IAkJaWYgKCFycSB8fCBycS0+cSAhPSBxKQo+QEAgLTY0
-NiwxNSArNjU1LDE0IEBAIHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqYmxrX21xX2FsbG9jX2NhY2hl
-ZF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLAo+IAo+IAkJaWYgKGJsa19tcV9nZXRf
-aGN0eF90eXBlKG9wZikgIT0gcnEtPm1xX2hjdHgtPnR5cGUpCj4gCQkJcmV0dXJuIE5VTEw7Cj4t
-CQlpZiAob3BfaXNfZmx1c2gocnEtPmNtZF9mbGFncykgIT0gb3BfaXNfZmx1c2gob3BmKSkKPi0J
-CQlyZXR1cm4gTlVMTDsKPiAKPiAJCXJxX2xpc3RfcG9wKCZwbHVnLT5jYWNoZWRfcnFzKTsKPiAJ
-CWJsa19tcV9ycV90aW1lX2luaXQocnEsIGJsa190aW1lX2dldF9ucygpKTsKPisJCXJxLT5jbWRf
-ZmxhZ3MgPSBvcGY7Cj4rCQlJTklUX0xJU1RfSEVBRCgmcnEtPnF1ZXVlbGlzdCk7Cj4rCQlibGtf
-bXFfc2V0X3JxX3NjaGVkKHJxLCBvcGYpOwo+IAl9Cj4gCj4tCXJxLT5jbWRfZmxhZ3MgPSBvcGY7
-Cj4tCUlOSVRfTElTVF9IRUFEKCZycS0+cXVldWVsaXN0KTsKPiAJcmV0dXJuIHJxOwo+IH0KPiAK
-PkBAIC0zMDYwLDggKzMwNjgsNiBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19tcV9nZXRf
-Y2FjaGVkX3JlcXVlc3Qoc3RydWN0IGJsa19wbHVnICpwbHVnLAo+IAlpZiAodHlwZSAhPSBycS0+
-bXFfaGN0eC0+dHlwZSAmJgo+IAkgICAgKHR5cGUgIT0gSENUWF9UWVBFX1JFQUQgfHwgcnEtPm1x
-X2hjdHgtPnR5cGUgIT0gSENUWF9UWVBFX0RFRkFVTFQpKQo+IAkJcmV0dXJuIE5VTEw7Cj4tCWlm
-IChvcF9pc19mbHVzaChycS0+Y21kX2ZsYWdzKSAhPSBvcF9pc19mbHVzaChvcGYpKQo+LQkJcmV0
-dXJuIE5VTEw7Cj4gCXJxX2xpc3RfcG9wKCZwbHVnLT5jYWNoZWRfcnFzKTsKPiAJcmV0dXJuIHJx
-Owo+IH0KPkBAIC0zMTY2LDYgKzMxNzIsNyBAQCB2b2lkIGJsa19tcV9zdWJtaXRfYmlvKHN0cnVj
-dCBiaW8gKmJpbykKPiAJCWJsa19tcV9ycV90aW1lX2luaXQocnEsIGJsa190aW1lX2dldF9ucygp
-KTsKPiAJCXJxLT5jbWRfZmxhZ3MgPSBiaW8tPmJpX29wZjsKPiAJCUlOSVRfTElTVF9IRUFEKCZy
-cS0+cXVldWVsaXN0KTsKPisJCWJsa19tcV9zZXRfcnFfc2NoZWQocnEsIGJpby0+Ymlfb3BmKTsK
-PiAJfSBlbHNlIHsKPiAJCXJxID0gYmxrX21xX2dldF9uZXdfcmVxdWVzdHMocSwgcGx1ZywgYmlv
-KTsKPiAJCWlmICh1bmxpa2VseSghcnEpKSB7Cj4tLQo=
+Hi,
+
+在 2026/9/18 11:17, Tao Cui 写道:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> This is v5 of the RFC.  The changes since v4 are listed in the
+> changelog at the bottom.
+> 
+
+Please ignore that change in v5; v6 is authoritative and
+removes the extra put.
+
+It was based on a bad measurement: a SIGKILLed loader never
+unregistered its model, and the leftover reference was mistaken for
+a racing-writers leak.  The single iocost_bpf_model_put(old) was
+already balanced.
+
+v6 will follow shortly.
+
+Thanks,
+Tao
+
+> Why a pluggable model at all
+> ----------------------------
+> 
+> When iocost landed in 2019, its commit message already promised that
+> "a later patch will also allow using bpf progs for cost models", and
+> the code has carried the split for it ever since: calc_vtime_cost()
+> is a dispatcher whose only implementation is calc_vtime_cost_builtin().
+> Seven years later the builtin linear model is still the only one.
+> This series fills that slot, following the TCP congestion control
+> model registration pattern: builtin algorithms remain the default
+> while new ones can be prototyped in BPF.
+> 
+> The measured problems
+> ---------------------
+> 
+> The builtin model prices each IO with a binary sequential/random base
+> picked by a single per-cgroup cursor and a 16MB seek threshold, plus
+> a per-page cost.  On a virtio-blk device with the HDD autop profile,
+> a 4k IO costs ~24us when judged sequential and ~2.7ms when judged
+> random, a 112x spread, so a wrong judgement becomes a wrong price.
+> Three classes of mispricing, all measured:
+> 
+>  1. Heuristic rigidity.  Two legitimate sequential readers in one
+>     cgroup (a database with multiple tablespaces, a threaded backup)
+>     ping-pong the single cursor and are all priced random: a
+>     measured 89x overcharge collapses throughput under the same
+>     weight.  Random IO within a hot window smaller than the 16MB
+>     threshold is priced sequential: measured 107x undercharge, an
+>     accounting escape for hotspot workloads.  No setting of the six
+>     builtin parameters seems able to fix this: telling the streams
+>     apart requires per-IO state tracking, which looks like logic
+>     rather than coefficients.
+> 
+>  2. Device nonlinearity.  SLC-cache phases, SMR band placement and
+>     shared controllers (multiple NVMe namespaces multiplexing one
+>     device) make the real cost of an identical IO vary by an order
+>     of magnitude over time or across namespaces.  A static
+>     6-parameter linear model has no way to express that.
+> 
+>  3. Unpriced operations.  Flush and zone append fall through to a
+>     cost of zero and bypass throttling entirely, and the same pattern
+>     extends to device quirks the builtin model was never taught.
+> 
+> Mispricing feeds directly into the control loop: vtime budgets,
+> surplus donation and the vrate feedback all consume the model's
+> output, so a wrong model can skew the whole controller.
+> 
+> How
+> ---
+> 
+> A bound BPF model fully owns pricing for every IO on the device:
+> it is called from the bio charging path and prices every operation
+> including flushes.  The completion-time request sizing for the
+> latency met/missed accounting still uses the builtin coefficients
+> (the request's bio, and with it the issuing cgroup, is gone by then);
+> extending the model there is left open by this interface.  The builtin
+> cursor is not exposed; a model is expected to track its own stream
+> state.  Model state keyed by the blkcg alone is shared across every
+> device the model is bound to, unlike the builtin cursor which is
+> per (cgroup, device).
+> 
+>     u64 calc_cost(u64 opf, u64 nbytes, sector_t sector,
+> 		  struct blkcg *blkcg, u64 model_flags)
+> 
+> opf is the full bio->bi_opf (the operation must be extracted with a
+> mask, and the REQ_* flag bits, including PREFLUSH/FUA, are part of
+> it); model_flags carries iocost-specific metadata which is not part
+> of the bio operation flags, such as whether the cost calculation
+> is for a merged request; the return value is vtime, clamped to 1
+> second of device time per IO.  blkcg is passed so the model can key
+> per-cgroup state; state stored in BPF_MAP_TYPE_CGRP_STORAGE
+> follows the cgroup lifetime, and optional blkcg_online()/
+> blkcg_offline() callbacks mirror the css lifecycle for models
+> which want eager setup or teardown.
+> 
+> The registration and binding model follows the TCP congestion
+> control model registration pattern: registering a struct_ops makes
+> the model available by its name, while io.cost.model binds one
+> registered model to a device with "model=<name>" and restores the
+> builtin model with "model=linear".  Unregistering a model removes
+> it from the registry so it can no longer be selected by name;
+> devices already using the model keep using it until they are
+> switched back to the builtin model, at which point the reference
+> is released.  A model which does not implement calc_cost is
+> rejected at load.  Sleepable models are rejected at verification,
+> since calc_cost() runs under RCU read lock.  Patch overview:
+> 
+>  1/5: the BPF struct_ops cost model support: Kconfig, ops
+>       definition, name registry, registration, io.cost.model
+>       binding, unified dispatch and verifier checks
+>  2/5: selftest with the 2x example model (the full builtin linear
+>       HDD formula at double cost) plus a runner and the selftest
+>       kernel config entries
+>  3/5: add an iocost_ioc_tick tracepoint emitting the per-period
+>       controller state, so model quality can be evaluated without
+>       drgn (existing events are state-change driven and silent in
+>       steady state)
+>  4/5: a second example model which replaces the single-cursor
+>       sequentiality heuristic with per-cgroup multi-stream detection
+>       keyed by the cgroup, the first consumer of the state interface
+>  5/5: document the model=<name> binding in cgroup-v2.rst
+> 
+> Does it work
+> ------------
+> 
+> Mechanism, verified functionally (QEMU, virtio-blk with the HDD
+> profile, sequential-read workload from a 1%-weight cgroup, builtin
+> vs the 2x example model):
+> 
+>  - per-IO charge: 2882us -> 5722us, a factor of 1.985x; the
+>    completed IO count halves and total cost.usage is conserved,
+>    i.e. the model output drives both charging and budgeting
+>  - edge cases: binding an unknown model name fails with ENOENT
+>    and nothing is applied; unregistering a bound model leaves the
+>    device correctly priced (2x) until it is switched back; the
+>    readback shows the bound model name; the selftest runner
+>    checks the write error and errno of every step, including the
+>    restoration
+> 
+> Workload-shape verification added in this revision (same setup,
+> 4k IOs at weight 1000, builtin vs the 2x example model):
+> 
+>  - flush-heavy workload (read/write/fsync alternating): priced
+>    1.99x the builtin, i.e. flushes no longer reset the cursor
+>    and misjudge the following IO as random
+>  - non-page-multiple IO (6 KiB): priced ~2x, matching the
+>    builtin's truncating page count
+>  - first IO from a high LBA (past 16 MiB): priced 2.01x, i.e.
+>    a fresh cgroup's zero cursor no longer misjudges the first IO
+>    as random
+> 
+> Payoff, demonstrated with the multi-stream example model (4/5) on
+> the same setup, 4k IOs at weight 1000, builtin vs the model:
+> 
+>  - two sequential readers in one cgroup: priced 1961us/op by builtin
+>    (both judged random by the single cursor) and 23us/op by the
+>    model (each stream keeps its own slot); the completed IO count
+>    rises by two orders of magnitude
+>  - random IO inside an 8M window: priced 24us/op by builtin
+>    (undercharge, an accounting escape) and 2607us/op by the model
+>  - single-stream sequential and whole-disk random pricing are
+>    unchanged, so the model fixes both directions of mispricing
+>    without introducing a new one
+> 
+> Non-interference, measured on enterprise NVMe: no measurable
+> overhead when the BPF model is not attached.
+> 
+> Changes in v5 (fixes from the v4 review):
+> - a model which is unregistered but still bound to a device keeps
+>   working by name for io.cost.model writes until the last device
+>   unbinds: a coefficient-only write on such a device used to fail
+>   with ENOENT because the name lookup only searched the registry
+> - the notify-list detach condition in iocost_bpf_model_put() is
+>   corrected for a registered model bound to several devices: the
+>   first unbind no longer removes the model from the lifecycle list
+>   while other devices are still bound, which also leaked the BPF map
+>   reference of the remaining bindings
+> - the 2x example model advances its cursor for merged bios too,
+>   matching the builtin backmerge behaviour, so a long merged stream
+>   no longer drifts past the 16MB seek threshold and misprices the
+>   following IO as random
+> - a concurrent-write leak is fixed: two racing io.cost.model writes
+>   resolving the same model each took a reference on it, but the write
+>   whose commit found the model already bound (old == new) did not drop
+>   one, leaking a map reference; that path now puts the redundant
+>   reference
+> - the cgroup-v2 documentation covers the BPF readback: the
+>   nested-key table lists "bpf" as a ctrl value and a bound model name
+>   as a model value, and the text notes that writing "ctrl=bpf" is
+>   accepted so a saved configuration can be restored as-is
+> - multi-line comments use the opening marker on its own line
+> 
+> Link: https://lore.kernel.org/r/20260908100143.47598-1-cui.tao@linux.dev # v1
+> Link: https://lore.kernel.org/r/20260910125817.223354-1-cui.tao@linux.dev # v2
+> Link: https://lore.kernel.org/r/20260914073356.791518-1-cui.tao@linux.dev # v3
+> Link: https://lore.kernel.org/r/20260916072302.1068871-1-cui.tao@linux.dev # v4
+> 
+> Tao Cui (5):
+>   blk-iocost: add BPF struct_ops cost model support
+>   selftests/bpf: add iocost cost model test
+>   blk-iocost: add iocost_ioc_tick tracepoint for per-period device
+>     summary
+>   selftests/bpf: add multi-stream sequentiality example model
+>   docs: cgroup-v2: document io.cost model=<name> binding
+> 
+>  Documentation/admin-guide/cgroup-v2.rst       |  19 +
+>  block/Kconfig                                 |   9 +
+>  block/Makefile                                |   1 +
+>  block/blk-cgroup.c                            |   4 +
+>  block/blk-iocost-bpf.c                        | 321 ++++++++++++++++++
+>  block/blk-iocost.c                            | 228 +++++++++++++--
+>  include/linux/blk-iocost.h                    |  86 +++++
+>  include/trace/events/iocost.h                 |  45 +++
+>  tools/testing/selftests/bpf/config            |   2 +
+>  .../selftests/bpf/prog_tests/iocost_model.c   | 200 ++++++++++++
+>  .../selftests/bpf/progs/iocost_model.c        | 135 ++++++++
+>  tools/testing/selftests/bpf/progs/iocost_ms.c | 156 +++++++++
+>   12 files changed, 1198 insertions(+), 19 deletions(-)
+>  create mode 100644 block/blk-iocost-bpf.c
+>  create mode 100644 include/linux/blk-iocost.h
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/iocost_model.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/iocost_model.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/iocost_ms.c
+> 
+
