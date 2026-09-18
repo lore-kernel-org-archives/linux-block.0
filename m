@@ -1,182 +1,107 @@
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFFA502774
-	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 13:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A0E342CB2;
+	Fri, 18 Sep 2026 14:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789739486; cv=none; b=ViKzozhq53NdogUIpOFyVIUh/db1as1IiLlX3EIrBUOCXsld6BBXLDLWkzFOK8vuwHwtRNrAdc6RKl7h2c2Un90R80RU7/leMIqqxTbzZDSLZP5NlnOQ1SRvtNP/RU+EQDkopwJqvDu0Y8M/Cj8rbeBgt7O1uXZsMENwA9p1X4Y=
+	t=1789740413; cv=none; b=rgzwkCvD7drkOdgMUGnNN2cDf8vVwJ3TbgL75CKZ0f2F7IMT+4KwrcGsBGVCJvjvibdmbU/krs4yWQpyGqZjN4KdBDQWlQB2Fy6O1YXkqK6wJdYtLJxZetHfSQlrXimkm5d/Ysjg4eRt3umb95eYz0NhVBja3KUq71kwQMQVXwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789739486; c=relaxed/simple;
-	bh=nhO0uCJLmHjyjirxMOVm/JMihRC8hJvWPltGRHbYrN0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q6Q4jPzISpbFWE9sWabLdbyP0VJ77MubSNbxjXYhdXhNP6BKLfGXs+dm8JIbgNodba6H7cQZFOY4uQjDIYNUtEwaPkN3/c7cN9Zxi8lZfJiAbsyTjqnrjX0FBkxVaGhRXGsa33yOHOBGcs8jhZwykIeQJoSvhE3ScEnOwptuYSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D/jdf/iW; arc=none smtp.client-ip=209.85.128.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com
+	s=arc-20240116; t=1789740413; c=relaxed/simple;
+	bh=XH01LQDrSeTYNcZ34jKuemgPhhisqKELCndQNzF6Qo4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=puEhR65SMIhQmJ2wsd9X1676VlP/qovg2FSoHrABCgKmaIGA2MKRfk2bXSL33NoSI6GsZvPIHKw9N7wIvDhYVsgWVCFQfV5yRZQZ9ikTiidwFf+Z+oQZLhJeYCYQpSEr29nK5gZ0AHS1BwP1vC0Svz/CVTdG9Ad1Qw+di7jmVNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLJN78un; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D/jdf/iW"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-49cd74fc1aaso5486845e9.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 06:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789739483; x=1790344283; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=eReSrbiKW9Bm7tiCx6GP2jpAQfD5imbh5NHzgm8A6aU=;
-        b=D/jdf/iWyIUH+O5QSc683eZiz6ZRRgVV15LGzUNFpW31NEP0dUKDFlxUlZh4q313CC
-         a9cfDUUFLeTNHB4Z0uAY2K4j9QVZxli4zaq+azA8t14gMgTGGNOqVIPYIbfr9AEHbmwp
-         5x2ymSZ/PDripbl1wponxS41GoDYSGIlyDAqWgD81P0NTePYpk9HDHzzw7ZPZ7ESx353
-         yUQtABjVOQGd4d1XIVu9al4rmgyH48WTFX+vgpSQ1qbJK9YG6HW+IjiAl9GnWFe2BHt0
-         Qyw5YIrZ5BqtwQGfUm5m9LymTd7ghXukcxJA5z83lYPmyfyUw5JYxo33NLByf/5L+g2o
-         KTHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789739483; x=1790344283;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=eReSrbiKW9Bm7tiCx6GP2jpAQfD5imbh5NHzgm8A6aU=;
-        b=2ITI6dTa9zBxJZngxolz87NFOLMvHbkvwoxVxfgVf2SkjmLsx4UTuZCYDD6+t1UuF3
-         aggaeWB2PHI0diiwj2lbNPpTh+VAk4W4jtZ4zfXNXfkceNe1W6BI8xHMvqaGWkhPJSsH
-         t8xjZIk8H7HC82g5TlAt/1Ymate3cUdcdxaed776035wJEnTJUP0AJigJiON9v8NWfAf
-         2hBQ3HiCtjVjzr3tYVSDG3nNtziqvQabz4zBmkFZnoPRtgb+UmMq9rCqmZ+xJfTTTtZa
-         s0DPIfZttnpkGqYsVucOW90Cbd2p4S98r7G8GBxDVcjqJwH8/W9QZrC6kY1KJDwjmXx6
-         n23Q==
-X-Forwarded-Encrypted: i=1; AKwUvBz7w0CMp/MQ/j8nqHASJsI/vohwBA0eiDXhPowwXfro0K/YJHRMSME8VNijSyGUN87wYewuLUwVwHe9lw==@vger.kernel.org
-X-Gm-Message-State: AFuF++lEdu8GgHkrKN2hi2CFdG3l4QhIzuRWk4WCz1up1qfVXWveXzCl
-	dvo9BkFYnPHlCi4a2a6eziEBW9Mu9Pm+6sO6iGGFj/hvtPZ8MzbDi/S3AEZE+BzMRMzR8lWKFLR
-	7jNn35/E4sYb8I2lmx7JSU80IcGL6b/jM7A==
-X-Received: from wmxe3-n1.prod.google.com ([2002:a05:600d:6503:10b0:49e:6c0c:b61c])
- (user=sergiiushakov job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:5251:b0:49c:fa20:cc00 with SMTP id 5b1f17b1804b1-49fc5736898mr30776365e9.23.1789739482636;
- Fri, 18 Sep 2026 06:51:22 -0700 (PDT)
-Date: Fri, 18 Sep 2026 15:51:20 +0200
-In-Reply-To: <20260918083557-mutt-send-email-mst@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLJN78un"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760F51F000FF;
+	Fri, 18 Sep 2026 14:06:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789740412;
+	bh=GTKWs0qfHLo3fEKtqsDO7a7gqF+SW8Fr3qS1h0YFepU=;
+	h=From:To:Cc:Subject:Date;
+	b=aLJN78unDeK4qGhWNw9uHIR1EihNGzOoyf5vUZeUpbVaVUo6Dz8tsf+Yf+29eafjF
+	 zRTzU/KJCXmTfhYJ2X0WXhp996aEVxyGWLf+/u48ifoemHDJQ9DbXdKYaA5YkxTko+
+	 mhFZ//OCRHv7Jkk47mpnXj8bUMT2CCBFua31p9VfYqemSBnt7DzGRyWD/4oPzE84a2
+	 0OX76mri7aJuJ8MfRWK4ZZYI90jNcPonCJItBAmQFWazmdQlbS1za8YM15Pczl8WuX
+	 aNKgS1kLq67iY0NAHIorRNg3HfSxy438AsPhb/dhoJYoUyvWLSSfev1RiRiAEAPmAp
+	 69yWWSY0Sd4nQ==
+From: Niklas Cassel <cassel@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowangio@gmail.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	virtualization@lists.linux.dev,
+	linux-block@vger.kernel.org
+Subject: [PATCH] virtio_blk: set the zone write granularity
+Date: Fri, 18 Sep 2026 16:06:42 +0200
+Message-ID: <20260918140641.2031075-2-cassel@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260918083557-mutt-send-email-mst@kernel.org>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-Message-ID: <20260918135120.1261150-1-sergiiushakov@google.com>
-Subject: [PATCH v4] virtio-blk: clamp max_segments to virtqueue ring size
-From: Sergii Ushakov <sergiiushakov@google.com>
-To: mst@redhat.com, axboe@kernel.dk, stefanha@redhat.com, hch@lst.de
-Cc: virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, pbonzini@redhat.com, sergiiushakov@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2288; i=cassel@kernel.org; h=from:subject; bh=XH01LQDrSeTYNcZ34jKuemgPhhisqKELCndQNzF6Qo4=; b=owGbwMvMwCV2MsVw8cxjvkWMp9WSGLLWuhZeOHgiZ+a5/yvMz3/K7jUMDIzbrVPQIqLzym3ft /OP+zOiOkpZGMS4GGTFFFl8f7jsL+52n3Jc8Y4NzBxWJpAhDFycAjCRt7KMDE9P3pi0YpbALMa/ s5wzpz7vXJ489+4EJ9U9ahOZJ0/m5+xmZNgc+nYzP9sJe+6fC2c5h65QcZ7+Xv3LwZtrHzfc8jp 34zUvAA==
+X-Developer-Key: i=cassel@kernel.org; a=openpgp; fpr=5ADE635C0E631CBBD5BE065A352FE6582ED9B5DA
+Content-Transfer-Encoding: 8bit
 
-In virtblk_add_req(), each request consumes 2 extra descriptors (out_hdr
-and in_hdr) in addition to the data scatter-gather segments.
+virtblk_read_zoned_limits() reads the write granularity that the device
+reports in virtio_blk_zoned_characteristics and assigns it to the
+physical block size and to io_min, but never to the limit that is named
+after it. queue_limits.zone_write_granularity is left at zero, so
+blk_validate_zoned_limits() raises it to the logical block size:
 
-When a hypervisor (e.g. QNX Hypervisor) advertises VIRTIO_BLK_F_SEG_MAX
-with seg_max = 1024 alongside a 1024-entry split ring (vring.num = 1024)
-and VIRTIO_RING_F_INDIRECT_DESC disabled, lim->max_segments is set to
-1024. When the block layer submits requests with 1023 or 1024 data
-segments, total_sg reaches 1025 or 1026. This exceeds vring.num (1024),
-causing virtqueue_add_split() to return -ENOSPC and permanently wedge
-the blk-mq queue.
+	if (lim->zone_write_granularity < lim->logical_block_size)
+		lim->zone_write_granularity = lim->logical_block_size;
 
-Furthermore, the Virtio specification (2.7.5.3.1) requires that a
-descriptor chain never exceed the Queue Size, and virtqueue_add_split()
-falls back to direct descriptors if indirect table allocation fails.
+A device that reports a granularity coarser than its logical block size,
+which is what the field exists to express, therefore has it silently
+reduced. A 512e host managed disk passed through to a guest reports a
+logical block size of 512 and a write granularity of 4096, and the guest
+ends up with a zone write granularity of 512.
 
-Fix this by:
-1. Rejecting queues with ring_size < 3 at probe, or
-   ring_size < (queue_max_segments + 2) during resume/reset recovery in
-   init_vq().
-2. Unconditionally clamping sg_elems to (ring_size - 2) across all
-   virtqueues in virtblk_read_limits().
+bio_split_alignment() returns lim->zone_write_granularity if it is non-zero
+and bio_split_io_at() may split a bio with as per bio_split_alignment().
+This can real to the write getting rejected by the host drive, as the write
+is not aligned to the physical block size.
 
-Fixes: 0864b79a1533 ("virtio: block: dynamic maximum segments")
-Signed-off-by: Sergii Ushakov <sergiiushakov@google.com>
+zonefs also takes its block size from bdev_zone_write_granularity(), so it
+would incorrectly use 512 on a disk that requires 4096.
+
+sd_zbc_read_zones() sets the limit from the physical block size for the
+same reason. NVMe ZNS and null_blk leave it unset, but the fallback
+gives the right answer for them, as their write granularity is the
+logical block size. virtio carries a separate value that may exceed it.
+
+Set the zone write granularity from the value that the device reports.
+
+Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+Signed-off-by: Niklas Cassel <cassel@kernel.org>
 ---
-Changes in v4:
-- Add Fixes tag.
-- Add code comments in init_vq() documenting the constants 3 and + 2.
-
- drivers/block/virtio_blk.c | 44 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 43 insertions(+), 1 deletion(-)
+ drivers/block/virtio_blk.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 32bf3ba07a9d..cafca309b4d0 100644
+index 32bf3ba07a9d..c8bfbf8435ac 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
-@@ -1021,6 +1021,30 @@ static int init_vq(struct virtio_blk *vblk)
- 		goto out;
- 
- 	for (i = 0; i < num_vqs; i++) {
-+		unsigned int ring_size = virtqueue_get_vring_size(vqs[i]);
-+		/*
-+		 * Each request consumes 2 extra descriptors (out_hdr and
-+		 * in_hdr) in addition to the data segments.
-+		 *
-+		 * At initial probe (!vblk->disk), each virtqueue must fit at
-+		 * least 1 data segment + 2 header descriptors (3).
-+		 * On resume/recovery (vblk->disk), each virtqueue must fit the
-+		 * existing queue_max_segments() + 2 header descriptors.
-+		 */
-+		unsigned int min_ring_size = 3;
-+
-+		if (vblk->disk)
-+			min_ring_size = queue_max_segments(vblk->disk->queue) + 2;
-+
-+		if (ring_size < min_ring_size) {
-+			dev_err(&vdev->dev,
-+				"virtqueue %u ring size %u is smaller than minimum %u\n",
-+				i, ring_size, min_ring_size);
-+			vdev->config->del_vqs(vdev);
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
- 		spin_lock_init(&vblk->vqs[i].lock);
- 		vblk->vqs[i].vq = vqs[i];
+@@ -743,6 +743,7 @@ static int virtblk_read_zoned_limits(struct virtio_blk *vblk,
+ 		dev_warn(&vdev->dev, "zero write granularity reported\n");
+ 		return -ENODEV;
  	}
-@@ -1253,7 +1277,7 @@ static int virtblk_read_limits(struct virtio_blk *vblk,
- 	u16 min_io_size;
- 	u8 physical_block_exp, alignment_offset;
- 	size_t max_dma_size;
--	int err;
-+	int err, i;
++	lim->zone_write_granularity = wg;
+ 	lim->physical_block_size = wg;
+ 	lim->io_min = wg;
  
- 	/* We need to know how many segments before we allocate. */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SEG_MAX,
-@@ -1267,6 +1291,23 @@ static int virtblk_read_limits(struct virtio_blk *vblk,
- 	/* Prevent integer overflows and honor max vq size */
- 	sg_elems = min_t(u32, sg_elems, VIRTIO_BLK_MAX_SG_ELEMS - 2);
- 
-+	/*
-+	 * virtblk_add_req() uses separate outgoing and incoming header
-+	 * descriptors (out_hdr and in_hdr), consuming 2 extra descriptors
-+	 * per request in addition to the data segments.
-+	 *
-+	 * Per virtio specification (2.7.5.3.1), a driver MUST NOT create a
-+	 * descriptor chain longer than the Queue Size of the device.
-+	 *
-+	 * Clamp max_segments to (ring_size - 2) across all virtqueues so
-+	 * that a request never exceeds the ring size of any queue.
-+	 */
-+	for (i = 0; i < vblk->num_vqs; i++) {
-+		u32 ring_size = virtqueue_get_vring_size(vblk->vqs[i].vq);
-+
-+		sg_elems = min_t(u32, sg_elems, ring_size - 2);
-+	}
-+
- 	/* We can handle whatever the host told us to handle. */
- 	lim->max_segments = sg_elems;
- 
-@@ -1466,6 +1507,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	mutex_init(&vblk->vdev_mutex);
- 
- 	vblk->vdev = vdev;
-+	vblk->disk = NULL;
- 
- 	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
- 
+
+base-commit: 5dd1818b15d98d4a20806cd00b1b40320b06004f
 -- 
-2.55.0.1082.g2b9226bbc0-goog
+2.55.0
 
