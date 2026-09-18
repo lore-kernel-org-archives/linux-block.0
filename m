@@ -1,263 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-42.ptr.blmpb.com (va-2-42.ptr.blmpb.com [209.127.231.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B2B3C5DA1;
-	Fri, 18 Sep 2026 04:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9C739CD08
+	for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 04:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789705110; cv=none; b=tgeZabWi3JzfsBJq8HkIbS6O1BhK5hgM/BWV7e8grWM4jA+Qga4iJv99IZGubLD1yXpL31YLBph1WxjMuSkz1JZ28BM4v5J1Mgmqo6XeeJV7MBjVrOcpA6ykPtjRrhS9NSPV7lTjnkTVgQoEGrysczpNDYGpaqxAKgNSQd0CRVM=
+	t=1789705229; cv=none; b=bE3xoBCF5/9M69iUJrU3OkvbHAPoVAzv+FPA0i0MhEMTQCGI4igXd3Tn2P5RiDTSiPdFrVC7ZbeWg+XsqVucYtkCaqsXNj0ttRAogovcalgonnAPXcJiDAsb+aHK3Va/KhIZGCb73rnT+pnYR+oi22Twuk7IaGmsvkv9N1B9sMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789705110; c=relaxed/simple;
-	bh=qexSzwfDHX65vvCPIdbP4qMTEGtxMwxaV4rTeQRm78U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HEEorEJqFXJbMOHGGCDf7vMqUjIkgAwR2IK9lKrIXwS11K62Casf7DyzghrXuh9XFDrnhu6Bs9CL0bi1ZdZ8qvAjcw6tVMJmMnYP++AfaVDbUaY26Yn7a2G5tNFrqBvwq5FWkWspetdLnCgeGMmeAj4Vd0gEUrw9sAIZ2c2/Ew8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAwWiY7D; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789705229; c=relaxed/simple;
+	bh=4tdY4Nfbp0zM9DiVLocaK1bcmB+KB1nfM1YBPTpz6Gk=;
+	h=Subject:In-Reply-To:Content-Type:From:References:Mime-Version:To:
+	 Cc:Date:Message-Id; b=hotWKBoyaPmrNJRQT0SeVjxlMpI7+HWucTr+4cAECvCGyU4grbWktvJI8uDMf8gr2dItg5xFb9XJidLmTexxoqVfLXg/Dqow4O4yZ0hBVUVfMrYleiYPQfMe0sk6CKY9rQPQUJI9xdb98u2t6EEwZ7YYpYnPM7eT3dghg+O98mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=gOHXTN/J; arc=none smtp.client-ip=209.127.231.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAwWiY7D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F02D1F00893;
-	Fri, 18 Sep 2026 04:18:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789705108;
-	bh=IfppJp8zrxHMpzyaV8VLzykkmDT25fBzST+B7CKyroc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IAwWiY7Deif7+Op6gb6GTVrcArdtHpbZNbaSOIvOLfg6xNsYUstfjsHxncwqEtpfl
-	 QLB+whWLHYdrRa0XmEoYUgIakQ72eSVY/qdZErsXoAIWvfs6KmDM3fdiX2gm9Ov4hy
-	 ntu71EE3AAu0PcI3ZCImhPon24ne5FPDnPVuEEJZOnJvLytoTHvkQY1qaqNYNUN1er
-	 UOu9VQwtWOG4Om8WSjVYir9knzzfaf1GUkJKbfj3qPoKbx5E4Aq67QCPLdhnCyNTF1
-	 opEYoRB3bzAQMyYxtaF1HHsVaSX0js+vBicMtWeMmAzZ7GU0pWjqQgHpRLKogLEJmM
-	 4C+DutKsVjfAA==
-From: Yu Kuai <yukuai@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Coly Li <colyli@fygo.io>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Song Liu <song@kernel.org>,
-	Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Barry Song <baohua@kernel.org>,
-	Youngjun Park <youngjun.park@lge.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Cc: Yu Kuai <yukuai@fygo.io>,
-	Christoph Hellwig <hch@lst.de>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Tao Cui <cuitao@kylinos.cn>,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v3 3/3] blk-cgroup: move async bio punt state to blkcg
-Date: Fri, 18 Sep 2026 12:17:44 +0800
-Message-ID: <20260918041744.1526924-4-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260918041744.1526924-1-yukuai@kernel.org>
-References: <20260918041744.1526924-1-yukuai@kernel.org>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="gOHXTN/J"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1789705216;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=aHjF+snUB7WsHjLwAEnV2J7aPUtJxbViNwazCqeh7NA=;
+ b=gOHXTN/JNPWkcbFkpznywkh2LWUY6t5DzsuZxWdrCTAP/LuEeQCPXTJNYdexscjTYejQdM
+ W1u8lVEwAvfKBvE/Vr9LuN50/HeoWF3F770ur4J20GJJbanUH2m7sdlkgWshkxUhkgl5wq
+ UY234VmLpvXSxD4QZQtL+ww8swKYvillcDSM5ChE8wJL+KvrECB3gGdVIujKPemQBHagMx
+ TKzZf9jYmRbxQI1VQ/9OHBlzDmmJZWKCFeCv85gJjXqnYB6BSFKIjBRDlrneoNrz9BOYuw
+ +6wsWp8Ozqb3exyC5RzZPK5ohO7swISa8s6OHJbP+ESpljNXhDimgcP3/bl2+Q==
+Subject: Re: [PATCH] blk-cgroup: wait for old blkgs to leave queue before disk rebind
+In-Reply-To: <20260818065823.753357-1-yukuai@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+From: "yu kuai" <yukuai@fygo.io>
+X-Original-From: yu kuai <yukuai@fygo.io>
+References: <20260818065823.753357-1-yukuai@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
+	"yu kuai" <yukuai@fygo.io>
+Cc: <hch@lst.de>, <tj@kernel.org>, <josef@toxicpanda.com>, 
+	<ming.lei@redhat.com>, <linux-kernel@vger.kernel.org>
+Date: Fri, 18 Sep 2026 12:20:11 +0800
+Content-Transfer-Encoding: quoted-printable
+Received: from [192.168.1.104] ([39.182.0.142]) by smtp.larksuite.com with ESMTPS; Fri, 18 Sep 2026 04:20:14 +0000
+X-Lms-Return-Path: <lba+26aacbbff+a96743+vger.kernel.org+yukuai@fygo.io>
+Reply-To: yukuai@fygo.io
+User-Agent: Mozilla Thunderbird
+Message-Id: <65258a92-967e-457b-a367-0e484006f3c0@fygo.io>
 
-From: Yu Kuai <yukuai@fygo.io>
+Hi, Jens
 
-blkcg_punt_bio_submit() currently queues punted bios on blkg->async_bios,
-so it has to call bio_blkg() to find or create a queue-local blkg.  Bios
-now carry and pin the blkcg css, so punted bio lifetime no longer needs to
-be anchored by a blkg.
+=E5=9C=A8 2026/8/18 14:58, Yu Kuai =E5=86=99=E9=81=93:
 
-Keeping the punt state in blkg can instantiate a blkg even when no blkcg
-policy is enabled, just to bounce submission from a shared kthread.  Move
-async_bio_lock, async_bios and async_bio_work to struct blkcg, and queue
-punted bios on bio_blkcg() for non-root cgroups.  Root or unassociated bios
-are submitted directly.
+> From: Yu Kuai <yukuai@fygo.io>
+>
+> blkcg_init_disk() currently waits for q->root_blkg to become NULL before
+> initializing blkcg state for a rebound disk. However, blkg_destroy_all()
+> clears q->root_blkg after calling blkg_destroy() for each blkg. At that
+> point the initial references have only been killed, and the blkgs remain
+> on q->blkg_list until the remaining references drain and
+> blkg_free_workfn() removes them.
+>
+> A rebound disk can therefore install new blkcg state while old blkgs are
+> still attached to the request queue. Wait for q->blkg_list to become empt=
+y
+> instead, and wake the waiter when the final blkg is removed. This covers
+> the complete queue-side blkg lifetime without adding separate state.
+>
+> Fixes: 3dbaacf6ab68 ("blk-cgroup: wait for blkcg cleanup before initializ=
+ing new disk")
+> Signed-off-by: Yu Kuai <yukuai@fygo.io>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-cgroup.c | 14 +++++---------
+>   1 file changed, 5 insertions(+), 9 deletions(-)
 
-This preserves the priority-inversion avoidance while preventing
-blkcg_punt_bio_submit() from creating blkgs that are not needed by any
-policy.
+Friendly ping ...
 
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
----
- block/blk-cgroup.c | 40 +++++++++++++++++-----------------------
- block/blk-cgroup.h | 14 ++++++--------
- 2 files changed, 23 insertions(+), 31 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 2b5c29434e42..6e1e12841880 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -136,6 +136,8 @@ static void blkg_free_workfn(struct work_struct *work=
+)
+>   		blkg_put(blkg->parent);
+>   	spin_lock_irq(&q->queue_lock);
+>   	list_del_init(&blkg->q_node);
+> +	if (list_empty(&q->blkg_list))
+> +		wake_up_var(&q->blkg_list);
+>   	spin_unlock_irq(&q->queue_lock);
+>   	mutex_unlock(&q->blkcg_mutex);
+>  =20
+> @@ -612,8 +614,6 @@ static void blkg_destroy_all(struct gendisk *disk)
+>   	q->root_blkg =3D NULL;
+>   	spin_unlock_irq(&q->queue_lock);
+>   	mutex_unlock(&q->blkcg_mutex);
+> -
+> -	wake_up_var(&q->root_blkg);
+>   }
+>  =20
+>   static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat=
+ *src)
+> @@ -1472,14 +1472,10 @@ int blkcg_init_disk(struct gendisk *disk)
+>   	/*
+>   	 * If the queue is shared across disk rebind (e.g., SCSI), the
+>   	 * previous disk's blkcg state is cleaned up asynchronously via
+> -	 * disk_release() -> blkcg_exit_disk(). Wait for that cleanup to
+> -	 * finish (indicated by root_blkg becoming NULL) before setting up
+> -	 * new blkcg state. Otherwise, we may overwrite q->root_blkg while
+> -	 * the old one is still alive, and radix_tree_insert() in
+> -	 * blkg_create() will fail with -EEXIST because the old entries
+> -	 * still occupy the same queue id slot in blkcg->blkg_tree.
+> +	 * disk_release() -> blkcg_exit_disk(). Wait for all old blkgs to be
+> +	 * removed from the queue list before setting up new blkcg state.
+>   	 */
+> -	wait_var_event(&q->root_blkg, !READ_ONCE(q->root_blkg));
+> +	wait_var_event(&q->blkg_list, list_empty_careful(&q->blkg_list));
+>  =20
+>   	new_blkg =3D blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
+>   	if (!new_blkg)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 59ccfefe16a8..32e82880893b 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -180,14 +180,10 @@ static void blkg_free(struct blkcg_gq *blkg)
- 
- static void __blkg_release(struct rcu_head *rcu)
- {
- 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
- 
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	WARN_ON(!bio_list_empty(&blkg->async_bios));
--#endif
--
- 	blkg_free(blkg);
- }
- 
- /*
-  * A group is RCU protected, but having an rcu lock does not mean that one
-@@ -226,23 +222,22 @@ static void blkg_release(struct percpu_ref *ref)
- }
- 
- #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
- static struct workqueue_struct *blkcg_punt_bio_wq;
- 
--static void blkg_async_bio_workfn(struct work_struct *work)
-+static void blkcg_async_bio_workfn(struct work_struct *work)
- {
--	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
--					     async_bio_work);
-+	struct blkcg *blkcg = container_of(work, struct blkcg, async_bio_work);
- 	struct bio_list bios = BIO_EMPTY_LIST;
- 	struct bio *bio;
- 	struct blk_plug plug;
- 	bool need_plug = false;
- 
--	/* as long as there are pending bios, @blkg can't go away */
--	spin_lock(&blkg->async_bio_lock);
--	bio_list_merge_init(&bios, &blkg->async_bios);
--	spin_unlock(&blkg->async_bio_lock);
-+	/* as long as there are pending bios, @blkcg can't go away */
-+	spin_lock(&blkcg->async_bio_lock);
-+	bio_list_merge_init(&bios, &blkcg->async_bios);
-+	spin_unlock(&blkcg->async_bio_lock);
- 
- 	/* start plug only when bio_list contains at least 2 bios */
- 	if (bios.head && bios.head->bi_next) {
- 		need_plug = true;
- 		blk_start_plug(&plug);
-@@ -259,19 +254,19 @@ static void blkg_async_bio_workfn(struct work_struct *work)
-  * cgroup.  Use this helper instead of submit_bio to punt the actual issuing to
-  * a dedicated per-blkcg work item to avoid such priority inversions.
-  */
- void blkcg_punt_bio_submit(struct bio *bio)
- {
--	struct blkcg_gq *blkg = bio_blkg(bio);
-+	struct blkcg *blkcg = bio_blkcg(bio);
- 
--	if (blkg && blkg->parent) {
--		spin_lock(&blkg->async_bio_lock);
--		bio_list_add(&blkg->async_bios, bio);
--		spin_unlock(&blkg->async_bio_lock);
--		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-+	if (blkcg && cgroup_parent(blkcg->css.cgroup)) {
-+		spin_lock(&blkcg->async_bio_lock);
-+		bio_list_add(&blkcg->async_bios, bio);
-+		spin_unlock(&blkcg->async_bio_lock);
-+		queue_work(blkcg_punt_bio_wq, &blkcg->async_bio_work);
- 	} else {
--		/* Never bounce if there is no non-root blkg to queue on. */
-+		/* Never bounce if there is no non-root blkcg to queue on. */
- 		submit_bio(bio);
- 	}
- }
- EXPORT_SYMBOL_GPL(blkcg_punt_bio_submit);
- 
-@@ -350,15 +345,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	blkg->q = disk->queue;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
- 	blkg->blkcg_id = blkcg->css.id;
- 	blkg->iostat.blkg = blkg;
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spin_lock_init(&blkg->async_bio_lock);
--	bio_list_init(&blkg->async_bios);
--	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
--#endif
- 
- 	u64_stats_init(&blkg->iostat.sync);
- 	for_each_possible_cpu(cpu) {
- 		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
- 		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
-@@ -1447,10 +1437,14 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
- 	}
- 
- 	spin_lock_init(&blkcg->lock);
- 	refcount_set(&blkcg->online_pin, 1);
- 	INIT_HLIST_HEAD(&blkcg->blkg_list);
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spin_lock_init(&blkcg->async_bio_lock);
-+	INIT_WORK(&blkcg->async_bio_work, blkcg_async_bio_workfn);
-+#endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	INIT_LIST_HEAD(&blkcg->cgwb_list);
- #endif
- 	list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
- 
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index f68ea21958f5..7fee8555e713 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -75,18 +75,11 @@ struct blkcg_gq {
- 
- 	struct blkg_iostat_set __percpu	*iostat_cpu;
- 	struct blkg_iostat_set		iostat;
- 
- 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
--#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
--	spinlock_t			async_bio_lock;
--	struct bio_list			async_bios;
--#endif
--	union {
--		struct work_struct	async_bio_work;
--		struct work_struct	free_work;
--	};
-+	struct work_struct		free_work;
- 
- 	atomic_t			use_delay;
- 	atomic64_t			delay_nsec;
- 	atomic64_t			delay_start;
- 	u64				last_delay;
-@@ -111,10 +104,15 @@ struct blkcg {
- 	/*
- 	 * List of updated percpu blkg_iostat_set's since the last flush.
- 	 */
- 	struct llist_head __percpu	*lhead;
- 
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	spinlock_t			async_bio_lock;
-+	struct bio_list			async_bios __guarded_by(&async_bio_lock);
-+	struct work_struct		async_bio_work;
-+#endif
- #ifdef CONFIG_BLK_CGROUP_FC_APPID
- 	char                            fc_app_id[FC_APPID_LEN];
- #endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head		cgwb_list;
--- 
-2.51.0
-
+--=20
+Thanks,
+Kuai
