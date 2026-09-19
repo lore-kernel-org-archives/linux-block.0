@@ -1,36 +1,31 @@
-Received: from mta0.migadu.com (out-97.mta0.migadu.com [91.218.175.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E2370AE3
-	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 07:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037BF2E5B2A;
+	Sat, 19 Sep 2026 10:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789803306; cv=none; b=bPog8vELIFBBgeEmbowrlzk1/alWF23rjqcAfbHf7ICZUbutZYaYrZdN2GsBr9TmzejGUqVhEqfXUSTddIfsW0T32Q8NoaemFGmvXrlzlLvmdrt0jJpA1vn+l09xvVhz4JO16wbPrO0ZcEuGAcMfEo9NKR2gvHND3Z8l35C7sWs=
+	t=1789814830; cv=none; b=pJCjzVvSNzgravj4iWzahaUYXCj98XI6c+rcJ1dkM44owJY7Dl/tOOkK/LIziGdgzdYJAz9/CHw8BiqKfpPNeFZP0ULH8aGU7CD/QLrUogulgHe7ovr4VsU3fBn9H9nbZElnG3Y4ivn6K9vc7EcySi064y+rHHeVN+R2dK4PBek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789803306; c=relaxed/simple;
-	bh=bwTHF6NnPL2Nf6L0KvSVWduTuK3JmVHwj2sjNly6dPo=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=e9SCtOGpM5EssfPLlXT432aIASxPPrk11my9ZrzGn2R5HRTc0XyJU6UyRNBn9hyA0uldqD0OVDtJfrvY3tYQsC6PlAQWIP34G6KFf40/c/b9vXG0cRTkKQnCI4O1PYnsNxBTE3RpFfQcdbyIZGnO8GoXn2N/idsLmXDnGLBd1rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jrkY5f59; arc=none smtp.client-ip=91.218.175.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jrkY5f59"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=bwTHF6NnPL2Nf6L0KvSVWduTuK3JmVHwj2sjNly6dPo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789803301; v=1; x=1790408101;
- b=jrkY5f59AO1rrkbeDGnUAJiQsf+UARwOfR38Ih2pV3qCG2BVedCN66sS6Xh0Jrj/JMBRBcvS
- eHgCAPTBrTtqIzGAGLootoakKC2dk4qpdIGe79VYB5ro4Dc2C7AaFKdiQP/QKyj2gbstDh8/Jt7
- juo3vlu9A57wjuDarjhlfKMA=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 95f1a4aad28e81c8;
-	Sat, 19 Sep 2026 07:35:01 +0000
-X-Mizu-Trace-ID: 95f1a4aad28e81c8
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <748ca00e-61af-4698-86a9-cb28a41c7471@linux.dev>
-Date: Sat, 19 Sep 2026 15:34:52 +0800
+	s=arc-20240116; t=1789814830; c=relaxed/simple;
+	bh=rd5JL2uCKAQd45ccIiM+TM1pPA1RboIRuKCBefuWJCc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AT/u+yKK2/hqwSVFYYCJR1t7Vsx0oRHwoGHtthqQLd2lpK1dxgji7bNq0IYQxDYBNRpn1gyED4jAevIKH8LId/IHIwJb+kBsmMR1tN48d62KGu8nWTWV/W63sR3jS9qPVK7aecvR8PaCMKDQt72W+LUSStMTh27lMzPeCSXtLQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68JAjo4U056451;
+	Sat, 19 Sep 2026 19:45:50 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68JAjoFN056448
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 19 Sep 2026 19:45:50 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <a3850b6f-a209-48d0-867c-3c764a740022@I-love.SAKURA.ne.jp>
+Date: Sat, 19 Sep 2026 19:45:47 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,65 +33,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
- cuitao@kylinos.cn
-Subject: Re: [RFC PATCH v5 1/5] blk-iocost: add BPF struct_ops cost model
- support
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, tj@kernel.org,
- josef@toxicopanda.com, axboe@kernel.dk, ameryhung@gmail.com
-References: <20260918031751.1255420-1-cui.tao@linux.dev>
- <20260918031751.1255420-2-cui.tao@linux.dev>
- <DLIK37JYD35X.3NZ4ZHTHDKAFX@gmail.com>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <DLIK37JYD35X.3NZ4ZHTHDKAFX@gmail.com>
+Subject: Re: [PATCH v3 2/2] loop: Perform __loop_clr_fd() after
+ disk->open_mutex is dropped.
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        linux-block <linux-block@vger.kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brian Foster
+ <bfoster@redhat.com>,
+        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
+        Markus Elfring <Markus.Elfring@web.de>,
+        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+        rust-for-linux@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Nilay Shroff <nilay@linux.ibm.com>
+References: <f597b6e6-77a7-4c09-9d72-e5a9cbe6d7c2@I-love.SAKURA.ne.jp>
+ <8ac41772-c397-4069-8878-7a1924e8b8a3@I-love.SAKURA.ne.jp>
+ <f232b118-f4d0-426a-94d4-eb9aa1f2d626@acm.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <f232b118-f4d0-426a-94d4-eb9aa1f2d626@acm.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav312.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-Hi Alexei,
-
-在 2026/9/18 23:43, Alexei Starovoitov 写道:
-> On Fri, Sep 18, 2026 at 11:17 AM Tao Cui <cui.tao@linux.dev> wrote:
->> The registration and binding model follows the TCP congestion
->> model registration pattern: registering a struct_ops makes the model
->> available by its name (char name[IOCOST_MODEL_NAME_LEN], validated at
->> init_member), while
->> io.cost.model binds one registered model to a device with
->> "model=<name>" and unbinds with "model=linear" or "ctrl=auto/user".
->> Unregistering a model removes it from the registry, but its name
+On 2026/09/19 5:41, Bart Van Assche wrote:
+> On 9/18/26 8:00 AM, Tetsuo Handa wrote:
+>> +    /* Step 1: Flush all outstanding I/O, without open_mutex held. */
+>> +    /*
+>> +     * Since loop_queue_rq() is called with RCU read lock, this synchronize_rcu()
+>> +     * makes sure that no more queue_work() calls are made from loop_queue_work()
+>> +     * from loop_queue_rq(). Subsequent loop_queue_rq() calls which are made after
+>> +     * this synchronize_rcu() returned shall see lo->lo_state != Lo_bound and
+>> +     * return with BLK_STS_IOERR.
+>> +     */
+>> +    synchronize_rcu();
 > 
-> I don't think it's what Tejun asked for in v1. He asked for a per-device
-> struct_ops instance where attaching switches the device to bpf and
-> detaching switches it back. Instead there is a global name registry,
-> a lifecycle list, an "unregistered but still bound" state and a
-> refcount_t on top of bpf_struct_ops_get(), and every version since v3
-> had a lifetime bug in exactly that code.
-> Do it like hid_bpf_ops does with hid_id: device in the struct_ops,
-> bind in .reg, unbind in .unreg, and le
-> t struct_ops own the lifetime.
+> Calling blk_mq_quiesce_queue(lo->lo_queue) and
+> blk_mq_unquiesce_queue(lo->lo_queue) is cleaner than calling
+> synchronize_rcu(). Additionally, it makes the purpose more clear.
+
+I appreciate your suggestions regarding APIs to use. However, since we don't
+know why this problem started to manifest (it is possible that a bug was
+introduced in the block layer APIs), I consider that we should start with
+raw API (for least dependencies). We can monitor syzbot reports for 2 weeks
+after this patch is applied to the linux tree. If my patch fails to fix
+this problem, we can reconsider what we are missing. After that period,
+you can apply your follow-up patches to the linux tree. If your patch
+restarts to manifest this problem, we can suspect the delta.
+
 > 
-
-Thanks for pointing this out.
-
-You are right. I misunderstood Tejun's comment from v1. I took
-"per-device" as selecting a registered model by name for each device,
-which led to the current registry/lifecycle design.
-
-My original implementation followed the tcp-cc style named model
-approach, but that was not what Tejun was suggesting. The intended
-model should be a per-device struct_ops instance, with attach/detach
-controlling the switch between the BPF model and the builtin model,
-and the struct_ops core owning the lifetime.
-
-> pls wait for Tejun's feedback before respinning.
+>> +    /*
+>> +     * In order to flush outstanding I/O (without open_mutex for deadlock
+>> +     * avoidance) before clearing the backing device, defer __loop_clr_fd()
+>> +     * to lo_post_release().
+>> +     * The Lo_rundown state guarantees that lo_open() will fail with -ENXIO.
+>> +     * The failing lo_open() guarantees that lo_release() will not overwrite
+>> +     * lo->rundown_owner until __loop_clr_fd() resets to the Lo_unbound state.
+>> +     */
+>>       if (need_clear)
+>> +        WRITE_ONCE(lo->rundown_owner, current);
 > 
+> The above code can be moved before the mutex_unlock() call and the
+> "need_clear" variable can be eliminated.
 
-I'll rework the design in that direction and wait for Tejun's feedback
-before sending another revision.
-
-Thanks,
-Tao
-
-> pw-bot: cr
-
+OK.
