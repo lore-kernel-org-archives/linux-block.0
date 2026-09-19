@@ -1,86 +1,36 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-97.mta0.migadu.com [91.218.175.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EEB1B4F1F
-	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 05:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E2370AE3
+	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 07:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789794974; cv=none; b=c0mEIxfHoJoFxDro0I1A7IDSrgz/DV4zVaawGP7wcg7zfZ2u0NHGTGFU+volGj0y6WB7LB1wjb1uO58PDlPPLiPLJLuQ5Gxwi3goG0smbDd9lMt3F5LlNR2SIBNNlL+1Ooq30kZWBnYS5ETxFutIGxHLiYRMFhZimVAZ8rMw2/0=
+	t=1789803306; cv=none; b=bPog8vELIFBBgeEmbowrlzk1/alWF23rjqcAfbHf7ICZUbutZYaYrZdN2GsBr9TmzejGUqVhEqfXUSTddIfsW0T32Q8NoaemFGmvXrlzlLvmdrt0jJpA1vn+l09xvVhz4JO16wbPrO0ZcEuGAcMfEo9NKR2gvHND3Z8l35C7sWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789794974; c=relaxed/simple;
-	bh=3F1dRiiOctBT+Y4P4x/exnUO4gCUsgrPUqAzlMHblfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MFmLZi7qFF+4VHv/Z69bvlPwgADnRAldVKM+Uc+83QY16AsLh6h6Pgp/qRaAHyJGWg8wedVGYETKYRfHP/mC1m+iAoTD/wLKEtGA+3KBDT+HolxvEFXv7cddso7Y2hGgWVLUvC4PZaBFXnxhNNhxEsDicJ/6kT2q9sJ7vuptG1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=RWpD7Jjh; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=tdyIqgqU; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1789803306; c=relaxed/simple;
+	bh=bwTHF6NnPL2Nf6L0KvSVWduTuK3JmVHwj2sjNly6dPo=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=e9SCtOGpM5EssfPLlXT432aIASxPPrk11my9ZrzGn2R5HRTc0XyJU6UyRNBn9hyA0uldqD0OVDtJfrvY3tYQsC6PlAQWIP34G6KFf40/c/b9vXG0cRTkKQnCI4O1PYnsNxBTE3RpFfQcdbyIZGnO8GoXn2N/idsLmXDnGLBd1rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jrkY5f59; arc=none smtp.client-ip=91.218.175.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="RWpD7Jjh";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="tdyIqgqU"
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68J4iSMo145706
-	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 01:16:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=7ckE
-	x97Ao3pgMPGM+UVMLsGwNfRL//boHpDqglPVhzk=; b=RWpD7JjheOxPes4WzuRe
-	AmT+kXTi8DNRrCjBnQXGHotfxOG8jDxbt/At8ZFKiJ/LEctm8d9nWGTJWPYdgCJg
-	ZYEZCXGW7ySNZro1m0t2JtiOWfdeAlBG4bsO8VlCkb/EnHQNgUjAMhYJPsPNB8SL
-	9Mj6LEZDhPvDMWp/otanQZj2Vq7CIwWdifZgxuC1++BtEXd4EmphozaJljpWHppq
-	Q1JAghuT7vHvq6555fKgRrgZx+2Zp7rzOqDpvWvJzwgRTVgaHJVQiGT8FJM1+FSs
-	IfQ4setrFUobuyGQZHtlW14GSHzajxs6wwEa6S+PzD9GBa9dFKNjSnNz0PVabO+x
-	hQ==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gscxehqqt-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 01:16:11 -0400 (EDT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-939d6c515deso305672685a.3
-        for <linux-block@vger.kernel.org>; Fri, 18 Sep 2026 22:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1789794970; x=1790399770; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7ckEx97Ao3pgMPGM+UVMLsGwNfRL//boHpDqglPVhzk=;
-        b=tdyIqgqU2WuBFyzr8W7fjy+oPPBvV+3TcGUoweT4uFkigcUKFAIuDMAQQ27m2c+smV
-         CdTH4cna6Hwq2zc+IhQAQYe53mwwK8fTCSLVT5DawaRoPnNi3EzrP5qkd5DS8/xmv7+T
-         ZJlnIrg92vejQANaNJmjLHxjwyQAbsgyX5V3TcOF0OWNqOiD5zbuUZjqAzSqGtzwbaG/
-         aD2ahFRE/prnDIIZ5lGWpWHFT/uCOk1yV5JvWidgOzEBx7FfprvtzeX10WZLjqCR/4kL
-         z/VRDW60ErGhK903h95gniMwbXy/sdxj/F3+x/nyVpYs156I802KDmcdbRkztoRC2aT0
-         XOlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789794970; x=1790399770;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7ckEx97Ao3pgMPGM+UVMLsGwNfRL//boHpDqglPVhzk=;
-        b=ACwc2Bf50iJU3tpVeHsxHUmy/CtxTMY0G02Kfu9z7/Snl4Uis54HUNR7tIP8Y8AM3a
-         5Na7y3ISkpIwy0S5+Vya+UUWVsPM1lmlnc3JTiwPyGaB7257rToF5C+D5VdRPte5lm5S
-         Vjv1l5aTLFojIXvoRqL3irhGfz0ShNxnVK554lZahGaw2MRR5Vy0cdirqryKDGYmjJEL
-         +Nf9Z37OZXlKt0pk9abneYId6DmRIvp/TPh/MSaaWySNbRRCZHi1Rbh3hOs1YVuOovtV
-         f43YjLgqaV/7CJ3pSXGPutH/Nj4RMwPYhE7B8w10V53nRlCt8tg7+X9YRXDE2xBnd6jv
-         bTug==
-X-Gm-Message-State: AFuF++m/El1ynQm1zUnT4TZ9ZShVOORnwelPfwHJ06oSZdnaiqqskSfy
-	2ZkKyZzn9tcbhBMe5b4mZc9z/SQlO9hx0gwo24b1P5Xinn6r6B/MCbJSYLw9mbiQDefY64MFLMi
-	CApajBc2gztKH5lzPFTlSVpFVzXpodMhviZZ2PPfBd9J5WvVIoHjhtR5HodBU6Ns/r3VB
-X-Gm-Gg: AYBFou3d1DIpLSFBqsmn2+OkcXl8AeT4Fdvfm/1TtdYZaqxAYUKpI51NQP+Z5HKGIit
-	qxhpWx1KLBcMtEdUTkQPNaikfeJgvX1osF3I53wLx6M2oOI+emSpWJmAIYaGSMew9vc4t3NU/TY
-	WOvOZgbtoEzWgz4DsRz9Cg5PcegneI4M4o3xhACQNv77ES5ZHLEVwWpVIPtQU4GMCbrFYT/ALRE
-	bcpSadIL48itrjMINXeebhYAeszGlQS9xxd2dDnTib9oUST0JOug/8dfZ8D/Ta0jkeTNQQGcsnt
-	dtUh2Ef8/183av3p4q8IQ5eV2bAt0AxWu/lNVOAB2eoA9ZYJycePwMU3h05tsEeQ79L1W6A/39q
-	WLDpzu/0ztCniSwYsJ68ykgRjww9MHZYyr5abu+bXMUulOsCQ
-X-Received: by 2002:a05:620a:648d:b0:93a:14c3:72c2 with SMTP id af79cd13be357-93bf559528fmr15354385a.29.1789794970298;
-        Fri, 18 Sep 2026 22:16:10 -0700 (PDT)
-X-Received: by 2002:a05:620a:648d:b0:93a:14c3:72c2 with SMTP id af79cd13be357-93bf559528fmr15352185a.29.1789794969791;
-        Fri, 18 Sep 2026 22:16:09 -0700 (PDT)
-Received: from [192.168.1.62] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93beda709a6sm113958185a.14.2026.09.18.22.16.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Sep 2026 22:16:09 -0700 (PDT)
-Message-ID: <b8b0a7f6-59cc-4ad3-8b36-b8107fe0fa77@columbia.edu>
-Date: Sat, 19 Sep 2026 01:16:08 -0400
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jrkY5f59"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=bwTHF6NnPL2Nf6L0KvSVWduTuK3JmVHwj2sjNly6dPo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789803301; v=1; x=1790408101;
+ b=jrkY5f59AO1rrkbeDGnUAJiQsf+UARwOfR38Ih2pV3qCG2BVedCN66sS6Xh0Jrj/JMBRBcvS
+ eHgCAPTBrTtqIzGAGLootoakKC2dk4qpdIGe79VYB5ro4Dc2C7AaFKdiQP/QKyj2gbstDh8/Jt7
+ juo3vlu9A57wjuDarjhlfKMA=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 95f1a4aad28e81c8;
+	Sat, 19 Sep 2026 07:35:01 +0000
+X-Mizu-Trace-ID: 95f1a4aad28e81c8
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <748ca00e-61af-4698-86a9-cb28a41c7471@linux.dev>
+Date: Sat, 19 Sep 2026 15:34:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -88,60 +38,65 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 0/3] blktests: tests for the direct I/O fallback,
- splice, and bio trimming fixes
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20260909-blkdev-fixes-tests-v1-0-1f8af8665d16@columbia.edu>
- <aqyll5sZ6qrYzo3W@shinmob>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <aqyll5sZ6qrYzo3W@shinmob>
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
+ cuitao@kylinos.cn
+Subject: Re: [RFC PATCH v5 1/5] blk-iocost: add BPF struct_ops cost model
+ support
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, tj@kernel.org,
+ josef@toxicopanda.com, axboe@kernel.dk, ameryhung@gmail.com
+References: <20260918031751.1255420-1-cui.tao@linux.dev>
+ <20260918031751.1255420-2-cui.tao@linux.dev>
+ <DLIK37JYD35X.3NZ4ZHTHDKAFX@gmail.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <DLIK37JYD35X.3NZ4ZHTHDKAFX@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE5MDA3MSBTYWx0ZWRfX2Txc+IHsBZzL
- xdLDvvCkRB+PQXnlDj80KJUgXpbftFGq5QUb7pEy6sxaqP9G19FisZoNeGFDsgEputooVdPAAxd
- meHzgnQ6zY9Xm+DKr6IGlW3l06nymYQpzt0Yi6zwRx7owngGH7H9Qi6qaPU8CMsxt+DcsPAqKXW
- vrAr9dVV2eYZ/06W7t7rbx9DLUY4erhtDzmx+HSzB5fALU8plPQYIjZr350APmD1X/7O+20TLWK
- n+Rufyvg73US6jiMeyLROxB7qfTopcbRXCTW4AgQUwFeeZstUTvp4MIcj7BiyY74UVnmfwJC7c4
- H7vXnEVGfrKXLtPRM0VS0kRz+1EHzJk+aLU3JSZHdeDI6zS2TLlS6QrakkVBkWvxxALeY/vp13R
- db/GgD3uGZBqtPu+5R6mi+Q6Ccci4Ps7eC3/U++ckh0gPtBH4dVszGmI0TFhcP+rekxzyOYAuxq
- hi9Jn9eTPbNDv1aW2vw==
-X-Proofpoint-ORIG-GUID: 1iG7DSGwnI9_TP9Erxyofqfm_Fn7ijSc
-X-Proofpoint-GUID: 1iG7DSGwnI9_TP9Erxyofqfm_Fn7ijSc
-X-Authority-Analysis: v=2.4 cv=GqfXaU1C c=1 sm=1 tr=0 ts=6aae1a9b cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
- a=VwQbUJbxAAAA:8 a=nFOSXamSZsj4_remXFAA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE5MDA3MSBTYWx0ZWRfX4ewSJeDKxqRv
- +0KvsfUUhpUjI0BSVGZ4zekLzd7NhKsnCkVeD5RPKSELU+o5n8hKrTrRIUpRsD3z2pk6Cmn11Xw
- wBPqSMD/GvKhPY/AzCD0Ku2qbmwg6RVjBFeKgYfZPXSAST2M6R2s
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11909
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=10 suspectscore=0 clxscore=1015 bulkscore=10
- adultscore=0 lowpriorityscore=10 priorityscore=1501 malwarescore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609190071
+Content-Transfer-Encoding: 8bit
 
-On 9/17/26 10:49 PM, Shin'ichiro Kawasaki wrote:
+Hi Alexei,
+
+在 2026/9/18 23:43, Alexei Starovoitov 写道:
+> On Fri, Sep 18, 2026 at 11:17 AM Tao Cui <cui.tao@linux.dev> wrote:
+>> The registration and binding model follows the TCP congestion
+>> model registration pattern: registering a struct_ops makes the model
+>> available by its name (char name[IOCOST_MODEL_NAME_LEN], validated at
+>> init_member), while
+>> io.cost.model binds one registered model to a device with
+>> "model=<name>" and unbinds with "model=linear" or "ctrl=auto/user".
+>> Unregistering a model removes it from the registry, but its name
 > 
-> Thanks for the series. The patches all look good to me.
-> 
-> I ran the new tests cases with and without the kernel side v3 patches [2] and
-> confirmed that the test cases trigger the expected failures and the kernel fix
-> patches avoid the failrues. Good.
+> I don't think it's what Tejun asked for in v1. He asked for a per-device
+> struct_ops instance where attaching switches the device to bpf and
+> detaching switches it back. Instead there is a global name registry,
+> a lifecycle list, an "unregistered but still bound" state and a
+> refcount_t on top of bpf_struct_ops_get(), and every version since v3
+> had a lifetime bug in exactly that code.
+> Do it like hid_bpf_ops does with hid_id: device in the struct_ops,
+> bind in .reg, unbind in .unreg, and le
+> t struct_ops own the lifetime.
 > 
 
-Thanks!
+Thanks for pointing this out.
 
-> [2] https://lore.kernel.org/linux-block/20260909-blkdev-fixes-v3-0-1a5222c6e8ad@columbia.edu/
-> 
-> I will wait for the kernel side patches get settled to Linus master branch
-> before I apply the blktests patches.
+You are right. I misunderstood Tejun's comment from v1. I took
+"per-device" as selecting a registered model by name for each device,
+which led to the current registry/lifecycle design.
+
+My original implementation followed the tcp-cc style named model
+approach, but that was not what Tejun was suggesting. The intended
+model should be a per-device struct_ops instance, with attach/detach
+controlling the switch between the BPF model and the builtin model,
+and the struct_ops core owning the lifetime.
+
+> pls wait for Tejun's feedback before respinning.
 > 
 
-Sounds good, I'll send out v4 early next week.
+I'll rework the design in that direction and wait for Tejun's feedback
+before sending another revision.
+
+Thanks,
+Tao
+
+> pw-bot: cr
+
