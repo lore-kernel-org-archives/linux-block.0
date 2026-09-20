@@ -1,108 +1,120 @@
-Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
+Received: from mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D572393DE0
-	for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 22:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D27E314B6E
+	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 07:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789856788; cv=none; b=o/vGUQ5CzKz7PY+hTLQUzi2Gv5ZpgyTJNAr0apvhl+WNBr35ET00HGUM7+zNMDWez3yOzrmPIJWFGGRA5GOxCkBqIsKppzVhBrmOxr1i5wTVpnRKYcuw04DObNRheQ1So3+xcQSTQfOskaemtv6QibWNO+/PtcEThdJoTy7h7E4=
+	t=1789888143; cv=none; b=BPnEcTrwLUEhiQhHtAFmUNOfPTWzcTyq4F1BGv/pAVCojZDW7yDahvmq+P7e7K5Eqwf6vixBwXJQUnPQhtSWi+cUHXsmWyXgROADKAv78j/W9kJkFGdsnrLJYcItEginM9qGo9gtHlbm3RTyhnN4Wm4b3KUJF8YGNCN6Ok0PYFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789856788; c=relaxed/simple;
-	bh=+MdI4r6n10gDS+p4YVUaZONpes94VhcY87e85kZMofE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UV+gpZLR1kr7Bl4/iuK/TErb5TK44XlZkd9+vVMrJuIXHb4CsnDUkSYNty23m76zZHdfpLGtEWtffKDsiUeAwPdJOfM2mWFJuNBRFK17dhnMHcuaVF+ScdNoz51DgbfGTnaAQIAF3dHd68jGMX2+C07Isd38bynuqH/nrtk0c2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3az9Lf0; arc=none smtp.client-ip=74.125.227.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789888143; c=relaxed/simple;
+	bh=VgeBjtVfHDvoQqBuILT+p6c6cwhxbzBnIRRxf84zUQc=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ErVI7Crh0WOhNk5dE375BUHdCihFChDjZeaRDLV8HV6al3lN4eSrmDxQlplP+pLcSgWC2Tb2o0cSQ7utSpDveC9AFcXf1l/5iK27TXsAkqmSF5YKMkmW6BkpzWZFRuKCcYWOPkbe6cXfh3s02+3BjNV7dNlYnFvyIMgsoRp8+xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j19dSBIc; arc=none smtp.client-ip=95.215.58.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3az9Lf0"
-Received: by mail-pj2-f43.google.com with SMTP id d9443c01a7336-2d91ede8035so22458025ad.3
-        for <linux-block@vger.kernel.org>; Sat, 19 Sep 2026 15:26:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789856785; x=1790461585; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/g+orwBOaMljS/JJ6ICfCzvcRhieOLrMuJNELTyKpxI=;
-        b=S3az9Lf0TD44ncVbRuSYmGonqLpsANDxcAaKrvYX+5UOOvKbSHpmW2VJZUlXT1iJFX
-         wA84iZrN6KPtOA0tqxX3m3LFfhaucS+zUXda0Mep6RMEXXoVmz5tz1XY+uARI3YvOB95
-         VNZAJ2jpniORc2bt7xJiNCUak/ne1L1CXDVRX573OR458YNzCNU2GtsmZMTve6Lnt7Mz
-         uFHpbo0YOoE0Z6FQOP8P5JTFhrjuvQjUWuHlZ7p8jjdsB3lXtmO5FbG/5KcOe+OqyxNS
-         VrHlftUQ3Dd5uUkFw5LPB/Rx7Zz4JAhZVRANa4PhZZa/sOaRndM+l7mz9MeSU25K4D28
-         jWgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789856785; x=1790461585;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/g+orwBOaMljS/JJ6ICfCzvcRhieOLrMuJNELTyKpxI=;
-        b=ELly3bZd6u0nWmjeAfha6SLv2HTtel0rFCG/gC7ZuPXFzx/F38sO9CpzUJ17N7QHMH
-         YVNBWGMTjcZru2VEIhmCaxIeuPwYMZPt4NeNruwntUmtbzCZaN2rRgrQw22qbAZlQXvJ
-         IPtTVVPCL0LjROKCbgyn1ZmVa4KzFe7NjHKnGICtd4w7rSwEqDV7U7s92kZztP/hjs8u
-         HQ2BQvNET4nrkmN1BBYtP3a5ppYJnTOHLxPgkJvYdypWOcdB0rjv9HKVhmImvvMsc3NR
-         BOoBGGDYFP6u1raGcjr+FDTv+w2aZCJ7OsrQYhBx8vN7QY9qgQfLXEpzcxoDkbtWyFPk
-         e8rg==
-X-Gm-Message-State: AFuF++kelza4IzpxFEJO2yIfn+r3vfNc6+i8+E2EHCXxdO+TlQIq1Gn+
-	i5G7MoC0vf9PZJl/RX5megWXXUVyNA0f52h3N9uOsWLtm/raGzZ2QLMQbfgFjgpM
-X-Gm-Gg: AYBFou18IKH+rk4F73YrGturcHAW6GQJd7U6C4yUYHSWs+oRLrcjelNyjvaVc/TAQwT
-	vAL2kYLJV1ZR6Fzt7CXbiI4Yo6+97YL32zHxa2QSNo2Lfh9DTDeQV9bgQ5cjOjgRx4Vx9AxNIm2
-	wr/56Qqe+/QjVD5tmvlmvfM0us87H12s553X2ptfJLo2diaWVbbuGEQgh9vs50v+NddQbaS+Qnp
-	h65AUCkx+C2p3D+HtvCa1Yl4f0tOEokN9qyiI/2h6TkUYAsAK2rXOE83bc92sOPubbVNXQ2O+XP
-	SGskTAPQ39z/dMrd8rRn4YCJJlrjlMTOUTnGjCAooYO/3T2reKxIJnxDxqlKePLYYsO9ON9aAkd
-	M3LNbi/ThJxIvU06OZnVINnP46UIIkhTYxorUMZzjuUU7OqXcMAqRtL1269663USQJ9/SedB6SX
-	MPlSPb8+ltDmuz6BwGteaXh5aC/u66DG87dSssRderdDELuwDnhRxlsWH4I7KeU+0c6y1F5boFu
-	p6X1fXGKCwqe7VQt07qRR0VrAU+xobGwLAuwoqW2MY6RhWyikStU38BbizOO2jUFqppxrQbmLuR
-	LA3hrmigGw==
-X-Received: by 2002:a17:903:2312:b0:2cc:6018:f030 with SMTP id d9443c01a7336-2ddb1b899famr115123815ad.14.1789856785398;
-        Sat, 19 Sep 2026 15:26:25 -0700 (PDT)
-Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ddc17e17e0sm13208235ad.70.2026.09.19.15.26.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 15:26:24 -0700 (PDT)
-From: Hui Peng <benquike@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] loop: restore lo_backing_file, gfp_mask, and uevent_suppress on loop_configure() error
-Date: Sat, 19 Sep 2026 22:26:24 +0000
-Message-ID: <20260919222624.3797511-1-benquike@gmail.com>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j19dSBIc"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=VgeBjtVfHDvoQqBuILT+p6c6cwhxbzBnIRRxf84zUQc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789888139; v=1; x=1790492939;
+ b=j19dSBIcYF/FfClW4UyntiOwbTP1RxAWh+hHdeXCSMEq8BjQcWVrnOnrHcZTT1trc71DPRVT
+ haf/m9zbHJxcQoD5KCxwWr1O3bAZgvs/jLI6b5CAPdccqJW2zNXaNPSthYmgN6fScdGNrsjdPsj
+ gdhFbMcYqNZwRAT1zoLev27E=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id b40f69e8e1eff5f6;
+	Sun, 20 Sep 2026 07:08:59 +0000
+X-Mizu-Trace-ID: b40f69e8e1eff5f6
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <ab72a564-108c-4b74-adf3-1eadbbf01084@linux.dev>
+Date: Sun, 20 Sep 2026 15:08:54 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, Josef Bacik <josef@toxicpanda.com>,
+ josef@toxicopanda.com, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@infradead.org>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cuitao@kylinos.cn
+Subject: Re: [PATCH v2 1/4] blk-iocost: charge flushes as pageless random
+ writes
+To: Tejun Heo <tj@kernel.org>
+References: <20260916085304.1080271-1-cui.tao@linux.dev>
+ <20260916085304.1080271-2-cui.tao@linux.dev>
+ <9575357186118be214d6377dd80a21e8@kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <9575357186118be214d6377dd80a21e8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In loop_configure() (drivers/block/loop.c), if
-loop_set_status_from_info() or blk_mq_unfreeze_queue() fails after
-lo->lo_backing_file has been assigned, reset lo->lo_backing_file = NULL,
-lo->lo_device = NULL, lo->lo_flags = 0, mapping_set_gfp_mask(mapping,
-lo->old_gfp_mask), and dev_set_uevent_suppress(disk_to_dev(lo->lo_disk),
-0) before calling fput(file) so a dangling struct file * pointer is not
-left in lo->lo_backing_file with lo_state == Lo_unbound.
+Hello Tejun,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Assisted-by: LLM
-Signed-off-by: Hui Peng <benquike@gmail.com>
----
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6..8fae858c9df7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1086,8 +1086,15 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	loop_update_limits(lo, &lim, config->block_size);
- 	/* No need to freeze the queue as the device isn't bound yet. */
- 	error = queue_limits_commit_update(lo->lo_queue, &lim);
--	if (error)
-+	if (error) {
-+		mapping_set_gfp_mask(file->f_mapping, lo->old_gfp_mask);
-+		spin_lock_irq(&lo->lo_lock);
-+		lo->lo_backing_file = NULL;
-+		spin_unlock_irq(&lo->lo_lock);
-+		lo->lo_device = NULL;
-+		dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
- 		goto out_unlock;
-+	}
- 
- 	/*
- 	 * We might switch to direct I/O mode for the loop device, write back
+在 2026/9/19 22:59, Tejun Heo 写道:
+> Hello, Tao.
+> 
+> On Wed, Sep 16, 2026 at 04:53:01PM +0800, Tao Cui wrote:
+>> Charge the flush component of any REQ_PREFLUSH bio on top of its data
+>> cost, priced as a pageless random write (LCOEF_WRANDIO), which provides
+>> an approximation of the device time consumed by a flush.  For profiles
+>> where WRANDIO clamps to zero (ssd_dfl / ssd_fast), use a one-page floor
+>> (LCOEF_WPAGE).
+> 
+> Pricing a flush as a random write, or as a page where that comes out to
+> zero, is as arbitrary as pricing it at zero, and it changes what existing
+> setups get charged. 013adcbef165 ("blk-iocost: skip empty flush bio in
+> iocost") zeroed them because the flush machinery coalesces flushes and the
+> write coefficients don't say anything about what a flush costs.
+> 
+
+Understood.  The write-coefficient pricing was only an approximation and
+would change the accounting behavior for existing setups, so I'll drop it
+and rework the series around a dedicated flush cost.
+
+> Can you instead add the flushiops parameter you mentioned in the v1 thread
+> to the linear model? A flush costs VTIME_PER_SEC / flushiops, and zero when
+> the parameter isn't set, including in the builtin profiles, so nothing
+> changes until it's configured or the profiles are regenerated with a flush
+> measurement.
+> 
+
+Will do.  I'll add flushiops to the linear model using the same conversion
+as the other iops coefficients:
+
+- add a flushiops=%u token for io.cost.model and translate it to
+  LCOEF_FLUSH = VTIME_PER_SEC / flushiops
+- keep flushiops zero in builtin profiles, with no fallback, so existing
+  profiles keep their current behavior
+- account REQ_PREFLUSH and REQ_FUA consistently with the flush machinery:
+  PREFLUSH charges one flush, and FUA adds another flush when the device
+  does not support native FUA
+
+The rest of the series (zone append charging, latency accounting, and the
+comment fix) remains unchanged.
+
+> The same charge should cover REQ_FUA the way the flush machinery does: one
+> flush for PREFLUSH, and one for FUA on a device without FUA support, which
+> is when a post-flush gets issued.
+> 
+> Please also drop the Fixes tag on this patch. With the parameter, this is
+> an extension rather than a fix.
+> 
+
+Done.  v3 will position this as a cost model extension.
+
+One remaining question is whether builtin profiles should eventually carry
+measured flushiops values, or whether flushiops is expected to remain
+user-configured.  This series leaves it at zero because I don't have
+reliable measurements for the existing profiles.
+
+Thanks,
+Tao
+
+> Thanks.
+> 
+
