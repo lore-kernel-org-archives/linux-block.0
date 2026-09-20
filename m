@@ -1,233 +1,135 @@
-Received: from mail-oi2-f43.google.com (mail-oi2-f43.google.com [74.125.231.235])
+Received: from mail-oa2-f12.google.com (mail-oa2-f12.google.com [74.125.231.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481B3306768
-	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 13:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.235
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789911599; cv=none; b=Cqqcwz3igQ9lbNpgPZ39yAa529Ds4hOWKDe4gYUcjQLl1h3nVLzPsGpFRmLVaLtVXH2lRcbQoU2Ryayw1sDiKtpFhSv/yUeMqhQLfMwgtruRoBuHzr5wzF2jSysjb0vEaAnlpGUWuK+UnfYnQcdRad6FrVjR9BZrhgVX+2toK9s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789911599; c=relaxed/simple;
-	bh=0Z6Ur5B6bJJOeDgQ/Dj4Kz+7/b/YMAa6rc/wlOIyarM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWjDTZpp/03kaSZuPR/4+BRfUFlGBAqViB65e9dLs4UUZ1bjMrOKOBNOhWQavoPz7PvSRRK/I0DseRD4GGgWd4ghzaAl5cd21l/a6mc1j5CktXLP3Z5EF3IQF34v3ifVnDXe5cFSr1UeZ4HEE2kk/nharkhX9Yvxe/b9p2amqAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fqPIDr13; arc=none smtp.client-ip=74.125.231.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47DD32AABD
+	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 13:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789911872; cv=pass; b=F+2G0IrOipOqF7TY9V0qligsQEzcXt75BERmkdjpz0afNa/bX79WkSwn99uY4L3XDXhz8MukEyymYNmSQEvnJ4HBLy3vJil2OsVAB75uIgkx0Y64Q6o/+F1DFKbdknlJ/VJnMekz1sHhdEcl/5EkR/aA5ewwVl66Iwwa+D8gSJk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789911872; c=relaxed/simple;
+	bh=UXA2zp3XI42BtFvhO8xS/jRT2Pk6aJkddDnJK1FECbA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fb7+lNvOFbLBVZBuR52lx+HaLNH1fmyqmy5kiFrLC5guZNCjleOPI3RGKsfzzOQj5T5kWQx6B4Ain+gIKv4xGEZpLYy+8P1sZjZYZgBjOt4ew5hxy7qcgB+750EmesUJr/m0C8jiMEWYm67fdDBaXhCNgSqod8p+AmnkOyhaTVs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgyK3aQ/; arc=pass smtp.client-ip=74.125.231.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqPIDr13"
-Received: by mail-oi2-f43.google.com with SMTP id 46e09a7af769-805440319deso1325205a34.2
-        for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 06:39:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgyK3aQ/"
+Received: by mail-oa2-f12.google.com with SMTP id 586e51a60fabf-466cc88a9b9so1488804fac.2
+        for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 06:44:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789911866; cv=none;
+        d=google.com; s=arc-20260327;
+        b=q34IVnQzu/s1nkMNThZwqb6N89pWD3J1sTRDAldukaJmkkcWuQMEFuI1JUVKDxFWOZ
+         fpGv/Fapp9c4QGpRmoOeczebIolbFlHpBHjwEtZ5ONFfuzcPZ9qAxDelRIYUlQNe+O0L
+         5u+S9RXCnEi6Fk2DcXtxJAFjhZaBpCbQxkxxdpKZbf2fHny6k/dqEK825adBD0C+TI+w
+         wMErABHfgUjlyy0qOHdYkSJ52RzYrbhuiSWYuh878i6k+2S5EOqiykkMlogcndfmAHat
+         QCUGJriePMzXigtE37kppvZ1EFLsi6cBM8+SjqSuA79N8eo1LhC+KJzHxYhq57FrNQCM
+         L+TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jEX4twDo/lUtcmDOQIlSIon0G7yYx0diVyTZgm1EyJs=;
+        fh=vcob7zHRqR3w4I9W6YDW1PsI7fVYs7plb+DSrYtqoyw=;
+        b=XM69QS2IeXPcSYACRgoFnClO6ZLAw0l3J/bsK5VdtU3UUiWRvjEFS+2fNlBwbDg0m5
+         KfnO3mny/G3iksbQketF111iQcloqXdD2GcCg1wlIcQmI2W9Uz2hrLOUGAO9YqzJShfg
+         FYj5RQqDvE7mENqwzvCuviqy5nE4NXJ/6hGU3HzsP9kILys6A8wQG9HHG4gJjXDAsMj5
+         EX1mCXld0f4D7AEYsXSS0EqpsUJKzbHufvp+tz7h4OooWmsY2/Mwubu0sjHnU5+93vT9
+         FYXvhCF4Q58wxoJ7n/2rxSJgyjE9QGtzt8jqKtCeT4kVIbjLQdD60fXdKqGfXwlfjNWY
+         e94Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789911597; x=1790516397; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1789911866; x=1790516666; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=yxUkkgeGlmRw+l40HMZLKgm5cFxw+sBpLHwN+11g3Ls=;
-        b=fqPIDr13ZT734AYX1dGmXv5AWQoBNy0uhDZ7tkO7eP3NaL0vSjRMrhKOBotF/WpBo0
-         UZ8hUf1e/5sUZiTNspb8G2Vh7X92L9cvCO6kX3mq6/OWVO+AI1n2b4CgsgbDgnuGO+3l
-         o4hoOztNMTWstgHHgAprNDCJUzTwMNR8kcjzjx2PBPh7S0BqJ9m2yabYAp9yhm6XP2ti
-         BmWi1+KdrU293iFcr8uJ/ZfR8bDZKiMkMiOc5QPxHkU8XxLul+pZCg/t2z+acyv4vt5W
-         BI/3xdN3QJoHdzl2Kv0RmXAarPmhYXjW3mzzSp1mDDR1vREOcg/0WLiAT2xrLeZ0GLUr
-         j5xw==
+        bh=jEX4twDo/lUtcmDOQIlSIon0G7yYx0diVyTZgm1EyJs=;
+        b=MgyK3aQ/6h1HplUODTa1qy7WG0z8Z5ZdGNO0jOHmwacei06LtsH2Fk6oVa0IXXSrsn
+         ndu0aaG56AS0YeFvEAR8ZUs0yRuMUMpuZiZHCPgvuFot1DgKOlMeGmsQvuX7GBRBP18b
+         QXZW4oPS9vTsaOGkU3PeJwzgvOyvMI8zFDQJgxqNqD+ZZucweBFQeE4eAvWK820xXX0+
+         itGJyuKMIztS8wjbPwZPt+slgpFESRDFhJvCzvEsou45HxdwMKYpewzLqVVcYxGESHpL
+         jcyZ4AQ+aF2tX+mBg+ztnprVe3Rh1YEonH7Kb7/ZZ7oikbiu0kMLO52ZH7f9aQbInsbA
+         2rDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789911597; x=1790516397;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1789911866; x=1790516666;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=yxUkkgeGlmRw+l40HMZLKgm5cFxw+sBpLHwN+11g3Ls=;
-        b=f4rWZ57vu49fAzwM5TZDICsCdE7fkTeoH/Z0wikhhZ+NO0gvZP3y+mgLYUiMrwAbwG
-         6DBYIFiTLtT3lA0rjeT0fy4hXLkwfTDSOCe/SyRGekLiIqPeEWffW+eRWq2kZnkvpmzc
-         lH79iqEnR87KlqdusDav3RS2TySGVf8Y7fstwqOBwpe5xBlyWMXn/m5cYAtcbAdfPhDM
-         Q1wVxP10Omhjd+ogIifOrRCK60f1cE+3fd8ucf4bBuK13TlkKVKkkeul4hrpZJ9FGgkU
-         U2ODKAnp42+bgboksMjpoy7W1vyITREP6Z+9W2/MkWPxLs0ygs6Pry+AflTq0SzBrAoE
-         XM8w==
-X-Forwarded-Encrypted: i=1; AKwUvByqHQD4FB4XWizXmv29BTo+2G5MB1KcdWHi8l1StYplm9g6khg8r+gWqSnXOovmSqALlZYeOykUEC6vuA==@vger.kernel.org
-X-Gm-Message-State: AFuF++kYoAmrwyHeVsO1FKmIIsd1olqrRSdxA+oZ7wnXa4Y69+u5UHhY
-	Y51JjeX7JyW3CVaK1w+zJ7BnsxS4Etk6iRiQ1bzoKQyTW9F6bjl6o9D9a/OclQ==
-X-Gm-Gg: AYBFou2If0usvRfGOImGZ98f1dgkds6uhkVB5whFenRJvsDZePRpuIj3xzVxc3LOSKw
-	ksXP5WUV21nfY/IE9zwoGQrRs6wKb/TwAF8wOtNaHCXMW9dULfCEr7onBnDAuMs0/ad0XhiSR0W
-	hf84MY1xwrtTc2Xhw/izkgcgyIEWoPKhRmGXq0c8Fq22iuwc9vHTQ6WtbVtxw4dDmvF5yjbZCUN
-	9zAVQeHawZwNazONFcxZojNEmMugPVHbZ1sr8/wsKfJ7cIEGdIvcXJNSQ4SzRVpU9uK1evfK94H
-	0vZGERo8DqZLnXFsdnPIO4h/mQx2sXYo8dMJZjLwCG+iXkdp5wRC68LVJXn23ATDrpPn4bM7cNz
-	60WvMI01pOhasAtZ28pHtU5jffo0pUm/3lC/6TJLpkRNwdQ1d84d1r3iyC7IAeg0NvCyGpg/gb1
-	8ISMZxP7NET15ekJsJHnPtTb7M7joz5cbDTh3fGbmR1ZG70Am9h9aMsksQW14TZfx9cF/wuvUNU
-	5sVqEY11jPt/B3w1YIHR03eHcL1kiO1mZqdyIQdM5f+BaTjs18IUqR4AZxVdBBRh03l4ZmFDfBM
-	wi0=
-X-Received: by 2002:a05:6830:2814:b0:7f6:96ad:36a8 with SMTP id 46e09a7af769-80de035a67amr7283786a34.8.1789911596678;
-        Sun, 20 Sep 2026 06:39:56 -0700 (PDT)
-Received: from fedora-laptop ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8107b8231a4sm5070777a34.3.2026.09.20.06.39.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Sep 2026 06:39:56 -0700 (PDT)
-Date: Sun, 20 Sep 2026 08:39:50 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, Chris Mason <mason@kernel.org>
-Subject: Re: ublk: consequences of a dead server are only failing on the last
- /dev/ublkcN release
-Message-ID: <aq_iJpAgRi9ZfnOg@fedora-laptop>
-References: <20260918-eisbrecher-toilette-worum-eb11f777c563@brauner>
+        bh=jEX4twDo/lUtcmDOQIlSIon0G7yYx0diVyTZgm1EyJs=;
+        b=d6WxSPPydwF8/qNzCzFkzbukVaFBgbn77QxNpSWJbmeHGC4R7c8jruaJ5O8rJT8LGr
+         BkHEZ6iBJUs5YyOHYAZ3QDctHuGJwCZ9bWeASN6ne4pjMjkgQWUOXsTV//zfwqVU5BT0
+         w7/wTUa4Xe/zcSOUf4oUWOwJ1WslG2cNpElC6nG7J0yBMQBjTmtbVLUrH2HFD4t/uePa
+         VERg0LLUBoOfrR0dsO/BVnfR4ER7Bo3T4O11jwmgithOUTWfXodyBUOii+nI0rmEHFx3
+         5QaVq1jvJMc89xBg8xAgOsAegzdbbPoisOmYizV6Cs57xDTIJdqV3bDN8guIc1PNNKTN
+         VHxg==
+X-Forwarded-Encrypted: i=1; AKwUvBzGWtqHYsyUabB+WccpL7fHZ1DprnR/S4qdRFtC2tJen+nN4wG/Puer/sZlACZecPOw4boCWEmVpNylhg==@vger.kernel.org
+X-Gm-Message-State: AFuF++n5nmhtVPcugEFrCdCyhGTnFhnoh4Aej6Qjsr9rG8o0GKiiWKZ2
+	sTeCm/x6Wo/lC9scbI0kkYQchzz/vRQb7Vt2XS9nvn6/5ZGQFdgU7qVo0OCZDqmDXj7PU4FaatO
+	oyI63HL+zK5+ZXuvsNydAHjjwzxCa6vU=
+X-Gm-Gg: AYBFou2S58D+OtX8AW9Cu3J9x7ymHnG1/jz8qaFZs/dFnvFdFjIbFSOCG1RX8bl0A2Y
+	cFk/y9w5Zlf011GvoVBWpA3DBO6/cZRs7MDjJLpWalT+Q7H4ahpsMCldGZJJrSZW3E2UbQYll9V
+	TWTnjj/jh0UzoSkOiZ4rAweGAolPJHaFg8HQSk2S2sX2BRTPIsPKkU8y+hSNKsc55rsxnZF/FJV
+	UFJV3SKixko4bBMfe0HAKlZ1tR3beWDeJ/dBgiv4CwEHz5o/ez62X3ytTvxmLpkVgtMYeSYB+Ti
+	bYio0PvqXJk4ZHzjN6mhn/QMyaEBm3Pl1kdRJAloLdHalqH8DpLCA3xiKRoVJSixMs2gLRf9Evk
+	THQlhkiwWr6ouT2Fea7DoBi6yJRqXjyk+QNKsNi75G5JktlzNEhcw1723
+X-Received: by 2002:a05:6870:b28e:b0:47b:7709:5568 with SMTP id
+ 586e51a60fabf-486e564dd74mr6640425fac.10.1789911866617; Sun, 20 Sep 2026
+ 06:44:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260918-eisbrecher-toilette-worum-eb11f777c563@brauner>
+References: <20260914110145.41627-2-dirk@gouders.net>
+In-Reply-To: <20260914110145.41627-2-dirk@gouders.net>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sun, 20 Sep 2026 08:44:15 -0500
+X-Gm-Features: AcwNN1VT3jlE_HOBtpGzW4wVVv5zCIPL3np61n-V3xFqz7HoPcojwrQzLe6U4Bw
+Message-ID: <CACVXFVNZga4LMOep2U9XgGHE1X0+FMESKL9uYmeAKETf2qu1yQ@mail.gmail.com>
+Subject: Re: [PATCH] selftests: ublk: fix unused_result error
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Shuah Khan <shuah@kernel.org>, Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Linux Kernel <linux-kernel@vger.kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Sep 14, 2026 at 6:11=E2=80=AFAM Dirk Gouders <dirk@gouders.net> wro=
+te:
+>
+> Commit 166b476b8dee (selftests/ublk: add shared memory zero-copy
+> support in kublk, 2026-03-31) introduced a write(2), ignoring its
+> return value and thus causing an error, when building.
+>
+> Fix this by using the common workaround "(void)!" to trick the
+> compiler the result is being used.
+>
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> ---
+>  tools/testing/selftests/ublk/kublk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftes=
+ts/ublk/kublk.c
+> index 2400b4615766..5b19bfcfa8d7 100644
+> --- a/tools/testing/selftests/ublk/kublk.c
+> +++ b/tools/testing/selftests/ublk/kublk.c
+> @@ -1589,7 +1589,7 @@ static int ublk_start_daemon(const struct dev_ctx *=
+ctx, struct ublk_dev *dev)
+>
+>         /* Signal listener thread to stop and wait for it */
+>         if (linfo.stop_efd >=3D 0) {
+> -               write(linfo.stop_efd, &stop_val, sizeof(stop_val));
+> +               (void)!write(linfo.stop_efd, &stop_val, sizeof(stop_val))=
+;
+>                 pthread_join(listener, NULL);
+>                 close(linfo.stop_efd);
+>                 ublk_shmem_sock_destroy(dinfo->dev_id, linfo.sock_fd);
 
-On Fri, Sep 18, 2026 at 12:29:22PM +0200, Christian Brauner wrote:
-> Hi,
-> 
-> Chris scanned a new series of mine for me and he reported some
-> interesting behavior that I dug into.
-> 
-> A ublk request that was handed to the server is only failed once the
-> last reference to /dev/ublkcN is dropped. So holding the file open keeps
-> the request alive.
-> 
-> This causes any waiter to be stuck in D state and blocks STOP_DEV.
-> 
-> I'm attaching two reproducers:
-> 
-> (1) ublk_inherited_fd_test.c   the general case, no vfork involved
-> (2) vfork_ublk_test.c          the holder of the reference is the waiter itself
-> 
-> Re (1):
-> 
-> A single-threaded ublk server fork()s a helper. The helper inherits the
-> fdtable including /dev/ublkcN. Now another process opens /dev/ublkbN and
-> writes 4 kb then fsync()s. The servers gets a WRITE and _exit()s without
-> completing it - say it crashes:
-> 
->   - The writer sleeps in folio_wait_writeback() in D state.
->   - STOP_DEV issued from another process never returns.
-> 
->     The control command runs on an io-wq worker of that process, which
->     calls ublk_stop_dev() -> del_gendisk() -> bdev_mark_dead() ->
->     filemap_write_and_wait_range() and ends up waiting on the page that
->     won't be written back.
-> 
->     Said process can't exit and io_wq_put_and_exit() waits for the
->     worker.
-> 
-> This can only be undone if the helper is SIGKILLed:
-> 
->   # ublk0 up, server 119
->   # helper 123 forked by the server, holds the inherited fds
->   # WRITER fsync
->   # server 119 died with the WRITE in hand
->   # 2s after the server died:
->   # writer pid 124, state D:
->   #   folio_wait_bit_common
->   #   folio_wait_writeback
->   #   __filemap_fdatawait_range
->   #   file_write_and_wait_range
->   #   blkdev_fsync
->   #   do_fsync
->   # STOP_DEV from pid 125 has not returned after 5s:
->   # STOP_DEV issuer thread 126:
->   #   folio_wait_bit_common
->   #   folio_wait_writeback
->   #   __filemap_fdatawait_range
->   #   filemap_write_and_wait_range
->   #   bdev_mark_dead
->   #   blk_report_disk_dead
->   #   __del_gendisk
->   #   del_gendisk
->   #   ublk_stop_dev_unlocked.part.0
->   #   ublk_ctrl_uring_cmd
->   #   io_uring_cmd
->   #   io_wq_submit_work
->   #   io_worker_handle_work
->   #   io_wq_worker
->   # killing helper 123
->   # WRITER fsync returned -1 errno 5
->   # STOP_DEV returned after the helper died
-> 
-> What happens to a device after a server crash depends on whoever else
-> holds /dev/ublkcN open: A forked helper, a process that got the fd via
-> SCM_RIGHTS, or a vfork child.
-> 
-> I'm not sure whether that's intended semantics but it surely has
-> confusion potential and should probably be at least documented.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-It is attributed to ublk driver implementation and kernel:
-
-1) ublk driver uses two-stage tear-down: 
-
-- uring commands are canceled when exiting io_uring
-
-- block requests are aborted when ublk server is down, which can only be signaled
-by closing /dev/ublkcN; this stage depends on canceling uring commands.
-
-Not get other idea for deciding if ublk server can be thought as being down.
-
-But yes, it should be documented.
-
-> 
-> I suppose failing outstanding requests on server crash is intentionally
-> not done for recover reasons or whatever. But maybe STOP_DEV should be
-> made to work.
-
-STOP_DEV needs to freeze request queue, which has to drain inflight
-request.
-
-> 
-> Re (2):
-> 
-> vfork() makes it really ugly. Say a single-threaded ublk server vfork()s
-> a child. The child opens /dev/ublkbN, writes some stuff and closes the
-> fd. Since close(2) runs bdev_release() -> sync_blockdev() it waits for
-> the write.
-
-ublk driver shouldn't access to /dev/ublkbN, #2 is similar with that, so it
-shouldn't be supported.
-
-> 
-> The write gets dispatched to the server's task work. But the server
-> sleeps in wait_for_vfork_done() until the child execs or exits.
-> 
-> But the child cannot exec or exit because close(2) doesn't return.
-> 
-> ublk makes this more hairy though. Even a SIGKILL sent to the server aka
-> the parent won't help. The vfork()ed child hangs on the close(2).
-> 
-> So that stays in D state forever with an undeletable device:
-> 
->     server, after SIGKILL: gone
->     child:
->       State:  D (disk sleep)
->       folio_wait_bit_common
->       folio_wait_writeback
->       __filemap_fdatawait_range
->       filemap_write_and_wait_range
->       bdev_release
->       blkdev_release
->       __fput
->       fput_close_sync
->       __x64_sys_close
-> 
-> Unrelated, but also a potential issue:
-> 
-> The commit 7fc4da6a304b ("ublk: scan partition in async way") made
-> partition scans run from a workqueue that holds disk->open_mutex while
-> the server serves its reads and START_DEV returns before it's finished.
-> 
-> Any server that treats START_DEV's return as a signal that the disk is
-> ready and doesn't serve requests hangs every open() of /dev/ublkbN on
-> uninterruptible on open_mutex. You can combine that with (1) and (2).
-
-START_DEV doesn't promise partitions scanning done when it is returned.
-
-nvme multipath has similar usage too.
-
-
-Thanks, 
-Ming
+Thanks,
+Ming Lei
