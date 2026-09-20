@@ -1,138 +1,233 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f43.google.com (mail-oi2-f43.google.com [74.125.231.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46DA31A045;
-	Sun, 20 Sep 2026 13:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481B3306768
+	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 13:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789909965; cv=none; b=ctGoCt0lngKxTe7fb9dsD+JXFl99U0byKND35u9TBfcaQPEUfgJh1FoVAoIaqydFmxI6b1JrxAYVouua86sbTZU22UWY6j49eoWpTlAYHwoFjyXJ2KhdHrg0x52ECjFheEz2ppC+Otdh9BT23vEB/AfsPEMIuCG2+XNcsUsdRww=
+	t=1789911599; cv=none; b=Cqqcwz3igQ9lbNpgPZ39yAa529Ds4hOWKDe4gYUcjQLl1h3nVLzPsGpFRmLVaLtVXH2lRcbQoU2Ryayw1sDiKtpFhSv/yUeMqhQLfMwgtruRoBuHzr5wzF2jSysjb0vEaAnlpGUWuK+UnfYnQcdRad6FrVjR9BZrhgVX+2toK9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789909965; c=relaxed/simple;
-	bh=eDMI5Ku1H/ICGHVjdTySIeVCjxxQYch6/DXg1E0Ox1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aWGz4yk7DAL3X9vypNWRyyRyUt87z+8cu9LG7Mio0OH5X5YyjpA5rlQrkUeKUy5kgFNB5V1RLFN3/wHx4rA8s7UQW09uGyp0rbusitqI+AQbaoW1nB/tiBx5TitMwy30j5b7Y00H0vGq5TPbZx3Duih5AQ/qCtMFrvxhsBgkZUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=DQ2H8v9F; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1789911599; c=relaxed/simple;
+	bh=0Z6Ur5B6bJJOeDgQ/Dj4Kz+7/b/YMAa6rc/wlOIyarM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rWjDTZpp/03kaSZuPR/4+BRfUFlGBAqViB65e9dLs4UUZ1bjMrOKOBNOhWQavoPz7PvSRRK/I0DseRD4GGgWd4ghzaAl5cd21l/a6mc1j5CktXLP3Z5EF3IQF34v3ifVnDXe5cFSr1UeZ4HEE2kk/nharkhX9Yvxe/b9p2amqAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fqPIDr13; arc=none smtp.client-ip=74.125.231.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="DQ2H8v9F"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1789909929;
-	bh=By7CwzjEKuoPxXJ29LeNnqaFT2rmfr7n3560XH0PorE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DQ2H8v9FwIRJR+CxHwYdJxr4SPzaQPc04V2zEUJep0JgST2APTgnSWGDDwsA4K617
-	 AzkTMJW7n61be6GuH1dfOqfwJ8VxjlPTH3+9BA9OdkJJXnBtX2Z/6WVuZrn9+PpoQL
-	 85Eg1wWuFh05BBHBc8waJ6d+EWyjRQvsc/UBE0nGzvJgqHjuCR4uypW9tMLS4hFy7l
-	 P18eTT4nMSFiilKUPUJmy8kjuV+1UELTDGuIdliyTOARhGuDeNE5Mw0IjMgFPpU28X
-	 8mFeNEA24qhQHYc9Pv4NluEPJTh4p8Qni9WMNG6rHkITNFfjlyVqcLYi27wqQ3h/FI
-	 fHe3rJrljwFiA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4hnmwl5VJvz4w1k;
-	Sun, 20 Sep 2026 23:12:07 +1000 (AEST)
-Date: Sun, 20 Sep 2026 23:12:26 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: linux-next@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Damien Le Moal
- <dlemoal@kernel.org>, linux-block@vger.kernel.org, cuitao@kylinos.cn, Mark
- Brown <broonie@kernel.org>
-Subject: Re: next-20260917 and next-20260918: merge of the block tree breaks
- all zoned devices
-Message-ID: <20260920231226.771a0e21@canb.auug.org.au>
-In-Reply-To: <20260920125846.1806521-1-cui.tao@linux.dev>
-References: <20260920125846.1806521-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqPIDr13"
+Received: by mail-oi2-f43.google.com with SMTP id 46e09a7af769-805440319deso1325205a34.2
+        for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 06:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789911597; x=1790516397; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=yxUkkgeGlmRw+l40HMZLKgm5cFxw+sBpLHwN+11g3Ls=;
+        b=fqPIDr13ZT734AYX1dGmXv5AWQoBNy0uhDZ7tkO7eP3NaL0vSjRMrhKOBotF/WpBo0
+         UZ8hUf1e/5sUZiTNspb8G2Vh7X92L9cvCO6kX3mq6/OWVO+AI1n2b4CgsgbDgnuGO+3l
+         o4hoOztNMTWstgHHgAprNDCJUzTwMNR8kcjzjx2PBPh7S0BqJ9m2yabYAp9yhm6XP2ti
+         BmWi1+KdrU293iFcr8uJ/ZfR8bDZKiMkMiOc5QPxHkU8XxLul+pZCg/t2z+acyv4vt5W
+         BI/3xdN3QJoHdzl2Kv0RmXAarPmhYXjW3mzzSp1mDDR1vREOcg/0WLiAT2xrLeZ0GLUr
+         j5xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789911597; x=1790516397;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yxUkkgeGlmRw+l40HMZLKgm5cFxw+sBpLHwN+11g3Ls=;
+        b=f4rWZ57vu49fAzwM5TZDICsCdE7fkTeoH/Z0wikhhZ+NO0gvZP3y+mgLYUiMrwAbwG
+         6DBYIFiTLtT3lA0rjeT0fy4hXLkwfTDSOCe/SyRGekLiIqPeEWffW+eRWq2kZnkvpmzc
+         lH79iqEnR87KlqdusDav3RS2TySGVf8Y7fstwqOBwpe5xBlyWMXn/m5cYAtcbAdfPhDM
+         Q1wVxP10Omhjd+ogIifOrRCK60f1cE+3fd8ucf4bBuK13TlkKVKkkeul4hrpZJ9FGgkU
+         U2ODKAnp42+bgboksMjpoy7W1vyITREP6Z+9W2/MkWPxLs0ygs6Pry+AflTq0SzBrAoE
+         XM8w==
+X-Forwarded-Encrypted: i=1; AKwUvByqHQD4FB4XWizXmv29BTo+2G5MB1KcdWHi8l1StYplm9g6khg8r+gWqSnXOovmSqALlZYeOykUEC6vuA==@vger.kernel.org
+X-Gm-Message-State: AFuF++kYoAmrwyHeVsO1FKmIIsd1olqrRSdxA+oZ7wnXa4Y69+u5UHhY
+	Y51JjeX7JyW3CVaK1w+zJ7BnsxS4Etk6iRiQ1bzoKQyTW9F6bjl6o9D9a/OclQ==
+X-Gm-Gg: AYBFou2If0usvRfGOImGZ98f1dgkds6uhkVB5whFenRJvsDZePRpuIj3xzVxc3LOSKw
+	ksXP5WUV21nfY/IE9zwoGQrRs6wKb/TwAF8wOtNaHCXMW9dULfCEr7onBnDAuMs0/ad0XhiSR0W
+	hf84MY1xwrtTc2Xhw/izkgcgyIEWoPKhRmGXq0c8Fq22iuwc9vHTQ6WtbVtxw4dDmvF5yjbZCUN
+	9zAVQeHawZwNazONFcxZojNEmMugPVHbZ1sr8/wsKfJ7cIEGdIvcXJNSQ4SzRVpU9uK1evfK94H
+	0vZGERo8DqZLnXFsdnPIO4h/mQx2sXYo8dMJZjLwCG+iXkdp5wRC68LVJXn23ATDrpPn4bM7cNz
+	60WvMI01pOhasAtZ28pHtU5jffo0pUm/3lC/6TJLpkRNwdQ1d84d1r3iyC7IAeg0NvCyGpg/gb1
+	8ISMZxP7NET15ekJsJHnPtTb7M7joz5cbDTh3fGbmR1ZG70Am9h9aMsksQW14TZfx9cF/wuvUNU
+	5sVqEY11jPt/B3w1YIHR03eHcL1kiO1mZqdyIQdM5f+BaTjs18IUqR4AZxVdBBRh03l4ZmFDfBM
+	wi0=
+X-Received: by 2002:a05:6830:2814:b0:7f6:96ad:36a8 with SMTP id 46e09a7af769-80de035a67amr7283786a34.8.1789911596678;
+        Sun, 20 Sep 2026 06:39:56 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8107b8231a4sm5070777a34.3.2026.09.20.06.39.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Sep 2026 06:39:56 -0700 (PDT)
+Date: Sun, 20 Sep 2026 08:39:50 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, Chris Mason <mason@kernel.org>
+Subject: Re: ublk: consequences of a dead server are only failing on the last
+ /dev/ublkcN release
+Message-ID: <aq_iJpAgRi9ZfnOg@fedora-laptop>
+References: <20260918-eisbrecher-toilette-worum-eb11f777c563@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/R3TRsirW5mdUq_ZFzNgejzQ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260918-eisbrecher-toilette-worum-eb11f777c563@brauner>
 
---Sig_/R3TRsirW5mdUq_ZFzNgejzQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-Hi Tao,
+On Fri, Sep 18, 2026 at 12:29:22PM +0200, Christian Brauner wrote:
+> Hi,
+> 
+> Chris scanned a new series of mine for me and he reported some
+> interesting behavior that I dug into.
+> 
+> A ublk request that was handed to the server is only failed once the
+> last reference to /dev/ublkcN is dropped. So holding the file open keeps
+> the request alive.
+> 
+> This causes any waiter to be stuck in D state and blocks STOP_DEV.
+> 
+> I'm attaching two reproducers:
+> 
+> (1) ublk_inherited_fd_test.c   the general case, no vfork involved
+> (2) vfork_ublk_test.c          the holder of the reference is the waiter itself
+> 
+> Re (1):
+> 
+> A single-threaded ublk server fork()s a helper. The helper inherits the
+> fdtable including /dev/ublkcN. Now another process opens /dev/ublkbN and
+> writes 4 kb then fsync()s. The servers gets a WRITE and _exit()s without
+> completing it - say it crashes:
+> 
+>   - The writer sleeps in folio_wait_writeback() in D state.
+>   - STOP_DEV issued from another process never returns.
+> 
+>     The control command runs on an io-wq worker of that process, which
+>     calls ublk_stop_dev() -> del_gendisk() -> bdev_mark_dead() ->
+>     filemap_write_and_wait_range() and ends up waiting on the page that
+>     won't be written back.
+> 
+>     Said process can't exit and io_wq_put_and_exit() waits for the
+>     worker.
+> 
+> This can only be undone if the helper is SIGKILLed:
+> 
+>   # ublk0 up, server 119
+>   # helper 123 forked by the server, holds the inherited fds
+>   # WRITER fsync
+>   # server 119 died with the WRITE in hand
+>   # 2s after the server died:
+>   # writer pid 124, state D:
+>   #   folio_wait_bit_common
+>   #   folio_wait_writeback
+>   #   __filemap_fdatawait_range
+>   #   file_write_and_wait_range
+>   #   blkdev_fsync
+>   #   do_fsync
+>   # STOP_DEV from pid 125 has not returned after 5s:
+>   # STOP_DEV issuer thread 126:
+>   #   folio_wait_bit_common
+>   #   folio_wait_writeback
+>   #   __filemap_fdatawait_range
+>   #   filemap_write_and_wait_range
+>   #   bdev_mark_dead
+>   #   blk_report_disk_dead
+>   #   __del_gendisk
+>   #   del_gendisk
+>   #   ublk_stop_dev_unlocked.part.0
+>   #   ublk_ctrl_uring_cmd
+>   #   io_uring_cmd
+>   #   io_wq_submit_work
+>   #   io_worker_handle_work
+>   #   io_wq_worker
+>   # killing helper 123
+>   # WRITER fsync returned -1 errno 5
+>   # STOP_DEV returned after the helper died
+> 
+> What happens to a device after a server crash depends on whoever else
+> holds /dev/ublkcN open: A forked helper, a process that got the fd via
+> SCM_RIGHTS, or a vfork child.
+> 
+> I'm not sure whether that's intended semantics but it surely has
+> confusion potential and should probably be at least documented.
 
-On Sun, 20 Sep 2026 20:58:34 +0800 Tao Cui <cui.tao@linux.dev> wrote:
->
-> Hi Stephen,
+It is attributed to ublk driver implementation and kernel:
 
-I no longer run linux-next, please email Mark Brown (cc'd).
+1) ublk driver uses two-stage tear-down: 
 
-[The rest kept for Mark's benefit]
+- uring commands are canceled when exiting io_uring
 
-> I ran into this while testing a blk-iocost series of mine (charging
-> zone appends as writes) against a zoned null_blk: the device simply
-> does not show up, whether configured through module parameters or
-> configfs.  null_blk prints "using native zone append" and then
-> add_disk() fails silently with -ENODEV.
->=20
-> My series only touches blk-iocost.c, and the failure reproduces on
-> plain linux-next, so it is not mine.  Bisecting over the tags (qemu,
-> "null_blk.zoned=3D1 null_blk.gb=3D1 null_blk.zone_size=3D64" on the comma=
-nd
-> line) narrows it down to one day:
->=20
->   next-20260916: nullb0 created, /sys/block/nullb0/queue/zoned =3D host-m=
-anaged
->   next-20260917: no device, add_disk() fails
->   next-20260918: same failure
->=20
-> The only blk-zoned.c changes between next-20260916 and next-20260917
-> come in through the merge of the block tree, and next-20260918 repeats
-> the same resolution in the same place:
->=20
->   66c8b6b56c09 ("Merge branch 'for-next' of .../axboe/linux.git", 2026-09=
--17)
->   a9ce2250a714 ("Merge branch 'for-next' of .../axboe/linux.git", 2026-09=
--18)
->=20
-> As far as I can tell the resolved disk_revalidate_capacity() matches
-> neither parent: it gains a
->=20
->   if (args->capacity >=3D args->nr_zones)
->=20
-> check that compares a sector count against a zone count, with
-> args->nr_zones still 0 on the first call, so it always trips and
-> blk_revalidate_disk_zones() always returns -ENODEV.  The zone_sectors
-> power-of-two check that both parents have is gone as well.  This hits
-> every zoned device, not just null_blk.
->=20
-> Taking the axboe side of the function makes nullb0 come back on
-> next-20260918 here (host-managed, chunk_sectors 131072), so it looks
-> like the merge should just have taken that side.
->=20
-> Same conflict, same bad outcome twice in a row now, so tomorrow's
-> merge may hit it again unless the block tree has moved on in this
-> area.
->=20
-> Regards,
-> Tao
->=20
+- block requests are aborted when ublk server is down, which can only be signaled
+by closing /dev/ublkcN; this stage depends on canceling uring commands.
 
---=20
-Cheers,
-Stephen Rothwell
+Not get other idea for deciding if ublk server can be thought as being down.
 
---Sig_/R3TRsirW5mdUq_ZFzNgejzQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+But yes, it should be documented.
 
------BEGIN PGP SIGNATURE-----
+> 
+> I suppose failing outstanding requests on server crash is intentionally
+> not done for recover reasons or whatever. But maybe STOP_DEV should be
+> made to work.
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmqv27oACgkQAVBC80lX
-0Gz6awf7BN38hUqChpXUqxW3J1gLKOkkrAYOfnA8o1ydQwT/pyQfvAygYuP6/Dnu
-gYpLJx2vB8citv2vakqdnJdaLJMlIcRWWsr/cm5jMNnPctjkEEh41EQ7f9QBmhL4
-DDCCl0FZpz3OhoDfBF+Pq2yMt6kcovw7/V23YKYQWdLDk4M77o88O7X/eF7rHBLP
-3ztPpT0JMiIQhLSDSMdEkRMKJAC7kwon1OP6BngUtAHk1ekg4YNB0uj2IivvuCSP
-zmVAWqVfBAxLCFV0QrLe+DJD5WHAPWzSk+JBlJII2Fh2iZpRa03Xl2HRyUyPR4yO
-yxCbLEZGo5c+WYMkEsTt05O255S1eA==
-=9NOG
------END PGP SIGNATURE-----
+STOP_DEV needs to freeze request queue, which has to drain inflight
+request.
 
---Sig_/R3TRsirW5mdUq_ZFzNgejzQ--
+> 
+> Re (2):
+> 
+> vfork() makes it really ugly. Say a single-threaded ublk server vfork()s
+> a child. The child opens /dev/ublkbN, writes some stuff and closes the
+> fd. Since close(2) runs bdev_release() -> sync_blockdev() it waits for
+> the write.
+
+ublk driver shouldn't access to /dev/ublkbN, #2 is similar with that, so it
+shouldn't be supported.
+
+> 
+> The write gets dispatched to the server's task work. But the server
+> sleeps in wait_for_vfork_done() until the child execs or exits.
+> 
+> But the child cannot exec or exit because close(2) doesn't return.
+> 
+> ublk makes this more hairy though. Even a SIGKILL sent to the server aka
+> the parent won't help. The vfork()ed child hangs on the close(2).
+> 
+> So that stays in D state forever with an undeletable device:
+> 
+>     server, after SIGKILL: gone
+>     child:
+>       State:  D (disk sleep)
+>       folio_wait_bit_common
+>       folio_wait_writeback
+>       __filemap_fdatawait_range
+>       filemap_write_and_wait_range
+>       bdev_release
+>       blkdev_release
+>       __fput
+>       fput_close_sync
+>       __x64_sys_close
+> 
+> Unrelated, but also a potential issue:
+> 
+> The commit 7fc4da6a304b ("ublk: scan partition in async way") made
+> partition scans run from a workqueue that holds disk->open_mutex while
+> the server serves its reads and START_DEV returns before it's finished.
+> 
+> Any server that treats START_DEV's return as a signal that the disk is
+> ready and doesn't serve requests hangs every open() of /dev/ublkbN on
+> uninterruptible on open_mutex. You can combine that with (1) and (2).
+
+START_DEV doesn't promise partitions scanning done when it is returned.
+
+nvme multipath has similar usage too.
+
+
+Thanks, 
+Ming
