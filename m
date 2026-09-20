@@ -1,36 +1,36 @@
-Received: from mta1.migadu.com (out-101.mta1.migadu.com [95.215.58.101])
+Received: from mta1.migadu.com (out-145.mta1.migadu.com [95.215.58.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C381A3DCDA3
-	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 07:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CB9314B6E
+	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 07:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789888290; cv=none; b=k7mgT2urIUjZOrLN9qoDgKOxe+nPDt/HtYX3yxmgTB00SSsx65ws6yWm7ioo5k3+mgaqtbUegq+MOElYKAo2LkR9jk32vPERlKH+xYzqwOh0BNgDRWWXE7bzraJvTLzGYA1cy1MVJCfXjcNd5NYBy63RICp6mibOUM5BJAXNs3o=
+	t=1789888399; cv=none; b=Qp3YFfgIMoMYQ+PIX/QxNanQPbZxowr7s8vUg68pH/eCyWEmDFkvoJwE5ZqcL7tXIeJKEkruo4Fe0nU9v6R5+CLyOYO5j1w8d607FGtb1lm3Xk9f1km+C7b153/68FuupgX3A+n5yFlhSFxKo1lTAk3uUujwoE+CR8S2z3XXfos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789888290; c=relaxed/simple;
-	bh=uaMKR+7TECAtMUAIgi2oWd84zdS5lYH++1kxf6ZsatQ=;
+	s=arc-20240116; t=1789888399; c=relaxed/simple;
+	bh=AmpQvYC+661I5Z6XBFyOhYJJR3FumQ2cqGqfiZD1Gtg=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=vDyyFoSLKnbp4xl1wRO7BdL42ZI5ypPGaVExR5HzdPC/ka2GwpwEUMVhBkFdxrz0lhV/uY8qfFU8YQhMQExuogBIByWtzfZI12IYzKJ8ng/RREmaz1TOH6NQobrHj0VGLjg/5RiDTS+Trwvr2VdWknceAni+BAz31aBdHJtI6eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YtedRfGn; arc=none smtp.client-ip=95.215.58.101
+	 In-Reply-To:Content-Type; b=BnIpTDFUtNwHz8XQNbm1vzUyZEBklJHnoV5xDmB2YAtY10uAu+tHMDSA9WNnmshdAMf6Y7RuMrkjvI6SjANvWWqJRt7qC5zl9Ypvm6gAfsbJBmiyXSqJUsucpjKoCay5WbeiPt5tbQoSR8+jzJj3R083z4KmYZci4G3MwNr+OGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ved1K0YU; arc=none smtp.client-ip=95.215.58.145
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YtedRfGn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ved1K0YU"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=uaMKR+7TECAtMUAIgi2oWd84zdS5lYH++1kxf6ZsatQ=;
+DKIM-Signature: a=rsa-sha256; bh=AmpQvYC+661I5Z6XBFyOhYJJR3FumQ2cqGqfiZD1Gtg=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789888286; v=1; x=1790493086;
- b=YtedRfGnv2MRNoF6mjRd0JH3+ZHsJvY/31aemWlo9poVeWdscf2e9HcmzaOwVDejUklRN0GZ
- +UOYHy26fJzGceuMHK7lLKJ26FGoXSUIRkfVqfEVh03hXJAcruratvAyYE6oNf1725+6f2tf7Mf
- KgiHTs/Uud5gyWSOaM23Y9A8=
+ t=1789888395; v=1; x=1790493195;
+ b=Ved1K0YUAUGAOCtw1/I4YIudHikNJ5JergFMDhMB/61g7cVnno8RPaPQjOcgITqLyWEEhzbK
+ U/WyGVbdGMaf4zXp+XydFtM2pDb7GcLSvfDH5ufjGbw01+4Ur6zKmgeac/tB4uf+n+vVdMBNGq2
+ 4dKGq6VBGKOjiZxpIAxvRuss=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 372c471ec016f75c;
-	Sun, 20 Sep 2026 07:11:26 +0000
-X-Mizu-Trace-ID: 372c471ec016f75c
+Received: by smtp.migadu.com with ESMTPS id 412a9c1ee22be783;
+	Sun, 20 Sep 2026 07:13:15 +0000
+X-Mizu-Trace-ID: 412a9c1ee22be783
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <3fe79d1a-72a1-4a70-9d6b-af7297879149@linux.dev>
-Date: Sun, 20 Sep 2026 15:11:23 +0800
+Message-ID: <7674b311-52a9-4a88-80c9-65a37383b4ab@linux.dev>
+Date: Sun, 20 Sep 2026 15:13:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,38 +38,69 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cuitao@kylinos.cn
+Cc: cui.tao@linux.dev, Josef Bacik <josef@toxicpanda.com>,
+ josef@toxicopanda.com, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@infradead.org>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cuitao@kylinos.cn
 Subject: Re: [PATCH v2 2/4] blk-iocost: charge zone appends as page-counted
  sequential writes
-To: Christoph Hellwig <hch@infradead.org>
+To: Tejun Heo <tj@kernel.org>
 References: <20260916085304.1080271-1-cui.tao@linux.dev>
- <20260916085304.1080271-3-cui.tao@linux.dev> <aq07Di4FPtCUxpAl@infradead.org>
+ <20260916085304.1080271-3-cui.tao@linux.dev>
+ <084ec3b97432a6d1520948417d9b9bc1@kernel.org>
 From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <aq07Di4FPtCUxpAl@infradead.org>
+In-Reply-To: <084ec3b97432a6d1520948417d9b9bc1@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Christoph,
+Hello Tejun,
 
-在 2026/9/18 21:22, Christoph Hellwig 写道:
+在 2026/9/19 23:00, Tejun Heo 写道:
+> Hello, Tao.
+> 
 > On Wed, Sep 16, 2026 at 04:53:02PM +0800, Tao Cui wrote:
->> From: Tao Cui <cuitao@kylinos.cn>
->>
->> Zone append is a primary write operation for zoned devices; zoned
->> btrfs and f2fs use it for data writes.
+>> A zone append advances the zone write pointer and is therefore
+>> sequential from the device's perspective; the actual sector is only
+>> returned after completion, so the cursor-based seq/rand classification
+>> doesn't apply.  Price it as a page-counted sequential write.
 > 
-> f2fs doesn't.  xfs and btrfs do.
+> Whether an append is cheap depends on where the previous IO went, the same
+> as for a regular write, and the cursor already tracks that. The sector is
+> the zone start rather than the write pointer, but the cursor gets set from
+> the same sector, so back-to-back appends to the same zone are a bio length
+> apart and classify sequential, appends to different zones are a zone apart
+> and classify random, and emulated appends already arrive here as regular
+> writes at the write pointer.
+> 
+> It isn't exact. A read or regular write into a zone being appended to is
+> measured from the zone start rather than the write pointer, so it drifts
+> toward random as the zone fills, and the last append in one zone and the
+> first in the next are contiguous but compute as a zone apart. Both are
+> bounded by the difference between the seq and rand base costs of one IO,
+> which is small on the flash devices that do native appends. Mostly right
+> is fine here. Can you just add REQ_OP_ZONE_APPEND to the REQ_OP_WRITE case
+> and leave the cursor update alone?
 > 
 
-Thanks for the review.  I'll fix the commit message to remove f2fs and
-mention xfs and btrfs instead.
+That fits the existing model better than the special handling I
+introduced.  I had missed that the cursor is set from the same
+zone-start sector on every append, so back-to-back appends classify
+sequential as expected, and that emulated appends already take the regular
+WRITE path.
 
-Thanks,
-Tao
+I'll drop the special case and the cursor skip in v3 and just add
+REQ_OP_ZONE_APPEND to the REQ_OP_WRITE case.
 
-> Otherwise looks good:
+> Also, the Fixes tags on this patch and 3/4 should point at 0512a75b98f8
+> ("block: Introduce REQ_OP_ZONE_APPEND"), which added the op without pricing
+> it, rather than the iocost commit that predates it.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Agreed, that's the right anchor - the gap appeared when the op was
+added.  Both Fixes tags will be updated.
+
+Thanks.
+
+> Thanks.
+> 
 
