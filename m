@@ -1,95 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-19.mta1.migadu.com [95.215.58.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE03C3B8950;
-	Sun, 20 Sep 2026 12:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6BD3BB119
+	for <linux-block@vger.kernel.org>; Sun, 20 Sep 2026 12:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789907893; cv=none; b=hBV/isfzBZ1UQO6M4odfvYggZNrFsBi/IX49ref9BzsyZuxOYkyA1s80UKN/LjNXKBje/+7VjPEg9cg8jAtPUGiPmqEhJdbqmdNW25dwmhkgG99XMhjAaGD94ZoLrU0Ix5SlyKv9OoxZtLU7UKHY8/MJy1XMHHWSTEkOvtkeWAo=
+	t=1789909149; cv=none; b=Pw7Fku+r72Tlt7iG6YdFo9HP5ZjrNW1NCpmesC+AeNlcWIN1Wo89jq+AXv/bCmpVEjgRDPV8DBRfWV0vpqi8IoDqOMSiyxDBxtCp7lcHV/Vaq+wdRT5Hbeq9Q6Z5umUSExba/aoU7AoYPOf7aUDlvTrHuiQPVYatg7aSCNNb7D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789907893; c=relaxed/simple;
-	bh=7nBd7keEM0+xZExEzrMDyD3wNXVvbEfKLHPe1/8pqxs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=LVL9T0nfapnpcLseu8nSZExfHrTEiZ/aos4wPTMhP404QVzhQX2XwWf7BkxOWI6RQj/Q+cB4K7OgNjMOVxoZ+ggVNkEFlp2c2bV9a/0K8mekY0Faa3L0NJtiQmy/gdf3Fpl+FLp+M3MpCDVf1GZDxlEU/gio2bunQryd8iSosT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tfu41fTW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789909149; c=relaxed/simple;
+	bh=X0zoaWd01k/fecOFyUt875CQ7h6jkceb7wVkzeVisIk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Sf0zLwAM7OWOHcLPpr2sjV+i8e2ZPymDfq6MYXUnLZkG37VA9tPcBeFYZjFf6ZKHtxQdU2oeMJ1YIfx1vWVLNoeQnbKjz0RmD28NLKOtlHYWX659AhzAwMq/KaR+HLYusqonDHzfghIweksayXlHgwizBqm8haFD0svpu9UodSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F1kMWARo; arc=none smtp.client-ip=95.215.58.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tfu41fTW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE64E1F000FF;
-	Sun, 20 Sep 2026 12:37:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789907875;
-	bh=8TXSOAoauEDqUAiNkN8UacM8jNoYS5sAyxYgzMe9pLY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Tfu41fTWM3gSmOu+hwWOtrDgVn/zpXFuQKqN4APJo9TJ6fTyPNi3LOPbntxjrJJSG
-	 1bsh/nbFLU6vZMTNc5t0vf12EPKFsVn5AslSlAFmaH+xhFke54Wy5ooF6qf2xK3VPT
-	 sFcKlcldYLJRlSTOvWtI35zrL3DZ/xECZ9uZYb51Ot2YNcZuQiM5aJZF7UEDj5ivHg
-	 bSPgO0lbP0rQUuma110bhuBfcla6JnB4ssj1aETv/y3Y+hZij8loVdqYPyHFLyhrXE
-	 dfxa2riyC4X6MD9eEti4MVRAo9+/pzs4G6i/gwsPLKnfUO45sbrXfg59ay4plIvA5x
-	 L+umh4UtxqPrg==
-Date: Sun, 20 Sep 2026 02:37:54 -1000
-Message-ID: <b40622ed67f77f3ff88d5772e7ea8476@kernel.org>
-From: Tejun Heo <tj@kernel.org>
-To: Julian Sun <sunjunchao@bytedance.com>
-Cc: linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	hannes@cmpxchg.org,
-	mhocko@kernel.org,
-	roman.gushchin@linux.dev,
-	shakeel.butt@linux.dev,
-	muchun.song@linux.dev,
-	willy@infradead.org,
-	jack@suse.cz,
-	tj@kernel.org,
-	akpm@linux-foundation.org
-Subject: Re: [PATCH v6 1/3] block: introduce bdev_flush_by_dev()
-In-Reply-To: <20260917065759.2643940-2-sunjunchao@bytedance.com>
-References: <20260917065759.2643940-1-sunjunchao@bytedance.com>
-	<20260917065759.2643940-2-sunjunchao@bytedance.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F1kMWARo"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=X0zoaWd01k/fecOFyUt875CQ7h6jkceb7wVkzeVisIk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789909140; v=1; x=1790513940;
+ b=F1kMWARoa3+eFkEhSyjSGmoGvH4Y2S14JumDfdLq5wqBXtP+HZ6MuklnN9M35Nn8kTNuz1rb
+ C9Da5pMYHY4xN8aWeTFghPw7N3wcLebvLIK7zf4zB/qx9d0uXrVwJotMWzQHBdJCm7br88spQ6g
+ A/78PdUuuvCz1UGFdAyYEwvc=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 8931bcee9d023c79;
+	Sun, 20 Sep 2026 12:59:00 +0000
+X-Mizu-Trace-ID: 8931bcee9d023c79
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Tao Cui <cui.tao@linux.dev>,
+	linux-next@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	cuitao@kylinos.cn
+Subject: next-20260917 and next-20260918: merge of the block tree breaks all zoned devices
+Date: Sun, 20 Sep 2026 20:58:34 +0800
+Message-ID: <20260920125846.1806521-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello, Julian.
+Hi Stephen,
 
-On Thu, Sep 17, 2026 at 02:57:57PM +0800, Julian Sun wrote:
-> +void bdev_flush_by_dev(dev_t dev)
-> +{
-> +	struct block_device *bdev;
-> +
-> +	bdev = blkdev_get_no_open(dev, false);
-> +	if (!bdev)
-> +		return;
-> +
-> +	/* Prevent the device from closing between the check and writeback. */
-> +	if (mutex_trylock(&bdev->bd_disk->open_mutex)) {
-> +		if (atomic_read(&bdev->bd_openers))
-> +			sync_blockdev_nowait(bdev);
-> +		mutex_unlock(&bdev->bd_disk->open_mutex);
-> +	}
-> +	blkdev_put_no_open(bdev);
-> +}
+I ran into this while testing a blk-iocost series of mine (charging
+zone appends as writes) against a zoned null_blk: the device simply
+does not show up, whether configured through module parameters or
+configfs.  null_blk prints "using native zone append" and then
+add_disk() fails silently with -ENODEV.
 
-This holds the disk's open_mutex across the whole writepages pass, so every
-throttle-triggered flush blocks opens, closes and partition rescans on the
-disk for as long as submission takes, which can be a while on a congested
-device. bdev_release() syncs before taking the mutex for the same reason.
+My series only touches blk-iocost.c, and the failure reproduces on
+plain linux-next, so it is not mine.  Bisecting over the tags (qemu,
+"null_blk.zoned=1 null_blk.gb=1 null_blk.zone_size=64" on the command
+line) narrows it down to one day:
 
-I don't think the mutex or the openers check is needed. If the device is
-closed underneath, the last close syncs and truncates the mapping and
-truncate waits for writeback, so a racing no-wait flush either finishes
-first or finds nothing left. Holding just the reference from
-blkdev_get_no_open() should be enough.
+  next-20260916: nullb0 created, /sys/block/nullb0/queue/zoned = host-managed
+  next-20260917: no device, add_disk() fails
+  next-20260918: same failure
 
-> +void bdev_flush_by_dev(dev_t dev);
+The only blk-zoned.c changes between next-20260916 and next-20260917
+come in through the merge of the block tree, and next-20260918 repeats
+the same resolution in the same place:
 
-The neighbors have !CONFIG_BLOCK stubs. The only caller is under
-CGROUP_WRITEBACK so it builds either way, just noting for consistency.
+  66c8b6b56c09 ("Merge branch 'for-next' of .../axboe/linux.git", 2026-09-17)
+  a9ce2250a714 ("Merge branch 'for-next' of .../axboe/linux.git", 2026-09-18)
 
-Thanks.
+As far as I can tell the resolved disk_revalidate_capacity() matches
+neither parent: it gains a
 
---
-tejun
+  if (args->capacity >= args->nr_zones)
+
+check that compares a sector count against a zone count, with
+args->nr_zones still 0 on the first call, so it always trips and
+blk_revalidate_disk_zones() always returns -ENODEV.  The zone_sectors
+power-of-two check that both parents have is gone as well.  This hits
+every zoned device, not just null_blk.
+
+Taking the axboe side of the function makes nullb0 come back on
+next-20260918 here (host-managed, chunk_sectors 131072), so it looks
+like the merge should just have taken that side.
+
+Same conflict, same bad outcome twice in a row now, so tomorrow's
+merge may hit it again unless the block tree has moved on in this
+area.
+
+Regards,
+Tao
