@@ -1,58 +1,48 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0172388891;
-	Mon, 21 Sep 2026 06:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8A73AE704;
+	Mon, 21 Sep 2026 07:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789973821; cv=none; b=qx6jYE5hnnglCjAWGxGviE99aXxqWY9mUGasfhxA4M+shG5cDKpDu6YFDnumHh0VAmqG7qNMGLpk/JinVLTmWltybKdKvGbE7qznmGmeBeLnlqx6K9D3Vj/cGwX1175b+7cIVlLjQV1IooO2vdQUPfTMo4FlCGBEecimP267dwU=
+	t=1789974380; cv=none; b=RoeBr5YiV4FF7R0m9skTmM4sKhYQavQcc0kPhSgY0EYiXKAkiSS4JF9V4WcBztC0hDolP2bwhca4tpjhUuau19Yh+mJeXfENIn6yawqVhFTcTYWmJ4KY9oiuKksOj7tLvb/Wjn5ngEEm8PjC+67dQ3759+wo7FF9aYLLWaHux9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789973821; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1789974380; c=relaxed/simple;
+	bh=TLj8sFutufMJiN3IAaR7TuLNFlZlrMDr3iGF+7yceIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H3lIVPXz2wzIyRuXQ55IsKWIy5Kt/7USW7JzumHk4lhOoHvTutQCEpNtwFHMUwUSmoMyXIUxmNYysQGgAyEfrV+OnuWItArNbP1H9qYieNX63bodzR1DhlDiQ6cqRYtLG9AiQcN56iXtFPVIPKH9t8vKo45tu58ydta5CWIK4I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id CB10D6732A; Mon, 21 Sep 2026 08:56:51 +0200 (CEST)
-Date: Mon, 21 Sep 2026 08:56:51 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Yu Kuai <yukuai@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Coly Li <colyli@fygo.io>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Song Liu <song@kernel.org>, Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
-	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>,
-	Barry Song <baohua@kernel.org>,
-	Youngjun Park <youngjun.park@lge.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, Yu Kuai <yukuai@fygo.io>,
-	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>,
-	Tao Cui <cuitao@kylinos.cn>, linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v4 2/3] blk-cgroup: store blkcg in bio instead of blkg
-Message-ID: <20260921065651.GA13875@lst.de>
-References: <20260920092351.2434283-1-yukuai@kernel.org> <20260920092351.2434283-3-yukuai@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNN1BFLzWclnjtXPZwkpad2SpbPCwOspcQSKfxYXE5j6whtLt3IUE58hGzJNtzA396+lH+FSai+aRwKCL3vJzUsMEhSAJJMY/A1eJ2Fj4JF+nWETHIJ8zH2nb6sIK8GbdIc8RJP2/npKL8KgOqHtTOYP4xDAmcl1xDH6ap73y4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EHQ++RBJ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EHQ++RBJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=YruYuHsXYeu0Ni058efk89qmFUmonG8oukMq2C+cDTw=; b=EHQ++RBJi623ATzesXnFByagpi
+	W5zLALfCy+QiWdW/z+K+duVjojGYX96UxIbgdlmdUT8+AsPwrLjleISvAF5tVQdPUK87xg2zOqZb9
+	sCHDyDEKDY53lYG3jMy2IYh2y1kGZFgxdnjbi4Mmf0LbZiT9mSygHFdulVL5dokE0gQJw8kLcddk8
+	Ogr+p44fOnmdCLAlaARb5Rr4/ze/TIe8gBWC/u1xaJLmMlemtg5ZX3q1JfFQobFNJKzgWR1QsUXmw
+	W7KjmiuXX4msXorAOUNTXbQrXxNtZaO2+iV7+Jk7dwGf33IGIT9BVgH2sMR7ZXhGsgK0hPIeAE6re
+	ljewyVmQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x8Y6N-000000019eJ-3eau;
+	Mon, 21 Sep 2026 07:06:11 +0000
+Date: Mon, 21 Sep 2026 00:06:11 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Tejun Heo <tj@kernel.org>
+Cc: Tao Cui <cui.tao@linux.dev>, Josef Bacik <josef@toxicpanda.com>,
+	josef@toxicopanda.com, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cuitao@kylinos.cn
+Subject: Re: [PATCH v2 1/4] blk-iocost: charge flushes as pageless random
+ writes
+Message-ID: <arDXYwNm7rGqB7pg@infradead.org>
+References: <20260916085304.1080271-1-cui.tao@linux.dev>
+ <20260916085304.1080271-2-cui.tao@linux.dev>
+ <9575357186118be214d6377dd80a21e8@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,10 +51,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260920092351.2434283-3-yukuai@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <9575357186118be214d6377dd80a21e8@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+On Sat, Sep 19, 2026 at 04:59:51AM -1000, Tejun Heo wrote:
+> Hello, Tao.
+> Pricing a flush as a random write, or as a page where that comes out to
+> zero, is as arbitrary as pricing it at zero,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+No, it absolutely is not.  For any flush that actually makes here it
+is extremely expensive, and 0 is the wrongest possible value.  Even
+batching does not change that, as batching is not actually effective
+in any normal file system workload.
 
