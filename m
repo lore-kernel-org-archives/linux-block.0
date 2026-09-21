@@ -1,113 +1,115 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FBA37BE6B
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 19:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4013911C0;
+	Mon, 21 Sep 2026 19:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790018336; cv=none; b=AuRETEHHokDmSjh2Z1dV8D4VuqDdj6b3NAem9P+/JuUM9t80yKntbQWumaaP+170p9R0bdYvnnnlJk0Bph982iiJc4RHoxktu0AmfgkMUXaKiThNRziJPRPUT4vNvrIPabj9yrrth/ktHuoeLeb+8IPyfhp044NIhyzCO6cP8Fc=
+	t=1790019436; cv=none; b=PvKdYK4gjFaB6CWQU+zT6RnSxqmViM8Wn+dktDcL3RZoze+PLzyz/0m85Y1IZBmY+Fq+qytd54z5g5CfTOcBx2094btToaQAXjaIUyhDwVDVzzwYdmrt48aeUS6W3CBZ4/18BdJTp+jRQptO2D6xskr8RAzyFIJM56mOroDKe2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790018336; c=relaxed/simple;
-	bh=SqR+r8Lr00Rp3Hfbjj6yCMcVv9qvSkDLcKIebqYOdcM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RR4a4HSRZAC/AYkAN5qissU1zUd0NFQWTb4PneXDM4Hut+r5cnSgWSlugI6yqCsXSmudWGyh1XdQu5F5ucGIHhpRBanvgHDULz9+lHeulX/yZbtV8mhem/odR5rsvmz6MYXrnoMhZH0vkzBDznzEXWbbjW+j7fupVzYIxryCRCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XIQ6N1rj; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790019436; c=relaxed/simple;
+	bh=QwZCsT1DORnDWXFIR/vQs043enX7Vq2qJtZWdwbEMpc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UpZ9JAI//nrCsGwnlP4K6YGAMSq/2XXdsmqT9JltwxSMZN4Fn/c+/H2Rmo1dAVt3ZN5Y10GJXkc9p8n69J2A8QfrPAqkp2HdZmB/4nqLQXsOhqUHVKcU637/LDS/ICx9bJNIgQ9VQ2jKrFgwQuemn5PH8c46zMlhD259p5TsUxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bjs6E4uv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIQ6N1rj"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6b885ef8so18735415e9.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 12:18:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790018333; x=1790623133; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fxnzRUipIvU5hbEis2mzNW2MVxNqcQwtIKSVpz0TPYk=;
-        b=XIQ6N1rjkH9YkBmUBhiSzz+4giTY8AcM66sIuLNOE1sgiiR03Q1++MLMF+RZ+POmHL
-         ZAipdZuluAJQh4rZHurBjEeC+5ui7lIaQVEhbFw3DqIFYOUUjciNwAmQc8eK0VENMKVt
-         Jd8TEoCMBtntv3cqVPiBTHgIW1U4oPokSGHJdFvaQ160qoDUKdd592DH/8vg6/n/cigs
-         LEbAfF5pmzfPyQH0WQyYJSSQWeteWTmKJKyT2mpNs21CyzbBo0G19ZuCKoHd0UvOAr06
-         EK+3eghZnZN03YtT4XdhZYZgvsqmpGmRPYGtV0r5x9eQkBRsAtxcvru31+vrbAS9BlqH
-         Y5EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790018333; x=1790623133;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=fxnzRUipIvU5hbEis2mzNW2MVxNqcQwtIKSVpz0TPYk=;
-        b=pyrrn+i9nRwfYDZ0A4CHcV/Eod3uCAGm3xCAjKJDCzKeTUKbnduwdcSzm8vCPy1L/C
-         b/tkhV6hvLsBeb+ie/dtIE+boSMuS2Ky557HBcxGku4RWwUbQPPifmWtsSlEKykosx7T
-         QYS44tKT92u4ZXyP3cStde3QfT/nDLME7pNuxJC65u4MZJf0ertX3q6ZlhTbXB9S6iNf
-         MXCKqaKnY7IcA4F+foC/agzOle1nhjnM0QFhpiY7ErMdUZiBht3B3ahtn/wms6XOdgza
-         zad2WSFTOVuxSWqH/9y5JeTlNAfyx3DiS8JErfG0JVg8Wq9G+1NrcfSRL3cm6YNSruq/
-         p/2A==
-X-Gm-Message-State: AFuF++mIEze4lP2E0A5x+1YllvY/ZHobEXgf5mHjbn8jLPNb9fmLNO5V
-	t1zABk9rMGQHsJNbUr77FyGaZ4r4ZavhVSAYDaX1efpTSUEv/HvPQ7PO
-X-Gm-Gg: AYBFou0AUr+nxFbJiwspq7JU5Y7EgcBJK2zAPhPQk3Hx3N0oVuTpzUVXeTvQSg4PyZ5
-	CLvQ/SRkyERGqN3xfDBVpI5S0oIAsOxxhQ1Up4iMRCKnkkWKP61aNSMLqtaE33sLbiaNM9SghdU
-	NeefDxIgn88+YkVvM0T9NoplPOm/WI5L3I/OkGgualvzPifRJ3aR0IYBOA5PP8H7s5rfE+AKr/S
-	5JaOTc7m2aIycckn1RpP9Wrgpox9ScgiHvphX4Wo93FyWcyAr+poCj4HjXjb0lUlPhXSwWkwGiL
-	6wsBfPBoNYDAeBu0Rs7zJ2L/X0/BBR16lDfqDe39wQv9IjObD8MoAxd4o2V32zxeQ3Oid0Gz+RC
-	14qg6GKabgl++/q3tERGgb+6GDxJciTwbqmDllGFT4LpdYRnit22jUw22IGBRIHXVJiIcNF0Czg
-	zlhWRvFRSTt0jWRjG4oqFGsbMVYZMA8aDjW9QMhacDqGPOKauIfaacJeTgC0Oil2HjadQ=
-X-Received: by 2002:a05:600c:3f07:b0:49e:7caa:e7b2 with SMTP id 5b1f17b1804b1-49fc5756f60mr153732025e9.29.1790018332729;
-        Mon, 21 Sep 2026 12:18:52 -0700 (PDT)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48724562aebsm26906638f8f.14.2026.09.21.12.18.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 12:18:51 -0700 (PDT)
-Date: Mon, 21 Sep 2026 22:18:47 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-block@vger.kernel.org, ZHOU Jiaxiang <me@fxti.xyz>,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: [bug report] Merge branch 'for-next' of
- https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git
-Message-ID: <arGDF5byCiew-pqQ@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bjs6E4uv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C11841F000FF;
+	Mon, 21 Sep 2026 19:37:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790019435;
+	bh=niXzpMSw8m+T314eCpbts0SigBo4L6YAB5X+H9i6fL4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Bjs6E4uv6+9Tk/Bl84AErOExrdTESlCqnVehotVYm1zm6Xu+ZZ/cB0n/Mj5urjSpn
+	 QeynM1bUUWrK55mOJ2E8GAFK9xPA0GDSo9xOQZa9RT3MB2bSLkJz8kBhNXdXI/T0qI
+	 VSGM7acr7UpBb+7xIULQvqc/7DTfA/BUpvE5g8dJ+rq5mAdGTb1arY+/onZzbCmr7x
+	 xe4nO08qUOq6t4gKTxQO7R4yE4JA6j5JSbYB/05rAt1ZGEh6lS9lsiZ8F15cffe2ED
+	 FPuCFKM1P8mhidOIcmKn0C53vPo2GcYFdaxrYRCHYLDPw42ngIgWKp0sdrHqvc2Z9x
+	 ElQP5pMPrpGig==
+Date: Mon, 21 Sep 2026 09:37:13 -1000
+Message-ID: <e5656ccd4760f26772f5db86dfdea80a@kernel.org>
+From: Tejun Heo <tj@kernel.org>
+To: Tao Cui <cui.tao@linux.dev>
+Cc: tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk,
+ ameryhung@gmail.com, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+Subject: Re: [RFC PATCH v6 0/5] blk-iocost: BPF struct_ops cost model
+In-Reply-To: <20260918055001.1273840-1-cui.tao@linux.dev>
+References: <20260918055001.1273840-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hello Mark Brown,
+Hello, Tao.
 
-Commit a9ce2250a714 ("Merge branch 'for-next' of
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git")
-from Sep 18, 2026 (linux-next), leads to the following Smatch static
-checker warning:
+On Fri, 18 Sep 2026 13:49:56 +0800, Tao Cui wrote:
 
-	block/blk-zoned.c:2200 disk_init_revalidate_args()
-	warn: impossible condition '(args->nr_zones > (~0)) => (0-u32max > u32max)'
+> The registration and binding model follows the TCP congestion
+> control model registration pattern: registering a struct_ops makes
+> the model available by its name, while io.cost.model binds one
+> registered model to a device with "model=<name>" and restores the
+> builtin model with "model=linear".
 
-block/blk-zoned.c
-    2195 static int disk_init_revalidate_args(struct gendisk *disk,
-    2196                                      struct blk_revalidate_zone_args *args)
-    2197 {
-    2198         args->disk = disk;
-    2199         args->nr_zones = disk_get_nr_zones(disk, args->capacity);
---> 2200         if (args->nr_zones > UINT_MAX)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Alexei is right, this isn't what I meant. One struct_ops instance per
+device: attaching binds the instance to the device and switches the device
+to the model, detaching switches it back to the builtin. That removes the
+name registry, the lifecycle list and the refcounting on top of the
+struct_ops map reference. Putting the device id in the struct_ops the way
+hid_bpf_ops does works fine. I don't have a strong opinion on how the
+device is identified.
 
-The linux-next merge for linux-block went a bit sideways and
-commit 7c431d61b69a ("scsi: block: Fix zones_cond out-of-bounds write on
-zone report") needs to be re-done.
+>     u64 calc_cost(u64 opf, u64 nbytes, sector_t sector,
+> 		  struct blkcg *blkcg, u64 model_flags)
 
-    2201                 return -EINVAL;
-    2202 
-    2203         /* Cached zone conditions: 1 byte per zone */
-    2204         args->zones_state = kzalloc(args->nr_zones, GFP_NOIO);
-    2205         if (!args->zones_state)
-    2206                 return -ENOMEM;
-    2207 
-    2208         return 0;
-    2209 }
+Why not pass the bio itself? The model can read whatever it needs from it.
+The merge indicator still needs the flags argument as it isn't a property
+of the bio.
 
-This email is a free service from the Smatch-CI project [smatch.sf.net].
+> blkcg is passed so the model can key
+> per-cgroup state; state stored in BPF_MAP_TYPE_CGRP_STORAGE
+> follows the cgroup lifetime, and optional blkcg_online()/
+> blkcg_offline() callbacks mirror the css lifecycle for models
+> which want eager setup or teardown.
 
-regards,
-dan carpenter
+With a per-device instance, these should be bound to the iocg pd init and
+free rather than the blkcg css. That gives the model the same per cgroup
+per device lifetime as the builtin cursor and drops the global mutex from
+the cgroup online and offline paths.
+
+> The completion-time request sizing for the
+> latency met/missed accounting still uses the builtin coefficients
+> (the request's bio, and with it the issuing cgroup, is gone by then);
+> extending the model there is left open by this interface.
+
+Let's be explicit here. For now, the struct_ops should carry the transfer
+cost coefficients, vtime per page for reads and writes, and the builtin
+latency tracking and vrate adjustment should use these instead of the
+linear coefficients while the model is attached.
+
+Down the line, a model should be able to take over the QoS side too. The
+vrate adjustment is driven by an empirically derived table and being able
+to replace it is a good part of the value of a pluggable model. The shape
+I have in mind is an rq_done(struct request *) callback which disables the
+builtin latency tracking and periodic vrate adjustment, with the model
+modulating directly through kfuncs to set the base vrate and the
+saturation state and to read the block layer clock. That doesn't have to
+be part of this series.
+
+While a model is attached, the linear coefficients are inert. Coefficient
+writes can be stored and take effect again on detach, autop shouldn't step
+profiles based on vrate the same way it doesn't when the cost model is
+user-set, and io.cost.model can report the model in the model field, in a
+form which identifies it as a BPF model, with ctrl still describing the
+coefficients.
+
+Thanks.
+
+--
+tejun
