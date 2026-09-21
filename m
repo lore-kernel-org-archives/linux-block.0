@@ -1,104 +1,85 @@
-Received: from mail-oo2-f40.google.com (mail-oo2-f40.google.com [74.125.231.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB1749B47F
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 16:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3CD4DE701;
+	Mon, 21 Sep 2026 16:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790008369; cv=none; b=eVQWdjUwq31W6IPm4oL1qriQyxNE3Z3k+/IuI9jDd3Dsylo30/eu+9wK97asK777jbtUM1lIqqDVidduWtpd7GGZ0BhfSBgk0fgbxmgEiDVi4Q/igd+DEp7Gn/rfh5eBEyVq3tpoBCjdakzVUyuztLxzUZOlJW+ErRDeOjAEBHY=
+	t=1790009489; cv=none; b=FsrcpCR+/bAiW/CtOCIdo1VehfwWqzesit1KRH+U05JX/G41eem9Sg5cX1q9vru87y52dm10kNKZcxqVG62tMDkVGZo60lNER7LdU6jguQt1k8eOXEyTLFSsr1LbP8sT3t5icdxZPt9GUG8CiO1xIBZioLLq62lySm3HFAFCR+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790008369; c=relaxed/simple;
-	bh=N9Nz05Be5ukSvo8DN5d10l8stTAeb9nFpPYkm8hLyIc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=aWlVOVo1xGyCnAFuQGtaPHHZpPTOKXnHpms8Tnk2TmmH4Cf266Q7UFh4EIIVbWPX6Y/VIAZLDQl+z3UjtIPkTI/Uc9fEZy81IhkWP24gJECtLrsDWQU9D78Xa5s41tQnkcNFUs6QYhaGoeLB9pEIKa7u+enSIJEdU5AUn8JiVX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=fX7QOJqE; arc=none smtp.client-ip=74.125.231.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1790009489; c=relaxed/simple;
+	bh=TwCCuhT7Ima8OnppsoS1NQ7VB7yMzVzx8ASg1v8NLDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tyEPROMuFNofJu8RliKFDHRSfMYJ7Pw3XnMvpw9yY+bc0DJNM2Ir65+/XUzApZLfBndLj1BL4M3hzipSpxMhV6yZ0NOlHlwp4VKSSZFY3OFP6RuzVaQOjyH2EvzOwgPE7tYvLQf0k42cnaGeHL8q0EzEv/CRiSO2AWX6CayVtys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0LEWUPA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="fX7QOJqE"
-Received: by mail-oo2-f40.google.com with SMTP id 006d021491bc7-6b1ae7089c0so1537491eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 09:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1790008366; x=1790613166; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Rvp+JFs7UGjn1/fZUHqD5pglAyJFEHKXVcUO8JhHKd8=;
-        b=fX7QOJqEz9e7QVh9ZHKlZcnJlk3AeNnZP8NYZ4oL6FAJ4Ntgq19yo/fDGBKbMt1c3+
-         N1GNvKPtE+JLRN1SzPOJmCvMbuBTeYW/AH5xB+uETSS3x7zOepRDwftvcfHpCilaN/FN
-         A6tdf8TnCdVb0rckfQKXm8v6vk/uzQ7Lm2vOLQvPI0rWkxLO+YSzr/dXQuGozSVC7fr6
-         nM69HC13Jr411L6LosawzE+YhcftLlDOnsY2ZsW8ClR3vSdwKB/Of6G2HulKpbk+1liB
-         wzqyzfaavBbYdFlXkjlZOIJDw6UpU9Z56CymXfaxkVe2/cSZrOc+VRmEszk3bAhezGG/
-         1q5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790008366; x=1790613166;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Rvp+JFs7UGjn1/fZUHqD5pglAyJFEHKXVcUO8JhHKd8=;
-        b=h3+UFnuV0tHTl4QIMxFmUToUj2PEEPeJAguhuDc083jnsJq59kpqfA0j8VRtrQLi3+
-         fI6BdxJ3nXtuM0AVVN+7bnsXl99OBnWut57J88G8lqvpiuaVPKQc/WRaYcSy64vSgz14
-         OmAWCW5zhrItxmVL5Qjp/rXs8nARuhKVKGSWyapcXbeiK6HA18pU6dz+FfxgmnXkKK8R
-         c2iCWZ3N0eiG0JZI6tSz0WwobEAOwJJ0WICXE8w3jmKZdiP+3X62Pa/5IBjKF8qSadz2
-         JjZMtu19zRwoxT6NXldlYISPJLtNJvJEOpkqbAb8ZINrOMCXMwZDxi8ap84KvJTFD/Ao
-         3/3A==
-X-Forwarded-Encrypted: i=1; AKwUvBxUUYwkrJHaAQqLyoqmcT77GE1O1XBFhdFugRzT2JoEpHA983CE+nA1oM5Evoj8px5Mc87KuUiAcCx9NA==@vger.kernel.org
-X-Gm-Message-State: AFuF++nl7rB5Iz5kFvBrE8MWizASdimDve9wuVZyA52As2PrqVwmvMOp
-	SCAqnp7cSMBDdL18gp+0t8+Jxv83bb+P51H2W9XgStmG2H+/F6pP6Bpbsu8ADmgGPIA=
-X-Gm-Gg: AYBFou0mUidxwZEDFUh+8T3/ev5hqtoIsfP8mBapqVWDj3yXwnGrEqQ7na6Pur66vrv
-	DWXM7UTuND7qv0m0ZG8eYP+X5w+dIcddZaTT1BrDAddK80vCbqUkbK/i7oLADzwDxlsMTMWiBCp
-	z7M1KxoahSKu/ceX2tfmypp09GagFVXIZw564cZuxr39vPNwUDZoPebsLQauL2YhodzlrB3A4ny
-	o998eU0rdNv2GkbfYNxqu9OYnjxK3h5j07hPWSiTjp242MyopHu6Njcu7jOOeFXl+TgnbPbk4R6
-	2iiUWWdKHQl8xskUTZYybehf1OowtXoUGeDyL6tlImAdP2w6QJLM+9AUwFsxNy+XnDoTEbQUUVz
-	KtwygqCp85dNmZATn+SsHaQCqtHY0KN/SveRdQ44IXoLepvXqSFvx+zp/EQyGrrRxFBLhUFYyLF
-	uaNRU450+uGwjlfXuofNL3m3nH4FED/+UxSXtB2hE/glzZGivEXk6i/lhpQxHC/gfrNnxaRPx9Q
-	3KamTValPd6+UXCxtLN3S8=
-X-Received: by 2002:a05:6820:f010:b0:6c2:21ab:ec92 with SMTP id 006d021491bc7-6ca9ae3eb40mr10131077eaf.30.1790008366114;
-        Mon, 21 Sep 2026 09:32:46 -0700 (PDT)
-Received: from [127.0.0.1] ([99.196.129.128])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6d142be4e98sm445928eaf.2.2026.09.21.09.32.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 09:32:45 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Shuah Khan <shuah@kernel.org>, Dirk Gouders <dirk@gouders.net>
-Cc: Ming Lei <ming.lei@redhat.com>, 
- Linux Kernel <linux-kernel@vger.kernel.org>, 
- linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20260914110145.41627-2-dirk@gouders.net>
-References: <20260914110145.41627-2-dirk@gouders.net>
-Subject: Re: [PATCH] selftests: ublk: fix unused_result error
-Message-Id: <179000835839.1960768.1435257617416448183.b4-ty@b4>
-Date: Mon, 21 Sep 2026 10:32:38 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0LEWUPA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3BBF1F000FF;
+	Mon, 21 Sep 2026 16:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790009487;
+	bh=0Rk95nbCHvSDXKzKHRytip9QY2TC4q23JnFsZN3gYMM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=W0LEWUPAXKQ99l86x5srS05ioOguB9WT4+1+Fuc7Mx837xB1LILUehGNoa2FnUqtf
+	 9b4lnVH/yvjvQXRt6J6fxi4mZtn4KGLZHMGFUYfYG/WIzCzVEtgHuGcOIRMEpbtozj
+	 EyzS4WnrUdOIPqJl5fKHBLBgEa55c0b/RcDmmxFkCz7EGl31zZJESinWWym4pm7t8J
+	 sWYuaLXA68wN1g93BResBXSlhfFvSBDZmk3hBFcbjes9I5yIvZscIc8wa8Tx43Byur
+	 wqwqwb7yBjVLIu0dINTpY91/4khzJwPihi2i4GEDx+z0M5z16TJE+1UleT+kBG2q9D
+	 7rVbTJCi7NMjw==
+Date: Mon, 21 Sep 2026 06:51:26 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Tao Cui <cui.tao@linux.dev>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	yukuai@fygo.io, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cuitao@kylinos.cn
+Subject: Re: [RFC PATCH 1/1] block: charge passthrough requests to the
+ submitter's cgroup
+Message-ID: <arFgjkKUwYGWbV8H@slm.duckdns.org>
+References: <20260921070647.1928289-1-cui.tao@linux.dev>
+ <20260921070647.1928289-2-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260921070647.1928289-2-cui.tao@linux.dev>
 
-
-On Mon, 14 Sep 2026 13:01:09 +0200, Dirk Gouders wrote:
-> Commit 166b476b8dee (selftests/ublk: add shared memory zero-copy
-> support in kublk, 2026-03-31) introduced a write(2), ignoring its
-> return value and thus causing an error, when building.
+On Mon, Sep 21, 2026 at 03:06:47PM +0800, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
 > 
-> Fix this by using the common workaround "(void)!" to trick the
-> compiler the result is being used.
+> Passthrough requests (SG_IO, bsg, nvme passthrough ioctls and uring
+> commands) are dispatched via blk_execute_rq{,_nowait}() without ever
+> passing through submit_bio(), so the bio mapped by blk_rq_map_user()
+> carries no blkcg association: the transferred bytes never show up in
+> cgroup io.stat, and every rq_qos policy on the queue (iocost,
+> iolatency, wbt) is bypassed, as is blk-throttle, which hooks
+> submit_bio_noacct() directly rather than going through rq_qos.
 > 
-> [...]
+> A quick demonstration on a scsi_debug device with iocost enabled and
+> vrate pinned to its 1% floor: a direct fio writer was throttled ~10x
+> while the same cgroup issuing sg_dd writes ran at full device speed
+> with zero io.stat accounting.
+> 
+> Associate the mapped bio with the submitter's blkcg at dispatch time
+> and run the regular bio accounting (blk_cgroup_bio_start()) and
+> rq_qos throttle paths with it.  DRV_IN/DRV_OUT commands are mapped to
+> READ/WRITE so io.stat classifies their bytes normally; request
+> completion already pairs with the throttle through bio_endio() ->
+> rq_qos_done_bio().
+> 
+> The charge is gated by opcode (READ/WRITE/DRV_IN/DRV_OUT) and to
+> queues that already have a gendisk: commands issued during device
+> probing (SCSI INQUIRY etc.) have no gendisk yet and stay exempt,
+> following the same probe-exemption reasoning as the passthrough
+> iostats support.
 
-Applied, thanks!
+Do you have an actual use case where this matters?
 
-[1/1] selftests: ublk: fix unused_result error
-      commit: 687cb38c4330d52d58dbf426a3eb523850052d10
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
