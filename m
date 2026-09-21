@@ -1,226 +1,62 @@
-Received: from mta0.migadu.com (out-69.mta0.migadu.com [91.218.175.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CF53AEB4E
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 07:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6D43AE1BD;
+	Mon, 21 Sep 2026 07:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789974426; cv=none; b=aPi+vg92LVJDyYeo55DkhWiIDS1sy08Du0cJ9Akdh0PgwTL3VWfYVB01QwmqQX+vxJnOAgoCZUKbERcon6dXpgE8dvUkeOSth1zcz4n4SWgCFvFD2wrxs5C1Jj6D7bZfBGtyTHL3a9PccVErcXD8VVu7X7uI9m6//J8f+Mu8T3g=
+	t=1789974659; cv=none; b=DSotJ6hcoHwhQg7sZlmYh5ebb55z/ljcgo2ZtzYhyGs65uARhyZ4ntr4QH3Eixcbb81dqG2k88qi7Kkgo6d74KsyubZ5nQkQeKO2LkdfDGQmO3iz/BbYYocRXry/ha5DZLcI41eYAjngqHMv4MGN2MBN76fcShTkCPHNC7s9DOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789974426; c=relaxed/simple;
-	bh=P/yCX0dnYM3gWr3ZFgRoRyEBmvke2naC9owtFoJ45zE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KP2fwm6nFI3ILDk3bAZsrxskc2Y+s7ZpaSdGqTPWsjjbcvXT1pv6qbZGnjFXnPebSA99CUFmCe3eb4bPDKtM5f/uruni/sH1D6eC0j26Rn78n5R+VXcaNcMD6rmVDExNN2iXdYIuf0MPA/bG98pP4TaIpeh+zOPyeayoq/UO9ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fMYQKYLp; arc=none smtp.client-ip=91.218.175.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fMYQKYLp"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=P/yCX0dnYM3gWr3ZFgRoRyEBmvke2naC9owtFoJ45zE=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789974422; v=1; x=1790579222;
- b=fMYQKYLpjl/c4Xo3IXfhaHQrM+E68NgEk6PDAyOr4u81BIi5mga7X3y01IKNEd9d9yrYNLxT
- 9ALIQEVE6RMmp5/06esVLjt0MWhNHVW0aRWVZLeMOLmf8kbimNakHikYSdDaDCbbzbTrIPJzgz6
- ijjW5D8hp88useNC0rwJrmFM=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 53a3e59b4fe32a04;
-	Mon, 21 Sep 2026 07:07:02 +0000
-X-Mizu-Trace-ID: 53a3e59b4fe32a04
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: axboe@kernel.dk,
-	kbusch@kernel.org,
-	tj@kernel.org,
-	hch@lst.de,
-	sagi@grimberg.me,
-	yukuai@fygo.io
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn
-Subject: [RFC PATCH 1/1] block: charge passthrough requests to the submitter's cgroup
-Date: Mon, 21 Sep 2026 15:06:47 +0800
-Message-ID: <20260921070647.1928289-2-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260921070647.1928289-1-cui.tao@linux.dev>
-References: <20260921070647.1928289-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1789974659; c=relaxed/simple;
+	bh=N8cZnZCKytopLHm1s/MR5SCVYudpCEl7zW+nDZYooCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gE88r/9du2f65xj0JkR8QB+nnZr6nAM7J+OEvByCJeVffepppEMw/61ClAFjuLzPcIG+4eRHBMudUAxWXTtZl5NlH3OBDNkr2272sXg9rcjKj6gEEUQoYhcvN2Quw4aRLBA4rFbaOKPvmm2eQyE6HUWnHbwOLxerbVECjRGa0FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4965268B05; Mon, 21 Sep 2026 09:10:53 +0200 (CEST)
+Date: Mon, 21 Sep 2026 09:10:52 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>, 0wnerD1ed <l7z@0b1t.tech>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Tal Zussman <tz2294@columbia.edu>,
+	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 13/16] xfs: add support for lazy direct read bounce
+ buffering
+Message-ID: <20260921071052.GA14940@lst.de>
+References: <20260909060924.1102037-1-hch@lst.de> <20260909060924.1102037-14-hch@lst.de> <arDN1UdZIydNLUjz@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arDN1UdZIydNLUjz@shinmob>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Mon, Sep 21, 2026 at 03:40:00PM +0900, Shin'ichiro Kawasaki wrote:
+> I found that recent blktests CI trial runs started reporting the failure of
+> the test case block/046 [1]. I confirmed that it is observed with the kernel at
+> the linux-block for-next branch. I bisected and found the this commit triggers
+> the failure. The error message "preadv returned -1 (errno 22)" was printed at
+> src/bio-bounce-read.c line 121 [2].
+> 
+> AFAIU, the test case does direct read to a null_blk with bounce buffer, and the
+> kernel side introduced some new requirements to use bounce buffer for direct
+> I/Os. Then, I guess the test case requires some refinements to meet the new
+> requirements.
+> 
+> 0wnerD1ed, may I ask your help to fix this failure? At this moment, I don't have
+> much time to dig into this.
 
-Passthrough requests (SG_IO, bsg, nvme passthrough ioctls and uring
-commands) are dispatched via blk_execute_rq{,_nowait}() without ever
-passing through submit_bio(), so the bio mapped by blk_rq_map_user()
-carries no blkcg association: the transferred bytes never show up in
-cgroup io.stat, and every rq_qos policy on the queue (iocost,
-iolatency, wbt) is bypassed, as is blk-throttle, which hooks
-submit_bio_noacct() directly rather than going through rq_qos.
-
-A quick demonstration on a scsi_debug device with iocost enabled and
-vrate pinned to its 1% floor: a direct fio writer was throttled ~10x
-while the same cgroup issuing sg_dd writes ran at full device speed
-with zero io.stat accounting.
-
-Associate the mapped bio with the submitter's blkcg at dispatch time
-and run the regular bio accounting (blk_cgroup_bio_start()) and
-rq_qos throttle paths with it.  DRV_IN/DRV_OUT commands are mapped to
-READ/WRITE so io.stat classifies their bytes normally; request
-completion already pairs with the throttle through bio_endio() ->
-rq_qos_done_bio().
-
-The charge is gated by opcode (READ/WRITE/DRV_IN/DRV_OUT) and to
-queues that already have a gendisk: commands issued during device
-probing (SCSI INQUIRY etc.) have no gendisk yet and stay exempt,
-following the same probe-exemption reasoning as the passthrough
-iostats support.
-
-RFC notes:
- - validated on linux-next with scsi_debug + sg_dd (SG_IO) and qemu
-   emulated nvme + a NVME_IOCTL_IO64_CMD loop: in both cases the
-   transferred bytes are fully accounted (wbytes/wios) in the issuing
-   cgroup, and the issuing task is observed waiting on the iocost
-   waitqueue with vrate clamped;
- - iolatency gains the same coverage for free, and so does wbt:
-   passthrough writes now pass through wbt_wait() like bio-path
-   writes, a behavior change worth calling out even though wbt
-   targets buffered writeback and direct passthrough rarely hits it;
-   blk-throttle does not: it hooks
-   submit_bio_noacct() directly and is not an rq_qos policy, so
-   io.max stays unenforced for passthrough (measured).  Its
-   queue-and-resubmit throttling model would also need a synchronous
-   variant for request-bound bios;
- - nvme uring commands share the same blk_execute_rq_nowait()
-   dispatch as the validated ioctl path;
- - the charge runs in the submitter's context and may sleep in
-   rq_qos throttling; all data-op callers found run in sleepable
-   context, but this deserves reviewer attention.
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- block/blk-mq.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a26a11c73ee3..2dd59f6df321 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -10,6 +10,7 @@
- #include <linux/backing-dev.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include "blk-cgroup.h"
- #include <linux/blk-integrity.h>
- #include <linux/kmemleak.h>
- #include <linux/mm.h>
-@@ -1400,6 +1401,73 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	plug->rq_count++;
- }
- 
-+/*
-+ * Passthrough bios are mapped directly onto requests via
-+ * blk_rq_map_user() and never pass through submit_bio(), so they carry
-+ * no blkcg association and are invisible to cgroup io.stat and to every
-+ * rq_qos policy (iocost, blk-throttle, iolatency).  Charge the ones that
-+ * carry data to the submitter's blkcg at dispatch time and run the
-+ * regular bio accounting and rq_qos throttle paths with the associated
-+ * bio.
-+ *
-+ * Gated by opcode (READ/WRITE/DRV_IN/DRV_OUT, the latter two mapped
-+ * to READ/WRITE for io.stat classification) and to queues that
-+ * already have a gendisk: commands issued during device probing (SCSI
-+ * INQUIRY and friends) have no gendisk yet and stay exempt.  The
-+ * request bios may carry a stale ->bi_blkg from the mempool; the
-+ * association helper drops the old reference and re-associates.
-+ */
-+static void blk_mq_pt_charge(struct request *rq)
-+{
-+	struct bio *bio = rq->bio;
-+	enum req_op op = req_op(rq);
-+
-+	if (!bio || !rq->q->disk)
-+		return;
-+
-+	switch (op) {
-+	case REQ_OP_READ:
-+	case REQ_OP_WRITE:
-+	case REQ_OP_DRV_IN:
-+	case REQ_OP_DRV_OUT:
-+		break;
-+	default:
-+		return;
-+	}
-+	if (op == REQ_OP_DRV_IN)
-+		op = REQ_OP_READ;
-+	else if (op == REQ_OP_DRV_OUT)
-+		op = REQ_OP_WRITE;
-+
-+	if (!bio->bi_bdev)
-+		bio->bi_bdev = rq->q->disk->part0;
-+	bio->bi_opf &= ~REQ_OP_MASK;
-+	bio->bi_opf |= op;
-+#ifdef CONFIG_BLK_CGROUP
-+	/*
-+	 * Issued from kthreads the css is root and the charge is a
-+	 * no-op through the root exemptions; data-op issuers that
-+	 * matter run in the submitter's task context.
-+	 */
-+	{
-+		struct cgroup_subsys_state *css;
-+
-+		rcu_read_lock();
-+		css = task_css(current, io_cgrp_id);
-+		bio_associate_blkg_from_css(bio, css);
-+		rcu_read_unlock();
-+	}
-+#endif
-+	blk_cgroup_bio_start(bio);
-+
-+	/*
-+	 * The rq_qos throttle path may sleep on the waitqueues like any
-+	 * bio submitter; all callers found (ioctl / uring_cmd submit,
-+	 * target and error handling kthreads) run in sleepable context.
-+	 */
-+	rq_qos_throttle(rq->q, bio);
-+}
-+
- /**
-  * blk_execute_rq_nowait - insert a request to I/O scheduler for execution
-  * @rq:		request to insert
-@@ -1412,6 +1480,7 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
-  * Note:
-  *    This function will invoke @done directly if the queue is dead.
-  */
-+
- void blk_execute_rq_nowait(struct request *rq, bool at_head)
- {
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-@@ -1419,6 +1488,7 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
- 	WARN_ON(irqs_disabled());
- 	WARN_ON(!blk_rq_is_passthrough(rq));
- 
-+	blk_mq_pt_charge(rq);
- 	blk_account_io_start(rq);
- 
- 	if (current->plug && !at_head) {
-@@ -1484,6 +1554,8 @@ blk_status_t blk_execute_rq(struct request *rq, bool at_head)
- 	WARN_ON(irqs_disabled());
- 	WARN_ON(!blk_rq_is_passthrough(rq));
- 
-+	blk_mq_pt_charge(rq);
-+
- 	rq->end_io_data = &wait;
- 	rq->end_io = blk_end_sync_rq;
- 
--- 
-2.43.0
+From my head the lazy bounce probably means we are not using
+the bounce buffer but instead now doing lazy bouncing.  I'll see
+what causes this.
 
