@@ -1,87 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFF047B43B;
-	Mon, 21 Sep 2026 18:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FBA37BE6B
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 19:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790016078; cv=none; b=ud3IA+XZRwh5x3N2ZFFZQSG+xQJzKGx6NMi5cBqNNVkl3ceHnGPqe8qA0eUQWEQzOfHmKM0jno0v5uz7Z9P/h608jGmjkWizb4kFaTgp1TmLznHYljC1HjS6DtLxhnIQCvIf02YKFhrHJksNO/NiOYEep1VQgQSD6ol05k/kuJk=
+	t=1790018336; cv=none; b=AuRETEHHokDmSjh2Z1dV8D4VuqDdj6b3NAem9P+/JuUM9t80yKntbQWumaaP+170p9R0bdYvnnnlJk0Bph982iiJc4RHoxktu0AmfgkMUXaKiThNRziJPRPUT4vNvrIPabj9yrrth/ktHuoeLeb+8IPyfhp044NIhyzCO6cP8Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790016078; c=relaxed/simple;
-	bh=7w5YobZ4XBmdbOX4FISTGzM+7PrIIyHWz+pHyJGncPs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=NIFQNa2rNmrrkMmsXuYYWCfSNjBBayVT6zCQgw3Mz7fV4NNE8ti8O1nMFa6+zbv2Aw6Wzt5I2+nv8bbV3Q4qiUm+JInAa5ITK4+CFeHXHxGV4e0O8O0Y4O1r+QUsK4sYcAwr0y3TSuXWXy0q/euLOkkITRi60nPw5kjjYa+aExE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdInN+YE; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790018336; c=relaxed/simple;
+	bh=SqR+r8Lr00Rp3Hfbjj6yCMcVv9qvSkDLcKIebqYOdcM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RR4a4HSRZAC/AYkAN5qissU1zUd0NFQWTb4PneXDM4Hut+r5cnSgWSlugI6yqCsXSmudWGyh1XdQu5F5ucGIHhpRBanvgHDULz9+lHeulX/yZbtV8mhem/odR5rsvmz6MYXrnoMhZH0vkzBDznzEXWbbjW+j7fupVzYIxryCRCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XIQ6N1rj; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdInN+YE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5CC91F00893;
-	Mon, 21 Sep 2026 18:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790016076;
-	bh=orlWzdJhQKuC8O40EXsYgdzLtw4tS7YImxxkerXGWsM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LdInN+YE1gfJLEsn1SQsezO3RiawM/+JYyf1jX3cx0rDqN3nuFchISHKoxwrdZ59j
-	 VWoHvSP0Rw238KGihtd+h43kCkB4BbxbmrUu5KEmzELVDDxexYrYedoUzfAFe4/7yE
-	 6pm5lQzhrIIu8W1I8SktaxOmIFuWAQFpggfvIGRwHDug4ACKy0/WZOYyjmeLH2TWNa
-	 HgAbkK1h539A3UO2JPspDZuJBm/okef9mArTH6aqGeVWraQONF/pcfQFsIoAGo0yMb
-	 M6BxXuBWohsmZlG7cSiPb1hcjFIA/7z3Ur495QOwUtinqzMwWy1eJ/+X3TeTh8iXV8
-	 3xyTx/+TdNjBA==
-Date: Mon, 21 Sep 2026 08:41:16 -1000
-Message-ID: <8d777202a64f3a02f7d13d90ee97c4e7@kernel.org>
-From: Tejun Heo <tj@kernel.org>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@infradead.org>, cgroups@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cuitao@kylinos.cn, tj@kernel.org
-Subject: Re: [PATCH v3 0/4] blk-iocost: charge flushes and zone appends
-In-Reply-To: <20260921033453.1912971-1-cui.tao@linux.dev>
-References: <20260921033453.1912971-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIQ6N1rj"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6b885ef8so18735415e9.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 12:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790018333; x=1790623133; darn=vger.kernel.org;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=fxnzRUipIvU5hbEis2mzNW2MVxNqcQwtIKSVpz0TPYk=;
+        b=XIQ6N1rjkH9YkBmUBhiSzz+4giTY8AcM66sIuLNOE1sgiiR03Q1++MLMF+RZ+POmHL
+         ZAipdZuluAJQh4rZHurBjEeC+5ui7lIaQVEhbFw3DqIFYOUUjciNwAmQc8eK0VENMKVt
+         Jd8TEoCMBtntv3cqVPiBTHgIW1U4oPokSGHJdFvaQ160qoDUKdd592DH/8vg6/n/cigs
+         LEbAfF5pmzfPyQH0WQyYJSSQWeteWTmKJKyT2mpNs21CyzbBo0G19ZuCKoHd0UvOAr06
+         EK+3eghZnZN03YtT4XdhZYZgvsqmpGmRPYGtV0r5x9eQkBRsAtxcvru31+vrbAS9BlqH
+         Y5EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790018333; x=1790623133;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=fxnzRUipIvU5hbEis2mzNW2MVxNqcQwtIKSVpz0TPYk=;
+        b=pyrrn+i9nRwfYDZ0A4CHcV/Eod3uCAGm3xCAjKJDCzKeTUKbnduwdcSzm8vCPy1L/C
+         b/tkhV6hvLsBeb+ie/dtIE+boSMuS2Ky557HBcxGku4RWwUbQPPifmWtsSlEKykosx7T
+         QYS44tKT92u4ZXyP3cStde3QfT/nDLME7pNuxJC65u4MZJf0ertX3q6ZlhTbXB9S6iNf
+         MXCKqaKnY7IcA4F+foC/agzOle1nhjnM0QFhpiY7ErMdUZiBht3B3ahtn/wms6XOdgza
+         zad2WSFTOVuxSWqH/9y5JeTlNAfyx3DiS8JErfG0JVg8Wq9G+1NrcfSRL3cm6YNSruq/
+         p/2A==
+X-Gm-Message-State: AFuF++mIEze4lP2E0A5x+1YllvY/ZHobEXgf5mHjbn8jLPNb9fmLNO5V
+	t1zABk9rMGQHsJNbUr77FyGaZ4r4ZavhVSAYDaX1efpTSUEv/HvPQ7PO
+X-Gm-Gg: AYBFou0AUr+nxFbJiwspq7JU5Y7EgcBJK2zAPhPQk3Hx3N0oVuTpzUVXeTvQSg4PyZ5
+	CLvQ/SRkyERGqN3xfDBVpI5S0oIAsOxxhQ1Up4iMRCKnkkWKP61aNSMLqtaE33sLbiaNM9SghdU
+	NeefDxIgn88+YkVvM0T9NoplPOm/WI5L3I/OkGgualvzPifRJ3aR0IYBOA5PP8H7s5rfE+AKr/S
+	5JaOTc7m2aIycckn1RpP9Wrgpox9ScgiHvphX4Wo93FyWcyAr+poCj4HjXjb0lUlPhXSwWkwGiL
+	6wsBfPBoNYDAeBu0Rs7zJ2L/X0/BBR16lDfqDe39wQv9IjObD8MoAxd4o2V32zxeQ3Oid0Gz+RC
+	14qg6GKabgl++/q3tERGgb+6GDxJciTwbqmDllGFT4LpdYRnit22jUw22IGBRIHXVJiIcNF0Czg
+	zlhWRvFRSTt0jWRjG4oqFGsbMVYZMA8aDjW9QMhacDqGPOKauIfaacJeTgC0Oil2HjadQ=
+X-Received: by 2002:a05:600c:3f07:b0:49e:7caa:e7b2 with SMTP id 5b1f17b1804b1-49fc5756f60mr153732025e9.29.1790018332729;
+        Mon, 21 Sep 2026 12:18:52 -0700 (PDT)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48724562aebsm26906638f8f.14.2026.09.21.12.18.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Sep 2026 12:18:51 -0700 (PDT)
+Date: Mon, 21 Sep 2026 22:18:47 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: linux-block@vger.kernel.org, ZHOU Jiaxiang <me@fxti.xyz>,
+	Damien Le Moal <dlemoal@kernel.org>
+Subject: [bug report] Merge branch 'for-next' of
+ https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git
+Message-ID: <arGDF5byCiew-pqQ@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello, Tao.
+Hello Mark Brown,
 
-On Mon, Sep 21, 2026 at 11:34:49AM +0800, Tao Cui wrote:
-> While testing iocost's weight-based throttling under concurrent IO, we
-> observed that a cgroup limited to 1% weight could issue an unbounded
-> number of flushes without being throttled: an fsync loop produced ~510k
-> flushes in 12s with cost.usage staying at zero the entire time.  The
-> device was monopolized while iocost reported no activity.  Zone appends
-> were in the same position: the builtin linear cost model defines
-> coefficients only for READ and WRITE, so REQ_OP_ZONE_APPEND is priced
-> at zero and excluded from the latency statistics as well.
+Commit a9ce2250a714 ("Merge branch 'for-next' of
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git")
+from Sep 18, 2026 (linux-next), leads to the following Smatch static
+checker warning:
 
-Looks good to me. A few nits:
+	block/blk-zoned.c:2200 disk_init_revalidate_args()
+	warn: impossible condition '(args->nr_zones > (~0)) => (0-u32max > u32max)'
 
-- 1/4: REQ_PREFLUSH and REQ_FUA are in REQ_NOMERGE_FLAGS, so !is_merge is
-  always true there. Can you drop the wrapper and the separate flush_cost
-  accumulator? Adding to cost before the empty bio check gives the same
-  result, and the FUA condition fits on one line.
+block/blk-zoned.c
+    2195 static int disk_init_revalidate_args(struct gendisk *disk,
+    2196                                      struct blk_revalidate_zone_args *args)
+    2197 {
+    2198         args->disk = disk;
+    2199         args->nr_zones = disk_get_nr_zones(disk, args->capacity);
+--> 2200         if (args->nr_zones > UINT_MAX)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- 1/4: The comment mostly restates the two ifs and the coefficient
-  formula. The FUA condition is the only non-obvious part. Can it be
-  trimmed to that?
+The linux-next merge for linux-block went a bit sideways and
+commit 7c431d61b69a ("scsi: block: Fix zones_cond out-of-bounds write on
+zone report") needs to be re-done.
 
-- 1/4: Pending pre-flushes get coalesced into one device flush, so the
-  charge doesn't quite mirror what the block layer issues. It's a
-  per-request policy charge, which the description already says. The
-  other iops coefficients also have the page cost subtracted, so they
-  aren't translated the same way. There's also a short broken line in
-  that paragraph.
+    2201                 return -EINVAL;
+    2202 
+    2203         /* Cached zone conditions: 1 byte per zone */
+    2204         args->zones_state = kzalloc(args->nr_zones, GFP_NOIO);
+    2205         if (!args->zones_state)
+    2206                 return -ENOMEM;
+    2207 
+    2208         return 0;
+    2209 }
 
-- 1/4: cgroup-v2.rst doesn't use REQ_* names anywhere else. Maybe
-  describe them as a write with a preceding cache flush and a FUA write?
-  The table row could follow its siblings too ("The maximum ... per
-  second").
+This email is a free service from the Smatch-CI project [smatch.sf.net].
 
-For the series,
-
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+regards,
+dan carpenter
