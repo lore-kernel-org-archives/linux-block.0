@@ -1,83 +1,80 @@
-Received: from mail-pj2-f42.google.com (mail-pj2-f42.google.com [74.125.227.170])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27923AB272
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 20:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C096F455606
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 21:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790021257; cv=none; b=DfkGeFti6ircEntJM3gbSqgDd2XpFRIS5LPJzTJBj7A7o6oPMkMf3I+XpB+ydJJjNyuu33/pjMqU5SXg3Zv9gMEtLNhgIln4zgV6KwharKDwbQNeV+UhN5cP6Y9G+6+m4Aaycj+5cL9Qbhyzw9mLRIuOz7mApKMCJ1p7rZVsr+w=
+	t=1790024426; cv=none; b=F09UfppjYdIyVHAi/gDd2OU/CGqMp4M2ooHdqNQGKtx4+plDKYpHmXPjESxIYVGlGmZ58sGrZsZ9THMp8q/tTLCDyHzKQylMBWZ4mdVOX/ajByZmUt/hLwh+Fsm0zwBXRFqpFVuVsvSzXgCcdbk7TlxiEaAC9dYWyI/THvpcnZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790021257; c=relaxed/simple;
-	bh=3vXE7lcQFe0Ihorih0Ly7xdqxebP2q99jKEPnxKX+mU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VvO7K7XGBEM1ySDvvXkJLb9ro5DQlUUcFxsSowZgqkiYZgOgJkGOseOK6BTau3I7yxdDNMIzmtegaziRtLgSAvVnDCd2NptfG3ZxX9nChjBNbK7Cq1MiqxylzBciqpohBHxKPnKja0Jqaj/Jxb/yLDnZUOO5l4eckClFnaiySQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=IVJ242w4; arc=none smtp.client-ip=74.125.227.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
+	s=arc-20240116; t=1790024426; c=relaxed/simple;
+	bh=GjAxKLy+axJVTeCuJLWowsU0JOzvm/1d2H/T4YCZwdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mQrdi+SDZjPV9mK0NPpl4PD3HqWA+1FFJ1+yWEDirFGKBtGEOMkwOzqpA0EltFpuxeOyLGwFq+DYiaDSdf3uuN19TjaTVYUV6/JbxRYVmsufv0xJeU1KJopjJRXg9xt/qMxE6Af+f9OyM1RxgDdYXNZiMiyWNEAqczdt+Mnli4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=VDKpBXyc; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b="IVJ242w4"
-Received: by mail-pj2-f42.google.com with SMTP id 98e67ed59e1d1-3a02902dce2so1376793a91.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 13:07:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="VDKpBXyc"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e66390995so18684745e9.2
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 14:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1790021255; x=1790626055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=A4qzWgzNNZY14DzhBVqEY1Mje98vG/0yM0yF+Z9V/Bg=;
-        b=IVJ242w4vD43Q/eF3sfcPGvWTylhHY0x9f6jsXVW9+Bv2ln0VBpM9oL7VvybLjb0rE
-         WwfPdXEH4RmbDFWPl7reW0dDZf36FG9plKPJqGHtE/B8rUrDYWpycrY2q1BgOyMczjQ6
-         kVcSGcDr1Ug1VwoJz+7y+NRwNft9ZLVSW6xaVGxQw3GBhZoKEs5YwXGXGnzNpiwRxA9y
-         hPJTGkNSBiD6X4LVBOOX2rIL2r13BisHGfOfv8GL3xrZVKpuJ4up/mT30b8xRoegpfLK
-         LexCMlIyN2uQhDmxJRT+EuUd4CbkJY1txMkMdAt6K6HvS9JXKwFP2Uf3cNjORIFdJAra
-         XOSw==
+        d=purestorage.com; s=google2022; t=1790024422; x=1790629222; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=SxiX7ykUuzFoB5u8OW7JZMlOwhEiuup8UcQvf/vvFTw=;
+        b=VDKpBXyc2dCflVzt1nTXu5ZU5Bcip5oV6+/JawYVXNV4I8VqQJEFQISLNEkpvo54Nv
+         wuI43mNAMtOethChFJVxotaKEwnZYg7lSifBSpzc8UFWmLLIe2YD+r4R8YpuV4PdT3t9
+         fR8Cjd7/cCvPp2XlRZLtusaREUaenA4LdP8yuv9K5HRb3Tse7oflAuP31Hg035oQ9zUC
+         bjTvQZHbS9fOhXVAIjt0/7KfyAKsdXux+QFvHY/aRAxXavbUQ+gdNVTy2X+e1SjDRT/D
+         80jutbUK5aCr+evYM/7Td+PJbWLGB/vb9wkkBYN+W1/7yALxLgYr/gJxxygj4fDZUD16
+         ZvgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790021255; x=1790626055;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=A4qzWgzNNZY14DzhBVqEY1Mje98vG/0yM0yF+Z9V/Bg=;
-        b=tG+xU0kspPhdavmB/KG7bTJdb/5B8UXdAZONREQl7Q9/dAazh7gwg7MLQEhd+EYi9M
-         fLrZj0cg1Qgj4/cG4ibl3dORByo6CgY4RmljM6t1WfAhb+p06kPuHYKArjPvkSzsxYFr
-         q2UMh3YBLIj7cP4+MnAqZosITAktgwnoYQwbQHLzoK00KY+Cl4c/hWWTcHTnzsOBIc7a
-         CKl03aFb5wFytZbtcOo+2uqkYztELGEquFe2hw5hm/DISQ/nQlBOh3w1btvfnFGq3oax
-         ylJM6DEl8ek8XAjOmcHzNM4JNnYneDOHOqhw8def7MIGPLAJsPE3p6ntUi7lZFkAYd/o
-         tj6Q==
-X-Forwarded-Encrypted: i=1; AKwUvByOg7+Z1vHFzqvVV6vyskfw9FnQM09nFLvUt8QCmC2mZaCfLJbw7NBfG+iDxZizUsYl5E2poR0PyqBc9Q==@vger.kernel.org
-X-Gm-Message-State: AFuF++mEBnWDPPMsX9jlDZAOeAZlPDfQ7JkhlgBXdhyV1sJ3loEhnXpY
-	zG/jAYZkokY9CK2wP6dKPbqdBenGGbM/Cbo9hjMKRnmFhGs0yF04uGP4Axmxd9pKD9Y=
-X-Gm-Gg: AYBFou0PMY6sQAdrjvQLqI1uKNek8Z4MWxO89yDXsTCvRUG8cnO/CIoFjBFukaYmoHc
-	J0I1F1YnZBSykEoBLEXI1r4mev43MugA5ZGUntIJl/nt0BJVKYx2oBxn1kwXA2D8GsxkXP8Ccqm
-	6MWe7kRqUBPnlHKxjdoPT62Wj9wc5yBWUdpJib5pwF7AHLdwbgLka69GRmYqYQXgWgTX3paWdsk
-	Q3tXvsZZePL/K8IzGl+nLWh5dUWtEm8dYV3hphPgoFZ8l9D+IbM9qoChYM+wUXAzzYwr9b37uqs
-	wrzPnO0GoiB3te6fplqrIAZlUkKL0OaRLlRz10Int6xlHGrreiSDaMVA67rtbLq9jaIUFhE3wO/
-	PmiPjXi0hCa44lMa4Ac93elgIb/WRe8OPKTyvS76fwUyoNa7dxwL+GKJ9HdnsTtj6DJk7xMtjfc
-	dXzA4T6avLm/hSqAjztcl9bcfHrL5lmAE9GaZXpvAMi1ZxWmR0D/ATgz/XRNAw2kexNhiCDCTkj
-	QPHIthp/ODhLRl58MVRdWeKytDWaNuPXmktb9v7gAiyznNNCQosKObyiH9doVq7WFhJv+HfB6fv
-	egfEKw==
-X-Received: by 2002:a17:90b:2649:b0:39e:3713:c2e4 with SMTP id 98e67ed59e1d1-39e54dce754mr19264623a91.14.1790021255157;
-        Mon, 21 Sep 2026 13:07:35 -0700 (PDT)
-Received: from localhost.localdomain ([2603:8001:5f01:8bab:289a:f600:f11e:a45c])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e5ebcdbe8sm501164eec.15.2026.09.21.13.07.33
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 21 Sep 2026 13:07:34 -0700 (PDT)
-From: Artem Dinaburg <artem@trailofbits.com>
-To: stable@vger.kernel.org
-Cc: Artem Dinaburg <artem@trailofbits.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sasha Levin <sashal@kernel.org>,
+        d=1e100.net; s=20260707; t=1790024422; x=1790629222;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SxiX7ykUuzFoB5u8OW7JZMlOwhEiuup8UcQvf/vvFTw=;
+        b=1TeGVHuUtsGyCdwzo40uT7NyX5oZpP+AyNFRb5hzrKwuoiTVetA/n1q+b2qB+ZQO7G
+         z32dg7IpD4CMpouK2OZ28HNG4FLsBBxiSboP7r69rm6ieA8mmGdlLeVb4KOD8OLedgsB
+         yKMI9tLz+eq4EAAofL0N6YKIWjsDBngIi30LmVaHoAs8v9kEi0sAVn2uFUBttaCW4GlT
+         PdzeWLpHY+Vbb53vlHWzYdlK4jUCeSIoYesNyk5elE8QKomd7gdJ5ZjskD9DcXo+2052
+         yIMwxAXGkg/XwJAnykYaSdIIOMQbA0o4dpZtyat8Yp3Zyu8L1B5hHIloZ9tGF9t3RsSf
+         ng6Q==
+X-Gm-Message-State: AFuF++mK/Bk8HkLuzAhAIxGSKhrXZi7IAJb716VtyuU5RL0sPCA0mkLu
+	kwdLYrlcbQO8A6GF+gMVafo5P/qmasVD8wxZbSb8CLNK2nmkXq/REzuQVY/7qkFFAJ4+wlpTG7Z
+	tXM4p/wbqfVG6KEaImKQ5+982D2hG5aL7NC3HbJICCmdEbt/b1G4p+WuimZgauTGLfxEnaTK4hZ
+	ZCFyKokbObwYzVQj4Q9+NCZ7vrq4f0Sv79EaVrC7ckWSZq5wJa/p0N57c=
+X-Gm-Gg: AYBFou36b8IfJSKC1Q0If8NaxteddtHgYVsvCLnnmuKY/FPGMv3mQ1Ya8d1upkpy/M/
+	RupJSDLt+k9Mixjm5B4vMIjWM55bVE22zEhsUJObskzLy25CJma5FrdMBKpmNOzgQwR6wRVvv4m
+	evGO83fVuJmRuLzNvUP1fUgNSq7RoRo2pQ6doiF6Xqg1oyR3MxJbY40O6sAjcq+pjj969s3RIYT
+	gFlGQofq/s/IpLBLfknZRRFJZ0n2eEBxC+MsUHe9+rLFZPw3E3MbJ9VR2P4L7kZj1CKORRqc7M1
+	49L+CrBQPcCAImMr2b/i0YU9F4KIL60wk7sLSZrcOJqhnmxd9Tlw1mwWbQ1Q8FRUUFYmaC+mPKM
+	oSYC/eKIpta6ZGF+T9VZA8P3DymSfGfmmvZzcBcvF5YO40bt+izsIkj/XA6YcxbJf1VhDoROn8s
+	IZjw+OvBp7IkD9Cx/0eXtMxMkHXTs/GkNklU+fZAYKao0c37TLpSGtE1pHs/g9XhR60+16YLSgX
+	QkF7iXPTZQ+wmn8c9eqF+jN1bsXmHDWoTeMLU0=
+X-Received: by 2002:a05:600c:1993:b0:49c:ffe3:2b3f with SMTP id 5b1f17b1804b1-49fc56dbc54mr169802245e9.3.1790024421579;
+        Mon, 21 Sep 2026 14:00:21 -0700 (PDT)
+Received: from dev-mkhalfella.dev.purestorage.com ([208.88.159.128])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-49fda089577sm3345565e9.1.2026.09.21.14.00.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Sep 2026 14:00:20 -0700 (PDT)
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,
+	Keith Busch <kbusch@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chengming Zhou <zhouchengming@bytedance.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 6.1.y 2/2] blk-mq: fix tags UAF when shrinking q->nr_hw_queues
-Date: Mon, 21 Sep 2026 16:07:26 -0400
-Message-ID: <20260921200728.84114-3-artem@trailofbits.com>
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	John Meneghini <jmeneghi@redhat.com>,
+	Jesse Taube <jtaubepe@redhat.com>,
+	Randy Jennings <randyj@purestorage.com>,
+	Dhaval Giani <dgiani@purestorage.com>,
+	Mohamed Khalfella <mkhalfella@purestorage.com>
+Subject: [PATCH blktests] nvme/071: test CCR and CQT recovery on a multipath fabrics namespace
+Date: Mon, 21 Sep 2026 14:59:51 -0600
+Message-ID: <20260921205951.3023714-1-mkhalfella@purestorage.com>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260921200728.84114-1-artem@trailofbits.com>
-References: <20260921200728.84114-1-artem@trailofbits.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -86,90 +83,303 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+nvme/070 demonstrated the ABA ghost write window. The kernel closes it
+by fencing a controller before retrying timed-out writes on another
+path, but nvme/070 does not functionally exercise CCR or CQT
+themselves.
 
-[ Upstream commit 6be6d112419713334ddd9c01f219ca16adaa4c76 ]
+Add a functional test that drives both cross-controller reset (CCR)
+and command quiesce time (CQT) recovery. The setup is the same as
+nvme/070: a ublk loop device backs an nvmet namespace that is exported
+through two ports, the host connects to both paths, and io_timeout on
+the subsystem drops to 2 seconds. In addition, the target subsystem's
+CQT is set to 30 seconds, since it is disabled by default.
 
-When nr_hw_queues shrink, we free the excess tags before realloc'ing
-hw_ctxs for each queue. During that resize, we may need to access those
-tags, like blk_mq_tag_idle(hctx) will access queue shared tags.
+The first scenario holds one write in the backstore for 4 seconds. The
+host times the write out, starts fencing, and the CCR issued on the
+other path completes within its budget. The second scenario holds a
+write for 10 seconds, longer than CCR can wait, so the host gives up
+on CCR and switches to time-based recovery, waiting out the remaining
+CQT window before releasing the retry.
 
-This can cause a slab use-after-free, as reported by KASAN. Fix it by
-moving the releasing of excess tags to the end.
+Each scenario runs nvme-ghost-write-detector while recovery is in flight
+to check that no stale data surfaces, and confirms the recovery took the
+expected route by watching dmesg after a marker written to /dev/kmsg.
 
-Fixes: e1dd7bc93029 ("blk-mq: fix tags leak when shrink nr_hw_queues")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Closes: https://lore.kernel.org/all/CAHj4cs_CK63uoDpGBGZ6DN4OCTpzkR3UaVgK=LX8Owr8ej2ieQ@mail.gmail.com/
-Cc: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Link: https://lore.kernel.org/r/20230908005702.2183908-1-chengming.zhou@linux.dev
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+The test requires nvme_core.multipath=Y and is limited to tcp, rdma
+and fc, the transports that implement controller fencing.
 
-[ Backport to 6.1.y follow-up to e1dd7bc93029: move those frees after
-  hctx resizing using cur_nr_hw_queues, preventing its tag UAF. ]
-Assisted-by: LLM
-Signed-off-by: Artem Dinaburg <artem@trailofbits.com>
+Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
 ---
-Stable submission note: patch 2/2 in the CVE-2023-54227 series for Linux
-6.1.y.
+ tests/nvme/071     | 184 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/071.out |  67 +++++++++++++++++
+ 2 files changed, 251 insertions(+)
+ create mode 100755 tests/nvme/071
+ create mode 100644 tests/nvme/071.out
 
-CVE: CVE-2023-54227
-
-Build: This patch was included in the x86_64 allmodconfig and
-CONFIG_WERROR=y build. It produced no new warnings or errors.
-
- block/blk-mq.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b6215bee3d3c45..bf69079f6bd517 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4509,13 +4509,9 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
- 				  int cur_nr_hw_queues, int new_nr_hw_queues)
- {
- 	struct blk_mq_tags **new_tags;
--	int i;
- 
--	if (cur_nr_hw_queues >= new_nr_hw_queues) {
--		for (i = new_nr_hw_queues; i < cur_nr_hw_queues; i++)
--			__blk_mq_free_map_and_rqs(set, i);
-+	if (cur_nr_hw_queues >= new_nr_hw_queues)
- 		return 0;
--	}
- 
- 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
- 				GFP_KERNEL, set->numa_node);
-@@ -4804,7 +4800,8 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- {
- 	struct request_queue *q;
- 	LIST_HEAD(head);
--	int prev_nr_hw_queues;
-+	int prev_nr_hw_queues = set->nr_hw_queues;
-+	int i;
- 
- 	lockdep_assert_held(&set->tag_list_lock);
- 
-@@ -4831,7 +4828,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_sysfs_unregister_hctxs(q);
- 	}
- 
--	prev_nr_hw_queues = set->nr_hw_queues;
- 	if (blk_mq_realloc_tag_set_tags(set, set->nr_hw_queues, nr_hw_queues) <
- 	    0)
- 		goto reregister;
-@@ -4869,6 +4865,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_unfreeze_queue(q);
+diff --git a/tests/nvme/071 b/tests/nvme/071
+new file mode 100755
+index 0000000..d700416
+--- /dev/null
++++ b/tests/nvme/071
+@@ -0,0 +1,184 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Mohamed Khalfella
 +
-+	/* Free the excess tags when nr_hw_queues shrink. */
-+	for (i = set->nr_hw_queues; i < prev_nr_hw_queues; i++)
-+		__blk_mq_free_map_and_rqs(set, i);
- }
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
++. tests/nvme/rc
++. common/ublk
++
++DESCRIPTION="CCR/CQT functional test"
++
++requires() {
++	_nvme_requires
++	_have_loop
++	_have_ublk
++	_have_module_param_value nvme_core multipath Y
++	_require_nvme_trtype tcp rdma fc
++	_have_src_program nvme-ghost-write-detector
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++count_paths_to_subsystem() {
++	local subsysnqn="$1"
++	local dev count
++
++	count=0
++	for dev in /sys/class/nvme/nvme*; do
++		[[ -e "${dev}/subsysnqn" ]] || continue
++		[[ "$(cat "${dev}/subsysnqn")" == "${subsysnqn}" ]] || continue
++		count=$(( count + 1 ))
++	done
++	echo "${count}"
++}
++
++set_io_timeout_of_subsystem() {
++	local subsysnqn="$1"
++	local timeout="$2"
++	local dev
++
++	for dev in /sys/class/nvme/nvme*; do
++		[[ -e "${dev}/subsysnqn" ]] || continue
++		[[ "$(cat "${dev}/subsysnqn")" == "${subsysnqn}" ]] || continue
++		if ! echo "${timeout}" > "${dev}/io_timeout" 2> /dev/null; then
++			echo "FAIL: can not set io_timeout on ${dev##*/}"
++			return 1
++		fi
++	done
++}
++
++dmesg_mark() {
++	local marker="blktests ${TEST_NAME} $1"
++
++	echo "${marker}" >> /dev/kmsg
++	echo "${marker}"
++}
++
++dmesg_since_mark() {
++	dmesg | awk -v m="$1" 'index($0, m) { found = 1; next } found'
++}
++
++wait_for_dmesg_after_mark() {
++	local mark="$1"
++	local pattern="$2"
++	local timeout="$3"
++	local i
++
++	for ((i = 0; i < timeout * 2; i++)); do
++		if dmesg_since_mark "${mark}" | grep -q -e "${pattern}"; then
++			return 0
++		fi
++		sleep 0.5
++	done
++	return 1
++}
++
++test_injecting_delay_ccr_recovery() {
++	local mark ns
++
++	mark=$(dmesg_mark "ccr_recovery_started")
++
++	if ! ${UBLK_PROG} inject -n 0 -o write -d 4 -c 1 >> "$FULL" 2>&1; then
++		echo "FAIL: can not inject write delay"
++	fi
++
++	ns=$(_find_nvme_ns "${def_subsys_uuid}")
++	"$SRCDIR/nvme-ghost-write-detector" "/dev/${ns}"
++
++	# The injected delay is within the limits that CCR can handle.
++	# Expect fencing to start and CCR to succeed.
++	if ! wait_for_dmesg_after_mark "${mark}" "starting controller fencing" 30; then
++		echo "FAIL: controller fencing did not start"
++	fi
++
++	if ! wait_for_dmesg_after_mark "${mark}" "CCR succeeded using nvme" 30; then
++		echo "FAIL: cross controller reset did not succeed"
++	fi
++}
++
++test_injecting_delay_cqt_recovery() {
++	local mark ns
++
++	mark=$(dmesg_mark "cqt_recovery_started")
++
++	if ! ${UBLK_PROG} inject -n 0 -o write -d 10 -c 1 >> "$FULL" 2>&1; then
++		echo "FAIL: can not inject write delay"
++	fi
++
++	ns=$(_find_nvme_ns "${def_subsys_uuid}")
++	"$SRCDIR/nvme-ghost-write-detector" "/dev/${ns}"
++
++	# The injected delay is outside the limit that CCR can handle.
++	# Expect CCR to fail and CQT to save the day.
++	if ! wait_for_dmesg_after_mark "${mark}" "starting controller fencing" 30; then
++		echo "FAIL: controller fencing did not start"
++	fi
++
++	if ! wait_for_dmesg_after_mark "${mark}" "attempting CCR" 30; then
++		echo "FAIL: cross controller reset was not attempted"
++	fi
++
++	if ! wait_for_dmesg_after_mark "${mark}" "CCR failed, switch to time-based recovery" 30; then
++		echo "FAIL: cross controller did not fail as expected"
++	fi
++
++	if ! wait_for_dmesg_after_mark "${mark}" "Time-based recovery finished" 30; then
++		echo "FAIL: expected to see time-based recovery ends"
++	fi
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	local port nr_paths
++	local attr_cqt
++	local -a ports
++
++	if ! _init_ublk; then
++		return 1
++	fi
++
++	truncate -s "${NVME_IMG_SIZE}" "${TMPDIR}/ublk-img"
++	if ! ${UBLK_PROG} add -t loop -f "${TMPDIR}/ublk-img" -n 0 > "$FULL" 2>&1; then
++		echo "fail to add ublk device"
++		_exit_ublk
++		return 1
++	fi
++	udevadm settle
++
++	_setup_nvmet
++	_nvmet_target_setup --ports 2 --blkdev none
++	_create_nvmet_ns --blkdev /dev/ublkb0 \
++		--uuid "${def_subsys_uuid}" > /dev/null
++
++	# CQT is disabled by default, enable it for 30s
++	attr_cqt="${NVMET_CFS}/subsystems/${def_subsysnqn}/attr_cqt"
++	if [[ -f "${attr_cqt}" ]]; then
++		echo 30000 > "${attr_cqt}"
++	else
++		echo "FAIL: failed to find attr_cqt: ${attr_cqt}"
++	fi
++
++	_get_nvmet_ports "${def_subsysnqn}" ports
++	echo "Target ports: ${#ports[@]}"
++	for port in "${ports[@]}"; do
++		_nvme_connect_subsys --port "${port}"
++	done
++
++	nr_paths=$(count_paths_to_subsystem "${def_subsysnqn}")
++	if ((  nr_paths != 2 )); then
++		echo "FAIL: expected 2 paths, found ${nr_paths}"
++	fi
++
++	set_io_timeout_of_subsystem "${def_subsysnqn}" 2000
++
++	test_injecting_delay_ccr_recovery
++
++	test_injecting_delay_cqt_recovery
++
++	_nvme_disconnect_subsys
++	_nvmet_target_cleanup
++	_exit_ublk
++	echo "Test complete"
++}
+diff --git a/tests/nvme/071.out b/tests/nvme/071.out
+new file mode 100644
+index 0000000..f55eefb
+--- /dev/null
++++ b/tests/nvme/071.out
+@@ -0,0 +1,67 @@
++Running nvme/071
++Target ports: 2
++starting nvme-ghost-write-detector test program
++iteration number 0, writing data
++validating written data
++successfully validated
++iteration number 1, writing data
++validating written data
++successfully validated
++iteration number 2, writing data
++validating written data
++successfully validated
++iteration number 3, writing data
++validating written data
++successfully validated
++iteration number 4, writing data
++validating written data
++successfully validated
++iteration number 5, writing data
++validating written data
++successfully validated
++iteration number 6, writing data
++validating written data
++successfully validated
++iteration number 7, writing data
++validating written data
++successfully validated
++iteration number 8, writing data
++validating written data
++successfully validated
++iteration number 9, writing data
++validating written data
++successfully validated
++finished nvme-ghost-write-detector test program
++starting nvme-ghost-write-detector test program
++iteration number 0, writing data
++validating written data
++successfully validated
++iteration number 1, writing data
++validating written data
++successfully validated
++iteration number 2, writing data
++validating written data
++successfully validated
++iteration number 3, writing data
++validating written data
++successfully validated
++iteration number 4, writing data
++validating written data
++successfully validated
++iteration number 5, writing data
++validating written data
++successfully validated
++iteration number 6, writing data
++validating written data
++successfully validated
++iteration number 7, writing data
++validating written data
++successfully validated
++iteration number 8, writing data
++validating written data
++successfully validated
++iteration number 9, writing data
++validating written data
++successfully validated
++finished nvme-ghost-write-detector test program
++Test complete
 -- 
-2.39.5
+2.55.0
 
