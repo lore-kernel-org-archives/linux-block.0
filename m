@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-60.mta0.migadu.com [91.218.175.60])
+Received: from mta1.migadu.com (out-224.mta1.migadu.com [95.215.58.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10CC276050
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 08:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72AD456DE2
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 08:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789979901; cv=none; b=dKFAi9FAvi3qzrYn6/BqkVHhqbSJzQ/FBHbXrR4daDkhCaVXkyJEDBjT46wSEw8sakc7rV30UYNABoIDLcSCeA1u364nBoU78wvpNofAX77B9bsDBlk1N8HA08pAuBRVdydmv8JX5vtEjE8/MsiJA6pG94OCEFgdTw2Ic5JU7/g=
+	t=1789979902; cv=none; b=Mb4Teh7eVu3ob+6ah1eOYr6aDUVwdQg3NwM0xEQ+IBGRrrGBQyLV+Oh6sibkQ8hSJAUOaOxciIzB7krzyjEt5PKweCy3P8bfIgEmkeAt731MOK2s/o8Ku1SXtnWm6rBRiGKTfZd3s7wRoTYpknOSBBV9f50nvIqEreQC8J38lg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789979901; c=relaxed/simple;
-	bh=lo+3hYrHbOxtP+yhhzev+iunFmIbTKcxkOK8eO47HeM=;
+	s=arc-20240116; t=1789979902; c=relaxed/simple;
+	bh=CyYEsYiDmgMUgwn5djnlaruTgvmjRSRmVi5fM9yhJOA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rlJH3a+ucUyGQ/wsNACXzl0S/p5mw7QHqTsSKkI0wMblGr3TMQTTp8JBBy++fOd3i3VnuXiLTnKiKWKD3tcQZPebK6HtdkdT40J87zpI76dwKQX7Hv21v5u+mOS5qHrowX1QqnCEtG/6t0A33TU8t0I8Y2xPR2aZUuTk82ABQd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lSXdiOQU; arc=none smtp.client-ip=91.218.175.60
+	 MIME-Version; b=VOGwNNAoDJj6k2kglw1vwOG7Mckug25/4W3QEMrOA1kUceJWjzqzq7BnP71pxREz80Rk8Bn0mFZF7dWlqPjfJiNjecEfc+36qqBqh9YbmtaKILlSNeV6ak4JGdhTxHlIrGGEYoZuf9rEbnektBmT3H3S8LJI06nVTsO76VxdKCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kssizVvu; arc=none smtp.client-ip=95.215.58.224
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lSXdiOQU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kssizVvu"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=lo+3hYrHbOxtP+yhhzev+iunFmIbTKcxkOK8eO47HeM=;
+DKIM-Signature: a=rsa-sha256; bh=CyYEsYiDmgMUgwn5djnlaruTgvmjRSRmVi5fM9yhJOA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789979897; v=1; x=1790584697;
- b=lSXdiOQUnmMvl/VHbFJgzutIS1h8AXdoxa1RXyfLS2I2/jK2YRNtzW9DQV2sq/Qval3XEyfC
- +MMKWmGEmTpvf9cnczjdIbSDdSJkRXMHDsbhMkAV+wk/J7x9bzVneyfWm94M4AcDp3YxNT1ZbHd
- h1ilfnvY667FrgteW/qFAssk=
+ t=1789979898; v=1; x=1790584698;
+ b=kssizVvuQYWXQONWgTV9ccYkvMnwRyYculof1E3i23gElHD0EdrhHJYEPHUiwMQ7az414mgv
+ Aui6S6+2hBjXN+peFXoIz2Mo0C6ZgQT6F/5Iq+hQI4eWw7Fuz80JIbWv2Xq7c8XPOARan0pv0gg
+ 6rQUdhJGYzpVTFBX+1AG71kM=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta11.migadu.com with ESMTPS id 9969d023204782c0;
-	Mon, 21 Sep 2026 08:38:17 +0000
-X-Mizu-Trace-ID: 9969d023204782c0
+Received: by mta11.migadu.com with ESMTPS id ba07615db5f16531;
+	Mon, 21 Sep 2026 08:38:18 +0000
+X-Mizu-Trace-ID: ba07615db5f16531
 X-Migadu-Flow: FLOW_OUT
 From: John Garry <john.garry@linux.dev>
 To: axboe@kernel.dk,
@@ -37,9 +37,9 @@ To: axboe@kernel.dk,
 Cc: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	John Garry <john.garry@linux.dev>
-Subject: [PATCH v4 3/4] nvme-multipath: clone head disk partitions to per-path disks
-Date: Mon, 21 Sep 2026 09:37:51 +0100
-Message-ID: <20260921083752.1154316-4-john.garry@linux.dev>
+Subject: [PATCH v4 4/4] nvme-multipath: fix diskstats for partitions
+Date: Mon, 21 Sep 2026 09:37:52 +0100
+Message-ID: <20260921083752.1154316-5-john.garry@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260921083752.1154316-1-john.garry@linux.dev>
 References: <20260921083752.1154316-1-john.garry@linux.dev>
@@ -51,78 +51,140 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To fix diskstats per partition, it is required that the per-path disk
-actually has an up-to-date partition table. This partition table would be
-a clone of the head disk partition table.
+Currently diskstats for partitions are never updated:
+$ ./fio_read nvme1n1p1 # run traffic on /dev/nvme1n1p1
+...
+$ more /proc/diskstats | grep nvme1
+259       2 nvme1c1n1 49857 0 400344 768565 0 0 0 0 0 2334 768565 0 0 0 0 0 0
+259       3 nvme1n1 99710 0 800680 1599285 0 0 0 0 0 2346 1599285 0 0 0 0 0 0
+259       5 nvme1n1p1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+259       4 nvme1c2n1 49853 0 400336 831472 0 0 0 0 0 2315 831472 0 0 0 0 0 0
 
-At two points the partition table needs to be updated:
-- when the per-path disk is added in nvme_mpath_add_disk()
-- for partition table updates to the head disk, add
-  nvme_ns_head_disk_changed() to clone the partition table to per-path
-  disks
+This is because we only ever update the diskstats for the multipath disk in
+nvme_mpath_end_request(), and we never take into account that the original
+bi_bdev may been a partition of this disk.
+
+Functions bdev_start_io_acct() and bdev_start_io_acct() do handle
+updating diskstats for a partition, in that they also update the whole
+disk also (if a partition), so use the partition (if applicable) when
+calling those functions.
+
+Change any functionality which used to lookup the gendisk part0 to now
+lookup the specific gendisk partition.
 
 Signed-off-by: John Garry <john.garry@linux.dev>
 ---
- drivers/nvme/host/multipath.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ drivers/nvme/host/multipath.c | 51 ++++++++++++++++++++++++++++-------
+ 1 file changed, 41 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 75dbb58286a3..e871ad40d893 100644
+index e871ad40d893..2969c0e5187c 100644
 --- a/drivers/nvme/host/multipath.c
 +++ b/drivers/nvme/host/multipath.c
-@@ -623,6 +623,23 @@ static int nvme_ns_head_report_zones(struct gendisk *disk, sector_t sector,
- #define nvme_ns_head_report_zones	NULL
- #endif /* CONFIG_BLK_DEV_ZONED */
+@@ -144,6 +144,23 @@ void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
+ 			blk_freeze_queue_start(h->disk->queue);
+ }
  
-+static void nvme_ns_head_disk_changed(struct gendisk *disk)
++static struct block_device *nvme_disk_to_part(struct gendisk *disk,
++						u8 partno)
 +{
-+	struct nvme_ns_head *head = disk->private_data;
-+	struct nvme_ns *ns;
-+	int srcu_idx;
-+
-+	lockdep_assert_held(&disk->open_mutex);
-+
-+	srcu_idx = srcu_read_lock(&head->srcu);
-+	list_for_each_entry_srcu(ns, &head->list, siblings,
-+				 srcu_read_lock_held(&head->srcu)) {
-+		if (bdev_clone_partitions(head->disk, ns->disk))
-+			clear_bit(NVME_NS_READY, &ns->flags);
-+	}
-+	srcu_read_unlock(&head->srcu, srcu_idx);
++	/* Quick lookup for whole disk */
++	if (!partno)
++		return disk->part0;
++	return xa_load(&disk->part_tbl, partno);
 +}
 +
- const struct block_device_operations nvme_ns_head_ops = {
- 	.owner		= THIS_MODULE,
- 	.submit_bio	= nvme_ns_head_submit_bio,
-@@ -634,6 +651,7 @@ const struct block_device_operations nvme_ns_head_ops = {
- 	.get_unique_id	= nvme_ns_head_get_unique_id,
- 	.report_zones	= nvme_ns_head_report_zones,
- 	.pr_ops		= &nvme_pr_ops,
-+	.disk_changed_notify	= nvme_ns_head_disk_changed,
- };
- 
- static const struct file_operations nvme_ns_head_chr_fops = {
-@@ -1360,6 +1378,20 @@ void nvme_mpath_remove_sysfs_link(struct nvme_ns *ns)
- 
- void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid)
++static struct block_device *nvme_to_disk_part(struct gendisk *disk,
++					struct block_device *bdev)
++{
++	if (!bdev)
++		return disk->part0;
++	return nvme_disk_to_part(disk, bdev_partno(bdev));
++}
++
+ void nvme_failover_req(struct request *req)
  {
-+	struct nvme_ns_head *head = ns->head;
-+	int ret;
-+
-+	if (!head->disk)
-+		return;
-+
-+	mutex_lock(&head->disk->open_mutex);
-+	ret = bdev_clone_partitions(head->disk, ns->disk);
-+	mutex_unlock(&head->disk->open_mutex);
-+	if (ret) {
-+		clear_bit(NVME_NS_READY, &ns->flags);
-+		return;
+ 	struct nvme_ns *ns = req->q->queuedata;
+@@ -165,8 +182,10 @@ void nvme_failover_req(struct request *req)
+ 	}
+ 
+ 	spin_lock_irqsave(&ns->head->requeue_lock, flags);
+-	for (bio = req->bio; bio; bio = bio->bi_next)
+-		bio_set_dev(bio, ns->head->disk->part0);
++	for (bio = req->bio; bio; bio = bio->bi_next) {
++		bio_set_dev(bio, nvme_to_disk_part(ns->head->disk,
++				bio->bi_bdev));
 +	}
+ 	blk_steal_bios(&ns->head->requeue_list, req);
+ 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
+ 
+@@ -194,8 +213,9 @@ void nvme_mpath_start_request(struct request *rq)
+ 		return;
+ 
+ 	nvme_req(rq)->flags |= NVME_MPATH_IO_STATS;
+-	nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0, req_op(rq),
+-						      jiffies);
++	nvme_req(rq)->start_time = bdev_start_io_acct(
++			nvme_to_disk_part(disk, rq->part),
++			req_op(rq), jiffies);
+ }
+ EXPORT_SYMBOL_GPL(nvme_mpath_start_request);
+ 
+@@ -208,7 +228,8 @@ void nvme_mpath_end_request(struct request *rq)
+ 
+ 	if (!(nvme_req(rq)->flags & NVME_MPATH_IO_STATS))
+ 		return;
+-	bdev_end_io_acct(ns->head->disk->part0, req_op(rq),
++	bdev_end_io_acct(nvme_to_disk_part(ns->head->disk,
++			 rq->part), req_op(rq),
+ 			 blk_rq_bytes(rq) >> SECTOR_SHIFT,
+ 			 nvme_req(rq)->start_time);
+ }
+@@ -530,11 +551,21 @@ static bool nvme_available_path(struct nvme_ns_head *head)
+ 	return nvme_mpath_queue_if_no_path(head);
+ }
+ 
++static struct block_device *nvme_find_path_bdev(struct nvme_ns_head *head,
++						u8 partno)
++{
++	struct nvme_ns *ns = nvme_find_path(head);
 +
- 	if (nvme_ctrl_use_ana(ns->ctrl)) {
- 		struct nvme_ana_group_desc desc = {
- 			.grpid = anagrpid,
++	if (!ns)
++		return NULL;
++	return nvme_disk_to_part(ns->disk, partno);
++}
++
+ static void nvme_ns_head_submit_bio(struct bio *bio)
+ {
+ 	struct nvme_ns_head *head = bio->bi_bdev->bd_disk->private_data;
+ 	struct device *dev = disk_to_dev(head->disk);
+-	struct nvme_ns *ns;
++	struct block_device *bdev;
+ 	int srcu_idx;
+ 
+ 	/*
+@@ -547,9 +578,9 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
+ 		return;
+ 
+ 	srcu_idx = srcu_read_lock(&head->srcu);
+-	ns = nvme_find_path(head);
+-	if (likely(ns)) {
+-		bio_set_dev(bio, ns->disk->part0);
++	bdev = nvme_find_path_bdev(head, bdev_partno(bio->bi_bdev));
++	if (likely(bdev)) {
++		bio_set_dev(bio, bdev);
+ 		/*
+ 		 * Use BIO_REMAPPED to skip bio_check_eod() when this bio
+ 		 * enters submit_bio_noacct() for the per-path device. The EOD
+@@ -557,7 +588,7 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
+ 		 */
+ 		bio_set_flag(bio, BIO_REMAPPED);
+ 		bio->bi_opf |= REQ_NVME_MPATH;
+-		trace_block_bio_remap(bio, disk_devt(ns->head->disk),
++		trace_block_bio_remap(bio, disk_devt(head->disk),
+ 				      bio->bi_iter.bi_sector);
+ 		submit_bio_noacct(bio);
+ 	} else if (nvme_available_path(head)) {
 -- 
 2.43.0
 
