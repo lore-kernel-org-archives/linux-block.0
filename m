@@ -1,96 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-214.mta1.migadu.com [95.215.58.214])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1073AE1BD;
-	Mon, 21 Sep 2026 08:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32DE390987
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 08:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.214
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789979102; cv=none; b=OUm8KBKNUDvRRLB2vdln7bv6WOrRT23E+KPK0Gcf/4m1p2qIx1jJtWEYjEgB7ig8wfRGYzvMMt++NZnp/70aVlW9AMFv1oQgRD3UvY5lkJC+UDFxc2nkrUi5JLAGOAcM28uBHWlBDHfBBh+Ib3wu9sZ9XMQb1qWk3TSgwDS+kms=
+	t=1789979896; cv=none; b=YZBg/6ECauujgTqBEgzYcE+vDXTFB+C2mb5IMe0ReNdgAD8BVvuB7lmxMvhEozzZ8jGuy+wpSw0mYPKwIj//QYkSyd69L3LXhcOoE/Lba+vY0bAG99yMfPMw8BEppVecc4I1+jX7fVeeR1uWm5AOFWDpYQbIStfRTpCibebEheI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789979102; c=relaxed/simple;
-	bh=3t0e3F4VfslWuBdGcVFQ9hUz411uxVQF1KTgMoLo1JA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ltvjiypRYOIwdLVA4JYHCHtTuRqs37KVXLdxR8C0ag6Ne77c4/N9hD+BfpVBu4EK1o7L5xnh+dp/gdxcvLp6kYfa1GTPPX8/kHXTyI493NQDRxA4Dw9zlH9fVSPd2LuK4m8TDq3ZGyIS16OH8tUoizBHpfAu/ovs+fTgPP9A8x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZLu7BZBz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789979896; c=relaxed/simple;
+	bh=DIJ7cgApn0K70wpDhKxctu+FTAf8hiJPt+G9sqtwaG4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=skegG1ctxApK1H9EfLBRMxVEE0fJDuWHQGNaSuYafavsR1ww+wQtUKfhVfK1r/jmvja/j/xGY41ilDrZsVj7uyLm9k/PI6LgC/UANCKmxYhlm88Gpoc71qC7aujaJoNQ3YK5CDLZ3pQZPvO5aO6LJTlMGKvPXxCmP2xBpGpQiKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pRoccNxk; arc=none smtp.client-ip=95.215.58.214
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZLu7BZBz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB3FA1F000FF;
-	Mon, 21 Sep 2026 08:25:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789979100;
-	bh=xDdoMFVwkZuW5V48Pj4XfLchh/Rg4wCVY3CUXYAw3dI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZLu7BZBzgbOtkBRYnS1jyz7lI68Te+SShWBVJmQ408j4cm2Un5eSZhZJY46quBPwq
-	 WMd2zAybk8IZrd1TuYXNAyfyxQiQoVDVCUZVZKwTqraNDEMb2712W59NqEtk6VqHtz
-	 YxcpgTr0PdGE7Ek3bKDzk7lxVzZOcOJ5UYMGXxIrM2xHODFXbV2wYt6L8X9MEcZUb3
-	 0edk4OjL6Vec0pgNbiCVRj/8W1PUzSENzav88HRWaLFt71blacDltBd8CFFREfjDv/
-	 xL6bJaHer/fpCVHZG6nuD1xReEn3SeAqXnMmDgjtkiEM/C6UfM3lOYnQV33BpU66VR
-	 wOxfTMuC531QA==
-Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
-	id E91BC1AC52F3; Mon, 21 Sep 2026 09:24:46 +0100 (BST)
-Date: Mon, 21 Sep 2026 10:24:46 +0200
-From: Mark Brown <broonie@kernel.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Tao Cui <cui.tao@linux.dev>, linux-next@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	cuitao@kylinos.cn
-Subject: Re: next-20260917 and next-20260918: merge of the block tree breaks
- all zoned devices
-Message-ID: <arDpzvyInLOK8MJv@sirena.co.uk>
-References: <20260920125846.1806521-1-cui.tao@linux.dev>
- <20260920231226.771a0e21@canb.auug.org.au>
- <aq_5QycDLgQGCc86@sirena.org.uk>
- <d97685b3-f22c-4a27-a7d7-24b2ac7dfbe6@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pRoccNxk"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=DIJ7cgApn0K70wpDhKxctu+FTAf8hiJPt+G9sqtwaG4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789979891; v=1; x=1790584691;
+ b=pRoccNxkS2OUoRDeN0e29rvPMV+Sj1w56a3tNWcQFuWgiYpeIkNRoLjeTJ6ns1E8s0cG05JM
+ kPjN/uvFfkAZyrcFHIDrXpM2jVdH4tScPanwb3pIE6KPf2nyutwX1PCvcgRz6Whgj2oG/TyFosO
+ 8wi2NArAEh290CQgb7zdTY4Q=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by mta11.migadu.com with ESMTPS id 5dd44f618b7d12b2;
+	Mon, 21 Sep 2026 08:38:11 +0000
+X-Mizu-Trace-ID: 5dd44f618b7d12b2
+X-Migadu-Flow: FLOW_OUT
+From: John Garry <john.garry@linux.dev>
+To: axboe@kernel.dk,
+	kbusch@kernel.org,
+	sagi@grimberg.me,
+	hch@lst.de
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	John Garry <john.garry@linux.dev>
+Subject: [PATCH v4 0/4] fix NVMe multipath partition diskstats
+Date: Mon, 21 Sep 2026 09:37:48 +0100
+Message-ID: <20260921083752.1154316-1-john.garry@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="N14GSpgRFIvMtJQm"
-Content-Disposition: inline
-In-Reply-To: <d97685b3-f22c-4a27-a7d7-24b2ac7dfbe6@kernel.org>
-X-Cookie: Too clever is dumb.
+Content-Transfer-Encoding: 8bit
 
 
---N14GSpgRFIvMtJQm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Currently the NVMe multipath partition diskstats are not maintained.
+This is because the functionality to update the diskstats only updates
+for the whole disk (and not per partition).
 
-On Mon, Sep 21, 2026 at 07:37:58AM +0900, Damien Le Moal wrote:
-> On 9/21/26 00:18, Mark Brown wrote:
+As an example:
+$ ./fio_read nvme1n1p1 # run traffic on /dev/nvme1n1p1
+...
+$ more /proc/diskstats | grep nvme1
+ 259       2 nvme1c1n1 49857 0 400344 768565 0 0 0 0 0 2334 768565 0 0 0 0 0 0
+ 259       3 nvme1n1 99710 0 800680 1599285 0 0 0 0 0 2346 1599285 0 0 0 0 0 0
+ 259       5 nvme1n1p1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 259       4 nvme1c2n1 49853 0 400336 831472 0 0 0 0 0 2315 831472 0 0 0 0 0 0
 
-> > I did say when I did that merge that I had no confidence in it but
-> > nobody responded.  Can you please send me a commit on top of current
-> > -next which fixes up the resolution appropriately?  I can drop extra
-> > fixups in relatively easily, it's probably safer to take something that
-> > you have tested.
+Notice how all values are 0 for nvme1n1p1.
 
-> My apologies for not replying, but I was traveling. I had looked at your
-> resolution but only quickly and I did not notice the incorrect comparison
-> causing the issue.
+This series addresses that problem by first updating the gendisk code to
+create the partition table for hidden disks, as suggested by Keith.
 
-No worries, stuff happens - I was just surprised nobody complained about
-the merge TBH.
+This is done by cloning the partition table from the multipath disk.
 
-> I am attaching a diff that cleans up the conflict resolution.
+Secondly the NVMe multipath functionality to handle the diskstats is
+modified to handle the gendisk partition, by looking up this partition
+from the per-path disk partition.
 
-Thanks, that should appear in today's -next all being well.
+Difference to v3:
+- Add block device operation disk changed CB
 
---N14GSpgRFIvMtJQm
-Content-Type: application/pgp-signature; name="signature.asc"
+Difference to v2:
+- don't scan per-path disk, and clone from multipath disk instead
 
------BEGIN PGP SIGNATURE-----
+John Garry (4):
+  block: support cloning partitions
+  block: don't show partition diskstats for GENHD_FL_HIDDEN
+  nvme-multipath: clone head disk partitions to per-path disks
+  nvme-multipath: fix diskstats for partitions
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqw6c4ACgkQJNaLcl1U
-h9CplAf/eIQ8mfAEfonr2Nm3JP5mKLLDAqCKMM/1CZOfX8TN8WtiZF2NX5wenGtG
-5hEokmB96wvwYEAPJzIvRncGbZF2D6TYCBE2HgCQHVGv8B3x92AlAD0P84BHrr6+
-emDw6o4BJxblut5W9CV8gFxIGoMoSepi87m9W/c6LW3aYQRcCdZ4JTTPdZO6U6Qt
-nKktxnZWj6E/uVwNK88IpWMEUmiPB1f1k194qTK5wkIl60kZskNLrEa+pZZJplUi
-ElqeYkuUbke7A1iF1tYpc94jAnw8Cdybh4jlLUanjq+ERmEkhllGn9jhBReQlQzc
-xZHNS/Wz+hbYryqa6ZiJCiTVCeMoYQ==
-=Xlur
------END PGP SIGNATURE-----
+ block/genhd.c                 |  3 +-
+ block/partitions/core.c       | 43 ++++++++++++++++++
+ drivers/nvme/host/multipath.c | 83 ++++++++++++++++++++++++++++++-----
+ include/linux/blkdev.h        |  2 +
+ 4 files changed, 120 insertions(+), 11 deletions(-)
 
---N14GSpgRFIvMtJQm--
+-- 
+2.43.0
+
