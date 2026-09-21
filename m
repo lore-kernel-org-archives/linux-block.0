@@ -1,87 +1,173 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC3B3451C8;
-	Mon, 21 Sep 2026 17:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E45B4C10D1;
+	Mon, 21 Sep 2026 17:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790012461; cv=none; b=CX1hKk4xsXcP9HwF+shNYZBPHTivR+wbPlsyb3hhxnIfSx/F0B7laYLs7iBnesRXwSkfvmD9PoX85x2ghhCDyAmvApxWX17MkTXFsIlsNRsh6FjoLjRtZLRhDmJKOAE/NeDabgVEVp/SNZUfQUDlOjvtz74i9Pm+oPrfetHtK9Y=
+	t=1790013483; cv=none; b=T0LwsbojI20UAoXb7qesBiKE5MtdLMmSBfaLQuz5pDpm8Jug3VNj13OD0CzVWXjkc3IBA53V/BiyHGOxF69UavTzQMagt+B7LcvN6VdSO4VVIaRbgK28U5cydAWJjvXDMiOv7aeAavnmfQFiGoL15BGWyFBPVVacuFS7r1p6g7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790012461; c=relaxed/simple;
-	bh=W2sTmF0h9eTycZzHaHETeYfrC2ve1SdmSUXNjWH6ogQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QwfjoLFnZaNILe2XdTLP8yxK5Rx0H9yDXEDAI6UQu16tF4ZXy7lPkzrUsTrGLzbamLVuXIEd3CrR2rYi5Ar4u9T88TRqPGNYiBmKTTFT3MV/gIwASwkveI5IVJo/ZvhOZF5liBlnMHSk74NGMw6siDXWSgcJiNN3h+GD+t5lYxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SqjCY2BA; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1790013483; c=relaxed/simple;
+	bh=ACnVqDRu9L4EX0PIQzq+ln5rZQhr/h9DYNn8XFGJUm8=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PSmAaMr63TIImloQBey7PlsTzEu9Q8Lea+xGZucoESd88z9lbuC64RO2MNlEHcx0b3zct4FZsVNfqWFyaq89h0YkUr1avJWWg65J7n7er8nJW/dEUCh0JGUMxhAlxF1RbFgZpJzbHGOuM386a9jGJlXJ9Ast31TuzXMsq2kMcbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/sDK9og; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SqjCY2BA"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hpVrV1jf7z1XM4Tn;
-	Mon, 21 Sep 2026 17:40:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1790012453; x=1792604454; bh=s/qD/yP/nZKgimxLxhrVpNeL
-	GX+y2IvysHmu+C1EYSM=; b=SqjCY2BAbY3RwG90NYkFu0VK3XdJcImidrz08Mkt
-	bfamCEd5wlSkLCMrOvA3RqhlcDTeqxwJJHINBz9uEgqN0lWexSBFlvIls58maqPG
-	SlOOGQURLq3XwzDB4Ey0SN/k+o1nZH8gVZW7JxJBYTBcnXh2URuYayYvdXDOR07Q
-	i2t0DrmgnMhmkfH//prYw+sRZMtDU3aslcQlOL2ZwBtzdhFVk83H5LZQ+6QmVmBU
-	PJ3C0UH2T4IzX8p1XI+tEfNu8f2Hzg71hQhIXYp+qPC+oENdfMyNHzbhwoauJvWd
-	tEwQYEwvqGxa96BMtDK8cqkjQuTy+zAC3m2MHJyd5NmMnw==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id h97cIMHrh7yp; Mon, 21 Sep 2026 17:40:53 +0000 (UTC)
-Received: from [100.80.231.125] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hpVrN0JtRz1XM4TB;
-	Mon, 21 Sep 2026 17:40:51 +0000 (UTC)
-Message-ID: <a7ee4ea1-c255-4613-a4cd-aa20400b8756@acm.org>
-Date: Mon, 21 Sep 2026 10:40:51 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/sDK9og"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 904521F000FF;
+	Mon, 21 Sep 2026 17:58:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790013481;
+	bh=VrEKRxhpsxO4YB1Z88WoC1VfhzGFQ3EMsTjDujrRO+w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=R/sDK9ogDpGJxJewL8iIUth9DWQnev+2MEzZXFhD0YypTxIon+lddkV/B5MiXsboO
+	 byMrkKP0wfUx7XngMjTu9nAl2JaQK7zF3Phju/+ez58bU954kYLbxc8z3/4Vc0WgzQ
+	 KOftHb5AUK5N9gFffvyEvRM47sRdl27CRx18LUuqQktKtMjB9/XICkbjwojAmHMCx0
+	 IOUpxI7tR5Dak2iI8yZqV+B2DzvoXQOeYv7BXJA3uNEFbHCW1NXGE79SgsXboqYDFB
+	 G+yzrNcbI31AM4MpDGbVDD6WgYVtVj6uG6HlTqlFELJEHb+bHt6BsCAnyTE5hCf2DX
+	 y4CbMiaMOzh0w==
+Message-ID: <b15c63490f9164bf46d68ff3ec5dfc02@kernel.org>
+From: Tejun Heo <tj@kernel.org>
+To: Julian Sun <sunjunchao@bytedance.com>
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hannes@cmpxchg.org,
+ mhocko@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev,
+ muchun.song@linux.dev, willy@infradead.org, jack@suse.cz, tj@kernel.org,
+ akpm@linux-foundation.org
+Subject: Re: [PATCH v7 2/3] memcg,writeback: flush foreign bdev mappings
+ separately from owner wbs
+Date: Mon, 21 Sep 2026 07:55:17 -1000
+In-Reply-To: <20260921120658.1627992-3-sunjunchao@bytedance.com>
+References: <20260921120658.1627992-1-sunjunchao@bytedance.com>
+ <20260921120658.1627992-3-sunjunchao@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] loop: defer the queue limits clear to a workqueue
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: cuitao@kylinos.cn, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260919104700.1578247-1-cui.tao@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260919104700.1578247-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On 9/19/26 3:47 AM, Tao Cui wrote:
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 9f6e518e60d28..d6460f359c0a8 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -68,9 +68,10 @@ struct loop_device {
->   	struct list_head        idle_worker_list;
->   	struct rb_root          worker_tree;
->   	struct work_struct      clear_limits_work;
-> -	atomic_t		clear_limits_mode;
-> -	atomic_t		rebind_gen;
-> -	atomic_t		clear_limits_gen;
-> +	struct mutex		clear_limits_lock;
-> +	unsigned int		clear_limits_mode;
-> +	unsigned int		rebind_gen;
-> +	unsigned int		clear_limits_gen;
+Hello, Julian.
 
-This patch has been generated as a diff compared to v3. Please make sure
-that your patch applies cleanly to Jens' for-next branch.
+This is an AI review. The series was built here, and the bdev reference
+across a racing last close and disk removal, the slot races, and the
+css_free ordering were traced and look correct. Two behavioral notes and
+some description and comment fixups.
 
-Thanks,
+On Mon, Sep 21, 2026 at 08:06:57PM +0800, Julian Sun wrote:
+> Use fixed per-memcg slots. Tracking is best effort: record only dev_t
 
-Bart.
+The slot policy this version adopted, oldest-first replacement, expiry
+after dirty_expire_interval, and re-arming when the mapping is dirtied
+while a flush is in flight, isn't stated anywhere. Can you add a sentence?
+
+> If allocation fails, retain the existing foreign-wb path.
+
+Andrew found this unclear on v6 and the subject is still implied. Something
+like "If the workqueue can't be allocated at boot, bdev inodes keep using
+the existing foreign-wb path."?
+
+> This primarily affects filesystems that keep metadata in the bdev page
+> cache, such as ext4 and other buffer_head users, rather than the usual
+
+The branch keys on sb_is_blkdev_sb(), so buffered writers of raw block
+devices are covered too whenever the bdev inode's wb belongs to another
+cgroup. Worth a mention.
+
+> +struct bdev_frn_flush_ctx {
+> +	struct work_struct work;
+> +	dev_t dev;			/* for bdev inode, device hint */
+> +	u64 at;				/* last recorded dirtying time in jiffies */
+> +	atomic_t inflight;
+> +};
+
+It sits next to memcg_cgwb_frn and is memcg's, so maybe memcg_bdev_frn?
+"for bdev inode, device hint" doesn't say what the value is. Following the
+sibling's comments, "dev_t of the foreign bdev inode", and @inflight could
+use one too.
+
+> + * For non-bdev inodes, when a foreign page - a page whose memcg and
+> + * writeback ownerships don't match - is dirtied,
+> + * mem_cgroup_track_foreign_dirty() records the inode owning bdi_writeback
+> + * on the page owning memcg. When balance_dirty_pages() decides that the
+> + * memcg needs to sleep due to high dirty ratio, it calls
+>   * mem_cgroup_flush_foreign() which queues writeback on the recorded
+>   * foreign bdi_writebacks which haven't expired.  Both the numbers of
+>   * recorded bdi_writebacks and concurrent in-flight foreign writebacks are
+>   * limited to MEMCG_CGWB_FRN_CNT.
+
+The flush sentence and the slot limit apply to both paths now, so the "For
+non-bdev inodes" scoping reads wrong. Maybe keep the original paragraph and
+let the new one state only the difference: separate MEMCG_CGWB_FRN_CNT
+slots keyed by dev_t, flushing only the bdev mapping, same expiry.
+
+> + * These wb/bdev_inodes records only remember IDs and don't hold any object
+> + * references. As being wrong occasionally doesn't matter, updates and
+> + * accesses to the records are lockless and racy.
+
+The paragraph above already says the bdev records hold no references, and
+"wb/bdev_inodes records" doesn't parse. "Both kinds of records only
+remember IDs ..." would do.
+
+> +	if (memcg_bdev_frn_wq && bdev_inode &&
+> +	    sb_is_blkdev_sb(bdev_inode->i_sb)) {
+> +		mem_cgroup_track_foreign_bdev(memcg, bdev_inode->i_rdev);
+> +		return;
+> +	}
+>
+>  	trace_track_foreign_dirty(folio, wb);
+
+With this patch alone, foreign dirtying of a bdev folio no longer hits
+track_foreign_dirty at all and patch 3 adds the call back inside the
+branch. Can you keep the tracepoint firing on the bdev path here so that
+patch 3 only adds the argument? Also, @bdev_inode can't be NULL:
+__folio_mark_dirty() checked folio->mapping under the same lock and
+folio_account_dirtied() already dereferenced mapping->host.
+
+> +static void bdev_frn_flush_work(struct work_struct *work)
+> +{
+> +	struct bdev_frn_flush_ctx *ctx =
+> +		container_of(work, struct bdev_frn_flush_ctx, work);
+> +
+> +	bdev_flush_by_dev(ctx->dev);
+> +
+> +	atomic_set(&ctx->inflight, 0);
+> +}
+
+The in-flight window is now just the submission of the bdev mapping, and
+mem_cgroup_flush_foreign() runs on every throttle-loop iteration, so a
+memcg that keeps dirtying and throttling requeues the flush back to back.
+A folio the flush redirties, e.g. a buffer locked by a jbd2 checkpoint
+write, re-stamps the slot on its own. The old record stayed in flight for
+the whole owner-wb work. With a journal the write cadence of hot metadata
+is still bounded by the commit interval, but for nojournal ext4 and other
+buffer_head users it's bounded only by the throttle pause, for every
+tenant of the filesystem while any tenant throttles. Not measured. The
+description covers the target size but not the cadence.
+
+Each pass also goes through wbc_attach_fdatawrite_inode() and
+wbc_detach_inode(), so it votes in the bdev inode's wb-switch detection
+like the owner-wb flush did, at the higher pass rate. Whether the bdev
+inode ends up switching wbs more often is an open question.
+
+> +		if (memcg_bdev_frn_wq && time_after64(ctx->at, now - intv) &&
+> +		    atomic_cmpxchg(&ctx->inflight, 0, 1) == 0) {
+
+Records are only created when the workqueue exists and @at stays 0
+otherwise, so the wq test can't be false with a live record. Fine as
+documentation, but the cover lists it as a fix.
+
+> +		INIT_WORK(&ctx->work, bdev_frn_flush_work);
+> +		atomic_set(&ctx->inflight, 0);
+
+memcg is zero-allocated, so the atomic_set() isn't needed.
+
+On patch 1, the kerneldoc's "does not wait for all I/O to complete"
+understates it, the flush waits for nothing.
+
+Thanks.
+
+--
+tejun
