@@ -1,164 +1,130 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3989444A730;
-	Mon, 21 Sep 2026 08:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42045D918
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 09:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789981191; cv=none; b=Eu0CxVmU4kB2v1DoFDqzZj43LqwlubV449KvTVJmqvrYjPnIyQlzY9Etec3fnUFnzbV6DBudmbvCI9Mn/gLcyXyRkHU2/pxg9C5L8ALFatIx/eVIKZ5tj3gz3HdROdLNGk+keSd2RPOTOCfmzCOjqDegsYzDcX0gWsg5/8thskM=
+	t=1789981968; cv=none; b=NX4wTUuw2Y21CALIm7k8HQ0Nmy/JDaWzKA9uGiyY/vsqy0Qb/OvmnRQFHB9mfelS/xs+22ehuCKJzwYUEhvQJHFPY2kEOoyL3vZ1N3nYEBoYkkkcn0X8Z+w4CwPAVLK4caLzSGB9MiVZYTqNIHj9sqTayfmMfn9bLfpLBjFUtMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789981191; c=relaxed/simple;
-	bh=9NTPFYO9+TwpiFyel6iI5IaZzEyVbH2xHZ8DKrUFgcE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOhWwyD6X/tOGuYT7/DT41VfqqYi/TnRfpvF7d7TRW2fvyTAIlhchwA9l2WaOTtgUrNQi01awf1886Jog1/iRSFIEhVmoQRwPd7KayyP7dZEq3dFNmxJvhSdeMAZN7/tzK56NkCsCRGMyWCFpVlWTo3Dnvq7ejtywq7eEeGwICc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MUsNe7Kk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=z9XLB6OO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YEh/A/mp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fdKth+eR; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MUsNe7Kk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="z9XLB6OO";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YEh/A/mp";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fdKth+eR"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EB423219F1;
-	Mon, 21 Sep 2026 08:59:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1789981184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D+WgP2p/OiA1lkjOPB9vNnBxmDRzRFy6x4ytQkZ9Ado=;
-	b=MUsNe7KkebeCHmLt5iJ25kUikW9GHNuuFF+PlA9eaF+imC7mHXq7h4BQwJoAxrN7xABQM1
-	8YiXcJn7QjNGOnt1JCgf6fxl7JIKqD0oH1Rne2slQOoHpNu2XW7vUMsEK8zM9Wv3FVk818
-	O1KCjFo4xwg4nn8xZIuBGyy3vxdxA8A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1789981184;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D+WgP2p/OiA1lkjOPB9vNnBxmDRzRFy6x4ytQkZ9Ado=;
-	b=z9XLB6OO24pARwQcwM/FHPvuzVVlQU00HIinXhxVNSHj6xm4ieVN+/LR/k3ckxjjUleCR7
-	Bmio0r8NaNPpilBA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="YEh/A/mp";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=fdKth+eR
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1789981179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D+WgP2p/OiA1lkjOPB9vNnBxmDRzRFy6x4ytQkZ9Ado=;
-	b=YEh/A/mp9UzZq0Zd+ZI+ANdSNYrgyoSzEDoLLmgKwWiFaabq0gKI1EDq/cNTKNmeNAcVSj
-	Y9zbMdwbtO2RtbaIBG7RT299Cde93fms7ABcoWbHEQlp8qJ+q2zkxbZqpb28xeBegKNgzM
-	gj3Rq24A4G9FQVfnFauJ/PyJWXCoBiA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1789981179;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D+WgP2p/OiA1lkjOPB9vNnBxmDRzRFy6x4ytQkZ9Ado=;
-	b=fdKth+eRdjmNvPVjr79A27/fTRk+FYnr0hgjMDyFxQC9lEUOwYF/I0nRr+6Yc4Ybx7mhGr
-	wFZbc3Wf1xBMcqBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 944FD13793;
-	Mon, 21 Sep 2026 08:59:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id BRbxFfvxsGouWQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 21 Sep 2026 08:59:39 +0000
-Message-ID: <ad45110f-2497-43e7-9846-3e2dc56c6079@suse.de>
-Date: Mon, 21 Sep 2026 10:59:38 +0200
+	s=arc-20240116; t=1789981968; c=relaxed/simple;
+	bh=3Xw1p8G0AHRqUmNK3rQ94pM9U+fqhG0AXQrTKQWNS94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fRnK50tSUEI0bMUPvFQMw+lLu8HKBWkZtMu0njwsWgzylKfbqz3Cp8YGJMkORHpH3u+g5WPbpTDV9EIMGfTlMuhXLzHN5r/6piP3bROPFpW/A304Gg5wLlK+2bf4Ez7b3HiFniwF3pIAkOD03pNGSW4YOCqRrM20wSrHQ4ZUGN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=0b1t.tech; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.230.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=0b1t.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-52fb76ec395so23980701cf.2
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 02:12:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789981965; x=1790586765;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=PgveYix98Rp2X24AFbGYCW9BQGFKiOVojzHndnJC0kc=;
+        b=Qy7HfmziCovgrnMBs3f/jzH1FrxxdqpWqiQPmAHDOCYvL3VclPmC5hGUs9QEpHx7Af
+         svFAVdGQND1YCDe6Jan3qz5Q+qCHw78cidZLB/FYj08iTO8zT2SmDMqw21/qDXGr5KNQ
+         9tmwl9cBcsCFMBM6LAcTixN+wsEzm+HtmIriVFH9KTGt2oqjJnWWK/bvKPEwqnYGd1YK
+         ztJpQEHL8Axd0TBhjI7UOUF9IV0mvABYGCoYWung5h2lXGBmPj0CeEwgxVRfB9A72Z0O
+         M5raGUjJVSPhyOnPtjRBPgy//wtoH6u6tcPd3nIQjbJrlzIS2ZIjrmOV5r3I3Ia7N5Fz
+         0YKw==
+X-Gm-Message-State: AFuF++lX3wN28Fj2ECNFB5lgUNomg8lrEy6tAqyHQo5q4CXpWEpkza/6
+	NQX2ZhljdXhgvO1Dy43arScl1MAsRWgC5M+ceAAA3/OUW/wIF5DjlllYZYnvIgJj7KQ=
+X-Gm-Gg: AYBFou1ccQZv0mbFck2OCwiJJHn1zht0vjMfm0xwM68oVkUcA8eAE+TtFb5vUOrGimw
+	kxaAXNtrHke9ekq9alBHHJwXUxoLWn6KOzOHkGekhuXqur64irDY/hu66BFrOAvzXmw6wT71Xwd
+	55cyDRCOOw79r2n0Tc+fkETjgoHeyIXqhtZYUi0YCLMRlwiPcZNLcFBLBjx2aB7K+mEgYrbHd4E
+	XSfYM1yAy7DTkETa12cFru9UCsQmT47eaMj1tnv/cr4MVlaDvazjDHVgLgBmtgd4gEed0kW6DKN
+	nKH5DobGVTsTeaRDcrohY4JzhXdMCXx0/nxG8wQik2bRJv5jNWfYtvUq3umPGFGiwNGIMbicTtB
+	w/gFhlDg3dZteVgyN34D2XrEksk1hZTxto/ht7Sz7FZzwHTLKJ4DQSeRvVVN2DY+/M83JcMgraw
+	Hi+VYKfrAhmg6RCkWyfAf+QQPC0etYbp5hrQZR5z/xQEWcSYoY1BwJa5N3/5XCAhXQ2+C8C83d6
+	MNn1Z8zVq/gOBzwH5GKTApc2pPQ
+X-Received: by 2002:ac8:5a89:0:b0:530:f8f6:4ded with SMTP id d75a77b69052e-532b7362febmr92506811cf.56.1789981965377;
+        Mon, 21 Sep 2026 02:12:45 -0700 (PDT)
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com. [74.125.230.205])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-532ae5e91dfsm59195291cf.7.2026.09.21.02.12.45
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Sep 2026 02:12:45 -0700 (PDT)
+Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-530d0d5ae11so29753061cf.0
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 02:12:45 -0700 (PDT)
+X-Received: by 2002:a05:620a:2311:10b0:93b:fb3c:2d09 with SMTP id
+ af79cd13be357-93bfb3c2d27mr518547385a.66.1789981964786; Mon, 21 Sep 2026
+ 02:12:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ublk: consequences of a dead server are only failing on the last
- /dev/ublkcN release
-To: Ming Lei <tom.leiming@gmail.com>, Christian Brauner <brauner@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, Chris Mason <mason@kernel.org>
-References: <20260918-eisbrecher-toilette-worum-eb11f777c563@brauner>
- <aq_iJpAgRi9ZfnOg@fedora-laptop>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aq_iJpAgRi9ZfnOg@fedora-laptop>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -5.51
-X-Rspamd-Queue-Id: EB423219F1
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	DWL_DNSWL_LOW(-1.00)[suse.de:dkim];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
+References: <CAKTh27_iPvKWV8_bLMwwhEZAD+XPXimBdpz4D8iuue8mSh2A=g@mail.gmail.com>
+In-Reply-To: <CAKTh27_iPvKWV8_bLMwwhEZAD+XPXimBdpz4D8iuue8mSh2A=g@mail.gmail.com>
+From: 0wnerD1ed <l7z@0b1t.tech>
+Date: Mon, 21 Sep 2026 17:12:31 +0800
+X-Gmail-Original-Message-ID: <CAKTh279TUXfzjd52aY7op+TL5VihhXJvy=JSp5mjXz=r272FcQ@mail.gmail.com>
+X-Gm-Features: AcwNN1XS36jXZjKcvaM-VP5y4pPZnoWFCKHbsi2tsaezrDgCcV3qkf960Kvee8o
+Message-ID: <CAKTh279TUXfzjd52aY7op+TL5VihhXJvy=JSp5mjXz=r272FcQ@mail.gmail.com>
+Subject: Re: [PATCH blktests] block/046: skip with the new XFS read-bounce implementation
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Content-Type: multipart/mixed; boundary="0000000000002a8589065bfaa79f"
 
-On 9/20/26 3:39 PM, Ming Lei wrote:
-> Hello,
-> 
-> On Fri, Sep 18, 2026 at 12:29:22PM +0200, Christian Brauner wrote:
->> Hi,
->>
-[ .. ]
->> The commit 7fc4da6a304b ("ublk: scan partition in async way") made
->> partition scans run from a workqueue that holds disk->open_mutex while
->> the server serves its reads and START_DEV returns before it's finished.
->>
->> Any server that treats START_DEV's return as a signal that the disk is
->> ready and doesn't serve requests hangs every open() of /dev/ublkbN on
->> uninterruptible on open_mutex. You can combine that with (1) and (2).
-> 
-> START_DEV doesn't promise partitions scanning done when it is returned.
-> 
-> nvme multipath has similar usage too.
-> 
-Indeed, we hit the same issue with nvme. We got it fixed by commit
-1f021341eef41e77a633186e9be5223de2ce5d48 ('nvme-multipath: defer 
-partition scanning'), essentially suppress partition scan during
-probing, and move the partition scan to a work thread. That way
-probing can continue (even if partition scan is blocked), and
-a failed probe can correctly abort partition scanning.
+--0000000000002a8589065bfaa79f
+Content-Type: text/plain; charset="UTF-8"
 
-Cheers,
+The v1 message was corrupted by Gmail web, tabs were converted to spaces
+and added lines were hard-wrapped. The code is unchanged. Please use the
+attached v2 format-patch, which preserves the original whitespace.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+--0000000000002a8589065bfaa79f
+Content-Type: application/octet-stream; 
+	name="0001-block-046-skip-with-the-new-XFS-read-bounce-imple.v2.patch"
+Content-Disposition: attachment; 
+	filename="0001-block-046-skip-with-the-new-XFS-read-bounce-imple.v2.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mub0zyp00>
+X-Attachment-Id: f_mub0zyp00
+
+RnJvbSA1ZGM1NDU2NmVlNmY0NTA3YzA3OWM5YzIwN2NiN2ZmOWJmMDZlOTJhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiAwd25lckQxZWQgPGw3ekAwYjF0LnRlY2g+CkRhdGU6IE1vbiwg
+MjEgU2VwIDIwMjYgMTY6NTA6MTIgKzA4MDAKU3ViamVjdDogW1BBVENIIGJsa3Rlc3RzIHYyXSBi
+bG9jay8wNDY6IHNraXAgd2l0aCB0aGUgbmV3IFhGUyByZWFkLWJvdW5jZQogaW1wbGVtZW50YXRp
+b24KVG86IFNoaW4naWNoaXJvIEthd2FzYWtpIDxzaGluaWNoaXJvLmthd2FzYWtpQHdkYy5jb20+
+CkNjOiBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmcsCiAgICBDaHJpc3RvcGggSGVsbHdpZyA8
+aGNoQGxzdC5kZT4KCmJsb2NrLzA0NiB1c2VzIGEgZGVsaWJlcmF0ZWx5IG1pc2FsaWduZWQgb25l
+LWJ5dGUgaW92ZWMgdG8gZXhlcmNpc2UgdGhlCnNwZWNpYWwgYnZlYyBsYXlvdXQgaW4gYmlvX2lv
+dl9pdGVyX2JvdW5jZV9yZWFkKCkuCgpUaGUgbmV3IFhGUyBsYXp5IHJlYWQtYm91bmNlIGltcGxl
+bWVudGF0aW9uIG5vIGxvbmdlciBzZXRzCklPTUFQX0RJT19CT1VOQ0UgYmVmb3JlIGV4dHJhY3Rp
+bmcgdGhlIHVzZXIgcGFnZXMuICBUaGUgb3JkaW5hcnkgcGF0aCBub3cKcmVqZWN0cyB0aGF0IGlv
+dmVjIHdpdGggRUlOVkFMLCBhbmQgYSBsYXRlciBwYXRjaCByZW1vdmVzIHRoZSBsZWdhY3kgaGVs
+cGVyCmVudGlyZWx5LgoKRGV0ZWN0IHRoZSBwZXItbW91bnQgY3N1bS9yZWFkX2JvdW5jZSBpbnRl
+cmZhY2UgYW5kIG1hcmsgdGhlIHRlc3Qgbm90IHJ1bgphZnRlciBjbGVhbmluZyB1cCB0aGUgWEZT
+IG1vdW50IGFuZCBudWxsX2JsayBkZXZpY2UuICBUaGlzIHJldGFpbnMgdGhlCnJlZ3Jlc3Npb24g
+Y292ZXJhZ2Ugb24gb2xkZXIga2VybmVscyB3aXRob3V0IHRyZWF0aW5nIHRoZSBleHBlY3RlZCBF
+SU5WQUwKYXMgYSBzdWNjZXNzZnVsIHJlc3VsdC4KClJlcG9ydGVkLWJ5OiBTaGluJ2ljaGlybyBL
+YXdhc2FraSA8c2hpbmljaGlyby5rYXdhc2FraUB3ZGMuY29tPgpMaW5rOiBodHRwczovL2xvcmUu
+a2VybmVsLm9yZy9yL2FyRE4xVWRaSXlkTkxVanpAc2hpbm1vYgpMaW5rOiBodHRwczovL2xvcmUu
+a2VybmVsLm9yZy9yLzIwMjYwOTIxMDgyMjQwLkdBMTk4MzNAbHN0LmRlClNpZ25lZC1vZmYtYnk6
+IDB3bmVyRDFlZCA8bDd6QDBiMXQudGVjaD4KLS0tCkNoYW5nZXMgc2luY2UgdjE6Ci0gcmVzZW5k
+IHdpdGggdGhlIG9yaWdpbmFsIHdoaXRlc3BhY2U7IEdtYWlsIGNvbnZlcnRlZCB0YWJzIHRvIHNw
+YWNlcyBhbmQKICBoYXJkLXdyYXBwZWQgYWRkZWQgbGluZXMgaW4gdGhlIHYxIG1lc3NhZ2UKCiB0
+ZXN0cy9ibG9jay8wNDYgfCAxOSArKysrKysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwg
+MTkgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3Rlc3RzL2Jsb2NrLzA0NiBiL3Rlc3RzL2Js
+b2NrLzA0NgppbmRleCA1Zjg3NGJjLi5lOTdmNTgzIDEwMDc1NQotLS0gYS90ZXN0cy9ibG9jay8w
+NDYKKysrIGIvdGVzdHMvYmxvY2svMDQ2CkBAIC0yMyw2ICsyMyw3IEBAIHJlcXVpcmVzKCkgewog
+dGVzdCgpIHsKIAlsb2NhbCBibG9ja19zaXplCiAJbG9jYWwgbW91bnRfZGlyPSIke1RNUERJUn0v
+bW50IgorCWxvY2FsIHJlYWRfYm91bmNlPSIvc3lzL2ZzL3hmcy9udWxsYjEvY3N1bS9yZWFkX2Jv
+dW5jZSIKIAlsb2NhbCB0ZXN0X2ZpbGU9IiR7bW91bnRfZGlyfS90YXJnZXQiCiAKIAllY2hvICJS
+dW5uaW5nICR7VEVTVF9OQU1FfSIKQEAgLTQyLDYgKzQzLDI0IEBAIHRlc3QoKSB7CiAJCV9leGl0
+X251bGxfYmxrCiAJCXJldHVybgogCWZpCisKKwkjIFRoZSBsYXp5IFhGUyByZWFkLWJvdW5jZSBp
+bXBsZW1lbnRhdGlvbiByZXBsYWNlZCB0aGUgbGVnYWN5IGJsb2NrLWxheWVyCisJIyBwYXRoIHdo
+b3NlIHNwZWNpYWwgYnZlYyBsYXlvdXQgdGhpcyB0ZXN0IGV4ZXJjaXNlcy4KKwlpZiBbWyAtZSAi
+JHtyZWFkX2JvdW5jZX0iIF1dOyB0aGVuCisJCWlmICEgdW1vdW50ICIke21vdW50X2Rpcn0iID4+
+IiR7RlVMTH0iIDI+JjE7IHRoZW4KKwkJCWVjaG8gImZhaWxlZCB0byB1bm1vdW50IFhGUyIKKwkJ
+CV9leGl0X251bGxfYmxrCisJCQlyZXR1cm4gMQorCQlmaQorCQlybSAtcmYgIiR7bW91bnRfZGly
+fSIKKwkJaWYgISBfZXhpdF9udWxsX2JsazsgdGhlbgorCQkJZWNobyAiZmFpbGVkIHRvIHJlbW92
+ZSBudWxsX2JsayIKKwkJCXJldHVybiAxCisJCWZpCisJCVNLSVBfUkVBU09OUys9KCJsZWdhY3kg
+cmVhZC1ib3VuY2UgaW1wbGVtZW50YXRpb24gaXMgbm90IHByZXNlbnQiKQorCQlyZXR1cm4KKwlm
+aQorCiAJZGQgaWY9L2Rldi96ZXJvIG9mPSIke3Rlc3RfZmlsZX0iIGJzPTFNIGNvdW50PTEgY29u
+dj1mc3luYyBcCiAJCXN0YXR1cz1ub25lCiAJYmxvY2tfc2l6ZT0kKGJsb2NrZGV2IC0tZ2V0c3Mg
+L2Rldi9udWxsYjEpCi0tIAoyLjU0LjAK
+--0000000000002a8589065bfaa79f--
