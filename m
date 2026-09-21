@@ -1,113 +1,85 @@
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C78D368291;
-	Mon, 21 Sep 2026 09:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.130.215.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438246E01D;
+	Mon, 21 Sep 2026 10:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789984738; cv=none; b=pWnIv4Tm8QG5mn8DOPtzH0qGE7l1ojYjptplnbVpQ10MCfKbxFOTp9ng+C+b/mOh+7j4wpsWpnx9IY3GQF2YY6iQjcb4g2hh6UD5GncNLKeGDdpLUAm5OlA3ydraIegGoxCiRvNjKAoRfsvi2RCN9OiwGJtwvuzAm4d/AEoefkg=
+	t=1789986558; cv=none; b=U/6IRb1GDmRiDx19gCww2Ldl1w19emxWqW9mRlBK1pRzBs6r3qzOb421lMt5vNgIyrU4K2xI4YKBRwfWsWr58lunEoq3Lpf7/AOcL3nhG7XzjbP8CpXRY/0FaCEKYYsFsBX/GCg20dZ7wncbiMlu7g8f4HJD5MQSV7APv9kXUPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789984738; c=relaxed/simple;
-	bh=QuK95/JbafJy3CjmT3UxrGnjkUHW975hSkFBCYS+wHo=;
+	s=arc-20240116; t=1789986558; c=relaxed/simple;
+	bh=gg7GufPXHI3MjnU0puBbIoWyRAcap2K6AzjjzkOwcnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NNxeGqPlZPcay8OxcLimkvwUI0wc8nr6jIk3ASROBiM1SgTKFOsee1CMSe9QNslA5WLr7IO4vkTfhiGK0Nr6jXNcHhU+Ni7apSMEXvhsGHKAeseQvqwCAPGzJwpRZgoAKhfyqVv5JjZ7idp5dMoRvt9QZ3GKclP8IWYFQhXejk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xenproject.org; spf=pass smtp.mailfrom=xenproject.org; dkim=pass (1024-bit key) header.d=xenproject.org header.i=@xenproject.org header.b=UBWawS4T; arc=none smtp.client-ip=104.130.215.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xenproject.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xenproject.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=aHUDTxSBmhan2sYsEqDzl6CRGrcym86xaF8nPZweCZIzf989iuWkQ0MRlys0nfRchYrJAq1GW+DJBMKYilPlIO7pGqdP8b352RWrrI6Cq3/k4WGv1DzhPkh+OwtUIQeafzK/tbpasInFxGllXGrbeCrCYC0VNncpyzolBk0UT9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBYqwUfp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xenproject.org header.i=@xenproject.org header.b="UBWawS4T"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=xenproject.org; s=20200302mail; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date;
-	bh=EzYlQ1oqZU6GvVE+84SeCPxWxElZBzucNgw2Qhmh2Lg=; b=UBWawS4To53/6rURwNJLFQp9nw
-	5rTraV0kDPxHAH91XCUw51qaZii5Pdn2b7KgBi4Olfj/V6yOpXuzmKjQcCY7+teP6Wx3rQ/QQW0ID
-	K0+c27Hqcg8dtn71ojFKeBy2Ko66ZXhLNstmyA5OKu5M3tLcEJDb6sHYKv77i2Gj6gkc=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-	by mail.xenproject.org with esmtp (Exim 4.96)
-	(envelope-from <roger@xenproject.org>)
-	id 1x8aTm-008sVj-1X;
-	Mon, 21 Sep 2026 09:38:30 +0000
-Received: from 224.pool85-54-217.dynamic.orange.es ([85.54.217.224] helo=localhost)
-	by xenbits.xenproject.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <roger@xenproject.org>)
-	id 1x8aTm-006IIf-2z;
-	Mon, 21 Sep 2026 09:38:30 +0000
-Date: Mon, 21 Sep 2026 11:38:28 +0200
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger@xenproject.org>
-To: Yuchao Zhang <ndaugoing@gmail.com>
-Cc: Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/1] xen-blkfront: unbind irq before tearing down ring
- and shadow requests
-Message-ID: <arD7FHmbqJlLHmyE@macbook.local>
-References: <20260918114354.3660102-1-ndaugoing@gmail.com>
- <20260918114354.3660102-2-ndaugoing@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBYqwUfp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 988E51F000FF;
+	Mon, 21 Sep 2026 10:29:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789986556;
+	bh=gg7GufPXHI3MjnU0puBbIoWyRAcap2K6AzjjzkOwcnA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lBYqwUfp2o9g1150tJrGhlc3WqQTYv+uLcFQffDsdbfYLAFQ650bOOkOyhVXlHIBj
+	 PBEccpWIFxJSRMeteEyxz/RnvPCQGxqnMqZw4RyPWC47On2W2LeN4hexvgL+tbfvjw
+	 N3xHJA1jETRbDy5A9amOy9kmEmDZt5/m/cjwGqhnILFJh95nDrqt1KBLbmGfYVue/v
+	 zb6znGS4WA0e37Iq8Ay1cOndrDm6AbiCmKq4+w5cz9E3vknPjlUuK1bjCgPRYsTWl/
+	 9KqjbGhfY+9ThTEJpziGyT6qBwB8rcxLol6nc9K9A3zBH+nKu3rTPfLn6/Uu3qnktJ
+	 rZtHoTu1PFuxQ==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id D81921AC5363; Mon, 21 Sep 2026 11:29:13 +0100 (BST)
+Date: Mon, 21 Sep 2026 12:29:13 +0200
+From: Mark Brown <broonie@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Tao Cui <cui.tao@linux.dev>, linux-next@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	cuitao@kylinos.cn
+Subject: Re: next-20260917 and next-20260918: merge of the block tree breaks
+ all zoned devices
+Message-ID: <arEG-YH7Q7ansx6o@sirena.co.uk>
+References: <20260920125846.1806521-1-cui.tao@linux.dev>
+ <20260920231226.771a0e21@canb.auug.org.au>
+ <aq_5QycDLgQGCc86@sirena.org.uk>
+ <d97685b3-f22c-4a27-a7d7-24b2ac7dfbe6@kernel.org>
+ <7141040b-5a15-471f-9bbf-9a18bed864e7@linux.dev>
+ <0ed54aa9-2cc6-4051-abe7-8144f39f6bed@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SUF6pmeD9FlGm4tO"
 Content-Disposition: inline
-In-Reply-To: <20260918114354.3660102-2-ndaugoing@gmail.com>
+In-Reply-To: <0ed54aa9-2cc6-4051-abe7-8144f39f6bed@kernel.org>
+X-Cookie: Too clever is dumb.
 
-On Fri, Sep 18, 2026 at 07:43:54PM +0800, Yuchao Zhang wrote:
-> In blkif_free_ring(), the driver tears down the ring's persistent grants,
-> shadow request arrays, and shared ring structure (xenbus_teardown_ring),
-> and only calls unbind_from_irqhandler() at the very end.
-> 
-> While blkif_free_ring() is freeing persistent grants and clearing the
-> shadow array, the event channel interrupt (blkif_interrupt) is still
-> registered and active.  If an interrupt arrives from the backend during
-> this teardown window, blkif_interrupt() reads rinfo->ring.sring and,
-> via blkif_completion(), accesses rinfo->shadow[id].grants_used and
-> rinfo->shadow[id].sg.  blkif_free_ring() tears these structures down
-> without holding rinfo->ring_lock, and the handler only checks
-> info->connected at entry, so this is a real race resulting in a
-> use-after-free or NULL pointer dereference.
-> 
-> Fix this by moving unbind_from_irqhandler() to the beginning of
-> blkif_free_ring().  Calling unbind_from_irqhandler() first frees the
-> IRQ and synchronizes with any in-flight interrupt handlers on other CPUs
-> before ring memory and shadow request structures are deallocated,
-> matching the teardown order in drivers/net/xen-netfront.c.
-> 
-> Fixes: 907c3eb18e0b ("xen-blkfront: convert to blk-mq APIs")
 
-Are you sure this is the commit that introduced the issue?  I think
-it's:
+--SUF6pmeD9FlGm4tO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-11659569f720 xen/blkfront: split per device io_lock
+On Mon, Sep 21, 2026 at 11:31:11AM +0900, Damien Le Moal wrote:
 
-The commit that split the lock and removed the usage of
-rinfo->ring_lock in the interrupt handler.
+> Mark, Attaching a v2 diff for corrected the conflict resolution. This is on top
+> of the current linux-next.
 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yuchao Zhang <ndaugoing@gmail.com>
-> ---
->  drivers/block/xen-blkfront.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> index 8dad7bf5f664..e70b78ca4df2 100644
-> --- a/drivers/block/xen-blkfront.c
-> +++ b/drivers/block/xen-blkfront.c
-> @@ -1210,6 +1210,10 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
->  	struct blkfront_info *info = rinfo->dev_info;
->  	int i, j, segs;
->  
-> +	if (rinfo->irq)
-> +		unbind_from_irqhandler(rinfo->irq, rinfo);
-> +	rinfo->evtchn = rinfo->irq = 0;
+I've replaced the patch with this one.
 
-Please add a comment that interrupt teardown must be done ahead of
-freeing of queue related data, otherwise the interrupt handler can
-race with the cleanup.
+--SUF6pmeD9FlGm4tO
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks, Roger.
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqxBvkACgkQJNaLcl1U
+h9CU8wf/a0GBTq/Y0ThBWuEpezEY6ooGroVPWRUchrFWiga4hZ2jyKS+rNNJCY0d
+yo5tV89FxXEZEv+JBo3oTL8mdUk4QREfN0wsFtpUP2tnWeiNVDCpE/HakVrsLxYS
+euGjGxYuTG95gJjGrACbjHhZPb57KHOaFMmdjxhrzAXeEUHqLpS1d5wdrLag6NVp
+Wg0GgtoPVHRZabG/uUkk9ABnHw5Ti40qLDaO/H6iinWaCA66DyCPGcZbG1oF27VO
+VTRwNRUBBBeMNqTxA3zWVWIxA8G0Xba9oaoR90jy4djUzOctCh1jbRv/jHcqXol0
+nIhkKI8fNW5IjwEA2hnlOnVG2+ag+w==
+=mgsS
+-----END PGP SIGNATURE-----
+
+--SUF6pmeD9FlGm4tO--
