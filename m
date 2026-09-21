@@ -1,385 +1,247 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C096F455606
-	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 21:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82394FC346
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 21:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790024426; cv=none; b=F09UfppjYdIyVHAi/gDd2OU/CGqMp4M2ooHdqNQGKtx4+plDKYpHmXPjESxIYVGlGmZ58sGrZsZ9THMp8q/tTLCDyHzKQylMBWZ4mdVOX/ajByZmUt/hLwh+Fsm0zwBXRFqpFVuVsvSzXgCcdbk7TlxiEaAC9dYWyI/THvpcnZw=
+	t=1790026009; cv=none; b=lF63m342OJDz/i35RBcRwzvY2SAf8BKpnrX9IxmjJ1eCGD1lf90r4FOsr3ddW827CUaaApCX3hjQXFn/8mtWsA7KK1yPmFue/t1AD2WTQZJ/dRjYRTMvBjPiGj5kd5KFmzzWFWIJ2J0raPwTotqYrAI5HLBlvsWuxija69At9/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790024426; c=relaxed/simple;
-	bh=GjAxKLy+axJVTeCuJLWowsU0JOzvm/1d2H/T4YCZwdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mQrdi+SDZjPV9mK0NPpl4PD3HqWA+1FFJ1+yWEDirFGKBtGEOMkwOzqpA0EltFpuxeOyLGwFq+DYiaDSdf3uuN19TjaTVYUV6/JbxRYVmsufv0xJeU1KJopjJRXg9xt/qMxE6Af+f9OyM1RxgDdYXNZiMiyWNEAqczdt+Mnli4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=VDKpBXyc; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1790026009; c=relaxed/simple;
+	bh=E2UnhwWUr86vvlerZRoiXd6Z2CE3q05PX6HoBxgj/0M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MJ+KrwhiKmzWjPFGxW71AmdJp8Eg2zk1F8k6hgHr221kigtmWi4gC1AwHNa6039yiQxpmonNz/HN1CrujAm9EbdL2QxBh+5Xv5QgcB4Cb3qfFbi+RFoTT96qEwfh1olWg/hTk5huNvprOgYz1kP4Fn50kS9AtQ+n1Sv5Co8slXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=braoesk/; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="VDKpBXyc"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e66390995so18684745e9.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 14:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1790024422; x=1790629222; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=SxiX7ykUuzFoB5u8OW7JZMlOwhEiuup8UcQvf/vvFTw=;
-        b=VDKpBXyc2dCflVzt1nTXu5ZU5Bcip5oV6+/JawYVXNV4I8VqQJEFQISLNEkpvo54Nv
-         wuI43mNAMtOethChFJVxotaKEwnZYg7lSifBSpzc8UFWmLLIe2YD+r4R8YpuV4PdT3t9
-         fR8Cjd7/cCvPp2XlRZLtusaREUaenA4LdP8yuv9K5HRb3Tse7oflAuP31Hg035oQ9zUC
-         bjTvQZHbS9fOhXVAIjt0/7KfyAKsdXux+QFvHY/aRAxXavbUQ+gdNVTy2X+e1SjDRT/D
-         80jutbUK5aCr+evYM/7Td+PJbWLGB/vb9wkkBYN+W1/7yALxLgYr/gJxxygj4fDZUD16
-         ZvgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790024422; x=1790629222;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=SxiX7ykUuzFoB5u8OW7JZMlOwhEiuup8UcQvf/vvFTw=;
-        b=1TeGVHuUtsGyCdwzo40uT7NyX5oZpP+AyNFRb5hzrKwuoiTVetA/n1q+b2qB+ZQO7G
-         z32dg7IpD4CMpouK2OZ28HNG4FLsBBxiSboP7r69rm6ieA8mmGdlLeVb4KOD8OLedgsB
-         yKMI9tLz+eq4EAAofL0N6YKIWjsDBngIi30LmVaHoAs8v9kEi0sAVn2uFUBttaCW4GlT
-         PdzeWLpHY+Vbb53vlHWzYdlK4jUCeSIoYesNyk5elE8QKomd7gdJ5ZjskD9DcXo+2052
-         yIMwxAXGkg/XwJAnykYaSdIIOMQbA0o4dpZtyat8Yp3Zyu8L1B5hHIloZ9tGF9t3RsSf
-         ng6Q==
-X-Gm-Message-State: AFuF++mK/Bk8HkLuzAhAIxGSKhrXZi7IAJb716VtyuU5RL0sPCA0mkLu
-	kwdLYrlcbQO8A6GF+gMVafo5P/qmasVD8wxZbSb8CLNK2nmkXq/REzuQVY/7qkFFAJ4+wlpTG7Z
-	tXM4p/wbqfVG6KEaImKQ5+982D2hG5aL7NC3HbJICCmdEbt/b1G4p+WuimZgauTGLfxEnaTK4hZ
-	ZCFyKokbObwYzVQj4Q9+NCZ7vrq4f0Sv79EaVrC7ckWSZq5wJa/p0N57c=
-X-Gm-Gg: AYBFou36b8IfJSKC1Q0If8NaxteddtHgYVsvCLnnmuKY/FPGMv3mQ1Ya8d1upkpy/M/
-	RupJSDLt+k9Mixjm5B4vMIjWM55bVE22zEhsUJObskzLy25CJma5FrdMBKpmNOzgQwR6wRVvv4m
-	evGO83fVuJmRuLzNvUP1fUgNSq7RoRo2pQ6doiF6Xqg1oyR3MxJbY40O6sAjcq+pjj969s3RIYT
-	gFlGQofq/s/IpLBLfknZRRFJZ0n2eEBxC+MsUHe9+rLFZPw3E3MbJ9VR2P4L7kZj1CKORRqc7M1
-	49L+CrBQPcCAImMr2b/i0YU9F4KIL60wk7sLSZrcOJqhnmxd9Tlw1mwWbQ1Q8FRUUFYmaC+mPKM
-	oSYC/eKIpta6ZGF+T9VZA8P3DymSfGfmmvZzcBcvF5YO40bt+izsIkj/XA6YcxbJf1VhDoROn8s
-	IZjw+OvBp7IkD9Cx/0eXtMxMkHXTs/GkNklU+fZAYKao0c37TLpSGtE1pHs/g9XhR60+16YLSgX
-	QkF7iXPTZQ+wmn8c9eqF+jN1bsXmHDWoTeMLU0=
-X-Received: by 2002:a05:600c:1993:b0:49c:ffe3:2b3f with SMTP id 5b1f17b1804b1-49fc56dbc54mr169802245e9.3.1790024421579;
-        Mon, 21 Sep 2026 14:00:21 -0700 (PDT)
-Received: from dev-mkhalfella.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-49fda089577sm3345565e9.1.2026.09.21.14.00.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 14:00:20 -0700 (PDT)
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	John Meneghini <jmeneghi@redhat.com>,
-	Jesse Taube <jtaubepe@redhat.com>,
-	Randy Jennings <randyj@purestorage.com>,
-	Dhaval Giani <dgiani@purestorage.com>,
-	Mohamed Khalfella <mkhalfella@purestorage.com>
-Subject: [PATCH blktests] nvme/071: test CCR and CQT recovery on a multipath fabrics namespace
-Date: Mon, 21 Sep 2026 14:59:51 -0600
-Message-ID: <20260921205951.3023714-1-mkhalfella@purestorage.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="braoesk/"
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68LKfAOE1551280
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 14:26:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps82601-s2048-2026-q3; bh=mo+EzH/c1
+	Ee/cD5mChapw0UJJ7KnqCzomO17w+xEUs8=; b=braoesk/lnAoEO1jvxu4eBj7r
+	xegLP0311fpz11ejKf3tAp8d6ULqL8FZwaPh94aXD4OUZhOtzrnLG7dcdIvQNize
+	hcb5/ixnq8GIM0yWK8gw1U3TW2l/PC5rxor1zfjOYWOCp0cxFSkMnCcx8ORHL+z0
+	1Y7ic9KU9jmjSgSxwPeqynp59lpb6uPxwuAKgKIvIHT3LgULcC+GNR4On24XYAxk
+	uKVcBzKto3lSFYA7iq+jTTclm8uTyKtTibjBHeucLkx8tOZMP/0jWKYbIpr8aekR
+	pgAu7jxEoJeFc1iNWuicj3eBpiF61Z3lxQLdSTNeyDwNnjcekG6mX4B7T4xfg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4gsr4c7h3x-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 14:26:46 -0700 (PDT)
+Received: from twshared103475.15.frc2.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.45; Mon, 21 Sep 2026 21:26:44 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 66FD32C33717A; Mon, 21 Sep 2026 14:26:32 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: Keith Busch <kbusch@kernel.org>, <stable@vger.kernel.org>,
+        Henry Hu
+	<huhai@kylinos.cn>
+Subject: [PATCH] blk-mq: set RQF_USE_SCHED when the operation is known
+Date: Mon, 21 Sep 2026 14:26:24 -0700
+Message-ID: <20260921212624.1942234-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: a-Xs_EOQVKE8Q0oQy5O8kZZCaqG4kirk
+X-Authority-Analysis: v=2.4 cv=SKnXx+vH c=1 sm=1 tr=0 ts=6ab1a116 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=xtH7KyWI9dI7BmFOsl-x:22 a=VwQbUJbxAAAA:8 a=pVJO5A81n4mMywtpseEA:9
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIxMDMxMyBTYWx0ZWRfX5I7A/3j4srAz
+ wAiAXYcXW9ISg9XyfcZhDTx9khtyRf701WPEsKQK7WH59NLjA7txF/QyN9G+4q4OlromWTxKt5Y
+ sBmRUW6E1EZ4mSUdXx2H6qByQQLpHpc=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIxMDMxMyBTYWx0ZWRfX7RA+/vrgEUrx
+ IyepYxTHSqIQ0QP9lYBcCi7UPqnjU42v9suadKqlbwZYuFpfqH2Y/YgZrUrUrsTf0JdVe15Vovv
+ 1pUoX7pqQpMoaDv3ZvnAErtY/icni37kk8860G3v4+h1LRLhw0Of1PX6Vt7XcS28WWtIuOOTFND
+ /M9YdIih19xjhSALV32ttefQnLAKBYresRYaT2SrBFvwszCld7naTFHLQb29MmKxSN9/sifvcLq
+ L4G9x4GCJdQYLgfh4IMbG9aJdnaFNJq6hL68+JUQgF0px/eTFP/G1FhRdb5oqdz+K+i/I79NISk
+ hf1lDatavcdbUWT1KiPK5OPrDLuhVx/KCoauiC4i+aVz5VOuwHoIiHpVieNk3/P/qXpRVzLusym
+ SGELdqMcmQtFtBTK6WVP/ZlsbkORjSE9T/BhVa1AXOwwgVTvb9SRStFJlf8WE6LI9XvEuamrwUB
+ Vg8g2op33Kt08BMnaUg==
+X-Proofpoint-GUID: a-Xs_EOQVKE8Q0oQy5O8kZZCaqG4kirk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-21_06,2026-09-21_02,2025-10-01_01
 
-nvme/070 demonstrated the ABA ghost write window. The kernel closes it
-by fencing a controller before retrying timed-out writes on another
-path, but nvme/070 does not functionally exercise CCR or CQT
-themselves.
+From: Keith Busch <kbusch@kernel.org>
 
-Add a functional test that drives both cross-controller reset (CCR)
-and command quiesce time (CQT) recovery. The setup is the same as
-nvme/070: a ublk loop device backs an nvmet namespace that is exported
-through two ports, the host connects to both paths, and io_timeout on
-the subsystem drops to 2 seconds. In addition, the target subsystem's
-CQT is set to 30 seconds, since it is disabled by default.
+The cached requests are allocated for one operation but can be handed
+out for another. A passthrough command has RQF_USE_SCHED cleared, so
+using those flags for a subsequent read/write bio will insert it into
+the scheduler without ->prepare_request() and frees it without
+->finish_request(). For kyber, this leaks the domain token acquired at
+dispatch and stalls the queue.
 
-The first scenario holds one write in the backstore for 4 seconds. The
-host times the write out, starts fencing, and the CCR issued on the
-other path completes within its budget. The second scenario holds a
-write for 10 seconds, longer than CCR can wait, so the host gives up
-on CCR and switches to time-based recovery, waiting out the remaining
-CQT window before releasing the retry.
+Don't set RQF_USE_SCHED based on the first operation the batch happened
+to be allocated for. Instead, set it after the request is claimed by an
+operation.
 
-Each scenario runs nvme-ghost-write-detector while recovery is in flight
-to check that no stale data surfaces, and confirms the recovery took the
-expected route by watching dmesg after a marker written to /dev/kmsg.
-
-The test requires nvme_core.multipath=Y and is limited to tcp, rdma
-and fc, the transports that implement controller fencing.
-
-Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+Fixes: 4b6a5d9cea91 ("block: enable batched allocation for blk_mq_alloc_r=
+equest()")
+Cc: stable@vger.kernel.org
+Reported-by: Henry Hu <huhai@kylinos.cn>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- tests/nvme/071     | 184 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/071.out |  67 +++++++++++++++++
- 2 files changed, 251 insertions(+)
- create mode 100755 tests/nvme/071
- create mode 100644 tests/nvme/071.out
+ block/blk-mq.c | 51 +++++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 21 deletions(-)
 
-diff --git a/tests/nvme/071 b/tests/nvme/071
-new file mode 100755
-index 0000000..d700416
---- /dev/null
-+++ b/tests/nvme/071
-@@ -0,0 +1,184 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Mohamed Khalfella
-+
-+. tests/nvme/rc
-+. common/ublk
-+
-+DESCRIPTION="CCR/CQT functional test"
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_have_ublk
-+	_have_module_param_value nvme_core multipath Y
-+	_require_nvme_trtype tcp rdma fc
-+	_have_src_program nvme-ghost-write-detector
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a26a11c73ee3e..b1e1b9dea3c0f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -447,16 +447,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk=
+_mq_alloc_data *data,
+ 	WRITE_ONCE(rq->deadline, 0);
+ 	req_ref_set(rq, 1);
+=20
+-	if (rq->rq_flags & RQF_USE_SCHED) {
+-		struct elevator_queue *e =3D data->q->elevator;
+-
+-		INIT_HLIST_NODE(&rq->hash);
+-		RB_CLEAR_NODE(&rq->rb_node);
+-
+-		if (e->type->ops.prepare_request)
+-			e->type->ops.prepare_request(rq);
+-	}
+-
+ 	return rq;
+ }
+=20
+@@ -498,6 +488,12 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_da=
+ta *data)
+ 	return rq_list_pop(data->cached_rqs);
+ }
+=20
++static bool blk_op_bypass_sched(blk_opf_t opf)
++{
++	return (opf & REQ_OP_MASK) =3D=3D REQ_OP_FLUSH ||
++	       blk_op_is_passthrough(opf);
 +}
 +
-+set_conditions() {
-+	_set_nvme_trtype "$@"
+ static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
+ {
+ 	struct elevator_mq_ops *ops;
+@@ -518,12 +514,10 @@ static void blk_mq_limit_depth(struct blk_mq_alloc_=
+data *data)
+ 	 * Flush/passthrough requests are special and go directly to the
+ 	 * dispatch list, they are not subject to the async_depth limit.
+ 	 */
+-	if ((data->cmd_flags & REQ_OP_MASK) =3D=3D REQ_OP_FLUSH ||
+-	    blk_op_is_passthrough(data->cmd_flags))
++	if (blk_op_bypass_sched(data->cmd_flags))
+ 		return;
+=20
+ 	WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
+-	data->rq_flags |=3D RQF_USE_SCHED;
+=20
+ 	/*
+ 	 * By default, sync requests have no limit, and async requests are
+@@ -534,6 +528,23 @@ static void blk_mq_limit_depth(struct blk_mq_alloc_d=
+ata *data)
+ 		ops->limit_depth(data->cmd_flags, data);
+ }
+=20
++static void blk_mq_set_rq_sched(struct request *rq)
++{
++	struct elevator_queue *e;
++
++	if (!(rq->rq_flags & RQF_SCHED_TAGS) ||
++	    blk_op_bypass_sched(rq->cmd_flags))
++		return;
++
++	rq->rq_flags |=3D RQF_USE_SCHED;
++	INIT_HLIST_NODE(&rq->hash);
++	RB_CLEAR_NODE(&rq->rb_node);
++
++	e =3D rq->q->elevator;
++	if (e->type->ops.prepare_request)
++		e->type->ops.prepare_request(rq);
 +}
 +
-+count_paths_to_subsystem() {
-+	local subsysnqn="$1"
-+	local dev count
-+
-+	count=0
-+	for dev in /sys/class/nvme/nvme*; do
-+		[[ -e "${dev}/subsysnqn" ]] || continue
-+		[[ "$(cat "${dev}/subsysnqn")" == "${subsysnqn}" ]] || continue
-+		count=$(( count + 1 ))
-+	done
-+	echo "${count}"
-+}
-+
-+set_io_timeout_of_subsystem() {
-+	local subsysnqn="$1"
-+	local timeout="$2"
-+	local dev
-+
-+	for dev in /sys/class/nvme/nvme*; do
-+		[[ -e "${dev}/subsysnqn" ]] || continue
-+		[[ "$(cat "${dev}/subsysnqn")" == "${subsysnqn}" ]] || continue
-+		if ! echo "${timeout}" > "${dev}/io_timeout" 2> /dev/null; then
-+			echo "FAIL: can not set io_timeout on ${dev##*/}"
-+			return 1
-+		fi
-+	done
-+}
-+
-+dmesg_mark() {
-+	local marker="blktests ${TEST_NAME} $1"
-+
-+	echo "${marker}" >> /dev/kmsg
-+	echo "${marker}"
-+}
-+
-+dmesg_since_mark() {
-+	dmesg | awk -v m="$1" 'index($0, m) { found = 1; next } found'
-+}
-+
-+wait_for_dmesg_after_mark() {
-+	local mark="$1"
-+	local pattern="$2"
-+	local timeout="$3"
-+	local i
-+
-+	for ((i = 0; i < timeout * 2; i++)); do
-+		if dmesg_since_mark "${mark}" | grep -q -e "${pattern}"; then
-+			return 0
-+		fi
-+		sleep 0.5
-+	done
-+	return 1
-+}
-+
-+test_injecting_delay_ccr_recovery() {
-+	local mark ns
-+
-+	mark=$(dmesg_mark "ccr_recovery_started")
-+
-+	if ! ${UBLK_PROG} inject -n 0 -o write -d 4 -c 1 >> "$FULL" 2>&1; then
-+		echo "FAIL: can not inject write delay"
-+	fi
-+
-+	ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+	"$SRCDIR/nvme-ghost-write-detector" "/dev/${ns}"
-+
-+	# The injected delay is within the limits that CCR can handle.
-+	# Expect fencing to start and CCR to succeed.
-+	if ! wait_for_dmesg_after_mark "${mark}" "starting controller fencing" 30; then
-+		echo "FAIL: controller fencing did not start"
-+	fi
-+
-+	if ! wait_for_dmesg_after_mark "${mark}" "CCR succeeded using nvme" 30; then
-+		echo "FAIL: cross controller reset did not succeed"
-+	fi
-+}
-+
-+test_injecting_delay_cqt_recovery() {
-+	local mark ns
-+
-+	mark=$(dmesg_mark "cqt_recovery_started")
-+
-+	if ! ${UBLK_PROG} inject -n 0 -o write -d 10 -c 1 >> "$FULL" 2>&1; then
-+		echo "FAIL: can not inject write delay"
-+	fi
-+
-+	ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+	"$SRCDIR/nvme-ghost-write-detector" "/dev/${ns}"
-+
-+	# The injected delay is outside the limit that CCR can handle.
-+	# Expect CCR to fail and CQT to save the day.
-+	if ! wait_for_dmesg_after_mark "${mark}" "starting controller fencing" 30; then
-+		echo "FAIL: controller fencing did not start"
-+	fi
-+
-+	if ! wait_for_dmesg_after_mark "${mark}" "attempting CCR" 30; then
-+		echo "FAIL: cross controller reset was not attempted"
-+	fi
-+
-+	if ! wait_for_dmesg_after_mark "${mark}" "CCR failed, switch to time-based recovery" 30; then
-+		echo "FAIL: cross controller did not fail as expected"
-+	fi
-+
-+	if ! wait_for_dmesg_after_mark "${mark}" "Time-based recovery finished" 30; then
-+		echo "FAIL: expected to see time-based recovery ends"
-+	fi
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local port nr_paths
-+	local attr_cqt
-+	local -a ports
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	truncate -s "${NVME_IMG_SIZE}" "${TMPDIR}/ublk-img"
-+	if ! ${UBLK_PROG} add -t loop -f "${TMPDIR}/ublk-img" -n 0 > "$FULL" 2>&1; then
-+		echo "fail to add ublk device"
-+		_exit_ublk
-+		return 1
-+	fi
-+	udevadm settle
-+
-+	_setup_nvmet
-+	_nvmet_target_setup --ports 2 --blkdev none
-+	_create_nvmet_ns --blkdev /dev/ublkb0 \
-+		--uuid "${def_subsys_uuid}" > /dev/null
-+
-+	# CQT is disabled by default, enable it for 30s
-+	attr_cqt="${NVMET_CFS}/subsystems/${def_subsysnqn}/attr_cqt"
-+	if [[ -f "${attr_cqt}" ]]; then
-+		echo 30000 > "${attr_cqt}"
-+	else
-+		echo "FAIL: failed to find attr_cqt: ${attr_cqt}"
-+	fi
-+
-+	_get_nvmet_ports "${def_subsysnqn}" ports
-+	echo "Target ports: ${#ports[@]}"
-+	for port in "${ports[@]}"; do
-+		_nvme_connect_subsys --port "${port}"
-+	done
-+
-+	nr_paths=$(count_paths_to_subsystem "${def_subsysnqn}")
-+	if ((  nr_paths != 2 )); then
-+		echo "FAIL: expected 2 paths, found ${nr_paths}"
-+	fi
-+
-+	set_io_timeout_of_subsystem "${def_subsysnqn}" 2000
-+
-+	test_injecting_delay_ccr_recovery
-+
-+	test_injecting_delay_cqt_recovery
-+
-+	_nvme_disconnect_subsys
-+	_nvmet_target_cleanup
-+	_exit_ublk
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/071.out b/tests/nvme/071.out
-new file mode 100644
-index 0000000..f55eefb
---- /dev/null
-+++ b/tests/nvme/071.out
-@@ -0,0 +1,67 @@
-+Running nvme/071
-+Target ports: 2
-+starting nvme-ghost-write-detector test program
-+iteration number 0, writing data
-+validating written data
-+successfully validated
-+iteration number 1, writing data
-+validating written data
-+successfully validated
-+iteration number 2, writing data
-+validating written data
-+successfully validated
-+iteration number 3, writing data
-+validating written data
-+successfully validated
-+iteration number 4, writing data
-+validating written data
-+successfully validated
-+iteration number 5, writing data
-+validating written data
-+successfully validated
-+iteration number 6, writing data
-+validating written data
-+successfully validated
-+iteration number 7, writing data
-+validating written data
-+successfully validated
-+iteration number 8, writing data
-+validating written data
-+successfully validated
-+iteration number 9, writing data
-+validating written data
-+successfully validated
-+finished nvme-ghost-write-detector test program
-+starting nvme-ghost-write-detector test program
-+iteration number 0, writing data
-+validating written data
-+successfully validated
-+iteration number 1, writing data
-+validating written data
-+successfully validated
-+iteration number 2, writing data
-+validating written data
-+successfully validated
-+iteration number 3, writing data
-+validating written data
-+successfully validated
-+iteration number 4, writing data
-+validating written data
-+successfully validated
-+iteration number 5, writing data
-+validating written data
-+successfully validated
-+iteration number 6, writing data
-+validating written data
-+successfully validated
-+iteration number 7, writing data
-+validating written data
-+successfully validated
-+iteration number 8, writing data
-+validating written data
-+successfully validated
-+iteration number 9, writing data
-+validating written data
-+successfully validated
-+finished nvme-ghost-write-detector test program
-+Test complete
--- 
-2.55.0
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data =
+*data)
+ {
+ 	struct request_queue *q =3D data->q;
+@@ -563,6 +574,7 @@ static struct request *__blk_mq_alloc_requests(struct=
+ blk_mq_alloc_data *data)
+ 		rq =3D __blk_mq_alloc_requests_batch(data);
+ 		if (rq) {
+ 			blk_mq_rq_time_init(rq, alloc_time_ns);
++			blk_mq_set_rq_sched(rq);
+ 			return rq;
+ 		}
+ 		data->nr_tags =3D 1;
+@@ -591,6 +603,7 @@ static struct request *__blk_mq_alloc_requests(struct=
+ blk_mq_alloc_data *data)
+ 		blk_mq_inc_active_requests(data->hctx);
+ 	rq =3D blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
+ 	blk_mq_rq_time_init(rq, alloc_time_ns);
++	blk_mq_set_rq_sched(rq);
+ 	return rq;
+ }
+=20
+@@ -637,8 +650,6 @@ static struct request *blk_mq_alloc_cached_request(st=
+ruct request_queue *q,
+ 		if (plug->nr_ios =3D=3D 1)
+ 			return NULL;
+ 		rq =3D blk_mq_rq_cache_fill(q, plug, opf, flags);
+-		if (!rq)
+-			return NULL;
+ 	} else {
+ 		rq =3D rq_list_peek(&plug->cached_rqs);
+ 		if (!rq || rq->q !=3D q)
+@@ -646,15 +657,14 @@ static struct request *blk_mq_alloc_cached_request(=
+struct request_queue *q,
+=20
+ 		if (blk_mq_get_hctx_type(opf) !=3D rq->mq_hctx->type)
+ 			return NULL;
+-		if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(opf))
+-			return NULL;
+=20
+ 		rq_list_pop(&plug->cached_rqs);
+ 		blk_mq_rq_time_init(rq, blk_time_get_ns());
++		rq->cmd_flags =3D opf;
++		INIT_LIST_HEAD(&rq->queuelist);
++		blk_mq_set_rq_sched(rq);
+ 	}
+=20
+-	rq->cmd_flags =3D opf;
+-	INIT_LIST_HEAD(&rq->queuelist);
+ 	return rq;
+ }
+=20
+@@ -3060,8 +3070,6 @@ static struct request *blk_mq_get_cached_request(st=
+ruct blk_plug *plug,
+ 	if (type !=3D rq->mq_hctx->type &&
+ 	    (type !=3D HCTX_TYPE_READ || rq->mq_hctx->type !=3D HCTX_TYPE_DEFAU=
+LT))
+ 		return NULL;
+-	if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(opf))
+-		return NULL;
+ 	rq_list_pop(&plug->cached_rqs);
+ 	return rq;
+ }
+@@ -3166,6 +3174,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		blk_mq_rq_time_init(rq, blk_time_get_ns());
+ 		rq->cmd_flags =3D bio->bi_opf;
+ 		INIT_LIST_HEAD(&rq->queuelist);
++		blk_mq_set_rq_sched(rq);
+ 	} else {
+ 		rq =3D blk_mq_get_new_requests(q, plug, bio);
+ 		if (unlikely(!rq)) {
+--=20
+2.52.0
 
