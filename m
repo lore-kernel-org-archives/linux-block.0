@@ -1,95 +1,95 @@
 Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD0854CF6B
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 14:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B600654A7F8
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 14:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790085938; cv=pass; b=Da6ZuIG5XBCQvTeZNkUn43SRFX27fzOYLFkuoxr4Kk9aabobhs5Q+K9AzGrFpO2VbJnt+bwN1ukJpFqu4EeC36FlD5sPC1onQbRCYPT92k1ag5wQu0ZqG13rRqrAB0ERMhbVLvVNbeDYRqeuzDuhl7z3nyQyX+C7Gtx5DeZBdw0=
+	t=1790085948; cv=pass; b=ioe+IeSu8hAGlJPeSFmjtW/nZNxKLH7KAEHQib/P7gWVmvaIEHL2bzXhvAJGpHkh4Q+w0k6xDLmZ562ASq+NvZ77eAOq+onONtsKiUlBUtXmBPeNNjXqK2kgjXEl6vtiR3OoqDzX0Qwmv4zgDMLR598IrKc1Km5AoKplEbDboSk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790085938; c=relaxed/simple;
-	bh=Ay5NjTz63OiCiHZ7ALzt+lcJMCr4C+fqEYLzWAvlTPI=;
+	s=arc-20240116; t=1790085948; c=relaxed/simple;
+	bh=4H7cYh/XcFy79IKh5ntWbkLJLoAWIpLRyRLXVAEP+zw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W0XAz8akBOzgrso/qKQxnPFExECSPLpuZbZTbIwlejkI6GmyOVRXiQ4xQLIlt+PBRPToOMVy0uKcxNZ7wQIi2vRowZNEbUawX7a6EYsg8ylDctoVB5fJfTQTAtW0aKzpPMRXtvlLSqJp6CGR0Bb+VFzS0uXx3G7l42ZHsa0TPFs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=It34vOS8; arc=pass smtp.client-ip=74.125.225.76
+	 To:Cc:Content-Type; b=q+aNJ4C3Cf7I/vFDwKTKmWwZqnvK97rYyWPACqsxyLP63UU6MXu/81hru+iSIgZ12QXvQkx1Xnfh0ZONTM2qh/0cU+75kDJHAKvANqwGOgthLfkK750GMaM0H8AB8vETwnlcd5WntXkD83cktP4K4SptIQ1Lspl0k189etaq2mc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OaZw4Jlp; arc=pass smtp.client-ip=74.125.225.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="It34vOS8"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f6351831so2225535f8f.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:05:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790085934; cv=none;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OaZw4Jlp"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f6350faaso2318519f8f.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:05:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790085945; cv=none;
         d=google.com; s=arc-20260327;
-        b=dowMIRt8qFKsTOtXbxSuJ1k15PyqeZx8AF78nyGapaE8XOZPOh4+7IA0xF4V1kdgyM
-         RbaxywxVNHIzd6mYK6zDX9xEd2geOF0mc8nCtw/ak4WIKpAP2lfcWB+JERlekGa2QrBM
-         eDSWLGQ/RVwiNSK+OiSqj8JAdpNyAny5KCnRKcHHTFe3z5kRDx6wwOaOdxfv26S8lrq0
-         f/+RW8ui8z2Qv8XsBuX9yv69zjNVbBYmVolDC7EHStIQUC2fLP+AITVq8CeTVSjoDAl4
-         oE9+8DpQK2zyWQvvRbqKpKwVM+5llifyyzGzq5uilCvZ5l9KCvG6h5BiqYC/nqMHYkfw
-         SeYA==
+        b=UvyLx8/JSQ26zWnxePB3Ign9JZxw5f3c6iG51fGjtDCGYEkEQHRotszd6GijCxOcm6
+         bYWaudStSLzmVLi1DokiKXgqFHTaQJf9yW/7lfMT2cbO1Us51h/YeZRwMD/BPvHufrIb
+         w8oQzTvDI9bmrUQgOzC8NHGKnMDAh1kQv87/uGZuKjPZu1ZjGFZvY7eKMg+GXavIATH/
+         2sqZFfd0g9crLYzpVTRpWfCienTnHYLWlP6cHHNyzEd861ExK1NSuwEpf/fMvqsVvlSk
+         LkgN8h2DHPnYtYNSrlz9/H/4dI8RxqaYE6N+Y+GkQhxk7wK3vx+55EJIXvG3Kfzn6mDu
+         Q6YQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=6YS2AxBcCq9ZhMi42e6qWSeGTCX4XCRef+vl2kw8gyg=;
-        fh=YZRD04EtAOcSo3psGz+xq1GG7krZtPuQm67A8L3A1g0=;
-        b=QAs2+pciX81v6qbp6Jpj/Siy3Bj5x0khefBk6a+wS/oZozk7ak/P2eulzDGy1htv9k
-         f2WSkoQW3we1Wo0N09BQCMdcPxDti/b6oWIt+xhv3gqYUl9cntpWgCLfV7hLLWumIPkj
-         A+hU6IChqJr+IPEdPqpcuHSOfMvvNfsjCjeI4PHaF1ETdI51Tz3WyJg6/vb3WanAlub4
-         TAHUvZfxMXuWPZewD8oQeDf39Vvodtos7GoalsxC15QLFbg7zYPycVQnc8wazXgHZIjN
-         r9J3TzmAYkRXnSLUueV/THNSRb2mqdS5S6sIuM1lQw44rvv0WSPc8Kxw9g2LYjHodsM4
-         25CQ==;
+        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
+        fh=igM8J6s/r6VvNCtw01/jPw/kIC42aLMk2iproMFdKu0=;
+        b=ZHDLxTU3WS+0df/Po2DCPhkGbHuzUJ1pDfZsdHz14UBi7FRaDBJAXzQZjR4yIo3koD
+         2jaUEDVzzPjoqQ/+Ml+oGWlJJlptTK2JHmgfMx0ozdvuyf5yiLtXLX1axvLOx9cITPyA
+         MwTnUi0+4VySTDDY39ZfwMLnppj1bybuonhlMoN0EQyeFtA5f+o/qcS0gFOhCTj3xmVs
+         bSDWsRvWyWESS94xRZRtNJvFIdaGM573jTjFQtQegmTBJI7XcIv32qC8QdjWjEW6UxCg
+         8Y68W0BSegoamewjWGf4JkYy3eOC1EggOFSp745gRswVad+c+Uaai7XukFHwmDdowLAQ
+         XL3Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1790085934; x=1790690734; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1790085945; x=1790690745; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=6YS2AxBcCq9ZhMi42e6qWSeGTCX4XCRef+vl2kw8gyg=;
-        b=It34vOS8sUSb96CZ88ohJ7YHGY3ycuWEwg8dqvOZUvCFuYqztFt5TZ1DCFgwxQHyGh
-         CEc/A06jCixtwMIhOu2JmVnw77yYJBi57m4ovFQHMvxZLomGf0+6/9G3uDF+fmk4CAmL
-         3jGIYPDTXXXu+RmKo/edM+Bd/OAxjjgvH5VWPQQf/++/hpBu3W+KgP5DS7gNlPnsDgvJ
-         CjAmNYrYTnlE0qDpqbpzji6TzpPacEbI0ugFuwDuPfPRpCuscoQnr4Nb+BODmAzapyPd
-         Fwqv7QBanNNIiCmjxvSssudzUGg7vC7fTuVQBcocAQtdODsoDxxrHS/mSCmzzGZS1DZY
-         z9+A==
+        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
+        b=OaZw4JlpEJnPotAAApkw/LFOiwvi3X6tj5Xr6yfn43f8A4HJunL2BYhfAn/tznUyVN
+         qjajcgIof+vAF77Nlhhn7LGc8XluAKPY9Yugz6Saty9rYpmP2sMv0tARCSpOk7VNloUX
+         pg6RkXpf1TMnVHEw2B1zF43vBSyFXnJTkQ80F6dOKOiEAGWiHSkNIcJ7rQ3Ikjox+m3j
+         IWk3KcV3HzS5aK8rZVaUHv+4hEfKXf49VAYL0MLmlhtyUpDhuaGK2eEgUidZx8GkSY0o
+         6dUI/uQ/eDY1C2+J4jWSCEsIm4YwmSej4UX+8SNIix6XGo6yUUSuhmH5ang8rK0XG26q
+         sY/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790085934; x=1790690734;
+        d=1e100.net; s=20260707; t=1790085945; x=1790690745;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=6YS2AxBcCq9ZhMi42e6qWSeGTCX4XCRef+vl2kw8gyg=;
-        b=p+koJoWTN4xH/qaiWIIXFFMlmNhjRKcCFT+AO4Z7rfTUis0zrP1KY81nJ8WL21Dvnv
-         IeyYZ3pkaWlnwmK24TiFIBRX2f2dqAEREdWsK8fa1Xffew4vNNnl4eRdzQ+2aIWcFpG7
-         Tfl8Ialhsa81ageMVPeGkT70Oq8/KMSb132Lqg5huH8UWclyFtiJ0vhTdfY3HGQpxOSn
-         JJzAd8a+yzuTA4W9S72/IiihoDbmkEC4G5K8wsSBZiPn6huIKXlIhBBXGrFTz24opFCW
-         N8IXOVrw9hrUDkqEUX7F8BgRteWw8o9r45F4Uw3Agc0hXibqWNC9UxOruSV5aDF3WIvz
-         DaVg==
-X-Forwarded-Encrypted: i=1; AKwUvBwCRCB/mCbKha1HASu+n6Oz2jZdLiuiIBQLRVsDBBcNC4kNYpYC4NZVP4KgGtqJU/uUh41vRXKVZnpKwQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++nqUME7dUXZYdsoYpAwZtPhKDxNLDTeFyYAlSCkMdgasEdcHt+u
-	6laVkabCGXT5UBvsQZEGT+XR4MiK88tj+KmdGiQYfbpV2rjVOeK5tvxFBG7ELNFgyJUSnHkuV+4
-	vnAiRqZBLsFTbdOKi/QdbQrM40JAPuuOnJvckeCzV0g==
-X-Gm-Gg: AYBFou1+ZDgYXXrk9bnGcYofMcxg5+KoV4aLrjYWAHlktiD75FiuWJ7XKGp4uggeLI8
-	k7m1sBWG777BtF5MFWnA6ce6SKKnh9HqZGaklwGisJERGSwZJaPPRgf7ao4fldIwzGOD/nPMwV2
-	+tbAOMc0p5nDiAVK5I50Ka/j3crI28ch0s+W+GmT2arunVYTwKuQ+MSjttwXXmwM+9542acASzi
-	ojbPYu3Okw2Dp1HJnZgg/wBxVbeGn4uWm/Jy54OVMaQA19qCQ3EQy8xiZtwvoJg7+P/kPkEysCq
-	Zg8fLJVaMD6NaRwneAJF9bYYETzMWBxrUoPi55bK1kC5Dk8jj94HPAq1m0r6yc5/Fuu4iDAz8C/
-	4vuSknLAGGc1P/buVlFTcwghcVXkjmR2oDjX8RgOGEVcmyHMiSEe2
-X-Received: by 2002:a05:600c:83cd:b0:49c:c0d4:53d9 with SMTP id
- 5b1f17b1804b1-49fc56f7a11mr167442875e9.14.1790085933488; Tue, 22 Sep 2026
- 07:05:33 -0700 (PDT)
+        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
+        b=nZ6K0AnMcgLG9hrOKXUDpU1A+kYjsBRpxruDpLkCLxLuv3IJOc6JkS8Wpsc/ApzhE1
+         kAv74Xw+CO+swgPjR9db/B1Uu1PBYhCiHJ619jzgeirrNCbWSsxe0zRjn5DJuNlOmYpE
+         pDv3x0dREh8MrXZa8MSzVJvChJFWOqtAHpi+nmvivXBh+o/Z7DQg9RcsBpq1FIW/DiMm
+         nRyePhTBrf0wZ7Q99yFYM2W8odilNs14GsySL9vxHylfL3k8kao0cDX/CgxmVo0fe5Zl
+         0YiDMM6BF5flJ1H2QLu+KQ4w1kqRXULlP9SEFdOThgy90xee/EIHiXmf/R3rt3+tBGfs
+         LJbg==
+X-Forwarded-Encrypted: i=1; AKwUvBzCr0S5dDyUWdTpwAXFPHUh1hGJEf8586IyKe9d7E1b7FcmqST6OZEOWkqwuJqr2Mvit4EyNZ7+LvBlgw==@vger.kernel.org
+X-Gm-Message-State: AFuF++mGrGTcU04eHXG14exbqZICdBCpDsylOBVRcZr+G33CP18sb8O7
+	VQ+vkDmc15IFhEcfysJctb+ufYOVNp7jAYhuX/Rv6px0G8IYialfyDV3jAFws9GXwa3bKn0Hirh
+	Itby9H2x+PTDVBLvPWnGXmGMx/BNl3HDur5lVtUku6A==
+X-Gm-Gg: AYBFou0TKIUCpaPmg5tt0V8zKDfI5XTjs/7rH34nDE9xfymt2WaLC6prlikDEqWro12
+	XpB2nZ8NiF8GqQK7Qyvs3j9GzB5p4b6G9awbrjfePoIKmlmlF4KUV41ygrRs1ioxx8WYXxHsJOC
+	yL/DkmLQ3qcZPnc2gBV4BXSO+lVrkhgFRa3aj+pgm3F+ZU+X7XyXaurhqBCUlUXO5orn8kcEFau
+	RLg/80QIpgdUh6Dn9+MaBBZHg+kUTFwPz/UTjdIdKIQATtybU0NeuXoqNow0jnrB2yUY4U9j4UI
+	fxW0PQSpdgW8rEC6ZRpOsi8/8MssmEvrLLsiHdrK2rNKt13S0trX6Su3s52sb5344IMC+bxewUJ
+	BX8VBmPMws1RA/HKC9KPrK35I7zlR4uR7oyuJN2s/4tqqeUrfk2+P
+X-Received: by 2002:a05:6000:2409:b0:487:342:d147 with SMTP id
+ ffacd0b85a97d-4871e363e1cmr24110192f8f.39.1790085944981; Tue, 22 Sep 2026
+ 07:05:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-13-neelx@suse.com>
- <20260602032710.GI2295@sol>
-In-Reply-To: <20260602032710.GI2295@sol>
+References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-14-neelx@suse.com>
+ <20260601234454.GF25574@quark>
+In-Reply-To: <20260601234454.GF25574@quark>
 From: Daniel Vacek <neelx@suse.com>
-Date: Tue, 22 Sep 2026 16:05:22 +0200
-X-Gm-Features: AclHuK9W2Pxjl3KwkDzeI2ubrLmu06MdbRUN3yT63V6ZnZJwdsBl8QwyQ-GSdxM
-Message-ID: <CAPjX3Ffd8uiaOaOkwyATq_NtCf-Jx5+Q3Q+y-PH+3XhC+GBvgQ@mail.gmail.com>
-Subject: Re: [PATCH v7 12/43] btrfs: add new FEATURE_INCOMPAT_ENCRYPT flag
+Date: Tue, 22 Sep 2026 16:05:33 +0200
+X-Gm-Features: AclHuK8dl-tYp2fYNBoxko904-iqmC5latOeVGuZqXI84CESlhxypC11MK8aWjs
+Message-ID: <CAPjX3FctU6PQ1=2vL5yVPhWRb9konu2P=Oz_W4E-KSu0FmG96g@mail.gmail.com>
+Subject: Re: [PATCH v7 13/43] btrfs: adapt readdir for encrypted and nokey names
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
 	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -99,101 +99,21 @@ Cc: Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
 	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2 Jun 2026 at 05:28, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Wed, May 13, 2026 at 10:52:46AM +0200, Daniel Vacek wrote:
-> > From: Omar Sandoval <osandov@osandov.com>
-> >
-> > As encrypted files will be incompatible with older filesystem versions,
-> > new filesystems should be created with an incompat flag for fscrypt,
-> > which will gate access to the encryption ioctls.
-> >
-> > Signed-off-by: Omar Sandoval <osandov@osandov.com>
-> > Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-> > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-> > Signed-off-by: Daniel Vacek <neelx@suse.com>
-> > ---
-> >
-> > v5: https://lore.kernel.org/linux-btrfs/ccbea52046c1dadbbef926bfc878cc23af952729.1706116485.git.josef@toxicpanda.com/
-> >  * No changes since.
-> > ---
-> >  fs/btrfs/fs.h              | 3 ++-
-> >  fs/btrfs/super.c           | 5 +++++
-> >  fs/btrfs/sysfs.c           | 6 ++++++
-> >  include/uapi/linux/btrfs.h | 1 +
-> >  4 files changed, 14 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/btrfs/fs.h b/fs/btrfs/fs.h
-> > index a4758d94b32e..dbdb73722c14 100644
-> > --- a/fs/btrfs/fs.h
-> > +++ b/fs/btrfs/fs.h
-> > @@ -322,7 +322,8 @@ enum {
-> >       (BTRFS_FEATURE_INCOMPAT_SUPP_STABLE |   \
-> >        BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE | \
-> >        BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2 | \
-> > -      BTRFS_FEATURE_INCOMPAT_REMAP_TREE)
-> > +      BTRFS_FEATURE_INCOMPAT_REMAP_TREE |    \
-> > +      BTRFS_FEATURE_INCOMPAT_ENCRYPT)
-> >
-> >  #else
-> >
-> > diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-> > index efaa0788c1fc..84df97363611 100644
-> > --- a/fs/btrfs/super.c
-> > +++ b/fs/btrfs/super.c
-> > @@ -2563,6 +2563,11 @@ static int __init btrfs_print_mod_info(void)
-> >                       ", fsverity=yes"
-> >  #else
-> >                       ", fsverity=no"
-> > +#endif
-> > +#ifdef CONFIG_FS_ENCRYPTION
-> > +                     ", fscrypt=yes"
-> > +#else
-> > +                     ", fscrypt=no"
-> >  #endif
-> >                       ;
-> >
-> > diff --git a/fs/btrfs/sysfs.c b/fs/btrfs/sysfs.c
-> > index 0d14570c8bc2..3fe57843f902 100644
-> > --- a/fs/btrfs/sysfs.c
-> > +++ b/fs/btrfs/sysfs.c
-> > @@ -305,6 +305,9 @@ BTRFS_FEAT_ATTR_INCOMPAT(remap_tree, REMAP_TREE);
-> >  #ifdef CONFIG_FS_VERITY
-> >  BTRFS_FEAT_ATTR_COMPAT_RO(verity, VERITY);
-> >  #endif
-> > +#ifdef CONFIG_FS_ENCRYPTION
-> > +BTRFS_FEAT_ATTR_INCOMPAT(encryption, ENCRYPT);
-> > +#endif /* CONFIG_FS_ENCRYPTION */
-> >
-> >  /*
-> >   * Features which depend on feature bits and may differ between each fs.
-> > @@ -338,6 +341,9 @@ static struct attribute *btrfs_supported_feature_attrs[] = {
-> >  #ifdef CONFIG_FS_VERITY
-> >       BTRFS_FEAT_ATTR_PTR(verity),
-> >  #endif
-> > +#ifdef CONFIG_FS_ENCRYPTION
-> > +     BTRFS_FEAT_ATTR_PTR(encryption),
-> > +#endif /* CONFIG_FS_ENCRYPTION */
-> >       NULL
-> >  };
-> >
-> > diff --git a/include/uapi/linux/btrfs.h b/include/uapi/linux/btrfs.h
-> > index 9165154a274d..2f6a46e5f4ce 100644
-> > --- a/include/uapi/linux/btrfs.h
-> > +++ b/include/uapi/linux/btrfs.h
-> > @@ -335,6 +335,7 @@ struct btrfs_ioctl_fs_info_args {
-> >  #define BTRFS_FEATURE_INCOMPAT_ZONED         (1ULL << 12)
-> >  #define BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2        (1ULL << 13)
-> >  #define BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE      (1ULL << 14)
-> > +#define BTRFS_FEATURE_INCOMPAT_ENCRYPT               (1ULL << 15)
-> >  #define BTRFS_FEATURE_INCOMPAT_SIMPLE_QUOTA  (1ULL << 16)
-> >  #define BTRFS_FEATURE_INCOMPAT_REMAP_TREE    (1ULL << 17)
+On Tue, 2 Jun 2026 at 01:44, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, May 13, 2026 at 10:52:47AM +0200, Daniel Vacek wrote:
+> > +     /*
+> > +      * TODO: This should maybe be using the crypto API, not the fallback,
+> > +      * but fscrypt uses the fallback and this is only used in emulation of
+> > +      * fscrypt's buffer sha256 method.
+> > +      */
 >
-> There seems to be an inconsistency where btrfs's fscrypt support depends
-> on CONFIG_BTRFS_EXPERIMENTAL, but the support is advertised in sysfs
-> regardless.
+> You can delete this TODO.  The SHA-256 library functions just do the
+> right thing now.
 
-That is true. These should also depend on BTRFS_EXPERIMENTAL. Will
-amend. Thank you.
+That's great! Thanks.
+
+While at it, there was also a BUG for folios of order > 0. So I
+cleaned up the whole function a bit.
 
 --nX
 
