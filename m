@@ -1,279 +1,158 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815A7579806
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 17:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C6B552952
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 17:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790098053; cv=none; b=JOmAAMJQGBrosnWHl953QDh89sotf0d0f+r7VUMfMUjVC/EsPND36RyfvV54g9aqw4cTbCzKNP5wiSNoqtOOSeXy7hq82LqQ45S1oe28uz1aG3+mw4TmUqlty/XwYBuEPj9LB/wRs3r9qZfGrOkDMvegzrgvpFxYaZhP17l5O+E=
+	t=1790098878; cv=none; b=WdiY9Fw1P4EgjuvxijBlWgHpH/mz9uy7J4DVgeF8mwlw6tepYdVtNICosTGbpqJXRZfCiA8qTkUJFOw0/O1iqtuPlnwwhfiRbdeMEpR0hLnGRXpmmQ2jc1dGrCgJSRgOFwU+xSP5pthKD+9Q0d0cxZPM4brOixNizYolqczxCMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790098053; c=relaxed/simple;
-	bh=XTTsStmTTpH1UdMbAn34Zpy7D2B9GAGap9GcXTkwXFU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nRX+x5XaGMySY2rnOOLrxKXpDubxTwuJi80CgJ2Wv21CknbuAvcozksNRYWmVyzM74tPUeE6g8CW+9vKyp83B31/f3bQZTmbKkH/zpuYeSwUrdIZKDaIrNUgBHoM4d/be1S7Ks04KrtRUvm/UMl0oLZRXeTOeli7FjkgMJwK9KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=LRMR/dAS; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1790098878; c=relaxed/simple;
+	bh=bPFkHCUf+6FtH0ZCu5qND9AO4RF8i3O3qWdtLqBTnAI=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=oAhIyyIqEm4aKpdOPb9NlBLps6n/maYp8i/VSJgL/NJ8MX71Sst3BS4lZHIPsHkLWzI2Q4IbJ3s+RX3EUSjVjaP29yOAWlT57A3QQ8Kt54LY2avmBp4Iy1AjkNHA2trWKpZBjbw4k6kl6UagqX09AKt78+T5ZOrlYe3K29xvqJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gYyW8h+q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="LRMR/dAS"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68MH1oM23981876
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:27:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pps82601-s2048-2026-q3; bh=h710CD/+m
-	ZNimAxffx9SesZHz/+Uejm0o+uiL1NsvkI=; b=LRMR/dASqO4EkRu9fL9zEhh6y
-	CgT003rUKPhtR6jiwWOAJVVpdywXYahplfGRvH7REmKOxCVW4+sV5IHjh10WFAH0
-	2unznhuIeMB9TNdtgCZ0kj7ycc9vu3OazlV+wzxPAe3rEX13do3ButlwfpxY8afI
-	oPBksKjEGHcMdZUOO4PEJgumsfzUcnIA3F3HveN32D5S7Vr9JSv6p4uEuq+I5aUh
-	FQDooJ6bSZo1t0me85s7I4rCBYEW48yt56Jq6Imc/WdINmjGLwm6LTDsER66HcYx
-	FThxmJbz2fofHyu4gail9hY8oyIdng15g9uZB/Nv4NBB91dmgXerik3vcHjQw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4gsr4cffsb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:27:26 -0700 (PDT)
-Received: from twshared15303.01.snb2.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.49; Tue, 22 Sep 2026 17:27:25 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id DD0732C3D7B6C; Tue, 22 Sep 2026 10:27:12 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: <hare@kernel.org>, <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        Henry Hu
-	<huhai@kylinos.cn>
-Subject: [PATCHv2 1/2] blk-mq: set RQF_USE_SCHED when the operation is known
-Date: Tue, 22 Sep 2026 10:27:10 -0700
-Message-ID: <20260922172711.1573186-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gYyW8h+q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790098876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pL4BW2rf46UNolfAMEWqBNp9AHFrnYSaffiDXV2pInk=;
+	b=gYyW8h+qfQNUjTZATdsVFfGUnlmydqeg6iZPvHDiLyKRg7oc8+tkaN2e5QcbSPe3lxmfGq
+	pJ7dDtTNnVQ+MlQ+tI1v9rqMhCaoshKzogKG5Wfe5oUjmmsderPDoVXWMtiRrbbt/GFcg4
+	GmdhCJZ57d8bv804+9Fo+VLLGgWp8zo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-587--yykJJ3lPFCa4-U1PybGVQ-1; Tue,
+ 22 Sep 2026 13:41:12 -0400
+X-MC-Unique: -yykJJ3lPFCa4-U1PybGVQ-1
+X-Mimecast-MFC-AGG-ID: -yykJJ3lPFCa4-U1PybGVQ_1790098871
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EC23180066C;
+	Tue, 22 Sep 2026 17:41:11 +0000 (UTC)
+Received: from mpatocka-thinkpadx1carbongen12.rmtcz.csb (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AADD330001B9;
+	Tue, 22 Sep 2026 17:41:09 +0000 (UTC)
+Date: Tue, 22 Sep 2026 19:41:06 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: =?ISO-8859-15?Q?L=E9o_Terziman?= <leo.terziman@gmail.com>
+cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [BUG] NULL deref in mempool_free_bulk via crypt_endio on dm-crypt
+ teardown (6.8 -> 7.0 regression)
+In-Reply-To: <CAKjZdKjO0WVs2T3jM3txaqxYEt4uJhSc_G9mviWiq9XBe+8jkw@mail.gmail.com>
+Message-ID: <61ea45dc-d0a6-e5e1-fcf5-14c512b17114@redhat.com>
+References: <CAKjZdKjO0WVs2T3jM3txaqxYEt4uJhSc_G9mviWiq9XBe+8jkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: sYWLmdi54Qq9FaSscJP_5SPkMhhITOLY
-X-Authority-Analysis: v=2.4 cv=SKnXx+vH c=1 sm=1 tr=0 ts=6ab2ba7e cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=xtH7KyWI9dI7BmFOsl-x:22 a=VwQbUJbxAAAA:8 a=Byx-y9mGAAAA:8
- a=0RVA0AUJAqKfxIjY3rsA:9
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIyMDI1NSBTYWx0ZWRfX0z4Qpmv/oiQ9
- TQkd6jCnaahhbflEsfAYSsQ0Z05N+9NsKA7wUlvO7sM25VBLrmqpJemitJswh+SQPpTtDuwiGSC
- oAkI/WaMGHZA4suSdwLiNhbBACpYMO4=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIyMDI1NSBTYWx0ZWRfXyameRvlOmNvp
- AlHXBL3RoczrnUg0hCJYVr0t+ZbGXm/zoOAre42WVoo4SzAGMk8IeIKsbh9/zJNmVXxMgXM1V9b
- AZrpjAvU8OJ/aXe7RhmOjcfCs+riHLSmqNh/QY6kHzQrt7sTmahJjSioH+5cr5dy+Nz/5Vm14xi
- RibxI8h+aFaxGtmwFV7OpdNgaQexZUGdFbC6OFXudSYVZia5jLzCWZwQdDfVzYxk2xs9ccmi8WN
- TZ60REUrK2SoukwUoyn989iLqiMADY2ZklNIDceohL/BPmZAIDNye7DJIBlzgo2YE8y39pMWbY+
- hQTFaNv/a8xBwYJbitf/rR3v9mVE8gYpye9vRoiOxg+XsDauCkRR6BkqaoAl/tzMUulOntHbEtS
- Mo9K1wPs1Ym7Vbl2ZotKuPGblgvpYfZRUd5OyzOB6xyLIUBJ6NWNCpbZydOYhin73dT51qGb7YV
- TozG5N6yX2v+2Y682Bw==
-X-Proofpoint-GUID: sYWLmdi54Qq9FaSscJP_5SPkMhhITOLY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-22_02,2026-09-21_02,2025-10-01_01
+Content-Type: multipart/mixed; BOUNDARY="-1463801984-263208959-1790085153=:217987"
+Content-ID: <91848acf-1742-94da-4847-c71a2526d4c0@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Keith Busch <kbusch@kernel.org>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-The cached requests are allocated for one operation but can be handed
-out for another. A passthrough command has RQF_USE_SCHED cleared, so
-using those flags for a subsequent read/write bio will insert it into
-the scheduler without ->prepare_request() and frees it without
-->finish_request(). For kyber, this leaks the domain token acquired at
-dispatch and stalls the queue.
+---1463801984-263208959-1790085153=:217987
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: 8BIT
+Content-ID: <130d1c3c-d8b1-c2e3-790b-be259fa6b730@redhat.com>
 
-Don't set RQF_USE_SCHED based on the first operation the batch happened
-to be allocated for. Instead, set it after the request is claimed by an
-operation. Introduce a helper function, blk_mq_rq_late_init() for this,
-and absorb blk_mq_rq_time_init() since the two run together.
 
-Fixes: 4b6a5d9cea91 ("block: enable batched allocation for blk_mq_alloc_r=
-equest()")
-Link: https://lore.kernel.org/linux-block/20260916151655.2588-1-158158270=
-59@163.com/
-Reported-by: Henry Hu <huhai@kylinos.cn>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v1->v2:
-  Introduced a new helper function for the late request init
 
-  Split off the flush handling into a separate patch.
+On Wed, 16 Sep 2026, Léo Terziman wrote:
 
-  Updated mq-deadline comment
+> NULL pointer dereference in mempool_free_bulk via crypt_endio during
+> dm-crypt device teardown
+> 
+> SUMMARY
+> =======
+> Since upgrading from Ubuntu 24.04 (Linux 6.8) to Ubuntu 26.04 (Linux 7.0),
+> this machine panics roughly once a week. The panic is always a NULL pointer
+> dereference in mempool_free_bulk(), reached from crypt_endio() in dm_crypt
+> via bio_put()/bio_free(), running in softirq context from a SCSI completion.
+> 
+> It reproduces during teardown of a dm-crypt device: a late bio completion
+> arrives after the dm-crypt target's bio_set has already been destroyed, so
+> bio_free() returns the bio to a mempool whose ->elements is NULL.
+> 
+> The system was stable on 6.8 for approximately two years with the identical
+> storage configuration and the identical backup script. Nothing in userspace
+> changed at the time the crashes began.
+> 
+> 
+> ENVIRONMENT
+> ===========
+> Distribution:  Ubuntu 26.04 LTS
+> Kernel:        7.0.0-31-generic #31-Ubuntu PREEMPT(lazy) x86_64
+> Hardware:      Supermicro X13SAE-F, BIOS 5.3 06/04/2026
+> Memory:        64 GB ECC (ie31200_edac; 0 CE, 0 UE reported)
+> DKMS modules:  none
+> Taint:         G W  -- the W is an unrelated boot-time WARN in i915
+>                (print_ddi_port, intel_bios.c VBT parsing, headless system).
+>                No out-of-tree modules are loaded.
+> 
+> 
+> STORAGE STACK
+> =============
+> Four backup volumes, each:
+> 
+>   iSCSI (iscsi_tcp, Synology target over TCP/IP)
+>     -> sd (SCSI disk)
+>       -> dm-crypt
+>         -> btrfs (zstd:3, blake2b csums, async discard enabled)
+> 
+> Mounted together nightly by a backup script, then unmounted and torn down
+> (umount -> cryptsetup close -> iscsiadm logout) when the backup finishes.
+> 
+> Separate from this, the system also uses hardware RAID -> bcache -> btrfs
+> for primary storage and md RAID1 for SSD storage. Neither appears in any
+> crash trace.
+> 
+> 
+> TRIGGER
+> =======
+> Every crash occurs during teardown of the backup volumes, within seconds of
+> unmount. The preceding log is consistent across occurrences:
+> 
+>   [256109.45] BTRFS info (device dm-15): last unmount of filesystem ...
+>   [256109.53] sd 9:0:0:1:  [sdb] Synchronizing SCSI cache
+>   [256109.75] BTRFS info (device dm-16): last unmount of filesystem ...
+>   [256109.96] sd 10:0:0:1: [sdc] Synchronizing SCSI cache
+>   [256110.06] BTRFS info (device dm-17): last unmount of filesystem ...
+>   [256110.17] sd 11:0:0:1: [sdd] Synchronizing SCSI cache
+>   [256111.50] BTRFS info (device dm-18): last unmount of filesystem ...
+>   [256115.15] BTRFS warning (device dm-18): folio private not zero on folio
+>               906100736
+>               [~100 more identical warnings for consecutive folios]
+>   [256115.18] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> 
+> The "folio private not zero" flood immediately before the oops indicates
+> btrfs is releasing folios that still carry I/O state, i.e. the unmount is
+> completing while work is still outstanding beneath it.
 
- block/blk-mq.c      | 59 ++++++++++++++++++++++++++++-----------------
- block/mq-deadline.c |  2 +-
- 2 files changed, 38 insertions(+), 23 deletions(-)
+I suspect that this is btrfs bug. It seems that btrfs closes a block 
+device without waiting for bios to finish.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a26a11c73ee3e..5df6d2244db82 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -447,16 +447,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk=
-_mq_alloc_data *data,
- 	WRITE_ONCE(rq->deadline, 0);
- 	req_ref_set(rq, 1);
-=20
--	if (rq->rq_flags & RQF_USE_SCHED) {
--		struct elevator_queue *e =3D data->q->elevator;
--
--		INIT_HLIST_NODE(&rq->hash);
--		RB_CLEAR_NODE(&rq->rb_node);
--
--		if (e->type->ops.prepare_request)
--			e->type->ops.prepare_request(rq);
--	}
--
- 	return rq;
- }
-=20
-@@ -498,6 +488,12 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_da=
-ta *data)
- 	return rq_list_pop(data->cached_rqs);
- }
-=20
-+static bool blk_op_bypass_sched(blk_opf_t opf)
-+{
-+	return (opf & REQ_OP_MASK) =3D=3D REQ_OP_FLUSH ||
-+	       blk_op_is_passthrough(opf);
-+}
-+
- static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
- {
- 	struct elevator_mq_ops *ops;
-@@ -518,12 +514,10 @@ static void blk_mq_limit_depth(struct blk_mq_alloc_=
-data *data)
- 	 * Flush/passthrough requests are special and go directly to the
- 	 * dispatch list, they are not subject to the async_depth limit.
- 	 */
--	if ((data->cmd_flags & REQ_OP_MASK) =3D=3D REQ_OP_FLUSH ||
--	    blk_op_is_passthrough(data->cmd_flags))
-+	if (blk_op_bypass_sched(data->cmd_flags))
- 		return;
-=20
- 	WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
--	data->rq_flags |=3D RQF_USE_SCHED;
-=20
- 	/*
- 	 * By default, sync requests have no limit, and async requests are
-@@ -534,6 +528,29 @@ static void blk_mq_limit_depth(struct blk_mq_alloc_d=
-ata *data)
- 		ops->limit_depth(data->cmd_flags, data);
- }
-=20
-+/*
-+ * Finish initializing a request once it has been claimed for an operati=
-on.
-+ * Cached requests are allocated before that operation is known.
-+ */
-+static void blk_mq_rq_late_init(struct request *rq, u64 alloc_time_ns)
-+{
-+	struct elevator_queue *e;
-+
-+	blk_mq_rq_time_init(rq, alloc_time_ns);
-+
-+	if (!(rq->rq_flags & RQF_SCHED_TAGS) || (rq->rq_flags & RQF_RESV) ||
-+	    blk_op_bypass_sched(rq->cmd_flags))
-+		return;
-+
-+	rq->rq_flags |=3D RQF_USE_SCHED;
-+	INIT_HLIST_NODE(&rq->hash);
-+	RB_CLEAR_NODE(&rq->rb_node);
-+
-+	e =3D rq->q->elevator;
-+	if (e->type->ops.prepare_request)
-+		e->type->ops.prepare_request(rq);
-+}
-+
- static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data =
-*data)
- {
- 	struct request_queue *q =3D data->q;
-@@ -562,7 +579,7 @@ static struct request *__blk_mq_alloc_requests(struct=
- blk_mq_alloc_data *data)
- 	if (data->nr_tags > 1) {
- 		rq =3D __blk_mq_alloc_requests_batch(data);
- 		if (rq) {
--			blk_mq_rq_time_init(rq, alloc_time_ns);
-+			blk_mq_rq_late_init(rq, alloc_time_ns);
- 			return rq;
- 		}
- 		data->nr_tags =3D 1;
-@@ -590,7 +607,7 @@ static struct request *__blk_mq_alloc_requests(struct=
- blk_mq_alloc_data *data)
- 	if (!(data->rq_flags & RQF_SCHED_TAGS))
- 		blk_mq_inc_active_requests(data->hctx);
- 	rq =3D blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
--	blk_mq_rq_time_init(rq, alloc_time_ns);
-+	blk_mq_rq_late_init(rq, alloc_time_ns);
- 	return rq;
- }
-=20
-@@ -637,8 +654,6 @@ static struct request *blk_mq_alloc_cached_request(st=
-ruct request_queue *q,
- 		if (plug->nr_ios =3D=3D 1)
- 			return NULL;
- 		rq =3D blk_mq_rq_cache_fill(q, plug, opf, flags);
--		if (!rq)
--			return NULL;
- 	} else {
- 		rq =3D rq_list_peek(&plug->cached_rqs);
- 		if (!rq || rq->q !=3D q)
-@@ -650,11 +665,11 @@ static struct request *blk_mq_alloc_cached_request(=
-struct request_queue *q,
- 			return NULL;
-=20
- 		rq_list_pop(&plug->cached_rqs);
--		blk_mq_rq_time_init(rq, blk_time_get_ns());
-+		rq->cmd_flags =3D opf;
-+		INIT_LIST_HEAD(&rq->queuelist);
-+		blk_mq_rq_late_init(rq, blk_time_get_ns());
- 	}
-=20
--	rq->cmd_flags =3D opf;
--	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
- }
-=20
-@@ -766,7 +781,7 @@ struct request *blk_mq_alloc_request_hctx(struct requ=
-est_queue *q,
- 	if (!(data.rq_flags & RQF_SCHED_TAGS))
- 		blk_mq_inc_active_requests(data.hctx);
- 	rq =3D blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
--	blk_mq_rq_time_init(rq, alloc_time_ns);
-+	blk_mq_rq_late_init(rq, alloc_time_ns);
- 	rq->__data_len =3D 0;
- 	rq->phys_gap_bit =3D 0;
- 	rq->__sector =3D (sector_t) -1;
-@@ -3163,9 +3178,9 @@ void blk_mq_submit_bio(struct bio *bio)
- new_request:
- 	if (rq) {
- 		rq_qos_throttle(rq->q, bio);
--		blk_mq_rq_time_init(rq, blk_time_get_ns());
- 		rq->cmd_flags =3D bio->bi_opf;
- 		INIT_LIST_HEAD(&rq->queuelist);
-+		blk_mq_rq_late_init(rq, blk_time_get_ns());
- 	} else {
- 		rq =3D blk_mq_get_new_requests(q, plug, bio);
- 		if (unlikely(!rq)) {
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 5f643c0ce2a86..e5db1ee097c35 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -685,7 +685,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *=
-hctx,
- 	blk_mq_free_requests(&free);
- }
-=20
--/* Callback from inside blk_mq_rq_ctx_init(). */
-+/* Callback from inside blk_mq_rq_late_init(). */
- static void dd_prepare_request(struct request *rq)
- {
- 	rq->elv.priv[0] =3D NULL;
---=20
-2.52.0
+The mempool_free function was reworked between 6.8 and 7.0. In 6.8 it 
+didn't crash if we attempted to free an entry into a free mempool. In 7.0 
+it crashes in this case. So, the btrfs bug could have been there forever, 
+it was just latent and didn't result in a crash on old kernels.
+
+You can try to apply the patch 83f7e52b7ed1c3e03b79123e20b6f6adf8d886bb - 
+maybe it helps.
+
+Mikulas
+---1463801984-263208959-1790085153=:217987--
 
