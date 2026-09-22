@@ -1,262 +1,149 @@
-Received: from mail-oa2-f11.google.com (mail-oa2-f11.google.com [74.125.231.75])
+Received: from mail-yx2-f7.google.com (mail-yx2-f7.google.com [74.125.224.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2B33C6600
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 11:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.75
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790078100; cv=none; b=DvzfFYtm3+MTBp0a19VqkTcWt6l/f4EPzREp/4CZwIiI7d7rfHRaNqwkxWNNEjE9VjAFvTgCMNZdNIsI2s6REfWIRjFMrrBaeAOgqSVMRCB8RwXvfNxVR16FVHBL0MOPqjri/2TZtguYZ6qVb+PHFLyhPryIOKBxRgNCwvA2GiI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790078100; c=relaxed/simple;
-	bh=9Vrz2yJ5IJQ8xZobKroTxgw4W4TDjfkF1IVwe35tFzM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Cy6ZHfcErPlWpevt8GSnEh9ttaIju6KTTgXPvhaXaLXFtOXb+YnSkqqO2JY8wcPz64hDK6Hw+5EIBwBcPOSdhN+IQxbxwR54T/f6X4Lfb91AOE6tOjWpJRUFXqxExdMiLG9SJB+f6xQVIir5MecY0wBiavBlH1SDwh16bljMAAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa2-f11.google.com with SMTP id 586e51a60fabf-46a6530ebd4so1339500fac.0
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:54:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790078097; x=1790682897;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264DC535FCA
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 12:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.135
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790079070; cv=pass; b=IIBYDL9tIWB/gD/VIh3oEhdsr42nAuXELDTZ31zsEQU51qm9G2CD0IfCySVjeq0Si9g5vuliyfdT8pn/kWLkux2A0FrNJgSgHZ05ecNcXcn9SowN/pqOh/M4MAF9yi9bhdjtQDD7SgKb1vEUR8ybf1tCGrxY+rVrdWZByM7nXMQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790079070; c=relaxed/simple;
+	bh=UDre4lqux7Xicwi+fojVvKcL8dYa3ExtouGNXeiHI1k=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HeiScsvpmsTzRDyLugzenO2E9bLI8XLtlmTuF6wmDg2Fi1QJFOznlrYXsIvPXpE2KNJiDdHoLJmW/9G2TLUgwLKaIrdyAU4L1GOfDffLJ06PzTEW3/5AEgROE6k7KBOS1eEV5HUi7GcyUk//gxPuigCawnHk5ENJgL1HQkxyCLE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSFRxe4J; arc=pass smtp.client-ip=74.125.224.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSFRxe4J"
+Received: by mail-yx2-f7.google.com with SMTP id 00721157ae682-8552adbe8ebso8477337b3.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 05:11:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790079068; cv=none;
+        d=google.com; s=arc-20260327;
+        b=BehxQ9U5I0GMl6I9oZGXihNUNqRlFHOpOXDi5ru1iS3O9+NptOO5/lPmdlFxq+hs9o
+         JIQ5UcHuePzEBzg9zJeD7kIxjRhYNRG9kCoJmBhmZIwQzTFQ0PpPNB3ib0Hc04P12tQJ
+         FAXL39aOI33dJsAfKmaxLkJyNQlhaViB7qd2zIYtzt5gx2yFqKlZyDuRHcYV3NxkjOWt
+         YUMIV4JYNb28mkFCTGikZHzNdA/bS7ordbgrgKmyLxyF6MsELOeyDKlNwo8xjhiGp4TV
+         9e0bC+Pns0MCaI928CZxihENbNAI56PJA1C1yhRJzwmvAXzd7aBHNma4itqwAm7z693A
+         pJPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:reply-to:mime-version
+         :dkim-signature;
+        bh=33MOPJgpvg9zM9RDeL1oh9Q/BC1A+9nzmHtNl+8zkU4=;
+        fh=CcE2iZyys1CzyZd31cCWxvgHrz/n0XDUo1SQvLO3XnU=;
+        b=YdRBPHLjSx5v48OJ/FDIG71EzYP8ijhkOre70s7W6UcTcqcxiO9jX1sgtkKXd/6xSJ
+         CX7yVZHBznXBqql/Kja/PgLM+u+8+Hvnf08SWERmo91E9pasgIcim3HUXM06+4Qrez8d
+         qlBn5ZeulnNCjdt6CiVsZ1NKxOoTpsAfuClLCWGOAylUju/oge2uwU0Xh9eN8Ajr6uJx
+         kAef11XBtKILqI7g9DsiNAJTSWC8NgbE7A10X0psJ+iLWdlt8n/N8wDQIyLLA3lrnbHq
+         n0ogdDrSUIXB0a1rZbMBWzqRfiOx/Hw6IR1vnJxh7kMqmj2KzwNi0Ti+oaR15+3IEnfN
+         P8MQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790079068; x=1790683868; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:reply-to
+         :mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=xz9NsVfFyEQ4ELu4SH9AXjL8muGA26kDetAt0gAOsqY=;
-        b=qH/op6VcUTZPrdj9ucNiW1zYaBSiImZILLK5dgEDxaXMBEREhS5ta9TUYQdINLmirD
-         HzJlE/NTK4yu4+zUEAPcY3ImaVmN+k8FkjBNhDltsSN8PKoZ/DHuWRWfBfDFYLAQ6G6N
-         C+/yT2VlCerAXLq2A4CUF3tY0G1uPg0OcT+Db8U+GJb7neWkPIIie0vEu+RpumDcIOhW
-         LcSy74jMXrlkOzuXAeOclBl3mYGmXEZndPqfbBFBhZCF4Je/DTXyq05SfS1JoGUWV15q
-         1O5AXuJ05MV4EZkqw549blAIbSgdvIiDu0ew9F+LKp40DL7b+xqnvapt2v7fU+cFSPL4
-         c3rA==
-X-Forwarded-Encrypted: i=1; AKwUvBwxnaTtmVzGfN7Y2iEDX7Zzej/q9PJnnHl6KxfEg0HkOCCaFwRaFemJcN9fEK/Pm5azeNSjrY324492nw==@vger.kernel.org
-X-Gm-Message-State: AFuF++l+ee6N6q+F+Od5V00FsjmehYxm0pOyIi7nkVPoEs58lDyE+yJs
-	gDRVxaoRoTzAIKOrl26fSfqby3NFhC36xhf1xAdXw+SBjXHf4DC5QF3x2gMI6L2mcotNz/pFLxH
-	vdyFurF5o2t5cn6Rm+1eTxZQwaVz/wrYzR/QfTzVH0pyW8/NCTTdD2xCzC+Q=
+        bh=33MOPJgpvg9zM9RDeL1oh9Q/BC1A+9nzmHtNl+8zkU4=;
+        b=fSFRxe4JNAEAx+3lWRkILhN6ZoJk8RMzMldMl5fiR4OaLDNFRKgiOPr/05shc7THOf
+         mcRZ7dQ0qt99RrhFHM76hRnEjuMQctyZtKWwl+uYeO1PTUn2jl4gYUnXMVLRm8usGxUh
+         gD6Cf+o8uGxQuVq4sr1GIk9+Ngs46U91N3sbwpdLCafezgNjOrP7d0yBQmk4n9Qpsym3
+         npYqh7f7mNXy3SxX9SKSODqu+V0WhzM8nVmQaPM2gCHJG83ThC4E4T5dLUgLRUzsmNc4
+         0Y0cxCa7BegeRKGMnm0zSKzrFrudqAJ6Np2Axw7UaP070uLpd4DyE8b7nCdgY6101t8/
+         hPpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790079068; x=1790683868;
+        h=content-type:cc:to:subject:message-id:date:from:reply-to
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=33MOPJgpvg9zM9RDeL1oh9Q/BC1A+9nzmHtNl+8zkU4=;
+        b=yUOztrb+SYHIOL/w1NTc79F+8l4Rz+fd6YolUjmcPvYsBloYg+NhChSQVs/1aovQ74
+         jq9q6xc0tnOtJGPlRQD5Y7m5F2IsrJisea1Y8i7eJP9w4pcpZgPZv8BgPyudDlVYUkSj
+         JBZtzhM8X2cvUg8U5ADTXu7w3B5Zfd7A1FqUNw8rsMODT8nAXf2+RLZSRuvU5Bhhy3cV
+         H4CuB5vG5TDAFglrM+lc/RoyiCqEd1bpjYFlozbue9bsu3mYy7unFvOU9ryX0xvFdDJ+
+         o8ijzufzOqmMMq6BVDsspzUv+Cy2xNqU1uvu7qAuPYtbm1rPTivSHSkK1D+GRP+0axZO
+         acOw==
+X-Gm-Message-State: AFuF++lDQECjcuPBb8+QeCDAwodcVLEfJgevKIUn9w7TU9iA74WqPqJ3
+	+arOdrvq++tllIs0HPSZKH841RHfjjcg4sss9az18nCWF372H/UR2MB6ihXvcYXquIRM1i+fvQU
+	nSKscxURIDxrUyiRmGDqYR3A6CBPsIKQ=
+X-Gm-Gg: AYBFou1co9FuyUJ7RiRz7/8IblDHzeP6eUgOiiOQwHgVI0DEOIg9XCJ+NNjDeVdD04o
+	mTRu6rpR91qJzrXBnf1vOnDGkYG6ZNHA5wz+bcLqSYXW44He0GjqIy4omkh0STSt2ERh/eN8iRT
+	O9rvTQlrzeToFG/WKe0SGP4UZrfDm93QcYy5jUIJoVihZnJF8YxMhrhxH3nZX2zf3RSQIM702xR
+	E2KafunyGIw+369T5Vj/kHwSggXBmMmos2t/Cy//uo68IkxFRRfSFXMQ+ehdZuXGUurUWSOb3IH
+	O1lmkAFPN+O1q9DNaJ15s7TPKS/Yh7uZs7XSzlBF/+10ZKJEPNFHRmcm1OjKmQeuw5acjeHK+Bc
+	oCjwmyXNkDPzfIWLL/G1vSrDr2xZCR0pePaSfeg==
+X-Received: by 2002:a05:690c:34c9:b0:89f:a3c7:402a with SMTP id
+ 00721157ae682-8a254895b66mr9451467b3.15.1790079067831; Tue, 22 Sep 2026
+ 05:11:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2908:b0:6c9:e0a0:af1d with SMTP id
- 006d021491bc7-6ca9a643b29mr12002654eaf.26.1790078096876; Tue, 22 Sep 2026
- 04:54:56 -0700 (PDT)
-Date: Tue, 22 Sep 2026 04:54:56 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ab26c90.c68e76dc.23da29.00ab.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in sd_revalidate_disk
-From: syzbot <syzbot+2e02ccadb3c5522a5c59@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, dlemoal@kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Reply-To: www.rokinthanp03@gmail.com
+From: Rokinthan p <rokinthanp03@gmail.com>
+Date: Tue, 22 Sep 2026 17:40:50 +0530
+X-Gm-Features: AcwNN1WqR55AEPQHwUcgSGoSAVt3qtxdFgKe7oLMbyWc5WkpOjGsZD5Dti4AAeE
+Message-ID: <CAHzb5FHOCS+mH2DbFrxUB+=a9Wh4Za2Vf-2=fR_pY3_mgX_cRw@mail.gmail.com>
+Subject: [PATCH] zram: reject zero or overflowed disksize in disksize_store
+To: minchan@kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+fb23651a7efbea8868ed@syzkaller.appspotmail.com
+Content-Type: multipart/mixed; boundary="000000000000f57554065c114200"
+
+--000000000000f57554065c114200
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    9d80aa4617b3 Add linux-next specific files for 20260903
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=175ba915580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b370c26fb58c72f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=2e02ccadb3c5522a5c59
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/84a12994f553/disk-9d80aa46.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2329deeb3b2b/vmlinux-9d80aa46.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/689910d8c695/bzImage-9d80aa46.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2e02ccadb3c5522a5c59@syzkaller.appspotmail.com
-
-sd 1:0:0:0: [sdb] Test Unit Ready failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
-sd 1:0:0:0: [sdb] Read Capacity(10) failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
-sd 1:0:0:0: [sdb] Sense not available.
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-kworker/u8:3/49 is trying to acquire lock:
-ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:316 [inline]
-ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4636 [inline]
-ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4974 [inline]
-ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: __do_kmalloc_node mm/slub.c:5418 [inline]
-ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
-
-but task is already holding lock:
-ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
-ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: sd_revalidate_disk+0xb88/0xb350 drivers/scsi/sd.c:3803
-
-which lock already depends on the new lock.
 
 
-the existing dependency chain (in reverse order) is:
+--000000000000f57554065c114200
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-zram-reject-zero-or-overflowed-disksize-in-disksize_.patch"
+Content-Disposition: attachment; 
+	filename="0001-zram-reject-zero-or-overflowed-disksize-in-disksize_.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mucmtal30>
+X-Attachment-Id: f_mucmtal30
 
--> #2 (&q->limits_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
-       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
-       disk_update_zone_resources block/blk-zoned.c:2067 [inline]
-       blk_revalidate_disk_zones+0xad9/0x12e0 block/blk-zoned.c:2375
-       nvme_mpath_revalidate_zones+0x106/0x1c0 drivers/nvme/host/multipath.c:301
-       nvme_update_ns_info+0x984/0x1200 drivers/nvme/host/core.c:2622
-       nvme_alloc_ns drivers/nvme/host/core.c:4284 [inline]
-       nvme_scan_ns+0x2563/0x3640 drivers/nvme/host/core.c:4471
-       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
-       process_one_work kernel/workqueue.c:3399 [inline]
-       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
-       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
-       kthread+0x38b/0x480 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 (&q->q_usage_counter(io)#77){++++}-{0:0}:
-       blk_alloc_queue+0x544/0x690 block/blk-core.c:504
-       __blk_alloc_disk+0xe3/0x1d0 block/genhd.c:1527
-       nvme_mpath_alloc_disk+0x5c2/0x8b0 drivers/nvme/host/multipath.c:769
-       nvme_alloc_ns_head drivers/nvme/host/core.c:4043 [inline]
-       nvme_init_ns_head drivers/nvme/host/core.c:4144 [inline]
-       nvme_alloc_ns drivers/nvme/host/core.c:4258 [inline]
-       nvme_scan_ns+0x1e0f/0x3640 drivers/nvme/host/core.c:4471
-       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
-       process_one_work kernel/workqueue.c:3399 [inline]
-       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
-       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
-       kthread+0x38b/0x480 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 (fs_reclaim){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3209 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
-       validate_chain kernel/locking/lockdep.c:3952 [inline]
-       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
-       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
-       __fs_reclaim_acquire mm/page_alloc.c:4357 [inline]
-       fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4371
-       might_alloc include/linux/sched/mm.h:316 [inline]
-       slab_pre_alloc_hook mm/slub.c:4636 [inline]
-       slab_alloc_node mm/slub.c:4974 [inline]
-       __do_kmalloc_node mm/slub.c:5418 [inline]
-       __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
-       _kmalloc_noprof include/linux/slab.h:995 [inline]
-       sd_read_block_zero drivers/scsi/sd.c:3749 [inline]
-       sd_revalidate_disk+0x177d/0xb350 drivers/scsi/sd.c:3817
-       sd_probe+0x9f3/0x1180 drivers/scsi/sd.c:4101
-       call_driver_probe drivers/base/dd.c:-1 [inline]
-       really_probe+0x254/0xae0 drivers/base/dd.c:706
-       __driver_probe_device+0x1e8/0x360 drivers/base/dd.c:868
-       driver_probe_device+0x4f/0x240 drivers/base/dd.c:898
-       __device_attach_driver+0x270/0x410 drivers/base/dd.c:1026
-       bus_for_each_drv+0x258/0x2f0 drivers/base/bus.c:500
-       __device_attach_async_helper+0x1e7/0x2b0 drivers/base/dd.c:1055
-       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
-       process_one_work kernel/workqueue.c:3399 [inline]
-       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
-       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
-       kthread+0x38b/0x480 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-other info that might help us debug this:
-
-Chain exists of:
-  fs_reclaim --> &q->q_usage_counter(io)#77 --> &q->limits_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->limits_lock);
-                               lock(&q->q_usage_counter(io)#77);
-                               lock(&q->limits_lock);
-  lock(fs_reclaim);
-
- *** DEADLOCK ***
-
-locks held by kworker/u8:3/49: 4, last CPU#0:
- #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
- #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3364 [inline]
- #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: process_scheduled_works+0x97a/0x1630 kernel/workqueue.c:3482
- #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
- #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3364 [inline]
- #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_scheduled_works+0x97a/0x1630 kernel/workqueue.c:3482
- #2: ffff888075d823c0 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1104 [inline]
- #2: ffff888075d823c0 (&dev->mutex){....}-{4:4}, at: __device_attach_async_helper+0xa4/0x2b0 drivers/base/dd.c:1041
- #3: ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
- #3: ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: sd_revalidate_disk+0xb88/0xb350 drivers/scsi/sd.c:3803
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 49 Comm: kworker/u8:3 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
-Workqueue: async async_run_entry_fn
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
- check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
- check_prev_add kernel/locking/lockdep.c:3209 [inline]
- check_prevs_add kernel/locking/lockdep.c:3328 [inline]
- validate_chain kernel/locking/lockdep.c:3952 [inline]
- __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
- lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
- __fs_reclaim_acquire mm/page_alloc.c:4357 [inline]
- fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4371
- might_alloc include/linux/sched/mm.h:316 [inline]
- slab_pre_alloc_hook mm/slub.c:4636 [inline]
- slab_alloc_node mm/slub.c:4974 [inline]
- __do_kmalloc_node mm/slub.c:5418 [inline]
- __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
- _kmalloc_noprof include/linux/slab.h:995 [inline]
- sd_read_block_zero drivers/scsi/sd.c:3749 [inline]
- sd_revalidate_disk+0x177d/0xb350 drivers/scsi/sd.c:3817
- sd_probe+0x9f3/0x1180 drivers/scsi/sd.c:4101
- call_driver_probe drivers/base/dd.c:-1 [inline]
- really_probe+0x254/0xae0 drivers/base/dd.c:706
- __driver_probe_device+0x1e8/0x360 drivers/base/dd.c:868
- driver_probe_device+0x4f/0x240 drivers/base/dd.c:898
- __device_attach_driver+0x270/0x410 drivers/base/dd.c:1026
- bus_for_each_drv+0x258/0x2f0 drivers/base/bus.c:500
- __device_attach_async_helper+0x1e7/0x2b0 drivers/base/dd.c:1055
- async_run_entry_fn+0x9d/0x430 kernel/async.c:129
- process_one_work kernel/workqueue.c:3399 [inline]
- process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
- worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
- kthread+0x38b/0x480 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-sd 1:0:0:0: [sdb] 0 512-byte logical blocks: (0 B/0 B)
-sd 1:0:0:0: [sdb] 0-byte physical blocks
-sd 1:0:0:0: [sdb] Write Protect is off
-sd 1:0:0:0: [sdb] Mode Sense: 00 00 00 00
-sd 1:0:0:0: [sdb] Asking for cache data failed
-sd 1:0:0:0: [sdb] Assuming drive cache: write through
-sd 1:0:0:0: [sdb] Attached SCSI removable disk
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+RnJvbSAzZGE4OGViMDZjYWIzMWJhMzVjYzkxYmNmNjU4M2FlMTU1MDE3MjEwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpbnRoYW4gPHJva2ludGhhbnAwM0BnbWFpbC5jb20+CkRh
+dGU6IFR1ZSwgMjIgU2VwIDIwMjYgMTY6MjY6NTcgKzA1MzAKU3ViamVjdDogW1BBVENIXSB6cmFt
+OiByZWplY3QgemVybyBvciBvdmVyZmxvd2VkIGRpc2tzaXplIGluIGRpc2tzaXplX3N0b3JlCgpX
+aGVuIHVzZXJzcGFjZSB3cml0ZXMgYSB2YWx1ZSBjbG9zZSB0byBVNjRfTUFYIChzdWNoIGFzICh1
+NjQpLTEpIHRvIHRoZQpzeXNmcyBhdHRyaWJ1dGUgL3N5cy9ibG9jay96cmFtPGlkPi9kaXNrc2l6
+ZSwgZGlza3NpemVfc3RvcmUoKSBwYXJzZXMgaXQKd2l0aCBtZW1wYXJzZSgpIGFuZCB0aGVuIGNh
+bGxzOgoKICAgIGRpc2tzaXplID0gUEFHRV9BTElHTihkaXNrc2l6ZSk7CgpCZWNhdXNlIGFkZGlu
+ZyBQQUdFX1NJWkUgLSAxIHRvIHZhbHVlcyBpbiB0aGUgcmFuZ2UKW1U2NF9NQVggLSBQQUdFX1NJ
+WkUgKyAyLCBVNjRfTUFYXSBjYXVzZXMgYW4gaW50ZWdlciBvdmVyZmxvdyB3cmFwcGluZwp0byAw
+LCBkaXNrc2l6ZSBiZWNvbWVzIDAuIGRpc2tzaXplX3N0b3JlKCkgdGhlbiBwYXNzZXMgMCB0bwp6
+cmFtX21ldGFfYWxsb2MoKSwgd2hpY2ggY29tcHV0ZXMgbnVtX3BhZ2VzID0gMCBhbmQgY2FsbHMg
+dnphbGxvYygwKS4KCkluIG1tL3ZtYWxsb2MuYywgX192bWFsbG9jX25vZGVfcmFuZ2Vfbm9wcm9m
+KCkgY2hlY2tzCmBpZiAoV0FSTl9PTl9PTkNFKCFzaXplKSlgIGFuZCB0cmlnZ2VycyBhIGtlcm5l
+bCB3YXJuaW5nOgoKICAgIFdBUk5JTkc6IG1tL3ZtYWxsb2MuYzo0MDM4IGF0IF9fdm1hbGxvY19u
+b2RlX3JhbmdlX25vcHJvZgogICAgQ2FsbCB0cmFjZToKICAgICBfX3ZtYWxsb2Nfbm9kZV9yYW5n
+ZV9ub3Byb2YKICAgICB2emFsbG9jX25vcHJvZgogICAgIGRpc2tzaXplX3N0b3JlCiAgICAgZGV2
+X2F0dHJfc3RvcmUKICAgICBzeXNmc19rZl93cml0ZQoKRml4IHRoaXMgYnkgY2hlY2tpbmcgaWYg
+ZGlza3NpemUgd3JhcHBlZCB0byAwIGFmdGVyIFBBR0VfQUxJR04oZGlza3NpemUpCmFuZCByZXR1
+cm5pbmcgLUVJTlZBTC4gQWxzbyBhZGQgYSBkZWZlbnNpdmUgY2hlY2sgaW4genJhbV9tZXRhX2Fs
+bG9jKCkKdG8gcmV0dXJuIGZhbHNlIGlmIGRpc2tzaXplIGlzIDAsIGF2b2lkaW5nIHZ6YWxsb2Mo
+MCkgdW5kZXIgYW55CmNpcmN1bXN0YW5jZS4KCkZpeGVzOiBjZDY3ZTEwYWM2OTkgKCJ6cmFtOiBw
+cm9tb3RlIHpyYW0gZnJvbSBzdGFnaW5nIikKUmVwb3J0ZWQtYnk6IHN5emJvdCtmYjIzNjUxYTdl
+ZmJlYTg4NjhlZEBzeXprYWxsZXIuYXBwc3BvdG1haWwuY29tCkNsb3NlczogaHR0cHM6Ly9zeXpr
+YWxsZXIuYXBwc3BvdC5jb20vYnVnP2V4dGlkPWZiMjM2NTFhN2VmYmVhODg2OGVkClNpZ25lZC1v
+ZmYtYnk6IFJvaGludGhhbiA8cm9raW50aGFucDAzQGdtYWlsLmNvbT4KLS0tCiBkcml2ZXJzL2Js
+b2NrL3pyYW0venJhbV9kcnYuYyB8IDYgKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRp
+b25zKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2LmMgYi9kcml2
+ZXJzL2Jsb2NrL3pyYW0venJhbV9kcnYuYwppbmRleCA2Y2I0NGUyLi5mZGQxM2RmIDEwMDY0NAot
+LS0gYS9kcml2ZXJzL2Jsb2NrL3pyYW0venJhbV9kcnYuYworKysgYi9kcml2ZXJzL2Jsb2NrL3py
+YW0venJhbV9kcnYuYwpAQCAtMTk4OSw2ICsxOTg5LDkgQEAgc3RhdGljIGJvb2wgenJhbV9tZXRh
+X2FsbG9jKHN0cnVjdCB6cmFtICp6cmFtLCB1NjQgZGlza3NpemUpCiB7CiAJc2l6ZV90IG51bV9w
+YWdlczsKIAorCWlmICghZGlza3NpemUpCisJCXJldHVybiBmYWxzZTsKKwogCW51bV9wYWdlcyA9
+IGRpc2tzaXplID4+IFBBR0VfU0hJRlQ7CiAJenJhbS0+dGFibGUgPSB2emFsbG9jKGFycmF5X3Np
+emUobnVtX3BhZ2VzLCBzaXplb2YoKnpyYW0tPnRhYmxlKSkpOwogCWlmICghenJhbS0+dGFibGUp
+CkBAIC0yODc4LDYgKzI4ODEsOSBAQCBzdGF0aWMgc3NpemVfdCBkaXNrc2l6ZV9zdG9yZShzdHJ1
+Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBkZXZpY2VfYXR0cmlidXRlICphdHRyLAogCX0KIAogCWRp
+c2tzaXplID0gUEFHRV9BTElHTihkaXNrc2l6ZSk7CisJaWYgKCFkaXNrc2l6ZSkKKwkJcmV0dXJu
+IC1FSU5WQUw7CisKIAlpZiAoIXpyYW1fbWV0YV9hbGxvYyh6cmFtLCBkaXNrc2l6ZSkpCiAJCXJl
+dHVybiAtRU5PTUVNOwogCi0tIAoyLjUzLjAKCg==
+--000000000000f57554065c114200--
