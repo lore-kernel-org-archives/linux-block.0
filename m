@@ -1,149 +1,116 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0683B549391;
-	Tue, 22 Sep 2026 15:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9475955C305
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 15:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790089298; cv=none; b=midpINWDxpo6nVKjot7EMptfxULVNzZFndIiUgjN5oWemjUHs6J1VsEZes+T+7wR+C/SFWn/fFs3H4ppzQWYKY9V1T1T3eWCuKhpWA/oayzVIMwrxAeO5H0q/D51MZtx113e9Ucgcoa/LJTJtZ0V/8yfFC61iCkh4GUZ4oKihiI=
+	t=1790091278; cv=none; b=kHrtAvNWUBbpU6n7THvfwkkwaQaZ5hLsuNmorUrEZQkscBUgYiSm0SHkAolFg32T4Hx66lm82/rxwtU6I67826gS99Z2lIQbcHNDJRB6FovoelK6j+y55hvE7l4+4QkpH8fVJYW+rIHTZ88t/bJ04edH12xqHAnvws4W/CgmcZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790089298; c=relaxed/simple;
-	bh=Xx8OpgywHGcsMeIvcyLKY53xhgcQ53vAtUHJ1T4t+ds=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oZLOgItkBZbuT5WHYX25rVqfN5854xvNzIM1tC+qpJbTdSsQEIl4LcX/zduTlhmg3Vm88vQFsEz4qIZRcx5xXxdp+5Ixx0NUsufjA9ZvcVgZthzR2U537DvdSZE50t9k0gZPZ4VkA8oTToOdvgAYrMKHjazamGBMB9SmVU4sZM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=KLXmWEc6; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1790091278; c=relaxed/simple;
+	bh=LuiaBeSD0IBnKnMQwy2MeH+wYKQ4HMIUxgxd4XXEt50=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l76kWYh+ThcmUxiEDDI4lgoKPY0/OnOpGPxsMe0hfsLv+cBVJpdc9DriaPSCM9Yf/r8hUL2U/8sMUue8Eie1uLhXkV9pqRQo5PzGaC68Id112/1lsTIowkMQ+bFevbNKdezhvm9hp3Hnd10KItcxEbhgAx8tentYmUmM4CO6nVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Gc13Dmh3; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="KLXmWEc6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=ky
-	nlDgai36MsbIl72qSEa5NJ1VukAAFb/WIGZOyQrXs=; b=KLXmWEc6euuUVnYiLy
-	dOuN0v0MTSkSDKMG3dc7OMDTyPZtpNI3n/6LnR91d/gmYc3DcvLhCEmK5Q3yRum5
-	XBiDQacQkTYEBfRvM5KVMJF+Q9TvarNukkvQ0Q0E+ts2zsNqnX28EE/zyClkT5py
-	1gNZJyBW5EQU2860oHFfNNb8Y=
-Received: from colol4bi5.localdomain (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgCXlWozmLJqCKtEAw--.24065S2;
-	Tue, 22 Sep 2026 23:01:08 +0800 (CST)
-From: Binbin Deng <18983559317@163.com>
-To: philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com,
-	axboe@kernel.dk
-Cc: drbd-dev@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Binbin Deng <18983559317@163.com>
-Subject: [PATCH v1] drbd: fix use-after-frees of disk_conf and rs_plan_s in chg-disk-opts
-Date: Tue, 22 Sep 2026 23:01:04 +0800
-Message-ID: <20260922150104.156635-1-18983559317@163.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Gc13Dmh3"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 68MF2Np72373682
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 08:34:35 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps82601-s2048-2026-q3; bh=l2zHm5Xj3
+	0UEAOy9nk3DRA+Kvmm8ZO804nBKRhqtn60=; b=Gc13Dmh3rdvnXajo5nIwwIXz8
+	9FnjRmsuVSRd0KGYUGyoZ7rCnbIbUdLcLOVvH4LL6bElYcfmhY2TFzYwewGwDA++
+	NEtFrP8ltQNvufJ6007FO0mrH+1YG3NXp8dMX30qr5DmmyzkBG+JS88CqIodv95c
+	6//rXrJIW4S7Zn8OnUUOjH79jn2XyXf+GW9LfX628SGeLJCqAf7aKT/ZSwUT3fGu
+	7sM4CPSSLVFq4K8WCjZCESbdNCoEguwI3lyD4XtiTt9PTVFYJAV0kMWKXVzQ/n5+
+	UdhYfICtqNDLXdDulmhjY7F8d8nECYizpJNVVkMPPoO/ff6EXRAmh3QXCwMfw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 4gsp29eryq-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 08:34:35 -0700 (PDT)
+Received: from twshared123204.16.frc2.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.49; Tue, 22 Sep 2026 15:34:33 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 07E412C3C65D8; Tue, 22 Sep 2026 08:34:17 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dinguyen@kernel.org>, <schuster.simon@siemens-energy.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <lftan@altera.com>, Keith Busch <kbusch@kernel.org>,
+        kernel test robot
+	<lkp@intel.com>
+Subject: [PATCH] nios2: fix __wsum type degradation in csum_fold()
+Date: Tue, 22 Sep 2026 08:34:16 -0700
+Message-ID: <20260922153416.730513-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgCXlWozmLJqCKtEAw--.24065S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxZw4xKr47CrWxAFykKFWfZrb_yoW5KF1xpF
-	W5Ka1UAr1Utw4YvF4ak3WrWr45tan7XF9rGrZ7Ka12vw43Ar9xXFW3Z3ya9Fnxur97CFyx
-	Za9xJFs7K3sYkFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRyCJPUUUUU=
-X-CM-SenderInfo: jprymmytvvmjmrxbiqqrwthudrp/xtbC4BR6XmqymDSkPgAA3+
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIyMDIyNyBTYWx0ZWRfX4L7I8cxA2OMq
+ 2wDgEwu4Hu6bJmNmqd0OtheJPPrsQow/S1nfTMILao2GODGrLMLs6X9Ft1jZF5sHm/T7sfHUfw3
+ BfxTDQqO0vbobyfPlGKZeJ8Xu6k5Sgc=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIyMDIyNyBTYWx0ZWRfX6IGDOUFVIwsk
+ 4/bpKhBAZGaK9cEhzcqqnzEEpe1FjPokYK/RfnidBM0YyFpBDyQlZ7rAstWveMn0flT8pOATQkE
+ xdT/JEiu4AMSTY20ZbjZ8TTSJCJTBhrb6H0LQHDP38G95eBM9v8yYzd45u/uhbcMHmQhFCwdmMG
+ xk/X9LS/oYu5O2sTCe2bGT6zp2aFY1iYb4Uzn8rsYs7pnZB7V98AHsxniLnFlrrxgW7l7/t2/9i
+ 3Q3dzn/EKjfj3VNdZUqjHYvpoFJTgjkYVnHNa9GWs1Q19JXlYLOfjeOYRCU9r2HqrNh7UQMULSq
+ mlu6gcMD0HvLbXVVJUfsJl09/f4JvyQ3lBXn8uo52ChXGHes+T33JHiYQWL+gDT3KCJx1zNmmDG
+ iYGEiHkTlvPrWVuiEy0ya9vke4Yd8zV9OEKYzk/JJlcPfR/XwoDlyDbtes2io4UIMg8jxDTN9r2
+ v1qI7v/sajue+J1+Rcw==
+X-Proofpoint-GUID: _kMzZ11oZlqJkA2yi-GXmAFRdQSNXetX
+X-Proofpoint-ORIG-GUID: _kMzZ11oZlqJkA2yi-GXmAFRdQSNXetX
+X-Authority-Analysis: v=2.4 cv=abX0Dhot c=1 sm=1 tr=0 ts=6ab2a00b cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=_78whYxrdx1mplLwxq1U:22 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8
+ a=QfzvH6fXpEJYp8rZMLYA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-22_02,2026-09-21_02,2025-10-01_01
 
-drbd_nl_chg_disk_opts_doit() installs a new disk_conf, drops conf_update
-and then keeps reading from the old and the new object. A concurrent
-receive_SyncParam(), which runs from the receiver thread and serialises
-on the same mutex, may install another disk_conf and kfree() the published
-one as soon as conf_update is released.  Its synchronize_rcu() does not
-wait for these reads, because they are not inside an RCU read-side
-critical section, so the object can be freed while it is still being read.
+From: Keith Busch <kbusch@kernel.org>
 
-BUG: KASAN: slab-use-after-free in drbd_nl_chg_disk_opts_doit+0x16a8/0x18b0
-Read of size 1 at addr ffff888100d84950 by task drbdsetup-84/100447
-Call Trace:
- <TASK>
- dump_stack_lvl+0x53/0x70
- print_report+0xd0/0x630
- ? __pfx__raw_spin_lock_irqsave+0x10/0x10
- ? drbd_nl_chg_disk_opts_doit+0x16a8/0x18b0
- ? genlmsg_put+0x12f/0x330
- ? __pfx_drbd_nl_chg_disk_opts_doit+0x10/0x10
- ? __nla_parse+0x24/0x30
- ? genl_family_rcv_msg_attrs_parse.isra.0+0x17a/0x290
- genl_family_rcv_msg_doit+0x1e0/0x2c0
- ? __pfx_genl_family_rcv_msg_doit+0x10/0x10
- ? __pfx_cred_has_capability.isra.0+0x10/0x10
- genl_rcv_msg+0x419/0x6d0
- ? __pfx_genl_rcv_msg+0x10/0x10
- ? __pfx_drbd_pre_doit+0x10/0x10
- ? __pfx_drbd_nl_chg_disk_opts_doit+0x10/0x10
- ? __pfx_drbd_post_doit+0x10/0x10
- netlink_rcv_skb+0x11f/0x350
- ? __pfx_genl_rcv_msg+0x10/0x10
- ? __pfx_netlink_rcv_skb+0x10/0x10
- ? __pfx___netlink_lookup+0x10/0x10
- genl_rcv+0x23/0x30
- netlink_unicast+0x5f5/0x860
- ? __pfx_netlink_unicast+0x10/0x10
- ? __pfx_sock_has_perm+0x10/0x10
- netlink_sendmsg+0x70a/0xba0
- ? __pfx_netlink_sendmsg+0x10/0x10
- ? selinux_socket_sendmsg+0x8c/0x270
- sock_write_iter+0x405/0x4a0
- ? __pfx_sock_write_iter+0x10/0x10
- ? __file_has_perm+0x30f/0x410
- ? folio_add_new_anon_rmap+0x254/0x5d0
- vfs_write+0xa4b/0xcf0
- ? __handle_mm_fault+0xd1a/0x1e30
- ? __pfx_vfs_write+0x10/0x10
- ? fdget_pos+0x53/0x4b0
- ksys_write+0x17c/0x1c0
- ? __pfx_ksys_write+0x10/0x10
- do_syscall_64+0xf9/0x540
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
- </TASK>
+csum_fold() shifts a bitwise __wsum type, which sparse reports as
+"restricted __wsum degrades to integer". Sparse only checks the body of
+a static inline once something instantiates it, so this went unnoticed
+until a recent block layer change added the first csum_fold() caller to
+a file built on this architecture.
 
-Fix this by caching the values needed from the disk_conf objects while
-conf_update is still held, and by waiting for a grace period before
-freeing the previous rs_plan_s.
+Force cast to a __u32 for the shift, as the other architectures do.
 
-Fixes: 813472ced7fac ("drbd: RCU for rs_plan_s")
-Signed-off-by: Binbin Deng <18983559317@163.com>
+Fixes: eea9507a69d6 ("nios2: Library functions")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202609222053.5gjiJjtb-lkp@i=
+ntel.com/
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/block/drbd/drbd_nl.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ arch/nios2/include/asm/checksum.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index b77f901fc3ef..f34ed481217e 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1657,7 +1657,6 @@ int drbd_nl_chg_disk_opts_doit(struct sk_buff *skb, struct genl_info *info)
- 		old_plan = device->rs_plan_s;
- 		rcu_assign_pointer(device->rs_plan_s, new_plan);
- 	}
--
- 	mutex_unlock(&device->resource->conf_update);
- 
- 	if (new_disk_conf->al_updates)
-@@ -1687,7 +1686,16 @@ int drbd_nl_chg_disk_opts_doit(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	kvfree_rcu_mightsleep(old_disk_conf);
--	kfree(old_plan);
-+	if (old_plan) {
-+		/*
-+		 * rs_plan_s is dereferenced by the resync controller
-+		 * (drbd_rs_controller()) under rcu_read_lock(), so wait for
-+		 * a grace period before releasing the previous plan, like
-+		 * receive_SyncParam() does.
-+		 */
-+		synchronize_rcu();
-+		kfree(old_plan);
-+	}
- 	mod_timer(&device->request_timer, jiffies + HZ);
- 	goto success;
- 
--- 
-2.43.0
+diff --git a/arch/nios2/include/asm/checksum.h b/arch/nios2/include/asm/c=
+hecksum.h
+index 69004e07a1ba3..b6b415ae17a08 100644
+--- a/arch/nios2/include/asm/checksum.h
++++ b/arch/nios2/include/asm/checksum.h
+@@ -27,7 +27,7 @@ static inline __sum16 csum_fold(__wsum sum)
+ 		"add	%0, %0, r8\n"
+ 		"nor	%0, %0, %0\n"
+ 		: "=3Dr" (sum)
+-		: "r" (sum << 16), "0" (sum)
++		: "r" ((__force u32)sum << 16), "0" (sum)
+ 		: "r8");
+ 	return (__force __sum16) sum;
+ }
+--=20
+2.52.0
 
