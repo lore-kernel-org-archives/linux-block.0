@@ -1,95 +1,95 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+Received: from mail-wr2-f27.google.com (mail-wr2-f27.google.com [74.125.225.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B600654A7F8
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 14:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48713549389
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 14:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.91
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790085948; cv=pass; b=ioe+IeSu8hAGlJPeSFmjtW/nZNxKLH7KAEHQib/P7gWVmvaIEHL2bzXhvAJGpHkh4Q+w0k6xDLmZ562ASq+NvZ77eAOq+onONtsKiUlBUtXmBPeNNjXqK2kgjXEl6vtiR3OoqDzX0Qwmv4zgDMLR598IrKc1Km5AoKplEbDboSk=
+	t=1790085966; cv=pass; b=d0T5PCgp1PGgi+K7ouRXPlvte4qgNODK2deF08oX+BzRtyrzcfh04e11S4DKGNQF4lQiYDVB5wmHlTspEFFOhd4S4cowJ5TRNyaaPPWGZeWAKahLh2kubydvjMskwP13QKW0gbY895TaIMX2nsY7LhSNxwi1/se3/R+TbNAoEFk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790085948; c=relaxed/simple;
-	bh=4H7cYh/XcFy79IKh5ntWbkLJLoAWIpLRyRLXVAEP+zw=;
+	s=arc-20240116; t=1790085966; c=relaxed/simple;
+	bh=FFDGTIkdjwlrSIKakQdYABzBT/A8PNvRaqDPQjmAe6k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q+aNJ4C3Cf7I/vFDwKTKmWwZqnvK97rYyWPACqsxyLP63UU6MXu/81hru+iSIgZ12QXvQkx1Xnfh0ZONTM2qh/0cU+75kDJHAKvANqwGOgthLfkK750GMaM0H8AB8vETwnlcd5WntXkD83cktP4K4SptIQ1Lspl0k189etaq2mc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OaZw4Jlp; arc=pass smtp.client-ip=74.125.225.76
+	 To:Cc:Content-Type; b=GIPHTgzICLma7VOnR5pDajOycDp/i2fVdgfKLNe4+DPFvhcj44DB10ll8BvJkxL/dwtU1TgQxOozEKzOG5ktPulqJull/8BN+i4nEEHZ4uOculEgw1Di+xAZQGSemoMtwXVEa9r+jVHpCZG/5exS2Iv8i1ctd3VXOjIaAgg2X1A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Y2mCWJGM; arc=pass smtp.client-ip=74.125.225.91
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OaZw4Jlp"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f6350faaso2318519f8f.0
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:05:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790085945; cv=none;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Y2mCWJGM"
+Received: by mail-wr2-f27.google.com with SMTP id ffacd0b85a97d-4843796e373so2439761f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:06:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790085963; cv=none;
         d=google.com; s=arc-20260327;
-        b=UvyLx8/JSQ26zWnxePB3Ign9JZxw5f3c6iG51fGjtDCGYEkEQHRotszd6GijCxOcm6
-         bYWaudStSLzmVLi1DokiKXgqFHTaQJf9yW/7lfMT2cbO1Us51h/YeZRwMD/BPvHufrIb
-         w8oQzTvDI9bmrUQgOzC8NHGKnMDAh1kQv87/uGZuKjPZu1ZjGFZvY7eKMg+GXavIATH/
-         2sqZFfd0g9crLYzpVTRpWfCienTnHYLWlP6cHHNyzEd861ExK1NSuwEpf/fMvqsVvlSk
-         LkgN8h2DHPnYtYNSrlz9/H/4dI8RxqaYE6N+Y+GkQhxk7wK3vx+55EJIXvG3Kfzn6mDu
-         Q6YQ==
+        b=lTz6gQfnMs+ZszXeGi5436kFOpJQPLtzaMPabe4965+ZZMSSn5qngpjcJK0ZSaCkOa
+         iAUSo6Vr5NBwaZQz4PpdW5HvCZTnXXmSXrWyUs/CwyuZh+zLMVjXpNUQoloSlF9I1aDt
+         CFGCr6HKw9Zoya/ryTIx57Y81uG53EM2FzfPkRWo1CGXeANnVk0SdIXS5FA6VCPdN37q
+         aphSn6q4KkcLJ/yfvVXoCmBFyOVMlKRgLK9yxqP5IJHYrPPTnr3WQ/2Y3Qi6OHZJnmA3
+         ttabVOc8r+Q8CmGCHJp8KGc2EjFZNIT/iAOiBPcbc1wxhyjsbslT2fM+pYbT+SNWPNNe
+         1M0w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
-        fh=igM8J6s/r6VvNCtw01/jPw/kIC42aLMk2iproMFdKu0=;
-        b=ZHDLxTU3WS+0df/Po2DCPhkGbHuzUJ1pDfZsdHz14UBi7FRaDBJAXzQZjR4yIo3koD
-         2jaUEDVzzPjoqQ/+Ml+oGWlJJlptTK2JHmgfMx0ozdvuyf5yiLtXLX1axvLOx9cITPyA
-         MwTnUi0+4VySTDDY39ZfwMLnppj1bybuonhlMoN0EQyeFtA5f+o/qcS0gFOhCTj3xmVs
-         bSDWsRvWyWESS94xRZRtNJvFIdaGM573jTjFQtQegmTBJI7XcIv32qC8QdjWjEW6UxCg
-         8Y68W0BSegoamewjWGf4JkYy3eOC1EggOFSp745gRswVad+c+Uaai7XukFHwmDdowLAQ
-         XL3Q==;
+        bh=HQ5Sa3kOLjyBVe2SVv4WjG5tA5uHiXwiU9nv/zosuek=;
+        fh=BMaL7fscoZGCJkVdgqjbKnPc1bq9MRmosh6C0aLz6pg=;
+        b=sxZcdJsLA4ArTZNwY9IHAZQozKvdlLZOqRxEOVYcTriXL34T+EJ38/lJdowSDk0gyj
+         z7Gh1Y5PKUTZOpgHEcFQx+CHX2CnNvnSa3VJ0Ae9aQCKYe+UthhlFXY46OEWkGTvEPOb
+         rkDGi8+Ry1XBM48TUW9dorKbANjDSOH/AIlM/f0hb3MztbsY5lppMqZTsOv1+NUkxAKh
+         gy6FbHJklfCSJiDE49mgh8tdJF7wdayR9L8IKOAR5cVjRK+Zn0H6/tAqyDoXo86eANx6
+         LxJb+wNapFS0/xCMOLpgiVJ7gOy1Dz7mw0t5GIo/BVef1xSryjlxECTqkFZ0YKl8x21Q
+         7VCA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1790085945; x=1790690745; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1790085963; x=1790690763; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
-        b=OaZw4JlpEJnPotAAApkw/LFOiwvi3X6tj5Xr6yfn43f8A4HJunL2BYhfAn/tznUyVN
-         qjajcgIof+vAF77Nlhhn7LGc8XluAKPY9Yugz6Saty9rYpmP2sMv0tARCSpOk7VNloUX
-         pg6RkXpf1TMnVHEw2B1zF43vBSyFXnJTkQ80F6dOKOiEAGWiHSkNIcJ7rQ3Ikjox+m3j
-         IWk3KcV3HzS5aK8rZVaUHv+4hEfKXf49VAYL0MLmlhtyUpDhuaGK2eEgUidZx8GkSY0o
-         6dUI/uQ/eDY1C2+J4jWSCEsIm4YwmSej4UX+8SNIix6XGo6yUUSuhmH5ang8rK0XG26q
-         sY/g==
+        bh=HQ5Sa3kOLjyBVe2SVv4WjG5tA5uHiXwiU9nv/zosuek=;
+        b=Y2mCWJGM63FTGl4+yJW4u+r0juwVDCmvwuHvh08vBoh/KHFZxx1mQrlB4lOpzLGQkd
+         +PoPDF3QjeFaDtroPLiULmOeE+PQFuJ4pwcUXjRAZ8Kdws5qRDV+RttmHRfXlh4FGt07
+         ICZFwgy6nM+mR5fslmAPAZNVCuIheNoI2G3r3svUf9EUJqSgw6sDDiDY/Q3BE3V5/2ut
+         whQPnVzaooSi/VV/jgruiDIvINZFSRvpb6BFoiqPw25LpeFLwd2bAqVzG38z6CNMBfds
+         wjpVpgyQufgMueHsbd7zyqTl9DOLfgyBul+EvaSMTPh6Ekl9YjstZjQ46O7hJanLyAD0
+         e1gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790085945; x=1790690745;
+        d=1e100.net; s=20260707; t=1790085963; x=1790690763;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=LV8hwkL+g4D+YUVw11Whf1ua4hVH+TJu4M6R33VpXN0=;
-        b=nZ6K0AnMcgLG9hrOKXUDpU1A+kYjsBRpxruDpLkCLxLuv3IJOc6JkS8Wpsc/ApzhE1
-         kAv74Xw+CO+swgPjR9db/B1Uu1PBYhCiHJ619jzgeirrNCbWSsxe0zRjn5DJuNlOmYpE
-         pDv3x0dREh8MrXZa8MSzVJvChJFWOqtAHpi+nmvivXBh+o/Z7DQg9RcsBpq1FIW/DiMm
-         nRyePhTBrf0wZ7Q99yFYM2W8odilNs14GsySL9vxHylfL3k8kao0cDX/CgxmVo0fe5Zl
-         0YiDMM6BF5flJ1H2QLu+KQ4w1kqRXULlP9SEFdOThgy90xee/EIHiXmf/R3rt3+tBGfs
-         LJbg==
-X-Forwarded-Encrypted: i=1; AKwUvBzCr0S5dDyUWdTpwAXFPHUh1hGJEf8586IyKe9d7E1b7FcmqST6OZEOWkqwuJqr2Mvit4EyNZ7+LvBlgw==@vger.kernel.org
-X-Gm-Message-State: AFuF++mGrGTcU04eHXG14exbqZICdBCpDsylOBVRcZr+G33CP18sb8O7
-	VQ+vkDmc15IFhEcfysJctb+ufYOVNp7jAYhuX/Rv6px0G8IYialfyDV3jAFws9GXwa3bKn0Hirh
-	Itby9H2x+PTDVBLvPWnGXmGMx/BNl3HDur5lVtUku6A==
-X-Gm-Gg: AYBFou0TKIUCpaPmg5tt0V8zKDfI5XTjs/7rH34nDE9xfymt2WaLC6prlikDEqWro12
-	XpB2nZ8NiF8GqQK7Qyvs3j9GzB5p4b6G9awbrjfePoIKmlmlF4KUV41ygrRs1ioxx8WYXxHsJOC
-	yL/DkmLQ3qcZPnc2gBV4BXSO+lVrkhgFRa3aj+pgm3F+ZU+X7XyXaurhqBCUlUXO5orn8kcEFau
-	RLg/80QIpgdUh6Dn9+MaBBZHg+kUTFwPz/UTjdIdKIQATtybU0NeuXoqNow0jnrB2yUY4U9j4UI
-	fxW0PQSpdgW8rEC6ZRpOsi8/8MssmEvrLLsiHdrK2rNKt13S0trX6Su3s52sb5344IMC+bxewUJ
-	BX8VBmPMws1RA/HKC9KPrK35I7zlR4uR7oyuJN2s/4tqqeUrfk2+P
-X-Received: by 2002:a05:6000:2409:b0:487:342:d147 with SMTP id
- ffacd0b85a97d-4871e363e1cmr24110192f8f.39.1790085944981; Tue, 22 Sep 2026
- 07:05:44 -0700 (PDT)
+        bh=HQ5Sa3kOLjyBVe2SVv4WjG5tA5uHiXwiU9nv/zosuek=;
+        b=udTIPeAYHUiOBGaUho5Cq6Bwlqm9DDGSQWJnAsO6aV1bGqs/JNduZd+rp0oeawla+t
+         FnuSRBS8visyt9NwQqWO5shdJjHi2KWkiN8L7zHWHoqNeMMx6MfkAcfef3iGgitfe+Uy
+         bQLR+oRs3P1xMDL6rB3iA6QSwwCvos9nfAY9GFd+r9CgzfcONhQJ5fQi8L8Goo1MtDXH
+         IblQwMuVfX/rpoIemQpwC7WUp3Fq5v35UWWHTdIBRCiHvm9hmIK0ofMXOz6P1xdZxQNS
+         ertjDKzeH72SH5kyva9UG5d5xZuhZmQn5D6vxxhhjPXdGzi+lfuxT0vHKBgHGOpOEdZm
+         xJxA==
+X-Forwarded-Encrypted: i=1; AKwUvBzQRi4Kw9pocIHKYx0CM3D+wEePI4IEJGdfvgE0SbN9VYcAAvJn3s74AXryYCa1ygHu80c4FZRj5OACmA==@vger.kernel.org
+X-Gm-Message-State: AFuF++mCXiJZcEr+Lqpcjcc9RfmLQZv0qSWF6dZQtqZEKueWb/2xOVT9
+	PSx7UuLqroO27OSrfSyrKWUe2KCvGp/DhsE15HtI+KtHjEeQGnFip4HczD8fxNjHeeWeQ4D869A
+	hYUaKZ8tQNGCQ6+Q8fnQq5kT/6PozKiuEsJvMqVZTlsvPblvxVAoftSg=
+X-Gm-Gg: AYBFou2P3Q6yM4MqrZ9Plgm7kieoAENIwmzXas1K8XMBNJT+hhH9Zt115Wtdgia5uRX
+	8bvCNHWNdMuGCo4sFAKYGdkVc/+oXrGyZaK8MWEf4VMRQXlRd5c5JTw6eEm/Pob6ApdJWc1Ym/W
+	542uAHV79ZpuL4bLHrKriwhgXV53tEzAI2t/uAJ00Ni3vuFGLKzauIqPkrBP/7fTkT7pvdiopva
+	tPPeTzf3l6ciFUG//oGNvy0EPLt9hOtz+B9xv9X3YpzOtxn9bEPMPROoVGhsyhETnAX4Ybt2djZ
+	kKfsscmqTFQtQBeYeCla2MNdhUEvtkMXrzmRLs3ZgHkksyYspsNSeRzP4OBOT8EvSmfnKRzHp0e
+	pDQP2rc+7VLwSFLCBDLsAXLpK0ia9fDVFJLRbf/cFODtNT0CaZd8vwufykMu7wfLi
+X-Received: by 2002:a05:6000:2081:b0:487:936:7ce0 with SMTP id
+ ffacd0b85a97d-4871e268810mr20353521f8f.28.1790085963456; Tue, 22 Sep 2026
+ 07:06:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-14-neelx@suse.com>
- <20260601234454.GF25574@quark>
-In-Reply-To: <20260601234454.GF25574@quark>
+References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-16-neelx@suse.com>
+ <20260602023556.GC2295@sol>
+In-Reply-To: <20260602023556.GC2295@sol>
 From: Daniel Vacek <neelx@suse.com>
-Date: Tue, 22 Sep 2026 16:05:33 +0200
-X-Gm-Features: AclHuK8dl-tYp2fYNBoxko904-iqmC5latOeVGuZqXI84CESlhxypC11MK8aWjs
-Message-ID: <CAPjX3FctU6PQ1=2vL5yVPhWRb9konu2P=Oz_W4E-KSu0FmG96g@mail.gmail.com>
-Subject: Re: [PATCH v7 13/43] btrfs: adapt readdir for encrypted and nokey names
+Date: Tue, 22 Sep 2026 16:05:51 +0200
+X-Gm-Features: AclHuK9CuIsJsfiw8COS456pIsuT7e5VI7VW-i2_tJPdheeuBMmFVb8b2MLQ3fY
+Message-ID: <CAPjX3FfSeE+WOya6Dg8aLSCRADBvnm0nFBk_uBbaeFM4egvqGQ@mail.gmail.com>
+Subject: Re: [PATCH v7 15/43] btrfs: implement fscrypt ioctls
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
 	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -99,21 +99,57 @@ Cc: Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
 	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2 Jun 2026 at 01:44, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Wed, May 13, 2026 at 10:52:47AM +0200, Daniel Vacek wrote:
-> > +     /*
-> > +      * TODO: This should maybe be using the crypto API, not the fallback,
-> > +      * but fscrypt uses the fallback and this is only used in emulation of
-> > +      * fscrypt's buffer sha256 method.
-> > +      */
+On Tue, 2 Jun 2026 at 04:37, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, May 13, 2026 at 10:52:49AM +0200, Daniel Vacek wrote:
+> > diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+> > index 6a37dd3cc5ee..2e0b79f41197 100644
+> > --- a/fs/btrfs/ioctl.c
+> > +++ b/fs/btrfs/ioctl.c
+> > @@ -5159,6 +5159,35 @@ long btrfs_ioctl(struct file *file, unsigned int
+> >               return btrfs_ioctl_get_fslabel(fs_info, argp);
+> >       case FS_IOC_SETFSLABEL:
+> >               return btrfs_ioctl_set_fslabel(file, argp);
+> > +#ifdef CONFIG_BTRFS_EXPERIMENTAL
+> > +     case FS_IOC_SET_ENCRYPTION_POLICY: {
+> > +             if (!IS_ENABLED(CONFIG_FS_ENCRYPTION))
+> > +                     return -EOPNOTSUPP;
+> > +             if (sb_rdonly(fs_info->sb))
+> > +                     return -EROFS;
+> > +             /*
+> > +              *  If we crash before we commit, nothing encrypted could have
+> > +              * been written so it doesn't matter whether the encrypted
+> > +              * state persists.
+> > +              */
+> > +             btrfs_set_fs_incompat(fs_info, ENCRYPT);
+> > +             return fscrypt_ioctl_set_policy(file, (const void __user *)arg);
+> > +     }
+> > +     case FS_IOC_GET_ENCRYPTION_POLICY:
+> > +             return fscrypt_ioctl_get_policy(file, (void __user *)arg);
+> > +     case FS_IOC_GET_ENCRYPTION_POLICY_EX:
+> > +             return fscrypt_ioctl_get_policy_ex(file, (void __user *)arg);
+> > +     case FS_IOC_ADD_ENCRYPTION_KEY:
+> > +             return fscrypt_ioctl_add_key(file, (void __user *)arg);
+> > +     case FS_IOC_REMOVE_ENCRYPTION_KEY:
+> > +             return fscrypt_ioctl_remove_key(file, (void __user *)arg);
+> > +     case FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS:
+> > +             return fscrypt_ioctl_remove_key_all_users(file, (void __user *)arg);
+> > +     case FS_IOC_GET_ENCRYPTION_KEY_STATUS:
+> > +             return fscrypt_ioctl_get_key_status(file, (void __user *)arg);
+> > +     case FS_IOC_GET_ENCRYPTION_NONCE:
+> > +             return fscrypt_ioctl_get_nonce(file, (void __user *)arg);
+> > +#endif /* CONFIG_BTRFS_EXPERIMENTAL */
 >
-> You can delete this TODO.  The SHA-256 library functions just do the
-> right thing now.
+> Are you sure you want to auto-enable the "encrypt" feature flag like
+> this?  It doesn't even require a privilege.
+>
+> It's also only in FS_IOC_SET_ENCRYPTION_POLICY, so this doesn't work in
+> cases where users add a key first.
 
-That's great! Thanks.
+The filesystem is flagged with encryption once the first file is
+encrypted. Adding a key does not change any on-disk data if I'm not
+mistaken.
 
-While at it, there was also a BUG for folios of order > 0. So I
-cleaned up the whole function a bit.
+Though I'm open to suggestions.
 
 --nX
 
