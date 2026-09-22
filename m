@@ -1,318 +1,128 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C61356E05E
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 17:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790096841; cv=pass; b=s0w+HUT/AKBTIrokipYyxTbZpTJoLGFBoFH/VfpCV77q8QIkd8FsiqSBsZmQRY9kO3Ojd9eAZfjGGMo4fkiG7RJVDCpMr+dip1nHBn1enb+vbJtgel90F0SkDhOaEaZkP4lPjpBEWroiZWseSO8NG/rHIguDc4a+HrW/j6QCtmM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790096841; c=relaxed/simple;
-	bh=QcqZs0CfngnGUFnb9M1HXobtyUqW7390zC2QZAYupKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n6m1Q3sP7JvleDFZ4gfxC33Gd6JzEvdLsBVXKt131P6wv0+j2bd4mOGPNpcVUSrUyK4mTGjdRSy0niLUClIee7vv3uruKfOLLhQYN87l2Lbik/qGkb8OB7dfHvy7XHwMLUFSMMtSsxF+vfUHf1lI7aGKQBpFJasuhZYrkEYMJ9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PjDxyzUZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OYCJ6gc2; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACACC577E58
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 17:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790098045; cv=none; b=sFTro4jnTqudTm8s/7RDmO50lfRN4jVKIY3xhzhv0hKosk3Vbo3ss5+ZqD3zd2fXsi2BBmCovkS68jPvifiT3eftrQG3McmmD89uQQczrnqKG/AqN8viBQ7JfIkn6MdXt4IeN31uwNdtjm99PcPRWShRPmHIWuFny5k95l0UjgU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790098045; c=relaxed/simple;
+	bh=nNq352D6I2xuxjd0vi11xYWOtk+G3eZQb/3pz0ojgaI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DxmGw0QmOWYceI3iutRYDzl4676kQjERK8mZ4VLi3JfBUgFU2tpQoeRXUg4Hs+tWGg6IAESAyksczNsF0ci/lzp0qybUKzUtMuUFcw/BBBphrwqa+cKgoI3AEdHWq2cBxmcqRfUG4fy2lTiHXPTIr8pFyWtfbhXlGzpztwb2Cpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=jFjZrI8U; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjDxyzUZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYCJ6gc2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790096838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ubro+jIAFnsWakSS77gHsPvo6tKKqzbfUk+fLBAP3g0=;
-	b=PjDxyzUZ7ifHChGLiPEYaX1o5Sg7QweVOcNyf820j/5acHJDr8gOsKTF0461S0hJnfX//l
-	ELV2emQYCWtiB7wKcnGc7c95UnXBzDhyihFspDOJm+UUgKk89C127l4/BBkgzWC6X/G1UB
-	TlI309uJDi1Y8Fvbcf0bslsulVn9UOs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-SRpidsJYOeqYwQKV2MVGcQ-1; Tue, 22 Sep 2026 13:07:16 -0400
-X-MC-Unique: SRpidsJYOeqYwQKV2MVGcQ-1
-X-Mimecast-MFC-AGG-ID: SRpidsJYOeqYwQKV2MVGcQ_1790096835
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4886448d257so122068f8f.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:07:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790096835; cv=none;
-        d=google.com; s=arc-20260327;
-        b=g9qS+bUJaNHNcphubSA3ka/0Zb6CGRHKjNq7C2MXiftyF3WhS4mSc8himAoohI9ANZ
-         u4b3GMk3TltAi6zKKBkM/6G0pgsvlsiJkTyOmD5VQ9s+WsR6DJe8y/XVYSaGmKKsRkd8
-         hq4SoW4JhvCh5MlyYMPj6RmZNRfQlGaQRiCokM4MsGGWfva6yEyVwdZjTEhiXyGHyAF+
-         bb2xuq7ZZx1/IPDyyAxCB73/UIwBu33YUyTmjzDvPjWmq+p6y30rlHwRtnjY7mUavRF2
-         tCN3q9bvZEmQp6Zfv/MM2dC7EG/KPDQlP6IvPjFS9Sxn0EZOdmR3tYNAY/bjjL9MbvOu
-         wpHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ubro+jIAFnsWakSS77gHsPvo6tKKqzbfUk+fLBAP3g0=;
-        fh=uT0i16xmV8Z4H7vOfdiGNazh+ksHCbGw+anAkg2zjyM=;
-        b=R6AV9HkGo53x6uPsT0N3msb7A15gnIg3FiEPYsCECHPls+KY2ULMATLDjfVGsTX5jc
-         QTjwRKhscl5H+N50wtktaBliFFLSh6nxuiqHYPgdZbU7+y+rna2GOIDvbGDyHsyjZr0k
-         8SqB1IPxIZW8dkmaNvcUYInxMno16E1RampAbfi2BlWgLCN7RTRKXGwidoH1SK5JLFps
-         DIwd9yxBlzuVtVL3X6BoFHTXWQtomf9tY08xZTdsNIavwzhFnlg+eX2l6qq/mFmOPSu+
-         FzsPSvhgsBKY+7dpeljNYcjQL/CUDGubXJ/CoQcm0sLygPTzj5S/iFWLorNIX2JVHNin
-         LqqQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1790096835; x=1790701635; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ubro+jIAFnsWakSS77gHsPvo6tKKqzbfUk+fLBAP3g0=;
-        b=OYCJ6gc2c4WenFYoR1oEADlzyDozCHx4nD/vRKbDNSnn1no5Ir/nyYKbQ+j4tBqnBd
-         OQTd/uTN6wvW9VnzPzNXUtLvpMM4UfAscJL25GI+RN7goyDrcC17AjX70HocZDnyGJAX
-         onkZpBMJXz8X8Vhqb7nMbHXT5VDNpB/D6Z5cc0xwjkmp0RgSLiVQ2nurkyKhaOmzG83z
-         VFzUXUwDIG2doMFQ6NGfkqGkpZpCB+/xr6SsoQJbkR21Ryx1xQwrgF8nTo0Itr/aFBUl
-         8leTa/GsT8ALxuVjHQ1gxfnTgnEyEmE6i4/TfK/PY6l3kae8HhqzpGeE2XmxPMvQKMhU
-         nGwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790096835; x=1790701635;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ubro+jIAFnsWakSS77gHsPvo6tKKqzbfUk+fLBAP3g0=;
-        b=Fq+DMCjFHiXziWYtQ4zNsMYPPDUN0nXxnkOWXGYj5n+bNq7EG4JedFeA3B0E2NDZ98
-         mV+zwkA6yv72ZHoVQuWWEOlNRuLaK9yEPmsnrkFW0TvdGhfG0BdBJheQ8bv04wnYDPtA
-         Ei2G69rI/TVS65ZXMp6ACE1e/bEBtQ17JJWbSNBGWhcvDsSdq7JwIXDxxSLQYxaqDXV/
-         Je/q5w31R8fAaSl8HmO9Yk9dqswCjJjOb8oUXPk466fjMasudFSNvVn5jM/fsfGjmh/R
-         WdEc0jUY5HJCOwGIrplitsJ+qGBBeX3xkj+ok2vsQIDcUNrp3YqIufcyf54BGMZ38ENc
-         8KZg==
-X-Gm-Message-State: AFuF++m2v2HxSlt0NKLexBtdlUQgGgpSRea+nqwcpznuw3JNZa+SM0ZD
-	V+d5rj+4ONH2Hru0dZVKK/zHtwWHpmWWhd8E0oGJOP2ybHHsfu3uHPHfyg0G/aXdXp3jSDFpktq
-	KrZyNWDxy0ba8FiAsueLrc+iCQBoZhBTqD58ZUu2AWaspPIdfUl8UitQuGs/EzHJeB2QmHtoLzK
-	SYRkXQCumOOpDmjxkVW7LaekMNW1vZqNvu/4xscXQ=
-X-Gm-Gg: AYBFou35ByqfpBxRpGdA7S0utnhSKuAPzAVZxJHANYm8Z5j9o/F+bK0m4S6Cr5DlGDB
-	p0tNr+e8l4n3YOkH1Z6tv99qAd0VoehPM4EalybkXYpsJrFx9GxQ0WY2y2ymB1ccvztnHYhsZD5
-	HJBBQUz3YwDfMsfONzWhmkjAMW3zeW3VImEiwI46MM2s30ZQJFrupMLdaQNcCcg7dQm77CwzFbn
-	m6S+Er5Y6gU+RtfAg==
-X-Received: by 2002:a05:6000:603:b0:487:106f:ee31 with SMTP id ffacd0b85a97d-4886708f075mr403701f8f.27.1790096835255;
-        Tue, 22 Sep 2026 10:07:15 -0700 (PDT)
-X-Received: by 2002:a05:6000:603:b0:487:106f:ee31 with SMTP id
- ffacd0b85a97d-4886708f075mr403667f8f.27.1790096834831; Tue, 22 Sep 2026
- 10:07:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="jFjZrI8U"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 68MH1pkW2628318
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:27:19 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	pps82601-s2048-2026-q3; bh=0g/yDB9JO66buRhjOa2Rq4y+j27hyJBBIMXrY
+	URjKkw=; b=jFjZrI8UeH6QArbN39PccmW2cNDvOUcQhNt6W1I2e9phPOV8u4vAH
+	50M6YPfhIlf9DdnoXD5c7EXygmwuK+ezwH4+ZGhRdJMmEqHfkWZr2hKYMg71R8sH
+	mMOMF0UwyByh6rcC/lrGNlhlBMZsVDHPHLCZ8/JPKYnPqQwMCjm5pL+NEFNqtvMJ
+	Ga2ZhEHELJUfQbXSpso7jYKVz6PcSJ4xu+IFrNMNr6Oozg/vKtv2lUSG0+k1K+IZ
+	e3osjkwyk8SXINjZCO9/wMv5VfTWJkC7S/Ij6t+k9Lo52Wxtsi56XB3fcLjIX/CP
+	BmFHr80WRFBk2MuVcZ7SBnfs8a5uPES4Q==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 4gsp29fv7k-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:27:19 -0700 (PDT)
+Received: from twshared27354.02.snb1.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.49; Tue, 22 Sep 2026 17:27:17 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 14C282C3D7B78; Tue, 22 Sep 2026 10:27:12 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <hare@kernel.org>, <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 2/2] blk-mq: allow cached requests to be used for flush operations
+Date: Tue, 22 Sep 2026 10:27:11 -0700
+Message-ID: <20260922172711.1573186-2-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260922172711.1573186-1-kbusch@meta.com>
+References: <20260922172711.1573186-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260917020752.1672578-1-mkhalfella@purestorage.com> <20260917020752.1672578-6-mkhalfella@purestorage.com>
-In-Reply-To: <20260917020752.1672578-6-mkhalfella@purestorage.com>
-From: Jesse Taube <jtaubepe@redhat.com>
-Date: Tue, 22 Sep 2026 13:07:04 -0400
-X-Gm-Features: AclHuK_wSBiAnimxjVdRYj8rwEq2tUFRTzRomng-cGL662ILXA_dUsdeVzx8o5k
-Message-ID: <CADRr4bffEXo-0sjyCWYsBmH01miQ9uURqLYXuBHPk0bnV2Apkg@mail.gmail.com>
-Subject: Re: [PATCH blktests 5/5] nvme/070: test for ABA ghost writes on a
- multipath fabrics namespace
-To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com, 
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>, John Meneghini <jmeneghi@redhat.com>, 
-	Randy Jennings <randyj@purestorage.com>, Dhaval Giani <dgiani@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIyMDI1NSBTYWx0ZWRfX5Y1GSiB2hMA1
+ 7yveTeBBixjj4kgW/zq9Q5R3l3iH06Abs0vrkTLIw9AONf03IwOATv6FEPKrbUjainhUMtBc3Ir
+ QKEC5f7pbk7q+KH3I5lC3I03E4HT2bk=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIyMDI1NSBTYWx0ZWRfX18zWaOKp0dOy
+ +mhtWOAWs6Au0UU8dUtVCBxnCxJUMW+IJQKsKPAf73PvFrs1Ncmvwdh8VX774jJvYoVnSwrsWw5
+ 6Y1sZsSQm5JLUFsdANBm5HHDveJU5OnEZybyzgOaNI/FWDGdkwr2iLcZ6y5Gsd/+KkozZJMdNNU
+ Ro525bXPDboSPgcJamxatURiePO5k1AAgl4x/wBuimmhlwxM+UgQzju004wXTM32j8J5hcx618W
+ PXdKCsk7MoKeC+wzPBW4/6uUYOBF38UlSLMX61LQPklUDyn9FXyBnP4p/erqkrrDRNETHZxMtkD
+ VoAhvhShcGJoXfWT8LPEYbHjUn3tooszfGmvAdQlR6VNNxt7eqDffiFNl3wwOGpqJ4n0c9Rq0hN
+ bwyu+UNw972iEF15p2UOkJ3XRb3VkKkaTVCZ3TZmmII6bjEHNKT9w7Dwl29gPeKETDAFISlGkbD
+ e1XpN3SPuZdNqfEsdtA==
+X-Proofpoint-GUID: cbvQujKm6k7x-L6cAQ71hSXmnnNDZ9tn
+X-Proofpoint-ORIG-GUID: cbvQujKm6k7x-L6cAQ71hSXmnnNDZ9tn
+X-Authority-Analysis: v=2.4 cv=abX0Dhot c=1 sm=1 tr=0 ts=6ab2ba77 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=_78whYxrdx1mplLwxq1U:22 a=VwQbUJbxAAAA:8 a=agf09bV8uAnK7eYYuEwA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-22_02,2026-09-21_02,2025-10-01_01
 
-On Wed, Sep 16, 2026 at 10:09=E2=80=AFPM Mohamed Khalfella
-<mkhalfella@purestorage.com> wrote:
->
-> An unacknowledged write that is retried on another path can still be
-> alive in the fabric. If it reaches the target after a later write to the
-> same LBA has landed, it overwrites it, and a read returns stale data.
-> Nothing in the tree exercises that window.
->
-> Add a test that builds it deliberately. A ublk loop device backs an
-> nvmet namespace exported through two ports, and the host connects to
-> both, so nvme-multipath has a second path to fail over to. io_timeout on
-> the subsystem drops to 2 seconds, then miniublk's inject command holds
-> one write in the backstore for 4 seconds. The host times that write out,
-> retries it on the other path, and the held write completes at the target
-> afterwards.
->
-> nvme-ghost-write-detector then writes distinct patterns to a single LBA
-> and reads the block back, so a resurfaced write shows up as the wrong
-> pattern.
->
-> The test requires nvme_core.multipath=3DY and a fabrics transport. As of
-> today it passes on loop, which defines no timeout callback and so never
-> times the write out and never retries it, and fails on tcp, rdma and fc.
+From: Keith Busch <kbusch@kernel.org>
 
-Can you share a tcp or fc variant of this test that demonstrates failure?
+The cached request lookups reject a request whose op_is_flush() state doe=
+s
+not match the incoming operation. That check is from when rq->elv and
+rq->flush shared a union, so a request could not be both a scheduler
+request and carry flush state. Commit be4c427809b0 ("blk-mq: use the I/O
+scheduler for writes from the flush state machine") made them separate
+members of struct request.
 
->
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+A cached request now gets its scheduler state when it is claimed by an
+operation, so one claimed for a flush is set up exactly as a freshly
+allocated request. Drop the check so a cached batch can mix flush and
+non-flush operations.
 
-Reviewed-by: Jesse Taube <jtaubepe@redhat.com>
-Tested-by: Jesse Taube <jtaubepe@redhat.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-mq.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-> ---
->  tests/nvme/070     | 98 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/070.out | 35 +++++++++++++++++
->  2 files changed, 133 insertions(+)
->  create mode 100755 tests/nvme/070
->  create mode 100644 tests/nvme/070.out
-
-btw this needs to be bumped to 071 as 070 got added recently.
-
-Thanks,
-Jesse Taube
-
->
-> diff --git a/tests/nvme/070 b/tests/nvme/070
-> new file mode 100755
-> index 0000000..e9a4690
-> --- /dev/null
-> +++ b/tests/nvme/070
-> @@ -0,0 +1,98 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2026 Mohamed Khalfella
-> +
-> +. tests/nvme/rc
-> +. common/ublk
-> +
-> +DESCRIPTION=3D"Test injecting delay on nvme-target backstore and expect =
-no corruption"
-> +
-> +requires() {
-> +       _nvme_requires
-> +       _have_loop
-> +       _have_ublk
-> +       _have_module_param_value nvme_core multipath Y
-> +       _require_nvme_trtype_is_fabrics
-> +       _have_src_program nvme-ghost-write-detector
-> +}
-> +
-> +set_conditions() {
-> +       _set_nvme_trtype "$@"
-> +}
-> +
-> +count_paths_to_subsystem() {
-> +       local subsysnqn=3D"$1"
-> +       local dev count
-> +
-> +       count=3D0
-> +       for dev in /sys/class/nvme/nvme*; do
-> +               [[ -e "${dev}/subsysnqn" ]] || continue
-> +               [[ "$(cat "${dev}/subsysnqn")" =3D=3D "${subsysnqn}" ]] |=
-| continue
-> +               count=3D$(( count + 1 ))
-> +       done
-> +       echo "${count}"
-> +}
-> +
-> +set_io_timeout_of_subsystem() {
-> +       local subsysnqn=3D"$1"
-> +       local timeout=3D"$2"
-> +       local dev
-> +
-> +       for dev in /sys/class/nvme/nvme*; do
-> +               [[ -e "${dev}/subsysnqn" ]] || continue
-> +               [[ "$(cat "${dev}/subsysnqn")" =3D=3D "${subsysnqn}" ]] |=
-| continue
-> +               if ! echo "${timeout}" > "${dev}/io_timeout" 2> /dev/null=
-; then
-> +                       echo "FAIL: can not set io_timeout on ${dev##*/}"
-> +                       return 1
-> +               fi
-> +       done
-> +}
-> +
-> +test() {
-> +       echo "Running ${TEST_NAME}"
-> +
-> +       local ns port nr_paths
-> +       local -a ports
-> +
-> +       if ! _init_ublk; then
-> +               return 1
-> +       fi
-> +
-> +       truncate -s "${NVME_IMG_SIZE}" "${TMPDIR}/ublk-img"
-> +       if ! ${UBLK_PROG} add -t loop -f "${TMPDIR}/ublk-img" -n 0 > "$FU=
-LL" 2>&1; then
-> +               echo "fail to add ublk device"
-> +               _exit_ublk
-> +               return 1
-> +       fi
-> +       udevadm settle
-> +
-> +       _setup_nvmet
-> +       _nvmet_target_setup --ports 2 --blkdev none
-> +       _create_nvmet_ns --blkdev /dev/ublkb0 \
-> +               --uuid "${def_subsys_uuid}" > /dev/null
-> +
-> +       _get_nvmet_ports "${def_subsysnqn}" ports
-> +       echo "Target ports: ${#ports[@]}"
-> +       for port in "${ports[@]}"; do
-> +               _nvme_connect_subsys --port "${port}"
-> +       done
-> +
-> +       nr_paths=3D$(count_paths_to_subsystem "${def_subsysnqn}")
-> +       if ((  nr_paths !=3D 2 )); then
-> +               echo "FAIL: expected 2 paths, found ${nr_paths}"
-> +       fi
-> +
-> +       set_io_timeout_of_subsystem "${def_subsysnqn}" 2000
-> +
-> +       if ! ${UBLK_PROG} inject -n 0 -o write -d 4 -c 1 >> "$FULL" 2>&1;=
- then
-> +               echo "FAIL: can not inject write delay"
-> +       fi
-> +
-> +       ns=3D$(_find_nvme_ns "${def_subsys_uuid}")
-> +       "$SRCDIR/nvme-ghost-write-detector" "/dev/${ns}"
-> +
-> +       _nvme_disconnect_subsys
-> +       _nvmet_target_cleanup
-> +       _exit_ublk
-> +       echo "Test complete"
-> +}
-> diff --git a/tests/nvme/070.out b/tests/nvme/070.out
-> new file mode 100644
-> index 0000000..b43fec7
-> --- /dev/null
-> +++ b/tests/nvme/070.out
-> @@ -0,0 +1,35 @@
-> +Running nvme/070
-> +Target ports: 2
-> +starting nvme-ghost-write-detector test program
-> +iteration number 0, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 1, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 2, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 3, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 4, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 5, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 6, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 7, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 8, writing data
-> +validating written data
-> +successfully validated
-> +iteration number 9, writing data
-> +validating written data
-> +successfully validated
-> +finished nvme-ghost-write-detector test program
-> +Test complete
-> --
-> 2.55.0
->
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5df6d2244db82..025a799f35b92 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -661,8 +661,6 @@ static struct request *blk_mq_alloc_cached_request(st=
+ruct request_queue *q,
+=20
+ 		if (blk_mq_get_hctx_type(opf) !=3D rq->mq_hctx->type)
+ 			return NULL;
+-		if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(opf))
+-			return NULL;
+=20
+ 		rq_list_pop(&plug->cached_rqs);
+ 		rq->cmd_flags =3D opf;
+@@ -3075,8 +3073,6 @@ static struct request *blk_mq_get_cached_request(st=
+ruct blk_plug *plug,
+ 	if (type !=3D rq->mq_hctx->type &&
+ 	    (type !=3D HCTX_TYPE_READ || rq->mq_hctx->type !=3D HCTX_TYPE_DEFAU=
+LT))
+ 		return NULL;
+-	if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(opf))
+-		return NULL;
+ 	rq_list_pop(&plug->cached_rqs);
+ 	return rq;
+ }
+--=20
+2.52.0
 
