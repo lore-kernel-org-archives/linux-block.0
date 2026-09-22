@@ -1,117 +1,88 @@
-Received: from mta0.migadu.com (out-230.mta0.migadu.com [91.218.175.230])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3A640A956
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 08:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4088134F24A;
+	Tue, 22 Sep 2026 08:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.130.215.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790064613; cv=none; b=ZDs5HvPz7HcUkA/aPBuKHbm/fDWEoW+NT3Ij43fxP9tOEOdoXHqCCTsNMj5J0M+uD3uDdTwcM0YBzI0nu3QNy/+ybHve+RCmObcqcec7luQPvzUKH32K0kktL7wiN2QSFR2iDFi8o8GKW9G+wSg4ZM4q6BBmIZwfH7NQ40NVEro=
+	t=1790066132; cv=none; b=AmcVBBnupFJ9r9KwnH0h0JoJfxpQY7RBqKm/5kP/Pz0QHvHiETw/pNVYOteMaA8+Tok8s1PvZeg4wA+bEuFhQknI1qzEw6tb8w9p0KvAsF2bJhyyahjRDFtGVMyI2NzyWcGq/nIGvX8FlwG5uFoGeGrudth52o+2RAmtRSeWldI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790064613; c=relaxed/simple;
-	bh=NlF78RerIOTo/MnyozLSa9euZ5Hw7BjWTrePBtX97Ok=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jP5IaI6gYmRXTdwWNILiW305V/w0aCNga1iOBcz9lHTu/sn7AkGr6U/NkwOR9XJL3fxMt5DM2GoUCHYYlDOqP7R4mthzY1/I6HFHNkOF2QzmBKNsjG5VXdZeurcQAKc53jy5Vdosws9NnaJhz6Gn6bna8YfWlyX2gU2vrEk6bxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B3Q8G17s; arc=none smtp.client-ip=91.218.175.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790066132; c=relaxed/simple;
+	bh=M95JSYeEcGEbDHbbNJsPV1xAi5baJR/6qeM/ywKJyyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RJeMwcxs7wuKgQkKoSiKqeCLv5KJ9hfsTnyG/MaBCtIdF0jrmdUr5q/T4xm9GbfcOT5N2A7EMIdZHTxeM4lh7Eq6RtYA0jXwBwpO6pf5WNH30psm9TkNWvz45vreER2GmY1kk8yMBIsEIH/+xRL92jdQ3LfwcGeQ4WVN/b3T1lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xenproject.org; spf=pass smtp.mailfrom=xenproject.org; dkim=pass (1024-bit key) header.d=xenproject.org header.i=@xenproject.org header.b=dc3dEUSs; arc=none smtp.client-ip=104.130.215.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xenproject.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xenproject.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B3Q8G17s"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=NlF78RerIOTo/MnyozLSa9euZ5Hw7BjWTrePBtX97Ok=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790064603; v=1; x=1790669403;
- b=B3Q8G17sfPxyLqZ6/GzobbbM0TEywCwKS7BX4DRLSSCnq3hXf7Csf/xyUU/fEJfHE+YavObD
- hylAHE9gaKJyztZci/Je3JJ86ipBp+XDch507c3nY1jl4zQI/uS/oNEMuNrEb1h6Fw8xVaLYI9G
- SSB1JlYPYNDImeuHb2IewOP0=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 316ad890671470eb;
-	Tue, 22 Sep 2026 08:10:02 +0000
-X-Mizu-Trace-ID: 316ad890671470eb
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <acd79732-1ef3-47d5-96fc-4dd3ff3eee27@linux.dev>
-Date: Tue, 22 Sep 2026 16:09:57 +0800
+	dkim=pass (1024-bit key) header.d=xenproject.org header.i=@xenproject.org header.b="dc3dEUSs"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=xenproject.org; s=20200302mail; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date;
+	bh=in5miQYTc3LbtSaYzXdTxL0Fg8Xm0nJOMms6+76vWBc=; b=dc3dEUSsMAiLyhZ8Hulk5Iludw
+	a1IqcerfvlF8rbrGAMO1ZHwlkGEc8HTyQ9PMLEeJZGYxPQEoVNSzaczEQqV/2T0N9mBwIWO5oMboL
+	ne5HW3VXVPbSBhMOOT6abD4yoSCDsZvM5Wj46NvfDSW3owHMAO2xylkUtiW89XR3nK5c=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+	by mail.xenproject.org with esmtp (Exim 4.96)
+	(envelope-from <roger@xenproject.org>)
+	id 1x8vyJ-00AiKl-0a;
+	Tue, 22 Sep 2026 08:35:27 +0000
+Received: from 224.pool85-54-217.dynamic.orange.es ([85.54.217.224] helo=localhost)
+	by xenbits.xenproject.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <roger@xenproject.org>)
+	id 1x8vyJ-005P5n-1y;
+	Tue, 22 Sep 2026 08:35:27 +0000
+Date: Tue, 22 Sep 2026 10:35:25 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger@xenproject.org>
+To: Yuchao Zhang <ndaugoing@gmail.com>
+Cc: Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] xen-blkfront: unbind irq before tearing down ring and
+ shadow requests
+Message-ID: <arI9zQrvacVVR_Sm@macbook.local>
+References: <arD7FHmbqJlLHmyE@macbook.local>
+ <20260922072155.34625-1-ndaugoing@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, axboe@kernel.dk, kbusch@kernel.org, hch@lst.de,
- sagi@grimberg.me, yukuai@fygo.io, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, cgroups@vger.kernel.org,
- linux-kernel@vger.kernel.org, cuitao@kylinos.cn
-Subject: Re: [RFC PATCH 1/1] block: charge passthrough requests to the
- submitter's cgroup
-To: Tejun Heo <tj@kernel.org>
-References: <20260921070647.1928289-1-cui.tao@linux.dev>
- <20260921070647.1928289-2-cui.tao@linux.dev>
- <arFgjkKUwYGWbV8H@slm.duckdns.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <arFgjkKUwYGWbV8H@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260922072155.34625-1-ndaugoing@gmail.com>
 
-Hi Tejun,
-
-在 2026/9/22 00:51, Tejun Heo 写道:
-> On Mon, Sep 21, 2026 at 03:06:47PM +0800, Tao Cui wrote:
->> From: Tao Cui <cuitao@kylinos.cn>
->>
->> Passthrough requests (SG_IO, bsg, nvme passthrough ioctls and uring
->> commands) are dispatched via blk_execute_rq{,_nowait}() without ever
->> passing through submit_bio(), so the bio mapped by blk_rq_map_user()
->> carries no blkcg association: the transferred bytes never show up in
->> cgroup io.stat, and every rq_qos policy on the queue (iocost,
->> iolatency, wbt) is bypassed, as is blk-throttle, which hooks
->> submit_bio_noacct() directly rather than going through rq_qos.
->>
->> A quick demonstration on a scsi_debug device with iocost enabled and
->> vrate pinned to its 1% floor: a direct fio writer was throttled ~10x
->> while the same cgroup issuing sg_dd writes ran at full device speed
->> with zero io.stat accounting.
->>
->> Associate the mapped bio with the submitter's blkcg at dispatch time
->> and run the regular bio accounting (blk_cgroup_bio_start()) and
->> rq_qos throttle paths with it.  DRV_IN/DRV_OUT commands are mapped to
->> READ/WRITE so io.stat classifies their bytes normally; request
->> completion already pairs with the throttle through bio_endio() ->
->> rq_qos_done_bio().
->>
->> The charge is gated by opcode (READ/WRITE/DRV_IN/DRV_OUT) and to
->> queues that already have a gendisk: commands issued during device
->> probing (SCSI INQUIRY etc.) have no gendisk yet and stay exempt,
->> following the same probe-exemption reasoning as the passthrough
->> iostats support.
+On Tue, Sep 22, 2026 at 03:21:55PM +0800, Yuchao Zhang wrote:
+> In blkif_free_ring(), the driver tears down the ring's persistent grants,
+> shadow request arrays, and shared ring structure (xenbus_teardown_ring),
+> and only calls unbind_from_irqhandler() at the very end.
 > 
-> Do you have an actual use case where this matters?
+> While blkif_free_ring() is freeing persistent grants and clearing the
+> shadow array, the event channel interrupt (blkif_interrupt) is still
+> registered and active.  If an interrupt arrives from the backend during
+> this teardown window, blkif_interrupt() reads rinfo->ring.sring and,
+> via blkif_completion(), accesses rinfo->shadow[id].grants_used and
+> rinfo->shadow[id].sg.  blkif_free_ring() tears these structures down
+> without holding rinfo->ring_lock, and the handler only checks
+> info->connected at entry, so this is a real race resulting in a
+> use-after-free or NULL pointer dereference.
 > 
-
-I don't have a specific passthrough workload that triggered this in
-production. I ran into it while testing blk-iocost accounting coverage.
-
-The relevant concern here is cgroup IO isolation. The expectation of
-blkcg IO control is that the IO consumed by a cgroup is reflected in its
-accounting and subject to blkcg IO policies. Today that is true for IO
-going through submit_bio(), but not for passthrough requests.
-
-The concrete observation was that the same cgroup issuing equivalent
-writes through two paths gets different results: normal bio IO is
-accounted in io.stat and subject to blkcg IO policies, while SG_IO
-writes consume device bandwidth without accounting or blkcg IO control.
-
-So the motivation is not a particular SG_IO application, but whether
-passthrough IO should be considered part of the IO usage controlled by
-blkcg.
-
-I don't know yet whether the right answer is always-on behavior or an
-opt-in mechanism. The RFC was mainly to discuss whether passthrough
-paths should be covered by blkcg accounting/enforcement at all.
-
-Thanks,
-Tao
-
-> Thanks.
+> Fix this by moving unbind_from_irqhandler() to the beginning of
+> blkif_free_ring().  Calling unbind_from_irqhandler() first frees the
+> IRQ and synchronizes with any in-flight interrupt handlers on other CPUs
+> before ring memory and shadow request structures are deallocated,
+> matching the teardown order in drivers/net/xen-netfront.c.
 > 
+> Fixes: 11659569f720 ("xen/blkfront: split per device io_lock")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Yuchao Zhang <ndaugoing@gmail.com>
 
+Acked-by: Roger Pau Monné <roger@xenproject.org>
+
+Thanks, Roger.
