@@ -1,140 +1,126 @@
-Received: from mail-pj2-f7.google.com (mail-pj2-f7.google.com [74.125.227.135])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A49753ECEF
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 12:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A669738E5EF
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 12:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790079462; cv=none; b=Dm/wE47DpDFrB626zh/t9PyaSsIeJedVdT21ENnRmNnumcpo66YU1i+haX6nAVQ3nADBEfL9OHJxIxU9Xdhkr0lIiBPPmsEAOOOSLP96cQ2evi5txXOlpzCCAt01Kz9b2xiMDslGD0kNQGADGPSyD4F0Mm5Ovkg/G+RZysqv+0U=
+	t=1790079909; cv=none; b=F04Es4kJ4NmZpJETNhlYl7TuRpZBS0pbKegcFRkLddl8Dp+3FugK7nnHBcADveU64Xj5zt5tobngwMT/aXnIsyp3ibHcws72otgWuP2D5uC8gZeC1W+oTX+6uGr+PSHUHuwluBiwTb287Vfp+2z6mGNvnOT6uLEuo87hXy9ph7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790079462; c=relaxed/simple;
-	bh=Jwu8MyzOC2LLhO+SlqloCZGM/Bml9CbxrRt/Few6LS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HPyOf7NYdheeT/W/Iuy/lGw7aVjm3E+Y0MfAbWvkr4ySh3AyKpFcgyFLHyd97I4yq/Dtd2EiDC9wGc0t3VATX8BUu19Q5oBr+voLPcMNfHn/N16GhjtCwi9NMkF8lWf/6jjdd3ydfGmUmM4fYRcBM6RyR4Z8QADml6luc3TCqE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YLsBVL20; arc=none smtp.client-ip=74.125.227.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790079909; c=relaxed/simple;
+	bh=MpdpneTahvV7dd4HcsSGeHrxkz25aKOWFS75pW4RUUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kS5ootY4sOLeZWS8UGd0gOMJxhNWhP4SxY0CcQQ0jQpmkVAfJs9pZD8spzX3y0E0rgWbP2Sk/xArZ3ddx+vNwQW1JC9eIKHZtHeRtbMyLt8CzQHS5CF849wVVMrusks1VMF+IbN4s1jmsaBQ2rqEJW/z/5Rat4V3OOOd6RFuMBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Hy+l7Nvs; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLsBVL20"
-Received: by mail-pj2-f7.google.com with SMTP id 98e67ed59e1d1-39e37c430bbso1915717a91.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 05:17:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Hy+l7Nvs"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912e4b11so22502545e9.3
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 05:25:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790079461; x=1790684261; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e05fSioi2aryDDHJ7lqPTQ6ph0EZpuAJ3Kl8RbYZsrw=;
-        b=YLsBVL20HBq1ziEnnDx5jxBZSoH+eRapyznoHKXU4clGjLPGMPk+EoxZ/US63K2+Aa
-         3gUlyTb1dQwGcYH8KqSdhb8bowPR9JxOUaDfHAv+0CVhAzUnQAf3sphInUKC6hUeWgLP
-         Zzrtlo5Zin48JK8QzPuF0YZSIYer6qwf5hwEzSnW/BySAftaiWTsUicVdBJiGu9HlTPb
-         BU9XKw465PYzQbisqpQcDDHMzGUTEVRnHSrkgWOakO2xzDUSjaxstbTeftp3o4WRPtlk
-         h2VacJY/D2Mftu9xC86kSSDQpJEhbJexX6VSw1itX8uWxzr2+sc8Z72TMC49TpRIoCgK
-         pbTA==
+        d=suse.com; s=google; t=1790079906; x=1790684706; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Z0UH5f4Xwx0eHqEEdAgzMEXfye5CzpFBUkt22qJELao=;
+        b=Hy+l7Nvsvo9rIAYpCVWkHs6HGyNyhzOkkQRTy8gSbTEX43W5TBKiKl5Rsq2vL2q4Xa
+         tlvCGB3P9/nWTtSS/kfXZsJKmf7DztSyf70rq//z8fnUlWcRY1uUzXYXGROk2IBY33zU
+         8oStgmYcQRd6FTmTHt0Y9+SFUZQE1bdXpWy60pf4ldc7VG5wD09wh3X4ErndVWPRQmu7
+         J5L0WU+fzwMisPGY/tKfKj7COQr8KU/ym+Ca8T/cKcA8o9dJwP2HVy7rvjeaHsiU8GY7
+         vu07oL5xw2yQnNhCyOKJ2ueOAIlDJul1MXNCGAw2fxzkASqhOTkv+y6V25FqfD5TgxDP
+         NxEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790079461; x=1790684261;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1790079906; x=1790684706;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=e05fSioi2aryDDHJ7lqPTQ6ph0EZpuAJ3Kl8RbYZsrw=;
-        b=eUQz3izpnD5HvCCDti4WUiYwa3/+mROhO0xboMuTYHPY+HyPVOA15IQLGcwhi1LhYK
-         mo2Z1YuD/mb07ywWRp2yGZ0p9bQEerxlqSVAgW8FpUa0fyM1iS8NoHNXz55GdLGXt6Pt
-         C12bO34A/KZntavW/ZRjsrNpNUJF799gRAQdjcHwFfIw2qFQEM7NIubKW/Fr2QfHYMzu
-         3gq3e3mtZTVRF9L4TKKWfV7lmSeDsOogJ+fR43q66eMVivdr9g2xDQi7Pww4Qjj+lNfS
-         6LxGflhp7sEljBtkMqaK4XPeRYXwPx2ofCSEznb9nin51FCjHz9uE4kSl1FiJB0PxXaj
-         nzqw==
-X-Gm-Message-State: AFuF++nrOL/xZypsDhrZBtLyHsyc/H7urNEYhKaLXe24EMig40okh0Z5
-	8UK5c4j/YQReViXTm4nqpeCRs0vSz0EqWkPRKVE8FgxvbwMY5F0WeZCg
-X-Gm-Gg: AYBFou29tqiuyN5R8taTFl4xWHHd4OTHRkfPzmPALK5JD02S9ro0c4qPpkySUTuROHT
-	inQQErLyQkyuj8hg1UJ9EvjtORPi45btyb9xtWuAScnSVdFlVp+24jFbaC6B7q9cFfPH51O14Mt
-	oSl/wyakMt3M6GPc/43DTGT70AGzrcegPV5MraWliisCDzIRE94AbbAIbFj+27w6Wji0zG3jYeD
-	ZUnW/iMgcprTzOHYDoA/i1SIFy/Z4BB9KERZDqkC4sUduYYHJrgGujqek7imwI9tTc45W6mcBQw
-	9PSxos1QjVEdRC3j2VSRRxkv2lMAihzkgIvYE++8/JzjaU3ADlfVJo+JxeuxERPupGckyESijci
-	jnip+S8Lbg+8MvGH3vxgWDgmIp12dG25ndWmD91nou4eQfvjKM+Lrq4iB9KQnetvL8QfpphfMLV
-	il6M/efqgngtUpfHXnHRkxNObYRGQYkOxc64JUP1gpK9KwI/kZRO0QncJGTeNC916zhcY46OXQ1
-	o7Vnz516qQC6YSBfDlItCMFKAO3cZ69i1pLi6Qpn0H0iF7D2VuxwmUs
-X-Received: by 2002:a17:90a:e7cc:b0:3a0:2900:f57e with SMTP id 98e67ed59e1d1-3a07320034amr1105288a91.40.1790079460421;
-        Tue, 22 Sep 2026 05:17:40 -0700 (PDT)
-Received: from Raccoon ([2409:408d:3188:aa03:3bb2:acc7:b581:620])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-144f2a44cc8sm4892510c88.13.2026.09.22.05.17.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 05:17:39 -0700 (PDT)
-From: Rohinthan <rokinthanp03@gmail.com>
-To: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Rohinthan <rokinthanp03@gmail.com>,
-	syzbot+fb23651a7efbea8868ed@syzkaller.appspotmail.com
-Subject: [PATCH] zram: reject zero or overflowed disksize in disksize_store
-Date: Tue, 22 Sep 2026 17:47:20 +0530
-Message-ID: <20260922121720.11241-1-rokinthanp03@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=Z0UH5f4Xwx0eHqEEdAgzMEXfye5CzpFBUkt22qJELao=;
+        b=eCjEbgvSENfXIa3euxsRBDE2YPa9PNklmqqCkQebjtAcosNEuxfxAeN39EtwY8/FK/
+         VggRUbZdKyGP25rdlLb5jesj1JweVNzGgLV0CfeFwL57PXjJaaFk/ZqJ33+nkUykT2uA
+         2Ni8ZqvIXNSLjVHL9wXWdUjZJT+LLbWpT+gU9FGb23hR3h2AA7UXEfsth4TGT+aAVSed
+         yC/8T84qZd6gqSmU80cDD9mrXpGfRFNB4WCoNvxX36BF5oUsbpAwYIhBo0EPFeFzHDVB
+         d/bs0YNIlafQyodmKUUATTzojd0RpTaMGeFXWHebhXU64MRYbwQW0mFwErsGdrNDaZB6
+         D+uw==
+X-Forwarded-Encrypted: i=1; AKwUvBycf4Yy8XgW6TRpumzTODwsruz7JiB6i0KbrbECSFrETFDsIX4LaQPIquVN5tpo9gJhrUte/rAg1iF50Q==@vger.kernel.org
+X-Gm-Message-State: AFuF++loo5dOCik1hgswYTukGT4mjC5dHRjVo7JuA0u5BeqS7ksWxZ8a
+	ewfCuu/yhfzdjODBJayScCmk4hvTKdyJ+cA2HLAEB7y0CrqZCBhvfemXNXpCI+fqKiI=
+X-Gm-Gg: AYBFou02AYdNocsfdWs6Lzdog838mgrvtg8bXmglc8vLZjf4IQj6dfiwQILbqZnkJ4f
+	MLpGRMKO9iPNnONUwIaEWK5ZGpdyoUc3IovQW5Oipp0oh5mHxemxitMuji3SsyqAoT6N/DQi5WF
+	gjGw/0GiaMcZEn4NXmrIqPVN6GzwjhcLSukpjzZRb/aYkfRIjhl2F+O1uHqD8HCJurmVGi16WTy
+	7cX/NLqtAei9Vl/n4mOGjL5518CUa2YuQ2dG6ZL7WIY4tXaaRRMZ+9aa2XEnikIxB+NydsTnSx4
+	cpecdgtccBRs+4ZEEQR9uy1B60W5XWzImfHOe5GF8Ls//bitAm2qCxLGF10E3H4HVdP4rXDvPQl
+	lwuMxPUQL+8CtOQMrlZ5AlcemotOWfK4AHHUAzvM/QcNbZjm9YsAuj2cHf6oSNL2TuFIzpQrwae
+	z2TYwpPTDKCFb4fsuq3T52+/TPu5WbkQRcD0ysRJt5j8LB05f4UVUtDmPrcnOcpIGXlq5D4xvvN
+	kKRoOojepJMWPfPtc/fCgr7l7696EahygSj0NKeAzXkJ0AhlBLkD8P12lzenJXUNe0KPpQSn3E+
+	fiJDL4wzwPktw2rKSgO4m+Cfv+1QsFvJW/UiJaKB
+X-Received: by 2002:a05:600c:1f95:b0:49e:7862:c09e with SMTP id 5b1f17b1804b1-49fc57238b8mr181860835e9.14.1790079905892;
+        Tue, 22 Sep 2026 05:25:05 -0700 (PDT)
+Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdad40b4dsm48644925e9.10.2026.09.22.05.25.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Sep 2026 05:25:05 -0700 (PDT)
+Message-ID: <d7bdb421-4c65-4133-95fa-ecf3ea2b7374@suse.com>
+Date: Tue, 22 Sep 2026 14:25:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Remove the error-injection.h include from
+ linux/module.h
+To: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Tvrtko Ursulin <tursulin@ursulin.net>,
+ Matthew Brost <matthew.brost@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>
+Cc: Simon Horman <horms@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Francois Dugast
+ <francois.dugast@intel.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>, linux-block@vger.kernel.org,
+ netdev@vger.kernel.org, linux-api@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260911-module-include-error_injection-v1-0-5da895d8c84d@suse.com>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260911-module-include-error_injection-v1-0-5da895d8c84d@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When userspace writes a value close to U64_MAX (such as (u64)-1) to the
-sysfs attribute /sys/block/zram<id>/disksize, disksize_store() parses it
-with memparse() and then calls:
+On 9/11/26 5:04 PM, Petr Pavlu wrote:
+> linux/module.h appears in roughly 15k #include directives across the
+> kernel. This makes it a "hot" header, so it should avoid pulling in
+> unnecessary definitions.
+> 
+> The header currently includes linux/error-injection.h to obtain the
+> definition of `struct error_injection_entry`. However, this is unnecessary
+> because the type is only referenced in the file as a pointer, for which an
+> incomplete type is sufficient.
+> 
+> Add explicit includes of linux/error-injection.h to files that use the
+> ALLOW_ERROR_INJECTION() macro and currently rely on it being provided
+> indirectly via linux/module.h. Then remove the linux/error-injection.h
+> include from linux/module.h.
+> 
+> The first five patches can go through their respective trees if preferred.
+> The final patch depends on the preceding cleanups.
 
-    disksize = PAGE_ALIGN(disksize);
+Thanks for the Reviewed-by and Acked-by tags so far. They cover the
+majority of the changes, so I plan to pick up this series on
+modules-next at the end of the week. Acked-by tags from the relevant
+maintainers on the remaining patches are still appreciated.
 
-Because adding PAGE_SIZE - 1 to values in the range
-[U64_MAX - PAGE_SIZE + 2, U64_MAX] causes an integer overflow wrapping
-to 0, disksize becomes 0. disksize_store() then passes 0 to
-zram_meta_alloc(), which computes num_pages = 0 and calls vzalloc(0).
-
-In mm/vmalloc.c, __vmalloc_node_range_noprof() checks
-`if (WARN_ON_ONCE(!size))` and triggers a kernel warning:
-
-    WARNING: mm/vmalloc.c:4038 at __vmalloc_node_range_noprof
-    Call trace:
-     __vmalloc_node_range_noprof
-     vzalloc_noprof
-     disksize_store
-     dev_attr_store
-     sysfs_kf_write
-
-Fix this by checking if disksize wrapped to 0 after PAGE_ALIGN(disksize)
-and returning -EINVAL. Also add a defensive check in zram_meta_alloc()
-to return false if disksize is 0, avoiding vzalloc(0) under any
-circumstance.
-
-Fixes: cd67e10ac699 ("zram: promote zram from staging")
-Reported-by: syzbot+fb23651a7efbea8868ed@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fb23651a7efbea8868ed
-Signed-off-by: Rohinthan <rokinthanp03@gmail.com>
----
- drivers/block/zram/zram_drv.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 6cb44e2..fdd13df 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1989,6 +1989,9 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
- {
- 	size_t num_pages;
- 
-+	if (!disksize)
-+		return false;
-+
- 	num_pages = disksize >> PAGE_SHIFT;
- 	zram->table = vzalloc(array_size(num_pages, sizeof(*zram->table)));
- 	if (!zram->table)
-@@ -2878,6 +2881,9 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
- 	}
- 
- 	disksize = PAGE_ALIGN(disksize);
-+	if (!disksize)
-+		return -EINVAL;
-+
- 	if (!zram_meta_alloc(zram, disksize))
- 		return -ENOMEM;
- 
 -- 
-2.53.0
-
+Thanks,
+Petr
