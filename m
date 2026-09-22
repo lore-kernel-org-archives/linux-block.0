@@ -1,158 +1,195 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C6B552952
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 17:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656B747F3C3;
+	Tue, 22 Sep 2026 18:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790098878; cv=none; b=WdiY9Fw1P4EgjuvxijBlWgHpH/mz9uy7J4DVgeF8mwlw6tepYdVtNICosTGbpqJXRZfCiA8qTkUJFOw0/O1iqtuPlnwwhfiRbdeMEpR0hLnGRXpmmQ2jc1dGrCgJSRgOFwU+xSP5pthKD+9Q0d0cxZPM4brOixNizYolqczxCMU=
+	t=1790100620; cv=none; b=mmQpGDMOraQ01b1k8/vqX8ELH2H/fD2UZUj/CV+Sj3Q72hoMjdQKUQ2BhxN0BcqI0OyhaW2191Atxiiwh+tS2FPgA3825tQ3tzckPjLZAqlr3qgwKCYESwmp3n/KuIC0+JXz32gxHSQLpl0LNc4ne2mGINz3Xq9UnIpmltPutBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790098878; c=relaxed/simple;
-	bh=bPFkHCUf+6FtH0ZCu5qND9AO4RF8i3O3qWdtLqBTnAI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=oAhIyyIqEm4aKpdOPb9NlBLps6n/maYp8i/VSJgL/NJ8MX71Sst3BS4lZHIPsHkLWzI2Q4IbJ3s+RX3EUSjVjaP29yOAWlT57A3QQ8Kt54LY2avmBp4Iy1AjkNHA2trWKpZBjbw4k6kl6UagqX09AKt78+T5ZOrlYe3K29xvqJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gYyW8h+q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790100620; c=relaxed/simple;
+	bh=deKIgFiUGBErYiAo09/pFi8Zuuux40USuhet68Qc0jw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cKEqusmimhFuxLg1gA4HfGavfTj1beoqfuDmhNcXsnTGtrWXUSXt9E8r7R4HqygApG68NEM79zvgg9StPgHVG/6VvQY0Qisnqzwnd+q4HeT58hzfgg5sM3ge35Qrp2nMhgcEcbIyI+kbC1wVlnOdF+A4F8sG8I9YQmwaNnWuhFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TzE1ft7S; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gYyW8h+q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790098876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pL4BW2rf46UNolfAMEWqBNp9AHFrnYSaffiDXV2pInk=;
-	b=gYyW8h+qfQNUjTZATdsVFfGUnlmydqeg6iZPvHDiLyKRg7oc8+tkaN2e5QcbSPe3lxmfGq
-	pJ7dDtTNnVQ+MlQ+tI1v9rqMhCaoshKzogKG5Wfe5oUjmmsderPDoVXWMtiRrbbt/GFcg4
-	GmdhCJZ57d8bv804+9Fo+VLLGgWp8zo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-587--yykJJ3lPFCa4-U1PybGVQ-1; Tue,
- 22 Sep 2026 13:41:12 -0400
-X-MC-Unique: -yykJJ3lPFCa4-U1PybGVQ-1
-X-Mimecast-MFC-AGG-ID: -yykJJ3lPFCa4-U1PybGVQ_1790098871
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TzE1ft7S"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hq7Rs3fgFz1XM4TB;
+	Tue, 22 Sep 2026 18:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1790100601; x=1792692602; bh=6iFUwmy3Y7707Y6oNNSb5VkG
+	F0O3ViC9MBP2z4P2CIs=; b=TzE1ft7Sw8h9N7ctQFg1mr3uZsJIFWnugd+GGPze
+	w5/cxTs7YuwxpETzPcLbVh16/kNq742MCOw5TNGC32xYb/Ta5PpGoJPwhJYjCrOT
+	VchYRkiwp04Da1nNzFNUk+XDXjB7aaSX13snXIfuLttV3JhZ4Rsa+T+ATe59Pp2W
+	zM3v6kjkzvXm5a67gcmIsT7J6+QurLOh/r4WsLvFIMSefSLtbSRFdTBnxl2F7aQA
+	dOw8clumwTKRKIAb8MCDKsK7t78o5e+iZoC4NO1R3uKCV1uhr8HmU4K+1aKs53hu
+	BJOIF9//u4anBJglNZGVo9D4tfrPO43DuQsyKKGT8K/MWQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7bApeaQEWz9c; Tue, 22 Sep 2026 18:10:01 +0000 (UTC)
+Received: from [192.168.0.215] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EC23180066C;
-	Tue, 22 Sep 2026 17:41:11 +0000 (UTC)
-Received: from mpatocka-thinkpadx1carbongen12.rmtcz.csb (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AADD330001B9;
-	Tue, 22 Sep 2026 17:41:09 +0000 (UTC)
-Date: Tue, 22 Sep 2026 19:41:06 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: =?ISO-8859-15?Q?L=E9o_Terziman?= <leo.terziman@gmail.com>
-cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [BUG] NULL deref in mempool_free_bulk via crypt_endio on dm-crypt
- teardown (6.8 -> 7.0 regression)
-In-Reply-To: <CAKjZdKjO0WVs2T3jM3txaqxYEt4uJhSc_G9mviWiq9XBe+8jkw@mail.gmail.com>
-Message-ID: <61ea45dc-d0a6-e5e1-fcf5-14c512b17114@redhat.com>
-References: <CAKjZdKjO0WVs2T3jM3txaqxYEt4uJhSc_G9mviWiq9XBe+8jkw@mail.gmail.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hq7RR17XPz1XM4Sx;
+	Tue, 22 Sep 2026 18:09:54 +0000 (UTC)
+Message-ID: <ac1d3825-8a10-42e1-9eaa-f2ba51216660@acm.org>
+Date: Tue, 22 Sep 2026 11:09:53 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="-1463801984-263208959-1790085153=:217987"
-Content-ID: <91848acf-1742-94da-4847-c71a2526d4c0@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] block: Add run_todo() operation
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Jan Kara <jack@suse.cz>, linux-block <linux-block@vger.kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+ Andrew Morton <akpm@linux-foundation.org>, Brian Foster
+ <bfoster@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Hillf Danton <hdanton@sina.com>, Markus Elfring <Markus.Elfring@web.de>,
+ Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+ Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+ rust-for-linux@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Nilay Shroff <nilay@linux.ibm.com>
+References: <e615fb71-f386-4029-8ceb-22e375ad9e94@I-love.SAKURA.ne.jp>
+ <afbf50a0-d409-45a3-8e95-99c04ca0e302@acm.org>
+ <24ef93b9-7385-4dda-8912-f7c78f9705d1@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <24ef93b9-7385-4dda-8912-f7c78f9705d1@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 9/21/26 10:08 PM, Tetsuo Handa wrote:
+> I think post_release() is misleading because post_release() is also called
+> when disk->fops->open() in blkdev_get_whole() failed (and therefore
+> bdev->bd_disk->fops->release() in blkdev_put_whole() from blkdev_get_whole()
+> was not called).
 
----1463801984-263208959-1790085153=:217987
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <130d1c3c-d8b1-c2e3-790b-be259fa6b730@redhat.com>
+Has it been considered to call the new callback only if fops->release()
+has been invoked? Here is an (untested) example of how this could be
+implemented:
 
+diff --git a/block/bdev.c b/block/bdev.c
+index cd8323083740..82be4812a7a0 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -766,7 +766,8 @@ static void blkdev_put_whole(struct block_device *bdev)
+  		bdev->bd_disk->fops->release(bdev->bd_disk);
+  }
 
+-static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
++static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode,
++			    bool *called_release)
+  {
+  	struct gendisk *disk = bdev->bd_disk;
+  	int ret;
+@@ -793,18 +794,20 @@ static int blkdev_get_whole(struct block_device 
+*bdev, blk_mode_t mode)
+  		ret = bdev_disk_changed(disk, false);
+  		if (ret && (mode & BLK_OPEN_STRICT_SCAN)) {
+  			blkdev_put_whole(bdev);
++			*called_release = true;
+  			return ret;
+  		}
+  	}
+  	return 0;
+  }
 
-On Wed, 16 Sep 2026, Léo Terziman wrote:
+-static int blkdev_get_part(struct block_device *part, blk_mode_t mode)
++static int blkdev_get_part(struct block_device *part, blk_mode_t mode,
++			   bool *called_release)
+  {
+  	struct gendisk *disk = part->bd_disk;
+  	int ret;
 
-> NULL pointer dereference in mempool_free_bulk via crypt_endio during
-> dm-crypt device teardown
-> 
-> SUMMARY
-> =======
-> Since upgrading from Ubuntu 24.04 (Linux 6.8) to Ubuntu 26.04 (Linux 7.0),
-> this machine panics roughly once a week. The panic is always a NULL pointer
-> dereference in mempool_free_bulk(), reached from crypt_endio() in dm_crypt
-> via bio_put()/bio_free(), running in softirq context from a SCSI completion.
-> 
-> It reproduces during teardown of a dm-crypt device: a late bio completion
-> arrives after the dm-crypt target's bio_set has already been destroyed, so
-> bio_free() returns the bio to a mempool whose ->elements is NULL.
-> 
-> The system was stable on 6.8 for approximately two years with the identical
-> storage configuration and the identical backup script. Nothing in userspace
-> changed at the time the crashes began.
-> 
-> 
-> ENVIRONMENT
-> ===========
-> Distribution:  Ubuntu 26.04 LTS
-> Kernel:        7.0.0-31-generic #31-Ubuntu PREEMPT(lazy) x86_64
-> Hardware:      Supermicro X13SAE-F, BIOS 5.3 06/04/2026
-> Memory:        64 GB ECC (ie31200_edac; 0 CE, 0 UE reported)
-> DKMS modules:  none
-> Taint:         G W  -- the W is an unrelated boot-time WARN in i915
->                (print_ddi_port, intel_bios.c VBT parsing, headless system).
->                No out-of-tree modules are loaded.
-> 
-> 
-> STORAGE STACK
-> =============
-> Four backup volumes, each:
-> 
->   iSCSI (iscsi_tcp, Synology target over TCP/IP)
->     -> sd (SCSI disk)
->       -> dm-crypt
->         -> btrfs (zstd:3, blake2b csums, async discard enabled)
-> 
-> Mounted together nightly by a backup script, then unmounted and torn down
-> (umount -> cryptsetup close -> iscsiadm logout) when the backup finishes.
-> 
-> Separate from this, the system also uses hardware RAID -> bcache -> btrfs
-> for primary storage and md RAID1 for SSD storage. Neither appears in any
-> crash trace.
-> 
-> 
-> TRIGGER
-> =======
-> Every crash occurs during teardown of the backup volumes, within seconds of
-> unmount. The preceding log is consistent across occurrences:
-> 
->   [256109.45] BTRFS info (device dm-15): last unmount of filesystem ...
->   [256109.53] sd 9:0:0:1:  [sdb] Synchronizing SCSI cache
->   [256109.75] BTRFS info (device dm-16): last unmount of filesystem ...
->   [256109.96] sd 10:0:0:1: [sdc] Synchronizing SCSI cache
->   [256110.06] BTRFS info (device dm-17): last unmount of filesystem ...
->   [256110.17] sd 11:0:0:1: [sdd] Synchronizing SCSI cache
->   [256111.50] BTRFS info (device dm-18): last unmount of filesystem ...
->   [256115.15] BTRFS warning (device dm-18): folio private not zero on folio
->               906100736
->               [~100 more identical warnings for consecutive folios]
->   [256115.18] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> 
-> The "folio private not zero" flood immediately before the oops indicates
-> btrfs is releasing folios that still carry I/O state, i.e. the unmount is
-> completing while work is still outstanding beneath it.
+-	ret = blkdev_get_whole(bdev_whole(part), mode);
++	ret = blkdev_get_whole(bdev_whole(part), mode, called_release);
+  	if (ret)
+  		return ret;
 
-I suspect that this is btrfs bug. It seems that btrfs closes a block 
-device without waiting for bios to finish.
+@@ -821,6 +824,7 @@ static int blkdev_get_part(struct block_device 
+*part, blk_mode_t mode)
 
-The mempool_free function was reworked between 6.8 and 7.0. In 6.8 it 
-didn't crash if we attempted to free an entry into a free mempool. In 7.0 
-it crashes in this case. So, the btrfs bug could have been there forever, 
-it was just latent and didn't result in a crash on old kernels.
+  out_blkdev_put:
+  	blkdev_put_whole(bdev_whole(part));
++	*called_release = true;
+  	return ret;
+  }
 
-You can try to apply the patch 83f7e52b7ed1c3e03b79123e20b6f6adf8d886bb - 
-maybe it helps.
+@@ -973,6 +977,7 @@ int bdev_open(struct block_device *bdev, blk_mode_t 
+mode, void *holder,
+  {
+  	bool unblock_events = true;
+  	struct gendisk *disk = bdev->bd_disk;
++	bool called_release = false;
+  	int ret;
 
-Mikulas
----1463801984-263208959-1790085153=:217987--
+  	if (holder) {
+@@ -997,9 +1002,9 @@ int bdev_open(struct block_device *bdev, blk_mode_t 
+mode, void *holder,
+  	if (!bdev_may_open(bdev, mode))
+  		goto put_module;
+  	if (bdev_is_partition(bdev))
+-		ret = blkdev_get_part(bdev, mode);
++		ret = blkdev_get_part(bdev, mode, &called_release);
+  	else
+-		ret = blkdev_get_whole(bdev, mode);
++		ret = blkdev_get_whole(bdev, mode, &called_release);
+  	if (ret)
+  		goto put_module;
+  	bdev_claim_write_access(bdev, mode);
+@@ -1037,7 +1042,14 @@ int bdev_open(struct block_device *bdev, 
+blk_mode_t mode, void *holder,
 
+  	return 0;
+  put_module:
++	if (holder)
++		bd_abort_claiming(bdev, holder);
++	mutex_unlock(&disk->open_mutex);
++	if (called_release && disk->fops->post_release)
++		disk->fops->post_release(disk);
++	disk_unblock_events(disk);
+  	module_put(disk->fops->owner);
++	return ret;
+  abort_claiming:
+  	if (holder)
+  		bd_abort_claiming(bdev, holder);
+@@ -1189,6 +1201,9 @@ void bdev_release(struct file *bdev_file)
+  		blkdev_put_whole(bdev);
+  	mutex_unlock(&disk->open_mutex);
+
++	if (disk->fops->post_release)
++		disk->fops->post_release(disk);
++
+  	module_put(disk->fops->owner);
+  put_no_open:
+  	blkdev_put_no_open(bdev);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 4f7905c3412b..f2a2f70a9582 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1577,6 +1577,7 @@ struct block_device_operations {
+  			unsigned int flags);
+  	int (*open)(struct gendisk *disk, blk_mode_t mode);
+  	void (*release)(struct gendisk *disk);
++	void (*post_release)(struct gendisk *disk);
+  	int (*ioctl)(struct block_device *bdev, blk_mode_t mode,
+  			unsigned cmd, unsigned long arg);
+  	int (*compat_ioctl)(struct block_device *bdev, blk_mode_t mode,
+
+Thanks,
+
+Bart.
