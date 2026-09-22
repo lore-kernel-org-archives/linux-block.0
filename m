@@ -1,202 +1,149 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F0F54DAC0
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 14:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790085972; cv=pass; b=nji2Q8OA+q9E/KfmSxo8AJDVqYLorB0P4orn4S78elOauqupzXTpOa5epy9PK+6TVcYfSqvdjbCjtKAGpn0xiPObyECeG8/syoGWL3gXFzvACuK4dGEbu+AeIcjhvsqGm3BZe403hbUgs38ofbjB6pk0HNgtL65NNZDJ5bYveu4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790085972; c=relaxed/simple;
-	bh=6V0JdsZmrDPONncSpMZX6xqR02M8d8On8QjmlhG5X+Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I2H+bK4uTCQ/LbsdheNAqKxaOwTsdruHqQ5k83XEFbuKDDdnMmJGosGWen/dDe0z420JrvQAN77gVppKJncC3WORdrAS4uWj2uNRXwWePH5mvWLQx+O8a8ZrYYiHV5H57udAcCwAUVpYKrjnMYsHh2qgMlWTXvDSWEVdh5t7/8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ET408zLj; arc=pass smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0683B549391;
+	Tue, 22 Sep 2026 15:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790089298; cv=none; b=midpINWDxpo6nVKjot7EMptfxULVNzZFndIiUgjN5oWemjUHs6J1VsEZes+T+7wR+C/SFWn/fFs3H4ppzQWYKY9V1T1T3eWCuKhpWA/oayzVIMwrxAeO5H0q/D51MZtx113e9Ucgcoa/LJTJtZ0V/8yfFC61iCkh4GUZ4oKihiI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790089298; c=relaxed/simple;
+	bh=Xx8OpgywHGcsMeIvcyLKY53xhgcQ53vAtUHJ1T4t+ds=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oZLOgItkBZbuT5WHYX25rVqfN5854xvNzIM1tC+qpJbTdSsQEIl4LcX/zduTlhmg3Vm88vQFsEz4qIZRcx5xXxdp+5Ixx0NUsufjA9ZvcVgZthzR2U537DvdSZE50t9k0gZPZ4VkA8oTToOdvgAYrMKHjazamGBMB9SmVU4sZM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=KLXmWEc6; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ET408zLj"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912df756so29222535e9.3
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:06:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790085969; cv=none;
-        d=google.com; s=arc-20260327;
-        b=O27Xq6FvBDrEydkGeXzwWVWwXTw8QUzW3pSURLwiOMlk0IpJ65Y+DSGB74Z/8ri2Nm
-         PWWA5KtlByaclnbbwHDJjVDa6mCc7TZYqMbX5279UxFCL3U2w27vW/An4T5PKs33H58D
-         bP6M5JzHRVKjZiLwmgHHNErUdWznYEMsnSFe3B+4L78UgLu3pIju1cqvdAuxBNnlPiTf
-         jrip2aaX6OtHhVkwHsKwox3JqhV5QoXgUE/YsTsL//P4xnbUAB/A8J24ZCSLq2nzGTHC
-         s9l9MhbUBYGc1LQwzVj5qfAJFcIPa2kAINWFb13M7xjR3BLmj4N5jRjZaDKaHavofZ5u
-         qcHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=99HU+/JZi5dG2Cu1dueoA580pKUbZlE9+G71ugT35kg=;
-        fh=+YxF6K3CG/KXj8JtnXEl8lY4vj823Gnt9M1/W5UpqOc=;
-        b=KhDE5Y9zwJ3nAC6PNLLz2NtViWv+jXjFTekrpIbq7Oo2ygdFwWRvBsOV+Suq8Cc5v3
-         0tUgkvi5dcRl3nLov/hXjv5uNyfScD86jLCKB0zY+qZOhyT2SQUkWoQERS4GVtQQ4R0V
-         B7v74T8QkVzbgn8lNciFmWi5kUEKU9SzuyeigqWQ223JyQZ1Md34q9GpUiGW0mVeQIAq
-         Z8n5T34HmVVT6aYZK85dm86J4Bw9flW2WnLggBdbR/5N4t/n/TqjG0vCBuKYyq6nm8Fy
-         vtJRp2t/RpW06wkitXpphAyvXDpR++ZaZvW/nYnxOG8gqye5KI2O5f/gAZ7v+VurBlUF
-         Mf/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1790085969; x=1790690769; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=99HU+/JZi5dG2Cu1dueoA580pKUbZlE9+G71ugT35kg=;
-        b=ET408zLjAzvCPY64foMxS80uN54uNuNIF6r4skc1oJu90iQbUarD8nhoXqWzkmWAhP
-         OzdJ5SUo1qsNughomVYW4y3WageEMhf7g2TKk7Pj7NBIGWZITCafBLL445mCuVOYthBh
-         A1C3YWvlMmt70ZJWhzmwhu+Ea0Pm26tvuWp/C7AOQ5B4sMwZGIZnuzK8qYiVQrcDyL5T
-         YEZOVdbOCy31oUw1NwqNUH32rEsc4Jl0wWhKRxmhEld4/awf2LbVbWGX/sAXj9+262pr
-         NqfMsnnyQ+k6fVEiZhuySOc6iy5v/62FKHzsDsmw0nFaS6lIAYqhPSt7wyRiAYiAFcfl
-         ruGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790085969; x=1790690769;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=99HU+/JZi5dG2Cu1dueoA580pKUbZlE9+G71ugT35kg=;
-        b=M6yuhPhRvyQl/07IK68jMXJ+ZIUyzBS7cdfupi83lK/jxbUg529X/fSGcGn2AeaQ7P
-         a/dWVn3MiUuBumAqhfHNuefc2PnSTXvMV2z2L5PbJF7CpumWF80ltyhB1F7dh7ni3l7M
-         nXAFC7O6n2lQmzTOrzHoLhPykekagKqC/0lAchEgsyvVb0DI0gLhsZX8YXAgqE75shgh
-         uFORWuEDct6ZX+laW+hEISkQiLq/I0ZWfrlEBY8b86gXWABKOmsVO6Bxoqito9/pyEO1
-         Ln6MPYKzYJOsX3kYzYZVD4xGRNK3d5538ELzYPSj5YVFt1+JkfMTc5w0Ai3QkWQPC7/V
-         mYEw==
-X-Forwarded-Encrypted: i=1; AKwUvBzTk1ipr93xyiD5UsbWltCrF5YI5LEIYjtfJtR/N69om7qjRGg5iOcraZMql0tNma/0dgpnRHYVSAEOFA==@vger.kernel.org
-X-Gm-Message-State: AFuF++n/kOn2n7J+wDKDf8tRhwv4u5s0IMEOA9HkEsv+FtyluEtPdza6
-	2R1JVBf4mop66O4pZJzqpWU/E/zY+7YScP4KG8cwL0iBTQI32wjpcNL7jLRIIU3oj2VvvtgYFiA
-	MA6jOoSP/zzueSm1+C0ubYn5vRcuqclacKeK9J6D2MDjqW2o+lLwBK4s=
-X-Gm-Gg: AYBFou2E2Si2xZdlPMFrTrZhAUkL7VEgiC2ikxRcuzyIjG5yXQ5vFOZ8qa0iFPhm3o/
-	e0TBdBshu7MQgO+z5rpsDNWDupj1yqy2eekj8QQjw1UHjvrH2021m4c7yaIbr2zMFXEcWKyU0DD
-	Y4wdlplMvNP9GmqRKCEsl0QSx9ofMni9ILokU1ZQuxLszUeOqRbmi1XeHwG0DrbFlsw4AOV5j0G
-	ZJybr9WNIUBah+uJz80dIVHoJd6ZJ1wZUmVKY5H9tXM6b/civkRvpEAy5kDa1nxq+MUuoioLBH/
-	FgujstNIYFkmCv6W/w6vk4cvMEXg/9tj38fJmi5nO7fpp8xOsqHgtUj/9XDdO7gTz8STIPNqiJ5
-	OBy4W0izjg9dMvGpJ7s9/hTb6suCEYql3OtjPdUwPO/MtmnZZDicd
-X-Received: by 2002:a05:600c:8b81:b0:49d:15f8:2bdb with SMTP id
- 5b1f17b1804b1-49fc568125bmr178646965e9.7.1790085969364; Tue, 22 Sep 2026
- 07:06:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="KLXmWEc6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=ky
+	nlDgai36MsbIl72qSEa5NJ1VukAAFb/WIGZOyQrXs=; b=KLXmWEc6euuUVnYiLy
+	dOuN0v0MTSkSDKMG3dc7OMDTyPZtpNI3n/6LnR91d/gmYc3DcvLhCEmK5Q3yRum5
+	XBiDQacQkTYEBfRvM5KVMJF+Q9TvarNukkvQ0Q0E+ts2zsNqnX28EE/zyClkT5py
+	1gNZJyBW5EQU2860oHFfNNb8Y=
+Received: from colol4bi5.localdomain (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgCXlWozmLJqCKtEAw--.24065S2;
+	Tue, 22 Sep 2026 23:01:08 +0800 (CST)
+From: Binbin Deng <18983559317@163.com>
+To: philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	christoph.boehmwalder@linbit.com,
+	axboe@kernel.dk
+Cc: drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Binbin Deng <18983559317@163.com>
+Subject: [PATCH v1] drbd: fix use-after-frees of disk_conf and rs_plan_s in chg-disk-opts
+Date: Tue, 22 Sep 2026 23:01:04 +0800
+Message-ID: <20260922150104.156635-1-18983559317@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-37-neelx@suse.com>
- <20260602024253.GD2295@sol>
-In-Reply-To: <20260602024253.GD2295@sol>
-From: Daniel Vacek <neelx@suse.com>
-Date: Tue, 22 Sep 2026 16:05:58 +0200
-X-Gm-Features: AclHuK94ZowdPkv8oLMNoMqk3wQaTqmzoE8-Amh55RA3X3wy5PPxpE6ut7cEYZ4
-Message-ID: <CAPjX3FdyCWLszDifMeEuT=x=QScr8K-dKsHCyD_bJOxOSQEnMw@mail.gmail.com>
-Subject: Re: [PATCH v7 36/43] btrfs: deal with encrypted symlinks in send
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>, 
-	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:QCgvCgCXlWozmLJqCKtEAw--.24065S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZw4xKr47CrWxAFykKFWfZrb_yoW5KF1xpF
+	W5Ka1UAr1Utw4YvF4ak3WrWr45tan7XF9rGrZ7Ka12vw43Ar9xXFW3Z3ya9Fnxur97CFyx
+	Za9xJFs7K3sYkFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRyCJPUUUUU=
+X-CM-SenderInfo: jprymmytvvmjmrxbiqqrwthudrp/xtbC4BR6XmqymDSkPgAA3+
 
-On Tue, 2 Jun 2026 at 04:44, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Wed, May 13, 2026 at 10:53:10AM +0200, Daniel Vacek wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > Send needs to send the decrypted value of the symlinks, handle the case
-> > where the inode is encrypted and decrypt the symlink name into a buffer
-> > and copy this buffer into our fs_path struct.
-> >
-> > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-> > Signed-off-by: Daniel Vacek <neelx@suse.com>
-> > ---
-> >
-> > No changes in v7.
-> > v6 changes:
-> >  * read_symlink_encrypted() reworked from using pages to using folios.
-> > v5: https://lore.kernel.org/linux-btrfs/4d97f35d6f85ff041b09bed33b63446a92b7a20c.1706116485.git.josef@toxicpanda.com/
-> > ---
-> >  fs/btrfs/send.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 42 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/fs/btrfs/send.c b/fs/btrfs/send.c
-> > index 89d72d8cb85f..d5256c22fe7a 100644
-> > --- a/fs/btrfs/send.c
-> > +++ b/fs/btrfs/send.c
-> > @@ -1701,9 +1701,7 @@ static int find_extent_clone(struct send_ctx *sctx,
-> >       return ret;
-> >  }
-> >
-> > -static int read_symlink(struct btrfs_root *root,
-> > -                     u64 ino,
-> > -                     struct fs_path *dest)
-> > +static int read_symlink_unencrypted(struct btrfs_root *root, u64 ino, struct fs_path *dest)
-> >  {
-> >       int ret;
-> >       BTRFS_PATH_AUTO_FREE(path);
-> > @@ -1764,6 +1762,47 @@ static int read_symlink(struct btrfs_root *root,
-> >       return fs_path_add_from_extent_buffer(dest, path->nodes[0], off, len);
-> >  }
-> >
-> > +static int read_symlink_encrypted(struct btrfs_root *root, u64 ino, struct fs_path *dest)
-> > +{
-> > +     DEFINE_DELAYED_CALL(done);
-> > +     const char *buf;
-> > +     struct folio *folio;
-> > +     struct btrfs_inode *inode;
-> > +     int ret = 0;
-> > +
-> > +     inode = btrfs_iget(ino, root);
-> > +     if (IS_ERR(inode))
-> > +             return PTR_ERR(inode);
-> > +
-> > +     folio = read_mapping_folio(inode->vfs_inode.i_mapping, 0, NULL);
-> > +     if (IS_ERR(folio)) {
-> > +             iput(&inode->vfs_inode);
-> > +             return PTR_ERR(folio);
-> > +     }
-> > +
-> > +     buf = fscrypt_get_symlink(&inode->vfs_inode, folio_address(folio),
-> > +                               BTRFS_MAX_INLINE_DATA_SIZE(root->fs_info),
-> > +                               &done);
-> > +     folio_put(folio);
-> > +     iput(&inode->vfs_inode);
-> > +
-> > +     if (IS_ERR(buf))
-> > +             return PTR_ERR(buf);
-> > +
-> > +     ret = fs_path_add(dest, buf, strlen(buf));
-> > +     do_delayed_call(&done);
-> > +     return ret;
-> > +}
-> > +
-> > +
-> > +static int read_symlink(struct btrfs_root *root, u64 ino,
-> > +                     struct fs_path *dest)
-> > +{
-> > +     if (btrfs_fs_incompat(root->fs_info, ENCRYPT))
-> > +             return read_symlink_encrypted(root, ino, dest);
-> > +     return read_symlink_unencrypted(root, ino, dest);
-> > +}
->
-> This just assumes that all the symlinks on the filesystem are encrypted,
-> without checking the actual encrypt flag in the inode.
->
-> Of course, looking at the Sashiko review for this patch, it already
-> found this, as well as a use-after-free.
->
-> I don't know why I'm even reviewing this.
+drbd_nl_chg_disk_opts_doit() installs a new disk_conf, drops conf_update
+and then keeps reading from the old and the new object. A concurrent
+receive_SyncParam(), which runs from the receiver thread and serialises
+on the same mutex, may install another disk_conf and kfree() the published
+one as soon as conf_update is released.  Its synchronize_rcu() does not
+wait for these reads, because they are not inside an RCU read-side
+critical section, so the object can be freed while it is still being read.
 
-This is unrelated to fscrypt; it is internal to btrfs. Btrfs
-encryption is experimental and under development. Not all features are
-ready.
-For now, btrfs send is not implemented or supported and it returns
-EINVAL with an error message in the log before the code even reaches
-this point. So far read_symlink() is never called on encrypted FS.
-Yes, it can be improved, but it was not a priority right now.
-I am really grateful for your insight as I am not familiar with all
-the fscrypt internals. And don't get me wrong, for the next version
-I'm also addressing the points Sashiko raised. I am sure we can all
-work together to get btrfs encryption into a usable state.
+BUG: KASAN: slab-use-after-free in drbd_nl_chg_disk_opts_doit+0x16a8/0x18b0
+Read of size 1 at addr ffff888100d84950 by task drbdsetup-84/100447
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x53/0x70
+ print_report+0xd0/0x630
+ ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+ ? drbd_nl_chg_disk_opts_doit+0x16a8/0x18b0
+ ? genlmsg_put+0x12f/0x330
+ ? __pfx_drbd_nl_chg_disk_opts_doit+0x10/0x10
+ ? __nla_parse+0x24/0x30
+ ? genl_family_rcv_msg_attrs_parse.isra.0+0x17a/0x290
+ genl_family_rcv_msg_doit+0x1e0/0x2c0
+ ? __pfx_genl_family_rcv_msg_doit+0x10/0x10
+ ? __pfx_cred_has_capability.isra.0+0x10/0x10
+ genl_rcv_msg+0x419/0x6d0
+ ? __pfx_genl_rcv_msg+0x10/0x10
+ ? __pfx_drbd_pre_doit+0x10/0x10
+ ? __pfx_drbd_nl_chg_disk_opts_doit+0x10/0x10
+ ? __pfx_drbd_post_doit+0x10/0x10
+ netlink_rcv_skb+0x11f/0x350
+ ? __pfx_genl_rcv_msg+0x10/0x10
+ ? __pfx_netlink_rcv_skb+0x10/0x10
+ ? __pfx___netlink_lookup+0x10/0x10
+ genl_rcv+0x23/0x30
+ netlink_unicast+0x5f5/0x860
+ ? __pfx_netlink_unicast+0x10/0x10
+ ? __pfx_sock_has_perm+0x10/0x10
+ netlink_sendmsg+0x70a/0xba0
+ ? __pfx_netlink_sendmsg+0x10/0x10
+ ? selinux_socket_sendmsg+0x8c/0x270
+ sock_write_iter+0x405/0x4a0
+ ? __pfx_sock_write_iter+0x10/0x10
+ ? __file_has_perm+0x30f/0x410
+ ? folio_add_new_anon_rmap+0x254/0x5d0
+ vfs_write+0xa4b/0xcf0
+ ? __handle_mm_fault+0xd1a/0x1e30
+ ? __pfx_vfs_write+0x10/0x10
+ ? fdget_pos+0x53/0x4b0
+ ksys_write+0x17c/0x1c0
+ ? __pfx_ksys_write+0x10/0x10
+ do_syscall_64+0xf9/0x540
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+ </TASK>
 
---nX
+Fix this by caching the values needed from the disk_conf objects while
+conf_update is still held, and by waiting for a grace period before
+freeing the previous rs_plan_s.
 
-> - Eric
+Fixes: 813472ced7fac ("drbd: RCU for rs_plan_s")
+Signed-off-by: Binbin Deng <18983559317@163.com>
+---
+ drivers/block/drbd/drbd_nl.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index b77f901fc3ef..f34ed481217e 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1657,7 +1657,6 @@ int drbd_nl_chg_disk_opts_doit(struct sk_buff *skb, struct genl_info *info)
+ 		old_plan = device->rs_plan_s;
+ 		rcu_assign_pointer(device->rs_plan_s, new_plan);
+ 	}
+-
+ 	mutex_unlock(&device->resource->conf_update);
+ 
+ 	if (new_disk_conf->al_updates)
+@@ -1687,7 +1686,16 @@ int drbd_nl_chg_disk_opts_doit(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	kvfree_rcu_mightsleep(old_disk_conf);
+-	kfree(old_plan);
++	if (old_plan) {
++		/*
++		 * rs_plan_s is dereferenced by the resync controller
++		 * (drbd_rs_controller()) under rcu_read_lock(), so wait for
++		 * a grace period before releasing the previous plan, like
++		 * receive_SyncParam() does.
++		 */
++		synchronize_rcu();
++		kfree(old_plan);
++	}
+ 	mod_timer(&device->request_timer, jiffies + HZ);
+ 	goto success;
+ 
+-- 
+2.43.0
+
