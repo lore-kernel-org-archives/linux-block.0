@@ -1,80 +1,47 @@
-Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+Received: from mta1.migadu.com (out-131.mta1.migadu.com [95.215.58.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BC02D949C
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 03:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5B03596F8
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790048445; cv=none; b=WmCIKlvWoPbh426Cv9lpxVvmaETuUL59RwrRJHrfJ1m5l1u0PYDP1YK2pjJQnd8AYcP4RjV9aXO4A8DqqCxSimIBxZJrztLyo7HEIRBdblEKwpfaOJrasWl0IIB/gsQrKgOo9EYoK4ieYguJYh8Frh9KIK4UOS/HAsA4xN7TsiY=
+	t=1790051962; cv=none; b=fZBRni1cy+OEEDVM4UqyKwyZFDIehTkEbTuVEgjBG7jeyog6amActpuiR6V+nGr/S4evU90fKcj+inrN4o4xaLQbnMsrr7Atj5w9J8PQP2pU966xqLeV3ZD/bUX49Dm7tf21s3qMnhKqrUP5WKVgpyWd8Gq9q/Vh2mPdR34PBYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790048445; c=relaxed/simple;
-	bh=0xg/9XRL25RybIS6ohHuHvgZW7EH5ABEOTFdeK+l46I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gTxi7aIbi9e/LfBEjgwrEKF/mywoZGFSsLrZ7GAwLGJH629i7XBLYJgr6/WUwPDEhAiIDmISIlS3MmAyh/ZJlJZcKavb5HBIcT5F+TH8TsZQCGmG5+olbWRmuQJHowjqWA3zZkEoiBUpyJXoxl4KGk2I29bk0IWA9Hnu4q0oXOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=jfG7JvzF; arc=none smtp.client-ip=74.125.228.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	s=arc-20240116; t=1790051962; c=relaxed/simple;
+	bh=UXsAZ0ZIDITmqWOM2hM8N2RqkY0U1XHEV6bVpJvnAPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y94CP3msDmvTKajFWc3qAucjepVKeBsMEugdGQa7MgRgq3HrAyY7/0Wm5qIYvnynqv8VFZZ9Vy1/WHFmhmBwuJ+qauMkgrJkRpUj/5hUHLgTfrf9RnAQRg7H78STQQMdOlWzEHqV4DeHR+cqiuNKm4UaXRjlC1ZQVCk8bIoFSR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UXE6iDDk; arc=none smtp.client-ip=95.215.58.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="jfG7JvzF"
-Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-85469d249c4so3264887b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2026 20:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1790048443; x=1790653243; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=HmLr6ctIBfRz+487t7olFZJDBL/YcLep23adJGDGqxg=;
-        b=jfG7JvzFK2iidcyAivplN9K0bkIgfW50hw2kn0gA1Blic5Gtsmvs4EagHKG9LhjvCM
-         zbThAEv6mRwrpKcTmRH/Vb/C2abPU2c0solhgtqd8dgQhKywKcOA7kPXPfQ/jBgoV9yb
-         yjtjDJcLhVXYdF7riji41KN226xLU5ZY8CvTSBqtnO73VXnzvzvIO2HknajNO3mEep1/
-         kT3I1FXtohpLkSzDpjWbxyUW6iu0NPmLFZ+sC62S5hiN6X0WsddZFffdU38fayIXdlfe
-         /KBQxti7apcArBO9LQFz3sErv3PGJGaw0gLqWNX7nghVbrdAuK9mJIsAJpzUYzkm7A/I
-         6LpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790048443; x=1790653243;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=HmLr6ctIBfRz+487t7olFZJDBL/YcLep23adJGDGqxg=;
-        b=svS+bT7H2vAU/8kANbBmzM4eA7ThYv3oQe4aW7mNPnsc+DXV0CnlE1XM39ZAEeNj4a
-         hjd5Ef7SYGk/nq3+YYFvcy0plqi5nAWNu9TlhGs7EHbgQbOlNmbIcHC0h5XKQLwPYwRJ
-         daDVXz/ab7U8lvcbRfh8CZF3pTawBjrkbJx6kaa8TtAe4eR6d29xY2POnbn08YMovN8E
-         +TyprnjP/+Vd1RQFlCD/ve+DpslMElQclciuBEt6xxQ9uj0N0k3hvVplDXvmmfSstDoc
-         UtJOEhDdBfk+afHFvoBbkQown+fXDvRDKDJLbrSCMWSaI49MhLBGHPSJsSWGHsOPuOwg
-         xzjA==
-X-Gm-Message-State: AFuF++mE0X7EqNkejfTuevdGIiGZ3ZrgPFkKGndLH6ogg2vzkDqZ6cHw
-	h84/rZydmLpknbLD1qLKK20JAlH0fjXVAHQ75ipkQ0QehShhfJwi4csOfCL/MLXNK1iX28VpVfv
-	nCMIRxh3/
-X-Gm-Gg: AYBFou2A7DfFDSXh8fofnXtOH6gndDn3rXyqYVsan2ykopchhQcNUe/+i0+H7Wt6/tx
-	ntPpQpvGmV3H9wbNeJtsdegtpWsJwIOwn1v3aOaFceEAP54I+onhMWR80L0cE8o2qzwez0CEbKy
-	xa3M+bATTk1LPLGUTD4a7wEUMEUCiJiq2e1V/YWbMKmtTVvwKImYsvwgI8ZAXIXVu2N0MYz2lq5
-	pttJa8nJifrcQFIWNhQcBQIFa1icEmhFKurNrcnYqD00WXf7TaJRu3/68i8e+mmrG7deZZn6DKQ
-	KjAvoDZF8WdOaB8ZXH+WiWMcN7g7IFYauYB1AajP90JzxWH4x+qHywVUW9mUsieLrIeaECa7gQZ
-	Joru7DJXHePXkiQna5ubJx1mB7YKWxEhv0dfBW4oA6tlYzFsY/lXO2XwnSub1W+4XySlcZ0LVOk
-	xJuvO885B7pYqpDfuBx61SU+3pgHiFMO4iJUN3Qu42DQMFU+zw1v9IwUG7l+EwLDh80wTCGlPgj
-	mJw2DDz
-X-Received: by 2002:a05:6a00:278d:b0:879:ffd9:126d with SMTP id d2e1a72fcca58-879ffd91ae4mr6148848b3a.15.1790048443207;
-        Mon, 21 Sep 2026 20:40:43 -0700 (PDT)
-Received: from enjou-Legion-Y7000P-2019 ([167.71.204.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87c324d0154sm151769b3a.23.2026.09.21.20.40.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 20:40:42 -0700 (PDT)
-From: Ren Wei <weir@nebusec.ai>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	kees@kernel.org,
-	objecting@objecting.org,
-	phdm@macqel.be,
-	akpm@linux-foundation.org,
-	vega@nebusec.ai,
-	rakukuip@gmail.com,
-	weir@nebusec.ai
-Subject: [PATCH 1/1] block: partitions: sysv68: validate slice count
-Date: Tue, 22 Sep 2026 11:40:10 +0800
-Message-ID: <72850b6d00233f9d93b82d27a60ef13e895eb8d1.1790005101.git.rakukuip@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1790005101.git.rakukuip@gmail.com>
-References: <cover.1790005101.git.rakukuip@gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UXE6iDDk"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=UXsAZ0ZIDITmqWOM2hM8N2RqkY0U1XHEV6bVpJvnAPc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790051950; v=1; x=1790656750;
+ b=UXE6iDDkyHzaIvaBzK3K+HaM/4uqXWHtBE1Kfzv8kx6WX42KrchnLLhwXOacdcx0w7Js91sP
+ Jviw1olKLPUweCTp4oz39P3CQuRIq5u1VHFUXST6aLWY3eOJ3QWSahO+v65/dIMFu6WP6rLwUO0
+ RLXFM8ZKn8XqHR8tpTuiSD24=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 013422bacf437b27;
+	Tue, 22 Sep 2026 04:39:10 +0000
+X-Mizu-Trace-ID: 013422bacf437b27
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	hch@infradead.org
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cui.tao@linux.dev,
+	cuitao@kylinos.cn
+Subject: [PATCH v4 0/4] blk-iocost: charge flushes and zone appends
+Date: Tue, 22 Sep 2026 12:38:52 +0800
+Message-ID: <20260922043856.2020116-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,50 +50,88 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luxiao Xu <rakukuip@gmail.com>
+From: Tao Cui <cuitao@kylinos.cn>
 
-sysv68_partition() reads the on-disk slice count from dkconfig without
-validation. It then reads a single 512-byte sector to hold the slice
-table records.
 
-Since each struct slice is 8 bytes, a single sector can hold at most
-SECTOR_SIZE / sizeof(struct slice) = 64 slice records. The parser
-decrements slices by one (as the last slice represents the whole disk)
-and then iterates slices entries.
+While testing iocost's weight-based throttling under concurrent IO, we
+observed that a cgroup limited to 1% weight could issue an unbounded
+number of flushes without being throttled: an fsync loop produced ~510k
+flushes in 12s with cost.usage staying at zero the entire time.  The
+device was monopolized while iocost reported no activity.  Zone appends
+were in the same position: the builtin linear cost model defines
+coefficients only for READ and WRITE, so REQ_OP_ZONE_APPEND is priced
+at zero and excluded from the latency statistics as well.
 
-A crafted disk image with an out-of-bounds slice count (such as 66)
-causes the loop to walk past the end of the 512-byte sector buffer,
-leading to an out-of-bounds read and triggering KASAN warnings when the
-sector is near the end of a mapped page/folio.
+This series prices both, without changing the behavior of existing
+setups:
 
-Validate that slices is at least 1 and does not exceed the number of
-struct slice records that fit in a single sector, releasing the sector
-and returning 0 if the check fails.
+ 1/4: add a flushiops entry to io.cost.model, translated like the
+      other iops coefficients (VTIME_PER_SEC / flushiops).  A bio with
+      REQ_PREFLUSH is charged one flush on top of its data cost, and a
+      bio with REQ_FUA one more flush on devices without native FUA
+      support (bdev_fua()), mirroring the pre-flush and post-flush the
+      block layer issues for them.  flushiops is zero in the builtin
+      profiles with no fallback to the write coefficients, so nothing
+      changes until it is configured.  Also documents flushiops in
+      cgroup-v2.rst.
+ 2/4: treat zone appends as writes in the builtin cost model -
+      REQ_OP_ZONE_APPEND falls through to the REQ_OP_WRITE
+      coefficients.
+ 3/4: count zone append completions in the latency window so the vrate
+      feedback loop can see ZA-induced latency.
+ 4/4: fix a stale comment in ioc_rqos_throttle().
 
-Fixes: 19d0e8ce856a ("partition: add support for sysv68 partitions")
-Cc: stable@vger.kernel.org
-Reported-by: VEGA <vega@nebusec.ai>
-Assisted-by: LLM
-Signed-off-by: Luxiao Xu <rakukuip@gmail.com>
-Signed-off-by: Ren Wei <weir@nebusec.ai>
----
- block/partitions/sysv68.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Measured on virtio-blk with a bio test module issuing bios from a
+cgroup (300 bios per phase):
 
-diff --git a/block/partitions/sysv68.c b/block/partitions/sysv68.c
-index 470e0f9de7be..0edf2ff80c5e 100644
---- a/block/partitions/sysv68.c
-+++ b/block/partitions/sysv68.c
-@@ -72,6 +72,10 @@ int sysv68_partition(struct parsed_partitions *state)
- 	if (!data)
- 		return -1;
- 
-+	if (slices < 1 || slices > (int)(SECTOR_SIZE / sizeof(struct slice))) {
-+		put_dev_sector(sect);
-+		return 0;
-+	}
- 	slices -= 1; /* last slice is the whole disk */
- 	seq_buf_printf(&state->pp_buf, "sysV68: %s(s%u)", state->name, slices);
- 	slice = (struct slice *)data;
+  - plain writes cost 23.41 usec, unchanged
+  - with the default model, WRITE|PREFLUSH and standalone flushes cost
+    the same as before: the flush component is free until flushiops is
+    configured
+  - with flushiops=100, WRITE|PREFLUSH and WRITE|FUA are charged
+    +10000 usec per bio and WRITE|PREFLUSH|FUA +20000, exactly
+    VTIME_PER_SEC / 100 per flush (virtio-blk has no native FUA,
+    confirmed via queue/fua)
+  - standalone flushes are charged 10000.06 usec each, matching
+    VTIME_PER_SEC / 100
+  - with flushiops=10, a flush storm from a low-weight cgroup is
+    throttled to one flush per 100ms
+
+Changes in v4:
+- 1/4 only, addressed Tejun's review comments: remove the always-true
+  !is_merge wrapper and the separate flush_cost accumulator, charge
+  flushes directly into cost before the empty bio check, trim the
+  comment to the FUA case, and update the commit message and
+  cgroup-v2.rst wording. No behavioral change: the whitebox numbers
+  are identical.
+- 2/4, 3/4 and 4/4 are unchanged except for the added Acked-by tags.
+
+Changes in v2:
+- charge the flush component of data-bearing REQ_PREFLUSH bios too,
+  not only standalone flushes (Christoph)
+- skip the iocg->cursor update for dataless flush bios
+
+Changes in v3:
+- the write-coefficient flush pricing is replaced by the flushiops
+  model parameter: pricing a flush off the write coefficients is as
+  arbitrary as pricing it at zero and changes what existing setups
+  get charged, so flushes are only priced when flushiops is
+  configured (Tejun)
+- the zone append patch is reduced to the minimal change: ZA falls
+  through to the REQ_OP_WRITE coefficients and the cursor is left
+  alone (Tejun)
+- the Fixes tags on 2/4 and 3/4 point at 0512a75b98f8, which added
+  the op without pricing it; 3/4 is otherwise unchanged from v2
+
+Tao Cui (4):
+  blk-iocost: add flush cost support with the flushiops model parameter
+  blk-iocost: charge zone appends as writes
+  blk-iocost: account zone append completions in latency stats
+  blk-iocost: fix stale comment in ioc_rqos_throttle()
+
+ Documentation/admin-guide/cgroup-v2.rst |  7 +++++
+ block/blk-iocost.c                      | 39 ++++++++++++++++++++-----
+ 2 files changed, 38 insertions(+), 8 deletions(-)
+
 -- 
 2.43.0
