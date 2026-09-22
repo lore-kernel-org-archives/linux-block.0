@@ -1,94 +1,67 @@
-Received: from mta1.migadu.com (out-66.mta1.migadu.com [95.215.58.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA165519A9
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 13:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CB95592F5;
+	Tue, 22 Sep 2026 13:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790083136; cv=none; b=i0G5KT01xtfja1y+YrqPBZa218Q2ZSP9WRPBu2QeioMwTpLrBZNBUYwJho1eUZVnwQ1Ms0VxO7Sj7PJ+XVVTi+X5a02K0zhQG4p0WJ80ybR/i64NULs0emn6YTC2oooEAkVYdDzy5QPKHcjULRg5EdN72WcI81iw+O7QraVMIrw=
+	t=1790083225; cv=none; b=Z00OExudsBhzbPQG88ro5awIFr7np9jf6X3Su1fEScRNNVPppl5KUd09YbzhUykL9QiTD2VOLPiEc41oN/e4FYcnzkCC6GgyyB61wnrhm3Bx8WH1mR87HSNcsCS+sPzB0ZqYfm3gb0+name1pxz3GOjFe5f7ZpTWKyEUKY6JFxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790083136; c=relaxed/simple;
-	bh=fZKcC/8Lg3XIF8w9KFAgMwUllIiXTJWXvemejboeABo=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JXC2iXK/nezYks3bEzjfEoFOITVagDC5GRqQLdStAjTV5XgC11gNbJiUlqFUzIlOiU+0Y1StYhnJTEjQQGkNQKalfCZlEtuZ8BlgslUH9m9W2XFdqyNEjJuYiYzuS5eF+9t8fpNL0tVTieXgPWzdtkePJ+YELryZOUPlwAnzW4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ibhp0qyi; arc=none smtp.client-ip=95.215.58.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ibhp0qyi"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=fZKcC/8Lg3XIF8w9KFAgMwUllIiXTJWXvemejboeABo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790083133; v=1; x=1790687933;
- b=ibhp0qyiB48q+PqedIf43LPyx9U7/sxQYgsiAGG3xmDk4vRnHVdmdVAkbZLj5+aJAr4DEXT2
- /3HdJ+Cdbfvf47/uuXCdOPP9B6hFpQI5AuFMVlPcaceXMurLs0I/Q6Kwfm7HIaLfhKIjo9LtS0H
- vCPSnqX4tgl87r+K3cw533+g=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 19a8fee23e81eb2e;
-	Tue, 22 Sep 2026 13:18:52 +0000
-X-Mizu-Trace-ID: 19a8fee23e81eb2e
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <bc816cf7-825f-4576-a1ff-a37c18e7f17d@linux.dev>
-Date: Tue, 22 Sep 2026 21:18:48 +0800
+	s=arc-20240116; t=1790083225; c=relaxed/simple;
+	bh=Fv5UtnMOkrV4L6o2J600jZ+PSpEfTT3W1fpr7JrMPT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AuAESrB94RHI9spBaCsoP96vDSd9MX1eE1WJ7xqhGxJpJg3tgu+D482vtmIEMJ9mzhbEID3AHxp8LYUx8FXN04jo0MW7pGLmkpeYqwZKvrdcLfbemhwG1/7TAnugMnIuiPeDQMumXlcLvUYJcVCumJut3RmgbINfIuILddGaob8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 8030168C7B; Tue, 22 Sep 2026 15:20:17 +0200 (CEST)
+Date: Tue, 22 Sep 2026 15:20:16 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Phil Cayton <phil.cayton@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+Subject: Re: [PATCH v6 06/13] nvme-pci: implement dma-buf backed requests
+Message-ID: <20260922132016.GA30684@lst.de>
+References: <cover.1789997898.git.asml.silence@gmail.com> <e80c3b1e0de004eaca6c51a2a86115ac9ed36381.1789997898.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- ameryhung@gmail.com, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [RFC PATCH v6 3/5] blk-iocost: add iocost_ioc_tick tracepoint for
- per-period device summary
-To: Tejun Heo <tj@kernel.org>
-References: <20260918055001.1273840-1-cui.tao@linux.dev>
- <20260918055001.1273840-4-cui.tao@linux.dev>
- <7203f0453d62336bb1ca712c8e7cf569@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <7203f0453d62336bb1ca712c8e7cf569@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e80c3b1e0de004eaca6c51a2a86115ac9ed36381.1789997898.git.asml.silence@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hello, Tejun.
+On Mon, Sep 21, 2026 at 02:38:50PM +0100, Pavel Begunkov wrote:
+> Enable BIO_DMABUF_MAP backed requests. On registration we map the
 
-在 2026/9/22 03:37, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Fri, 18 Sep 2026 13:49:59 +0800, Tao Cui wrote:
-> 
->> +	/*
->> +	 * vrate and period_us change right below; snapshot the values
->> +	 * this period ran in so the tick below reports the period's own
->> +	 * parameters instead of the next period's.
->> +	 */
->> +	tick_period_us = ioc->period_us;
->> +	tick_vrate = ioc->vtime_base_rate;
-> 
-> Everything the tick reports is already final at this point. busy_level
-> was just computed, running and cur_period haven't changed yet, and
-> nr_active and usage_us_sum are complete. Can you emit the tracepoint here
-> instead and drop the snapshots? The event can then read the fields
-> directly and the only cost outside the static key is the nr_active
-> increment.
-> 
+This is now REQ_DMABUF.
 
-That's a cleaner placement.  The tracepoint is now emitted
-before the period refresh, after busy_level is clamped, and the
-temporary tick_* snapshots are removed; the event reads the ioc fields
-directly.  nr_active remains the only cost outside the static key.
+Sashiko had a few comments, which I think are correct - if we use
+dma_map_sg to map the data, we need to use the sync_sg APIs to
+transfer ownership.  That only matters on non-coherent architectures
+with MMU, but we need to get it right.
 
-Thanks,
-Tao
-
-> Looks fine otherwise.
-> 
-> Thanks.
-> 
-> --
-> tejun
+And the reset deadlock also looks plausible.
 
