@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-135.mta1.migadu.com [95.215.58.135])
+Received: from mta1.migadu.com (out-139.mta1.migadu.com [95.215.58.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DB738F927
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4273F23DB
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790051967; cv=none; b=iAxQIwSd+TqXU6Oq/h83M+znrh6pzItxxM+pTTQtKTuD3ebTJCb/uTml8/SUnj7lr/990zzwRmqJC3v4X4s29QsxG/Htw8UwJFdDKOlJd4Ifjgqo1kSpiXKSZioJJjvcltfOT2jYc3DJK80V2DYmcumMOUAISAvgzD8T63OoETc=
+	t=1790051974; cv=none; b=r7z8Krlb6O1CFfg9xDUeysIWJg1zW8O8ayG7GYe0QlruNowK94eYSaONE0ydhBc0hOs0opvEJ2qmPn92EPRCudGp2+tFDZ6Mfc74Uci4jmhHOBUofwwCBqswqQReTQQAx8WOnt0O4vDuB0GNX99MUSy8yRGE59odRseUPyjwD08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790051967; c=relaxed/simple;
-	bh=MTDgTZY1SVlOE7xli04ykLXBc+uQIoxK/6E0aXN7PRI=;
+	s=arc-20240116; t=1790051974; c=relaxed/simple;
+	bh=jkQ9YMPODGMTgKGwx8hfh8F2ew/NT3cs1OijQlA8Ws8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZAbXprvqIsJBQVBtciDMRWxPi+NFrFJOOGOR2xB91UBwsNSbNnybuIDAAl/+PPkdtjy8wcAoPKfuARMxxhb3icFjZZS1C0E8wqNg17cuCdjlZbl1xWhwviLaTV5w/HABx/sNgaBBqAB7bzGP5I9Uzgd9YqULKyAFHLgTSlWZtp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LlgAkq3B; arc=none smtp.client-ip=95.215.58.135
+	 MIME-Version; b=NZ92jIUCNYAlb1KFOG6Ko9Ms17KeShJWw5JUNSk5LxjdpjwhXZP05BSk/SXNAGpFSPalvH+uFtUvY/V8bdgbRWy1B10I7p3iUVTGSC4pWqV3p+LyJENkdBHrSSZiNn8jgduPaLfSEGBxc5jJjp2cQl7i5SE8oqhCScMPWpi+5VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fegZSm7C; arc=none smtp.client-ip=95.215.58.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LlgAkq3B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fegZSm7C"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=MTDgTZY1SVlOE7xli04ykLXBc+uQIoxK/6E0aXN7PRI=;
+DKIM-Signature: a=rsa-sha256; bh=jkQ9YMPODGMTgKGwx8hfh8F2ew/NT3cs1OijQlA8Ws8=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790051960; v=1; x=1790656760;
- b=LlgAkq3By8yRC3M38mz2liE+JHsH0AS8FsppRsAV6MVcIb/SwzWdHfX9zi3DaS0fcO+x09U+
- BFuZiliTI/VCPgyhVtmOmwhJWNQvXaQa74EL23+pqQbVEZ1prvu0TCWVRng33O+hjqPxZJlWHZZ
- MHO3oz5WMFxCCKpLq2IPeyDU=
+ t=1790051965; v=1; x=1790656765;
+ b=fegZSm7CM/hIS0JNr4labss0EtG/uPvtPkHgOCyH/a6KNMth9FN9pzzPYxTf1Zvz5Yeow89D
+ J/IVLc4cWet7C+mjqUyG8Jzw1kRvRWkJeq5gn3aO6llBKoazecYK53183WRosbFGJF1juxCnf9C
+ lGsUNfyMMKJNQThw93yXc/sE=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id f7e9b12a9d775cde;
-	Tue, 22 Sep 2026 04:39:20 +0000
-X-Mizu-Trace-ID: f7e9b12a9d775cde
+Received: by smtp.migadu.com with ESMTPS id 1f5cc8b9c7f2cd4b;
+	Tue, 22 Sep 2026 04:39:25 +0000
+X-Mizu-Trace-ID: 1f5cc8b9c7f2cd4b
 X-Migadu-Flow: FLOW_OUT
 From: Tao Cui <cui.tao@linux.dev>
 To: tj@kernel.org,
@@ -38,10 +38,11 @@ Cc: cgroups@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	cui.tao@linux.dev,
-	cuitao@kylinos.cn
-Subject: [PATCH v4 2/4] blk-iocost: charge zone appends as writes
-Date: Tue, 22 Sep 2026 12:38:54 +0800
-Message-ID: <20260922043856.2020116-3-cui.tao@linux.dev>
+	cuitao@kylinos.cn,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 3/4] blk-iocost: account zone append completions in latency stats
+Date: Tue, 22 Sep 2026 12:38:55 +0800
+Message-ID: <20260922043856.2020116-4-cui.tao@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260922043856.2020116-1-cui.tao@linux.dev>
 References: <20260922043856.2020116-1-cui.tao@linux.dev>
@@ -55,33 +56,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-Zone append is a primary write operation for zoned devices; zoned xfs
-and btrfs use it for data writes.  It is priced at zero, so the zone
-append portion of zoned workloads runs outside the controller: a
-1%-weight cgroup issued 16000 appends at zero cost on a zoned null_blk.
+ioc_rqos_done() only accounts READ and WRITE completions, so zone
+append completions are excluded from the latency window: the vrate
+feedback loop cannot see ZA-induced latency, leaving it unable to
+respond to device saturation caused by zone appends.  Similarly,
+calc_size_vtime_cost_builtin() does not classify zone append as a
+write operation.
 
-Treat REQ_OP_ZONE_APPEND the same as REQ_OP_WRITE so it goes through
-the existing seq/rand classification and charging.
+Charging (the cost model) and feedback (the latency window) are
+separate mechanisms, so this is not covered by the previous patch
+that prices zone appends.
+
+Treat zone append as WRITE for both latency accounting and cost
+classification.
 
 Fixes: 0512a75b98f8 ("block: Introduce REQ_OP_ZONE_APPEND")
 Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-iocost.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 546458246cf9..6b262ccb6b32 100644
+index 6b262ccb6b32..9ca58cfbce86 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -2557,6 +2557,7 @@ static void calc_vtime_cost_builtin(struct bio *bio, struct ioc_gq *iocg,
- 		coef_randio	= ioc->params.lcoefs[LCOEF_RRANDIO];
- 		coef_page	= ioc->params.lcoefs[LCOEF_RPAGE];
+@@ -2601,6 +2601,7 @@ static void calc_size_vtime_cost_builtin(struct request *rq, struct ioc *ioc,
+ 	case REQ_OP_READ:
+ 		*costp = pages * ioc->params.lcoefs[LCOEF_RPAGE];
  		break;
 +	case REQ_OP_ZONE_APPEND:
  	case REQ_OP_WRITE:
- 		coef_seqio	= ioc->params.lcoefs[LCOEF_WSEQIO];
- 		coef_randio	= ioc->params.lcoefs[LCOEF_WRANDIO];
+ 		*costp = pages * ioc->params.lcoefs[LCOEF_WPAGE];
+ 		break;
+@@ -2871,6 +2872,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+ 		pidx = QOS_RLAT;
+ 		rw = READ;
+ 		break;
++	case REQ_OP_ZONE_APPEND:
+ 	case REQ_OP_WRITE:
+ 		pidx = QOS_WLAT;
+ 		rw = WRITE;
 -- 
 2.43.0
 
