@@ -1,199 +1,262 @@
-Received: from mta0.migadu.com (out-153.mta0.migadu.com [91.218.175.153])
+Received: from mail-oa2-f11.google.com (mail-oa2-f11.google.com [74.125.231.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7BA53162F
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 10:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2B33C6600
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 11:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.75
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790072185; cv=none; b=Wwa9s+F4hwQcAjsGsBk3XeEJvILCVchqBZyS+NiecTsIUsxUpRKRpsIglXedlQSw5kwSSMJ1Wiiz7QBnPGxwk1gZ8bF7rqovkOBK1SxL9ug3ThekW5kVFmkQTNudNbMcmN4XehyZAJt7Q1evH63QsWJSZJOBwtHkpZRkdiMRrpQ=
+	t=1790078100; cv=none; b=DvzfFYtm3+MTBp0a19VqkTcWt6l/f4EPzREp/4CZwIiI7d7rfHRaNqwkxWNNEjE9VjAFvTgCMNZdNIsI2s6REfWIRjFMrrBaeAOgqSVMRCB8RwXvfNxVR16FVHBL0MOPqjri/2TZtguYZ6qVb+PHFLyhPryIOKBxRgNCwvA2GiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790072185; c=relaxed/simple;
-	bh=5jon+ifDWFP5QwYioELCR5y1JdhGgZVy832hXqPL/DU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ynnrn6DpzpXO+roKGA4vIWSJuoZ8iLJyOpL/C9c+vPgvgu3ffzoQsej9r2huBVQBmH1V1ClIokqPnWfuWvISineS+jVLhTXuKXBzxeoLGU/V4Z6+9sSIkL2AXLpheGkbX9AzeSNUtAGE+qtKNHkLNzK6cetrOmHBveiHn5+Y6Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JD7NX+VX; arc=none smtp.client-ip=91.218.175.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JD7NX+VX"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=5jon+ifDWFP5QwYioELCR5y1JdhGgZVy832hXqPL/DU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790072177; v=1; x=1790676977;
- b=JD7NX+VXhxjhKxPVCatT4HQfo+W174hJ2g861hCCjyrbm1Yvt9ldIfa/6NYZzVtBqyB/qlTi
- OHwJCQtoUW5+5/84f9bp5PR9fesyLxlFvBFEObtkpjxgq9UeC0qBo6jFx7Dl+zzM1Ff6qDlAm2o
- IfCi+r13uWyndstbfxmd0yIo=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta11.migadu.com with ESMTPS id 2d792f7ed8adce60;
-	Tue, 22 Sep 2026 10:16:07 +0000
-X-Mizu-Trace-ID: 2d792f7ed8adce60
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <07aced0d-35d4-4c4f-95e4-9d3168e24617@linux.dev>
-Date: Tue, 22 Sep 2026 11:16:04 +0100
+	s=arc-20240116; t=1790078100; c=relaxed/simple;
+	bh=9Vrz2yJ5IJQ8xZobKroTxgw4W4TDjfkF1IVwe35tFzM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Cy6ZHfcErPlWpevt8GSnEh9ttaIju6KTTgXPvhaXaLXFtOXb+YnSkqqO2JY8wcPz64hDK6Hw+5EIBwBcPOSdhN+IQxbxwR54T/f6X4Lfb91AOE6tOjWpJRUFXqxExdMiLG9SJB+f6xQVIir5MecY0wBiavBlH1SDwh16bljMAAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa2-f11.google.com with SMTP id 586e51a60fabf-46a6530ebd4so1339500fac.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:54:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790078097; x=1790682897;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xz9NsVfFyEQ4ELu4SH9AXjL8muGA26kDetAt0gAOsqY=;
+        b=qH/op6VcUTZPrdj9ucNiW1zYaBSiImZILLK5dgEDxaXMBEREhS5ta9TUYQdINLmirD
+         HzJlE/NTK4yu4+zUEAPcY3ImaVmN+k8FkjBNhDltsSN8PKoZ/DHuWRWfBfDFYLAQ6G6N
+         C+/yT2VlCerAXLq2A4CUF3tY0G1uPg0OcT+Db8U+GJb7neWkPIIie0vEu+RpumDcIOhW
+         LcSy74jMXrlkOzuXAeOclBl3mYGmXEZndPqfbBFBhZCF4Je/DTXyq05SfS1JoGUWV15q
+         1O5AXuJ05MV4EZkqw549blAIbSgdvIiDu0ew9F+LKp40DL7b+xqnvapt2v7fU+cFSPL4
+         c3rA==
+X-Forwarded-Encrypted: i=1; AKwUvBwxnaTtmVzGfN7Y2iEDX7Zzej/q9PJnnHl6KxfEg0HkOCCaFwRaFemJcN9fEK/Pm5azeNSjrY324492nw==@vger.kernel.org
+X-Gm-Message-State: AFuF++l+ee6N6q+F+Od5V00FsjmehYxm0pOyIi7nkVPoEs58lDyE+yJs
+	gDRVxaoRoTzAIKOrl26fSfqby3NFhC36xhf1xAdXw+SBjXHf4DC5QF3x2gMI6L2mcotNz/pFLxH
+	vdyFurF5o2t5cn6Rm+1eTxZQwaVz/wrYzR/QfTzVH0pyW8/NCTTdD2xCzC+Q=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/8] block: fail a short atomic pin in
- bio_iov_iter_get_pages()
-To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
- <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
- "Martin K. Petersen" <mkp@kernel.org>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260921-blkdev-fixes-v4-0-e2801f71ede9@columbia.edu>
- <20260921-blkdev-fixes-v4-5-e2801f71ede9@columbia.edu>
-Content-Language: en-US
-From: John Garry <john.garry@linux.dev>
-In-Reply-To: <20260921-blkdev-fixes-v4-5-e2801f71ede9@columbia.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6820:2908:b0:6c9:e0a0:af1d with SMTP id
+ 006d021491bc7-6ca9a643b29mr12002654eaf.26.1790078096876; Tue, 22 Sep 2026
+ 04:54:56 -0700 (PDT)
+Date: Tue, 22 Sep 2026 04:54:56 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6ab26c90.c68e76dc.23da29.00ab.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in sd_revalidate_disk
+From: syzbot <syzbot+2e02ccadb3c5522a5c59@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, dlemoal@kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/22/26 03:54, Tal Zussman wrote:
-> On a partial page pin, __blkdev_direct_IO_simple() and
-> __blkdev_direct_IO_async() submit what was pinned with REQ_ATOMIC set
-> and leave the rest to the buffered fallback, tearing an IOCB_ATOMIC
-> write.
-> 
-> This can be triggered deterministically. A 16K pwritev2(RWF_ATOMIC)
-> whose last page is PROT_NONE, on a scsi_debug device with atomic_wr=1,
-> completes short with only three of the four pages written, violating
-> RWF_ATOMIC semantics.
-> 
-> Make bio_iov_iter_get_pages() release the pins and return -EINVAL when
-> a REQ_ATOMIC bio doesn't cover the whole iterator, since an atomic
-> write is submitted as a single bio and a short one would be torn. That
-> covers iomap as well, where a partially unmapped buffer could trip the
-> WARN_ON_ONCE() in iomap_dio_bio_iter_one(). The async block device path
-> currently sets REQ_ATOMIC after pinning, so set it before, and move
-> REQ_NOWAIT along with it.
-> 
-> Fixes: caf336f81b3a ("block: Add fops atomic write support")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Link: https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
->   block/bio.c  | 29 ++++++++++++++++++++++-------
->   block/fops.c | 12 ++++++------
->   2 files changed, 28 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index f95b63c0604a..14429a5d4e68 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1285,6 +1285,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
->   			   unsigned mem_align_mask, unsigned len_align_mask)
->   {
->   	iov_iter_extraction_t flags = 0;
-> +	int ret;
->   
->   	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
->   		return -EIO;
-> @@ -1304,34 +1305,48 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
->   		flags |= ITER_ALLOW_P2PDMA;
->   
->   	do {
-> -		ssize_t ret;
-> +		ssize_t size;
->   
-> -		ret = iov_iter_extract_bvecs(iter, bio->bi_io_vec,
-> +		size = iov_iter_extract_bvecs(iter, bio->bi_io_vec,
->   				BIO_MAX_SIZE - bio->bi_iter.bi_size,
->   				&bio->bi_vcnt, bio->bi_max_vecs,
->   				mem_align_mask, flags);
-> -		if (ret <= 0) {
-> +		if (size <= 0) {
->   			/*
->   			 * A misaligned vector fails the whole I/O.  Release any
->   			 * pages pinned by earlier iterations before returning
->   			 * since this bio won't be submitted to release them.
->   			 */
-> -			if (ret == -EINVAL) {
-> +			if (size == -EINVAL) {
+Hello,
 
-*
+syzbot found the following issue on:
 
->   				bio_release_pages(bio, false);
->   				bio_clear_flag(bio, BIO_PAGE_PINNED);
->   				bio->bi_vcnt = 0;
->   			}
->   			if (!bio->bi_vcnt)
-> -				return ret;
-> +				return size;
->   			break;
->   		}
-> -		bio->bi_iter.bi_size += ret;
-> +		bio->bi_iter.bi_size += size;
->   	} while (iov_iter_count(iter) && !bio_full(bio, 0));
->   
->   	if (is_pci_p2pdma_page(bio->bi_io_vec->bv_page))
->   		bio->bi_opf |= REQ_NOMERGE;
-> -	return bio_iov_iter_align_down(bio, iter,
-> +	ret = bio_iov_iter_align_down(bio, iter,
->   			&bio->bi_io_vec[bio->bi_vcnt - 1], len_align_mask);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/*
-> +	 * An atomic write is submitted as a single bio, so it has to cover
-> +	 * the whole iterator or it would be torn.
-> +	 */
-> +	if ((bio->bi_opf & REQ_ATOMIC) && iov_iter_count(iter)) {
-> +		bio_release_pages(bio, false);
-> +		bio_clear_flag(bio, BIO_PAGE_PINNED);
-> +		bio->bi_vcnt = 0;
-> +		return -EINVAL;
+HEAD commit:    9d80aa4617b3 Add linux-next specific files for 20260903
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=175ba915580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b370c26fb58c72f0
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e02ccadb3c5522a5c59
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
 
-There is some commonality here with iov_iter_extract_bvecs() failing, 
-above *. You could add an error out label for both error scenarios.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If that does not work:
-Reviewed-by: John Garry <john.garry@linux.dev>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/84a12994f553/disk-9d80aa46.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2329deeb3b2b/vmlinux-9d80aa46.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/689910d8c695/bzImage-9d80aa46.xz
 
-> +	}
-> +	return 0;
->   }
->   
->   static struct folio *folio_alloc_greedy(gfp_t gfp, size_t *size,
-> diff --git a/block/fops.c b/block/fops.c
-> index a3a709697b40..90777e8a9a6c 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -342,6 +342,12 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
->   	bio->bi_end_io = blkdev_bio_end_io_async;
->   	bio->bi_ioprio = iocb->ki_ioprio;
->   
-> +	if (iocb->ki_flags & IOCB_ATOMIC)
-> +		bio->bi_opf |= REQ_ATOMIC;
-> +
-> +	if (iocb->ki_flags & IOCB_NOWAIT)
-> +		bio->bi_opf |= REQ_NOWAIT;
-> +
->   	/*
->   	 * Users don't rely on the iterator being in any particular
->   	 * state for async I/O returning -EIOCBQUEUED, hence we can
-> @@ -371,12 +377,6 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
->   			goto out_bio_put;
->   	}
->   
-> -	if (iocb->ki_flags & IOCB_ATOMIC)
-> -		bio->bi_opf |= REQ_ATOMIC;
-> -
-> -	if (iocb->ki_flags & IOCB_NOWAIT)
-> -		bio->bi_opf |= REQ_NOWAIT;
-> -
->   	if (iocb->ki_flags & IOCB_HIPRI) {
->   		bio->bi_opf |= REQ_POLLED;
->   		submit_bio(bio);
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2e02ccadb3c5522a5c59@syzkaller.appspotmail.com
 
+sd 1:0:0:0: [sdb] Test Unit Ready failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+sd 1:0:0:0: [sdb] Read Capacity(10) failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+sd 1:0:0:0: [sdb] Sense not available.
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L     
+------------------------------------------------------
+kworker/u8:3/49 is trying to acquire lock:
+ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:316 [inline]
+ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4636 [inline]
+ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4974 [inline]
+ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: __do_kmalloc_node mm/slub.c:5418 [inline]
+ffffffff8f090420 (fs_reclaim){+.+.}-{0:0}, at: __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
+
+but task is already holding lock:
+ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: sd_revalidate_disk+0xb88/0xb350 drivers/scsi/sd.c:3803
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&q->limits_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+       disk_update_zone_resources block/blk-zoned.c:2067 [inline]
+       blk_revalidate_disk_zones+0xad9/0x12e0 block/blk-zoned.c:2375
+       nvme_mpath_revalidate_zones+0x106/0x1c0 drivers/nvme/host/multipath.c:301
+       nvme_update_ns_info+0x984/0x1200 drivers/nvme/host/core.c:2622
+       nvme_alloc_ns drivers/nvme/host/core.c:4284 [inline]
+       nvme_scan_ns+0x2563/0x3640 drivers/nvme/host/core.c:4471
+       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
+       process_one_work kernel/workqueue.c:3399 [inline]
+       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
+       kthread+0x38b/0x480 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 (&q->q_usage_counter(io)#77){++++}-{0:0}:
+       blk_alloc_queue+0x544/0x690 block/blk-core.c:504
+       __blk_alloc_disk+0xe3/0x1d0 block/genhd.c:1527
+       nvme_mpath_alloc_disk+0x5c2/0x8b0 drivers/nvme/host/multipath.c:769
+       nvme_alloc_ns_head drivers/nvme/host/core.c:4043 [inline]
+       nvme_init_ns_head drivers/nvme/host/core.c:4144 [inline]
+       nvme_alloc_ns drivers/nvme/host/core.c:4258 [inline]
+       nvme_scan_ns+0x1e0f/0x3640 drivers/nvme/host/core.c:4471
+       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
+       process_one_work kernel/workqueue.c:3399 [inline]
+       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
+       kthread+0x38b/0x480 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (fs_reclaim){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3209 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+       __fs_reclaim_acquire mm/page_alloc.c:4357 [inline]
+       fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4371
+       might_alloc include/linux/sched/mm.h:316 [inline]
+       slab_pre_alloc_hook mm/slub.c:4636 [inline]
+       slab_alloc_node mm/slub.c:4974 [inline]
+       __do_kmalloc_node mm/slub.c:5418 [inline]
+       __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
+       _kmalloc_noprof include/linux/slab.h:995 [inline]
+       sd_read_block_zero drivers/scsi/sd.c:3749 [inline]
+       sd_revalidate_disk+0x177d/0xb350 drivers/scsi/sd.c:3817
+       sd_probe+0x9f3/0x1180 drivers/scsi/sd.c:4101
+       call_driver_probe drivers/base/dd.c:-1 [inline]
+       really_probe+0x254/0xae0 drivers/base/dd.c:706
+       __driver_probe_device+0x1e8/0x360 drivers/base/dd.c:868
+       driver_probe_device+0x4f/0x240 drivers/base/dd.c:898
+       __device_attach_driver+0x270/0x410 drivers/base/dd.c:1026
+       bus_for_each_drv+0x258/0x2f0 drivers/base/bus.c:500
+       __device_attach_async_helper+0x1e7/0x2b0 drivers/base/dd.c:1055
+       async_run_entry_fn+0x9d/0x430 kernel/async.c:129
+       process_one_work kernel/workqueue.c:3399 [inline]
+       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
+       kthread+0x38b/0x480 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+other info that might help us debug this:
+
+Chain exists of:
+  fs_reclaim --> &q->q_usage_counter(io)#77 --> &q->limits_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->limits_lock);
+                               lock(&q->q_usage_counter(io)#77);
+                               lock(&q->limits_lock);
+  lock(fs_reclaim);
+
+ *** DEADLOCK ***
+
+locks held by kworker/u8:3/49: 4, last CPU#0:
+ #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
+ #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3364 [inline]
+ #0: ffff88801bedc940 ((wq_completion)async){+.+.}-{0:0}, at: process_scheduled_works+0x97a/0x1630 kernel/workqueue.c:3482
+ #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
+ #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3364 [inline]
+ #1: ffffc90000ba7c40 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_scheduled_works+0x97a/0x1630 kernel/workqueue.c:3482
+ #2: ffff888075d823c0 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1104 [inline]
+ #2: ffff888075d823c0 (&dev->mutex){....}-{4:4}, at: __device_attach_async_helper+0xa4/0x2b0 drivers/base/dd.c:1041
+ #3: ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
+ #3: ffff888012ece3b8 (&q->limits_lock){+.+.}-{4:4}, at: sd_revalidate_disk+0xb88/0xb350 drivers/scsi/sd.c:3803
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 49 Comm: kworker/u8:3 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+Workqueue: async async_run_entry_fn
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
+ check_prev_add kernel/locking/lockdep.c:3209 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+ __fs_reclaim_acquire mm/page_alloc.c:4357 [inline]
+ fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4371
+ might_alloc include/linux/sched/mm.h:316 [inline]
+ slab_pre_alloc_hook mm/slub.c:4636 [inline]
+ slab_alloc_node mm/slub.c:4974 [inline]
+ __do_kmalloc_node mm/slub.c:5418 [inline]
+ __kmalloc_noprof+0xbc/0x710 mm/slub.c:5444
+ _kmalloc_noprof include/linux/slab.h:995 [inline]
+ sd_read_block_zero drivers/scsi/sd.c:3749 [inline]
+ sd_revalidate_disk+0x177d/0xb350 drivers/scsi/sd.c:3817
+ sd_probe+0x9f3/0x1180 drivers/scsi/sd.c:4101
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x254/0xae0 drivers/base/dd.c:706
+ __driver_probe_device+0x1e8/0x360 drivers/base/dd.c:868
+ driver_probe_device+0x4f/0x240 drivers/base/dd.c:898
+ __device_attach_driver+0x270/0x410 drivers/base/dd.c:1026
+ bus_for_each_drv+0x258/0x2f0 drivers/base/bus.c:500
+ __device_attach_async_helper+0x1e7/0x2b0 drivers/base/dd.c:1055
+ async_run_entry_fn+0x9d/0x430 kernel/async.c:129
+ process_one_work kernel/workqueue.c:3399 [inline]
+ process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3482
+ worker_thread+0xa47/0xfb0 kernel/workqueue.c:3563
+ kthread+0x38b/0x480 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+sd 1:0:0:0: [sdb] 0 512-byte logical blocks: (0 B/0 B)
+sd 1:0:0:0: [sdb] 0-byte physical blocks
+sd 1:0:0:0: [sdb] Write Protect is off
+sd 1:0:0:0: [sdb] Mode Sense: 00 00 00 00
+sd 1:0:0:0: [sdb] Asking for cache data failed
+sd 1:0:0:0: [sdb] Assuming drive cache: write through
+sd 1:0:0:0: [sdb] Attached SCSI removable disk
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
