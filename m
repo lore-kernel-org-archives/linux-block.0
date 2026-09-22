@@ -1,68 +1,87 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-163.mta0.migadu.com [91.218.175.163])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9F3559313;
-	Tue, 22 Sep 2026 13:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1858D54DAC0
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 13:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790082984; cv=none; b=RkRel2pQ7pcqzzIzPS5Ql2INBZS6an/7RjYo13ejtQhfNznXhdD1TF6q+rxdjfY5zb/PyeUv4poI6kpzufhbUI6fdMUOy8ckvZqgI+IueVv20pfLJV06a5Kc7lxBUs7ifu5si/TxuWni3Ll0dEaHQGVIYi3Yfa/IStL/yX0z2jg=
+	t=1790083084; cv=none; b=YlYrHgblbnfK3k1+fNUq6ntpQGDKvhac1XKHJi56KRzmNkSF9DJNCRG90qDxsw0B0glbpsIHI5l7juFkxTPhfTgOdhKI/gBr8e7rBuVMuWGFq9m81FuC2fYLk1Of4GoSej1NIW8//ePzLL/q3dC1OtivoYKsmi9ycAldJItSBIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790082984; c=relaxed/simple;
-	bh=Y8SIGh6YdZZ1CNW2JjI2lgNP0I2lOTxj/HFJcJxssAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nA5t0XLtI/BfQMu4lTKsMcWtjoIdoHf8t0ONQqVF0J9ANWZqHCDL1OAnY0kKz+06jI9GxDlUreTIl862OH0a1MvbiVmF4QZmDs08Q1pAiaASUWicQSteJ1qMLzhdbZo3jbrz7qdMusiKHASpsJTuIU0CdRwGxOaZ41Emsr8gejQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A774668C4E; Tue, 22 Sep 2026 15:16:11 +0200 (CEST)
-Date: Tue, 22 Sep 2026 15:16:10 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-Subject: Re: [PATCH v6 04/13] block: introduce dma map backed bio type
-Message-ID: <20260922131610.GA30468@lst.de>
-References: <cover.1789997898.git.asml.silence@gmail.com> <a3ee719abc440ca139f1a945fdaf43a45f0c6b57.1789997898.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1790083084; c=relaxed/simple;
+	bh=4pfzmO/hwWCixkUYL+9BkgmWlmDGjMCDcNSgG5Tt31w=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CAKpDxyl5IdMG5XzyX2MMPnp1zqTUHcphnL4hDTV3MgxlIVVNaBinEzBBY2qY/IOV+b/bya5hd0rfZrL8LFtM//YgPkFyx4VoKxXO2dJaXOZTPPc8af8k1WcPq2vyiOCt5pGjMj844M0K40e8VerdSjl5tc+AX2GtFYM61F5g1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NdUYEgec; arc=none smtp.client-ip=91.218.175.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NdUYEgec"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=4pfzmO/hwWCixkUYL+9BkgmWlmDGjMCDcNSgG5Tt31w=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790083080; v=1; x=1790687880;
+ b=NdUYEgecqHccCywkar7DtDVmls+dip8NSfSCn/QPe1z2Iv8SgEf833AzLV9MY4yPF3KXMUYd
+ Q4pOqSiWKQ8IvVyrXbh7jCGZGPXmXLXaw52lbvUOQ2R7z4NuRETAQmN6LkcbX3faB0xbRjs/owB
+ CsDWQtYZ7dfPz+8mFkVYXpmE=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 702c86f6eda1fa1b;
+	Tue, 22 Sep 2026 13:18:00 +0000
+X-Mizu-Trace-ID: 702c86f6eda1fa1b
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <e415b04b-468a-4831-9e0c-55b1b7ccceff@linux.dev>
+Date: Tue, 22 Sep 2026 21:17:53 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a3ee719abc440ca139f1a945fdaf43a45f0c6b57.1789997898.git.asml.silence@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
+ ameryhung@gmail.com, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>
+Subject: Re: [RFC PATCH v6 1/5] blk-iocost: add BPF struct_ops cost model
+ support
+To: Tejun Heo <tj@kernel.org>
+References: <20260918055001.1273840-1-cui.tao@linux.dev>
+ <20260918055001.1273840-2-cui.tao@linux.dev>
+ <e95fad14874587df6ca17c5cf767d24e@kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <e95fad14874587df6ca17c5cf767d24e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 21, 2026 at 02:38:48PM +0100, Pavel Begunkov wrote:
-> Premapped buffers don't require a generic bio_vec since these have
-> already been dma mapped. Repurpose the bi_io_vec space to strore dmabuf
+Hello, Tejun.
 
-s/strore/store/
+在 2026/9/22 03:37, Tejun Heo 写道:
+> Hello, Tao.
+> 
+> On Fri, 18 Sep 2026 13:49:57 +0800, Tao Cui wrote:
+> 
+>> +	mutex_lock(&iocost_bpf_reg_lock);
+>> +	{
+>> +		struct iocost_bpf_model *other;
+>> +
+>> +		list_for_each_entry(other, &iocost_bpf_models, list) {
+> 
+> No need for a block to scope a variable. Declare it at the top of the
+> function, or in the body if it has to sit inside an #ifdef block. Same for
+> the other blocks in this patch and the cursor block in the 2x example
+> model.
+> 
 
-Can you please expland on the splitting considerations a bit?  Preferably
-both in a comment for the details, and in the commit log for how we
-arrived at them and why they are fine for now?
+Thanks, fixed.  The scopes used only to declare local variables are
+removed and the declarations moved up, including the cursor block in
+the 2x example model.
 
-Otherwise looks good.
+Thanks,
+Tao
+
+> Thanks.
+> 
+> --
+> tejun
 
