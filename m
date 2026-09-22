@@ -1,154 +1,117 @@
-Received: from mail-pz2-f41.google.com (mail-pz2-f41.google.com [74.125.228.41])
+Received: from mta0.migadu.com (out-230.mta0.migadu.com [91.218.175.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D58515966
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 07:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3A640A956
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 08:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790061725; cv=none; b=AaIP7PKBpb9RwZ37V2/30xs4YGtSkUDpet8p45zVTGQFkNW8X+vhI2Sx0QaBtjnEUnOA/BZp3lFLXHkR+GzrOaHShOIN7UEZXoj80Kb1s3bOZFxxEXEUm8ndY9BEbpu+v2amPc8GJxxlzDVOip56hr2WX8zpeqFLDz58BtMqk+0=
+	t=1790064613; cv=none; b=ZDs5HvPz7HcUkA/aPBuKHbm/fDWEoW+NT3Ij43fxP9tOEOdoXHqCCTsNMj5J0M+uD3uDdTwcM0YBzI0nu3QNy/+ybHve+RCmObcqcec7luQPvzUKH32K0kktL7wiN2QSFR2iDFi8o8GKW9G+wSg4ZM4q6BBmIZwfH7NQ40NVEro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790061725; c=relaxed/simple;
-	bh=MnwjxHsRvv6B7ebV4jOBaeSUOdh4EX9DSXNEM3ODyYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ic5+laSnP2fJpgcO3f57TK5gVC8pu6Dqv4WvGcvFwUv7kpTuLvjDPg9HAN6Xtb/VOjoD0Q1THmL2+h1VyvDtXh99Xbrla3fFTw+npDriVQcRUk/pAJiRSXarAQ6oGXS24/v/mPSooGM7nHK0BrKY0wUlnQOx0iXCq9oOxKQzxQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cX9JLXY9; arc=none smtp.client-ip=74.125.228.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790064613; c=relaxed/simple;
+	bh=NlF78RerIOTo/MnyozLSa9euZ5Hw7BjWTrePBtX97Ok=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jP5IaI6gYmRXTdwWNILiW305V/w0aCNga1iOBcz9lHTu/sn7AkGr6U/NkwOR9XJL3fxMt5DM2GoUCHYYlDOqP7R4mthzY1/I6HFHNkOF2QzmBKNsjG5VXdZeurcQAKc53jy5Vdosws9NnaJhz6Gn6bna8YfWlyX2gU2vrEk6bxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B3Q8G17s; arc=none smtp.client-ip=91.218.175.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cX9JLXY9"
-Received: by mail-pz2-f41.google.com with SMTP id d2e1a72fcca58-85469a3490bso3990731b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 00:22:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790061723; x=1790666523; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=YwywWDLrZalzz03FLTpDP9g/tBAvW+/0SJTZpW2eZ4M=;
-        b=cX9JLXY9ZzuzueGaBeNkOosGlWrBoNQ51gqgemit1k96eNxTZ7FNlFC9joRbJA+43Y
-         jDZ0gf/RN9hg3NZUrjaSQg5KPCRV9bnbNMikkZQShOMz4kh7FOUZmHASy1XqLHSi+/f3
-         zBuI+/q8xDZNPoC4gV2UIJWa39H6CIjUYwY4xggHJq+HGi8TQ6h7iYkt+V6s5sMSkKMu
-         D9UYMFFZTaotJLC7rVJwfoy+PU/uIx8i3rMqs4xvanTo+Q9BzW9JNtgaj8ztdMu2MMDK
-         H4wZnm7LyAhmc7Ys59ohClY9YRU6VHFLyoHHcllU8qjmqVkxj4O4ma+TDPUx/KJBNYnh
-         dUdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790061723; x=1790666523;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YwywWDLrZalzz03FLTpDP9g/tBAvW+/0SJTZpW2eZ4M=;
-        b=j9qnzfC0o9b0zU+XTLeMMct0LIxTjSuN0w5kyltixySuRMnFYcZH6yZdHkqWvHzdY3
-         JxO6HhiS3l5YKFfwP7CSd/1MSvkJUg36Qge6CEov75blRM9Ga8kbIua9VTUK+H5fvMcC
-         2hweCjQ1a2jrGjOl+8zF8hL7nrfTiIR61KIGJzBGJf9dh4KHzL58Nm/LaokUEHasStQz
-         9GdEVYynwqhxyrv1RQy6bPFrrt9QieqQ85Y7ZgJ11wLoJ93C3qU1lWr0i/syQe2IoW7w
-         CDd232GyJOIsf2y4UWeeYIhs7g5PVBDnc5v3Bwjc2PyCV5chd62ncwbfDj7XvMWcB2yN
-         twBg==
-X-Forwarded-Encrypted: i=1; AKwUvBzEJzJzHqD6nTSpFmvlY39MOZfUfFxB/DDUQsxaMxnNpB0oTKDjZlrr3qANv9Te9BdOR+kkAM6/qRjQCw==@vger.kernel.org
-X-Gm-Message-State: AFuF++m3xMmlGZ0BLDBCSdjEz2xNzv9K6ADhgQklWkCXoMBg6Ctrry3q
-	GerbMkrK6Shna2KhI/y/R/h1jMahhkJBTnHMQ8iVYo5UIN8VuaYE7Ogf
-X-Gm-Gg: AYBFou3qXBj3bM+n9zP7zSkR6LtNEIPJFYWU8sZBsuG1+wKuDwmjW3Hdba4vSVAPx1M
-	VAewbRoxwWZu9HalaPADgYu77lJOm1UYE1FRrHhArHD/RvtJMbXmtUTKU0GnBevoTEai742G6XH
-	ptqgOgeUDCTNSAU/96q2bkNm+G1GdvMOweRdkdTTTVsL8rjqQIV+OqENil0ujt4H0ln/zG+9wbb
-	xKYYBkoxnOq04TQr51zyYHDX0oA0Me+GzSRtQQ+rAxR6vWTqsyG/f0rkj8vNavpW7iLICFfZLPU
-	of3nDqHe3DM12t3CBHsVoYlGdqQazNB6rqSkAqHXBEggZa7T5R5jGtabCyFdigMUVz85uUwMEbY
-	hiEQzR7g7DCJ6ptqVf8n+eeORNMGrwZYcCAPv12Sr6KLiJz8hya+K0kPGTWG4O9+HFVlgRPOQRj
-	fTLBr1Htu3ba66MtdzgmR4rCb+SZS97/OEoh/Bjm+UfoPCHeeWp29+xOs5oyppaVspLCkLDemFF
-	YSSsuBBXzoiMO/dN2KdQqIjSasCfHU6FTKMIpU=
-X-Received: by 2002:a05:6a20:734f:b0:3dd:a007:cb35 with SMTP id adf61e73a8af0-3ddec82175emr329149637.49.1790061722924;
-        Tue, 22 Sep 2026 00:22:02 -0700 (PDT)
-Received: from localhost.localdomain ([2409:8a1e:2e81:7320:b94b:d1b8:4cbd:b7e1])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc756a317ccsm443117a12.14.2026.09.22.00.22.00
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 22 Sep 2026 00:22:02 -0700 (PDT)
-From: Yuchao Zhang <ndaugoing@gmail.com>
-To: =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger@xenproject.org>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Yuchao Zhang <ndaugoing@gmail.com>
-Subject: [PATCH v2] xen-blkfront: unbind irq before tearing down ring and shadow requests
-Date: Tue, 22 Sep 2026 15:21:55 +0800
-Message-ID: <20260922072155.34625-1-ndaugoing@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <arD7FHmbqJlLHmyE@macbook.local>
-References: <arD7FHmbqJlLHmyE@macbook.local>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B3Q8G17s"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=NlF78RerIOTo/MnyozLSa9euZ5Hw7BjWTrePBtX97Ok=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790064603; v=1; x=1790669403;
+ b=B3Q8G17sfPxyLqZ6/GzobbbM0TEywCwKS7BX4DRLSSCnq3hXf7Csf/xyUU/fEJfHE+YavObD
+ hylAHE9gaKJyztZci/Je3JJ86ipBp+XDch507c3nY1jl4zQI/uS/oNEMuNrEb1h6Fw8xVaLYI9G
+ SSB1JlYPYNDImeuHb2IewOP0=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 316ad890671470eb;
+	Tue, 22 Sep 2026 08:10:02 +0000
+X-Mizu-Trace-ID: 316ad890671470eb
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <acd79732-1ef3-47d5-96fc-4dd3ff3eee27@linux.dev>
+Date: Tue, 22 Sep 2026 16:09:57 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, axboe@kernel.dk, kbusch@kernel.org, hch@lst.de,
+ sagi@grimberg.me, yukuai@fygo.io, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cuitao@kylinos.cn
+Subject: Re: [RFC PATCH 1/1] block: charge passthrough requests to the
+ submitter's cgroup
+To: Tejun Heo <tj@kernel.org>
+References: <20260921070647.1928289-1-cui.tao@linux.dev>
+ <20260921070647.1928289-2-cui.tao@linux.dev>
+ <arFgjkKUwYGWbV8H@slm.duckdns.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <arFgjkKUwYGWbV8H@slm.duckdns.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In blkif_free_ring(), the driver tears down the ring's persistent grants,
-shadow request arrays, and shared ring structure (xenbus_teardown_ring),
-and only calls unbind_from_irqhandler() at the very end.
+Hi Tejun,
 
-While blkif_free_ring() is freeing persistent grants and clearing the
-shadow array, the event channel interrupt (blkif_interrupt) is still
-registered and active.  If an interrupt arrives from the backend during
-this teardown window, blkif_interrupt() reads rinfo->ring.sring and,
-via blkif_completion(), accesses rinfo->shadow[id].grants_used and
-rinfo->shadow[id].sg.  blkif_free_ring() tears these structures down
-without holding rinfo->ring_lock, and the handler only checks
-info->connected at entry, so this is a real race resulting in a
-use-after-free or NULL pointer dereference.
+在 2026/9/22 00:51, Tejun Heo 写道:
+> On Mon, Sep 21, 2026 at 03:06:47PM +0800, Tao Cui wrote:
+>> From: Tao Cui <cuitao@kylinos.cn>
+>>
+>> Passthrough requests (SG_IO, bsg, nvme passthrough ioctls and uring
+>> commands) are dispatched via blk_execute_rq{,_nowait}() without ever
+>> passing through submit_bio(), so the bio mapped by blk_rq_map_user()
+>> carries no blkcg association: the transferred bytes never show up in
+>> cgroup io.stat, and every rq_qos policy on the queue (iocost,
+>> iolatency, wbt) is bypassed, as is blk-throttle, which hooks
+>> submit_bio_noacct() directly rather than going through rq_qos.
+>>
+>> A quick demonstration on a scsi_debug device with iocost enabled and
+>> vrate pinned to its 1% floor: a direct fio writer was throttled ~10x
+>> while the same cgroup issuing sg_dd writes ran at full device speed
+>> with zero io.stat accounting.
+>>
+>> Associate the mapped bio with the submitter's blkcg at dispatch time
+>> and run the regular bio accounting (blk_cgroup_bio_start()) and
+>> rq_qos throttle paths with it.  DRV_IN/DRV_OUT commands are mapped to
+>> READ/WRITE so io.stat classifies their bytes normally; request
+>> completion already pairs with the throttle through bio_endio() ->
+>> rq_qos_done_bio().
+>>
+>> The charge is gated by opcode (READ/WRITE/DRV_IN/DRV_OUT) and to
+>> queues that already have a gendisk: commands issued during device
+>> probing (SCSI INQUIRY etc.) have no gendisk yet and stay exempt,
+>> following the same probe-exemption reasoning as the passthrough
+>> iostats support.
+> 
+> Do you have an actual use case where this matters?
+> 
 
-Fix this by moving unbind_from_irqhandler() to the beginning of
-blkif_free_ring().  Calling unbind_from_irqhandler() first frees the
-IRQ and synchronizes with any in-flight interrupt handlers on other CPUs
-before ring memory and shadow request structures are deallocated,
-matching the teardown order in drivers/net/xen-netfront.c.
+I don't have a specific passthrough workload that triggered this in
+production. I ran into it while testing blk-iocost accounting coverage.
 
-Fixes: 11659569f720 ("xen/blkfront: split per device io_lock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yuchao Zhang <ndaugoing@gmail.com>
----
-v2:
- - Update Fixes tag to 11659569f720 ("xen/blkfront: split per device io_lock")
-   per Roger Pau Monné.
- - Add comment in blkif_free_ring() noting that interrupt teardown must precede
-   freeing queue-related data.
+The relevant concern here is cgroup IO isolation. The expectation of
+blkcg IO control is that the IO consumed by a cgroup is reflected in its
+accounting and subject to blkcg IO policies. Today that is true for IO
+going through submit_bio(), but not for passthrough requests.
 
- drivers/block/xen-blkfront.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+The concrete observation was that the same cgroup issuing equivalent
+writes through two paths gets different results: normal bio IO is
+accounted in io.stat and subject to blkcg IO policies, while SG_IO
+writes consume device bandwidth without accounting or blkcg IO control.
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 8dad7bf5f664..86f5dd3aced1 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1210,6 +1210,14 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
- 	struct blkfront_info *info = rinfo->dev_info;
- 	int i, j, segs;
- 
-+	/*
-+	 * Interrupt teardown must be done ahead of freeing queue-related
-+	 * data, otherwise the interrupt handler can race with the cleanup.
-+	 */
-+	if (rinfo->irq)
-+		unbind_from_irqhandler(rinfo->irq, rinfo);
-+	rinfo->evtchn = rinfo->irq = 0;
-+
- 	/*
- 	 * Remove indirect pages, this only happens when using indirect
- 	 * descriptors but not persistent grants
-@@ -1292,10 +1300,6 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
- 	/* Free resources associated with old device channel. */
- 	xenbus_teardown_ring((void **)&rinfo->ring.sring, info->nr_ring_pages,
- 			     rinfo->ring_ref);
--
--	if (rinfo->irq)
--		unbind_from_irqhandler(rinfo->irq, rinfo);
--	rinfo->evtchn = rinfo->irq = 0;
- }
- 
- static void blkif_free(struct blkfront_info *info, int suspend)
--- 
-2.53.0
+So the motivation is not a particular SG_IO application, but whether
+passthrough IO should be considered part of the IO usage controlled by
+blkcg.
+
+I don't know yet whether the right answer is always-on behavior or an
+opt-in mechanism. The RFC was mainly to discuss whether passthrough
+paths should be covered by blkcg accounting/enforcement at all.
+
+Thanks,
+Tao
+
+> Thanks.
+> 
 
