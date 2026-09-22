@@ -1,94 +1,115 @@
-Received: from mta1.migadu.com (out-143.mta1.migadu.com [95.215.58.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F993F074A
-	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 04:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F405B1FC4;
+	Tue, 22 Sep 2026 05:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790051984; cv=none; b=GrN3dzgd9rUpU9X4PRHmQaVs0BhqdglCnUzC3hygUmSUjprPlokZnJ84gKWVLHVTx/xPpkIkom1u28rWNE1mMLaW5gBxD/Q+/CP0Zho8cXgeOTDeFT4w1M1uecgfKziDx44ri8TwtSl/O4TYXu38aviHybHQTOgoz0EedGScr0w=
+	t=1790053799; cv=none; b=qvI7xYba5wChi9Us/rVRSJWClrKQ0Ohi7vtRQ4F2llM+6MTM1SbxB9jFGZT7SmOOJ+ivQuLBpgj8VN3bC80ZZHwY7kDCJJbZa20q5odZQqJByEqBNVh7xxwLRti+YyJpoiBgppj9bcsMwhs1bK06ruyYRj3gwnme8iwxeNUrhGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790051984; c=relaxed/simple;
-	bh=bXbEK/PiziSTn08RAdNdo/eKnwYk983TIRsyonb/wYU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sS7Lcpbf3ev/2Rz3Wksm+ZqrgSd2nlxBzNIcynyjxMWueh2Wgv21tw1cumyjOXwp0ahnIOetTK7XMgKQXncAAmGormRd4IJVImSwo9I7M+IpdWNBRrxKW6GyAuOLDRwdcsM5226mEd3tNpO2Ii/oJlv5pVT+pqht4wocFMKII9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U/MCce+c; arc=none smtp.client-ip=95.215.58.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U/MCce+c"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=bXbEK/PiziSTn08RAdNdo/eKnwYk983TIRsyonb/wYU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790051974; v=1; x=1790656774;
- b=U/MCce+cvi5fr37Oa/MzgQQoiX8ooYC5HJ+GEXD17Sx07+JtAJQ8K16ra3tkNy4bz36Y6hGN
- WD7Vs3NX89a7+Cbk/On7w96koBsIJyj1rBQcCLeFzen0oapHGzHrNyGIs06gtbyE95oJW0H4LUQ
- mAU8DWwEK22UyhMDR56UYQ1A=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 04fdd75e5b702cb4;
-	Tue, 22 Sep 2026 04:39:34 +0000
-X-Mizu-Trace-ID: 04fdd75e5b702cb4
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	hch@infradead.org
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 4/4] blk-iocost: fix stale comment in ioc_rqos_throttle()
-Date: Tue, 22 Sep 2026 12:38:56 +0800
-Message-ID: <20260922043856.2020116-5-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260922043856.2020116-1-cui.tao@linux.dev>
-References: <20260922043856.2020116-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1790053799; c=relaxed/simple;
+	bh=Sl5+ibW9Ni5uZqI5D8DGq8p4oXB/YnA1+OvTct4KMs8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jtue8wLyi6VTEoU3CKm2Upn45lILr2aOpIHuz+vk37z8nrwL/D1xsA3HXLz0Re8SCSok7U9PioUN/JuhS93L9KwFMBKnDeB0+fk6egWrEwXGDBJZ43+Xu/fx7Y9BeenbxN31iz2nL5Yvpn4HyaAf4TwnUghaHUhpq/WQn1Esfms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68M58RYZ087222;
+	Tue, 22 Sep 2026 14:08:27 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68M58Rd3087213
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 22 Sep 2026 14:08:27 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <24ef93b9-7385-4dda-8912-f7c78f9705d1@I-love.SAKURA.ne.jp>
+Date: Tue, 22 Sep 2026 14:08:27 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] block: Add run_todo() operation
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        linux-block <linux-block@vger.kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brian Foster
+ <bfoster@redhat.com>,
+        Damien Le Moal <dlemoal@kernel.org>, Hillf Danton <hdanton@sina.com>,
+        Markus Elfring <Markus.Elfring@web.de>,
+        Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
+        Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
+        rust-for-linux@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Nilay Shroff <nilay@linux.ibm.com>
+References: <e615fb71-f386-4029-8ceb-22e375ad9e94@I-love.SAKURA.ne.jp>
+ <afbf50a0-d409-45a3-8e95-99c04ca0e302@acm.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <afbf50a0-d409-45a3-8e95-99c04ca0e302@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav412.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-From: Tao Cui <cuitao@kylinos.cn>
+On 2026/09/22 2:27, Bart Van Assche wrote:
+> On 9/19/26 3:50 AM, Tetsuo Handa wrote:
+>> Add run_todo() block device operation which provides a hook for performing
+>> synchronous cleanup without disk->open_mutex held, which is needed by the
+>> loop devices.
+> 
+> I like the "post_release()" name much better. I think it is more clear
+> and more descriptive than "run_todo()".
 
-The comment says that priority-inversion IOs are "punted to
-@ioc->aux_iocg", but no aux_iocg field ever existed in struct ioc.
-The comment was introduced already stale by commit da437b95db83
-("blk-iocost: grab ioc->lock for debt handling").  Update it to
-describe the current use_debt / iocg->abs_vdebt mechanism.
+I think post_release() is misleading because post_release() is also called
+when disk->fops->open() in blkdev_get_whole() failed (and therefore
+bdev->bd_disk->fops->release() in blkdev_put_whole() from blkdev_get_whole()
+was not called).
 
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- block/blk-iocost.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+>> diff --git a/block/bdev.c b/block/bdev.c
+>> index cd8323083740..8f09aafbae11 100644
+>> --- a/block/bdev.c
+>> +++ b/block/bdev.c
+>> @@ -974,6 +974,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+>>       bool unblock_events = true;
+>>       struct gendisk *disk = bdev->bd_disk;
+>>       int ret;
+>> +    struct module *fops_owner = NULL;
+>> +    void (*run_todo)(struct gendisk *disk) = NULL;
+>>         if (holder) {
+>>           mode |= BLK_OPEN_EXCL;
+>> @@ -996,6 +998,7 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+>>       ret = -EBUSY;
+>>       if (!bdev_may_open(bdev, mode))
+>>           goto put_module;
+>> +    run_todo = disk->fops->run_todo;
+>>       if (bdev_is_partition(bdev))
+>>           ret = blkdev_get_part(bdev, mode);
+>>       else
+>> @@ -1037,12 +1040,15 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+>>         return 0;
+>>   put_module:
+>> -    module_put(disk->fops->owner);
+>> +    fops_owner = disk->fops->owner;
+>>   abort_claiming:
+>>       if (holder)
+>>           bd_abort_claiming(bdev, holder);
+>>       mutex_unlock(&disk->open_mutex);
+>>       disk_unblock_events(disk);
+>> +    if (run_todo)
+>> +        run_todo(disk);
+>> +    module_put(fops_owner);
+>>       return ret;
+>>   }
+> The above changes introduce a bug: these changes cause module_put()
+> to be called if try_module_get() fails. I think that's wrong.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 9ca58cfbce86..a81488c755ca 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2743,10 +2743,11 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 
- 	/*
- 	 * We're over budget. This can be handled in two ways. IOs which may
--	 * cause priority inversions are punted to @ioc->aux_iocg and charged as
--	 * debt. Otherwise, the issuer is blocked on @iocg->waitq. Debt handling
--	 * requires @ioc->lock, waitq handling @iocg->waitq.lock. Determine
--	 * whether debt handling is needed and acquire locks accordingly.
-+	 * cause priority inversions are issued regardless and charged against
-+	 * @iocg->abs_vdebt as debt. Otherwise, the issuer is blocked on
-+	 * @iocg->waitq. Debt handling requires @ioc->lock, waitq handling
-+	 * @iocg->waitq.lock. Determine whether debt handling is needed and
-+	 * acquire locks accordingly.
- 	 */
- 	use_debt = bio_issue_as_root_blkg(bio) || fatal_signal_pending(current);
- 	ioc_locked = use_debt || READ_ONCE(iocg->abs_vdebt);
--- 
-2.43.0
-
+No, this change is safe. module_put(NULL) is no-op, fops_owner is initialized with NULL,
+and fops_owner might become non-NULL at the put_module label.
