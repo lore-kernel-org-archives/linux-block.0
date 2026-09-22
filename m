@@ -1,47 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CB95592F5;
-	Tue, 22 Sep 2026 13:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A70A5625F3
+	for <linux-block@vger.kernel.org>; Tue, 22 Sep 2026 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790083225; cv=none; b=Z00OExudsBhzbPQG88ro5awIFr7np9jf6X3Su1fEScRNNVPppl5KUd09YbzhUykL9QiTD2VOLPiEc41oN/e4FYcnzkCC6GgyyB61wnrhm3Bx8WH1mR87HSNcsCS+sPzB0ZqYfm3gb0+name1pxz3GOjFe5f7ZpTWKyEUKY6JFxw=
+	t=1790083287; cv=none; b=f302ODKuDN8+mGvRV3Hu3CJv84Z6vsMXl2I/GZxJM1lKdnGnfgxrLyB7ZyePZskUJHBmAodQzIfdcEfACxd7tBmknGF3/UCk3j/cHRUvIG2RfBIJSLVSAfQ81LcDlHTLQHnDCO/uQccPwGR7uh3wR6nKQFfZI3M/6yQrs5Qg6a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790083225; c=relaxed/simple;
-	bh=Fv5UtnMOkrV4L6o2J600jZ+PSpEfTT3W1fpr7JrMPT0=;
+	s=arc-20240116; t=1790083287; c=relaxed/simple;
+	bh=7YGczbjeje7x8r+pI6F5nYwxiK7ymFdHN2doiHpJs98=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AuAESrB94RHI9spBaCsoP96vDSd9MX1eE1WJ7xqhGxJpJg3tgu+D482vtmIEMJ9mzhbEID3AHxp8LYUx8FXN04jo0MW7pGLmkpeYqwZKvrdcLfbemhwG1/7TAnugMnIuiPeDQMumXlcLvUYJcVCumJut3RmgbINfIuILddGaob8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=YTFoZzl/md6vzaqRjf5U19V2gy7Jtb4do9Vt8qrW3GvQT8MBsUhB1AjV5DR1cwTBPXaP3vrbpFeDSpxlATSqMndKGsapejXHIEufUgMDrM6RvbyD4fxkl1ZXwa42K6y/aal/RPhAYaGes4VuDfg3D96+N3PBvoIWQlT0/8VkBxc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8030168C7B; Tue, 22 Sep 2026 15:20:17 +0200 (CEST)
-Date: Tue, 22 Sep 2026 15:20:16 +0200
+	id B57B468BFE; Tue, 22 Sep 2026 15:21:22 +0200 (CEST)
+Date: Tue, 22 Sep 2026 15:21:22 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-Subject: Re: [PATCH v6 06/13] nvme-pci: implement dma-buf backed requests
-Message-ID: <20260922132016.GA30684@lst.de>
-References: <cover.1789997898.git.asml.silence@gmail.com> <e80c3b1e0de004eaca6c51a2a86115ac9ed36381.1789997898.git.asml.silence@gmail.com>
+To: 0wnerD1ed <l7z@0b1t.tech>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH blktests] block/046: skip with the new XFS read-bounce
+ implementation
+Message-ID: <20260922132122.GA31163@lst.de>
+References: <CAKTh27_iPvKWV8_bLMwwhEZAD+XPXimBdpz4D8iuue8mSh2A=g@mail.gmail.com> <CAKTh279TUXfzjd52aY7op+TL5VihhXJvy=JSp5mjXz=r272FcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,18 +33,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e80c3b1e0de004eaca6c51a2a86115ac9ed36381.1789997898.git.asml.silence@gmail.com>
+In-Reply-To: <CAKTh279TUXfzjd52aY7op+TL5VihhXJvy=JSp5mjXz=r272FcQ@mail.gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Sep 21, 2026 at 02:38:50PM +0100, Pavel Begunkov wrote:
-> Enable BIO_DMABUF_MAP backed requests. On registration we map the
+The changes look good, thanks:
 
-This is now REQ_DMABUF.
-
-Sashiko had a few comments, which I think are correct - if we use
-dma_map_sg to map the data, we need to use the sync_sg APIs to
-transfer ownership.  That only matters on non-coherent architectures
-with MMU, but we need to get it right.
-
-And the reset deadlock also looks plausible.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
