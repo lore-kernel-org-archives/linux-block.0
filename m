@@ -1,177 +1,201 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F46B522696
-	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 13:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790168928; cv=pass; b=dJ543icoOySbxU/ajUrSedzlrzPSmyYrE1yaV21ZWfEqVmafTEZyZbGMqnYpEfyoau9oznrlAIG8gNid5a9s1HcCtnZuU01KqMqyGy7fnlrtwgcxUvDIP8t7Hi4MqyRc/gnNibzxgE44LDE4eQsSHaScwsfCuh1vaI/Wrqcqyc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790168928; c=relaxed/simple;
-	bh=afGZwUpaqGcjytcrknwNorYZV57gdzojPLTsyTjqLqw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aDBVynANJCxENY1aBTvSXIoGXsozMbOHF2s5XBVATt2nP5ZsHbRbyr4H9SNJFzAUXzFLyAPwXqdMfGTmny6cXIMFp2OaCp3r+kInpjIVwrH73UmxvBkwQSDn0PUJYXJKF3w1KeDcDUZhjlewE8ZASTbusrhAMFfdB1XzLf5w8C4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b=XOKa4ZVe; arc=pass smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA16374178
+	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 13:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790171386; cv=none; b=iKZDfOS6Tfa/Rjk+FhlEGwvDiehsW98UnSrSRbAiIAWyUGMf64jXxtaUHsO8Ngu0fr0prjsNKDhFnogqhZ2RuymHtO4G78NgFgth1sXbzWetbaVnXzNEbAB8wT1P1DFB16jvGVURfN22R1waALbody9kUj0stgAiO6RDR0gfH/Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790171386; c=relaxed/simple;
+	bh=cCQTXm+H/RF188nyjeKnn6+rJFQZz7XvWT6Zx1aJyRo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UIXNxCNd5mZoL9DsHB0sUatXf7OCd3TmocxEMX2G2SQO1+Z3p8hkwdrTpiVLKYlnrZ8XdFwVGIUIiyxiTBxMiO3GzJ1snN4Nfulnf+/LB6nW4d/UIkTbUdjGXHvQ+kQXP+5rB3gu5XxAhxDybnD4FMNyL0GJ17gHR0TajrtpG9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fC0dJNBc; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="XOKa4ZVe"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c25bf832368so9132466b.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 06:08:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790168920; cv=none;
-        d=google.com; s=arc-20260327;
-        b=bLoRT6IkczkYV3dnzCBIP/byDrf7sAE6TsaQYo/yyPH4DQh8k+npQ13sXGpPh+RMDj
-         me2TFZg4CgvzE2UdAuO3Prrq5Ta6M7txBpvlOjPAeaigmqNTDe37BNrPMOGr2BqKT1bZ
-         LFccABwbVYSUeqHOLzF1r5cPLMF4BOsWG+ylRd6CBLKm1FN4+3CQL9gtPj4UKkt0LmiG
-         rAL7mYjc8FTwvg9uaTTihFUAkVxN01oPqyNsHtoEWliUeRcaNrL7UTF/RXB018vIuf+I
-         f77fG9OuM97osxigprXtSUjoc0mgjqEv3ZhaZhuhaHubeIO0dL7ie29NNunP2xdOy/gB
-         IAOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=afGZwUpaqGcjytcrknwNorYZV57gdzojPLTsyTjqLqw=;
-        fh=d4AwgUisd4teZ7zA0h/yA9lAkXDFx2tG6OKkytkbVAc=;
-        b=Jfy2P32yA2v2mJV8mypEDX2T4hcmzNLv0hNCS3Bcy9IghNdfxgY6ofNyMdbYnUon9a
-         swKK3206ey2Z4ZIriA38RcJCNhTaAgPPyeZ/aJ+J5aRgmNlqkYEXnq5Hs0E+F5F3hiu5
-         dEJzrwXtJhHoOfA5IC4z7hAe3i7YUGmYDIr7KZfMRRV676ImVfD+319443o0RL42iLlW
-         xbaPmdS8tDiKxdXe/pMHEBvStPhwnDIljcoA1x7/XBDxv/+OkFPT65ZVtnioOISUGNYb
-         Epeg+478wwgbLHfAB7iO2bWfGu8MzfipUpdenm/Zc2it9ImHidHiHdSoiHYf19bHsZ1T
-         DKkA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fC0dJNBc"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-86868f7707dso396762b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 06:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google; t=1790168920; x=1790773720; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=afGZwUpaqGcjytcrknwNorYZV57gdzojPLTsyTjqLqw=;
-        b=XOKa4ZVe4onhAm9ODXkL88nm0nX8JIzZy/dV50kQnetqGc0dSFkLmuDU/OVSzMDemh
-         0tkdgvLsGjxHBO4OYElk/zn0n294un/OpBKKazw0ZObiRWCzVTksL6KJFVkKnG4oBOaK
-         bxfG6LxCEWW6w1M/6FI4BWEK34eMqu8mz4LYNxgNHwdS17wjxjJLOfdUmI80UeIRYO8s
-         Pm33jFZMVu9FP456YKzY+Q6NTR27oFAeT/EonqRPLD3enVAXPHqCllP8p5nX6nD3i037
-         0xn6FBRzqufSd3EHol5rX0Q7H0uG+H0scNMpfVYEpPTr+o6bue24Bl8m5TLAB9lJV+TN
-         rYrA==
+        d=gmail.com; s=20251104; t=1790171385; x=1790776185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Hl7YnjaAsEmCFUnVGh3gw3Uebzmmjg5lfPeWcSdrH8g=;
+        b=fC0dJNBcVaEdB0Jsq0M8lqzpobAwxDKvL/O0unLnzmg2eT/NrYjQfk8T6DxxRytNQ6
+         mzXQTtk/LXVpegzi9vXxthlh1fCxxczYV6nbW3P61+ADS/B0PH0zDGGTVJkD5EwKe7Vm
+         x+IILN9CeP7hh8aQKtxLgtVvXbRTvRoQFTikShOODOOe9BQPVuXuf+WoMyaB9i73qP25
+         L80BweVuFG21LENgnOLbZFIgfbWllSMrjMHcpN2xzhmwl32LTwKoZ6HgJAab+0cLbA17
+         TFjGpddxfnvq5c6m6FsOh7qhmkyGND27UAMvLE1PgsPhI48Dy5Lef9Q3sooFamb8tyaa
+         ihzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790168920; x=1790773720;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=afGZwUpaqGcjytcrknwNorYZV57gdzojPLTsyTjqLqw=;
-        b=XMI8vcCVrMMJuFH3fv7YZUs2A/b8bX26jZV+Zel3UUygzN/shZ91VSwcSo25LWyvzA
-         2Lq7CBfo0yHPovASNIOK1UZ9a7XLQHbZPrI8OShvXaqGxXu7JCZWwePXYBdLPLJO2ojN
-         l76ar3LvabMkcZmyZ96iYu9yfjov1Rl86nLUSZnYzFAcswNmNgTC5+ubpd2UsmWTfYZ3
-         ap94JU70i8OSqHRnLbn3XHQRpviKzvPjgME3npB/UkNMvHrs2j6upDr7ZamJXqh5/zGn
-         XyGXW6oWpoV8rUlU4le/ZaLhRpOQ92bXT+qn16r1h5vM27Ho0b6v1CmZ/r/2rmTS+lUx
-         2SaQ==
-X-Gm-Message-State: AFuF++kFKi27sXCifXxvRXoVQBO+IzH21tz8XPEJjWdGyjYKg/bIftJr
-	CKkhnnWcqkmn4vN4obddLG8eeuiBEKOh0OVK3sTVGFnyuzKg6GnFYKsxCjIzpIPnCc+R0kxLDL+
-	v6NccP7nNMDGUazCNiBNg3e/abYYD7vN5YpIdIjb9K+CaP+WFOfTIz5356w==
-X-Gm-Gg: AYBFou1yXeHUiUAxKb5IeO/VZEUIJqb63MV4LuLymGuXGfCFXLGbiK3iAU6c+JrFQwj
-	WowjaCm4cbTfsCE5fuFTt22IPOLpMiJTjBQTec/lRnzvq3JeDaY4BN4ktSzBCDygN/4JaBJet3i
-	roAOIvgz34AFGpGhA7gMw5xVZXVDqeYNF+QYRAfTjGjTtfwvT0wFMwhqK4zaUZVBd2xbtI/ZDUo
-	tAk1zLhmE1grLbPv3K+eC/kZt8KDoYs9Kq7DTkWBkC5ERjvkQJJHNgGQaaRnOEFEtXLtavK/FUG
-	EgCUaaVVKLuEYIlWxntk6GUYWPMJYEVlUt5/QLGRA66nryTOUm7Cv/evrsCEGOtr9ExZYjyWNl7
-	dMRJqvjw9OnC95H+lm3me4g==
-X-Received: by 2002:a17:907:6e9f:b0:c21:7bf1:2c88 with SMTP id
- a640c23a62f3a-c2aae248f74mr227648666b.2.1790168919633; Wed, 23 Sep 2026
- 06:08:39 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790171385; x=1790776185;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Hl7YnjaAsEmCFUnVGh3gw3Uebzmmjg5lfPeWcSdrH8g=;
+        b=eEVXkuvq5kFnh2c8eyxBTiyrJ+PLUebb3mrO4WNfHdCGMiDhqeuM5tobeoOApwprZI
+         yBpIoqQwzP9/F9mHhwP9BKa6vgzavFmfvwrrftDzDs4HWYA28CMYPOPo1nhqVBrhBEWd
+         g+ieICc0A03qcVLBn5TKduemFn4vMdUfgjLSmUbnGunKct3tTmC6/G2H52+S3zLP4Qpm
+         W/amRdK66duVGv6j3jDCcEy17N0vsYm2hMr5ledru0+uCes7cYEtzWlj+PkP3MLejuCh
+         HFs2FsZDvpVF8bQl+Mqxm50KU88mvDyrSbTBoz94Q760OkZ/6Krd09RoF/39aYfnvJar
+         PoPA==
+X-Gm-Message-State: AFuF++l2bC7YrKoDn+Qa2EN5S4Vzcw9CuD8TWxmF7T8uF2XuJhL/upjV
+	m6l7xygh99rSh15X8R18OlviY3Ls+xI3fHmhOfI6gdFjJPcA63qk1uBeQ6No+A==
+X-Gm-Gg: AYBFou0dX/1VU3yztzjdtXZs2Z/fmfJJHRUGLAUdyj6f+tzAdcHupB1DSGvuM96aiWW
+	9oIlfyi6q6IScy0xx5XnwxRbOJooH1Eb03GJGQqX66OPBRsYF99Bluz7i8wLzEtkAHYxYs77H8K
+	TaJJ8hqaHIBQZu8sZR/v712Kk7MvFcPcrfmDdUQ8Xe2Br8DsZVTRimVlGgk1BeBTWXVTwIX/SPJ
+	E2tHUowvwN6x6Ml7f/YC9ojUR6kIxfO/xGmaURBEoGeI7ay5/7wF9DPrygiO11Fsp7bUMIdVVB+
+	f0vAHLScTQ4hPkZxJfuWzkTLHLfh+t0eHsNzfXIoGUT6bfi+Ia9hfK0Y2tW/EkrTgm+Xn5UGA3U
+	xretk7eBzgUEb0Kq6nmovPgzzHzLSxGqxcLfRP3XTm65pei8J1I1Kz41mwBuXPUApcDfl1J7Z3J
+	j4dOjFmzf1GRkDCbNs6h0r9x4KD3hM3DWyP8kSywXAbX9B1SmkruwDGF2d7Za3uUkkN+PQxxSdl
+	30H+TlRcVQ+4V0DoghgoWoeYeWPW8P1dqXhaw==
+X-Received: by 2002:a05:6a00:178e:b0:87a:9335:c93f with SMTP id d2e1a72fcca58-87d1c0ab0aemr2062753b3a.43.1790171384406;
+        Wed, 23 Sep 2026 06:49:44 -0700 (PDT)
+Received: from thangnn-ASUS.. ([2405:4802:1d4a:e90:f072:2258:ced5:5d8c])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87d1e0f4fbbsm1319790b3a.52.2026.09.23.06.49.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 06:49:43 -0700 (PDT)
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	Hannes Reinecke <hare@suse.de>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH blktests v2] nvme/071: add a test for fcloop LS request use-after-free
+Date: Wed, 23 Sep 2026 20:49:37 +0700
+Message-ID: <20260923134938.12673-1-ngocthang2710.1999@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260921145659.17151-1-ngocthang2710.1999@gmail.com>
+References: <20260921145659.17151-1-ngocthang2710.1999@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260910100916.1638378-1-jinpu.wang@ionos.com> <arNiSSZ37GJF431J@shinmob>
-In-Reply-To: <arNiSSZ37GJF431J@shinmob>
-From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date: Wed, 23 Sep 2026 15:08:25 +0200
-X-Gm-Features: AclHuK91o-Sy98b8W4mZfhlEltA0hjUnLxePARoSbPTVghPt9fytQObaDxc2ef4
-Message-ID: <CAMGffEkRmc1e=n6d==biaUyt8Sc-MB44B6pcw4H2v1cV89yJ-w@mail.gmail.com>
-Subject: Re: [PATCH blktests] tests/md: add test 005 for raid1 deadlock under
- I/O, limit changes and recovery
-To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Shin'ichiro,
+Delete the fcloop remote port and then the target port while an
+association is being deleted. The Disconnect Association LS is completed
+from a work item that can run after nvmet_fc_unregister_targetport() freed
+the pending request, which KASAN reports as a use-after-free in
+fcloop_tport_lsrqst_work().
 
-Thanks for the review and for testing the patch. The suggested shorter
-description sounds good to me, please go ahead and fold in the change.
+Kernel fix: "nvmet-fc: flush nvmet_wq twice on targetport unregister"
 
-Best,
-Jack
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+---
+Changes in v2 (thanks Shin'ichiro for the review):
+- Note the kernel fix's commit title in the file header.
+- local -a ports, and use _get_fc_host_port() instead of reading
+  ports_to_hosts directly.
+- Connect with --ctrl-loss-tmo 0. Without it, the host can spend up to
+  NVMF_DEF_CTRL_LOSS_TMO (600s) retrying reconnect after we pull the
+  remote port, which is likely the hang you saw; disconnecting it
+  cleanly then has to wait on that reconnect state first.
+- Drop the swept delay before pulling the ports. I could not tell it
+  apart from a fixed "sleep 0" here either (KASAN UAF + list_debug BUG,
+  both with and without it), so it wasn't earning its complexity.
+- v1: https://lore.kernel.org/linux-block/20260921145659.17151-1-ngocthang2710.1999@gmail.com/
 
-On Wed, Sep 23, 2026 at 7:30=E2=80=AFAM Shin'ichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> On Sep 10, 2026 / 12:09, Jack Wang wrote:
-> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> >
-> > Add a regression test for a deadlock reported against raid1 with an
-> > internal bitmap, where concurrent I/O, queue limit updates
-> > (max_sectors_kb) and device fail/remove/add (recovery) cycles can
-> > deadlock.
-> >
-> > The test creates a raid1 array with an internal bitmap on two brd
-> > devices, drives it with fio while repeatedly toggling
-> > max_sectors_kb and cycling one member through fail/remove/add, and
-> > flags a likely deadlock if any of these steps fail to make progress
-> > within a bounded timeout.
-> >
-> > Link: https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-kd-=
-=3DH9Y54WozKASSEZhc9UNKjA@mail.gmail.com/T/#t
-> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
->
-> Thanks for the patch. Overall, the patch looks good to me. I have one com=
-ment in
-> line. Also, I ran the test case on v7.3-rc4 kernel, and confirmed it avoi=
-s the
-> hang. When I applied the kernel side fix v2 series [*] on top of v7.3-rc4
-> kernel, and confirmed that the test case passes. Good.
->
-> [*] https://lore.kernel.org/linux-block/20260910081114.1605746-1-jinpu.wa=
-ng@ionos.com/
->
-> I will wait for the kernel side patches get settled on Linus master branc=
-h
-> before applying this patch. Thanks!
->
->
-> [...]
->
-> > diff --git a/tests/md/005 b/tests/md/005
-> > new file mode 100755
-> > index 000000000000..5493d0edc933
-> > --- /dev/null
-> > +++ b/tests/md/005
-> > @@ -0,0 +1,142 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-3.0+
-> > +# Copyright (C) 2026 Jack Wang
-> > +#
-> > +# Regression test for a deadlock reported against raid1 with an intern=
-al
-> > +# bitmap, where concurrent I/O, queue limit updates (max_sectors_kb) a=
-nd
-> > +# device fail/remove/add cycles (recovery) can deadlock.
-> > +#
-> > +# See: https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-k=
-d-=3DH9Y54WozKASSEZhc9UNKjA@mail.gmail.com/T/#t
-> > +
-> > +. tests/md/rc
-> > +. common/brd
-> > +. common/fio
-> > +
-> > +DESCRIPTION=3D"test for raid1 deadlock with internal bitmap under I/O,=
- queue limit changes and fail/remove/add"
->
-> This description line looks a bit lengthy. How about to make it shorter a=
-s
-> follows?
->
-> "raid1 internal bitmap race among I/O, queue limit changes and fail/remov=
-e/add"
->
-> If you are okay with it, I can fold in the change when I apply the patch.
+ tests/nvme/071     | 75 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/071.out |  2 ++
+ 2 files changed, 77 insertions(+)
+ create mode 100755 tests/nvme/071
+ create mode 100644 tests/nvme/071.out
+
+diff --git a/tests/nvme/071 b/tests/nvme/071
+new file mode 100755
+index 0000000..406a841
+--- /dev/null
++++ b/tests/nvme/071
+@@ -0,0 +1,75 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Nguyen Ngoc Thang
++#
++# Regression test for a use-after-free in fcloop when the target port is
++# deleted right after the remote port. Deleting the association sends a
++# Disconnect Association LS whose completion is queued while
++# nvmet_fc_unregister_targetport() is flushing nvmet_wq. The pending LS request
++# was freed before that completion ran.
++#
++# Kernel fix: "nvmet-fc: flush nvmet_wq twice on targetport unregister"
++
++. tests/nvme/rc
++
++DESCRIPTION="delete fcloop target port right after remote port"
++QUICK=1
++
++requires() {
++	_nvme_requires
++	_have_loop
++	_require_nvme_trtype fc
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local -a ports
++	local i port host_port
++
++	_nvmet_target_setup
++
++	_get_nvmet_ports "${def_subsysnqn}" ports
++	port="${ports[0]}"
++	host_port="$(_get_fc_host_port "${port}")"
++
++	for ((i = 0; i < 20; i++)); do
++		# ctrl-loss-tmo=0 so the host drops the controller on the first
++		# failed reconnect instead of retrying for NVMF_DEF_CTRL_LOSS_TMO
++		# (600s), which would make each iteration look like it hangs.
++		_nvme_connect_subsys --ctrl-loss-tmo 0
++		sleep 0.05
++
++		# Deleting the association sends a Disconnect Association LS.
++		_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
++
++		# Remote port first, so the LS can't reach the host anymore.
++		_nvme_fcloop_del_rport "$(_host_wwnn "${host_port}")" \
++				       "$(_host_wwpn "${host_port}")" \
++				       "$(_remote_wwnn "${port}")" \
++				       "$(_remote_wwpn "${port}")"
++		_nvme_fcloop_del_tport "$(_remote_wwnn "${port}")" \
++				       "$(_remote_wwpn "${port}")"
++
++		# The host keeps trying to reconnect, drop the controller.
++		_nvme_disconnect_subsys >> "${FULL}" 2>&1
++
++		_nvme_fcloop_add_tport "$(_remote_wwnn "${port}")" \
++				       "$(_remote_wwpn "${port}")"
++		_nvme_fcloop_add_rport "$(_host_wwnn "${host_port}")" \
++				       "$(_host_wwpn "${host_port}")" \
++				       "$(_remote_wwnn "${port}")" \
++				       "$(_remote_wwpn "${port}")"
++		_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
++	done
++
++	_nvmet_target_cleanup
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/071.out b/tests/nvme/071.out
+new file mode 100644
+index 0000000..146809b
+--- /dev/null
++++ b/tests/nvme/071.out
+@@ -0,0 +1,2 @@
++Running nvme/071
++Test complete
+-- 
+2.43.0
+
