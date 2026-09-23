@@ -1,88 +1,87 @@
 Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C073F4101
-	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 23:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CAC3F86F2
+	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 23:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790207824; cv=none; b=eXV4vdtu+DSjM2/urC2WdFmGzdqYEy1G68taF2r+iVg+Vb4VKfMA6x7hQudkvardj2y+yYZVIWY6c/QhlShvw0rfZi7gQ0dp310prQB6co1LlcG2A0QMzUBhfkhYkz4zCEf/Brn/67hqJbrEtA0PMwnMKVjaK71ziYFe6WqeGuI=
+	t=1790207824; cv=none; b=ZNOg3Lz720TnatgynzHSHqpougGn63B4skOOD6C+LGS8eiQZv5IrCMHwTdBoeYo6bYgOEISLczqj+5YC1rfk5Mlvv5YZJdgvrG0lghMAt16M3AV1fzHsMPHBhBoPqeO+5CmnD/Pucoebj/8dhd0lap7JzeRoLcKf3RU8fSHKSzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790207824; c=relaxed/simple;
-	bh=spLOCm9oIGjNLT3/zOuEwP/vu912oCh+c2ZtPG1gx+E=;
+	bh=+6JrzqfYyBrGC9pfDqzdgv7ta7N3grQNKoC2mDums3M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KrQLXjzyWHIFwQ/UQWwJjKARyXJt2FssGMVChN0x+pdq7nQgyzI5kmRPab8ogcZU6d8rdjVAvEsZDys7YwYMv10Xd16Q/oFhckRxW8O/RuxH52HRhlY9kOHvu31I3pLpiMfE2wI78PPS6XATNuCYqY2gLE5Y6ZWitYtXdKMOdck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=mqzYsTUV; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=SvWAL0ty; arc=none smtp.client-ip=148.163.135.74
+	 In-Reply-To:To:Cc; b=bOSN3CvMnvIif3/lEWX4wXgFfg+DAFZP7juDAgZfGL+/EoQl9O73u8huk6Bo6oimVFlJHqqtR1nVngHRCcJySAOaM83IDs1UYH4/N/HYTz6W7YcDFARLjXcA/hvaX6xaystUec3ESzAjT2oEyA0DCNmEKD+Xu3ICUVlrwQuVQMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=ZIF+oELv; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=Xfp1wmY/; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="mqzYsTUV";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="SvWAL0ty"
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="ZIF+oELv";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="Xfp1wmY/"
 Received: from pps.filterd (m0167069.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68NNEVm5047466
-	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 19:57:01 -0400
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68NNEMOo047246
+	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 19:57:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=LyqV
-	U+CLvutgdAtA5rnYnRg4S9pI27Ht0vSVxZHopDI=; b=mqzYsTUVo/ZrCTXqP7Ka
-	ACYFjQ/n/6iQyeUtZ5OMBEOR4QYgVR8ovosSXb1p1PaNGl1dPqy+gHVmtBwJWRNW
-	o6gTKErA0ayWMTu9/0DADQ2Wf9khQh0eQajX3qCq9cD/1wdkDAa1SxJZ5NNdH0jG
-	KBsQ60JSSCFC101vHPcUubxgZgkT5FIfgMewLfdvoQwwRTfUiwIut1OsVvWrOJ1N
-	qHg0aoYbX0oyGMhwjAG3eRqm77ybcveEWqq4qWxPql6Sizs66ZOVLYP57zT5GYs9
-	CbAqNDxkXfYkB/PstY+ILENwzrMP/BSFq0vjZZRtXx8uTGaLzAZAS6JSNB+5xOSy
-	1Q==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gvhrem5kr-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=HttR
+	teK87V8g79twx1jaSTPrE7lew+ZNw8C68XNjrsg=; b=ZIF+oELvaW4TWpkgzVo9
+	+v/WeH+if8/IRVrLAJKDNHdQTl2ZHsH+jRqHFkmNgR/Fgjg4w+FdDo0kknGaGSW0
+	ihnWu9Wi2+2yayUmldfplrbrtVnR/uKIAU+3ACBCq8cVU+tVFYRdSBZScK3bTjK1
+	+L3/saRYZiEIgkFDT7lWt3bZ6b7T1DndNE7JMRJtn0gXtdM57d0B1aIci3jlbtGg
+	npWUP5yBf6uctWaYskHQM82oJZcAVRRU9WkI41Pa/ywhRbnXw753KtAoq05umEyi
+	75akWk2w9/mrZtn0apY5rHKVZy9R6FHkuGMBuEkqN7jhMuM7zBm9Fq1kr4lJBNyB
+	SA==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4gvhrem5kh-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 19:57:01 -0400 (EDT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3965ba1ba3eso1172001a91.2
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 16:57:01 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 19:57:00 -0400 (EDT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-381250979d5so1265560a91.0
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 16:56:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1790207821; x=1790812621; darn=vger.kernel.org;
+        d=columbia.edu; s=lionmail; t=1790207819; x=1790812619; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=LyqVU+CLvutgdAtA5rnYnRg4S9pI27Ht0vSVxZHopDI=;
-        b=SvWAL0tyk+KhugtwWwuKeFgX/qpipyl/zDY/fAV0buCLtskr/zsCFjkhgJsjSNuC/Q
-         uJlmQYESqjfEenA6lGH4N27urgOZj7jXd5OgOQH2RHQ6rmcJPumR4EFx0XTQk53cInFF
-         6hlPpWcvzw3cH7+5TVuTTPXu2Vr/eJGRGUjjT7lOFJGVLq1m5Zb/EvjhPyo82IUIrd5X
-         M2fIN4kC1eLhijXNnY5UK3KllUa/OmxSNHcvn0AM1u41Mac/MEH1szzzTFPqViHsDFK4
-         mDgEaJlQGVqYRZ106hJK5TKIlh1hA4kbgyct2el7SfPC9MP4tlIEBaFWnBrIUkT83BXO
-         4Gzg==
+        bh=HttRteK87V8g79twx1jaSTPrE7lew+ZNw8C68XNjrsg=;
+        b=Xfp1wmY/GwU5bYrn38l3lBntinZsSggL7IG92n/d1k/STAi24AolVLTeqyThD72ruW
+         IaU0ofx5V/R+dXCf5eKbziaaOvT77Rjwy1+El58SMy5qrXzjZPNQWyRzgvYDDfGc1jAX
+         aMtx/FMxtQ622eWM3bX2R1efLNrKHSmCY7pyK7D8dRwLMvnN0IDGbJJTKTWrEfmYtkVX
+         NRDsonus8B4nz/RzTqh+52p00/bJKUsxbQ56b8WX2gBmsx/YcfkvHOX10aUdKB/XP/iw
+         2sue/GWOgcyHufjpLOr7BRL6puGBacl+vsUkDMCAIrTiHV7l9Sz7x44bCa29hd4Oi2hR
+         wn+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790207821; x=1790812621;
+        d=1e100.net; s=20260707; t=1790207819; x=1790812619;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=LyqVU+CLvutgdAtA5rnYnRg4S9pI27Ht0vSVxZHopDI=;
-        b=kCNn3TqM+4u8IXXMNyH0zsaX2aJWxFWnyGOBWrvj8DgfdKYFB8z9Z/lv+0WjRxeHIA
-         hNQ7gLyD/+L71Ef5A3s6Plfcfyaopc69oDtJY2W/v0aeLOKhzE521xum02tNkGCu3XDn
-         oykTos96kAUFfB+FT4HO86c1rrPCqmqv2hWbV3op1rDH7c4TdgbWZacxBM5z2ZEuKQt+
-         sXxxWKbtEuG+dAQ1jigNhEFu/Igiw3T/PtyPqvl2E3pDA6MoEEFkpzN817WiQ7/zinLL
-         zRv20iXRTcCUbXyu7HH3K2Ovpf3BmiGjX0JvWFL+F9VyxSl4oAVQVxvOkCRghP4eVok7
-         j6AQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxR3IJpqwa+8LCtxBdg2rX6Z2CaMZrGx7kwcA1O4lo6WzlRXUEAZVY/fhtxEug2yopxPniuN+M0xLgp6A==@vger.kernel.org
-X-Gm-Message-State: AFuF++mNGaq1FMa1i7WK0hwLVkh0OiGfTF+Ra1I9B81kingivyLHfcnP
-	gDfJs2d97/2e0H7BU/jjfUSPnKKRrcARo1umB8PBJKVA+GdQRXZTaKbaVlJ0FgEBerXsrZHsRpI
-	KAnw9OHFy9OinhrMZWe5tPgryl6L560Nw8jobxMe7jwIbPEbP2RFakIHAZvIu
-X-Gm-Gg: AYBFou2hcmVBgL1gM6a0Oh5tHpQpE/8hvwPi15erEWcKaBSAM5DzzyB7wHW3lF1UIYq
-	zSW2rSRq72x44Wnge6kC5kHG7ordAZLDpqz6RV2VaQbNcft+KRnYeGxslEzSqULLRd4OFAZmgsZ
-	Vl7HT4QsFyu2d9HYlglEXsdMnp9X6/K6WgdJ6vjCqenNuSRS8Y9wLLZuuH6sQyfSYtND5wq7aLH
-	N8E4uSpl4NDZleZzFZZRFJNzk48ZpCOmNsAzknEv6dRZE9m1Iz39H5K97g1b/uoP2Gxp2MhF7bQ
-	nMjYvtRRhORjz/vAJOvLQHo63nTGX72kGf1ABf2cmd1WmhaKDFtxVjiUW3okF4fHkcKRXg9k2gl
-	3JejjZYMo4bVaciTomzNJvBMxFVVZg0zE3A2rlBfiQ9I50A==
-X-Received: by 2002:a17:90b:28d0:b0:39e:6a81:c920 with SMTP id 98e67ed59e1d1-3a098724784mr555252a91.19.1790207820670;
-        Wed, 23 Sep 2026 16:57:00 -0700 (PDT)
-X-Received: by 2002:a17:90b:28d0:b0:39e:6a81:c920 with SMTP id 98e67ed59e1d1-3a098724784mr555217a91.19.1790207820196;
-        Wed, 23 Sep 2026 16:57:00 -0700 (PDT)
-Received: from [127.0.1.1] (RED-LION-HO.car2.Seattle1.Level3.net. [4.53.155.98])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0976ca5f9sm1331613a91.14.2026.09.23.16.56.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=HttRteK87V8g79twx1jaSTPrE7lew+ZNw8C68XNjrsg=;
+        b=ws9syytrWxKZQzSWW+VynDH7QpxauqomrzoKNMULnzuozkMIshyoAp39rk3Em6si6v
+         VPtDmKpy9zeZxKLHhcvptSTe52mpehITrw1X1QeA3SDZEm9rVFXCTrlcRJNKzwIDuZSY
+         7fxXvfoWsTEmh37c3e17VPWywuVMth5w05REv83hEnHAOTaNYkd/UHX6mdr5d1ucAGmj
+         yxIxdpFD9BTP9U5DXOEc3yukYrgtrlSUq4eyo1WFd+YF2FeS6RkZPmLyBnfbMntzhQzo
+         HLqaqM0mBo+nTJAo0NhpbFGOSWneV4RegYpwA7wafQ00Jwv+M6RFSHUW4D8+BoBZoWZy
+         FCQQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwcncYueSuYgNgJBQ6iHgPK6W0fN4UT4BIxRB47QIYD71pwAHVZzKl6fvuLccu85urqi0MJpTjFI4Cu6w==@vger.kernel.org
+X-Gm-Message-State: AFuF++niuPRdN0CH2CbnwwBwe3nI7rmhWiAeCESSSCr3AHyrSmPXwfIO
+	5u9vIgSYmX7D/2KoChYQEVs0UIVshHcM4yExpSCJp5x57iBnBM4MkKxFbgInv66mPwKKGpWLEiF
+	byX8eYgXHDcZuWhZvHv7+K/q+WjLCAXr6bSCizrUYWquLv7QfWJ0fwL2Lqtlh
+X-Gm-Gg: AYBFou3ZnlZxC+Rh7SVBWxgwjIqoPlHFePNHNupnbvMjsoXnOotSrhkeK8vTPz8+TJY
+	LFo7ZMMK5HqrVWCCpoWAlWPUouV3tJb8j853vIq6xRcX+MmZsyBlaldrcxgEH3YEHiv2/OSq5OH
+	AtFVuHKDLG88xK39nqgifw434BYkLzq99uNFMmcxap8UD+zNGSwlDIqSBRmMYTqKmxZT4T2gq9x
+	DxsVg2N6aYRoY4wtPvGFoqdq5W9LyInuaXHQItO3zXsbvdb2/CoR4fVOkTg9tCshi+cdKd6JmrB
+	IYoX7oKNbOzAYSZOUFFeLVqWcR6Zn6YMmoWT8WHM8mV4bDXoqZF8bTbDOy9SNrF458rhrYDPi+6
+	sPpwGyjfcTx0HqdePVasvQMlN3Gm7nk2IEpoRANymFbYL5g==
+X-Received: by 2002:a17:90b:3985:b0:39e:6c69:f482 with SMTP id 98e67ed59e1d1-3a098d5e61fmr587377a91.65.1790207819421;
         Wed, 23 Sep 2026 16:56:59 -0700 (PDT)
+X-Received: by 2002:a17:90b:3985:b0:39e:6c69:f482 with SMTP id 98e67ed59e1d1-3a098d5e61fmr587362a91.65.1790207818962;
+        Wed, 23 Sep 2026 16:56:58 -0700 (PDT)
+Received: from [127.0.1.1] (RED-LION-HO.car2.Seattle1.Level3.net. [4.53.155.98])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0976ca5f9sm1331613a91.14.2026.09.23.16.56.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 16:56:58 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Wed, 23 Sep 2026 19:56:37 -0400
-Subject: [PATCH v5 4/9] block: honor IOCB_NOWAIT in the block device
- buffered read path
+Date: Wed, 23 Sep 2026 19:56:36 -0400
+Subject: [PATCH v5 3/9] block: take i_rwsem for the splice read path
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,7 +90,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260923-blkdev-fixes-v5-4-89e60d66eb38@columbia.edu>
+Message-Id: <20260923-blkdev-fixes-v5-3-89e60d66eb38@columbia.edu>
 References: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
 In-Reply-To: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
 To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
@@ -106,34 +105,34 @@ To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Sashiko <sashiko-bot@kernel.org>, Tal Zussman <tz2294@columbia.edu>
+        Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev-db0b7
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790207813; l=1869;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790207813; l=2886;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=spLOCm9oIGjNLT3/zOuEwP/vu912oCh+c2ZtPG1gx+E=;
- b=xk+BkWRoenjTdGReG9uXLP9A4qN4gTtvtRRKSU8g5yBN5P/np5trElupUCU8rZS97yuSy0wxd
- xVbV2pMTglADr3gYSLzkvGQ4lNdyhNYMN1Azm5e3AA2NKB4iBqsONT4
+ bh=+6JrzqfYyBrGC9pfDqzdgv7ta7N3grQNKoC2mDums3M=;
+ b=dD7Cr3HZsDdAA+/bC11LwMS3llQ1d3sCSR6/9uZY0+P+73KAknov8g3Rkg8eZm4OsVsAKz51H
+ U7kxqmE9IGaDj0C3yx5QoD1f+Q+Ez0zWFF4MgOVTY5TZY87E0SpFnvK
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-ORIG-GUID: Hanww2_HmPOyR-6sz0vfa-j7HZKfXO4R
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIzMDEwMCBTYWx0ZWRfX6TuKeZW9jAxO
- 3rPq9J2X/J2RoRzPDSy7OjLRWWtsqMHCt2Fh13o8arLe0gALtyVl6AjW+7ysrXyPBTgrrnox8yP
- xMg8FcSrAtStjk5S0ZO1/iRyN40IapbHQ5RN/aDdGRNJvfs+2cWNaN42vRpEXskXHGCK6HSXwF4
- fzRnRfhnXgebKqr6Gu9kdp01+1vTjt8AfY51sA6qNYpZDMp9Dg57ZPa1yZeFVeSXm1mZCELHrzI
- s5RIF5j+pVPISnZF5mG+oL2ncSDcGlKRKUNWJCAvRjbSbFTbKkJaYh/IIgYXKTJwRxRO2nBleUf
- d6ffHO+8On00yEOxdchWSf8BrVhggSVolGi8t/Dz7v6vsnW3X+hmZvMlB82zhVP29TMqErnf20b
- o4TofCKT/cyiQSOA5zW6UqGI++Z6DEN7U/6/270jFYy7BVE2Jkwk40tqRHsALjXYV7/yXyWrzlx
- 8oq8fG2TRmjNQKwwMpA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIzMDEwMCBTYWx0ZWRfX5efwX3mgvFW4
- DGbMKaLGRa30Xil3bd25uRA6ZrwM2NCTyhIYBMtEhosuGZ6pJpooyYMd4+UPa0jlWeIoOh7yRJP
- 2SEWoq4mKyyQARRqHRsJ/vmc7kKrQfbCl/x5PklBq6D8f/9s/uQE
-X-Authority-Analysis: v=2.4 cv=J/A/fwnS c=1 sm=1 tr=0 ts=6ab4674d cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=6aZ3Ysb2zzbY2sELL/OBJw==:17
+X-Proofpoint-ORIG-GUID: Mosst9J71r9ukY-0jkBxn_WdYuZBrLP9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIzMDEwMCBTYWx0ZWRfXzVniRmuJrQ04
+ g2rb4bwfEWzSaPEp/sfUacvINeCy7CLECFdujjriyBPiy2F3qi5kEQnGqWxOsOM9jQhKNNfmrbX
+ QrwmiAnnwtG3DLr9vALYVgjbFHkM/USheQB9Ru7eUVrxyGeFeR2IAsjxT5WIM1hyJhTEkWoqi4b
+ 06g7MnfMJx082fHH3psKDD0l13tZ6v9dJFjzE58NwSv5jYTQuxq9R2fyBy6ipXL7gKbDOr4IAcT
+ ORrgsVoZoq2XXBWaU3xaI7oLEgU/WKI98Hu1AyqVbx6fOa4+pPvqkS0g39Q68Z3yIaC39iS50Ob
+ /B7PuGqo3edv/eq6od0dUzPvz2DwQRRrTKB63Ac62QpusFU0J8lhmiaXMEHtdVOIH6tWQA28cfa
+ p+tedkvA7+5CSc8K2Z7l2OdO6YEmMwOPDi9J7/Wl3ZH2y0lCX11IhY95tIs+mrkT0cMpq7RHjUd
+ 5N+BziwUNKYRyKpDpVA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIzMDEwMCBTYWx0ZWRfX4hwSDmhHzqPQ
+ scXRlhJBAfO4dHBQ4X3286pvTd1uYa+Q1PMEh6rg8Mt5a0zQTyApofdJlUeT+O0UX2/KmWNmv3E
+ 6gLBHaKXIZZjH6jaBHddezx9ZEqEMr6r43tQsRhsIsCMo+EV1OWf
+X-Authority-Analysis: v=2.4 cv=J/A/fwnS c=1 sm=1 tr=0 ts=6ab4674c cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=6aZ3Ysb2zzbY2sELL/OBJw==:17
  a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
  a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=JR4YdQiviy7OQf72WyZ1:22
- a=c92rfblmAAAA:8 a=VwQbUJbxAAAA:8 a=s8mzj7eOnaliLhoSWqYA:9 a=QEXdDO2ut3YA:10
- a=iS9zxrgQBfv6-_F4QbHw:22 a=GvGzcOZaWPEFPQC_NcjD:22
-X-Proofpoint-GUID: Hanww2_HmPOyR-6sz0vfa-j7HZKfXO4R
+ a=VwQbUJbxAAAA:8 a=JF9118EUAAAA:8 a=kXXCQoMOyz17bj_MZH4A:9 a=QEXdDO2ut3YA:10
+ a=rl5im9kqc5Lf4LNbBjHf:22 a=xVlTc564ipvMDusKsbsT:22
+X-Proofpoint-GUID: Mosst9J71r9ukY-0jkBxn_WdYuZBrLP9
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11914
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
@@ -143,52 +142,82 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
  definitions=main-2609230100
 
-blkdev_read_iter() takes inode_lock_shared() unconditionally around
-filemap_read(). Unlike blkdev_write_iter(), it does not reject
-IOCB_NOWAIT for buffered I/O, so a non-blocking read, or the buffered
-tail of a short IOCB_NOWAIT direct read, blocks behind set_blocksize()
-holding i_rwsem across sync_blockdev().
+def_blk_fops wires ->splice_read directly to filemap_splice_read(),
+which allocates folios based on mapping_min_folio_order() without any
+lock against set_blocksize(). A splice from a block device can race
+set_blocksize() raising the minimum folio order and insert a folio that
+is too small for the mapping. blkdev_read_iter() wraps filemap_read()
+in inode_lock_shared() for this reason, but the splice path was missed.
 
-A preadv2(RWF_NOWAIT) issued while another thread changes the block
-size with a dirty page cache blocks for as long as sync_blockdev()
-takes, 4 to 6 seconds on a scsi_debug device with delay=5.
+Splicing from a block device while toggling the block size between 512
+bytes and 64K with BLKBSZSET hits this within seconds on a
+CONFIG_DEBUG_VM kernel:
 
-Use inode_trylock_shared() for IOCB_NOWAIT and return the bytes the
-direct path already read, or -EAGAIN if none, when the lock is
-contended, preserving NOWAIT semantics.
+  page dumped because: VM_BUG_ON_FOLIO(folio_order(folio) < mapping_min_folio_order(mapping))
+  kernel BUG at mm/filemap.c:858!
+  Oops: invalid opcode: 0000 [#1] SMP NOPTI
+  RIP: 0010:__filemap_add_folio+0x51c/0x570
+  Call Trace:
+   filemap_add_folio+0x64/0x140
+   page_cache_ra_order+0x1dd/0x3d0
+   filemap_get_pages+0x153/0x760
+   filemap_splice_read+0x13f/0x300
+   splice_file_to_pipe+0xc0/0xd0
+   do_splice+0x6a8/0x890
+   __do_splice+0xb0/0x210
+   __x64_sys_splice+0x80/0x100
+   do_syscall_64+0x10e/0x520
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Fixes: c0e473a0d226 ("block: fix race between set_blocksize and read paths")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Link: https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
+Take inode_lock_shared() around filemap_splice_read(), like the read
+path does.
+
+Fixes: 3c20917120ce ("block/bdev: enable large folio support for large logical block sizes")
 Assisted-by: Claude:claude-fable-5
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
- block/fops.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ block/fops.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/block/fops.c b/block/fops.c
-index 652297cd90b4..f61d250e49c8 100644
+index 7ff78b448659..652297cd90b4 100644
 --- a/block/fops.c
 +++ b/block/fops.c
-@@ -850,7 +850,15 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	 * Take i_rwsem and invalidate_lock to avoid racing with set_blocksize
- 	 * changing i_blkbits/folio order and punching out the pagecache.
- 	 */
--	inode_lock_shared(bd_inode);
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		if (!inode_trylock_shared(bd_inode)) {
-+			if (!ret)
-+				ret = -EAGAIN;
-+			goto reexpand;
-+		}
-+	} else {
-+		inode_lock_shared(bd_inode);
-+	}
- 	ret = filemap_read(iocb, to, ret);
- 	inode_unlock_shared(bd_inode);
+@@ -860,6 +860,22 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	return ret;
+ }
  
++/*
++ * Take i_rwsem to avoid racing with set_blocksize changing i_blkbits/folio
++ * order and punching out the pagecache.
++ */
++static ssize_t blkdev_splice_read(struct file *in, loff_t *ppos,
++		struct pipe_inode_info *pipe, size_t len, unsigned int flags)
++{
++	struct inode *bd_inode = bdev_file_inode(in);
++	ssize_t ret;
++
++	inode_lock_shared(bd_inode);
++	ret = filemap_splice_read(in, ppos, pipe, len, flags);
++	inode_unlock_shared(bd_inode);
++	return ret;
++}
++
+ #define	BLKDEV_FALLOC_FL_SUPPORTED					\
+ 		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
+ 		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_WRITE_ZEROES)
+@@ -961,7 +977,7 @@ const struct file_operations def_blk_fops = {
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= compat_blkdev_ioctl,
+ #endif
+-	.splice_read	= filemap_splice_read,
++	.splice_read	= blkdev_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= blkdev_fallocate,
+ 	.uring_cmd	= blkdev_uring_cmd,
 
 -- 
 2.39.5
