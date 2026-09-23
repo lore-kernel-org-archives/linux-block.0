@@ -1,30 +1,31 @@
 Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8F8414DFA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02124156DF;
 	Wed, 23 Sep 2026 05:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790140290; cv=none; b=THl+kfR+nWifk/sjZn417mC3KiSnizmS+ZUuD5Sm0FMNnbUppHwPBtOydJdnmDxY9H2EgO2/7+CBoEOF5PrfmCA3jXMhjrLQJqJsAG1dwcynj0pTzuaYkG/JavX4QANJaC41LooXKQxIXzuFxPiDt7cpyFS9ysW/ZMgvsxcaais=
+	t=1790140291; cv=none; b=UWAeBiFmUfJk7q4P7elKQ/AW7mTHsPliIh/7idWvpllyLsVk3zpVfNYn00qds+2XjJ3wDaycThN/MKHqNDYf5aka8LM4pipIO91lMMpX+cIuYetpy+q40cew9KQ9ozeesvHg5RrgPaBXDyTL6B62MlWuJJfMKAgZ6X8454IBz+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790140290; c=relaxed/simple;
-	bh=VpCqEALnYueCZ/uuf/U/dS9wtmGxFNB/pTswfhfia/w=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=aE1hDyaHs2ZVW85QjdmpuUTgHuuC96zvQGOayVyTnOhzlO9CAT1cSNt8Jp/d5gMPB4ZlkqpAC6DJO6cg1LU9TxKZu5YCki5re3ikHg+0FnRCT6Mnp58A/6gyCEi+QsCRW3z7bSSxOLaZFrKQnUJ500/G7uJHD48HmaTaHJF+ODY=
+	s=arc-20240116; t=1790140291; c=relaxed/simple;
+	bh=3LNltbeXG22Wd6ou/BxN7F68ZBJvWrCG3CX69ZrHg5g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=HypagVgYQc/beJAcXOlLD2VkPRnN+FoEsYHug+KOwRv5xaTRUkrXe8R7gvaoZlaN0vY33DRCEMRIwOuzV32qaKDOkdAYQcgi8ZkPABBWWp03NbVvy68TXAEH84GasenOluPrgVKbnnbHYMIaRuZLskhnbh4X7XCtjU/BHvkpk7k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
 Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68N59wNB077943;
-	Wed, 23 Sep 2026 14:09:58 +0900 (JST)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 68N5AEV7078024;
+	Wed, 23 Sep 2026 14:10:14 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
 Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
 	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68N59wGt077940
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 68N5AD9r078021
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 23 Sep 2026 14:09:58 +0900 (JST)
+	Wed, 23 Sep 2026 14:10:14 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp>
-Date: Wed, 23 Sep 2026 14:09:58 +0900
+Message-ID: <1bced9b4-83df-4702-81ac-fc0c44baeeac@I-love.SAKURA.ne.jp>
+Date: Wed, 23 Sep 2026 14:10:13 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,7 +33,9 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: [PATCH v5 2/2] loop: Perform __loop_clr_fd() from post_release
+ callback.
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
         linux-block <linux-block@vger.kernel.org>
@@ -47,195 +50,175 @@ Cc: Al Viro <viro@zeniv.linux.org.uk>,
         rust-for-linux@vger.kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Nilay Shroff <nilay@linux.ibm.com>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH v5 1/2] block: Add post_release() operation
+References: <69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav313.rs.sakura.ne.jp
 X-Virus-Status: clean
-X-Anti-Virus-Server: fsav211.rs.sakura.ne.jp
 
-Add post_release() block device operation which provides a hook for
-performing synchronous cleanup without disk->open_mutex held, which is
-needed by the loop devices.
+syzbot is reporting NULL pointer dereference in lo_rw_aio().
+An analysis by the Gemini AI collaborator considers that this problem
+is caused by a timing shift primarily exposed by commit 65565ca5f99b
+("block: unify the synchronous bi_end_io callbacks"), along with helper
+refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
+helper").
 
-Real-world container engines, test suites, and system utilities rely on
-fput() from __loop_clr_fd() being completed when lo_release() returns.
-But changes which went to the v7.1 merge window broke an assumption that
-there is no outstanding I/O when __loop_clr_fd() is called, causing NULL
-pointer dereference problem in lo_rw_aio().
+But due to difficulty of reproducing this race, discussion about what is
+happening and how to fix this problem is stalling. Also, we haven't
+identified how many filesystems are subjected to this problem.
 
-In order to fix this regression, we want to allow __loop_clr_fd() to flush
-outstanding I/O. But calling drain_workqueue() from __loop_clr_fd() with
-disk->open_mutex held causes lockdep warnings. We need a mechanism which
-can flush outstanding I/O without disk->open_mutex held.
+Therefore, introduce a grace period for flushing outstanding I/O
+(which should be a good thing from the perspective of defensive
+programming) so that we won't hit NULL pointer dereference problem.
 
-But deferring __loop_clr_fd() to WQ context has a problem that there is no
-way to wait for completion of __loop_clr_fd() before the calling thread
-returns to the userspace, for there is no hook for calling flush_work().
-Despite what LO_FLAGS_AUTOCLEAR can guarantee is to clear backing device
-"eventually" after the last thread called lo_release(), abovementioned
-programs are expecting "synchronously" when a thread who is going to call
-umount() or open() as soon as returning from close() called close().
-That is an unsatisfiable expectation because the former is an objective
-behavior and the latter is a subjective dependency. Nonetheless, we need
-to try to wait for completion of __loop_clr_fd() at best-effort basis.
+Since calling drain_workqueue() from __loop_clr_fd() with disk->open_mutex
+held causes lockdep warnings, call __loop_clr_fd() from lo_post_release().
+Use rundown_owner for remembering who is responsible for calling
+__loop_clr_fd() from lo_post_release().
 
-Also, since __loop_clr_fd() calls module_put(THIS_MODULE) and there is no
-API for waiting for completion of remote thread's task work context,
-deferring __loop_clr_fd() to task work context has a problem (aside from
-task_work_add() being not exported to loadable modules) that module unload
-operation can unmap code/data segment before __loop_clr_fd() completes.
-
-Therefore, allow the loop driver to safely know completion of
-__loop_clr_fd(), by adding a hook which is called after disk->open_mutex
-is released.
-
+Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp
+Reported-by: syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28
+Reported-by: syzbot+bc273027d5643e48e5b3@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3
+Depends-on: "block: Add post_release() operation"
+Fixes: 65565ca5f99b ("block: unify the synchronous bi_end_io callbacks")
+Assisted-by: Gemini-Pro
 Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
-Changes in v5:
-  Since Bart Van Assche commented that post_release() is more clear
-  and more descriptive than run_todo(), renamed run_todo() back to
-  post_release(), and make it be called only if release() was called.
+ drivers/block/loop.c | 66 ++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 52 insertions(+), 14 deletions(-)
 
- block/bdev.c                     | 28 +++++++++++++++++++---------
- include/linux/blkdev.h           | 10 ++++++++++
- rust/kernel/block/mq/gen_disk.rs |  1 +
- 3 files changed, 30 insertions(+), 9 deletions(-)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index cd8323083740..50cd82719236 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -766,7 +766,8 @@ static void blkdev_put_whole(struct block_device *bdev)
- 		bdev->bd_disk->fops->release(bdev->bd_disk);
- }
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 758c20678bf6..45543c338717 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -75,6 +75,7 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
++	struct task_struct	*rundown_owner;
+ };
  
--static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
-+static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode,
-+			    bool *called_release)
+ struct loop_cmd {
+@@ -1138,11 +1139,39 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 
+ static void __loop_clr_fd(struct loop_device *lo)
  {
- 	struct gendisk *disk = bdev->bd_disk;
- 	int ret;
-@@ -793,18 +794,20 @@ static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
- 		ret = bdev_disk_changed(disk, false);
- 		if (ret && (mode & BLK_OPEN_STRICT_SCAN)) {
- 			blkdev_put_whole(bdev);
-+			*called_release = true;
- 			return ret;
- 		}
- 	}
- 	return 0;
- }
++	struct gendisk *disk = lo->lo_disk;
+ 	struct queue_limits lim;
+ 	struct file *filp;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	int err;
  
--static int blkdev_get_part(struct block_device *part, blk_mode_t mode)
-+static int blkdev_get_part(struct block_device *part, blk_mode_t mode,
-+			   bool *called_release)
- {
- 	struct gendisk *disk = part->bd_disk;
- 	int ret;
- 
--	ret = blkdev_get_whole(bdev_whole(part), mode);
-+	ret = blkdev_get_whole(bdev_whole(part), mode, called_release);
- 	if (ret)
- 		return ret;
- 
-@@ -821,6 +824,7 @@ static int blkdev_get_part(struct block_device *part, blk_mode_t mode)
- 
- out_blkdev_put:
- 	blkdev_put_whole(bdev_whole(part));
-+	*called_release = true;
- 	return ret;
- }
- 
-@@ -974,6 +978,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 	bool unblock_events = true;
- 	struct gendisk *disk = bdev->bd_disk;
- 	int ret;
-+	bool called_release = false;
-+	struct module *fops_owner = NULL;
- 
- 	if (holder) {
- 		mode |= BLK_OPEN_EXCL;
-@@ -993,15 +999,16 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 		goto abort_claiming;
- 	if (!try_module_get(disk->fops->owner))
- 		goto abort_claiming;
-+	fops_owner = disk->fops->owner;
- 	ret = -EBUSY;
- 	if (!bdev_may_open(bdev, mode))
--		goto put_module;
-+		goto abort_claiming;
- 	if (bdev_is_partition(bdev))
--		ret = blkdev_get_part(bdev, mode);
-+		ret = blkdev_get_part(bdev, mode, &called_release);
- 	else
--		ret = blkdev_get_whole(bdev, mode);
-+		ret = blkdev_get_whole(bdev, mode, &called_release);
- 	if (ret)
--		goto put_module;
-+		goto abort_claiming;
- 	bdev_claim_write_access(bdev, mode);
- 	if (holder) {
- 		bd_finish_claiming(bdev, holder, hops);
-@@ -1036,13 +1043,14 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 	bdev_file->private_data = holder;
- 
- 	return 0;
--put_module:
--	module_put(disk->fops->owner);
- abort_claiming:
- 	if (holder)
- 		bd_abort_claiming(bdev, holder);
- 	mutex_unlock(&disk->open_mutex);
- 	disk_unblock_events(disk);
-+	if (called_release && disk->fops->post_release)
-+		disk->fops->post_release(disk);
-+	module_put(fops_owner);
- 	return ret;
- }
- 
-@@ -1188,6 +1196,8 @@ void bdev_release(struct file *bdev_file)
- 	else
- 		blkdev_put_whole(bdev);
- 	mutex_unlock(&disk->open_mutex);
-+	if (disk->fops->post_release)
-+		disk->fops->post_release(disk);
- 
- 	module_put(disk->fops->owner);
- put_no_open:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4f7905c3412b..5354eb006c02 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1577,6 +1577,16 @@ struct block_device_operations {
- 			unsigned int flags);
- 	int (*open)(struct gendisk *disk, blk_mode_t mode);
- 	void (*release)(struct gendisk *disk);
++	/* Step 1: Flush all outstanding I/O, without open_mutex held. */
 +	/*
-+	 * This operation is for performing synchronous cleanup after
-+	 * release() was called. Since this operation is called without
-+	 * disk->open_mutex held, users of this operation must implement
-+	 * appropriate serialization. For example, even if thread-A called
-+	 * release() operation before thread-B calls release() operation,
-+	 * it is possible that thread-B calls post_release() operation
-+	 * before thread-A calls post_release() operation.
++	 * Since loop_queue_rq() is called with RCU read lock, this synchronize_rcu()
++	 * makes sure that no more queue_work() calls are made from loop_queue_work()
++	 * from loop_queue_rq(). Subsequent loop_queue_rq() calls which are made after
++	 * this synchronize_rcu() returned shall see lo->lo_state != Lo_bound and
++	 * return with BLK_STS_IOERR.
 +	 */
-+	void (*post_release)(struct gendisk *disk);
- 	int (*ioctl)(struct block_device *bdev, blk_mode_t mode,
- 			unsigned cmd, unsigned long arg);
- 	int (*compat_ioctl)(struct block_device *bdev, blk_mode_t mode,
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index fc97dd873974..2ff77ef49781 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -129,6 +129,7 @@ pub fn build<T: Operations>(
-             submit_bio: None,
-             open: None,
-             release: None,
-+            post_release: None,
-             ioctl: None,
-             compat_ioctl: None,
-             check_events: None,
++	synchronize_rcu();
++	/*
++	 * This drain_workqueue() makes sure that no more loop_handle_cmd() calls are
++	 * made from loop_process_work() from loop_workfn()/loop_rootcg_workfn().
++	 */
++	drain_workqueue(lo->workqueue);
++	/*
++	 * This blk_mq_freeze_queue() waits for completion of all outstanding I/O
++	 * which has been scheduled via loop_queue_rq(), by waiting for q_usage_counter
++	 * to reach 0. Since the lo->lo_state != Lo_bound check in loop_queue_rq()
++	 * guarantees that no more new I/O requests are made, we can call
++	 * blk_mq_unfreeze_queue() immediately after blk_mq_freeze_queue() returns.
++	 */
++	blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
++
++	/* Step 2: Perform remaining cleanup, with open_mutex held. */
++	mutex_lock(&disk->open_mutex);
++	WARN_ON_ONCE(lo->lo_state != Lo_rundown);
++
+ 	spin_lock_irq(&lo->lo_lock);
+ 	filp = lo->lo_backing_file;
+ 	lo->lo_backing_file = NULL;
+@@ -1153,12 +1182,7 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	lo->lo_sizelimit = 0;
+ 	memset(lo->lo_file_name, 0, LO_NAME_SIZE);
+ 
+-	/*
+-	 * Reset the block size to the default.
+-	 *
+-	 * No queue freezing needed because this is called from the final
+-	 * ->release call only, so there can't be any outstanding I/O.
+-	 */
++	/* Reset the block size to the default. */
+ 	lim = queue_limits_start_update(lo->lo_queue);
+ 	lim.logical_block_size = SECTOR_SIZE;
+ 	lim.physical_block_size = SECTOR_SIZE;
+@@ -1201,11 +1225,9 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	WRITE_ONCE(lo->lo_state, Lo_unbound);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	/*
+-	 * Need not hold lo_mutex to fput backing file. Calling fput holding
+-	 * lo_mutex triggers a circular lock dependency possibility warning as
+-	 * fput can take open_mutex which is usually taken before lo_mutex.
+-	 */
++	/* Step 3: Drop refcounts, without open_mutex held. */
++	mutex_unlock(&disk->open_mutex);
++
+ 	fput(filp);
+ }
+ 
+@@ -1754,7 +1776,6 @@ static int lo_open(struct gendisk *disk, blk_mode_t mode)
+ static void lo_release(struct gendisk *disk)
+ {
+ 	struct loop_device *lo = disk->private_data;
+-	bool need_clear = false;
+ 
+ 	if (disk_openers(disk) > 0)
+ 		return;
+@@ -1768,11 +1789,27 @@ static void lo_release(struct gendisk *disk)
+ 	if (lo->lo_state == Lo_bound && (lo->lo_flags & LO_FLAGS_AUTOCLEAR))
+ 		WRITE_ONCE(lo->lo_state, Lo_rundown);
+ 
+-	need_clear = (lo->lo_state == Lo_rundown);
++	/*
++	 * In order to flush outstanding I/O (without open_mutex for deadlock
++	 * avoidance) before clearing the backing device, defer __loop_clr_fd()
++	 * to lo_post_release().
++	 * The Lo_rundown state guarantees that lo_open() will fail with -ENXIO.
++	 * The failing lo_open() guarantees that lo_release() will not overwrite
++	 * lo->rundown_owner until __loop_clr_fd() resets to the Lo_unbound state.
++	 */
++	if (lo->lo_state == Lo_rundown)
++		WRITE_ONCE(lo->rundown_owner, current);
+ 	mutex_unlock(&lo->lo_mutex);
++}
+ 
+-	if (need_clear)
++static void lo_post_release(struct gendisk *disk)
++{
++	struct loop_device *lo = disk->private_data;
++
++	if (READ_ONCE(lo->rundown_owner) == current) {
++		WRITE_ONCE(lo->rundown_owner, NULL);
+ 		__loop_clr_fd(lo);
++	}
+ }
+ 
+ static void lo_free_disk(struct gendisk *disk)
+@@ -1791,6 +1828,7 @@ static const struct block_device_operations lo_fops = {
+ 	.owner =	THIS_MODULE,
+ 	.open =         lo_open,
+ 	.release =	lo_release,
++	.post_release =	lo_post_release,
+ 	.ioctl =	lo_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl =	lo_compat_ioctl,
 -- 
 2.52.0
 
