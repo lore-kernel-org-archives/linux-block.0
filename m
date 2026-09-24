@@ -1,289 +1,273 @@
-Received: from mta0.migadu.com (out-31.mta0.migadu.com [91.218.175.31])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBB42DF138
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 10:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC08744780F;
+	Thu, 24 Sep 2026 10:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790245941; cv=none; b=Yjjc8F527tuG5TAaUBssvnHbHi5pPqHk0Km1UbFmKkQcrKhDoW4SSon0p724DZ8K0VNGdPiY4sbR3cBmRsrPD191iDfvAtcH4JbYhTMfvoqRCWn6nYrIH54jaxASFu0IwqUvS1K/3OI6NANvgCxVJTk3ZYGTp5ulSNbkrvaYSLU=
+	t=1790247471; cv=none; b=FHji2jjXAv26LSSay3G8M7Zs/82OdVafVYpITM4dmOFiWfICTG1fP8dmUjiK77yqjuSmysE+5EEZA0ve7EuQV8Sfuwo9y+qx/HnZxXopasS9jK8F9yQ9GMlXQkRpzfcqEX/QnOxf9DhUVx/NreFeikS/YnCfrBVwBY4XB2WZ3Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790245941; c=relaxed/simple;
-	bh=ObZcquRpx4x09nCPiDX6i/CHCCMMhKjGvOEeNB6yuZc=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=F5qxZBBRgNL3L/MfH5EFKo+ZMSjjmZNjnfAX1HP1MLUfmHQsCNAHWsY35CRKwNjQ1Quw6+cI6WpBTqJSQykNoypANDdCiz1yH6WWMDNyQVNNix7r+givLGlLoPIy7GLylPehE/veH6dxe0o3xZ451af4bOkTUVNf6BOT/nNyErQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cDe9sJdZ; arc=none smtp.client-ip=91.218.175.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790247471; c=relaxed/simple;
+	bh=3xX6Y+1JC3mm+xz311I53Qd6nLDPBCXrqF00YMpbftE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eu+WPHRY2o/v39nhz+RBfS14jK7UcMF0mtWAeKlF1ov1O/m+goAMIMqJxTsNydc6v4VVEbuHJrrj5Vo+DeznHMNqQfunRdCsOXz/Cuq1pGWoamHvjqBuigu9GjjxejD6rEMCKZtTZZq72rGvCiRx5e8TImAT0296LDYKO831bY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rwkH7yk/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZcaR9tcI; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=VGdEVve7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lQcXohwT; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cDe9sJdZ"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=ObZcquRpx4x09nCPiDX6i/CHCCMMhKjGvOEeNB6yuZc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790245937; v=1; x=1790850737;
- b=cDe9sJdZXTpjyok5ljrQkbmMQodvtDWC6IVx7X10yHq6efYtvN5QQ3BNjKBGlYKyVGsGgly0
- 0ujoUrA0HCwu/D33bVV2rjxhohTlVTD0WS27G1b5jrBNqI236Ua52PPj/aPojptPMx3H+djgvZa
- A5a5QPIypGqS+ahyvx7CuC8g=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id e39e4bbfa92ee16f;
-	Thu, 24 Sep 2026 10:32:16 +0000
-X-Mizu-Trace-ID: e39e4bbfa92ee16f
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <446b50ad-f41d-4e08-ad33-45da37193560@linux.dev>
-Date: Thu, 24 Sep 2026 18:32:13 +0800
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rwkH7yk/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZcaR9tcI";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="VGdEVve7";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lQcXohwT"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id BAD6A21F05;
+	Thu, 24 Sep 2026 10:57:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1790247463; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qGe1Uyoj3hhwaqMmmb4P4GWQZZ0XVbX1aCs+aO9Y1iA=;
+	b=rwkH7yk/nadi0w+6IrC3tuhGWnNWPkleBFeW/8SVSb7/yEL5RvRcN7EKX91i9dGkvCfrSl
+	JhxQj7nh/5RfVYKaOBUlwys1qbT/5pxgrPVDkaYyn2hy4vG5JpVF/fCAXzNPrlTonHmO5c
+	S7A0BtSAbMfg4+bag4QKVCZh54D85uk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1790247463;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qGe1Uyoj3hhwaqMmmb4P4GWQZZ0XVbX1aCs+aO9Y1iA=;
+	b=ZcaR9tcIrRhdwUhtPcQUMDU/BnzZD1b2TbxVw1Ln1mjLffpVUzU9Pyy+M4ae0dlCGg2r9t
+	ffEYs6mm2LwOUWCg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=VGdEVve7;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=lQcXohwT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1790247458; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qGe1Uyoj3hhwaqMmmb4P4GWQZZ0XVbX1aCs+aO9Y1iA=;
+	b=VGdEVve7YyDaxnDIgn08n2nt1Hb+Rhy8pzwOvhyxpkOhY2jiGd8MALSMaKMiHo16n/c1yJ
+	bO1ieKBMGNnp3GQVIWdNG1QSkhSnwLc5bHSdtCKULjtjpg3L9sDUBFA6GI8YvA3108+pHx
+	+D+snlQkaUCM9jXELaSKS9GipaQ6uVw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1790247458;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qGe1Uyoj3hhwaqMmmb4P4GWQZZ0XVbX1aCs+aO9Y1iA=;
+	b=lQcXohwTmm7KFljPOB4yE7ES2ohOCoH4SMLNRblhmwysOdz2dxoWV1F8ZSqaAnIgXxRqAT
+	MiEGr4/JwtQAmTCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8EF8B13668;
+	Thu, 24 Sep 2026 10:57:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id kOtDGiICtWqoAQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 24 Sep 2026 10:57:38 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 20EC2A132E; Thu, 24 Sep 2026 12:57:34 +0200 (CEST)
+Date: Thu, 24 Sep 2026 12:57:34 +0200
+From: Jan Kara <jack@suse.cz>
+To: Julian Sun <sunjunchao@bytedance.com>
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, axboe@kernel.dk, 
+	hannes@cmpxchg.org, mhocko@kernel.org, roman.gushchin@linux.dev, 
+	shakeel.butt@linux.dev, muchun.song@linux.dev, willy@infradead.org, jack@suse.cz, 
+	tj@kernel.org, akpm@linux-foundation.org
+Subject: Re: [PATCH v8 3/3] writeback: record bdev targets in foreign
+ writeback tracepoints
+Message-ID: <xktq4fmpdlbtrncw2zjdu73mgstjsceq7qurdmatditlqhhavz@53m37febbjki>
+References: <20260922125015.3435215-1-sunjunchao@bytedance.com>
+ <20260922125015.3435215-4-sunjunchao@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, cuitao@kylinos.cn, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] loop: defer the queue limits clear to a workqueue
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20260924102027.2307044-1-cui.tao@linux.dev>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260924102027.2307044-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260922125015.3435215-4-sunjunchao@bytedance.com>
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: BAD6A21F05
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.cz:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
 
-
-
-在 2026/9/24 18:20, Tao Cui 写道:
-> From: Tao Cui <cuitao@kylinos.cn>
+On Tue 22-09-26 20:50:15, Julian Sun wrote:
+> Add dev to track_foreign_dirty and flush_foreign so traces can
+> distinguish foreign-wb tracking from the bdev-only path. Append the
+> field to each event and print it as major:minor; zero denotes the
+> normal foreign-wb path.
 > 
-> loop_clear_limits() calls queue_limits_commit_update() directly from
-> the loop workqueue that processes the request.  That does a
-> non-atomic struct assignment to q->limits without freezing the queue,
-> which races with lockless readers of q->limits on other CPUs - bio
-> splitting reads max_hw_sectors, the discard path reads
-> max_hw_discard_sectors - and can let them observe torn values.  The
-> trigger is a discard or write-zeroes request on a loop device whose
-> backing file does not support the corresponding fallocate operation.
-> 
+> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
 
-Oops, I messed up the subject, that was supposed to be [PATCH v5].
-The patch in it is the final version: rebased as a single commit,
-plus one fix over v4, clear_limits_lock now covers the limits
-commit too, since the queue freeze is counted and doesn't exclude
-a concurrent loop_change_fd(). Please ignore the subject and treat
-it as v5.
+Hum, won't it be better to introduce new tracepoints instead of kind of
+abusing the existing ones and filling in zeros? At least if I were to use
+these tracepoints, I'd prefer that.
 
-Sorry for the noise,
-Tao.
+								Honza
 
-> The code already has an XXX comment saying this should move to a
-> workqueue.  Do that: schedule a work item on the system workqueue, where
-> it is safe to freeze the queue around the limits update.  The pending
-> modes and the rebind generation live under a new mutex,
-> lo->clear_limits_lock.  The work item takes the mutex with the queue
-> frozen and holds it over the limits commit, so a rebind cannot slip
-> in between the generation check and the commit.  Rebinding the
-> device drops the accumulated modes and invalidates an already
-> scheduled work item, so a stale clear cannot hit the new backing
-> file.  The work item is cancelled before the device is freed.
-> 
-> Suggested-by: Bart Van Assche <bvanassche@acm.org>
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> 
 > ---
-> Changes since v4:
+>  include/trace/events/writeback.h | 22 ++++++++++++++--------
+>  mm/memcontrol.c                  |  8 +++++---
+>  2 files changed, 19 insertions(+), 11 deletions(-)
 > 
-> - Rebase onto the current block tree as a single commit.
-> 
-> - Hold clear_limits_lock over the limits commit in the work item.
->   The queue freeze is counted, not mutually exclusive, so
->   loop_change_fd() could rebind between the generation check and
->   the commit, and a stale clear could disable discard and write
->   zeroes on the new backing file.
-> 
-> Changes since v3:
-> 
-> - Replace the three atomic variables (clear_limits_mode, rebind_gen,
->   clear_limits_gen) with plain variables protected by a new
->   clear_limits_lock mutex, as suggested by Bart.  The mutex is taken
->   after the queue freeze in the work item, which keeps the same
->   freeze -> mutex ordering as loop_change_fd(), the only rebinding
->   path that freezes the queue.
-> 
-> Changes since v2:
-> 
-> - Skip the clear when the device was rebound since the work item
->   was scheduled: the modes used to be captured before the freeze,
->   so a LOOP_CHANGE_FD completing in between could apply the old
->   modes to the new backing file.  The rebind generation is now
->   checked with the queue frozen, which excludes loop_change_fd()
->   because it assigns the new backing file under the same freeze,
->   so a rebind cannot slip in between the check and the commit.
->   Cancelling from loop_assign_backing_file() would instead
->   deadlock on the freeze held by loop_change_fd().
-> 
-> - Also bump the rebind generation from __loop_clr_fd(): unbinding
->   does not go through loop_assign_backing_file(), so a work item
->   scheduled before the last close could otherwise commit a stale
->   clear to the queue limits of the unbound device.
-> 
-> Changes since v1:
-> 
-> - Reset clear_limits_mode when assigning a new backing file, so
->   stale modes do not clear limits of the new file.
-> 
-> - Cancel the work item from loop_remove() before del_gendisk():
->   the queue can already be in RCU-delayed freeing when
->   lo_free_disk() cancels it.
-> 
-> Tested on x86-64 (qemu, vfat-backed loop device): a 30s discard and
-> reconfigure loop exercises the clear path 288 times, no torn sysfs
-> reads, no difference against the unpatched kernel.
-> 
-> Link: https://lore.kernel.org/r/20260828072004.273519-1-cui.tao@linux.dev/
-> ---
->  drivers/block/loop.c | 83 ++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 69 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 758c20678bf6c..0b89036c982ad 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -67,6 +67,11 @@ struct loop_device {
->  	struct list_head        rootcg_cmd_list;
->  	struct list_head        idle_worker_list;
->  	struct rb_root          worker_tree;
-> +	struct work_struct      clear_limits_work;
-> +	struct mutex		clear_limits_lock;
-> +	unsigned int		clear_limits_mode;
-> +	unsigned int		rebind_gen;
-> +	unsigned int		clear_limits_gen;
->  	struct timer_list       timer;
->  	bool			sysfs_inited;
+> diff --git a/include/trace/events/writeback.h b/include/trace/events/writeback.h
+> index 13ee076ccd16..ffd1b8df4231 100644
+> --- a/include/trace/events/writeback.h
+> +++ b/include/trace/events/writeback.h
+> @@ -273,9 +273,9 @@ TRACE_EVENT(inode_switch_wbs,
 >  
-> @@ -222,26 +227,53 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
->  		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
->  }
+>  TRACE_EVENT(track_foreign_dirty,
 >  
-> -static void loop_clear_limits(struct loop_device *lo, int mode)
-> +static void loop_clear_limits_workfn(struct work_struct *work)
->  {
-> +	struct loop_device *lo =
-> +		container_of(work, struct loop_device, clear_limits_work);
->  	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
-> -
-> -	if (mode & FALLOC_FL_ZERO_RANGE)
-> -		lim.max_write_zeroes_sectors = 0;
-> -
-> -	if (mode & FALLOC_FL_PUNCH_HOLE) {
-> -		lim.max_hw_discard_sectors = 0;
-> -		lim.discard_granularity = 0;
-> -	}
-> +	unsigned int memflags;
-> +	int mode = 0;
+> -	TP_PROTO(struct folio *folio, struct bdi_writeback *wb),
+> +	TP_PROTO(struct folio *folio, struct bdi_writeback *wb, dev_t dev),
+>  
+> -	TP_ARGS(folio, wb),
+> +	TP_ARGS(folio, wb, dev),
+>  
+>  	TP_STRUCT__entry(
+>  		__array(char,		name, 32)
+> @@ -284,6 +284,7 @@ TRACE_EVENT(track_foreign_dirty,
+>  		__field(u64,		cgroup_ino)
+>  		__field(u64,		page_cgroup_ino)
+>  		__field(unsigned int,	memcg_id)
+> +		__field(dev_t,		dev)
+>  	),
+>  
+>  	TP_fast_assign(
+> @@ -295,34 +296,37 @@ TRACE_EVENT(track_foreign_dirty,
+>  		__entry->ino		= inode ? inode->i_ino : 0;
+>  		__entry->memcg_id	= wb->memcg_css->id;
+>  		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
+> +		__entry->dev		= dev;
+>  
+>  		rcu_read_lock();
+>  		__entry->page_cgroup_ino = cgroup_ino(folio_memcg(folio)->css.cgroup);
+>  		rcu_read_unlock();
+>  	),
+>  
+> -	TP_printk("bdi %s[%llu]: ino=%llu memcg_id=%u cgroup_ino=%llu page_cgroup_ino=%llu",
+> +	TP_printk("bdi %s[%llu]: ino=%llu memcg_id=%u cgroup_ino=%llu page_cgroup_ino=%llu dev=%u:%u",
+>  		__entry->name,
+>  		__entry->bdi_id,
+>  		__entry->ino,
+>  		__entry->memcg_id,
+>  		__entry->cgroup_ino,
+> -		__entry->page_cgroup_ino
+> +		__entry->page_cgroup_ino,
+> +		MAJOR(__entry->dev), MINOR(__entry->dev)
+>  	)
+>  );
+>  
+>  TRACE_EVENT(flush_foreign,
+>  
+>  	TP_PROTO(struct bdi_writeback *wb, unsigned int frn_bdi_id,
+> -		 unsigned int frn_memcg_id),
+> +		 unsigned int frn_memcg_id, dev_t dev),
+>  
+> -	TP_ARGS(wb, frn_bdi_id, frn_memcg_id),
+> +	TP_ARGS(wb, frn_bdi_id, frn_memcg_id, dev),
+>  
+>  	TP_STRUCT__entry(
+>  		__array(char,		name, 32)
+>  		__field(u64,		cgroup_ino)
+>  		__field(unsigned int,	frn_bdi_id)
+>  		__field(unsigned int,	frn_memcg_id)
+> +		__field(dev_t,		dev)
+>  	),
+>  
+>  	TP_fast_assign(
+> @@ -330,13 +334,15 @@ TRACE_EVENT(flush_foreign,
+>  		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
+>  		__entry->frn_bdi_id	= frn_bdi_id;
+>  		__entry->frn_memcg_id	= frn_memcg_id;
+> +		__entry->dev		= dev;
+>  	),
+>  
+> -	TP_printk("bdi %s: cgroup_ino=%llu frn_bdi_id=%u frn_memcg_id=%u",
+> +	TP_printk("bdi %s: cgroup_ino=%llu frn_bdi_id=%u frn_memcg_id=%u dev=%u:%u",
+>  		__entry->name,
+>  		__entry->cgroup_ino,
+>  		__entry->frn_bdi_id,
+> -		__entry->frn_memcg_id
+> +		__entry->frn_memcg_id,
+> +		MAJOR(__entry->dev), MINOR(__entry->dev)
+>  	)
+>  );
+>  #endif
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 6042c694d56c..534b0d537a09 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -3956,12 +3956,12 @@ void mem_cgroup_track_foreign_dirty_slowpath(struct folio *folio,
+>  	struct inode *inode = mapping->host;
+>  
+>  	if (memcg_bdev_frn_wq && sb_is_blkdev_sb(inode->i_sb)) {
+> -		trace_track_foreign_dirty(folio, wb);
+> +		trace_track_foreign_dirty(folio, wb, inode->i_rdev);
+>  		mem_cgroup_track_foreign_bdev(memcg, inode->i_rdev);
+>  		return;
+>  	}
+>  
+> -	trace_track_foreign_dirty(folio, wb);
+> +	trace_track_foreign_dirty(folio, wb, 0);
 >  
 >  	/*
-> -	 * XXX: this updates the queue limits without freezing the queue, which
-> -	 * is against the locking protocol and dangerous.  But we can't just
-> -	 * freeze the queue as we're inside the ->queue_rq method here.  So this
-> -	 * should move out into a workqueue unless we get the file operations to
-> -	 * advertise if they support specific fallocate operations.
-> +	 * Commit the unmodified limits if the device was rebound since
-> +	 * the work item was scheduled.  The freeze does not exclude a
-> +	 * rebind through loop_change_fd(), which freezes the queue
-> +	 * itself, so hold clear_limits_lock over the generation check
-> +	 * and the commit: loop_assign_backing_file() bumps rebind_gen
-> +	 * under the same mutex, so a rebind either precedes the check
-> +	 * or follows the commit, and a stale clear cannot hit the new
-> +	 * backing file.  The other rebinding paths, loop_configure()
-> +	 * and __loop_clr_fd(), bump rebind_gen under the same mutex
-> +	 * without freezing the queue; the generation check detects
-> +	 * them as well.
->  	 */
-> +	memflags = blk_mq_freeze_queue(lo->lo_queue);
-> +	mutex_lock(&lo->clear_limits_lock);
-> +	if (lo->clear_limits_gen == lo->rebind_gen) {
-> +		mode = lo->clear_limits_mode;
-> +		lo->clear_limits_mode = 0;
-> +
-> +		if (mode & FALLOC_FL_ZERO_RANGE)
-> +			lim.max_write_zeroes_sectors = 0;
-> +
-> +		if (mode & FALLOC_FL_PUNCH_HOLE) {
-> +			lim.max_hw_discard_sectors = 0;
-> +			lim.discard_granularity = 0;
-> +		}
-> +	}
->  	queue_limits_commit_update(lo->lo_queue, &lim);
-> +	mutex_unlock(&lo->clear_limits_lock);
-> +	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
-> +}
-> +
-> +static void loop_clear_limits(struct loop_device *lo, int mode)
-> +{
-> +	mutex_lock(&lo->clear_limits_lock);
-> +	lo->clear_limits_gen = lo->rebind_gen;
-> +	lo->clear_limits_mode |= mode;
-> +	mutex_unlock(&lo->clear_limits_lock);
-> +	schedule_work(&lo->clear_limits_work);
->  }
->  
->  static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-> @@ -518,6 +550,10 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
->  static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
->  {
->  	lo->lo_backing_file = file;
-> +	mutex_lock(&lo->clear_limits_lock);
-> +	lo->rebind_gen++;
-> +	lo->clear_limits_mode = 0;
-> +	mutex_unlock(&lo->clear_limits_lock);
->  	lo->old_gfp_mask = mapping_gfp_mask(file->f_mapping);
->  	mapping_set_gfp_mask(file->f_mapping,
->  			lo->old_gfp_mask & ~(__GFP_IO | __GFP_FS));
-> @@ -1148,6 +1184,15 @@ static void __loop_clr_fd(struct loop_device *lo)
->  	lo->lo_backing_file = NULL;
->  	spin_unlock_irq(&lo->lo_lock);
->  
-> +	/*
-> +	 * Invalidate any pending clear that was scheduled against the old
-> +	 * backing file, like loop_assign_backing_file() does on rebind.
-> +	 */
-> +	mutex_lock(&lo->clear_limits_lock);
-> +	lo->rebind_gen++;
-> +	lo->clear_limits_mode = 0;
-> +	mutex_unlock(&lo->clear_limits_lock);
-> +
->  	lo->lo_device = NULL;
->  	lo->lo_offset = 0;
->  	lo->lo_sizelimit = 0;
-> @@ -1783,7 +1828,9 @@ static void lo_free_disk(struct gendisk *disk)
->  		destroy_workqueue(lo->workqueue);
->  	loop_free_idle_workers(lo, true);
->  	timer_shutdown_sync(&lo->timer);
-> +	cancel_work_sync(&lo->clear_limits_work);
->  	mutex_destroy(&lo->lo_mutex);
-> +	mutex_destroy(&lo->clear_limits_lock);
->  	kfree(lo);
->  }
->  
-> @@ -2102,6 +2149,8 @@ static int loop_add(int i)
->  	spin_lock_init(&lo->lo_lock);
->  	spin_lock_init(&lo->lo_work_lock);
->  	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-> +	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
-> +	mutex_init(&lo->clear_limits_lock);
->  	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
->  	disk->major		= LOOP_MAJOR;
->  	disk->first_minor	= i << part_shift;
-> @@ -2140,6 +2189,12 @@ static int loop_add(int i)
->  
->  static void loop_remove(struct loop_device *lo)
->  {
-> +	/*
-> +	 * Cancel early: the queue may already be in RCU-delayed freeing
-> +	 * by the time lo_free_disk() cancels the work item.
-> +	 */
-> +	cancel_work_sync(&lo->clear_limits_work);
-> +
->  	/* Make this loop device unreachable from pathname. */
->  	del_gendisk(lo->lo_disk);
->  	blk_mq_free_tag_set(&lo->tag_set);
-
+>  	 * Pick the slot to use.  If there is already a slot for @wb, keep
+> @@ -4032,6 +4032,7 @@ void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
+>  			 * the timestamp for a later flush.
+>  			 */
+>  			frn->at = 0;
+> +			trace_flush_foreign(wb, 0, 0, frn->dev);
+>  			queue_work(memcg_bdev_frn_wq, &frn->work);
+>  		}
+>  	}
+> @@ -4048,7 +4049,8 @@ void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
+>  		if (time_after64(frn->at, now - intv) &&
+>  		    atomic_read(&frn->done.cnt) == 1) {
+>  			frn->at = 0;
+> -			trace_flush_foreign(wb, frn->bdi_id, frn->memcg_id);
+> +			trace_flush_foreign(wb, frn->bdi_id, frn->memcg_id,
+> +					    0);
+>  			cgroup_writeback_by_id(frn->bdi_id, frn->memcg_id,
+>  					       WB_REASON_FOREIGN_FLUSH,
+>  					       &frn->done);
+> -- 
+> 2.39.5
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
