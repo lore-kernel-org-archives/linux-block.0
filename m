@@ -1,277 +1,218 @@
-Received: from mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BCF440A08
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 10:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3674A4749DD;
+	Thu, 24 Sep 2026 10:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790245246; cv=none; b=rRqnrRbdepMN1eQubU+GPn9g46V6mR8AxjgviRZHKk+bxdEGYhI7rVoovHczCN01+Bh3DEDaZ7lAqjCcz7lKePpyBKLDdieB23Mt61JbHz2pT9nf8uYZu0JpOlmJGAj8Ecqw9spDccnOvAlUj6q//VzXHdcaYKZObRyChyMLMsk=
+	t=1790245349; cv=none; b=DmeXEwj3u/j4FypJ4BwhAhL87kP4KOb/CHtfOpwvVm4CvjZEpXSvBZIMQVgJNQ1GtHJcoif3i/2cULEEG1GKVgeNHl7cz4TdhrCe8xY2nQoVhwBcBxIweVFI+6jyfLs89aErGewtoV/6V/y7GWr5zNeFbrP34R/XSinAcs4m2os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790245246; c=relaxed/simple;
-	bh=NzAv5RE3xOBRaAf8a2zVLfosFZZ7tifV3krhM40Gs50=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sEGuAoxVT8p1tPlu+wRSOuleGQnKtDNDACBlorOqdt2hT2igDjaSwxVRj3ebaP4ycvIDeRAmIQMLKVac2NkoBPI7xTwdYiEFgYEtimp79lHBz9zB5I4C9gJgdKjAhSCS4SGJWedF93qg/R5rLwDpZzbxhBFe4y29chJaJfq5EYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hFXjRt4w; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790245349; c=relaxed/simple;
+	bh=JD32s8eD5JSHh277X1R2SZ0l+uvehg9HATseGnbtzJs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sryAPB1rELBDZA5+S9wmG7TvgJiQHXGa3AgvB1rmh82t09jDr1Dz5BuC2+sqz1TLkBolWDB7bJ7CUjUnvKskUnb8YLZT79crZeRrrHfbgGBKxq3hlcLhusvnkPisVRjUzuKDZiRidNFK2p6lLpbIiCn9ud/fOdOuCtzNdc0ZWrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=xrjONZAS; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hFXjRt4w"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=NzAv5RE3xOBRaAf8a2zVLfosFZZ7tifV3krhM40Gs50=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790245239; v=1; x=1790850039;
- b=hFXjRt4wNccYK48FnRCwF0+eq9YwZZLrX2YwJ/je6WKVQCVJotr/kcs3hPife63wulLO4dzZ
- MeNgtr0ftfxijsr7Sda9prvjftGwKxcTWs9QxLUPdBpfWtbloB2C4wKHlyF10tiXAlK6RmDJDV8
- 8BWKvHQ/90e9ofHIQT6LxNkM=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 908aef3dba0e5e1c;
-	Thu, 24 Sep 2026 10:20:39 +0000
-X-Mizu-Trace-ID: 908aef3dba0e5e1c
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: Bart Van Assche <bvanassche@acm.org>,
-	axboe@kernel.dk,
-	hch@lst.de,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: cuitao@kylinos.cn,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev
-Subject: [PATCH] loop: defer the queue limits clear to a workqueue
-Date: Thu, 24 Sep 2026 18:20:27 +0800
-Message-ID: <20260924102027.2307044-1-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="xrjONZAS"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yg/c5dnmZTi6xyPOZ86hk74blfRQhWYpuq7fF3Kbs7A=;
+	b=xrjONZASgZH2dB4W12aPwAUjOwKHhuoT3i4U1FLpQsZw+cPLUW1gCi4qySKYwWAnY/2fa/nMH
+	2Ic97JDw8b/I36cpUZTVgECBEPpkkhCD2kgT43L9L8RjG93PnEkKKNXn8tuIFP5pJjIu1GAV6CL
+	P/HreNo6hafJvlYVPC1YGdY=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4hr8j419d9znTVd;
+	Thu, 24 Sep 2026 18:10:16 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id EA04D40578;
+	Thu, 24 Sep 2026 18:22:19 +0800 (CST)
+Received: from octopus.huawei.com (10.67.174.191) by
+ whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Thu, 24 Sep 2026 18:22:15 +0800
+From: Cai Xinchen <caixinchen1@huawei.com>
+To: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>
+CC: <rdunlap@infradead.org>, <gregkh@linuxfoundation.org>,
+	<rafael@kernel.org>, <dakr@kernel.org>, <dlemoal@kernel.org>, <hch@lst.de>,
+	<axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <dhowells@redhat.com>, <code@tyhicks.com>,
+	<linkinjeon@kernel.org>, <sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
+	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
+	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <miklos@szeredi.hu>, <amir73il@gmail.com>,
+	<senozhatsky@chromium.org>, <chenxiaosong@chenxiaosong.com>,
+	<zohar@linux.ibm.com>, <roberto.sassu@huawei.com>,
+	<dmitry.kasatkin@gmail.com>, <eric.snowberg@oracle.com>,
+	<stephen.smalley.work@gmail.com>, <omosnacek@gmail.com>,
+	<casey@schaufler-ca.com>, <nanx95726@gmail.com>, <djwong@kernel.org>,
+	<daniel@iogearbox.net>, <linux-security-module@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netfs@lists.linux.dev>,
+	<ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+	<selinux@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<xiujianfeng@huawei.com>, <caixinchen1@huawei.com>, <lujialin4@huawei.com>
+Subject: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and WRITE_METADATA access rights
+Date: Thu, 24 Sep 2026 18:48:19 +0800
+Message-ID: <20260924104831.1081137-1-caixinchen1@huawei.com>
+X-Mailer: git-send-email 2.18.0.huawei.25
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
-From: Tao Cui <cuitao@kylinos.cn>
+This series adds two new Landlock filesystem access rights,
+LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+which control access to file and directory metadata such as inode
+attributes (mode, ownership, timestamps), extended attributes and POSIX
+ACLs.  It picks up the work from the "landlock: add chmod and chown
+support" series [1] and follows the coarse-grained grouping discussed in
+that thread [2]: instead of separate chmod/chown rights, metadata
+operations are grouped into one read and one write right.
 
-loop_clear_limits() calls queue_limits_commit_update() directly from
-the loop workqueue that processes the request.  That does a
-non-atomic struct assignment to q->limits without freezing the queue,
-which races with lockless readers of q->limits on other CPUs - bio
-splitting reads max_hw_sectors, the discard path reads
-max_hw_discard_sectors - and can let them observe torn values.  The
-trigger is a discard or write-zeroes request on a loop device whose
-backing file does not support the corresponding fallocate operation.
+Landlock evaluates access rights on a per-path basis, but the metadata
+related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+object.  Patches 1-7 therefore first pass struct path instead of dentry
+through the metadata-related VFS helpers and LSM hooks.  This is a pure
+refactoring with no behavior change, split so that every patch builds
+and works on its own:
 
-The code already has an XXX comment saying this should move to a
-workqueue.  Do that: schedule a work item on the system workqueue, where
-it is safe to freeze the queue around the limits update.  The pending
-modes and the rebind generation live under a new mutex,
-lo->clear_limits_lock.  The work item takes the mutex with the queue
-frozen and holds it over the limits commit, so a rebind cannot slip
-in between the generation check and the commit.  Rebinding the
-device drops the accumulated modes and invalidates an already
-scheduled work item, so a stale clear cannot hit the new backing
-file.  The work item is cancelled before the device is freed.
+  1: notify_change() and its callers
+  2: inode_setsecctx hook (must come before 3: the SELinux and Smack
+     implementations call __vfs_setxattr_locked internally)
+  3: xattr helpers, which also drops a redundant EVM xattr size sanity
+     check whose vfs_getxattr() call only has a dentry and therefore
+     cannot be migrated to the new path-based signature
+  4: POSIX ACL helpers
+  5: inode_setattr hook
+  6: inode xattr hooks
+  7: inode POSIX ACL hooks
 
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+Two deliberate scoping decisions for this refactor:
 
----
-Changes since v4:
+- The hooks consistently take struct path rather than struct file.  The
+  VFS call sites involved (chmod(2), chown(2), utimensat(2), xattr(2)
+  and ACL syscalls) operate on paths, and several of them (lstat(2),
+  lchown(2), llistxattr(2), ...) have no struct file to begin with.
 
-- Rebase onto the current block tree as a single commit.
+- struct inode_operations->setattr still receives (idmap, dentry, attr).
+  Only the VFS boundary (notify_change()) and the LSM hook layer see the
+  path, which keeps the refactor contained to fs/attr.c and the LSM
+  infrastructure instead of touching every filesystem.
 
-- Hold clear_limits_lock over the limits commit in the work item.
-  The queue freeze is counted, not mutually exclusive, so
-  loop_change_fd() could rebind between the generation check and
-  the commit, and a stale clear could disable discard and write
-  zeroes on the new backing file.
+Patches 8-12 then implement the new rights, their tests, the sandboxer
+sample and the documentation.  Semantics:
 
-Changes since v3:
+- READ_METADATA covers stat(2) and friends, getxattr(2) and friends,
+  listxattr(2) and friends, and POSIX ACL reads.
+- WRITE_METADATA covers chmod(2), chown(2), utimensat(2), setxattr(2),
+  removexattr(2) and friends, and POSIX ACL set and remove.
+- Only explicit metadata changes requested by user space are restricted.
+  Implicit changes performed by the kernel (e.g. timestamp updates on
+  write(2), size changes on truncate(2)) are not, and neither are
+  chmod(2)/chown(2) calls that change nothing (e.g. chown(2) with
+  (-1, -1), which never reaches the hook), matching the SELinux
+  inode_setattr behavior.
+- Kernel-internal accesses performed with override_creds() (e.g.
+  overlayfs, cachefiles) and kernel threads without a Landlock domain
+  (e.g. nfsd, ksmbd) are not restricted.
 
-- Replace the three atomic variables (clear_limits_mode, rebind_gen,
-  clear_limits_gen) with plain variables protected by a new
-  clear_limits_lock mutex, as suggested by Bart.  The mutex is taken
-  after the queue freeze in the work item, which keeps the same
-  freeze -> mutex ordering as loop_change_fd(), the only rebinding
-  path that freezes the queue.
+The Landlock ABI version is incremented from 11 to 12.
 
-Changes since v2:
+The series is based on linux-next commit 5c4d4169604b ("Add linux-next
+specific files for 20260921").
 
-- Skip the clear when the device was rebound since the work item
-  was scheduled: the modes used to be captured before the freeze,
-  so a LOOP_CHANGE_FD completing in between could apply the old
-  modes to the new backing file.  The rebind generation is now
-  checked with the queue frozen, which excludes loop_change_fd()
-  because it assigns the new backing file under the same freeze,
-  so a rebind cannot slip in between the check and the commit.
-  Cancelling from loop_assign_backing_file() would instead
-  deadlock on the freeze held by loop_change_fd().
+Testing: each patch has been built for aarch64 (gcc, -Werror) and the
+landlock selftests (445 tests, including the new ones) pass in QEMU on
+aarch64; base_test reports ABI v12.
 
-- Also bump the rebind generation from __loop_clr_fd(): unbinding
-  does not go through loop_assign_backing_file(), so a work item
-  scheduled before the last close could otherwise commit a stale
-  clear to the queue limits of the unbound device.
+[1] https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
+[2] https://lore.kernel.org/all/abc960a1-e66e-792e-6869-cfd201c29dbe@digikod.net/
 
-Changes since v1:
+Assisted-by: opencode: glm-5.3
 
-- Reset clear_limits_mode when assigning a new backing file, so
-  stale modes do not clear limits of the new file.
+Cai Xinchen (12):
+  fs: pass struct path to notify_change()
+  LSM: pass struct path to the inode_setsecctx hook
+  fs: pass struct path to xattr helpers
+  fs: pass struct path to POSIX ACL helpers
+  LSM: pass struct path to the inode_setattr hook
+  LSM: pass struct path to the inode xattr hooks
+  LSM: pass struct path to the inode posix acl hooks
+  landlock: Add READ_METADATA and WRITE_METADATA access rights
+  landlock: Implement metadata access hooks
+  selftests/landlock: Add tests for metadata access rights
+  samples/landlock: Add metadata rights to sandboxer
+  Documentation: Update landlock doc for metadata rights
 
-- Cancel the work item from loop_remove() before del_gendisk():
-  the queue can already be in RCU-delayed freeing when
-  lo_free_disk() cancels it.
+ Documentation/userspace-api/landlock.rst     |  11 +-
+ drivers/base/devtmpfs.c                      |   6 +-
+ drivers/block/zloop.c                        |   4 +-
+ fs/attr.c                                    |  20 +-
+ fs/cachefiles/interface.c                    |   6 +-
+ fs/cachefiles/xattr.c                        |  32 +-
+ fs/coredump.c                                |   2 +-
+ fs/ecryptfs/inode.c                          |  34 +-
+ fs/exfat/file.c                              |   3 +-
+ fs/fat/file.c                                |   3 +-
+ fs/inode.c                                   |   7 +-
+ fs/internal.h                                |  17 +-
+ fs/namei.c                                   |   7 +-
+ fs/nfsd/nfs4ctl.h                            |   4 +-
+ fs/nfsd/nfs4state.c                          |  14 +-
+ fs/nfsd/nfs4xdr.c                            |   2 +-
+ fs/nfsd/state.h                              |   2 +-
+ fs/nfsd/vfs.c                                |  73 +++--
+ fs/open.c                                    |  18 +-
+ fs/overlayfs/copy_up.c                       |   4 +-
+ fs/overlayfs/inode.c                         |   4 +-
+ fs/overlayfs/overlayfs.h                     |  39 ++-
+ fs/overlayfs/xattrs.c                        |  13 +-
+ fs/posix_acl.c                               |  46 +--
+ fs/smb/server/smb2pdu.c                      |  77 ++---
+ fs/smb/server/smb_common.c                   |   2 -
+ fs/smb/server/smbacl.c                       |  21 +-
+ fs/smb/server/tests/smbacl_kunit.c           |   6 +-
+ fs/smb/server/vfs.c                          | 111 +++----
+ fs/smb/server/vfs.h                          |  39 +--
+ fs/smb/server/vfs_cache.c                    |   3 +-
+ fs/utimes.c                                  |   3 +-
+ fs/xattr.c                                   |  96 +++---
+ include/linux/fs.h                           |   6 +-
+ include/linux/landlock.h                     |   4 +-
+ include/linux/lsm_hook_defs.h                |  29 +-
+ include/linux/posix_acl.h                    |  21 +-
+ include/linux/security.h                     |  65 ++--
+ include/linux/xattr.h                        |  22 +-
+ include/uapi/linux/landlock.h                |  26 +-
+ samples/landlock/sandboxer.c                 |  17 +-
+ security/commoncap.c                         |  22 +-
+ security/integrity/evm/evm_crypto.c          |   8 +-
+ security/integrity/evm/evm_main.c            |  36 ++-
+ security/integrity/ima/ima_appraise.c        |  17 +-
+ security/landlock/fs.c                       |  86 ++++++
+ security/landlock/limits.h                   |   2 +-
+ security/landlock/syscalls.c                 |   2 +-
+ security/security.c                          |  99 +++---
+ security/selinux/hooks.c                     |  49 +--
+ security/smack/smack_lsm.c                   |  62 ++--
+ tools/testing/selftests/landlock/base_test.c |   2 +-
+ tools/testing/selftests/landlock/fs_test.c   | 309 ++++++++++++++++++-
+ 53 files changed, 999 insertions(+), 614 deletions(-)
 
-Tested on x86-64 (qemu, vfat-backed loop device): a 30s discard and
-reconfigure loop exercises the clear path 288 times, no torn sysfs
-reads, no difference against the unpatched kernel.
-
-Link: https://lore.kernel.org/r/20260828072004.273519-1-cui.tao@linux.dev/
----
- drivers/block/loop.c | 83 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 69 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6c..0b89036c982ad 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -67,6 +67,11 @@ struct loop_device {
- 	struct list_head        rootcg_cmd_list;
- 	struct list_head        idle_worker_list;
- 	struct rb_root          worker_tree;
-+	struct work_struct      clear_limits_work;
-+	struct mutex		clear_limits_lock;
-+	unsigned int		clear_limits_mode;
-+	unsigned int		rebind_gen;
-+	unsigned int		clear_limits_gen;
- 	struct timer_list       timer;
- 	bool			sysfs_inited;
- 
-@@ -222,26 +227,53 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
- 		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- }
- 
--static void loop_clear_limits(struct loop_device *lo, int mode)
-+static void loop_clear_limits_workfn(struct work_struct *work)
- {
-+	struct loop_device *lo =
-+		container_of(work, struct loop_device, clear_limits_work);
- 	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
--
--	if (mode & FALLOC_FL_ZERO_RANGE)
--		lim.max_write_zeroes_sectors = 0;
--
--	if (mode & FALLOC_FL_PUNCH_HOLE) {
--		lim.max_hw_discard_sectors = 0;
--		lim.discard_granularity = 0;
--	}
-+	unsigned int memflags;
-+	int mode = 0;
- 
- 	/*
--	 * XXX: this updates the queue limits without freezing the queue, which
--	 * is against the locking protocol and dangerous.  But we can't just
--	 * freeze the queue as we're inside the ->queue_rq method here.  So this
--	 * should move out into a workqueue unless we get the file operations to
--	 * advertise if they support specific fallocate operations.
-+	 * Commit the unmodified limits if the device was rebound since
-+	 * the work item was scheduled.  The freeze does not exclude a
-+	 * rebind through loop_change_fd(), which freezes the queue
-+	 * itself, so hold clear_limits_lock over the generation check
-+	 * and the commit: loop_assign_backing_file() bumps rebind_gen
-+	 * under the same mutex, so a rebind either precedes the check
-+	 * or follows the commit, and a stale clear cannot hit the new
-+	 * backing file.  The other rebinding paths, loop_configure()
-+	 * and __loop_clr_fd(), bump rebind_gen under the same mutex
-+	 * without freezing the queue; the generation check detects
-+	 * them as well.
- 	 */
-+	memflags = blk_mq_freeze_queue(lo->lo_queue);
-+	mutex_lock(&lo->clear_limits_lock);
-+	if (lo->clear_limits_gen == lo->rebind_gen) {
-+		mode = lo->clear_limits_mode;
-+		lo->clear_limits_mode = 0;
-+
-+		if (mode & FALLOC_FL_ZERO_RANGE)
-+			lim.max_write_zeroes_sectors = 0;
-+
-+		if (mode & FALLOC_FL_PUNCH_HOLE) {
-+			lim.max_hw_discard_sectors = 0;
-+			lim.discard_granularity = 0;
-+		}
-+	}
- 	queue_limits_commit_update(lo->lo_queue, &lim);
-+	mutex_unlock(&lo->clear_limits_lock);
-+	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
-+}
-+
-+static void loop_clear_limits(struct loop_device *lo, int mode)
-+{
-+	mutex_lock(&lo->clear_limits_lock);
-+	lo->clear_limits_gen = lo->rebind_gen;
-+	lo->clear_limits_mode |= mode;
-+	mutex_unlock(&lo->clear_limits_lock);
-+	schedule_work(&lo->clear_limits_work);
- }
- 
- static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-@@ -518,6 +550,10 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
- static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
- {
- 	lo->lo_backing_file = file;
-+	mutex_lock(&lo->clear_limits_lock);
-+	lo->rebind_gen++;
-+	lo->clear_limits_mode = 0;
-+	mutex_unlock(&lo->clear_limits_lock);
- 	lo->old_gfp_mask = mapping_gfp_mask(file->f_mapping);
- 	mapping_set_gfp_mask(file->f_mapping,
- 			lo->old_gfp_mask & ~(__GFP_IO | __GFP_FS));
-@@ -1148,6 +1184,15 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	lo->lo_backing_file = NULL;
- 	spin_unlock_irq(&lo->lo_lock);
- 
-+	/*
-+	 * Invalidate any pending clear that was scheduled against the old
-+	 * backing file, like loop_assign_backing_file() does on rebind.
-+	 */
-+	mutex_lock(&lo->clear_limits_lock);
-+	lo->rebind_gen++;
-+	lo->clear_limits_mode = 0;
-+	mutex_unlock(&lo->clear_limits_lock);
-+
- 	lo->lo_device = NULL;
- 	lo->lo_offset = 0;
- 	lo->lo_sizelimit = 0;
-@@ -1783,7 +1828,9 @@ static void lo_free_disk(struct gendisk *disk)
- 		destroy_workqueue(lo->workqueue);
- 	loop_free_idle_workers(lo, true);
- 	timer_shutdown_sync(&lo->timer);
-+	cancel_work_sync(&lo->clear_limits_work);
- 	mutex_destroy(&lo->lo_mutex);
-+	mutex_destroy(&lo->clear_limits_lock);
- 	kfree(lo);
- }
- 
-@@ -2102,6 +2149,8 @@ static int loop_add(int i)
- 	spin_lock_init(&lo->lo_lock);
- 	spin_lock_init(&lo->lo_work_lock);
- 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-+	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
-+	mutex_init(&lo->clear_limits_lock);
- 	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
- 	disk->major		= LOOP_MAJOR;
- 	disk->first_minor	= i << part_shift;
-@@ -2140,6 +2189,12 @@ static int loop_add(int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
-+	/*
-+	 * Cancel early: the queue may already be in RCU-delayed freeing
-+	 * by the time lo_free_disk() cancels the work item.
-+	 */
-+	cancel_work_sync(&lo->clear_limits_work);
-+
- 	/* Make this loop device unreachable from pathname. */
- 	del_gendisk(lo->lo_disk);
- 	blk_mq_free_tag_set(&lo->tag_set);
 -- 
-2.43.0
+2.18.0.huawei.25
 
