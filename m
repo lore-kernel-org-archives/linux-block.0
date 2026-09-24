@@ -1,138 +1,132 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CFC372045
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 14:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4211B4A5EA1
+	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 15:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790258828; cv=none; b=BA0xh1Oc9zDQ+WWNg4DRnklKoFXjW6X9FnQZazG+ux7OcJZbbWc+h7tnE80pyhMDE8bqpEQFuatEkO3+pK/7ykFpefB2UHWMi7VNRqXfDp6Oh4GgO4kj5HEqemPL0KwSJZFk6yVOH8vAVGgeN2VnX+iFDZj0RszpxRrR/Ro/UW0=
+	t=1790265232; cv=none; b=Oc9cCuoctoewDDR/zmDRL2UHEQndNR22i7CPNUXhtc8qViI3dyX7m1HX96plWKDLWuFBnF1SFsJTXMIS5RLJOZ8IlmRoq5GtxtL7ZXqTpa1ZTByzsehq5lGJVx8v0OBv9iRLMZWBc8bTNS+vhD4TbwrVJ8tAVdkejwTjUrV94KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790258828; c=relaxed/simple;
-	bh=GC6+lg7Gi2oM3B60HChdLke11qcKRYNxpaj36DtcwJE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=k6zRYZ4r1nAoG6YPJT0LhHZbLxJuEt/9/AaTAqs9Q0fMUE0JzFw+PeSanYX+Kh/RsFNJ/tmLjbJDbv1ElAyFMJ00DVGjfQpcBGWS9+YHCTVVL/YfFYCMLh2aZ78rrGcrd33BX7aVJsXGHgoNvkG/M6Xk/IPjARDOkff/LUs1HRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LhCUVUYS; arc=none smtp.client-ip=74.125.225.140
+	s=arc-20240116; t=1790265232; c=relaxed/simple;
+	bh=wMUbxl5vt/9aakHALUb0wzH/L2TqRFPYLffnV8Cgl4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kwndrKopoTJjAXi1a8yXiAbzzKBM1iH/S/ocoq9wplhCwRbiSawPXXzOMVF5ARvK8rtrWfBNa/tDrOsxjhi+9zla0urQAIDMjmJ89443mqlgbLns5lGSNcTKf+sj9SHzrfpR5nhficPvfe5f2EpWX3tS+CE5RoNMoR+nS2kO9tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCGQz2eS; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LhCUVUYS"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49d097b4939so11865105e9.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 07:07:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCGQz2eS"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6aa13a28848so1600423a12.1
+        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 08:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790258825; x=1790863625; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=h4+moVG7ALNUHSWlTD3Rr/Ll9jrIrLEWhCFkgg7SYzk=;
-        b=LhCUVUYSPeZH+cNDphxOsZY/J1K4tXqfTxOR17XGWUQCi2wMJ6o44O4MyChpS6heOl
-         Mc4Wtg0Osx5W3MVWRImmWRfN+knhalJ8mDRK3arUSMG4VyqIAb6NGhZy5XyOU5tpq/Xq
-         BE47J3WPXYd5bZ3OM/Nw1k2jLZURNddcJWRPz+h8X0yr0LT1CR93vUetrEFT69F7HwjB
-         f3BBlfERuoGPDHJ2l/he5CBC6/dHCRDNTifRYQOXWManOV/wINKXPNbyVdAdFhgfnQzd
-         5q2sfn+/57TcFfNVQDzrAD4WHsaVoM+gx9o3h/ow0KDvMMl2q0LaucoAK/V9qcr9Ia4g
-         Lluw==
+        d=gmail.com; s=20251104; t=1790265228; x=1790870028; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=GNmm9vpoKogbEkGqMdf9XAhWMEnJbsDsb3NN6zmWdWA=;
+        b=bCGQz2eSkcQYMSbQNfLYFZiq45HlXMpEwZjtjh5ha94/5vOF0qLHpu9X/lZmf/vZXK
+         DeUHu394OYCJ6Lj32I9RPjdNdKveIfOpfEWorZhCfIEYywR+cRALMykbVEFtub5oDS2O
+         MpV7RU+rbkuShz+jA3asVlrDJ23iFlQ4iSPCrgC2ETXrn5yuRl21vE7rVYDSB5jygVhZ
+         dyoViXu0rSJrHzN+ecwAoQ1pkTwqCTYP8kzclXNL+9EdUyS7bNOcgcXqSJPkcGLBQzc8
+         HLItADMdjRIEMYD5rCPdt6ykQwa731k1tcla8CM/ahBbW8iD8Wx9Jtw/dlD8gEdJRYNb
+         Lqvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790258825; x=1790863625;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=h4+moVG7ALNUHSWlTD3Rr/Ll9jrIrLEWhCFkgg7SYzk=;
-        b=iVkpC9eb1MmZZ1VLDzfYKFSLZZDX/45ux951uLMoM1Y4mon/oAvsILFM9MA+5yVz5O
-         bXw2K8dyL7gdGzmfL+LsEHODBeJTI+HXgReD2utqSZ5gsMeZnuBqgV97DyjL1d1hvL+v
-         P5milT/KfbAp6gzmZ4bFRCefmF28gIt0FHfs0y/VTsg0jVAaKbSl/t9TOF2COD3JBKiW
-         1+C71+VslDADOLzQ2LCUb0ZHbBm5VmTQkOd3KG4tzpkAvQseecdu3fvf5R67GeEiELPJ
-         3RqSSopH5Vg+4nYuMifXQ05tL8nwOs5m5fBEhKV/0rKDvFTL4Olc6di5T0MHjYD3MqIe
-         55oQ==
-X-Gm-Message-State: AFuF++lDx63sIJtdFdu4PtycFVKstG1EycL7EP7PdDpsOHcH706bs7YB
-	b96ewXWSscT19s5zE/S0++VJHxp17veMthbgNgnkGa/f84wojb867Ss5
-X-Gm-Gg: AYBFou3FYoRp66Ho5u5jfwM7bhBTBvVXFbUkUCB3WuBKFndvqa8dbDVgAGdpYvNd3wL
-	fBNK/knr5JOLuuKXBjjOyYNFYhczqA7Op8ZPU2FfQiF9qpjV/41Vrd7694WOK2h3FZKEXsKXiVb
-	IyGyYj4OrTR76hX1NFJ9VqsACj9hUNeHbyIZCRoVFYSV9RViAo4XNAOAn8Hxp+dj4hXw6YxhXTK
-	fywNpxDhzsW8FEjmxfQn/9SpIQFMG6xFg1pSxKlLSFadGXzcDi9sMrdUQWoxo+uXTRuFGVdS48y
-	qqzyJv5EeOQX6yRmcAUp25KV19m26A10+Ldkwrk3+UJ4xP0/Qm7fXrMCAffdwnXx4BKFINgEpWM
-	jEb1toWjYMIIrKvuO3hvm+6clNR0ltuBW3N4pOZU2JsHm+c5ihSmjXnG/oZzDU/WAa2rFm/Kfwa
-	GMEh0A7miUKTaP5tSCk8Y9H8MBzXkwS9fi+wysry0yS1aQGwxUe9zbW5xy9CzWLRG7Rvlj6xTpH
-	Zs62DH65vNknJOx99FuUjJ6h+OQfgnZi1hS3mf0MONrJw/VpvkvbRAIMsvfDAOlpPsAAfDodbLV
-	1A==
-X-Received: by 2002:a05:600c:4689:b0:49f:bc8a:b103 with SMTP id 5b1f17b1804b1-49fe66841f8mr45428675e9.0.1790258824470;
-        Thu, 24 Sep 2026 07:07:04 -0700 (PDT)
-Received: from [127.0.0.2] (0xd461ec5f.inet.dsl.telianet.dk. [212.97.236.95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fe5e07bdcsm64234815e9.15.2026.09.24.07.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 07:07:03 -0700 (PDT)
-From: Malte Wechter <maltewechter@gmail.com>
-Date: Thu, 24 Sep 2026 16:06:58 +0200
-Subject: [PATCH v2] rnull: configfs: add power to configfs features
+        d=1e100.net; s=20260707; t=1790265228; x=1790870028;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GNmm9vpoKogbEkGqMdf9XAhWMEnJbsDsb3NN6zmWdWA=;
+        b=hPAIGnMYmJlGLsmU90TN/kU2N3kUJ0VprZ4uQrlK/8R1AQS+rmZs0dUBSHiAen6u2E
+         VfZvXJIRzO2+6stnqF+OL0tdBGbXpyJv2lYSZebzaKDU0h2b30FQerlu4POXBPTf7vDk
+         GL/+7V+6J/QfOfn7eqaM4nFS7tG5KjZ+6kYHc+s6jyar0BIXv0jwCLa0+ycUf5MpBhAU
+         ZKC/2fKA8zG1NloSGZD4JPapH7ysBEzVobPO0jqtnHEm1MC6ZGK5Vg0HZlW3QjXWKOhY
+         lqcjRC9I/oR3qEHz2haTKPepQEIRrZpu43mUJ7yi35Ah//vg2/aopIwAa6vN7eHEwcKb
+         F0Qw==
+X-Gm-Message-State: AFuF++mgQjPZLW3n72PewfuSQiHIjToClCN1h2SNyao0qJA7w4kDLP+9
+	Vk1oG7HVWvhpa4fX+GBx7fkn21pBAuEyWCVRSEvp+37b3c1zYkidqrYo
+X-Gm-Gg: AYBFou2uaKFYNsBUb9qzm+S7jhBFUPYKtsVYyXXV9TlG49pRsyXcZ00hper5ZsCmqpU
+	y3Rmf1fDu3kyIFJKJ6DkxKVcm3oNYtM9YiFbNAc+sJ+q9s8+GuIXiLfb9LN331u5tqygATqS3sY
+	jigt3DUrHhA+ustSP5t5qdx1sL4r/jVB3UHnoYJh/c/8HGh1/2ycUlPaWEGMrNpi7p/tK+YNRZI
+	thG0Dpfe4X50vLuwWBdDKMbbCc5LcHw2OV5XkGcs2aYCS4UeTpqd7BNA0syC1k04r2mg9KRbJ2B
+	nJk8/atHjmQ4ZN5k5EzU3/Uu3xacQj0GcxmV1Ewg2U2Wp1UEnjCAmoOneLZOQKH36E71pXRvNBW
+	Bcz5A1rkMgkdCmBQMV/kAeVnMnk+3kDmt0oTk7nnl6D+swWKqJw80ZYH/j2ZZdMcEoVb3kPfTa8
+	Xh3CIyQxT/UnCUQZ4Y6kzHH5w2d9zLpjePQ+IvhizeBD6BalhzdbIJH9nZjVbe+lTSWKnefmCvR
+	rvIlAw+cFLnkFkK3savdBkzZUErYrkqb0d/xfEvwttuMrOMhZ3Gf+auEoPaEo+9xDg4jr+ZTFMY
+	Xf//ILTL30mrsd7UiWu8ZRKCJEvK+vA4cIflJM2paXRWLdQpOQ==
+X-Received: by 2002:aa7:d94b:0:b0:6a9:c9d8:b3b6 with SMTP id 4fb4d7f45d1cf-6aac8f0ae7emr1949690a12.6.1790265228473;
+        Thu, 24 Sep 2026 08:53:48 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6aab38b2fc5sm3815784a12.27.2026.09.24.08.53.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Sep 2026 08:53:45 -0700 (PDT)
+Message-ID: <6d538f3d-dd83-4dfb-b091-9b84acf47c62@gmail.com>
+Date: Thu, 24 Sep 2026 16:53:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 06/13] nvme-pci: implement dma-buf backed requests
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Matthew Brost <matthew.brost@intel.com>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+References: <cover.1789997898.git.asml.silence@gmail.com>
+ <e80c3b1e0de004eaca6c51a2a86115ac9ed36381.1789997898.git.asml.silence@gmail.com>
+ <20260922132016.GA30684@lst.de>
+ <d39a6dd7-cb5a-43d6-8dcb-16eb9fc95b4d@gmail.com>
+ <20260923045505.GB26231@lst.de>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260923045505.GB26231@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260924-upstream-v7-3-rc3-v2-1-ca56ae7a73e9@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAIEutWoC/32Nyw6CMBBFf4XM2jFtiWBd+R+GRR8DjJFHWmg0h
- H8XcO/yJOeeu0CkwBThli0QKHHkod9AnTJwrekbQvYbgxKqEFqWOI9xCmQ6TCXmGFyOwttLobU
- 3Nhew7cZANb+P5qP6cZztk9y0h3aj5TgN4XOcJrl7//pJokQvbKGEra/K6XvTGX6d3dBBta7rF
- +c8mxXEAAAA
-X-Change-ID: 20260917-upstream-v7-3-rc3-0db5699dab30
-To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Malte Wechter <maltewechter@gmail.com>, 
- Alice Ryhl <aliceryhl@google.com>, 
- Daniel Almeida <daniel.almeida@collabora.com>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790258821; l=1634;
- i=maltewechter@gmail.com; s=20260812; h=from:subject:message-id;
- bh=GC6+lg7Gi2oM3B60HChdLke11qcKRYNxpaj36DtcwJE=;
- b=HBkxMA+FpFwazc6nsQOIkIwjEP66uRgwrFErgqQgHY2Vz3ZG7kCoducPa1Tbgc0gFq/lIGEAB
- ZU0B2/mbhfpAO3hE8VMtY5FCL6iw2ib8J9d3ZOOAMLzcmhll38DV8Bz
-X-Developer-Key: i=maltewechter@gmail.com; a=ed25519;
- pk=Ta/JQQMOW0Cbxp+yEwWqWFEyKFRyuQeSoYicwD7yvWI=
 
-features displayed by configfs for rnull was inconsistent with the
-actual features available. This correctly exposes `power` as a feature,
-which is also consistent with the C null_blk driver.
+On 9/23/26 05:55, Christoph Hellwig wrote:
+> On Tue, Sep 22, 2026 at 02:37:08PM +0100, Pavel Begunkov wrote:
+>>> Sashiko had a few comments, which I think are correct - if we use
+>>> dma_map_sg to map the data, we need to use the sync_sg APIs to
+>>> transfer ownership.  That only matters on non-coherent architectures
+>>> with MMU, but we need to get it right.
+>>
+>> I've seen that and fixed everything locally that should be fixed,
+>> apart from the sync. I wonder what we can do about that? I can
+>> somehow replace it with the sg variant for now, but sync'ing the
+>> entire possibly multi-GB mapping for, let's say, a 512B I/O, sounds
+>> not wise.
+> 
+> If we'd want to fix this for real we'd need to add an offset to the
+> sync by sg methods.  Or move away from scatterlists in dma-buf, given
+> that they are a horrible API.  All of these are bigger projects,
+> though.  So for now I think you'd want to do the sync all, and have
+> the people who run high-performance io_uring code on non-coherent
+> platforms suffer.
+> 
+>> And I can think of another place that does mix sync_single
+>> with sgs.
+> 
+> Which one?
 
-Fixes: d969d504bc13 ("rnull: enable configuration via `configfs`")
+All the recent networking zero-copy / dma-buf apis.
 
-Signed-off-by: Malte Wechter <maltewechter@gmail.com>
----
-Changes in v2:
-- Add fixes tag
-- Link to v1: https://patch.msgid.link/20260917-upstream-v7-3-rc3-v1-1-d0b620bf82c9@gmail.com
-
-To: Andreas Hindborg <a.hindborg@kernel.org>
-To: Boqun Feng <boqun@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-To: Alice Ryhl <aliceryhl@google.com>
-To: Daniel Almeida <daniel.almeida@collabora.com>
-Cc: linux-block@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/block/rnull/configfs.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 32c10c3f4d0fd7..5f1cdd54cf48aa 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -35,7 +35,7 @@ impl AttributeOperations<0> for Config {
- 
-     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-         let mut writer = kernel::str::Formatter::new(page);
--        writer.write_str("blocksize,size,rotational,irqmode\n")?;
-+        writer.write_str("blocksize,size,rotational,irqmode,power\n")?;
-         Ok(writer.bytes_written())
-     }
- }
-
----
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
-change-id: 20260917-upstream-v7-3-rc3-0db5699dab30
-
-Best regards,
---  
-Malte Wechter <maltewechter@gmail.com>
+-- 
+Pavel Begunkov
 
