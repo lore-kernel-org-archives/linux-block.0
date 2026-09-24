@@ -1,259 +1,159 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2EB18B0A
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 02:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790218557; cv=none; b=R54Ob9cYQl0hsPfrOh33AfGtM5Jq34giKuKOGaY+ysoCBzv7PIgsd+ikuXAqKGc3a/eROhOktbS2LnwBg+J9ttMnG8t2XMg03F/ItcQKwe4fncfA3X6/Wbyn8Kfrb8Yax4aU3v8vmn5HpdrSGJg3QkqNjYSwsns7TvFj/GJ5/e4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790218557; c=relaxed/simple;
-	bh=5W8ySdelCPBPMU3yxu92T7qKOlLN3Eps8rGXJRVpONQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hEIYN0A2IutUqhXLUSnjWkrSxetJ3A8Rvy50LtWiSn/NErzAMrn1wENvBkMM33xK0RBzrP7j7gXYzrx7ZpLdP8GJ+uP9DLsOw0R6YcFID0HbPYkUQtSvHT+H/HTit4Pf/Dvjo5kz2Oezvb6zwWpBD8L6gtsUvZdqJwOBQqOxHbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=MUpItQaE; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857E51DE8AE
+	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 03:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790219485; cv=pass; b=s/EXXylbnzZyBDJ+qO71nzx9U4he5uwrsjssH0n07Em1XXy2bt/rxNsKIgdeiuXafiaEnuKjq3SgMdtZOM/gul6ALWXEZptXx+r9KeeqAYK6k6OFPxAb3jIBpPbsqnv0GJmAptassvqnRLQaFFFFkd+OQlk87/RCP+BUziXx27k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790219485; c=relaxed/simple;
+	bh=2j1C56GM8BFyvZlQYTWpHHylUYR90lKGt/E8S17eoYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fpHL0Wybk7y9NrycgkhZx0nuhocINvuS1W239udbjb6rpFyRH+2cZLbsICx/xoDTg6BB+1ykiwMIDSnUiqmh2mPxLhsljbRja+mdAQ1vHOUCTswShHEYEPyZa/BDm5jYkK3celI44bwM27rvzCkWjBy3agthNz8cL4wtArP1YG8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TfXqSMba; arc=pass smtp.client-ip=74.125.231.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MUpItQaE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=qf
-	rkj9l+kENoufd6Ok0K4V6UDAKalm/KqrpKYXx4bbo=; b=MUpItQaEhuVakTmYrb
-	Nq3SbT4J5yJKq57thdAJm/loxWlZ2w8r3Rre8j/12RecT7smEQI6Ezf4mhLZYXnR
-	5/MsXGpGVKyTb0Nw8xWTLRl5V9j0kZbK6tDx2P+XKp1SUNa/3fxrM65nKAr7Frw0
-	xk9BcbAhkFL70D+KfUeSHa924=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgDX394ikbRql94HBA--.62560S2;
-	Thu, 24 Sep 2026 10:55:31 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH blktests] block/049: test polled dio with user PI metadata
-Date: Thu, 24 Sep 2026 10:55:26 +0800
-Message-Id: <20260924025526.298050-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfXqSMba"
+Received: by mail-oo2-f43.google.com with SMTP id 006d021491bc7-6b1ae6f5fc7so889688eaf.3
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 20:11:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790219481; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QTSVq7oVzufPabZ7sSNBv5SUdgMc/RIHORSO8Ohamo9DMLKQAUjvTO7/QsawlDRt60
+         rWPnK6weDqAQfaPj+5HVZQt2F8vS+dhGZttJ/aWTD8GU3UARJJZMiv8HzQDBEwPO9hVS
+         UlmqtZyE+/AEdkmJPqvZOccATmzZRpJyb2g8VsHfhxD/FM4IU1QCbNfN4a0e9qQg6CdJ
+         RIpKIsevZVPTXjz5UTAl+4gHAJg+aa4EozBvb2hBy5KchB+N2U3k89SutauK1A8fk7uG
+         6opBbaqUB02DM9BQn2KvZ144vtABRjhhDJo393F5DT31dkk7qt2A2ctOFoSC6cbjDQH5
+         3UUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
+        fh=TJyzGoT3ToiKEgSON9lNdNani5ajzxr5s/WG5CJsqcg=;
+        b=c19ZSPsYxizrViCKJ9C85mcyR2t767uwYTDXAeiIFD8KeAmLaygXXhD2p8HOr1l7jF
+         WmYHpzQlRthmtmL26gBNj9Y2Jp/2VCInyY6ECNY/cXyUn8YSqvi6fJU6sNSmj9Q8fJsZ
+         dDkvCztVAaZt3BkH4qqgsOuPkLGynx85huhR10i46aQQWhHDvLNSvA2wRwS8zN9XRno8
+         OHhCO2E3a91UUQODC6dpZGHYAS1/RfPlJ97BxLvMK0gP6yBFF+K5SkADjOCkV2xQxkVM
+         iarIAXFG5GoarGYYpWOnW8w4XO+RwDwyC+3V4zk3lYEps+vxSRqeCW5TvvxDGK1TC2iN
+         xOGw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790219481; x=1790824281; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
+        b=TfXqSMba54WY0GY9oG64XNy49goW9EVXAFyjh7WC4AZVqRdm3u/GTi1IwwKPRhyIwL
+         LvNzKzpuefIdNAcE62z5F9SREPZvOwQFLtd+xyRcpwzDu6BBtJsVXfyqhXjUQHxDzbXI
+         bW9lMHZEuOe8bFseU9nwPOvFyOvgovvTy6Q9Je7hgqollxdXr5opszCr0JgfHIkebxJB
+         rZpHGDNe0/0x2tjDPflDwf6txNRVSMtTGFajO7Ef0WXzfi3G+BhEypTfDHeE4ql0i6Cn
+         kZcjvC8celmEJQcYXM3xw3qzlXOpynCRP3bssN7aTQ4s0c8ED34hVRVejhNe/Za7yeUU
+         4DXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790219481; x=1790824281;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
+        b=dYXSAG4puEDjiXVj2n65qZVni1VMV+HjC9bOeprVv+FJq7hX3vpNIkU2Cu5yavJUj5
+         RacZlvXm4b+1f9tIcJyp+FA256ugqVCRS+10rLkkfBV/1qt9l6N5ogGj/8UbY0GWhgSd
+         w9qgQ0bs7pTTFyj6SnFMf+8472UVzh+a+xUMXziQrVx23wnyOXmCnwvXUCEGv5DrM0ge
+         ZACHHsI86RnYis5lblug3GbsbWBOD0cVxx9+yqY8vuPzww/YauOaJO6PO/mZhuyQJYnw
+         XQ4s4Q0uvhMRkCL7zcKR9kGV59FxOtWtuOboazV1u5Cw5j2AA9Rfj3RMitm2A2RmnMc9
+         rarw==
+X-Forwarded-Encrypted: i=1; AKwUvBy7Arh6DZWmJpWAvfkNsY49i2gqG8rcefxQuLpkQi5OMWzI70sf67hFYf7lhqE7UD4oXdcktraZBuavLA==@vger.kernel.org
+X-Gm-Message-State: AFuF++npVcISDg90VVWLQOLesKhkmM8f+yjM2P6kb5cs1ukjpodk/GP5
+	UwFIv1TKZvROGqBbltdLpPijAhc7tfs51YnMj7AvrvHZCcRdT8dNlS3UkZaHHhD9P/6dy1jAYrb
+	QE+rY3JqjUhhEg5bdR20eLhuAUjWPLtA=
+X-Gm-Gg: AYBFou3LQOMJpvyALaPNncq7VZX+ObpMufm1Bep7/hl806D3e7lWCMFhwlaCbH6MZVQ
+	vJOW4Rb81Z3npG8/NvBaxF1oAV4ABszIIgOypDzq7GtigQSJqHYmm6jp7kTy0rWUpYxBmEvt4va
+	iit71KPjEHdxpyMCjeO79g+x0cUVbH6SLip5qGygF2j5/SaQNW4BZVEwx0zX6Gqtr/WtNfhqgW0
+	iiGiN+w1KaI4bcjNFijDwp+YvB2mFLOYloxz8EdCphD2LL29vtDyNWxH08aS0ziMJibK13p0jeE
+	KNkLUMipt3ct4+vJDsfNXX+dooQ5NKcK9VUDtBKeb6OvUamOMTxS45LookkxuykqxiJcwSOXHXG
+	BWoaxQliowjVyJqudM9GhP1C/TX70QGEf8h6ActMppLEr9hbaOhivJNA=
+X-Received: by 2002:a05:6820:3092:b0:6c9:83aa:6fbd with SMTP id
+ 006d021491bc7-6d4416aaba1mr1152652eaf.66.1790219481377; Wed, 23 Sep 2026
+ 20:11:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgDX394ikbRql94HBA--.62560S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Jw1rAF13GF1xKFy8AryUtrb_yoW7Wr47p3
-	yFqFyrGrZ7Kr17XF93AF43uFyrAa18u3y7XFZF9w1jyryavF9Iyr4xKry5XF98JrWfWayU
-	Aws2qFZ0kr4DXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UU-BiUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6gQ1xWq0kSRZFAAA34
+References: <179010105967.8478.2344875677216734809@proton.me>
+In-Reply-To: <179010105967.8478.2344875677216734809@proton.me>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 23 Sep 2026 22:11:10 -0500
+X-Gm-Features: AclHuK_hx_9XpVaJnWKId8Vpv3AIeuVNOuhwsC5qOUuULKOEPF9dmpRXHbPPP8c
+Message-ID: <CACVXFVNi5E2Anxs5-EwevS+srqv2_D0bp3NJJv_hzM6pBNBWeA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: hold RCU read lock in ublk_try_buf_match()
+To: Paolo Bertinetti <paolobertinetti200f4@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-IOPOLL combined with a PI attribute used to leave iocb->private as a
-uio_meta and oops in bio_poll(). The kernel rejects that combination
-with -EOPNOTSUPP. Add a scsi_debug reproducer that expects this result.
+On Tue, Sep 22, 2026 at 1:17=E2=80=AFPM Paolo Bertinetti
+<paolobertinetti200f4@proton.me> wrote:
+>
+> syzbot reports a lockdep splat when I/O is dispatched to a ublk device
+> with UBLK_F_SHMEM_ZC enabled:
+>
+>   WARNING: suspicious RCU usage
+>   lib/maple_tree.c:720 suspicious rcu_dereference_check() usage!
+>   ...
+>   Call Trace:
+>    mas_root lib/maple_tree.c:720 [inline]
+>    mas_start+0x3cc/0x640 lib/maple_tree.c:1250
+>    mas_state_walk lib/maple_tree.c:3006 [inline]
+>    mas_walk+0x1db/0x490 lib/maple_tree.c:4458
+>    ublk_try_buf_match drivers/block/ublk_drv.c:5639 [inline]
+>    ublk_init_iod+0x5d2/0x1120 drivers/block/ublk_drv.c:521
+>    ublk_dispatch_req+0x97/0x9c0 drivers/block/ublk_drv.c:1776
+>    tctx_task_work_run+0x73d/0xa80 io_uring/tw.c:96
+>
+> ublk_try_buf_match() calls mas_walk() on the buffer tree without
+> holding the RCU read lock or the tree lock. Writers are already
+> excluded because ublk_lock_buf_tree() freezes the queue, so there is
+> no real race, but maple tree readers must still hold one of the two.
+>
+> Take the RCU read lock around the walk.
+>
+> Fixes: 4d4a512a1f87 ("ublk: add PFN-based buffer matching in I/O path")
+> Reported-by: syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Db48868c46e62c1c4cb2c
+> Assisted-by: LLM
+> Signed-off-by: Paolo Bertinetti <paolobertinetti200f4@proton.me>
+> ---
+> syzbot tested this patch [1]: the RCU splat is gone, but the reproducer
+> then hits the already open "WARNING in io_wq_put_and_exit (2)" [2],
+> which syzbot has been reporting since May on kernels without this change.
+>
+> [1] https://lore.kernel.org/all/6ab1eabe.71f81b7d.15fa6d.003b.GAE@google.=
+com/
+> [2] https://syzkaller.appspot.com/bug?extid=3Db0d54b9e81de55179e47
+>
+>  drivers/block/ublk_drv.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 66eb55e71..7a64745e1 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -5628,6 +5628,8 @@ static bool ublk_try_buf_match(struct ublk_device *=
+ub,
+>         unsigned long expected_offset =3D 0;
+>         bool first =3D true;
+>
+> +       guard(rcu)();
+> +
 
-Assisted-by: LLM
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
-Depends on the kernel fix that rejects IOPOLL plus user PI metadata
-with -EOPNOTSUPP. Without that fix this test oopses in bio_poll().
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-Link: https://lore.kernel.org/linux-block/20260923093732.1504291-1-yangxiuwei@kylinos.cn/
-
-The fix is not in mainline yet. Is an oops on kernels without it
-acceptable here, or how should the test avoid that? _have_kver after
-the fix lands would still skip a stable backport, which keeps the old
-version number. The only userspace difference is -EOPNOTSUPP versus
-the oops.
-
- src/Makefile          |   1 +
- src/metadata-iopoll.c | 101 ++++++++++++++++++++++++++++++++++++++++++
- tests/block/049       |  46 +++++++++++++++++++
- tests/block/049.out   |   2 +
- 4 files changed, 150 insertions(+)
- create mode 100644 src/metadata-iopoll.c
- create mode 100755 tests/block/049
- create mode 100644 tests/block/049.out
-
-diff --git a/src/Makefile b/src/Makefile
-index dd64694..1e571c6 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -31,6 +31,7 @@ C_TARGETS := \
- 	zbdioctl
- 
- C_URING_TARGETS := metadata \
-+	metadata-iopoll \
- 	nvme-passthru-admin-uring
- C_UBLK_TARGETS := miniublk
- 
-diff --git a/src/metadata-iopoll.c b/src/metadata-iopoll.c
-new file mode 100644
-index 0000000..95e2bc9
---- /dev/null
-+++ b/src/metadata-iopoll.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-3.0+
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <signal.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <liburing.h>
-+
-+#ifndef IORING_RW_ATTR_FLAG_PI
-+#define PI_URING_COMPAT
-+#define IORING_RW_ATTR_FLAG_PI (1U << 0)
-+struct io_uring_attr_pi {
-+	__u16 flags;
-+	__u16 app_tag;
-+	__u32 len;
-+	__u64 addr;
-+	__u64 seed;
-+	__u64 rsvd;
-+};
-+#endif
-+
-+#ifndef IO_INTEGRITY_CHK_GUARD
-+#define IO_INTEGRITY_CHK_GUARD  (1U << 0)
-+#define IO_INTEGRITY_CHK_REFTAG (1U << 1)
-+#endif
-+
-+#define DATA_LEN 4096
-+#define META_LEN 64
-+
-+static void on_alarm(int sig)
-+{
-+	(void)sig;
-+	dprintf(STDERR_FILENO, "timed out\n");
-+	_exit(1);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct io_uring ring;
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring_attr_pi pi = {
-+		.flags = IO_INTEGRITY_CHK_GUARD | IO_INTEGRITY_CHK_REFTAG,
-+		.len = META_LEN,
-+		.seed = 1,
-+	};
-+	void *data, *meta;
-+	int fd, ret;
-+
-+	if (argc != 2)
-+		return 1;
-+
-+	signal(SIGALRM, on_alarm);
-+	alarm(10);
-+
-+	fd = open(argv[1], O_RDONLY | O_DIRECT);
-+	if (fd < 0) {
-+		perror("open");
-+		return 1;
-+	}
-+	if (posix_memalign(&data, 4096, DATA_LEN) ||
-+	    posix_memalign(&meta, 4096, META_LEN)) {
-+		perror("posix_memalign");
-+		return 1;
-+	}
-+	pi.addr = (__u64)(uintptr_t)meta;
-+
-+	ret = io_uring_queue_init(8, &ring, IORING_SETUP_IOPOLL);
-+	if (ret < 0) {
-+		fprintf(stderr, "queue_init: %s\n", strerror(-ret));
-+		return 1;
-+	}
-+	sqe = io_uring_get_sqe(&ring);
-+	if (!sqe)
-+		return 1;
-+	io_uring_prep_read(sqe, fd, data, DATA_LEN, 0);
-+#ifdef PI_URING_COMPAT
-+	sqe->__pad2[0] = IORING_RW_ATTR_FLAG_PI;
-+	sqe->addr3 = (__u64)&pi;
-+#else
-+	sqe->attr_type_mask = IORING_RW_ATTR_FLAG_PI;
-+	sqe->attr_ptr = (__u64)&pi;
-+#endif
-+	ret = io_uring_submit(&ring);
-+	if (ret < 1) {
-+		fprintf(stderr, "submit: %d\n", ret);
-+		return 1;
-+	}
-+	ret = io_uring_wait_cqe(&ring, &cqe);
-+	if (ret < 0) {
-+		fprintf(stderr, "wait: %s\n", strerror(-ret));
-+		return 1;
-+	}
-+	if (cqe->res != -EOPNOTSUPP) {
-+		fprintf(stderr, "cqe %d\n", cqe->res);
-+		return 1;
-+	}
-+	return 0;
-+}
-diff --git a/tests/block/049 b/tests/block/049
-new file mode 100755
-index 0000000..b932414
---- /dev/null
-+++ b/tests/block/049
-@@ -0,0 +1,46 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Yang Xiuwei <yangxiuwei@kylinos.cn>
-+#
-+# IOPOLL combined with a PI attribute used to oops in bio_poll(). The kernel
-+# rejects that combination with -EOPNOTSUPP.
-+
-+. tests/block/rc
-+. common/scsi_debug
-+
-+DESCRIPTION="iopoll dio with user PI metadata returns -EOPNOTSUPP"
-+QUICK=1
-+
-+requires() {
-+	_have_kernel_option IO_URING
-+	_have_kernel_option BLK_DEV_INTEGRITY
-+	_have_module scsi_debug
-+	_have_src_program metadata-iopoll
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_scsi_debug dif=1 dix=1 dev_size_mb=64 sector_size=512 \
-+			submit_queues=2 poll_queues=1; then
-+		return 1
-+	fi
-+
-+	local dev="${SCSI_DEBUG_DEVICES[0]}"
-+
-+	if [[ "$(<"/sys/block/${dev}/queue/io_poll")" != 1 ]]; then
-+		SKIP_REASONS+=("scsi_debug has no poll queue")
-+		_exit_scsi_debug
-+		return
-+	fi
-+
-+	src/metadata-iopoll "/dev/${dev}" >>"$FULL" 2>&1
-+	local rc=$?
-+
-+	_exit_scsi_debug
-+	if ((rc)); then
-+		echo "metadata-iopoll failed"
-+		return 1
-+	fi
-+	echo "Test complete"
-+}
-diff --git a/tests/block/049.out b/tests/block/049.out
-new file mode 100644
-index 0000000..c88edfe
---- /dev/null
-+++ b/tests/block/049.out
-@@ -0,0 +1,2 @@
-+Running block/049
-+Test complete
--- 
-2.25.1
-
+Thanks
+Ming Lei
