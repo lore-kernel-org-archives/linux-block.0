@@ -1,194 +1,305 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ed2-f12.google.com (mail-ed2-f12.google.com [74.125.228.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5F73AE6F5;
-	Thu, 24 Sep 2026 10:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790247483; cv=none; b=dlXRcZwutyhtIYBrt023SOS+hA1u7Ae80yJj98wzI/msXEjiIvrAjGGODadIHejMzwKcVWJj4QU+0AdX8X6QL3p1cvWMQSB2h7MsfuOs50ybmq+392v/x+C1ZFlfkMVXuxR0KT+Q1JlYKY3sGfQWhJzCC5YfrCPfVKgebXY0im0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790247483; c=relaxed/simple;
-	bh=9o3NzcqvOIGdzBOEsIKCWMcka79vw2gyCaYu5ehMNUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ia10jS6XIPaSMqYLyLazPaVR1wXMdakPpRS9RHFukEoXiBeG17tVFx89t20OzFPwk7/h3lw7vZFqP95oZsCs6//KDr+HWvDyH5ToxfXxiUo6diSZa4fyPkX+DufPNyfTFwkrgAD8dOV4LzF7mmfMblLQbT6hpq0+oOJi2Cvge10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=XK2yhAGH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WWHHdk7E; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NdRYl4RN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5ms3zhBK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECDE4756B1
+	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 11:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790248382; cv=pass; b=VKw3d8lW+l1b1uyJ8SYHyBbV5FyKV3dBrQ5GxC7avyIO7AxvbNLOmo1t4Vt5AYzbo9kAS+FWxbm3BFCdJe++sd+o9wmqg3ofPeoLzylupxuj9hfxNE9r7XvPKQpkmsmQMzEO0Dkc7faSJqr95rqnw3EHfaESo6DEoM3IsDaIcwE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790248382; c=relaxed/simple;
+	bh=eJYqN4wEoL/OX9Q03eUTbGvGTyg+Jo8gjHizQ3XF3AE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s4w8hcI79BWnTCccHabEY5juHReOJRs6p3CCwVV8RcmxAVgR3tJ/0oT9mUcvSoGKT1Rv6k8J1ln87MImJkkDM1yvzrL5buVI+32Uay+GHV2DkKlZgaGpgZSUWlJzsk/zxps48XKwUMApQw3/hEjbXT9jxuPd8wJ1fWtKzZ+ZuPE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UO5XdKUV; arc=pass smtp.client-ip=74.125.228.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="XK2yhAGH";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WWHHdk7E";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NdRYl4RN";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5ms3zhBK"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1CFC021EFA;
-	Thu, 24 Sep 2026 10:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1790247475; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FbmFn96Dr7Y82qM5io19+Dl7w0OLn9pRCPxXUR9XU3U=;
-	b=XK2yhAGHuRe7loDBoUcmiUjhc3jq+AXGRrtCd26aJMsjCpTjTc50RShuhwIDHku3jpoWto
-	l1fAXLYwqeP2zyTn2oNluiPnUzJEhgh9G8qbngwDg9asFA4FKm693CiJCW5sg7w6Poyklp
-	LA82k2G59tmY2/Ikt3DdPOx8V2Vre6A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1790247475;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FbmFn96Dr7Y82qM5io19+Dl7w0OLn9pRCPxXUR9XU3U=;
-	b=WWHHdk7EANbYYRDXkfinNben5xPkYcXFY49Uj+pTr9iqE9goZWHi6IH6WmhhRaA72XJ06x
-	OxGEK2me0Dcj8dCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1790247471; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FbmFn96Dr7Y82qM5io19+Dl7w0OLn9pRCPxXUR9XU3U=;
-	b=NdRYl4RNFwYn4+r8u8oUBD2piXAAKS7IlbEEr1LFQzjcq8vhhNJqWmmQ8toqMkym/N8Y3F
-	dKxPbGkMRIPxdbM3jUgWAiVErkGA9URGXf0na+WXKgWreLRY1cjwu1/6lACocTgg03ua3R
-	A8ImfD5/x7S1kzmp+y6vA5bvGIheXF0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1790247471;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FbmFn96Dr7Y82qM5io19+Dl7w0OLn9pRCPxXUR9XU3U=;
-	b=5ms3zhBK/LwkYNAoYxufp9jcZMjN6u9w+T+22YHBrKfJ08UiDsN9qQi6DxM1ofTTXYk3Ry
-	d64Cwu5WvYr3uWBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E926713668;
-	Thu, 24 Sep 2026 10:57:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mVg4MC4CtWpeAgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 24 Sep 2026 10:57:50 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 8B114A132E; Thu, 24 Sep 2026 12:57:46 +0200 (CEST)
-Date: Thu, 24 Sep 2026 12:57:46 +0200
-From: Jan Kara <jack@suse.cz>
-To: Julian Sun <sunjunchao@bytedance.com>
-Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, axboe@kernel.dk, 
-	hannes@cmpxchg.org, mhocko@kernel.org, roman.gushchin@linux.dev, 
-	shakeel.butt@linux.dev, muchun.song@linux.dev, willy@infradead.org, jack@suse.cz, 
-	tj@kernel.org, akpm@linux-foundation.org
-Subject: Re: [PATCH v8 1/3] block: introduce bdev_flush_by_dev()
-Message-ID: <sb2ptqety3wgay5egv4otva2s7hdvztifhsealwqpdnw5nyprc@ceu2bsedj4wy>
-References: <20260922125015.3435215-1-sunjunchao@bytedance.com>
- <20260922125015.3435215-2-sunjunchao@bytedance.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UO5XdKUV"
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a9984f9adcso3342481a12.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 04:12:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790248376; cv=none;
+        d=google.com; s=arc-20260327;
+        b=okz02r0KuDPwONswL8k/+vcepwhnqbpLCHX9LO7i1aoj86bXjZgAsBcADY9rd9L6C7
+         cTthMyEuZv0jlFKlQxBQzy61loQB1kCn5ULzZoShZJFT4pqpzpwq71b4Zj83l1xv1Vr2
+         gmqIN8rImZU1xxjHUxV6EhNPW/dtlPMcmwy54MtiyxyoVDqwyo0wKZeWmGybb4T5C+ih
+         PbqZI69zIJ0g5/f7juzno8LQubbf88K6VLtxeWVJz3ePTBRmXRk9xJyn5w54YxpxX+jy
+         wT0fCUeJ/CCKrWAuNfbGUG5RFJINEwmurLNPtDEZaWPp8ZXEdKA//ETaPqdjs03LtAQ1
+         ykPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BIF+DNqqKyKNEhEgpncpLAUjcdtzT9Ko8rcMz3NbVVk=;
+        fh=f6ZUm8iMTIenEGTSSd0bwoUVdLgQzaHFU0b7fAy16+8=;
+        b=LVKgyJ4TjwsL95YbRhZxfn0W1vnc/8U3iqrOswqGKpggRTUDra8m4Z/NrFmqsx/m4G
+         ZPzfs3n+b8J1J+0jYXBtsHdJRSRYWx2vlDpWHDbnT2YWBjNbodi/qVek4auwlLZ3LyuV
+         1Z6ZNidnYbHyKAzHdo3XhcgDxx95fzBPx+RRIdYW0T8wFBB5gKNcDKGyvT4M1DuD5Boq
+         5BKdmKnQtp6rvaBEVXfd6iOyA0isX31AMmOXUN5JjLv6PN3GeDPGzWJyxY+Go/fU72jN
+         c/xtckTS8IZNhKQ/bKLBH8wYXXK9oyjcF/L5Kw4qGf58XwG7YgEUwM4f79gMIgH853eb
+         VvdQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790248376; x=1790853176; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=BIF+DNqqKyKNEhEgpncpLAUjcdtzT9Ko8rcMz3NbVVk=;
+        b=UO5XdKUVr0Tnk1hLWi6U3CPXLr93cZu/hKzPqXOfEb9XlRA0iR/adpDePOfLdoKpvd
+         5FjwlmLvQrvCHJHg4or9JvxUYzyPNL/Sb8ina3N19bebDtjEHcwJ9zjGwVAo7aKkRYeg
+         5LjvvdEApWh+gyHuf9RPlsIA0p9I4kErydeF8UZief7e6N/lRrhKU05VI8G/DZxVQLjO
+         7dMo/uOT+lVUArZxkGK+U+g2aqzCdtgO+FJravKU2rX05b5uYT6H0/8dxVEGWexA3sYf
+         giEgTf65NfSGtsvwzw3VsVMbuPP3Enl/KJAZea0xDbpy6OQbqaD+47wmAUhOpUZCqNZR
+         EP2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790248376; x=1790853176;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BIF+DNqqKyKNEhEgpncpLAUjcdtzT9Ko8rcMz3NbVVk=;
+        b=cfcJtEWSqthDpZcNwkeqjvEgFLQNZwj2d1WGVsYJd1T1ghYmbEfKfoS5m3NFbc2NCW
+         /JpgR2FXal+dr0CFz51AuFH2ESqTcBgqTnx8BmePXzclqnDmRgawWreWDMePEazrSGWa
+         J+irVcdB10bxFontX3hXckQ9QK3ekIO3vtEy/nNCjkiUo80t60wEhEkSpm95KV1/i/Xf
+         hgL65094FIyd3w++H0nhj+ZcsPdUV73nb1oNWqLH1Z64bwBW9T3giaxdJKdoJmcr+Jqk
+         8jwaiQ1/RlJu3BBu59OyTLX39y09LsutSKo3m6U4HB0HeBBYWheZHhpzdiIkvDp1+hhZ
+         497w==
+X-Forwarded-Encrypted: i=1; AKwUvBwnhw4+lFX/5hCim2durT20JAezm6Q9qZ+ZKqvCuzBexeR6EY6bzmY2ar4gbV7OoFkxlZwhfpavzkFy2A==@vger.kernel.org
+X-Gm-Message-State: AFuF++lZD/ZQDh/Lc8dVX0pgiMweVqJGoTN0a0W75TgTFnmnqXcpI389
+	0C+hCUw52U/qgY7H505v/20yrAqhTWwfTp4rp5u88FMq1lZjeIGtqeeOpJkZLA8iqGa2bRTIsLl
+	pcFRivgJ9zDOROcLEQeo7AxhV7vZdBJc=
+X-Gm-Gg: AYBFou2jTbrzK1UjuwyuwwqC8QvWVZH40hDZi8ujXC4MtUnOE7G5q4kGGWzkRlx89MZ
+	1T6aoWU/Z4WVPcVwA0DOUy2K3Pugm1/f9+tpX4fbik8/DwJHHt1sCWZt10ovc2kalgXetHtfHHQ
+	V+6lWnpeJuqVC+vtGWAypLAaPOXI+QcRDTmFOcjNvNxhB2HnNpM9vIVk59PLPd698sDMk6/4eTX
+	GpeRuNTex4BfgKFIasRvsg+ClIdmNgIMXDcoI7WRfGKRA01pfImdXmpH58faLIsA/41LLvLdvwM
+	u6SkyqyL31+U2PeWdZwtCgJaDyvE4KCl3lvitKCyHZeC7BNEGdiw4xN9
+X-Received: by 2002:a05:6402:278f:b0:6aa:665:830 with SMTP id
+ 4fb4d7f45d1cf-6aac8f4be3bmr1951363a12.15.1790248376170; Thu, 24 Sep 2026
+ 04:12:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260922125015.3435215-2-sunjunchao@bytedance.com>
-X-Spam-Score: -3.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email]
-X-Spam-Flag: NO
+References: <20260924104831.1081137-1-caixinchen1@huawei.com> <20260924104831.1081137-4-caixinchen1@huawei.com>
+In-Reply-To: <20260924104831.1081137-4-caixinchen1@huawei.com>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Thu, 24 Sep 2026 13:12:44 +0200
+X-Gm-Features: AclHuK814JZB8XXMibt7ISdY9GmULY6F59LGn_JEl7Ybs7QawxIOFdTv7Ii5ZE4
+Message-ID: <CAOQ4uxhMhcxq5+crz84f8xj+Wi1bHhNqa_TecP-RvipheBR+ug@mail.gmail.com>
+Subject: Re: [PATCH RFC -next 03/12] fs: pass struct path to xattr helpers
+To: Cai Xinchen <caixinchen1@huawei.com>
+Cc: mic@digikod.net, gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, corbet@lwn.net, skhan@linuxfoundation.org, 
+	rdunlap@infradead.org, gregkh@linuxfoundation.org, rafael@kernel.org, 
+	dakr@kernel.org, dlemoal@kernel.org, hch@lst.de, axboe@kernel.dk, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
+	dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org, 
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com, hirofumi@mail.parknet.co.jp, 
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name, okorniev@redhat.com, 
+	Dai.Ngo@oracle.com, tom@talpey.com, miklos@szeredi.hu, 
+	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, zohar@linux.ibm.com, 
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, 
+	stephen.smalley.work@gmail.com, omosnacek@gmail.com, casey@schaufler-ca.com, 
+	nanx95726@gmail.com, djwong@kernel.org, daniel@iogearbox.net, 
+	linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, exfat@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	xiujianfeng@huawei.com, lujialin4@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue 22-09-26 20:50:13, Julian Sun wrote:
-> Add bdev_flush_by_dev() to submit page-cache writeback for a device
-> identified by dev_t without requiring callers to hold a persistent
-> device reference.
-> 
-> A subsequent patch will use this helper to flush foreign bdev mappings.
-> 
-> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
-
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
+On Thu, Sep 24, 2026 at 12:22=E2=80=AFPM Cai Xinchen <caixinchen1@huawei.co=
+m> wrote:
+>
+> vfs_setxattr(), vfs_getxattr(), vfs_listxattr() and vfs_removexattr()
+> along with their __vfs_setxattr_locked()/__vfs_removexattr_locked()
+> counterparts and the do_setxattr()/do_getxattr()/listxattr()/
+> removexattr() syscall helpers take a struct mnt_idmap and a struct
+> dentry even though callers either already hold a struct path (or a
+> struct file) or have to pass &nop_mnt_idmap because no idmapped
+> mount is involved.  Switch them all to take a struct path instead
+> and derive the idmap and dentry from it where needed.
+>
+> __vfs_setxattr_noperm(), __vfs_getxattr(), __vfs_setxattr(),
+> __vfs_removexattr() and vfs_getxattr_alloc() keep taking the idmap
+> and dentry as they are only called from contexts that operate on
+> bare dentries such as LSM internals.  The SELinux and Smack
+> inode_setsecctx implementations now pass the path they got from the
+> previous patch straight through.
+>
+> The security_inode_*xattr() hooks invoked from fs/xattr.c keep
+> taking the idmap and dentry for now; they will be converted together
+> with the LSM hooks themselves in separate patches.
+>
+> evm_calc_hmac_or_hash() contains a redundant xattr size sanity check
+> which calls vfs_getxattr() only to emit a debug message when the
+> kernel-side and user-space-side xattr sizes differ, without ever
+> influencing the result.  Because that function only has a dentry, the
+> call cannot be migrated to the new path-based signature; drop the
+> check and the now unused user_space_size variable instead.
+>
+> Assisted-by: opencode: glm-5.3
+> Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
 > ---
->  block/bdev.c           | 18 ++++++++++++++++++
->  include/linux/blkdev.h |  4 ++++
->  2 files changed, 22 insertions(+)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index cd8323083740..c7c192af6262 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -264,6 +264,24 @@ int sync_blockdev_nowait(struct block_device *bdev)
->  }
->  EXPORT_SYMBOL_GPL(sync_blockdev_nowait);
->  
-> +/**
-> + * bdev_flush_by_dev - attempt writeback of a block device's page cache
-> + * @dev: target block device number
-> + *
-> + * May sleep while submitting writeback; does not wait for I/O completion.
-> + */
-> +void bdev_flush_by_dev(dev_t dev)
-> +{
-> +	struct block_device *bdev;
-> +
-> +	bdev = blkdev_get_no_open(dev, false);
-> +	if (!bdev)
-> +		return;
-> +
-> +	sync_blockdev_nowait(bdev);
-> +	blkdev_put_no_open(bdev);
-> +}
-> +
->  /*
->   * Write out and wait upon all the dirty data associated with a block
->   * device via its mapping.  Does not take the superblock lock.
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 4f7905c3412b..27afe3ff6fb5 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1710,6 +1710,7 @@ void invalidate_bdev(struct block_device *bdev);
->  int sync_blockdev(struct block_device *bdev);
->  int sync_blockdev_range(struct block_device *bdev, loff_t lstart, loff_t lend);
->  int sync_blockdev_nowait(struct block_device *bdev);
-> +void bdev_flush_by_dev(dev_t dev);
->  void sync_bdevs(bool wait);
->  void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask);
->  void printk_all_partitions(void);
-> @@ -1726,6 +1727,9 @@ static inline int sync_blockdev_nowait(struct block_device *bdev)
+>  drivers/block/zloop.c               |   4 +-
+>  fs/cachefiles/xattr.c               |  32 ++++----
+>  fs/ecryptfs/inode.c                 |   8 +-
+>  fs/nfsd/nfs4ctl.h                   |   4 +-
+>  fs/nfsd/vfs.c                       |  57 +++++++-------
+>  fs/overlayfs/copy_up.c              |   4 +-
+>  fs/overlayfs/overlayfs.h            |  18 +++--
+>  fs/overlayfs/xattrs.c               |  13 +++-
+>  fs/smb/server/smb2pdu.c             |  75 +++++++------------
+>  fs/smb/server/smb_common.c          |   2 -
+>  fs/smb/server/smbacl.c              |  19 +++--
+>  fs/smb/server/tests/smbacl_kunit.c  |   6 +-
+>  fs/smb/server/vfs.c                 | 112 ++++++++++++----------------
+>  fs/smb/server/vfs.h                 |  39 ++++------
+>  fs/smb/server/vfs_cache.c           |   3 +-
+>  fs/xattr.c                          |  92 ++++++++++++-----------
+>  include/linux/xattr.h               |  22 +++---
+>  security/integrity/evm/evm_crypto.c |   8 +-
+>  security/selinux/hooks.c            |   4 +-
+>  security/smack/smack_lsm.c          |   4 +-
+>  20 files changed, 243 insertions(+), 283 deletions(-)
+>
+
+[...]
+
+> diff --git a/fs/overlayfs/copy_up.c b/fs/overlayfs/copy_up.c
+> index e963701b4c87..6dc241f195a6 100644
+> --- a/fs/overlayfs/copy_up.c
+> +++ b/fs/overlayfs/copy_up.c
+> @@ -83,7 +83,7 @@ int ovl_copy_xattr(struct super_block *sb, const struct=
+ path *oldpath, struct de
+>         if (!old->d_inode->i_op->listxattr || !new->d_inode->i_op->listxa=
+ttr)
+>                 return 0;
+>
+> -       list_size =3D vfs_listxattr(old, NULL, 0);
+> +       list_size =3D vfs_listxattr(oldpath, NULL, 0);
+>         if (list_size <=3D 0) {
+>                 if (list_size =3D=3D -EOPNOTSUPP)
+>                         return 0;
+> @@ -94,7 +94,7 @@ int ovl_copy_xattr(struct super_block *sb, const struct=
+ path *oldpath, struct de
+>         if (!buf)
+>                 return -ENOMEM;
+>
+> -       list_size =3D vfs_listxattr(old, buf, list_size);
+> +       list_size =3D vfs_listxattr(oldpath, buf, list_size);
+>         if (list_size <=3D 0) {
+>                 error =3D list_size;
+>                 goto out;
+> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
+> index d915b87c0b06..c13f6b2c915c 100644
+> --- a/fs/overlayfs/overlayfs.h
+> +++ b/fs/overlayfs/overlayfs.h
+> @@ -291,8 +291,7 @@ static inline ssize_t ovl_do_getxattr(const struct pa=
+th *path, const char *name,
+>
+>         WARN_ON(path->dentry->d_sb !=3D path->mnt->mnt_sb);
+>
+> -       err =3D vfs_getxattr(mnt_idmap(path->mnt), path->dentry,
+> -                              name, value, size);
+> +       err =3D vfs_getxattr(path, name, value, size);
+>         len =3D (value && err > 0) ? err : 0;
+>
+>         pr_debug("getxattr(%pd2, \"%s\", \"%*pE\", %zu, 0) =3D %i\n",
+> @@ -325,9 +324,13 @@ static inline int ovl_do_setxattr(struct ovl_fs *ofs=
+, struct dentry *dentry,
+>                                   const char *name, const void *value,
+>                                   size_t size, int flags)
 >  {
->  	return 0;
->  }
-> +static inline void bdev_flush_by_dev(dev_t dev)
-> +{
-> +}
->  static inline void sync_bdevs(bool wait)
+> +       struct path path =3D {
+> +               .mnt =3D ovl_upper_mnt(ofs),
+> +               .dentry =3D dentry,
+> +       };
+> +
+>         /* Use vfs_setxattr(), not __vfs_setxattr(): it idmaps the securi=
+ty.capability rootid. */
+> -       int err =3D vfs_setxattr(ovl_upper_mnt_idmap(ofs), dentry, name,
+> -                              value, size, flags);
+> +       int err =3D vfs_setxattr(&path, name, value, size, flags);
+>
+>         pr_debug("setxattr(%pd2, \"%s\", \"%*pE\", %zu, %d) =3D %i\n",
+>                  dentry, name, min((int)size, 48), value, size, flags, er=
+r);
+> @@ -344,7 +347,12 @@ static inline int ovl_setxattr(struct ovl_fs *ofs, s=
+truct dentry *dentry,
+>  static inline int ovl_do_removexattr(struct ovl_fs *ofs, struct dentry *=
+dentry,
+>                                      const char *name)
 >  {
+> -       int err =3D vfs_removexattr(ovl_upper_mnt_idmap(ofs), dentry, nam=
+e);
+> +       struct path path =3D {
+> +               .mnt =3D ovl_upper_mnt(ofs),
+> +               .dentry =3D dentry,
+> +       };
+> +
+> +       int err =3D vfs_removexattr(&path, name);
+>         pr_debug("removexattr(%pd2, \"%s\") =3D %i\n", dentry, name, err)=
+;
+>         return err;
 >  }
-> -- 
-> 2.39.5
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> diff --git a/fs/overlayfs/xattrs.c b/fs/overlayfs/xattrs.c
+> index 5ae44b9c8790..b4658324b9f3 100644
+> --- a/fs/overlayfs/xattrs.c
+> +++ b/fs/overlayfs/xattrs.c
+> @@ -45,7 +45,7 @@ static int ovl_xattr_set(struct dentry *dentry, struct =
+inode *inode, const char
+>         if (!value && !upperdentry) {
+>                 ovl_path_lower(dentry, &realpath);
+>                 with_ovl_creds(dentry->d_sb)
+> -                       err =3D vfs_getxattr(mnt_idmap(realpath.mnt), rea=
+ldentry, name, NULL, 0);
+> +                       err =3D vfs_getxattr(&realpath, name, NULL, 0);
+>                 if (err < 0)
+>                         goto out;
+>         }
+> @@ -86,7 +86,7 @@ static int ovl_xattr_get(struct dentry *dentry, struct =
+inode *inode, const char
+>         ovl_i_path_real(inode, &realpath);
+>         /* Use vfs_getxattr(), not __vfs_getxattr(): it idmaps the securi=
+ty.capability rootid. */
+>         with_ovl_creds(dentry->d_sb)
+> -               return vfs_getxattr(mnt_idmap(realpath.mnt), realpath.den=
+try, name, value, size);
+> +               return vfs_getxattr(&realpath, name, value, size);
+>  }
+>
+>  static bool ovl_can_list(struct super_block *sb, const char *s)
+> @@ -105,15 +105,20 @@ static bool ovl_can_list(struct super_block *sb, co=
+nst char *s)
+>
+>  ssize_t ovl_listxattr(struct dentry *dentry, char *list, size_t size)
+>  {
+> -       struct dentry *realdentry =3D ovl_dentry_real(dentry);
+> +       struct path realpath;
+>         struct ovl_fs *ofs =3D OVL_FS(dentry->d_sb);
+>         ssize_t res;
+>         size_t len;
+>         char *s;
+>         size_t prefix_len, name_len;
+>
+> +       if (ovl_dentry_upper(dentry))
+> +               ovl_path_upper(dentry, &realpath);
+> +       else
+> +               ovl_path_lower(dentry, &realpath);
+> +
+
+that's ovl_path_real()
+
+I have no technical issue with the ovl patch bits in this series.
+Anyway, I guess landlock is not going to enforce anything on the
+private mnt with ovl_creds anyway?
+
+Thanks,
+Amir.
