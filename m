@@ -1,42 +1,38 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479BC1F1304
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 00:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2EB18B0A
+	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 02:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790210143; cv=none; b=ebR9TsPi2Af6IE8kneBih5/OuBlnI1bGheF3NMdoiyKKt1CAOJi43+kDASPHSg+dTAAsy3LlsiDpKE3Kn7vzB4atlqLdtM8IhzVgwsuwXDfenoQzLUMOHrjvF6M9hdgcxnZoeYCHyZQHkR5ikNdEYWbqAxxttGjYgeJ3/+gv/ik=
+	t=1790218557; cv=none; b=R54Ob9cYQl0hsPfrOh33AfGtM5Jq34giKuKOGaY+ysoCBzv7PIgsd+ikuXAqKGc3a/eROhOktbS2LnwBg+J9ttMnG8t2XMg03F/ItcQKwe4fncfA3X6/Wbyn8Kfrb8Yax4aU3v8vmn5HpdrSGJg3QkqNjYSwsns7TvFj/GJ5/e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790210143; c=relaxed/simple;
-	bh=IL6SrhP13FcM6bA3H2bJNtyJI6PfQqcwkzPwvea/Fsg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nK94mj7BPKU8ghP69fcgr24g6s44qaIMqAbY5cS3h5UvqKSerh+kf5F+v97/GCkMNP1ZfuvZOt9ciifr3COZeGtiCGyvaU7ZcYgbl4WpfGik7cK0yO9BNkkxlAB6hPtio6Jr/ohKVDOVu6kM1+dgmhe7ZvxKukmVLPBor7gsJF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=I5b7oKZ8; arc=none smtp.client-ip=117.135.210.3
+	s=arc-20240116; t=1790218557; c=relaxed/simple;
+	bh=5W8ySdelCPBPMU3yxu92T7qKOlLN3Eps8rGXJRVpONQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hEIYN0A2IutUqhXLUSnjWkrSxetJ3A8Rvy50LtWiSn/NErzAMrn1wENvBkMM33xK0RBzrP7j7gXYzrx7ZpLdP8GJ+uP9DLsOw0R6YcFID0HbPYkUQtSvHT+H/HTit4Pf/Dvjo5kz2Oezvb6zwWpBD8L6gtsUvZdqJwOBQqOxHbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=MUpItQaE; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="I5b7oKZ8"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MUpItQaE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=IL
-	6SrhP13FcM6bA3H2bJNtyJI6PfQqcwkzPwvea/Fsg=; b=I5b7oKZ82jibNYEfFb
-	LAYRMk3KzhG96BmjdntT7lwnORCHkpwJaFz4R5FHVgcirxW3FDbjU6PmmruAcq4i
-	lqFnuHISpljRNPR2T7IxC8/oLTQIu1g7YA+PeZOpLHi0udQCAt12rUZUAT8aTR07
-	2Afd5/GEPBbjxgd/lDpZSRUfU=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=qf
+	rkj9l+kENoufd6Ok0K4V6UDAKalm/KqrpKYXx4bbo=; b=MUpItQaEhuVakTmYrb
+	Nq3SbT4J5yJKq57thdAJm/loxWlZ2w8r3Rre8j/12RecT7smEQI6Ezf4mhLZYXnR
+	5/MsXGpGVKyTb0Nw8xWTLRl5V9j0kZbK6tDx2P+XKp1SUNa/3fxrM65nKAr7Frw0
+	xk9BcbAhkFL70D+KfUeSHa924=
 Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgBnNhc+cLRqWTWxAw--.57379S2;
-	Thu, 24 Sep 2026 08:35:12 +0800 (CST)
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgDX394ikbRql94HBA--.62560S2;
+	Thu, 24 Sep 2026 10:55:31 +0800 (CST)
 From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: hch@lst.de
-Cc: axboe@kernel.dk,
-	brauner@kernel.org,
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>,
 	linux-block@vger.kernel.org,
-	mkp@kernel.org
-Subject: Re: [PATCH] block: reject polled dio with user integrity metadata
-Date: Thu, 24 Sep 2026 08:35:10 +0800
-Message-Id: <20260924003510.4072211-1-yangxiuwei@kylinos.cn>
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH blktests] block/049: test polled dio with user PI metadata
+Date: Thu, 24 Sep 2026 10:55:26 +0800
+Message-Id: <20260924025526.298050-1-yangxiuwei@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260923143937.GA28622@lst.de>
-References: <20260923093732.1504291-1-yangxiuwei@kylinos.cn> <20260923143937.GA28622@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,19 +40,220 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgBnNhc+cLRqWTWxAw--.57379S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUeuWLUUUUU
+X-CM-TRANSID:PSgvCgDX394ikbRql94HBA--.62560S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Jw1rAF13GF1xKFy8AryUtrb_yoW7Wr47p3
+	yFqFyrGrZ7Kr17XF93AF43uFyrAa18u3y7XFZF9w1jyryavF9Iyr4xKry5XF98JrWfWayU
+	Aws2qFZ0kr4DXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UU-BiUUUUU=
 Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwQDzhGq0cEC4kAAA3w
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6gQ1xWq0kSRZFAAA34
 
-Hi Christoph,
+IOPOLL combined with a PI attribute used to leave iocb->private as a
+uio_meta and oops in bio_poll(). The kernel rejects that combination
+with -EOPNOTSUPP. Add a scsi_debug reproducer that expects this result.
 
-On Wed, Sep 23, 2026 at 04:39:37PM +0200, Christoph Hellwig wrote:
-> Can you add a reproducer for this to blktests?
+Assisted-by: LLM
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+---
+Depends on the kernel fix that rejects IOPOLL plus user PI metadata
+with -EOPNOTSUPP. Without that fix this test oopses in bio_poll().
 
-Yes. I'll send one that expects -EOPNOTSUPP.
+Link: https://lore.kernel.org/linux-block/20260923093732.1504291-1-yangxiuwei@kylinos.cn/
 
-Thanks,
-Yang Xiuwei
+The fix is not in mainline yet. Is an oops on kernels without it
+acceptable here, or how should the test avoid that? _have_kver after
+the fix lands would still skip a stable backport, which keeps the old
+version number. The only userspace difference is -EOPNOTSUPP versus
+the oops.
+
+ src/Makefile          |   1 +
+ src/metadata-iopoll.c | 101 ++++++++++++++++++++++++++++++++++++++++++
+ tests/block/049       |  46 +++++++++++++++++++
+ tests/block/049.out   |   2 +
+ 4 files changed, 150 insertions(+)
+ create mode 100644 src/metadata-iopoll.c
+ create mode 100755 tests/block/049
+ create mode 100644 tests/block/049.out
+
+diff --git a/src/Makefile b/src/Makefile
+index dd64694..1e571c6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -31,6 +31,7 @@ C_TARGETS := \
+ 	zbdioctl
+ 
+ C_URING_TARGETS := metadata \
++	metadata-iopoll \
+ 	nvme-passthru-admin-uring
+ C_UBLK_TARGETS := miniublk
+ 
+diff --git a/src/metadata-iopoll.c b/src/metadata-iopoll.c
+new file mode 100644
+index 0000000..95e2bc9
+--- /dev/null
++++ b/src/metadata-iopoll.c
+@@ -0,0 +1,101 @@
++// SPDX-License-Identifier: GPL-3.0+
++#include <errno.h>
++#include <fcntl.h>
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <liburing.h>
++
++#ifndef IORING_RW_ATTR_FLAG_PI
++#define PI_URING_COMPAT
++#define IORING_RW_ATTR_FLAG_PI (1U << 0)
++struct io_uring_attr_pi {
++	__u16 flags;
++	__u16 app_tag;
++	__u32 len;
++	__u64 addr;
++	__u64 seed;
++	__u64 rsvd;
++};
++#endif
++
++#ifndef IO_INTEGRITY_CHK_GUARD
++#define IO_INTEGRITY_CHK_GUARD  (1U << 0)
++#define IO_INTEGRITY_CHK_REFTAG (1U << 1)
++#endif
++
++#define DATA_LEN 4096
++#define META_LEN 64
++
++static void on_alarm(int sig)
++{
++	(void)sig;
++	dprintf(STDERR_FILENO, "timed out\n");
++	_exit(1);
++}
++
++int main(int argc, char **argv)
++{
++	struct io_uring ring;
++	struct io_uring_sqe *sqe;
++	struct io_uring_cqe *cqe;
++	struct io_uring_attr_pi pi = {
++		.flags = IO_INTEGRITY_CHK_GUARD | IO_INTEGRITY_CHK_REFTAG,
++		.len = META_LEN,
++		.seed = 1,
++	};
++	void *data, *meta;
++	int fd, ret;
++
++	if (argc != 2)
++		return 1;
++
++	signal(SIGALRM, on_alarm);
++	alarm(10);
++
++	fd = open(argv[1], O_RDONLY | O_DIRECT);
++	if (fd < 0) {
++		perror("open");
++		return 1;
++	}
++	if (posix_memalign(&data, 4096, DATA_LEN) ||
++	    posix_memalign(&meta, 4096, META_LEN)) {
++		perror("posix_memalign");
++		return 1;
++	}
++	pi.addr = (__u64)(uintptr_t)meta;
++
++	ret = io_uring_queue_init(8, &ring, IORING_SETUP_IOPOLL);
++	if (ret < 0) {
++		fprintf(stderr, "queue_init: %s\n", strerror(-ret));
++		return 1;
++	}
++	sqe = io_uring_get_sqe(&ring);
++	if (!sqe)
++		return 1;
++	io_uring_prep_read(sqe, fd, data, DATA_LEN, 0);
++#ifdef PI_URING_COMPAT
++	sqe->__pad2[0] = IORING_RW_ATTR_FLAG_PI;
++	sqe->addr3 = (__u64)&pi;
++#else
++	sqe->attr_type_mask = IORING_RW_ATTR_FLAG_PI;
++	sqe->attr_ptr = (__u64)&pi;
++#endif
++	ret = io_uring_submit(&ring);
++	if (ret < 1) {
++		fprintf(stderr, "submit: %d\n", ret);
++		return 1;
++	}
++	ret = io_uring_wait_cqe(&ring, &cqe);
++	if (ret < 0) {
++		fprintf(stderr, "wait: %s\n", strerror(-ret));
++		return 1;
++	}
++	if (cqe->res != -EOPNOTSUPP) {
++		fprintf(stderr, "cqe %d\n", cqe->res);
++		return 1;
++	}
++	return 0;
++}
+diff --git a/tests/block/049 b/tests/block/049
+new file mode 100755
+index 0000000..b932414
+--- /dev/null
++++ b/tests/block/049
+@@ -0,0 +1,46 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Yang Xiuwei <yangxiuwei@kylinos.cn>
++#
++# IOPOLL combined with a PI attribute used to oops in bio_poll(). The kernel
++# rejects that combination with -EOPNOTSUPP.
++
++. tests/block/rc
++. common/scsi_debug
++
++DESCRIPTION="iopoll dio with user PI metadata returns -EOPNOTSUPP"
++QUICK=1
++
++requires() {
++	_have_kernel_option IO_URING
++	_have_kernel_option BLK_DEV_INTEGRITY
++	_have_module scsi_debug
++	_have_src_program metadata-iopoll
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _init_scsi_debug dif=1 dix=1 dev_size_mb=64 sector_size=512 \
++			submit_queues=2 poll_queues=1; then
++		return 1
++	fi
++
++	local dev="${SCSI_DEBUG_DEVICES[0]}"
++
++	if [[ "$(<"/sys/block/${dev}/queue/io_poll")" != 1 ]]; then
++		SKIP_REASONS+=("scsi_debug has no poll queue")
++		_exit_scsi_debug
++		return
++	fi
++
++	src/metadata-iopoll "/dev/${dev}" >>"$FULL" 2>&1
++	local rc=$?
++
++	_exit_scsi_debug
++	if ((rc)); then
++		echo "metadata-iopoll failed"
++		return 1
++	fi
++	echo "Test complete"
++}
+diff --git a/tests/block/049.out b/tests/block/049.out
+new file mode 100644
+index 0000000..c88edfe
+--- /dev/null
++++ b/tests/block/049.out
+@@ -0,0 +1,2 @@
++Running block/049
++Test complete
+-- 
+2.25.1
 
