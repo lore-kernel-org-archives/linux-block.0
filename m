@@ -1,159 +1,138 @@
-Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
+Received: from mail-oi2-f12.google.com (mail-oi2-f12.google.com [74.125.231.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857E51DE8AE
-	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 03:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148CA326927
+	for <linux-block@vger.kernel.org>; Thu, 24 Sep 2026 04:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.204
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790219485; cv=pass; b=s/EXXylbnzZyBDJ+qO71nzx9U4he5uwrsjssH0n07Em1XXy2bt/rxNsKIgdeiuXafiaEnuKjq3SgMdtZOM/gul6ALWXEZptXx+r9KeeqAYK6k6OFPxAb3jIBpPbsqnv0GJmAptassvqnRLQaFFFFkd+OQlk87/RCP+BUziXx27k=
+	t=1790224507; cv=pass; b=Y+aUmfEfv9whsC+OjrB50wIcjnLQV6hwR0o9gK5wWIEtiXhxKaOpqe68jkTApuxSFy2Zr+Gztfnu1ohWstYYnIjDhvkaVxmPpz3OJRcJuCw9jLXh1aQVxAd4evYzURmNKSJHonqlAA9ao2N+AMnREq0Sd5FpFERUna9nf3YpNWI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790219485; c=relaxed/simple;
-	bh=2j1C56GM8BFyvZlQYTWpHHylUYR90lKGt/E8S17eoYk=;
+	s=arc-20240116; t=1790224507; c=relaxed/simple;
+	bh=th4Y241gR8fKqXdszPTrMDgI2QzkfuYH1UjS4q/XE0o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fpHL0Wybk7y9NrycgkhZx0nuhocINvuS1W239udbjb6rpFyRH+2cZLbsICx/xoDTg6BB+1ykiwMIDSnUiqmh2mPxLhsljbRja+mdAQ1vHOUCTswShHEYEPyZa/BDm5jYkK3celI44bwM27rvzCkWjBy3agthNz8cL4wtArP1YG8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TfXqSMba; arc=pass smtp.client-ip=74.125.231.171
+	 To:Cc:Content-Type; b=JFDVcRJWgxTUx7hB2iYKPRWYp9mlB4lBAFBgXwPdiEQX6Ox8elwg+3kN9cl9ajTKO/6BQKNpOHgUvuxKuF+D5RSDmFPSpK+1QhpICV7k89KemfNTZNvbol3ZWlvT7ZRJamPDiC96iF7g4jcoKKfdOl+pSaobD9tKT9MOfzCpVVs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yn0yF/PV; arc=pass smtp.client-ip=74.125.231.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfXqSMba"
-Received: by mail-oo2-f43.google.com with SMTP id 006d021491bc7-6b1ae6f5fc7so889688eaf.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 20:11:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790219481; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yn0yF/PV"
+Received: by mail-oi2-f12.google.com with SMTP id 5614622812f47-4b37a36887bso981640b6e.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2026 21:35:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790224505; cv=none;
         d=google.com; s=arc-20260327;
-        b=QTSVq7oVzufPabZ7sSNBv5SUdgMc/RIHORSO8Ohamo9DMLKQAUjvTO7/QsawlDRt60
-         rWPnK6weDqAQfaPj+5HVZQt2F8vS+dhGZttJ/aWTD8GU3UARJJZMiv8HzQDBEwPO9hVS
-         UlmqtZyE+/AEdkmJPqvZOccATmzZRpJyb2g8VsHfhxD/FM4IU1QCbNfN4a0e9qQg6CdJ
-         RIpKIsevZVPTXjz5UTAl+4gHAJg+aa4EozBvb2hBy5KchB+N2U3k89SutauK1A8fk7uG
-         6opBbaqUB02DM9BQn2KvZ144vtABRjhhDJo393F5DT31dkk7qt2A2ctOFoSC6cbjDQH5
-         3UUQ==
+        b=E9yRrteESj+yGnffus5OGbxES4jR9L28XdXNQ06YPgqD9l3ekvyxdHyrgmQHzouOmE
+         Y5UBrZ5WVcC/9lJFlJ4XiftDM9qImqQYe3tsiKQlJy5QIPOO0NVYAkd1ej7FqgsMthOa
+         OQ623dfTxLy6nq06QtpedqC1+YLShRrYo1p1NNRAqEjWbW9KwAndz8qrTKEpt3wvwRsk
+         bxxy41HDD/um/8VWfSYpH+/v7UkG2xd78NJag+NHR26hsGc4gJLtih/yVMxfkrIrIpsq
+         +aoTSGXYGGruJO3BtkyvCnFkXFXg/kViY2HKnDqCoy1N+IOsYW8lcGPZ368NsZ01lWkl
+         /FUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
-        fh=TJyzGoT3ToiKEgSON9lNdNani5ajzxr5s/WG5CJsqcg=;
-        b=c19ZSPsYxizrViCKJ9C85mcyR2t767uwYTDXAeiIFD8KeAmLaygXXhD2p8HOr1l7jF
-         WmYHpzQlRthmtmL26gBNj9Y2Jp/2VCInyY6ECNY/cXyUn8YSqvi6fJU6sNSmj9Q8fJsZ
-         dDkvCztVAaZt3BkH4qqgsOuPkLGynx85huhR10i46aQQWhHDvLNSvA2wRwS8zN9XRno8
-         OHhCO2E3a91UUQODC6dpZGHYAS1/RfPlJ97BxLvMK0gP6yBFF+K5SkADjOCkV2xQxkVM
-         iarIAXFG5GoarGYYpWOnW8w4XO+RwDwyC+3V4zk3lYEps+vxSRqeCW5TvvxDGK1TC2iN
-         xOGw==;
+        bh=HgPIQmEvwYaItDda9jIvvcgV4nx3Zf69aHXsVWLINFs=;
+        fh=S/UMyiKphgCRdQHmtRBrtVDX7/xN6T5pr6OJc+oYL14=;
+        b=QlrWPbmgAbJu7OIjQy9Ru8Wy+Bz1MRQqiNeUBp7HzQn5QvXJ6e4AHCY13ybAGmuErs
+         odL7ls7uwz10HoN4r5alcaHEy7DUiqtXL9V4g9tZX6Zh5pudxqxfsBHgo3Q3gM47dOtg
+         69fdqf4jsTc7GfiXFw9V+qpuXZxWRXDgBPZ0dg1BA40ATZUlFSzqjYdxovc+o+gmOKmb
+         /OjOOj/44aIsUDJKsbe6EPp2vZ0VpoSM6qmf310kVg3C/yRt4+2TSuJnInIjEPf8L+Nc
+         7U1QBDR5/bzGNugWymiu3porvYxAKCOf3HQBk9rVcAHGaBqg3mxAtqgcFYXA5gUPVmER
+         TKpg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790219481; x=1790824281; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790224505; x=1790829305; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
-        b=TfXqSMba54WY0GY9oG64XNy49goW9EVXAFyjh7WC4AZVqRdm3u/GTi1IwwKPRhyIwL
-         LvNzKzpuefIdNAcE62z5F9SREPZvOwQFLtd+xyRcpwzDu6BBtJsVXfyqhXjUQHxDzbXI
-         bW9lMHZEuOe8bFseU9nwPOvFyOvgovvTy6Q9Je7hgqollxdXr5opszCr0JgfHIkebxJB
-         rZpHGDNe0/0x2tjDPflDwf6txNRVSMtTGFajO7Ef0WXzfi3G+BhEypTfDHeE4ql0i6Cn
-         kZcjvC8celmEJQcYXM3xw3qzlXOpynCRP3bssN7aTQ4s0c8ED34hVRVejhNe/Za7yeUU
-         4DXg==
+        bh=HgPIQmEvwYaItDda9jIvvcgV4nx3Zf69aHXsVWLINFs=;
+        b=Yn0yF/PV+g1RlFbDOnz3BVwuIlFOiZkSVx9KP8g9JJeaiPf/TB7+EAkKOzB80b0Iy4
+         ZWASIaRpVAjMSxa+V80uzprm9U65TszsVkBeT8OgaGR7QthwnFstQHNT2W0AbkhyKp3+
+         yit4S/I77KtNKm9MVfYwkL0vJ5lLO6dTffb3N5Q2jEX6lldmUZ/6SEe82WdSzCPyxoc1
+         A+/T7jTV3gL3zpvS799EPh34D2EgigO5yP9P9iUdOnykei9r+IvIw6Kq2UE0dDFE2DMZ
+         qeUdj6ms6Gez9aF6jCdHxQfj1O6IKHUpPeML4ge7l49SRhtEb2VIigkauQB6FqexXzIH
+         x3iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790219481; x=1790824281;
+        d=1e100.net; s=20260707; t=1790224505; x=1790829305;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=PAbCNvl+vbwtDCjhKld2y+X8RPnKNQMIOsSC/w3hdyg=;
-        b=dYXSAG4puEDjiXVj2n65qZVni1VMV+HjC9bOeprVv+FJq7hX3vpNIkU2Cu5yavJUj5
-         RacZlvXm4b+1f9tIcJyp+FA256ugqVCRS+10rLkkfBV/1qt9l6N5ogGj/8UbY0GWhgSd
-         w9qgQ0bs7pTTFyj6SnFMf+8472UVzh+a+xUMXziQrVx23wnyOXmCnwvXUCEGv5DrM0ge
-         ZACHHsI86RnYis5lblug3GbsbWBOD0cVxx9+yqY8vuPzww/YauOaJO6PO/mZhuyQJYnw
-         XQ4s4Q0uvhMRkCL7zcKR9kGV59FxOtWtuOboazV1u5Cw5j2AA9Rfj3RMitm2A2RmnMc9
-         rarw==
-X-Forwarded-Encrypted: i=1; AKwUvBy7Arh6DZWmJpWAvfkNsY49i2gqG8rcefxQuLpkQi5OMWzI70sf67hFYf7lhqE7UD4oXdcktraZBuavLA==@vger.kernel.org
-X-Gm-Message-State: AFuF++npVcISDg90VVWLQOLesKhkmM8f+yjM2P6kb5cs1ukjpodk/GP5
-	UwFIv1TKZvROGqBbltdLpPijAhc7tfs51YnMj7AvrvHZCcRdT8dNlS3UkZaHHhD9P/6dy1jAYrb
-	QE+rY3JqjUhhEg5bdR20eLhuAUjWPLtA=
-X-Gm-Gg: AYBFou3LQOMJpvyALaPNncq7VZX+ObpMufm1Bep7/hl806D3e7lWCMFhwlaCbH6MZVQ
-	vJOW4Rb81Z3npG8/NvBaxF1oAV4ABszIIgOypDzq7GtigQSJqHYmm6jp7kTy0rWUpYxBmEvt4va
-	iit71KPjEHdxpyMCjeO79g+x0cUVbH6SLip5qGygF2j5/SaQNW4BZVEwx0zX6Gqtr/WtNfhqgW0
-	iiGiN+w1KaI4bcjNFijDwp+YvB2mFLOYloxz8EdCphD2LL29vtDyNWxH08aS0ziMJibK13p0jeE
-	KNkLUMipt3ct4+vJDsfNXX+dooQ5NKcK9VUDtBKeb6OvUamOMTxS45LookkxuykqxiJcwSOXHXG
-	BWoaxQliowjVyJqudM9GhP1C/TX70QGEf8h6ActMppLEr9hbaOhivJNA=
-X-Received: by 2002:a05:6820:3092:b0:6c9:83aa:6fbd with SMTP id
- 006d021491bc7-6d4416aaba1mr1152652eaf.66.1790219481377; Wed, 23 Sep 2026
- 20:11:21 -0700 (PDT)
+        bh=HgPIQmEvwYaItDda9jIvvcgV4nx3Zf69aHXsVWLINFs=;
+        b=W0TTPNM9rWflB33eFkIusEJLijXBJ5zs5RHFUI9dfROuo4ZwyQWy3YI8mNhC754130
+         XRcumplq6+QcWSsgvElxuoycOGPpDgHvOVzb83wfrHnGu3inKyF7dlvzL9Act5v6F98c
+         VZpP9qTuEEGISEfcU/A19yBAF9qcTmOzNKLPmvkWM+Ak8wv96LVWYMpjsMUo4frD+eeE
+         6eTs3S256qiXeum3ZbDzFD88lam7gt40/XCykfpZj64kt0Ws4QFRpGoKe87WTDhRY4Ka
+         w+V+jBYmdfufVZSYr8F24WTBVGehU2PqWojCNF2nE1p+3nJhneNz8LG0cgWM3Tg6s3+V
+         RBUw==
+X-Forwarded-Encrypted: i=1; AKwUvBwKsnbBhkD/FbEHSJ8EM6GBdwQ85ypV3+49htJK9S/spoq7bxU5+ehH/r8RT8ACzY95HA5Omi8qlovdww==@vger.kernel.org
+X-Gm-Message-State: AFuF++kPhvFkzUQ5+XQd4rtWgVrL4lsvhOLiqA3JzkXWRaF5noHZFpaW
+	9fxGkmJHNGR3rN+Qy2BTIPeyLJ20fZ4Fknfe30oYAJtrdrAXCqTRYqXNN5J4aC94gIka9wWYhin
+	ZGXRCY/GsBjGPOnYGknTo3C/YVXVFSlk=
+X-Gm-Gg: AYBFou2v7AXcelr8d5o8GhdPBDiQ/Z/UvxquaA+t/J/b717K5wMI+JoNqlAANA/YwsS
+	cCAT0KeM6plFgUvPQlMbAjiALtc04E8nXmXnvJ5qUq/Yoti2tMZ4zJ1fiS7x9lzTizujtUTvxt7
+	Q4kTOIqrlaqKMVJuJmPw2qMcHuHcuoCPcpPcKXfgMOswpyt+u+tWGJh7jN6FVeeWGnb138VZweS
+	bAkKe7l+SmQCIr3XrIhMrQbzDKznFJqG5BcrPzFDXb2GxJuT8FgW/n/BFzYjzLbxGiXnGx/Ze3V
+	wtxhb7uuVTWTXn32sEi0FWYNvG4NKSHdVemtZzlnxWTEVDCWPK2+gUqJreqrIHo49XGb0S5MbPh
+	hU31h+t0r1C0=
+X-Received: by 2002:a05:6808:1992:b0:4b2:98a3:a567 with SMTP id
+ 5614622812f47-4d72be39068mr1776744b6e.4.1790224504958; Wed, 23 Sep 2026
+ 21:35:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <179010105967.8478.2344875677216734809@proton.me>
-In-Reply-To: <179010105967.8478.2344875677216734809@proton.me>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Wed, 23 Sep 2026 22:11:10 -0500
-X-Gm-Features: AclHuK_hx_9XpVaJnWKId8Vpv3AIeuVNOuhwsC5qOUuULKOEPF9dmpRXHbPPP8c
-Message-ID: <CACVXFVNi5E2Anxs5-EwevS+srqv2_D0bp3NJJv_hzM6pBNBWeA@mail.gmail.com>
-Subject: Re: [PATCH] ublk: hold RCU read lock in ublk_try_buf_match()
-To: Paolo Bertinetti <paolobertinetti200f4@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20260923152653.40953-1-yupeng0921@gmail.com> <arP0TmdK3FnNfbwH@localhost.localdomain>
+In-Reply-To: <arP0TmdK3FnNfbwH@localhost.localdomain>
+From: peng yu <yupeng0921@gmail.com>
+Date: Wed, 23 Sep 2026 21:34:48 -0700
+X-Gm-Features: AclHuK942CAMjDTV2Zi3exg6L6EKi3Q-gOuQhHvB5LNabYOBYKDQn8SWx2V9lpQ
+Message-ID: <CAG3TDc0bQJATmJR5dF5j9RoDp1ti-tbAiUkLRGq4zX2CYD3unQ@mail.gmail.com>
+Subject: Re: [PATCH v3] nvmet: add cgroup_path to charge namespace I/O to a cgroup
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Jens Axboe <axboe@kernel.dk>, Maurizio Lombardi <mlombard@arkamax.eu>, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 22, 2026 at 1:17=E2=80=AFPM Paolo Bertinetti
-<paolobertinetti200f4@proton.me> wrote:
+On Wed, Sep 23, 2026 at 8:53=E2=80=AFAM Michal Koutn=C3=BD <mkoutny@suse.co=
+m> wrote:
 >
-> syzbot reports a lockdep splat when I/O is dispatched to a ublk device
-> with UBLK_F_SHMEM_ZC enabled:
+> On Wed, Sep 23, 2026 at 08:26:53AM -0700, Peng Yu <yupeng0921@gmail.com> =
+wrote:
+> > Scenario:
+> > * Create multiple nvmet subsystems/namespaces.
+> > * The namespaces are backed by different LVM logical volumes.
+> > * Some of the logical volumes share the same physical volumes.
 >
->   WARNING: suspicious RCU usage
->   lib/maple_tree.c:720 suspicious rcu_dereference_check() usage!
->   ...
->   Call Trace:
->    mas_root lib/maple_tree.c:720 [inline]
->    mas_start+0x3cc/0x640 lib/maple_tree.c:1250
->    mas_state_walk lib/maple_tree.c:3006 [inline]
->    mas_walk+0x1db/0x490 lib/maple_tree.c:4458
->    ublk_try_buf_match drivers/block/ublk_drv.c:5639 [inline]
->    ublk_init_iod+0x5d2/0x1120 drivers/block/ublk_drv.c:521
->    ublk_dispatch_req+0x97/0x9c0 drivers/block/ublk_drv.c:1776
->    tctx_task_work_run+0x73d/0xa80 io_uring/tw.c:96
->
-> ublk_try_buf_match() calls mas_walk() on the buffer tree without
-> holding the RCU read lock or the tree lock. Writers are already
-> excluded because ublk_lock_buf_tree() freezes the queue, so there is
-> no real race, but maple tree readers must still hold one of the two.
->
-> Take the RCU read lock around the walk.
->
-> Fixes: 4d4a512a1f87 ("ublk: add PFN-based buffer matching in I/O path")
-> Reported-by: syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Db48868c46e62c1c4cb2c
-> Assisted-by: LLM
-> Signed-off-by: Paolo Bertinetti <paolobertinetti200f4@proton.me>
-> ---
-> syzbot tested this patch [1]: the RCU splat is gone, but the reproducer
-> then hits the already open "WARNING in io_wq_put_and_exit (2)" [2],
-> which syzbot has been reporting since May on kernels without this change.
->
-> [1] https://lore.kernel.org/all/6ab1eabe.71f81b7d.15fa6d.003b.GAE@google.=
-com/
-> [2] https://syzkaller.appspot.com/bug?extid=3Db0d54b9e81de55179e47
->
->  drivers/block/ublk_drv.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 66eb55e71..7a64745e1 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -5628,6 +5628,8 @@ static bool ublk_try_buf_match(struct ublk_device *=
-ub,
->         unsigned long expected_offset =3D 0;
->         bool first =3D true;
->
-> +       guard(rcu)();
-> +
+> Why are LVMs mentioned? (The test scenario doesn't seem to use those.
+> And the example is backed by RAM, so where would be any IO to control at
+> all? Note: I'm only giving this part of my attention span.)
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+The LVMs are close to my real use case, so I mentioned them to explain why
+I need this feature.
+When I write the testing code, I try to demonstrate the usage in a
+simpler way, so
+I use RAM devices.
+Sorry for the inconsistency.
 
-Thanks
-Ming Lei
+
+> > * The subsystems are exported to different users.
+> > * We should provide each user a specific iops/bps quota, thus a noisy
+> >   neighbor won't impact the performance of other logical volumes.
+>
+> Why cannot you place users into respective cgroups and configure
+> appropriate per-device limits?
+
+I export the devices to nvme target. Per my understanding, the IOs are
+controlled by kernel threads. The users are remote users, so I can't find
+a way to put them in a local cgroup.
+
+> Thanks for providing more context about the scenario so that I can
+> understand what's the goal and obstacle.
+>
+> Michal
