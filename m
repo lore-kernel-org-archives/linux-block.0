@@ -1,81 +1,80 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0BB3F7AAB;
-	Fri, 25 Sep 2026 05:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055044052C4;
+	Fri, 25 Sep 2026 05:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790313006; cv=none; b=rJvEXjU6yB+G0S6jRAjrPKZfzM9wvzvaYdYUfOPKEYQulWcQ4m7ZzAoJpNaEaJ/N4Dz762Zfz3gfWjRK3qQ6kvYbTlR49UTRnVRYn6CrEMdwZSbptxtqjS79TgNuH/wg3nRVaiifCOTzLv5KdzjgdQP9OkYMtAmQj14rUf6uDV8=
+	t=1790313274; cv=none; b=CHS/WgbUSnvN4ORtBxMa0kLPeyupwiOVkcMw0aolsuWUnIljmmeqMPoMC5X2ka6LtSTYyFbHxjcQb7rYcFeKlBrB9KA1FpxOb+YIKO/nlO87PV4mY6Wzdv+hnBZ07sK3SdzUg5mmwuUK2rjn2/4h4I+89D+ITk6FFpgnLn97yuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790313006; c=relaxed/simple;
-	bh=v64y7N95oMg6Ru5wJOHoWnwLhn0lEqJ9B7e7jl8MkvM=;
+	s=arc-20240116; t=1790313274; c=relaxed/simple;
+	bh=inyUqdWmMk6Xi5GTH3gtRSrWebEOsK++2vbEVN9R9H0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F4Sm+ocI8PK+FmiLx82rwPiIDq2qMQg8lz/Z/DzwECVZsnqCVuH31G29uTvPC2/K/yo3A3lDSwmJ6QTdLYIBIY4bFr9x/n5UyyqrxksBspWzWJr+9+QN3xSr7dgZwVDWlbL2n+qZolcHAG0Rv1EMIJuu2p/bgLdLPFgmVKRwe/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JwW8oDJf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HGIU1Czn; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Hd6qNjaJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+AAfL/Lm; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=Dtm0q8kU8hXAbG0noH7J0Q6kSstg4WZetQg0abne86QbKaBsHV/3KjwHj/rTAYB0CyqBj18ZP6dg0xJJ+dqqcK0cNWzk1TtBNxJYvQofN0P8DcvlugLTgUr9NTQ3GXTTPlzm5VmNukDkWUb0U8ufAbsRO/g2ex9uFTpCUnrFPPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=c+s5PtC7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ofPAGOVL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PNMDKD9Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GuDcHeEd; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JwW8oDJf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HGIU1Czn";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Hd6qNjaJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+AAfL/Lm"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="c+s5PtC7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ofPAGOVL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PNMDKD9Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GuDcHeEd"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3C5B91FFE6;
-	Fri, 25 Sep 2026 05:09:54 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 462BF21CFE;
+	Fri, 25 Sep 2026 05:14:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790312998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1790313264; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D0JZfVv9Tl9PjTrtkqmBRz5s6KPc27+JXH6tHdZHZWM=;
-	b=JwW8oDJfti+pnwyHBiaSGR2i9WEMTlMCPgUBJPEtQRmn98TFYJkP9QHY3axB5igt/nc6cU
-	QNzq/BXKm1oXbisMy52S0F1We+V/GNBTeI8Iprhw2ss2pa1qKioxDgSfP/FTJU6fhUa8eA
-	cgTTPjA8jJQTsscRIVgQbjd5rAAjiAk=
+	bh=qOpvbDL1MnlsGJleBCqgU9n75lUBDxUlMNPY0qUqrGo=;
+	b=c+s5PtC758CtUvBblec7bKLdFrQXQ2M/xNNZ37j+IT3/IhkXN7Q51TAAjhabjL+sTnldgz
+	GfsO5bpIxPmTUwaPe97J55plpVJMp3JX4ZBrSNMOlQmCfODiMUQ/jd3xkPY6c2e2d+paDh
+	PGOoEIYX/sbJ4x/jVStF4dq+8t22FY4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790312998;
+	s=susede2_ed25519; t=1790313264;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D0JZfVv9Tl9PjTrtkqmBRz5s6KPc27+JXH6tHdZHZWM=;
-	b=HGIU1CznmJQAKQX6+atRx85T/TOA2c4IsX4xZcfB0KUp3MvPUxBTojBuTzXFhN/xdKc3yI
-	j1a1yzOQ/OG4KRAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Hd6qNjaJ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="+AAfL/Lm"
+	bh=qOpvbDL1MnlsGJleBCqgU9n75lUBDxUlMNPY0qUqrGo=;
+	b=ofPAGOVLRf+W2qaB33NUZEDtmQznygaW9gpVYGa0eSDlvJ6Krj/ysvigntN7dqHW6CyHGr
+	0Isllbuj2j+Id6AA==
+Authentication-Results: smtp-out1.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790312994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1790313260; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D0JZfVv9Tl9PjTrtkqmBRz5s6KPc27+JXH6tHdZHZWM=;
-	b=Hd6qNjaJKmc+6UAmoTxECGTheOO76ZwWUYZ4HFrJWd0587kQ6fyKdlmm3FLxCYt1Fx/XJc
-	kjMerftAaJu4nmy/xaYSf06eNXzketD43kxtzyGIemw5Qt2Alh0AGBnb1NsC1t49q42Mp5
-	S7uQSXJ7bzhSzcsF1DThg6Vm51G4BSI=
+	bh=qOpvbDL1MnlsGJleBCqgU9n75lUBDxUlMNPY0qUqrGo=;
+	b=PNMDKD9ZdJyWuHvxa7/nG8UBN6o80V1arvnG22z0duAegY6s3aB0/qsA8LbauH9jv7EZ7C
+	azk2QjWwn10tsHQRYGnZLCpCtPA+kFUpX60eVXWYtu8pe1av0eXT3hP0C7WnMgZ0c9SkxM
+	29dtdzXBMraa0aUVT121ontDSUrtUgc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790312994;
+	s=susede2_ed25519; t=1790313260;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D0JZfVv9Tl9PjTrtkqmBRz5s6KPc27+JXH6tHdZHZWM=;
-	b=+AAfL/LmruMK41qlVoULgHUAU3gUxuJHtOPPJqLntUGI/EDUvvRBUc2XTGRJgcI6IyP/Dl
-	6ckMS71us+i9gDCw==
+	bh=qOpvbDL1MnlsGJleBCqgU9n75lUBDxUlMNPY0qUqrGo=;
+	b=GuDcHeEdRDBsH5JoGxNNVENTWS8qUbity0nbjhQEE2YHqBK+D51ZKtY1sBcvvd7zINGllD
+	5xgOFtKUCYkNC4BA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6205213432;
-	Fri, 25 Sep 2026 05:09:53 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9C9C5136F7;
+	Fri, 25 Sep 2026 05:14:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id aDteBSECtmqTfgAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 25 Sep 2026 05:09:53 +0000
-Message-ID: <a7a60b61-24b4-429b-8ccb-ee5b6f06a5ed@suse.de>
-Date: Fri, 25 Sep 2026 07:09:52 +0200
+	id pSfkFysDtmq9AwAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 25 Sep 2026 05:14:19 +0000
+Message-ID: <f8464d20-0cca-4816-bfb5-d19839a1bc4d@suse.de>
+Date: Fri, 25 Sep 2026 07:14:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,103 +82,80 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 7/7] nvme: fcloop: Add set_marginal_rport to sysfs
-To: Jesse Taube <jtaubepe@redhat.com>
-Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Justin Tee <justin.tee@broadcom.com>,
- Naresh Gottumukkala <nareshgottumukkala83@gmail.com>,
- Paul Ely <paul.ely@broadcom.com>, Chaitanya Kulkarni <kch@nvidia.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Nilesh Javali <njavali@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- John Meneghini <jmeneghi@redhat.com>, Bryan Gurney <bgurney@redhat.com>,
- Chris Leech <cleech@redhat.com>, "Ewan D . Milne" <emilne@redhat.com>,
- shinichiro.kawasaki@wdc.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20260902200547.184734-1-jtaubepe@redhat.com>
- <20260902200547.184734-8-jtaubepe@redhat.com>
- <ab97f32b-31dd-4975-a8b2-b445110ae3a9@suse.de>
- <CADRr4bePoiDnWX_XrMWtQe=1g4Yrw1_dK86EV2k9XZR0HnL+UQ@mail.gmail.com>
- <d4879e78-2735-4f86-beab-8aa319e9162c@suse.de>
- <CADRr4bcSvLwzfSiV0LTxnhZR7oo3F1b2XEo+wwqi668Gr2BBQA@mail.gmail.com>
+Subject: Re: [PATCH v5 5/9] block: fail a short atomic pin in
+ bio_iov_iter_get_pages()
+To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ John Garry <john.garry@linux.dev>, Christian Brauner <brauner@kernel.org>,
+ "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <mkp@kernel.org>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>
+References: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
+ <20260923-blkdev-fixes-v5-5-89e60d66eb38@columbia.edu>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CADRr4bcSvLwzfSiV0LTxnhZR7oo3F1b2XEo+wwqi668Gr2BBQA@mail.gmail.com>
+In-Reply-To: <20260923-blkdev-fixes-v5-5-89e60d66eb38@columbia.edu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.30
 X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 3C5B91FFE6
-X-Spamd-Result: default: False [-4.51 / 50.00];
+X-Spamd-Result: default: False [-4.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.993];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_TLS_ALL(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,kernel.dk,lst.de,grimberg.me,broadcom.com,gmail.com,nvidia.com,hansenpartnership.com,oracle.com,marvell.com,redhat.com,wdc.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+]
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
 X-Spam-Flag: NO
-X-Spam-Score: -4.51
 
-On 9/23/26 6:16 PM, Jesse Taube wrote:
-> On Wed, Sep 23, 2026 at 11:34 AM Hannes Reinecke <hare@suse.de> wrote:
->>
->> On 9/23/26 4:56 PM, Jesse Taube wrote:
->>> On Mon, Sep 21, 2026 at 10:03 AM Hannes Reinecke <hare@suse.de> wrote:
->>>>
-[ .. ]
->>>>> @@ -1671,6 +1719,7 @@ static DEVICE_ATTR(del_remote_port, 0200, NULL, fcloop_delete_remote_port);
->>>>>     static DEVICE_ATTR(add_target_port, 0200, NULL, fcloop_create_target_port);
->>>>>     static DEVICE_ATTR(del_target_port, 0200, NULL, fcloop_delete_target_port);
->>>>>     static DEVICE_ATTR(set_cmd_drop, 0200, NULL, fcloop_set_cmd_drop);
->>>>> +static DEVICE_ATTR(set_marginal_rport, 0200, NULL, fcloop_set_marginal_rport);
->>>>>
->>>>>     static struct attribute *fcloop_dev_attrs[] = {
->>>>>         &dev_attr_add_local_port.attr,
->>>>> @@ -1680,6 +1729,7 @@ static struct attribute *fcloop_dev_attrs[] = {
->>>>>         &dev_attr_add_target_port.attr,
->>>>>         &dev_attr_del_target_port.attr,
->>>>>         &dev_attr_set_cmd_drop.attr,
->>>>> +     &dev_attr_set_marginal_rport.attr,
->>>>>         NULL
->>>>>     };
->>>>>
->>>> Please don't make it a fabrics option.
->>>
->>> What do you mean by fabrics option? How should I fix this?
->>>
->> Your patch does two things; one is to modify the parser in
->> fcloop_parse_options, and the other is to implement a new
->> sysfs rport attribute 'set_marginal_rport()'.
->> My suggestion is to drop the first part;
+On 9/24/26 1:56 AM, Tal Zussman wrote:
+> On a partial page pin, __blkdev_direct_IO_simple() and
+> __blkdev_direct_IO_async() submit what was pinned with REQ_ATOMIC set
+> and leave the rest to the buffered fallback, tearing an IOCB_ATOMIC
+> write.
 > 
-> You want to drop the parser?
+> This can be triggered deterministically. A 16K pwritev2(RWF_ATOMIC)
+> whose last page is PROT_NONE, on a scsi_debug device with atomic_wr=1,
+> completes short with only three of the four pages written, violating
+> RWF_ATOMIC semantics.
 > 
-Yes. 'set_marginal_rport()' sets a boolean value.
-You don't really need a parser for that.
+> Make bio_iov_iter_get_pages() release the pins and return -EINVAL when
+> a REQ_ATOMIC bio doesn't cover the whole iterator, since an atomic
+> write is submitted as a single bio and a short one would be torn. That
+> covers iomap as well, where a partially unmapped buffer could trip the
+> WARN_ON_ONCE() in iomap_dio_bio_iter_one(). The async block device path
+> currently sets REQ_ATOMIC after pinning, so set it before, and move
+> REQ_NOWAIT along with it.
+> 
+> Fixes: caf336f81b3a ("block: Add fops atomic write support")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Link: https://sashiko.dev/#/patchset/20260802-blkdev-fixes-v1-0-a82fc549fd74%40columbia.edu?part=2
+> Assisted-by: Claude:claude-fable-5
+> Reviewed-by: John Garry <john.garry@linux.dev>
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> ---
+>   block/bio.c  | 46 ++++++++++++++++++++++++++++++----------------
+>   block/fops.c | 12 ++++++------
+>   2 files changed, 36 insertions(+), 22 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
 
